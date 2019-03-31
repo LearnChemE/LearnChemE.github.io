@@ -4168,6 +4168,17 @@ GPlot.prototype.drawBackground = function() {
 	this.parent.pop();
 };
 
+GPlot.prototype.drawLimits = function() {
+	this.parent.push();
+	this.parent.rectMode(this.parent.CORNER);
+	this.parent.fill(this.bgColor);
+	this.parent.noStroke();
+	this.parent.rect(-this.mar[1], - this.dim[1], this.outerDim[0], -this.outerDim[1]);
+	this.parent.rect(-this.mar[1], - this.outerDim[1], this.mar[0], this.outerDim[1] + this.mar[1]);
+	this.parent.rect(-this.mar[1], this.mar[0], this.outerDim[1], -this.mar[0]+1);
+	this.parent.pop();
+} 
+
 GPlot.prototype.drawBox = function() {
 	this.parent.push();
 	this.parent.rectMode(this.parent.CORNER);
