@@ -21,7 +21,7 @@ var draggingLine = [false, 1]; // Is the line being dragged, if so, which line?
 
 var r; // point radius
 var mouseOffset = [0, 0]; // Mouseclick offset
-var graphicsOffset = [1, 1]; // Quadrants for graphics offset. [1, 1] is top-right, [-1, 1] is top left, etc. Used to prevent graphics from overlapping.
+var graphicsOffset = [[1, 1]]; // Quadrants for graphics offset. [1, 1] is top-right, [-1, 1] is top left, etc. Used to prevent graphics from overlapping.
 
 var i = 1; // iterator variables (comes in handy, since p5.js is a looping library)
 var j = 1;
@@ -31,6 +31,7 @@ let jHat; // 85*196 original size
 let kHat; // 121*206 original size
 
 var selectOptions;
+var addVectorButton;
 
 function preload() {
   iHat = loadImage('../../media/iHatWhite.png');
@@ -38,24 +39,73 @@ function preload() {
   kHat = loadImage('../../media/kHatWhite.png');
 }
 
+class options {
+  constructor(gPlot) {
+    this.gPlot = gPlot;
+    this.width = width;
+    this.height = height;
+  }
+  
+  defaultPlot() {
+    this.gPlot.setPos(0, 0); // sets the top-left corner of the plot at the top-left corner of base canvas
+    this.gPlot.setOuterDim(this.width-100, this.height); // gives the plot identical dimensions to base canvas
+
+    // axes range, labels
+    this.gPlot.setXLim(-xAxisLimit, xAxisLimit); // x limits
+    this.gPlot.setYLim(-yAxisLimit, xAxisLimit); // y limits
+    this.gPlot.getXAxis().getAxisLabel().setText("x - axis"); // x-axis label
+    this.gPlot.getYAxis().getAxisLabel().setText("y - axis"); // y-axis label
+    this.gPlot.getXAxis().setFontSize(18);
+    this.gPlot.getYAxis().setFontSize(18);
+    this.gPlot.getXAxis().getAxisLabel().setFontSize(18);
+    this.gPlot.getYAxis().getAxisLabel().setFontSize(18);
+
+    this.gPlot.getTitle().setText("Learn About Vectors"); // title
+    this.gPlot.getTitle().setFontSize(20);
+  }
+
+  defaultSidebar() {
+    addVectorButton = createButton('add vector');
+    addVectorButton.position(this.width-100, 40);
+    addVectorButton.mousePressed(addVector);
+  
+    selectOptions = createSelect();
+    selectOptions.position(this.width-100, 100);
+    selectOptions.option('vector addition');
+    selectOptions.option('3D vectors');
+    selectOptions.option('another option');
+    selectOptions.changed(mySelectEvent);
+  }
+}
+
+class drawing {
+  constructor(gPlot) {
+    this.gPlot = gPlot;
+  }
+
+  drawMethod() {
+  this.gPlot.beginDraw(); // draws the plot
+  this.gPlot.drawBackground();
+  this.gPlot.drawBox();
+  this.gPlot.setHorizontalAxesNTicks(8);
+  this.gPlot.setVerticalAxesNTicks(8);
+  this.gPlot.drawGridLines(GPlot.BOTH);
+  this.gPlot.drawXAxis();
+  this.gPlot.drawYAxis();
+  this.gPlot.drawTitle();
+  this.gPlot.endDraw();
+  }
+}
+
 function setup() {
   createCanvas(800, 600); // Add base canvas, x-pixels by y-pixels
 
   basePlot2D = new GPlot(this); // see "grafica.js" library for info on GPlots
-  basePlot2D.setPos(0, 0); // sets the top-left corner of the plot at the top-left corner of base canvas
-  basePlot2D.setOuterDim(this.width-100, this.height); // gives the plot identical dimensions to base canvas
-
-  basePlot2D.setXLim(-xAxisLimit, xAxisLimit); // x limits
-  basePlot2D.setYLim(-yAxisLimit, xAxisLimit); // y limits
-  basePlot2D.getXAxis().getAxisLabel().setText("x - axis"); // x-axis label
-  basePlot2D.getYAxis().getAxisLabel().setText("y - axis"); // y-axis label
-  basePlot2D.getXAxis().setFontSize(18);
-  basePlot2D.getYAxis().setFontSize(18);
-  basePlot2D.getXAxis().getAxisLabel().setFontSize(18);
-  basePlot2D.getYAxis().getAxisLabel().setFontSize(18);
-
-  basePlot2D.getTitle().setText("Learn About Vectors"); // title
-  basePlot2D.getTitle().setFontSize(20);
+  
+  ops = new options;
+  ops.gPlot = basePlot2D;
+  ops.defaultPlot();
+  ops.defaultSidebar();
 
   r = 20; // radius of the dragged points (pixels)
 
@@ -63,16 +113,8 @@ function setup() {
  
   background(220); // background color of main canvas to RGB(220, 220, 220) "lighter gray"
 
-  var addVectorButton = createButton('add vector');
-  addVectorButton.position(this.width-100, 40);
-  addVectorButton.mousePressed(addVector);
-
-  selectOptions = createSelect();
-  selectOptions.position(this.width-100, 100);
-  selectOptions.option('vector addition');
-  selectOptions.option('3D vectors');
-  selectOptions.option('another option');
-  selectOptions.changed(mySelectEvent);
+  plotdraw = new drawing;
+  plotdraw.gPlot = basePlot2D;
 }
 
 function mySelectEvent() {
@@ -80,7 +122,10 @@ function mySelectEvent() {
 }
 
 function addVector() {
-
+  pt1.push([300, 400]);
+  pt2.push([500, 600]);
+  graphicsOffset.push([1, 1]);
+  n++;
 }
 
 // a quick function to get the plot coordinates (x, y) at pixels (xPix, yPix). gPlot is the ID of your GPlot.
@@ -96,16 +141,7 @@ function getCoords(x, y, gPlot) {
 function draw() {
   background(255); // draws light gray background every frame
 
-  basePlot2D.beginDraw(); // draws the plot
-  basePlot2D.drawBackground();
-  basePlot2D.drawBox();
-  basePlot2D.setHorizontalAxesNTicks(8);
-  basePlot2D.setVerticalAxesNTicks(8);
-  basePlot2D.drawGridLines(GPlot.BOTH);
-  basePlot2D.drawXAxis();
-  basePlot2D.drawYAxis();
-  basePlot2D.drawTitle();
-  basePlot2D.endDraw();
+  plotdraw.drawMethod();
 
   // iteratively checks to see if the mouse is over any points. if so, sets rollover to "true" and sets the rollover ID to the point ID.
   for (j = 1; j <= n; j++) {
@@ -125,8 +161,8 @@ function draw() {
     pt2Coords[j-1] = loc(pt2[j-1][0], pt2[j-1][1], basePlot2D);
     
     // put text to the right or left? above or below? helps with graphics placement
-    if (pt1[j-1][0] < pt2[j-1][0]) {graphicsOffset[0] = -1} else {graphicsOffset[0] = 1}
-    if (pt1[j-1][1] < pt2[j-1][1]) {graphicsOffset[1] = 1} else {graphicsOffset[1] = -1}
+    if (pt1[j-1][0] < pt2[j-1][0]) {graphicsOffset[j-1][0] = -1} else {graphicsOffset[j-1][0] = 1}
+    if (pt1[j-1][1] < pt2[j-1][1]) {graphicsOffset[j-1][1] = 1} else {graphicsOffset[j-1][1] = -1}
   }
 
   if (draggingPt1[0]) 
@@ -145,7 +181,7 @@ function draw() {
     extraCanvas.clear();
     extraCanvas.fill(255);
     extraCanvas.stroke(0);
-
+    
     for (j = 1; j <= n; j++) {
       extraCanvas.push();
       extraCanvas.strokeWeight(5);
@@ -156,22 +192,22 @@ function draw() {
       extraCanvas.push();
       extraCanvas.strokeWeight(3);
       extraCanvas.stroke(255, 30, 30);
-      extraCanvas.line(pt1[j-1][0]-10*graphicsOffset[0], pt1[j-1][1], pt2[j-1][0]+10*graphicsOffset[0], pt1[j-1][1]);
+      extraCanvas.line(pt1[j-1][0]-10*graphicsOffset[j-1][0], pt1[j-1][1], pt2[j-1][0]+10*graphicsOffset[j-1][0], pt1[j-1][1]);
       extraCanvas.fill(255, 30, 30);
-      extraCanvas.triangle(pt2[j-1][0]+10*graphicsOffset[0], pt1[j-1][1],  pt2[j-1][0]+16*graphicsOffset[0], pt1[j-1][1]+3,  pt2[j-1][0]+16*graphicsOffset[0], pt1[j-1][1]-3);
-      extraCanvas.tint(255, 30, 30);
-      extraCanvas.image(iHat, 0.5*pt1[j-1][0]+0.5*pt2[j-1][0]-30, pt1[j-1][1]-20-30*graphicsOffset[1], 0.12*iHat.width, 0.12*iHat.height);
+      extraCanvas.triangle(pt2[j-1][0]+10*graphicsOffset[j-1][0], pt1[j-1][1],  pt2[j-1][0]+16*graphicsOffset[j-1][0], pt1[j-1][1]+3,  pt2[j-1][0]+16*graphicsOffset[j-1][0], pt1[j-1][1]-3);
+      extraCanvas.tint(255, 50, 50);
+      extraCanvas.image(iHat, 0.5*pt1[j-1][0]+0.5*pt2[j-1][0]-30, pt1[j-1][1]-20-30*graphicsOffset[j-1][1], 0.09*iHat.width, 0.12*iHat.height);
       extraCanvas.pop();
 
       //j-hat arrow
       extraCanvas.push();
       extraCanvas.strokeWeight(3);
       extraCanvas.stroke(30, 30, 255);
-      extraCanvas.line(pt2[j-1][0], pt1[j-1][1] + 4*graphicsOffset[1], pt2[j-1][0], pt2[j-1][1] - 16*graphicsOffset[1]);
+      extraCanvas.line(pt2[j-1][0], pt1[j-1][1] + 4*graphicsOffset[j-1][1], pt2[j-1][0], pt2[j-1][1] - 16*graphicsOffset[j-1][1]);
       extraCanvas.fill(30, 30, 255);
-      extraCanvas.triangle(pt2[j-1][0], pt2[j-1][1] - 14*graphicsOffset[1],  pt2[j-1][0] + 3, pt2[j-1][1] - 20*graphicsOffset[1],  pt2[j-1][0] - 3, pt2[j-1][1] - 20*graphicsOffset[1]);
-      extraCanvas.tint(30, 30, 255);
-      extraCanvas.image(jHat, pt2[j-1][0]-35-50*graphicsOffset[0], 0.5*pt1[j-1][1]+0.5*pt2[j-1][1], 0.12*jHat.width, 0.12*jHat.height)
+      extraCanvas.triangle(pt2[j-1][0], pt2[j-1][1] - 14*graphicsOffset[j-1][1],  pt2[j-1][0] + 3, pt2[j-1][1] - 20*graphicsOffset[j-1][1],  pt2[j-1][0] - 3, pt2[j-1][1] - 20*graphicsOffset[j-1][1]);
+      extraCanvas.tint(50, 50, 255);
+      extraCanvas.image(jHat, pt2[j-1][0]-35-50*graphicsOffset[j-1][0], 0.5*pt1[j-1][1]+0.5*pt2[j-1][1], 0.11*jHat.width, 0.12*jHat.height)
       extraCanvas.pop();
 
       extraCanvas.push();
@@ -179,16 +215,16 @@ function draw() {
       extraCanvas.circle(pt2[j-1][0], pt2[j-1][1], r*0.25);
       extraCanvas.textAlign(CENTER);
       extraCanvas.textSize(18);
+      extraCanvas.noStroke();
       extraCanvas.fill(0);
-      extraCanvas.stroke(0);
-      extraCanvas.text("(".concat(pt1Coords[j-1][0].toFixed(1),", ", pt1Coords[j-1][1].toFixed(1),")"), pt1[j-1][0]+50*graphicsOffset[0], pt1[j-1][1]-20);
-      extraCanvas.text("(".concat(pt2Coords[j-1][0].toFixed(1),", ", pt2Coords[j-1][1].toFixed(1),")"), pt2[j-1][0]-50*graphicsOffset[0], pt2[j-1][1]-10);
+      extraCanvas.text("(".concat(pt1Coords[j-1][0].toFixed(1),", ", pt1Coords[j-1][1].toFixed(1),")"), pt1[j-1][0]+50*graphicsOffset[j-1][0], pt1[j-1][1]-20);
+      extraCanvas.text("(".concat(pt2Coords[j-1][0].toFixed(1),", ", pt2Coords[j-1][1].toFixed(1),")"), pt2[j-1][0]-50*graphicsOffset[j-1][0], pt2[j-1][1]-10);
       extraCanvas.textAlign(LEFT);
       extraCanvas.fill(255, 30, 30);
-      extraCanvas.text("= ".concat((pt2Coords[j-1][0]-pt1Coords[j-1][0]).toFixed(1)), 0.5*pt1[j-1][0]+0.5*pt2[j-1][0]-30+0.2*iHat.width, pt1[j-1][1]-20-30*graphicsOffset[1]+0.12*iHat.height);
+      extraCanvas.text("= ".concat((pt2Coords[j-1][0]-pt1Coords[j-1][0]).toFixed(1)), 0.5*pt1[j-1][0]+0.5*pt2[j-1][0]-30+0.2*iHat.width, pt1[j-1][1]-20-30*graphicsOffset[j-1][1]+0.12*iHat.height);
       extraCanvas.fill(30, 30, 255)
-      extraCanvas.text("= ".concat((pt2Coords[j-1][1]-pt1Coords[j-1][1]).toFixed(1)), pt2[j-1][0]-35-50*graphicsOffset[0]+0.2*jHat.width, 0.5*pt1[j-1][1]+0.5*pt2[j-1][1]+0.1*jHat.height);
-      extraCanvas.pop();
+      extraCanvas.text("= ".concat((pt2Coords[j-1][1]-pt1Coords[j-1][1]).toFixed(1)), pt2[j-1][0]-35-50*graphicsOffset[j-1][0]+0.2*jHat.width, 0.5*pt1[j-1][1]+0.5*pt2[j-1][1]+0.1*jHat.height);
+      extraCanvas.pop();      
     }
   }
 
