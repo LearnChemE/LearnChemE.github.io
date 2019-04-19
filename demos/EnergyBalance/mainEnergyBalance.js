@@ -14,6 +14,8 @@ let D = 0.5 * F;
 let B = (1 - 0.5) * F;
 let textReg = 20;
 let inpB;
+let margX;
+let margY;
 
 function preload() {
   distColImg = loadImage('./img/DistCol.png');
@@ -22,18 +24,17 @@ function preload() {
 function centerCanvas() {
   cnvWidth = Math.min(windowWidth, 1500);
   cnvHeight = Math.min(windowHeight, 1200);
+  
   if(cnvWidth/cnvHeight < aspRatio) {
     cnvHeight = cnvWidth / aspRatio;
   } else if(cnvWidth/cnvHeight > aspRatio) {
     cnvWidth = cnvHeight * aspRatio;
   }
   resizeCanvas(cnvWidth, cnvHeight);
-  let x = (windowWidth - width) / 2;
-  let y = (windowHeight - height) / 2;
-  cnv.position(x, y);
-  nextButton.position(x + 10, y + 10);
-  inpB.position(x + cnvHeight*dColAspRatio/2, y + cnvHeight - 30);
-  inpBbutton.position(x + cnvHeight*dColAspRatio/2 + cnvWidth/5, y + cnvHeight - 30)
+  margX = (windowWidth - width) / 2;
+  margY = (windowHeight - height) / 2;
+  cnv.position(margX, margY);
+  nextButton.position(margX + 10, margY + 10);
   if(cnvWidth < 500) {textSize(12);}
   else if(500 <= cnvWidth && cnvWidth <=1000) {textSize(20);}
   else if(cnvWidth >= 1000) {textSize(24);}
@@ -49,13 +50,8 @@ function setup() {
   nextButton = createButton('begin');
   nextButton.mousePressed(performAction);
 
-  inpB = createInput('');
-  inpB.size(cnvWidth/10);
+  inpB = new submitInput("B = ", cnvWidth/10, "mol/s", "submit");
   inpB.hide();
-
-  inpBbutton = createButton('submit');
-  inpBbutton.mousePressed(performAction);
-  inpBbutton.hide();
 
   dColAspRatio = distColImg.width / distColImg.height;
   
@@ -93,17 +89,11 @@ function draw() {
       break;
     case 2:
       image(distColImg, 150, 50, (cnvHeight - 100)*dColAspRatio, cnvHeight - 100);
-      push();
       text("step 1. solve for B");
       text("F = ".concat(F, " mol/s"), 100, (cnvHeight - 100) / 1.8);
-      textAlign(RIGHT, TOP);
-      text("B = ", cnvHeight*dColAspRatio/2, cnvHeight - 30);
-      text("mol/s", cnvHeight*dColAspRatio/2 + cnvWidth/10, cnvHeight - 30);
-      inpB.show();
-      inpBbutton.show();
+      inpB.place(cnvHeight*dColAspRatio/2, cnvHeight - 30);
       text("D = ".concat(D, " mol/s"), 150 + (cnvHeight-100)*dColAspRatio, 30 + cnvHeight / 2.6);
       text("");
-      pop();
       break;
     case 3:
       image(distColImg, 150, 50, (cnvHeight - 100)*dColAspRatio, cnvHeight - 100);
