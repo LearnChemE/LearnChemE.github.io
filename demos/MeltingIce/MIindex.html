@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!--
+  File: melting-ice.html
+  Purpose: Melting ice simulation
+  Author: Emily Ehrenberger (July 2011)
+ 		  Under the supervision of Margot Vigeant, Bucknell University
+ 		  Based on Flash simulation by Matt Koppenhaver under Professor Michael Prince
+  (c) Margot Vigeant 2011
+-->
+
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>Melting Ice Simulation (MIS)</title>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+        <!-- Bootstrap: Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+        <!-- Bootstrap: Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+        <!-- Bootstrap: Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+        <link href="MISstyle.css" type="text/css" rel="stylesheet" />
+
+		<script type="text/javascript" src="MISscript.js"></script>
+	</head>
+
+	<body>
+    	<noscript><p align="center"><br /><br />JavaScript must be enabled for this application to run correctly. Please enable JavaScript in your browser in order to fully enjoy this page.</p><br /><br /><br /><br /></noscript>
+
+
+        <div id="pageDiv">
+			<h1 id="title">Melting Ice Simulation</h1>
+
+            <div id="sit1Div">
+                <h3 id="sit1Heading">Situation 1</h3>
+
+                <div> <!-- Beginning of input 1 div -->
+
+                    <label id="tempLabel" class="input1Label">Initial Block Temp.:</label>
+                    <input id="temp1" class="input1" type="text"/>
+                    <label id="tempUnits" class="input1Label">&#8451;</label>
+
+                    <label id="heatCapacityLabel" class="input1Label">Block Heat Capacity:</label>
+                    <input id="heatCapacity1" class="input1" type="text" maxLength="3" />
+                    <label id="heatCapacityUnits" class="input1Label">J/(g &#8451;)</label>
+
+                    <label id="massLabel" class="input1Label">Mass of each block:</label>
+                    <input id="mass1" class="input1" type="text" maxlength="2" />
+                    <label id="massUnits" class="input1Label">g</label>
+
+                    <label id="areaLabel" class="input1Label">Area of each block:</label>
+                    <input id="area1" class="input1" type="text" maxlength="1" />
+                    <label id="areaUnits" class="input1Label">cm<sup>2</sup></label>
+
+                    <label id="numBlocksLabel" class="input1Label">Number of blocks:</label>
+                    <select id="numBlocks1" class="input1">
+                    	<option id="numBlocks1Default" value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+
+                    <label id="currentBlockTempLabel" class="input1Label">Current Block Temp.:</label>
+                    <label id="currentBlockTemp1" class="input1Label">200</label>
+                    <label id="currentBlockTempUnits" class="input1Label">&#8451;</label>
+
+                    <label id="stirBarCheckLabel" class="input1Label">Stir Bar:</label>
+                    <input id="stirBarCheck1" name="stirBarCheck1" type="checkbox" value="checked" />
+
+                </div> <!-- End of input form div -->
+
+                <a href="javascript:" id="sit1DefaultButton" class="btn .btn-warning btn-sm" value="sit1Default">Default</a>
+            </div>
+
+            <img id="beakersImg" alt="" src="beakers.png" />
+            <img id="waterImg" alt="" src="water.png" />
+            <img id="stirBar1" alt="" src="stirBar.gif" />
+            <img id="stirBar2" alt="" src="stirBar.gif" />
+
+            <img id="sit1block1" class="sit1block" alt="" src="blank_img.png" />
+            <img id="sit1block2" class="sit1block" alt="" src="blank_img.png" />
+            <img id="sit1block3" class="sit1block" alt="" src="blank_img.png" />
+            <img id="sit1block4" class="sit1block" alt="" src="blank_img.png" />
+            <img id="sit1Ice1" class="sit1Ice" alt="" src="blank_img.png" />
+            <img id="sit1Ice2" class="sit1Ice" alt="" src="blank_img.png" />
+            <img id="sit1Ice3" class="sit1Ice" alt="" src="blank_img.png" />
+
+            <img id="sit2block1" class="sit2block" alt="" src="blank_img.png" />
+            <img id="sit2block2" class="sit2block" alt="" src="blank_img.png" />
+            <img id="sit2block3" class="sit2block" alt="" src="blank_img.png" />
+            <img id="sit2block4" class="sit2block" alt="" src="blank_img.png" />
+            <img id="sit2Ice1" class="sit2Ice" alt="" src="blank_img.png" />
+            <img id="sit2Ice2" class="sit2Ice" alt="" src="blank_img.png" />
+            <img id="sit2Ice3" class="sit2Ice" alt="" src="blank_img.png" />
+
+            <div id="sit2Div"> <!-- Beginning of input 2 div -->
+                <h3 id="sit2Heading">Situation 2</h3>
+                <label id="tempLabel" class="input2Label">Initial Block Temp.:</label>
+                <input id="temp2" class="input2" type="text" maxLength="3" />
+                <label id="tempUnits" class="input2Label">&#8451;</label>
+
+                <label id="heatCapacityLabel" class="input2Label">Block Heat Capacity:</label>
+                <input id="heatCapacity2" class="input2" type="text" maxLength="3" />
+                <label id="heatCapacityUnits" class="input2Label">J/(g &#8451;)</label>
+
+                <label id="massLabel" class="input2Label">Mass of each block:</label>
+                <input id="mass2" class="input2" type="text" maxlength="2" />
+                <label id="massUnits" class="input2Label">g</label>
+
+                <label id="areaLabel" class="input2Label">Area of each block:</label>
+                <input id="area2" class="input2" type="text" maxlength="1" />
+                <label id="areaUnits" class="input2Label">cm<sup>2</sup></label>
+
+                <label id="numBlocksLabel" class="input2Label">Number of blocks:</label>
+                <select id="numBlocks2" class="input2">
+                	<option id="numBlocks2Default" value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+
+                <label id="currentBlockTempLabel" class="input2Label">Current Block Temp.:</label>
+                <label id="currentBlockTemp2" class="input2Label">200</label>
+                <label id="currentBlockTempUnits" class="input2Label">&#8451;</label>
+
+                <label id="stirBarCheckLabel" class="input2Label">Stir Bar:</label>
+                <input id="stirBarCheck2" name="stirBarCheck2" type="checkbox" value="checked" />
+
+                <a href="javascript:" id="sit2DefaultButton" class="btn .btn-warning btn-sm" value="sit2Default">Default</a>
+            </div> <!-- End of input 2 div -->
+
+            <!-- Bootstrap buttons (start/reset) -->
+            <a href="javascript:" id="startButton" class="btn btn-success btn-lg" value="start">Start</a>
+            <a href="javascript:" id="resetButton" class="btn btn-danger btn-lg" value="reset">Reset</a>
+
+            <!-- Glyphicons (pause/help/info -->)
+            <a href="javascript:" id="pauseButton" class="btn btn-default btn-md" value="pause"><span class="glyphicon glyphicon-pause"></span></a>
+            <a href="javascript:" id="infoButton" class="btn btn-default btn-md" value="info"><span class="glyphicon glyphicon-info-sign"></span></a>
+            <a href="javascript:" id="helpButton" class="btn btn-info btn-md" value="help"><span class="glyphicon glyphicon-question-sign"></span></a>
+
+            <!--<label id="graphInfoLabel">Q: What information can you get from looking at the graph?<br /><br />A:</label>-->
+			<label id="initialIceLabel">Initial condition:</label>
+			<label id="initialIce"></label>
+			<label id="initialIceUnits">g ice in each cup</label>
+            <a href="javascript:" id="graphInfo" class="btn btn-info btn-lg" value="graphButton">Enable Graph Tooltips</a>
+            <!--[if IE]><a id="IEexp" href="">Why do my ice cubes look like an 8-bit video game?</a><![endif]-->
+
+            <img id="graphBase" src="graphBase.png" alt="" />
+
+            <textarea id="graphHeightInfo" class="myTooltip">The height of the graph represents how much ice has melted.
+            </textarea>
+            <textarea id="graphSlopeInfo" class="myTooltip">The slope of the graph represents the rate of heat transfer. A steeper slope corresponds to faster heat transfer.
+            </textarea>
+
+            <label id="yLabel1" class="graphLabel"></label>
+            <label id="yLabel2" class="graphLabel"></label>
+            <label id="yLabel3" class="graphLabel"></label>
+            <label id="yLabel4" class="graphLabel"></label>
+            <label id="xLabel1" class="graphLabel"></label>
+            <label id="xLabel2" class="graphLabel"></label>
+            <label id="xLabel3" class="graphLabel"></label>
+            <label id="xLabel4" class="graphLabel"></label>
+        </div>
+	</body>
+</html>
