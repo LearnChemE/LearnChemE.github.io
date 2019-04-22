@@ -15,6 +15,8 @@
 
 $(document).ready(init);
 
+let initTempCold;
+
 // Global constants
 var icewaterTemp = 0;
 var tauNumber = 5; // a scaling factor
@@ -67,6 +69,21 @@ var xScale; // Used to store pixels/second for the x-axis of the graph
 var yScale; // Used to store pixels/gram for the x-axis of the graph
 
 
+window.onload = function() {
+	var panel1 = QuickSettings.create(10, 10, "Settings: Hot")
+		.addRange("Initial Temperature (°C)", 1, 100, 30, 1, function(value) {
+		initialTemp1 = value;
+		getTemps();
+	})
+	.addRange("Block Heat Capacity (J/(g °C))", 0.1, 10, 1, 0.1, function(value) {
+		heatCapacity1 = value;
+		heatCapacity2 = value;
+	})
+	.addRange("Block 1 Mass (g)", 0.1, 100, 1, 0.1, function(value) {
+		mass1 = value;
+		mass2 = value;
+	})
+}
 
 /*
 *************************************************************************
@@ -91,9 +108,10 @@ function init() {
 	resetExperiment(); // the experiment animations must be reset AFTER the graph points are initialized
 
 	// register event handlers for Situation 1 input fields
-	$("#temp1").on('change', getTemps);
-	$("#heatCapacity1").on('change', getHeatCapacities);
-	$("#mass1").on('change', getMasses);
+	//$("#temp1").on('change', getTemps);
+	$("#temp1").hide();
+	$("#heatCapacity1").hide();
+	$("#mass1").hide();
 	$("#area1").on('change', getAreas);
 	$("#numBlocks1").on('change', getNumBlocks);
 	$("#stirBarCheck1").click(toggleStirBar1); // check box must be registered with "click" to work correctly in IE
@@ -101,8 +119,8 @@ function init() {
 
 	// register event handlers for Situation 1 input fields
 	$("#temp2").on('change', getTemps);
-	$("#heatCapacity2").on('change', getHeatCapacities);
-	$("#mass2").on('change', getMasses);
+	$("#heatCapacity2").hide();
+	$("#mass2").hide();
 	$("#area2").on('change', getAreas);
 	$("#numBlocks2").on('change', getNumBlocks);
 	$("#stirBarCheck2").click(toggleStirBar2); // check box must be registered with "click" to work correctly in IE
@@ -207,21 +225,6 @@ function resetExperiment() {
  * "current block temperature" display and the color of the blocks according to the new temperature for each Situation.
 */
 function getTemps() {
-	initialTemp1 = $("#temp1").val();
-	if(initialTemp1 == "") initialTemp1 = NaN; // Ensure a blank text field is read as "no value", not as a value of 0
-
-	// If the value entered is not a number, reset initialTemp1 to its default value
-	if(isNaN(initialTemp1)) {
-		$("#temp1").val(200);
-		initialTemp1 = 200;
-	}
-	// If initialTemp1 is less than 0, set it to 0
-	if(initialTemp1 < 0) {
-		$("#temp1").val(0);
-		initialTemp1 = 0;
-	}
-
-	// Now that initialTemp1 is sure to have a valid value, change the "current temperature"
 	// label to reflect the new temperature
 	currentBlockTemp1 = initialTemp1;
 	$("#currentBlockTemp1").html(currentBlockTemp1);
@@ -292,21 +295,7 @@ function updateBlockColors() {
  * Reads in and validates both heat capacity values, and updates global variables accordingly
 */
 function getHeatCapacities() {
-	heatCapacity1 = $("#heatCapacity1").val();
-	if(heatCapacity1=="") heatCapacity1 = NaN; // Ensure a blank text field is read as "no value", not as a value of 0
-
-	// If the value entered is not a number, reset heatCapacity1 to its default value
-	if(isNaN(heatCapacity1)) {
-		$("#heatCapacity1").val(1);
-		heatCapacity1 = 1;
-	}
-	// If the value entered is less than 0, set it to 0
-	else if(heatCapacity1 <= 0) {
-		$("#heatCapacity1").val(0.1);
-		heatCapacity1 = 0.1;
-	}
-
-
+	
 	heatCapacity2 = $("#heatCapacity2").val();
 	if(heatCapacity2=="") heatCapacity2 = NaN; // Ensure a blank text field is read as "no value", not as a value of 0
 
@@ -615,8 +604,8 @@ function resetSituation1() {
 	// Calls the event handler functions to read in the new values rather than setting them directly, because
 	// some of these parameters require other side effects to happen as well (such as changes in the display)
 	getTemps();
-	getHeatCapacities();
-	getMasses();
+	//getHeatCapacities();
+	//getMasses();
 	getAreas();
 	getNumBlocks();
 	toggleStirBar1();
@@ -640,8 +629,8 @@ function resetSituation2() {
 	// Calls the event handler functions to read in the new values rather than setting them directly, because
 	// some of these parameters require other side effects to happen as well (such as changes in the display)
 	getTemps();
-	getHeatCapacities();
-	getMasses();
+	//getHeatCapacities();
+	//getMasses();
 	getAreas();
 	getNumBlocks();
 	toggleStirBar2();
@@ -820,8 +809,8 @@ function initializeCalculationVars() {
 
 	// Ensure all input values are current
 	getTemps();
-	getHeatCapacities();
-	getMasses();
+	//getHeatCapacities();
+	//getMasses();
 	getAreas();
 	getNumBlocks();
 	toggleStirBar1();
