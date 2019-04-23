@@ -15,8 +15,6 @@
 
 $(document).ready(init);
 
-let initTempCold;
-
 // Global constants
 var icewaterTemp = 0;
 var tauNumber = 5; // a scaling factor
@@ -31,22 +29,22 @@ var sit1BlockTop;
 var sit2BlockTop;
 var sit1BlockHeight;
 var sit2BlockHeight;
-var currentStep;
+var currentStep = 1;
 
 // Variables to hold input values
-var initialTemp1;
-var heatCapacity1;
-var mass1;
-var area1;
-var numBlocks1;
-var stirFactor1;
+var initialTemp1 = 30;
+var heatCapacity1 = 1;
+var mass1 = 1;
+var area1 = 1;
+var numBlocks1 = 1;
+var stirFactor1 = 0.03;
 
-var initialTemp2;
-var heatCapacity2;
-var mass2;
-var area2;
-var numBlocks2;
-var stirFactor2;
+var initialTemp2 = 30;
+var heatCapacity2 = 1;
+var mass2 = 1;
+var area2 = 1;
+var numBlocks2 = 1;
+var stirFactor2 = 0.03;
 
 // Variables that will be necessary for calculations
 var currentBlockTemp1;
@@ -68,21 +66,60 @@ var currentIceHeight2;
 var xScale; // Used to store pixels/second for the x-axis of the graph
 var yScale; // Used to store pixels/gram for the x-axis of the graph
 
+var panel1;
+var panel2;
+
 
 window.onload = function() {
-	var panel1 = QuickSettings.create(10, 10, "Settings: Hot")
+	panel1 = QuickSettings.create(10, 10, "Settings: Hot")
 		.addRange("Initial Temperature (°C)", 1, 100, 30, 1, function(value) {
 		initialTemp1 = value;
 		getTemps();
 	})
 	.addRange("Block Heat Capacity (J/(g °C))", 0.1, 10, 1, 0.1, function(value) {
 		heatCapacity1 = value;
-		heatCapacity2 = value;
 	})
 	.addRange("Block 1 Mass (g)", 0.1, 100, 1, 0.1, function(value) {
 		mass1 = value;
+	})
+	.addRange("Block 1 area (cm²)", 1, 9, 1, 1, function(value) {
+		area1 = value;
+		getAreas();
+	})
+	.addRange("Number of Blocks", 1, 5, 1, 1, function(value) {
+		numBlocks1 = value;
+		getNumBlocks();
+	})
+	.addBoolean("Stir Bar:", false, function(value) {
+		if(value) {$("#stirBar1").show();stirFactor1=0.1;} else {$("#stirBar1").hide();stirFactor1=0.03;}
+	})
+	.setWidth(220)
+	.setDraggable(false);
+
+	panel2 = QuickSettings.create(900, 10, "Settings: Cold")
+		.addRange("Initial Temperature (°C)", 1, 100, 30, 1, function(value) {
+		initialTemp2 = value;
+		getTemps();
+	})
+	.addRange("Block Heat Capacity (J/(g °C))", 0.1, 10, 1, 0.1, function(value) {
+		heatCapacity2 = value;
+	})
+	.addRange("Block 2 Mass (g)", 0.1, 100, 1, 0.1, function(value) {
 		mass2 = value;
 	})
+	.addRange("Block 2 area (cm²)", 1, 9, 1, 1, function(value) {
+		area2 = value;
+		getAreas();
+	})
+	.addRange("Number of Blocks", 1, 5, 1, 1, function(value) {
+		numBlocks2 = value;
+		getNumBlocks();
+	})
+	.addBoolean("Stir Bar:", false, function(value) {
+		if(value) {$("#stirBar2").show();stirFactor2=0.1;} else {$("#stirBar2").hide();stirFactor2=0.03;}
+	})
+	.setWidth(220)
+	.setDraggable(false);
 }
 
 /*
@@ -109,22 +146,11 @@ function init() {
 
 	// register event handlers for Situation 1 input fields
 	//$("#temp1").on('change', getTemps);
-	$("#temp1").hide();
-	$("#heatCapacity1").hide();
-	$("#mass1").hide();
-	$("#area1").on('change', getAreas);
-	$("#numBlocks1").on('change', getNumBlocks);
-	$("#stirBarCheck1").click(toggleStirBar1); // check box must be registered with "click" to work correctly in IE
-	$("#sit1DefaultButton").on('click', resetSituation1);
+
+	$("#sit1DefaultButton").hide();
 
 	// register event handlers for Situation 1 input fields
-	$("#temp2").on('change', getTemps);
-	$("#heatCapacity2").hide();
-	$("#mass2").hide();
-	$("#area2").on('change', getAreas);
-	$("#numBlocks2").on('change', getNumBlocks);
-	$("#stirBarCheck2").click(toggleStirBar2); // check box must be registered with "click" to work correctly in IE
-	$("#sit2DefaultButton").on('click', resetSituation2);
+	$("#sit2DefaultButton").hide();
 
 	// register event handlers for control buttons (start, pause, reset, help)
 	$("#startButton").on('click', startMelting);
@@ -164,22 +190,25 @@ function generateGraphPoints() {
 */
 function resetExperiment() {
 
+	// Re-enable the input fields if they are disabled
+	if(experimentRunning || experimentStarted) {
+	panel1.enableControl("Initial Temperature (°C)");
+	panel1.enableControl("Block Heat Capacity (J/(g °C))");
+	panel1.enableControl("Block 1 Mass (g)");
+	panel1.enableControl("Block 1 area (cm²)");
+	panel1.enableControl("Number of Blocks");
+	panel1.enableControl("Stir Bar:");
+	
+	panel2.enableControl("Initial Temperature (°C)");
+	panel2.enableControl("Block Heat Capacity (J/(g °C))");
+	panel2.enableControl("Block 2 Mass (g)");
+	panel2.enableControl("Block 2 area (cm²)");
+	panel2.enableControl("Number of Blocks");
+	panel2.enableControl("Stir Bar:");
+	}
+	
 	experimentRunning = false;
-	experimentStarted = false;
-
-	// Re-enable the input fields, and change all the colors back to their original
-	// reds and blues. (Many are grayed out manually in the startMelting function.)
-	$(".input1").removeAttr("disabled");
-	$(".input1").css("color", "blue");
-	$("#stirBarCheck1").removeAttr("disabled");
-	$("#sit1DefaultButton").removeAttr("disabled");
-	$("#sit1DefaultButton").css("border-color", "#B90000");
-
-	$(".input2").removeAttr("disabled");
-	$(".input2").css("color", "red");
-	$("#stirBarCheck2").removeAttr("disabled");
-	$("#sit2DefaultButton").removeAttr("disabled");
-	$("#sit2DefaultButton").css("border-color", "#2011D0");
+	experimentStarted = false; 
 
 	$("#startButton").removeAttr("disabled");
 	$("#startButton").css("border-color", "#093");
@@ -193,7 +222,7 @@ function resetExperiment() {
 
 	// Return the blocks to their original positions and the ice cubes to their
 	// original sizes. Hide all data points and labels on the graph.
-	getAreas(); //getAreas automatically returns the blocks to the correct height based on their size
+	
 	$(".sit1Ice").css({height:"42px", width:"85px"});
 	$(".sit2Ice").css({height:"42px", width:"85px"});
 	$(".sit1Point").hide();
@@ -203,6 +232,9 @@ function resetExperiment() {
 	// reset currentBlockTemp1 and currentBlockTemp2 by simply re-reading in the initial
 	// temperature inputs
 	getTemps();
+	getAreas();
+	updateBlockColors();
+	getNumBlocks();
 
 	// Clears the display of initial ice that the beakers start with, since this number is not
 	// calculated until the Start button is pressed
@@ -229,22 +261,6 @@ function getTemps() {
 	currentBlockTemp1 = initialTemp1;
 	$("#currentBlockTemp1").html(currentBlockTemp1);
 
-
-	initialTemp2 = $("#temp2").val();
-	if(initialTemp2 == "") initialTemp2 = NaN; // Ensure a blank text field is read as "no value", not as a value of 0
-
-	// If the value entered is not a number, reset initialTemp2 to its default value
-	if(isNaN(initialTemp2)) {
-		$("#temp2").val(200);
-		initialTemp2 = 200;
-	}
-	// If initialTemp2 is less than 0, set it to 0
-	if(initialTemp2 < 0) {
-		$("#temp2").val(0);
-		initialTemp2 = 0;
-	}
-
-	// Now that initialTemp2 is sure to have a valid value, change the "current temperature"
 	// label to reflect the new temperature
 	currentBlockTemp2 = initialTemp2;
 	$("#currentBlockTemp2").html(currentBlockTemp2);
@@ -289,66 +305,6 @@ function updateBlockColors() {
 }
 
 /*
- * Event Handler Function: getHeatCapacities
- * Called when the user enters a new value for "block heat capacity" for either Situation
- *
- * Reads in and validates both heat capacity values, and updates global variables accordingly
-*/
-function getHeatCapacities() {
-	
-	heatCapacity2 = $("#heatCapacity2").val();
-	if(heatCapacity2=="") heatCapacity2 = NaN; // Ensure a blank text field is read as "no value", not as a value of 0
-
-	// If the value entered is not a number, reset heatCapacity2 to its default value
-	if(isNaN(heatCapacity2)) {
-		$("#heatCapacity2").val(1);
-		heatCapacity2 = 1;
-	}
-	// If the value entered is less than 0, set it to 0
-	else if(heatCapacity2 <= 0) {
-		$("#heatCapacity2").val(0.1);
-		heatCapacity2 = 0.1;
-	}
-}
-
-/*
- * Event Handler Function: getMasses
- * Called when the user enters a new value for "mass of each block" for either Situation
- *
- * Reads in and validates both mass values, and updates global variables accordingly
-*/
-function getMasses() {
-	mass1 = $("#mass1").val();
-	if(mass1=="") mass1 = NaN; // Ensure a blank text field is read as "no value", not as a value of 0
-
-	// If the value entered is not a number, reset mass1 to its default value
-	if(isNaN(mass1)) {
-		$("#mass1").val(40);
-		mass1 = 40;
-	}
-	// If the value entered is less than 0, set it to 0
-	else if(mass1 <= 0) {
-		$("#mass1").val(1);
-		mass1 = 1;
-	}
-
-
-	mass2 = $("#mass2").val();
-	if(mass2=="") mass2 = NaN; // Ensure a blank text field is read as "no value", not as a value of 0
-
-	// If the value entered is not a number, reset mass2 to its default value
-	if(isNaN(mass2)) {
-		$("#mass2").val(40);
-		mass2 = 40;
-	}
-	// If the value entered is less than 0, set it to 0
-	else if(mass2 <= 0) {
-		$("#mass2").val(1);
-		mass2 = 1;
-	}
-}
-
-/*
  * Event Handler Function: getAreas
  * Called when the user enters a new value for "area of each block" for either Situation
  *
@@ -356,15 +312,6 @@ function getMasses() {
  * the size of the block pictures on the display, according to the current area values.
 */
 function getAreas() {
-	area1 = $("#area1").val();
-	if(area1=="") area1 = NaN; // Ensure a blank text field is read as "no value", not as a value of 0
-
-	// If the value entered is not a number, reset area1 to its default value
-	if(isNaN(area1)) {
-		$("#area1").val(4);
-		area1 = 4;
-	}
-
 	// Change the blocks' size according to the input surface area
 	switch(area1*1) { // must multiply by 1 to make sure area1 is treated as an integer
 	case 0: $("#area1").val(1);
@@ -413,18 +360,6 @@ function getAreas() {
 			sit1BlockTop = 60;
 			sit2BlockHeight = 33;
 			break;
-	}
-
-
-	// Now read in and process area2
-
-	area2 = $("#area2").val();
-	if(area2=="") area2 = NaN; // Ensure a blank text field is read as "no value", not as a value of 0
-
-	// If the value entered is not a number, reset area1 to its default value
-	if(isNaN(area2)) {
-		$("#area2").val(4);
-		area1 = 4;
 	}
 
 	// Change the blocks' size according to the input surface area
@@ -477,7 +412,6 @@ function getAreas() {
 			break;
 	}
 }
-
 /*
  * Event Handler Function: getNumBlocks
  * Called when the user enters a new value for "number of blocks" for either Situation
@@ -486,8 +420,7 @@ function getAreas() {
  * blocks in the display so that the numbers the user entered determine the number of blocks they see.
 */
 function getNumBlocks() {
-	numBlocks1 = $("#numBlocks1").val(); // no need for validation because this is a drop-down box, so entering an illegal value is impossible
-
+	
 	switch(numBlocks1*1) {
 	case 1:
 			$("#sit1block1").hide();
@@ -514,9 +447,6 @@ function getNumBlocks() {
 			$("#sit1block4").show();
 			break;
 	}
-
-
-	numBlocks2 = $("#numBlocks2").val();
 
 	switch(numBlocks2*1) {
 	case 1:
@@ -547,46 +477,6 @@ function getNumBlocks() {
 }
 
 /*
- * Event Handler Function: toggleStirBar1
- * Called when the user clicks the checkbox to toggle the stir bar in Situation 1
- *
- * Determines whether the checkbox is now checked or unchecked, and updates global variables
- * accordingly. Displays or hides the stir bar animation accordingly as well.
-*/
-function toggleStirBar1() {
-	var isChecked = $("#stirBarCheck1").is(":checked");
-
-	if(isChecked) {
-		$("#stirBar1").show();
-		stirFactor1 = 0.1;
-	}
-	else {
-		$("#stirBar1").hide();
-		stirFactor1 = 0.03;
-	}
-}
-
-/*
- * Event Handler Function: toggleStirBar2
- * Called when the user clicks the checkbox to toggle the stir bar in Situation 2
- *
- * Determines whether the checkbox is now checked or unchecked, and updates global variables
- * accordingly. Displays or hides the stir bar animation accordingly as well.
-*/
-function toggleStirBar2() {
-	var isChecked = $("#stirBarCheck2").is(":checked");
-
-	if(isChecked) {
-		$("#stirBar2").show();
-		stirFactor2 = 0.1;
-	}
-	else {
-		$("#stirBar2").hide();
-		stirFactor2 = 0.03;
-	}
-}
-
-/*
  * Event Handler Function: resetSituation1
  * Called when the user clicks the "Default" button for Situation 1
  *
@@ -594,21 +484,16 @@ function toggleStirBar2() {
  * and in the display.
 */
 function resetSituation1() {
-	$("#temp1").val(200);
-	$("#heatCapacity1").val(1);
-	$("#mass1").val(40);
-	$("#area1").val(4);
-	$("#numBlocks1").val("1");
-	$("#stirBarCheck1").removeAttr("checked");
-
-	// Calls the event handler functions to read in the new values rather than setting them directly, because
-	// some of these parameters require other side effects to happen as well (such as changes in the display)
+	initialTemp1=30;
+	heatCapacity1=1;
+	mass1=1;
+	area1=1;
+	numBlocks1=1;
+	
 	getTemps();
-	//getHeatCapacities();
-	//getMasses();
 	getAreas();
 	getNumBlocks();
-	toggleStirBar1();
+//	toggleStirBar1();
 }
 
 /*
@@ -619,21 +504,16 @@ function resetSituation1() {
  * and in the display.
 */
 function resetSituation2() {
-	$("#temp2").val(200);
-	$("#heatCapacity2").val(1);
-	$("#mass2").val(40);
-	$("#area2").val(4);
-	$("#numBlocks2").val("1");
-	$("#stirBarCheck2").removeAttr("checked");
-
-	// Calls the event handler functions to read in the new values rather than setting them directly, because
-	// some of these parameters require other side effects to happen as well (such as changes in the display)
+	initialTemp2=30;
+	heatCapacity2=1;
+	mass2=1;
+	area2=1;
+	numBlocks2=1;
+	
 	getTemps();
-	//getHeatCapacities();
-	//getMasses();
 	getAreas();
 	getNumBlocks();
-	toggleStirBar2();
+//	toggleStirBar1();
 }
 
 
@@ -708,6 +588,20 @@ function startMelting() {
 	experimentRunning = true;
 	experimentStarted = true;
 	dropBlocks();
+
+	panel1.disableControl("Initial Temperature (°C)");
+	panel1.disableControl("Block Heat Capacity (J/(g °C))");
+	panel1.disableControl("Block 1 Mass (g)");
+	panel1.disableControl("Block 1 area (cm²)");
+	panel1.disableControl("Number of Blocks");
+	panel1.disableControl("Stir Bar:");
+	
+	panel2.disableControl("Initial Temperature (°C)");
+	panel2.disableControl("Block Heat Capacity (J/(g °C))");
+	panel2.disableControl("Block 2 Mass (g)");
+	panel2.disableControl("Block 2 area (cm²)");
+	panel2.disableControl("Number of Blocks");
+	panel2.disableControl("Stir Bar:");
 }
 
 /*
@@ -741,6 +635,7 @@ function calculateGraphLabels() {
 			qInstant1 = initialQ1;
 		q1 = q1 - qInstant1;
 		currentBlockTemp1 = q1/(numBlocks1 * mass1 * heatCapacity1) + icewaterTemp;
+		console.log(currentBlockTemp1);
 
 		// Calculate heat transfer and new block temperatures for this step for the blocks of situation 2
 		qInstant2 = stirFactor2 * area2 * numBlocks2 * (currentBlockTemp2 - icewaterTemp) * secondsPerStep;
@@ -809,12 +704,11 @@ function initializeCalculationVars() {
 
 	// Ensure all input values are current
 	getTemps();
-	//getHeatCapacities();
-	//getMasses();
 	getAreas();
 	getNumBlocks();
-	toggleStirBar1();
-	toggleStirBar2();
+
+	//toggleStirBar1();
+	//toggleStirBar2();
 
 	var tau1 = mass1 * heatCapacity1/(numBlocks1 * stirFactor1 * area1);
 	var tau2 = mass2 * heatCapacity2/(numBlocks2 * stirFactor2 * area2);

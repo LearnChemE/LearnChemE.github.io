@@ -36,32 +36,6 @@ a {
 
 /**********Class selectors************/
 
-/*****Classes for input fields*****/
-.input1 {
-	color:blue;
-	font-size:13px;
-}
-
-.input2 {
-	color:red;
-	font-size:13px;
-}
-
-.input1Label {
-	position:absolute;
-	font-weight:bold;
-	font-size:0.9em;
-	font-family:sans-serif;
-	color:#B90000;
-}
-
-.input2Label {
-	position:absolute;
-	font-weight:bold;
-	font-size:0.9em;
-	font-family:sans-serif;
-	color:#2011D0;
-}
 
 /******************** Other ************************/
 
@@ -284,56 +258,10 @@ a {
 }
 
 
-/***** input fields for Situation 1 *****/
-#sit1Heading {
-	text-align:center;
-	color:#B90000;
-}
-#temp1 {
-	position:absolute;
-	top:35px;
-	left:140px;
-	width:35px;
-}
-#heatCapacity1 {
-	position:absolute;
-	top:60px;
-	left:140px;
-	width:35px;
-}
-#mass1 {
-	position:absolute;
-	top:85px;
-	left:140px;
-	width:35px;
-}
-#area1 {
-	position:absolute;
-	top:110px;
-	left:140px;
-	width:35px;
-}
-#numBlocks1 {
-	position:absolute;
-	top:135px;
-	left:140px;
-	width:35px;
-}
-#currentBlockTemp1 {
-	position:absolute;
-	top:165px;
-	left:140px;
-	width:35px;
-	overflow:hidden;
-}
-#stirBarCheck1 {
-	position:absolute;
-	top:190px;
-	left:120px;
-}
+/***** default button placements *****/
 #sit1DefaultButton {
 	position:absolute;
-	top:220px;
+	top:250px;
 	left:40px;
 	width:120px;
 	font-weight:bold;
@@ -342,58 +270,9 @@ a {
 	color:#B90000;
 }
 
-
-/***** input fields for Situation 2 *****/
-#sit2Heading {
-	text-align:center;
-	color:#2011D0;
-	/*color:#1A7B17;*/
-}
-#temp2 {
-	position:absolute;
-	top:35px;
-	left:140px;
-	width:35px;
-}
-#heatCapacity2 {
-	position:absolute;
-	top:60px;
-	left:140px;
-	width:35px;
-}
-#mass2 {
-	position:absolute;
-	top:85px;
-	left:140px;
-	width:35px;
-}
-#area2 {
-	position:absolute;
-	top:110px;
-	left:140px;
-	width:35px;
-}
-#numBlocks2 {
-	position:absolute;
-	top:135px;
-	left:140px;
-	width:35px;
-}
-#currentBlockTemp2 {
-	position:absolute;
-	top:165px;
-	left:140px;
-	width:28px;
-	overflow:hidden;
-}
-#stirBarCheck2 {
-	position:absolute;
-	top:190px;
-	left:140px;
-}
 #sit2DefaultButton {
 	position:absolute;
-	top:220px;
+	top:250px;
 	left:40px;
 	width:120px;
 	font-weight:bold;
@@ -526,13 +405,13 @@ a {
 
 #startButton {
 	position:absolute;
-	top:310px;
+	top:410px;
 	left:25px;
 }
 
 #resetButton {
 	position:absolute;
-	top:310px;
+	top:410px;
 	left:100px;
 }
 

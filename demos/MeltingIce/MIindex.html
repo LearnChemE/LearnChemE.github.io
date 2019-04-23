@@ -42,43 +42,6 @@
 			<h1 id="title">Melting Ice Simulation</h1>
 
             <div id="sit1Div">
-                <h3 id="sit1Heading">Situation 1</h3>
-
-                <div> <!-- Beginning of input 1 div -->
-
-                    <label id="tempLabel" class="input1Label">Initial Block Temp.:</label>
-                    <input id="temp1" class="input1" type="text"/>
-                    <label id="tempUnits" class="input1Label">&#8451;</label>
-
-                    <label id="heatCapacityLabel" class="input1Label">Block Heat Capacity:</label>
-                    <input id="heatCapacity1" class="input1" type="text" maxlength="3" />
-                    <label id="heatCapacityUnits" class="input1Label">J/(g &#8451;)</label>
-
-                    <label id="massLabel" class="input1Label">Mass of each block:</label>
-                    <input id="mass1" class="input1" type="text" maxlength="2" />
-                    <label id="massUnits" class="input1Label">g</label>
-
-                    <label id="areaLabel" class="input1Label">Area of each block:</label>
-                    <input id="area1" class="input1" type="text" maxlength="1" />
-                    <label id="areaUnits" class="input1Label">cm<sup>2</sup></label>
-
-                    <label id="numBlocksLabel" class="input1Label">Number of blocks:</label>
-                    <select id="numBlocks1" class="input1">
-                    	<option id="numBlocks1Default" value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                    </select>
-
-                    <label id="currentBlockTempLabel" class="input1Label">Current Block Temp.:</label>
-                    <label id="currentBlockTemp1" class="input1Label">200</label>
-                    <label id="currentBlockTempUnits" class="input1Label">&#8451;</label>
-
-                    <label id="stirBarCheckLabel" class="input1Label">Stir Bar:</label>
-                    <input id="stirBarCheck1" name="stirBarCheck1" type="checkbox" value="checked" />
-
-                </div> <!-- End of input form div -->
-
                 <a href="javascript:" id="sit1DefaultButton" class="btn .btn-warning btn-sm" value="sit1Default">Default</a>
             </div>
 
@@ -104,38 +67,6 @@
             <img id="sit2Ice3" class="sit2Ice" alt="" src="blank_img.png" />
 
             <div id="sit2Div"> <!-- Beginning of input 2 div -->
-                <h3 id="sit2Heading">Situation 2</h3>
-                <label id="tempLabel" class="input2Label">Initial Block Temp.:</label>
-                <input id="temp2" class="input2" type="text" maxLength="3" />
-                <label id="tempUnits" class="input2Label">&#8451;</label>
-
-                <label id="heatCapacityLabel" class="input2Label">Block Heat Capacity:</label>
-                <input id="heatCapacity2" class="input2" type="text" maxLength="3" />
-                <label id="heatCapacityUnits" class="input2Label">J/(g &#8451;)</label>
-
-                <label id="massLabel" class="input2Label">Mass of each block:</label>
-                <input id="mass2" class="input2" type="text" maxlength="2" />
-                <label id="massUnits" class="input2Label">g</label>
-
-                <label id="areaLabel" class="input2Label">Area of each block:</label>
-                <input id="area2" class="input2" type="text" maxlength="1" />
-                <label id="areaUnits" class="input2Label">cm<sup>2</sup></label>
-
-                <label id="numBlocksLabel" class="input2Label">Number of blocks:</label>
-                <select id="numBlocks2" class="input2">
-                	<option id="numBlocks2Default" value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                </select>
-
-                <label id="currentBlockTempLabel" class="input2Label">Current Block Temp.:</label>
-                <label id="currentBlockTemp2" class="input2Label">200</label>
-                <label id="currentBlockTempUnits" class="input2Label">&#8451;</label>
-
-                <label id="stirBarCheckLabel" class="input2Label">Stir Bar:</label>
-                <input id="stirBarCheck2" name="stirBarCheck2" type="checkbox" value="checked" />
-
                 <a href="javascript:" id="sit2DefaultButton" class="btn .btn-warning btn-sm" value="sit2Default">Default</a>
             </div> <!-- End of input 2 div -->
 
@@ -143,7 +74,7 @@
             <a href="javascript:" id="startButton" class="btn btn-success btn-lg" value="start">Start</a>
             <a href="javascript:" id="resetButton" class="btn btn-danger btn-lg" value="reset">Reset</a>
 
-            <!-- Glyphicons (pause/help/info -->)
+            <!-- Glyphicons (pause/help/info) -->
             <a href="javascript:" id="pauseButton" class="btn btn-default btn-md" value="pause"><span class="glyphicon glyphicon-pause"></span></a>
             <a href="javascript:" id="infoButton" class="btn btn-default btn-md" value="info"><span class="glyphicon glyphicon-info-sign"></span></a>
             <a href="javascript:" id="helpButton" class="btn btn-info btn-md" value="help"><span class="glyphicon glyphicon-question-sign"></span></a>
