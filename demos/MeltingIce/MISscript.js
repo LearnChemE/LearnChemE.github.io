@@ -72,21 +72,21 @@ var panel2;
 
 window.onload = function() {
 	panel1 = QuickSettings.create(10, 10, "Settings: Hot")
-		.addRange("Initial Temperature (°C)", 1, 100, 30, 1, function(value) {
+		.addRange("Initial Temperature (°C)", 1, 200, 30, 1, function(value) {
 		initialTemp1 = value;
 		getTemps();
 	})
 	.addRange("Block Heat Capacity (J/(g °C))", 0.1, 10, 1, 0.1, function(value) {
 		heatCapacity1 = value;
 	})
-	.addRange("Block 1 Mass (g)", 0.1, 100, 1, 0.1, function(value) {
+	.addRange("Block 1 Mass (g)", 0.1, 5, 1, 0.1, function(value) {
 		mass1 = value;
 	})
 	.addRange("Block 1 area (cm²)", 1, 9, 1, 1, function(value) {
 		area1 = value;
 		getAreas();
 	})
-	.addRange("Number of Blocks", 1, 5, 1, 1, function(value) {
+	.addRange("Number of Blocks", 1, 4, 1, 1, function(value) {
 		numBlocks1 = value;
 		getNumBlocks();
 	})
@@ -97,21 +97,21 @@ window.onload = function() {
 	.setDraggable(false);
 
 	panel2 = QuickSettings.create(900, 10, "Settings: Cold")
-		.addRange("Initial Temperature (°C)", 1, 100, 30, 1, function(value) {
+		.addRange("Initial Temperature (°C)", 1, 400, 30, 1, function(value) {
 		initialTemp2 = value;
 		getTemps();
 	})
 	.addRange("Block Heat Capacity (J/(g °C))", 0.1, 10, 1, 0.1, function(value) {
 		heatCapacity2 = value;
 	})
-	.addRange("Block 2 Mass (g)", 0.1, 100, 1, 0.1, function(value) {
+	.addRange("Block 2 Mass (g)", 0.1, 10, 1, 0.1, function(value) {
 		mass2 = value;
 	})
 	.addRange("Block 2 area (cm²)", 1, 9, 1, 1, function(value) {
 		area2 = value;
 		getAreas();
 	})
-	.addRange("Number of Blocks", 1, 5, 1, 1, function(value) {
+	.addRange("Number of Blocks", 1, 4, 1, 1, function(value) {
 		numBlocks2 = value;
 		getNumBlocks();
 	})
@@ -238,7 +238,7 @@ function resetExperiment() {
 
 	// Clears the display of initial ice that the beakers start with, since this number is not
 	// calculated until the Start button is pressed
-	$("#initialIce").html("");
+	//$("#initialIce").html("");
 }
 
 
@@ -633,9 +633,11 @@ function calculateGraphLabels() {
 		qInstant1 = stirFactor1 * area1 * numBlocks1 * (currentBlockTemp1 - icewaterTemp) * secondsPerStep;
 		if (qInstant1 > initialQ1)
 			qInstant1 = initialQ1;
+		if((initialQ1-q1)/(1000*2.01) < 1) {
 		q1 = q1 - qInstant1;
 		currentBlockTemp1 = q1/(numBlocks1 * mass1 * heatCapacity1) + icewaterTemp;
-		console.log(currentBlockTemp1);
+		}
+		else {q1 += 0};
 
 		// Calculate heat transfer and new block temperatures for this step for the blocks of situation 2
 		qInstant2 = stirFactor2 * area2 * numBlocks2 * (currentBlockTemp2 - icewaterTemp) * secondsPerStep;
@@ -656,7 +658,7 @@ function calculateGraphLabels() {
 
 	// Now that we know the amount of ice that both beakers will start with (i.e. the max ice that will
 	// be melted) we can update that amount on the display
-	$("#initialIce").html(maxIceMelt);
+	//$("#initialIce").html(maxIceMelt);
 
 	// We only want the order of magnitude for y, so separate out the first digit
 	// and fill in the rest with 0's
@@ -673,6 +675,7 @@ function calculateGraphLabels() {
 	else
 		yMax = Math.ceil(maxIceMelt);
 
+	yMax = Math.min(yMax, 1000);
 
 	// Having calculated yMax, fill in the values of the 4 labels on the y-axis accordingly
 	$("#yLabel1").html(yMax / 4);
@@ -729,21 +732,10 @@ function initializeCalculationVars() {
 	currentIceHeight2 = 42;
 	currentIceWidth2 = 85;
 
-	// Whichever situation has the bigger initial q value should have its ice melt all the way (max time and
-	// max ice melted were calculated to make sure that happens). For the other situation, the amount of ice
-	// that melts is proportional of the ratio of the two situations' initial q values.
-	if(initialQ1 > initialQ2) {
-		iceMeltHeight1 = 42;
-		iceMeltWidth1 = 85;
-		iceMeltHeight2 = initialQ2/initialQ1 * 42;
-		iceMeltWidth2 = initialQ2/initialQ1 * 85;
-	}
-	else {
-		iceMeltHeight2 = 42;
-		iceMeltWidth2 = 85;
-		iceMeltHeight1 = initialQ1/initialQ2 * 42;
-		iceMeltWidth1 = initialQ1/initialQ2 * 85;
-	}
+	iceMeltHeight1 = 42;
+	iceMeltWidth1 = 85;
+	iceMeltHeight2 = 42;
+	iceMeltWidth2 = 85;
 }
 
 function dropBlocks() {
@@ -784,15 +776,19 @@ function calculateStep() {
 	var qInstant1 = stirFactor1 * area1 * numBlocks1 * (currentBlockTemp1 - icewaterTemp) * secondsPerStep;
 	if (qInstant1 > initialQ1)
 		qInstant1 = initialQ1;
-	q1 = q1 - qInstant1;
-	currentBlockTemp1 = q1/(numBlocks1 * mass1 * heatCapacity1) + icewaterTemp;
+	if((initialQ1-q1+qInstant1)/(1000*2.01) < 1) {
+		q1 = q1 - qInstant1;
+		currentBlockTemp1 = q1/(numBlocks1 * mass1 * heatCapacity1) + icewaterTemp;
+		}
+		else {q1 += 0};
 
 	// Calculate heat transfer and new block temperatures for this step for the blocks of situation 2
 	var qInstant2 = stirFactor2 * area2 * numBlocks2 * (currentBlockTemp2 - icewaterTemp) * secondsPerStep;
-	if (qInstant2 > initialQ2)
-		qInstant2 = initialQ2;
-	q2 = q2 - qInstant2;
-	currentBlockTemp2 = q2/(numBlocks2 * mass2 * heatCapacity2) + icewaterTemp;
+	if((initialQ2-q2+qInstant2)/(1000*2.01) < 1) {
+		q2 = q2 - qInstant2;
+		currentBlockTemp2 = q2/(numBlocks2 * mass2 * heatCapacity2) + icewaterTemp;
+		}
+		else {q2 += 0};
 
 	// Calculate the coordinates for the points on the graph
 	var x = currentStep * secondsPerStep * xScale;
@@ -810,9 +806,9 @@ function calculateStep() {
 	// Note that since currentIceHeight is a global variable, it is necessary to make a copy of it
 	// to format it correctly for CSS, because if you change the format of the original you'll have
 	// to change it back again afterwards.
-	currentIceHeight1 = currentIceHeight1 - (qInstant1/initialQ1 * iceMeltHeight1);
+	currentIceHeight1 = Math.max(0, iceMeltHeight1 - ((initialQ1-q1)/(1000*2.01)) * iceMeltHeight1);
 	var cssHeight1 = currentIceHeight1 + "px";
-	currentIceWidth1 = currentIceWidth1 - (qInstant1/initialQ1 * iceMeltWidth1);
+	currentIceWidth1 = Math.max(0, iceMeltWidth1 - ((initialQ1-q1)/(1000*2.01)) * iceMeltWidth1);
 	var cssWidth1 = currentIceWidth1 + "px";
 
 	// Update the current temperature of the blocks on the screen, and change the color to match
@@ -821,9 +817,9 @@ function calculateStep() {
 	updateBlockColors();
 
 	// Calculate the new height and width values for the ice cubes of situation 2
-	currentIceHeight2 = currentIceHeight2 - (qInstant2/initialQ2 * iceMeltHeight2);
+	currentIceHeight2 = Math.max(0, iceMeltHeight2 - ((initialQ2-q2)/(1000*2.01)) * iceMeltHeight2);
 	var cssHeight2 = currentIceHeight2 + "px";
-	currentIceWidth2 = currentIceWidth2 - (qInstant2/initialQ2 * iceMeltWidth2);
+	currentIceWidth2 = Math.max(0, iceMeltWidth2 - ((initialQ2-q2)/(1000*2.01)) * iceMeltWidth2);
 	var cssWidth2 = currentIceWidth2 + "px";
 
 	// Animate blocks. The rest of the visual changes will take place while the animation is
