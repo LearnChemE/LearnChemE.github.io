@@ -32,7 +32,10 @@ let drawArrows = false;
 let drawCoords = false;
 
 let ops;
-let page = "vector addition";
+let pageSelection = sessionStorage.getItem("pageVal");
+let page;
+
+if (sessionStorage.getItem("pageVal")) {page = pageSelection} else {page = "vector addition"}
 
 let twoDimension = true;
 
@@ -96,6 +99,7 @@ class options {
     selectOptions.option('scalar multiplication');
     selectOptions.option('dot product');
     selectOptions.option('cross product');
+    selectOptions.value(page);
     selectOptions.changed(reInitialize);
   }
 }
@@ -145,14 +149,14 @@ function setup() {
     ambientMaterial(39, 235, 91);
     camera(100, -200, (height/2.0) / tan(PI*30.0 / 180.0), 0, 0, 0, 0, 1, 0);
     sliderRange(-2, 2, 0.05);
-    gui = createGui('plot controls', width-200, height);
+    gui = createGui('plot controls', width + 10, 0.42*height);
     gui.addGlobals('x1','y1','z1','x2','y2','z2');
     debugMode();
   }
 }
 
 function reInitialize() {
-  if (page == "cross product") {location.reload();}
+  if (page == "cross product") {sessionStorage.setItem("pageVal", selectOptions.value()); location.reload();}
   page = selectOptions.value();
   if (page == "cross product") {
     twoDimension = false;
