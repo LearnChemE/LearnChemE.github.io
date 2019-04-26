@@ -4,10 +4,14 @@
 <!--
   File: melting-ice.html
   Purpose: Melting ice simulation
-  Author: Emily Ehrenberger (July 2011)
- 		  Under the supervision of Margot Vigeant, Bucknell University
- 		  Based on Flash simulation by Matt Koppenhaver under Professor Michael Prince
+  Original Author: Emily Ehrenberger (July 2011)
+ 		Under the supervision of Margot Vigeant, Bucknell University
+        Based on Flash simulation by Matt Koppenhaver under Professor Michael Prince
+
   (c) Margot Vigeant 2011
+
+(This copy was modified with permission by the author to be adapted to LearnChemE.com)
+(Neil Hendren, University of Colorado Boulder, 2019)
 -->
 
 
@@ -37,70 +41,83 @@
 	<body>
     	<noscript><p align="center"><br /><br />JavaScript must be enabled for this application to run correctly. Please enable JavaScript in your browser in order to fully enjoy this page.</p><br /><br /><br /><br /></noscript>
 
-
-        <div id="pageDiv">
-			<h1 id="title">Melting Ice Simulation</h1>
-
-            <div id="sit1Div">
+        <div id="pageDiv" class="wrapper">
+			
+            <!-- <div id="sit1Div">
                 <a href="javascript:" id="sit1DefaultButton" class="btn .btn-warning btn-sm" value="sit1Default">Default</a>
+            </div> -->
+            <div class="box a" id="topLeft">
             </div>
 
-            <img id="beakersImg" alt="" src="beakers.png" />
-            <img id="waterImg" alt="" src="water.png" />
-            <img id="stirBar1" alt="" src="stirBar.gif" />
-            <img id="stirBar2" alt="" src="stirBar.gif" />
-
-            <img id="sit1block1" class="sit1block" alt="" src="blank_img.png" />
-            <img id="sit1block2" class="sit1block" alt="" src="blank_img.png" />
-            <img id="sit1block3" class="sit1block" alt="" src="blank_img.png" />
-            <img id="sit1block4" class="sit1block" alt="" src="blank_img.png" />
-            <img id="sit1Ice1" class="sit1Ice" alt="" src="blank_img.png" />
-            <img id="sit1Ice2" class="sit1Ice" alt="" src="blank_img.png" />
-            <img id="sit1Ice3" class="sit1Ice" alt="" src="blank_img.png" />
-
-            <img id="sit2block1" class="sit2block" alt="" src="blank_img.png" />
-            <img id="sit2block2" class="sit2block" alt="" src="blank_img.png" />
-            <img id="sit2block3" class="sit2block" alt="" src="blank_img.png" />
-            <img id="sit2block4" class="sit2block" alt="" src="blank_img.png" />
-            <img id="sit2Ice1" class="sit2Ice" alt="" src="blank_img.png" />
-            <img id="sit2Ice2" class="sit2Ice" alt="" src="blank_img.png" />
-            <img id="sit2Ice3" class="sit2Ice" alt="" src="blank_img.png" />
-
-            <div id="sit2Div"> <!-- Beginning of input 2 div -->
+            <!-- <div id="sit2Div"> 
                 <a href="javascript:" id="sit2DefaultButton" class="btn .btn-warning btn-sm" value="sit2Default">Default</a>
-            </div> <!-- End of input 2 div -->
+            </div> -->
 
-            <!-- Bootstrap buttons (start/reset) -->
-            <a href="javascript:" id="startButton" class="btn btn-success btn-lg" value="start">Start</a>
-            <a href="javascript:" id="resetButton" class="btn btn-danger btn-lg" value="reset">Reset</a>
+            <div class="box b" id="topCenter">
+                <div class="box b1" id="buttons1">
+                    <!-- Bootstrap buttons (start/reset) -->
+                    <a href="javascript:" id="startButton" class="btn btn-success btn-lg" value="start">Start</a>
+                    <a href="javascript:" id="resetButton" class="btn btn-danger btn-lg" value="reset">Reset</a>
+                </div>
 
-            <!-- Glyphicons (pause/help/info) -->
-            <a href="javascript:" id="pauseButton" class="btn btn-default btn-md" value="pause"><span class="glyphicon glyphicon-pause"></span></a>
-            <a href="javascript:" id="infoButton" class="btn btn-default btn-md" value="info"><span class="glyphicon glyphicon-info-sign"></span></a>
-            <a href="javascript:" id="helpButton" class="btn btn-info btn-md" value="help"><span class="glyphicon glyphicon-question-sign"></span></a>
+                <div class="box b2" id="buttons2">
+                    <!-- Glyphicons (pause/help/info) -->
+                    <a href="javascript:" id="pauseButton" class="btn btn-default btn-md" value="pause"><span class="glyphicon glyphicon-pause"></span></a>
+                    <a href="javascript:" id="infoButton" class="btn btn-default btn-md" value="info"><span class="glyphicon glyphicon-info-sign"></span></a>
+                    <a href="javascript:" id="helpButton" class="btn btn-info btn-md" value="help"><span class="glyphicon glyphicon-question-sign"></span></a>
+                </div>
 
-            <!--<label id="graphInfoLabel">Q: What information can you get from looking at the graph?<br /><br />A:</label>-->
-			<label id="initialIceLabel">Initial condition:</label>
-			<label id="initialIce">1000</label>
-			<label id="initialIceUnits"> g ice in each cup</label>
-            <a href="javascript:" id="graphInfo" class="btn btn-info btn-lg" value="graphButton">Enable Graph Tooltips</a>
-            <!--[if IE]><a id="IEexp" href="">Why do my ice cubes look like an 8-bit video game?</a><![endif]-->
+                <img id="waterImg" alt="" src="water.png" />
+                <img id="beakersImg" alt="" src="beakers.png" />
+                <img id="stirBar1" alt="" src="stirBar.gif" />
+                <img id="stirBar2" alt="" src="stirBar.gif" />
 
-            <img id="graphBase" src="graphBase.png" alt="" />
+                <img id="sit1block1" class="sit1block" alt="" src="blank_img.png" />
+                <img id="sit1block2" class="sit1block" alt="" src="blank_img.png" />
+                <img id="sit1block3" class="sit1block" alt="" src="blank_img.png" />
+                <img id="sit1block4" class="sit1block" alt="" src="blank_img.png" />
 
-            <textarea id="graphHeightInfo" class="myTooltip">The height of the graph represents how much ice has melted.
-            </textarea>
-            <textarea id="graphSlopeInfo" class="myTooltip">The slope of the graph represents the rate of heat transfer. A steeper slope corresponds to faster heat transfer.
-            </textarea>
+                <img id="sit1Ice1" class="sit1Ice" alt="" src="blank_img.png" />
+                <img id="sit1Ice2" class="sit1Ice" alt="" src="blank_img.png" />
+                <img id="sit1Ice3" class="sit1Ice" alt="" src="blank_img.png" />
 
-            <label id="yLabel1" class="graphLabel"></label>
-            <label id="yLabel2" class="graphLabel"></label>
-            <label id="yLabel3" class="graphLabel"></label>
-            <label id="yLabel4" class="graphLabel"></label>
-            <label id="xLabel1" class="graphLabel"></label>
-            <label id="xLabel2" class="graphLabel"></label>
-            <label id="xLabel3" class="graphLabel"></label>
-            <label id="xLabel4" class="graphLabel"></label>
+                <img id="sit2block1" class="sit2block" alt="" src="blank_img.png" />
+                <img id="sit2block2" class="sit2block" alt="" src="blank_img.png" />
+                <img id="sit2block3" class="sit2block" alt="" src="blank_img.png" />
+                <img id="sit2block4" class="sit2block" alt="" src="blank_img.png" />
+
+                <img id="sit2Ice1" class="sit2Ice" alt="" src="blank_img.png" />
+                <img id="sit2Ice2" class="sit2Ice" alt="" src="blank_img.png" />
+                <img id="sit2Ice3" class="sit2Ice" alt="" src="blank_img.png" />
+
+            </div>
+
+            <div class="box c" id="topRight">
+            </div>
+            
+            <div class="box d" id="bottomCenter">
+
+                <div class="box b3" id="initCond">
+                    <label id="initialIceLabel">Initial condition: 1000g ice in each cup</label>
+                </div>
+                <img id="graphBase" src="graphBase.png" alt="" />
+                <textarea id="graphHeightInfo" class="myTooltip">The height of the graph represents how much ice has melted.
+                </textarea>
+                <textarea id="graphSlopeInfo" class="myTooltip">The slope of the graph represents the rate of heat transfer. A steeper slope corresponds to faster heat transfer.
+                </textarea>
+
+                <label id="yLabel1" class="graphLabel"></label>
+                <label id="yLabel2" class="graphLabel"></label>
+                <label id="yLabel3" class="graphLabel"></label>
+                <label id="yLabel4" class="graphLabel"></label>
+                <label id="xLabel1" class="graphLabel"></label>
+                <label id="xLabel2" class="graphLabel"></label>
+                <label id="xLabel3" class="graphLabel"></label>
+                <label id="xLabel4" class="graphLabel"></label>
+                <a href="javascript:" id="graphInfo" class="btn btn-info btn-lg" value="graphButton">Enable Graph Tooltips</a>
+                <!--[if IE]><a id="IEexp" href="">Why do my ice cubes look like an 8-bit video game?</a><![endif]-->
+            </div>
+            
         </div>
 	</body>
 </html>
