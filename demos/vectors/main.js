@@ -26,10 +26,12 @@ let kHat; // 121*206 original size
 var selectOptions;
 var newVectorButton;
 let sumVectorButton;
+let crossVectorCheckbox;
 let arrowsCheckbox;
 let coordsCheckbox;
 let drawArrows = false;
 let drawCoords = false;
+let drawCross = false;
 
 let ops;
 let pageSelection = sessionStorage.getItem("pageVal");
@@ -88,6 +90,10 @@ class options {
     arrowsCheckbox.position(width-100, 180);
     arrowsCheckbox.changed(mySelectEvent);
 
+    crossVectorCheckbox = createCheckbox('show cross product', false);
+    crossVectorCheckbox.position(width-100, 180);
+    crossVectorCheckbox.changed(mySelectEvent);
+
     coordsCheckbox = createCheckbox('show coordinates', false);
     coordsCheckbox.position(width-100, 210);
     coordsCheckbox.changed(mySelectEvent);
@@ -142,6 +148,7 @@ function setup() {
     plotdraw2D = new drawing;
     plotdraw2D.gPlot = basePlot2D;
     options.defaultSidebar();
+    crossVectorCheckbox.hide();
   }
   else {
     createCanvas(700, 600, WEBGL);
@@ -160,6 +167,11 @@ function reInitialize() {
   page = selectOptions.value();
   if (page == "cross product") {
     twoDimension = false;
+    newVectorButton.hide();
+    sumVectorButton.hide();
+    arrowsCheckbox.hide();
+    coordsCheckbox.hide();
+    crossVectorCheckbox.show();
     setup();
     selectOptions.value("cross product");
   }
@@ -168,6 +180,7 @@ function reInitialize() {
 function mySelectEvent() {
   drawArrows = arrowsCheckbox.checked();
   drawCoords = coordsCheckbox.checked();
+  drawCross = crossVectorCheckbox.checked();
 }
 
 function newVector() {
@@ -400,7 +413,9 @@ function draw() {
       new vector3D(x1, y1, z1);
       ambientMaterial(135, 191, 109);
       new vector3D(x2, y2, z2);
-      vector3D.cross(x1, y1, z1, x2, y2, z2);
+      if(drawCross) {
+        vector3D.cross(x1, y1, z1, x2, y2, z2);
+      }
       break;
   }
   i++;
