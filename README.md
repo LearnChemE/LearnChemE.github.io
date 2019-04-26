@@ -1,3 +1,3 @@
-# p5.js-Demonstrations
-Demonstrations created with the library "P5.js", hosted (or to be hosted in the future) on http://www.learncheme.com/ 
+#In-Browser Demonstrations
+Demonstrations created for http://www.learncheme.com/ . Mostly created with p5.js libraries.
 
