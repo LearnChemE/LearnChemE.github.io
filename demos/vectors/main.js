@@ -43,10 +43,10 @@ let twoDimension = true;
 
 var x1 = 1;
 var y1 = 0;
-var z1 = 1;
-var x2 = 0.2;
-var y2 = 0.8;
-var z2 = -0.2;
+var z1 = 0;
+var x2 = 0;
+var y2 = 1;
+var z2 = 0;
 
 function preload() {
   iHat = loadImage('../../media/iHatWhite.png');
@@ -362,26 +362,35 @@ class vector3D {
     this.y = -y;
     this.z = -z;
 
+    //This calculates the rotation matrix for the cylinder we will draw
     let v0 = createVector(0, 1, 0);
     let v1 = createVector(this.x, this.y, this.z);
     let crossProd = p5.Vector.cross(v0, v1);
-    let phi = Math.acos(this.y / v1.mag());
-        
-    push();
-    rotate(phi, crossProd);
-    translate(0, v1.mag()*100 / 2, 0);
 
-    cylinder(3, 100 * v1.mag());
-    translate(0, v1.mag()*100 / 2 + 2, 0);
-    cone(10, 25);
+    push();
+
+    //Necessary for vectors with only an i-component
+    if(crossProd.x != 0 || crossProd.y != 0 || crossProd.z != 0) {
+      var phi = Math.acos(this.y / v1.mag());
+      rotate(phi, crossProd);
+    } else if (this.y <= 0) {rotateX(PI);}
+
+    //Only draws vectors with magnitude greater than 0
+    if(this.x != 0 || this.y !=0 || this.z != 0) {
+      translate(0, v1.mag()*100 / 2, 0);
+      cylinder(3, 100 * v1.mag());
+      translate(0, v1.mag()*100 / 2 + 2, 0);
+      cone(10, 25);
+    }
+
     pop();
   }
 
+  //static method that draws the cross-product of two vectors
   static cross(X1, Y1, Z1, X2, Y2, Z2) {
     let v0 = createVector(X1, Y1, Z1);
     let v1 = createVector(X2, Y2, Z2);
     let crossProd = p5.Vector.cross(v0, v1);
-
     new vector3D(crossProd.x, crossProd.y, crossProd.z);
   }
 }
