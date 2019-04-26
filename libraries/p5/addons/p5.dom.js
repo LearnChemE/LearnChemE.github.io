@@ -435,6 +435,7 @@
   p5.prototype.createImg = function() {
     p5._validateParameters('createImg', arguments);
     var elt = document.createElement('img');
+    elt.crossOrigin = 'Anonymous';
     var args = arguments;
     var self;
     var setAttrs = function() {
@@ -671,7 +672,7 @@
    * function mySelectEvent() {
    *   var item = sel.value();
    *   background(200);
-   *   text('it is a' + item + '!', 50, 50);
+   *   text('It is a ' + item + '!', 50, 50);
    * }
    * </code></div>
    */
@@ -1002,9 +1003,9 @@
    * @param  {String} [multiple] optional to allow multiple files selected
    * @return {p5.Element} pointer to <a href="#/p5.Element">p5.Element</a> holding created DOM element
    * @example
-   * <div class='norender'><code>
-   * var input;
-   * var img;
+   * <div><code>
+   * let input;
+   * let img;
    *
    * function setup() {
    *   input = createFileInput(handleFile);
@@ -1012,6 +1013,7 @@
    * }
    *
    * function draw() {
+   *   background(255);
    *   if (img) {
    *     image(img, 0, 0, width, height);
    *   }
@@ -1022,6 +1024,8 @@
    *   if (file.type === 'image') {
    *     img = createImg(file.data);
    *     img.hide();
+   *   } else {
+   *     img = null;
    *   }
    * }
    * </code></div>
@@ -1130,12 +1134,20 @@
    * <div><code>
    * var vid;
    * function setup() {
-   *   vid = createVideo(['small.mp4', 'small.ogv', 'small.webm'], vidLoad);
+   *   noCanvas();
+   *
+   *   vid = createVideo(
+   *     ['assets/small.mp4', 'assets/small.ogv', 'assets/small.webm'],
+   *     vidLoad
+   *   );
+   *
+   *   vid.size(100, 100);
    * }
    *
    * // This function is called when the video loads
    * function vidLoad() {
-   *   vid.play();
+   *   vid.loop();
+   *   vid.volume(0);
    * }
    * </code></div>
    */
@@ -1299,6 +1311,7 @@
    *     image(c, 0, 0);
    *   }
    * }
+   * </code></div>
    */
   p5.prototype.createCapture = function() {
     p5._validateParameters('createCapture', arguments);
@@ -1407,11 +1420,9 @@
    */
   p5.Element.prototype.addClass = function(c) {
     if (this.elt.className) {
-      // PEND don't add class more than once
-      //var regex = new RegExp('[^a-zA-Z\d:]?'+c+'[^a-zA-Z\d:]?');
-      //if (this.elt.className.search(/[^a-zA-Z\d:]?hi[^a-zA-Z\d:]?/) === -1) {
-      this.elt.className = this.elt.className + ' ' + c;
-      //}
+      if (!this.hasClass(c)) {
+        this.elt.className = this.elt.className + ' ' + c;
+      }
     } else {
       this.elt.className = c;
     }
@@ -1444,9 +1455,70 @@
    * </code></div>
    */
   p5.Element.prototype.removeClass = function(c) {
-    var regex = new RegExp('(?:^|\\s)' + c + '(?!\\S)');
-    this.elt.className = this.elt.className.replace(regex, '');
-    this.elt.className = this.elt.className.replace(/^\s+|\s+$/g, ''); //prettify (optional)
+    // Note: Removing a class that does not exist does NOT throw an error in classList.remove method
+    this.elt.classList.remove(c);
+    return this;
+  };
+
+  /**
+   *
+   * Checks if specified class already set to element
+   *
+   * @method hasClass
+   * @returns {boolean} a boolean value if element has specified class
+   * @param c {String} class name of class to check
+   * @example
+   * <div class='norender'><code>
+   * var div;
+   *
+   * function setup() {
+   *   div = createDiv('div');
+   *   div.addClass('show');
+   * }
+   *
+   * function mousePressed() {
+   *   if (div.hasClass('show')) {
+   *     div.addClass('show');
+   *   } else {
+   *     div.removeClass('show');
+   *   }
+   * }
+   * </code></div>
+   */
+  p5.Element.prototype.hasClass = function(c) {
+    return this.elt.classList.contains(c);
+  };
+
+  /**
+   *
+   * Toggles element class
+   *
+   * @method toggleClass
+   * @param c {String} class name to toggle
+   * @chainable
+   * @example
+   * <div class='norender'><code>
+   * var div;
+   *
+   * function setup() {
+   *   div = createDiv('div');
+   *   div.addClass('show');
+   * }
+   *
+   * function mousePressed() {
+   *   div.toggleClass('show');
+   * }
+   * </code></div>
+   */
+  p5.Element.prototype.toggleClass = function(c) {
+    // classList also has a toggle() method, but we cannot use that yet as support is unclear.
+    // See https://github.com/processing/p5.js/issues/3631
+    // this.elt.classList.toggle(c);
+    if (this.elt.classList.contains(c)) {
+      this.elt.classList.remove(c);
+    } else {
+      this.elt.classList.add(c);
+    }
     return this;
   };
 
@@ -1692,9 +1764,7 @@
    * given value (2nd arg). If a single argument is given, .style()
    * returns the value of the given property; however, if the single argument
    * is given in css syntax ('text-align:center'), .style() sets the css
-   * appropriatly. .style() also handles 2d and 3d css transforms. If
-   * the 1st arg is 'rotate', 'translate', or 'position', the following arguments
-   * accept Numbers as values. ('translate', 10, 100, 50);
+   * appropriately.
    *
    * @method style
    * @param  {String} property   property to be set
@@ -1712,11 +1782,6 @@
    * button.position(10, 10);
    * </code></div>
    * <div><code class='norender'>
-   * var myDiv = createDiv('I like lizards.');
-   * myDiv.style('position', 20, 20);
-   * myDiv.style('rotate', 45);
-   * </code></div>
-   * <div><code class='norender'>
    * var myDiv;
    * function setup() {
    *   background(200);
@@ -1732,9 +1797,8 @@
   /**
    * @method style
    * @param  {String} property
-   * @param  {String|Number|p5.Color} value     value to assign to property (only String|Number for rotate/translate)
-   * @param  {String|Number|p5.Color} [value2]  position can take a 2nd value
-   * @param  {String|Number|p5.Color} [value3]  translate can take a 2nd & 3rd value
+   * @param  {String|Number|p5.Color} value     value to assign to property
+   * @return {String} current value of property, if no value is given as second argument
    * @chainable
    */
   p5.Element.prototype.style = function(prop, val) {
@@ -1754,6 +1818,7 @@
     }
 
     if (typeof val === 'undefined') {
+      // input provided as single line string
       if (prop.indexOf(':') === -1) {
         var styles = window.getComputedStyle(self.elt);
         var style = styles.getPropertyValue(prop);
@@ -1768,21 +1833,16 @@
         }
       }
     } else {
-      if (prop === 'rotate' || prop === 'translate' || prop === 'position') {
-        var trans = Array.prototype.shift.apply(arguments);
-        var f = this[trans] || this['_' + trans];
-        f.apply(this, arguments);
-      } else {
-        this.elt.style[prop] = val;
-        if (
-          prop === 'width' ||
-          prop === 'height' ||
-          prop === 'left' ||
-          prop === 'top'
-        ) {
-          var numVal = val.replace(/\D+/g, '');
-          this[prop] = parseInt(numVal, 10); // pend: is this necessary?
-        }
+      // input provided as key,val pair
+      this.elt.style[prop] = val;
+      if (
+        prop === 'width' ||
+        prop === 'height' ||
+        prop === 'left' ||
+        prop === 'top'
+      ) {
+        var numVal = val.replace(/\D+/g, '');
+        this[prop] = parseInt(numVal, 10);
       }
     }
     return this;
@@ -1960,15 +2020,20 @@
   /**
    *
    * Sets the width and height of the element. AUTO can be used to
-   * only adjust one dimension. If no arguments given returns the width and height
-   * of the element in an object.
+   * only adjust one dimension at a time. If no arguments are given, it
+   * returns the width and height of the element in an object. In case of
+   * elements which need to be loaded, such as images, it is recommended
+   * to call the function after the element has finished loading.
    *
    * @method size
    * @return {Object} the width and height of the element in an object
    * @example
    * <div class='norender'><code>
-   * var div = createDiv('this is a div');
+   * let div = createDiv('this is a div');
    * div.size(100, 100);
+   * let img = createImg('assets/laDefense.jpg', () => {
+   *   img.size(10, AUTO);
+   * });
    * </code></div>
    */
   /**
@@ -2000,10 +2065,8 @@
           }
           this.elt.setAttribute('width', aW * this._pInst._pixelDensity);
           this.elt.setAttribute('height', aH * this._pInst._pixelDensity);
-          this.elt.setAttribute(
-            'style',
-            'width:' + aW + 'px; height:' + aH + 'px'
-          );
+          this.elt.style.width = aW + 'px';
+          this.elt.style.height = aH + 'px';
           this._pInst.scale(
             this._pInst._pixelDensity,
             this._pInst._pixelDensity
@@ -2016,8 +2079,6 @@
           this.elt.style.height = aH + 'px';
           this.elt.width = aW;
           this.elt.height = aH;
-          this.width = aW;
-          this.height = aH;
         }
 
         this.width = this.elt.offsetWidth;
@@ -2055,6 +2116,111 @@
     delete this;
   };
 
+  /**
+   * Registers a callback that gets called every time a file that is
+   * dropped on the element has been loaded.
+   * p5 will load every dropped file into memory and pass it as a p5.File object to the callback.
+   * Multiple files dropped at the same time will result in multiple calls to the callback.
+   *
+   * You can optionally pass a second callback which will be registered to the raw
+   * <a href="https://developer.mozilla.org/en-US/docs/Web/Events/drop">drop</a> event.
+   * The callback will thus be provided the original
+   * <a href="https://developer.mozilla.org/en-US/docs/Web/API/DragEvent">DragEvent</a>.
+   * Dropping multiple files at the same time will trigger the second callback once per drop,
+   * whereas the first callback will trigger for each loaded file.
+   *
+   * @method drop
+   * @param  {Function} callback  callback to receive loaded file, called for each file dropped.
+   * @param  {Function} [fxn]     callback triggered once when files are dropped with the drop event.
+   * @chainable
+   * @example
+   * <div><code>
+   * function setup() {
+   *   var c = createCanvas(100, 100);
+   *   background(200);
+   *   textAlign(CENTER);
+   *   text('drop file', width / 2, height / 2);
+   *   c.drop(gotFile);
+   * }
+   *
+   * function gotFile(file) {
+   *   background(200);
+   *   text('received file:', width / 2, height / 2);
+   *   text(file.name, width / 2, height / 2 + 50);
+   * }
+   * </code></div>
+   *
+   * <div><code>
+   * var img;
+   *
+   * function setup() {
+   *   var c = createCanvas(100, 100);
+   *   background(200);
+   *   textAlign(CENTER);
+   *   text('drop image', width / 2, height / 2);
+   *   c.drop(gotFile);
+   * }
+   *
+   * function draw() {
+   *   if (img) {
+   *     image(img, 0, 0, width, height);
+   *   }
+   * }
+   *
+   * function gotFile(file) {
+   *   img = createImg(file.data).hide();
+   * }
+   * </code></div>
+   *
+   * @alt
+   * Canvas turns into whatever image is dragged/dropped onto it.
+   */
+  p5.Element.prototype.drop = function(callback, fxn) {
+    // Is the file stuff supported?
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+      if (!this._dragDisabled) {
+        this._dragDisabled = true;
+
+        var preventDefault = function(evt) {
+          evt.preventDefault();
+        };
+
+        // If you want to be able to drop you've got to turn off
+        // a lot of default behavior.
+        // avoid `attachListener` here, since it overrides other handlers.
+        this.elt.addEventListener('dragover', preventDefault);
+
+        // If this is a drag area we need to turn off the default behavior
+        this.elt.addEventListener('dragleave', preventDefault);
+      }
+
+      // Deal with the files
+      p5.Element._attachListener(
+        'drop',
+        function(evt) {
+          evt.preventDefault();
+          // Call the second argument as a callback that receives the raw drop event
+          if (typeof fxn === 'function') {
+            fxn.call(this, evt);
+          }
+          // A FileList
+          var files = evt.dataTransfer.files;
+
+          // Load each one and trigger the callback
+          for (var i = 0; i < files.length; i++) {
+            var f = files[i];
+            p5.File._load(f, callback);
+          }
+        },
+        this
+      );
+    } else {
+      console.log('The File APIs are not fully supported in this browser.');
+    }
+
+    return this;
+  };
+
   // =============================================================================
   //                         p5.MediaElement additions
   // =============================================================================
@@ -2078,6 +2244,7 @@
     this._prevTime = 0;
     this._cueIDCounter = 0;
     this._cues = [];
+    this._pixelsState = this;
     this._pixelDensity = 1;
     this._modified = false;
     this._pixelsDirty = true;
@@ -2768,7 +2935,11 @@
     this.setModified(true);
     return this;
   };
-  p5.MediaElement.prototype.get = function(x, y, w, h) {
+  p5.MediaElement.prototype.get = function() {
+    this._ensureCanvas();
+    return p5.Renderer2D.prototype.get.apply(this, arguments);
+  };
+  p5.MediaElement.prototype._getPixel = function() {
     if (this.loadedmetadata) {
       // wait for metadata
       var currentTime = this.elt.currentTime;
@@ -2777,16 +2948,10 @@
       } else {
         this._ensureCanvas();
       }
-
-      return p5.Renderer2D.prototype.get.call(this, x, y, w, h);
-    } else if (typeof x === 'undefined') {
-      return new p5.Image(1, 1);
-    } else if (w > 1) {
-      return new p5.Image(x, y, w, h);
-    } else {
-      return [0, 0, 0, 255];
     }
+    return p5.Renderer2D.prototype._getPixel.apply(this, arguments);
   };
+
   p5.MediaElement.prototype.set = function(x, y, imgOrCol) {
     if (this.loadedmetadata) {
       // wait for metadata
@@ -3163,13 +3328,9 @@
     this._prevTime = playbackTime;
   };
 
-  // =============================================================================
-  //                         p5.File
-  // =============================================================================
-
   /**
-   * Base class for a file
-   * Using this for createFileInput
+   * Base class for a file.
+   * Used for Element.drop and createFileInput.
    *
    * @class p5.File
    * @constructor
@@ -3220,28 +3381,28 @@
      */
     this.data = undefined;
   };
-});
 
-p5.File._createLoader = function(theFile, callback) {
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    var p5file = new p5.File(theFile);
-    p5file.data = e.target.result;
-    callback(p5file);
+  p5.File._createLoader = function(theFile, callback) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var p5file = new p5.File(theFile);
+      p5file.data = e.target.result;
+      callback(p5file);
+    };
+    return reader;
   };
-  return reader;
-};
 
-p5.File._load = function(f, callback) {
-  // Text or data?
-  // This should likely be improved
-  if (/^text\//.test(f.type)) {
-    p5.File._createLoader(f, callback).readAsText(f);
-  } else if (!/^(video|audio)\//.test(f.type)) {
-    p5.File._createLoader(f, callback).readAsDataURL(f);
-  } else {
-    var file = new p5.File(f);
-    file.data = URL.createObjectURL(f);
-    callback(file);
-  }
-};
+  p5.File._load = function(f, callback) {
+    // Text or data?
+    // This should likely be improved
+    if (/^text\//.test(f.type)) {
+      p5.File._createLoader(f, callback).readAsText(f);
+    } else if (!/^(video|audio)\//.test(f.type)) {
+      p5.File._createLoader(f, callback).readAsDataURL(f);
+    } else {
+      var file = new p5.File(f);
+      file.data = URL.createObjectURL(f);
+      callback(file);
+    }
+  };
+});
