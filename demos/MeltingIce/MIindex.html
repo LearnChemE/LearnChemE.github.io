@@ -32,7 +32,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
         <script src="quicksettings3/quicksettings.js"></script>
-
+        <link id="qs_styles" rel="stylesheet" href="quicksettings3/quicksettings.css">
         <link href="MISstyle.css" type="text/css" rel="stylesheet" />
 
 		<script type="text/javascript" src="MISscript.js"></script>
@@ -94,12 +94,13 @@
 
             <div class="box c" id="topRight">
             </div>
+
+            <div class="box b3" id="initCond">
+                <label id="initialIceLabel">Initial condition: 1000g ice in each cup</label>
+            </div>
             
             <div class="box d" id="bottomCenter">
 
-                <div class="box b3" id="initCond">
-                    <label id="initialIceLabel">Initial condition: 1000g ice in each cup</label>
-                </div>
                 <img id="graphBase" src="graphBase.png" alt="" />
                 <textarea id="graphHeightInfo" class="myTooltip">The height of the graph represents how much ice has melted.
                 </textarea>

@@ -69,8 +69,41 @@ var yScale; // Used to store pixels/gram for the x-axis of the graph
 var panel1;
 var panel2;
 
+class ControllerStyle {
+	constructor(data) {
+		this.data = data;
+
+		var styleTag = document.getElementById("qs_styles");
+		if(this.data == "defaultStyle") {
+			styleTag.href = "quicksettings3/quicksettings.css";
+		}
+		else {
+			styleTag.href = "quicksettings3/quicksettings_" + this.data + ".css";
+		}
+	}
+};
+
+function resize() {
+	var w1 = $("#topLeft").width();
+	var w2 = $("#topRight").width();
+	panel1.setWidth(w1);
+	panel2.setWidth(w2);
+	
+	panel1.setPosition(0, 30);
+	panel2.setPosition($("#bottomCenter").width() - w2, 30);
+	
+	if(window.innerWidth > 900) {
+		new ControllerStyle("defaultStyle");
+	} else {
+		new ControllerStyle("tiny")
+	}
+	/*if(window.innerWidth < 700) {
+		$(".qs_label").css("fontSize", "0.8em");
+	} else {$(".qs_label").css("fontSize", "");}*/
+}
 
 window.onload = function() {
+	QuickSettings.useExtStyleSheet();
 	panel1 = QuickSettings.create(0, 30, "Settings: Situation 1")
 		.addRange("Initial Temperature (°C)", 1, 200, 30, 1, function(value) {
 		initialTemp1 = value;
@@ -93,7 +126,6 @@ window.onload = function() {
 	.addBoolean("Stir Bar:", false, function(value) {
 		if(value) {$("#stirBar1").show();stirFactor1=0.1;} else {$("#stirBar1").hide();stirFactor1=0.03;}
 	})
-	.setWidth(220)
 	.setDraggable(true);
 
 	panel2 = QuickSettings.create($("#bottomCenter").width() - 220, 30, "Settings: Situation 2")
@@ -118,9 +150,12 @@ window.onload = function() {
 	.addBoolean("Stir Bar:", false, function(value) {
 		if(value) {$("#stirBar2").show();stirFactor2=0.1;} else {$("#stirBar2").hide();stirFactor2=0.03;}
 	})
-	.setWidth(220)
 	.setDraggable(true);
+
+	resize();
 }
+
+window.onresize = function() {resize()}
 
 /*
 *************************************************************************
@@ -235,7 +270,6 @@ function resetExperiment() {
 	getAreas();
 	updateBlockColors();
 	getNumBlocks();
-
 }
 
 
