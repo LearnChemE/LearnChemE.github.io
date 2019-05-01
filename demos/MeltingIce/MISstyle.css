@@ -13,14 +13,14 @@ body {
   
   .wrapper {
 	width: 95%;
-	
+	height: minmax(500px, 1200px);
 	min-height: 500px;
 	max-height: 1200px;
-	max-width:1200px;
-	min-width:500px;
+	max-width: 1200px;
+	min-width: 500px;
 	display: grid;
 	grid-template-columns: 25% 50% 25%;
-	grid-template-rows: 40% 2% 58%;
+	grid-template-rows: 40fr 2fr 58fr;
 	grid-gap: 10px;
 	grid-row-gap: 1.5em;
 	background-color: none;
@@ -29,10 +29,16 @@ body {
   
   .box {
 	background-color: rgb(100, 99, 99, 0);
-	min-height: 120px;
+
 	border-radius: 5px;
 	padding: 0px;
 	font-size: 150%;
+  }
+  
+  .b {
+	position: relative;
+	display: grid;
+	grid-template-rows: 5% 5% 15%;
   }
 
   .d {
@@ -49,75 +55,67 @@ body {
 	max-height: 1.5em;
  }
 
-	#initialIceLabel {
+#initialIceLabel {
 	position: absolute;
 	left: 50%;
 	transform: translate(-50%, 0%);
 	top: 0px;
 	font-size: 0.9em;
 	white-space: nowrap;
-	}
+}
 
-  #beakersImg {
+#beakersImg {
 	display: inline-block;
 	position: absolute;
 	left: 0px;
 	bottom: 0px;
-  	max-width: 100%;
-  	height: 47%;
+	max-width: 100%;
+	height: 47%;
 	overflow: hidden;
-  }
+}
 
-  #buttons1 {
+#buttons1 {
 	position: absolute;
 	display: inline-block;
 	justify-self: center;
 	margin-top: 0%;
-  }
+}
 
-  #buttons2 {
+#buttons2 {
 	position: absolute;
 	justify-self: center;
 	margin-top: 50px;
-  }
+}
 
-  
-
-  .b {
-	position: relative;
-	display: grid;
-	grid-template-rows: 5% 5% 15%;
-  }
-
-  #waterImg {
+#waterImg {
 	display: inline-block;
 	position: absolute;
 	left: 0px;
 	bottom: 0px;
-  	max-width: 100%;
-  	height: 47%;
+	max-width: 100%;
+	height: 47%;
 	overflow: hidden;
 	opacity: 0.7;
 	z-index:2;
-  }
+}
 
-  #graphBase {
+#graphBase {
 	display: inline-block;
 	position: absolute;
 	margin: auto;
 	width: 100%;
-  	height: 100%;
+	height: 100%;
 	overflow: hidden;
-  }
+}
 
-  #graphInfo {
-	  position: absolute;
-	  justify-self: center;
-	  bottom: -15%;
-	  left: 40%;
-  }
+#graphInfo {
+	position: absolute;
+	justify-self: center;
+	bottom: -15%;
+	left: 40%;
+}
 
-  .sit1block {
+.sit1block {
 	position: absolute;
 	bottom:40%;
 	left:0px;
@@ -139,7 +137,7 @@ body {
 }
 .sit1Ice {
 	position:absolute;
-	height:9.5%;
+	height:19.5%;
 	width:10.2%;
 	border-style:solid;
 	border-width:thin;
