@@ -4,14 +4,15 @@ var yAxisLimit = 4;
 
 var pts = [[200, 400], [400, 200]]; // Default location of coordinates. Note that this is px, not coordinate
 var ptCoords = []; // Their corresponding coordinates (solved for in the program)
-var n = pts.length; // number of lines
+var n = pts.length; // number of points
+var vSum = [[200, 400], [400, 200]];
 
 var rolloverPt = [false, 1]; // Is the mouse over the circle, if so, which circle?
 var rolloverLine = [false, 1]; // Is the mouse over the line, if so, which line?
 var draggingPt = [false, 1]; // Is a point being dragged, if so, which point?
 var draggingLine = [false, 1]; // Is the line being dragged, if so, which line?
 var mouseOffset = [0, 0]; // Mouseclick offset
-var r; // point radius
+var r = 10; // // radius of the dragged points (pixels)
 
 var graphicsOffset = [[1, 1], [1, 1]]; // Quadrants for graphics offset. [1, 1] is top-right, [-1, 1] is top left, etc. Used to prevent graphics from overlapping.
 let offset = [];
@@ -26,10 +27,14 @@ let kHat; // 121*206 original size
 var selectOptions;
 var newVectorButton;
 let sumVectorButton;
+let sumPressed = false;
+let removeVectorButton;
+let resetVectorsButton;
 let crossVectorCheckbox;
 let arrowsCheckbox;
 let coordsCheckbox;
-let drawArrows = false;
+
+let drawArrows = [false, false, false, false, false];
 let drawCoords = false;
 let drawCross = false;
 
@@ -47,6 +52,11 @@ var z1 = 0;
 var x2 = 0;
 var y2 = 1;
 var z2 = 0;
+
+var aspRatio = 0.8;
+var margins = 80;
+var pageWidth = window.innerWidth - margins;
+var pageHeight = pageWidth * aspRatio;
 
 function preload() {
   iHat = loadImage('../../media/iHatWhite.png');
@@ -86,8 +96,16 @@ class options {
     sumVectorButton.position(width-100, 90);
     sumVectorButton.mousePressed(sumVector);
 
+    removeVectorButton = createButton('remove vector');
+    removeVectorButton.position(width-100, 140);
+    removeVectorButton.mousePressed(removeVector);
+
+    resetVectorsButton = createButton('reset');
+    resetVectorsButton.position(width-100, 180);
+    resetVectorsButton.mousePressed(reset);
+
     arrowsCheckbox = createCheckbox('show arrows', false);
-    arrowsCheckbox.position(width-100, 180);
+    arrowsCheckbox.position(width-100, 260);
     arrowsCheckbox.changed(mySelectEvent);
 
     crossVectorCheckbox = createCheckbox('show cross product', false);
@@ -95,12 +113,12 @@ class options {
     crossVectorCheckbox.changed(mySelectEvent);
 
     coordsCheckbox = createCheckbox('show coordinates', false);
-    coordsCheckbox.position(width-100, 210);
+    coordsCheckbox.position(width-100, 290);
     coordsCheckbox.changed(mySelectEvent);
 
 
     selectOptions = createSelect();
-    selectOptions.position(width-100, 140);
+    selectOptions.position(width-100, 220);
     selectOptions.option('vector addition');
     selectOptions.option('scalar multiplication');
     selectOptions.option('dot product');
@@ -131,7 +149,7 @@ class drawing {
 
 function setup() {
   if(twoDimension) {
-    createCanvas(800, 600, P2D); // Add base canvas, x-pixels by y-pixels
+    createCanvas(pageWidth, pageHeight, P2D); // Add base canvas, x-pixels by y-pixels
 
     basePlot2D = new GPlot(this); // see "grafica.js" library for info on GPlots
     
@@ -139,19 +157,29 @@ function setup() {
     ops.gPlot = basePlot2D;
     ops.defaultPlot();
 
-    r = 20; // radius of the dragged points (pixels)
-
-    extraCanvas = createGraphics(800, 600); // adds a second canvas on top of the first. this will be transparent, and where the points will be drawn onto.
+    extraCanvas = createGraphics(pageWidth, pageHeight); // adds a second canvas on top of the first. this will be transparent, and where the points will be drawn onto.
     
     background(220); // background color of main canvas to RGB(220, 220, 220) "lighter gray"
 
     plotdraw2D = new drawing;
     plotdraw2D.gPlot = basePlot2D;
+
     options.defaultSidebar();
     crossVectorCheckbox.hide();
+
+    switch(page) {
+      case "vector addition":
+        break;
+      case "scalar multiplication":
+        break;
+      case "dot product":
+        break;
+      default:
+        break;
+    }
   }
   else {
-    createCanvas(700, 600, WEBGL);
+    createCanvas(pageWidth - 100, pageHeight, WEBGL);
     normalMaterial();
     ambientMaterial(39, 235, 91);
     camera(100, -200, (height/2.0) / tan(PI*30.0 / 180.0), 0, 0, 0, 0, 1, 0);
@@ -163,7 +191,8 @@ function setup() {
 }
 
 function reInitialize() {
-  if (page == "cross product") {sessionStorage.setItem("pageVal", selectOptions.value()); location.reload();}
+  sessionStorage.setItem("pageVal", selectOptions.value());
+  if (page == "cross product") {location.reload();}
   page = selectOptions.value();
   if (page == "cross product") {
     twoDimension = false;
@@ -177,22 +206,57 @@ function reInitialize() {
   }
 }
 
+function reset() {
+  switch(page) {
+    case "vector addition":
+      while(n > 2) {
+        pts.pop();
+        n--;
+      }
+      sumPressed = false;
+      break;
+    case "scalar multiplication":
+      break;
+    case "dot product":
+      break;
+    case "cross product":
+      break;
+    default:
+      break;
+  }
+}
+
 function mySelectEvent() {
-  drawArrows = arrowsCheckbox.checked();
+  //drawArrows = arrowsCheckbox.checked();
   drawCoords = coordsCheckbox.checked();
   drawCross = crossVectorCheckbox.checked();
 }
 
 function newVector() {
-  let xyMin = getCoords(-xAxisLimit, -yAxisLimit, basePlot2D);
-  let xyMax = getCoords(xAxisLimit, yAxisLimit, basePlot2D);
-  pts.push([random(xyMin[0],xyMax[0]), random(xyMin[1],xyMax[1])]);
-  graphicsOffset.push([1, 1]);
-  n += 1;
+  if(n <= 5) {
+    let xyMin = getCoords(-xAxisLimit, -yAxisLimit, basePlot2D);
+    let xyMax = getCoords(xAxisLimit, yAxisLimit, basePlot2D);
+    pts.push([random(xyMin[0],xyMax[0]), random(xyMin[1],xyMax[1])]);
+    graphicsOffset.push([1, 1]);
+    n += 1;
+  }
 }
 
 function sumVector() {
+  if(n > 2) {
+    vSum[0] = pts[0];
+    vSum[1] = pts[n - 1];
+    console.log(vSum);
+    sumPressed = true;
+  }
+}
 
+function removeVector() {
+  if(!sumPressed && n > 2) {
+    pts.pop();
+    graphicsOffset.pop();
+    n += -1;
+  }
 }
 
 // a quick function to get the plot coordinates (x, y) at pixels (xPix, yPix). gPlot is the ID of your GPlot.
@@ -206,48 +270,47 @@ function getCoords(x, y, gPlot) {
 }
 
 function DrawArrows(parentLayer) {
-  if (drawArrows)
-  {for (j = 0; j < n - 1; j++) {
-    //i-hat arrow
-    this.parentLayer = parentLayer;
-    this.parentLayer.push();
-    this.parentLayer.strokeWeight(3);
-    this.parentLayer.stroke(255, 30, 30);
-    this.parentLayer.line(pts[j][0]-10*graphicsOffset[j][0], pts[j][1], pts[j+1][0]+10*graphicsOffset[j][0], pts[j][1]);
-    this.parentLayer.fill(255, 30, 30);
-    this.parentLayer.triangle(pts[j+1][0]+10*graphicsOffset[j][0], pts[j][1],  pts[j+1][0]+16*graphicsOffset[j][0], pts[j][1]+3,  pts[j+1][0]+16*graphicsOffset[j][0], pts[j][1]-3);
-    this.parentLayer.tint(255, 50, 50);
-    this.parentLayer.image(iHat, 0.5*pts[j][0]+0.5*pts[j+1][0]-30, pts[j][1]-20-30*graphicsOffset[j][1], 0.09*iHat.width, 0.12*iHat.height);
-    this.parentLayer.fill(255, 30, 30);
-    this.parentLayer.textSize(18);
-    this.parentLayer.noStroke();
-    this.parentLayer.textAlign(LEFT);
-    this.parentLayer.text("= ".concat((ptCoords[j+1][0]-ptCoords[j][0]).toFixed(1)), 0.5*pts[j][0]+0.5*pts[j+1][0]-30+0.2*iHat.width, pts[j][1]-20-30*graphicsOffset[j][1]+0.12*iHat.height);
-    this.parentLayer.pop();
+  for (j = 0; j < n - 1; j++) {
+    if (drawArrows[j+1]) {
+      //i-hat arrow
+      this.parentLayer = parentLayer;
+      this.parentLayer.push();
+      this.parentLayer.strokeWeight(3);
+      this.parentLayer.stroke(255, 30, 30);
+      this.parentLayer.line(pts[j][0]-10*graphicsOffset[j][0], pts[j][1], pts[j+1][0]+2*graphicsOffset[j][0], pts[j][1]);
+      this.parentLayer.fill(255, 30, 30);
+      this.parentLayer.triangle(pts[j+1][0]+2*graphicsOffset[j][0], pts[j][1],  pts[j+1][0]+8*graphicsOffset[j][0], pts[j][1]+3,  pts[j+1][0]+8*graphicsOffset[j][0], pts[j][1]-3);
+      this.parentLayer.tint(255, 50, 50);
+      this.parentLayer.image(iHat, 0.5*pts[j][0]+0.5*pts[j+1][0]-30, pts[j][1]-20-30*graphicsOffset[j][1], 0.09*iHat.width, 0.12*iHat.height);
+      this.parentLayer.fill(255, 30, 30);
+      this.parentLayer.textSize(18);
+      this.parentLayer.noStroke();
+      this.parentLayer.textAlign(LEFT);
+      this.parentLayer.text("= ".concat((ptCoords[j+1][0]-ptCoords[j][0]).toFixed(1)), 0.5*pts[j][0]+0.5*pts[j+1][0]-30+0.2*iHat.width, pts[j][1]-20-30*graphicsOffset[j][1]+0.12*iHat.height);
+      this.parentLayer.pop();
 
-    //j-hat arrow
-    this.parentLayer.push();
-    this.parentLayer.strokeWeight(3);
-    this.parentLayer.stroke(30, 30, 255);
-    this.parentLayer.line(pts[j+1][0], pts[j][1] + 4*graphicsOffset[j][1], pts[j+1][0], pts[j+1][1] - 16*graphicsOffset[j][1]);
-    this.parentLayer.fill(30, 30, 255);
-    this.parentLayer.triangle(pts[j+1][0], pts[j+1][1] - 14*graphicsOffset[j][1],  pts[j+1][0] + 3, pts[j+1][1] - 20*graphicsOffset[j][1],  pts[j+1][0] - 3, pts[j+1][1] - 20*graphicsOffset[j][1]);
-    this.parentLayer.tint(50, 50, 255);
-    this.parentLayer.image(jHat, pts[j+1][0]-35-50*graphicsOffset[j][0], 0.5*pts[j][1]+0.5*pts[j+1][1], 0.11*jHat.width, 0.12*jHat.height)
-    this.parentLayer.fill(30, 30, 255)
-    this.parentLayer.textAlign(LEFT);
-    this.parentLayer.textSize(18);
-    this.parentLayer.noStroke();
-    this.parentLayer.text("= ".concat((ptCoords[j+1][1]-ptCoords[j][1]).toFixed(1)), pts[j+1][0]-35-50*graphicsOffset[j][0]+0.2*jHat.width, 0.5*pts[j][1]+0.5*pts[j+1][1]+0.1*jHat.height);
-    this.parentLayer.pop();
+      //j-hat arrow
+      this.parentLayer.push();
+      this.parentLayer.strokeWeight(3);
+      this.parentLayer.stroke(30, 30, 255);
+      this.parentLayer.line(pts[j+1][0], pts[j][1] + 4*graphicsOffset[j][1], pts[j+1][0], pts[j+1][1] - 6*graphicsOffset[j][1]);
+      this.parentLayer.fill(30, 30, 255);
+      this.parentLayer.triangle(pts[j+1][0], pts[j+1][1] - 4*graphicsOffset[j][1],  pts[j+1][0] + 3, pts[j+1][1] - 10*graphicsOffset[j][1],  pts[j+1][0] - 3, pts[j+1][1] - 10*graphicsOffset[j][1]);
+      this.parentLayer.tint(50, 50, 255);
+      this.parentLayer.image(jHat, pts[j+1][0]-35-50*graphicsOffset[j][0], 0.5*pts[j][1]+0.5*pts[j+1][1], 0.11*jHat.width, 0.12*jHat.height)
+      this.parentLayer.fill(30, 30, 255)
+      this.parentLayer.textAlign(LEFT);
+      this.parentLayer.textSize(18);
+      this.parentLayer.noStroke();
+      this.parentLayer.text("= ".concat((ptCoords[j+1][1]-ptCoords[j][1]).toFixed(1)), pts[j+1][0]-35-50*graphicsOffset[j][0]+0.2*jHat.width, 0.5*pts[j][1]+0.5*pts[j+1][1]+0.1*jHat.height);
+      this.parentLayer.pop();
     }
   }
 }
 
 function DrawCoords(parentLayer) {
-  if (drawCoords)
-  {for (j = 0; j < n; j++) {
-    this.parentLayer = parentLayer;
+  this.parentLayer = parentLayer;
+  for (j = 0; j < n; j++) {
     //text
     this.parentLayer.push();
     if (j == 0) {
@@ -276,37 +339,36 @@ function DrawCoords(parentLayer) {
         offset[j] = p5.Vector.fromAngle(angle, 50)
       };
     }
-    this.parentLayer.textAlign(CENTER);
-    this.parentLayer.textSize(18);
-    this.parentLayer.noStroke();
-    this.parentLayer.fill(0);
-    this.parentLayer.text("(".concat(ptCoords[j][0].toFixed(1),", ", ptCoords[j][1].toFixed(1),")"), pts[j][0] + offset[j].x, pts[j][1] + offset[j].y);
-    /*if (j == n - 1) {//the for loop is 1 shorter than the number of points
-      this.parentLayer.text("(".concat(ptCoords[j+1][0].toFixed(1),", ", ptCoords[j+1][1].toFixed(1),")"), pts[j+1][0]-50*graphicsOffset[j][0], pts[j+1][1]-10);
-    }*/
-    this.parentLayer.pop();
+    if (rolloverPt[0] && rolloverPt[1] == j || draggingPt[0] && draggingPt[1] == j ) {
+      this.parentLayer.textAlign(CENTER);
+      this.parentLayer.textSize(18);
+      this.parentLayer.noStroke();
+      this.parentLayer.fill(0);
+      this.parentLayer.text("(".concat(ptCoords[j][0].toFixed(1),", ", ptCoords[j][1].toFixed(1),")"), pts[j][0] + offset[j].x, pts[j][1] + offset[j].y);
+      /*if (j == n - 1) {//the for loop is 1 shorter than the number of points
+        this.parentLayer.text("(".concat(ptCoords[j+1][0].toFixed(1),", ", ptCoords[j+1][1].toFixed(1),")"), pts[j+1][0]-50*graphicsOffset[j][0], pts[j+1][1]-10);
+      }*/
+      this.parentLayer.pop();
     }
   }
 }
 
 function DrawVectorText(parentLayer) {
   this.parentLayer = parentLayer;
-  if (!drawArrows) {
-    for (j = 0; j < n - 1; j++) {
-      let angle = atan2(pts[j][1]-pts[j+1][1], pts[j][0]-pts[j+1][0]);
-      if (angle > PI / 2 || angle < - PI / 2) {angle += -PI};
-      this.parentLayer.push();
-      this.parentLayer.textAlign(CENTER);
-      this.parentLayer.textSize(18);
-      this.parentLayer.noStroke();
-      this.parentLayer.fill(0);
-      this.parentLayer.translate((pts[j][0] + pts[j+1][0])/2, (pts[j][1] + pts[j+1][1])/2);
-      this.parentLayer.rotate(angle);
-      let jSign;
-      if(ptCoords[j+1][1]-ptCoords[j][1] > 0) {jSign = "+ "} else {jSign = "- "}
-      this.parentLayer.text("".concat((ptCoords[j+1][0]-ptCoords[j][0]).toFixed(1), " i ", jSign, abs(ptCoords[j+1][1]-ptCoords[j][1]).toFixed(1), " j"), 0, -10);
-      this.parentLayer.pop();
-    }
+  for (j = 0; j < n - 1; j++) {
+    let angle = atan2(pts[j][1]-pts[j+1][1], pts[j][0]-pts[j+1][0]);
+    if (angle > PI / 2 || angle < - PI / 2) {angle += -PI};
+    this.parentLayer.push();
+    this.parentLayer.textAlign(CENTER);
+    this.parentLayer.textSize(18);
+    this.parentLayer.noStroke();
+    this.parentLayer.fill(0);
+    this.parentLayer.translate((pts[j][0] + pts[j+1][0])/2, (pts[j][1] + pts[j+1][1])/2);
+    this.parentLayer.rotate(angle);
+    let jSign;
+    if(ptCoords[j+1][1]-ptCoords[j][1] > 0) {jSign = "+ "} else {jSign = "- "}
+    this.parentLayer.text("".concat((ptCoords[j+1][0]-ptCoords[j][0]).toFixed(1), " i ", jSign, abs(ptCoords[j+1][1]-ptCoords[j][1]).toFixed(1), " j"), 0, -10);
+    this.parentLayer.pop();
   }
 }
 
@@ -314,44 +376,98 @@ function DrawVectorText(parentLayer) {
 function MovePoints(parentLayer) {
   this.parentLayer = parentLayer;
   rolloverPt[0] = false;
-  for (j = 0; j < n; j++) {
-    if (mouseX > pts[j][0] - r &&
-      mouseX < pts[j][0] + r &&
-        mouseY > pts[j][1] - r &&
-        mouseY < pts[j][1] + r) 
-        {rolloverPt[0] = true; rolloverPt[1] = j;}
+  rolloverLine[0] = false;
+  if(!sumPressed){
+    for (j = 0; j < n; j++) {
+      if (j == 0) {var adjX = 0; var adjY = 0;} else {
+        var adjX = -10*(pts[j][0] - pts[j-1][0])/Math.sqrt(Math.pow(pts[j][0] - pts[j-1][0],2) + Math.pow(pts[j][1] - pts[j-1][1],2));
+        var adjY = -10*(pts[j][1] - pts[j-1][1])/Math.sqrt(Math.pow(pts[j][0] - pts[j-1][0],2) + Math.pow(pts[j][1] - pts[j-1][1],2));
+      }
+      if (mouseX > pts[j][0] + adjX - r &&
+        mouseX < pts[j][0] + adjX + r &&
+          mouseY > pts[j][1] + adjY - r &&
+          mouseY < pts[j][1] + adjY + r) 
+          {rolloverPt[0] = true; rolloverPt[1] = j;}
+      
+      if (j > 0) {
+        let lineX = new Between(mouseX, pts[j][0], pts[j-1][0]);
+        let lineY = new Between(mouseY, pts[j][1], pts[j-1][1]);
+        if(abs(lineX.diff()) > abs(lineY.diff())) {
+          lineX.isBetween && abs(mouseY - lineY.a - lineX.interp()*lineY.diff()) < 10  && !rolloverPt[0] && !draggingPt[0] ? drawArrows[j] = true : drawArrows[j] = false;
+        } else {
+          lineY.isBetween && abs(mouseX - lineX.a - lineY.interp()*lineX.diff()) < 10  && !rolloverPt[0] && !draggingPt[0] ? drawArrows[j] = true : drawArrows[j] = false;
+        }
+      }
 
-    ptCoords[j] = loc(pts[j][0], pts[j][1], basePlot2D);
-    
-    // put text to the right or left? above or below? helps with graphics placement
-    if (j > 0) {
-      if (pts[j-1][0] < pts[j][0]) {graphicsOffset[j-1][0] = -1} else {graphicsOffset[j-1][0] = 1}
-      if (pts[j-1][1] < pts[j][1]) {graphicsOffset[j-1][1] = 1} else {graphicsOffset[j-1][1] = -1}
-    }
+      ptCoords[j] = loc(pts[j][0], pts[j][1], basePlot2D);
+      
+      // put text to the right or left? above or below? helps with graphics placement
+      if (j > 0) {
+        if (pts[j-1][0] < pts[j][0]) {graphicsOffset[j-1][0] = -1} else {graphicsOffset[j-1][0] = 1}
+        if (pts[j-1][1] < pts[j][1]) {graphicsOffset[j-1][1] = 1} else {graphicsOffset[j-1][1] = -1}
+      }
 
-    if (j == n - 1) {
-      if (pts[j][0] > pts[j-1][0]) {graphicsOffset[j][0] = 1} else {graphicsOffset[j][0] = -1}
-      if (pts[j][1] > pts[j-1][1]) {graphicsOffset[j][1] = 1} else {graphicsOffset[j][1] = -1}
+      if (j == n - 1) {
+        if (pts[j][0] > pts[j-1][0]) {graphicsOffset[j][0] = 1} else {graphicsOffset[j][0] = -1}
+        if (pts[j][1] > pts[j-1][1]) {graphicsOffset[j][1] = 1} else {graphicsOffset[j][1] = -1}
+      }
     }
   }
-
-  if (draggingPt[0]) 
-    {this.parentLayer.fill(50); pts[draggingPt[1]] = [mouseX + mouseOffset[0], mouseY + mouseOffset[1]];}
-  else if (rolloverPt[0]) {this.parentLayer.fill(100);}
-  else {this.parentLayer.fill(175, 200);}
+  if (draggingPt[0])
+    {pts[draggingPt[1]] = [mouseX + mouseOffset[0], mouseY + mouseOffset[1]]}
 }
 
 function DrawVectors(parentLayer) {
+  this.parentLayer = parentLayer;
+  
+  function fillColor(x) {
+    this.x = x;
+    //if statement changes color of the dots if the mouse is over the dot, and another color if the mouse is held as well
+    if (sumPressed) {this.parentLayer.fill(50, 20)}
+    else if (draggingPt[0] && draggingPt[1] == this.x) {this.parentLayer.fill(50)}
+    else if (rolloverPt[0] && rolloverPt[1] == this.x) {this.parentLayer.fill(100)}
+    else {this.parentLayer.fill(175, 100)}
+  }
+  if(sumPressed) {this.parentLayer.stroke(0, 50)}
+  
   for (j = 0; j < n - 1; j++) {
     this.parentLayer.push();
     this.parentLayer.strokeWeight(5);
-    this.parentLayer.line(pts[j][0], pts[j][1], pts[j+1][0], pts[j+1][1]);
+    this.parentLayer.translate(pts[j][0], pts[j][1]);
+    this.parentLayer.rotate(atan2(pts[j+1][0] - pts[j][0], pts[j][1] - pts[j+1][1]));
+    this.parentLayer.line(0, 0, 0, -Math.sqrt(Math.pow(pts[j+1][0] - pts[j][0],2) + Math.pow(pts[j+1][1] - pts[j][1],2)) + 22);
     this.parentLayer.pop();
-        
-    //the "draggable circles"
+
     this.parentLayer.push();
-    this.parentLayer.circle(pts[j][0], pts[j][1], r*0.25);
-    this.parentLayer.circle(pts[j+1][0], pts[j+1][1], r*0.25);
+    fillColor(j+1);
+    this.parentLayer.translate(pts[j+1][0], pts[j+1][1]);
+    this.parentLayer.rotate(atan2(pts[j+1][0] - pts[j][0], pts[j][1] - pts[j+1][1]));
+    this.parentLayer.strokeWeight(3);
+    this.parentLayer.triangle(0, 0, 7, 20, -7, 20);
+    this.parentLayer.pop();
+  }
+
+  this.parentLayer.push();
+  fillColor(0);
+  this.parentLayer.circle(pts[0][0], pts[0][1], r);
+  this.parentLayer.pop();
+
+  if(sumPressed) {
+    this.parentLayer.push();
+    this.parentLayer.stroke(0);
+    this.parentLayer.strokeWeight(5);
+    this.parentLayer.translate(vSum[0][0], vSum[0][1]);
+    this.parentLayer.rotate(atan2(vSum[1][0] - vSum[0][0], vSum[0][1] - vSum[1][1]));
+    this.parentLayer.line(0, 0, 0, -Math.sqrt(Math.pow(vSum[1][0] - vSum[0][0],2) + Math.pow(vSum[1][1] - vSum[0][1],2)) + 22);
+    this.parentLayer.pop();
+
+    this.parentLayer.push();
+    this.parentLayer.stroke(0);
+    this.parentLayer.fill(200);
+    this.parentLayer.translate(vSum[1][0], vSum[1][1]);
+    this.parentLayer.rotate(atan2(vSum[1][0] - vSum[0][0], vSum[0][1] - vSum[1][1]));
+    this.parentLayer.strokeWeight(3);
+    this.parentLayer.triangle(0, 0, 7, 20, -7, 20);
     this.parentLayer.pop();
   }
 }
@@ -407,7 +523,7 @@ function draw() {
       extraCanvas.fill(255);
       extraCanvas.stroke(0);
 
-      MovePoints(extraCanvas);  
+      MovePoints(extraCanvas)  
       DrawArrows(extraCanvas);
       DrawCoords(extraCanvas);
       DrawVectors(extraCanvas);
@@ -435,10 +551,7 @@ function draw() {
 function mousePressed() {
 // Did I click on the point?
   for (j = 0; j < n; j++) {
-    if (mouseX > pts[j][0] - r &&
-      mouseX < pts[j][0] + r &&
-       mouseY > pts[j][1] - r &&
-        mouseY < pts[j][1] + r)  {
+    if (rolloverPt[0])  {
       draggingPt[0] = true;
       draggingPt[1] = rolloverPt[1];
       // If so, keep track of relative location of click to corner of rectangle
