@@ -16,110 +16,122 @@ original-source:https://www.projects.bucknell.edu/Inquiry_Activities/HT_JS/Melti
 -->
 
 
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>Melting Ice Simulation (MIS)</title>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Melting Ice Simulation (MIS)</title>
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-        <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 
-        <!-- Bootstrap: Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Bootstrap: Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-        <!-- Bootstrap: Optional theme -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Bootstrap: Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+        integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
-        <!-- Bootstrap: Latest compiled and minified JavaScript -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <!-- Bootstrap: Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
+    </script>
 
-        <script src="quicksettings3/quicksettings.js"></script>
-        <link id="qs_styles" rel="stylesheet" href="quicksettings3/quicksettings.css">
-        <link href="MISstyle.css" type="text/css" rel="stylesheet" />
+    <script src="quicksettings3/quicksettings.js"></script>
+    <link id="qs_styles" rel="stylesheet" href="quicksettings3/quicksettings.css">
+    <link href="MISstyle.css" type="text/css" rel="stylesheet" />
 
-		<script type="text/javascript" src="MISscript.js"></script>
-	</head>
+    <script type="text/javascript" src="MISscript.js"></script>
+</head>
 
-	<body>
-    	<noscript><p align="center"><br /><br />JavaScript must be enabled for this application to run correctly. Please enable JavaScript in your browser in order to fully enjoy this page.</p><br /><br /><br /><br /></noscript>
+<body>
+    <noscript>
+        <p align="center"><br /><br />JavaScript must be enabled for this application to run correctly. Please enable
+            JavaScript in your browser in order to fully enjoy this page.</p><br /><br /><br /><br />
+    </noscript>
 
-        <div id="pageDiv" class="wrapper">
-			
-            <!-- <div id="sit1Div">
+    <div id="pageDiv" class="wrapper">
+
+        <!-- <div id="sit1Div">
                 <a href="javascript:" id="sit1DefaultButton" class="btn .btn-warning btn-sm" value="sit1Default">Default</a>
             </div> -->
-            <div class="box a" id="topLeft">
-            </div>
+        <div class="box a" id="topLeft">
+        </div>
 
-            <!-- <div id="sit2Div"> 
+        <!-- <div id="sit2Div"> 
                 <a href="javascript:" id="sit2DefaultButton" class="btn .btn-warning btn-sm" value="sit2Default">Default</a>
             </div> -->
 
-            <div class="box b" id="topCenter">
-                <div class="box b1" id="buttons1">
-                    <!-- Bootstrap buttons (start/reset) -->
-                    <a href="javascript:" id="startButton" class="btn btn-success btn-lg" value="start">Start</a>
-                    <a href="javascript:" id="resetButton" class="btn btn-danger btn-lg" value="reset">Reset</a>
-                </div>
-
-                <div class="box b2" id="buttons2">
-                    <!-- Glyphicons (pause/help/info) -->
-                    <a href="javascript:" id="pauseButton" class="btn btn-default btn-md" value="pause"><span class="glyphicon glyphicon-pause"></span></a>
-                    <a href="javascript:" id="infoButton" class="btn btn-default btn-md" value="info"><span class="glyphicon glyphicon-info-sign"></span></a>
-                    <a href="javascript:" id="helpButton" class="btn btn-info btn-md" value="help"><span class="glyphicon glyphicon-question-sign"></span></a>
-                </div>
-
-                <img id="waterImg" alt="" src="water.png" />
-                <img id="beakersImg" alt="" src="beakers.png" />
-                <img id="stirBar1" alt="" src="stirBar.gif" />
-                <img id="stirBar2" alt="" src="stirBar.gif" />
-
-                <img id="sit1block1" class="sit1block" alt="" src="blank_img.png" />
-                <img id="sit1block2" class="sit1block" alt="" src="blank_img.png" />
-                <img id="sit1block3" class="sit1block" alt="" src="blank_img.png" />
-                <img id="sit1block4" class="sit1block" alt="" src="blank_img.png" />
-
-                <img id="sit1Ice1" class="sit1Ice" alt="" src="blank_img.png" />
-                <img id="sit1Ice2" class="sit1Ice" alt="" src="blank_img.png" />
-                <img id="sit1Ice3" class="sit1Ice" alt="" src="blank_img.png" />
-
-                <img id="sit2block1" class="sit2block" alt="" src="blank_img.png" />
-                <img id="sit2block2" class="sit2block" alt="" src="blank_img.png" />
-                <img id="sit2block3" class="sit2block" alt="" src="blank_img.png" />
-                <img id="sit2block4" class="sit2block" alt="" src="blank_img.png" />
-
-                <img id="sit2Ice1" class="sit2Ice" alt="" src="blank_img.png" />
-                <img id="sit2Ice2" class="sit2Ice" alt="" src="blank_img.png" />
-                <img id="sit2Ice3" class="sit2Ice" alt="" src="blank_img.png" />
-
+        <div class="box b" id="topCenter">
+            <div class="box b1" id="buttons1">
+                <!-- Bootstrap buttons (start/reset) -->
+                <a href="javascript:" id="startButton" class="btn btn-success btn-lg" value="start">Start</a>
+                <a href="javascript:" id="resetButton" class="btn btn-danger btn-lg" value="reset">Reset</a>
             </div>
 
-            <div class="box c" id="topRight">
+            <div class="box b2" id="buttons2">
+                <!-- Glyphicons (pause/help/info) -->
+                <a href="javascript:" id="pauseButton" class="btn btn-default btn-md" value="pause"><span
+                        class="glyphicon glyphicon-pause"></span></a>
+                <a href="javascript:" id="infoButton" class="btn btn-default btn-md" value="info"><span
+                        class="glyphicon glyphicon-info-sign"></span></a>
+                <a href="javascript:" id="helpButton" class="btn btn-info btn-md" value="help"><span
+                        class="glyphicon glyphicon-question-sign"></span></a>
             </div>
 
-            <div class="box b3" id="initCond">
-                <label id="initialIceLabel">Initial condition: 1000g ice in each cup</label>
-            </div>
-            
-            <div class="box d" id="bottomCenter">
+            <img id="waterImg" alt="" src="water.png" />
+            <img id="beakersImg" alt="" src="beakers.png" />
+            <img id="stirBar1" alt="" src="stirBar.gif" />
+            <img id="stirBar2" alt="" src="stirBar.gif" />
 
-                <img id="graphBase" src="graphBase.png" alt="" />
-                <textarea id="graphHeightInfo" class="myTooltip">The height of the graph represents how much ice has melted.
-                </textarea>
-                <textarea id="graphSlopeInfo" class="myTooltip">The slope of the graph represents the rate of heat transfer. A steeper slope corresponds to faster heat transfer.
-                </textarea>
+            <img id="sit1block1" class="sit1block" alt="" src="blank_img.png" />
+            <img id="sit1block2" class="sit1block" alt="" src="blank_img.png" />
+            <img id="sit1block3" class="sit1block" alt="" src="blank_img.png" />
+            <img id="sit1block4" class="sit1block" alt="" src="blank_img.png" />
 
-                <label id="yLabel1" class="graphLabel"></label>
-                <label id="yLabel2" class="graphLabel"></label>
-                <label id="yLabel3" class="graphLabel"></label>
-                <label id="yLabel4" class="graphLabel"></label>
-                <label id="xLabel1" class="graphLabel"></label>
-                <label id="xLabel2" class="graphLabel"></label>
-                <label id="xLabel3" class="graphLabel"></label>
-                <label id="xLabel4" class="graphLabel"></label>
-                <a href="javascript:" id="graphInfo" class="btn btn-info btn-lg" value="graphButton">Enable Graph Tooltips</a>
-                <!--[if IE]><a id="IEexp" href="">Why do my ice cubes look like an 8-bit video game?</a><![endif]-->
-            </div>
-            
+            <img id="sit1Ice1" class="sit1Ice" alt="" src="blank_img.png" />
+            <img id="sit1Ice2" class="sit1Ice" alt="" src="blank_img.png" />
+            <img id="sit1Ice3" class="sit1Ice" alt="" src="blank_img.png" />
+
+            <img id="sit2block1" class="sit2block" alt="" src="blank_img.png" />
+            <img id="sit2block2" class="sit2block" alt="" src="blank_img.png" />
+            <img id="sit2block3" class="sit2block" alt="" src="blank_img.png" />
+            <img id="sit2block4" class="sit2block" alt="" src="blank_img.png" />
+
+            <img id="sit2Ice1" class="sit2Ice" alt="" src="blank_img.png" />
+            <img id="sit2Ice2" class="sit2Ice" alt="" src="blank_img.png" />
+            <img id="sit2Ice3" class="sit2Ice" alt="" src="blank_img.png" />
+
         </div>
-	</body>
+
+        <div class="box c" id="topRight">
+        </div>
+
+        <div class="box b3" id="initCond">
+            <label id="initialIceLabel">Initial condition: 1000g ice in each cup</label>
+        </div>
+
+        <div class="box d" id="bottomCenter">
+
+            <img id="graphBase" src="graphBase.png" alt="" />
+            <textarea id="graphHeightInfo" class="myTooltip">The height of the graph represents how much ice has melted.
+                </textarea>
+            <textarea id="graphSlopeInfo" class="myTooltip">The slope of the graph represents the rate of heat transfer. A steeper slope corresponds to faster heat transfer.
+                </textarea>
+
+            <label id="yLabel1" class="graphLabel"></label>
+            <label id="yLabel2" class="graphLabel"></label>
+            <label id="yLabel3" class="graphLabel"></label>
+            <label id="yLabel4" class="graphLabel"></label>
+            <label id="xLabel1" class="graphLabel"></label>
+            <label id="xLabel2" class="graphLabel"></label>
+            <label id="xLabel3" class="graphLabel"></label>
+            <label id="xLabel4" class="graphLabel"></label>
+            <a href="javascript:" id="graphInfo" class="btn btn-info btn-lg" value="graphButton">Enable Graph
+                Tooltips</a>
+            <!--[if IE]><a id="IEexp" href="">Why do my ice cubes look like an 8-bit video game?</a><![endif]-->
+        </div>
+
+    </div>
+</body>
+
 </html>

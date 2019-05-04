@@ -128,9 +128,9 @@
          * @returns {module:QuickSettings}    New QuickSettings Panel
          * @static
          */
-        create: function (x, y, title, parent) {
+        create: function (x, y, title, parent, id) {
             var obj = Object.create(this);
-            obj._init(x, y, title, parent);
+            obj._init(x, y, title, parent, id);
             return obj;
         },
 
@@ -146,12 +146,12 @@
             }
         },
 
-        _init: function (x, y, title, parent) {
+        _init: function (x, y, title, parent, id) {
             if (!cssInjected) {
                 injectCSS();
             }
             this._bindHandlers();
-            this._createPanel(x, y, parent);
+            this._createPanel(x, y, parent, id);
             this._createTitleBar(title || "QuickSettings");
             this._createContent();
 
@@ -243,8 +243,8 @@
         // region CREATION FUNCTIONS
         ////////////////////////////////////////////////////////////////////////////////
 
-        _createPanel: function (x, y, parent) {
-            this._panel = createElement("div", null, "qs_main", parent || document.body);
+        _createPanel: function (x, y, parent, id) {
+            this._panel = createElement("div", id, "qs_main", parent || document.body);
             this._panel.style.zIndex = ++QuickSettings._topZ;
             this.setPosition(x || 0, y || 0);
             this._controls = {};
