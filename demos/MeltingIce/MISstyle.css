@@ -7,9 +7,8 @@
  * (c) Margot Vigeant 2011
 */
 
-body {
-	margin: 0px;
-	overflow: hidden;
+:root {
+	font-size: 12px;
 }
 
 .wrapper {
