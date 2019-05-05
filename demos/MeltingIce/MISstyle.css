@@ -18,7 +18,8 @@
 	min-width: 500px;
 	display: grid;
 	grid-template-columns: 25% 50% 25%;
-	grid-gap: 10px;
+	grid-column-gap: 10px;
+	grid-row-gap: 0px;
 	background-color: none;
 	color: none;
 }
@@ -41,7 +42,6 @@
 	grid-row: 3;
 	grid-column: 1 / span 3;
 	position: relative;
-	padding-bottom: calc(100% / 2);
 }
 
 #startButton {
