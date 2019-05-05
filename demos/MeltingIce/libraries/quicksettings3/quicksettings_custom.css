@@ -2,7 +2,7 @@
   text-align: left;
   position: absolute;
   width: 200px;
-  font: 1.3em sans-serif;
+  font: 1.3rem sans-serif;
   box-shadow: none;
   user-select: none;
   -webkit-user-select: none;
@@ -288,7 +288,7 @@
   user-select: none;
   -webkit-user-select: none;
   cursor: default;
-  font: 0.9em sans-serif;
+  font: 0.9rem sans-serif;
 }
 .qs_text_input {
   -webkit-box-sizing: border-box;
@@ -300,7 +300,7 @@
   border: none;
   background-color: #eeeeee;
   color: #333333;
-  font-size: 15px;
+  font-size: 1rem;
 }
 .qs_text_input:focus {
   outline: none;
@@ -322,10 +322,10 @@
   padding: 0 5px;
   outline: none;
   -moz-outline: none;
-  font-size: 14px;
+  font-size: 0.95rem;
 }
 .qs_select option {
-  font-size: 14px;
+  font-size: 0.95rem;
 }
 .qs_select::-ms-expand {
   display: none;
@@ -362,7 +362,7 @@
   border: none;
   background-color: #eeeeee;
   color: #333333;
-  font-size: 12px;
+  font-size: 0.9rem;
 }
 .qs_textarea:focus {
   outline: none;

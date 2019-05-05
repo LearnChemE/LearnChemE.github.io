@@ -148,7 +148,7 @@ function GTitle(parent, dim) {
 	this.fontName = "Helvetica";
 	this.fontColor = this.parent.color(100);
 	this.fontStyle = this.parent.BOLD;
-	this.fontSize = 24;
+	this.fontSize = 20;
 }
 
 GTitle.prototype.draw = function() {
@@ -250,7 +250,7 @@ function GAxisLabel(parent, type, dim) {
 	this.textAlignment = this.parent.CENTER;
 	this.fontName = "Helvetica";
 	this.fontColor = this.parent.color(0);
-	this.fontSize = 24;
+	this.fontSize = 20;
 }
 
 GAxisLabel.prototype.draw = function() {
@@ -469,7 +469,7 @@ function GAxis(parent, type, dim, lim, log) {
 	// Text properties
 	this.fontName = "Helvetica";
 	this.fontColor = this.parent.color(0);
-	this.fontSize = 20;
+	this.fontSize = 18;
 
 	// Update the arrays
 	this.updateTicks();
