@@ -140,6 +140,29 @@ function windowResized() {
 	$(".b3").css("height", clientHeight * 0.04 + "px");
 	$(".d").css("height", clientHeight * 0.58 + "px");
 
+	let aHeight = clientHeight * 0.38;
+
+	$("#startButton").css({height: aHeight*0.11 + "px", width: aHeight*0.2 + "px", fontSize: aHeight/300 + "rem"});
+	$("#startButton").css("line-height", aHeight*0.11 + "px");
+	$("#resetButton").css({height: aHeight*0.11 + "px", width: aHeight*0.2 + "px", fontSize: aHeight/300 + "rem"});
+	$("#resetButton").css("line-height", aHeight*0.11 + "px");
+
+	$("#pauseButton").css({height: aHeight*0.07 + "px", width: aHeight*0.07 + "px"});
+	$("#pauseButton").css("line-height", aHeight*0.07 + "px");
+	$("#pauseButton").css("font-size", aHeight*0.04 + "px");
+	$("#infoButton").css({height: aHeight*0.07 + "px", width: aHeight*0.07 + "px"});
+	$("#infoButton").css("line-height", aHeight*0.07 + "px");
+	$("#infoButton").css("font-size", aHeight*0.04 + "px");
+	$("#helpButton").css({height: aHeight*0.07 + "px", width: aHeight*0.07 + "px"});
+	$("#helpButton").css("line-height", aHeight*0.07 + "px");
+	$("#helpButton").css("font-size", aHeight*0.04 + "px");
+
+	$("#buttons2").css("margin-top", aHeight*0.15 + "px");
+	$("#buttons2").css("margin-left", aHeight*0.3 + "px");
+
+	$("#graphInfo").css({height: aHeight*0.11 + "px", width: aHeight*0.45 + "px", fontSize: aHeight/300 + "rem", bottom: aHeight*0.5 + "px"});
+	$("#graphInfo").css("line-height", aHeight*0.11 + "px");
+
 	var w1 = $("#topLeft").width();
 	var w2 = $("#topRight").width();
 	panel1.setWidth(w1);

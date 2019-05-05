@@ -34,7 +34,7 @@
 .b {
 	position: relative;
 	display: grid;
-	grid-template-rows: 5% 5% 15%;
+	grid-template-rows: 5% 3% 5%;
 }
 
 .d {
@@ -45,14 +45,52 @@
 	padding-bottom: calc(100% / 2);
 }
 
-.b3 {
-	height: 40px;
-	grid-row: 2;
-	grid-column: 1 / span 3;
-	position: relative;
-	bottom:10px;
-	justify-self: center;
-	transform: translateX(-100px);
+#startButton {
+    width: 50px;
+    height: 50px;
+    margin: auto;
+    padding: 0;
+    display: inline-block;
+    line-height: 30px;
+    text-align: center;
+}
+
+#resetButton {
+    width: 50px;
+    height: 50px;
+    margin: auto;
+    padding: 0;
+    display: inline-block;
+    line-height: 30px;
+    text-align: center;
+}
+
+#pauseButton {
+    width: 50px;
+    height: 50px;
+    margin: auto;
+    padding: 0;
+    display: inline-block;
+    line-height: 30px;
+    text-align: center;
+}
+#infoButton {
+    width: 50px;
+    height: 50px;
+    margin: auto;
+    padding: 0;
+    display: inline-block;
+    line-height: 30px;
+    text-align: center;
+}
+#helpButton {
+    width: 50px;
+    height: 50px;
+    margin: auto;
+    padding: 0;
+    display: inline-block;
+    line-height: 30px;
+    text-align: center;
 }
 
 #initConds {
@@ -81,7 +119,7 @@
 	position: absolute;
 	display: inline-block;
 	justify-self: left;
-	margin-top: 20px;
+	margin-top: 1rem;
 	margin-left: 15%;
 }
 
@@ -102,9 +140,15 @@
 
 #graphInfo {
 	position: absolute;
-	display: inline-block;
-	justify-self: center;
-	margin-top: 5px;
+    width: 50px;
+    height: 50px;
+    margin: auto;
+    padding: 0;
+    display: inline-block;
+    line-height: 30px;
+	text-align: center;
+	right: 0px;
+	bottom: 0px;
 }
 
 #waterImg {
@@ -173,19 +217,6 @@
 
 /*****Classes for graph elements*****/
 
-.sit1Point {
-	position: absolute;
-	height: 0.6%;
-	width: 0.5%;
-	background-color: #C00;
-}
-
-.sit2Point {
-	position: absolute;
-	height: 0.4%;
-	width: 0.4%;
-	background-color: #03C;
-}
 
 .myTooltip {
 	position: absolute;
@@ -287,53 +318,6 @@
 
 /***** graph elements/labels *****/
 
-#yLabel1 {
-	position: absolute;
-	top: 65%;
-	left: 6%;
-}
-
-#yLabel2 {
-	position: absolute;
-	top: 44%;
-	left: 6%;
-}
-
-#yLabel3 {
-	position: absolute;
-	top: 23%;
-	left: 6%;
-}
-
-#yLabel4 {
-	position: absolute;
-	top: 1%;
-	left: 6%;
-}
-
-#xLabel1 {
-	position: absolute;
-	top: 90%;
-	left: 32%;
-}
-
-#xLabel2 {
-	position: absolute;
-	top: 90%;
-	left: 55%;
-}
-
-#xLabel3 {
-	position: absolute;
-	top: 90%;
-	left: 77%;
-}
-
-#xLabel4 {
-	position: absolute;
-	top: 90%;
-	left: 98%;
-}
 
 /* text bubbles of "more info" */
 #graphHeightInfo {
