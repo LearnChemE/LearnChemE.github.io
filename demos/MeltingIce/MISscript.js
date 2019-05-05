@@ -105,18 +105,6 @@ var blockHeight;
 let fallDist;
 let maxIce = 10; // amount of ice in the beakers, g
 
-class ControllerStyle {
-	constructor(data) {
-		this.data = data;
-
-		var styleTag = document.getElementById("qs_styles");
-		if (this.data == "defaultStyle") {
-			styleTag.href = "libraries/quicksettings3/quicksettings_custom.css";
-		} else {
-			styleTag.href = "libraries/quicksettings3/quicksettings_custom_tiny.css";
-		}
-	}
-};
 
 function windowResized() {
 	maxWidth = Math.min(document.documentElement.clientWidth * 0.95, 1200);
@@ -147,14 +135,14 @@ function windowResized() {
 	$("#resetButton").css({height: aHeight*0.11 + "px", width: aHeight*0.2 + "px", fontSize: aHeight/300 + "rem"});
 	$("#resetButton").css("line-height", aHeight*0.11 + "px");
 
-	$("#pauseButton").css({height: aHeight*0.07 + "px", width: aHeight*0.07 + "px"});
-	$("#pauseButton").css("line-height", aHeight*0.07 + "px");
+	$("#pauseButton").css({height: aHeight*0.08 + "px", width: aHeight*0.08 + "px"});
+	$("#pauseButton").css("line-height", aHeight*0.08 + "px");
 	$("#pauseButton").css("font-size", aHeight*0.04 + "px");
-	$("#infoButton").css({height: aHeight*0.07 + "px", width: aHeight*0.07 + "px"});
-	$("#infoButton").css("line-height", aHeight*0.07 + "px");
+	$("#infoButton").css({height: aHeight*0.08 + "px", width: aHeight*0.08 + "px"});
+	$("#infoButton").css("line-height", aHeight*0.08 + "px");
 	$("#infoButton").css("font-size", aHeight*0.04 + "px");
-	$("#helpButton").css({height: aHeight*0.07 + "px", width: aHeight*0.07 + "px"});
-	$("#helpButton").css("line-height", aHeight*0.07 + "px");
+	$("#helpButton").css({height: aHeight*0.08 + "px", width: aHeight*0.08 + "px"});
+	$("#helpButton").css("line-height", aHeight*0.08 + "px");
 	$("#helpButton").css("font-size", aHeight*0.04 + "px");
 
 	$("#buttons2").css("margin-top", aHeight*0.15 + "px");
@@ -171,31 +159,23 @@ function windowResized() {
 	panel1.setPosition(0, 10);
 	panel2.setPosition($("#bottomCenter").width() - w2, 10);
 
-	if (window.innerWidth > 900) {
-		new ControllerStyle("defaultStyle");
-	} else {
-		new ControllerStyle("tiny")
-	}
-	/*if(window.innerWidth < 700) {
-		$(".qs_label").css("fontSize", "0.8em");
-	} else {$(".qs_label").css("fontSize", "");}*/
 	bkHeight = $("#beakersImg").height();
 	boxHeight = $("#topCenter").height();
 	fallDist = 100*(0.6*bkHeight/boxHeight);
 	clear();
 	switch(showWhichGraph) {
 		case "1":
-		plot1.setOuterDim(clientWidth - 200, clientHeight * 0.54);
+		plot1.setOuterDim(clientWidth - 140, clientHeight * 0.54);
 		plot1.setPos(10, clientHeight * 0.02);
 		break;
 		case "2":
-		plot2.setOuterDim(clientWidth - 200, clientHeight * 0.54);
+		plot2.setOuterDim(clientWidth - 140, clientHeight * 0.54);
 		plot2.setPos(10, clientHeight * 0.02);
 		break;
 		case "3":
-		plot1.setOuterDim(clientWidth*0.5 - 100, clientHeight * 0.54);
-		plot2.setOuterDim(clientWidth*0.5 - 100, clientHeight * 0.54);
-		plot2.setPos(clientWidth*0.5 - 100, clientHeight * 0.02);
+		plot1.setOuterDim(clientWidth*0.5 - 70, clientHeight * 0.54);
+		plot2.setOuterDim(clientWidth*0.5 - 70, clientHeight * 0.54);
+		plot2.setPos(clientWidth*0.5 - 70, clientHeight * 0.02);
 		break;
 	}
 	resizeCanvas(clientWidth / 0.95, cnv.height = clientHeight * 0.58 / 0.95);
@@ -898,6 +878,7 @@ function drawPlot2() {
 }
 
 function setup() {
+	pixelDensity(4.0);
 	cnv = createCanvas(100, 100);
 	cnv.parent("bottomCenter");
 	plot1 = new GPlot(this);
