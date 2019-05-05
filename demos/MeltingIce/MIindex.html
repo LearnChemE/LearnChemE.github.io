@@ -25,34 +25,33 @@ original-source:https://www.projects.bucknell.edu/Inquiry_Activities/HT_JS/Melti
 
     <!-- imports p5.js libraries from local folders -->
     <script type="text/javascript" src="libraries/p5/p5.min.js"></script>
-    <script type="text/javascript" src="libraries/p5/addons/p5.dom.min.js"></script>
+    <!-- <script type="text/javascript" src="libraries/p5/addons/p5.dom.min.js"></script> -->
     <script type="text/javascript" src="libraries/plotFun.js"></script>
-    
+
     <!-- imports grafica and GUI libraries from local folders -->
     <script type="text/javascript" src="libraries/grafica.js"></script>
-    <script type="text/javascript" src="libraries/dat.gui.js"></script>
+    <script src="libraries/quicksettings3/quicksettings.js"></script>
 
+    <!-- latset version of jQuery-->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-
-    <!-- Bootstrap: Latest compiled and minified CSS -->
+    <!-- Bootstrap: compiled and minified CSS. Versions from original simulation. -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
         integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-    <!-- Bootstrap: Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
         integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-    <!-- Bootstrap: Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
         integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
     </script>
 
-    <script src="libraries/quicksettings3/quicksettings.js"></script>
+    <!-- styling for the sliders / GUI -->
     <link id="qs_styles" rel="stylesheet" href="libraries/quicksettings3/quicksettings_custom_tiny.css">
+
+    <!-- all other styling -->
     <link href="MISstyle.css" type="text/css" rel="stylesheet" />
 
+    <!-- program lives in this script-->
     <script type="text/javascript" src="MISscript.js"></script>
 </head>
 
@@ -131,15 +130,15 @@ original-source:https://www.projects.bucknell.edu/Inquiry_Activities/HT_JS/Melti
                 </textarea>
 
             <div class="graphChoose">
-                <input type="radio" id="which1" name="whichGraph" value="1" checked/><label for="which1"> ice melt vs. time </label><br>
-                <input type="radio" id="which2" name="whichGraph" value="2" /><label for="which2"> temperature vs. time </label><br>
+                <input type="radio" id="which1" name="whichGraph" value="1" checked /><label for="which1"> ice melt vs.
+                    time </label><br>
+                <input type="radio" id="which2" name="whichGraph" value="2" /><label for="which2"> temperature vs. time
+                </label><br>
                 <input type="radio" id="which3" name="whichGraph" value="3" /><label for="which3"> both </label>
             </div>
 
             <a href="javascript:" id="graphInfo" class="btn btn-info btn-lg" value="graphButton">Enable Graph
-                    Tooltips</a>
-
-            <!--[if IE]><a id="IEexp" href="">Why do my ice cubes look like an 8-bit video game?</a><![endif]-->
+                Tooltips</a>
         </div>
 
     </div>
