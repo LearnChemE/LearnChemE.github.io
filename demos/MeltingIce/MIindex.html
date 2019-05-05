@@ -20,6 +20,19 @@ original-source:https://www.projects.bucknell.edu/Inquiry_Activities/HT_JS/Melti
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Melting Ice Simulation (MIS)</title>
 
+    <!-- imports various libraries from local folders-->
+    <script type="text/javascript" src="libraries/math.js"></script>
+
+    <!-- imports p5.js libraries from local folders -->
+    <script type="text/javascript" src="libraries/p5/p5.min.js"></script>
+    <script type="text/javascript" src="libraries/p5/addons/p5.dom.min.js"></script>
+    <script type="text/javascript" src="libraries/plotFun.js"></script>
+    
+    <!-- imports grafica and GUI libraries from local folders -->
+    <script type="text/javascript" src="libraries/grafica.js"></script>
+    <script type="text/javascript" src="libraries/dat.gui.js"></script>
+
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 
@@ -36,8 +49,8 @@ original-source:https://www.projects.bucknell.edu/Inquiry_Activities/HT_JS/Melti
         integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
     </script>
 
-    <script src="quicksettings3/quicksettings.js"></script>
-    <link id="qs_styles" rel="stylesheet" href="quicksettings3/quicksettings.css">
+    <script src="libraries/quicksettings3/quicksettings.js"></script>
+    <link id="qs_styles" rel="stylesheet" href="libraries/quicksettings3/quicksettings.css">
     <link href="MISstyle.css" type="text/css" rel="stylesheet" />
 
     <script type="text/javascript" src="MISscript.js"></script>
@@ -78,6 +91,10 @@ original-source:https://www.projects.bucknell.edu/Inquiry_Activities/HT_JS/Melti
                         class="glyphicon glyphicon-question-sign"></span></a>
             </div>
 
+            <div id="initConds">
+                <p>Initial conditions:<br>10g ice in each cup<br>1L water in each beaker</p>
+            </div>
+
             <img id="waterImg" alt="" src="water.png" />
             <img id="beakersImg" alt="" src="beakers.png" />
             <img id="stirBar1" alt="" src="stirBar.gif" />
@@ -106,28 +123,24 @@ original-source:https://www.projects.bucknell.edu/Inquiry_Activities/HT_JS/Melti
         <div class="box c" id="topRight">
         </div>
 
-        <div class="box b3" id="initCond">
-            <label id="initialIceLabel">Initial condition: 1000g ice in each cup</label>
+        <div class="box b3" id="buttons4">
+            <a href="javascript:" id="graphInfo" class="btn btn-info btn-lg" value="graphButton">Enable Graph
+                Tooltips</a>
         </div>
 
         <div class="box d" id="bottomCenter">
 
-            <img id="graphBase" src="graphBase.png" alt="" />
             <textarea id="graphHeightInfo" class="myTooltip">The height of the graph represents how much ice has melted.
                 </textarea>
             <textarea id="graphSlopeInfo" class="myTooltip">The slope of the graph represents the rate of heat transfer. A steeper slope corresponds to faster heat transfer.
                 </textarea>
 
-            <label id="yLabel1" class="graphLabel"></label>
-            <label id="yLabel2" class="graphLabel"></label>
-            <label id="yLabel3" class="graphLabel"></label>
-            <label id="yLabel4" class="graphLabel"></label>
-            <label id="xLabel1" class="graphLabel"></label>
-            <label id="xLabel2" class="graphLabel"></label>
-            <label id="xLabel3" class="graphLabel"></label>
-            <label id="xLabel4" class="graphLabel"></label>
-            <a href="javascript:" id="graphInfo" class="btn btn-info btn-lg" value="graphButton">Enable Graph
-                Tooltips</a>
+            <div class="graphChoose">
+                <input type="radio" id="which1" name="whichGraph" value="1" checked/><label for="which1"> ice melt vs. time </label><br>
+                <input type="radio" id="which2" name="whichGraph" value="2" /><label for="which2"> temperature vs. time </label><br>
+                <input type="radio" id="which3" name="whichGraph" value="3" /><label for="which3"> both </label>
+            </div>
+
             <!--[if IE]><a id="IEexp" href="">Why do my ice cubes look like an 8-bit video game?</a><![endif]-->
         </div>
 

@@ -15,46 +15,67 @@
 
 $(document).ready(init);
 
+let maxWidth = Math.min(document.documentElement.clientWidth, 1200);
+let	maxHeight = Math.min(document.documentElement.clientHeight, 1000);
+let	minWidth = Math.max(600, document.documentElement.clientWidth);
+let	minHeight = Math.max(500, document.documentElement.clientHeight);
+
+let	clientWidth = Math.max(minWidth, maxWidth);
+let clientHeight = Math.max(minHeight, maxHeight);
+
+if (clientWidth > 1.2 * clientHeight) {
+	clientWidth = clientHeight * 1.2
+} else {
+	clientHeight = clientWidth / 1.2
+}
+
 // Global constants
 var icewaterTemp = 0;
-var tauNumber = 5; // a scaling factor
-var graphWidth = 811; // The width of the graph in pixels; used for scaling - 90% is used
-var graphHeight = 453; // The height of the graph in pixels; used for scaling - top 88% is used
+var waterHeatCap = 4.184; // J/(g K)
+var waterMass = 1000; // g
 
 // Variables to keep track of state
 var graphInfoShowing = false;
 var experimentStarted = false;
 var experimentRunning = false;
+var blocksDropped = false;
 var sit1BlockTop;
 var sit2BlockTop;
 var sit1BlockHeight;
 var sit2BlockHeight;
-var currentStep = 1;
+var currentStep = 0;
 
 // Variables to hold input values
-var initialTemp1 = 30;
-var heatCapacity1 = 1;
-var mass1 = 1;
-var area1 = 1;
+var initialTemp1 = 400;
+var heatCapacity1 = 10;
+var mass1 = 5;
+var area1 = 9;
 var numBlocks1 = 1;
-var stirFactor1 = 0.03;
+var stirFactor1 = 1000;
 
-var initialTemp2 = 30;
-var heatCapacity2 = 1;
-var mass2 = 1;
-var area2 = 1;
-var numBlocks2 = 1;
-var stirFactor2 = 0.03;
+var initialTemp2 = 80; // celsius
+var heatCapacity2 = 1; // J/(g K)
+var mass2 = 1; // g
+var area2 = 1; // cm^2 per block
+var numBlocks2 = 1; // integer, number of blocks
+var stirFactor2 = 1000; // heat transfer coefficient
 
-// Variables that will be necessary for calculations
-var currentBlockTemp1;
-var currentBlockTemp2;
-var tau; // total "time" to simulate (depends on user's inputs; is NOT the number of steps to run)
-var initialQ1;
-var initialQ2;
-var q1;
-var q2;
-var secondsPerStep;
+var waterHeatFusion = 333.05; // J/g
+
+var sit1IceArray = [[0, 0]];
+var sit2IceArray = [[0, 0]];
+
+var iceMeltedVsTime1;
+var iceMeltedVsTime2;
+var tempVsTime1;
+var tempVsTime2;
+var tempVsTime3;
+var tempVsTime4;
+var plotPts1 = [];
+var plotPts2 = [];
+
+var showWhichGraph = "1";
+
 var iceMeltHeight1; // iceMeltHeight and iceMeltWidth represent the amount the ice's size should change in each dimension,
 var iceMeltWidth1; // such that, for example, the ice's full size minus iceMeltHeight1 will give you the height the ice
 var iceMeltHeight2; // should be at the end of a given experiment.
@@ -63,11 +84,26 @@ var currentIceWidth1;
 var currentIceHeight1;
 var currentIceWidth2;
 var currentIceHeight2;
-var xScale; // Used to store pixels/second for the x-axis of the graph
-var yScale; // Used to store pixels/gram for the x-axis of the graph
 
 var panel1;
 var panel2;
+
+var arr;
+
+var plot1;
+var plot2;
+
+var plotPts = [];
+var xAxisLimit = 120;
+var yAxisLimit1 = 1;
+var yAxisLimit2 = 400;
+
+var bkHeight;
+var boxHeight;
+var blockHeight;
+
+let fallDist;
+let maxIce = 10; // amount of ice in the beakers, g
 
 class ControllerStyle {
 	constructor(data) {
@@ -75,21 +111,42 @@ class ControllerStyle {
 
 		var styleTag = document.getElementById("qs_styles");
 		if (this.data == "defaultStyle") {
-			styleTag.href = "quicksettings3/quicksettings_custom.css";
+			styleTag.href = "libraries/quicksettings3/quicksettings_custom.css";
 		} else {
-			styleTag.href = "quicksettings3/quicksettings_custom_tiny.css";
+			styleTag.href = "libraries/quicksettings3/quicksettings_custom_tiny.css";
 		}
 	}
 };
 
-function resize() {
+function windowResized() {
+	maxWidth = Math.min(document.documentElement.clientWidth * 0.95, 1200);
+	maxHeight = Math.min(document.documentElement.clientHeight * 0.95, 1000);
+	minWidth = Math.max(600, document.documentElement.clientWidth * 0.95);
+	minHeight = Math.max(500, document.documentElement.clientHeight * 0.95);
+
+	clientWidth = Math.max(minWidth, maxWidth);
+	clientHeight = Math.max(minHeight, maxHeight);
+
+	if (clientWidth > 1.2 * clientHeight) {
+		clientWidth = clientHeight * 1.2
+	} else {
+		clientHeight = clientWidth / 1.2
+	}
+	getAreas();
+
+	$(".wrapper").css("width", clientWidth + "px");
+	$(".wrapper").css("height", clientHeight + "px");
+	$(".box").css("height", clientHeight * 0.38 + "px");
+	$(".b3").css("height", clientHeight * 0.04 + "px");
+	$(".d").css("height", clientHeight * 0.58 + "px");
+
 	var w1 = $("#topLeft").width();
 	var w2 = $("#topRight").width();
 	panel1.setWidth(w1);
 	panel2.setWidth(w2);
 
-	panel1.setPosition(0, 30);
-	panel2.setPosition($("#bottomCenter").width() - w2, 30);
+	panel1.setPosition(0, 10);
+	panel2.setPosition($("#bottomCenter").width() - w2, 10);
 
 	if (window.innerWidth > 900) {
 		new ControllerStyle("defaultStyle");
@@ -99,22 +156,42 @@ function resize() {
 	/*if(window.innerWidth < 700) {
 		$(".qs_label").css("fontSize", "0.8em");
 	} else {$(".qs_label").css("fontSize", "");}*/
+	bkHeight = $("#beakersImg").height();
+	boxHeight = $("#topCenter").height();
+	fallDist = 100*(0.6*bkHeight/boxHeight);
+	clear();
+	switch(showWhichGraph) {
+		case "1":
+		plot1.setOuterDim(clientWidth - 200, clientHeight * 0.54);
+		plot1.setPos(10, clientHeight * 0.02);
+		break;
+		case "2":
+		plot2.setOuterDim(clientWidth - 200, clientHeight * 0.54);
+		plot2.setPos(10, clientHeight * 0.02);
+		break;
+		case "3":
+		plot1.setOuterDim(clientWidth*0.5 - 100, clientHeight * 0.54);
+		plot2.setOuterDim(clientWidth*0.5 - 100, clientHeight * 0.54);
+		plot2.setPos(clientWidth*0.5 - 100, clientHeight * 0.02);
+		break;
+	}
+	resizeCanvas(clientWidth / 0.95, cnv.height = clientHeight * 0.58 / 0.95);
+	clear();
 }
 
 window.onload = function () {
 	QuickSettings.useExtStyleSheet();
 	panel1 = QuickSettings.create(0, 30, "Settings: Situation 1", document.body, "red")
-		.addRange("Initial Temperature (°C)", 1, 400, 30, 1, function (value) {
+		.addRange("Initial Temperature (°C)", 1, 400, 400, 1, function (value) {
 			initialTemp1 = value;
-			getTemps();
 		})
-		.addRange("Block Heat Capacity (J/(g °C))", 0.1, 10, 1, 0.1, function (value) {
+		.addRange("Block Heat Capacity (J/(g °C))", 0.1, 10, 10, 0.1, function (value) {
 			heatCapacity1 = value;
 		})
-		.addRange("Block 1 Mass (g)", 0.1, 5, 1, 0.1, function (value) {
+		.addRange("Block 1 Mass (g)", 0.1, 5, 5, 0.1, function (value) {
 			mass1 = value;
 		})
-		.addRange("Block 1 area (cm²)", 1, 9, 1, 1, function (value) {
+		.addRange("Block 1 area (cm²)", 1, 9, 9, 1, function (value) {
 			area1 = value;
 			getAreas();
 		})
@@ -125,18 +202,17 @@ window.onload = function () {
 		.addBoolean("Stir Bar:", false, function (value) {
 			if (value) {
 				$("#stirBar1").show();
-				stirFactor1 = 0.1;
+				stirFactor1 = 3000;
 			} else {
 				$("#stirBar1").hide();
-				stirFactor1 = 0.03;
+				stirFactor1 = 1000;
 			}
 		})
 		.setDraggable(true);
 
 	panel2 = QuickSettings.create($("#bottomCenter").width() - 220, 30, "Settings: Situation 2", document.body, "blue")
-		.addRange("Initial Temperature (°C)", 1, 400, 30, 1, function (value) {
+		.addRange("Initial Temperature (°C)", 1, 400, 80, 1, function (value) {
 			initialTemp2 = value;
-			getTemps();
 		})
 		.addRange("Block Heat Capacity (J/(g °C))", 0.1, 10, 1, 0.1, function (value) {
 			heatCapacity2 = value;
@@ -155,19 +231,15 @@ window.onload = function () {
 		.addBoolean("Stir Bar:", false, function (value) {
 			if (value) {
 				$("#stirBar2").show();
-				stirFactor2 = 0.1;
+				stirFactor2 = 3000;
 			} else {
 				$("#stirBar2").hide();
-				stirFactor2 = 0.03;
+				stirFactor2 = 1000;
 			}
 		})
 		.setDraggable(true);
 
-	resize();
-}
-
-window.onresize = function () {
-	resize()
+windowResized();
 }
 
 /*
@@ -187,10 +259,14 @@ function init() {
 	$("#graphHeightInfo").hide();
 	$("#graphSlopeInfo").hide();
 
-	resetSituation1(); // restore Situation 1 parameters to default values (in program and on display)
-	resetSituation2();
-	generateGraphPoints(); // must initialize the objects used as points on the graph
-	resetExperiment(); // the experiment animations must be reset AFTER the graph points are initialized
+	$(".sit1Ice").css({
+		height: "9.5%",
+		width: "10.8%"
+	});
+	$(".sit2Ice").css({
+		height: "9.5%",
+		width: "10.8%"
+	});
 
 	// register event handlers for control buttons (start, pause, reset, help)
 	$("#startButton").on('click', startMelting);
@@ -202,25 +278,99 @@ function init() {
 	$("#graphInfo").on('click', displayGraphInfo);
 	$("#infoButton").on('click', displayAboutInfo);
 	$("#IEexp").on('click', displayIEexp);
+	
+	$("input[name='whichGraph']").click(function() {
+		showWhichGraph = $("input[name='whichGraph']:checked").val();
+		windowResized();
+	  });
 
+	bkHeight = $("#beakersImg").height();
+	boxHeight = $("#topCenter").height();
+	fallDist = 100*(0.6*bkHeight/boxHeight);
+
+	getAreas();
+	updateBlockColors();
+	getNumBlocks();
 	//panel2.setPosition($("#topRight").offset().left, 10);
 }
 
 /*
  * Function: generateGraphPoints
- * Adds 1000 images (500 for each Situation) to the HTML page to represent points on the graph. This is
- * done only when the page is first loaded. Done dynamically to keep the saved HTML document concise.
  */
 function generateGraphPoints() {
-	var sit1HTML = "";
-	var sit2HTML = "";
 
-	for (var i = 1; i <= 500; i++) {
-		sit1HTML += '<img id="sit1Point' + i + '" class="sit1Point" src="blank_img.png" />';
-		sit2HTML += '<img id="sit2Point' + i + '" class="sit2Point" src="blank_img.png" />';
+	var UA1 = stirFactor1 * area1 / 10000;
+	var UA2 = stirFactor2 * area2 / 10000;
+	var TB01 = initialTemp1;
+	var TB02 = initialTemp2;
+	var TW0 = 0;
+	var cpBmB1 = heatCapacity1 * mass1;
+	var cpBmB2 = heatCapacity2 * mass2;
+	var cpWmW = waterHeatCap * waterMass;
+	var HfW = waterHeatFusion;
+
+	// ice melted vs time equation: mi(t) = cpB*mB*(TB0 - TW0)*(1-e^(-U*A*t/cpB*mB)) / (Hfw*mW) => outputs a string
+	iceMeltedVsTime1 = String(cpBmB1*(TB01-TW0)).concat("(1 - e^(",String(-UA1/cpBmB1),"*t))/",String(HfW));
+
+	iceMeltedVsTime2 = String(cpBmB2*(TB02-TW0)).concat("(1 - e^(",String(-UA2/cpBmB2),"*t))/",String(HfW))
+
+	// temperature vs time equation, constant water temperature: T(t) = (m*cp*TB0 + U*A*Tw*t)/(M*cp + U*A*t) => outputs a string
+	tempVsTime1 = String(TW0).concat("+",String(TB01-TW0),"*e^(",String(-UA1/cpBmB1),"*t)");
+
+	tempVsTime2 = String(TW0).concat("+",String(TB02-TW0),"*e^(",String(-UA2/cpBmB2),"*t)");
+
+	sit1IceArray = functionToArray(iceMeltedVsTime1, ["t", 0, 120, 0.2]);
+	sit2IceArray = functionToArray(iceMeltedVsTime2, ["t", 0, 120, 0.2]);
+
+	var meltedAt1 = false;
+	var meltedAt2 = false;
+	var meltIndex1 = 600;
+	var meltIndex2 = 600;
+
+	//finds the array index at which the ice is fully melted, if the ice fully melts. Otherwise, meltIndex is the last value in the array and never melts.
+	for (i = 0; i < sit1IceArray.length; i++) {
+		if (sit1IceArray[i][1] >= maxIce) {
+			sit1IceArray[i][1] = maxIce;
+			if(!meltedAt1) {
+				meltIndex1 = i;
+			}
+			meltedAt1 = true;
+		}
+	};
+
+	for (i = 0; i < sit2IceArray.length; i++) {
+		if (sit2IceArray[i][1] >= maxIce) {
+			sit2IceArray[i][1] = maxIce;
+			if(!meltedAt2) {
+				meltIndex2 = i;
+			}
+			meltedAt2 = true;
+		}
+	};
+
+	sit1TempArray = functionToArray(tempVsTime1, ["t", 0, meltIndex1 * 0.2, 0.2]);
+	sit2TempArray = functionToArray(tempVsTime2, ["t", 0, meltIndex2 * 0.2, 0.2]);
+
+	if(meltedAt1) {
+		let TB0 = sit1TempArray[meltIndex1][1];
+
+		// string form of the equation to calculate the block temp when water temperature is not constant
+		tempVsTime3 = "(".concat(String(cpBmB1*TB0 + cpWmW*TW0),"+",String((TB0 - TW0)*cpWmW),"*e^(",String((-cpBmB1-cpWmW)*UA1/(cpBmB1*cpWmW)),"*(t - ",String(meltIndex1 * 0.2),")))/",String(cpBmB1+cpWmW));	
+		let newArray = functionToArray(tempVsTime3, ["t", meltIndex1 * 0.2, 120, 0.2]);
+		sit1TempArray = sit1TempArray.concat(newArray);
+	
 	}
 
-	$("#graphBase").after('<div id="graphPointsDiv">' + sit1HTML + sit2HTML + '</div>');
+	if(meltedAt2) {
+		let TB0 = sit2TempArray[meltIndex2][1];
+		tempVsTime4 = "(".concat(String(cpBmB2*TB0 + cpWmW*TW0),"+",String((TB0 - TW0)*cpWmW),"*e^(",String((-cpBmB2-cpWmW)*UA2/(cpBmB2*cpWmW)),"*(t - ",String(meltIndex2 * 0.2),")))/",String(cpBmB2+cpWmW))
+		let newArray = functionToArray(tempVsTime4, ["t", meltIndex2 * 0.2, 120, 0.2]);
+		sit2TempArray = sit2TempArray.concat(newArray);
+	}
+
+	yAxisLimit1 = Math.max(Math.min(sit2IceArray[sit2IceArray.length - 1][1] * 1.1, 10), Math.min(sit1IceArray[sit1IceArray.length - 1][1] * 1.1, 10.5));
+
+	yAxisLimit2 = Math.max(initialTemp1, initialTemp2);
 }
 
 /*
@@ -251,9 +401,7 @@ function resetExperiment() {
 
 	experimentRunning = false;
 	experimentStarted = false;
-
-	graphWidth = Math.ceil($("#graphBase").width() * 0.9); // The width of the graph in pixels; used for scaling
-	graphHeight = Math.ceil($("#graphBase").height() * 0.88);
+	blocksDropped = false;
 
 	$("#startButton").removeAttr("disabled");
 
@@ -277,71 +425,61 @@ function resetExperiment() {
 		height: "9.5%",
 		width: "10.8%"
 	});
-	/*$(".sit1Ice").hide();
-	$(".sit2Ice").hide();*/
-	$(".sit1Point").hide();
-	$(".sit2Point").hide();
-	$(".graphLabel").hide();
 
-	// reset currentBlockTemp1 and currentBlockTemp2 by simply re-reading in the initial
+	currentStep = 0;
+	blockHeight = 50;
+
+	sit1PtsGraph1 = [];
+	sit2PtsGraph1 = [];
+	sit1PtsGraph2 = [];
+	sit2PtsGraph2 = [];
+
+	sit1IceArray = [[0, 0]];
+	sit2IceArray = [[0, 0]];
+	sit1TempArray = [[0, initialTemp1]];
+	sit2TempArray = [[0, initialTemp2]];
+
+	currentIceHeight1 = 9.5;
+	currentIceWidth1 = 10.8;
+	currentIceHeight2 = 9.5;
+	currentIceWidth2 = 10.8;
+
+	iceMeltHeight1 = 9.5;
+	iceMeltWidth1 = 10.8;
+	iceMeltHeight2 = 9.5;
+	iceMeltWidth2 = 10.8;
+
 	// temperature inputs
-	getTemps();
 	getAreas();
 	updateBlockColors();
 	getNumBlocks();
 }
 
 
-
-/*
- *************************************************************************
- *					Event Handlers for Input Fields						*
- *************************************************************************
- */
-
-/*
- * Event Handler Function: getTemps
- * Called when the "initial block temperature" value is changed in the user input field, in either Situation.
- *
- * Reads in the values for "initial block temperature" in both Situation 1 and Situation 2, and updates the
- * "current block temperature" display and the color of the blocks according to the new temperature for each Situation.
- */
-function getTemps() {
-	// label to reflect the new temperature
-	currentBlockTemp1 = initialTemp1;
-	$("#currentBlockTemp1").html(currentBlockTemp1);
-
-	// label to reflect the new temperature
-	currentBlockTemp2 = initialTemp2;
-	$("#currentBlockTemp2").html(currentBlockTemp2);
-
-	updateBlockColors();
-}
-
 /*
  * Function: updateBlockColors
- * Auxiliary function for getTemps. Updates the colors of the blocks on display, according to the
+ * Updates the colors of the blocks on display, according to the
  * current temperature of the blocks for each situation. (Is also called to update the blocks
  * while an experiment is running.)
  */
 function updateBlockColors() {
 	// Change situation 1 blocks' color to reflect the temperature
-	if (currentBlockTemp1 < 40) {
+	if (initialTemp1 < 40) {
 		$(".sit1block").css("background", "url('blocks.png') 0 0"); // black
-	} else if (currentBlockTemp1 < 180) {
+	} else if (initialTemp1 < 180) {
 		$(".sit1block").css("background", "url('blocks.png') -48px 0"); // blue
-	} else if (currentBlockTemp1 < 400) {
+	} else if (initialTemp1 < 400) {
 		$(".sit1block").css("background", "url('blocks.png') -96px 0"); // purple/dark red
 	} else {
 		$(".sit1block").css("background", "url('blocks.png') -144px 0"); // bright red
 	}
 
 	// Change situation 2 blocks' color to reflect the temperature
-	if (currentBlockTemp2 < 40) {
+	if (initialTemp2 < 40) {
 		$(".sit2block").css("background", "url('blocks.png') 0 0"); // black
-	} else if (currentBlockTemp2 < 180) {
+	} else if (initialTemp2 < 180) {
 		$(".sit2block").css("background", "url('blocks.png') -48px 0"); // blue
-	} else if (currentBlockTemp2 < 400) {
+	} else if (initialTemp2 < 400) {
 		$(".sit2block").css("background", "url('blocks.png') -96px 0"); // purple/dark red
 	} else {
 		$(".sit2block").css("background", "url('blocks.png') -144px 0"); // bright red
@@ -356,206 +494,25 @@ function updateBlockColors() {
  * the size of the block pictures on the display, according to the current area values.
  */
 function getAreas() {
+	let scalingFactor = Math.min(clientWidth / 1200, clientHeight / 1000);
 	// Change the blocks' size according to the input surface area
-	switch (area1 * 1) { // must multiply by 1 to make sure area1 is treated as an integer
-		case 0:
-			$("#area1").val(1);
-			area2 = 1;
-			// If the entered area is 0, reset the area to 1, and then fall through to case 1
-		case 1:
-			$(".sit1block").css({
-				height: "17px",
-				width: "17px",
-				bottom: "50%"
-			});
-			sit1BlockTop = 50;
-			sit1BlockHeight = 17;
-			break;
-		case 2:
-			$(".sit1block").css({
-				height: "23px",
-				width: "23px",
-				bottom: "50%"
-			});
-			sit1BlockTop = 50;
-			sit1BlockHeight = 23;
-			break;
-		case 3:
-			$(".sit1block").css({
-				height: "28px",
-				width: "28px",
-				bottom: "50%"
-			});
-			sit1BlockTop = 50;
-			sit1BlockHeight = 28;
-			break;
-		case 4:
-			$(".sit1block").css({
-				height: "33px",
-				width: "32px",
-				bottom: "50%"
-			});
-			sit1BlockTop = 50;
-			sit1BlockHeight = 33;
-			break;
-		case 5:
-			$(".sit1block").css({
-				height: "36px",
-				width: "36px",
-				bottom: "50%"
-			});
-			sit1BlockTop = 50;
-			sit1BlockHeight = 36;
-			break;
-		case 6:
-			$(".sit1block").css({
-				height: "39px",
-				width: "40px",
-				bottom: "50%"
-			});
-			sit1BlockTop = 50;
-			sit1BlockHeight = 39;
-			break;
-		case 7:
-			$(".sit1block").css({
-				height: "43px",
-				width: "42px",
-				bottom: "50%"
-			});
-			sit1BlockTop = 50;
-			sit1BlockHeight = 43;
-			break;
-		case 8:
-			$(".sit1block").css({
-				height: "45px",
-				width: "46px",
-				bottom: "50%"
-			});
-			sit1BlockTop = 50;
-			sit1BlockHeight = 45;
-			break;
-		case 9:
-			$(".sit1block").css({
-				height: "48px",
-				width: "48px",
-				bottom: "50%"
-			});
-			sit1BlockTop = 50;
-			sit1BlockHeight = 48;
-			break;
-		default: // This case should never run, but if it does, reset area1 to its default value
-			area1 = 4;
-			$("#area1").val(4);
-			$(".sit1block").css({
-				height: "33px",
-				width: "32px",
-				bottom: "50%"
-			});
-			sit1BlockTop = 50;
-			sit1BlockHeight = 33;
-			break;
-	}
+	let size1 = Math.min(48, area1 * scalingFactor * 5) + "px"
+	let size2 = Math.min(48, area2 * scalingFactor * 5) + "px"
+	$(".sit1block").css({
+		height: size1,
+		width: size1,
+		bottom: "50%"
+	});
 
-	// Change the blocks' size according to the input surface area
-	switch (area2 * 1) { // must multiply by 1 to make sure area2 is treated as an integer
-		case 0:
-			$("#area2").val(1);
-			area2 = 1;
-			// If the entered area is 0, reset the area to 1, and then fall through to case 1
-		case 1:
-			$(".sit2block").css({
-				height: "17px",
-				width: "17px",
-				bottom: "50%"
-			});
-			sit2BlockTop = 50;
-			sit2BlockHeight = 17;
-			break;
-		case 2:
-			$(".sit2block").css({
-				height: "23px",
-				width: "23px",
-				bottom: "50%"
-			});
-			sit2BlockTop = 50;
-			sit2BlockHeight = 23;
-			break;
-		case 3:
-			$(".sit2block").css({
-				height: "28px",
-				width: "28px",
-				bottom: "50%"
-			});
-			sit2BlockTop = 50;
-			sit2BlockHeight = 28;
-			break;
-		case 4:
-			$(".sit2block").css({
-				height: "33px",
-				width: "32px",
-				bottom: "50%"
-			});
-			sit2BlockTop = 50;
-			sit2BlockHeight = 33;
-			break;
-		case 5:
-			$(".sit2block").css({
-				height: "36px",
-				width: "36px",
-				bottom: "50%"
-			});
-			sit2BlockTop = 50;
-			sit2BlockHeight = 36;
-			break;
-		case 6:
-			$(".sit2block").css({
-				height: "39px",
-				width: "40px",
-				bottom: "50%"
-			});
-			sit2BlockTop = 50;
-			sit2BlockHeight = 39;
-			break;
-		case 7:
-			$(".sit2block").css({
-				height: "43px",
-				width: "42px",
-				bottom: "50%"
-			});
-			sit2BlockTop = 50;
-			sit2BlockHeight = 43;
-			break;
-		case 8:
-			$(".sit2block").css({
-				height: "45px",
-				width: "46px",
-				bottom: "50%"
-			});
-			sit2BlockTop = 50;
-			sit2BlockHeight = 45;
-			break;
-		case 9:
-			$(".sit2block").css({
-				height: "48px",
-				width: "48px",
-				bottom: "50%"
-			});
-			sit2BlockTop = 50;
-			sit2BlockHeight = 48;
-			break;
-		default: // This case should never run, but if it does, reset area2 to its default value
-			area2 = 4;
-			$("#area2").val(4);
-			$(".sit2block").css({
-				height: "33px",
-				width: "32px",
-				bottom: "50%"
-			});
-			sit2BlockTop = 50;
-			sit2BlockHeight = 33;
-			break;
-	}
-
+	$(".sit2block").css({
+		height: size2,
+		width: size2,
+		bottom: "50%"
+	});
+/* 
+	sit1BlockTop = 50;
+	sit1BlockHeight = area1 * scalingFactor; */
+	
 }
 /*
  * Event Handler Function: getNumBlocks
@@ -635,7 +592,6 @@ function resetSituation1() {
 	area1 = 1;
 	numBlocks1 = 1;
 
-	getTemps();
 	getAreas();
 	getNumBlocks();
 	//	toggleStirBar1();
@@ -655,7 +611,6 @@ function resetSituation2() {
 	area2 = 1;
 	numBlocks2 = 1;
 
-	getTemps();
 	getAreas();
 	getNumBlocks();
 	//	toggleStirBar1();
@@ -686,9 +641,10 @@ function pauseMelting() {
 		$("#pauseButton").find(".glyphicon").addClass('glyphicon-play');
 	} else {
 		experimentRunning = true;
+		redraw();
 		$("#pauseButton").find(".glyphicon").removeClass('glyphicon-play');
 		$("#pauseButton").find(".glyphicon").addClass('glyphicon-pause');
-		calculateStep();
+		pictureBehavior();
 	}
 }
 
@@ -702,6 +658,10 @@ function pauseMelting() {
 function startMelting() {
 	// Reset experiment to the beginning (ex. unmelt ice cubes, move blocks back to their starting location, etc.) just
 	// in case the user re-starts the experiment without explicitly clicking the Reset button first
+	if (experimentStarted) {
+		return;
+	}
+
 	resetExperiment();
 
 	// Disable "start" button and enable "pause" button
@@ -711,13 +671,14 @@ function startMelting() {
 	$("#pauseButton").css("border-color", "#F00");
 
 	// Initialize starting values for the calculations
-	calculateGraphLabels();
-	initializeCalculationVars();
+	generateGraphPoints();
 
 	// Start the experiment
 	experimentRunning = true;
 	experimentStarted = true;
-	dropBlocks();
+
+	currentStep = 0;
+	blockHeight = 50;
 
 	panel1.disableControl("Initial Temperature (°C)");
 	panel1.disableControl("Block Heat Capacity (J/(g °C))");
@@ -735,281 +696,53 @@ function startMelting() {
 }
 
 /*
- * Function: calculateGraphLabels
- * Determines the appropriate max values for the x and y axes on the graph for the current experiment (essentially, adjusts
- * the "zoom" of the graph to make it most readable). Also updates the display of how much ice each beaker starts with,
- * since this is where that number is calculated.
- *
- * To calculate appropriate max for the y-axis (amount of ice melted), the function must essentially run the whole simulation
- * mathematically before the simulation is run for the user, to determine how much ice should melt in 500 steps. Although it is
- * computationally redundant to run the experiment twice, the alternatives are to leave the y-axis unlabeled until the very end
- * of the experiment (not ideal for the user), or to store several data points for each of the 500 steps of calculation in order
- * to reuse them when running the experiment "for real". The computer can run the experiment quickly enough that the user does
- * not notice the lag produced by doing it twice, so this is the most effective alternative.
- *
- * The max value for the x-axis depends on tau, which is calculated in initializeCalculationVars, and represents the amount of time
- * it will take for the fastest Situation to melt all of the ice
- */
-function calculateGraphLabels() {
-	// Because we're essentially pre-running the whole experiment to find yMax, we need to initialize the variables here, too
-	initializeCalculationVars();
-	var qInstant1;
-	var qInstant2;
-	var xMax;
-	var yMax;
-
-	for (var i = 1; i <= 500; i++) {
-		// Calculate heat transfer and new block temperatures for this step for the blocks of situation 1
-		qInstant1 = stirFactor1 * area1 * numBlocks1 * (currentBlockTemp1 - icewaterTemp) * secondsPerStep;
-		if (qInstant1 > initialQ1)
-			qInstant1 = initialQ1;
-		if ((initialQ1 - q1) / (1000 * 2.01) < 1) {
-			q1 = q1 - qInstant1;
-			currentBlockTemp1 = q1 / (numBlocks1 * mass1 * heatCapacity1) + icewaterTemp;
-		} else {
-			q1 += 0
-		};
-
-		// Calculate heat transfer and new block temperatures for this step for the blocks of situation 2
-		qInstant2 = stirFactor2 * area2 * numBlocks2 * (currentBlockTemp2 - icewaterTemp) * secondsPerStep;
-		if (qInstant2 > initialQ2)
-			qInstant2 = initialQ2;
-		q2 = q2 - qInstant2;
-		currentBlockTemp2 = q2 / (numBlocks2 * mass2 * heatCapacity2) + icewaterTemp;
-	}
-
-	var iceMelt1 = (initialQ1 - q1) / 2.01; // The heat capacity for ice is 2.01 j/gC
-	var iceMelt2 = (initialQ2 - q2) / 2.01;
-	var maxIceMelt;
-
-	if (iceMelt1 > iceMelt2)
-		maxIceMelt = Math.floor(iceMelt1);
-	else
-		maxIceMelt = Math.floor(iceMelt2);
-
-	// Now that we know the amount of ice that both beakers will start with (i.e. the max ice that will
-	// be melted) we can update that amount on the display
-	//$("#initialIce").html(maxIceMelt);
-
-	// We only want the order of magnitude for y, so separate out the first digit
-	// and fill in the rest with 0's
-	if (maxIceMelt >= 100000)
-		yMax = Math.ceil(maxIceMelt / 100000) * 100000;
-	else if (maxIceMelt >= 10000)
-		yMax = Math.ceil(maxIceMelt / 10000) * 10000;
-	else if (maxIceMelt >= 1000)
-		yMax = Math.ceil(maxIceMelt / 1000) * 1000;
-	else if (maxIceMelt >= 100)
-		yMax = Math.ceil(maxIceMelt / 100) * 100;
-	else if (maxIceMelt >= 10)
-		yMax = Math.ceil(maxIceMelt / 10) * 10;
-	else
-		yMax = Math.ceil(maxIceMelt);
-
-	yMax = Math.min(yMax, 1000);
-
-	// Having calculated yMax, fill in the values of the 4 labels on the y-axis accordingly
-	$("#yLabel1").html(yMax / 4);
-	$("#yLabel2").html(yMax / 2);
-	$("#yLabel3").html(yMax * 3 / 4);
-	$("#yLabel4").html(yMax);
-
-
-	// Now label the x-axis
-	xMax = Math.floor(tau);
-	$("#xLabel1").html(xMax / 4);
-	$("#xLabel2").html(xMax / 2);
-	$("#xLabel3").html(xMax * 3 / 4);
-	$("#xLabel4").html(xMax);
-
-	$(".graphLabel").show();
-
-	// Finally, calculate xScale and yScale
-	xScale = graphWidth / xMax;
-	yScale = graphHeight / yMax;
-}
-
-/*
- * Function: initializeCalculationVars
- *
- */
-function initializeCalculationVars() {
-	currentStep = 1;
-
-	// Ensure all input values are current
-	getTemps();
-	getAreas();
-	getNumBlocks();
-
-	//toggleStirBar1();
-	//toggleStirBar2();
-
-	var tau1 = mass1 * heatCapacity1 / (numBlocks1 * stirFactor1 * area1);
-	var tau2 = mass2 * heatCapacity2 / (numBlocks2 * stirFactor2 * area2);
-	if (tau1 > tau2)
-		tau = tau1 * tauNumber;
-	else
-		tau = tau2 * tauNumber;
-
-	secondsPerStep = tau / 500;
-
-	initialQ1 = mass1 * heatCapacity1 * (currentBlockTemp1 - icewaterTemp) * numBlocks1;
-	q1 = initialQ1;
-	initialQ2 = mass2 * heatCapacity2 * (currentBlockTemp2 - icewaterTemp) * numBlocks2;
-	q2 = initialQ2;
-
-	currentIceHeight1 = 9.5;
-	currentIceWidth1 = 10.8;
-	currentIceHeight2 = 9.5;
-	currentIceWidth2 = 10.8;
-
-	iceMeltHeight1 = 9.5;
-	iceMeltWidth1 = 10.8;
-	iceMeltHeight2 = 9.5;
-	iceMeltWidth2 = 10.8;
-}
-
-function dropBlocks() {
-
-	var bkHeight = $("#beakersImg").height();
-	var boxHeight = $("#topCenter").height();
-
-	const fallHeight = (0.01 * sit1BlockTop * boxHeight - 0.6 * bkHeight) / boxHeight;
-
-	sit1BlockTop = sit1BlockTop - fallHeight * 100;
-	var cssVal1 = sit1BlockTop + "%";
-
-	sit2BlockTop = sit2BlockTop - fallHeight * 100;
-	var cssVal2 = sit2BlockTop + "%";
-
-	// Move the blocks down until they hit the water (the coordinates that were just calculated). Make
-	// the fall take half a second (500ms). Then call calculateStep to start the heat-transfer calculations.
-	$(".sit1block").animate({
-		bottom: cssVal1
-	}, 500, "linear");
-	$("#sit2block1, #sit2block2, #sit2block3").animate({
-		bottom: cssVal2
-	}, 500, "linear");
-	//sit2block4 must be animated separately so that the callback can be attached to only that one block;
-	// otherwise it will be called four times (one for each block selected by ".sit2block")
-	$("#sit2block4").animate({
-		bottom: cssVal2
-	}, 500, "linear", calculateStep);
-}
-
-
-/*
  *************************************************************************
  *							Running the Simulation						*
  *************************************************************************
  */
 
-function calculateStep() {
-	if (!experimentRunning) return;
-	if (currentStep > 500) {
-		experimentRunning = false;
-		$("#startButton").removeAttr("disabled");
-		$("#startButton").css("border-color", "#093");
-		$("#pauseButton").attr("disabled", "disabled");
-		$("#pauseButton").css("border-color", "gray");
-		return;
+function pictureBehavior() {
+
+	if (currentStep == 0 && !blocksDropped && experimentRunning) {
+
+		blockHeight -= 1;
+
+		$(".sit1block").css("bottom", blockHeight + "%");
+		$(".sit2block").css("bottom", blockHeight + "%");
+
+		if (blockHeight <= fallDist) {blocksDropped = true} else {blocksDropped = false}
+
+	} else if (experimentRunning) {
+
+		currentIceHeight1 = Math.max(0, iceMeltHeight1 * (maxIce - sit1IceArray[currentStep][1]) / maxIce);
+		var cssHeight1 = currentIceHeight1 + "%";
+		currentIceWidth1 = Math.max(0, iceMeltWidth1 * (maxIce - sit1IceArray[currentStep][1]) / maxIce);
+		var cssWidth1 = currentIceWidth1 + "%";
+
+		updateBlockColors();
+
+		// Calculate the new height and width values for the ice cubes of situation 2
+		currentIceHeight2 = Math.max(0, iceMeltHeight2 * (maxIce - sit2IceArray[currentStep][1]) / maxIce);
+		var cssHeight2 = currentIceHeight2 + "%";
+		currentIceWidth2 = Math.max(0, iceMeltWidth2 * (maxIce - sit2IceArray[currentStep][1]) / maxIce);
+		var cssWidth2 = currentIceWidth2 + "%";
+
+		if ((blockHeight) > 2) // If the blocks are already at the bottom of the beaker, don't move them
+			blockHeight -= 0.3;
+		$(".sit1block").css("bottom", blockHeight + "%");
+		$(".sit2block").css("bottom", blockHeight + "%");
+
+		// Shrink the ice cubes
+		$(".sit1Ice").css({
+			height: cssHeight1,
+			width: cssWidth1
+		});
+		$(".sit2Ice").css({
+			height: cssHeight2,
+			width: cssWidth2
+		});
 	}
-
-	// Calculate heat transfer and new block temperatures for this step for the blocks of situation 1
-	var qInstant1 = stirFactor1 * area1 * numBlocks1 * (currentBlockTemp1 - icewaterTemp) * secondsPerStep;
-	if (qInstant1 > initialQ1)
-		qInstant1 = initialQ1;
-	if ((initialQ1 - q1 + qInstant1) / (1000 * 2.01) < 1) {
-		q1 = q1 - qInstant1;
-		currentBlockTemp1 = q1 / (numBlocks1 * mass1 * heatCapacity1) + icewaterTemp;
-	} else {
-		q1 += 0
-	};
-
-	// Calculate heat transfer and new block temperatures for this step for the blocks of situation 2
-	var qInstant2 = stirFactor2 * area2 * numBlocks2 * (currentBlockTemp2 - icewaterTemp) * secondsPerStep;
-	if ((initialQ2 - q2 + qInstant2) / (1000 * 2.01) < 1) {
-		q2 = q2 - qInstant2;
-		currentBlockTemp2 = q2 / (numBlocks2 * mass2 * heatCapacity2) + icewaterTemp;
-	} else {
-		q2 += 0
-	};
-
-	// Calculate the coordinates for the points on the graph
-	var x = currentStep * secondsPerStep * xScale + $("#graphBase").offset().left + 0.1 * graphWidth;
-	x = x + "px";
-	var y1 = ((initialQ1 - q1) / 2.01) * yScale + $("#graphBase").position().top; // The amount of ice melted is equal to the change in q divided by the
-	// heat capacity of water (2.01)
-	y1 = graphHeight - y1; // account for the fact that element positioning on a page counts from the top, not the bottom
-	y1 = y1 + "px";
-	var y2 = ((initialQ2 - q2) / 2.01) * yScale + $("#graphBase").position().top;
-	y2 = graphHeight - y2;
-	y2 = y2 + "px";
-
-
-	// Calculate the new height and width values for the ice cubes of situation 1
-	// Note that since currentIceHeight is a global variable, it is necessary to make a copy of it
-	// to format it correctly for CSS, because if you change the format of the original you'll have
-	// to change it back again afterwards.
-	currentIceHeight1 = Math.max(0, iceMeltHeight1 - ((initialQ1 - q1) / (1000 * 2.01)) * iceMeltHeight1);
-	var cssHeight1 = currentIceHeight1 + "%";
-	currentIceWidth1 = Math.max(0, iceMeltWidth1 - ((initialQ1 - q1) / (1000 * 2.01)) * iceMeltWidth1);
-	var cssWidth1 = currentIceWidth1 + "%";
-
-	// Update the current temperature of the blocks on the screen, and change the color to match
-	$("#currentBlockTemp1").html(currentBlockTemp1.toFixed(2));
-	$("#currentBlockTemp2").html(currentBlockTemp2.toFixed(2));
-	updateBlockColors();
-
-	// Calculate the new height and width values for the ice cubes of situation 2
-	currentIceHeight2 = Math.max(0, iceMeltHeight2 - ((initialQ2 - q2) / (1000 * 2.01)) * iceMeltHeight2);
-	var cssHeight2 = currentIceHeight2 + "%";
-	currentIceWidth2 = Math.max(0, iceMeltWidth2 - ((initialQ2 - q2) / (1000 * 2.01)) * iceMeltWidth2);
-	var cssWidth2 = currentIceWidth2 + "%";
-
-	// Animate blocks. The rest of the visual changes will take place while the animation is
-	// running; as a callback, the animation will re-call this function. Like in dropBlocks,
-	// sit2block4 will be animated separately so that the callback can be attached to that block alone,
-	// to make sure the callback is only called once.
-	if ((sit1BlockTop) > 2) // If the blocks are already at the bottom of the beaker, don't move them
-		sit1BlockTop -= 0.3;
-	if ((sit2BlockTop) > 2)
-		sit2BlockTop -= 0.3;
-	var cssVal1 = sit1BlockTop + "%";
-	var cssVal2 = sit2BlockTop + "%";
-	$(".sit1block").css("bottom", cssVal1);
-	$("#sit2block1, #sit2block2, #sit2block3").css("bottom", cssVal2);
-	$("#sit2block4").animate({
-		bottom: cssVal2
-	}, 15, "linear", calculateStep); // One frame should take about 50ms
-
-	// Shrink the ice cubes
-	$(".sit1Ice").css({
-		height: cssHeight1,
-		width: cssWidth1
-	});
-	$(".sit2Ice").css({
-		height: cssHeight2,
-		width: cssWidth2
-	});
-
-	var dot1 = "#sit1Point" + currentStep;
-	var dot2 = "#sit2Point" + currentStep;
-	$(dot1).css({
-		top: y1,
-		left: x
-	});
-	$(dot2).css({
-		top: y2,
-		left: x
-	});
-	$(dot1).show();
-	$(dot2).show();
-
-	currentStep++;
 }
-
-
 
 /*
  *************************************************************************
@@ -1068,3 +801,129 @@ function displayIEexp() {
 
 	return false;
 }
+
+function drawPlot1() {
+	plot1.setXLim(0, xAxisLimit);
+		plot1.setYLim(0, yAxisLimit1);
+		plot1.beginDraw();
+		plot1.drawBackground();
+		plot1.drawBox();
+		plot1.setFontSize(48);
+		push();
+		strokeWeight(5);
+		if(blocksDropped) {
+			textAlign(BOTTOM);
+			textSize(24);
+			textStyle(BOLD);
+			fill(204, 0, 0);
+			let loc1 = plot1.mainLayer.valueToPlot(sit1IceArray[currentStep][0], sit1IceArray[currentStep][1]);
+			text("1", loc1[0] + 5, loc1[1]);
+			fill(0, 51, 204);
+			let loc2 = plot1.mainLayer.valueToPlot(sit2IceArray[currentStep][0], sit2IceArray[currentStep][1]);
+			text("2", loc2[0] + 5, loc2[1]);
+
+			stroke(204, 0, 0);
+			sit1PtsGraph1.push(sit1IceArray[currentStep]);
+			arrayToPlot(sit1PtsGraph1, plot1, true);
+
+			stroke(0, 51, 204);
+			sit2PtsGraph1.push(sit2IceArray[currentStep]);
+			arrayToPlot(sit2PtsGraph1, plot1, true);
+		}
+		pop();
+		plot1.drawLimits();
+		plot1.drawXAxis();
+		plot1.drawYAxis();
+		plot1.drawTitle();
+		plot1.endDraw();
+}
+
+function drawPlot2() {
+	plot2.setXLim(0, xAxisLimit);
+		plot2.setYLim(0, yAxisLimit2);
+		plot2.beginDraw();
+		plot2.drawBackground();
+		plot2.drawBox();
+		plot2.setFontSize(48);
+		push();
+		strokeWeight(5);
+		if(blocksDropped) {
+			textAlign(BOTTOM);
+			textSize(24);
+			textStyle(BOLD);
+			fill(204, 0, 0);
+			let loc1 = plot2.mainLayer.valueToPlot(sit1TempArray[currentStep][0], sit1TempArray[currentStep][1]);
+			text("1", loc1[0] + 5, loc1[1]);
+			fill(0, 51, 204);
+			let loc2 = plot2.mainLayer.valueToPlot(sit2TempArray[currentStep][0], sit2TempArray[currentStep][1]);
+			text("2", loc2[0] + 5, loc2[1]);
+
+			stroke(204, 0, 0);
+			sit1PtsGraph2.push(sit1TempArray[currentStep]);
+			arrayToPlot(sit1PtsGraph2, plot2, true);
+
+			stroke(0, 51, 204);
+			sit2PtsGraph2.push(sit2TempArray[currentStep]);
+			arrayToPlot(sit2PtsGraph2, plot2, true);
+		}
+		pop();
+		plot2.drawLimits();
+		plot2.drawXAxis();
+		plot2.drawYAxis();
+		plot2.drawTitle();
+		plot2.endDraw();
+}
+
+function setup() {
+	cnv = createCanvas(100, 100);
+	cnv.parent("bottomCenter");
+	plot1 = new GPlot(this);
+	plot1.setPos(10, 0);
+	plot1.setOuterDim(100, 100);
+	plot1.setYLim(0, 1);
+	plot1.getXAxis().getAxisLabel().setText("time (sec)");
+	plot1.getYAxis().getAxisLabel().setText("mass of ice melted (g)");
+	plot1.setFontSize(48);
+	plot1.getTitle().setText("mass of ice melted");
+
+	plot2 = new GPlot(this);
+	plot2.setPos(10, 0);
+	plot2.setOuterDim(100, 100);
+	plot2.setYLim(0, 400);
+	plot2.getXAxis().getAxisLabel().setText("time (sec)");
+	plot2.getYAxis().getAxisLabel().setText("temperature (°C)");
+	plot2.setFontSize(48);
+	plot2.getTitle().setText("temperature");
+  }
+  
+  function draw() {
+
+	pictureBehavior();
+
+	background(255);
+
+	switch(showWhichGraph) {
+		case "1":
+		drawPlot2();
+		drawPlot1();
+		break;
+		case "2":
+		drawPlot1();
+		drawPlot2();
+		break;
+		case "3":
+		drawPlot1();
+		drawPlot2();
+		break;
+	}
+
+	if (blocksDropped && experimentRunning) {currentStep++}
+
+	if (currentStep >= 599) {
+		experimentRunning = false;
+		$("#startButton").removeAttr("disabled");
+		$("#startButton").css("border-color", "#093");
+		$("#pauseButton").attr("disabled", "disabled");
+		$("#pauseButton").css("border-color", "gray");
+	}
+  }
