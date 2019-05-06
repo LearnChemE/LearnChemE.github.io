@@ -47,12 +47,19 @@ const waterMass = 1000; // amount of water per beaker, grams
 const waterHeatFusion = 333.05; // J/g
 const maxIce = 10; // amount of ice in the beakers, g
 
+// Creates a matrix of length 4000: [index, 0] which will be used later for water temperature arrays
+let zeros = [];
+for(i=0; i<=4000; i++) {zeros = zeros.concat([[i, 0]])}
+const TW = zeros;
+var water1TempArray = TW;
+var water2TempArray = TW;
+
 // Initial block properties, situation 1. Can be adjusted with sliders.
-var initialTemp1 = 400; // celsius
-var heatCapacity1 = 10; // J/(g K)
-var mass1 = 5; // g
-var area1 = 9; // cm^2 per block. This must always be divided by 10000 for stoichiometry.
-var numBlocks1 = 1; // number of blocks
+var initialTemp1 = 150; // celsius
+var heatCapacity1 = 4; // J/(g K)
+var mass1 = 2; // g
+var area1 = 4; // cm^2 per block. This must always be divided by 10000 for stoichiometry.
+var numBlocks1 = 2; // number of blocks
 var stirFactor1 = 1000; // note - stir factor is equivalent to heat transfer coefficient, "U". Units: W/(m^2 K)
 
 // Initial block properties, situation 2. Can also be adjusted with sliders.
@@ -66,6 +73,8 @@ var stirFactor2 = 1000;
 // Blank arrays in which the coordinate data for plotting will be stored.
 var sit1IceArray = [[0, 0]];
 var sit2IceArray = [[0, 0]];
+var sit1TempArray = [[0, initialTemp1]];
+var	sit2TempArray = [[0, initialTemp2]];
 var iceMeltedVsTime1;
 var iceMeltedVsTime2;
 var tempVsTime1;
@@ -73,7 +82,7 @@ var tempVsTime2;
 var tempVsTime3;
 var tempVsTime4;
 
-// Initiates the quicksettings sliders as "panel1" and "panel2"
+// Initiates the quicksettings sliders as "panel#"
 var panel1;
 var panel2;
 var panel3;
@@ -83,8 +92,10 @@ var panel3;
 */
 var plot1;
 var plot2;
-var tMax = 120;
-var dt = 0.2;
+var tMax = 120; // 120 seconds are simulated
+var dt = tMax / 1000; // plots 1000 points
+var frMult = 2; // multiplier times real time (seconds per second)
+//var fr;
 var xAxisLimit = tMax;
 var yAxisLimit1 = 1;
 var yAxisLimit2 = 400;
@@ -167,8 +178,8 @@ function windowResized() {
 	panel2.setWidth(w2);
 	panel1.setPosition(0, 10);
 	panel2.setPosition($("#bottomCenter").width() - w2, 10);
-	panel3.setWidth(w2*0.9);
-	panel3.setPosition($("#bottomCenter").width() - w2*0.9, clientHeight - 200);
+	panel3.setWidth(140);
+	panel3.setPosition($("#bottomCenter").width() - 140, clientHeight - 200);
 
 	// retrieves the beaker height and the size to adjust falling distance
 	bkHeight = $("#beakersImg").height();
@@ -207,20 +218,20 @@ window.onload = function () {
 	// creates the quicksettings panels, gives initial values to each slider, etc.
 	QuickSettings.useExtStyleSheet();
 	panel1 = QuickSettings.create(0, 30, "Settings: Situation 1", document.body, "red")
-		.addRange("Initial Temperature (°C)", 1, 400, 400, 1, function (value) {
+		.addRange("Initial Temperature (°C)", 1, 400, 150, 1, function (value) {
 			initialTemp1 = value;
 		})
-		.addRange("Block Heat Capacity (J/(g °C))", 0.1, 10, 10, 0.1, function (value) {
+		.addRange("Block Heat Capacity (J/(g °C))", 0.1, 10, 4, 0.1, function (value) {
 			heatCapacity1 = value;
 		})
-		.addRange("Block 1 Mass (g)", 0.1, 5, 5, 0.1, function (value) {
+		.addRange("Block 1 Mass (g)", 0.1, 5, 2, 0.1, function (value) {
 			mass1 = value;
 		})
-		.addRange("Block 1 area (cm²)", 1, 9, 9, 1, function (value) {
+		.addRange("Block 1 area (cm²)", 1, 9, 4, 1, function (value) {
 			area1 = value;
 			getAreas();
 		})
-		.addRange("Number of Blocks", 1, 4, 1, 1, function (value) {
+		.addRange("Number of Blocks", 1, 4, 2, 1, function (value) {
 			numBlocks1 = value;
 			getNumBlocks();
 		})
@@ -264,11 +275,11 @@ window.onload = function () {
 		})
 		.setDraggable(true);
 	panel3 = QuickSettings.create(0, 30, "Plot Options", document.body, "graph")
-		.addRange("x axis", 10, 500, 120, 1, function (value) {
+		.addRange("time", 10, 500, 120, 1, function (value) {
 			tMax = value;
 		})
-		.addRange("dt", 0.01, 10, 0.2, 0.01, function (value) {
-			dt = value;
+		.addRange("animation speed", 0.5, 10, 2, 0.5, function (value) {
+			frMult = value;
 		})
 windowResized();
 }
@@ -346,6 +357,7 @@ function generateGraphPoints() {
 	let TB01 = initialTemp1;
 	let TB02 = initialTemp2;
 	let TW0 = icewaterTemp;
+
 	let cpBmB1 = heatCapacity1 * mass1;
 	let cpBmB2 = heatCapacity2 * mass2;
 	let cpWmW = waterHeatCap * waterMass;
@@ -404,12 +416,27 @@ function generateGraphPoints() {
 		tempVsTime3 = "(".concat(String(cpBmB1*TB0 + cpWmW*TW0),"+",String((TB0 - TW0)*cpWmW),"*e^(",String((-cpBmB1-cpWmW)*UA1/(cpBmB1*cpWmW)),"*(t - ",String(meltIndex1 * dt),")))/",String(cpBmB1+cpWmW));	
 		let newArray = functionToArray(tempVsTime3, ["t", meltIndex1 * dt, tMax, dt]);
 		sit1TempArray = sit1TempArray.concat(newArray);
+		
+		// equation for water temperature after ice melts has a similar form
+		water1TempArray = TW;
+		waterTempVsTime1 = "(".concat(String(cpBmB1*TB0 + cpWmW*TW0),"-",String((TB0 - TW0)*cpBmB1),"*e^(",String((-cpBmB1-cpWmW)*UA1/(cpBmB1*cpWmW)),"*(t - ",String(meltIndex1 * dt),")))/",String(cpBmB1+cpWmW));
+		let TW1= functionToArray(waterTempVsTime1, ["t", meltIndex1 * dt, tMax, dt]);
+		for(i=meltIndex1; i<(meltIndex1 + TW1.length); i++) {
+			water1TempArray[i][1] = TW1[i - meltIndex1][1]
+		};
 	}
 	if(meltedAt2) {
 		let TB0 = sit2TempArray[meltIndex2 - 1][1];
 		tempVsTime4 = "(".concat(String(cpBmB2*TB0 + cpWmW*TW0),"+",String((TB0 - TW0)*cpWmW),"*e^(",String((-cpBmB2-cpWmW)*UA2/(cpBmB2*cpWmW)),"*(t - ",String(meltIndex2 * dt),")))/",String(cpBmB2+cpWmW))
 		let newArray = functionToArray(tempVsTime4, ["t", meltIndex2 * dt, tMax, dt]);
 		sit2TempArray = sit2TempArray.concat(newArray);
+		
+		water2TempArray = TW;
+		waterTempVsTime2 = "(".concat(String(cpBmB2*TB0 + cpWmW*TW0),"-",String((TB0 - TW0)*cpBmB2),"*e^(",String((-cpBmB2-cpWmW)*UA2/(cpBmB2*cpWmW)),"*(t - ",String(meltIndex2 * dt),")))/",String(cpBmB2+cpWmW));
+		let TW2= functionToArray(waterTempVsTime2, ["t", meltIndex2 * dt, tMax, dt]);
+		for(i=meltIndex2; i<(meltIndex2 + TW2.length); i++) {
+			water2TempArray[i][1] = TW2[i - meltIndex2][1]
+		};
 	}
 	// Finally, adjusts the limits on the plot accordingly.
 	xAxisLimit = Math.ceil(tMax);
@@ -624,8 +651,11 @@ function resetExperiment() {
  * called. This is part of the p5.js library.
  */
 function draw() {
+	dt = frMult * tMax / 2000
+	frameRate(60);
 	pictureBehavior();
 	background(255);
+	$("#temps1").html(String(water1TempArray[currentStep][1].toFixed(2)).concat(" degrees C<br>",String(currentStep==0 ? initialTemp1 : sit1TempArray[currentStep][1].toFixed(1))," degrees C"));
 
 	/* This switch() look superfluous, but it is important. Both plots
 	 * must be drawing at all times, so that if the user switches to
@@ -647,7 +677,7 @@ function draw() {
 	}
 	// Only advances in time once the blocks hit the water.
 	if (blocksDropped && experimentRunning) {
-		currentStep++
+		{currentStep++};
 	}
 
 	if (currentStep >= Math.floor(tMax / dt - 1)) {
