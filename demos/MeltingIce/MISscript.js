@@ -76,6 +76,7 @@ var tempVsTime4;
 // Initiates the quicksettings sliders as "panel1" and "panel2"
 var panel1;
 var panel2;
+var panel3;
 
 /* Initiates the plots, and their initial axes limits. Upon loading
 * the page displays only time vs. Ice melted graph.
@@ -157,6 +158,7 @@ function windowResized() {
 	// "enable graph tooltips" button adjust
 	$("#graphInfo").css({height: aHeight*0.11 + "px", width: aHeight*0.45 + "px", fontSize: aHeight/300 + "rem", bottom: aHeight*0.5 + "px"});
 	$("#graphInfo").css("line-height", aHeight*0.11 + "px");
+	$("#graphInfo").hide();
 
 	// adjusts the quicksettings panel size and position
 	let w1 = $("#topLeft").width();
@@ -165,6 +167,8 @@ function windowResized() {
 	panel2.setWidth(w2);
 	panel1.setPosition(0, 10);
 	panel2.setPosition($("#bottomCenter").width() - w2, 10);
+	panel3.setWidth(w2*0.9);
+	panel3.setPosition($("#bottomCenter").width() - w2*0.9, clientHeight - 200);
 
 	// retrieves the beaker height and the size to adjust falling distance
 	bkHeight = $("#beakersImg").height();
@@ -259,7 +263,13 @@ window.onload = function () {
 			}
 		})
 		.setDraggable(true);
-
+	panel3 = QuickSettings.create(0, 30, "Plot Options", document.body, "graph")
+		.addRange("x axis", 10, 500, 120, 1, function (value) {
+			tMax = value;
+		})
+		.addRange("dt", 0.01, 10, 0.2, 0.01, function (value) {
+			dt = value;
+		})
 windowResized();
 }
 
@@ -341,9 +351,6 @@ function generateGraphPoints() {
 	let cpWmW = waterHeatCap * waterMass;
 	let HfW = waterHeatFusion;
 
-	tMax = 120;
-	dt = 0.2;
-
 	/* 	ice melted vs time equation:
 		mi(t) = cpB*mB*(TB0 - TW0)*(1-e^(-U*A*t/cpB*mB)) / Hfw
 		(outputs this equation as a string, then feeds this into math.js via plotFun.js, 
@@ -394,13 +401,13 @@ function generateGraphPoints() {
 	// If the ice did melt fully, it will now use this equation. Similar method to tempVsTime1/2.
 	if(meltedAt1) {
 		let TB0 = sit1TempArray[meltIndex1 - 1][1];
-		tempVsTime3 = "(".concat(String(cpBmB1*TB0 + cpWmW*TW0),"+",String((TB0 - TW0)*cpWmW),"*e^(",String((-cpBmB1-cpWmW)*UA1/(cpBmB1*cpWmW)),"*(t - ",String(meltIndex1 * 0.2),")))/",String(cpBmB1+cpWmW));	
+		tempVsTime3 = "(".concat(String(cpBmB1*TB0 + cpWmW*TW0),"+",String((TB0 - TW0)*cpWmW),"*e^(",String((-cpBmB1-cpWmW)*UA1/(cpBmB1*cpWmW)),"*(t - ",String(meltIndex1 * dt),")))/",String(cpBmB1+cpWmW));	
 		let newArray = functionToArray(tempVsTime3, ["t", meltIndex1 * dt, tMax, dt]);
 		sit1TempArray = sit1TempArray.concat(newArray);
 	}
 	if(meltedAt2) {
 		let TB0 = sit2TempArray[meltIndex2 - 1][1];
-		tempVsTime4 = "(".concat(String(cpBmB2*TB0 + cpWmW*TW0),"+",String((TB0 - TW0)*cpWmW),"*e^(",String((-cpBmB2-cpWmW)*UA2/(cpBmB2*cpWmW)),"*(t - ",String(meltIndex2 * 0.2),")))/",String(cpBmB2+cpWmW))
+		tempVsTime4 = "(".concat(String(cpBmB2*TB0 + cpWmW*TW0),"+",String((TB0 - TW0)*cpWmW),"*e^(",String((-cpBmB2-cpWmW)*UA2/(cpBmB2*cpWmW)),"*(t - ",String(meltIndex2 * dt),")))/",String(cpBmB2+cpWmW))
 		let newArray = functionToArray(tempVsTime4, ["t", meltIndex2 * dt, tMax, dt]);
 		sit2TempArray = sit2TempArray.concat(newArray);
 	}
