@@ -415,7 +415,7 @@ function generateGraphPoints() {
 			meltedAt2 = true;
 		}
 	};
-	
+
 	// Then stores the final value in an array, up to the time at which ice melts.
 	sit1TempArray = functionToArray(tempVsTime1, ["t", 0, meltIndex1 * dt, dt]);
 	sit2TempArray = functionToArray(tempVsTime2, ["t", 0, meltIndex2 * dt, dt]);
@@ -436,7 +436,8 @@ function generateGraphPoints() {
 		for(i=meltIndex1; i<(meltIndex1 + TW1.length); i++) {
 			water1TempArray[i][1] = TW1[i - meltIndex1][1]
 		};
-	}
+	} else {water1TempArray = TW};
+	
 	if(meltedAt2) {
 		let TB0 = sit2TempArray.last()[1];
 		tempVsTime4 = "(".concat(String(cpBmB2*TB0 + cpWmW*TW0),"+",String((TB0 - TW0)*cpWmW),"*e^(",String((-cpBmB2-cpWmW)*UA2/(cpBmB2*cpWmW)),"*(t - ",String(meltIndex2 * dt),")))/",String(cpBmB2+cpWmW))
@@ -449,7 +450,10 @@ function generateGraphPoints() {
 		for(i=meltIndex2; i<(meltIndex2 + TW2.length); i++) {
 			water2TempArray[i][1] = TW2[i - meltIndex2][1]
 		};
-	}
+	} else {water2TempArray = TW};
+
+	console.log(water1TempArray);
+
 	// Finally, adjusts the limits on the plot accordingly.
 	xAxisLimit = Math.ceil(tMax);
 	yAxisLimit1 = Math.max(Math.min(sit2IceArray.last()[1] * 1.1, 10.5), Math.min(sit1IceArray.last()[1] * 1.1, 10.5));
@@ -667,8 +671,8 @@ function draw() {
 	frameRate(60);
 	pictureBehavior();
 	background(255);
-	$("#temps1").html(`water temperature: ${water1TempArray[currentStep][1].toFixed(2)} °C<br>block temperature: ${currentStep==0 ? initialTemp1 : sit1TempArray[currentStep][1].toFixed(1)} °C`);
-	$("#temps2").html(`water temperature: ${water2TempArray[currentStep][1].toFixed(2)} °C<br>block temperature: ${currentStep==0 ? initialTemp2 : sit2TempArray[currentStep][1].toFixed(1)} °C`);
+	$("#temps1").html(`block temperature: ${currentStep==0 ? initialTemp1 : sit1TempArray[currentStep][1].toFixed(1)} °C`);
+	$("#temps2").html(`block temperature: ${currentStep==0 ? initialTemp2 : sit2TempArray[currentStep][1].toFixed(1)} °C`);
 
 	/* This switch() look superfluous, but it is important. Both plots
 	 * must be drawing at all times, so that if the user switches to
