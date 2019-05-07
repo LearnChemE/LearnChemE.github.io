@@ -24,8 +24,9 @@
 $(document).ready(init);
 
 /* This document is designed to have a static aspect ratio
-* of 1.2, and to work between widths of 600 and 1200 px
-*/
+ * of 1.2, and to work between widths of 600 and 1200 px. Would have
+ * expanded the range but CSS is hard
+ */
 let maxWidth = Math.min(document.documentElement.clientWidth, 1200);
 let	maxHeight = Math.min(document.documentElement.clientHeight, 1000);
 let	minWidth = Math.max(600, document.documentElement.clientWidth);
@@ -47,7 +48,7 @@ const waterMass = 1000; // amount of water per beaker, grams
 const waterHeatFusion = 333.05; // J/g
 const maxIce = 10; // amount of ice in the beakers, g
 
-// Creates a matrix of length 4000: [index, 0] which will be used later for water temperature arrays
+// TW (a.k.a. water temperature). Having TW as a const here becomes handy later on.
 let zeros = [];
 for(i=0; i<=4000; i++) {zeros = zeros.concat([[i, 0]])}
 const TW = zeros;
@@ -130,6 +131,13 @@ var boxHeight;
 var blockHeight;
 var fallDist;
 
+// add a prototype to Array to save some time
+if (!Array.prototype.last){
+    Array.prototype.last = function(){
+        return this[this.length - 1];
+    };
+};
+
 function windowResized() {
 	maxWidth = Math.min(document.documentElement.clientWidth * 0.95, 1200);
 	maxHeight = Math.min(document.documentElement.clientHeight * 0.95, 1000);
@@ -150,10 +158,10 @@ function windowResized() {
 	// resizes the grid
 	$(".wrapper").css("width", clientWidth + "px");
 	$(".wrapper").css("height", clientHeight + "px");
-	$(".box").css("height", clientHeight * 0.38 + "px");
+	$(".box").css("height", clientHeight * 0.42 + "px");
 	$(".d").css("height", clientHeight * 0.58 + "px");
 
-	let aHeight = clientHeight * 0.38;
+	let aHeight = clientHeight * 0.42;
 
 	// adjusts start/reset buttons
 	$(".btn-lg").css({height: aHeight*0.11 + "px", width: aHeight*0.2 + "px", fontSize: aHeight/300 + "rem"});
@@ -163,8 +171,8 @@ function windowResized() {
 	$(".btn-md").css({height: aHeight*0.08 + "px", width: aHeight*0.08 + "px"});
 	$(".btn-md").css("line-height", aHeight*0.08 + "px");
 	$(".btn-md").css("font-size", aHeight*0.04 + "px");
-	$("#buttons2").css("margin-top", aHeight*0.15 + "px");
-	$("#buttons2").css("margin-left", aHeight*0.3 + "px");
+	$(".b1").css("bottom", clientHeight * 0.13 + "px");
+	$(".b2").css({right: aHeight*0.05 + "px", bottom: clientHeight * 0.08 + "px"});
 
 	// "enable graph tooltips" button adjust
 	$("#graphInfo").css({height: aHeight*0.11 + "px", width: aHeight*0.45 + "px", fontSize: aHeight/300 + "rem", bottom: aHeight*0.5 + "px"});
@@ -179,7 +187,7 @@ function windowResized() {
 	panel1.setPosition(0, 10);
 	panel2.setPosition($("#bottomCenter").width() - w2, 10);
 	panel3.setWidth(140);
-	panel3.setPosition($("#bottomCenter").width() - 140, clientHeight - 200);
+	panel3.setPosition($("#bottomCenter").width() - 140, clientHeight * 0.7 - 40);
 
 	// retrieves the beaker height and the size to adjust falling distance
 	bkHeight = $("#beakersImg").height();
@@ -190,7 +198,7 @@ function windowResized() {
 	clear();
 	switch(showWhichGraph) {
 		case "1":
-		plot1.setOuterDim(clientWidth - 140, clientHeight * 0.54);
+		plot1.setOuterDim(clientWidth - 170, clientHeight * 0.54);
 		plot1.setPos(10, clientHeight * 0.02);
 		break;
 		case "2":
@@ -198,9 +206,9 @@ function windowResized() {
 		plot2.setPos(10, clientHeight * 0.02);
 		break;
 		case "3":
-		plot1.setOuterDim(clientWidth*0.5 - 70, clientHeight * 0.54);
-		plot2.setOuterDim(clientWidth*0.5 - 70, clientHeight * 0.54);
-		plot2.setPos(clientWidth*0.5 - 70, clientHeight * 0.02);
+		plot1.setOuterDim(clientWidth*0.5 - 85, clientHeight * 0.54);
+		plot2.setOuterDim(clientWidth*0.5 - 85, clientHeight * 0.54);
+		plot2.setPos(clientWidth*0.5 - 85, clientHeight * 0.02);
 		break;
 	}
 	resizeCanvas(clientWidth / 0.95, cnv.height = clientHeight * 0.58 / 0.95);
@@ -352,17 +360,17 @@ function setup() {
  */
 function generateGraphPoints() {
 	// shortened the name of some variables to make typing this section less of a nightmare.
-	let UA1 = stirFactor1 * area1 / 10000;
+	let UA1 = stirFactor1 * area1 / 10000; // heat transfer coefficient times area
 	let UA2 = stirFactor2 * area2 / 10000;
-	let TB01 = initialTemp1;
+	let TB01 = initialTemp1; // initial block temp
 	let TB02 = initialTemp2;
-	let TW0 = icewaterTemp;
+	let TW0 = icewaterTemp; // initial water temp
 
 	let cpBmB1 = heatCapacity1 * mass1;
 	let cpBmB2 = heatCapacity2 * mass2;
 	let cpWmW = waterHeatCap * waterMass;
 	let HfW = waterHeatFusion;
-
+	
 	/* 	ice melted vs time equation:
 		mi(t) = cpB*mB*(TB0 - TW0)*(1-e^(-U*A*t/cpB*mB)) / Hfw
 		(outputs this equation as a string, then feeds this into math.js via plotFun.js, 
@@ -370,7 +378,7 @@ function generateGraphPoints() {
 	*/ 
 	iceMeltedVsTime1 = String(cpBmB1*(TB01-TW0)).concat("(1 - e^(",String(-UA1/cpBmB1),"*t))/",String(HfW));
 	iceMeltedVsTime2 = String(cpBmB2*(TB02-TW0)).concat("(1 - e^(",String(-UA2/cpBmB2),"*t))/",String(HfW))
-	sit1IceArray = functionToArray(iceMeltedVsTime1, ["t", 0, tMax, dt]);
+	sit1IceArray = functionToArray(iceMeltedVsTime1, ["t", 0, tMax, dt]); // see plotFun.js for function definition
 	sit2IceArray = functionToArray(iceMeltedVsTime2, ["t", 0, tMax, dt]);
 
 	/*  temperature vs time equation, constant water temperature:
@@ -382,12 +390,13 @@ function generateGraphPoints() {
 	/*  if the ice does not fully melt, meltedAt stays false and the array index
 		at which "the ice melts" is the last item in the array.
 	*/
+
 	let meltedAt1 = false;
 	let meltedAt2 = false;
 	let meltIndex1 = Math.round(tMax / dt);
 	let meltIndex2 = Math.round(tMax / dt);
 
-	//Finds index when ice melts and switches to a new equation at that index.
+	// Finds array index when ice melts and switches to a new temperature equation at that index.
 	for (i = 0; i < sit1IceArray.length; i++) {
 		if (sit1IceArray[i][1] >= maxIce) {
 			sit1IceArray[i][1] = maxIce;
@@ -406,14 +415,17 @@ function generateGraphPoints() {
 			meltedAt2 = true;
 		}
 	};
+	
 	// Then stores the final value in an array, up to the time at which ice melts.
 	sit1TempArray = functionToArray(tempVsTime1, ["t", 0, meltIndex1 * dt, dt]);
 	sit2TempArray = functionToArray(tempVsTime2, ["t", 0, meltIndex2 * dt, dt]);
-
+	
 	// If the ice did melt fully, it will now use this equation. Similar method to tempVsTime1/2.
 	if(meltedAt1) {
-		let TB0 = sit1TempArray[meltIndex1 - 1][1];
+		let TB0 = sit1TempArray.last()[1];
 		tempVsTime3 = "(".concat(String(cpBmB1*TB0 + cpWmW*TW0),"+",String((TB0 - TW0)*cpWmW),"*e^(",String((-cpBmB1-cpWmW)*UA1/(cpBmB1*cpWmW)),"*(t - ",String(meltIndex1 * dt),")))/",String(cpBmB1+cpWmW));	
+		//later realized I could write this using template literals (see below) but it works fine now so I won't change it
+		//tempVsTime3 = `(${cpBmB1*TB0 + cpWmW*TW0} + ${(TB0 - TW0)*cpWmW} * e^(${(-cpBmB1-cpWmW)*UA1/(cpBmB1*cpWmW)} * (t - ${meltIndex1 * dt}))) / ${cpBmB1 + cpWmW}`;
 		let newArray = functionToArray(tempVsTime3, ["t", meltIndex1 * dt, tMax, dt]);
 		sit1TempArray = sit1TempArray.concat(newArray);
 		
@@ -426,7 +438,7 @@ function generateGraphPoints() {
 		};
 	}
 	if(meltedAt2) {
-		let TB0 = sit2TempArray[meltIndex2 - 1][1];
+		let TB0 = sit2TempArray.last()[1];
 		tempVsTime4 = "(".concat(String(cpBmB2*TB0 + cpWmW*TW0),"+",String((TB0 - TW0)*cpWmW),"*e^(",String((-cpBmB2-cpWmW)*UA2/(cpBmB2*cpWmW)),"*(t - ",String(meltIndex2 * dt),")))/",String(cpBmB2+cpWmW))
 		let newArray = functionToArray(tempVsTime4, ["t", meltIndex2 * dt, tMax, dt]);
 		sit2TempArray = sit2TempArray.concat(newArray);
@@ -440,7 +452,7 @@ function generateGraphPoints() {
 	}
 	// Finally, adjusts the limits on the plot accordingly.
 	xAxisLimit = Math.ceil(tMax);
-	yAxisLimit1 = Math.max(Math.min(sit2IceArray[sit2IceArray.length - 1][1] * 1.1, 10.5), Math.min(sit1IceArray[sit1IceArray.length - 1][1] * 1.1, 10.5));
+	yAxisLimit1 = Math.max(Math.min(sit2IceArray.last()[1] * 1.1, 10.5), Math.min(sit1IceArray.last()[1] * 1.1, 10.5));
 	yAxisLimit2 = Math.max(initialTemp1, initialTemp2);
 }
 
@@ -655,7 +667,8 @@ function draw() {
 	frameRate(60);
 	pictureBehavior();
 	background(255);
-	$("#temps1").html(String(water1TempArray[currentStep][1].toFixed(2)).concat(" degrees C<br>",String(currentStep==0 ? initialTemp1 : sit1TempArray[currentStep][1].toFixed(1))," degrees C"));
+	$("#temps1").html(`water temperature: ${water1TempArray[currentStep][1].toFixed(2)} °C<br>block temperature: ${currentStep==0 ? initialTemp1 : sit1TempArray[currentStep][1].toFixed(1)} °C`);
+	$("#temps2").html(`water temperature: ${water2TempArray[currentStep][1].toFixed(2)} °C<br>block temperature: ${currentStep==0 ? initialTemp2 : sit2TempArray[currentStep][1].toFixed(1)} °C`);
 
 	/* This switch() look superfluous, but it is important. Both plots
 	 * must be drawing at all times, so that if the user switches to
@@ -700,10 +713,15 @@ function draw() {
  */
 function drawPlot1() {
 	plot1.setXLim(0, xAxisLimit);
-		plot1.setYLim(0, yAxisLimit1);
+		plot1.setYLim(0, Math.ceil(yAxisLimit1));
 		plot1.beginDraw();
 		plot1.drawBackground();
+		plot1.drawLimits();
+		plot1.drawXAxis();
+		plot1.drawYAxis();
+		plot1.drawTitle();
 		plot1.drawBox();
+		plot1.drawGridLines(2);
 		push();
 		strokeWeight(3.5);
 		if(blocksDropped) {
@@ -726,10 +744,6 @@ function drawPlot1() {
 			arrayToPlot(sit2PtsGraph1, plot1, true);
 		}
 		pop();
-		plot1.drawLimits();
-		plot1.drawXAxis();
-		plot1.drawYAxis();
-		plot1.drawTitle();
 		plot1.endDraw();
 }
 /*
@@ -738,10 +752,15 @@ function drawPlot1() {
  */
 function drawPlot2() {
 	plot2.setXLim(0, xAxisLimit);
-		plot2.setYLim(0, yAxisLimit2);
+		plot2.setYLim(0, Math.ceil(yAxisLimit2 / 20.0) * 20);
 		plot2.beginDraw();
 		plot2.drawBackground();
+		plot2.drawLimits();
+		plot2.drawXAxis();
+		plot2.drawYAxis();
+		plot2.drawTitle();
 		plot2.drawBox();
+		plot2.drawGridLines(2);
 		push();
 		strokeWeight(3.5);
 		if(blocksDropped) {
@@ -764,10 +783,6 @@ function drawPlot2() {
 			arrayToPlot(sit2PtsGraph2, plot2, true);
 		}
 		pop();
-		plot2.drawLimits();
-		plot2.drawXAxis();
-		plot2.drawYAxis();
-		plot2.drawTitle();
 		plot2.endDraw();
 }
 

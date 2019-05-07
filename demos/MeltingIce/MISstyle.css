@@ -44,7 +44,20 @@
 	position: relative;
 }
 
-#startButton {
+.b1 {
+	position: absolute;
+	right: 0px;
+	bottom: 300px;
+}
+
+.b2 {
+	position: absolute;
+	right: 25px;
+	bottom: 250px;
+}
+
+.btn-lg {
+	right: 100px;
     width: 50px;
     height: 50px;
     margin: auto;
@@ -54,7 +67,7 @@
 	text-align: center;
 }
 
-#resetButton {
+.btn-md {
     width: 50px;
     height: 50px;
     margin: auto;
@@ -62,34 +75,6 @@
     display: inline-block;
     line-height: 30px;
 	text-align: center;
-}
-
-#pauseButton {
-    width: 50px;
-    height: 50px;
-    margin: auto;
-    padding: 0;
-    display: inline-block;
-    line-height: 30px;
-    text-align: center;
-}
-#infoButton {
-    width: 50px;
-    height: 50px;
-    margin: auto;
-    padding: 0;
-    display: inline-block;
-    line-height: 30px;
-    text-align: center;
-}
-#helpButton {
-    width: 50px;
-    height: 50px;
-    margin: auto;
-    padding: 0;
-    display: inline-block;
-    line-height: 30px;
-    text-align: center;
 }
 
 #initConds {
@@ -100,7 +85,7 @@
 	font-size: 1rem;
 	margin-right: 7%;
 	white-space: nowrap;
-	justify-self: right;
+	justify-self: center;
 	text-align: center;
 }
 
@@ -315,6 +300,19 @@
 	right: 32%;
 }
 
+#temps1 {
+	position: absolute;
+	bottom: 55%;
+	left: 0%;
+	font-size: 1rem;
+}
+
+#temps2 {
+	position: absolute;
+	bottom: 55%;
+	right: 0%;
+	font-size: 1rem;
+}
 /***** graph elements/labels *****/
 
 

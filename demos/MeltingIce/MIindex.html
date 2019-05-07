@@ -74,25 +74,10 @@ original-source:https://www.projects.bucknell.edu/Inquiry_Activities/HT_JS/Melti
             </div> -->
 
         <div class="box b" id="topCenter">
-            <div class="box b1" id="buttons1">
-                <!-- Bootstrap buttons (start/reset) -->
-                <a href="javascript:" id="startButton" class="btn btn-success btn-lg" value="start">Start</a>
-                <a href="javascript:" id="resetButton" class="btn btn-danger btn-lg" value="reset">Reset</a>
-            </div>
-
-            <div class="box b2" id="buttons2">
-                <!-- Glyphicons (pause/help/info) -->
-                <a href="javascript:" id="pauseButton" class="btn btn-default btn-md" value="pause"><span
-                        class="glyphicon glyphicon-pause"></span></a>
-                <a href="javascript:" id="infoButton" class="btn btn-default btn-md" value="info"><span
-                        class="glyphicon glyphicon-info-sign"></span></a>
-                <a href="javascript:" id="helpButton" class="btn btn-info btn-md" value="help"><span
-                        class="glyphicon glyphicon-question-sign"></span></a>
-            </div>
-
+            <p id="temps1"></p>
+            <p id="temps2"></p>
             <div id="initConds">
                 <p>Initial conditions:<br>10g ice in each cup<br>1L water in each beaker</p>
-                <p id="temps1">0 degrees C</p>
             </div>
 
             <img id="waterImg" alt="" src="water.png" />
@@ -129,6 +114,22 @@ original-source:https://www.projects.bucknell.edu/Inquiry_Activities/HT_JS/Melti
                 </textarea>
             <textarea id="graphSlopeInfo" class="myTooltip">The slope of the graph represents the rate of heat transfer. A steeper slope corresponds to faster heat transfer.
                 </textarea>
+
+            <div class="buttons b1">
+                <!-- Bootstrap buttons (start/reset) -->
+                <a href="javascript:" id="startButton" class="btn btn-success btn-lg" value="start">Start</a>
+                <a href="javascript:" id="resetButton" class="btn btn-danger btn-lg" value="reset">Reset</a>
+            </div>
+
+            <div class="buttons b2">
+                <!-- Glyphicons (pause/help/info) -->
+                <a href="javascript:" id="pauseButton" class="btn btn-default btn-md" value="pause"><span
+                        class="glyphicon glyphicon-pause"></span></a>
+                <a href="javascript:" id="infoButton" class="btn btn-default btn-md" value="info"><span
+                        class="glyphicon glyphicon-info-sign"></span></a>
+                <a href="javascript:" id="helpButton" class="btn btn-info btn-md" value="help"><span
+                        class="glyphicon glyphicon-question-sign"></span></a>
+            </div>
 
             <div class="graphChoose">
                 <input type="radio" id="which1" name="whichGraph" value="1" checked /><label for="which1"> ice melt vs.
