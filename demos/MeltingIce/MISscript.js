@@ -212,16 +212,16 @@ function windowResized() {
 	switch(showWhichGraph) {
 		case "1":
 		plot1.setOuterDim(clientWidth - 170, clientHeight * 0.54);
-		plot1.setPos(10, clientHeight * 0.02);
+		plot1.setPos(10, 0);
 		break;
 		case "2":
 		plot2.setOuterDim(clientWidth - 170, clientHeight * 0.54);
-		plot2.setPos(10, clientHeight * 0.02);
+		plot2.setPos(10, 0);
 		break;
 		case "3":
 		plot1.setOuterDim(clientWidth*0.5 - 85, clientHeight * 0.54);
 		plot2.setOuterDim(clientWidth*0.5 - 85, clientHeight * 0.54);
-		plot2.setPos(clientWidth*0.5 - 85, clientHeight * 0.02);
+		plot2.setPos(clientWidth*0.5 - 85, 0);
 		break;
 	}
 	resizeCanvas(clientWidth / 0.95, cnv.height = clientHeight * 0.54 / 0.95);
