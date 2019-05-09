@@ -62,7 +62,7 @@ let heatCapacity1 = 4; // J/(g K)
 let mass1 = 2; // g
 let area1 = 4; // cm^2 per block. This must always be divided by 10000 for stoichiometry.
 let numBlocks1 = 2; // number of blocks
-let stirFactor1 = 1000; // note - stir factor is equivalent to heat transfer coefficient, "U". Units: W/(m^2 K)
+let stirFactor1 = 300; // note - stir factor is equivalent to heat transfer coefficient, "U". Units: W/(m^2 K)
 
 // Initial block properties, situation 2. Can also be adjusted with sliders.
 let initialTemp2 = 80; 
@@ -70,7 +70,7 @@ let heatCapacity2 = 1;
 let mass2 = 1; 
 let area2 = 1; 
 let numBlocks2 = 1;
-let stirFactor2 = 1000;
+let stirFactor2 = 300;
 
 // Blank arrays in which the coordinate data for plotting will be stored.
 let sit1IceArray = [[0, 0]];
@@ -99,7 +99,7 @@ let frMult = 2; // multiplier times real time (seconds per second)
 let xAxisLimit = tMax;
 let yAxisLimit1 = 1;
 let yAxisLimit2 = 400;
-let showWhichGraph = "1";
+let showWhichGraph = "3";
 
 // Variables to keep track of animation state
 let currentStep = 0;
@@ -259,10 +259,10 @@ window.onload = function () {
 		.addBoolean("Add Stir Bar", false, function (value) {
 			if (value) {
 				$("#stirBar1").show();
-				stirFactor1 = 3000;
+				stirFactor1 = 1000;
 			} else {
 				$("#stirBar1").hide();
-				stirFactor1 = 1000;
+				stirFactor1 = 300;
 			}
 		})
 		.setDraggable(true);
@@ -271,7 +271,7 @@ window.onload = function () {
 		.addRange("Initial Temperature", 1, 400, 80, 1, function (value) {
 			initialTemp2 = value;
 		}, "°C")
-		.addRange("Heat Capacity", 0.1, 10, 1, 0.1, function (value) {
+		.addRange("Block Heat Capacity", 0.1, 10, 1, 0.1, function (value) {
 			heatCapacity2 = value;
 		}, `&nbsp&nbspJ / (g °C)`)
 		.addRange("Block Mass", 0.1, 10, 1, 0.1, function (value) {
@@ -288,20 +288,21 @@ window.onload = function () {
 		.addBoolean("Add Stir Bar", false, function (value) {
 			if (value) {
 				$("#stirBar2").show();
-				stirFactor2 = 3000;
+				stirFactor2 = 1000;
 			} else {
 				$("#stirBar2").hide();
-				stirFactor2 = 1000;
+				stirFactor2 = 300;
 			}
 		})
 		.setDraggable(true);
 	panel3 = QuickSettings.create(0, 30, "Plot Options", document.body, "graph")
-		.addRange("time", 10, 500, 120, 1, function (value) {
+		.addRange("duration to simulate", 10, 500, 120, 1, function (value) {
 			tMax = value;
-		})
-		.addRange("animation speed", 0.5, 10, 2, 0.5, function (value) {
+			dt = tMax / 2000;
+		}, "s")
+		.addRange("animation speed", 0.5, 5, 1, 0.5, function (value) {
 			frMult = value;
-		})
+		}, "x")
 windowResized();
 }
 
@@ -322,7 +323,7 @@ function init() {
 		showWhichGraph = $("input[name='whichGraph']:checked").val();
 		windowResized();
 	  });
-
+	showWhichGraph = $("input[name='whichGraph']:checked").val();
 	// some CSS adjustments as well
 	$("#stirBar1").hide();
 	$("#stirBar2").hide();
@@ -580,19 +581,21 @@ function startMelting() {
 	currentStep = 0;
 	blockHeight = 55;
 
-	panel1.disableControl("Initial Temperature (°C)");
-	panel1.disableControl("Block Heat Capacity (J/(g °C))");
-	panel1.disableControl("Block 1 Mass (g)");
-	panel1.disableControl("Block 1 area (cm²)");
+	panel1.disableControl("Initial Temperature");
+	panel1.disableControl("Block Heat Capacity");
+	panel1.disableControl("Block Mass");
+	panel1.disableControl("Block Area");
 	panel1.disableControl("Number of Blocks");
-	panel1.disableControl("Stir Bar:");
+	panel1.disableControl("Add Stir Bar");
 
-	panel2.disableControl("Initial Temperature (°C)");
-	panel2.disableControl("Block Heat Capacity (J/(g °C))");
-	panel2.disableControl("Block 2 Mass (g)");
-	panel2.disableControl("Block 2 area (cm²)");
+	panel2.disableControl("Initial Temperature");
+	panel2.disableControl("Block Heat Capacity");
+	panel2.disableControl("Block Mass");
+	panel2.disableControl("Block Area");
 	panel2.disableControl("Number of Blocks");
-	panel2.disableControl("Stir Bar:");
+	panel2.disableControl("Add Stir Bar");
+
+	panel3.disableControl("duration to simulate")
 }
 
 /*
@@ -603,19 +606,21 @@ function resetExperiment() {
 
 	// Re-enable the input fields if they are disabled
 	if (experimentRunning || experimentStarted) {
-		panel1.enableControl("Initial Temperature (°C)");
-		panel1.enableControl("Block Heat Capacity (J/(g °C))");
-		panel1.enableControl("Block 1 Mass (g)");
-		panel1.enableControl("Block 1 area (cm²)");
+		panel1.enableControl("Initial Temperature");
+		panel1.enableControl("Block Heat Capacity");
+		panel1.enableControl("Block Mass");
+		panel1.enableControl("Block Area");
 		panel1.enableControl("Number of Blocks");
-		panel1.enableControl("Stir Bar:");
-
-		panel2.enableControl("Initial Temperature (°C)");
-		panel2.enableControl("Block Heat Capacity (J/(g °C))");
-		panel2.enableControl("Block 2 Mass (g)");
-		panel2.enableControl("Block 2 area (cm²)");
+		panel1.enableControl("Add Stir Bar");
+	
+		panel2.enableControl("Initial Temperature");
+		panel2.enableControl("Block Heat Capacity");
+		panel2.enableControl("Block Mass");
+		panel2.enableControl("Block Area");
 		panel2.enableControl("Number of Blocks");
-		panel2.enableControl("Stir Bar:");
+		panel2.enableControl("Add Stir Bar");
+
+		panel3.enableControl("duration to simulate")
 	}
 
 	experimentRunning = false;
