@@ -441,7 +441,7 @@ function generateGraphPoints() {
 		sit1TempArray = sit1TempArray.concat(newArray);
 		
 		// equation for water temperature after ice melts has a similar form
-		waterTempVsTime1 = `(${cpBmB1*TB0 + cpWmW*TW0} - ${(TB0 - TW0)*cpBmB1} * e^( ${(-cpBmB1-cpWmW)*UA1/(cpBmB1*cpWmW)} * (t - ${meltIndex1 * dt}) )) / ${cpBmB1+cpWmW}`;
+		let waterTempVsTime1 = `(${cpBmB1*TB0 + cpWmW*TW0} - ${(TB0 - TW0)*cpBmB1} * e^( ${(-cpBmB1-cpWmW)*UA1/(cpBmB1*cpWmW)} * (t - ${meltIndex1 * dt}) )) / ${cpBmB1+cpWmW}`;
 		let TW1= functionToArray(waterTempVsTime1, ["t", meltIndex1 * dt, tMax, dt]);
 
 		for(i=meltIndex1; i<(meltIndex1 + TW1.length); i++) {
@@ -456,7 +456,7 @@ function generateGraphPoints() {
 		let newArray = functionToArray(tempVsTime4, ["t", meltIndex2 * dt, tMax, dt]);
 		sit2TempArray = sit2TempArray.concat(newArray);
 
-		waterTempVsTime2 = `(${cpBmB2*TB0 + cpWmW*TW0} - ${(TB0 - TW0)*cpBmB2} * e^( ${(-cpBmB2-cpWmW)*UA2/(cpBmB2*cpWmW)} * (t - ${meltIndex2 * dt}) )) / ${cpBmB2+cpWmW}`
+		let waterTempVsTime2 = `(${cpBmB2*TB0 + cpWmW*TW0} - ${(TB0 - TW0)*cpBmB2} * e^( ${(-cpBmB2-cpWmW)*UA2/(cpBmB2*cpWmW)} * (t - ${meltIndex2 * dt}) )) / ${cpBmB2+cpWmW}`
 		let TW2= functionToArray(waterTempVsTime2, ["t", meltIndex2 * dt, tMax, dt]);
 		for(i=meltIndex2; i<(meltIndex2 + TW2.length); i++) {
 			water2TempArray[i][1] = TW2[i - meltIndex2][1]
