@@ -37,10 +37,12 @@
   user-select: none;
   -webkit-user-select: none;
   cursor: pointer;
-  padding: 5px;
   font-weight: bold;
-  border: none;
-  color: #000000;
+  margin: 1px;
+  padding: 4px;
+  outline: 1px solid black;
+  position: relative;
+  right: 0px;
 }
 
 #blue .qs_title_bar {
@@ -54,11 +56,12 @@
 }
 
 .qs_container {
-  margin: 3px;
-  margin-right: 5px;
+  margin: 2px;
   padding: 3px;
-  border: 1px solid #000000;
+  outline: 1px solid rgba(0, 0, 0, 0.5);
   position: relative;
+  right: 1px;
+  transition-duration: 200ms;
 }
 
 #red .qs_container {
@@ -70,7 +73,7 @@
 }
 
 .qs_container_selected {
-  border: 1px solid #666666;
+  outline: 1px solid #ffffff;
 }
 
 #red .qs_container_selected {

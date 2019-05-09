@@ -81,20 +81,31 @@
 	position: absolute;
 /* 	left: 50%;
 	transform: translate(-50%, 0%); */
-	top: 5%;
+	top: 0%;
 	font-size: 1rem;
 	margin-right: 7%;
 	white-space: nowrap;
 	justify-self: center;
 	text-align: center;
+	line-height: 1.3rem;
+	background-color: rgb(231, 235, 226);
+	padding-left: 2%;
+	padding-right: 2%;
+	padding-top: 1%;
+	padding-bottom: 1%;
+	border-radius: 5px;
+	border: 1px solid black;
+	box-shadow: 2px 2px 1px #888888;
 }
 
 #beakersImg {
-	display: inline-block;
+	display: block;
 	position: absolute;
 	left: 0px;
 	bottom: 0px;
 	max-width: 100%;
+	margin-left: auto;
+	margin-right: auto;
 	height: 47%;
 	overflow: hidden;
 }
@@ -117,9 +128,11 @@
 .graphChoose {
 	position: absolute;
 	justify-self: right;
-	top: 60px;
+	top: 35px;
 	right: 0px;
 	font-size: 1rem;
+	line-height: 1rem;
+	margin: 0px;
 }
 
 #graphInfo {
@@ -138,18 +151,18 @@
 #waterImg {
 	display: inline-block;
 	position: absolute;
-	left: 0px;
-	bottom: 0px;
-	max-width: 100%;
-	height: 47%;
+	left: 2.5%;
+	bottom: 1.7%;
+	max-width: 95%;
+	height: 36.5%;
 	overflow: hidden;
-	opacity: 0.7;
+	opacity: 0.5;
 	z-index: 2;
 }
 
 .sit1block {
 	position: absolute;
-	bottom: 40%;
+	bottom: 55%;
 	left: 0px;
 	height: 42px;
 	width: 42px;
@@ -160,7 +173,7 @@
 
 .sit2block {
 	position: absolute;
-	bottom: 40%;
+	bottom: 55%;
 	right: 0px;
 	height: 42px;
 	width: 42px;
@@ -171,32 +184,20 @@
 
 .sit1Ice {
 	position: absolute;
-	height: 9.5%;
-	width: 10.8%;
-	border-style: solid;
-	border-width: thin;
-	opacity: 0.9;
-	-webkit-border-radius: 20px;
-	-khtml-border-radius: 20px;
-	-moz-border-radius: 20px;
-	border-radius: 20px;
-	background: url('blueGradient.png') 0 0;
+	height: 14.3%;
+	width: 10.0%;
 	z-index: 1;
+	opacity: 0.8;
+	bottom: 37%;
 }
 
 .sit2Ice {
 	position: absolute;
-	height: 9.5%;
-	width: 10.8%;
-	border-style: solid;
-	border-width: thin;
-	opacity: 0.9;
-	-webkit-border-radius: 20px;
-	-khtml-border-radius: 20px;
-	-moz-border-radius: 20px;
-	border-radius: 20px;
-	background: url('blueGradient.png') 0 0;
+	height: 14.3%;
+	width: 10.0%;
 	z-index: 1;
+	opacity: 0.8;
+	bottom: 37%;
 }
 
 /*****Classes for graph elements*****/
@@ -229,6 +230,7 @@
 	bottom: 5%;
 	left: 20%;
 	z-index: 0;
+	width: 10%;
 }
 
 #stirBar2 {
@@ -236,6 +238,7 @@
 	bottom: 5%;
 	right: 20%;
 	z-index: 0;
+	width: 10%;
 }
 
 #sit1block1 {
@@ -271,47 +274,57 @@
 }
 
 #sit1Ice1 {
-	bottom: 33%;
-	left: 6%;
+	left: 12%;
+	transform: translate(-50%, 50%) rotate(15deg);
 }
 
 #sit1Ice2 {
-	bottom: 31%;
-	left: 19%;
+	left: 25%;
+	transform: translate(-50%, 50%) rotate(-15deg);
 }
 
 #sit1Ice3 {
-	bottom: 33%;
-	left: 32%;
+	left: 37%;
+	transform: translate(-50%, 50%) rotate(5deg);
 }
 
 #sit2Ice1 {
-	bottom: 33%;
-	right: 6%;
+	right: 11%;
+	transform: translate(50%, 50%) rotate(-12deg);
 }
 
 #sit2Ice2 {
-	bottom: 31%;
-	right: 19%;
+	right: 23%;
+	transform: translate(50%, 50%) rotate(10deg);
 }
 
 #sit2Ice3 {
-	bottom: 33%;
-	right: 32%;
+	right: 36%;
+	transform: translate(50%, 50%) rotate(3deg);
+}
+
+.temps {
+	position: absolute;
+	font-size: 1rem;
+	bottom: 200px;
+	padding-left: 2%;
+	padding-right: 2%;
+	padding-top: 1%;
+	padding-bottom: 1%;
+	border-radius: 5px;
+	border: 1px solid black;
+	box-shadow: 2px 2px 1px #888888;
+	line-height: 1.3rem;
 }
 
 #temps1 {
-	position: absolute;
-	bottom: 55%;
 	left: 0%;
-	font-size: 1rem;
+	background-color: rgb(255, 203, 203);
 }
 
 #temps2 {
-	position: absolute;
-	bottom: 55%;
 	right: 0%;
-	font-size: 1rem;
+	background-color: rgb(202, 220, 255);
 }
 /***** graph elements/labels *****/
 
@@ -338,5 +351,8 @@
 }
 
 input[type="radio"] {
+	margin-left: 0px;
 	margin-right: 5px;
+	margin-top: 0px;
+	margin-bottom: 0px;
   }

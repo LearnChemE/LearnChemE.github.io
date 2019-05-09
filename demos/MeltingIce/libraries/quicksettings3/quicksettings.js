@@ -1179,8 +1179,11 @@
          * @param [callback] {Function} Callback function to call when control value changes.
          * @returns {module:QuickSettings}
          */
-        addRange: function (title, min, max, value, step, callback) {
-            return this._addNumber("range", title, min, max, value, step, callback);
+        addRange: function (title, min, max, value, step, callback, units) {
+            if ( units === undefined ) {
+                units = '';
+             }
+            return this._addNumber("range", title, min, max, value, step, callback, units);
         },
 
         /**
@@ -1193,23 +1196,38 @@
          * @param [callback] {Function} Callback function to call when control value changes.
          * @returns {module:QuickSettings}
          */
-        addNumber: function (title, min, max, value, step, callback) {
-            return this._addNumber("number", title, min, max, value, step, callback);
+        addNumber: function (title, min, max, value, step, callback, units) {
+            if ( units === undefined ) {
+                units = '';
+             }
+            return this._addNumber("number", title, min, max, value, step, callback, units);
         },
 
-        _addNumber: function (type, title, min, max, value, step, callback) {
+        _addNumber: function (type, title, min, max, value, step, callback, units) {
             var container = this._createContainer();
 
             var label = createLabel("", container);
+
+            function decimalPlaces(num) {
+                var match = (''+num).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/);
+                if (!match) { return 0; }
+                return Math.max(
+                     0,
+                     // Number of digits right of decimal point.
+                     (match[1] ? match[1].length : 0)
+                     // Adjust for scientific notation.
+                     - (match[2] ? +match[2] : 0));
+              }
+            let prec = decimalPlaces(step);
 
             var className = type === "range" ? "qs_range" : "qs_text_input qs_number";
             var input = createInput(type, getNextID(), className, container);
             input.min = min || 0;
             input.max = max || 100;
             input.step = step || 1;
-            input.value = value || 0;
+            input.value = Number.parseFloat(value).toFixed(prec) || 0;
 
-            label.innerHTML = "<b>" + title + ":</b> " + input.value;
+            label.innerHTML = "<b>" + title + ":</b> " + Number.parseFloat(input.value).toFixed(prec) + " " + units;
 
 
             this._controls[title] = {
@@ -1223,7 +1241,7 @@
                 },
                 setValue: function (value) {
                     this.control.value = value;
-                    this.label.innerHTML = "<b>" + this.title + ":</b> " + this.control.value;
+                    this.label.innerHTML = "<b>" + this.title + ":</b> " + Number.parseFloat(this.control.value).toFixed(prec) + " " + units;
                     if (callback) {
                         callback(parseFloat(value));
                     }
@@ -1236,7 +1254,7 @@
             }
             var self = this;
             input.addEventListener(eventName, function () {
-                label.innerHTML = "<b>" + title + ":</b> " + input.value;
+                label.innerHTML = "<b>" + title + ":</b> " + Number.parseFloat(input.value).toFixed(prec) + " " + units;
                 if (callback) {
                     callback(parseFloat(input.value));
                 }
