@@ -931,19 +931,17 @@ function getNumBlocks() {
 }
 
 function showHelp() {
-	let string = "Melting Ice Simulation lets you compare the rate of energy transfer";
-	string += " from heated blocks to the water and ice cubes in two different beakers, each under";
-	string += " its own set of initial conditions.   Choose the initial conditions";
-	string += " for Situation 1 and Situation 2.  Then click the Start button to";
-	string += " watch the ice melt.  After the ice has melted, in order to change";
-	string += " the initial conditions for another experiment, you must first press the";
-	string += " Reset button to return the ice and the heated blocks to their initial";
-	string += " positions and energies.  While the ice is melting, you can watch the";
-	string += " graph to see the mass of ice melted in each beaker over time. Note that";
-	string += " the axes are recalculated every time to ensure a good view of the";
-	string += " graph.  This simulation assumes that all energy transferred goes into";
-	string += " melting ice at 0\xB0C into water at 0\xB0C, and none goes into changing the";
-	string += " temperature of the water or ice.";
+	let string = "Melting Ice Simulation lets you compare the rate of energy transfer from " + 
+	"heated metal blocks to the water and ice cubes in two different beakers, each under its own set " +
+	"of initial conditions. Choose the initial conditions for Situation 1 and Situation 2. " +
+	"Then click the Start button to watch the ice melt.  After the ice has melted, in order to change " +
+	"the initial conditions for another experiment, you must first press the " +
+	"Reset button to return the ice and the heated blocks to their initial " +
+	"positions and energies.  While the ice is melting, you can watch the " +
+	"graph to see the mass of ice melted in each beaker over time, as well as the temperature " +
+	"change with time. This simulation assumes perfect mixing, and that all energy transferred " +
+	"goes into melting the ice until the ice has fully melted. After that, all energy goes into " +
+	"raising the temperature of the water.";
 	alert(string);
 }
 
