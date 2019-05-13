@@ -97,3 +97,16 @@ function plotFunction() {
     }
   }
 }
+
+function Plot(func, indep, min, max, parentPlot, resolution) {
+  if (resolution === undefined) {resolution = (max - min)/200};
+  parentPlot.beginDraw();
+  parentPlot.drawBackground();
+  parentPlot.drawBox();
+  plotFunction(func, [indep, min, max, resolution], parentPlot, true);
+  parentPlot.drawLimits();
+  parentPlot.drawXAxis();
+  parentPlot.drawYAxis();
+  parentPlot.drawTitle();
+  parentPlot.endDraw();
+}

@@ -4,10 +4,16 @@ var clientHeight = clientWidth * aspRatio;
 
 var mainPlot;
 var gui;
-var variable = 1;
+var variable;
 
 function windowResized() {
+  clientWidth = Math.max(200, window.innerWidth - 200);
+  aspRatio = 1;
+  clientHeight = clientWidth * aspRatio;
   resizeCanvas(clientWidth, clientHeight);
+  mainPlot.setOuterDim(clientWidth, clientHeight);
+  mainPlot.setPos(0, 0);
+  gui.prototype.setPosition(clientWidth, mainPlot.mar[2]);
 }
 
 class PlotSetup {
@@ -34,26 +40,12 @@ function setup() {
   plotSettings.defaultSetup();
 
   // Create the GUI
-  sliderRange(0, 1, 0.05);
-  gui = createGui('plot controls', 0, -1);
-  gui.addGlobals('variable');
-
-  // Only call draw when then gui is changed
-
+  gui = createGui('plot controls', clientWidth, mainPlot.mar[2]);
+  gui.newSlider('variable', 0, 1, 0.5, 0.1);
 }
 
 function draw() {
   background(255);
 
-  mainPlot.beginDraw();
-  mainPlot.drawBackground();
-  mainPlot.drawBox();
-  
-  plotFunction(String(`0.5 * sin(10 * x + 10 * ${variable}) + 0.5`),["x", 0, 1, 0.01], mainPlot, true);
-
-  mainPlot.drawLimits();
-  mainPlot.drawXAxis();
-  mainPlot.drawYAxis();
-  mainPlot.drawTitle();
-  mainPlot.endDraw();
+  Plot("x", "x", 0, 1, mainPlot);
 }

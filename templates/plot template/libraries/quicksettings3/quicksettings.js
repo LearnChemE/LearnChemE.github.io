@@ -1179,11 +1179,14 @@
          * @param [callback] {Function} Callback function to call when control value changes.
          * @returns {module:QuickSettings}
          */
-        addRange: function (title, min, max, value, step, callback, units) {
+        addRange: function (title, min, max, value, step, callback, name, units) {
             if ( units === undefined ) {
                 units = '';
-             }
-            return this._addNumber("range", title, min, max, value, step, callback, units);
+            }
+            if ( name === undefined ) {
+                name = title;
+            }
+            return this._addNumber("range", title, min, max, value, step, callback, name, units);
         },
 
         /**
@@ -1196,16 +1199,18 @@
          * @param [callback] {Function} Callback function to call when control value changes.
          * @returns {module:QuickSettings}
          */
-        addNumber: function (title, min, max, value, step, callback, units) {
+        addNumber: function (title, min, max, value, step, callback, name, units) {
             if ( units === undefined ) {
                 units = '';
-             }
-            return this._addNumber("number", title, min, max, value, step, callback, units);
+            }
+            if ( name === undefined ) {
+                name = title;
+            }
+            return this._addNumber("number", title, min, max, value, step, callback, name, units);
         },
 
-        _addNumber: function (type, title, min, max, value, step, callback, units) {
+        _addNumber: function (type, title, min, max, value, step, callback, name, units) {
             var container = this._createContainer();
-
             var label = createLabel("", container);
 
             function decimalPlaces(num) {
@@ -1227,7 +1232,7 @@
             input.step = step || 1;
             input.value = Number.parseFloat(value).toFixed(prec) || 0;
 
-            label.innerHTML = "<b>" + title + ":</b> " + Number.parseFloat(input.value).toFixed(prec) + " " + units;
+            label.innerHTML = "<b>" + name + ":</b> " + Number.parseFloat(input.value).toFixed(prec) + " " + units;
 
 
             this._controls[title] = {
@@ -1235,13 +1240,14 @@
                 control: input,
                 label: label,
                 title: title,
+                name: name,
                 callback: callback,
                 getValue: function () {
                     return parseFloat(this.control.value);
                 },
                 setValue: function (value) {
                     this.control.value = value;
-                    this.label.innerHTML = "<b>" + this.title + ":</b> " + Number.parseFloat(this.control.value).toFixed(prec) + " " + units;
+                    this.label.innerHTML = "<b>" + this.name + ":</b> " + Number.parseFloat(this.control.value).toFixed(prec) + " " + units;
                     if (callback) {
                         callback(parseFloat(value));
                     }
@@ -1254,7 +1260,7 @@
             }
             var self = this;
             input.addEventListener(eventName, function () {
-                label.innerHTML = "<b>" + title + ":</b> " + Number.parseFloat(input.value).toFixed(prec) + " " + units;
+                label.innerHTML = "<b>" + name + ":</b> " + Number.parseFloat(input.value).toFixed(prec) + " " + units;
                 if (callback) {
                     callback(parseFloat(input.value));
                 }
@@ -1273,10 +1279,16 @@
          * @param object {Object} Object the control is bound to. When the value of the control changes, a property on this object, with the name of the title of this control, will be set to the current value of this control.
          * @returns {module:QuickSettings}
          */
-        bindRange: function (title, min, max, value, step, object) {
+        bindRange: function (title, min, max, value, step, object, name, units) {
+            if ( units === undefined ) {
+                units = "";
+            }
+            if ( name === undefined ) {
+                name = title;
+            }
             return this.addRange(title, min, max, value, step, function (value) {
                 object[title] = value;
-            });
+            }, name, units);
         },
 
         /**

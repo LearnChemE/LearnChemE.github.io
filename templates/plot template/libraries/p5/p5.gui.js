@@ -9,33 +9,16 @@
   var sliderMin = 0;
   var sliderMax = 100;
   var sliderStep = 1;
-
-  // default gui provider
-  var guiProvider = 'QuickSettings';
+  var sliderUnit = "";
 
   // Create a GUI using QuickSettings (or DAT.GUI or ...)
-  p5.prototype.createGui = function(label, x, y, provider) {
+  p5.prototype.createGui = function(label, x, y, id) {
 
     label = label || 'GUI';
     x = x || 20;
     y = y || 20;
-    provider = provider || guiProvider;
 
-    var gui;
-
-    // create a gui using the provider
-    if(provider === 'QuickSettings') {
-      if(QuickSettings) {
-        console.log('Creating p5.gui powered by QuickSettings.');
-        gui = new QSGui(label, x, y);
-      } else {
-        console.log('QuickSettings not found. Is the script included in your HTML?');
-        gui = new DummyGui(label, x, y);
-      }
-    } else {
-      console.log('Unknown GUI provider ' + provider);
-      gui = new DummyGui(label, x, y);
-    }
+    var gui = new QSGui(label, x, y, id);
 
     // add it to the list of guis
     guis.push(gui);
@@ -51,10 +34,11 @@
   };
 
   // update defaults used for creation of sliders
-  p5.prototype.sliderRange = function(vmin, vmax, vstep) {
+  p5.prototype.sliderRange = function(vmin, vmax, vstep, vunit) {
     sliderMin = vmin;
     sliderMax = vmax;
     sliderStep = vstep;
+    sliderUnit = vunit;
   };
 
   // extend default behaviour of noLoop()
@@ -76,14 +60,40 @@
 
 
   // interface for quicksettings
-  function QSGui(label, x, y) {
-    var qs = QuickSettings.create(x, y, label, document.body, "red");
+  function QSGui(label, x, y, id) {
+    var qs = QuickSettings.create(x, y, label, document.body, id);
     this.prototype = qs;
 
     // addGlobals(global1, global2, ...) to add the selected globals
     this.addGlobals = function() {
       qs.bindGlobals(arguments);
     };
+    /**
+     * Adds a range slider control.
+     * @param variable {String} Name of global variable.
+     * @param min {Number} Minimum value of control.
+     * @param max {Number} Maximum value of control.
+     * @param val {Number} Initial value of control. Only works if variable is undefined.
+     * @param step {Number} Size of value increments.
+     * @param title {String} [optional] Label for control.
+     * @param units {String} [optional] Units for control.
+     */
+    this.newSlider = function(variable, min, max, val, step, title, units) {
+      let a; let b;let c; let d; let e; let f; let g;
+      a = variable;
+        if (window[variable] === undefined) {
+          b = min;
+          c = max;
+        } else {
+          b = Math.min(min, window[variable]);
+          c = Math.max(max, window[variable]);
+        }
+        if (window[variable] === undefined) {d = val; window[variable] = val} else {d = window[variable]};
+        e = step;
+        if (title === undefined) {f = variable} else {f = title};
+        if (units === undefined) {g = ""} else {g = units};
+        return qs.bindRange(a, b, c, d, e, window, f, g)
+    }
 
     // addObject(object) to add all params of the object
     // addObject(object, param1, param2, ...) to add selected params
@@ -116,15 +126,6 @@
     this.hide = function() { qs.hide(); };
     this.toggleVisibility = function() { qs.toggleVisibility(); };
 
-  }
-
-  // Just a Dummy object that provides the GUI interface
-  function DummyGui() {
-    var f = function() {};
-    this.addGlobals = f;
-    this.noLoop = f;
-    this.addObject = f;
-    this.show = f;
   }
 
   // Extend Quicksettings
@@ -172,9 +173,10 @@
           // the actual values can still overrule the limits set by magic
           var vmin = min(val, vmin);
           var vmax = max(val, vmax);
+          var vunits = object[arg + 'Unit'] || object[arg + 'unit'] || object[arg + 'Units'] || object[arg + 'units'] || sliderUnit;
 
           // set the range
-          this.bindRange(arg, vmin, vmax, val, vstep, object);
+          this.bindRange(arg, vmin, vmax, val, vstep, object, vunits);
 
           break;
 
