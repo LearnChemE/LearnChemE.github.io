@@ -2,9 +2,16 @@
 /* CSS Document */
 
 html, body {
-  margin: 0;
-  padding: 0;
+  height: 100%;
 }
-canvas {
-  display: block;
+
+body {
+  margin: 0;
+  display: flex;
+
+  /* This centers our sketch horizontally. */
+  justify-content: left;
+
+  /* This centers our sketch vertically. */
+  align-items: top;
 }
