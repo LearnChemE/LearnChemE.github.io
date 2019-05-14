@@ -1,4 +1,4 @@
-//
+/* jshint esversion: 6 */
 
 (function() {
 
@@ -88,12 +88,12 @@
           b = Math.min(min, window[variable]);
           c = Math.max(max, window[variable]);
         }
-        if (window[variable] === undefined) {d = val; window[variable] = val} else {d = window[variable]};
+        if (window[variable] === undefined) {d = val; window[variable] = val;} else {d = window[variable];}
         e = step;
-        if (title === undefined) {f = variable} else {f = title};
-        if (units === undefined) {g = ""} else {g = units};
-        return qs.bindRange(a, b, c, d, e, window, f, g)
-    }
+        if (title === undefined) {f = variable;} else {f = title;}
+        if (units === undefined) {g = "";} else {g = units;}
+        return qs.bindRange(a, b, c, d, e, window, f, g);
+    };
 
     // addObject(object) to add all params of the object
     // addObject(object, param1, param2, ...) to add selected params
@@ -103,7 +103,7 @@
       // convert arguments object to array
       var params = [];
       if(arguments.length > 1) {
-        params = Array.prototype.slice.call(arguments)
+        params = Array.prototype.slice.call(arguments);
         params = params.slice(1);
       }
       // if no arguments are provided take all keys of the object
@@ -171,8 +171,8 @@
           var vstep = object[arg + 'Step'] || object[arg + 'step'] || sliderStep;
 
           // the actual values can still overrule the limits set by magic
-          var vmin = min(val, vmin);
-          var vmax = max(val, vmax);
+          vmin = min(val, vmin);
+          vmax = max(val, vmax);
           var vunits = object[arg + 'Unit'] || object[arg + 'unit'] || object[arg + 'Units'] || object[arg + 'units'] || sliderUnit;
 
           // set the range

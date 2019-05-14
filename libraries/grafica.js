@@ -4177,7 +4177,7 @@ GPlot.prototype.drawLimits = function() {
 	this.parent.rect(-this.mar[1], - this.outerDim[1], this.mar[0], this.outerDim[1] + this.mar[1]);
 	this.parent.rect(-this.mar[1], this.mar[0], this.outerDim[1], -this.mar[0]+1);
 	this.parent.pop();
-} 
+};
 
 GPlot.prototype.drawBox = function() {
 	this.parent.push();
