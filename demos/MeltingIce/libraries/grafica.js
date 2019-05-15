@@ -148,7 +148,7 @@ function GTitle(parent, dim) {
 	this.fontName = "Helvetica";
 	this.fontColor = this.parent.color(100);
 	this.fontStyle = this.parent.BOLD;
-	this.fontSize = graphFontSize;
+	this.fontSize = Math.ceil(graphFontSize);
 }
 
 GTitle.prototype.draw = function() {
@@ -250,7 +250,7 @@ function GAxisLabel(parent, type, dim) {
 	this.textAlignment = this.parent.CENTER;
 	this.fontName = "Helvetica";
 	this.fontColor = this.parent.color(0);
-	this.fontSize = graphFontSize;
+	this.fontSize = Math.ceil(graphFontSize);
 }
 
 GAxisLabel.prototype.draw = function() {
@@ -469,7 +469,7 @@ function GAxis(parent, type, dim, lim, log) {
 	// Text properties
 	this.fontName = "Helvetica";
 	this.fontColor = this.parent.color(0);
-	this.fontSize = graphFontSize + 2;
+	this.fontSize = Math.ceil(graphFontSize + 2);
 
 	// Update the arrays
 	this.updateTicks();
@@ -1341,7 +1341,7 @@ function GHistogram(parent, type, dim, plotPoints) {
 	this.rotateLabels = false;
 	this.fontName = "Helvetica";
 	this.fontColor = this.parent.color(0);
-	this.fontSize = graphFontSize - 4;
+	this.fontSize = Math.ceil(graphFontSize - 4);
 }
 
 GHistogram.prototype.updateArrays = function() {
@@ -1741,7 +1741,7 @@ function GLayer(parent, id, dim, xLim, yLim, xLog, yLog) {
 	this.labelSeparation = [7, 7];
 	this.fontName = "Helvetica";
 	this.fontColor = this.parent.color(0);
-	this.fontSize = graphFontSize - 4;
+	this.fontSize = Math.ceil(graphFontSize - 4);
 
 	// Helper variable
 	this.cuts = [[0, 0], [0, 0], [0, 0], [0, 0]];

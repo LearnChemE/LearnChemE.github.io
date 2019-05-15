@@ -76,7 +76,7 @@
             <p id="temps1" class="temps"></p>
             <p id="temps2" class="temps"></p>
             <p id="initConds">
-                Initial conditions:<br>10 g ice in each cup<br>1 L water in each beaker
+                Initial conditions:<br>10 g ice in each cup<br>100 mL water in each beaker
             </p>
 
             <img id="waterImg" alt="" src="water.png" />
@@ -143,6 +143,143 @@
         </div>
 
     </div>
-</body>
+    <div id="modalDirections">
+        <div id="directions-content">
+            <span class="close">&times;</span>
+            <p class="popup paragraph">This simulation compares the rate of energy transfer from heated metal blocks to ice water in two beakers, 
+            each under its own set of initial conditions.  When the <span style="color:#479E47">green</span> "Start" button is clicked, one or more hot 
+            metal blocks drop into beakers containing ice water, and the water temperature and/or the mass of ice melted 
+            is plotted versus time by selecting the appropriate radio button. The number of blocks and their properties 
+            are adjusted with sliders. Checking "Add stir bar"  to increases the heat transfer rate. Comparisons can be 
+            made by choosing different conditions for beakers 1 and 2. To change the initial conditions for another 
+            experiment, first press the Reset button. This simulation assumes perfect mixing, no temperature gradient 
+            in the metal blocks, and that all energy transferred from the blocks goes into melting the ice. Once the 
+            ice fully melts, the energy goes into raising the water temperature.</p>
+        </div>
+    </div>
 
+    <!--<div id="key">
+        <div>
+            <img name="s1" src="https://latex.codecogs.com/gif.latex?%5Cdot%7BE%7D_%7Bout%7D" style="background-color:transparent;font-size:10pt">
+            <p class="popup">rate of energy transfer to water</p>
+            <img name="s1unit" src="https://latex.codecogs.com/gif.latex?%28W%29" style="background-color:transparent;font-size:10pt">
+        </div>
+        <div>
+            <img name="s2" src="https://latex.codecogs.com/gif.latex?%5Cdot%7BE%7D_%7Bst%7D" style="font-size:10pt;background-color:transparent">
+            <p class="popup">change in block's stored heat</p>
+            <img name="s2unit" src="https://latex.codecogs.com/gif.latex?%28W%29" style="background-color:transparent;font-size:10pt">
+        </div>
+        <div>
+            <img name="s3" src="https://latex.codecogs.com/gif.latex?U">
+            <p class="popup">overall heat transfer coefficient</p>
+            <img name="s3unit" src="https://latex.codecogs.com/gif.latex?%28%5Cfrac%7BW%7D%7Bm%5E2%20K%7D%29" style="background-color:transparent">
+        </div>
+        <div>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?A_%7Bs%7D">
+            <p class="popup">surface area of heat transfer</p>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?%28m%5E2%29" style="background-color:transparent">
+        </div>
+        <div>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?T_%7BB%7D">
+            <p class="popup">temperature of the block</p>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?%28K%29" style="background-color:transparent">
+        </div> 
+        <div>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?T_%7Bi%7D">
+            <p class="popup">initial temperature of the block</p>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?%28K%29" style="font-style:normal;font-family:arial,sans-serif;font-size:medium;background-color:transparent">
+        </div>
+        <div>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?T_%7BW%7D" style="background-color:transparent">
+            <p class="popup">temperature of the water</p>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?%28K%29" style="background-color:transparent">
+        </div>
+        <div>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?%5Crho" style="background-color:transparent">
+            <p class="popup">density of the block</p>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?%28%5Cfrac%7Bkg%7D%7Bm%5E3%7D%29" style="background-color:transparent">
+        </div>
+        <div>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?V" style="background-color:transparent">
+            <p class="popup">volume of the block</p>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?%28m%5E3%29" style="background-color:transparent">
+        </div>
+        <div>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?c" style="background-color:transparent">
+            <p class="popup">heat capacity of the block</p>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?%28%5Cfrac%7BJ%7D%7Bkg%20K%7D%29" style="background-color:transparent">
+        </div>
+        <div>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?%5Cfrac%7BdT_%7BB%7D%7D%7Bdt%7D">
+            <p class="popup">block temperature change with time</p>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?%28%5Cfrac%7BK%7D%7Bs%7D%29" style="font-style:normal;font-size:medium;background-color:transparent">
+        </div>
+        <div>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?%5CDelta%20H_%7Bfus%7D">
+            <p class="popup">ice heat of fusion</p>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?%28%5Cfrac%7BJ%7D%7Bkg%7D%29" style="background-color:transparent;">
+        </div>
+        <div>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?m_%7Bmelt%7D">
+            <p class="popup">mass of ice melted</p>
+            <img name="equationview" src="https://latex.codecogs.com/gif.latex?%28kg%29" style="background-color:transparent;font-size:10pt">
+        </div>
+    </div>-->
+
+    <div id="modalDetails">
+        <div id="details-content">
+        <span class="close">&times;</span>
+        <p class="popup paragraph">This simulation is a <i>Lumped Capacitance</i> method of examining transient conduction. It assumes 
+            that temperature gradients within the block and water are negligible. This may not be realistic. The overall energy balance on the system is</p>
+        <span><img class="latex" name="eBal" src="https://latex.codecogs.com/gif.latex?UA_%7Bs%7D%28T_%7BB%7D-T_%7BW%7D%29%3D-%5Crho%20Vc%5Cfrac%7BdT_%7BB%7D%7D%7Bdt%7D"></span>
+        <p class="popup paragraph">where <span><img class="latex" name="U" src="https://latex.codecogs.com/gif.latex?U"></span> is the overall heat transfer coefficient,
+        <span><img class="latex" name="As" src="https://latex.codecogs.com/gif.latex?A_%7Bs%7D"></span> is the surface area for heat transfer, <span><img class="latex" name="TB" src="https://latex.codecogs.com/gif.latex?T_%7Bi%7D"></span> 
+        and <span><img class="latex" name="TW" src="https://latex.codecogs.com/gif.latex?T_%7BW%7D" style="background-color:transparent"></span> are the temperature of the block and water, respectively, 
+        <span><img class="latex" name="rho" src="https://latex.codecogs.com/gif.latex?%5Crho" style="background-color:transparent"></span> and <span><img class="latex" name="V" src="https://latex.codecogs.com/gif.latex?V" style="background-color:transparent"></span>
+        are the block density and volume, <span><img class="latex" name="Cp" src="https://latex.codecogs.com/gif.latex?C_%7Bp%7D" style="background-color:transparent"></span> is the block heat capacity, and 
+        <span><img class="latex" name="t" src="https://latex.codecogs.com/gif.latex?t"></span> is time.</p>
+        <p class="popup paragraph">if <span><img class="latex" name="TW" src="https://latex.codecogs.com/gif.latex?T_%7BW%7D" style="background-color:transparent"></span> is constant (i.e. there is sufficient ice to keep the water at 0°C) and we let
+        the block's initial temperature be <span><img class="latex" name="initialCondTi" src="https://latex.codecogs.com/gif.latex?T_%7BB%7D%280%29%20%3D%20T_%7Bi%7D" style="background-color:transparent;"></span>,
+        the solution to this ordinary differential equation becomes:</p>
+        <span><img class="latex" name="difEqSol1" src="https://latex.codecogs.com/gif.latex?%5Cfrac%7BT_%7BB%7D-T_%7BW%7D%7D%7BT_%7Bi%7D-T_%7BW%7D%7D%3D%5Ctextup%7Bexp%7D%5B-%28%5Cfrac%7BUA_%7Bs%7D%7D%7B%5Crho%20Vc%7D%29%5D" style="background-color:transparent;"></span>
+        <p class="popup paragraph">(or rearranging gives us)</p>
+        <span><img class="latex" name="difEqSol2" src="https://latex.codecogs.com/gif.latex?T_%7BB%7D%28t%29%20%3D%20T_%7BW%7D%20&amp;plus;%20%28T_%7Bi%7D-T_%7BW%7D%29e%5E%7B-%28%5Cfrac%7BUA_%7Bs%7D%7D%7B%5Crho%20Vc%7D%29%7D" style="background-color:transparent;"></span>
+        <p class="popup paragraph">The total amount of ice melted can then be calculated:</p>
+
+        <p class="popup paragraph">Where <span><img class="latex" name="mmelt" src="https://latex.codecogs.com/gif.latex?m_%7Bmelt%7D"></span> is the mass of ice melted, and <span><img class="latex" name="DHfusion" src="https://latex.codecogs.com/gif.latex?%5CDelta%20H_%7Bfus%7D"></span> is ice's heat of fusion.<br>
+            Until the ice fully melts, energy transfer from the block will not affect the temperature of the water. Once all the ice melts, the water temperature will rise.</p>
+        </div>
+    </div>
+    <!-- popup handler -->
+    <script>var modalDirections = document.getElementById("modalDirections");
+            var modalDetails = document.getElementById("modalDetails");
+            // Get the button that opens the modal
+            var directionsButton = document.getElementById("helpButton");
+            var detailsButton = document.getElementById("infoButton");
+            // Get the element that closes the modal
+            var closeDirections = document.getElementsByClassName("close")[0];
+            var closeDetails = document.getElementsByClassName("close")[1];
+            // When the user clicks the button, open the modal 
+            directionsButton.onclick = function() {
+              modalDirections.style.display = "block";
+            }
+            detailsButton.onclick = function() {
+              modalDetails.style.display = "block";
+            }
+            // When the user clicks on <span> (x), close the modal
+            closeDirections.onclick = function() {
+              modalDirections.style.display = "none";
+            }
+            closeDetails.onclick = function() {
+              modalDetails.style.display = "none";
+            }
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function(event) {
+              if (event.target == modalDirections || event.target == modalDetails) {
+                modalDirections.style.display = "none";
+                modalDetails.style.display = "none";
+              }
+            }
+            </script>
+</body>
 </html>

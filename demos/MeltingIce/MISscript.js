@@ -18,7 +18,8 @@
  * math.js (https://mathjs.org/)
  * grafica.js (https://github.com/jagracar/grafica.js)
  * quicksettings 3 (https://github.com/bit101/quicksettings)
- */
+ * 
+ *//* jshint esversion: 6 */
 
 
 $(document).ready(init);
@@ -36,15 +37,18 @@ let	clientWidth = Math.max(minWidth, maxWidth);
 let clientHeight = Math.max(minHeight, maxHeight);
 
 if (clientWidth > 1.2 * clientHeight) {
-	clientWidth = clientHeight * 1.2
+	clientWidth = clientHeight * 1.2;
 } else {
-	clientHeight = clientWidth / 1.2
+	clientHeight = clientWidth / 1.2;
 }
+
+// Adapt the device pixel ratio
+let HD=window.devicePixelRatio;
 
 // Water properties
 let icewaterTemp = 0;
 let waterHeatCap = 4.184; // J/(g K)
-let waterMass = 1000; // amount of water per beaker, grams
+let waterMass = 100; // amount of water per beaker, grams
 let waterHeatFusion = 333.05; // J/g
 let maxIce = 10; // amount of ice in the beakers, g
 
@@ -57,20 +61,20 @@ for(i=1; i<=4000; i++) {
 }
 
 // Initial block properties, situation 1. Can be adjusted with sliders.
-let initialTemp1 = 150; // celsius
-let heatCapacity1 = 4; // J/(g K)
-let mass1 = 2; // g
-let area1 = 4; // cm^2 per block. This must always be divided by 10000 for stoichiometry.
-let numBlocks1 = 2; // number of blocks
-let stirFactor1 = 300; // note - stir factor is equivalent to heat transfer coefficient, "U". Units: W/(m^2 K)
+let initialTemp1; // celsius
+let heatCapacity1; // J/(g K)
+let mass1; // g
+let area1; // cm^2 per block. This must always be divided by 10000 for stoichiometry.
+let numBlocks1; // number of blocks
+let stirFactor1; // note - stir factor is equivalent to heat transfer coefficient, "U". Units: W/(m^2 K)
 
 // Initial block properties, situation 2. Can also be adjusted with sliders.
-let initialTemp2 = 80; 
-let heatCapacity2 = 1; 
-let mass2 = 1; 
-let area2 = 1; 
-let numBlocks2 = 1;
-let stirFactor2 = 300;
+let initialTemp2; 
+let heatCapacity2; 
+let mass2; 
+let area2; 
+let numBlocks2;
+let stirFactor2;
 
 // Blank arrays in which the coordinate data for plotting will be stored.
 let sit1IceArray = [[0, 0]];
@@ -134,7 +138,7 @@ if (!Array.prototype.last){
     Array.prototype.last = function(){
         return this[this.length - 1];
     };
-};
+}
 
 // really bad at CSS so resizing functionality is with javascript .. don't judge me
 function windowResized() {
@@ -147,9 +151,9 @@ function windowResized() {
 	clientHeight = Math.max(minHeight, maxHeight);
 
 	if (clientWidth > 1.2 * clientHeight) {
-		clientWidth = clientHeight * 1.2
+		clientWidth = clientHeight * 1.2;
 	} else {
-		clientHeight = clientWidth / 1.2
+		clientHeight = clientWidth / 1.2;
 	}
 
 	getAreas();
@@ -239,7 +243,7 @@ window.onload = function () {
 	// creates the quicksettings panels, gives initial values to each slider, etc.
 	QuickSettings.useExtStyleSheet();
 	panel1 = QuickSettings.create(0, 30, "Settings: Situation 1", document.body, "red")
-		.addRange("Initial Temperature", 1, 400, 150, 1, function (value) {
+		.addRange("Initial Temperature", 1, 100, 30, 1, function (value) {
 			initialTemp1 = value;
 		}, "°C")
 		.addRange("Block Heat Capacity", 0.1, 10, 4, 0.1, function (value) {
@@ -268,7 +272,7 @@ window.onload = function () {
 		.setDraggable(true);
 
 	panel2 = QuickSettings.create($("#bottomCenter").width() - 220, 30, "Settings: Situation 2", document.body, "blue")
-		.addRange("Initial Temperature", 1, 400, 80, 1, function (value) {
+		.addRange("Initial Temperature", 1, 100, 80, 1, function (value) {
 			initialTemp2 = value;
 		}, "°C")
 		.addRange("Block Heat Capacity", 0.1, 10, 1, 0.1, function (value) {
@@ -302,9 +306,9 @@ window.onload = function () {
 		}, "s")
 		.addRange("animation speed", 0.5, 5, 1, 0.5, function (value) {
 			frMult = value;
-		}, "x")
+		}, "x");
 windowResized();
-}
+};
 
 /*
  * Function: init
@@ -316,9 +320,9 @@ function init() {
 	$("#startButton").on('click', startMelting);
 	$("#pauseButton").on('click', pauseMelting);
 	$("#resetButton").on('click', resetExperiment);
-	$("#helpButton").on('click', showHelp);
+	//$("#helpButton").on('click', showHelp);
 	$("#graphInfo").on('click', displayGraphInfo);
-	$("#infoButton").on('click', displayAboutInfo);
+	//$("#infoButton").on('click', displayAboutInfo);
 	$("input[name='whichGraph']").click(function() {
 		showWhichGraph = $("input[name='whichGraph']:checked").val();
 		windowResized();
@@ -340,7 +344,7 @@ function init() {
  * provides some setup information for the p5 canvas object.
  */
 function setup() {
-	pixelDensity(4.0);
+	pixelDensity(HD);
 	cnv = createCanvas(100, 100);
 	cnv.parent("bottomCenter");
 	plot1 = new GPlot(this);
@@ -358,6 +362,8 @@ function setup() {
 	plot2.getXAxis().getAxisLabel().setText("time (sec)");
 	plot2.getYAxis().getAxisLabel().setText("temperature (°C)");
 	plot2.getTitle().setText("temperature");
+
+	smooth();
   }
 
 /*
@@ -418,7 +424,7 @@ function generateGraphPoints() {
 			}
 			meltedAt1 = true;
 		}
-	};
+	}
 	for (i = 0; i < sit2IceArray.length; i++) {
 		if (sit2IceArray[i][1] >= maxIce) {
 			sit2IceArray[i][1] = maxIce;
@@ -427,7 +433,7 @@ function generateGraphPoints() {
 			}
 			meltedAt2 = true;
 		}
-	};
+	}
 
 	// Then stores the final value in an array, up to the time at which ice melts.
 	sit1TempArray = functionToArray(tempVsTime1, ["t", 0, meltIndex1 * dt, dt]);
@@ -446,8 +452,8 @@ function generateGraphPoints() {
 		let TW1= functionToArray(waterTempVsTime1, ["t", meltIndex1 * dt, tMax, dt]);
 
 		for(i=meltIndex1; i<(meltIndex1 + TW1.length); i++) {
-			water1TempArray[i][1] = TW1[i - meltIndex1][1]
-		};
+			water1TempArray[i][1] = TW1[i - meltIndex1][1];
+		}
 	}
 	
 	if(meltedAt2) {
@@ -457,11 +463,11 @@ function generateGraphPoints() {
 		let newArray = functionToArray(tempVsTime4, ["t", meltIndex2 * dt, tMax, dt]);
 		sit2TempArray = sit2TempArray.concat(newArray);
 
-		let waterTempVsTime2 = `(${cpBmB2*TB0 + cpWmW*TW0} - ${(TB0 - TW0)*cpBmB2} * e^( ${(-cpBmB2-cpWmW)*UA2/(cpBmB2*cpWmW)} * (t - ${meltIndex2 * dt}) )) / ${cpBmB2+cpWmW}`
+		let waterTempVsTime2 = `(${cpBmB2*TB0 + cpWmW*TW0} - ${(TB0 - TW0)*cpBmB2} * e^( ${(-cpBmB2-cpWmW)*UA2/(cpBmB2*cpWmW)} * (t - ${meltIndex2 * dt}) )) / ${cpBmB2+cpWmW}`;
 		let TW2= functionToArray(waterTempVsTime2, ["t", meltIndex2 * dt, tMax, dt]);
 		for(i=meltIndex2; i<(meltIndex2 + TW2.length); i++) {
-			water2TempArray[i][1] = TW2[i - meltIndex2][1]
-		};
+			water2TempArray[i][1] = TW2[i - meltIndex2][1];
+		}
 	}
 	
 
@@ -469,6 +475,7 @@ function generateGraphPoints() {
 	xAxisLimit = Math.ceil(tMax);
 	yAxisLimit1 = Math.max(Math.min(sit2IceArray.last()[1] * 1.1, 10.5), Math.min(sit1IceArray.last()[1] * 1.1, 10.5));
 	yAxisLimit2 = Math.max(initialTemp1, initialTemp2);
+	console.log();
 }
 
 /* 
@@ -485,7 +492,7 @@ function pictureBehavior() {
 		$(".sit1block").css("bottom", blockHeight + "%");
 		$(".sit2block").css("bottom", blockHeight + "%");
 
-		if (blockHeight <= fallDist) {blocksDropped = true; y = 0.75;} else {blocksDropped = false}
+		if (blockHeight <= fallDist) {blocksDropped = true; y = 0.75;} else {blocksDropped = false;}
 
 	} else if (experimentRunning) {
 
@@ -579,7 +586,7 @@ function startMelting() {
 	experimentStarted = true;
 
 	currentStep = 0;
-	blockHeight = 55;
+	blockHeight = 51;
 
 	panel1.disableControl("Initial Temperature");
 	panel1.disableControl("Block Heat Capacity");
@@ -595,7 +602,7 @@ function startMelting() {
 	panel2.disableControl("Number of Blocks");
 	panel2.disableControl("Add Stir Bar");
 
-	panel3.disableControl("duration to simulate")
+	panel3.disableControl("duration to simulate");
 }
 
 /*
@@ -620,7 +627,7 @@ function resetExperiment() {
 		panel2.enableControl("Number of Blocks");
 		panel2.enableControl("Add Stir Bar");
 
-		panel3.enableControl("duration to simulate")
+		panel3.enableControl("duration to simulate");
 	}
 
 	experimentRunning = false;
@@ -653,7 +660,7 @@ function resetExperiment() {
 	currentIceWidth2 = 10.0;
 
 	currentStep = 0;
-	blockHeight = 55;
+	blockHeight = 51;
 
 	sit1PtsGraph1 = [];
 	sit2PtsGraph1 = [];
@@ -689,7 +696,7 @@ function resetExperiment() {
 function draw() {
 	frameRate(60);
 	pictureBehavior();
-	background(255);
+	background(color(255,255,255));
 
 	$("#temps1").html(`water temperature: ${currentStep == 0 ? icewaterTemp : water1TempArray[currentStep][1].toFixed(1)} °C<br>block temperature: ${currentStep==0 ? initialTemp1 : sit1TempArray[currentStep][1].toFixed(1)} °C`);
 	$("#temps2").html(`water temperature: ${currentStep == 0 ? icewaterTemp : water2TempArray[currentStep][1].toFixed(1)} °C<br>block temperature: ${currentStep==0 ? initialTemp2 : sit2TempArray[currentStep][1].toFixed(1)} °C`);
@@ -715,8 +722,8 @@ function draw() {
 	// Only advances in time once the blocks hit the water.
 	if (blocksDropped && experimentRunning) {
 		{currentStep += Math.floor(2 * frMult);
-			if (currentStep >= Math.floor(tMax / dt - 1)) {currentStep = Math.floor(tMax / dt - 1)}
-		};
+			if (currentStep >= Math.floor(tMax / dt - 1)) {currentStep = Math.floor(tMax / dt - 1);}
+		}
 	}
 
 	if (currentStep >= Math.floor(tMax / dt - 1)) {
@@ -851,18 +858,18 @@ function updateBlockColors() {
 function getAreas() {
 	let scalingFactor = Math.min(clientWidth / 1200, clientHeight / 1000);
 	// Change the blocks' size according to the input surface area
-	let size1 = Math.min(48, area1 * scalingFactor * 5) + "px"
-	let size2 = Math.min(48, area2 * scalingFactor * 5) + "px"
+	let size1 = Math.min(48, 5 + Math.sqrt(area1) * scalingFactor * 8) + "px";
+	let size2 = Math.min(48, 5 + Math.sqrt(area2) * scalingFactor * 8) + "px";
 	$(".sit1block").css({
 		height: size1,
 		width: size1,
-		bottom: "55%"
+		bottom: "51%"
 	});
 
 	$(".sit2block").css({
 		height: size2,
 		width: size2,
-		bottom: "55%"
+		bottom: "51%"
 	});
 	
 }

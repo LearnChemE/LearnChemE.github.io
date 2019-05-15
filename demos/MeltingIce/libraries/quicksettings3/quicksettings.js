@@ -728,6 +728,9 @@
                 }
                 self._callGCH(title);
             });
+            if (callback) {
+                callback(value);
+            }
             return this;
         },
 
@@ -1260,6 +1263,9 @@
                 }
                 self._callGCH(title);
             });
+            if (callback) {
+                callback(parseFloat(value));
+            }
             return this;
         },
 

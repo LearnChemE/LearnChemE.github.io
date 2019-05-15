@@ -21,7 +21,7 @@ var equation;
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 function updateEquations() {
-  equation =  `x + ${variable - 0.5}`;
+  equation =  `erf(x) + ${variable - 0.5}`;
 }
 
 /**
