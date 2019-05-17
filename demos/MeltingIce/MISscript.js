@@ -171,9 +171,6 @@ function windowResized() {
 	$(".btn-lg").css("line-height", aHeight*0.11 + "px");
 
 	// adjusts pause/info/help buttons
-	$(".btn-md").css({height: aHeight*0.08 + "px", width: aHeight*0.08 + "px"});
-	$(".btn-md").css("line-height", aHeight*0.08 + "px");
-	$(".btn-md").css("font-size", aHeight*0.04 + "px");
 	$(".b1").css("bottom", clientHeight * 0.13 + "px");
 	$(".b2").css({right: aHeight*0.05 + "px", bottom: clientHeight * 0.08 + "px"});
 
@@ -185,9 +182,9 @@ function windowResized() {
 	$(".graphChoose").css("top", 35 + ((clientHeight - 500) / 500) * 50 + "px");
 	$("input[type='radio']").css("margin-bottom", ((clientHeight - 500) / 500) * 20 + "px");
 
-	$(".temps").css({bottom: aHeight*0.75 - 45 + "px"});
+	/*$(".temps").css({bottom: aHeight*0.75 - 45 + "px"});
 	$("#temps1").css({"margin-left": ((clientWidth - 600) / 600) * 50 + "px"});
-	$("#temps2").css({"margin-right": ((clientWidth - 600) / 600) * 50 + "px"});
+	$("#temps2").css({"margin-right": ((clientWidth - 600) / 600) * 50 + "px"});*/
 
 	$(":root").css({"font-size": 11 + ((clientWidth - 600) / 600) * 4 + "px"});
 	graphFontSize = 12 + ((clientWidth - 600) / 600) * 4;
@@ -242,25 +239,25 @@ function windowResized() {
 window.onload = function () {
 	// creates the quicksettings panels, gives initial values to each slider, etc.
 	QuickSettings.useExtStyleSheet();
-	panel1 = QuickSettings.create(0, 30, "Settings: Situation 1", document.body, "red")
-		.addRange("Initial Temperature", 1, 100, 30, 1, function (value) {
+	panel1 = QuickSettings.create(0, 30, "Beaker 1", document.body, "red")
+		.addRange("Initial temperature", 1, 100, 30, 1, function (value) {
 			initialTemp1 = value;
 		}, "°C")
-		.addRange("Block Heat Capacity", 0.1, 10, 4, 0.1, function (value) {
+		.addRange("Block heat capacity", 0.1, 10, 4, 0.1, function (value) {
 			heatCapacity1 = value;
-		}, `&nbsp&nbspJ / (g °C)`)
-		.addRange("Block Mass", 0.1, 5, 2, 0.1, function (value) {
+		}, `&nbspJ / (g°C)`)
+		.addRange("Block mass", 0.1, 5, 2, 0.1, function (value) {
 			mass1 = value;
 		}, `&nbspg (per block)`)
-		.addRange("Block Area", 1, 9, 4, 1, function (value) {
+		.addRange("Block area", 1, 9, 4, 1, function (value) {
 			area1 = value;
 			getAreas();
 		}, `&nbspcm² (per block)`)
-		.addRange("Number of Blocks", 1, 4, 2, 1, function (value) {
+		.addRange("Number of blocks", 1, 4, 2, 1, function (value) {
 			numBlocks1 = value;
 			getNumBlocks();
 		})
-		.addBoolean("Add Stir Bar", false, function (value) {
+		.addBoolean("Add stir bar", false, function (value) {
 			if (value) {
 				$("#stirBar1").show();
 				stirFactor1 = 1000;
@@ -271,25 +268,25 @@ window.onload = function () {
 		})
 		.setDraggable(true);
 
-	panel2 = QuickSettings.create($("#bottomCenter").width() - 220, 30, "Settings: Situation 2", document.body, "blue")
-		.addRange("Initial Temperature", 1, 100, 80, 1, function (value) {
+	panel2 = QuickSettings.create($("#bottomCenter").width() - 220, 30, "Beaker 2", document.body, "blue")
+		.addRange("Initial temperature", 1, 100, 80, 1, function (value) {
 			initialTemp2 = value;
 		}, "°C")
-		.addRange("Block Heat Capacity", 0.1, 10, 1, 0.1, function (value) {
+		.addRange("Block heat capacity", 0.1, 10, 1, 0.1, function (value) {
 			heatCapacity2 = value;
-		}, `&nbsp&nbspJ / (g °C)`)
-		.addRange("Block Mass", 0.1, 10, 1, 0.1, function (value) {
+		}, `&nbspJ / (g°C)`)
+		.addRange("Block mass", 0.1, 10, 1, 0.1, function (value) {
 			mass2 = value;
 		}, `&nbspg (per block)`)
-		.addRange("Block Area", 1, 9, 1, 1, function (value) {
+		.addRange("Block area", 1, 9, 1, 1, function (value) {
 			area2 = value;
 			getAreas();
 		}, `&nbspcm² (per block)`)
-		.addRange("Number of Blocks", 1, 4, 1, 1, function (value) {
+		.addRange("Number of blocks", 1, 4, 1, 1, function (value) {
 			numBlocks2 = value;
 			getNumBlocks();
 		})
-		.addBoolean("Add Stir Bar", false, function (value) {
+		.addBoolean("Add stir bar", false, function (value) {
 			if (value) {
 				$("#stirBar2").show();
 				stirFactor2 = 1000;
@@ -300,11 +297,11 @@ window.onload = function () {
 		})
 		.setDraggable(true);
 	panel3 = QuickSettings.create(0, 30, "Plot Options", document.body, "graph")
-		.addRange("duration to simulate", 10, 500, 120, 1, function (value) {
+		.addRange("Simulation time", 10, 500, 120, 1, function (value) {
 			tMax = value;
 			dt = tMax / 2000;
 		}, "s")
-		.addRange("animation speed", 0.5, 5, 1, 0.5, function (value) {
+		.addRange("Animation speed", 0.5, 5, 1, 0.5, function (value) {
 			frMult = value;
 		}, "x");
 windowResized();
@@ -318,10 +315,8 @@ windowResized();
 function init() {
 	// register event handlers for control buttons (start, pause, reset, help)
 	$("#startButton").on('click', startMelting);
-	$("#pauseButton").on('click', pauseMelting);
 	$("#resetButton").on('click', resetExperiment);
 	//$("#helpButton").on('click', showHelp);
-	$("#graphInfo").on('click', displayGraphInfo);
 	//$("#infoButton").on('click', displayAboutInfo);
 	$("input[name='whichGraph']").click(function() {
 		showWhichGraph = $("input[name='whichGraph']:checked").val();
@@ -331,11 +326,8 @@ function init() {
 	// some CSS adjustments as well
 	$("#stirBar1").hide();
 	$("#stirBar2").hide();
-	$("#graphHeightInfo").hide();
-	$("#graphSlopeInfo").hide();
 
 	getAreas();
-	updateBlockColors();
 	getNumBlocks();
 }
 
@@ -351,7 +343,7 @@ function setup() {
 	plot1.setPos(10, 0);
 	plot1.setOuterDim(100, 100);
 	plot1.setYLim(0, 1);
-	plot1.getXAxis().getAxisLabel().setText("time (sec)");
+	plot1.getXAxis().getAxisLabel().setText("time (s)");
 	plot1.getYAxis().getAxisLabel().setText("mass of ice melted (g)");
 	plot1.getTitle().setText("mass of ice melted");
 
@@ -359,7 +351,7 @@ function setup() {
 	plot2.setPos(10, 0);
 	plot2.setOuterDim(100, 100);
 	plot2.setYLim(0, 400);
-	plot2.getXAxis().getAxisLabel().setText("time (sec)");
+	plot2.getXAxis().getAxisLabel().setText("time (s)");
 	plot2.getYAxis().getAxisLabel().setText("temperature (°C)");
 	plot2.getTitle().setText("temperature");
 
@@ -501,8 +493,6 @@ function pictureBehavior() {
 		currentIceWidth1 = Math.max(0, iceMaxWidth1 * (maxIce - sit1IceArray[currentStep][1]) / maxIce);
 		let cssWidth1 = currentIceWidth1 + "%";
 
-		updateBlockColors();
-
 		// Calculate the new height and width values for the ice cubes of situation 2
 		currentIceHeight2 = Math.max(0, iceMaxHeight2 * (maxIce - sit2IceArray[currentStep][1]) / maxIce);
 		let cssHeight2 = currentIceHeight2 + "%";
@@ -546,12 +536,10 @@ function pauseMelting() {
 
 	if (experimentRunning) {
 		experimentRunning = false;
-		$("#pauseButton").find(".glyphicon").removeClass('glyphicon-pause');
-		$("#pauseButton").find(".glyphicon").addClass('glyphicon-play');
+		$("#startButton").html("Start");
 	} else {
 		experimentRunning = true;
-		$("#pauseButton").find(".glyphicon").removeClass('glyphicon-play');
-		$("#pauseButton").find(".glyphicon").addClass('glyphicon-pause');
+		$("#startButton").html("Pause");
 		pictureBehavior();
 	}
 }
@@ -567,6 +555,7 @@ function startMelting() {
 	// Reset experiment to the beginning (ex. unmelt ice cubes, move blocks back to their starting location, etc.) just
 	// in case the user re-starts the experiment without explicitly clicking the Reset button first
 	if (experimentStarted) {
+		pauseMelting();
 		return;
 	}
 
@@ -575,8 +564,7 @@ function startMelting() {
 	// Disable "start" button and enable "pause" button
 	$("#startButton").attr("disabled", "disabled");
 	$("#startButton").css("border-color", "gray");
-	$("#pauseButton").removeAttr("disabled");
-	$("#pauseButton").css("border-color", "#F00");
+	$("#startButton").html("Pause");
 
 	// Initialize starting values for the calculations
 	generateGraphPoints();
@@ -636,12 +624,7 @@ function resetExperiment() {
 
 	$("#startButton").removeAttr("disabled");
 	$("#startButton").css("border-color", "#093");
-	$("#pauseButton").find(".glyphicon").removeClass('glyphicon-play');
-	$("#pauseButton").find(".glyphicon").addClass('glyphicon-pause');
-
-	// Make sure the Pause button reads "PAUSE" rather than "RESET", and disable the Pause button
-	$("#pauseButton").attr("disabled", "disabled");
-	$("#pauseButton").css("border-color", "gray");
+	$("#startButton").html("Start");
 
 	// Return the blocks to their original positions and the ice cubes to their
 	// original sizes. Hide all data points and labels on the graph.
@@ -678,7 +661,6 @@ function resetExperiment() {
 
 	// temperature inputs
 	getAreas();
-	updateBlockColors();
 	getNumBlocks();
 
 }
@@ -730,8 +712,7 @@ function draw() {
 		experimentRunning = false;
 		$("#startButton").removeAttr("disabled");
 		$("#startButton").css("border-color", "#093");
-		$("#pauseButton").attr("disabled", "disabled");
-		$("#pauseButton").css("border-color", "gray");
+		$("#startButton").html("Start");
 	}
 }
 
@@ -817,35 +798,6 @@ function drawPlot2() {
 		}
 		pop();
 		plot2.endDraw();
-}
-
-/*
- * Function: updateBlockColors
- * Updates the colors of the blocks on display, according to the
- * current temperature of the blocks for each situation. May or may not deprecate soon.
- */
-function updateBlockColors() {
-	// Change situation 1 blocks' color to reflect the temperature
-	if (initialTemp1 < 40) {
-		$(".sit1block").css("background", "url('blocks.png') 0 0"); // black
-	} else if (initialTemp1 < 180) {
-		$(".sit1block").css("background", "url('blocks.png') -48px 0"); // blue
-	} else if (initialTemp1 < 400) {
-		$(".sit1block").css("background", "url('blocks.png') -96px 0"); // purple/dark red
-	} else {
-		$(".sit1block").css("background", "url('blocks.png') -144px 0"); // bright red
-	}
-
-	// Change situation 2 blocks' color to reflect the temperature
-	if (initialTemp2 < 40) {
-		$(".sit2block").css("background", "url('blocks.png') 0 0"); // black
-	} else if (initialTemp2 < 180) {
-		$(".sit2block").css("background", "url('blocks.png') -48px 0"); // blue
-	} else if (initialTemp2 < 400) {
-		$(".sit2block").css("background", "url('blocks.png') -96px 0"); // purple/dark red
-	} else {
-		$(".sit2block").css("background", "url('blocks.png') -144px 0"); // bright red
-	}
 }
 
 /*

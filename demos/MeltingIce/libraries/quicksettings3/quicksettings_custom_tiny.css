@@ -39,10 +39,10 @@
   cursor: pointer;
   font-weight: bold;
   margin: 1px;
-  padding: 4px;
+  padding: 2px;
   outline: 1px solid black;
-  position: relative;
-  right: 0px;
+  font-size: 1.2rem;
+  text-align: center;
 }
 
 #blue .qs_title_bar {
@@ -140,15 +140,15 @@
   border-radius: 0;
   cursor: pointer;
   margin-top: 0px;
-  background: #fffcfc;
+  background: #ffffff;
 }
 
 #red .qs_range::-webkit-slider-thumb {
-  background: #fffcfc;
+  background: #ffffff;
 }
 
 #blue .qs_range::-webkit-slider-thumb {
-  background: #cddfff;
+  background: #ffffff;
 }
 
 .qs_range::-moz-range-track {
@@ -177,15 +177,15 @@
   -moz-border-radius: 0;
   border-radius: 0;
   cursor: pointer;
-  background: #fffcfc;
+  background: #ffffff;
 }
 
 #red .qs_range::-moz-range-thumb {
-  background: #fffcfc;
+  background: #ffffff;
 }
 
 #blue .qs_range::-moz-range-thumb {
-  background: #cddfff;
+  background: #ffffff;
 }
 
 .qs_range::-ms-track {
@@ -208,11 +208,11 @@
 }
 
 #red .qs_range::-ms-thumb {
-  background: #fffcfc
+  background: #ffffff
 }
 
 #blue .qs_range::-ms-thumb {
-  background: #cddfff;
+  background: #ffffff;
 }
 
 .qs_range::-ms-fill-lower {

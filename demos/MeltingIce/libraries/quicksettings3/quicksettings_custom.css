@@ -133,11 +133,11 @@
 }
 
 #red .qs_range::-webkit-slider-thumb {
-  background: #fffcfc;
+  background: #ffffff;
 }
 
 #blue .qs_range::-webkit-slider-thumb {
-  background: #cddfff;
+  background: #ffffff;
 }
 
 .qs_range::-moz-range-track {
@@ -168,11 +168,11 @@
 }
 
 #red .qs_range::-moz-range-thumb {
-  background: #fffcfc;
+  background: #ffffff;
 }
 
 #blue .qs_range::-moz-range-thumb {
-  background: #cddfff;
+  background: #ffffff;
 }
 
 .qs_range::-ms-track {
@@ -194,11 +194,11 @@
 }
 
 #red .qs_range::-ms-thumb {
-  background: #fffcfc
+  background: #ffffff
 }
 
 #blue .qs_range::-ms-thumb {
-  background: #cddfff;
+  background: #ffffff;
 }
 
 .qs_range::-ms-fill-lower {

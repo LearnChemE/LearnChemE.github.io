@@ -1230,7 +1230,7 @@
             input.step = step || 1;
             input.value = Number.parseFloat(value).toFixed(prec) || 0;
 
-            label.innerHTML = "<b>" + title + ":</b> " + Number.parseFloat(input.value).toFixed(prec) + " " + units;
+            label.innerHTML = "<b>" + title + ":</b> " + Number.parseFloat(input.value).toFixed(prec) + units;
 
 
             this._controls[title] = {
@@ -1244,7 +1244,7 @@
                 },
                 setValue: function (value) {
                     this.control.value = value;
-                    this.label.innerHTML = "<b>" + this.title + ":</b> " + Number.parseFloat(this.control.value).toFixed(prec) + " " + units;
+                    this.label.innerHTML = "<b>" + this.title + ":</b> " + Number.parseFloat(this.control.value).toFixed(prec) + units;
                     if (callback) {
                         callback(parseFloat(value));
                     }
@@ -1257,7 +1257,7 @@
             }
             var self = this;
             input.addEventListener(eventName, function () {
-                label.innerHTML = "<b>" + title + ":</b> " + Number.parseFloat(input.value).toFixed(prec) + " " + units;
+                label.innerHTML = "<b>" + title + ":</b> " + Number.parseFloat(input.value).toFixed(prec) + units;
                 if (callback) {
                     callback(parseFloat(input.value));
                 }

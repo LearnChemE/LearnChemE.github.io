@@ -242,7 +242,7 @@ function GAxisLabel(parent, type, dim) {
 	this.dim = dim.slice();
 	this.relativePos = 0.5;
 	this.plotPos = (this.type === this.parent.BOTTOM || this.type === this.parent.TOP) ? this.relativePos * this.dim[0] : -this.relativePos * this.dim[1];
-	this.offset = 45;
+	this.offset = 35;
 	this.rotate = (this.type === this.parent.BOTTOM || this.type === this.parent.TOP) ? false : true;
 
 	// Text properties
