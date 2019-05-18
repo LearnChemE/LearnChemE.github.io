@@ -68,10 +68,13 @@ let margins = 120;
 let pageWidth = window.innerWidth - margins;
 let pageHeight = pageWidth * aspRatio;
 
+let myFont;
+
 function preload() {
   iHat = loadImage('../../media/iHatWhite.png');
   jHat = loadImage('../../media/jHatWhite.png');
   kHat = loadImage('../../media/kHatWhite.png');
+  myFont = loadFont('Helvetica.otf');
 }
 
 class options {
@@ -142,8 +145,6 @@ class options {
     
     
     //let phi = 0;
-
-    //This calculates the rotation matrix for the cylinder we will draw
     let v0 = createVector(0, 1, 0);
     let x = p5.Vector.cross(v0, createVector(1, 0, 0));
     let y = p5.Vector.cross(v0, createVector(0, 1, 0));
@@ -155,33 +156,69 @@ class options {
     let RGB = [0, 0, 0];
     // x-axis
     push();
-    ambientMaterial.apply(this, RGB);
-    translate(trans[0], trans[1], trans[2]);
-    rotate(PI/2, x);
-    translate(0, axisLength / 2, 0);
+      ambientMaterial.apply(this, RGB);
+      translate(trans[0], trans[1], trans[2]);
+      rotate(PI/2, x);
+      translate(0, axisLength / 2, 0);
       cylinder(axisThickness, axisLength);
       translate(0, axisLength / 2 + 2, 0);
       cone(4, 10);
     pop();
     // y-axis
     push();
-    ambientMaterial.apply(this, RGB);
-    translate(trans[0], trans[1], trans[2]);
-    rotateX(PI);
-    translate(0, axisLength / 2, 0);
+      ambientMaterial.apply(this, RGB);
+      translate(trans[0], trans[1], trans[2]);
+      rotateX(PI);
+      translate(0, axisLength / 2, 0);
       cylinder(axisThickness, axisLength);
       translate(0, axisLength / 2 + 2, 0);
       cone(4, 10);
     pop();
     // z-axis
     push();
-    ambientMaterial.apply(this, RGB);
-    translate(trans[0], trans[1], trans[2]);
-    rotate(-PI/2, z);
-    translate(0, axisLength / 2, 0);
+      ambientMaterial.apply(this, RGB);
+      translate(trans[0], trans[1], trans[2]);
+      rotate(-PI/2, z);
+      translate(0, axisLength / 2, 0);
       cylinder(axisThickness, axisLength);
       translate(0, axisLength / 2 + 2, 0);
       cone(4, 10);
+    pop();
+
+    let camX = window._renderer._curCamera.eyeX;
+    let camY = window._renderer._curCamera.eyeY;
+    let camZ = window._renderer._curCamera.eyeZ;
+    let camVec = createVector(camX, camY, camZ);
+    let theta = atan2(camX, camZ);
+    let phi = -atan2(camY, camVec.mag());
+    textAlign(CENTER);
+
+    push();
+      fill(0);
+      translate(trans[0], trans[1], trans[2]);
+      translate(axisLength+30, 10, 0);
+      rotate(theta, v0);
+      rotateX(phi);
+      // BUG????? needed to add this extra character or nothing works????? halp
+      text('_x', 0, 0);
+    pop();
+
+    push();
+      fill(0);
+      translate(trans[0], trans[1], trans[2]);
+      translate(0, - axisLength - 40, 0);
+      rotate(theta, v0);
+      rotateX(phi);
+      text('y', 0, 0);
+    pop();
+
+    push();
+      fill(0);
+      translate(trans[0], trans[1], trans[2]);
+      translate(0, 10, -axisLength - 40);
+      rotate(theta, v0);
+      rotateX(phi);
+      text('z', 0, 0);
     pop();
   }
 }
@@ -244,6 +281,8 @@ function setup() {
     createCanvas(pageWidth, pageHeight, WEBGL);
     options.defaultSidebar();
     resizeCanvas(pageWidth-100, pageHeight);
+    textFont(myFont);
+    textSize(rem*2);
 
     newVectorButton.hide();
     sumVectorButton.hide();
@@ -260,9 +299,9 @@ function setup() {
     gui.newSlider("x1", -4, 4, 1, 0.1, "vector 1 x-component", " i");
     gui.newSlider("y1", -4, 4, 1, 0.1, "vector 1 y-component", " j");
     gui.newSlider("z1", -4, 4, 1, 0.1, "vector 1 z-component", " k");
-    gui.newSlider("x2", -4, 4, 1, 0.1, "vector 1 x-component", " i");
-    gui.newSlider("y2", -4, 4, 1, 0.1, "vector 1 y-component", " j");
-    gui.newSlider("z2", -4, 4, 1, 0.1, "vector 1 z-component", " k");
+    gui.newSlider("x2", -4, 4, 1, 0.1, "vector 2 x-component", " i");
+    gui.newSlider("y2", -4, 4, 1, 0.1, "vector 2 y-component", " j");
+    gui.newSlider("z2", -4, 4, 1, 0.1, "vector 2 z-component", " k");
 
 
     LaTexCross();
@@ -744,6 +783,7 @@ function draw() {
       if (drawNormalPlane) {
         vector3D.normPlane(x1, y1, z1, x2, y2, z2);
       }
+
       break;
   }
   i++;
