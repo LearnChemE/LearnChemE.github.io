@@ -1,31 +1,34 @@
-var basePlot2D;
-var xAxisLimit = 4;
-var yAxisLimit = 4;
+/* jshint esversion: 6 */
 
-var pts = [[200, 400], [400, 200]]; // Default location of coordinates. Note that this is px, not coordinate
-var ptCoords = []; // Their corresponding coordinates (solved for in the program)
-var n = pts.length; // number of points
-var vSum = [[200, 400], [400, 200]];
+let basePlot2D;
+let xAxisLimit = 4;
+let yAxisLimit = 4;
 
-var rolloverPt = [false, 1]; // Is the mouse over the circle, if so, which circle?
-var rolloverLine = [false, 1]; // Is the mouse over the line, if so, which line?
-var draggingPt = [false, 1]; // Is a point being dragged, if so, which point?
-var draggingLine = [false, 1]; // Is the line being dragged, if so, which line?
-var mouseOffset = [0, 0]; // Mouseclick offset
-var r = 10; // // radius of the dragged points (pixels)
+let pts = [[200, 400], [400, 200]]; // Default location of coordinates. Note that this is px, not coordinate
+let ptCoords = []; // Their corresponding coordinates (solved for in the program)
+let n = pts.length; // number of points
+let vSum = [0, 0];
+let vSumCoords = [[200, 400], [400, 200]];
 
-var graphicsOffset = [[1, 1], [1, 1]]; // Quadrants for graphics offset. [1, 1] is top-right, [-1, 1] is top left, etc. Used to prevent graphics from overlapping.
+let rolloverPt = [false, 1]; // Is the mouse over the circle, if so, which circle?
+let rolloverLine = [false, 1]; // Is the mouse over the line, if so, which line?
+let draggingPt = [false, 1]; // Is a point being dragged, if so, which point?
+let draggingLine = [false, 1]; // Is the line being dragged, if so, which line?
+let mouseOffset = [0, 0]; // Mouseclick offset
+let r = 10; // // radius of the dragged points (pixels)
+
+let graphicsOffset = [[1, 1], [1, 1], [1, 1]]; // Quadrants for graphics offset. [1, 1] is top-right, [-1, 1] is top left, etc. Used to prevent graphics from overlapping.
 let offset = [];
 
-var i = 1; // iterator variables (comes in handy, since p5.js is a looping library)
-var j = 1;
+let i = 1; // iterator variables (comes in handy, since p5.js is a looping library)
+let j = 1;
 
 let iHat; // 70*153 original size
 let jHat; // 85*196 original size
 let kHat; // 121*206 original size
 
-var selectOptions;
-var newVectorButton;
+let selectOptions;
+let newVectorButton;
 let sumVectorButton;
 let sumPressed = false;
 let removeVectorButton;
@@ -34,7 +37,7 @@ let crossVectorCheckbox;
 let arrowsCheckbox;
 let coordsCheckbox;
 
-let drawArrows = [false, false, false, false, false];
+let drawArrows = [false, false, false, false, false, false, false];
 let drawCoords = false;
 let drawCross = false;
 
@@ -42,7 +45,7 @@ let ops;
 let pageSelection = sessionStorage.getItem("pageVal");
 let page;
 
-if (sessionStorage.getItem("pageVal")) {page = pageSelection} else {page = "vector addition"}
+if (sessionStorage.getItem("pageVal")) {page = pageSelection;} else {page = "vector addition";}
 
 let twoDimension = true;
 
@@ -53,10 +56,10 @@ var x2 = 0;
 var y2 = 1;
 var z2 = 0;
 
-var aspRatio = 0.8;
-var margins = 80;
-var pageWidth = window.innerWidth - margins;
-var pageHeight = pageWidth * aspRatio;
+let aspRatio = 0.8;
+let margins = 120;
+let pageWidth = window.innerWidth - margins;
+let pageHeight = pageWidth * aspRatio;
 
 function preload() {
   iHat = loadImage('../../media/iHatWhite.png');
@@ -88,6 +91,7 @@ class options {
   }
 
   static defaultSidebar() {
+    if (newVectorButton === undefined) {
     newVectorButton = createButton('add vector');
     newVectorButton.position(width-100, 40);
     newVectorButton.mousePressed(newVector);
@@ -104,18 +108,9 @@ class options {
     resetVectorsButton.position(width-100, 180);
     resetVectorsButton.mousePressed(reset);
 
-    arrowsCheckbox = createCheckbox('show arrows', false);
-    arrowsCheckbox.position(width-100, 260);
-    arrowsCheckbox.changed(mySelectEvent);
-
     crossVectorCheckbox = createCheckbox('show cross product', false);
     crossVectorCheckbox.position(width-100, 180);
     crossVectorCheckbox.changed(mySelectEvent);
-
-    coordsCheckbox = createCheckbox('show coordinates', false);
-    coordsCheckbox.position(width-100, 290);
-    coordsCheckbox.changed(mySelectEvent);
-
 
     selectOptions = createSelect();
     selectOptions.position(width-100, 220);
@@ -125,6 +120,7 @@ class options {
     selectOptions.option('cross product');
     selectOptions.value(page);
     selectOptions.changed(reInitialize);
+    }
   }
 }
 
@@ -148,12 +144,12 @@ class drawing {
 }
 
 function setup() {
-  if(twoDimension) {
+  if(page != "cross product") {
     createCanvas(pageWidth, pageHeight, P2D); // Add base canvas, x-pixels by y-pixels
 
     basePlot2D = new GPlot(this); // see "grafica.js" library for info on GPlots
     
-    ops = new options;
+    ops = new options();
     ops.gPlot = basePlot2D;
     ops.defaultPlot();
 
@@ -161,12 +157,12 @@ function setup() {
     
     background(220); // background color of main canvas to RGB(220, 220, 220) "lighter gray"
 
-    plotdraw2D = new drawing;
+    plotdraw2D = new drawing();
     plotdraw2D.gPlot = basePlot2D;
-
     options.defaultSidebar();
     crossVectorCheckbox.hide();
 
+    /* doesn't do anything yet ...
     switch(page) {
       case "vector addition":
         break;
@@ -176,21 +172,33 @@ function setup() {
         break;
       default:
         break;
-    }
+    }*/
   }
   else {
-    createCanvas(pageWidth - 100, pageHeight, WEBGL);
+    createCanvas(pageWidth, pageHeight, WEBGL);
+    options.defaultSidebar();
+    resizeCanvas(pageWidth-100, pageHeight);
+
+    newVectorButton.hide();
+    sumVectorButton.hide();
+    removeVectorButton.hide();
+    resetVectorsButton.hide();
+
     normalMaterial();
     ambientMaterial(39, 235, 91);
     camera(100, -200, (height/2.0) / tan(PI*30.0 / 180.0), 0, 0, 0, 0, 1, 0);
     sliderRange(-2, 2, 0.05);
     gui = createGui('plot controls', width + 10, 0.42*height);
     gui.addGlobals('x1','y1','z1','x2','y2','z2');
+
     debugMode();
   }
 }
 
 function reInitialize() {
+  /**
+   * re-initializes the canvas when user switches to a different section
+   */
   sessionStorage.setItem("pageVal", selectOptions.value());
   if (page == "cross product") {location.reload();}
   page = selectOptions.value();
@@ -198,8 +206,6 @@ function reInitialize() {
     twoDimension = false;
     newVectorButton.hide();
     sumVectorButton.hide();
-    arrowsCheckbox.hide();
-    coordsCheckbox.hide();
     crossVectorCheckbox.show();
     setup();
     selectOptions.value("cross product");
@@ -213,6 +219,8 @@ function reset() {
         pts.pop();
         n--;
       }
+      vSum[0]=0;
+      vSum[1]=0;
       sumPressed = false;
       break;
     case "scalar multiplication":
@@ -227,13 +235,11 @@ function reset() {
 }
 
 function mySelectEvent() {
-  //drawArrows = arrowsCheckbox.checked();
-  drawCoords = coordsCheckbox.checked();
   drawCross = crossVectorCheckbox.checked();
 }
 
 function newVector() {
-  if(n <= 5) {
+  if(n < 5 && !sumPressed) {
     let xyMin = getCoords(-xAxisLimit, -yAxisLimit, basePlot2D);
     let xyMax = getCoords(xAxisLimit, yAxisLimit, basePlot2D);
     pts.push([random(xyMin[0],xyMax[0]), random(xyMin[1],xyMax[1])]);
@@ -243,10 +249,12 @@ function newVector() {
 }
 
 function sumVector() {
-  if(n > 2) {
-    vSum[0] = pts[0];
-    vSum[1] = pts[n - 1];
-    console.log(vSum);
+  if(n > 2 && !sumPressed) {
+    // finds coordinates for sum vector arrow
+    vSumCoords[0] = pts[0];
+    vSumCoords[1] = pts[n - 1];
+    // sums the vectors
+    for (i=0;i<n-1;i++) {vSum[0]+=Number((ptCoords[i+1][0]-ptCoords[i][0]).toFixed(1));vSum[1]+=Number((ptCoords[i+1][1]-ptCoords[i][1]).toFixed(1));}
     sumPressed = true;
   }
 }
@@ -306,6 +314,39 @@ function DrawArrows(parentLayer) {
       this.parentLayer.pop();
     }
   }
+  if (sumPressed && drawArrows[n+1]) {
+    this.parentLayer = parentLayer;
+      this.parentLayer.push();
+      this.parentLayer.strokeWeight(3);
+      this.parentLayer.stroke(255, 30, 30);
+      this.parentLayer.line(pts[0][0]-10*graphicsOffset[n][0], pts[0][1], pts[n-1][0]+2*graphicsOffset[n][0], pts[0][1]);
+      this.parentLayer.fill(255, 30, 30);
+      this.parentLayer.triangle(pts[n-1][0]+2*graphicsOffset[n][0], pts[0][1],  pts[n-1][0]+8*graphicsOffset[n][0], pts[0][1]+3,  pts[n-1][0]+8*graphicsOffset[n][0], pts[0][1]-3);
+      this.parentLayer.tint(255, 50, 50);
+      this.parentLayer.image(iHat, 0.5*pts[0][0]+0.5*pts[n-1][0]-30, pts[0][1]-20-30*graphicsOffset[n][1], 0.09*iHat.width, 0.12*iHat.height);
+      this.parentLayer.fill(255, 30, 30);
+      this.parentLayer.textSize(18);
+      this.parentLayer.noStroke();
+      this.parentLayer.textAlign(LEFT);
+      this.parentLayer.text("= ".concat((ptCoords[n-1][0]-ptCoords[0][0]).toFixed(1)), 0.5*pts[0][0]+0.5*pts[n-1][0]-30+0.2*iHat.width, pts[0][1]-20-30*graphicsOffset[n][1]+0.12*iHat.height);
+      this.parentLayer.pop();
+
+      //j-hat arrow
+      this.parentLayer.push();
+      this.parentLayer.strokeWeight(3);
+      this.parentLayer.stroke(30, 30, 255);
+      this.parentLayer.line(pts[n-1][0], pts[0][1] + 4*graphicsOffset[n][1], pts[n-1][0], pts[n-1][1] - 6*graphicsOffset[n][1]);
+      this.parentLayer.fill(30, 30, 255);
+      this.parentLayer.triangle(pts[n-1][0], pts[n-1][1] - 4*graphicsOffset[n][1],  pts[n-1][0] + 3, pts[n-1][1] - 10*graphicsOffset[n][1],  pts[n-1][0] - 3, pts[n-1][1] - 10*graphicsOffset[n][1]);
+      this.parentLayer.tint(50, 50, 255);
+      this.parentLayer.image(jHat, pts[n-1][0]-35-50*graphicsOffset[n][0], 0.5*pts[0][1]+0.5*pts[n-1][1], 0.11*jHat.width, 0.12*jHat.height)
+      this.parentLayer.fill(30, 30, 255)
+      this.parentLayer.textAlign(LEFT);
+      this.parentLayer.textSize(18);
+      this.parentLayer.noStroke();
+      this.parentLayer.text("= ".concat((ptCoords[n-1][1]-ptCoords[0][1]).toFixed(1)), pts[n-1][0]-35-50*graphicsOffset[n][0]+0.2*jHat.width, 0.5*pts[0][1]+0.5*pts[n-1][1]+0.1*jHat.height);
+      this.parentLayer.pop();
+  }
 }
 
 function DrawCoords(parentLayer) {
@@ -357,7 +398,7 @@ function DrawVectorText(parentLayer) {
   this.parentLayer = parentLayer;
   for (j = 0; j < n - 1; j++) {
     let angle = atan2(pts[j][1]-pts[j+1][1], pts[j][0]-pts[j+1][0]);
-    if (angle > PI / 2 || angle < - PI / 2) {angle += -PI};
+    if (angle > PI / 2 || angle < - PI / 2) {angle += -PI;}
     this.parentLayer.push();
     this.parentLayer.textAlign(CENTER);
     this.parentLayer.textSize(18);
@@ -366,8 +407,24 @@ function DrawVectorText(parentLayer) {
     this.parentLayer.translate((pts[j][0] + pts[j+1][0])/2, (pts[j][1] + pts[j+1][1])/2);
     this.parentLayer.rotate(angle);
     let jSign;
-    if(ptCoords[j+1][1]-ptCoords[j][1] > 0) {jSign = "+ "} else {jSign = "- "}
+    if(ptCoords[j+1][1]-ptCoords[j][1] > 0) {jSign = "+ ";} else {jSign = "- ";}
     this.parentLayer.text("".concat((ptCoords[j+1][0]-ptCoords[j][0]).toFixed(1), " i ", jSign, abs(ptCoords[j+1][1]-ptCoords[j][1]).toFixed(1), " j"), 0, -10);
+    this.parentLayer.pop();
+  }
+  if (sumPressed) {
+    let angle = atan2(vSum[1], -vSum[0]);
+    if (angle > PI / 2 || angle < - PI / 2) {angle += -PI;}
+    this.parentLayer.push();
+    this.parentLayer.textAlign(CENTER);
+    this.parentLayer.textSize(18);
+    this.parentLayer.noStroke();
+    this.parentLayer.fill(0);
+    this.parentLayer.translate((pts[0][0] + pts[n-1][0])/2, (pts[0][1] + pts[n-1][1])/2);
+    this.parentLayer.rotate(angle);
+    let jSign;
+    if(vSum[0] > 0) {jSign = "+ ";} else {jSign = "- ";}
+    this.parentLayer.text("".concat(vSum[0].toFixed(1), " i ", jSign, abs(vSum[1]).toFixed(1), " j"), 0, -10);
+    
     this.parentLayer.pop();
   }
 }
@@ -377,11 +434,13 @@ function MovePoints(parentLayer) {
   this.parentLayer = parentLayer;
   rolloverPt[0] = false;
   rolloverLine[0] = false;
+  let adjX = 0;
+  let adjY = 0;
   if(!sumPressed){
     for (j = 0; j < n; j++) {
-      if (j == 0) {var adjX = 0; var adjY = 0;} else {
-        var adjX = -10*(pts[j][0] - pts[j-1][0])/Math.sqrt(Math.pow(pts[j][0] - pts[j-1][0],2) + Math.pow(pts[j][1] - pts[j-1][1],2));
-        var adjY = -10*(pts[j][1] - pts[j-1][1])/Math.sqrt(Math.pow(pts[j][0] - pts[j-1][0],2) + Math.pow(pts[j][1] - pts[j-1][1],2));
+      if (j == 0) {adjX = 0; adjY = 0;} else {
+        adjX = -10*(pts[j][0] - pts[j-1][0])/Math.sqrt(Math.pow(pts[j][0] - pts[j-1][0],2) + Math.pow(pts[j][1] - pts[j-1][1],2));
+        adjY = -10*(pts[j][1] - pts[j-1][1])/Math.sqrt(Math.pow(pts[j][0] - pts[j-1][0],2) + Math.pow(pts[j][1] - pts[j-1][1],2));
       }
       if (mouseX > pts[j][0] + adjX - r &&
         mouseX < pts[j][0] + adjX + r &&
@@ -390,6 +449,9 @@ function MovePoints(parentLayer) {
           {rolloverPt[0] = true; rolloverPt[1] = j;}
       
       if (j > 0) {
+        // Collision mechanics for whether the mouse is within 10 pixels of a vector to draw "vector arrows".
+        // Does not draw them if one is moving a vector or if the mouse is also over a vertex
+        // The "Between" function just spits out a true/false for if the cursor is over a vector. Also does some other neat stuff.
         let lineX = new Between(mouseX, pts[j][0], pts[j-1][0]);
         let lineY = new Between(mouseY, pts[j][1], pts[j-1][1]);
         if(abs(lineX.diff()) > abs(lineY.diff())) {
@@ -412,9 +474,19 @@ function MovePoints(parentLayer) {
         if (pts[j][1] > pts[j-1][1]) {graphicsOffset[j][1] = 1} else {graphicsOffset[j][1] = -1}
       }
     }
+  } else {
+    let lineX = new Between(mouseX, pts[n-1][0], pts[0][0]);
+    let lineY = new Between(mouseY, pts[n-1][1], pts[0][1]);
+    if(abs(lineX.diff()) > abs(lineY.diff())) {
+      lineX.isBetween && abs(mouseY - lineY.a - lineX.interp()*lineY.diff()) < 10  ? drawArrows[n+1] = true : drawArrows[n+1] = false;
+    } else {
+      lineY.isBetween && abs(mouseX - lineX.a - lineY.interp()*lineX.diff()) < 10  ? drawArrows[n+1] = true : drawArrows[n+1] = false;
+    }
+    if (pts[0][0] < pts[n-1][0]) {graphicsOffset[n][0] = -1;} else {graphicsOffset[n][0] = 1;}
+    if (pts[0][1] < pts[n-1][1]) {graphicsOffset[n][1] = 1;} else {graphicsOffset[n][1] = -1;}
   }
   if (draggingPt[0])
-    {pts[draggingPt[1]] = [mouseX + mouseOffset[0], mouseY + mouseOffset[1]]}
+    {pts[draggingPt[1]] = [mouseX + mouseOffset[0], mouseY + mouseOffset[1]];}
 }
 
 function DrawVectors(parentLayer) {
@@ -423,12 +495,13 @@ function DrawVectors(parentLayer) {
   function fillColor(x) {
     this.x = x;
     //if statement changes color of the dots if the mouse is over the dot, and another color if the mouse is held as well
-    if (sumPressed) {this.parentLayer.fill(50, 20)}
-    else if (draggingPt[0] && draggingPt[1] == this.x) {this.parentLayer.fill(50)}
-    else if (rolloverPt[0] && rolloverPt[1] == this.x) {this.parentLayer.fill(100)}
-    else {this.parentLayer.fill(175, 100)}
+    if (sumPressed) {this.parentLayer.fill(50, 20);}
+    else if (draggingPt[0] && draggingPt[1] == this.x) {this.parentLayer.fill(50);}
+    else if (rolloverPt[0] && rolloverPt[1] == this.x) {this.parentLayer.fill(100);}
+    else {this.parentLayer.fill(175, 100);}
   }
-  if(sumPressed) {this.parentLayer.stroke(0, 50)}
+
+  if(sumPressed) {this.parentLayer.stroke(0, 50);}
   
   for (j = 0; j < n - 1; j++) {
     this.parentLayer.push();
@@ -456,16 +529,16 @@ function DrawVectors(parentLayer) {
     this.parentLayer.push();
     this.parentLayer.stroke(0);
     this.parentLayer.strokeWeight(5);
-    this.parentLayer.translate(vSum[0][0], vSum[0][1]);
-    this.parentLayer.rotate(atan2(vSum[1][0] - vSum[0][0], vSum[0][1] - vSum[1][1]));
-    this.parentLayer.line(0, 0, 0, -Math.sqrt(Math.pow(vSum[1][0] - vSum[0][0],2) + Math.pow(vSum[1][1] - vSum[0][1],2)) + 22);
+    this.parentLayer.translate(vSumCoords[0][0], vSumCoords[0][1]);
+    this.parentLayer.rotate(atan2(vSumCoords[1][0] - vSumCoords[0][0], vSumCoords[0][1] - vSumCoords[1][1]));
+    this.parentLayer.line(0, 0, 0, -Math.sqrt(Math.pow(vSumCoords[1][0] - vSumCoords[0][0],2) + Math.pow(vSumCoords[1][1] - vSumCoords[0][1],2)) + 22);
     this.parentLayer.pop();
 
     this.parentLayer.push();
     this.parentLayer.stroke(0);
     this.parentLayer.fill(200);
-    this.parentLayer.translate(vSum[1][0], vSum[1][1]);
-    this.parentLayer.rotate(atan2(vSum[1][0] - vSum[0][0], vSum[0][1] - vSum[1][1]));
+    this.parentLayer.translate(vSumCoords[1][0], vSumCoords[1][1]);
+    this.parentLayer.rotate(atan2(vSumCoords[1][0] - vSumCoords[0][0], vSumCoords[0][1] - vSumCoords[1][1]));
     this.parentLayer.strokeWeight(3);
     this.parentLayer.triangle(0, 0, 7, 20, -7, 20);
     this.parentLayer.pop();
@@ -477,6 +550,7 @@ class vector3D {
     this.x = x;
     this.y = -y;
     this.z = -z;
+    let phi = 0;
 
     //This calculates the rotation matrix for the cylinder we will draw
     let v0 = createVector(0, 1, 0);
@@ -487,7 +561,7 @@ class vector3D {
 
     //Necessary for vectors with only an i-component
     if(crossProd.x != 0 || crossProd.y != 0 || crossProd.z != 0) {
-      var phi = Math.acos(this.y / v1.mag());
+      phi = Math.acos(this.y / v1.mag());
       rotate(phi, crossProd);
     } else if (this.y <= 0) {rotateX(PI);}
 
@@ -562,5 +636,34 @@ function mousePressed() {
 
 function mouseReleased() {
   // Quit dragging
-  draggingPt[0] = false; 
+  draggingPt[0] = false;
+
+  if (page == "vector addition") {
+    let vecEqn;
+    /*switch(n) {
+      case 2:
+        vecEqn = `\\vec{v} = \\begin{bmatrix}${(ptCoords[j+1][0]-ptCoords[j][0]).toFixed(1)} \\\\ ${(ptCoords[j+1][1]-ptCoords[j][1]).toFixed(1)}\\end{bmatrix}`;
+        break;
+      case 3:
+        vecEqn = `\\begin{bmatrix}${n} \\\\ ${n+1}\\end{bmatrix}`;
+        break;
+      case 4:
+        vecEqn = `\\begin{bmatrix}${n} \\\\ ${n+1}\\end{bmatrix}`;
+        break;
+      case 5:
+        vecEqn = `\\begin{bmatrix}${n} \\\\ ${n+1}\\end{bmatrix}`;
+        break;
+      case 6:
+        vecEqn = `\\begin{bmatrix}${n} \\\\ ${n+1}\\end{bmatrix}`;
+        break;
+    }*/
+    vecEqn = `\\vec{v} = `;
+    for (j = 0; j<n-1; j++) {
+      vecEqn+=`\\begin{bmatrix}${(ptCoords[j+1][0]-ptCoords[j][0]).toFixed(1)} \\\\ ${(ptCoords[j+1][1]-ptCoords[j][1]).toFixed(1)}\\end{bmatrix}`;
+      if (j+2<n) {vecEqn+=`+`;}
+    }
+    if (n>2&&sumPressed) {vecEqn+=`= \\begin{bmatrix}${vSum[0].toFixed(1)} \\\\ ${vSum[1].toFixed(1)}\\end{bmatrix}`}
+    let math = MathJax.Hub.getAllJax("vectorLATEX")[0];
+    MathJax.Hub.Queue(["Text",math, vecEqn]);
+  }
 }

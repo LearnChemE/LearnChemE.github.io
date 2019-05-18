@@ -3,30 +3,33 @@
 	<head>
 		<meta charset="UTF-8">
 		
-		<title>Template_p5Plot.js</title>
+		<title>vectors!</title>
 		
 		<!-- imports math functions -->
-		<script type="text/javascript" src="../../libraries/math.js"></script>
-		<script type="text/javascript" src="utility.js"></script>
+		<script type="text/javascript" src="libraries/math.min.js"></script>
+		<script type="text/javascript" src="libraries/utility.js"></script>
 
 		<!-- imports p5.js libraries from local folders -->
-		<script type="text/javascript" src="../../libraries/p5/p5.min.js"></script>
-		<script type="text/javascript" src="../../libraries/p5/addons/p5.dom.min.js"></script>
-		<!-- <script type="text/javascript" src="../../libraries/p5/addons/p5.sound.min.js"></script> -->
+		<script type="text/javascript" src="libraries/p5/p5.min.js"></script>
+		<script type="text/javascript" src="libraries/p5/p5.dom.min.js"></script>
 		
 		<!-- imports grafica and GUI libraries from local folders -->
-		<script type="text/javascript" src="../../libraries/grafica.min.js"></script>
-		<script type="text/javascript" src="../../libraries/dat.gui.js"></script>
-		<script type="text/javascript" src="../../libraries/quicksettings.js"></script>
-		<script type="text/javascript" src="../../libraries/p5.gui.js"></script>
+		<script type="text/javascript" src="libraries/p5/grafica.js"></script>
+		<script type="text/javascript" src="libraries/quicksettings3/quicksettings.js"></script>
+		<script type="text/javascript" src="libraries/p5/p5.gui.js"></script>
 		
 		<!-- styling is minimal, but CSS sheets were included just in case-->
 		<link rel="stylesheet" type="text/css" href="style.css">
+
+		<!-- imports some utilities -->
+		<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML" async></script>
 		
 	</head>
 
 	<body>
 		<!-- runs the main code -->
 		<script type="text/javascript" src="main.js"></script>
+		<p id="vectorLATEX">$$\vec{v} = \begin{bmatrix}2.5 \\ 2.8\end{bmatrix}$$</p>
 	</body>
 </html>
