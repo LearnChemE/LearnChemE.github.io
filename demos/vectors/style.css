@@ -6,11 +6,15 @@ html, body {
   padding: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 canvas {
   display: block;
 }
 
 #vectorLATEX {
+  background: #dfdede;
+  outline: solid 1px #000000;
   order: 2;
+  font-size: 1rem;
 }

@@ -1,14 +1,19 @@
 /* jshint esversion: 6 */
 
+var html = document.getElementsByTagName('html')[0];
+let rem = parseInt(window.getComputedStyle(html).fontSize);
+
 let basePlot2D;
 let xAxisLimit = 4;
 let yAxisLimit = 4;
+let xyMin;
+let xyMax;
 
-let pts = [[200, 400], [400, 200]]; // Default location of coordinates. Note that this is px, not coordinate
+let pts = [[100, 200], [200, 100]]; // Default location of coordinates. Note that this is px, not coordinate
 let ptCoords = []; // Their corresponding coordinates (solved for in the program)
 let n = pts.length; // number of points
 let vSum = [0, 0];
-let vSumCoords = [[200, 400], [400, 200]];
+let vSumCoords = [[100, 200], [200, 100]];
 
 let rolloverPt = [false, 1]; // Is the mouse over the circle, if so, which circle?
 let rolloverLine = [false, 1]; // Is the mouse over the line, if so, which line?
@@ -34,12 +39,14 @@ let sumPressed = false;
 let removeVectorButton;
 let resetVectorsButton;
 let crossVectorCheckbox;
+let normPlaneCheckbox;
 let arrowsCheckbox;
 let coordsCheckbox;
 
 let drawArrows = [false, false, false, false, false, false, false];
 let drawCoords = false;
 let drawCross = false;
+let drawNormalPlane = false;
 
 let ops;
 let pageSelection = sessionStorage.getItem("pageVal");
@@ -81,18 +88,18 @@ class options {
     this.gPlot.setYLim(-yAxisLimit, xAxisLimit); // y limits
     this.gPlot.getXAxis().getAxisLabel().setText("x - axis"); // x-axis label
     this.gPlot.getYAxis().getAxisLabel().setText("y - axis"); // y-axis label
-    this.gPlot.getXAxis().setFontSize(18);
-    this.gPlot.getYAxis().setFontSize(18);
-    this.gPlot.getXAxis().getAxisLabel().setFontSize(18);
-    this.gPlot.getYAxis().getAxisLabel().setFontSize(18);
+    this.gPlot.getXAxis().setFontSize(1*rem);
+    this.gPlot.getYAxis().setFontSize(1*rem);
+    this.gPlot.getXAxis().getAxisLabel().setFontSize(1*rem);
+    this.gPlot.getYAxis().getAxisLabel().setFontSize(1*rem);
 
     this.gPlot.getTitle().setText("Learn About Vectors"); // title
-    this.gPlot.getTitle().setFontSize(20);
+    this.gPlot.getTitle().setFontSize(1.2*rem);
   }
 
   static defaultSidebar() {
     if (newVectorButton === undefined) {
-    newVectorButton = createButton('add vector');
+    newVectorButton = createButton('insert vector');
     newVectorButton.position(width-100, 40);
     newVectorButton.mousePressed(newVector);
   
@@ -109,8 +116,12 @@ class options {
     resetVectorsButton.mousePressed(reset);
 
     crossVectorCheckbox = createCheckbox('show cross product', false);
-    crossVectorCheckbox.position(width-100, 180);
+    crossVectorCheckbox.position(width-100, 10);
     crossVectorCheckbox.changed(mySelectEvent);
+
+    normPlaneCheckbox = createCheckbox('show normal plane', false);
+    normPlaneCheckbox.position(width-100, 50);
+    normPlaneCheckbox.changed(mySelectEvent);
 
     selectOptions = createSelect();
     selectOptions.position(width-100, 220);
@@ -122,6 +133,57 @@ class options {
     selectOptions.changed(reInitialize);
     }
   }
+
+  static drawAxes3D() {
+    background(200);
+    ambientLight(160, 160, 160);
+    pointLight(255, 255, 255, 20, 20, 200);
+    orbitControl(5, 5);
+    
+    
+    //let phi = 0;
+
+    //This calculates the rotation matrix for the cylinder we will draw
+    let v0 = createVector(0, 1, 0);
+    let x = p5.Vector.cross(v0, createVector(1, 0, 0));
+    let y = p5.Vector.cross(v0, createVector(0, 1, 0));
+    let z = p5.Vector.cross(v0, createVector(0, 0, 1));
+    
+    let trans = [-180, 0, 180];
+    let axisLength = 200;
+    let axisThickness = 0.5;
+    let RGB = [0, 0, 0];
+    // x-axis
+    push();
+    ambientMaterial.apply(this, RGB);
+    translate(trans[0], trans[1], trans[2]);
+    rotate(PI/2, x);
+    translate(0, axisLength / 2, 0);
+      cylinder(axisThickness, axisLength);
+      translate(0, axisLength / 2 + 2, 0);
+      cone(4, 10);
+    pop();
+    // y-axis
+    push();
+    ambientMaterial.apply(this, RGB);
+    translate(trans[0], trans[1], trans[2]);
+    rotateX(PI);
+    translate(0, axisLength / 2, 0);
+      cylinder(axisThickness, axisLength);
+      translate(0, axisLength / 2 + 2, 0);
+      cone(4, 10);
+    pop();
+    // z-axis
+    push();
+    ambientMaterial.apply(this, RGB);
+    translate(trans[0], trans[1], trans[2]);
+    rotate(-PI/2, z);
+    translate(0, axisLength / 2, 0);
+      cylinder(axisThickness, axisLength);
+      translate(0, axisLength / 2 + 2, 0);
+      cone(4, 10);
+    pop();
+  }
 }
 
 class drawing {
@@ -129,7 +191,7 @@ class drawing {
     this.gPlot = gPlot;
   }
 
-  drawMethod() {
+  drawMethod2D() {
   this.gPlot.beginDraw(); // draws the plot
   this.gPlot.drawBackground();
   this.gPlot.drawBox();
@@ -161,6 +223,10 @@ function setup() {
     plotdraw2D.gPlot = basePlot2D;
     options.defaultSidebar();
     crossVectorCheckbox.hide();
+    normPlaneCheckbox.hide();
+
+    xyMin = getCoords(-xAxisLimit, -yAxisLimit, basePlot2D);
+    xyMax = getCoords(xAxisLimit, yAxisLimit, basePlot2D);
 
     /* doesn't do anything yet ...
     switch(page) {
@@ -183,15 +249,25 @@ function setup() {
     sumVectorButton.hide();
     removeVectorButton.hide();
     resetVectorsButton.hide();
+    normPlaneCheckbox.show();
+    selectOptions.position(width + 10, 90);
 
     normalMaterial();
     ambientMaterial(39, 235, 91);
     camera(100, -200, (height/2.0) / tan(PI*30.0 / 180.0), 0, 0, 0, 0, 1, 0);
-    sliderRange(-2, 2, 0.05);
-    gui = createGui('plot controls', width + 10, 0.42*height);
-    gui.addGlobals('x1','y1','z1','x2','y2','z2');
 
-    debugMode();
+    gui = createGui('plot controls', width + 10, 140);
+    gui.newSlider("x1", -4, 4, 1, 0.1, "vector 1 x-component", " i");
+    gui.newSlider("y1", -4, 4, 1, 0.1, "vector 1 y-component", " j");
+    gui.newSlider("z1", -4, 4, 1, 0.1, "vector 1 z-component", " k");
+    gui.newSlider("x2", -4, 4, 1, 0.1, "vector 1 x-component", " i");
+    gui.newSlider("y2", -4, 4, 1, 0.1, "vector 1 y-component", " j");
+    gui.newSlider("z2", -4, 4, 1, 0.1, "vector 1 z-component", " k");
+
+
+    LaTexCross();
+
+    loop();
   }
 }
 
@@ -236,13 +312,30 @@ function reset() {
 
 function mySelectEvent() {
   drawCross = crossVectorCheckbox.checked();
+  drawNormalPlane = normPlaneCheckbox.checked();
+  mouseReleased();
 }
 
 function newVector() {
   if(n < 5 && !sumPressed) {
-    let xyMin = getCoords(-xAxisLimit, -yAxisLimit, basePlot2D);
-    let xyMax = getCoords(xAxisLimit, yAxisLimit, basePlot2D);
     pts.push([random(xyMin[0],xyMax[0]), random(xyMin[1],xyMax[1])]);
+    // if the new random point is too close to other vertices, it looks for a new random spot on the canvas until it finds an empty spot.
+    let dist = new Array(n).fill(0);
+    let tooClose = true;
+    let k=0;
+    while(tooClose) {
+    tooClose = false;
+      for(i=0;i<n;i++){
+        dist[i] = abs(Math.sqrt(Math.pow(pts[i][0]-pts[n][0],2)+Math.pow(pts[i][1]-pts[n][1],2)));
+        if(dist[i]<200){
+          pts[n]=[random(xyMin[0],xyMax[0]), random(xyMin[1],xyMax[1])];
+          tooClose = true;
+          break;}
+        }
+      if(k>10){break;}
+      k++;
+    }
+
     graphicsOffset.push([1, 1]);
     n += 1;
   }
@@ -291,7 +384,7 @@ function DrawArrows(parentLayer) {
       this.parentLayer.tint(255, 50, 50);
       this.parentLayer.image(iHat, 0.5*pts[j][0]+0.5*pts[j+1][0]-30, pts[j][1]-20-30*graphicsOffset[j][1], 0.09*iHat.width, 0.12*iHat.height);
       this.parentLayer.fill(255, 30, 30);
-      this.parentLayer.textSize(18);
+      this.parentLayer.textSize(1*rem);
       this.parentLayer.noStroke();
       this.parentLayer.textAlign(LEFT);
       this.parentLayer.text("= ".concat((ptCoords[j+1][0]-ptCoords[j][0]).toFixed(1)), 0.5*pts[j][0]+0.5*pts[j+1][0]-30+0.2*iHat.width, pts[j][1]-20-30*graphicsOffset[j][1]+0.12*iHat.height);
@@ -308,7 +401,7 @@ function DrawArrows(parentLayer) {
       this.parentLayer.image(jHat, pts[j+1][0]-35-50*graphicsOffset[j][0], 0.5*pts[j][1]+0.5*pts[j+1][1], 0.11*jHat.width, 0.12*jHat.height)
       this.parentLayer.fill(30, 30, 255)
       this.parentLayer.textAlign(LEFT);
-      this.parentLayer.textSize(18);
+      this.parentLayer.textSize(1*rem);
       this.parentLayer.noStroke();
       this.parentLayer.text("= ".concat((ptCoords[j+1][1]-ptCoords[j][1]).toFixed(1)), pts[j+1][0]-35-50*graphicsOffset[j][0]+0.2*jHat.width, 0.5*pts[j][1]+0.5*pts[j+1][1]+0.1*jHat.height);
       this.parentLayer.pop();
@@ -325,7 +418,7 @@ function DrawArrows(parentLayer) {
       this.parentLayer.tint(255, 50, 50);
       this.parentLayer.image(iHat, 0.5*pts[0][0]+0.5*pts[n-1][0]-30, pts[0][1]-20-30*graphicsOffset[n][1], 0.09*iHat.width, 0.12*iHat.height);
       this.parentLayer.fill(255, 30, 30);
-      this.parentLayer.textSize(18);
+      this.parentLayer.textSize(1*rem);
       this.parentLayer.noStroke();
       this.parentLayer.textAlign(LEFT);
       this.parentLayer.text("= ".concat((ptCoords[n-1][0]-ptCoords[0][0]).toFixed(1)), 0.5*pts[0][0]+0.5*pts[n-1][0]-30+0.2*iHat.width, pts[0][1]-20-30*graphicsOffset[n][1]+0.12*iHat.height);
@@ -342,7 +435,7 @@ function DrawArrows(parentLayer) {
       this.parentLayer.image(jHat, pts[n-1][0]-35-50*graphicsOffset[n][0], 0.5*pts[0][1]+0.5*pts[n-1][1], 0.11*jHat.width, 0.12*jHat.height)
       this.parentLayer.fill(30, 30, 255)
       this.parentLayer.textAlign(LEFT);
-      this.parentLayer.textSize(18);
+      this.parentLayer.textSize(1*rem);
       this.parentLayer.noStroke();
       this.parentLayer.text("= ".concat((ptCoords[n-1][1]-ptCoords[0][1]).toFixed(1)), pts[n-1][0]-35-50*graphicsOffset[n][0]+0.2*jHat.width, 0.5*pts[0][1]+0.5*pts[n-1][1]+0.1*jHat.height);
       this.parentLayer.pop();
@@ -382,7 +475,7 @@ function DrawCoords(parentLayer) {
     }
     if (rolloverPt[0] && rolloverPt[1] == j || draggingPt[0] && draggingPt[1] == j ) {
       this.parentLayer.textAlign(CENTER);
-      this.parentLayer.textSize(18);
+      this.parentLayer.textSize(1*rem);
       this.parentLayer.noStroke();
       this.parentLayer.fill(0);
       this.parentLayer.text("(".concat(ptCoords[j][0].toFixed(1),", ", ptCoords[j][1].toFixed(1),")"), pts[j][0] + offset[j].x, pts[j][1] + offset[j].y);
@@ -401,7 +494,7 @@ function DrawVectorText(parentLayer) {
     if (angle > PI / 2 || angle < - PI / 2) {angle += -PI;}
     this.parentLayer.push();
     this.parentLayer.textAlign(CENTER);
-    this.parentLayer.textSize(18);
+    this.parentLayer.textSize(1*rem);
     this.parentLayer.noStroke();
     this.parentLayer.fill(0);
     this.parentLayer.translate((pts[j][0] + pts[j+1][0])/2, (pts[j][1] + pts[j+1][1])/2);
@@ -416,7 +509,7 @@ function DrawVectorText(parentLayer) {
     if (angle > PI / 2 || angle < - PI / 2) {angle += -PI;}
     this.parentLayer.push();
     this.parentLayer.textAlign(CENTER);
-    this.parentLayer.textSize(18);
+    this.parentLayer.textSize(1*rem);
     this.parentLayer.noStroke();
     this.parentLayer.fill(0);
     this.parentLayer.translate((pts[0][0] + pts[n-1][0])/2, (pts[0][1] + pts[n-1][1])/2);
@@ -486,7 +579,13 @@ function MovePoints(parentLayer) {
     if (pts[0][1] < pts[n-1][1]) {graphicsOffset[n][1] = 1;} else {graphicsOffset[n][1] = -1;}
   }
   if (draggingPt[0])
-    {pts[draggingPt[1]] = [mouseX + mouseOffset[0], mouseY + mouseOffset[1]];}
+    {
+      pts[draggingPt[1]] = [mouseX + mouseOffset[0], mouseY + mouseOffset[1]];
+      pts[draggingPt[1]][0] = Math.max(pts[draggingPt[1]][0], xyMin[0]);
+      pts[draggingPt[1]][0] = Math.min(pts[draggingPt[1]][0], xyMax[0]);
+      pts[draggingPt[1]][1] = Math.min(pts[draggingPt[1]][1], xyMin[1]);
+      pts[draggingPt[1]][1] = Math.max(pts[draggingPt[1]][1], xyMax[1]);
+    }
 }
 
 function DrawVectors(parentLayer) {
@@ -567,10 +666,10 @@ class vector3D {
 
     //Only draws vectors with magnitude greater than 0
     if(this.x != 0 || this.y !=0 || this.z != 0) {
-      translate(0, v1.mag()*100 / 2, 0);
-      cylinder(3, 100 * v1.mag());
-      translate(0, v1.mag()*100 / 2 + 2, 0);
-      cone(10, 25);
+      translate(0, v1.mag()*40 / 2, 0);
+      cylinder(2, 40 * v1.mag());
+      translate(0, v1.mag()*40 / 2 + 2, 0);
+      cone(5, 15);
     }
 
     pop();
@@ -583,14 +682,44 @@ class vector3D {
     let crossProd = p5.Vector.cross(v0, v1);
     new vector3D(crossProd.x, crossProd.y, crossProd.z);
   }
+
+  //static method that calculates the cross-product of two vectors, returns as array
+  static cross2(X1, Y1, Z1, X2, Y2, Z2) {
+    let v0 = createVector(X1, Y1, Z1);
+    let v1 = createVector(X2, Y2, Z2);
+    let crossProd = p5.Vector.cross(v0, v1);
+    return [crossProd.x, crossProd.y, crossProd.z];
+  }
+
+  static normPlane(X1, Y1, Z1, X2, Y2, Z2) {
+    let normVector = vector3D.cross2(X1, Y1, Z1, X2, Y2, Z2);
+    let x = normVector[0];let y = -normVector[1];let z = -normVector[2];
+
+    let v0 = createVector(0, 1, 0);
+    let v1 = createVector(x, y, z);
+    let crossProd = p5.Vector.cross(v0, v1);
+
+    push();
+      let phi = Math.acos(y / v1.mag());
+      rotate(phi, crossProd);
+      rotateX(-PI/2);
+      shininess(10);
+      specularMaterial(250, 50);
+      box(300, 300, 2);
+      //plane(300, 300);
+    pop();
+  }
 }
 
 function draw() {
+  // when everything is evaluated and it starts drawing, update the LaTex text. Happens once.
+  if(frameCount == 10) {mouseReleased();}
+
   background(255); // draws light gray background every frame
 
   switch(page) {
     case "vector addition":
-      plotdraw2D.drawMethod();
+      plotdraw2D.drawMethod2D();
       image(extraCanvas, 0, 0);
       extraCanvas.background(255);
       extraCanvas.clear();
@@ -604,16 +733,16 @@ function draw() {
       DrawVectorText(extraCanvas);
       break;
     case "cross product":
-      background(200);
-      ambientLight(160, 160, 160);
-      pointLight(255, 255, 255, 20, 20, 200);
-      orbitControl(5, 5);
+      options.drawAxes3D();
       ambientMaterial(135, 91, 209);
       new vector3D(x1, y1, z1);
       ambientMaterial(135, 191, 109);
       new vector3D(x2, y2, z2);
       if(drawCross) {
         vector3D.cross(x1, y1, z1, x2, y2, z2);
+      }
+      if (drawNormalPlane) {
+        vector3D.normPlane(x1, y1, z1, x2, y2, z2);
       }
       break;
   }
@@ -638,26 +767,18 @@ function mouseReleased() {
   // Quit dragging
   draggingPt[0] = false;
 
-  if (page == "vector addition") {
-    let vecEqn;
-    /*switch(n) {
-      case 2:
-        vecEqn = `\\vec{v} = \\begin{bmatrix}${(ptCoords[j+1][0]-ptCoords[j][0]).toFixed(1)} \\\\ ${(ptCoords[j+1][1]-ptCoords[j][1]).toFixed(1)}\\end{bmatrix}`;
-        break;
-      case 3:
-        vecEqn = `\\begin{bmatrix}${n} \\\\ ${n+1}\\end{bmatrix}`;
-        break;
-      case 4:
-        vecEqn = `\\begin{bmatrix}${n} \\\\ ${n+1}\\end{bmatrix}`;
-        break;
-      case 5:
-        vecEqn = `\\begin{bmatrix}${n} \\\\ ${n+1}\\end{bmatrix}`;
-        break;
-      case 6:
-        vecEqn = `\\begin{bmatrix}${n} \\\\ ${n+1}\\end{bmatrix}`;
-        break;
-    }*/
-    vecEqn = `\\vec{v} = `;
+  switch(page) {
+   case "vector addition":
+      LaTexAddition();
+      break;
+    case "cross product":
+      LaTexCross();
+      break;
+  }
+}
+
+function LaTexAddition() {
+  let vecEqn = `\\vec{v} = `;
     for (j = 0; j<n-1; j++) {
       vecEqn+=`\\begin{bmatrix}${(ptCoords[j+1][0]-ptCoords[j][0]).toFixed(1)} \\\\ ${(ptCoords[j+1][1]-ptCoords[j][1]).toFixed(1)}\\end{bmatrix}`;
       if (j+2<n) {vecEqn+=`+`;}
@@ -665,5 +786,16 @@ function mouseReleased() {
     if (n>2&&sumPressed) {vecEqn+=`= \\begin{bmatrix}${vSum[0].toFixed(1)} \\\\ ${vSum[1].toFixed(1)}\\end{bmatrix}`}
     let math = MathJax.Hub.getAllJax("vectorLATEX")[0];
     MathJax.Hub.Queue(["Text",math, vecEqn]);
-  }
+}
+
+function LaTexCross() {
+  let vecEqn = `\\vec{u}\\times \\vec{v} = `;
+    vecEqn+=`\\begin{bmatrix}${(x1).toFixed(1)} \\\\ ${(y1).toFixed(1)} \\\\ ${(z1).toFixed(1)}\\end{bmatrix}`;
+    vecEqn+=`\\times`;
+    vecEqn+=`\\begin{bmatrix}${(x2).toFixed(1)} \\\\ ${(y2).toFixed(1)} \\\\ ${(z2).toFixed(1)}\\end{bmatrix}`;
+    if (drawCross) {
+      let crossProd = vector3D.cross2(x1, y1, z1, x2, y2, z2);
+      vecEqn+=`= \\begin{bmatrix}${(crossProd[0]).toFixed(1)} \\\\ ${(crossProd[1]).toFixed(1)} \\\\ ${(crossProd[2]).toFixed(1)}\\end{bmatrix}`}
+    let math = MathJax.Hub.getAllJax("vectorLATEX")[0];
+    MathJax.Hub.Queue(["Text",math, vecEqn]);
 }
