@@ -353,7 +353,7 @@ function setup() {
 	plot2.setYLim(0, 400);
 	plot2.getXAxis().getAxisLabel().setText("time (s)");
 	plot2.getYAxis().getAxisLabel().setText("temperature (°C)");
-	plot2.getTitle().setText("temperature");
+	plot2.getTitle().setText("temperature of blocks");
 
 	smooth();
   }
@@ -887,46 +887,4 @@ function getNumBlocks() {
 			$("#sit2block4").show();
 			break;
 	}
-}
-
-function showHelp() {
-	let string = "Melting Ice Simulation lets you compare the rate of energy transfer from " + 
-	"heated metal blocks to the water and ice cubes in two different beakers, each under its own set " +
-	"of initial conditions. Choose the initial conditions for Situation 1 and Situation 2. " +
-	"Then click the Start button to watch the ice melt.  After the ice has melted, in order to change " +
-	"the initial conditions for another experiment, you must first press the " +
-	"Reset button to return the ice and the heated blocks to their initial " +
-	"positions and energies.  While the ice is melting, you can watch the " +
-	"graph to see the mass of ice melted in each beaker over time, as well as the temperature " +
-	"change with time. This simulation assumes perfect mixing, and that all energy transferred " +
-	"goes into melting the ice until the ice has fully melted. After that, all energy goes into " +
-	"raising the temperature of the water.";
-	alert(string);
-}
-
-function displayGraphInfo() {
-	if (graphInfoShowing) {
-		$("#graphHeightInfo").hide();
-		$("#graphSlopeInfo").hide();
-		graphInfoShowing = false;
-	} else {
-		$("#graphHeightInfo").fadeIn();
-		$("#graphSlopeInfo").fadeIn();
-		graphInfoShowing = true;
-	}
-	return false;
-}
-
-function displayAboutInfo() {
-	alert("This program was originally created under the direction of Dr. Margot Vigeant " +
-		"and Dr. Michael Prince at Bucknell University. It was first developed " +
-		"in Flash by Matt Koppenhaver under Dr. Prince, and was adapted to " +
-		"Javascript by Emily Ehrenberger under Dr. Vigeant in " +
-		"2011. In 2019, it was modified for use on LearnChemE.com by Neil Hendren under the " +
-		"direction of Dr. John Falconer at the University of Colorado Boulder. " +
-		"The development of this program was funded by the National Science " +
-		"Foundation Grant DUE-0442234 (Prince) and DUE-0717536 (Vigeant).  Address " +
-		"any questions or comments to nehe8116@colorado.edu." +
-		"\u00A9 Margot Vigeant 2011");
-	return false;
 }

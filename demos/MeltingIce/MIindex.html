@@ -69,7 +69,7 @@
         <div class="box b" id="topCenter">
             <a href="javascript:" id="infoButton" class="buttonMed" value="info">Details</a>
             <p id="initConds">
-                Initial conditions:<br>10 g ice in each cup<br>100 mL water in each beaker
+                Initial conditions in beakers:<br>10 g ice and 100 mL water
             </p>
             <a href="javascript:" id="helpButton" class="buttonMed" value="help">Directions</a>
             <p id="temps1" class="temps"></p>
@@ -78,28 +78,28 @@
             <p id="bk1Text">Beaker 1</p>
             <p id="bk2Text">Beaker 2</p>
 
-            <img id="waterImg" alt="" src="water.png" />
-            <img id="beakersImg" alt="" src="beakers.png" />
-            <img id="stirBar1" alt="" src="stirBar.gif" />
-            <img id="stirBar2" alt="" src="stirBar.gif" />
+            <img id="waterImg" alt="" src="media/water.png" />
+            <img id="beakersImg" alt="" src="media/beakers.png" />
+            <img id="stirBar1" alt="" src="media/stirBar.gif" />
+            <img id="stirBar2" alt="" src="media/stirBar.gif" />
 
-            <img id="sit1block1" class="sit1block" alt="" src="blank_img.png" />
-            <img id="sit1block2" class="sit1block" alt="" src="blank_img.png" />
-            <img id="sit1block3" class="sit1block" alt="" src="blank_img.png" />
-            <img id="sit1block4" class="sit1block" alt="" src="blank_img.png" />
+            <img id="sit1block1" class="sit1block" alt="" src="media/blank_img.png" />
+            <img id="sit1block2" class="sit1block" alt="" src="media/blank_img.png" />
+            <img id="sit1block3" class="sit1block" alt="" src="media/blank_img.png" />
+            <img id="sit1block4" class="sit1block" alt="" src="media/blank_img.png" />
             <div class="test1">
-            <img id="sit1Ice1" class="sit1Ice" alt="" src="iceCube2.png" />
-            <img id="sit1Ice2" class="sit1Ice" alt="" src="iceCube2.png" />
-            <img id="sit1Ice3" class="sit1Ice" alt="" src="iceCube2.png" />
+            <img id="sit1Ice1" class="sit1Ice" alt="" src="media/iceCube.png" />
+            <img id="sit1Ice2" class="sit1Ice" alt="" src="media/iceCube.png" />
+            <img id="sit1Ice3" class="sit1Ice" alt="" src="media/iceCube.png" />
             </div>
-            <img id="sit2block1" class="sit2block" alt="" src="blank_img.png" />
-            <img id="sit2block2" class="sit2block" alt="" src="blank_img.png" />
-            <img id="sit2block3" class="sit2block" alt="" src="blank_img.png" />
-            <img id="sit2block4" class="sit2block" alt="" src="blank_img.png" />
+            <img id="sit2block1" class="sit2block" alt="" src="media/blank_img.png" />
+            <img id="sit2block2" class="sit2block" alt="" src="media/blank_img.png" />
+            <img id="sit2block3" class="sit2block" alt="" src="media/blank_img.png" />
+            <img id="sit2block4" class="sit2block" alt="" src="media/blank_img.png" />
 
-            <img id="sit2Ice1" class="sit2Ice" alt="" src="iceCube2.png" />
-            <img id="sit2Ice2" class="sit2Ice" alt="" src="iceCube2.png" />
-            <img id="sit2Ice3" class="sit2Ice" alt="" src="iceCube2.png" />
+            <img id="sit2Ice1" class="sit2Ice" alt="" src="media/iceCube.png" />
+            <img id="sit2Ice2" class="sit2Ice" alt="" src="media/iceCube.png" />
+            <img id="sit2Ice3" class="sit2Ice" alt="" src="media/iceCube.png" />
 
         </div>
 
@@ -121,6 +121,8 @@
                 </label><br>
                 <input type="radio" id="which3" name="whichGraph" value="3" checked /><label for="which3"> show both plots </label>
             </div>
+
+            <a href="javascript:" id="aboutButton" class="buttonMed">About</a>
         </div>
 
     </div>
@@ -131,7 +133,7 @@
             each under its own set of initial conditions.  When the <span style="color:#479E47">green</span> "Start" button is clicked, one or more hot 
             metal blocks drop into beakers containing ice water, and the water temperature and/or the mass of ice melted 
             is plotted versus time by selecting the appropriate radio button. The number of blocks and their properties 
-            are adjusted with sliders. Checking "Add stir bar"  to increases the heat transfer rate. Comparisons can be 
+            are adjusted with sliders. Checking "Add stir bar" increases the heat transfer rate. Comparisons can be 
             made by choosing different conditions for beakers 1 and 2. To change the initial conditions for another 
             experiment, first press the Reset button. This simulation assumes perfect mixing, no temperature gradient 
             in the metal blocks, and that all energy transferred from the blocks goes into melting the ice. Once the 
@@ -142,7 +144,7 @@
     <div id="modalDetails">
         <div id="details-content">
         <span class="close">&times;</span>
-        <p class="popup paragraph">This simulation is a <i>Lumped Capacitance</i> method of examining transient conduction. It assumes 
+        <p class="popup paragraph">This simulation is a <i>lumped capacitance</i> method of examining transient conduction. It assumes 
             that temperature gradients within the block and water are negligible. This may not be realistic. The overall energy balance on the system is</p>
         <span><img class="latex" name="eBal" src="media/eBal.gif"></span>
         <p class="popup paragraph">where <span><img class="latex" name="U" src="media/U.gif"></span> is the overall heat transfer coefficient,
@@ -151,7 +153,7 @@
         <span><img class="latex" name="rho" src="media/rho.gif" style="background-color:transparent"></span> and <span><img class="latex" name="V" src="media/V.gif" style="background-color:transparent"></span>
         are the block density and volume, <span><img class="latex" name="Cp" src="media/Cp.gif" style="background-color:transparent"></span> is the block heat capacity, and 
         <span><img class="latex" name="t" src="media/t.gif"></span> is time.</p>
-        <p class="popup paragraph">If <span><img class="latex" name="TW" src="media/TW.gif" style="background-color:transparent"></span> is constant (i.e. there is sufficient ice to keep the water at 0°C) and we let
+        <p class="popup paragraph">If <span><img class="latex" name="TW" src="media/TW.gif" style="background-color:transparent"></span> is constant (i.e., there is sufficient ice to keep the water at 0°C) and we let
         the block's initial temperature be <span><img class="latex" name="initialCondTi" src="media/initCondTi.gif" style="background-color:transparent;"></span>,
         the solution to this ordinary differential equation becomes:</p>
         <span><img class="latex" name="difEqSol1" src="media/difEqSol1.gif" style="background-color:transparent;"></span>
@@ -159,25 +161,41 @@
         <span><img class="latex" name="difEqSol2" src="media/difEqSol2.gif" style="background-color:transparent;"></span>
         <p class="popup paragraph">The total amount of ice melted can then be calculated:</p>
         <span><img class="latex" name="meltEq" src="media/meltEq.gif" style="background-color:transparent;"></span>
-        <p class="popup paragraph">Where <span><img class="latex" name="mmelt" src="media/mmelt.gif"></span> is the mass of ice melted, and <span><img class="latex" name="DHfusion" src="media/DHfusion.gif"></span> is ice's heat of fusion.<br>
+        <p class="popup paragraph">where <span><img class="latex" name="mmelt" src="media/mmelt.gif"></span> is the mass of ice melted, and <span><img class="latex" name="DHfusion" src="media/DHfusion.gif"></span> is ice's heat of fusion.<br>
             Until the ice fully melts, energy transfer from the block will not affect the temperature of the water. Once all the ice melts, the water temperature will rise.</p>
         </div>
     </div>
+
+    <div id="modalAbout">
+        <div id="about-content">
+            <span class="close">&times;</span>
+            <p class="popup paragraph">
+            This program was originally created under the direction of Dr. Margot Vigeant and Dr. Michael Prince at Bucknell University. It was first developed in Flash by Matt Koppenhaver under Dr. Prince, and was adapted to Javascript by Emily Ehrenberger under Dr. Vigeant in 2011. In 2019, it was modernized and redesigned for use on LearnChemE.com by Neil Hendren under the direction of Dr. John Falconer at the University of Colorado Boulder. The development of this program was funded by the National Science Foundation Grant DUE-0442234 (Prince) and DUE-0717536 (Vigeant).  Address any questions or comments to learncheme@gmail.com. As of 5-20-2019, original version is accessible at: <a href="https://www.projects.bucknell.edu/Inquiry_Activities/HT_JS/Melting_Ice/melting-ice.html">https://www.projects.bucknell.edu/Inquiry_Activities/HT_JS/Melting_Ice/melting-ice.html</a> <br>© Margot Vigeant 2011.
+            </p>
+        </div>
+    </div>
+
     <!-- popup handler -->
     <script>var modalDirections = document.getElementById("modalDirections");
             var modalDetails = document.getElementById("modalDetails");
+            var modalAbout = document.getElementById("modalAbout");
             // Get the button that opens the modal
             var directionsButton = document.getElementById("helpButton");
             var detailsButton = document.getElementById("infoButton");
+            var aboutButton = document.getElementById("aboutButton");
             // Get the element that closes the modal
             var closeDirections = document.getElementsByClassName("close")[0];
             var closeDetails = document.getElementsByClassName("close")[1];
+            var closeAbout = document.getElementsByClassName("close")[2];
             // When the user clicks the button, open the modal 
             directionsButton.onclick = function() {
               modalDirections.style.display = "block";
             }
             detailsButton.onclick = function() {
               modalDetails.style.display = "block";
+            }
+            aboutButton.onclick = function() {
+              modalAbout.style.display = "block";
             }
             // When the user clicks on <span> (x), close the modal
             closeDirections.onclick = function() {
@@ -186,11 +204,15 @@
             closeDetails.onclick = function() {
               modalDetails.style.display = "none";
             }
+            closeAbout.onclick = function() {
+              modalAbout.style.display = "none";
+            }
             // When the user clicks anywhere outside of the modal, close it
             window.onclick = function(event) {
-              if (event.target == modalDirections || event.target == modalDetails) {
+              if (event.target == modalDirections || event.target == modalDetails || event.target == modalAbout) {
                 modalDirections.style.display = "none";
                 modalDetails.style.display = "none";
+                modalAbout.style.display = "none";
               }
             }
             </script>

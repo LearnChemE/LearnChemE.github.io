@@ -58,7 +58,6 @@
 .qs_container {
   margin: 2px;
   padding: 3px;
-  outline: 1px solid rgba(0, 0, 0, 0.5);
   position: relative;
   right: 1px;
   transition-duration: 200ms;
