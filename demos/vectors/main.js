@@ -52,6 +52,9 @@ let ops;
 let pageSelection = sessionStorage.getItem("pageVal");
 let page;
 
+let gui;
+let gui2D;
+
 if (sessionStorage.getItem("pageVal")) {page = pageSelection;} else {page = "vector addition";}
 
 let twoDimension = true;
@@ -62,6 +65,8 @@ var z1 = 0;
 var x2 = 0;
 var y2 = 1;
 var z2 = 0;
+
+var multFac = 1;
 
 let aspRatio = 0.8;
 let margins = 120;
@@ -134,6 +139,16 @@ class options {
     selectOptions.option('cross product');
     selectOptions.value(page);
     selectOptions.changed(reInitialize);
+
+    gui2D = createGui('plot controls', width - 100, 80);
+    gui2D.newSlider("multFac", -5, 5, 1, 0.1, "multiplication factor", "");
+    gui2D.addButton("multiply!", function() {
+      console.log("sweet");
+    });
+    gui2D.addButton("reset", function() {
+      console.log("neat");
+    });
+    gui2D.hide();
     }
   }
 
@@ -265,6 +280,8 @@ function setup() {
     xyMin = getCoords(-xAxisLimit, -yAxisLimit, basePlot2D);
     xyMax = getCoords(xAxisLimit, yAxisLimit, basePlot2D);
 
+    reInitialize();
+
     /* doesn't do anything yet ...
     switch(page) {
       case "vector addition":
@@ -317,13 +334,34 @@ function reInitialize() {
   sessionStorage.setItem("pageVal", selectOptions.value());
   if (page == "cross product") {location.reload();}
   page = selectOptions.value();
-  if (page == "cross product") {
-    twoDimension = false;
-    newVectorButton.hide();
-    sumVectorButton.hide();
-    crossVectorCheckbox.show();
-    setup();
-    selectOptions.value("cross product");
+  switch (page) {
+    case "vector addition":
+      resetVectorsButton.show();
+      removeVectorButton.show();
+      newVectorButton.show();
+      sumVectorButton.show();
+      selectOptions.position(width-100, 220);
+      gui2D.hide();
+    break;
+    case "scalar multiplication":
+      reset();
+      pts[0] = getCoords(0, 0, basePlot2D);
+      pts[1] = getCoords(1, 0, basePlot2D);
+      resetVectorsButton.hide();
+      removeVectorButton.hide();
+      newVectorButton.hide();
+      sumVectorButton.hide();
+      selectOptions.position(width-100, 40);
+      gui2D.show();
+    break;
+    case "cross product":
+      twoDimension = false;
+      newVectorButton.hide();
+      sumVectorButton.hide();
+      crossVectorCheckbox.show();
+      setup();
+      selectOptions.value("cross product");
+    break;
   }
 }
 
@@ -770,6 +808,20 @@ function draw() {
       DrawCoords(extraCanvas);
       DrawVectors(extraCanvas);
       DrawVectorText(extraCanvas);
+      break;
+    case "scalar multiplication":
+        plotdraw2D.drawMethod2D();
+        image(extraCanvas, 0, 0);
+        extraCanvas.background(255);
+        extraCanvas.clear();
+        extraCanvas.fill(255);
+        extraCanvas.stroke(0);
+  
+        MovePoints(extraCanvas);
+        DrawArrows(extraCanvas);
+        DrawCoords(extraCanvas);
+        DrawVectors(extraCanvas);
+        DrawVectorText(extraCanvas);
       break;
     case "cross product":
       options.drawAxes3D();

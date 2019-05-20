@@ -28,11 +28,6 @@
 
   };
 
-
-  p5.prototype.removeGui = function(gui) {
-    // TODO: implement this
-  };
-
   // update defaults used for creation of sliders
   p5.prototype.sliderRange = function(vmin, vmax, vstep, vunit) {
     sliderMin = vmin;
@@ -61,6 +56,7 @@
 
   // interface for quicksettings
   function QSGui(label, x, y, id) {
+    QuickSettings.useExtStyleSheet();
     var qs = QuickSettings.create(x, y, label, document.body, id);
     this.prototype = qs;
 
@@ -95,6 +91,18 @@
         return qs.bindRange(a, b, c, d, e, window, f, g);
     };
 
+    this.hide = function() {
+      qs.hide();
+    };
+
+    this.show = function() {
+      qs.show();
+    };
+
+    this.addButton = function(title, callback) {
+      qs.addButton(title, callback);
+    };
+    
     // addObject(object) to add all params of the object
     // addObject(object, param1, param2, ...) to add selected params
     this.addObject = function() {
