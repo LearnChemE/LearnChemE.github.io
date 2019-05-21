@@ -12,6 +12,16 @@ canvas {
   display: block;
 }
 
+#dotProductDiv {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  display: grid;
+  width: 500px;
+  height: 500px;
+  background: #97979767;
+}
+
 #vectorLATEX {
   background: #dfdede;
   outline: solid 1px #000000;

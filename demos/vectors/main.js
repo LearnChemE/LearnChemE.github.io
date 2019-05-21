@@ -38,10 +38,13 @@ let sumVectorButton;
 let sumPressed = false;
 let removeVectorButton;
 let resetVectorsButton;
+let dotProductButton;
+let dpResetButton;
 let crossVectorCheckbox;
 let normPlaneCheckbox;
 let arrowsCheckbox;
 let coordsCheckbox;
+var dotInput;
 
 let drawArrows = [false, false, false, false, false, false, false];
 let drawCoords = false;
@@ -106,33 +109,44 @@ class options {
   }
 
   static defaultSidebar() {
+    // "if" statement ensures this is only ever called once.
     if (newVectorButton === undefined) {
     newVectorButton = createButton('insert vector');
-    newVectorButton.position(width-100, 40);
+    newVectorButton.position(width-100, 90);
     newVectorButton.mousePressed(newVector);
   
     sumVectorButton = createButton('sum vectors');
-    sumVectorButton.position(width-100, 90);
+    sumVectorButton.position(width-100, 140);
     sumVectorButton.mousePressed(sumVector);
 
     removeVectorButton = createButton('remove vector');
-    removeVectorButton.position(width-100, 140);
+    removeVectorButton.position(width-100, 190);
     removeVectorButton.mousePressed(removeVector);
 
     resetVectorsButton = createButton('reset');
-    resetVectorsButton.position(width-100, 180);
+    resetVectorsButton.position(width-100, 240);
     resetVectorsButton.mousePressed(reset);
 
+    dotProductButton = createButton('dot product');
+    dotProductButton.position(width-100, 90);
+    dotProductButton.mousePressed(dot.product);
+    dotProductButton.hide();
+
+    dpResetButton = createButton('reset');
+    dpResetButton.position(width-100, 140);
+    dpResetButton.mousePressed(dot.reset);
+    dpResetButton.hide();
+
     crossVectorCheckbox = createCheckbox('show cross product', false);
-    crossVectorCheckbox.position(width-100, 10);
+    crossVectorCheckbox.position(width-100, 90);
     crossVectorCheckbox.changed(mySelectEvent);
 
     normPlaneCheckbox = createCheckbox('show normal plane', false);
-    normPlaneCheckbox.position(width-100, 50);
+    normPlaneCheckbox.position(width-100, 130);
     normPlaneCheckbox.changed(mySelectEvent);
 
     selectOptions = createSelect();
-    selectOptions.position(width-100, 220);
+    selectOptions.position(width-100, 40);
     selectOptions.option('vector addition');
     selectOptions.option('scalar multiplication');
     selectOptions.option('dot product');
@@ -140,16 +154,23 @@ class options {
     selectOptions.value(page);
     selectOptions.changed(reInitialize);
 
-    gui2D = createGui('plot controls', width - 100, 80);
-    gui2D.newSlider("multFac", -5, 5, 1, 0.1, "multiplication factor", "");
+    gui2D = createGui('Scalar Multiplier', width - 100, 80);
+    gui2D.newSlider("multFac", -4, 4, 1, 0.1, "multiplication factor", "");
     gui2D.addButton("multiply!", function() {
-      console.log("sweet");
+      scalar.Mult();
     });
     gui2D.addButton("reset", function() {
-      console.log("neat");
+      scalar.Reset();
     });
     gui2D.hide();
     }
+
+    dotInput = {
+      a: createInput('0'),
+      b: createInput('test2')
+    };
+    dotInput.a.position(10, 10);
+    dotInput.a.input(out => {dotInput.a.value(dot.sanitize(dotInput.a.value()));});
   }
 
   static drawAxes3D() {
@@ -260,6 +281,9 @@ class drawing {
 function setup() {
   if(page != "cross product") {
     createCanvas(pageWidth, pageHeight, P2D); // Add base canvas, x-pixels by y-pixels
+    $("#dotProductDiv").width(pageWidth - margins + "px");
+    $("#dotProductDiv").height(pageHeight + "px");
+    $("#dotProductDiv").hide();
 
     basePlot2D = new GPlot(this); // see "grafica.js" library for info on GPlots
     
@@ -296,23 +320,25 @@ function setup() {
   }
   else {
     createCanvas(pageWidth, pageHeight, WEBGL);
+
     options.defaultSidebar();
     resizeCanvas(pageWidth-100, pageHeight);
     textFont(myFont);
     textSize(rem*2);
 
+    $("#dotProductDiv").hide();
     newVectorButton.hide();
     sumVectorButton.hide();
     removeVectorButton.hide();
     resetVectorsButton.hide();
     normPlaneCheckbox.show();
-    selectOptions.position(width + 10, 90);
+    selectOptions.position(width + 10, 40);
 
     normalMaterial();
     ambientMaterial(39, 235, 91);
     camera(100, -200, (height/2.0) / tan(PI*30.0 / 180.0), 0, 0, 0, 0, 1, 0);
 
-    gui = createGui('plot controls', width + 10, 140);
+    gui = createGui('3D Plot Controls', width + 10, 180);
     gui.newSlider("x1", -4, 4, 1, 0.1, "vector 1 x-component", " i");
     gui.newSlider("y1", -4, 4, 1, 0.1, "vector 1 y-component", " j");
     gui.newSlider("z1", -4, 4, 1, 0.1, "vector 1 z-component", " k");
@@ -336,25 +362,44 @@ function reInitialize() {
   page = selectOptions.value();
   switch (page) {
     case "vector addition":
+      $("#dotProductDiv").hide();
+      dpResetButton.hide();
+      dotProductButton.hide();
       resetVectorsButton.show();
       removeVectorButton.show();
       newVectorButton.show();
       sumVectorButton.show();
-      selectOptions.position(width-100, 220);
       gui2D.hide();
     break;
     case "scalar multiplication":
       reset();
+      $("#dotProductDiv").hide();
+      dpResetButton.hide();
+      dotProductButton.hide();
+      scalar.limit = 1;
       pts[0] = getCoords(0, 0, basePlot2D);
       pts[1] = getCoords(1, 0, basePlot2D);
       resetVectorsButton.hide();
       removeVectorButton.hide();
       newVectorButton.hide();
       sumVectorButton.hide();
-      selectOptions.position(width-100, 40);
       gui2D.show();
     break;
+    case "dot product":
+      resetVectorsButton.hide();
+      removeVectorButton.hide();
+      newVectorButton.hide();
+      sumVectorButton.hide();
+      gui2D.hide();
+      $("#dotProductDiv").show();
+      dpResetButton.show();
+      dotProductButton.show();
+      break;
     case "cross product":
+      $("#dotProductDiv").hide();
+      dpResetButton.hide();
+      dotProductButton.hide();
+      gui2D.hide();
       twoDimension = false;
       newVectorButton.hide();
       sumVectorButton.hide();
@@ -366,25 +411,13 @@ function reInitialize() {
 }
 
 function reset() {
-  switch(page) {
-    case "vector addition":
-      while(n > 2) {
-        pts.pop();
-        n--;
-      }
-      vSum[0]=0;
-      vSum[1]=0;
-      sumPressed = false;
-      break;
-    case "scalar multiplication":
-      break;
-    case "dot product":
-      break;
-    case "cross product":
-      break;
-    default:
-      break;
+  while(n > 2) {
+    pts.pop();
+    n--;
   }
+  vSum[0]=0;
+  vSum[1]=0;
+  sumPressed = false;
 }
 
 function mySelectEvent() {
@@ -436,6 +469,36 @@ function removeVector() {
     n += -1;
   }
 }
+
+let scalar = {
+  Mult: function() {
+    if (multFac * this.limit <= 4) {
+    let ref00 = getCoords(0, 0, basePlot2D);
+    pts[1][0] = (pts[1][0]-ref00[0])*multFac+ref00[0];
+    pts[1][1] = (pts[1][1]-ref00[1])*multFac+ref00[1];
+    this.limit *= multFac;
+    }
+  },
+  Reset: function() {
+    pts[0] = getCoords(0, 0, basePlot2D);
+    pts[1] = getCoords(1, 0, basePlot2D);
+    this.limit = 1;
+  },
+  limit: 1
+};
+
+let dot = {
+  sanitize: function(str){
+    let re = /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/g;
+    if(str.match(re)) {console.log("good");} else {console.log("bad");}
+    return str;
+  },
+  v1: [0, 0],
+  v2: [0, 0],
+  vDP: [0, 0],
+  product: function() {},
+  reset: function() {}
+};
 
 // a quick function to get the plot coordinates (x, y) at pixels (xPix, yPix). gPlot is the ID of your GPlot.
 function loc(xPix, yPix, gPlot) {
@@ -657,11 +720,26 @@ function MovePoints(parentLayer) {
   }
   if (draggingPt[0])
     {
+    if (page == "scalar multiplication") {
+      if (draggingPt[1] != 0) {
+        pts[draggingPt[1]] = [mouseX + mouseOffset[0], mouseY + mouseOffset[1]];
+        let ref00 = getCoords(0, 0, basePlot2D);
+        let coords = loc(mouseX + mouseOffset[0], mouseY + mouseOffset[1], basePlot2D);
+        let mX = coords[0];
+        let mY = coords[1];
+        let currentMag = sqrt(pow(ptCoords[1][0],2)+pow(ptCoords[1][1],2));
+        let unitMag = sqrt(pow(mX,2)+pow(mY,2));
+
+        pts[1][0] = (pts[1][0]-ref00[0])*currentMag/unitMag+ref00[0];
+        pts[1][1] = (pts[1][1]-ref00[1])*currentMag/unitMag+ref00[1];
+      }
+    } else {
       pts[draggingPt[1]] = [mouseX + mouseOffset[0], mouseY + mouseOffset[1]];
       pts[draggingPt[1]][0] = Math.max(pts[draggingPt[1]][0], xyMin[0]);
       pts[draggingPt[1]][0] = Math.min(pts[draggingPt[1]][0], xyMax[0]);
       pts[draggingPt[1]][1] = Math.min(pts[draggingPt[1]][1], xyMin[1]);
       pts[draggingPt[1]][1] = Math.max(pts[draggingPt[1]][1], xyMax[1]);
+    }
     }
 }
 
@@ -695,12 +773,12 @@ function DrawVectors(parentLayer) {
     this.parentLayer.triangle(0, 0, 7, 20, -7, 20);
     this.parentLayer.pop();
   }
-
+  if (page == "vector addition") {
   this.parentLayer.push();
   fillColor(0);
   this.parentLayer.circle(pts[0][0], pts[0][1], r);
   this.parentLayer.pop();
-
+  }
   if(sumPressed) {
     this.parentLayer.push();
     this.parentLayer.stroke(0);
@@ -810,6 +888,7 @@ function draw() {
       DrawVectorText(extraCanvas);
       break;
     case "scalar multiplication":
+        if(frameCount % 30 == 0) {LaTexScMult();}
         plotdraw2D.drawMethod2D();
         image(extraCanvas, 0, 0);
         extraCanvas.background(255);
@@ -822,6 +901,9 @@ function draw() {
         DrawCoords(extraCanvas);
         DrawVectors(extraCanvas);
         DrawVectorText(extraCanvas);
+      break;
+    case "dot product":
+
       break;
     case "cross product":
       options.drawAxes3D();
@@ -836,6 +918,10 @@ function draw() {
         vector3D.normPlane(x1, y1, z1, x2, y2, z2);
       }
 
+      break;
+    default:
+      page = "vector addition";
+      reInitialize();
       break;
   }
   i++;
@@ -860,8 +946,11 @@ function mouseReleased() {
   draggingPt[0] = false;
 
   switch(page) {
-   case "vector addition":
+    case "vector addition":
       LaTexAddition();
+      break;
+    case "scalar multiplication":
+      LaTexScMult();
       break;
     case "cross product":
       LaTexCross();
@@ -888,6 +977,15 @@ function LaTexCross() {
     if (drawCross) {
       let crossProd = vector3D.cross2(x1, y1, z1, x2, y2, z2);
       vecEqn+=`= \\begin{bmatrix}${(crossProd[0]).toFixed(1)} \\\\ ${(crossProd[1]).toFixed(1)} \\\\ ${(crossProd[2]).toFixed(1)}\\end{bmatrix}`}
+    let math = MathJax.Hub.getAllJax("vectorLATEX")[0];
+    MathJax.Hub.Queue(["Text",math, vecEqn]);
+}
+
+function LaTexScMult() {
+  let vecEqn = `\\vec{u} = `;
+    vecEqn+=`${multFac} `;
+    vecEqn+=`\\begin{bmatrix}${(ptCoords[1][0]).toFixed(1)} \\\\ ${(ptCoords[1][1]).toFixed(1)} \\end{bmatrix}`;
+    vecEqn+=`= \\begin{bmatrix}${(ptCoords[1][0]*multFac).toFixed(1)} \\\\ ${(ptCoords[1][1]*multFac).toFixed(1)} \\end{bmatrix}`;
     let math = MathJax.Hub.getAllJax("vectorLATEX")[0];
     MathJax.Hub.Queue(["Text",math, vecEqn]);
 }
