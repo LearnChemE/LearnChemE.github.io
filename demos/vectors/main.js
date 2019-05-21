@@ -171,6 +171,8 @@ class options {
     };
     dotInput.a.position(10, 10);
     dotInput.a.input(out => {dotInput.a.value(dot.sanitize(dotInput.a.value()));});
+    dotInput.a.hide();
+    dotInput.b.hide();
   }
 
   static drawAxes3D() {
