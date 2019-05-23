@@ -870,7 +870,17 @@ class vector3D {
 
 function draw() {
   // when everything is evaluated and it starts drawing, update the LaTex text. Happens once.
-  if(frameCount == 10) {mouseReleased();}
+  if(frameCount % 10 == 0) {switch(page) {
+    case "vector addition":
+      LaTexAddition();
+      break;
+    case "scalar multiplication":
+      LaTexScMult();
+      break;
+    case "cross product":
+      LaTexCross();
+      break;
+  }}
 
   background(255); // draws light gray background every frame
 
@@ -946,18 +956,6 @@ function mousePressed() {
 function mouseReleased() {
   // Quit dragging
   draggingPt[0] = false;
-
-  switch(page) {
-    case "vector addition":
-      LaTexAddition();
-      break;
-    case "scalar multiplication":
-      LaTexScMult();
-      break;
-    case "cross product":
-      LaTexCross();
-      break;
-  }
 }
 
 function LaTexAddition() {
