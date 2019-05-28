@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>sanitize an input field</title>
+    <script>
+        function sanitizeFloat(txt) {
+            let re = /^[-]?((\d+(\.\d*)?)|(\.\d+))$/g;
+            let str = txt.value;
+            if (!str.match(re)) {
+                str = str.replace(/[^0-9.-]/g, "");
+                let t = 0;
+                str = str.replace(/\./g, function (match) {
+                    t++;
+                    return (t >= 2) ? "" : match;
+                });
+                t = 0;
+                if (!str.match(/^[^\-].*/)) {
+                    str = str.replace(/\-/g, function (match) {
+                        t++;
+                        return (t >= 2) ? "" : match;
+                    });
+                } else {
+                    str = str.replace(/\-/g, "");
+                }
+                txt.value = str;
+            }
+            if (!isNaN(parseFloat(Number(txt.value)))) {
+                document.getElementById("outputText").innerText = parseFloat(Number(txt.value));
+            }
+        }
+        function sanitizeText(txt) {
+            let re = /^[a-zA-Z]+$/g;
+            let str = txt.value;
+            if (!str.match(re)) {
+                str = str.replace(/[^a-zA-Z]/g, "");
+                txt.value = str;
+            }
+            document.getElementById("outputText2").innerText = txt.value;
+        }
+    </script>
+    <style>#txt {width:500px;padding-top:50px;}</style>
+</head>
+
+<body>
+    <p>this input box will only accept valid numbers as input (with optional decimals and negative sign):</p>
+    <input type="text" oninput="javascript:sanitizeFloat(document.getElementById('inputBox'))" class="form-control" id="inputBox">
+    <p>output:</p>
+    <p id="outputText">0</p>
+    <p><br><br>similar can be done to only accept letters:</p>
+    <input type="text" oninput="javascript:sanitizeText(document.getElementById('inputBox2'))" class="form-control" id="inputBox2">
+    <p>output:</p>
+    <p id="outputText2"></p>
+    <p id="txt">and so on ... this is HIGHLY recommended for security and bug prevention. View source code for more info. If your website handles sensitive information such as passwords or credit card info, please do more research before adding input boxes of <b>ANY</b> kind, even with input sanitization. For apps on LearnChemE.com, though, this will work fine.</p>
+</body>
+
+</html>

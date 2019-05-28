@@ -4,6 +4,12 @@
 		<meta charset="UTF-8">
 		
 		<title>vectors!</title>
+
+		<!-- Bootstrap, Popper, jQuery.... -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+		<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 		
 		<!-- imports math functions -->
 		<script type="text/javascript" src="libraries/math.min.js"></script>
@@ -22,18 +28,45 @@
 		<link rel="stylesheet" type="text/css" href="style.css">
 		<link rel="stylesheet" type="text/css" href="libraries/quicksettings3/quicksettingsCustom.min.css">
 
-		<!-- imports some utilities -->
-		<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML" async></script>
+		<!-- imports MathJax, for writing the LaTex -->
+		<script async src="libraries/MathJax-master/MathJax.js?config=default"></script>
 		
 	</head>
 
 	<body>
 		<!-- runs the main code -->
-		<script type="text/javascript" src="main.min.js"></script>
+		<script type="text/javascript" src="main.js"></script>
 		<div id="dotProductDiv">
-			
+			<div id="vec1">
+				<div class="input-group mb-3 input-group-lg">
+					<input type="text" oninput="javascript:sanitize(dotInput.i1)" class="form-control" id="inpVec1i">
+					<div class="input-group-append"><span class="input-group-text">$$\hat{\imath}$$</span></div>
+				</div>
+				<div class="input-group mb-3 input-group-lg">
+					<input type="text" oninput="javascript:sanitize(dotInput.j1)" class="form-control" id="inpVec1j">
+					<div class="input-group-append"><span class="input-group-text">$$\hat{\jmath}$$</span></div>
+				</div>
+				<div class="input-group mb-3 input-group-lg">
+					<input type="text" oninput="javascript:sanitize(dotInput.k1)" class="form-control" id="inpVec1k">
+					<div class="input-group-append"><span class="input-group-text">$$\hat{k}$$</span></div>
+				</div>
+			</div>
+
+			<div id="vec2">
+				<div class="input-group mb-3 input-group-lg">
+						<input type="text" oninput="javascript:sanitize(dotInput.i2)" class="form-control" id="inpVec2i">
+						<div class="input-group-append"><span class="input-group-text">$$\hat{\imath}$$</span></div>
+				</div>
+				<div class="input-group mb-3 input-group-lg">
+						<input type="text" oninput="javascript:sanitize(dotInput.j2)" class="form-control" id="inpVec2j">
+						<div class="input-group-append"><span class="input-group-text">$$\hat{\jmath}$$</span></div>
+				</div>
+				<div class="input-group mb-3 input-group-lg">
+						<input type="text" oninput="javascript:sanitize(dotInput.k2)" class="form-control" id="inpVec2k">
+						<div class="input-group-append"><span class="input-group-text">$$\hat{k}$$</span></div>
+				</div>
+			</div>
 		</div>
-		<p id="vectorLATEX">$$\vec{v} = \begin{bmatrix}2.5 \\ 2.8\end{bmatrix}$$</p>
+		<p id="vectorLATEX">$$\vec{v} = \begin{bmatrix}loading.. \\ loading..\end{bmatrix}$$</p>
 	</body>
 </html>

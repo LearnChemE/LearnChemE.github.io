@@ -166,13 +166,13 @@ class options {
     }
 
     dotInput = {
-      a: createInput('0'),
-      b: createInput('test2')
+      i1: document.getElementById("inpVec1i"),
+      j1: document.getElementById("inpVec1j"),
+      k1: document.getElementById("inpVec1k"),
+      i2: document.getElementById("inpVec2i"),
+      j2: document.getElementById("inpVec2j"),
+      k2: document.getElementById("inpVec2k"),
     };
-    dotInput.a.position(10, 10);
-    dotInput.a.input(out => {dotInput.a.value(dot.sanitize(dotInput.a.value()));});
-    dotInput.a.hide();
-    dotInput.b.hide();
   }
 
   static drawAxes3D() {
@@ -288,7 +288,6 @@ function setup() {
     $("#dotProductDiv").hide();
 
     basePlot2D = new GPlot(this); // see "grafica.js" library for info on GPlots
-    
     ops = new options();
     ops.gPlot = basePlot2D;
     ops.defaultPlot();
@@ -352,6 +351,39 @@ function setup() {
     LaTexCross();
 
     loop();
+  }
+}
+
+function sanitize(txt) {
+  let re = /^[-]?((\d+(\.\d*)?)|(\.\d+))$/g;
+  let str = txt.value;
+  if(!str.match(re)) {
+    str = str.replace(/[^0-9.-]/g, "");
+    let t=0;   
+    str = str.replace(/\./g, function (match) {
+      t++;
+      return (t >= 2) ? "" : match;
+    });
+    t=0;
+    if(!str.match(/^[^\-].*/)) {   
+      str = str.replace(/\-/g, function (match) {
+        t++;
+        return (t >= 2) ? "" : match;
+      });} else {
+        str = str.replace(/\-/g,"");
+      }
+    txt.value=str;
+  }
+  if(str.length > 6) {
+    txt.value = str.slice(0, 6);
+  }
+  if(!isNaN(parseFloat(Number(txt.value)))) { 
+  dot.v1[0] = parseFloat(Number(dotInput.i1.value).toFixed(2));
+  dot.v1[1] = parseFloat(Number(dotInput.j1.value).toFixed(2));
+  dot.v1[2] = parseFloat(Number(dotInput.k1.value).toFixed(2));
+  dot.v2[0] = parseFloat(Number(dotInput.i2.value).toFixed(2));
+  dot.v2[1] = parseFloat(Number(dotInput.j2.value).toFixed(2));
+  dot.v2[2] = parseFloat(Number(dotInput.k2.value).toFixed(2));
   }
 }
 
@@ -490,13 +522,8 @@ let scalar = {
 };
 
 let dot = {
-  sanitize: function(str){
-    let re = /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/g;
-    if(str.match(re)) {console.log("good");} else {console.log("bad");}
-    return str;
-  },
-  v1: [0, 0],
-  v2: [0, 0],
+  v1: [0, 0, 0],
+  v2: [0, 0, 0],
   vDP: [0, 0],
   product: function() {},
   reset: function() {}

@@ -13,13 +13,29 @@ canvas {
 }
 
 #dotProductDiv {
-  position: absolute;
+  position: relative;
   left: 0px;
   top: 0px;
-  display: grid;
+
   width: 500px;
   height: 500px;
   background: #97979767;
+}
+
+#vec1, #vec2 {
+  width: 125px;
+}
+
+#vec1 {
+  position: absolute;
+  left: 100px;
+  top: 100px;
+}
+
+#vec2 {
+  position: absolute;
+  left: 400px;
+  top: 100px;
 }
 
 #vectorLATEX {
@@ -27,4 +43,7 @@ canvas {
   outline: solid 1px #000000;
   order: 2;
   font-size: 1rem;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
