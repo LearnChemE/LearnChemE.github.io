@@ -246,7 +246,7 @@ window.onload = function () {
 		.addRange("Block heat capacity", 0.1, 10, 4, 0.1, function (value) {
 			heatCapacity1 = value;
 		}, `&nbspJ / (g°C)`)
-		.addRange("Block mass", 0.1, 5, 2, 0.1, function (value) {
+		.addRange("Block mass", 0.1, 10, 2, 0.1, function (value) {
 			mass1 = value;
 		}, `&nbspg (per block)`)
 		.addRange("Block area", 1, 9, 4, 1, function (value) {
