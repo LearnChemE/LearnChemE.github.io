@@ -347,8 +347,7 @@ function setup() {
     gui.newSlider("y2", -4, 4, 1, 0.1, "vector 2 y-component", " j");
     gui.newSlider("z2", -4, 4, 1, 0.1, "vector 2 z-component", " k");
 
-
-    LaTexCross();
+    $("#vectorLATEX").css({"height":"6rem"});
 
     loop();
   }
@@ -392,7 +391,7 @@ function reInitialize() {
    * re-initializes the canvas when user switches to a different section
    */
   sessionStorage.setItem("pageVal", selectOptions.value());
-  if (page == "cross product") {location.reload();}
+  if (page == "cross product" || selectOptions.value == "cross product") {location.reload();}
   page = selectOptions.value();
   switch (page) {
     case "vector addition":
@@ -897,7 +896,7 @@ class vector3D {
 
 function draw() {
   // when everything is evaluated and it starts drawing, update the LaTex text. Happens once.
-  if(frameCount % 10 == 0) {switch(page) {
+  if(frameCount % 30 == 0) {switch(page) {
     case "vector addition":
       LaTexAddition();
       break;
@@ -906,6 +905,8 @@ function draw() {
       break;
     case "cross product":
       LaTexCross();
+      break;
+    default:
       break;
   }}
 

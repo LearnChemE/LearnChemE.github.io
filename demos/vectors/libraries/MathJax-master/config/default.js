@@ -799,6 +799,9 @@ MathJax.Hub.Config({
     styles: {
       ".MathJax_Display": {
         "margin": "0rem 0rem"
+      },
+      "#vectorLATEX > .MathJax_Display":{
+        "top": "1rem"
       }
     },
     
@@ -1105,4 +1108,4 @@ MathJax.Hub.Config({
   }
 });
 
-MathJax.Ajax.loadComplete("[MathJax]/config/default.js");
+MathJax.Ajax.loadComplete("[MathJax]/config/default.min.js");
