@@ -576,21 +576,21 @@ function startMelting() {
 	currentStep = 0;
 	blockHeight = 51;
 
-	panel1.disableControl("Initial Temperature");
-	panel1.disableControl("Block Heat Capacity");
-	panel1.disableControl("Block Mass");
-	panel1.disableControl("Block Area");
-	panel1.disableControl("Number of Blocks");
-	panel1.disableControl("Add Stir Bar");
+	panel1.disableControl("Initial temperature");
+	panel1.disableControl("Block heat capacity");
+	panel1.disableControl("Block mass");
+	panel1.disableControl("Block area");
+	panel1.disableControl("Number of blocks");
+	panel1.disableControl("Add stir bar");
 
-	panel2.disableControl("Initial Temperature");
-	panel2.disableControl("Block Heat Capacity");
-	panel2.disableControl("Block Mass");
-	panel2.disableControl("Block Area");
-	panel2.disableControl("Number of Blocks");
-	panel2.disableControl("Add Stir Bar");
+	panel2.disableControl("Initial temperature");
+	panel2.disableControl("Block heat capacity");
+	panel2.disableControl("Block mass");
+	panel2.disableControl("Block area");
+	panel2.disableControl("Number of blocks");
+	panel2.disableControl("Add stir bar");
 
-	panel3.disableControl("duration to simulate");
+	panel3.disableControl("Simulation time");
 }
 
 /*
@@ -601,21 +601,21 @@ function resetExperiment() {
 
 	// Re-enable the input fields if they are disabled
 	if (experimentRunning || experimentStarted) {
-		panel1.enableControl("Initial Temperature");
-		panel1.enableControl("Block Heat Capacity");
-		panel1.enableControl("Block Mass");
-		panel1.enableControl("Block Area");
-		panel1.enableControl("Number of Blocks");
-		panel1.enableControl("Add Stir Bar");
+		panel1.enableControl("Initial temperature");
+		panel1.enableControl("Block heat capacity");
+		panel1.enableControl("Block mass");
+		panel1.enableControl("Block area");
+		panel1.enableControl("Number of blocks");
+		panel1.enableControl("Add stir bar");
 	
-		panel2.enableControl("Initial Temperature");
-		panel2.enableControl("Block Heat Capacity");
-		panel2.enableControl("Block Mass");
-		panel2.enableControl("Block Area");
-		panel2.enableControl("Number of Blocks");
-		panel2.enableControl("Add Stir Bar");
-
-		panel3.enableControl("duration to simulate");
+		panel2.enableControl("Initial temperature");
+		panel2.enableControl("Block heat capacity");
+		panel2.enableControl("Block mass");
+		panel2.enableControl("Block area");
+		panel2.enableControl("Number of blocks");
+		panel2.enableControl("Add stir bar");
+	
+		panel3.enableControl("Simulation time");
 	}
 
 	experimentRunning = false;
