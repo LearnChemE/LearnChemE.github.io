@@ -3482,7 +3482,8 @@ function GPlot() {
 	this.boxBgColor = this.parent.color(245);
 	this.boxLineColor = this.parent.color(210);
 	this.boxLineWidth = 1;
-	this.gridLineColor = this.parent.color(210);
+	this.gridLineColor = this.parent.color(220);
+	this.gridLineColor2 = this.parent.color(235);
 	this.gridLineWidth = 1;
 
 	// Layers
@@ -4312,31 +4313,44 @@ GPlot.prototype.drawGridLines = function(gridType) {
 
 	this.parent.push();
 	this.parent.noFill();
-	this.parent.stroke(this.gridLineColor);
+	
 	this.parent.strokeWeight(this.gridLineWidth);
 	this.parent.strokeCap(this.parent.SQUARE);
 
 	if (gridType === GPlot.BOTH || gridType === GPlot.VERTICAL) {
 		var xPlotTicks = this.xAxis.getPlotTicksRef();
-
+		this.parent.stroke(this.gridLineColor);
 		for (i = 0; i < xPlotTicks.length; i++) {
 			if (xPlotTicks[i] >= 0 && xPlotTicks[i] <= this.dim[0]) {
 				this.parent.line(xPlotTicks[i], 0, xPlotTicks[i], -this.dim[1]);
+			}
+		}
+		this.parent.stroke(this.gridLineColor2);
+		for (i = 0; i < xPlotTicks.length + 1; i++) {
+			if (xPlotTicks[i] >= 0 && xPlotTicks[i] <= this.dim[0]) {
+				this.parent.line((xPlotTicks[i] + xPlotTicks[i + 1])/2, 0, (xPlotTicks[i] + xPlotTicks[i + 1])/2, -this.dim[1]);
 			}
 		}
 	}
 
 	if (gridType === GPlot.BOTH || gridType === GPlot.HORIZONTAL) {
 		var yPlotTicks = this.yAxis.getPlotTicksRef();
-
+		this.parent.stroke(this.gridLineColor);
 		for (i = 0; i < yPlotTicks.length; i++) {
 			if (-yPlotTicks[i] >= 0 && -yPlotTicks[i] <= this.dim[1]) {
 				this.parent.line(0, yPlotTicks[i], this.dim[0], yPlotTicks[i]);
 			}
 		}
+		this.parent.stroke(this.gridLineColor2);
+		for (i = 0; i < yPlotTicks.length; i++) {
+			if (-yPlotTicks[i] >= 0 && -yPlotTicks[i] <= this.dim[1]) {
+				this.parent.line(0, (yPlotTicks[i] + yPlotTicks[i + 1])/2, this.dim[0], (yPlotTicks[i] + yPlotTicks[i + 1])/2);
+			}
+		}
 	}
 
 	this.parent.pop();
+	
 };
 
 GPlot.prototype.drawHistograms = function() {

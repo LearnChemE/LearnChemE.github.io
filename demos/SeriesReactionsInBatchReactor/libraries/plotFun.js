@@ -5,6 +5,8 @@
  * Requires: Math.js, p5.js, and grafica.js
  */
 
+var graphFontSize;
+
 /**
  * Turns a function into a 2-dimensional array of coordinates.
  * @example functionToArray("2*x + 1", ["x", 0, 5, 2]) // Returns [[0, 1], [2, 5], [4, 9]]
@@ -142,8 +144,11 @@ class PlotCanvas {
     this.xAxisLabel = "x - label";
     this.yAxisLabel = "y - label";
     this.plotTitle = "Plot Title";
-
     this.funcs = new Array(0);
+    this.fontSize = 18;
+    this.titleFontSize = 18;
+    this.axisFontSize = 15;
+    this.axisLabelSize = 15;
   }
 
   addFuncs() {
@@ -158,6 +163,7 @@ class PlotCanvas {
     this.GPLOT.beginDraw();
     this.GPLOT.drawBackground();
     this.GPLOT.drawBox();
+    this.GPLOT.drawGridLines(2);
 
     for (i=0; i<this.funcs.length; i++) {
       stroke(this.funcs[i].lineColor);
@@ -173,6 +179,12 @@ class PlotCanvas {
   }
 
   plotSetup() {
+    this.GPLOT.setFontSize(this.fontSize);
+    this.GPLOT.getXAxis().fontSize = this.axisFontSize;
+    this.GPLOT.getYAxis().fontSize = this.axisFontSize;
+    this.GPLOT.getXAxis().lab.fontSize = this.axisLabelSize;
+    this.GPLOT.getYAxis().lab.fontSize = this.axisLabelSize;
+    this.GPLOT.getTitle().fontSize = this.titleFontSize;
     this.GPLOT.setPos.apply(this.GPLOT, this.pos);
     this.GPLOT.setOuterDim.apply(this.GPLOT, this.dims);
     this.GPLOT.setXLim.apply(this.GPLOT, this.xLims);
@@ -180,6 +192,43 @@ class PlotCanvas {
     this.GPLOT.getXAxis().getAxisLabel().setText(this.xAxisLabel);
     this.GPLOT.getYAxis().getAxisLabel().setText(this.yAxisLabel);
     this.GPLOT.getTitle().setText(this.plotTitle);
+  }
+
+  labelDraw(text, x, y, col, align, subsuper, background) {
+    let xAlign = CENTER;
+    let yAlign = CENTER;
+    if(align) {
+      xAlign = align[0];
+      yAlign = align[1];
+    }
+    let fontSize = this.fontSize;
+    if(subsuper) {
+      switch(subsuper) {
+        case "sub":
+          fontSize = this.fontSize * 0.8;
+          break;
+        case "super":
+          fontSize = this.fontSize * 0.8;
+          break;
+        default:
+          break;
+      }
+    }
+    if(background) {
+      let coords = this.GPLOT.getScreenPosAtValue(x, y);
+      push();
+      fill(this.GPLOT.boxBgColor.levels[0], this.GPLOT.boxBgColor.levels[1], this.GPLOT.boxBgColor.levels[2], col.levels[3]);
+      noStroke();
+      rectMode(CENTER);
+      rect(coords[0], coords[1], fontSize * background[0], fontSize * background[1]);
+      pop();
+    }
+
+    this.GPLOT.getMainLayer().fontColor = col;
+    this.GPLOT.getMainLayer().fontSize = fontSize;
+    this.GPLOT.beginDraw();
+    this.GPLOT.drawAnnotation(text, x, y, xAlign, yAlign);
+    this.GPLOT.endDraw();
   }
 }
 

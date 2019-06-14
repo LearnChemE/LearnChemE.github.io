@@ -94,6 +94,42 @@
         if (units === undefined) {g = "";} else {g = units;}
         return qs.bindRange(a, b, c, d, e, window, f, g);
     };
+    /**
+     * Adds a dropdown menu. If only one argument is given, the variable is assigned to a global variable called "selection".
+     * @example GUI.newDropdown(["option 1", "option 2"]), or GUI.newDropdown("globalVariable", ["assignment 1", "assignment 2", ...]), or GUI.newDropdown("key", ["value 1", "value 2", ...], object), or GUI.newDropdown("globalVariable", ["assignment 1", "assignment 2" ...], "title"), or GUI.newDropdown("key", ["value 1", "value 2" ...], object, "title")
+     * @param [variable] {String} Name of global variable.
+     * @param options {Array} Minimum value of control.
+     * @param [object] {Object} Maximum value of control.
+     * @param [title] {String} Label to put above dropdown.
+     */
+    this.newDropdown = function(variable, options, object) {
+      let a; let b; let c; let d;
+      if (arguments.length == 1) {
+        var selection = arguments[0][0];
+        b = arguments[0];
+        return qs.addDropDown(a, b, function (value) {selection = value.value;});
+      } else if (arguments.length == 2) {
+        a = arguments[0];
+        b = arguments[1];
+        return qs.addDropDown("", b, function (value) {this[a] = value.value;});
+      } else if (arguments.length == 3 && typeof arguments[2] != "string") {
+        a = arguments[0];
+        b = arguments[1];
+        c = arguments[2];
+        return qs.addDropDown(a, b, function (value) {c[a] = value.value;});
+      } else if (arguments.length == 3 && typeof arguments[2] == "string") {
+        a = arguments[0];
+        b = arguments[1];
+        c = arguments[2];
+        return qs.addDropDown(c, b, function (value) {this[a] = value.value;});
+      } else if (arguments.length == 4) {
+        a = arguments[0];
+        b = arguments[1];
+        c = arguments[2];
+        d = arguments[3];
+        return qs.addDropDown(d, b, function (value) {c[a] = value.value;});
+      }
+    };
 
     // addObject(object) to add all params of the object
     // addObject(object, param1, param2, ...) to add selected params
