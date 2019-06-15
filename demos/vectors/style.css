@@ -13,29 +13,57 @@ canvas {
 }
 
 #dotProductDiv {
-  position: relative;
+  position: absolute;
   left: 0px;
   top: 0px;
-
   width: 500px;
   height: 500px;
   background: #97979767;
 }
 
 #vec1, #vec2 {
-  width: 125px;
+  width: 165px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 10px;
 }
 
 #vec1 {
   position: absolute;
-  left: 100px;
+  left: 10%;
   top: 100px;
 }
 
 #vec2 {
   position: absolute;
-  left: 400px;
+  left: 50%;
   top: 100px;
+}
+
+.form-control {
+  background:#ffffff;
+  transition-property: background;
+  transition-duration: 0.6s;
+  transition-timing-function: ease-in;
+}
+
+.dotProdLabel {
+  position: absolute;
+  left: 0;
+  top: 0px;
+  transform: translateY(-100%);
+  min-width: 165px;
+  padding: 5px;
+  color: #000000;
+  font-size: 2rem;
+  z-index: 1;
+}
+
+.form-control.highlighted {
+  background:#FFFF00;
+  transition-property: background;
+  transition-duration: 0.6s;
+  transition-timing-function: ease-in;
 }
 
 #vectorLATEX {

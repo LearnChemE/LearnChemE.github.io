@@ -36,7 +36,7 @@ let selectOptions;
 let newVectorButton;
 let sumVectorButton;
 let sumPressed = false;
-let removeVectorButton;
+//let removeVectorButton;
 let resetVectorsButton;
 let dotProductButton;
 let dpResetButton;
@@ -119,9 +119,9 @@ class options {
     sumVectorButton.position(width-100, 140);
     sumVectorButton.mousePressed(sumVector);
 
-    removeVectorButton = createButton('remove vector');
+    /*removeVectorButton = createButton('remove vector');
     removeVectorButton.position(width-100, 190);
-    removeVectorButton.mousePressed(removeVector);
+    removeVectorButton.mousePressed(removeVector);*/
 
     resetVectorsButton = createButton('reset');
     resetVectorsButton.position(width-100, 240);
@@ -155,7 +155,7 @@ class options {
     selectOptions.changed(reInitialize);
 
     gui2D = createGui('Scalar Multiplier', width - 100, 80);
-    gui2D.newSlider("multFac", -4, 4, 1, 0.1, "multiplication factor", "");
+    gui2D.newSlider("multFac", -4, 4, 1, 0.1, "multiply by", "");
     gui2D.addButton("multiply!", function() {
       scalar.Mult();
     });
@@ -284,7 +284,7 @@ function setup() {
   if(page != "cross product") {
     createCanvas(pageWidth, pageHeight, P2D); // Add base canvas, x-pixels by y-pixels
     $("#dotProductDiv").width(pageWidth - margins + "px");
-    $("#dotProductDiv").height(pageHeight + "px");
+    $("#dotProductDiv").height(pageHeight - margins + "px");
     $("#dotProductDiv").hide();
 
     basePlot2D = new GPlot(this); // see "grafica.js" library for info on GPlots
@@ -330,7 +330,7 @@ function setup() {
     $("#dotProductDiv").hide();
     newVectorButton.hide();
     sumVectorButton.hide();
-    removeVectorButton.hide();
+    //removeVectorButton.hide();
     resetVectorsButton.hide();
     normPlaneCheckbox.show();
     selectOptions.position(width + 10, 40);
@@ -373,16 +373,22 @@ function sanitize(txt) {
       }
     txt.value=str;
   }
-  if(str.length > 6) {
-    txt.value = str.slice(0, 6);
+  if(str.includes("-") && str.charAt(3) == ".") {
+    txt.value = str.slice(0, 5);
+  } else
+  if(str.length > 4) {
+    txt.value = str.slice(0, 4);
+  }
+  if(!str.includes("-") && str.charAt(2) != ".") {
+    txt.value = str.slice(0, 3);
   }
   if(!isNaN(parseFloat(Number(txt.value)))) { 
-  dot.v1[0] = parseFloat(Number(dotInput.i1.value).toFixed(2));
-  dot.v1[1] = parseFloat(Number(dotInput.j1.value).toFixed(2));
-  dot.v1[2] = parseFloat(Number(dotInput.k1.value).toFixed(2));
-  dot.v2[0] = parseFloat(Number(dotInput.i2.value).toFixed(2));
-  dot.v2[1] = parseFloat(Number(dotInput.j2.value).toFixed(2));
-  dot.v2[2] = parseFloat(Number(dotInput.k2.value).toFixed(2));
+  dot.v1[0] = parseFloat(Number(dotInput.i1.value).toFixed(1));
+  dot.v1[1] = parseFloat(Number(dotInput.j1.value).toFixed(1));
+  dot.v1[2] = parseFloat(Number(dotInput.k1.value).toFixed(1));
+  dot.v2[0] = parseFloat(Number(dotInput.i2.value).toFixed(1));
+  dot.v2[1] = parseFloat(Number(dotInput.j2.value).toFixed(1));
+  dot.v2[2] = parseFloat(Number(dotInput.k2.value).toFixed(1));
   }
 }
 
@@ -391,15 +397,16 @@ function reInitialize() {
    * re-initializes the canvas when user switches to a different section
    */
   sessionStorage.setItem("pageVal", selectOptions.value());
-  if (page == "cross product" || selectOptions.value == "cross product") {location.reload();}
+  if (page == "cross product" || selectOptions.value() == "cross product") {location.reload();}
   page = selectOptions.value();
   switch (page) {
     case "vector addition":
       $("#dotProductDiv").hide();
       dpResetButton.hide();
       dotProductButton.hide();
+      $("#vectorLATEX").css({"height":"5rem"});
       resetVectorsButton.show();
-      removeVectorButton.show();
+      //removeVectorButton.show();
       newVectorButton.show();
       sumVectorButton.show();
       gui2D.hide();
@@ -409,24 +416,27 @@ function reInitialize() {
       $("#dotProductDiv").hide();
       dpResetButton.hide();
       dotProductButton.hide();
+      $("#vectorLATEX").css({"height":"5rem"});
       scalar.limit = 1;
       pts[0] = getCoords(0, 0, basePlot2D);
       pts[1] = getCoords(1, 0, basePlot2D);
       resetVectorsButton.hide();
-      removeVectorButton.hide();
+      //removeVectorButton.hide();
       newVectorButton.hide();
       sumVectorButton.hide();
       gui2D.show();
     break;
     case "dot product":
       resetVectorsButton.hide();
-      removeVectorButton.hide();
+      //removeVectorButton.hide();
       newVectorButton.hide();
       sumVectorButton.hide();
       gui2D.hide();
+      $("#vectorLATEX").css({"height":"6rem"});
       $("#dotProductDiv").show();
       dpResetButton.show();
       dotProductButton.show();
+      dot.reset();
       break;
     case "cross product":
       $("#dotProductDiv").hide();
@@ -495,37 +505,107 @@ function sumVector() {
   }
 }
 
-function removeVector() {
+/*function removeVector() {
   if(!sumPressed && n > 2) {
     pts.pop();
     graphicsOffset.pop();
     n += -1;
   }
-}
+}*/
 
 let scalar = {
   Mult: function() {
-    if (multFac * this.limit <= 4) {
     let ref00 = getCoords(0, 0, basePlot2D);
     pts[1][0] = (pts[1][0]-ref00[0])*multFac+ref00[0];
     pts[1][1] = (pts[1][1]-ref00[1])*multFac+ref00[1];
-    this.limit *= multFac;
-    }
   },
   Reset: function() {
     pts[0] = getCoords(0, 0, basePlot2D);
     pts[1] = getCoords(1, 0, basePlot2D);
-    this.limit = 1;
-  },
-  limit: 1
+  }
 };
 
 let dot = {
   v1: [0, 0, 0],
   v2: [0, 0, 0],
-  vDP: [0, 0],
-  product: function() {},
-  reset: function() {}
+  Prod: 0,
+  baseEqn: "",
+  Eqn: "",
+  animationStep: 1,
+  animationRunning: false,
+  product: function() {
+    dot.animationRunning = true;
+    dot.Prod = dot.v1[0]*dot.v2[0] + dot.v1[1]*dot.v2[1] + dot.v1[2]*dot.v2[2];
+    dot.animationStep = 1;
+    dot.baseEqn = `\\require{color} \\vec{u} \\cdot \\vec{v} = `;
+    dot.baseEqn+=`\\begin{bmatrix}${(dot.v1[0]).toFixed(1)} \\\\ ${(dot.v1[1]).toFixed(1)} \\\\ ${(dot.v1[2]).toFixed(1)} \\end{bmatrix}`;
+    dot.baseEqn+=`\\cdot`;
+    dot.baseEqn+=`\\begin{bmatrix}${(dot.v2[0]).toFixed(1)} \\\\ ${(dot.v2[1]).toFixed(1)} \\\\ ${(dot.v2[2]).toFixed(1)} \\end{bmatrix}`;
+    
+    // sequentially highlight input boxes when "dot product" button is pressed
+    $("#inpVec1i, #inpVec2i").queue(function() {
+      if(dot.animationStep == 1) {
+        dot.Eqn = dot.baseEqn +
+        `=(\\colorbox{yellow}{${(dot.v1[0]).toFixed(1)}} \\cdot \\colorbox{yellow}{${(dot.v2[0]).toFixed(1)}}) ...`;}
+      dot.animationStep = 2;
+      $( this ).addClass( "highlighted" ).dequeue();
+    })
+    .delay(2000)
+    .queue(function() {
+      $( this ).removeClass( "highlighted" ).dequeue();
+    });
+
+    $("#inpVec1j, #inpVec2j").delay(2600)
+    .queue(function() {
+      if(dot.animationStep == 2) {
+        dot.Eqn = dot.baseEqn +
+        `=(${(dot.v1[0]).toFixed(1)}\\cdot ${(dot.v2[0]).toFixed(1)})` +
+        `+(\\colorbox{yellow}{${(dot.v1[1]).toFixed(1)}} \\cdot \\colorbox{yellow}{${(dot.v2[1]).toFixed(1)}}) ...`;
+      }
+      dot.animationStep = 3;
+      $( this ).addClass( "highlighted" ).dequeue();
+    })
+    .delay(2000)
+    .queue(function() {
+      $( this ).removeClass( "highlighted" ).dequeue();
+    });
+    
+    $("#inpVec1k, #inpVec2k").delay(5200)
+    .queue(function() {
+      if(dot.animationStep == 3) {
+        dot.Eqn = dot.baseEqn +
+        `=(${(dot.v1[0]).toFixed(1)}\\cdot ${(dot.v2[0]).toFixed(1)})` +
+        `+(${(dot.v1[1]).toFixed(1)}\\cdot ${(dot.v2[1]).toFixed(1)})` +
+        `+(\\colorbox{yellow}{${(dot.v1[2]).toFixed(1)}} \\cdot \\colorbox{yellow}{${(dot.v2[2]).toFixed(1)}}) ...`;}
+      dot.animationStep = 4;
+      $( this ).addClass( "highlighted" ).dequeue();
+    })
+    .delay(2400)
+    .queue(function() {
+      if(dot.animationStep == 4) {
+        dot.Eqn = dot.baseEqn +
+        `=(${(dot.v1[0]).toFixed(1)}\\cdot ${(dot.v2[0]).toFixed(1)})` +
+        `+(${(dot.v1[1]).toFixed(1)}\\cdot ${(dot.v2[1]).toFixed(1)})` +
+        `+(${(dot.v1[2]).toFixed(1)}\\cdot ${(dot.v2[2]).toFixed(1)})` +
+        `=${dot.Prod}`;
+        dot.animationRunning = false;}
+      dot.animationStep = 5;
+      $( this ).removeClass( "highlighted" ).dequeue();
+    });},
+  reset: function() {
+    dot.animationStep = 1;
+    dot.Eqn = `\\vec{u} \\cdot \\vec{v} = `;
+    dot.Eqn+=`\\begin{bmatrix}${(dot.v1[0]).toFixed(1)} \\\\ ${(dot.v1[1]).toFixed(1)} \\\\ ${(dot.v1[2]).toFixed(1)} \\end{bmatrix}`;
+    dot.Eqn+=`\\cdot`;
+    dot.Eqn+=`\\begin{bmatrix}${(dot.v2[0]).toFixed(1)} \\\\ ${(dot.v2[1]).toFixed(1)} \\\\ ${(dot.v2[2]).toFixed(1)} \\end{bmatrix}`;
+    LaTexDotProd();
+  },
+  set: function() {
+    dot.Eqn = `\\vec{u} \\cdot \\vec{v} = `;
+    dot.Eqn+=`\\begin{bmatrix}${(dot.v1[0]).toFixed(1)} \\\\ ${(dot.v1[1]).toFixed(1)} \\\\ ${(dot.v1[2]).toFixed(1)} \\end{bmatrix}`;
+    dot.Eqn+=`\\cdot`;
+    dot.Eqn+=`\\begin{bmatrix}${(dot.v2[0]).toFixed(1)} \\\\ ${(dot.v2[1]).toFixed(1)} \\\\ ${(dot.v2[2]).toFixed(1)} \\end{bmatrix}`;
+  }
 };
 
 // a quick function to get the plot coordinates (x, y) at pixels (xPix, yPix). gPlot is the ID of your GPlot.
@@ -751,6 +831,11 @@ function MovePoints(parentLayer) {
     if (page == "scalar multiplication") {
       if (draggingPt[1] != 0) {
         pts[draggingPt[1]] = [mouseX + mouseOffset[0], mouseY + mouseOffset[1]];
+        pts[draggingPt[1]][0] = Math.max(pts[draggingPt[1]][0], xyMin[0]);
+        pts[draggingPt[1]][0] = Math.min(pts[draggingPt[1]][0], xyMax[0]);
+        pts[draggingPt[1]][1] = Math.min(pts[draggingPt[1]][1], xyMin[1]);
+        pts[draggingPt[1]][1] = Math.max(pts[draggingPt[1]][1], xyMax[1]);
+        /*pts[draggingPt[1]] = [mouseX + mouseOffset[0], mouseY + mouseOffset[1]];
         let ref00 = getCoords(0, 0, basePlot2D);
         let coords = loc(mouseX + mouseOffset[0], mouseY + mouseOffset[1], basePlot2D);
         let mX = coords[0];
@@ -759,7 +844,7 @@ function MovePoints(parentLayer) {
         let unitMag = sqrt(pow(mX,2)+pow(mY,2));
 
         pts[1][0] = (pts[1][0]-ref00[0])*currentMag/unitMag+ref00[0];
-        pts[1][1] = (pts[1][1]-ref00[1])*currentMag/unitMag+ref00[1];
+        pts[1][1] = (pts[1][1]-ref00[1])*currentMag/unitMag+ref00[1];*/
       }
     } else {
       pts[draggingPt[1]] = [mouseX + mouseOffset[0], mouseY + mouseOffset[1]];
@@ -903,6 +988,9 @@ function draw() {
     case "scalar multiplication":
       LaTexScMult();
       break;
+    case "dot product":
+      LaTexDotProd();
+      break;
     case "cross product":
       LaTexCross();
       break;
@@ -928,19 +1016,19 @@ function draw() {
       DrawVectorText(extraCanvas);
       break;
     case "scalar multiplication":
-        if(frameCount % 30 == 0) {LaTexScMult();}
-        plotdraw2D.drawMethod2D();
-        image(extraCanvas, 0, 0);
-        extraCanvas.background(255);
-        extraCanvas.clear();
-        extraCanvas.fill(255);
-        extraCanvas.stroke(0);
-  
-        MovePoints(extraCanvas);
-        DrawArrows(extraCanvas);
-        DrawCoords(extraCanvas);
-        DrawVectors(extraCanvas);
-        DrawVectorText(extraCanvas);
+      if(frameCount % 30 == 0) {LaTexScMult();}
+      plotdraw2D.drawMethod2D();
+      image(extraCanvas, 0, 0);
+      extraCanvas.background(255);
+      extraCanvas.clear();
+      extraCanvas.fill(255);
+      extraCanvas.stroke(0);
+
+      MovePoints(extraCanvas);
+      DrawArrows(extraCanvas);
+      DrawCoords(extraCanvas);
+      DrawVectors(extraCanvas);
+      DrawVectorText(extraCanvas);
       break;
     case "dot product":
 
@@ -988,32 +1076,50 @@ function mouseReleased() {
 
 function LaTexAddition() {
   let vecEqn = `\\vec{v} = `;
-    for (j = 0; j<n-1; j++) {
-      vecEqn+=`\\begin{bmatrix}${(ptCoords[j+1][0]-ptCoords[j][0]).toFixed(1)} \\\\ ${(ptCoords[j+1][1]-ptCoords[j][1]).toFixed(1)}\\end{bmatrix}`;
-      if (j+2<n) {vecEqn+=`+`;}
-    }
-    if (n>2&&sumPressed) {vecEqn+=`= \\begin{bmatrix}${vSum[0].toFixed(1)} \\\\ ${vSum[1].toFixed(1)}\\end{bmatrix}`}
-    let math = MathJax.Hub.getAllJax("vectorLATEX")[0];
-    MathJax.Hub.Queue(["Text",math, vecEqn]);
+  for (j = 0; j<n-1; j++) {
+    vecEqn+=`\\begin{bmatrix}${(ptCoords[j+1][0]-ptCoords[j][0]).toFixed(1)} \\\\ ${(ptCoords[j+1][1]-ptCoords[j][1]).toFixed(1)}\\end{bmatrix}`;
+    if (j+2<n) {vecEqn+=`+`;}
+  }
+  if (n>2&&sumPressed) {vecEqn+=`= \\begin{bmatrix}${vSum[0].toFixed(1)} \\\\ ${vSum[1].toFixed(1)}\\end{bmatrix}`;}
+  //document.getElementById("vectorLATEX").innerHTML = vecEqn;
+  let math = MathJax.Hub.getAllJax("vectorLATEX")[0];
+  if(math != undefined) {
+    MathJax.Hub.Queue(["Text", math, vecEqn]);
+  }
 }
 
 function LaTexCross() {
   let vecEqn = `\\vec{u}\\times \\vec{v} = `;
-    vecEqn+=`\\begin{bmatrix}${(x1).toFixed(1)} \\\\ ${(y1).toFixed(1)} \\\\ ${(z1).toFixed(1)}\\end{bmatrix}`;
-    vecEqn+=`\\times`;
-    vecEqn+=`\\begin{bmatrix}${(x2).toFixed(1)} \\\\ ${(y2).toFixed(1)} \\\\ ${(z2).toFixed(1)}\\end{bmatrix}`;
-    if (drawCross) {
-      let crossProd = vector3D.cross2(x1, y1, z1, x2, y2, z2);
-      vecEqn+=`= \\begin{bmatrix}${(crossProd[0]).toFixed(1)} \\\\ ${(crossProd[1]).toFixed(1)} \\\\ ${(crossProd[2]).toFixed(1)}\\end{bmatrix}`}
-    let math = MathJax.Hub.getAllJax("vectorLATEX")[0];
-    MathJax.Hub.Queue(["Text",math, vecEqn]);
+  vecEqn+=`\\begin{bmatrix}${(x1).toFixed(1)} \\\\ ${(y1).toFixed(1)} \\\\ ${(z1).toFixed(1)}\\end{bmatrix}`;
+  vecEqn+=`\\times`;
+  vecEqn+=`\\begin{bmatrix}${(x2).toFixed(1)} \\\\ ${(y2).toFixed(1)} \\\\ ${(z2).toFixed(1)}\\end{bmatrix}`;
+  if (drawCross) {
+    let crossProd = vector3D.cross2(x1, y1, z1, x2, y2, z2);
+    vecEqn+=`= \\begin{bmatrix}${(crossProd[0]).toFixed(1)} \\\\ ${(crossProd[1]).toFixed(1)} \\\\ ${(crossProd[2]).toFixed(1)}\\end{bmatrix}`;}
+  //document.getElementById("vectorLATEX").innerHTML = vecEqn;
+  let math = MathJax.Hub.getAllJax("vectorLATEX")[0];
+  if(math != undefined) {
+    MathJax.Hub.Queue(["Text", math, vecEqn]);
+  }
 }
 
 function LaTexScMult() {
   let vecEqn = `\\vec{u} = `;
-    vecEqn+=`${multFac} `;
-    vecEqn+=`\\begin{bmatrix}${(ptCoords[1][0]).toFixed(1)} \\\\ ${(ptCoords[1][1]).toFixed(1)} \\end{bmatrix}`;
-    vecEqn+=`= \\begin{bmatrix}${(ptCoords[1][0]*multFac).toFixed(1)} \\\\ ${(ptCoords[1][1]*multFac).toFixed(1)} \\end{bmatrix}`;
-    let math = MathJax.Hub.getAllJax("vectorLATEX")[0];
-    MathJax.Hub.Queue(["Text",math, vecEqn]);
+  vecEqn+=`${multFac} `;
+  vecEqn+=`\\begin{bmatrix}${(ptCoords[1][0]).toFixed(1)} \\\\ ${(ptCoords[1][1]).toFixed(1)} \\end{bmatrix}`;
+  vecEqn+=`= \\begin{bmatrix}${(ptCoords[1][0]*multFac).toFixed(1)} \\\\ ${(ptCoords[1][1]*multFac).toFixed(1)} \\end{bmatrix}`;
+  //document.getElementById("vectorLATEX").innerHTML = vecEqn;
+  let math = MathJax.Hub.getAllJax("vectorLATEX")[0];
+  if(math != undefined) {
+    MathJax.Hub.Queue(["Text", math, vecEqn]);
+  }
+}
+
+function LaTexDotProd() {
+  if(!dot.animationRunning && dot.animationStep == 1) {dot.set();}
+  //document.getElementById("vectorLATEX").innerHTML = dot.Eqn;
+  let math = MathJax.Hub.getAllJax("vectorLATEX")[0];
+  if(math != undefined) {
+    MathJax.Hub.Queue(["Text", math, dot.Eqn]);
+  }
 }
