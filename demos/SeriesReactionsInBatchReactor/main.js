@@ -101,7 +101,7 @@ function windowResized() {
   resizeCanvas(clientWidth, clientHeight);
   mainPlot.GPLOT.setOuterDim(clientWidth, clientHeight);
   mainPlot.GPLOT.setPos(0, 0);
-  gui.prototype.setPosition(clientWidth, mainPlot.GPLOT.mar[2]);
+  gui.prototype.setPosition(clientWidth, mainPlot.GPLOT.mar[2] + 50);
 }
 
 /**
@@ -110,8 +110,8 @@ function windowResized() {
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 function setup() {
-  createCanvas(clientWidth, clientHeight);
-
+  let cnv = createCanvas(clientWidth, clientHeight);
+  cnv.parent('plotContainer');
   // Declare a plot
   mainPlot = new PlotCanvas(this);
   mainPlot.xLims = [0, tfinal];
@@ -122,7 +122,7 @@ function setup() {
   mainPlot.plotSetup();
   
   // Create the GUI using p5.gui.js
-  gui = createGui('plot controls', clientWidth, mainPlot.GPLOT.mar[2]);
+  gui = createGui('plot controls', clientWidth, mainPlot.GPLOT.mar[2] + 50);
   gui.newSlider('T', 450, 480, 450, 1, 'Temperature', 'K');
   gui.newDropdown("page", ["concentration", "selectivity"], "display:");
   updateData();
@@ -182,11 +182,11 @@ function draw() {
   mainPlot.labelDraw("selectivity", tfinal / 2, selectivity[Math.trunc(map(tfinal/2, 0, tfinal, 0, tfinal / dt - 1))][1], selFunction.lineColor, [CENTER, CENTER], false, [5, 1.6]);
  
   mainPlot.labelDraw("C", tfinal / 6, CA[Math.trunc(map(tfinal/6, 0, tfinal, 0, tfinal / dt - 1))][1], CaFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
-  mainPlot.labelDraw("a", tfinal / 6, CA[Math.trunc(map(tfinal/6, 0, tfinal, 0, tfinal / dt - 1))][1], CaFunction.lineColor, [LEFT, TOP],"sub");
+  mainPlot.labelDraw("A", tfinal / 6, CA[Math.trunc(map(tfinal/6, 0, tfinal, 0, tfinal / dt - 1))][1], CaFunction.lineColor, [LEFT, TOP],"sub");
   
   mainPlot.labelDraw("C", tfinal / 2, CB[Math.trunc(map(tfinal/2, 0, tfinal, 0, tfinal / dt - 1))][1], CbFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
-  mainPlot.labelDraw("b", tfinal / 2, CB[Math.trunc(map(tfinal/2, 0, tfinal, 0, tfinal / dt - 1))][1], CbFunction.lineColor, [LEFT, TOP],"sub");
+  mainPlot.labelDraw("B", tfinal / 2, CB[Math.trunc(map(tfinal/2, 0, tfinal, 0, tfinal / dt - 1))][1], CbFunction.lineColor, [LEFT, TOP],"sub");
  
   mainPlot.labelDraw("C", 5 * tfinal / 6, CC[Math.trunc(map(5*tfinal/6, 0, tfinal, 0, tfinal / dt - 1))][1], CcFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
-  mainPlot.labelDraw("c", 5 * tfinal / 6, CC[Math.trunc(map(5*tfinal/6, 0, tfinal, 0, tfinal / dt - 1))][1], CcFunction.lineColor, [LEFT, TOP],"sub");
+  mainPlot.labelDraw("C", 5 * tfinal / 6, CC[Math.trunc(map(5*tfinal/6, 0, tfinal, 0, tfinal / dt - 1))][1], CcFunction.lineColor, [LEFT, TOP],"sub");
 }

@@ -27,5 +27,36 @@
 	</head>
 
 	<body>
+		<div class="wrapper">
+			<a href="javascript:" id="directionsButton" class="buttonMed" value="directions">Directions</a>
+			<a href="javascript:" id="detailsButton" class="buttonMed" value="details">Details</a>
+			<a href="javascript:" id="aboutButton" class="buttonMed" value="about">About</a>
+			<div class="modal">
+				<div id="modalDirections" class="modal-content" style="display:none;">
+					<div id="directions-content">
+						<span class="close">&times;</span>
+						<p class="popup paragraph">Two first-order, liquid-phase reactions <i>A</i>&#8594<i>B</i>&#8594<i>C</i> take place in an isothermal batch reactor. The reactor initially contains only <i>A</i> at a concentration of 2  mol/dm<sup>3</sup>. The activation energy <i>E</i><sub><i>a</i>,2</sub> of the second reaction (155 kJ/mol) is higher than the activation energy <i>E</i><sub><i>a</i>,1</sub> of the first reaction (145 kJ/mol). Vary the temperature of the reaction with a slider. Select "selectivity" to plot selectivity (C<sub><i>B</i></sub>/C<sub><i>C</i></sub>) versus time. The selectivity changes with temperature because the reactions have different activation energies. The time scale in the plots changes between 450 K and 480 K.</p>
+					</div>
+				</div>
+
+				<div id="modalDetails" class="modal-content" style="display:none;">
+					<div id="details-content">
+						<span class="close">&times;</span>
+						<p class="popup paragraph">(Temporary Filler Text) Lorem ipsum dolor sit amet consectetur, adipisicing elit. Atque minus tenetur ab corporis natus nobis tempora dolores dignissimos molestias corrupti molestiae velit aut, explicabo dicta harum recusandae beatae tempore consequatur! Non inventore porro praesentium eaque alias dolor placeat iste officia similique deleniti optio minus repellat voluptatibus nulla perspiciatis ut cum rerum consequatur aspernatur sapiente cumque odio facilis, voluptate est. Explicabo perspiciatis illo dolorem vitae commodi corrupti facere tenetur quisquam quos nihil est dolorum suscipit quibusdam quo dolores, neque vero. Dolorem cupiditate consectetur velit maxime dignissimos excepturi, labore inventore dolorum omnis vel dolore aperiam totam ex sunt eos soluta eum provident?.</p>
+					</div>
+				</div>
+
+				<div id="modalAbout" class="modal-content" style="display:none;">
+					<div id="about-content">
+						<span class="close">&times;</span>
+						<p class="popup paragraph">
+						(Temporary Filler Text) Lorem ipsum dolor sit amet consectetur adipisicing elit. Vero, reiciendis. Porro totam eos laboriosam voluptate reprehenderit, amet velit sed distinctio saepe, veritatis cupiditate rem repudiandae, soluta commodi officia qui quas maxime. Ipsum possimus corrupti error quaerat consequatur, officiis, odio vel nisi necessitatibus illo at, placeat unde commodi excepturi tempore ullam! <a href="https://www.google.com/" target="_blank">destination</a>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div id="plotContainer"></div>
+		</div>
+		<script type="text/javascript" src="modals.min.js"></script>
 	</body>
 </html>
