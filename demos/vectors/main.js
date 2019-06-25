@@ -31,6 +31,9 @@ let j = 1;
 let iHat; // 70*153 original size
 let jHat; // 85*196 original size
 let kHat; // 121*206 original size
+let uvec;
+let vvec;
+let uxvvec;
 
 let selectOptions;
 let newVectorButton;
@@ -66,8 +69,8 @@ var x1 = 1;
 var y1 = 0;
 var z1 = 0;
 var x2 = 0;
-var y2 = 1;
-var z2 = 0;
+var y2 = 0;
+var z2 = 1;
 
 var multFac = 1;
 
@@ -82,6 +85,9 @@ function preload() {
   iHat = loadImage('../../media/iHatWhite.png');
   jHat = loadImage('../../media/jHatWhite.png');
   kHat = loadImage('../../media/kHatWhite.png');
+  uvec = loadImage('../../media/uvec.png');
+  vvec = loadImage('../../media/vvec.png');
+  uxvvec = loadImage('../../media/uxvvec.png');
   myFont = loadFont('Helvetica.otf');
 }
 
@@ -238,7 +244,8 @@ class options {
       rotate(theta, v0);
       rotateX(phi);
       // BUG????? needed to add this extra character or nothing works????? halp
-      text('_x', 0, 0);
+      text('_.', -1000, -1000);
+      text('x', 0, 0);
     pop();
 
     push();
@@ -247,7 +254,7 @@ class options {
       translate(0, - axisLength - 40, 0);
       rotate(theta, v0);
       rotateX(phi);
-      text('y', 0, 0);
+      text('z', 0, 0);
     pop();
 
     push();
@@ -256,7 +263,7 @@ class options {
       translate(0, 10, -axisLength - 40);
       rotate(theta, v0);
       rotateX(phi);
-      text('z', 0, 0);
+      text('y', 0, 0);
     pop();
   }
 }
@@ -504,14 +511,6 @@ function sumVector() {
     sumPressed = true;
   }
 }
-
-/*function removeVector() {
-  if(!sumPressed && n > 2) {
-    pts.pop();
-    graphicsOffset.pop();
-    n += -1;
-  }
-}*/
 
 let scalar = {
   Mult: function() {
@@ -913,31 +912,72 @@ function DrawVectors(parentLayer) {
 }
 
 class vector3D {
-  constructor(x, y, z) {
-    this.x = x;
-    this.y = -y;
-    this.z = -z;
+  /*
+  * A note about these methods - I had to set the input "y" value to equal negative k-hat, and the input "z" value to equal
+  * negative j-hat, because the way that WebGL seemingly renders coordinate systems is kind of backwards from how one would
+  * like to vizualize them. Hopefully this comment clears up any confusion that might come with trying to figure out why
+  * "this.j = -z" and so on. It's so that it renders in a coordinate system that makes sense visually.
+  */
+  constructor(x, y, z, title, labelDims) {
+    this.i = x;
+    this.j = -z;
+    this.k = -y;
+    
+    if (typeof labelDims == "undefined") {
+      this.labelDims = [20, 25];
+    } else {this.labelDims = labelDims;}
+
+    if (typeof title == "undefined") {
+      this.label = " ";
+    } else {this.label = title;}
+
     let phi = 0;
 
     //This calculates the rotation matrix for the cylinder we will draw
     let v0 = createVector(0, 1, 0);
-    let v1 = createVector(this.x, this.y, this.z);
+    let v1 = createVector(this.i, this.j, this.k);
     let crossProd = p5.Vector.cross(v0, v1);
 
     push();
 
     //Necessary for vectors with only an i-component
     if(crossProd.x != 0 || crossProd.y != 0 || crossProd.z != 0) {
-      phi = Math.acos(this.y / v1.mag());
+      phi = Math.acos(this.j / v1.mag());
       rotate(phi, crossProd);
-    } else if (this.y <= 0) {rotateX(PI);}
+    } else if (this.j <= 0) {rotateX(PI);}
 
     //Only draws vectors with magnitude greater than 0
-    if(this.x != 0 || this.y !=0 || this.z != 0) {
+    if(this.i != 0 || this.j !=0 || this.k != 0) {
       translate(0, v1.mag()*40 / 2, 0);
       cylinder(2, 40 * v1.mag());
       translate(0, v1.mag()*40 / 2 + 2, 0);
       cone(5, 15);
+      translate(0, 30, 0);
+      fill(0);
+      if(crossProd.x != 0 || crossProd.y != 0 || crossProd.z != 0) {
+        phi = Math.acos(this.j / v1.mag());
+        rotate(-phi, crossProd);
+      } else if (this.j <= 0) {rotateX(-PI);}
+
+      let camX = window._renderer._curCamera.eyeX;
+      let camY = window._renderer._curCamera.eyeY;
+      let camZ = window._renderer._curCamera.eyeZ;
+      let camVec = createVector(camX, camY, camZ);
+      let theta = atan2(camX, camZ);
+      let phi2 = -atan2(camY, camVec.mag());
+
+      textAlign(CENTER);
+      rotate(theta, v0);
+      rotateX(phi2);
+      
+      text('_.', -1000, -1000);
+
+      if(typeof this.label == "string") {
+        text(this.label, 0, 0);
+      } else {
+        texture(this.label);
+        plane(this.labelDims[0], this.labelDims[1]);
+      }
     }
 
     pop();
@@ -948,7 +988,7 @@ class vector3D {
     let v0 = createVector(X1, Y1, Z1);
     let v1 = createVector(X2, Y2, Z2);
     let crossProd = p5.Vector.cross(v0, v1);
-    new vector3D(crossProd.x, crossProd.y, crossProd.z);
+    new vector3D(crossProd.x, crossProd.y, crossProd.z, uxvvec, [80, 25]);
   }
 
   //static method that calculates the cross-product of two vectors, returns as array
@@ -961,7 +1001,9 @@ class vector3D {
 
   static normPlane(X1, Y1, Z1, X2, Y2, Z2) {
     let normVector = vector3D.cross2(X1, Y1, Z1, X2, Y2, Z2);
-    let x = normVector[0];let y = -normVector[1];let z = -normVector[2];
+    let x = normVector[0];
+    let y = -normVector[2];
+    let z = -normVector[1];
 
     let v0 = createVector(0, 1, 0);
     let v1 = createVector(x, y, z);
@@ -1036,9 +1078,9 @@ function draw() {
     case "cross product":
       options.drawAxes3D();
       ambientMaterial(135, 91, 209);
-      new vector3D(x1, y1, z1);
+      new vector3D(x1, y1, z1, uvec);
       ambientMaterial(135, 191, 109);
-      new vector3D(x2, y2, z2);
+      new vector3D(x2, y2, z2, vvec);
       if(drawCross) {
         vector3D.cross(x1, y1, z1, x2, y2, z2);
       }
