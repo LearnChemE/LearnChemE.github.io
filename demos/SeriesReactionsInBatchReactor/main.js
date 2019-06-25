@@ -118,13 +118,13 @@ function setup() {
   mainPlot.yLims = [0, 2.5];
   mainPlot.xAxisLabel = "time (h)";
   mainPlot.yAxisLabel = "concentration (M)";
-  mainPlot.plotTitle = "Series Reactions in a Batch Reactor";
+  mainPlot.plotTitle = "";
   mainPlot.plotSetup();
   
   // Create the GUI using p5.gui.js
-  gui = createGui('plot controls', clientWidth, mainPlot.GPLOT.mar[2] + 50);
+  gui = createGui('Plot Controls', clientWidth - 10, mainPlot.GPLOT.mar[2] + 70);
   gui.newSlider('T', 450, 480, 450, 1, 'Temperature', 'K');
-  gui.newDropdown("page", ["concentration", "selectivity"], "display:");
+  gui.newDropdown("page", ["concentration", "selectivity"], "Display:");
   updateData();
 
   CaFunction = new ArrayPlot(CA);

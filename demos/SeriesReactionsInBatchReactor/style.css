@@ -12,9 +12,11 @@ body {
 .wrapper {
   display: grid;
   justify-items: center;
-  grid-row-gap: 2rem;
+  grid-row-gap: 0.25rem;
+  grid-template-rows: auto 40px 600px;
   grid-template-areas:
-    "button1 button2 button3"
+	"button1 button2 button3"
+	"title title title"
     "cnv cnv cnv"
 }
 
@@ -22,7 +24,7 @@ body {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 10; /* Sit on top */
-  padding-top: 8rem; /* Location of the box */
+  padding-top: 2rem; /* Location of the box */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -116,15 +118,42 @@ body {
 #aboutButton {
   grid-area: button3;
 }
+
+.title {
+	grid-area: title;
+	transform: translateY(40px) translateX(-80px);
+	z-index: 9;
+}
+
+#title1 {
+	transform: translateY(-5px);
+}
+
 #plotContainer {
   grid-area: cnv;
   justify-self: start;
+  align-self: start;
 }
+
 .latex {
 	height: 2rem;
 	padding-top: 5px;
 }
 
+.latexTitle {
+	height: 1.5rem;
+}
+
 #ABC {
 	height: 1.3rem;
+}
+
+#directions-content {
+	text-align: left;
+	line-height: 1.5rem;
+}
+
+#details-content {
+	line-height: 1.25rem;
+	padding-top: 0rem;
 }
