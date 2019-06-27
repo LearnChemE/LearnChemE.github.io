@@ -73,4 +73,5 @@ canvas {
   font-size: 1rem;
   margin-top: 0.5rem;
   height: 5rem;
+  max-width: 800px;
 }

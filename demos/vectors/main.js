@@ -76,7 +76,7 @@ var multFac = 1;
 
 let aspRatio = 0.8;
 let margins = 120;
-let pageWidth = window.innerWidth - margins;
+let pageWidth = Math.min(window.innerWidth - margins, 800);
 let pageHeight = pageWidth * aspRatio;
 
 let myFont;
