@@ -137,7 +137,7 @@ class PlotCanvas {
   constructor(parent) {
     this.parent = parent;   
     this.GPLOT = new GPlot(this.parent);
-    this.pos = [0, 0];
+    this.pos = [10, 0];
     this.dims = [this.GPLOT.parent.width, this.GPLOT.parent.height];
     this.xLims = [0, 1];
     this.yLims = [0, 1];
@@ -147,8 +147,12 @@ class PlotCanvas {
     this.funcs = new Array(0);
     this.fontSize = 18;
     this.titleFontSize = 18;
-    this.axisFontSize = 15;
-    this.axisLabelSize = 15;
+    this.axisFontSize = 18;
+    this.axisLabelSize = 18;
+    this.GPLOT.yAxis.setRotateTickLabels(false);
+    this.GPLOT.yAxis.setTickLabelOffset(10);
+    this.GPLOT.yAxis.lab.setOffset(50);
+    this.GPLOT.xAxis.lab.setOffset(40);
   }
 
   addFuncs() {
@@ -214,6 +218,7 @@ class PlotCanvas {
           break;
       }
     }
+
     if(background) {
       let coords = this.GPLOT.getScreenPosAtValue(x, y);
       push();
@@ -228,6 +233,110 @@ class PlotCanvas {
     this.GPLOT.getMainLayer().fontSize = fontSize;
     this.GPLOT.beginDraw();
     this.GPLOT.drawAnnotation(text, x, y, xAlign, yAlign);
+    this.GPLOT.endDraw();
+  }
+
+  subSuperDraw(text1, text2, x, y, col, subsuper, rot, offsetX, offsetY) {
+    let xPlot = this.GPLOT.mainLayer.valueToXPlot(x);
+    let yPlot = this.GPLOT.mainLayer.valueToYPlot(y);
+    let offX; let offY;
+    if (offsetX) {offX = offsetX;} else {offX = 0;}
+    if (offsetY) {offY = offsetY;} else {offY = 0;}
+    let aln;
+    if (subsuper == "sub") {aln = this.GPLOT.mainLayer.parent.TOP;} else {aln = this.GPLOT.mainLayer.parent.BOTTOM;}
+
+    this.GPLOT.beginDraw();
+    this.GPLOT.mainLayer.parent.textAlign(this.GPLOT.mainLayer.parent.RIGHT, this.GPLOT.mainLayer.parent.CENTER);
+    this.GPLOT.mainLayer.parent.translate(xPlot + offX, yPlot + offY);
+    this.GPLOT.mainLayer.parent.rotate(rot);
+    this.GPLOT.mainLayer.parent.textFont(this.GPLOT.mainLayer.fontName);
+    this.GPLOT.mainLayer.parent.textSize(this.fontSize);
+    this.GPLOT.mainLayer.parent.fill(col);
+    this.GPLOT.mainLayer.parent.text(text1, 0, 0);
+    this.GPLOT.endDraw();
+
+    this.GPLOT.beginDraw();
+    this.GPLOT.mainLayer.parent.textAlign(this.GPLOT.mainLayer.parent.LEFT, aln);
+    this.GPLOT.mainLayer.parent.translate(xPlot + offX, yPlot + offY);
+    this.GPLOT.mainLayer.parent.rotate(rot);
+    this.GPLOT.mainLayer.parent.textFont(this.GPLOT.mainLayer.fontName);
+    this.GPLOT.mainLayer.parent.textSize(this.fontSize*0.8);
+    this.GPLOT.mainLayer.parent.fill(col);
+    this.GPLOT.mainLayer.parent.text(text2, 0, 0);
+    this.GPLOT.endDraw();
+  }
+
+  yaxisSubSuperDraw(text1, text2, offsetX, offsetY, col, subsuper, rot) {
+
+    /*this.parent.textAlign(this.parent.RIGHT, this.parent.CENTER);
+		this.parent.translate(this.plotPos, this.offset);
+		this.parent.rotate(-0.5 * Math.PI);
+    this.parent.text(this.text, 0, 0);*/
+
+    let offX; let offY;
+    
+    if (offsetX) {offX = offsetX;} else {offX = 0;}
+    if (offsetY) {offY = offsetY;} else {offY = 0;}
+    let aln;
+    if (subsuper == "sub") {aln = this.GPLOT.mainLayer.parent.TOP;} else {aln = this.GPLOT.mainLayer.parent.BOTTOM;}
+    this.GPLOT.beginDraw();
+    this.GPLOT.mainLayer.parent.textAlign(this.GPLOT.mainLayer.parent.RIGHT, this.GPLOT.mainLayer.parent.BOTTOM);
+    this.GPLOT.mainLayer.parent.translate(-this.GPLOT.yAxis.lab.offset, this.GPLOT.yAxis.lab.plotPos);
+    this.GPLOT.mainLayer.parent.rotate(rot);
+    this.GPLOT.mainLayer.parent.translate(this.fontSize * offY, 0);
+    this.GPLOT.mainLayer.parent.textFont(this.GPLOT.mainLayer.fontName);
+    this.GPLOT.mainLayer.parent.textSize(this.fontSize);
+    this.GPLOT.mainLayer.parent.fill(col);
+    this.GPLOT.mainLayer.parent.text(text1, 0, 0);
+    this.GPLOT.endDraw();
+
+    this.GPLOT.beginDraw();
+    this.GPLOT.mainLayer.parent.textAlign(this.GPLOT.mainLayer.parent.LEFT, this.GPLOT.mainLayer.parent.CENTER);
+    this.GPLOT.mainLayer.parent.translate(-this.GPLOT.yAxis.lab.offset, this.GPLOT.yAxis.lab.plotPos);
+    this.GPLOT.mainLayer.parent.rotate(rot);
+    this.GPLOT.mainLayer.parent.translate(this.fontSize * offY, 0);
+    this.GPLOT.mainLayer.parent.textFont(this.GPLOT.mainLayer.fontName);
+    this.GPLOT.mainLayer.parent.textSize(this.fontSize*0.8);
+    this.GPLOT.mainLayer.parent.fill(col);
+    this.GPLOT.mainLayer.parent.text(text2, 0, 0);
+    this.GPLOT.endDraw();
+  }
+
+  drawLine(xCenter, yCenter, xLength, yLength, col, thickness, offsetX, offsetY) {
+    let xPlot1 = this.GPLOT.mainLayer.valueToXPlot(xCenter) - xLength / 2 + offsetX;
+    let yPlot1 = this.GPLOT.mainLayer.valueToYPlot(yCenter) - yLength / 2 + offsetY;
+    let xPlot2 = xPlot1 + xLength / 2;
+    let yPlot2 = yPlot1 + yLength / 2;
+    let clr;
+    let thk;
+    if (col) {clr = col;} else {clr = color(0, 0, 0, 255);}
+    if (thickness) {thk = thickness;} else {thk = 2;}
+    this.GPLOT.beginDraw();
+    this.GPLOT.mainLayer.parent.stroke(clr);
+    this.GPLOT.mainLayer.parent.strokeWeight(thk);
+    this.GPLOT.mainLayer.parent.line(xPlot1, yPlot1, xPlot2, yPlot2);
+    this.GPLOT.endDraw();
+  }
+
+  drawRect(xCenter, yCenter, width, height, background) {
+    let xPlot = this.GPLOT.mainLayer.valueToXPlot(xCenter);
+    let yPlot = this.GPLOT.mainLayer.valueToYPlot(yCenter);
+    let clr;
+    
+    this.GPLOT.beginDraw();
+    this.GPLOT.mainLayer.parent.noStroke();
+    if (typeof(background) == "number" && background <= 1 && background >= 0) {
+      clr = [this.GPLOT.boxBgColor.levels[0], this.GPLOT.boxBgColor.levels[1], this.GPLOT.boxBgColor.levels[2], background * 255];
+      this.GPLOT.mainLayer.parent.fill.apply(this, clr);
+    } else if(background) {
+      clr = background;
+      this.GPLOT.mainLayer.parent.fill(clr);
+    } else {
+      clr = [100, 100, 100, 255];
+      this.GPLOT.mainLayer.parent.fill.apply(this, clr);
+    }
+    this.GPLOT.mainLayer.parent.rectMode(this.GPLOT.mainLayer.parent.CENTER);
+    this.GPLOT.mainLayer.parent.rect(xPlot, yPlot, width, height);
     this.GPLOT.endDraw();
   }
 }

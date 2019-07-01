@@ -61,6 +61,7 @@
 
   // interface for quicksettings
   function QSGui(label, x, y, id) {
+    QuickSettings.useExtStyleSheet();
     var qs = QuickSettings.create(x, y, label, document.body, id);
     this.prototype = qs;
 

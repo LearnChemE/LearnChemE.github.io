@@ -117,14 +117,14 @@ function setup() {
   mainPlot.xLims = [0, tfinal];
   mainPlot.yLims = [0, 2.5];
   mainPlot.xAxisLabel = "time (h)";
-  mainPlot.yAxisLabel = "concentration (M)";
+  mainPlot.yAxisLabel = " ";
   mainPlot.plotTitle = "";
   mainPlot.plotSetup();
   
   // Create the GUI using p5.gui.js
   gui = createGui('Plot Controls', clientWidth - 10, mainPlot.GPLOT.mar[2] + 70);
   gui.newSlider('T', 450, 480, 450, 1, 'Temperature', 'K');
-  gui.newDropdown("page", ["concentration", "selectivity"], "Display:");
+  gui.newDropdown("page", ["concentrations", "selectivity"], "Display:");
   updateData();
 
   CaFunction = new ArrayPlot(CA);
@@ -143,7 +143,6 @@ function setup() {
 
   mainPlot.addFuncs(CaFunction, CbFunction, CcFunction, selFunction);
 
-  //console.log(mainPlot);
   noLoop();
 }
 
@@ -165,12 +164,16 @@ function draw() {
   // hides/shows lines depending on page selected
   switch(page) {
     case "selectivity":
+      mainPlot.yAxisLabel = "selectivity (     /     )";
+      mainPlot.GPLOT.getYAxis().getAxisLabel().setText(mainPlot.yAxisLabel);
       selFunction.lineColor = color(0, 0, 0, 255);
       CaFunction.lineColor = color(255, 0, 0, 0);
       CbFunction.lineColor = color(50, 220, 0, 0);
       CcFunction.lineColor = color(0, 0, 255, 0);
       break;
     default:
+      mainPlot.yAxisLabel = "concentration (M)";
+      mainPlot.GPLOT.getYAxis().getAxisLabel().setText(mainPlot.yAxisLabel);
       selFunction.lineColor = color(0, 0, 0, 0);
       CaFunction.lineColor = color(255, 0, 0, 255);
       CbFunction.lineColor = color(50, 220, 0, 255);
@@ -179,14 +182,38 @@ function draw() {
   }
 
   mainPlot.plotDraw();
-  mainPlot.labelDraw("selectivity", tfinal / 2, selectivity[Math.trunc(map(tfinal/2, 0, tfinal, 0, tfinal / dt - 1))][1], selFunction.lineColor, [CENTER, CENTER], false, [5, 1.6]);
+  let selX = tfinal / 2;
+  let selY = selectivity[Math.trunc(map(tfinal/2, 0, tfinal, 0, tfinal / dt - 1))][1] + 0.1;
+  let CAX = tfinal / 6;
+  let CAY = CA[Math.trunc(map(tfinal/6, 0, tfinal, 0, tfinal / dt - 1))][1];
+  let CBX = tfinal / 2;
+  let CBY = CB[Math.trunc(map(tfinal/2, 0, tfinal, 0, tfinal / dt - 1))][1];
+  let CCX = 5 * tfinal / 6;
+  let CCY = CC[Math.trunc(map(5*tfinal/6, 0, tfinal, 0, tfinal / dt - 1))][1];
+
+  mainPlot.labelDraw("selectivity", selX, selY, selFunction.lineColor, [CENTER, CENTER], false, [5, 1.6]);
  
-  mainPlot.labelDraw("C", tfinal / 6, CA[Math.trunc(map(tfinal/6, 0, tfinal, 0, tfinal / dt - 1))][1], CaFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
-  mainPlot.labelDraw("A", tfinal / 6, CA[Math.trunc(map(tfinal/6, 0, tfinal, 0, tfinal / dt - 1))][1], CaFunction.lineColor, [LEFT, TOP],"sub");
+  mainPlot.labelDraw("C", CAX, CAY, CaFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
+  mainPlot.labelDraw("A", CAX, CAY, CaFunction.lineColor, [LEFT, TOP],"sub");
   
-  mainPlot.labelDraw("C", tfinal / 2, CB[Math.trunc(map(tfinal/2, 0, tfinal, 0, tfinal / dt - 1))][1], CbFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
-  mainPlot.labelDraw("B", tfinal / 2, CB[Math.trunc(map(tfinal/2, 0, tfinal, 0, tfinal / dt - 1))][1], CbFunction.lineColor, [LEFT, TOP],"sub");
+  mainPlot.labelDraw("C", CBX, CBY, CbFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
+  mainPlot.labelDraw("B", CBX, CBY, CbFunction.lineColor, [LEFT, TOP],"sub");
  
-  mainPlot.labelDraw("C", 5 * tfinal / 6, CC[Math.trunc(map(5*tfinal/6, 0, tfinal, 0, tfinal / dt - 1))][1], CcFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
-  mainPlot.labelDraw("C", 5 * tfinal / 6, CC[Math.trunc(map(5*tfinal/6, 0, tfinal, 0, tfinal / dt - 1))][1], CcFunction.lineColor, [LEFT, TOP],"sub");
+  mainPlot.labelDraw("C", CCX, CCY, CcFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
+  mainPlot.labelDraw("C", CCX, CCY, CcFunction.lineColor, [LEFT, TOP],"sub");
+
+  push();
+  translate(mainPlot.GPLOT.pos[0] + mainPlot.GPLOT.mar[1], mainPlot.GPLOT.pos[1] + mainPlot.GPLOT.mar[2] + mainPlot.GPLOT.dim[1]);
+  fill(mainPlot.GPLOT.boxBgColor.levels[0], mainPlot.GPLOT.boxBgColor.levels[1], mainPlot.GPLOT.boxBgColor.levels[2], selFunction.lineColor._array[3]*255);
+  noStroke();
+  rectMode(CENTER);
+  rect(mainPlot.GPLOT.mainLayer.valueToXPlot(selX) + mainPlot.fontSize*3.3, mainPlot.GPLOT.mainLayer.valueToYPlot(selY), 30, 55);
+  pop();
+  
+  mainPlot.subSuperDraw("C","B", selX, selY, selFunction.lineColor, "sub", 0, 3.3*mainPlot.fontSize, -0.9*mainPlot.fontSize);
+  mainPlot.subSuperDraw("C","C", selX, selY, selFunction.lineColor, "sub", 0, 3.3*mainPlot.fontSize, 0.8*mainPlot.fontSize);
+  mainPlot.drawLine(selX, selY, mainPlot.fontSize*3, 0, selFunction.lineColor, 1, mainPlot.fontSize*4, 0);
+
+  mainPlot.yaxisSubSuperDraw("C","B", 0, 1.4, selFunction.lineColor, "sub", -PI/2);
+  mainPlot.yaxisSubSuperDraw("C","C", 0, 3.2, selFunction.lineColor, "sub", -PI/2);
 }
