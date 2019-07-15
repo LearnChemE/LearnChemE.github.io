@@ -57,6 +57,8 @@ let drawNormalPlane = false;
 let ops;
 let pageSelection = sessionStorage.getItem("pageVal");
 let page;
+var cnv;
+let cnvOffset = 184;
 
 let gui;
 let gui2D;
@@ -110,7 +112,7 @@ class options {
     this.gPlot.getXAxis().getAxisLabel().setFontSize(1*rem);
     this.gPlot.getYAxis().getAxisLabel().setFontSize(1*rem);
 
-    this.gPlot.getTitle().setText("Learn About Vectors"); // title
+    this.gPlot.getTitle().setText(" "); // title
     this.gPlot.getTitle().setFontSize(1.2*rem);
   }
 
@@ -118,11 +120,11 @@ class options {
     // "if" statement ensures this is only ever called once.
     if (newVectorButton === undefined) {
     newVectorButton = createButton('insert vector');
-    newVectorButton.position(width-100, 90);
+    newVectorButton.position(width-100, 90 + cnvOffset);
     newVectorButton.mousePressed(newVector);
   
     sumVectorButton = createButton('sum vectors');
-    sumVectorButton.position(width-100, 140);
+    sumVectorButton.position(width-100, 140 + cnvOffset);
     sumVectorButton.mousePressed(sumVector);
 
     /*removeVectorButton = createButton('remove vector');
@@ -130,29 +132,29 @@ class options {
     removeVectorButton.mousePressed(removeVector);*/
 
     resetVectorsButton = createButton('reset');
-    resetVectorsButton.position(width-100, 240);
+    resetVectorsButton.position(width-100, 240 + cnvOffset);
     resetVectorsButton.mousePressed(reset);
 
     dotProductButton = createButton('dot product');
-    dotProductButton.position(width-100, 90);
+    dotProductButton.position(width-100, 90 + cnvOffset);
     dotProductButton.mousePressed(dot.product);
     dotProductButton.hide();
 
     dpResetButton = createButton('reset');
-    dpResetButton.position(width-100, 140);
+    dpResetButton.position(width-100, 140 + cnvOffset);
     dpResetButton.mousePressed(dot.reset);
     dpResetButton.hide();
 
     crossVectorCheckbox = createCheckbox('show cross product', false);
-    crossVectorCheckbox.position(width-100, 90);
+    crossVectorCheckbox.position(width-80, 90 + cnvOffset);
     crossVectorCheckbox.changed(mySelectEvent);
 
     normPlaneCheckbox = createCheckbox('show normal plane', false);
-    normPlaneCheckbox.position(width-100, 130);
+    normPlaneCheckbox.position(width-80, 130 + cnvOffset);
     normPlaneCheckbox.changed(mySelectEvent);
 
     selectOptions = createSelect();
-    selectOptions.position(width-100, 40);
+    selectOptions.position(width-100, 40 + cnvOffset);
     selectOptions.option('vector addition');
     selectOptions.option('scalar multiplication');
     selectOptions.option('dot product');
@@ -160,7 +162,7 @@ class options {
     selectOptions.value(page);
     selectOptions.changed(reInitialize);
 
-    gui2D = createGui('Scalar Multiplier', width - 100, 80);
+    gui2D = createGui('Scalar Multiplier', width - 100, 180 + cnvOffset);
     gui2D.newSlider("multFac", -4, 4, 1, 0.1, "multiply by", "");
     gui2D.addButton("multiply!", function() {
       scalar.Mult();
@@ -289,7 +291,9 @@ class drawing {
 
 function setup() {
   if(page != "cross product") {
-    createCanvas(pageWidth, pageHeight, P2D); // Add base canvas, x-pixels by y-pixels
+    cnv = createCanvas(pageWidth, pageHeight, P2D); // Add base canvas, x-pixels by y-pixels
+    cnv.parent('canvas');
+
     $("#dotProductDiv").width(pageWidth - margins + "px");
     $("#dotProductDiv").height(pageHeight - margins + "px");
     $("#dotProductDiv").hide();
@@ -327,7 +331,8 @@ function setup() {
     }*/
   }
   else {
-    createCanvas(pageWidth, pageHeight, WEBGL);
+    cnv = createCanvas(pageWidth, pageHeight, WEBGL);
+    cnv.parent('canvas');
 
     options.defaultSidebar();
     resizeCanvas(pageWidth-100, pageHeight);
@@ -340,13 +345,13 @@ function setup() {
     //removeVectorButton.hide();
     resetVectorsButton.hide();
     normPlaneCheckbox.show();
-    selectOptions.position(width + 10, 40);
+    selectOptions.position(width + 10, 40 + cnvOffset);
 
     normalMaterial();
     ambientMaterial(39, 235, 91);
     camera(100, -200, (height/2.0) / tan(PI*30.0 / 180.0), 0, 0, 0, 0, 1, 0);
 
-    gui = createGui('3D Plot Controls', width + 10, 180);
+    gui = createGui('3D Plot Controls', width + 10, 180  + cnvOffset);
     gui.newSlider("x1", -4, 4, 1, 0.1, "vector 1 x-component", " i");
     gui.newSlider("y1", -4, 4, 1, 0.1, "vector 1 y-component", " j");
     gui.newSlider("z1", -4, 4, 1, 0.1, "vector 1 z-component", " k");
