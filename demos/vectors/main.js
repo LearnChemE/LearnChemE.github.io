@@ -58,9 +58,10 @@ let ops;
 let pageSelection = sessionStorage.getItem("pageVal");
 let page;
 var cnv;
-let cnvOffset = 184;
+let cnvOffset = 154;
 
-let gui;
+let guiU;
+let guiV;
 let gui2D;
 
 if (sessionStorage.getItem("pageVal")) {page = pageSelection;} else {page = "vector addition";}
@@ -162,6 +163,7 @@ class options {
     selectOptions.value(page);
     selectOptions.changed(reInitialize);
 
+    QuickSettings.useExtStyleSheet();
     gui2D = createGui('Scalar Multiplier', width - 100, 180 + cnvOffset);
     gui2D.newSlider("multFac", -4, 4, 1, 0.1, "multiply by", "");
     gui2D.addButton("multiply!", function() {
@@ -349,18 +351,21 @@ function setup() {
 
     normalMaterial();
     ambientMaterial(39, 235, 91);
-    camera(100, -200, (height/2.0) / tan(PI*30.0 / 180.0), 0, 0, 0, 0, 1, 0);
+    camera(200, -300, (height/1.5) / tan(PI*30.0 / 180.0), 0, 0, 0, 0, 1, 0);
 
-    gui = createGui('3D Plot Controls', width + 10, 180  + cnvOffset);
-    gui.newSlider("x1", -4, 4, 1, 0.1, "vector 1 x-component", " i");
-    gui.newSlider("y1", -4, 4, 1, 0.1, "vector 1 y-component", " j");
-    gui.newSlider("z1", -4, 4, 1, 0.1, "vector 1 z-component", " k");
-    gui.newSlider("x2", -4, 4, 1, 0.1, "vector 2 x-component", " i");
-    gui.newSlider("y2", -4, 4, 1, 0.1, "vector 2 y-component", " j");
-    gui.newSlider("z2", -4, 4, 1, 0.1, "vector 2 z-component", " k");
+    QuickSettings.useExtStyleSheet();
+    guiU = createGui('$$\\vec{u}$$', width + 10, 180  + cnvOffset);
+    guiU.newSlider("x1", -4, 4, 1, 0.1, "x-component: ", ' <img class="guiImgI" src="../../media/iHat.png"></img>');
+    guiU.newSlider("y1", -4, 4, 1, 0.1, "y-component: ", ' <img class="guiImgJ" src="../../media/jHat.png"></img>');
+    guiU.newSlider("z1", -4, 4, 1, 0.1, "z-component: ", ' <img class="guiImgK" src="../../media/kHat.png"></img>');
+    
+    guiV = createGui('$$\\vec{v}$$', width + 10, 410  + cnvOffset);
+    guiV.newSlider("x2", -4, 4, 1, 0.1, "x-component: ", ' <img class="guiImgI" src="../../media/iHat.png"></img>');
+    guiV.newSlider("y2", -4, 4, 1, 0.1, "y-component: ", ' <img class="guiImgJ" src="../../media/jHat.png"></img>');
+    guiV.newSlider("z2", -4, 4, 1, 0.1, "z-component: ", ' <img class="guiImgK" src="../../media/kHat.png"></img>');
 
     $("#vectorLATEX").css({"height":"6rem"});
-
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
     loop();
   }
 }

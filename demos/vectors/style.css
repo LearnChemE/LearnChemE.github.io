@@ -5,7 +5,7 @@ html, body {
   margin: 0;
   padding: 0;
   display: grid;
-  grid-row-gap: 1rem;
+  grid-row-gap: 0.5rem;
   grid-template-areas: 
   "btn1 btn2 btn3"
   "ltx  ltx  ltx"
@@ -182,4 +182,18 @@ canvas {
 
 #aboutButton {
   grid-area:btn3;
+}
+
+.guiImgI {
+  height: 0.65rem;
+  transform: translateY(-25%) scaleX(0.8);
+}
+
+.guiImgJ {
+  height: 0.75rem;
+  transform: scaleX(0.8);
+}
+.guiImgK {
+  height: 0.75rem;
+  transform: translateY(-20%) scaleX(0.8);
 }
