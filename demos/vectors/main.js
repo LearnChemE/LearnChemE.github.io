@@ -186,7 +186,7 @@ class options {
   }
 
   static drawAxes3D() {
-    background(200);
+    background(245);
     ambientLight(160, 160, 160);
     pointLight(255, 255, 255, 20, 20, 200);
     orbitControl(5, 5);
