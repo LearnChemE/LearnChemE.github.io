@@ -172,7 +172,7 @@ function draw() {
       CcFunction.lineColor = color(0, 0, 255, 0);
       break;
     default:
-      mainPlot.yAxisLabel = "concentration (M)";
+      mainPlot.yAxisLabel = "concentration (mol / L)";
       mainPlot.GPLOT.getYAxis().getAxisLabel().setText(mainPlot.yAxisLabel);
       selFunction.lineColor = color(0, 0, 0, 0);
       CaFunction.lineColor = color(255, 0, 0, 255);
