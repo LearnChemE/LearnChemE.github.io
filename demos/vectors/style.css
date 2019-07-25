@@ -1,6 +1,11 @@
 @charset "UTF-8";
 /* CSS Document */
 
+* {
+  overflow-y: visible;
+  overflow-x: visible;
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -10,7 +15,6 @@ html, body {
   "btn1 btn2 btn3"
   "ltx  ltx  ltx"
   "cnv  cnv  cnv";
-  overflow: hidden;
 }
 canvas {
   display: block;
@@ -95,7 +99,6 @@ canvas {
   top: 0;
   width: 100%; /* Full width */
   height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
   background-color: rgb(0,0,0); /* Fallback color */
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
@@ -106,12 +109,14 @@ canvas {
 	padding: 1.5rem;
 	padding-top: 3rem;
 	border: 1px solid #888;
-	width: 80%;
+	width: 90%;
 }
 
 .close {
 	color: #1b1b1b;
-	float: right;
+  position: absolute;
+  right: 0.25rem;
+  top: 0.25rem;
 	font-size: 2rem;
 	font-weight: bold;
 	transform: translateY(-2.5rem);
@@ -170,6 +175,10 @@ canvas {
 	font-family:sans-serif;
 	font-weight:bold;
 	text-decoration:none;
+}
+
+#directions-content, #details-content, #about-content {
+  position: relative;
 }
 
 #directionsButton {

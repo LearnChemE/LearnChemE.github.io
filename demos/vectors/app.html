@@ -44,23 +44,105 @@
 		<div class="modal">
 			<div id="modalDirections" class="modal-content" style="display:none;">
 				<div id="directions-content">
-					<span class="close">&times;</span>
-					<ol class="popup paragraph">
-						<li>vector addition</li>
-						&Tab;&Tab;Drag the vector by its head or tail to move it around on the plot. To insert another vector into the plot, press the "insert vector" button to the right of the plot. To find the sum of all of the vectors on the plot, press "sum vectors". The resulting vector is equivalent to the sum of all vectors inserted into the plot.<br>
-						<li>scalar multiplication</li>
-						&Tab;&Tab;The vector's origin is always at (0, 0), so this vector can only be dragged by its head. To make a scalar multiplication of the vector, adjust the slider to the right of the plot labeled "multiply by", then press "multiply!". At any time, you may press "reset" to reset the simulation.<br> 
-						<li>dot product</li>
-						&Tab;&Tab;The two 
-						<li>cross product</li>
-					</ol>
+					<div class="close">&times;</div>
+					<ul class="nav nav-tabs" role="tablist">
+						<li class="nav-item">
+						<a class="nav-link active vectorAdditionTab" id="" data-toggle="tab" href="#vecAdd" role="tab" aria-controls="vecAdd" aria-selected="true">Vector Addition</a>
+						</li>
+						<li class="nav-item">
+						<a class="nav-link scalarMultiplicationTab" id="" data-toggle="tab" href="#scalarMult" role="tab" aria-controls="scalarMult" aria-selected="false">Scalar Multiplication</a>
+						</li>
+						<li class="nav-item">
+						<a class="nav-link dotProductTab" id="" data-toggle="tab" href="#dotProd" role="tab" aria-controls="dotProd" aria-selected="false">Dot Product</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link crossProductTab" id="" data-toggle="tab" href="#crossProd" role="tab" aria-controls="crossProd" aria-selected="false">Cross Product</a>
+						</li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane fade show active vecAdd" id="" role="tabpanel" aria-labelledby="vector-addition-tab">
+							<br>
+							<ul>
+								<li>Drag the vector by its head or tail to move it around on the plot. The coordinates will display near the cursor.</li>
+								<li>Hover your mouse over the vector to show the \(\hat{\imath}\) and \(\hat{\jmath}\) components of the vector.</li>
+								<li>As you move the vector, notice that the two-dimensional matrix above the plot updates! A two-dimensional matrix is one form of vector notation, one of many ways to represent a vector.</li>
+								<li>To insert another vector into the plot, press the "insert vector" button to the right of the plot. This will add another vector of random magnitude and direction, whose origin is the head of the first vector.</li>
+								<li>To find the sum of all of the vectors you have added to the plot, press the "sum vectors" button to the right of the plot. The resulting vector is equivalent to the sum of all vectors inserted into the plot.</li>
+								<li>After you have summed the vectors, the solution to the equation will display above the plot! Press reset to start again.</li>
+							</ul>
+						</div>
+						<div class="tab-pane fade scalarMult" id="" role="tabpanel" aria-labelledby="scalar-multiplication-tab">
+							<br>
+							<ul>
+								<li>Drag the vector by its head to move it around on the plot. The coordinates will display near the cursor.</li>
+								<li>The origin of the vector is held at (0, 0), and cannot be moved.</li>
+								<li>In the panel to the right of the plot, adjust the slider to the value you would like to scalar-multiply by.</li>
+								<li>Check the equation above the plot, it shows the resulting vector if the current vector is multiplied by the number you have chosen on the slider.</li>
+								<li>Hover the mouse over the vector to show the \(\hat{\imath}\) and \(\hat{\jmath}\) components of the vector.</li>
+								<li>To reset to the default vector, press "reset" on the panel to the right of the plot.</li>
+							</ul>
+						</div>
+						<div class="tab-pane fade dotProd" id="" role="tabpanel" aria-labelledby="dot-product-tab">
+							<br>
+							<ul>
+								<li>The 3-dimensional \(\vec{u}\) and \(\vec{v}\) vectors are defined by the values in the left and right panels, respectively.</li>
+								<li>The default value of each vector is \(0\hat{\imath}+0\hat{\jmath}+0\hat{k}\).</li>
+								<li>Click on each value and type in the desired \(\hat{\imath}\), \(\hat{\jmath}\), and \(\hat{k}\) component values.</li>
+								<li>The value you enter for each component must be a positive or negative real number, between -999 and 999.</li>
+								<li>Decimal values may only be added to numbers between -99.9 and 99.9.</li>
+								<li>Notice that the 3-dimensional matrix above the canvas updates to match the vectors you have entered.</li>
+								<li>When you are ready to calculate the dot product of your two vectors, press the "dot product" button to the right of the canvas and watch the animation.</li>
+								<li>The equation above the canvas shows the result!</li>
+							</ul>
+						</div>
+						<div class="tab-pane fade crossProd" id="" role="tabpanel" aria-labelledby="cross-product-tab">
+							<br>
+							<ul>
+								<li>Using the two panels to the right of the 3D plot, adjust the \(\hat{\imath}\), \(\hat{\jmath}\), and \(\hat{k}\) components of the \(\vec{u}\) and \(\vec{v}\) vectors.</li>
+								<li>You can rotate the camera around the plot by hovering the mouse over the plot, then holding down the left mouse button and moving the mouse.</li>
+								<li>Zoom in and out with the scroll wheel on your mouse.</li>
+								<li>Translate the camera forward and backward, or side-to-side using the right mouse button.</li>
+							</ul>
+						</div>
+					</div>
 				</div>
 			</div>
 
 			<div id="modalDetails" class="modal-content" style="display:none;">
 				<div id="details-content">
-					<span class="close">&times;</span>
-					<p class="popup paragraph"></p>
+					<div class="close">&times;</div>
+					<ul class="nav nav-tabs" role="tablist">
+						<li class="nav-item">
+						<a class="nav-link active vectorAdditionTab" id="" data-toggle="tab" href="#vecAdd" role="tab" aria-controls="vecAdd" aria-selected="true">Vector Addition</a>
+						</li>
+						<li class="nav-item">
+						<a class="nav-link scalarMultiplicationTab" id="" data-toggle="tab" href="#scalarMult" role="tab" aria-controls="scalarMult" aria-selected="false">Scalar Multiplication</a>
+						</li>
+						<li class="nav-item">
+						<a class="nav-link dotProductTab" id="" data-toggle="tab" href="#dotProd" role="tab" aria-controls="dotProd" aria-selected="false">Dot Product</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link crossProductTab" id="" data-toggle="tab" href="#crossProd" role="tab" aria-controls="crossProd" aria-selected="false">Cross Product</a>
+						</li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane fade show active vecAdd" id="" role="tabpanel" aria-labelledby="vector-addition-tab">
+							<br>
+
+						</div>
+						<div class="tab-pane fade scalarMult" id="" role="tabpanel" aria-labelledby="scalar-multiplication-tab">
+							<br>
+
+						</div>
+						<div class="tab-pane fade dotProd" id="" role="tabpanel" aria-labelledby="dot-product-tab">
+							<br>
+							
+						</div>
+						<div class="tab-pane fade crossProd" id="" role="tabpanel" aria-labelledby="cross-product-tab">
+							<br>
+							
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -70,7 +152,8 @@
 					<p class="popup paragraph">
 					"Vector Basics"<br><br>
 					Author: Neil C. Hendren<br>
-					This simulation was created for <a href="http://www.learncheme.com/" target="_blank">LearnChemE.com</a> under the supervision of John L. Falconer at the University of Colorado Boulder. The source code for this demonstration is publicly available at: <a href="https://github.com/LearnChemE/" target="_blank">https://github.com/LearnChemE/</a><br><br>For inquiries or feedback, contact: learncheme@gmail.com 
+					This simulation was created for <a href="http://www.learncheme.com/" target="_blank">LearnChemE.com</a> under the supervision of John L. Falconer at the University of Colorado Boulder. The source code for this demonstration is publicly available at: <a href="https://github.com/LearnChemE/" target="_blank">https://github.com/LearnChemE/</a><br><br>For inquiries or feedback, contact: learncheme@gmail.com <br><br>
+					This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, or Edge.
 					</p>
 				</div>
 			</div>

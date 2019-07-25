@@ -187,10 +187,10 @@ class options {
 
   static drawAxes3D() {
     background(245);
+    orbitControl(3, 3);
+
     ambientLight(160, 160, 160);
     pointLight(255, 255, 255, 20, 20, 200);
-    orbitControl(5, 5);
-    
     
     //let phi = 0;
     let v0 = createVector(0, 1, 0);
@@ -295,7 +295,7 @@ function setup() {
   if(page != "cross product") {
     cnv = createCanvas(pageWidth, pageHeight, P2D); // Add base canvas, x-pixels by y-pixels
     cnv.parent('canvas');
-
+    
     $("#dotProductDiv").width(pageWidth - margins + "px");
     $("#dotProductDiv").height(pageHeight - margins + "px");
     $("#dotProductDiv").hide();
@@ -333,6 +333,7 @@ function setup() {
     }*/
   }
   else {
+
     cnv = createCanvas(pageWidth, pageHeight, WEBGL);
     cnv.parent('canvas');
 
@@ -365,6 +366,10 @@ function setup() {
     guiV.newSlider("z2", -4, 4, 1, 0.1, "z-component: ", ' <img class="guiImgK" src="../../media/kHat.png"></img>');
 
     $("#vectorLATEX").css({"height":"6rem"});
+    $(".vecAdd").toggleClass('show active', false);$(".vectorAdditionTab").toggleClass('active', false);
+    $(".scalarMult").toggleClass('show active', false);$(".scalarMultiplicationTab").toggleClass('active', false);
+    $(".dotProd").toggleClass('show active', false);$(".dotProductTab").toggleClass('active', false);
+    $(".crossProd").toggleClass('show active', true);$(".crossProductTab").toggleClass('active', true);
     MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
     loop();
   }
@@ -422,6 +427,10 @@ function reInitialize() {
       dpResetButton.hide();
       dotProductButton.hide();
       $("#vectorLATEX").css({"height":"5rem"});
+      $(".vecAdd").toggleClass('show active', true);$(".vectorAdditionTab").toggleClass('active', true);
+      $(".scalarMult").toggleClass('show active', false);$(".scalarMultiplicationTab").toggleClass('active', false);
+      $(".dotProd").toggleClass('show active', false);$(".dotProductTab").toggleClass('active', false);
+      $(".crossProd").toggleClass('show active', false);$(".crossProductTab").toggleClass('active', false);
       resetVectorsButton.show();
       //removeVectorButton.show();
       newVectorButton.show();
@@ -434,6 +443,10 @@ function reInitialize() {
       dpResetButton.hide();
       dotProductButton.hide();
       $("#vectorLATEX").css({"height":"5rem"});
+      $(".vecAdd").toggleClass('show active', false);$(".vectorAdditionTab").toggleClass('active', false);
+      $(".scalarMult").toggleClass('show active', true);$(".scalarMultiplicationTab").toggleClass('active', true);
+      $(".dotProd").toggleClass('show active', false);$(".dotProductTab").toggleClass('active', false);
+      $(".crossProd").toggleClass('show active', false);$(".crossProductTab").toggleClass('active', false);
       scalar.limit = 1;
       pts[0] = getCoords(0, 0, basePlot2D);
       pts[1] = getCoords(1, 0, basePlot2D);
@@ -450,6 +463,10 @@ function reInitialize() {
       sumVectorButton.hide();
       gui2D.hide();
       $("#vectorLATEX").css({"height":"6rem"});
+      $(".vecAdd").toggleClass('show active', false);$(".vectorAdditionTab").toggleClass('active', false);
+      $(".scalarMult").toggleClass('show active', false);$(".scalarMultiplicationTab").toggleClass('active', false);
+      $(".dotProd").toggleClass('show active', true);$(".dotProductTab").toggleClass('active', true);
+      $(".crossProd").toggleClass('show active', false);$(".crossProductTab").toggleClass('active', false);
       $("#dotProductDiv").show();
       dpResetButton.show();
       dotProductButton.show();
@@ -596,7 +613,7 @@ let dot = {
         `=(${(dot.v1[0]).toFixed(1)}\\cdot ${(dot.v2[0]).toFixed(1)})` +
         `+(${(dot.v1[1]).toFixed(1)}\\cdot ${(dot.v2[1]).toFixed(1)})` +
         `+(${(dot.v1[2]).toFixed(1)}\\cdot ${(dot.v2[2]).toFixed(1)})` +
-        `=${dot.Prod}`;
+        `=${dot.Prod.toFixed(2)}`;
         dot.animationRunning = false;}
       dot.animationStep = 5;
       $( this ).removeClass( "highlighted" ).dequeue();
@@ -1032,6 +1049,7 @@ class vector3D {
 }
 
 function draw() {
+
   // when everything is evaluated and it starts drawing, update the LaTex text. Happens once.
   if(frameCount % 30 == 0) {switch(page) {
     case "vector addition":
