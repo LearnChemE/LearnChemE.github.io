@@ -109,7 +109,9 @@ canvas {
 	padding: 1.5rem;
 	padding-top: 3rem;
 	border: 1px solid #888;
-	width: 90%;
+  width: 90%;
+  height: 700px;
+  overflow-y:auto;
 }
 
 .close {
@@ -205,4 +207,9 @@ canvas {
 .guiImgK {
   height: 0.75rem;
   transform: translateY(-20%) scaleX(0.8);
+}
+
+.show>.MathJax_Display {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
