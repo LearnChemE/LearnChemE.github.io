@@ -146,9 +146,35 @@
 							$$\vec{v}=6\boldsymbol{\hat{\imath}}+3\boldsymbol{\hat{\jmath}}+2\boldsymbol{\hat{k}}$$
 							Simply multiply together the components with the same dimension ...
 							$$\vec{u}\cdot\vec{v}=(1\cdot6)+(4\cdot3)+(5\cdot2)=28$$
-							One interesting property of the dot product is that any two vectors with identical direction (and non-zero magnitude) will always have a positive dot product, whereas orthogonal vectors will always have a dot product of zero. Let's take a look at these two vectors:
-							<img src="vecSVG1.svg" height="50px" width="100px" style="transform:scaleX(-1);"/>
-							<img src="vecSVG2.svg" height="50px" width="100px" style="transform:scaleX(-1);"/>
+							One interesting property of the dot product is that any two vectors with identical direction (and non-zero magnitude) will always have a positive dot product. Consider the dot product of these two vectors:<br>
+							
+							<div style="width:20%; text-align:center;display:inline-block;margin-left:20%;margin-top:30px;margin-bottom:1.5rem;">
+								<img src="vecSVG1.svg" height="50px" width="100px" style="transform:scaleX(-1);padding-bottom:0.5rem;" />
+								$$\vec{u}=-4\boldsymbol{\hat{\imath}}+2\boldsymbol{\hat{\jmath}}$$
+							</div>
+							
+							<div style="width:20%; text-align:center;display:inline-block;margin-left:20%;">
+								<img src="vecSVG2.svg" height="50px" width="100px" style="transform:scaleX(-1);padding-bottom:0.5rem;" />
+								$$\vec{v}=-2\boldsymbol{\hat{\imath}}+1\boldsymbol{\hat{\jmath}}$$
+							</div>
+							
+							$$\vec{u}\cdot\vec{v}=(-4\cdot-2)+(2\cdot1)=10$$<br>
+							On the other hand, orthogonal vectors will always have a dot product of zero:<br>
+							
+							<div style="width:20%; text-align:center;display:inline-block;margin-left:20%;margin-top:30px;margin-bottom:1.5rem;">
+								<img src="vecSVG1.svg" height="50px" width="100px" style="transform:scaleX(-1);padding-bottom:0.5rem;" />
+								$$\vec{u}=-4\boldsymbol{\hat{\imath}}+2\boldsymbol{\hat{\jmath}}$$
+							</div>
+
+							<div style="width:20%; text-align:center;display:inline-block;margin-left:20%;">
+								<img src="vecSVG2.svg" height="50px" width="100px" style="transform:scaleX(-1) rotate(-90deg) translateY(-25%) translateX(25%);padding-bottom:0.5rem;" />
+								$$\vec{v}=1\boldsymbol{\hat{\imath}}+2\boldsymbol{\hat{\jmath}}$$
+							</div>
+							
+							$$\vec{u}\cdot\vec{v}=(-4\cdot1)+(2\cdot2)=0$$<br>
+							The dot product may also be defined geometrically, as the product of the magnitude of the two vectors and the cosine of the angle between the two vectors:
+							$$\vec{u}\cdot\vec{v}=\| \mathbf{u} \|\| \mathbf{v} \|\cos(\theta)$$
+							Since we know that&nbsp;\(\cos(0°)=1\) and \(\cos(90°)=0\), it should make sense why vectors with identical direction have a positive dot product, and orthogonal vectors have a dot product of zero!
 						</div>
 						<div class="tab-pane fade crossProd" id="crossProd2" role="tabpanel" aria-labelledby="cross-product-tab">
 							<br>
