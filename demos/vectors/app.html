@@ -139,7 +139,16 @@
 						</div>
 						<div class="tab-pane fade dotProd" id="dotProd2" role="tabpanel" aria-labelledby="dot-product-tab">
 							<br>
-							
+							The dot product is used to multiply together together the common components of two vectors. The result of the dot product is a scalar value (not a vector). The algebraic definition of dot product is:
+							$$\sum_{i=1}^{n}u_{i}v_{i}$$
+							Where \(u_{i}\) is the component of vector \(\vec{u}\) in the \(i^{th}\) dimension, and \(v_{i}\) is the component of vector \(\vec{v}\) in the \(i^{th}\) dimension. \(n\) represents the total number of dimensions in vectors \(\vec{u}\) and \(\vec{v}\). A dot product can be performed on any two vectors with identical dimensions. Let's look at a dot product of two 3-dimensional vectors:
+							$$\vec{u}=1\boldsymbol{\hat{\imath}}+4\boldsymbol{\hat{\jmath}}+5\boldsymbol{\hat{k}}$$
+							$$\vec{v}=6\boldsymbol{\hat{\imath}}+3\boldsymbol{\hat{\jmath}}+2\boldsymbol{\hat{k}}$$
+							Simply multiply together the components with the same dimension ...
+							$$\vec{u}\cdot\vec{v}=(1\cdot6)+(4\cdot3)+(5\cdot2)=28$$
+							One interesting property of the dot product is that any two vectors with identical direction (and non-zero magnitude) will always have a positive dot product, whereas orthogonal vectors will always have a dot product of zero. Let's take a look at these two vectors:
+							<img src="vecSVG1.svg" height="50px" width="100px" style="transform:scaleX(-1);"/>
+							<img src="vecSVG2.svg" height="50px" width="100px" style="transform:scaleX(-1);"/>
 						</div>
 						<div class="tab-pane fade crossProd" id="crossProd2" role="tabpanel" aria-labelledby="cross-product-tab">
 							<br>
