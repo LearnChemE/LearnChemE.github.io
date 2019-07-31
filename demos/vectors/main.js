@@ -147,11 +147,11 @@ class options {
     dpResetButton.hide();
 
     crossVectorCheckbox = createCheckbox('show cross product', false);
-    crossVectorCheckbox.position(width-80, 90 + cnvOffset);
+    crossVectorCheckbox.position(width-80, 80 + cnvOffset);
     crossVectorCheckbox.changed(mySelectEvent);
 
     normPlaneCheckbox = createCheckbox('show normal plane', false);
-    normPlaneCheckbox.position(width-80, 130 + cnvOffset);
+    normPlaneCheckbox.position(width-80, 110 + cnvOffset);
     normPlaneCheckbox.changed(mySelectEvent);
 
     selectOptions = createSelect();
@@ -356,12 +356,12 @@ function setup() {
     camera(200, -300, (height/1.5) / tan(PI*30.0 / 180.0), 0, 0, 0, 0, 1, 0);
 
     QuickSettings.useExtStyleSheet();
-    guiU = createGui('$$\\vec{u}$$', width + 10, 180  + cnvOffset,"uGUI");
+    guiU = createGui('$$\\vec{u}$$', width + 10, 145  + cnvOffset,"uGUI");
     guiU.newSlider("x1", -4, 4, 1, 0.1, "x-component: ", ' <img class="guiImgI" src="../../media/iHat.png"></img>');
     guiU.newSlider("y1", -4, 4, 1, 0.1, "y-component: ", ' <img class="guiImgJ" src="../../media/jHat.png"></img>');
     guiU.newSlider("z1", -4, 4, 1, 0.1, "z-component: ", ' <img class="guiImgK" src="../../media/kHat.png"></img>');
     
-    guiV = createGui('$$\\vec{v}$$', width + 10, 410  + cnvOffset,"vGUI");
+    guiV = createGui('$$\\vec{v}$$', width + 10, 360  + cnvOffset,"vGUI");
     guiV.newSlider("x2", -4, 4, 1, 0.1, "x-component: ", ' <img class="guiImgI" src="../../media/iHat.png"></img>');
     guiV.newSlider("y2", -4, 4, 1, 0.1, "y-component: ", ' <img class="guiImgJ" src="../../media/jHat.png"></img>');
     guiV.newSlider("z2", -4, 4, 1, 0.1, "z-component: ", ' <img class="guiImgK" src="../../media/kHat.png"></img>');
@@ -373,6 +373,8 @@ function setup() {
     $(".crossProd").toggleClass('show active', true);$(".crossProductTab").toggleClass('active', true);
     MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
     loop();
+
+    $("#defaultCanvas0").css({"outline":"1px solid black","transform":"translateX(2px)"});
   }
 }
 
