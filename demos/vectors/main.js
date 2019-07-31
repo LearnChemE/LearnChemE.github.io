@@ -164,7 +164,7 @@ class options {
     selectOptions.changed(reInitialize);
 
     QuickSettings.useExtStyleSheet();
-    gui2D = createGui('Scalar Multiplier', width - 100, 180 + cnvOffset);
+    gui2D = createGui('scalar multiplier', width - 100, 180 + cnvOffset);
     gui2D.newSlider("multFac", -4, 4, 1, 0.1, "multiply by", "");
     gui2D.addButton("multiply!", function() {
       scalar.Mult();
@@ -186,7 +186,7 @@ class options {
   }
 
   static drawAxes3D() {
-    background(245);
+    background(255);
     orbitControl(3, 3);
 
     ambientLight(160, 160, 160);
@@ -336,11 +336,12 @@ function setup() {
 
     cnv = createCanvas(pageWidth, pageHeight, WEBGL);
     cnv.parent('canvas');
-
-    options.defaultSidebar();
-    resizeCanvas(pageWidth-100, pageHeight);
     textFont(myFont);
     textSize(rem*2);
+
+    options.defaultSidebar();
+
+    resizeCanvas(pageWidth-100, pageHeight);
 
     $("#dotProductDiv").hide();
     newVectorButton.hide();
@@ -355,12 +356,12 @@ function setup() {
     camera(200, -300, (height/1.5) / tan(PI*30.0 / 180.0), 0, 0, 0, 0, 1, 0);
 
     QuickSettings.useExtStyleSheet();
-    guiU = createGui('$$\\vec{u}$$', width + 10, 180  + cnvOffset);
+    guiU = createGui('$$\\vec{u}$$', width + 10, 180  + cnvOffset,"uGUI");
     guiU.newSlider("x1", -4, 4, 1, 0.1, "x-component: ", ' <img class="guiImgI" src="../../media/iHat.png"></img>');
     guiU.newSlider("y1", -4, 4, 1, 0.1, "y-component: ", ' <img class="guiImgJ" src="../../media/jHat.png"></img>');
     guiU.newSlider("z1", -4, 4, 1, 0.1, "z-component: ", ' <img class="guiImgK" src="../../media/kHat.png"></img>');
     
-    guiV = createGui('$$\\vec{v}$$', width + 10, 410  + cnvOffset);
+    guiV = createGui('$$\\vec{v}$$', width + 10, 410  + cnvOffset,"vGUI");
     guiV.newSlider("x2", -4, 4, 1, 0.1, "x-component: ", ' <img class="guiImgI" src="../../media/iHat.png"></img>');
     guiV.newSlider("y2", -4, 4, 1, 0.1, "y-component: ", ' <img class="guiImgJ" src="../../media/jHat.png"></img>');
     guiV.newSlider("z2", -4, 4, 1, 0.1, "z-component: ", ' <img class="guiImgK" src="../../media/kHat.png"></img>');
@@ -1105,11 +1106,12 @@ function draw() {
       break;
     case "cross product":
       options.drawAxes3D();
-      ambientMaterial(135, 91, 209);
+      ambientMaterial(50, 50, 255);
       new vector3D(x1, y1, z1, uvec);
-      ambientMaterial(135, 191, 109);
+      ambientMaterial(125, 255, 50);
       new vector3D(x2, y2, z2, vvec);
       if(drawCross) {
+        ambientMaterial(255, 50, 50);
         vector3D.cross(x1, y1, z1, x2, y2, z2);
       }
       if (drawNormalPlane) {

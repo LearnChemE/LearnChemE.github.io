@@ -47,16 +47,16 @@
 					<div class="close">&times;</div>
 					<ul class="nav nav-tabs" role="tablist">
 						<li class="nav-item">
-						<a class="nav-link active vectorAdditionTab" id="" data-toggle="tab" href="#vecAdd1" role="tab" aria-controls="vecAdd" aria-selected="true">Vector Addition</a>
+						<a class="nav-link active vectorAdditionTab" id="" data-toggle="tab" href="#vecAdd1" role="tab" aria-controls="vecAdd" aria-selected="true">Vector addition</a>
 						</li>
 						<li class="nav-item">
-						<a class="nav-link scalarMultiplicationTab" id="" data-toggle="tab" href="#scalarMult1" role="tab" aria-controls="scalarMult" aria-selected="false">Scalar Multiplication</a>
+						<a class="nav-link scalarMultiplicationTab" id="" data-toggle="tab" href="#scalarMult1" role="tab" aria-controls="scalarMult" aria-selected="false">Scalar multiplication</a>
 						</li>
 						<li class="nav-item">
-						<a class="nav-link dotProductTab" id="" data-toggle="tab" href="#dotProd1" role="tab" aria-controls="dotProd" aria-selected="false">Dot Product</a>
+						<a class="nav-link dotProductTab" id="" data-toggle="tab" href="#dotProd1" role="tab" aria-controls="dotProd" aria-selected="false">Dot product</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link crossProductTab" id="" data-toggle="tab" href="#crossProd1" role="tab" aria-controls="crossProd" aria-selected="false">Cross Product</a>
+							<a class="nav-link crossProductTab" id="" data-toggle="tab" href="#crossProd1" role="tab" aria-controls="crossProd" aria-selected="false">Cross product</a>
 						</li>
 					</ul>
 					<div class="tab-content">
@@ -113,53 +113,50 @@
 					<div class="close">&times;</div>
 					<ul class="nav nav-tabs" role="tablist">
 						<li class="nav-item">
-						<a class="nav-link active vectorAdditionTab" id="" data-toggle="tab" href="#vecAdd2" role="tab" aria-controls="vecAdd" aria-selected="true">Vector Addition</a>
+						<a class="nav-link active vectorAdditionTab" id="" data-toggle="tab" href="#vecAdd2" role="tab" aria-controls="vecAdd" aria-selected="true">Vector addition</a>
 						</li>
 						<li class="nav-item">
-						<a class="nav-link scalarMultiplicationTab" id="" data-toggle="tab" href="#scalarMult2" role="tab" aria-controls="scalarMult" aria-selected="false">Scalar Multiplication</a>
+						<a class="nav-link scalarMultiplicationTab" id="" data-toggle="tab" href="#scalarMult2" role="tab" aria-controls="scalarMult" aria-selected="false">Scalar multiplication</a>
 						</li>
 						<li class="nav-item">
-						<a class="nav-link dotProductTab" id="" data-toggle="tab" href="#dotProd2" role="tab" aria-controls="dotProd" aria-selected="false">Dot Product</a>
+						<a class="nav-link dotProductTab" id="" data-toggle="tab" href="#dotProd2" role="tab" aria-controls="dotProd" aria-selected="false">Dot product</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link crossProductTab" id="" data-toggle="tab" href="#crossProd2" role="tab" aria-controls="crossProd" aria-selected="false">Cross Product</a>
+							<a class="nav-link crossProductTab" id="" data-toggle="tab" href="#crossProd2" role="tab" aria-controls="crossProd" aria-selected="false">Cross product</a>
 						</li>
 					</ul>
 					<div class="tab-content">
 						<div class="tab-pane fade show active vecAdd" id="vecAdd2" role="tabpanel" aria-labelledby="vector-addition-tab">
 							<br>
-							Vector addition is used to sum together multiple vectors of the same dimension. The resultant vector is defined by the sum of the individual components of each vector. For example, if we have two vectors: $$\vec{u}=2\boldsymbol{\hat{\imath}}+3\boldsymbol{\hat{\jmath}}$$ $$\vec{v}=4\boldsymbol{\hat{\imath}}+7\boldsymbol{\hat{\jmath}}$$ then their sum is:
-							$$\vec{u}+\vec{v}=(2+4)\boldsymbol{\hat{\imath}}+(3+7)\boldsymbol{\hat{\jmath}}=6\boldsymbol{\hat{\imath}}+10\boldsymbol{\hat{\jmath}}$$ In matrix notation, this may written in either of these two ways: $$\vec{u}+\vec{v}=\begin{bmatrix}2 \\ 3 \end{bmatrix}+\begin{bmatrix}4 \\ 7 \end{bmatrix}=\begin{bmatrix}6 \\ 10 \end{bmatrix}$$ $$\vec{u}+\vec{v}=\begin{bmatrix}2 & 3 \end{bmatrix}+\begin{bmatrix}4 & 7 \end{bmatrix}=\begin{bmatrix}6 & 10 \end{bmatrix}$$ And in ordered-set notation: $$\vec{u}+\vec{v}=\langle2, 3\rangle+\langle4, 7\rangle=\langle6, 10\rangle$$
-							Note that the same method of adding individual components <b>cannot</b> be used for vectors written in polar, cylindrical, or spherical coordinates: $$\vec{u}+\vec{v}=\begin{bmatrix}3.6 \\\angle56° \end{bmatrix}+\begin{bmatrix}8.1 \\ \angle60° \end{bmatrix}\ne\begin{bmatrix}11.7 \\ \angle116° \end{bmatrix}$$
-							Instead, they must first be converted to cartesian coordinates then summed.
+							When vectors are added, the resultant vector is the sum of the individual components of each vector. For example, for these two vectors:
+							$$\vec{u}=2\boldsymbol{\hat{\imath}}+3\boldsymbol{\hat{\jmath}}$$ $$\vec{v}=4\boldsymbol{\hat{\imath}}+7\boldsymbol{\hat{\jmath}}$$
+							their sum is:
+							$$\vec{u}+\vec{v}=(2+4)\boldsymbol{\hat{\imath}}+(3+7)\boldsymbol{\hat{\jmath}}=6\boldsymbol{\hat{\imath}}+10\boldsymbol{\hat{\jmath}}$$
+							In matrix notation, this may written either of two ways:
+							$$\vec{u}+\vec{v}=\begin{bmatrix}2 \\ 3 \end{bmatrix}+\begin{bmatrix}4 \\ 7 \end{bmatrix}=\begin{bmatrix}6 \\ 10 \end{bmatrix}$$ $$\vec{u}+\vec{v}=\begin{bmatrix}2 & 3 \end{bmatrix}+\begin{bmatrix}4 & 7 \end{bmatrix}=\begin{bmatrix}6 & 10 \end{bmatrix}$$
 						</div>
 						<div class="tab-pane fade scalarMult" id="scalarMult2" role="tabpanel" aria-labelledby="scalar-multiplication-tab">
 							<br>
-							Scalar multiplication of vectors is used to multiply the <i>magnitude</i> of vectors by a scalar quantity without altering the <i>direction</i> of the vector. For example, given the 3-dimensional vector below:$$\vec{u}=2\boldsymbol{\hat{\imath}}+4\boldsymbol{\hat{\jmath}}+1\boldsymbol{\hat{k}}$$ Performing a scalar multiplication by a factor of 3 would result in the following: $$3\vec{u}=(3\cdot2)\boldsymbol{\hat{\imath}}+(3\cdot4)\boldsymbol{\hat{\jmath}}+(3\cdot1)\boldsymbol{\hat{k}}=6\boldsymbol{\hat{\imath}}+12\boldsymbol{\hat{\jmath}}+3\boldsymbol{\hat{k}}$$ In matrix notation, this may be written in either of these two ways: $$3\vec{u}=3\begin{bmatrix}2 \\ 4 \\ 1 \end{bmatrix}=\begin{bmatrix}6 \\ 12 \\ 3\end{bmatrix}$$ $$3\vec{u}=3\begin{bmatrix}2 & 4 & 1 \end{bmatrix}=\begin{bmatrix}6 & 12 & 3\end{bmatrix}$$ And in ordered-set notation: $$3\vec{u}=3\langle2, 4, 1\rangle=\langle6, 12, 3\rangle$$Unlike with vector addition, scalar multiplication in cylindrical, spherical, or polar coordinates is very simple. Simply multiply the magnitude by the scalar value, and keep the direction constant. Some examples of scalar multiplication in other coordinate systems:<div style="text-align:center;"><br>Spherical Coordinates</div>$$\vec{v}=4\boldsymbol{\hat{r}}+60°\boldsymbol{\hat{\theta}}+75°\boldsymbol{\hat{\phi}}$$ $$3\vec{v}=12\boldsymbol{\hat{r}}+60°\boldsymbol{\hat{\theta}}+75°\boldsymbol{\hat{\phi}}$$<div style="text-align:center;"><br>Cylindrical Coordinates</div>$$\vec{w}=5\boldsymbol{\hat{\rho}}+15.4°\boldsymbol{\hat{\theta}}+2\boldsymbol{\hat{z}}$$ $$3\vec{w}=15\boldsymbol{\hat{\rho}}+15.4°\boldsymbol{\hat{\theta}}+6\boldsymbol{\hat{z}}$$<div style="text-align:center;"><br>Polar Coordinates</div>$$\vec{x}=8\boldsymbol{\hat{r}}+52°\boldsymbol{\hat{\theta}}$$ $$3\vec{x}=24\boldsymbol{\hat{r}}+52°\boldsymbol{\hat{\theta}}$$
+							Scalar multiplication of vectors multiplies the <i>magnitude</i> of vectors by a scalar quantity without altering the <i>direction</i> of the vector. For example, the 3-dimensional vector:
+							$$\vec{u}=2\boldsymbol{\hat{\imath}}+4\boldsymbol{\hat{\jmath}}+1\boldsymbol{\hat{k}}$$
+							A scalar multiplication by a factor of 3 yields:
+							$$3\vec{u}=(3\cdot2)\boldsymbol{\hat{\imath}}+(3\cdot4)\boldsymbol{\hat{\jmath}}+(3\cdot1)\boldsymbol{\hat{k}}=6\boldsymbol{\hat{\imath}}+12\boldsymbol{\hat{\jmath}}+3\boldsymbol{\hat{k}}$$
+							In matrix notation, this can be written two ways:
+							$$3\vec{u}=3\begin{bmatrix}2 \\ 4 \\ 1 \end{bmatrix}=\begin{bmatrix}6 \\ 12 \\ 3\end{bmatrix}$$ $$3\vec{u}=3\begin{bmatrix}2 & 4 & 1 \end{bmatrix}=\begin{bmatrix}6 & 12 & 3\end{bmatrix}$$
+							In ordered-set notation, it is written as:
+							$$3\vec{u}=3\langle2, 4, 1\rangle=\langle6, 12, 3\rangle$$
 						</div>
 						<div class="tab-pane fade dotProd" id="dotProd2" role="tabpanel" aria-labelledby="dot-product-tab">
 							<br>
-							The dot product is used to multiply together together the common components of two vectors. The result of the dot product is a scalar value (not a vector). The algebraic definition of dot product is:
+							The dot product multiplies together the common components of two vectors to yield a scalar value (not a vector):
 							$$\sum_{i=1}^{n}u_{i}v_{i}$$
-							Where \(u_{i}\) is the component of vector \(\vec{u}\) in the \(i^{th}\) dimension, and \(v_{i}\) is the component of vector \(\vec{v}\) in the \(i^{th}\) dimension. \(n\) represents the total number of dimensions in vectors \(\vec{u}\) and \(\vec{v}\). A dot product can be performed on any two vectors with identical dimensions. Let's look at a dot product of two 3-dimensional vectors:
+							Where \(u_{i}\) is the component of vector \(\vec{u}\) in the \(i^{th}\) dimension, and \(v_{i}\) is the component of vector \(\vec{v}\) in the \(i^{th}\) dimension. \(n\) represents the total number of dimensions in vectors \(\vec{u}\) and \(\vec{v}\). A dot product can be performed on any two vectors with identical dimensions. For these 3-dimensional vectors:
 							$$\vec{u}=1\boldsymbol{\hat{\imath}}+4\boldsymbol{\hat{\jmath}}+5\boldsymbol{\hat{k}}$$
 							$$\vec{v}=6\boldsymbol{\hat{\imath}}+3\boldsymbol{\hat{\jmath}}+2\boldsymbol{\hat{k}}$$
-							Simply multiply together the components with the same dimension ...
+							Multiply together the components with the same dimension ...
 							$$\vec{u}\cdot\vec{v}=(1\cdot6)+(4\cdot3)+(5\cdot2)=28$$
-							One interesting property of the dot product is that any two vectors with identical direction (and non-zero magnitude) will always have a positive dot product. Consider the dot product of these two vectors:<br>
 							
-							<div style="width:20%; text-align:center;display:inline-block;margin-left:20%;margin-top:30px;margin-bottom:1.5rem;">
-								<img src="vecSVG1.svg" height="50px" width="100px" style="transform:scaleX(-1);padding-bottom:0.5rem;" />
-								$$\vec{u}=-4\boldsymbol{\hat{\imath}}+2\boldsymbol{\hat{\jmath}}$$
-							</div>
-							
-							<div style="width:20%; text-align:center;display:inline-block;margin-left:20%;">
-								<img src="vecSVG2.svg" height="50px" width="100px" style="transform:scaleX(-1);padding-bottom:0.5rem;" />
-								$$\vec{v}=-2\boldsymbol{\hat{\imath}}+1\boldsymbol{\hat{\jmath}}$$
-							</div>
-							
-							$$\vec{u}\cdot\vec{v}=(-4\cdot-2)+(2\cdot1)=10$$<br>
-							On the other hand, orthogonal vectors will always have a dot product of zero:<br>
+							Note that orthogonal vectors have a dot product of zero:<br>
 							
 							<div style="width:20%; text-align:center;display:inline-block;margin-left:20%;margin-top:30px;margin-bottom:1.5rem;">
 								<img src="vecSVG1.svg" height="50px" width="100px" style="transform:scaleX(-1);padding-bottom:0.5rem;" />
@@ -172,28 +169,28 @@
 							</div>
 							
 							$$\vec{u}\cdot\vec{v}=(-4\cdot1)+(2\cdot2)=0$$<br>
-							The dot product may also be defined geometrically, as the product of the magnitude of the two vectors and the cosine of the angle between the two vectors:
-							$$\vec{u}\cdot\vec{v}=\| \mathbf{u} \|\| \mathbf{v} \|\cos(\theta)$$
-							Since we know that&nbsp;\(\cos(0°)=1\) and \(\cos(90°)=0\), it should make sense why vectors with identical direction have a positive dot product, and orthogonal vectors have a dot product of zero!
+
 						</div>
 						<div class="tab-pane fade crossProd" id="crossProd2" role="tabpanel" aria-labelledby="cross-product-tab">
 							<br>
-							The cross-product is used to define the vector that is <i>normal</i> to the plane created by the intersection of two linearly-independent vectors in 3-dimensional space. Its direction obeys the right-hand rule, and its magnitude is dependent on the magnitude of the two vectors, as well as the degree of orthogonality between them.<br><br>Let's break down this definition a bit. The definition of the cross-product is$$\vec{u}\times\vec{v}=\| \mathbf{u} \|\| \mathbf{v} \|\sin(\theta)\mathbf{n}$$Where \(\|\mathbf{u}\|\) and \(\|\mathbf{v}\|\) are the magnitudes of vectors \(\vec{u}\) and \(\vec{v}\), \(\theta\) is the angle created by the intersection of the two vectors, and \(\mathbf{n}\) is the vector normal to the plane created by the two vectors. Because \(\sin(0°)=0\) and \(\sin(90°)=1\), vectors with high orthogonality will create cross product vectors with higher magnitude than those with low orthogonality. See the animation below for a visual representation of this principle:
+							The direction of the cross-product obeys the right-hand rule, and its magnitude is dependent on the magnitude of the two vectors, as well as the degree of orthogonality between them.<br><br>The definition of the cross-product is:
+							$$\vec{u}\times\vec{v}=\| \mathbf{u} \|\| \mathbf{v} \|\sin(\theta)\mathbf{n}$$
+							Where \(\|\mathbf{u}\|\) and \(\|\mathbf{v}\|\) are the magnitudes of vectors \(\vec{u}\) and \(\vec{v}\), \(\theta\) is the angle created by the intersection of the two vectors, and \(\mathbf{n}\) is the vector normal to the plane created by the two vectors. Because \(\sin(0°)=0\) and \(\sin(90°)=1\), vectors with high orthogonality will create cross product vectors with higher magnitude than those with low orthogonality.<br>
 							<div style="width:20%;font-size:0.75rem;text-align:center;display:inline-block;margin-left:40%;">
 								<img src="crossproduct.gif" width="100%" style="padding-bottom:0.5rem;" />
 								Image source: wikipedia.org
 							</div><br>
-							The definition above, though concise, does not allow us to calculate the cross-product very easily. Therefore, given two 3-dimensional vectors \(\vec{u}\) and \(\vec{v}\):
+							The cross product of \(\vec{u}\) and \(\vec{v}\):
 							$$\vec{u}=u_{1}\boldsymbol{\hat{\imath}}+u_{2}\boldsymbol{\hat{\jmath}}+u_{3}\boldsymbol{\hat{k}}$$
 							$$\vec{v}=v_{1}\boldsymbol{\hat{\imath}}+v_{2}\boldsymbol{\hat{\jmath}}+v_{3}\boldsymbol{\hat{k}}$$
-							We find the cross-product through the determinant:
+							Can be calculated through the determinant:
 							$$\vec{u}\times\vec{v}=
 							\begin{vmatrix}
 							\hat{\imath} & \hat{\jmath} & \hat{k} \\ 
 							u_{1} & u_{2} & u_{3} \\ 
 							v_{1} & v_{2} & v_{3}
 							\end{vmatrix}$$
-							Resulting in the following:
+							This results in:
 							$$\vec{u}\times\vec{v}=(u_{2}v_{3}-u_{3}v_{2})\boldsymbol{\hat{\imath}}+(u_{3}v_{1}-u_{1}v_{3})\boldsymbol{\hat{\jmath}}+(u_{1}v_{2}-u_{2}v_{1})\boldsymbol{\hat{k}}$$
 							Or in matrix notation:
 							$$\vec{u}\times\vec{v}=\begin{bmatrix} 

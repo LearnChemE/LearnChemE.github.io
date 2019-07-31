@@ -70,6 +70,7 @@
   -moz-border-radius: 6px;
   border-radius: 6px;
   background:#b0c08c;
+  border: 1px solid black;
 }
 .qs_range:focus::-webkit-slider-runnable-track {
   background:#c7d6a4;
@@ -77,14 +78,14 @@
 
 .qs_range::-webkit-slider-thumb {
   -webkit-appearance: none;
-  height: 12px;
-  width: 12px;
+  height: 14px;
+  width: 14px;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
   border: 1px solid #000000;
   cursor: pointer;
-  margin-top: 0px;
+  margin-top: -2px;
   background:#fa4848;
 }
 
@@ -96,6 +97,7 @@
   -moz-border-radius: 6px;
   border-radius: 6px;
   background:#b0c08c;
+  border: 1px solid #000000;
 }
 
 .qs_range::-moz-range-thumb {
@@ -127,6 +129,7 @@
   -moz-border-radius: 6px;
   border-radius: 6px;
   border: 1px solid #000000;
+  margin-top: -1px;
   cursor: pointer;
   background: #fa4848;
 }
@@ -137,6 +140,7 @@
   -moz-border-radius: 6px;
   border-radius: 6px;
   background: #b0c08c;
+  border: 1px solid #000000;
 }
 
 .qs_range::-ms-fill-upper {
@@ -144,6 +148,8 @@
   -moz-border-radius: 6px;
   border-radius: 6px;
   background:#b0c08c;
+  border: 1px solid #000000;
+  transform: translateX(-1px);
 }
 
 .qs_range:focus::-ms-fill-lower {
@@ -323,4 +329,108 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+#uGUI {
+  background-color: rgb(255, 255, 255);
+}
+
+#uGUI .qs_container {
+  background-color: rgb(255, 255, 255);
+}
+
+#uGUI .qs_range::-webkit-slider-runnable-track {
+  background: rgb(180, 180, 255);
+}
+
+#uGUI .qs_range:focus::-webkit-slider-runnable-track {
+  background: rgb(200, 200, 255);
+}
+
+#uGUI .qs_range::-webkit-slider-thumb {
+  background: rgb(0, 0, 255);
+}
+
+#uGUI .qs_range::-moz-range-track {
+  background: rgb(180, 180, 255);
+}
+
+#uGUI .qs_range::-moz-range-thumb {
+  background: rgb(0, 0, 255);
+}
+
+#uGUI .qs_range::-ms-track {
+  background: rgb(180, 180, 255);
+}
+
+#uGUI .qs_range::-ms-thumb {
+  background: rgb(0, 0, 255);
+}
+
+#uGUI .qs_range::-ms-fill-lower {
+  background: rgb(180, 180, 255);
+}
+
+#uGUI .qs_range::-ms-fill-upper {
+  background: rgb(180, 180, 255);
+}
+
+#uGUI .qs_range:focus::-ms-fill-lower {
+  background: rgb(200, 200, 255);
+}
+
+#uGUI .qs_range:focus::-ms-fill-upper {
+  background: rgb(200, 200, 255);
+}
+
+#vGUI {
+  background-color: rgb(255, 255, 255);
+}
+
+#vGUI .qs_container {
+  background-color: rgb(255, 255, 255);
+}
+
+#vGUI .qs_range::-webkit-slider-runnable-track {
+  background: rgb(235, 255, 180);
+}
+
+#vGUI .qs_range:focus::-webkit-slider-runnable-track {
+  background: rgb(255, 255, 200);
+}
+
+#vGUI .qs_range::-webkit-slider-thumb {
+  background: rgb(50, 200, 0);
+}
+
+#vGUI .qs_range::-moz-range-track {
+  background: rgb(235, 255, 180);
+}
+
+#vGUI .qs_range::-moz-range-thumb {
+  background: rgb(50, 200, 0);
+}
+
+#vGUI .qs_range::-ms-track {
+  background: rgb(235, 255, 180);
+}
+
+#vGUI .qs_range::-ms-thumb {
+  background: rgb(50, 200, 0);
+}
+
+#vGUI .qs_range::-ms-fill-lower {
+  background: rgb(235, 255, 180);
+}
+
+#vGUI .qs_range::-ms-fill-upper {
+  background: rgb(235, 255, 180);
+}
+
+#vGUI .qs_range:focus::-ms-fill-lower {
+  background: rgb(255, 255, 200);
+}
+
+#vGUI .qs_range:focus::-ms-fill-upper {
+  background: rgb(255, 255, 200);
 }
