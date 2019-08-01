@@ -291,6 +291,18 @@ class drawing {
   }
 }
 
+
+function zoom(event) {
+    // zoom according to direction of mouseWheelDeltaY rather than value
+    let sensitivityZoom = 0.05;
+    let scaleFactor = cnv.height;
+    if (event.deltaY > 0) {
+        cnv._curCamera._orbit(0, 0, sensitivityZoom * scaleFactor);
+    } else {
+        cnv._curCamera._orbit(0, 0, -sensitivityZoom * scaleFactor);
+    }
+}
+
 function setup() {
   if(page != "cross product") {
     cnv = createCanvas(pageWidth, pageHeight, P2D); // Add base canvas, x-pixels by y-pixels
@@ -336,6 +348,8 @@ function setup() {
 
     cnv = createCanvas(pageWidth, pageHeight, WEBGL);
     cnv.parent('canvas');
+    cnv.mouseWheel(zoom);
+
     textFont(myFont);
     textSize(rem*2);
 

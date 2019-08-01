@@ -17,6 +17,7 @@
 
 		<!-- imports p5.js libraries from local folders -->
 		<script type="text/javascript" src="libraries/p5/p5.min.js"></script>
+		<script type="text/javascript" src="libraries/p5/orbitControl.min.js"></script>
 		<script type="text/javascript" src="libraries/p5/p5.dom.min.js"></script>
 		
 		<!-- imports grafica and GUI libraries from local folders -->
@@ -62,28 +63,36 @@
 					<div class="tab-content">
 						<div class="tab-pane fade show active vecAdd" id="vecAdd1" role="tabpanel" aria-labelledby="vector-addition-tab">
 							<br>
+							Vector addition adds up to four two-dimensional vectors and displays the resultant vector.
+							<br><br>
 							<ul>
-								<li>Drag the vector by its head or tail to move it around on the plot. The coordinates will display near the cursor.</li>
-								<li>Hover your mouse over the vector to show the \(\boldsymbol{\hat{\imath}}\) and \(\boldsymbol{\hat{\jmath}}\) components of the vector.</li>
-								<li>As you move the vector, notice that the two-dimensional matrix above the plot updates! A two-dimensional matrix is one form of vector notation, one of many ways to represent a vector.</li>
-								<li>To insert another vector into the plot, press the "insert vector" button to the right of the plot. This will add another vector of random magnitude and direction, whose origin is the head of the first vector.</li>
-								<li>To find the sum of all of the vectors you have added to the plot, press the "sum vectors" button to the right of the plot. The resulting vector is equivalent to the sum of all vectors inserted into the plot.</li>
+								<li>Select "vector addition" from the drop-down menu.</li>
+								<li>Drag the vector by its head or tail to move it around on the plot. Coordinates of the head or tail will display near the cursor.</li>
+								<li>Hover your mouse over the vector to show its \(\boldsymbol{\hat{\imath}}\) and \(\boldsymbol{\hat{\jmath}}\) components.</li>
+								<li>As you move the vector, the matrix above the plot updates.</li>
+								<li>To add another vector to the plot, press the "insert vector" button. This will add a vector whose origin is the head of the first vector; its magnitude and direction are random. Up to three vectors can be inserted.</li>
+								<li>Press the "sum vectors" button to add the vectors and display the resultant vector. The matrices are added above the plot and the matrix of the resultant vector is shown.</li>
 								<li>After you have summed the vectors, the solution to the equation will display above the plot! Press reset to start again.</li>
+								<li>Press reset at any time to start over.</li>
 							</ul>
 						</div>
 						<div class="tab-pane fade scalarMult" id="scalarMult1" role="tabpanel" aria-labelledby="scalar-multiplication-tab">
 							<br>
+							Scalar multiplication multiples a vector by a scalar and displays the resultant vector.
+							<br><br>
 							<ul>
-								<li>Drag the vector by its head to move it around on the plot. The coordinates will display near the cursor.</li>
-								<li>The origin of the vector is held at (0, 0), and cannot be moved.</li>
-								<li>In the panel to the right of the plot, adjust the slider to the value you would like to scalar-multiply by.</li>
-								<li>Check the equation above the plot, it shows the resulting vector if the current vector is multiplied by the number you have chosen on the slider.</li>
+								<li>Select "scalar multiplication" from the drop-down menu.</li>
+								<li>The origin of the starting  vector is fixed at (0, 0). Drag the vector head to move it around on the plot. The coordinates will display near the cursor.</li>
+								<li>Adjust the slider "multiply by" to the desired scalar value. The equation above the plot shows the resulting vector if the starting vector is multiplied the slider value.</li>
+								<li>Press the "multiply!" button to display the resulting vector.</li>
 								<li>Hover the mouse over the vector to show the \(\boldsymbol{\hat{\imath}}\) and \(\boldsymbol{\hat{\jmath}}\) components of the vector.</li>
-								<li>To reset to the default vector, press "reset" on the panel to the right of the plot.</li>
+								<li>Press reset at any time to start over.</li>
 							</ul>
 						</div>
 						<div class="tab-pane fade dotProd" id="dotProd1" role="tabpanel" aria-labelledby="dot-product-tab">
 							<br>
+							Dot product calculates the value of the dot product of two three-dimensional vectors.
+							<br><br>
 							<ul>
 								<li>The 3-dimensional \(\vec{u}\) and \(\vec{v}\) vectors are defined by the values in the left and right panels, respectively.</li>
 								<li>The default value of each vector is \(0\boldsymbol{\hat{\imath}}+0\boldsymbol{\hat{\jmath}}+0\boldsymbol{\hat{k}}\).</li>
@@ -175,15 +184,11 @@
 							<br>
 							The direction of the cross-product obeys the right-hand rule, and its magnitude is dependent on the magnitude of the two vectors, as well as the degree of orthogonality between them.<br><br>The definition of the cross-product is:
 							$$\vec{u}\times\vec{v}=\| \mathbf{u} \|\| \mathbf{v} \|\sin(\theta)\mathbf{n}$$
-							Where \(\|\mathbf{u}\|\) and \(\|\mathbf{v}\|\) are the magnitudes of vectors \(\vec{u}\) and \(\vec{v}\), \(\theta\) is the angle created by the intersection of the two vectors, and \(\mathbf{n}\) is the vector normal to the plane created by the two vectors. Because \(\sin(0°)=0\) and \(\sin(90°)=1\), vectors with high orthogonality will create cross product vectors with higher magnitude than those with low orthogonality.<br>
-							<div style="width:20%;font-size:0.75rem;text-align:center;display:inline-block;margin-left:40%;">
-								<img src="crossproduct.gif" width="100%" style="padding-bottom:0.5rem;" />
-								Image source: wikipedia.org
-							</div><br>
+							Where \(\|\mathbf{u}\|\) and \(\|\mathbf{v}\|\) are the magnitudes of vectors \(\vec{u}\) and \(\vec{v}\), \(\theta\) is the angle created by the intersection of the two vectors, and \(\mathbf{n}\) is the vector normal to the plane created by the two vectors. Because \(\sin(0°)=0\) and \(\sin(90°)=1\), vectors with high orthogonality will create cross product vectors with higher magnitude than those with low orthogonality.<br><br>
 							The cross product of \(\vec{u}\) and \(\vec{v}\):
 							$$\vec{u}=u_{1}\boldsymbol{\hat{\imath}}+u_{2}\boldsymbol{\hat{\jmath}}+u_{3}\boldsymbol{\hat{k}}$$
 							$$\vec{v}=v_{1}\boldsymbol{\hat{\imath}}+v_{2}\boldsymbol{\hat{\jmath}}+v_{3}\boldsymbol{\hat{k}}$$
-							Can be calculated through the determinant:
+							can be calculated through the determinant:
 							$$\vec{u}\times\vec{v}=
 							\begin{vmatrix}
 							\hat{\imath} & \hat{\jmath} & \hat{k} \\ 
