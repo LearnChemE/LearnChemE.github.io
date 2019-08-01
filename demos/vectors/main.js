@@ -558,14 +558,30 @@ function sumVector() {
 
 let scalar = {
   Mult: function() {
+    this.Multiplied = true;
+    this.factor = multFac;
     let ref00 = getCoords(0, 0, basePlot2D);
-    pts[1][0] = (pts[1][0]-ref00[0])*multFac+ref00[0];
-    pts[1][1] = (pts[1][1]-ref00[1])*multFac+ref00[1];
+    this.pxList[0] = ref00;
+    this.pxList[1] = ([pts[1][0],pts[1][1]]);
+    this.valList[0] = [0, 0];
+    this.valList[1] = ([ptCoords[1][0], ptCoords[1][1]]);
+
+    let answer = [Math.round(10*ptCoords[1][0]*multFac)/10, Math.round(10*ptCoords[1][1]*multFac)/10];
+    this.valList[2] = answer;
+    let newPx = getCoords(answer[0], answer[1], basePlot2D);
+    pts[1] = newPx;
   },
   Reset: function() {
+    this.Multiplied = false;
+    this.pxList = [];
+    this.valList = [];
     pts[0] = getCoords(0, 0, basePlot2D);
     pts[1] = getCoords(1, 0, basePlot2D);
-  }
+  },
+  "factor": 1,
+  "Multiplied": false,
+  "pxList" : [],
+  "valList" : []
 };
 
 let dot = {
@@ -806,7 +822,7 @@ function DrawVectorText(parentLayer) {
     this.parentLayer.translate((pts[0][0] + pts[n-1][0])/2, (pts[0][1] + pts[n-1][1])/2);
     this.parentLayer.rotate(angle);
     let jSign;
-    if(vSum[0] > 0) {jSign = "+ ";} else {jSign = "- ";}
+    if(vSum[1] >= 0) {jSign = "+ ";} else {jSign = "- ";}
     this.parentLayer.text("".concat(vSum[0].toFixed(1), " i ", jSign, abs(vSum[1]).toFixed(1), " j"), 0, -10);
     
     this.parentLayer.pop();
@@ -844,8 +860,8 @@ function MovePoints(parentLayer) {
           lineY.isBetween && abs(mouseX - lineX.a - lineY.interp()*lineX.diff()) < 10  && !rolloverPt[0] && !draggingPt[0] ? drawArrows[j] = true : drawArrows[j] = false;
         }
       }
-
-      ptCoords[j] = loc(pts[j][0], pts[j][1], basePlot2D);
+      let locs = loc(pts[j][0], pts[j][1], basePlot2D);
+      ptCoords[j] = [(Math.round(locs[0]*10)/10), (Math.round(locs[1]*10)/10)];
       
       // put text to the right or left? above or below? helps with graphics placement
       if (j > 0) {
@@ -878,16 +894,9 @@ function MovePoints(parentLayer) {
         pts[draggingPt[1]][0] = Math.min(pts[draggingPt[1]][0], xyMax[0]);
         pts[draggingPt[1]][1] = Math.min(pts[draggingPt[1]][1], xyMin[1]);
         pts[draggingPt[1]][1] = Math.max(pts[draggingPt[1]][1], xyMax[1]);
-        /*pts[draggingPt[1]] = [mouseX + mouseOffset[0], mouseY + mouseOffset[1]];
-        let ref00 = getCoords(0, 0, basePlot2D);
-        let coords = loc(mouseX + mouseOffset[0], mouseY + mouseOffset[1], basePlot2D);
-        let mX = coords[0];
-        let mY = coords[1];
-        let currentMag = sqrt(pow(ptCoords[1][0],2)+pow(ptCoords[1][1],2));
-        let unitMag = sqrt(pow(mX,2)+pow(mY,2));
-
-        pts[1][0] = (pts[1][0]-ref00[0])*currentMag/unitMag+ref00[0];
-        pts[1][1] = (pts[1][1]-ref00[1])*currentMag/unitMag+ref00[1];*/
+        if (scalar.Multiplied) {
+          scalar.pxList = [];scalar.valList=[];scalar.Multiplied = false;
+        }
       }
     } else {
       pts[draggingPt[1]] = [mouseX + mouseOffset[0], mouseY + mouseOffset[1]];
@@ -952,6 +961,26 @@ function DrawVectors(parentLayer) {
     this.parentLayer.strokeWeight(3);
     this.parentLayer.triangle(0, 0, 7, 20, -7, 20);
     this.parentLayer.pop();
+  }
+  if (page == "scalar multiplication" && scalar.Multiplied && scalar.pxList.length>=1) {
+    for (j = scalar.pxList.length - 1; j > 0; j--) {
+      this.parentLayer.push();
+      this.parentLayer.strokeWeight(5);
+      this.parentLayer.stroke(120,120,255,180);
+      this.parentLayer.translate(scalar.pxList[0][0], scalar.pxList[0][1]);
+      this.parentLayer.rotate(atan2(scalar.pxList[j][0] - scalar.pxList[0][0], scalar.pxList[0][1] - scalar.pxList[j][1]));
+      this.parentLayer.line(0, 0, 0, -Math.sqrt(Math.pow(scalar.pxList[j][0] - scalar.pxList[0][0],2) + Math.pow(scalar.pxList[j][1] - scalar.pxList[0][1],2)) + 22);
+      this.parentLayer.pop();
+  
+      this.parentLayer.push();
+      this.parentLayer.translate(scalar.pxList[j][0], scalar.pxList[j][1]);
+      this.parentLayer.rotate(atan2(scalar.pxList[j][0] - scalar.pxList[0][0], scalar.pxList[0][1] - scalar.pxList[j][1]));
+      this.parentLayer.strokeWeight(3);
+      this.parentLayer.stroke(120,120,255,180);
+      this.parentLayer.fill(150,150,255,120);
+      this.parentLayer.triangle(0, 0, 7, 20, -7, 20);
+      this.parentLayer.pop();
+    }
   }
 }
 
@@ -1103,7 +1132,6 @@ function draw() {
       DrawVectorText(extraCanvas);
       break;
     case "scalar multiplication":
-      if(frameCount % 30 == 0) {LaTexScMult();}
       plotdraw2D.drawMethod2D();
       image(extraCanvas, 0, 0);
       extraCanvas.background(255);
@@ -1193,9 +1221,11 @@ function LaTexCross() {
 
 function LaTexScMult() {
   let vecEqn = `\\vec{u} = `;
-  vecEqn+=`${multFac} `;
-  vecEqn+=`\\begin{bmatrix}${(ptCoords[1][0]).toFixed(1)} \\\\ ${(ptCoords[1][1]).toFixed(1)} \\end{bmatrix}`;
-  vecEqn+=`= \\begin{bmatrix}${(ptCoords[1][0]*multFac).toFixed(1)} \\\\ ${(ptCoords[1][1]*multFac).toFixed(1)} \\end{bmatrix}`;
+  if (scalar.Multiplied) {
+    vecEqn+=`${scalar.factor} `;
+    vecEqn+=`\\begin{bmatrix}${(scalar.valList[scalar.valList.length - 2][0]).toFixed(1)} \\\\ ${(scalar.valList[scalar.valList.length - 2][1]).toFixed(1)} \\end{bmatrix}`;
+    vecEqn+=`= \\begin{bmatrix}${(ptCoords[1][0]).toFixed(1)} \\\\ ${(ptCoords[1][1]).toFixed(1)} \\end{bmatrix}`;
+  } else {vecEqn+=`\\begin{bmatrix}${(ptCoords[1][0]).toFixed(1)} \\\\ ${(ptCoords[1][1]).toFixed(1)} \\end{bmatrix}`}
   //document.getElementById("vectorLATEX").innerHTML = vecEqn;
   let math = MathJax.Hub.getAllJax("vectorLATEX")[0];
   if(math != undefined) {
