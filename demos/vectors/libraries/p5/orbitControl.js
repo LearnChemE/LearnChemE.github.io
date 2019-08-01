@@ -33,10 +33,10 @@ p5.prototype.orbitControl = function(sensitivityX, sensitivityY) {
   
     // disable default scrolling behavior on the canvas element and add
     // 'wheelDefaultDisabled' flag to p5 instance
-    /*if (this.wheelDefaultDisabled !== true) {
+    if (this.wheelDefaultDisabled !== true) {
       this.canvas.onwheel = () => false;
       this._setProperty('wheelDefaultDisabled', true);
-    }*/
+    }
   
     const scaleFactor = this.height < this.width ? this.height : this.width;
 
