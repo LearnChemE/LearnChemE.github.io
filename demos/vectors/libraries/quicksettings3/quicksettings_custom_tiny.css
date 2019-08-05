@@ -340,11 +340,11 @@
 }
 
 #uGUI .qs_range::-webkit-slider-runnable-track {
-  background: rgb(180, 180, 255);
+  background: rgb(210, 210, 255);
 }
 
 #uGUI .qs_range:focus::-webkit-slider-runnable-track {
-  background: rgb(200, 200, 255);
+  background: rgb(235, 235, 255);
 }
 
 #uGUI .qs_range::-webkit-slider-thumb {
@@ -352,7 +352,7 @@
 }
 
 #uGUI .qs_range::-moz-range-track {
-  background: rgb(180, 180, 255);
+  background: rgb(210, 210, 255);
 }
 
 #uGUI .qs_range::-moz-range-thumb {
@@ -360,7 +360,7 @@
 }
 
 #uGUI .qs_range::-ms-track {
-  background: rgb(180, 180, 255);
+  background: rgb(210, 210, 255);
 }
 
 #uGUI .qs_range::-ms-thumb {
@@ -368,19 +368,19 @@
 }
 
 #uGUI .qs_range::-ms-fill-lower {
-  background: rgb(180, 180, 255);
+  background: rgb(210, 210, 255);
 }
 
 #uGUI .qs_range::-ms-fill-upper {
-  background: rgb(180, 180, 255);
+  background: rgb(210, 210, 255);
 }
 
 #uGUI .qs_range:focus::-ms-fill-lower {
-  background: rgb(200, 200, 255);
+  background: rgb(235, 235, 255);
 }
 
 #uGUI .qs_range:focus::-ms-fill-upper {
-  background: rgb(200, 200, 255);
+  background: rgb(235, 235, 255);
 }
 
 #vGUI {
