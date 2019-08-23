@@ -1,0 +1,31 @@
+.tipbox {
+    z-index: 3;
+    background: #F4F06B;
+    position: absolute;
+    border-radius: 10px;
+    border: 1px solid black;
+    left: 270px;
+    top: 300px;
+    width: 200px;
+}
+
+.tiptext {
+    word-wrap: break-word;
+    padding: 6px;
+    font-weight: bold;
+}
+
+.tipdontshow {
+    font-size: 12px;
+}
+
+.tipcheck {
+
+}
+
+.tipbutton {
+    height: 30px;
+    width: 50px;
+    color: black;
+    float: right;
+}

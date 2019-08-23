@@ -1,0 +1,46 @@
+#scorediv {
+    position: fixed;
+    display: inline-block;
+    width: auto;
+    bottom: 55px;
+    transition: 0.3s;
+    z-index: 5;
+}
+
+#scorediv.hidden {
+    bottom: -500px;
+}
+
+table {
+    background: #DDDDDD;
+    border: 1px solid black;
+    border-collapse: collapse;
+    color: #222222;
+    font-size: 18px;
+    text-align: center;
+}
+
+tr {
+
+}
+
+th {
+    border: 2px solid black;
+    background-color: #BBBBBB;
+    padding: 5px;
+}
+
+td {
+    border: 2px solid black;
+    padding: 3px;
+}
+
+#currentquestion {
+    font-weight: bold;
+    background-color: rgb(230,230,0);
+}
+
+#lastscorerow {
+    font-weight: bold;
+    background-color: #BBBBBB
+}

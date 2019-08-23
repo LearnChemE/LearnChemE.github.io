@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: ZCanvas.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: ZCanvas.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+    Stacked canvases for drawing on different layers
+    @param {int} args.layers Number of layers
+    @param {int} args.width Width of canvases
+    @param {int} args.height Height of canvases
+    @param {string} args.containerid ID of container element
+    @param {string} args.containerclass class of container element
+    @param {string} args.canvasidprefix ID of each canvas, postpended by its layer number
+    @param {string} args.canvasclass Classes added to each canvas
+    @param {string} args.parentid ID of element to be inserted into
+*/
+export class ZCanvas {
+    constructor(args) {
+        // Pull in arguments
+        for (let key of Object.keys(args)) {
+            this[key] = args[key];
+        }
+        // If parentid is given, insert html
+        if (document.getElementById(this.parentid)) {
+            document.getElementById(this.parentid).insertAdjacentHTML("beforeend", this.getHTML());
+        }
+        // If elements exist, link to them
+        if (document.getElementById(this.containerid)) {
+            this.link();
+        }
+    }
+
+    /**
+    *   Generates the HTML for a ZCanvas container and internal canvases
+    *   @returns { string}  The html block
+    */
+    getHTML() {
+        let html = `&lt;div id="${this.containerid}" class="${this.containerclass}" style="position:relative; min-width:${this.width}px; min-height:${this.height}px;">`
+        for (let i = 0; i &lt; this.layers; i++) {
+            html += `&lt;canvas id="${this.containerid}-${this.canvasidprefix}${i}" class="${this.canvasclass}" style="z-index:${i}; position:absolute;">&lt;/canvas>`;
+        }
+        html += `&lt;/div>`;
+        return html;
+    }
+
+    static getHTMLSkeleton(args) {
+        let html = `&lt;div id="${args.containerid}" class="${args.containerclass}" style="position:relative; min-width:${args.width}px; min-height:${args.height}px;">`
+        for (let i = 0; i &lt; args.layers; i++) {
+            html += `&lt;canvas id="${args.containerid}-${args.canvasidprefix}${i}" class="${args.canvasclass}" style="z-index:${i}; position:absolute;">&lt;/canvas>`;
+        }
+        html += `&lt;/div>`;
+        return html;
+    }
+
+    /**
+    *   Connects the canvas elements to this object and sets the size
+    */
+    link() {
+        if (document.getElementById(`${this.containerid}`)) {
+            this.canvas = {};
+            this.ctx = {};
+            for (let i = 0; i &lt; this.layers; i++) {
+                this.canvas[i] = document.getElementById(`${this.containerid}-${this.canvasidprefix}${i}`)
+                this.canvas[i].width = this.width;
+                this.canvas[i].height = this.height;
+                this.ctx[i] = this.canvas[i].getContext("2d");
+            }
+            this.updateTopBottom();
+        } else {
+            console.log('Error initializing ZCanvas, does not exist in document yet.', this);
+        }
+    }
+    
+    /**
+    * Sets 'top' and 'bottom' references to the appropriate layers
+    */
+    updateTopBottom() {
+        this.canvas["top"] = this.canvas[this.layers - 1];
+        this.canvas["bottom"] = this.canvas[0];
+        this.ctx["top"] = this.ctx[this.layers - 1];
+        this.ctx["bottom"] = this.ctx[0];
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CanvasElement.html">CanvasElement</a></li><li><a href="GraphCanvasController.html">GraphCanvasController</a></li><li><a href="GraphInfo.html">GraphInfo</a></li><li><a href="Line.html">Line</a></li><li><a href="Modal.html">Modal</a></li><li><a href="Point.html">Point</a></li><li><a href="ProblemController.html">ProblemController</a></li><li><a href="Question_Question.html">Question</a></li><li><a href="QuestionElement.html">QuestionElement</a></li><li><a href="Text.html">Text</a></li><li><a href="TextboxElement.html">TextboxElement</a></li><li><a href="TextElement.html">TextElement</a></li><li><a href="ZCanvas.html">ZCanvas</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkCookie">checkCookie</a></li><li><a href="global.html#constrain">constrain</a></li><li><a href="global.html#DOM">DOM</a></li><li><a href="global.html#FindRoot">FindRoot</a></li><li><a href="global.html#FindRootMulti">FindRootMulti</a></li><li><a href="global.html#generateVariables">generateVariables</a></li><li><a href="global.html#getAngle">getAngle</a></li><li><a href="global.html#getCookie">getCookie</a></li><li><a href="global.html#getDist">getDist</a></li><li><a href="global.html#getRandom">getRandom</a></li><li><a href="global.html#ifTF">ifTF</a></li><li><a href="global.html#isBetween">isBetween</a></li><li><a href="global.html#isIterable">isIterable</a></li><li><a href="global.html#randomID">randomID</a></li><li><a href="global.html#recursiveExists">recursiveExists</a></li><li><a href="global.html#recursiveFind">recursiveFind</a></li><li><a href="global.html#recursiveNumberfy">recursiveNumberfy</a></li><li><a href="global.html#recursiveReplace">recursiveReplace</a></li><li><a href="global.html#roundTo">roundTo</a></li><li><a href="global.html#setCookie">setCookie</a></li><li><a href="global.html#VAR">VAR</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 05 2018 12:57:58 GMT-0700 (Mountain Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

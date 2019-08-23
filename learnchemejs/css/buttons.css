@@ -1,0 +1,109 @@
+#buttons {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: rgb(0,0,0,0.4);
+    border: 1px solid black;
+}
+
+button {
+    border: 2px solid black;
+    text-align: center;
+    vertical-align: top;
+    width: 179px;
+    height: 50px;
+    font-size: 20px;
+    border-radius: 10px;
+    margin: 2px;
+    transition-duration: 0.0s;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+#beginbutton {
+    color: white;
+    background-color: #123456;
+}
+
+#restartbutton {
+    color: white;
+    background-color: #BC5F50;
+}
+
+#hintbutton {
+    color: white;
+    background-color: #50729a;
+}
+
+#hintbutton.disabled {
+    color: #CCCCCC;
+    background-color: #555555;
+}
+
+#submitbutton {
+    color: white;
+    background-color: forestgreen;
+}
+
+#submitbutton.disabled {
+    color: #CCCCCC;
+    background-color: #555555;
+}
+
+#nextbutton {
+    color: white;
+    background-color: forestgreen;
+}
+
+#showgradebutton {
+    color: white;
+    background-color: #123456;
+}
+
+#submitgradebutton {
+    color: white;
+    background-color: #123456;
+}
+
+#submitfeedbackbutton.disabled {
+    color: #CCCCCC;
+    background-color: #555555;
+}
+
+#restartzero {
+    color: white;
+    background-color: #555555;
+}
+
+#restartone {
+    color: white;
+    background-color: #555555;
+}
+
+#restartabort {
+    color: white;
+    background-color: #444444;
+}
+
+#scorebutton {
+    color: black;
+    background-color: gold;
+}
+
+#feedbackbutton {
+    color: black;
+    background-color: lightgray;
+}
+
+#submitfeedbackbutton {
+    color: black;
+    background-color: lightgray;
+}
+
+#submitfeedbackbutton.disabled {
+    color: #CCCCCC;
+    background-color: #555555;
+}

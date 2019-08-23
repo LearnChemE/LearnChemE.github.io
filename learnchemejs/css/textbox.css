@@ -1,0 +1,17 @@
+.textboxanswer {
+    font-size: 20px;
+    color: green;
+    margin-left: 10px;
+    padding: 5px;
+}
+
+.textboxanswershown {
+    border: 1px solid green;
+}
+
+::-webkit-input-placeholder {
+    opacity: 0.4;
+}
+::-moz-input-placeholder {
+    opacity: 0.4;
+}

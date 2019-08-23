@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: TextboxElement.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: TextboxElement.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {DOM} from "./DOM.js";
+import {QuestionElement} from "./QuestionElement.js";
+
+const VAR = "@";
+
+/**
+    Container class for textbox-entry questions
+*/
+export class TextboxElement extends QuestionElement{
+    /**
+        @param {object} inputarguments
+        @param {string} inputarguments.placeholder Placeholder text in textbox
+        @param {string} inputarguments.answertype "number" or "text"
+        @param {float|string} inputarguments.answer Correct answer
+        @param {object} inputarguments.tolerance Range above or below answer to count as correct
+        @param {float} inputarguments.tolerance.x
+        @param {float} inputarguments.tolerance.y
+        @param {int} inputarguments.points Number of points question is worth
+    */
+    constructor(inputarguments) {
+        super(inputarguments);
+    }
+    /**
+        Checks the answer of the TextboxElement
+        @param {float|string} answer The user-submitted answer
+        @return {float} Correctness (0 to 1)
+    */
+    checkanswer(answer) {
+        if (this.answertype === "number") {
+            // If user entered a number as 45%, convert to 0.45
+            if (answer.slice(-1) === "%") {
+                answer = parseFloat(answer) / 100;
+            }
+            if (parseFloat(answer) >= this.answer - this.tolerance &amp;&amp; parseFloat(answer) &lt;= this.answer + this.tolerance) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else if (this.answertype === "text") {
+            if (answer.toUpperCase().trim() === this.answer.toUpperCase().trim()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+    }
+    /**
+        Generates the HTML for this element
+        @param {int} id Unique id to be included in the HTML elements
+    */
+    getHTML(id) {
+        let html = `&lt;div class="${DOM.textboxdivclass}">`;
+        html += `&lt;input class="${DOM.textboxclass}" placeholder="${this.placeholder}" id="${DOM.textboxid}">`;
+        html += `&lt;br>&lt;br>`
+        html += `&lt;span class="${DOM.textboxanswerclass}" id="${DOM.textboxanswerid}">&lt;/span>`;
+        html += `&lt;/input>&lt;/div>`;
+        html = html.replace(new RegExp(`${VAR}id${VAR}`, "g"), id);
+        return html;
+    }
+    /**
+        Inserts the HTML for this element
+        @param {string} containerid HTML id of parent element
+        @param {int} id Unique id to be included in the HTML elements
+    */
+    insertHTML(containerid, id) {
+        super.insertHTML(containerid, this.getHTML(id));
+    }
+}
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CanvasElement.html">CanvasElement</a></li><li><a href="GraphCanvasController.html">GraphCanvasController</a></li><li><a href="GraphInfo.html">GraphInfo</a></li><li><a href="Line.html">Line</a></li><li><a href="Modal.html">Modal</a></li><li><a href="Point.html">Point</a></li><li><a href="ProblemController.html">ProblemController</a></li><li><a href="Question_Question.html">Question</a></li><li><a href="QuestionElement.html">QuestionElement</a></li><li><a href="Text.html">Text</a></li><li><a href="TextboxElement.html">TextboxElement</a></li><li><a href="TextElement.html">TextElement</a></li><li><a href="ZCanvas.html">ZCanvas</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkCookie">checkCookie</a></li><li><a href="global.html#constrain">constrain</a></li><li><a href="global.html#DOM">DOM</a></li><li><a href="global.html#FindRoot">FindRoot</a></li><li><a href="global.html#FindRootMulti">FindRootMulti</a></li><li><a href="global.html#generateVariables">generateVariables</a></li><li><a href="global.html#getAngle">getAngle</a></li><li><a href="global.html#getCookie">getCookie</a></li><li><a href="global.html#getDist">getDist</a></li><li><a href="global.html#getRandom">getRandom</a></li><li><a href="global.html#ifTF">ifTF</a></li><li><a href="global.html#isBetween">isBetween</a></li><li><a href="global.html#isIterable">isIterable</a></li><li><a href="global.html#randomID">randomID</a></li><li><a href="global.html#recursiveExists">recursiveExists</a></li><li><a href="global.html#recursiveFind">recursiveFind</a></li><li><a href="global.html#recursiveNumberfy">recursiveNumberfy</a></li><li><a href="global.html#recursiveReplace">recursiveReplace</a></li><li><a href="global.html#roundTo">roundTo</a></li><li><a href="global.html#setCookie">setCookie</a></li><li><a href="global.html#VAR">VAR</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 05 2018 12:57:58 GMT-0700 (Mountain Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

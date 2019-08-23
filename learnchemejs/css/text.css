@@ -1,0 +1,33 @@
+.textspan {
+    font-size: 20px;
+    margin: 2px;
+}
+
+.prompt {
+    margin: 5px;
+}
+
+.data {
+    opacity: 0.7;
+    margin: 5px;
+}
+
+.textboxlabel {
+    font-size: 20px;
+}
+
+.textbox {
+    font-size: 20px;
+    width: 300px;
+    margin: 5px;
+}
+
+.hint {
+    color: #50729a;
+    font-weight: bold;
+    margin: 10px;
+}
+
+.hiddentext {
+    visibility: hidden;
+}

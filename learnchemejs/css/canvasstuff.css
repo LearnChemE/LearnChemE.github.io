@@ -1,0 +1,12 @@
+.canvasarea {
+    position: relative;
+    flex: 1;
+    margin: 5px;
+}
+.canvasarea canvas {
+    position: absolute;
+}
+.canvas {
+    cursor: crosshair;
+    border: 1px solid black;
+}

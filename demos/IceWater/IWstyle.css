@@ -13,16 +13,16 @@
 }
 
 .wrapper {
-	width: 500px;
+	width: 800px;
 
-	min-height: 500px;
-	min-width: 500px;
+	min-height: 800px;
 	display: grid;
 	grid-template-columns: 25% 50% 25%;
 	grid-column-gap: 10px;
 	grid-row-gap: 0px;
 	background-color: none;
 	color: none;
+	overflow:visible;
 }
 
 .box {
@@ -41,7 +41,7 @@
 	align-content: start;
 	grid-gap: 0%;
 	grid-template-areas: "det init init dir"
-											 "wt1 wt1  wt2  wt2";
+						"wt1 wt1  wt2  wt2";
 	grid-template-rows: 1fr 1fr 4fr;
   height: 100%;
 }
@@ -161,8 +161,8 @@
 
 .b1 {
 	position: absolute;
-	right: 0px;
-	bottom: 300px;
+	right: 20px;
+	bottom: 100px;
 }
 
 .b2 {
@@ -237,6 +237,9 @@
 	padding:0.5rem 0.75rem;
 	text-decoration:none;
 	text-shadow:0px 1px 0px #528009;
+	position: absolute;
+	right: 100px;
+	top: ;
 }
 #startButton:hover {
 	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #77a809), color-stop(1, #89c403));
@@ -258,7 +261,7 @@
 #aboutButton {
 	text-decoration:none;
 	position: absolute;
-	right: 0px;
+	right: 60px;
 	bottom: 0px;
 }
 
@@ -597,9 +600,4 @@ input[type="radio"] {
 	color: #000;
 	text-decoration: none;
 	cursor: pointer;
-}
-
-.latex {
-	padding: 0.1rem 0.2rem;
-	transform: scale(0.8) translateY(-0.1rem);
 }

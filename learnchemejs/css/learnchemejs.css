@@ -1,0 +1,117 @@
+/*
+    Black:          #000000
+    Gold:           #CFB87C
+    Dark grey:      #565A5C
+    Light grey:     #A2A4A3
+    ? dark grey:    #222222
+    Note yellow:    #F4F06B
+*/
+
+/*
+how to fix common bugs using flex
+https://github.com/philipwalton/flexbugs
+*/
+
+/* Imports */
+
+@import url("../css/modal.css");
+@import url("../css/scoretable.css");
+@import url("../css/buttons.css");
+@import url("../css/canvasstuff.css");
+@import url("../css/text.css");
+@import url("../css/textbox.css");
+@import url("../css/rowcolumn.css");
+@import url("../css/tipbox.css");
+
+/* ########## Overall ########## */
+
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    border: 0;
+    padding: 0;
+    /*overflow-x: hidden; /* hide horizontal scroll bar*/
+    font-family: sans-serif;
+}
+
+#page {
+    min-height: 100%;
+    position: relative;
+}
+
+#header {
+    color: #DDDDDD;
+    padding: 5px;
+    background-color: #222222;
+    width: 100%;
+    height: 60px;
+    font-size: 12px;
+}
+
+#title {
+    font-size: 24px;
+    text-decoration: underline;
+    font-weight: bold;
+    padding: 3px;
+}
+
+#step {
+    font-size: 18px;
+    font-weight: bold;
+    padding-left: 3px;
+}
+
+#body {
+    padding-bottom: 60px;
+}
+
+#footer {
+    color: #DDDDDD;
+    padding: 5px;
+    background-color: black;
+    position:absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    font-size: 12px;
+}
+
+#question {
+    padding: 0px;
+    width: 100%;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.disabled {
+    pointer-events: none;
+}
+
+.error {
+    color: red;
+    font-weight: bold;
+}
+
+#feedbackinputtext {
+    width: 95%;
+    height: 110px;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.fadein {
+    animation-name: animatefadein;
+    animation-duration: 0.5s;
+}
+
+
+@keyframes animatefadein {
+    0%   {opacity:0}
+    100% {opacity:1}
+}

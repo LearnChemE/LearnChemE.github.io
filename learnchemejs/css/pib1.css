@@ -1,0 +1,116 @@
+canvas {
+    /* border: 1px solid black; */
+}
+
+button {
+    display: inline;
+    border: 2px solid black;
+    text-align: center;
+    vertical-align: top;
+    width: 150px;
+    height: 50px;
+    font-size: 20px;
+    border-radius: 10px;
+    margin: 5px;
+    transition-duration: 0.0s;
+    cursor: pointer;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+}
+
+.sliderdiv {
+    padding-left: 5px;
+}
+
+.sliderp {
+    margin: 3px;
+    text-align: center;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 225px;
+    height: 20px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #000000;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #000000;
+    cursor: pointer;
+}
+
+table {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+tr {
+
+}
+
+th {
+    border: 1px solid black;
+    background-color: rgb(200,200,200);
+}
+
+td {
+    border: 1px solid black;
+    width: 155px;
+}
+
+.table {
+    /* text-align: center; */
+}
+
+td.dark {
+    background-color: rgb(220,220,220);
+    text-align: center;
+}
+
+td.light {
+    background-color: rgb(255,255,255);
+}
+
+.tableinput {
+    border: none;
+    font-size: 16px;
+    text-align: center;
+    vertical-align: middle;
+    width: 155px;
+}
+
+.graphtitle {
+    font-size: 20px;
+    text-align: center;
+    font-weight: bold;
+    font-family: sans-serif;
+    margin: 5px;
+}

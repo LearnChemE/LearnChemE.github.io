@@ -140,11 +140,11 @@ function windowResized() {
 	let w2 = $("#topRight").width();
 	let w3 = 170;
 
-	panel1.setWidth(w1);
-	panel2.setWidth(w2);
+	panel1.setWidth(w1 - 10);
+	panel2.setWidth(w2 - 10);
 	panel1.setPosition(0, 10);
 	panel2.setPosition($("#bottomCenter").width() - w2, 10);
-	panel3.setWidth(w3);
+	panel3.setWidth(w3 - 10);
 	panel3.setPosition($("#bottomCenter").width() - 170, clientHeight * 0.7 - 40);
 
 	// retrieves the beaker height and the size to adjust falling distance
@@ -218,7 +218,7 @@ function setup() {
 
 	plot = new GPlot(this);
 	plot.setPos(10, 0);
-	plot.setOuterDim(100, 100);
+	plot.setOuterDim(200, 100);
 	plot.setYLim(0, 1);
 	plot.getXAxis().getAxisLabel().setText("time (s)");
 	plot.getYAxis().getAxisLabel().setText("temperature (K)");

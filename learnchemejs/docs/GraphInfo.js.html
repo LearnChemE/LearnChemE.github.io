@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: GraphInfo.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: GraphInfo.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+    Container class for graph/calibration data
+    @param {object} args Object of input arguments.
+    @param {int} args.graphheight Height (in px) of the vertical (y) axes
+    @param {int} args.graphwidth Width (in px) of the horizontal (x) axes
+    @param {string} args.graphbackground Color of the area within the axes
+    @param {string} args.axesbackground Color of the area around the graph
+    @param {object} args.padding Container for padding size around the plot
+        @param {int} args.padding.top Height (in px) of the region above the plot
+        @param {int} args.padding.left Width (in px) of the region to the left of the plot
+        @param {int} args.padding.bottom Height (in px) of the region below the plot
+        @param {int} args.padding.right Width (in px) of the region to the right of the plot
+    @param {object} args.x Container for information about the primary x axis
+        @param {string} args.x.label Text to label the axis
+        @param {float} args.x.min Left/bottom value on the axis
+        @param {float} args.x.max Right/top value on the axis
+        @param {float} args.x.majortick Increment to draw major tick marks on the axis
+        @param {float} args.x.minortick Increment to draw minor tick marks on the axis
+        @param {float} args.x.gridline Increent to draw gridlines across the plot
+    @param {object} args.y Container for information about the primary y axis (same arguments as {@link x})
+    @param {object} args.x2 Container for information about the secondary x axis (same arguments as {@link x})
+    @param {object} args.y2 Container for information about the secondary y axis (same arguments as {@link x})
+*/
+export class GraphInfo {
+    constructor(args) {
+        for (let key of Object.keys(args)) {
+            this[key] = args[key];
+        }
+        this.height = this.graphheight + this.padding.bottom + this.padding.top;
+        this.width = this.graphwidth + this.padding.left + this.padding.right;
+        this.graphleft = this.padding.left;
+        this.graphright = this.padding.left + this.graphwidth;
+        this.graphtop = this.padding.top;
+        this.graphbottom = this.padding.top + this.graphheight;
+
+        // Generate calibration values/functions
+        if (this.x != undefined) {
+            this.setupAxis(this.x, this.padding.left, this.graphwidth, this.x.min, this.x.max);
+        }
+        if (this.y != undefined) {
+            this.setupAxis(this.y, this.padding.top, this.graphheight, this.y.max, this.y.min);
+        }
+        if (this.x2 != undefined) {
+            this.setupAxis(this.x2, this.padding.left, this.graphwidth, this.x2.min, this.x2.max);
+        }
+        if (this.y2 != undefined) {
+            this.setupAxis(this.y2, this.padding.top, this.graphheight, this.y2.max, this.y2.min);
+        }
+    }
+    /**
+    * TODO
+    */
+    setupAxis(axis, padding, graphsize, axismin, axismax) {
+        axis.scale = graphsize / (axismax - axismin);
+        axis.CalToRaw = function(cal) {
+            return (cal - axismin) * axis.scale + padding;
+        };
+        axis.RawToCal = function(raw) {
+            return (raw - padding) / axis.scale + axismin;
+        };
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CanvasElement.html">CanvasElement</a></li><li><a href="GraphCanvasController.html">GraphCanvasController</a></li><li><a href="GraphInfo.html">GraphInfo</a></li><li><a href="Line.html">Line</a></li><li><a href="Modal.html">Modal</a></li><li><a href="Point.html">Point</a></li><li><a href="ProblemController.html">ProblemController</a></li><li><a href="Question_Question.html">Question</a></li><li><a href="QuestionElement.html">QuestionElement</a></li><li><a href="Text.html">Text</a></li><li><a href="TextboxElement.html">TextboxElement</a></li><li><a href="TextElement.html">TextElement</a></li><li><a href="ZCanvas.html">ZCanvas</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkCookie">checkCookie</a></li><li><a href="global.html#constrain">constrain</a></li><li><a href="global.html#DOM">DOM</a></li><li><a href="global.html#FindRoot">FindRoot</a></li><li><a href="global.html#FindRootMulti">FindRootMulti</a></li><li><a href="global.html#generateVariables">generateVariables</a></li><li><a href="global.html#getAngle">getAngle</a></li><li><a href="global.html#getCookie">getCookie</a></li><li><a href="global.html#getDist">getDist</a></li><li><a href="global.html#getRandom">getRandom</a></li><li><a href="global.html#ifTF">ifTF</a></li><li><a href="global.html#isBetween">isBetween</a></li><li><a href="global.html#isIterable">isIterable</a></li><li><a href="global.html#randomID">randomID</a></li><li><a href="global.html#recursiveExists">recursiveExists</a></li><li><a href="global.html#recursiveFind">recursiveFind</a></li><li><a href="global.html#recursiveNumberfy">recursiveNumberfy</a></li><li><a href="global.html#recursiveReplace">recursiveReplace</a></li><li><a href="global.html#roundTo">roundTo</a></li><li><a href="global.html#setCookie">setCookie</a></li><li><a href="global.html#VAR">VAR</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 05 2018 12:57:58 GMT-0700 (Mountain Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

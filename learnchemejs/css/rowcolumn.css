@@ -1,0 +1,12 @@
+.row {
+    display: flex;
+    flex-direction: row;
+    padding: 1px;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1px;
+}
