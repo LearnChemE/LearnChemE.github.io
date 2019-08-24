@@ -1,6 +1,8 @@
+/* eslint-disable no-undef */
 import {GraphCanvas} from "../src/GraphCanvas.js"
 import {hsvToRgb} from '../src/hsvToRgb.js';
 import {linspace} from '../src/sky-helpers.js';
+import {Modal} from '../src/Modal.js';
 
 class Sim {
     constructor() {
@@ -50,10 +52,17 @@ class Sim {
         this.PROBS = [];
         this.RES = [];
         this.IMS = [];
+
+        this.modal = new Modal({modalid:"modal-identifier",modalclass:"modal",headerstyle:"",header:"header",contentstyle:"",content:"content",showing:false});
     }
 
     insertPageElements() {
         let html = `<div id="page">`;
+        html += `<div class="navbar">`;
+        html += `<button id='details' class='buttonMed'>details</button>`;
+        html += `<button id='directions' class='buttonMed'>directions</button>`;
+        html += `<button id='about' class='buttonMed'>about</button>`;
+        html += `</div>`;
         html += `<div class="row">`;
         html += `<div id="left" class="column"></div>`;
         html += `<div id="right" class="column"></div>`;
@@ -229,6 +238,7 @@ class Sim {
         }
         document.getElementById('sldmass').addEventListener("input", () => this.getMass());
         document.getElementById('sldlength').addEventListener("input", () => this.getLength());
+        document.getElementById('details').addEventListener("click", () => this.modal.show());
     }
 
     nextFrame() {
@@ -410,4 +420,5 @@ class Sim {
     }
 }
 
+// eslint-disable-next-line no-unused-vars
 const Simulation = new Sim();
