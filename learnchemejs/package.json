@@ -7,37 +7,35 @@
     "test": "live-server",
     "docs": "jsdoc ./src/ -r -d ./docs/",
     "webpack": "webpack --config webpack.config.js",
-    "build": "npm run docs && npm run webpack",
+    "build": "npm run webpack",
     "deploy": "npm run build && git add * && git commit && git push",
     "deploybeta": "npm run build && git add * && git commit && git push --set-upstream origin beta"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/mirrorcoloured/learnchemejs.git"
+    "url": "git+https://github.com/LearnChemE/LearnChemE.github.io.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://gitlab.com/mirrorcoloured/learnchemejs/issues"
+    "url": "https://github.com/LearnChemE/LearnChemE.github.io/issues"
   },
-  "homepage": "https://gitlab.com/mirrorcoloured/learnchemejs#README",
+  "homepage": "https://github.com/LearnChemE/LearnChemE.github.io",
   "dependencies": {
     "babel-eslint": "^8.2.6",
     "jsdoc": "^3.5.5",
-    "live-server": "^1.2.0",
-    "npm": "^6.1.1",
-    "webpack-cli": "^3.1.2"
+    "npm": "^6.1.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.4",
+    "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
-    "eslint": "^5.3.0",
+    "eslint": "^5.16.0",
     "eslint-config-google": "^0.9.1",
-    "webpack": "^4.10.1",
-    "webpack-cli": "^2.1.4"
+    "webpack": "^4.39.2",
+    "webpack-cli": "^3.3.7"
   },
   "directories": {
     "lib": "lib"
