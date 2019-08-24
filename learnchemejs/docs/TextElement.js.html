@@ -47,7 +47,7 @@ export class TextElement extends QuestionElement{
         @param {int} id Unique id to be included in the HTML elements
     */
     getHTML(id) {
-        let html = `&lt;span class="${DOM.textspanclass} ${this.class}">${this.label}&lt;/span>`;
+        let html = `&lt;span class="${DOM.textspanclass} ${this.class}"&gt;${this.label}&lt;/span&gt;`;
         return html;
     }
     /**
