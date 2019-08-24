@@ -5,3 +5,5 @@ _notes/
 /bower_components/
 /node_modules/
 .vscode/launch.json
+/learnchemejs/node_modules/
+.gitignore
