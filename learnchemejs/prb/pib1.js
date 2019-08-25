@@ -53,7 +53,9 @@ class Sim {
         this.RES = [];
         this.IMS = [];
 
-        this.modal = new Modal({modalid:"modal-identifier",modalclass:"modal",headerstyle:"",header:"header",contentstyle:"",content:"content",showing:false});
+        this.modalDetails = new Modal({modalid:"modal-details",modalclass:"modal",headerstyle:"",header:"Details",contentstyle:"",content:"Equations, etc.",showing:false});
+        this.modalDirections = new Modal({modalid:"modal-directions",modalclass:"modal",headerstyle:"",header:"Directions",contentstyle:"",content:"How-to use",showing:false});
+        this.modalAbout = new Modal({modalid:"modal-about",modalclass:"modal",headerstyle:"",header:"About",contentstyle:"",content:"Authorship, contact info, copyright, etc.",showing:false});    
     }
 
     insertPageElements() {
@@ -238,7 +240,9 @@ class Sim {
         }
         document.getElementById('sldmass').addEventListener("input", () => this.getMass());
         document.getElementById('sldlength').addEventListener("input", () => this.getLength());
-        document.getElementById('details').addEventListener("click", () => this.modal.show());
+        document.getElementById('details').addEventListener("click", () => this.modalDetails.show());
+        document.getElementById('directions').addEventListener("click", () => this.modalDirections.show());
+        document.getElementById('about').addEventListener("click", () => this.modalAbout.show());
     }
 
     nextFrame() {
