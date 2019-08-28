@@ -3,6 +3,7 @@ import {GraphCanvas} from "../src/GraphCanvas.js"
 import {hsvToRgb} from '../src/hsvToRgb.js';
 import {linspace} from '../src/sky-helpers.js';
 import {Modal} from '../src/Modal.js';
+import {modalFill} from '../src/modalFill.js';
 
 class Sim {
     constructor() {
@@ -19,6 +20,9 @@ class Sim {
         this.getMass();
         this.getLength();
         this.update();
+        modalFill(this.modalDetails,'../html/modalHTML/pib1DetailsContent.html.txt');
+        modalFill(this.modalDirections,'../html/modalHTML/pib1DirectionsContent.html.txt');
+        modalFill(this.modalAbout,'../html/modalHTML/pib1AboutContent.html.txt');
     }
 
     defineGlobals() {
@@ -53,9 +57,14 @@ class Sim {
         this.RES = [];
         this.IMS = [];
 
-        this.modalDetails = new Modal({modalid:"modal-details",modalclass:"modal",headerstyle:"",header:"Details",contentstyle:"",content:"Equations, etc.",showing:false});
-        this.modalDirections = new Modal({modalid:"modal-directions",modalclass:"modal",headerstyle:"",header:"Directions",contentstyle:"",content:"How-to use",showing:false});
-        this.modalAbout = new Modal({modalid:"modal-about",modalclass:"modal",headerstyle:"",header:"About",contentstyle:"",content:"Authorship, contact info, copyright, etc.",showing:false});    
+        this.detailsContent = "";
+        this.directionsContent = "";
+        this.aboutContent = "";
+
+        this.modalDetails = new Modal({modalid:"modal-details",modalclass:"modal",headerstyle:"",header:"Details",contentstyle:"",content:this.detailsContent,showing:false});
+        this.modalDirections = new Modal({modalid:"modal-directions",modalclass:"modal",headerstyle:"",header:"Directions",contentstyle:"",content:this.directionsContent,showing:false});
+        this.modalAbout = new Modal({modalid:"modal-about",modalclass:"modal",headerstyle:"",header:"About",contentstyle:"",content:this.aboutContent,showing:false});    
+
     }
 
     insertPageElements() {

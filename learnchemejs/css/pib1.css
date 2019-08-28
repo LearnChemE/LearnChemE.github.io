@@ -173,3 +173,12 @@ td.light {
     width: 1000px;
     justify-content: space-around;
 }
+
+.modal-header>p {
+    margin-block-start: 4px;
+    margin-block-end: 4px;
+    background-color:#333333;
+    color:#FFFFFF;
+    font-size:2rem;
+    font-weight:normal;
+}
