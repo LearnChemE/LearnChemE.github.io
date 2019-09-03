@@ -11,16 +11,16 @@ where \( \hbar \) is the reduced Planck constant \( \left(\frac{h}{2 \pi } \righ
 
 $$ \Psi(x, t) = A e^{i(kx- \omega t)} $$
 
-where \( A \) is the amplitude, \( k \) is the magnitude of the wave vector, and \( \omega \) the angular frequency. For a particle confined to an infinite potential energy well (a "particle in a box"), the solution to the wave function is
+where \( A \) is the amplitude, \( k \) is the magnitude of the wave vector, and \( \omega \) the angular frequency. For a particle confined to an infinite potential energy well (a "particle in a box"), the time-independent solution to the wave function is
 
-$$ \Psi(x, t) = \sum_{n} C_{n} \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) \exp \left[ -i \frac{n^{2} \pi^{2} \hbar }{2mL^{2}}t \right] $$
+$$ \psi_{n}(x) = \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) $$
 
-with \( n \) being any integer such that \( n \geq 1 \). \( C_{n} \) is the expansion coefficient at energy state \( n \), and \( L \) is the length of the "box". The time-independent wave function for a particle-in-a-box is
+with \( n \) being any integer such that \( n \geq 1 \). The equation above is called the energy eigenstate (or eigenfunction). The total solution to the time-independent wave function is a linear combination of all possible eigenstates:
 
 $$ \psi(x) = \sum_{n} C_{n} \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) $$
 
-for any combination of eigenstates described by
+where \( C_{n} \) is the expansion coefficient at energy state \( n \), and \( L \) is the length of the "box". Adding time-dependence yields the following equation:
 
-$$ \psi_{n}(x) = \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) $$
+$$ \Psi(x, t) = \sum_{n} C_{n} \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) \exp \left[ -i \frac{n^{2} \pi^{2} \hbar }{2mL^{2}}t \right] $$
 
 </div>
