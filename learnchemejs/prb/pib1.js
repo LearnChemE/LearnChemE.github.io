@@ -20,9 +20,25 @@ class Sim {
         this.getMass();
         this.getLength();
         this.update();
-        modalFill(this.modalDetails,'../html/modalHTML/pib1DetailsContent.html.txt');
-        modalFill(this.modalDirections,'../html/modalHTML/pib1DirectionsContent.html.txt');
-        modalFill(this.modalAbout,'../html/modalHTML/pib1AboutContent.html.txt');
+        var modalFiles = [];
+        modalFiles.push(modalFill(this.modalDetails,'../html/modalHTML/pib1DetailsContent.html.txt'));
+        modalFiles.push(modalFill(this.modalDirections,'../html/modalHTML/pib1DirectionsContent.html.txt'));
+        modalFiles.push(modalFill(this.modalAbout,'../html/modalHTML/pib1AboutContent.html.txt'));
+        const error1 = this.modalDetails;
+        const error2 = this.modalDirections;
+        Promise.all(modalFiles).then(function() {
+            MathJax.Hub.Configured();
+        }).catch(() => {
+            console.log("MathJax Not Yet Loaded ...");
+            let delay = 1000;
+            setTimeout(function jax() {
+                try {MathJax.Hub.Configured()}
+                catch(error) {console.error(error); if(delay < 10000) {delay*= 1.5; setTimeout(jax, delay);} else {
+                    modalFill(error1,'../html/modalHTML/errorText.html.txt');
+                    modalFill(error2,'../html/modalHTML/errorText.html.txt');
+                }}
+            }, delay);
+          })
     }
 
     defineGlobals() {

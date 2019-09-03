@@ -21,5 +21,9 @@ export function modalFill(modal, url) {
         .getElementsByClassName("modal-body")[0];
         
         innerhtml.innerHTML = text;
+        return modal;
+    })
+    .then(function(modal) {
+        return `${modal.modalid} filled`;
     })
 }

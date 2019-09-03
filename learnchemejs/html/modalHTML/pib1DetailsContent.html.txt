@@ -19,8 +19,8 @@ with \( n \) being any integer such that \( n \geq 1 \). \( C_{n} \) is the expa
 
 $$ \psi(x) = \sum_{n} C_{n} \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) $$
 
-or when describing one energy state, is
+for any combination of eigenstates described by
 
-$$ \psi(x) = \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) $$
+$$ \psi_{n}(x) = \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) $$
 
 </div>

@@ -1,3 +1,11 @@
-<div>This demonstration illustrates the wavefunctions for the quantum particle in a box, including superposition states. The input table (upper left corner) can be edited to change the quantum number \( n \) and coefficient \( C_{n} \) in the general state:  $$ \Psi=C_{n} \Sigma \sqrt{\frac{2}{L}} \sin⁡(\frac{nπx}{L}) $$ Time evolution can be observed with the Start/Stop button, and a probabilistic collapse of the wavefunction can be seen with the Measure button.  The mass of the particle and box length are adjustable with sliders, and the integrated probability density can be computed over any position range with the lower input table and the Integrate button.
-   Probability density is plotted in the upper right, while real and imaginary components of the wave, as well as total system energy, are additionally shown in the two bottom plots.  The probability density plot has a fixed scale so that relative comparisons can be made. Coefficients are renormalized in the plotting and integration routines but will appear in the table as entered.
+<div>
+This demonstration illustrates the wavefunctions for the quantum particle in a box, including superposition states.
+<ul>
+<li>The input table (upper left corner) can be edited to change the quantum number \( n \) and coefficient \( C_{n} \) in the general state:</li>
+$$ \psi(x) = \sum_{n} C_{n} \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) $$
+<li>Time evolution can be observed with the Start/Stop button, and a probabilistic collapse of the wavefunction can be seen with the Measure button.</li>
+<li>The mass of the particle and box length are adjustable with sliders, and the integrated probability density can be computed over any position range with the lower input table and the Integrate button.</li>
+<li>Probability density is plotted in the upper right, while real and imaginary components of the wave, as well as total system energy, are additionally shown in the two bottom plots.</li>
+<li>The probability density plot has a fixed scale so that relative comparisons can be made.</li>
+<li>Coefficients are renormalized in the plotting and integration routines but will appear in the table as entered.</li>
 </div>
