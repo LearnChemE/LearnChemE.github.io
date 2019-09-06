@@ -2,6 +2,5 @@
 "Particle In A Box Simulation 1"<br><br>
    Author: Adam Holewinski<br>
    Adapted for in-browser use by: Sky Chrastina and Neil C. Hendren<br><br>
-   This simulation was created for <a href="http://www.learncheme.com/" target="_blank">LearnChemE.com</a> under the supervision of John L. Falconer at the University of Colorado Boulder. The Matlab version of this demonstration is available at:
-   <a href="https://www.google.com/" target="_blank">https://www.insert-link-here.com/</a><br><br>The source code for this demonstration is publicly available at: <a href="https://github.com/LearnChemE/" target="_blank">https://github.com/LearnChemE/</a><br><br>For inquiries or feedback, contact: learncheme@gmail.com 
+   This simulation was created for <a href="http://www.learncheme.com/" target="_blank">LearnChemE.com</a> under the supervision of John L. Falconer at the University of Colorado Boulder. The Matlab version of this demonstration is available by clicking <a href="https://github.com/LearnChemE/LearnChemE.github.io/raw/master/resources/PIBsim1.m" download="PIB1">here</a><br><br>The source code for this demonstration is publicly available at: <a href="https://github.com/LearnChemE/" target="_blank">https://github.com/LearnChemE/</a><br><br>For inquiries or feedback, contact: learncheme@gmail.com 
 </div>
