@@ -7,19 +7,33 @@ where \( \hat{H} \) is the Hamiltonian operator, \( \Psi \) is the wave function
 
 $$ i \hbar \frac{\partial\Psi(x,t)}{\partial t} = - \frac{\hbar^2}{2m} \frac{\partial^2\Psi(x,t)}{\partial x^2} + U(x,t) \Psi(x,t) $$
 
-where \( \hbar \) is the reduced Planck constant \( \left(\frac{h}{2 \pi } \right) \), \( x \) and \( t \) are position and time, respectively, \( U \) is the particle's potential energy, and \( m \) is the particle's mass. The wave function \( \Psi \), describes the probability density of a particle at position \( x \):
+where \( \hbar \) is the reduced Planck constant \( \left(\frac{h}{2 \pi } \right) \), \( x \) and \( t \) are position and time, respectively, \( U \) is the particle's potential energy, and \( m \) is the particle's mass. The wave function \( \Psi \), describes the probability density of a particle at position \( x \). For a particle confined to an infinite potential energy well of length \( L \), where
 
-$$ \Psi(x, t) = A e^{i(kx- \omega t)} $$
+\[ 
+U(x) = 
+    \begin{cases} 
+        \infty, & x\lt 0 \\
+        0, & 0\leq x \leq L \\
+        \infty, & x\gt L 
+    \end{cases}
+\]
 
-where \( A \) is the amplitude, \( k \) is the magnitude of the wave vector, and \( \omega \) the angular frequency. For a particle confined to an infinite potential energy well (a "particle in a box"), the time-independent solution to the wave function is
+the time-independent solution to the wave function is
+ 
+\[ 
+\psi_{n}(x) = 
+    \begin{cases} 
+        0, & x\lt 0 \\
+        \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ), & 0\leq x \leq L \\
+        0, & x\gt L 
+    \end{cases}
+\]
 
-$$ \psi_{n}(x) = \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) $$
-
-with \( n \) being any integer such that \( n \geq 1 \). The equation above is called the energy eigenstate (or eigenfunction). The total solution to the time-independent wave function is a linear combination of all possible eigenstates:
+with \( n \) being any integer such that \( n \geq 1 \). This situation is known colloquially as a "particle in a box". The wave function described above, \( \psi_{n}(x) \), is called the energy eigenstate (or eigenfunction). The total solution to the time-independent wave function is a linear combination of all possible eigenstates:
 
 $$ \psi(x) = \sum_{n} C_{n} \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) $$
 
-where \( C_{n} \) is the expansion coefficient at energy state \( n \), and \( L \) is the length of the "box". Adding time-dependence yields the following equation:
+where \( C_{n} \) is the expansion coefficient at energy state \( n \). Adding time-dependence yields the following equation:
 
 $$ \Psi(x, t) = \sum_{n} C_{n} \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) \exp \left[ -i \frac{n^{2} \pi^{2} \hbar }{2mL^{2}}t \right] $$
 

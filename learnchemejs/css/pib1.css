@@ -182,3 +182,11 @@ td.light {
     font-size:2rem;
     font-weight:normal;
 }
+
+.modal.moveUp {
+    padding-top: 50px;
+}
+
+li {
+    margin: 1rem 0;
+}

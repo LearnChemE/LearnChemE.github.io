@@ -32,7 +32,7 @@ class Sim {
             console.log("MathJax Not Yet Loaded ...");
             let delay = 1000;
             setTimeout(function jax() {
-                try {MathJax.Hub.Configured()}
+                try {MathJax.Hub.Configured();}
                 catch(error) {console.error(error); if(delay < 10000) {delay*= 1.5; setTimeout(jax, delay);} else {
                     modalFill(error1,'../html/modalHTML/errorText.html.txt');
                     modalFill(error2,'../html/modalHTML/errorText.html.txt');
@@ -77,9 +77,9 @@ class Sim {
         this.directionsContent = "";
         this.aboutContent = "";
 
-        this.modalDetails = new Modal({modalid:"modal-details",modalclass:"modal",headerstyle:"",header:"Details",contentstyle:"",content:this.detailsContent,showing:false});
-        this.modalDirections = new Modal({modalid:"modal-directions",modalclass:"modal",headerstyle:"",header:"Directions",contentstyle:"",content:this.directionsContent,showing:false});
-        this.modalAbout = new Modal({modalid:"modal-about",modalclass:"modal",headerstyle:"",header:"About",contentstyle:"",content:this.aboutContent,showing:false});    
+        this.modalDetails = new Modal({modalid:"modal-details",modalclass:"modal moveUp",headerstyle:"",header:"Details",contentstyle:"",content:this.detailsContent,showing:false});
+        this.modalDirections = new Modal({modalid:"modal-directions",modalclass:"modal moveUp",headerstyle:"",header:"Directions",contentstyle:"",content:this.directionsContent,showing:false});
+        this.modalAbout = new Modal({modalid:"modal-about",modalclass:"modal moveUp",headerstyle:"",header:"About",contentstyle:"",content:this.aboutContent,showing:false});    
 
     }
 
