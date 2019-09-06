@@ -45,7 +45,7 @@ class Sim {
         this.RUNNING = false;
         this.FPS = 60;
         this.T = 0;
-        this.TSTEP = 1 / this.FPS;
+        this.TSTEP = 0.2 / this.FPS;
 
         this.minMass = 0.1;
         this.maxMass = 10;
@@ -282,8 +282,8 @@ class Sim {
     }
 
     calculatePsi() {
-        const freqs = this.NS.map(n => 2 * math.PI * math.pow(n / ( this.M * this.L ), 2));
-        const PhaseShifts = freqs.map(freq => math.exp(math.complex(0, freq * this.T)));
+        const freqs = this.NS.map(n => 2 * math.pi * math.pow(n / (this.M * this.L), 2)); /*Proportional to n^2/(m L^2)*/
+        const PhaseShifts = freqs.map(freq => math.exp(math.complex(0, - freq * this.T)));
 
         // let InitialStates = math.multiply(math.dotMultiply(math.transpose(math.matrix([this.NS])), math.pi), math.matrix([this.XS]));
         // InitialStates = InitialStates.forEach(function (value, index, matrix) {return math.sqrt(2 / 1) * math.sin(value * math.PI)});
