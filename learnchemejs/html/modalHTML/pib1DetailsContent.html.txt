@@ -3,11 +3,11 @@ The Schr&#246;dinger Equation describes the state (position and momentum) of a p
 
 $$ \hat{H} \Psi = E \Psi $$
 
-where \( \hat{H} \) is the Hamiltonian operator, \( \Psi \) is the wave function, and \( E \) is the total energy of the particle. The one-dimensional time-dependent Schr&#246;dinger equation is described by
+where \( \hat{H} \) is the Hamiltonian operator, \( \Psi \) is the wave function, and \( E \) is the total energy of the particle. The one-dimensional time-independent Schr&#246;dinger equation is described by
 
-$$ i \hbar \frac{\partial\Psi(x,t)}{\partial t} = - \frac{\hbar^2}{2m} \frac{\partial^2\Psi(x,t)}{\partial x^2} + U(x,t) \Psi(x,t) $$
+$$ E \Psi(x) = - \frac{\hbar^2}{2m} \frac{\partial^2\Psi(x)}{\partial x^2} + U(x) \Psi(x) $$
 
-where \( \hbar \) is the reduced Planck constant \( \left(\frac{h}{2 \pi } \right) \), \( x \) and \( t \) are position and time, respectively, \( U \) is the particle's potential energy, and \( m \) is the particle's mass. The wave function \( \Psi \), describes the probability density of a particle at position \( x \). For a particle confined to an infinite potential energy well of length \( L \), where
+where \( \hbar \) is the reduced Planck constant \( \left(\frac{h}{2 \pi } \right) \), \( x \) is position, \( U \) is the particle's potential energy, and \( m \) is the particle's mass. The wave function \( \Psi \), describes the probability density of a particle at position \( x \). For a particle confined to an infinite potential energy well of length \( L \), where
 
 \[ 
 U(x) = 
@@ -33,7 +33,7 @@ with \( n \) being any integer such that \( n \geq 1 \). This situation is known
 
 $$ \psi(x) = \sum_{n} C_{n} \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) $$
 
-where \( C_{n} \) is the expansion coefficient at energy state \( n \). Adding time-dependence yields the following equation:
+where \( C_{n} \) is the expansion coefficient at energy state \( n \). Adding time-dependence yields the following equation, with each eigenstate evolving at its own frequency:
 
 $$ \Psi(x, t) = \sum_{n} C_{n} \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) \exp \left[ -i \frac{n^{2} \pi^{2} \hbar }{2mL^{2}}t \right] $$
 
