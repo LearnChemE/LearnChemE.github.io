@@ -64,7 +64,7 @@ class Sim {
 
         this.MAXCOEFFICIENTS = 6;
         this.NS = linspace(1, this.MAXCOEFFICIENTS, this.MAXCOEFFICIENTS, true);
-        this.POINTS = 1000;
+        this.POINTS = 500;
 
         this.XS = linspace(this.xbounds[0], this.xbounds[1], this.POINTS + 1, true);
         this.L = 1;
@@ -282,7 +282,7 @@ class Sim {
     }
 
     calculatePsi() {
-        const freqs = this.NS.map(n => 2 * math.pi * math.pow(n / (this.M * this.L), 2)); /*Proportional to n^2/(m L^2)*/
+        const freqs = this.NS.map(n => 2 * math.pi * math.pow(n / this.L, 2) / this.M); /*Proportional to n^2/(m L^2)*/
         const PhaseShifts = freqs.map(freq => math.exp(math.complex(0, - freq * this.T)));
 
         // let InitialStates = math.multiply(math.dotMultiply(math.transpose(math.matrix([this.NS])), math.pi), math.matrix([this.XS]));
@@ -320,7 +320,7 @@ class Sim {
         }
         this.ENERGY = 0;
         for (let i = 0; i < this.MAXCOEFFICIENTS; i++) {
-            const level = this.NS[i] ** 2 / (8 * 1.67 * this.M * this.L) ** 2 * 6.62 ** 2 * 6.02;
+            const level = this.NS[i] ** 2 / (8 * 1.67 * this.L) ** 2 * 6.62 ** 2 * 6.02 / this.M;
             this.ENERGY += level * this.scaledcoefficients[i];
         }
     }
@@ -340,7 +340,7 @@ class Sim {
         this.componentgc.drawLine(this.XS, this.IMS, hsvToRgb(0,100,100), 3);
 
         for (let i = 0; i < this.MAXCOEFFICIENTS; i++) {
-            const level = this.NS[i] ** 2 / (8 * 1.67 * this.M * this.L) ** 2 * 6.62 ** 2 * 6.02;
+            const level = this.NS[i] ** 2 / (8 * 1.67 * this.L) ** 2 * 6.62 ** 2 * 6.02 / this.M;
             this.energygc.drawLine(this.xbounds, [level,level], hsvToRgb(0,0,0), 1, [2, 2]);
         }
         this.energygc.drawLine(this.xbounds, [this.ENERGY,this.ENERGY], hsvToRgb(0,100,100), 3);

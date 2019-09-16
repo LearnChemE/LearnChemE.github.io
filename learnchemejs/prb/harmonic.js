@@ -43,8 +43,7 @@ class Sim {
 
         this.MAXCOEFFICIENTS = 6;
         this.NS = linspace(0, this.MAXCOEFFICIENTS - 1, this.MAXCOEFFICIENTS, true);
-        console.log(this.NS);
-        this.POINTS = 2000;
+        this.POINTS = 200;
 
         this.XS = linspace(this.xbounds[0], this.xbounds[1], this.POINTS + 1, true);
         this.YS = [];
@@ -219,21 +218,17 @@ class Sim {
 
     calculateHermites() {
         if (this.YS.length > 0) {
-            console.log('ys', this.YS);
             this.HS = [];
             this.HS.push(this.YS.map(y => 1));
             this.HS.push(this.YS.map(y => math.prod(2, y)));
             // this.HS.push(this.YS.map(y => math.prod(4, y) ** 2 - 2));
-            console.log('hermites start', this.HS);
             if (this.HS.length < math.max(this.NS)) {
                 for (let i = this.HS.length + 1; i < math.max(this.NS); i++) {
-                    console.log('calculating', i);
                     for (let yi = 0; yi < this.YS.length; yi++) {
                         this.HS.push(2 * this.YS[yi] * this.HS[yi - 1] - 2 * (i - 2) * this.HS[i - 2]);
                     }
                 }
             }
-            console.log('hermites', this.HS);
         }
     }
 
