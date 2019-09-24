@@ -6,8 +6,20 @@ import {ZCanvas} from "./ZCanvas.js";
 import {getDist, constrain, roundTo, getAngle, evalWithContext, isBetween, FindRoot} from "./sky-helpers.js";
 
 const VAR = "@";
-const GRABRADIUS = 10;
 const SPVAR = "~";
+
+// Checks to see if the device is a touchscreen.
+var isTouch = false;
+let prefixes = ' -webkit- -moz- -o- -ms- '.split(' ');
+let mq = function(query) {
+    return window.matchMedia(query).matches;
+}
+if (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
+    isTouch = true;
+} else { isTouch = mq(['(', prefixes.join('touch-enabled),('), 'heartz', ')'].join('')) }
+
+var GRABRADIUS;
+if (isTouch) {GRABRADIUS = 50} else {GRABRADIUS = 10}
 
 // Layer information
 export const LAYERS = {
@@ -93,26 +105,16 @@ export class GraphCanvasController{
                 }
             }
         }
-
-        // Checks to see if the device is a touchscreen. Decided to pretend like all devices are touchscreens and always have both mouse and touch event listeners.
-        /*
-        let isTouch = false;
-        let prefixes = ' -webkit- -moz- -o- -ms- '.split(' ');
-        let mq = function(query) {
-            return window.matchMedia(query).matches;
-        }
-        if (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
-            isTouch = true;
-        } else { isTouch = mq(['(', prefixes.join('touch-enabled),('), 'heartz', ')'].join('')) }
-        */
-
-        // Mouse event listeners
-
+        
+        // Touchscreen event listeners
+        if (isTouch) {
         this.canvas["top"].addEventListener("touchmove", e => this.mouseMove(e.targetTouches[0]), false);
         this.canvas["top"].addEventListener("touchstart", e=> this.mouseDown(e.targetTouches[0]), false);
         this.canvas["top"].addEventListener("touchend", e => this.mouseUp(e.changedTouches[0]), false);
         this.canvas["top"].addEventListener("touchcancel", e => this.mouseUp(e.changedTouches[0]), false);
+        }
 
+        // Mouse event listeners
         this.canvas["top"].addEventListener("mousemove", e => this.mouseMove(e));
         this.canvas["top"].addEventListener("mouseup", e => this.mouseUp(e));
         this.canvas["top"].addEventListener("mousedown", e => this.mouseDown(e));
