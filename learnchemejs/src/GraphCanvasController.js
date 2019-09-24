@@ -108,10 +108,13 @@ export class GraphCanvasController{
         
         // Touchscreen event listeners
         if (isTouch) {
-        this.canvas["top"].addEventListener("touchmove", e => this.mouseMove(e.targetTouches[0]), false);
-        this.canvas["top"].addEventListener("touchstart", e=> this.mouseDown(e.targetTouches[0]), false);
-        this.canvas["top"].addEventListener("touchend", e => this.mouseUp(e.changedTouches[0]), false);
-        this.canvas["top"].addEventListener("touchcancel", e => this.mouseUp(e.changedTouches[0]), false);
+            this.canvas["top"].addEventListener("touchmove", e => {
+                if (e.touches.length == 1) {e.preventDefault();}
+                this.mouseMove(e.targetTouches[0]);
+            }, {passive: false});
+            this.canvas["top"].addEventListener("touchstart", e=> this.mouseDown(e.targetTouches[0]), true);
+            this.canvas["top"].addEventListener("touchend", e => this.mouseUp(e.changedTouches[0]), false);
+            this.canvas["top"].addEventListener("touchcancel", e => this.mouseUp(e.changedTouches[0]), false);
         }
 
         // Mouse event listeners
