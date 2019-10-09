@@ -1,5 +1,5 @@
 .textspan {
-    font-size: 20px;
+    font-size: 2.0rem;
     margin: 2px;
 }
 
@@ -13,11 +13,11 @@
 }
 
 .textboxlabel {
-    font-size: 20px;
+    font-size: 2.0rem;
 }
 
 .textbox {
-    font-size: 20px;
+    font-size: 2.0rem;
     width: 300px;
     margin: 5px;
 }

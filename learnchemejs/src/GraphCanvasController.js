@@ -80,6 +80,7 @@ export class GraphCanvasController{
         // Set up canvas size
         this.height = this.graphinfo.height;
         this.width = this.graphinfo.width;
+        this.fontsize = this.graphinfo.fontsize || 20;
 
         // Draw graph layout
         this.drawGraph();
@@ -367,7 +368,7 @@ export class GraphCanvasController{
         const TickThickness = 1;
         const TextColor = "black";
         const TextFont = "sans-serif";
-        const TextFontSize = 20;
+        let TextFontSize = this.fontsize;
         const TextFontStyle = "";
 
         let pt = 0;

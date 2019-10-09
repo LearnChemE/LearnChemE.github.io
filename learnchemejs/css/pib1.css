@@ -1,5 +1,9 @@
 @import url("modal.css");
 
+html {
+    font-size: 10px;
+}
+
 canvas {
     /* border: 1px solid black; */
 }
@@ -11,7 +15,7 @@ button {
     vertical-align: top;
     width: 150px;
     height: 50px;
-    font-size: 20px;
+    font-size: 2.0rem;
     border-radius: 10px;
     margin: 5px;
     transition-duration: 0.0s;
@@ -152,14 +156,14 @@ td.light {
 
 .tableinput {
     border: none;
-    font-size: 16px;
+    font-size: 1.6rem;
     text-align: center;
     vertical-align: middle;
     width: 155px;
 }
 
 .graphtitle {
-    font-size: 20px;
+    font-size: 2.0rem;
     text-align: center;
     font-weight: bold;
     font-family: sans-serif;
@@ -179,7 +183,7 @@ td.light {
     margin-block-end: 4px;
     background-color:#333333;
     color:#FFFFFF;
-    font-size:2rem;
+    font-size:2.0rem;
     font-weight:normal;
 }
 
