@@ -19,7 +19,7 @@ var pib1 = {
     }
 };
 
-var immicibleP = {
+var immiscibleP = {
     entry: "./prb/immiscibleP.js",
     output: {
         filename: "bundleImmiscibleP.js",
@@ -38,10 +38,48 @@ var immicibleP = {
     }
 };
 
-var immicibleT = {
+var immisciblePMobile = {
+    entry: "./prb/immisciblePMobile.js",
+    output: {
+        filename: "bundleImmisciblePMobile.js",
+        path: path.resolve(__dirname, "dist")
+    },
+    module: {
+        rules: [
+            { test: /\.js$/,
+                exclude: /node_modules/,
+                loader: "babel-loader" }
+        ]
+    },
+    mode: "development",
+    stats: {
+        colors: true
+    }
+};
+
+var immiscibleT = {
     entry: "./prb/immiscibleT.js",
     output: {
         filename: "bundleImmiscibleT.js",
+        path: path.resolve(__dirname, "dist")
+    },
+    module: {
+        rules: [
+            { test: /\.js$/,
+                exclude: /node_modules/,
+                loader: "babel-loader" }
+        ]
+    },
+    mode: "development",
+    stats: {
+        colors: true
+    }
+};
+
+var immiscibleTMobile = {
+    entry: "./prb/immiscibleTMobile.js",
+    output: {
+        filename: "bundleImmiscibleTMobile.js",
         path: path.resolve(__dirname, "dist")
     },
     module: {
@@ -76,6 +114,25 @@ var Pxy = {
     }
 };
 
+var PxyMobile = {
+    entry: "./prb/PxyMobile.js",
+    output: {
+        filename: "bundlePxyMobile.js",
+        path: path.resolve(__dirname, "dist")
+    },
+    module: {
+        rules: [
+            { test: /\.js$/,
+                exclude: /node_modules/,
+                loader: "babel-loader" }
+        ]
+    },
+    mode: "development",
+    stats: {
+        colors: true
+    }
+};
+
 var Txy = {
     entry: "./prb/Txy.js",
     output: {
@@ -95,6 +152,25 @@ var Txy = {
     }
 };
 
+var TxyMobile = {
+    entry: "./prb/TxyMobile.js",
+    output: {
+        filename: "bundleTxyMobile.js",
+        path: path.resolve(__dirname, "dist")
+    },
+    module: {
+        rules: [
+            { test: /\.js$/,
+                exclude: /node_modules/,
+                loader: "babel-loader" }
+        ]
+    },
+    mode: "development",
+    stats: {
+        colors: true
+    }
+};
+
 module.exports = [
-  immicibleT, immicibleP, Pxy, Txy, pib1
+  immiscibleT, immiscibleP, Pxy, Txy, immiscibleTMobile, immisciblePMobile, PxyMobile, TxyMobile, pib1
 ];

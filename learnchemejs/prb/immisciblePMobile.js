@@ -536,4 +536,5 @@ const problem = {
     } // begin
 };
 
+try {document.documentElement.style.setProperty('--fontsize', 8 + "px")} catch(e) {console.log("couldn't set font size: ",String(e))}
 let problemController = new ProblemController(problem, document.getElementById("myscript").getAttribute("parentid"));
