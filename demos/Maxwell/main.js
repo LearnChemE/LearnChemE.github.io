@@ -1,4 +1,4 @@
-let choice, w, h, lnHt, fontSize;
+let choice, w, h, lnHt, fontSize, i;
 let eqns = {
     'fundamentals':{"U":`dU=TdS-pdV`,"F":`dF=-SdT-pdV`,"H":`dH=TdS+Vdp`,"G":`dG=-SdT+Vdp`}
 };
@@ -7,11 +7,13 @@ let page = 1;
 let update = false;
 let effects = false;
 let effect = [];
+let letters = [];
+let fps = 20;
 
 function setup() {
     let cnv = createCanvas(windowWidth, windowHeight);
     cnv.parent('main');
-    
+    frameRate(fps);
     /* define globals relative height and width (%) of canvas */
     window["wdRelative"] = windowWidth / 100;
     window["htRelative"] = windowHeight / 100;
@@ -35,13 +37,12 @@ function draw() {
 
 function drawPage(p) {
     
-    removeElements();
     background(180);
 
     switch(p) {
         case 1:
+            removeElements();
             text("Click an equation to get started.", 10, 10);
-            let i;
             let k = Object.keys(eqns['fundamentals']);
             for(i = 0; i < k.length; i++) {
                 domObjs.push(new Tex({"content":eqns['fundamentals'][k[i]], "position":[20, 10 + lnHt * (i + 1)], "name":`${k[i]}`}));
@@ -52,6 +53,18 @@ function drawPage(p) {
             }
             break;
         case 2:
+            text("Click the differential term you would like held constant", 10, 10);
+            for(i = 0; i < domObjs.length; i++) {
+                if (i != choice) {domObjs[i].div.remove()}
+            }
+            effect = [];
+            letters = document.querySelectorAll('g');
+            let glowLetters = choice == 0 || choice == 2 ? [1,2,5,6,9,10] : choice == 1 || choice == 3 ? [1,2,6,7,10,11] : [];
+            for(i = 0; i < glowLetters.length; i++) {
+                let element = letters[glowLetters[i] + 1];
+                effect.push({"target":element, "effect":"glow"});
+            }
+            effects = true;
             break;
         case 3:
             break;
@@ -69,14 +82,12 @@ function next(p, c) {
     if(p == page) {
         switch(page) {
             case 1:
-                let i;
                 let event;
                 for(i = 0; i < domObjs.length; i++) {
                     i != c ? event = "fade" : event = "expand";
                     let element = document.getElementById(`eq${i}`);
                     effect.push({"target":element, "effect":event});
                 }
-                console.log(effect);
                 /* domObjs[i].div.remove(); */
                 update = false;
                 effects = true;
