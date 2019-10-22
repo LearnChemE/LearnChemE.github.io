@@ -1,0 +1,11 @@
+@charset "UTF-8";
+/* CSS Document */
+
+:root {
+  font-size:10px;
+}
+
+body {
+  font-size:1.6rem;
+  margin:0px;
+}
