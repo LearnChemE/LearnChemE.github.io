@@ -42,6 +42,7 @@ function drawPage(p) {
     switch(p) {
         case 1:
             removeElements();
+            domObjs = [];
             text("Click an equation to get started.", 10, 10);
             let k = Object.keys(eqns['fundamentals']);
             for(i = 0; i < k.length; i++) {
