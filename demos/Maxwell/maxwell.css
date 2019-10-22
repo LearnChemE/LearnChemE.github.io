@@ -1,0 +1,21 @@
+@charset "UTF-8";
+/* CSS Document */
+
+:root {
+    font-size: 10px;
+    overflow: hidden;
+}
+
+body {
+    font-size: 1.6rem;
+    margin: 0px;
+}
+
+#main {
+    background-color: #0000FF;
+    position: relative;
+}
+
+.eq>mjx-container:focus {
+    outline:none;
+}
