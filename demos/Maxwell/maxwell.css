@@ -2,7 +2,7 @@
 /* CSS Document */
 
 :root {
-    font-size: 10px;
+    font-size: 15px;
     overflow: hidden;
 }
 
@@ -12,7 +12,7 @@ body {
 }
 
 #main {
-    background-color: #0000FF;
+    background-color: #FFFFFF;
     position: relative;
 }
 
