@@ -4,6 +4,7 @@ let prg = 0;
 let x1, x2, y1, y2;
 
 function applyEffect(a) {
+    let d = a["delete"] || null;
 
     for(i = 0; i < a.length; i++) {
         let t = a[i]['target'];
@@ -23,8 +24,8 @@ function applyEffect(a) {
                     t.style.fontSize = fontSize;
                     t.style.transition = "all 1s";
                     t.firstChild.style.transition = "all 1s";
-                    t.firstChild.style.fontSize = `${fontSize * 2.5 / 10}rem`;
-                    t.style.top = `${10 + 2 * lnHt}px`;
+                    t.firstChild.style.fontSize = `${fontSize * 2.2 / 10}rem`;
+                    t.style.top = `${texY + 1.2 * lnHt}px`;
                     break;
                 case 'glow':
                     glow({
@@ -43,12 +44,15 @@ function applyEffect(a) {
                     });
                     break;
                 case 'zeroAndDelete':
+                    let tStamps = [0, 0.5, 1, 1.5, 2, 2.5, 3];
+                    var animSpeeds = [0.04, 0.04, 0.04, 0.025, 0.025, 0.025];
                     if(!running) {
                         prg = 0;
-                        x1 = t[0].getClientRects()[0]["left"];
-                        x2 = t[1].getClientRects()[0]["right"];
-                        y1 = t[0].getClientRects()[0]["bottom"] + 25;
-                        y2 = t[1].getClientRects()[0]["top"] - 25;
+                        x1 = getCoords(t[0])["left"];
+                        x2 = getCoords(t[1])["right"];
+                        // not sure why, but these are consistently 10 pixels off??
+                        y1 = getCoords(t[0])["bottom"] + 10 + 0.5*lnHt;
+                        y2 = getCoords(t[1])["top"] + 10 - 0.5*lnHt;
                         running = true;
                         effects = true;
                         update = false;
@@ -56,26 +60,66 @@ function applyEffect(a) {
                             domObjs[i].div.style('z-index', '-1');
                         }
                         loop();
-                    } else if(running && prg < 0.5) {
-                        prg += 0.025;
-                        let dur = 0.5;
+                    } else if(running && prg < tStamps[1]) {
+                        prg += animSpeeds[0];
+                        let dur = tStamps[1] - tStamps[0];
                         push();
                         strokeWeight(4);
                         line(x1, y1, (1-(prg/dur))*x1+(prg/dur)*x2, (1-(prg/dur))*y1+(prg/dur)*y2);
                         pop();
-                    } else if(running && prg < 1) {
-                        prg += 0.025;
-                        let dur = 0.5;
+                    } else if(running && prg < tStamps[2]) {
+                        prg += animSpeeds[1];
+                        let dur = tStamps[2] - tStamps[1];
                         push();
                         noStroke();
-                        fill(`rgba(0, 0, 0, ${(prg-dur)/dur})`);
+                        fill(`rgba(0, 0, 0, ${(prg - tStamps[1])/dur})`);
                         text("0", x2, y2 - lnHt);
                         pop();
-                    } else if(running && prg >= 1) {
-                        running = false;
+                    } else if(running && prg < tStamps[3]) {
+                        prg += animSpeeds[2];
+                    } else if(running && prg < tStamps[4]) {
+                        prg += animSpeeds[3];
+                        let dur = tStamps[4] - tStamps[3];
+                        let k = Object.keys(eqns['fundamentals']);
+                        let str = eqns['fundamentals'][k[choices[0]]];
+                        deleteDif(str, letters, choices[1]).forEach(function(elt) {elt.style.opacity = (tStamps[4]-prg)/dur});
+                        
+                        clear();
+                        push();
+                            noStroke();
+                            fill(`rgba(0, 0, 0, ${Math.max((tStamps[4]-prg)/dur, 0)})`);
+                            text("0", x2, y2 - lnHt);
+                            stroke(`rgba(0, 0, 0, ${Math.max((tStamps[4]-prg)/dur, 0)})`);
+                            strokeWeight(4);
+                            line(x1, y1, x2, y2);
+                        pop();
+                        if((tStamps[4]-prg)/dur < 0.05) {deleteDif(str, letters, choices[1]).forEach(function(elt) {elt.style.visibility="hidden"}); clear();}
+                        /* for(let j=0; j<d.length; j++) {
+                            d[j].style.opacity = (tStamps[4]-prg)/dur;
+                        } */
+                    } else if(running && prg < tStamps[5]){
+                        prg += animSpeeds[4];
+                        let dur = tStamps[5] - tStamps[4];
+                        let slide = document.getElementById(`eq${choices[0]}`);
+                        slide.style.transition = `all ${dur/animSpeeds[4]/fps}s`;
+                        slide.style.top = `${texY}px`;
+                    } else if(running && prg < tStamps[6]){
+                        prg += animSpeeds[5];
+                        let dur = tStamps[6] - tStamps[5];
+                        if(choices[1] == 1) {
+                            let k = Object.keys(eqns['fundamentals']);
+                            let str = eqns['fundamentals'][k[choices[0]]];
+                            let xVal = getCoords(deleteDif(str, letters, 1)[0]).left;
+                            let move = deleteDif(str, letters, 2); let x = getCoords(move[0])["left"];
+                            move.forEach(function(elt){elt.style.transition = `all ${dur/animSpeeds[5]/fps}s`; elt.style.transform = `translateX(${xVal-x}px)`});
+                        }
+                        prg = tStamps[6];
+                    } else if(running && prg >= tStamps[6]) {
+                        
                         effects = false;
+                        running = false;
                         prg = 0;
-                        noLoop();
+                        update = true;
                     }
                     break;
             }            
