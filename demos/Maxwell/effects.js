@@ -137,7 +137,7 @@ function glow({continuous, duration, element, id}) {
     let frames = Math.floor(duration * fps/ 1000) ;
     let prog = (frameCount % frames) / frames;
     let x = continuous ? 0.5 + 0.5*Math.sin(prog*Math.PI) : 1;
-    let rgb = id == 0 ? [0, 0, 0] : id == 1 ? [100, 255, 100] : id == 2 ? [100, 100, 255] : [0, 0, 0];
+    let rgb = id == 0 ? [0, 0, 0] : id == 1 ? [70, 200, 50] : id == 2 ? [100, 100, 255] : [0, 0, 0];
     let colr = `rgb(${rgb[0]*x},${rgb[1]*x},${rgb[2]*x})`;
     element.style.color = colr;
     if(continuous) {loop()};
