@@ -5,6 +5,7 @@ let x1, x2, y1, y2;
 
 function applyEffect(a) {
     let d = a["delete"] || null;
+    let v = a["time"] || 0.5;
 
     for(i = 0; i < a.length; i++) {
         let t = a[i]['target'];
@@ -17,14 +18,14 @@ function applyEffect(a) {
             switch(f) {
                 case 'fade':
                     t.style.opacity = 1;
-                    t.style.transition = "opacity 0.5s";
+                    t.style.transition = `opacity ${v}s`;
                     t.style.opacity = 0;
                     break;
                 case 'expand':
                     t.style.fontSize = fontSize;
                     t.style.transition = "all 1s";
                     t.firstChild.style.transition = "all 1s";
-                    t.firstChild.style.fontSize = `${fontSize * 2.2 / 10}rem`;
+                    t.firstChild.style.fontSize = `${largeFontSize}rem`;
                     t.style.top = `${texY + 1.2 * lnHt}px`;
                     break;
                 case 'glow':
@@ -82,7 +83,7 @@ function applyEffect(a) {
                         let dur = tStamps[4] - tStamps[3];
                         let k = Object.keys(eqns['fundamentals']);
                         let str = eqns['fundamentals'][k[choices[0]]];
-                        deleteDif(str, letters, choices[1]).forEach(function(elt) {elt.style.opacity = (tStamps[4]-prg)/dur});
+                        selectItem(str, letters, choices[1]).forEach(function(elt) {elt.style.opacity = (tStamps[4]-prg)/dur});
                         
                         clear();
                         push();
@@ -93,33 +94,38 @@ function applyEffect(a) {
                             strokeWeight(4);
                             line(x1, y1, x2, y2);
                         pop();
-                        if((tStamps[4]-prg)/dur < 0.05) {deleteDif(str, letters, choices[1]).forEach(function(elt) {elt.style.visibility="hidden"}); clear();}
+                        if((tStamps[4]-prg)/dur < 0.05) {selectItem(str, letters, choices[1]).forEach(function(elt) {elt.style.visibility="hidden"}); clear();}
                         /* for(let j=0; j<d.length; j++) {
                             d[j].style.opacity = (tStamps[4]-prg)/dur;
                         } */
                     } else if(running && prg < tStamps[5]){
+                        if(prg < tStamps[4] + animSpeeds[4]) {
+                            let dur = tStamps[5] - tStamps[4];
+                            let slide = document.getElementById(`eq${choices[0]}`);
+                            slide.style.transition = `all ${dur/animSpeeds[4]/fps}s`;
+                            slide.style.top = `${texY}px`;
+                            let distLeft = refLeft - getCoords(letters[2]).left
+                            let curLeft = getCoords(letters[0]).left;
+                            slide.style.left = `${curLeft + distLeft}px`;
+                        }
                         prg += animSpeeds[4];
-                        let dur = tStamps[5] - tStamps[4];
-                        let slide = document.getElementById(`eq${choices[0]}`);
-                        slide.style.transition = `all ${dur/animSpeeds[4]/fps}s`;
-                        slide.style.top = `${texY}px`;
                     } else if(running && prg < tStamps[6]){
                         prg += animSpeeds[5];
                         let dur = tStamps[6] - tStamps[5];
                         if(choices[1] == 1) {
                             let k = Object.keys(eqns['fundamentals']);
                             let str = eqns['fundamentals'][k[choices[0]]];
-                            let xVal = getCoords(deleteDif(str, letters, 1)[0]).left;
-                            let move = deleteDif(str, letters, 2); let x = getCoords(move[0])["left"];
+                            let xVal = getCoords(selectItem(str, letters, 1)[0]).left;
+                            let negativeQ = selectItem(str, letters, 2, true).charAt(0) == "+" ? false : true;
+                            let move = selectItem(str, letters, 2); if(!negativeQ){move[0].style.visibility="hidden"; move.shift()}
+                            let x = getCoords(move[0])["left"];
                             move.forEach(function(elt){elt.style.transition = `all ${dur/animSpeeds[5]/fps}s`; elt.style.transform = `translateX(${xVal-x}px)`});
                         }
                         prg = tStamps[6];
                     } else if(running && prg >= tStamps[6]) {
-                        
-                        effects = false;
                         running = false;
                         prg = 0;
-                        update = true;
+                        return next(3, null);
                     }
                     break;
             }            
@@ -131,7 +137,7 @@ function glow({continuous, duration, element, id}) {
     let frames = Math.floor(duration * fps/ 1000) ;
     let prog = (frameCount % frames) / frames;
     let x = continuous ? 0.5 + 0.5*Math.sin(prog*Math.PI) : 1;
-    let rgb = id == 0 ? [255, 100, 100] : id == 1 ? [100, 255, 100] : id == 2 ? [100, 100, 255] : [50, 128, 128];
+    let rgb = id == 0 ? [0, 0, 0] : id == 1 ? [100, 255, 100] : id == 2 ? [100, 100, 255] : [0, 0, 0];
     let colr = `rgb(${rgb[0]*x},${rgb[1]*x},${rgb[2]*x})`;
     element.style.color = colr;
     if(continuous) {loop()};

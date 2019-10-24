@@ -9,5 +9,6 @@ class Tex {
         this.div.parent('main');
         this.div.style('font-size',`${fontSize / 10}rem`);
         this.div.position(this.position[0], this.position[1]);
+        MathJax.typeset();
     }
 }
