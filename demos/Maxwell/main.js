@@ -1,6 +1,6 @@
 let w, h, instrX, instrY, texX, texY, lnHt, fontSize, largeFontSize, i, constant, constantIndex, restart, finalEq, topPartial, bottomPartial, constantText, refLeft, rhs;
 let eqns = {
-    'fundamentals':{"U":`dU=TdS-PdV`,"F":`dF=-SdT-PdV`,"H":`dH=TdS+VdP`,"G":`dG=-SdT+VdP`,"Rand":`d§=▲d♫-♣dΩ`}
+    'fundamentals':{"U":`dU=TdS-PdV`,"A":`dA=-SdT-PdV`,"H":`dH=TdS+VdP`,"G":`dG=-SdT+VdP`,"Rand":`d§=▲d♫-♣dΩ`}
 };
 let choices = [];
 let domObjs = [];
@@ -93,7 +93,7 @@ function drawPage(p) {
             effects = true;
             break;
         case 3:
-            domObjs.push(new Tex({"content":`\\left ( \\frac{\\partial ${partials[0]}}{\\partial ${partials[1]}} \\right )_{${constant}}=${rhs}`,"position":[texX, texY], "name":"partial"}));
+            domObjs.push(new Tex({"content":`\\left( \\frac{\\partial ${partials[0]}}{\\partial ${partials[1]}} \\right)_{\\scriptscriptstyle ${constant}}=${rhs}`,"position":[texX, texY], "name":"partial"}));
 
             domObjs[domObjs.length - 1].div.id('final');
             finalEq = document.querySelectorAll('mjx-container')[1].firstChild;
@@ -109,7 +109,7 @@ function drawPage(p) {
             //effect.push({"target":letters[3], "effect":"color", "color":choices[1]});
             break;
         case 4:
-            text(`With constant ${constant},`, instrX, instrY);
+            text("With constant", instrX, instrY);
             let newTex = domObjs[domObjs.length - 1];
             newTex.div.show();
             newTex.div.style('opacity','0');
@@ -121,19 +121,22 @@ function drawPage(p) {
             next(4, null);
             break;
         case 5:
-            text(`With constant ${constant},`, instrX, instrY);
+            text("With constant ", instrX, instrY);
+            let sWidth = textWidth("With constant ");
+            let cnst = new Tex({"content": `${constant},`, "position":[instrX + sWidth + 0.05*lnHt, instrY - 0.1*lnHt]});
+            cnst.div.id('constantLetter'); effect.push({"target":document.getElementById('constantLetter'), "effect":"color", "color":`${choices[1] == 2 ? 2 : 1}`});
             effects = true;
             page++;
             window.setTimeout((e)=>{update = true}, 2000);
             break;
         case 6:
-            text(`With constant ${constant},`, instrX, instrY);
+            text("With constant", instrX, instrY);
             text(`therefore,`, instrX, texY + 2.5*lnHt);
             window.setTimeout((e)=>{update = true}, 2000);
             page++;
             break;
         case 7:
-            text(`With constant ${constant},`, instrX, instrY);
+            text("With constant", instrX, instrY);
             text(`therefore,`, instrX, texY + 2.5*lnHt);
             let obj = document.getElementById('final');
             obj.style.top = `${texY + 4*lnHt}px`;
