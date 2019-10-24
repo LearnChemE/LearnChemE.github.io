@@ -1,7 +1,13 @@
 @import url("modal.css");
 
-html {
+:root {
     font-size: 10px;
+}
+
+.MathJax { font-size: 1.6em !important; }
+
+body {
+    font-size: 1.6rem;
 }
 
 canvas {
@@ -45,7 +51,6 @@ button {
     cursor:pointer;
     color:#333333;
     font-family:sans-serif;
-    font-size:1.25rem;
     padding:0.25rem 0.75rem;
     font-weight:bold;
     text-decoration:none;
