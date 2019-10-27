@@ -1,7 +1,7 @@
 var glowList = [];
 let running = false;
 let prg = 0;
-let x1, x2, y1, y2;
+let x1, x2, y1, y2, negativeQ, xOrig, xNew;
 
 function applyEffect(a) {
     let d = a["delete"] || null;
@@ -17,9 +17,9 @@ function applyEffect(a) {
         if (domQ) {
             switch(f) {
                 case 'fade':
-                    t.style.opacity = 1;
+                    t.style.opacity = "1";
                     t.style.transition = `opacity ${v}s`;
-                    t.style.opacity = 0;
+                    t.style.opacity = "0";
                     break;
                 case 'expand':
                     t.style.fontSize = fontSize;
@@ -46,7 +46,8 @@ function applyEffect(a) {
                     break;
                 case 'zeroAndDelete':
                     let tStamps = [0, 0.5, 1, 1.5, 2, 2.5, 3];
-                    var animSpeeds = [0.04, 0.04, 0.04, 0.025, 0.025, 0.025];
+                    //var animSpeeds = [0.04, 0.04, 0.04, 0.025, 0.025, 0.025];
+                    var animSpeeds = [0.05, 0.05, 0.05, 0.05, 0.05, 0.05];
                     if(!running) {
                         prg = 0;
                         x1 = getCoords(t[0])["left"];
@@ -83,7 +84,7 @@ function applyEffect(a) {
                         let dur = tStamps[4] - tStamps[3];
                         let k = Object.keys(eqns['fundamentals']);
                         let str = eqns['fundamentals'][k[choices[0]]];
-                        selectItem(str, letters, choices[1]).forEach(function(elt) {elt.style.opacity = (tStamps[4]-prg)/dur});
+                        selectItem(str, letters, choices[1]).forEach(function(elt) {elt.style.opacity = `${(tStamps[4]-prg)/dur}`});
                         
                         clear();
                         push();
@@ -115,17 +116,17 @@ function applyEffect(a) {
                         if(choices[1] == 1) {
                             let k = Object.keys(eqns['fundamentals']);
                             let str = eqns['fundamentals'][k[choices[0]]];
-                            let xVal = getCoords(selectItem(str, letters, 1)[0]).left;
-                            let negativeQ = selectItem(str, letters, 2, true).charAt(0) == "+" ? false : true;
+                            xNew = getCoords(selectItem(str, letters, 1)[0]).left;
+                            negativeQ = selectItem(str, letters, 2, true).charAt(0) == "+" ? false : true;
                             let move = selectItem(str, letters, 2); if(!negativeQ){move[0].style.visibility="hidden"; move.shift()}
-                            let x = getCoords(move[0])["left"];
-                            move.forEach(function(elt){elt.style.transition = `all ${dur/animSpeeds[5]/fps}s`; elt.style.transform = `translateX(${xVal-x}px)`});
+                            xOrig = getCoords(move[0])["left"];
+                            move.forEach(function(elt){elt.style.transition = `all ${dur/animSpeeds[5]/fps}s`; elt.style.transform = `translateX(${xNew-xOrig}px)`});
                         }
                         prg = tStamps[6];
                     } else if(running && prg >= tStamps[6]) {
                         running = false;
                         prg = 0;
-                        return next(3, null);
+                        return next(parseInt(`${page}`), null);
                     }
                     break;
             }            
