@@ -1,4 +1,4 @@
-let w, h, instrX, instrY, texX, texY, sWidth, lnHt, fontSize, largeFontSize, i, k, str, constant, constantIndex, modify, m, restart, finalEq, topPartial, bottomPartial, constantText, finalEq2, topPartial2, bottomPartial2, constantText2, refLeft, rhs, cnst, cnst2, cnst3, cnst4, s, objt, objt2;
+let w, h, instrX, instrY, texX, texY, sWidth, lnHt, fontSize, largeFontSize, i, k, str, constant, constantIndex, modify, m, restart, finalEq, topPartial, bottomPartial, constantText, finalEq2, topPartial2, bottomPartial2, constantText2, refLeft, rhs, cnst, cnst2, cnst3, cnst4, s, objt, objt2, symmetry;
 let eqns = {
     'fundamentals':{"U":`dU=TdS-PdV`,"A":`dA=-SdT-PdV`,"H":`dH=TdS+VdP`,"G":`dG=-SdT+VdP`,"Rand":`d§=▲d♫-♣dΩ`}
 };
@@ -10,10 +10,12 @@ let effects = false;
 let effect = [];
 let letters = [];
 let glowLetters = [];
-let fps = 20;
+let fps = 30;
 let partials = [];
 let ctc = false;
 let textDelay = 2000;
+
+let symmetryText = "\\Big( \\frac{\\partial}{\\partial x} \\Big( \\frac{\\partial z}{\\partial y} \\Big)_{\\scriptscriptstyle x} \\Big)_{\\scriptscriptstyle y } = \\Big( \\frac{\\partial}{\\partial y} \\Big( \\frac{\\partial z}{\\partial x} \\Big)_{\\scriptscriptstyle y} \\Big)_{\\scriptscriptstyle x} = \\frac{\\partial^{2} z}{\\partial x \\partial y}";
 
 function setup() {
     /* creates reset button */
@@ -252,6 +254,11 @@ function drawPage(p) {
             objt2 = document.getElementById('final2');
             objt2.style.transition = `all ${s}s`
             objt2.style.top = `${getCoords(objt).top - getCoords(objt2).height - lnHt}px`;
+            domObjs.push(new Tex({"content":symmetryText,"position":[texX, texY + 3.5*lnHt], "name":"symmetry"}));
+            symmetry = domObjs[domObjs.length - 1];
+            symmetry.div.style('font-size', `${largeFontSize / 1.4}rem`);
+            symmetry.div.style('opacity', '0');
+            symmetry.div.style('visibility', 'hidden');
             //objt2.style.left = `${90*w - getCoords(objt2).width}px`
             document.getElementById(`eq${choices[0]}`).style.visibility = "hidden";
             document.getElementById('constantLetter4').remove();
@@ -259,7 +266,40 @@ function drawPage(p) {
             window.setTimeout((e)=>{update = true}, 2000);
             break;
         case 18:
-            text("(coming soon, the second derivative part ...)", instrX, instrY)
+            text("We know from Schwarz's theorem that second\nderivatives are distributive. That is, order doesn't\nmatter. For example, with arbitrary variables\nx, y, and z: ", instrX, instrY);
+            symmetry.div.style('visibility', 'visible');
+            symmetry.div.id('symmetry');
+
+            let sym = document.getElementById('symmetry');
+            let xItems = [
+                sym.firstChild.firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1], 
+                sym.firstChild.firstChild.childNodes[4].childNodes[1],
+                sym.firstChild.firstChild.childNodes[10].firstChild.childNodes[1].firstChild.childNodes[1],
+                sym.firstChild.firstChild.childNodes[12].childNodes[1],
+                sym.firstChild.firstChild.childNodes[14].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[0],
+                sym.firstChild.firstChild.childNodes[14].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[1]];
+            let yItems = [    
+                sym.firstChild.firstChild.childNodes[3].firstChild.childNodes[1].firstChild.childNodes[1],
+                sym.firstChild.firstChild.childNodes[5].childNodes[1],
+                sym.firstChild.firstChild.childNodes[8].firstChild.childNodes[1].firstChild.childNodes[1],
+                sym.firstChild.firstChild.childNodes[11].childNodes[1],
+                sym.firstChild.firstChild.childNodes[14].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[2],
+                sym.firstChild.firstChild.childNodes[14].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[3]];
+            let zItems = [
+                sym.firstChild.firstChild.childNodes[3].firstChild.childNodes[0],
+                sym.firstChild.firstChild.childNodes[10].firstChild.childNodes[0],
+                sym.firstChild.firstChild.childNodes[14].firstChild.childNodes[0]];
+            
+            let xColor = "rgb(70, 200, 50)"
+            let yColor = "rgb(100, 100, 255)"
+            let zColor = "rgb(0, 0, 0)"
+
+            xItems.forEach((itm) => {itm.style.color = xColor});
+            yItems.forEach((itm) => {itm.style.color = yColor});
+            zItems.forEach((itm) => {itm.style.color = zColor});
+
+            symmetry.div.style('transition', `all ${2}s`);
+            symmetry.div.style('opacity', '1');
             break;
     }
 }

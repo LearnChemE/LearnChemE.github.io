@@ -45,9 +45,9 @@ function applyEffect(a) {
                     });
                     break;
                 case 'zeroAndDelete':
-                    let tStamps = [0, 0.5, 1, 1.5, 2, 2.5, 3];
+                    let tStamps = [0, 0.8, 1.6, 2.4, 3.2, 4, 4.8];
                     //var animSpeeds = [0.04, 0.04, 0.04, 0.025, 0.025, 0.025];
-                    var animSpeeds = [0.05, 0.05, 0.05, 0.05, 0.05, 0.05];
+                    var animSpeeds = [0.06, 0.04, 0.04, 0.05, 0.05, 0.05];
                     if(!running) {
                         prg = 0;
                         x1 = getCoords(t[0])["left"];
