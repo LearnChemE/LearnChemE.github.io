@@ -1,4 +1,4 @@
-let w, h, instrX, instrY, texX, texY, sWidth, lnHt, fontSize, largeFontSize, i, k, str, constant, constantIndex, modify, m, restart, finalEq, topPartial, bottomPartial, constantText, finalEq2, topPartial2, bottomPartial2, constantText2, refLeft, rhs, cnst, cnst2, cnst3, cnst4, s, objt, objt2, symmetry;
+let stateFunc1, stateFunc2, sym, symmetryText, w, h, instrX, instrY, texX, texY, sWidth, lnHt, fontSize, largeFontSize, i, k, str, constant, constantIndex, modify, m, restart, topPartial1, topPartial2, bottomPartial1, bottomPartial2, constantText1, constantText2, refLeft, rhs, cnst, cnst2, cnst3, cnst4, s, symmetry, hidePartial1, hidePartial2, showPartial1, showPartial2, motionText1, motionText2, endSolution, endSolutionDOMobj;
 let eqns = {
     'fundamentals':{"U":`dU=TdS-PdV`,"A":`dA=-SdT-PdV`,"H":`dH=TdS+VdP`,"G":`dG=-SdT+VdP`,"Rand":`d§=▲d♫-♣dΩ`}
 };
@@ -8,14 +8,15 @@ let page = 1;
 let update = false;
 let effects = false;
 let effect = [];
-let letters = [];
-let glowLetters = [];
+let eqnLetterObjs = [];
+let coloredLetters = [];
 let fps = 30;
 let partials = [];
 let ctc = false;
-let textDelay = 2000;
+let animSpeedMult = 1;
+let textDelay = 2000/animSpeedMult;
 
-let symmetryText = "\\Big( \\frac{\\partial}{\\partial x} \\Big( \\frac{\\partial z}{\\partial y} \\Big)_{\\scriptscriptstyle x} \\Big)_{\\scriptscriptstyle y } = \\Big( \\frac{\\partial}{\\partial y} \\Big( \\frac{\\partial z}{\\partial x} \\Big)_{\\scriptscriptstyle y} \\Big)_{\\scriptscriptstyle x} = \\frac{\\partial^{2} z}{\\partial x \\partial y}";
+//let symmetryText = "\\Big( \\frac{\\partial}{\\partial X} \\Big( \\frac{\\partial Z}{\\partial Y} \\Big)_{\\scriptscriptstyle X} \\Big)_{\\scriptscriptstyle Y } = \\Big( \\frac{\\partial}{\\partial Y} \\Big( \\frac{\\partial Z}{\\partial X} \\Big)_{\\scriptscriptstyle Y} \\Big)_{\\scriptscriptstyle X} = \\frac{\\partial^{2} Z}{\\partial X \\partial Y}";
 
 function setup() {
     /* creates reset button */
@@ -86,10 +87,10 @@ function drawPage(p) {
             }
             effect = [];
             //console.log(document.querySelectorAll('mjx-container')[0].firstChild.classList.value);
-            letters = document.querySelectorAll('mjx-container')[0].firstChild.childNodes;
-            glowLetters = choices[0] == 0 || choices[0] == 2 ? [0,1,4,5,8,9] : choices[0] == 1 || choices[0] == 3 ? [0,1,5,6,9,10] : [0,1,4,5,8,9];
-            for(let i = 0; i < glowLetters.length; i++) {
-                let element = letters[glowLetters[i]];
+            eqnLetterObjs = document.querySelectorAll('mjx-container')[0].firstChild.childNodes;
+            coloredLetters = choices[0] == 0 || choices[0] == 2 ? [0,1,4,5,8,9] : choices[0] == 1 || choices[0] == 3 ? [0,1,5,6,9,10] : [0,1,4,5,8,9];
+            for(let i = 0; i < coloredLetters.length; i++) {
+                let element = eqnLetterObjs[coloredLetters[i]];
                 let id = `${Math.floor(i/2)}`;
                 effect.push({"target":element, "effect":"color", "color":`${id}`});
                 if(i >= 2) {element.addEventListener("mousedown", () => {next(2, id)})}
@@ -100,14 +101,14 @@ function drawPage(p) {
             domObjs.push(new Tex({"content":`\\left( \\frac{\\partial ${partials[0]}}{\\partial ${partials[1]}} \\right)_{\\scriptscriptstyle ${constant}}=${rhs}`,"position":[texX, texY], "name":"partial"}));
 
             domObjs[domObjs.length - 1].div.id('final');
-            finalEq = document.querySelectorAll('mjx-container')[1].firstChild;
-            finalEq.style.fontSize = `${largeFontSize}rem`;
-            topPartial = finalEq.firstChild["childNodes"][0].childNodes[1].firstChild.childNodes[0];
-            bottomPartial = finalEq.firstChild["childNodes"][0].childNodes[1].firstChild.childNodes[1];
-            constantText = finalEq.firstChild["childNodes"][1];
-            refLeft = getCoords(constantText).right;
+            stateFunc1 = document.getElementById('final');
+            stateFunc1.style.fontSize = `${largeFontSize}rem`;
+            topPartial1 = stateFunc1.firstChild.firstChild.firstChild["childNodes"][0].childNodes[1].firstChild.childNodes[0];
+            bottomPartial1 = stateFunc1.firstChild.firstChild.firstChild["childNodes"][0].childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1];
+            constantText1 = stateFunc1.firstChild.firstChild.firstChild["childNodes"][1];
+            refLeft = getCoords(constantText1).right;
             domObjs[domObjs.length - 1].div.hide();
-            effect.push({"target":[letters[constantIndex], letters[constantIndex + 1]], "effect":"zeroAndDelete"});
+            effect.push({"target":[eqnLetterObjs[constantIndex], eqnLetterObjs[constantIndex + 1]], "effect":"zeroAndDelete"});
             effects = true;
             loop();
             //effect.push({"target":letters[3], "effect":"color", "color":choices[1]});
@@ -117,9 +118,9 @@ function drawPage(p) {
             let newTex = domObjs[domObjs.length - 1];
             newTex.div.show();
             newTex.div.style('opacity','0');
-            effect.push({"target":topPartial, "effect":"color", "color":0});
-            effect.push({"target":bottomPartial, "effect":"color", "color":`${choices[1] == 1 ? 2 : 1}`});
-            effect.push({"target":constantText, "effect":"color", "color":`${choices[1] == 2 ? 2 : 1}`});
+            effect.push({"target":topPartial1, "effect":"color", "color":0});
+            effect.push({"target":bottomPartial1, "effect":"color", "color":`${choices[1] == 1 ? 2 : 1}`});
+            effect.push({"target":constantText1, "effect":"color", "color":`${choices[1] == 2 ? 2 : 1}`});
 
             effects = true;
             next(4, null);
@@ -142,31 +143,29 @@ function drawPage(p) {
         case 7:
             text("With constant", instrX, instrY);
             text(`therefore,`, instrX, texY + 2.5*lnHt);
-            let obj = document.getElementById('final');
-            obj.style.top = `${texY + 4*lnHt}px`;
-            obj.style.opacity = "1";
+            stateFunc1.style.top = `${texY + 4*lnHt}px`;
+            stateFunc1.style.opacity = "1";
             window.setTimeout((e)=>{update = true}, textDelay);
             page++;
             break;
         case 8:
             text("With constant", instrX, instrY);
             text(`therefore,`, instrX, texY + 2.5*lnHt);
-            text("click anywhere to continue.", instrX, getCoords(document.getElementById('final')).bottom + lnHt);
+            text("click anywhere to continue.", instrX, getCoords(stateFunc1).bottom + lnHt);
             document.getElementsByClassName('p5Canvas')[0].addEventListener("mousedown", () => {next(8, null)});
             break;
         case 9:
-            s = 2;
-            selectItem(str, letters, choices[1]).forEach(function(elt) {elt.style.visibility = "visible"; elt.style.transition = `opacity ${s}s`; elt.style.opacity = "1";});
+            s = 2/animSpeedMult;
+            selectItem(str, eqnLetterObjs, choices[1]).forEach(function(elt) {elt.style.visibility = "visible"; elt.style.transition = `opacity ${s}s`; elt.style.opacity = "1";});
             if(choices[1] == 1) {
-                let move = selectItem(str, letters, 2); if(!negativeQ){setTimeout(() => {move[0].style.visibility="visible"; move[0].style.opacity = "1"}, 1000*s)}
+                let move = selectItem(str, eqnLetterObjs, 2); if(!negativeQ){setTimeout(() => {move[0].style.visibility="visible"; move[0].style.opacity = "1"}, 1000*s)}
                 move.forEach(function(elt){elt.style.transition = `all ${s}s`; elt.style.transform = `translateX(0px)`})}
-            objt = document.getElementById('final');
-            objt.style.transition = `all ${s}s`
-            objt.style.top = `${90*h - 2*lnHt}px`;
+            stateFunc1.style.transition = `all ${s}s`
+            stateFunc1.style.top = `${90*h - 2*lnHt}px`;
             document.getElementById(`eq${choices[0]}`).style.top = `${texY + 1.2 * lnHt}px`;
             document.getElementById('constantLetter').remove();
             page++;
-            window.setTimeout((e)=>{update = true}, 2000);
+            window.setTimeout((e)=>{update = true}, textDelay);
             break;
         case 10:
             choices[1] = choices[1] == 1 ? 2 : 1;
@@ -174,9 +173,9 @@ function drawPage(p) {
             let txt = `Now, derive the other state function by holding \nconstant. Click `;
             sWidth = textWidth('Now, derive the other state function by holding ');
             let sWidth2 = textWidth('constant. Click ');
-            let newThing = selectItem(str, letters, choices[1], true);
+            let newThing = selectItem(str, eqnLetterObjs, choices[1], true);
             constant = newThing[newThing.length - 1];
-            partials = [str[1], choices[1] == 1 ? str[glowLetters[5]] : str[glowLetters[3]]];
+            partials = [str[1], choices[1] == 1 ? str[coloredLetters[5]] : str[coloredLetters[3]]];
             cnst2 = new Tex({"content": `d${constant}`, "position":[instrX + sWidth + 0.05*lnHt, instrY - 0.1*lnHt]});
             cnst3 = new Tex({"content": `d${constant}`, "position":[instrX + sWidth2 + 0.05*lnHt, instrY + lnHt - 0.1*lnHt]});
             cnst2.div.id('constantLetter2'); effect.push({"target":document.getElementById('constantLetter2'), "effect":"color", "color":`${choices[1] == 2 ? 2 : 1}`});
@@ -187,7 +186,7 @@ function drawPage(p) {
                 domObjs[i].div.style('z-index', '1');
             }
             let newElements = choices[1] == 1 ? [2, 3] : [4, 5];
-            let newListeners = [letters[glowLetters[newElements[0]]], letters[glowLetters[newElements[1]]]];
+            let newListeners = [eqnLetterObjs[coloredLetters[newElements[0]]], eqnLetterObjs[coloredLetters[newElements[1]]]];
             newListeners.forEach((elm) => {elm.addEventListener("mousedown", () => {next(10, choices[1])})});
             break;
         case 11:
@@ -195,14 +194,14 @@ function drawPage(p) {
             cnst3.div.remove();
             domObjs.push(new Tex({"content":`\\left( \\frac{\\partial ${partials[0]}}{\\partial ${partials[1]}} \\right)_{\\scriptscriptstyle ${constant}}=${rhs}`,"position":[texX, texY], "name":"partial2"}));
             domObjs[domObjs.length - 1].div.id('final2');
-            finalEq2 = document.getElementById('final2').firstChild.firstChild;
-            finalEq2.style.fontSize = `${largeFontSize}rem`;
-            topPartial2 = finalEq2.firstChild["childNodes"][0].childNodes[1].firstChild.childNodes[0];
-            bottomPartial2 = finalEq2.firstChild["childNodes"][0].childNodes[1].firstChild.childNodes[1];
-            constantText2 = finalEq2.firstChild["childNodes"][1];
+            stateFunc2 = document.getElementById('final2');
+            stateFunc2.style.fontSize = `${largeFontSize}rem`;
+            topPartial2 = stateFunc2.firstChild.firstChild.firstChild["childNodes"][0].childNodes[1].firstChild.childNodes[0];
+            bottomPartial2 = stateFunc2.firstChild.firstChild.firstChild["childNodes"][0].childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1];
+            constantText2 = stateFunc2.firstChild.firstChild.firstChild["childNodes"][1];
             refLeft = getCoords(constantText2).right;
             domObjs[domObjs.length - 1].div.hide();
-            effect.push({"target":[letters[constantIndex], letters[constantIndex + 1]], "effect":"zeroAndDelete"});
+            effect.push({"target":[eqnLetterObjs[constantIndex], eqnLetterObjs[constantIndex + 1]], "effect":"zeroAndDelete"});
             effects = true;
             loop();
             break;
@@ -236,41 +235,42 @@ function drawPage(p) {
         case 15:
             text("With constant", instrX, instrY);
             text(`therefore,`, instrX, texY + 2.5*lnHt);
-            let obj2 = document.getElementById('final2');
-            obj2.style.top = `${texY + 4*lnHt}px`;
-            obj2.style.opacity = "1";
+            stateFunc2.style.top = `${texY + 4*lnHt}px`;
+            stateFunc2.style.opacity = "1";
             window.setTimeout((e)=>{update = true}, textDelay);
             page++;
             break;
         case 16:
             text("With constant", instrX, instrY);
             text(`therefore,`, instrX, texY + 2.5*lnHt);
-            text("click anywhere to continue.", instrX, getCoords(document.getElementById('final2')).bottom + lnHt);
+            text("click anywhere to continue.", instrX, getCoords(stateFunc2).bottom + lnHt);
             document.getElementsByClassName('p5Canvas')[0].addEventListener("mousedown", () => {next(16, null)});
             break;
         case 17:
-            s = 2;
-            letters.forEach((elt) => {elt.style.visibility = "inherit"; elt.style.opacity = "0";  elt.style.transform = `translateX(0px)`});
-            objt2 = document.getElementById('final2');
-            objt2.style.transition = `all ${s}s`
-            objt2.style.top = `${getCoords(objt).top - getCoords(objt2).height - lnHt}px`;
-            domObjs.push(new Tex({"content":symmetryText,"position":[texX, texY + 3.5*lnHt], "name":"symmetry"}));
+            eqnLetterObjs.forEach((elt) => {elt.style.visibility = "inherit"; elt.style.opacity = "0";  elt.style.transform = `translateX(0px)`});
+            stateFunc2.style.transition = `all ${s}s`
+            stateFunc2.style.top = `${getCoords(stateFunc1).top - getCoords(stateFunc2).height - lnHt}px`;
+
+            symmetryText = `\\Big( \\frac{\\partial}{\\partial ${constant}} \\Big( \\frac{\\partial ${partials[0]}}{\\partial ${partials[1]}} \\Big)_{\\scriptscriptstyle ${constant}} \\Big)_{\\scriptscriptstyle ${partials[1]} } = \\Big( \\frac{\\partial}{\\partial ${partials[1]}} \\Big( \\frac{\\partial ${partials[0]}}{\\partial ${constant}} \\Big)_{\\scriptscriptstyle ${partials[1]}} \\Big)_{\\scriptscriptstyle ${constant}} = \\frac{\\partial^{2} ${partials[0]}}{\\partial ${constant} \\partial ${partials[1]}}`;
+
+            domObjs.push(new Tex({"content":symmetryText,"position":[texX, texY + 2.5*lnHt], "name":"symmetry"}));
             symmetry = domObjs[domObjs.length - 1];
-            symmetry.div.style('font-size', `${largeFontSize / 1.4}rem`);
+            symmetry.div.style('font-size', `${largeFontSize / 1.5}rem`);
             symmetry.div.style('opacity', '0');
+            symmetry.div.id('symmetry');
             symmetry.div.style('visibility', 'hidden');
+
             //objt2.style.left = `${90*w - getCoords(objt2).width}px`
             document.getElementById(`eq${choices[0]}`).style.visibility = "hidden";
             document.getElementById('constantLetter4').remove();
             page++;
-            window.setTimeout((e)=>{update = true}, 2000);
+            window.setTimeout((e)=>{update = true}, textDelay);
             break;
         case 18:
-            text("We know from Schwarz's theorem that second\nderivatives are distributive. That is, order doesn't\nmatter. For example, with arbitrary variables\nx, y, and z: ", instrX, instrY);
+            text("We know that second derivatives are distributive.\nThat is, order of differentiation doesn't matter. So:", instrX, instrY);
             symmetry.div.style('visibility', 'visible');
-            symmetry.div.id('symmetry');
 
-            let sym = document.getElementById('symmetry');
+            sym = document.getElementById('symmetry');
             let xItems = [
                 sym.firstChild.firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1], 
                 sym.firstChild.firstChild.childNodes[4].childNodes[1],
@@ -290,16 +290,51 @@ function drawPage(p) {
                 sym.firstChild.firstChild.childNodes[10].firstChild.childNodes[0],
                 sym.firstChild.firstChild.childNodes[14].firstChild.childNodes[0]];
             
-            let xColor = "rgb(70, 200, 50)"
-            let yColor = "rgb(100, 100, 255)"
+            let xColor = choices[1] == 1 ? "rgb(70, 200, 50)" : "rgb(100, 100, 255)"
+            let yColor = choices[1] == 2 ? "rgb(70, 200, 50)" : "rgb(100, 100, 255)"
             let zColor = "rgb(0, 0, 0)"
-
+            
             xItems.forEach((itm) => {itm.style.color = xColor});
             yItems.forEach((itm) => {itm.style.color = yColor});
             zItems.forEach((itm) => {itm.style.color = zColor});
 
-            symmetry.div.style('transition', `all ${2}s`);
+            symmetry.div.style('transition', `all ${1/animSpeedMult}s`);
             symmetry.div.style('opacity', '1');
+
+            window.setTimeout(() => {
+                text("click on one of the state functions below\nto substitute it into the equation.", instrX, getCoords(sym).bottom + lnHt);
+                stateFunc1.style.zIndex = "1";
+                stateFunc1.addEventListener("mousedown", () => {next(18, 1)});
+                stateFunc2.style.zIndex = "1";
+                stateFunc2.addEventListener("mousedown", () => {next(18, 2)});
+            }, textDelay);
+            break;
+        case 19:
+            window.setTimeout(() => {
+                text("now, click the other state function to substitute it.", instrX, getCoords(sym).bottom + lnHt);
+                if(choices[2] == 1) {
+                stateFunc2.addEventListener("mousedown", () => {next(19, 2)});
+                } else {
+                stateFunc1.addEventListener("mousedown", () => {next(19, 1)});
+                }
+            }, textDelay * 1.5);
+            break;
+        case 20:
+            
+            endSolution = `${motionText1[0] == "-" ? motionText2[0] == "-" ? " " : "-" : " "}\\Big( \\frac{\\partial ${motionText2[0] == "-" || motionText2[0] == "+" ? motionText2[1] : motionText2[0]}}{\\partial ${constant}} \\Big)_{\\scriptscriptstyle ${partials[1]} } = ${motionText2[0] == "-" ? motionText1[0] == "-" ? " " : "-" : " "} \\Big( \\frac{\\partial ${motionText1[0] == "-" || motionText1[0] == "+" ? motionText1[1] : motionText1[0]}}{\\partial ${partials[1]}} \\Big)_{\\scriptscriptstyle ${constant}}`;
+            domObjs.push(new Tex({"content":endSolution,"position":[texX + 1.5 * lnHt, getCoords(sym).bottom + 3 * lnHt], "name":"es"}));
+            domObjs[domObjs.length - 1].div.id('endSolution');
+            endSolutionDOMobj = document.getElementById('endSolution');
+            endSolutionDOMobj.style.fontSize = `${largeFontSize}rem`;
+            endSolutionDOMobj.style.opacity = "0";
+            window.setTimeout(() => {
+                text("The equation above simplifies to a Maxwell Relation!", instrX, getCoords(sym).bottom + 1.25*lnHt);
+                window.setTimeout(() => {    
+                    endSolutionDOMobj.style.transition = `all ${1/animSpeedMult}s`;
+                    endSolutionDOMobj.style.opacity = "1";
+                    text("press the reset button to try another.", instrX, getCoords(endSolutionDOMobj).bottom + 1.5*lnHt);
+                }, textDelay/2);
+            }, textDelay);
             break;
     }
 }
@@ -323,10 +358,10 @@ function next(p, c) {
             case 2:
                 choices.push(c);
                 str = eqns['fundamentals'][k[choices[0]]];
-                constant = str.charAt(glowLetters[2*c+1]);
-                constantIndex = glowLetters[2 * c];
+                constant = str.charAt(coloredLetters[2*c+1]);
+                constantIndex = coloredLetters[2 * c];
                 modify = [];
-                glowLetters.forEach((n) => {if(n != glowLetters[2*c] && n != glowLetters[2*c + 1]) {modify.push(n)}});
+                coloredLetters.forEach((n) => {if(n != coloredLetters[2*c] && n != coloredLetters[2*c + 1]) {modify.push(n)}});
                 m = str.charAt(modify[2] - 1);
                 if(str.charAt(modify[2] - 2)=="-"){rhs=`-${m}`} else {rhs=`${m}`}
                 partials = [];
@@ -352,10 +387,10 @@ function next(p, c) {
                 break;
             case 10:
                 str = eqns['fundamentals'][k[choices[0]]];
-                constant = str.charAt(glowLetters[2*c+1]);
-                constantIndex = glowLetters[2 * c];
+                constant = str.charAt(coloredLetters[2*c+1]);
+                constantIndex = coloredLetters[2 * c];
                 modify = [];
-                glowLetters.forEach((n) => {if(n != glowLetters[2*c] && n != glowLetters[2*c + 1]) {modify.push(n)}});
+                coloredLetters.forEach((n) => {if(n != coloredLetters[2*c] && n != coloredLetters[2*c + 1]) {modify.push(n)}});
                 m = str.charAt(modify[2] - 1);
                 if(str.charAt(modify[2] - 2)=="-"){rhs=`-${m}`} else {rhs=`${m}`}
                 update = true;
@@ -375,7 +410,59 @@ function next(p, c) {
                 update = true;
                 page++;
                 break;
+            case 18:
+                update = true;
+                choices.push(c);
+                replacePartials(c);
+                page++;
+                break;
+            case 19:
+                update = true;
+                replacePartials(c);
+                page++;
+                break;
         }
+    }
+}
+
+function replacePartials(c) {
+    hidePartial1 = [sym.firstChild.firstChild.childNodes[7], sym.firstChild.firstChild.childNodes[10], sym.firstChild.firstChild.childNodes[11], stateFunc1.firstChild.firstChild.childNodes[0], stateFunc1.firstChild.firstChild.childNodes[1]];
+    hidePartial2 = [sym.firstChild.firstChild.childNodes[0], sym.firstChild.firstChild.childNodes[3], sym.firstChild.firstChild.childNodes[4], stateFunc2.firstChild.firstChild.childNodes[0], stateFunc2.firstChild.firstChild.childNodes[1]];
+    motionText1 = selectItem(str, eqnLetterObjs, choices[1], true);
+    motionText2 = selectItem(str, eqnLetterObjs, choices[1] == 1 ? 2 : 1, true);
+    showPartial1 = motionText1[0] == "-" ? [stateFunc1.firstChild.firstChild.childNodes[2], stateFunc1.firstChild.firstChild.childNodes[3]] : [stateFunc1.firstChild.firstChild.childNodes[2]];
+    showPartial2 = motionText2[0] == "-" ? [stateFunc2.firstChild.firstChild.childNodes[2], stateFunc2.firstChild.firstChild.childNodes[3]] : [stateFunc2.firstChild.firstChild.childNodes[2]];
+
+    if(c == 1) {
+        hidePartial1.forEach((elm) => {
+            elm.style.transition = `all ${2/animSpeedMult}s`;
+            elm.style.opacity = "0";
+        });
+        for(let i = 0; i < showPartial1.length; i++) {
+            let elm = showPartial1[i];
+            elm.style.transition = `all ${2/animSpeedMult}s`;
+            //elm.style.fontSize = `${largeFontSize * 0.5}rem`;
+            elm.style.transform = `translate(
+                ${getCoords(hidePartial1[1]).left - (getCoords(showPartial1[0]).left + getCoords(showPartial1[showPartial1.length - 1]).left) / 2 + 0.75 * lnHt}px,
+                ${(getCoords(hidePartial1[0]).top + getCoords(hidePartial1[0]).bottom) / 2 - (getCoords(elm).bottom + getCoords(elm).top) / 2}px
+                )`;
+        }; 
+    } else {
+        hidePartial2.forEach((elm) => {
+            elm.style.transition = `all ${2/animSpeedMult}s`;
+            elm.style.opacity = "0";
+        });
+        for(let i = 0; i < showPartial2.length; i++) {
+            let elm = showPartial2[i];
+            elm.style.transition = `all ${2/animSpeedMult}s`;
+            //elm.style.fontSize = `${largeFontSize * 0.5}rem`;
+            let j = `translate(
+                ${getCoords(hidePartial2[1]).left - (getCoords(showPartial2[0]).left + getCoords(showPartial2[showPartial2.length - 1]).left) / 2 + 0.75 * lnHt}px,
+                ${(getCoords(hidePartial2[0]).top + getCoords(hidePartial2[0]).bottom) / 2 - (getCoords(elm).bottom + getCoords(elm).top) / 2}px
+                )`;
+            elm.style.transform = j;
+            console.log(j);
+        }; 
     }
 }
 

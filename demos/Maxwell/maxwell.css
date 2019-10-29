@@ -16,6 +16,6 @@ body {
     position: relative;
 }
 
-.eq>mjx-container:focus {
+mjx-container:focus {
     outline:none;
 }

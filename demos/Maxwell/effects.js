@@ -5,7 +5,7 @@ let x1, x2, y1, y2, negativeQ, xOrig, xNew;
 
 function applyEffect(a) {
     let d = a["delete"] || null;
-    let v = a["time"] || 0.5;
+    let v = a["time"]/animSpeedMult || 0.5;
 
     for(i = 0; i < a.length; i++) {
         let t = a[i]['target'];
@@ -23,8 +23,8 @@ function applyEffect(a) {
                     break;
                 case 'expand':
                     t.style.fontSize = fontSize;
-                    t.style.transition = "all 1s";
-                    t.firstChild.style.transition = "all 1s";
+                    t.style.transition = `all ${1/animSpeedMult}s`;
+                    t.firstChild.style.transition = `all ${1/animSpeedMult}s`;
                     t.firstChild.style.fontSize = `${largeFontSize}rem`;
                     t.style.top = `${texY + 1.2 * lnHt}px`;
                     break;
@@ -48,6 +48,8 @@ function applyEffect(a) {
                     let tStamps = [0, 0.8, 1.6, 2.4, 3.2, 4, 4.8];
                     //var animSpeeds = [0.04, 0.04, 0.04, 0.025, 0.025, 0.025];
                     var animSpeeds = [0.06, 0.04, 0.04, 0.05, 0.05, 0.05];
+                    for(let i = 0; i < animSpeeds.length; i++) {animSpeeds[i] *= animSpeedMult};
+
                     if(!running) {
                         prg = 0;
                         x1 = getCoords(t[0])["left"];
@@ -84,7 +86,7 @@ function applyEffect(a) {
                         let dur = tStamps[4] - tStamps[3];
                         let k = Object.keys(eqns['fundamentals']);
                         let str = eqns['fundamentals'][k[choices[0]]];
-                        selectItem(str, letters, choices[1]).forEach(function(elt) {elt.style.opacity = `${(tStamps[4]-prg)/dur}`});
+                        selectItem(str, eqnLetterObjs, choices[1]).forEach(function(elt) {elt.style.opacity = `${(tStamps[4]-prg)/dur}`});
                         
                         clear();
                         push();
@@ -95,7 +97,7 @@ function applyEffect(a) {
                             strokeWeight(4);
                             line(x1, y1, x2, y2);
                         pop();
-                        if((tStamps[4]-prg)/dur < 0.05) {selectItem(str, letters, choices[1]).forEach(function(elt) {elt.style.visibility="hidden"}); clear();}
+                        if((tStamps[4]-prg)/dur < 0.05) {selectItem(str, eqnLetterObjs, choices[1]).forEach(function(elt) {elt.style.visibility="hidden"}); clear();}
                         /* for(let j=0; j<d.length; j++) {
                             d[j].style.opacity = (tStamps[4]-prg)/dur;
                         } */
@@ -105,8 +107,8 @@ function applyEffect(a) {
                             let slide = document.getElementById(`eq${choices[0]}`);
                             slide.style.transition = `all ${dur/animSpeeds[4]/fps}s`;
                             slide.style.top = `${texY}px`;
-                            let distLeft = refLeft - getCoords(letters[2]).left
-                            let curLeft = getCoords(letters[0]).left;
+                            let distLeft = refLeft - getCoords(eqnLetterObjs[2]).left
+                            let curLeft = getCoords(eqnLetterObjs[0]).left;
                             slide.style.left = `${curLeft + distLeft}px`;
                         }
                         prg += animSpeeds[4];
@@ -116,9 +118,9 @@ function applyEffect(a) {
                         if(choices[1] == 1) {
                             let k = Object.keys(eqns['fundamentals']);
                             let str = eqns['fundamentals'][k[choices[0]]];
-                            xNew = getCoords(selectItem(str, letters, 1)[0]).left;
-                            negativeQ = selectItem(str, letters, 2, true).charAt(0) == "+" ? false : true;
-                            let move = selectItem(str, letters, 2); if(!negativeQ){move[0].style.visibility="hidden"; move.shift()}
+                            xNew = getCoords(selectItem(str, eqnLetterObjs, 1)[0]).left;
+                            negativeQ = selectItem(str, eqnLetterObjs, 2, true).charAt(0) == "+" ? false : true;
+                            let move = selectItem(str, eqnLetterObjs, 2); if(!negativeQ){move[0].style.visibility="hidden"; move.shift()}
                             xOrig = getCoords(move[0])["left"];
                             move.forEach(function(elt){elt.style.transition = `all ${dur/animSpeeds[5]/fps}s`; elt.style.transform = `translateX(${xNew-xOrig}px)`});
                         }
