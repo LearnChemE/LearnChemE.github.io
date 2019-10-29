@@ -85,7 +85,7 @@ function drawPage(p) {
                 let id = `${i}`;
                 document.getElementById(`eq${id}`).addEventListener("mousedown", () => {if(page == 1) {choices.push(parseInt(id))}; next(1, choices[0])});
             }
-            text("Or try solving a Maxwell relation with\nrandomly-generated letters:", instrX, texY + 6*lnHt);
+            text("Or click the equation below to try solving a\nMaxwell relation with randomly-generated letters", instrX, texY + 6*lnHt);
 
             break;
         case 2:
