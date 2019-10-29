@@ -2,6 +2,12 @@ let stateFunc1, stateFunc2, sym, symmetryText, w, h, instrX, instrY, texX, texY,
 let eqns = {
     'fundamentals':{"U":`dU=TdS-PdV`,"A":`dA=-SdT-PdV`,"H":`dH=TdS+VdP`,"G":`dG=-SdT+VdP`,"Rand":`d§=▲d♫-♣dΩ`}
 };
+
+function shuffleElements(ar) {var ci = ar.length, tv, ri;while (0 !== ci) {ri = Math.floor(Math.random() * ci);ci -= 1;tv = ar[ci];ar[ci] = ar[ri];ar[ri] = tv;}return ar;}
+let randomLetters = shuffleElements(['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']);
+let randomSigns = shuffleElements(['-','+','-','+']);
+eqns['fundamentals'].Rand = `d${randomLetters[0]}=${randomSigns[0]=="+" ? "" : "-"}${randomLetters[1]}d${randomLetters[2]}${randomSigns[1]}${randomLetters[3]}d${randomLetters[4]}`;
+
 let choices = [];
 let domObjs = [];
 let page = 1;
@@ -70,25 +76,27 @@ function drawPage(p) {
             choices = [];
             domObjs = [];
             effect = [];
-            text("Click an equation to get started.", instrX, instrY);
+            text("Click a fundamental equation to get started.", instrX, instrY);
             k = Object.keys(eqns['fundamentals']);
             for(let i = 0; i < k.length; i++) {
-                domObjs.push(new Tex({"content":eqns['fundamentals'][k[i]], "position":[texX, texY + lnHt * (i + 1)], "name":`${k[i]}`}));
+                domObjs.push(new Tex({"content":eqns['fundamentals'][k[i]], "position":[texX, eval(`${texY + lnHt * (i + 1)}+${i == 4 ? 3 * lnHt : 0}`)], "name":`${k[i]}`}));
                 domObjs[i].div.addClass('eq');
                 domObjs[i].div.id(`eq${i}`);
                 let id = `${i}`;
                 document.getElementById(`eq${id}`).addEventListener("mousedown", () => {if(page == 1) {choices.push(parseInt(id))}; next(1, choices[0])});
             }
+            text("Or try solving a Maxwell relation with\nrandomly-generated letters:", instrX, texY + 6*lnHt);
+
             break;
         case 2:
-            text("Click the differential term you would like held constant\n(options are colored)", instrX, instrY);
+            text(`${choices[0] == 4 ? 'First, try to solve this Maxwell relation yourself.\nThen, click a colored differential term to continue.' : 'Click the differential term you would like held constant\n(options are colored)'}`, instrX, instrY);
             for(let i = 0; i < domObjs.length; i++) {
                 if (i != choices[0]) {domObjs[i].div.remove()}
             }
             effect = [];
             //console.log(document.querySelectorAll('mjx-container')[0].firstChild.classList.value);
             eqnLetterObjs = document.querySelectorAll('mjx-container')[0].firstChild.childNodes;
-            coloredLetters = choices[0] == 0 || choices[0] == 2 ? [0,1,4,5,8,9] : choices[0] == 1 || choices[0] == 3 ? [0,1,5,6,9,10] : [0,1,4,5,8,9];
+            coloredLetters = choices[0] == 0 || choices[0] == 2 ? [0,1,4,5,8,9] : choices[0] == 1 || choices[0] == 3 ? [0,1,5,6,9,10] : eqns['fundamentals'].Rand[3] == "-" ? [0,1,5,6,9,10] : [0,1,4,5,8,9];
             for(let i = 0; i < coloredLetters.length; i++) {
                 let element = eqnLetterObjs[coloredLetters[i]];
                 let id = `${Math.floor(i/2)}`;
