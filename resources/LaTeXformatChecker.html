@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<!-- This document is intended to test LaTeX commands easily before putting them into a document. -->
+<head>
+    <meta charset="UTF-8">
+    <meta id="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maxwell Relations Demo</title>
+    <link rel="icon" type="image/png" href="../../resources/siteicon.png">
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" ></script>
+
+</head>
+
+<body>
+    <p style="font-size:40px;" id="main"></p>
+    <script>
+        // Type the LaTeX commands below. '\( xxxxx \)' for in-line LaTeX and '$$ xxxxx $$' for block-display. Note that in Javascript (but not HTML), each backslash requires two characters, e.g. \\
+        let latex = `
+        $$
+        \\Big( \\frac{\\partial}{\\partial x} \\Big( \\frac{\\partial z}{\\partial y} \\Big)_{\\scriptscriptstyle x} \\Big)_{\\scriptscriptstyle y } = \\Big( \\frac{\\partial}{\\partial y} \\Big( \\frac{\\partial z}{\\partial x} \\Big)_{\\scriptscriptstyle y} \\Big)_{\\scriptscriptstyle x} = \\frac{\\partial^{2} z}{\\partial x \\partial y}
+        $$
+        `;
+        let node = document.getElementById('main').innerHTML = latex;
+    </script>
+</body>
+
+</html>
