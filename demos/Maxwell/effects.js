@@ -54,7 +54,7 @@ function applyEffect(a) {
                         prg = 0;
                         x1 = getCoords(t[0])["left"];
                         x2 = getCoords(t[1])["right"];
-                        // not sure why, but these are consistently 10 pixels off??
+                        // not sure why, but these are consistently exactly 10 pixels off??
                         y1 = getCoords(t[0])["bottom"] + 10 + 0.5*lnHt;
                         y2 = getCoords(t[1])["top"] + 10 - 0.5*lnHt;
                         running = true;
@@ -115,12 +115,10 @@ function applyEffect(a) {
                     } else if(running && prg < tStamps[6]){
                         prg += animSpeeds[5];
                         let dur = tStamps[6] - tStamps[5];
-                        if(choices[1] == 1) {
-                            let k = Object.keys(eqns['fundamentals']);
-                            let str = eqns['fundamentals'][k[choices[0]]];
-                            xNew = getCoords(selectItem(str, eqnLetterObjs, 1)[0]).left;
-                            negativeQ = selectItem(str, eqnLetterObjs, 2, true).charAt(0) == "+" ? false : true;
-                            let move = selectItem(str, eqnLetterObjs, 2); if(!negativeQ){move[0].style.visibility="hidden"; move.shift()}
+                        if(choices[1] == 0) {
+                            xNew = getCoords(selectItem(str, eqnLetterObjs, 0)[0]).left;
+                            negativeQ = selectItem(str, eqnLetterObjs, 1, true).charAt(0) == "+" ? false : true;
+                            let move = selectItem(str, eqnLetterObjs, 1); if(!negativeQ){move[0].style.visibility="hidden"; move.shift()}
                             xOrig = getCoords(move[0])["left"];
                             move.forEach(function(elt){elt.style.transition = `all ${dur/animSpeeds[5]/fps}s`; elt.style.transform = `translateX(${xNew-xOrig}px)`});
                         }
@@ -140,7 +138,7 @@ function glow({continuous, duration, element, id}) {
     let frames = Math.floor(duration * fps/ 1000) ;
     let prog = (frameCount % frames) / frames;
     let x = continuous ? 0.5 + 0.5*Math.sin(prog*Math.PI) : 1;
-    let rgb = id == 0 ? [0, 0, 0] : id == 1 ? [70, 200, 50] : id == 2 ? [100, 100, 255] : [0, 0, 0];
+    let rgb = id == 0 ? [70, 200, 50] : id == 1 ? [100, 100, 255] : [0, 0, 0];
     let colr = `rgb(${rgb[0]*x},${rgb[1]*x},${rgb[2]*x})`;
     element.style.color = colr;
     if(continuous) {loop()};
