@@ -33,6 +33,13 @@ function setup() {
     /* calls windowResized with "initialization" value as true to get window dimensions */
     let dims = windowResized(true);
     b.style.left = `${instrX}px`;
+    b.classList.add('buttonMed');
+    b.classList.add('red');
+    let aboutButton = document.getElementById('aboutButton');
+    b.style.fontSize = `${Number(window.getComputedStyle(aboutButton).getPropertyValue('font-size').replace(/[^\d.-]/g, ''))}px`;
+    aboutButton.style.position = "absolute";
+    aboutButton.style.left = `${getCoords(b).right + 20}px`;
+    aboutButton.style.top = `${getCoords(b).top}px`;
 
     let cnv = createCanvas(dims, dims);
 
@@ -486,7 +493,7 @@ function resizeFont() {
     textSize(fontSize);
     lnHt = textAscent() * 1.5;
     instrX = 5*w;
-    instrY = lnHt + 10 + getCoords(document.getElementById('resetbutton'))['height'];
+    instrY = lnHt + getCoords(document.getElementById('resetbutton')).bottom;
     texX = instrX;
     texY = instrY + lnHt;
     largeFontSize = fontSize * 2.2 / 10;

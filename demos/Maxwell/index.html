@@ -20,6 +20,33 @@
 </head>
 
 <body>
+    <a href="javascript:" id="aboutButton" class="buttonMed">about</a>
+    <div id="modalAbout">
+        <div id="about-content">
+            <span class="close">&times;</span>
+            <p style="font-weight:bold;">Maxwell Relations Demonstration</p>
+            <p class="popup paragraph">
+            This simulation was created for use on LearnChemE.com by Neil Hendren under the direction of Dr. John Falconer at the University of Colorado Boulder. Address any questions or comments to learncheme@gmail.com. This app is hosted at: <br><br><a href="https://learncheme.github.io/demos/Maxwell/index.html">https://learncheme.github.io/demos/Maxwell/index.html</a><br><br>and the source code is available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/Maxwell">Github</a>.
+            </p>
+        </div>
+    </div>
+    <script>
+        // Modal handler for the "about" button
+        var modalAbout = document.getElementById("modalAbout");
+        var aboutButton = document.getElementById("aboutButton");
+        var closeAbout = document.getElementsByClassName("close")[0];
+        aboutButton.onclick = function() {
+            modalAbout.style.display = "block";
+        }
+        closeAbout.onclick = function() {
+            modalAbout.style.display = "none";
+        }
+        window.onclick = function(event) {
+            if (event.target == modalAbout) {
+            modalAbout.style.display = "none";
+            }
+        }
+    </script>
     <div id="main"></div>
 </body>
 

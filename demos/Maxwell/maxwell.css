@@ -19,3 +19,120 @@ body {
 mjx-container:focus {
     outline:none;
 }
+
+.buttonMed {
+    z-index:3;
+    border:none;
+    outline:none;
+    text-align: center;
+    -moz-box-shadow: 0px 1px 0px 0px #fff6af;
+    -webkit-box-shadow: 0px 1px 0px 0px #fff6af;
+    box-shadow: 0px 1px 0px 0px #fff6af;
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffec64), color-stop(1, #ffab23));
+    background:-moz-linear-gradient(top, #ffec64 5%, #ffab23 100%);
+    background:-webkit-linear-gradient(top, #ffec64 5%, #ffab23 100%);
+    background:-o-linear-gradient(top, #ffec64 5%, #ffab23 100%);
+    background:-ms-linear-gradient(top, #ffec64 5%, #ffab23 100%);
+    background:linear-gradient(to bottom, #ffec64 5%, #ffab23 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffec64', endColorstr='#ffab23',GradientType=0);
+    background-color:#ffec64;
+    -moz-border-radius:6px;
+    -webkit-border-radius:6px;
+    border-radius:6px;
+    border:1px solid #ffaa22;
+    display:inline-block;
+    cursor:pointer;
+    color:#333333;
+    font-family:sans-serif;
+    padding:1rem 1.5rem;
+    font-weight:bold;
+    text-decoration:none;
+    text-shadow:0px 1px 0px #ffee66;
+}
+.buttonMed:hover {
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #fff5aa), color-stop(1, #ffc567));
+    background:-moz-linear-gradient(top, #fff5aa 5%, #ffc567 100%);
+    background:-webkit-linear-gradient(top, #fff5aa 5%, #ffc567 100%);
+    background:-o-linear-gradient(top, #fff5aa 5%, #ffc567 100%);
+    background:-ms-linear-gradient(top, #fff5aa 5%, #ffc567 100%);
+    background:linear-gradient(to bottom, #fff5aa 5%, #ffc567 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff5aa', endColorstr='#ffc567',GradientType=0);
+    background-color:#fff5aa;
+    font-family:sans-serif;
+    text-decoration:none;
+    font-weight:bold;
+}
+.buttonMed:active {
+    font-family:sans-serif;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+.buttonMed.red {
+    -moz-box-shadow: 0px 1px 0px 0px #ffb8af;
+    -webkit-box-shadow: 0px 1px 0px 0px #ffb8af;
+    box-shadow: 0px 1px 0px 0px #ffb8af;
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ff8787), color-stop(1, #f36262));
+    background:-moz-linear-gradient(top, #ff8787 5%, #f36262 100%);
+    background:-webkit-linear-gradient(top, #ff8787 5%, #f36262 100%);
+    background:-o-linear-gradient(top, #ff8787 5%, #f36262 100%);
+    background:-ms-linear-gradient(top, #ff8787 5%, #f36262 100%);
+    background:linear-gradient(to bottom, #ff8787 5%, #f36262 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff8787', endColorstr='#f36262',GradientType=0);
+    background-color:#ff8787;
+    border:1px solid #494646;
+    color:#000000;
+    text-shadow:0px 1px 0px #ffb8af;
+}
+.buttonMed.red:hover {
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffb4b4), color-stop(1, #ff9292));
+    background:-moz-linear-gradient(top, #ffb4b4 5%, #ff9292 100%);
+    background:-webkit-linear-gradient(top, #ffb4b4 5%, #ff9292 100%);
+    background:-o-linear-gradient(top, #ffb4b4 5%, #ff9292 100%);
+    background:-ms-linear-gradient(top, #ffb4b4 5%, #ff9292 100%);
+    background:linear-gradient(to bottom, #ffb4b4 5%, #ff9292 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffb4b4', endColorstr='#ff9292',GradientType=0);
+    background-color:#ffb4b4;
+}
+
+#modalAbout {
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 10; /* Sit on top */
+	padding-top: 2rem; /* Location of the box */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: rgb(0,0,0); /* Fallback color */
+	background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+#about-content {
+	background-color: #fefefe;
+	margin: auto;
+	padding: 1.5rem;
+	padding-top: 3rem;
+	border: 1px solid #888;
+    width: 80%;
+    font-size: 1.6rem;
+    line-height: 2.5rem;
+    font-family: sans-serif;
+}
+
+/* The Close Button */
+.close {
+	color: #1b1b1b;
+	float: right;
+	font-size: 2rem;
+	font-weight: bold;
+	transform: translateY(-2.5rem);
+}
+
+.close:hover,
+.close:focus {
+	color: #000;
+	text-decoration: none;
+	cursor: pointer;
+}
