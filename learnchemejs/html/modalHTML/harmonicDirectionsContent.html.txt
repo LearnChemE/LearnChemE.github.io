@@ -1,0 +1,11 @@
+<div>
+This demonstration illustrates the wavefunctions and time evolution of the quantum harmonic oscillator.
+<ul>
+<li>The input table (upper left corner) can be edited to change the quantum number \( n \) and expansion coefficient \( C_{n} \) for the general state:</li>
+$$ (equation here) $$
+<li>Time evolution can be observed with the Start/Stop button, and a probabilistic collapse of the wavefunction can be seen with the "Measure E" button.</li>
+<li>The mass of the particle and force constant (k<sub>f</sub>) are adjustable with sliders</li>
+<li>The integrated probability density can be computed over any position range with the lower input table and the Integrate button. The lower limit of integration is designated \( x_{1} \) and the upper limit is \( x_{2} \). The integrated probability appears under the box labeled, "integral".</li>
+<li>Probability density is plotted on the right, while real and imaginary components of the wave, as well as total system energy, are additionally shown on the bottom-left plot.</li>
+<li>The probability density plot has a fixed scale so that relative comparisons can be made, and coefficients \( C_{n} \) are normalized.</li>
+</div>

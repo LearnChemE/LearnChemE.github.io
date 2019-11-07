@@ -1,0 +1,6 @@
+<div>
+"Harmonic Oscillator Simulation"<br><br>
+   Author: Adam Holewinski<br>
+   Adapted for in-browser use by: Sky Chrastina and Neil C. Hendren<br><br>
+   This simulation was created for <a href="http://www.learncheme.com/" target="_blank">LearnChemE.com</a> under the supervision of John L. Falconer at the University of Colorado Boulder. The Matlab version of this demonstration is available by clicking <a href="../../resources/HarmonicSim.m" download>here</a><br><br>The source code for this demonstration is publicly available at: <a href="https://github.com/LearnChemE/" target="_blank">https://github.com/LearnChemE/</a><br><br>For inquiries or feedback, contact: learncheme@gmail.com 
+</div>

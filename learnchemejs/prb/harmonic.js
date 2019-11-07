@@ -3,6 +3,8 @@
 import {GraphCanvas} from "../src/GraphCanvas.js"
 import {hsvToRgb} from '../src/hsvToRgb.js';
 import {linspace} from '../src/sky-helpers.js';
+import {Modal} from '../src/Modal.js';
+import {modalFill} from '../src/modalFill.js';
 
 class Sim {
     constructor() {
@@ -20,6 +22,25 @@ class Sim {
         this.getKF();
         this.T -= this.TSTEP;
         this.update();
+        var modalFiles = [];
+        modalFiles.push(modalFill(this.modalDetails,'../html/modalHTML/harmonicDetailsContent.html.txt'));
+        modalFiles.push(modalFill(this.modalDirections,'../html/modalHTML/harmonicDirectionsContent.html.txt'));
+        modalFiles.push(modalFill(this.modalAbout,'../html/modalHTML/harmonicAboutContent.html.txt'));
+        const error1 = this.modalDetails;
+        const error2 = this.modalDirections;
+        Promise.all(modalFiles).then(function() {
+            MathJax.Hub.Configured();
+        }).catch(() => {
+            console.log("MathJax Not Yet Loaded ...");
+            let delay = 1000;
+            setTimeout(function jax() {
+                try {MathJax.Hub.Configured();}
+                catch(error) {console.error(error); if(delay < 10000) {delay*= 1.5; setTimeout(jax, delay);} else {
+                    modalFill(error1,'../html/modalHTML/errorText.html.txt');
+                    modalFill(error2,'../html/modalHTML/errorText.html.txt');
+                }}
+            }, delay);
+          })
     }
 
     defineGlobals() {
@@ -55,10 +76,24 @@ class Sim {
         this.PROBS = [];
         this.RES = [];
         this.IMS = [];
+        
+        this.detailsContent = "";
+        this.directionsContent = "";
+        this.aboutContent = "";
+
+        this.modalDetails = new Modal({modalid:"modal-details",modalclass:"modal moveUp",headerstyle:"",header:"Details",contentstyle:"",content:this.detailsContent,showing:false});
+        this.modalDirections = new Modal({modalid:"modal-directions",modalclass:"modal moveUp",headerstyle:"",header:"Directions",contentstyle:"",content:this.directionsContent,showing:false});
+        this.modalAbout = new Modal({modalid:"modal-about",modalclass:"modal moveUp",headerstyle:"",header:"About",contentstyle:"",content:this.aboutContent,showing:false});    
+
     }
 
     insertPageElements() {
         let html = `<div id="page">`;
+        html += `<div class="navbar">`;
+        html += `<button id='details' class='buttonMed'>details</button>`;
+        html += `<button id='directions' class='buttonMed'>directions</button>`;
+        html += `<button id='about' class='buttonMed'>about</button>`;
+        html += `</div>`;
         html += `<div class="row">`;
         html += `<div id="left" class="column"></div>`;
         html += `<div id="right" class="column"></div>`;
@@ -200,6 +235,9 @@ class Sim {
         }
         document.getElementById('sldmass').addEventListener("input", () => this.getMass());
         document.getElementById('sldkf').addEventListener("input", () => this.getKF());
+        document.getElementById('details').addEventListener("click", () => this.modalDetails.show());
+        document.getElementById('directions').addEventListener("click", () => this.modalDirections.show());
+        document.getElementById('about').addEventListener("click", () => this.modalAbout.show());
     }
 
     nextFrame() {
@@ -290,6 +328,7 @@ class Sim {
         this.RUNNING = false;
         this.T = 0;
         this.getCoefficients();
+        this.T -= this.TSTEP;
         this.update();
     }
 

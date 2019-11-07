@@ -1,0 +1,4 @@
+<div>
+Imagine some fancy physics equations here until this gets written ...
+$$ f_{ancy}=E(qation)$$
+</div>
