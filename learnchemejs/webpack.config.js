@@ -1,5 +1,24 @@
 const path = require("path");
 
+var harmonic = {
+    entry: "./prb/harmonic.min.js",
+    output: {
+        filename: "bundleHarmonic.js",
+        path: path.resolve(__dirname, "dist")
+    },
+    module: {
+        rules: [
+            { test: /\.js$/,
+                exclude: /node_modules/,
+                loader: "babel-loader" }
+        ]
+    },
+    mode: "development",
+    stats: {
+        colors: true
+    }
+};
+
 var pib1 = {
     entry: "./prb/pib1.js",
     output: {
@@ -172,5 +191,5 @@ var TxyMobile = {
 };
 
 module.exports = [
-  immiscibleT, immiscibleP, Pxy, Txy, immiscibleTMobile, immisciblePMobile, PxyMobile, TxyMobile, pib1
+  immiscibleT, immiscibleP, Pxy, Txy, immiscibleTMobile, immisciblePMobile, PxyMobile, TxyMobile, pib1, harmonic
 ];
