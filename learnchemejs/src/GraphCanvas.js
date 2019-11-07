@@ -2,7 +2,7 @@ import {ZCanvas} from "./ZCanvas.js";
 import {Point} from "./Point.js";
 import {Line} from "./Line.js";
 import {Text} from "./Text.js";
-import {GraphInfo} from "./Graphinfo.js";
+import {GraphInfo} from "./GraphInfo.js";
 import {getDist, constrain, roundTo, getAngle, evalWithContext, isBetween, FindRoot} from "./sky-helpers.js";
 
 const GRABRADIUS = 10;
