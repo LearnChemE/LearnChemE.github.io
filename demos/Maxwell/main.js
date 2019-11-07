@@ -14,7 +14,7 @@ let coloredLetters = [];
 let fps = 30;
 let partials = [];
 let ctc = false;
-let animSpeedMult = 0.9;
+let animSpeedMult = 1;
 let textDelay = 2000/animSpeedMult;
 
 //let symmetryText = "\\Big( \\frac{\\partial}{\\partial X} \\Big( \\frac{\\partial Z}{\\partial Y} \\Big)_{\\scriptscriptstyle X} \\Big)_{\\scriptscriptstyle Y } = \\Big( \\frac{\\partial}{\\partial Y} \\Big( \\frac{\\partial Z}{\\partial X} \\Big)_{\\scriptscriptstyle Y} \\Big)_{\\scriptscriptstyle X} = \\frac{\\partial^{2} Z}{\\partial X \\partial Y}";
@@ -111,7 +111,7 @@ function drawPage(p) {
             stateFunc1 = document.getElementById('stateFunc1');
             stateFunc1.style.fontSize = `${largeFontSize}rem`;
             topPartial1 = stateFunc1.firstChild.firstChild.firstChild["childNodes"][0].childNodes[1].firstChild.childNodes[0];
-            bottomPartial1 = stateFunc1.firstChild.firstChild.firstChild["childNodes"][0].childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1];
+            bottomPartial1 = stateFunc1.firstChild.firstChild.firstChild["childNodes"][0].childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[1];
             constantText1 = stateFunc1.firstChild.firstChild.firstChild["childNodes"][1];
             refLeft = getCoords(constantText1).right;
             domObjs[domObjs.length - 1].div.hide();
@@ -208,7 +208,7 @@ function drawPage(p) {
             stateFunc2 = document.getElementById('stateFunc2');
             stateFunc2.style.fontSize = `${largeFontSize}rem`;
             topPartial2 = stateFunc2.firstChild.firstChild.firstChild["childNodes"][0].childNodes[1].firstChild.childNodes[0];
-            bottomPartial2 = stateFunc2.firstChild.firstChild.firstChild["childNodes"][0].childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1];
+            bottomPartial2 = stateFunc2.firstChild.firstChild.firstChild["childNodes"][0].childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[1];
             constantText2 = stateFunc2.firstChild.firstChild.firstChild["childNodes"][1];
             refLeft = getCoords(constantText2).right;
             domObjs[domObjs.length - 1].div.hide();
@@ -283,18 +283,16 @@ function drawPage(p) {
 
             sym = document.getElementById('symmetry');
             let xItems = [
-                sym.firstChild.firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1], 
+                sym.firstChild.firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[1], 
                 sym.firstChild.firstChild.childNodes[4].childNodes[1],
-                sym.firstChild.firstChild.childNodes[10].firstChild.childNodes[1].firstChild.childNodes[1],
+                sym.firstChild.firstChild.childNodes[10].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[1],
                 sym.firstChild.firstChild.childNodes[12].childNodes[1],
-                sym.firstChild.firstChild.childNodes[14].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[0],
                 sym.firstChild.firstChild.childNodes[14].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[1]];
             let yItems = [    
-                sym.firstChild.firstChild.childNodes[3].firstChild.childNodes[1].firstChild.childNodes[1],
+                sym.firstChild.firstChild.childNodes[3].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[1],
                 sym.firstChild.firstChild.childNodes[5].childNodes[1],
-                sym.firstChild.firstChild.childNodes[8].firstChild.childNodes[1].firstChild.childNodes[1],
+                sym.firstChild.firstChild.childNodes[8].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[1],
                 sym.firstChild.firstChild.childNodes[11].childNodes[1],
-                sym.firstChild.firstChild.childNodes[14].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[2],
                 sym.firstChild.firstChild.childNodes[14].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[3]];
             let zItems = [
                 sym.firstChild.firstChild.childNodes[3].firstChild.childNodes[0],
@@ -478,7 +476,6 @@ function replacePartials(c) {
                 ${(getCoords(hidePartial2[0]).top + getCoords(hidePartial2[0]).bottom) / 2 - (getCoords(elm).bottom + getCoords(elm).top) / 2}px
                 )`;
             elm.style.transform = j;
-            console.log(j);
         }; 
     }
 }
