@@ -5,6 +5,7 @@ import {hsvToRgb} from '../src/hsvToRgb.js';
 import {linspace} from '../src/sky-helpers.js';
 import {Modal} from '../src/Modal.js';
 import {modalFill} from '../src/modalFill.js';
+import {scale} from '../src/scaleApp.js';
 
 class Sim {
     constructor() {
@@ -76,6 +77,8 @@ class Sim {
         this.PROBS = [];
         this.RES = [];
         this.IMS = [];
+
+        this.SCALE = 1;
         
         this.detailsContent = "";
         this.directionsContent = "";
@@ -90,6 +93,7 @@ class Sim {
     insertPageElements() {
         let html = `<div id="page">`;
         html += `<div class="navbar">`;
+        html += `<div class='zoom'><img src='../../media/magPlus.png' width='30' id='zoomIn' class='buttonSmall'></img><img src='../../media/magMinus.png' width='30' id='zoomOut' class='buttonSmall'></img></div>`
         html += `<button id='details' class='buttonMed'>details</button>`;
         html += `<button id='directions' class='buttonMed'>directions</button>`;
         html += `<button id='about' class='buttonMed'>about</button>`;
@@ -238,6 +242,8 @@ class Sim {
         document.getElementById('details').addEventListener("click", () => this.modalDetails.show());
         document.getElementById('directions').addEventListener("click", () => this.modalDirections.show());
         document.getElementById('about').addEventListener("click", () => this.modalAbout.show());
+        document.getElementById('zoomIn').addEventListener("click", () => {this.SCALE *= 1.125; this.scaleBody(this.SCALE);});
+        document.getElementById('zoomOut').addEventListener("click", () => {this.SCALE /= 1.125; this.scaleBody(this.SCALE);});
     }
 
     nextFrame() {
@@ -416,6 +422,8 @@ class Sim {
         this.T -= this.TSTEP;
         this.update();
     }
+
+    scaleBody() {scale(this.SCALE);}
 }
 
 function hermites(n, xx) {
