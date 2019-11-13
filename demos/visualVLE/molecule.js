@@ -12,7 +12,7 @@ class Molecule {
         this.velocity = [Math.cos(this.direction)*this.speed, Math.sin(this.direction)*this.speed];
         this.position = [Math.trunc(Math.random()*dims), 0];
         this.position[1] = this.state == 'vapor' ?  Math.trunc(Math.random()*liquidLine) :  liquidLine + Math.trunc(Math.random()*(dims - liquidLine));
-        this.noiseScaleXY = 5;
+        this.noiseScaleXY = 8;
         this.noiseScaleTheta = 0.2;
         this.noiseSeedX = Math.trunc(1000 * Math.random());
         this.noiseSeedY = Math.trunc(1000 * Math.random());        
@@ -70,24 +70,19 @@ class Molecule {
     }
 
     Condense() {
-        if((this.component == 'a' && (yA/xA)/(yB/xB) >= Alpha) || (this.component == 'b' && (yA/xA)/(yB/xB) <= Alpha)) {
-            if(Math.random() < condFraction && (molsVapor[0]/mols) >= (1 - fracLiq)) {
-                molsLiquid[0]++;
-                molsVapor[0]--;
-                if(this.component == 'a') {molsLiquid[1]++;molsVapor[1]--} else {molsLiquid[2]++;molsVapor[2]--};
-                xA = molsLiquid[1] / molsLiquid[0]; xB = 1 - xA;
-                this.state = 'liquid';
-                this.position[1] += this.diameter / 2;
-                this.speed /= 3;
-                return true;
-            }
-        }
-        return false;
+        molsLiquid[0]++;
+        molsVapor[0]--;
+        if(this.component == 'a') {molsLiquid[1]++;molsVapor[1]--} else {molsLiquid[2]++;molsVapor[2]--};
+        xA = molsLiquid[1] / molsLiquid[0]; xB = 1 - xA;
+        this.state = 'liquid';
+        this.position[1] += this.diameter;
+        this.speed /= 3;
+        return true;
     }
 
     Evaporate() {
         if((this.component == 'a' && (yA/xA)/(yB/xB) <= Alpha) || (this.component == 'b' && (yA/xA)/(yB/xB) >= Alpha)) {
-            if(Math.random() < evapFraction && (molsLiquid[0]/mols) >= fracLiq) {
+            if((molsLiquid[0]/mols) >= fracLiq) {
                 molsVapor[0]++;
                 molsLiquid[0]--;
                 if(this.component == 'a') {molsVapor[1]++;molsLiquid[1]--} else {molsVapor[2]++;molsLiquid[2]--};
@@ -99,5 +94,16 @@ class Molecule {
             }
         }
         return false;
+    }
+
+    ChangeComponent(comp) {
+        if(this.component != comp) {
+            if(this.state == 'vapor') {if(this.component == 'a'){molsVapor[1]--;molsVapor[2]++}else{molsVapor[1]++;molsVapor[2]--}} else {if(this.component == 'a'){molsLiquid[1]--;molsLiquid[2]++}else{molsLiquid[1]++;molsLiquid[2]--}}
+            xA = molsLiquid[1] / molsLiquid[0]; xB = 1 - xA;
+            yA = molsVapor[1] / molsVapor[0]; yB = 1 - yA;
+            this.component = comp;
+            this.color = this.component == 'a' ? 'rgba(100, 180, 0, 0.75)' : 'rgba(50, 0, 150, 0.75)';
+            this.div.style.backgroundColor = this.color;
+        }
     }
 }
