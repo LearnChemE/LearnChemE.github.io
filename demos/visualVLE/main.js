@@ -1,7 +1,7 @@
 let dims, cnv, bc, barHeight, xLabel, xSlider, leftBarLabel, rightBarLabel, leftBarTop, leftBarBottom, rightBarTop, rightBarBottom, mainDiv, liquidColor, liquidLine, alphaLabel, molNumberSlider, molNumberLabel, evapFraction, condFraction;
 let mol = [];
 let liquidLevel = 0.2;
-var mols = 50;
+var mols = 80;
 var Alpha = 1;
 var fracLiq = 0.85;
 var molsVapor = [0, 0, 0];//[total, A, B]
@@ -13,6 +13,9 @@ var yB = 0.5;
 var zA = 0.5;
 var xAtarget = 0.5;
 var yAtarget = 0.5;
+
+let Acolor = 'rgb(80, 0, 180)';
+let Bcolor = 'rgb(130, 180, 0)';
 
 let checkbox;
 var checked = false;
@@ -26,7 +29,7 @@ function setup() {
     mainDiv = document.getElementById('main');
     background(240);
     liquidColor = color(200, 200, 240);
-    //frameRate(30);
+    frameRate(30);
     for(let i = 0; i < mols; i++) {
         if(i % 2 == 0) {mol.push(new Molecule({'component':'a'}))} else {mol.push(new Molecule({'component':'b'}))};
     }
@@ -93,10 +96,10 @@ function addBarChart() {
     rightBarTop = document.getElementById('rbt');
     leftBarLabel = document.getElementById('lbl');
     rightBarLabel = document.getElementById('rbl');
-    leftBarBottom.style.background = `rgba(50, 0, 150, 1)`;
-    rightBarBottom.style.background = `rgba(50, 0, 150, 1)`;
-    leftBarTop.style.background = `rgba(100, 150, 0, 1)`;
-    rightBarTop.style.background = `rgba(100, 150, 0, 1)`;
+    leftBarBottom.style.background = `${Acolor}`;
+    rightBarBottom.style.background = `${Acolor}`;
+    leftBarTop.style.background = `${Bcolor}`;
+    rightBarTop.style.background = `${Bcolor}`;
     leftBarBottom.style.position = 'absolute';
     leftBarTop.style.position = 'absolute';
     rightBarBottom.style.position = 'absolute';
@@ -107,18 +110,18 @@ function addBarChart() {
     rightBarLabel.innerText = 'vapor';
     leftBarLabel.style.textAlign = 'center';
     rightBarLabel.style.textAlign = 'center';
-    let transitionTime = 0.5;
+    let transitionTime = 1;
     leftBarTop.style.transition = `height ${transitionTime}s`;
     rightBarTop.style.transition = `height ${transitionTime}s`;
 }
 
 function drawBarChart() {
     if(checked) {
-        leftBarTop.style.height = `${barHeight * xA}px`;
-        rightBarTop.style.height = `${barHeight * yA}px`;
+        leftBarTop.style.height = `${barHeight * (1 - xA)}px`;
+        rightBarTop.style.height = `${barHeight * (1 - yA)}px`;
     } else {
-        leftBarTop.style.height = `${barHeight * xAtarget}px`;
-        rightBarTop.style.height = `${barHeight * yAtarget}px`;
+        leftBarTop.style.height = `${barHeight * (1 - xAtarget)}px`;
+        rightBarTop.style.height = `${barHeight * (1 - yAtarget)}px`;
     }
 }
 
@@ -203,7 +206,7 @@ function addSliders() {
     molNumberLabel.id('mnl');
     molNumberLabel.position(getCoords('canvas0').right, getCoords('canvas0').top + 10);
 
-    molNumberSlider = createSlider(10, 200, 50, 1);
+    molNumberSlider = createSlider(10, 200, 80, 1);
     molNumberSlider.id('mns');
     molNumberSlider.position(getCoords('canvas0').right, getCoords('mnl').bottom + 10);
     molNumberSlider.style('width', '100px');

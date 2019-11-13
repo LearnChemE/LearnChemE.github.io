@@ -1,6 +1,6 @@
 class Molecule {
     constructor(_args) {
-        let colors = {'a': 'rgba(100, 180, 0, 0.75)', 'b': 'rgba(50, 0, 150, 0.75)'};
+        let colors = {'a': Acolor, 'b': Bcolor};
         this.component = _args['component'] || 'a';
         this.color = _args['color'] || colors[`${this.component}`];
         this.diameter = _args['diameter'] || 10;
@@ -22,7 +22,8 @@ class Molecule {
         this.div.classList.add('molecule');
         this.div.style.top = `${this.position[1]}px`;
         this.div.style.left = `${this.position[0]}px`;
-        document.body.appendChild(this.div);
+        this.div.style.zIndex = Math.random() > 0.499 ? '1' : '2';
+        document.getElementById('molecules').appendChild(this.div);
         if(this.state == 'liquid') {molsLiquid[0]++; if(this.component == 'a'){molsLiquid[1]++} else {molsLiquid[2]++}}
         else {molsVapor[0]++; if(this.component == 'a'){molsVapor[1]++} else {molsVapor[2]++}}
         xA = molsLiquid[1] / molsLiquid[0]; yA = molsVapor[1] / molsVapor[0]; xB = 1 - xA; yB = 1 - yA;
@@ -102,7 +103,7 @@ class Molecule {
             xA = molsLiquid[1] / molsLiquid[0]; xB = 1 - xA;
             yA = molsVapor[1] / molsVapor[0]; yB = 1 - yA;
             this.component = comp;
-            this.color = this.component == 'a' ? 'rgba(100, 180, 0, 0.75)' : 'rgba(50, 0, 150, 0.75)';
+            this.color = this.component == 'a' ? Acolor : Bcolor;
             this.div.style.backgroundColor = this.color;
         }
     }
