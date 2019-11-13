@@ -1,4 +1,4 @@
-let dims, cnv, bc, barHeight, leftBarLabel, rightBarLabel, leftBarTop, leftBarBottom, rightBarTop, rightBarBottom, mainDiv, liquidColor, liquidLine, alphaLabel, molNumberSlider, molNumberLabel, evapFraction, condFraction;
+let dims, cnv, bc, barHeight, xLabel, xSlider, leftBarLabel, rightBarLabel, leftBarTop, leftBarBottom, rightBarTop, rightBarBottom, mainDiv, liquidColor, liquidLine, alphaLabel, molNumberSlider, molNumberLabel, evapFraction, condFraction;
 let mol = [];
 let liquidLevel = 0.2;
 var mols = 50;
@@ -11,6 +11,11 @@ var xB = 0.5;
 var yA = 0.5;
 var yB = 0.5;
 var zA = 0.5;
+var xAtarget = 0.5;
+var yAtarget = 0.5;
+
+let checkbox;
+var checked = false;
 
 function setup() {
     addBarChart();
@@ -21,23 +26,22 @@ function setup() {
     mainDiv = document.getElementById('main');
     background(240);
     liquidColor = color(200, 200, 240);
-    frameRate(30);
+    //frameRate(30);
     for(let i = 0; i < mols; i++) {
         if(i % 2 == 0) {mol.push(new Molecule({'component':'a'}))} else {mol.push(new Molecule({'component':'b'}))};
     }
     addSliders();
 }
 
-function assignVolatility() {
+function updateGlobals() {
     Alpha = Math.pow(10, volatilitySlider.value());
     alphaLabel.html(`relative volatility (&#945): ${Number.parseFloat(Alpha).toFixed(2)}`);
-}
-
-function assignMols() {
     mols = molNumberSlider.value();
     molNumberLabel.html(`number of particles: ${mols}`);
-    zLabel.html(`z<sub>A</sub>: ${zA}`);
-    zA = zSlider.value();
+    xLabel.html(`x<sub>A</sub>: ${xAtarget}`);
+    xAtarget = xSlider.value();
+    yAtarget = (Alpha*xAtarget)/(1 - xAtarget + Alpha*xAtarget);
+    zA = xAtarget*fracLiq + (1 - fracLiq)*yAtarget;
     for(let i = 0; i < mol.length; i++) {if(i <= mols*zA){mol[i].ChangeComponent('a');}else{mol[i].ChangeComponent('b');}}
 }
 
@@ -103,14 +107,19 @@ function addBarChart() {
     rightBarLabel.innerText = 'vapor';
     leftBarLabel.style.textAlign = 'center';
     rightBarLabel.style.textAlign = 'center';
-    let transitionTime = 4;
+    let transitionTime = 0.5;
     leftBarTop.style.transition = `height ${transitionTime}s`;
     rightBarTop.style.transition = `height ${transitionTime}s`;
 }
 
 function drawBarChart() {
-    leftBarTop.style.height = `${barHeight * xA}px`;
-    rightBarTop.style.height = `${barHeight * yA}px`;
+    if(checked) {
+        leftBarTop.style.height = `${barHeight * xA}px`;
+        rightBarTop.style.height = `${barHeight * yA}px`;
+    } else {
+        leftBarTop.style.height = `${barHeight * xAtarget}px`;
+        rightBarTop.style.height = `${barHeight * yAtarget}px`;
+    }
 }
 
 function drawLiquid(){
@@ -169,6 +178,9 @@ function windowResized() {
         molNumberSlider.position(getCoords('canvas0').right, getCoords('mnl').bottom + 10);
         alphaLabel.position(getCoords('canvas0').right, getCoords('mns').top + 30);
         volatilitySlider.position(getCoords('canvas0').right, getCoords('al').bottom + 10);
+        xSlider.position(getCoords('canvas0').right, getCoords('xl').bottom + 10);
+        xLabel.position(getCoords('canvas0').right, getCoords('vs').bottom + 10);
+        checkbox.position(getCoords('canvas0').right, getCoords('barchart').top + 20);    
     }
 }
 
@@ -205,16 +217,24 @@ function addSliders() {
     volatilitySlider.id('vs');
     volatilitySlider.style('width', '100px');
 
-    zLabel = createDiv(`z<sub>A</sub>: ${zA}`);
-    zLabel.id('zl');
-    zLabel.position(getCoords('canvas0').right, getCoords('vs').bottom + 10);
+    xLabel = createDiv(`x<sub>A</sub>: ${xAtarget}`);
+    xLabel.id('xl');
+    xLabel.position(getCoords('canvas0').right, getCoords('vs').bottom + 10);
 
-    zSlider = createSlider(0.03, 0.97, 0.5, 0.01);
-    zSlider.id('zs');
-    zSlider.position(getCoords('canvas0').right, getCoords('zl').bottom + 10);
-    zSlider.style('width', '100px');
+    xSlider = createSlider(0.03, 0.97, 0.5, 0.01);
+    xSlider.id('xs');
+    xSlider.position(getCoords('canvas0').right, getCoords('xl').bottom + 10);
+    xSlider.style('width', '100px');
 
-    document.getElementById('mns').oninput = assignMols;
-    document.getElementById('vs').oninput = assignVolatility;
-    document.getElementById('zs').oninput = assignMols;
+    checkbox = createCheckbox('show values in real-time', false);
+    checkbox.changed(checkboxEvent);
+    checkbox.position(getCoords('canvas0').right, getCoords('barchart').top + 20);
+
+    document.getElementById('mns').oninput = updateGlobals;
+    document.getElementById('vs').oninput = updateGlobals;
+    document.getElementById('xs').oninput = updateGlobals;
+}
+
+function checkboxEvent() {
+    checked = !checked;
 }
