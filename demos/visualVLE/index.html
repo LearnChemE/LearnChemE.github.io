@@ -8,16 +8,17 @@
     <link rel="icon" type="image/png" href="https://LearnChemE.github.io/resources/siteicon.png">
     
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
     <script type="text/javascript" src="main.min.js"></script>
     <script type="text/javascript" src="molecule.min.js"></script>
     
     <link rel="stylesheet" type="text/css" href="visualVLE.css">
 </head>
 
-<body>
-    <div id="main"></div>
+<body onresize="resize()">
+    <div id="main">
+        <div id="canvas0" style="z-index: 0"></div>
+        <div id="subCanvas" style="z-index: 1"></div>
+    </div>
     <div id="molecules"></div>
 </body>
 

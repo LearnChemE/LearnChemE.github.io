@@ -4,7 +4,7 @@ class Molecule {
         this.component = _args['component'] || 'a';
         this.color = _args['color'] || colors[`${this.component}`];
         this.diameter = _args['diameter'] || 10;
-        this.temperature = _args['temperature'] || 290;
+        this.temperature = _args['temperature'] || 285;
         this.direction = Math.random() * Math.PI * 2;
         let determineState = Math.random();
         this.state = determineState > fracLiq ? 'vapor' : 'liquid';
@@ -12,7 +12,7 @@ class Molecule {
         this.velocity = [Math.cos(this.direction)*this.speed, Math.sin(this.direction)*this.speed];
         this.position = [Math.trunc(Math.random()*dims), 0];
         this.position[1] = this.state == 'vapor' ?  Math.trunc(Math.random()*liquidLine) :  liquidLine + Math.trunc(Math.random()*(dims - liquidLine));
-        this.noiseScaleXY = 8;
+        this.noiseScaleXY = 6;
         this.noiseScaleTheta = 0.2;
         this.noiseSeedX = Math.trunc(1000 * Math.random());
         this.noiseSeedY = Math.trunc(1000 * Math.random());        
@@ -22,7 +22,7 @@ class Molecule {
         this.div.classList.add('molecule');
         this.div.style.top = `${this.position[1]}px`;
         this.div.style.left = `${this.position[0]}px`;
-        this.div.style.zIndex = Math.random() > 0.499 ? '1' : '2';
+        this.div.style.opacity = '0.75';
         document.getElementById('molecules').appendChild(this.div);
         if(this.state == 'liquid') {molsLiquid[0]++; if(this.component == 'a'){molsLiquid[1]++} else {molsLiquid[2]++}}
         else {molsVapor[0]++; if(this.component == 'a'){molsVapor[1]++} else {molsVapor[2]++}}
@@ -40,11 +40,11 @@ class Molecule {
         this.noiseSeedX += 0.25;
         this.noiseSeedY += 0.25;
         this.noiseSeedTheta += 0.05;
-        this.direction = atan2(this.velocity[1], this.velocity[0]);
+        this.direction = Math.atan2(this.velocity[1], this.velocity[0]);
 
-        let noiseX = this.noiseScaleXY * noise(this.noiseSeedX) - this.noiseScaleXY / 2;
-        let noiseY = this.noiseScaleXY * noise(this.noiseSeedY) - this.noiseScaleXY / 2;
-        let noiseTheta = Math.random() * this.noiseScaleTheta - this.noiseScaleTheta / 2//this.noiseScaleTheta * noise(this.noiseSeedTheta) - this.noiseScaleTheta / 2;
+        let noiseX = this.noiseScaleXY * /*noise(this.noiseSeedX)*/Math.random() - this.noiseScaleXY / 2;
+        let noiseY = this.noiseScaleXY * /*noise(this.noiseSeedY)*/Math.random() - this.noiseScaleXY / 2;
+        let noiseTheta = Math.random() * this.noiseScaleTheta - this.noiseScaleTheta / 2;
 
         this.direction += noiseTheta;
         this.velocity = [Math.cos(this.direction)*this.speed, Math.sin(this.direction)*this.speed];

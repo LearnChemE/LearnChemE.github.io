@@ -8,11 +8,22 @@
 body {
   font-size:1.6rem;
   margin:0px;
+  overflow: visible;
 }
 
 .molecule {
   width: 10px;
   height: 10px;
   border-radius: 5px;
+  position: absolute;
+}
+
+#canvas0 {
+  background: rgba(200, 200, 225, 0.25);
+  position: absolute;
+}
+
+#subCanvas {
+  background: rgba(100, 100, 225, 0.25);
   position: absolute;
 }
