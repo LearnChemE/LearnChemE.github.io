@@ -67,7 +67,7 @@ class Sim {
 
         this.MAXCOEFFICIENTS = 6;
         this.NS = linspace(0, this.MAXCOEFFICIENTS - 1, this.MAXCOEFFICIENTS, true);
-        this.POINTS = 201;
+        this.POINTS = 501;
 
         this.XS = linspace(this.xbounds[0], this.xbounds[1], this.POINTS + 1, true);
         this.YS = [];
