@@ -1,6 +1,6 @@
 let dims, cnv, bc, barHeight, xLabel, xSlider, leftBarLabel, rightBarLabel, leftBarTop, leftBarBottom, rightBarTop, rightBarBottom, mainDiv, liquidColor, liquidLine, alphaLabel, molNumberSlider, molNumberLabel, evapFraction, condFraction;
 let mol = [];
-let liquidLevel = 0.2;
+let liquidLevel = 0.15;
 var mols = 80;
 var Alpha = 1;
 var fracLiq = 0.85;
@@ -25,6 +25,7 @@ var timeNow = null;
 var stop = false;
 var frameCount = 0;
 var fps, fpsInterval, startTime, now, then, elapsed;
+var onoff = true;
 
 function startAnimating(fps) {
     fpsInterval = 1000 / fps;
@@ -43,7 +44,9 @@ function animate() {
     if (elapsed > fpsInterval) {
         then = now - (elapsed % fpsInterval);
         drawBarChart();
-        mol.forEach((m) => m.Draw());
+        //mol.forEach((m) => m.Draw());
+        for(let i = onoff ? 0 : 1; i < mol.length; i+=2) {mol[i].Draw()}
+        onoff = !onoff;
         while(mols < mol.length) {
             let removeThis = mol[mol.length - 1];
             if(removeThis.component == 'a') {if(removeThis.state == 'vapor'){molsVapor[0]--;molsVapor[1]--}else{molsLiquid[0]--;molsLiquid[1]--}}else{if(removeThis.state == 'vapor'){molsVapor[0]--;molsVapor[2]--}else{molsLiquid[0]--;molsLiquid[2]--}};
@@ -63,7 +66,7 @@ window.onload = (event) => {
         if(i % 2 == 0) {mol.push(new Molecule({'component':'a'}))} else {mol.push(new Molecule({'component':'b'}))};
     }
     addSliders();
-    startAnimating(60);
+    startAnimating(120);
   };
 
 function updateGlobals() {
@@ -143,6 +146,7 @@ function drawBarChart() {
 function resize() {
     let wHeight = window.innerWidth;
     let wWidth = window.innerHeight;
+
     dims = Math.min(400, Math.min(wWidth - 100, wHeight / 2 - 20));
     liquidLine = dims - liquidLevel * dims;
     evapFraction = ((1 - fracLiq) * (dims - liquidLine) / dims) / ((1 - fracLiq) * (dims - liquidLine) / dims + fracLiq * liquidLine / dims);
@@ -152,8 +156,8 @@ function resize() {
     canv.style.width = `${dims}px`;
     subCanv.style.width = `${dims}px`;
     canv.style.height = `${dims}px`;
-    subCanv.style.height = `${dims * 0.2}px`;
-    subCanv.style.top = `${dims * 0.8}px`;
+    subCanv.style.height = `${dims * liquidLevel}px`;
+    subCanv.style.top = `${dims * (1 - liquidLevel)}px`;
 
     bc.style.left = `${0}px`;
     bc.style.top = `${dims + 20}px`;
