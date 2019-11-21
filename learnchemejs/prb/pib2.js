@@ -56,17 +56,14 @@ class Sim {
         this.scaleMass = 100; // Sliders cannot use floats
         this.scaleLength = 100; // Sliders cannot use floats
 
-        this.graphWidth = 420;
+        this.graphWidth = 410;
         this.graphHeight = 280;
-        this.rightGraphHeight = 240;
         this.bigGraphHeight = 600;
-        this.graphLeft = 30;
+        this.graphLeft = 40;
         this.graphRight = 10;
         this.graphTop = 10;
         this.graphBottom = 50;
         this.xbounds = [0, 1];
-
-        this.separate = true;
 
         this.MAXCOEFFICIENTS = 6;
         this.NS = linspace(1, this.MAXCOEFFICIENTS, this.MAXCOEFFICIENTS, true);
@@ -126,7 +123,7 @@ class Sim {
         html += `<button id='reset'>reset defaults</button>`;
         html += `<button id='togglec'>start/stop</button>`;
         html += `<br>`;
-        html += `<button id='measure' style='width:250px;'>measure E<br>(probabilistic collapse)</button>`;
+        html += `<button id='measure'>measure E</button>`;
         html += `<button id='integrate'>integrate</button>`;
         html += `</div>`;
         document.getElementById("left").insertAdjacentHTML("beforeend", html);
@@ -156,36 +153,8 @@ class Sim {
         document.getElementById("left").insertAdjacentHTML("beforeend", html);
 
         // Define graph layouts
-        let probgraphinfo = {
-            "graphwidth": this.graphWidth,
-            "graphheight": this.rightGraphHeight,
-            "padding": {
-                "left": this.graphLeft,
-                "bottom": this.graphBottom,
-                "top": this.graphTop,
-                "right": this.graphRight
-            },
-            "graphbackground": "white",
-            "axesbackground": "white",
-            "x": {
-                "label": "x / L",
-                "min": this.xbounds[0],
-                "max": this.xbounds[1],
-                "majortick": 0.2,
-                "minortick": 0.2,
-                "gridline": 1,
-            },
-            "y": {
-                "label": "",
-                "min": 0,
-                "max": 5,
-                "majortick": 1,
-                "minortick": 1,
-                "gridline": 5,
-            }
-        };
 
-        let compgraphinfo = {
+        const compgraphinfo = {
             "graphwidth": this.graphWidth,
             "graphheight": this.graphHeight,
             "padding": {
@@ -214,40 +183,11 @@ class Sim {
             }
         };
 
-        let energygraphinfo = {
+        const energygraphinfo = {
             "graphwidth": this.graphWidth,
-            "graphheight": this.rightGraphHeight,
-            "padding": {
-                "left": this.graphLeft,
-                "bottom": this.graphBottom,
-                "top": this.graphTop,
-                "right": this.graphRight
-            },
-            "graphbackground": "white",
-            "axesbackground": "white",
-            "x": {
-                "label": "x / L",
-                "min": this.xbounds[0],
-                "max": this.xbounds[1],
-                "majortick": 0.2,
-                "minortick": 0.2,
-                "gridline": 1,
-            },
-            "y": {
-                "label": "",
-                "min": 0,
-                "max": 60,
-                "majortick": 10,
-                "minortick": 10,
-                "gridline": 60,
-            }
-        };
-
-        let combinedgraphinfo = {
-            "graphwidth": this.graphWidth - 10,
             "graphheight": this.bigGraphHeight,
             "padding": {
-                "left": this.graphLeft + 10,
+                "left": this.graphLeft,
                 "bottom": this.graphBottom,
                 "top": this.graphTop,
                 "right": this.graphRight
@@ -273,28 +213,16 @@ class Sim {
         };
 
         // Create graphs
-        document.getElementById("right").insertAdjacentHTML("beforeend", `<button id='switchGraph' class='buttonMed' style='align-self:center;transform:translateY(-20px);width:300px;'>show as single plot</button>`);
-        document.getElementById("right").insertAdjacentHTML("beforeend", `<span class="graphtitle" id="pdtitle">Probability Density |ψ|² (=ψ*ψ)</span>`);
-        this.densitygc = new GraphCanvas("density-gc", "right", {
-            graphinfo: probgraphinfo,
-        });
-
         document.getElementById("left").insertAdjacentHTML("beforeend", `<span class="graphtitle">Real & Imaginary Components</span>`);
         this.componentgc = new GraphCanvas("component-gc", "left", {
             graphinfo: compgraphinfo,
         });
 
-        document.getElementById("right").insertAdjacentHTML("beforeend", `<span class="graphtitle" id="energytitle" style="margin-top:30px;">Energy (kJ / mol)</span>`);
+        document.getElementById("right").insertAdjacentHTML("beforeend", `<button id='switchGraph' class='buttonMed' style='align-self:center;transform:translateY(-20px);width:300px;'>show separate plots</button>`);
+        document.getElementById("right").insertAdjacentHTML("beforeend", `<span class="graphtitle">Energy (kJ / mol)</span>`);
         this.energygc = new GraphCanvas("energy-gc", "right", {
             graphinfo: energygraphinfo,
         });
-        document.getElementById("right").insertAdjacentHTML("beforeend", `<span class="graphtitle" id="combtitle">Energy (kJ / mol)</span>`);
-        this.combinedgc = new GraphCanvas("combined-gc", "right", {
-            graphinfo: combinedgraphinfo,
-        });
-        // document.getElementById('combined-gc').style.transform = `translateY(${this.getCoords('combtitle').bottom - this.getCoords('combined-gc').top}px)`;
-        document.getElementById('combined-gc').style.display = 'none';
-        document.getElementById('combtitle').style.display = 'none';
     }
 
     attachListeners() {
@@ -316,7 +244,6 @@ class Sim {
         document.getElementById('about').addEventListener("click", () => this.modalAbout.show());
         document.getElementById('zoomIn').addEventListener("click", () => {this.SCALE *= 1.125; this.scaleBody(this.SCALE);});
         document.getElementById('zoomOut').addEventListener("click", () => {this.SCALE /= 1.125; this.scaleBody(this.SCALE);});
-        document.getElementById('switchGraph').addEventListener("click", () => {this.switchGraph()});
     }
 
     nextFrame() {
@@ -356,7 +283,7 @@ class Sim {
         const int = this.riemanntrapezoid(this.XS, this.PROBS, 0, 1, false);
         this.NORMPSI = [];
         for (let psi of this.PSI) {
-            this.NORMPSI.push(math.divide(psi, (int * this.L) ** 0.5))
+            this.NORMPSI.push(math.divide(psi, (int * this.L) ** 0.5));
         }
 
         this.PROBS = [];
@@ -373,27 +300,20 @@ class Sim {
             const level = this.NS[i] ** 2 / (8 * 1.67 * this.L) ** 2 * 6.62 ** 2 * 6.02 / this.M;
             this.ENERGY += level * this.scaledcoefficients[i];
         }
-        if(!this.separate) {
         const pmax = math.max(this.PROBS);
-            for (let p of this.PROBS) {
-                this.drawPROBS.push(10*(p/pmax) + this.ENERGY);
-            }
+        for (let p of this.PROBS) {
+            this.drawPROBS.push(10*(p/pmax) + this.ENERGY);
         }
     }
 
     clearGraphs() {
-        this.densitygc.clear();
-        this.combinedgc.clear();
         this.componentgc.clear();
         this.energygc.clear();
     }
 
     drawGraphs() {
-        if(this.separate) {
-            this.densitygc.drawLine(this.XS, this.PROBS, hsvToRgb(0,0,0), 3);
-        } else {
-            this.combinedgc.drawLine(this.XS, this.drawPROBS, hsvToRgb(0,0,0), 3);
-        }
+        this.energygc.drawLine(this.XS, this.drawPROBS, hsvToRgb(0,0,0), 3);
+
         this.componentgc.drawText('Re', 0.93, 2.8, {'color':'blue'});
         this.componentgc.drawText('Im', 0.93, 2.3, {'color':'red'});
         this.componentgc.drawLine(this.XS, this.RES, hsvToRgb(220,100,100), 3);
@@ -401,46 +321,13 @@ class Sim {
 
         for (let i = 0; i < this.MAXCOEFFICIENTS; i++) {
             const level = this.NS[i] ** 2 / (8 * 1.67 * this.L) ** 2 * 6.62 ** 2 * 6.02 / this.M;
-            if(this.separate){
-                this.energygc.drawLine(this.xbounds, [level,level], hsvToRgb(0,0,0), 1, [2, 2]);
-            } else {
-                this.combinedgc.drawLine(this.xbounds, [level,level], hsvToRgb(0,0,0), 1, [2, 2]);
-            }
+            this.energygc.drawLine(this.xbounds, [level,level], hsvToRgb(0,0,0), 1, [2, 2]);
         }
-        if(this.separate){
-            this.energygc.drawLine(this.xbounds, [this.ENERGY,this.ENERGY], hsvToRgb(0,100,100), 3);
-        } else {
-            this.combinedgc.drawLine(this.xbounds, [this.ENERGY,this.ENERGY], hsvToRgb(0,100,100), 3);
-        }
-    }
-
-    switchGraph() {
-        this.separate = !this.separate;
-        if(this.separate) {
-            document.getElementById('switchGraph').innerText = 'show as single plot';
-            document.getElementById('density-gc').style.display = 'block';
-            document.getElementById('energy-gc').style.display = 'block';
-            document.getElementById('combined-gc').style.display = 'none';
-            document.getElementById('pdtitle').style.display = 'block';
-            document.getElementById('energytitle').style.display = 'block';
-            document.getElementById('combtitle').style.display = 'none';
-        } else {
-            document.getElementById('switchGraph').innerText = 'show as separate plots';
-            document.getElementById('density-gc').style.display = 'none';
-            document.getElementById('energy-gc').style.display = 'none';
-            document.getElementById('combined-gc').style.display = 'block';
-            document.getElementById('pdtitle').style.display = 'none';
-            document.getElementById('energytitle').style.display = 'none';
-            document.getElementById('combtitle').style.display = 'block';
-        }
-
-        this.T -= this.TSTEP;
-        this.update();
+        this.energygc.drawLine(this.xbounds, [this.ENERGY,this.ENERGY], hsvToRgb(0,100,100), 3);
     }
 
     toggleRunning() {
         this.RUNNING = !this.RUNNING;
-        this.changeCoefficients();
     }
 
     resetTime() {
@@ -475,9 +362,6 @@ class Sim {
             }
         }
         this.coefficients = levels;
-        this.scaledcoefficients = levels;
-        this.T = -this.TSTEP;
-        this.RUNNING = false;
         this.update();
     }
 
@@ -486,8 +370,7 @@ class Sim {
         for (let i = 0; i < x.length; i+=1) {
             if (x[i] >= x1 && x[i+1] <= x2) {
                 int += (y[i] + y[i+1]) / 2 * (x[i+1] - x[i]);
-                if (draw && this.separate) this.densitygc.fillLine([x[i], x[i], x[i+1], x[i+1]], [0, y[i], y[i+1], 0], hsvToRgb(0,100,100));
-                if (draw && !this.separate) this.combinedgc.fillLine([x[i], x[i], x[i+1], x[i+1]], [this.ENERGY, y[i], y[i+1], this.ENERGY], hsvToRgb(0,100,100));
+                if (draw) this.energygc.fillLine([x[i], x[i], x[i+1], x[i+1]], [this.ENERGY, y[i], y[i+1], this.ENERGY], hsvToRgb(0,100,100));
             }
         }
         return int;
@@ -498,14 +381,8 @@ class Sim {
         this.clearGraphs();
         const x1 = Number(document.getElementById('x1').value);
         const x2 = Number(document.getElementById('x2').value);
-        let int;
-        if(!this.separate) {
-            int = this.riemanntrapezoid(this.XS, this.PROBS, x1, x2, false) / this.riemanntrapezoid(this.XS, this.PROBS, 0, 1, false);
-            this.riemanntrapezoid(this.XS, this.drawPROBS, x1, x2, true);
-        } else {
-            const fullint = this.riemanntrapezoid(this.XS, this.PROBS, 0, 1, false);
-            int = this.riemanntrapezoid(this.XS, this.PROBS, x1, x2, true) / fullint;
-        }
+        const int = this.riemanntrapezoid(this.XS, this.PROBS, x1, x2, false) / this.riemanntrapezoid(this.XS, this.PROBS, 0, 1, false);
+        this.riemanntrapezoid(this.XS, this.drawPROBS, x1, x2, true);
         this.drawGraphs();
         const digits = 4;
         document.getElementById('int').value = Math.round(int * (10 ** digits), digits) / (10 ** digits);
@@ -556,21 +433,7 @@ class Sim {
     }
 
     scaleBody() {scale(this.SCALE);}
-
-    getCoords(id) {
-        let elem = document.getElementById(id);
-        let box = elem.getBoundingClientRect();
-      
-        return {
-          top: box.top + pageYOffset,
-          left: box.left + pageXOffset,
-          bottom: box.top + pageYOffset + box.height,
-          right: box.left + pageXOffset + box.width,
-          height: box.height,
-          width: box.width
-        };
-      }
 }
 
 // eslint-disable-next-line no-unused-vars
-window.Simulation = new Sim();
+const Simulation = new Sim();

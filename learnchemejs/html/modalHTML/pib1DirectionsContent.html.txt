@@ -8,4 +8,5 @@ $$ \psi(x) = \sum_{n} C_{n} \sqrt{ \frac{2}{L} } \sin ( \frac{n \pi x}{L} ) $$
 <li>The integrated probability density can be computed over any position range with the lower input table and the Integrate button. The lower limit of integration is designated \( x_{1} \) and the upper limit is \( x_{2} \). The integrated probability appears under the box labeled, "integral".</li>
 <li>Probability density is plotted in the upper right, while real and imaginary components of the wave, as well as total system energy, are additionally shown in the two bottom plots.</li>
 <li>The probability density plot has a fixed scale so that relative comparisons can be made, and coefficients \( C_{n} \) are normalized.</li>
+<li>The energy plot and probability density plot can be combined by pressing "show as single plot". Note that the height of the probability density function will no longer scale vertically (i.e. compress or expand) in this mode. It is normalized to a height of 50 pixels and remains on top of the red 'energy line'.</li>
 </div>
