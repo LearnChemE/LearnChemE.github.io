@@ -17,14 +17,13 @@ var yAtarget = 0.5;
 let Acolor = 'rgb(80, 0, 180)';
 let Bcolor = 'rgb(130, 180, 0)';
 
-// let checkbox;
-var checked = false;
+let rowColumn = true;
 
 var timeNow = null;
 
 var stop = false;
 var frameCount = 0;
-var fps, fpsInterval, startTime, now, then, elapsed;
+var fps, fpsInterval, startTime, now, then, elapsed, yDims;
 var onoff = true;
 
 function startAnimating(fps) {
@@ -59,13 +58,13 @@ function animate() {
 }
 
 window.onload = (event) => {
+    mainDiv = document.getElementById('main');
+    addSliders();
     addBarChart();
     resize();
-    mainDiv = document.getElementById('main');
     for(let i = 0; i < mols; i++) {
         if(i % 2 == 0) {mol.push(new Molecule({'component':'a'}))} else {mol.push(new Molecule({'component':'b'}))};
     }
-    addSliders();
     startAnimating(120);
   };
 
@@ -134,75 +133,101 @@ function addBarChart() {
 }
 
 function drawBarChart() {
-    if(checked) {
-        leftBarTop.style.height = `${barHeight * (1 - xA)}px`;
-        rightBarTop.style.height = `${barHeight * (1 - yA)}px`;
-    } else {
-        leftBarTop.style.height = `${barHeight * (1 - xAtarget)}px`;
-        rightBarTop.style.height = `${barHeight * (1 - yAtarget)}px`;
-    }
+    leftBarTop.style.height = `${barHeight * (1 - xAtarget)}px`;
+    rightBarTop.style.height = `${barHeight * (1 - yAtarget)}px`;
 }
 
 function resize() {
-    let wHeight = window.innerWidth;
-    let wWidth = window.innerHeight;
+    let wHeight = window.innerHeight;
+    let wWidth = window.innerWidth;
 
-    dims = Math.min(400, Math.min(wWidth - 100, wHeight / 2 - 20));
-    liquidLine = dims - liquidLevel * dims;
+    dims = Math.min(Math.max(400, Math.min(wWidth, wHeight - 20)),800);
+    if(rowColumn) {dims *= 0.6} else {dims -= 100}
     evapFraction = ((1 - fracLiq) * (dims - liquidLine) / dims) / ((1 - fracLiq) * (dims - liquidLine) / dims + fracLiq * liquidLine / dims);
     condFraction = (fracLiq * liquidLine / dims) / ((1 - fracLiq) * (dims - liquidLine) / dims + fracLiq * liquidLine / dims);
+    
+    let hMarg = 40;
+    let vMarg = 20;
+
+    if(rowColumn) {
+        molNumberLabel.position(10, 0);
+        molNumberSlider.position(0, getCoords('mnl').bottom + 10);
+        alphaLabel.position(Math.max(getCoords('mnl').right,getCoords('mns').right) + hMarg, getCoords('mnl').top);
+        volatilitySlider.position(Math.max(getCoords('mnl').right,getCoords('mns').right) + hMarg, getCoords('al').bottom + 10);
+        let xPos = wWidth < Math.max(getCoords('al').right, getCoords('vs').right) + 200 ? getCoords('mnl').left : Math.max(getCoords('al').right, getCoords('vs').right) + hMarg; 
+        let yPos = wWidth < Math.max(getCoords('al').right, getCoords('vs').right) + 200 ? getCoords('mns').bottom + vMarg : getCoords('al').top; 
+        xLabel.position(xPos, yPos);
+        xSlider.position(xPos, getCoords('xl').bottom + 10);
+    } else {
+        molNumberLabel.position(getCoords('canvas0').right, 10);
+        molNumberSlider.position(getCoords('canvas0').right, getCoords('mnl').bottom + 10);
+        alphaLabel.position(getCoords('canvas0').right, getCoords('mns').bottom + 30);
+        volatilitySlider.position(getCoords('canvas0').right, getCoords('al').bottom + 10);
+        xLabel.position(getCoords('canvas0').right, getCoords('vs').bottom + 30);
+        xSlider.position(getCoords('canvas0').right, getCoords('xl').bottom + 10);
+    } 
+
     let canv = document.getElementById('canvas0');
     let subCanv = document.getElementById('subCanvas');
+    
     canv.style.width = `${dims}px`;
     subCanv.style.width = `${dims}px`;
-    canv.style.height = `${dims}px`;
-    subCanv.style.height = `${dims * liquidLevel}px`;
-    subCanv.style.top = `${dims * (1 - liquidLevel)}px`;
+    canv.style.height = `${Math.min(Math.max(dims, wHeight - getCoords('xs').bottom - 30), 600)}px`;
+    subCanv.style.height = `${getCoords('canvas0').height * liquidLevel}px`;
+    let ctop = rowColumn ? getCoords('xs').bottom + 10 : 0;
+    canv.style.top = `${ctop}px`
+    subCanv.style.bottom = `0px`;
 
-    bc.style.left = `${0}px`;
-    bc.style.top = `${dims + 20}px`;
-    bc.style.width = `${dims}px`;
-    bc.style.height = `${dims}px`;
-    
+    liquidLine = (1 - liquidLevel) * getCoords('canvas0').height;
+    yDims = getCoords('canvas0').height;
+
+    let bcWidth;
+    let bcLeft;
+    let bcTop;
+    let bcHeight = getCoords('canvas0').height;
     let bMarg = 10;
-    
-    leftBarLabel.style.bottom = `0px`;
-    rightBarLabel.style.bottom = `0px`;
+    barHeight = bcHeight - 2*bMarg - Math.max(getCoords('lbl').height, getCoords('rbl').height);
 
-    barHeight = dims - 2*bMarg - Math.max(getCoords('lbl').height, getCoords('rbl').height);
+    if(rowColumn) {
+        bcWidth = dims / 2;
+        bcLeft = dims + 10;
+        bcTop = getCoords('canvas0').top;
+    } else {
+        bcWidth = dims;
+        bcLeft = 0;
+        bcTop = getCoords('canvas0').bottom + 20;
+    }
 
-    leftBarBottom.style.width = `${dims / 2 - 2 * bMarg}px`;
-    rightBarBottom.style.width = `${dims / 2 - 2 * bMarg}px`;
-    leftBarTop.style.width = `${dims / 2 - 2 * bMarg}px`;
-    rightBarTop.style.width = `${dims / 2 - 2 * bMarg}px`;
+    leftBarBottom.style.width = `${bcWidth / 2 - 2 * bMarg}px`;
+    rightBarBottom.style.width = `${bcWidth / 2 - 2 * bMarg}px`;
+    leftBarTop.style.width = `${bcWidth / 2 - 2 * bMarg}px`;
+    rightBarTop.style.width = `${bcWidth / 2 - 2 * bMarg}px`;
     leftBarLabel.style.width = `${getCoords('lbb').width}px`;
     rightBarLabel.style.width = `${getCoords('rbb').width}px`;
 
     leftBarBottom.style.height = `${barHeight}px`;
     rightBarBottom.style.height = `${barHeight}px`;
     
-    leftBarBottom.style.top = `${(dims - barHeight)/3}px`;
-    leftBarTop.style.top = `${(dims - barHeight)/3}px`;
-    rightBarBottom.style.top = `${(dims - barHeight)/3}px`;
-    rightBarTop.style.top = `${(dims - barHeight)/3}px`;
-
+    leftBarBottom.style.top = `${(bcHeight - barHeight)/3}px`;
+    leftBarTop.style.top = `${(bcHeight - barHeight)/3}px`;
+    rightBarBottom.style.top = `${(bcHeight - barHeight)/3}px`;
+    rightBarTop.style.top = `${(bcHeight - barHeight)/3}px`;
 
     leftBarBottom.style.left = `${bMarg}px`;
     leftBarTop.style.left = `${bMarg}px`;
-    rightBarBottom.style.left = `${dims / 2 + bMarg}px`;
-    rightBarTop.style.left = `${dims / 2 + bMarg}px`;
-    leftBarLabel.style.left = `${getCoords('lbb').left}px`;
-    rightBarLabel.style.left = `${getCoords('rbb').left}px`;
+    rightBarBottom.style.left = `${bcWidth / 2 + bMarg}px`;
+    rightBarTop.style.left = `${bcWidth / 2 + bMarg}px`;
+    leftBarLabel.style.left = `${getCoords('lbb').left - getCoords('barchart').left}px`;
+    rightBarLabel.style.left = `${getCoords('rbb').left - getCoords('barchart').left}px`;
 
-    if(typeof molNumberSlider == 'object') {
-        molNumberLabel.position(getCoords('canvas0').right, getCoords('canvas0').top + 10);
-        molNumberSlider.position(getCoords('canvas0').right, getCoords('mnl').bottom + 10);
-        alphaLabel.position(getCoords('canvas0').right, getCoords('mns').top + 30);
-        volatilitySlider.position(getCoords('canvas0').right, getCoords('al').bottom + 10);
-        xSlider.position(getCoords('canvas0').right, getCoords('xl').bottom + 10);
-        xLabel.position(getCoords('canvas0').right, getCoords('vs').bottom + 10);
-        // checkbox.position(getCoords('canvas0').right, getCoords('barchart').top + 20);    
-    }
+    bc.style.left = `${bcLeft}px`;
+    bc.style.top = `${bcTop}px`;
+    bc.style.width = `${bcWidth}px`;
+    bc.style.height = `${bcHeight}px`;
+    
+    leftBarLabel.style.bottom = `0px`;
+    rightBarLabel.style.bottom = `0px`;
+
 }
 
 function getCoords(id) {
@@ -277,9 +302,6 @@ function addSliders() {
     xSlider.style.width = '100px';
     xSlider.position = (x, y) => {xSlider.style.left = `${x}px`; xSlider.style.top = `${y}px`; };
 
-    /* checkbox = createCheckbox('show values in real-time', false);
-    checkbox.changed(checkboxEvent); */
-
     molNumberLabel.style.position = 'absolute';
     molNumberSlider.style.position = 'absolute';
     alphaLabel.style.position = 'absolute';
@@ -291,14 +313,12 @@ function addSliders() {
     document.getElementById('vs').oninput = updateGlobals;
     document.getElementById('xs').oninput = updateGlobals;
 
-    molNumberLabel.position(getCoords('canvas0').right, getCoords('canvas0').top + 10);
+/*     molNumberLabel.position(getCoords('canvas0').right, getCoords('canvas0').top + 10);
     molNumberSlider.position(getCoords('canvas0').right, getCoords('mnl').bottom + 10);
     alphaLabel.position(getCoords('canvas0').right, getCoords('mns').bottom + 10);
     volatilitySlider.position(getCoords('canvas0').right, getCoords('al').bottom + 10);
     xLabel.position(getCoords('canvas0').right, getCoords('vs').bottom + 10);
-    xSlider.position(getCoords('canvas0').right, getCoords('xl').bottom + 10);
-    // checkbox.position(getCoords('canvas0').right, getCoords('barchart').top + 20);
-
+    xSlider.position(getCoords('canvas0').right, getCoords('xl').bottom + 10); */
 }
 
 /* function checkboxEvent() {

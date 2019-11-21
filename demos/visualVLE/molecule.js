@@ -11,7 +11,7 @@ class Molecule {
         this.speed = this.state == 'vapor' ? (this.temperature - 273) / 3 : (this.temperature - 273) / 10;
         this.velocity = [Math.cos(this.direction)*this.speed, Math.sin(this.direction)*this.speed];
         this.position = [Math.trunc(Math.random()*dims), 0];
-        this.position[1] = this.state == 'vapor' ?  Math.trunc(Math.random()*liquidLine) :  liquidLine + Math.trunc(Math.random()*(dims - liquidLine));
+        this.position[1] = this.state == 'vapor' ?  Math.trunc(Math.random()*liquidLine) :  liquidLine + Math.trunc(Math.random()*(yDims - liquidLine));
         this.noiseScaleXY = 8;
         this.noiseScaleTheta = 0.8;
         this.noiseSeedX = Math.trunc(1000 * Math.random());
@@ -59,7 +59,7 @@ class Molecule {
         if(this.position[0] <= 0) {this.velocity[0] = Math.abs(this.velocity[0])}
         if(this.position[0] >= dims - this.diameter) {this.velocity[0] = Math.abs(this.velocity[0]) * (-1)}
         if(this.position[1] <= 0) {this.velocity[1] = Math.abs(this.velocity[1])}
-        if(this.position[1] >= dims - this.diameter) {this.velocity[1] = Math.abs(this.velocity[1]) * (-1)}
+        if(this.position[1] >= yDims - this.diameter) {this.velocity[1] = Math.abs(this.velocity[1]) * (-1)}
 
         if(this.state == 'vapor' && this.position[1] >= liquidLine - this.diameter) {
             let condQ = this.Condense();
@@ -74,7 +74,7 @@ class Molecule {
 
         let totalVelocity = [this.velocity[0] + this.noiseX, this.velocity[1] + this.noiseY];
         this.position[0] = Math.max(0, Math.min(dims - this.diameter, this.position[0] + totalVelocity[0]));
-        this.position[1] = Math.max(0, Math.min(dims - this.diameter, this.position[1] + totalVelocity[1]));
+        this.position[1] = Math.max(0, Math.min(yDims - this.diameter, this.position[1] + totalVelocity[1]));
     }
 
     Condense() {
