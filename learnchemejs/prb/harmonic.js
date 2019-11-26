@@ -41,7 +41,8 @@ class Sim {
                     modalFill(error2,'../html/modalHTML/errorText.html.txt');
                 }}
             }, delay);
-          })
+          });
+        this.scaleBody(this.SCALE);
     }
 
     defineGlobals() {
@@ -78,7 +79,7 @@ class Sim {
         this.RES = [];
         this.IMS = [];
 
-        this.SCALE = 1;
+        this.SCALE = Math.min(1, window.innerWidth/1000);
         
         this.detailsContent = "";
         this.directionsContent = "";
