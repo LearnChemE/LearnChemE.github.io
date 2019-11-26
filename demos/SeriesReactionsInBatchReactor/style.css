@@ -12,6 +12,7 @@ body {
 .wrapper {
   display: grid;
   justify-items: center;
+  max-width: 800px;
   grid-row-gap: 0.25rem;
   grid-template-rows: auto 40px 600px;
   grid-template-areas:
