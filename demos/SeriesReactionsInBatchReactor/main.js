@@ -5,7 +5,7 @@
  *           GLOBAL VARIABLES         
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
-var clientWidth = Math.max(200, window.innerWidth - 200);
+var clientWidth = Math.min(window.innerWidth - 200, 600);
 var aspRatio = 1;
 var clientHeight = clientWidth * aspRatio;
 
@@ -93,7 +93,7 @@ function updateData() {
  */
 function windowResized() {
   // retrieve the new client width
-  clientWidth = Math.max(200, window.innerWidth - 200);
+  clientWidth = Math.min(window.innerWidth - 200, 600);
   aspRatio = 1;
   clientHeight = clientWidth * aspRatio;
   
@@ -101,7 +101,7 @@ function windowResized() {
   resizeCanvas(clientWidth, clientHeight);
   mainPlot.GPLOT.setOuterDim(clientWidth, clientHeight);
   mainPlot.GPLOT.setPos(0, 0);
-  gui.prototype.setPosition(clientWidth, mainPlot.GPLOT.mar[2] + 50);
+  gui.prototype.setPosition(clientWidth, mainPlot.GPLOT.mar[2] + 100);
 }
 
 /**
@@ -122,7 +122,7 @@ function setup() {
   mainPlot.plotSetup();
   
   // Create the GUI using p5.gui.js
-  gui = createGui('Plot Controls', clientWidth - 10, mainPlot.GPLOT.mar[2] + 70);
+  gui = createGui('Plot Controls', clientWidth - 10, mainPlot.GPLOT.mar[2] + 100);
   gui.newSlider('T', 450, 480, 450, 1, 'Temperature', 'K');
   gui.newDropdown("page", ["concentrations", "selectivity"], "Display:");
   updateData();
