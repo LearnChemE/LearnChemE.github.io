@@ -808,7 +808,7 @@ function DrawVectorText(parentLayer) {
     this.parentLayer.rotate(angle);
     let jSign;
     if(ptCoords[j+1][1]-ptCoords[j][1] > 0) {jSign = "+ ";} else {jSign = "- ";}
-    this.parentLayer.text("".concat((ptCoords[j+1][0]-ptCoords[j][0]).toFixed(1), " i ", jSign, abs(ptCoords[j+1][1]-ptCoords[j][1]).toFixed(1), " j"), 0, -10);
+    this.parentLayer.text("".concat((ptCoords[j+1][0]-ptCoords[j][0]).toFixed(1), " î ", jSign, abs(ptCoords[j+1][1]-ptCoords[j][1]).toFixed(1), " ĵ"), 0, -10);
     this.parentLayer.pop();
   }
   if (sumPressed) {
