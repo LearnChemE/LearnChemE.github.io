@@ -2,10 +2,14 @@
 This demonstration illustrates the wavefunctions and time evolution of the quantum harmonic oscillator.
 <ul>
 <li>The input table (upper left corner) can be edited to change the quantum number \( n \) and expansion coefficient \( C_{n} \) for the general state:</li>
-$$ (equation here) $$
+$$ \psi(x) = \sum_{n} C_{n} N_{n} H_{n}(y) e^{- y^{2}/2} $$
 <li>Time evolution can be observed with the Start/Stop button, and a probabilistic collapse of the wavefunction can be seen with the "Measure E" button.</li>
-<li>The mass of the particle and force constant (k<sub>f</sub>) are adjustable with sliders</li>
+<li>The mass of the particle (\( m \)) and force constant (\( k_{f} \)) are adjustable with sliders</li>
 <li>The integrated probability density can be computed over any position range with the lower input table and the Integrate button. The lower limit of integration is designated \( x_{1} \) and the upper limit is \( x_{2} \). The integrated probability appears under the box labeled, "integral".</li>
-<li>Probability density is plotted on the right, while real and imaginary components of the wave, as well as total system energy, are additionally shown on the bottom-left plot.</li>
-<li>The probability density plot has a fixed scale so that relative comparisons can be made, and coefficients \( C_{n} \) are normalized.</li>
+<li>The plot on the right displays the energy of each quantum state (dashed lines). Only the energy states under the "\( n \)" column of the input table are displayed.</li>
+<li>The plot on the right also displays the well potential (dotted blue line), the wave function \( \Psi (x,t) \) (solid black line), and the total energy of the particle (solid red line).</li>
+<li>Real and imaginary components of the wave, as well as total system energy, are additionally shown on the bottom-left plot.</li>
+<li>Important notes:<br><br>
+- The probability density function (the square of the wave function) has no units and is drawn to an arbitrary height on the right-side plot. It is included primarily to show the shape of \( \lvert \Psi \rvert^{2} \), and to show its relative height as \( m \) and \( k_{f} \) are adjusted.  The exact numerical value of the wave function at any given position \( x \) should be taken from the bottom-left plot.<br><br>
+- Expansion coefficients \( C_{n} \) are normalized such that \( \stackrel{n}{\sum} C_{n} = 1 \).</li>
 </div>

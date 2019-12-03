@@ -49,32 +49,26 @@ class Sim {
         this.RUNNING = false;
         this.FPS = 60;
         this.T = 0;
-        this.TSTEP = 1 / this.FPS;
-
-        this.minMass = 0.1;
-        this.maxMass = 10;
-        this.minKF = 1;
-        this.maxKF = 100;
-        this.scaleMass = 100; // Sliders cannot use floats
-        this.scaleKF = 100; // Sliders cannot use floats
+        this.TSTEP = 0.1 / this.FPS;
 
         this.graphWidth = 420;
         this.graphHeight = 280;
+        this.rightGraphHeight = this.graphHeight * 2.5;
         this.graphLeft = 30;
-        this.graphRight = 10;
+        this.graphRight = 25;
         this.graphTop = 10;
         this.graphBottom = 50;
-        this.xbounds = [-2, 2];
+        this.xbounds = [-0.5, 0.5];
 
         this.MAXCOEFFICIENTS = 6;
         this.NS = linspace(0, this.MAXCOEFFICIENTS - 1, this.MAXCOEFFICIENTS, true);
-        this.POINTS = 501;
+        this.POINTS = 500;
 
         this.XS = linspace(this.xbounds[0], this.xbounds[1], this.POINTS + 1, true);
-        this.YS = [];
+        this.Yrange = [0, 10];
         this.HS = [];
-        this.KF = 10;
-        this.M = 1;
+        this.KF = 20;
+        this.M = 0.01;
         this.PROBS = [];
         this.RES = [];
         this.IMS = [];
@@ -135,8 +129,8 @@ class Sim {
         html = `<div id="integral">`;
         html += `<table>`
         html += `<th>x<sub>1</sub></th><th>x<sub>2</sub></th><th>integral</th>`;
-        html += `<tr><td><input id="x1" class="tableinput" value="${-1}" placeholder="0"></input></td>`;
-        html += `<td><input id="x2" class="tableinput" value="${1}" placeholder="0"></input></td>`;
+        html += `<tr><td><input id="x1" class="tableinput" value="${-0.5}" placeholder="0"></input></td>`;
+        html += `<td><input id="x2" class="tableinput" value="${0.5}" placeholder="0"></input></td>`;
         html += `<td><input id="int" class="tableinput" placeholder="-" readonly></input></td>`;
         html += `</tr></table>`
         html += `</div>`
@@ -146,11 +140,11 @@ class Sim {
         html = `<div id="sliders" class="row">`;
         html += `<div class="sliderdiv">`;
         html += `<p id="spanmass" class="sliderp">Mass</p>`;
-        html += `<input type="range" min="${this.minMass * this.scaleMass}" max="${this.maxMass * this.scaleMass}" value="${this.M * this.scaleMass}" class="slider" id="sldmass">`;
+        html += `<input type="range" min="${1}" max="${100}" value="${50}" class="slider" id="sldmass">`;
         html += `</div>`
         html += `<div class="sliderdiv">`;
         html += `<p id="spankf" class="sliderp">force constant k<sub>f</sub>&nbsp</p>`;
-        html += `<input type="range" min="${this.minKF * this.scaleKF}" max="${this.maxKF * this.scaleKF}" value="${this.KF * this.scaleKF}" class="slider" id="sldkf">`;
+        html += `<input type="range" min="${1}" max="${100}" value="${50}" class="slider" id="sldkf">`;
         html += `</div>`
         html += `</div>`
         document.getElementById("left").insertAdjacentHTML("beforeend", html);
@@ -158,9 +152,9 @@ class Sim {
         // Define graph layouts
         const probgraphinfo = {
             "graphwidth": this.graphWidth,
-            "graphheight": this.graphHeight*2.5,
+            "graphheight": this.rightGraphHeight,
             "padding": {
-                "left": this.graphLeft,
+                "left": this.graphLeft + 40,
                 "bottom": this.graphBottom,
                 "top": this.graphTop,
                 "right": this.graphRight
@@ -168,20 +162,20 @@ class Sim {
             "graphbackground": "white",
             "axesbackground": "white",
             "x": {
-                "label": "x - x<sub>0</sub>",
+                "label": "x - x<sub>0</sub> (nm)",
                 "min": this.xbounds[0],
                 "max": this.xbounds[1],
-                "majortick": 1,
-                "minortick": 1,
-                "gridline": 2,
+                "majortick": 0.25,
+                "minortick": 0.05,
+                "gridline": 0.5,
             },
             "y": {
-                "label": "",
-                "min": 0,
-                "max": 70,
-                "majortick": 10,
-                "minortick": 10,
-                "gridline": 70,
+                "label": "energy (eV)",
+                "min": this.Yrange[0],
+                "max": this.Yrange[1],
+                "majortick": Number.parseInt(Math.trunc((this.Yrange[1] - this.Yrange[0]) / 7)),
+                "minortick": Number.parseInt(Math.trunc((this.Yrange[1] - this.Yrange[0]) / 7)) / 4,
+                "gridline": this.Yrange[1],
             }
         };
 
@@ -197,12 +191,12 @@ class Sim {
             "graphbackground": "white",
             "axesbackground": "white",
             "x": {
-                "label": "x - x<sub>0</sub>",
+                "label": "x - x<sub>0</sub> (nm)",
                 "min": this.xbounds[0],
                 "max": this.xbounds[1],
-                "majortick": 1,
-                "minortick": 1,
-                "gridline": 2,
+                "majortick": 0.25,
+                "minortick": 0.05,
+                "gridline": 0.5,
             },
             "y": {
                 "label": "",
@@ -259,21 +253,24 @@ class Sim {
     }
 
     calculatePsi() {
-        const hb = 0.1; // h-bar
         this.PSI = [];
         this.PROBS = [];
         this.RES = [];
         this.IMS = [];
 
+        // Phase shifts in arbitrary units because propagation is at ridiculously high frequency
         const freqs = this.NS.map(n => (n + 0.5) * math.sqrt(this.KF / this.M));
         const PhaseShifts = freqs.map(freq => math.exp(math.complex(0, - freq * this.T)));
 
+        const hb = 1; // h-bar
+
         const alpha = math.pow(hb*hb/(this.M*this.KF), 0.25);
-        const yArr = this.XS.map(x => x / alpha);
+        const cnvrt = 19.6573; // conversion factor to SI units
+        const yArr = this.XS.map(x => (x / alpha) * cnvrt);
         const eArr = yArr.map(y => math.exp(-0.5*math.pow(y, 2)));
 
         for (let i = 0; i < this.coefficients.length; i++) {
-            const Nv = math.divide(1, math.sqrt(math.prod(alpha, math.pow(2, this.NS[i]), math.factorial(this.NS[i]), math.pow(math.PI, 0.5))));
+            const Nv = math.divide(1, math.sqrt(math.prod(math.pow(2, this.NS[i]), math.factorial(this.NS[i]), math.sqrt(math.PI))));
             for (let j = 0; j < this.XS.length; j++) {
                 const y = yArr[j];
                 const Hv = hermites(this.NS[i], y);
@@ -300,10 +297,13 @@ class Sim {
 
         this.ENERGY = 0;
         for (let i = 0; i < this.MAXCOEFFICIENTS; i++) {
-            const level = (this.NS[i] + 0.5) * math.sqrt(this.KF/this.M) * (6.62 / (1.67*2*math.PI)) * 3.16 * 6.022 * 100 / 1000;
+            const cnvrt = 0.0161538; // conversion factor to electron-volts from (N^0.5 m^-0.5 Da^-0.5)
+            const level = (this.NS[i] + 0.5) * math.sqrt(this.KF/this.M) * cnvrt;
             this.ENERGY += level * this.scaledcoefficients[i];
         }
         for (let i = 0; i < this.XS.length; i++) {this.PROBS[i] += this.ENERGY}
+
+        this.POTENTIAL = this.XS.map(x => 0.5 * this.KF * math.pow(x, 2));
     }
 
     clearGraphs() {
@@ -312,23 +312,38 @@ class Sim {
     }
 
     drawGraphs() {
+        
         for (let i = 0; i < this.MAXCOEFFICIENTS; i++) {
-            const level = (this.NS[i] + 0.5) * math.sqrt(this.KF/this.M) * (6.62 / (1.67*2*math.PI)) * 3.16 * 6.022 * 100 / 1000;
-            this.densitygc.drawLine(this.xbounds, [level,level], hsvToRgb(0,0,0), 1, [3, 3]);
+            const cnvrt = 0.0161538; // conversion factor to electron-volts from (N^0.5 m^-0.5 Da^-0.5)
+            const level = (this.NS[i] + 0.5) * math.sqrt(this.KF/this.M) * cnvrt;
+            this.densitygc.drawLine(this.xbounds, [level,level], hsvToRgb(0,0,0), 1, [5, 4]);
+            this.densitygc.drawText(`n = ${this.NS[i]}`, 0.4, level + 10 * (this.Yrange[1] - this.Yrange[0]) / this.rightGraphHeight, {'color':'black', 'fontsize':'14'});
         }
-        //
-        //
-        this.densitygc.drawLine(this.xbounds, [this.ENERGY, this.ENERGY], hsvToRgb(0,100,100), 3);
+        
+        this.densitygc.drawLine(this.XS.slice(0, 49), this.POTENTIAL.slice(0, 49), hsvToRgb(240,100,100), 1, [2, 2]);
+        this.densitygc.drawLine(this.XS.slice(53, this.XS.length), this.POTENTIAL.slice(53, this.POTENTIAL.length), hsvToRgb(240,100,100), 1, [2, 2]);
         this.densitygc.drawLine(this.XS, this.PROBS, hsvToRgb(0,0,0), 3);
+        this.densitygc.drawLine(this.xbounds, [this.ENERGY, this.ENERGY], hsvToRgb(0,100,100), 3);
+        this.densitygc.drawText(`V(x)`, -0.43, this.POTENTIAL[50], {'color':'blue', 'fontsize':'14', 'fontstyle':'bold'});
 
-        this.componentgc.drawText('Re', 0.93, 2.8, {'color':'blue'});
-        this.componentgc.drawText('Im', 0.93, 2.3, {'color':'red'});
+        this.componentgc.drawText('Re', 0.3, 2.6, {'color':'blue'});
+        this.componentgc.drawText('Im', 0.3, 2.1, {'color':'red'});
+        this.componentgc.drawLine([0.38, 0.43], [2.6, 2.6], hsvToRgb(220,100,100), 2);
+        this.componentgc.drawLine([0.38, 0.43], [2.1, 2.1], hsvToRgb(0,100,100), 2);
         this.componentgc.drawLine(this.XS, this.RES, hsvToRgb(220,100,100), 3);
         this.componentgc.drawLine(this.XS, this.IMS, hsvToRgb(0,100,100), 3);
     }
 
     toggleRunning() {
-        this.RUNNING = !this.RUNNING;
+        if(this.RUNNING) {
+            this.RUNNING = false
+        } else {
+            this.getCoefficients();
+            this.getNs();
+            this.getMass();
+            this.getKF();
+            this.RUNNING = true
+        }
     }
 
     resetTime() {
@@ -345,7 +360,7 @@ class Sim {
         let levels = [];
         for (let i = 0; i < this.MAXCOEFFICIENTS; i++) {
             levels.push(0);
-            const last = i > 0 ? cumsum[i-1] : 0;
+            const last = i > 0 ? cumsum[i - 1] : 0;
             cumsum.push(last + this.scaledcoefficients[i])
         }
         const probe = Math.random();
@@ -355,7 +370,9 @@ class Sim {
                 break;
             }
         }
-        this.coefficients = levels;
+        this.scaledcoefficients = levels;
+        if(this.RUNNING) this.toggleRunning();
+        this.T = 0 - this.TSTEP;
         this.update();
     }
 
@@ -375,7 +392,7 @@ class Sim {
         this.clearGraphs();
         const x1 = Number(document.getElementById('x1').value);
         const x2 = Number(document.getElementById('x2').value);
-        const fullint = this.riemanntrapezoid(this.XS, this.PROBS, -2, 2, false);
+        const fullint = this.riemanntrapezoid(this.XS, this.PROBS, -0.5, 0.5, false);
         const int = this.riemanntrapezoid(this.XS, this.PROBS, x1, x2, true) / fullint;
         this.drawGraphs();
         const digits = 4;
@@ -409,16 +426,16 @@ class Sim {
     }
 
     getMass() {
-        const value = document.getElementById("sldmass").value / this.scaleMass;
-        document.getElementById("spanmass").innerHTML = `mass: ${value}`;
+        const value = Number(math.pow(10, -3 + 3 * (document.getElementById("sldmass").value - 1) / 99)).toFixed(5); // varies between 10^-3 and 10^0, logarithmically
+        document.getElementById("spanmass").innerHTML = `mass: ${Number(value).toFixed(3)} Da`;
         this.M = value;
         this.T -= this.TSTEP;
         this.update();
     }
 
     getKF() {
-        const value = document.getElementById("sldkf").value / this.scaleKF;
-        document.getElementById("spankf").innerHTML = `force constant k<sub>f</sub>&nbsp: ${value}`;
+        const value = Math.trunc(math.pow(10, 1 + 2 * (document.getElementById("sldkf").value - 1) / 99)); // varies between 10^1 and 10^3, logarithmically
+        document.getElementById("spankf").innerHTML = `force constant k<sub>f</sub>&nbsp: ${value} N/m`;
         this.KF = value;
         this.T -= this.TSTEP;
         this.update();
