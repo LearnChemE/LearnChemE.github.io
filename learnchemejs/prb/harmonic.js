@@ -57,8 +57,8 @@ class Sim {
         this.graphLeft = 30;
         this.graphRight = 25;
         this.graphTop = 10;
-        this.graphBottom = 50;
-        this.xbounds = [-0.5, 0.5];
+        this.graphBottom = 60;
+        this.xbounds = [-400, 400];
 
         this.MAXCOEFFICIENTS = 6;
         this.NS = linspace(0, this.MAXCOEFFICIENTS - 1, this.MAXCOEFFICIENTS, true);
@@ -154,7 +154,7 @@ class Sim {
             "graphwidth": this.graphWidth,
             "graphheight": this.rightGraphHeight,
             "padding": {
-                "left": this.graphLeft + 40,
+                "left": this.graphLeft + 50,
                 "bottom": this.graphBottom,
                 "top": this.graphTop,
                 "right": this.graphRight
@@ -162,12 +162,12 @@ class Sim {
             "graphbackground": "white",
             "axesbackground": "white",
             "x": {
-                "label": "x - x<sub>0</sub> (nm)",
+                "label": "x - x<sub>0</sub> (pm)",
                 "min": this.xbounds[0],
                 "max": this.xbounds[1],
-                "majortick": 0.25,
-                "minortick": 0.05,
-                "gridline": 0.5,
+                "majortick": Number((this.xbounds[1] - this.xbounds[0]) / 4).toFixed(2),
+                "minortick": Number((this.xbounds[1] - this.xbounds[0]) / 16),
+                "gridline": this.xbounds[1],
             },
             "y": {
                 "label": "energy (eV)",
@@ -183,7 +183,7 @@ class Sim {
             "graphwidth": this.graphWidth,
             "graphheight": this.graphHeight,
             "padding": {
-                "left": this.graphLeft,
+                "left": this.graphLeft + 50,
                 "bottom": this.graphBottom,
                 "top": this.graphTop,
                 "right": this.graphRight
@@ -191,20 +191,20 @@ class Sim {
             "graphbackground": "white",
             "axesbackground": "white",
             "x": {
-                "label": "x - x<sub>0</sub> (nm)",
+                "label": "x - x<sub>0</sub> (pm)",
                 "min": this.xbounds[0],
                 "max": this.xbounds[1],
-                "majortick": 0.25,
-                "minortick": 0.05,
-                "gridline": 0.5,
+                "majortick": Number((this.xbounds[1] - this.xbounds[0]) / 4).toFixed(2),
+                "minortick": Number((this.xbounds[1] - this.xbounds[0]) / 16),
+                "gridline": this.xbounds[1],
             },
             "y": {
-                "label": "",
-                "min": -3,
-                "max": 3,
-                "majortick": 1,
-                "minortick": 1,
-                "gridline": 3,
+                "label": "ψ (pm <sup>-1/2</sup>)",
+                "min": -0.3,
+                "max": 0.3,
+                "majortick": 0.1,
+                "minortick": 0.1,
+                "gridline": 0.3,
             }
         };
 
@@ -261,33 +261,35 @@ class Sim {
         // Phase shifts in arbitrary units because propagation is at ridiculously high frequency
         const freqs = this.NS.map(n => (n + 0.5) * math.sqrt(this.KF / this.M));
         const PhaseShifts = freqs.map(freq => math.exp(math.complex(0, - freq * this.T)));
-
-        const hb = 1; // h-bar
-
-        const alpha = math.pow(hb*hb/(this.M*this.KF), 0.25);
-        const cnvrt = 19.6573; // conversion factor to SI units
-        const yArr = this.XS.map(x => (x / alpha) * cnvrt);
+        const lengthUnits = 1e-12; // picometers
+        const hb = 1; // h-bar is beyond floating-point precision of javascript, conversion factor was built-in below.
+        const scale = 5.08716e-11; // conversion factor to SI
+        const alpha = math.pow(hb*hb/(this.M*this.KF), 0.25) * scale; // units of alpha are meters
+        const yArr = this.XS.map(x => (x / alpha) * lengthUnits); // y is unitless
         const eArr = yArr.map(y => math.exp(-0.5*math.pow(y, 2)));
 
+        //const scaleForGraph = 7e-6; // to normalize wave function to graph size
+
         for (let i = 0; i < this.coefficients.length; i++) {
-            const Nv = math.divide(1, math.sqrt(math.prod(math.pow(2, this.NS[i]), math.factorial(this.NS[i]), math.sqrt(math.PI))));
+            const Nv = math.divide(1, math.sqrt(math.prod(alpha, math.pow(2, this.NS[i]), math.factorial(this.NS[i]), math.sqrt(math.PI))));
             for (let j = 0; j < this.XS.length; j++) {
                 const y = yArr[j];
                 const Hv = hermites(this.NS[i], y);
                 const e = eArr[j];
                 if(i == 0) {
                     // calculates the initial state, pushes to PSI array
-                    this.PSI.push(math.prod(this.scaledcoefficients[i], Nv, Hv, e));
+                    this.PSI.push(math.prod(this.scaledcoefficients[i], Nv, Hv, e, math.sqrt(lengthUnits)));
                     // converts the initial state to a complex value, multiplies by phase shift
+                    // units of PSI are pm^-0.5
                     this.PSI[j] = math.complex(math.prod(this.PSI[j], math.re(PhaseShifts[i])), math.prod(this.PSI[j], math.im(PhaseShifts[i])));
-                    // probability is the product of complex and its conjugate
+                    // probability is the product of complex and its conjugate (constant added to match graph size)
                     this.PROBS.push(math.re(math.prod(this.PSI[j], math.conj(this.PSI[j]))));      
                     this.RES.push(math.re(this.PSI[j]));
                     this.IMS.push(math.im(this.PSI[j]));              
                 }
                 else {
-                    this.PSI[j].re += math.prod(this.scaledcoefficients[i], Nv, Hv, e, math.re(PhaseShifts[i]));
-                    this.PSI[j].im += math.prod(this.scaledcoefficients[i], Nv, Hv, e, math.im(PhaseShifts[i]));
+                    this.PSI[j].re += math.prod(this.scaledcoefficients[i], Nv, Hv, e, math.re(PhaseShifts[i]), math.sqrt(lengthUnits));
+                    this.PSI[j].im += math.prod(this.scaledcoefficients[i], Nv, Hv, e, math.im(PhaseShifts[i]), math.sqrt(lengthUnits));
                     this.RES[j] = math.re(this.PSI[j]);
                     this.IMS[j] = math.im(this.PSI[j]);
                     this.PROBS[j] += math.re(math.prod(this.PSI[j], math.conj(this.PSI[j])));
@@ -301,9 +303,11 @@ class Sim {
             const level = (this.NS[i] + 0.5) * math.sqrt(this.KF/this.M) * cnvrt;
             this.ENERGY += level * this.scaledcoefficients[i];
         }
-        for (let i = 0; i < this.XS.length; i++) {this.PROBS[i] += this.ENERGY}
+        const scaleFactor = (this.Yrange[1] - this.Yrange[0]) / (this.componentgc.graphinfo.y.max - this.componentgc.graphinfo.y.min);
 
-        this.POTENTIAL = this.XS.map(x => 0.5 * this.KF * math.pow(x, 2));
+        for (let i = 0; i < this.XS.length; i++) {this.PROBS[i] *= scaleFactor; this.PROBS[i] += this.ENERGY}
+
+        this.POTENTIAL = this.XS.map(x => 0.5 * this.KF * math.pow(x, 2) * 6.242e-6);
     }
 
     clearGraphs() {
@@ -312,7 +316,7 @@ class Sim {
     }
 
     drawGraphs() {
-        
+
         for (let i = 0; i < this.MAXCOEFFICIENTS; i++) {
             const cnvrt = 0.0161538; // conversion factor to electron-volts from (N^0.5 m^-0.5 Da^-0.5)
             const level = (this.NS[i] + 0.5) * math.sqrt(this.KF/this.M) * cnvrt;
@@ -323,8 +327,13 @@ class Sim {
         this.densitygc.drawLine(this.XS.slice(0, 49), this.POTENTIAL.slice(0, 49), hsvToRgb(240,100,100), 1, [2, 2]);
         this.densitygc.drawLine(this.XS.slice(53, this.XS.length), this.POTENTIAL.slice(53, this.POTENTIAL.length), hsvToRgb(240,100,100), 1, [2, 2]);
         this.densitygc.drawLine(this.XS, this.PROBS, hsvToRgb(0,0,0), 3);
-        this.densitygc.drawLine(this.xbounds, [this.ENERGY, this.ENERGY], hsvToRgb(0,100,100), 3);
-        this.densitygc.drawText(`V(x)`, -0.43, this.POTENTIAL[50], {'color':'blue', 'fontsize':'14', 'fontstyle':'bold'});
+
+        this.densitygc.drawLine([this.xbounds[0], 0.52*this.xbounds[1]], [this.ENERGY, this.ENERGY], hsvToRgb(0,100,100), 3);
+        this.densitygc.drawLine([this.xbounds[1]*0.63, this.xbounds[1]], [this.ENERGY, this.ENERGY], hsvToRgb(0,100,100), 3);
+        this.densitygc.drawLine([this.xbounds[1]*0.52, this.xbounds[1]*0.63], [this.ENERGY, this.ENERGY], hsvToRgb(0,0,100), 3);
+
+        this.densitygc.drawText(`E`, this.xbounds[1]*0.55, this.ENERGY + 0.03, {'color':'red', 'fontsize':'14', 'fontstyle':'bold italic'});
+        this.densitygc.drawText(`U(x)`, -43, this.POTENTIAL[50], {'color':'blue', 'fontsize':'14', 'fontstyle':'bold'});
 
         this.componentgc.drawText('Re', 0.3, 2.6, {'color':'blue'});
         this.componentgc.drawText('Im', 0.3, 2.1, {'color':'red'});
