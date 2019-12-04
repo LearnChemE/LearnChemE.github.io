@@ -120,7 +120,7 @@ class Sim {
         html += `<button id='reset'>reset defaults</button>`;
         html += `<button id='togglec'>start/stop</button>`;
         html += `<br>`;
-        html += `<button id='measure'>measure E</button>`;
+        html += `<button id='measure' style='width:250px'>collapse wave function (measure E)</button>`;
         html += `<button id='integrate'>integrate</button>`;
         html += `</div>`;
         document.getElementById("left").insertAdjacentHTML("beforeend", html);
@@ -128,9 +128,9 @@ class Sim {
         // Insert integral box
         html = `<div id="integral">`;
         html += `<table>`
-        html += `<th>x<sub>1</sub></th><th>x<sub>2</sub></th><th>integral</th>`;
-        html += `<tr><td><input id="x1" class="tableinput" value="${-0.5}" placeholder="0"></input></td>`;
-        html += `<td><input id="x2" class="tableinput" value="${0.5}" placeholder="0"></input></td>`;
+        html += `<th>x<sub>1</sub> (pm)</th><th>x<sub>2</sub> (pm)</th><th>integral</th>`;
+        html += `<tr><td><input id="x1" class="tableinput" value="${-50}" placeholder="0"></input></td>`;
+        html += `<td><input id="x2" class="tableinput" value="${50}" placeholder="0"></input></td>`;
         html += `<td><input id="int" class="tableinput" placeholder="-" readonly></input></td>`;
         html += `</tr></table>`
         html += `</div>`
@@ -401,7 +401,7 @@ class Sim {
         this.clearGraphs();
         const x1 = Number(document.getElementById('x1').value);
         const x2 = Number(document.getElementById('x2').value);
-        const fullint = this.riemanntrapezoid(this.XS, this.PROBS, -0.5, 0.5, false);
+        const fullint = this.riemanntrapezoid(this.XS, this.PROBS, this.xbounds[0], this.xbounds[1], false);
         const int = this.riemanntrapezoid(this.XS, this.PROBS, x1, x2, true) / fullint;
         this.drawGraphs();
         const digits = 4;
