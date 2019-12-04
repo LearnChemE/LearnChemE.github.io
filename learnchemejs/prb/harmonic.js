@@ -303,7 +303,7 @@ class Sim {
             const level = (this.NS[i] + 0.5) * math.sqrt(this.KF/this.M) * cnvrt;
             this.ENERGY += level * this.scaledcoefficients[i];
         }
-        const scaleFactor = (this.Yrange[1] - this.Yrange[0]) / (this.componentgc.graphinfo.y.max - this.componentgc.graphinfo.y.min);
+        const scaleFactor = (this.Yrange[1] - this.Yrange[0]) / (this.componentgc.graphinfo.y.max);
 
         for (let i = 0; i < this.XS.length; i++) {this.PROBS[i] *= scaleFactor; this.PROBS[i] += this.ENERGY}
 
