@@ -67,7 +67,7 @@ class Sim {
         this.XS = linspace(this.xbounds[0], this.xbounds[1], this.POINTS + 1, true);
         this.Yrange = [0, 10];
         this.HS = [];
-        this.KF = 20;
+        this.KF = 25;
         this.M = 0.01;
         this.PROBS = [];
         this.RES = [];
@@ -140,11 +140,11 @@ class Sim {
         html = `<div id="sliders" class="row">`;
         html += `<div class="sliderdiv">`;
         html += `<p id="spanmass" class="sliderp">Mass</p>`;
-        html += `<input type="range" min="${1}" max="${100}" value="${50}" class="slider" id="sldmass">`;
+        html += `<input type="range" min="${1}" max="${100}" value="${34}" class="slider" id="sldmass">`;
         html += `</div>`
         html += `<div class="sliderdiv">`;
         html += `<p id="spankf" class="sliderp">force constant k<sub>f</sub>&nbsp</p>`;
-        html += `<input type="range" min="${1}" max="${100}" value="${50}" class="slider" id="sldkf">`;
+        html += `<input type="range" min="${1}" max="${100}" value="${21}" class="slider" id="sldkf">`;
         html += `</div>`
         html += `</div>`
         document.getElementById("left").insertAdjacentHTML("beforeend", html);
@@ -321,7 +321,7 @@ class Sim {
             const cnvrt = 0.0161538; // conversion factor to electron-volts from (N^0.5 m^-0.5 Da^-0.5)
             const level = (this.NS[i] + 0.5) * math.sqrt(this.KF/this.M) * cnvrt;
             this.densitygc.drawLine(this.xbounds, [level,level], hsvToRgb(0,0,0), 1, [5, 4]);
-            this.densitygc.drawText(`n = ${this.NS[i]}`, 0.4, level + 10 * (this.Yrange[1] - this.Yrange[0]) / this.rightGraphHeight, {'color':'black', 'fontsize':'14'});
+            this.densitygc.drawText(`n = ${this.NS[i]}`, this.xbounds[1] - 50 * (this.xbounds[1] - this.xbounds[0]) / this.POINTS, level + 10 * (this.Yrange[1] - this.Yrange[0]) / this.rightGraphHeight, {'color':'black', 'fontsize':'14'});
         }
         
         this.densitygc.drawLine(this.XS.slice(0, 49), this.POTENTIAL.slice(0, 49), hsvToRgb(240,100,100), 1, [2, 2]);
@@ -333,7 +333,7 @@ class Sim {
         this.densitygc.drawLine([this.xbounds[1]*0.52, this.xbounds[1]*0.63], [this.ENERGY, this.ENERGY], hsvToRgb(0,0,100), 3);
 
         this.densitygc.drawText(`E`, this.xbounds[1]*0.55, this.ENERGY + 0.03, {'color':'red', 'fontsize':'14', 'fontstyle':'bold italic'});
-        this.densitygc.drawText(`U(x)`, -43, this.POTENTIAL[50], {'color':'blue', 'fontsize':'14', 'fontstyle':'bold'});
+        this.densitygc.drawText(`U(x)`, this.xbounds[0] + 42 * (this.xbounds[1] - this.xbounds[0]) / this.POINTS, this.POTENTIAL[50], {'color':'blue', 'fontsize':'14', 'fontstyle':'bold'});
 
         this.componentgc.drawText('Re', 0.3, 2.6, {'color':'blue'});
         this.componentgc.drawText('Im', 0.3, 2.1, {'color':'red'});
