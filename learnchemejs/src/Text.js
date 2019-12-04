@@ -94,8 +94,8 @@ export class Text {
                     this.fontsize *= subscale;
                     yoff += this.fontsize * supoff;
                 } else if (command === "</sup>") {
-                    this.fontsize /= subscale;
                     yoff -= this.fontsize * supoff;
+                    this.fontsize /= subscale;
                 } else if (command.slice(0,7) === "<color:") {
                     charcolor = command.slice(7,command.indexOf(">"));
                 } else if (command === "</color>") {
