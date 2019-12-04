@@ -1,4 +1,57 @@
 <div>
-Imagine some fancy physics equations here until this gets written ...
-$$ f_{ancy}=E(qation)$$
+
+The Schr&#246;dinger Equation governing the wave function of a particle takes the general form: 
+
+$$ \hat{H} \Psi = E \Psi $$
+
+where \( \hat{H} \) is the Hamiltonian operator, \( \Psi \) is the wave function, and \( E \) is the total energy of the particle. The one-dimensional time-independent Schr&#246;dinger equation gives a wave function describing the probability density and other properties of a particle at position \( x \):
+
+$$ - \frac{\hbar^2}{2m} \frac{\partial^2\Psi(x)}{\partial x^2} + U(x) \Psi(x) = E \Psi(x) $$
+
+Above, \( \hbar \) is the reduced Planck constant \( \left(\frac{h}{2 \pi } \right) \), \( x \) is position, \( U \) is the particle's potential energy, and \( m \) is the particle's mass. In a quantum harmonic oscillator, the potential energy well is defined as:
+
+$$ U(x) = \frac{1}{2} k_{f} x^{2} $$
+
+where \( k_{f} \) is the force constant.  The force constant is typically written as a function of the particle's mass and oscillation frequency:
+
+$$ k_{f} = m \omega^{2} $$
+
+The solution to the time-independent Schr&#246;dinger equation is of the form:
+
+$$ \Psi(y) = \sum_{n = 0}^{N} C_{n} N_{n} H_{n} (y) e^{- \frac{y^{2}}{2}} $$
+
+where \( N \) is the total number of energy states, \( C_{n} \) is the expansion coefficient for energy state \( n \), where
+
+$$ \sum_{n=0}^{N} C_{n} = 1 $$
+
+\( N_{n} \) is the normalization constant (written here in terms of the force constant \( k_{f} \)):
+
+$$ N_{n} = \left( \frac{ (m k_{f})^{1/4} }{ 2^{n} n! \ \sqrt{ \pi \hbar } } \right)^{1/2}$$
+
+\( y \) is a transformation of the position \( x \), such that:
+
+$$ y = \left( \frac{ m k_{f} }{ \hbar^{2} } \right)^{1/4} x $$
+
+and \( H_{n}(y) \) is the Hermite Polynomial that satisfies the recursive relation \( H_{n + 1} - 2y H_{n} + 2n H_{n - 1} = 0\). The first five solutions to the hermite polynomial are shown below:
+
+$$
+\begin{array} {|c|l|} \hline
+    n & \ \ \ \  H_{n}(y) \\ \hline
+    0 & 1 \\ \hline 
+    1 & 2y \\ \hline 
+    2 & 4y^{2} - 2 \\ \hline 
+    3 & 8y^{3} - 12y \\ \hline 
+    4 & 16y^{4} - 48y^{2} + 12 \\ \hline  
+\end{array}
+$$
+
+A Mathematica notebook is available <a href="../../resources/hermitePolynomials/Hermites.nb" download>here</a> to calculate Hermite Polynomial solutions for any value \( n \). The energy levels for each energy state are:
+
+$$ E_{n} = \sqrt{\frac{k_{f}}{m}} \left( n + \frac{1}{2} \right) \hbar $$
+
+and each eigenstate \( \psi_{n}(y, t) \) oscillates at its own frequency, such that the time-dependent wave function takes the form:
+
+$$ \Psi(y, t) = \sum_{n = 0}^{N} C_{n} N_{n} H_{n} (y) e^{- \frac{y^{2}}{2} -i E_{n} t} $$
+
+A probabilistic collapse of the wave function resolves to a single energy state \( E_{n} \), with the probability of a collapse to energy state \( n \) depending on its expansion coefficient \( C_{n} \).
 </div>
