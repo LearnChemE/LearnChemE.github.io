@@ -205,7 +205,7 @@ function resize() {
         let xPos = wWidth < Math.max(getCoords('al').right, getCoords('vs').right) + 200 ? getCoords('mnl').left : Math.max(getCoords('al').right, getCoords('vs').right) + hMarg; 
         let yPos = wWidth < Math.max(getCoords('al').right, getCoords('vs').right) + 200 ? getCoords('mns').bottom + vMarg : getCoords('al').top; 
         xLabel.position(xPos, yPos);
-        xSlider.position(xPos, getCoords('xl').bottom + 10);
+        xSlider.position(xPos, getCoords('xl').bottom + 7);
     } else {
         molNumberLabel.position(getCoords('canvas0').right, getCoords('nav').bottom);
         molNumberSlider.position(getCoords('canvas0').right, getCoords('mnl').bottom + 10);
@@ -222,7 +222,7 @@ function resize() {
     subCanv.style.width = `${dims}px`;
     canv.style.height = `${Math.min(Math.max(dims, wHeight - getCoords('xs').bottom - 30), 600)}px`;
     subCanv.style.height = `${getCoords('canvas0').height * liquidLevel}px`;
-    const ctop = rowColumn ? getCoords('xs').bottom + 10 : getCoords('nav').bottom;
+    const ctop = rowColumn ? getCoords('xs').bottom + 20 : getCoords('nav').bottom + 20;
     canv.style.top = `${ctop}px`
     subCanv.style.bottom = `0px`;
 
@@ -342,7 +342,7 @@ function addSliders() {
     xLabel.id = 'xl';
     mainDiv.appendChild(xLabel);
     xLabel = document.getElementById('xl');
-    xLabel.innerHTML = `x<sub>A</sub>: ${xAtarget}`;
+    xLabel.innerHTML = `<i>x</i><sub>A</sub>: ${xAtarget}`;
     xLabel.classList.add('label');
     xLabel.position = (x, y) => {xLabel.style.left = `${x}px`; xLabel.style.top = `${y}px`; };
 
