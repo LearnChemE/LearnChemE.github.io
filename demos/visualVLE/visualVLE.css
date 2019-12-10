@@ -20,11 +20,13 @@ body {
 
 #canvas0 {
   background: rgba(200, 200, 225, 0.25);
+  border: 2px solid black;
   position: absolute;
 }
 
 #subCanvas {
   background: rgba(100, 100, 225, 0.25);
+  outline: 1px solid rgba(50, 50, 125, 0.5);
   position: absolute;
 }
 
