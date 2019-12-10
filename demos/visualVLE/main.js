@@ -1,7 +1,7 @@
 let sliderWidth, nav, buttonHeight, about, details, directions, dims, cnv, bc, barHeight, xLabel, xSlider, leftBarLabel, rightBarLabel, leftBarTop, leftBarBottom, rightBarTop, rightBarBottom, mainDiv, liquidColor, liquidLine, alphaLabel, molNumberSlider, molNumberLabel, evapFraction, condFraction;
 let mol = [];
 let liquidLevel = 0.15;
-var mols = 80;
+var mols = 100;
 var Alpha = 1;
 var fracLiq = 0.85;
 var molsVapor = [0, 0, 0];//[total, A, B]
@@ -66,19 +66,28 @@ window.onload = (event) => {
     for(let i = 0; i < mols; i++) {
         if(i % 2 == 0) {mol.push(new Molecule({'component':'a'}))} else {mol.push(new Molecule({'component':'b'}))};
     }
+    updateGlobals();
     startAnimating(120);
   };
 
 function updateGlobals() {
-    Alpha = Math.pow(10, volatilitySlider.value);
-    alphaLabel.innerHTML = `relative volatility (&#945): ${Number.parseFloat(Alpha).toFixed(2)}`;
+    Alpha = Math.pow(10, volatilitySlider.value / 100);
+    alphaLabel.innerHTML = `relative volatility (&#945<sub>blue/green</sub>): ${Number.parseFloat(Alpha).toFixed(2)}`;
     mols = parseInt(molNumberSlider.value);
     molNumberLabel.innerText = `number of particles: ${mols}`;
-    xLabel.innerHTML = `x<sub>A</sub>: ${xAtarget}`;
+    xLabel.innerHTML = `<i>x</i><sub>blue</sub>: ${Number.parseFloat(xAtarget).toFixed(2)}`;
     xAtarget = parseFloat(xSlider.value);
     yAtarget = (Alpha*xAtarget)/(1 - xAtarget + Alpha*xAtarget);
     zA = xAtarget*fracLiq + (1 - fracLiq)*yAtarget;
     for(let i = 0; i < mol.length; i++) {if(i <= mols*zA){mol[i].ChangeComponent('a');}else{mol[i].ChangeComponent('b');}}
+    const liqCanv = document.getElementById('liqCanvas');
+    const vapCanv = document.getElementById('vapCanvas');
+    const bright1 = 255/180;
+    const bright2 = 255/180;
+    liqCanv.style.background = `rgba(${bright1 * (130 - (50 * xAtarget))}, ${bright1 * (180 - (180 * xAtarget))}, ${bright1 * (180 * xAtarget)}, 0.6)`;
+    vapCanv.style.background = `rgba(${bright2 * (130 - (50 * yAtarget))}, ${bright2 * (180 - (180 * yAtarget))}, ${bright2 * (180 * yAtarget)}, 0.3)`;
+    //let Acolor = 'rgb(80, 0, 180)';
+    //let Bcolor = 'rgb(130, 180, 0)';
 }
 
 function addButtons() {
@@ -216,15 +225,19 @@ function resize() {
     } 
 
     const canv = document.getElementById('canvas0');
-    const subCanv = document.getElementById('subCanvas');
+    const liqCanv = document.getElementById('liqCanvas');
+    const vapCanv = document.getElementById('vapCanvas');
     
     canv.style.width = `${dims}px`;
-    subCanv.style.width = `${dims}px`;
+    liqCanv.style.width = `${dims}px`;
+    vapCanv.style.width = `${dims}px`;
     canv.style.height = `${Math.min(Math.max(dims, wHeight - getCoords('xs').bottom - 30), 600)}px`;
-    subCanv.style.height = `${getCoords('canvas0').height * liquidLevel}px`;
+    liqCanv.style.height = `${getCoords('canvas0').height * liquidLevel}px`;
+    vapCanv.style.height = `${getCoords('canvas0').height - getCoords('liqCanvas').height - 4}px`;
     const ctop = rowColumn ? getCoords('xs').bottom + 20 : getCoords('nav').bottom + 20;
-    canv.style.top = `${ctop}px`
-    subCanv.style.bottom = `0px`;
+    canv.style.top = `${ctop}px`;
+    vapCanv.style.top = `0px`;
+    liqCanv.style.bottom = `0px`;
 
     liquidLine = (1 - liquidLevel) * getCoords('canvas0').height;
     yDims = getCoords('canvas0').height;
@@ -310,9 +323,9 @@ function addSliders() {
     molNumberSlider = document.getElementById('mns');
     molNumberSlider.type = 'range';
     molNumberSlider.classList.add('slider');
-    molNumberSlider.min = 10;
+    molNumberSlider.min = 50;
     molNumberSlider.max = 500;
-    molNumberSlider.value = 80;
+    molNumberSlider.value = 100;
     molNumberSlider.step = 1;
     molNumberSlider.style.width = `${sliderWidth}px`;
     molNumberSlider.position = (x, y) => {molNumberSlider.style.left = `${x}px`; molNumberSlider.style.top = `${y}px`; };
@@ -321,7 +334,7 @@ function addSliders() {
     alphaLabel.id = 'al';
     mainDiv.appendChild(alphaLabel);
     alphaLabel = document.getElementById('al');
-    alphaLabel.innerHTML = `relative volatility (&#945): ${Alpha}`;
+    alphaLabel.innerHTML = `relative volatility (&#945<sub>blue/green</sub>): ${Number.parseFloat(Alpha).toFixed(2)}`;
     alphaLabel.classList.add('label');
     alphaLabel.position = (x, y) => {alphaLabel.style.left = `${x}px`; alphaLabel.style.top = `${y}px`; };
 
@@ -331,10 +344,10 @@ function addSliders() {
     volatilitySlider = document.getElementById('vs');
     volatilitySlider.type = 'range';
     volatilitySlider.classList.add('slider');
-    volatilitySlider.min = -1;
-    volatilitySlider.max = 1;
+    volatilitySlider.min = -100;
+    volatilitySlider.max = 100;
     volatilitySlider.value = 0;
-    volatilitySlider.step = 0.1;
+    volatilitySlider.step = 1;
     volatilitySlider.style.width = `${sliderWidth}px`;
     volatilitySlider.position = (x, y) => {volatilitySlider.style.left = `${x}px`; volatilitySlider.style.top = `${y}px`; };
 
@@ -342,7 +355,7 @@ function addSliders() {
     xLabel.id = 'xl';
     mainDiv.appendChild(xLabel);
     xLabel = document.getElementById('xl');
-    xLabel.innerHTML = `<i>x</i><sub>A</sub>: ${xAtarget}`;
+    xLabel.innerHTML = `<i>x</i><sub>blue</sub>: ${Number.parseFloat(xAtarget).toFixed(2)}`;
     xLabel.classList.add('label');
     xLabel.position = (x, y) => {xLabel.style.left = `${x}px`; xLabel.style.top = `${y}px`; };
 

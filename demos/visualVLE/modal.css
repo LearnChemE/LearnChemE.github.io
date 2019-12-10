@@ -110,7 +110,7 @@
 /* The content */
 .modal-header {
     padding: 10px 10px;
-    background-color: #333333;
+    background-color: #666666;/*(The number of the beast)*/
     font-size: 2.0rem;
     font-weight: bold;
 }
@@ -123,4 +123,8 @@
 .modal-footer {
     padding: 10px 10px;
     background-color: #333333;
+}
+
+.dirList {
+    line-height: 3rem;
 }

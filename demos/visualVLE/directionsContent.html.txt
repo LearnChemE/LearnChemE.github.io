@@ -1,3 +1,11 @@
 <div>
-Follow these directions.
+This simulation visualizes the behavior of a binary mixture in vapor-liquid equilibrium.
+<ul class="dirList">
+    <li>The image on the left depicts a binary mixture, with liquid at the bottom and vapor above the liquid.</li>
+    <li>Each circle represents an individual atom or molecule.</li>
+    <li>The bar chart on the right represents the mole fractions of each component.</li>
+    <li>The number of particles, relative volatility, and liquid composition may be adjusted using the three sliders above the simulation.</li>
+    <li><i>x</i><sub>blue</sub> represents the mole fraction of the blue component in the liquid phase, and &#945<sub>blue/green</sub> is the relative volatility of the blue component with respect to the green component. More information can be found in the details.</li>
+    <li>Note that when the volatility is adjusted, it may take a few seconds for the compositions in the simulation to match those of the bar chart, as the components "evaporate" or "condense" accordingly.</li>
+</ul>
 </div>

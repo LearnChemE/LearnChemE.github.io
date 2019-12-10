@@ -14,19 +14,24 @@ body {
 .molecule {
   width: 10px;
   height: 10px;
+  border: 1px solid black;
   border-radius: 5px;
   position: absolute;
+  z-index: 2;
 }
 
 #canvas0 {
-  background: rgba(200, 200, 225, 0.25);
+  background: rgb(255, 255, 255);
   border: 2px solid black;
   position: absolute;
 }
 
-#subCanvas {
-  background: rgba(100, 100, 225, 0.25);
+#liqCanvas {
   outline: 1px solid rgba(50, 50, 125, 0.5);
+  position: absolute;
+}
+
+#vapCanvas {
   position: absolute;
 }
 
@@ -69,6 +74,6 @@ body {
 }
 
 .label {
-  font-size: 1.8rem;
+  font-size: 1.7rem;
   font-family: sans-serif;
 }
