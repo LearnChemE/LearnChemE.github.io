@@ -27,3 +27,46 @@ body {
   background: rgba(100, 100, 225, 0.25);
   position: absolute;
 }
+
+#nav {
+  display: flex;
+  justify-content: space-around;
+}
+
+.slider {
+  -webkit-appearance: none;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  outline: none;
+  -webkit-transition: .2s;
+  transition: background .2s;
+}
+
+.slider:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  background: #2e316d;
+  border: 2px solid black;
+  border-radius: 20%;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: #2e316d;
+  border: 2px solid black;
+  border-radius: 20%;
+  cursor: pointer;
+}
+
+.label {
+  font-size: 1.8rem;
+  font-family: sans-serif;
+}

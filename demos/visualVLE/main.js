@@ -1,4 +1,4 @@
-let dims, cnv, bc, barHeight, xLabel, xSlider, leftBarLabel, rightBarLabel, leftBarTop, leftBarBottom, rightBarTop, rightBarBottom, mainDiv, liquidColor, liquidLine, alphaLabel, molNumberSlider, molNumberLabel, evapFraction, condFraction;
+let sliderWidth, nav, buttonHeight, about, details, directions, dims, cnv, bc, barHeight, xLabel, xSlider, leftBarLabel, rightBarLabel, leftBarTop, leftBarBottom, rightBarTop, rightBarBottom, mainDiv, liquidColor, liquidLine, alphaLabel, molNumberSlider, molNumberLabel, evapFraction, condFraction;
 let mol = [];
 let liquidLevel = 0.15;
 var mols = 80;
@@ -59,6 +59,7 @@ function animate() {
 
 window.onload = (event) => {
     mainDiv = document.getElementById('main');
+    addButtons();
     addSliders();
     addBarChart();
     resize();
@@ -78,6 +79,44 @@ function updateGlobals() {
     yAtarget = (Alpha*xAtarget)/(1 - xAtarget + Alpha*xAtarget);
     zA = xAtarget*fracLiq + (1 - fracLiq)*yAtarget;
     for(let i = 0; i < mol.length; i++) {if(i <= mols*zA){mol[i].ChangeComponent('a');}else{mol[i].ChangeComponent('b');}}
+}
+
+function addButtons() {
+    nav = document.getElementById('nav');
+    buttonHeight = 70;
+
+    about = {"content": ""};
+    directions = {"content" : ""};
+    details = {"content" : ""}
+
+    about["modal"] = new Modal({modalid:"modal-about",modalclass:"modal moveUp",headerstyle:"",header:"About",contentstyle:"",content:about.content,showing:false});    
+    directions["modal"] = new Modal({modalid:"modal-directions",modalclass:"modal moveUp",headerstyle:"",header:"Directions",contentstyle:"",content:directions.content,showing:false});
+    details["modal"] = new Modal({modalid:"modal-details",modalclass:"modal moveUp",headerstyle:"",header:"Details",contentstyle:"",content:details.content,showing:false});
+    
+    about["button"] = document.getElementById('about').addEventListener("click", () => about.modal.show());
+    directions["button"] = document.getElementById('directions').addEventListener("click", () => directions.modal.show());
+    details["button"] = document.getElementById('details').addEventListener("click", () => details.modal.show());
+    
+    var modalFiles = [];
+    modalFiles.push(modalFill(about.modal,'aboutContent.html.txt'));
+    modalFiles.push(modalFill(directions.modal,'directionsContent.html.txt'));
+    modalFiles.push(modalFill(details.modal,'detailsContent.html.txt'));
+
+    const error1 = details.modal;
+    const error2 = directions.modal;
+    Promise.all(modalFiles).then(function() {
+        MathJax.Hub.Configured();
+    }).catch(() => {
+        console.log("MathJax Not Yet Loaded ...");
+        let delay = 1000;
+        setTimeout(function jax() {
+            try {MathJax.Hub.Configured();}
+            catch(error) {console.error(error); if(delay < 10000) {delay*= 1.5; setTimeout(jax, delay);} else {
+                modalFill(error1,'errorText.html.txt');
+                modalFill(error2,'errorText.html.txt');
+            }}
+        }, delay);
+      });
 }
 
 function addBarChart() {
@@ -124,7 +163,9 @@ function addBarChart() {
     leftBarLabel.style.position = 'absolute';
     rightBarLabel.style.position = 'absolute';
     leftBarLabel.innerText = 'liquid';
+    leftBarLabel.classList.add('label');
     rightBarLabel.innerText = 'vapor';
+    rightBarLabel.classList.add('label');
     leftBarLabel.style.textAlign = 'center';
     rightBarLabel.style.textAlign = 'center';
     let transitionTime = 1;
@@ -138,19 +179,26 @@ function drawBarChart() {
 }
 
 function resize() {
-    let wHeight = window.innerHeight;
-    let wWidth = window.innerWidth;
+    const wHeight = window.innerHeight;
+    const wWidth = window.innerWidth;
+
+    nav.style.height = `${buttonHeight}px`;
 
     dims = Math.min(Math.max(400, Math.min(wWidth, wHeight - 20)),800);
     if(rowColumn) {dims *= 0.6} else {dims -= 100}
     evapFraction = ((1 - fracLiq) * (dims - liquidLine) / dims) / ((1 - fracLiq) * (dims - liquidLine) / dims + fracLiq * liquidLine / dims);
     condFraction = (fracLiq * liquidLine / dims) / ((1 - fracLiq) * (dims - liquidLine) / dims + fracLiq * liquidLine / dims);
     
-    let hMarg = 40;
-    let vMarg = 20;
+    const hMarg = 40;
+    const vMarg = 20;
 
     if(rowColumn) {
-        molNumberLabel.position(10, 0);
+        sliderWidth = (dims * 1.5) / 3 - 40;
+        molNumberSlider.style.width = `${sliderWidth}px`;
+        volatilitySlider.style.width = `${sliderWidth}px`;
+        xSlider.style.width = `${sliderWidth}px`;
+
+        molNumberLabel.position(10, getCoords('nav').bottom);
         molNumberSlider.position(0, getCoords('mnl').bottom + 10);
         alphaLabel.position(Math.max(getCoords('mnl').right,getCoords('mns').right) + hMarg, getCoords('mnl').top);
         volatilitySlider.position(Math.max(getCoords('mnl').right,getCoords('mns').right) + hMarg, getCoords('al').bottom + 10);
@@ -159,7 +207,7 @@ function resize() {
         xLabel.position(xPos, yPos);
         xSlider.position(xPos, getCoords('xl').bottom + 10);
     } else {
-        molNumberLabel.position(getCoords('canvas0').right, 10);
+        molNumberLabel.position(getCoords('canvas0').right, getCoords('nav').bottom);
         molNumberSlider.position(getCoords('canvas0').right, getCoords('mnl').bottom + 10);
         alphaLabel.position(getCoords('canvas0').right, getCoords('mns').bottom + 30);
         volatilitySlider.position(getCoords('canvas0').right, getCoords('al').bottom + 10);
@@ -167,14 +215,14 @@ function resize() {
         xSlider.position(getCoords('canvas0').right, getCoords('xl').bottom + 10);
     } 
 
-    let canv = document.getElementById('canvas0');
-    let subCanv = document.getElementById('subCanvas');
+    const canv = document.getElementById('canvas0');
+    const subCanv = document.getElementById('subCanvas');
     
     canv.style.width = `${dims}px`;
     subCanv.style.width = `${dims}px`;
     canv.style.height = `${Math.min(Math.max(dims, wHeight - getCoords('xs').bottom - 30), 600)}px`;
     subCanv.style.height = `${getCoords('canvas0').height * liquidLevel}px`;
-    let ctop = rowColumn ? getCoords('xs').bottom + 10 : 0;
+    const ctop = rowColumn ? getCoords('xs').bottom + 10 : getCoords('nav').bottom;
     canv.style.top = `${ctop}px`
     subCanv.style.bottom = `0px`;
 
@@ -184,8 +232,8 @@ function resize() {
     let bcWidth;
     let bcLeft;
     let bcTop;
-    let bcHeight = getCoords('canvas0').height;
-    let bMarg = 10;
+    const bcHeight = getCoords('canvas0').height;
+    const bMarg = 10;
     barHeight = bcHeight - 2*bMarg - Math.max(getCoords('lbl').height, getCoords('rbl').height);
 
     if(rowColumn) {
@@ -228,11 +276,12 @@ function resize() {
     leftBarLabel.style.bottom = `0px`;
     rightBarLabel.style.bottom = `0px`;
 
+    nav.style.width = `${bcLeft + bcWidth}px`;
 }
 
 function getCoords(id) {
-    let elem = document.getElementById(id);
-    let box = elem.getBoundingClientRect();
+    const elem = document.getElementById(id);
+    const box = elem.getBoundingClientRect();
   
     return {
       top: box.top + pageYOffset,
@@ -245,11 +294,14 @@ function getCoords(id) {
   }
 
 function addSliders() {
+    sliderWidth = 100;
+
     molNumberLabel = document.createElement('div');
     molNumberLabel.id = 'mnl';
     mainDiv.appendChild(molNumberLabel);
     molNumberLabel = document.getElementById('mnl');
     molNumberLabel.innerHTML = `number of particles: ${mols}`;
+    molNumberLabel.classList.add('label');
     molNumberLabel.position = (x, y) => {molNumberLabel.style.left = `${x}px`; molNumberLabel.style.top = `${y}px`; };
     
     molNumberSlider = document.createElement('input');
@@ -257,11 +309,12 @@ function addSliders() {
     mainDiv.appendChild(molNumberSlider);
     molNumberSlider = document.getElementById('mns');
     molNumberSlider.type = 'range';
+    molNumberSlider.classList.add('slider');
     molNumberSlider.min = 10;
     molNumberSlider.max = 500;
     molNumberSlider.value = 80;
     molNumberSlider.step = 1;
-    molNumberSlider.style.width = '100px';
+    molNumberSlider.style.width = `${sliderWidth}px`;
     molNumberSlider.position = (x, y) => {molNumberSlider.style.left = `${x}px`; molNumberSlider.style.top = `${y}px`; };
     
     alphaLabel = document.createElement('div');
@@ -269,6 +322,7 @@ function addSliders() {
     mainDiv.appendChild(alphaLabel);
     alphaLabel = document.getElementById('al');
     alphaLabel.innerHTML = `relative volatility (&#945): ${Alpha}`;
+    alphaLabel.classList.add('label');
     alphaLabel.position = (x, y) => {alphaLabel.style.left = `${x}px`; alphaLabel.style.top = `${y}px`; };
 
     volatilitySlider = document.createElement('input');
@@ -276,11 +330,12 @@ function addSliders() {
     mainDiv.appendChild(volatilitySlider);
     volatilitySlider = document.getElementById('vs');
     volatilitySlider.type = 'range';
+    volatilitySlider.classList.add('slider');
     volatilitySlider.min = -1;
     volatilitySlider.max = 1;
     volatilitySlider.value = 0;
     volatilitySlider.step = 0.1;
-    volatilitySlider.style.width = '100px';
+    volatilitySlider.style.width = `${sliderWidth}px`;
     volatilitySlider.position = (x, y) => {volatilitySlider.style.left = `${x}px`; volatilitySlider.style.top = `${y}px`; };
 
     xLabel = document.createElement('div');
@@ -288,6 +343,7 @@ function addSliders() {
     mainDiv.appendChild(xLabel);
     xLabel = document.getElementById('xl');
     xLabel.innerHTML = `x<sub>A</sub>: ${xAtarget}`;
+    xLabel.classList.add('label');
     xLabel.position = (x, y) => {xLabel.style.left = `${x}px`; xLabel.style.top = `${y}px`; };
 
     xSlider = document.createElement('input');
@@ -295,11 +351,12 @@ function addSliders() {
     mainDiv.appendChild(xSlider);
     xSlider = document.getElementById('xs');
     xSlider.type = 'range';
+    xSlider.classList.add('slider');
     xSlider.min = 0.03;
     xSlider.max = 0.97;
     xSlider.step = 0.01;
     xSlider.value = 0.50;
-    xSlider.style.width = '100px';
+    xSlider.style.width = `${sliderWidth}px`;
     xSlider.position = (x, y) => {xSlider.style.left = `${x}px`; xSlider.style.top = `${y}px`; };
 
     molNumberLabel.style.position = 'absolute';

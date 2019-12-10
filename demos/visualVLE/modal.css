@@ -1,0 +1,126 @@
+/* Main properties */
+.buttonMed {
+    border:none;
+    outline:none;
+    text-align: center;
+    align-self: flex-start;
+    -moz-box-shadow: 0px 1px 0px 0px #fff6af;
+    -webkit-box-shadow: 0px 1px 0px 0px #fff6af;
+    box-shadow: 0px 1px 0px 0px #fff6af;
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffec64), color-stop(1, #ffab23));
+    background:-moz-linear-gradient(top, #ffec64 5%, #ffab23 100%);
+    background:-webkit-linear-gradient(top, #ffec64 5%, #ffab23 100%);
+    background:-o-linear-gradient(top, #ffec64 5%, #ffab23 100%);
+    background:-ms-linear-gradient(top, #ffec64 5%, #ffab23 100%);
+    background:linear-gradient(to bottom, #ffec64 5%, #ffab23 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffec64', endColorstr='#ffab23',GradientType=0);
+    background-color:#ffec64;
+    -moz-border-radius:6px;
+    -webkit-border-radius:6px;
+    border-radius:6px;
+    border:1px solid #ffaa22;
+    display:inline-block;
+    cursor:pointer;
+    color:#333333;
+    font-size: 1.8rem;
+    font-family:sans-serif;
+    padding: 1rem 1.5rem;
+    font-weight:bold;
+    text-decoration:none;
+    text-shadow:0px 1px 0px #ffee66;
+}
+.buttonMed:hover {
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffab23), color-stop(1, #ffec64));
+    background:-moz-linear-gradient(top, #ffab23 5%, #ffec64 100%);
+    background:-webkit-linear-gradient(top, #ffab23 5%, #ffec64 100%);
+    background:-o-linear-gradient(top, #ffab23 5%, #ffec64 100%);
+    background:-ms-linear-gradient(top, #ffab23 5%, #ffec64 100%);
+    background:linear-gradient(to bottom, #ffab23 5%, #ffec64 100%);
+    font-family:sans-serif;
+    text-decoration:none;
+    font-weight:bold;
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffab23', endColorstr='#ffec64',GradientType=0);
+    background-color:#ffab23;
+}
+.buttonMed:active {
+    position:relative;
+    font-family:sans-serif;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 10; /* Sit on top */
+    padding-top: 200px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    font-family: sans-serif;
+}
+
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 60%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.25),0 6px 20px 0 rgba(0,0,0,0.25);
+    animation-name: animatezoomout;
+    animation-duration: 0.4s
+}
+
+/* Animations */
+@keyframes animatezoomout {
+    0%   {transform: scale(1.5); opacity:0}
+    100% {transform: scale(1); opacity:1}
+}
+
+@keyframes animatezoomin {
+    0%   {transform: scale(0.5); opacity:0}
+    100% {transform: scale(1); opacity:1}
+}
+
+@keyframes animatetop {
+    0%   {top:-300px; opacity:0}
+    100% {top:0; opacity:1}
+}
+
+/* The Close Button */
+.close {
+    color: white;
+    float: right;
+    font-size: 2.0rem;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #888888;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* The content */
+.modal-header {
+    padding: 10px 10px;
+    background-color: #333333;
+    font-size: 2.0rem;
+    font-weight: bold;
+}
+
+.modal-body {
+    padding: 10px 10px;
+    font-size: 1.6rem;
+}
+
+.modal-footer {
+    padding: 10px 10px;
+    background-color: #333333;
+}

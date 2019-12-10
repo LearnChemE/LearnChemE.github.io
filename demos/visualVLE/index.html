@@ -8,13 +8,20 @@
     <link rel="icon" type="image/png" href="https://LearnChemE.github.io/resources/siteicon.png">
     
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML&delayStartupUntil=configured" async></script>        
+    <script type="text/javascript" src="modal.min.js"></script>
     <script type="text/javascript" src="main.min.js"></script>
     <script type="text/javascript" src="molecule.min.js"></script>
-    
+    <link rel="stylesheet" type="text/css" href="modal.css">
     <link rel="stylesheet" type="text/css" href="visualVLE.css">
 </head>
 
 <body onresize="resize()">
+    <div id="nav">
+        <div id="directions" class="buttonMed">Directions</div>
+        <div id="details" class="buttonMed">Details</div>
+        <div id="about" class="buttonMed">About</div>
+    </div>
     <div id="main">
         <div id="canvas0" style="z-index: 0">
             <div id="molecules"></div>
