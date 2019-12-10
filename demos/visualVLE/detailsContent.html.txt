@@ -6,8 +6,8 @@ $$ y_{i} = \frac{p_{i}}{P_{total}} $$
 and the sum of the vapor pressures equals the total pressure:
 $$ P_{total} = \sum^{n} p_{i} $$
 where \( n \) is the total number of components in a mixture. For a binary mixture, \( P_{total} = p_{A} + p_{B} \). Combining the equations above yields a method for calculating vapor composition of component \( i \) for any liquid composition and total pressure:
-$$ x_{i} = \frac{ y_{i} P_{total} }{ p_{i}^{*} } $$
-In a binary mixture, the phase behavior may be described by the relative volatility of two components:
+$$ y_{i} = \frac{ p_{i}^{*} x_{i} }{ P_{total} } $$
+In a binary mixture, the phase behavior is often described by the relative volatility of two components:
 $$ \alpha_{ij} = \frac{(y_{i}/x_{i})}{(y_{j}/x_{j})} $$
 In a binary mixture where \( \alpha_{ij} > 1 \), the vapor mole fraction of component \( i \) will be higher than its liquid mole fraction ( \( y_{i} > x_{i} \) ). Likewise, in a mixture where \( \alpha_{ij} < 1 \), the vapor mole fraction of component \( i \) will be lower than its liquid mole fraction ( \( y_{i} < x_{i} \) ).
 </div>
