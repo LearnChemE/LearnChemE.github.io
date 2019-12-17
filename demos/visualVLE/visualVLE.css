@@ -14,7 +14,6 @@ body {
 .molecule {
   width: 10px;
   height: 10px;
-  border: 1px solid black;
   border-radius: 5px;
   position: absolute;
   z-index: 2;
@@ -27,8 +26,9 @@ body {
 }
 
 #liqCanvas {
-  outline: 1px solid rgba(50, 50, 125, 0.5);
+  outline: 1px solid rgba(50, 50, 125, 0.7);
   position: absolute;
+  background: rgba(25, 25, 60, 0.35);
 }
 
 #vapCanvas {

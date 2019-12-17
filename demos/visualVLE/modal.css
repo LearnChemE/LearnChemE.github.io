@@ -53,7 +53,7 @@
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 10; /* Sit on top */
-    padding-top: 200px; /* Location of the box */
+    padding-top: 50px; /* Location of the box */
     left: 0;
     top: 0;
     width: 100%; /* Full width */
@@ -70,7 +70,7 @@
     margin: auto;
     padding: 0;
     border: 1px solid #888;
-    width: 60%;
+    width: calc(90% - 20px);
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.25),0 6px 20px 0 rgba(0,0,0,0.25);
     animation-name: animatezoomout;
     animation-duration: 0.4s

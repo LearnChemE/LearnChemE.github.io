@@ -67,7 +67,7 @@ window.onload = (event) => {
         if(i % 2 == 0) {mol.push(new Molecule({'component':'a'}))} else {mol.push(new Molecule({'component':'b'}))};
     }
     updateGlobals();
-    startAnimating(120);
+    startAnimating(60);
   };
 
 function updateGlobals() {
@@ -80,14 +80,14 @@ function updateGlobals() {
     yAtarget = (Alpha*xAtarget)/(1 - xAtarget + Alpha*xAtarget);
     zA = xAtarget*fracLiq + (1 - fracLiq)*yAtarget;
     for(let i = 0; i < mol.length; i++) {if(i <= mols*zA){mol[i].ChangeComponent('a');}else{mol[i].ChangeComponent('b');}}
-    const liqCanv = document.getElementById('liqCanvas');
+    /* const liqCanv = document.getElementById('liqCanvas');
     const vapCanv = document.getElementById('vapCanvas');
     const bright1 = 255/180;
     const bright2 = 255/180;
     liqCanv.style.background = `rgba(${bright1 * (130 - (50 * xAtarget))}, ${bright1 * (180 - (180 * xAtarget))}, ${bright1 * (180 * xAtarget)}, 0.6)`;
     vapCanv.style.background = `rgba(${bright2 * (130 - (50 * yAtarget))}, ${bright2 * (180 - (180 * yAtarget))}, ${bright2 * (180 * yAtarget)}, 0.3)`;
     //let Acolor = 'rgb(80, 0, 180)';
-    //let Bcolor = 'rgb(130, 180, 0)';
+    //let Bcolor = 'rgb(130, 180, 0)'; */
 }
 
 function addButtons() {
