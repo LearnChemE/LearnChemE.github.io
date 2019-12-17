@@ -67,7 +67,7 @@ window.onload = (event) => {
         if(i % 2 == 0) {mol.push(new Molecule({'component':'a'}))} else {mol.push(new Molecule({'component':'b'}))};
     }
     updateGlobals();
-    startAnimating(60);
+    startAnimating(120);
   };
 
 function updateGlobals() {
@@ -324,7 +324,7 @@ function addSliders() {
     molNumberSlider.type = 'range';
     molNumberSlider.classList.add('slider');
     molNumberSlider.min = 50;
-    molNumberSlider.max = 500;
+    molNumberSlider.max = 150;
     molNumberSlider.value = 100;
     molNumberSlider.step = 1;
     molNumberSlider.style.width = `${sliderWidth}px`;

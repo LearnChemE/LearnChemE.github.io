@@ -3,7 +3,7 @@ class Molecule {
         let colors = {'a': Acolor, 'b': Bcolor};
         this.component = _args['component'] || 'a';
         this.color = _args['color'] || colors[`${this.component}`];
-        this.diameter = _args['diameter'] || 10;
+        this.diameter = _args['diameter'] || 22;
         this.temperature = _args['temperature'] || 290;
         this.direction = Math.random() * Math.PI * 2;
         let determineState = Math.random();
@@ -24,7 +24,11 @@ class Molecule {
         this.div.classList.add('molecule');
         this.div.style.top = `${this.position[1]}px`;
         this.div.style.left = `${this.position[0]}px`;
-        this.div.style.opacity = '0.75';
+        this.div.style.height = `${this.diameter}px`;
+        this.div.style.width = `${this.diameter}px`;
+        this.div.style.borderRadius = `${this.diameter / 2}px`;
+        this.div.style.zIndex = Math.random() > 0.5 ? '2' : '3';
+        this.div.style.opacity = '1';
         document.getElementById('molecules').appendChild(this.div);
         if(this.state == 'liquid') {molsLiquid[0]++; if(this.component == 'a'){molsLiquid[1]++} else {molsLiquid[2]++}}
         else {molsVapor[0]++; if(this.component == 'a'){molsVapor[1]++} else {molsVapor[2]++}}
@@ -97,6 +101,7 @@ class Molecule {
             this.component = comp;
             this.color = this.component == 'a' ? Acolor : Bcolor;
             this.div.style.backgroundColor = this.color;
+            this.div.style.zIndex = Math.random() > 0.5 ? '2' : '3';
         }
     }
 }
