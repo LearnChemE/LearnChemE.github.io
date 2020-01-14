@@ -346,7 +346,7 @@ function addSliders() {
     volatilitySlider.classList.add('slider');
     volatilitySlider.min = -100;
     volatilitySlider.max = 100;
-    volatilitySlider.value = 0;
+    volatilitySlider.value = 30;
     volatilitySlider.step = 1;
     volatilitySlider.style.width = `${sliderWidth}px`;
     volatilitySlider.position = (x, y) => {volatilitySlider.style.left = `${x}px`; volatilitySlider.style.top = `${y}px`; };
