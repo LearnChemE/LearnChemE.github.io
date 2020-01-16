@@ -136,3 +136,13 @@ mjx-container:focus {
 	text-decoration: none;
 	cursor: pointer;
 }
+
+#vidContainer {
+    overflow: visible;
+}
+
+video {
+    width: 220%;
+    height: 220%;
+    transform:translate(-28%, -48%);
+}

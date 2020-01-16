@@ -1,6 +1,6 @@
-let stateFunc1, stateFunc2, sym, symmetryText, w, h, instrX, instrY, texX, texY, sWidth, lnHt, fontSize, largeFontSize, i, k, str, constant, constantIndex, partialsIndex, m, restart, topPartial1, topPartial2, bottomPartial1, bottomPartial2, constantText1, constantText2, refLeft, rhs, cnst, cnst2, cnst3, cnst4, s, symmetry, hidePartial1, hidePartial2, showPartial1, showPartial2, motionText1, motionText2, endSolution, endSolutionDOMobj;
+let start, modsTimer, volumeText, volumeTextDOMObj, vTime, vDuration, txt, txt2, txt3, vid, stateFunc1, stateFunc2, sym, symmetryText, w, h, instrX, instrY, texX, texY, sWidth, lnHt, fontSize, largeFontSize, i, k, str, constant, constantIndex, partialsIndex, m, restart, topPartial1, topPartial2, bottomPartial1, bottomPartial2, constantText1, constantText2, refLeft, rhs, cnst, cnst2, cnst3, cnst4, s, symmetry, hidePartial1, hidePartial2, showPartial1, showPartial2, motionText1, motionText2, endSolution, endSolutionDOMobj;
 let eqns = {
-    'fundamentals':{"U":`dU=TdS-PdV`,"A":`dA=-SdT-PdV`,"H":`dH=TdS+VdP`,"G":`dG=-SdT+VdP`}
+    'fundamentals':{"U":`dU=TdS-PdV`,"A":`dA=-SdT-PdV`,"H":`dH=TdS+VdP`,"G":`dG=-SdT+VdP`,"C":'dV= \\left( \\frac{\\partial V}{\\partial r} \\right)_{\\scriptscriptstyle L} dr + \\left( \\frac{\\partial V}{\\partial L} \\right)_{\\scriptscriptstyle r} dL'}
 };
 
 let choices = [];
@@ -16,8 +16,11 @@ let partials = [];
 let ctc = false;
 let animSpeedMult = 1;
 let textDelay = 2000/animSpeedMult;
+let cylinder = false;
+let dims;
 
 //let symmetryText = "\\Big( \\frac{\\partial}{\\partial X} \\Big( \\frac{\\partial Z}{\\partial Y} \\Big)_{\\scriptscriptstyle X} \\Big)_{\\scriptscriptstyle Y } = \\Big( \\frac{\\partial}{\\partial Y} \\Big( \\frac{\\partial Z}{\\partial X} \\Big)_{\\scriptscriptstyle Y} \\Big)_{\\scriptscriptstyle X} = \\frac{\\partial^{2} Z}{\\partial X \\partial Y}";
+
 
 function setup() {
     /* creates reset button */
@@ -26,12 +29,14 @@ function setup() {
     b.id = 'resetbutton';
     b.innerText = 'reset';
     b.onclick = reset;
-    b.style.zIndex = 2;
+    b.style.zIndex = 3;
     b.style.position ='absolute';
     b.style.top = '10px';
     c.appendChild(b);
     /* calls windowResized with "initialization" value as true to get window dimensions */
-    let dims = windowResized(true);
+    dims = windowResized(true);
+    c.style.width = `${dims}px`;
+    c.style.height = `${dims}px`;
     b.style.left = `${instrX}px`;
     b.classList.add('buttonMed');
     b.classList.add('red');
@@ -45,7 +50,7 @@ function setup() {
 
     cnv.parent('main');
     cnv.position(0, 0);
-    cnv.style('z-index', 0);
+    cnv.style('z-index', 1);
 
     frameRate(fps);
     /* define globals relative height and width (%) of canvas */
@@ -56,6 +61,10 @@ function setup() {
     // MathJax.startup.defaultReady();
 
     textAlign(LEFT, TOP);
+    vid = document.getElementById('cylVid');
+    vid.currentTime = 0;
+    vidContainer = document.getElementById('vidContainer');
+    vidContainer.style.position = 'absolute';
 
     windowResized();
     background(255, 255, 255);
@@ -69,7 +78,6 @@ function draw() {
 }
 
 function drawPage(p) {
-    
     clear();
 
     switch(p) {
@@ -81,22 +89,41 @@ function drawPage(p) {
             text("Click a fundamental equation to get started.", instrX, instrY);
             k = Object.keys(eqns['fundamentals']);
             for(let i = 0; i < k.length; i++) {
-                domObjs.push(new Tex({"content":eqns['fundamentals'][k[i]], "position":[texX, eval(`${texY + lnHt * (i + 1)}+${i == 4 ? 3 * lnHt : 0}`)], "name":`${k[i]}`}));
+                domObjs.push(new Tex({"content":eqns['fundamentals'][k[i]], "position":[texX, eval(`${texY + lnHt * (i + 1)}+${i == 4 ? 4 * lnHt : 0}`)], "name":`${k[i]}`}));
                 domObjs[i].div.addClass('eq');
                 domObjs[i].div.id(`eq${i}`);
+                domObjs[i].div.style('z-index', '2');
                 let id = `${i}`;
                 document.getElementById(`eq${id}`).addEventListener("mousedown", () => {if(page == 1) {choices.push(parseInt(id))}; next(1, choices[0])});
             }
+
+            const instr2Y = getCoords(document.getElementById(`eq${Object.keys(eqns['fundamentals']).length - 1}`)).top - 3.5 * lnHt;
+            text("Or to better understand exact differentials, click\nthis equation of cylinder volume dependence on\nradius and length", instrX, instr2Y);
+            vidContainer.style.right = `0px`;
+            vidContainer.style.top = `${instr2Y + 4*lnHt}px`;
+            vidContainer.style.width = `${2*dims/5}px`;
+            vidContainer.style.height = `${2*dims/5}px`;
             break;
         case 2:
-            text(`Click the state variable you would like held constant\n(options are colored)`, instrX, instrY);
+            if(cylinder) {
+                text(`Click the dimension you would like held constant\n(options are colored)`, instrX, instrY);
+                vidContainer.style.transition = `all ${2 / animSpeedMult}s`;
+                /*vidContainer.style.left = "10%";
+                vidContainer.style.top = `${texY + 3.5 * lnHt}px`
+                vidContainer.style.width = `${2*dims/3}px`;
+                vidContainer.style.height = `${2*dims/3}px`; */
+            }
+            else {
+                text(`Click the state variable you would like held constant\n(options are colored)`, instrX, instrY)
+            }
+            
             for(let i = 0; i < domObjs.length; i++) {
                 if (i != choices[0]) {domObjs[i].div.remove()}
             }
             effect = [];
             //console.log(document.querySelectorAll('mjx-container')[0].firstChild.classList.value);
             eqnLetterObjs = document.querySelectorAll('mjx-container')[0].firstChild.childNodes;
-            coloredLetters = choices[0] == 0 || choices[0] == 2 ? [5,9] : choices[0] == 1 || choices[0] == 3 ? [6,10] : [0, 1];
+            coloredLetters = choices[0] == 0 || choices[0] == 2 ? [5,9] : choices[0] == 1 || choices[0] == 3 ? [6,10] : [5, 9];
             for(let i = 0; i < coloredLetters.length; i++) {
                 let element = eqnLetterObjs[coloredLetters[i]];
                 let id = `${i}`;
@@ -120,7 +147,21 @@ function drawPage(p) {
             loop();
             break;
         case 4:
-            text("With constant", instrX, instrY);
+            vDuration = vid.duration;
+            if(cylinder) {
+                txt = `With constant ${choices[1] == "0" ? 'radius ' : 'length '} `;
+                txt2 = 'and we know that the volume of a cylinder is ';
+                txt3 = `therefore, volume changes with\n${choices[1] == "1" ? 'radius' : 'length'} according to the following: `;
+                volumeText = new Tex({"content":`V=\u03C0r\u00B2L`,"position":[texX, texY + 4*lnHt], "name":"volumeEqn"});
+                volumeText.div.id('volumeText');
+                volumeTextDOMObj = document.getElementById('volumeText');
+                volumeTextDOMObj.style.fontSize = `${largeFontSize}rem`;
+                volumeTextDOMObj.style.opacity = "0";
+            }
+            else {
+                txt = "With constant ";
+                txt2 = `therefore,`;
+            }
             let newTex = domObjs[domObjs.length - 1];
             newTex.div.show();
             newTex.div.style('opacity','0');
@@ -132,8 +173,8 @@ function drawPage(p) {
             next(4, null);
             break;
         case 5:
-            text("With constant ", instrX, instrY);
-            sWidth = textWidth("With constant ");
+            text(txt, instrX, instrY);
+            sWidth = textWidth(txt);
             cnst = new Tex({"content": `${constant},`, "position":[instrX + sWidth + 0.05*lnHt, instrY - 0.1*lnHt]});
             cnst.div.id('constantLetter'); effect.push({"target":document.getElementById('constantLetter'), "effect":"color", "color":`${choices[1] == 1 ? 1 : 0}`});
             effects = true;
@@ -141,22 +182,48 @@ function drawPage(p) {
             window.setTimeout((e)=>{update = true}, textDelay);
             break;
         case 6:
-            text("With constant", instrX, instrY);
-            text(`therefore,`, instrX, texY + 2.5*lnHt);
+            text(txt, instrX, instrY);
+            text(txt2, instrX, texY + 3*lnHt);
+            if(cylinder) {
+                window.setTimeout((e)=>{volumeTextDOMObj.style.opacity = "1"}, textDelay);
+                window.setTimeout((e)=>{update = true}, 2 * textDelay);
+            } else {
             window.setTimeout((e)=>{update = true}, textDelay);
+            }
             page++;
             break;
         case 7:
-            text("With constant", instrX, instrY);
-            text(`therefore,`, instrX, texY + 2.5*lnHt);
-            stateFunc1.style.top = `${texY + 4*lnHt}px`;
-            stateFunc1.style.opacity = "1";
-            window.setTimeout((e)=>{update = true}, textDelay);
+            text(txt, instrX, instrY);
+            text(txt2, instrX, texY + 3*lnHt);
+            if(cylinder) {
+                text(txt3, instrX, getCoords(volumeTextDOMObj).bottom + lnHt);
+                start = choices[1] == "0" ? 0 : vDuration / 4;
+                window.setTimeout((e)=>{
+                    stateFunc1.style.top = `${getCoords(volumeTextDOMObj).bottom + 3 * lnHt}px`;
+                    stateFunc1.style.opacity = `1`;
+                    vid.currentTime = start;
+                    vid.play();
+                }, textDelay);
+                vid.addEventListener("timeupdate", function(){
+                    if(this.currentTime >= start + vDuration / 4 - 0.25) {
+                        this.pause();
+                    }
+                });
+                window.setTimeout((e)=>{update = true}, 2 * textDelay);
+            }
+            else {
+                stateFunc1.style.top = `${texY + 5*lnHt}px`;
+                stateFunc1.style.opacity = "1";
+                window.setTimeout((e)=>{update = true}, textDelay);
+            }
             page++;
             break;
         case 8:
-            text("With constant", instrX, instrY);
-            text(`therefore,`, instrX, texY + 2.5*lnHt);
+            text(txt, instrX, instrY);
+            text(txt2, instrX, texY + 3*lnHt);
+            if(cylinder) {
+                text(txt3, instrX, getCoords(volumeTextDOMObj).bottom + lnHt);
+            }
             text("click anywhere to continue.", instrX, getCoords(stateFunc1).bottom + lnHt);
             document.getElementsByClassName('p5Canvas')[0].addEventListener("mousedown", () => {next(8, null)});
             break;
@@ -176,8 +243,8 @@ function drawPage(p) {
         case 10:
             choices[1] = choices[1] == 0 ? 1 : 0;
             effect = [];
-
-            let txtTop = `Now, the other state function must be derived. `;
+            stateFunc1.style.opacity = 0.3;
+            let txtTop = cylinder ? `Now, let's examine volume change with respect to ${choices[1] == "1" ? 'radius.' : 'length.'}` : `Now, the other state function must be derived. `;
             let txtBottom = `Click `;
 
             sWidth = textWidth(txtTop);
@@ -191,10 +258,10 @@ function drawPage(p) {
             cnst3.div.id('constantLetter3'); effect.push({"target":document.getElementById('constantLetter3'), "effect":"color", "color":`${choices[1] == 1 ? 1 : 0}`});
             
             text(`${txtTop}\n${txtBottom}`, instrX, instrY);
-            text('\n to hold it constant.', getCoords(document.getElementById('constantLetter3')).right + 0.05*lnHt, instrY);
+            text(`\n to hold ${cylinder ? choices[1] == 0 ? "radius" : "length" : "it"} constant.`, getCoords(document.getElementById('constantLetter3')).right + 0.05*lnHt, instrY);
             
             for(i = 0; i < domObjs.length; i++) {
-                domObjs[i].div.style('z-index', '1');
+                domObjs[i].div.style('z-index', '2');
             }
             let newElement = choices[1] == 0 ? 0 : 1;
             let newListener = eqnLetterObjs[coloredLetters[newElement]];
@@ -217,7 +284,16 @@ function drawPage(p) {
             loop();
             break;
         case 12:
-            text("With constant", instrX, instrY);
+            if(cylinder) {
+                txt = `With constant ${choices[1] == "0" ? 'radius ' : 'length '} `;
+                txt2 = 'and we know that the volume of a cylinder is ';
+                txt3 = `therefore, volume changes with\n${choices[1] == "1" ? 'radius' : 'length'} according to the following: `;
+            }
+            else {
+                txt = "With constant ";
+                txt2 = `therefore,`;
+            }
+            text(txt, instrX, instrY);
             let newTex2 = domObjs[domObjs.length - 1];
             newTex2.div.show();
             newTex2.div.style('opacity','0');
@@ -229,8 +305,8 @@ function drawPage(p) {
             next(12, null);
             break;
         case 13:
-            text("With constant ", instrX, instrY);
-            sWidth = textWidth("With constant ");
+            text(txt, instrX, instrY);
+            sWidth = textWidth(txt);
             cnst4 = new Tex({"content": `${constant},`, "position":[instrX + sWidth + 0.05*lnHt, instrY - 0.1*lnHt]});
             cnst4.div.id('constantLetter4'); effect.push({"target":document.getElementById('constantLetter4'), "effect":"color", "color":`${choices[1] == 1 ? 1 : 0}`});
             effects = true;
@@ -238,26 +314,59 @@ function drawPage(p) {
             window.setTimeout((e)=>{update = true}, textDelay);
             break;
         case 14:
-            text("With constant", instrX, instrY);
-            text(`therefore,`, instrX, texY + 2.5*lnHt);
-            window.setTimeout((e)=>{update = true}, textDelay);
+            text(txt, instrX, instrY);
+            text(txt2, instrX, texY + 3*lnHt);
+            if(cylinder) {
+                window.setTimeout((e)=>{volumeTextDOMObj.style.display = "block"}, textDelay);
+                window.setTimeout((e)=>{update = true}, 2 * textDelay);
+            } else {
+                window.setTimeout((e)=>{update = true}, textDelay);
+            }
             page++;
             break;
         case 15:
-            text("With constant", instrX, instrY);
-            text(`therefore,`, instrX, texY + 2.5*lnHt);
-            stateFunc2.style.top = `${texY + 4*lnHt}px`;
-            stateFunc2.style.opacity = "1";
-            window.setTimeout((e)=>{update = true}, textDelay);
+            text(txt, instrX, instrY);
+            text(txt2, instrX, texY + 3*lnHt);
+            if(cylinder) {
+                text(txt3, instrX, getCoords(volumeTextDOMObj).bottom + lnHt);
+                vid.removeEventListener("timeupdate", function(){
+                    if(this.currentTime >= start + vDuration / 4 - 0.25) {
+                        this.pause();
+                    }
+                });
+                start = choices[1] == "0" ? 0 : vDuration / 4;
+                window.setTimeout((e)=>{
+                    stateFunc2.style.top = `${getCoords(volumeTextDOMObj).bottom + 3 * lnHt}px`;
+                    stateFunc2.style.opacity = "1";
+                    vid.currentTime = start;
+                    vid.play();
+                }, textDelay);
+                vid.addEventListener("timeupdate", function(){
+                    if(this.currentTime >= start + vDuration / 4 - 0.25) {
+                        this.pause();
+                    }
+                });
+                window.setTimeout((e)=>{update = true}, 2 * textDelay);
+            }
+            else {
+                stateFunc2.style.top = `${texY + 5*lnHt}px`;
+                stateFunc2.style.opacity = "1";
+                window.setTimeout((e)=>{update = true}, textDelay);
+            }
             page++;
             break;
         case 16:
-            text("With constant", instrX, instrY);
-            text(`therefore,`, instrX, texY + 2.5*lnHt);
+            text(txt, instrX, instrY);
+            text(txt2, instrX, texY + 3*lnHt);
+            if(cylinder) {
+                text(txt3, instrX, getCoords(volumeTextDOMObj).bottom + lnHt);
+            };
             text("click anywhere to continue.", instrX, getCoords(stateFunc2).bottom + lnHt);
             document.getElementsByClassName('p5Canvas')[0].addEventListener("mousedown", () => {next(16, null)});
             break;
         case 17:
+            stateFunc1.style.opacity = "1";
+            if(cylinder) {volumeTextDOMObj.style.display = "none";}
             eqnLetterObjs.forEach((elt) => {elt.style.visibility = "inherit"; elt.style.opacity = "0";  elt.style.transform = `translateX(0px)`});
             stateFunc2.style.transition = `all ${s}s`
             stateFunc2.style.top = `${getCoords(stateFunc1).top - getCoords(stateFunc2).height - lnHt}px`;
@@ -280,7 +389,6 @@ function drawPage(p) {
         case 18:
             text("The order of differentiation does not matter for second\n derivatives. So:", instrX, instrY);
             symmetry.div.style('visibility', 'visible');
-
             sym = document.getElementById('symmetry');
             let xItems = [
                 sym.firstChild.firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].firstChild.childNodes[1].childNodes[1], 
@@ -311,10 +419,10 @@ function drawPage(p) {
             symmetry.div.style('opacity', '1');
 
             window.setTimeout(() => {
-                text("click on one of the state functions below\nto substitute it into the equation above.", instrX, getCoords(sym).bottom + 2 * lnHt);
-                stateFunc1.style.zIndex = "1";
+                text(`click on one of the ${cylinder ? "partial derivatives" : "state functions"} below\nto substitute it into the equation above.`, instrX, getCoords(sym).bottom + 2 * lnHt);
+                stateFunc1.style.zIndex = "2";
                 stateFunc1.addEventListener("mousedown", () => {next(18, 0)});
-                stateFunc2.style.zIndex = "1";
+                stateFunc2.style.zIndex = "2";
                 stateFunc2.addEventListener("mousedown", () => {next(18, 1)});
             }, textDelay);
             break;
@@ -330,14 +438,30 @@ function drawPage(p) {
             break;
         case 20:
             
-            endSolution = `${motionText2[0] == "-" ? motionText1[0] == "-" ? " " : "-" : " "}\\Big( \\frac{\\partial ${motionText2[0] == "-" || motionText2[0] == "+" ? motionText2[1] : motionText2[0]}}{\\partial ${constant}} \\Big)_{\\scriptscriptstyle ${partials[1]} } = ${motionText1[0] == "-" ? motionText2[0] == "-" ? " " : "-" : " "} \\Big( \\frac{\\partial ${motionText1[0] == "-" || motionText1[0] == "+" ? motionText1[1] : motionText1[0]}}{\\partial ${partials[1]}} \\Big)_{\\scriptscriptstyle ${constant}}`;
+            if(cylinder) {
+                endSolution = "2 \u03C0 r = 2 \u03C0 r";
+            } else {
+                endSolution = `${motionText2[0] == "-" ? motionText1[0] == "-" ? " " : "-" : " "}\\Big( \\frac{\\partial ${motionText2[0] == "-" || motionText2[0] == "+" ? motionText2[1] : motionText2[0]}}{\\partial ${constant}} \\Big)_{\\scriptscriptstyle ${partials[1]} } = ${motionText1[0] == "-" ? motionText2[0] == "-" ? " " : "-" : " "} \\Big( \\frac{\\partial ${motionText1[0] == "-" || motionText1[0] == "+" ? motionText1[1] : motionText1[0]}}{\\partial ${partials[1]}} \\Big)_{\\scriptscriptstyle ${constant}}`;
+            }
             domObjs.push(new Tex({"content":endSolution,"position":[texX + 1.5 * lnHt, getCoords(sym).bottom + 3 * lnHt], "name":"es"}));
             domObjs[domObjs.length - 1].div.id('endSolution');
             endSolutionDOMobj = document.getElementById('endSolution');
             endSolutionDOMobj.style.fontSize = `${largeFontSize}rem`;
             endSolutionDOMobj.style.opacity = "0";
             window.setTimeout(() => {
-                text("The equation above simplifies to a Maxwell Relation!", instrX, getCoords(sym).bottom + 1.25*lnHt);
+                if(cylinder) {
+                    text("Simplifying the equation above,\nwe find equivalency!", instrX, getCoords(sym).bottom + lnHt);
+                    start = vDuration;
+                    vid.removeEventListener("timeupdate", function(){
+                        if(this.currentTime >= start + vDuration / 4 - 0.25) {
+                            this.pause();
+                        }
+                    });
+                    vid.currentTime = `${vDuration / 2}`;
+                    //vid.play();
+                } else {
+                    text("The equation above simplifies to a Maxwell Relation!", instrX, getCoords(sym).bottom + 1.25*lnHt);
+                };
                 window.setTimeout(() => {    
                     endSolutionDOMobj.style.transition = `all ${1/animSpeedMult}s`;
                     endSolutionDOMobj.style.opacity = "1";
@@ -349,6 +473,9 @@ function drawPage(p) {
 }
 
 function next(p, c) {
+    const pi = '\u03C0';
+    const sqrd = '\u00B2';
+    let s;
     if(p == page) {
         switch(page) {
             case 1:
@@ -358,6 +485,7 @@ function next(p, c) {
                     let element = document.getElementById(`eq${i}`);
                     effect.push({"target":element, "effect":event});
                 }
+                if(c == 4) {cylinder = true} else {vidContainer.style.display = "none"}
                 /* domObjs[i].div.remove(); */
                 effects = true;
                 redraw();
@@ -366,7 +494,7 @@ function next(p, c) {
                 break;
             case 2:
                 choices.push(c);
-                str = eqns['fundamentals'][k[choices[0]]];
+                str = cylinder ? 'dV=Jdr+KdL': eqns['fundamentals'][k[choices[0]]];
                 // calculates the constant
                 constantIndex = coloredLetters[c];
                 constant = str.charAt(constantIndex);
@@ -375,7 +503,8 @@ function next(p, c) {
                 partialsIndex.push(c == 0 ? coloredLetters[1] - 1 : coloredLetters[0] - 1);
                 partialsIndex.push(c == 0 ? coloredLetters[1] : coloredLetters[0]);
                 // calculates the right-hand side of the state function e.g. '-T', 'V'
-                m = str.charAt(partialsIndex[2] - 1);
+                s = str.charAt(partialsIndex[2] - 1);
+                m = s == "J" ? `2${pi}rL` : s == "K" ? `${pi}r${sqrd}` : s;
                 if(str.charAt(partialsIndex[2] - 2)=="-"){rhs=`-${m}`} else {rhs=`${m}`}
                 // the string array of the differential terms is called 'partials'
                 partials = [];
@@ -395,6 +524,7 @@ function next(p, c) {
                 break;
             case 8:
                 update = true;
+                if(cylinder) {volumeTextDOMObj.style.display = "none"}
                 page++;
                 break;
             case 10:
@@ -404,7 +534,8 @@ function next(p, c) {
                 partialsIndex = [0, 1];
                 partialsIndex.push(c == 0 ? coloredLetters[1] - 1 : coloredLetters[0] - 1);
                 partialsIndex.push(c == 0 ? coloredLetters[1] : coloredLetters[0]);
-                m = str.charAt(partialsIndex[2] - 1);
+                s = str.charAt(partialsIndex[2] - 1);
+                m = s == "J" ? `2${pi}rL` : s == "K" ? `${pi}r${sqrd}` : s;
                 if(str.charAt(partialsIndex[2] - 2)=="-"){rhs=`-${m}`} else {rhs=`${m}`}
                 partials = [];
                 for(i = 0; i < partialsIndex.length; i++) {partials.push(str[partialsIndex[2 * i + 1]])}
@@ -445,9 +576,15 @@ function replacePartials(c) {
     hidePartial2 = [sym.firstChild.firstChild.childNodes[0], sym.firstChild.firstChild.childNodes[3], sym.firstChild.firstChild.childNodes[4], stateFunc2.firstChild.firstChild.childNodes[0], stateFunc2.firstChild.firstChild.childNodes[1]];
     motionText1 = selectItem(str, eqnLetterObjs, choices[1], true);
     motionText2 = selectItem(str, eqnLetterObjs, choices[1] == 0 ? 1 : 0, true);
-    showPartial1 = motionText1[0] == "-" ? [stateFunc1.firstChild.firstChild.childNodes[2], stateFunc1.firstChild.firstChild.childNodes[3]] : [stateFunc1.firstChild.firstChild.childNodes[2]];
-    showPartial2 = motionText2[0] == "-" ? [stateFunc2.firstChild.firstChild.childNodes[2], stateFunc2.firstChild.firstChild.childNodes[3]] : [stateFunc2.firstChild.firstChild.childNodes[2]];
 
+    if(cylinder) {
+        showPartial1 = choices[1] == "0" ? [stateFunc1.firstChild.firstChild.childNodes[2], stateFunc1.firstChild.firstChild.childNodes[3], stateFunc1.firstChild.firstChild.childNodes[4], stateFunc1.firstChild.firstChild.childNodes[5]] : [stateFunc1.firstChild.firstChild.childNodes[2], stateFunc1.firstChild.firstChild.childNodes[3], stateFunc1.firstChild.firstChild.childNodes[4]];
+        showPartial2 = choices[1] == "1" ? [stateFunc2.firstChild.firstChild.childNodes[2], stateFunc2.firstChild.firstChild.childNodes[3], stateFunc2.firstChild.firstChild.childNodes[4], stateFunc2.firstChild.firstChild.childNodes[5]] : [stateFunc2.firstChild.firstChild.childNodes[2], stateFunc2.firstChild.firstChild.childNodes[3], stateFunc2.firstChild.firstChild.childNodes[4]];
+    } else {
+        showPartial1 = motionText1[0] == "-" ? [stateFunc1.firstChild.firstChild.childNodes[2], stateFunc1.firstChild.firstChild.childNodes[3]] : [stateFunc1.firstChild.firstChild.childNodes[2]];
+        showPartial2 = motionText2[0] == "-" ? [stateFunc2.firstChild.firstChild.childNodes[2], stateFunc2.firstChild.firstChild.childNodes[3]] : [stateFunc2.firstChild.firstChild.childNodes[2]];
+    }
+    const adjust = cylinder ? lnHt / 2 : 0;
     if(c == 0) {
         hidePartial1.forEach((elm) => {
             elm.style.transition = `all ${2/animSpeedMult}s`;
@@ -456,11 +593,11 @@ function replacePartials(c) {
         for(let i = 0; i < showPartial1.length; i++) {
             let elm = showPartial1[i];
             elm.style.transition = `all ${2/animSpeedMult}s`;
-            //elm.style.fontSize = `${largeFontSize * 0.5}rem`;
             elm.style.transform = `translate(
-                ${getCoords(hidePartial1[1]).left - (getCoords(showPartial1[0]).left + getCoords(showPartial1[showPartial1.length - 1]).left) / 2 + 0.75 * lnHt}px,
-                ${(getCoords(hidePartial1[0]).top + getCoords(hidePartial1[0]).bottom) / 2 - (getCoords(elm).bottom + getCoords(elm).top) / 2}px
+                ${adjust + getCoords(hidePartial1[1]).left - (getCoords(showPartial1[0]).left + getCoords(showPartial1[showPartial1.length - 1]).left) / 2 + 0.75 * lnHt}px,
+                ${(getCoords(hidePartial1[0]).top + getCoords(hidePartial1[0]).bottom) / 2 - getCoords(showPartial1[0]).bottom + 0.5 * lnHt}px
                 )`;
+            if(cylinder) {elm.style.fontSize = `${largeFontSize * 0.75}rem`;}
         }; 
     } else {
         hidePartial2.forEach((elm) => {
@@ -470,12 +607,12 @@ function replacePartials(c) {
         for(let i = 0; i < showPartial2.length; i++) {
             let elm = showPartial2[i];
             elm.style.transition = `all ${2/animSpeedMult}s`;
-            //elm.style.fontSize = `${largeFontSize * 0.5}rem`;
             let j = `translate(
-                ${getCoords(hidePartial2[1]).left - (getCoords(showPartial2[0]).left + getCoords(showPartial2[showPartial2.length - 1]).left) / 2 + 0.75 * lnHt}px,
-                ${(getCoords(hidePartial2[0]).top + getCoords(hidePartial2[0]).bottom) / 2 - (getCoords(elm).bottom + getCoords(elm).top) / 2}px
+                ${adjust + getCoords(hidePartial2[1]).left - (getCoords(showPartial2[0]).left + getCoords(showPartial2[showPartial2.length - 1]).left) / 2 + 0.75 * lnHt}px,
+                ${(getCoords(hidePartial2[0]).top + getCoords(hidePartial2[0]).bottom) / 2 - getCoords(showPartial2[0]).bottom + 0.5 * lnHt}px
                 )`;
             elm.style.transform = j;
+            if(cylinder) {elm.style.fontSize = `${largeFontSize * 0.75}rem`;}
         }; 
     }
 }
@@ -500,7 +637,7 @@ function windowResized(init) {
 
     let ww = windowWidth;
     let wh = windowHeight;
-    let dims = Math.min(ww, wh);
+    dims = Math.min(ww, wh);
     w = dims / 100;
     h = dims / 100;
     resizeFont();

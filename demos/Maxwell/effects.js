@@ -61,7 +61,7 @@ function applyEffect(a) {
                         effects = true;
                         update = false;
                         for(i = 0; i < domObjs.length; i++) {
-                            domObjs[i].div.style('z-index', '-1');
+                            domObjs[i].div.style('z-index', '0');
                         }
                         loop();
                     } else if(running && prg < tStamps[1]) {
@@ -109,7 +109,7 @@ function applyEffect(a) {
                             slide.style.top = `${texY}px`;
                             let distLeft = refLeft - getCoords(eqnLetterObjs[2]).left
                             let curLeft = getCoords(eqnLetterObjs[0]).left;
-                            slide.style.left = `${curLeft + distLeft}px`;
+                            //slide.style.left = `${curLeft + distLeft}px`;
                         }
                         prg += animSpeeds[4];
                     } else if(running && prg < tStamps[6]){
