@@ -428,7 +428,7 @@ function drawPage(p) {
             break;
         case 19:
             window.setTimeout(() => {
-                text("now, click the other state function to substitute it.", instrX, getCoords(sym).bottom + 2 * lnHt);
+                text(`now, click the other ${cylinder ? "partial derivative" : "state function"} to substitute it.`, instrX, getCoords(sym).bottom + 2 * lnHt);
                 if(choices[2] == 0) {
                 stateFunc2.addEventListener("mousedown", () => {next(19, 1)});
                 } else {
