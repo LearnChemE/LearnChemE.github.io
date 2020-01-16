@@ -98,7 +98,7 @@ function drawPage(p) {
             }
 
             const instr2Y = getCoords(document.getElementById(`eq${Object.keys(eqns['fundamentals']).length - 1}`)).top - 3.5 * lnHt;
-            text("Or to better understand exact differentials, click\nthis equation of cylinder volume dependence on\nradius and length", instrX, instr2Y);
+            text("To better understand exact differentials, click\nthis equation of cylinder volume dependence\non radius and length", instrX, instr2Y);
             vidContainer.style.right = `0px`;
             vidContainer.style.top = `${instr2Y + 4*lnHt}px`;
             vidContainer.style.width = `${2*dims/5}px`;
