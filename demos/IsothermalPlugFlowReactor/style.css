@@ -120,10 +120,11 @@ body {
   grid-area: button3;
 }
 
-.title {
+#title {
 	grid-area: title;
 	transform: translateY(40px) translateX(-80px);
 	z-index: 9;
+	font-size: 1.25rem;
 }
 
 #title1 {
