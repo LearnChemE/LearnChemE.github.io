@@ -2,7 +2,7 @@
  * @module QuickSettings
  */
 (function () {
-
+   
     ////////////////////////////////////////////////////////////////////////////////
     // region PRIVATE GENERIC UTILS
     ////////////////////////////////////////////////////////////////////////////////
@@ -1231,7 +1231,7 @@
             input.max = max || 100;
             input.step = step || 1;
             input.value = Number.parseFloat(value).toFixed(prec) || 0;
-
+            console.log(this.name);
             label.innerHTML = "<b>" + name + ":</b> " + Number.parseFloat(input.value).toFixed(prec) + " " + units;
 
 
@@ -1248,6 +1248,7 @@
                 setValue: function (value) {
                     this.control.value = value;
                     this.label.innerHTML = "<b>" + this.name + ":</b> " + Number.parseFloat(this.control.value).toFixed(prec) + " " + units;
+                    console.log(this.name);
                     if (callback) {
                         callback(parseFloat(value));
                     }
@@ -1260,11 +1261,14 @@
             }
             var self = this;
             input.addEventListener(eventName, function () {
-                label.innerHTML = "<b>" + name + ":</b> " + Number.parseFloat(input.value).toFixed(prec) + " " + units;
+                let unit1;
+                if (name == "reaction rate constant <i>k</i>") {unit1 = window["kInnerHTML"]} else {unit1 = ""};
+                label.innerHTML = "<b>" + name + ":</b> " + Number.parseFloat(input.value).toFixed(prec) + " " + unit1;
                 if (callback) {
                     callback(parseFloat(input.value));
                 }
                 self._callGCH(title);
+                if (name == "reaction order of B") {document.getElementById('kunits').innerHTML = window["kInnerHTML"]}
             });
             return this;
         },

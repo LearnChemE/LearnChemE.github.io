@@ -26,6 +26,8 @@ var n;
 var title = `\\(\\mathrm{ A+2B \\rightarrow C \\qquad\\qquad } r = 0.50 \\mathrm{ C_{A}C_{B} \\;  \\frac{mol}{m^{3}s} } \\)`;
 var titleDOM;
 let mjready = false;
+let kunits;
+window["kInnerHTML"] = '<span id="kunits">m<sup>3</sup>/(mol s)</span>';
 
 const sim = math.parser();
 
@@ -125,7 +127,24 @@ function updateData() {
   FB.unshift([0, (1 - xA0) * u]);
   FC.unshift([0, 0]);
 
+  adjustUnits();
+}
 
+function adjustUnits() {
+  switch(n) {
+    case 0:
+      window["kInnerHTML"] = '<span id="kunits">s<sup>-1</sup></span>';
+      kunits.innerHTML = window["kInnerHTML"];
+      break;
+    case 1:
+      window["kInnerHTML"] = '<span id="kunits">m<sup>3</sup>/(mol s)</span>';
+      kunits.innerHTML = window["kInnerHTML"];
+      break;
+    case 2:
+      window["kInnerHTML"] = '<span id="kunits">m<sup>6</sup>/(mol<sup>2</sup> s)</span>';
+      kunits.innerHTML = window["kInnerHTML"];
+      break;  
+  };
 }
 
 /**
@@ -167,8 +186,9 @@ function setup() {
   // Create the GUI using p5.gui.js
   gui = createGui('Plot Controls', clientWidth - 10, mainPlot.GPLOT.mar[2] + 100);
   gui.newSlider('xA0', 0, 1, 0.5, 0.01, 'inlet mole fraction A');
-  gui.newSlider('k', 0, 1, 0.5, 0.01, 'reaction rate constant <i>k</i>','<span id="kunits">L / mol</span>');
+  gui.newSlider('k', 0, 1, 0.5, 0.01, 'reaction rate constant <i>k</i>',`${window["kInnerHTML"]}`);
   gui.newSlider('n', 0, 2, 1, 1, 'reaction order of B');
+  kunits = document.getElementById("kunits");
   updateData();
 
   FaFunction = new ArrayPlot(FA);
