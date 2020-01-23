@@ -10,24 +10,29 @@ var aspRatio = 1;
 var clientHeight = clientWidth * aspRatio;
 
 var gui;
-var vfinal = 5;
-var dv = 0.1;
+var tfinal = 20;
+var dt = 0.01;
 var mainPlot;
 var equation;
 
-var FA;
-var FB;
-var FC;
-var xA0;
-var k;
-var u = 1;
+var T;
+var Ed;
+var Eu;
+
+var NA, NB, ND, NU;
+var NaFunction, NbFunction, NdFunction, NuFunction;
+var Na0 = 0;
+var Nb0 = 100;
+var Nd0 = 0;
+var Nu0 = 0;
+var V0 = 10;
 var n;
 
-var title = `\\(\\mathrm{ A+2B \\rightarrow C \\qquad\\qquad } r = 0.50 \\mathrm{ C_{A}C_{B} \\;  \\frac{mol}{m^{3}s} } \\)`;
+function overText(under, over) {return `\\mathrel{\\stackrel{${over}}{${under}}}`};
+
+var title = `\\(\\mathrm{ A+B ${overText("\\rightarrow", "k_{D}")} D \\qquad\\qquad } \\mathrm{ A+B ${overText("\\rightarrow", "k_{U}")} U \\qquad\\qquad } \\)`;
 var titleDOM;
 let mjready = false;
-let kunits;
-window["kInnerHTML"] = '<span id="kunits">m<sup>3</sup>/(mol s)</span>';
 
 const sim = math.parser();
 
@@ -40,111 +45,62 @@ const sim = math.parser();
  */
 function updateData() {
   // set initial conditions and constants
-  sim.eval(`Ca0 = ${xA0}`);
-  sim.eval(`Cb0 = ${1 - xA0}`);
-  sim.eval(`Cc0 = 0`);
-  sim.eval(`k = ${k}`);
-  sim.eval(`u = ${u}`);
-  sim.eval(`n = ${n}`);
+  sim.eval('R = 0.008314');
+  sim.eval(`T = ${T}`);
+  sim.eval(`Ed = ${Ed}`);
+  sim.eval(`Eu = ${Eu}`);
+  sim.eval(`kd = 1.22*(10^22)*e^(-Ed/(R*T))`);
+  sim.eval(`ku = 3.79*(10^23)*e^(-Eu/(R*T))`);
 
-  sim.eval(`vfinal = ${vfinal}`);
-  sim.eval(`dv = ${dv}`);
+  //sim.eval(`rd = (kd * (Na / V) * ((Nb / V) ^ 2))`);
+  //sim.eval(`ru = (ku * (Na / V) * (Nb / V))`);
+
+  sim.eval(`Na0 = ${Na0}`);
+  sim.eval(`Nb0 = ${Nb0}`);
+  sim.eval(`Nd0 = ${Nd0}`);
+  sim.eval(`Nu0 = ${Nu0}`);
+  sim.eval(`V0 = ${V0}`);
+
+  sim.eval(`dt = ${dt}`);
+  sim.eval(`tfinal = ${tfinal}`);
 
   // define differential equations
-  sim.eval("dCadv(Ca, Cb, Cc) = -k * Ca * (Cb ^ n) / u");
-  sim.eval("dCbdv(Ca, Cb, Cc) = -2 * k * Ca * (Cb ^ n) / u");
-  sim.eval("dCcdv(Ca, Cb, Cc) = k * Ca * (Cb ^ n) / u");
+  sim.eval('dNadt(Na, Nb, Nd, Nu, V) = 10 - ((kd * (Na / V) * ((Nb / V) ^ 2)) * V) - ((ku * (Na / V) * (Nb / V)) * V)');
+  sim.eval('dNbdt(Na, Nb, Nd, Nu, V) = -V * ((kd * (Na / V) * ((Nb / V) ^ 2)) + (ku * (Na / V) * (Nb / V)))');
+  sim.eval('dNddt(Na, Nb, Nd, Nu, V) = (kd * (Na / V) * ((Nb / V) ^ 2)) * V');
+  sim.eval('dNudt(Na, Nb, Nd, Nu, V) = (ku * (Na / V) * (Nb / V)) * V');
+  sim.eval('dVdt(Na, Nb, Nd, Nu, V) = 1');
 
   // evaluate system of ODEs and create an array from the result
-  sim.eval("result = ndsolve([dCadv, dCbdv, dCcdv], [Ca0, Cb0, Cc0], dv, vfinal)");
+  sim.eval("result = ndsolve([dNadt, dNbdt, dNddt, dNudt, dVdt], [Na0, Nb0, Nd0, Nu0, V0], dt, tfinal)");
 
-  let Ca = sim.eval("transpose(concat(transpose(result[:,1]),1))").toArray().map(function(e) { return e[0];});
-  let Cb = sim.eval("transpose(concat(transpose(result[:,2]),1))").toArray().map(function(e) { return e[0];});
-  let Cc = sim.eval("transpose(concat(transpose(result[:,3]),1))").toArray().map(function(e) { return e[0];});
+  let Na = sim.eval("transpose(concat(transpose(result[:,1]),1))").toArray().map(function(e) { return e[0];});
+  let Nb = sim.eval("transpose(concat(transpose(result[:,2]),1))").toArray().map(function(e) { return e[0];});
+  let Nd = sim.eval("transpose(concat(transpose(result[:,3]),1))").toArray().map(function(e) { return e[0];});
+  let Nu = sim.eval("transpose(concat(transpose(result[:,4]),1))").toArray().map(function(e) { return e[0];});
 
   let zeroIndex = -1;
-  let CaCbZero;
-  let tempCa, tempCb, tempCc;
+  let l = Na.length;
 
-  for(let i = 0; i < Ca.length; i++) {
-    if(Ca[i] <= 0) {
-      zeroIndex = i;
-      CaCbZero = "Ca";
-      break;
-    }
-    if(Cb[i] <= 0) {
-      zeroIndex = i;
-      CaCbZero = "Cb";
-      break;
-    }
-  }
+  NA = new Array(l);
+  NB = new Array(l);
+  ND = new Array(l);
+  NU = new Array(l);
 
-  if(zeroIndex >= 0) {
-    sim.eval(`Ca0 = ${CaCbZero == "Ca" ? 0 : xA0 - ((1 - xA0) / 2)}`);
-    sim.eval(`Cb0 = ${CaCbZero == "Cb" ? 0 : (1 - 2 * xA0)}`);
-    sim.eval(`Cc0 = ${CaCbZero == "Ca" ? xA0 : ((1 - xA0) / 2)}`);
-    sim.eval(`k = ${k}`);
-    sim.eval(`u = ${u}`);
-    sim.eval(`n = ${n}`);
-  
-    sim.eval(`vfinal = ${vfinal * (1 - (zeroIndex / Ca.length))}`);
-    sim.eval(`dv = ${dv}`);
-  
-    // define differential equations
-    sim.eval(`dCadv(Ca, Cb, Cc) = 0`);
-    sim.eval(`dCbdv(Ca, Cb, Cc) = 0`);
-    sim.eval(`dCcdv(Ca, Cb, Cc) = 0`);
-  
-    // evaluate system of ODEs and create an array from the result
-    sim.eval("result = ndsolve([dCadv, dCbdv, dCcdv], [Ca0, Cb0, Cc0], dv, vfinal)");
-  
-    tempCa = sim.eval("transpose(concat(transpose(result[:,1]),1))").toArray().map(function(e) { return e[0];});
-    tempCb = sim.eval("transpose(concat(transpose(result[:,2]),1))").toArray().map(function(e) { return e[0];});
-    tempCc = sim.eval("transpose(concat(transpose(result[:,3]),1))").toArray().map(function(e) { return e[0];});
-  
-    for(let i = 0; i < tempCa.length; i++) {
-      Ca[zeroIndex + i] = tempCa[i];
-      Cb[zeroIndex + i] = tempCb[i];
-      Cc[zeroIndex + i] = tempCc[i];
-    }
-  }
-
-  let l = Ca.length;
-
-  FA = new Array(l);
-  FB = new Array(l);
-  FC = new Array(l);
-
-  for (i = 0; i < FA.length; i++) {
-    let v = (vfinal/l) * (i + 1);
-    FA[i]=[v, Ca[i] * u];
-    FB[i]=[v, Cb[i] * u];
-    FC[i]=[v, Cc[i] * u];
+  for (i = 0; i < l; i++) {
+    let t = (tfinal/l) * (i + 1);
+    NA[i]=[t, Na[i]];
+    NB[i]=[t, Nb[i]];
+    ND[i]=[t, Nd[i]];
+    NU[i]=[t, Nu[i]];
   }
 
   // add initial conditions to beginning of array. Initial selectivity is technically infinite.
-  FA.unshift([0, xA0 * u]);
-  FB.unshift([0, (1 - xA0) * u]);
-  FC.unshift([0, 0]);
+  NA.unshift([0, Na0]);
+  NB.unshift([0, Nb0]);
+  ND.unshift([0, Nd0]);
+  NU.unshift([0, Nu0]);
 
-  adjustUnits();
-}
-
-function adjustUnits() {
-  switch(n) {
-    case 0:
-      window["kInnerHTML"] = '<span id="kunits">s<sup>-1</sup></span>';
-      kunits.innerHTML = window["kInnerHTML"];
-      break;
-    case 1:
-      window["kInnerHTML"] = '<span id="kunits">m<sup>3</sup>/(mol s)</span>';
-      kunits.innerHTML = window["kInnerHTML"];
-      break;
-    case 2:
-      window["kInnerHTML"] = '<span id="kunits">m<sup>6</sup>/(mol<sup>2</sup> s)</span>';
-      kunits.innerHTML = window["kInnerHTML"];
-      break;  
-  };
 }
 
 /**
@@ -176,10 +132,10 @@ function setup() {
   cnv.parent('plotContainer');
   // Declare a plot
   mainPlot = new PlotCanvas(this);
-  mainPlot.xLims = [0, vfinal];
-  mainPlot.yLims = [0, 1];
-  mainPlot.xAxisLabel = "volume (m³)";
-  mainPlot.yAxisLabel = "molar flow rate (mol / s)";
+  mainPlot.xLims = [0, tfinal];
+  mainPlot.yLims = [0, 100];
+  mainPlot.xAxisLabel = "time (min)";
+  mainPlot.yAxisLabel = "moles of product";
   mainPlot.plotTitle = "";
   mainPlot.plotSetup();
   
@@ -192,16 +148,19 @@ function setup() {
   gui.newDropdown('plot', ['ND and NU', 'Selectivity (ND/NU)', 'NA and NB'], 'plot: ');
   updateData();
 
-  FaFunction = new ArrayPlot(FA);
-  FaFunction.lineColor = color(255, 0, 0, 255);
+  NaFunction = new ArrayPlot(NA);
+  NaFunction.lineColor = color(255, 0, 0, 255);
 
-  FbFunction = new ArrayPlot(FB);
-  FbFunction.lineColor = color(50, 220, 0, 255);
+  NbFunction = new ArrayPlot(NB);
+  NbFunction.lineColor = color(50, 220, 0, 255);
 
-  FcFunction = new ArrayPlot(FC);
-  FcFunction.lineColor = color(0, 0, 255, 255);
+  NdFunction = new ArrayPlot(ND);
+  NdFunction.lineColor = color(0, 0, 255, 255);
 
-  mainPlot.addFuncs(FaFunction, FbFunction, FcFunction);
+  NuFunction = new ArrayPlot(NU);
+  NuFunction.lineColor = color(0, 100, 100, 255);
+
+  mainPlot.addFuncs(NaFunction, NbFunction, NdFunction, NuFunction);
 
   let delay = 1000;
   setTimeout(function jax() {
@@ -230,31 +189,38 @@ function draw() {
   
   // updates the solution, then updates the lines on the plot
   updateData();
-  FaFunction.update(FA);
-  FbFunction.update(FB);
-  FcFunction.update(FC);
+  NaFunction.update(NA);
+  NbFunction.update(NB);
+  NdFunction.update(ND);
+  NuFunction.update(NU);
 
   // hides/shows lines depending on page selected
-  FaFunction.lineColor = color(255, 0, 0, 255);
-  FbFunction.lineColor = color(50, 220, 0, 255);
-  FcFunction.lineColor = color(0, 0, 255, 255);
+  NaFunction.lineColor = color(255, 0, 0, 255);
+  NbFunction.lineColor = color(50, 220, 0, 255);
+  NdFunction.lineColor = color(0, 0, 255, 255);
+  NuFunction.lineColor = color(0, 100, 100, 255);
 
   mainPlot.plotDraw();
-  let FAX = vfinal / 6;
-  let FAY = FA[Math.trunc(map(vfinal/6, 0, vfinal, 0, vfinal / dv - 1))][1];
-  let FBX = vfinal / 2;
-  let FBY = FB[Math.trunc(map(vfinal/2, 0, vfinal, 0, vfinal / dv - 1))][1];
-  let FCX = 5 * vfinal / 6;
-  let FCY = FC[Math.trunc(map(5*vfinal/6, 0, vfinal, 0, vfinal / dv - 1))][1];
+  let NAX = tfinal / 8;
+  let NAY = NA[Math.trunc(map(tfinal/8, 0, tfinal, 0, tfinal / dt - 1))][1];
+  let NBX = 3 * tfinal / 8;
+  let NBY = NB[Math.trunc(map(3 * tfinal / 8, 0, tfinal, 0, tfinal / dt - 1))][1];
+  let NDX = 5 * tfinal / 8;
+  let NDY = ND[Math.trunc(map(5 * tfinal / 8, 0, tfinal, 0, tfinal / dt - 1))][1];
+  let NUX = 7 * tfinal / 8;
+  let NUY = NU[Math.trunc(map(7 * tfinal / 8, 0, tfinal, 0, tfinal / dt - 1))][1];
  
-  mainPlot.labelDraw("F", FAX, FAY, FaFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
-  mainPlot.labelDraw("A", FAX, FAY, FaFunction.lineColor, [LEFT, TOP],"sub");
+  mainPlot.labelDraw("N", NAX, NAY, NaFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
+  mainPlot.labelDraw("A", NAX, NAY, NaFunction.lineColor, [LEFT, TOP],"sub");
   
-  mainPlot.labelDraw("F", FBX, FBY, FbFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
-  mainPlot.labelDraw("B", FBX, FBY, FbFunction.lineColor, [LEFT, TOP],"sub");
+  mainPlot.labelDraw("N", NBX, NBY, NbFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
+  mainPlot.labelDraw("B", NBX, NBY, NbFunction.lineColor, [LEFT, TOP],"sub");
  
-  mainPlot.labelDraw("F", FCX, FCY, FcFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
-  mainPlot.labelDraw("C", FCX, FCY, FcFunction.lineColor, [LEFT, TOP],"sub");
+  mainPlot.labelDraw("N", NDX, NDY, NdFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
+  mainPlot.labelDraw("D", NDX, NDY, NdFunction.lineColor, [LEFT, TOP],"sub");
+
+  mainPlot.labelDraw("N", NUX, NUY, NuFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
+  mainPlot.labelDraw("U", NUX, NUY, NuFunction.lineColor, [LEFT, TOP],"sub");
   
 }
 
