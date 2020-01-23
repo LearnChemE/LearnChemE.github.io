@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+	<head>
+
+		<meta charset="utf-8">
+    	<meta id="viewport" content="width=device-width, initial-scale=1.0">
+    	<title>Isothermal Plug Flow Reactor</title>
+		<link rel="icon" type="image/png" href="../../resources/siteicon.png">
+		<!-- imports libraries from local folders -->
+		<script type="text/javascript" src="./libraries/ndsolve.js"></script>
+		<script type="text/javascript" src="./libraries/math.min.js"></script>
+		<script>math.import({ndsolve:ndsolve})</script>		
+		<script type="text/javascript" src="./libraries/p5/p5.min.js"></script>
+		<script type="text/javascript" src="./libraries/p5/p5.dom.min.js"></script>
+		<script type="text/javascript" src="./libraries/p5/grafica.min.js"></script>
+		<script type="text/javascript" src="./libraries/p5/dat.gui.min.js"></script>
+		<script type="text/javascript" src="./libraries/quicksettings3/quicksettings.min.js"></script>
+		<script type="text/javascript" src="./libraries/p5/p5.gui.js"></script>
+		<script type="text/javascript" src="./libraries/plotFun.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML&delayStartupUntil=configured" async></script>
+
+		<!-- imports main file -->
+		<script type="text/javascript" src="main.js"></script>
+		
+		<!-- styling is minimal, but CSS sheets were included just in case-->
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<!-- styling for the sliders / GUI -->
+		<link type="text/css" id="qs_styles" rel="stylesheet" href="libraries/quicksettings3/quicksettings_custom_tiny.min.css">
+		
+	</head>
+
+	<body>
+		<div class="wrapper">
+			<a href="javascript:" id="directionsButton" class="buttonMed" value="directions">Directions</a>
+			<a href="javascript:" id="detailsButton" class="buttonMed" value="details">Details</a>
+			<a href="javascript:" id="aboutButton" class="buttonMed" value="about">About</a>
+			<div class="modal">
+				<div id="modalDirections" class="modal-content" style="display:none;">
+					<div id="directions-content">
+						<span class="close">&times;</span>
+						<p class="popup paragraph">In this Demonstration, the liquid-phase reaction \( A + 2B \rightarrow C \) takes place in an isothermal plug flow reactor. Only \( A \) and \( B \) enter the reactor, and the user inputs the mole fraction of \( A \) in the feed. The reaction is first order in the concentration of \( A \), but the user inputs the reaction order with respect to \( B \) and the value of the rate constant. When the reaction order is changed, the units of the rate constant change, but the numerical value does not. The molar flow rates of \( A \), \( B \), and \( C \;\) (\( F_{A} \), \( F_{B} \), \( F_{C} \)) are plotted versus the cumulative reactor volume (the distance from the reactor inlet times the reactor cross-sectional area).</p>
+					</div>
+				</div>
+
+				<div id="modalDetails" class="modal-content" style="display:none;">
+					<div id="details-content">
+						<span class="close">&times;</span>
+						<p class="popup paragraph">The constant-density liquid-phase reaction takes place in an isothermal plug flow reactor:$$ A + 2B \rightarrow C $$with reaction rate $$ r = kC_{A}C_{B}^{n} $$where \(C_{i}\) is the concentration of component \( i \), \( r \) is rate of reaction, \( n \) is the order of reaction with respect to component \( B \), and \( k \) is the rate constant.  Mass balances on each component are: 
+						$$ 
+						v \frac{dC_{A}}{dV} = r_{A} = -r
+						$$
+						$$ 
+						v \frac{dC_{B}}{dV} = r_{B} = -2r
+						$$
+						$$ 
+						v \frac{dC_{B}}{dV} = r_{C} = r
+						$$
+						where \( v \) is volumetric flow rate of the reactor and \( V \) is the cumulative volume of the plug flow reactor (i.e., the distance from the inlet times the cross-sectional area). In order to solve the system of differential equations, initial conditions for \( V=0 \) must be specified:
+						$$
+						C_{A} = C_{A0}
+						$$
+						$$
+						C_{B} = C_{B0}
+						$$
+						$$
+						C_{C} = 0
+						$$
+						The molar flow rates are calculated as \( F_{i} = v C_{i} \), where for component \( i \), \( F_{i} \) is the molar flow rate and \( C_{i} \) is the concentration. 
+						</p>
+					</div>
+				</div>
+
+				<div id="modalAbout" class="modal-content" style="display:none;">
+					<div id="about-content">
+						<span class="close">&times;</span>
+						<p class="popup paragraph">
+						"Isothermal Plug Flow Reactor"<br><br>
+						Author: Rachael L. Baumann<br>
+						Adapted for in-browser use by: Neil C. Hendren<br><br>
+						This simulation was created for <a href="http://www.learncheme.com/" target="_blank">LearnChemE.com</a> under the supervision of John L. Falconer at the University of Colorado Boulder.  A desktop version that can be viewed with the free <a href="https://www.wolfram.com/player/" target="_blank">Wolfram CDF Player</a> is also available 
+						<a href="https://demonstrations.wolfram.com/app-files/inc/download.php?nb=IsothermalPlugFlowReactor/IsothermalPlugFlowReactor.cdf" target="_blank">here.</a><br><br> The source code for this demonstration is publicly available at: <a href="https://github.com/LearnChemE/" target="_blank">https://github.com/LearnChemE/</a><br><br>For inquiries or feedback, contact: learncheme@gmail.com 
+						</p>
+					</div>
+				</div>
+			</div>
+			<div id="title">
+				Loading . . .
+			</div>
+			<div id="plotContainer"></div>
+		</div>
+		<script type="text/javascript" src="modals.min.js"></script>
+	</body>
+</html>
