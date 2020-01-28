@@ -7,3 +7,4 @@ _notes/
 .vscode/launch.json
 /learnchemejs/node_modules/
 .gitignore
+LearnChemE Live-Server.bat

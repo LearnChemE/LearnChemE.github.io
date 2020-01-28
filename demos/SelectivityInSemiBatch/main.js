@@ -11,7 +11,7 @@ var clientHeight = clientWidth * aspRatio;
 
 var gui;
 var tfinal = 20;
-var dt = 0.01;
+var dt = 0.1;
 var mainPlot;
 var equation;
 
@@ -45,61 +45,36 @@ const sim = math.parser();
  */
 function updateData() {
   // set initial conditions and constants
-  sim.eval('R = 0.008314');
-  sim.eval(`T = ${T}`);
-  sim.eval(`Ed = ${Ed}`);
-  sim.eval(`Eu = ${Eu}`);
-  sim.eval(`kd = 1.22*(10^22)*e^(-Ed/(R*T))`);
-  sim.eval(`ku = 3.79*(10^23)*e^(-Eu/(R*T))`);
-
-  //sim.eval(`rd = (kd * (Na / V) * ((Nb / V) ^ 2))`);
-  //sim.eval(`ru = (ku * (Na / V) * (Nb / V))`);
-
-  sim.eval(`Na0 = ${Na0}`);
-  sim.eval(`Nb0 = ${Nb0}`);
-  sim.eval(`Nd0 = ${Nd0}`);
-  sim.eval(`Nu0 = ${Nu0}`);
-  sim.eval(`V0 = ${V0}`);
-
-  sim.eval(`dt = ${dt}`);
-  sim.eval(`tfinal = ${tfinal}`);
+  const R = 0.008314;
+  const con1 = Math.exp(-Ed/(R*T));
+  const con2 = Math.exp(-Eu/(R*T))
+  const kd = 1.22*(10**22)*con1;
+  const ku = 3.79*(10**23)*con2;
 
   // define differential equations
-  sim.eval('dNadt(Na, Nb, Nd, Nu, V) = 10 - ((kd * (Na / V) * ((Nb / V) ^ 2)) * V) - ((ku * (Na / V) * (Nb / V)) * V)');
-  sim.eval('dNbdt(Na, Nb, Nd, Nu, V) = -V * ((kd * (Na / V) * ((Nb / V) ^ 2)) + (ku * (Na / V) * (Nb / V)))');
-  sim.eval('dNddt(Na, Nb, Nd, Nu, V) = (kd * (Na / V) * ((Nb / V) ^ 2)) * V');
-  sim.eval('dNudt(Na, Nb, Nd, Nu, V) = (ku * (Na / V) * (Nb / V)) * V');
-  sim.eval('dVdt(Na, Nb, Nd, Nu, V) = 1');
+  function dNadt(Na, Nb, Nd, Nu, V) {
+    const d = (10 - ((kd * (Na / V) * ((Nb / V) ** 2)) * V) - ((ku * (Na / V) * (Nb / V)) * V));
+    return d}
+  function dNbdt(Na, Nb, Nd, Nu, V) {
+    const d = -V * ((kd * (Na / V) * ((Nb / V) ** 2)) + (ku * (Na / V) * (Nb / V)));
+    return d}
+  function dNddt(Na, Nb, Nd, Nu, V) {
+    const d = (kd * (Na / V) * ((Nb / V) ** 2)) * V;
+    return d}
+  function dNudt(Na, Nb, Nd, Nu, V) {
+    const d = (ku * (Na / V) * (Nb / V)) * V;
+    return d}
+  function dVdt(Na, Nb, Nd, Nu, V) {
+    const d = 1;
+    return d}
 
   // evaluate system of ODEs and create an array from the result
-  sim.eval("result = ndsolve([dNadt, dNbdt, dNddt, dNudt, dVdt], [Na0, Nb0, Nd0, Nu0, V0], dt, tfinal)");
+  let result = new RangeSolve2({"f":[dNadt, dNbdt, dNddt, dNudt, dVdt], "yi":[Na0, Nb0, Nd0, Nu0, V0], "tinitial": 0, "dt": dt, "tfinal": tfinal}).calcAll();
 
-  let Na = sim.eval("transpose(concat(transpose(result[:,1]),1))").toArray().map(function(e) { return e[0];});
-  let Nb = sim.eval("transpose(concat(transpose(result[:,2]),1))").toArray().map(function(e) { return e[0];});
-  let Nd = sim.eval("transpose(concat(transpose(result[:,3]),1))").toArray().map(function(e) { return e[0];});
-  let Nu = sim.eval("transpose(concat(transpose(result[:,4]),1))").toArray().map(function(e) { return e[0];});
-
-  let zeroIndex = -1;
-  let l = Na.length;
-
-  NA = new Array(l);
-  NB = new Array(l);
-  ND = new Array(l);
-  NU = new Array(l);
-
-  for (i = 0; i < l; i++) {
-    let t = (tfinal/l) * (i + 1);
-    NA[i]=[t, Na[i]];
-    NB[i]=[t, Nb[i]];
-    ND[i]=[t, Nd[i]];
-    NU[i]=[t, Nu[i]];
-  }
-
-  // add initial conditions to beginning of array. Initial selectivity is technically infinite.
-  NA.unshift([0, Na0]);
-  NB.unshift([0, Nb0]);
-  ND.unshift([0, Nd0]);
-  NU.unshift([0, Nu0]);
+  NA = result[0];
+  NB = result[1];
+  ND = result[2];
+  NU = result[3];
 
 }
 
@@ -129,6 +104,9 @@ function windowResized() {
 function setup() {
   titleDOM = document.getElementById('title');
   let cnv = createCanvas(clientWidth, clientHeight);
+  
+  math.import({RangeSolve2:RangeSolve2});
+
   cnv.parent('plotContainer');
   // Declare a plot
   mainPlot = new PlotCanvas(this);
@@ -173,9 +151,6 @@ function setup() {
       }}
   }, delay);
 
-  let GUIDOM = document.getElementsByClassName("qs_main")[0];
-  GUIDOM.addEventListener("mouseup", e => {updateJax()});
-
   noLoop();
 }
 
@@ -201,14 +176,18 @@ function draw() {
   NuFunction.lineColor = color(0, 100, 100, 255);
 
   mainPlot.plotDraw();
-  let NAX = tfinal / 8;
-  let NAY = NA[Math.trunc(map(tfinal/8, 0, tfinal, 0, tfinal / dt - 1))][1];
-  let NBX = 3 * tfinal / 8;
-  let NBY = NB[Math.trunc(map(3 * tfinal / 8, 0, tfinal, 0, tfinal / dt - 1))][1];
-  let NDX = 5 * tfinal / 8;
-  let NDY = ND[Math.trunc(map(5 * tfinal / 8, 0, tfinal, 0, tfinal / dt - 1))][1];
-  let NUX = 7 * tfinal / 8;
-  let NUY = NU[Math.trunc(map(7 * tfinal / 8, 0, tfinal, 0, tfinal / dt - 1))][1];
+  const NAX = tfinal / 8;
+  const Ai = NA.findIndex(e => Math.abs(e[0] - NAX) < dt);
+  const NAY = NA[Ai][1];
+  const NBX = 3 * tfinal / 8;
+  const Bi = NB.findIndex(e => Math.abs(e[0] - NBX) < dt);
+  const NBY = NB[Bi][1];
+  const NDX = 5 * tfinal / 8;
+  const Di = ND.findIndex(e => Math.abs(e[0] - NDX) < dt);
+  const NDY = ND[Di][1];
+  const NUX = 7 * tfinal / 8;
+  const Ci = NU.findIndex(e => Math.abs(e[0] - NUX) < dt);
+  const NUY = NU[Ci][1];
  
   mainPlot.labelDraw("N", NAX, NAY, NaFunction.lineColor, [RIGHT, CENTER], false, [2, 1.8]);
   mainPlot.labelDraw("A", NAX, NAY, NaFunction.lineColor, [LEFT, TOP],"sub");
@@ -226,7 +205,7 @@ function draw() {
 
 function updateJax() {
   if(mjready) {
-    title = `\\mathrm{ A+2B \\rightarrow C \\qquad\\qquad } r = ${k} \\mathrm{ C_{A}C_{B}${n != 1 ? String("^{" + n + "}") : ""} \\;  \\frac{mol}{m^{3}s} } `;
+    title = ``;
     var math = MathJax.Hub.getAllJax("title")[0];
     MathJax.Hub.Queue(["Text", math, title]);
   }
