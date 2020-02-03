@@ -99,7 +99,11 @@
 							Material balances for system where \( A \) is fed into pure \( B \):
 
 							$$
-							\frac{d N_{A}}{dt} = F_{A,0} - r_{D} V - r_{U} V
+							\frac{d N_{A}}{dt} =  
+								\begin{cases} 
+									F_{A, 0} - r_{D} V - r_{U} V, & t\leq 10 \textrm{ min} \\
+									- r_{D} V - r_{U} V, & t\gt 10 \textrm{ min} \\
+								\end{cases}
 							$$
 
 							$$
@@ -125,11 +129,15 @@
 							Only \( \frac{d N_{A}}{dt} \) and \( \frac{d N_{B}}{dt} \) differ from above balance:
 
 							$$
-							\frac{d N_{A}}{dt} = r_{D} V - r_{U} V
+							\frac{d N_{A}}{dt} = - r_{D} V - r_{U} V
 							$$
 
 							$$
-							\frac{d N_{B}}{dt} = F_{B,0} - r_{D} V - r_{U} V
+							\frac{d N_{B}}{dt} =  
+								\begin{cases} 
+									F_{B, 0} - r_{D} V - r_{U} V, & t\leq 10 \textrm{ min} \\
+									- r_{D} V - r_{U} V, & t\gt 10 \textrm{ min} \\
+								\end{cases}
 							$$
 
 							where \( F_{B,0} \) is the inlet molar flow rate of \( B \).
