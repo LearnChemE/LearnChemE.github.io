@@ -60,7 +60,7 @@ function updateData() {
 
   // define differential equations
   function dNadt(Na, Nb, Nd, Nu, V) {
-    if(AB == ABchoices[0]) {
+    if(AB == ABchoices[0] && V <= 20) {
       const d = (10 - ((kd * (Na / V) * ((Nb / V) ** 2)) * V) - ((ku * (Na / V) * (Nb / V)) * V));
       return d
     } else {
@@ -69,7 +69,7 @@ function updateData() {
     }
   }
   function dNbdt(Na, Nb, Nd, Nu, V) {
-    if(AB == ABchoices[0]) {
+    if(AB == ABchoices[0] || (AB == ABchoices[1] && V > 20)) {
       const d = -V * ((kd * (Na / V) * ((Nb / V) ** 2)) + (ku * (Na / V) * (Nb / V)));
       return d
     } else {

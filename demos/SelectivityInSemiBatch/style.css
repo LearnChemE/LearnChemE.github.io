@@ -160,10 +160,6 @@ body {
 	padding-top: 0rem;
 }
 
-#details-content>.popup {
-	overflow-y: scroll;
-}
-
 .MJXc-display {
   text-align: left !important;
   margin-left: 10px;
