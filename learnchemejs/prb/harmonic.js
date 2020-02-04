@@ -53,7 +53,7 @@ class Sim {
 
         this.graphWidth = 420;
         this.graphHeight = 280;
-        this.rightGraphHeight = this.graphHeight * 2.5;
+        this.rightGraphHeight = this.graphHeight * 2.15;
         this.graphLeft = 30;
         this.graphRight = 25;
         this.graphTop = 10;
@@ -72,6 +72,9 @@ class Sim {
         this.PROBS = [];
         this.RES = [];
         this.IMS = [];
+
+        this.scaledParameterToggle = false;
+        this.maxY = 1;
 
         this.SCALE = Math.min(1, window.innerWidth/1000);
         
@@ -128,7 +131,7 @@ class Sim {
         // Insert integral box
         html = `<div id="integral">`;
         html += `<table>`
-        html += `<th>x<sub>1</sub> (pm)</th><th>x<sub>2</sub> (pm)</th><th>integral</th>`;
+        html += `<th id="th1">x<sub>1</sub> (pm)</th><th id="th2">x<sub>2</sub> (pm)</th><th>integral</th>`;
         html += `<tr><td><input id="x1" class="tableinput" value="${-50}" placeholder="0"></input></td>`;
         html += `<td><input id="x2" class="tableinput" value="${50}" placeholder="0"></input></td>`;
         html += `<td><input id="int" class="tableinput" placeholder="-" readonly></input></td>`;
@@ -149,8 +152,11 @@ class Sim {
         html += `</div>`
         document.getElementById("left").insertAdjacentHTML("beforeend", html);
 
+        html = `<button id='changeXaxis' style='align-self: center; transform:translateY(-25%); width:35rem;'>toggle scaled length parameter</button>`;
+        document.getElementById("right").insertAdjacentHTML("beforeend", html);
+
         // Define graph layouts
-        const probgraphinfo = {
+        this.probgraphinfo = {
             "graphwidth": this.graphWidth,
             "graphheight": this.rightGraphHeight,
             "padding": {
@@ -179,7 +185,7 @@ class Sim {
             }
         };
 
-        const compgraphinfo = {
+        this.compgraphinfo = {
             "graphwidth": this.graphWidth,
             "graphheight": this.graphHeight,
             "padding": {
@@ -211,12 +217,30 @@ class Sim {
         // Create graphs
         document.getElementById("right").insertAdjacentHTML("beforeend", `<span class="graphtitle">Energy and Probability Density |ψ|² (=ψ*ψ)</span>`);
         this.densitygc = new GraphCanvas("density-gc", "right", {
-            graphinfo: probgraphinfo,
+            graphinfo: this.probgraphinfo,
         });
 
         document.getElementById("left").insertAdjacentHTML("beforeend", `<span class="graphtitle">Real & Imaginary Components</span>`);
         this.componentgc = new GraphCanvas("component-gc", "left", {
-            graphinfo: compgraphinfo,
+            graphinfo: this.compgraphinfo,
+        });
+
+    }
+
+    // to invoke this function, this.probgraphinfo or this.compgraphinfo must be modified first
+    redrawAxes() {
+        document.getElementById('density-gc').remove();
+        delete this.densitygc;
+
+        document.getElementById('component-gc').remove();
+        delete this.componentgc;
+
+        this.densitygc = new GraphCanvas("density-gc", "right", {
+            graphinfo: this.probgraphinfo,
+        });
+
+        this.componentgc = new GraphCanvas("component-gc", "left", {
+            graphinfo: this.compgraphinfo,
         });
     }
 
@@ -227,6 +251,7 @@ class Sim {
         document.getElementById('reset').addEventListener("click", () => location.reload());
         document.getElementById('measure').addEventListener("click", () => this.measureE());
         document.getElementById('integrate').addEventListener("click", () => this.integrate());
+        document.getElementById('changeXaxis').addEventListener("click", () => this.scaledParameter());
         // Input events
         for (let i = 1; i <= this.MAXCOEFFICIENTS; i++) {
             document.getElementById(`n-${i}`).addEventListener("input", () => this.getNs());
@@ -247,6 +272,7 @@ class Sim {
 
     update() {
         this.T += this.TSTEP;
+        if(this.T >= 2 * Math.PI) {this.T = 0}
         this.calculatePsi();
         this.clearGraphs();
         this.drawGraphs();
@@ -265,36 +291,52 @@ class Sim {
         const hb = 1; // h-bar is beyond floating-point precision of javascript, conversion factor was built-in below.
         const scale = 5.08716e-11; // conversion factor to SI
         const alpha = math.pow(hb*hb/(this.M*this.KF), 0.25) * scale; // units of alpha are meters
-        const yArr = this.XS.map(x => (x / alpha) * lengthUnits); // y is unitless
+        const unitsAdjust = this.scaledParameterToggle ? 1 : math.sqrt(lengthUnits);         
+        
+        let yArr = [];
+
+        if(this.scaledParameterToggle) {
+            yArr = this.XS; // y is unitless
+        } else {
+            yArr = this.XS.map(x => (x / alpha) * lengthUnits); // y is unitless
+        }
+
         const eArr = yArr.map(y => math.exp(-0.5*math.pow(y, 2)));
 
-        //const scaleForGraph = 7e-6; // to normalize wave function to graph size
-
         for (let i = 0; i < this.coefficients.length; i++) {
-            const Nv = math.divide(1, math.sqrt(math.prod(alpha, math.pow(2, this.NS[i]), math.factorial(this.NS[i]), math.sqrt(math.PI))));
+            const Nv = this.scaledParameterToggle ? 
+            math.divide(1, math.sqrt(math.prod(math.pow(2, this.NS[i]), math.factorial(this.NS[i]), math.sqrt(math.PI))))
+            : math.divide(1, math.sqrt(math.prod(alpha, math.pow(2, this.NS[i]), math.factorial(this.NS[i]), math.sqrt(math.PI))));
+            
             for (let j = 0; j < this.XS.length; j++) {
                 const y = yArr[j];
                 const Hv = hermites(this.NS[i], y);
                 const e = eArr[j];
                 if(i == 0) {
                     // calculates the initial state, pushes to PSI array
-                    this.PSI.push(math.prod(this.scaledcoefficients[i], Nv, Hv, e, math.sqrt(lengthUnits)));
+                    this.PSI.push(math.prod(this.scaledcoefficients[i], Nv, Hv, e, unitsAdjust));
                     // converts the initial state to a complex value, multiplies by phase shift
-                    // units of PSI are pm^-0.5
+                    // units of PSI are pm^-0.5 or unitless, depending on scaled length parameter
                     this.PSI[j] = math.complex(math.prod(this.PSI[j], math.re(PhaseShifts[i])), math.prod(this.PSI[j], math.im(PhaseShifts[i])));
                     // probability is the product of complex and its conjugate (constant added to match graph size)
                     this.PROBS.push(math.re(math.prod(this.PSI[j], math.conj(this.PSI[j]))));      
                     this.RES.push(math.re(this.PSI[j]));
-                    this.IMS.push(math.im(this.PSI[j]));              
+                    this.IMS.push(math.im(this.PSI[j]));
                 }
                 else {
-                    this.PSI[j].re += math.prod(this.scaledcoefficients[i], Nv, Hv, e, math.re(PhaseShifts[i]), math.sqrt(lengthUnits));
-                    this.PSI[j].im += math.prod(this.scaledcoefficients[i], Nv, Hv, e, math.im(PhaseShifts[i]), math.sqrt(lengthUnits));
+                    this.PSI[j].re += math.prod(this.scaledcoefficients[i], Nv, Hv, e, math.re(PhaseShifts[i]), unitsAdjust);
+                    this.PSI[j].im += math.prod(this.scaledcoefficients[i], Nv, Hv, e, math.im(PhaseShifts[i]), unitsAdjust);
                     this.RES[j] = math.re(this.PSI[j]);
                     this.IMS[j] = math.im(this.PSI[j]);
                     this.PROBS[j] += math.re(math.prod(this.PSI[j], math.conj(this.PSI[j])));
                 }
             }
+        }
+
+        if(this.T == 0) {
+            this.maxY = this.PROBS.reduce(function(a, b) {
+                return Math.max(a, b);
+            });
         }
 
         this.ENERGY = 0;
@@ -303,11 +345,16 @@ class Sim {
             const level = (this.NS[i] + 0.5) * math.sqrt(this.KF/this.M) * cnvrt;
             this.ENERGY += level * this.scaledcoefficients[i];
         }
-        const scaleFactor = (this.Yrange[1] - this.Yrange[0]) / (this.componentgc.graphinfo.y.max);
+
+        const scaleFactor = (this.probgraphinfo.y.max - this.probgraphinfo.y.min) / this.maxY / 3;
 
         for (let i = 0; i < this.XS.length; i++) {this.PROBS[i] *= scaleFactor; this.PROBS[i] += this.ENERGY}
 
-        this.POTENTIAL = this.XS.map(x => 0.5 * this.KF * math.pow(x, 2) * 6.242e-6);
+        if(this.scaledParameterToggle) {
+            this.POTENTIAL = this.XS.map(x => 0.5 * this.KF * math.pow(x * alpha / lengthUnits, 2) * 6.242e-6);
+        } else {
+            this.POTENTIAL = this.XS.map(x => 0.5 * this.KF * math.pow(x, 2) * 6.242e-6);
+        }
     }
 
     clearGraphs() {
@@ -361,6 +408,79 @@ class Sim {
         this.getCoefficients();
         this.T -= this.TSTEP;
         this.update();
+    }
+
+    scaledParameter() {
+        if(this.scaledParameterToggle) {
+            // in real-space
+            this.xbounds = [-400, 400];
+            this.probgraphinfo.x = {
+                "label": "x - x<sub>0</sub> (pm)",
+                "min": this.xbounds[0],
+                "max": this.xbounds[1],
+                "majortick": Number((this.xbounds[1] - this.xbounds[0]) / 4).toFixed(2),
+                "minortick": Number((this.xbounds[1] - this.xbounds[0]) / 16),
+                "gridline": this.xbounds[1],
+            };
+            this.compgraphinfo.x = this.probgraphinfo.x;
+            this.compgraphinfo.y = {
+                "label": "ψ (pm <sup>-1/2</sup>)",
+                "min": -0.3,
+                "max": 0.3,
+                "majortick": 0.1,
+                "minortick": 0.1,
+                "gridline": 0.3,
+            };
+            this.XS = linspace(this.xbounds[0], this.xbounds[1], this.POINTS + 1, true);
+            const th1 = document.getElementById("th1");
+            const th2 = document.getElementById("th2");
+            const x1 = document.getElementById("x1");
+            const x2 = document.getElementById("x2");
+            th1.innerHTML = "x<sub>1</sub> (pm)";
+            th2.innerHTML = "x<sub>2</sub> (pm)";
+            x1.value = `${this.probgraphinfo.x.min}`;
+            x2.value = `${this.probgraphinfo.x.max}`;
+
+            this.scaledParameterToggle = false;
+            this.redrawAxes();
+            if(this.RUNNING) {this.toggleRunning();}
+            this.T = -this.TSTEP;
+            this.update();
+        } else {
+            // in y-space
+            this.xbounds = [-4, 4];
+            this.probgraphinfo.x = {
+                "label": "y - y<sub>0</sub>",
+                "min": this.xbounds[0],
+                "max": this.xbounds[1],
+                "majortick": Number((this.xbounds[1] - this.xbounds[0]) / 4).toFixed(2),
+                "minortick": Number((this.xbounds[1] - this.xbounds[0]) / 16),
+                "gridline": this.xbounds[1],
+            };
+            this.compgraphinfo.x = this.probgraphinfo.x;
+            this.compgraphinfo.y = {
+                "label": "ψ",
+                "min": -1.5,
+                "max": 1.5,
+                "majortick": 0.5,
+                "minortick": 0.125,
+                "gridline": 1.5,
+            };
+            this.XS = linspace(this.xbounds[0], this.xbounds[1], this.POINTS + 1, true);
+            const th1 = document.getElementById("th1");
+            const th2 = document.getElementById("th2");
+            const x1 = document.getElementById("x1");
+            const x2 = document.getElementById("x2");
+            th1.innerHTML = "y<sub>1</sub>";
+            th2.innerHTML = "y<sub>2</sub>";
+            x1.value = `${this.probgraphinfo.x.min}`;
+            x2.value = `${this.probgraphinfo.x.max}`;
+            this.scaledParameterToggle = true;
+            this.redrawAxes();
+            if(this.RUNNING) {this.toggleRunning();}
+            this.T = -this.TSTEP;
+            this.update();
+        }
     }
 
     measureE() {
