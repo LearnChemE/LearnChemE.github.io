@@ -53,5 +53,6 @@ and each eigenstate \( \psi_{n}(y, t) \) oscillates at its own frequency, such t
 
 $$ \Psi(y, t) = \sum_{n = 0}^{N} C_{n} N_{n} H_{n} (y) e^{- \frac{y^{2}}{2} -i E_{n} t} $$
 
-A probabilistic collapse of the wave function resolves to a single energy state \( E_{n} \), with the probability of a collapse to energy state \( n \) depending on its expansion coefficient \( C_{n} \).
+A probabilistic collapse of the wave function resolves to a single energy state \( E_{n} \), with the probability of a collapse to energy state \( n \) depending on its expansion coefficient \( C_{n} \).<br><br>
+<i>Note: many textbooks refer to the variables described here in terms of the angular frequency of the oscillator, </i>\( \omega = \sqrt{ \frac{k}{m} } \) <i> and/or alpha, where </i>\( \alpha = \left( \frac{\hbar^{2}}{m k_{f}} \right)^{1/4} \).  <i>Alpha may also be seen as  </i> \( \alpha = \frac{m \omega}{\hbar} \), <i>or similar variations.  This simulation decided to omit such terms in order to demonstrate the effects of the mass</i> \( m \) <i>and force constant</i> \( k_{f} \) <i>on the wave function.</i>
 </div>

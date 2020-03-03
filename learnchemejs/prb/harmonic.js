@@ -179,8 +179,8 @@ class Sim {
                 "label": "energy (eV)",
                 "min": this.Yrange[0],
                 "max": this.Yrange[1],
-                "majortick": Number.parseInt(Math.trunc((this.Yrange[1] - this.Yrange[0]) / 7)),
-                "minortick": Number.parseInt(Math.trunc((this.Yrange[1] - this.Yrange[0]) / 7)) / 4,
+                "majortick": Number((this.Yrange[1] - this.Yrange[0]) / 7).toFixed(0),
+                "minortick": Number((this.Yrange[1] - this.Yrange[0]) / 7).toFixed(0) / 4,
                 "gridline": this.Yrange[1],
             }
         };
@@ -227,13 +227,33 @@ class Sim {
 
     }
 
+    checkAxes() {
+        if(this.maxEnergy > this.Yrange[1] || this.maxEnergy < this.Yrange[1] / 4) {
+            this.Yrange[1] = Math.ceil(this.maxEnergy * 2);
+            let majorTick, minorTick;
+            if(this.Yrange[1] >= 7) {
+                majorTick = Number((this.Yrange[1] - this.Yrange[0]) / 7).toFixed(0);
+                minorTick = majorTick / 4;
+            } else {
+                majorTick = Math.max(Number((this.Yrange[1] - this.Yrange[0]) / 7).toFixed(1), 0.1);
+                minorTick = majorTick / 4;
+            }
+            this.probgraphinfo.y = {
+                "label": "energy (eV)",
+                "min": this.Yrange[0],
+                "max": this.Yrange[1],
+                "majortick": majorTick,
+                "minortick": minorTick,
+                "gridline": this.Yrange[1],
+            };
+            this.redrawAxes();
+        }
+    }
+
     // to invoke this function, this.probgraphinfo or this.compgraphinfo must be modified first
     redrawAxes() {
         document.getElementById('density-gc').remove();
-        delete this.densitygc;
-
         document.getElementById('component-gc').remove();
-        delete this.componentgc;
 
         this.densitygc = new GraphCanvas("density-gc", "right", {
             graphinfo: this.probgraphinfo,
@@ -340,11 +360,15 @@ class Sim {
         }
 
         this.ENERGY = 0;
+        this.maxEnergy = 0;
         for (let i = 0; i < this.MAXCOEFFICIENTS; i++) {
             const cnvrt = 0.0161538; // conversion factor to electron-volts from (N^0.5 m^-0.5 Da^-0.5)
             const level = (this.NS[i] + 0.5) * math.sqrt(this.KF/this.M) * cnvrt;
+            if(level > this.maxEnergy) {this.maxEnergy = level;}
             this.ENERGY += level * this.scaledcoefficients[i];
         }
+
+        this.checkAxes();
 
         const scaleFactor = (this.probgraphinfo.y.max - this.probgraphinfo.y.min) / this.maxY / 3;
 
