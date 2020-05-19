@@ -1,4 +1,7 @@
-import '~bootstrap'
+@import '~bootstrap/scss/bootstrap.scss';
 
 $bg: #AAAAAA;
 
+body {
+  background: $bg;
+}
