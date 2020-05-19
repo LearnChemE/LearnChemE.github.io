@@ -8,3 +8,4 @@ _notes/
 /learnchemejs/node_modules/
 .gitignore
 LearnChemE Live-Server.bat
+**/node_modules
