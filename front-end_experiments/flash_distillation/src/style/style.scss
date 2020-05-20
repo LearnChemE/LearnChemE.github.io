@@ -1,7 +1,26 @@
 @import '~bootstrap/scss/bootstrap.scss';
 
-$bg: #AAAAAA;
+$bg: #FFFFFF;
+$outerPlotMargin: 10px;
 
 body {
   background: $bg;
+}
+
+#TPlot {
+  position: absolute;
+  bottom: $outerPlotMargin;
+  left: $outerPlotMargin;
+}
+
+#PPlot {
+  position: absolute;
+  top: $outerPlotMargin;
+  right: $outerPlotMargin;
+}
+
+#LPlot {
+  position: absolute;
+  bottom: $outerPlotMargin;
+  right: $outerPlotMargin;
 }

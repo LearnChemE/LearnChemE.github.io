@@ -20,42 +20,14 @@ const rules = [
   },
   {
     test: /\.css$/i,
-    use: ["to-string-loader", "css-loader"]
-  },
-  {
-    test: /component\.s[ac]ss$/i,
-    use: [
-      {
-        loader: "to-string-loader"
-      },
-      {
-        loader: "css-loader"
-      }, 
-      {
-        loader: 'postcss-loader', // Run post css actions
-        options: {
-          plugins: function () { // post css plugins, can be exported to postcss.config.js
-            return [
-              require('autoprefixer')
-            ];
-          }
-        }
-      },
-      {
-        loader: "sass-loader"
-      }
-    ]
+    use: ["style-loader", "css-loader"]
   },
   { 
-    test: /^((?!component\.).)*s[ac]ss$/i,
+    test: /\.s[ac]ss$/i,
     use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"]
   },
   {
-    test: /^((?!component\.).)*\.html$/i,
-    use: ["html-loader"]
-  },
-  {
-    test: /component\.html$/i,
+    test: /\.html$/i,
     use: ["to-string-loader", "html-loader"]
   },
   {
