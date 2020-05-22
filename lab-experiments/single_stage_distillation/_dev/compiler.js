@@ -2,7 +2,7 @@ const webpack = require("webpack");
 const liveServer = require("live-server");
 const path = require('path');
 
-const configuration = require("./webpack.config.js");
+const configuration = require("./webpack.config.js")({production: false});
 
 let compiler = webpack(configuration);
 

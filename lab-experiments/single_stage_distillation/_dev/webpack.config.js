@@ -4,8 +4,6 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const mode = "production";
-// const mode = "development";
 
 const rules = [
   {
@@ -72,9 +70,12 @@ const terserOptions = {
   parallel: true
 }
 
-const minimize = mode == "development" ? false : true;
+module.exports = env => {
+  let mode, minimize;
 
-module.exports = [{
+  if(env.production) {minimize = true; mode = "production";} else {minimize = false; mode = "development";}
+
+  return {
     mode: mode,
     entry: { app: [path.resolve(__dirname, "../src/index.js")] },
     output: {
@@ -96,4 +97,4 @@ module.exports = [{
       new HtmlWebpackPlugin({ ...htmlOptions, title: "Flash Column Experiment"})
     ]
   }
-]
+}
