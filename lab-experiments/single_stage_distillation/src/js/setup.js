@@ -80,8 +80,56 @@ function setup(sk, speed) {
 
     separator.createCoords();
 
+    setupInputs();
+
     sk.frameRate(speed);
   }
+}
+
+function parseNumericInput(value, min, max) {
+  let input = Number(value);
+  input = Math.max(min, Math.min(max, input));
+  return input;
+}
+
+function setupInputs() {
+  const liftInput = document.getElementById("input-lift");
+  const powerInput = document.getElementById("input-power");
+  const flowInput = document.getElementById("input-flow");
+  const updateLiftButton = document.getElementById("update-lift");
+  const updatePowerButton = document.getElementById("update-power");
+  const updateFlowButton = document.getElementById("update-flow");
+
+  liftInput.addEventListener('input', () => {
+    const inputValue = liftInput.value;
+    const min = Number(liftInput.getAttribute("min"));
+    const max = Number(liftInput.getAttribute("max"));
+    const parsed = parseNumericInput(inputValue, min, max);
+    liftInput.value = parsed;
+    window.userInputs.PressureController.lift = parsed;
+  });
+
+  powerInput.addEventListener('input', () => {
+    const inputValue = powerInput.value;
+    const min = Number(powerInput.getAttribute("min"));
+    const max = Number(powerInput.getAttribute("max"));
+    const parsed = parseNumericInput(inputValue, min, max);
+    powerInput.value = parsed;
+    window.userInputs.TemperatureController.power = parsed;
+  });
+
+  flowInput.addEventListener('input', () => {
+    const inputValue = flowInput.value;
+    const min = Number(flowInput.getAttribute("min"));
+    const max = Number(flowInput.getAttribute("max"));
+    const parsed = parseNumericInput(inputValue, min, max);
+    flowInput.value = parsed;
+    window.userInputs.LevelController.flowRate = parsed;
+  });
+
+  updateLiftButton.addEventListener('click', () => {separator.lift = window.userInputs.PressureController.lift});
+  updatePowerButton.addEventListener('click', () => {separator.Q = window.userInputs.TemperatureController.power});
+  updateFlowButton.addEventListener('click', () => {separator.L = window.userInputs.LevelController.flowRate});
 }
 
 module.exports = setup;

@@ -7,6 +7,16 @@ body {
   background: $bg;
 }
 
+#buttonGroup {
+  width: 320px;
+  margin-top: 2rem;
+  margin-left: 2rem;
+
+  .input-group-text {
+    width: 15ch;
+  }
+}
+
 #TPlot {
   position: absolute;
   bottom: $outerPlotMargin;

@@ -17,7 +17,7 @@ class Separator {
     this.autoPressure = false;
 
     /**** Control Variables *****/
-    this.L = 0.6597; // Volumetric flowrate of bottoms (L / sec)
+    this.L = 0.65; // Volumetric flowrate of bottoms (L / sec)
     this.Q = 500000; // heat added
     this.lift = 0.5; // lift of valve
 
@@ -60,6 +60,20 @@ class Separator {
       const mappedValue = frac * (y1axes[1] - y1axes[0]) + y1axes[0];
       return mappedValue;
     };
+
+    const minMax = (array, precision) => {
+      let min = array[0];
+      let max = array[0];
+      for (let i = 1; i < array.length; i++) {
+        min = Math.min(array[i], min);
+        max = Math.max(array[i], max);
+      }
+      min *= 0.9;
+      max *= 1.1;
+      min = Number(Number(min).toFixed(precision));
+      max = Number(Number(max).toFixed(precision));
+      return [min, max];
+    }
 
     const coords = (arrIn, arrOut, y1Axes, y2Axes, useMap) => {
       let arr = [];
