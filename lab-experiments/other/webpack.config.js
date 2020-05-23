@@ -91,8 +91,8 @@ module.exports = env => {
     },
     plugins: [
       new MiniCssExtractPlugin(styleOptions),
-      new CleanWebpackPlugin({ root: path.join(__dirname, 'dist') }),
-      new HtmlWebpackPlugin({ ...htmlOptions, title: "Other"})
+      new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns: ['**/*'] }),
+      new HtmlWebpackPlugin({ ...htmlOptions, title: "Other", template: 'index.html'})
     ]
   }
 }
