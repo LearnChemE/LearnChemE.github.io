@@ -148,7 +148,7 @@ class Separator {
     powerMinMax[1] += (10 - powerMinMax[1] % 10); // round up to nearest 10
     graphics.TPlot.rightLims = powerMinMax;
     coords(this.powers, this.powerCoords, graphics.TPlot.yLims, graphics.TPlot.rightLims, true);
-    graphics.TPlot.funcs[0].update(this.powerCoords);
+    graphics.TPlot.funcs[1].update(this.powerCoords);
 
     let flowRateMinMax = minMax(this.flowRates);
     flowRateMinMax[0] -= flowRateMinMax[0] % 0.1;
@@ -169,7 +169,7 @@ class Separator {
     tempMinMax[1] += (10 - tempMinMax[1] % 10);
     graphics.TPlot.yLims = tempMinMax;
     coords(this.temperatures, this.temperatureCoords, 0, 0, false);
-    graphics.TPlot.funcs[1].update(this.temperatureCoords);
+    graphics.TPlot.funcs[0].update(this.temperatureCoords);
 
     let levelMinMax = minMax(this.levels);
     levelMinMax[0] -= levelMinMax[0] % 10;
