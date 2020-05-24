@@ -5,7 +5,7 @@ function definePlotFunctions() {
       this.max = array[array.length - 1][1];
       this.lineColor = 'rgb(0, 0, 0)';
       this.lineThickness = 2; //pixels
-      this.tightness = 0.7;
+      this.tightness = 1;
       this.arr = array;
     }
 
@@ -28,6 +28,8 @@ function definePlotFunctions() {
       this.yAxisLabel = "y - label";
       this.rightAxisLabel = "right - label"
       this.plotTitle = "Plot Title";
+      this.yAxisColor = "rgb(0, 0, 0)";
+      this.rightAxisColor = "rgb(0, 0, 0)";
       this.funcs = new Array(0);
       this.fontSize = 14;
       this.titleFontSize = 14;
@@ -91,7 +93,12 @@ function definePlotFunctions() {
       this.GPLOT.getXAxis().getAxisLabel().setText(this.xAxisLabel);
       this.GPLOT.getYAxis().getAxisLabel().setText(this.yAxisLabel);
       this.GPLOT.getTitle().setText(this.plotTitle);
-
+      this.GPLOT.getYAxis().setLineColor(this.yAxisColor);
+      this.GPLOT.getYAxis().setFontColor(this.yAxisColor);
+      this.GPLOT.getYAxis().lab.setFontColor(this.yAxisColor);
+      this.rGPLOT.getRightAxis().setLineColor(this.rightAxisColor);
+      this.rGPLOT.getRightAxis().setFontColor(this.rightAxisColor);
+      this.rGPLOT.getRightAxis().lab.setFontColor(this.rightAxisColor);
       this.rGPLOT.setFontSize(this.fontSize);
       this.rGPLOT.getRightAxis().lab.fontSize = this.axisLabelSize;
       this.rGPLOT.getRightAxis().fontSize = this.axisFontSize;

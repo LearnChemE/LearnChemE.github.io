@@ -1,11 +1,11 @@
 function setup(sk, speed) {
   window.graphics = {
     TempColor: 'rgb(255, 0, 0)',
-    PowerColor: 'rgb(0, 128, 128)',
-    LevelColor: 'rgb(50, 50, 50)',
+    PowerColor: 'rgb(0, 0, 255)',
+    LevelColor: 'rgb(255, 0, 0)',
     FlowrateColor: 'rgb(0, 0, 255)',
-    PressureColor: 'rgb(255, 0, 255)',
-    LiftColor: 'rgb(0, 220, 0)'
+    PressureColor: 'rgb(255, 0, 0)',
+    LiftColor: 'rgb(0, 0, 255)'
   }
 
   sk.setup = () => {
@@ -36,28 +36,34 @@ function setup(sk, speed) {
     TPlot.yAxisLabel = "temperature (K)";
     TPlot.rightAxisLabel = "power consumption (kW)"
     TPlot.plotTitle = "";
+    TPlot.yAxisColor = graphics.TempColor;
+    TPlot.rightAxisColor = graphics.PowerColor;
     TPlot.plotSetup();
 
     graphics.PPlot = new PlotCanvas(graphics.topRight, document.getElementById("PPlot"));
     const PPlot = graphics.PPlot;
-    PPlot.xLims = [-120, 0];
+    PPlot.xLims = [-1000, 0];
     PPlot.yLims = [0, 120];
     PPlot.rightLims = [0.4, 0.6];
     PPlot.xAxisLabel = "time (s)";
     PPlot.yAxisLabel = "pressure (kPa)";
     PPlot.rightAxisLabel = "lift"
     PPlot.plotTitle = "";
+    PPlot.yAxisColor = graphics.PressureColor;
+    PPlot.rightAxisColor = graphics.LiftColor;
     PPlot.plotSetup();
 
     graphics.LPlot = new PlotCanvas(graphics.bottomRight, document.getElementById("LPlot"));
     const LPlot = graphics.LPlot;
-    LPlot.xLims = [-120, 0];
+    LPlot.xLims = [-1000, 0];
     LPlot.yLims = [0, 100];
     LPlot.rightLims = [0.5, 0.7];
     LPlot.xAxisLabel = "time (s)";
     LPlot.yAxisLabel = "liquid level (%)";
     LPlot.rightAxisLabel = "flow rate (L/s)"
     LPlot.plotTitle = "";
+    LPlot.yAxisColor = graphics.LevelColor;
+    LPlot.rightAxisColor = graphics.FlowrateColor;
     LPlot.plotSetup();
 
     const TemperatureArray = new ArrayPlot(separator.temperatureCoords);
@@ -105,8 +111,7 @@ function setupInputs() {
     const min = Number(liftInput.getAttribute("min"));
     const max = Number(liftInput.getAttribute("max"));
     const parsed = parseNumericInput(inputValue, min, max);
-    liftInput.value = parsed;
-    window.userInputs.PressureController.lift = parsed;
+    separator.PressureController.lift = parsed;
   });
 
   powerInput.addEventListener('input', () => {
@@ -114,8 +119,7 @@ function setupInputs() {
     const min = Number(powerInput.getAttribute("min"));
     const max = Number(powerInput.getAttribute("max"));
     const parsed = parseNumericInput(inputValue, min, max);
-    powerInput.value = parsed;
-    window.userInputs.TemperatureController.power = parsed;
+    separator.TemperatureController.power = parsed;
   });
 
   flowInput.addEventListener('input', () => {
@@ -123,13 +127,12 @@ function setupInputs() {
     const min = Number(flowInput.getAttribute("min"));
     const max = Number(flowInput.getAttribute("max"));
     const parsed = parseNumericInput(inputValue, min, max);
-    flowInput.value = parsed;
-    window.userInputs.LevelController.flowRate = parsed;
+    separator.LevelController.flowRate = parsed;
   });
 
-  updateLiftButton.addEventListener('click', () => {separator.lift = window.userInputs.PressureController.lift});
-  updatePowerButton.addEventListener('click', () => {separator.Q = window.userInputs.TemperatureController.power});
-  updateFlowButton.addEventListener('click', () => {separator.L = window.userInputs.LevelController.flowRate});
+  updateLiftButton.addEventListener('click', () => {separator.lift = separator.PressureController.lift; liftInput.value = separator.PressureController.lift;});
+  updatePowerButton.addEventListener('click', () => {separator.Q = separator.TemperatureController.power; powerInput.value = separator.TemperatureController.power});
+  updateFlowButton.addEventListener('click', () => {separator.L = separator.LevelController.flowRate; flowInput.value = separator.LevelController.flowRate});
 }
 
 module.exports = setup;

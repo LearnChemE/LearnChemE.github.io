@@ -7,6 +7,34 @@ class Separator {
     this.xA = 0.303386547137665; // mole fraction A in liquid
     this.T = 455.361990495356; // Temperature of column
     this.P = 75000; // Pressure in column (Pa)
+    this.level = 17.627608479123547; // Liquid level (%)
+
+    this.PressureController = {
+      auto: false,
+      lift: separator.lift,
+      Kc: 0,
+      Tau: 3600,
+      stpt: 70000,
+      error: 0
+    };
+  
+    this.TemperatureController = {
+      auto: false,
+      power: separator.Q,
+      Kc: 0,
+      Tau: 3600,
+      stpt: 550,
+      error: 0
+    };
+    
+    this.LevelController = {
+      auto: false,
+      flowRate: separator.L,
+      Kc: 0,
+      Tau: 3600,
+      stpt: 0.50,
+      error: 0
+    };
 
     /***** USER SPECIFIED *****/
     this.Tin = 400; // Temperature at inlet
@@ -24,7 +52,7 @@ class Separator {
     /***** Historical Values, 1-D array *****/
     this.powers = [this.Q / 1000];
     this.temperatures = [this.T];
-    this.liquidLevels = [this.nL / this.density()];
+    this.levels = [this.level];
     this.flowRates = [this.L];
     this.pressures = [this.P / 1000];
     this.lifts = [this.lift];
@@ -40,16 +68,43 @@ class Separator {
   }
 
   advance() {
-    this.flash();
+    const PC = this.PressureController;
+    const TC = this.TemperatureController;
+    const LC = this.LevelController;
+
+    this.P = this.pressure();
+
+    [this.lift, PC.error] = this.PI(PC.Kc, PC.Tau, PC.error, this.lift, this.P, PC.stpt, PC.auto);
+    this.lift = Math.min(1, this.lift);
+    if(PC.auto) { PC.lift = this.lift; }
+
+    [this.Q, TC.error] = this.PI(TC.Kc, TC.Tau, TC.error, this.Q, this.T, TC.stpt, TC.auto);
+    this.Q = Math.min(1e6, this.Q);
+    this.level = 100 * this.nL / this.density();
+    if(TC.auto) { TC.power = this.Q; }
+
+    [this.L, LC.error] = this.PI(LC.Kc, LC.Tau, LC.error, this.L, this.level, LC.stpt, LC.auto);
+    this.L = Math.min(10, this.L);
+    if(LC.auto) { LC.flowRate = this.L; }
+
+    for (let i = 0; i < 4; i++) {
+      let dx = this.flash();
+      this.nV += 0.25 * dx.dnV;
+      this.nL += 0.25 * dx.dnL;
+      this.xA += 0.25 * dx.dxA;
+      this.yA += 0.25 * dx.dyA;
+      this.T += 0.25 * dx.dT;
+    }  
+
     this.powers.push(this.Q / 1000);
     this.temperatures.push(this.T);
-    this.liquidLevels.push(this.nL / this.density());
+    this.levels.push(this.level);
     this.flowRates.push(this.L);
     this.pressures.push(this.P / 1000);
     this.lifts.push(this.lift);
 
     if(this.temperatures.length > Math.abs(graphics.TPlot.xLims[0])) { this.powers.shift(); this.temperatures.shift(); }
-    if(this.liquidLevels.length > Math.abs(graphics.LPlot.xLims[0])) { this.liquidLevels.shift(); this.flowRates.shift(); }
+    if(this.levels.length > Math.abs(graphics.LPlot.xLims[0])) { this.levels.shift(); this.flowRates.shift(); }
     if(this.pressures.length > Math.abs(graphics.PPlot.xLims[0])) { this.pressures.shift(); this.lifts.shift(); }
   }
 
@@ -61,17 +116,15 @@ class Separator {
       return mappedValue;
     };
 
-    const minMax = (array, precision) => {
+    const minMax = (array) => {
       let min = array[0];
       let max = array[0];
-      for (let i = 1; i < array.length; i++) {
+      for (let i = 0; i < array.length; i++) {
         min = Math.min(array[i], min);
         max = Math.max(array[i], max);
       }
       min *= 0.9;
       max *= 1.1;
-      min = Number(Number(min).toFixed(precision));
-      max = Number(Number(max).toFixed(precision));
       return [min, max];
     }
 
@@ -88,21 +141,47 @@ class Separator {
       }
     };
 
+    // Update axes limits, then convert the values to coordinates, then update the plotted array
+
+    let powerMinMax = minMax(this.powers);
+    powerMinMax[0] -= powerMinMax[0] % 10; // round down to nearest 10
+    powerMinMax[1] += (10 - powerMinMax[1] % 10); // round up to nearest 10
+    graphics.TPlot.rightLims = powerMinMax;
     coords(this.powers, this.powerCoords, graphics.TPlot.yLims, graphics.TPlot.rightLims, true);
     graphics.TPlot.funcs[0].update(this.powerCoords);
 
+    let flowRateMinMax = minMax(this.flowRates);
+    flowRateMinMax[0] -= flowRateMinMax[0] % 0.1;
+    flowRateMinMax[1] += (0.1 - flowRateMinMax[1] % 0.1);
+    graphics.LPlot.rightLims = flowRateMinMax;
     coords(this.flowRates, this.flowRateCoords, graphics.LPlot.yLims, graphics.LPlot.rightLims, true);
     graphics.LPlot.funcs[1].update(this.flowRateCoords);
 
+    let liftMinMax = minMax(this.lifts);
+    liftMinMax[0] -= liftMinMax[0] % 0.1;
+    liftMinMax[1] += (0.1 - liftMinMax[1] % 0.1);
+    graphics.PPlot.rightLims = liftMinMax;
     coords(this.lifts, this.liftCoords, graphics.PPlot.yLims, graphics.PPlot.rightLims, true);
     graphics.PPlot.funcs[1].update(this.liftCoords);
 
+    let tempMinMax = minMax(this.temperatures);
+    tempMinMax[0] -= tempMinMax[0] % 10;
+    tempMinMax[1] += (10 - tempMinMax[1] % 10);
+    graphics.TPlot.yLims = tempMinMax;
     coords(this.temperatures, this.temperatureCoords, 0, 0, false);
     graphics.TPlot.funcs[1].update(this.temperatureCoords);
 
-    coords(this.liquidLevels, this.liquidLevelCoords, [0, 100], [0, 1], true); // fraction to percent
+    let levelMinMax = minMax(this.levels);
+    levelMinMax[0] -= levelMinMax[0] % 10;
+    levelMinMax[1] += (10 - levelMinMax[1] % 10);
+    graphics.LPlot.yLims = levelMinMax;
+    coords(this.levels, this.liquidLevelCoords, 0, 0, false);
     graphics.LPlot.funcs[0].update(this.liquidLevelCoords);
 
+    let pressureMinMax = minMax(this.pressures);
+    pressureMinMax[0] -= pressureMinMax[0] % 10;
+    pressureMinMax[1] += (10 - pressureMinMax[1] % 10);
+    graphics.PPlot.yLims = pressureMinMax;
     coords(this.pressures, this.pressureCoords, 0, 0, false);
     graphics.PPlot.funcs[0].update(this.pressureCoords);
 
@@ -126,8 +205,8 @@ class Separator {
     this.T =  Math.max(zero, this.T);
     this.P = this.pressure();
 
-    const B = this.L * this.density() / 1000; // bottoms flow rate, mol / s
     const D = this.valve(); // distillate flow rate, mol / s
+    const B = this.L * this.density() / 1000; // bottoms flow rate, mol / s
 
     const Cp = 190; // J / mol
     const heatVapA = 43290; // heat of vaporization, J / mol
@@ -137,9 +216,9 @@ class Separator {
     const NB = this.fluxB();
 
     let dnV = (NA + NB) - D;
+    let dyA = (NA - this.yA * (NA + NB)) / this.nV;
     let dnL = this.F - (NA + NB) - B;
-    let dyA = (NA - this.yA * D) / this.nV; // modified from original equation to make sense
-    let dxA = (this.F * this.xin - NA - B * this.xA) / this.nL; // modified from original equation to make sense
+    let dxA = (this.F * (this.xin - this.xA) - NA + this.xA * (NA + NB)) / this.nL;
     let dT = (Cp * this.F * ( this.Tin - this.T ) + this.Q - heatVapA * NA - heatVapB * NB) / ( Cp * (this.nV + this.nL) );
 
     let d = [];
@@ -159,11 +238,13 @@ class Separator {
       d.push(d0);
     });
     
-    this.nV += d[0];
-    this.nL += d[1];
-    this.yA += d[2];
-    this.xA += d[3];
-    this.T += d[4];
+    return {
+      dnV : d[0],
+      dnL : d[1],
+      dyA : d[2],
+      dxA : d[3],
+      dT : d[4]
+    }
   }
 
   // Molar flow rate of A from liquid to vapor
@@ -180,6 +261,21 @@ class Separator {
     const A = 5; // m^2 / m^2
     const NB = (1 - this.xA) * KB * A * (this.pSatB() * (1 - this.xA) / this.P - (1 - this.yA)) * this.nL / this.density();
     return NB;
+  }
+
+  PI(Kc, tauI, currentErrors, currentmv, cv, stpt, auto) {
+    let errors = currentErrors;
+    let mv = currentmv;
+    if (auto) {
+      const err = stpt - cv;
+      errors += err;
+      const dmv = Kc*(err + errors/tauI);
+      mv += dmv;
+    } else {
+      errors = 0;
+    }
+    mv = Math.max(Number.MIN_VALUE, mv);
+    return [mv, errors];
   }
 
   pressure() {

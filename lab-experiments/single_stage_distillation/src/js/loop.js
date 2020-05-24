@@ -5,6 +5,7 @@ function loop(sk) {
     graphics.TPlot.plotDraw();
     graphics.PPlot.plotDraw();
     graphics.LPlot.plotDraw();
+    // sk.noLoop();
   }
 }
 
