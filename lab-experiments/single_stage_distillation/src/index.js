@@ -18,7 +18,7 @@ document.body.appendChild(doc);
 window.separator = Separator();
 
 let animation = (sk) => {
-  setup(sk, 15);
+  setup(sk, 120);
   loop(sk);
 }
 

@@ -9,33 +9,6 @@ class Separator {
     this.P = 75000; // Pressure in column (Pa)
     this.level = 17.627608479123547; // Liquid level (%)
 
-    this.PressureController = {
-      auto: false,
-      lift: separator.lift,
-      Kc: 0,
-      Tau: 3600,
-      stpt: 70000,
-      error: 0
-    };
-  
-    this.TemperatureController = {
-      auto: false,
-      power: separator.Q,
-      Kc: 0,
-      Tau: 3600,
-      stpt: 550,
-      error: 0
-    };
-    
-    this.LevelController = {
-      auto: false,
-      flowRate: separator.L,
-      Kc: 0,
-      Tau: 3600,
-      stpt: 0.50,
-      error: 0
-    };
-
     /***** USER SPECIFIED *****/
     this.Tin = 400; // Temperature at inlet
     this.xin = 0.5; // mole fraction at inlet
@@ -45,9 +18,36 @@ class Separator {
     this.autoPressure = false;
 
     /**** Control Variables *****/
-    this.L = 0.65; // Volumetric flowrate of bottoms (L / sec)
+    this.L = 0.66; // Volumetric flowrate of bottoms (L / sec)
     this.Q = 500000; // heat added
     this.lift = 0.5; // lift of valve
+
+    this.PressureController = {
+      auto: false,
+      Kc: 0,
+      mv: this.lift,
+      Tau: 36000,
+      stpt: 70000,
+      error: 0
+    };
+  
+    this.TemperatureController = {
+      auto: false,
+      Kc: 0,
+      mv: this.Q,
+      Tau: 36000,
+      stpt: 550,
+      error: 0
+    };
+    
+    this.LevelController = {
+      auto: false,
+      Kc: -0.6,
+      mv: this.L,
+      Tau: 360,
+      stpt: 18,
+      error: 0
+    };
 
     /***** Historical Values, 1-D array *****/
     this.powers = [this.Q / 1000];
@@ -74,18 +74,19 @@ class Separator {
 
     this.P = this.pressure();
 
-    [this.lift, PC.error] = this.PI(PC.Kc, PC.Tau, PC.error, this.lift, this.P, PC.stpt, PC.auto);
+    //PI(Kc, tauI, currentErrors, currentmv, cv, stpt, auto)
+    if(!PC.auto) {PC.stpt = this.lift}
+    [this.lift, PC.error] = this.PI(PC.Kc, PC.Tau, PC.error, PC.mv, this.P, PC.stpt, PC.auto);
     this.lift = Math.min(1, this.lift);
-    if(PC.auto) { PC.lift = this.lift; }
 
-    [this.Q, TC.error] = this.PI(TC.Kc, TC.Tau, TC.error, this.Q, this.T, TC.stpt, TC.auto);
+    if(!TC.auto) {TC.stpt = this.Q}
+    [this.Q, TC.error] = this.PI(TC.Kc, TC.Tau, TC.error, TC.mv, this.T, TC.stpt, TC.auto);
     this.Q = Math.min(1e6, this.Q);
     this.level = 100 * this.nL / this.density();
-    if(TC.auto) { TC.power = this.Q; }
 
-    [this.L, LC.error] = this.PI(LC.Kc, LC.Tau, LC.error, this.L, this.level, LC.stpt, LC.auto);
+    if(!LC.auto) {LC.stpt = this.L}
+    [this.L, LC.error] = this.PI(LC.Kc, LC.Tau, LC.error, LC.mv, this.level, LC.stpt, LC.auto);
     this.L = Math.min(10, this.L);
-    if(LC.auto) { LC.flowRate = this.L; }
 
     for (let i = 0; i < 4; i++) {
       let dx = this.flash();
@@ -263,15 +264,14 @@ class Separator {
     return NB;
   }
 
-  PI(Kc, tauI, currentErrors, currentmv, cv, stpt, auto) {
-    let errors = currentErrors;
-    let mv = currentmv;
+  PI(Kc, tauI, errors, mv, cv, stpt, auto) {
     if (auto) {
       const err = stpt - cv;
       errors += err;
       const dmv = Kc*(err + errors/tauI);
       mv += dmv;
     } else {
+      mv = stpt;
       errors = 0;
     }
     mv = Math.max(Number.MIN_VALUE, mv);
