@@ -72,7 +72,7 @@ const autoParams = {
   KcDefault: 0,
   KcMin: -1000000,
   KcMax: 1000000,
-  KcStep: 1
+  KcStep: 1e-9
 }
 
 function html(opts) {
@@ -147,7 +147,9 @@ function insertInputs() {
     const toggleAuto = () => {
       manualbtn.classList.remove("on");
       autobtn.classList.add("on");
-      stptInput.value = opts.obj["currentVal"];
+      opts.obj["stpt"] = stptInput.value;
+      opts.obj["Tau"] = tauInput.value;
+      opts.obj["Kc"] = KcInput.value;
       opts.obj["auto"] = true;
     }
 
