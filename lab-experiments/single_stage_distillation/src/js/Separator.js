@@ -24,28 +24,40 @@ class Separator {
 
     this.PressureController = {
       auto: false,
-      Kc: 0,
       mv: this.lift,
+      currentVal: this.lift,
+      Kc: 0,
       Tau: 36000,
       stpt: 70000,
+      tempTau: 36000,
+      tempStpt: 70000,
+      tempKc: 0,
       error: 0
     };
   
     this.TemperatureController = {
       auto: false,
-      Kc: 0,
       mv: this.Q,
+      currentVal: this.Q,
+      Kc: 0,
       Tau: 36000,
-      stpt: 550,
+      stpt: 500,
+      tempTau: 36000,
+      tempStpt: 500,
+      tempKc: 0,
       error: 0
     };
     
     this.LevelController = {
       auto: false,
-      Kc: -0.6,
       mv: this.L,
-      Tau: 360,
-      stpt: 18,
+      currentVal: this.L,
+      Kc: 0,
+      Tau: 36000,
+      stpt: 25,
+      tempTau: 36000,
+      tempStpt: 25,
+      tempKc: 0,
       error: 0
     };
 
@@ -53,7 +65,7 @@ class Separator {
     this.powers = [this.Q / 1000];
     this.temperatures = [this.T];
     this.levels = [this.level];
-    this.flowRates = [this.L];
+    this.flowRatesOut = [this.L];
     this.pressures = [this.P / 1000];
     this.lifts = [this.lift];
 
@@ -61,7 +73,7 @@ class Separator {
     this.powerCoords = [[0, 0]];
     this.temperatureCoords = [[0, 0]];
     this.liquidLevelCoords = [[0, 0]];
-    this.flowRateCoords = [[0, 0]];
+    this.flowRatesOutCoords = [[0, 0]];
     this.pressureCoords = [[0, 0]];
     this.liftCoords = [[0, 0]];
 
@@ -75,16 +87,16 @@ class Separator {
     this.P = this.pressure();
 
     //PI(Kc, tauI, currentErrors, currentmv, cv, stpt, auto)
-    if(!PC.auto) {PC.stpt = this.lift}
+    if(!PC.auto) {PC.stpt = this.lift; PC.currentVal = this.P - this.P % 100;} else { PC.currentVal = Number(Number(this.lift).toFixed(2)); }
     [this.lift, PC.error] = this.PI(PC.Kc, PC.Tau, PC.error, PC.mv, this.P, PC.stpt, PC.auto);
     this.lift = Math.min(1, this.lift);
 
-    if(!TC.auto) {TC.stpt = this.Q}
+    if(!TC.auto) {TC.stpt = this.Q; TC.currentVal = this.T - this.T % 1;} else { TC.currentVal = this.Q - this.Q % 100;}
     [this.Q, TC.error] = this.PI(TC.Kc, TC.Tau, TC.error, TC.mv, this.T, TC.stpt, TC.auto);
     this.Q = Math.min(1e6, this.Q);
     this.level = 100 * this.nL / this.density();
 
-    if(!LC.auto) {LC.stpt = this.L}
+    if(!LC.auto) {LC.stpt = this.L; LC.currentVal = this.level - this.level % 1;} else { LC.currentVal = Number(Number(this.L).toFixed(2));}
     [this.L, LC.error] = this.PI(LC.Kc, LC.Tau, LC.error, LC.mv, this.level, LC.stpt, LC.auto);
     this.L = Math.min(10, this.L);
 
@@ -95,17 +107,17 @@ class Separator {
       this.xA += 0.25 * dx.dxA;
       this.yA += 0.25 * dx.dyA;
       this.T += 0.25 * dx.dT;
-    }  
+    }
 
     this.powers.push(this.Q / 1000);
     this.temperatures.push(this.T);
     this.levels.push(this.level);
-    this.flowRates.push(this.L);
+    this.flowRatesOut.push(this.L);
     this.pressures.push(this.P / 1000);
     this.lifts.push(this.lift);
 
     if(this.temperatures.length > Math.abs(graphics.TPlot.xLims[0])) { this.powers.shift(); this.temperatures.shift(); }
-    if(this.levels.length > Math.abs(graphics.LPlot.xLims[0])) { this.levels.shift(); this.flowRates.shift(); }
+    if(this.levels.length > Math.abs(graphics.LPlot.xLims[0])) { this.levels.shift(); this.flowRatesOut.shift(); }
     if(this.pressures.length > Math.abs(graphics.PPlot.xLims[0])) { this.pressures.shift(); this.lifts.shift(); }
   }
 
@@ -151,12 +163,12 @@ class Separator {
     coords(this.powers, this.powerCoords, graphics.TPlot.yLims, graphics.TPlot.rightLims, true);
     graphics.TPlot.funcs[1].update(this.powerCoords);
 
-    let flowRateMinMax = minMax(this.flowRates);
-    flowRateMinMax[0] -= flowRateMinMax[0] % 0.1;
-    flowRateMinMax[1] += (0.1 - flowRateMinMax[1] % 0.1);
-    graphics.LPlot.rightLims = flowRateMinMax;
-    coords(this.flowRates, this.flowRateCoords, graphics.LPlot.yLims, graphics.LPlot.rightLims, true);
-    graphics.LPlot.funcs[1].update(this.flowRateCoords);
+    let flowRateOutMinMax = minMax(this.flowRatesOut);
+    flowRateOutMinMax[0] -= flowRateOutMinMax[0] % 0.1;
+    flowRateOutMinMax[1] += (0.1 - flowRateOutMinMax[1] % 0.1);
+    graphics.LPlot.rightLims = flowRateOutMinMax;
+    coords(this.flowRatesOut, this.flowRatesOutCoords, graphics.LPlot.yLims, graphics.LPlot.rightLims, true);
+    graphics.LPlot.funcs[1].update(this.flowRatesOutCoords);
 
     let liftMinMax = minMax(this.lifts);
     liftMinMax[0] -= liftMinMax[0] % 0.1;

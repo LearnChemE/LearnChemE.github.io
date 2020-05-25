@@ -11,8 +11,8 @@ function setup(sk, speed) {
   sk.setup = () => {
     graphics.cnv = sk.createCanvas(1, 1);
     graphics.cnv.hide();
-    let plotWidth = 450;
-    let plotHeight = 320;
+    let plotWidth = 350;
+    let plotHeight = 240;
     graphics.bottomLeft = sk.createGraphics(plotWidth, plotHeight);
     graphics.bottomRight = sk.createGraphics(plotWidth, plotHeight);
     graphics.topRight = sk.createGraphics(plotWidth, plotHeight);
@@ -71,7 +71,7 @@ function setup(sk, speed) {
     const PressureArray = new ArrayPlot(separator.pressureCoords);
     const LiftArray = new ArrayPlot(separator.liftCoords);
     const LevelArray = new ArrayPlot(separator.liquidLevelCoords);
-    const FlowrateArray = new ArrayPlot(separator.flowRateCoords);
+    const FlowrateArray = new ArrayPlot(separator.flowRatesOutCoords);
 
     TemperatureArray.lineColor = graphics.TempColor;
     PowerArray.lineColor = graphics.PowerColor;
@@ -86,53 +86,8 @@ function setup(sk, speed) {
 
     separator.createCoords();
 
-    setupInputs();
-
     sk.frameRate(speed);
   }
-}
-
-function parseNumericInput(value, min, max) {
-  let input = Number(value);
-  input = Math.max(min, Math.min(max, input));
-  return input;
-}
-
-function setupInputs() {
-  const liftInput = document.getElementById("input-lift");
-  const powerInput = document.getElementById("input-power");
-  const flowInput = document.getElementById("input-flow");
-  const updateLiftButton = document.getElementById("update-lift");
-  const updatePowerButton = document.getElementById("update-power");
-  const updateFlowButton = document.getElementById("update-flow");
-
-  liftInput.addEventListener('input', () => {
-    const inputValue = liftInput.value;
-    const min = Number(liftInput.getAttribute("min"));
-    const max = Number(liftInput.getAttribute("max"));
-    const parsed = parseNumericInput(inputValue, min, max);
-    separator.PressureController.lift = parsed;
-  });
-
-  powerInput.addEventListener('input', () => {
-    const inputValue = powerInput.value;
-    const min = Number(powerInput.getAttribute("min"));
-    const max = Number(powerInput.getAttribute("max"));
-    const parsed = parseNumericInput(inputValue, min, max);
-    separator.TemperatureController.power = parsed;
-  });
-
-  flowInput.addEventListener('input', () => {
-    const inputValue = flowInput.value;
-    const min = Number(flowInput.getAttribute("min"));
-    const max = Number(flowInput.getAttribute("max"));
-    const parsed = parseNumericInput(inputValue, min, max);
-    separator.LevelController.flowRate = parsed;
-  });
-
-  updateLiftButton.addEventListener('click', () => {separator.lift = separator.PressureController.lift; liftInput.value = separator.PressureController.lift;});
-  updatePowerButton.addEventListener('click', () => {separator.Q = separator.TemperatureController.power; powerInput.value = separator.TemperatureController.power});
-  updateFlowButton.addEventListener('click', () => {separator.L = separator.LevelController.flowRate; flowInput.value = separator.LevelController.flowRate});
 }
 
 module.exports = setup;

@@ -1,3 +1,5 @@
+$enable-responsive-font-sizes: true;
+
 @import '~bootstrap/scss/bootstrap.scss';
 
 $bg: #FFFFFF;
@@ -7,30 +9,41 @@ body {
   background: $bg;
 }
 
-#buttonGroup {
-  width: 320px;
+.button-group {
+  width: 12rem;
   margin-top: 2rem;
   margin-left: 2rem;
 
   .input-group-text {
-    width: 15ch;
+    width: 6rem;
+  }
+
+  .form-control {
+    width: 5rem;
+  }
+
+  .btn-group {
+    .on {
+      background-color: #45494d;
+      border-color: rgb(180, 189, 20);
+    }
   }
 }
 
 #TPlot {
   position: absolute;
-  bottom: $outerPlotMargin;
+  top: 15rem;
   left: $outerPlotMargin;
 }
 
 #PPlot {
   position: absolute;
-  top: $outerPlotMargin;
-  right: $outerPlotMargin;
+  top: 15rem;
+  left: 380px;
 }
 
 #LPlot {
   position: absolute;
-  bottom: $outerPlotMargin;
-  right: $outerPlotMargin;
+  top: 15rem;
+  left: 740px;
 }

@@ -8,14 +8,10 @@ import * as setup from './js/setup.js';
 import * as loop from './js/loop.js';
 import * as Separator from './js/Separator.js';
 
-/******** ADD HTML FROM HTML FOLDER ********/
-const html = require('./html/main.html').toString();
-const doc = document.createElement('div');
-doc.id = "main-application-wrapper";
-doc.innerHTML = html;
-document.body.appendChild(doc);
-
 window.separator = Separator();
+
+/******** ADD HTML FOR BUTTONS ********/
+require('./js/insertInputs.js')();
 
 let animation = (sk) => {
   setup(sk, 120);
