@@ -141,7 +141,7 @@ function defineGraficaJS() {
 		this.dim = dim.slice();
 		this.relativePos = 0.5;
 		this.plotPos = this.relativePos * this.dim[0];
-		this.offset = 10;
+		this.offset = 15;
 
 		// Text properties
 		this.text = "";

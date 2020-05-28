@@ -119,6 +119,8 @@ class Separator {
     if(this.temperatures.length > Math.abs(graphics.TPlot.xLims[0])) { this.powers.shift(); this.temperatures.shift(); }
     if(this.levels.length > Math.abs(graphics.LPlot.xLims[0])) { this.levels.shift(); this.flowRatesOut.shift(); }
     if(this.pressures.length > Math.abs(graphics.PPlot.xLims[0])) { this.pressures.shift(); this.lifts.shift(); }
+
+    this.updateDOM();
   }
 
   createCoords() {
@@ -310,6 +312,31 @@ class Separator {
     const C = -74.048;
     const pSat = 101325 * 10 ** (A - B / (this.T + C));
     return pSat;
+  }
+
+  updateDOM() {
+    const TemperatureDisplay = document.getElementById("TemperatureTextWrapper").firstChild;
+    const PressureDisplay = document.getElementById("PressureTextWrapper").firstChild;
+    const LevelDisplay = document.getElementById("LevelTextWrapper").firstChild;
+    const LiftDisplay = document.getElementById("input-lift");
+    const BottomsDisplay = document.getElementById("input-flowRateOut");
+    const PowerDisplay = document.getElementById("input-power");
+
+    const T = Math.round(this.T);
+    const P = Number(this.P).toFixed(0);
+    const L = Number(this.level).toPrecision(3);
+
+    const Q = Number(this.Q).toFixed(0);
+    const B = Number(this.L).toPrecision(3);
+    const lift = Number(this.lift).toPrecision(3);
+
+    TemperatureDisplay.innerHTML = `${T}&nbsp;K`;
+    PressureDisplay.innerHTML = `${P}&nbsp;Pa`;
+    LevelDisplay.innerHTML = `${L}&nbsp;%`;
+
+    if(this.TemperatureController.auto) {PowerDisplay.value = `${Q}`}
+    if(this.PressureController.auto) {LiftDisplay.value = `${lift}`}
+    if(this.LevelController.auto) {BottomsDisplay.value = `${B}`}
   }
 
   valve() {

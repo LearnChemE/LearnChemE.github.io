@@ -31,10 +31,10 @@ function definePlotFunctions() {
       this.yAxisColor = "rgb(0, 0, 0)";
       this.rightAxisColor = "rgb(0, 0, 0)";
       this.funcs = new Array(0);
-      this.fontSize = 12;
-      this.titleFontSize = 12;
-      this.axisFontSize = 12;
-      this.axisLabelSize = 12;
+      this.fontSize = 13;
+      this.titleFontSize = 14;
+      this.axisFontSize = 13;
+      this.axisLabelSize = 14;
       this.GPLOT.yAxis.setRotateTickLabels(false);
       this.GPLOT.yAxis.setTickLabelOffset(10);
       this.GPLOT.yAxis.lab.setOffset(45);

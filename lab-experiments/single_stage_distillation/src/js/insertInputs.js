@@ -147,6 +147,7 @@ function insertInputs() {
 
     const toggleAuto = () => {
       manualbtn.classList.remove("on");
+      manualInput.setAttribute("disabled", true);
       autobtn.classList.add("on");
       opts.obj["stpt"] = stptInput.value;
       opts.obj["Tau"] = tauInput.value;
@@ -156,6 +157,7 @@ function insertInputs() {
 
     const toggleManual = () => {
       autobtn.classList.remove("on");
+      manualInput.removeAttribute("disabled");
       manualbtn.classList.add("on");
       manualInput.value = opts.obj["currentVal"];
       opts.obj["auto"] = false;
