@@ -10,11 +10,12 @@ import * as Separator from './js/Separator.js';
 
 window.separator = Separator();
 
-/******** ADD HTML FOR BUTTONS ********/
+/******** ADD HTML ********/
+require('./js/insertSVG.js')();
 require('./js/insertInputs.js')();
 
 let animation = (sk) => {
-  setup(sk, 120);
+  setup(sk, 20);
   loop(sk);
 }
 

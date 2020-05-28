@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400mm" height="300mm" version="1.1" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <title>Process and instrumentation diagram for a single stage distillation column</title>
+ <g fill="none" stroke="#000">
+  <g stroke-dashoffset="21.001" stroke-width=".53">
+   <rect id="PressureGraphArea" x="255.26" y="5.265" width="139.47" height="94.47"/>
+   <rect id="LevelGraphArea" x="255.26" y="200.26" width="139.47" height="94.47"/>
+   <rect id="TemperatureGraphArea" x="5.265" y="200.26" width="139.47" height="94.47"/>
+  </g>
+  <g>
+   <rect id="LCInputArea" x="155.26" y="210.26" width="89.47" height="84.47" stroke-width=".53"/>
+   <rect id="TCInputArea" x="5.265" y="105.26" width="89.47" height="89.47" stroke-width=".53"/>
+   <rect id="InletInputArea" x="5.265" y="5.265" width="89.47" height="64.47" stroke-width=".53"/>
+   <rect id="PCInputArea" x="305.26" y="105.26" width="89.47" height="89.47" stroke-width=".53"/>
+  </g>
+ </g>
+ <g id="CenterImage" transform="translate(.65666 6.8976)">
+  <path d="m173.23 147.47v22c7.5 0.0151 34.381-0.15051 41.881-0.13544" fill="none" stroke="#000" stroke-width=".26458px"/>
+  <g id="pump" transform="matrix(.71477 0 0 .71347 39.428 -3.6986)" fill="#ccc" stroke-width="1.4003">
+   <path d="m246.14 247.39h22.517c-1.1258-1.1578-2.2517-2.3156-3.3775-3.4733h-15.762c-1.1258 1.1578-2.2517 2.3156-3.3775 3.4733z" stroke="#000" stroke-width=".74217"/>
+   <rect x="260.27" y="225.26" width="14.47" height="5.47"/>
+   <rect x="245.8" y="239.8" width="14.47" height="5.47"/>
+   <circle cx="260.27" cy="235.26" r="10"/>
+   <g stroke="#000" stroke-width=".74217">
+    <path d="m269.18 230.73a10 10 0 0 1-0.38366 9.7649 10 10 0 0 1-8.5264 4.775" stroke-dashoffset="21.001"/>
+    <path d="m251.44 239.96a10 10 0 0 1 0.2578-9.8451 10 10 0 0 1 8.5717-4.8496" stroke-dashoffset="21.001"/>
+    <path d="m260.27 225.26h14.47v5.47h-5.555"/>
+    <path d="m260.27 245.26h-14.47v-5.47h5.5551"/>
+   </g>
+  </g>
+  <g id="column" transform="matrix(.72921 0 0 .73012 27.392 -13.153)" stroke="#000" stroke-width=".36261px">
+   <path d="m225 200v-100s0.10567-20-25-20c-25.233 0-25 20-25 20v100s-0.10567 20 25 20c24.978 0 25-20 25-20z" fill="#e6e6e6"/>
+   <path id="liquidPath" d="m175 200s-0.1376 20 25 20 25-20 25-20v-15s-4.064-2.279-6.2258-2c-2.4598 0.31751-3.7939 4.0022-6.2742 4-2.4735-2e-3 -3.7765-4-6.25-4s-3.7765 3.9961-6.25 4c-2.4857 4e-3 -3.8077-3.9946-6.2934-4-2.5029-5e-3 -3.8518 4.0144-6.3547 4-2.458-0.0142-3.7576-3.6823-6.195-4-2.1398-0.27892-6.1569 2-6.1569 2z" fill="#deaa87"/>
+  </g>
+  <g stroke="#000" stroke-width=".26458px">
+   <path id="arrowIn" d="m92.719 80.83h62.284l-6.7158-1.9435v3.887l6.7158-1.9435"/>
+   <path id="arrowTop" d="m173.23 45.257 1.8e-4 -36.482-1.9435 6.7158h3.887l-1.9435-6.7158"/>
+   <path id="arrowAfterPump" d="m235.8 158.97h62.284l-6.7158-1.9435v3.887l6.7158-1.9435"/>
+  </g>
+  <g id="ValveAfterPump" transform="translate(155.75 96.456)" fill="#f2f2f2" stroke="#000">
+   <path d="m99.08 57.721v9.5914l20-9.5914v9.5914z" stroke-width=".26458px"/>
+   <path d="m109.08 62.516v-9h7.4885s-1.079-4.7485-7.4885-4.7485-7.4885 4.7485-7.4885 4.7485h7.4885" stroke-width=".26458px"/>
+  </g>
+  <g stroke="#000">
+   <rect x="191.46" y="122.07" width="4.6059" height="5.3277" fill="#e6e6e6" stroke-dashoffset="21.001" stroke-width=".265"/>
+   <rect x="150.4" y="102.38" width="4.6059" height="5.3277" fill="#e6e6e6" stroke-dashoffset="21.001" stroke-width=".265"/>
+   <path d="m196.07 124.73h68.756v20.492" fill="none" stroke-dasharray="2.12, 1.06" stroke-width=".265"/>
+   <circle id="LCcircle" cx="264.83" cy="124.73" r="10" fill="#f9f9f9" stroke-width=".265"/>
+  </g>
+  <g transform="rotate(90 157.06 78.695)" fill="#f2f2f2" stroke="#000">
+   <path d="m99.08 57.721v9.5914l20-9.5914v9.5914z" stroke-width=".26458px"/>
+   <path d="m109.08 62.516v-9h7.4885s-1.079-4.7485-7.4885-4.7485-7.4885 4.7485-7.4885 4.7485h7.4885" stroke-width=".26458px"/>
+  </g>
+  <g stroke="#000">
+   <path d="m187.02 30.72h33.758v31.803h-24.704" fill="none" stroke-dasharray="2.12, 1.06" stroke-width=".265"/>
+   <g>
+    <rect x="191.46" y="59.859" width="4.6059" height="5.3277" fill="#e6e6e6" stroke-dashoffset="21.001" stroke-width=".265"/>
+    <circle id="PCcircle" cx="220.77" cy="30.72" r="10" fill="#f9f9f9" stroke-width=".265"/>
+    <path d="m125.46 117.93h40.305l-6.1422 4.735 6.1422 4.735h-36.012" fill="none" stroke-width=".53"/>
+   </g>
+   <path d="m116.94 113.17v-8.1246h33.498" fill="none" stroke-dasharray="2.12, 1.06" stroke-width=".265"/>
+   <circle cx="116.94" cy="123.17" r="10" fill="#f9f9f9" stroke-width=".265"/>
+   <path d="m126.42 127.4 5.5931-1.6362v3.2724z" stroke-width=".26458px"/>
+  </g>
+  <g fill="#000000" font-family="sans-serif" font-size="10.583px" stroke-width=".26458">
+   <text x="258.28293" y="128.5834" style="line-height:1.25" xml:space="preserve"><tspan x="258.28293" y="128.5834" stroke-width=".26458">LC</tspan></text>
+   <text x="213.47501" y="34.510365" style="line-height:1.25" xml:space="preserve"><tspan x="213.47501" y="34.510365" stroke-width=".26458">PC</tspan></text>
+   <text x="110.11662" y="127.01147" style="line-height:1.25" xml:space="preserve"><tspan x="110.11662" y="127.01147" stroke-width=".26458">TC</tspan></text>
+  </g>
+ </g>
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:title>Process and instrumentation diagram for a single stage distillation column</dc:title>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+</svg>

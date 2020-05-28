@@ -85,8 +85,44 @@ function setup(sk, speed) {
     LPlot.addFuncs(LevelArray, FlowrateArray);
 
     separator.createCoords();
-
+    sk.windowResized();
     sk.frameRate(speed);
+  }
+
+  sk.windowResized = () => {
+    const TGraphArea = document.getElementById("TemperatureGraphArea");
+    const PGraphArea = document.getElementById("PressureGraphArea");
+    const LGraphArea = document.getElementById("LevelGraphArea");
+    const TInputArea = document.getElementById("TCInputArea");
+    const PInputArea = document.getElementById("PCInputArea");
+    const LInputArea = document.getElementById("LCInputArea");
+
+    const TGraph = document.getElementById("TPlot");
+    const PGraph = document.getElementById("PPlot");
+    const LGraph = document.getElementById("LPlot");
+    const TInput = document.getElementById("TC-control");
+    const PInput = document.getElementById("PC-control");
+    const LInput = document.getElementById("LC-control");
+
+    [
+      [TGraph, TGraphArea],
+      [PGraph, PGraphArea],
+      [LGraph, LGraphArea],
+      [TInput, TInputArea],
+      [PInput, PInputArea],
+      [LInput, LInputArea]
+    ].forEach(pair => {
+      const rect = pair[1].getBoundingClientRect();
+      const x = rect.x;
+      const y = rect.y;
+      const width = rect.width;
+      const height = rect.height;
+
+      pair[0].style.left = `${x}px`;
+      pair[0].style.top = `${y}px`;
+      pair[0].style.width = `${width}px`;
+      pair[0].style.height = `${height}px`;
+    })
   }
 }
 
