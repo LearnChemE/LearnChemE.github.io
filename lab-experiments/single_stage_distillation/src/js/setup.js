@@ -35,7 +35,7 @@ function setup(sk, speed) {
     TPlot.xAxisLabel = "time (s)";
     TPlot.yAxisLabel = "temperature (K)";
     TPlot.rightAxisLabel = "power consumption (kW)"
-    TPlot.plotTitle = "";
+    TPlot.plotTitle = "Temperature vs. power consumption";
     TPlot.yAxisColor = graphics.TempColor;
     TPlot.rightAxisColor = graphics.PowerColor;
     TPlot.plotSetup();
@@ -48,7 +48,7 @@ function setup(sk, speed) {
     PPlot.xAxisLabel = "time (s)";
     PPlot.yAxisLabel = "pressure (kPa)";
     PPlot.rightAxisLabel = "lift"
-    PPlot.plotTitle = "";
+    PPlot.plotTitle = "Pressure vs. valve lift";
     PPlot.yAxisColor = graphics.PressureColor;
     PPlot.rightAxisColor = graphics.LiftColor;
     PPlot.plotSetup();
@@ -61,7 +61,7 @@ function setup(sk, speed) {
     LPlot.xAxisLabel = "time (s)";
     LPlot.yAxisLabel = "liquid level (%)";
     LPlot.rightAxisLabel = "flow rate (L/s)"
-    LPlot.plotTitle = "";
+    LPlot.plotTitle = "Liquid level vs. bottoms flow rate";
     LPlot.yAxisColor = graphics.LevelColor;
     LPlot.rightAxisColor = graphics.FlowrateColor;
     LPlot.plotSetup();

@@ -37,12 +37,12 @@ function definePlotFunctions() {
       this.axisLabelSize = 12;
       this.GPLOT.yAxis.setRotateTickLabels(false);
       this.GPLOT.yAxis.setTickLabelOffset(10);
-      this.GPLOT.yAxis.lab.setOffset(50);
+      this.GPLOT.yAxis.lab.setOffset(45);
       this.GPLOT.xAxis.lab.setOffset(40);
-      this.GPLOT.setMar([42, 68, 20, 30]);
+      this.GPLOT.setMar([45, 65, 28, 0]);
 
       this.rGPLOT.getRightAxis().setRotateTickLabels(false);
-      this.rGPLOT.getRightAxis().lab.setOffset(50);
+      this.rGPLOT.getRightAxis().lab.setOffset(48);
     }
 
     addFuncs() {

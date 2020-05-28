@@ -12,12 +12,13 @@ const pressureButtons = {
   },
   cv : {
     name: "pressure",
-    stptlabel: "Pressure (Pa)",
+    stptlabel: "<i>P</i>&nbsp;(Pa)",
     stptDefault: 75000,
     stptMin: Number.MIN_VALUE,
     stptMax: 1000000,
     stptStep: 1
-  }
+  },
+  KcUnits : "(Pa<sup>-1</sup>)"
 };
 
 const tempButtons = {
@@ -25,7 +26,7 @@ const tempButtons = {
   obj: separator.TemperatureController,
   mv : {
     name: "power",
-    label: "Power (W)",
+    label: "<i>Q</i>&nbsp;(W)",
     objmvName: "Q",
     min: 0,
     max: 1000000,
@@ -34,12 +35,13 @@ const tempButtons = {
   },
   cv : {
     name: "temperature",
-    stptlabel: "Temp (K)",
+    stptlabel: "<i>T</i>&nbsp;(K)",
     stptDefault: 500,
     stptMin: Number.MIN_VALUE,
     stptMax: 1000,
     stptStep: 10
-  }
+  },
+  KcUnits : "(W/K)"
 };
 
 const levelButtons = {
@@ -47,7 +49,7 @@ const levelButtons = {
   obj: separator.LevelController,
   mv : {
     name: "flowRateOut",
-    label: "Bottoms (L/s)",
+    label: "v<sub>out</sub>&nbsp;(L/s)",
     objmvName: "L",
     min: 0,
     max: 10,
@@ -56,12 +58,13 @@ const levelButtons = {
   },
   cv : {
     name: "level",
-    stptlabel: "Level (%)",
+    stptlabel: "<i>Lvl.</i>&nbsp;(%)",
     stptDefault: 25,
     stptMin: Number.MIN_VALUE,
     stptMax: 100 - Number.MIN_VALUE,
     stptStep: 1
-  }
+  },
+  KcUnits : "[L/(s %)]"
 };
 
 const autoParams = {
@@ -79,24 +82,22 @@ function html(opts) {
 
   const text = `
   <div class="button-group">
+    <h5>${opts.cv.name} controller</h5>
     <div class="btn-toolbar mb-1" role="toolbar" aria-label="PI Controller Mode Toggles for ${opts.mv.label}">
       <div class="btn-group" role="group" aria-label="Auto and manual buttons">
         <button type="button" class="btn btn-sm btn-secondary auto mode-toggle ${opts.controller}">Auto</button>
         <button type="button" class="btn btn-sm btn-secondary manual mode-toggle ${opts.controller} on">Manual</button>
       </div>
-      <button id="update-${opts.controller}" class="btn btn-sm btn-primary ml-3" aria-label="Update controller settings button">Update</button>
+      <button id="update-${opts.controller}" class="btn btn-sm btn-primary ml-1" aria-label="Update controller settings button">Update</button>
     </div>
 
-    <div class="input-wrapper-manual">
+    <div class="input-wrapper">
       <div class="input-group input-group-sm">
         <div class="input-group-prepend">
           <span class="input-group-text" id="input-${opts.mv.name}-label">${opts.mv.label}</span>
         </div>
         <input type="number" id="input-${opts.mv.name}" class="form-control" min="${opts.mv.min}" max="${opts.mv.max}" step="${opts.mv.step}" value="${opts.mv.default}" aria-label="${opts.mv.name} input" aria-describedby="input-${opts.mv.name}-label">
       </div>
-    </div>
-
-    <div class="input-wrapper-auto">
       <div class="input-group input-group-sm">
         <div class="input-group-prepend">
           <span class="input-group-text" id="input-${opts.cv.name}-label">${opts.cv.stptlabel}</span>
@@ -105,7 +106,7 @@ function html(opts) {
       </div>
       <div class="input-group input-group-sm">
         <div class="input-group-prepend">
-          <span class="input-group-text" id="input-${opts.cv.name}-Kc-label">K<sub>c</sub></span>
+          <span class="input-group-text" id="input-${opts.cv.name}-Kc-label">K<sub>c</sub>&nbsp;${opts.KcUnits}</span>
         </div>
         <input type="number" id="input-${opts.cv.name}-Kc" class="form-control" min="${autoParams.KcMin}" max="${autoParams.KcMax}" step="${autoParams.KcStep}" value="${autoParams.KcDefault}" aria-label="${opts.cv.name} gain input" aria-describedby="input-${opts.cv.name}-Kc-label">
       </div>
@@ -180,6 +181,7 @@ function insertInputs() {
         opts.obj["Kc"] = opts.obj["tempKc"]
         opts.obj["Tau"] = opts.obj["tempTau"];
         opts.obj["stpt"] = opts.obj["tempStpt"];
+        opts.obj["error"] = 0;
       } else {
         separator[`${opts.mv.objmvName}`] = opts.obj["mv"];
         manualInput.value = opts.obj["mv"];

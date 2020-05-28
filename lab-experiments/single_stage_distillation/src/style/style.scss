@@ -1,4 +1,5 @@
 $enable-responsive-font-sizes: true;
+$font-size-base: 0.85rem;
 
 @import '~bootstrap/scss/bootstrap.scss';
 
@@ -12,9 +13,40 @@ body {
 .button-group {
   width: 100%;
   height: 100%;
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 11% 17% 68%;
+  grid-gap: 2% 0%;
+  justify-items: center;
+
+  h5 {
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 0rem;
+    margin-top: 0.15rem;
+    white-space: nowrap;
+  }
+
+  .btn-toolbar {
+    flex-wrap: nowrap;
+  }
+
+  .btn-sm {
+    height: 1.85rem;
+  }
+
+  .input-wrapper {
+    display: grid;
+    grid-template-columns: 100%;
+    grid-auto-rows: 1fr 1fr 1fr 1fr;
+
+    .input-group {
+      height: 1.25rem;
+    }
+  }
 
   .input-group-text {
-    width: 6rem;
+    width: 5rem;
   }
 
   .form-control {
@@ -27,6 +59,7 @@ body {
       border-color: rgb(180, 189, 20);
     }
   }
+
 }
 
 #bgdiv {

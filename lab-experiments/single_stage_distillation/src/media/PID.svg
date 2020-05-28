@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="400mm" height="300mm" version="1.1" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
  <title>Process and instrumentation diagram for a single stage distillation column</title>
- <g fill="none" stroke="#000">
-  <g stroke-dashoffset="21.001" stroke-width=".53">
-   <rect id="PressureGraphArea" x="255.26" y="5.265" width="139.47" height="94.47"/>
-   <rect id="LevelGraphArea" x="255.26" y="200.26" width="139.47" height="94.47"/>
-   <rect id="TemperatureGraphArea" x="5.265" y="200.26" width="139.47" height="94.47"/>
-  </g>
-  <g>
-   <rect id="LCInputArea" x="155.26" y="210.26" width="89.47" height="84.47" stroke-width=".53"/>
-   <rect id="TCInputArea" x="5.265" y="105.26" width="89.47" height="89.47" stroke-width=".53"/>
-   <rect id="InletInputArea" x="5.265" y="5.265" width="89.47" height="64.47" stroke-width=".53"/>
-   <rect id="PCInputArea" x="305.26" y="105.26" width="89.47" height="89.47" stroke-width=".53"/>
-  </g>
+ <g fill="none">
+  <rect id="TemperatureGraphArea" x="5.265" y="200.26" width="126.14" height="94.47"/>
+  <rect id="PressureGraphArea" x="268.6" y="200.26" width="126.14" height="94.47"/>
+  <rect id="LevelGraphArea" x="136.94" y="200.26" width="126.14" height="94.47"/>
+  <rect id="InletInputArea" x="5.265" y="5.265" width="89.47" height="64.47"/>
+  <rect id="TCInputArea" x="5.265" y="105.26" width="89.47" height="89.47"/>
+  <rect id="PCInputArea" x="255.26" y="5.265" width="89.47" height="89.47"/>
+  <rect id="LCInputArea" x="305.26" y="105.26" width="89.47" height="89.47"/>
  </g>
  <g id="CenterImage" transform="translate(.65666 6.8976)">
   <path d="m173.23 147.47v22c7.5 0.0151 34.381-0.15051 41.881-0.13544" fill="none" stroke="#000" stroke-width=".26458px"/>
@@ -67,6 +63,11 @@
    <text x="213.47501" y="34.510365" style="line-height:1.25" xml:space="preserve"><tspan x="213.47501" y="34.510365" stroke-width=".26458">PC</tspan></text>
    <text x="110.11662" y="127.01147" style="line-height:1.25" xml:space="preserve"><tspan x="110.11662" y="127.01147" stroke-width=".26458">TC</tspan></text>
   </g>
+ </g>
+ <g fill="none" stroke="#000" stroke-width=".26458px">
+  <path d="m255.26 5.265h89.47v89.47h-89.47v-52.735l-17.467-5 17.467-5z"/>
+  <path d="m305.26 105.26h89.47v89.47h-89.47v-57.735l-18.226-5 18.226-5z"/>
+  <path d="m94.735 194.74h-89.47v-89.47h89.47l-3e-6 19.735 10.053 5-10.053 5z"/>
  </g>
  <metadata>
   <rdf:RDF>
