@@ -96,6 +96,7 @@ function setup(sk, speed) {
     const TInputArea = document.getElementById("TCInputArea");
     const PInputArea = document.getElementById("PCInputArea");
     const LInputArea = document.getElementById("LCInputArea");
+    const InletInputArea = document.getElementById("InletInputArea");
 
     const TGraph = document.getElementById("TPlot");
     const PGraph = document.getElementById("PPlot");
@@ -103,6 +104,7 @@ function setup(sk, speed) {
     const TInput = document.getElementById("TC-control");
     const PInput = document.getElementById("PC-control");
     const LInput = document.getElementById("LC-control");
+    const InletInput = document.getElementById("inlet-control");
 
     [
       [TGraph, TGraphArea],
@@ -110,7 +112,8 @@ function setup(sk, speed) {
       [LGraph, LGraphArea],
       [TInput, TInputArea],
       [PInput, PInputArea],
-      [LInput, LInputArea]
+      [LInput, LInputArea],
+      [InletInput, InletInputArea]
     ].forEach(pair => {
       const rect = pair[1].getBoundingClientRect();
       const x = rect.x;

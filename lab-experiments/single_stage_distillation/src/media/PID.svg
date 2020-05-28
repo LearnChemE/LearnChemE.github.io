@@ -4,7 +4,7 @@
   <rect id="TemperatureGraphArea" x="5.265" y="200.26" width="126.14" height="94.47"/>
   <rect id="PressureGraphArea" x="268.6" y="200.26" width="126.14" height="94.47"/>
   <rect id="LevelGraphArea" x="136.94" y="200.26" width="126.14" height="94.47"/>
-  <rect id="InletInputArea" x="5.265" y="5.265" width="89.47" height="64.47"/>
+  <rect id="InletInputArea" x="5.265" y="5.265" width="89.47" height="78.47"/>
   <rect id="TCInputArea" x="5.265" y="105.26" width="89.47" height="89.47"/>
   <rect id="PCInputArea" x="255.26" y="5.265" width="89.47" height="89.47"/>
   <rect id="LCInputArea" x="305.26" y="105.26" width="89.47" height="89.47"/>
@@ -63,10 +63,13 @@
    <text x="110.11662" y="127.01147" style="line-height:1.25" xml:space="preserve"><tspan x="110.11662" y="127.01147" stroke-width=".26458">TC</tspan></text>
   </g>
  </g>
- <g fill="none" stroke="#000" stroke-width=".26458px">
-  <path d="m255.26 5.265h89.47v89.47h-89.47v-52.735l-17.467-5 17.467-5z"/>
-  <path d="m305.26 105.26h89.47v89.47h-89.47v-57.735l-18.226-5 18.226-5z"/>
-  <path d="m94.735 194.74h-89.47v-89.47h89.47l-3e-6 19.735 10.053 5-10.053 5z"/>
+ <g fill="none" stroke="#000">
+  <g stroke-width=".26458px">
+   <path d="m255.26 5.265h89.47v89.47h-89.47v-52.735l-17.467-5 17.467-5z"/>
+   <path d="m305.26 105.26h89.47v89.47h-89.47v-57.735l-18.226-5 18.226-5z"/>
+   <path d="m94.735 194.74h-89.47v-89.47h89.47l-3e-6 19.735 10.053 5-10.053 5z"/>
+  </g>
+  <path d="m5.265 5.265h89.47v68.429l10.488 11.683-19.322-1.6417h-80.636v-78.47" stroke-width=".265"/>
  </g>
  <g fill="#000000" font-family="Arial" font-size="7.0556px">
   <text id="PressureTextWrapper" transform="translate(4.635 4.051)" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;line-height:1.25;shape-inside:url(#rect1178);white-space:pre" xml:space="preserve"><tspan x="201.30664" y="20.661968"><tspan font-family="Arial" font-size="7.0556px" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal">70000 Pa</tspan></tspan></text>

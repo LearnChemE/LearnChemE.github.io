@@ -28,9 +28,9 @@ class Separator {
       currentVal: this.lift,
       Kc: 0,
       Tau: 36000,
-      stpt: 70000,
+      stpt: 75000,
       tempTau: 36000,
-      tempStpt: 70000,
+      tempStpt: 75000,
       tempKc: 0,
       error: 0
     };

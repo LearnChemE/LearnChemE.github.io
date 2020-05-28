@@ -67,6 +67,36 @@ const levelButtons = {
   KcUnits : "[L/(s %)]"
 };
 
+const inletParams = {
+  F0 : {
+    name: "flowRateIn",
+    label: "F<sub>in</sub>&nbsp;(mol/s)",
+    objName: "F",
+    min: 0,
+    max: 100,
+    step: 0.1,
+    default: 15
+  },
+  xA0 : {
+    name: "moleFracIn",
+    label: "x<sub>A,in</sub>",
+    objName: "xin",
+    min: 0,
+    max: 1,
+    step: 0.01,
+    default: 0.5
+  },
+  Tin : {
+    name: "temperatureIn",
+    label: "<i>T</i><sub>in</sub>&nbsp;(K)",
+    objName: "Tin",
+    min: Number.MIN_VALUE,
+    max: 1000,
+    step: 1,
+    default: 400
+  }
+}
+
 const autoParams = {
   tauDefault: 36000,
   tauMin: Number.MIN_VALUE,
@@ -78,7 +108,7 @@ const autoParams = {
   KcStep: 1e-9
 }
 
-function html(opts) {
+function controllerHTML(opts) {
 
   const text = `
   <div class="button-group">
@@ -123,6 +153,38 @@ function html(opts) {
   return text;
 }
 
+function disturbanceHTML(opts) {
+
+  const text = `
+  <div class="button-group">
+    <h5>Inlet conditions</h5>
+    <button id="update-inlet" class="btn btn-sm btn-primary" aria-label="Update inlet conditions button">Update</button>
+    <div class="input-wrapper">
+      <div class="input-group input-group-sm">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="input-${opts.F0.name}-label">${opts.F0.label}</span>
+        </div>
+        <input type="number" id="input-${opts.F0.name}" class="form-control" min="${opts.F0.min}" max="${opts.F0.max}" step="${opts.F0.step}" value="${opts.F0.default}" aria-label="${opts.F0.name} input" aria-describedby="input-${opts.F0.name}-label">
+      </div>
+      <div class="input-group input-group-sm">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="input-${opts.xA0.name}-label">${opts.xA0.label}</span>
+        </div>
+        <input type="number" id="input-${opts.xA0.name}" class="form-control" min="${opts.xA0.min}" max="${opts.xA0.max}" step="${opts.xA0.step}" value="${opts.xA0.default}" aria-label="${opts.xA0.name} input" aria-describedby="input-${opts.xA0.name}-label">
+      </div>
+      <div class="input-group input-group-sm">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="input-${opts.Tin.name}-label">${opts.Tin.label}</span>
+        </div>
+        <input type="number" id="input-${opts.Tin.name}" class="form-control" min="${opts.Tin.min}" max="${opts.Tin.max}" step="${opts.Tin.step}" value="${opts.Tin.default}" aria-label="${opts.Tin.name} input" aria-describedby="input-${opts.Tin.name}-label">
+      </div>
+    </div>
+  </div>
+  `;
+
+  return text;
+}
+
 function insertInputs() {
   const doc = document.createElement('div');
   doc.id = "main-application-wrapper";
@@ -131,9 +193,9 @@ function insertInputs() {
   [pressureButtons, levelButtons, tempButtons].forEach(opts => {
     const wrapper = document.createElement('div');
     wrapper.id = `${opts.controller}-control`;
-    wrapper.style.display = "inline-block";
+    wrapper.style.display = "block";
     
-    const text = html(opts);
+    const text = controllerHTML(opts);
     wrapper.innerHTML = text;
     doc.appendChild(wrapper);
 
@@ -189,6 +251,30 @@ function insertInputs() {
         manualInput.value = opts.obj["mv"];
       }
     });
+  });
+
+  const inletWrapper = document.createElement("div");
+  inletWrapper.id = "inlet-control";
+  inletWrapper.style.display = "block";
+  const text = disturbanceHTML(inletParams);
+  inletWrapper.innerHTML = text;
+  doc.appendChild(inletWrapper);
+
+  const updateInletButton = document.getElementById("update-inlet");
+  const FInput = document.getElementById(`input-${inletParams.F0.name}`);
+  const xInput = document.getElementById(`input-${inletParams.xA0.name}`);
+  const TInput = document.getElementById(`input-${inletParams.Tin.name}`);
+
+  updateInletButton.addEventListener("click", () => {
+    const parseF = parseNumericInput(FInput.value, Number(FInput.getAttribute("min")), Number(FInput.getAttribute("max")));
+    const parseX = parseNumericInput(xInput.value, Number(xInput.getAttribute("min")), Number(xInput.getAttribute("max")));
+    const parseT = parseNumericInput(TInput.value, Number(TInput.getAttribute("min")), Number(TInput.getAttribute("max")));
+    FInput.value = parseF;
+    xInput.value = parseX;
+    TInput.value = parseT;
+    separator.F = parseF;
+    separator.xin = parseX;
+    separator.Tin = parseT;
   })
 }
 
