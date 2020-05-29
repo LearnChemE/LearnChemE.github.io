@@ -120,7 +120,7 @@ const speedParams = {
   min: 1,
   max: 60,
   step: 1,
-  label: "Animation speed:&nbsp;1&nbsp;s&nbsp;s<sup>-1</sup>"
+  label: `speed:&nbsp;1&nbsp;s&nbsp;s<sup>-1</sup>`
 }
 
 function controllerHTML(opts) {
@@ -312,10 +312,12 @@ function insertInputs() {
   sliderWrapper.innerHTML = sliderText;
   doc.appendChild(sliderWrapper);
   const slider = document.getElementById("input-speed");
+  const SpeedDisplay = document.getElementById("animation-speed-label");
 
   slider.addEventListener("input", () => {
     separator.speed = Number(Number(slider.value).toFixed(0));
     window.adjustSpeed(separator.speed);
+    SpeedDisplay.innerHTML = `speed:&nbsp;${separator.speed}&nbsp;s&nbsp;s<sup>-1</sup>`;
   });
 }
 

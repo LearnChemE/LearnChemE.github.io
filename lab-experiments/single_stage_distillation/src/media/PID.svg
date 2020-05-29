@@ -7,7 +7,7 @@
    <rect id="LevelGraphArea" x="136.94" y="200.26" width="126.14" height="94.47"/>
    <rect id="InletInputArea" x="5.265" y="5.265" width="89.47" height="78.47"/>
   </g>
-  <rect id="SpeedInputArea" x="100.27" y="5.265" width="60.47" height="20" fill="#d7eef4" stroke="#000" stroke-width=".265"/>
+  <rect id="SpeedInputArea" x="100.27" y="5.265" width="60.47" height="24" fill="#d7eef4" stroke="#000" stroke-width=".265"/>
   <g fill="none">
    <rect id="TCInputArea" x="5.265" y="105.26" width="89.47" height="89.47"/>
    <rect id="PCInputArea" x="255.26" y="5.265" width="89.47" height="89.47"/>

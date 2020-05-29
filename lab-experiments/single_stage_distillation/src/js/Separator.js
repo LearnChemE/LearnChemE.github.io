@@ -336,7 +336,7 @@ class Separator {
     const LiftDisplay = document.getElementById("input-lift");
     const BottomsDisplay = document.getElementById("input-flowRateOut");
     const PowerDisplay = document.getElementById("input-power");
-    const SpeedDisplay = document.getElementById("animation-speed-label");
+    
 
     const T = Math.round(this.T);
     const P = Number(this.P / 1000).toFixed(1);
@@ -346,13 +346,9 @@ class Separator {
     const B = Number(this.L).toPrecision(3);
     const lift = Number(this.lift).toPrecision(3);
 
-    const speed = this.speed;
-
     TemperatureDisplay.innerHTML = `${T}&nbsp;K`;
     PressureDisplay.innerHTML = `${P}&nbsp;kPa`;
     LevelDisplay.innerHTML = `${L}&nbsp;%`;
-
-    SpeedDisplay.innerHTML = `Animation speed:&nbsp;${speed}&nbsp;s&nbsp;s<sup>-1</sup>`;
 
     if(this.TemperatureController.auto) {PowerDisplay.value = `${Q}`}
     if(this.PressureController.auto) {LiftDisplay.value = `${lift}`}
