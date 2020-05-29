@@ -323,15 +323,15 @@ class Separator {
     const PowerDisplay = document.getElementById("input-power");
 
     const T = Math.round(this.T);
-    const P = Number(this.P).toFixed(0);
+    const P = Number(this.P / 1000).toFixed(1);
     const L = Number(this.level).toPrecision(3);
 
-    const Q = Number(this.Q).toFixed(0);
+    const Q = Number(this.Q / 1000).toFixed(1);
     const B = Number(this.L).toPrecision(3);
     const lift = Number(this.lift).toPrecision(3);
 
     TemperatureDisplay.innerHTML = `${T}&nbsp;K`;
-    PressureDisplay.innerHTML = `${P}&nbsp;Pa`;
+    PressureDisplay.innerHTML = `${P}&nbsp;kPa`;
     LevelDisplay.innerHTML = `${L}&nbsp;%`;
 
     if(this.TemperatureController.auto) {PowerDisplay.value = `${Q}`}

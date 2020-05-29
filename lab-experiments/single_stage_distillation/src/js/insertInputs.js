@@ -8,17 +8,19 @@ const pressureButtons = {
     min: 0,
     max: 1,
     step: 0.01,
-    default: 0.50
+    default: 0.50,
+    multiplier: 1
   },
   cv : {
     name: "pressure",
-    stptlabel: "<i>P</i>&nbsp;(Pa)",
-    stptDefault: 75000,
+    stptlabel: "<i>P</i>&nbsp;(kPa)",
+    stptDefault: 75,
     stptMin: Number.MIN_VALUE,
-    stptMax: 1000000,
-    stptStep: 1
+    stptMax: 1000,
+    stptStep: 0.1,
+    multiplier: 1000
   },
-  KcUnits : "(Pa<sup>-1</sup>)"
+  KcUnits : "(kPa<sup>-1</sup>)"
 };
 
 const tempButtons = {
@@ -26,12 +28,13 @@ const tempButtons = {
   obj: separator.TemperatureController,
   mv : {
     name: "power",
-    label: "<i>Q</i>&nbsp;(W)",
+    label: "<i>Q</i>&nbsp;(kW)",
     objmvName: "Q",
     min: 0,
-    max: 1000000,
-    step: 10000,
-    default: 500000
+    max: 1000,
+    step: 10,
+    default: 500,
+    multiplier: 1000
   },
   cv : {
     name: "temperature",
@@ -39,9 +42,10 @@ const tempButtons = {
     stptDefault: 500,
     stptMin: Number.MIN_VALUE,
     stptMax: 1000,
-    stptStep: 10
+    stptStep: 10,
+    multiplier: 1
   },
-  KcUnits : "(W/K)"
+  KcUnits : "(kW/K)"
 };
 
 const levelButtons = {
@@ -54,7 +58,8 @@ const levelButtons = {
     min: 0,
     max: 10,
     step: 0.05,
-    default: 0.5
+    default: 0.660,
+    multiplier: 1
   },
   cv : {
     name: "level",
@@ -62,7 +67,8 @@ const levelButtons = {
     stptDefault: 25,
     stptMin: Number.MIN_VALUE,
     stptMax: 100 - Number.MIN_VALUE,
-    stptStep: 1
+    stptStep: 1,
+    multiplier: 1
   },
   KcUnits : "[L/(s %)]"
 };
@@ -211,9 +217,9 @@ function insertInputs() {
       manualbtn.classList.remove("on");
       manualInput.setAttribute("disabled", true);
       autobtn.classList.add("on");
-      opts.obj["stpt"] = stptInput.value;
+      opts.obj["stpt"] = Number(stptInput.value) * opts.cv.multiplier;
       opts.obj["Tau"] = tauInput.value;
-      opts.obj["Kc"] = KcInput.value;
+      opts.obj["Kc"] = KcInput.value * opts.mv.multiplier / opts.cv.multiplier;
       opts.obj["auto"] = true;
     }
 
@@ -221,7 +227,7 @@ function insertInputs() {
       autobtn.classList.remove("on");
       manualInput.removeAttribute("disabled");
       manualbtn.classList.add("on");
-      manualInput.value = opts.obj["currentVal"];
+      manualInput.value = Math.max(Number.MIN_VALUE, opts.obj["currentVal"] / opts.mv.multiplier);
       opts.obj["auto"] = false;
     }
 
@@ -229,13 +235,18 @@ function insertInputs() {
     manualbtn.addEventListener('click', toggleManual);
 
     // Updates a temporary variable when user puts input; temporary variable is capped at min/max and assigned to controller when user presses "update"
-    [[manualInput, "mv"], [stptInput, "tempStpt"], [KcInput, "tempKc"], [tauInput, "tempTau"]].forEach(pair => {
-      pair[0].addEventListener('input', () => {
-        const inputValue = pair[0].value;
-        const min = Number(pair[0].getAttribute("min"));
-        const max = Number(pair[0].getAttribute("max"));
+    [
+      [manualInput, "mv", opts.mv.multiplier],
+      [stptInput, "tempStpt", opts.cv.multiplier],
+      [KcInput, "tempKc", opts.mv.multiplier / opts.cv.multiplier],
+      [tauInput, "tempTau", 1]
+    ].forEach(item => {
+      item[0].addEventListener('input', () => {
+        const inputValue = item[0].value;
+        const min = Number(item[0].getAttribute("min"));
+        const max = Number(item[0].getAttribute("max"));
         const parsed = parseNumericInput(inputValue, min, max);
-        opts.obj[pair[1]] = parsed;
+        opts.obj[item[1]] = parsed * item[2];
       });
     });
 
@@ -248,7 +259,7 @@ function insertInputs() {
         opts.obj["error"] = 0;
       } else {
         separator[`${opts.mv.objmvName}`] = opts.obj["mv"];
-        manualInput.value = opts.obj["mv"];
+        manualInput.value = opts.obj["mv"] / opts.mv.multiplier;
       }
     });
   });

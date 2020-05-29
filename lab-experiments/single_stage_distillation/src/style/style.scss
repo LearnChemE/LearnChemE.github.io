@@ -1,9 +1,12 @@
 $enable-responsive-font-sizes: true;
 $font-size-base: 0.85rem;
+$input-height-sm: 1.5rem;
+$input-font-size-sm: 0.7rem;
 
 @import '~bootstrap/scss/bootstrap.scss';
 
 $bg: #FFFFFF;
+$inputSize: 1.5rem;
 $outerPlotMargin: 10px;
 
 body {
@@ -32,7 +35,7 @@ body {
   }
 
   .btn-sm {
-    height: 1.85rem;
+    height: 1.75rem;
   }
 
   .input-wrapper {
@@ -41,7 +44,15 @@ body {
     grid-auto-rows: 1fr 1fr 1fr 1fr;
 
     .input-group {
-      height: 1.25rem;
+      height: $input-height-sm;
+
+      .input-group-prepend {
+        height: $input-height-sm;
+
+        .form-control {
+          height: $input-height-sm;
+        }
+      }
     }
   }
 
