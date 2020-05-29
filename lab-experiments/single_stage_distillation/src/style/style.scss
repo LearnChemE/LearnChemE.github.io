@@ -91,13 +91,29 @@ body {
   }
 }
 
+#slider-wrapper {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-auto-rows: 1fr 1fr;
+  align-items: center;
+  padding: 0rem 0.25rem 0rem 0.25rem;
+  height: 100%;
+
+  h5 {
+    font-size: 0.8rem;
+    margin-bottom: 0rem;
+    text-align: center;
+
+  }
+}
+
 #TPlot, #PPlot, #LPlot {
   position: absolute;
   top: 0px;
   left: 0px;
 }
 
-#TC-control, #PC-control, #LC-control, #inlet-control {
+#TC-control, #PC-control, #LC-control, #inlet-control, #slider-wrapper {
   position: absolute;
   top: 0px;
   left: 0px;

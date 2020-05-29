@@ -4,7 +4,7 @@ function definePlotFunctions() {
       this.min = array[0][1];
       this.max = array[array.length - 1][1];
       this.lineColor = 'rgb(0, 0, 0)';
-      this.lineThickness = 2; //pixels
+      this.lineThickness = 1.5; //pixels
       this.tightness = 1;
       this.arr = array;
     }
@@ -54,6 +54,7 @@ function definePlotFunctions() {
     plotDraw() {
       this.parent.background("#FFFFFF");
       this.GPLOT.beginDraw();
+      this.GPLOT.setXLim(this.xLims);
       this.GPLOT.setYLim(this.yLims);
       this.GPLOT.drawBackground();
       this.GPLOT.drawBox();

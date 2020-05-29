@@ -16,6 +16,7 @@ class Separator {
     this.autoTemp = false;
     this.autoLevel = false;
     this.autoPressure = false;
+    this.speed = 1; // animation speed
 
     /**** Control Variables *****/
     this.L = 0.66; // Volumetric flowrate of bottoms (L / sec)
@@ -77,6 +78,8 @@ class Separator {
     this.pressureCoords = [[0, 0]];
     this.liftCoords = [[0, 0]];
 
+    this.xAxisLimit = 1000;
+
   }
 
   advance() {
@@ -116,9 +119,9 @@ class Separator {
     this.pressures.push(this.P / 1000);
     this.lifts.push(this.lift);
 
-    if(this.temperatures.length > Math.abs(graphics.TPlot.xLims[0])) { this.powers.shift(); this.temperatures.shift(); }
-    if(this.levels.length > Math.abs(graphics.LPlot.xLims[0])) { this.levels.shift(); this.flowRatesOut.shift(); }
-    if(this.pressures.length > Math.abs(graphics.PPlot.xLims[0])) { this.pressures.shift(); this.lifts.shift(); }
+    if(this.temperatures.length > this.xAxisLimit) { this.powers.shift(); this.temperatures.shift(); }
+    if(this.levels.length > this.xAxisLimit) { this.levels.shift(); this.flowRatesOut.shift(); }
+    if(this.pressures.length > this.xAxisLimit) { this.pressures.shift(); this.lifts.shift(); }
 
     this.updateDOM();
   }
@@ -200,6 +203,18 @@ class Separator {
     coords(this.pressures, this.pressureCoords, 0, 0, false);
     graphics.PPlot.funcs[0].update(this.pressureCoords);
 
+    const secondsPassed = this.pressures.length;
+    const resizeArray = [60, 120, 200, 300, 400, 500, 1000];
+    let xAxisSize = 60;
+    for(let i = 0; i < resizeArray.length - 1; i++) {
+      if(secondsPassed > resizeArray[i]) {
+        xAxisSize = resizeArray[i + 1]
+      }
+    }
+    const xLims = [-xAxisSize, 0];
+    graphics.TPlot.xLims = xLims;
+    graphics.PPlot.xLims = xLims;
+    graphics.LPlot.xLims = xLims;
   }
 
   // Density of the liquid in column
@@ -321,6 +336,7 @@ class Separator {
     const LiftDisplay = document.getElementById("input-lift");
     const BottomsDisplay = document.getElementById("input-flowRateOut");
     const PowerDisplay = document.getElementById("input-power");
+    const SpeedDisplay = document.getElementById("animation-speed-label");
 
     const T = Math.round(this.T);
     const P = Number(this.P / 1000).toFixed(1);
@@ -330,9 +346,13 @@ class Separator {
     const B = Number(this.L).toPrecision(3);
     const lift = Number(this.lift).toPrecision(3);
 
+    const speed = this.speed;
+
     TemperatureDisplay.innerHTML = `${T}&nbsp;K`;
     PressureDisplay.innerHTML = `${P}&nbsp;kPa`;
     LevelDisplay.innerHTML = `${L}&nbsp;%`;
+
+    SpeedDisplay.innerHTML = `Animation speed:&nbsp;${speed}&nbsp;s&nbsp;s<sup>-1</sup>`;
 
     if(this.TemperatureController.auto) {PowerDisplay.value = `${Q}`}
     if(this.PressureController.auto) {LiftDisplay.value = `${lift}`}

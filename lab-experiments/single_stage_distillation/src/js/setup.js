@@ -29,7 +29,7 @@ function setup(sk, speed) {
     // Initialize Each Plot
     graphics.TPlot = new PlotCanvas(graphics.bottomLeft, document.getElementById("TPlot"));
     const TPlot = graphics.TPlot;
-    TPlot.xLims = [-1000, 0];
+    TPlot.xLims = [-60, 0];
     TPlot.yLims = [400, 600];
     TPlot.rightLims = [400, 600];
     TPlot.xAxisLabel = "time (s)";
@@ -42,7 +42,7 @@ function setup(sk, speed) {
 
     graphics.PPlot = new PlotCanvas(graphics.topRight, document.getElementById("PPlot"));
     const PPlot = graphics.PPlot;
-    PPlot.xLims = [-1000, 0];
+    PPlot.xLims = [-60, 0];
     PPlot.yLims = [0, 120];
     PPlot.rightLims = [0.4, 0.6];
     PPlot.xAxisLabel = "time (s)";
@@ -55,7 +55,7 @@ function setup(sk, speed) {
 
     graphics.LPlot = new PlotCanvas(graphics.bottomRight, document.getElementById("LPlot"));
     const LPlot = graphics.LPlot;
-    LPlot.xLims = [-1000, 0];
+    LPlot.xLims = [-60, 0];
     LPlot.yLims = [0, 100];
     LPlot.rightLims = [0.5, 0.7];
     LPlot.xAxisLabel = "time (s)";
@@ -86,7 +86,8 @@ function setup(sk, speed) {
 
     separator.createCoords();
     sk.windowResized();
-    sk.frameRate(speed);
+    window.adjustSpeed = (sp) => {sk.frameRate(sp)}
+    sk.frameRate(60);
   }
 
   sk.windowResized = () => {
@@ -97,6 +98,7 @@ function setup(sk, speed) {
     const PInputArea = document.getElementById("PCInputArea");
     const LInputArea = document.getElementById("LCInputArea");
     const InletInputArea = document.getElementById("InletInputArea");
+    const SpeedInputArea = document.getElementById("SpeedInputArea");
 
     const TGraph = document.getElementById("TPlot");
     const PGraph = document.getElementById("PPlot");
@@ -105,6 +107,7 @@ function setup(sk, speed) {
     const PInput = document.getElementById("PC-control");
     const LInput = document.getElementById("LC-control");
     const InletInput = document.getElementById("inlet-control");
+    const SpeedInput = document.getElementById("slider-wrapper");
 
     [
       [TGraph, TGraphArea],
@@ -113,7 +116,8 @@ function setup(sk, speed) {
       [TInput, TInputArea],
       [PInput, PInputArea],
       [LInput, LInputArea],
-      [InletInput, InletInputArea]
+      [InletInput, InletInputArea],
+      [SpeedInput, SpeedInputArea]
     ].forEach(pair => {
       const rect = pair[1].getBoundingClientRect();
       const x = rect.x;

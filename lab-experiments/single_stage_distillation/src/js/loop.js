@@ -5,7 +5,7 @@ function loop(sk) {
     graphics.TPlot.plotDraw();
     graphics.PPlot.plotDraw();
     graphics.LPlot.plotDraw();
-    // sk.noLoop();
+    if(sk.frameCount < 2) {window.adjustSpeed(1)}
   }
 }
 

@@ -38,6 +38,7 @@ const stats = "errors-only";
 
 const htmlOptions = {
   filename: "index.html",
+  template: path.resolve(__dirname, "../src/html/index.html"),
   meta: {
     "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
     "keywords": "LearnChemE, Chemical Engineering, Engineering, Education, Simulation, Simulated Laboratory Experiment",

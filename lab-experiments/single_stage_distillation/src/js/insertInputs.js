@@ -114,6 +114,15 @@ const autoParams = {
   KcStep: 1e-9
 }
 
+const speedParams = {
+  name: "animation speed",
+  default: 1,
+  min: 1,
+  max: 60,
+  step: 1,
+  label: "Animation speed:&nbsp;1&nbsp;s&nbsp;s<sup>-1</sup>"
+}
+
 function controllerHTML(opts) {
 
   const text = `
@@ -188,6 +197,14 @@ function disturbanceHTML(opts) {
   </div>
   `;
 
+  return text;
+}
+
+function sliderHTML(opts) {
+  const text = `
+  <h5 id="animation-speed-label">${opts.label}</h5>
+  <input type="range" id="input-speed" class="" value="${opts.default}" min="${opts.min}" max="${opts.max}" step="${opts.step}" aria-label="${opts.name} input" aria-describedby="animation-speed-label">
+  `;
   return text;
 }
 
@@ -286,7 +303,20 @@ function insertInputs() {
     separator.F = parseF;
     separator.xin = parseX;
     separator.Tin = parseT;
-  })
+  });
+
+  
+  const sliderWrapper = document.createElement("div");
+  const sliderText = sliderHTML(speedParams);
+  sliderWrapper.id = "slider-wrapper";
+  sliderWrapper.innerHTML = sliderText;
+  doc.appendChild(sliderWrapper);
+  const slider = document.getElementById("input-speed");
+
+  slider.addEventListener("input", () => {
+    separator.speed = Number(Number(slider.value).toFixed(0));
+    window.adjustSpeed(separator.speed);
+  });
 }
 
 function parseNumericInput(value, min, max) {
