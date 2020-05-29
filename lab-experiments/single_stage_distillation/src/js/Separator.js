@@ -63,6 +63,9 @@ class Separator {
     };
 
     /***** Historical Values, 1-D array *****/
+    this.Fs = [this.F];
+    this.Tins = [this.Tin];
+    this.xins = [this.xin];
     this.powers = [this.Q / 1000];
     this.temperatures = [this.T];
     this.levels = [this.level];
@@ -118,6 +121,9 @@ class Separator {
     this.flowRatesOut.push(this.L);
     this.pressures.push(this.P / 1000);
     this.lifts.push(this.lift);
+    this.Fs.push(this.F);
+    this.Tins.push(this.Tin);
+    this.xins.push(this.xin);
 
     if(this.temperatures.length > this.xAxisLimit) { this.powers.shift(); this.temperatures.shift(); }
     if(this.levels.length > this.xAxisLimit) { this.levels.shift(); this.flowRatesOut.shift(); }

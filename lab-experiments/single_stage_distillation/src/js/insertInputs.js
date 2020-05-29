@@ -172,7 +172,7 @@ function disturbanceHTML(opts) {
 
   const text = `
   <div class="button-group">
-    <h5>Inlet conditions</h5>
+    <h5>inlet conditions</h5>
     <button id="update-inlet" class="btn btn-sm btn-primary" aria-label="Update inlet conditions button">Update</button>
     <div class="input-wrapper">
       <div class="input-group input-group-sm">
@@ -209,14 +209,14 @@ function sliderHTML(opts) {
 }
 
 const csvHTML = `
-  <button id="download-as-csv-button" class="btn btn-sm btn-secondary" onclick="generateCSV();">Download .CSV</button>
+  <button id="download-as-csv-button" class="btn btn-sm btn-secondary" onclick="generateCSV();">Snapshot .CSV</button>
 `;
 
 window.generateCSV = () => {
   let rows = [[
     "Time (s)",
-    "Inlet Mole Fraction",
     "Inlet Molar Flow Rate (mol/s)",
+    "Inlet Mole Fraction",
     "Inlet Temperature (K)",
     "Column Pressure (kPa)",
     "Distillate Valve Lift",
@@ -228,16 +228,16 @@ window.generateCSV = () => {
   const csvLength = separator.pressures.length;
   for(let i = 0; i < csvLength; i++) {
     let newRow = [
-      `-${i}`,
-      "work in progress",
-      "work in progress",
-      "work in progress",
-      `${separator.pressures[csvLength - 1 - i]}`,
-      `${separator.lifts[csvLength - 1 - i]}`,
-      `${separator.temperatures[csvLength - 1 - i]}`,
-      `${separator.powers[csvLength - 1 - i]}`,
-      `${separator.levels[csvLength - 1 - i]}`,
-      `${separator.flowRatesOut[csvLength - 1 - i]}`
+      `-${csvLength - 1 - i}`,
+      `${separator.Fs[i]}`,
+      `${separator.xins[i]}`,
+      `${separator.Tins[i]}`,
+      `${separator.pressures[i]}`,
+      `${separator.lifts[i]}`,
+      `${separator.temperatures[i]}`,
+      `${separator.powers[i]}`,
+      `${separator.levels[i]}`,
+      `${separator.flowRatesOut[i]}`
     ];
     rows.push(newRow);
   }
@@ -248,7 +248,15 @@ window.generateCSV = () => {
   link.setAttribute("href", encodedUri);
   
   var date = new Date();
-  var title = "MyData_" + Number(date.getMonth() + 1).toFixed(0) + "-" + date.getDate() + "-" + date.getFullYear() + "_" + date.getHours() + "h" + date.getMinutes() + "m" + date.getSeconds() + "s.csv" ;
+  const month = Number(date.getMonth() + 1).toFixed(0);
+  const year = date.getFullYear();
+  const dayNumber = date.getDate();
+  let hour = date.getHours();
+  const AMPM = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12;
+  if(hour == 0) {hour = 12}
+  const minutes = date.getMinutes();
+  var title = "MyData_" + month + "-" + dayNumber + "-" + year + "@" + hour + "-" + minutes + AMPM + ".csv" ;
   
   link.setAttribute("download", title);
   link.style.display = "none";
