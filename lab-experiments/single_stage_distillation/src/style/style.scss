@@ -107,13 +107,17 @@ body {
   }
 }
 
+#download-as-csv-button {
+  white-space: nowrap;
+}
+
 #TPlot, #PPlot, #LPlot {
   position: absolute;
   top: 0px;
   left: 0px;
 }
 
-#TC-control, #PC-control, #LC-control, #inlet-control, #slider-wrapper {
+#TC-control, #PC-control, #LC-control, #inlet-control, #slider-wrapper, #csv-wrapper {
   position: absolute;
   top: 0px;
   left: 0px;

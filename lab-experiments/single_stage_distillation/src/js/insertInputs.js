@@ -208,6 +208,55 @@ function sliderHTML(opts) {
   return text;
 }
 
+const csvHTML = `
+  <button id="download-as-csv-button" class="btn btn-sm btn-secondary" onclick="generateCSV();">Download .CSV</button>
+`;
+
+window.generateCSV = () => {
+  let rows = [[
+    "Time (s)",
+    "Inlet Mole Fraction",
+    "Inlet Molar Flow Rate (mol/s)",
+    "Inlet Temperature (K)",
+    "Column Pressure (kPa)",
+    "Distillate Valve Lift",
+    "Column Temperature (K)",
+    "Column Heat Load (kW)",
+    "Column Liquid Level (%)",
+    "Bottoms Flow Rate (L/s)"
+  ]];
+  const csvLength = separator.pressures.length;
+  for(let i = 0; i < csvLength; i++) {
+    let newRow = [
+      `-${i}`,
+      "work in progress",
+      "work in progress",
+      "work in progress",
+      `${separator.pressures[csvLength - 1 - i]}`,
+      `${separator.lifts[csvLength - 1 - i]}`,
+      `${separator.temperatures[csvLength - 1 - i]}`,
+      `${separator.powers[csvLength - 1 - i]}`,
+      `${separator.levels[csvLength - 1 - i]}`,
+      `${separator.flowRatesOut[csvLength - 1 - i]}`
+    ];
+    rows.push(newRow);
+  }
+  let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+  let encodedUri = encodeURI(csvContent);
+  
+  var link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  
+  var date = new Date();
+  var title = "MyData_" + Number(date.getMonth() + 1).toFixed(0) + "-" + date.getDate() + "-" + date.getFullYear() + "_" + date.getHours() + "h" + date.getMinutes() + "m" + date.getSeconds() + "s.csv" ;
+  
+  link.setAttribute("download", title);
+  link.style.display = "none";
+  
+  document.body.appendChild(link);
+  link.click();
+}
+
 function insertInputs() {
   const doc = document.createElement('div');
   doc.id = "main-application-wrapper";
@@ -319,6 +368,11 @@ function insertInputs() {
     window.adjustSpeed(separator.speed);
     SpeedDisplay.innerHTML = `speed:&nbsp;${separator.speed}&nbsp;s&nbsp;s<sup>-1</sup>`;
   });
+
+  const csvWrapper = document.createElement("div");
+  csvWrapper.id = "csv-wrapper";
+  csvWrapper.innerHTML = csvHTML;
+  doc.appendChild(csvWrapper);
 }
 
 function parseNumericInput(value, min, max) {
