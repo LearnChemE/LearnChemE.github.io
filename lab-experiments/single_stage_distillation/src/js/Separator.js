@@ -31,6 +31,7 @@ class Separator {
       Kc: 0,
       Tau: 36000,
       stpt: 75000,
+      tempmv: this.lift,
       tempTau: 36000,
       tempStpt: 75000,
       tempKc: 0,
@@ -44,6 +45,7 @@ class Separator {
       Kc: 0,
       Tau: 36000,
       stpt: 500,
+      tempmv: this.Q,
       tempTau: 36000,
       tempStpt: 500,
       tempKc: 0,
@@ -57,6 +59,7 @@ class Separator {
       Kc: 0,
       Tau: 36000,
       stpt: 25,
+      tempmv: this.L,
       tempTau: 36000,
       tempStpt: 25,
       tempKc: 0,
@@ -100,6 +103,7 @@ class Separator {
       TauI: PC.Tau,
       Bias: PC.bias,
       ProcessVal: this.P,
+      MV: this.lift,
       SetPoint: PC.stpt,
       AccumErr: PC.error,
       Auto: PC.auto
@@ -114,6 +118,7 @@ class Separator {
       TauI: TC.Tau,
       Bias: TC.bias,
       ProcessVal: this.T,
+      MV: this.Q,
       SetPoint: TC.stpt,
       AccumErr: TC.error,
       Auto: TC.auto
@@ -131,6 +136,7 @@ class Separator {
       TauI: LC.Tau,
       Bias: LC.bias,
       ProcessVal: this.level,
+      MV: this.L,
       SetPoint: LC.stpt,
       AccumErr: LC.error,
       Auto: LC.auto
@@ -208,15 +214,15 @@ class Separator {
     graphics.TPlot.funcs[1].update(this.powerCoords);
 
     let flowRateOutMinMax = minMax(this.flowRatesOut);
-    flowRateOutMinMax[0] -= flowRateOutMinMax[0] % 0.1;
-    flowRateOutMinMax[1] += (0.1 - flowRateOutMinMax[1] % 0.1);
+    flowRateOutMinMax[0] -= flowRateOutMinMax[0] % 0.01;
+    flowRateOutMinMax[1] += (0.01 - flowRateOutMinMax[1] % 0.01);
     graphics.LPlot.rightLims = flowRateOutMinMax;
     coords(this.flowRatesOut, this.flowRatesOutCoords, graphics.LPlot.yLims, graphics.LPlot.rightLims, true);
     graphics.LPlot.funcs[1].update(this.flowRatesOutCoords);
 
     let liftMinMax = minMax(this.lifts);
-    liftMinMax[0] -= liftMinMax[0] % 0.1;
-    liftMinMax[1] += (0.1 - liftMinMax[1] % 0.1);
+    liftMinMax[0] -= liftMinMax[0] % 0.01;
+    liftMinMax[1] += (0.01 - liftMinMax[1] % 0.01);
     graphics.PPlot.rightLims = liftMinMax;
     coords(this.lifts, this.liftCoords, graphics.PPlot.yLims, graphics.PPlot.rightLims, true);
     graphics.PPlot.funcs[1].update(this.liftCoords);
@@ -229,15 +235,15 @@ class Separator {
     graphics.TPlot.funcs[0].update(this.temperatureCoords);
 
     let levelMinMax = minMax(this.levels);
-    levelMinMax[0] -= levelMinMax[0] % 10;
-    levelMinMax[1] += (10 - levelMinMax[1] % 10);
+    levelMinMax[0] -= levelMinMax[0] % 1;
+    levelMinMax[1] += (1 - levelMinMax[1] % 1);
     graphics.LPlot.yLims = levelMinMax;
     coords(this.levels, this.liquidLevelCoords, 0, 0, false);
     graphics.LPlot.funcs[0].update(this.liquidLevelCoords);
 
     let pressureMinMax = minMax(this.pressures);
-    pressureMinMax[0] -= pressureMinMax[0] % 10;
-    pressureMinMax[1] += (10 - pressureMinMax[1] % 10);
+    pressureMinMax[0] -= pressureMinMax[0] % 1;
+    pressureMinMax[1] += (1 - pressureMinMax[1] % 1);
     graphics.PPlot.yLims = pressureMinMax;
     coords(this.pressures, this.pressureCoords, 0, 0, false);
     graphics.PPlot.funcs[0].update(this.pressureCoords);
@@ -340,7 +346,7 @@ class Separator {
     const stpt = args.SetPoint;
     let errs = args.AccumErr;
     const auto = args.Auto;
-    let mv = 0;
+    let mv = args.MV;
     let dmv = 0;
     const terminal = document.getElementById("code-output");
 

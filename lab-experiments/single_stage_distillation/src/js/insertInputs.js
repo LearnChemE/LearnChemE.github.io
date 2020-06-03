@@ -305,7 +305,8 @@ function insertInputs() {
       autobtn.classList.remove("on");
       manualInput.removeAttribute("disabled");
       manualbtn.classList.add("on");
-      manualInput.value = Math.max(Number.MIN_VALUE, opts.obj["mv"] / opts.mv.multiplier);
+      manualInput.value = separator[`${opts.mv.objmvName}`] / opts.mv.multiplier;
+      opts.obj["tempmv"] = Number(manualInput.value);
       opts.obj["auto"] = false;
     }
 
@@ -314,7 +315,7 @@ function insertInputs() {
 
     // Updates a temporary variable when user puts input; temporary variable is capped at min/max and assigned to controller when user presses "update"
     [
-      [manualInput, "mv", opts.mv.multiplier],
+      [manualInput, "tempmv", opts.mv.multiplier],
       [stptInput, "tempStpt", opts.cv.multiplier],
       [KcInput, "tempKc", opts.mv.multiplier / opts.cv.multiplier],
       [tauInput, "tempTau", 1]
@@ -336,8 +337,7 @@ function insertInputs() {
         opts.obj["stpt"] = opts.obj["tempStpt"];
         opts.obj["error"] = 0;
       } else {
-        separator[`${opts.mv.objmvName}`] = opts.obj["mv"];
-        manualInput.value = opts.obj["mv"] / opts.mv.multiplier;
+        separator[`${opts.mv.objmvName}`] = opts.obj["tempmv"] * opts.mv.multiplier;
       }
     });
   });
