@@ -212,6 +212,10 @@ const csvHTML = `
   <button id="download-as-csv-button" class="btn btn-sm btn-secondary" onclick="generateCSV();">Snapshot .CSV</button>
 `;
 
+const codeInputHTML = `
+  <textarea id="code-input" value="0">0</textarea>
+`;
+
 window.generateCSV = () => {
   let rows = [[
     "Time (s)",
@@ -381,6 +385,12 @@ function insertInputs() {
   csvWrapper.id = "csv-wrapper";
   csvWrapper.innerHTML = csvHTML;
   doc.appendChild(csvWrapper);
+
+  const codeInputWrapper = document.createElement("div");
+  codeInputWrapper.id = "code-input-wrapper";
+  codeInputWrapper.innerHTML = codeInputHTML;
+  doc.appendChild(codeInputWrapper);
+
 }
 
 function parseNumericInput(value, min, max) {
