@@ -213,7 +213,7 @@ const csvHTML = `
 `;
 
 const codeInputHTML = `
-  <textarea id="code-input" value="0">0</textarea>
+  <textarea id="code-input" value="0" spellcheck="false">0</textarea>
 `;
 
 window.generateCSV = () => {
@@ -305,7 +305,7 @@ function insertInputs() {
       autobtn.classList.remove("on");
       manualInput.removeAttribute("disabled");
       manualbtn.classList.add("on");
-      manualInput.value = Math.max(Number.MIN_VALUE, opts.obj["currentVal"] / opts.mv.multiplier);
+      manualInput.value = Math.max(Number.MIN_VALUE, opts.obj["mv"] / opts.mv.multiplier);
       opts.obj["auto"] = false;
     }
 
@@ -391,12 +391,34 @@ function insertInputs() {
   codeInputWrapper.innerHTML = codeInputHTML;
   doc.appendChild(codeInputWrapper);
 
+  const codeInput = document.getElementById("code-input");
+  codeInput.addEventListener('input', () => {
+    const value = parseTextInput(String(codeInput.value));
+    separator.codeString = value;
+  });
+
+  const codeOutput = document.createElement("div");
+  codeOutput.id = "code-output";
+  doc.appendChild(codeOutput);
 }
 
 function parseNumericInput(value, min, max) {
   let input = Number(value);
   input = Math.max(min, Math.min(max, input));
   return input;
+}
+
+function parseTextInput(str) {
+  let parsedString = str.replace(/[^a-zA-Z\d \*\-\+\/\.\(\)\^]/gmi, "");
+  parsedString = parsedString.replace(/\^/, "**");
+  const addTimes = (match) => {
+    let str = match[0] + "*" + match[1];
+    return str;
+  }
+  parsedString = parsedString.replace(/\d[a-zA-z\(]/, addTimes);
+  parsedString = parsedString.replace(/[a-zA-z]\(/, addTimes);
+  parsedString = parsedString.replace(/\)[0-9a-zA-z]/, addTimes);
+  return parsedString;
 }
 
 module.exports = insertInputs;

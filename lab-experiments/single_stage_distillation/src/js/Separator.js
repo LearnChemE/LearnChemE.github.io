@@ -17,6 +17,7 @@ class Separator {
     this.autoLevel = false;
     this.autoPressure = false;
     this.speed = 1; // animation speed
+    this.codeString = "0";
 
     /**** Control Variables *****/
     this.L = 0.66; // Volumetric flowrate of bottoms (L / sec)
@@ -25,8 +26,8 @@ class Separator {
 
     this.PressureController = {
       auto: false,
+      bias: this.lift,
       mv: this.lift,
-      currentVal: this.lift,
       Kc: 0,
       Tau: 36000,
       stpt: 75000,
@@ -38,8 +39,8 @@ class Separator {
   
     this.TemperatureController = {
       auto: false,
+      bias: this.Q,
       mv: this.Q,
-      currentVal: this.Q,
       Kc: 0,
       Tau: 36000,
       stpt: 500,
@@ -51,8 +52,8 @@ class Separator {
     
     this.LevelController = {
       auto: false,
+      bias: this.L,
       mv: this.L,
-      currentVal: this.L,
       Kc: 0,
       Tau: 36000,
       stpt: 25,
@@ -92,19 +93,51 @@ class Separator {
 
     this.P = this.pressure();
 
-    //PI(Kc, tauI, currentErrors, currentmv, cv, stpt, auto)
-    if(!PC.auto) {PC.stpt = this.lift; PC.currentVal = this.P - this.P % 100;} else { PC.currentVal = Number(Number(this.lift).toFixed(2)); }
-    [this.lift, PC.error] = this.PI(PC.Kc, PC.Tau, PC.error, PC.mv, this.P, PC.stpt, PC.auto);
-    this.lift = Math.min(1, this.lift);
+    if(!PC.auto) { PC.stpt = this.lift }
 
-    if(!TC.auto) {TC.stpt = this.Q; TC.currentVal = this.T - this.T % 1;} else { TC.currentVal = this.Q - this.Q % 100;}
-    [this.Q, TC.error] = this.PI(TC.Kc, TC.Tau, TC.error, TC.mv, this.T, TC.stpt, TC.auto);
+    [this.lift, PC.error] = this.PI({
+      Kc: PC.Kc,
+      TauI: PC.Tau,
+      Bias: PC.bias,
+      ProcessVal: this.P,
+      SetPoint: PC.stpt,
+      AccumErr: PC.error,
+      Auto: PC.auto
+    });
+    this.lift = Math.min(1, this.lift);
+    PC.mv = Number(Number(this.lift).toFixed(2));
+
+    if(!TC.auto) { TC.stpt = this.Q }
+
+    [this.Q, TC.error] = this.PI({
+      Kc: TC.Kc,
+      TauI: TC.Tau,
+      Bias: TC.bias,
+      ProcessVal: this.T,
+      SetPoint: TC.stpt,
+      AccumErr: TC.error,
+      Auto: TC.auto
+    });
+
     this.Q = Math.min(1e6, this.Q);
+    TC.mv = this.Q - this.Q % 100;
+
     this.level = 100 * this.nL / this.density();
 
-    if(!LC.auto) {LC.stpt = this.L; LC.currentVal = this.level - this.level % 1;} else { LC.currentVal = Number(Number(this.L).toFixed(2));}
-    [this.L, LC.error] = this.PI(LC.Kc, LC.Tau, LC.error, LC.mv, this.level, LC.stpt, LC.auto);
+    if(!LC.auto) { LC.stpt = this.L }
+
+    [this.L, LC.error] = this.PI({
+      Kc: LC.Kc,
+      TauI: LC.Tau,
+      Bias: LC.bias,
+      ProcessVal: this.level,
+      SetPoint: LC.stpt,
+      AccumErr: LC.error,
+      Auto: LC.auto
+    });
+
     this.L = Math.min(10, this.L);
+    LC.mv = Number(Number(this.L).toFixed(2));
 
     for (let i = 0; i < 4; i++) {
       let dx = this.flash();
@@ -299,18 +332,54 @@ class Separator {
     return NB;
   }
 
-  PI(Kc, tauI, errors, mv, cv, stpt, auto) {
-    if (auto) {
-      const err = stpt - cv;
-      errors += err;
-      const dmv = Kc*(err + errors/tauI);
-      mv += dmv;
-    } else {
-      mv = stpt;
-      errors = 0;
+  PI(args) {
+    const Kc = args.Kc;
+    const Ti = args.TauI;
+    let mv0 = args.Bias;
+    const pv = args.ProcessVal;
+    const stpt = args.SetPoint;
+    let errs = args.AccumErr;
+    const auto = args.Auto;
+    let mv = 0;
+    let dmv = 0;
+    const terminal = document.getElementById("code-output");
+
+    const err = stpt - pv;
+    errs = errs + err;
+
+    try {
+      if(this.codeString === "") {this.codeString = "0"}
+      const toEval = `dmv = ${this.codeString}`;
+      eval(toEval);
+      if(typeof(dmv) !== "number") {
+        throw {
+          __proto__ : { name : "TypeError" },
+          message : `At least one specified variable is not of type "float"`
+        }
+      }
+      mv = mv0 + dmv;
+      const output = `Manipulated variable set to<br>&nbsp;&nbsp;&nbsp;&nbsp;mv = mv0 + ${this.codeString.replace(/\*\*/, "^")}<br>while in "auto" mode.`;
+      terminal.innerHTML = output;
+    } catch(e) {
+      const errorType = e.__proto__.name;
+      const error = `${errorType}:<br>${e.message}`;
+      terminal.innerHTML = error;
+      if(auto) {
+        const offButtons = document.getElementsByClassName("btn manual");
+        for(let i = 0; i < offButtons.length; i++) {
+          const button = offButtons[i];
+          button.click();
+        };
+      }
     }
+
+    if (!auto) {
+      mv = stpt;
+      errs = 0;
+    }
+
     mv = Math.max(Number.MIN_VALUE, mv);
-    return [mv, errors];
+    return [mv, errs];
   }
 
   pressure() {
@@ -336,9 +405,9 @@ class Separator {
   }
 
   updateDOM() {
-    const TemperatureDisplay = document.getElementById("TemperatureTextWrapper").firstChild;
-    const PressureDisplay = document.getElementById("PressureTextWrapper").firstChild;
-    const LevelDisplay = document.getElementById("LevelTextWrapper").firstChild;
+    const TemperatureDisplay = document.getElementById("TemperatureTextWrapper").firstElementChild;
+    const PressureDisplay = document.getElementById("PressureTextWrapper").firstElementChild;
+    const LevelDisplay = document.getElementById("LevelTextWrapper").firstElementChild;
     const LiftDisplay = document.getElementById("input-lift");
     const BottomsDisplay = document.getElementById("input-flowRateOut");
     const PowerDisplay = document.getElementById("input-power");
