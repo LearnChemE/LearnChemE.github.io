@@ -6,6 +6,6 @@ _notes/
 /node_modules/
 .vscode/launch.json
 /learnchemejs/node_modules/
-.gitignore
 LearnChemE Live-Server.bat
 **/node_modules
+Current\ Projects.code-workspace
