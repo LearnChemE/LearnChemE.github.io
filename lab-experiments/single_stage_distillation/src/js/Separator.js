@@ -434,6 +434,22 @@ class Separator {
     if(this.TemperatureController.auto) {PowerDisplay.value = `${Q}`}
     if(this.PressureController.auto) {LiftDisplay.value = `${lift}`}
     if(this.LevelController.auto) {BottomsDisplay.value = `${B}`}
+
+    this.adjustLiquidLevel(this.level / 100);
+  }
+
+  adjustLiquidLevel(lvl) {
+    const actualEmpty = 0.05;
+    const actualFull = 0.97;
+    const lvlAdj = actualEmpty + (actualFull - actualEmpty) * lvl;
+    const ls = document.getElementById("liquidSquiggle");
+    const lr = document.getElementById("liquidRect");
+    const maxHeight = this.maxLiquidHeight;
+    const rectHeightAtLvl = lvlAdj*maxHeight;
+    const translateY = maxHeight - rectHeightAtLvl;
+    ls.setAttribute("transform", `translate(0, ${translateY})`);
+    lr.setAttribute("transform", `translate(0, ${translateY})`);
+    lr.setAttribute("height", `${rectHeightAtLvl}`);
   }
 
   valve() {

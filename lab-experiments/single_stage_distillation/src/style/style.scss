@@ -1,6 +1,6 @@
 $enable-responsive-font-sizes: true;
 $font-size-base: 0.85rem;
-$input-height-sm: 1.5rem;
+$input-height-sm: calc(min(100%, 5rem));
 $input-font-size-sm: 0.7rem;
 
 @import '~bootstrap/scss/bootstrap.scss';
@@ -39,19 +39,26 @@ body {
   }
 
   .input-wrapper {
+    width: 100%;
     display: grid;
     grid-template-columns: 100%;
     grid-auto-rows: 1fr 1fr 1fr 1fr;
 
     .input-group {
-      height: $input-height-sm;
+      height: calc(min(100%, 2rem));
+      flex-wrap: nowrap;
+      justify-content: center;
 
       .input-group-prepend {
-        height: $input-height-sm;
+        height: 100%;
 
         .form-control {
-          height: $input-height-sm;
+          height: 100%;
         }
+      }
+      input {
+        height: 100%;
+        max-width: 12ch;
       }
     }
   }
