@@ -225,7 +225,7 @@ window.generateCSV = () => {
     "Column Pressure (kPa)",
     "Distillate Valve Lift",
     "Column Temperature (K)",
-    "Column Heat Load (kW)",
+    "Column Heat Duty (kW)",
     "Column Liquid Level (%)",
     "Bottoms Flow Rate (L/s)"
   ]];
