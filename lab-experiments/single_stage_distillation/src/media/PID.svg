@@ -27,7 +27,7 @@
      inkscape:zoom="1.8373181"
      inkscape:cx="262.27108"
      inkscape:cy="271.50541"
-     inkscape:current-layer="column" />
+     inkscape:current-layer="OutermostWrapperIGuess" />
   <g
      transform="translate(2.5002 2.4997)"
      id="OutermostWrapperIGuess">
@@ -370,11 +370,12 @@
          id="text923">10.0%</text>
     </g>
     <rect
+       style="fill:none"
        id="csvDownloadArea"
-       x="224.89"
-       y="54.965"
-       width="84.803"
-       height="44.419"
+       x="209.65039"
+       y="49.522285"
+       width="84.803001"
+       height="44.418999"
        fill="none" />
     <g
        transform="translate(-4,2)"

@@ -209,7 +209,7 @@ function sliderHTML(opts) {
 }
 
 const csvHTML = `
-  <button id="download-as-csv-button" class="btn btn-sm btn-secondary" onclick="generateCSV();">Snapshot .CSV</button>
+  <button id="download-as-csv-button" class="btn btn-sm btn-success" onclick="generateCSV();" style="font-size:110%">Snapshot .CSV</button>
 `;
 
 const codeInputHTML = `

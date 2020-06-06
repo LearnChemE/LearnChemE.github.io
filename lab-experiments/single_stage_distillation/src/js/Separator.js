@@ -364,7 +364,7 @@ class Separator {
         }
       }
       mv = mv0 + dmv;
-      const output = `Manipulated variable set to<br>&nbsp;&nbsp;&nbsp;&nbsp;mv = mv0 + ${this.codeString.replace(/\*\*/, "^")}<br>while in "auto" mode.`;
+      const output = `Manipulated variable set to<br>&nbsp;&nbsp;&nbsp;&nbsp;mv = bias + ${this.codeString.replace(/\*\*/, "^")}<br>while in "auto" mode.`;
       terminal.innerHTML = output;
     } catch(e) {
       const errorType = e.__proto__.name;
