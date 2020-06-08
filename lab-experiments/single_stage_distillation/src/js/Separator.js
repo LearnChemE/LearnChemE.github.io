@@ -129,6 +129,8 @@ class Separator {
 
     this.level = 100 * this.nL / this.density();
 
+    if(this.level >= 99.9) {this.emergencyShutoff()}
+
     if(!LC.auto) { LC.stpt = this.L }
 
     [this.L, LC.error] = this.PI({
@@ -270,6 +272,28 @@ class Separator {
     return rhoAvg;
   }
 
+  emergencyShutoff() {
+    const buttons = document.getElementsByClassName('btn manual');
+    for(let i = 0; i < buttons.length; i++) {
+      buttons[i].click();
+    }
+    const iL = document.getElementById("input-lift");
+    const iFo = document.getElementById("input-flowRateOut");
+    const iFi = document.getElementById("input-flowRateIn");
+    const iQ = document.getElementById("input-power");
+    iL.value = "1";
+    iFo.value = "10";
+    iFi.value = "15";
+    iQ.value = "500";
+    this.PressureController.tempmv = 1;
+    this.TemperatureController.tempmv = 500;
+    this.LevelController.tempmv = 10;
+    ["update-PC", "update-LC", "update-TC", "update-inlet"].forEach((e) => {
+      const button = document.getElementById(e);
+      button.click();
+    })
+  }
+
   flash() {
     const zero = Number.MIN_VALUE;
 
@@ -340,8 +364,8 @@ class Separator {
 
   PI(args) {
     const Kc = args.Kc;
-    const Ti = args.TauI;
-    let mv0 = args.Bias;
+    const TauI = args.TauI;
+    const bias = args.Bias;
     const pv = args.ProcessVal;
     const stpt = args.SetPoint;
     let errs = args.AccumErr;
@@ -360,10 +384,10 @@ class Separator {
       if(typeof(dmv) !== "number") {
         throw {
           __proto__ : { name : "TypeError" },
-          message : `At least one specified variable is not of type "float"`
+          message : `At least one called variable is not of type "number"`
         }
       }
-      mv = mv0 + dmv;
+      mv = bias + dmv;
       const output = `Manipulated variable set to<br>&nbsp;&nbsp;&nbsp;&nbsp;mv = bias + ${this.codeString.replace(/\*\*/, "^")}<br>while in "auto" mode.`;
       terminal.innerHTML = output;
     } catch(e) {
@@ -390,7 +414,11 @@ class Separator {
 
   pressure() {
     const R = 8.314;
-    const P = this.nV * R * this.T / (this.columnVolume - this.nL / this.density());
+    let numerator = this.nV * R * this.T;
+    let denominator = this.columnVolume - this.nL / this.density();
+    denominator = Math.max(denominator, Math.sqrt(Number.MIN_VALUE));
+    numerator = Math.max(numerator, Math.sqrt(Number.MIN_VALUE));
+    const P = numerator / denominator;
     return P;
   }
 
