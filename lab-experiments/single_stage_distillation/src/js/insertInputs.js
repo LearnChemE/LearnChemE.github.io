@@ -337,7 +337,7 @@ function insertInputs() {
         opts.obj["stpt"] = opts.obj["tempStpt"];
         opts.obj["error"] = 0;
       } else {
-        separator[`${opts.mv.objmvName}`] = opts.obj["tempmv"] * opts.mv.multiplier;
+        separator[`${opts.mv.objmvName}`] = opts.obj["tempmv"];
       }
     });
   });
