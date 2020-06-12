@@ -141,3 +141,13 @@ body {
   padding: 10px;
   color: rgb(255, 255, 30);
 }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
