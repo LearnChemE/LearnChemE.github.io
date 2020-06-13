@@ -147,35 +147,22 @@ function setup(sk, speed) {
 
 function ripple(t) {
   const ls = document.getElementById("liquidSquiggle");
+  const width = 77.514;
+  let lines = "";
+  const resolution = 30;
+  const dx = width / resolution;
+  let x = 0;
+  for(let i = 0; i < resolution; i++) {
+    x += dx;
+    const dy = 0.5 * Math.sin(x * 6 * Math.PI / width + t / 11) + 0.45 * Math.sin(x * 5 * Math.PI / width + t / 14) + 0.35 * Math.sin(x * 2.5 * Math.PI / width + t / 8);
+    lines += `-${dx},${dy} `;
+  }
   const path = `
   m 320.032,100.18395
   h 38.7568 38.7572
   v -9.532082
-  c 
-  0,0
-  ${-6.3 + Math.sin(t/5) * 2},-3.22797
-  -9.651,${-2.83291 + 1.5 * Math.sin(t/9)}
-  -3.814,0.44979
-  ${-5.882 + Math.sin(t/6)},5.66764
-  -9.727,5.66491
-  ${-3.845 + 1.5*Math.sin(t/8)},-0.003
-  -5.855,${-5.66491 + 1.7 * Math.sin(t/9)}
-  -9.689,-5.66491
-  -3.834,0
-  -5.8562,${5.66491 + 1.4 * Math.sin(t/5)}
-  -9.6902,5.66491
-  ${-3.853 + 1.25 * Math.sin(t/8.5)},0.005
-  -5.8998,${-5.66491 + Math.sin(t/7)}
-  -9.7568,-5.66491
-  -3.88,${-0.007 + 2 * Math.sin(t/4)}
-  -5.971,5.68589
-  ${-9.851 + 0.5 * Math.sin(t/7)},5.66491
-  ${-3.81 + 1.5* Math.sin(t/6)},-0.0201
-  ${-5.826 + 2 * Math.sin(t/12)},-5.21512
-  -9.6,-5.66491
-  -3.317,-0.39506
-  -9.545,2.83291
-  -9.545,2.83291 z
+  l ${lines}
+  z
   `;
   ls.setAttribute("d", path);
 }
