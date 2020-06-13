@@ -83,7 +83,8 @@ function setup(sk, speed) {
     TPlot.addFuncs(TemperatureArray, PowerArray);
     PPlot.addFuncs(PressureArray, LiftArray);
     LPlot.addFuncs(LevelArray, FlowrateArray);
-
+    window["rippleTimer"] = 0;
+    setInterval(() => { window["rippleTimer"] += 1; ripple(window["rippleTimer"])}, 50);
     separator.createCoords();
     sk.windowResized();
     setInterval(() => {sk.windowResized()}, 5000);
@@ -142,6 +143,41 @@ function setup(sk, speed) {
       pair[0].style.height = `${height}px`;
     })
   }
+}
+
+function ripple(t) {
+  const ls = document.getElementById("liquidSquiggle");
+  const path = `
+  m 320.032,100.18395
+  h 38.7568 38.7572
+  v -9.532082
+  c 
+  0,0
+  ${-6.3 + Math.sin(t/5) * 2},-3.22797
+  -9.651,${-2.83291 + 1.5 * Math.sin(t/9)}
+  -3.814,0.44979
+  ${-5.882 + Math.sin(t/6)},5.66764
+  -9.727,5.66491
+  ${-3.845 + 1.5*Math.sin(t/8)},-0.003
+  -5.855,${-5.66491 + 1.7 * Math.sin(t/9)}
+  -9.689,-5.66491
+  -3.834,0
+  -5.8562,${5.66491 + 1.4 * Math.sin(t/5)}
+  -9.6902,5.66491
+  ${-3.853 + 1.25 * Math.sin(t/8.5)},0.005
+  -5.8998,${-5.66491 + Math.sin(t/7)}
+  -9.7568,-5.66491
+  -3.88,${-0.007 + 2 * Math.sin(t/4)}
+  -5.971,5.68589
+  ${-9.851 + 0.5 * Math.sin(t/7)},5.66491
+  ${-3.81 + 1.5* Math.sin(t/6)},-0.0201
+  ${-5.826 + 2 * Math.sin(t/12)},-5.21512
+  -9.6,-5.66491
+  -3.317,-0.39506
+  -9.545,2.83291
+  -9.545,2.83291 z
+  `;
+  ls.setAttribute("d", path);
 }
 
 module.exports = setup;
