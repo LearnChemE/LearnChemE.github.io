@@ -14,6 +14,7 @@ const pressureButtons = {
   cv : {
     name: "pressure",
     stptlabel: "<i>P</i>&nbsp;(kPa)",
+    objcvName: "P",
     stptDefault: 75,
     stptMin: Number.MIN_VALUE,
     stptMax: 1000,
@@ -39,7 +40,8 @@ const tempButtons = {
   cv : {
     name: "temperature",
     stptlabel: "<i>T</i>&nbsp;(K)",
-    stptDefault: 500,
+    objcvName: "T",
+    stptDefault: 450,
     stptMin: Number.MIN_VALUE,
     stptMax: 1000,
     stptStep: 10,
@@ -64,6 +66,7 @@ const levelButtons = {
   cv : {
     name: "level",
     stptlabel: "<i>Lvl.</i>&nbsp;(%)",
+    objcvName: "level",
     stptDefault: 25,
     stptMin: Number.MIN_VALUE,
     stptMax: 100 - Number.MIN_VALUE,
@@ -295,6 +298,7 @@ function insertInputs() {
       manualbtn.classList.remove("on");
       manualInput.setAttribute("disabled", true);
       autobtn.classList.add("on");
+      stptInput.value = Number(separator[`${opts.cv.objcvName}`] / opts.cv.multiplier).toPrecision(3);
       opts.obj["bias"] = Number(separator[`${opts.mv.objmvName}`]);
       opts.obj["stpt"] = Number(stptInput.value) * opts.cv.multiplier;
       opts.obj["Tau"] = tauInput.value;
