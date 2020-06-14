@@ -87,6 +87,8 @@ class Separator {
 
     this.xAxisLimit = 1000;
 
+    // Emergency shutoff state
+    this.emergency = false;
   }
 
   advance() {
@@ -129,7 +131,7 @@ class Separator {
 
     this.level = 100 * this.nL / this.density();
 
-    if(this.level >= 99.9) {this.emergencyShutoff()}
+    if(this.level >= 95) {this.emergencyShutoff()}
 
     if(!LC.auto) { LC.stpt = this.L }
 
@@ -171,6 +173,8 @@ class Separator {
     if(this.pressures.length > this.xAxisLimit) { this.pressures.shift(); this.lifts.shift(); }
 
     this.updateDOM();
+
+    if(this.emergency) {this.drain(this.level)}
   }
 
   createCoords() {
@@ -272,7 +276,24 @@ class Separator {
     return rhoAvg;
   }
 
+  drain(lvl) {
+    if(lvl < 20) {
+      this.LevelController.tempmv = 0.66;
+      this.PressureController.tempmv = 0.5;
+      const iL = document.getElementById("input-lift");
+      const iFo = document.getElementById("input-flowRateOut");
+      iL.value = "0.5";
+      iFo.value = "0.66";
+      ["update-PC", "update-LC"].forEach((e) => {
+        const button = document.getElementById(e);
+        button.click();
+      })
+      this.emergency = false;
+    }
+  }
+
   emergencyShutoff() {
+    this.emergency = true;
     const buttons = document.getElementsByClassName('btn manual');
     for(let i = 0; i < buttons.length; i++) {
       buttons[i].click();
@@ -286,7 +307,7 @@ class Separator {
     iFi.value = "15";
     iQ.value = "500";
     this.PressureController.tempmv = 1;
-    this.TemperatureController.tempmv = 500;
+    this.TemperatureController.tempmv = 500000;
     this.LevelController.tempmv = 10;
     ["update-PC", "update-LC", "update-TC", "update-inlet"].forEach((e) => {
       const button = document.getElementById(e);

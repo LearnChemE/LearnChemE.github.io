@@ -118,7 +118,7 @@ const speedParams = {
   name: "animation speed",
   default: 1,
   min: 1,
-  max: 60,
+  max: 20,
   step: 1,
   label: `speed:&nbsp;1&nbsp;s&nbsp;s<sup>-1</sup>`
 }
@@ -295,6 +295,7 @@ function insertInputs() {
       manualbtn.classList.remove("on");
       manualInput.setAttribute("disabled", true);
       autobtn.classList.add("on");
+      opts.obj["bias"] = Number(separator[`${opts.mv.objmvName}`]);
       opts.obj["stpt"] = Number(stptInput.value) * opts.cv.multiplier;
       opts.obj["Tau"] = tauInput.value;
       opts.obj["Kc"] = KcInput.value * opts.mv.multiplier / opts.cv.multiplier;
@@ -305,7 +306,7 @@ function insertInputs() {
       autobtn.classList.remove("on");
       manualInput.removeAttribute("disabled");
       manualbtn.classList.add("on");
-      manualInput.value = separator[`${opts.mv.objmvName}`] / opts.mv.multiplier;
+      manualInput.value = Number(Number(separator[`${opts.mv.objmvName}`] / opts.mv.multiplier).toPrecision(3));
       opts.obj["tempmv"] = Number(manualInput.value);
       opts.obj["auto"] = false;
     }
