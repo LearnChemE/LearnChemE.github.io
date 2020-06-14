@@ -123,7 +123,7 @@ const speedParams = {
   min: 1,
   max: 20,
   step: 1,
-  label: `speed:&nbsp;1&nbsp;s&nbsp;s<sup>-1</sup>`
+  label: `simulation speed:&nbsp;1`
 }
 
 function controllerHTML(opts) {
@@ -132,9 +132,9 @@ function controllerHTML(opts) {
   <div class="button-group">
     <h5>${opts.cv.name} controller</h5>
     <div class="btn-toolbar mb-1" role="toolbar" aria-label="PI Controller Mode Toggles for ${opts.mv.label}">
-      <div class="btn-group" role="group" aria-label="Auto and manual buttons">
-        <button type="button" class="btn btn-sm btn-secondary auto mode-toggle ${opts.controller}">Auto</button>
-        <button type="button" class="btn btn-sm btn-secondary manual mode-toggle ${opts.controller} on">Manual</button>
+      <div class="btn-group" role="group" aria-label="Auto and manual buttons" style="pointer-events:none;">
+        <button type="button" class="btn btn-sm btn-secondary auto mode-toggle ${opts.controller}" disabled="true">Auto</button>
+        <button type="button" class="btn btn-sm btn-secondary manual mode-toggle ${opts.controller} on" disabled="true">Manual</button>
       </div>
       <button id="update-${opts.controller}" class="btn btn-sm btn-primary ml-1" aria-label="Update controller settings button">Update</button>
     </div>
@@ -146,23 +146,23 @@ function controllerHTML(opts) {
         </div>
         <input type="number" id="input-${opts.mv.name}" class="form-control" min="${opts.mv.min}" max="${opts.mv.max}" step="${opts.mv.step}" value="${opts.mv.default}" aria-label="${opts.mv.name} input" aria-describedby="input-${opts.mv.name}-label">
       </div>
-      <div class="input-group input-group-sm">
+      <div class="input-group input-group-sm" style="opacity:0.5;">
         <div class="input-group-prepend">
           <span class="input-group-text" id="input-${opts.cv.name}-label">${opts.cv.stptlabel}</span>
         </div>
-        <input type="number" id="input-${opts.cv.name}" class="form-control" min="${opts.cv.stptMin}" max="${opts.cv.stptMax}" step="${opts.cv.stptStep}" value="${opts.cv.stptDefault}" aria-label="${opts.cv.name} input" aria-describedby="input-${opts.cv.name}-label">
+        <input type="number" id="input-${opts.cv.name}" class="form-control" min="${opts.cv.stptMin}" max="${opts.cv.stptMax}" step="${opts.cv.stptStep}" value="${opts.cv.stptDefault}" aria-label="${opts.cv.name} input" aria-describedby="input-${opts.cv.name}-label" disabled="true">
       </div>
-      <div class="input-group input-group-sm">
+      <div class="input-group input-group-sm" style="opacity:0.5">
         <div class="input-group-prepend">
           <span class="input-group-text" id="input-${opts.cv.name}-Kc-label">K<sub>c</sub>&nbsp;${opts.KcUnits}</span>
         </div>
-        <input type="number" id="input-${opts.cv.name}-Kc" class="form-control" min="${autoParams.KcMin}" max="${autoParams.KcMax}" step="${autoParams.KcStep}" value="${autoParams.KcDefault}" aria-label="${opts.cv.name} gain input" aria-describedby="input-${opts.cv.name}-Kc-label">
+        <input type="number" id="input-${opts.cv.name}-Kc" class="form-control" min="${autoParams.KcMin}" max="${autoParams.KcMax}" step="${autoParams.KcStep}" value="${autoParams.KcDefault}" aria-label="${opts.cv.name} gain input" aria-describedby="input-${opts.cv.name}-Kc-label" disabled="true">
       </div>
-      <div class="input-group input-group-sm">
+      <div class="input-group input-group-sm" style="opacity:0.5">
         <div class="input-group-prepend">
           <span class="input-group-text" id="input-${opts.cv.name}-tau-label">Tau</span>
         </div>
-        <input type="number" id="input-${opts.cv.name}-tau" class="form-control" min="${autoParams.tauMin}" max="${autoParams.tauMax}" step="${autoParams.tauStep}" value="${autoParams.tauDefault}" aria-label="${opts.cv.name} tau input" aria-describedby="input-${opts.cv.name}-tau-label">
+        <input type="number" id="input-${opts.cv.name}-tau" class="form-control" min="${autoParams.tauMin}" max="${autoParams.tauMax}" step="${autoParams.tauStep}" value="${autoParams.tauDefault}" aria-label="${opts.cv.name} tau input" aria-describedby="input-${opts.cv.name}-tau-label" disabled="true">
       </div>
     </div>
   </div>
@@ -213,10 +213,6 @@ function sliderHTML(opts) {
 
 const csvHTML = `
   <button id="download-as-csv-button" class="btn btn-sm btn-success" onclick="generateCSV();" style="font-size:110%">Snapshot .CSV</button>
-`;
-
-const codeInputHTML = `
-  <textarea id="code-input" value="0" spellcheck="false">0</textarea>
 `;
 
 window.generateCSV = () => {
@@ -383,7 +379,7 @@ function insertInputs() {
   slider.addEventListener("input", () => {
     separator.speed = Number(Number(slider.value).toFixed(0));
     window.adjustSpeed(separator.speed);
-    SpeedDisplay.innerHTML = `speed:&nbsp;${separator.speed}&nbsp;s&nbsp;s<sup>-1</sup>`;
+    SpeedDisplay.innerHTML = `simulation speed:&nbsp;${separator.speed}`;
   });
 
   const csvWrapper = document.createElement("div");
@@ -391,20 +387,6 @@ function insertInputs() {
   csvWrapper.innerHTML = csvHTML;
   doc.appendChild(csvWrapper);
 
-  const codeInputWrapper = document.createElement("div");
-  codeInputWrapper.id = "code-input-wrapper";
-  codeInputWrapper.innerHTML = codeInputHTML;
-  doc.appendChild(codeInputWrapper);
-
-  const codeInput = document.getElementById("code-input");
-  codeInput.addEventListener('input', () => {
-    const value = parseTextInput(String(codeInput.value));
-    separator.codeString = value;
-  });
-
-  const codeOutput = document.createElement("div");
-  codeOutput.id = "code-output";
-  doc.appendChild(codeOutput);
 }
 
 function parseNumericInput(value, min, max) {

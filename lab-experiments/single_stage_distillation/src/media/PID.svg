@@ -62,9 +62,9 @@
        id="inputAreas">
       <rect
          id="SpeedInputArea"
-         x="202.26"
-         y=".282"
-         width="128.56"
+         width="148.56"
+         y="0.28200001"
+         x="192.25999"
          height="42.52"
          fill="#d7eef4"
          stroke="#000"

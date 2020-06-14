@@ -17,7 +17,6 @@ class Separator {
     this.autoLevel = false;
     this.autoPressure = false;
     this.speed = 1; // animation speed
-    this.codeString = "0";
 
     /**** Control Variables *****/
     this.L = 0.66; // Volumetric flowrate of bottoms (L / sec)
@@ -393,36 +392,9 @@ class Separator {
     const auto = args.Auto;
     let mv = args.MV;
     let dmv = 0;
-    const terminal = document.getElementById("code-output");
 
     const err = stpt - pv;
     errs = errs + err;
-
-    try {
-      if(this.codeString === "") {this.codeString = "0"}
-      const toEval = `dmv = ${this.codeString}`;
-      eval(toEval);
-      if(typeof(dmv) !== "number") {
-        throw {
-          __proto__ : { name : "TypeError" },
-          message : `At least one called variable is not of type "number"`
-        }
-      }
-      mv = bias + dmv;
-      const output = `Manipulated variable set to<br>&nbsp;&nbsp;&nbsp;&nbsp;mv = bias + ${this.codeString.replace(/\*\*/, "^")}<br>while in "auto" mode.`;
-      terminal.innerHTML = output;
-    } catch(e) {
-      const errorType = e.__proto__.name;
-      const error = `${errorType}:<br>${e.message}`;
-      terminal.innerHTML = error;
-      if(auto) {
-        const offButtons = document.getElementsByClassName("btn manual");
-        for(let i = 0; i < offButtons.length; i++) {
-          const button = offButtons[i];
-          button.click();
-        };
-      }
-    }
 
     if (!auto) {
       mv = stpt;

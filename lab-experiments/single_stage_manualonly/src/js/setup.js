@@ -103,8 +103,6 @@ function setup(sk, speed) {
     const InletInputArea = document.getElementById("InletInputArea");
     const SpeedInputArea = document.getElementById("SpeedInputArea");
     const CSVArea = document.getElementById("csvDownloadArea");
-    const CodeInputArea = document.getElementById("CodeEntryArea");
-    const CodeOutputArea = document.getElementById("TerminalOutputWrapper");
 
     const TGraph = document.getElementById("TPlot");
     const PGraph = document.getElementById("PPlot");
@@ -115,8 +113,6 @@ function setup(sk, speed) {
     const InletInput = document.getElementById("inlet-control");
     const SpeedInput = document.getElementById("slider-wrapper");
     const CSVdownload = document.getElementById("csv-wrapper");
-    const CodeInput = document.getElementById("code-input-wrapper");
-    const CodeOutput = document.getElementById("code-output");
 
     [
       [TGraph, TGraphArea],
@@ -127,9 +123,7 @@ function setup(sk, speed) {
       [LInput, LInputArea],
       [InletInput, InletInputArea],
       [SpeedInput, SpeedInputArea],
-      [CSVdownload, CSVArea],
-      [CodeInput, CodeInputArea],
-      [CodeOutput, CodeOutputArea]
+      [CSVdownload, CSVArea]
     ].forEach(pair => {
       const rect = pair[1].getBoundingClientRect();
       const x = rect.x;
