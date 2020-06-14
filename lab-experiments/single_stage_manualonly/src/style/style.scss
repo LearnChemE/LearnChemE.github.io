@@ -1,0 +1,153 @@
+$enable-responsive-font-sizes: true;
+$font-size-base: 0.85rem;
+$input-height-sm: calc(min(100%, 5rem));
+$input-font-size-sm: 0.7rem;
+
+@import '~bootstrap/scss/bootstrap.scss';
+
+$bg: #FFFFFF;
+$inputSize: 1.5rem;
+$outerPlotMargin: 10px;
+
+body {
+  background: $bg;
+}
+
+.button-group {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 11% 17% 68%;
+  grid-gap: 2% 0%;
+  justify-items: center;
+
+  h5 {
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 0rem;
+    margin-top: 0.15rem;
+    white-space: nowrap;
+  }
+
+  .btn-toolbar {
+    flex-wrap: nowrap;
+  }
+
+  .btn-sm {
+    height: 1.75rem;
+  }
+
+  .input-wrapper {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-auto-rows: 1fr 1fr 1fr 1fr;
+
+    .input-group {
+      height: calc(min(100%, 2rem));
+      flex-wrap: nowrap;
+      justify-content: center;
+
+      .input-group-prepend {
+        height: 100%;
+
+        .form-control {
+          height: 100%;
+        }
+      }
+      input {
+        height: 100%;
+        max-width: 12ch;
+      }
+    }
+  }
+
+  .input-group-text {
+    width: 5rem;
+  }
+
+  .form-control {
+    width: 5rem;
+  }
+
+  .btn-group {
+    .on {
+      background-color: #45494d;
+      border-color: rgb(180, 189, 20);
+    }
+  }
+
+}
+
+#bgdiv {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  margin: 0px;
+  padding: 0px;
+
+  svg {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    margin: 0px;
+    padding: 0px;
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+#slider-wrapper {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-auto-rows: 1fr 1fr;
+  align-items: center;
+  padding: 0rem 0.25rem 0rem 0.25rem;
+  height: 100%;
+
+  h5 {
+    font-size: 0.8rem;
+    margin-bottom: 0rem;
+    text-align: center;
+    white-space: nowrap;
+  }
+}
+
+#download-as-csv-button {
+  white-space: nowrap;
+}
+
+#TPlot, #PPlot, #LPlot {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+#TC-control, #PC-control, #LC-control, #inlet-control, #slider-wrapper, #csv-wrapper, #code-input-wrapper, #code-output {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 0px;
+  height: 0px;
+}
+
+#code-input {
+  width: 100%;
+  height: 100%;
+}
+
+#code-output {
+  padding: 10px;
+  color: rgb(255, 255, 30);
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
