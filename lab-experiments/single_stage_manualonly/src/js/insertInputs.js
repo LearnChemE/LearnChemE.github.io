@@ -7,7 +7,7 @@ const pressureButtons = {
     objmvName: "lift",
     min: 0,
     max: 1,
-    step: 0.01,
+    step: 1e-12,
     default: 0.50,
     multiplier: 1
   },
@@ -18,7 +18,7 @@ const pressureButtons = {
     stptDefault: 75,
     stptMin: Number.MIN_VALUE,
     stptMax: 1000,
-    stptStep: 0.1,
+    stptStep: 1e-12,
     multiplier: 1000
   },
   KcUnits : "(kPa<sup>-1</sup>)"
@@ -33,7 +33,7 @@ const tempButtons = {
     objmvName: "Q",
     min: 0,
     max: 1000,
-    step: 10,
+    step: 1e-12,
     default: 500,
     multiplier: 1000
   },
@@ -44,7 +44,7 @@ const tempButtons = {
     stptDefault: 450,
     stptMin: Number.MIN_VALUE,
     stptMax: 1000,
-    stptStep: 10,
+    stptStep: 1e-12,
     multiplier: 1
   },
   KcUnits : "(kW/K)"
@@ -59,7 +59,7 @@ const levelButtons = {
     objmvName: "L",
     min: 0,
     max: 10,
-    step: 0.05,
+    step: 1e-12,
     default: 0.660,
     multiplier: 1
   },
@@ -70,7 +70,7 @@ const levelButtons = {
     stptDefault: 25,
     stptMin: Number.MIN_VALUE,
     stptMax: 100 - Number.MIN_VALUE,
-    stptStep: 1,
+    stptStep: 1e-12,
     multiplier: 1
   },
   KcUnits : "[L/(s %)]"
@@ -83,7 +83,7 @@ const inletParams = {
     objName: "F",
     min: 0,
     max: 100,
-    step: 0.1,
+    step: 1e-12,
     default: 15
   },
   xA0 : {
@@ -92,7 +92,7 @@ const inletParams = {
     objName: "xin",
     min: 0,
     max: 1,
-    step: 0.01,
+    step: 1e-12,
     default: 0.5
   },
   Tin : {
@@ -101,7 +101,7 @@ const inletParams = {
     objName: "Tin",
     min: Number.MIN_VALUE,
     max: 1000,
-    step: 1,
+    step: 1e-12,
     default: 400
   }
 }
@@ -110,11 +110,11 @@ const autoParams = {
   tauDefault: 36000,
   tauMin: Number.MIN_VALUE,
   tauMax: 3600000,
-  tauStep: 10,
+  tauStep: 1e-12,
   KcDefault: 0,
   KcMin: -1000000,
   KcMax: 1000000,
-  KcStep: 1e-9
+  KcStep: 1e-12
 }
 
 const speedParams = {
