@@ -85,6 +85,7 @@ class Separator {
     this.liftCoords = [[0, 0]];
 
     this.xAxisLimit = 1000;
+    this.pressureAxisLimit = 300; // pressure graph has smaller x-axis
 
     // Emergency shutoff state
     this.emergency = false;
@@ -211,33 +212,19 @@ class Separator {
 
     // Update axes limits, then convert the values to coordinates, then update the plotted array
 
-    let powerMinMax = minMax(this.powers);
-    powerMinMax[0] -= powerMinMax[0] % 10; // round down to nearest 10
-    powerMinMax[1] += (10 - powerMinMax[1] % 10); // round up to nearest 10
-    graphics.TPlot.rightLims = powerMinMax;
-    coords(this.powers, this.powerCoords, graphics.TPlot.yLims, graphics.TPlot.rightLims, true);
-    graphics.TPlot.funcs[1].update(this.powerCoords);
-
-    let flowRateOutMinMax = minMax(this.flowRatesOut);
-    flowRateOutMinMax[0] -= flowRateOutMinMax[0] % 0.01;
-    flowRateOutMinMax[1] += (0.01 - flowRateOutMinMax[1] % 0.01);
-    graphics.LPlot.rightLims = flowRateOutMinMax;
-    coords(this.flowRatesOut, this.flowRatesOutCoords, graphics.LPlot.yLims, graphics.LPlot.rightLims, true);
-    graphics.LPlot.funcs[1].update(this.flowRatesOutCoords);
-
-    let liftMinMax = minMax(this.lifts);
-    liftMinMax[0] -= liftMinMax[0] % 0.01;
-    liftMinMax[1] += (0.01 - liftMinMax[1] % 0.01);
-    graphics.PPlot.rightLims = liftMinMax;
-    coords(this.lifts, this.liftCoords, graphics.PPlot.yLims, graphics.PPlot.rightLims, true);
-    graphics.PPlot.funcs[1].update(this.liftCoords);
-
     let tempMinMax = minMax(this.temperatures);
     tempMinMax[0] -= tempMinMax[0] % 10;
     tempMinMax[1] += (10 - tempMinMax[1] % 10);
     graphics.TPlot.yLims = tempMinMax;
     coords(this.temperatures, this.temperatureCoords, 0, 0, false);
     graphics.TPlot.funcs[0].update(this.temperatureCoords);
+
+    let powerMinMax = minMax(this.powers);
+    powerMinMax[0] -= powerMinMax[0] % 10; // round down to nearest 10
+    powerMinMax[1] += (10 - powerMinMax[1] % 10); // round up to nearest 10
+    graphics.TPlot.rightLims = powerMinMax;
+    coords(this.powers, this.powerCoords, graphics.TPlot.yLims, graphics.TPlot.rightLims, true);
+    graphics.TPlot.funcs[1].update(this.powerCoords);
 
     let levelMinMax = minMax(this.levels);
     levelMinMax[0] -= levelMinMax[0] % 1;
@@ -246,12 +233,31 @@ class Separator {
     coords(this.levels, this.liquidLevelCoords, 0, 0, false);
     graphics.LPlot.funcs[0].update(this.liquidLevelCoords);
 
-    let pressureMinMax = minMax(this.pressures);
+    let flowRateOutMinMax = minMax(this.flowRatesOut);
+    flowRateOutMinMax[0] -= flowRateOutMinMax[0] % 0.01;
+    flowRateOutMinMax[1] += (0.01 - flowRateOutMinMax[1] % 0.01);
+    graphics.LPlot.rightLims = flowRateOutMinMax;
+    coords(this.flowRatesOut, this.flowRatesOutCoords, graphics.LPlot.yLims, graphics.LPlot.rightLims, true);
+    graphics.LPlot.funcs[1].update(this.flowRatesOutCoords);
+
+    const minIndex = Math.max(0, this.pressures.length - this.pressureAxisLimit);
+    const maxIndex = this.pressures.length;
+
+    let truncatedPressures = this.pressures.slice(minIndex, maxIndex);
+    let pressureMinMax = minMax(truncatedPressures);
     pressureMinMax[0] -= pressureMinMax[0] % 1;
     pressureMinMax[1] += (1 - pressureMinMax[1] % 1);
     graphics.PPlot.yLims = pressureMinMax;
-    coords(this.pressures, this.pressureCoords, 0, 0, false);
+    coords(truncatedPressures, this.pressureCoords, 0, 0, false);
     graphics.PPlot.funcs[0].update(this.pressureCoords);
+
+    let truncatedLifts = this.lifts.slice(minIndex, maxIndex);
+    let liftMinMax = minMax(truncatedLifts);
+    liftMinMax[0] -= liftMinMax[0] % 0.01;
+    liftMinMax[1] += (0.01 - liftMinMax[1] % 0.01);
+    graphics.PPlot.rightLims = liftMinMax;
+    coords(truncatedLifts, this.liftCoords, graphics.PPlot.yLims, graphics.PPlot.rightLims, true);
+    graphics.PPlot.funcs[1].update(this.liftCoords);
 
     const secondsPassed = this.pressures.length;
     const resizeArray = [60, 120, 200, 300, 400, 500, 1000];
@@ -262,8 +268,9 @@ class Separator {
       }
     }
     const xLims = [-xAxisSize, 0];
+    const xLimsPressure = [Math.max(-1 * this.pressureAxisLimit, xLims[0]), 0];
     graphics.TPlot.xLims = xLims;
-    graphics.PPlot.xLims = xLims;
+    graphics.PPlot.xLims = xLimsPressure;
     graphics.LPlot.xLims = xLims;
   }
 
