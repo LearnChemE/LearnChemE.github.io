@@ -466,15 +466,29 @@ class Separator {
     const LiftDisplay = document.getElementById("input-lift");
     const BottomsDisplay = document.getElementById("input-flowRateOut");
     const PowerDisplay = document.getElementById("input-power");
-    
+    const Column = document.getElementById("columnPath");
 
     const T = Math.round(this.T);
+    let red, green, blue;
+    if(T > 450) {
+      red = 230 + Math.max(0, Math.min(25, 25 * ((T - 450) / 50)));
+      green = 230 - (red - 230) * 3;
+      blue = 230 - (red - 230) * 3;
+    } else {
+      blue = 230 + Math.max(0, Math.min(25, 25 * ((450 - T) / 50)));
+      green = 230 - (blue - 230);
+      red = 230 - (blue - 230);
+    }
+
+    const color = `rgb(${red}, ${green}, ${blue})`;
     const P = Number(this.P / 1000).toFixed(1);
     const L = Number(this.level).toPrecision(3);
 
     const Q = Number(this.Q / 1000).toFixed(1);
     const B = Number(this.L).toPrecision(3);
     const lift = Number(this.lift).toPrecision(3);
+
+    Column.style.fill = color;
 
     TemperatureDisplay.innerHTML = `${T}&nbsp;K`;
     PressureDisplay.innerHTML = `${P}&nbsp;kPa`;
