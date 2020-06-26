@@ -26,13 +26,13 @@ h1 {
   font-weight: 400;
 }
 
-a {
+a, #lce {
   font-size: 1.6rem;
   font-weight: 700;
   text-decoration-color: rgba(255, 255, 255, 0);
 }
 
-a:hover {
+a:hover, #lce:hover {
   transition: text-decoration-color 0.5s;
   text-decoration-color: rgba(255, 255, 255, 1);
 }
@@ -58,4 +58,15 @@ li {
 
 li + li{
   margin-top : 0.5rem;
+}
+
+#lce {
+  display: inline;
+  color: rgb(0, 0, 255);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0);
+}
+
+#lce:hover {
+  cursor: pointer;
 }
