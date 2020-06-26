@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang=en>
+
+<head>
+  <meta charset=utf-8>
+  <meta http-equiv=content-language content=en>
+  <meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
+  <meta name=keywords
+    content="LearnChemE, Chemical Engineering, learncheme.github.io, github, open source, Engineering, Education, Simulation, Simulated Laboratory Experiment">
+  <meta name=author content="LearnChemE, Neil Hendren">
+  <meta name=application-name content="learncheme.github.io">
+  <meta name=description content="Open source simulations and demonstrations for Chemical Engineering undergraduate students">
+  <link href="./home page/style.css" rel=stylesheet>
+  <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans&family=Open+Sans&display=swap" rel="stylesheet">
+
+  <title>learncheme.github.io</title>
+</head>
+
+<body>
+  <div id="home">
+    <h1>learncheme.github.io</h1>
+    <p>Learncheme.github.io is a collection of open-source, web-based scientific simulations built for <a href="//www.learncheme.com">LearnChemE.com</a>, an educational website with a focus on chemical engineering and related disciplines.</p>
+    <p>Browser-based simulations:</p>
+    <ul id="list"></ul>
+  </div>
+
+  <script type="text/javascript">
+    const list = document.getElementById("list");
+    const demos = {
+      "Melting ice simulation" : "/demos/MeltingIce/MIindex.html",
+      "Maxwell relations" : "/demos/Maxwell/index.html",
+      "Isothermal plug flow reactor" : "/demos/IsothermalPlugFlowReactor/index.html",
+      "Selectivity in a semi-batch reactor" : "/demos/SelectivityInSemiBatch/index.html",
+      "Series reactions in a batch reactor" : "/demos/SeriesReactionsInBatchReactor/index.html",
+      "Vector basics" : "/demos/vectors/app.min.html",
+      "Visualization of vapor-liquid equilibrium" : "/demos/visualVLE/index.html",
+      "Single-stage distillation" : "/lab-experiments/single_stage_distillation/dist/index.html",
+      "Single-stage distillation (manual control only, for Controls and Instrumentation course)" : "/lab-experiments/single_stage_manualonly/dist/index.html",
+      "Quantum harmonic oscillator" : "/learnchemejs/html/harmonic.html",
+      "Quantum particle-in-a-box 1" : "/learnchemejs/html/pib1.html",
+      "Quantum particle-in-a-box 2" : "/learnchemejs/html/pib2.html",
+      "Step-by-step P-x-y diagram for immiscible liquids" : "/learnchemejs/html/immiscibleP.html",
+      "Step-by-step T-x-y diagram for immiscible liquids" : "/learnchemejs/html/immiscibleT.html",
+      "Construct P-x-y diagrams for vapor-liquid-equilibrium" : "/learnchemejs/html/Pxy",
+      "Construct T-x-y diagrams for vapor-liquid-equilibrium" : "/learnchemejs/html/Txy",
+    };
+    const demo = Object.keys(demos);
+    for (let i = 0; i < demo.length; i++) {
+      const listItem = document.createElement("li");
+      list.appendChild(listItem);
+
+      const a = document.createElement("a");
+      a.setAttribute("href", "https://learncheme.github.io" + demos[demo[i]]);
+      a.innerHTML = "" + demo[i];
+      listItem.appendChild(a);
+    }
+  </script>
+</body>
+
+</html>

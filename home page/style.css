@@ -1,0 +1,61 @@
+:root {
+  font-size: 10px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.8rem;
+}
+
+#home {
+  margin: 1rem;
+  padding: 0.5rem 1rem 3rem 1rem;
+  width: 100%;
+  max-width: 90ch;
+  background: lightgrey;
+  box-shadow: 0px 0px 10px teal;
+}
+
+h1 {
+  font-size: 3.0rem;
+  margin-bottom: 2rem;
+  font-family: 'Balsamiq Sans', cursive;
+  font-weight: 400;
+}
+
+a {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-decoration-color: rgba(255, 255, 255, 0);
+}
+
+a:hover {
+  transition: text-decoration-color 0.5s;
+  text-decoration-color: rgba(255, 255, 255, 1);
+}
+
+p {
+  margin-top: 2rem;
+}
+
+ul {
+  margin-top: 2rem;
+  margin-left: 2rem;
+  list-style-type: none;
+}
+
+li {
+  background-image: url("bullet.svg");
+  background-size: 0.7rem;
+  background-repeat: no-repeat;
+  background-position: 0rem 1.1rem;
+  padding-left: 1.5rem;
+  /* https://learncheme.github.io/home page */
+}
+
+li + li{
+  margin-top : 0.5rem;
+}
