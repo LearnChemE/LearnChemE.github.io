@@ -151,3 +151,16 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+.y1Label, .y2Label, .x1Label, .y1Axis, .y2Axis, .x1Axis {
+  font-size: 0.8rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.y1Label, .y1Axis {
+  fill: rgb(255, 0, 0);
+}
+
+.y2Label, .y2Axis {
+  fill: rgb(0, 0, 255);
+}

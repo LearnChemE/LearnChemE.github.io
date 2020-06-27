@@ -1,88 +1,75 @@
 function setup(sk, speed) {
   window.graphics = {
-    TempColor: 'rgb(255, 0, 0)',
-    PowerColor: 'rgb(0, 0, 255)',
-    LevelColor: 'rgb(255, 0, 0)',
-    FlowrateColor: 'rgb(0, 0, 255)',
-    PressureColor: 'rgb(255, 0, 0)',
-    LiftColor: 'rgb(0, 0, 255)'
+    y1Color: 'rgb(255, 0, 0)',
+    y2Color: 'rgb(0, 0, 255)',
   }
 
   sk.setup = () => {
-    graphics.cnv = sk.createCanvas(1, 1);
-    graphics.cnv.hide();
-    let plotWidth = 350;
-    let plotHeight = 240;
-    graphics.bottomLeft = sk.createGraphics(plotWidth, plotHeight);
-    graphics.bottomRight = sk.createGraphics(plotWidth, plotHeight);
-    graphics.topRight = sk.createGraphics(plotWidth, plotHeight);
-    graphics.bottomLeft.id('TPlot');
-    graphics.bottomRight.id('LPlot');
-    graphics.topRight.id('PPlot');
+    require("flot");
+    // graphics.bottomLeft = sk.createGraphics(plotWidth, plotHeight);
+    // graphics.bottomRight = sk.createGraphics(plotWidth, plotHeight);
+    // graphics.topRight = sk.createGraphics(plotWidth, plotHeight);
+    // graphics.bottomLeft.id('TPlot');
+    // graphics.bottomRight.id('LPlot');
+    // graphics.topRight.id('PPlot');
+    const TGraphArea = document.getElementById("TemperatureGraphArea");
+    const PGraphArea = document.getElementById("PressureGraphArea");
+    const LGraphArea = document.getElementById("LevelGraphArea");
+    const plotWidth = TGraphArea.getBoundingClientRect().width;
+    const plotHeight = TGraphArea.getBoundingClientRect().height;
+
     ['TPlot', 'LPlot', 'PPlot'].forEach((id) => {
+      const div = document.createElement("div");
+      div.id = `${id}`;
+      document.body.appendChild(div);
       document.getElementById("main-application-wrapper").appendChild(document.getElementById(id));
+      graphics[`${id}`] = jQuery.plot($(`#${id}`), [ [[0, 0], [1, 1]] ], {
+        series : { 
+          shadowSize: 0,
+        },
+        xaxes: [
+          { position: 'bottom', axisLabel : 'time (s)', min: -10, max: 0 },
+          { position: 'top', show: true, showTicks: false, showTickLabels: false, gridLines: false}
+        ],
+        yaxes: [
+          { position: 'left', axisLabel : '', color: graphics.y1Color},
+          { position: 'right', axisLabel: '', color: graphics.y2Color, show: true, showTicks: true, gridLines: false },
+        ],
+        colors: [graphics.y1Color, graphics.y2Color]
+      });
     });
-    graphics.bottomLeft.show();
-    graphics.bottomRight.show();
-    graphics.topRight.show();
 
     // Initialize Each Plot
-    graphics.TPlot = new PlotCanvas(graphics.bottomLeft, document.getElementById("TPlot"));
     const TPlot = graphics.TPlot;
-    TPlot.xLims = [-60, 0];
-    TPlot.yLims = [400, 600];
-    TPlot.rightLims = [400, 600];
-    TPlot.xAxisLabel = "time (s)";
-    TPlot.yAxisLabel = "temperature (K)";
-    TPlot.rightAxisLabel = "power consumption (kW)"
-    TPlot.plotTitle = "Temperature vs. power consumption";
-    TPlot.yAxisColor = graphics.TempColor;
-    TPlot.rightAxisColor = graphics.PowerColor;
-    TPlot.plotSetup();
-
-    graphics.PPlot = new PlotCanvas(graphics.topRight, document.getElementById("PPlot"));
     const PPlot = graphics.PPlot;
-    PPlot.xLims = [-60, 0];
-    PPlot.yLims = [0, 120];
-    PPlot.rightLims = [0.4, 0.6];
-    PPlot.xAxisLabel = "time (s)";
-    PPlot.yAxisLabel = "pressure (kPa)";
-    PPlot.rightAxisLabel = "lift"
-    PPlot.plotTitle = "Pressure vs. valve lift";
-    PPlot.yAxisColor = graphics.PressureColor;
-    PPlot.rightAxisColor = graphics.LiftColor;
-    PPlot.plotSetup();
-
-    graphics.LPlot = new PlotCanvas(graphics.bottomRight, document.getElementById("LPlot"));
     const LPlot = graphics.LPlot;
-    LPlot.xLims = [-60, 0];
-    LPlot.yLims = [0, 100];
-    LPlot.rightLims = [0.5, 0.7];
-    LPlot.xAxisLabel = "time (s)";
-    LPlot.yAxisLabel = "liquid level (%)";
-    LPlot.rightAxisLabel = "flow rate (L/s)"
-    LPlot.plotTitle = "Liquid level vs. bottoms flow rate";
-    LPlot.yAxisColor = graphics.LevelColor;
-    LPlot.rightAxisColor = graphics.FlowrateColor;
-    LPlot.plotSetup();
 
-    const TemperatureArray = new ArrayPlot(separator.temperatureCoords);
-    const PowerArray = new ArrayPlot(separator.powerCoords);
-    const PressureArray = new ArrayPlot(separator.pressureCoords);
-    const LiftArray = new ArrayPlot(separator.liftCoords);
-    const LevelArray = new ArrayPlot(separator.liquidLevelCoords);
-    const FlowrateArray = new ArrayPlot(separator.flowRatesOutCoords);
+    const TOpts = TPlot.getOptions();
+    const POpts = PPlot.getOptions();
+    const LOpts = LPlot.getOptions();
+    
+    TOpts.yaxes[0].axisLabel = 'temperature (K)';
+    TOpts.yaxes[1].axisLabel = 'heat duty (kW)';
+    TOpts.xaxes[1].axisLabel = 'temperature vs. heat duty';
 
-    TemperatureArray.lineColor = graphics.TempColor;
-    PowerArray.lineColor = graphics.PowerColor;
-    PressureArray.lineColor = graphics.PressureColor;
-    LiftArray.lineColor = graphics.LiftColor;
-    LevelArray.lineColor = graphics.LevelColor;
-    FlowrateArray.lineColor = graphics.FlowrateColor;
+    POpts.yaxes[0].axisLabel = 'pressure (kPa)';
+    POpts.yaxes[1].axisLabel = 'valve lift';
+    POpts.xaxes[1].axisLabel = 'valve lift vs pressure';
 
-    TPlot.addFuncs(TemperatureArray, PowerArray);
-    PPlot.addFuncs(PressureArray, LiftArray);
-    LPlot.addFuncs(LevelArray, FlowrateArray);
+    LOpts.yaxes[0].axisLabel = 'level (%)';
+    LOpts.yaxes[1].axisLabel = 'bottoms flow (L / s)';
+    LOpts.xaxes[1].axisLabel = 'level vs. bottoms flow rate';
+
+
+    [TPlot, PPlot, LPlot].forEach(plot => {
+
+      plot.getAxes().yaxis.options.autoScale = "none";
+      plot.getAxes().y2axis.options.autoScale = "none";
+
+      plot.getAxes().xaxis.options.max = 0;
+      plot.getAxes().xaxis.options.autoScale = "exact";
+    })
+
     window["rippleTimer"] = 0;
     setInterval(() => { window["rippleTimer"] += 1; ripple(window["rippleTimer"])}, 50);
     separator.createCoords();
@@ -141,6 +128,11 @@ function setup(sk, speed) {
       pair[0].style.top = `${y}px`;
       pair[0].style.width = `${width}px`;
       pair[0].style.height = `${height}px`;
+    });
+
+    [graphics.TPlot, graphics.PPlot, graphics.LPlot].forEach(plot => {
+      plot.resize();
+      plot.setupGrid();
     })
   }
 }
