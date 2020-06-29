@@ -51,23 +51,32 @@ function setup(sk, speed) {
     TOpts.yaxes[0].axisLabel = 'temperature (K)';
     TOpts.yaxes[1].axisLabel = 'heat duty (kW)';
     TOpts.xaxes[1].axisLabel = 'temperature vs. heat duty';
+    TPlot.getAxes().yaxis.options.min = 400;
+    TPlot.getAxes().yaxis.options.max = 500;
+    TPlot.getAxes().y2axis.options.min = 450;
+    TPlot.getAxes().y2axis.options.max = 550;
 
     POpts.yaxes[0].axisLabel = 'pressure (kPa)';
     POpts.yaxes[1].axisLabel = 'valve lift';
     POpts.xaxes[1].axisLabel = 'valve lift vs pressure';
+    PPlot.getAxes().yaxis.options.min = 50;
+    PPlot.getAxes().yaxis.options.max = 100;
+    PPlot.getAxes().y2axis.options.min = 0.3;
+    PPlot.getAxes().y2axis.options.max = 0.7;
 
     LOpts.yaxes[0].axisLabel = 'level (%)';
     LOpts.yaxes[1].axisLabel = 'bottoms flow (L / s)';
     LOpts.xaxes[1].axisLabel = 'level vs. bottoms flow rate';
+    LPlot.getAxes().yaxis.options.min = 15;
+    LPlot.getAxes().yaxis.options.max = 20;
+    LPlot.getAxes().y2axis.options.min = 0.5;
+    LPlot.getAxes().y2axis.options.max = 0.72;
 
 
     [TPlot, PPlot, LPlot].forEach(plot => {
-
       plot.getAxes().yaxis.options.autoScale = "none";
       plot.getAxes().y2axis.options.autoScale = "none";
-
-      plot.getAxes().xaxis.options.max = 0;
-      plot.getAxes().xaxis.options.autoScale = "exact";
+      plot.getAxes().xaxis.options.autoScale = "none";
     })
 
     window["rippleTimer"] = 0;

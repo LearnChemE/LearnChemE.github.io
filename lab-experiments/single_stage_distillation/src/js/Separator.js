@@ -194,8 +194,8 @@ class Separator {
         min = Math.min(array[i], min);
         max = Math.max(array[i], max);
       }
-      min = min - 0.1 * max;
-      max *= 1.1;
+      if(isNaN(min)) {min = 0}
+      if(isNaN(max)) {max = 1}
       return [min, max];
     }
 
@@ -219,20 +219,62 @@ class Separator {
     const liftRange = minMax(truncatedLifts);
     const PRange = minMax(truncatedPressures)
 
-    graphics.TPlot.getAxes().yaxis.options.min = TRange[0];
-    graphics.TPlot.getAxes().yaxis.options.max = TRange[1];
-    graphics.TPlot.getAxes().y2axis.options.min = QRange[0];
-    graphics.TPlot.getAxes().y2axis.options.max = QRange[1];
+    // The following 7 blocks of code adjust the y-axes based on the minimum and maximum values in each series.
 
-    graphics.PPlot.getAxes().yaxis.options.min = PRange[0];
-    graphics.PPlot.getAxes().yaxis.options.max = PRange[1];
-    graphics.PPlot.getAxes().y2axis.options.min = liftRange[0];
-    graphics.PPlot.getAxes().y2axis.options.max = liftRange[1];
+    const TAxisY1 = graphics.TPlot.getOptions().yaxes[0];
+    const TAxisY2 = graphics.TPlot.getOptions().yaxes[1];
+    const PAxisY1 = graphics.PPlot.getOptions().yaxes[0];
+    const PAxisY2 = graphics.PPlot.getOptions().yaxes[1];
+    const LAxisY1 = graphics.LPlot.getOptions().yaxes[0];
+    const LAxisY2 = graphics.LPlot.getOptions().yaxes[1];
 
-    graphics.LPlot.getAxes().yaxis.options.min = LRange[0];
-    graphics.LPlot.getAxes().yaxis.options.max = LRange[1];
-    graphics.LPlot.getAxes().y2axis.options.min = BRange[0];
-    graphics.LPlot.getAxes().y2axis.options.max = BRange[1];
+    if(TRange[0] <= TAxisY1.min) { TAxisY1.min = TRange[0] * 0.9 }
+    if(TRange[1] >= TAxisY1.max) { TAxisY1.max = TRange[1] * 1.1 }
+    if(QRange[0] <= TAxisY2.min) { TAxisY2.min = QRange[0] * 0.9 }
+    if(QRange[1] >= TAxisY2.max) { TAxisY2.max = QRange[1] * 1.1 }
+
+    if(TRange[0] / (TAxisY1.min + TAxisY1.max) > 0.5) { TAxisY1.min = TRange[0] * 0.9 }
+    if(TRange[1] / (TAxisY1.min + TAxisY1.max) < 0.5) { TAxisY1.max = TRange[1] * 1.1 }
+    if(QRange[0] / (TAxisY2.min + TAxisY2.max) > 0.5) { TAxisY2.min = QRange[0] * 0.9 }
+    if(QRange[1] / (TAxisY2.min + TAxisY2.max) < 0.5) { TAxisY2.max = QRange[1] * 1.1 }
+
+    if(PRange[0] <= PAxisY1.min) { PAxisY1.min = PRange[0] * 0.9 }
+    if(PRange[1] >= PAxisY1.max) { PAxisY1.max = PRange[1] * 1.1 }
+    if(liftRange[0] <= PAxisY2.min) { PAxisY2.min = liftRange[0] * 0.9 }
+    if(liftRange[1] >= PAxisY2.max) { PAxisY2.max = liftRange[1] * 1.1 }
+
+    if(PRange[0] / (PAxisY1.min + PAxisY1.max) > 0.5) { PAxisY1.min = PRange[0] * 0.9 }
+    if(PRange[1] / (PAxisY1.min + PAxisY1.max) < 0.5) { PAxisY1.max = PRange[1] * 1.1 }
+    if(liftRange[0] / (PAxisY2.min + PAxisY2.max) > 0.5) { PAxisY2.min = liftRange[0] * 0.9 }
+    if(liftRange[1] / (PAxisY2.min + PAxisY2.max) < 0.5) { PAxisY2.max = liftRange[1] * 1.1 }
+    
+    if(LRange[0] <= LAxisY1.min) { LAxisY1.min = LRange[0] * 0.9 }
+    if(LRange[1] >= LAxisY1.max) { LAxisY1.max = LRange[1] * 1.1 }
+    if(BRange[0] <= LAxisY2.min) { LAxisY2.min = BRange[0] * 0.9 }
+    if(BRange[1] >= LAxisY2.max) { LAxisY2.max = BRange[1] * 1.1 }
+
+    if(LRange[0] / (LAxisY1.min + LAxisY1.max) > 0.5) { LAxisY1.min = LRange[0] * 0.9 }
+    if(LRange[1] / (LAxisY1.min + LAxisY1.max) < 0.5) { LAxisY1.max = LRange[1] * 1.1 }
+    if(BRange[0] / (LAxisY2.min + LAxisY2.max) > 0.5) { LAxisY2.min = BRange[0] * 0.9 }
+    if(BRange[1] / (LAxisY2.min + LAxisY2.max) < 0.5) { LAxisY2.max = BRange[1] * 1.1 }
+
+    const secondsPassed = this.pressures.length;
+    const resizeArray = [60, 120, 200, 300, 400, 500, 1000];
+    let xAxisSize = 60;
+    for(let i = 0; i < resizeArray.length - 1; i++) {
+      if(secondsPassed > resizeArray[i]) {
+        xAxisSize = resizeArray[i + 1]
+      }
+    }
+    const xLims = [-xAxisSize, 0];
+    const xLimsPressure = [Math.max(-1 * this.pressureAxisLimit, xLims[0]), 0];
+    
+    graphics.TPlot.getAxes().xaxis.options.min = xLims[0];
+    graphics.TPlot.getAxes().xaxis.options.max = xLims[1];
+    graphics.PPlot.getAxes().xaxis.options.min = xLimsPressure[0];
+    graphics.PPlot.getAxes().xaxis.options.max = xLimsPressure[1];
+    graphics.LPlot.getAxes().xaxis.options.min = xLims[0];
+    graphics.LPlot.getAxes().xaxis.options.max = xLims[1];
 
     graphics.TPlot.setData([
       {data : this.temperatureCoords, xaxis : 1, yaxis : 1},
@@ -249,24 +291,9 @@ class Separator {
       {data : this.flowRatesOutCoords,  xaxis : 1, yaxis : 2}
     ]);
 
-    graphics.TPlot.setupGrid(true);
-    graphics.PPlot.setupGrid(true);
-    graphics.LPlot.setupGrid(true);
-
-
-    const secondsPassed = this.pressures.length;
-    const resizeArray = [60, 120, 200, 300, 400, 500, 1000];
-    let xAxisSize = 60;
-    for(let i = 0; i < resizeArray.length - 1; i++) {
-      if(secondsPassed > resizeArray[i]) {
-        xAxisSize = resizeArray[i + 1]
-      }
-    }
-    const xLims = [-xAxisSize, 0];
-    const xLimsPressure = [Math.max(-1 * this.pressureAxisLimit, xLims[0]), 0];
-    // graphics.TPlot.xLims = xLims;
-    // graphics.PPlot.xLims = xLimsPressure;
-    // graphics.LPlot.xLims = xLims;
+    graphics.TPlot.setupGrid();
+    graphics.PPlot.setupGrid();
+    graphics.LPlot.setupGrid();
   }
 
   // Density of the liquid in column
