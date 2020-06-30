@@ -2,10 +2,12 @@ function setup(sk, speed) {
   window.graphics = {
     y1Color: 'rgb(255, 0, 0)',
     y2Color: 'rgb(0, 0, 255)',
+    y3Color: 'rgb(0, 0, 0)',
   }
 
   sk.setup = () => {
     require("flot");
+    require("./flot.dashes.js");
     // graphics.bottomLeft = sk.createGraphics(plotWidth, plotHeight);
     // graphics.bottomRight = sk.createGraphics(plotWidth, plotHeight);
     // graphics.topRight = sk.createGraphics(plotWidth, plotHeight);
@@ -25,7 +27,7 @@ function setup(sk, speed) {
       document.getElementById("main-application-wrapper").appendChild(document.getElementById(id));
       graphics[`${id}`] = jQuery.plot($(`#${id}`), [ [[0, 0], [1, 1]] ], {
         series : { 
-          shadowSize: 0,
+          shadowSize: 0
         },
         xaxes: [
           { position: 'bottom', axisLabel : 'time (s)', min: -10, max: 0 },
@@ -35,7 +37,7 @@ function setup(sk, speed) {
           { position: 'left', axisLabel : '', color: graphics.y1Color},
           { position: 'right', axisLabel: '', color: graphics.y2Color, show: true, showTicks: true, gridLines: false },
         ],
-        colors: [graphics.y1Color, graphics.y2Color]
+        colors: [graphics.y1Color, graphics.y2Color, graphics.y3Color]
       });
     });
 
@@ -48,6 +50,13 @@ function setup(sk, speed) {
     const POpts = PPlot.getOptions();
     const LOpts = LPlot.getOptions();
     
+    TOpts.series.dashes.show = true;
+    POpts.series.dashes.show = true;
+    LOpts.series.dashes.show = true;
+    TOpts.series.dashes.displayDashesOn = [2];
+    POpts.series.dashes.displayDashesOn = [2];
+    LOpts.series.dashes.displayDashesOn = [2];
+
     TOpts.yaxes[0].axisLabel = 'temperature (K)';
     TOpts.yaxes[1].axisLabel = 'heat duty (kW)';
     TOpts.xaxes[1].axisLabel = 'temperature vs. heat duty';

@@ -303,6 +303,10 @@ function insertInputs() {
       opts.obj["stpt"] = Number(stptInput.value) * opts.cv.multiplier;
       opts.obj["Tau"] = tauInput.value;
       opts.obj["Kc"] = KcInput.value * opts.mv.multiplier / opts.cv.multiplier;
+      if(!opts.obj["auto"]) { // if it is going from manual to auto, clear the set point arrays
+        separator[`${opts.cv.objcvName}stpts`] = [];
+        separator[`${opts.cv.objcvName}stptCoords`] = [];
+      }
       opts.obj["auto"] = true;
     }
 
@@ -313,6 +317,8 @@ function insertInputs() {
       manualInput.value = Number(Number(separator[`${opts.mv.objmvName}`] / opts.mv.multiplier).toPrecision(3));
       opts.obj["tempmv"] = Number(manualInput.value);
       opts.obj["auto"] = false;
+      separator[`${opts.cv.objcvName}stpts`] = [];
+      separator[`${opts.cv.objcvName}stptCoords`] = [];
     }
 
     autobtn.addEventListener('click', toggleAuto);

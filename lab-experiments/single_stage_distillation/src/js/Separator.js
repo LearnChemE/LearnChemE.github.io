@@ -72,18 +72,24 @@ class Separator {
     this.xins = [this.xin];
     this.powers = [this.Q / 1000];
     this.temperatures = [this.T];
+    this.Tstpts = [this.TemperatureController.stpt];
     this.levels = [this.level];
     this.flowRatesOut = [this.L];
+    this.levelstpts = [this.LevelController.stpt];
     this.pressures = [this.P / 1000];
     this.lifts = [this.lift];
+    this.Pstpts = [this.PressureController.stpt / 1000];
 
     /***** Coordinates for Above Values, 2-column matrix *****/
     this.powerCoords = [[0, 0]];
     this.temperatureCoords = [[0, 0]];
+    this.TstptCoords = [[0, 0]];
     this.liquidLevelCoords = [[0, 0]];
     this.flowRatesOutCoords = [[0, 0]];
+    this.levelstptCoords = [[0, 0]];
     this.pressureCoords = [[0, 0]];
     this.liftCoords = [[0, 0]];
+    this.PstptCoords = [[0, 0]];
 
     this.xAxisLimit = 1000;
     this.pressureAxisLimit = 300;
@@ -169,6 +175,10 @@ class Separator {
     this.Tins.push(this.Tin);
     this.xins.push(this.xin);
 
+    if(this.TemperatureController.auto) {this.Tstpts.push(this.TemperatureController.stpt)}
+    if(this.PressureController.auto) {this.Pstpts.push(this.PressureController.stpt / 1000)}
+    if(this.LevelController.auto) {this.levelstpts.push(this.LevelController.stpt)}
+
     if(this.temperatures.length > this.xAxisLimit) { this.powers.shift(); this.temperatures.shift(); }
     if(this.levels.length > this.xAxisLimit) { this.levels.shift(); this.flowRatesOut.shift(); }
     if(this.pressures.length > this.xAxisLimit) { this.pressures.shift(); this.lifts.shift(); }
@@ -207,17 +217,33 @@ class Separator {
 
     coords(this.temperatures, this.temperatureCoords);
     coords(this.powers, this.powerCoords);
+    coords(this.Tstpts, this.TstptCoords);
     coords(this.levels, this.liquidLevelCoords);
     coords(this.flowRatesOut, this.flowRatesOutCoords);
+    coords(this.levelstpts, this.PstptCoords);
     coords(truncatedLifts, this.liftCoords);
     coords(truncatedPressures, this.pressureCoords);
+    coords(this.Pstpts, this.PstptCoords);
 
-    const TRange = minMax(this.temperatures);
+    let TRange = minMax(this.temperatures);
     const QRange = minMax(this.powers);
-    const LRange = minMax(this.levels);
+    let LRange = minMax(this.levels);
     const BRange = minMax(this.flowRatesOut);
+    let PRange = minMax(truncatedPressures);
     const liftRange = minMax(truncatedLifts);
-    const PRange = minMax(truncatedPressures)
+
+    if(this.TemperatureController.auto) {
+      const TstptRange = minMax(this.Tstpts);
+      TRange = [Math.min(TstptRange[0], TRange[0]), Math.max(TstptRange[1], TRange[1])];
+    }
+    if(this.PressureController.auto) {
+      const PstptRange = minMax(this.Pstpts);
+      PRange = [Math.min(PstptRange[0], PRange[0]), Math.max(PstptRange[1], PRange[1])];
+    }
+    if(this.LevelController.auto) {
+      const levelstptRange = minMax(this.levelstpts);
+      LRange = [Math.min(levelstptRange[0], LRange[0]), Math.max(levelstptRange[1], LRange[1])];
+    }
 
     // The following 7 blocks of code adjust the y-axes based on the minimum and maximum values in each series.
 
@@ -276,20 +302,46 @@ class Separator {
     graphics.LPlot.getAxes().xaxis.options.min = xLims[0];
     graphics.LPlot.getAxes().xaxis.options.max = xLims[1];
 
-    graphics.TPlot.setData([
-      {data : this.temperatureCoords, xaxis : 1, yaxis : 1},
-      {data : this.powerCoords,  xaxis : 1, yaxis : 2}
-    ]);
+    if(this.TemperatureController.auto) {
+      graphics.TPlot.setData([
+        {data : this.temperatureCoords, xaxis : 1, yaxis : 1},
+        {data : this.powerCoords,  xaxis : 1, yaxis : 2},
+        {data : this.TstptCoords, xaxis : 1, yaxis : 1}
+      ]);
+    } else {
+      graphics.TPlot.setData([
+        {data : this.temperatureCoords, xaxis : 1, yaxis : 1},
+        {data : this.powerCoords,  xaxis : 1, yaxis : 2}
+      ]);
+    }
+    if(this.PressureController.auto) {
+      graphics.PPlot.setData([
+        {data : this.pressureCoords, xaxis : 1, yaxis : 1},
+        {data : this.liftCoords,  xaxis : 1, yaxis : 2},
+        {data : this.PstptCoords, xaxis : 1, yaxis : 1}
+      ]);
+    } else {      
+      graphics.PPlot.setData([
+        {data : this.pressureCoords, xaxis : 1, yaxis : 1},
+        {data : this.liftCoords,  xaxis : 1, yaxis : 2}
+      ]);
+    }
+    if(this.LevelController.auto) {
+      graphics.LPlot.setData([
+        {data : this.liquidLevelCoords, xaxis : 1, yaxis : 1},
+        {data : this.flowRatesOutCoords,  xaxis : 1, yaxis : 2},
+        {data : this.levelstptCoords, xaxis : 1, yaxis : 1}
+      ]);
+    } else {
+      graphics.LPlot.setData([
+        {data : this.liquidLevelCoords, xaxis : 1, yaxis : 1},
+        {data : this.flowRatesOutCoords,  xaxis : 1, yaxis : 2}
+      ]);
+    }
 
-    graphics.PPlot.setData([
-      {data : this.pressureCoords, xaxis : 1, yaxis : 1},
-      {data : this.liftCoords,  xaxis : 1, yaxis : 2}
-    ]);
 
-    graphics.LPlot.setData([
-      {data : this.liquidLevelCoords, xaxis : 1, yaxis : 1},
-      {data : this.flowRatesOutCoords,  xaxis : 1, yaxis : 2}
-    ]);
+
+
 
     graphics.TPlot.setupGrid();
     graphics.PPlot.setupGrid();
