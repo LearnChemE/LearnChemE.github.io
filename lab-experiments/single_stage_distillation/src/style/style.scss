@@ -4,6 +4,7 @@ $input-height-sm: calc(min(100%, 5rem));
 $input-font-size-sm: 0.7rem;
 
 @import '~bootstrap/scss/bootstrap.scss';
+@import './fonts/hack.scss';
 
 $bg: #FFFFFF;
 $inputSize: 1.5rem;
@@ -135,11 +136,13 @@ body {
 #code-input {
   width: 100%;
   height: 100%;
+  font-family: 'Hack', sans-serif;
 }
 
 #code-output {
   padding: 10px;
   color: rgb(255, 255, 30);
+  font-family: 'Hack', sans-serif;
 }
 
 input::-webkit-outer-spin-button,

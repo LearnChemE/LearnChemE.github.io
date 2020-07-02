@@ -1,3 +1,5 @@
+import './style/fonts/hack-regular.woff';
+import './style/fonts/hack-regular.woff2';
 import './style/style.scss';
 import jQuery from 'jquery';
 window["jQuery"] = jQuery;

@@ -8,12 +8,7 @@ function setup(sk, speed) {
   sk.setup = () => {
     require("flot");
     require("./flot.dashes.js");
-    // graphics.bottomLeft = sk.createGraphics(plotWidth, plotHeight);
-    // graphics.bottomRight = sk.createGraphics(plotWidth, plotHeight);
-    // graphics.topRight = sk.createGraphics(plotWidth, plotHeight);
-    // graphics.bottomLeft.id('TPlot');
-    // graphics.bottomRight.id('LPlot');
-    // graphics.topRight.id('PPlot');
+
     const TGraphArea = document.getElementById("TemperatureGraphArea");
     const PGraphArea = document.getElementById("PressureGraphArea");
     const LGraphArea = document.getElementById("LevelGraphArea");
@@ -151,7 +146,26 @@ function setup(sk, speed) {
     [graphics.TPlot, graphics.PPlot, graphics.LPlot].forEach(plot => {
       plot.resize();
       plot.setupGrid();
-    })
+    });
+
+    const bg = document.getElementById("OutermostWrapperIGuess");
+    const codeOutput = document.getElementById("code-output");
+    const codeInput = document.getElementById("code-input");
+    const height = Number(bg.getBoundingClientRect().height);
+    // can't do media queries because size is with respect to SVG height/width, not window height/width
+    if(height < 580) {
+      codeOutput.style.fontSize = "10px";
+      codeOutput.style.padding = "6px";
+      codeInput.style.fontSize = "12px";
+    } else if(height < 750) {
+      codeOutput.style.fontSize = "12px";
+      codeOutput.style.padding = "8px";
+      codeInput.style.fontSize = "13px";
+    } else {
+      codeOutput.style.fontSize = "14px";
+      codeOutput.style.padding = "10px";
+      codeInput.style.fontSize = "15px";
+    }
   }
 }
 

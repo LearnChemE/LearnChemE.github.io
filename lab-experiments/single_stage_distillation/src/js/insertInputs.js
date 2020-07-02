@@ -123,7 +123,7 @@ const speedParams = {
   min: 1,
   max: 20,
   step: 1,
-  label: `speed:&nbsp;1&nbsp;s&nbsp;s<sup>-1</sup>`
+  label: `simulation speed:&nbsp;1`
 }
 
 function controllerHTML(opts) {
@@ -216,7 +216,7 @@ const csvHTML = `
 `;
 
 const codeInputHTML = `
-  <textarea id="code-input" value="0" spellcheck="false">0</textarea>
+  <textarea id="code-input" placeholder="enter your code here" spellcheck="false"></textarea>
 `;
 
 window.generateCSV = () => {
@@ -389,7 +389,7 @@ function insertInputs() {
   slider.addEventListener("input", () => {
     separator.speed = Number(Number(slider.value).toFixed(0));
     window.adjustSpeed(separator.speed);
-    SpeedDisplay.innerHTML = `speed:&nbsp;${separator.speed}&nbsp;s&nbsp;s<sup>-1</sup>`;
+    SpeedDisplay.innerHTML = `simulation speed:&nbsp;${separator.speed}`;
   });
 
   const csvWrapper = document.createElement("div");

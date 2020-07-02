@@ -463,54 +463,83 @@ class Separator {
     return NB;
   }
 
-  PI(args) {
-    const Kc = args.Kc;
-    const TauI = args.TauI;
-    const bias = args.Bias;
-    const pv = args.ProcessVal;
-    const stpt = args.SetPoint;
-    let errs = args.AccumErr;
-    const auto = args.Auto;
-    let mv = args.MV;
-    let dmv = 0;
-    const terminal = document.getElementById("code-output");
+  PI(privateArgs) {
+    const __Kc = privateArgs.Kc;
+    const __TauI = privateArgs.TauI;
+    const __bias = privateArgs.Bias;
+    const __pv = privateArgs.ProcessVal;
+    const __stpt = privateArgs.SetPoint;
+    let __errs = privateArgs.AccumErr;
+    const __auto = privateArgs.Auto;
+    let __mv = privateArgs.MV;
+    const __derr = __stpt - __pv;
+    __errs = __errs + __derr;
 
-    const err = stpt - pv;
-    errs = errs + err;
+    const __inputs = [
+      "input-temperature",
+      "input-temperature-Kc",
+      "input-temperature-tau",
+      "input-level",
+      "input-level-Kc",
+      "input-level-tau",
+      "input-pressure",
+      "input-pressure-Kc",
+      "input-pressure-tau",
+    ];
+
+    const terminal = document.getElementById("code-output");
+    // easiest way to check if the correct equation is entered is to use random values, to avoid 0 == 0 false positive
+    let dmv = 0;
+    const derr = Math.PI;
+    const errs = Math.E;
+    const Kc = 9.243523525;
+    const tauI = 3.4253629;
 
     try {
       if(this.codeString === "") {this.codeString = "0"}
+
       const toEval = `dmv = ${this.codeString}`;
       eval(toEval);
-      if(typeof(dmv) !== "number") {
+
+      const ans = Kc*(derr+errs/tauI);
+
+      if(dmv !== ans) {
         throw {
-          __proto__ : { name : "TypeError" },
-          message : `At least one called variable is not of type "number"`
+          __proto__ : { name : "Incorrect equation entered" },
+          message : "Auto mode disabled."
         }
+      } else {
+        const __dmv = __Kc*(__derr + __errs/__TauI);
+        __mv = __bias + __dmv;
+        for(let i = 0; i < __inputs.length; i++) {
+          document.getElementById(__inputs[i]).removeAttribute("disabled");
+        }
+        const output = `Correct equation entered:<br>Auto mode enabled.`;
+        terminal.innerHTML = output;
       }
-      mv = bias + dmv;
-      const output = `Manipulated variable set to<br>&nbsp;&nbsp;&nbsp;&nbsp;mv = bias + ${this.codeString.replace(/\*\*/, "^")}<br>while in "auto" mode.`;
-      terminal.innerHTML = output;
     } catch(e) {
       const errorType = e.__proto__.name;
       const error = `${errorType}:<br>${e.message}`;
       terminal.innerHTML = error;
-      if(auto) {
+      if(__auto) {
         const offButtons = document.getElementsByClassName("btn manual");
         for(let i = 0; i < offButtons.length; i++) {
           const button = offButtons[i];
           button.click();
         };
       }
+      for(let i = 0; i < __inputs.length; i++) {
+        document.getElementById(__inputs[i]).setAttribute("disabled", "true");
+      }
     }
 
-    if (!auto) {
-      mv = stpt;
-      errs = 0;
+    if (!__auto) {
+      __mv = __stpt;
+      __errs = 0;
     }
 
-    mv = Math.max(Number.MIN_VALUE, mv);
-    return [mv, errs];
+    __mv = Math.max(1e-9, __mv);
+    return [__mv, __errs];
   }
 
   pressure() {

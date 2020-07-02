@@ -1,0 +1,639 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   viewBox="0 0 998.26 621.24"
+   id="svg1565"
+   sodipodi:docname="PID_originalText.svg"
+   inkscape:version="1.1-dev (b530929, 2020-05-03)">
+  <defs
+     id="defs1569">
+    <rect
+       x="744.24039"
+       y="34.510767"
+       width="77.556614"
+       height="169.86632"
+       id="rect237" />
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="640"
+     inkscape:window-height="480"
+     id="namedview1567"
+     showgrid="false"
+     inkscape:zoom="2.2658798"
+     inkscape:cx="807.8335"
+     inkscape:cy="293.86763"
+     inkscape:current-layer="OutermostWrapperIGuess" />
+  <g
+     transform="translate(2.5002 2.4997)"
+     id="OutermostWrapperIGuess">
+    <g
+       style="stroke:none"
+       fill="none"
+       id="graphAreas">
+      <rect
+         style="stroke:none"
+         id="TemperatureGraphArea"
+         x="-0.00024923851"
+         y="414.85001"
+         width="327.29999"
+         height="190" />
+      <rect
+         style="stroke:none"
+         id="LevelGraphArea"
+         x="332.2998"
+         y="414.85001"
+         width="327.29999"
+         height="190" />
+      <rect
+         style="stroke:none"
+         id="PressureGraphArea"
+         x="665.59979"
+         y="414.85001"
+         width="327.29999"
+         height="190" />
+    </g>
+    <g
+       fill="none"
+       id="inputAreas">
+      <rect
+         id="SpeedInputArea"
+         width="148.56"
+         y="0.28200001"
+         x="192.25999"
+         height="42.52"
+         fill="#d7eef4"
+         stroke="#000"
+         stroke-miterlimit="8.5042"
+         stroke-width=".56338px" />
+      <rect
+         id="InletInputArea"
+         x=".288"
+         y=".282"
+         width="190.22"
+         height="166.83" />
+      <rect
+         id="TCInputArea"
+         x=".288"
+         y="212.88"
+         width="190.22"
+         height="190.22" />
+      <rect
+         id="PCInputArea"
+         x="531.79"
+         y=".282"
+         width="190.22"
+         height="190.22" />
+      <rect
+         id="LCInputArea"
+         x="533.91"
+         y="212.88"
+         width="190.22"
+         height="190.22" />
+    </g>
+    <g
+       id="CenterImage">
+      <g
+         id="column"
+         stroke-miterlimit="3"
+         stroke-width="0.27196px"
+         style="display:inline">
+        <path
+           transform="translate(-14.168,-14.173)"
+           d="M 411.71,300.41 V 145.19 c 0,0 0.163,-31.045 -38.757,-31.045 -39.119,0 -38.757,31.045 -38.757,31.045 v 155.22 c 0,0 -0.164,31.045 38.757,31.045 38.722,0 38.757,-31.045 38.757,-31.045 z"
+           fill="#e6e6e6"
+           id="columnPath"
+           style="fill:#e6e6e6;stroke:none;stroke-width:0.272;stroke-miterlimit:3;stroke-dasharray:none" />
+        <path
+           id="liquidSquiggle"
+           d="m 320.032,100.18395 h 38.7568 38.7572 v -9.532082 c 0,0 -6.3,-3.22797 -9.651,-2.83291 -3.814,0.44979 -5.882,5.66764 -9.727,5.66491 -3.845,-0.003 -5.855,-5.66491 -9.689,-5.66491 -3.834,0 -5.8562,5.6567 -9.6902,5.66491 -3.853,0.005 -5.8998,-5.6567 -9.7568,-5.66491 -3.88,-0.007 -5.971,5.68589 -9.851,5.66491 -3.81,-0.0201 -5.826,-5.21512 -9.6,-5.66491 -3.317,-0.39506 -9.545,2.83291 -9.545,2.83291 z"
+           fill="#deaa87"
+           sodipodi:nodetypes="cscccsscccccc"
+           style="stroke-width:0.271959px;stroke:#000000" />
+        <rect
+           style="fill:#deaa87;fill-opacity:1;stroke:none;stroke-width:0.272001;stroke-miterlimit:3;stroke-dasharray:none"
+           id="liquidRect"
+           width="93.494225"
+           height="238.66391"
+           x="313.94177"
+           y="95.594688" />
+        <path
+           id="inverseColumnPath"
+           style="fill:#ffffff;stroke:none;stroke-width:2.13543"
+           d="m 309.00806,81.7923 h 103.565 v 253.913 h -103.565 z M 397.542,286.237 v -155.22 c 0,0 0.163,-31.045 -38.757,-31.045 -39.119,0 -38.757,31.045 -38.757,31.045 v 155.22 c 0,0 -0.164,31.045 38.757,31.045 38.722,0 38.757,-31.045 38.757,-31.045 z"
+           sodipodi:nodetypes="cccccccsccsc" />
+        <path
+           id="columnPathOutline"
+           fill="#e6e6e6"
+           d="M 411.71,300.41 V 145.19 c 0,0 0.163,-31.045 -38.757,-31.045 -39.119,0 -38.757,31.045 -38.757,31.045 v 155.22 c 0,0 -0.164,31.045 38.757,31.045 38.722,0 38.757,-31.045 38.757,-31.045 z"
+           transform="translate(-14.168,-14.173)"
+           style="fill:none;stroke:#000000;stroke-width:0.564;stroke-miterlimit:3;stroke-dasharray:none" />
+        <rect
+           style="stroke:#000000"
+           x="397.54"
+           y="263.27"
+           width="9.792"
+           height="11.326"
+           fill="#e6e6e6"
+           id="rect870" />
+        <rect
+           x="310.24"
+           y="221.41"
+           width="9.792"
+           height="11.326"
+           fill="#e6e6e6"
+           id="rect872"
+           style="stroke:#000000" />
+        <rect
+           style="stroke:#000000"
+           x="397.54"
+           y="131.01"
+           width="9.792"
+           height="11.327"
+           fill="#e6e6e6"
+           id="rect887" />
+      </g>
+      <g
+         id="pump"
+         fill="#ccc">
+        <path
+           transform="translate(-14.168,-14.173)"
+           d="m400.03 385.32h34.217l-5.132-5.27h-23.949z"
+           stroke="#000"
+           stroke-miterlimit="3"
+           stroke-width=".55663px"
+           id="path837" />
+        <rect
+           x="407.34"
+           y="337.58"
+           width="21.988"
+           height="8.297"
+           id="rect839" />
+        <rect
+           x="385.35"
+           y="359.62"
+           width="21.988"
+           height="8.297"
+           id="rect841" />
+        <ellipse
+           cx="407.34"
+           cy="352.75"
+           rx="15.196"
+           ry="15.168"
+           id="ellipse843" />
+        <g
+           stroke="#000"
+           stroke-miterlimit="3"
+           stroke-width=".55663px"
+           id="g853">
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m435.04 360.03a15.169 15.169 0 0 1-13.541 22.055"
+             id="path845" />
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m408.09 374.04a15.168 15.168 0 0 1 13.414-22.289"
+             id="path847" />
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m421.5 351.74h21.989v8.3h-8.442"
+             id="path849" />
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m421.5 382.08h-21.985v-8.3h8.442"
+             id="path851" />
+        </g>
+      </g>
+      <g
+         stroke="#000"
+         id="ColumnAccessories">
+        <g
+           stroke-width=".5625px"
+           id="ArrowsAndLines">
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m273.43 288.77 11.889-3.48v6.957z"
+             stroke-width=".5625px"
+             id="path898" />
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m253.27 258.51v-17.273h71.217"
+             fill="none"
+             stroke-dasharray="4.50709, 2.25354"
+             stroke-width=".56338px"
+             id="path894" />
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m271.38 268.63h85.687l-13.058 10.069 13.058 10.068h-76.56"
+             fill="none"
+             stroke-width="1.1268px"
+             id="path892" />
+          <g
+             stroke-width=".56338px"
+             id="g890" />
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m421.6 283.1h59.59v43.566"
+             fill="none"
+             stroke-dasharray="4.50709, 2.25354"
+             id="path874" />
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m372.84 331.45v46.772c5.361 0.032 24.575-0.32 29.936-0.288"
+             fill="none"
+             stroke="#000"
+             stroke-miterlimit="8.5042"
+             stroke-width=".5625px"
+             id="path835" />
+          <path
+             id="arrowIn"
+             transform="translate(-14.168,-14.173)"
+             d="m201.78 189.77h132.41l-14.278-4.132v8.264l14.278-4.132" />
+          <path
+             id="arrowTop"
+             transform="translate(-14.168,-14.173)"
+             d="m372.95 114.14v-77.558l-4.132 14.278h8.264l-4.132-14.278" />
+          <path
+             id="arrowAfterPump"
+             transform="translate(-14.168,-14.173)"
+             d="m444.39 355.9h83.475l-14.277-4.132v8.264l14.277-4.132" />
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m402.25 83.238h71.768v67.613h-52.519"
+             fill="none"
+             stroke-dasharray="4.50709, 2.25354"
+             id="path885" />
+        </g>
+        <g
+           id="ValveAfterPump"
+           fill="#f2f2f2"
+           stroke-width=".5625px">
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m460.7 345.7v20.392l42.52-20.392v20.392z"
+             id="path865" />
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m481.95 355.9v-19.133h15.92s-2.293-10.095-15.92-10.095-15.92 10.095-15.92 10.095h15.92"
+             id="path867" />
+        </g>
+        <g
+           stroke-width=".56338px"
+           id="ControllerCircles">
+          <circle
+             id="LCcircle"
+             cx="465.93"
+             cy="268.93"
+             r="21.26"
+             fill="#f9f9f9" />
+          <circle
+             id="PCcircle"
+             cx="459.85"
+             cy="69.062"
+             r="21.26"
+             fill="#f9f9f9" />
+          <circle
+             cx="239.11"
+             cy="265.61"
+             r="21.26"
+             fill="#f9f9f9"
+             stroke-width=".56338px"
+             id="TCcircle" />
+        </g>
+        <g
+           fill="#f2f2f2"
+           stroke-width=".5625px"
+           id="ValveOnTop">
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m383.15 61.976h-20.391l20.391 42.517h-20.391z"
+             id="path879" />
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m372.95 83.238h19.134v15.921s10.095-2.294 10.095-15.921-10.095-15.92-10.095-15.92v15.92"
+             id="path881" />
+        </g>
+      </g>
+    </g>
+    <g
+       stroke="#000"
+       fill="none"
+       stroke-width=".5625px"
+       id="labelBubbles">
+      <path
+         transform="translate(-14.168,-14.173)"
+         d="m14.456 14.455h190.22v145.48l22.3 24.838-41.079-3.491h-171.43v-166.82"
+         stroke-width=".56338px"
+         id="path913" />
+      <path
+         transform="translate(-14.168,-14.173)"
+         d="m545.95 14.455h190.22v190.22h-190.22v-112.11l-37.132-10.631 37.132-10.629z"
+         id="path905" />
+      <path
+         transform="translate(-14.168,-14.173)"
+         d="m547.32 227.05h190.22v190.22h-190.22v-122.74l-38.748-10.629 38.748-10.63z"
+         id="path907" />
+      <path
+         transform="translate(-14.168,-14.173)"
+         d="m204.66 417.27h-190.22v-190.22h190.22v41.956l21.375 10.63-21.375 10.63z"
+         id="path909" />
+    </g>
+    <g
+       id="PressureTextWrapper">
+      <text
+         transform="translate(430.52 40.19)"
+         font-family="ArialMT, Arial"
+         font-size="15px"
+         style="isolation:isolate"
+         id="text917">70.0 kPa</text>
+    </g>
+    <g
+       id="TemperatureTextWrapper">
+      <text
+         transform="translate(218.77 306.94)"
+         font-family="ArialMT, Arial"
+         font-size="15px"
+         style="isolation:isolate"
+         id="text920">400 K</text>
+    </g>
+    <g
+       id="LevelTextWrapper">
+      <text
+         transform="translate(444.52 238.56)"
+         font-family="ArialMT, Arial"
+         font-size="15px"
+         style="isolation:isolate"
+         id="text923">10.0%</text>
+    </g>
+    <rect
+       style="fill:none"
+       id="csvDownloadArea"
+       x="209.65039"
+       y="49.522285"
+       width="84.803001"
+       height="44.418999"
+       fill="none" />
+    <rect
+       id="CodeBlockWrapper"
+       x="734.46002"
+       y="1.2146364"
+       width="257.39001"
+       height="340.2041"
+       fill="#f2f2f2"
+       stroke="#808080"
+       stroke-miterlimit="8.5042"
+       stroke-width="1" />
+    <rect
+       id="CodeEntryArea"
+       x="826.9895"
+       y="275.06894"
+       width="155.34579"
+       height="39.638813"
+       fill="#f2f2f2"
+       style="fill:none;stroke:none;stroke-width:1" />
+    <g
+       style="font-size:20pt;"
+       id="FunctionText">
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none"
+         id="codeRect1"
+         width="71.847565"
+         height="21.51685"
+         x="859.16742"
+         y="7.3078156" />
+      <rect
+         y="35.560371"
+         x="859.16742"
+         height="21.51685"
+         width="71.847565"
+         id="codeRect2"
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none" />
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none"
+         id="codeRect3"
+         width="71.847565"
+         height="21.51685"
+         x="859.16742"
+         y="62.993683" />
+      <rect
+         y="90.930168"
+         x="859.16742"
+         height="21.51685"
+         width="71.847565"
+         id="codeRect4"
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none" />
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none"
+         id="codeRect5"
+         width="71.847565"
+         height="21.51685"
+         x="859.16742"
+         y="119.61507" />
+      <text
+         id="Normal"
+         y="24.26384"
+         x="848.52844"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18.6667px;line-height:1.5;font-family:'Book Antiqua';-inkscape-font-specification:'Book Antiqua, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none"
+         xml:space="preserve"><tspan
+           y="24.26384"
+           x="848.52844"
+           id="tspan133"
+           sodipodi:role="line">Δe =</tspan><tspan
+           y="52.263889"
+           x="848.52844"
+           id="tspan135"
+           sodipodi:role="line">ΣΔe =</tspan><tspan
+           id="tspan137"
+           y="80.263939"
+           x="848.52844"
+           sodipodi:role="line">Δu =</tspan><tspan
+           id="tspan139"
+           y="108.26399"
+           x="848.52844"
+           sodipodi:role="line">K   =</tspan><tspan
+           id="tspan141"
+           y="136.26404"
+           x="848.52844"
+           sodipodi:role="line">τ   =</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;line-height:1.25;font-family:'Book Antiqua';-inkscape-font-specification:'Book Antiqua, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
+         x="825.83533"
+         y="141.34987"
+         id="SubscriptC"><tspan
+           sodipodi:role="line"
+           id="tspan104"
+           x="825.83533"
+           y="141.34987">I</tspan></text>
+      <text
+         id="SubscriptI"
+         y="111.44031"
+         x="825.62067"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.3333px;line-height:1.25;font-family:'Book Antiqua';-inkscape-font-specification:'Book Antiqua, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
+         xml:space="preserve"><tspan
+           y="111.44031"
+           x="825.62067"
+           id="tspan143"
+           sodipodi:role="line">c</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.6667px;line-height:1.25;font-family:Hack;-inkscape-font-specification:'Hack, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
+         x="864.42303"
+         y="23.892651"
+         id="codeText1"><tspan
+           sodipodi:role="line"
+           id="tspan159"
+           x="864.42303"
+           y="23.892651">derr</tspan></text>
+      <text
+         id="codeText2"
+         y="51.945366"
+         x="864.42303"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.6667px;line-height:1.25;font-family:Hack;-inkscape-font-specification:'Hack, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
+         xml:space="preserve"><tspan
+           y="51.945366"
+           x="864.42303"
+           id="tspan105"
+           sodipodi:role="line">errs</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.6667px;line-height:1.25;font-family:Hack;-inkscape-font-specification:'Hack, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
+         x="864.42303"
+         y="79.287849"
+         id="codeText3"><tspan
+           sodipodi:role="line"
+           id="tspan109"
+           x="864.42303"
+           y="79.287849">dmv</tspan></text>
+      <text
+         id="codeText4"
+         y="106.92096"
+         x="864.42303"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.6667px;line-height:1.25;font-family:Hack;-inkscape-font-specification:'Hack, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
+         xml:space="preserve"><tspan
+           y="106.92096"
+           x="864.42303"
+           id="tspan113"
+           sodipodi:role="line">Kc</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.6667px;line-height:1.25;font-family:Hack;-inkscape-font-specification:'Hack, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
+         x="864.42303"
+         y="135.8638"
+         id="codeText5"><tspan
+           sodipodi:role="line"
+           id="tspan117"
+           x="864.42303"
+           y="135.8638">tauI</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.6667px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
+         x="777.00916"
+         y="179.70056"
+         id="GivenTheSymbols"><tspan
+           sodipodi:role="line"
+           id="tspan959"
+           x="777.00916"
+           y="179.70056">Given the symbols above,</tspan><tspan
+           sodipodi:role="line"
+           x="777.00916"
+           y="198.03394"
+           id="tspan963">complete the missing line</tspan><tspan
+           sodipodi:role="line"
+           x="777.00916"
+           y="216.36731"
+           id="tspan965">of code (multiplication is *).</tspan></text>
+      <path
+         style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 742.54407,153.90573 H 982.03595"
+         id="SeparatorLine" />
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none"
+         id="BottomCodeBlockWrapper"
+         width="246.976"
+         height="103.28088"
+         x="739.92462"
+         y="232.87592" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.6667px;line-height:1.25;font-family:Hack;-inkscape-font-specification:'Hack, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
+         x="749.90717"
+         y="252.5027"
+         id="BottomCodeBlockText"><tspan
+           sodipodi:role="line"
+           id="tspan971"
+           x="749.90717"
+           y="252.5027">function PIcontrol() {</tspan><tspan
+           sodipodi:role="line"
+           x="749.90717"
+           y="270.83609"
+           id="tspan975">   errs = errs + derr;</tspan><tspan
+           sodipodi:role="line"
+           x="749.90717"
+           y="289.16946"
+           id="tspan979">   dmv =</tspan><tspan
+           sodipodi:role="line"
+           x="749.90717"
+           y="307.50284"
+           id="tspan981" /><tspan
+           id="tspan942"
+           sodipodi:role="line"
+           x="749.90717"
+           y="325.83621">}</tspan></text>
+    </g>
+    <g
+       id="PC-text">
+      <path
+         id="path932"
+         d="m461.72 90.723v-15.03h5.671a13.667 13.667 0 0 1 2.286 0.144 4.533 4.533 0 0 1 1.856 0.7 3.692 3.692 0 0 1 1.205 1.451 4.892 4.892 0 0 1-0.764 5.3q-1.221 1.329-4.409 1.328h-3.855v6.111zm1.99-7.885h3.885a4.128 4.128 0 0 0 2.739-0.718 2.558 2.558 0 0 0 0.81-2.02 2.718 2.718 0 0 0-0.477-1.615 2.237 2.237 0 0 0-1.257-0.887 8.542 8.542 0 0 0-1.855-0.133h-3.845z"
+         transform="translate(-14.168,-14.173)" />
+      <path
+         id="path934"
+         d="m486.45 85.45 1.989 0.5a6.689 6.689 0 0 1-2.25 3.737 6.2 6.2 0 0 1-3.975 1.287 7.132 7.132 0 0 1-3.953-0.989 6.176 6.176 0 0 1-2.317-2.866 10.231 10.231 0 0 1-0.795-4.03 8.871 8.871 0 0 1 0.9-4.1 6.146 6.146 0 0 1 2.547-2.649 7.46 7.46 0 0 1 3.645-0.908 6.167 6.167 0 0 1 3.794 1.149 5.966 5.966 0 0 1 2.143 3.23l-1.959 0.461a4.647 4.647 0 0 0-1.517-2.389 4.041 4.041 0 0 0-2.5-0.75 4.868 4.868 0 0 0-2.9 0.83 4.386 4.386 0 0 0-1.635 2.231 8.94 8.94 0 0 0-0.472 2.887 9.157 9.157 0 0 0 0.559 3.347 4.17 4.17 0 0 0 1.737 2.138 4.87 4.87 0 0 0 2.55 0.708 4.27 4.27 0 0 0 2.83-0.965 4.926 4.926 0 0 0 1.574-2.859z"
+         transform="translate(-14.168,-14.173)" />
+    </g>
+    <g
+       id="LC-text">
+      <path
+         id="path936"
+         d="m468.69 289.97v-15.031h1.989v13.263h7.4v1.772z"
+         transform="translate(-14.168,-14.173)" />
+      <path
+         id="path938"
+         d="m491.19 284.7 1.989 0.5a6.7 6.7 0 0 1-2.25 3.738 6.2 6.2 0 0 1-3.975 1.287 7.138 7.138 0 0 1-3.952-0.99 6.172 6.172 0 0 1-2.318-2.866 10.231 10.231 0 0 1-0.8-4.03 8.867 8.867 0 0 1 0.9-4.1 6.152 6.152 0 0 1 2.55-2.656 7.449 7.449 0 0 1 3.645-0.907 6.163 6.163 0 0 1 3.795 1.148 5.97 5.97 0 0 1 2.142 3.23l-1.958 0.461a4.646 4.646 0 0 0-1.518-2.388 4.041 4.041 0 0 0-2.5-0.75 4.849 4.849 0 0 0-2.9 0.83 4.38 4.38 0 0 0-1.636 2.23 8.965 8.965 0 0 0-0.471 2.886 9.161 9.161 0 0 0 0.558 3.348 4.165 4.165 0 0 0 1.738 2.139 4.878 4.878 0 0 0 2.55 0.707 4.284 4.284 0 0 0 2.831-0.964 4.936 4.936 0 0 0 1.58-2.853z"
+         transform="translate(-14.168,-14.173)" />
+    </g>
+    <g
+       id="TC-text">
+      <path
+         id="path940"
+         d="m245.37 286.66v-13.26h-4.95v-1.775h11.916v1.775h-4.974v13.26z"
+         transform="translate(-14.168,-14.173)" />
+      <path
+         id="path942"
+         d="m265.1 281.39 1.99 0.5a6.7 6.7 0 0 1-2.25 3.737 6.206 6.206 0 0 1-3.975 1.287 7.152 7.152 0 0 1-3.954-0.989 6.184 6.184 0 0 1-2.317-2.867 10.212 10.212 0 0 1-0.794-4.03 8.839 8.839 0 0 1 0.9-4.1 6.148 6.148 0 0 1 2.553-2.656 7.459 7.459 0 0 1 3.645-0.907 6.155 6.155 0 0 1 3.794 1.149 5.96 5.96 0 0 1 2.143 3.229l-1.958 0.462a4.645 4.645 0 0 0-1.518-2.389 4.041 4.041 0 0 0-2.5-0.75 4.849 4.849 0 0 0-2.9 0.83 4.38 4.38 0 0 0-1.636 2.23 8.995 8.995 0 0 0-0.472 2.887 9.162 9.162 0 0 0 0.559 3.348 4.167 4.167 0 0 0 1.738 2.138 4.888 4.888 0 0 0 2.55 0.708 4.285 4.285 0 0 0 2.831-0.965 4.934 4.934 0 0 0 1.569-2.859z"
+         transform="translate(-14.168,-14.173)" />
+    </g>
+    <rect
+       id="TerminalOutputWrapper"
+       x="734.17999"
+       y="348.85443"
+       width="257.95001"
+       height="54.121109"
+       fill="#333333"
+       stroke="#000000"
+       stroke-miterlimit="3"
+       stroke-width="2.25px" />
+  </g>
+</svg>
