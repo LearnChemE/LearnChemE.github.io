@@ -496,7 +496,7 @@ class Separator {
     const terminal = document.getElementById("code-output");
 
     try {
-      let noEquation = false;
+
       if(this.codeString === "") {
         function BlankInputException() {
           this.__proto__.name = "BlankInputError";
@@ -509,7 +509,9 @@ class Separator {
 
       eval(toEval);
 
-      __mv = __bias + dmv;
+      dmv = Number(dmv);
+
+      __mv = Number(__bias) + dmv;
 
       for(let i = 0; i < __inputs.length; i++) {
         document.getElementById(__inputs[i]).removeAttribute("disabled");
