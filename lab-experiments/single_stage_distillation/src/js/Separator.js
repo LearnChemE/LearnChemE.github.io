@@ -79,7 +79,10 @@ class Separator {
     this.pressures = [this.P / 1000];
     this.lifts = [this.lift];
     this.Pstpts = [this.PressureController.stpt];
-    this.equations = [""]
+    this.equations = [""];
+    this.TstptScales = [true];
+    this.PstptScales = [true];
+    this.levelstptScales = [true];
 
     /***** Coordinates for Above Values, 2-column matrix *****/
     this.powerCoords = [[0, 0]];
@@ -180,11 +183,15 @@ class Separator {
     if(!PC.auto) { this.Pstpts.push(PC.stpt) } else { this.Pstpts.push(PC.stpt / 1000) }
     this.levelstpts.push(this.LevelController.stpt)
 
-    if(this.temperatures.length > this.xAxisLimit) { this.powers.shift(); this.temperatures.shift(); }
-    if(this.levels.length > this.xAxisLimit) { this.levels.shift(); this.flowRatesOut.shift(); }
-    if(this.pressures.length > this.xAxisLimit) { this.pressures.shift(); this.lifts.shift(); }
+    this.TstptScales.push(!TC.auto);
+    this.PstptScales.push(!PC.auto);
+    this.levelstptScales.push(!LC.auto);
 
     this.equations.push(this.codeString);
+
+    if(this.temperatures.length > this.xAxisLimit) { this.powers.shift(); this.temperatures.shift(); this.Tstpts.shift(); this.TstptScales.shift(); this.equations.shift();}
+    if(this.levels.length > this.xAxisLimit) { this.levels.shift(); this.flowRatesOut.shift(); this.Pstpts.shift(); this.PstptScales.shift();}
+    if(this.pressures.length > this.xAxisLimit) { this.pressures.shift(); this.lifts.shift(); this.levelstpts.shift(); this.levelstptScales.shift();}
 
     this.updateDOM();
 
@@ -199,13 +206,6 @@ class Separator {
       };
     };
 
-    const pushCoord = (value, arrOut) => {
-      arrOut.unshift([1, value]);
-      for(let i = 0; i < arrOut.length; i++) {
-        arrOut[i][0] -= 1;
-      }
-    }
-
     // Update axes limits, then convert the values to coordinates, then update the plotted array
     const minMax = (array) => {
       let min = array[0];
@@ -219,15 +219,18 @@ class Separator {
       return [min, max];
     }
 
+    const TAxisY1 = graphics.TPlot.getOptions().yaxes[0];
+    const TAxisY2 = graphics.TPlot.getOptions().yaxes[1];
+    const PAxisY1 = graphics.PPlot.getOptions().yaxes[0];
+    const PAxisY2 = graphics.PPlot.getOptions().yaxes[1];
+    const LAxisY1 = graphics.LPlot.getOptions().yaxes[0];
+    const LAxisY2 = graphics.LPlot.getOptions().yaxes[1];
+
     const minIndex = Math.max(0, this.pressures.length - this.pressureAxisLimit);
     const maxIndex = this.pressures.length;
 
     let truncatedLifts = this.lifts.slice(minIndex, maxIndex);
     let truncatedPressures = this.pressures.slice(minIndex, maxIndex);
-
-    pushCoord(this.Tstpts[this.Tstpts.length - 1], this.TstptCoords);
-    pushCoord(this.Pstpts[this.Pstpts.length - 1], this.PstptCoords);
-    pushCoord(this.levelstpts[this.levelstpts.length - 1], this.levelstptCoords);
 
     coords(this.temperatures, this.temperatureCoords);
     coords(this.powers, this.powerCoords);
@@ -236,13 +239,18 @@ class Separator {
     coords(truncatedLifts, this.liftCoords);
     coords(truncatedPressures, this.pressureCoords);
 
-
     let TRange = minMax(this.temperatures);
     const QRange = minMax(this.powers);
     let LRange = minMax(this.levels);
     const BRange = minMax(this.flowRatesOut);
     let PRange = minMax(truncatedPressures);
     const liftRange = minMax(truncatedLifts);
+
+    for(let i = 0; i < this.TstptScales.length; i++) {
+      if(!this.TstptScales[i]) {TRange = [ Math.min(this.Tstpts[i], TRange[0]), Math.max(this.Tstpts[i], TRange[1]) ]}
+      if(!this.PstptScales[i]) {PRange = [ Math.min(this.Pstpts[i], PRange[0]), Math.max(this.Pstpts[i], PRange[1]) ]}
+      if(!this.levelstptScales[i]) {LRange = [ Math.min(this.levelstpts[i], LRange[0]), Math.max(this.levelstpts[i], LRange[1]) ]}
+    }
 
     // const TstptRange = minMax(this.Tstpts);
     // TRange = [Math.min(TstptRange[0], TRange[0]), Math.max(TstptRange[1], TRange[1])];
@@ -254,13 +262,6 @@ class Separator {
     // LRange = [Math.min(levelstptRange[0], LRange[0]), Math.max(levelstptRange[1], LRange[1])];
 
     // The following 7 blocks of code adjust the y-axes based on the minimum and maximum values in each series.
-
-    const TAxisY1 = graphics.TPlot.getOptions().yaxes[0];
-    const TAxisY2 = graphics.TPlot.getOptions().yaxes[1];
-    const PAxisY1 = graphics.PPlot.getOptions().yaxes[0];
-    const PAxisY2 = graphics.PPlot.getOptions().yaxes[1];
-    const LAxisY1 = graphics.LPlot.getOptions().yaxes[0];
-    const LAxisY2 = graphics.LPlot.getOptions().yaxes[1];
 
     if(TRange[0] <= TAxisY1.min) { TAxisY1.min = TRange[0] * 0.9 }
     if(TRange[1] >= TAxisY1.max) { TAxisY1.max = TRange[1] * 1.1 }
@@ -297,33 +298,19 @@ class Separator {
       return out;
     }
 
-    if(!this.TemperatureController.auto) {
-      const TAxisY1 = graphics.TPlot.getOptions().yaxes[0];
-      const TAxisY2 = graphics.TPlot.getOptions().yaxes[1];
-      const y1min = TAxisY1.min;
-      const y1max = TAxisY1.max;
-      const y2min = TAxisY2.min;
-      const y2max = TAxisY2.max;
-      this.TstptCoords[0][1] = interpolate(this.TstptCoords[0][1], y1min, y1max, y2min, y2max);
+    const scaledCoords = (arrIn, arrOut, scaleArr, y1min, y1max, y2min, y2max) => {
+      for(let i = 0; i < arrIn.length; i++) {
+        if(scaleArr[arrIn.length - i - 1]) { 
+          arrOut[i] = [-i, interpolate(arrIn[arrIn.length - i - 1], y1min, y1max, y2min, y2max)];
+        } else {
+          arrOut[i] = [-i, arrIn[arrIn.length - i - 1]]
+        }
+      } 
     }
-    if(!this.PressureController.auto) {
-      const PAxisY1 = graphics.PPlot.getOptions().yaxes[0];
-      const PAxisY2 = graphics.PPlot.getOptions().yaxes[1];
-      const y1min = PAxisY1.min;
-      const y1max = PAxisY1.max;
-      const y2min = PAxisY2.min;
-      const y2max = PAxisY2.max;
-      this.PstptCoords[0][1] = interpolate(this.PstptCoords[0][1], y1min, y1max, y2min, y2max);
-    }
-    if(!this.LevelController.auto) {
-      const LAxisY1 = graphics.LPlot.getOptions().yaxes[0];
-      const LAxisY2 = graphics.LPlot.getOptions().yaxes[1];
-      const y1min = LAxisY1.min;
-      const y1max = LAxisY1.max;
-      const y2min = LAxisY2.min;
-      const y2max = LAxisY2.max;
-      this.levelstptCoords[0][1] = interpolate(this.levelstptCoords[0][1], y1min, y1max, y2min, y2max);
-    }
+
+    scaledCoords(this.Tstpts, this.TstptCoords, this.TstptScales, TAxisY1.min, TAxisY1.max, TAxisY2.min, TAxisY2.max);
+    scaledCoords(this.Pstpts, this.PstptCoords, this.PstptScales, PAxisY1.min, PAxisY1.max, PAxisY2.min, PAxisY2.max);
+    scaledCoords(this.levelstpts, this.levelstptCoords, this.levelstptScales, LAxisY1.min, LAxisY1.max, LAxisY2.min, LAxisY2.max);
 
     const secondsPassed = this.pressures.length;
     const resizeArray = [60, 120, 200, 300, 400, 500, 1000];
