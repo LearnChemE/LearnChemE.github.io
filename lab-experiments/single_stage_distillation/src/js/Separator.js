@@ -244,14 +244,14 @@ class Separator {
     let PRange = minMax(truncatedPressures);
     const liftRange = minMax(truncatedLifts);
 
-    const TstptRange = minMax(this.Tstpts);
-    TRange = [Math.min(TstptRange[0], TRange[0]), Math.max(TstptRange[1], TRange[1])];
+    // const TstptRange = minMax(this.Tstpts);
+    // TRange = [Math.min(TstptRange[0], TRange[0]), Math.max(TstptRange[1], TRange[1])];
 
-    const PstptRange = minMax(this.Pstpts);
-    PRange = [Math.min(PstptRange[0], PRange[0]), Math.max(PstptRange[1], PRange[1])];
+    // const PstptRange = minMax(this.Pstpts);
+    // PRange = [Math.min(PstptRange[0], PRange[0]), Math.max(PstptRange[1], PRange[1])];
 
-    const levelstptRange = minMax(this.levelstpts);
-    LRange = [Math.min(levelstptRange[0], LRange[0]), Math.max(levelstptRange[1], LRange[1])];
+    // const levelstptRange = minMax(this.levelstpts);
+    // LRange = [Math.min(levelstptRange[0], LRange[0]), Math.max(levelstptRange[1], LRange[1])];
 
     // The following 7 blocks of code adjust the y-axes based on the minimum and maximum values in each series.
 
