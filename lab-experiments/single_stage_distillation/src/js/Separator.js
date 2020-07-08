@@ -17,7 +17,7 @@ class Separator {
     this.autoLevel = false;
     this.autoPressure = false;
     this.speed = 1; // animation speed
-    this.codeString = "0";
+    this.codeString = "";
 
     /**** Control Variables *****/
     this.L = 0.66; // Volumetric flowrate of bottoms (L / sec)
@@ -30,7 +30,7 @@ class Separator {
       mv: this.lift,
       Kc: 0,
       Tau: 36000,
-      stpt: 75000,
+      stpt: this.lift,
       tempmv: this.lift,
       tempTau: 36000,
       tempStpt: 75000,
@@ -44,7 +44,7 @@ class Separator {
       mv: this.Q,
       Kc: 0,
       Tau: 36000,
-      stpt: 500,
+      stpt: this.Q / 1000,
       tempmv: this.Q,
       tempTau: 36000,
       tempStpt: 500,
@@ -58,7 +58,7 @@ class Separator {
       mv: this.L,
       Kc: 0,
       Tau: 36000,
-      stpt: 25,
+      stpt: this.L,
       tempmv: this.L,
       tempTau: 36000,
       tempStpt: 25,
@@ -78,18 +78,19 @@ class Separator {
     this.levelstpts = [this.LevelController.stpt];
     this.pressures = [this.P / 1000];
     this.lifts = [this.lift];
-    this.Pstpts = [this.PressureController.stpt / 1000];
+    this.Pstpts = [this.PressureController.stpt];
+    this.equations = [""]
 
     /***** Coordinates for Above Values, 2-column matrix *****/
     this.powerCoords = [[0, 0]];
     this.temperatureCoords = [[0, 0]];
-    this.TstptCoords = [[0, 0]];
+    this.TstptCoords = [];
     this.liquidLevelCoords = [[0, 0]];
     this.flowRatesOutCoords = [[0, 0]];
-    this.levelstptCoords = [[0, 0]];
+    this.levelstptCoords = [];
     this.pressureCoords = [[0, 0]];
     this.liftCoords = [[0, 0]];
-    this.PstptCoords = [[0, 0]];
+    this.PstptCoords = [];
 
     this.xAxisLimit = 1000;
     this.pressureAxisLimit = 300;
@@ -175,13 +176,15 @@ class Separator {
     this.Tins.push(this.Tin);
     this.xins.push(this.xin);
 
-    if(this.TemperatureController.auto) {this.Tstpts.push(this.TemperatureController.stpt)}
-    if(this.PressureController.auto) {this.Pstpts.push(this.PressureController.stpt / 1000)}
-    if(this.LevelController.auto) {this.levelstpts.push(this.LevelController.stpt)}
+    if(!TC.auto) { this.Tstpts.push(TC.stpt / 1000) } else { this.Tstpts.push(TC.stpt) }
+    if(!PC.auto) { this.Pstpts.push(PC.stpt) } else { this.Pstpts.push(PC.stpt / 1000) }
+    this.levelstpts.push(this.LevelController.stpt)
 
     if(this.temperatures.length > this.xAxisLimit) { this.powers.shift(); this.temperatures.shift(); }
     if(this.levels.length > this.xAxisLimit) { this.levels.shift(); this.flowRatesOut.shift(); }
     if(this.pressures.length > this.xAxisLimit) { this.pressures.shift(); this.lifts.shift(); }
+
+    this.equations.push(this.codeString);
 
     this.updateDOM();
 
@@ -195,6 +198,13 @@ class Separator {
         arrOut[i] = [-i, arrIn[arrIn.length - i - 1]];
       };
     };
+
+    const pushCoord = (value, arrOut) => {
+      arrOut.unshift([1, value]);
+      for(let i = 0; i < arrOut.length; i++) {
+        arrOut[i][0] -= 1;
+      }
+    }
 
     // Update axes limits, then convert the values to coordinates, then update the plotted array
     const minMax = (array) => {
@@ -215,15 +225,17 @@ class Separator {
     let truncatedLifts = this.lifts.slice(minIndex, maxIndex);
     let truncatedPressures = this.pressures.slice(minIndex, maxIndex);
 
+    pushCoord(this.Tstpts[this.Tstpts.length - 1], this.TstptCoords);
+    pushCoord(this.Pstpts[this.Pstpts.length - 1], this.PstptCoords);
+    pushCoord(this.levelstpts[this.levelstpts.length - 1], this.levelstptCoords);
+
     coords(this.temperatures, this.temperatureCoords);
     coords(this.powers, this.powerCoords);
-    coords(this.Tstpts, this.TstptCoords);
     coords(this.levels, this.liquidLevelCoords);
     coords(this.flowRatesOut, this.flowRatesOutCoords);
-    coords(this.levelstpts, this.PstptCoords);
     coords(truncatedLifts, this.liftCoords);
     coords(truncatedPressures, this.pressureCoords);
-    coords(this.Pstpts, this.PstptCoords);
+
 
     let TRange = minMax(this.temperatures);
     const QRange = minMax(this.powers);
@@ -232,18 +244,14 @@ class Separator {
     let PRange = minMax(truncatedPressures);
     const liftRange = minMax(truncatedLifts);
 
-    if(this.TemperatureController.auto) {
-      const TstptRange = minMax(this.Tstpts);
-      TRange = [Math.min(TstptRange[0], TRange[0]), Math.max(TstptRange[1], TRange[1])];
-    }
-    if(this.PressureController.auto) {
-      const PstptRange = minMax(this.Pstpts);
-      PRange = [Math.min(PstptRange[0], PRange[0]), Math.max(PstptRange[1], PRange[1])];
-    }
-    if(this.LevelController.auto) {
-      const levelstptRange = minMax(this.levelstpts);
-      LRange = [Math.min(levelstptRange[0], LRange[0]), Math.max(levelstptRange[1], LRange[1])];
-    }
+    const TstptRange = minMax(this.Tstpts);
+    TRange = [Math.min(TstptRange[0], TRange[0]), Math.max(TstptRange[1], TRange[1])];
+
+    const PstptRange = minMax(this.Pstpts);
+    PRange = [Math.min(PstptRange[0], PRange[0]), Math.max(PstptRange[1], PRange[1])];
+
+    const levelstptRange = minMax(this.levelstpts);
+    LRange = [Math.min(levelstptRange[0], LRange[0]), Math.max(levelstptRange[1], LRange[1])];
 
     // The following 7 blocks of code adjust the y-axes based on the minimum and maximum values in each series.
 
@@ -284,6 +292,39 @@ class Separator {
     if(BRange[0] / (LAxisY2.min + LAxisY2.max) > 0.5) { LAxisY2.min = BRange[0] * 0.9 }
     if(BRange[1] / (LAxisY2.min + LAxisY2.max) < 0.5) { LAxisY2.max = BRange[1] * 1.1 }
 
+    const interpolate = (value, y1min, y1max, y2min, y2max) => {
+      const out = ((value - y2min) / (y2max - y2min)) * (y1max - y1min) + y1min;
+      return out;
+    }
+
+    if(!this.TemperatureController.auto) {
+      const TAxisY1 = graphics.TPlot.getOptions().yaxes[0];
+      const TAxisY2 = graphics.TPlot.getOptions().yaxes[1];
+      const y1min = TAxisY1.min;
+      const y1max = TAxisY1.max;
+      const y2min = TAxisY2.min;
+      const y2max = TAxisY2.max;
+      this.TstptCoords[0][1] = interpolate(this.TstptCoords[0][1], y1min, y1max, y2min, y2max);
+    }
+    if(!this.PressureController.auto) {
+      const PAxisY1 = graphics.PPlot.getOptions().yaxes[0];
+      const PAxisY2 = graphics.PPlot.getOptions().yaxes[1];
+      const y1min = PAxisY1.min;
+      const y1max = PAxisY1.max;
+      const y2min = PAxisY2.min;
+      const y2max = PAxisY2.max;
+      this.PstptCoords[0][1] = interpolate(this.PstptCoords[0][1], y1min, y1max, y2min, y2max);
+    }
+    if(!this.LevelController.auto) {
+      const LAxisY1 = graphics.LPlot.getOptions().yaxes[0];
+      const LAxisY2 = graphics.LPlot.getOptions().yaxes[1];
+      const y1min = LAxisY1.min;
+      const y1max = LAxisY1.max;
+      const y2min = LAxisY2.min;
+      const y2max = LAxisY2.max;
+      this.levelstptCoords[0][1] = interpolate(this.levelstptCoords[0][1], y1min, y1max, y2min, y2max);
+    }
+
     const secondsPassed = this.pressures.length;
     const resizeArray = [60, 120, 200, 300, 400, 500, 1000];
     let xAxisSize = 60;
@@ -302,46 +343,23 @@ class Separator {
     graphics.LPlot.getAxes().xaxis.options.min = xLims[0];
     graphics.LPlot.getAxes().xaxis.options.max = xLims[1];
 
-    if(this.TemperatureController.auto) {
-      graphics.TPlot.setData([
-        {data : this.temperatureCoords, xaxis : 1, yaxis : 1},
-        {data : this.powerCoords,  xaxis : 1, yaxis : 2},
-        {data : this.TstptCoords, xaxis : 1, yaxis : 1}
-      ]);
-    } else {
-      graphics.TPlot.setData([
-        {data : this.temperatureCoords, xaxis : 1, yaxis : 1},
-        {data : this.powerCoords,  xaxis : 1, yaxis : 2}
-      ]);
-    }
-    if(this.PressureController.auto) {
-      graphics.PPlot.setData([
-        {data : this.pressureCoords, xaxis : 1, yaxis : 1},
-        {data : this.liftCoords,  xaxis : 1, yaxis : 2},
-        {data : this.PstptCoords, xaxis : 1, yaxis : 1}
-      ]);
-    } else {      
-      graphics.PPlot.setData([
-        {data : this.pressureCoords, xaxis : 1, yaxis : 1},
-        {data : this.liftCoords,  xaxis : 1, yaxis : 2}
-      ]);
-    }
-    if(this.LevelController.auto) {
-      graphics.LPlot.setData([
-        {data : this.liquidLevelCoords, xaxis : 1, yaxis : 1},
-        {data : this.flowRatesOutCoords,  xaxis : 1, yaxis : 2},
-        {data : this.levelstptCoords, xaxis : 1, yaxis : 1}
-      ]);
-    } else {
-      graphics.LPlot.setData([
-        {data : this.liquidLevelCoords, xaxis : 1, yaxis : 1},
-        {data : this.flowRatesOutCoords,  xaxis : 1, yaxis : 2}
-      ]);
-    }
+    graphics.TPlot.setData([
+      {data : this.TstptCoords, xaxis : 1, yaxis : 1},
+      {data : this.temperatureCoords, xaxis : 1, yaxis : 1},
+      {data : this.powerCoords,  xaxis : 1, yaxis : 2}
+    ]);
 
+    graphics.PPlot.setData([
+      {data : this.PstptCoords, xaxis : 1, yaxis : 1},
+      {data : this.pressureCoords, xaxis : 1, yaxis : 1},
+      {data : this.liftCoords,  xaxis : 1, yaxis : 2}
+    ]);
 
-
-
+    graphics.LPlot.setData([
+      {data : this.levelstptCoords, xaxis : 1, yaxis : 1},
+      {data : this.liquidLevelCoords, xaxis : 1, yaxis : 1},
+      {data : this.flowRatesOutCoords,  xaxis : 1, yaxis : 2}
+    ]);
 
     graphics.TPlot.setupGrid();
     graphics.PPlot.setupGrid();
@@ -463,17 +481,18 @@ class Separator {
     return NB;
   }
 
-  PI(privateArgs) {
-    const __Kc = privateArgs.Kc;
-    const __TauI = privateArgs.TauI;
-    const __bias = privateArgs.Bias;
-    const __pv = privateArgs.ProcessVal;
-    const __stpt = privateArgs.SetPoint;
-    let __errs = privateArgs.AccumErr;
-    const __auto = privateArgs.Auto;
-    let __mv = privateArgs.MV;
-    const __derr = __stpt - __pv;
-    __errs = __errs + __derr;
+  PI(args) {
+    const Kc = args.Kc;
+    const tauI = args.TauI;
+    const __bias = args.Bias;
+    const __pv = args.ProcessVal;
+    const __stpt = args.SetPoint;
+    let errs = args.AccumErr;
+    const __auto = args.Auto;
+    let __mv = args.MV;
+    const derr = __stpt - __pv;
+    errs = errs + derr;
+    let dmv = 0;
 
     const __inputs = [
       "input-temperature",
@@ -488,35 +507,30 @@ class Separator {
     ];
 
     const terminal = document.getElementById("code-output");
-    // easiest way to check if the correct equation is entered is to use random values, to avoid 0 == 0 false positive
-    let dmv = 0;
-    const derr = Math.PI;
-    const errs = Math.E;
-    const Kc = 9.243523525;
-    const tauI = 3.4253629;
 
     try {
-      if(this.codeString === "") {this.codeString = "0"}
+      let noEquation = false;
+      if(this.codeString === "") {
+        function BlankInputException() {
+          this.__proto__.name = "BlankInputError";
+          this.message = 'Auto mode disabled.';
+        }
+        throw new BlankInputException()
+      }
 
       const toEval = `dmv = ${this.codeString}`;
+
       eval(toEval);
 
-      const ans = Kc*(derr+errs/tauI);
+      __mv = __bias + dmv;
 
-      if(dmv !== ans) {
-        throw {
-          __proto__ : { name : "Incorrect equation entered" },
-          message : "Auto mode disabled."
-        }
-      } else {
-        const __dmv = __Kc*(__derr + __errs/__TauI);
-        __mv = __bias + __dmv;
-        for(let i = 0; i < __inputs.length; i++) {
-          document.getElementById(__inputs[i]).removeAttribute("disabled");
-        }
-        const output = `Correct equation entered:<br>Auto mode enabled.`;
-        terminal.innerHTML = output;
+      for(let i = 0; i < __inputs.length; i++) {
+        document.getElementById(__inputs[i]).removeAttribute("disabled");
       }
+      
+      const output = `Valid equation entered:<br>dmv = ${this.codeString}.`;
+      terminal.innerHTML = output;
+
     } catch(e) {
       const errorType = e.__proto__.name;
       const error = `${errorType}:<br>${e.message}`;
@@ -535,11 +549,11 @@ class Separator {
 
     if (!__auto) {
       __mv = __stpt;
-      __errs = 0;
+      errs = 0;
     }
 
-    __mv = Math.max(1e-9, __mv);
-    return [__mv, __errs];
+    __mv = Math.max(1e-12, __mv);
+    return [__mv, errs];
   }
 
   pressure() {

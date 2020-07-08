@@ -1,8 +1,8 @@
 function setup(sk, speed) {
   window.graphics = {
-    y1Color: 'rgb(255, 0, 0)',
-    y2Color: 'rgb(0, 0, 255)',
-    y3Color: 'rgb(0, 0, 0)',
+    y1Color: 'rgb(0, 0, 0)',
+    y2Color: 'rgb(255, 0, 0)',
+    y3Color: 'rgb(0, 0, 255)'
   }
 
   sk.setup = () => {
@@ -29,8 +29,8 @@ function setup(sk, speed) {
           { position: 'top', show: true, showTicks: false, showTickLabels: false, gridLines: false}
         ],
         yaxes: [
-          { position: 'left', axisLabel : '', color: graphics.y1Color},
-          { position: 'right', axisLabel: '', color: graphics.y2Color, show: true, showTicks: true, gridLines: false },
+          { position: 'left', axisLabel : '', color: graphics.y2Color},
+          { position: 'right', axisLabel: '', color: graphics.y3Color, show: true, showTicks: true, gridLines: false },
         ],
         colors: [graphics.y1Color, graphics.y2Color, graphics.y3Color]
       });
@@ -48,9 +48,9 @@ function setup(sk, speed) {
     TOpts.series.dashes.show = true;
     POpts.series.dashes.show = true;
     LOpts.series.dashes.show = true;
-    TOpts.series.dashes.displayDashesOn = [2];
-    POpts.series.dashes.displayDashesOn = [2];
-    LOpts.series.dashes.displayDashesOn = [2];
+    TOpts.series.dashes.displayDashesOn = [0];
+    POpts.series.dashes.displayDashesOn = [0];
+    LOpts.series.dashes.displayDashesOn = [0];
 
     TOpts.yaxes[0].axisLabel = 'temperature (K)';
     TOpts.yaxes[1].axisLabel = 'heat duty (kW)';

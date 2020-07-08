@@ -227,10 +227,14 @@ window.generateCSV = () => {
     "Inlet Temperature (K)",
     "Column Pressure (kPa)",
     "Distillate Valve Lift",
+    "Pressure Controller Stpt",
     "Column Temperature (K)",
     "Column Heat Duty (kW)",
+    "Temperature Controller Stpt",
     "Column Liquid Level (%)",
-    "Bottoms Flow Rate (L/s)"
+    "Bottoms Flow Rate (L/s)",
+    "Level Controller Stpt",
+    "Controller Equation"
   ]];
   const csvLength = separator.pressures.length;
   for(let i = 0; i < csvLength; i++) {
@@ -241,10 +245,14 @@ window.generateCSV = () => {
       `${separator.Tins[i]}`,
       `${separator.pressures[i]}`,
       `${separator.lifts[i]}`,
+      `${separator.Pstpts[i]}`,
       `${separator.temperatures[i]}`,
       `${separator.powers[i]}`,
+      `${separator.Tstpts[i]}`,
       `${separator.levels[i]}`,
-      `${separator.flowRatesOut[i]}`
+      `${separator.flowRatesOut[i]}`,
+      `${separator.levelstpts[i]}`,
+      `${separator.equations[i]}`
     ];
     rows.push(newRow);
   }
@@ -303,10 +311,6 @@ function insertInputs() {
       opts.obj["stpt"] = Number(stptInput.value) * opts.cv.multiplier;
       opts.obj["Tau"] = tauInput.value;
       opts.obj["Kc"] = KcInput.value * opts.mv.multiplier / opts.cv.multiplier;
-      if(!opts.obj["auto"]) { // if it is going from manual to auto, clear the set point arrays
-        separator[`${opts.cv.objcvName}stpts`] = [];
-        separator[`${opts.cv.objcvName}stptCoords`] = [];
-      }
       opts.obj["auto"] = true;
     }
 
@@ -317,8 +321,6 @@ function insertInputs() {
       manualInput.value = Number(Number(separator[`${opts.mv.objmvName}`] / opts.mv.multiplier).toPrecision(3));
       opts.obj["tempmv"] = Number(manualInput.value);
       opts.obj["auto"] = false;
-      separator[`${opts.cv.objcvName}stpts`] = [];
-      separator[`${opts.cv.objcvName}stptCoords`] = [];
     }
 
     autobtn.addEventListener('click', toggleAuto);

@@ -64,7 +64,7 @@
             dashOffLength;
 
         if (series.dashes.dashLength[0]) {
-          dashOnLength = series.dashes.dashLength[0];
+            dashOnLength = series.dashes.dashLength[0];
           if (series.dashes.dashLength[1]) {
             dashOffLength = series.dashes.dashLength[1];
           } else {
@@ -74,7 +74,7 @@
           dashOffLength = dashOnLength = series.dashes.dashLength;
         }
 
-        if (!showThisSeries || !series.dashes.show) {dashOffLength = 0}
+        if (!showThisSeries || !series.dashes.show) {dashOffLength = 0} else {dashOnLength = 3; dashOffLength = 3;}
 
         ctx.beginPath();
 
@@ -236,7 +236,7 @@
           show: false,
           displayDashesOn: [],
           lineWidth: 1,
-          dashLength: 6
+          dashLength: 1
         }
       }
     },
