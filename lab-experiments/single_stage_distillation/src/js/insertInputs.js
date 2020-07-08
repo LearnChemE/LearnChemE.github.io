@@ -340,6 +340,14 @@ function insertInputs() {
         const parsed = parseNumericInput(inputValue, min, max);
         opts.obj[item[1]] = parsed * item[2];
       });
+
+      item[0].addEventListener('keydown', (e) => {
+        if(e.keyCode == 13) {
+          const updateButton = document.getElementById(`update-${opts.controller}`);
+          updateButton.click();
+          updateButton.focus();
+        }
+      })
     });
 
     // When "update" is pressed, the controller is updated to the temporary variables
@@ -366,6 +374,16 @@ function insertInputs() {
   const FInput = document.getElementById(`input-${inletParams.F0.name}`);
   const xInput = document.getElementById(`input-${inletParams.xA0.name}`);
   const TInput = document.getElementById(`input-${inletParams.Tin.name}`);
+
+  [FInput, xInput, TInput].forEach(inp => {
+    inp.addEventListener('keydown', e => {
+      if(e.keyCode == 13) {
+        const updateButton = document.getElementById('update-inlet');
+        updateButton.click();
+        updateButton.focus();
+      }
+    })
+  })
 
   updateInletButton.addEventListener("click", () => {
     const parseF = parseNumericInput(FInput.value, Number(FInput.getAttribute("min")), Number(FInput.getAttribute("max")));
