@@ -80,7 +80,13 @@ const terserOptions = {
 module.exports = env => {
   let mode, minimize;
 
-  if(env.production) {minimize = true; mode = "production";} else {minimize = false; mode = "development";}
+  if(env.production) {
+    minimize = true;
+    mode = "production";
+  } else {
+    minimize = false;
+    mode = "development";
+  }
 
   return {
     mode: mode,
@@ -90,6 +96,12 @@ module.exports = env => {
       path: path.resolve(__dirname, "../dist/"),
     },
     module: { rules: rules },
+    devServer: {
+      contentBase: path.join(__dirname, '../dist'),
+      compress: true,
+      open: true,
+      stats: 'errors-only',
+    },
     stats: stats,
     optimization: {
       minimize: minimize,

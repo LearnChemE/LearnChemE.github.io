@@ -78,6 +78,12 @@ module.exports = env => {
       path: path.resolve(__dirname, "../dist/"),
     },
     module: { rules: rules },
+    devServer: {
+      contentBase: path.join(__dirname, '../dist'),
+      compress: true,
+      open: true,
+      stats: 'errors-only',
+    },
     stats: stats,
     optimization: {
       minimize: minimize,
