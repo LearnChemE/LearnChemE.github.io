@@ -91,6 +91,7 @@ function setup(sk, speed) {
     separator.maxLiquidHeight = Number(document.getElementById("liquidRect").getAttribute("height"));
     window.adjustSpeed = (sp) => {sk.frameRate(sp)}
     sk.frameRate(60);
+    sk.noCanvas();
   }
 
   sk.windowResized = () => {
