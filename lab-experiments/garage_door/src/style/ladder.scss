@@ -1,0 +1,12 @@
+line, path, circle, ellipse, polygon, polyline, rect {
+  stroke: #000;
+}
+
+#test {
+  width: 400px;
+}
+
+.svg-line {
+  stroke-width: 0.5;
+  fill: none;
+}
