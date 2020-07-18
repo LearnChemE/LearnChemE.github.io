@@ -160,7 +160,7 @@ function controllerHTML(opts) {
       </div>
       <div class="input-group input-group-sm">
         <div class="input-group-prepend">
-          <span class="input-group-text" id="input-${opts.cv.name}-tau-label">Tau</span>
+          <span class="input-group-text" id="input-${opts.cv.name}-tau-label">tauI</span>
         </div>
         <input type="number" id="input-${opts.cv.name}-tau" class="form-control" min="${autoParams.tauMin}" max="${autoParams.tauMax}" step="${autoParams.tauStep}" value="${autoParams.tauDefault}" aria-label="${opts.cv.name} tau input" aria-describedby="input-${opts.cv.name}-tau-label">
       </div>
