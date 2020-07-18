@@ -34,7 +34,7 @@ const tempButtons = {
     min: 0,
     max: 1000,
     step: 1e-12,
-    default: 500,
+    default: 455,
     multiplier: 1000
   },
   cv : {
@@ -309,6 +309,7 @@ function insertInputs() {
       stptInput.value = Number(separator[`${opts.cv.objcvName}`] / opts.cv.multiplier).toPrecision(3);
       opts.obj["bias"] = Number(separator[`${opts.mv.objmvName}`]);
       opts.obj["stpt"] = Number(stptInput.value) * opts.cv.multiplier;
+      console.log(opts.obj["stpt"]);
       opts.obj["Tau"] = tauInput.value;
       opts.obj["Kc"] = KcInput.value * opts.mv.multiplier / opts.cv.multiplier;
       opts.obj["auto"] = true;
@@ -353,9 +354,14 @@ function insertInputs() {
     // When "update" is pressed, the controller is updated to the temporary variables
     updateInput.addEventListener('click', () => {
       if(opts.obj["auto"] === true) {
-        opts.obj["Kc"] = opts.obj["tempKc"]
-        opts.obj["Tau"] = opts.obj["tempTau"];
-        opts.obj["stpt"] = opts.obj["tempStpt"];
+        // stptInput.value = Number(separator[`${opts.cv.objcvName}`] / opts.cv.multiplier).toPrecision(3);
+        // opts.obj["bias"] = Number(separator[`${opts.mv.objmvName}`]);
+        opts.obj["stpt"] = Number(stptInput.value) * opts.cv.multiplier;
+        opts.obj["Tau"] = tauInput.value;
+        opts.obj["Kc"] = KcInput.value * opts.mv.multiplier / opts.cv.multiplier;
+        // opts.obj["Kc"] = opts.obj["tempKc"]
+        // opts.obj["Tau"] = opts.obj["tempTau"];
+        // opts.obj["stpt"] = opts.obj["tempStpt"];
         opts.obj["error"] = 0;
       } else {
         separator[`${opts.mv.objmvName}`] = opts.obj["tempmv"];
