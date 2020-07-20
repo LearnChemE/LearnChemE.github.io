@@ -189,9 +189,28 @@ class Separator {
 
     this.equations.push(this.codeString);
 
-    if(this.temperatures.length > this.xAxisLimit) { this.powers.shift(); this.temperatures.shift(); this.Tstpts.shift(); this.TstptScales.shift(); this.equations.shift();}
-    if(this.levels.length > this.xAxisLimit) { this.levels.shift(); this.flowRatesOut.shift(); this.Pstpts.shift(); this.PstptScales.shift();}
-    if(this.pressures.length > this.xAxisLimit) { this.pressures.shift(); this.lifts.shift(); this.levelstpts.shift(); this.levelstptScales.shift();}
+    if(this.temperatures.length > this.xAxisLimit) {
+      this.powers.shift();
+      this.temperatures.shift();
+      this.Tstpts.shift();
+      this.TstptScales.shift();
+      this.equations.shift();
+      this.Fs.shift();
+      this.Tins.shift();
+      this.xins.shift();
+    }
+    if(this.levels.length > this.xAxisLimit) {
+      this.levels.shift();
+      this.flowRatesOut.shift();
+      this.Pstpts.shift();
+      this.PstptScales.shift();
+    }
+    if(this.pressures.length > this.xAxisLimit) {
+      this.pressures.shift();
+      this.lifts.shift();
+      this.levelstpts.shift();
+      this.levelstptScales.shift();
+    }
 
     this.updateDOM();
 
