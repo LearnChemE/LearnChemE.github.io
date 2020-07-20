@@ -168,7 +168,13 @@ class Separator {
     this.Tins.push(this.Tin);
     this.xins.push(this.xin);
 
-    if(this.temperatures.length > this.xAxisLimit) { this.powers.shift(); this.temperatures.shift(); }
+    if(this.temperatures.length > this.xAxisLimit) {
+      this.powers.shift();
+      this.temperatures.shift();
+      this.Fs.shift();
+      this.Tins.shift();
+      this.xins.shift();
+    }
     if(this.levels.length > this.xAxisLimit) { this.levels.shift(); this.flowRatesOut.shift(); }
     if(this.pressures.length > this.xAxisLimit) { this.pressures.shift(); this.lifts.shift(); }
 
