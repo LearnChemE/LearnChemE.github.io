@@ -54,11 +54,13 @@ const htmlOptions = {
 };
 
 const jsOptions = {
-  filename: "main.[contentHash].js"
+  // filename: "main.[contentHash].js"
+  filename: "main.js"
 };
 
 const styleOptions = {
-  filename: "[name].[contentHash].css"
+  // filename: "[name].[contentHash].css"
+  filename: "[name].css"
 };
 
 const terserOptions = {
