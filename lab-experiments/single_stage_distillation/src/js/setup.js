@@ -87,6 +87,7 @@ function setup(sk, speed) {
     setInterval(() => { window["rippleTimer"] += 1; ripple(window["rippleTimer"])}, 50);
     separator.createCoords();
     sk.windowResized();
+    setTimeout(() => {sk.windowResized()}, 2000);
     setInterval(() => {sk.windowResized()}, 5000);
     separator.maxLiquidHeight = Number(document.getElementById("liquidRect").getAttribute("height"));
     window.adjustSpeed = (sp) => {sk.frameRate(sp)}
