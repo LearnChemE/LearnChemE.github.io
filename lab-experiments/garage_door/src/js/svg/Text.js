@@ -32,7 +32,7 @@ class Text extends SVGObject {
     if(!this.selectable) { this.addClass('no-select') }
 
     this.element.setAttribute("alignment-baseline", "middle");
-
+    this.element.setAttribute("dominant-baseline", "middle");
   }
 
   editText(str) {

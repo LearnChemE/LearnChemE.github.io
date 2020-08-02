@@ -160,7 +160,7 @@ class SVGObject {
    */
   translate(x, y) {
     this.translationCoords = [ x, y ];
-    this.element.setAttribute("transform", `translate(${this.translationCoords[0]} ${this.translationCoords[1]})`);
+    this.element.setAttribute("transform", `translate(${this.translationCoords[0]}, ${this.translationCoords[1]})`);
   }
 
   /**
@@ -174,8 +174,8 @@ class SVGObject {
     const rect = svg.getBoundingClientRect();
     this.dragProps.pxWidth = Number(rect.width); // Width of SVG element (px)
     this.dragProps.pxHeight = Number(rect.height); // Height of SVG element (px)
-    this.dragProps.offsetX = e.offsetX;
-    this.dragProps.offsetY = e.offsetY;
+    this.dragProps.offsetX = e.clientX;
+    this.dragProps.offsetY = e.clientY;
     this.dragProps.isDragging = true;
     this.dragProps.originalNodeListIndex = Array.prototype.indexOf.call(this.parent.element.children, this.element);
     this.element.parentNode.appendChild(this.element);
@@ -194,8 +194,8 @@ class SVGObject {
    */
   drag(e) {
     if(this.dragProps.isDragging) {
-      const mouseX = e.offsetX;
-      const mouseY = e.offsetY;
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
       const dx = mouseX - this.dragProps.offsetX;
       const dy = mouseY - this.dragProps.offsetY;
       const translateX = dx * (this.dragProps.ptWidth / this.dragProps.pxWidth);

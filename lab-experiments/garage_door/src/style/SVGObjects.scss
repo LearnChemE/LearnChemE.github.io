@@ -1,5 +1,6 @@
 svg * {
   pointer-events: visible;
+  shape-rendering: geometricPrecision;
   
   &:focus {
     outline: none;

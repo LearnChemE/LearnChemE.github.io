@@ -99,7 +99,7 @@ module.exports = env => {
     devServer: {
       contentBase: path.join(__dirname, '../dist'),
       compress: true,
-      open: true,
+      open: 'Firefox',
       stats: 'errors-only',
     },
     stats: stats,
