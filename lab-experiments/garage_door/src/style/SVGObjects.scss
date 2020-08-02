@@ -1,0 +1,42 @@
+svg * {
+  pointer-events: visible;
+  
+  &:focus {
+    outline: none;
+  }
+}
+
+line, path, circle, ellipse, polygon, polyline, rect {
+  stroke: #000;
+}
+
+.svg-line {
+  stroke-width: 0.5;
+  fill: none;
+}
+
+.svg-polyline {
+  stroke-width: 1;
+  fill: none;
+}
+
+.no-select {
+  cursor: default;
+  &::selection {
+    background: rgba(255, 255, 255, 0);
+  }
+}
+
+.coil-BG-circle, .contact-BG-rect {
+  stroke: none;
+  fill: white;
+}
+
+.coil-indicator-circle, .contact-indicator-rect {
+  stroke: none;
+  fill: white;
+
+  &.on {
+    fill: yellow;
+  }
+}

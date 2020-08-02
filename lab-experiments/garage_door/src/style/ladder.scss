@@ -1,12 +1,5 @@
-line, path, circle, ellipse, polygon, polyline, rect {
-  stroke: #000;
-}
-
-#test {
+#ladderSVG {
   width: 400px;
+  border: 1px solid black;
 }
 
-.svg-line {
-  stroke-width: 0.5;
-  fill: none;
-}

@@ -11,21 +11,19 @@ class G extends SVGObject {
   * @property {SVGobject[]} children - The child SVGObjects of the group
   * @property {number[]} translationCoords - [x, y] Translation matrix of the g (default [0, 0])
   * @property {string[]} classList - ["string", "string2", ...] List of classes for line. (default [])
+  * @property {boolean} canBeDragged - determines whether the group can be dragged
+  * @property {boolean} isDragging - determines if the group is being dragged on initialization
   */
   constructor(options) {
     super({ ...options, objectName: "g" });
-    this.translationCoords = options.translationCoords ?? [ 0, 0 ];
-    this.element.setAttribute("transform", `translate(${this.translationCoords[0]} ${this.translationCoords[1]})`);
-  }
 
-  /**
-   * Function to translate the group
-   * @param {number} x - translate line along x-axis with respect to viewbox
-   * @param {number} y - translate line along y-axis with respect to viewbox
-   */
-  translate(x, y) {
-    this.translationCoords = [ x, y ];
-    this.element.setAttribute("transform", `translate(${this.translationCoords[0]} ${this.translationCoords[1]})`);
+    this.canBeDragged = options.canBeDragged ?? false;
+
+    if(this.canBeDragged) {
+      this.dragEventInit();
+    } else {
+      this.element.addEventListener("mousedown", e => { this.spawn(e); });
+    }
   }
 
   /**
@@ -40,6 +38,31 @@ class G extends SVGObject {
       })
     }
     this.translate( 0, 0 );
+  }
+
+  /**
+   * Add event listeners for dragging
+   */
+  dragEventInit() {
+    this.element.addEventListener("mousedown", e => { this.beginDrag(e); });
+    document.body.addEventListener("mousemove", e => { this.drag(e) });
+    this.element.addEventListener("mouseup", e => { this.endDrag(e) });
+  }
+
+  /**
+   * Spawn a new SVGObject of the same type
+   */
+  spawn(e) {
+    const ClassDef = this.constructor;
+
+    const obj = new ClassDef({
+      parent : this.parent,
+      translationCoords : this.translationCoords,
+      type : this.type,
+      canBeDragged : true,      
+    });
+
+    obj.beginDrag(e);
   }
 }
 

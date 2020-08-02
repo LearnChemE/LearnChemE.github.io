@@ -2,11 +2,11 @@ const SVGObject = require("./SVGObject");
 
 class Path extends SVGObject {
   /**
-  * @param {object} options - Default options for the line
+  * @param {object} options - Default options for the path
   * @property {element} parent - The SVGObject parent (default {element: document.body});
   * @property {string} id - id of the element
   * @property {*[][]} commands - Multi-dimensional array of path commands e.g. [["M", 20, 20], ["A", 20, 20, 0, 0]]. See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d for more information.
-  * @property {number[]} translationCoords - [x, y] Translation matrix of the line (default [0, 0])
+  * @property {number[]} translationCoords - [x, y] Translation matrix of the path (default [0, 0])
   * @property {string[]} classList - ["string", "string2", ...] List of classes for line. (default [])
   */
   constructor(options) {
@@ -14,8 +14,6 @@ class Path extends SVGObject {
     super({ ...options, objectName: "path", classList: classList });
     this.commands = options.commands ?? [["M", 0, 0], ["l", 10, 0]];
     this.drawPath();
-    this.translationCoords = options.translationCoords ?? [ 0, 0 ];
-    this.element.setAttribute("transform", `translate(${this.translationCoords[0]} ${this.translationCoords[1]})`);
   }
 
   drawPath() {
@@ -30,16 +28,6 @@ class Path extends SVGObject {
       }
     }
     this.element.setAttribute("d", path);
-  }
-
-  /**
-   * Function to translate the line
-   * @param {number} x - translate line along x-axis with respect to viewbox
-   * @param {number} y - translate line along y-axis with respect to viewbox
-   */
-  translate(x, y) {
-    this.translationCoords = [ x, y ];
-    this.element.setAttribute("transform", `translate(${this.translationCoords[0]} ${this.translationCoords[1]})`);
   }
 
   /**

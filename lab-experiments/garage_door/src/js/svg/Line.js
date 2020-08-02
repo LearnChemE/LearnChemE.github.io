@@ -18,23 +18,12 @@ class Line extends SVGObject {
     super({ ...options, objectName: "line", classList: classList });
     this.coord1 = options.coord1 ?? [ 0, 0 ];
     this.coord2 = options.coord2 ?? [ 10, 10 ];
-    this.translationCoords = options.translationCoords ?? [ 0, 0 ];
+
     this.element.setAttribute("id", `${this.id}`);
     this.element.setAttribute("x1", `${this.coord1[0]}`);
     this.element.setAttribute("y1", `${this.coord1[1]}`);
     this.element.setAttribute("x2", `${this.coord2[0]}`);
     this.element.setAttribute("y2", `${this.coord2[1]}`);
-    this.element.setAttribute("transform", `translate(${this.translationCoords[0]} ${this.translationCoords[1]})`);
-  }
-
-  /**
-   * Function to translate the line
-   * @param {number} x - translate line along x-axis with respect to viewbox
-   * @param {number} y - translate line along y-axis with respect to viewbox
-   */
-  translate(x, y) {
-    this.translationCoords = [ x, y ];
-    this.element.setAttribute("transform", `translate(${this.translationCoords[0]} ${this.translationCoords[1]})`);
   }
 
   /**

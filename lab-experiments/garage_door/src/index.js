@@ -1,19 +1,57 @@
 /*****************************************************/
 /**************** Import HTML, CSS *******************/
 /*****************************************************/
-const style = require("./style/style.scss");
 
+const style = require("./style/style.scss");
+const tippyStyle = require("tippy.js/dist/tippy.css");
 const mainDiv = document.getElementsByTagName("main")[0];
 
 const SVG = require("./js/svg/SVG");
-const Line = require("./js/svg/Line");
-const G = require("./js/svg/G");
-const Path = require("./js/svg/Path");
+const Coil = require("./js/svg/Coil");
+const Contact = require("./js/svg/Contact");
 
-const svg = new SVG({id: "test"});
-const path = new Path({
-  parent: svg,
-  commands: [["M", 20, 20], ["a", 4, 4, 0, 0, 1, 0, -6]]
+window.ladderSVG = new SVG({id: "ladderSVG"});
+
+const coil = new Coil({
+  type : "coil",
+  parent : ladderSVG,
+  translationCoords : [10, 5],
+  canBeDragged : false,
+})
+
+const nCoil = new Coil({
+  type : "negated coil",
+  parent : ladderSVG,
+  translationCoords : [22, 5],
+  canBeDragged : false,
+});
+
+const SLatch = new Coil({
+  type : "set latch",
+  parent : ladderSVG,
+  translationCoords : [34, 5],
+  canBeDragged : false,
+});
+
+const RLatch = new Coil({
+  type : "reset latch",
+  parent : ladderSVG,
+  translationCoords : [46, 5],
+  canBeDragged : false,
+});
+
+const contact = new Contact({
+  type : "NO",
+  parent : ladderSVG,
+  translationCoords : [58, 5],
+  canBeDragged : false,
+});
+
+const NCcontact = new Contact({
+  type : "NC",
+  parent : ladderSVG,
+  translationCoords : [70, 5],
+  canBeDragged : false,
 });
 
 /*****************************************************/

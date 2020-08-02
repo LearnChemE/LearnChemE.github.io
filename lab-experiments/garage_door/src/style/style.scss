@@ -2,5 +2,5 @@ $enable-responsive-font-sizes: true;
 $font-size-base: 0.85rem;
 
 @import '~bootstrap/scss/bootstrap.scss';
-
+@import './SVGObjects.scss';
 @import './ladder.scss';
