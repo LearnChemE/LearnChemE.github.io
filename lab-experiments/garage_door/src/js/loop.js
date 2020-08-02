@@ -9,7 +9,6 @@ function MainLoop(args) {
   this.timeElapsed = 0;
 
   this.loop = () => {
-    console.log(this.frameCount);
 
 
 
