@@ -3,4 +3,14 @@ $font-size-base: 0.85rem;
 
 @import '~bootstrap/scss/bootstrap.scss';
 @import './SVGObjects.scss';
-@import './ladder.scss';
+@import './DOM.scss';
+
+.node:hover {
+  outline: 1px solid blue;
+  outline-offset: 1px;
+  stroke: rgb(0, 255, 0);
+}
+
+#ladderSVG {
+  outline: 1px solid black;
+}

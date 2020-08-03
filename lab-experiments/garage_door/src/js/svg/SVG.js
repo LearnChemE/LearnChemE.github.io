@@ -13,7 +13,7 @@ class SVG extends SVGObject {
   */
   constructor(options) {
     super({ ...options, objectName: "svg" });
-    this.viewBox = options.viewBox ?? [0, 0, 100, 100];
+    this.viewBox = options.viewBox ?? [0, 0, 100, 20];
     this.element.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     this.element.setAttribute("viewBox", `${this.viewBox[0]} ${this.viewBox[1]} ${this.viewBox[2]} ${this.viewBox[3]}`);
 

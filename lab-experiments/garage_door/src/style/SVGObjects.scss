@@ -16,11 +16,6 @@ line, path, circle, ellipse, polygon, polyline, rect {
   fill: none;
 }
 
-.svg-polyline {
-  stroke-width: 1;
-  fill: none;
-}
-
 .no-select {
   cursor: default;
   &::selection {

@@ -54,19 +54,19 @@ class Contact extends G {
       classList : ["contact-indicator-rect"]
     });
 
-    this.type = options.type ?? "NO";
+    this.type = options.type ?? "normally open contact";
 
     this.on = false;
 
     this.addChildren([this.contactBGRect, this.leftSidePoly, this.rightSidePoly, this.contactIndicatorRect]);
 
     switch (this.type) {
-      case "NO" :
+      case "normally open contact" :
         this.tooltip({
           content : "normally open contact"
         });
         break;
-      case "NC" :
+      case "normally closed contact" :
         this.tooltip({
           content : "normally closed contact"
         });

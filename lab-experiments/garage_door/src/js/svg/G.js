@@ -21,8 +21,6 @@ class G extends SVGObject {
 
     if(this.canBeDragged) {
       this.dragEventInit();
-    } else {
-      this.element.addEventListener("mousedown", e => { this.spawn(e); });
     }
   }
 

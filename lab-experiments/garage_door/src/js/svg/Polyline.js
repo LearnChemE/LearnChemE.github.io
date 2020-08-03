@@ -10,7 +10,7 @@ class Polyline extends SVGObject {
   * @property {string[]} classList - ["string", "string2", ...] List of classes for line. (default [])
   */
   constructor(options) {
-    const classList = options.classList ?? ["svg-polyline"];
+    const classList = options.classList ?? ["svg-line"];
     super({ ...options, objectName: "polyline", classList: classList });
     this.coords = options.coords ?? [[0, 0], [10, 10]];
     this.draw();
