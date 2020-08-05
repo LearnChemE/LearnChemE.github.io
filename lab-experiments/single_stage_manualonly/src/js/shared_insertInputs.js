@@ -156,9 +156,9 @@ const controllerHTML = function(opts) {
       </div>
       <div class="input-group input-group-sm">
         <div class="input-group-prepend">
-          <span class="input-group-text pv-color" id="input-${opts.cv.name}-label">${opts.cv.stptlabel}</span>
+          <span class="input-group-text" id="input-${opts.cv.name}-label">${opts.cv.stptlabel}</span>
         </div>
-        <input type="number" id="input-${opts.cv.name}" class="form-control pv-color" min="${opts.cv.stptMin}" max="${opts.cv.stptMax}" step="${opts.cv.stptStep}" value="${opts.cv.stptDefault}" aria-label="${opts.cv.name} input" aria-describedby="input-${opts.cv.name}-label">
+        <input type="number" id="input-${opts.cv.name}" class="form-control" min="${opts.cv.stptMin}" max="${opts.cv.stptMax}" step="${opts.cv.stptStep}" value="${opts.cv.stptDefault}" aria-label="${opts.cv.name} input" aria-describedby="input-${opts.cv.name}-label">
       </div>
       <div class="input-group input-group-sm">
         <div class="input-group-prepend">
