@@ -270,6 +270,23 @@ exports.insertInputs = function(buttons, codeEntry) {
   doc.id = "main-application-wrapper";
   document.body.appendChild(doc);
 
+  if(codeEntry) {
+    const codeInputWrapper = document.createElement("div");
+    codeInputWrapper.id = "code-input-wrapper";
+    codeInputWrapper.innerHTML = codeInputHTML;
+    doc.appendChild(codeInputWrapper);
+  
+    const codeInput = document.getElementById("code-input");
+    codeInput.addEventListener('input', () => {
+      const value = parseTextInput(String(codeInput.value));
+      separator.codeString = value;
+    });
+  
+    const codeOutput = document.createElement("div");
+    codeOutput.id = "code-output";
+    doc.appendChild(codeOutput);
+  }
+
   buttons.forEach(opts => {
     const wrapper = document.createElement('div');
     wrapper.id = `${opts.controller}-control`;
@@ -287,23 +304,6 @@ exports.insertInputs = function(buttons, codeEntry) {
     for ( let j = 1; j < autoInputs.length; j++ ) {
       autoInputs[j].children[1].setAttribute("disabled", "true");
       autoInputs[j].classList.add("disabled");
-    }
-
-    if(codeEntry) {
-      const codeInputWrapper = document.createElement("div");
-      codeInputWrapper.id = "code-input-wrapper";
-      codeInputWrapper.innerHTML = codeInputHTML;
-      doc.appendChild(codeInputWrapper);
-    
-      const codeInput = document.getElementById("code-input");
-      codeInput.addEventListener('input', () => {
-        const value = parseTextInput(String(codeInput.value));
-        separator.codeString = value;
-      });
-    
-      const codeOutput = document.createElement("div");
-      codeOutput.id = "code-output";
-      doc.appendChild(codeOutput);
     }
   
     const autobtn = wrapper.getElementsByClassName(`auto mode-toggle ${opts.controller}`)[0];
