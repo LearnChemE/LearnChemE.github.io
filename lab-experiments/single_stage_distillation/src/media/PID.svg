@@ -19,10 +19,10 @@
        x="744.24039" />
   </defs>
   <sodipodi:namedview
-     inkscape:current-layer="BottomCodeBlockText"
-     inkscape:cy="199.11657"
-     inkscape:cx="502.10533"
-     inkscape:zoom="2.2658798"
+     inkscape:current-layer="OutermostWrapperIGuess"
+     inkscape:cy="193.84708"
+     inkscape:cx="601.86376"
+     inkscape:zoom="1.4879706"
      showgrid="false"
      id="namedview1567"
      inkscape:window-height="480"
@@ -223,22 +223,21 @@
            stroke-width=".5625px">
           <path
              id="path898"
-             stroke-width=".5625px"
-             d="m273.43 288.77 11.889-3.48v6.957z"
-             transform="translate(-14.168,-14.173)" />
+             stroke-width="0.5625px"
+             d="m 259.262,288.597 11.889,-3.48 v 6.957 z" />
           <path
              id="path894"
-             stroke-width=".56338px"
+             stroke-width="0.56338px"
              stroke-dasharray="4.50709, 2.25354"
              fill="none"
-             d="m253.27 258.51v-17.273h71.217"
-             transform="translate(-14.168,-14.173)" />
+             d="m 253.27,272.86509 0,-31.62809 h 71.217"
+             transform="translate(-14.168,-14.173)"
+             sodipodi:nodetypes="ccc" />
           <path
              id="path892"
              stroke-width="1.1268px"
              fill="none"
-             d="m271.38 268.63h85.687l-13.058 10.069 13.058 10.068h-76.56"
-             transform="translate(-14.168,-14.173)" />
+             d="m 257.212,268.457 h 85.687 l -13.058,10.069 13.058,10.068 h -76.56" />
           <g
              id="g890"
              stroke-width=".56338px" />
@@ -305,10 +304,10 @@
              id="PCcircle" />
           <circle
              id="TCcircle"
-             stroke-width=".56338px"
+             stroke-width="0.56338px"
              fill="#f9f9f9"
              r="21.26"
-             cy="265.61"
+             cy="279.60999"
              cx="239.11" />
         </g>
         <g
@@ -346,10 +345,12 @@
          transform="translate(-14.168,-14.173)" />
       <path
          id="path909"
-         d="m204.66 417.27h-190.22v-190.22h190.22v41.956l21.375 10.63-21.375 10.63z"
-         transform="translate(-14.168,-14.173)" />
+         d="M 204.66,417.27 H 14.44 V 227.05 h 190.22 l 0,51.94215 21.375,13.75067 -21.375,11.87827 z"
+         transform="translate(-14.168,-14.173)"
+         sodipodi:nodetypes="cccccccc" />
     </g>
     <g
+       class="pv-color"
        id="PressureTextWrapper">
       <text
          id="text917"
@@ -359,15 +360,18 @@
          transform="translate(430.52 40.19)">70.0 kPa</text>
     </g>
     <g
-       id="TemperatureTextWrapper">
+       classq="pv-color"
+       id="TemperatureTextWrapper"
+       transform="translate(0,14)">
       <text
          id="text920"
          style="isolation:isolate"
          font-size="15px"
          font-family="ArialMT, Arial"
-         transform="translate(218.77 306.94)">400 K</text>
+         transform="translate(218.77,306.94)">400 K</text>
     </g>
     <g
+       class="pv-color"
        id="LevelTextWrapper">
       <text
          id="text923"
@@ -955,16 +959,37 @@
          id="path938" />
     </g>
     <g
-       id="TC-text">
+       id="TC-text"
+       transform="translate(0,14)">
       <path
          transform="translate(-14.168,-14.173)"
-         d="m245.37 286.66v-13.26h-4.95v-1.775h11.916v1.775h-4.974v13.26z"
+         d="M 245.37,286.66 V 273.4 h -4.95 v -1.775 h 11.916 v 1.775 h -4.974 v 13.26 z"
          id="path940" />
       <path
          transform="translate(-14.168,-14.173)"
-         d="m265.1 281.39 1.99 0.5a6.7 6.7 0 0 1-2.25 3.737 6.206 6.206 0 0 1-3.975 1.287 7.152 7.152 0 0 1-3.954-0.989 6.184 6.184 0 0 1-2.317-2.867 10.212 10.212 0 0 1-0.794-4.03 8.839 8.839 0 0 1 0.9-4.1 6.148 6.148 0 0 1 2.553-2.656 7.459 7.459 0 0 1 3.645-0.907 6.155 6.155 0 0 1 3.794 1.149 5.96 5.96 0 0 1 2.143 3.229l-1.958 0.462a4.645 4.645 0 0 0-1.518-2.389 4.041 4.041 0 0 0-2.5-0.75 4.849 4.849 0 0 0-2.9 0.83 4.38 4.38 0 0 0-1.636 2.23 8.995 8.995 0 0 0-0.472 2.887 9.162 9.162 0 0 0 0.559 3.348 4.167 4.167 0 0 0 1.738 2.138 4.888 4.888 0 0 0 2.55 0.708 4.285 4.285 0 0 0 2.831-0.965 4.934 4.934 0 0 0 1.569-2.859z"
+         d="m 265.1,281.39 1.99,0.5 a 6.7,6.7 0 0 1 -2.25,3.737 6.206,6.206 0 0 1 -3.975,1.287 7.152,7.152 0 0 1 -3.954,-0.989 6.184,6.184 0 0 1 -2.317,-2.867 10.212,10.212 0 0 1 -0.794,-4.03 8.839,8.839 0 0 1 0.9,-4.1 6.148,6.148 0 0 1 2.553,-2.656 7.459,7.459 0 0 1 3.645,-0.907 6.155,6.155 0 0 1 3.794,1.149 5.96,5.96 0 0 1 2.143,3.229 l -1.958,0.462 a 4.645,4.645 0 0 0 -1.518,-2.389 4.041,4.041 0 0 0 -2.5,-0.75 4.849,4.849 0 0 0 -2.9,0.83 4.38,4.38 0 0 0 -1.636,2.23 8.995,8.995 0 0 0 -0.472,2.887 9.162,9.162 0 0 0 0.559,3.348 4.167,4.167 0 0 0 1.738,2.138 4.888,4.888 0 0 0 2.55,0.708 4.285,4.285 0 0 0 2.831,-0.965 4.934,4.934 0 0 0 1.569,-2.859 z"
          id="path942" />
     </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
+       x="230.02448"
+       y="150.20036"
+       id="inlet-label-aniline"><tspan
+         sodipodi:role="line"
+         id="tspan1065"
+         x="230.02448"
+         y="150.20036">aniline</tspan></text>
+    <text
+       id="inlet-label-butanol"
+       y="167.41222"
+       x="230.02448"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"><tspan
+         y="167.41222"
+         x="230.02448"
+         id="tspan1086"
+         sodipodi:role="line">butanol</tspan></text>
     <rect
        stroke-width="2.25px"
        stroke-miterlimit="3"

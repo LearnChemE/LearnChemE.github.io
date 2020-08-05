@@ -17,10 +17,10 @@
      fit-margin-left="2.5"
      lock-margins="true"
      fit-margin-top="2.5"
-     inkscape:current-layer="graphAreas"
-     inkscape:cy="271.5054"
-     inkscape:cx="262.28013"
-     inkscape:zoom="1.6392273"
+     inkscape:current-layer="OutermostWrapperIGuess"
+     inkscape:cy="273.01471"
+     inkscape:cx="391.48024"
+     inkscape:zoom="1.8273951"
      showgrid="false"
      id="namedview1567"
      inkscape:window-height="480"
@@ -222,21 +222,20 @@
           <path
              id="path898"
              stroke-width="0.5625px"
-             d="m 273.43,288.77 11.889,-3.48 v 6.957 z"
-             transform="translate(-14.168,-14.173)" />
+             d="m 259.262,288.597 11.889,-3.48 v 6.957 z" />
           <path
              id="path894"
              stroke-width="0.56338px"
              stroke-dasharray="4.50709, 2.25354"
              fill="none"
-             d="m 253.27,258.51 v -17.273 h 71.217"
-             transform="translate(-14.168,-14.173)" />
+             d="m 253.27,273.83806 0,-32.60106 h 71.217"
+             transform="translate(-14.168,-14.173)"
+             sodipodi:nodetypes="ccc" />
           <path
              id="path892"
              stroke-width="1.1268px"
              fill="none"
-             d="m 271.38,268.63 h 85.687 l -13.058,10.069 13.058,10.068 h -76.56"
-             transform="translate(-14.168,-14.173)" />
+             d="m 257.212,268.457 h 85.687 l -13.058,10.069 13.058,10.068 h -76.56" />
           <g
              id="g890"
              stroke-width="0.56338px" />
@@ -306,7 +305,7 @@
              stroke-width="0.56338px"
              fill="#f9f9f9"
              r="21.26"
-             cy="265.60999"
+             cy="279.60999"
              cx="239.11" />
         </g>
         <g
@@ -344,10 +343,12 @@
          transform="translate(-14.168,-14.173)" />
       <path
          id="path909"
-         d="M 204.66,417.27 H 14.44 V 227.05 h 190.22 v 41.956 l 21.375,10.63 -21.375,10.63 z"
-         transform="translate(-14.168,-14.173)" />
+         d="M 204.66,417.27 H 14.44 V 227.05 h 190.22 l 0,55.89061 21.375,10.62999 -21.375,11.55898 z"
+         transform="translate(-14.168,-14.173)"
+         sodipodi:nodetypes="cccccccc" />
     </g>
     <g
+       class="pv-color"
        id="PressureTextWrapper">
       <text
          id="text917"
@@ -357,7 +358,9 @@
          transform="translate(430.52,40.19)">70.0 kPa</text>
     </g>
     <g
-       id="TemperatureTextWrapper">
+       class="pv-color"
+       id="TemperatureTextWrapper"
+       transform="translate(0,14)">
       <text
          id="text920"
          style="isolation:isolate"
@@ -366,6 +369,7 @@
          transform="translate(218.77,306.94)">400 K</text>
     </g>
     <g
+       class="pv-color"
        id="LevelTextWrapper">
       <text
          id="text923"
@@ -453,6 +457,26 @@
          y="0"
          x="0"
          sodipodi:role="line">}</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:1.25;font-family:ArialMT, Arial;-inkscape-font-specification:'ArialMT, Arial, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
+       x="233.91452"
+       y="168.89592"
+       id="inlet-label-butanol"><tspan
+         sodipodi:role="line"
+         id="tspan1329"
+         x="233.91452"
+         y="168.89592">butanol</tspan></text>
+    <text
+       id="inlet-label-aniline"
+       y="150.78093"
+       x="233.91452"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:1.25;font-family:ArialMT, Arial;-inkscape-font-specification:'ArialMT, Arial, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"><tspan
+         y="150.78093"
+         x="233.91452"
+         id="tspan1335"
+         sodipodi:role="line">aniline</tspan></text>
     <g
        id="PC-text">
       <path
@@ -476,7 +500,8 @@
          id="path938" />
     </g>
     <g
-       id="TC-text">
+       id="TC-text"
+       transform="translate(0,14)">
       <path
          transform="translate(-14.168,-14.173)"
          d="M 245.37,286.66 V 273.4 h -4.95 v -1.775 h 11.916 v 1.775 h -4.974 v 13.26 z"

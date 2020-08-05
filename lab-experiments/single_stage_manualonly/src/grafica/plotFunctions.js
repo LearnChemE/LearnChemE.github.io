@@ -32,14 +32,14 @@ function definePlotFunctions() {
       this.rightAxisColor = "rgb(0, 0, 0)";
       this.funcs = new Array(0);
       this.fontSize = 13;
-      this.titleFontSize = 14;
+      this.titleFontSize = 16;
       this.axisFontSize = 13;
       this.axisLabelSize = 14;
       this.GPLOT.yAxis.setRotateTickLabels(false);
       this.GPLOT.yAxis.setTickLabelOffset(10);
       this.GPLOT.yAxis.lab.setOffset(45);
       this.GPLOT.xAxis.lab.setOffset(40);
-      this.GPLOT.setMar([45, 65, 28, 0]);
+      this.GPLOT.setMar([45, 65, 33, 0]);
 
       this.rGPLOT.getRightAxis().setRotateTickLabels(false);
       this.rGPLOT.getRightAxis().lab.setOffset(48);
@@ -51,7 +51,7 @@ function definePlotFunctions() {
       }
     }
 
-    plotDraw() {
+    draw() {
       this.parent.background("#FFFFFF");
       this.GPLOT.beginDraw();
       this.GPLOT.setXLim(this.xLims);

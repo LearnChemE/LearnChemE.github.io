@@ -15,11 +15,11 @@ window.separator = Separator();
 
 /******** ADD HTML ********/
 require('./js/insertSVG.js')();
-require('./js/insertInputs.js')();
+require('./js/insertInputs.js');
 
 let animation = (sk) => {
-  setup(sk, 20);
-  loop(sk);
+  setup(sk);
+  loop(sk, true);
 }
 
 

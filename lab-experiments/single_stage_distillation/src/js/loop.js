@@ -1,11 +1,8 @@
+const sharedLoop = require("../../../single_stage_manualonly/src/js/shared_loop").sharedLoop;
+
 function loop(sk) {
   sk.draw = () => {
-    separator.advance();
-    separator.createCoords();
-    graphics.TPlot.draw();
-    graphics.PPlot.draw();
-    graphics.LPlot.draw();
-    if(sk.frameCount < 2) {window.adjustSpeed(1)}
+    sharedLoop(sk);
   }
 }
 
