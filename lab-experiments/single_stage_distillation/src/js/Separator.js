@@ -114,15 +114,6 @@ class AutoSeparator extends Separator {
       if(!this.levelstptScales[i]) {LRange = [ Math.min(this.levelstpts[i], LRange[0]), Math.max(this.levelstpts[i], LRange[1]) ]}
     }
 
-    // const TstptRange = minMax(this.Tstpts);
-    // TRange = [Math.min(TstptRange[0], TRange[0]), Math.max(TstptRange[1], TRange[1])];
-
-    // const PstptRange = minMax(this.Pstpts);
-    // PRange = [Math.min(PstptRange[0], PRange[0]), Math.max(PstptRange[1], PRange[1])];
-
-    // const levelstptRange = minMax(this.levelstpts);
-    // LRange = [Math.min(levelstptRange[0], LRange[0]), Math.max(levelstptRange[1], LRange[1])];
-
     // The following 7 blocks of code adjust the y-axes based on the minimum and maximum values in each series.
 
     if(TRange[0] <= TAxisY1.min) { TAxisY1.min = TRange[0] * 0.9 }
@@ -240,6 +231,8 @@ class AutoSeparator extends Separator {
       "input-pressure-tau",
     ];
 
+    const _toggles = document.getElementsByClassName("btn mode-toggle");
+
     const terminal = document.getElementById("code-output");
 
     try {
@@ -265,8 +258,13 @@ class AutoSeparator extends Separator {
         inp.removeAttribute("disabled");
         inp.parentElement.classList.remove("disabled");
       }
+
+      for(let i = 0; i < _toggles.length; i++) {
+        const toggle = _toggles[i];
+        toggle.removeAttribute("disabled");
+      }
       
-      const output = `Valid equation entered:<br>dmv = ${this.codeString}.`;
+      const output = `Valid equation entered:<br>dmv = ${this.codeString}`;
       terminal.innerHTML = output;
 
     } catch(e) {
@@ -284,6 +282,10 @@ class AutoSeparator extends Separator {
         const inp = document.getElementById(__inputs[i]);
         inp.setAttribute("disabled", "true");
         inp.parentElement.classList.add("disabled")
+      }
+      for(let i = 0; i < _toggles.length; i++) {
+        const toggle = _toggles[i];
+        toggle.setAttribute("disabled", "true");
       }
     }
 

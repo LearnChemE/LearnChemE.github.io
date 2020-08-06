@@ -1,7 +1,19 @@
+export function clickUpdateButtons() {
+  [
+    'update-TC',
+    'update-LC',
+    'update-PC',
+    'update-inlet'
+  ].forEach(buttonID =>{
+    const button = document.getElementById(buttonID);
+    button.click();
+  });
+}
+
 export function defineGlobals() {
 
   window.graphics = {
-    y1Color: 'rgb(0, 0, 0)',
+    y1Color: 'rgb(255, 0, 0)',
     y2Color: 'rgb(34, 139, 34)',
     y3Color: 'rgb(0, 80, 255)'
   }
@@ -177,7 +189,7 @@ export function resizePlots() {
           break;
 
         case 2 : 
-          titles[i].innerHTML = `<tspan class="pv-color">valve lift</tspan> and <tspan class="mv-color">pressure</tspan>`;
+          titles[i].innerHTML = `<tspan class="pv-color">pressure</tspan> and <tspan class="mv-color">valve lift</tspan>`;
           break;
       }
     }

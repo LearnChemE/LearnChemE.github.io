@@ -30,10 +30,6 @@ module.exports = class Separator {
       Kc: 0,
       Tau: 36000,
       stpt: this.lift,
-      tempmv: this.lift,
-      tempTau: 36000,
-      tempStpt: 75000,
-      tempKc: 0,
       error: 0
     };
   
@@ -44,10 +40,6 @@ module.exports = class Separator {
       Kc: 0,
       Tau: 36000,
       stpt: this.Q / 1000,
-      tempmv: this.Q,
-      tempTau: 36000,
-      tempStpt: 500,
-      tempKc: 0,
       error: 0
     };
     
@@ -58,10 +50,6 @@ module.exports = class Separator {
       Kc: 0,
       Tau: 36000,
       stpt: this.L,
-      tempmv: this.L,
-      tempTau: 36000,
-      tempStpt: 25,
-      tempKc: 0,
       error: 0
     };
 
@@ -368,8 +356,6 @@ module.exports = class Separator {
 
   drain(lvl) {
     if(lvl < 20) {
-      this.LevelController.tempmv = 0.66;
-      this.PressureController.tempmv = 0.5;
       const iL = document.getElementById("input-lift");
       const iFo = document.getElementById("input-flowRateOut");
       iL.value = "0.5";
@@ -392,17 +378,18 @@ module.exports = class Separator {
     const iFo = document.getElementById("input-flowRateOut");
     const iFi = document.getElementById("input-flowRateIn");
     const iQ = document.getElementById("input-power");
+
     iL.value = "1";
     iFo.value = "10";
     iFi.value = "15";
     iQ.value = "500";
-    this.PressureController.tempmv = 1;
-    this.TemperatureController.tempmv = 500000;
-    this.LevelController.tempmv = 10;
+
     ["update-PC", "update-LC", "update-TC", "update-inlet"].forEach((e) => {
       const button = document.getElementById(e);
       button.click();
-    })
+    });
+
+    alert("You let the liquid level get too high.  The distillation column exploded and 21 people died. How will you live with the guilt?");
   }
 
   flash() {

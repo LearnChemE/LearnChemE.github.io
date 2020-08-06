@@ -177,7 +177,7 @@ button[disabled=true] {
 }
 
 .y1Label, .y2Label, .x1Label, .y1Axis, .y2Axis, .x1Axis {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -189,6 +189,10 @@ button[disabled=true] {
 .y2Label, .y2Axis, .mv-color {
   fill: rgb(0, 80, 255);
   color: rgb(0, 80, 255);
+}
+
+.stpt-color {
+  color: rgb(255, 0, 0);
 }
 
 .x2LabelLayer > .x2Label {

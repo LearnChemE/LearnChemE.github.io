@@ -9,6 +9,7 @@ function setup(sk) {
     shared.rippleAnimation();
     shared.initialResize(sk);
     shared.initialFrameRate(sk);
+    shared.clickUpdateButtons();
   }
 
   sk.windowResized = () => {
