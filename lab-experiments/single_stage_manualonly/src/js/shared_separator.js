@@ -389,7 +389,7 @@ module.exports = class Separator {
       button.click();
     });
 
-    alert("You let the liquid level get too high.  The distillation column exploded and 21 people died. How will you live with the guilt?");
+    alert("The liquid level got too high and the distillation column released its contents through a pressure relief valve.");
   }
 
   flash() {
