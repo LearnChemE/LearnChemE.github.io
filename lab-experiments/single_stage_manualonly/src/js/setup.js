@@ -11,7 +11,7 @@ function setup(sk) {
     shared.initialResize(sk);
     shared.initialFrameRate(sk);
     shared.clickUpdateButtons();
-    shared.importDirections(directionsHTML, "Directions: Part One");
+    shared.importDirections(directionsHTML, 1);
   }
 
   sk.windowResized = () => {

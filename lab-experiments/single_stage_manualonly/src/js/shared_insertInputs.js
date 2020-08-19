@@ -228,6 +228,7 @@ window.closeDirections = () => {
   const modal = document.getElementById("modal-bg");
   window.modalIsOpen = false;
   modal.style.display = "none";
+  try { directionsVideo.pauseVideo(); } catch (e) {}
 }
 
 exports.download = function(rows) {

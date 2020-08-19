@@ -139,9 +139,17 @@ export function flotInit(include_stpts) {
   })
 }
 
-export function importDirections(text, directionsTitle) {
+export function importDirections(text, part) {
   const innerHTML = text;
-  
+  let directionsTitle, videoId;
+  if(part == 1) {
+    directionsTitle = "Directions: Part One";
+    videoId = "4zBIp-R9M-Q";
+  } else {
+    directionsTitle = "Directions: Part Two";
+    videoId = "Jo4AcjyIfeU";
+  }
+
   const modalBG = document.createElement("div");
   modalBG.id = "modal-bg";
   modalBG.style.display = "none";
@@ -191,7 +199,7 @@ export function importDirections(text, directionsTitle) {
       window.directionsVideo = new YT.Player( 'directions-player', {
         height: '390',
         width: '640',
-        videoId: 'NpEaa2P7qZI',
+        videoId: videoId,
       });
     }
   
