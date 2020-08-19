@@ -212,6 +212,24 @@ const csvHTML =  `
 <button id="download-as-csv-button" class="btn btn-sm btn-success" onclick="generateCSV();" style="font-size:110%">Snapshot .CSV</button>
 `;
 
+const directionsButtonHTML = `
+<button id="directions-button" class="btn btn-sm btn-secondary" onclick="openDirections();" style="font-size:110%">Directions</button>
+`;
+
+window.modalIsOpen = false;
+
+window.openDirections = () => {
+  const modal = document.getElementById("modal-bg");
+  setTimeout(() => {window.modalIsOpen = true;}, 1000);
+  modal.style.display = "block";
+}
+
+window.closeDirections = () => {
+  const modal = document.getElementById("modal-bg");
+  window.modalIsOpen = false;
+  modal.style.display = "none";
+}
+
 exports.download = function(rows) {
   let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
   let encodedUri = encodeURI(csvContent);
@@ -434,4 +452,8 @@ exports.insertInputs = function(buttons, codeEntry) {
   csvWrapper.innerHTML = csvHTML;
   doc.appendChild(csvWrapper);
 
+  const directionsButtonWrapper = document.createElement("div");
+  directionsButtonWrapper.id = "directions-button-wrapper";
+  directionsButtonWrapper.innerHTML = directionsButtonHTML;
+  doc.appendChild(directionsButtonWrapper);
 }

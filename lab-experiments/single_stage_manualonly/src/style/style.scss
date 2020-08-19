@@ -140,7 +140,7 @@ body {
   left: 0px;
 }
 
-#TC-control, #PC-control, #LC-control, #inlet-control, #slider-wrapper, #csv-wrapper, #code-input-wrapper, #code-output {
+#TC-control, #PC-control, #LC-control, #inlet-control, #slider-wrapper, #directions-button-wrapper, #csv-wrapper, #code-input-wrapper, #code-output {
   position: absolute;
   top: 0px;
   left: 0px;
@@ -199,3 +199,36 @@ button[disabled=true] {
   font-size: 13pt;
 }
 
+#modal-bg {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#modal {
+  width: 100ch;
+  max-width: calc(100vw - 2rem);
+  background-color: white;
+  margin: 2rem auto;
+}
+
+#modal-title {
+  font-size: 1.75rem;
+  text-align: center;
+}
+
+#exit-modal {
+  font-size: 2.5rem;
+  float: right;
+  position: relative;
+  top: -0.75rem;
+  right: 1rem;
+  cursor: pointer;
+}
+
+#modal-content {
+  
+}

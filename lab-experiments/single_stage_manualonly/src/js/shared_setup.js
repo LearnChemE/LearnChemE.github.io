@@ -18,13 +18,6 @@ export function defineGlobals() {
     y3Color: 'rgb(0, 80, 255)'
   }
   
-  // window.graphics.TempColor = window.graphics.y2Color;
-  // window.graphics.PowerColor = window.graphics.y3Color;
-  // window.graphics.LevelColor = window.graphics.y2Color;
-  // window.graphics.FlowrateColor = window.graphics.y3Color;
-  // window.graphics.PressureColor = window.graphics.y2Color;
-  // window.graphics.LiftColor = window.graphics.y3Color;
-
 }
 
 export function elementsToBeResized() {
@@ -37,6 +30,7 @@ export function elementsToBeResized() {
   const InletInputArea = document.getElementById("InletInputArea");
   const SpeedInputArea = document.getElementById("SpeedInputArea");
   const CSVArea = document.getElementById("csvDownloadArea");
+  const DirectionsArea = document.getElementById("directionsArea");
   
   const TGraph = document.getElementById("TPlot");
   const PGraph = document.getElementById("PPlot");
@@ -47,6 +41,7 @@ export function elementsToBeResized() {
   const InletInput = document.getElementById("inlet-control");
   const SpeedInput = document.getElementById("slider-wrapper");
   const CSVdownload = document.getElementById("csv-wrapper");
+  const DirectionsButton = document.getElementById("directions-button-wrapper");
 
   return [
     [TGraph, TGraphArea],
@@ -57,7 +52,8 @@ export function elementsToBeResized() {
     [LInput, LInputArea],
     [InletInput, InletInputArea],
     [SpeedInput, SpeedInputArea],
-    [CSVdownload, CSVArea]
+    [CSVdownload, CSVArea],
+    [DirectionsButton, DirectionsArea]
   ]
 };
 
@@ -141,6 +137,50 @@ export function flotInit(include_stpts) {
     plot.getAxes().y2axis.options.autoScale = "none";
     plot.getAxes().xaxis.options.autoScale = "none";
   })
+}
+
+export function importDirections(text) {
+  const innerHTML = text;
+  
+  const modalBG = document.createElement("div");
+  modalBG.id = "modal-bg";
+  modalBG.style.display = "none";
+  document.body.appendChild(modalBG);
+
+  const modal = document.createElement("div");
+  modal.id = "modal";
+  modalBG.appendChild(modal);
+
+  const modalTitle = document.createElement("div");
+  modalTitle.id = "modal-title";
+  modalTitle.innerHTML = "Directions";
+  modal.appendChild(modalTitle);
+
+  const exit = document.createElement("span");
+  exit.id = "exit-modal";
+  exit.innerHTML = "&times;";
+  exit.addEventListener("click", () => {window.closeDirections()});
+  modalTitle.appendChild(exit);
+
+  const content = document.createElement("div");
+  content.id = "modal-content";
+  content.innerHTML = innerHTML;
+  modal.appendChild(content);
+
+  const clickOutsideModal = e => {
+    const modalCoords = modal.getBoundingClientRect();
+    const left = modalCoords.left;
+    const top = modalCoords.top;
+    const width = modalCoords.width;
+    const height = modalCoords.height;
+    const x = e.pageX;
+    const y = e.pageY;
+    if((x < left || x > left + width || y < top || y > top + height) && window.modalIsOpen) {
+      window.closeDirections();
+    }
+  }
+
+  document.body.addEventListener("click", e => clickOutsideModal(e));
 }
 
 export function initialFrameRate(sk) {

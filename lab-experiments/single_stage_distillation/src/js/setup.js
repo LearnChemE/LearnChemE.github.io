@@ -1,4 +1,5 @@
 const shared = require("../../../single_stage_manualonly/src/js/shared_setup");
+const directionsHTML = require("../html/directions.html").toString();
 shared.defineGlobals();
 
 function setup(sk) {
@@ -10,6 +11,7 @@ function setup(sk) {
     shared.initialResize(sk);
     shared.initialFrameRate(sk);
     shared.clickUpdateButtons();
+    shared.importDirections(directionsHTML);
   }
 
   sk.windowResized = () => {

@@ -4,512 +4,520 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   inkscape:version="1.1-dev (b530929, 2020-05-03)"
-   sodipodi:docname="PID.svg"
-   id="svg1565"
+   version="1.1"
    viewBox="0 0 728.66247 610.37801"
-   version="1.1">
+   id="svg1565"
+   sodipodi:docname="PID.svg"
+   inkscape:version="1.1-dev (b530929, 2020-05-03)">
   <defs
      id="defs1569" />
   <sodipodi:namedview
-     fit-margin-bottom="2.5"
-     fit-margin-right="2.5"
-     fit-margin-left="2.5"
-     lock-margins="true"
-     fit-margin-top="2.5"
-     inkscape:current-layer="OutermostWrapperIGuess"
-     inkscape:cy="273.01471"
-     inkscape:cx="391.48024"
-     inkscape:zoom="1.8273951"
-     showgrid="false"
-     id="namedview1567"
-     inkscape:window-height="480"
-     inkscape:window-width="640"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0"
-     guidetolerance="10"
-     gridtolerance="10"
-     objecttolerance="10"
-     borderopacity="1"
+     pagecolor="#ffffff"
      bordercolor="#666666"
-     pagecolor="#ffffff" />
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="640"
+     inkscape:window-height="480"
+     id="namedview1567"
+     showgrid="false"
+     inkscape:zoom="1.6970903"
+     inkscape:cx="391.48024"
+     inkscape:cy="273.01471"
+     inkscape:current-layer="OutermostWrapperIGuess"
+     fit-margin-top="2.5"
+     lock-margins="true"
+     fit-margin-left="2.5"
+     fit-margin-right="2.5"
+     fit-margin-bottom="2.5" />
   <g
-     id="OutermostWrapperIGuess"
-     transform="translate(2.50925,2.49969)">
+     transform="translate(2.50925,2.49969)"
+     id="OutermostWrapperIGuess">
     <g
-       id="graphAreas"
+       style="stroke:none"
        fill="none"
-       style="stroke:none">
+       id="graphAreas">
       <rect
-         height="190"
-         width="238.55"
-         y="414.85001"
-         x="-0.00024923851"
+         style="stroke:none;stroke-width:0.999996"
          id="TemperatureGraphArea"
-         style="stroke:none;stroke-width:0.999996" />
-      <rect
-         height="190"
-         width="239.55"
-         y="414.85031"
-         x="242.0498"
-         id="LevelGraphArea"
-         style="stroke:none;stroke-width:0.999997" />
-      <rect
-         height="190"
-         width="239.55"
+         x="-0.00024923851"
          y="414.85001"
-         x="484.09979"
+         width="238.55"
+         height="190" />
+      <rect
+         style="stroke:none;stroke-width:0.999997"
+         id="LevelGraphArea"
+         x="242.0498"
+         y="414.85031"
+         width="239.55"
+         height="190" />
+      <rect
+         style="stroke:none;stroke-width:0.999997"
          id="PressureGraphArea"
-         style="stroke:none;stroke-width:0.999997" />
+         x="484.09979"
+         y="414.85001"
+         width="239.55"
+         height="190" />
     </g>
     <g
-       id="inputAreas"
-       fill="none">
+       fill="none"
+       id="inputAreas">
       <rect
-         stroke-width="0.56338px"
-         stroke-miterlimit="8.5042"
-         stroke="#000000"
-         fill="#d7eef4"
-         height="42.52"
-         width="148.56"
-         y="0.28200001"
+         id="SpeedInputArea"
          x="192.25999"
-         id="SpeedInputArea" />
-      <rect
-         height="166.83"
-         width="190.22"
          y="0.28200001"
-         x="0.28799999"
-         id="InletInputArea" />
+         width="148.56"
+         height="42.52"
+         fill="#d7eef4"
+         stroke="#000000"
+         stroke-miterlimit="8.5042"
+         stroke-width="0.56338px" />
       <rect
-         height="190.22"
+         id="InletInputArea"
+         x="0.28799999"
+         y="0.28200001"
          width="190.22"
+         height="166.83" />
+      <rect
+         id="TCInputArea"
+         x="0.28799999"
          y="212.88"
-         x="0.28799999"
-         id="TCInputArea" />
-      <rect
-         height="190.22"
          width="190.22"
-         y="0.28200001"
+         height="190.22" />
+      <rect
+         id="PCInputArea"
          x="531.78998"
-         id="PCInputArea" />
-      <rect
-         height="190.22"
+         y="0.28200001"
          width="190.22"
-         y="212.88"
+         height="190.22" />
+      <rect
+         id="LCInputArea"
          x="533.90997"
-         id="LCInputArea" />
+         y="212.88"
+         width="190.22"
+         height="190.22" />
     </g>
     <g
        id="CenterImage">
       <g
-         style="display:inline"
-         stroke-width="0.27196px"
+         id="column"
          stroke-miterlimit="3"
-         id="column">
+         stroke-width="0.27196px"
+         style="display:inline">
         <path
-           style="fill:#e6e6e6;stroke:none;stroke-width:0.272;stroke-miterlimit:3;stroke-dasharray:none"
-           id="columnPath"
-           fill="#e6e6e6"
-           d="M 411.71,300.41 V 145.19 c 0,0 0.163,-31.045 -38.757,-31.045 -39.119,0 -38.757,31.045 -38.757,31.045 v 155.22 c 0,0 -0.164,31.045 38.757,31.045 38.722,0 38.757,-31.045 38.757,-31.045 z"
-           transform="translate(-14.168,-14.173)" />
-        <path
-           style="stroke:#000000;stroke-width:0.271959px"
-           sodipodi:nodetypes="cscccsscccccc"
-           fill="#deaa87"
-           d="m 320.032,100.18395 h 38.7568 38.7572 v -9.532082 c 0,0 -6.3,-3.22797 -9.651,-2.83291 -3.814,0.44979 -5.882,5.66764 -9.727,5.66491 -3.845,-0.003 -5.855,-5.66491 -9.689,-5.66491 -3.834,0 -5.8562,5.6567 -9.6902,5.66491 -3.853,0.005 -5.8998,-5.6567 -9.7568,-5.66491 -3.88,-0.007 -5.971,5.68589 -9.851,5.66491 -3.81,-0.0201 -5.826,-5.21512 -9.6,-5.66491 -3.317,-0.39506 -9.545,2.83291 -9.545,2.83291 z"
-           id="liquidSquiggle" />
-        <rect
-           y="95.594688"
-           x="313.94177"
-           height="238.66391"
-           width="93.494225"
-           id="liquidRect"
-           style="fill:#deaa87;fill-opacity:1;stroke:none;stroke-width:0.272001;stroke-miterlimit:3;stroke-dasharray:none" />
-        <path
-           sodipodi:nodetypes="cccccccsccsc"
-           d="m 309.00806,81.7923 h 103.565 v 253.913 h -103.565 z M 397.542,286.237 v -155.22 c 0,0 0.163,-31.045 -38.757,-31.045 -39.119,0 -38.757,31.045 -38.757,31.045 v 155.22 c 0,0 -0.164,31.045 38.757,31.045 38.722,0 38.757,-31.045 38.757,-31.045 z"
-           style="fill:#ffffff;stroke:none;stroke-width:2.13543"
-           id="inverseColumnPath" />
-        <path
-           style="fill:none;stroke:#000000;stroke-width:0.564;stroke-miterlimit:3;stroke-dasharray:none"
            transform="translate(-14.168,-14.173)"
            d="M 411.71,300.41 V 145.19 c 0,0 0.163,-31.045 -38.757,-31.045 -39.119,0 -38.757,31.045 -38.757,31.045 v 155.22 c 0,0 -0.164,31.045 38.757,31.045 38.722,0 38.757,-31.045 38.757,-31.045 z"
            fill="#e6e6e6"
-           id="columnPathOutline" />
+           id="columnPath"
+           style="fill:#e6e6e6;stroke:none;stroke-width:0.272;stroke-miterlimit:3;stroke-dasharray:none" />
+        <path
+           id="liquidSquiggle"
+           d="m 320.032,100.18395 h 38.7568 38.7572 v -9.532082 c 0,0 -6.3,-3.22797 -9.651,-2.83291 -3.814,0.44979 -5.882,5.66764 -9.727,5.66491 -3.845,-0.003 -5.855,-5.66491 -9.689,-5.66491 -3.834,0 -5.8562,5.6567 -9.6902,5.66491 -3.853,0.005 -5.8998,-5.6567 -9.7568,-5.66491 -3.88,-0.007 -5.971,5.68589 -9.851,5.66491 -3.81,-0.0201 -5.826,-5.21512 -9.6,-5.66491 -3.317,-0.39506 -9.545,2.83291 -9.545,2.83291 z"
+           fill="#deaa87"
+           sodipodi:nodetypes="cscccsscccccc"
+           style="stroke:#000000;stroke-width:0.271959px" />
         <rect
-           id="rect870"
+           style="fill:#deaa87;fill-opacity:1;stroke:none;stroke-width:0.272001;stroke-miterlimit:3;stroke-dasharray:none"
+           id="liquidRect"
+           width="93.494225"
+           height="238.66391"
+           x="313.94177"
+           y="95.594688" />
+        <path
+           id="inverseColumnPath"
+           style="fill:#ffffff;stroke:none;stroke-width:2.13543"
+           d="m 309.00806,81.7923 h 103.565 v 253.913 h -103.565 z M 397.542,286.237 v -155.22 c 0,0 0.163,-31.045 -38.757,-31.045 -39.119,0 -38.757,31.045 -38.757,31.045 v 155.22 c 0,0 -0.164,31.045 38.757,31.045 38.722,0 38.757,-31.045 38.757,-31.045 z"
+           sodipodi:nodetypes="cccccccsccsc" />
+        <path
+           id="columnPathOutline"
            fill="#e6e6e6"
-           height="11.326"
-           width="9.7919998"
-           y="263.26999"
+           d="M 411.71,300.41 V 145.19 c 0,0 0.163,-31.045 -38.757,-31.045 -39.119,0 -38.757,31.045 -38.757,31.045 v 155.22 c 0,0 -0.164,31.045 38.757,31.045 38.722,0 38.757,-31.045 38.757,-31.045 z"
+           transform="translate(-14.168,-14.173)"
+           style="fill:none;stroke:#000000;stroke-width:0.564;stroke-miterlimit:3;stroke-dasharray:none" />
+        <rect
+           style="stroke:#000000"
            x="397.54001"
+           y="263.26999"
+           width="9.7919998"
+           height="11.326"
+           fill="#e6e6e6"
+           id="rect870" />
+        <rect
+           x="310.23999"
+           y="221.41"
+           width="9.7919998"
+           height="11.326"
+           fill="#e6e6e6"
+           id="rect872"
            style="stroke:#000000" />
         <rect
            style="stroke:#000000"
-           id="rect872"
-           fill="#e6e6e6"
-           height="11.326"
-           width="9.7919998"
-           y="221.41"
-           x="310.23999" />
-        <rect
-           id="rect887"
-           fill="#e6e6e6"
-           height="11.327"
-           width="9.7919998"
-           y="131.00999"
            x="397.54001"
-           style="stroke:#000000" />
+           y="131.00999"
+           width="9.7919998"
+           height="11.327"
+           fill="#e6e6e6"
+           id="rect887" />
       </g>
       <g
-         fill="#cccccc"
-         id="pump">
+         id="pump"
+         fill="#cccccc">
         <path
-           id="path837"
-           stroke-width="0.55663px"
-           stroke-miterlimit="3"
-           stroke="#000000"
+           transform="translate(-14.168,-14.173)"
            d="m 400.03,385.32 h 34.217 l -5.132,-5.27 h -23.949 z"
-           transform="translate(-14.168,-14.173)" />
-        <rect
-           id="rect839"
-           height="8.2969999"
-           width="21.988001"
-           y="337.57999"
-           x="407.34" />
-        <rect
-           id="rect841"
-           height="8.2969999"
-           width="21.988001"
-           y="359.62"
-           x="385.35001" />
-        <ellipse
-           id="ellipse843"
-           ry="15.168"
-           rx="15.196"
-           cy="352.75"
-           cx="407.34" />
-        <g
-           id="g853"
-           stroke-width="0.55663px"
+           stroke="#000000"
            stroke-miterlimit="3"
-           stroke="#000000">
+           stroke-width="0.55663px"
+           id="path837" />
+        <rect
+           x="407.34"
+           y="337.57999"
+           width="21.988001"
+           height="8.2969999"
+           id="rect839" />
+        <rect
+           x="385.35001"
+           y="359.62"
+           width="21.988001"
+           height="8.2969999"
+           id="rect841" />
+        <ellipse
+           cx="407.34"
+           cy="352.75"
+           rx="15.196"
+           ry="15.168"
+           id="ellipse843" />
+        <g
+           stroke="#000000"
+           stroke-miterlimit="3"
+           stroke-width="0.55663px"
+           id="g853">
           <path
-             id="path845"
+             transform="translate(-14.168,-14.173)"
              d="m 435.04,360.03 a 15.169,15.169 0 0 1 -13.541,22.055"
-             transform="translate(-14.168,-14.173)" />
+             id="path845" />
           <path
-             id="path847"
+             transform="translate(-14.168,-14.173)"
              d="m 408.09,374.04 a 15.168,15.168 0 0 1 13.414,-22.289"
-             transform="translate(-14.168,-14.173)" />
+             id="path847" />
           <path
-             id="path849"
+             transform="translate(-14.168,-14.173)"
              d="m 421.5,351.74 h 21.989 v 8.3 h -8.442"
-             transform="translate(-14.168,-14.173)" />
+             id="path849" />
           <path
-             id="path851"
+             transform="translate(-14.168,-14.173)"
              d="m 421.5,382.08 h -21.985 v -8.3 h 8.442"
-             transform="translate(-14.168,-14.173)" />
+             id="path851" />
         </g>
       </g>
       <g
-         id="ColumnAccessories"
-         stroke="#000000">
+         stroke="#000000"
+         id="ColumnAccessories">
         <g
-           id="ArrowsAndLines"
+           stroke-width="0.5625px"
+           id="ArrowsAndLines">
+          <path
+             d="m 259.262,288.597 11.889,-3.48 v 6.957 z"
+             stroke-width="0.5625px"
+             id="path898" />
+          <path
+             sodipodi:nodetypes="ccc"
+             transform="translate(-14.168,-14.173)"
+             d="m 253.27,273.83806 0,-32.60106 h 71.217"
+             fill="none"
+             stroke-dasharray="4.50709, 2.25354"
+             stroke-width="0.56338px"
+             id="path894" />
+          <path
+             d="m 257.212,268.457 h 85.687 l -13.058,10.069 13.058,10.068 h -76.56"
+             fill="none"
+             stroke-width="1.1268px"
+             id="path892" />
+          <g
+             stroke-width="0.56338px"
+             id="g890" />
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m 421.6,283.1 h 59.59 v 43.566"
+             fill="none"
+             stroke-dasharray="4.50709, 2.25354"
+             id="path874" />
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m 372.84,331.45 v 46.772 c 5.361,0.032 24.575,-0.32 29.936,-0.288"
+             fill="none"
+             stroke="#000000"
+             stroke-miterlimit="8.5042"
+             stroke-width="0.5625px"
+             id="path835" />
+          <path
+             id="arrowIn"
+             transform="translate(-14.168,-14.173)"
+             d="m 201.78,189.77 h 132.41 l -14.278,-4.132 v 8.264 l 14.278,-4.132" />
+          <path
+             id="arrowTop"
+             transform="translate(-14.168,-14.173)"
+             d="M 372.95,114.14 V 36.582 l -4.132,14.278 h 8.264 L 372.95,36.582" />
+          <path
+             id="arrowAfterPump"
+             transform="translate(-14.168,-14.173)"
+             d="m 444.39,355.9 h 83.475 l -14.277,-4.132 v 8.264 l 14.277,-4.132" />
+          <path
+             transform="translate(-14.168,-14.173)"
+             d="m 402.25,83.238 h 71.768 v 67.613 h -52.519"
+             fill="none"
+             stroke-dasharray="4.50709, 2.25354"
+             id="path885" />
+        </g>
+        <g
+           id="ValveAfterPump"
+           fill="#f2f2f2"
            stroke-width="0.5625px">
           <path
-             id="path898"
-             stroke-width="0.5625px"
-             d="m 259.262,288.597 11.889,-3.48 v 6.957 z" />
-          <path
-             id="path894"
-             stroke-width="0.56338px"
-             stroke-dasharray="4.50709, 2.25354"
-             fill="none"
-             d="m 253.27,273.83806 0,-32.60106 h 71.217"
              transform="translate(-14.168,-14.173)"
-             sodipodi:nodetypes="ccc" />
-          <path
-             id="path892"
-             stroke-width="1.1268px"
-             fill="none"
-             d="m 257.212,268.457 h 85.687 l -13.058,10.069 13.058,10.068 h -76.56" />
-          <g
-             id="g890"
-             stroke-width="0.56338px" />
-          <path
-             id="path874"
-             stroke-dasharray="4.50709, 2.25354"
-             fill="none"
-             d="m 421.6,283.1 h 59.59 v 43.566"
-             transform="translate(-14.168,-14.173)" />
-          <path
-             id="path835"
-             stroke-width="0.5625px"
-             stroke-miterlimit="8.5042"
-             stroke="#000000"
-             fill="none"
-             d="m 372.84,331.45 v 46.772 c 5.361,0.032 24.575,-0.32 29.936,-0.288"
-             transform="translate(-14.168,-14.173)" />
-          <path
-             d="m 201.78,189.77 h 132.41 l -14.278,-4.132 v 8.264 l 14.278,-4.132"
-             transform="translate(-14.168,-14.173)"
-             id="arrowIn" />
-          <path
-             d="M 372.95,114.14 V 36.582 l -4.132,14.278 h 8.264 L 372.95,36.582"
-             transform="translate(-14.168,-14.173)"
-             id="arrowTop" />
-          <path
-             d="m 444.39,355.9 h 83.475 l -14.277,-4.132 v 8.264 l 14.277,-4.132"
-             transform="translate(-14.168,-14.173)"
-             id="arrowAfterPump" />
-          <path
-             id="path885"
-             stroke-dasharray="4.50709, 2.25354"
-             fill="none"
-             d="m 402.25,83.238 h 71.768 v 67.613 h -52.519"
-             transform="translate(-14.168,-14.173)" />
-        </g>
-        <g
-           stroke-width="0.5625px"
-           fill="#f2f2f2"
-           id="ValveAfterPump">
-          <path
-             id="path865"
              d="m 460.7,345.7 v 20.392 L 503.22,345.7 v 20.392 z"
-             transform="translate(-14.168,-14.173)" />
+             id="path865" />
           <path
-             id="path867"
+             transform="translate(-14.168,-14.173)"
              d="m 481.95,355.9 v -19.133 h 15.92 c 0,0 -2.293,-10.095 -15.92,-10.095 -13.627,0 -15.92,10.095 -15.92,10.095 h 15.92"
-             transform="translate(-14.168,-14.173)" />
+             id="path867" />
         </g>
         <g
-           id="ControllerCircles"
-           stroke-width="0.56338px">
+           stroke-width="0.56338px"
+           id="ControllerCircles">
           <circle
-             fill="#f9f9f9"
-             r="21.26"
-             cy="268.92999"
+             id="LCcircle"
              cx="465.92999"
-             id="LCcircle" />
-          <circle
-             fill="#f9f9f9"
+             cy="268.92999"
              r="21.26"
-             cy="69.061996"
+             fill="#f9f9f9" />
+          <circle
+             id="PCcircle"
              cx="459.85001"
-             id="PCcircle" />
-          <circle
-             id="TCcircle"
-             stroke-width="0.56338px"
-             fill="#f9f9f9"
+             cy="69.061996"
              r="21.26"
+             fill="#f9f9f9" />
+          <circle
+             cx="239.11"
              cy="279.60999"
-             cx="239.11" />
+             r="21.26"
+             fill="#f9f9f9"
+             stroke-width="0.56338px"
+             id="TCcircle" />
         </g>
         <g
-           id="ValveOnTop"
+           fill="#f2f2f2"
            stroke-width="0.5625px"
-           fill="#f2f2f2">
+           id="ValveOnTop">
           <path
-             id="path879"
+             transform="translate(-14.168,-14.173)"
              d="m 383.15,61.976 h -20.391 l 20.391,42.517 h -20.391 z"
-             transform="translate(-14.168,-14.173)" />
+             id="path879" />
           <path
-             id="path881"
+             transform="translate(-14.168,-14.173)"
              d="m 372.95,83.238 h 19.134 v 15.921 c 0,0 10.095,-2.294 10.095,-15.921 0,-13.627 -10.095,-15.92 -10.095,-15.92 v 15.92"
-             transform="translate(-14.168,-14.173)" />
+             id="path881" />
         </g>
       </g>
     </g>
     <g
-       id="labelBubbles"
-       stroke-width="0.5625px"
+       stroke="#000000"
        fill="none"
-       stroke="#000000">
+       stroke-width="0.5625px"
+       id="labelBubbles">
       <path
-         id="path913"
-         stroke-width="0.56338px"
-         d="m 14.456,14.455 h 190.22 v 145.48 l 22.3,24.838 -41.079,-3.491 H 14.467 V 14.462"
-         transform="translate(-14.168,-14.173)" />
-      <path
-         id="path905"
-         d="m 545.95,14.455 h 190.22 v 190.22 H 545.95 V 92.565 L 508.818,81.934 545.95,71.305 Z"
-         transform="translate(-14.168,-14.173)" />
-      <path
-         id="path907"
-         d="M 547.32,227.05 H 737.54 V 417.27 H 547.32 V 294.53 l -38.748,-10.629 38.748,-10.63 z"
-         transform="translate(-14.168,-14.173)" />
-      <path
-         id="path909"
-         d="M 204.66,417.27 H 14.44 V 227.05 h 190.22 l 0,55.89061 21.375,10.62999 -21.375,11.55898 z"
          transform="translate(-14.168,-14.173)"
-         sodipodi:nodetypes="cccccccc" />
+         d="m 14.456,14.455 h 190.22 v 145.48 l 22.3,24.838 -41.079,-3.491 H 14.467 V 14.462"
+         stroke-width="0.56338px"
+         id="path913" />
+      <path
+         transform="translate(-14.168,-14.173)"
+         d="m 545.95,14.455 h 190.22 v 190.22 H 545.95 V 92.565 L 508.818,81.934 545.95,71.305 Z"
+         id="path905" />
+      <path
+         transform="translate(-14.168,-14.173)"
+         d="M 547.32,227.05 H 737.54 V 417.27 H 547.32 V 294.53 l -38.748,-10.629 38.748,-10.63 z"
+         id="path907" />
+      <path
+         sodipodi:nodetypes="cccccccc"
+         transform="translate(-14.168,-14.173)"
+         d="M 204.66,417.27 H 14.44 V 227.05 h 190.22 l 0,55.89061 21.375,10.62999 -21.375,11.55898 z"
+         id="path909" />
     </g>
     <g
-       class="pv-color"
-       id="PressureTextWrapper">
+       id="PressureTextWrapper"
+       class="pv-color">
       <text
-         id="text917"
-         style="isolation:isolate"
-         font-size="15px"
+         transform="translate(430.52,40.19)"
          font-family="ArialMT, Arial"
-         transform="translate(430.52,40.19)">70.0 kPa</text>
+         font-size="15px"
+         style="isolation:isolate"
+         id="text917">70.0 kPa</text>
     </g>
     <g
-       class="pv-color"
+       transform="translate(0,14)"
        id="TemperatureTextWrapper"
-       transform="translate(0,14)">
+       class="pv-color">
       <text
-         id="text920"
-         style="isolation:isolate"
-         font-size="15px"
+         transform="translate(218.77,306.94)"
          font-family="ArialMT, Arial"
-         transform="translate(218.77,306.94)">400 K</text>
+         font-size="15px"
+         style="isolation:isolate"
+         id="text920">400 K</text>
     </g>
     <g
-       class="pv-color"
-       id="LevelTextWrapper">
+       id="LevelTextWrapper"
+       class="pv-color">
       <text
-         id="text923"
-         style="isolation:isolate"
-         font-size="15px"
+         transform="translate(444.52,238.56)"
          font-family="ArialMT, Arial"
-         transform="translate(444.52,238.56)">10.0%</text>
+         font-size="15px"
+         style="isolation:isolate"
+         id="text923">10.0%</text>
     </g>
     <rect
-       fill="none"
-       height="44.418999"
-       width="84.803001"
-       y="49.522285"
-       x="209.65039"
+       style="fill:none"
        id="csvDownloadArea"
+       x="209.65039"
+       y="49.522285"
+       width="84.803001"
+       height="34.418999"
+       fill="none" />
+    <rect
+       fill="none"
+       height="34.418999"
+       width="84.803001"
+       y="89"
+       x="209.65039"
+       id="directionsArea"
        style="fill:none" />
     <text
-       id="functionTextOriginal"
-       y="40.151508"
-       x="740.50629"
+       xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:14.3319px;line-height:1.25;font-family:sans-serif;display:none;opacity:0;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1"
-       xml:space="preserve"><tspan
-         style="stroke-width:1"
-         y="0"
-         x="0"
+       x="740.50629"
+       y="40.151508"
+       id="functionTextOriginal"><tspan
+         sodipodi:role="line"
          id="tspan1627"
-         sodipodi:role="line">PI(pv, stpt, Kc, bias, TauI, auto) {</tspan><tspan
-         style="stroke-width:1"
+         x="0"
+         y="0"
+         style="stroke-width:1">PI(pv, stpt, Kc, bias, TauI, auto) {</tspan><tspan
+         sodipodi:role="line"
+         x="0"
+         y="0"
          id="tspan1629"
-         y="0"
+         style="stroke-width:1">  if ( auto ) {</tspan><tspan
+         sodipodi:role="line"
          x="0"
-         sodipodi:role="line">  if ( auto ) {</tspan><tspan
-         style="stroke-width:1"
+         y="0"
          id="tspan1631"
-         y="0"
+         style="stroke-width:1">    float err = stpt - pv;</tspan><tspan
+         sodipodi:role="line"
          x="0"
-         sodipodi:role="line">    float err = stpt - pv;</tspan><tspan
-         style="stroke-width:1"
+         y="0"
          id="tspan1633"
-         y="0"
+         style="stroke-width:1">    errs = errs + err;</tspan><tspan
+         sodipodi:role="line"
          x="0"
-         sodipodi:role="line">    errs = errs + err;</tspan><tspan
-         style="stroke-width:1"
+         y="0"
          id="tspan1635"
-         y="0"
+         style="stroke-width:1">    float dmv =</tspan><tspan
+         sodipodi:role="line"
          x="0"
-         sodipodi:role="line">    float dmv =</tspan><tspan
-         style="stroke-width:1"
+         y="0"
          id="tspan1637"
-         y="0"
+         style="stroke-width:1">    </tspan><tspan
+         sodipodi:role="line"
          x="0"
-         sodipodi:role="line">    </tspan><tspan
-         style="stroke-width:1"
+         y="0"
          id="tspan1639"
-         y="0"
+         style="stroke-width:1">    mv = bias + dmv;</tspan><tspan
+         sodipodi:role="line"
          x="0"
-         sodipodi:role="line">    mv = bias + dmv;</tspan><tspan
-         style="stroke-width:1"
+         y="0"
          id="tspan1641"
-         y="0"
+         style="stroke-width:1">  } else {</tspan><tspan
+         sodipodi:role="line"
          x="0"
-         sodipodi:role="line">  } else {</tspan><tspan
-         style="stroke-width:1"
+         y="0"
          id="tspan1643"
-         y="0"
+         style="stroke-width:1">    mv = stpt;</tspan><tspan
+         sodipodi:role="line"
          x="0"
-         sodipodi:role="line">    mv = stpt;</tspan><tspan
-         style="stroke-width:1"
+         y="0"
          id="tspan1645"
-         y="0"
+         style="stroke-width:1">    errs = 0;</tspan><tspan
+         sodipodi:role="line"
          x="0"
-         sodipodi:role="line">    errs = 0;</tspan><tspan
-         style="stroke-width:1"
+         y="0"
          id="tspan1647"
-         y="0"
+         style="stroke-width:1">  }</tspan><tspan
+         sodipodi:role="line"
          x="0"
-         sodipodi:role="line">  }</tspan><tspan
-         style="stroke-width:1"
+         y="0"
          id="tspan1649"
-         y="0"
+         style="stroke-width:1">  return [mv, errs];</tspan><tspan
+         sodipodi:role="line"
          x="0"
-         sodipodi:role="line">  return [mv, errs];</tspan><tspan
-         style="stroke-width:1"
+         y="0"
          id="tspan1651"
-         y="0"
-         x="0"
-         sodipodi:role="line">}</tspan></text>
+         style="stroke-width:1">}</tspan></text>
+    <text
+       id="inlet-label-butanol"
+       y="168.89592"
+       x="233.91452"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:1.25;font-family:ArialMT, Arial;-inkscape-font-specification:'ArialMT, Arial, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"><tspan
+         y="168.89592"
+         x="233.91452"
+         id="tspan1329"
+         sodipodi:role="line">butanol</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:1.25;font-family:ArialMT, Arial;-inkscape-font-specification:'ArialMT, Arial, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
        x="233.91452"
-       y="168.89592"
-       id="inlet-label-butanol"><tspan
-         sodipodi:role="line"
-         id="tspan1329"
-         x="233.91452"
-         y="168.89592">butanol</tspan></text>
-    <text
-       id="inlet-label-aniline"
        y="150.78093"
-       x="233.91452"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:1.25;font-family:ArialMT, Arial;-inkscape-font-specification:'ArialMT, Arial, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none"
-       xml:space="preserve"><tspan
-         y="150.78093"
-         x="233.91452"
+       id="inlet-label-aniline"><tspan
+         sodipodi:role="line"
          id="tspan1335"
-         sodipodi:role="line">aniline</tspan></text>
+         x="233.91452"
+         y="150.78093">aniline</tspan></text>
     <g
        id="PC-text">
       <path
-         transform="translate(-14.168,-14.173)"
+         id="path932"
          d="m 461.72,90.723 v -15.03 h 5.671 a 13.667,13.667 0 0 1 2.286,0.144 4.533,4.533 0 0 1 1.856,0.7 3.692,3.692 0 0 1 1.205,1.451 4.892,4.892 0 0 1 -0.764,5.3 q -1.221,1.329 -4.409,1.328 h -3.855 v 6.111 z m 1.99,-7.885 h 3.885 a 4.128,4.128 0 0 0 2.739,-0.718 2.558,2.558 0 0 0 0.81,-2.02 2.718,2.718 0 0 0 -0.477,-1.615 2.237,2.237 0 0 0 -1.257,-0.887 8.542,8.542 0 0 0 -1.855,-0.133 h -3.845 z"
-         id="path932" />
+         transform="translate(-14.168,-14.173)" />
       <path
-         transform="translate(-14.168,-14.173)"
+         id="path934"
          d="m 486.45,85.45 1.989,0.5 a 6.689,6.689 0 0 1 -2.25,3.737 6.2,6.2 0 0 1 -3.975,1.287 7.132,7.132 0 0 1 -3.953,-0.989 6.176,6.176 0 0 1 -2.317,-2.866 10.231,10.231 0 0 1 -0.795,-4.03 8.871,8.871 0 0 1 0.9,-4.1 6.146,6.146 0 0 1 2.547,-2.649 7.46,7.46 0 0 1 3.645,-0.908 6.167,6.167 0 0 1 3.794,1.149 5.966,5.966 0 0 1 2.143,3.23 l -1.959,0.461 a 4.647,4.647 0 0 0 -1.517,-2.389 4.041,4.041 0 0 0 -2.5,-0.75 4.868,4.868 0 0 0 -2.9,0.83 4.386,4.386 0 0 0 -1.635,2.231 8.94,8.94 0 0 0 -0.472,2.887 9.157,9.157 0 0 0 0.559,3.347 4.17,4.17 0 0 0 1.737,2.138 4.87,4.87 0 0 0 2.55,0.708 4.27,4.27 0 0 0 2.83,-0.965 4.926,4.926 0 0 0 1.574,-2.859 z"
-         id="path934" />
+         transform="translate(-14.168,-14.173)" />
     </g>
     <g
        id="LC-text">
       <path
-         transform="translate(-14.168,-14.173)"
+         id="path936"
          d="m 468.69,289.97 v -15.031 h 1.989 v 13.263 h 7.4 v 1.772 z"
-         id="path936" />
+         transform="translate(-14.168,-14.173)" />
       <path
-         transform="translate(-14.168,-14.173)"
+         id="path938"
          d="m 491.19,284.7 1.989,0.5 a 6.7,6.7 0 0 1 -2.25,3.738 6.2,6.2 0 0 1 -3.975,1.287 7.138,7.138 0 0 1 -3.952,-0.99 6.172,6.172 0 0 1 -2.318,-2.866 10.231,10.231 0 0 1 -0.8,-4.03 8.867,8.867 0 0 1 0.9,-4.1 6.152,6.152 0 0 1 2.55,-2.656 7.449,7.449 0 0 1 3.645,-0.907 6.163,6.163 0 0 1 3.795,1.148 5.97,5.97 0 0 1 2.142,3.23 l -1.958,0.461 a 4.646,4.646 0 0 0 -1.518,-2.388 4.041,4.041 0 0 0 -2.5,-0.75 4.849,4.849 0 0 0 -2.9,0.83 4.38,4.38 0 0 0 -1.636,2.23 8.965,8.965 0 0 0 -0.471,2.886 9.161,9.161 0 0 0 0.558,3.348 4.165,4.165 0 0 0 1.738,2.139 4.878,4.878 0 0 0 2.55,0.707 4.284,4.284 0 0 0 2.831,-0.964 4.936,4.936 0 0 0 1.58,-2.853 z"
-         id="path938" />
+         transform="translate(-14.168,-14.173)" />
     </g>
     <g
-       id="TC-text"
-       transform="translate(0,14)">
+       transform="translate(0,14)"
+       id="TC-text">
       <path
-         transform="translate(-14.168,-14.173)"
+         id="path940"
          d="M 245.37,286.66 V 273.4 h -4.95 v -1.775 h 11.916 v 1.775 h -4.974 v 13.26 z"
-         id="path940" />
+         transform="translate(-14.168,-14.173)" />
       <path
-         transform="translate(-14.168,-14.173)"
+         id="path942"
          d="m 265.1,281.39 1.99,0.5 a 6.7,6.7 0 0 1 -2.25,3.737 6.206,6.206 0 0 1 -3.975,1.287 7.152,7.152 0 0 1 -3.954,-0.989 6.184,6.184 0 0 1 -2.317,-2.867 10.212,10.212 0 0 1 -0.794,-4.03 8.839,8.839 0 0 1 0.9,-4.1 6.148,6.148 0 0 1 2.553,-2.656 7.459,7.459 0 0 1 3.645,-0.907 6.155,6.155 0 0 1 3.794,1.149 5.96,5.96 0 0 1 2.143,3.229 l -1.958,0.462 a 4.645,4.645 0 0 0 -1.518,-2.389 4.041,4.041 0 0 0 -2.5,-0.75 4.849,4.849 0 0 0 -2.9,0.83 4.38,4.38 0 0 0 -1.636,2.23 8.995,8.995 0 0 0 -0.472,2.887 9.162,9.162 0 0 0 0.559,3.348 4.167,4.167 0 0 0 1.738,2.138 4.888,4.888 0 0 0 2.55,0.708 4.285,4.285 0 0 0 2.831,-0.965 4.934,4.934 0 0 0 1.569,-2.859 z"
-         id="path942" />
+         transform="translate(-14.168,-14.173)" />
     </g>
   </g>
 </svg>
