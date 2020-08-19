@@ -1,5 +1,7 @@
 export function sharedLoop(sk, include_stpts) {
-  separator.advance();
+  if(!window.pauseSimulation) {
+    separator.advance();
+  }
   separator.createCoords(include_stpts);
   graphics.TPlot.draw();
   graphics.PPlot.draw();

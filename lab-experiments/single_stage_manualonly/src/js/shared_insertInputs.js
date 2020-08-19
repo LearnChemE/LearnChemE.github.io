@@ -110,7 +110,7 @@ const defaultParams = {
   speedParams : {
     name: "animation speed",
     default: 1,
-    min: 1,
+    min: 0,
     max: 20,
     step: 1,
     label: `simulation speed:&nbsp;1`

@@ -211,6 +211,7 @@ button[disabled=true] {
 #modal {
   width: 100ch;
   max-width: calc(100vw - 2rem);
+  max-height: calc(100vh - 4rem);
   background-color: white;
   margin: 2rem auto;
 }
@@ -230,5 +231,14 @@ button[disabled=true] {
 }
 
 #modal-content {
-  
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100vh - 7.5rem);
+  padding-left: 1rem;
+  padding-top: 1rem;
+}
+
+#directions-player {
+  margin-left: 50%;
+  transform: translateX(-50%);
 }

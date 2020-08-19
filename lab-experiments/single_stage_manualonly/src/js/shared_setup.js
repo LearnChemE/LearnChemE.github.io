@@ -139,7 +139,7 @@ export function flotInit(include_stpts) {
   })
 }
 
-export function importDirections(text) {
+export function importDirections(text, directionsTitle) {
   const innerHTML = text;
   
   const modalBG = document.createElement("div");
@@ -153,7 +153,7 @@ export function importDirections(text) {
 
   const modalTitle = document.createElement("div");
   modalTitle.id = "modal-title";
-  modalTitle.innerHTML = "Directions";
+  modalTitle.innerHTML = directionsTitle;
   modal.appendChild(modalTitle);
 
   const exit = document.createElement("span");
@@ -181,10 +181,37 @@ export function importDirections(text) {
   }
 
   document.body.addEventListener("click", e => clickOutsideModal(e));
+
+  (function embedYouTubePlayers() {
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.body.appendChild(tag);
+  
+    window.onYouTubeIframeAPIReady = function() {
+      window.directionsVideo = new YT.Player( 'directions-player', {
+        height: '390',
+        width: '640',
+        videoId: 'NpEaa2P7qZI',
+      });
+    }
+  
+    window.onPlayerReady = function(event) {
+      console.log(event.target);
+    }
+  })();
 }
 
 export function initialFrameRate(sk) {
-  window.adjustSpeed = (sp) => {sk.frameRate(sp)}
+  window.pauseSimulation = false;
+  window.adjustSpeed = (sp) => {
+    if(sp === 0) {
+      window.pauseSimulation = true;
+      sk.frameRate(1);
+    } else {
+      window.pauseSimulation = false;
+      sk.frameRate(sp);
+    }
+  }
   sk.frameRate(60);
   sk.noCanvas();
 }
