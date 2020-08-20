@@ -147,7 +147,7 @@ export function importDirections(text, part) {
     videoId = "4zBIp-R9M-Q";
   } else {
     directionsTitle = "Directions: Part Two";
-    videoId = "Jo4AcjyIfeU";
+    videoId = "-qAP0RzZoD8";
   }
 
   const modalBG = document.createElement("div");
