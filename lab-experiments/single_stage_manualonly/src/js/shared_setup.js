@@ -144,10 +144,10 @@ export function importDirections(text, part) {
   let directionsTitle, videoId;
   if(part == 1) {
     directionsTitle = "Directions: Part One";
-    videoId = "4zBIp-R9M-Q";
+    videoId = "n2RL8T3rd_o";
   } else {
     directionsTitle = "Directions: Part Two";
-    videoId = "-qAP0RzZoD8";
+    videoId = "QTU1YvfYpQ8";
   }
 
   const modalBG = document.createElement("div");
