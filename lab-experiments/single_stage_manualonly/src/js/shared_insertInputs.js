@@ -117,6 +117,8 @@ const defaultParams = {
   }
 }
 
+const inputStep = 0.00001;
+
 exports.defaultParams = defaultParams;
 
 const codeInputHTML = `
@@ -141,25 +143,25 @@ const controllerHTML = function(opts) {
         <div class="input-group-prepend">
           <span class="input-group-text mv-color" id="input-${opts.mv.name}-label">${opts.mv.label}</span>
         </div>
-        <input type="number" id="input-${opts.mv.name}" class="form-control mv-color" min="${opts.mv.min}" max="${opts.mv.max}" value="${opts.mv.default}" aria-label="${opts.mv.name} input" aria-describedby="input-${opts.mv.name}-label">
+        <input type="number" id="input-${opts.mv.name}" class="form-control mv-color" min="${opts.mv.min}" max="${opts.mv.max}" step="${inputStep}" value="${opts.mv.default}" aria-label="${opts.mv.name} input" aria-describedby="input-${opts.mv.name}-label">
       </div>
       <div class="input-group input-group-sm">
         <div class="input-group-prepend">
           <span class="input-group-text stpt-color" id="input-${opts.cv.name}-label">${opts.cv.stptlabel}</span>
         </div>
-        <input type="number" id="input-${opts.cv.name}" class="form-control stpt-color" min="${opts.cv.stptMin}" max="${opts.cv.stptMax}" value="${opts.cv.stptDefault}" aria-label="${opts.cv.name} input" aria-describedby="input-${opts.cv.name}-label">
+        <input type="number" id="input-${opts.cv.name}" class="form-control stpt-color" min="${opts.cv.stptMin}" max="${opts.cv.stptMax}" step="${inputStep}" value="${opts.cv.stptDefault}" aria-label="${opts.cv.name} input" aria-describedby="input-${opts.cv.name}-label">
       </div>
       <div class="input-group input-group-sm">
         <div class="input-group-prepend">
           <span class="input-group-text" id="input-${opts.cv.name}-Kc-label">K<sub>c</sub>&nbsp;${opts.KcUnits}</span>
         </div>
-        <input type="number" id="input-${opts.cv.name}-Kc" class="form-control" min="${defaultParams.autoParams.KcMin}" max="${defaultParams.autoParams.KcMax}" value="${defaultParams.autoParams.KcDefault}" aria-label="${opts.cv.name} gain input" aria-describedby="input-${opts.cv.name}-Kc-label">
+        <input type="number" id="input-${opts.cv.name}-Kc" class="form-control" min="${defaultParams.autoParams.KcMin}" max="${defaultParams.autoParams.KcMax}" step="${inputStep}" value="${defaultParams.autoParams.KcDefault}" aria-label="${opts.cv.name} gain input" aria-describedby="input-${opts.cv.name}-Kc-label">
       </div>
       <div class="input-group input-group-sm">
         <div class="input-group-prepend">
           <span class="input-group-text" id="input-${opts.cv.name}-tau-label">tauI (s<sup>-1</sup>)</span>
         </div>
-        <input type="number" id="input-${opts.cv.name}-tau" class="form-control" min="${defaultParams.autoParams.tauMin}" max="${defaultParams.autoParams.tauMax}" value="${defaultParams.autoParams.tauDefault}" aria-label="${opts.cv.name} tau input" aria-describedby="input-${opts.cv.name}-tau-label">
+        <input type="number" id="input-${opts.cv.name}-tau" class="form-control" min="${defaultParams.autoParams.tauMin}" max="${defaultParams.autoParams.tauMax}" step="${inputStep}" value="${defaultParams.autoParams.tauDefault}" aria-label="${opts.cv.name} tau input" aria-describedby="input-${opts.cv.name}-tau-label">
       </div>
     </div>
   </div>
@@ -179,19 +181,19 @@ const disturbanceHTML = function(opts) {
         <div class="input-group-prepend">
           <span class="input-group-text" id="input-${opts.F0.name}-label">${opts.F0.label}</span>
         </div>
-        <input type="number" id="input-${opts.F0.name}" class="form-control" min="${opts.F0.min}" max="${opts.F0.max}" value="${opts.F0.default}" aria-label="${opts.F0.name} input" aria-describedby="input-${opts.F0.name}-label">
+        <input type="number" id="input-${opts.F0.name}" class="form-control" min="${opts.F0.min}" max="${opts.F0.max}" step="${inputStep}" value="${opts.F0.default}" aria-label="${opts.F0.name} input" aria-describedby="input-${opts.F0.name}-label">
       </div>
       <div class="input-group input-group-sm">
         <div class="input-group-prepend">
           <span class="input-group-text" id="input-${opts.xA0.name}-label">${opts.xA0.label}</span>
         </div>
-        <input type="number" id="input-${opts.xA0.name}" class="form-control" min="${opts.xA0.min}" max="${opts.xA0.max}" value="${opts.xA0.default}" aria-label="${opts.xA0.name} input" aria-describedby="input-${opts.xA0.name}-label">
+        <input type="number" id="input-${opts.xA0.name}" class="form-control" min="${opts.xA0.min}" max="${opts.xA0.max}" step="${inputStep}" value="${opts.xA0.default}" aria-label="${opts.xA0.name} input" aria-describedby="input-${opts.xA0.name}-label">
       </div>
       <div class="input-group input-group-sm">
         <div class="input-group-prepend">
           <span class="input-group-text" id="input-${opts.Tin.name}-label">${opts.Tin.label}</span>
         </div>
-        <input type="number" id="input-${opts.Tin.name}" class="form-control" min="${opts.Tin.min}" max="${opts.Tin.max}" value="${opts.Tin.default}" aria-label="${opts.Tin.name} input" aria-describedby="input-${opts.Tin.name}-label">
+        <input type="number" id="input-${opts.Tin.name}" class="form-control" min="${opts.Tin.min}" max="${opts.Tin.max}" step="${inputStep}" value="${opts.Tin.default}" aria-label="${opts.Tin.name} input" aria-describedby="input-${opts.Tin.name}-label">
       </div>
     </div>
   </div>
