@@ -41,10 +41,10 @@ const htmlOptions = {
   template: path.resolve(__dirname, "../src/html/index.html"),
   meta: {
     "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
-    "keywords": "LearnChemE, Chemical Engineering, Engineering, Education, Simulation, Simulated Laboratory Experiment",
-    "author": "Neil Hendren and Scott Rowe",
-    "application-name": "Simulated Lab Flash Distillation Experiment",
-    "description": "An Online Lab Experiment for Chemical Engineering undergraduate students"
+    "keywords": "LearnChemE, Chemical Engineering, Engineering, Education, Simulation, Combustion, Thermodynamics",
+    "author": "Neil Hendren",
+    "application-name": "Adiabatic Flame Temperature Simulation",
+    "description": "Simulation of an adiabatic combustion reaction and the effect of inlet conditions on flame temperature"
   },
   minify: {
     removeAttributeQuotes: true,
@@ -54,13 +54,13 @@ const htmlOptions = {
 };
 
 const jsOptions = {
-  // filename: "main.[contentHash].js"
-  filename: "main.js"
+  filename: "main.[contentHash].js"
+  // filename: "main.js"
 };
 
 const styleOptions = {
-  // filename: "[name].[contentHash].css"
-  filename: "[name].css"
+  filename: "[name].[contentHash].css"
+  // filename: "[name].css"
 };
 
 const terserOptions = {
@@ -97,7 +97,7 @@ module.exports = env => {
     plugins: [
       new MiniCssExtractPlugin(styleOptions),
       new CleanWebpackPlugin(),
-      new HtmlWebpackPlugin({ ...htmlOptions, title: "Flash Column Experiment"})
+      new HtmlWebpackPlugin({ ...htmlOptions, title: "Adiabatic Flame Temperature"})
     ]
   }
 }

@@ -1,0 +1,32 @@
+@import "bootstrap";
+
+#app {
+  width: 600px;
+}
+
+#controls {
+  margin: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.control {
+  display: grid;
+  width: 100%;
+    
+  label {
+    text-align: center;
+  }
+
+}
+
+#graphic {
+  margin: 1rem;
+
+  #flameTemp {
+    font-size: 2rem;
+  }
+}

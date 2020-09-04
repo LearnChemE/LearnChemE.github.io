@@ -1,0 +1,45 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en">
+  <title>Adiabatic Flame Temperature</title>
+</head>
+
+<body>
+  <div id="app">
+    <div id="controls">
+      
+      <div class="control">
+        <label for="excessO2" id="excessO2label">excess air = 0%</label>
+        <input name="excessO2" id="excessO2" type="range" min="0" max="1.5" step="0.01" value="0"></input>
+      </div>
+      
+      <div class="control">
+        <label for="oxidizer">oxidizer</label>
+        <select name="oxidizer" id="oxidizer">
+          <option value="air">air</option>
+          <option value="oxygen">oxygen</option>
+        </select>
+      </div>
+      
+      <div class="control">
+        <label for="fuel">fuel</label>
+        <select name="fuel" id="fuel">
+          <option value="methane">methane</option>
+          <option value="ethane">ethane</option>
+          <option value="acetylene">acetylene</option>
+          <option value="propane">propane</option>
+          <option value="butane">butane</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div id="graphic">
+      <div id="flameTemp"></div>
+    </div>
+  </div>
+</body>
+</html>

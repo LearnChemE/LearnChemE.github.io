@@ -4,7 +4,9 @@
   "description": "Simulate the flame temperature of an adiabatic combustion chamber",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./_dev/compiler.js",
+    "build": "webpack --config ./_dev/webpack.config.js --env.production --progress"
   },
   "keywords": [
     "chemical",
