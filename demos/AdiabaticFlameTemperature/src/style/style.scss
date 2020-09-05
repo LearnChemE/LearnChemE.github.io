@@ -23,10 +23,23 @@
 
 }
 
-#graphic {
+#graphic-container {
   margin: 1rem;
 
-  #flameTemp {
-    font-size: 2rem;
+  .textBox {
+    position: absolute;
+    display: grid;
+    padding-left: 0.25rem;
+    
+    &.above {
+      align-items: end;
+    }
+  }
+
+  #textBox-6 {
+    grid-template-columns: 1fr 2fr;
+    .left {
+      justify-self: center;
+    }
   }
 }

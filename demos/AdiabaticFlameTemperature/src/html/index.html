@@ -17,6 +17,16 @@
       </div>
       
       <div class="control">
+        <label for="inletFuelTempSlider" id="inletFuelTempLabel">T<sub>fuel</sub> = <span id="inletFuelTemp">25</span>°C</label>
+        <input name="inletFuelTempSlider" id="inletFuelTempSlider" type="range" min="25" max="250" step="1" value="25"></input>
+      </div>
+
+      <div class="control">
+        <label for="inletOxidizerTempSlider" id="inletOxidizerTempLabel">T<sub>oxidizer</sub> = <span id="inletOxidizerTemp">150</span>°C</label>
+        <input name="inletOxidizerTempSlider" id="inletOxidizerTempSlider" type="range" min="25" max="250" step="1" value="150"></input>
+      </div>
+
+      <div class="control">
         <label for="oxidizer">oxidizer</label>
         <select name="oxidizer" id="oxidizer">
           <option value="air">air</option>
@@ -34,12 +44,10 @@
           <option value="butane">butane</option>
         </select>
       </div>
-
+      
     </div>
 
-    <div id="graphic">
-      <div id="flameTemp"></div>
-    </div>
+    <div id="graphic-container"></div>
   </div>
 </body>
 </html>

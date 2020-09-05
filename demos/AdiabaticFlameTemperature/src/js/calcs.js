@@ -1,8 +1,13 @@
 window.simulationSettings = {
-  inletFuelTemperature : 298 + 25,
-  inletOxidizerTemperature : 298 + 150,
+  inletFuelTemperature : 273 + 25,
+  inletOxidizerTemperature : 273 + 150,
   inletFuelMolarFlowRate : 100,
+  oxygenOutletFlowRate : 0,
+  nitrogenOutletFlowRate : 276,
+  waterOutletFlowRate : 200,
+  carbonDioxideOutletFlowRate : 100,
   excessO2 : 0,
+  oxidizerFlowRate : 961,
   fuel : "methane",
   oxidizer : "air",
 }
@@ -65,14 +70,16 @@ function CpButane(T) {
   return 20.79 + 0.3456*T
 }
 
-function SensibleHeat(Cp, Tmin, Tmax, steps) { // 
+function SensibleHeat(Cp, Tmin, Tmax, steps) {
   
+  const adjustment = 6.6; // added slight tweak to Cp values to match literature-reported adiabatic flame temperatures
+
   let T = Tmin;
   let H = 0;
   const dT = (Tmax - Tmin) / steps;
 
   for ( let i = 0; i < steps; i++ ) {
-    const cp = Cp(T);
+    const cp = Cp(T) + adjustment;
     const dH = cp * dT;
     H += dH;
     T += dT;
@@ -90,16 +97,14 @@ window.findFlameTemp = function() {
   nFuel = simulationSettings.inletFuelMolarFlowRate; // mol / hr
 
   let Hc; // Heat of combustion ( J / mol )
+  let CpFuel;
 
   const O2x = simulationSettings.excessO2;
   let xO2; // Excess oxygen molar flow rate
 
-  let CpFuel; // Heat capacity function
-
-  // Original simulation modeled it as fuel first increasing to temperature of the oxidizer then reacting
-  // Regardless of whether or not this is theoretically correct, it will show behavior well enough
-  const TFuelInitial = simulationSettings.inletFuelTemperature;
+  const T0 = 298;
   const TOxidizer = simulationSettings.inletOxidizerTemperature;
+  const TFuel = simulationSettings.inletFuelTemperature;
 
   switch(fuel) {
     case "methane":
@@ -153,60 +158,67 @@ window.findFlameTemp = function() {
     nN2 = (nO2 + xO2) * 79 / 21
   }
 
+  simulationSettings.oxidizerFlowRate = nO2 + xO2 + nN2;
+  simulationSettings.oxygenOutletFlowRate = xO2;
+  simulationSettings.nitrogenOutletFlowRate = nN2;
+  simulationSettings.waterOutletFlowRate = nH2O;
+  simulationSettings.carbonDioxideOutletFlowRate = nCO2;
+
   const totalHeat = -1 * nFuel * Hc;
 
-  const FuelSensibleHeatChange = nFuel * SensibleHeat(CpFuel, TFuelInitial, TOxidizer, 100);
+  const FuelSensibleHeatChange = -1 * nFuel * SensibleHeat(CpFuel, T0, TFuel, 100);
+  const OxidizerSensibleHeatChange = -1 * (nO2 + xO2) * SensibleHeat(CpO2, T0, TOxidizer, 100) + -1 * nN2 * SensibleHeat(CpN2, T0, TOxidizer, 100);
 
   let ProductsSensibleHeatChange = 0; // Initial value
   let TFlame = TOxidizer + 1; // Initial value for flame temperature is inlet oxidizer temperature + 1
 
   const precision = 100;
 
-  while ( ProductsSensibleHeatChange + FuelSensibleHeatChange < totalHeat ) {
+  while ( ProductsSensibleHeatChange + OxidizerSensibleHeatChange + FuelSensibleHeatChange < totalHeat ) {
 
     TFlame += 1000;
 
     ProductsSensibleHeatChange = 
-      xO2 * SensibleHeat(CpO2, TFuelInitial, TFlame, precision) +
-      nN2 * SensibleHeat(CpN2, TFuelInitial, TFlame, precision) +
-      nH2O * SensibleHeat(CpH2O, TFuelInitial, TFlame, precision) +
-      nCO2 * SensibleHeat(CpCO2, TFuelInitial, TFlame, precision)
+      xO2 * SensibleHeat(CpO2, T0, TFlame, precision) +
+      nN2 * SensibleHeat(CpN2, T0, TFlame, precision) +
+      nH2O * SensibleHeat(CpH2O, T0, TFlame, precision) +
+      nCO2 * SensibleHeat(CpCO2, T0, TFlame, precision)
 
   }
 
-  while ( ProductsSensibleHeatChange + FuelSensibleHeatChange > totalHeat ) {
+  while ( ProductsSensibleHeatChange + OxidizerSensibleHeatChange + FuelSensibleHeatChange > totalHeat ) {
 
     TFlame -= 100;
 
     ProductsSensibleHeatChange = 
-      xO2 * SensibleHeat(CpO2, TFuelInitial, TFlame, precision) +
-      nN2 * SensibleHeat(CpN2, TFuelInitial, TFlame, precision) +
-      nH2O * SensibleHeat(CpH2O, TFuelInitial, TFlame, precision) +
-      nCO2 * SensibleHeat(CpCO2, TFuelInitial, TFlame, precision)
+      xO2 * SensibleHeat(CpO2, T0, TFlame, precision) +
+      nN2 * SensibleHeat(CpN2, T0, TFlame, precision) +
+      nH2O * SensibleHeat(CpH2O, T0, TFlame, precision) +
+      nCO2 * SensibleHeat(CpCO2, T0, TFlame, precision)
 
   }
 
-  while ( ProductsSensibleHeatChange + FuelSensibleHeatChange < totalHeat ) {
+  while ( ProductsSensibleHeatChange + OxidizerSensibleHeatChange + FuelSensibleHeatChange < totalHeat ) {
 
     TFlame += 10;
 
     ProductsSensibleHeatChange = 
-      xO2 * SensibleHeat(CpO2, TFuelInitial, TFlame, precision) +
-      nN2 * SensibleHeat(CpN2, TFuelInitial, TFlame, precision) +
-      nH2O * SensibleHeat(CpH2O, TFuelInitial, TFlame, precision) +
-      nCO2 * SensibleHeat(CpCO2, TFuelInitial, TFlame, precision)
+      xO2 * SensibleHeat(CpO2, T0, TFlame, precision) +
+      nN2 * SensibleHeat(CpN2, T0, TFlame, precision) +
+      nH2O * SensibleHeat(CpH2O, T0, TFlame, precision) +
+      nCO2 * SensibleHeat(CpCO2, T0, TFlame, precision)
 
   }
 
-  while ( ProductsSensibleHeatChange + FuelSensibleHeatChange > totalHeat ) {
+  while ( ProductsSensibleHeatChange + OxidizerSensibleHeatChange + FuelSensibleHeatChange > totalHeat ) {
 
     TFlame -= 1;
 
     ProductsSensibleHeatChange = 
-      xO2 * SensibleHeat(CpO2, TFuelInitial, TFlame, precision) +
-      nN2 * SensibleHeat(CpN2, TFuelInitial, TFlame, precision) +
-      nH2O * SensibleHeat(CpH2O, TFuelInitial, TFlame, precision) +
-      nCO2 * SensibleHeat(CpCO2, TFuelInitial, TFlame, precision)
+      xO2 * SensibleHeat(CpO2, T0, TFlame, precision) +
+      nN2 * SensibleHeat(CpN2, T0, TFlame, precision) +
+      nH2O * SensibleHeat(CpH2O, T0, TFlame, precision) +
+      nCO2 * SensibleHeat(CpCO2, T0, TFlame, precision)
 
   }
 
