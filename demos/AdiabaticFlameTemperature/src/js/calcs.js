@@ -72,14 +72,12 @@ function CpButane(T) {
 
 function SensibleHeat(Cp, Tmin, Tmax, steps) {
   
-  const adjustment = 6.6; // added slight tweak to Cp values to match literature-reported adiabatic flame temperatures
-
   let T = Tmin;
   let H = 0;
   const dT = (Tmax - Tmin) / steps;
 
   for ( let i = 0; i < steps; i++ ) {
-    const cp = Cp(T) + adjustment;
+    const cp = Cp(T);
     const dH = cp * dT;
     H += dH;
     T += dT;
