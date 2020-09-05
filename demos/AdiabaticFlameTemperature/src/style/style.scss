@@ -11,20 +11,38 @@
   justify-items: center;
   justify-content: center;
   gap: 1rem;
-}
-
-.control {
-  display: grid;
-  width: 100%;
-    
-  label {
-    text-align: center;
+  
+  .control {
+    display: grid;
+    width: 100%;
+      
+    label {
+      text-align: center;
+    }
+  
   }
 
 }
 
 #annotation {
-  padding: 0rem 1.5rem;
+  padding: 0rem 1rem;
+  text-align: justify;
+
+  .ref-header {
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .reference {
+    font-size: 0.8rem;
+    line-height: 1rem;
+    padding-bottom: 0.75rem;
+    text-align: left;
+  }
+}
+
+.modal-body p {
+  text-align: justify;
 }
 
 #graphic-container {
