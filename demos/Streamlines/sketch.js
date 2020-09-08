@@ -1,28 +1,41 @@
+// Setup function is from the p5.js library.  See https://p5js.org/reference/ for more info.  It is how I draw the grey canvas with the cylinder and arrows.
 function setup() {
   createCanvas(600, 600);
   background(200);
 }
 
+// Initial reynolds number
 let re = 100;
+
+// Maximum arrow length (pixels)
 let lineLength = 5;
+
+// This means that the axis range is x = [-3, 3] and y = [-3, 3]
 let canvasSize = 3;
 
+// This updates the variable "re" to match the value of the slider
 document.getElementById("re").addEventListener("input", e => {
   re = Number( e.target.value );
   document.getElementById("reVal").innerHTML = `${re}`;
 })
 
+// This function is from p5.js. It is called about 60 times per second 
 function draw() {
 
+  // Draw a grey background
   background(200);
 
+  // Line thickness of 0.5 pixels (will default to 1 on most screens)
   strokeWeight(0.5);
 
+  // Draw a circle in the middle of the canvas
   ellipse( width / 2, height / 2, width / canvasSize, height / canvasSize );
 
+  // Every 20 pixels, draw an arrow from pt1 to pt2, except within the circle boundary
   for ( let canvasX = 0; canvasX < width; canvasX += 20 ) {
     for ( let canvasY = 0; canvasY < height; canvasY += 20 ) {
 
+      // Normalize
       const x = ((canvasX - width / 2) / width) * 2 * canvasSize;
       const y = ((canvasY - height / 2) / height) * 2 * canvasSize;
       
@@ -39,6 +52,7 @@ function draw() {
           y : canvasY + lineLength * u[1]
         };
 
+        // push(), pop(), translate(), rotate(), line(), and triangle() are part of p5.js
         push();
           translate( ( pt1.x + pt2.x ) / 2, ( pt1.y + pt2.y ) / 2);
           rotate( Math.atan2( pt2.y - pt1.y, pt2.x - pt1.x ) );
@@ -51,6 +65,8 @@ function draw() {
     }
   }
 }
+
+// Everything from here down is just math copied from https://demonstrations.wolfram.com/FlowAroundASphereAtFiniteReynoldsNumberByGalerkinMethod/
 
 function A1(re) {
   const r = re**2;
