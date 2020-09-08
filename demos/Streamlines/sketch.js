@@ -1,0 +1,144 @@
+function setup() {
+  createCanvas(600, 600);
+  background(200);
+}
+
+let re = 100;
+let lineLength = 5;
+let canvasSize = 3;
+
+document.getElementById("re").addEventListener("input", e => {
+  re = Number( e.target.value );
+  document.getElementById("reVal").innerHTML = `${re}`;
+})
+
+function draw() {
+
+  background(200);
+
+  strokeWeight(0.5);
+
+  ellipse( width / 2, height / 2, width / canvasSize, height / canvasSize );
+
+  for ( let canvasX = 0; canvasX < width; canvasX += 20 ) {
+    for ( let canvasY = 0; canvasY < height; canvasY += 20 ) {
+
+      const x = ((canvasX - width / 2) / width) * 2 * canvasSize;
+      const y = ((canvasY - height / 2) / height) * 2 * canvasSize;
+      
+      if ( x**2 + y**2 > 1 ) {
+        const u = U(re, x, y);
+
+        const pt1 = { 
+          x : canvasX - lineLength * u[0],
+          y : canvasY - lineLength * u[1] 
+        };
+
+        const pt2 = {
+          x : canvasX + lineLength * u[0],
+          y : canvasY + lineLength * u[1]
+        };
+
+        push();
+          translate( ( pt1.x + pt2.x ) / 2, ( pt1.y + pt2.y ) / 2);
+          rotate( Math.atan2( pt2.y - pt1.y, pt2.x - pt1.x ) );
+          const m = Math.sqrt( ( pt2.x - pt1.x )**2 + ( pt2.y - pt1.y )**2 );
+          line( -m, 0, m, 0 );
+          triangle( m, 0, m / 3, m / 6, m / 3, -m / 6);
+        pop();
+      }
+
+    }
+  }
+}
+
+function A1(re) {
+  const r = re**2;
+
+  const c1 = ( ( 2.7391417851819595e11 + r * (2.1079461581884886e9 + r * (3.609662630935375e4 + 3.3644813668472526 * r ) ) + 100 * re * Math.sqrt( ( 1.2735686181258997e17 + r * (4.388552339698552e14 + r * (1.776934907636144e10 + r * (1.1512716122770787e6 + 57.95077149780876 * r ) ) ) ) ) ) ) ** ( 1 / 3 );
+
+  const c2 = 100 * (1.3636505692563244 * ( r - 85.79134132307645**2 ) * ( r - 50.51906885775793**2 ) );
+
+  const c3 = c2 / c1 + 60.73294576824199 * c1;
+
+  const c4 = Math.sqrt( 41.715270532950086 + ( -788846.5185368055 + c3 ) / r );
+  
+  return ( ( c4 - Math.sqrt( 83.43054106590017 + ( ( 5.686988475331831e7 + 1474.4854794642922 * r ) / ( r * c4 ) - ( 1.5776930370736108e6 + c3 ) / r ) ) ) / 2 - 2.8781637206259836 );
+}
+
+function A2(re) {
+  return -15 / 29 * ( 8 + 5 * A1(re) )
+}
+
+function A3(re) {
+  return 9 / 29 * ( 17 + 7 * A1(re) )
+}
+
+function A4(re) {
+  return -1 / 58 * ( 95 + 34 * A1(re) )
+}
+
+function B1(re) {
+  const c = A1(re);
+
+  return - 1 * ( 44.689656 + 9.931035 * c ) / ( ( 0.011713 - 0.002546 * c ) * re )
+}
+
+function B2(re) {
+  return -23/9 * B1(re)
+}
+
+function B3(re) {
+  return 19 / 9 * B1(re)
+}
+
+function B4(re) {
+  return - 5 / 9 * B1(re)
+}
+
+function Ur0(re, r, th) {
+  const cos = Math.cos(th);
+  const sin = Math.sin(th); 
+  const r2 = 1 / (r * r);
+  let r3, r4, r5, r6;
+
+  r3 = r2 / r;
+  r4 = r2 * r2;
+  r5 = r2 * r3;
+  r6 = r3 * r3;
+
+  return [
+    
+    ( 1 + 2 * ( A1(re) * r3 + A2(re) * r4 + A3(re) * r5 + A4(re) * r6 ) ) * cos + ( B1(re) * r3 + B2(re) * r4 + B3(re) * r5 + B4(re) * r6 ) * ( 3 * cos**2 - 1 ),
+    
+    ( -1 + A1(re) * r3 + 2 * A2(re) * r4 + 3 * A3(re) * r5 + 4 * A4(re) * r6 ) * sin + ( B1(re) * r3 + 2 * B2(re) * r4 + 3 * B3(re) * r5 + 4 * B4(re) * r6 ) * sin * cos
+  
+  ]
+}
+
+function Psi(re, r, th) {
+  let r2 = r * r;
+  let r3, r4;
+  let sin2 = Math.sin(th)**2;
+  
+  r3 = r2 * r;
+  r4 = r2 * r2;
+ 
+  return ( ( r2 / 2 + A1(re) / r + A2(re) / r2 + A3(re) / r3 + A4(re) / r4 ) * sin2 + ( B1(re) / r + B2(re) / r2 + B3(re) / r3 + B4(re) / r4 ) * Math.cos(th) * sin2 )
+}
+
+function U(re, x, y) {
+  const r = Math.sqrt( x**2 + y**2 );
+  const th = Math.atan2(y, x);
+
+  function dot(a, b) {
+    return a[0] * b[0] + a[1] * b[1]
+  }
+  
+  const ur = Ur0(re, r, th);
+  const m1 = [ Math.cos(th), -1 * Math.sin(th) ];
+  const m2 = [ Math.sin(th), Math.cos(th) ];
+
+  return [ dot(ur, m1), dot(ur, m2) ]
+}
+
