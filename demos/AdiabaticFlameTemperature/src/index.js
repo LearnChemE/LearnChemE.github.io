@@ -5,18 +5,12 @@ require("./js/insertGraphicsElements.js");
 require("./js/calcs.js");
 
 const fuelSelection = document.getElementById("fuel");
-const oxidizerSelection = document.getElementById("oxidizer");
 const O2slider = document.getElementById("excessO2");
 const fuelSlider = document.getElementById("inletFuelTempSlider");
 const oxidizerTempSlider = document.getElementById("inletOxidizerTempSlider"); 
 
 O2slider.addEventListener('input', (e) => {  
   window.simulationSettings.excessO2 = O2slider.value;
-  updateLabels();
-});
-
-oxidizerSelection.addEventListener('change', (e) => {
-  window.simulationSettings.oxidizer = oxidizerSelection.value;
   updateLabels();
 });
 
@@ -38,9 +32,7 @@ oxidizerTempSlider.addEventListener('input', (e) => {
 window.updateLabels = function() {
 
   const fuelLabel = document.getElementById("fuelLabel");
-  //const fuelFlowRate = document.getElementById("fuelFlowRate");
   const fuelTemp = document.getElementById("fuelTemp");
-  const oxidizerLabel = document.getElementById("oxidizerLabel");
   const oxidizerSliderLabel = document.getElementById("excessO2label");
   const oxidizerFlowRate = document.getElementById("oxidizerFlowRate");
   const oxidizerTemp = document.getElementById("oxidizerTemp");
@@ -64,9 +56,7 @@ window.updateLabels = function() {
 
   fuelTemp.innerHTML = `${simulationSettings.inletFuelTemperature - 273}`;
 
-  oxidizerLabel.innerHTML = simulationSettings.oxidizer === "air" ? "air" : "O<sub>2</sub>";
-
-  oxidizerSliderLabel.innerHTML = `excess ${oxidizerSelection.value} = ${Number.parseInt(O2slider.value * 100)}%`;
+  oxidizerSliderLabel.innerHTML = `excess air = ${Number.parseInt(O2slider.value * 100)}%`;
 
   oxidizerFlowRate.innerHTML = `${Number.parseInt(simulationSettings.oxidizerFlowRate)}`;
 
