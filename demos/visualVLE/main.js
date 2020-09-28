@@ -61,7 +61,7 @@ window.onload = (event) => {
     mainDiv = document.getElementById('main');
     addButtons();
     addSliders();
-    addBarChart();
+    addBarChart();  
     resize();
     for(let i = 0; i < mols; i++) {
         if(i % 2 == 0) {mol.push(new Molecule({'component':'a'}))} else {mol.push(new Molecule({'component':'b'}))};
