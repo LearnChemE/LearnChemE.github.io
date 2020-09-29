@@ -95,17 +95,13 @@
           </div>
           
           <div class="details-paragraph">
-            For example, for methane:
+            where \( \Delta H_{rxn} \) is heat of reaction at 298 K, \( \nu_{i} \) is a stoichiometric coefficient, and \( \Delta H_{f,i} \) is the heat of formation (enthalpy of formation) of species \( i \). Heats of formation are at 298 K. For example, for methane:
           </div>
           
           <div class="details-math">
             $$
             \Delta H_{rxn} = 2 \Delta H_{f,H_{2}O} - \Delta H_{f,CH_{4}} - 2 \Delta H_{f,O_{2}}
             $$
-          </div>
-
-          <div class="details-paragraph">
-            where \( \Delta H_{rxn} \) is heat of reaction at 298 K, \( \nu_{i} \) is a stoichiometric coefficient, and \( \Delta H_{f,i} \) is the heat of formation (enthalpy of formation) of species \( i \). Heats of formation are at 298 K.
           </div>
 
           <div class="details-header">
@@ -119,7 +115,7 @@
           </div>
           <div class="details-math" style="margin-bottom: 2rem;">
             $$
-            \Delta H = n_{fuel} \Delta H_{rxn} + \Sigma \left( n_{i}^{out} \int_{298}^{T} C_{P} dT \right) - \Sigma \left( n_{i}^{in} \int_{298}^{T_{in}} C_{P} dT \right)
+            \Delta H = n_{fuel} \Delta H_{rxn} + \sum_{i} \left( n_{i}^{out} \int_{298}^{T} C_{P} dT \right) - \sum_{i} \left( n_{i}^{in} \int_{298}^{T_{in}} C_{P} dT \right)
             $$
           </div>
 
