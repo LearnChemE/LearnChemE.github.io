@@ -1,7 +1,15 @@
+$modal-lg: 980px;
+
 @import "bootstrap";
 
+#doc {
+  width: 1000px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
 #app {
-  width: 600px;
+  width: 500px;
 }
 
 #controls {
@@ -22,10 +30,14 @@
   
   }
 
+  .button {
+    height: min-content;
+    align-self: end;
+  }
 }
 
 #annotation {
-  padding: 0rem 1rem;
+  padding: 1rem 1rem;
   text-align: justify;
 
   .ref-header {
@@ -64,4 +76,19 @@
       justify-self: center;
     }
   }
+}
+
+.details-paragraph {
+  padding-bottom: 1rem;
+}
+
+.details-math {
+  width: min-content;
+  margin-left: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.details-header {
+  margin-bottom: 2rem;
 }

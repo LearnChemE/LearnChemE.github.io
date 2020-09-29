@@ -1,3 +1,16 @@
+window.jQuery = require('jquery');
+window.$ = window.jQuery;
+require("popper.js");
+require("bootstrap");
+
+(function addMathJax() {
+  const mj = document.createElement("script");
+  mj.id = "MathJax-script";
+  mj.setAttribute("async", "");
+  mj.setAttribute("src", "./mathjax/mathjax.js");
+  document.head.appendChild(mj);
+})();
+
 require("./style/style.scss");
 const graphic = require("./media/graphic.svg").toString();
 document.getElementById("graphic-container").innerHTML = graphic;
@@ -27,7 +40,7 @@ fuelSlider.addEventListener('input', (e) => {
 oxidizerTempSlider.addEventListener('input', (e) => {
   window.simulationSettings.inletOxidizerTemperature = Number(oxidizerTempSlider.value) + 273;
   updateLabels();
-})
+});
 
 window.updateLabels = function() {
 

@@ -96,7 +96,7 @@ module.exports = env => {
     },
     plugins: [
       new MiniCssExtractPlugin(styleOptions),
-      new CleanWebpackPlugin(),
+      new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns : ['**/*', '!mathjax/**'] }),
       new HtmlWebpackPlugin({ ...htmlOptions, title: "Adiabatic Flame Temperature"})
     ]
   }
