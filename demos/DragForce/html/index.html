@@ -1,2 +1,33 @@
 <!-- This simulation is on the topic of drag force.--> 
 <!-- This is the first file created by Mingyuan Lu for this project.--> 
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta id="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag force in freefall</title>
+    <link rel="icon" type="image/png" href="https://LearnChemE.github.io/resources/siteicon.png">
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML&delayStartupUntil=configured" async></script>        
+    <script type="text/javascript" src="../js/main.js"></script>
+
+</head>
+
+<body onresize="resize()">
+    <div id="nav">
+        <div id="directions" class="buttonMed">Directions</div>
+        <div id="about" class="buttonMed">About</div>
+    </div>
+    <div id="main">
+        <div id="canvas0" style="z-index: 0">
+            <div id="modify"></div>
+            <div id="fall" style="z-index: 1"></div>
+            <div id="vtdiagram" style="z-index: 1"></div>
+            <div id="data" style="z-index: 1"></div>
+        </div>
+    </div>
+</body>
+
+</html>
