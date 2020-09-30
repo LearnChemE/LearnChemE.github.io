@@ -15,13 +15,14 @@ $modal-lg: 980px;
 #controls {
   margin: 1rem;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, calc( (500px - 4rem) / 3 ) );
   justify-items: center;
   justify-content: center;
   gap: 1rem;
   
   .control {
     display: grid;
+    grid-template-columns: 100%;
     width: 100%;
       
     label {
@@ -97,4 +98,15 @@ $modal-lg: 980px;
 .details-reference {
   border-top: 1px solid grey;
   padding-top: 1rem;
+}
+
+input[type=range]::-moz-range-thumb {
+  background-color: royalblue;
+  width: 12px;
+  height: 12px;
+  border: 2px solid darkslateblue;
+}
+
+input[type=range]::-moz-range-track {
+  background-color: slategray;
 }
