@@ -1,13 +1,48 @@
 @import "bootstrap";
 
-#start-button {
-  margin: 2rem;
+#controls {
+  display: grid;
+  grid-template-columns: 110px 310px;
+  align-items: center;
+  justify-items: center;
   margin-left: 5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+#start-button {
   width: 4rem;
 }
 
-#plot {
+#graphics-area {
+  display: grid;
+  grid-template-columns: 500px 200px;
+  grid-template-rows: 400px;
+  gap: 1rem;
   margin-left: 1rem;
-  width : 500px;
-  height : 400px;
+
+  #parameters {
+    height: 350px;
+    border: 1px solid black;
+    padding: 1rem;
+    font-size: 1.2rem;
+
+    .parameter {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 50% 20% 30%;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      justify-items: start;
+      
+      .parameter-name {
+        justify-self: end;
+      }
+
+      #reynolds-number {
+        grid-column: 2 / -1;
+      }
+
+    }
+  }
 }

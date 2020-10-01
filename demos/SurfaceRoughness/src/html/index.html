@@ -9,12 +9,50 @@
 </head>
 
 <body>
-  <div id="start-button" class="btn btn-primary">Hit</div>
-  Surface roughness (&epsilon;/D):
-  <select id="select-ball">
+  <div id="controls">
+    
+    <div class="control-box">
+      <div id="start-button" class="btn btn-primary">Hit</div>
+    </div>
+    
+    <div class="control-box">
+      Surface roughness (&epsilon;/D):
+      <select id="select-ball"></select>
+    </div>
 
-  </select>
-  <div id="plot"></div>
+  </div>
+
+  <div id="graphics-area">
+    
+    <div id="plot"></div>
+
+    <div id="parameters">
+      <div class="parameter">
+        <div class="parameter-name">velocity =</div>
+        <div id="velocity">0.0</div>
+        <div class="metric">m/s</div>
+      </div>
+
+      <div class="parameter">
+        <div class="parameter-name">Re =</div>
+        <div id="reynolds-number">0.00 x 10<sup>0</sup></div>
+      </div>
+
+      <div class="parameter">
+        <div class="parameter-name">C<sub>d</sub> =</div>
+        <div id="drag-coefficient">0.00</div>
+        <div class="metric"></div>
+      </div>
+
+      <div class="parameter">
+        <div class="parameter-name">F<sub>d</sub> =</div>
+        <div id="drag-force">0.00</div>
+        <div class="metric">N</div>
+      </div>
+    </div>
+
+  </div>
+
 </body>
 
 </html>

@@ -17,6 +17,7 @@ function updateGraph(array) {
 function animationFunction() {
   index++;
   ball.update(dt);
+  ball.updateDOM();
   if( ball.y < 0 ) { isRunning = false }
   window.graphData.push([ball.x, ball.y]); 
   updateGraph(window.graphData);
