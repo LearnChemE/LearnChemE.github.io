@@ -19,7 +19,7 @@ let plotOptions = {
       autoScale : "none",
       axisLabel : "time (s)",
       min: 0,
-      max: 5
+      max: 8
     },
     { 
       position: "top",
@@ -34,10 +34,10 @@ let plotOptions = {
   yaxes: [
     {
       position: "left",
-      axisLabel : "position (pixels)",
+      axisLabel : "Velocity (m/s)",
       autoScale : "none",
       min : 0,
-      max : 500,
+      max : 60,
       font : axisFont,
     },
   ],
@@ -50,7 +50,7 @@ let data = [[
 ]];
 
 // Finally, we create a global variable called "Plot" with the specified data and options.
-let Plot = $.plot(
+let Plot = $.plot( //$for Jquery variable0
   $("#plot"),
   data,
   plotOptions
