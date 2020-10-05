@@ -5,8 +5,8 @@ var mspc = 1; //ms per calculation
 var d_t = mspc/1000;
 var Cd = 0.5;
 var A = 0.147;
-var mass = 5;
-var max_t = 5;
+var M = 0.75;
+var max_t = 8;
 
 
 var acceleration = 0;
@@ -30,7 +30,7 @@ function Drag()
 //Return: acceleration
 function acc()
 {
-    acceleration =  (g-Drag()/mass);
+    acceleration =  (g-Drag()/M);
     return acceleration;
 }
 
@@ -53,4 +53,28 @@ function VT()
         time = time + mspc;
     }
     
+}
+
+function initValue()
+{
+    Cd = document.getElementById("dragCoeff").value;
+    A = document.getElementById("area").value;
+    M = document.getElementById("mass").value;
+
+    acceleration = 0;
+    velocity = 0;
+    height = 400;
+    VTdict[0] = velocity;
+    VHdict[0] = height;
+
+    updateData();
+
+}
+
+function updateData()
+{
+    document.getElementById("GForce").innerHTML = (g * M).toFixed(3);
+    document.getElementById("HVelocity").innerHTML = VTdict[elapsed].toFixed(3);
+    document.getElementById("HHeight").innerHTML = VHdict[elapsed].toFixed(3);
+    document.getElementById("HAcceleration").innerHTML = ((VTdict[elapsed]-VTdict[elapsed-1])/0.001).toFixed(3);
 }

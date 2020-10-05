@@ -19,7 +19,7 @@ let plotOptions = {
       autoScale : "none",
       axisLabel : "time (s)",
       min: 0,
-      max: 5
+      max: 8
     },
     { 
       position: "top",
