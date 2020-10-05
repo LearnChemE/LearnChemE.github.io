@@ -22,11 +22,10 @@ function updateGraph(array) {
 
 // This function is called once every animation frame.
 function animationFunction() {
-  yPosition++; // Increment the ball position by 1
   index++; // Increment our arbitrary "index" variable by 1
-  graphData.push([elapsed / 1000, yPosition]); // Add new data to the "graphData" variable 
+  graphData.push([elapsed / 1000, VTdict[elapsed]]); // Add new data to the "graphData" variable 
   updateGraph(graphData);
-  ball.style.top = `${yPosition}px`; // Change the css property "top" of the ball to make it move
+  ball.style.top = `${200-VHdict[elapsed]}px`; // Change the css property "top" of the ball to make it move
 }
 
 // This is an implementation based on https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
@@ -39,7 +38,7 @@ function step() {
   if (elapsed < 5000 && isRunning) { // Stop the animation after 5 seconds
     window.requestAnimationFrame(step);
   } else {
-    isRunning = false
+    isRunning = false;
     window.cancelAnimationFrame(step);
   }
 }
@@ -47,6 +46,10 @@ function step() {
 // This is the function that is called when you click the "start" button
 // We do not want it to be called if the simulation is already running, hence the "isRunning" variable
 function startAnimation() {
+
+  VT();
+  console.log("VT gened");
+
   if (!isRunning) {
     isRunning = true;
     index = 0;
