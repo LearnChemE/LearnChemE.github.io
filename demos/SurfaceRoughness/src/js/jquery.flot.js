@@ -307,8 +307,9 @@ don't work unless the canvas is attached to the DOM.
             if (text.indexOf('<br>') !== -1) {
                 addTspanElements(text, element, -9999);
             } else {
-                var textNode = document.createTextNode(text);
-                element.appendChild(textNode);
+                // var textNode = document.createTextNode(text);
+                // element.appendChild(textNode);
+                element.innerHTML = text;
             }
 
             element.style.position = 'absolute';
@@ -404,7 +405,7 @@ don't work unless the canvas is attached to the DOM.
                     y -= 0.25 * info.height;
                     addTspanElements(text, position.element, x);
                 } else {
-                    position.element.textContent = text;
+                    position.element.innerHTML = text;
                 }
                 position.element.setAttributeNS(null, 'x', x);
                 position.element.setAttributeNS(null, 'y', y);
@@ -437,7 +438,7 @@ don't work unless the canvas is attached to the DOM.
             y -= 0.25 * info.height;
             addTspanElements(text, position.element, x);
         } else {
-            position.element.textContent = text;
+            position.element.innerHTML = text;
         }
 
         // Move the element to its final position within the container
@@ -459,7 +460,7 @@ don't work unless the canvas is attached to the DOM.
             } else {
                 tspan = element.childNodes[i];
             }
-            tspan.textContent = lines[i];
+            tspan.innerHTML = lines[i];
             offset = (i === 0 ? 0 : 1) + 'em';
             tspan.setAttributeNS(null, 'dy', offset);
             tspan.setAttributeNS(null, 'x', x);

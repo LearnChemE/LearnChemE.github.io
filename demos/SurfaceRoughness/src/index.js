@@ -3,15 +3,15 @@ require("./style/style.scss");
 window.jQuery = require("jquery");
 window.$ = window.jQuery;
 require("./js/jquery.flot.js");
+require("./js/dragCoeffs.js");
 require("./js/initializePlot.js");
-const { dragCoeff, dragCoeffs } = require("./js/dragCoeffs.js");
 require("./js/calcs.js");
 require("./js/loop.js");
 
 const select = document.getElementById("select-ball");
-for ( let i = 0; i < Object.keys(dragCoeffs).length; i++ ) {
+for ( let i = 0; i < Object.keys(window.dragCoeffs).length; i++ ) {
   const option = document.createElement("option");
-  option.innerText = Object.keys(dragCoeffs)[i];
+  option.innerText = Object.keys(window.dragCoeffs)[i];
   option.value = String(i);
   select.appendChild(option);
 }

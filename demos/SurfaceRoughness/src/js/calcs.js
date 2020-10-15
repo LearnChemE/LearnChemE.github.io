@@ -1,4 +1,4 @@
-const { dragCoeff, dragCoeffs } = require("./dragCoeffs");
+const dragCoeff = require("./dragCoeffs");
 
 window.parameterLabels = {
   velocity : document.getElementById("velocity"),
@@ -32,7 +32,7 @@ window.ballObj = {
     this.vx = this.v * Math.cos( this.theta );
     this.vy = this.v * Math.sin( this.theta );
   },
-  roughnesses : Object.keys(dragCoeffs),
+  roughnesses : Object.keys(window.dragCoeffs),
   roughness : "golf ball",
   updateRe : function() { // Reynolds number
     this.Re = ( this.v * this.D / window.airObj.nu );

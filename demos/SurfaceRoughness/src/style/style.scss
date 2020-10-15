@@ -17,12 +17,12 @@
 #graphics-area {
   display: grid;
   grid-template-columns: 500px 200px;
-  grid-template-rows: 400px;
+  grid-template-rows: 300px 300px;
   gap: 1rem;
   margin-left: 1rem;
 
   #parameters {
-    height: 350px;
+    height: 250px;
     border: 1px solid black;
     padding: 1rem;
     font-size: 1.2rem;
@@ -45,4 +45,17 @@
 
     }
   }
+}
+
+// k 1 = k/d = 1250 × 10 −5 , k 2 = 500 × 10 −5 , k 3 = 150 × 10 −5
+
+#roughnessPlot {
+  width: 500px;
+  height: 336px;
+}
+
+#roughnessImg {
+  position: absolute;
+  top: 392px;
+  left: 38px;
 }

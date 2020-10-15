@@ -9,9 +9,9 @@ let elapsed = now - start;
 let index = 0;
 
 function updateGraph(array) {
-  Plot.setData([array]);
-  Plot.setupGrid(true);
-  Plot.draw();
+  window.positionPlot.setData([array]);
+  window.positionPlot.setupGrid(true);
+  window.positionPlot.draw();
 }
 
 function animationFunction() {
@@ -19,8 +19,8 @@ function animationFunction() {
   ball.update(dt);
   ball.updateDOM();
   if( ball.y < 0 ) { isRunning = false }
-  window.graphData.push([ball.x, ball.y]); 
-  updateGraph(window.graphData);
+  window.positionPlotData.push([ball.x, ball.y]); 
+  updateGraph(window.positionPlotData);
 }
 
 function step() {
