@@ -1,33 +1,135 @@
-<!-- This simulation is on the topic of drag force.--> 
-<!-- This is the first file created by Mingyuan Lu for this project.--> 
-<!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta id="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drag force in freefall</title>
-    <link rel="icon" type="image/png" href="https://LearnChemE.github.io/resources/siteicon.png">
-    
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML&delayStartupUntil=configured" async></script>        
-    <script type="text/javascript" src="../js/main.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulation Template</title>
 
+  <!-- The flot library requires jquery version 1 (I know, it's very old) -->
+  <script src="../js/jquery.js"></script>
+  
+  <!-- Flot library for plotting stuff http://www.flotcharts.org/ -->
+  <script src="../js/jquery.flot.js"></script>
+  
+  <!-- Included bootstrap css to make my button look nice -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  
+  <!-- Main style sheet -->
+  <link rel="stylesheet" href="../js/style.css">
 </head>
+<body>
 
-<body onresize="resize()">
-    <div id="nav">
-        <div id="directions" class="buttonMed">Directions</div>
-        <div id="about" class="buttonMed">About</div>
+  <div class = "row " style="height: 60px">
+    <div class = "col-2" >
+  
+      <div id="dir" class="btn btn-primary">Directions</div>
     </div>
-    <div id="main">
-        <div id="canvas0" style="z-index: 0">
-            <div id="modify"></div>
-            <div id="fall" style="z-index: 1"></div>
-            <div id="vtdiagram" style="z-index: 1"></div>
-            <div id="data" style="z-index: 1"></div>
+      <div class = "col-2" >
+      <div id="detail" class="btn btn-primary">Details</div>
+      </div>
+      <div class = "col-2" >
+      <div id="about" class="btn btn-primary">About</div>
+      </div>
+    </div>
+  
+  </div>
+
+  <div class = "row" > <!-- Value_in Area -->
+  
+    <div class = "col-3">
+      <div class="form-group row">
+
+				<label class="col-6 col-form-label" for="Drag Coefficient">Drag Coefficient</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" id="dragCoeff"  value="0.5">
         </div>
+      </div>
     </div>
-</body>
 
+    <div class = "col-3">
+      <div class="form-group row">  
+        <label class="col-6 col-form-label" for="Mass">Mass (kg)</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control"  id="mass"  value="0.75">
+        </div>
+      </div>
+    </div>  
+    
+
+    <div class = "col-3">
+      <div class="form-group row">
+        <label class="col-6 col-form-label" for="A ">Cross-Sectional Area (m<sup>2</sup>) </label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control"  id="area"  value="0.147">
+        </div>
+      </div>
+    </div>  
+
+    <div class = "col-3">
+      <div id="start-button" class="btn btn-primary">Start</div>
+      <div id="stop-button" class="btn btn-primary" onclick ="stopAnimation()" >Stop</div>
+
+    </div>
+
+  </div>
+
+  <div class = "row" style="height: 20px"></div>
+
+
+  <div class = "row" >
+
+    <div class = "col-3" style="width: 200px" > <!-- Animation Area -->
+       <div id="canvas">
+            <img src="../img/ball.png" id="ball" />
+            <img src="../img/tower.png" id = "tower" />
+        </div>
+    </div>  
+
+    <div class = "col-600px"><!-- Animation Area -->
+      <div id="plot"></div>
+    </div>
+
+    
+            
+    <div class = "col-2"><!-- Data Area -->
+        <table>
+          <tr>
+            <td>Force of Gravity (N): </td>
+            <td id="GForce"></td>
+          </tr>
+          <tr>
+            <td>Velocity (m/s): </td>
+            <td id="HVelocity"></td>
+          </tr>
+          <tr>
+            <td>Height (m): </td>
+            <td id="HHeight"></td>
+          </tr>
+          <tr>
+            <td>Acceleration (m/s<sup>2</sup>): </td>
+            <td id="HAcceleration"></td>
+          </tr>
+
+          <tr>
+            <td>Drag Force (N): </td>
+            <td id="HDrag"></td>
+          </tr>
+
+        </table>
+
+
+</div>
+
+
+         
+
+          <!-- This div gets filled with content automatically by the Flot library. See initializePlot.js for more info. -->
+          
+
+          <script src="../js/initializePlot.js"></script>
+          <script src="../js/main.js"></script>
+          <script src="../js/calculation.js"></script>
+      
+  </div>
+
+</body>
 </html>

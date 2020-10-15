@@ -24,9 +24,10 @@ function updateGraph(array) {
 function animationFunction() {
   index++; // Increment our arbitrary "index" variable by 1
   graphData.push([elapsed / 1000, VTdict[elapsed]]); // Add new data to the "graphData" variable 
-  updateData();
+  if(elapsed<=max_t)
+  {updateData();}
   updateGraph(graphData);
-  ball.style.top = `${400-VHdict[elapsed]}px`; // Change the css property "top" of the ball to make it move
+  ball.style.top = `${400-HTdict[elapsed]}px`; // Change the css property "top" of the ball to make it move
 }
 
 // This is an implementation based on https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
@@ -36,7 +37,7 @@ function step() {
   elapsed = now - start;
   animationFunction();
 
-  if (elapsed < 8000 && isRunning) { // Stop the animation after 5 seconds
+  if (elapsed < max_t && isRunning) { // Stop the animation after 5 seconds
     window.requestAnimationFrame(step);
   } else {
     isRunning = false;
@@ -48,17 +49,27 @@ function step() {
 // We do not want it to be called if the simulation is already running, hence the "isRunning" variable
 function startAnimation() {
   
-  initValue();
-  VT();
-
   if (!isRunning) {
-
+    initValue();
+    VT();
     isRunning = true;
     index = 0;
     graphData = [[0, 0]];
     start = Date.now();
     yPosition = 0;
     window.requestAnimationFrame(step);
+  }
+  
+
+
+}
+
+function stopAnimation()
+{
+if(isRunning)
+  {
+    window.cancelAnimationFrame(step);
+    isRunning = false;
   }
 }
 

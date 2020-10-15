@@ -6,23 +6,25 @@ var d_t = mspc/1000;
 var Cd = 0.5;
 var A = 0.147;
 var M = 0.75;
-var max_t = 8;
+var max_t = 8000;
 
 
 var acceleration = 0;
 var velocity = 0;
 var height = 200; 
+var dragForce = 0;
 
 let VTdict = {};
-let VHdict = {};
+let HTdict = {};
+let FTdict = {};
 
 //Drag force function
 //Input: Drag Coefficient, Velocity,Area
 //Return: magnitude of force
 function Drag()
 {
-    var F = Cd*rho_air*velocity*velocity*A/2;
-    return F;
+    dragForce = Cd*rho_air*velocity*velocity*A/2;
+    return dragForce;
 }
 
 //The acc function 
@@ -46,10 +48,11 @@ function V()
 function VT()
 {
     var time = 0; // time of falling
-    while((height >= 0) && (time <= max_t*1000)) //Max time 10 secs
+    while((height >= 0) && (time <= max_t)) //Max time 10 secs
     {
         VTdict[time] = V();
-        VHdict[time] = height;
+        HTdict[time] = height;
+        FTdict[time] = dragForce;
         time = time + mspc;
     }
     
@@ -65,7 +68,12 @@ function initValue()
     velocity = 0;
     height = 400;
     VTdict[0] = velocity;
-    VHdict[0] = height;
+    HTdict[0] = height;
+    FTdict[0] = Drag();
+
+    start = Date.now(); // This is the time value when the animation starts - it is updated once when the animation begins
+    now = Date.now();
+    elapsed = now - start;
 
     updateData();
 
@@ -73,8 +81,10 @@ function initValue()
 
 function updateData()
 {
-    document.getElementById("GForce").innerHTML = (g * M).toFixed(3);
-    document.getElementById("HVelocity").innerHTML = VTdict[elapsed].toFixed(3);
-    document.getElementById("HHeight").innerHTML = VHdict[elapsed].toFixed(3);
+    document.getElementById("GForce").innerHTML = (g * M).toFixed(2);
+    document.getElementById("HVelocity").innerHTML = VTdict[elapsed].toFixed(1);
+    document.getElementById("HHeight").innerHTML = HTdict[elapsed].toFixed(0);
     document.getElementById("HAcceleration").innerHTML = ((VTdict[elapsed]-VTdict[elapsed-1])/0.001).toFixed(3);
+    document.getElementById("HDrag").innerHTML = FTdict[elapsed].toFixed(2);
+
 }
