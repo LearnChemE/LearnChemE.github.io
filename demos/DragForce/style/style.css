@@ -1,0 +1,84 @@
+#canvas {
+  width : 200px;
+  height : 400px;
+}
+
+#ball {
+  position : relative;
+  top : 0px;
+  left : 50px;
+  width : 50px;
+  height : 50px;
+}
+
+#plot {
+  width : 500px;
+  height : 400px;
+}
+
+#tower{
+  position : relative;
+  left : 100px;
+  width : 200px;
+  height : 400px;
+}
+
+#app {
+  width: 800px;
+}
+
+/* INPUT/BUTTONS AREA */
+#controls-area {
+  display: grid;
+  grid-template-columns: 100%;
+  width: 100%;
+}
+
+/* TOP ROW */
+
+#top-controls-row {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  align-items: center;
+  justify-items: center;
+  gap: 20px;
+  margin: 20px;
+}
+
+#modal-buttons {
+  grid-column: 1;
+}
+
+#other-buttons {
+  grid-column: 2;
+}
+
+#modal-buttons .btn, #other-buttons .btn {
+  margin: 0rem 0.5rem;
+  width: 12ch;
+}
+
+/* BOTTOM ROW */
+
+#bottom-controls-row {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 20px;
+  margin: 0rem 0rem 2rem 2rem;
+}
+
+.input-group {
+  
+}
+
+.input-group>label {
+  
+}
+
+.input-group>input[type="text"] {
+  width: 8ch;
+}
+
+.input-group>input[type="range"] {
+
+}

@@ -1,96 +1,93 @@
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulation Template</title>
+  <title>Drag Force Simulation</title>
 
-  <!-- The flot library requires jquery version 1 (I know, it's very old) -->
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="../style/bootstrap.min.css">
+
+  <!-- Main style sheet -->
+  <link rel="stylesheet" href="../style/style.css">
+
+  <!-- Bootstrap dependencies -->
+  <script src="../js/popper.js"></script>
   <script src="../js/jquery.js"></script>
-  
+
+  <!-- Bootstrap JS -->
+  <script src="../js/bootstrap.min.js"></script>
+
   <!-- Flot library for plotting stuff http://www.flotcharts.org/ -->
   <script src="../js/jquery.flot.js"></script>
-  
-  <!-- Included bootstrap css to make my button look nice -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  
-  <!-- Main style sheet -->
-  <link rel="stylesheet" href="../js/style.css">
 </head>
+
 <body>
 
-  <div class = "row " style="height: 60px">
-    <div class = "col-2" >
+  <div id="app">
+
+    <div id="controls-area">
+
+      <div id="top-controls-row">
+        <div id="modal-buttons">
+          <div id="dir" class="btn btn-primary" data-toggle="modal" data-target="#directionsModal">Directions</div>
+          <div id="detail" class="btn btn-primary" data-toggle="modal" data-target="#detailsModal">Details</div>
+          <div id="about" class="btn btn-primary" data-toggle="modal" data-target="#aboutModal">About</div>
+        </div>
+
+        <div id="other-buttons">
+          <div id="start-button" class="btn btn-success">Start</div>
+          <div id="stop-button" class="btn btn-danger" onclick="stopAnimation()">Stop</div>
+        </div>
+      </div>
+
+      <div id="bottom-controls-row">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">Drag Coefficient</span>
+          </div>
+          <input type="text" class="form-control" id="dragCoeff" value="0.5">
+        </div>
+
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">Mass (kg)</span>
+          </div>
+          <input type="text" class="form-control" id="mass" value="0.75">
+        </div>
+
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">Cross-Sectional Area (m<sup>2</sup>) </span>
+          </div>
+          <input type="text" class="form-control" id="area" value="0.147">
+        </div>
+
+      </div>
+
+    </div>
+       
+    <div class="row">
   
-      <div id="dir" class="btn btn-primary">Directions</div>
-    </div>
-      <div class = "col-2" >
-      <div id="detail" class="btn btn-primary">Details</div>
+      <div class="col-3" style="width: 200px">
+        
+        <!-- Animation Area -->
+        <div id="canvas">
+          <img src="../img/ball.png" id="ball" />
+          <img src="../img/tower.png" id="tower" />
+        </div>
+
       </div>
-      <div class = "col-2" >
-      <div id="about" class="btn btn-primary">About</div>
-      </div>
-    </div>
   
-  </div>
-
-  <div class = "row" > <!-- Value_in Area -->
+      <div class="col-600px">
+        <!-- Plot Area -->
+        <div id="plot"></div>
+      </div>
   
-    <div class = "col-3">
-      <div class="form-group row">
-
-				<label class="col-6 col-form-label" for="Drag Coefficient">Drag Coefficient</label>
-				<div class="col-sm-4">
-					<input type="text" class="form-control" id="dragCoeff"  value="0.5">
-        </div>
-      </div>
-    </div>
-
-    <div class = "col-3">
-      <div class="form-group row">  
-        <label class="col-6 col-form-label" for="Mass">Mass (kg)</label>
-				<div class="col-sm-4">
-					<input type="text" class="form-control"  id="mass"  value="0.75">
-        </div>
-      </div>
-    </div>  
-    
-
-    <div class = "col-3">
-      <div class="form-group row">
-        <label class="col-6 col-form-label" for="A ">Cross-Sectional Area (m<sup>2</sup>) </label>
-				<div class="col-sm-4">
-					<input type="text" class="form-control"  id="area"  value="0.147">
-        </div>
-      </div>
-    </div>  
-
-    <div class = "col-3">
-      <div id="start-button" class="btn btn-primary">Start</div>
-      <div id="stop-button" class="btn btn-primary" onclick ="stopAnimation()" >Stop</div>
-
-    </div>
-
-  </div>
-
-  <div class = "row" style="height: 20px"></div>
-
-
-  <div class = "row" >
-
-    <div class = "col-3" style="width: 200px" > <!-- Animation Area -->
-       <div id="canvas">
-            <img src="../img/ball.png" id="ball" />
-            <img src="../img/tower.png" id = "tower" />
-        </div>
-    </div>  
-
-    <div class = "col-600px"><!-- Animation Area -->
-      <div id="plot"></div>
-    </div>
-
-    
-            
-    <div class = "col-2"><!-- Data Area -->
+  
+  
+      <div class="col-2">
+        <!-- Data Area -->
         <table>
           <tr>
             <td>Force of Gravity (N): </td>
@@ -108,28 +105,74 @@
             <td>Acceleration (m/s<sup>2</sup>): </td>
             <td id="HAcceleration"></td>
           </tr>
-
+  
           <tr>
             <td>Drag Force (N): </td>
             <td id="HDrag"></td>
           </tr>
-
+  
         </table>
+  
+  
+      </div>
+  
+    </div>
 
-
-</div>
-
-
-         
-
-          <!-- This div gets filled with content automatically by the Flot library. See initializePlot.js for more info. -->
-          
-
-          <script src="../js/initializePlot.js"></script>
-          <script src="../js/main.js"></script>
-          <script src="../js/calculation.js"></script>
-      
   </div>
 
+  <!-- Modals -->
+  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          ...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          ...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="aboutModalLabel">About</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          ...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/initializePlot.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/calculation.js"></script>
+
 </body>
+
 </html>
