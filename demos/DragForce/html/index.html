@@ -20,6 +20,9 @@
 
   <!-- Flot library for plotting stuff http://www.flotcharts.org/ -->
   <script src="../js/jquery.flot.js"></script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
 <body>
@@ -63,6 +66,13 @@
           <input type="text" class="form-control" id="area" value="0.147">
         </div>
 
+      </div>
+
+      <div id="third-controls-row">
+        <select id="object-selection">
+          <option value="1">Object 1</option>
+          <option value="2">Object 2</option>
+        </select>
       </div>
 
     </div>
@@ -131,7 +141,12 @@
           </button>
         </div>
         <div class="modal-body">
-          ...
+          <!-- Block structure -->
+          $$
+            \Phi = 1
+          $$
+          <!-- Inline structure -->
+          \( \frac{1}{2} \)
         </div>
       </div>
     </div>
