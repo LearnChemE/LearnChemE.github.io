@@ -45,9 +45,18 @@
       </div>
 
       <div id="bottom-controls-row">
+
+        
+        <select id="object-selection">
+          <option value="1">Soccer ball</option>
+          <option value="2">Parachutist</option>
+          <option Value="-1">Custom</option>
+        </select>
+        
+
         <div class="input-group">
           <div class="input-group-prepend">
-            <span class="input-group-text">Drag Coefficient</span>
+            <span class="input-group-text ">Drag Coefficient</span>
           </div>
           <input type="text" class="form-control" id="dragCoeff" value="0.5">
         </div>
@@ -68,22 +77,17 @@
 
       </div>
 
-      <div id="third-controls-row">
-        <select id="object-selection">
-          <option value="1">Object 1</option>
-          <option value="2">Object 2</option>
-        </select>
-      </div>
+      
 
     </div>
        
     <div class="row">
   
-      <div class="col-3" style="width: 200px">
+      <div class="col-3" style="width: 800px">
         
         <!-- Animation Area -->
         <div id="canvas">
-          <img src="../img/ball.png" id="ball" />
+          <img src="../img/ball.png" id="objImage" />
           <img src="../img/tower.png" id="tower" />
         </div>
 
@@ -142,11 +146,20 @@
         </div>
         <div class="modal-body">
           <!-- Block structure -->
-          $$
+          <!-- $$
             \Phi = 1
-          $$
+          $$ -->
           <!-- Inline structure -->
-          \( \frac{1}{2} \)
+          <!-- \( \frac{1}{2} \) -->
+
+           <p>Choose objects for simulation through the dropdown menu. For custom object, select "custom"
+           and then enter the physical properties. </p>
+          
+           <p>Press "Start" button to start the animation. </p>
+
+           <p>Press "Stop" to interrupt the animation. Beware that the animation can't be resumed once interrupted.</p>
+          
+           
         </div>
       </div>
     </div>
@@ -162,7 +175,16 @@
           </button>
         </div>
         <div class="modal-body">
-          ...
+          <p><b>On calculation</b></p>
+          <p>The equation for drag force calculation is:
+            $$F = \frac{C_D \rho V^2 A}{2}$$
+            Where \( C_D \) is the drag coefficient. \( \rho \) is the desity of 
+            surrounding fluid, which is air in our case. \( A \) is the cross-sectional 
+            area of the object.
+          </p>
+
+          <p><b>On object</b></p>
+          <p>The parachutist weights 174 kg with parachute. The parachute has a diameter of 35 feet (11m).  </p>
         </div>
       </div>
     </div>
@@ -187,6 +209,7 @@
   <script src="../js/initializePlot.js"></script>
   <script src="../js/main.js"></script>
   <script src="../js/calculation.js"></script>
+  <script src="../js/objdata.js"></script>
 
 </body>
 
