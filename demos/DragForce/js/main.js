@@ -3,6 +3,7 @@
 // These are some elements you can find in "index.html"
 const ball = document.getElementById("ball");
 const startButton = document.getElementById("start-button");
+const selection = document.getElementById("object-selection");
 
 let yPosition = 0; // Initial position of the ball
 let isRunning = false; // Animation is initially not running
@@ -73,5 +74,22 @@ if(isRunning)
   }
 }
 
+function updateInput()
+{
+    if(selection.value != -1)
+    {
+        document.getElementById("dragCoeff").value = obj[selection.value]["Cd"];
+        document.getElementById("area").value= obj[selection.value]["A"];
+        document.getElementById("mass").value= obj[selection.value]["M"];
+        document.getElementById("objImage").scr = obj[selection.value]["src"];
+    }
+    if(selection.value == -1)
+    {
+        log("something");
+    }
+
+}
+
 // Instruct the start button to call the startAnimation() function when we click it
 startButton.addEventListener("click", startAnimation);
+selection.addEventListener("change", updateInput);

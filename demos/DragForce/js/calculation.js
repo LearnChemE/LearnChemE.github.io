@@ -88,3 +88,4 @@ function updateData()
     document.getElementById("HDrag").innerHTML = FTdict[elapsed].toFixed(2);
 
 }
+
