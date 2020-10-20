@@ -18,7 +18,7 @@ for (let i = 0; i < topics.length; i++) {
   accordion.classList.add("screencasts-accordion");
   list.appendChild(accordion);
   
-  const subtopics = Object.keys(data[topic]);
+  const subtopics = Object.keys(window.screencasts_json[topic]);
   
   for ( let j = 0; j < subtopics.length; j++ ) {
     
@@ -46,7 +46,7 @@ for (let i = 0; i < topics.length; i++) {
     const screencastsList = document.createElement("ul");
     dropdownListWrapper.appendChild(screencastsList);
     
-    const videos = data[topic][subtopic];
+    const videos = window.screencasts_json[topic][subtopic];
     
     for ( let k = 0; k < videos.length; k++ ) {
       const video = videos[k];
