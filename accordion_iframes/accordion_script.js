@@ -44,6 +44,7 @@ for (let i = 0; i < topics.length; i++) {
     dropdown.appendChild(dropdownListWrapper);
     
     const screencastsList = document.createElement("ul");
+    screencastsList.setAttribute("toggle-state", "closed");
     dropdownListWrapper.appendChild(screencastsList);
     
     const videos = window.screencasts_json[topic][subtopic];
@@ -61,11 +62,16 @@ for (let i = 0; i < topics.length; i++) {
       li.appendChild(anchor);
     }
 
+    const margin = 30;
+    const height = Number(screencastsList.getBoundingClientRect().height) + margin;
+
     dropdownTitle.addEventListener("click", function() {
-    if( dropdownListWrapper.style.display !== "block" ) {
-      dropdownListWrapper.style.display = "block";
+    if( screencastsList.getAttribute("toggle-state") == "closed" ) {
+      screencastsList.setAttribute("toggle-state", "open");
+      dropdownListWrapper.style.height = `${height}px`;
     } else {
-      dropdownListWrapper.style.display = "none";
+      screencastsList.setAttribute("toggle-state", "closed");
+      dropdownListWrapper.style.height = "0px";
     }
   });
   }

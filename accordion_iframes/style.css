@@ -35,7 +35,12 @@
 }
 
 .screencasts-dropdown-list-wrapper {
-	display: none;
+	display: block;
+	height: 0px;
+	overflow: hidden;
+	transition-property: height;
+	transition-timing-function: ease-in-out;
+	transition-duration: 0.5s;
 	padding-top: 0rem;
 	padding-bottom: 0rem;
 }
