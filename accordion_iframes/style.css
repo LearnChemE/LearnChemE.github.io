@@ -1,6 +1,9 @@
+:root {
+	font-family: Arial, sans-serif;
+}
+
 #screencasts-list {
 	width: 100%;
-	font-family: sans-serif;
 }
 
 .screencasts-topic-header {
@@ -14,7 +17,8 @@
 }
 
 .screencasts-dropdown {
-	margin-bottom: 0.1rem;
+	margin-bottom: 1px;
+	min-height: 24px;
 	font-size: 0.9rem;
 }
 
@@ -42,12 +46,20 @@
 	transition-timing-function: ease-in-out;
 	transition-duration: 0.5s;
 	padding-top: 0rem;
-	padding-bottom: 0rem;
+	margin-bottom: 0.25;
+}
+
+.screencasts-dropdown-list-wrapper ul {
+	height: max-content;
+	line-height: 1.2rem;
+}
+
+.screencasts-dropdown-list-wrapper li {
+
 }
 
 .up-down-arrow {
 	float: right;
-	font-family: sans-serif;
 	font-size: 1.25rem;
 	font-weight: 100;
 	text-shadow: 0px 0px 1px white;
