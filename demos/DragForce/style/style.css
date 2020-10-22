@@ -6,6 +6,7 @@
   display: grid;
   grid-template-columns: 100%;
   width: 100%;
+  margin-bottom: 1rem;
 }
 
 #top-controls-row {
@@ -44,6 +45,10 @@ select {
   gap: 1ch;
 }
 
+#input-variables {
+  gap: 1px;
+}
+
 #input-variables .data-row {
   grid-template-columns: 20ch min-content 5ch;
   font-size: 0.9rem;
@@ -69,6 +74,10 @@ input[type="text"].form-control {
   font-size: 1em;
 }
 
+input[type="text"].form-control:focus {
+  box-shadow: 0 0 0 0.1rem rgba(0,123,255,.25)
+}
+
 #modal-buttons {
   grid-column: 1;
 }
@@ -90,7 +99,11 @@ input[type="text"].form-control {
 }
 
 #object-fall-area {
-  height: min-content;  
+  height: min-content;
+}
+
+#object-fall-area img {
+  vertical-align: top;
 }
 
 #tower {
@@ -104,7 +117,8 @@ input[type="text"].form-control {
   top : 0px;
   left : 50px;
   width : 40px;
-  height :40px;
+  height : 40px;
+  transform : translateY(-50%);
 }
 
 #plot {
