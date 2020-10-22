@@ -36,7 +36,7 @@ function updateAxes() {
   const maxXAxis = Math.ceil(fallTime);
   const maxYAxis = Math.ceil(max_velocity);
   Plot.getOptions().xaxes[0].max = maxXAxis;
-  Plot.getOptions().yaxes[0].max = Number( 20 + maxYAxis - maxYAxis % 20); // sets y axis to max velocity in increments of 20
+  Plot.getOptions().yaxes[0].max = Number( 10 + maxYAxis - ( maxYAxis % 10 ) ); // sets y axis to max velocity in increments of 10
   Plot.setupGrid();
   Plot.draw();
 }
