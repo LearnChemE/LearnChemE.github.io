@@ -46,7 +46,6 @@ function animationFunction() {
   graphData.push([elapsed / 1000, velocity]); // Add new data to the "graphData" variable
   updateDOM();
   updateGraph(graphData);
-  objImage.style.top = `${ (fall_height - height) * ( tower_image_size / fall_height ) }px`; // Change the css property "top" of the objImage to make it move
 }
 
 // This is an implementation based on https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
@@ -85,7 +84,6 @@ function startPauseAnimation() {
     updateAxes();
     isRunning = true;
     index = 0;
-    graphData = [[0, 0]];
     start = Date.now();
     yPosition = 0;
     window.requestAnimationFrame(step);
@@ -113,7 +111,9 @@ function resetAnimation() {
   graphData = [[0, 0]];
   fallTime = 10;
   startPauseButton.innerHTML = "Start"
+  graphData = [[0, 0]];
   updateAxes();
+  updateGraph(graphData);
 }
 
 function updateInput()

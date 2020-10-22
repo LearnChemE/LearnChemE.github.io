@@ -21,7 +21,6 @@ function advance()
     velocity = velocity + dt*acceleration;
     height = height - dt*velocity;
     time += dt;
-    return velocity;
 }
 
 function VT() // calculates the total time it will take to fall and sets the global variable "fallTime" to that value.
@@ -69,4 +68,5 @@ function updateDOM()
     document.getElementById("HVelocity").innerHTML = Math.round(velocity);
     document.getElementById("HHeight").innerHTML = Math.abs(Number(height).toFixed(0));
     document.getElementById("HAcceleration").innerHTML = Number(acceleration).toFixed(1);
+    objImage.style.top = `${ (fall_height - height) * ( tower_image_size / fall_height ) }px`;
 }
