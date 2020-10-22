@@ -30,6 +30,11 @@ for (let i = 0; i < topics.length; i++) {
     
     const dropdownTitle = document.createElement("div");
     dropdownTitle.classList.add("screencasts-dropdown-title");
+
+    const upDownArrow = document.createElement("div");
+    upDownArrow.innerHTML = "^";
+    upDownArrow.classList.add("up-down-arrow");
+    dropdown.appendChild(upDownArrow);
     
     if (subtopic == "blank") {
       dropdownTitle.innerHTML = "Other Screencasts";
@@ -68,9 +73,11 @@ for (let i = 0; i < topics.length; i++) {
     dropdownTitle.addEventListener("click", function() {
     if( screencastsList.getAttribute("toggle-state") == "closed" ) {
       screencastsList.setAttribute("toggle-state", "open");
+      upDownArrow.style.transform = "rotate(0deg)";
       dropdownListWrapper.style.height = `${height}px`;
     } else {
       screencastsList.setAttribute("toggle-state", "closed");
+      upDownArrow.style.transform = "rotate(180deg)";
       dropdownListWrapper.style.height = "0px";
     }
   });

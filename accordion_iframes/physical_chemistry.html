@@ -5,83 +5,11 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  
   <div id="screencasts-list"></div>
   <script>
-  const list = document.getElementById("screencasts-list");
-  const data = {"blank":{"Physical Chemistry":[{"title":"Degeneracy","description":"Discusses degeneracy which is usually related to the presence of symmetry in a system. Example uses a particle in a 2-D \"square\" box.","duration":"Sat Dec 30 1899 03:49:00 GMT-0700 (Mountain Standard Time)","url":"https://www.youtube.com/watch?v=nSxngN_UCC0&list=PL4xAk5aclnUgmmVCVhlFKOs_dUR1z3CZ4&index=5"},{"title":"Eigenvalues and Eigenfunctions","description":"Determine whether or not the given functions are eigenfunctions of the operator d/dx.","duration":"Sat Dec 30 1899 03:09:00 GMT-0700 (Mountain Standard Time)","url":"https://www.youtube.com/watch?v=-e-ocwZLB9Y&list=PL4xAk5aclnUgmmVCVhlFKOs_dUR1z3CZ4&index=1"},{"title":"Harmonic Oscillator","description":"Determine allowed energies and wave function for a particle undergoing harmonic motion.","duration":"Sat Dec 30 1899 06:05:00 GMT-0700 (Mountain Standard Time)","url":"https://www.youtube.com/watch?v=sXjp3OsSZ84&index=6&list=PL4xAk5aclnUgmmVCVhlFKOs_dUR1z3CZ4"},{"title":"Normalizing a Wavefunction","description":"Determine the normalization factor \"A\" for the wave function psi(x) = A*sin(n*pi*x/L).","duration":"Sat Dec 30 1899 03:51:00 GMT-0700 (Mountain Standard Time)","url":"https://www.youtube.com/watch?v=X5kdO-Q4VXg&index=3&list=PL4xAk5aclnUgmmVCVhlFKOs_dUR1z3CZ4"},{"title":"Particle in a Box","description":"Determine the allowed energies and solve for the wave function for a particle in  a 1-D box.","duration":"Sat Dec 30 1899 05:10:00 GMT-0700 (Mountain Standard Time)","url":"https://www.youtube.com/watch?v=rsksuELLNmk&list=PL4xAk5aclnUgmmVCVhlFKOs_dUR1z3CZ4&index=2"},{"title":"Separation of Variables","description":"Determine the wave function ad allowed energy levels for a particle in a 2-D box.","duration":"Sat Dec 30 1899 06:01:00 GMT-0700 (Mountain Standard Time)","url":"https://www.youtube.com/watch?v=AYRuPNK6WNM&index=4&list=PL4xAk5aclnUgmmVCVhlFKOs_dUR1z3CZ4"}]}};
-  const topics = Object.keys(data);
-  for (let i = 0; i < topics.length; i++) {
-    const topic = topics[i];
-    const topicHeader = document.createElement("div");
-    topicHeader.classList.add("screencasts-topic-header");
-    
-    if(topic == "blank") {
-      topicHeader.innerHTML = "";
-      topicHeader.style.display = "none";
-    } else {
-      topicHeader.innerHTML = topic; 
-    }
-
-    list.appendChild(topicHeader);
-    
-    const accordion = document.createElement("div");
-    accordion.classList.add("screencasts-accordion");
-    list.appendChild(accordion);
-    
-    const subtopics = Object.keys(data[topic]);
-    
-    for ( let j = 0; j < subtopics.length; j++ ) {
-      
-      const subtopic = subtopics[j];
-      
-      const dropdown = document.createElement("div");
-      dropdown.classList.add("screencasts-dropdown");
-      accordion.appendChild(dropdown);
-      
-      const dropdownTitle = document.createElement("div");
-      dropdownTitle.classList.add("screencasts-dropdown-title");
-      
-      if (subtopic == "blank") {
-        dropdownTitle.innerHTML = "Other Screencasts";
-      } else {
-        dropdownTitle.innerHTML = subtopics[j];
-      }
-      
-      dropdown.appendChild(dropdownTitle);
-      
-      const dropdownListWrapper = document.createElement("div");
-      dropdownListWrapper.classList.add("screencasts-dropdown-list-wrapper");
-      dropdown.appendChild(dropdownListWrapper);
-      
-      const screencastsList = document.createElement("ul");
-      dropdownListWrapper.appendChild(screencastsList);
-      
-      const videos = data[topic][subtopic];
-      
-      for ( let k = 0; k < videos.length; k++ ) {
-        const video = videos[k];
-        const anchor = document.createElement("a");
-        anchor.setAttribute("href", video.url);
-        anchor.setAttribute("title", video.description);
-        anchor.setAttribute("target", "_blank");
-        anchor.innerHTML = video.title;
-
-        const li = document.createElement("li");
-        screencastsList.appendChild(li);
-        li.appendChild(anchor);
-      }
-
-      dropdownTitle.addEventListener("click", function() {
-      if( dropdownListWrapper.style.display !== "block" ) {
-        dropdownListWrapper.style.display = "block";
-      } else {
-        dropdownListWrapper.style.display = "none";
-      }
-    });
-    }
-  }
+    window.screencasts_json = {"blank":{"Physical Chemistry":[{"title":"Degeneracy","description":"Discusses degeneracy which is usually related to the presence of symmetry in a system. Example uses a particle in a 2-D \"square\" box.","duration":"Sat Dec 30 1899 03:49:00 GMT-0700 (Mountain Standard Time)","url":"https://www.youtube.com/watch?v=nSxngN_UCC0&list=PL4xAk5aclnUgmmVCVhlFKOs_dUR1z3CZ4&index=5"},{"title":"Eigenvalues and Eigenfunctions","description":"Determine whether or not the given functions are eigenfunctions of the operator d/dx.","duration":"Sat Dec 30 1899 03:09:00 GMT-0700 (Mountain Standard Time)","url":"https://www.youtube.com/watch?v=-e-ocwZLB9Y&list=PL4xAk5aclnUgmmVCVhlFKOs_dUR1z3CZ4&index=1"},{"title":"Harmonic Oscillator","description":"Determine allowed energies and wave function for a particle undergoing harmonic motion.","duration":"Sat Dec 30 1899 06:05:00 GMT-0700 (Mountain Standard Time)","url":"https://www.youtube.com/watch?v=sXjp3OsSZ84&index=6&list=PL4xAk5aclnUgmmVCVhlFKOs_dUR1z3CZ4"},{"title":"Normalizing a Wavefunction","description":"Determine the normalization factor \"A\" for the wave function psi(x) = A*sin(n*pi*x/L).","duration":"Sat Dec 30 1899 03:51:00 GMT-0700 (Mountain Standard Time)","url":"https://www.youtube.com/watch?v=X5kdO-Q4VXg&index=3&list=PL4xAk5aclnUgmmVCVhlFKOs_dUR1z3CZ4"},{"title":"Particle in a Box","description":"Determine the allowed energies and solve for the wave function for a particle in  a 1-D box.","duration":"Sat Dec 30 1899 05:10:00 GMT-0700 (Mountain Standard Time)","url":"https://www.youtube.com/watch?v=rsksuELLNmk&list=PL4xAk5aclnUgmmVCVhlFKOs_dUR1z3CZ4&index=2"},{"title":"Separation of Variables","description":"Determine the wave function ad allowed energy levels for a particle in a 2-D box.","duration":"Sat Dec 30 1899 06:01:00 GMT-0700 (Mountain Standard Time)","url":"https://www.youtube.com/watch?v=AYRuPNK6WNM&index=4&list=PL4xAk5aclnUgmmVCVhlFKOs_dUR1z3CZ4"}]}};
   </script>
+  <script src="accordion_script.js"></script>
   
 </body>
 </html>

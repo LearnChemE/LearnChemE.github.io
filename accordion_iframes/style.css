@@ -44,3 +44,21 @@
 	padding-top: 0rem;
 	padding-bottom: 0rem;
 }
+
+.up-down-arrow {
+	float: right;
+	font-family: sans-serif;
+	font-size: 1.25rem;
+	font-weight: 100;
+	text-shadow: 0px 0px 1px white;
+	color: darkslategrey;
+	height: 0.8rem;
+	margin: 0;
+	margin-right: 1rem;
+	margin-top: 0.15rem;
+	padding-bottom: 0.25rem;
+	transform: rotate(180deg);
+	transition-property: transform;
+	transition-duration: 0.5s;
+	transition-timing-function: ease-out;
+}
