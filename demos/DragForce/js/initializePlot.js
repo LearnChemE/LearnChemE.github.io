@@ -4,7 +4,7 @@
 
 // This is the font for the tick labels ("0.0", "0.5", etc.). To modify the styling for the axis labels e.g. "time (s)" or "position (pixels)", you will need to do that in the style.css file.
 let axisFont = {
-  size : 16,
+  size : 14,
   lineHeight : 13,
   family : "sans-serif"
 }
@@ -20,15 +20,6 @@ let plotOptions = {
       axisLabel : "time (s)",
       min: 0,
       max: 8
-    },
-    { 
-      position: "top",
-      autoScale : "none",
-      axisLabel : "Plot Title",
-      show: true,
-      showTicks: false,
-      showTickLabels: false,
-      gridLines: false
     }
   ],
   yaxes: [

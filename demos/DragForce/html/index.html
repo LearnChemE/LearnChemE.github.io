@@ -39,97 +39,90 @@
         </div>
 
         <div id="other-buttons">
-          <div id="start-button" class="btn btn-success">Start</div>
-          <div id="stop-button" class="btn btn-danger" onclick="stopAnimation()">Stop</div>
+          <div id="start-pause-button" class="btn btn-success">Start</div>
+          <div id="reset-button" class="btn btn-danger">Reset</div>
         </div>
       </div>
 
       <div id="bottom-controls-row">
+                
+        <div id="variables-stack">
 
-        
+          <div class="data-area" id="input-variables">
+            <div class="data-row input-group-sm">
+              <div class="data-name">Drag Coefficient = </div>
+              <input type="text" class="form-control data-value" id="dragCoeff" value="0.5">
+              <div class="data-metric"></div>
+            </div>
+            
+            <div class="data-row input-group-sm">
+              <div class="data-name">Mass = </div>
+              <input type="text" class="form-control data-value" id="mass" value="0.75">
+              <div class="data-metric">kg</div>
+            </div>
+    
+            <div class="data-row input-group-sm">
+              <div class="data-name">Cross-Sectional Area = </div>
+              <input type="text" class="form-control data-value" id="area" value="0.147">
+              <div class="data-metric">m<sup>2</sup></div>
+            </div>
+          </div>
+
+        </div>
+
         <select id="object-selection">
+          <option value="" disabled selected hidden>Select an object</option>
           <option value="1">Soccer ball</option>
           <option value="2">Parachutist</option>
           <option Value="-1">Custom</option>
         </select>
-        
-
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text ">Drag Coefficient</span>
-          </div>
-          <input type="text" class="form-control" id="dragCoeff" value="0.5">
-        </div>
-
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">Mass (kg)</span>
-          </div>
-          <input type="text" class="form-control" id="mass" value="0.75">
-        </div>
-
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">Cross-Sectional Area (m<sup>2</sup>) </span>
-          </div>
-          <input type="text" class="form-control" id="area" value="0.147">
-        </div>
 
       </div>
-
-      
 
     </div>
        
-    <div class="row">
+    <div id="image-area">
   
-      <div class="col-3" style="width: 800px">
+      <div id="object-fall-area">
+        <img src="../img/ball.png" id="objImage" />
+        <img src="../img/tower.png" id="tower" />
+      </div>
+  
+      <div id="plot">
+      </div>
+
+      <div class="data-area" id="output-variables">
+        <div class="data-row">
+          <div class="data-name">Force of Gravity = </div>
+          <div class="data-value" id="GForce">0</div>
+          <div class="data-metric">N</div>
+        </div>
         
-        <!-- Animation Area -->
-        <div id="canvas">
-          <img src="../img/ball.png" id="objImage" />
-          <img src="../img/tower.png" id="tower" />
+        <div class="data-row">
+          <div class="data-name">Velocity = </div>
+          <div class="data-value" id="HVelocity">0</div>
+          <div class="data-metric">m/s</div>
         </div>
 
+        <div class="data-row">
+          <div class="data-name">Height = </div>
+          <div class="data-value" id="HHeight">0</div>
+          <div class="data-metric">m</div>
+        </div>
+
+        <div class="data-row">
+          <div class="data-name">Acceleration = </div>
+          <div class="data-value" id="HAcceleration">0</div>
+          <div class="data-metric">(m/s<sup>2</sup>)</div>
+        </div>
+
+        <div class="data-row">
+          <div class="data-name">Drag Force = </div>
+          <div class="data-value" id="HDrag">0</div>
+          <div class="data-metric">N</div>
+        </div>
       </div>
-  
-      <div class="col-600px">
-        <!-- Plot Area -->
-        <div id="plot"></div>
-      </div>
-  
-  
-  
-      <div class="col-2">
-        <!-- Data Area -->
-        <table>
-          <tr>
-            <td>Force of Gravity (N): </td>
-            <td id="GForce"></td>
-          </tr>
-          <tr>
-            <td>Velocity (m/s): </td>
-            <td id="HVelocity"></td>
-          </tr>
-          <tr>
-            <td>Height (m): </td>
-            <td id="HHeight"></td>
-          </tr>
-          <tr>
-            <td>Acceleration (m/s<sup>2</sup>): </td>
-            <td id="HAcceleration"></td>
-          </tr>
-  
-          <tr>
-            <td>Drag Force (N): </td>
-            <td id="HDrag"></td>
-          </tr>
-  
-        </table>
-  
-  
-      </div>
-  
+    
     </div>
 
   </div>
