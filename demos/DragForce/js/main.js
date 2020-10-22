@@ -2,6 +2,7 @@
 
 // These are some elements you can find in "index.html"
 const objImage = document.getElementById("objImage");
+const structureImage = document.getElementById("structureImage");
 const startPauseButton = document.getElementById("start-pause-button");
 const resetButton = document.getElementById("reset-button");
 const selection = document.getElementById("object-selection");
@@ -20,7 +21,7 @@ let index = 0; // This is just a number that increments every animation frame. Y
 let dt = 1; //ms per calculation
 let fallTime = 10; // The amount of time it takes to fall
 let max_velocity = 50;
-let tower_image_size = 285; // see style.css
+const image_height = structureImage.getBoundingClientRect().height; // see style.css
 
 // This function updates the Plot with a two-dimensional array of coordinates, e.g. [[0, 0], [5, 2], [3, 1], ...]
 // See some examples of live updating at http://www.flotcharts.org/flot/examples/ . You can view the source code of the examples in the index.html file of each example page on this website.
@@ -51,13 +52,13 @@ function animationFunction() {
 // This is an implementation based on https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
 // This function just increments the "now" variable to the current time, calls animationFunction(), then calls itself until 5000 ms have elapsed
 function step() {
-  if ( !isPaused ) {
+  if ( !isPaused && height > 0 ) {
     dt = (Date.now() - now) / 1000;
     if ( dt == 0 ) { dt = 0.016 }
     now = Date.now();
     elapsed = now - start;
     animationFunction();
-  } else {
+  } else if ( height > 0 ) {
     dt = (Date.now() - now) / 1000;
     now = Date.now();
     start += (dt * 1000);
@@ -78,7 +79,7 @@ function startPauseAnimation() {
   
   startPauseButton.innerHTML = "Pause"
 
-  if (!isRunning) {
+  if (!isRunning && height > 0) {
     [selection, cdInp, aInp, mInp].forEach(inp => { inp.setAttribute("disabled", "true") });
     VT();
     updateAxes();
@@ -106,6 +107,7 @@ function resetAnimation() {
   isRunning = false;
   isPaused = false;
   selection.removeAttribute("disabled");
+  updateInput();
   window.cancelAnimationFrame(step);
   initValue();
   graphData = [[0, 0]];

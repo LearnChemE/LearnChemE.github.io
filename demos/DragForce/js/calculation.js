@@ -19,7 +19,7 @@ function advance()
     dragForce = Cd*rho_air*velocity*velocity*A/2;
     acceleration = g - dragForce / M;
     velocity = velocity + dt*acceleration;
-    height = height - dt*velocity;
+    height = Math.max(0, height - dt*velocity);
     time += dt;
 }
 
@@ -28,7 +28,7 @@ function VT() // calculates the total time it will take to fall and sets the glo
     initValue();
     dt = 0.01;
 
-    while(height >= 0) { 
+    while(height > 0) { 
         advance();
     }
 
@@ -66,7 +66,7 @@ function updateDOM()
     document.getElementById("GForce").innerHTML = Number(g * M).toFixed(1);
     document.getElementById("HDrag").innerHTML = Number(dragForce).toFixed(1);
     document.getElementById("HVelocity").innerHTML = Math.round(velocity);
-    document.getElementById("HHeight").innerHTML = Math.abs(Number(height).toFixed(0));
+    document.getElementById("HHeight").innerHTML = Math.round(height);
     document.getElementById("HAcceleration").innerHTML = Number(acceleration).toFixed(1);
-    objImage.style.top = `${ (fall_height - height) * ( tower_image_size / fall_height ) }px`;
+    objImage.style.top = `${ (fall_height - height) * ( image_height / fall_height ) }px`;
 }
