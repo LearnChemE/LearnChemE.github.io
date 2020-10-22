@@ -42,9 +42,13 @@ function VT() // calculates the total time it will take to fall and sets the glo
 
 function initValue()
 {
-    Cd = document.getElementById("dragCoeff").value;
-    A = document.getElementById("area").value;
-    M = document.getElementById("mass").value;
+    Cd = Number(document.getElementById("dragCoeff").value) > 0 ? Number(document.getElementById("dragCoeff").value) : 0.001;
+    A = Number(document.getElementById("area").value) > 0 ? Number(document.getElementById("area").value) : 0.001;
+    M = Number(document.getElementById("mass").value) > 0 ? Number(document.getElementById("mass").value) : 0.001;
+
+    cdInp.value = Cd;
+    aInp.value = A;
+    mInp.value = M;
 
     time = 0;
     acceleration = 0;

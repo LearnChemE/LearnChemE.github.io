@@ -174,6 +174,7 @@ function fallObject() {
       });
     }
     objImage.setAttribute("src", this.src);
+    try { initValue() } catch(e) {}
   }
 
   this.setSoccer();
@@ -185,3 +186,8 @@ let FallObject = new fallObject();
 startPauseButton.addEventListener("click", startPauseAnimation);
 resetButton.addEventListener("click", resetAnimation);
 selection.addEventListener("change", updateInput);
+[cdInp, mInp, aInp].forEach(inp => {
+  inp.addEventListener("change", () => {
+    try { initValue() } catch(e) {}
+  })
+})
