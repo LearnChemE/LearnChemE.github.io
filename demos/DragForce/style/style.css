@@ -5,7 +5,7 @@
 #controls-area {
   display: grid;
   grid-template-columns: 100%;
-  width: 100%;
+  width: 620px;
   margin-bottom: 1rem;
 }
 
@@ -25,8 +25,8 @@
 
 #bottom-controls-row {
   display: grid;
-  grid-template-columns: repeat(4, max-content);
-  gap: 20px;
+  grid-template-columns: repeat(2, max-content);
+  gap: 80px;
   margin: 0rem 0rem 1rem 4.5rem;
 }
 
