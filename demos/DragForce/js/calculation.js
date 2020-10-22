@@ -67,10 +67,24 @@ function initValue()
 
 function updateDOM()
 {
-    document.getElementById("GForce").innerHTML = Number(g * M).toFixed(1);
-    document.getElementById("HDrag").innerHTML = Number(dragForce).toFixed(1);
-    document.getElementById("HVelocity").innerHTML = Math.round(velocity);
-    document.getElementById("HHeight").innerHTML = Math.round(height);
-    document.getElementById("HAcceleration").innerHTML = Number(acceleration).toFixed(1);
+    document.getElementById("GForce").innerHTML = formatNumber(g * M);
+    document.getElementById("HDrag").innerHTML = formatNumber(dragForce);
+    document.getElementById("HVelocity").innerHTML = formatNumber(velocity);
+    document.getElementById("HHeight").innerHTML = formatNumber(height);
+    document.getElementById("HAcceleration").innerHTML = formatNumber(acceleration);
     objImage.style.top = `${ (fall_height - height) * ( image_height / fall_height ) }px`;
+}
+
+// This returns a number, formatted to be around 3-4 characters long
+function formatNumber(num) {
+    let n = Number.parseFloat(num);
+    if (isNaN(n)) { n = 0 }
+    n = Math.round(n * 10000) / 10000;
+    if ( n === 0 ) { return 0 }
+    else if ( n > 100 ) { return Number.parseInt(n) }
+    else if ( n > 1 ) { return Number( Number( Math.round( n * 10 ) / 10 ).toFixed(1) ) }
+    else { 
+        if ( n < 0.001 ) { return 0 }
+        return Number( Number( Math.round( n * 1000 ) / 1000 ).toPrecision(1) )
+    }
 }
