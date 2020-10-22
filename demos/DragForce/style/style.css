@@ -6,7 +6,7 @@
   display: grid;
   grid-template-columns: 100%;
   width: 620px;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 #top-controls-row {
@@ -123,7 +123,7 @@ input[type="text"].form-control:focus {
   left : 50px;
   width : 40px;
   height : 40px;
-  transform : translateY(-50%);
+  transform : translateY(-100%);
 }
 
 #plot {
