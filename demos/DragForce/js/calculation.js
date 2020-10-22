@@ -92,7 +92,7 @@ function formatNumber(num) {
     if (isNaN(n)) { n = 0 }
     n = Math.round(n * 10000) / 10000;
     if ( n === 0 ) { return 0 }
-    else if ( n > 100 ) { return Number.parseInt(n) }
+    else if ( n > 10 ) { return Number.parseInt(n) }
     else if ( n > 1 ) { return Number( Number( Math.round( n * 10 ) / 10 ).toFixed(1) ) }
     else { 
         if ( n < 0.001 ) { return 0 }
