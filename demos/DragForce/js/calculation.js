@@ -12,8 +12,7 @@ var velocity = 0;
 var height = fall_height; 
 var dragForce = 0;
 
-//Position 
-//Acceleration is also changing with time. Taking small time intervals (0.001) for calculation. 
+// This updates all the global variables for position, velocity, etc.
 function advance()
 {
     dragForce = Cd*rho_air*velocity*velocity*A/2;
@@ -23,7 +22,8 @@ function advance()
     time += dt;
 }
 
-function VT() // calculates the total time it will take to fall and sets the global variable "fallTime" to that value.
+// calculates the total time it will take to fall and sets the global variable "fallTime" to that value. Also sets the max_velocity
+function VT() 
 {
     initValue();
     dt = 0.01;
@@ -51,6 +51,7 @@ function VT() // calculates the total time it will take to fall and sets the glo
 
 function initValue()
 {
+    // Sets a minimum input value of 0.001
     Cd = Number(document.getElementById("dragCoeff").value) > 0 ? Number(document.getElementById("dragCoeff").value) : 0.001;
     A = Number(document.getElementById("area").value) > 0 ? Number(document.getElementById("area").value) : 0.001;
     M = Number(document.getElementById("mass").value) > 0 ? Number(document.getElementById("mass").value) : 0.001;
@@ -74,6 +75,7 @@ function initValue()
 
 }
 
+// Update document object model (DOM).  Uses a function "formatNumber" for all numbers displayed on screen
 function updateDOM()
 {
     document.getElementById("GForce").innerHTML = formatNumber(g * M);

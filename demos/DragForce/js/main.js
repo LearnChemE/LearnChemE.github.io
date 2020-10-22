@@ -18,10 +18,10 @@ let now = Date.now(); // This is the time value during the animation - it is upd
 let elapsed = now - start; // This is the time elapsed - the difference between "now" and "start"
 let graphData = [[0, 0]]; // This is the "graph data" variable that we will update then put into the graph
 let index = 0; // This is just a number that increments every animation frame. You may find it useful for something
-let dt = 1; //ms per calculation
-let fallTime = 10; // The amount of time it takes to fall
-let max_velocity = 50;
-const image_height = structureImage.getBoundingClientRect().height; // see style.css
+let dt = 0.016; // default to 60 fps
+let fallTime = 10; // The amount of time it takes to fall - calculated every time VT() is called
+let max_velocity = 50; // Also calculated every time VT() is called
+const image_height = structureImage.getBoundingClientRect().height; // automatically grab the height of the structure (e.g. the tower)
 
 // This function updates the Plot with a two-dimensional array of coordinates, e.g. [[0, 0], [5, 2], [3, 1], ...]
 // See some examples of live updating at http://www.flotcharts.org/flot/examples/ . You can view the source code of the examples in the index.html file of each example page on this website.
@@ -31,6 +31,7 @@ function updateGraph(array) {
   Plot.draw();
 }
 
+// This updates the x and y axes to match the maximum time and fall velocity
 function updateAxes() {
   const maxXAxis = Math.ceil(fallTime);
   const maxYAxis = Math.ceil(max_velocity);
@@ -43,7 +44,7 @@ function updateAxes() {
 // This function is called once every animation frame.
 function animationFunction() {
   index++; // Increment our arbitrary "index" variable by 1
-  advance();
+  advance(); // See calculation.js
   graphData.push([elapsed / 1000, velocity]); // Add new data to the "graphData" variable
   updateDOM();
   updateGraph(graphData);
