@@ -60,8 +60,13 @@ select {
 }
 
 #output-variables .data-row {
-  grid-template-columns: 16ch min-content 5ch;
+  grid-template-columns: 16ch max-content 5ch;
   font-size: 0.9rem;
+}
+
+#output-variables .data-value {
+  width: max-content;
+  min-width: 3ch;
 }
 
 .data-name {
