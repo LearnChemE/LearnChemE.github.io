@@ -54,8 +54,22 @@
 	line-height: 1.2rem;
 }
 
-.screencasts-dropdown-list-wrapper li {
+.screencasts-dropdown-list-wrapper li>* {
+	display: inline;
+	margin-right: 1rem;
+}
 
+.screencasts-dropdown-list-wrapper li>div.dl-link {
+	color: rgb(100, 90, 185);
+	cursor: pointer;
+}
+
+.screencasts-dropdown-list-wrapper li>div.in-progress {
+	display: none;
+}
+
+.screencasts-dropdown-list-wrapper li>div.dl-link:hover {
+	text-decoration: underline;
 }
 
 .up-down-arrow {

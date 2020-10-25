@@ -1,5 +1,63 @@
 const list = document.getElementById("screencasts-list");
 const topics = Object.keys(window.screencasts_json);
+
+const getVideo = function(id, title) {
+  const dllinks = document.getElementsByClassName("dl-link");
+  const inProgressElts = document.getElementsByClassName("in-progress");
+  for ( let i = 0; i < dllinks.length; i++ ) {
+    dllinks[i].style.display = "none";
+  }
+
+  fetch('https://learncheme-dl.herokuapp.com/download', {
+  method: 'POST',
+  credentials: 'omit',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({"id" : id}),
+  }).then(response => {
+    return response.body
+  }).then(body => {
+    const reader = body.getReader();
+    return new ReadableStream({
+      start(controller) {
+        return pump();
+        function pump() {
+          return reader.read().then(({ done, value }) => {
+            // When no more data needs to be consumed, close the stream
+            if (done) {
+                controller.close();
+                return;
+            }
+            // Enqueue the next data chunk into our target stream
+            controller.enqueue(value);
+            return pump();
+          });
+        }
+      }  
+    })
+  })
+  .then(stream => new Response(stream))
+  .then(response => response.blob())
+  .then(blob => URL.createObjectURL(blob))
+  .then(url => {
+    const fileName = String(title).replace(/[^a-zA-Z\d]/gi,"").substr(0, 24);
+    for ( let i = 0; i < dllinks.length; i++ ) {
+      dllinks[i].style.display = "inline";
+    };
+    for ( let i = 0; i < inProgressElts.length; i++ ) {
+      inProgressElts[i].style.display = "none";
+    };
+    const a = document.createElement("a");
+    a.textContent = 'video/mp4';
+    a.setAttribute("href", url);
+    a.style.display = "none";
+    a.setAttribute("download", `${fileName}.mp4`);
+    document.body.appendChild(a);
+    a.click();
+  });
+}
+
 for (let i = 0; i < topics.length; i++) {
   const topic = topics[i];
   const topicHeader = document.createElement("div");
@@ -62,9 +120,23 @@ for (let i = 0; i < topics.length; i++) {
       anchor.setAttribute("target", "_blank");
       anchor.innerHTML = video.title;
 
+      const ytid = video.id;
+
+      const dllink = document.createElement("div");
+      dllink.classList.add("dl-link");
+      dllink.innerHTML = "- download";
+
+      const inProgress = document.createElement("div");
+      inProgress.classList.add("in-progress");
+      inProgress.innerHTML = "retrieving the requested resource...this may take a minute";
+
+      dllink.addEventListener("click", () => {inProgress.style.display="inline"; getVideo(ytid, video.title)})
+
       const li = document.createElement("li");
       screencastsList.appendChild(li);
       li.appendChild(anchor);
+      li.appendChild(dllink);
+      li.appendChild(inProgress);
     }
 
     const margin = 30;
