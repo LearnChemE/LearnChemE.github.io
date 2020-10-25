@@ -139,19 +139,18 @@ for (let i = 0; i < topics.length; i++) {
       li.appendChild(inProgress);
     }
 
-    const margin = 30;
-    const height = Number(screencastsList.getBoundingClientRect().height) + margin;
-
     dropdownTitle.addEventListener("click", function() {
-    if( screencastsList.getAttribute("toggle-state") == "closed" ) {
-      screencastsList.setAttribute("toggle-state", "open");
-      upDownArrow.style.transform = "rotate(0deg)";
-      dropdownListWrapper.style.height = `${height}px`;
-    } else {
-      screencastsList.setAttribute("toggle-state", "closed");
-      upDownArrow.style.transform = "rotate(180deg)";
-      dropdownListWrapper.style.height = "0px";
-    }
-  });
+      const margin = 30;
+      const height = Number(screencastsList.getBoundingClientRect().height) + margin;
+      if( screencastsList.getAttribute("toggle-state") == "closed" ) {
+        screencastsList.setAttribute("toggle-state", "open");
+        upDownArrow.style.transform = "rotate(0deg)";
+        dropdownListWrapper.style.height = `${height}px`;
+      } else {
+        screencastsList.setAttribute("toggle-state", "closed");
+        upDownArrow.style.transform = "rotate(180deg)";
+        dropdownListWrapper.style.height = "0px";
+      }
+    });
   }
 }
