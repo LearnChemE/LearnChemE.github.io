@@ -124,7 +124,7 @@ for (let i = 0; i < topics.length; i++) {
 
       const dllink = document.createElement("div");
       dllink.classList.add("dl-link");
-      dllink.innerHTML = "-download";
+      dllink.innerHTML = "download";
 
       const inProgress = document.createElement("div");
       inProgress.classList.add("in-progress");
