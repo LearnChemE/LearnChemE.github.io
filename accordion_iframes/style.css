@@ -19,7 +19,7 @@
 .screencasts-dropdown {
 	margin-bottom: 1px;
 	min-height: 24px;
-	font-size: 0.9rem;
+	font-size: 0.8rem;
 }
 
 .screencasts-dropdown-title {
@@ -56,7 +56,7 @@
 
 .screencasts-dropdown-list-wrapper li>* {
 	display: inline;
-	margin-right: 1rem;
+	margin-right: 0.75rem;
 }
 
 .screencasts-dropdown-list-wrapper li>div.dl-link {

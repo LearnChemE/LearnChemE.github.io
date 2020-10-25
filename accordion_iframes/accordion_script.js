@@ -124,11 +124,11 @@ for (let i = 0; i < topics.length; i++) {
 
       const dllink = document.createElement("div");
       dllink.classList.add("dl-link");
-      dllink.innerHTML = "- download";
+      dllink.innerHTML = "-download";
 
       const inProgress = document.createElement("div");
       inProgress.classList.add("in-progress");
-      inProgress.innerHTML = "retrieving the requested resource...this may take a minute";
+      inProgress.innerHTML = "retrieving the requested resource...if download does not begin within 30 seconds, please refresh the page and try again.";
 
       dllink.addEventListener("click", () => {inProgress.style.display="inline"; getVideo(ytid, video.title)})
 
