@@ -1,63 +1,6 @@
 const list = document.getElementById("screencasts-list");
 const topics = Object.keys(window.screencasts_json);
 
-const getVideo = function(id, title) {
-  const dllinks = document.getElementsByClassName("dl-link");
-  const inProgressElts = document.getElementsByClassName("in-progress");
-  for ( let i = 0; i < dllinks.length; i++ ) {
-    dllinks[i].style.display = "none";
-  }
-
-  fetch('https://learncheme-dl.herokuapp.com/download', {
-  method: 'POST',
-  credentials: 'omit',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({"id" : id}),
-  }).then(response => {
-    return response.body
-  }).then(body => {
-    const reader = body.getReader();
-    return new ReadableStream({
-      start(controller) {
-        return pump();
-        function pump() {
-          return reader.read().then(({ done, value }) => {
-            // When no more data needs to be consumed, close the stream
-            if (done) {
-                controller.close();
-                return;
-            }
-            // Enqueue the next data chunk into our target stream
-            controller.enqueue(value);
-            return pump();
-          });
-        }
-      }  
-    })
-  })
-  .then(stream => new Response(stream))
-  .then(response => response.blob())
-  .then(blob => URL.createObjectURL(blob))
-  .then(url => {
-    const fileName = String(title).replace(/[^a-zA-Z\d]/gi,"").substr(0, 24);
-    for ( let i = 0; i < dllinks.length; i++ ) {
-      dllinks[i].style.display = "inline";
-    };
-    for ( let i = 0; i < inProgressElts.length; i++ ) {
-      inProgressElts[i].style.display = "none";
-    };
-    const a = document.createElement("a");
-    a.textContent = 'video/mp4';
-    a.setAttribute("href", url);
-    a.style.display = "none";
-    a.setAttribute("download", `${fileName}.mp4`);
-    document.body.appendChild(a);
-    a.click();
-  });
-}
-
 for (let i = 0; i < topics.length; i++) {
   const topic = topics[i];
   const topicHeader = document.createElement("div");
@@ -106,7 +49,8 @@ for (let i = 0; i < topics.length; i++) {
     dropdownListWrapper.classList.add("screencasts-dropdown-list-wrapper");
     dropdown.appendChild(dropdownListWrapper);
     
-    const screencastsList = document.createElement("ul");
+    const screencastsList = document.createElement("div");
+    screencastsList.classList.add("screencasts-list");
     screencastsList.setAttribute("toggle-state", "closed");
     dropdownListWrapper.appendChild(screencastsList);
     
@@ -114,34 +58,34 @@ for (let i = 0; i < topics.length; i++) {
     
     for ( let k = 0; k < videos.length; k++ ) {
       const video = videos[k];
-      const anchor = document.createElement("a");
-      anchor.setAttribute("href", video.url);
-      anchor.setAttribute("title", video.description);
-      anchor.setAttribute("target", "_blank");
-      anchor.innerHTML = video.title;
+      const youTubeId = video.id;
 
-      const ytid = video.id;
+      const youTubeAnchor = document.createElement("a");
+      youTubeAnchor.setAttribute("href", video.url);
+      youTubeAnchor.setAttribute("title", video.description);
+      youTubeAnchor.setAttribute("target", "_blank");
+      youTubeAnchor.classList.add("yt-link");
+      youTubeAnchor.innerHTML = video.title;
 
-      const dllink = document.createElement("div");
-      dllink.classList.add("dl-link");
-      dllink.innerHTML = "download";
+      const videoSrc = `https://www.lcedevelopment.com/wp-content/uploads/screencasts/video_${youTubeId}.mp4`;
+      const downloadAnchor = document.createElement("a");
+      downloadAnchor.innerHTML = "mirror";
+      downloadAnchor.classList.add("dl-link");
+      downloadAnchor.href = videoSrc;
+      downloadAnchor.setAttribute("download", "");
+      downloadAnchor.setAttribute("target", "_blank");
 
-      const inProgress = document.createElement("div");
-      inProgress.classList.add("in-progress");
-      inProgress.innerHTML = "retrieving the requested resource...if download does not begin within 30 seconds, please refresh the page and try again.";
-
-      dllink.addEventListener("click", () => {inProgress.style.display="inline"; getVideo(ytid, video.title)})
-
-      const li = document.createElement("li");
-      screencastsList.appendChild(li);
-      li.appendChild(anchor);
-      li.appendChild(dllink);
-      li.appendChild(inProgress);
+      const listItem = document.createElement("div");
+      listItem.classList.add("list-item");
+      
+      listItem.appendChild(youTubeAnchor);
+      listItem.appendChild(downloadAnchor);
+      screencastsList.appendChild(listItem);
     }
 
     dropdownTitle.addEventListener("click", function() {
-      const margin = 30;
-      const height = Number(screencastsList.getBoundingClientRect().height) + margin;
+      const margin = 15;
+      const height = Number(screencastsList.getBoundingClientRect().height) + (2 * margin);
       if( screencastsList.getAttribute("toggle-state") == "closed" ) {
         screencastsList.setAttribute("toggle-state", "open");
         upDownArrow.style.transform = "rotate(0deg)";
