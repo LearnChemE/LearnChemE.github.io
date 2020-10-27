@@ -55,7 +55,8 @@ for (let i = 0; i < topics.length; i++) {
     dropdownListWrapper.appendChild(screencastsList);
     
     const videos = window.screencasts_json[topic][subtopic];
-    
+    let maxWidth = 0;
+
     for ( let k = 0; k < videos.length; k++ ) {
       const video = videos[k];
       const youTubeId = video.id;
@@ -68,19 +69,27 @@ for (let i = 0; i < topics.length; i++) {
       youTubeAnchor.innerHTML = video.title;
 
       const videoSrc = `https://www.lcedevelopment.com/wp-content/uploads/screencasts/video_${youTubeId}.mp4`;
-      const downloadAnchor = document.createElement("a");
-      downloadAnchor.innerHTML = "mirror";
-      downloadAnchor.classList.add("dl-link");
-      downloadAnchor.href = videoSrc;
-      downloadAnchor.setAttribute("download", "");
-      downloadAnchor.setAttribute("target", "_blank");
+      const mirrorAnchor = document.createElement("a");
+      mirrorAnchor.innerHTML = "mirror";
+      mirrorAnchor.classList.add("dl-link");
+      mirrorAnchor.href = videoSrc;
+      mirrorAnchor.setAttribute("target", "_blank");
 
       const listItem = document.createElement("div");
       listItem.classList.add("list-item");
       
       listItem.appendChild(youTubeAnchor);
-      listItem.appendChild(downloadAnchor);
+      listItem.appendChild(mirrorAnchor);
       screencastsList.appendChild(listItem);
+
+      maxWidth = Math.max(maxWidth, youTubeAnchor.getBoundingClientRect().width);
+      
+    }
+
+    maxWidth = Math.min(450, maxWidth);
+    const children = screencastsList.children;
+    for (let k = 0; k < children.length; k++) {
+      children[k].firstChild.style.width = `${maxWidth}px`;
     }
 
     dropdownTitle.addEventListener("click", function() {
