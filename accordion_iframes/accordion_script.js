@@ -38,7 +38,7 @@ for (let i = 0; i < topics.length; i++) {
     dropdown.appendChild(upDownArrow);
     
     if (subtopic == "blank") {
-      dropdownTitle.innerHTML = "Other Screencasts";
+      dropdownTitle.innerHTML = "All Other Screencasts";
     } else {
       dropdownTitle.innerHTML = subtopics[j];
     }
