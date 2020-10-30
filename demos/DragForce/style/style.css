@@ -91,7 +91,7 @@ input[type="text"].form-control:focus {
 
 #modal-buttons .btn, #other-buttons .btn {
   margin: 0rem 0.5rem;
-  width: 10ch;
+  width: 11ch;
 }
 
 #image-area {
@@ -116,10 +116,10 @@ input[type="text"].form-control:focus {
 
 #objImage {
   position : relative;
-  top : 0px;
+  top : 40px;
   left : 50px;
-  width : 40px;
-  height : 40px;
+  width : 30px;
+  height : 30px;
   transform : translateY(-100%);
 }
 

@@ -5,7 +5,7 @@ var time = 0;
 var Cd = 0.5;
 var A = 0.147;
 var M = 0.75;
-var fall_height = 324; // height of eiffel tower in meters
+var fall_height = 169; // height of washington monument
 
 var acceleration = 0;
 var velocity = 0;
@@ -83,7 +83,7 @@ function updateDOM()
     document.getElementById("HVelocity").innerHTML = formatNumber(velocity);
     document.getElementById("HHeight").innerHTML = formatNumber(height);
     document.getElementById("HAcceleration").innerHTML = formatNumber(acceleration);
-    objImage.style.top = `${ (fall_height - height) * ( image_height / fall_height ) }px`;
+    objImage.style.top = `${ 40+(fall_height - height) * ( (image_height-40) / fall_height ) }px`;
 }
 
 // This returns a number, formatted to be around 3-4 characters long

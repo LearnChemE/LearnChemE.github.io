@@ -150,8 +150,8 @@ function fallObject() {
 
   this.setJumper = () => {
     this.Cd = 1.4;
-    this.A = 95.03;
-    this.M = 174,
+    this.A = 24.92;
+    this.M = 79;
     this.src = "../img/Parachute-Fallschirm.svg";
     this.updateInputs(true);
   }
