@@ -19,6 +19,7 @@ let elapsed = now - start; // This is the time elapsed - the difference between 
 let graphData = [[0, 0]]; // This is the "graph data" variable that we will update then put into the graph
 let index = 0; // This is just a number that increments every animation frame. You may find it useful for something
 let dt = 0.016; // default to 60 fps
+let speed = 1; //default speed of animation
 let fallTime = 10; // The amount of time it takes to fall - calculated every time VT() is called
 let max_velocity = 50; // Also calculated every time VT() is called
 const image_height = structureImage.getBoundingClientRect().height; // automatically grab the height of the structure (e.g. the tower)
@@ -45,7 +46,7 @@ function updateAxes() {
 function animationFunction() {
   index++; // Increment our arbitrary "index" variable by 1
   advance(); // See calculation.js
-  graphData.push([elapsed / 1000, velocity]); // Add new data to the "graphData" variable
+  graphData.push([elapsed / 1000*speed, velocity]); // Add new data to the "graphData" variable
   updateDOM();
   updateGraph(graphData);
 }
@@ -54,15 +55,15 @@ function animationFunction() {
 // This function just increments the "now" variable to the current time, calls animationFunction(), then calls itself until 5000 ms have elapsed
 function step() {
   if ( !isPaused && height > 0 ) {
-    dt = (Date.now() - now) / 1000;
+    dt = (Date.now() - now) / 1000*speed;
     if ( dt == 0 ) { dt = 0.016 }
     now = Date.now();
     elapsed = now - start;
     animationFunction();
   } else if ( height > 0 ) {
-    dt = (Date.now() - now) / 1000;
+    dt = (Date.now() - now) / 1000*speed;
     now = Date.now();
-    start += (dt * 1000);
+    start += (dt * 1000*speed);
     elapsed = now - start;
   }
 
