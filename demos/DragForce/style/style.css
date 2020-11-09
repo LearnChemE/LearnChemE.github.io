@@ -40,6 +40,12 @@ select {
   gap: 1ch;
 }
 
+.speed-row {
+  display: grid;
+  grid-template-columns: 60% 40%;
+  gap: 20px;
+}
+
 #input-variables {
   gap: 1px;
 }
@@ -110,7 +116,7 @@ input[type="text"].form-control:focus {
 
 #structureImage {
   margin-top: 3px;
-
+  width: 188.89px;
   height: 285px;
 }
 
@@ -121,6 +127,13 @@ input[type="text"].form-control:focus {
   width : 30px;
   height : 30px;
   transform : translateY(-100%);
+}
+
+#slider-wrapper {
+  left: 450.203px; 
+  top: 4.27021px; 
+  width: 228.057px; 
+  height: 65.2731px;
 }
 
 #plot {

@@ -75,6 +75,7 @@
           <option value="" disabled selected hidden>Select an object</option>
           <option value="1">Soccer ball</option>
           <option value="2">Parachutist</option>
+          <option value="3">Skydiver</option>
           <option Value="-1">Custom</option>
         </select>
 
@@ -87,6 +88,11 @@
       <div id="object-fall-area">
         <img src="../img/ball.png" id="objImage" />
         <img src="../img/monument1.png" id="structureImage" />
+        
+        <div class = "speed-row" id = "speedControl">
+          <div class="data-name">Play speed: </div>
+          <input type="text" class="form-control data-value" id="playspeed" value="1">
+        </div >
       </div>
   
       <div id="plot">
@@ -156,6 +162,7 @@
 
            <p>Press "Stop" to interrupt the animation. Beware that the animation can't be resumed once interrupted.</p>
           
+           <p>For the "skydiver" simulation, "height" indicates the distance from the jumping point. </p>
            
         </div>
       </div>
@@ -199,6 +206,8 @@
           <p>A FIFA standard soccer ball have circumference of between 68 cm and 70 cm. It  should weight between 410 g and 450 g. </p>
           <p>The parachutist was assumed to weight 75 kg without the parachute. The parachute for reference is a <a href="http://www.paragear.com/skydiving/10000220/C88/PRECISION-AERODYNAMICS-FALCON-MAIN-PARACHUTE">Falcon 265</a> parachute, which 
           has a area of 265 ft<sup>2</sup> and a weight of 11 lbs.  </p>
+          <P>The photo used in skydiver simulation is <span>Photo by <a href="https://unsplash.com/@taylorvanriper925?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Taylor Van Riper</a> on <a href="https://unsplash.com/s/photos/sky?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span></P>
+          <p>Skydiver simulation is set up based on the paper: <br>Landell-Mills N. (2017). Buoyancy Explains Terminal Velocity in Skydiving.</p>
         </div>
       </div>
     </div>

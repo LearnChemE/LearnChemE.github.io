@@ -10,6 +10,7 @@ const cdInp = document.getElementById("dragCoeff");
 const aInp = document.getElementById("area");
 const mInp = document.getElementById("mass");
 
+
 let yPosition = 0; // Initial position of the objImage
 let isRunning = false; // Animation is initially not running
 let isPaused = false;
@@ -22,6 +23,7 @@ let dt = 0.016; // default to 60 fps
 let speed = 1; //default speed of animation
 let fallTime = 10; // The amount of time it takes to fall - calculated every time VT() is called
 let max_velocity = 50; // Also calculated every time VT() is called
+let sd = 0; //indicator of skydiving
 const image_height = structureImage.getBoundingClientRect().height; // automatically grab the height of the structure (e.g. the tower)
 
 // This function updates the Plot with a two-dimensional array of coordinates, e.g. [[0, 0], [5, 2], [3, 1], ...]
@@ -114,6 +116,8 @@ function resetAnimation() {
   initValue();
   graphData = [[0, 0]];
   fallTime = 10;
+  document.getElementById("playspeed").value = 1;
+  speed = 1;
   startPauseButton.innerHTML = "Start"
   graphData = [[0, 0]];
   updateAxes();
@@ -123,18 +127,50 @@ function resetAnimation() {
 function updateInput()
 {
   // selection.value is a string, so make sure this switch statement uses strings
+  uSpeed = document.getElementById("playspeed").value;
+  if(uSpeed < 0)
+  {
+    alert("Please enter play speed larger than 0.");
+    resetAnimation();
+    //break;
+  }
+  
+  speed = uSpeed;
+
+
+
   switch(selection.value) {
     default:
+      sd = 0;
+      fall_height = 169;      
       FallObject.setCustom();
+      structureImage.src = "../img/monument1.png";
       break;
     case "1":
+      sd = 0;
+      fall_height = 169;
       FallObject.setSoccer();
+      structureImage.src = "../img/monument1.png";
       break;
     case "2":
+      sd = 0;
+      fall_height = 169;
       FallObject.setJumper();
+      structureImage.src = "../img/monument1.png";
       break;
+    case "3":
+      sd = 1;
+      fall_height = 1100;
+      FallObject.setSkyDiver();
+      structureImage.src = "../img/sky.jpg";
+      
+      break;
+      
     case "-1":
+      sd = 0;
+      fall_height = 169;
       FallObject.setCustom();
+      structureImage.src = "../img/monument1.png";
       break;
   }
 }
@@ -157,8 +193,16 @@ function fallObject() {
     this.updateInputs(true);
   }
 
+  this.setSkyDiver = () => {
+    this.Cd = 0.294;
+    this.A = 1;
+    this.M = 79;
+    this.src = "../img/skydiver.png";
+    this.updateInputs(true);
+  }
+
   this.setCustom = () => {
-    this.src = "../img/ball.png";
+    this.src = "../img/custom.png";
     this.updateInputs(false);
   }
 
