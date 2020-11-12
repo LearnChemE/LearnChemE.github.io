@@ -81,7 +81,7 @@ function updateDOM()
     document.getElementById("GForce").innerHTML = formatNumber(g * M);
     document.getElementById("HDrag").innerHTML = formatNumber(dragForce);
     document.getElementById("HVelocity").innerHTML = formatNumber(velocity);
-    document.getElementById("HHeight").innerHTML = formatNumber(height) - (sd==1)*1100;
+    document.getElementById("HHeight").innerHTML = formatNumber(height) - (sd==1)*fall_height;
     document.getElementById("HAcceleration").innerHTML = formatNumber(acceleration);
     objImage.style.top = `${ 40+(fall_height - height) * ( (image_height-40) / fall_height ) }px`;
 }

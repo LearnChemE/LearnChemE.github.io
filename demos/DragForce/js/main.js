@@ -9,6 +9,7 @@ const selection = document.getElementById("object-selection");
 const cdInp = document.getElementById("dragCoeff");
 const aInp = document.getElementById("area");
 const mInp = document.getElementById("mass");
+const uSpeed = document.getElementById("playspeed");
 
 
 let yPosition = 0; // Initial position of the objImage
@@ -80,6 +81,18 @@ function step() {
 // This is the function that is called when you click the "start" button
 // We do not want it to be called if the simulation is already running, hence the "isRunning" variable
 function startPauseAnimation() {
+
+  
+  speed = uSpeed.value;
+  if(isNaN(speed)||(speed<=0))
+  {
+    alert("Please enter a number greater than 0 for Play Speed.");
+    resetAnimation();
+    return;
+  }
+
+  uSpeed.setAttribute("disabled", "true");
+  
   
   startPauseButton.innerHTML = "Pause"
 
@@ -108,6 +121,8 @@ function startPauseAnimation() {
 }
 
 function resetAnimation() {
+
+  uSpeed.removeAttribute("disabled");
   isRunning = false;
   isPaused = false;
   selection.removeAttribute("disabled");
@@ -127,15 +142,7 @@ function resetAnimation() {
 function updateInput()
 {
   // selection.value is a string, so make sure this switch statement uses strings
-  uSpeed = document.getElementById("playspeed").value;
-  if(uSpeed < 0)
-  {
-    alert("Please enter play speed larger than 0.");
-    resetAnimation();
-    //break;
-  }
   
-  speed = uSpeed;
 
 
 
@@ -160,7 +167,7 @@ function updateInput()
       break;
     case "3":
       sd = 1;
-      fall_height = 1100;
+      fall_height = 1500;
       FallObject.setSkyDiver();
       structureImage.src = "../img/sky.jpg";
       

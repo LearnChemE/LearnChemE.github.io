@@ -72,7 +72,7 @@
         </div>
 
         <select id="object-selection">
-          <option value="" disabled selected hidden>Select an object</option>
+          <option value="1" disabled selected hidden>Select an object</option> 
           <option value="1">Soccer ball</option>
           <option value="2">Parachutist</option>
           <option value="3">Skydiver</option>
@@ -157,11 +157,8 @@
 
            <p>Choose objects for simulation through the dropdown menu. For custom object, select "custom"
            and then enter the physical properties. </p>
-          
-           <p>Press "Start" button to start the animation. </p>
-
-           <p>Press "Stop" to interrupt the animation. Beware that the animation can't be resumed once interrupted.</p>
-          
+              
+           <p>The simulation speed can be adjusted by entering a positive number in the "Play Speed" box.</p>
            <p>For the "skydiver" simulation, "height" indicates the distance from the jumping point. </p>
            
         </div>
@@ -179,13 +176,17 @@
           </button>
         </div>
         <div class="modal-body">
-          <p><b>On calculation</b></p>
+          <!-- <p><b>On calculation</b></p> -->
           <p>The equation for drag force calculation is:
             $$F_D = \frac{C_D \rho V^2 A}{2}$$
             Where \( C_D \) is the drag coefficient. \( \rho \) is the desity of 
-            surrounding fluid, which is air in our case. \( A \) is the cross-sectional 
-            area of the object.
+            surrounding fluid. In our case, it is \( \rho _{air} = 1.23\) \(kg/m^3\). \( A \) is the cross-sectional 
+            area of the object. \( V \) is the velocity of the object.
           </p>
+
+          <p>In the equation above, velocity is not a constant value. The acceleraion of the object is affected by the 
+            graviational force and the drag force, which means it is a system of differential equations. In this simulation,
+           the system is solved iteratively using a time gap of 0.001 second. </p>
 
           
         </div>
@@ -207,7 +208,7 @@
           <p>The parachutist was assumed to weight 75 kg without the parachute. The parachute for reference is a <a href="http://www.paragear.com/skydiving/10000220/C88/PRECISION-AERODYNAMICS-FALCON-MAIN-PARACHUTE">Falcon 265</a> parachute, which 
           has a area of 265 ft<sup>2</sup> and a weight of 11 lbs.  </p>
           <P>The photo used in skydiver simulation is <span>Photo by <a href="https://unsplash.com/@taylorvanriper925?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Taylor Van Riper</a> on <a href="https://unsplash.com/s/photos/sky?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span></P>
-          <p>Skydiver simulation is set up based on the paper: <br>Landell-Mills N. (2017). Buoyancy Explains Terminal Velocity in Skydiving.</p>
+          <p>Physical data for skydiver simulation is acquired from the paper: <br>Landell-Mills N. (2017). <i>Buoyancy Explains Terminal Velocity in Skydiving</i>.</p>
         </div>
       </div>
     </div>
