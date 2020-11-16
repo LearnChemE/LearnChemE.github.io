@@ -2,11 +2,16 @@
   width: 800px;
 }
 
+
 #controls-area {
   display: grid;
   grid-template-columns: 100%;
   width: 640px;
   margin-bottom: 2rem;
+}
+
+div{
+  font-size: 13px;
 }
 
 #top-controls-row {
@@ -32,6 +37,7 @@ select {
 
 .data-area {
   display: grid;
+  align-items: center;
 }
 
 .data-row {
@@ -50,6 +56,13 @@ select {
   gap: 1px;
 }
 
+#select-row
+{
+  display: grid;
+  align-items: center;
+  width: 100px 100px;
+}
+
 #input-variables .data-row {
   grid-template-columns: 20ch min-content 5ch;
   font-size: 0.9rem;
@@ -57,7 +70,7 @@ select {
 
 #output-variables {
   height: min-content;
-  gap: 0.25rem;
+  gap: 0rem;
 }
 
 #output-variables .data-row {
@@ -108,6 +121,8 @@ input[type="text"].form-control:focus {
 
 #object-fall-area {
   height: min-content;
+  grid-template-rows: auto;
+  align-items: center;
 }
 
 #object-fall-area img {

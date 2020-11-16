@@ -25,7 +25,7 @@
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
-<body>
+<body onload = "loadAxes()">
 
   <div id="app">
 
@@ -47,9 +47,19 @@
 
       <div id="bottom-controls-row">
                 
-        <div id="variables-stack">
+        <div id="variables-stack" >
 
           <div class="data-area" id="input-variables">
+            <div class="select-row">
+              <select id="object-selection"  style="width: 130px; font-size: 13px;">
+                <option value="1" disabled selected hidden>Select an object</option> 
+                <option value="1">Soccer ball</option>
+                <option value="2">Parachutist</option>
+                <option value="3">Skydiver</option>
+                <option Value="-1">Custom</option>
+              </select>
+            </div>
+
             <div class="data-row input-group-sm">
               <div class="data-name">Drag Coefficient = </div>
               <input type="text" class="form-control data-value" id="dragCoeff" value="0.5">
@@ -71,13 +81,40 @@
 
         </div>
 
-        <select id="object-selection">
-          <option value="1" disabled selected hidden>Select an object</option> 
-          <option value="1">Soccer ball</option>
-          <option value="2">Parachutist</option>
-          <option value="3">Skydiver</option>
-          <option Value="-1">Custom</option>
-        </select>
+        <div class="data-area" id="output-variables">
+          <div class="data-row">
+            <div class="data-name">Force of Gravity = </div>
+            <div class="data-value" id="GForce">0</div>
+            <div class="data-metric">N</div>
+          </div>
+          
+          <div class="data-row">
+            <div class="data-name">Drag Force = </div>
+            <div class="data-value" id="HDrag">0</div>
+            <div class="data-metric">N</div>
+          </div>
+  
+          <div class="data-row">
+            <div class="data-name">Velocity = </div>
+            <div class="data-value" id="HVelocity">0</div>
+            <div class="data-metric">m/s</div>
+          </div>
+  
+          <div class="data-row">
+            <div class="data-name">Height = </div>
+            <div class="data-value" id="HHeight">0</div>
+            <div class="data-metric">m</div>
+          </div>
+  
+          <div class="data-row">
+            <div class="data-name">Acceleration = </div>
+            <div class="data-value" id="HAcceleration">0</div>
+            <div class="data-metric">(m/s<sup>2</sup>)</div>
+          </div>
+  
+          
+  
+        </div>
 
       </div>
 
@@ -89,49 +126,20 @@
         <img src="../img/ball.png" id="objImage" />
         <img src="../img/monument1.png" id="structureImage" />
         
-        <div class = "speed-row" id = "speedControl">
+        <!-- <div class = "speed-row" id = "speedControl">
           <div class="data-name">Play speed: </div>
           <input type="text" class="form-control data-value" id="playspeed" value="1">
-        </div >
+        </div > -->
+        <div class="slidecontainer" style="align-self:right;">
+          <div>Animation Speed: </div> <div id = "speed-display">1</div>
+          <input type="range" min="0.1" max="4" step="0.1" value="1" class="slider" id="slider">
+        </div>
       </div>
   
       <div id="plot">
       </div>
 
-      <div class="data-area" id="output-variables">
-        <div class="data-row">
-          <div class="data-name">Force of Gravity = </div>
-          <div class="data-value" id="GForce">0</div>
-          <div class="data-metric">N</div>
-        </div>
-        
-        <div class="data-row">
-          <div class="data-name">Drag Force = </div>
-          <div class="data-value" id="HDrag">0</div>
-          <div class="data-metric">N</div>
-        </div>
-
-        <div class="data-row">
-          <div class="data-name">Velocity = </div>
-          <div class="data-value" id="HVelocity">0</div>
-          <div class="data-metric">m/s</div>
-        </div>
-
-        <div class="data-row">
-          <div class="data-name">Height = </div>
-          <div class="data-value" id="HHeight">0</div>
-          <div class="data-metric">m</div>
-        </div>
-
-        <div class="data-row">
-          <div class="data-name">Acceleration = </div>
-          <div class="data-value" id="HAcceleration">0</div>
-          <div class="data-metric">(m/s<sup>2</sup>)</div>
-        </div>
-
-        
-
-      </div>
+      
     
     </div>
 
@@ -139,7 +147,7 @@
 
   <!-- Modals -->
   <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
@@ -161,13 +169,14 @@
            <p>The simulation speed can be adjusted by entering a positive number in the "Play Speed" box.</p>
            <p>For the "skydiver" simulation, "height" indicates the distance from the jumping point. </p>
            
+
         </div>
       </div>
     </div>
   </div>
 
   <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="detailsModalLabel">Details</h5>
@@ -189,13 +198,18 @@
            the system is solved iteratively using a time gap of 0.001 second. </p>
 
           
+          <p>A FIFA standard soccer ball have circumference of between 68 cm and 70 cm. It  should weight between 410 g and 450 g. </p>
+          <p>The parachutist was assumed to weight 75 kg without the parachute. The parachute for reference is a <a href="http://www.paragear.com/skydiving/10000220/C88/PRECISION-AERODYNAMICS-FALCON-MAIN-PARACHUTE">Falcon 265</a> parachute, which 
+          has a area of 265 ft<sup>2</sup> and a weight of 11 lbs.  </p>
+
+          
         </div>
       </div>
     </div>
   </div>
 
   <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="aboutModalLabel">About</h5>
@@ -204,9 +218,12 @@
           </button>
         </div>
         <div class="modal-body">
-          <p>A FIFA standard soccer ball have circumference of between 68 cm and 70 cm. It  should weight between 410 g and 450 g. </p>
-          <p>The parachutist was assumed to weight 75 kg without the parachute. The parachute for reference is a <a href="http://www.paragear.com/skydiving/10000220/C88/PRECISION-AERODYNAMICS-FALCON-MAIN-PARACHUTE">Falcon 265</a> parachute, which 
-          has a area of 265 ft<sup>2</sup> and a weight of 11 lbs.  </p>
+          <p>This simulation was created in the Department of Chemical and
+             Biological Engineering, University of Colorado Boulder for LearnChemE.com
+              by Mingyuan Lu and Neil Hendren under the direction of Professor
+               John L. Falconer. Address any questions or comments to
+                learncheme@gmail.com.
+          </p>
           <P>The photo used in skydiver simulation is <span>Photo by <a href="https://unsplash.com/@taylorvanriper925?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Taylor Van Riper</a> on <a href="https://unsplash.com/s/photos/sky?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span></P>
           <p>Physical data for skydiver simulation is acquired from the paper: <br>Landell-Mills N. (2017). <i>Buoyancy Explains Terminal Velocity in Skydiving</i>.</p>
         </div>

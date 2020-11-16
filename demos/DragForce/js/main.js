@@ -10,6 +10,7 @@ const cdInp = document.getElementById("dragCoeff");
 const aInp = document.getElementById("area");
 const mInp = document.getElementById("mass");
 const uSpeed = document.getElementById("playspeed");
+const slider = document.getElementById("slider");
 
 
 let yPosition = 0; // Initial position of the objImage
@@ -36,20 +37,49 @@ function updateGraph(array) {
 }
 
 // This updates the x and y axes to match the maximum time and fall velocity
-function updateAxes() {
-  const maxXAxis = Math.ceil(fallTime);
-  const maxYAxis = Math.ceil(max_velocity);
-  Plot.getOptions().xaxes[0].max = maxXAxis;
-  Plot.getOptions().yaxes[0].max = Number( 10 + maxYAxis - ( maxYAxis % 10 ) ); // sets y axis to max velocity in increments of 10
+function loadAxes()
+{
+  obj = selection.value;
+  if(obj != 3)
+    {Plot.getOptions().xaxes[0].max = 3;}
+  if(obj == 3)
+    {
+      Plot.getOptions().xaxes[0].max = 25;
+    }
+  
+  Plot.getOptions().yaxes[0].max = 20*((obj==1)||(obj==-1)) + 10*(obj==2)+70*(obj==3); // sets y axis to max velocity in increments of 10
   Plot.setupGrid();
   Plot.draw();
+}
+
+function updateAxes(curT) {
+  const maxXAxis = Math.ceil(fallTime);
+  const maxYAxis = Math.ceil(max_velocity);
+  if(obj == 3)
+  {
+    Plot.getOptions().xaxes[0].max = 25;
+  }
+  else
+  { if(curT<3)
+    {
+      Plot.getOptions().xaxes[0].max = 3;
+    }
+    else
+    {
+      Plot.getOptions().xaxes[0].max = curT;
+    }
+    Plot.getOptions().yaxes[0].max = Number( 10 + maxYAxis - ( maxYAxis % 10 ) ); // sets y axis to max velocity in increments of 10
+    Plot.setupGrid();
+    Plot.draw();
+  }
 }
 
 // This function is called once every animation frame.
 function animationFunction() {
   index++; // Increment our arbitrary "index" variable by 1
+  updateAxes(elapsed / 1000*speed);
   advance(); // See calculation.js
-  graphData.push([elapsed / 1000*speed, velocity]); // Add new data to the "graphData" variable
+  graphData.push([elapsed / 1000*speed, velocity]); // Add new data to the "graphData" variable
   updateDOM();
   updateGraph(graphData);
 }
@@ -82,24 +112,14 @@ function step() {
 // We do not want it to be called if the simulation is already running, hence the "isRunning" variable
 function startPauseAnimation() {
 
-  
-  speed = uSpeed.value;
-  if(isNaN(speed)||(speed<=0))
-  {
-    alert("Please enter a number greater than 0 for Play Speed.");
-    resetAnimation();
-    return;
-  }
-
-  uSpeed.setAttribute("disabled", "true");
-  
+  slider.setAttribute("disabled","ture");
   
   startPauseButton.innerHTML = "Pause"
 
   if (!isRunning && height > 0) {
     [selection, cdInp, aInp, mInp].forEach(inp => { inp.setAttribute("disabled", "true") });
     VT();
-    updateAxes();
+    updateAxes(index);
     isRunning = true;
     index = 0;
     start = Date.now();
@@ -122,20 +142,21 @@ function startPauseAnimation() {
 
 function resetAnimation() {
 
-  uSpeed.removeAttribute("disabled");
+  slider.removeAttribute("disabled");
   isRunning = false;
   isPaused = false;
   selection.removeAttribute("disabled");
   updateInput();
   window.cancelAnimationFrame(step);
   initValue();
-  graphData = [[0, 0]];
+  graphData = [{data:[0, 0],color:'#3248a8'}];
   fallTime = 10;
-  document.getElementById("playspeed").value = 1;
+  initSpeed();
   speed = 1;
+  index = 0;
   startPauseButton.innerHTML = "Start"
-  graphData = [[0, 0]];
-  updateAxes();
+  graphData = [{data:[0, 0],color:'#3248a8'}];
+  updateAxes(index);
   updateGraph(graphData);
 }
 
@@ -144,7 +165,7 @@ function updateInput()
   // selection.value is a string, so make sure this switch statement uses strings
   
 
-
+  loadAxes();
 
   switch(selection.value) {
     default:
@@ -233,12 +254,26 @@ function fallObject() {
   this.setSoccer();
 }
 
+function updateSpeed()
+{
+  document.getElementById("speed-display").innerHTML = slider.value;
+  speed = slider.value;
+}
+
+function initSpeed()
+{
+  speed = 1;
+  slider.value = 1;
+  updateSpeed();
+}
+
 let FallObject = new fallObject();
 
 // Instruct the start button to call the startAnimation() function when we click it
 startPauseButton.addEventListener("click", startPauseAnimation);
 resetButton.addEventListener("click", resetAnimation);
 selection.addEventListener("change", updateInput);
+slider.addEventListener("change",updateSpeed);
 [cdInp, mInp, aInp].forEach(inp => {
   inp.addEventListener("change", () => {
     try { initValue() } catch(e) {}
