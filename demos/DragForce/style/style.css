@@ -44,7 +44,9 @@ select {
 .data-row {
   display: grid;
   align-items: center;
+  grid-template-columns: 20ch min-content 5ch;
   gap: 1ch;
+  font-size: 0.9rem;
 }
 
 .speed-row {
@@ -61,13 +63,21 @@ select {
 {
   display: grid;
   justify-items: center;
-  width: 100px 100px;
-  padding-bottom: 5px;
+  align-items: center;
+  grid-template-columns: 150px max-content;
+  gap: 0px 10px;
+  padding-top: 10px;
 }
 
-#input-variables .data-row {
-  grid-template-columns: 20ch min-content 5ch;
-  font-size: 0.9rem;
+.select-row>div {
+  justify-self: right;
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: 150px 100px 5ch 2ch;
+  align-items: center;
+  gap: 0px 5px;
 }
 
 #output-variables {
