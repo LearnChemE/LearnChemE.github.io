@@ -7,7 +7,7 @@
   display: grid;
   grid-template-columns: 100%;
   width: 640px;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 div{
@@ -16,18 +16,19 @@ div{
 
 #top-controls-row {
   display: grid;
-  grid-template-columns: 60% 40%;
+  grid-template-columns: repeat(2, max-content);
   align-items: center;
   justify-items: center;
-  gap: 20px;
-  margin: 20px;
+  gap: 10px;
+  margin: 10px;
+  margin-bottom: 20px;
 }
 
 #bottom-controls-row {
   display: grid;
   grid-template-columns: repeat(2, max-content);
-  gap: 80px;
-  margin: 0rem 0rem 1rem 4.5rem;
+  gap: 20px;
+  margin: 0rem 0rem 0rem 1rem;
 }
 
 select {
@@ -43,7 +44,9 @@ select {
 .data-row {
   display: grid;
   align-items: center;
+  grid-template-columns: 20ch min-content 5ch;
   gap: 1ch;
+  font-size: 0.9rem;
 }
 
 .speed-row {
@@ -56,16 +59,25 @@ select {
   gap: 1px;
 }
 
-#select-row
+.select-row
 {
   display: grid;
+  justify-items: center;
   align-items: center;
-  width: 100px 100px;
+  grid-template-columns: 150px max-content;
+  gap: 0px 10px;
+  padding-top: 10px;
 }
 
-#input-variables .data-row {
-  grid-template-columns: 20ch min-content 5ch;
-  font-size: 0.9rem;
+.select-row>div {
+  justify-self: right;
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: 150px 100px 5ch 2ch;
+  align-items: center;
+  gap: 0px 5px;
 }
 
 #output-variables {
@@ -82,7 +94,7 @@ select {
 #output-variables .data-value {
   padding-left: 0.2rem;
   width: max-content;
-  min-width: 4.8ch;
+  min-width: 5.8ch;
 }
 
 .data-name {
@@ -149,6 +161,13 @@ input[type="text"].form-control:focus {
   top: 4.27021px; 
   width: 228.057px; 
   height: 65.2731px;
+}
+
+.slidecontainer {
+  width: max-content;
+  margin: 5px;
+  margin-left: 2.5rem;
+  line-height: 1.5rem;
 }
 
 #plot {

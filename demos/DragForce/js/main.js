@@ -207,8 +207,8 @@ function fallObject() {
 
   this.setSoccer = () => {
     this.Cd = 0.5;
-    this.A = 0.147;
-    this.M = 0.75;
+    this.A = 0.15;
+    this.M = 0.41;
     this.src = "../img/ball.png";
     this.updateInputs(true);
   }
@@ -239,9 +239,9 @@ function fallObject() {
       [cdInp, aInp, mInp].forEach(inp => {
         inp.setAttribute("disabled", "true");
       });
-      cdInp.value = this.Cd;
-      aInp.value = this.A;
-      mInp.value = this.M;
+      cdInp.value = Math.log( this.Cd );
+      aInp.value = Math.log( this.A );
+      mInp.value = Math.log( this.M );
     } else {
       [cdInp, aInp, mInp].forEach(inp => {
         inp.removeAttribute("disabled");
@@ -273,9 +273,9 @@ let FallObject = new fallObject();
 startPauseButton.addEventListener("click", startPauseAnimation);
 resetButton.addEventListener("click", resetAnimation);
 selection.addEventListener("change", updateInput);
-slider.addEventListener("change",updateSpeed);
+slider.addEventListener("input",updateSpeed);
 [cdInp, mInp, aInp].forEach(inp => {
-  inp.addEventListener("change", () => {
+  inp.addEventListener("input", () => {
     try { initValue() } catch(e) {}
   })
 })

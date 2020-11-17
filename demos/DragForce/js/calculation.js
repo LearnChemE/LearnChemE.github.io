@@ -51,14 +51,14 @@ function VT()
 
 function initValue()
 {
-    // Sets a minimum input value of 0.001
-    Cd = Number(document.getElementById("dragCoeff").value) > 0 ? Number(document.getElementById("dragCoeff").value) : 0.001;
-    A = Number(document.getElementById("area").value) > 0 ? Number(document.getElementById("area").value) : 0.001;
-    M = Number(document.getElementById("mass").value) > 0 ? Number(document.getElementById("mass").value) : 0.001;
+    // We can span orders of magnitude by using Math.exp of the slider value
+    Cd = Math.exp( document.getElementById("dragCoeff").value );
+    A = Math.exp( document.getElementById("area").value );
+    M = Math.exp( document.getElementById("mass").value );
 
-    cdInp.value = Cd;
-    aInp.value = A;
-    mInp.value = M;
+    document.getElementById("cdValue").innerHTML = `${formatNumber(Cd)}`;
+    document.getElementById("areaValue").innerHTML = `${formatNumber(A)}`;
+    document.getElementById("massValue").innerHTML = `${formatNumber(M)}`;
 
     time = 0;
     acceleration = 0;
@@ -86,16 +86,19 @@ function updateDOM()
     objImage.style.top = `${ 40+(fall_height - height) * ( (image_height-40) / fall_height ) }px`;
 }
 
-// This returns a number, formatted to be around 3-4 characters long
+// This returns a number as a string, formatted to be around 3-4 characters long
 function formatNumber(num) {
     let n = Number.parseFloat(num);
     if (isNaN(n)) { n = 0 }
     n = Math.round(n * 10000) / 10000;
     if ( n === 0 ) { return 0 }
-    else if ( n > 10 ) { return Number.parseInt(n) }
-    else if ( n > 1 ) { return Number( Number( Math.round( n * 10 ) / 10 ).toFixed(1) ) }
+    else if ( n >= 10 ) { return Number.parseInt(n).toFixed(0) }
+    else if ( n >= 1 ) { return Number( Math.round( n * 10 ) / 10 ).toFixed(1) }
+    else if ( n >= 0.01 ) {
+        return Number( Math.round( n * 100 ) / 100 ).toFixed(2);
+    }
     else { 
-        if ( n < 0.001 ) { return 0 }
-        return Number( Number( Math.round( n * 1000 ) / 1000 ).toPrecision(1) )
+        if ( n < 0.001 ) { return "0" }
+        return Number( Math.round( n * 1000 ) / 1000 ).toPrecision(1);
     }
 }
