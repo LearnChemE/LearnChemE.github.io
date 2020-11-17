@@ -1,6 +1,7 @@
 // This code is only run once when the page loads to initialize the plot.
 // More information for formatting the chart at https://github.com/flot/flot/blob/master/API.md
 // Also see http://www.flotcharts.org/
+// More reference information at http://www.flotcharts.org/flot/API/
 
 // This is the font for the tick labels ("0.0", "0.5", etc.). To modify the styling for the axis labels e.g. "time (s)" or "position (pixels)", you will need to do that in the style.css file.
 let axisFont = {
@@ -32,7 +33,12 @@ let plotOptions = {
       font : axisFont,
     },
   ],
-
+  series: {
+    lines: {
+      lineWidth: 2,
+    }
+  },
+  colors: ["#0000FF"],
 }
 
 // The initial data set is just a single point at [0, 0]
@@ -46,3 +52,5 @@ let Plot = $.plot( //$for Jquery variable0
   data,
   plotOptions
 );
+
+console.log( Plot.getOptions() );
