@@ -27,6 +27,7 @@ let fallTime = 10; // The amount of time it takes to fall - calculated every tim
 let max_velocity = 50; // Also calculated every time VT() is called
 let sd = 0; //indicator of skydiving
 const image_height = structureImage.getBoundingClientRect().height; // automatically grab the height of the structure (e.g. the tower)
+const object_height = objImage.getBoundingClientRect().height;
 
 // This function updates the Plot with a two-dimensional array of coordinates, e.g. [[0, 0], [5, 2], [3, 1], ...]
 // See some examples of live updating at http://www.flotcharts.org/flot/examples/ . You can view the source code of the examples in the index.html file of each example page on this website.
@@ -173,24 +174,31 @@ function updateInput()
       fall_height = 169;      
       FallObject.setCustom();
       structureImage.src = "../img/monument1.png";
+      
       break;
     case "1":
       sd = 0;
       fall_height = 169;
       FallObject.setSoccer();
       structureImage.src = "../img/monument1.png";
+      objImage.style.height = "30px";
+      objImage.style.width = "30px";
       break;
     case "2":
       sd = 0;
       fall_height = 169;
       FallObject.setJumper();
       structureImage.src = "../img/monument1.png";
+      objImage.style.height = "35px";
+      objImage.style.width = "35px";
       break;
     case "3":
       sd = 1;
       fall_height = 1500;
       FallObject.setSkyDiver();
       structureImage.src = "../img/sky.jpg";
+      objImage.style.height = "21px";
+      objImage.style.width = "42px";
       
       break;
       
@@ -199,6 +207,8 @@ function updateInput()
       fall_height = 169;
       FallObject.setCustom();
       structureImage.src = "../img/monument1.png";
+      objImage.style.height = "20px";
+      objImage.style.width = "20px";
       break;
   }
 }
@@ -211,6 +221,7 @@ function fallObject() {
     this.M = 0.41;
     this.src = "../img/ball.png";
     this.updateInputs(true);
+
   }
 
   this.setJumper = () => {
@@ -219,6 +230,7 @@ function fallObject() {
     this.M = 79;
     this.src = "../img/Parachute-Fallschirm.svg";
     this.updateInputs(true);
+
   }
 
   this.setSkyDiver = () => {
@@ -227,11 +239,13 @@ function fallObject() {
     this.M = 79;
     this.src = "../img/skydiver.png";
     this.updateInputs(true);
+
   }
 
   this.setCustom = () => {
     this.src = "../img/custom.png";
     this.updateInputs(false);
+
   }
 
   this.updateInputs = (disable) => {
@@ -248,6 +262,7 @@ function fallObject() {
       });
     }
     objImage.setAttribute("src", this.src);
+
     try { initValue() } catch(e) {}
   }
 

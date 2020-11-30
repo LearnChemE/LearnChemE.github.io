@@ -151,8 +151,8 @@ input[type="text"].form-control:focus {
   position : relative;
   top : 40px;
   left : 50px;
-  width : 35px;
-  height : 35px;
+  width : 30px;
+  height : 30px;
   transform : translateY(-100%);
 }
 

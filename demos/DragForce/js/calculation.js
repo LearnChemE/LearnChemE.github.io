@@ -83,7 +83,7 @@ function updateDOM()
     document.getElementById("HVelocity").innerHTML = formatNumber(velocity);
     document.getElementById("HHeight").innerHTML = formatNumber(height) - (sd==1)*fall_height;
     document.getElementById("HAcceleration").innerHTML = formatNumber(acceleration);
-    objImage.style.top = `${ 40+(fall_height - height) * ( (image_height-40) / fall_height ) }px`;
+    objImage.style.top = `${ object_height+(fall_height - height) * ( (image_height-object_height) / fall_height ) }px`;
 }
 
 // This returns a number as a string, formatted to be around 3-4 characters long
