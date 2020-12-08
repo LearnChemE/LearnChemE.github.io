@@ -4,7 +4,7 @@ var rho_air = 1.23; //air density
 var time = 0;
 var Cd = 0.5;
 var A = 0.147;
-var M = 0.75;
+var M = 0.41;
 var fall_height = 169; // height of washington monument
 
 var acceleration = 0;
