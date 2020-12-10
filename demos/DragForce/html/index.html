@@ -250,20 +250,30 @@
           
           <div class="modal-equation">
             $$
-            V(t) = \mathrm{ tanh } \left(\sqrt{ \frac{ A C_{D} g t^{2} \rho_{air} }{ 2m } } \right) \sqrt{ \frac{ 2 g m }{ A C_{D} \rho_{air} } }
+            V(t) = \mathrm{ tanh } \left[ \left( \alpha g \right)^{ \frac{1}{2} } t \right] \sqrt{ \frac{ g }{ \alpha } }
             $$
 
           </div>
           
           <div class="modal-equation">
             $$
-            Y(t) = Y_0 - \mathrm{ ln } \left[ \mathrm{ cosh } \left( \sqrt{ \frac{ A C_{D} gt^{2} \rho_{air} }{ 2 m } } \right) \right] \frac{ 2 m }{ AC_{D}\rho_{air} }
+            Y(t) = Y_0 - \frac{ \mathrm{ ln } \left[ \mathrm{ cosh } \left( g^{ \frac{1}{2} } t \right) \right] }{ \alpha }
             $$
 
           </div>
          
           <div class="modal-text">
-           A FIFA standard soccer ball has a circumference of 0.69 &#x00B1; 0.01 m and mass of 0.43 &#x00B1; 0.02 kg. The parachutist (without the parachute) was assumed to weigh 75 kg. The parachute used for reference is a <a href="http://www.paragear.com/skydiving/10000220/C88/PRECISION-AERODYNAMICS-FALCON-MAIN-PARACHUTE">Falcon 265</a> parachute, which 
+            where
+          </div>
+
+          <div class="modal-equation">
+            $$
+            \alpha = \frac{ A C_{D} \rho_{air} }{ 2 m }
+            $$
+          </div>
+
+          <div class="modal-text">
+            A FIFA standard soccer ball has a circumference of 0.69 &#x00B1; 0.01 m and mass of 0.43 &#x00B1; 0.02 kg. The parachutist (without the parachute) was assumed to weigh 75 kg. The parachute used for reference is a <a href="http://www.paragear.com/skydiving/10000220/C88/PRECISION-AERODYNAMICS-FALCON-MAIN-PARACHUTE">Falcon 265</a> parachute, which 
             has an area of 24.6 m<sup>2</sup> and mass of 5 kg.
           </div>
         
