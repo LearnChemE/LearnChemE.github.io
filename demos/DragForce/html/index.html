@@ -217,21 +217,35 @@
           </div>
           
           <div class="modal-text">
-            Where \( C_D \) is the drag coefficient, \( \rho_{air} \) is the density of air ( 1.23 kg/m<sup>3</sup> ), \( A \) is the cross-sectional area of the object, and \( V \) is its velocity ( \( V=-dY/dt \), where \( Y \) is height).
+            Where \( C_D \) is the drag coefficient, \( \rho_{air} \) is the density of air ( 1.23 kg/m<sup>3</sup> ), \( A \) is the cross-sectional area of the object, and \( V \) is its velocity. The following system of ordinary differential equations describes the velocity ( \( V \) ) and height ( \( Y \) ):
           </div>
 
-          <div class="modal-text">
-            Drag is subtracted from gravitational acceleration ( \( g \) ) to give net acceleration:
+          <div class="modal-equation no-padding">
+            $$
+            \frac{ dY }{ dt } = - V
+            $$
           </div>
           
-          <div class="modal-equation">
+          <div class="modal-equation no-padding">
             $$
             \frac{ dV }{ dt } = g - \frac{ F_{D} }{ m }
             $$
           </div>
+
+          <div class="modal-equation no-padding">
+            $$
+            Y(0) = Y_{0}
+            $$
+          </div>
+
+          <div class="modal-equation no-padding">
+            $$
+            V(0) = 0
+            $$
+          </div>
           
           <div class="modal-text">
-            where \( m \) is the object's mass. In this simulation, velocity and height were calculated using Euler's Method of numerical integration, with initial conditions for height \( Y(0) = Y_{0} \) and velocity \( V(0) = 0 \). However, an analytical solution exists to find velocity \( V(t) \) and height \( Y(t) \) as functions of time.
+            where \( m \) is the object's mass, \( t \) is time, and \( Y_{0} \) is the initial height of the object. In this simulation, velocity and height were calculated using Euler's Method of numerical integration, but an analytical solution exists to find velocity \( V(t) \) and height \( Y(t) \) as functions of time.
           </div>
           
           <div class="modal-equation">

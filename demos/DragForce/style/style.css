@@ -321,3 +321,7 @@ input[type=range]:focus::-ms-fill-upper {
 .modal-text+.modal-text {
   margin-top: 10px;
 }
+
+.modal-equation.no-padding {
+  padding: 0px;
+}
