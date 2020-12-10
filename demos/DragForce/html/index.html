@@ -196,37 +196,65 @@
   <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
+        
         <div class="modal-header">
           <h5 class="modal-title" id="detailsModalLabel">Details</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
-          <!-- <p><b>On calculation</b></p> -->
-          The equation for drag force calculation is:
-            $$F_D = \frac{C_D \rho V^2 A}{2}$$
-            Where \( C_D \) is the drag coefficient. \( \rho \) is the desity of 
-            surrounding fluid. In our case, it is \( \rho _{air} = 1.23\) \(kg/m^3\). \( A \) is the cross-sectional 
-            area of the object. \( V \) is the velocity of the object.<br>
-          The velocity of freefall can be represented as \(\frac{dY}{dt} = -V\). 
-          At the same time, the acceleraion is related with drag coefficient.
-          \(\frac{dV}{dt} = g - \frac{F_D}{m} \). 
-          Where \(g\) is the graviational constant and \(m\) is the mass of the object. Using the initial condition of \(Y(0)=Y_0\)
-          and \(V(0)=0\), we can solve the function of velocity \(V\) and height \(Y\) with respect to time \(t\).
-          $$ V(t) = \sqrt{\frac{2mg}{AC_D\rho}}\cdot tanh(\sqrt{\frac{AC_Dg\rho_{air}}{m}}\cdot t)$$
-          $$ Y(t) = Y_0 + \frac{2\log_{10}(e) m (\sqrt{\frac{2AC_{D} {g} \rho_{air}}{m}}\cdot t +1)-2\log_{10}(2)m}{AC_D\rho_{air}}
-          -\sqrt{\frac{2mg}{AC_D \rho_{air}}} \cdot t$$
-          
-
         
+        <div class="modal-body">
           
-         <p> A FIFA standard soccer ball have circumference of between 68 cm and 70 cm. It  should weight between 410 g and 450 g. <br>
-          The parachutist was assumed to weight 75 kg without the parachute. The parachute for reference is a <a href="http://www.paragear.com/skydiving/10000220/C88/PRECISION-AERODYNAMICS-FALCON-MAIN-PARACHUTE">Falcon 265</a> parachute, which 
-          has a area of 265 ft<sup>2</sup> and a weight of 11 lb.  </p>
+          <div class="modal-text">
+            The equation for drag force is:
+          </div>
+          
+          <div class="modal-equation">
+            $$
+            F_D = \frac{C_D \rho_{air} V^2 A}{2}
+            $$
+          </div>
+          
+          <div class="modal-text">
+            Where \( C_D \) is the drag coefficient, \( \rho_{air} \) is the density of air ( 1.23 kg/m<sup>3</sup> ), \( A \) is the cross-sectional area of the object, and \( V \) is its velocity ( \( V=-dY/dt \), where \( Y \) is height).
+          </div>
 
+          <div class="modal-text">
+            Drag is subtracted from gravitational acceleration ( \( g \) ) to give net acceleration:
+          </div>
           
+          <div class="modal-equation">
+            $$
+            \frac{ dV }{ dt } = g - \frac{ F_{D} }{ m }
+            $$
+          </div>
+          
+          <div class="modal-text">
+            where \( m \) is the object's mass. In this simulation, velocity and height were calculated using Euler's Method of numerical integration, with initial conditions for height \( Y(0) = Y_{0} \) and velocity \( V(0) = 0 \). However, an analytical solution exists to find velocity \( V(t) \) and height \( Y(t) \) as functions of time.
+          </div>
+          
+          <div class="modal-equation">
+            $$
+            V(t) = \mathrm{ tanh } \left( \sqrt{ \frac{ A C_{D} g \rho_{air} }{ 2 m } } t \right) \sqrt{ \frac{ 2 g m }{ A C_{D} \rho_{air} } }
+            $$
+
+          </div>
+          
+          <div class="modal-equation">
+            $$
+            Y(t) = Y_0 - \frac{ 2 m }{ A C_{D} \rho_{air} }\mathrm{ ln } \left[ \mathrm{ cosh } \left( \sqrt{ \frac{ A C_{D} g \rho_{air} }{ 2 m } t } \right) \right]
+            $$
+
+          </div>
+         
+          <div class="modal-text">
+           A FIFA standard soccer ball has a circumference of 0.69 &#x00B1; 0.01 m and mass of 0.43 &#x00B1; 0.02 kg. The parachutist (without the parachute) was assumed to weigh 75 kg. The parachute used for reference is a <a href="http://www.paragear.com/skydiving/10000220/C88/PRECISION-AERODYNAMICS-FALCON-MAIN-PARACHUTE">Falcon 265</a> parachute, which 
+            has an area of 24.6 m<sup>2</sup> and mass of 5 kg.
+          </div>
+        
         </div>
+
       </div>
     </div>
   </div>
