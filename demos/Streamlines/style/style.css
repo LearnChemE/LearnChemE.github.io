@@ -1,8 +1,8 @@
 .input-area {
     display: grid;
-    grid-template-columns: 150px 100px 5ch 5ch;
+    grid-template-columns: 150px 180px 5ch 5ch;
     align-items: center;
-    gap: 0px 5px;
+    gap: 0px 10px;
 }
 
 .value-area {

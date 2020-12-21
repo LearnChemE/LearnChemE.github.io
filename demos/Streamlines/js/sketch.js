@@ -5,11 +5,16 @@ function setup() {
 }
 
 // Initial reynolds number
-let re = 100;
+let re = 11236;
 let viscosity = 0.0089;
-let velocity = 2.42;
+let velocity = 1;
 let density = 1000;
 let diameter = 0.1;
+
+let visInp = document.getElementById("viscosity");
+let vInp = document.getElementById("velocity");
+let rhoInp = document.getElementById("density");
+let dInp = document.getElementById("diameter");
 
 // Maximum arrow length (pixels)
 let lineLength = 5;
@@ -18,25 +23,55 @@ let lineLength = 5;
 let canvasSize = 3;
 
 // This updates the variable "re" to match the value of the slider
-document.getElementById("viscosity").addEventListener("input", e => {
-  viscosity = Number( e.target.value );
-  document.getElementById("viscosityValue").innerHTML = `${re}`;
+
+[visInp,vInp,rhoInp,dInp].forEach(inp => {
+  inp.addEventListener("input",()=>{
+    try { initValue() } catch(e) {}
+  })
 })
 
-document.getElementById("re").addEventListener("input", e => {
-  re = Number( e.target.value );
-  document.getElementById("reVal").innerHTML = `${re}`;
-})
+function initValue()
+{
+    // We can span orders of magnitude by using Math.exp of the slider value
+    viscosity = Math.exp( visInp.value );
+    velocity = Math.exp( vInp.value );
+    density = Math.exp( rhoInp.value );
+    diameter = Math.exp( dInp.value );
 
-document.getElementById("re").addEventListener("input", e => {
-  re = Number( e.target.value );
-  document.getElementById("reVal").innerHTML = `${re}`;
-})
+    document.getElementById("viscosityValue").innerHTML = `${formatNumber(viscosity)}`;
+    document.getElementById("velocityValue").innerHTML = `${formatNumber(velocity)}`;
+    document.getElementById("densityValue").innerHTML = `${formatNumber(density)}`;
+    document.getElementById("diameterValue").innerHTML = `${formatNumber(diameter)}`;
+    
 
-document.getElementById("re").addEventListener("input", e => {
-  re = Number( e.target.value );
-  document.getElementById("reVal").innerHTML = `${re}`;
-})
+
+
+    updateRe();
+}
+
+function updateRe()
+{
+  re = density * velocity * diameter / viscosity;
+  document.getElementById("ReNumber").innerHTML = `${formatNumber(re)}`;
+
+}
+
+function formatNumber(num) {
+  let n = Number.parseFloat(num);
+  if (isNaN(n)) { n = 0 }
+  n = Math.round(n * 10000) / 10000;
+  if ( n === 0 ) { return 0 }
+  else if ( n >= 10 ) { return Number.parseInt(n).toFixed(0) }
+  else if ( n >= 1 ) { return Number( Math.round( n * 100 ) / 100 ).toFixed(2) }
+  else if ( n >= 0.01 ) {
+      return Number( Math.round( n * 1000 ) / 1000 ).toFixed(3);
+  }
+  else if ( n >= 0.001 ) {
+    return Number( Math.round( n * 10000 ) / 10000 ).toFixed(4);
+  }
+
+  
+}
 
 // This function is from p5.js. It is called about 60 times per second 
 function draw() {
