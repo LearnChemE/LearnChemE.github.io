@@ -6,6 +6,10 @@ function setup() {
 
 // Initial reynolds number
 let re = 100;
+let viscosity = 0.0089;
+let velocity = 2.42;
+let density = 1000;
+let diameter = 0.1;
 
 // Maximum arrow length (pixels)
 let lineLength = 5;
@@ -14,6 +18,21 @@ let lineLength = 5;
 let canvasSize = 3;
 
 // This updates the variable "re" to match the value of the slider
+document.getElementById("viscosity").addEventListener("input", e => {
+  viscosity = Number( e.target.value );
+  document.getElementById("viscosityValue").innerHTML = `${re}`;
+})
+
+document.getElementById("re").addEventListener("input", e => {
+  re = Number( e.target.value );
+  document.getElementById("reVal").innerHTML = `${re}`;
+})
+
+document.getElementById("re").addEventListener("input", e => {
+  re = Number( e.target.value );
+  document.getElementById("reVal").innerHTML = `${re}`;
+})
+
 document.getElementById("re").addEventListener("input", e => {
   re = Number( e.target.value );
   document.getElementById("reVal").innerHTML = `${re}`;
