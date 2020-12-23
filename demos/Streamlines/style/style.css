@@ -1,0 +1,22 @@
+.input-area {
+    display: grid;
+    grid-template-columns: 150px 180px 5ch 5ch;
+    align-items: center;
+    gap: 0px 10px;
+}
+
+.value-area {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    gap: 20px;
+    margin: 0rem 0rem 0rem 1rem;
+}
+
+.deptRow {
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    gap: 20px;
+    margin: 0rem 0rem 0rem 1rem;
+    align-items: center;
+
+}
