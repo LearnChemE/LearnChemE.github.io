@@ -9,7 +9,7 @@ let re = 11236;
 let viscosity = 0.0089;
 let velocity = 0.01;
 let density = 1000;
-let diameter = 0.5;
+let diameter = 1;
 
 let visInp = document.getElementById("viscosity");
 let vInp = document.getElementById("velocity");
@@ -95,9 +95,9 @@ function draw() {
       // Normalize
       const x = ((canvasX - width / 2) / width) * 2 * canvasSize;
       const y = ((canvasY - height / 2) / height) * 2 * canvasSize;
-      const edge = ((height / 2 - d_pixels/2 ) / height) * 2 * canvasSize;
+      // const edge = ((height / 2 - d_pixels/2 ) / height) * 2 * canvasSize;
       
-      if ( x**2 + y**2 > edge**2 ) {
+      if ( x**2 + y**2 > 1.05 ) {
         const u = U(re, x, y);
 
         const pt1 = { 
@@ -114,7 +114,7 @@ function draw() {
         push();
           translate( ( pt1.x + pt2.x ) / 2, ( pt1.y + pt2.y ) / 2);
           rotate( Math.atan2( pt2.y - pt1.y, pt2.x - pt1.x ) );
-          const m = Math.sqrt( ( pt2.x - pt1.x )**2 + ( pt2.y - pt1.y )**2 );
+          const m = 10;
           line( -m, 0, m, 0 );
           triangle( m, 0, m / 3, m / 6, m / 3, -m / 6);
         pop();
