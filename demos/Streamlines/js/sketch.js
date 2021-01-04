@@ -7,9 +7,9 @@ function setup() {
 // Initial reynolds number
 let re = 11236;
 let viscosity = 0.0089;
-let velocity = 1;
+let velocity = 0.01;
 let density = 1000;
-let diameter = 0.1;
+let diameter = 0.5;
 
 let visInp = document.getElementById("viscosity");
 let vInp = document.getElementById("velocity");
@@ -47,6 +47,7 @@ function initValue()
 
 
     updateRe();
+    draw();
 }
 
 function updateRe()
@@ -83,7 +84,9 @@ function draw() {
   strokeWeight(0.5);
 
   // Draw a circle in the middle of the canvas
-  ellipse( width / 2, height / 2, width / canvasSize, height / canvasSize );
+
+  d_pixels = diameter*(width / canvasSize);
+  ellipse( width / 2, height / 2, d_pixels, d_pixels);
 
   // Every 20 pixels, draw an arrow from pt1 to pt2, except within the circle boundary
   for ( let canvasX = 0; canvasX < width; canvasX += 20 ) {
@@ -92,8 +95,9 @@ function draw() {
       // Normalize
       const x = ((canvasX - width / 2) / width) * 2 * canvasSize;
       const y = ((canvasY - height / 2) / height) * 2 * canvasSize;
+      const edge = ((height / 2 - d_pixels/2 ) / height) * 2 * canvasSize;
       
-      if ( x**2 + y**2 > 1 ) {
+      if ( x**2 + y**2 > edge**2 ) {
         const u = U(re, x, y);
 
         const pt1 = { 
