@@ -5,16 +5,18 @@ function setup() {
 }
 
 // Initial reynolds number
-let re = 11236;
-let viscosity = 0.0089;
-let velocity = 0.01;
-let density = 1000;
+let re = 50;
+let viscosity = 1.19;
+let velocity = 0.0425;
+let density = 1400;
+
 let diameter = 1;
 
-let visInp = document.getElementById("viscosity");
+//let visInp = document.getElementById("viscosity");
 let vInp = document.getElementById("velocity");
-let rhoInp = document.getElementById("density");
-let dInp = document.getElementById("diameter");
+let selection = document.getElementById("fluid-selection");
+//let rhoInp = document.getElementById("density");
+//let dInp = document.getElementById("diameter");
 
 // Maximum arrow length (pixels)
 let lineLength = 5;
@@ -24,28 +26,75 @@ let canvasSize = 3;
 
 // This updates the variable "re" to match the value of the slider
 
-[visInp,vInp,rhoInp,dInp].forEach(inp => {
+[vInp].forEach(inp => {
   inp.addEventListener("input",()=>{
     try { initValue() } catch(e) {}
   })
 })
 
+selection.addEventListener("change", updateFluid);
+
+function updateFluid()
+{
+  switch(selection.value) {
+    default:
+      
+      viscosity = 1.19;
+      velocity = 0.0425;
+      density = 1400;
+      updateRe();
+      updateProperty();
+      break;
+      
+    break;
+
+    //water
+    case "1":
+      
+      viscosity = 0.00112;
+      velocity = 0.0005;
+      density = 999;
+      updateRe();
+      updateProperty();
+      vInp.style.display = "none";
+      break;
+    //milk
+    case "2":
+      
+      viscosity = 0.00336;
+      velocity = 0.0005;
+      density = 1027;
+      updateRe();
+      updateProperty();
+      vInp.style.display = "none";
+      break;
+    //honey
+    case "3":
+      viscosity = 1.19;
+      velocity = 0.0425;
+      density = 1400;
+      updateRe();
+      updateProperty();
+      vInp.style.display = "block";
+      break;
+
+
+    
+  }
+}
+
 function initValue()
 {
-    // We can span orders of magnitude by using Math.exp of the slider value
-    viscosity = Math.exp( visInp.value );
-    velocity = Math.exp( vInp.value );
-    density = Math.exp( rhoInp.value );
-    diameter = Math.exp( dInp.value );
-
-    document.getElementById("viscosityValue").innerHTML = `${formatNumber(viscosity)}`;
+    velocity = Math.exp( vInp.value );  
     document.getElementById("velocityValue").innerHTML = `${formatNumber(velocity)}`;
-    document.getElementById("densityValue").innerHTML = `${formatNumber(density)}`;
-    document.getElementById("diameterValue").innerHTML = `${formatNumber(diameter)}`;
-    
+    // We can span orders of magnitude by using Math.exp of the slider value
+    //viscosity = Math.exp( visInp.value );
+    //density = Math.exp( rhoInp.value );
+    //diameter = Math.exp( dInp.value );
 
-
-
+    //document.getElementById("viscosityValue").innerHTML = `${formatNumber(viscosity)}`;
+    //document.getElementById("densityValue").innerHTML = `${formatNumber(density)}`;
+    //document.getElementById("diameterValue").innerHTML = `${formatNumber(diameter)}`;
     updateRe();
     draw();
 }
@@ -54,7 +103,15 @@ function updateRe()
 {
   re = density * velocity * diameter / viscosity;
   document.getElementById("ReNumber").innerHTML = `${formatNumber(re)}`;
+  return re;
 
+}
+
+function updateProperty(){
+  document.getElementById("viscosityValue").innerHTML = `${formatNumber(viscosity)}`;
+  document.getElementById("densityValue").innerHTML = `${formatNumber(density)}`;
+  document.getElementById("velocityValue").innerHTML = `${formatNumber(velocity)}`;
+ 
 }
 
 function formatNumber(num) {
@@ -71,6 +128,12 @@ function formatNumber(num) {
     return Number( Math.round( n * 10000 ) / 10000 ).toFixed(4);
   }
 
+  else if ( n >= 0.0001 ) {
+    return Number( Math.round( n * 100000 ) / 100000 ).toFixed(4);
+  }
+
+  
+
   
 }
 
@@ -85,8 +148,8 @@ function draw() {
 
   // Draw a circle in the middle of the canvas
 
-  d_pixels = diameter*(width / canvasSize);
-  ellipse( width / 2, height / 2, d_pixels, d_pixels);
+
+  ellipse( width / 2, height / 2, width / canvasSize, width / canvasSize);
 
   // Every 20 pixels, draw an arrow from pt1 to pt2, except within the circle boundary
   for ( let canvasX = 0; canvasX < width; canvasX += 20 ) {
