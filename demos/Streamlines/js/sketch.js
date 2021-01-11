@@ -178,8 +178,10 @@ function draw() {
           translate( ( pt1.x + pt2.x ) / 2, ( pt1.y + pt2.y ) / 2);
           rotate( Math.atan2( pt2.y - pt1.y, pt2.x - pt1.x ) );
           const m = 10;
+          // strokeWidth()
+          // p5.js library for info on styling
           line( -m, 0, m, 0 );
-          triangle( m, 0, m / 3, m / 6, m / 3, -m / 6);
+          triangle( m, 0, m / 3, m / 6, m / 3, -m / 6 );
         pop();
       }
 
