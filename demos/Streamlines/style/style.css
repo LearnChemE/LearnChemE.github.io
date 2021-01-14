@@ -1,6 +1,6 @@
 .input-area {
     display: grid;
-    grid-template-columns: 150px 180px 5ch 5ch;
+    grid-template-columns: 19ch 20ch 5ch;
     align-items: center;
     gap: 0px 10px;
 }
@@ -12,6 +12,11 @@
     margin: 0rem 0rem 0rem 1rem;
 }
 
+.group-slider {
+  display: grid;
+  grid-template-columns: 15ch 5ch;
+  gap: 1ch;
+}
 .deptRow {
     display: grid;
     grid-template-columns: repeat(3, max-content);
@@ -19,4 +24,33 @@
     margin: 0rem 0rem 0rem 1rem;
     align-items: center;
 
+}
+
+.modalButtonsRow {
+    display: grid;
+    grid-template-columns: repeat(3, 12ch );
+    gap: 20px;
+    margin: 0rem 0rem 0rem 1rem;
+
+}
+
+
+
+.modal-body .modal-text {
+    max-width: 70ch;
+    text-align: justify;
+}
+
+.modal-body .modal-equation {
+  width: max-content;
+  margin-left: 15px;
+  padding: 2px;
+}
+
+.modal-text+.modal-text {
+  margin-top: 10px;
+}
+
+.modal-equation.no-padding {
+  padding: 0px;
 }

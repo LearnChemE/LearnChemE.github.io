@@ -2,52 +2,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Streamline</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <!-- CSS -->
   <link rel="stylesheet" href="../style/style.css">
+
+  <script src="../js/jquery.js"></script>
+  <script src="../js/popper.js"></script>
+
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="../style/bootstrap.min.css">
+  <script src="../js/bootstrap.min.js"></script>
+
+
+
 </head>
 <body>
+  <div class = "modalButtonsRow">
+    <div id="dir" class="btn btn-primary" data-toggle="modal" data-target="#directionsModal">Directions</div>
+    <div id="dir" class="btn btn-primary" data-toggle="modal" data-target="#detailsModal">Details</div>
+    <div id="dir" class="btn btn-primary" data-toggle="modal" data-target="#aboutModal">About</div>
+  </div>  
+
+
 <div class = "value-area">
   <div class = "inputs">
+  
+    <div class="input-area">
+      <div>Object</div>
+      <select id="fluid-selection"  style="width: 130px; font-size: 13px;">
+        <option value="3">Honey</option>
+        <option value="1">Water</option>
+        <option value="2">Milk</option>
+       
+      </select>
+    </div>
+
   <div class = "input-area">
-   <div class="data-name">Dynamic viscosity\((\mu)\): </div>
+   <div class="data-name">Dynamic viscosity\((\mu)\):</div>
    <!-- The slider is the natural logarithm of the value, so the initial value must be ln(0.50) --> 
-   <input type="range" id="viscosity" min="-6.5" max="2" step="0.00001" value="-4.721704002">
-   <div class="data-value" id="viscosityValue">0.0089</div>
+   <!-- <input type="range" id="viscosity" min="-6.5" max="2" step="0.00001" value="-4.721704002"> -->
+   <div class="data-value" id="viscosityValue">1.19</div>
    <div class="data-metric">Pa\(\cdot\)s</div>
   </div>
 
   <div class = "input-area">
-   <div class="data-name">Fluid velocity \(V\): </div>
+   <div class="data-name">Fluid Density \(\rho\):</div>
    <!-- The slider is the natural logarithm of the value, so the initial value must be ln(0.50) -->
-   <input type="range" id="velocity" min="-4.6051" max="2.0149" step="0.01" value="0">
-   <div class="data-value" id="velocityValue">1</div>
-   <div class="data-metric">m/s</div>
+   <!-- <input type="range" id="density" min="0.2" max="7.6" step="0.01" value="6.907755"> -->
+   <div class="data-value" id="densityValue">1400</div>
+   <div class="data-metric">kg/m<sup>3</sup></div>
   </div> 
 
+
   <div class = "input-area">
-   <div class="data-name">Fluid Density \(\rho\): </div>
+   <div class="data-name">Fluid velocity \(V\):</div>
    <!-- The slider is the natural logarithm of the value, so the initial value must be ln(0.50) -->
-   <input type="range" id="density" min="0.2" max="7.6" step="0.01" value="6.907755">
-   <div class="data-value" id="densityValue">1000</div>
-   <div class="data-metric">kg/m<sup>3</sup></div>
+   <div class = "group-slider">
+   <input type="range" id="velocity" min="-3.5066" max="-0.8557" step="0.05" value="-3.15825">
+   <div class="data-value" id="velocityValue">0.043</div>
+   </div>
+   <div class="data-metric">m/s</div>
   </div>
 
   <div class = "input-area">
-   <div class="data-name">Cylinder Diameter \(D\): </div>
-   <!-- The slider is the natural logarithm of the value, so the initial value must be ln(0.50) -->
-   <input type="range" id="diameter" min="-4.605" max="0" step="0.01" value="-2.302585">
-   <div class="data-value" id="diameterValue">0.50</div>
-   <div class="data-metric">m</div>
-  </div>
-  </div>
-
-  <div class = "dependent">
-    <div class="deptRow" >
+    
       <div>Reynolds number: </div>
-      <div id = "ReNumber"> 11236 </div>
-      <div></div>
+      <div id = "ReNumber"> 50 </div>
+    
     </div>
 <!--  
     <div class="deptRow" >
@@ -56,6 +80,65 @@
       <div>N</div>
     </div>-->
 
+  </div>
+  </div>
+
+ 
+</div>
+
+<div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          directions
+        </p>
+      
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        
+       <p>Details</p>
+      
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aboutModalLabel">About</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>About</p>
+      </div>
+    </div>
   </div>
 </div>
 
