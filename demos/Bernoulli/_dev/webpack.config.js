@@ -100,7 +100,7 @@ module.exports = env => {
     },
     plugins: [
       new MiniCssExtractPlugin(styleOptions),
-      new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns : ['**/*', '!mathjax/**'] }),
+      new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns : ['**/*', '!mathjax.js', '!output/**'] }),
       new HtmlWebpackPlugin({ ...htmlOptions, title: "Bernoulli Fluid Flow"})
     ]
   }
