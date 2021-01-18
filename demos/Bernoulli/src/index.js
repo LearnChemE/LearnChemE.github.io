@@ -22,12 +22,16 @@ window.setup = function() {
 }
 
 window.draw = function() {
-  background(200);
-  shapes.pipeHorizontal(70, 300, 20, 100);
-  shapes.pipeVertical(170, 300, 20, sp.pipeHeight);
-  shapes.elbow1(170, 300, 20);
-  shapes.elbow2(170, 300 - sp.pipeHeight, 20);
-  shapes.pipeHorizontal(224, 246.75 - sp.pipeHeight, 20, 100);
+  background(240);
+  shapes.pipeHorizontal(100, 300, 20, 100);
+  shapes.pipeVertical(200, 300, 20, sp.pipeHeight);
+  shapes.elbow1(200, 300, 20);
+  shapes.elbow2(200, 300 - sp.pipeHeight, 20);
+  shapes.pipeHorizontal(254, 246.75 - sp.pipeHeight, 20, 100);
+  shapes.doubleArrow(280, 320, sp.pipeHeight);
+
+  textSize(16);
+  text(`Δz = ${Number(window.sp.pipeHeight) + 50} cm`, 290, 295 - sp.pipeHeight / 2);
 }
 
 const heightSlider = document.getElementById("heightSlider");

@@ -58,6 +58,18 @@ const shapes = {
       strokeWeight(1);
       rect(x + pipeDiameter, y - 5 * pipeDiameter / 6 - height, 2 * pipeDiameter / 3, height);
     pop();
+  },
+  doubleArrow : function(x, y, length) {
+    push();
+      stroke(0);
+      strokeWeight(1);
+      fill(0);
+      line(x, y, x, y - length - 55);
+      triangle(x, y, x + 5, y - 10, x - 5, y - 10);
+      triangle(x, y - length - 55, x + 5, y - length - 45, x - 5, y - length - 45);
+      strokeWeight(0.5);
+      line(x - 50, y + 0.5, x + 10, y + 0.5 );
+    pop();
   }
 }
 
