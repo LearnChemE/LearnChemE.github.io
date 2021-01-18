@@ -70,6 +70,15 @@ const shapes = {
       strokeWeight(0.5);
       line(x - 50, y + 0.5, x + 10, y + 0.5 );
     pop();
+  },
+  singleArrow : function(x, y, x2, y2) {
+    push();
+      stroke(0);
+      strokeWeight(1);
+      fill(0);
+      line(x, y, x2, y2);
+      triangle(x2, y2, x2 - 10, y2 - 5, x2 - 10, y2 + 5);
+    pop();
   }
 }
 

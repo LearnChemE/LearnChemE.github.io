@@ -10,7 +10,8 @@ window.shapes = require("./js/shapes.js");
 window.sp = {
   width : 500,
   height : 400,
-  pipeHeight : 50,
+  pipeHeightInPixels : 50,
+  pipeHeightInMeters : 2.7,
 }
 
 window.setup = function() {
@@ -24,18 +25,22 @@ window.setup = function() {
 window.draw = function() {
   background(240);
   shapes.pipeHorizontal(100, 300, 20, 100);
-  shapes.pipeVertical(200, 300, 20, sp.pipeHeight);
+  shapes.pipeVertical(200, 300, 20, sp.pipeHeightInPixels);
   shapes.elbow1(200, 300, 20);
-  shapes.elbow2(200, 300 - sp.pipeHeight, 20);
-  shapes.pipeHorizontal(254, 246.75 - sp.pipeHeight, 20, 100);
-  shapes.doubleArrow(280, 320, sp.pipeHeight);
+  shapes.elbow2(200, 300 - sp.pipeHeightInPixels, 20);
+  shapes.pipeHorizontal(254, 246.75 - sp.pipeHeightInPixels, 20, 100);
+  shapes.doubleArrow(280, 320, sp.pipeHeightInPixels);
 
   textSize(16);
-  text(`Δz = ${Number(window.sp.pipeHeight) + 50} cm`, 290, 295 - sp.pipeHeight / 2);
+  text(`Δz = ${window.sp.pipeHeightInMeters} m`, 290, 295 - sp.pipeHeightInPixels / 2);
+
+  shapes.singleArrow(20, 310, 95, 310);
+  shapes.singleArrow(360, 257 - sp.pipeHeightInPixels, 450, 257 - sp.pipeHeightInPixels);
 }
 
 const heightSlider = document.getElementById("heightSlider");
 
 heightSlider.addEventListener("input", function () {
-  window.sp.pipeHeight = heightSlider.value;
+  window.sp.pipeHeightInPixels = heightSlider.value;
+  window.sp.pipeHeightInMeters = Number(0.25 + ( 9.75 * Number(heightSlider.value) / 200 )).toFixed(1);
 });
