@@ -62,9 +62,9 @@
    <!-- The slider is the natural logarithm of the value, so the initial value must be ln(0.50) -->
    <div class = "group-slider">
    <input type="range" id="velocity" min="-3.5066" max="-0.8557" step="0.05" value="-3.15825">
-   <div class="data-value" id="velocityValue">0.043</div>
+   <div class="data-value" id="velocityValue">4.25</div>
    </div>
-   <div class="data-metric">m/s</div>
+   <div class="data-metric">cm/s</div>
   </div>
 
   <div class = "input-area">
@@ -97,7 +97,10 @@
       </div>
       <div class="modal-body">
         <p>
-          directions
+          This simulation calculates and generates a vector field that visualizes 
+          the direction of moving fluid particals around a 1 meter sphere. One of three fluids can be selected
+          from the dropdown menu. The velocity of selected fluid can be adjusted with the 
+          slider bar. The vector field will automaticaly update if there are changes.
         </p>
       
       </div>
@@ -136,7 +139,27 @@
         </button>
       </div>
       <div class="modal-body">
-        <p>About</p>
+        <p>This simulation was created in the Department of Chemical and Biological Engineering, at University 
+          of Colorado Boulder for LearnChemE.com by Mingyuan Lu and Neil Hendren under the direction of Professor John L. Falconer.
+           Address any questions or comments to learncheme@gmail.com. The source code for this and other browser-based simulations 
+           can be found in our public <a href = "https://github.com/LearnChemE/LearnChemE.github.io">LearnChemE GitHub repository</a>
+            . We invite other students and scientists to collaborate and contribute to our open-source demonstrations; email us to inquire.
+        </p>
+        
+        <p>This simulation was created based on: Hamielec, A.E., Hoffman, T.W. and Ross, L.L. (1967),
+           Numerical solution of the Navier‐Stokes equation for flow past spheres: Part I. Viscous flow around spheres
+            with and without radial mass efflux. AIChE J.,13: 212-219. https://doi-org.colorado.idm.oclc.org/10.1002/aic.690130206</p>
+
+        <p>Physical properties credits: <br>
+          Viscosity and density of honey: Nayik, Gulzar & Dar, B. & Nanda, Vikas. (2015). "Physico-chemical, rheological 
+          and sugar profile of different honeys from Kashmir Valley of India". <i>Arabian Journal of Chemistry</i>.
+           12. 10.1016/j.arabjc.2015.08.017.<br>
+           Viscosity and density of water: 
+           Gerhart, P. M., Gerhart, A. L., Hochstein, J. I.  (2015-11-23). Munson, Young and Okiishi's Fundamentals of Fluid Mechanics,
+             8th Edition. [[VitalSource Bookshelf version]].  Retrieved from vbk://9781119159568 <br>
+          Viscosity of Milk:<a href = "http://www.vp-scientific.com/Viscosity_Tables.htm"> V&P Scientific</a><br>
+          Density of Milk:<a href = "https://www.uoguelph.ca/foodscience/book/export/html/1988#:~:text=With%20all%20of%20this%20in,m3%20at%2020%C2%B0%20C.">  University of Guelph</a>
+          </p>
       </div>
     </div>
   </div>

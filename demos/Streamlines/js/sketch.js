@@ -44,6 +44,7 @@ function updateFluid()
       density = 1400;
       updateRe();
       updateProperty();
+      
       break;
       
     break;
@@ -52,30 +53,39 @@ function updateFluid()
     case "1":
       
       viscosity = 0.00112;
-      velocity = 0.0005;
+      velocity = 0.00034;
       density = 999;
-      updateRe();
+      vInp.min = "-9.21";
+      vInp.max = "-7.506594";
+      vInp.value = "-8";
       updateProperty();
-      vInp.style.display = "none";
+      updateRe();
+
       break;
     //milk
     case "2":
       
       viscosity = 0.00336;
-      velocity = 0.0005;
+      velocity = 0.00034;
       density = 1027;
-      updateRe();
+      vInp.min = "-9.21";
+      vInp.max = "-6.4176054";
+      vInp.value = "-8";
       updateProperty();
-      vInp.style.display = "none";
+      updateRe();
+      
       break;
     //honey
     case "3":
       viscosity = 1.19;
-      velocity = 0.0425;
+      velocity =0.0425;
       density = 1400;
+      vInp.min = "-3.5066";
+      vInp.max = "-0.8557";
+      vInp.value = "-3.15825";
       updateRe();
       updateProperty();
-      vInp.style.display = "block";
+
       break;
 
 
@@ -86,7 +96,7 @@ function updateFluid()
 function initValue()
 {
     velocity = Math.exp( vInp.value );  
-    document.getElementById("velocityValue").innerHTML = `${formatNumber(velocity)}`;
+    document.getElementById("velocityValue").innerHTML = `${formatNumber(velocity*100)}`;
     // We can span orders of magnitude by using Math.exp of the slider value
     //viscosity = Math.exp( visInp.value );
     //density = Math.exp( rhoInp.value );
@@ -110,7 +120,7 @@ function updateRe()
 function updateProperty(){
   document.getElementById("viscosityValue").innerHTML = `${formatNumber(viscosity)}`;
   document.getElementById("densityValue").innerHTML = `${formatNumber(density)}`;
-  document.getElementById("velocityValue").innerHTML = `${formatNumber(velocity)}`;
+  document.getElementById("velocityValue").innerHTML = `${(formatNumber(velocity*100))}`;
  
 }
 
@@ -152,8 +162,8 @@ function draw() {
   ellipse( width / 2, height / 2, width / canvasSize, width / canvasSize);
 
   // Every 20 pixels, draw an arrow from pt1 to pt2, except within the circle boundary
-  for ( let canvasX = 0; canvasX < width; canvasX += 20 ) {
-    for ( let canvasY = 0; canvasY < height; canvasY += 20 ) {
+  for ( let canvasX = 0; canvasX < width; canvasX += 15 ) {
+    for ( let canvasY = 0; canvasY < height; canvasY += 15 ) {
 
       // Normalize
       const x = ((canvasX - width / 2) / width) * 2 * canvasSize;
@@ -177,7 +187,7 @@ function draw() {
         push();
           translate( ( pt1.x + pt2.x ) / 2, ( pt1.y + pt2.y ) / 2);
           rotate( Math.atan2( pt2.y - pt1.y, pt2.x - pt1.x ) );
-          const m = 10;
+          const m = 6;
           // strokeWidth()
           // p5.js library for info on styling
           line( -m, 0, m, 0 );
