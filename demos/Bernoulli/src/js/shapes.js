@@ -68,7 +68,7 @@ const shapes = {
       triangle(x, y, x + 5, y - 10, x - 5, y - 10);
       triangle(x, y - length - 55, x + 5, y - length - 45, x - 5, y - length - 45);
       strokeWeight(0.5);
-      line(x - 50, y + 0.5, x + 10, y + 0.5 );
+      line(x - 25, y + 0.5, x + 10, y + 0.5 );
     pop();
   },
   singleArrow : function(x, y, x2, y2) {
@@ -78,6 +78,19 @@ const shapes = {
       fill(0);
       line(x, y, x2, y2);
       triangle(x2, y2, x2 - 10, y2 - 5, x2 - 10, y2 + 5);
+    pop();
+  },
+  expander : function(x, y, d1, d2) {
+    push();
+      fill(colors[0]);
+      stroke(0);
+      strokeWeight(1);
+      beginShape();
+        vertex(x, y + d1 / 6);
+        vertex(x, y + 5 * d1 / 6);
+        vertex(x + 40, y + d1 - (d1 - d2) / 2 - d2 / 6);
+        vertex(x + 40, y + (d1 - d2) / 2 + d2 / 6);
+      endShape(CLOSE);
     pop();
   }
 }
