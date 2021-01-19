@@ -39,6 +39,16 @@
       <div class="slider-value" id="inlet-velocity-value">1.0</div>
       <div class="slider-metric">m/s</div>
     </div>
+
+    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+      Display: 
+      <label class="btn btn-secondary active" id="toggle-1">
+        <input type="radio" name="options" id="option1" autocomplete="off" checked>Fluid properties
+      </label>
+      <label class="btn btn-secondary">
+        <input type="radio" name="options" id="option2" autocomplete="off">Energy
+      </label>
+    </div>
   
   </div>
 
@@ -61,7 +71,7 @@
         
         <div class="modal-body directions">
           <p>
-            This is a simulation of water flowing through a pipe with an inlet diameter of 5 cm.  You may adjust the change in height (i.e. Δz), outlet pipe diameter, inlet pressure, and inlet velocity using the sliders on the right-hand side of the screen. The pressure and velocity at the outlet are determined using Bernoulli's equation.  To learn more about Bernoulli's equation, click the "Details" button on the right hand side of the screen.
+            This application simulates water flowing through a pipe with an inlet diameter of 5 cm. You can adjust the outlet height (i.e., change Δz), outlet pipe diameter, inlet gauge pressure, and inlet velocity using the sliders. The pressure and velocity at the outlet are determined using Bernoulli's equation. To learn more about Bernoulli's equation, click the "Details" button.
           </p>
         </div>
 

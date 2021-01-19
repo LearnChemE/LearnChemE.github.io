@@ -29,6 +29,7 @@ window.sp = {
   inletVelocity : 1,
   outletPressure : 100,
   outletVelocity : 1,
+  display: 0,
 }
 
 window.setup = function() {
@@ -53,19 +54,33 @@ window.draw = function() {
   textSize(16);
   text(`Δz = ${window.sp.pipeHeightInMeters} m`, 260, 300 - sp.pipeHeightInPixels / 2);
   push();
-    text(`D   = ${Number(Number(window.sp.pipeDiameterInletInMeters) * 100).toFixed(1)} cm`, 20, 230);
-    text(`P   = ${window.sp.inletPressure} kPa`, 20, 260);
-    text(`u   = ${Number( window.sp.inletVelocity ).toFixed(1) } m/s`, 20, 290);
-    text(`D     = ${Number( window.sp.pipeDiameterOutletInCentimeters).toFixed(1)} cm`, 410, 285 - Number(window.sp.pipeHeightInPixels));
-    text(`P     = ${window.sp.outletPressure} kPa`, 410, 315 - Number(window.sp.pipeHeightInPixels));
-    text(`u     = ${Number( window.sp.outletVelocity).toFixed(1) } m/s`, 410, 340 - Number(window.sp.pipeHeightInPixels));
-    textSize(12);
-    text(`in`, 30, 295);
-    text(`in`, 30, 265);
-    text(`in`, 32, 235);
-    text(`out`, 420, 320 - Number(window.sp.pipeHeightInPixels));
-    text(`out`, 420, 345 - Number(window.sp.pipeHeightInPixels));
-    text(`out`, 420, 290 - Number(window.sp.pipeHeightInPixels));
+    if( window.sp.display == 0 ) {
+      
+      text(`D   = ${Number(Number(window.sp.pipeDiameterInletInMeters) * 100).toFixed(1)} cm`, 20, 230);
+      text(`P   = ${window.sp.inletPressure} kPa`, 20, 260);
+      text(`u   = ${Number( window.sp.inletVelocity ).toFixed(1) } m/s`, 20, 290);
+
+      text(`D     = ${Number( window.sp.pipeDiameterOutletInCentimeters).toFixed(1)} cm`, 410, 285 - Number(window.sp.pipeHeightInPixels));
+      text(`P     = ${window.sp.outletPressure} kPa`, 410, 315 - Number(window.sp.pipeHeightInPixels));
+      text(`u     = ${Number( window.sp.outletVelocity).toFixed(1) } m/s`, 410, 345 - Number(window.sp.pipeHeightInPixels));
+      
+      textSize(12);
+      text(`in`, 30, 295);
+      text(`in`, 30, 265);
+      text(`in`, 32, 235);
+      text(`out`, 420, 320 - Number(window.sp.pipeHeightInPixels));
+      text(`out`, 420, 350 - Number(window.sp.pipeHeightInPixels));
+      text(`out`, 420, 290 - Number(window.sp.pipeHeightInPixels));
+    } else {
+      text(`K.E. = ${0}`, 20, 230);
+      text(`P.E. = ${0}`, 20, 260);
+      text(`I.E. = ${0}`, 20, 290);
+      text(`K.E. = ${0}`, 410, 285 - Number(window.sp.pipeHeightInPixels));
+      text(`P.E. = ${0}`, 410, 315 - Number(window.sp.pipeHeightInPixels));
+      text(`I.E. = ${0}`, 410, 345 - Number(window.sp.pipeHeightInPixels));
+      textSize(12);
+    }
+    
   pop();
 
 
@@ -195,3 +210,16 @@ aboutButton.addEventListener("click", function() {
   };
 
 });
+
+window.toggles = document.getElementsByClassName("btn-secondary");
+
+for ( let i = 0; i < toggles.length; i++ ) {
+  const toggle = toggles[i];
+  toggle.addEventListener("click", function() {
+    if( toggles[0].firstChild.checked ) {
+      window.sp.display = 0;
+    } else {
+      window.sp.display = 1;
+    }
+  });
+}
