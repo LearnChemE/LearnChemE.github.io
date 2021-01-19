@@ -42,10 +42,10 @@
 
     <div class="btn-group btn-group-toggle" data-toggle="buttons">
       Display:
-      <label class="btn btn-secondary active" id="toggle-1">
+      <label class="btn btn-success active" id="toggle-1">
         <input type="radio" name="options" id="option1" autocomplete="off" checked>Fluid properties
       </label>
-      <label class="btn btn-secondary">
+      <label class="btn btn-success">
         <input type="radio" name="options" id="option2" autocomplete="off">Energy
       </label>
     </div>
@@ -77,19 +77,23 @@
 
         <div class="modal-body details">
           <p>
-            Bernoulli's equation is an energy balance used to solve various fluid flow applications.  Bernoulli's equation states that the sum of a fluid's kinetic energy, potential energy, and internal energy are constant along a streamline. Bernoulli's equation is most often used to describe incompressible flow, an assumption that can be used for most liquids. The incompressible Bernoulli equation is:
+            Bernoulli's equation is a steady-state energy balance. It states the sum of a fluid's kinetic energy, potential energy, and pressure are constant along a streamline.  For incompressible flow, Bernoulli's equation is:
+            
             $$
-              \frac{ v^{2} }{ 2 } + gz + \frac{ p }{ \rho } = constant
+              \frac{ \rho v^{2} }{ 2 } + \rho gz + p = constant
             $$
-            where \( v \) is fluid velocity (m/s), \( g \) is the gravitational constant (9.81 m/s<sup>2</sup>), \( p \) is pressure, and \( \rho \) is fluid density. One can solve for fluid properties at any point along a streamline, if the fluid properties are known at another point along the streamline.  For example, one can solve for properties at location "2" if they know the properties at location "1" on the same streamline, because energy and mass are conserved:
+
+            where \( v \) is fluid velocity, \( g \) is the gravitational constant (9.81 m/s<sup>2</sup>), \( p \) is pressure, and \( \rho \) is fluid density. Thus, the properties at the outlet can be determined given the properties at the inlet:
+            
             $$
-              \frac{ v^{2}_{1} }{ 2 } + gz_{1} + \frac{ p_{1} }{ \rho } = \frac{ v^{2}_{2} }{ 2 } + gz_{2} + \frac{ p_{2} }{ \rho }
+             \frac{ \rho v^{2}_{in} }{ 2 } + \rho gz_{in} + p_{in} = \frac{ \rho v^{2}_{out} }{ 2 } + \rho gz_{out} + p_{out}
             $$
-            In this simulation, the fluid velocity at the inlet is specified, as well as the pipe diameter at the inlet and outlet.  By conservation of mass, we can calculate volumetric flowrate, then solve for fluid velocity at the outlet by assuming incompressible flow (constant volumetric flow rate at the inlet and outlet):
+            
+            In this simulation, the inlet pipe diameter is fixed, and the inlet fluid velocity and the outlet pipe diameter are adjusted with sliders. By conservation of mass, the volumetric flowrate is constant because the fluid is assumed to be incompressible. Thus, inlet volumetric flow rate equals outlet flow rate:
             $$
               \frac{ \pi v_{in} D_{ in }^{ 2 } }{4} = \frac{ \pi v_{out} D_{ out }^{ 2 } }{4}
             $$
-            Where \( D_{i} \) is pipe diameter, and "\( in \)" and "\( out \)" refer to the inlet and outlet. This equation can be simplified to:
+            where \( D_{i} \) is pipe diameter. Solving for the fluid velocity at the outlet,
             $$
               v_{out} = v_{in} \frac{ D^{2}_{in} }{ D^{2}_{out} }
             $$

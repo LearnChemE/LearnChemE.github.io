@@ -64,6 +64,10 @@ window.draw = function() {
       text(`P     = ${window.sp.outletPressure} kPa`, 410, 315 - Number(window.sp.pipeHeightInPixels));
       text(`u     = ${Number( window.sp.outletVelocity).toFixed(1) } m/s`, 410, 340 - Number(window.sp.pipeHeightInPixels));
       
+      text(`D = pipe diameter`, 20, 30);
+      text(`P = pressure`, 20, 55);
+      text(`u = fluid velocity`, 20, 80);
+
       textSize(12);
       text(`in`, 30, 290);
       text(`in`, 30, 265);
@@ -71,6 +75,7 @@ window.draw = function() {
       text(`out`, 420, 320 - Number(window.sp.pipeHeightInPixels));
       text(`out`, 420, 345 - Number(window.sp.pipeHeightInPixels));
       text(`out`, 420, 295 - Number(window.sp.pipeHeightInPixels));
+      
     } else {
       
       const KEin = Number( 1000 * window.sp.inletVelocity**2 / ( 2 * 1000 ) ).toFixed(1);
@@ -85,10 +90,10 @@ window.draw = function() {
 
       text(`K.E.`, 5, 235);
       text(`P.E.`, 5, 260);
-      text(`I.E.`, 5, 285);
+      text(`P`, 5, 285);
       text(`K.E.`, 390, 295 - Number(window.sp.pipeHeightInPixels));
       text(`P.E.`, 390, 320 - Number(window.sp.pipeHeightInPixels));
-      text(`I.E.`, 390, 345 - Number(window.sp.pipeHeightInPixels));
+      text(`P`, 390, 345 - Number(window.sp.pipeHeightInPixels));
 
       text(`=  ${KEin}`, 40, 235);
       text(`=  ${PEin}`, 40, 260);
@@ -99,7 +104,7 @@ window.draw = function() {
 
       text(`K.E. = Kinetic energy`, 20, 30);
       text(`P.E. = Potential energy`, 20, 55);
-      text(`I.E. = Internal energy`, 20, 80);
+      text(`P = Pressure`, 20, 80);
 
       text(`kJ/m`, 108, 235);
       text(`kJ/m`, 108, 260);
@@ -249,7 +254,7 @@ aboutButton.addEventListener("click", function() {
 
 });
 
-window.toggles = document.getElementsByClassName("btn-secondary");
+window.toggles = document.getElementsByClassName("btn-success");
 
 for ( let i = 0; i < toggles.length; i++ ) {
   const toggle = toggles[i];
