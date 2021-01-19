@@ -27,7 +27,7 @@ window.sp = {
   pipeDiameterOutletInCentimeters: 5,
   inletPressure : 100,
   inletVelocity : 1,
-  outletPressure : 100,
+  outletPressure : 74,
   outletVelocity : 1,
   display: 0,
 }
@@ -56,28 +56,66 @@ window.draw = function() {
   push();
     if( window.sp.display == 0 ) {
       
-      text(`D   = ${Number(Number(window.sp.pipeDiameterInletInMeters) * 100).toFixed(1)} cm`, 20, 230);
+      text(`D   = ${Number(Number(window.sp.pipeDiameterInletInMeters) * 100).toFixed(1)} cm`, 20, 235);
       text(`P   = ${window.sp.inletPressure} kPa`, 20, 260);
-      text(`u   = ${Number( window.sp.inletVelocity ).toFixed(1) } m/s`, 20, 290);
+      text(`u   = ${Number( window.sp.inletVelocity ).toFixed(1) } m/s`, 20, 285);
 
-      text(`D     = ${Number( window.sp.pipeDiameterOutletInCentimeters).toFixed(1)} cm`, 410, 285 - Number(window.sp.pipeHeightInPixels));
+      text(`D     = ${Number( window.sp.pipeDiameterOutletInCentimeters).toFixed(1)} cm`, 410, 290 - Number(window.sp.pipeHeightInPixels));
       text(`P     = ${window.sp.outletPressure} kPa`, 410, 315 - Number(window.sp.pipeHeightInPixels));
-      text(`u     = ${Number( window.sp.outletVelocity).toFixed(1) } m/s`, 410, 345 - Number(window.sp.pipeHeightInPixels));
+      text(`u     = ${Number( window.sp.outletVelocity).toFixed(1) } m/s`, 410, 340 - Number(window.sp.pipeHeightInPixels));
       
       textSize(12);
-      text(`in`, 30, 295);
+      text(`in`, 30, 290);
       text(`in`, 30, 265);
-      text(`in`, 32, 235);
+      text(`in`, 32, 240);
       text(`out`, 420, 320 - Number(window.sp.pipeHeightInPixels));
-      text(`out`, 420, 350 - Number(window.sp.pipeHeightInPixels));
-      text(`out`, 420, 290 - Number(window.sp.pipeHeightInPixels));
+      text(`out`, 420, 345 - Number(window.sp.pipeHeightInPixels));
+      text(`out`, 420, 295 - Number(window.sp.pipeHeightInPixels));
     } else {
-      text(`K.E. = ${0}`, 20, 230);
-      text(`P.E. = ${0}`, 20, 260);
-      text(`I.E. = ${0}`, 20, 290);
-      text(`K.E. = ${0}`, 410, 285 - Number(window.sp.pipeHeightInPixels));
-      text(`P.E. = ${0}`, 410, 315 - Number(window.sp.pipeHeightInPixels));
-      text(`I.E. = ${0}`, 410, 345 - Number(window.sp.pipeHeightInPixels));
+      
+      const KEin = Number( 1000 * window.sp.inletVelocity**2 / ( 2 * 1000 ) ).toFixed(1);
+      const PEin = 0;
+      const IEin = Number( window.sp.inletPressure ).toFixed(1);
+      
+      const KEout = Number( 1000 * window.sp.outletVelocity**2 / ( 2 * 1000 ) ).toFixed(1);
+      const PEout = Number( 1000 * 9.81 * window.sp.pipeHeightInMeters / 1000 ).toFixed(1);
+      const IEout = Number( window.sp.outletPressure ).toFixed(1);
+
+      textAlign(LEFT);
+
+      text(`K.E.`, 5, 235);
+      text(`P.E.`, 5, 260);
+      text(`I.E.`, 5, 285);
+      text(`K.E.`, 390, 295 - Number(window.sp.pipeHeightInPixels));
+      text(`P.E.`, 390, 320 - Number(window.sp.pipeHeightInPixels));
+      text(`I.E.`, 390, 345 - Number(window.sp.pipeHeightInPixels));
+
+      text(`=  ${KEin}`, 40, 235);
+      text(`=  ${PEin}`, 40, 260);
+      text(`=  ${IEin}`, 40, 285);
+      text(`=  ${KEout}`, 425, 295 - Number(window.sp.pipeHeightInPixels));
+      text(`=  ${PEout}`, 425, 320 - Number(window.sp.pipeHeightInPixels));
+      text(`=  ${IEout}`, 425, 345 - Number(window.sp.pipeHeightInPixels));
+
+      text(`K.E. = Kinetic energy`, 20, 30);
+      text(`P.E. = Potential energy`, 20, 55);
+      text(`I.E. = Internal energy`, 20, 80);
+
+      text(`kJ/m`, 108, 235);
+      text(`kJ/m`, 108, 260);
+      text(`kJ/m`, 108, 285);   
+
+      text(`kJ/m`, 495, 295 - Number(window.sp.pipeHeightInPixels));
+      text(`kJ/m`, 495, 320 - Number(window.sp.pipeHeightInPixels));
+      text(`kJ/m`, 495, 345 - Number(window.sp.pipeHeightInPixels));
+
+      textSize(12);
+      text(`3`, 143, 279);
+      text(`3`, 143, 253);
+      text(`3`, 143, 227);
+      text(`3`, 529, 312 - Number(window.sp.pipeHeightInPixels));
+      text(`3`, 529, 337 - Number(window.sp.pipeHeightInPixels));
+      text(`3`, 529, 287 - Number(window.sp.pipeHeightInPixels));
       textSize(12);
     }
     

@@ -56,6 +56,10 @@ main {
 
 .btn-group {
   margin-top: 2rem;
+  font-size: 0.9rem;
+  label {
+    font-size: 0.9rem !important;
+  }
 }
 
 label {
@@ -63,5 +67,5 @@ label {
 }
 
 #toggle-1 {
-  margin-left: 2rem;
+  margin-left: 1rem;
 }
