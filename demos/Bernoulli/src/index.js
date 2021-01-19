@@ -1,11 +1,19 @@
 // Load libraries
 require("./style/style.scss");
-require("../dist/mathjax.js");
 window.jQuery = require("jquery");
 window.$ = window.jQuery;
 require("bootstrap");
 window.p5 = require("p5");
 window.shapes = require("./js/shapes.js");
+
+window.MathJax = {
+  chtml: {
+    displayAlign: 'left',
+    displayIndent: '1em',
+  }
+};
+
+require("../dist/mathjax.js");
 
 // Declare global variables (sp represents "sketch properties")
 window.sp = {
