@@ -55,10 +55,10 @@ window.draw = function() {
   push();
     text(`D   = ${Number(Number(window.sp.pipeDiameterInletInMeters) * 100).toFixed(1)} cm`, 20, 230);
     text(`P   = ${window.sp.inletPressure} kPa`, 20, 260);
-    text(`u   = ${window.sp.inletVelocity} m/s`, 20, 290);
-    text(`D     = ${Number( Number(window.sp.pipeDiameterOutletInCentimeters)).toFixed(1)} cm`, 410, 285 - Number(window.sp.pipeHeightInPixels));
+    text(`u   = ${Number( window.sp.inletVelocity ).toFixed(1) } m/s`, 20, 290);
+    text(`D     = ${Number( window.sp.pipeDiameterOutletInCentimeters).toFixed(1)} cm`, 410, 285 - Number(window.sp.pipeHeightInPixels));
     text(`P     = ${window.sp.outletPressure} kPa`, 410, 315 - Number(window.sp.pipeHeightInPixels));
-    text(`u     = ${window.sp.outletVelocity} m/s`, 410, 340 - Number(window.sp.pipeHeightInPixels));
+    text(`u     = ${Number( window.sp.outletVelocity).toFixed(1) } m/s`, 410, 340 - Number(window.sp.pipeHeightInPixels));
     textSize(12);
     text(`in`, 30, 295);
     text(`in`, 30, 265);
