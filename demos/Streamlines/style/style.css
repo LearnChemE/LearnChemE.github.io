@@ -34,7 +34,9 @@
 
 }
 
-
+li {
+  margin-bottom: 0.5rem;
+}
 
 .modal-body .modal-text {
     max-width: 70ch;
