@@ -89,11 +89,14 @@
              \frac{ \rho v^{2}_{in} }{ 2 } + \rho gz_{in} + p_{in} = \frac{ \rho v^{2}_{out} }{ 2 } + \rho gz_{out} + p_{out}
             $$
             
-            In this simulation, the inlet pipe diameter is fixed, and the inlet fluid velocity and the outlet pipe diameter are adjusted with sliders. By conservation of mass, the volumetric flowrate is constant because the fluid is assumed to be incompressible. Thus, inlet volumetric flow rate equals outlet flow rate:
+            A mass balance is required to solve for \( v_{out} \). The volumetric flowrate is constant because the fluid is assumed to be incompressible, thus:
+
             $$
-              \frac{ \pi v_{in} D_{ in }^{ 2 } }{4} = \frac{ \pi v_{out} D_{ out }^{ 2 } }{4}
+              \frac{ \pi D_{ in }^{ 2 } }{4} v_{in}  = \frac{ \pi D_{ out }^{ 2 } }{4} v_{out} 
             $$
+            
             where \( D_{i} \) is pipe diameter. Solving for the fluid velocity at the outlet,
+            
             $$
               v_{out} = v_{in} \frac{ D^{2}_{in} }{ D^{2}_{out} }
             $$
