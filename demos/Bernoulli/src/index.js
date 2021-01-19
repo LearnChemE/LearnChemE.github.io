@@ -3,6 +3,7 @@ require("./style/style.scss");
 require("../dist/mathjax.js");
 window.jQuery = require("jquery");
 window.$ = window.jQuery;
+require("bootstrap");
 window.p5 = require("p5");
 window.shapes = require("./js/shapes.js");
 
@@ -115,4 +116,74 @@ inletVelocitySlider.addEventListener("input", function() {
   window.sp.inletVelocity = Number(inletVelocitySlider.value).toFixed(1);
   document.getElementById("inlet-velocity-value").innerHTML = window.sp.inletVelocity;
   calculate();
-})
+});
+
+const directionsButton = document.getElementById("directions-button");
+const detailsButton = document.getElementById("details-button");
+const aboutButton = document.getElementById("about-button");
+
+directionsButton.addEventListener("click", function() {
+  const titles = document.getElementsByClassName("modal-title");
+  const bodies = document.getElementsByClassName("modal-body");
+  const directions = document.getElementsByClassName("directions");
+  
+  for ( let i = 0; i < titles.length; i++ ) {
+    const title = titles[i];
+    title.style.display = "none";
+  };
+  
+  for ( let i = 0; i < bodies.length; i++ ) {
+    const body = bodies[i];
+    body.style.display = "none";
+  };
+  
+  for ( let i = 0; i < directions.length; i++ ) {
+    const elt = directions[i];
+    elt.style.display = "block";
+  };
+
+});
+
+detailsButton.addEventListener("click", function() {
+  const titles = document.getElementsByClassName("modal-title");
+  const bodies = document.getElementsByClassName("modal-body");
+  const details = document.getElementsByClassName("details");
+  
+  for ( let i = 0; i < titles.length; i++ ) {
+    const title = titles[i];
+    title.style.display = "none";
+  };
+  
+  for ( let i = 0; i < bodies.length; i++ ) {
+    const body = bodies[i];
+    body.style.display = "none";
+  };
+  
+  for ( let i = 0; i < details.length; i++ ) {
+    const elt = details[i];
+    elt.style.display = "block";
+  };
+
+});
+
+aboutButton.addEventListener("click", function() {
+  const titles = document.getElementsByClassName("modal-title");
+  const bodies = document.getElementsByClassName("modal-body");
+  const abouts = document.getElementsByClassName("about");
+  
+  for ( let i = 0; i < titles.length; i++ ) {
+    const title = titles[i];
+    title.style.display = "none";
+  };
+  
+  for ( let i = 0; i < bodies.length; i++ ) {
+    const body = bodies[i];
+    body.style.display = "none";
+  };
+  
+  for ( let i = 0; i < abouts.length; i++ ) {
+    const elt = abouts[i];
+    elt.style.display = "block";
+  };
+
+});

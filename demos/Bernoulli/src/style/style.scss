@@ -22,3 +22,29 @@ main {
   align-items: center;
   gap: 10px;
 }
+
+.modal-title {
+  display: none;
+}
+
+.modal-body {
+  display: none;
+}
+
+#directions-button, #details-button, #about-button {
+  position: absolute;
+  top: 20px;
+  width: 12ch;
+}
+
+#directions-button {
+  left: 580px;
+}
+
+#details-button {
+ left: 700px;
+}
+
+#about-button {
+ left: 820px;
+}
