@@ -10,6 +10,7 @@ window.MathJax = {
   chtml: {
     displayAlign: 'left',
     displayIndent: '1em',
+    mathmlSpacing: true,
   }
 };
 
@@ -30,6 +31,7 @@ window.sp = {
   outletPressure : 74,
   outletVelocity : 1,
   display: 0,
+  impossible: false,
 }
 
 window.setup = function() {
@@ -53,6 +55,16 @@ window.draw = function() {
 
   textSize(16);
   text(`Δz = ${window.sp.pipeHeightInMeters} m`, 260, 300 - sp.pipeHeightInPixels / 2);
+  
+  if ( window.sp.impossible ) {
+    push();
+    fill(255, 0, 0);
+    rect(180, -15, 400, 50);
+    fill(255, 255, 20);
+    text("The inlet pressure is too low for fluid flow.\nTry lowering Δz or increasing inlet pressure.", 200, 5);
+    pop();
+  }
+
   push();
     if( window.sp.display == 0 ) {
       
@@ -64,9 +76,9 @@ window.draw = function() {
       text(`P     = ${window.sp.outletPressure} kPa`, 410, 315 - Number(window.sp.pipeHeightInPixels));
       text(`u     = ${Number( window.sp.outletVelocity).toFixed(1) } m/s`, 410, 340 - Number(window.sp.pipeHeightInPixels));
       
-      text(`D = pipe diameter`, 20, 30);
-      text(`P = pressure`, 20, 55);
-      text(`u = fluid velocity`, 20, 80);
+      text(`D = pipe diameter`, 10, 30);
+      text(`P = pressure`, 10, 55);
+      text(`u = fluid velocity`, 10, 80);
 
       textSize(12);
       text(`in`, 30, 290);
@@ -102,9 +114,9 @@ window.draw = function() {
       text(`=  ${PEout}`, 425, 320 - Number(window.sp.pipeHeightInPixels));
       text(`=  ${IEout}`, 425, 345 - Number(window.sp.pipeHeightInPixels));
 
-      text(`K.E. = Kinetic energy`, 20, 30);
-      text(`P.E. = Potential energy`, 20, 55);
-      text(`P = Pressure`, 20, 80);
+      text(`K.E. = Kinetic energy`, 10, 30);
+      text(`P.E. = Potential energy`, 10, 55);
+      text(`P = Pressure`, 10, 80);
 
       text(`kJ/m`, 108, 235);
       text(`kJ/m`, 108, 260);
@@ -148,6 +160,16 @@ function calculate() {
 
   window.sp.outletPressure = Number(Math.round(outletPressure) / 1000).toFixed(0);
   window.sp.outletVelocity = Number(outletVelocity).toFixed(1);
+
+  if ( window.sp.outletPressure <= 0 ) {
+    window.sp.outletVelocity = 0;
+    window.sp.outletPressure = 0;
+    window.sp.inletVelocity = 0;
+    window.sp.impossible = true;
+  } else {
+    window.sp.impossible = false;
+    window.sp.inletVelocity = Number(document.getElementById("inletVelocitySlider").value).toFixed(1);
+  }
 };
 
 const heightSlider = document.getElementById("heightSlider");
