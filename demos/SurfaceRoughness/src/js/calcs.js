@@ -26,11 +26,15 @@ window.ballObj = {
   Re : 0,
   resetLaunch : function() {
     this.theta = Number(document.getElementById("launch-angle").value);
-    this.v = 70;
+    this.v = Number(document.getElementById("launch-velocity").value);
     this.x = 0;
     this.y = 0;
     this.vx = this.v * Math.cos( this.theta );
     this.vy = this.v * Math.sin( this.theta );
+    window.positionPlot.getOptions().xaxes[0].max = 200;
+    window.positionPlot.getOptions().yaxes[0].max= 150;
+    window.positionPlot.getData()[1].color = "rgb(0, 0, 0)";
+    window.positionPlot.setupGrid(true);
   },
   roughnesses : Object.keys(window.dragCoeffs),
   roughness : "golf ball",
@@ -66,12 +70,20 @@ window.ballObj = {
 
     this.x += this.vx * dt; // update x and y positions
     this.y += this.vy * dt;
+
+    if ( this.x > 200 ) {
+      window.positionPlot.getOptions().xaxes[0].max = 300;
+    }
+
+    if ( this.y > 150 ) {
+      window.positionPlot.getOptions().yaxes[0].max= 200;
+    }
   },
   updateDOM : function() {
     window.parameterLabels.velocity.innerHTML = `${Number.parseInt(this.v)}`;
     window.parameterLabels.Cd.innerHTML = `${Number(this.Cd).toFixed(2)}`;
     window.parameterLabels.Fd.innerHTML = `${Number(this.Fd).toFixed(2)}`;
-    const exp = Number(this.Re).toExponential(2).replace("e", "&nbsp;x&nbsp10<sup>").concat("</sup>").replace("+", "");
+    const exp = Number(this.Re).toExponential(1).replace("e", "&nbsp;x&nbsp10<sup>").concat("</sup>").replace("+", "");
     window.parameterLabels.Re.innerHTML = `${exp}`;
   }
 }

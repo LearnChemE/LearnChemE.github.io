@@ -9,7 +9,12 @@ let elapsed = now - start;
 let index = 0;
 
 function updateGraphs(positionArray, CdCoord) {
-  window.positionPlot.setData(positionArray);
+
+  window.positionPlot.setData([
+    { data : positionArray, lines: { show: true } },
+    { data : [positionArray[positionArray.length - 1]], points : { show: true, color: "rgb(0, 0, 0)", fillColor: "rgb(155, 205, 0)" } }
+  ]);
+  window.positionPlot.getData()[1].color = "rgb(0, 0, 0)";
   window.positionPlot.setupGrid(true);
   window.positionPlot.draw();
 
@@ -26,7 +31,7 @@ function animationFunction() {
   ball.update(dt);
   ball.updateDOM();
   if( ball.y < 0 ) { isRunning = false }
-  window.positionPlotData[window.positionPlotData.length - 1].push([ball.x, ball.y]); 
+  window.positionPlotData.push([ball.x, ball.y]); 
   updateGraphs(window.positionPlotData, window.CdPlotCoord);
 }
 
@@ -34,9 +39,9 @@ function step() {
   dt = (Date.now() - now) / 1000;
   now = Date.now();
   elapsed = now - start;
-  animationFunction();
 
   if (isRunning) {
+    animationFunction();
     window.requestAnimationFrame(step);
   } else {
     window.cancelAnimationFrame(step);

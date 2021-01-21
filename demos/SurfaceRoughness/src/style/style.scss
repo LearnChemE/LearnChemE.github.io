@@ -3,76 +3,98 @@
 
 #controls {
   display: grid;
-  grid-template-columns: 200px 310px;
-  grid-template-rows: 40px 30px;
-  gap: 10px;
+  grid-template-columns: max-content 310px;
+  grid-template-rows: min-content;
+  gap: 20px;
   align-items: center;
   justify-items: center;
   margin-left: 5rem;
   margin-top: 1rem;
   margin-bottom: 1rem;
+
+  .btn {
+    margin-top: 0.5rem;
+    justify-self: center;
+  }
 }
 
 #control-sliders {
   display: grid;
-  grid-template-columns: repeat(4, max-content);
+  grid-template-columns: max-content 150px max-content;
   align-items: end;
   gap: 10px;
+  .label {
+    text-align: end;
+  }
 }
 
-#start-button {
-  width: 4rem;
+#start-button, #reset-button {
+  width: 8rem;
+}
+
+.control-box.right {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
 }
 
 #control-buttons {
   display: grid;
   grid-template-columns: max-content max-content;
-  gap: 10px;
+  gap: 20px;
 }
 
-#reset-button {
-  width: 10rem;
+#select-ball {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.35rem;
 }
 
 #graphics-area {
   display: grid;
-  grid-template-columns: 500px 200px;
-  grid-template-rows: 300px 300px;
+  width: 800px;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: 320px;
   gap: 1rem;
   margin-left: 1rem;
 
-  #parameters {
-    height: 250px;
-    border: 1px solid black;
-    padding: 1rem;
-    font-size: 1.2rem;
-
-    .parameter {
-      width: 100%;
-      display: grid;
-      grid-template-columns: 50% 20% 30%;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-      justify-items: start;
-      
-      .parameter-name {
-        justify-self: end;
-      }
-
-      #reynolds-number {
-        grid-column: 2 / -1;
-      }
-
-    }
-  }
 }
 
 // k 1 = k/d = 1250 × 10 −5 , k 2 = 500 × 10 −5 , k 3 = 150 × 10 −5
 
-#roughnessPlot {
-  width: 500px;
-  height: 336px;
+#parameters {
+  width: max-content;
+  align-self: end;
+  border: 1px solid black;
+  padding: 0.5rem;
+  padding-left: 1.5rem;
+  padding-right: 2.5rem;
+  font-size: 1rem;
+  box-shadow: 0px 0px 3px black;
+
+  .parameter {
+    display: grid;
+    grid-template-columns: 10ch max-content 4ch;
+    gap: 0.3rem;
+    margin-bottom: 0.15rem;
+    justify-items: start;
+    
+    .parameter-name {
+      justify-self: end;
+    }
+
+    #reynolds-number {
+      grid-column: 2 / -1;
+    }
+
+  }
 }
+
+// #roughnessPlot {
+//   width: 500px;
+//   height: 336px;
+// }
 
 #roughnessImg {
   position: absolute;

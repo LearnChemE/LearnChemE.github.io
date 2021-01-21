@@ -940,7 +940,7 @@ Licensed under the MIT license.
                     borderColor: null, // set if different from the grid color
                     tickColor: null, // color for the ticks, e.g. "rgba(0,0,0,0.15)"
                     margin: 0, // distance from the canvas edge to the grid
-                    labelMargin: 5, // in pixels
+                    labelMargin: 2, // in pixels
                     axisMargin: 8, // in pixels
                     borderWidth: 1, // in pixels
                     minBorderMargin: null, // in pixels, null means taken from points radius
@@ -1189,7 +1189,7 @@ Licensed under the MIT license.
                 fontSizeDefault = fontSize ? +fontSize.replace("px", "") : 13,
                 fontDefaults = {
                     style: placeholder.css("font-style"),
-                    size: Math.round(0.8 * fontSizeDefault),
+                    size: Math.round(1 * fontSizeDefault),
                     variant: placeholder.css("font-variant"),
                     weight: placeholder.css("font-weight"),
                     family: placeholder.css("font-family")

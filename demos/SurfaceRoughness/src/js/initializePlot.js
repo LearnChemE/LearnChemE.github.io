@@ -1,5 +1,5 @@
 const axisFont = {
-  size : 16,
+  size : 13,
   lineHeight : 13,
   family : "sans-serif"
 }
@@ -11,13 +11,15 @@ const positionPlotOptions = {
       position: "bottom",
       autoScale : "none",
       axisLabel : "x-position (m)",
+      font: axisFont,
       min: 0,
       max: 200
     },
     { 
       position: "top",
       autoScale : "none",
-      axisLabel : "",
+      axisLabel : "Trajectory",
+      font : axisFont,
       show: true,
       showTicks: false,
       showTickLabels: false,
@@ -36,26 +38,35 @@ const positionPlotOptions = {
   ],
   series: {
     lines: { lineWidth: 2 },
+    points: { radius: 5, color: "rgb(0, 0, 0)", fillColor: "rgb(155, 205, 0)" },
   }
 
 }
 
-window.positionPlotData = [];
+window.positionPlotData = [[0, 0]];
 
 window.positionPlot = $.plot(
   $("#positionPlot"),
-  [window.positionPlotData],
+  [window.positionPlotData, [[0, 0]]],
   positionPlotOptions
 );
+
+window.positionPlot.getData()[1].lines.show = false;
+window.positionPlot.getData()[1].points.show = true;
+window.positionPlot.getData()[1].color = "rgb(0, 0, 0)";
+window.positionPlot.getData()[1].points.fillColor = "rgb(155, 205, 0)";
+window.positionPlot.setupGrid(true);
+window.positionPlot.draw();
 
 window.xab = 0;
 
 const roughnessPlotOptions = {
 
-  xaxis: {
+  xaxes: [{
     position: "bottom",
     autoScale : "none",
     axisLabel : "Reynold's Number",
+    font: axisFont,
     showTickLabels : "all",
     min: 5e4,
     max: 5e5,
@@ -65,13 +76,23 @@ const roughnessPlotOptions = {
     transform: function (v) { return Math.log(v); },
     inverseTransform: function (v) { return Math.exp(v); }
   },
+  { 
+    position: "top",
+    autoScale : "none",
+    axisLabel : "Drag",
+    font : axisFont,
+    show: true,
+    showTicks: false,
+    showTickLabels: false,
+    gridLines: false
+  }],
 
   yaxis: {
     position: "left",
     axisLabel : "Drag Coefficient",
     autoScale : "none",
     min : 0,
-    max : 0.55,
+    max : 0.6,
     font : axisFont,
   },
 
@@ -111,10 +132,10 @@ window.roughnessPlot.setupGrid(true);
 window.roughnessPlot.draw();
 
 document.getElementById("reset-button").addEventListener("click", function() {
-  if(!window.isRunning) {
-    window.positionPlotData = [];
-    window.positionPlot.setData([window.positionPlotData]);
-    window.positionPlot.setupGrid(true);
-    window.positionPlot.draw();
-  }
+  window.isRunning = false;
+  window.positionPlotData = [[0, 0]];
+  window.positionPlot.setData([ { data : window.positionPlotData, lines: { show: true } }, { data : [[0, 0]], points : { show: true, color : "rgb(0, 0, 0)", fillColor: "rgb(155, 205, 0)" } }]);
+  window.ballObj.resetLaunch();
+  window.positionPlot.getData()[1].points.color = "rgb(0, 0, 0)";
+  window.positionPlot.draw();
 })

@@ -44,4 +44,12 @@ launchAngle.addEventListener("input", () => {
   window.ballObj.theta = Number(launchAngle.value);
   const degrees = Number(180 * window.ballObj.theta / Math.PI).toFixed(0);
   launchAngleValue.innerHTML = `${degrees}&deg;`;
-})
+});
+
+const launchVelocity = document.getElementById("launch-velocity");
+const launchVelocityValue = document.getElementById("launch-velocity-value");
+
+launchVelocity.addEventListener("input", () => {
+  window.ballObj.v = Number(launchVelocity.value);
+  launchVelocityValue.innerHTML = `${window.ballObj.v} m/s`;
+});
