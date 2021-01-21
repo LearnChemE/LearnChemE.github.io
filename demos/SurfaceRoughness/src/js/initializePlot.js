@@ -58,7 +58,7 @@ const roughnessPlotOptions = {
     axisLabel : "Reynold's Number",
     showTickLabels : "all",
     min: 5e4,
-    max: 5.2e6,
+    max: 5e5,
     tickFormatter: function(n) {
       return String( Number(n).toExponential(0) ).replace("e+", `<tspan dy="-1" dx="0.5" style="font-size:0.8rem">x</tspan><tspan dy="1">10</tspan><tspan dy="-5" style="font-size: 0.8rem">`).concat("</tspan>");
     },
