@@ -16,7 +16,7 @@ window.ballObj = {
   D : 0.042672, // diameter of a golf ball (m)
   mass : 0.04593, // mass of golf ball (kg)
   v : 70, // ball velocity (m/s) (initial value based on drive of average professional golfer)
-  theta : 0.4, // angle of drive (radians)
+  theta : 0.785398, // angle of drive (radians)
   x : 0, // ball x-position
   y : 0, // ball y-position
   vx : 0,
@@ -25,6 +25,7 @@ window.ballObj = {
   Fd : 0,
   Re : 0,
   resetLaunch : function() {
+    this.theta = Number(document.getElementById("launch-angle").value);
     this.v = 70;
     this.x = 0;
     this.y = 0;
