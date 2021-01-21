@@ -19,4 +19,13 @@ for ( let i = 0; i < Object.keys(window.dragCoeffs).length; i++ ) {
 select.addEventListener("change", e => {
   const i = Number(select.value);
   window.ballObj.roughness = window.ballObj.roughnesses[i];
+});
+
+const launchAngle = document.getElementById("launch-angle");
+const launchAngleValue = document.getElementById("launch-angle-value");
+
+launchAngle.addEventListener("input", () => {
+  window.ballObj.theta = Number(launchAngle.value);
+  const degrees = Number(180 * window.ballObj.theta / Math.PI).toFixed(0);
+  launchAngleValue.innerHTML = `${degrees}&deg;`;
 })

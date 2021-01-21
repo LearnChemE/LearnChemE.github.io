@@ -1,8 +1,11 @@
 @import "bootstrap";
+@import "./slider.scss";
 
 #controls {
   display: grid;
-  grid-template-columns: 110px 310px;
+  grid-template-columns: 200px 310px;
+  grid-template-rows: 40px 30px;
+  gap: 10px;
   align-items: center;
   justify-items: center;
   margin-left: 5rem;
@@ -10,8 +13,25 @@
   margin-bottom: 1rem;
 }
 
+#control-sliders {
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  align-items: end;
+  gap: 10px;
+}
+
 #start-button {
   width: 4rem;
+}
+
+#control-buttons {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  gap: 10px;
+}
+
+#reset-button {
+  width: 10rem;
 }
 
 #graphics-area {

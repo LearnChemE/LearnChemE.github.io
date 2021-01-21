@@ -1,4 +1,4 @@
-const dragCoeff = require("./dragCoeffs");
+const { dragCoeff } = require("./dragCoeffs");
 
 window.parameterLabels = {
   velocity : document.getElementById("velocity"),
@@ -24,9 +24,8 @@ window.ballObj = {
   Cd : 0,
   Fd : 0,
   Re : 0,
-  setToDefaults : function() {
+  resetLaunch : function() {
     this.v = 70;
-    this.theta = 0.4;
     this.x = 0;
     this.y = 0;
     this.vx = this.v * Math.cos( this.theta );
@@ -36,6 +35,7 @@ window.ballObj = {
   roughness : "golf ball",
   updateRe : function() { // Reynolds number
     this.Re = ( this.v * this.D / window.airObj.nu );
+    if ( this.Re < 50000 ) { this.Re = 50000 }
   },
   updateCd : function() { // Drag coefficient
     this.Cd = dragCoeff( this.roughness, this.Re );
@@ -50,6 +50,8 @@ window.ballObj = {
     this.updateCd();
     this.updateFd();
     
+    window.CdPlotCoord = [this.Re, this.Cd];
+
     this.theta = Math.atan2( this.vy, this.vx ); // recalculate angle
 
     this.v -= ( this.Fd / this.mass ) * dt; // apply drag force
@@ -73,4 +75,4 @@ window.ballObj = {
   }
 }
 
-window.ballObj.setToDefaults();
+window.ballObj.resetLaunch();

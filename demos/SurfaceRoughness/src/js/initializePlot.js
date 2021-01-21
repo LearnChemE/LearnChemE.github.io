@@ -34,12 +34,13 @@ const positionPlotOptions = {
       font : axisFont,
     },
   ],
+  series: {
+    lines: { lineWidth: 2 },
+  }
 
 }
 
-window.positionPlotData = [
-  [0, 0],
-];
+window.positionPlotData = [];
 
 window.positionPlot = $.plot(
   $("#positionPlot"),
@@ -54,7 +55,7 @@ const roughnessPlotOptions = {
   xaxis: {
     position: "bottom",
     autoScale : "none",
-    axisLabel : "x-position (m)",
+    axisLabel : "Reynold's Number",
     showTickLabels : "all",
     min: 5e4,
     max: 5.2e6,
@@ -67,7 +68,7 @@ const roughnessPlotOptions = {
 
   yaxis: {
     position: "left",
-    axisLabel : "y-position (m)",
+    axisLabel : "Drag Coefficient",
     autoScale : "none",
     min : 0,
     max : 0.55,
@@ -75,7 +76,8 @@ const roughnessPlotOptions = {
   },
 
   series: {
-    lines: { lineWidth: 2 }
+    lines: { lineWidth: 2 },
+    points: { radius: 5 }
   },
 
   grid: {clickable: true}
@@ -83,6 +85,7 @@ const roughnessPlotOptions = {
 }
 
 const roughnessData = Object.values(window.dragCoeffs);
+window.CdPlotCoord = [0, 0.3];
 
 window.roughnessPlot = $.plot(
   $("#roughnessPlot"),
@@ -90,21 +93,28 @@ window.roughnessPlot = $.plot(
   roughnessPlotOptions
 )
 
-window.dataPoints0 = [];
-
-// $("#roughnessPlot").bind("plotclick", function ( event, pos, item ) {
-
-//   window.dataPoints0.push([pos.x, pos.y]);
-
-// })
-
 window.roughnessPlot.setData([
   { data : roughnessData[0] },
   { data : roughnessData[1] },
   { data : roughnessData[2] },
   { data : roughnessData[3] },
   { data : roughnessData[4] },
+  { data: [window.CdPlotCoord] }
 ]);
+
+const pointData = window.roughnessPlot.getData()[5];
+pointData.points.show = true;
+pointData.color = "rgb(0, 0, 0)";
+pointData.points.fillColor = "rgb(155, 205, 0)";
 
 window.roughnessPlot.setupGrid(true);
 window.roughnessPlot.draw();
+
+document.getElementById("reset-button").addEventListener("click", function() {
+  if(!window.isRunning) {
+    window.positionPlotData = [];
+    window.positionPlot.setData([window.positionPlotData]);
+    window.positionPlot.setupGrid(true);
+    window.positionPlot.draw();
+  }
+})
