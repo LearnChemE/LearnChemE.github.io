@@ -38,27 +38,26 @@ const positionPlotOptions = {
   ],
   series: {
     lines: { lineWidth: 2 },
-    points: { radius: 5, color: "rgb(0, 0, 0)", fillColor: "rgb(155, 205, 0)" },
+    points: { radius: 5, color: "rgb(0, 0, 0)" },
   }
 
 }
 
-window.positionPlotData = [[0, 0]];
+window.positionLineData = [[0, 0]];
+window.positionPointData = [[0, 0]];
 
 window.positionPlot = $.plot(
   $("#positionPlot"),
-  [window.positionPlotData, [[0, 0]]],
+  [window.positionLineData, window.positionPointData],
   positionPlotOptions
 );
 
 window.positionPlot.getData()[1].lines.show = false;
 window.positionPlot.getData()[1].points.show = true;
 window.positionPlot.getData()[1].color = "rgb(0, 0, 0)";
-window.positionPlot.getData()[1].points.fillColor = "rgb(155, 205, 0)";
+
 window.positionPlot.setupGrid(true);
 window.positionPlot.draw();
-
-window.xab = 0;
 
 const roughnessPlotOptions = {
 
@@ -69,9 +68,11 @@ const roughnessPlotOptions = {
     font: axisFont,
     showTickLabels : "all",
     min: 5e4,
-    max: 5e5,
+    max: 1e6,
     tickFormatter: function(n) {
-      return String( Number(n).toExponential(0) ).replace("e+", `<tspan dy="-1" dx="0.5" style="font-size:0.8rem">x</tspan><tspan dy="1">10</tspan><tspan dy="-5" style="font-size: 0.8rem">`).concat("</tspan>");
+      n /= 10**5;
+      n = Number(n).toFixed(1);
+      return `${n}<tspan dy="-1" dx="0.5" style="font-size:0.8rem">x</tspan><tspan dy="1">10</tspan><tspan dy="-5" style="font-size: 0.8rem">5</tspan>`;
     },
     transform: function (v) { return Math.log(v); },
     inverseTransform: function (v) { return Math.exp(v); }
@@ -101,41 +102,47 @@ const roughnessPlotOptions = {
     points: { radius: 5 }
   },
 
-  grid: {clickable: true}
+  grid: {
+    labelMargin: 0
+  }
 
 }
 
-const roughnessData = Object.values(window.dragCoeffs);
+const dragCoefficientValues = Object.values(window.dragCoeffs);
 window.CdPlotCoord = [0, 0.3];
 
 window.roughnessPlot = $.plot(
   $("#roughnessPlot"),
-  [[[0, 0]]],
+  [[], [], [], [], [], []],
   roughnessPlotOptions
 )
 
 window.roughnessPlot.setData([
-  { data : roughnessData[0] },
-  { data : roughnessData[1] },
-  { data : roughnessData[2] },
-  { data : roughnessData[3] },
-  { data : roughnessData[4] },
-  { data: [window.CdPlotCoord] }
+  { data : dragCoefficientValues[0], label: "golf ball" },
+  { data : dragCoefficientValues[1], label: "ε = 0.0125" },
+  { data : dragCoefficientValues[2], label: "ε = 0.005" },
+  { data : dragCoefficientValues[3], label: "ε = 0.0015" },
+  { data : dragCoefficientValues[4], label: "smooth ball" },
+  { data: [window.CdPlotCoord], color: "rgb(0, 0, 0)" }
 ]);
 
 const pointData = window.roughnessPlot.getData()[5];
 pointData.points.show = true;
-pointData.color = "rgb(0, 0, 0)";
-pointData.points.fillColor = "rgb(155, 205, 0)";
+pointData.lines.show = false;
 
 window.roughnessPlot.setupGrid(true);
 window.roughnessPlot.draw();
 
 document.getElementById("reset-button").addEventListener("click", function() {
   window.isRunning = false;
-  window.positionPlotData = [[0, 0]];
-  window.positionPlot.setData([ { data : window.positionPlotData, lines: { show: true } }, { data : [[0, 0]], points : { show: true, color : "rgb(0, 0, 0)", fillColor: "rgb(155, 205, 0)" } }]);
+  window.positionLineData = [[0, 0]];
+  window.positionPointData = [[0, 0]];
+  
+  window.positionPlot.setData([ 
+    { data : window.positionLineData },
+    { data : window.positionPointData, points : { show: true, color : "rgb(0, 0, 0)" } }
+  ]);
+
   window.ballObj.resetLaunch();
-  window.positionPlot.getData()[1].points.color = "rgb(0, 0, 0)";
   window.positionPlot.draw();
 })

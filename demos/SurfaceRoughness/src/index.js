@@ -1,12 +1,15 @@
 require("./style/style.scss");
-
 window.jQuery = require("jquery");
 window.$ = window.jQuery;
+require("bootstrap");
 require("./js/jquery.flot.js");
+
 require("./js/dragCoeffs.js");
 require("./js/initializePlot.js");
 require("./js/calcs.js");
 require("./js/loop.js");
+
+// After loading libraries, dragCoeffLists.js => dragCoeffs.js => initializePlot.js => calcs.js => loop.js
 
 const select = document.getElementById("select-ball");
 for ( let i = 0; i < Object.keys(window.dragCoeffs).length; i++ ) {

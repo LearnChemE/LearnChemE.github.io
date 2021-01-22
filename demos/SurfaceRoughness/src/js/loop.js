@@ -6,33 +6,28 @@ let start = Date.now();
 let now = Date.now();
 let dt = 0;
 let elapsed = now - start;
-let index = 0;
 
 function updateGraphs(positionArray, CdCoord) {
 
   window.positionPlot.setData([
     { data : positionArray, lines: { show: true } },
-    { data : [positionArray[positionArray.length - 1]], points : { show: true, color: "rgb(0, 0, 0)", fillColor: "rgb(155, 205, 0)" } }
+    { data : [positionArray[positionArray.length - 1]], color: "rgb(0, 0, 0)", points : { show: true } }
   ]);
-  window.positionPlot.getData()[1].color = "rgb(0, 0, 0)";
+
   window.positionPlot.setupGrid(true);
   window.positionPlot.draw();
 
-  const roughnessPlot = window.roughnessPlot;
-  const CdPointData = roughnessPlot.getData()[5];
-  CdPointData.data = [CdCoord];
-  CdPointData.datapoints.points = CdCoord;
-  roughnessPlot.setupGrid(true);
-  roughnessPlot.draw();
+  roughnessPlot.getData()[5].datapoints.points = CdCoord;
+  window.roughnessPlot.setupGrid(true);
+  window.roughnessPlot.draw();
 }
 
 function animationFunction() {
-  index++;
   ball.update(dt);
   ball.updateDOM();
-  if( ball.y < 0 ) { isRunning = false }
-  window.positionPlotData.push([ball.x, ball.y]); 
-  updateGraphs(window.positionPlotData, window.CdPlotCoord);
+  if( ball.y < 0 ) { ball.y = 0; isRunning = false }
+  window.positionLineData.push([ball.x, ball.y]); 
+  updateGraphs(window.positionLineData, window.CdPlotCoord);
 }
 
 function step() {
@@ -51,10 +46,8 @@ function step() {
 function startAnimation() {
   if (!isRunning) {
     window.ballObj.resetLaunch();
-    window.positionPlotData.push([0, 0]);
+    window.positionLineData.push([0, 0]);
     isRunning = true;
-    index = 0;
-    graphData = [[0, 0]];
     start = Date.now();
     now = Date.now();
     yPosition = 0;

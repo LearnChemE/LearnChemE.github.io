@@ -72,11 +72,11 @@ window.ballObj = {
     this.y += this.vy * dt;
 
     if ( this.x > 200 ) {
-      window.positionPlot.getOptions().xaxes[0].max = 300;
+      window.positionPlot.getOptions().xaxes[0].max += 100;
     }
 
     if ( this.y > 150 ) {
-      window.positionPlot.getOptions().yaxes[0].max= 200;
+      window.positionPlot.getOptions().yaxes[0].max += 50;
     }
   },
   updateDOM : function() {
