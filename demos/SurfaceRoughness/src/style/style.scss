@@ -20,7 +20,8 @@
 
 #control-sliders {
   display: grid;
-  grid-template-columns: max-content 150px max-content;
+  grid-template-columns: max-content 150px 7ch;
+  white-space: nowrap;
   align-items: end;
   gap: 10px;
   .label {
