@@ -75,13 +75,14 @@
 
   .parameter {
     display: grid;
-    grid-template-columns: 10ch max-content 4ch;
+    grid-template-columns: 16ch max-content 4ch;
     gap: 0.3rem;
     margin-bottom: 0.15rem;
     justify-items: start;
     
     .parameter-name {
       justify-self: end;
+      white-space: nowrap;
     }
 
     #reynolds-number {
@@ -91,13 +92,41 @@
   }
 }
 
-// #roughnessPlot {
-//   width: 500px;
-//   height: 336px;
-// }
-
 #roughnessImg {
   position: absolute;
   top: 392px;
   left: 38px;
+}
+
+.legendLayer {
+  &>rect {
+    fill: white;
+    stroke:black;
+  }
+  &>g {
+    transform: translateY(3pt);
+    text {
+      transform: translateX(-2pt);
+    }
+  }
+}
+
+#legend-container {
+  position: absolute;
+  width: 130px !important;
+  height: 220px;
+  box-shadow: 0px 0px 2px black;
+}
+
+#legend-container::before {
+  content: "Legend";
+  position: absolute;
+  top: -29px;
+  left: 0px;
+  width: 130px;
+  height: 30px;
+  text-align: center;
+  background-color: white;
+  border: 1px solid black;
+  box-shadow: 0px 0px 2px black;
 }

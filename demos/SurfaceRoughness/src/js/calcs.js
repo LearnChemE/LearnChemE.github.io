@@ -24,6 +24,7 @@ window.ballObj = {
   Cd : 0,
   Fd : 0,
   Re : 0,
+  colorArray : ["rgb(255, 160, 122)"],
   resetLaunch : function() {
     this.theta = Number(document.getElementById("launch-angle").value);
     this.v = Number(document.getElementById("launch-velocity").value);
@@ -31,8 +32,6 @@ window.ballObj = {
     this.y = 0;
     this.vx = this.v * Math.cos( this.theta );
     this.vy = this.v * Math.sin( this.theta );
-    window.positionPlot.getOptions().xaxes[0].max = 200;
-    window.positionPlot.getOptions().yaxes[0].max= 150;
     window.positionPlot.getData()[1].color = "rgb(0, 0, 0)";
     window.positionPlot.setupGrid(true);
   },
@@ -71,11 +70,11 @@ window.ballObj = {
     this.x += this.vx * dt; // update x and y positions
     this.y += this.vy * dt;
 
-    if ( this.x > 200 ) {
+    if ( this.x > window.positionPlot.getOptions().xaxes[0].max ) {
       window.positionPlot.getOptions().xaxes[0].max += 100;
     }
 
-    if ( this.y > 150 ) {
+    if ( this.y > window.positionPlot.getOptions().yaxes[0].max ) {
       window.positionPlot.getOptions().yaxes[0].max += 50;
     }
   },

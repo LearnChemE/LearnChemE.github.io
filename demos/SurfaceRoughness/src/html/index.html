@@ -6,6 +6,9 @@
   <meta http-equiv="content-language" content="en">
   <title>Surface Roughness Ball Flight</title>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
 </head>
 
 <body>
@@ -15,7 +18,7 @@
   <div id="controls">
         
     <div class="control-box" id="control-sliders">
-      <div class="label">Surface roughness (&epsilon;/D):</div>      
+      <div class="label">Surface roughness \( \frac{ \Large { \varepsilon } }{ D } \):</div>      
       <select id="select-ball"></select>
       <div class="value"></div>
 
@@ -39,24 +42,24 @@
       </div>
       <div id="parameters">
         <div class="parameter">
-          <div class="parameter-name">velocity =</div>
+          <div class="parameter-name">Velocity =</div>
           <div id="velocity">0.0</div>
           <div class="metric">m/s</div>
         </div>
   
         <div class="parameter">
-          <div class="parameter-name">Re =</div>
+          <div class="parameter-name">Reynold's number =</div>
           <div id="reynolds-number">0.0 x 10<sup>0</sup></div>
         </div>
   
         <div class="parameter">
-          <div class="parameter-name">C<sub>d</sub> =</div>
+          <div class="parameter-name">Drag coefficient =</div>
           <div id="drag-coefficient">0.00</div>
           <div class="metric"></div>
         </div>
   
         <div class="parameter">
-          <div class="parameter-name">F<sub>d</sub> =</div>
+          <div class="parameter-name">Drag force =</div>
           <div id="drag-force">0.00</div>
           <div class="metric">N</div>
         </div>
@@ -72,6 +75,8 @@
     <div id="roughnessPlot"></div>
 
   </div>
+
+  <div id="legend-container"></div>
 
 </body>
 
