@@ -7,14 +7,12 @@ let now = Date.now();
 let dt = 0;
 let elapsed = now - start;
 
+const inputElementIDs = ["start-button", "reset-button", "launch-angle", "launch-velocity", "select-ball"];
+inputElementIDs.forEach(elt => document.getElementById(elt).style.opacity = "1");
+
 function updateGraphs(positionArray, CdCoord) {
 
   const data = window.positionPlot.getData();
-
-  // window.positionPlot.setData([
-  //   { data : positionArray, lines: { show: true } },
-  //   { data : [positionArray[positionArray.length - 1]], color: "rgb(0, 0, 0)", points : { show: true } }
-  // ]);
 
   data[0].data = positionArray;
   data[0].lines = { ...data[0].lines, show: true };
@@ -43,7 +41,11 @@ function animationFunction() {
   ball.updateDOM();
   if( ball.y < 0 ) {
     ball.y = 0;
-    isRunning = false;
+    isRunning = false;   
+    inputElementIDs.forEach(elt => {
+      document.getElementById(elt).style.pointerEvents = "initial";
+      document.getElementById(elt).style.opacity = "1";
+    });
     let data = window.positionPlot.getData();
     data.unshift({ data: [[0, 0]] });
     const n = Number(document.getElementById("select-ball").value) + 1;
@@ -72,6 +74,10 @@ function step() {
 
 function startAnimation() {
   if (!isRunning) {
+    inputElementIDs.forEach(elt => { 
+      document.getElementById(elt).style.pointerEvents = "none";
+      document.getElementById(elt).style.opacity = "0.75";
+    });
     window.ballObj.resetLaunch();
     window.positionLineData.push([0, 0]);
     isRunning = true;

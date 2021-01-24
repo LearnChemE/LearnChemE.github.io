@@ -5,13 +5,13 @@ const axisFont = {
 }
 
 window.lineColors = [
-  "rgb(0, 0, 0)",
-  "rgb(255, 160, 122)",
-  "rgb(255, 200, 255)",
-  "rgb(128, 220, 0)",
-  "rgb(0, 0, 0)",
-  "rgb(0, 0, 255)",
-  "rgb(0, 0, 0)",
+  "rgba(0, 0, 0, 1)",
+  "rgba(255, 160, 122, 0.75)",
+  "rgba(255, 200, 255, 0.75)",
+  "rgba(128, 220, 0, 0.75)",
+  "rgba(0, 0, 0, 0.75)",
+  "rgba(0, 0, 255, 0.75)",
+  "rgba(0, 0, 0, 1)",
 ]
 
 const positionPlotOptions = {
@@ -23,7 +23,7 @@ const positionPlotOptions = {
       axisLabel : "x-position (m)",
       font: axisFont,
       min: 0,
-      max: 200
+      max: 150
     },
     { 
       position: "top",
@@ -42,7 +42,7 @@ const positionPlotOptions = {
       axisLabel : "y-position (m)",
       autoScale : "none",
       min : 0,
-      max : 150,
+      max : 100,
       font : axisFont,
     },
   ],
@@ -174,7 +174,7 @@ document.getElementById("reset-button").addEventListener("click", function() {
   window.isRunning = false;
   window.positionLineData = [[0, 0]];
   window.positionPointData = [[0, 0]];
-  window.positionPlot.getOptions().xaxes[0].max = 200;
+  window.positionPlot.getOptions().xaxes[0].max = 150;
   window.positionPlot.getOptions().yaxes[0].max= 150;
   window.positionPlot.setData([ 
     { data : window.positionLineData },

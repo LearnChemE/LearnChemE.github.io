@@ -24,7 +24,7 @@ window.ballObj = {
   Cd : 0,
   Fd : 0,
   Re : 0,
-  colorArray : ["rgb(255, 160, 122)"],
+  colorArray : [window.lineColors[1]],
   resetLaunch : function() {
     this.theta = Number(document.getElementById("launch-angle").value);
     this.v = Number(document.getElementById("launch-velocity").value);
