@@ -3,11 +3,10 @@
 
 #controls {
   display: grid;
-  grid-template-columns: max-content 310px;
+  grid-template-columns: repeat(3, max-content);
   grid-template-rows: min-content;
   gap: 20px;
   align-items: center;
-  justify-items: center;
   margin-left: 5rem;
   margin-top: 1rem;
   margin-bottom: 1rem;
@@ -33,10 +32,18 @@
   width: 8rem;
 }
 
-.control-box.right {
+.control-box {
   display: grid;
-  justify-items: center;
   gap: 10px;
+
+  &.right {
+    align-self: end;
+    gap: 5px;
+  }
+}
+
+.control-box-title {
+  text-align: center;
 }
 
 #control-buttons {
@@ -62,15 +69,13 @@
 
 }
 
-// k 1 = k/d = 1250 × 10 −5 , k 2 = 500 × 10 −5 , k 3 = 150 × 10 −5
-
 #parameters {
   width: max-content;
   align-self: end;
   border: 1px solid black;
   padding: 0.5rem;
-  padding-left: 1.5rem;
-  padding-right: 2.5rem;
+  padding-left: 1rem;
+  padding-right: 0.5rem;
   font-size: 1rem;
   box-shadow: 0px 0px 3px black;
 
@@ -113,21 +118,21 @@
 }
 
 #legend-container {
-  position: absolute;
+  // position: absolute;
   width: 130px !important;
   height: 220px;
   box-shadow: 0px 0px 2px black;
 }
 
-#legend-container::before {
-  content: "Legend";
-  position: absolute;
-  top: -29px;
-  left: 0px;
-  width: 130px;
-  height: 30px;
-  text-align: center;
-  background-color: white;
-  border: 1px solid black;
-  box-shadow: 0px 0px 2px black;
-}
+// #legend-container::before {
+//   content: "Legend";
+//   // position: relative;
+//   top: 0px;
+//   left: 0px;
+//   width: 130px;
+//   height: 30px;
+//   text-align: center;
+//   background-color: white;
+//   border: 1px solid black;
+//   box-shadow: 0px 0px 2px black;
+// }
