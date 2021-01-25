@@ -7,7 +7,7 @@ require("./js/dragCoeffs.js");
 require("./js/initializePlot.js");
 require("./js/calcs.js");
 require("./js/loop.js");
-
+require("./js/directionsDetailsAbout.js");
 
 // After loading libraries, dragCoeffLists.js => dragCoeffs.js => initializePlot.js => calcs.js => loop.js
 

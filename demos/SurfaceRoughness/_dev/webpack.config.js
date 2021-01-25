@@ -7,7 +7,7 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 const rules = [
   {
-    test: /\.js?$/,
+    test: /\.js?$/i,
     exclude: /node_modules/,
     use: {
       loader: "babel-loader",
@@ -33,7 +33,7 @@ const rules = [
     use: ["to-string-loader", "html-loader"]
   },
   {
-    test: /\.(png|jpg|gif)/,
+    test: /\.(png|jpg|gif)$/i,
     use: ["file-loader"]
   }
 ];
