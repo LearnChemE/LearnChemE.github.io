@@ -1,6 +1,17 @@
 @import "bootstrap";
 @import "./slider.scss";
 
+@font-face {
+  font-family: 'openSans';
+  src: url('../fonts/OpenSans-Regular.ttf');
+  font-weight: 400;
+  font-style: normal;
+}
+
+* {
+  font-family: 'openSans', 'sans-serif';
+}
+
 #controls {
   display: grid;
   grid-template-columns: repeat(3, max-content);
@@ -124,6 +135,10 @@
   box-shadow: 0px 0px 2px black;
 }
 
+.modal-body {
+  padding-bottom: 2rem;
+}
+
 .modal-image {
   width: 100%;
   margin: 0.75rem;
@@ -140,18 +155,18 @@
 
 #launch-angle-velocity {
   max-width: 350px;
+  margin-top: 10px;
 }
 
 .inline-button>img {
   height: 3rem;
+  margin: -0.5rem 0rem;
 }
 
 #comparison-plot {
-  max-width: 400px;
-}
-
-#color-legend {
-  max-width: 160px;
+  max-width: 550px;
+  display: grid;
+  grid-template-columns: 380px 150px;
 }
 
 #drag-plot {
@@ -164,4 +179,9 @@
 
 #directions-details-about-buttons {
   max-width: 300px;
+}
+
+#force-diagram {
+  max-width: 450px;
+  img { padding: 0.5rem; }
 }

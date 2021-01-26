@@ -6,6 +6,7 @@
   <meta http-equiv="content-language" content="en">
   <title>Surface Roughness Ball Flight</title>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script>window.MathJax = {chtml: {displayAlign: 'left', displayIndent: '-1'} }</script>
   <script type="text/javascript" id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
   </script>
@@ -93,21 +94,13 @@
         </div>
         
         <div class="modal-body">
-          This is a simulation of a non-rotating sphere's trajectory when launched, with the surface roughness determining the sphere's drag profile.<br><br>First, select the surface roughness using the drop-down menu,
+          This simulation plots the trajectory of a non-rotating sphere when launched; the surface roughness determines the sphere's drag profile. First, select the surface roughness using the drop-down menu,
           <div class="modal-image" id="roughness-select"></div>
           where \( \large{ \varepsilon } \) is the depth of imperfections and \( \small{ D } \) is the sphere's diameter. Then, choose a launch angle and launch velocity using the sliders:
           <div class="modal-image" id="launch-angle-velocity"></div>
-          Now, press <span class="inline-button" id="launch-button"></span>!<br>
-          After the sphere has landed, you may press "Launch" again with different settings to compare trajectories side-by-side.
+          then press <span class="inline-button" id="launch-button"></span>. After the sphere has landed, you may press "Launch" again with different settings to compare trajectories on the same plot. Otherwise, press <span class="inline-button" id="clear-plot-button"></span> to clear the previous trajectories.
           <div class="modal-image" id="comparison-plot"></div>
-          The plot color legend will help you remember which roughness you used for each trajectory:
-          <div class="modal-image" id="color-legend"></div>
-          Otherwise, press <span class="inline-button" id="clear-plot-button"></span> to clear the previous trajectories.<br>
-          The drag coefficient is displayed as a white circle on the drag coefficient plot. The shape of the curve is only dependent on the roughness of the sphere:
-          <div class="modal-image" id="drag-plot"></div>
-          Some information about the sphere is displayed in real-time:
-          <div class="modal-image" id="sphere-state-window"></div>
-          To read more about the governing equations, press <span class="inline-button" id="details-button-img"></span>. To read more about the author and LearnChemE, press <span class="inline-button" id="about-button-img"></span>.
+          The drag coefficient is displayed as a white circle on both plots. The shape of the "Reynold's Number versus Drag Coefficient" curve depends on the sphere's roughness.
         </div>
       </div>
     </div>
@@ -125,9 +118,17 @@
         </div>
         
         <div class="modal-body">
-
-          <div class="modal-image" id="roughness-plot" style="opacity:0;"></div>
-
+          For an object in motion, there are three relevant forces acting on it. The gravitational force \( F_{g} \), the drag force \( F_{D} \), and the lift force \( F_{L} \):
+          <div class="modal-image" id="force-diagram"></div>
+          The gravitational force \( F_{g} = gm \) is a function of the object's mass \( m \) and gravitational acceleration \( g \).  The lift force \( F_{L} \) is defined as
+          $$
+            F_{L} = \frac{ C_{L} \rho V^{2} A_{c} }{ 2 }
+          $$
+          Where \( \rho \) is the fluid density, \( A_{c} \) is the cross-sectional area of the object, \( V \) is the velocity of the object, and \( C_{L} \) is the lift coefficient. For spheres, \( C_{L} \) is a function of angular velocity (rotation speed), Reynold's number \( Re = \frac{ \rho V D }{ \mu } \) (with \( \mu \) being dynamic viscosity of the fluid), angle of attack \( \theta \), and geometry of the sphere. A golf ball's geometry to maximizes \( F_{L} \) when the ball is rotating, to make it fly further. Since this simulation assumes zero angular velocity, \( F_{L} \) is zero.  The drag equation is nearly identical,
+          $$
+            F_{D} = \frac{ C_{D} \rho V^{2} A_{c} }{ 2 }
+          $$
+          with the drag coefficient \( C_{D} \) being a function of the Reynold's number, angular velocity, and geometry of the sphere. Surface roughness has a large effect on the drag coefficient, with golf balls being designed to minimize \( C_{D} \) at low velocities.
         </div>
       </div>
     </div>
@@ -145,7 +146,9 @@
         </div>
         
         <div class="modal-body">
-          About
+          This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>
+          
+          Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. The recommended browser is the latest version of: Chrome, Safari, Firefox, Edge, Brave, or Opera.
         </div>
       </div>
     </div>
