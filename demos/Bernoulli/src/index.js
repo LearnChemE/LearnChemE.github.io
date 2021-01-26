@@ -43,7 +43,7 @@ window.setup = function() {
 }
 
 window.draw = function() {
-  background(245);
+  background(252);
   translate(10, 20);
   shapes.pipeHorizontal(100, 300, Number(sp.pipeDiameterInletInPixels), 100);
   shapes.pipeVertical(200, 300, Number(sp.pipeDiameterInletInPixels), sp.pipeHeightInPixels);
