@@ -182,6 +182,24 @@
 }
 
 #force-diagram {
-  max-width: 450px;
+  max-width: 300px;
   img { padding: 0.5rem; }
+}
+
+.references {
+  font-size: 0.8rem;
+  width: 80ch;
+  padding-left: 1rem;
+
+  .reference {
+    margin-bottom: 0.25rem;
+  }
+
+  &::before {
+    content: "References";
+    font-size: 1rem;
+    position: relative;
+    left: -1rem;
+    top: -0.5rem;
+  }
 }

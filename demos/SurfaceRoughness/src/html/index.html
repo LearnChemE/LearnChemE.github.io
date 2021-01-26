@@ -6,7 +6,7 @@
   <meta http-equiv="content-language" content="en">
   <title>Surface Roughness Ball Flight</title>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script>window.MathJax = {chtml: {displayAlign: 'left', displayIndent: '-1'} }</script>
+  <script>window.MathJax = {chtml: {displayAlign: 'left', displayIndent: '-1', mathmlSpacing: true, } }</script>
   <script type="text/javascript" id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
   </script>
@@ -100,7 +100,7 @@
           <div class="modal-image" id="launch-angle-velocity"></div>
           then press <span class="inline-button" id="launch-button"></span>. After the sphere has landed, you may press "Launch" again with different settings to compare trajectories on the same plot. Otherwise, press <span class="inline-button" id="clear-plot-button"></span> to clear the previous trajectories.
           <div class="modal-image" id="comparison-plot"></div>
-          The drag coefficient is displayed as a white circle on both plots. The shape of the "Reynold's Number versus Drag Coefficient" curve depends on the sphere's roughness.
+          The drag coefficient is displayed as a white circle on the "Reynold's Number versus Drag Coefficient" plot. This plot also displays the shape of the drag coefficient curve, which depends on the sphere's roughness.
         </div>
       </div>
     </div>
@@ -118,17 +118,16 @@
         </div>
         
         <div class="modal-body">
-          For an object in motion, there are three relevant forces acting on it. The gravitational force \( F_{g} \), the drag force \( F_{D} \), and the lift force \( F_{L} \):
+          Three forces act on an object in motion: the gravitational force \( F_{g} \), the drag force \( F_{D} \), and the lift force \( F_{L} \).
           <div class="modal-image" id="force-diagram"></div>
-          The gravitational force \( F_{g} = gm \) is a function of the object's mass \( m \) and gravitational acceleration \( g \).  The lift force \( F_{L} \) is defined as
+          The gravitational force is \( F_{g} = gm \), where \( g \) is gravitational acceleration and \( m \) is the object's mass. The lift force \( F_{L} \) is zero in this simulation because the spheres are not rotating. A golf ball's geometry creates lift when the ball rotates. The drag force equation is
           $$
-            F_{L} = \frac{ C_{L} \rho V^{2} A_{c} }{ 2 }
+            F_{D} = \frac{ C_{D} \rho A_{c} V^{2} }{ 2 }
           $$
-          Where \( \rho \) is the fluid density, \( A_{c} \) is the cross-sectional area of the object, \( V \) is the velocity of the object, and \( C_{L} \) is the lift coefficient. For spheres, \( C_{L} \) is a function of angular velocity (rotation speed), Reynold's number \( Re = \frac{ \rho V D }{ \mu } \) (with \( \mu \) being dynamic viscosity of the fluid), angle of attack \( \theta \), and geometry of the sphere. A golf ball's geometry to maximizes \( F_{L} \) when the ball is rotating, to make it fly further. Since this simulation assumes zero angular velocity, \( F_{L} \) is zero.  The drag equation is nearly identical,
-          $$
-            F_{D} = \frac{ C_{D} \rho V^{2} A_{c} }{ 2 }
-          $$
-          with the drag coefficient \( C_{D} \) being a function of the Reynold's number, angular velocity, and geometry of the sphere. Surface roughness has a large effect on the drag coefficient, with golf balls being designed to minimize \( C_{D} \) at low velocities.
+          where \( V \) is the velocity and \( A_{c} \) is the cross-sectional area of a sphere with diameter \( D \).  The drag coefficient \( C_{D} \) is a function of the angular velocity, the sphere's surface roughness, and the Reynold's number \( Re = \frac{ \rho V D }{ \mu } \) where \( \mu \) is the dynamic viscosity of air. Surface roughness has a large effect on the drag coefficient, and the dimples on golf balls are designed to minimize \( C_{D} \) at low velocities. Values for drag coefficients obtained from Munson et al. [1]<br><br>
+          <ol class="references">
+            <li class="reference">Munson, B.R., Okiishi, T.H., Huebsch, W.W., Rothmayer, A.P. (2013). Fundamentals of Fluid Mechanics (7th edition). John Wiley & Sons.</li>
+          </ol>
         </div>
       </div>
     </div>
