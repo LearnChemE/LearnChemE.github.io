@@ -137,6 +137,7 @@
 
 .modal-body {
   padding-bottom: 2rem;
+  font-size: 0.95rem;
 }
 
 .modal-image {
@@ -201,5 +202,11 @@
     position: relative;
     left: -1rem;
     top: -0.5rem;
+  }
+}
+
+.flot-svg {
+  svg {
+    overflow: visible !important;
   }
 }
