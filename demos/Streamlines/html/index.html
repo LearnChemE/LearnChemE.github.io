@@ -1,11 +1,21 @@
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Streamline</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"></script>
+  <script>
+    MathJax = {
+      chtml: {
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+        displayIndent: '-1', // default for indentshift when set to 'auto'
+      }
+    };
+  </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  
+
   <!-- CSS -->
   <link rel="stylesheet" href="../style/style.css">
 
@@ -16,176 +26,271 @@
   <link rel="stylesheet" href="../style/bootstrap.min.css">
   <script src="../js/bootstrap.min.js"></script>
 
-
+  <link rel="stylesheet" href="../style/sliders.css">
 
 </head>
+
 <body>
-  <div class = "modalButtonsRow">
+  <div class="modalButtonsRow">
     <div id="dir" class="btn btn-primary" data-toggle="modal" data-target="#directionsModal">Directions</div>
     <div id="dir" class="btn btn-primary" data-toggle="modal" data-target="#detailsModal">Details</div>
     <div id="dir" class="btn btn-primary" data-toggle="modal" data-target="#aboutModal">About</div>
-  </div>  
-
-
-<div class = "value-area">
-  <div class = "inputs">
-  
-    <div class="input-area">
-      <div>Object</div>
-      <select id="fluid-selection"  style="width: 130px; font-size: 13px;">
-        <option value="3">Honey</option>
-        <option value="1">Water</option>
-        <option value="2">Milk</option>
-       
-      </select>
-    </div>
-
-  <div class = "input-area">
-   <div class="data-name">Dynamic viscosity\((\mu)\):</div>
-   <!-- The slider is the natural logarithm of the value, so the initial value must be ln(0.50) --> 
-   <!-- <input type="range" id="viscosity" min="-6.5" max="2" step="0.00001" value="-4.721704002"> -->
-   <div class="data-value" id="viscosityValue">1.19</div>
-   <div class="data-metric">Pa\(\cdot\)s</div>
   </div>
 
-  <div class = "input-area">
-   <div class="data-name">Fluid Density \(\rho\):</div>
-   <!-- The slider is the natural logarithm of the value, so the initial value must be ln(0.50) -->
-   <!-- <input type="range" id="density" min="0.2" max="7.6" step="0.01" value="6.907755"> -->
-   <div class="data-value" id="densityValue">1400</div>
-   <div class="data-metric">kg/m<sup>3</sup></div>
-  </div> 
+
+  <div class="value-area">
+    <div class="inputs">
+
+      <div class="input-area">
+        <div>Object</div>
+        <select id="fluid-selection">
+          <option value="3">Honey</option>
+          <option value="1">Water</option>
+          <option value="2">Milk</option>
+
+        </select>
+      </div>
+
+      <div class="input-area">
+        <div class="data-name">Dynamic viscosity\((\mu)\):</div>
+        <!-- The slider is the natural logarithm of the value, so the initial value must be ln(0.50) -->
+        <!-- <input type="range" id="viscosity" min="-6.5" max="2" step="0.00001" value="-4.721704002"> -->
+        <div class="data-value" id="viscosityValue">1.19</div>
+        <div class="data-metric">Pa\(\cdot\)s</div>
+      </div>
+
+      <div class="input-area">
+        <div class="data-name">Fluid Density \(\rho\):</div>
+        <!-- The slider is the natural logarithm of the value, so the initial value must be ln(0.50) -->
+        <!-- <input type="range" id="density" min="0.2" max="7.6" step="0.01" value="6.907755"> -->
+        <div class="data-value" id="densityValue">1400</div>
+        <div class="data-metric">kg/m<sup>3</sup></div>
+      </div>
 
 
-  <div class = "input-area">
-   <div class="data-name">Fluid velocity \(V\):</div>
-   <!-- The slider is the natural logarithm of the value, so the initial value must be ln(0.50) -->
-   <div class = "group-slider">
-   <input type="range" id="velocity" min="-3.5066" max="-0.8557" step="0.05" value="-3.15825">
-   <div class="data-value" id="velocityValue">4.25</div>
-   </div>
-   <div class="data-metric">cm/s</div>
-  </div>
+      <div class="input-area">
+        <div class="data-name">Fluid velocity \(V\):</div>
+        <!-- The slider is the natural logarithm of the value, so the initial value must be ln(0.50) -->
+        <div class="group-slider">
+          <input type="range" id="velocity" min="-3.5066" max="-0.8557" step="0.05" value="-3.15825">
+          <div class="data-value" id="velocityValue">4.25</div>
+        </div>
+        <div class="data-metric">cm/s</div>
+      </div>
 
-  <div class = "input-area">
-    
-      <div>Reynolds number: </div>
-      <div id = "ReNumber"> 50 </div>
-    
-    </div>
-<!--  
+      <div class="input-area">
+
+        <div>Reynolds number: </div>
+        <div id="ReNumber"> 50 </div>
+
+      </div>
+      <!--  
     <div class="deptRow" >
       <div>Drag force: </div>
       <div id = "Fd"> 20 </div>
       <div>N</div>
     </div>-->
 
-  </div>
+    </div>
   </div>
 
- 
-</div>
 
-<div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>
-          This simulation calculates and generates a vector field that visualizes 
-          the direction of moving fluid particals around a 1 meter sphere. One of three fluids can be selected
-          from the dropdown menu. The velocity of selected fluid can be adjusted with the 
-          slider bar. The vector field will automaticaly update if there are changes.
-        </p>
-      
+  </div>
+
+  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This simulation generates a vector field around a sphere with radius \( r = 1 \; \mathrm{ m } \). One of three
+            fluids can be selected from the dropdown menu. The velocity of the fluid can be adjusted with the slider
+            below the dropdown menu. The vector field will automaticaly update if a parameter is changed. Note that the
+            velocity of the fluid may change automatically when a new fluid is selected, in order to keep the Reynold's
+            number within a valid domain (because the governing equations are only valid for a certain range of
+            Reynold's numbers). Click "Details" to see the governing equations used in this simulation.
+          </p>
+
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      
-      <div class="modal-header">
-        <h5 class="modal-title" id="detailsModalLabel">Details</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      
-      <div class="modal-body">
-        
-       <p>The Reynolds number is used to indicate the change from lanimar flow to turbular flow. 
-         It is the ratio of inertial force to viscous force within a fluid. 
-       </p>
-       <p>Reynolds number is defined as:
-      $$Re = \frac{\rho V D}{\mu}$$ Where: <br>
-      \(\rho\) is the density of the fluid; \(V\) is the flow speed;
-      \(D\) is the characteristic length of the object; \(\mu\) is the 
-      dynamic vicosity of the fluid.</p>
-      <p>The purpose of this simulation is to show the relationship between reynolds 
-        number and the turbular movement of the fluid.
-      </p>
-      </div>
+  <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
 
+        <div class="modal-header">
+          <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+
+          <p>
+            The Navier-Stokes equations are a set of partial differential equations that describe the motion of viscous
+            fluids. Mathematically, they express conservation of momentum and mass<sup>1</sup>. Few analytical solutions
+            exist for the Navier-Stokes equations, so numerical approximations are often used to model fluid
+            behavior. Assuming incompressible fluid, steady-state flow, and radial symmetry about the x-axis (which
+            goes left-to-right in this simulation), the Navier-Stokes equation of motion in spherical coordinates
+            is<sup>2</sup>
+          </p>
+
+          $$
+          - \frac{1}{ r^{2} \; \mathrm{sin} ( \theta ) } \frac{ \partial ( \Psi , D^{ 2 } \Psi ) }{ \partial ( r, \theta
+          ) } + \frac{ 2 }{ r^{ 2 } } \frac{ D^{ 2 } \Psi }{ \mathrm{ sin }^{ 2 } ( \theta ) } \left( \frac{ \partial
+          \Psi }{ \partial r } \mathrm{ cos }( \theta ) - \frac{ 1 }{ r } \frac{ \partial \Psi }{ \partial \theta }
+          \mathrm{ sin } ( \theta ) \right) - \frac{ 2 }{ Re } D^{ 4 } \Psi = 0
+          $$
+
+          <p>
+            where \( r \) is radius, \( \theta \) is the polar angle, \( \Psi \) is the stream function, \( Re \) is the
+            Reynolds number and \( D \) is
+          </p>
+
+          $$
+          D^{ 2 } = \frac{ \partial^{ 2 } }{ \partial r^{ 2 } } + \frac{ \mathrm{ sin }( \theta ) }{ r^{ 2 } } \frac{
+          \partial }{ \partial \theta } \left( \frac{ 1 }{ \mathrm{ sin }( \theta ) } \frac{ \partial }{ \partial \theta
+          } \right)
+          $$
+
+          <p>
+            The Reynolds number is
+          </p>
+
+          $$
+          Re = \frac{ \rho V D }{ \mu }
+          $$
+
+          <p>
+            where \( \rho \) is the density of the fluid, \( V \) is the magnitude of the fluid velocity vector, \( D \)
+            is the characteristic length, and \( \mu \) is the dynamic vicosity of the fluid. The x-component \( u \)
+            and y-component \( v \) of the velocity vector \( \textbf{ V } \) are defined
+          </p>
+
+          $$
+          u = \frac{ 1 }{ r^{ 2 } \; \mathrm{ sin } \theta } \frac{ \partial \Psi }{ \partial \theta }
+          $$
+
+          $$
+          v = - \frac{ 1 }{ r \; \mathrm{ sin } \theta } \frac{ \partial \Psi }{ \partial r }
+          $$
+
+          <p>
+            The boundary conditions for flow around a sphere are
+          </p>
+
+          $$
+          \Psi = \frac{ 1 }{ 2 } r^{ 2 } \mathrm{ sin }^{ 2 } \theta, \; \; r \rightarrow \infty
+          $$
+
+          $$
+          \Psi = \frac{ \partial \Psi }{ \partial r } = 0, \; \; r = R
+          $$
+
+          <p>
+            where \( R \) is the radius of the sphere. The numerical "Galerkin method" approximates the stream function \( \Psi \) as a polynomial in which coefficients are determined experimentally.  For this reason, the solution is only valid for low Reynolds numbers \( 0 \leq Re \leq 500 \).
+          </p>
+
+          <p>
+            References:
+          </p>
+          <p>
+            <ol class="references">
+              <li>
+                n.a. (2021) <i>Navier–Stokes Equations</i>. Wikipedia.com.  <a
+                  href="https://en.wikipedia.org/wiki/Navier–Stokes_equations">https://en.wikipedia.org/wiki/Navier–Stokes_equations</a>
+              </li>
+
+              <li>
+                Kawaguti, M. (1955). <i>The critical Reynolds number for the flow past a sphere.</i> Journal of the Physical Society of Japan, 10(8), 694-699.
+              </li>
+            </ol>
+          </p>
+        </div>
+
+      </div>
     </div>
   </div>
-</div>
 
-<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="aboutModalLabel">About</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>
-          This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Mingyuan Lu and Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera. 
-        </p>
-        
-        <p>
-          References:<br>
-        </p>
+  <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="aboutModalLabel">About</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Mingyuan Lu and Neil Hendren under
+            the direction of Professor John L. Falconer. It is an HTML5/JavaScript implementation of the Wolfram Demonstration created by M.D. Mikhailov<sup>1</sup>. Address any questions or comments to learncheme@gmail.com. All
+            of our simulations are open source, and are available on our <a
+              href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+              repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page
+            (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is
+            not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended
+            browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
+          </p>
 
-        <ol style="font-size: 0.8rem; margin-bottom: 1rem;">
-          <li>
-            Hamielec, A. E., Hoffman, T. W., & Ross, L. L. (1967). Numerical solution of the Navier‐Stokes equation for flow past spheres: Part I. Viscous flow around spheres with and without radial mass efflux. AIChE Journal, 13(2), 212-219.
-          </li>
-         
-          <li>
-            Viscosity and density of honey: Nayik, Gulzar & Dar, B. & Nanda, Vikas. (2015). "Physico-chemical, rheological 
-            and sugar profile of different honeys from Kashmir Valley of India". <i>Arabian Journal of Chemistry</i>. 
-            12. 10.1016/j.arabjc.2015.08.017.
-          </li>
+          <p>
+            References:<br>
+          </p>
 
-          <li>
-            Viscosity and density of water: 
-            Gerhart, P. M., Gerhart, A. L., & Hochstein, J. I. (2016). Munson, Young and Okiishi's Fundamentals of Fluid Mechanics. John Wiley & Sons.
-          </li>
-          
-          <li>
-            <a href = "http://www.vp-scientific.com/Viscosity_Tables.htm"> V&P Scientific</a><br>
-          </li>
-          
-          <li>
-            <a href = "https://www.uoguelph.ca/foodscience/book/export/html/1988#:~:text=With%20all%20of%20this%20in,m3%20at%2020%C2%B0%20C.">  University of Guelph</a>
-          </li>
-        </ol>
+          <ol class="references">
+            <li>
+              Mikhailov, M.D. (2013). Flow around a Sphere at Finite Reynolds Number by Galerkin Method. <a href="http://demonstrations.wolfram.com/FlowAroundASphereAtFiniteReynoldsNumberByGalerkinMethod/">http://demonstrations.wolfram.com/FlowAroundASphereAtFiniteReynoldsNumberByGalerkinMethod/</a>. <br> A <a href="https://demonstrations.wolfram.com">Wolfram Demonstrations</a> Project.
+            </li>
 
+            <li>
+              Hamielec, A. E., Hoffman, T. W., & Ross, L. L. (1967). Numerical solution of the Navier‐Stokes equation
+              for flow past spheres: Part I. Viscous flow around spheres with and without radial mass efflux. AIChE
+              Journal, 13(2), 212-219.
+            </li>
+
+            <li>
+              Viscosity and density of honey: Nayik, Gulzar & Dar, B. & Nanda, Vikas. (2015). "Physico-chemical,
+              rheological
+              and sugar profile of different honeys from Kashmir Valley of India". <i>Arabian Journal of Chemistry</i>.
+              12. 10.1016/j.arabjc.2015.08.017.
+            </li>
+
+            <li>
+              Viscosity and density of water:
+              Gerhart, P. M., Gerhart, A. L., & Hochstein, J. I. (2016). Munson, Young and Okiishi's Fundamentals of
+              Fluid Mechanics. John Wiley & Sons.
+            </li>
+
+            <li>
+              <a href="http://www.vp-scientific.com/Viscosity_Tables.htm"> V&P Scientific</a><br>
+            </li>
+
+            <li>
+              <a
+                href="https://www.uoguelph.ca/foodscience/book/export/html/1988#:~:text=With%20all%20of%20this%20in,m3%20at%2020%C2%B0%20C.">
+                University of Guelph</a>
+            </li>
+          </ol>
+
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <script src="../js/sketch.js"></script>
 </body>
+
 </html>
