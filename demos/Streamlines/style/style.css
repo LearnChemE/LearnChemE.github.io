@@ -47,9 +47,21 @@ li {
   margin-bottom: 0.5rem;
 }
 
+.modal.show {
+  padding-left: 0px !important;
+}
+
+.modal-body {
+  font-size: 0.8rem;
+}
+
+.modal-body>p {
+  font-size: 0.9rem;
+}
+
 .modal-body .modal-text {
-    max-width: 70ch;
-    text-align: justify;
+  max-width: 70ch;
+  text-align: justify;
 }
 
 .modal-body .modal-equation {
@@ -73,5 +85,5 @@ canvas {
 }
 
 .references {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }

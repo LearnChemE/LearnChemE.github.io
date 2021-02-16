@@ -8,6 +8,7 @@
   <script>
     MathJax = {
       chtml: {
+        scale: 0.95,
         mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
         displayAlign: 'left', // default for indentalign when set to 'auto'
         displayIndent: '-1', // default for indentshift when set to 'auto'
@@ -23,7 +24,7 @@
   <script src="../js/popper.js"></script>
 
   <!-- bootstrap -->
-  <link rel="stylesheet" href="../style/bootstrap.min.css">
+  <link rel="stylesheet" href="../style/bootstrap.css">
   <script src="../js/bootstrap.min.js"></script>
 
   <link rel="stylesheet" href="../style/sliders.css">
@@ -168,13 +169,13 @@
           </p>
 
           $$
-          Re = \frac{ \rho V D }{ \mu }
+          Re = \frac{ \rho V l }{ \mu }
           $$
 
           <p>
-            where \( \rho \) is the density of the fluid, \( V \) is the magnitude of the fluid velocity vector, \( D \)
+            where \( \rho \) is the density of the fluid, \( V \) is the magnitude of the fluid velocity vector, \( l \)
             is the characteristic length, and \( \mu \) is the dynamic vicosity of the fluid. The x-component \( u \)
-            and y-component \( v \) of the velocity vector \( \textbf{ V } \) are defined
+            and y-component \( v \) of the fluid velocity at coordinate \( ( r, \theta ) \) are
           </p>
 
           $$
@@ -198,7 +199,7 @@
           $$
 
           <p>
-            where \( R \) is the radius of the sphere. The numerical "Galerkin method" used in this simulation approximates the stream function \( \Psi \) as a polynomial in which coefficients are determined experimentally.  For this reason, the solution is only valid for low Reynolds numbers \( 0 \leq Re \leq 500 \).
+            where \( R \) is the radius of the sphere. The numerical Galerkin method used in this simulation approximates the stream function \( \Psi \) as a polynomial in which coefficients are determined experimentally.  For this reason, the solution is only valid for low Reynolds numbers \( 0 \leq Re \leq 500 \).
           </p>
 
           <p>
