@@ -8,7 +8,7 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const rules = [
   {
     test: /\.js?$/,
-    exclude: /node_modules/,
+    exclude: [/node_modules/, /p4.js/],
     use: {
       loader: "babel-loader",
       options: {
@@ -54,7 +54,7 @@ const htmlOptions = {
     removeAttributeQuotes: true,
     collapseWhitespace: true,
     removeComments: true
-  }
+  },
 };
 
 const jsOptions = {
