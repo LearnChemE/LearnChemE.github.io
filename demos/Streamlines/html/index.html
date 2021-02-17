@@ -141,49 +141,45 @@
             The Navier-Stokes equations are a set of partial differential equations that describe the motion of viscous
             fluids. Mathematically, they express conservation of momentum and mass<sup>1</sup>. Few analytical solutions
             exist for the Navier-Stokes equations, so numerical approximations are often used to model fluid
-            behavior. Assuming incompressible fluid, steady-state flow, and radial symmetry about the x-axis (which
+            behavior. Assuming viscous, incompressible fluid, steady-state flow, and radial symmetry about the x-axis (which
             goes left-to-right in this simulation), the Navier-Stokes equation of motion in spherical coordinates
-            is<sup>2</sup>
+            is<sup>2,3,4</sup>
           </p>
 
           $$
-          - \frac{1}{ r^{2} \; \mathrm{sin} ( \theta ) } \frac{ \partial ( \Psi , D^{ 2 } \Psi ) }{ \partial ( r, \theta
-          ) } + \frac{ 2 }{ r^{ 2 } } \frac{ D^{ 2 } \Psi }{ \mathrm{ sin }^{ 2 } ( \theta ) } \left( \frac{ \partial
-          \Psi }{ \partial r } \mathrm{ cos }( \theta ) - \frac{ 1 }{ r } \frac{ \partial \Psi }{ \partial \theta }
-          \mathrm{ sin } ( \theta ) \right) - \frac{ 2 }{ Re } D^{ 4 } \Psi = 0
+            \frac{ Re }{ 2 } \left[ \frac{ \partial \Psi }{ \partial r } \frac{ \partial }{ \partial \theta } \left( \frac{ E^{2} \Psi }{ r^{2} \mathrm{ sin }^{ 2 } \theta } \right) - \frac{ \partial \Psi }{ \partial \theta } \frac{ \partial }{ \partial r } \left( \frac{ E^{2} \Psi }{ r^{2} \mathrm{ sin }^{ 2 } \theta} \right) \right] \mathrm{ sin } \theta = E^{ 4 } \Psi
           $$
 
           <p>
             where \( r \) is radius, \( \theta \) is the polar angle, \( \Psi \) is the stream function, \( Re \) is the
-            Reynolds number and \( D \) is
+            Reynolds number and \( E \) is
           </p>
 
           $$
-          D^{ 2 } = \frac{ \partial^{ 2 } }{ \partial r^{ 2 } } + \frac{ \mathrm{ sin }( \theta ) }{ r^{ 2 } } \frac{
-          \partial }{ \partial \theta } \left( \frac{ 1 }{ \mathrm{ sin }( \theta ) } \frac{ \partial }{ \partial \theta
-          } \right)
+            E^{ 2 } = \frac{ \partial^{ 2 } }{ \partial r^{ 2 } } + \frac{ \mathrm{ sin } \theta }{ r^{ 2 } } \frac{
+            \partial }{ \partial \theta } \left( \frac{ 1 }{ \mathrm{ sin } \theta } \frac{ \partial }{ \partial \theta
+            } \right)
           $$
 
           <p>
-            The Reynolds number is
+            The Reynolds number is the ratio of inertial forces to viscous forces:
           </p>
 
           $$
-          Re = \frac{ \rho V l }{ \mu }
+            Re = \frac{ \rho V l }{ \mu }
           $$
 
           <p>
-            where \( \rho \) is the density of the fluid, \( V \) is the magnitude of the fluid velocity vector, \( l \)
-            is the characteristic length, and \( \mu \) is the dynamic vicosity of the fluid. The x-component \( u \)
-            and y-component \( v \) of the fluid velocity at coordinate \( ( r, \theta ) \) are
+            where \( \rho \) is the density of the fluid, \( V \) is the fluid velocity at \( r = \infty \), \( l \)
+            is the characteristic length, and \( \mu \) is the dynamic vicosity of the fluid. The radial velocity \( V_{ r } \) and tangential velocity \( V_{ \theta } \) at coordinate \( ( r, \theta ) \) are
           </p>
 
           $$
-          u = \frac{ 1 }{ r^{ 2 } \; \mathrm{ sin } \theta } \frac{ \partial \Psi }{ \partial \theta }
+            V_{ r } = - \frac{ 1 }{ r^{ 2 } \; \mathrm{ sin } \theta } \frac{ \partial \Psi }{ \partial \theta }
           $$
 
           $$
-          v = - \frac{ 1 }{ r \; \mathrm{ sin } \theta } \frac{ \partial \Psi }{ \partial r }
+            V_{ \theta } = \frac{ 1 }{ r \; \mathrm{ sin } \theta } \frac{ \partial \Psi }{ \partial r }
           $$
 
           <p>
@@ -191,15 +187,15 @@
           </p>
 
           $$
-          \Psi = \frac{ 1 }{ 2 } r^{ 2 } \mathrm{ sin }^{ 2 } \theta, \; \; r \rightarrow \infty
+            \Psi = \frac{ 1 }{ 2 } r^{ 2 } \mathrm{ sin }^{ 2 } \theta, \; \; r \rightarrow \infty
           $$
 
           $$
-          \Psi = \frac{ \partial \Psi }{ \partial r } = 0, \; \; r = R
+            \Psi = \frac{ \partial \Psi }{ \partial r } = 0, \; \; r = R
           $$
 
           <p>
-            where \( R \) is the radius of the sphere. The numerical Galerkin method used in this simulation approximates the stream function \( \Psi \) as a polynomial in which coefficients are determined experimentally.  For this reason, the solution is only valid for low Reynolds numbers \( 0 \leq Re \leq 500 \).
+            where \( R \) is the radius of the sphere. The numerical Galerkin method used in this simulation approximates the stream function \( \Psi \) as a polynomial in which coefficients are determined experimentally. This solution is only valid for the laminar flow regime \( 0 \leq Re \leq 500 \), with error increasing as Reynold's number increases<sup>2</sup>.
           </p>
 
           <p>
@@ -208,12 +204,20 @@
           <p>
             <ol class="references">
               <li>
-                n.a. (2021) <i>Navier–Stokes Equations</i>. Wikipedia.com.  <a
+                n.a. (2021) Navier–Stokes Equations. <i>Wikipedia.com.</i>  <a
                   href="https://en.wikipedia.org/wiki/Navier–Stokes_equations">https://en.wikipedia.org/wiki/Navier–Stokes_equations</a>
               </li>
 
               <li>
-                Kawaguti, M. (1955). <i>The critical Reynolds number for the flow past a sphere.</i> Journal of the Physical Society of Japan, 10(8), 694-699.
+                Kawaguti, M. (1955). The critical Reynolds number for the flow past a sphere. <i>Journal of the Physical Society of Japan</i>, 10(8), 694-699.
+              </li>
+
+              <li>
+                Hamielec, A. E., Hoffman, T. W., & Ross, L. L. (1967). Numerical solution of the Navier‐Stokes equation for flow past spheres: Part I. Viscous flow around spheres with and without radial mass efflux. <i>AIChE Journal</i>, 13(2), 212-219.
+              </li>
+
+              <li>
+                Hamielec, A. E., Johnson, A. I., & Houghton, W. T. (1967). Numerical solution of the Navier‐Stokes equation for flow past spheres: Part II. Viscous flow around circulating spheres of low viscosity. <i>AIChE Journal</i>, 13(2), 220-224.
               </li>
             </ol>
           </p>
@@ -254,12 +258,6 @@
           <ol class="references">
             <li>
               Mikhailov, M.D. (2013). Flow around a Sphere at Finite Reynolds Number by Galerkin Method. <a href="http://demonstrations.wolfram.com/FlowAroundASphereAtFiniteReynoldsNumberByGalerkinMethod/">http://demonstrations.wolfram.com/FlowAroundASphereAtFiniteReynoldsNumberByGalerkinMethod/</a>. <br> A <a href="https://demonstrations.wolfram.com">Wolfram Demonstrations</a> Project.
-            </li>
-
-            <li>
-              Hamielec, A. E., Hoffman, T. W., & Ross, L. L. (1967). Numerical solution of the Navier‐Stokes equation
-              for flow past spheres: Part I. Viscous flow around spheres with and without radial mass efflux. AIChE
-              Journal, 13(2), 212-219.
             </li>
 
             <li>
