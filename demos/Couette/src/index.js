@@ -3,22 +3,30 @@ require("bootstrap");
 require("./style/slider.scss");
 window.p5 = new require("./js/p5.min.js");
 
-const containerElement = document.getElementById('p5-container');
-
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
   dpdx: 0,
   U0: 0.15,
 }
 
+const backgroundShapes = require("./js/background.js");
+const arrowsAndCurves = require("./js/flowProfile.js");
+const containerElement = document.getElementById('p5-container');
+
 const sketch = (p) => {
 
   p.setup = function() {
     p.createCanvas(600, 500);
+    p.frameRate(1);
   };
 
   p.draw = function() {
-    p.background(200);
+    p.background(250);
+    backgroundShapes.drawPlates(p);
+    backgroundShapes.drawAxis(p);
+    backgroundShapes.drawText(p);
+    arrowsAndCurves.drawArrows(p);
+    arrowsAndCurves.drawCurve(p);
   };
 };
 
