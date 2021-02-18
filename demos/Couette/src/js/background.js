@@ -87,6 +87,10 @@ const functions = {
       p.text("u = ", gvs.endX - 70, gvs.coordToPixel(0, 0.1)[1] + 33);
       p.textStyle(p.NORMAL);
       p.text("0", gvs.endX - 60, gvs.coordToPixel(0, 0.1)[1] + 33);
+      p.stroke(0, 0, 255);
+      p.strokeWeight(1);
+      p.line(gvs.endX - 42, gvs.coordToPixel(0, -0.1)[1] - 30, gvs.endX - 22, gvs.coordToPixel(0, -0.1)[1] - 30)
+      p.triangle(gvs.endX - 22, gvs.coordToPixel(0, -0.1)[1] - 34, gvs.endX - 22, gvs.coordToPixel(0, -0.1)[1] - 26, gvs.endX - 8, gvs.coordToPixel(0, -0.1)[1] - 30)
     p.pop();
   }
 

@@ -60,7 +60,7 @@
         </div>
         <div class="modal-body">
           <p>
-            Directions
+            Use the sliders to adjust upper plate velocity and pressure gradient. The x-axis units are "m/s" and the y-axis units are "m". Press "Details" to see the governing equations or press "About" to see more information about the authors.
           </p>
 
         </div>
@@ -83,17 +83,34 @@
         <div class="modal-body">
 
           <p>
-            Details:
+            For steady-state, laminar flow of an incompressible viscous fluid between parallel plates, the ordinary differential equation (ODE) describing fluid velocity is
+          </p>
+
+          $$
+            \frac{ d^{ 2 } u }{ d y^{ 2 } } = \frac{ 1 }{ \mu } \frac{ dp }{ dx }
+          $$
+
+          <p>
+            where \( u \) is fluid velocity, \( y \) is distance from the center line, \( \mu \) is dynamic viscosity of the fluid, and \( \frac{ dp }{ dx } \) is the pressure gradient along the x-axis. The boundary conditions are
+          </p>
+          
+          <p class="p-eqn">
+            \( u \left( \mathop{\mbox{-$h$}} \right) = 0 \; \; \) (lower plate velocity)
+          </p>
+          
+          <p class="p-eqn">
+            \( u \left( h \right) = U_{ 0 } \; \; \) (upper plate velocity)
           </p>
 
           <p>
-            References:
+            where \( 2h \) is the distance between the plates and \( U_{ 0 } \) is the velocity of the top plate. An analytical solution exists for this ODE:
           </p>
-          <p>
-            <ol class="references">
- 
-            </ol>
-          </p>
+
+          $$
+            u \left( y \right) = \frac{ U_{ 0 } }{ 2 } \left( 1 + \frac{ y }{ h } \right) - \frac{ dp }{ dx } \frac{ h^{ 2 } }{ 2 \mu } \left( 1 - \left( \frac{ y }{ h } \right)^{ 2 } \right)
+          $$
+
+          <div style="margin-top: 2rem;"></div>
         </div>
 
       </div>
@@ -112,7 +129,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. It is an HTML5/JavaScript implementation of the Wolfram Demonstration created by M.D. Mikhailov<sup>1</sup>. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. It is an HTML5/JavaScript implementation of the Wolfram Demonstration created by W.C. Guttner<sup>1</sup>. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
           </p>
 
           <p>
@@ -120,7 +137,9 @@
           </p>
 
           <ol class="references">
-
+            <li>
+              Guttner, W.C. (2011).  <a href="https://demonstrations.wolfram.com/CouetteFlow/">Couette Flow</a>. A <a href="https://demonstrations.wolfram.com">Wolfram Demonstrations</a> Project.
+            </li>
           </ol>
 
         </div>
