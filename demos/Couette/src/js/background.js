@@ -61,7 +61,7 @@ const functions = {
       let tickRight;
       if ( i % 5 == 2 && currentCoordY != 0) {
         tickRight = tickLeft + 6;
-        p.text(`${Number(currentCoordY).toFixed(2)}`, tickLeft - 33, pixels[1] + 5);
+        p.text(`${Number(-1 * currentCoordY).toFixed(2)}`, tickLeft - 33, pixels[1] + 5);
       } else {
         tickRight = tickLeft + 3;
       }
@@ -77,7 +77,16 @@ const functions = {
 
   drawText: function(p) {
     p.push();
-
+      p.fill(0, 0, 255);
+      p.textAlign(p.RIGHT);
+      p.textSize(12);
+      p.text("0", gvs.endX - 52, gvs.coordToPixel(0, -0.1)[1] - 20);
+      p.textStyle(p.ITALIC);
+      p.textSize(20);
+      p.text("u = U", gvs.endX - 60, gvs.coordToPixel(0, -0.1)[1] - 25);
+      p.text("u = ", gvs.endX - 70, gvs.coordToPixel(0, 0.1)[1] + 33);
+      p.textStyle(p.NORMAL);
+      p.text("0", gvs.endX - 60, gvs.coordToPixel(0, 0.1)[1] + 33);
     p.pop();
   }
 
