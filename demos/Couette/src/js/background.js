@@ -27,13 +27,21 @@ const functions = {
     p.rectMode(p.CORNERS);
     p.rect(gvs.startX, gvs.coordToPixel(0, -0.1)[1] - 10, gvs.endX, gvs.coordToPixel(0, -0.1)[1]);
     p.rect(gvs.startX, gvs.coordToPixel(0, 0.1)[1], gvs.endX, gvs.coordToPixel(0, 0.1)[1] + 10)
-
+    p.stroke(0);
+    p.fill(100, 220, 200);
+    const coord = [gvs.flowRate(0.1), 0.1];
+    const pixel1 = gvs.coordToPixel(0, -0.103);
+    const pixel2 = gvs.coordToPixel(coord[0], -0.103);
+    p.line(pixel1[0], pixel1[1], pixel2[0], pixel2[1]);
+    if(coord[0] > 0) {
+      p.triangle(pixel2[0], pixel2[1], pixel2[0] - 12, pixel2[1] - 3, pixel2[0] - 12, pixel2[1] + 3);
+    }
     p.pop();
   },
   
   drawAxis: function(p) {
     p.push();
-
+    p.textSize(15);
     p.strokeWeight(0.5);
 
     p.line(gvs.startX, gvs.zeroLocation[1], gvs.endX, gvs.zeroLocation[1]); // x-axis
@@ -69,8 +77,8 @@ const functions = {
       p.line(tickLeft, pixels[1], tickRight, pixels[1]);
     }
 
-    p.text("x", gvs.endX + 5, gvs.zeroLocation[1] + 5);
-    p.text("y", gvs.zeroLocation[0] - 5, gvs.startY - 10);
+    p.text("x (m/s)", gvs.endX - 30, gvs.zeroLocation[1] - 20);
+    p.text("y (m)", gvs.zeroLocation[0] - 10, gvs.startY - 10);
 
     p.pop();
   },
@@ -87,7 +95,8 @@ const functions = {
       p.text("u = ", gvs.endX - 70, gvs.coordToPixel(0, 0.1)[1] + 33);
       p.textStyle(p.NORMAL);
       p.text("0", gvs.endX - 60, gvs.coordToPixel(0, 0.1)[1] + 33);
-      p.stroke(0, 0, 255);
+      p.stroke(0);
+      p.fill(100, 220, 200);
       p.strokeWeight(1);
       p.line(gvs.endX - 42, gvs.coordToPixel(0, -0.1)[1] - 30, gvs.endX - 22, gvs.coordToPixel(0, -0.1)[1] - 30)
       p.triangle(gvs.endX - 22, gvs.coordToPixel(0, -0.1)[1] - 34, gvs.endX - 22, gvs.coordToPixel(0, -0.1)[1] - 26, gvs.endX - 8, gvs.coordToPixel(0, -0.1)[1] - 30)

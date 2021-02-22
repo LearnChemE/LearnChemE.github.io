@@ -1,4 +1,4 @@
-function flowRate(y) {
+gvs.flowRate = function(y) {
   const mu = 1e-3;
   const h = 0.1;
   const U0 = gvs.U0;
@@ -12,7 +12,7 @@ const profile = {
     p.stroke(0, 0, 255);
     p.strokeWeight(1);
     for ( let i = -0.08; i < 0.1; i += 0.02 ) {
-      const coord = [flowRate(-1 * i), i];
+      const coord = [gvs.flowRate(-1 * i), i];
       const pixel1 = gvs.coordToPixel(0, i);
       const pixel2 = gvs.coordToPixel(coord[0], i);
       p.noFill();
@@ -23,7 +23,6 @@ const profile = {
       } else if(coord[0] > 0) {
         p.triangle(pixel2[0], pixel2[1], pixel2[0] - 12, pixel2[1] - 3, pixel2[0] - 12, pixel2[1] + 3);
       }
-
     }
     p.pop();
   },
@@ -34,7 +33,7 @@ const profile = {
     p.noFill();
     p.beginShape();
     for(let i = -0.1; i < 0.105; i += 0.005) {
-      const coord = [flowRate(-1 * i), i];
+      const coord = [gvs.flowRate(-1 * i), i];
       const pixels = gvs.coordToPixel(coord[0], coord[1]);
       p.vertex(pixels[0], pixels[1]);
     }
