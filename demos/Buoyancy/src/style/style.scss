@@ -2,11 +2,31 @@
 @import "./slider.scss";
 
 .input-area {
+  font-size: 0.9rem;
   display: grid;
+  grid-template-columns: max-content max-content;
   margin-top: 20px;
   margin-bottom: 20px;
   margin-left: 10px;
-  gap: 10px;
+  gap: 15px;
+
+  .input-row {
+    display: grid;
+    gap: 1ch;
+    align-items: end;
+  
+    .data-name {
+      justify-self: end;
+    }
+
+    &.dropdown {
+      grid-template-columns: 6ch 23ch;
+    }
+
+    &.slider {
+      grid-template-columns: 25ch 10rem max-content max-content;
+    }
+  }
 }
 
 .modal-buttons-row {
@@ -23,16 +43,7 @@
     gap: 0px 10px;
 }
 
-.input-row {
-  display: grid;
-  grid-template-columns: 80px 10rem max-content max-content;
-  gap: 1ch;
-  align-items: end;
 
-  .data-name {
-    justify-self: end;
-  }
-}
 
 li {
   margin-bottom: 0.5rem;

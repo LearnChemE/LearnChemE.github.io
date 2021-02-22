@@ -28,18 +28,36 @@
 
   <div class="input-area">
 
-    <div class="input-row">
-      <div class="data-name">Slider 1</div>
-      <input type="range" id="slider1" min="0" max="1" step="0.01" value="0">
-      <div class="data-value" id="slider1-value">0.00</div>
-      <div class="data-metric">units</div>
+    <div class="input-row dropdown">
+      <div class="data-name">Object</div>
+      <select id="object-composition">
+        <option value="aspen">Aspen wood</option>
+        <option value="oak">Heavy oak wood</option>
+        <option value="pvc">Polyvinyl chloride (PVC)</option>
+        <option value="custom" hidden>Custom</option>
+      </select>
     </div>
 
-    <div class="input-row">
-      <div class="data-name">Slider 2</div>
-      <input type="range" id="slider2" min="0" max="1" step="0.01" value="0">
-      <div class="data-value" id="slider2-value">0.00</div>
-      <div class="data-metric">units</div>
+    <div class="input-row slider">
+      <div class="data-name">Custom object specific gravity</div>
+      <input type="range" id="object-specific-gravity" min="0.1" max="3" step="0.01" value="0.42">
+      <div class="data-value" id="object-specific-gravity-display">0.42</div>
+    </div>
+
+    <div class="input-row dropdown">
+      <div class="data-name">Liquid</div>
+      <select id="liquid-composition">
+        <option value="water">Water</option>
+        <option value="gasoline">Gasoline</option>
+        <option value="seawater">Sea water</option>
+        <option value="custom" hidden>Custom</option>
+      </select>
+    </div>
+
+    <div class="input-row slider">
+      <div class="data-name">Custom liquid specific gravity</div>
+      <input type="range" id="liquid-specific-gravity" min="0.01" max="3" step="0.01" value="1.00">
+      <div class="data-value" id="liquid-specific-gravity-display">1.00</div>
     </div>
 
   </div>

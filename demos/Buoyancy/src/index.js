@@ -5,7 +5,10 @@ window.p5 = new require("./js/p5.min.js");
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
-
+  objectSG: 0.42,
+  liquidSG: 1,
+  objectVolume: 1, // units: m^3
+  objectHeightInPixels: 200
 }
 
 const backgroundFunctions = require("./js/background.js");
@@ -26,19 +29,67 @@ const sketch = (p) => {
 
 const P5 = new p5(sketch, containerElement);
 
-const slider1 = document.getElementById("slider1");
-const slider1Value = document.getElementById("slider1-value");
-const slider2 = document.getElementById("slider2");
-const slider2Value = document.getElementById("slider2-value");
+const objectSGslider = document.getElementById("object-specific-gravity");
+const objectSGdisplay = document.getElementById("object-specific-gravity-display");
+const liquidSGslider = document.getElementById("liquid-specific-gravity");
+const liquidSGdisplay = document.getElementById("liquid-specific-gravity-display");
+const objectDropdown = document.getElementById("object-composition");
+const liquidDropdown = document.getElementById("liquid-composition");
 
-slider1.addEventListener("input", () => {
-  gvs.var1 = Number(Number(slider1.value).toFixed(2));
-  slider1Value.innerHTML = Number(gvs.var1).toFixed(2);
+objectSGslider.addEventListener("input", () => {
+  gvs.objectSG = Number(objectSGslider.value);
+  objectSGdisplay.innerHTML = Number(gvs.objectSG).toFixed(2);
+  objectDropdown.value = "custom";
   P5.redraw();
 });
 
-slider2.addEventListener("input", () => {
-  gvs.var2 = Number(Number(slider2.value).toFixed(2));
-  slider2Value.innerHTML = Number(gvs.var2).toFixed(2);
+liquidSGslider.addEventListener("input", () => {
+  gvs.liquidSG = Number(liquidSGslider.value);
+  liquidSGdisplay.innerHTML = Number(gvs.liquidSG).toFixed(2);
+  liquidDropdown.value = "custom";
   P5.redraw();
 });
+
+objectDropdown.addEventListener("change", function() {
+  switch(objectDropdown.value) {
+    case "aspen":
+      gvs.objectSG = 0.42;
+      objectSGslider.value = "0.42";
+      objectSGdisplay.innerHTML = "0.42";
+      break;
+    case "oak":
+      gvs.objectSG = 0.93;
+      objectSGslider.value = "0.93";
+      objectSGdisplay.innerHTML = "0.93";
+      break;
+    case "pvc":
+      gvs.objectSG = 1.33;
+      objectSGslider.value = "1.33";
+      objectSGdisplay.innerHTML = "1.33";
+      break;
+    default:
+      break;
+  }
+});
+
+liquidDropdown.addEventListener("change", function() {
+  switch(liquidDropdown.value) {
+    case "water":
+      gvs.liquidSG = 1.00;
+      liquidSGslider.value = "1.00";
+      liquidSGdisplay.innerHTML = "1.00";
+      break;
+    case "gasoline":
+      gvs.liquidSG = 0.68;
+      liquidSGslider.value = "0.68";
+      liquidSGdisplay.innerHTML = "0.68";
+      break;
+    case "seawater":
+      gvs.liquidSG = 1.02;
+      liquidSGslider.value = "1.02";
+      liquidSGdisplay.innerHTML = "1.02";
+      break;
+    default:
+      break;
+  }
+})
