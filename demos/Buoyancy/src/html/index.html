@@ -78,7 +78,7 @@
         </div>
         <div class="modal-body">
           <p>
-            Directions
+            A cube with a volume of 1 m<sup>3</sup> is placed in a liquid, and depending on the specific gravities of the cube and the liquid, the cube either floats or sinks. The cube material and the type of liquid are selected with drop-down menus, or custom specific gravities are specified with sliders.  The displaced liquid volume, the cube weight, and the buoyant force are shown. If the cube floats, the distance from the top of the cube to the liquid surface is shown.
           </p>
 
         </div>
@@ -101,7 +101,23 @@
         <div class="modal-body">
 
           <p>
-            Details
+            The buoyant force is equal to the weight of the liquid displaced by an object:
+          </p>
+
+          $$
+            F_{B} = \rho_{L} V_{L} g = \gamma_{L} V_{L} = \mathrm{SG}_{L} V_{L} \gamma_{w}
+          $$
+
+          <p>
+            where \( F_{B} \) is the buoyant force, \( \rho_{L} \) is the density of the liquid, \( g \) is gravitational acceleration, \( \gamma_{L} \) and \( \gamma_{w} \) are the specific weights of the liquid and water, respectively, and \( \mathrm{SG}_{L} \) is the specific gravity of the liquid with respect to water. At equilibrium, an object's buoyant force is equivalent to its weight, or gravitational force \( F_{g} \):
+          </p>
+
+          $$
+            F_{B} = F_{g} = \rho_{c} V_{c} g = \gamma_{c} V_{c} = \mathrm{SG}_{c} V_{c} \gamma_{w}
+          $$
+
+          <p>
+            Here, the subscript "\( c \)" denotes the properties of the cube. If the specific weight of the cube is less than the buoyant force acting upon it, it will float. Otherwise, it will sink.
           </p>
 
           <div style="margin-top: 2rem;"></div>
