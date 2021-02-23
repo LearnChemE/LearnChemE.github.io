@@ -8,10 +8,27 @@ window.gvs = {
   objectSG: 0.42,
   liquidSG: 1,
   objectVolume: 1, // units: m^3
-  objectHeightInPixels: 200
+  objectHeightInPixels: 150,
+  objectWeight: 4.12, // units: kN
+  liquidVolumeDisplaced: 0.42, // units: m^3
+  buoyantForce: 4.12, // units: kN
+  heightAboveWater: 0.58, // units: m
 }
 
-const backgroundFunctions = require("./js/background.js");
+gvs.update = function() {
+  this.objectWeight = this.objectSG * this.objectVolume * 9.81;
+  if ( this.objectSG >= this.liquidSG ) {
+    this.liquidVolumeDisplaced = this.objectVolume;
+    this.buoyantForce = this.liquidSG * this.objectVolume * 9.81;
+    this.heightAboveWater = -1;
+  } else {
+    this.liquidVolumeDisplaced = (this.objectSG / this.liquidSG) * this.objectVolume;
+    this.buoyantForce = this.objectWeight;
+    this.heightAboveWater = this.objectVolume - this.liquidVolumeDisplaced; // this equation would need to be modified if the object volume is not 1 m^3
+  }
+};
+
+const graphics = require("./js/graphics.js");
 const containerElement = document.getElementById('p5-container');
 
 const sketch = (p) => {
@@ -23,7 +40,10 @@ const sketch = (p) => {
 
   p.draw = function() {
     p.background(250);
-
+    graphics.rectangularPrism(p);
+    graphics.water(p);
+    graphics.arrow(p);
+    graphics.text(p);
   };
 };
 
@@ -40,6 +60,7 @@ objectSGslider.addEventListener("input", () => {
   gvs.objectSG = Number(objectSGslider.value);
   objectSGdisplay.innerHTML = Number(gvs.objectSG).toFixed(2);
   objectDropdown.value = "custom";
+  gvs.update();
   P5.redraw();
 });
 
@@ -47,6 +68,7 @@ liquidSGslider.addEventListener("input", () => {
   gvs.liquidSG = Number(liquidSGslider.value);
   liquidSGdisplay.innerHTML = Number(gvs.liquidSG).toFixed(2);
   liquidDropdown.value = "custom";
+  gvs.update();
   P5.redraw();
 });
 
@@ -69,7 +91,9 @@ objectDropdown.addEventListener("change", function() {
       break;
     default:
       break;
-  }
+  };
+  gvs.update();
+  P5.redraw();
 });
 
 liquidDropdown.addEventListener("change", function() {
@@ -91,5 +115,7 @@ liquidDropdown.addEventListener("change", function() {
       break;
     default:
       break;
-  }
-})
+  };
+  gvs.update();
+  P5.redraw();
+});
