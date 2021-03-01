@@ -65,7 +65,9 @@
             Reynold's numbers). Click "Details" to see the governing equations used in this simulation.
           </p> -->
           <p>
-            This simulation shows the velocity profile of fluid in pipe.  
+            This simulation demonstrates laminar flow of a viscous fluid in a pipe. The plot shows fluid velocity as a function of
+             vertical distance. Velocity is proportional to the length of the arrows. The pressure gradient, the pipe diameter,
+              and the fluid viscosity are set with sliders.
           </p>
 
         </div>
@@ -88,44 +90,47 @@
         <div class="modal-body">
 
           <p>
-            A fully developed laminar flow in horizontal pipe has the following properties:
-            (1) The fluid is only moving in z direction.
-            (2) The system does not change over time.
-            (3) Fluid have zero velocity on pipe walls. 
-            (4) Velocity is constant down the streamline. 
-            (5) There is no axial mixing.
-            (6) The fluid velocity is at maximum at the center of the pipe.
-            In our simulation, we can also assume that (7)the effect from gravitational force is neglectable.
+            Fully-developed laminar flow in an horizontal pipe means the fluid 
+            (1) only moves in the axial (z) direction. 
+            (2) flow is at steady state. 
+            (3) velocity is zero at the pipe wall. 
+            (4) velocity is constant along a streamline. 
+            (5) does not have axial mixing. 
+            (6) velocity is maximum at the pipe center. 
+            The gravitational force is negligible.
+
           </p>
           
           <p>
-            The Navier-Stokes equation for cylindrical coordinate in z 
-            direction is:
+            In terms of cylindrical polar coordinates, the z-direction Navier-Stokes equation can be written as:
             $$
             \begin{multline}
             \rho (\frac{\partial u_r}{\partial t} + u_r \frac{\partial u_r}{\partial r} + \frac{u_\theta}{r}\frac{\partial u_r}{\partial_\theta}
             - \frac{u^2_\theta}{r} + u_z \frac{\partial u_r}{\partial z}) \\ 
-               = - \frac{\partial p}{\partial z} + \rho g_z + \mu (
+               = - \frac{\partial P}{\partial z} + \rho g_z + \mu (
               \frac{1}{r} \frac{\partial}{\partial r}(r\frac{\partial u_z}{\partial r}) + \frac{1}{r^2}\frac{\partial ^2 u_z}{\partial \theta ^2}
               + \frac{\partial ^2 u_z}{\partial z^2}
             )
             \end{multline}
             $$
-
-            Based on properties above, the equation can be simplified to:
+            Where \(u_r, u_\theta , u_z \) is the fluid velocity in \(r, \theta, z\) directions; \(\rho\) is the fluid density; \(\mu\) is the fluid viscosity;
+            \(P\) is the pressure; \(g\) is the gravitational force; \(t\) is time. 
+          </p>
+          <p>
+            This equation simplifies to:
             $$
-            0 = - \frac{\partial p}{\partial z} + \mu \frac{1}{r}\frac{\partial}{\partial r}(r \frac{\partial u_z}{\partial r})
+            0 = - \frac{\partial P}{\partial z} + \mu \frac{1}{r}\frac{\partial}{\partial r}(r \frac{\partial u_z}{\partial r})
             $$
-            In this simulation, \(\frac{\partial p}{\partial z}\) equals to \(\frac{\Delta p}{l}\), which is a constant value.
-            The equation can be solved with the following boundary conditions:
+            The pressure gradient in the z direction \(\frac{\partial p}{\partial z}\) is constant and equal to \(\frac{\Delta p}{l}\).
+            The boundary conditions are:
             $$
             u_z(R) = 0
             $$
             $$
             \left. \frac{\partial u_z}{\partial r} \right|_{r=0} = 0
             $$
-            Where \(R\) is the distance from the center of the pipe to the pipe wall. 
-            The final solution for \(u_z\) is:
+            Where \(R\) is the pipe radius. 
+            The solution for \(u_z\) is:
             $$
             u_z = \frac{R^2}{4 \mu} \frac{\Delta p}{l} (1-\frac{r^2}{R^2})
             $$
@@ -162,12 +167,14 @@
             This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
               Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
               href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Mingyuan Lu and Neil Hendren under
-            the direction of Professor John L. Falconer. It is an HTML5/JavaScript implementation of the Wolfram Demonstration created by M.D. Mikhailov<sup>1</sup>. Address any questions or comments to learncheme@gmail.com. All
+            the direction of Professor John L. Falconer. This simulation is programmed in HTML5/JavaScript and the equation are from reference 1.
+             Address any questions or comments to learncheme@gmail.com. All
             of our simulations are open source, and are available on our <a
               href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
-              repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page
-            (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is
-            not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended
+              repository</a>.<br><br>If your screen is too small to fit this simulation,  zoom out using
+            CTRL and "-", zoom in using CTRL and "=" on Windows; zoom out using ⌘ and "-", zoom in using ⌘ and"=" on Mac. After the adjustment,
+            refresh the page to reload this simulation. This application is not compatible with Internet Explorer or web browsers 
+            that do not support WebGL and HTML5. Recommended
             browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
           </p>
 
@@ -180,7 +187,7 @@
 
             <li>
               Gerhart, P. M., Gerhart, A. L., & Hochstein, J. I. (2016). Munson, Young and Okiishi's Fundamentals of
-              Fluid Mechanics. John Wiley & Sons.
+              Fluid Mechanics. John Wiley & Sons. P.332.
             </li>
 
             
