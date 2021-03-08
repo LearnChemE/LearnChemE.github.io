@@ -35,7 +35,7 @@ function formatNumber(num) {
   else if ( n >= 0.0001 ) {
     return Number( Math.round( n * 100000 ) / 100000 ).toFixed(4);
   }
- 
+
 }
 
 function update()
@@ -48,12 +48,12 @@ function update()
   document.getElementById("viscosity-value").innerHTML = formatNumber(mu);
   coords.topPlateY = 200 - radius * 3000 - 10;
   coords.bottomPlateY = 200 + radius * 3000;
-  setup();
-  draw();
+  redraw();
 }
 
 function setup() {
   cnv = createCanvas(500, 400);
+  noLoop();
 }
 
 function draw() {
@@ -64,22 +64,25 @@ function draw() {
 }
 
 function drawPlates() {
-  fill(200, 200, 200);
-  noStroke();
-  rect(30, coords.topPlateY, 420, 10);
-  rect(30, coords.bottomPlateY, 420, 10);
-  
+  push();
+    fill(200, 200, 200);
+    noStroke();
+    rect(30, coords.topPlateY, 420, 10);
+    rect(30, coords.bottomPlateY, 420, 10);
+  pop();
 }
 
 function drawAxes() {
-  // line()
-  /*
-  for( let i = 0; i < numberOfTicks; i++ ) {
-    line() for each tick on x and y axis
-  }
-  */
-  
-  line(30,200,50,50);
+  push();
+    // line()
+    /*
+    for( let i = 0; i < numberOfTicks; i++ ) {
+      line() for each tick on x and y axis
+    }
+    */
+    
+    line(30,200,50,50);
+  pop();
 }
 
 // Write this to convert from coordinate plane to pixel location
@@ -102,14 +105,15 @@ function velocityProfile(rp)
 }
 
 function drawContour() {
-
-  noFill();
-  stroke(0, 0, 255);
-  beginShape();
-    for(i = coords.topPlateY+10; i < coords.bottomPlateY+1; i++)
-    {
-      pixCoord = velocityProfile(i);
-      vertex(pixCoord, i);
-    }
-  endShape();
+  push();
+    noFill();
+    stroke(0, 0, 255);
+    beginShape();
+      for(i = coords.topPlateY+10; i < coords.bottomPlateY+1; i++)
+      {
+        pixCoord = velocityProfile(i);
+        vertex(pixCoord, i);
+      }
+    endShape();
+  pop();
 }
