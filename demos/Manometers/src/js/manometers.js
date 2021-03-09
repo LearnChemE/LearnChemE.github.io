@@ -280,6 +280,17 @@ const functions = {
     p.pop();
   }
 
+};
+
+window.gvs.zoom = function(event) {
+  // zoom according to direction of mouseWheelDeltaY rather than value
+  let sensitivityZoom = 0.05;
+  let scaleFactor = window.P5.height;
+  if (event.deltaY > 0) {
+    window.P5._renderer._curCamera._orbit(0, 0, sensitivityZoom * scaleFactor);
+  } else {
+    window.P5._renderer._curCamera._orbit(0, 0, -sensitivityZoom * scaleFactor);
+  }
 }
 
 module.exports = functions;

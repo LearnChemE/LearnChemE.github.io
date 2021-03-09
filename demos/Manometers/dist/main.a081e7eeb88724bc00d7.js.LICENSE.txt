@@ -29,8 +29,6 @@
  * Date: 2021-03-02T17:08Z
  */
 
-/*! p5.js v1.2.0 December 19, 2020 */
-
 /**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
  * @version 1.16.1

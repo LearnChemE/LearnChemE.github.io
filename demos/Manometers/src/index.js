@@ -49,11 +49,13 @@ const sketch = (p) => {
   }
 
   p.setup = function() {
-    p.createCanvas(600, 500, p.WEBGL);
+    const cnv = p.createCanvas(600, 500, p.WEBGL);
     const cnvElt = document.getElementsByTagName("canvas");
     cnvElt[0].addEventListener("mouseenter", function() { P5.loop(); });
     cnvElt[0].addEventListener("mouseleave", function() { P5.noLoop(); });
+    cnvElt[0].addEventListener("wheel", e => {e.preventDefault()});
     gvs.defaultCamera();
+    cnv.mouseWheel(gvs.zoom);
     findFluidHeight();
     p.textFont(gvs.cnvText);
     p.noLoop();
