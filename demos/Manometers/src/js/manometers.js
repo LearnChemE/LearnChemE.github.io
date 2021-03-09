@@ -174,8 +174,8 @@ const functions = {
     const beginY = 60;
     const beginX = - beginY / Math.sin( p.TWO_PI*(gvs.theta / 360) );
     const dx = -150 - beginX;
-    const dy = 10;
-    const dz = -120;
+    const dy = -20;
+    const dz = 0;
 
     const L = gvs.hInPixels / Math.sin( p.TWO_PI*(gvs.theta / 360) ); // "length of liquid"
     
