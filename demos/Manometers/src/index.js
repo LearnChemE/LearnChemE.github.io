@@ -14,7 +14,8 @@ window.gvs = {
   rhom: 1000, // density of manometer fluid, kg/m^3
   Pf: 105000, // hydrostatic pressure, Pa 
   theta: 30, // angle of inclined manometer, degrees
-  defaultCamera: function() { P5.camera(0, -50, 300, 0, 0, 0, 0, 1, 0); }
+  defaultCamera: function() { P5.camera(0, -60, 400, 0, 0, 0, 0, 1, 0); },
+  cnvText: null,
 }
 
 const manometers = require("./js/manometers.js");
@@ -42,6 +43,11 @@ function findFluidHeight() {
 
 const sketch = (p) => {
 
+  p.preload = function() {
+    // gvs.cnvText = p.loadFont('./assets/OpenSans-Regular.ttf');
+    gvs.cnvText = p.loadFont('./assets/NotoSans-Regular.ttf');
+  }
+
   p.setup = function() {
     p.createCanvas(600, 500, p.WEBGL);
     const cnvElt = document.getElementsByTagName("canvas");
@@ -49,12 +55,13 @@ const sketch = (p) => {
     cnvElt[0].addEventListener("mouseleave", function() { P5.noLoop(); });
     gvs.defaultCamera();
     findFluidHeight();
+    p.textFont(gvs.cnvText);
     p.noLoop();
   };
 
   p.draw = function() {
     p.background(255);
-    // p.orbitControl();
+    p.orbitControl();
     p.ambientLight(100);
     p.pointLight(250, 250, 250, 50, 50, 50);
     p.noStroke();
@@ -72,7 +79,7 @@ const sketch = (p) => {
   };
 };
 
-const P5 = new p5(sketch, containerElement);
+window.P5 = new p5(sketch, containerElement);
 
 const pressureSlider = document.getElementById("pressure-slider");
 const angleSlider = document.getElementById("angle-slider");
@@ -156,3 +163,8 @@ for ( let i = 0; i < selectManometer.length; i++ ) {
     P5.redraw();
   });
 };
+
+document.getElementById("reset-camera").addEventListener("click", function() {
+  gvs.defaultCamera();
+  P5.redraw();
+});

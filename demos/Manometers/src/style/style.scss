@@ -107,8 +107,9 @@ canvas {
   text-align: left;
 }
 
-#camera-reset {
+#cameraContainer {
   position: absolute;
+  width: 30ch;
   left: 650px;
   top: 180px;
 }

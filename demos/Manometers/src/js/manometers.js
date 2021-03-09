@@ -1,30 +1,107 @@
 const dp = 200; // "Drawing precision". Increase this to draw with more polygons
 
+function drawText(p, str, x, y, z, w, size, outline) {
+
+  let camX = window.P5._renderer._curCamera.eyeX;
+  let camY = window.P5._renderer._curCamera.eyeY;
+  let camZ = window.P5._renderer._curCamera.eyeZ;
+  
+  let v0 = p.createVector(0, 1, 0);
+  let camVec = p.createVector(camX, camY, camZ);
+
+  let theta = p.atan2(camX, camZ);
+  let phi = -p.atan2(camY, camVec.mag());
+  
+  p.textAlign(p.CENTER);
+
+  p.push();
+    p.fill(0);
+    p.noStroke();
+    p.textSize(size);
+    p.translate(x, y, z);
+    p.rotate(theta, v0);
+    p.rotateX(phi);
+    p.text(str, 0, 0, w);
+    p.translate(w / 2 - 2, -8, -1);
+    p.emissiveMaterial(255, 255, 255);
+    if(outline) { p.stroke(0) } else { p.noStroke(); }
+    p.beginShape();
+      p.vertex(-w / 2, -5*size/8, 0);
+      p.vertex(w / 2, -5*size/8, 0);
+      p.vertex(w / 2, 5*size/8, 0);
+      p.vertex(-w / 2, 5*size/8, 0);
+    p.endShape(p.CLOSE);
+    // p.plane(w, 25);
+  p.pop();
+}
+
 const functions = {
   
   drawPiezometer: function(p) {
     const dy = 100; // how far down to translate the image
     const piezoHeight = 250;
+    drawText(p, "P\u2090", -10, -170, 0, 30, 24, true);
+    drawText(p, "P\u2092", -10, 110, 60, 30, 24, true);
+
     p.push();
       p.ambientMaterial(gvs.fluidColor);
       p.translate(0, 30 + dy, 0);
       p.rotateZ(1.57);
       p.cylinder(30, 350, dp, dp);
-
-      p.ambientMaterial(gvs.pipeColor);
-      p.cylinder(35, 360, dp, dp);
     p.pop();
 
     p.push();
       p.ambientMaterial(gvs.fluidColor);
       p.translate(0, dy - gvs.hInPixels / 2, 0);
-      p.cylinder(20, gvs.hInPixels, dp, dp);
+      p.cylinder(10, gvs.hInPixels + 10, dp, dp);
+    p.pop();
+
+    p.push();
+      p.translate(0, 30 + dy, 0);
+      p.rotateZ(1.57);
+      p.ambientMaterial(gvs.pipeColor);
+      p.cylinder(35, 360, dp, dp);
     p.pop();
 
     p.push();
       p.translate(0, dy - piezoHeight / 2, 0);
       p.ambientMaterial(gvs.pipeColor);
-      p.cylinder(25, piezoHeight, dp, dp);
+      p.cylinder(15, piezoHeight, dp, dp);
+    p.pop();
+
+    p.push();
+      const height = Math.round(Number(gvs.h * 100)).toString();
+      const bottom = 100;
+      drawText(p, `${height} cm`, 50, dy - gvs.hInPixels / 2, 0, 70, 20, false);
+      p.fill(0);
+      p.noStroke();
+      p.translate(30, bottom - gvs.hInPixels / 2, 0);
+      p.cylinder(1, gvs.hInPixels, 100, 100);
+      p.translate(0, - gvs.hInPixels / 2, 0);
+      p.rotateZ(1.57);
+      p.cylinder(1, 10, 100, 100);
+      p.translate(gvs.hInPixels - 5, 0, 0);
+      p.cylinder(1, 10, 100, 100);
+    p.pop();
+
+    p.push();
+      const arrowLength = 100;
+      p.emissiveMaterial(0, 0, 0);
+      p.rotateZ(1.57);
+      p.translate(120, 100, 40);
+      p.cylinder(1, arrowLength, 100, 100);
+      p.translate(0, - arrowLength / 2, 0);
+      p.rotateZ(-p.PI);
+      p.cone(6, 20);
+      p.translate(0, 140, 0);
+      p.cylinder(1, arrowLength, 100, 100);
+      p.translate(0, arrowLength / 2, 0);
+      p.cone(6, 20);
+    p.pop();
+
+    p.push();
+      const dp = Number((gvs.Pf - 101325) / 1000).toFixed(1);
+      drawText(p, `\u0394P = P\u2092 \u2012 P\u2090 = ${dp} kPa`, -270, -150, -10, 240, 20, false);
     p.pop();
   },
   

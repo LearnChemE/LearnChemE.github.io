@@ -52,7 +52,7 @@
 
   <div class="input-area sliders">
     <div class="input-block slider">
-      <div class="data-name">hydrostatic pressure \( P_{m} \)</div>
+      <div class="data-name">hydrostatic pressure \( P_{o} \)</div>
       <input type="range" id="pressure-slider" min="102000" max="110000" step="100" value="105000">
       <div class="data-value" id="pressure-value">105.0</div>
       <div class="data-metric">kPa</div>
@@ -69,6 +69,13 @@
 
   <div id="p5-container"></div>
 
+  </div>
+
+  <div id="cameraContainer">
+    <p>
+      Move the camera by dragging the image while holding the left or right mouse button.
+    </p>
+    <button id="reset-camera" class="btn btn-sm btn-secondary">Reset camera</button>
   </div>
 
   <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"

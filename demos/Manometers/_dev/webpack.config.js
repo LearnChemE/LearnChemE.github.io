@@ -100,7 +100,7 @@ module.exports = env => {
     },
     plugins: [
       new MiniCssExtractPlugin(styleOptions),
-      new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns : ['**/*', '!mathjax/**'] }),
+      new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns : ['**/*', '!mathjax/**', '!assets/**'] }),
       new HtmlWebpackPlugin({ ...htmlOptions, title: "Manometry simulation"})
     ]
   }
