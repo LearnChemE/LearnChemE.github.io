@@ -3,6 +3,9 @@ let pressureGradient = 0.5;
 let radius = 0.05;
 let mu = 0.00112;
 let oneMeter = 3000;
+let averageVelocity = 0;
+let Q = 0;
+let u_pix = 0;
 const coords = {
   topPlateY: 40,// 1m
   bottomPlateY: 350, // 1m
@@ -59,6 +62,7 @@ function setup() {
 function draw() {
   background(255, 255, 255);
   drawPlates();
+  drawAverage();
   drawAxes();
   drawContour();
 }
@@ -74,14 +78,31 @@ function drawPlates() {
 
 function drawAxes() {
   push();
-    // line()
-    /*
-    for( let i = 0; i < numberOfTicks; i++ ) {
-      line() for each tick on x and y axis
+    line(100,25,100,375);
+    line(30,200,470,200);
+    for(j = 0.1; j <= 0.6; j= j+0.1)
+    {
+      x_pix = j*oneMeter/5+100;
+      line(x_pix, 197, x_pix,200);
+      text(j.toFixed(1),x_pix-15,212);
     }
-    */
-    
-    line(30,200,50,50);
+
+    for(j = -0.5; j <= 0.5; j= j+0.1)
+    {
+      y_pix = 200-j*300;
+      line(100, y_pix, 103, y_pix);
+      if(j < 0)
+        text((j*10).toFixed(0), 85,y_pix-2);
+      else
+        text((j*10).toFixed(0), 90,y_pix-2);
+    }
+
+    fill(0,0,0)
+    triangle(97, 25, 103,25, 100, 15);
+    triangle(470, 197, 470, 203, 480, 200);
+    text('r (cm)', 60, 25);
+    text('u (m/s)', 460, 220);
+
   pop();
 }
 
@@ -115,5 +136,25 @@ function drawContour() {
         vertex(pixCoord, i);
       }
     endShape();
+  pop();
+}
+
+function averageV()
+{
+  pi = 3.1415926;
+  Q = pi * pressureGradient*(2*radius)**4/mu/128;
+  averageVelocity = Q/radius**2/pi;
+  return averageVelocity;
+
+}
+
+function drawAverage()
+{
+  v = averageV();
+  u_pix = v*oneMeter/5;
+  push();
+    noStroke();
+    fill(255, 200,200);
+    rect(100,coords.topPlateY+10, u_pix, coords.bottomPlateY - coords.topPlateY -10);
   pop();
 }
