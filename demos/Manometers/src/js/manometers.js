@@ -107,7 +107,7 @@ const functions = {
   
   drawUTube: function(p) {
     const dx = 20;
-    const dy = 40;
+    const dy = 100;
     const dz = -300;
     const height = 200; // some arbitrary value used as a reference
     const distanceApart = 100;
@@ -166,6 +166,34 @@ const functions = {
       p.cylinder(30, 180, dp, dp);
       p.translate(0, 160, 0);
       p.sphere(80, dp, dp);
+    p.pop();
+
+    p.push();
+      p.translate(dx, dy, dz);
+      drawText(p, "P\u2090", distanceApart - 40, -height - 70, 0, 80, 38, false);
+      drawText(p, "P\u2092", -distanceApart - 200, -height + 10, 120, 50, 38, false);
+      const h = Math.round(Number(gvs.h * 100)).toString();
+      drawText(p, `${h} cm`, distanceApart + 100, 30, 0, 150, 38, false);
+    p.pop();
+
+    p.push();
+      p.emissiveMaterial(0, 0, 0);
+      p.fill(0);
+      p.noStroke();
+      p.translate(dx, dy, dz);
+      p.translate(distanceApart + 80, 0, 0);
+      p.cylinder(1, gvs.hInPixels, 100, 100);
+      p.translate(-distanceApart - 15, gvs.hInPixels / 2, 0);
+      p.rotateZ(1.57);
+      p.cylinder(1, 260, dp, dp);
+      p.translate(-gvs.hInPixels, -distanceApart, 0);
+      p.cylinder(1, 50, dp, dp);
+    p.pop();
+
+    p.push();
+      p.translate(dx, dy, dz);
+      const dP = Number((gvs.Pf - 101325) / 1000).toFixed(1);
+      drawText(p, `\u0394P = P\u2092 \u2012 P\u2090 = ${dP} kPa`, -200, -350, 0, 400, 38, false);
     p.pop();
   },
 
