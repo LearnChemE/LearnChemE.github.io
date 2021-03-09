@@ -193,7 +193,7 @@ const functions = {
     p.push();
       p.translate(dx, dy, dz);
       const dP = Number((gvs.Pf - 101325) / 1000).toFixed(1);
-      drawText(p, `\u0394P = P\u2092 \u2012 P\u2090 = ${dP} kPa`, -200, -350, 0, 400, 38, false);
+      drawText(p, `\u0394P = P\u2092 \u2012 P\u2090 = ${dP} kPa`, -200, -350, 0, 450, 38, false);
     p.pop();
   },
 
