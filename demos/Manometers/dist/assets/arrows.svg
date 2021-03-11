@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:version="1.1-dev (b530929, 2020-05-03)"
+   height="448.00015"
+   width="448.00015"
+   sodipodi:docname="arrows.svg"
+   id="svg4"
+   version="1.1"
+   viewBox="0 0 448.00015 448.00015"
+   role="img"
+   class="svg-inline--fa fa-expand-arrows-alt fa-w-14"
+   data-icon="expand-arrows-alt"
+   data-prefix="fas"
+   focusable="false"
+   aria-hidden="true">
+  <defs
+     id="defs8" />
+  <sodipodi:namedview
+     inkscape:current-layer="svg4"
+     inkscape:cy="301.04597"
+     inkscape:cx="201.68442"
+     inkscape:zoom="2.5039809"
+     fit-margin-bottom="0"
+     fit-margin-right="0"
+     fit-margin-left="0"
+     fit-margin-top="0"
+     showgrid="false"
+     id="namedview6"
+     inkscape:window-height="480"
+     inkscape:window-width="640"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     guidetolerance="10"
+     gridtolerance="10"
+     objecttolerance="10"
+     borderopacity="1"
+     bordercolor="#666666"
+     pagecolor="#ffffff" />
+  <path
+     id="path2"
+     d="m 448.00008,312.00008 v 112 a 23.94,23.94 0 0 1 -24,24 h -112 c -21.39,0 -32.09,-25.9 -17,-41 l 36.2,-36.2 -107.2,-107.2 -107.23,107.3 36.23,36.1 c 15.09,15.1 4.39,41 -17,41 H 24.000075 a 23.94,23.94 0 0 1 -23.999999622878,-24 v -112 c 0,-21.4 25.889999622878,-32.1 40.999999622878,-17 l 36.19,36.2 107.270005,-107.2 -107.280005,-107.3 -36.18,36.3 c -15.1,15.1 -40.999999622878,4.4 -40.999999622878,-17 V 24.000075 A 23.94,23.94 0 0 1 24.000075,7.5377122e-5 H 136.00008 c 21.39,0 32.09,25.899999622878 17,40.999999622878 l -36.2,36.2 107.2,107.200005 107.23,-107.300005 -36.23,-36.1 c -15.09,-15.1 -4.39,-40.999999622878 17,-40.999999622878 h 112 a 23.94,23.94 0 0 1 24,23.999999622878 V 136.00008 c 0,21.4 -25.89,32.1 -41,17 l -36.19,-36.2 -107.27,107.2 107.28,107.3 36.18,-36.2 c 15.1,-15.2 41,-4.5 41,16.9 z"
+     fill="currentColor" />
+</svg>

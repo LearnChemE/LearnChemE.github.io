@@ -54,6 +54,7 @@ const sketch = (p) => {
     cnvElt[0].addEventListener("mouseenter", function() { P5.loop(); });
     cnvElt[0].addEventListener("mouseleave", function() { P5.noLoop(); });
     cnvElt[0].addEventListener("wheel", e => {e.preventDefault()});
+    cnvElt[0].style.cursor = `url("./assets/arrows.png"), auto`;
     gvs.defaultCamera();
     cnv.mouseWheel(gvs.zoom);
     gvs.findFluidHeight();
