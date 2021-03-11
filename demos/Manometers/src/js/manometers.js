@@ -233,7 +233,7 @@ const functions = {
     const rectRadius = 2;
     const heightOfContainer = 120;
     const cylinderRadius = 40;
-    const defaultLiquidHeight = heightOfContainer / 3;
+    const defaultLiquidHeight = heightOfContainer / 5;
     const containerLiquidHeight = defaultLiquidHeight - gvs.hInPixels / 10;
 
     const thetaRad = p.TWO_PI*(gvs.theta / 360);
@@ -296,7 +296,7 @@ const functions = {
 
     // draw the inclined pipe
     p.push();
-      const Hp = heightOfContainer; // "Height of pipe"
+      const Hp = 6 * heightOfContainer / 7; // "Height of pipe"
       const pipeX = Hp / Math.tan( thetaRad ); // "Length of pipe"
       const cutawayWidth = wt / Math.tan( thetaRad );
       p.ambientMaterial(gvs.pipeColor);
