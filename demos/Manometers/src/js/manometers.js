@@ -2,35 +2,37 @@ const dp = 200; // "Drawing precision". Increase this to draw with more polygons
 
 function drawText(p, str, x, y, z, w, size, outline) {
 
-  let camX = window.P5._renderer._curCamera.eyeX;
-  let camY = window.P5._renderer._curCamera.eyeY;
-  let camZ = window.P5._renderer._curCamera.eyeZ;
+  // let camX = window.P5._renderer._curCamera.eyeX;
+  // let camY = window.P5._renderer._curCamera.eyeY;
+  // let camZ = window.P5._renderer._curCamera.eyeZ;
   
-  let v0 = p.createVector(0, 1, 0);
-  let camVec = p.createVector(camX, camY, camZ);
+  // let v0 = p.createVector(0, 1, 0);
+  // let camVec = p.createVector(camX, camY, camZ);
 
-  let theta = p.atan2(camX, camZ);
-  let phi = -p.atan2(camY, camVec.mag());
+  // let theta = p.atan2(camX, camZ);
+  // let phi = -p.atan2(camY, camVec.mag());
   
   p.textAlign(p.CENTER);
 
   p.push();
-    p.fill(0);
-    p.noStroke();
     p.textSize(size);
     p.translate(x, y, z);
-    p.rotate(theta, v0);
-    p.rotateX(phi);
-    p.text(str, 0, 0, w);
-    p.translate(w / 2 - 2, -8, -1);
+    // p.rotate(theta, v0);
+    // p.rotateX(phi);
     p.emissiveMaterial(255, 255, 255);
+    p.fill(255, 255, 255);
     if(outline) { p.stroke(0) } else { p.noStroke(); }
     p.beginShape();
-      p.vertex(-w / 2, -5*size/8, 0);
-      p.vertex(w / 2, -5*size/8, 0);
-      p.vertex(w / 2, 5*size/8, 0);
-      p.vertex(-w / 2, 5*size/8, 0);
+      p.vertex(-w / 2, -11*size/16, -0.1);
+      p.vertex(w / 2, -11*size/16, -0.1);
+      p.vertex(w / 2, 11*size/16, -0.1);
+      p.vertex(-w / 2, 11*size/16, -0.1);
     p.endShape(p.CLOSE);
+    p.translate( - w / 2 + 2, 7, 0.1);
+    p.fill(0);
+    p.noStroke();
+    p.text(str, 0, 0, w);
+
     // p.plane(w, 25);
   p.pop();
 }
@@ -40,8 +42,8 @@ const functions = {
   drawPiezometer: function(p) {
     const dy = 100; // how far down to translate the image
     const piezoHeight = 250;
-    drawText(p, "P\u2090", -10, -170, 0, 30, 24, true);
-    drawText(p, "P\u2092", -10, 110, 60, 30, 24, true);
+    drawText(p, "P  ", 0, -177, 0, 45, 24, true);
+    drawText(p, "P ", 3, 103, 60, 30, 24, true);
 
     p.push();
       p.ambientMaterial(gvs.fluidColor);
@@ -72,7 +74,7 @@ const functions = {
     p.push();
       const height = Math.round(Number(gvs.h * 100)).toString();
       const bottom = 100;
-      drawText(p, `${height} cm`, 50, dy - gvs.hInPixels / 2, 0, 70, 20, false);
+      drawText(p, `${height} cm`, 70, Math.min(80, dy - gvs.hInPixels / 2 - 5), 0, 70, 20, false);
       p.fill(0);
       p.noStroke();
       p.translate(30, bottom - gvs.hInPixels / 2, 0);
@@ -101,7 +103,23 @@ const functions = {
 
     p.push();
       const dp = Number((gvs.Pf - 101325) / 1000).toFixed(1);
-      drawText(p, `\u0394P = P\u2092 \u2012 P\u2090 = ${dp} kPa`, -270, -150, -10, 240, 20, false);
+      drawText(p, `P  = P  \u2012 P   = ${dp} kPa`, -151, -157, 0, 240, 20, false);
+    p.pop();
+
+    p.push();
+      p.textSize(12);
+      p.textAlign(p.CENTER);
+      p.fill(0, 0, 0);
+      p.noStroke();
+      p.translate(0, 0, 0.5);
+      p.text("atm", -5, -179, 30, 40);
+      p.translate(0, 0, 60);
+      p.text("f", -8, 102, 30, 40);
+      p.textSize(10);
+      p.translate(0, 0, -60);
+      p.text("g", -247, -158, 30, 40);
+      p.text("f", -209, -156, 30, 40);
+      p.text("atm", -166, -156, 30, 40);
     p.pop();
   },
   
@@ -170,10 +188,10 @@ const functions = {
 
     p.push();
       p.translate(dx, dy, dz);
-      drawText(p, "P\u2090", distanceApart - 40, -height - 70, 0, 80, 38, false);
-      drawText(p, "P\u2092", -distanceApart - 200, -height + 10, 120, 50, 38, false);
+      drawText(p, "P  ", distanceApart - 5, - height - 80, 0, 80, 38, false);
+      drawText(p, "P ", - distanceApart - 180, -height + 10, 82, 50, 38, false);
       const h = Math.round(Number(gvs.h * 100)).toString();
-      drawText(p, `${h} cm`, distanceApart + 100, 30, 0, 150, 38, false);
+      drawText(p, `${h} cm`, distanceApart + 160, 20, 0, 150, 38, false);
     p.pop();
 
     p.push();
@@ -193,132 +211,216 @@ const functions = {
     p.push();
       p.translate(dx, dy, dz);
       const dP = Number((gvs.Pf - 101325) / 1000).toFixed(1);
-      drawText(p, `\u0394P = P\u2092 \u2012 P\u2090 = ${dP} kPa`, -200, -350, 0, 450, 38, false);
+      drawText(p, `P  = P  \u2012 P    = ${dp} kPa`, -200, -350, 0, 450, 38, false);
+    p.pop();
+
+    p.push();
+      p.textSize(22);
+      p.textAlign(p.CENTER);
+      p.fill(0, 0, 0);
+      p.noStroke();
+      p.translate(dx, dy, dz + 0.2);
+      p.text("atm", 85, -288, 50, 40);
+      p.text("g", -378, -362, 30, 40);
+      p.text("f", -307, -357, 30, 40);
+      p.text("atm", -230, -357, 50, 40);
+      p.translate(0, 0, 82);
+      p.text("f", -291, -195, 30, 40);
     p.pop();
   },
 
   drawInclined: function(p) {
-    const rectRadius = 10;
-    const beginY = 60;
-    const beginX = - beginY / Math.sin( p.TWO_PI*(gvs.theta / 360) );
-    const dx = -150 - beginX;
-    const dy = -20;
-    const dz = 0;
+    const rectRadius = 4;
+    const dx = -60;
+    const dy = 50;
+    const dz = 150;
 
-    const L = gvs.hInPixels / Math.sin( p.TWO_PI*(gvs.theta / 360) ); // "length of liquid"
+    const wt = 2; // wall thickness
+
+    const heightOfContainer = 120;
+    const cylinderRadius = 40;
+    const defaultLiquidHeight = heightOfContainer / 2;
+    const containerLiquidHeight = defaultLiquidHeight - gvs.hInPixels;
+
+    const thetaRad = p.TWO_PI*(gvs.theta / 360);
+
+    const L = gvs.hInPixels / Math.sin( thetaRad ); // "length of liquid"
+    const liqX = defaultLiquidHeight / Math.tan( thetaRad ) + L * Math.cos( thetaRad );
+    const liqY = defaultLiquidHeight + gvs.hInPixels;
+    const liqDefaultX = defaultLiquidHeight / Math.tan( thetaRad );
+    const liquidXLength = 2 * rectRadius / Math.tan( thetaRad );
+
+    const Pf = Number(gvs.Pf / 1000).toFixed(1);
+    const dP = Number((gvs.Pf - 101325) / 1000).toFixed(1);
+    const height = Math.round(Number(gvs.h * 100)).toString();
     
+    p.translate(dx, dy, dz);
+
     // draw the inclined fluid
     p.push();
-      p.translate(dx, dy, dz);
       p.noStroke();
       p.fill(gvs.fluidColor);
-      p.beginShape();
-        p.vertex(beginX, beginY - rectRadius, rectRadius);
-        p.vertex(beginX, beginY - rectRadius, -rectRadius);
-        p.vertex(L, -rectRadius - gvs.hInPixels, -rectRadius);
-        p.vertex(L, -rectRadius - gvs.hInPixels, rectRadius);
+      p.beginShape();// front
+        p.vertex( 0, 0, -rectRadius);
+        p.vertex( 0, -2 * rectRadius, -rectRadius);
+        p.vertex( liqX - liquidXLength, -liqY, -rectRadius);
+        p.vertex( liqX, -liqY, -rectRadius);
       p.endShape(p.CLOSE);
-      p.beginShape();
-        p.vertex(L, -rectRadius - gvs.hInPixels, -rectRadius);
-        p.vertex(L + rectRadius / Math.sin( p.TWO_PI*(gvs.theta / 360) ), -rectRadius - gvs.hInPixels, -rectRadius);
-        p.vertex(L + rectRadius / Math.sin( p.TWO_PI*(gvs.theta / 360) ), -rectRadius - gvs.hInPixels, rectRadius);
-        p.vertex(L, -rectRadius - gvs.hInPixels, rectRadius);
+      p.beginShape();//back
+        p.vertex( 0, 0, rectRadius);
+        p.vertex( 0, -2 * rectRadius, rectRadius);
+        p.vertex( liqX - liquidXLength, -liqY, rectRadius);
+        p.vertex( liqX, -liqY, rectRadius);
       p.endShape(p.CLOSE);
-      p.beginShape();
-        p.vertex(beginX, beginY, rectRadius);
-        p.vertex(beginX, beginY, -rectRadius);
-        p.vertex(L + rectRadius / Math.sin( p.TWO_PI*(gvs.theta / 360) ), -rectRadius - gvs.hInPixels, -rectRadius);
-        p.vertex(L + rectRadius / Math.sin( p.TWO_PI*(gvs.theta / 360) ), -rectRadius - gvs.hInPixels, rectRadius);
+      p.beginShape();//top
+        p.vertex( 0, -2 * rectRadius, -rectRadius);
+        p.vertex( 0, -2 * rectRadius, rectRadius);
+        p.vertex( liqX - liquidXLength, -liqY, rectRadius);
+        p.vertex( liqX - liquidXLength, -liqY, -rectRadius);
       p.endShape(p.CLOSE);
-      p.beginShape();
-        p.vertex(beginX, beginY, rectRadius);
-        p.vertex(beginX, beginY - rectRadius, rectRadius);
-        p.vertex(L, -rectRadius - gvs.hInPixels, rectRadius);
-        p.vertex(L + rectRadius / Math.sin( p.TWO_PI*(gvs.theta / 360) ), -rectRadius - gvs.hInPixels, rectRadius);
+      p.beginShape();//bottom
+        p.vertex( 0, 0, -rectRadius);
+        p.vertex( 0, 0, rectRadius);
+        p.vertex( liqX, -liqY, rectRadius);
+        p.vertex( liqX, -liqY, -rectRadius);
       p.endShape(p.CLOSE);
-      p.beginShape();
-        p.vertex(beginX, beginY, -rectRadius);
-        p.vertex(beginX, beginY - rectRadius, -rectRadius);
-        p.vertex(L, -rectRadius - gvs.hInPixels, -rectRadius);
-        p.vertex(L + rectRadius / Math.sin( p.TWO_PI*(gvs.theta / 360) ), -rectRadius - gvs.hInPixels, -rectRadius);
+      p.beginShape();//cap
+        p.vertex( liqX - liquidXLength, -liqY, -rectRadius);
+        p.vertex( liqX, -liqY, -rectRadius);
+        p.vertex( liqX, -liqY, rectRadius);
+        p.vertex( liqX - liquidXLength, -liqY, rectRadius);
       p.endShape(p.CLOSE);
+    p.pop();
+
+    // draw the liquid in the container
+    p.push();
+      p.translate( -cylinderRadius, -containerLiquidHeight / 2, 0);
+      p.ambientMaterial(gvs.fluidColor);
+      p.cylinder(cylinderRadius, containerLiquidHeight, dp, dp);
     p.pop();
 
     // draw the inclined pipe
     p.push();
-      const wt = 5; // "wall thickness"
-      const Hp = 50; // "Height of pipe"
-      const Lp = Hp / Math.sin( p.TWO_PI * (gvs.theta / 360) ); // "Length of pipe"
+      const Hp = heightOfContainer; // "Height of pipe"
+      const pipeX = Hp / Math.tan( thetaRad ); // "Length of pipe"
+      const cutawayWidth = wt / Math.tan( thetaRad );
       p.ambientMaterial(gvs.pipeColor);
-      p.translate(dx, dy, dz);
-      p.noStroke();
-      p.fill(gvs.pipeColor);
-      p.beginShape();
-        p.vertex(beginX, beginY - rectRadius - wt, rectRadius + wt);
-        p.vertex(beginX, beginY - rectRadius - wt, -rectRadius - wt);
-        p.vertex(Lp, -rectRadius - wt - Hp, -rectRadius - wt);
-        p.vertex(Lp, -rectRadius - wt - Hp, rectRadius + wt);
+      p.beginShape();//front
+        p.vertex( 0, - 2 * rectRadius - wt, -rectRadius - wt);
+        p.vertex( pipeX - liquidXLength - cutawayWidth, -Hp, -rectRadius - wt);
+        p.vertex( pipeX + cutawayWidth, -Hp, -rectRadius - wt);
+        p.vertex( 0, wt, -rectRadius - wt);
       p.endShape(p.CLOSE);
-      p.beginShape();
-        p.vertex(Lp, -rectRadius - wt - Hp, -rectRadius - wt);
-        p.vertex(Lp + (rectRadius + 2 * wt) / Math.sin( p.TWO_PI*(gvs.theta / 360) ), -rectRadius - wt - Hp, -rectRadius - wt);
-        p.vertex(Lp + (rectRadius + 2 * wt) / Math.sin( p.TWO_PI*(gvs.theta / 360) ), -rectRadius - wt - Hp, rectRadius + wt);
-        p.vertex(Lp, -rectRadius - wt - Hp, rectRadius + wt);
+      p.beginShape();//back
+        p.vertex( 0, - 2 * rectRadius - wt, rectRadius + wt);
+        p.vertex( pipeX - liquidXLength - cutawayWidth, -Hp, rectRadius + wt);
+        p.vertex( pipeX + cutawayWidth, -Hp, rectRadius + wt);
+        p.vertex( 0, wt, rectRadius + wt);
       p.endShape(p.CLOSE);
-      p.beginShape();
-        p.vertex(beginX, beginY + wt, rectRadius + wt);
-        p.vertex(beginX, beginY + wt, - rectRadius - wt);
-        p.vertex(Lp + (rectRadius + 2 * wt) / Math.sin( p.TWO_PI*(gvs.theta / 360) ), -rectRadius - wt - Hp, -rectRadius - wt);
-        p.vertex(Lp + (rectRadius + 2 * wt) / Math.sin( p.TWO_PI*(gvs.theta / 360) ), -rectRadius - wt - Hp, rectRadius + wt);
+      p.beginShape();//top
+        p.vertex( 0, -2 * rectRadius - wt, rectRadius + wt);
+        p.vertex( 0, -2 * rectRadius - wt, -rectRadius - wt);
+        p.vertex( pipeX - liquidXLength - cutawayWidth, -Hp, -rectRadius - wt);
+        p.vertex( pipeX - liquidXLength - cutawayWidth, -Hp, rectRadius + wt);
       p.endShape(p.CLOSE);
-      p.beginShape();
-        p.vertex(beginX, beginY + wt, rectRadius + wt);
-        p.vertex(beginX, beginY - rectRadius - wt, rectRadius + wt);
-        p.vertex(Lp, -rectRadius - wt - Hp, rectRadius + wt);
-        p.vertex(Lp + (rectRadius + 2 * wt) / Math.sin( p.TWO_PI*(gvs.theta / 360) ), -rectRadius - wt - Hp, rectRadius + wt);
+      p.beginShape();//bottom
+        p.vertex( 0, wt, rectRadius + wt);
+        p.vertex( 0, wt, -rectRadius - wt);
+        p.vertex( pipeX + cutawayWidth, -Hp, -rectRadius - wt);
+        p.vertex( pipeX + cutawayWidth, -Hp, rectRadius + wt);
       p.endShape(p.CLOSE);
-      p.beginShape();
-        p.vertex(beginX, beginY + wt, -rectRadius - wt);
-        p.vertex(beginX, beginY - rectRadius - wt, -rectRadius - wt);
-        p.vertex(Lp, -rectRadius - wt - Hp, -rectRadius - wt);
-        p.vertex(Lp + (rectRadius + 2 * wt) / Math.sin( p.TWO_PI*(gvs.theta / 360) ), -rectRadius - wt - Hp, -rectRadius - wt);
-      p.endShape(p.CLOSE);
+
     p.pop();
 
-    const cylinderRadius = 40;
-    const cylinderLiquidHeight = beginY + rectRadius - gvs.hInPixels;
-    const zeroPoint = - rectRadius; // when delta P is zero, both liquid levels are here
-    const bottomOfCylinder = zeroPoint + beginY + rectRadius;
-    
-    // draw the liquid in the container
-    p.push();
-      p.translate(dx, dy, dz);
-      p.translate(-cylinderRadius + beginX, bottomOfCylinder - cylinderLiquidHeight / 2, 0);
-      p.ambientMaterial(gvs.fluidColor);
-      p.cylinder(cylinderRadius, cylinderLiquidHeight, dp, dp);
-    p.pop();
-
-    const heightOfContainer = 120;
-
-    p.push();
+    p.push(); // draw container with cone and top cylinder
+      const coneHeight = 40;
       p.ambientMaterial(gvs.pipeColor);
-      p.translate(dx, dy, dz);
-      p.translate(-cylinderRadius + beginX, bottomOfCylinder - heightOfContainer / 2, 0);
+      p.translate(-cylinderRadius, - heightOfContainer / 2 + wt, 0);
       p.cylinder(cylinderRadius + wt, heightOfContainer, dp, dp);
+      p.translate(0, -heightOfContainer / 2 - coneHeight / 2 - 0.01, 0);
+      p.rotateZ(p.PI);
+      p.cone(cylinderRadius + wt, coneHeight);
+      p.rotateZ(-p.PI);
+      p.translate(0, -coneHeight / 2, 0);
+      p.cylinder(cylinderRadius / 5, 20, dp, dp);
+    p.pop();
+
+    p.push(); // draw the "zero" black lines on the inclined manometer
+      const dc = 1; // a unit of of wiggle room
+      const edgeRadius = 0.25; // radius of the line drawn around incline
+      p.emissiveMaterial(0, 0, 0);
+      const lengthOfEdge = liquidXLength + 2 * cutawayWidth;
+      let translateX = liqDefaultX - liquidXLength / 2;
+      p.translate(translateX, -defaultLiquidHeight, rectRadius + wt + dc);
+      p.rotateZ(p.PI / 2);
+      p.cylinder(edgeRadius, lengthOfEdge + 3 * dc / 2, dp, dp);
+      p.translate(0, 0, - rectRadius - 4 * wt - 2 * dc);
+      p.cylinder(edgeRadius, lengthOfEdge + 3 * dc / 2, dp, dp);
+      p.translate(0, 0, (rectRadius + 4 * wt + 2 * dc) / 2);
+      p.rotateX(p.PI / 2);
+      p.translate(0, 0, lengthOfEdge / 2 + dc / 2);
+      p.cylinder(edgeRadius, rectRadius + 4 * wt + 2 * dc, dp, dp);
+      p.translate(0, 0, - lengthOfEdge - 3 * dc / 2);
+      p.cylinder(edgeRadius, rectRadius + 4 * wt + 2 * dc, dp, dp);
+    p.pop();
+
+    p.push();
+      p.translate(10, -defaultLiquidHeight, 0);
+      p.emissiveMaterial(0, 0, 0);
+      p.cylinder(edgeRadius, 2 * gvs.hInPixels, dp, dp);
+      p.push();
+        p.translate(0, gvs.hInPixels, 0);
+        p.rotateZ( p.PI / 2 );
+        p.cylinder(edgeRadius, 10, dp, dp);
+      p.pop();
+      p.push();
+        p.translate(0, -gvs.hInPixels, 0);
+        const spanLength = liqX - liquidXLength - cutawayWidth; // horizontal distance from edge of container to the end of the liquid
+        p.rotateZ( p.PI / 2 );
+        p.cylinder(edgeRadius, 10, dp, dp);
+        const dashDistance = 5;
+        const dashWidth = 2;
+        p.translate(0, -dashDistance / 2, 0);
+        for ( let i = 10; i < spanLength; i += dashDistance ) {
+          p.translate(0, -dashDistance, 0);
+          p.cylinder(edgeRadius, dashWidth, dp, dp);
+        }
+      p.pop();
+      p.push();
+        p.translate(0, - gvs.hInPixels - 10, 0);
+        p.textSize(12);
+        p.fill(0);
+        p.noStroke();
+        p.textAlign(p.LEFT);
+        p.text(`h = ${height} cm`, 0, 0);
+      p.pop();
+    p.pop();
+
+    p.push();
+      const margin = 8;
+      p.emissiveMaterial(0, 0, 0);
+      p.translate(liqDefaultX, -defaultLiquidHeight, rectRadius + wt); // we are now edge of the black demarcation
+      p.rotateZ( p.PI/2 - thetaRad);
+      p.translate(margin, - L / 2 - 3, 0);
+      p.cylinder(edgeRadius, L, dp, dp);
+      p.push();
+        p.translate(0, L / 2, 0);
+        p.rotateZ(p.PI / 2);
+        p.cylinder(edgeRadius, 5, dp, dp);
+      p.pop();
+      p.push();
+        p.translate(0, - L / 2, 0);
+        p.rotateZ(p.PI / 2);
+        p.cylinder(edgeRadius, 5, dp, dp);
+      p.pop();
+      p.translate(20, 0, 0);
+      p.rotateZ( -p.PI/2 + thetaRad );
+      p.translate(12, 0, 0);
+      const length = Number(100 * gvs.h / Math.sin( thetaRad ) / 2).toFixed(0);
+      p.text(`L = ${length} cm`, 0, 0);
     p.pop();
   }
 
 };
-
-window.gvs.zoom = function(event) {
-  // zoom according to direction of mouseWheelDeltaY rather than value
-  let sensitivityZoom = 0.05;
-  let scaleFactor = window.P5.height;
-  if (event.deltaY > 0) {
-    window.P5._renderer._curCamera._orbit(0, 0, sensitivityZoom * scaleFactor);
-  } else {
-    window.P5._renderer._curCamera._orbit(0, 0, -sensitivityZoom * scaleFactor);
-  }
-}
 
 module.exports = functions;
