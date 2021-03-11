@@ -73,10 +73,11 @@ const functions = {
       p.cylinder(15, piezoHeight, dp, dp);
     p.pop();
 
+    const height = Math.round(Number(gvs.h * 100)).toString();
+    const bottom = 100;
+    drawText(p, `${height} cm`, 70, Math.min(80, dy - gvs.hInPixels / 2 - 5), 0, 70, 20, false);
+
     p.push();
-      const height = Math.round(Number(gvs.h * 100)).toString();
-      const bottom = 100;
-      drawText(p, `${height} cm`, 70, Math.min(80, dy - gvs.hInPixels / 2 - 5), 0, 70, 20, false);
       p.fill(0);
       p.noStroke();
       p.translate(30, bottom - gvs.hInPixels / 2, 0);
@@ -103,10 +104,8 @@ const functions = {
       p.cone(6, 20);
     p.pop();
 
-    p.push();
-      const dp = Number((gvs.Pf - 101325) / 1000).toFixed(1);
-      drawText(p, `P  = P  \u2012 P   = ${dp} kPa`, -151, -157, 0, 240, 20, false);
-    p.pop();
+    const dP = Number((gvs.Pf - 101325) / 1000).toFixed(1);
+    drawText(p, `P  = P  \u2012 P   = ${dP} kPa`, -151, -157, 0, 240, 20, false);
 
     p.push();
       p.textSize(12);
@@ -118,7 +117,7 @@ const functions = {
       p.translate(0, 0, 60);
       p.text("f", -8, 102, 30, 40);
       p.textSize(10);
-      p.translate(0, 0, -60);
+      p.translate(1, 1, -60);
       p.text("g", -247, -158, 30, 40);
       p.text("f", -209, -156, 30, 40);
       p.text("atm", -166, -156, 30, 40);
@@ -132,21 +131,22 @@ const functions = {
     const height = 200; // some arbitrary value used as a reference
     const distanceApart = 100;
 
+    p.translate(dx, dy, dz);
+
     p.push(); // left-side fluid (dynamic cylinder)
       p.ambientMaterial(gvs.fluidColor);
-      p.translate(dx - distanceApart, dy + height / 2 + gvs.hInPixels / 4, dz);
+      p.translate(- distanceApart, height / 2 + gvs.hInPixels / 4, 0);
       p.cylinder(30, height - gvs.hInPixels / 2, dp, dp);
     p.pop();
 
     p.push(); // right-side fluid (dynamic cylinder)
       p.ambientMaterial(gvs.fluidColor);
-      p.translate(dx + distanceApart, dy + height / 2 - gvs.hInPixels / 4, dz);
+      p.translate(distanceApart, height / 2 - gvs.hInPixels / 4, 0);
       p.cylinder(30, height + gvs.hInPixels / 2, dp, dp);
     p.pop();
 
     p.push(); // left-side and right-side fluids (static cylinders, below dynamic cylinder)
       p.ambientMaterial(gvs.fluidColor);
-      p.translate(dx, dy, dz);
       p.translate(distanceApart, height + 30, 0);
       p.cylinder(30, 60, dp, dp);
       p.translate(-2 * distanceApart, 0);
@@ -154,7 +154,6 @@ const functions = {
     p.pop();
 
     p.push(); // bottom fluid (static cylinder, below dynamic cylinder)
-      p.translate(dx, dy, dz);
       p.translate(0, height + 50, 0);
       p.rotateZ(1.57);
       p.ambientMaterial(gvs.fluidColor);
@@ -163,14 +162,13 @@ const functions = {
 
     p.push(); // left and right vertical pipes (static)
       p.ambientMaterial(gvs.pipeColor);
-      p.translate(dx + distanceApart, dy, dz);
+      p.translate(distanceApart, 0, 0);
       p.cylinder(40, 2 * height + 80, dp, dp, false, false);
       p.translate(-2 * distanceApart, 30, 0);
       p.cylinder(40, 2 * height + 20, dp, dp, false, false);
     p.pop();
 
     p.push(); // bottom pipe (static)
-      p.translate(dx, dy, dz);
       p.translate(0, height + 50, 0);
       p.rotateZ(1.57);
 
@@ -180,7 +178,6 @@ const functions = {
 
     p.push(); // top-left pipe and sphere (static)
       p.ambientMaterial(gvs.pipeColor);
-      p.translate(dx, dy, dz);
       p.translate(-distanceApart - 50, -height, 0);
       p.rotateZ(1.57);
       p.cylinder(30, 180, dp, dp);
@@ -188,19 +185,15 @@ const functions = {
       p.sphere(80, dp, dp);
     p.pop();
 
-    p.push();
-      p.translate(dx, dy, dz);
-      drawText(p, "P  ", distanceApart - 5, - height - 80, 0, 80, 38, false);
-      drawText(p, "P ", - distanceApart - 180, -height + 10, 82, 50, 38, false);
-      const h = Math.round(Number(gvs.h * 100)).toString();
-      drawText(p, `${h} cm`, distanceApart + 160, 20, 0, 150, 38, false);
-    p.pop();
+    drawText(p, "P  ", distanceApart - 5, - height - 80, 0, 80, 38, false);
+    drawText(p, "P ", - distanceApart - 180, -height + 10, 82, 50, 38, false);
+    const h = Math.round(Number(gvs.h * 100)).toString();
+    drawText(p, `${h} cm`, distanceApart + 165, 10, 0, 150, 38, false);
 
     p.push();
       p.emissiveMaterial(0, 0, 0);
       p.fill(0);
       p.noStroke();
-      p.translate(dx, dy, dz);
       p.translate(distanceApart + 80, 0, 0);
       p.cylinder(1, gvs.hInPixels, 100, 100);
       p.translate(-distanceApart - 15, gvs.hInPixels / 2, 0);
@@ -210,18 +203,15 @@ const functions = {
       p.cylinder(1, 50, dp, dp);
     p.pop();
 
-    p.push();
-      p.translate(dx, dy, dz);
-      const dP = Number((gvs.Pf - 101325) / 1000).toFixed(1);
-      drawText(p, `P  = P  \u2012 P    = ${dp} kPa`, -200, -350, 0, 450, 38, false);
-    p.pop();
+    const dP = Number((gvs.Pf - 101325) / 1000).toFixed(1);
+    drawText(p, `P  = P  \u2012 P    = ${dP} kPa`, -200, -350, 0, 450, 38, false);
 
     p.push();
       p.textSize(22);
       p.textAlign(p.CENTER);
       p.fill(0, 0, 0);
       p.noStroke();
-      p.translate(dx, dy, dz + 0.2);
+      p.translate(5, 2, 0.2);
       p.text("atm", 85, -288, 50, 40);
       p.text("g", -378, -362, 30, 40);
       p.text("f", -307, -357, 30, 40);
@@ -428,16 +418,18 @@ const functions = {
 
     p.push();
       p.ambientMaterial(0, 0, 0);
-      p.translate(30, -10, 0);
+      p.translate(100, -190, 0);
       p.noStroke();
       p.fill(0, 0, 0);
       p.textSize(14);
-      p.text(`P  = P  \u2012 P    = ${dP} kPa`, 20, -180);
+      p.text(`P  = P  \u2012 P    = ${dP} kPa`, 0, 0);
       p.textSize(8);
-      p.translate(0, 0, 0.1);
-      p.text("atm", 80, -176);
-      p.text("g", 27, -177);
-      p.text("f", 54, -176);
+      p.translate(-58, 3, 0.1);
+      p.text("g", 0, 0);
+      p.translate(27, 1, 0);
+      p.text("f", 0, 0);
+      p.translate(31, 0, 0);
+      p.text("atm", 0, 0);
     p.pop();
 
     p.push();
@@ -452,7 +444,7 @@ const functions = {
       p.translate(-5, -14, 0);
       p.text("P", 0, 0);
       p.textSize(8);
-      p.translate(6, 4, 0.1);
+      p.translate(4, 4, 0.1);
       p.text("f", 0, 0);
     p.pop();
 
@@ -464,7 +456,7 @@ const functions = {
       p.translate(pipeX - 10, -Hp - 10, 0);
       p.text("P", 0, 0);
       p.textSize(8);
-      p.translate(6, 4, 0.1);
+      p.translate(10, 4, 0.1);
       p.text("atm", 0, 0);
     p.pop();
   }
