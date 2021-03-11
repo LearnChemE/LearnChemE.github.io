@@ -45,15 +45,17 @@ const functions = {
     drawText(p, "P  ", 0, -177, 0, 45, 24, true);
     drawText(p, "P ", 3, 103, 60, 30, 24, true);
 
+    p.emissiveMaterial(0, 0, 0);
+
     p.push();
-      p.ambientMaterial(gvs.fluidColor);
+      p.fill(gvs.fluidColor);
       p.translate(0, 30 + dy, 0);
       p.rotateZ(1.57);
       p.cylinder(30, 350, dp, dp);
     p.pop();
 
     p.push();
-      p.ambientMaterial(gvs.fluidColor);
+      p.fill(gvs.fluidColor);
       p.translate(0, dy - gvs.hInPixels / 2, 0);
       p.cylinder(10, gvs.hInPixels + 10, dp, dp);
     p.pop();
@@ -230,23 +232,23 @@ const functions = {
   },
 
   drawInclined: function(p) {
-    const rectRadius = 4;
+
     const dx = -60;
-    const dy = 50;
+    const dy = 60;
     const dz = 150;
 
     const wt = 2; // wall thickness
-
+    const rectRadius = 2;
     const heightOfContainer = 120;
     const cylinderRadius = 40;
-    const defaultLiquidHeight = heightOfContainer / 2;
-    const containerLiquidHeight = defaultLiquidHeight - gvs.hInPixels;
+    const defaultLiquidHeight = heightOfContainer / 3;
+    const containerLiquidHeight = defaultLiquidHeight - gvs.hInPixels / 10;
 
     const thetaRad = p.TWO_PI*(gvs.theta / 360);
 
     const L = gvs.hInPixels / Math.sin( thetaRad ); // "length of liquid"
-    const liqX = defaultLiquidHeight / Math.tan( thetaRad ) + L * Math.cos( thetaRad );
     const liqY = defaultLiquidHeight + gvs.hInPixels;
+    const liqX = liqY / Math.tan( thetaRad );
     const liqDefaultX = defaultLiquidHeight / Math.tan( thetaRad );
     const liquidXLength = 2 * rectRadius / Math.tan( thetaRad );
 
@@ -255,6 +257,7 @@ const functions = {
     const height = Math.round(Number(gvs.h * 100)).toString();
     
     p.translate(dx, dy, dz);
+    p.emissiveMaterial(0, 0, 0);
 
     // draw the inclined fluid
     p.push();
@@ -294,8 +297,8 @@ const functions = {
 
     // draw the liquid in the container
     p.push();
+      p.fill(gvs.fluidColor);
       p.translate( -cylinderRadius, -containerLiquidHeight / 2, 0);
-      p.ambientMaterial(gvs.fluidColor);
       p.cylinder(cylinderRadius, containerLiquidHeight, dp, dp);
     p.pop();
 
@@ -345,10 +348,9 @@ const functions = {
       p.cylinder(cylinderRadius / 5, 20, dp, dp);
     p.pop();
 
-    p.push(); // draw the "zero" black lines on the inclined manometer
+    p.push(); // draw the "default liquid height" demarcation black lines on the inclined manometer
       const dc = 1; // a unit of of wiggle room
       const edgeRadius = 0.25; // radius of the line drawn around incline
-      p.emissiveMaterial(0, 0, 0);
       const lengthOfEdge = liquidXLength + 2 * cutawayWidth;
       let translateX = liqDefaultX - liquidXLength / 2;
       p.translate(translateX, -defaultLiquidHeight, rectRadius + wt + dc);
@@ -364,60 +366,106 @@ const functions = {
       p.cylinder(edgeRadius, rectRadius + 4 * wt + 2 * dc, dp, dp);
     p.pop();
 
-    p.push();
-      p.translate(10, -defaultLiquidHeight, 0);
-      p.emissiveMaterial(0, 0, 0);
-      p.cylinder(edgeRadius, 2 * gvs.hInPixels, dp, dp);
-      p.push();
-        p.translate(0, gvs.hInPixels, 0);
-        p.rotateZ( p.PI / 2 );
-        p.cylinder(edgeRadius, 10, dp, dp);
-      p.pop();
-      p.push();
-        p.translate(0, -gvs.hInPixels, 0);
-        const spanLength = liqX - liquidXLength - cutawayWidth; // horizontal distance from edge of container to the end of the liquid
-        p.rotateZ( p.PI / 2 );
-        p.cylinder(edgeRadius, 10, dp, dp);
-        const dashDistance = 5;
-        const dashWidth = 2;
-        p.translate(0, -dashDistance / 2, 0);
-        for ( let i = 10; i < spanLength; i += dashDistance ) {
-          p.translate(0, -dashDistance, 0);
-          p.cylinder(edgeRadius, dashWidth, dp, dp);
-        }
-      p.pop();
-      p.push();
-        p.translate(0, - gvs.hInPixels - 10, 0);
-        p.textSize(12);
-        p.fill(0);
-        p.noStroke();
-        p.textAlign(p.LEFT);
-        p.text(`h = ${height} cm`, 0, 0);
-      p.pop();
-    p.pop();
+    p.translate(10, -defaultLiquidHeight, 0);
 
     p.push();
-      const margin = 8;
-      p.emissiveMaterial(0, 0, 0);
+      p.translate(0, - 9 * gvs.hInPixels / 20);
+      p.cylinder(edgeRadius, 11 * gvs.hInPixels / 10, dp, dp);
+    p.pop();
+    p.push();
+      p.translate(0, gvs.hInPixels / 10, 0);
+      p.rotateZ( p.PI / 2 );
+      p.cylinder(edgeRadius, 10, dp, dp);
+    p.pop();
+    p.push();
+      p.translate(0, -gvs.hInPixels, 0);
+      const spanLength = liqX - liquidXLength - cutawayWidth; // horizontal distance from edge of container to the end of the liquid
+      p.rotateZ( p.PI / 2 );
+      p.cylinder(edgeRadius, 10, dp, dp);
+      const dashDistance = 5;
+      const dashWidth = 2;
+      p.translate(0, -dashDistance / 2, 0);
+      for ( let i = 10; i < spanLength; i += dashDistance ) {
+        p.translate(0, -dashDistance, 0);
+        p.cylinder(edgeRadius, dashWidth, dp, dp);
+      }
+    p.pop();
+
+    p.push(); // draw h = x cm
+      p.translate(0, - gvs.hInPixels - 10, 0);
+      p.textSize(12);
+      p.fill(0);
+      p.noStroke();
+      p.textAlign(p.LEFT);
+      p.text(`h = ${height} cm`, 0, 0);
+    p.pop();
+
+    p.translate(-10, defaultLiquidHeight, 0);
+
+    const margin = 8;
+    p.push(); // draw the angled, black measurement line
       p.translate(liqDefaultX, -defaultLiquidHeight, rectRadius + wt); // we are now edge of the black demarcation
       p.rotateZ( p.PI/2 - thetaRad);
       p.translate(margin, - L / 2 - 3, 0);
       p.cylinder(edgeRadius, L, dp, dp);
-      p.push();
-        p.translate(0, L / 2, 0);
-        p.rotateZ(p.PI / 2);
-        p.cylinder(edgeRadius, 5, dp, dp);
-      p.pop();
-      p.push();
-        p.translate(0, - L / 2, 0);
-        p.rotateZ(p.PI / 2);
-        p.cylinder(edgeRadius, 5, dp, dp);
-      p.pop();
+      p.translate(0, L / 2, 0);
+      p.rotateZ(p.PI / 2);
+      p.cylinder(edgeRadius, 3, dp, dp);
+      p.translate(-L, 0, 0);
+      p.cylinder(edgeRadius, 3, dp, dp);
+    p.pop();
+
+    p.push();
+      p.translate(liqDefaultX, -defaultLiquidHeight, rectRadius + wt);
+      p.rotateZ( p.PI/2 - thetaRad);
+      p.translate(margin, - L / 2 - 3, 0);
       p.translate(20, 0, 0);
       p.rotateZ( -p.PI/2 + thetaRad );
-      p.translate(12, 0, 0);
-      const length = Number(100 * gvs.h / Math.sin( thetaRad ) / 2).toFixed(0);
+      p.translate(15, 0, 0);
+      const length = Number(100 * gvs.h / Math.sin( thetaRad ) ).toFixed(0);
       p.text(`L = ${length} cm`, 0, 0);
+    p.pop();
+
+    p.push();
+      p.ambientMaterial(0, 0, 0);
+      p.translate(30, -10, 0);
+      p.noStroke();
+      p.fill(0, 0, 0);
+      p.textSize(14);
+      p.text(`P  = P  \u2012 P    = ${dP} kPa`, 20, -180);
+      p.textSize(8);
+      p.translate(0, 0, 0.1);
+      p.text("atm", 80, -176);
+      p.text("g", 27, -177);
+      p.text("f", 54, -176);
+    p.pop();
+
+    p.push();
+      p.ambientMaterial(0, 0, 0);
+      p.noStroke();
+      p.fill(0, 0, 0);
+      p.textSize(12);
+      p.translate(-cylinderRadius, -heightOfContainer - coneHeight - 15, 0);
+      p.cone(2, 5);
+      p.translate(0, -6, 0);
+      p.cylinder(edgeRadius, 10, dp, dp);
+      p.translate(-5, -14, 0);
+      p.text("P", 0, 0);
+      p.textSize(8);
+      p.translate(6, 4, 0.1);
+      p.text("f", 0, 0);
+    p.pop();
+
+    p.push();
+      p.ambientMaterial(0, 0, 0);
+      p.noStroke();
+      p.fill(0, 0, 0);
+      p.textSize(12);
+      p.translate(pipeX - 10, -Hp - 10, 0);
+      p.text("P", 0, 0);
+      p.textSize(8);
+      p.translate(6, 4, 0.1);
+      p.text("atm", 0, 0);
     p.pop();
   }
 

@@ -22,7 +22,7 @@ window.gvs = {
 const manometers = require("./js/manometers.js");
 const containerElement = document.getElementById('p5-container');
 
-function findFluidHeight() {
+gvs.findFluidHeight = function() {
   const gamma = gvs.rhom * 9.81; // specific weight
   const Patm = 101325;
   const h = (gvs.Pf - Patm) / gamma;
@@ -37,7 +37,7 @@ function findFluidHeight() {
     break;
 
     case "inclined":
-      gvs.hInPixels = gvs.h * 50;
+      gvs.hInPixels = gvs.h * 85;
     break;
   }
 }
@@ -56,7 +56,7 @@ const sketch = (p) => {
     cnvElt[0].addEventListener("wheel", e => {e.preventDefault()});
     gvs.defaultCamera();
     cnv.mouseWheel(gvs.zoom);
-    findFluidHeight();
+    gvs.findFluidHeight();
     p.textFont(gvs.cnvText);
     p.noLoop();
   };
@@ -104,14 +104,14 @@ const angleValue = document.getElementById("angle-value");
 pressureSlider.addEventListener("input", () => {
   gvs.Pf = Number(pressureSlider.value);
   pressureValue.innerHTML = Number(gvs.Pf / 1000).toFixed(1);
-  findFluidHeight();
+  gvs.findFluidHeight();
   P5.redraw();
 });
 
 angleSlider.addEventListener("input", () => {
   gvs.theta = Number(angleSlider.value);
   angleValue.innerHTML = Number(gvs.theta).toFixed(1);
-  findFluidHeight();
+  gvs.findFluidHeight();
   P5.redraw();
 });
 
@@ -154,7 +154,7 @@ for ( let i = 0; i < selectFluid.length; i++ ) {
         pressureSlider.setAttribute("max", "220000");
         break;
     };
-    findFluidHeight();
+    gvs.findFluidHeight();
     P5.redraw();
   });
 };
@@ -174,7 +174,7 @@ for ( let i = 0; i < selectManometer.length; i++ ) {
     } else {
       document.getElementById("angle-block").classList.add("hidden");
     }
-    findFluidHeight();
+    gvs.findFluidHeight();
     P5.redraw();
   });
 };
