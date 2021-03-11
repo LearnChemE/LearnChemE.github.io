@@ -219,6 +219,8 @@ const functions = {
       p.translate(0, 0, 82);
       p.text("f", -291, -195, 30, 40);
     p.pop();
+
+    p.translate(-dx, -dy, -dz);
   },
 
   drawInclined: function(p) {
@@ -459,6 +461,8 @@ const functions = {
       p.translate(10, 4, 0.1);
       p.text("atm", 0, 0);
     p.pop();
+
+    p.translate(-dx, -dy, -dz);
   }
 
 };
