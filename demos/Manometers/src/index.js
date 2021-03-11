@@ -16,7 +16,7 @@ window.gvs = {
   theta: 35, // angle of inclined manometer, degrees
   defaultCamera: function() { P5.camera(0, -60, 400, 0, -10, 0, 0, 1, 0); },
   cnvText: null,
-  clickedLocation: [0, false]
+  cameraSettings: {lastCoord: [0, 0], isMoving: false}
 }
 
 const manometers = require("./js/manometers.js");
@@ -54,6 +54,7 @@ const sketch = (p) => {
     cnvElt[0].addEventListener("mouseenter", function() { P5.loop(); });
     cnvElt[0].addEventListener("mouseleave", function() { P5.noLoop(); });
     cnvElt[0].addEventListener("wheel", e => {e.preventDefault()});
+    cnvElt[0].addEventListener("contextmenu", function(e) {e.preventDefault()});
     cnvElt[0].style.cursor = `url("./assets/arrows.png"), auto`;
     gvs.defaultCamera();
     cnv.mouseWheel(gvs.zoom);
@@ -64,7 +65,6 @@ const sketch = (p) => {
 
   p.draw = function() {
     p.background(255);
-    p.orbitControl();
     p.ambientLight(100);
     p.pointLight(250, 250, 250, 50, 50, 50);
     p.noStroke();
@@ -79,17 +79,49 @@ const sketch = (p) => {
         manometers.drawInclined(p);
         break;
     }
-    if(p.mouseIsPressed && p.mouseButton === p.CENTER) {
-      if( gvs.clickedLocation[1] ) {
-        const delta = p.mouseY - gvs.clickedLocation[0];
-        window.P5._renderer._curCamera.move(0, -delta / 2, 0);
-        gvs.clickedLocation[0] = p.mouseY;
-      } else {
-        gvs.clickedLocation[0] = p.mouseY;
+    if( p.mouseIsPressed && p.mouseY > 0 && p.mouseY < p.height && p.mouseX > 0 && p.mouseX < p.width ) {
+
+      if( gvs.cameraSettings.isMoving ) {
+
+        const deltaX = p.mouseX - gvs.cameraSettings.lastCoord[0];
+        const deltaY = p.mouseY - gvs.cameraSettings.lastCoord[1];
+        
+        if( p.mouseButton === p.CENTER) {
+          window.P5._renderer._curCamera.move(0, -deltaY / 2, 0);
+        } else if ( p.mouseButton === p.LEFT ) {
+          const coords = window.P5._renderer._curCamera._getLocalAxes();
+          const xmag = Math.sqrt(coords.x[0] * coords.x[0] + coords.x[2] * coords.x[2]);
+          if (xmag !== 0) {
+            coords.x[0] /= xmag;
+            coords.x[2] /= xmag;
+          }
+          const ymag = Math.sqrt(coords.y[0] * coords.y[0] + coords.y[2] * coords.y[2]);
+          if (ymag !== 0) {
+            coords.y[0] /= ymag;
+            coords.y[2] /= ymag;
+          }
+  
+          const sensitivityX = 1;
+          const sensitivityY = 1;
+  
+          const dx = -1 * sensitivityX * (p.mouseX - p.pmouseX);
+          const dz = -1 * sensitivityY * (p.mouseY - p.pmouseY);
+  
+          window.P5._renderer._curCamera.setPosition(
+            window.P5._renderer._curCamera.eyeX + dx * coords.x[0] + dz * coords.z[0],
+            window.P5._renderer._curCamera.eyeY,
+            window.P5._renderer._curCamera.eyeZ + dx * coords.x[2] + dz * coords.z[2]
+          );
+        } else if ( p.mouseButton === p.RIGHT ) {
+          const scaleFactorX = 0.005;
+          const scaleFactorY = 0.003;
+          window.P5._renderer._curCamera._orbit(- scaleFactorX * deltaX, scaleFactorY * deltaY, 0);
+        }
       }
-      gvs.clickedLocation[1] = true;
+      gvs.cameraSettings.lastCoord = [p.mouseX, p.mouseY];
+      gvs.cameraSettings.isMoving = true;
     } else {
-      gvs.clickedLocation[1] = false;
+      gvs.cameraSettings.isMoving = false;
     }
   };
 
