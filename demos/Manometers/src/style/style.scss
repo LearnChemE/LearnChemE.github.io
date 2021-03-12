@@ -50,9 +50,10 @@
 
         .btn {
           width: max-content;
-          background-color: rgb(71, 78, 135);
+          background-color: rgb(244, 244, 244);
           border: 1px solid rgb(214, 186, 186);
-          color: white;
+          box-shadow: 0px 0px 2px black;
+          color: black;
           opacity: 1;
           transition: all 0.05s;
 
@@ -62,9 +63,8 @@
         }
 
         .selected {
-          background-color: rgb(244, 244, 244);
-          color: black;
-          box-shadow: 0px 0px 2px black;
+          background-color: rgb(71, 78, 135);
+          color: white;
         }
       }
 
