@@ -50,10 +50,15 @@
 
         .btn {
           width: max-content;
-          background-color: slategray;
-          border: 1px solid rgb(63, 63, 63);
+          background-color: rgb(71, 78, 135);
+          border: 1px solid rgb(214, 186, 186);
           color: white;
+          opacity: 1;
           transition: all 0.05s;
+
+          &:hover {
+            opacity: 0.8;
+          }
         }
 
         .selected {
