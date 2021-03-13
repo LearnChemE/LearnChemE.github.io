@@ -10,7 +10,7 @@
   <meta name=author content="LearnChemE, Neil Hendren">
   <meta name=application-name content="learncheme.github.io">
   <meta name=description content="Open source simulations and demonstrations for Chemical Engineering undergraduate students">
-  <link href="./home page/style.css" rel=stylesheet>
+  <link href="./home_page/style.css" rel=stylesheet>
   <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans&family=Open+Sans&display=swap" rel="stylesheet">
 
   <title>learncheme.github.io</title>
@@ -38,8 +38,8 @@
       "Visualization of vapor-liquid equilibrium" : "/demos/visualVLE/index.html",
       "Single-stage distillation (virtual process controls lab)" : "/lab-experiments/single_stage_distillation/dist/index.html",
       "Single-stage distillation (manual control only)" : "/lab-experiments/single_stage_manualonly/dist/index.html",
-      "Streamlines (unfinished concept)" : "/demos/Streamlines/index.html",
-      "Surface roughness (in progress)" : "/demos/SurfaceRoughness/dist/index.html",
+      "Streamlines Over a Sphere" : "/demos/Streamlines/html/index.html",
+      "Surface roughness effect on an object's trajectory" : "/demos/SurfaceRoughness/dist/index.html",
       "Quantum harmonic oscillator" : "/learnchemejs/html/harmonic.html",
       "Quantum particle-in-a-box 1" : "/learnchemejs/html/pib1.html",
       "Quantum particle-in-a-box 2" : "/learnchemejs/html/pib2.html",
@@ -47,8 +47,14 @@
       "Step-by-step T-x-y diagram for immiscible liquids" : "/learnchemejs/html/immiscibleT.html",
       "Construct P-x-y diagrams for vapor-liquid-equilibrium" : "/learnchemejs/html/Pxy",
       "Construct T-x-y diagrams for vapor-liquid-equilibrium" : "/learnchemejs/html/Txy",
+      "Bernoulli Fluid Flow" : "/demos/Bernoulli/dist/index.html",
+      "Buoyancy of a cube" : "/demos/Buoyancy/dist/index.html",
+      "Couette flow" : "/demos/Couette/dist/index.html",
+      "Laminar pipe flow" : "/demos/LaminarPipeFlow/html/index.html",
+      "Manometers" : "/demos/Manometers/dist/index.html",
     };
-    const demo = Object.keys(demos);
+
+    const demo = Object.keys(demos).sort();
     for (let i = 0; i < demo.length; i++) {
       const listItem = document.createElement("li");
       list.appendChild(listItem);
