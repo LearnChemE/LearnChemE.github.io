@@ -62,6 +62,13 @@ canvas {
   font-size: 0.9rem;
 }
 
+.value-area {
+  display: grid;
+  grid-template-columns: 50ch 50ch;
+  align-items: center;
+  gap: 0px 10px;
+}
+
 .input-area {
   display: grid;
   grid-template-columns: 1fr;
@@ -69,6 +76,22 @@ canvas {
   margin-bottom: 20px;
   margin-left: 10px;
   gap: 10px;
+}
+
+.input-area {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: 10px;
+  gap: 5px;
+}
+
+.physical-data {
+  display: grid;
+  grid-template-columns: 17ch 2ch max-content max-content;
+  align-items: center;
+  gap: 0px 10px;
 }
 
 .input {

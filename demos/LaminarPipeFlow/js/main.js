@@ -27,7 +27,7 @@ function formatNumber(num) {
   n = Math.round(n * 10000) / 10000;
   if ( n === 0 ) { return 0 }
   else if ( n >= 10 ) { return Number.parseInt(n).toFixed(0) }
-  else if ( n >= 1 ) { return Number( Math.round( n * 100 ) / 100 ).toFixed(2) }
+  else if ( n >= 1 ) { return Number( Math.round( n * 100 ) / 100 ).toFixed(1) }
   else if ( n >= 0.01 ) {
       return Number( Math.round( n * 1000 ) / 1000 ).toFixed(3);
   }
@@ -36,9 +36,13 @@ function formatNumber(num) {
   }
 
   else if ( n >= 0.0001 ) {
-    return Number( Math.round( n * 100000 ) / 100000 ).toFixed(4);
+    return Number( Math.round( n * 1000000 ) / 1000000 ).toFixed(4);
   }
-
+  else if ( n <= -1 ) { return Number.parseInt(n).toFixed(0) }
+  else if ( n <= -0.0001 ) {
+    return Number( Math.round( n * 10000 ) / 10000 ).toFixed(4);
+  }
+  
 }
 
 function update()
@@ -46,12 +50,25 @@ function update()
   radius = vRadius.value;
   pressureGradient = vPressureGradient.value;
   mu = Math.exp(vMu.value);
-  document.getElementById("dpdz-value").innerHTML = pressureGradient;
-  document.getElementById("radius-value").innerHTML = radius;
+  document.getElementById("dpdz-value").innerHTML = Number(pressureGradient*-1).toFixed(2);
+  document.getElementById("radius-value").innerHTML = Number(radius*100).toFixed(1);
   document.getElementById("viscosity-value").innerHTML = formatNumber(mu);
   coords.topPlateY = 200 - radius * 3000 - 10;
   coords.bottomPlateY = 200 + radius * 3000;
   redraw();
+
+  document.getElementById("Qdata").innerHTML = formatNumber(Q);
+  document.getElementById("averageVelocity-data").innerHTML = formatNumber(averageVelocity);
+  document.getElementById("maxVelocity-data").innerHTML = formatNumber(velocityProfile(0));
+  document.getElementById("Re-data").innerHTML = formatNumber(reynolds());
+
+
+  
+}
+
+function reynolds()
+{
+  return radius*2*1000*averageVelocity/mu;
 }
 
 function setup() {
@@ -98,7 +115,7 @@ function drawAxes() {
     }
 
     fill(0,0,0)
-    triangle(97, 25, 103,25, 100, 15);
+    //triangle(97, 25, 103,25, 100, 15);
     triangle(470, 197, 470, 203, 480, 200);
     text('r (cm)', 60, 25);
     text('u (m/s)', 460, 220);
@@ -113,16 +130,16 @@ function coordinateToPixel(x, y) {
   return pixels;
 }
 
-function velocityProfile(rp)
+function velocityProfile(r)
 {
   //pix to r
-  r = (rp - 200)/oneMeter;
+  
   u = radius**2/(4*mu)*pressureGradient*(1-r**2/radius**2);
-  u_pix = u*oneMeter/5+100;
+  
 
   //u_pix = (rp-200)**2/100 + 100
   
-  return u_pix;
+  return u;
 }
 
 function drawContour() {
@@ -132,8 +149,10 @@ function drawContour() {
     beginShape();
       for(i = coords.topPlateY+10; i < coords.bottomPlateY+1; i++)
       {
-        pixCoord = velocityProfile(i);
-        vertex(pixCoord, i);
+        r = (i - 200)/oneMeter;
+        u = velocityProfile(r);
+        u_pix = u*oneMeter/5+100;
+        vertex(u_pix, i);
       }
     endShape();
   pop();
