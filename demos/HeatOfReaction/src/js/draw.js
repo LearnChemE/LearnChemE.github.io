@@ -38,7 +38,8 @@ function drawAxes() {
             if ( x !== xMin ) { p.line(xPix, yPix, xPix, yPix - tickSize) };
             p.noStroke();
             p.fill(0);
-            
+
+            p.textSize(14);
             const offsetX = p.textWidth(`${x}`) / 2;
             const offsetY = p.textWidth("X") * 2;
 
@@ -76,9 +77,10 @@ function drawAxes() {
             p.noStroke();
             p.fill(0);
 
+            p.textSize(14);
             const offsetX = p.textWidth(`${y}`) + 10;
             const offsetY = p.textAscent() / 2;
-            
+
             if ( i % 5 === 0 && i !== 0 ) {
                 p.text(`${y}`, xPix - offsetX, yPix + offsetY);
             }
@@ -220,7 +222,7 @@ function drawAll(p5obj) {
     xMax = gvs.xRange[1];
     yMin = 0;
     yMax = gvs.yRange[1];
-    margins = [[75, 40], [50, 70]]; // margins of graph from edge of canvas
+    margins = [[75, 40], [36, 70]]; // margins of graph from edge of canvas
     gPix = [[margins[0][0], p.width - margins[0][1]], [margins[1][0], p.height - margins[1][1]]]; // Graph pixel values of the edges, i.e. [[pixels of left bound, pixels of right bound], [pixels of top bound, pixels of bottom bound]]
     drawAxes();
     drawH0();
