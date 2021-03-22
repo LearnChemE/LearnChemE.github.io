@@ -1,0 +1,55 @@
+@import "bootstrap";
+@import "./slider.scss";
+
+.modal-buttons-row {
+  display: grid;
+  grid-template-columns: repeat(3, 12ch );
+  gap: 30px;
+  margin: 0.5rem 0rem 0rem 1rem;
+}
+
+.input-area {
+  display: grid;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: 10px;
+  gap: 10px;
+
+  .input-row {
+    display: grid;
+    grid-template-columns: 180px 10rem max-content max-content;
+    gap: 1ch;
+    align-items: end;
+  
+    .data-name {
+      justify-self: end;
+    }
+
+    #t-value {
+      width: 3ch;
+      margin-right: -10px;
+    }
+  }
+}
+
+canvas {
+  margin-left: 10px;
+  outline: 1px solid black;
+  box-shadow: 0px 0px 2px black;
+}
+
+.modal.show {
+  padding-left: 0px !important;
+}
+
+.modal-body {
+  text-align: left;
+
+  .references {
+    font-size: 0.8rem;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+}
