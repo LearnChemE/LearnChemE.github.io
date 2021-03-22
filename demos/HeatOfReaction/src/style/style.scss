@@ -26,8 +26,18 @@
     }
 
     #t-value {
-      width: 3ch;
-      margin-right: -10px;
+      width: calc(max(3ch, max-content));
+      margin-right: -8px;
+    }
+  }
+
+  .input-select {
+    display: grid;
+    grid-template-columns: 175px max-content;
+    gap: 15px;
+
+    .select-label {
+      text-align: right;
     }
   }
 }
@@ -36,6 +46,11 @@ canvas {
   margin-left: 10px;
   outline: 1px solid black;
   box-shadow: 0px 0px 2px black;
+}
+
+#loading {
+  margin-left: 15px;
+  font-size: 1.5rem;
 }
 
 .modal.show {
