@@ -220,7 +220,7 @@ function drawAll(p5obj) {
     xMax = gvs.xRange[1];
     yMin = 0;
     yMax = gvs.yRange[1];
-    margins = [[80, 70], [80, 80]]; // margins of graph from edge of canvas
+    margins = [[75, 40], [50, 70]]; // margins of graph from edge of canvas
     gPix = [[margins[0][0], p.width - margins[0][1]], [margins[1][0], p.height - margins[1][1]]]; // Graph pixel values of the edges, i.e. [[pixels of left bound, pixels of right bound], [pixels of top bound, pixels of bottom bound]]
     drawAxes();
     drawH0();

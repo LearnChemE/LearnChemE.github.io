@@ -17,7 +17,7 @@
 
   .input-row {
     display: grid;
-    grid-template-columns: 180px 10rem max-content max-content;
+    grid-template-columns: 100px 15rem max-content max-content;
     gap: 1ch;
     align-items: end;
   
@@ -33,19 +33,39 @@
 
   .input-select {
     display: grid;
-    grid-template-columns: 175px max-content;
+    grid-template-columns: 95px max-content;
     gap: 15px;
+    align-items: center;
 
     .select-label {
       text-align: right;
     }
+
+    #select-reaction {
+      padding: 0.25rem;
+    }
   }
+}
+
+.reaction-container {
+  display: grid;
+  width: 600px;
+  height: 45px;
+  border-style: solid solid none solid;
+  border-width: 1px;
+  border-color: black;
+  margin-left: 10px;
+  align-items: center;
+  justify-items: center;
+  font-size: 1.25rem;
+  background-color: rgb(253, 253, 253);
 }
 
 canvas {
   margin-left: 10px;
-  outline: 1px solid black;
-  box-shadow: 0px 0px 2px black;
+  border-style: none solid solid solid;
+  border-width: 1px;
+  border-color: black;
 }
 
 #loading {

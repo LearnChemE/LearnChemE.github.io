@@ -35,7 +35,7 @@ const sketch = (p) => {
     };
 
     p.draw = function () {
-        p.background(250);
+        p.background(253);
         calcAll();
         drawAll(p);
     };
@@ -71,11 +71,11 @@ function changeReaction(rxn) {
     switch( rxn ) {
         case "1":
             gvs.reaction = "acetylene hydrogenation";
-            gvs.xRange = [0, 350];
+            gvs.xRange = [0, 320];
             gvs.yRange = [25, 1000];
             tSlider.setAttribute("min", "30");
             tSlider.setAttribute("max", "900");
-            tSlider.setAttribute("step", "10");
+            tSlider.setAttribute("step", "1");
             gvs.H = function(T, X) {
                 const H0 = gvs.chemicals.hydrogen.enthalpy(T) + gvs.chemicals.acetylene.enthalpy(T);
                 const H1 = gvs.chemicals.ethylene.enthalpy(T);
