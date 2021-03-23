@@ -284,3 +284,41 @@ window.gvs.chemicals.carbondioxide = {
         return this.A(T)*(t) + this.B(T)*(t**2) / 2 + this.C(T)*(t**3) / 3 + this.D(T)*(t**4) / 4 - this.E(T) / t + this.F(T);
     },
 };
+
+window.gvs.chemicals.carbonmonoxide = {
+    A : function(T) { 
+        if( T < 1300 ) { return 25.56759 }
+        if( T <= 6000 ) { return 35.15070 }
+    },
+    B: function(T) { 
+        if( T < 1300 ) { return 6.096130 }
+        if( T <= 6000 ) { return 1.300095 }
+    },
+    C: function(T) { 
+        if( T < 1300 ) { return 4.054656 }
+        if( T <= 6000 ) { return -0.205921 }
+    },
+    D: function(T) { 
+        if( T < 1300 ) { return -2.671301 }
+        if( T <= 6000 ) { return 0.013550 }
+    },
+    E: function(T) { 
+        if( T < 1300 ) { return 0.131021 }
+        if( T <= 6000 ) { return -3.282780 }
+    },
+    F: function(T) { 
+        if( T < 1300 ) { return -118.0089 }
+        if( T <= 6000 ) { return -127.8375 }
+    },
+    H: function(T) { 
+        if( T < 1300 ) { return -110.5271 }
+        if( T <= 6000 ) { return -110.5271 }
+    },
+    enthalpy: function(T) {
+        if( typeof(T) !== "number" ) { throw "invalid temperature specified for carbon monoxide" };
+        if( T < 298 ) { throw "Carbon monoxide temperature below valid range" };
+        if( T > 6000 ) { throw "Carbon monoxide temperature above valid range" };
+        const t = T / 1000;
+        return this.A(T)*(t) + this.B(T)*(t**2) / 2 + this.C(T)*(t**3) / 3 + this.D(T)*(t**4) / 4 - this.E(T) / t + this.F(T);
+    },
+};

@@ -16,6 +16,10 @@ function drawAxes() {
             incX = 60;
             incY = 10;
         break;
+        case "carbon monoxide oxidation":
+            incX = 30;
+            incY = 160;
+        break;
     }
 
     p.push();
@@ -108,8 +112,7 @@ function drawH0() {
         p.beginShape();
             let Tinc = ( yMax - yMin ) / 100;
             let H = 0;
-            const Tstart = gvs.reaction === "acetylene hydrogenation" ? 25 : gvs.reaction === "methane combustion" ? 25 : 25;
-            for ( let TC = Tstart; TC < yMax - Tinc && H < xMax ; TC += Tinc ) {
+            for ( let TC = 25; TC < yMax - Tinc && H < xMax ; TC += Tinc ) {
                 const T = 273.15 + TC;
                 H = gvs.H(T, 0);
                 const xPix = gPix[0][0] + (( H - xMin ) / ( xMax - xMin )) * ( gPix[0][1] - gPix[0][0] );
@@ -128,8 +131,7 @@ function drawH1() {
         p.beginShape();
             Tinc = ( yMax - yMin ) / 100;
             let H = 0;
-            const Tstart = gvs.reaction === "acetylene hydrogenation" ? 25 : gvs.reaction === "methane combustion" ? 25 : 25;
-            for ( let TC = Tstart; TC < yMax - Tinc && H < xMax ; TC += Tinc ) {
+            for ( let TC = 25; TC < yMax - Tinc && H < xMax ; TC += Tinc ) {
                 const T = 273.15 + TC;
                 H = gvs.H(T, 1);
                 const xPix = gPix[0][0] + (( H - xMin ) / ( xMax - xMin )) * ( gPix[0][1] - gPix[0][0] );

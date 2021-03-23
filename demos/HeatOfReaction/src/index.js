@@ -77,6 +77,9 @@ function changeReaction(rxn) {
             tSlider.setAttribute("min", "30");
             tSlider.setAttribute("max", "900");
             tSlider.setAttribute("step", "1");
+            gvs.T = gvs.p.constrain(gvs.T - 273.15, 30, 900) + 273.15;
+            tSlider.value = String(gvs.T - 273.15);
+            tValue.innerHTML = Number(Number(tSlider.value).toFixed(0));
             gvs.H = function(T, X) {
                 const H0 = gvs.chemicals.hydrogen.enthalpy(T) + gvs.chemicals.acetylene.enthalpy(T);
                 const H1 = gvs.chemicals.ethylene.enthalpy(T);
@@ -96,8 +99,8 @@ function changeReaction(rxn) {
             tSlider.setAttribute("max", "200");
             tSlider.setAttribute("step", "1");
 
-            gvs.T = Math.min( gvs.T, 473.15 );
-            tSlider.value = `${gvs.T - 273.15}`;
+            gvs.T = gvs.p.constrain(gvs.T - 273.15, 25, 200) + 273.15;
+            tSlider.value = String(gvs.T - 273.15);
             tValue.innerHTML = Number(Number(tSlider.value).toFixed(0));
 
             gvs.H = function(T, X) {
@@ -110,7 +113,27 @@ function changeReaction(rxn) {
         break;
         
         case "3":
+            gvs.reaction = "carbon monoxide oxidation";
 
+            gvs.xRange = [-450, 300];
+            gvs.yRange = [0, 5700];
+
+            tSlider.setAttribute("min", "30");
+            tSlider.setAttribute("max", "5500");
+            tSlider.setAttribute("step", "10");
+
+            gvs.T = gvs.p.constrain(gvs.T - 273.15, 30, 5500) + 273.15;
+            
+            tSlider.value = String(gvs.T - 273.15);
+            tValue.innerHTML = Number(Number(tSlider.value).toFixed(0));
+
+            gvs.H = function(T, X) {
+                const H0 = gvs.chemicals.carbonmonoxide.enthalpy(T) + 0.5 * gvs.chemicals.oxygen.enthalpy(T);
+                const H1 = gvs.chemicals.carbondioxide.enthalpy(T);
+                return H0 + X * (H1 - H0);
+            }
+            gvs.Hrxn = gvs.H(gvs.T, 1) - gvs.H(gvs.T, 0);
+            reactionContainer.innerHTML = `\\( \\mathrm{ C O + \\frac{1}{2} \\; O_{2} \\longrightarrow CO_{2} } \\)`;
         break;
     };
     window.MathJax.typeset();
