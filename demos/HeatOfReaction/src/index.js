@@ -49,6 +49,7 @@ const xSlider = document.getElementById("x-slider");
 const tValue = document.getElementById("t-value");
 const xValue = document.getElementById("x-value");
 const selectReaction = document.getElementById("select-reaction");
+const reactionContainer = document.getElementById("reaction-container");
 
 tSlider.addEventListener("input", () => {
     gvs.T = Number(Number(tSlider.value).toFixed(0)) + 273.15;
@@ -64,7 +65,7 @@ xSlider.addEventListener("input", () => {
 
 selectReaction.addEventListener("change", () => {
     changeReaction(selectReaction.value);
-    gvs.p.redraw();
+    P5.redraw();
 });
 
 function changeReaction(rxn) {
@@ -82,14 +83,35 @@ function changeReaction(rxn) {
                 return H0 + X * (H1 - H0);
             }
             gvs.Hrxn = gvs.H(gvs.T, 1) - gvs.H(gvs.T, 0);
+            reactionContainer.innerHTML = `\\( \\mathrm{ C_{2} H_{2} + H_{2} \\longrightarrow C_{2} H_{4} } \\)`;
         break;
 
         case "2":
+            gvs.reaction = "methane combustion";
 
+            gvs.xRange = [-1200, 200];
+            gvs.yRange = [0, 220];
+
+            tSlider.setAttribute("min", "25");
+            tSlider.setAttribute("max", "200");
+            tSlider.setAttribute("step", "1");
+
+            gvs.T = Math.min( gvs.T, 473.15 );
+            tSlider.value = `${gvs.T - 273.15}`;
+            tValue.innerHTML = Number(Number(tSlider.value).toFixed(0));
+
+            gvs.H = function(T, X) {
+                const H0 = gvs.chemicals.methane.enthalpy(T) + 2 * gvs.chemicals.oxygen.enthalpy(T);
+                const H1 = gvs.chemicals.carbondioxide.enthalpy(T) + 2 * gvs.chemicals.water.enthalpy(T);
+                return H0 + X * (H1 - H0);
+            }
+            gvs.Hrxn = gvs.H(gvs.T, 1) - gvs.H(gvs.T, 0);
+            reactionContainer.innerHTML = `\\( \\mathrm{ C_{2} H_{4} + 2 \\; O_{2} \\longrightarrow CO_{2} + 2 \\; H_{2} O } \\)`;
         break;
         
         case "3":
 
         break;
     };
+    window.MathJax.typeset();
 }

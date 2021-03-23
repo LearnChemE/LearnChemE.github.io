@@ -12,14 +12,21 @@ function drawAxes() {
             incX = 20;
             incY = 40;
         break;
-        
+        case "methane combustion":
+            incX = 60;
+            incY = 10;
+        break;
     }
 
     p.push();
 
         // Draw x-axis
         p.line(gPix[0][0], gPix[1][1], gPix[0][1], gPix[1][1]);
+
         let i = 0;
+        let yPix = gPix[1][1];
+        let offsetY = p.textWidth("X") * 2;
+
         for ( let x = xMin; x <= xMax; x += incX ) {
             let tickSize;
             if ( i % 5 === 0 ) {
@@ -27,30 +34,25 @@ function drawAxes() {
             } else {
                 tickSize = 3;
             }
-
+            
             p.noFill();
             p.stroke(0);
             p.strokeWeight(0.5);
 
             const xPix = gPix[0][0] + (( x - xMin ) / ( xMax - xMin )) * ( gPix[0][1] - gPix[0][0] );
-            const yPix = gPix[1][1];
             
             if ( x !== xMin ) { p.line(xPix, yPix, xPix, yPix - tickSize) };
-            p.noStroke();
-            p.fill(0);
-
-            p.textSize(14);
-            const offsetX = p.textWidth(`${x}`) / 2;
-            const offsetY = p.textWidth("X") * 2;
 
             if ( i % 5 === 0 ) {
+                p.noStroke();
+                p.fill(0);
+                p.textSize(14);
+                const offsetX = p.textWidth(`${x}`) / 2;
                 p.text(`${x}`, xPix - offsetX, yPix + offsetY);
             }
 
             i++;
         };
-
-
 
         p.noFill();
         p.stroke(0);
@@ -59,6 +61,9 @@ function drawAxes() {
         // Draw y-axis
         p.line(gPix[0][0], gPix[1][0], gPix[0][0], gPix[1][1]);
         i = 0;
+        let xPix = gPix[0][0];
+        offsetY = p.textAscent() / 2;
+
         for ( let y = yMin; y <= yMax; y += incY ) {
             let tickSize;
             if ( i % 5 === 0 ) {
@@ -70,29 +75,26 @@ function drawAxes() {
             p.stroke(0);
             p.strokeWeight(0.5);
 
-            const xPix = gPix[0][0];
             const yPix = gPix[1][1] - (( y - yMin ) / ( yMax - yMin )) * ( gPix[1][1] - gPix[1][0] );
 
             if ( i !== 0 ) { p.line(xPix, yPix, xPix + tickSize, yPix) };
-            p.noStroke();
-            p.fill(0);
-
-            p.textSize(14);
-            const offsetX = p.textWidth(`${y}`) + 10;
-            const offsetY = p.textAscent() / 2;
-
+  
             if ( i % 5 === 0 && i !== 0 ) {
+                p.noStroke();
+                p.fill(0);
+                p.textSize(14);
+                const offsetX = p.textWidth(`${y}`) + 10;
                 p.text(`${y}`, xPix - offsetX, yPix + offsetY);
             }
             i++;
         };
 
-        p.textSize(14);
-
-        p.text("enthalpy (kJ/mol)", (gPix[0][1] - gPix[0][0] + margins[0][0]) / 2, gPix[1][1] + 2 * margins[1][1] / 3);
+        p.noStroke();
+        p.fill(0);
 
         p.textAlign(p.CENTER, p.BOTTOM);
-
+        
+        p.text("standard enthalpy H° (kJ/mol)", (gPix[0][1] - gPix[0][0] + margins[0][0]) / 2 + 50, gPix[1][1] + 3 * margins[1][1] / 4);
         p.text("temperature (°C)", gPix[0][0] - 10, gPix[1][0] - 20);
 
     p.pop();
@@ -106,7 +108,8 @@ function drawH0() {
         p.beginShape();
             let Tinc = ( yMax - yMin ) / 100;
             let H = 0;
-            for ( let TC = 25; TC < yMax - Tinc && H < xMax ; TC += Tinc ) {
+            const Tstart = gvs.reaction === "acetylene hydrogenation" ? 25 : gvs.reaction === "methane combustion" ? 25 : 25;
+            for ( let TC = Tstart; TC < yMax - Tinc && H < xMax ; TC += Tinc ) {
                 const T = 273.15 + TC;
                 H = gvs.H(T, 0);
                 const xPix = gPix[0][0] + (( H - xMin ) / ( xMax - xMin )) * ( gPix[0][1] - gPix[0][0] );
@@ -124,8 +127,9 @@ function drawH1() {
         // Draw line for X = 1
         p.beginShape();
             Tinc = ( yMax - yMin ) / 100;
-            H = 0;
-            for ( let TC = 25; TC < yMax - Tinc && H < xMax ; TC += Tinc ) {
+            let H = 0;
+            const Tstart = gvs.reaction === "acetylene hydrogenation" ? 25 : gvs.reaction === "methane combustion" ? 25 : 25;
+            for ( let TC = Tstart; TC < yMax - Tinc && H < xMax ; TC += Tinc ) {
                 const T = 273.15 + TC;
                 H = gvs.H(T, 1);
                 const xPix = gPix[0][0] + (( H - xMin ) / ( xMax - xMin )) * ( gPix[0][1] - gPix[0][0] );
@@ -180,7 +184,7 @@ function drawProductLabel() {
         p.translate(xPix, yPix);
         p.textSize(18);
         p.textAlign(p.CENTER, p.CENTER);
-        const offset = p.textWidth("products") - 10;
+        const offset = gvs.reaction !== "methane combustion" ? p.textWidth("products") - 10 : p.textWidth("products") - 25;
         if ( gvs.Hrxn < 0 ) {
             p.text("products", -offset, 0);
         } else {
