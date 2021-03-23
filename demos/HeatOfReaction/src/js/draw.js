@@ -20,6 +20,10 @@ function drawAxes() {
             incX = 30;
             incY = 160;
         break;
+        case "haber bosch process":
+            incX = 15;
+            incY = 80;
+        break;
     }
 
     p.push();

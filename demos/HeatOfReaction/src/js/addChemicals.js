@@ -322,3 +322,86 @@ window.gvs.chemicals.carbonmonoxide = {
         return this.A(T)*(t) + this.B(T)*(t**2) / 2 + this.C(T)*(t**3) / 3 + this.D(T)*(t**4) / 4 - this.E(T) / t + this.F(T);
     },
 };
+
+window.gvs.chemicals.nitrogen = {
+    A : function(T) { 
+        if( T < 500 ) { return 28.98641 }
+        if( T < 2000 ) { return 19.50583 }
+        if( T <= 6000 ) { return 35.51872 }
+    },
+    B: function(T) { 
+        if( T < 500 ) { return 1.853978 }
+        if( T < 2000 ) { return 19.88705 }
+        if( T <= 6000 ) { return 1.128728 }
+    },
+    C: function(T) { 
+        if( T < 500 ) { return -9.647459 }
+        if( T < 2000 ) { return -8.598535 }
+        if( T <= 6000 ) { return -0.196103 }
+    },
+    D: function(T) { 
+        if( T < 500 ) { return 16.63537 }
+        if( T < 2000 ) { return 1.369784 }
+        if( T <= 6000 ) { return 0.014662 }
+    },
+    E: function(T) { 
+        if( T < 500 ) { return 0.000117 }
+        if( T < 2000 ) { return 0.527601 }
+        if( T <= 6000 ) { return -4.553760 }
+    },
+    F: function(T) { 
+        if( T < 500 ) { return -8.671914 }
+        if( T < 2000 ) { return -4.935202 }
+        if( T <= 6000 ) { return -18.97091 }
+    },
+    H: function(T) { 
+        if( T < 500 ) { return 0 }
+        if( T < 2000 ) { return 0 }
+        if( T <= 6000 ) { return 0 }
+    },
+    enthalpy: function(T) {
+        if( typeof(T) !== "number" ) { throw "invalid temperature specified for nitrogen" };
+        if( T < 298 ) { throw "Nitrogen temperature below valid range" };
+        if( T > 6000 ) { throw "Nitrogen temperature above valid range" };
+        const t = T / 1000;
+        return this.A(T)*(t) + this.B(T)*(t**2) / 2 + this.C(T)*(t**3) / 3 + this.D(T)*(t**4) / 4 - this.E(T) / t + this.F(T);
+    },
+};
+
+window.gvs.chemicals.ammonia = {
+    A : function(T) { 
+        if( T < 1400 ) { return 19.99563 }
+        if( T <= 6000 ) { return 52.02427 }
+    },
+    B: function(T) { 
+        if( T < 1400 ) { return 49.77119 }
+        if( T <= 6000 ) { return 18.48801 }
+    },
+    C: function(T) { 
+        if( T < 1400 ) { return -15.37599 }
+        if( T <= 6000 ) { return -3.765128 }
+    },
+    D: function(T) { 
+        if( T < 1400 ) { return 1.921168 }
+        if( T <= 6000 ) { return 0.248541 }
+    },
+    E: function(T) { 
+        if( T < 1400 ) { return 0.189174 }
+        if( T <= 6000 ) { return -12.45799 }
+    },
+    F: function(T) { 
+        if( T < 1400 ) { return -53.30667 }
+        if( T <= 6000 ) { return -85.53895 }
+    },
+    H: function(T) { 
+        if( T < 1400 ) { return -45.89806 }
+        if( T <= 6000 ) { return -45.89806 }
+    },
+    enthalpy: function(T) {
+        if( typeof(T) !== "number" ) { throw "invalid temperature specified for ammonia" };
+        if( T < 298 ) { throw "Ammonia temperature below valid range" };
+        if( T > 6000 ) { throw "Ammonia temperature above valid range" };
+        const t = T / 1000;
+        return this.A(T)*(t) + this.B(T)*(t**2) / 2 + this.C(T)*(t**3) / 3 + this.D(T)*(t**4) / 4 - this.E(T) / t + this.F(T);
+    },
+};
