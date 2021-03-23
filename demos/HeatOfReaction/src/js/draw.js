@@ -62,7 +62,7 @@ function drawAxes() {
         p.line(gPix[0][0], gPix[1][0], gPix[0][0], gPix[1][1]);
         i = 0;
         let xPix = gPix[0][0];
-        offsetY = p.textAscent() / 2;
+        offsetY = 6;
 
         for ( let y = yMin; y <= yMax; y += incY ) {
             let tickSize;
