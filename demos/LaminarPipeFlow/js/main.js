@@ -1,7 +1,7 @@
 let cnv;
 let pressureGradient = 0.65;
-let radius = 0.025;
-let mu = 0.00112;
+let radius = 0.025; // m
+let mu = 0.00112; //
 let oneMeter = 6000; //pix
 let averageVelocity = 0;
 let Q = 0;
@@ -13,13 +13,13 @@ const coords = {
   bottomPlateY: 350, // -0.025
 }
 
-vRadius = document.getElementById("radius-slider");
-vPressureGradient = document.getElementById("dpdz-slider");
-vMu = document.getElementById("viscosity-slider");
+const vRadius = document.getElementById("radius-slider");
+const vPressureGradient = document.getElementById("dpdz-slider");
+const vMu = document.getElementById("viscosity-slider");
 
 [vRadius,vPressureGradient,vMu].forEach(inp => {
   inp.addEventListener("input",()=>{
-    try { update() } catch(e) {}
+    try { update() } catch(e) { console.log(e) }
   })
 })
 
@@ -49,17 +49,19 @@ function formatNumber(num) {
 
 function update()
 {
-  radius = vRadius.value;
-  pressureGradient = vPressureGradient.value;
-  mu = Math.exp(vMu.value);
+  radius = Number(vRadius.value);
+  pressureGradient = Number(vPressureGradient.value);
+  mu = Math.exp(Number(vMu.value));
+
   updatePressureSlider();
-  document.getElementById("radius-value").innerHTML = Number(radius*100).toFixed(1);
+
+  document.getElementById("radius-value").innerHTML = (radius*100).toFixed(1);
   document.getElementById("viscosity-value").innerHTML = formatNumber(mu);
   coords.topPlateY = 200 - radius * oneMeter - 10;
   coords.bottomPlateY = 200 + radius * oneMeter;
   redraw();
 
-  document.getElementById("Qdata").innerHTML = formatNumber(Q*1000000);
+  document.getElementById("Qdata").innerHTML = formatNumber(Q*(100**3));
   document.getElementById("averageVelocity-data").innerHTML = formatNumber(averageVelocity*100);
   document.getElementById("maxVelocity-data").innerHTML = formatNumber(velocityProfile(0, pressureGradient, mu)*100);
   document.getElementById("Re-data").innerHTML = formatNumber(reynolds());
@@ -71,32 +73,49 @@ function update()
 function updatePressureSlider()
 {
   //calculate max pressure
-  maxAveV = 2100*mu/(50); //radius*2*1000
-  maxQ = maxAveV*2.5**2*pi;
-  maxP = maxQ*mu*128/3.1415926/625;
-  console.log(maxP);
-  
+  // let maxAveV = 2100*mu/(50); //radius*2*1000
+  // let maxQ = maxAveV*2.5**2*pi;
+  // let maxP = maxQ*mu*128/3.1415926/625;
+
+  // const pi = 3.1415926;
+  // const Q = pi * p*(2*r)**4/m/128;
+  // const averageVelocity = Q/r**2/pi;
+  // return averageVelocity;
+  // p = (Q * m * 128) / (pi * (2*r)**4 )
+
+  const maxRadius = 0.025;
+  const maxReynolds = 2100; // Re = rho*v*D/mu -> Re * mu / (Rho * D)
+  const reynoldsLimited = maxReynolds * mu / (1000 * 2 * maxRadius);
+  const maxAveV = 0.06 < reynoldsLimited ? 0.06 : reynoldsLimited;
+  // const vel = velocityProfile(0, pressureGradient, mu);
+  const maxQ = Math.PI * ( maxRadius**2 ) * maxAveV; // Q == pi*(r**2)*V
+  const maxP = (maxQ * mu * 128) / ( Math.PI * ((maxRadius*2)**4 )); //
+  // console.log(pressureGradient);
+
   if(pressureGradient>maxP)
   {
     pressureGradient = maxP;
-    vPressureGradient.value = maxp;
-    vPressureGradient.setAttribute("max",maxP);
-    document.getElementById("dpdz-value").innerHTML = Number(pressureGradient*-1).toFixed(2);
-    return;
+    vPressureGradient.value = String( maxP );
+    vPressureGradient.setAttribute("max", String(maxP));
   }
-  if(pressureGradient<=maxP)
+  else if(pressureGradient<=maxP)
   {
-    vPressureGradient.setAttribute("max",maxP);
-    document.getElementById("dpdz-value").innerHTML = Number(pressureGradient*-1).toFixed(2);
-    return;
+    if( pressureGradient < -maxP ) {
+      pressureGradient = -1 * maxP;
+      vPressureGradient.value = String( -1 * maxP );
+      vPressureGradient.setAttribute("min", String(-1 * maxP));
+    }
+    vPressureGradient.setAttribute("max", String(maxP));
   }
+  
+  document.getElementById("dpdz-value").innerHTML = Number(pressureGradient*-1).toFixed(2);
   
 
 }
 
 function reynolds()
 {
-  reynoldNumber = radius*2*1000*averageVelocity/mu;
+  const reynoldNumber = radius*2*1000*averageVelocity/mu;
   return reynoldNumber;
 }
 
@@ -152,13 +171,6 @@ function drawAxes() {
   pop();
 }
 
-// Write this to convert from coordinate plane to pixel location
-function coordinateToPixel(x, y) {
-  let pixels = [x, y];
-
-  return pixels;
-}
-
 function velocityProfile(r,p,m)
 {
   //pix to r
@@ -189,17 +201,17 @@ function drawContour() {
 
 function averageV(r,p,m)
 {
-  pi = 3.1415926;
-  Q = pi * p*(2*r)**4/m/128;
-  averageVelocity = Q/r**2/pi;
+
+  Q = Math.PI * p*(2*r)**4/m/128;
+  averageVelocity = Q/r**2/Math.PI;
   return averageVelocity;
 
 }
 
 function drawAverage()
 {
-  v = averageV(radius,pressureGradient,mu);
-  u_pix = v*oneMeter/2;
+  const v = averageV(radius,pressureGradient,mu);
+  const u_pix = v*oneMeter/2;
   push();
     noStroke();
     fill(255, 200,200);
