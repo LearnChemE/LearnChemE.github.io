@@ -46,22 +46,22 @@
 
     <div class="input-row">
       <div class="data-name">Pressure gradient \( \Large{\frac{ dp }{ dz }} \)</div>
-      <input type="range" id="dpdz-slider" min="-0.2" max="1" step="0.01" value="0.5">
-      <div class="data-value" id="dpdz-value">-0.5</div>
+      <input type="range" id="dpdz-slider" min="-0.2" max="0.65" step="0.01" value="0.65">
+      <div class="data-value" id="dpdz-value">-0.65</div>
       <div class="data-metric">Pa/m</div>
     </div>
 
     <div class="input-row">
       <div class="data-name">Pipe radius \( r \)</div>
-      <input type="range" id="radius-slider" min="0.005" max="0.05" step="0.001" value="0.05">
-      <div class="data-value" id="radius-value">5</div>
+      <input type="range" id="radius-slider" min="0.005" max="0.025" step="0.0005" value="0.025">
+      <div class="data-value" id="radius-value">2.5</div>
       <div class="data-metric">cm</div>
     </div>
 
     <div class="input-row">
       <div class="data-name">Dynamic viscosity \( \mu \)</div> 
       <!-- min 0.001 max 1  -->
-      <input type="range" id="viscosity-slider" min="-6.7944266" max="0" step="0.01" value="-6.7944266">
+      <input type="range" id="viscosity-slider" min="-6.7944266" max="0" step="0.1" value="-6.7944266">
       <div class="data-value" id="viscosity-value">0.0011</div>
       <div class="data-metric">Pa&middot;s</div>
     </div>
@@ -71,25 +71,25 @@
     <div class = "output-area">
       <div class = "physical-data">
         <div>Volumetric flow rate</div> <div>=</div>
-        <div id = "Qdata"> 0.0011 </div>
-        <div>m<sup>3</sup>/s</div>
+        <div id = "Qdata"> 89 </div>
+        <div>cm<sup>3</sup>/s</div>
       </div>
 
       <div class = "physical-data">
         <div>Average velocity</div> <div>=</div>
-        <div id = "averageVelocity-data"> 0.1395 </div>
-        <div>m/s</div>
+        <div id = "averageVelocity-data"> 4.5 </div>
+        <div>cm/s</div>
       </div>
 
       <div class = "physical-data">
         <div>Maximum velocity</div> <div>=</div>
-        <div id = "maxVelocity-data"> 0.2790 </div>
-        <div>m/s</div>
+        <div id = "maxVelocity-data"> 9.1 </div>
+        <div>cm/s</div>
       </div>
 
       <div class = "physical-data">
         <div>Reynold's number</div><div>=</div>
-        <div id = "Re-data"> 12456 </div>
+        <div id = "Re-data"> 2024 </div>
         <div></div>
       </div>
     </div>
