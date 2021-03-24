@@ -1,16 +1,14 @@
 let cnv;
-let pressureGradient = 0.65;
-let radius = 0.025;
+let pressureGradient = 0.5;
+let radius = 0.05;
 let mu = 0.00112;
-let oneMeter = 6000; //pix
+let oneMeter = 3000;
 let averageVelocity = 0;
 let Q = 0;
 let u_pix = 0;
-let reynoldNumber = 2024;
-
 const coords = {
-  topPlateY: 40,// +0.025
-  bottomPlateY: 350, // -0.025
+  topPlateY: 40,// 1m
+  bottomPlateY: 350, // 1m
 }
 
 vRadius = document.getElementById("radius-slider");
@@ -52,52 +50,25 @@ function update()
   radius = vRadius.value;
   pressureGradient = vPressureGradient.value;
   mu = Math.exp(vMu.value);
-  updatePressureSlider();
+  document.getElementById("dpdz-value").innerHTML = Number(pressureGradient*-1).toFixed(2);
   document.getElementById("radius-value").innerHTML = Number(radius*100).toFixed(1);
   document.getElementById("viscosity-value").innerHTML = formatNumber(mu);
-  coords.topPlateY = 200 - radius * oneMeter - 10;
-  coords.bottomPlateY = 200 + radius * oneMeter;
+  coords.topPlateY = 200 - radius * 3000 - 10;
+  coords.bottomPlateY = 200 + radius * 3000;
   redraw();
 
-  document.getElementById("Qdata").innerHTML = formatNumber(Q*1000000);
-  document.getElementById("averageVelocity-data").innerHTML = formatNumber(averageVelocity*100);
-  document.getElementById("maxVelocity-data").innerHTML = formatNumber(velocityProfile(0, pressureGradient, mu)*100);
+  document.getElementById("Qdata").innerHTML = formatNumber(Q);
+  document.getElementById("averageVelocity-data").innerHTML = formatNumber(averageVelocity);
+  document.getElementById("maxVelocity-data").innerHTML = formatNumber(velocityProfile(0));
   document.getElementById("Re-data").innerHTML = formatNumber(reynolds());
 
 
   
 }
 
-function updatePressureSlider()
-{
-  //calculate max pressure
-  maxAveV = 2100*mu/(50); //radius*2*1000
-  maxQ = maxAveV*2.5**2*pi;
-  maxP = maxQ*mu*128/3.1415926/625;
-  console.log(maxP);
-  
-  if(pressureGradient>maxP)
-  {
-    pressureGradient = maxP;
-    vPressureGradient.value = maxp;
-    vPressureGradient.setAttribute("max",maxP);
-    document.getElementById("dpdz-value").innerHTML = Number(pressureGradient*-1).toFixed(2);
-    return;
-  }
-  if(pressureGradient<=maxP)
-  {
-    vPressureGradient.setAttribute("max",maxP);
-    document.getElementById("dpdz-value").innerHTML = Number(pressureGradient*-1).toFixed(2);
-    return;
-  }
-  
-
-}
-
 function reynolds()
 {
-  reynoldNumber = radius*2*1000*averageVelocity/mu;
-  return reynoldNumber;
+  return radius*2*1000*averageVelocity/mu;
 }
 
 function setup() {
@@ -126,28 +97,28 @@ function drawAxes() {
   push();
     line(100,25,100,375);
     line(30,200,470,200);
-    for(j = 0.01; j <= 0.12; j= j+0.01)
+    for(j = 0.1; j <= 0.6; j= j+0.1)
     {
-      x_pix = j*oneMeter/2+100;
+      x_pix = j*oneMeter/5+100;
       line(x_pix, 197, x_pix,200);
-      text((j*100).toFixed(0),x_pix-15,212);
+      text(j.toFixed(1),x_pix-15,212);
     }
 
-    for(j = -0.25; j <= 0.25; j= j+0.05)
+    for(j = -0.5; j <= 0.5; j= j+0.1)
     {
-      y_pix = 200-j*(oneMeter/10); //200 center line, 
+      y_pix = 200-j*300;
       line(100, y_pix, 103, y_pix);
       if(j < 0)
-        text((j*10).toFixed(1), 75,y_pix-2);
+        text((j*10).toFixed(0), 85,y_pix-2);
       else
-        text((j*10).toFixed(1), 80,y_pix-2);
+        text((j*10).toFixed(0), 90,y_pix-2);
     }
 
     fill(0,0,0)
     //triangle(97, 25, 103,25, 100, 15);
     triangle(470, 197, 470, 203, 480, 200);
     text('r (cm)', 60, 25);
-    text('u (cm/s)', 455, 225);
+    text('u (m/s)', 460, 220);
 
   pop();
 }
@@ -159,11 +130,11 @@ function coordinateToPixel(x, y) {
   return pixels;
 }
 
-function velocityProfile(r,p,m)
+function velocityProfile(r)
 {
   //pix to r
   
-  u = radius**2/(4*m)*p*(1-r**2/radius**2);
+  u = radius**2/(4*mu)*pressureGradient*(1-r**2/radius**2);
   
 
   //u_pix = (rp-200)**2/100 + 100
@@ -179,27 +150,27 @@ function drawContour() {
       for(i = coords.topPlateY+10; i < coords.bottomPlateY+1; i++)
       {
         r = (i - 200)/oneMeter;
-        u = velocityProfile(r,pressureGradient,mu);
-        u_pix = u*oneMeter/2+100;
+        u = velocityProfile(r);
+        u_pix = u*oneMeter/5+100;
         vertex(u_pix, i);
       }
     endShape();
   pop();
 }
 
-function averageV(r,p,m)
+function averageV()
 {
   pi = 3.1415926;
-  Q = pi * p*(2*r)**4/m/128;
-  averageVelocity = Q/r**2/pi;
+  Q = pi * pressureGradient*(2*radius)**4/mu/128;
+  averageVelocity = Q/radius**2/pi;
   return averageVelocity;
 
 }
 
 function drawAverage()
 {
-  v = averageV(radius,pressureGradient,mu);
-  u_pix = v*oneMeter/2;
+  v = averageV();
+  u_pix = v*oneMeter/5;
   push();
     noStroke();
     fill(255, 200,200);
