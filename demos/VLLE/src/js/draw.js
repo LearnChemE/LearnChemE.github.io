@@ -207,6 +207,8 @@ function drawAll() {
   drawVapor();
   drawLines();
   drawAxes();
+  p.strokeWeight( 8 );
+  p.point(coordToPixel( gvs.z, gvs.T )[0], coordToPixel( gvs.z, gvs.T )[1]);
 };
 
 module.exports = { drawAll };

@@ -5,7 +5,9 @@ window.p5 = new require("./js/p5.min.js");
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
-
+    Tinit : 70,
+    z : Number(document.getElementById("z-slider").value),
+    heat : Number(document.getElementById("heat-slider").value),
 };
 
 // JavaScript modules from /js/ folder
@@ -47,8 +49,8 @@ zSlider.addEventListener("input", () => {
 });
 
 heatSlider.addEventListener("input", () => {
-    gvs.H = Number(Number(heatSlider.value).toFixed(1));
-    heatValue.innerHTML = Number(gvs.H).toFixed(1);
+    gvs.heat = Number(Number(heatSlider.value).toFixed(1));
+    heatValue.innerHTML = Number(gvs.heat).toFixed(1);
     P5.redraw();
 });
 
