@@ -556,7 +556,7 @@ function drawBarGraphAxes() {
 
     p.fill(0);
     p.noStroke();
-    p.text(`${gvs.data[5] == -1 ? "" : "y   = " + Number(gvs.data[5]).toFixed(2)}`, topCenter[0], topCenter[1] - 5);
+    p.text(`${gvs.data[5] == -1 ? "" : "x   = " + Number(gvs.data[5]).toFixed(2)}`, topCenter[0], topCenter[1] - 5);
     p.textSize(11);
     p.text(`${gvs.data[5] == -1 ? "" : "β"}`, topCenter[0] - 16.5, topCenter[1]);
 
