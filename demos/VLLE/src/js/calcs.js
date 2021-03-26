@@ -7,6 +7,8 @@ const cpvB = 0.3;
 const HvA = 12;
 const HvB = 12;
 
+const findRootPrecision = 0.005;
+
 // middle horizontal line
 function f1(z) { return 77.3; };
 
@@ -56,7 +58,7 @@ function heat2sol( H ) {
 };
 
 function heat3sol( H ) {
-  const complex = math.evaluate(`0.000019739 * ( 40789. + 2.8284 * sqrt( 4.6336*10^6 - (2.1109 * 10^6) * ${H} ) )`);
+  const complex = math.evaluate(`0.000019739 * ( 40789. + 2.8284 * sqrt( 4.6336*10^6 - ( 2.1109 * 10^6 ) * ${H} ) )`);
   if ( typeof( complex ) === "object" ) { return complex.re }
   return complex;
 };
@@ -64,7 +66,7 @@ function heat3sol( H ) {
 function heat4asol( H, z ) {
   let min = 1000;
   let j;
-  for ( let i = 0; i < 0.276; i += 0.001 ) {
+  for ( let i = 0; i < 0.276; i += findRootPrecision ) {
     const lhs = alphaVLEa( z, H, f4(z) );
     const rhs = f4( i );
     const diff = Math.abs( Math.abs(lhs) - Math.abs(rhs) );
@@ -76,7 +78,7 @@ function heat4asol( H, z ) {
 function heat4bsol( H, z ) {
   let min = 1000;
   let j;
-  for ( let i = 0; i < 0.276; i += 0.001 ) {
+  for ( let i = 0; i < 0.276; i += findRootPrecision ) {
     const lhs = alphaVLEb( z, H, 77.3 );
     const rhs = f4( i );
     const diff = Math.abs( Math.abs(lhs) - Math.abs(rhs) );
@@ -88,7 +90,7 @@ function heat4bsol( H, z ) {
 function heat5asol( H, z ) {
   let min = 1000;
   let j;
-  for ( let i = 0; i < 0.6; i += 0.001 ) {
+  for ( let i = 0; i < 0.6; i += findRootPrecision ) {
     const lhs = alphaVLEa( z, H, f4(z) );
     const rhs = f5( i );
     const diff = Math.abs( Math.abs(lhs) - Math.abs(rhs) );
@@ -100,7 +102,7 @@ function heat5asol( H, z ) {
 function heat5bsol( H, z ) {
   let min = 1000;
   let j;
-  for ( let i = 0; i < 0.6; i += 0.001 ) {
+  for ( let i = 0; i < 0.6; i += findRootPrecision ) {
     const lhs = alphaVLEb( z, H, 77.3 );
     const rhs = f5( i );
     const diff = Math.abs( Math.abs(lhs) - Math.abs(rhs) );
@@ -112,7 +114,7 @@ function heat5bsol( H, z ) {
 function heat6asol( H, z ) {
   let min = 1000;
   let j;
-  for ( let i = 0.6; i < 1; i += 0.001 ) {
+  for ( let i = 0.6; i < 1; i += findRootPrecision ) {
     const lhs = betaVLEa( z, H, 77.3 );
     const rhs = f6( i );
     const diff = Math.abs( Math.abs(lhs) - Math.abs(rhs) );
@@ -124,7 +126,7 @@ function heat6asol( H, z ) {
 function heat6bsol( H, z ) {
   let min = 1000;
   let j;
-  for ( let i = 0.6; i < 1; i += 0.001 ) {
+  for ( let i = 0.6; i < 1; i += findRootPrecision ) {
     const lhs = betaVLEb( z, H, f7(z) );
     const rhs = f6( i );
     const diff = Math.abs( Math.abs(lhs) - Math.abs(rhs) );
@@ -136,7 +138,7 @@ function heat6bsol( H, z ) {
 function heat7asol( H, z ) {
   let min = 1000;
   let j;
-  for ( let i = 0.81; i < 1; i += 0.001 ) {
+  for ( let i = 0.81; i < 1; i += findRootPrecision ) {
     const lhs = betaVLEa( z, H, 77.3 );
     const rhs = f7( i );
     const diff = Math.abs( Math.abs(lhs) - Math.abs(rhs) );
@@ -148,7 +150,7 @@ function heat7asol( H, z ) {
 function heat7bsol( H, z ) {
   let min = 1000;
   let j;
-  for ( let i = 0.81; i < 1; i += 0.001 ) {
+  for ( let i = 0.81; i < 1; i += findRootPrecision ) {
     const lhs = betaVLEa( z, H, f7(z) );
     const rhs = f7( i );
     const diff = Math.abs( Math.abs(lhs) - Math.abs(rhs) );
@@ -178,13 +180,13 @@ function section() {
 function data() {
   switch( section() ) {
     case 1:
-      return [ 70 + gvs.heat / ( gvs.z * cplB + ( 1 - gvs.z ) * cplA ), 1, 0, 0, gvs.z, -1, -1 ];
+      return [ gvs.Tinit + gvs.heat / ( gvs.z * cplB + ( 1 - gvs.z ) * cplA ), 1, 0, 0, gvs.z, -1, -1 ];
     case 2:
-      return [ 70 + gvs.heat / ( gvs.z * cplB + ( 1 - gvs.z ) * cplA ), ( heat3sol( gvs.heat ) - gvs.z ) / ( heat3sol( gvs.heat ) - heat2sol( gvs.heat ) ), ( gvs.z - heat2sol( gvs.heat ) ) / ( heat3sol( gvs.heat ) - heat2sol( gvs.heat ) ), 0, heat2sol( gvs.heat ), heat3sol( gvs.heat ), -1 ];
+      return [ gvs.Tinit + gvs.heat / ( gvs.z * cplB + ( 1 - gvs.z ) * cplA ), ( heat3sol( gvs.heat ) - gvs.z ) / ( heat3sol( gvs.heat ) - heat2sol( gvs.heat ) ), ( gvs.z - heat2sol( gvs.heat ) ) / ( heat3sol( gvs.heat ) - heat2sol( gvs.heat ) ), 0, heat2sol( gvs.heat ), heat3sol( gvs.heat ), -1 ];
     case 3:
-      return [ 70 + gvs.heat / ( gvs.z * cplB + ( 1 - gvs.z ) * cplA ), ( heat3sol( gvs.heat ) - gvs.z ) / ( heat3sol( gvs.heat ) - heat2sol( gvs.heat ) ), ( gvs.z - heat2sol( gvs.heat ) ) / ( heat3sol( gvs.heat ) - heat2sol( gvs.heat ) ), 0, heat2sol( gvs.heat ), heat3sol( gvs.heat ), -1 ];
+      return [ gvs.Tinit + gvs.heat / ( gvs.z * cplB + ( 1 - gvs.z ) * cplA ), ( heat3sol( gvs.heat ) - gvs.z ) / ( heat3sol( gvs.heat ) - heat2sol( gvs.heat ) ), ( gvs.z - heat2sol( gvs.heat ) ) / ( heat3sol( gvs.heat ) - heat2sol( gvs.heat ) ), 0, heat2sol( gvs.heat ), heat3sol( gvs.heat ), -1 ];
     case 4:
-      return [ 70 + gvs.heat / ( gvs.z * cplB + ( 1 - gvs.z ) * cplA ), 0, 1, 0, -1, gvs.z, -1 ];
+      return [ gvs.Tinit + gvs.heat / ( gvs.z * cplB + ( 1 - gvs.z ) * cplA ), 0, 1, 0, -1, gvs.z, -1 ];
     case 5:
       return [ 77.3, ( 0.6000 - gvs.z ) / 0.3240 + ( heat1alpha( gvs.z ) - gvs.heat ) / ( heat1alpha( gvs.z ) - heat1liquid( gvs.z ) ) * ( ( 0.8110 - gvs.z ) / 0.5340 - ( 0.6000 - gvs.z ) / 0.3240 ), ( gvs.z - 0.2760 ) / 0.5340 * ( heat1alpha( gvs.z ) - gvs.heat ) / ( heat1alpha( gvs.z ) - heat1liquid( gvs.z ) ), ( gvs.z - 0.2760 ) / 0.3240 * ( 1 - ( heat1alpha( gvs.z ) - gvs.heat ) / ( heat1alpha( gvs.z ) - heat1liquid( gvs.z ) ) ), 0.2760, 0.8110, 0.6000 ];
     case 6:
@@ -209,7 +211,8 @@ function data() {
 };
 
 function calcAll() {
-  gvs.T = data()[0];
+  gvs.data = data();
+  gvs.T = gvs.data[0];
 };
 
-module.exports = { cplA, cplB, cpvA, cpvB, HvA, HvB, f1, f2, f3, f4, f5, f6, f7, calcAll };
+module.exports = { cplA, cplB, cpvA, cpvB, HvA, HvB, f1, f2, f3, f4, f5, f6, f7, heat1liquid, heat1alpha, heat1beta, heat2, heat3, heat4, heat5, heat6, heat7, alphaVLEa, alphaVLEb, betaVLEa, betaVLEb, heat2sol, heat3sol, heat4asol, heat4bsol, heat5asol, heat5bsol, heat6asol, heat6bsol, heat7asol, heat7bsol, section, data, calcAll };

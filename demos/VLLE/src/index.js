@@ -19,8 +19,15 @@ const containerElement = document.getElementById("p5-container");
 
 const sketch = (p) => {
 
+    let font;
+
+    p.preload = function() {
+        font = p.loadFont('resources/OpenSans-Regular.ttf');
+    };
+
     p.setup = function () {
         p.createCanvas(800, 500);
+        p.textFont(font);
         p.noLoop();
         window.gvs.p = p;
         document.getElementById("loading").style.display = "none";
@@ -54,11 +61,17 @@ heatSlider.addEventListener("input", () => {
     P5.redraw();
 });
 
-resetButton.addEventListener("change", () => {
+resetButton.addEventListener("click", () => {
     resetToInitialConditions();
     P5.redraw();
 });
 
 function  resetToInitialConditions() {
-
+    zSlider.value = "0.50";
+    gvs.z = Number(Number(zSlider.value).toFixed(2));
+    zValue.innerHTML = Number(zSlider.value).toFixed(2);
+    heatSlider.value = "0";
+    gvs.heat = Number(Number(heatSlider.value).toFixed(1));
+    heatValue.innerHTML = Number(gvs.heat).toFixed(1);
+    P5.redraw();
 };

@@ -1,5 +1,5 @@
 let p;
-const { cplA, cplB, cpvA, cpvB, HvA, HvB, f1, f2, f3, f4, f5, f6, f7 } = require("./calcs.js");
+const { f2, f3, f4, f5, f6, f7, data, section } = require("./calcs.js");
 
 const plotOptions = {
   marginLeft: 60,
@@ -10,7 +10,18 @@ const plotOptions = {
   height: 400,
   xRange: [0, 1],
   yRange: [60, 100],
+  pointSize: 8,
 };
+
+const colors = {
+  alpha: "rgba(255, 50, 50, 0.5)",
+  beta: "rgba(100, 100, 200, 0.6)",
+  vapor: "rgba(0, 150, 0, 0.4)"
+};
+
+const lines = {
+  strokeWeight: 1.25,
+}
 
 function coordToPixel(x, y) {
   const yPix = p.height - plotOptions.marginBottom - p.map(y, plotOptions.yRange[0], plotOptions.yRange[1], 0, plotOptions.height);
@@ -70,7 +81,7 @@ function drawAxes() {
 
 function drawAlpha() {
   p.push();
-    p.fill(255, 100, 100, 120);
+    p.fill(colors.alpha);
     p.noStroke();
     p.beginShape();
       const bottomLeft = coordToPixel(0, 60);
@@ -94,7 +105,7 @@ function drawAlpha() {
 
 function drawBeta() {
   p.push();
-    p.fill(100, 100, 225, 120);
+    p.fill(colors.beta);
     p.noStroke();
     p.beginShape();
       const bottomRight = coordToPixel(1, 60);
@@ -118,7 +129,7 @@ function drawBeta() {
 
 function drawVapor() {
   p.push();
-    p.fill(50, 150, 80, 120);
+    p.fill(colors.vapor);
     p.noStroke();
     p.beginShape();
       const leftBound = coordToPixel(0, f4(0));
@@ -144,7 +155,7 @@ function drawVapor() {
   p.pop();
 };
 
-function drawLines() {
+function drawPlotCurves() {
   p.push();
     p.noFill();
     p.stroke(0);
@@ -200,15 +211,382 @@ function drawLines() {
   p.pop();
 };
 
+function drawAreaLabels() {
+  p.push();
+    p.noStroke();
+    p.fill(0);
+    p.textAlign(p.CENTER, p.CENTER);
+    p.textSize(16);
+    const vaporCoord = coordToPixel(0.58, 92);
+    const alphaCoord = coordToPixel(0.1, 78);
+    const betaCoord = coordToPixel(0.92, 78);
+    const alphaVaporCoord = coordToPixel(0.37, 80);
+    const betaVaporCoord = coordToPixel(0.76, 80);
+    p.text("vapor", vaporCoord[0], vaporCoord[1]);
+    p.text("α liquid", alphaCoord[0], alphaCoord[1]);
+    p.text("β liquid", betaCoord[0], betaCoord[1]);
+
+    p.textSize(14);
+
+    p.text("α liquid\n+ vapor", alphaVaporCoord[0], alphaVaporCoord[1]);
+    p.text("β liquid\n+ vapor", betaVaporCoord[0], betaVaporCoord[1]);
+  p.pop();
+}
+
+function vlineZ() {
+  p.push();
+    p.strokeWeight(lines.strokeWeight);
+    const coord1 = coordToPixel( gvs.z, gvs.data[0] );
+    const coord2 = coordToPixel( gvs.z, 60 );
+    p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  p.pop();
+};
+
+function vlineAlpha() {
+  p.push();
+    p.stroke(colors.alpha);
+    p.strokeWeight(lines.strokeWeight);
+    const coord1 = coordToPixel( gvs.data[4], gvs.data[0] );
+    const coord2 = coordToPixel( gvs.data[4], 60 );
+    p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  p.pop();
+};
+
+function vlineBeta() {
+  p.push();
+    p.stroke(colors.beta);
+    p.strokeWeight(lines.strokeWeight);
+    const coord1 = coordToPixel( gvs.data[5], gvs.data[0] );
+    const coord2 = coordToPixel( gvs.data[5], 60 );
+    p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  p.pop();
+};
+
+function vlineV() {
+  p.push();
+    p.stroke(colors.vapor);
+    p.strokeWeight(lines.strokeWeight);
+    const coord1 = coordToPixel( gvs.data[6], gvs.data[0] );
+    const coord2 = coordToPixel( gvs.data[6], 60 );
+    p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  p.pop();
+};
+
+function hlineAlpha() {
+  p.push();
+    p.stroke(colors.alpha);
+    p.strokeWeight(lines.strokeWeight);
+    const coord1 = coordToPixel( gvs.z, gvs.data[0] );
+    const coord2 = coordToPixel( gvs.data[4], gvs.data[0] );
+    p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  p.pop();
+};
+
+function hlineBeta() {
+  p.push();
+    p.stroke(colors.beta);
+    p.strokeWeight(lines.strokeWeight);
+    const coord1 = coordToPixel( gvs.z, gvs.data[0] );
+    const coord2 = coordToPixel( gvs.data[5], gvs.data[0] );
+    p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  p.pop();
+};
+
+function hlineV() {
+  p.push();
+    p.stroke(colors.vapor);
+    p.strokeWeight(lines.strokeWeight);
+    const coord1 = coordToPixel( gvs.z, gvs.data[0] );
+    const coord2 = coordToPixel( gvs.data[6], gvs.data[0] );
+    p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  p.pop();
+};
+
+function pointZ() {
+  p.push();
+    const coord = coordToPixel( gvs.z, gvs.data[0] );
+    p.strokeWeight(plotOptions.pointSize);
+    p.point(coord[0], coord[1]);
+  p.pop();
+};
+
+function pointAlpha() {
+  p.push();
+    const coord = coordToPixel( gvs.data[4], gvs.data[0] );
+    p.strokeWeight(plotOptions.pointSize);
+    p.point(coord[0], coord[1]);
+  p.pop();
+};
+
+function pointBeta() {
+  p.push();
+    const coord = coordToPixel( gvs.data[5], gvs.data[0] );
+    p.strokeWeight(plotOptions.pointSize);
+    p.point(coord[0], coord[1]);
+  p.pop();
+};
+
+function pointV() {
+  p.push();
+    const coord = coordToPixel( gvs.data[6], gvs.data[0] );
+    p.strokeWeight(plotOptions.pointSize);
+    p.point(coord[0], coord[1]);
+  p.pop();
+};
+
+function drawLinesAndPoints() {
+
+
+  switch( section() ) {
+    case 1:
+      pointZ();
+      vlineZ();
+    break;
+
+    case 2:
+      pointZ();
+      pointAlpha();
+      pointBeta();
+      vlineAlpha();
+      vlineBeta();
+      hlineAlpha();
+      hlineBeta();
+    break;
+
+    case 3:
+      pointZ();
+      pointAlpha();
+      pointBeta();
+      vlineAlpha();
+      vlineBeta();
+      hlineAlpha();
+      hlineBeta();
+    break;
+
+    case 4:
+      pointZ();
+      vlineZ();
+    break;
+
+    case 5:
+      pointZ();
+      pointAlpha();
+      pointBeta();
+      pointV();
+      vlineAlpha();
+      vlineBeta();
+      vlineV();
+    break;
+
+    case 6:
+      pointZ();
+      pointAlpha();
+      pointBeta();
+      pointV();
+      vlineAlpha();
+      vlineBeta();
+      vlineV();
+    break;
+
+    case 7:
+      pointZ();
+      pointAlpha();
+      pointV();
+      vlineAlpha();
+      vlineV();
+      hlineAlpha();
+      hlineV();
+    break;
+
+    case 8:
+      pointZ();
+      pointAlpha();
+      pointV();
+      vlineAlpha();
+      vlineV();
+      hlineAlpha();
+      hlineV();
+    break;
+
+    case 9:
+      pointZ();
+      pointBeta();
+      pointV();
+      vlineBeta();
+      vlineV();
+      hlineBeta();
+      hlineV();
+    break;
+
+    case 10:
+      pointZ();
+      pointBeta();
+      pointV();
+      vlineBeta();
+      vlineV();
+      hlineBeta();
+      hlineV();
+    break;
+
+    case 11:
+      pointZ();
+      vlineZ();
+    break;
+
+    case 12:
+      pointZ();
+      vlineZ();
+    break;
+
+    case 13:
+      pointZ();
+      vlineZ();
+    break;
+
+    case 14:
+      pointZ();
+      vlineZ();
+    break;
+
+    default:
+      throw "unidentified section specified"
+    break;
+  }
+}
+
+const barGraphOptions = {
+  marginLeft : 80,
+  marginBottom: 80,
+  width : 200,
+  height : 380,
+  yRange : [0, 1],
+  xRange: [0, 1],
+};
+
+function barGraphCoordToPixel(x, y) {
+  const yPix = p.height - barGraphOptions.marginBottom - p.map(y, barGraphOptions.yRange[0], barGraphOptions.yRange[1], 0, barGraphOptions.height);
+  const xPix = plotOptions.marginLeft + plotOptions.width + plotOptions.marginRight + barGraphOptions.marginLeft + p.map(x, barGraphOptions.xRange[0], barGraphOptions.xRange[1], 0, barGraphOptions.width);
+  return [xPix, yPix];
+}
+
+function drawBarGraphAxes() {
+  p.push();
+    const coord0 = barGraphCoordToPixel(0, 0);
+    const coordTopLeft = barGraphCoordToPixel(0, 1);
+    const coordBottomRight = barGraphCoordToPixel(1, 0);
+    p.strokeWeight(1);
+    p.stroke(0);
+    p.line( coord0[0], coord0[1], coordTopLeft[0], coordTopLeft[1] );
+    p.line( coord0[0], coord0[1], coordBottomRight[0], coordBottomRight[1] );
+    p.textAlign(p.RIGHT, p.CENTER);
+    
+    p.noStroke();
+    p.fill(0);
+    p.textSize(14);
+    
+    for( let i = 0; i <= 5; i++ ) {
+      const tickCoord = barGraphCoordToPixel(0, i / 5);
+      p.text( `${Number( i / 5 ).toFixed(1)}`, tickCoord[0] - 5, tickCoord[1] - 3);
+    }
+    
+    p.noFill();
+    p.stroke(0);
+    p.strokeWeight(0.5);
+
+    for( let i = 0; i <= 20; i++ ) {
+      const tickLength = i % 4 === 0 ? 5 : 3;
+      const tickCoord = barGraphCoordToPixel(0, i / 20);
+      p.line(tickCoord[0], tickCoord[1], tickCoord[0] + tickLength, tickCoord[1] );
+    }
+  p.pop();
+
+  p.push();
+    p.rectMode(p.CORNER);
+    p.textAlign(p.CENTER, p.BOTTOM);
+    p.textSize(14);
+    p.fill(colors.alpha);
+    p.strokeWeight(0.5);
+    p.stroke(0);
+    const rectRadius = 16;
+    let bottomCenter = barGraphCoordToPixel(0.167, 0);
+    let topCenter = barGraphCoordToPixel(0.167, gvs.data[1]);
+
+    p.rect(bottomCenter[0] - rectRadius, bottomCenter[1], 2 * rectRadius, - ( bottomCenter[1] - topCenter[1]) );
+
+    p.fill(0);
+    p.noStroke();
+    p.text(`${gvs.data[4] == -1 ? "" : "x   = " + Number(gvs.data[4]).toFixed(2)}`, topCenter[0], topCenter[1] - 5);
+    p.textSize(11);
+    p.text(`${gvs.data[4] == -1 ? "" : "α"}`, topCenter[0] - 16.5, topCenter[1] - 2);
+
+    bottomCenter = barGraphCoordToPixel(0.167 + 0.33, 0);
+    topCenter = barGraphCoordToPixel(0.167 + 0.33, gvs.data[2]);
+
+    p.textSize(14);    
+    p.fill(colors.beta);
+    p.strokeWeight(0.5);
+    p.stroke(0);
+    p.rect(bottomCenter[0] - rectRadius, bottomCenter[1], 2 * rectRadius, - ( bottomCenter[1] - topCenter[1]) );
+
+    p.fill(0);
+    p.noStroke();
+    p.text(`${gvs.data[5] == -1 ? "" : "y   = " + Number(gvs.data[5]).toFixed(2)}`, topCenter[0], topCenter[1] - 5);
+    p.textSize(11);
+    p.text(`${gvs.data[5] == -1 ? "" : "β"}`, topCenter[0] - 16.5, topCenter[1]);
+
+    p.fill(colors.vapor);
+
+    p.textSize(14);    
+    bottomCenter = barGraphCoordToPixel(0.167 + 0.67, 0);
+    topCenter = barGraphCoordToPixel(0.167 + 0.67, gvs.data[3]);
+    p.strokeWeight(0.5);
+    p.stroke(0);
+    p.rect(bottomCenter[0] - rectRadius, bottomCenter[1], 2 * rectRadius, - ( bottomCenter[1] - topCenter[1]) );
+
+    p.fill(0);
+    p.noStroke();
+    p.text(`${gvs.data[6] == -1 ? "" : "y   = " + Number(gvs.data[6]).toFixed(2)}`, topCenter[0], topCenter[1] - 5);
+    p.textSize(11);
+    p.text(`${gvs.data[6] == -1 ? "" : "v"}`, topCenter[0] - 16.5, topCenter[1]);
+
+  p.pop();
+
+  p.textAlign(p.RIGHT, p.TOP);
+  p.textSize( 16 );
+
+  p.push();
+    let labelCoord = barGraphCoordToPixel(0.2, 0);
+    p.translate(labelCoord[0], labelCoord[1]);
+    p.rotate( - Math.PI / 5 );
+    p.text("α liquid", -5, 0);
+  p.pop();
+
+  p.push();
+    labelCoord = barGraphCoordToPixel(0.33 + 0.2, 0);
+    p.translate(labelCoord[0], labelCoord[1]);
+    p.rotate( - Math.PI / 5 );
+    p.text("β liquid", -5, 0);
+  p.pop();
+
+  p.push();
+    labelCoord = barGraphCoordToPixel(0.67 + 0.2, 0);
+    p.translate(labelCoord[0], labelCoord[1]);
+    p.rotate( - Math.PI / 5 );
+    p.text("vapor", -5, 0);
+  p.pop();
+
+}
+
 function drawAll() {
   if ( typeof(p) === "undefined" ) { p = window.gvs.p }
   drawAlpha();
   drawBeta();
   drawVapor();
-  drawLines();
+  drawPlotCurves();
+  drawAreaLabels();
   drawAxes();
-  p.strokeWeight( 8 );
-  p.point(coordToPixel( gvs.z, gvs.T )[0], coordToPixel( gvs.z, gvs.T )[1]);
+  drawLinesAndPoints();
+  drawBarGraphAxes();
 };
 
 module.exports = { drawAll };
