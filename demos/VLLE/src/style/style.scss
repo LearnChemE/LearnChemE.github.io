@@ -20,12 +20,20 @@
 
   .input-row {
     display: grid;
-    grid-template-columns: 120px 15rem 6ch max-content;
+    grid-template-columns: 140px 18rem 4ch max-content;
     gap: 1ch;
     align-items: end;
   
     .data-name {
       justify-self: end;
+    }
+
+    .data-value {
+      justify-self: end;
+    }
+
+    .data-metric {
+      justify-self: start;
     }
 
   }

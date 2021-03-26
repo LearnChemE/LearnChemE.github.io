@@ -7,7 +7,7 @@ const cpvB = 0.3;
 const HvA = 12;
 const HvB = 12;
 
-const findRootPrecision = 0.005;
+let findRootPrecision = 0.005;
 
 // middle horizontal line
 function f1(z) { return 77.3; };
@@ -160,6 +160,8 @@ function heat7bsol( H, z ) {
 };
 
 function section() {
+  if( gvs.z === 0.00 && heat4( gvs.z )  <  gvs.heat && gvs.heat < heat5( gvs.z ) ) { return 15 }
+  if( gvs.z === 1.00 && heat7( gvs. z ) <= gvs.heat && gvs.heat < heat6( gvs.z ) ) { return 16 }
   if( gvs.z  <= 0.2752 && heat2( gvs.z )  <  gvs.heat && gvs.heat < heat4( gvs.z ) ) { return 1 }
   if( 0.2752 <  gvs.z  && gvs.z <= 0.6000 && gvs.heat <  heat1liquid( gvs.z ) || 0.0000 <= gvs.z && gvs.z <  0.2752 && gvs.heat <= heat2( gvs.z ) ) { return 2 }
   if( 0.6000 <  gvs.z  && gvs.z <  0.8109 && gvs.heat <  heat1liquid( gvs.z ) || 0.8109 <= gvs.z && gvs.z <= 1.0000 && gvs.heat <= heat3( gvs.z ) ) { return 3 }
@@ -207,10 +209,17 @@ function data() {
       return [ f6( gvs.z ) + ( gvs.heat - heat6( gvs.z ) ) / ( gvs.z * cpvB + ( 1 - gvs.z ) * cpvA), 0, 0, 1, -1, -1, gvs.z ];
     case 14:
       return [ f6( gvs.z ) + ( gvs.heat - heat6( gvs.z ) ) / ( gvs.z * cpvB + ( 1 - gvs.z ) * cpvA), 0, 0, 1, -1, -1, gvs.z ];
+    case 15:
+      return [ 97.3, 1 - (gvs.heat - ((97.3 - 70) * cplA)) / HvA, 0, (gvs.heat - ((97.3 - 70) * cplA)) / HvA, 0, -1, 0 ];
+    case 16:
+      return [ 92.77, 0, 1 - (gvs.heat - ((92.77 - 70) * cplB)) / HvB, (gvs.heat - ((92.77 - 70) * cplB)) / HvB, -1, 1, 1 ];
   }
 };
 
 function calcAll() {
+  if ( gvs.z === 0.01 || gvs.z === 0.99 ) { findRootPrecision = 0.001 }
+  else if ( gvs.z === 0.02 || gvs.z === 0.98 ) { findRootPrecision = 0.0025 }
+  else { findRootPrecision = 0.005 }
   gvs.data = data();
   gvs.T = gvs.data[0];
 };

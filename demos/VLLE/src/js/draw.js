@@ -5,7 +5,7 @@ const plotOptions = {
   marginLeft: 60,
   marginRight: 0,
   marginTop: 0,
-  marginBottom: 60,
+  marginBottom: 70,
   width: 400,
   height: 400,
   xRange: [0, 1],
@@ -76,6 +76,19 @@ function drawAxes() {
       p.line(coordLeft[0], coordLeft[1], coordLeft[0] + tickLength, coordLeft[1]);
       p.line(coordRight[0], coordRight[1], coordRight[0] - tickLength, coordRight[1]);
     }
+  p.pop();
+
+  p.push();
+    p.fill(0);
+    p.noStroke();
+    p.textAlign(p.CENTER, p.CENTER);
+    p.textSize(15);
+    const xLabelLoc = coordToPixel(0.5, 60);
+    p.text("mole fraction B", xLabelLoc[0], xLabelLoc[1] + 45);
+    const yLabelLoc = coordToPixel(0, 80);
+    p.translate(yLabelLoc[0] - 48, yLabelLoc[1]);
+    p.rotate( -Math.PI / 2 );
+    p.text("temperature (°C)", 0, 0);
   p.pop();
 }
 
@@ -222,6 +235,7 @@ function drawAreaLabels() {
     const betaCoord = coordToPixel(0.92, 78);
     const alphaVaporCoord = coordToPixel(0.37, 80);
     const betaVaporCoord = coordToPixel(0.76, 80);
+    const alphaBetaCoord = coordToPixel(0.5, 62.5);
     p.text("vapor", vaporCoord[0], vaporCoord[1]);
     p.text("α liquid", alphaCoord[0], alphaCoord[1]);
     p.text("β liquid", betaCoord[0], betaCoord[1]);
@@ -230,6 +244,8 @@ function drawAreaLabels() {
 
     p.text("α liquid\n+ vapor", alphaVaporCoord[0], alphaVaporCoord[1]);
     p.text("β liquid\n+ vapor", betaVaporCoord[0], betaVaporCoord[1]);
+    p.text("α liquid + β liquid", alphaBetaCoord[0], alphaBetaCoord[1]);
+
   p.pop();
 }
 
@@ -448,6 +464,16 @@ function drawLinesAndPoints() {
       vlineZ();
     break;
 
+    case 15:
+      pointZ();
+      vlineAlpha();
+    break;
+
+    case 16:
+      pointZ();
+      vlineBeta();
+    break;
+
     default:
       throw "unidentified section specified"
     break;
@@ -458,7 +484,7 @@ const barGraphOptions = {
   marginLeft : 80,
   marginBottom: 80,
   width : 200,
-  height : 380,
+  height : 350,
   yRange : [0, 1],
   xRange: [0, 1],
 };
@@ -573,6 +599,12 @@ function drawBarGraphAxes() {
     p.translate(labelCoord[0], labelCoord[1]);
     p.rotate( - Math.PI / 5 );
     p.text("vapor", -5, 0);
+  p.pop();
+
+  p.push();
+    p.textAlign(p.CENTER, p.CENTER);
+    labelCoord = barGraphCoordToPixel(0.5, 1.0);
+    p.text("relative amounts", labelCoord[0], labelCoord[1] - 40);
   p.pop();
 
 }

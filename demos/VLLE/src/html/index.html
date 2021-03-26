@@ -29,7 +29,7 @@
   <div class="input-area">
 
     <div class="input-row">
-      <div class="data-name">Mole fraction B&nbsp;</div>
+      <div class="data-name">Mole fraction \( B \)</div>
       <input type="range" id="z-slider" min="0" max="1" step="0.01" value="0.50">
       <div class="data-value" id="z-value">0.50</div>
       <div class="data-metric"></div>
@@ -40,10 +40,10 @@
     </div>
 
     <div class="input-row">
-      <div class="data-name">Heat added (kJ)&nbsp;</div>
+      <div class="data-name">Heat added</div>
       <input type="range" id="heat-slider" min="0" max="21" step="0.1" value="0.0">
       <div class="data-value" id="heat-value">0.0</div>
-      <div class="data-metric"></div>
+      <div class="data-metric">kJ</div>
     </div>
 
   </div>
@@ -64,7 +64,7 @@
         </div>
         <div class="modal-body">
           <p>
-            Directions
+            This is a simulation of phase equilibrium for a binary system of two partially miscible liquids, \( A \) and \( B \). Because of partial miscibility, vapor-liquid equilibrium (VLE), liquid-liquid equilibrium (LLE), and vapor-liquid-liquid equilibrium (VLLE) are all present on the phase diagram. You can vary the mole fraction of component \( B \) and add heat using the sliders. The black dot on the phase diagram shows the current temperature and mole fraction. Adding heat changes the temperature, except at 77°C, where all three phases are in equilibrium: \( \alpha \) liquid \( x_{ \alpha } = 0.28 \), \( \beta \) liquid \( x_{ \beta } = 0.81 \), and vapor \( y_{v} = 0.60 \). At this temperature, one phase must completely evaporate (or condense) before the temperature can increase (or decrease). The addition of heat is used to illustrate three phases coexisting at 77°C. The relative amounts of each phase are determined from the lever rule (a mole balance) and are shown in the bar graph, along with mole fractions \( x_{ \alpha } \), \(  x_{ \beta } \), and \( y_{v} \). In multiple phase regions, colored lines on the T-x-y diagram show the mole fraction of \( B \) in each phase.
           </p>
 
         </div>
@@ -87,20 +87,52 @@
         <div class="modal-body">
 
           <p>
-            Details
+            The relative amounts of each phase in the two-phase regions are found using the lever rule. An example of using the lever rule in the \( \alpha \) liquid plus \( \beta \) liquid region is given by the following equations:
           </p>
-
-          $$
-            1 + 1 = 2
-          $$
 
           <p>
-            References:<br>
+            Relative amount of \( \alpha \) liquid: &nbsp; \( R_{liquid} = \Large{ \frac{ z_{B} - x_{ \beta } }{ x_{ \alpha } - x_{ \beta } } } \)
           </p>
 
-          <ol class="references">
+          <p>
+            Relative amount of \( \beta \) liquid: &nbsp; \( \Large{ \frac{ x_{ \alpha } - z_{ B } }{ x_{ \alpha } - x_{ \beta } } } \normalsize{ = 1 - } \Large{ \frac{ z_{B} - x_{ \beta } }{ x_{ \alpha } - x_{ \beta } } } \normalsize{ = 1 - R_{liquid} } \)
+          </p>
+
+          <p>
+            where \( z_{B} \) is the overall mole fraction of the mixture (the mole fraction of the point in the T-x-y diagram).
+          </p>
+
+          <p>
+            When the system is in vapor-liquid-liquid equilibrium, the relative amounts of each phase are found using mass balances. For example, using 10% vaporization and an initial mole fraction of \( B \) of 0.7 in the diagram:
+          </p>
+
+          <ol style="line-height: 1.8rem;">
+            <li>determine the initial mole fraction of \( B \)<br>&nbsp;\( z_{B} = 0.7 \)</li>
+            <li>determine the mole fraction of component \( B \) in each phase<br>
+              &nbsp;<div style="width: 12ch; display: inline-block;">\( x_{ \alpha } = 0.276 \)</div> mole fraction of \( B \) in the alpha phase<br>
+              &nbsp;<div style="width: 12ch; display: inline-block;">\( x_{ \beta } = 0.81 \)</div> mole fraction of \( B \) in the beta phase<br>
+              &nbsp;<div style="width: 12ch; display: inline-block;">\( y_{ B } = 0.6 \)</div> mole fraction of \( B \) in the vapor phase
+            </li>
+            <li>set a basis for the amount of total moles in the system<br>&nbsp;total moles = 1</li>
+            <li>determine the percentage of vaporization<br>&nbsp;percent vaporization = 10%</li>
+            <li>determine the amount of vapor in the system<br>&nbsp;\( V = (\% \mathrm{ \; vaporization } ) \cdot (\mathrm{ total \; moles }) = 0.1 \cdot 1 = 0.1 \)&nbsp;moles</li>
+            <li>perform a mole balance on the whole system<br>&nbsp;total moles = vapor + \( \alpha \) liquid + \( \beta \) liquid<br>&nbsp;\( 1 = V + L_{ \alpha } + L_{ \beta } \)<br>&nbsp;\( 1 = 0.1 + L_{ \alpha } + L_{ \beta } \)</li>
             <li>
-              reference 1
+              perform a mole balance on component \( B \)<br>&nbsp;
+              \( z_{B}  \cdot \mathrm{ total \; moles } = ( x_{ \alpha } \cdot L_{ \alpha } ) + ( x_{ \beta } \cdot L_{ \beta } ) + ( y_{ B } \cdot V ) \)<br>&nbsp;
+              \( 0.7 \cdot 1 = ( 0.276 \, L_{ \alpha } ) + ( 0.81 \, L_{ \beta } ) + ( 0.6 \cdot 0.1 ) \)<br>&nbsp;
+              \( 0.7 = 0.276 \, L_{ \alpha } + 0.81 \, L_{ \beta } + 0.06 \)
+            </li>
+            <li>
+              simultaneously solve the equations with unknown variables (the number of equations should equal the number of unknown variables)<br>&nbsp;
+              \( 1 = 0.1 + L_{ \alpha } + L_{ \beta } \)<br>&nbsp;
+              \( 0.7 = 0.276 \, L_{ \alpha } + 0.81 \, L_{ \beta } + 0.06 \)
+            </li>
+            <li>
+              relative amounts of each phase<br>&nbsp;
+              <div style="width: 12ch; display: inline-block;">\( L_{ \alpha } = 0.166 \)</div> relative amount of \( \alpha \) liquid phase<br>&nbsp;
+              <div style="width: 12ch; display: inline-block;">\( L_{ \beta } = 0.734 \)</div> relative amount of \( \beta \) liquid phase<br>&nbsp;
+              <div style="width: 12ch; display: inline-block;">\( V = 0.1 \)</div> relative amount of vapor
             </li>
           </ol>
 
@@ -123,7 +155,9 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.</p>
+          <p style="line-height: 3rem;">
+            If this simulation is too big for your screen, zoom out using&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Windows.
           </p>
         </div>
       </div>
