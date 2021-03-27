@@ -368,9 +368,9 @@ function drawLinesAndPoints() {
       vlineBeta();
       hlineAlpha();
       hlineBeta();
-      pointZ();
       pointAlpha();
       pointBeta();
+      pointZ();
     break;
 
     case 3:
@@ -378,9 +378,9 @@ function drawLinesAndPoints() {
       vlineBeta();
       hlineAlpha();
       hlineBeta();
-      pointZ();
       pointAlpha();
       pointBeta();
+      pointZ();
     break;
 
     case 4:
@@ -392,20 +392,20 @@ function drawLinesAndPoints() {
       vlineAlpha();
       vlineBeta();
       vlineV();
-      pointZ();
       pointAlpha();
       pointBeta();
       pointV();
+      pointZ();
     break;
 
     case 6:
       vlineAlpha();
       vlineBeta();
       vlineV();
-      pointZ();
       pointAlpha();
       pointBeta();
       pointV();
+      pointZ();
     break;
 
     case 7:
@@ -413,9 +413,9 @@ function drawLinesAndPoints() {
       vlineV();
       hlineAlpha();
       hlineV();
-      pointZ();
       pointAlpha();
       pointV();
+      pointZ();
     break;
 
     case 8:
@@ -423,9 +423,9 @@ function drawLinesAndPoints() {
       vlineV();
       hlineAlpha();
       hlineV();
-      pointZ();
       pointAlpha();
       pointV();
+      pointZ();
     break;
 
     case 9:
@@ -433,9 +433,9 @@ function drawLinesAndPoints() {
       vlineV();
       hlineBeta();
       hlineV();
-      pointZ();
       pointBeta();
       pointV();
+      pointZ();
     break;
 
     case 10:
@@ -443,9 +443,9 @@ function drawLinesAndPoints() {
       vlineV();
       hlineBeta();
       hlineV();
-      pointZ();
       pointBeta();
       pointV();
+      pointZ();
     break;
 
     case 11:
