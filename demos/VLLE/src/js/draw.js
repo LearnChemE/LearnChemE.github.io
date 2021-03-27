@@ -10,13 +10,15 @@ const plotOptions = {
   height: 400,
   xRange: [0, 1],
   yRange: [60, 100],
-  pointSize: 8,
+  largePointSize: 7,
+  smallPointSize: 5,
 };
 
 const colors = {
   alpha: "rgba(255, 50, 50, 0.5)",
   beta: "rgba(100, 100, 200, 0.6)",
-  vapor: "rgba(0, 150, 0, 0.4)"
+  vapor: "rgba(0, 150, 0, 0.4)",
+  point: "rgba(255, 255, 255, 1)",
 };
 
 const lines = {
@@ -321,15 +323,17 @@ function hlineV() {
 function pointZ() {
   p.push();
     const coord = coordToPixel( gvs.z, gvs.data[0] );
-    p.strokeWeight(plotOptions.pointSize);
-    p.point(coord[0], coord[1]);
+    p.strokeWeight(1);
+    p.stroke(0);
+    p.fill(colors.point);
+    p.circle(coord[0], coord[1], plotOptions.largePointSize);
   p.pop();
 };
 
 function pointAlpha() {
   p.push();
     const coord = coordToPixel( gvs.data[4], gvs.data[0] );
-    p.strokeWeight(plotOptions.pointSize);
+    p.strokeWeight(plotOptions.smallPointSize);
     p.point(coord[0], coord[1]);
   p.pop();
 };
@@ -337,7 +341,7 @@ function pointAlpha() {
 function pointBeta() {
   p.push();
     const coord = coordToPixel( gvs.data[5], gvs.data[0] );
-    p.strokeWeight(plotOptions.pointSize);
+    p.strokeWeight(plotOptions.smallPointSize);
     p.point(coord[0], coord[1]);
   p.pop();
 };
@@ -345,7 +349,7 @@ function pointBeta() {
 function pointV() {
   p.push();
     const coord = coordToPixel( gvs.data[6], gvs.data[0] );
-    p.strokeWeight(plotOptions.pointSize);
+    p.strokeWeight(plotOptions.smallPointSize);
     p.point(coord[0], coord[1]);
   p.pop();
 };
@@ -355,123 +359,123 @@ function drawLinesAndPoints() {
 
   switch( section() ) {
     case 1:
-      pointZ();
       vlineZ();
+      pointZ();
     break;
 
     case 2:
-      pointZ();
-      pointAlpha();
-      pointBeta();
       vlineAlpha();
       vlineBeta();
       hlineAlpha();
       hlineBeta();
+      pointZ();
+      pointAlpha();
+      pointBeta();
     break;
 
     case 3:
-      pointZ();
-      pointAlpha();
-      pointBeta();
       vlineAlpha();
       vlineBeta();
       hlineAlpha();
       hlineBeta();
+      pointZ();
+      pointAlpha();
+      pointBeta();
     break;
 
     case 4:
-      pointZ();
       vlineZ();
+      pointZ();
     break;
 
     case 5:
+      vlineAlpha();
+      vlineBeta();
+      vlineV();
       pointZ();
       pointAlpha();
       pointBeta();
       pointV();
-      vlineAlpha();
-      vlineBeta();
-      vlineV();
     break;
 
     case 6:
+      vlineAlpha();
+      vlineBeta();
+      vlineV();
       pointZ();
       pointAlpha();
       pointBeta();
       pointV();
-      vlineAlpha();
-      vlineBeta();
-      vlineV();
     break;
 
     case 7:
-      pointZ();
-      pointAlpha();
-      pointV();
       vlineAlpha();
       vlineV();
       hlineAlpha();
       hlineV();
+      pointZ();
+      pointAlpha();
+      pointV();
     break;
 
     case 8:
-      pointZ();
-      pointAlpha();
-      pointV();
       vlineAlpha();
       vlineV();
       hlineAlpha();
       hlineV();
+      pointZ();
+      pointAlpha();
+      pointV();
     break;
 
     case 9:
-      pointZ();
-      pointBeta();
-      pointV();
       vlineBeta();
       vlineV();
       hlineBeta();
       hlineV();
+      pointZ();
+      pointBeta();
+      pointV();
     break;
 
     case 10:
-      pointZ();
-      pointBeta();
-      pointV();
       vlineBeta();
       vlineV();
       hlineBeta();
       hlineV();
+      pointZ();
+      pointBeta();
+      pointV();
     break;
 
     case 11:
-      pointZ();
       vlineZ();
+      pointZ();
     break;
 
     case 12:
-      pointZ();
       vlineZ();
+      pointZ();
     break;
 
     case 13:
-      pointZ();
       vlineZ();
+      pointZ();
     break;
 
     case 14:
-      pointZ();
       vlineZ();
+      pointZ();
     break;
 
     case 15:
-      pointZ();
       vlineAlpha();
+      pointZ();
     break;
 
     case 16:
-      pointZ();
       vlineBeta();
+      pointZ();
     break;
 
     default:
