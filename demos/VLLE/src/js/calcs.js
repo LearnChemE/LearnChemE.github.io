@@ -7,7 +7,7 @@ const cpvB = 0.3;
 const HvA = 12;
 const HvB = 12;
 
-let findRootPrecision = 0.005;
+let findRootPrecision = 0.002;
 
 // middle horizontal line
 function f1(z) { return 77.3; };
@@ -217,9 +217,9 @@ function data() {
 };
 
 function calcAll() {
-  if ( gvs.z === 0.01 || gvs.z === 0.99 ) { findRootPrecision = 0.001 }
-  else if ( gvs.z === 0.02 || gvs.z === 0.98 ) { findRootPrecision = 0.0025 }
-  else { findRootPrecision = 0.005 }
+  if ( gvs.z === 0.01 || gvs.z === 0.99 ) { findRootPrecision = 0.0005 }
+  else if ( gvs.z === 0.02 || gvs.z === 0.98 ) { findRootPrecision = 0.001 }
+  else { findRootPrecision = 0.002 }
   gvs.data = data();
   gvs.T = gvs.data[0];
 };
