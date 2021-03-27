@@ -17,14 +17,13 @@ const coords = {
   bottomPlateY: 350, // -0.025
 }
 
+const radiusSlider = document.getElementById("radius-slider");
+const dPdzSlider = document.getElementById("dpdz-slider");
+const muSlider = document.getElementById("viscosity-slider");
 
 /****************************/
 /********** SETUP ***********/
 /****************************/
-
-const radiusSlider = document.getElementById("radius-slider");
-const dPdzSlider = document.getElementById("dpdz-slider");
-const muSlider = document.getElementById("viscosity-slider");
 
 [radiusSlider, dPdzSlider, muSlider].forEach(inp => {
   inp.addEventListener("input",()=>{
