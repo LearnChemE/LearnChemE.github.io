@@ -205,6 +205,6 @@ function formatNumber(num) {
     return Number( Math.round( n * 1000000 ) / 1000000 ).toFixed(4);
   }
 
-  else throw "wtf";
+  else throw "formatNumber() received an invalid number";
   
 }
