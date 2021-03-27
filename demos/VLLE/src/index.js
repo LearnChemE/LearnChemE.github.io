@@ -22,8 +22,8 @@ const sketch = (p) => {
     let font;
 
     p.preload = function() {
-        font = p.loadFont('resources/OpenSans-Regular.ttf');
         document.getElementById("loading").style.display = "none";
+        font = p.loadFont('resources/OpenSans-Regular.ttf');
     };
 
     p.setup = function () {
