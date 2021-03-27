@@ -23,6 +23,7 @@ const sketch = (p) => {
 
     p.preload = function() {
         font = p.loadFont('resources/OpenSans-Regular.ttf');
+        document.getElementById("loading").style.display = "none";
     };
 
     p.setup = function () {
@@ -30,7 +31,6 @@ const sketch = (p) => {
         p.textFont(font);
         p.noLoop();
         window.gvs.p = p;
-        document.getElementById("loading").style.display = "none";
     };
 
     p.draw = function () {
