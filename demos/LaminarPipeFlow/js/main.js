@@ -104,7 +104,7 @@ function update()
   document.getElementById("Qdata").innerHTML = formatNumber( Q * ( 100**3 ) );
   document.getElementById("averageVelocity-data").innerHTML = formatNumber( 100 * averageVelocity );
   document.getElementById("maxVelocity-data").innerHTML = formatNumber( velocity( 0 ) * 100 );
-  document.getElementById("Re-data").innerHTML = formatNumber( Re );
+  document.getElementById("Re-data").innerHTML = formatNumber( Math.abs(Re) );
 
 }
 
