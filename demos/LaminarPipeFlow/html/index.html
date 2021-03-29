@@ -124,11 +124,9 @@
             Reynold's numbers). Click "Details" to see the governing equations used in this simulation.
           </p> -->
           <p>
-            This simulation demonstrates laminar flow of a viscous fluid in a pipe. The plot shows fluid velocity as a
-            function of
-            vertical distance. Velocity is proportional to the length of the arrows. The pressure gradient, the pipe
-            diameter,
-            and the fluid viscosity are set with sliders.
+            This simulation demonstrates laminar flow of viscous fluid in a pipe. The plot shows fluid velocity as a
+            function of vertical distance. Velocity is proportional to the length of the arrows. The pressure gradient, pipe
+            diameter, and fluid viscosity are set with sliders.
           </p>
 
         </div>
@@ -151,34 +149,37 @@
         <div class="modal-body">
 
           <p>
-            Fully-developed laminar flow in an horizontal pipe means the fluid
+            Fully-developed laminar flow in an horizontal pipe means the fluid:
             (1) only moves in the axial (z) direction.
             (2) flow is at steady state.
             (3) velocity is zero at the pipe wall.
-            (4) velocity is constant along a streamline.
+            (4) is constant velocity along a streamline.
             (5) does not have axial mixing.
             (6) velocity is maximum at the pipe center.
-            The gravitational force is negligible.
+
+            Gravitational force is assumed negligible.
 
           </p>
 
-          <p>
+          <p style="margin-bottom: 0px;">
             In terms of cylindrical polar coordinates, the z-direction Navier-Stokes equation can be written as:
-            $$
-            \begin{multline}
-            \rho (\frac{\partial u_r}{\partial t} + u_r \frac{\partial u_r}{\partial r} +
-            \frac{u_\theta}{r}\frac{\partial u_r}{\partial_\theta}
-            - \frac{u^2_\theta}{r} + u_z \frac{\partial u_r}{\partial z}) \\
-            = - \frac{\partial P}{\partial z} + \rho g_z + \mu (
-            \frac{1}{r} \frac{\partial}{\partial r}(r\frac{\partial u_z}{\partial r}) + \frac{1}{r^2}\frac{\partial ^2
-            u_z}{\partial \theta ^2}
-            + \frac{\partial ^2 u_z}{\partial z^2}
-            )
-            \end{multline}
-            $$
+          </p>
+          <div class="large-equation">
+            \(
+              \rho (\frac{\partial u_r}{\partial t} + u_r \frac{\partial u_r}{\partial r} +
+              \frac{u_\theta}{r}\frac{\partial u_r}{\partial_\theta}
+              - \frac{u^2_\theta}{r} + u_z \frac{\partial u_r}{\partial z}) \\
+              = - \frac{\partial P}{\partial z} + \rho g_z + \mu (
+              \frac{1}{r} \frac{\partial}{\partial r}(r\frac{\partial u_z}{\partial r}) + \frac{1}{r^2}\frac{\partial ^2
+              u_z}{\partial \theta ^2}
+              + \frac{\partial ^2 u_z}{\partial z^2}
+              )
+            \)
+          </div>
+          <p>
             Where \(u_r, u_\theta , u_z \) is the fluid velocity in \(r, \theta, z\) directions; \(\rho\) is the fluid
             density; \(\mu\) is the fluid viscosity;
-            \(P\) is the pressure; \(g\) is the gravitational force; \(t\) is time.
+            \(P\) is pressure; \(g\) is the gravitational force; \(t\) is time.
           </p>
           <p>
             This equation simplifies to:
@@ -186,7 +187,7 @@
             0 = - \frac{\partial P}{\partial z} + \mu \frac{1}{r}\frac{\partial}{\partial r}(r \frac{\partial
             u_z}{\partial r})
             $$
-            The pressure gradient in the z direction \(\frac{\partial p}{\partial z}\) is constant and equal to
+            Where the pressure gradient in the z direction \(\frac{\partial p}{\partial z}\) is constant and equal to
             \(\frac{\Delta p}{l}\).
             The boundary conditions are:
             $$
@@ -199,6 +200,10 @@
             The solution for \(u_z\) is:
             $$
             u_z = \frac{R^2}{4 \mu} \frac{\Delta p}{l} (1-\frac{r^2}{R^2})
+            $$
+            Average velocity is half the maximum velocity:
+            $$
+              u_{avg} = \frac{ R^{2} \Delta p }{ 8 \mu l }
             $$
           </p>
 

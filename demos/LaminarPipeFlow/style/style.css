@@ -52,6 +52,10 @@ li {
   padding: 0px;
 }
 
+.large-equation {
+  margin: 0.5rem;
+}
+
 canvas {
   margin-left: 10px;
   outline: 1px solid black;
