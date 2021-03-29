@@ -1,0 +1,170 @@
+@import "bootstrap";
+@import "./slider.scss";
+
+#app {
+  width: calc( 100vw - 20px );
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  align-items: start;
+  margin: 10px;
+
+  #svg-container {
+    height: max-content;
+    min-width: 430px;
+    svg {
+      max-height: 98vh;
+    }
+    #loading {
+      margin-left: 15px;
+      font-size: 1.5rem;
+    }
+  }
+
+  .input-area {
+    display: grid;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    gap: 15px;
+    grid-template-columns: max-content;
+    align-items: center;
+    align-content: center;
+    transform: translateX(-20px);
+  
+    .input-button {
+      display: grid;
+      grid-template-columns: max-content max-content max-content;
+      justify-items: center;
+      gap: 10px;
+      margin-left: 0px;
+  
+      .btn-primary, .btn-success {
+        min-width: 12ch;
+        box-shadow: 0.5px 0.5px 2px rgba(0, 0, 0, 0.5);
+      }
+  
+      .btn-secondary {
+        min-width: 5ch;
+        background-color: lightblue;
+        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
+  
+        img {
+          height: 3ch;
+        }
+      }
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: max-content 6rem 4ch max-content;
+      gap: 1ch;
+      align-items: end;
+      font-size: 0.75rem;
+      margin-top: 10px;
+    
+      .data-name {
+        justify-self: end;
+      }
+  
+      .data-value {
+        justify-self: end;
+      }
+  
+      .data-metric {
+        justify-self: start;
+      }
+  
+    }
+
+    .other-options {
+      display: grid;
+      grid-template-columns: max-content;
+      justify-content: center;
+      margin-top: 10px;
+      gap: 25px;
+
+      #select-container {
+        display: grid;
+        grid-template-columns: max-content max-content;
+        gap: 10px;
+        align-items: center;
+        
+        select {
+          font-size: 0.9rem;
+          padding: 3px;
+        }
+
+        div {
+          font-size: 0.75rem;
+        }
+      }
+    
+      button {
+        justify-self: start;
+        width: 13ch;
+        white-space: nowrap;
+        padding: 0.5rem;
+        margin-left: 30px;
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 850px) {
+  .input-row, #select-container>div {
+    font-size: 0.95rem !important;
+  }
+  select {
+    font-size: 1rem !important;
+  }
+  .input-row {
+    grid-template-columns: max-content 10rem 4ch max-content !important;
+  }
+  .btn {
+    font-size: 1rem !important;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .input-row, #select-container>div {
+    font-size: 1rem !important;
+  }
+  select {
+    font-size: 1.05rem !important;
+  }
+  .input-row {
+    grid-template-columns: max-content 12rem 4ch max-content !important;
+  }
+}
+
+
+@media screen and (min-width: 1500px) {
+  .input-row, #select-container>div {
+    font-size: 1.2rem !important;
+  }
+  select {
+    font-size: 1.25rem !important;
+  }
+  .input-row {
+    grid-template-columns: max-content 15rem 4ch max-content !important;
+  }
+  #app {
+    grid-template-columns: 0.75fr max-content;
+  }
+}
+
+.modal.show {
+  padding-left: 0px !important;
+}
+
+.modal-body {
+  text-align: left;
+
+  .references {
+    font-size: 0.8rem;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+}
