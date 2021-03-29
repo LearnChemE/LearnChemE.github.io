@@ -8,6 +8,7 @@ window.gvs = {
     Tinit : 70,
     z : Number(document.getElementById("z-slider").value),
     heat : Number(document.getElementById("heat-slider").value),
+    scale: 1
 };
 
 // JavaScript modules from /js/ folder
@@ -48,6 +49,8 @@ const heatSlider = document.getElementById("heat-slider");
 const zValue = document.getElementById("z-value");
 const heatValue = document.getElementById("heat-value");
 const resetButton = document.getElementById("reset-button");
+const sizeIncrease = document.getElementById("size-increase");
+const sizeDecrease = document.getElementById("size-decrease");
 
 zSlider.addEventListener("input", () => {
     gvs.z = Number(Number(zSlider.value).toFixed(2));
@@ -64,6 +67,16 @@ heatSlider.addEventListener("input", () => {
 resetButton.addEventListener("click", () => {
     resetToInitialConditions();
     P5.redraw();
+});
+
+sizeDecrease.addEventListener("click", () => {
+    gvs.scale *= 0.9;
+    document.body.style.transform = `translate(${-1 * (1 - gvs.scale) * 500}px, ${-1 * (1 - gvs.scale) * 250}px) scale(${gvs.scale})`;
+});
+
+sizeIncrease.addEventListener("click", () => {
+    gvs.scale *= 1.1;
+    document.body.style.transform = `translate(${-1 * (1 - gvs.scale) * 500}px, ${-1 * (1 - gvs.scale) * 250}px) scale(${gvs.scale})`;
 });
 
 function  resetToInitialConditions() {
