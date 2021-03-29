@@ -33,6 +33,9 @@ const muSlider = document.getElementById("viscosity-slider");
 
 function setup() {
   cnv = createCanvas(500, 400);
+
+  document.getElementById("p5-container").appendChild(cnv.elt);
+  document.getElementById("p5-container").appendChild(document.getElementsByClassName("output-area")[0]);
   noLoop();
 }
 
