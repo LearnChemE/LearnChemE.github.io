@@ -27,7 +27,7 @@ const sketch = (p) => {
     };
 
     p.setup = function () {
-        p.createCanvas(800, 500);
+        p.createCanvas(770, 450);
         p.textFont(font);
         p.noLoop();
         window.gvs.p = p;

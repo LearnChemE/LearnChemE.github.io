@@ -7,11 +7,20 @@ const plotOptions = {
   marginTop: 0,
   marginBottom: 70,
   width: 400,
-  height: 400,
+  height: 350,
   xRange: [0, 1],
   yRange: [60, 100],
   largePointSize: 7,
   smallPointSize: 5,
+};
+
+const barGraphOptions = {
+  marginLeft : 80,
+  marginBottom: 80,
+  width : 200,
+  height : 300,
+  yRange : [0, 1],
+  xRange: [0, 1],
 };
 
 const colors = {
@@ -484,14 +493,6 @@ function drawLinesAndPoints() {
   }
 }
 
-const barGraphOptions = {
-  marginLeft : 80,
-  marginBottom: 80,
-  width : 200,
-  height : 350,
-  yRange : [0, 1],
-  xRange: [0, 1],
-};
 
 function barGraphCoordToPixel(x, y) {
   const yPix = p.height - barGraphOptions.marginBottom - p.map(y, barGraphOptions.yRange[0], barGraphOptions.yRange[1], 0, barGraphOptions.height);
