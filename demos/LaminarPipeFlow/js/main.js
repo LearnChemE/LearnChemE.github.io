@@ -190,7 +190,7 @@ function drawAxes() {
     noStroke();
     textSize(14);
     textAlign(CENTER, BOTTOM);
-    rectMode(CENTER, CENTER);
+    rectMode(CENTER);
     fill("rgba(250, 250, 0, 0.5)");
     if( showNotification ) {
       switch(condition) {
