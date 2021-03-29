@@ -40,7 +40,7 @@ function setup() {
 /******* CALCULATIONS *******/
 /****************************/
 
-function velocity(r) { return ( R**2 / ( 4 * mu ) ) * dPdz * ( 1 - ( r**2 / R**2 ) ) }
+function calcVelocity(r) { return ( R**2 / ( 4 * mu ) ) * dPdz * ( 1 - ( r**2 / R**2 ) ) }
 
 function calcAverageVelocity()
 {
@@ -103,7 +103,7 @@ function update()
 
   document.getElementById("Qdata").innerHTML = formatNumber( Q * ( 100**3 ) );
   document.getElementById("averageVelocity-data").innerHTML = formatNumber( 100 * averageVelocity );
-  document.getElementById("maxVelocity-data").innerHTML = formatNumber( velocity( 0 ) * 100 );
+  document.getElementById("maxVelocity-data").innerHTML = formatNumber( calcVelocity( 0 ) * 100 );
   document.getElementById("Re-data").innerHTML = formatNumber( Math.abs(Re) );
 
 }
@@ -115,10 +115,10 @@ function update()
 
 function draw() {
   background(255, 255, 255);
-  drawPlates();
   drawAverage();
-  drawAxes();
   drawContour();
+  drawPlates();
+  drawAxes();
 }
 
 function drawPlates() {
@@ -127,12 +127,19 @@ function drawPlates() {
     noStroke();
     rect(30, coords.topPlateY, 420, 10);
     rect(30, coords.bottomPlateY, 420, 10);
+    stroke(0);
+    noFill();
+    strokeWeight(0.5);
+    line(30, coords.topPlateY, 450, coords.topPlateY);
+    line(30, coords.topPlateY + 10, 450, coords.topPlateY + 10);
+    line(30, coords.bottomPlateY, 450, coords.bottomPlateY);
+    line(30, coords.bottomPlateY + 10, 450, coords.bottomPlateY + 10);
   pop();
 }
 
 function drawAxes() {
   push();
-    line(100,25,100,375);
+    line(100,25,100,350);
     line(30,200,470,200);
 
     textAlign(CENTER, TOP);
@@ -143,7 +150,7 @@ function drawAxes() {
     }
 
     textAlign(RIGHT, CENTER);
-    for( let j = -0.25; j <= 0.25; j += 0.05 ) {
+    for( let j = -0.20; j <= 0.20; j += 0.05 ) {
       const y_pix = 200 - j * ( pixelsPerMeter / 10 ); //200 center line, 
       line(100, y_pix, 103, y_pix);
       if ( Math.abs(j) > 0.01 ) {
@@ -153,8 +160,11 @@ function drawAxes() {
 
     fill( 0, 0, 0 );
     triangle(470, 197, 470, 203, 480, 200);
-    text('r (cm)', 60, 25);
-    text('u (cm/s)', 455, 225);
+    textSize(14);
+    textAlign(CENTER, BOTTOM);
+    text('r (cm)', 100, 23);
+    textAlign(RIGHT, BOTTOM);
+    text('u (cm/s)', 490, 190);
   pop();
 }
 
@@ -162,9 +172,26 @@ function drawAverage()
 {
   const u_pix = averageVelocity * pixelsPerMeter / 2;
   push();
-    noStroke();
-    fill(255, 200,200);
+    stroke(100);
+    strokeWeight(0.5);
+    fill(200, 200, 255, 100);
     rect( 100, coords.topPlateY + 10, u_pix, coords.bottomPlateY - coords.topPlateY -10 );
+    
+    noFill();
+    strokeWeight(1);
+    line(100, height - 27, 100 + u_pix, height - 27);
+    noStroke();
+    fill(0);
+    if ( dPdz >= 0 ) {
+      triangle(100 + u_pix, height - 27, 92 + u_pix, height - 31, 92 + u_pix, height - 23);
+    } else {
+      triangle(100 + u_pix, height - 27, 108 + u_pix, height - 31, 108 + u_pix, height - 23);
+    }
+    textSize(15);
+    textAlign(CENTER, TOP);
+    text("u", 100, height - 23);
+    textSize(10);
+    text("avg", 113, height - 16);
   pop();
 }
 
@@ -175,7 +202,7 @@ function drawContour() {
     beginShape();
       for( let i = coords.topPlateY + 10; i < coords.bottomPlateY + 1; i++ ) {
         const r = ( i - 200 ) / pixelsPerMeter;
-        const u = velocity( r );
+        const u = calcVelocity( r );
         u_pix = u * pixelsPerMeter / 2 + 100;
         vertex(u_pix, i);
       }
