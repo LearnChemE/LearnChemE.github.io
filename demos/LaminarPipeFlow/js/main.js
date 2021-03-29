@@ -53,25 +53,46 @@ function calcReynolds()
   Re = R * 2 * 1000 * averageVelocity / mu;
 }
 
+let condition, showNotification = false;
+
 function calcSliderLimits()
 {
 
-  const maxRadius = 0.025;
   const maxReynolds = 2100; 
-  const reynoldsLimited = maxReynolds * mu / ( 1000 * 2 * maxRadius );
+  const reynoldsLimited = maxReynolds * mu / ( 1000 * 2 * R );
   let maxAveV;
-  if ( dPdz > 0 ) { maxAveV = 0.06 < reynoldsLimited ? 0.06 : reynoldsLimited } else { maxAveV = 0.01 < reynoldsLimited ? 0.01 : reynoldsLimited }
-  const maxQ = Math.PI * ( maxRadius**2 ) * maxAveV;
-  const maxP = (maxQ * mu * 128) / ( Math.PI * ((maxRadius*2)**4 ));
+  if ( dPdz > 0 ) { 
+    if(0.06 < reynoldsLimited) {
+      maxAveV = 0.06;
+      condition = "velocity limited positive";
+    } else {
+      maxAveV = reynoldsLimited;
+      condition = "reynolds limited positive";
+    }
+  } else { 
+    if( 0.01 < reynoldsLimited ) {
+      maxAveV = 0.01
+      condition = "velocity limited negative";
+    } else { 
+      maxAveV = reynoldsLimited
+      condition = "reynolds limited negative";
+    }
+  }
+  const maxQ = Math.PI * ( R**2 ) * maxAveV;
+  const maxP = (maxQ * mu * 128) / ( Math.PI * ((R*2)**4 ));
 
+  const step = Number(dPdzSlider.getAttribute("step"));
   if( dPdz > maxP ) {
-    dPdz = maxP;
-    dPdzSlider.value = String( maxP );
+    dPdzSlider.value = String( maxP - step );
+    dPdz = ( maxP - step );
     dPdzSlider.setAttribute("max", String( maxP ));
+    showNotification = true;
   } else {
+    showNotification = false;
     if( Math.abs( dPdz ) > maxP ) {
       dPdz = -1 * maxP;
-      dPdzSlider.value = String( -1 * maxP );
+      dPdzSlider.value = String( -1 * maxP + step );
+      showNotification = true;
     }
     dPdzSlider.setAttribute("min", String( -1 * maxP ) );
     dPdzSlider.setAttribute("max", String( maxP ) );
@@ -91,9 +112,9 @@ function update()
   dPdz = Number( dPdzSlider.value );
   mu = Math.exp( Number( muSlider.value ) );
 
+  calcSliderLimits();
   calcAverageVelocity();
   calcReynolds();
-  calcSliderLimits();
 
   document.getElementById("radius-value").innerHTML = ( 100 * R ).toFixed(1);
   document.getElementById("viscosity-value").innerHTML = formatNumber( mu );
@@ -165,7 +186,42 @@ function drawAxes() {
     text('r (cm)', 100, 23);
     textAlign(RIGHT, BOTTOM);
     text('u (cm/s)', 490, 190);
+    const textCoords = [ width / 2 + 50, 30];
+    noStroke();
+    textSize(14);
+    textAlign(CENTER, BOTTOM);
+    rectMode(CENTER, CENTER);
+    fill("rgba(250, 250, 0, 0.5)");
+    if( showNotification ) {
+      switch(condition) {
+        case "reynolds limited positive":
+          rect(textCoords[0], textCoords[1] - 6, 230, 20);
+          fill(0);
+          text("dP/dz reduced to keep Re < 2100", textCoords[0], textCoords[1]);
+        break;
+
+        case "reynolds limited negative":
+          rect(textCoords[0], textCoords[1] - 6, 230, 20);
+          fill(0);
+          text("dP/dz increased to keep Re < 2100", textCoords[0], textCoords[1]);
+        break;
+
+        case "velocity limited positive":
+          rect(textCoords[0], textCoords[1] - 6, 325, 20);
+          fill(0);
+          text("dP/dz reduced to keep maximum velocity under 12", textCoords[0], textCoords[1]);
+        break;
+
+        case "velocity limited negative":
+          rect(textCoords[0], textCoords[1] - 6, 330, 20);
+          fill(0);
+          text("dP/dz increased to keep maximum velocity above -2", textCoords[0], textCoords[1]);
+        break;
+      }
+    }
+
   pop();
+
 }
 
 function drawAverage()
