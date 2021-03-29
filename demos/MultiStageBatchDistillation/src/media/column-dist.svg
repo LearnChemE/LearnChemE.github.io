@@ -4,12 +4,12 @@
    xmlns="http://www.w3.org/2000/svg"
    id="column-svg"
    version="1.1"
-   viewBox="0 0 204.26986 181.92877">
+   viewBox="0 0 226.57118 181.92877">
   <defs
      id="defs" />
   <g
      id="still"
-     transform="translate(-1.1050627,-84.398827)">
+     transform="translate(-20.520109,-84.398827)">
     <path
        d="m 157.84422,206.14281 h 2.92479 l -0.53627,10.28872 -2.38862,1.13169 z"
        transform="rotate(25.350778)"
@@ -1032,7 +1032,7 @@
          x="82.588333"
          y="142.40303" />
       <rect
-         y="-128.63002"
+         y="-114.61736"
          x="142.40302"
          height="1.2297325"
          width="79.751755"
@@ -1042,10 +1042,11 @@
       <rect
          style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.264999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="rect1080"
-         width="22.627079"
-         height="1.2297325"
+         width="8.5464029"
+         height="1.2297363"
          x="106.00294"
-         y="142.40303" />
+         y="142.40303"
+         ry="0" />
       <rect
          style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.264999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="rect1018"
@@ -1197,11 +1198,11 @@
          id="path1276" />
       <path
          style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 106.49484,95.673195 v 46.811815 h 22.0532 v 79.64568 h -1.22973 v -78.49793 h -20.90545 v 2.2955 h -4.58076"
+         d="m 106.49484,95.673195 v 46.811815 h 8.17622 l 3.7e-4,79.64568 h -1.36578 l 4.1e-4,-78.49793 h -6.8932 v 2.2955 h -4.58076"
          id="path1278" />
       <g
          id="valve-1"
-         transform="matrix(0.73689062,0,0,1,33.677632,-1.1067895)"
+         transform="matrix(0.73689062,0,0,1,19.644323,-1.1067895)"
          style="stroke-width:1.16493">
         <rect
            y="212.06796"
@@ -1285,25 +1286,25 @@
          rx="0.5" />
       <path
          style="fill:none;stroke:#000000;stroke-width:0.264582px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 114.95102,135.02295 c 6.83305,0.0424 7.01424,-0.0521 8.4762,-0.73812 0.86548,-1.15012 0.17421,-2.05288 1.87102,-3.055 2.43054,-1.08681 4.80035,-1.10766 6.39241,-1.09961 4.76062,0.0241 9.16872,0.0895 9.16872,0.0895"
+         d="m 114.95102,135.02295 c 6.83305,0.0424 6.4611,-0.74954 7.46612,-1.8444 1.21982,-1.54323 2.51058,-3.68998 2.68973,-6.99917"
          id="path1325" />
       <rect
          style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.15;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="condenser-temperature-container"
          width="26.347527"
          height="10.012316"
-         x="130.23192"
-         y="125.58942" />
+         x="108.66876"
+         y="117.97089" />
       <text
          xml:space="preserve"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-         x="133.97931"
-         y="132.56247"
+         x="112.41615"
+         y="124.94394"
          id="condenser-temperature"><tspan
            id="tspan1329"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-           x="133.97931"
-           y="132.56247">250° C</tspan></text>
+           x="112.41615"
+           y="124.94394">250° C</tspan></text>
       <rect
          rx="0.5"
          ry="0.5"
@@ -1316,11 +1317,11 @@
          transform="scale(-1,1)" />
       <path
          id="path1325-8"
-         d="m 41.528967,247.69639 c -6.83305,0.0424 -7.01424,-0.0521 -8.4762,-0.73812 -0.86548,-1.15012 -0.17421,-2.05288 -1.87102,-3.055 -2.43054,-1.08681 -4.80035,-1.10766 -6.39241,-1.09961 -4.76062,0.0241 -9.16872,0.0895 -9.16872,0.0895"
+         d="m 41.528967,247.69639 c -3.22552,-0.94442 -4.226107,-1.43611 -6.685341,-3.37764 -2.277912,-2.37431 -2.780121,-3.19371 -2.797411,-8.02827"
          style="fill:none;stroke:#000000;stroke-width:0.264582px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
       <rect
-         y="237.20688"
-         x="-29.67277"
+         y="227.68372"
+         x="-48.991192"
          height="11.304424"
          width="26.396082"
          id="still-temperature-container"
@@ -1328,18 +1329,18 @@
          transform="scale(-1,1)" />
       <text
          id="still-temperature"
-         y="244.95573"
-         x="6.4676275"
+         y="235.43257"
+         x="25.786049"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
          xml:space="preserve"><tspan
            id="tspan1795"
-           x="6.4676275"
-           y="244.95573">150° C</tspan></text>
+           x="25.786049"
+           y="235.43257">150° C</tspan></text>
     </g>
   </g>
   <g
      id="flask-1"
-     transform="translate(47.612869,-6.7225385)">
+     transform="translate(14.24904,-6.7225389)">
     <path
        id="path1734"
        d="m 77.04706,147.20646 v 6.18979 c 0,0 -6.70503,14.26326 -6.64706,16.14729 1.89413,2.24856 16.086216,2.34779 18.086186,0 -0.231881,-1.50722 -6.64706,-16.14729 -6.64706,-16.14729 v -6.18979 z"
@@ -1370,4 +1371,11 @@
        rx="8.8935785"
        ry="0.36231342" />
   </g>
+  <rect
+     y="2.688127"
+     x="117.14576"
+     height="176.99194"
+     width="107.24213"
+     id="canvas-rect"
+     style="fill:none;fill-opacity:1;stroke-width:1.00157;stroke:none" />
 </svg>

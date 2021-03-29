@@ -6,6 +6,7 @@ window.p5 = new require("./js/p5.min.js");
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
     scale: 1,
+    cnv: undefined,
 };
 
 // JavaScript modules from /js/ folder
@@ -14,26 +15,39 @@ const { importSVG } = require("./js/importSVG.js"); // adds inline-SVG to the do
 const { updateSVG } = require("./js/updateSVG.js");
 
 const containerElement = document.getElementById("svg-container");
+const p5container = document.getElementById("p5-container");
 
 const sketch = (p) => {
 
     p.setup = function () {
         document.getElementById("loading").style.display = "none";
         p.noLoop();
-        p.noCanvas();
         importSVG();
+        p.windowResized();
         window.gvs.p = p;
     };
 
     p.draw = function () {
-        p.background(253);
+        p.background(252);
         calcAll();
         updateSVG();
     };
 
+    p.windowResized = function() {
+        const svgCnvElt = document.getElementById("canvas-rect");
+        const rect = svgCnvElt.getBoundingClientRect();
+        const w = rect.width;
+        const h = rect.height;
+        const top = rect.top;
+        const left = rect.left;
+        window.gvs.cnv = p.createCanvas(w, h);
+        p5container.style.top = `${top}px`;
+        p5container.style.left = `${left}px`;
+    }
+
 };
 
-const P5 = new p5(sketch, containerElement);
+const P5 = new p5(sketch, p5container);
 
 // const oneSlider = document.getElementById("one-slider");
 // const oneValue = document.getElementById("one-value");
