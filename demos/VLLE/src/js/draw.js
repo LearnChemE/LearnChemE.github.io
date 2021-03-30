@@ -10,28 +10,28 @@ const plotOptions = {
   height: 350,
   xRange: [0, 1],
   yRange: [60, 100],
-  largePointSize: 7,
-  smallPointSize: 5,
+  largePointSize: 9,
+  smallPointSize: 8,
 };
 
 const barGraphOptions = {
-  marginLeft : 80,
+  marginLeft : 60,
   marginBottom: 80,
-  width : 200,
-  height : 300,
+  width : 220,
+  height : 320,
   yRange : [0, 1],
   xRange: [0, 1],
 };
 
 const colors = {
-  alpha: "rgba(255, 50, 50, 0.5)",
-  beta: "rgba(100, 100, 200, 0.6)",
-  vapor: "rgba(0, 150, 0, 0.4)",
-  point: "rgba(255, 255, 255, 1)",
+  alpha: "rgba(255, 80, 80, 0.7)",
+  beta: "rgba(120, 120, 200, 0.7)",
+  vapor: "rgba(180, 200, 80, 0.7)",
+  point: "rgba(0, 255, 255, 1)",
 };
 
 const lines = {
-  strokeWeight: 1.25,
+  strokeWeight: 1.75,
 }
 
 function coordToPixel(x, y) {
@@ -240,7 +240,7 @@ function drawAreaLabels() {
     p.noStroke();
     p.fill(0);
     p.textAlign(p.CENTER, p.CENTER);
-    p.textSize(16);
+    p.textSize(15);
     const vaporCoord = coordToPixel(0.58, 92);
     const alphaCoord = coordToPixel(0.1, 78);
     const betaCoord = coordToPixel(0.92, 78);
@@ -250,8 +250,6 @@ function drawAreaLabels() {
     p.text("vapor", vaporCoord[0], vaporCoord[1]);
     p.text("α liquid", alphaCoord[0], alphaCoord[1]);
     p.text("β liquid", betaCoord[0], betaCoord[1]);
-
-    p.textSize(14);
 
     p.text("α liquid\n+ vapor", alphaVaporCoord[0], alphaVaporCoord[1]);
     p.text("β liquid\n+ vapor", betaVaporCoord[0], betaVaporCoord[1]);
@@ -301,7 +299,11 @@ function vlineV() {
 
 function hlineAlpha() {
   p.push();
-    p.stroke(colors.alpha);
+    if ( window.gvs.T >= 77.6 ) {
+      p.stroke(colors.vapor);
+    } else {
+      p.stroke(colors.beta);
+    }
     p.strokeWeight(lines.strokeWeight);
     const coord1 = coordToPixel( gvs.z, gvs.data[0] );
     const coord2 = coordToPixel( gvs.data[4], gvs.data[0] );
@@ -311,7 +313,11 @@ function hlineAlpha() {
 
 function hlineBeta() {
   p.push();
-    p.stroke(colors.beta);
+    if ( window.gvs.T >= 77.6 ) {
+      p.stroke(colors.vapor);
+    } else {
+      p.stroke(colors.alpha);
+    }
     p.strokeWeight(lines.strokeWeight);
     const coord1 = coordToPixel( gvs.z, gvs.data[0] );
     const coord2 = coordToPixel( gvs.data[5], gvs.data[0] );
@@ -321,7 +327,11 @@ function hlineBeta() {
 
 function hlineV() {
   p.push();
-    p.stroke(colors.vapor);
+    if ( window.gvs.z <= 0.6 ) {
+      p.stroke(colors.alpha);
+    } else {
+      p.stroke(colors.beta);
+    }
     p.strokeWeight(lines.strokeWeight);
     const coord1 = coordToPixel( gvs.z, gvs.data[0] );
     const coord2 = coordToPixel( gvs.data[6], gvs.data[0] );
@@ -538,7 +548,7 @@ function drawBarGraphAxes() {
     p.fill(colors.alpha);
     p.strokeWeight(0.5);
     p.stroke(0);
-    const rectRadius = 16;
+    const rectRadius = 20;
     let bottomCenter = barGraphCoordToPixel(0.167, 0);
     let topCenter = barGraphCoordToPixel(0.167, gvs.data[1]);
 
@@ -546,9 +556,10 @@ function drawBarGraphAxes() {
 
     p.fill(0);
     p.noStroke();
-    p.text(`${gvs.data[4] == -1 ? "" : "x   = " + Number(gvs.data[4]).toFixed(2)}`, topCenter[0], topCenter[1] - 5);
+    p.text(`${gvs.data[4] == -1 ? "" : "x   = " + Number(gvs.data[4]).toFixed(2)}`, topCenter[0], topCenter[1] - 6);
     p.textSize(11);
-    p.text(`${gvs.data[4] == -1 ? "" : "α"}`, topCenter[0] - 16.5, topCenter[1] - 2);
+    p.text(`${gvs.data[4] == -1 ? "" : "α"}`, topCenter[0] - 17.5, topCenter[1] - 14);
+    p.text(`${gvs.data[4] == -1 ? "" : "B"}`, topCenter[0] - 17, topCenter[1] - 2);
 
     bottomCenter = barGraphCoordToPixel(0.167 + 0.33, 0);
     topCenter = barGraphCoordToPixel(0.167 + 0.33, gvs.data[2]);
@@ -561,9 +572,10 @@ function drawBarGraphAxes() {
 
     p.fill(0);
     p.noStroke();
-    p.text(`${gvs.data[5] == -1 ? "" : "x   = " + Number(gvs.data[5]).toFixed(2)}`, topCenter[0], topCenter[1] - 5);
+    p.text(`${gvs.data[5] == -1 ? "" : "x   = " + Number(gvs.data[5]).toFixed(2)}`, topCenter[0], topCenter[1] - 6);
     p.textSize(11);
-    p.text(`${gvs.data[5] == -1 ? "" : "β"}`, topCenter[0] - 16.5, topCenter[1]);
+    p.text(`${gvs.data[5] == -1 ? "" : "β"}`, topCenter[0] - 16.5, topCenter[1] - 14);
+    p.text(`${gvs.data[5] == -1 ? "" : "B"}`, topCenter[0] - 16.5, topCenter[1]);
 
     p.fill(colors.vapor);
 
@@ -576,9 +588,10 @@ function drawBarGraphAxes() {
 
     p.fill(0);
     p.noStroke();
-    p.text(`${gvs.data[6] == -1 ? "" : "y   = " + Number(gvs.data[6]).toFixed(2)}`, topCenter[0], topCenter[1] - 5);
+    p.text(`${gvs.data[6] == -1 ? "" : "y   = " + Number(gvs.data[6]).toFixed(2)}`, topCenter[0], topCenter[1] - 6);
     p.textSize(11);
-    p.text(`${gvs.data[6] == -1 ? "" : "v"}`, topCenter[0] - 16.5, topCenter[1]);
+    p.text(`${gvs.data[6] == -1 ? "" : "V"}`, topCenter[0] - 16.5, topCenter[1] - 14);
+    p.text(`${gvs.data[6] == -1 ? "" : "B"}`, topCenter[0] - 16.5, topCenter[1]);
 
   p.pop();
 
@@ -608,8 +621,9 @@ function drawBarGraphAxes() {
 
   p.push();
     p.textAlign(p.CENTER, p.CENTER);
-    labelCoord = barGraphCoordToPixel(0.5, 1.0);
-    p.text("relative amounts", labelCoord[0], labelCoord[1] - 40);
+    labelCoord = barGraphCoordToPixel(-0.08, 1.08);
+    p.translate(labelCoord[0], labelCoord[1]);
+    p.text("moles", 0, 0);
   p.pop();
 
 }
