@@ -117,6 +117,38 @@
       }
     }
   }
+
+  .flask-div {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+
+    .flask-label {
+      white-space: nowrap;
+      font-size: 0.85rem;
+      line-height: 1rem;
+      text-align: center;
+    }
+  }
+}
+
+.flask-liquid {
+  fill: #d2d2ff;
+}
+
+.flask-line {
+  fill: none;
+  stroke: black;
+  stroke-width: 0.5px;
+}
+
+.flask-top-ellipse {
+  fill: grey;
+}
+
+.flask-liquid-ellipse {
+  stroke: black;
+  stroke-width: 0.25px;
 }
 
 @media screen and (min-width: 850px) {

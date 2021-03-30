@@ -12,7 +12,7 @@ window.gvs = {
 // JavaScript modules from /js/ folder
 const { calcAll } = require("./js/calcs.js"); // contains all calculation-related functions
 const { importSVG } = require("./js/importSVG.js"); // adds inline-SVG to the document
-const { updateSVG } = require("./js/updateSVG.js");
+const { updateSVG, resizeFlasks } = require("./js/updateSVG.js");
 
 const containerElement = document.getElementById("svg-container");
 const p5container = document.getElementById("p5-container");
@@ -43,6 +43,7 @@ const sketch = (p) => {
         window.gvs.cnv = p.createCanvas(w, h);
         p5container.style.top = `${top}px`;
         p5container.style.left = `${left}px`;
+        resizeFlasks();
     }
 
 };
