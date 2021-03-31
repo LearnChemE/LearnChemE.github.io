@@ -590,7 +590,6 @@ function drawBarGraphAxes() {
     p.noStroke();
     p.text(`${gvs.data[6] == -1 ? "" : "y   = " + Number(gvs.data[6]).toFixed(2)}`, topCenter[0], topCenter[1] - 6);
     p.textSize(11);
-    p.text(`${gvs.data[6] == -1 ? "" : "V"}`, topCenter[0] - 16.5, topCenter[1] - 14);
     p.text(`${gvs.data[6] == -1 ? "" : "B"}`, topCenter[0] - 16.5, topCenter[1]);
 
   p.pop();
