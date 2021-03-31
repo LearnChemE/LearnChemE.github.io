@@ -12,7 +12,7 @@
     height: max-content;
     min-width: 430px;
     svg {
-      max-height: 98vh;
+      max-height: 800px;
     }
     #loading {
       margin-left: 15px;
@@ -118,18 +118,23 @@
     }
   }
 
-  .flask-div {
-    position: absolute;
-    top: 0px;
-    left: 0px;
+}
 
-    .flask-label {
-      white-space: nowrap;
-      font-size: 0.85rem;
-      line-height: 1rem;
-      text-align: center;
-    }
-  }
+.flask-div {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  display: grid;
+  justify-items: center;
+  transform: translateX(-50%);
+}
+
+.flask-label {
+  white-space: nowrap;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  text-align: center;
+  width: max-content;
 }
 
 .flask-liquid {
@@ -152,6 +157,9 @@
 }
 
 @media screen and (min-width: 850px) {
+  .flask-label {
+    font-size: 0.8rem;
+  }
   .input-row, #select-container>div {
     font-size: 0.95rem !important;
   }
@@ -159,7 +167,7 @@
     font-size: 1rem !important;
   }
   .input-row {
-    grid-template-columns: max-content 10rem 4ch max-content !important;
+    grid-template-columns: max-content 9rem 4ch max-content !important;
   }
   .btn {
     font-size: 1rem !important;
@@ -167,6 +175,9 @@
 }
 
 @media screen and (min-width: 1024px) {
+  .flask-label {
+    font-size: 0.9rem;
+  }
   .input-row, #select-container>div {
     font-size: 1rem !important;
   }

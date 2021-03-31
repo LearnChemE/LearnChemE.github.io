@@ -7,12 +7,14 @@ window.p5 = new require("./js/p5.min.js");
 window.gvs = {
     scale: 1,
     cnv: undefined,
+    flasks: [],
+    still: undefined,
 };
 
 // JavaScript modules from /js/ folder
 const { calcAll } = require("./js/calcs.js"); // contains all calculation-related functions
-const { importSVG } = require("./js/importSVG.js"); // adds inline-SVG to the document
-const { updateSVG, resizeFlasks } = require("./js/updateSVG.js");
+const { importSVG, addStill } = require("./js/importSVG.js"); // adds inline-SVG to the document
+const { resizeFlasks, updateImage } = require("./js/update.js");
 
 const containerElement = document.getElementById("svg-container");
 const p5container = document.getElementById("p5-container");
@@ -23,6 +25,8 @@ const sketch = (p) => {
         document.getElementById("loading").style.display = "none";
         p.noLoop();
         importSVG();
+        addStill();
+        window.gvs.addFlask();
         p.windowResized();
         window.gvs.p = p;
     };
@@ -30,7 +34,7 @@ const sketch = (p) => {
     p.draw = function () {
         p.background(252);
         calcAll();
-        updateSVG();
+        updateImage();
     };
 
     p.windowResized = function() {

@@ -2,7 +2,7 @@ const svgContainer = document.getElementById("svg-container");
 const p5Container = document.getElementById("p5-container");
 const app = document.getElementById("app");
 
-function setFlaskLiquidLevel(elt, lvl) {
+window.gvs.setFlaskLiquidLevel = function(elt, lvl) {
   const flaskG = elt.firstChild;
   const flaskPoly = flaskG.children[0];
   const flaskBottomLiquid = flaskG.children[1];
@@ -28,6 +28,9 @@ function setFlaskLiquidLevel(elt, lvl) {
     flaskLiquidEllipse.setAttribute("cy", `${centerCoords[1]}`);
     flaskLiquidEllipse.setAttribute("rx", `${radiusX}`);
     flaskLiquidEllipse.setAttribute("ry", "1");
+
+    // DRAW BOTTOM OF LIQUID
+    flaskBottomLiquid.style.opacity = "1";
   } else if ( lvl > 0 ) {
     flaskPoly.style.opacity = "0";
     flaskLiquidEllipse.style.opacity = "1";
@@ -51,21 +54,25 @@ function setFlaskLiquidLevel(elt, lvl) {
 };
 
 function resizeFlasks() {
-  const flasks = document.getElementsByClassName("flask-div");
+  const flasks = [];
+  for ( let i = 0; i < 9; i++ ) { flasks.push( document.getElementById( `flask-div-${i + 1}` ) ) }
+  const svgs = document.getElementsByClassName("flask-svg");
   const containerRect = svgContainer.getBoundingClientRect();
+  const dispenserRect = document.getElementById("dispenser-rect").getBoundingClientRect();
   const p5Rect = p5Container.getBoundingClientRect();
-  const relativeSize = 0.08;
+  const relativeSize = 0.07;
   for ( let i = 0; i < flasks.length; i++ ) {
     const flaskDiv = flasks[i];
-    flaskDiv.style.width = `${relativeSize * containerRect.width}px`;
+    const svg = svgs[i];
+    svg.style.width = `${relativeSize * containerRect.width}px`;
     let left = 0;
     let top = 0;
     if ( i === 0 ) {
-      left = containerRect.left + 0.373 * containerRect.width;
-      top = containerRect.top + 0.78 * containerRect.height;
+      left = dispenserRect.left + dispenserRect.width / 2;
+      top = dispenserRect.top + dispenserRect.height + 10;
     } else {
       const adjWidth = p5Rect.width * 0.45;
-      const adjHeight = p5Rect.height * 0.125;
+      const adjHeight = p5Rect.height * 0.12;
       const topMargin = p5Rect.height * 0.02;
       const leftMargin = p5Rect.width * 0.28;
       left = p5Rect.left + ( ( i - 1 ) % 2 ) * adjWidth + leftMargin;
@@ -77,8 +84,51 @@ function resizeFlasks() {
   }
 };
 
-function updateSVG() {
-
+window.gvs.updateFlaskObjects = function() {
+  let i = 0;
+  for ( i = 0; i < window.gvs.flasks.length; i++ ) {
+    const thisFlask = window.gvs.flasks[i];
+    const flaskDiv = document.getElementById(`flask-div-${i + 1}`);
+    flaskDiv.style.display = "grid";
+    const label = `${thisFlask.name}<br>x<sub>B</sub> = ${Number(thisFlask.xB).toFixed(2)}`;
+    flaskDiv.children[1].innerHTML = label;
+    thisFlask.SVG = flaskDiv.children[0];
+    thisFlask.div = flaskDiv;
+    const lvl = thisFlask.V / thisFlask.maxVolume;
+    window.gvs.setFlaskLiquidLevel(thisFlask.SVG, lvl);
+  }
+  for ( let j = i; j < 9; j++ ) {
+    const flaskDiv = document.getElementById(`flask-div-${j + 1}`);
+    flaskDiv.style.display = "none";
+  }
 };
 
-module.exports = { updateSVG, resizeFlasks };
+window.gvs.addFlask = function() {
+  const k = Math.round(window.gvs.flasks.length + 1);
+  if ( k <= 9 ) {
+    const flask = { 
+      name: `flask #${k}`,
+      xB : 0.00,
+      V : 0.00,
+      maxVolume: Number(document.getElementById("evap-quantity-slider").getAttribute("max")),
+      SVG: document.getElementById(`flask-div-1`).children[0],
+      div: document.getElementById(`flask-div-1`),
+      updateImage: function() {
+        const lvl = this.V / this.maxVolume;
+        window.gvs.setFlaskLiquidLevel(this.SVG, lvl);
+        this.div.children[1].innerHTML = `${this.name}<br>x<sub>B</sub> = ${Number(this.xB).toFixed(2)}`;
+      },
+    };
+    window.gvs.flasks.unshift(flask);
+    window.gvs.updateFlaskObjects();
+  } else {
+    throw "too many flasks added with addFlask()"
+  }
+};
+
+function updateImage() {
+  window.gvs.flasks[0].updateImage();
+  window.gvs.still.updateImage();
+};
+
+module.exports = { resizeFlasks, updateImage };
