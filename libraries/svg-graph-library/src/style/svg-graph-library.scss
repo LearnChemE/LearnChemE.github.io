@@ -1,0 +1,60 @@
+:root {
+  --plot-padding-left: 2rem;
+  --plot-padding-right: 0rem;
+  --plot-padding-top: 0rem;
+  --plot-padding-bottom: 2rem;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.svg-plot {
+  svg {
+    // position: relative;
+    // top: var(--plot-padding-top);
+    // left: var(--plot-padding-left);
+    // width: calc(100% - var(--plot-padding-left) - var(--plot-padding-right));
+    // height: calc(100% - var(--plot-padding-top) - var(--plot-padding-bottom));
+  }
+}
+
+.axes-labels {
+  font-size: 1.1rem;
+}
+
+.plot-title {
+  font-size: 1.2rem;
+}
+
+.tick-label {
+  font-family: sans-serif;
+  font-size: 0.9rem;
+  position: absolute;
+  &.x {
+    transform: translate(-50%, 5px);
+  }
+  
+  &.y {
+    transform: translate(calc( -100% - 5px), -50%);
+  }
+}
+
+.tick-labels {
+  position: absolute;
+  width: 100vw;
+  height: 100vw;
+  left: 0px;
+  top: 0px;
+}
+
+.svg-axis-line {
+  stroke: black;
+  stroke-width: 0.5px;
+}
+
+.major-tick, .minor-tick {
+  stroke: black;
+  stroke-width: 0.5px;
+}
+
+line, path, rect, ellipse, circle, polygon, polyline, text {
+  vector-effect: non-scaling-stroke;
+}
