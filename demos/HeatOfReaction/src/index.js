@@ -115,8 +115,8 @@ function changeReaction(rxn) {
         case "3":
             gvs.reaction = "carbon monoxide oxidation";
 
-            gvs.xRange = [-450, 300];
-            gvs.yRange = [0, 5700];
+            gvs.xRange = [-450, 20];
+            gvs.yRange = [0, 2100];
 
             tSlider.setAttribute("min", "25");
             tSlider.setAttribute("max", "5500");
@@ -140,7 +140,7 @@ function changeReaction(rxn) {
             gvs.reaction = "haber bosch process";
 
             gvs.xRange = [-150, 160];
-            gvs.yRange = [0, 1300];
+            gvs.yRange = [0, 2000];
 
             tSlider.setAttribute("min", "25");
             tSlider.setAttribute("max", "1200");

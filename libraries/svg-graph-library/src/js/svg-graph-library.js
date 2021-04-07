@@ -45,14 +45,13 @@ function Graph(options) {
     },
   };
 
+  this.curves = [];
+  this.shapes = [];
+
   /***********************************************/
   /****** CREATE CONTAINER AND SVG ELEMENTS ******/
   /***********************************************/
   this.container = document.createElement("div");
-  const width = this.options.parent === document.body ? "500px" : "100%";
-  const height = this.options.parent === document.body ? "500px" : "100%";
-  this.container.style.width = `${width}`;
-  this.container.style.height = `${height}`;
   this.container.classList = this.options.classList;
   this.container.id = this.options.id;
   this.options.parent.appendChild(this.container);
@@ -133,6 +132,47 @@ function Graph(options) {
     return group;
   };
 
+  this.createPath = function(options) {
+    const o = {
+      coords: [],
+      classList: [],
+      usePlotCoordinates: true,
+      id: null,
+      parent: this.SVG,
+      stroke: "rgb(0, 0, 0)",
+      strokeWidth: 1,
+      fill: "none",
+      ...options,
+    };
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+
+    let coords = [];
+    if ( o.usePlotCoordinates ) {
+      o.coords.forEach(coord => {
+        coords.push(this.coordToPix(...coord));
+      });
+    } else {
+      o.coords.forEach(coord => {
+        coords.push(coord);
+      });
+    };
+    if( o.classList.length >= 1 ) { path.classList.add( ...o.classList ) }
+    if( o.id !== null ) { path.id = `${o.id}` }
+
+    path.style.stroke = o.stroke;
+    path.style.strokeWidth = `${o.strokeWidth}px`;
+    path.style.fill = o.fill;
+    
+    let d = `M ${coords[0][0]},${coords[0][1]} L`;
+    for ( let i = 1; i < coords.length; i++ ) {
+      d += ` ${coords[i][0].toFixed(2)},${coords[i][1].toFixed(2)}`;
+    };
+    
+    path.setAttribute("d", d);
+    o.parent.appendChild(path);
+    return path;
+  }
+
   /***********************/
   /****** DRAW AXES ******/
   /***********************/
@@ -176,13 +216,11 @@ function Graph(options) {
   [topGroup, bottomGroup, leftGroup, rightGroup].forEach(group => {
     this.createGroup({ classList: ["major", "ticks"], parent: group });
     this.createGroup({ classList: ["minor", "ticks"], parent: group });
-    this.createGroup({ classList: ["tick-labels"], parent: group });
   })
 
   this.redrawAxes = function() {
     // Clear currently existing ticks
-    const ticks = this.SVG.getElementsByClassName("ticks");
-    for ( let i = 0; i < ticks.length; i++ ) { ticks[i].innerHTML = "" }
+    this.tickLabels.innerHTML = "";
 
     const majorTicksX = ( this.options.axes.x.range[1] - this.options.axes.x.range[0] ) / this.options.axes.x.step;
     const majorTicksY = ( this.options.axes.y.range[1] - this.options.axes.y.range[0] ) / this.options.axes.y.step;
@@ -394,13 +432,96 @@ function Graph(options) {
       this.axesLabels.appendChild(plotTitle);
     }
 
-    console.log("k");
-
   };
 
-  window.onresize = () => { this.redrawAxes() };
+  /************************/
+  /**** WINDOW RESIZING ***/
+  /************************/
 
-  this.redrawAxes();
+  this.resize = () => {
+    const width = this.options.parent === document.body ? "500px" : `${this.options.parent.getBoundingClientRect().width}px`;
+    const height = this.options.parent === document.body ? "500px" : `${this.options.parent.getBoundingClientRect().height}px`;
+    this.container.style.width = `${width}`;
+    this.container.style.height = `${height}`;
+    this.redrawAxes();
+  };
+
+  window.onresize = this.resize;
+
+  /************************/
+  /***** CURVE METHODS ****/
+  /************************/
+
+  this.curveGroup = this.createGroup({ classList: ["curves"] });
+
+  this.addCurve = function(func, options) {
+    const graph = this;
+    
+    const opts = {
+      stroke: "rgba(0, 0, 0, 1)",
+      strokeWidth: 2,
+      resolution: 100,
+      fill: "none",
+      id: `curve-${graph.curves.length}`,
+      classList: ["curve"],
+      ...options
+    };
+
+    const curve = {
+      ...opts,
+      coords: [],
+      func: func,
+      updateCoords: function() {
+        this.coords = [];
+        const x0 = graph.options.axes.x.range[0];
+        const x1 = graph.options.axes.x.range[1];
+        const dx = (x1 - x0) / this.resolution;
+        for ( let x = x0; x <= x1; x += dx ) {
+          const y = this.func(x);
+          this.coords.push([x, y]);
+        };
+        const finalCoord = [x1, func(x1)];
+        this.coords.push(finalCoord);
+      },
+      drawCurve: function() {
+        const path = document.getElementById(this.id);
+        let coords = [];
+        this.coords.forEach(coord => {
+          coords.push(graph.coordToPix(...coord));
+        });
+
+        path.style.stroke = o.color;
+        path.style.strokeWidth = `${this.strokeWidth}px`;
+        path.style.fill = this.fill;
+        
+        let d = `M ${coords[0][0]},${coords[0][1]} L`;
+        for ( let i = 1; i < coords.length; i++ ) {
+          d += ` ${coords[i][0].toFixed(2)},${coords[i][1].toFixed(2)}`;
+        };
+        path.setAttribute("d", d);
+      }
+    };
+
+    curve.updateCoords();
+    
+    this.createPath({
+      coords: curve.coords,
+      classList: curve.classList,
+      id: curve.id,
+      parent: this.curveGroup,
+      stroke: curve.stroke,
+      strokeWidth: curve.strokeWidth,
+      fill: curve.fill,
+    });
+
+    this.curves.push(curve);
+  };
+
+
+  /********************************/
+  /***** FINISH INITIALIZATION ****/
+  /********************************/
+  this.resize();
 
   console.log(this);
 };
