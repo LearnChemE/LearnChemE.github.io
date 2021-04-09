@@ -1,5 +1,5 @@
 const svgContainer = document.getElementById("svg-container");
-const p5Container = document.getElementById("p5-container");
+const rightSideContainer = document.getElementById("right-side-container");
 const app = document.getElementById("app");
 
 window.gvs.setFlaskLiquidLevel = function(elt, lvl) {
@@ -59,7 +59,7 @@ function resizeFlasks() {
   const svgs = document.getElementsByClassName("flask-svg");
   const containerRect = svgContainer.getBoundingClientRect();
   const dispenserRect = document.getElementById("dispenser-rect").getBoundingClientRect();
-  const p5Rect = p5Container.getBoundingClientRect();
+  const p5Rect = rightSideContainer.getBoundingClientRect();
   const relativeSize = 0.07;
   for ( let i = 0; i < flasks.length; i++ ) {
     const flaskDiv = flasks[i];
@@ -87,7 +87,13 @@ function resizeFlasks() {
 window.gvs.updateFlaskObjects = function() {
   let i = 0;
   for ( i = 0; i < window.gvs.flasks.length; i++ ) {
-    const thisFlask = window.gvs.flasks[i];
+    let thisFlask;
+    if ( i > 0 ) {
+      const index = window.gvs.flasks.length - i;
+      thisFlask = window.gvs.flasks[index];
+    } else {
+      thisFlask = window.gvs.flasks[i];
+    }
     const flaskDiv = document.getElementById(`flask-div-${i + 1}`);
     flaskDiv.style.display = "grid";
     const label = `${thisFlask.name}<br>x<sub>B</sub> = ${Number(thisFlask.xB).toFixed(2)}`;
@@ -105,6 +111,7 @@ window.gvs.updateFlaskObjects = function() {
 
 window.gvs.addFlask = function() {
   const k = Math.round(window.gvs.flasks.length + 1);
+  if ( k > 1 ) { document.getElementById("flasks-here").style.opacity = "0" }
   if ( k <= 9 ) {
     const flask = { 
       name: `flask #${k}`,
@@ -124,6 +131,16 @@ window.gvs.addFlask = function() {
   } else {
     throw "too many flasks added with addFlask()"
   }
+};
+
+window.gvs.updateGraphs = function() {
+  const eqShapes = window.gvs.eqShapes;
+  const txyShapes = window.gvs.txyShapes;
+  const eqPlot = window.gvs.eqPlot;
+  const txyPlot = window.gvs.txyPlot;
+  eqShapes.operatingLine.setAttribute("y1", `${eqPlot.coordToPix(0, window.gvs.OL(0))[1]}`);
+  eqShapes.operatingLine.setAttribute("x2", `${eqPlot.coordToPix(window.gvs.xd, 0)[0]}`);
+  eqShapes.operatingLine.setAttribute("y2", `${eqPlot.coordToPix(0, window.gvs.OL( window.gvs.xd ))[1]}`);
 };
 
 function updateImage() {

@@ -20,13 +20,13 @@
     }
   }
 
-  #p5-container {
+  #right-side-container {
     position: absolute;
     top: 0px;
     left: 0px;
-    canvas {
-      box-shadow: 0px 0px 1px black;
-    }
+    background-color: rgb(252, 252, 252);
+    border: 1px solid grey;
+    box-shadow: 0px 0px 1px grey;
   }
 
   .input-area {
@@ -118,6 +118,10 @@
     }
   }
 
+}
+
+#flasks-here {
+  margin: 1rem;
 }
 
 .flask-div {
