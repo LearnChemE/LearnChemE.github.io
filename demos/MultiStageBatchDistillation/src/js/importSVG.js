@@ -38,8 +38,7 @@ function addStill() {
       document.getElementById("condenser-temperature"),
     ],
     updateImage: function() {
-      const adjLvl =  (this.V - 0.1 * this.maxVolume) / (0.9 * this.maxVolume);
-      if ( adjLvl < 0 ) { throw "liquid level in still less than 10%" }
+      const adjLvl =  Math.max(0, (this.V - 0.1 * this.maxVolume) / (0.9 * this.maxVolume));
       const liquidTop = 217.94961;
       const liquidMaxHeight = 28.84352;
       const liquidPath = `m 93.247999,${liquidTop + (1 - adjLvl) * liquidMaxHeight} v ${adjLvl * liquidMaxHeight} c -0.26353,4.91962 -1.86939,7.08134 -6.04743,7.47887 H 73.02836 58.856157 c -4.473673,-0.39762 -5.988585,-3.13313 -6.047154,-7.47887 v ${-1 * adjLvl * liquidMaxHeight} z`;

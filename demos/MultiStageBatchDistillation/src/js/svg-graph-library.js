@@ -362,7 +362,46 @@ function SVG_Graph(options) {
     path.setAttribute("d", d);
     o.parent.appendChild(path);
     return path;
-  }
+  };
+
+  this.createPoint = function(options) {
+    const o = {
+      coord: [0.5, 0.5],
+      radius: 2,
+      classList: [],
+      usePlotCoordinates: true,
+      id: null,
+      parent: this.SVG,
+      stroke: "rgb(0, 0, 0)",
+      strokeWidth: 1,
+      fill: "rgb(255, 255, 255)",
+      ...options,
+    };
+    const point = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+    const rect = this.SVG.getBoundingClientRect();
+    const aspectRatio = rect.width / rect.height;
+
+    let coord;
+    if ( o.usePlotCoordinates ) {
+      coord = this.coordToPix(...o.coord);
+    } else {
+      coord = o.coord;
+    };
+
+    if( o.classList.length >= 1 ) { point.classList.add( ...o.classList ) }
+    if( o.id !== null ) { point.id = `${o.id}` }
+
+    point.style.stroke = o.stroke;
+    point.style.strokeWidth = `${o.strokeWidth}px`;
+    point.style.fill = o.fill;
+        
+    point.setAttribute("cx", coord[0]);
+    point.setAttribute("cy", coord[1]);
+    point.setAttribute("rx", o.radius);
+    point.setAttribute("ry", `${o.radius * aspectRatio}`);
+    o.parent.appendChild(point);
+    return point;
+  };
 
   /***********************/
   /****** DRAW AXES ******/

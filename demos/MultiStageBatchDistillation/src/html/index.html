@@ -45,13 +45,13 @@
         <div class="data-metric"></div>
 
         <div class="data-name">equilibrium stages</div>
-        <input type="range" id="stages-slider" min="0" max="6" step="1" value="1">
+        <input type="range" id="stages-slider" min="1" max="6" step="1" value="2">
         <div class="data-value" id="stages-value">1</div>
         <div class="data-metric"></div>
 
         <div class="data-name">amount to collect</div>
-        <input type="range" id="evap-quantity-slider" min="0.05" max="2" step="0.01" value="0.50">
-        <div class="data-value" id="evap-quantity-value">0.10</div>
+        <input type="range" id="evap-quantity-slider" min="0.25" max="2" step="0.01" value="1.00">
+        <div class="data-value" id="evap-quantity-value">1.00</div>
         <div class="data-metric">kmol</div>
 
         <div class="data-name">reflux ration (L/D)</div>
@@ -65,7 +65,7 @@
         <div id="select-container">
           <div>right-side graphic:</div>
           <select id="right-side-graphic">
-            <option value="1">collected flasks</option>
+            <option value="1" selected>collected flasks</option>
             <option value="2">x-y plot</option>
             <option value="3">T-x-y plot</option>
           </select>

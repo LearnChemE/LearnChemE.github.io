@@ -8,13 +8,16 @@ const { SVG_Graph } = require("./js/svg-graph-library.js");
 window.gvs = {
     scale: 1,
     flasks: [],
-    still: undefined,
+    still: {},
     R: undefined,
     stages: undefined,
-    xStill: undefined,
     evapQuantity: undefined,
     txyShapes: {},
     eqShapes: {},
+    isCollecting: false,
+    isEmpty: false,
+    dV: 0.005,
+    xd: undefined,
 };
 
 // JavaScript modules from /js/ folder
@@ -109,6 +112,7 @@ function selectRightSideImage(n) {
     const txyLabels = document.getElementById("txy-plot-tick-labels");
     const flasks = document.getElementById("flasks-container");
     const flasksHere = document.getElementById("flasks-here");
+    const eqPlotStairLabels = document.getElementById("eq-plot-stair-labels");
     switch(n) {
         case 1:
             flasks.style.opacity = "1";
@@ -117,6 +121,7 @@ function selectRightSideImage(n) {
             txyPlot.style.opacity = "0";
             eqLabels.style.opacity = "0";
             txyLabels.style.opacity = "0";
+            try { eqPlotStairLabels.style.opacity = "0" } catch(e) {}
         break;
 
         case 2:
@@ -126,6 +131,7 @@ function selectRightSideImage(n) {
             eqLabels.style.opacity = "1";
             txyLabels.style.opacity = "0";
             flasksHere.style.opacity = "0";
+            try { eqPlotStairLabels.style.opacity = "1" } catch(e) {}
         break;
 
         case 3:
@@ -135,6 +141,7 @@ function selectRightSideImage(n) {
             eqLabels.style.opacity = "0";
             txyLabels.style.opacity = "1";
             flasksHere.style.opacity = "0";
+            try { eqPlotStairLabels.style.opacity = "0" } catch(e) {}
         break;
     }
 }
@@ -183,13 +190,61 @@ const sketch = (p) => {
         p.windowResized();
         window.gvs.findXd();
 
+        const eqLinesGroup = window.gvs.eqPlot.createGroup({
+            classList: ["eq-plot-lines"],
+            parent: window.gvs.eqPlot.SVG,
+        });
+
         const OLcoords = [[0, window.gvs.OL(0)], [window.gvs.xd, window.gvs.OL(window.gvs.xd)]];
-        window.gvs.eqShapes.operatingLine = window.gvs.eqPlot.createLine({coord1: OLcoords[0], coord2: OLcoords[1], usePlotCoordinates: true, stroke: "rgb(150, 150, 0)", strokeWidth: 1 });
+        window.gvs.eqShapes.operatingLine = window.gvs.eqPlot.createLine({ parent: eqLinesGroup, coord1: OLcoords[0], coord2: OLcoords[1], usePlotCoordinates: true, stroke: "rgb(150, 150, 0)", strokeWidth: 1 });
+        window.gvs.eqShapes.stairLines = [];
+        for ( let i = 0; i < 13; i++ ) {
+            const line = window.gvs.eqPlot.createLine({ parent: eqLinesGroup, classList:["eq", "stair-line"], stroke: "rgb(0, 0, 0)", strokeWidth: 1 });
+            line.style.strokeOpacity = "1";
+            window.gvs.eqShapes.stairLines.push( line );
+        };
+        window.gvs.eqShapes.stillDot = window.gvs.eqPlot.createPoint({ coord: [0.5, 0.5], radius: 1.75, parent: eqLinesGroup, classList:["eq", "point", "still"], fill: "rgb(0, 0, 255)" });
+        window.gvs.eqShapes.distillateDot = window.gvs.eqPlot.createPoint({ coord: [0.5, 0.5], radius: 1.75, parent: eqLinesGroup, classList:["eq", "point", "distillate"], fill: "rgb(255, 0, 0)" });
+        
+        const eqStairLabelDiv = document.createElement("div");
+        eqStairLabelDiv.id = "eq-plot-stair-labels";
+        eqStairLabelDiv.style.position = "absolute";
+        eqStairLabelDiv.style.left = "0px";
+        eqStairLabelDiv.style.top = "0px";
+        eqStairLabelDiv.style.width = "100vw";
+        eqStairLabelDiv.style.height = "100vh";
+        eqStairLabelDiv.style.pointerEvents = "none";
+        eqStairLabelDiv.style.opacity = "0";
+        document.body.appendChild(eqStairLabelDiv);
+        
+        window.gvs.eqShapes.stairLabels = [];
+        for ( let i = 0; i < 7; i++ ) {
+            const label = document.createElement("div");
+            label.classList.add("stair-label", "eq");
+            label.style.position = "absolute";
+            label.style.transform = "translateX(calc(-100% - 5px)) translateY(calc(-100% + 3px))";
+            label.style.opacity = "0";
+            label.style.padding = "0px 2px";
+            label.style.lineHeight = "16px";
+            label.style.backgroundColor = "rgba(255, 255, 255, 0.7)";
+            if( i === 0 ) { label.innerHTML = "still" }
+            else { label.innerHTML = `${i.toFixed(0)}` }
+            eqStairLabelDiv.appendChild(label);
+            window.gvs.eqShapes.stairLabels.push(label);
+        }
+
+        calcAll();
+        updateImage()
     };
 
     p.draw = function () {
-        calcAll();
-        updateImage();
+        if ( window.gvs.isCollecting ) {
+            calcAll();
+            updateImage();
+        } else if ( p.frameCount !== 1 ) {
+            endCollecting();
+            updateImage();
+        }
     };
 
     p.windowResized = function() {
@@ -206,12 +261,14 @@ const sketch = (p) => {
         window.gvs.txyPlot.resize();
         window.gvs.eqPlot.resize();
         resizeFlasks();
+        try { updateImage() } catch(e) {}
     }
 
 };
 
 const P5 = new p5(sketch, document.body);
 
+const collectButton = document.getElementById("collect-button");
 const resetButton = document.getElementById("reset-button");
 const sizeIncrease = document.getElementById("size-increase");
 const sizeDecrease = document.getElementById("size-decrease");
@@ -225,9 +282,29 @@ const evapQuantityValue = document.getElementById("evap-quantity-value");
 const refluxSlider = document.getElementById("reflux-slider");
 const refluxValue = document.getElementById("reflux-value");
 
+const xB = Number( xBinitSlider.value );
+window.gvs.still.xB = xB;
+xBinitValue.innerHTML = xB.toFixed(2);
+
+const stages = Math.round( stagesSlider.value );
+window.gvs.stages = stages;
+stagesValue.innerHTML = stages.toFixed(0);
+
+const evapQuantity = Number( evapQuantitySlider.value );
+evapQuantityValue.innerHTML = evapQuantity.toFixed(2);
+window.gvs.evapQuantity = evapQuantity;
+
+const R = Number( refluxSlider.value );
+window.gvs.R = R;
+refluxValue.innerHTML = R.toFixed(1);
+
 rightSideGraphicSelector.addEventListener("change", () => {
     const selection = Number(rightSideGraphicSelector.value);
     selectRightSideImage(selection);
+});
+
+collectButton.addEventListener("click", () => {
+    beginCollecting();
 });
 
 resetButton.addEventListener("click", () => {
@@ -246,18 +323,18 @@ sizeIncrease.addEventListener("click", () => {
 
 xBinitSlider.addEventListener("input", function() {
     const xB = Number( xBinitSlider.value );
-    window.gvs.xStill = xB;
+    window.gvs.still.xB = xB;
     xBinitValue.innerHTML = xB.toFixed(2);
-    window.gvs.findXd();
-    window.gvs.updateGraphs();
+    calcAll();
+    updateImage()
 });
 
 stagesSlider.addEventListener("input", function() {
     const stages = Math.round( stagesSlider.value );
     window.gvs.stages = stages;
     stagesValue.innerHTML = stages.toFixed(0);
-    window.gvs.findXd();
-    window.gvs.updateGraphs();
+    calcAll();
+    updateImage()
 });
 
 evapQuantitySlider.addEventListener("input", function() {
@@ -270,26 +347,57 @@ refluxSlider.addEventListener("input", function() {
     const R = Number( refluxSlider.value );
     window.gvs.R = R;
     refluxValue.innerHTML = R.toFixed(1);
-    window.gvs.findXd();
-    window.gvs.updateGraphs();
+    calcAll();
+    updateImage()
 });
 
-const xB = Number( xBinitSlider.value );
-window.gvs.xStill = xB;
-xBinitValue.innerHTML = xB.toFixed(2);
-
-const stages = Math.round( stagesSlider.value );
-window.gvs.stages = stages;
-stagesValue.innerHTML = stages.toFixed(0);
-
-const evapQuantity = Number( evapQuantitySlider.value );
-evapQuantityValue.innerHTML = evapQuantity.toFixed(2);
-window.gvs.evapQuantity = evapQuantity;
-
-const R = Number( refluxSlider.value );
-window.gvs.R = R;
-refluxValue.innerHTML = R.toFixed(1);
-
 function  resetToInitialConditions() {
+    [collectButton, resetButton, xBinitSlider, stagesSlider, evapQuantitySlider, refluxSlider].forEach(inp => {
+        inp.removeAttribute("disabled");
+    });
 
+    document.getElementById("flasks-here").style.opacity = "1";
+
+    const xB = Number( xBinitSlider.value );
+    window.gvs.still.xB = xB;
+    xBinitValue.innerHTML = xB.toFixed(2);
+    
+    const stages = Math.round( stagesSlider.value );
+    window.gvs.stages = stages;
+    stagesValue.innerHTML = stages.toFixed(0);
+    
+    const evapQuantity = Number( evapQuantitySlider.value );
+    evapQuantityValue.innerHTML = evapQuantity.toFixed(2);
+    window.gvs.evapQuantity = evapQuantity;
+    
+    const R = Number( refluxSlider.value );
+    window.gvs.R = R;
+    refluxValue.innerHTML = R.toFixed(1);
+
+    window.gvs.isCollecting = false;
+    window.gvs.isEmpty = false;
+    window.gvs.flasks = [];
+    window.gvs.addFlask();
+    window.gvs.still.V = window.gvs.still.maxVolume;
+    window.gvs.findXd();
+    P5.noLoop();
+    updateImage();
+};
+
+function beginCollecting() {
+    if ( !window.gvs.isEmpty ) {
+        window.gvs.isCollecting = true;
+        [collectButton, resetButton, xBinitSlider, stagesSlider, evapQuantitySlider, refluxSlider].forEach(inp => {
+            inp.setAttribute("disabled", "true");
+        });
+        P5.loop();
+    }
+};
+  
+function endCollecting() {
+    [collectButton, resetButton, evapQuantitySlider, refluxSlider].forEach(inp => {
+        inp.removeAttribute("disabled");
+    });
+    window.gvs.addFlask();
+    P5.noLoop();
 };

@@ -133,7 +133,53 @@ window.gvs.addFlask = function() {
   }
 };
 
-window.gvs.updateGraphs = function() {
+
+const setStairCoordinates = function() {
+  // First, set the equilibrium plot's stair coordinates
+  let eqCoordList = [[ window.gvs.still.xB, window.gvs.eq( window.gvs.still.xB ) ]];
+  let labelCoords = [];
+
+  for ( let i = 0; i < gvs.eqShapes.stairLines.length; i++ ) {
+    const line = gvs.eqShapes.stairLines[i];
+    const coord1 = gvs.eqPlot.coordToPix( ...eqCoordList[i] );
+    if ( i === 0 ) {
+      window.gvs.eqShapes.stillDot.setAttribute("cx", `${coord1[0]}`);
+      window.gvs.eqShapes.stillDot.setAttribute("cy", `${coord1[1]}`)
+    }
+    if ( i >= gvs.stages * 2 + 1 ) {
+      line.style.strokeOpacity = "0"
+    } else {
+      line.style.strokeOpacity = "1"
+    }
+    if ( i % 2 == 0 ) {
+      eqCoordList.push([ window.gvs.invOL(eqCoordList[i][1]), eqCoordList[i][1] ]);
+    } else {
+      eqCoordList.push([ eqCoordList[i][0], window.gvs.eq( eqCoordList[i][0] ) ]);
+    };
+    const coord2 = gvs.eqPlot.coordToPix( ...eqCoordList[i + 1] );
+    line.setAttribute("x1", coord1[0]);
+    line.setAttribute("y1", coord1[1]);
+    line.setAttribute("x2", coord2[0]);
+    line.setAttribute("y2", coord2[1]);
+    if ( i % 2 === 0 ) {
+      const rect = line.getBoundingClientRect();
+      labelCoords.push([rect.left, rect.top]);
+    }
+    if ( i === gvs.stages * 2 ) {
+      window.gvs.eqShapes.distillateDot.setAttribute("cx", `${coord2[0]}`);
+      window.gvs.eqShapes.distillateDot.setAttribute("cy", `${coord2[1]}`);
+    }
+  };
+
+  for ( let i = 0; i < gvs.eqShapes.stairLabels.length; i++ ) {
+    const label = gvs.eqShapes.stairLabels[i];
+    label.style.left = `${labelCoords[i][0]}px`;
+    label.style.top = `${labelCoords[i][1]}px`;
+    if ( i > window.gvs.stages ) { label.style.opacity = "0" } else { label.style.opacity = "1" }
+  }
+};
+
+const updateOperatingLine = function() {
   const eqShapes = window.gvs.eqShapes;
   const txyShapes = window.gvs.txyShapes;
   const eqPlot = window.gvs.eqPlot;
@@ -141,9 +187,15 @@ window.gvs.updateGraphs = function() {
   eqShapes.operatingLine.setAttribute("y1", `${eqPlot.coordToPix(0, window.gvs.OL(0))[1]}`);
   eqShapes.operatingLine.setAttribute("x2", `${eqPlot.coordToPix(window.gvs.xd, 0)[0]}`);
   eqShapes.operatingLine.setAttribute("y2", `${eqPlot.coordToPix(0, window.gvs.OL( window.gvs.xd ))[1]}`);
+}
+
+const updateGraphs = function() {
+  updateOperatingLine();
+  setStairCoordinates();
 };
 
 function updateImage() {
+  updateGraphs();
   window.gvs.flasks[0].updateImage();
   window.gvs.still.updateImage();
 };

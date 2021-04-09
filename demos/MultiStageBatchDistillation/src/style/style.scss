@@ -120,6 +120,11 @@
 
 }
 
+input[type="range"]:disabled {
+  opacity: 0.2;
+  pointer-events: none;
+}
+
 #flasks-here {
   margin: 1rem;
 }

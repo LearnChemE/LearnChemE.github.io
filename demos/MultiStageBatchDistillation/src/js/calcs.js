@@ -43,8 +43,8 @@ function invOL(y, xd) {
 window.gvs.findXd = function() {
   let xdCandidate = 0;
   let difference = 100;
-  for ( let xd = 0; xd < 1; xd += 0.001 ) {
-    let currentLoc = window.gvs.eq( window.gvs.xStill );
+  for ( let xd = 0.001; xd < 1; xd += 0.001 ) {
+    let currentLoc = window.gvs.eq( window.gvs.still.xB );
     for ( let i = 0; i < window.gvs.stages; i++ ) {
       currentLoc = invOL(currentLoc, xd);
       currentLoc = window.gvs.eq(currentLoc);
@@ -64,7 +64,33 @@ window.gvs.findXd = function() {
   };
 };
 
+
 function calcAll() {
+  window.gvs.findXd();
+  
+  if ( window.gvs.isCollecting ) {
+    const flask = window.gvs.flasks[0];
+    let flaskTotalB = flask.V * flask.xB;
+    flaskTotalB += window.gvs.dV * window.gvs.xd;
+    flask.V += window.gvs.dV;
+    flask.xB = flaskTotalB / flask.V;
+    flask.xB = window.gvs.p.constrain(flask.xB, 0.001, 0.999);
+  
+    const still = window.gvs.still;
+    let stillTotalB = still.V * still.xB;
+    stillTotalB -= window.gvs.dV * window.gvs.xd;
+    still.V -= window.gvs.dV;
+    still.xB = stillTotalB / still.V;
+    still.xB = window.gvs.p.constrain(still.xB, 0.001, 0.999);
+
+    if ( flask.V >= window.gvs.evapQuantity ) { window.gvs.isCollecting = false }
+    if ( still.V / still.maxVolume < 0.1 ) {
+      window.gvs.isCollecting = false;
+      window.gvs.isEmpty = true;
+    } else {
+      window.gvs.isEmpty = false;
+    }
+  }
 
 };
 
