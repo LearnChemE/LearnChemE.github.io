@@ -1,5 +1,5 @@
 require("./style/svg-graph-library.scss");
-const { Graph } = require("./js/svg-graph-library.js");
+const { SVG_Graph } = require("./js/svg-graph-library.js");
 
 const options = {
   title: "example plot",
@@ -13,7 +13,7 @@ const options = {
   },
 };
 
-window.graph0 = new Graph(options);
+window.graph0 = new SVG_Graph(options);
 
 function testFunc(x) {
   return x**0.5;

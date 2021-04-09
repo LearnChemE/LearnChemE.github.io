@@ -1,13 +1,161 @@
+/*
+
+"svg-graph-library"
+Author: Neil Hendren
+University of Colorado, Boulder
+Version: 0.0.1
+Date: 4/8/2021
+Most recent version available at: https://github.com/LearnChemE/LearnChemE.github.io/tree/master/libraries/svg-graph-library
+(or maybe on https://github.com/neiltheseal if I am no longer working for the University of Colorado)
+
+*/
+
+// JSDoc:
 /**
- * Creates a new Graph
+ * Creates a new SVG Graph. See svg-graph-library.js for documentation
  * @class
- * @param {object} [options] - object containing all the options for the SVG graph 
+ * @param {object} [options]
  */
-function Graph(options) {
+
+/*
+
+Example graph below, with default options. All options are optional.
+
+const graph = new SVG_Graph({
+ id: "svg-plot-(number)",          // id of the container element
+ classList: ["svg-plot"],          // classes to add to the plot container element
+ title: "",                        // text above the plot
+ titleFontSize: 20,                // font size of title, pixels
+ padding: [[70, 20], [40, 50]],    // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
+ parent: document.body,            // the element to place the plot within.  If a parent is specified (besides document.body), the plot size will be 100% of parent's width and height.
+ axes: {
+   axesStrokeWidth: 0.5,           // stroke width of the axes lines: the vertical and horizontal x and y-axes (px)
+   x : {
+     labels: ["", "bottom label"], // labels to add above the top x-axis and below the bottom x-axis
+     labelFontSize: 17,            // font size of the label(s) (px)
+     display: [true, true],        // choose whether to display the [top, bottom] x axes
+     range: [0, 1],                // the minimum and maximum values on the x-axis
+     step: 0.25,                   // the numerical distance between major ticks on the x-axis
+     minorTicks: 3,                // number of minor ticks to put between each major tick
+     majorTickSize: 2,             // the length (px) of the major ticks on the x-axis
+     minorTickSize: 1,             // the length (px) of the minor ticks on the x-axis
+     tickLabelFontSize: 14,        // font size of the tick labels (the numbers below the major ticks)
+     tickWidth: 0.5,               // stroke width of the ticks (px)
+     tickLabelPrecision: 2,        // digits of precision for the x-axis tick labels
+   },
+   y : {
+     labels: ["left label", ""],
+     labelFontSize: 17,
+     display: [true, true],
+     range: [0, 1],
+     step: 0.25,
+     minorTicks: 3,
+     majorTickSize: 2,
+     minorTickSize: 1,
+     tickLabelFontSize: 14,
+     tickWidth: 0.5,
+     tickLabelPrecision: 2,
+   }
+ }
+});
+
+******************************************************************************************************
+
+********* METHODS: ***********************************************************************************
+
+******************************************************************************************************
+
+graph.addCurve(func, options)           // add a curve ( i.e. a function, such as y=x^2 ) to the plot. The curve object is appended to the graph.curves array.
+
+example:
+
+  function xSquared(x) { return x**2 }
+  const curveOptions = {
+    stroke: "rgba(0, 0, 0, 1)",         // color of the curve
+    strokeWidth: 2,                     // stroke width of the curve (px)
+    resolution: 100,                    // number of points to plot
+    fill: "none",                       // whether to add fill. This option is incomplete. Example: "rgb(255, 0, 0)"
+    id: `curve-(number)`,               // HTML id of the curve
+    classList: ["curve"],               // classes to add to the curve
+  }
+  const curve = graph.addCurve(xSquared, curveOptions);
+
+  // you can then update the curve with a new function, for example.
+
+  function xCubed(x) { return x**3 }
+  curve.func = xCubed;
+  curve.updateCoords();
+  curve.drawCurve();
+
+  // and the graph will update to show x^3 rather than x^2
+
+******************************************************************************************************
+
+graph.createGroup(options)              // create an SVG "g" element with specified classlist, id, and parent
+
+example: 
+
+  const options = {
+    classList: [],
+    id: "example-id",
+    parent: graph.SVG,
+  };
+  const group = graph.createGroup(options);
+
+  // you can then add SVG-namedspaced elements to that group, e.g.:
+
+  graph.createLine({ parent: group });
+
+******************************************************************************************************
+
+graph.createLine(options)               // create an SVG line
+
+example, draw a line from (0, 5) to (1, 2)
+
+  const lineOptions = {
+    coord1: [0, 5],
+    coord2: [1, 2],
+    classList: ["line-class"],
+    usePlotCoordinates: true,           // this is "false" by default. If this option is "false", then coord1 and coord2 will refer to the SVG's "viewBox" coordinates, with (0, 0) being the top-left corner and (100, 100) being the bottom-right corner of the plot.
+    id: "my-line",
+    parent: document.getElementById("an-svg-g-element"),
+  };
+
+  const myLine = graph.createLine(options);
+  myLine.style.stroke = "rgb(0, 0, 0)";
+  myLine.style.strokeWidth = "1px";
+
+******************************************************************************************************
+
+graph.createPath(options)               // create an SVG "path" element. In this version of svg-graph-library.js, it is just a glorified polyline.
+
+example:
+
+  const pathOptions = {
+    coords: [[0, 0], [1, 1], [1, 2], [2, 5], [2, 2]],
+    classList: ["path-class"],
+    usePlotCoordinates: true,
+    id: "my-path",
+    parent: graph.SVG,
+    stroke: "rgb(200, 0, 0)",
+    strokeWidth: 1,                     // (pixels)
+    fill: "none",
+  };
+
+  const myPath = graph.createPath(pathOptions);
+  const d = myPath.getAttribute("d");
+  console.log(d) ===================> "M 0,0 L 1,1 1,2 2,5 2,2"
+
+******************************************************************************************************
+*/
+
+function SVG_Graph(options) {
+  const graphNumber = document.getElementsByClassName("svg-plot").length;
   this.options = {
-    id: "svg-plot-0",
+    id: `svg-plot-${graphNumber}`,
     classList: ["svg-plot"],
     title: "",
+    titleFontSize: 20,
     padding: [[70, 20], [40, 50]],
     parent: document.body,
   };
@@ -17,29 +165,36 @@ function Graph(options) {
     ...options
   };
 
-  const xOpts = typeof( options.axes ) === "undefined" ? {} : typeof( options.axes.x ) === "undefined" ? {} : options.axes.x;
-  const yOpts = typeof( options.axes ) === "undefined" ? {} : typeof( options.axes.y ) === "undefined" ? {} : options.axes.y;
+  const xOpts = typeof( options ) === "undefined" ? {} : typeof( options.axes ) === "undefined" ? {} : typeof( options.axes.x ) === "undefined" ? {} : options.axes.x;
+  const yOpts = typeof( options ) === "undefined" ? {} : typeof( options.axes ) === "undefined" ? {} : typeof( options.axes.y ) === "undefined" ? {} : options.axes.y;
 
   this.options.axes = {
+    axesStrokeWidth: 0.5,
     x : {
       labels: ["", "bottom label"],
+      labelFontSize: 17,
       display: [true, true],
       range: [0, 1],
       step: 0.25,
       minorTicks: 3,
       majorTickSize: 2,
       minorTickSize: 1,
+      tickLabelFontSize: 14,
+      tickWidth: 0.5,
       tickLabelPrecision: 2,
       ...xOpts
     },
     y : {
       labels: ["left label", ""],
+      labelFontSize: 17,
       display: [true, true],
       range: [0, 1],
       step: 0.25,
       minorTicks: 3,
       majorTickSize: 2,
       minorTickSize: 1,
+      tickLabelFontSize: 14,
+      tickWidth: 0.5,
       tickLabelPrecision: 2,
       ...yOpts
     },
@@ -47,6 +202,17 @@ function Graph(options) {
 
   this.curves = [];
   this.shapes = [];
+
+  /***********************************************/
+  /****** ADD STYLE ELEMENT TO DOCUMENT HEAD *****/
+  /***********************************************/
+  if ( document.getElementById("svg-plot-style") === null ) {
+    const style = document.createElement("style");
+    style.id = "svg-plot-style";
+    let styleText = ".svg-plot * {font-family:Arial, Helvetica, sans-serif; vector-effect: non-scaling-stroke;}";
+    style.innerHTML = styleText;
+    document.head.appendChild(style);
+  }
 
   /***********************************************/
   /****** CREATE CONTAINER AND SVG ELEMENTS ******/
@@ -71,6 +237,11 @@ function Graph(options) {
 
   this.tickLabels = document.createElement("div");
   this.tickLabels.classList.add("tick-labels");
+  this.tickLabels.style.position = "absolute";
+  this.tickLabels.style.width = "100vw";
+  this.tickLabels.style.height = "100vh";
+  this.tickLabels.style.top = "0px";
+  this.tickLabels.style.left = "0px";
   this.container.appendChild(this.tickLabels);
 
   this.axesLabels = document.createElement("div");
@@ -212,6 +383,11 @@ function Graph(options) {
     parent: rightGroup,
   });
 
+  [topAxisLine, bottomAxisLine, leftAxisLine, rightAxisLine].forEach(line => {
+    line.style.stroke = "rgb(0, 0, 0)";
+    line.style.strokeWidth = `${this.options.axes.axesStrokeWidth}px`;
+  });
+
   // Add a major and minor tick group to each axis group
   [topGroup, bottomGroup, leftGroup, rightGroup].forEach(group => {
     this.createGroup({ classList: ["major", "ticks"], parent: group });
@@ -230,7 +406,6 @@ function Graph(options) {
       leftGroup.style.opacity = "1";
       const majorGroup = leftGroup.getElementsByClassName("major")[0]; 
       const minorGroup = leftGroup.getElementsByClassName("minor")[0];
-      const labelGroup = leftGroup.getElementsByClassName("tick-labels")[0];
       for ( let i = 0; i <= majorTicksY; i++ ) {
         // For each major tick, create a line
         if ( i > 0 ) {
@@ -244,21 +419,25 @@ function Graph(options) {
             ],
             parent: majorGroup
           });
-         
+          majorTick.style.strokeWidth = `${this.options.axes.y.tickWidth}px`;
+          majorTick.style.stroke = "rgb(0, 0, 0)";
           const tickRect = majorTick.getBoundingClientRect();
           const labelText = Number(this.options.axes.y.range[0] + i * this.options.axes.y.step).toFixed(this.options.axes.y.tickLabelPrecision);
           const label = document.createElement("div");
           label.classList.add("tick-label", "y");
           label.innerHTML = labelText;
+          label.style.position = "absolute";
           label.style.top = `${tickRect.bottom}px`;
           label.style.left = `${tickRect.left}px`;
+          label.style.fontSize = `${this.options.axes.y.tickLabelFontSize}px`;
+          label.style.transform = "translate(calc( -100% - 5px), -50%)";
           this.tickLabels.appendChild(label);
         };
         // For each major tick, create the number of minor ticks specified between each major tick
         for ( let j = 1; j <= this.options.axes.y.minorTicks; j++ ) {
           const minorTickPix = this.coordToPix(this.options.axes.x.range[0], this.options.axes.y.range[0] + (i + j / (this.options.axes.y.minorTicks + 1)) * this.options.axes.y.step);
           if ( minorTickPix[1] >= 0 ) {
-            this.createLine({
+            const minorTick = this.createLine({
               classList: ["minor-tick"],
               coord1: minorTickPix,
               coord2: [
@@ -267,6 +446,8 @@ function Graph(options) {
               ],
               parent: minorGroup
             });
+            minorTick.style.strokeWidth = `${this.options.axes.y.tickWidth}px`;
+            minorTick.style.stroke = "rgb(0, 0, 0)";
           }
         };
       }
@@ -283,7 +464,7 @@ function Graph(options) {
         // For each major tick, create a line
         if ( i > 0 ) {
           const majorTickPix = this.coordToPix(this.options.axes.x.range[1], this.options.axes.y.range[0] + i * this.options.axes.y.step);
-          this.createLine({
+          const majorTick = this.createLine({
             classList: ["major-tick"],
             coord1: majorTickPix,
             coord2: [
@@ -292,12 +473,14 @@ function Graph(options) {
             ],
             parent: majorGroup
           });
+          majorTick.style.strokeWidth = `${this.options.axes.y.tickWidth}px`;
+          majorTick.style.stroke = "rgb(0, 0, 0)";
         };
         // For each major tick, create the number of minor ticks specified between each major tick
         for ( let j = 1; j <= this.options.axes.y.minorTicks; j++ ) {
           const minorTickPix = this.coordToPix(this.options.axes.x.range[1], this.options.axes.y.range[0] + (i + j / (this.options.axes.y.minorTicks + 1)) * this.options.axes.y.step);
           if ( minorTickPix[1] >= 0 ) {
-            this.createLine({
+            const minorTick = this.createLine({
               classList: ["minor-tick"],
               coord1: minorTickPix,
               coord2: [
@@ -306,6 +489,8 @@ function Graph(options) {
               ],
               parent: minorGroup
             });
+            minorTick.style.strokeWidth = `${this.options.axes.y.tickWidth}px`;
+            minorTick.style.stroke = "rgb(0, 0, 0)";
           }
         };
       }
@@ -322,7 +507,7 @@ function Graph(options) {
         // For each major tick, create a line
         if ( i > 0 ) {
           const majorTickPix = this.coordToPix(this.options.axes.x.range[0] + i * this.options.axes.x.step, this.options.axes.y.range[1]);
-          this.createLine({
+          const majorTick = this.createLine({
             classList: ["major-tick"],
             coord1: majorTickPix,
             coord2: [
@@ -331,12 +516,14 @@ function Graph(options) {
             ],
             parent: majorGroup
           });
+          majorTick.style.strokeWidth = `${this.options.axes.x.tickWidth}px`;
+          majorTick.style.stroke = "rgb(0, 0, 0)";
         };
         // For each major tick, create the number of minor ticks specified between each major tick
         for ( let j = 1; j <= this.options.axes.x.minorTicks; j++ ) {
           const minorTickPix = this.coordToPix(this.options.axes.x.range[0] + (i + j / (this.options.axes.x.minorTicks + 1)) * this.options.axes.x.step, this.options.axes.y.range[1]);
           if ( minorTickPix[0] <= 100 ) {
-            this.createLine({
+            const minorTick = this.createLine({
               classList: ["minor-tick"],
               coord1: minorTickPix,
               coord2: [
@@ -345,6 +532,8 @@ function Graph(options) {
               ],
               parent: minorGroup
             });
+            minorTick.style.strokeWidth = `${this.options.axes.x.tickWidth}px`;
+            minorTick.style.stroke = "rgb(0, 0, 0)";
           }
         };
       }
@@ -371,20 +560,25 @@ function Graph(options) {
             ],
             parent: majorGroup
           });
+          majorTick.style.strokeWidth = `${this.options.axes.x.tickWidth}px`;
+          majorTick.style.stroke = "rgb(0, 0, 0)";
           const tickRect = majorTick.getBoundingClientRect();
           const labelText = Number(this.options.axes.x.range[0] + i * this.options.axes.x.step).toFixed(this.options.axes.x.tickLabelPrecision);
           const label = document.createElement("div");
           label.classList.add("tick-label", "x");
           label.innerHTML = labelText;
+          label.style.position = "absolute";
           label.style.top = `${tickRect.bottom}px`;
           label.style.left = `${tickRect.left}px`;
+          label.style.fontSize = `${this.options.axes.x.tickLabelFontSize}px`;
+          label.style.transform = "translate(-50%, 5px)";
           this.tickLabels.appendChild(label);
         };
         // For each major tick, create the number of minor ticks specified between each major tick
         for ( let j = 1; j <= this.options.axes.x.minorTicks; j++ ) {
           const minorTickPix = this.coordToPix(this.options.axes.x.range[0] + (i + j / (this.options.axes.x.minorTicks + 1)) * this.options.axes.x.step, this.options.axes.y.range[0]);
           if ( minorTickPix[0] <= 100 ) {
-            this.createLine({
+            const minorTick = this.createLine({
               classList: ["minor-tick"],
               coord1: minorTickPix,
               coord2: [
@@ -393,6 +587,8 @@ function Graph(options) {
               ],
               parent: minorGroup
             });
+            minorTick.style.strokeWidth = `${this.options.axes.x.tickWidth}px`;
+            minorTick.style.stroke = "rgb(0, 0, 0)";
           }
         };
       }
@@ -408,6 +604,7 @@ function Graph(options) {
     yAxisLabel.style.left = "0px";
     yAxisLabel.style.top = `50%`;
     yAxisLabel.style.transform = "rotate(-90deg) translateX(50%) translateY(-100%)";
+    yAxisLabel.style.fontSize = `${this.options.axes.y.labelFontSize}px`;
     yAxisLabel.classList.add("axis-label");
     yAxisLabel.innerHTML = `${this.options.axes.y.labels[0]}`
     this.axesLabels.appendChild(yAxisLabel);
@@ -417,6 +614,7 @@ function Graph(options) {
     xAxisLabel.style.left = `calc(50% + ${this.options.padding[0][0] / 2.5}px)`;
     xAxisLabel.style.bottom = `0px`;
     xAxisLabel.style.transform = "translateX(-50%)";
+    xAxisLabel.style.fontSize = `${this.options.axes.x.labelFontSize}px`;
     xAxisLabel.classList.add("axis-label");
     xAxisLabel.innerHTML = `${this.options.axes.x.labels[1]}`
     this.axesLabels.appendChild(xAxisLabel);
@@ -427,6 +625,7 @@ function Graph(options) {
       plotTitle.style.left = `calc(50% + ${this.options.padding[0][0] / 4}px)`;
       plotTitle.style.top = `0px`;
       plotTitle.style.transform = "translateX(-50%)";
+      plotTitle.style.fontSize = `${this.options.titleFontSize}px`;
       plotTitle.classList.add("plot-title");
       plotTitle.innerHTML = `${this.options.title}`
       this.axesLabels.appendChild(plotTitle);
@@ -521,9 +720,15 @@ function Graph(options) {
   /********************************/
   /***** FINISH INITIALIZATION ****/
   /********************************/
-  this.resize();
 
+  this.resize();
   console.log(this);
+
 };
 
-module.exports = { Graph }
+// This file can be added in the document head, making SVG_Graph() a global variable, or imported as a module, e.g.
+// const { Graph } = require("svg-graph-library.js");
+
+if( typeof(window.SVG_Graph) === "undefined" ) {
+  module.exports = { SVG_Graph }
+}
