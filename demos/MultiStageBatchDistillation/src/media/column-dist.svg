@@ -5,10 +5,10 @@
    <rect y="137" x="92.5" height="27" width="1.8" id="pouring-liquid"
       style="fill:#d2d2ff;fill-opacity:0;stroke:none;stroke-opacity:0"; />
    <g transform="translate(-20.520109,-84.398827)" id="still">
-      <path id="left-foot" style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999;stroke-opacity:1"
+      <path id="left-foot" style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999;stroke-opacity:1"
          transform="rotate(25.350778)" d="m 157.84422,206.14281 h 2.92479 l -0.53627,10.28872 -2.38862,1.13169 z" />
       <path d="m 91.37861,253.87447 -2.643143,1.25228 4.889837,9.06834 2.643147,1e-5 z"
-         style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999;stroke-opacity:1" id="right-foot" />
+         style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999;stroke-opacity:1" id="right-foot" />
       <path
          style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          d="m 76.841813,256.21938 v 3.20614 c 0.499181,1.01491 0.69577,1.04081 1.878041,1.5285 h 4.438338 v -1.75219 h -3.213376 c -0.525454,0.0264 -0.965767,-0.33759 -1.018312,-0.77255 v -2.13534"
@@ -19,9 +19,9 @@
          <rect style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.266317;stroke-opacity:1" id="rect876"
             width="1.5577774" height="5.8843484" x="154.4695" y="142.3351"
             transform="matrix(0.88966688,0.45661017,-0.32738413,0.94489133,0,0)" />
-         <circle style="fill:#828282;fill-opacity:1;stroke:#000000;stroke-width:0.264999;stroke-opacity:1" id="path878"
+         <circle style="fill:#828282;fill-opacity:1;stroke:#000000;stroke-width:0.364999;stroke-opacity:1" id="path878"
             cx="92.555168" cy="202.32712" r="3.8747735" />
-         <circle r="3.2056758" style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264999;stroke-opacity:1"
+         <circle r="3.2056758" style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.364999;stroke-opacity:1"
             id="path878-4" cx="92.505234" cy="202.33711" />
          <path id="path900" d="m 90.338155,203.98487 0.659111,-0.47935"
             style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
@@ -51,8 +51,8 @@
             style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       </g>
       <path
-         style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.265;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         d="m 62,208 v -81.75078 l 10.916,-5.83446 10.916987,5.33563 10e-7,82.24961 c 3.335228,0.44473 6.843402,1.42808 9.376013,3.74933 1.005116,1.32269 2.18941,2.8786 2.023988,4.62384 v 32.30872 c -0.353583,3.28277 -2.471228,6.7906 -5.860705,7.51811 H 72.916494 56.460705 C 53.071228,255.47249 50.953583,251.96466 50.6,248.68189 v -32.30872 c -0.165422,-1.74524 1.585148,-3.81818 2.910333,-4.67308 1.204229,-0.82002 2.409983,-1.27533 2.5279,-1.36113 l -2.472576,-3.84464 1.724584,-1.21086 2.557875,4.1091 c 0,0 2.48427,-1.17019 4.151884,-1.39256"
+         style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 62,208 v -81.75078 l 10.916,-5.83446 10.916987,5.33563 10e-7,82.24961 c 3.335228,0.44473 6.843402,1.42808 9.376013,3.74933 1.005116,1.32269 2.18941,2.8786 2.023988,4.62384 v 32.30872 c -0.253583,3.28277 -2.471228,6.7906 -5.860705,7.51811 H 72.916494 56.460705 C 53.071228,255.47249 50.953583,251.96466 50.6,248.68189 v -32.30872 c -0.165422,-1.74524 1.585148,-3.81818 2.910333,-4.67308 1.204229,-0.82002 2.409983,-1.27533 2.5279,-1.36113 l -2.472576,-3.84464 1.724584,-1.21086 2.557875,4.1091 c 0,0 2.48427,-1.17019 4.151884,-1.39256"
          id="still-outer-shell" />
       <rect transform="rotate(-32.032969)" y="202.87648" x="-64.547272" height="1.1304178" width="3.0434327"
          id="relief-valve-cap"
@@ -64,19 +64,19 @@
          <path id="still-liquid"
             d="m 93.247999,217.94961 v 28.84352 c -0.26353,4.91962 -1.86939,7.08134 -6.04743,7.47887 H 73.02836 58.856157 c -4.473673,-0.39762 -5.988585,-3.13313 -6.047154,-7.47887 v -28.84352 z"
             style="fill:#e6e6ff;fill-opacity:1;stroke:none;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-         <ellipse style="fill:#d2d2ff;fill-opacity:1;stroke:#000000;stroke-width:0.264999" id="still-liquid-ellipse"
+         <ellipse style="fill:#d2d2ff;fill-opacity:1;stroke:#000000;stroke-width:0.364999" id="still-liquid-ellipse"
             cx="72.841164" cy="217.94962" rx="20.126621" ry="1.5166701" />
       </g>
       <path id="still-white-overlay"
          d="m 63.5,127.281 9.527932,-5.028 9.402027,5.028 v 82.453 c 4.959323,0.67312 6.935502,1.02353 9.176328,3.31779 1.851131,1.48772 1.784178,4.39378 1.641713,5.89782 v 27.84352 c -0.26353,4.91962 -1.86939,7.08134 -6.047439,7.47887 H 73.028357 58.856154 c -4.473673,-0.39762 -5.988585,-3.13313 -6.047154,-7.47887 v -27.84352 c -0.142466,-1.50404 -0.01186,-4.10206 2.520713,-6.05619 1.997116,-1.28285 3.534858,-2.29527 8.170287,-3.20306 z"
-         style="fill:#ffffff;fill-opacity:0;stroke:#000000;stroke-width:0.264999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#ffffff;fill-opacity:0;stroke:#000000;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <g transform="translate(0,-39.340961)" id="stage-group-1">
          <ellipse ry="0.73783952" rx="9.3869581" cy="190.4686" cx="73.017128" id="stage-bottom-ellipse"
-            style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" />
+            style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" />
          <rect
             style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.265;stroke-miterlimit:4;stroke-dasharray:none"
             id="stage-mid-rect" width="18.76483" height="2.1025457" x="63.608215" y="188.39502" ry="0" rx="0.25" />
-         <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" id="stage-top-ellipse"
+         <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" id="stage-top-ellipse"
             cx="73.005119" cy="188.31305" rx="9.3869581" ry="0.73783952" />
          <g id="stage-holes">
             <ellipse
@@ -107,7 +107,7 @@
          </g>
          <g id="downcomer-group">
             <rect
-               style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+               style="fill:#e6e6e6;fill-opacity:1;stroke:#000;stroke-width:0.10;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
                id="rect965" width="1.7626168" height="3.0580001" x="78.871826" y="185.22099" />
             <ellipse
                style="fill:#969696;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -118,12 +118,12 @@
          </g>
       </g>
       <g id="stage-group-3" transform="translate(2.6855469e-6,8.2056285)">
-         <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" id="ellipse1452"
+         <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" id="ellipse1452"
             cx="73.017128" cy="190.4686" rx="9.3869581" ry="0.73783952" />
          <rect rx="0.25" ry="0" y="188.39502" x="63.608215" height="2.1025457" width="18.76483" id="rect1454"
             style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.265;stroke-miterlimit:4;stroke-dasharray:none" />
          <ellipse ry="0.73783952" rx="9.3869581" cy="188.31305" cx="73.005119" id="ellipse1456"
-            style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" />
+            style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" />
          <g id="g1482">
             <ellipse ry="0.17391045" rx="0.63767165" cy="188.08559" cx="68.730644" id="ellipse1458"
                style="fill:#969696;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
@@ -163,7 +163,7 @@
          </g>
          <g id="g1490">
             <rect y="185.22099" x="78.871826" height="3.0580001" width="1.7626168" id="rect1484"
-               style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+               style="fill:#e6e6e6;fill-opacity:1;stroke:#000;stroke-width:0.10;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
             <ellipse ry="0.18433134" rx="0.86977887" cy="185.28333" cx="79.750175" id="ellipse1486"
                style="fill:#969696;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
             <path id="path1488" d="m 80.634445,185.3 v 2.97911 c -0.502141,0.22545 -1.20924,0.2152 -1.76262,0 V 185.3"
@@ -172,11 +172,11 @@
       </g>
       <g transform="matrix(-1,0,0,1,146.02225,-3.8677763)" id="stage-group-2">
          <ellipse ry="0.73783952" rx="9.3869581" cy="190.4686" cx="73.017128" id="ellipse1566"
-            style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" />
+            style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" />
          <rect
             style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.265;stroke-miterlimit:4;stroke-dasharray:none"
             id="rect1568" width="18.76483" height="2.1025457" x="63.608215" y="188.39502" ry="0" rx="0.25" />
-         <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" id="ellipse1570"
+         <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" id="ellipse1570"
             cx="73.005119" cy="188.31305" rx="9.3869581" ry="0.73783952" />
          <g id="g1596">
             <ellipse
@@ -207,7 +207,7 @@
          </g>
          <g id="g1604">
             <rect
-               style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+               style="fill:#e6e6e6;fill-opacity:1;stroke:#000;stroke-width:0.10;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
                id="rect1598" width="1.7626168" height="3.0580001" x="78.871826" y="185.22099" />
             <ellipse
                style="fill:#969696;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -218,12 +218,12 @@
          </g>
       </g>
       <g id="stage-group-5" transform="translate(2.6855469e-6,-15.678073)">
-         <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" id="ellipse1608"
+         <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" id="ellipse1608"
             cx="73.017128" cy="190.4686" rx="9.3869581" ry="0.73783952" />
          <rect rx="0.25" ry="0" y="188.39502" x="63.608215" height="2.1025457" width="18.76483" id="rect1610"
             style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.265;stroke-miterlimit:4;stroke-dasharray:none" />
          <ellipse ry="0.73783952" rx="9.3869581" cy="188.31305" cx="73.005119" id="ellipse1612"
-            style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" />
+            style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" />
          <g id="g1638">
             <ellipse ry="0.17391045" rx="0.63767165" cy="188.08559" cx="68.730644" id="ellipse1614"
                style="fill:#969696;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
@@ -263,7 +263,7 @@
          </g>
          <g id="g1646">
             <rect y="185.22099" x="78.871826" height="3.0580001" width="1.7626168" id="rect1640"
-               style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+               style="fill:#e6e6e6;fill-opacity:1;stroke:#000;stroke-width:0.10;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
             <ellipse ry="0.18433134" rx="0.86977887" cy="185.28333" cx="79.750175" id="ellipse1642"
                style="fill:#969696;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
             <path id="path1644" d="m 80.634445,185.3 v 2.97911 c -0.502141,0.22545 -1.20924,0.2152 -1.76262,0 V 185.3"
@@ -272,11 +272,11 @@
       </g>
       <g transform="matrix(-1,0,0,1,146.02225,-27.388043)" id="stage-group-4">
          <ellipse ry="0.73783952" rx="9.3869581" cy="190.4686" cx="73.017128" id="ellipse1650"
-            style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" />
+            style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" />
          <rect
             style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.265;stroke-miterlimit:4;stroke-dasharray:none"
             id="rect1652" width="18.76483" height="2.1025457" x="63.608215" y="188.39502" ry="0" rx="0.25" />
-         <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" id="ellipse1654"
+         <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" id="ellipse1654"
             cx="73.005119" cy="188.31305" rx="9.3869581" ry="0.73783952" />
          <g id="g1680">
             <ellipse
@@ -307,7 +307,7 @@
          </g>
          <g id="g1688">
             <rect
-               style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+               style="fill:#e6e6e6;fill-opacity:1;stroke:#000;stroke-width:0.10;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
                id="rect1682" width="1.7626168" height="3.0580001" x="78.871826" y="185.22099" />
             <ellipse
                style="fill:#969696;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -318,12 +318,12 @@
          </g>
       </g>
       <g id="stage-group-6" transform="matrix(-1,0,0,1,146.02225,-50.807984)">
-         <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" id="ellipse1692"
+         <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" id="ellipse1692"
             cx="73.017128" cy="190.4686" rx="9.3869581" ry="0.73783952" />
          <rect rx="0.25" ry="0" y="188.39502" x="63.608215" height="2.1025457" width="18.76483" id="rect1694"
             style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.265;stroke-miterlimit:4;stroke-dasharray:none" />
          <ellipse ry="0.73783952" rx="9.3869581" cy="188.31305" cx="73.005119" id="ellipse1696"
-            style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" />
+            style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" />
          <g id="g1722">
             <ellipse ry="0.17391045" rx="0.63767165" cy="188.08559" cx="68.730644" id="ellipse1698"
                style="fill:#969696;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
@@ -363,7 +363,7 @@
          </g>
          <g id="g1730">
             <rect y="185.22099" x="78.871826" height="3.0580001" width="1.7626168" id="rect1724"
-               style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+               style="fill:#e6e6e6;fill-opacity:1;stroke:#000;stroke-width:0.10;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
             <ellipse ry="0.18433134" rx="0.86977887" cy="185.28333" cx="79.750175" id="ellipse1726"
                style="fill:#969696;fill-opacity:1;stroke:#000000;stroke-width:0.05;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
             <path id="path1728" d="m 80.634445,185.3 v 2.97911 c -0.502141,0.22545 -1.20924,0.2152 -1.76262,0 V 185.3"
@@ -422,26 +422,26 @@
                d="m 92.629266,201.76496 1.251457,1.27957 -1.713019,-0.44986" id="path926-2" />
          </g>
          <rect y="142.40303" x="82.588333" height="1.5576613" width="16.364138" id="rect1121"
-            style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.264999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+            style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.364999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
          <rect transform="rotate(90)"
-            style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.264999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+            style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.364999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
             id="dispenser-rect" width="79.751755" height="1.2297325" x="142.40302" y="-114.61736" />
          <rect ry="0" y="142.40303" x="106.00294" height="1.2297363" width="8.5464029" id="rect1080"
-            style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.264999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+            style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.364999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
          <rect y="95.673195" x="96.902924" height="50.337048" width="9.5919151" id="rect1018"
-            style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.264999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+            style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.364999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
          <rect
-            style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.264999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+            style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.364999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
             id="rect1012" width="4.5090189" height="18.158602" x="70.62764" y="103.70746" ry="0.22341877" rx="0.25" />
          <rect
-            style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.264999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+            style="fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.364999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
             id="rect1014" width="32.869076" height="3.6521192" x="66.201912" y="100.17242" />
          <path id="path1125" d="m 75.129414,121.64499 0.0072,-17.85556 h 21.848249 v 38.65459 l -13.293546,-0.0145"
             style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
          <path id="path1127" d="M 70.578656,121.77355 V 103.73758 H 67.071461"
             style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
          <rect y="99.252861" x="65.648529" height="5.3710036" width="1.5153621" id="rect1016"
-            style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+            style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
          <g transform="translate(-0.07172282,0.73753821)" id="condenser-cap">
             <ellipse ry="0.44202238" rx="5.463686" cy="94.904381" cx="101.73762" id="path1129-4"
                style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.15;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
@@ -563,8 +563,8 @@
       height="18.99194" x="114.14576" y="2.688127" />
    <rect style="fill:none;fill-opacity:1;stroke:none" id="canvas-rect" width="130.24213"
       height="166.99194" x="114.14576" y="22.688127" />
-   <rect style="fill:none;fill-opacity:1;stroke:none" id="still-composition-rect" width="26.396082"
+   <rect style="fill:none;fill-opacity:1;stroke:#000;stroke-width:0.150001;" id="still-composition-rect" width="26.396082"
       height="11" x="2" y="131" />
-   <rect style="fill:none;fill-opacity:1;stroke:none" id="distillate-composition-rect" width="26.347527"
+   <rect style="fill:none;fill-opacity:1;stroke:#000;stroke-width:0.150001;" id="distillate-composition-rect" width="26.347527"
       height="11" x="88.2" y="21" />
 </svg>

@@ -2,6 +2,10 @@
 @import "./slider.scss";
 @import "./select.scss";
 
+svg * {
+  vector-effect: non-scaling-stroke;
+}
+
 #app {
   width: calc( 100vw - 20px );
   display: grid;
@@ -206,7 +210,7 @@ input[type="range"]:disabled {
 .flask-line {
   fill: none;
   stroke: black;
-  stroke-width: 0.5px;
+  stroke-width: 0.25px;
 }
 
 .flask-top-ellipse {
@@ -223,7 +227,6 @@ input[type="range"]:disabled {
   display: grid;
   align-items: center;
   justify-content: center;
-  outline: 1px solid black;
   div {
     white-space: nowrap;
   }
