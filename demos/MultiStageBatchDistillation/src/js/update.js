@@ -137,46 +137,118 @@ window.gvs.addFlask = function() {
 const setStairCoordinates = function() {
   // First, set the equilibrium plot's stair coordinates
   let eqCoordList = [[ window.gvs.still.xB, window.gvs.eq( window.gvs.still.xB ) ]];
-  let labelCoords = [];
+  let eqLabelCoords = [];
+  if ( window.gvs.selectedPane !== 1 ) {
+    for ( let i = 0; i < gvs.eqShapes.stairLines.length; i++ ) {
+      const line = gvs.eqShapes.stairLines[i];
+      if ( i >= gvs.stages * 2 + 1 && window.gvs.selectedPane === 2 ) {
+        line.style.strokeOpacity = "0"
+      } else {
+        let coord1;
+        if ( window.gvs.selectedPane === 2 ) {
+          coord1 = gvs.eqPlot.coordToPix( ...eqCoordList[i] );
+          line.style.strokeOpacity = "1";
+        }
+        
+        if ( i === 0 && window.gvs.selectedPane === 2 ) {
+          window.gvs.eqShapes.stillDot.setAttribute("cx", `${coord1[0]}`);
+          window.gvs.eqShapes.stillDot.setAttribute("cy", `${coord1[1]}`)
+        };
+        
+        if ( i % 2 == 0 ) {
+          eqCoordList.push([ window.gvs.invOL(eqCoordList[i][1]), eqCoordList[i][1] ]);
+        } else {
+          eqCoordList.push([ eqCoordList[i][0], window.gvs.eq( eqCoordList[i][0] ) ]);
+        };
 
-  for ( let i = 0; i < gvs.eqShapes.stairLines.length; i++ ) {
-    const line = gvs.eqShapes.stairLines[i];
-    const coord1 = gvs.eqPlot.coordToPix( ...eqCoordList[i] );
-    if ( i === 0 ) {
-      window.gvs.eqShapes.stillDot.setAttribute("cx", `${coord1[0]}`);
-      window.gvs.eqShapes.stillDot.setAttribute("cy", `${coord1[1]}`)
-    }
-    if ( i >= gvs.stages * 2 + 1 ) {
-      line.style.strokeOpacity = "0"
-    } else {
-      line.style.strokeOpacity = "1"
-    }
-    if ( i % 2 == 0 ) {
-      eqCoordList.push([ window.gvs.invOL(eqCoordList[i][1]), eqCoordList[i][1] ]);
-    } else {
-      eqCoordList.push([ eqCoordList[i][0], window.gvs.eq( eqCoordList[i][0] ) ]);
+        if( window.gvs.selectedPane === 2 ) {
+          const coord2 = gvs.eqPlot.coordToPix( ...eqCoordList[i + 1] );
+          line.setAttribute("x1", coord1[0]);
+          line.setAttribute("y1", coord1[1]);
+          line.setAttribute("x2", coord2[0]);
+          line.setAttribute("y2", coord2[1]);
+          if ( i % 2 === 0 ) {
+            const rect = line.getBoundingClientRect();
+            eqLabelCoords.push([rect.left, rect.top]);
+          }
+          if ( i === gvs.stages * 2 ) {
+            window.gvs.eqShapes.distillateDot.setAttribute("cx", `${coord2[0]}`);
+            window.gvs.eqShapes.distillateDot.setAttribute("cy", `${coord2[1]}`);
+          }
+        }
+        
+      }
     };
-    const coord2 = gvs.eqPlot.coordToPix( ...eqCoordList[i + 1] );
-    line.setAttribute("x1", coord1[0]);
-    line.setAttribute("y1", coord1[1]);
-    line.setAttribute("x2", coord2[0]);
-    line.setAttribute("y2", coord2[1]);
-    if ( i % 2 === 0 ) {
-      const rect = line.getBoundingClientRect();
-      labelCoords.push([rect.left, rect.top]);
+  
+    if ( window.gvs.selectedPane === 2 ) {
+      for ( let i = 0; i < gvs.eqShapes.stairLabels.length; i++ ) {
+        const label = gvs.eqShapes.stairLabels[i];
+        if ( i < gvs.stages + 1 ) {
+          label.style.left = `${eqLabelCoords[i][0]}px`;
+          label.style.top = `${eqLabelCoords[i][1]}px`;
+          label.style.opacity = "1";
+        } else {
+          label.style.opacity = "0"
+        }
+      };
     }
-    if ( i === gvs.stages * 2 ) {
-      window.gvs.eqShapes.distillateDot.setAttribute("cx", `${coord2[0]}`);
-      window.gvs.eqShapes.distillateDot.setAttribute("cy", `${coord2[1]}`);
-    }
-  };
-
-  for ( let i = 0; i < gvs.eqShapes.stairLabels.length; i++ ) {
-    const label = gvs.eqShapes.stairLabels[i];
-    label.style.left = `${labelCoords[i][0]}px`;
-    label.style.top = `${labelCoords[i][1]}px`;
-    if ( i > window.gvs.stages ) { label.style.opacity = "0" } else { label.style.opacity = "1" }
   }
+
+  if ( window.gvs.selectedPane === 3 ) {
+    // Then, set the t-x-y plot's stair coordinates
+    let txyCoordList = [[ window.gvs.still.xB, window.gvs.eqTempCelsius( window.gvs.still.xB ) ]];
+    let txyLabelCoords = [];
+
+    for ( let i = 0; i < gvs.txyShapes.stairLines.length; i++ ) {
+      const line = gvs.txyShapes.stairLines[i];
+      if ( i >= gvs.stages * 2 + 1 ) {
+        line.style.strokeOpacity = "0"
+      } else {
+        line.style.strokeOpacity = "1";
+        const coord1 = gvs.txyPlot.coordToPix( ...txyCoordList[i] );
+        if ( i === 0 ) {
+          window.gvs.txyShapes.stillDot.setAttribute("cx", `${coord1[0]}`);
+          window.gvs.txyShapes.stillDot.setAttribute("cy", `${coord1[1]}`)
+        };
+        if ( i % 2 == 0 ) {
+          txyCoordList.push([ window.gvs.invDewPointCelsius( txyCoordList[i][1] ), window.gvs.dewPointCelsius( eqCoordList[i][1] ) ]);
+        } else {
+          txyCoordList.push([ eqCoordList[i][0], window.gvs.eqTempCelsius( eqCoordList[i][0] ) ]);
+        };
+        const coord2 = gvs.txyPlot.coordToPix( ...txyCoordList[i + 1] );
+        line.setAttribute("x1", coord1[0]);
+        line.setAttribute("y1", coord1[1]);
+        line.setAttribute("x2", coord2[0]);
+        line.setAttribute("y2", coord2[1]);
+        if ( i % 2 === 0 ) {
+          const rect = line.getBoundingClientRect();
+          txyLabelCoords.push([rect.left, rect.top]);
+        }
+        if ( i === gvs.stages * 2 ) {
+          window.gvs.txyShapes.distillateDot.setAttribute("cx", `${coord2[0]}`);
+          window.gvs.txyShapes.distillateDot.setAttribute("cy", `${coord2[1]}`);
+          const rect = window.gvs.txyShapes.distillateDot.getBoundingClientRect();
+          txyLabelCoords.push([rect.left, rect.top]);
+        }
+      }
+    };
+
+    for ( let i = 0; i < gvs.txyShapes.stairLabels.length; i++ ) {
+      const label = gvs.txyShapes.stairLabels[i];
+      if ( i < gvs.stages + 1 ) {
+        label.style.left = `${txyLabelCoords[i][0]}px`;
+        label.style.top = `${txyLabelCoords[i][1]}px`;
+        label.style.opacity = "1";
+      } else if ( i !== gvs.txyShapes.stairLabels.length - 1 ) {
+        label.style.opacity = "0"
+      } else {
+        label.style.opacity = "1";
+        label.style.left = `${txyLabelCoords[txyLabelCoords.length - 1][0]}px`
+        label.style.top = `${txyLabelCoords[txyLabelCoords.length - 1][1]}px`
+      }
+    };
+  }
+
 };
 
 const updateOperatingLine = function() {

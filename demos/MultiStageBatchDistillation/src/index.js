@@ -18,6 +18,8 @@ window.gvs = {
     isEmpty: false,
     dV: 0.005,
     xd: undefined,
+    selectedPane: 1,
+    initializing: true,
 };
 
 // JavaScript modules from /js/ folder
@@ -33,7 +35,7 @@ const txyPlotOptions = {
     id: "txy-plot",                  
     title: "",
     titleFontSize: 16,
-    padding: [[53, 18], [20, 55]],
+    padding: [[45, 15], [20, 55]],
     axes: {
         axesStrokeWidth: 2,
         x : {
@@ -43,10 +45,10 @@ const txyPlotOptions = {
             range: [0, 1],                 
             step: 0.20,                    
             minorTicks: 4,                
-            majorTickSize: 1.35,              
-            minorTickSize: 0.65,
+            majorTickSize: 2,              
+            minorTickSize: 0.9,
             tickLabelFontSize: 13,
-            tickWidth: 0.5,
+            tickWidth: 0.25,
             tickLabelPrecision: 1,
             showZeroLabel: true,
         },
@@ -60,7 +62,7 @@ const txyPlotOptions = {
             majorTickSize: 2.75,
             minorTickSize: 1.25,
             tickLabelFontSize: 13,
-            tickWidth: 0.5,
+            tickWidth: 0.25,
             tickLabelPrecision: 0,
         }
     }
@@ -71,7 +73,7 @@ const eqPlotOptions = {
     id: "eq-plot",                  
     title: "",
     titleFontSize: 16,
-    padding: [[55, 20], [20, 55]],
+    padding: [[45, 15], [20, 55]],
     axes: {
         axesStrokeWidth: 2,
         x : {
@@ -81,10 +83,10 @@ const eqPlotOptions = {
             range: [0, 1],
             step: 0.20,
             minorTicks: 4,
-            majorTickSize: 1.35,
-            minorTickSize: 0.65,
+            majorTickSize: 2,
+            minorTickSize: 0.9,
             tickLabelFontSize: 13,
-            tickWidth: 0.5,
+            tickWidth: 0.25,
             tickLabelPrecision: 1,
             showZeroLabel: true,
         },
@@ -98,7 +100,7 @@ const eqPlotOptions = {
             majorTickSize: 2.75,
             minorTickSize: 1.25,
             tickLabelFontSize: 13,
-            tickWidth: 0.5,
+            tickWidth: 0.25,
             tickLabelPrecision: 1,
             showZeroLabel: true,
         }
@@ -106,6 +108,7 @@ const eqPlotOptions = {
 };
 
 function selectRightSideImage(n) {
+    window.gvs.selectedPane = n;
     const eqPlot = document.getElementById("eq-plot");
     const txyPlot = document.getElementById("txy-plot");
     const eqLabels = document.getElementById("eq-plot-tick-labels");
@@ -113,6 +116,7 @@ function selectRightSideImage(n) {
     const flasks = document.getElementById("flasks-container");
     const flasksHere = document.getElementById("flasks-here");
     const eqPlotStairLabels = document.getElementById("eq-plot-stair-labels");
+    const txyPlotStairLabels = document.getElementById("txy-plot-stair-labels");
     switch(n) {
         case 1:
             flasks.style.opacity = "1";
@@ -121,7 +125,8 @@ function selectRightSideImage(n) {
             txyPlot.style.opacity = "0";
             eqLabels.style.opacity = "0";
             txyLabels.style.opacity = "0";
-            try { eqPlotStairLabels.style.opacity = "0" } catch(e) {}
+            if ( !gvs.initializing ) { eqPlotStairLabels.style.opacity = "0" }
+            if ( !gvs.initializing ) { txyPlotStairLabels.style.opacity = "0" }
         break;
 
         case 2:
@@ -131,7 +136,8 @@ function selectRightSideImage(n) {
             eqLabels.style.opacity = "1";
             txyLabels.style.opacity = "0";
             flasksHere.style.opacity = "0";
-            try { eqPlotStairLabels.style.opacity = "1" } catch(e) {}
+            if ( !gvs.initializing ) { eqPlotStairLabels.style.opacity = "1" }
+            if ( !gvs.initializing ) { txyPlotStairLabels.style.opacity = "0" }
         break;
 
         case 3:
@@ -141,9 +147,11 @@ function selectRightSideImage(n) {
             eqLabels.style.opacity = "0";
             txyLabels.style.opacity = "1";
             flasksHere.style.opacity = "0";
-            try { eqPlotStairLabels.style.opacity = "0" } catch(e) {}
+            if ( !gvs.initializing ) { eqPlotStairLabels.style.opacity = "0" }
+            if ( !gvs.initializing ) { txyPlotStairLabels.style.opacity = "1" }
         break;
-    }
+    };
+    if ( !gvs.initializing ) { calcAll(); updateImage(); }
 }
 
 const sketch = (p) => {
@@ -222,19 +230,60 @@ const sketch = (p) => {
             const label = document.createElement("div");
             label.classList.add("stair-label", "eq");
             label.style.position = "absolute";
-            label.style.transform = "translateX(calc(-100% - 5px)) translateY(calc(-100% + 3px))";
+            label.style.transform = "translateX(calc(-100% - 6px)) translateY(calc(-100% + 3px))";
             label.style.opacity = "0";
-            label.style.padding = "0px 2px";
+            label.style.padding = "0px 1px";
             label.style.lineHeight = "16px";
-            label.style.backgroundColor = "rgba(255, 255, 255, 0.7)";
+            label.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
             if( i === 0 ) { label.innerHTML = "still" }
             else { label.innerHTML = `${i.toFixed(0)}` }
             eqStairLabelDiv.appendChild(label);
             window.gvs.eqShapes.stairLabels.push(label);
-        }
+        };
 
-        calcAll();
-        updateImage()
+        const txyLinesGroup = window.gvs.txyPlot.createGroup({
+            classList: ["txy-plot-lines"],
+            parent: window.gvs.txyPlot.SVG,
+        });
+        window.gvs.txyShapes.stairLines = [];
+        for ( let i = 0; i < 13; i++ ) {
+            const line = window.gvs.txyPlot.createLine({ parent: txyLinesGroup, classList:["txy", "stair-line"], stroke: "rgb(0, 0, 0)", strokeWidth: 1 });
+            line.style.strokeOpacity = "1";
+            window.gvs.txyShapes.stairLines.push( line );
+        };
+        window.gvs.txyShapes.stillDot = window.gvs.txyPlot.createPoint({ coord: [0.5, 0.5], radius: 1.75, parent: txyLinesGroup, classList:["txy", "point", "still"], fill: "rgb(0, 0, 255)" });
+        window.gvs.txyShapes.distillateDot = window.gvs.txyPlot.createPoint({ coord: [0.5, 0.5], radius: 1.75, parent: txyLinesGroup, classList:["txy", "point", "distillate"], fill: "rgb(255, 0, 0)" });
+
+        const txyStairLabelDiv = document.createElement("div");
+        txyStairLabelDiv.id = "txy-plot-stair-labels";
+        txyStairLabelDiv.style.position = "absolute";
+        txyStairLabelDiv.style.left = "0px";
+        txyStairLabelDiv.style.top = "0px";
+        txyStairLabelDiv.style.width = "100vw";
+        txyStairLabelDiv.style.height = "100vh";
+        txyStairLabelDiv.style.pointerEvents = "none";
+        txyStairLabelDiv.style.opacity = "0";
+        document.body.appendChild(txyStairLabelDiv);
+        
+        window.gvs.txyShapes.stairLabels = [];
+        for ( let i = 0; i < 8; i++ ) {
+            const label = document.createElement("div");
+            label.classList.add("stair-label", "txy");
+            label.style.position = "absolute";
+            label.style.transform = "translateX( calc( -100% - 5px ) )";
+            label.style.opacity = "0";
+            label.style.padding = "0px 1px";
+            label.style.lineHeight = "16px";
+            label.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
+            if( i === 0 ) { label.innerHTML = "still" }
+            else if ( i < 7 ) { label.innerHTML = `${i.toFixed(0)}` }
+            else { label.innerHTML = "x<sub>d</sub>"; label.style.transform = "translate(calc(100% - 8px), calc( -100% - 2px) )"; }
+            txyStairLabelDiv.appendChild(label);
+            window.gvs.txyShapes.stairLabels.push(label);
+        };
+
+        updateImage();
+        window.gvs.initializing = false;
     };
 
     p.draw = function () {
@@ -382,6 +431,8 @@ function  resetToInitialConditions() {
     window.gvs.findXd();
     P5.noLoop();
     updateImage();
+
+    selectRightSideImage(Number(rightSideGraphicSelector.value));
 };
 
 function beginCollecting() {

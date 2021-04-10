@@ -120,6 +120,22 @@
 
 }
 
+.axis-label {
+  font-size: 18px;
+}
+
+@media screen and (max-width: 1080px) {
+  .axis-label {
+    font-size: 16px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .axis-label {
+    font-size: 14px;
+  }
+}
+
 input[type="range"]:disabled {
   opacity: 0.2;
   pointer-events: none;

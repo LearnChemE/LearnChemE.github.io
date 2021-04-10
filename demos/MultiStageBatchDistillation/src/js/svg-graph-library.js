@@ -662,8 +662,9 @@ function SVG_Graph(options) {
     yAxisLabel.style.position = "absolute";
     yAxisLabel.style.left = "0px";
     yAxisLabel.style.top = `50%`;
-    yAxisLabel.style.transform = "translateX(-50%) rotate(-90deg) translateY(15px) translateX(20%)";
-    yAxisLabel.style.fontSize = `${this.options.axes.y.labelFontSize}px`;
+    yAxisLabel.style.transform = "translateX(-50%) rotate(-90deg) translateY(10px) translateX(20px)";
+    // yAxisLabel.style.fontSize = `${this.options.axes.y.labelFontSize}px`;
+    yAxisLabel.style.whiteSpace = "nowrap";
     yAxisLabel.classList.add("axis-label");
     yAxisLabel.innerHTML = `${this.options.axes.y.labels[0]}`
     this.axesLabels.appendChild(yAxisLabel);
@@ -673,7 +674,8 @@ function SVG_Graph(options) {
     xAxisLabel.style.left = `calc(50% + ${this.options.padding[0][0] / 2.5}px)`;
     xAxisLabel.style.bottom = `0px`;
     xAxisLabel.style.transform = "translateX(-50%) translateY(-7px)";
-    xAxisLabel.style.fontSize = `${this.options.axes.x.labelFontSize}px`;
+    // xAxisLabel.style.fontSize = `${this.options.axes.x.labelFontSize}px`;
+    xAxisLabel.style.whiteSpace = "nowrap";
     xAxisLabel.classList.add("axis-label");
     xAxisLabel.innerHTML = `${this.options.axes.x.labels[1]}`
     this.axesLabels.appendChild(xAxisLabel);

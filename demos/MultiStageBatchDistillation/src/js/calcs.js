@@ -1,14 +1,30 @@
+const math = require("mathjs");
+
 window.gvs.eq = function(x) {
-  return 2.24*x - 2.06*x**2 + 0.82*x**2.7;
+  return 2.24*x - 2.06*math.pow(x, 2) + 0.82*math.pow(x, 2.7);
 };
 
 window.gvs.eqTempKelvin = function(x) {
-  return 379 - 29*x - 5 * Math.sin(Math.PI * x);
+  return 379 - 29*x - 5 * math.sin(Math.PI * x);
 };
 
 window.gvs.eqTempCelsius = function(x) {
-  return 379 - 273.15 - 29*x - 5 * Math.sin(Math.PI * x);
+  return 379 - 273.15 - 29*x - 5 * math.sin(Math.PI * x);
 };
+
+window.gvs.invEqTempKelvin = function(y) {
+  let difference = 100;
+  let candidate = 0;
+  for ( let i = 0; i < 201; i++ ) {
+    const delta = Math.abs( window.gvs.eqTempKelvin(i / 200) - y );
+    if ( delta < difference ) { candidate = i / 200; difference = delta; }
+  }
+  return candidate;
+};
+
+window.gvs.invEqTempCelsius = function(y) {
+  return window.gvs.invEqTempKelvin(y + 273.15);
+}
 
 const dewPointCoords = [];
 for ( let i = 0; i < 201; i++ ) {
@@ -30,6 +46,26 @@ window.gvs.dewPointCelsius = function(x) {
   return window.gvs.dewPointKelvin(x) - 273.15;
 };
 
+window.gvs.invDewPointKelvin = function(y) {
+  if ( y >= window.gvs.dewPointKelvin(0) ) { return 0 }
+  if ( y <= window.gvs.dewPointKelvin(1) ) { return 1 }
+  else {
+    for ( let i = 0; i < dewPointCoords.length - 1; i++ ) {
+      if ( y > dewPointCoords[i][1] ) {
+        const between = ( dewPointCoords[i][1] - y ) / ( dewPointCoords[i][1] - dewPointCoords[i + 1][1] );
+        return ( between * dewPointCoords[i + 1][0] ) + ( 1 - between ) * dewPointCoords[i][0]
+      }
+    };
+    let i = dewPointCoords.length - 2;
+    const between = ( dewPointCoords[i][1] - y ) / ( dewPointCoords[i][1] - dewPointCoords[i + 1][1] );
+    return ( between * dewPointCoords[i + 1][0] ) + ( 1 - between ) * dewPointCoords[i][0];
+  }
+};
+
+window.gvs.invDewPointCelsius = function(y) {
+  return window.gvs.invDewPointKelvin(y + 273.15);
+}
+
 function OL(x, xd) {
   const LV = window.gvs.R / ( 1 + window.gvs.R );
   return LV * x + ( 1 - LV ) * xd;
@@ -42,31 +78,50 @@ function invOL(y, xd) {
 
 window.gvs.findXd = function() {
   let xdCandidate = 0;
+  let xd = window.gvs.still.xB;
   let difference = 100;
-  for ( let xd = 0.001; xd < 1; xd += 0.001 ) {
+  let dx = 0.1;
+  let iterations = 0;
+  let precision = 1;
+  
+  while ( precision < 7 ) {
+    if( iterations >= 20 || xd >= 1 ) {
+      xd = xdCandidate - dx;
+      dx *= 0.1;
+      precision++;
+      iterations = 0;
+    };
+
     let currentLoc = window.gvs.eq( window.gvs.still.xB );
     for ( let i = 0; i < window.gvs.stages; i++ ) {
       currentLoc = invOL(currentLoc, xd);
       currentLoc = window.gvs.eq(currentLoc);
     };
+    
     const delta = Math.abs( currentLoc - xd );
+    
     if ( delta < difference ) {
       xdCandidate = xd;
       difference = delta;
-    }
-  };
-  window.gvs.xd = Number( Number(xdCandidate).toFixed(3) );
+    };
+    
+    iterations++;
+    xd += dx;
+  
+  }
+
+  window.gvs.xd = Number(xdCandidate);
   window.gvs.OL = function(x) {
     return OL(x, window.gvs.xd);
   };
   window.gvs.invOL = function(y) {
     return invOL(y, window.gvs.xd);
   };
+  return
 };
 
 
 function calcAll() {
-  window.gvs.findXd();
   
   if ( window.gvs.isCollecting ) {
     const flask = window.gvs.flasks[0];
@@ -91,6 +146,8 @@ function calcAll() {
       window.gvs.isEmpty = false;
     }
   }
+
+  window.gvs.findXd();
 
 };
 
