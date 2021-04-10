@@ -178,7 +178,7 @@ function SVG_Graph(options) {
   const yOpts = typeof( options ) === "undefined" ? {} : typeof( options.axes ) === "undefined" ? {} : typeof( options.axes.y ) === "undefined" ? {} : options.axes.y;
 
   this.options.axes = {
-    axesStrokeWidth: 1.5,
+    axesStrokeWidth: 0.5,
     x : {
       labels: ["", "bottom label"],
       labelFontSize: 17,

@@ -42,7 +42,7 @@ const txyPlotOptions = {
     titleFontSize: 16,
     padding: [[45, 0], [0, 55]],
     axes: {
-        axesStrokeWidth: 2,
+        axesStrokeWidth: 0.125,
         x : {
             labels: ["", "mole fraction B"],  
             labelFontSize: 14,            
@@ -53,7 +53,7 @@ const txyPlotOptions = {
             majorTickSize: 2,              
             minorTickSize: 0.9,
             tickLabelFontSize: 13,
-            tickWidth: 0.25,
+            tickWidth: 0.125,
             tickLabelPrecision: 1,
             showZeroLabel: true,
         },
@@ -67,7 +67,7 @@ const txyPlotOptions = {
             majorTickSize: 2.75,
             minorTickSize: 1.25,
             tickLabelFontSize: 13,
-            tickWidth: 0.25,
+            tickWidth: 0.125,
             tickLabelPrecision: 0,
         }
     }
@@ -80,7 +80,7 @@ const eqPlotOptions = {
     titleFontSize: 16,
     padding: [[45, 0], [0, 45]],
     axes: {
-        axesStrokeWidth: 2,
+        axesStrokeWidth: 0.125,
         x : {
             labels: ["", "x<sub>B</sub>"],
             labelFontSize: 16,
@@ -91,7 +91,7 @@ const eqPlotOptions = {
             majorTickSize: 2,
             minorTickSize: 0.9,
             tickLabelFontSize: 13,
-            tickWidth: 0.25,
+            tickWidth: 0.125,
             tickLabelPrecision: 1,
             showZeroLabel: true,
         },
@@ -105,7 +105,7 @@ const eqPlotOptions = {
             majorTickSize: 2.75,
             minorTickSize: 1.25,
             tickLabelFontSize: 13,
-            tickWidth: 0.25,
+            tickWidth: 0.125,
             tickLabelPrecision: 1,
             showZeroLabel: true,
         }
