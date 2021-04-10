@@ -9,10 +9,10 @@
   <script>
     MathJax = {
       chtml: {
-        scale: 0.95,
+        scale: 0.9,
         mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
         displayAlign: 'left', // default for indentalign when set to 'auto'
-        displayIndent: '0.01', // default for indentshift when set to 'auto'
+        displayIndent: '-1', // default for indentshift when set to 'auto'
       }
     };
   </script>
@@ -69,6 +69,9 @@
 
     <div id="flasks-container"></div>
 
+    <div id="still-composition" style="position:absolute;"></div>
+    <div id="distillate-composition" style="position:absolute;"></div>
+
     <div id="right-side-graphics-selector" style="position:absolute;">
       <div>display:</div>
       <div class="select">
@@ -95,9 +98,11 @@
         </div>
         <div class="modal-body">
           <p>
-            Directions
+            Multistage batch distillation is simulated by an animation. 10 kmol of a binary mixture (components A and B, with B being the more volatile component) is placed in a batch still. Use the first slider to set the initial mole fraction of component B in the still. Next, adjust the number of trays in the column with the "equilibrium stages" slider, and adjust the reflux ratio of the column with the "reflux ratio (L/D)" slider. Specify the amount of liquid to be collected using the "amount to collect" slider.
           </p>
-
+          <p>
+            When you click "collect", the liquid evaporates into a collection container. After the specified amount of distillate is collected, the collection container is set aside and an empty container is substituted. This process can be repeated until 1 mole remains in the still or eight containers have been filled. The graphic on the right side may be changed by choosing an option using the drop-down menu above the plot. Select "reset" to start over. Tooltips enable hovering the mouse over components and streams in the graphic.
+          </p>
         </div>
       </div>
     </div>
@@ -118,9 +123,69 @@
         <div class="modal-body">
 
           <p>
-            Details
+            Multistage batch distillation can obtain much higher product purity than simple batch distillation. The overall mass balance is:
+          </p>
+          
+          $$
+            F = W_{final} + D_{total}
+          $$
+
+          <p>
+            where \( F \) is the initial molar quantity of the feed mixture, \( W_{final} \) is the molar quantity in the bottoms vessel (the "waste" product), and \( D_{total} \) is the total molar quantity of collected distillate. The component mass balance is:
           </p>
 
+          $$
+            F \; x_{f} = W_{final} \; x_{W,final} + D_{total} \; x_{D,avg}
+          $$
+
+          <p>
+            where \( x_{F} \) is the initial mole fraction of component B in the feed, \( x_{D,avg} \) is the average mole fraction of component B within the collected distillate, and \( x_{W,final} \) is the final mole fraction within the bottoms vessel.
+          </p>
+
+          <p>
+            Each tray in the column is assumed to be in vapor-liquid equilibrium:
+          </p>
+
+          $$
+            y = f(x)
+          $$
+
+          <p>
+            The function \( y = f(x) \) represents an equilibrium curve, plotted on an x-y diagram. The composition of each stage lies somewhere upon this curve.
+          </p>
+
+          <p>
+            An operating line relates the composition of a stage to the adjacent stage composition. The operating line equation is:
+          </p>
+
+          $$
+            y_{n} = \frac{ R }{ R + 1 } x_{ n + 1 } + \left( 1 - \frac{ R }{ R + 1 } \right) x_{D}
+          $$
+
+          <p>
+            where \( y_{n} \) is the vapor mole fraction of B at stage \( n \), \( R \) is the reflux ratio, and \( x_{ n + 1 } \) is the liquid mole fraction of B at stage \( n + 1 \). The reflux ratio is:
+          </p>
+
+          $$
+            R = \frac{L}{D}
+          $$
+
+          <p>
+            where \( L \) is the flow rate of liquid returning from the condenser to the column, and \( D \) is the flow rate of distillate being collected. The Rayleigh equation can be used to solve for the final composition of distillate and bottoms:
+          </p>
+
+          $$
+            \mathrm{ln} \left( \frac{ W_{final} }{ F } \right) = \int_{ x_{F} }^{ x_{ W, final } } \frac{ 1 }{ x_{D} - x_{ W } } \mathrm{d} x_{ W }
+          $$
+
+          <p>
+            but the relationship between distillate composition and bottoms composition \( f ( x_{ W } ) = x_{ D } \) is complicated with multistage columns, so the mole fractions are obtained numerically.
+          </p>
+
+          <p>Reference</p>
+          <p class="references">
+            [1] P. C. Wankat, "Batch Distillation," <i>Separation Process Engineering: Includes Mass Transfer Analysis</i>, 3rd ed., Upper Saddle River, NJ: Prentice Hall, 2012 pp. 329-347. 
+          </p>
           <div style="margin-top: 2rem;"></div>
         </div>
 
@@ -140,9 +205,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.</p>
-          <p style="line-height: 3rem;">
-            If this simulation is too big for your screen, zoom out using&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Windows.
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.
           </p>
         </div>
       </div>

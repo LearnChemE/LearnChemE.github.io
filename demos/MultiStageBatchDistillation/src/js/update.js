@@ -302,11 +302,24 @@ const updateGraphs = function() {
   setStairCoordinates();
 };
 
+const stillComposition = document.getElementById("still-composition");
+const distillateComposition = document.getElementById("distillate-composition");
+
+const updateCompositions = function() {
+  const xS = window.gvs.p.constrain(window.gvs.still.xB, 0.001, 0.999);
+  const xD = window.gvs.p.constrain(window.gvs.xd, 0.001, 0.999);
+  const xStill = xS < 0.01 ? xS.toFixed(3) : xS.toFixed(2);
+  const xDistillate = xD < 0.01 || xD > 0.99 ? xD.toFixed(3) : xD.toFixed(2);
+  stillComposition.innerHTML = `<div>x<sub>still</sub>:&nbsp;${xStill}</div>`;
+  distillateComposition.innerHTML = `<div>x<sub>d</sub>&nbsp;:&nbsp;${xDistillate}</div>`;
+}
+
 function updateImage() {
   updateGraphs();
   window.gvs.flasks[0].updateImage();
   window.gvs.still.updateImage();
   updateTemperatures();
+  updateCompositions();
 };
 
 module.exports = { resizeFlasks, updateImage };

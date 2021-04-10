@@ -220,7 +220,7 @@ function SVG_Graph(options) {
   if ( document.getElementById("svg-plot-style") === null ) {
     const style = document.createElement("style");
     style.id = "svg-plot-style";
-    let styleText = ".svg-plot * {font-family:Arial, Helvetica, sans-serif; vector-effect: non-scaling-stroke;}";
+    let styleText = ".svg-plot * {vector-effect: non-scaling-stroke;}";
     style.innerHTML = styleText;
     document.head.appendChild(style);
   }

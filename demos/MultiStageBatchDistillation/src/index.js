@@ -4,6 +4,10 @@ require("./style/slider.scss");
 window.p5 = new require("./js/p5.min.js");
 const { SVG_Graph } = require("./js/svg-graph-library.js");
 
+const font = document.createElement("style");
+font.innerHTML = "@font-face { font-family: appFont; src: url(./resources/OpenSans-Regular.ttf); } body { font-family: appFont; }";
+document.head.appendChild(font);
+
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
     scale: 1,
@@ -340,7 +344,19 @@ const sketch = (p) => {
             const point = points[i];
             point.setAttribute("rx", `${rx}`);
             point.setAttribute("ry", `${ry}`);
-        }
+        };
+        const stillCompositionRect = document.getElementById("still-composition-rect").getBoundingClientRect();
+        const distillateCompositionRect = document.getElementById("distillate-composition-rect").getBoundingClientRect();
+        const stillComposition = document.getElementById("still-composition");
+        const distillateComposition = document.getElementById("distillate-composition");
+        stillComposition.style.width = `${stillCompositionRect.width}px`;
+        stillComposition.style.height = `${stillCompositionRect.height}px`;
+        stillComposition.style.top = `${stillCompositionRect.top}px`;
+        stillComposition.style.left = `${stillCompositionRect.left}px`;
+        distillateComposition.style.width = `${distillateCompositionRect.width}px`;
+        distillateComposition.style.height = `${distillateCompositionRect.height}px`;
+        distillateComposition.style.top = `${distillateCompositionRect.top}px`;
+        distillateComposition.style.left = `${distillateCompositionRect.left}px`;
         try { updateImage() } catch(e) {}
     }
 

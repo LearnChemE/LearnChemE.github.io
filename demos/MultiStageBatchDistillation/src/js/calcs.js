@@ -84,7 +84,7 @@ window.gvs.findXd = function() {
   let iterations = 0;
   let precision = 1;
   
-  while ( precision < 7 ) {
+  while ( precision < 8 ) {
     if( iterations >= 20 || xd >= 1 ) {
       xd = xdCandidate - dx;
       dx *= 0.1;

@@ -540,7 +540,7 @@
          <rect y="117.97089" x="108.66876" height="10.012316" width="26.347527" id="condenser-temperature-container"
             style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.15;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
          <text id="condenser-temperature" y="124.94394" x="122"
-            style="text-anchor:middle;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+            style="text-anchor:middle;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5px;line-height:1.25;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
             xml:space="preserve">
          </text>
          <rect transform="scale(-1,1)"
@@ -554,13 +554,17 @@
             style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.150001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
             id="still-temperature-container" width="26.396082" height="11.304424" x="-48.991192" y="227.68372" />
          <text xml:space="preserve"
-            style="text-anchor:middle;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+            style="text-anchor:middle;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5px;line-height:1.25;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
             x="35.5" y="235.43257" id="still-temperature">
          </text>
       </g>
    </g>
-   <rect style="fill:none;fill-opacity:1;stroke-width:1.00157;stroke:none" id="buttons-rect" width="130.24213"
+   <rect style="fill:none;fill-opacity:1;stroke:none" id="buttons-rect" width="130.24213"
       height="18.99194" x="114.14576" y="2.688127" />
-   <rect style="fill:none;fill-opacity:1;stroke-width:1.00157;stroke:none" id="canvas-rect" width="130.24213"
+   <rect style="fill:none;fill-opacity:1;stroke:none" id="canvas-rect" width="130.24213"
       height="166.99194" x="114.14576" y="22.688127" />
+   <rect style="fill:none;fill-opacity:1;stroke:none" id="still-composition-rect" width="26.396082"
+      height="11" x="2" y="131" />
+   <rect style="fill:none;fill-opacity:1;stroke:none" id="distillate-composition-rect" width="26.347527"
+      height="11" x="88.2" y="21" />
 </svg>
