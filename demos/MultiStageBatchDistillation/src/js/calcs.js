@@ -1,15 +1,13 @@
-const math = require("mathjs");
-
 window.gvs.eq = function(x) {
-  return 2.24*x - 2.06*math.pow(x, 2) + 0.82*math.pow(x, 2.7);
+  return 2.24*x - 2.06*x**2 + 0.82*x**2.7;
 };
 
 window.gvs.eqTempKelvin = function(x) {
-  return 379 - 29*x - 5 * math.sin(Math.PI * x);
+  return 379 - 29*x - 5 * Math.sin(Math.PI * x);
 };
 
 window.gvs.eqTempCelsius = function(x) {
-  return 379 - 273.15 - 29*x - 5 * math.sin(Math.PI * x);
+  return 379 - 273.15 - 29*x - 5 * Math.sin(Math.PI * x);
 };
 
 window.gvs.invEqTempKelvin = function(y) {

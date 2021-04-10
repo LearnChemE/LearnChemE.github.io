@@ -124,6 +124,7 @@ window.gvs.addFlask = function() {
         const lvl = this.V / this.maxVolume;
         window.gvs.setFlaskLiquidLevel(this.SVG, lvl);
         this.div.children[1].innerHTML = `${this.name}<br>x<sub>B</sub> = ${Number(this.xB).toFixed(2)}`;
+        if( this.name === "container #9" ) { this.div.children[1].innerHTML = "collection area<br>full." }
       },
     };
     window.gvs.flasks.unshift(flask);

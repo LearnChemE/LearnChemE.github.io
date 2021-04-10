@@ -480,7 +480,7 @@ function  resetToInitialConditions() {
 };
 
 function beginCollecting() {
-    if ( !window.gvs.isEmpty ) {
+    if ( !window.gvs.isEmpty && window.gvs.flasks.length < 9 ) {
         window.gvs.isCollecting = true;
         [collectButton, resetButton, xBinitSlider, stagesSlider, evapQuantitySlider, refluxSlider].forEach(inp => {
             inp.setAttribute("disabled", "true");
