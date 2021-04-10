@@ -35,7 +35,7 @@ const txyPlotOptions = {
     id: "txy-plot",                  
     title: "",
     titleFontSize: 16,
-    padding: [[45, 15], [20, 55]],
+    padding: [[45, 0], [0, 55]],
     axes: {
         axesStrokeWidth: 2,
         x : {
@@ -73,7 +73,7 @@ const eqPlotOptions = {
     id: "eq-plot",                  
     title: "",
     titleFontSize: 16,
-    padding: [[45, 15], [20, 55]],
+    padding: [[45, 0], [0, 45]],
     axes: {
         axesStrokeWidth: 2,
         x : {
@@ -125,8 +125,8 @@ function selectRightSideImage(n) {
             txyPlot.style.opacity = "0";
             eqLabels.style.opacity = "0";
             txyLabels.style.opacity = "0";
-            if ( !gvs.initializing ) { eqPlotStairLabels.style.opacity = "0" }
-            if ( !gvs.initializing ) { txyPlotStairLabels.style.opacity = "0" }
+            eqPlotStairLabels.style.opacity = "0";
+            txyPlotStairLabels.style.opacity = "0";
         break;
 
         case 2:
@@ -136,8 +136,8 @@ function selectRightSideImage(n) {
             eqLabels.style.opacity = "1";
             txyLabels.style.opacity = "0";
             flasksHere.style.opacity = "0";
-            if ( !gvs.initializing ) { eqPlotStairLabels.style.opacity = "1" }
-            if ( !gvs.initializing ) { txyPlotStairLabels.style.opacity = "0" }
+            eqPlotStairLabels.style.opacity = "1";
+            txyPlotStairLabels.style.opacity = "0";
         break;
 
         case 3:
@@ -147,8 +147,8 @@ function selectRightSideImage(n) {
             eqLabels.style.opacity = "0";
             txyLabels.style.opacity = "1";
             flasksHere.style.opacity = "0";
-            if ( !gvs.initializing ) { eqPlotStairLabels.style.opacity = "0" }
-            if ( !gvs.initializing ) { txyPlotStairLabels.style.opacity = "1" }
+            eqPlotStairLabels.style.opacity = "0";
+            txyPlotStairLabels.style.opacity = "1";
         break;
     };
     if ( !gvs.initializing ) { calcAll(); updateImage(); }
@@ -193,7 +193,6 @@ const sketch = (p) => {
         const xyLine = window.gvs.eqPlot.addCurve(function(x) { return x }, { stroke: "rgb(100, 100, 100)", strokeWidth: 1 });
         xyLine.elt.style.strokeDasharray = "6px 3px";
 
-        selectRightSideImage(1);
         window.gvs.p = p;
         p.windowResized();
         window.gvs.findXd();
@@ -291,6 +290,7 @@ const sketch = (p) => {
             window.gvs.txyShapes.stairLabels.push(label);
         };
 
+        selectRightSideImage(Number(document.getElementById("right-side-graphic").value));
         updateImage();
         window.gvs.initializing = false;
     };
@@ -306,16 +306,23 @@ const sketch = (p) => {
     };
 
     p.windowResized = function() {
+        const selectGraphicElt = document.getElementById("right-side-graphics-selector");
+        const selectGraphicSVG = document.getElementById("buttons-rect");
         const svgCnvElt = document.getElementById("canvas-rect");
-        const rect = svgCnvElt.getBoundingClientRect();
-        const w = rect.width;
-        const h = rect.height;
-        const top = rect.top;
-        const left = rect.left;
-        rightSideContainer.style.width = `${w}px`;
-        rightSideContainer.style.height = `${h}px`;
-        rightSideContainer.style.top = `${top}px`;
-        rightSideContainer.style.left = `${left}px`;
+        const cnvRect = svgCnvElt.getBoundingClientRect();
+        const cnvW = cnvRect.width;
+        const cnvH = cnvRect.height;
+        const cnvTop = cnvRect.top;
+        const cnvLeft = cnvRect.left;
+        rightSideContainer.style.width = `${cnvW}px`;
+        rightSideContainer.style.height = `${cnvH}px`;
+        rightSideContainer.style.top = `${cnvTop}px`;
+        rightSideContainer.style.left = `${cnvLeft}px`;
+        const selectRect = selectGraphicSVG.getBoundingClientRect();
+        selectGraphicElt.style.width = `${selectRect.width}px`;
+        selectGraphicElt.style.height = `${selectRect.height}px`;
+        selectGraphicElt.style.top = `${selectRect.top}px`;
+        selectGraphicElt.style.left = `${selectRect.left}px`;
         window.gvs.txyPlot.resize();
         window.gvs.eqPlot.resize();
         resizeFlasks();
@@ -340,8 +347,6 @@ const P5 = new p5(sketch, document.body);
 
 const collectButton = document.getElementById("collect-button");
 const resetButton = document.getElementById("reset-button");
-const sizeIncrease = document.getElementById("size-increase");
-const sizeDecrease = document.getElementById("size-decrease");
 const rightSideGraphicSelector = document.getElementById("right-side-graphic");
 const xBinitSlider = document.getElementById("xBinit-slider");
 const xBinitValue = document.getElementById("xBinit-value");
@@ -371,6 +376,7 @@ refluxValue.innerHTML = R.toFixed(1);
 rightSideGraphicSelector.addEventListener("change", () => {
     const selection = Number(rightSideGraphicSelector.value);
     selectRightSideImage(selection);
+    try { document.activeElement.blur() } catch(e) {}
 });
 
 collectButton.addEventListener("click", () => {
@@ -379,16 +385,6 @@ collectButton.addEventListener("click", () => {
 
 resetButton.addEventListener("click", () => {
     resetToInitialConditions();
-});
-
-sizeDecrease.addEventListener("click", () => {
-    gvs.scale *= 0.9;
-    document.body.style.transform = `translate(${-1 * (1 - gvs.scale) * 500}px, ${-1 * (1 - gvs.scale) * 250}px) scale(${gvs.scale})`;
-});
-
-sizeIncrease.addEventListener("click", () => {
-    gvs.scale *= 1.1;
-    document.body.style.transform = `translate(${-1 * (1 - gvs.scale) * 500}px, ${-1 * (1 - gvs.scale) * 250}px) scale(${gvs.scale})`;
 });
 
 xBinitSlider.addEventListener("input", function() {

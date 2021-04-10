@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 246.57118 181.92877"
+<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 246.57118 191.92877"
    version="1.1" id="column-svg">
    <defs id="defs" />
    <g transform="translate(-20.520109,-84.398827)" id="still">
@@ -561,6 +561,8 @@
          </text>
       </g>
    </g>
-   <rect style="fill:none;fill-opacity:1;stroke-width:1.00157;stroke:none" id="canvas-rect" width="127.24213"
-      height="176.99194" x="117.14576" y="2.688127" />
+   <rect style="fill:none;fill-opacity:1;stroke-width:1.00157;stroke:none" id="buttons-rect" width="130.24213"
+      height="18.99194" x="114.14576" y="2.688127" />
+   <rect style="fill:none;fill-opacity:1;stroke-width:1.00157;stroke:none" id="canvas-rect" width="130.24213"
+      height="166.99194" x="114.14576" y="22.688127" />
 </svg>

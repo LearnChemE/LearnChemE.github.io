@@ -488,7 +488,7 @@ function SVG_Graph(options) {
           label.style.position = "absolute";
           label.style.top = `${tickRect.bottom}px`;
           label.style.left = `${tickRect.left}px`;
-          label.style.fontSize = `${this.options.axes.y.tickLabelFontSize}px`;
+          // label.style.fontSize = `${this.options.axes.y.tickLabelFontSize}px`;
           label.style.transform = "translate(calc( -100% - 5px), -50%)";
           this.tickLabels.appendChild(label);
         };
@@ -629,7 +629,7 @@ function SVG_Graph(options) {
           label.style.position = "absolute";
           label.style.top = `${tickRect.bottom}px`;
           label.style.left = `${tickRect.left}px`;
-          label.style.fontSize = `${this.options.axes.x.tickLabelFontSize}px`;
+          // label.style.fontSize = `${this.options.axes.x.tickLabelFontSize}px`;
           label.style.transform = "translate(-50%, 5px)";
           this.tickLabels.appendChild(label);
         };
@@ -673,7 +673,7 @@ function SVG_Graph(options) {
     xAxisLabel.style.position = "absolute";
     xAxisLabel.style.left = `calc(50% + ${this.options.padding[0][0] / 2.5}px)`;
     xAxisLabel.style.bottom = `0px`;
-    xAxisLabel.style.transform = "translateX(-50%) translateY(-7px)";
+    xAxisLabel.style.transform = "translateX(-50%)";
     // xAxisLabel.style.fontSize = `${this.options.axes.x.labelFontSize}px`;
     xAxisLabel.style.whiteSpace = "nowrap";
     xAxisLabel.classList.add("axis-label");
