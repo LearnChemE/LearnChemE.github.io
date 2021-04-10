@@ -60,7 +60,7 @@ function resizeFlasks() {
   const containerRect = svgContainer.getBoundingClientRect();
   const dispenserRect = document.getElementById("dispenser-rect").getBoundingClientRect();
   const p5Rect = rightSideContainer.getBoundingClientRect();
-  const relativeSize = 0.07;
+  const relativeSize = 0.055;
   for ( let i = 0; i < flasks.length; i++ ) {
     const flaskDiv = flasks[i];
     const svg = svgs[i];
@@ -113,8 +113,8 @@ window.gvs.addFlask = function() {
   const k = Math.round(window.gvs.flasks.length + 1);
   if ( k > 1 ) { document.getElementById("flasks-here").style.opacity = "0" }
   if ( k <= 9 ) {
-    const flask = { 
-      name: `flask #${k}`,
+    const flask = {
+      name: `container #${k}`,
       xB : 0.00,
       V : 0.00,
       maxVolume: Number(document.getElementById("evap-quantity-slider").getAttribute("max")),
@@ -249,6 +249,33 @@ const setStairCoordinates = function() {
     };
   }
 
+};
+
+window.gvs.setStagesInImage = function(stages) {
+  let groups = [];
+  for ( let i = 1; i <= 6; i++ ) {
+    const group = document.getElementById(`stage-group-${i}`);
+    if ( i > stages ) { group.style.opacity = "0" }
+    else { group.style.opacity = "1"; groups.push(group) }
+  };
+  
+  const minYTranslation = -64;
+  const maxYTranslation = 26;
+  const range = maxYTranslation - minYTranslation;
+  const n = groups.length;
+  const delta = range / ( n + 1 );
+  let currentY = maxYTranslation;
+
+  for ( let i = 0; i < n; i++ ) {
+    currentY -= delta;
+    let translationText;
+    if ( i % 2 === 0 ) {
+      translationText = `translate(0,${currentY})`;
+    } else {
+      translationText = `matrix(-1,0,0,1,146.02225,${currentY})`;
+    };
+    groups[i].setAttribute("transform", translationText);
+  }
 };
 
 const updateOperatingLine = function() {

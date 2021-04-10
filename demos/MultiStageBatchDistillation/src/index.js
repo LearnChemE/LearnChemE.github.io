@@ -16,7 +16,7 @@ window.gvs = {
     eqShapes: {},
     isCollecting: false,
     isEmpty: false,
-    dV: 0.005,
+    dV: undefined,
     xd: undefined,
     selectedPane: 1,
     initializing: true,
@@ -290,7 +290,9 @@ const sketch = (p) => {
             window.gvs.txyShapes.stairLabels.push(label);
         };
 
+        setdV();
         selectRightSideImage(Number(document.getElementById("right-side-graphic").value));
+        window.gvs.setStagesInImage( Number( document.getElementById("stages-slider").value ) );
         updateImage();
         window.gvs.initializing = false;
     };
@@ -399,6 +401,7 @@ stagesSlider.addEventListener("input", function() {
     const stages = Math.round( stagesSlider.value );
     window.gvs.stages = stages;
     stagesValue.innerHTML = stages.toFixed(0);
+    window.gvs.setStagesInImage(stages);
     calcAll();
     updateImage()
 });
@@ -413,9 +416,16 @@ refluxSlider.addEventListener("input", function() {
     const R = Number( refluxSlider.value );
     window.gvs.R = R;
     refluxValue.innerHTML = R.toFixed(1);
+    setdV();
     calcAll();
     updateImage()
 });
+
+function setdV() {
+    const R = window.gvs.R;
+    const modifier = 0.02;
+    window.gvs.dV = modifier / R;
+}
 
 function  resetToInitialConditions() {
     [collectButton, resetButton, xBinitSlider, stagesSlider, evapQuantitySlider, refluxSlider].forEach(inp => {
@@ -448,7 +458,7 @@ function  resetToInitialConditions() {
     window.gvs.findXd();
     P5.noLoop();
     updateImage();
-
+    document.getElementById("pouring-liquid").style.fillOpacity = "0";
     selectRightSideImage(Number(rightSideGraphicSelector.value));
 };
 
@@ -458,6 +468,7 @@ function beginCollecting() {
         [collectButton, resetButton, xBinitSlider, stagesSlider, evapQuantitySlider, refluxSlider].forEach(inp => {
             inp.setAttribute("disabled", "true");
         });
+        document.getElementById("pouring-liquid").style.fillOpacity = "1";
         P5.loop();
     }
 };
@@ -466,6 +477,7 @@ function endCollecting() {
     [collectButton, resetButton, evapQuantitySlider, refluxSlider].forEach(inp => {
         inp.removeAttribute("disabled");
     });
+    document.getElementById("pouring-liquid").style.fillOpacity = "0";
     window.gvs.addFlask();
     P5.noLoop();
 };

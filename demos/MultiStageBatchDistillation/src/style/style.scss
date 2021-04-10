@@ -190,8 +190,10 @@ input[type="range"]:disabled {
 
 .flask-label {
   white-space: nowrap;
-  font-size: 0.75rem;
-  line-height: 1rem;
+  outline: 0.5px solid white;
+  background-color: white;
+  font-size: 0.65rem;
+  line-height: 1.2em;
   text-align: center;
   width: max-content;
 }
@@ -217,7 +219,7 @@ input[type="range"]:disabled {
 
 @media screen and (min-width: 850px) {
   .flask-label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
   .input-row, #right-side-graphics-selector>div {
     font-size: 0.9rem !important;
@@ -236,7 +238,7 @@ input[type="range"]:disabled {
 
 @media screen and (min-width: 1024px) {
   .flask-label {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
   .input-row, #right-side-graphics-selector>div {
     font-size: 0.95rem !important;

@@ -2,6 +2,8 @@
 <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 246.57118 191.92877"
    version="1.1" id="column-svg">
    <defs id="defs" />
+   <rect y="137" x="92.5" height="27" width="1.8" id="pouring-liquid"
+      style="fill:#d2d2ff;fill-opacity:0;stroke:none;stroke-opacity:0"; />
    <g transform="translate(-20.520109,-84.398827)" id="still">
       <path id="left-foot" style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999;stroke-opacity:1"
          transform="rotate(25.350778)" d="m 157.84422,206.14281 h 2.92479 l -0.53627,10.28872 -2.38862,1.13169 z" />
@@ -115,7 +117,7 @@
                d="m 80.634445,185.3 v 2.97911 c -0.502141,0.22545 -1.20924,0.2152 -1.76262,0 V 185.3" id="path983" />
          </g>
       </g>
-      <g id="stage-group-2" transform="translate(2.6855469e-6,8.2056285)">
+      <g id="stage-group-3" transform="translate(2.6855469e-6,8.2056285)">
          <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" id="ellipse1452"
             cx="73.017128" cy="190.4686" rx="9.3869581" ry="0.73783952" />
          <rect rx="0.25" ry="0" y="188.39502" x="63.608215" height="2.1025457" width="18.76483" id="rect1454"
@@ -168,7 +170,7 @@
                style="fill:none;stroke:#000000;stroke-width:0.05;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
          </g>
       </g>
-      <g transform="matrix(-1,0,0,1,146.02225,-3.8677763)" id="stage-group-3">
+      <g transform="matrix(-1,0,0,1,146.02225,-3.8677763)" id="stage-group-2">
          <ellipse ry="0.73783952" rx="9.3869581" cy="190.4686" cx="73.017128" id="ellipse1566"
             style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" />
          <rect
@@ -215,7 +217,7 @@
                d="m 80.634445,185.3 v 2.97911 c -0.502141,0.22545 -1.20924,0.2152 -1.76262,0 V 185.3" id="path1602" />
          </g>
       </g>
-      <g id="stage-group-4" transform="translate(2.6855469e-6,-15.678073)">
+      <g id="stage-group-5" transform="translate(2.6855469e-6,-15.678073)">
          <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" id="ellipse1608"
             cx="73.017128" cy="190.4686" rx="9.3869581" ry="0.73783952" />
          <rect rx="0.25" ry="0" y="188.39502" x="63.608215" height="2.1025457" width="18.76483" id="rect1610"
@@ -268,7 +270,7 @@
                style="fill:none;stroke:#000000;stroke-width:0.05;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
          </g>
       </g>
-      <g transform="matrix(-1,0,0,1,146.02225,-27.388043)" id="stage-group-5">
+      <g transform="matrix(-1,0,0,1,146.02225,-27.388043)" id="stage-group-4">
          <ellipse ry="0.73783952" rx="9.3869581" cy="190.4686" cx="73.017128" id="ellipse1650"
             style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.264999" />
          <rect
