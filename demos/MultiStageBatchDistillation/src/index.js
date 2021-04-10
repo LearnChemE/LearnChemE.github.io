@@ -22,6 +22,7 @@ window.gvs = {
     initializing: true,
 };
 
+
 // JavaScript modules from /js/ folder
 const { calcAll } = require("./js/calcs.js"); // contains all calculation-related functions
 const { importSVG, addStill } = require("./js/importSVG.js"); // adds inline-SVG to the document

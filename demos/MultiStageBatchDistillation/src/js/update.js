@@ -278,6 +278,15 @@ window.gvs.setStagesInImage = function(stages) {
   }
 };
 
+function updateTemperatures() {
+  const condenserTempElt = document.getElementById("condenser-temperature");
+  const stillTempElt = document.getElementById("still-temperature");
+  const Tb = Math.round( window.gvs.eqTempCelsius(window.gvs.still.xB) );
+  const Tc = Math.round( window.gvs.dewPointCelsius(window.gvs.xd) );
+  condenserTempElt.textContent = `${Tc.toFixed(0)}° C`;
+  stillTempElt.textContent = `${Tb.toFixed(0)}° C`;
+};
+
 const updateOperatingLine = function() {
   const eqShapes = window.gvs.eqShapes;
   const txyShapes = window.gvs.txyShapes;
@@ -297,6 +306,7 @@ function updateImage() {
   updateGraphs();
   window.gvs.flasks[0].updateImage();
   window.gvs.still.updateImage();
+  updateTemperatures();
 };
 
 module.exports = { resizeFlasks, updateImage };

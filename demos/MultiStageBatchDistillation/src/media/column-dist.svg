@@ -539,12 +539,9 @@
             style="fill:none;stroke:#000000;stroke-width:0.264582px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
          <rect y="117.97089" x="108.66876" height="10.012316" width="26.347527" id="condenser-temperature-container"
             style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.15;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-         <text id="condenser-temperature" y="124.94394" x="112.41615"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         <text id="condenser-temperature" y="124.94394" x="122"
+            style="text-anchor:middle;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
             xml:space="preserve">
-            <tspan y="124.94394" x="112.41615"
-               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
-               id="condenser-temperature">250° C</tspan>
          </text>
          <rect transform="scale(-1,1)"
             style="fill:#787878;fill-opacity:1;stroke:#000000;stroke-width:0.15;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -557,9 +554,8 @@
             style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.150001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
             id="still-temperature-container" width="26.396082" height="11.304424" x="-48.991192" y="227.68372" />
          <text xml:space="preserve"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-            x="25.786049" y="235.43257" id="still-temperature">
-            <tspan y="235.43257" x="25.786049" id="still-temperature">150° C</tspan>
+            style="text-anchor:middle;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+            x="35.5" y="235.43257" id="still-temperature">
          </text>
       </g>
    </g>
