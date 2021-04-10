@@ -211,8 +211,16 @@ const sketch = (p) => {
             line.style.strokeOpacity = "1";
             window.gvs.eqShapes.stairLines.push( line );
         };
-        window.gvs.eqShapes.stillDot = window.gvs.eqPlot.createPoint({ coord: [0.5, 0.5], radius: 1.75, parent: eqLinesGroup, classList:["eq", "point", "still"], fill: "rgb(0, 0, 255)" });
-        window.gvs.eqShapes.distillateDot = window.gvs.eqPlot.createPoint({ coord: [0.5, 0.5], radius: 1.75, parent: eqLinesGroup, classList:["eq", "point", "distillate"], fill: "rgb(255, 0, 0)" });
+
+        const plotRect = document.getElementsByClassName("svg-axes")[0].getBoundingClientRect();
+        const plotW = plotRect.width;
+        const plotH = plotRect.height;
+        const aspectRatio = plotH / plotW;
+        const rx = ( 400 / plotW );
+        const ry = rx / aspectRatio;
+
+        window.gvs.eqShapes.stillDot = window.gvs.eqPlot.createPoint({ coord: [0.5, 0.5], radius: rx, parent: eqLinesGroup, classList:["eq", "point", "still"], fill: "rgb(0, 0, 255)" });
+        window.gvs.eqShapes.distillateDot = window.gvs.eqPlot.createPoint({ coord: [0.5, 0.5], radius: rx, parent: eqLinesGroup, classList:["eq", "point", "distillate"], fill: "rgb(255, 0, 0)" });
         
         const eqStairLabelDiv = document.createElement("div");
         eqStairLabelDiv.id = "eq-plot-stair-labels";
@@ -251,8 +259,9 @@ const sketch = (p) => {
             line.style.strokeOpacity = "1";
             window.gvs.txyShapes.stairLines.push( line );
         };
-        window.gvs.txyShapes.stillDot = window.gvs.txyPlot.createPoint({ coord: [0.5, 0.5], radius: 1.75, parent: txyLinesGroup, classList:["txy", "point", "still"], fill: "rgb(0, 0, 255)" });
-        window.gvs.txyShapes.distillateDot = window.gvs.txyPlot.createPoint({ coord: [0.5, 0.5], radius: 1.75, parent: txyLinesGroup, classList:["txy", "point", "distillate"], fill: "rgb(255, 0, 0)" });
+
+        window.gvs.txyShapes.stillDot = window.gvs.txyPlot.createPoint({ coord: [0.5, 0.5], radius: rx, parent: txyLinesGroup, classList:["txy", "point", "still"], fill: "rgb(0, 0, 255)" });
+        window.gvs.txyShapes.distillateDot = window.gvs.txyPlot.createPoint({ coord: [0.5, 0.5], radius: rx, parent: txyLinesGroup, classList:["txy", "point", "distillate"], fill: "rgb(255, 0, 0)" });
 
         const txyStairLabelDiv = document.createElement("div");
         txyStairLabelDiv.id = "txy-plot-stair-labels";
@@ -310,6 +319,18 @@ const sketch = (p) => {
         window.gvs.txyPlot.resize();
         window.gvs.eqPlot.resize();
         resizeFlasks();
+        const plotRect = document.getElementsByClassName("svg-axes")[0].getBoundingClientRect();
+        const plotW = plotRect.width;
+        const plotH = plotRect.height;
+        const aspectRatio = plotH / plotW;
+        const rx = ( 400 / plotW );
+        const ry = rx / aspectRatio;
+        const points = document.getElementsByClassName("point");
+        for ( let i = 0; i < points.length; i++ ) {
+            const point = points[i];
+            point.setAttribute("rx", `${rx}`);
+            point.setAttribute("ry", `${ry}`);
+        }
         try { updateImage() } catch(e) {}
     }
 
