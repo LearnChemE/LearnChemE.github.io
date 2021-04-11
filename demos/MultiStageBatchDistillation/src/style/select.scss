@@ -13,7 +13,7 @@
 select {
   // A reset of styles, including removing the default dropdown arrow
   appearance: none;
-  // Additional resets for further consistency
+  -webkit-appearance: none;
   background-color: transparent;
   border: none;
   padding: 4px 12px 4px 8px;
