@@ -96,7 +96,16 @@ window.gvs.updateFlaskObjects = function() {
     }
     const flaskDiv = document.getElementById(`flask-div-${i + 1}`);
     flaskDiv.style.display = "grid";
-    const label = `${thisFlask.name}<br>x<sub>B</sub> = ${Number(thisFlask.xB).toFixed(2)}`;
+    let xB;
+    if ( thisFlask.xB < 0.01 ) {
+      xB = thisFlask.xB.toPrecision(1);
+    } else if ( thisFlask.xB > 0.99 ) {
+      xB = thisFlask.xB > 0.999 ? thisFlask.xB.toFixed(4) : thisFlask.xB.toFixed(3);
+    } else {
+      xB = thisFlask.xB.toFixed(2);
+    }
+
+    const label = `${thisFlask.name}<br>x<sub>B</sub> = ${xB}`;
     flaskDiv.children[1].innerHTML = label;
     thisFlask.SVG = flaskDiv.children[0];
     thisFlask.div = flaskDiv;
@@ -115,7 +124,7 @@ window.gvs.addFlask = function() {
   if ( k <= 9 ) {
     const flask = {
       name: `container #${k}`,
-      xB : 0.00,
+      xB : -1,
       V : 0.00,
       maxVolume: Number(document.getElementById("evap-quantity-slider").getAttribute("max")),
       SVG: document.getElementById(`flask-div-1`).children[0],
@@ -123,7 +132,17 @@ window.gvs.addFlask = function() {
       updateImage: function() {
         const lvl = this.V / this.maxVolume;
         window.gvs.setFlaskLiquidLevel(this.SVG, lvl);
-        this.div.children[1].innerHTML = `${this.name}<br>x<sub>B</sub> = ${Number(this.xB).toFixed(2)}`;
+        let xB;
+        if ( this.xB === -1 ) {
+          xB = "0.00";
+        } else if ( this.xB < 0.01 ) {
+          xB = this.xB.toPrecision(1);
+        } else if ( this.xB > 0.99 ) {
+          xB = this.xB > 0.999 ? this.xB.toFixed(4) : this.xB.toFixed(3);
+        } else {
+          xB = this.xB.toFixed(2);
+        }
+        this.div.children[1].innerHTML = `${this.name}<br>x<sub>B</sub> = ${xB}`;
         if( this.name === "container #9" ) { this.div.children[1].innerHTML = "collection<br>area full." }
       },
     };
@@ -307,12 +326,48 @@ const stillComposition = document.getElementById("still-composition");
 const distillateComposition = document.getElementById("distillate-composition");
 
 const updateCompositions = function() {
-  const xS = window.gvs.p.constrain(window.gvs.still.xB, 0.001, 0.999);
-  const xD = window.gvs.p.constrain(window.gvs.xd, 0.001, 0.999);
-  const xStill = xS < 0.01 ? xS.toFixed(3) : xS.toFixed(2);
-  const xDistillate = xD < 0.01 || xD > 0.99 ? xD.toFixed(3) : xD.toFixed(2);
-  stillComposition.innerHTML = `<div>x<sub>still</sub>:&nbsp;${xStill}</div>`;
-  distillateComposition.innerHTML = `<div>x<sub>d</sub>&nbsp;:&nbsp;${xDistillate}</div>`;
+  let xStill, xDistillate;
+  let stillFontSize = "inherit";
+  let distillateFontSize = "inherit";
+
+  if ( window.gvs.still.xB < 0.01 ) {
+    xStill = window.gvs.still.xB.toPrecision(1);
+  } else if ( window.gvs.still.xB > 0.99 ) {
+    if ( window.gvs.still.xB > 0.999 ) {
+      xStill = window.gvs.still.xB.toFixed(4);
+    } else {
+      xStill = window.gvs.still.xB.toFixed(3);
+    }
+  } else {
+    xStill = window.gvs.still.xB.toFixed(2);
+  }
+  if ( xStill.length > 5 ) {
+    stillFontSize = "0.9em";
+  }
+  if ( xStill.length > 6 ) {
+    stillFontSize = "0.8em";
+  }
+
+  if ( window.gvs.xd < 0.01 ) {
+    xDistillate = window.gvs.xd.toPrecision(1);
+  } else if ( window.gvs.xd > 0.99 ) {
+    if ( window.gvs.xd > 0.999 ) {
+      xDistillate = window.gvs.xd.toFixed(4);
+    } else {
+      xDistillate = window.gvs.xd.toFixed(3);
+    }
+  } else {
+    xDistillate = window.gvs.xd.toFixed(2);
+  }
+  if ( xDistillate.length > 5 ) {
+    distillateFontSize = "0.9em";
+  }
+  if ( xDistillate.length > 6 ) {
+    distillateFontSize = "0.8em";
+  }
+
+  stillComposition.innerHTML = `<div style="font-size:${stillFontSize};">x<sub>still</sub>:&nbsp;${xStill}</div>`;
+  distillateComposition.innerHTML = `<div style="font-size:${distillateFontSize};">x<sub>d</sub>&nbsp;:&nbsp;${xDistillate}</div>`;
 }
 
 function updateImage() {

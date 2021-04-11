@@ -365,7 +365,7 @@ const sketch = (p) => {
 
 };
 
-const P5 = new p5(sketch, document.body);
+window.P5 = new p5(sketch, document.body);
 
 const collectButton = document.getElementById("collect-button");
 const resetButton = document.getElementById("reset-button");

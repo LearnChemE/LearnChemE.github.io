@@ -150,14 +150,14 @@ function calcAll() {
     flaskTotalB += window.gvs.dV * window.gvs.xd;
     flask.V += window.gvs.dV;
     flask.xB = flaskTotalB / flask.V;
-    flask.xB = window.gvs.p.constrain(flask.xB, 0.001, 0.999);
+    flask.xB = window.gvs.p.constrain(flask.xB, 0.00001, 0.99999);
   
     const still = window.gvs.still;
     let stillTotalB = still.V * still.xB;
     stillTotalB -= window.gvs.dV * window.gvs.xd;
     still.V -= window.gvs.dV;
     still.xB = stillTotalB / still.V;
-    still.xB = window.gvs.p.constrain(still.xB, 0.001, 0.999);
+    still.xB = window.gvs.p.constrain(still.xB, 0.00001, 0.99999);
 
     if ( flask.V >= window.gvs.evapQuantity ) { window.gvs.isCollecting = false }
     if ( still.V / still.maxVolume < 0.1 ) {
