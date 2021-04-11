@@ -126,6 +126,10 @@ svg * {
   }
 }
 
+.axes-labels {
+  pointer-events:none;
+}
+
 .axis-label {
   font-size: 16px;
 }
@@ -174,6 +178,10 @@ svg * {
   }
 }
 
+text {
+  pointer-events: none;
+}
+
 input[type="range"]:disabled {
   opacity: 0.1;
   pointer-events: none;
@@ -201,6 +209,13 @@ input[type="range"]:disabled {
   line-height: 1.2em;
   text-align: center;
   width: max-content;
+  padding-top: 2px;
+  z-index: 0;
+  transform: translateY(-2px);
+}
+
+.flask-svg {
+  z-index: 1;
 }
 
 .flask-liquid {
@@ -317,6 +332,9 @@ input[type="range"]:disabled {
 .modal-body {
   text-align: left;
   font-size: 0.9rem;
+  mjx-container {
+    transform: translateX(20px);
+  }
 
   .references {
     font-size: 0.8rem;

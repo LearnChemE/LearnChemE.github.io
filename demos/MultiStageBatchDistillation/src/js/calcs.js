@@ -11,13 +11,36 @@ window.gvs.eqTempCelsius = function(x) {
 };
 
 window.gvs.invEqTempKelvin = function(y) {
+
+  let xCandidate = 0;
+  let x = 0;
   let difference = 100;
-  let candidate = 0;
-  for ( let i = 0; i < 201; i++ ) {
-    const delta = Math.abs( window.gvs.eqTempKelvin(i / 200) - y );
-    if ( delta < difference ) { candidate = i / 200; difference = delta; }
-  }
-  return candidate;
+  let dx = 0.1;
+  let iterations = 0;
+  let precision = 1;
+  let k = 0;
+  
+  while ( precision < 5 ) {
+    k++;
+    if( iterations >= 20 || x >= 1 ) {
+      x = xCandidate - dx;
+      dx *= 0.1;
+      precision++;
+      iterations = 0;
+    };
+ 
+    const delta = Math.abs( window.gvs.eqTempKelvin(x) - y );
+    
+    if ( delta < difference ) {
+      xCandidate = x;
+      difference = delta;
+    };
+    
+    iterations++;
+    x += dx;
+  };
+
+  return xCandidate;
 };
 
 window.gvs.invEqTempCelsius = function(y) {

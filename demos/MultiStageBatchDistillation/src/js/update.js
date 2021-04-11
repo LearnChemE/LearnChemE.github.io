@@ -3,7 +3,7 @@ const rightSideContainer = document.getElementById("right-side-container");
 const app = document.getElementById("app");
 
 window.gvs.setFlaskLiquidLevel = function(elt, lvl) {
-  const flaskG = elt.firstChild;
+  const flaskG = elt.children[1];
   const flaskPoly = flaskG.children[0];
   const flaskBottomLiquid = flaskG.children[1];
   const flaskLiquidEllipse = flaskG.children[2];
@@ -60,7 +60,7 @@ function resizeFlasks() {
   const containerRect = svgContainer.getBoundingClientRect();
   const dispenserRect = document.getElementById("dispenser-rect").getBoundingClientRect();
   const p5Rect = rightSideContainer.getBoundingClientRect();
-  const relativeSize = 0.055;
+  const relativeSize = 0.065;
   for ( let i = 0; i < flasks.length; i++ ) {
     const flaskDiv = flasks[i];
     const svg = svgs[i];

@@ -52,6 +52,40 @@ function addStill() {
   };
 
   window.gvs.still = still;
-}
+};
 
-module.exports = { importSVG, addStill }
+const tooltips = [
+  {
+    id: "eq-curve-path",
+    message: "equilibrium line message",
+  },
+];
+
+function addTooltips() {
+  const SVGTooltip = (tooltip) => {
+    const elt = document.getElementById(tooltip.id);
+
+    elt.addEventListener("mouseover", () => {
+      elt.setAttribute("mouseisover", "yes");
+      elt.setAttribute("filter", "url(#drop-shadow)");
+      window.setTimeout(() => {
+        if( elt.getAttribute("mouseisover") === "yes" ) {
+          console.log("success");
+        }
+      }, 2000);
+    });
+    
+    elt.addEventListener("mouseleave", () => {
+      elt.setAttribute("mouseisover", "no");
+      elt.removeAttribute("filter");
+    });
+
+  };
+
+  for ( let i = 0; i < tooltips.length; i++ ) {
+    const tooltip = tooltips[i];
+    SVGTooltip( tooltip );
+  }
+};
+
+module.exports = { importSVG, addStill, addTooltips }

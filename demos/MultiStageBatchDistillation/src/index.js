@@ -1,6 +1,8 @@
 require("./style/style.scss");
 require("bootstrap");
 require("./style/slider.scss");
+window.$ = require("jquery");
+window.jQuery = window.$;
 window.p5 = new require("./js/p5.min.js");
 const { SVG_Graph } = require("./js/svg-graph-library.js");
 
@@ -29,7 +31,7 @@ window.gvs = {
 
 // JavaScript modules from /js/ folder
 const { calcAll } = require("./js/calcs.js"); // contains all calculation-related functions
-const { importSVG, addStill } = require("./js/importSVG.js"); // adds inline-SVG to the document
+const { importSVG, addStill, addTooltips } = require("./js/importSVG.js"); // adds inline-SVG to the document
 const { resizeFlasks, updateImage } = require("./js/update.js");
 
 const containerElement = document.getElementById("svg-container");
@@ -299,6 +301,7 @@ const sketch = (p) => {
         selectRightSideImage(Number(document.getElementById("right-side-graphic").value));
         window.gvs.setStagesInImage( Number( document.getElementById("stages-slider").value ) );
         updateImage();
+        // addTooltips();
         window.gvs.initializing = false;
     };
 
