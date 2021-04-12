@@ -8,12 +8,10 @@
          <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
       </filter> -->
       <filter id="drop-shadow" x="-1" y="-1" width="500%" height="500%">
-         <feOffset result="offOut" in="SourceAlpha" dx="0" dy="0" />
-         <feGaussianBlur stdDeviation="1" />
-         <feMerge>
-            <feMergeNode />
-            <feMergeNode in="SourceGraphic" />
-         </feMerge>
+         <feOffset result="offOut" in="SourceGraphic" dx="0" dy="0" />
+         <feColorMatrix result="matrixOut" in="offOut" type="matrix" values="0.2 0 0 0 0 0 0.2 0 0 0 0 0 0.2 0 0 0 0 0 1 0" />
+         <feGaussianBlur result="blurOut" in="matrixOut" stdDeviation="1" />
+         <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
       </filter>
    </defs>
    <rect y="137" x="92.5" height="27" width="1.8" id="pouring-liquid"
@@ -84,7 +82,7 @@
       <path id="still-white-overlay"
          d="m 63.5,127.281 9.527932,-5.028 9.402027,5.028 v 82.453 c 4.959323,0.67312 6.935502,1.02353 9.176328,3.31779 1.851131,1.48772 1.784178,4.39378 1.641713,5.89782 v 27.84352 c -0.26353,4.91962 -1.86939,7.08134 -6.047439,7.47887 H 73.028357 58.856154 c -4.473673,-0.39762 -5.988585,-3.13313 -6.047154,-7.47887 v -27.84352 c -0.142466,-1.50404 -0.01186,-4.10206 2.520713,-6.05619 1.997116,-1.28285 3.534858,-2.29527 8.170287,-3.20306 z"
          style="fill:#ffffff;fill-opacity:0;stroke:#000000;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <g transform="translate(0,-39.340961)" id="stage-group-1">
+      <g transform="translate(0,-39.340961)" id="stage-group-1" class="tooltip-element">
          <ellipse ry="0.73783952" rx="9.3869581" cy="190.4686" cx="73.017128" id="stage-bottom-ellipse"
             style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" />
          <rect
@@ -131,7 +129,7 @@
                d="m 80.634445,185.3 v 2.97911 c -0.502141,0.22545 -1.20924,0.2152 -1.76262,0 V 185.3" id="path983" />
          </g>
       </g>
-      <g id="stage-group-3" transform="translate(2.6855469e-6,8.2056285)">
+      <g id="stage-group-3" class="tooltip-element" transform="translate(2.6855469e-6,8.2056285)">
          <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" id="ellipse1452"
             cx="73.017128" cy="190.4686" rx="9.3869581" ry="0.73783952" />
          <rect rx="0.25" ry="0" y="188.39502" x="63.608215" height="2.1025457" width="18.76483" id="rect1454"
@@ -184,7 +182,7 @@
                style="fill:none;stroke:#000000;stroke-width:0.05;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
          </g>
       </g>
-      <g transform="matrix(-1,0,0,1,146.02225,-3.8677763)" id="stage-group-2">
+      <g transform="matrix(-1,0,0,1,146.02225,-3.8677763)" id="stage-group-2" class="tooltip-element">
          <ellipse ry="0.73783952" rx="9.3869581" cy="190.4686" cx="73.017128" id="ellipse1566"
             style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" />
          <rect
@@ -231,7 +229,7 @@
                d="m 80.634445,185.3 v 2.97911 c -0.502141,0.22545 -1.20924,0.2152 -1.76262,0 V 185.3" id="path1602" />
          </g>
       </g>
-      <g id="stage-group-5" transform="translate(2.6855469e-6,-15.678073)">
+      <g id="stage-group-5" class="tooltip-element" transform="translate(2.6855469e-6,-15.678073)">
          <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" id="ellipse1608"
             cx="73.017128" cy="190.4686" rx="9.3869581" ry="0.73783952" />
          <rect rx="0.25" ry="0" y="188.39502" x="63.608215" height="2.1025457" width="18.76483" id="rect1610"
@@ -284,7 +282,7 @@
                style="fill:none;stroke:#000000;stroke-width:0.05;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
          </g>
       </g>
-      <g transform="matrix(-1,0,0,1,146.02225,-27.388043)" id="stage-group-4">
+      <g transform="matrix(-1,0,0,1,146.02225,-27.388043)" class="tooltip-element" id="stage-group-4">
          <ellipse ry="0.73783952" rx="9.3869581" cy="190.4686" cx="73.017128" id="ellipse1650"
             style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" />
          <rect
@@ -331,7 +329,7 @@
                d="m 80.634445,185.3 v 2.97911 c -0.502141,0.22545 -1.20924,0.2152 -1.76262,0 V 185.3" id="path1686" />
          </g>
       </g>
-      <g id="stage-group-6" transform="matrix(-1,0,0,1,146.02225,-50.807984)">
+      <g id="stage-group-6" class="tooltip-element" transform="matrix(-1,0,0,1,146.02225,-50.807984)">
          <ellipse style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.364999" id="ellipse1692"
             cx="73.017128" cy="190.4686" rx="9.3869581" ry="0.73783952" />
          <rect rx="0.25" ry="0" y="188.39502" x="63.608215" height="2.1025457" width="18.76483" id="rect1694"

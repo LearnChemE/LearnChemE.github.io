@@ -275,8 +275,8 @@ window.gvs.setStagesInImage = function(stages) {
   let groups = [];
   for ( let i = 1; i <= 6; i++ ) {
     const group = document.getElementById(`stage-group-${i}`);
-    if ( i > stages ) { group.style.opacity = "0" }
-    else { group.style.opacity = "1"; groups.push(group) }
+    if ( i > stages ) { group.style.opacity = "0"; group.classList.remove("visible") }
+    else { group.style.opacity = "1"; group.classList.add("visible"); groups.push(group) }
   };
   
   const minYTranslation = -64;

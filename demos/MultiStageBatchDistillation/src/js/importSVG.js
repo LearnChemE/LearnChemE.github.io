@@ -56,28 +56,118 @@ function addStill() {
 
 const tooltips = [
   {
-    id: "eq-curve-path",
-    message: "equilibrium line message",
+    hover: "eq-curve-path-invisible",
+    highlight: "eq-curve-path",
+    message: function() { return "This equilibrium line shows the mole fractions of B for liquid and vapor in equilibrium." },
+    tooltipPosition: "top",
+  },
+  {
+    hover: "txy-curve-path-invisible",
+    highlight: "txy-curve-path",
+    message: function() { return "Bubble point line" },
+    tooltipPosition: "top",
+  },
+  {
+    hover: "dew-point-curve-path-invisible",
+    highlight: "dew-point-curve-path",
+    message: function() { return "Dew point line" },
+    tooltipPosition: "top",
+  },
+  {
+    hover: "x-y-line-path-invisible",
+    highlight: "x-y-line-path",
+    message: function() { return "y<sub>B</sub> = x<sub>B</sub> line" },
+    tooltipPosition: "top",
+  },
+  {
+    hover: "operating-line-svg-invisible",
+    highlight: "operating-line-svg",
+    message: function() { return "Operating line, defined by a mass balance around the condenser" },
+    tooltipPosition: "top",
   },
 ];
 
 function addTooltips() {
-  const SVGTooltip = (tooltip) => {
-    const elt = document.getElementById(tooltip.id);
+  const formatNumber = function(n) {
+    let out = n;
+    if( out > 0.999 ) { out = Math.min(0.9999, out); return out.toFixed(4) }
+    if( out > 0.99 ) { return out.toFixed(3) }
+    if( out < 0.01 ) { return out.toPrecision(1) }
+    return out.toFixed(2);
+  };
 
-    elt.addEventListener("mouseover", () => {
-      elt.setAttribute("mouseisover", "yes");
-      elt.setAttribute("filter", "url(#drop-shadow)");
+  for ( let i = 1; i <= 6; i++ ) {
+    const tooltip = {};
+    const id = `stage-group-${i}`;
+    tooltip.hover = id;
+    tooltip.highlight = id;
+    tooltip.message = function() {
+      const line = window.gvs.eqShapes.stairLines[-1 + 2 * i];
+      const xPix = Number(line.getAttribute("x2"));
+      const yPix = Number(line.getAttribute("y2"));
+      const coords = window.gvs.eqPlot.pixToCoord(xPix, yPix);
+      const xB = formatNumber(coords[0]);
+      const yB = formatNumber(coords[1]);
+      const temperature = Math.round( window.gvs.eqTempCelsius(xB) );
+      return `
+      <div style="text-align:center; line-height: 1.75em;">
+        stage ${i}<br>x<sub>B</sub>: ${xB}<br>y<sub>B</sub>: ${yB}<br>${temperature}° C
+      </div>
+      `;
+    };
+    tooltip.tooltipPosition = "left";
+    tooltips.push(tooltip);
+  };
+
+  const SVGTooltip = (tooltip) => {
+    const hoverElt = document.getElementById(tooltip.hover);
+    const highlightElt = document.getElementById(tooltip.highlight);
+    const tooltipElt = document.getElementById("tooltip-div");
+
+    hoverElt.addEventListener("mouseover", (e) => {
+      hoverElt.setAttribute("mouseisover", "yes");
+      highlightElt.setAttribute("filter", "url(#drop-shadow)");
+      if( !window.gvs.tooltipVisible ) {
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+        tooltipElt.style.top = `${mouseY}px`;
+        tooltipElt.style.left = `${mouseX}px`;
+      };
       window.setTimeout(() => {
-        if( elt.getAttribute("mouseisover") === "yes" ) {
-          console.log("success");
+        if( hoverElt.getAttribute("mouseisover") === "yes" && !window.gvs.tooltipVisible ) {
+          window.gvs.tooltipVisible = true;
+          tooltipElt.innerHTML = tooltip.message();
+          tooltipElt.style.opacity = "1";
+          switch(tooltip.tooltipPosition) {
+            case "top":
+              tooltipElt.style.transform = "translateX(-50%) translateY( calc( -100% - 10px ))";
+            break;
+
+            case "left":
+              tooltipElt.style.transform = "translateX( calc( -100% - 20px ) ) translateY( -50% )";
+            break;
+
+            case "right":
+              tooltipElt.style.transform = "translateX( 20px ) translateY( -50% )";
+            break;
+
+            case "bottom":
+              tooltipElt.style.transform = "translateX( -50% ) translateY( 20px )";
+            break;
+
+            default:
+              tooltipElt.style.transform = "";
+            break;
+          }
         }
-      }, 2000);
+      }, 1000);
     });
     
-    elt.addEventListener("mouseleave", () => {
-      elt.setAttribute("mouseisover", "no");
-      elt.removeAttribute("filter");
+    hoverElt.addEventListener("mouseleave", () => {
+      hoverElt.setAttribute("mouseisover", "no");
+      highlightElt.removeAttribute("filter");
+      tooltipElt.style.opacity = "0";
+      window.gvs.tooltipVisible = false;
     });
 
   };

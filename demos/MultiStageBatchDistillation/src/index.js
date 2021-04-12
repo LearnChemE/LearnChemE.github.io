@@ -26,6 +26,7 @@ window.gvs = {
     xd: undefined,
     selectedPane: 1,
     initializing: true,
+    tooltipVisible: false,
 };
 
 
@@ -124,12 +125,22 @@ function selectRightSideImage(n) {
     const flasksHere = document.getElementById("flasks-here");
     const eqPlotStairLabels = document.getElementById("eq-plot-stair-labels");
     const txyPlotStairLabels = document.getElementById("txy-plot-stair-labels");
+    const flaskTooltips = flasks.getElementsByClassName("tooltip-element");
+    const eqTooltips = eqPlot.getElementsByClassName("tooltip-element");
+    const txyTooltips = txyPlot.getElementsByClassName("tooltip-element");
+
     switch(n) {
         case 1:
+            flasks.style.display = "block";
             flasks.style.opacity = "1";
+            for( let i = 0; i < flaskTooltips.length; i++ ) { flaskTooltips[i].classList.add("visible") }
+            for( let i = 0; i < eqTooltips.length; i++ ) { eqTooltips[i].classList.remove("visible") }
+            for( let i = 0; i < txyTooltips.length; i++ ) { txyTooltips[i].classList.remove("visible") }
             if ( window.gvs.flasks.length === 1 ) { flasksHere.style.opacity = "1" }
             eqPlot.style.opacity = "0";
             txyPlot.style.opacity = "0";
+            eqPlot.style.pointerEvents = "none";
+            txyPlot.style.pointerEvents = "none";
             eqLabels.style.opacity = "0";
             txyLabels.style.opacity = "0";
             eqPlotStairLabels.style.opacity = "0";
@@ -137,6 +148,12 @@ function selectRightSideImage(n) {
         break;
 
         case 2:
+            flasks.style.display = "none";
+            for( let i = 0; i < flaskTooltips.length; i++ ) { flaskTooltips[i].classList.remove("visible") }
+            for( let i = 0; i < eqTooltips.length; i++ ) { eqTooltips[i].classList.add("visible") }
+            for( let i = 0; i < txyTooltips.length; i++ ) { txyTooltips[i].classList.remove("visible") }
+            eqPlot.style.pointerEvents = "all";
+            txyPlot.style.pointerEvents = "none";
             flasks.style.opacity = "0";
             eqPlot.style.opacity = "1";
             txyPlot.style.opacity = "0";
@@ -148,6 +165,12 @@ function selectRightSideImage(n) {
         break;
 
         case 3:
+            flasks.style.display = "none";
+            for( let i = 0; i < flaskTooltips.length; i++ ) { flaskTooltips[i].classList.remove("visible") }
+            for( let i = 0; i < eqTooltips.length; i++ ) { eqTooltips[i].classList.remove("visible") }
+            for( let i = 0; i < txyTooltips.length; i++ ) { txyTooltips[i].classList.add("visible") }
+            eqPlot.style.pointerEvents = "none";
+            txyPlot.style.pointerEvents = "all";
             flasks.style.opacity = "0";
             eqPlot.style.opacity = "0";
             txyPlot.style.opacity = "1";
@@ -165,6 +188,7 @@ const sketch = (p) => {
 
     p.setup = function () {
         document.getElementById("loading").style.display = "none";
+        window.gvs.p = p;
         p.noCanvas();
         p.noLoop();
         importSVG();
@@ -175,6 +199,8 @@ const sketch = (p) => {
         flasksHere.innerHTML = `Collected distillate will appear here after you press "collect".`;
         flasksHere.id = "flasks-here";
         rightSideContainer.appendChild(flasksHere);
+
+        window.gvs.findXd();
 
         const eqLineOptions = {
             stroke: "rgba(0, 0, 205, 1)",
@@ -191,30 +217,46 @@ const sketch = (p) => {
         };
 
         window.gvs.txyPlot = new SVG_Graph(txyPlotOptions);
-        window.gvs.txyPlot.addCurve(window.gvs.eqTempCelsius, txyLineOptions);
-        const dewPointLine = window.gvs.txyPlot.addCurve(window.gvs.dewPointCelsius, { stroke: "rgb(100, 100, 100)", strokeWidth: 1 });
+        const txyLineInvisibleOptions = { ...txyLineOptions, stroke: "rgba(255, 255, 255)", strokeWidth: 12, id: "txy-curve-path-invisible", classList: ["curve", "tooltip-element"] };
+        window.gvs.txyPlot.addCurve(window.gvs.eqTempCelsius, txyLineInvisibleOptions);
+        window.gvs.txyPlot.addCurve(window.gvs.dewPointCelsius, { stroke: "rgba(255, 255, 255)", strokeWidth: 12, id: "dew-point-curve-path-invisible", classList: ["curve", "tooltip-element"] });
+
+        const txyLine = window.gvs.txyPlot.addCurve(window.gvs.eqTempCelsius, txyLineOptions);
+        txyLine.elt.style.pointerEvents = "none";
+        const dewPointLine = window.gvs.txyPlot.addCurve(window.gvs.dewPointCelsius, { stroke: "rgb(100, 100, 100)", strokeWidth: 1, id: "dew-point-curve-path" });
         dewPointLine.elt.style.strokeDasharray = "6px 3px";
+        dewPointLine.elt.style.pointerEvents = "none";
 
         window.gvs.eqPlot = new SVG_Graph(eqPlotOptions);
-        window.gvs.eqPlot.addCurve(window.gvs.eq, eqLineOptions);
-        const xyLine = window.gvs.eqPlot.addCurve(function(x) { return x }, { stroke: "rgb(100, 100, 100)", strokeWidth: 1 });
-        xyLine.elt.style.strokeDasharray = "6px 3px";
 
-        window.gvs.p = p;
         p.windowResized();
-        window.gvs.findXd();
-
+        
         const eqLinesGroup = window.gvs.eqPlot.createGroup({
             classList: ["eq-plot-lines"],
             parent: window.gvs.eqPlot.SVG,
         });
 
         const OLcoords = [[0, window.gvs.OL(0)], [window.gvs.xd, window.gvs.OL(window.gvs.xd)]];
-        window.gvs.eqShapes.operatingLine = window.gvs.eqPlot.createLine({ parent: eqLinesGroup, coord1: OLcoords[0], coord2: OLcoords[1], usePlotCoordinates: true, stroke: "rgb(150, 150, 0)", strokeWidth: 1 });
+
+        window.gvs.eqShapes.operatingLineInvisible = window.gvs.eqPlot.createLine({ parent: window.gvs.eqPlot.SVG.getElementsByClassName("curves")[0] , coord1: OLcoords[0], coord2: OLcoords[1], usePlotCoordinates: true, stroke: "rgba(255, 255, 255)", strokeWidth: 12, id: "operating-line-svg-invisible", classList: ["tooltip-element"] });
+        const invisibleEqLineOptions = { ...eqLineOptions, stroke: "rgba(255, 255, 255)", strokeWidth: 12, id: "eq-curve-path-invisible", classList: ["curve", "tooltip-element"] };
+        window.gvs.eqPlot.addCurve(window.gvs.eq, invisibleEqLineOptions);
+        window.gvs.eqPlot.addCurve(function(x) { return x }, { stroke: "rgba(255, 255, 255)", strokeWidth: 12, id: "x-y-line-path-invisible", classList: ["curve", "tooltip-element"] });
+
+        const eqLine = window.gvs.eqPlot.addCurve(window.gvs.eq, eqLineOptions);
+        eqLine.elt.style.pointerEvents = "none";
+        const xyLine = window.gvs.eqPlot.addCurve(function(x) { return x }, { stroke: "rgb(100, 100, 100)", strokeWidth: 1, id: "x-y-line-path" });
+        xyLine.elt.style.strokeDasharray = "6px 3px";
+        xyLine.elt.style.pointerEvents = "none";
+
+        window.gvs.eqShapes.operatingLine = window.gvs.eqPlot.createLine({ parent: eqLinesGroup, coord1: OLcoords[0], coord2: OLcoords[1], usePlotCoordinates: true, stroke: "rgb(150, 150, 0)", strokeWidth: 1, id: "operating-line-svg" });
+        window.gvs.eqShapes.operatingLine.style.pointerEvents = "none";
+
         window.gvs.eqShapes.stairLines = [];
         for ( let i = 0; i < 13; i++ ) {
             const line = window.gvs.eqPlot.createLine({ parent: eqLinesGroup, classList:["eq", "stair-line"], stroke: "rgb(0, 0, 0)", strokeWidth: 1 });
             line.style.strokeOpacity = "1";
+            line.style.pointerEvents = "none";
             window.gvs.eqShapes.stairLines.push( line );
         };
 
@@ -226,8 +268,10 @@ const sketch = (p) => {
         const ry = rx / aspectRatio;
 
         window.gvs.eqShapes.stillDot = window.gvs.eqPlot.createPoint({ coord: [0.5, 0.5], radius: rx, parent: eqLinesGroup, classList:["eq", "point", "still"], fill: "rgb(0, 0, 255)" });
+        window.gvs.eqShapes.stillDot.style.pointerEvents = "none";
         window.gvs.eqShapes.distillateDot = window.gvs.eqPlot.createPoint({ coord: [0.5, 0.5], radius: rx, parent: eqLinesGroup, classList:["eq", "point", "distillate"], fill: "rgb(255, 0, 0)" });
-        
+        window.gvs.eqShapes.distillateDot.style.pointerEvents = "none";
+
         const eqStairLabelDiv = document.createElement("div");
         eqStairLabelDiv.id = "eq-plot-stair-labels";
         eqStairLabelDiv.style.position = "absolute";
@@ -259,15 +303,19 @@ const sketch = (p) => {
             classList: ["txy-plot-lines"],
             parent: window.gvs.txyPlot.SVG,
         });
+
         window.gvs.txyShapes.stairLines = [];
         for ( let i = 0; i < 13; i++ ) {
             const line = window.gvs.txyPlot.createLine({ parent: txyLinesGroup, classList:["txy", "stair-line"], stroke: "rgb(0, 0, 0)", strokeWidth: 1 });
             line.style.strokeOpacity = "1";
+            line.style.pointerEvents = "none";
             window.gvs.txyShapes.stairLines.push( line );
         };
 
         window.gvs.txyShapes.stillDot = window.gvs.txyPlot.createPoint({ coord: [0.5, 0.5], radius: rx, parent: txyLinesGroup, classList:["txy", "point", "still"], fill: "rgb(0, 0, 255)" });
         window.gvs.txyShapes.distillateDot = window.gvs.txyPlot.createPoint({ coord: [0.5, 0.5], radius: rx, parent: txyLinesGroup, classList:["txy", "point", "distillate"], fill: "rgb(255, 0, 0)" });
+        window.gvs.txyShapes.stillDot.style.pointerEvents = "none";
+        window.gvs.txyShapes.distillateDot.style.pointerEvents = "none";
 
         const txyStairLabelDiv = document.createElement("div");
         txyStairLabelDiv.id = "txy-plot-stair-labels";
@@ -301,7 +349,7 @@ const sketch = (p) => {
         selectRightSideImage(Number(document.getElementById("right-side-graphic").value));
         window.gvs.setStagesInImage( Number( document.getElementById("stages-slider").value ) );
         updateImage();
-        // addTooltips();
+        addTooltips();
         window.gvs.initializing = false;
     };
 

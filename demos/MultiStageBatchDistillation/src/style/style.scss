@@ -143,6 +143,23 @@ svg * {
   font-size: 15px;
 }
 
+.tooltip-element.visible {
+  pointer-events: painted;
+}
+
+.tooltip-element {
+  pointer-events: none;
+}
+
+#tooltip-div {
+  pointer-events: none;
+  font-size: 12px;
+  max-width: 40ch;
+  background-color:cornsilk;
+  padding: 4px;
+  border: 1px solid black;
+}
+
 @media screen and (max-width: 1080px) {
   .axis-label {
     font-size: 14px;
@@ -211,6 +228,7 @@ input[type="range"]:disabled {
   text-align: center;
   width: max-content;
   padding-top: 2px;
+  pointer-events: none;
   z-index: 0;
   transform: translateY(-2px);
 }

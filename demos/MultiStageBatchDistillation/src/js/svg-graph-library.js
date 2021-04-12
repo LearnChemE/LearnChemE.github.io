@@ -276,6 +276,12 @@ function SVG_Graph(options) {
     return [xPix, yPix]
   };
 
+  this.pixToCoord = function(x, y) {
+    const xCoord = this.options.axes.x.range[0] + ( x / 100 ) * ( this.options.axes.x.range[1] - this.options.axes.x.range[0] );
+    const yCoord = this.options.axes.y.range[0] + ( ( 100 - y ) / 100 ) * ( this.options.axes.y.range[1] - this.options.axes.y.range[0] );
+    return [xCoord, yCoord]
+  }
+
   this.createLine = function(options) {
     const o = {
       coord1: [0, 0],
