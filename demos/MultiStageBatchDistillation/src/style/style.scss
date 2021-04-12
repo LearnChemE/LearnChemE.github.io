@@ -38,10 +38,9 @@ svg * {
 
   .input-area {
     display: grid;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
     margin-left: 0px;
-    gap: 35px;
     grid-template-columns: max-content;
     align-items: center;
     align-content: center;
@@ -52,6 +51,7 @@ svg * {
       justify-items: center;
       gap: 10px;
       margin-left: 0px;
+      margin-bottom: 10px;
   
       .btn-primary, .btn-success {
         min-width: 12ch;
@@ -69,13 +69,19 @@ svg * {
       }
     }
 
+    .input-area-label {
+      font-size: 0.75rem;
+      margin-top: 10px;
+      margin-left: 10px;
+    }
+
     .input-row {
       display: grid;
       grid-template-columns: max-content 6rem 4ch max-content;
       gap: 1ch;
       align-items: end;
       font-size: 0.75rem;
-      margin-top: 10px;
+      margin-top: 5px;
       background-color: rgb(250, 250, 250);
       padding: 7px;
       box-shadow: 0px 0px 2px black;
@@ -95,24 +101,40 @@ svg * {
   
     }
 
-    .other-options {
-      display: grid;
-      grid-template-columns: max-content max-content;
-      justify-content: start;
-      margin-top: 10px;
-      margin-left: 0px;
-      gap: 15px;
-    
-      button {
-        justify-self: start;
-        width: 10ch;
-        white-space: nowrap;
-        padding: 0.3rem;
-        margin-left: 10px;
-      }
-    }
   }
 
+}
+
+#collection-heads-up {
+  margin-left: 15px;
+  margin-top: 25px;
+  font-size: 0.75rem;
+  max-width: 40ch;
+  padding: 5px;
+  padding-left: 10px;
+  border: 1px solid black;
+  border-radius: 3px;
+  background-color:rgb(231, 239, 255);
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-content: space-evenly;
+  justify-self: center;
+  width: max-content;
+  margin-top: 5px;
+  margin-left: 0px;
+  margin-bottom: 5px;
+  grid-column: 1 / 5;
+  gap: 50px;
+
+  button {
+    justify-self: center;
+    width: 9ch;
+    white-space: nowrap;
+    padding: 0.2rem;
+  }
 }
 
 #right-side-graphics-selector {
@@ -274,7 +296,7 @@ input[type="range"]:disabled {
   .flask-label {
     font-size: 0.75rem;
   }
-  .input-row, #right-side-graphics-selector>div {
+  .input-row, #right-side-graphics-selector>div, #collection-heads-up {
     font-size: 0.9rem !important;
   }
   select {
@@ -290,6 +312,10 @@ input[type="range"]:disabled {
   #still-composition, #distillate-composition {
     font-size: 10.5px;
   }
+  .input-area-label {
+    font-size: 0.9rem !important;
+    margin-top: 10px !important;
+  }
 }
 
 @media screen and (min-width: 940px) {
@@ -302,7 +328,7 @@ input[type="range"]:disabled {
   .flask-label {
     font-size: 0.85rem;
   }
-  .input-row, #right-side-graphics-selector>div {
+  .input-row, #right-side-graphics-selector>div, #collection-heads-up {
     font-size: 0.95rem !important;
   }
   select {
@@ -315,11 +341,19 @@ input[type="range"]:disabled {
   #still-composition, #distillate-composition {
     font-size: 12.5px;
   }
+  .input-area-label {
+    font-size: 0.95rem !important;
+    margin-top: 25px !important;
+  }
 }
 
 @media screen and (min-width: 1140px) {
   #still-composition, #distillate-composition {
     font-size: 13.5px;
+  }
+  .input-area-label, #collection-heads-up {
+    margin-top: 35px !important;
+    font-size: 1.1rem !important;
   }
 }
 
@@ -330,7 +364,7 @@ input[type="range"]:disabled {
 }
 
 @media screen and (min-width: 1500px) {
-  .input-row, #right-side-graphics-selector>div {
+  .input-row, #right-side-graphics-selector>div, #collection-heads-up {
     font-size: 1.1rem !important;
   }
   select {

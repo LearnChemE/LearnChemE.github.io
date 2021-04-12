@@ -24,9 +24,10 @@ window.gvs = {
     isEmpty: false,
     dV: undefined,
     xd: undefined,
-    selectedPane: 1,
+    selectedPane: null,
     initializing: true,
     tooltipVisible: false,
+    updateShown: false,
 };
 
 
@@ -145,6 +146,7 @@ function selectRightSideImage(n) {
             txyLabels.style.opacity = "0";
             eqPlotStairLabels.style.opacity = "0";
             txyPlotStairLabels.style.opacity = "0";
+            if( window.gvs.updateShown ) { document.getElementById("collection-heads-up").style.display = "none"; }
         break;
 
         case 2:
@@ -363,6 +365,7 @@ const sketch = (p) => {
             updateImage();
         } else if ( p.frameCount !== 1 ) {
             endCollecting();
+            displayHeadsUp();
             updateImage();
         }
     };
@@ -562,4 +565,13 @@ function adjustDispensedLiquidWidth(R) {
     const x = 92.5 + ( 1 - size ) * 0.8;
     pouringLiquid.setAttribute("width", `${width.toFixed(4)}`);
     pouringLiquid.setAttribute("x", `${x.toFixed(4)}`);
+};
+
+function displayHeadsUp() {
+    if ( window.gvs.selectedPane !== 1 && !window.gvs.updateShown ) {
+        document.getElementById("collection-heads-up").style.display = "block";
+        window.gvs.updateShown = true;
+    } else if ( window.gvs.selectedPane === 1 ) {
+        window.gvs.updateShown = true;
+    }
 }
