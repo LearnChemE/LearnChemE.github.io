@@ -327,6 +327,9 @@ const sketch = (p) => {
         txyStairLabelDiv.style.pointerEvents = "none";
         txyStairLabelDiv.style.opacity = "0";
         document.body.appendChild(txyStairLabelDiv);
+
+        window.gvs.txyShapes.liquidText = window.gvs.txyPlot.createText({ coord: [0.2, 82], content: "liquid", alignment: ["center", "center"], color: "rgb(0, 0, 205)" });
+        window.gvs.txyShapes.vaporText = window.gvs.txyPlot.createText({ coord: [0.7, 102], content: "vapor", alignment: ["center", "center"], color: "rgb(100, 100, 100)" });
         
         window.gvs.txyShapes.stairLabels = [];
         for ( let i = 0; i < 8; i++ ) {

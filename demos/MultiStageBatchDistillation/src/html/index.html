@@ -45,15 +45,15 @@
         <div class="data-value" id="stages-value">1</div>
         <div class="data-metric"></div>
 
-        <div class="data-name">amount to collect</div>
-        <input type="range" id="evap-quantity-slider" min="0.25" max="2" step="0.01" value="1.00">
-        <div class="data-value" id="evap-quantity-value">1.00</div>
-        <div class="data-metric">kmol</div>
-
         <div class="data-name">reflux ratio (L/D)</div>
         <input type="range" id="reflux-slider" min="3" max="10" step="0.1" value="5.0">
         <div class="data-value" id="reflux-value">5.0</div>
         <div class="data-metric"></div>
+
+        <div class="data-name">amount to collect</div>
+        <input type="range" id="evap-quantity-slider" min="0.25" max="2" step="0.01" value="1.00">
+        <div class="data-value" id="evap-quantity-value">1.00</div>
+        <div class="data-metric">kmol</div>
       
       </div>
 
@@ -99,11 +99,15 @@
         </div>
         <div class="modal-body">
           <p>
-            Multistage batch distillation is simulated by an animation. 10 kmol of a binary mixture (components A and B, with B being the more volatile component) is placed in a batch still. Use the first slider to set the initial mole fraction of component B in the still. Next, adjust the number of trays in the column with the "equilibrium stages" slider, and adjust the reflux ratio of the column with the "reflux ratio (L/D)" slider. Specify the amount of liquid to be collected using the "amount to collect" slider.
+            Multi-stage batch distillation is simulated using animation. 10 kmol of a binary mixture (components A and B, with B being the more volatile component) is placed in a batch still. Use the "initial mole fraction B" slider to set the initial composition of the still. Next, adjust the number of trays in the column with the "equilibrium stages" slider, and adjust the reflux ratio of the column with the "reflux ratio (L/D)" slider. Specify the amount of liquid to be collected using the "amount to collect" slider.
           </p>
           <p>
-            When you click "collect", the liquid evaporates into a collection container. After the specified amount of distillate is collected, the collection container is set aside and an empty container is substituted. This process can be repeated until 1 mole remains in the still or eight containers have been filled. The graphic on the right side may be changed by choosing an option using the drop-down menu above the plot. Select "reset" to start over. Tooltips enable hovering the mouse over components and streams in the graphic.
+            When you click "collect", the outlet valve is opened and liquid evaporates into a collection container. The container is then set aside and an empty container is substituted. This process can be repeated until 1 kmol remains in the still or eight containers have been filled. You may view previously collected distillate by selecting "collected distillate" on the drop-down menu above the plot. Select "reset" to start over. You may hover the mouse over the following to see a tooltip:
           </p>
+          <ul>
+            <li>various lines on each plot</li>
+            <li>the stage trays on the column</li>
+          </ul>
         </div>
       </div>
     </div>

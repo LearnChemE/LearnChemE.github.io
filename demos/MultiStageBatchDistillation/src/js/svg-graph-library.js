@@ -213,6 +213,7 @@ function SVG_Graph(options) {
 
   this.curves = [];
   this.shapes = [];
+  this.text = [];
 
   /***********************************************/
   /****** ADD STYLE ELEMENT TO DOCUMENT HEAD *****/
@@ -408,6 +409,50 @@ function SVG_Graph(options) {
     o.parent.appendChild(point);
     return point;
   };
+
+  this.createText = function(options) {
+    const o = {
+      coord: [],
+      content: "",
+      classList: ["svg-text"],
+      usePlotCoordinates: true,
+      id: null,
+      parent: this.SVG,
+      color: "rgb(0, 0, 0)",
+      fontSize: 5,
+      alignment: ["left", "top"],
+      ...options
+    };
+    const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+    let coord;
+    if ( o.usePlotCoordinates ) {
+      coord = this.coordToPix(...o.coord);
+    } else {
+      coord = o.coord;
+    };
+
+    if( o.classList.length >= 1 ) { text.classList.add( ...o.classList ) }
+    if( o.id !== null ) { text.id = `${o.id}` }
+    text.style.stroke = "none";
+    text.style.fill = o.color;
+    text.style.fontSize = `${o.fontSize}px`;
+    text.setAttribute("x", `${coord[0]}`);
+    text.setAttribute("y", `${coord[1]}`);
+    text.textContent = o.content;
+    if ( o.alignment[0] === "center" ) { text.style.textAnchor = "middle" }
+    else if ( o.alignment[0] === "right" ) { text.style.textAnchor = "end" }
+    if ( o.alignment[1] === "center" ) { text.style.transform = `translateY(${o.fontSize / 3}px)` }
+    else if ( o.alignment[1] === "top" ) { text.style.transform = `translateY(${5 * o.fontSize / 6}px)` }
+    o.parent.appendChild(text);
+
+    const rect = this.SVG.getBoundingClientRect();
+    const aspectRatio = rect.height / rect.width;
+    text.setAttribute("lengthAdjust", "spacingAndGlyphs");
+    let length = text.getComputedTextLength();
+    length *= aspectRatio;
+    text.setAttribute("textLength", `${length}`);
+    return text;
+  }
 
   /***********************/
   /****** DRAW AXES ******/
@@ -710,6 +755,13 @@ function SVG_Graph(options) {
     const height = this.options.parent === document.body ? "500px" : `${this.options.parent.getBoundingClientRect().height}px`;
     this.container.style.width = `${width}`;
     this.container.style.height = `${height}`;
+    this.text.forEach(text => {
+      const rect = this.SVG.getBoundingClientRect();
+      const aspectRatio = rect.height / rect.width;
+      let length = text.getComputedTextLength();
+      length *= aspectRatio;
+      text.setAttribute("textLength", `${length}`);
+    });
     this.redrawAxes();
   };
 
