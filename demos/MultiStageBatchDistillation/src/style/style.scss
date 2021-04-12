@@ -78,6 +78,7 @@ svg * {
     .input-row {
       display: grid;
       grid-template-columns: max-content 6rem 4ch max-content;
+      width: min-content;
       gap: 1ch;
       align-items: end;
       font-size: 0.75rem;
@@ -106,8 +107,8 @@ svg * {
 }
 
 #collection-heads-up {
-  margin-left: 15px;
-  margin-top: 25px;
+  margin-left: 0px;
+  margin-top: 10px;
   font-size: 0.75rem;
   max-width: 40ch;
   padding: 5px;
@@ -316,6 +317,9 @@ input[type="range"]:disabled {
     font-size: 0.9rem !important;
     margin-top: 10px !important;
   }
+  #collection-heads-up {
+    margin-top: 15px !important;
+  }
 }
 
 @media screen and (min-width: 940px) {
@@ -344,6 +348,9 @@ input[type="range"]:disabled {
   .input-area-label {
     font-size: 0.95rem !important;
     margin-top: 25px !important;
+  }
+  #collection-heads-up {
+    margin-top: 20px !important;
   }
 }
 

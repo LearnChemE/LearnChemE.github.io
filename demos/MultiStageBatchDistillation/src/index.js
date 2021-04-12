@@ -415,6 +415,11 @@ const sketch = (p) => {
         distillateComposition.style.height = `${distillateCompositionRect.height}px`;
         distillateComposition.style.top = `${distillateCompositionRect.top}px`;
         distillateComposition.style.left = `${distillateCompositionRect.left}px`;
+        const inputRect = document.getElementsByClassName("input-row")[1].getBoundingClientRect();
+        const input2 = document.getElementsByClassName("input-row")[0];
+        const headsUp = document.getElementById("collection-heads-up");
+        headsUp.style.maxWidth = `${inputRect.width}px`;
+        input2.style.width = `${inputRect.width}px`;
         try { updateImage() } catch(e) {}
     }
 
