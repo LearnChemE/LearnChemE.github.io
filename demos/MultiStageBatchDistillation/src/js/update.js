@@ -309,12 +309,14 @@ function updateTemperatures() {
 
 const updateOperatingLine = function() {
   const eqShapes = window.gvs.eqShapes;
-  const txyShapes = window.gvs.txyShapes;
   const eqPlot = window.gvs.eqPlot;
-  const txyPlot = window.gvs.txyPlot;
+
   eqShapes.operatingLine.setAttribute("y1", `${eqPlot.coordToPix(0, window.gvs.OL(0))[1]}`);
   eqShapes.operatingLine.setAttribute("x2", `${eqPlot.coordToPix(window.gvs.xd, 0)[0]}`);
   eqShapes.operatingLine.setAttribute("y2", `${eqPlot.coordToPix(0, window.gvs.OL( window.gvs.xd ))[1]}`);
+  eqShapes.operatingLineInvisible.setAttribute("y1", `${eqPlot.coordToPix(0, window.gvs.OL(0))[1]}`);
+  eqShapes.operatingLineInvisible.setAttribute("x2", `${eqPlot.coordToPix(window.gvs.xd, 0)[0]}`);
+  eqShapes.operatingLineInvisible.setAttribute("y2", `${eqPlot.coordToPix(0, window.gvs.OL( window.gvs.xd ))[1]}`);
 }
 
 const updateGraphs = function() {
