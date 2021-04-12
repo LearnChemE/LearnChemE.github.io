@@ -4,9 +4,9 @@ const app = document.getElementById("app");
 
 window.gvs.setFlaskLiquidLevel = function(elt, lvl) {
   const flaskG = elt.children[1];
-  const flaskPoly = flaskG.children[0];
-  const flaskBottomLiquid = flaskG.children[1];
-  const flaskLiquidEllipse = flaskG.children[2];
+  const flaskPoly = flaskG.children[1];
+  const flaskBottomLiquid = flaskG.children[2];
+  const flaskLiquidEllipse = flaskG.children[3];
   
   const polyVerticalDistance = 80 - 35;
   const polyHorizontalDistance = 40 - 25;

@@ -230,7 +230,6 @@ input[type="range"]:disabled {
   padding-top: 2px;
   pointer-events: none;
   z-index: 0;
-  transform: translateY(-2px);
 }
 
 .flask-svg {
@@ -254,6 +253,11 @@ input[type="range"]:disabled {
 .flask-liquid-ellipse {
   stroke: black;
   stroke-width: 0.25px;
+}
+
+.flask-mask {
+  fill: white;
+  stroke: none;
 }
 
 #still-composition, #distillate-composition {

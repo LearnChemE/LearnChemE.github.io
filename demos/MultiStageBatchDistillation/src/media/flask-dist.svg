@@ -3,6 +3,7 @@
    viewBox="20 0 60 91" version="1.1" class="flask-svg">
    <defs></defs>
    <g class="flask-g">
+      <rect class="flask-mask" x="20" y="85" width="60" height="10" />
       <path class="flask-liquid flask-liquid-poly" d="M 40,35 L 25,81 75,81 60,35 Z" />
       <path class="flask-liquid flask-bottom-liquid" d="m 25,80 a 25,5 0 0 0 50,0" />
       <ellipse class="flask-liquid flask-liquid-ellipse" cx="50" cy="35" rx="10" ry="1" />

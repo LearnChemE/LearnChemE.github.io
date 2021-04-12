@@ -348,6 +348,7 @@ const sketch = (p) => {
         setdV();
         selectRightSideImage(Number(document.getElementById("right-side-graphic").value));
         window.gvs.setStagesInImage( Number( document.getElementById("stages-slider").value ) );
+        adjustDispensedLiquidWidth( Number( document.getElementById("reflux-slider").value ) );
         updateImage();
         addTooltips();
         window.gvs.initializing = false;
@@ -484,6 +485,7 @@ refluxSlider.addEventListener("input", function() {
     const R = Number( refluxSlider.value );
     window.gvs.R = R;
     refluxValue.innerHTML = R.toFixed(1);
+    adjustDispensedLiquidWidth(R);
     setdV();
     calcAll();
     updateImage()
@@ -549,3 +551,12 @@ function endCollecting() {
     window.gvs.addFlask();
     P5.noLoop();
 };
+
+function adjustDispensedLiquidWidth(R) {
+    const pouringLiquid = document.getElementById("pouring-liquid");
+    const size = (10 - R) / 7;
+    const width = 0.4 + 1.6 * size;
+    const x = 92.5 + ( 1 - size ) * 0.8;
+    pouringLiquid.setAttribute("width", `${width.toFixed(4)}`);
+    pouringLiquid.setAttribute("x", `${x.toFixed(4)}`);
+}
