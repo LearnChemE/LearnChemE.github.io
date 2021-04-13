@@ -27,6 +27,13 @@ window.gvs.chemicals.acetylene = {
         if( T < 1100 ) { return 226.7314 }
         if( T <= 6000 ) { return 226.7314 }
     },
+    heatCapacity: function(T) {
+        if( typeof(T) !== "number" ) { throw "invalid temperature specified for acetylene" };
+        if( T < 298 ) { throw "Acetylene temperature below valid range" };
+        if( T > 6000 ) { throw "Acetylene temperature above valid range" };
+        const t = T / 1000;
+        return this.A(T) + this.B(T)*t + this.C(T)*(t**2) + this.D(T)*(t**3) + this.E(T) / (t**2);
+    },
     enthalpy: function(T) {
         if( typeof(T) !== "number" ) { throw "invalid temperature specified for acetylene" };
         if( T < 298 ) { throw "Acetylene temperature below valid range" };
@@ -64,6 +71,13 @@ window.gvs.chemicals.ethylene = {
     H: function(T) { 
         if( T < 1200 ) { return 52.46694 }
         if( T <= 6000 ) { return 52.46694 }
+    },
+    heatCapacity: function(T) {
+        if( typeof(T) !== "number" ) { throw "invalid temperature specified for ethylene" };
+        if( T < 298 ) { throw "Ethylene temperature below valid range" };
+        if( T > 6000 ) { throw "Ethylene temperature above valid range" };
+        const t = T / 1000;
+        return this.A(T) + this.B(T)*t + this.C(T)*(t**2) + this.D(T)*(t**3) + this.E(T) / (t**2);
     },
     enthalpy: function(T) {
         if( typeof(T) !== "number" ) { throw "invalid temperature specified for ethylene" };
@@ -110,6 +124,13 @@ window.gvs.chemicals.hydrogen = {
         if( T < 2500 ) { return 0 }
         if( T <= 6000 ) { return 0 }
     },
+    heatCapacity: function(T) {
+        if( typeof(T) !== "number" ) { throw "invalid temperature specified for hydrogen" };
+        if( T < 298 ) { throw "Hydrogen temperature below valid range" };
+        if( T > 6000 ) { throw "Hydrogen temperature above valid range" };
+        const t = T / 1000;
+        return this.A(T) + this.B(T)*t + this.C(T)*(t**2) + this.D(T)*(t**3) + this.E(T) / (t**2);
+    },
     enthalpy: function(T) {
         if( typeof(T) !== "number" ) { throw "invalid temperature specified for hydrogen" };
         if( T < 298 ) { throw "Hydrogen temperature below valid range" };
@@ -147,6 +168,13 @@ window.gvs.chemicals.methane = {
     H: function(T) { 
         if( T < 1300 ) { return -74.87310 }
         if( T <= 6000 ) { return -74.87310 }
+    },
+    heatCapacity: function(T) {
+        if( typeof(T) !== "number" ) { throw "invalid temperature specified for methane" };
+        if( T < 298 ) { throw "Methane temperature below valid range" };
+        if( T > 6000 ) { throw "Methane temperature above valid range" };
+        const t = T / 1000;
+        return this.A(T) + this.B(T)*t + this.C(T)*(t**2) + this.D(T)*(t**3) + this.E(T) / (t**2);
     },
     enthalpy: function(T) {
         if( typeof(T) !== "number" ) { throw "invalid temperature specified for methane" };
@@ -193,6 +221,13 @@ window.gvs.chemicals.oxygen = {
         if( T < 2000 ) { return 0 }
         if( T <= 6000 ) { return 0 }
     },
+    heatCapacity: function(T) {
+        if( typeof(T) !== "number" ) { throw "invalid temperature specified for oxygen" };
+        if( T < 100 ) { throw "Oxygen temperature below valid range" };
+        if( T > 6000 ) { throw "Oxygen temperature above valid range" };
+        const t = T / 1000;
+        return this.A(T) + this.B(T)*t + this.C(T)*(t**2) + this.D(T)*(t**3) + this.E(T) / (t**2);
+    },
     enthalpy: function(T) {
         if( typeof(T) !== "number" ) { throw "invalid temperature specified for oxygen" };
         if( T < 100 ) { throw "Oxygen temperature below valid range" };
@@ -238,6 +273,13 @@ window.gvs.chemicals.water = {
         if( T < 1700 ) { return -241.8264 }
         if( T <= 6000 ) { return -241.8264 }
     },
+    heatCapacity: function(T) {
+        if( typeof(T) !== "number" ) { throw "invalid temperature specified for water" };
+        if( T < 298 ) { throw "Water temperature below valid range" };
+        if( T > 6000 ) { throw "Water temperature above valid range" };
+        const t = T / 1000;
+        return this.A(T) + this.B(T)*t + this.C(T)*(t**2) + this.D(T)*(t**3) + this.E(T) / (t**2);
+    },
     enthalpy: function(T) {
         if( typeof(T) !== "number" ) { throw "invalid temperature specified for water" };
         if( T < 298 ) { throw "Water temperature below valid range" };
@@ -276,6 +318,13 @@ window.gvs.chemicals.carbondioxide = {
         if( T < 1200 ) { return -393.5224 }
         if( T <= 6000 ) { return -393.5224 }
     },
+    heatCapacity: function(T) {
+        if( typeof(T) !== "number" ) { throw "invalid temperature specified for carbon dioxide" };
+        if( T < 298 ) { throw "Carbon dioxide temperature below valid range" };
+        if( T > 6000 ) { throw "Carbon dioxide temperature above valid range" };
+        const t = T / 1000;
+        return this.A(T) + this.B(T)*t + this.C(T)*(t**2) + this.D(T)*(t**3) + this.E(T) / (t**2);
+    },
     enthalpy: function(T) {
         if( typeof(T) !== "number" ) { throw "invalid temperature specified for carbon dioxide" };
         if( T < 298 ) { throw "Carbon dioxide temperature below valid range" };
@@ -313,6 +362,13 @@ window.gvs.chemicals.carbonmonoxide = {
     H: function(T) { 
         if( T < 1300 ) { return -110.5271 }
         if( T <= 6000 ) { return -110.5271 }
+    },
+    heatCapacity: function(T) {
+        if( typeof(T) !== "number" ) { throw "invalid temperature specified for carbon monoxide" };
+        if( T < 298 ) { throw "Carbon monoxide temperature below valid range" };
+        if( T > 6000 ) { throw "Carbon monoxide temperature above valid range" };
+        const t = T / 1000;
+        return this.A(T) + this.B(T)*t + this.C(T)*(t**2) + this.D(T)*(t**3) + this.E(T) / (t**2);
     },
     enthalpy: function(T) {
         if( typeof(T) !== "number" ) { throw "invalid temperature specified for carbon monoxide" };
@@ -359,6 +415,13 @@ window.gvs.chemicals.nitrogen = {
         if( T < 2000 ) { return 0 }
         if( T <= 6000 ) { return 0 }
     },
+    heatCapacity: function(T) {
+        if( typeof(T) !== "number" ) { throw "invalid temperature specified for nitrogen" };
+        if( T < 298 ) { throw "Nitrogen temperature below valid range" };
+        if( T > 6000 ) { throw "Nitrogen temperature above valid range" };
+        const t = T / 1000;
+        return this.A(T) + this.B(T)*t + this.C(T)*(t**2) + this.D(T)*(t**3) + this.E(T) / (t**2);
+    },
     enthalpy: function(T) {
         if( typeof(T) !== "number" ) { throw "invalid temperature specified for nitrogen" };
         if( T < 298 ) { throw "Nitrogen temperature below valid range" };
@@ -396,6 +459,13 @@ window.gvs.chemicals.ammonia = {
     H: function(T) { 
         if( T < 1400 ) { return -45.89806 }
         if( T <= 6000 ) { return -45.89806 }
+    },
+    heatCapacity: function(T) {
+        if( typeof(T) !== "number" ) { throw "invalid temperature specified for ammonia" };
+        if( T < 298 ) { throw "Ammonia temperature below valid range" };
+        if( T > 6000 ) { throw "Ammonia temperature above valid range" };
+        const t = T / 1000;
+        return this.A(T) + this.B(T)*t + this.C(T)*(t**2) + this.D(T)*(t**3) + this.E(T) / (t**2);
     },
     enthalpy: function(T) {
         if( typeof(T) !== "number" ) { throw "invalid temperature specified for ammonia" };
