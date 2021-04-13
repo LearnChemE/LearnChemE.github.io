@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg"
-   viewBox="20 0 60 91" version="1.1" class="flask-svg">
+   viewBox="10 0 80 91" version="1.1" class="flask-svg">
    <defs></defs>
    <g class="flask-g">
       <rect class="flask-mask" x="20" y="85" width="60" height="10" />
@@ -11,5 +11,6 @@
       <path class="flask-line flask-right-wall" d="m 60,10 V 35 L 75,80" />
       <ellipse class="flask-line flask-top-ellipse" ry="1" rx="10" cy="10" cx="50" />
       <path class="flask-line flask-bottom-outline" d="m 25,80 A 25 5 0 0 0 75,80" />
+      <text class="flask-number-label" x="10" y="25" style="font-size:20px;"></text>
    </g>
 </svg>

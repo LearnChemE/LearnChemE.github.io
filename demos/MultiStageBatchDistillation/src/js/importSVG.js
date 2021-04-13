@@ -14,7 +14,7 @@ for( let i = 0; i < 9; i++ ) {
   flaskSVG.id = `flask-svg-${i + 1}`;
   const flaskLabelDiv = document.createElement("div");
   flaskLabelDiv.classList.add("flask-label");
-  flaskLabelDiv.innerHTML = `flask #${i + 1}<br>x<sub>B</sub> = 0.00`;
+  flaskLabelDiv.innerHTML = `0.00 kmol<br>x<sub>B</sub> = 0.00`;
   flaskDiv.appendChild(flaskLabelDiv);
 };
 
@@ -127,12 +127,14 @@ function addTooltips() {
     hoverElt.addEventListener("mouseover", (e) => {
       hoverElt.setAttribute("mouseisover", "yes");
       highlightElt.setAttribute("filter", "url(#drop-shadow)");
+
       if( !window.gvs.tooltipVisible ) {
         const mouseX = e.clientX;
         const mouseY = e.clientY;
         tooltipElt.style.top = `${mouseY}px`;
         tooltipElt.style.left = `${mouseX}px`;
       };
+
       window.setTimeout(() => {
         if( hoverElt.getAttribute("mouseisover") === "yes" && !window.gvs.tooltipVisible ) {
           window.gvs.tooltipVisible = true;

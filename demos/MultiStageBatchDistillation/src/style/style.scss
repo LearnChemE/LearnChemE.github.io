@@ -330,7 +330,7 @@ input[type="range"]:disabled {
 
 @media screen and (min-width: 1024px) {
   .flask-label {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
   .input-row, #right-side-graphics-selector>div, #collection-heads-up {
     font-size: 0.95rem !important;
@@ -355,6 +355,9 @@ input[type="range"]:disabled {
 }
 
 @media screen and (min-width: 1140px) {
+  .flask-label {
+    font-size: 0.85rem;
+  }
   #still-composition, #distillate-composition {
     font-size: 13.5px;
   }
@@ -367,6 +370,9 @@ input[type="range"]:disabled {
 @media screen and (min-width: 1280px) {
   #still-composition, #distillate-composition {
     font-size: 15.5px;
+  }
+  .flask-label {
+    font-size: 0.9rem;
   }
 }
 
@@ -386,6 +392,9 @@ input[type="range"]:disabled {
   }
   #still-composition, #distillate-composition {
     font-size: 17px;
+  }
+  .flask-label {
+    font-size: 1.0rem;
   }
 }
 

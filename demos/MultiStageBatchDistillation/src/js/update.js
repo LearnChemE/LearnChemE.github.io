@@ -60,7 +60,7 @@ function resizeFlasks() {
   const containerRect = svgContainer.getBoundingClientRect();
   const dispenserRect = document.getElementById("dispenser-rect").getBoundingClientRect();
   const p5Rect = rightSideContainer.getBoundingClientRect();
-  const relativeSize = 0.065;
+  const relativeSize = 0.08;
   for ( let i = 0; i < flasks.length; i++ ) {
     const flaskDiv = flasks[i];
     const svg = svgs[i];
@@ -73,7 +73,7 @@ function resizeFlasks() {
     } else {
       const adjWidth = p5Rect.width * 0.45;
       const adjHeight = p5Rect.height * 0.12;
-      const topMargin = p5Rect.height * 0.02;
+      const topMargin = p5Rect.height * 0;
       const leftMargin = p5Rect.width * 0.28;
       left = p5Rect.left + ( ( i - 1 ) % 2 ) * adjWidth + leftMargin;
       top = p5Rect.top + ( ( i - 1 ) * adjHeight ) - ( ( i - 1 ) % 2 ) * adjHeight + topMargin;
@@ -104,11 +104,12 @@ window.gvs.updateFlaskObjects = function() {
     } else {
       xB = thisFlask.xB.toFixed(2);
     }
-
-    const label = `${thisFlask.name}<br>x<sub>B</sub> = ${xB}`;
+    const label = `${Math.min(2.00, thisFlask.V).toFixed(2)} kmol<br>x<sub>B</sub> = ${xB}`;
     flaskDiv.children[1].innerHTML = label;
     thisFlask.SVG = flaskDiv.children[0];
     thisFlask.div = flaskDiv;
+    const numberLabel = thisFlask.SVG.getElementsByClassName("flask-number-label")[0];
+    numberLabel.textContent = `${thisFlask.name}`;
     const lvl = thisFlask.V / thisFlask.maxVolume;
     window.gvs.setFlaskLiquidLevel(thisFlask.SVG, lvl);
   }
@@ -123,7 +124,7 @@ window.gvs.addFlask = function() {
   if ( k > 1 ) { document.getElementById("flasks-here").style.opacity = "0" }
   if ( k <= 9 ) {
     const flask = {
-      name: `container #${k}`,
+      name: `#${k}`,
       xB : -1,
       V : 0.00,
       maxVolume: Number(document.getElementById("evap-quantity-slider").getAttribute("max")),
@@ -142,8 +143,10 @@ window.gvs.addFlask = function() {
         } else {
           xB = this.xB.toFixed(2);
         }
-        this.div.children[1].innerHTML = `${this.name}<br>x<sub>B</sub> = ${xB}`;
-        if( this.name === "container #9" ) { this.div.children[1].innerHTML = "collection<br>area full." }
+        const numberLabel = this.SVG.getElementsByClassName("flask-number-label")[0];
+        numberLabel.textContent = `${this.name}`;
+        this.div.children[1].innerHTML = `${Math.min(2.00, this.V).toFixed(2)} kmol<br>x<sub>B</sub> = ${xB}`;
+        if( this.name === "#9" ) { this.div.children[1].innerHTML = "collection<br>area full." }
       },
     };
     window.gvs.flasks.unshift(flask);

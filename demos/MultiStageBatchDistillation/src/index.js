@@ -512,7 +512,7 @@ function  resetToInitialConditions() {
     [collectButton, resetButton, xBinitSlider, stagesSlider, evapQuantitySlider, refluxSlider].forEach(inp => {
         inp.removeAttribute("disabled");
     });
-
+    collectButton.innerHTML = "collect";
     document.getElementById("flasks-here").style.opacity = "1";
 
     const xB = Number( xBinitSlider.value );
@@ -551,7 +551,7 @@ function beginCollecting() {
         });
         document.getElementById("pouring-liquid").style.fillOpacity = "1";
         P5.loop();
-    }
+    };
 };
   
 function endCollecting() {
@@ -560,6 +560,13 @@ function endCollecting() {
     });
     document.getElementById("pouring-liquid").style.fillOpacity = "0";
     window.gvs.addFlask();
+    if ( window.gvs.flasks.length === 9 ) {
+        collectButton.setAttribute("disabled", "yes");
+    };
+    if ( window.gvs.isEmpty ) {
+        collectButton.setAttribute("disabled", "yes");
+        collectButton.innerHTML = "empty";
+    }
     P5.noLoop();
 };
 
