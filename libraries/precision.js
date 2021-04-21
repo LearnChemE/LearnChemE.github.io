@@ -29,11 +29,11 @@ module.exports = function(number, precision) {
     }
 
     if (isNaN(parsedNumber)) {
-        throw "NaN passed to parsedPrecision rounding function."
+        throw "NaN passed to precision rounding function."
     }
 
     if (!isFinite(parsedNumber)) {
-        throw "Infinite value passed to parsedPrecision rounding function."
+        throw "Infinite value passed to precision rounding function."
     }
 
     if (parsedPrecision === 0) {
