@@ -551,45 +551,7 @@ const problem = {
             },
         },
         "questionelements": [
-            [{
-                "type": "graph",
-                "graphinfo": graphinfo,
-                "mode": "view",
-                "default": {
-                    "line": [
-                        {"points":[{"x":"@x1@", "y":"@PsatO@", "color":octanecolor},
-                                   {"x":"@x2@", "y":"@by2@", "show":false},
-                                   {"x":"@x3@", "y":"@by3@", "show":false},
-                                   {"x":"@x4@", "y":"@by4@", "show":false},
-                                   {"x":"@x5@", "y":"@PsatH@", "color":hexanecolor}],
-                         "color":graycolor},
-
-                        {"equation": "Math.pow(~x~ / @PsatH@ + (1 - ~x~) / @PsatO@, -1)",
-                         "independent": {
-                             "symbol": "x",
-                             "min": 0,
-                             "max": 1
-                         },
-                         "dependent": {
-                             "symbol": "y",
-                             "min": Pmin,
-                             "max": Pmax
-                         },
-                         "steps": 60,
-                         "tension": 0.5,
-                         "color": graycolor,
-                         "showpoints": false},
-
-                        {"points":[{"x":"@q4lx@", "y":"@q4y@", "color":purplecolor},
-                                   {"x":"@q4x@", "y":"@q4y@"},
-                                   {"x":"@q4vx@", "y":"@q4y@", "color":yellowcolor},],
-                         "color":graycolor}
-                    ],
-                },
-                "cursor": normalcursor,
-                "points": 0
-            },
-            [{
+            [[{
                 "type": "text",
                 "label": `This demonstration leads the user through the construction of a pressure-composition (P-x-y) diagram step-by-step for vapor-liquid equilibrium of an n-hexane/n-octane ideal mixture (Raoult's law).<br><br>After answering, the user clicks "Submit Answer" to check their answer, followed by "Next" to proceed with the question. The user can only move forward or select "Restart Problem" to start over at a different temperature. At any step, click "Hint" for help.`,
                 "class": "prompt"

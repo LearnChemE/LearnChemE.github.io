@@ -832,63 +832,7 @@ const problem = {
             }
         },
         "questionelements": [
-            [{
-                "type": "graph",
-                "graphinfo": graphinfo,
-                "mode": "view",
-                "answercount": {
-                    "point": 0,
-                    "line": 0
-                },
-                "answer": {},
-                "default": {
-                    "point":[
-                        {"x":"@x1@", "y":"@TsatO@", "color":octanecolor},
-                        {"x":"@x5@", "y":"@TsatH@", "color":hexanecolor}
-                    ],
-                    "line": [
-                        {"equation": "FindRoot({expression:'~x~ * Antoine(T, @AH@, @BH@, @CH@) + (1 - ~x~) * Antoine(T, @AO@, @BO@, @CO@) - @P@', variable:'T', min:@Tmin@, max:@Tmax@, precision:0.001})",
-                         "independent": {
-                             "symbol": "x",
-                             "min": 0,
-                             "max": 1
-                         },
-                         "dependent": {
-                             "symbol": "y",
-                             "min": Pmin,
-                             "max": Pmax
-                         },
-                         "steps": linesteps,
-                         "tension": 0.5,
-                         "color": graycolor,
-                         "showpoints": false},
-
-                        {"equation": "FindRoot({expression:'~x~ / Antoine(T, @AH@, @BH@, @CH@) + (1 - ~x~) / Antoine(T, @AO@, @BO@, @CO@) - 1 / @P@', variable:'T', min:@Tmin@, max:@Tmax@, precision:0.001})",
-                         "independent": {
-                             "symbol": "x",
-                             "min": 0,
-                             "max": 1
-                         },
-                         "dependent": {
-                             "symbol": "y",
-                             "min": Pmin,
-                             "max": Pmax
-                         },
-                         "steps": linesteps,
-                         "tension": 0.5,
-                         "color": graycolor,
-                         "showpoints": false},
-
-                        {"points":[{"x":"@q6lx@", "y":"@q6y@", "color":purplecolor},
-                                   {"x":"@q6x@", "y":"@q6y@"},
-                                   {"x":"@q6vx@", "y":"@q6y@", "color":yellowcolor},],
-                         "color":graycolor}
-
-                    ],
-                },
-                "cursor": normalcursor,
-            }, // element
-            [{
+            [[{
                 "type": "text",
                 "label": `This demonstration leads the user through the construction of a temperature-composition (T-x-y) diagram step-by-step for vapor-liquid equilibrium of an n-hexane/n-octane ideal mixture.<br><br>After answering, the user clicks "Submit Answer" to check their answer, followed by "Next" to proceed with the question. The user can only move forward or select "Restart Problem" to start over at a different temperature. At any step, click "Hint" for help.<br><br>In some steps, saturation pressures are calculated from Antoine's equation shown in a second graph.`,
                 "class": "prompt"

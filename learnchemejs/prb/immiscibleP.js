@@ -483,45 +483,7 @@ const problem = {
             }
         },
         "questionelements": [
-            [{
-                "type": "graph",
-                "graphinfo": graphinfo,
-                "mode": "move",
-                "answercount": {
-                    "point": 0,
-                    "line": 0
-                },
-                "answer": {},
-                "default": {
-                    "point": [],
-                    "line": [
-                        {"points":[{"x":0, "y":"@Psum@", "radius":1, "show":false},
-                                   {"x":1, "y":"@Psum@", "radius":1, "show":false}], "color":graycolor},
-                        {"points":[{"x":"0", "y":"@Psum@", "show":false},
-                                   {"x":"0", "y":"@PsatW@", "color":watercolor},
-                                   {"x":"@x1@", "y":"@y1@", "show": false},
-                                   {"x":"@x2@", "y":"@y2@", "show": false},
-                                   {"x":"@x3@", "y":"@y3@", "show": false},
-                                   {"x":"@xc@", "y":"@Psum@", "color":"green"}],
-                         "color":graycolor,
-                         "fill":{
-                             "color":watercolor,
-                             "opacity":0.2}},
-                        {"points":[{"x":"@xc@", "y":"@Psum@", "color":"green"},
-                                   {"x":"@x4@", "y":"@y4@", "show": false},
-                                   {"x":"@x5@", "y":"@y5@", "show": false},
-                                   {"x":"@x6@", "y":"@y6@", "show": false},
-                                   {"x":"1", "y":"@PsatO@", "color":organiccolor},
-                                   {"x":"1", "y":"@Psum@", "show":false}],
-                         "color":graycolor,
-                         "fill":{
-                             "color":organiccolor,
-                             "opacity":0.2}},
-                    ],
-                },
-                "cursor": normalcursor,
-            }, // element
-            [{
+            [[{
                 "type": "text",
                 "label": `In this demonstration, the user is led through a step-by-step procedure to create a temperature-composition diagram for two immiscible liquids (water and an organic) at a fixed pressure. The organic can be benzene, toluene, or n-hexane.<br><br>After answering, the user clicks "Submit Answer" to check their answer, followed by "Next" to proceed with the question. The user can only move forward or select "Restart Problem" to start over at a different temperature and a different organic. For any step, click "Hint" for help.`,
                 "class": "prompt"
