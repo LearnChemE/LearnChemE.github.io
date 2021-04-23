@@ -834,7 +834,7 @@ const problem = {
         "questionelements": [
             [[{
                 "type": "text",
-                "label": `This demonstration leads the user through the construction of a temperature-composition (T-x-y) diagram step-by-step for vapor-liquid equilibrium of an n-hexane/n-octane ideal mixture.<br><br>After answering, the user clicks "Submit Answer" to check their answer, followed by "Next" to proceed with the question. The user can only move forward or select "Restart Problem" to start over at a different temperature. At any step, click "Hint" for help.<br><br>In some steps, saturation pressures are calculated from Antoine's equation shown in a second graph.`,
+                "label": `This demonstration leads the user through the construction of a temperature-composition (T-x-y) diagram step-by-step for vapor-liquid equilibrium of an n-hexane/n-octane ideal mixture.<br><br>After answering, the user clicks "Submit Answer" to check their answer, followed by "Next" to proceed with the question. The user can only move forward or select "Restart Problem" to start over at a different temperature. At any step, click "Hint" for help.<br><br>In some steps, saturation pressures are calculated from Antoine's equation shown in a second graph. To begin, press the "Begin" button below.`,
                 "class": "prompt"
             },
             {

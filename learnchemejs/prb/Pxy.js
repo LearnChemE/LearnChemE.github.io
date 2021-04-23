@@ -552,7 +552,7 @@ const problem = {
         "questionelements": [
             [[{
                 "type": "text",
-                "label": `This demonstration leads the user through the construction of a pressure-composition (P-x-y) diagram step-by-step for vapor-liquid equilibrium of an n-hexane/n-octane ideal mixture (Raoult's law).<br><br>After answering, the user clicks "Submit Answer" to check their answer, followed by "Next" to proceed with the question. The user can only move forward or select "Restart Problem" to start over at a different temperature. At any step, click "Hint" for help.`,
+                "label": `This demonstration leads the user through the construction of a pressure-composition (P-x-y) diagram step-by-step for vapor-liquid equilibrium of an n-hexane/n-octane ideal mixture (Raoult's law).<br><br>After answering, the user clicks "Submit Answer" to check their answer, followed by "Next" to proceed with the question. The user can only move forward or select "Restart Problem" to start over at a different temperature. At any step, click "Hint" for help. To begin, press the "Begin" button below.`,
                 "class": "prompt"
             }, // element
             {
