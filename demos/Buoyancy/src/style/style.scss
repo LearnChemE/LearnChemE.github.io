@@ -1,6 +1,11 @@
 @import "bootstrap";
 @import "./slider.scss";
 
+body {
+  display: grid;
+  justify-content: center;
+}
+
 .input-area {
   font-size: 0.9rem;
   display: grid;
