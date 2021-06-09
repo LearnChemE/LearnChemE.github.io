@@ -113,7 +113,7 @@ function step() {
 // We do not want it to be called if the simulation is already running, hence the "isRunning" variable
 function startPauseAnimation() {
 
-  slider.setAttribute("disabled","ture");
+  slider.setAttribute("disabled","true");
   
   startPauseButton.innerHTML = "Pause"
 
@@ -252,6 +252,7 @@ function fallObject() {
     if(disable) {
       [cdInp, aInp, mInp].forEach(inp => {
         inp.setAttribute("disabled", "true");
+        inp.setAttribute("title", `select the "custom" object below to adjust this slider`);
       });
       cdInp.value = Math.log( this.Cd );
       aInp.value = Math.log( this.A );
@@ -259,6 +260,7 @@ function fallObject() {
     } else {
       [cdInp, aInp, mInp].forEach(inp => {
         inp.removeAttribute("disabled");
+        inp.removeAttribute("title");
       });
     }
     objImage.setAttribute("src", this.src);

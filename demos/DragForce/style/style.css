@@ -2,6 +2,11 @@
   width: 800px;
 }
 
+body {
+  display: grid;
+  justify-content: center;
+  justify-items: center;
+}
 
 #controls-area {
   display: grid;
@@ -112,15 +117,17 @@ input[type="text"].form-control:focus {
 }
 
 input[type=range] {
-  -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
   width: 100%; /* Specific width is required for Firefox. */
   background: transparent; /* Otherwise white in Chrome */
 }
 
 input[type=range]:disabled {
   opacity: 0.3 !important;
-  pointer-events: none !important;
-  cursor: none !important;
+  /* pointer-events: none !important; */
+  cursor: not-allowed !important;
 }
 
 input[type=range]:focus {
@@ -250,9 +257,12 @@ input[type=range]:focus::-ms-fill-upper {
 
 #object-fall-area {
   height: min-content;
-  grid-template-rows: auto;
-  align-items: center;
+  display: grid;
+  grid-template-rows: max-content;
+  justify-items: center;
+  justify-content: center;
   min-width: 235px;
+  position: relative;
 }
 
 #object-fall-area img {
@@ -260,18 +270,18 @@ input[type=range]:focus::-ms-fill-upper {
 }
 
 #structureImage {
-  margin-top: 3px;
+  margin-top: 0px;
   width: 188.89px;
   height: 285px;
-  position: absolute;
+  /* position: absolute;
   top: 180px;
-  left: 30px;
+  left: 30px; */
   z-index: 0;
 }
 
 #objImage {
-  position : relative;
-  top : 40px;
+  position : absolute;
+  top : 30px;
   left : 50px;
   width : 30px;
   height : 30px;
@@ -288,9 +298,9 @@ input[type=range]:focus::-ms-fill-upper {
 
 .slidecontainer {
   width: max-content;
-  position: absolute;
+  /* position: absolute;
   left: 2.5rem;
-  top: 475px;
+  top: 475px; */
   line-height: 1.5rem;
 }
 
