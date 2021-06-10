@@ -1,6 +1,11 @@
 @import "bootstrap";
 @import "./slider.scss";
 
+body {
+  display: grid;
+  justify-content: center;
+  justify-items: center;
+}
 
 .modal-buttons-row {
   display: grid;
