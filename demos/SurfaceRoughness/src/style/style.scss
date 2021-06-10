@@ -12,6 +12,11 @@
   font-family: 'openSans', 'sans-serif';
 }
 
+body {
+  display: grid;
+  justify-content: center;
+}
+
 #controls {
   display: grid;
   grid-template-columns: repeat(3, max-content);
