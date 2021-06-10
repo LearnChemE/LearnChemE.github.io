@@ -8,6 +8,11 @@ html, body {
 
 body {
   margin: 0;
+	padding-top: 10px;
+	padding-left: 20px;
+	max-width: 600px;
+	display: grid;
+	grid-template-rows: min-content 1fr;
 }
 
 .wrapper {
@@ -123,7 +128,7 @@ body {
 
 #title {
 	grid-area: title;
-	transform: translateY(40px) translateX(-80px);
+	transform: translateY(20px);
 	z-index: 9;
 	font-size: 1.25rem;
 }

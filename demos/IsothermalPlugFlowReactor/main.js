@@ -31,6 +31,9 @@ window["kInnerHTML"] = '<span id="kunits">m<sup>3</sup>/(mol s)</span>';
 
 const sim = math.parser();
 
+let wmax = window.innerWidth - 180;
+let wmin = 600;
+let w1 = Math.min(wmax, wmin);
 
 /**
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -157,12 +160,14 @@ function windowResized() {
   clientWidth = Math.min(window.innerWidth - 200, 600);
   aspRatio = 1;
   clientHeight = clientWidth * aspRatio;
-  
+  wmax = window.innerWidth - 180;
+  wmin = 600;
+  w1 = Math.min(wmax, wmin);
   // resize the canvas and plot, reposition the GUI 
   resizeCanvas(clientWidth, clientHeight);
   mainPlot.GPLOT.setOuterDim(clientWidth, clientHeight);
   mainPlot.GPLOT.setPos(0, 0);
-  gui.prototype.setPosition(clientWidth, mainPlot.GPLOT.mar[2] + 100);
+  gui.prototype.setPosition(w1, mainPlot.GPLOT.mar[2] + 100);
 }
 
 /**
@@ -184,7 +189,7 @@ function setup() {
   mainPlot.plotSetup();
   
   // Create the GUI using p5.gui.js
-  gui = createGui('Plot Controls', clientWidth - 10, mainPlot.GPLOT.mar[2] + 100);
+  gui = createGui('Plot Controls', w1, mainPlot.GPLOT.mar[2] + 100);
   gui.newSlider('xA0', 0, 1, 0.5, 0.01, 'inlet mole fraction A');
   gui.newSlider('k', 0, 1, 0.5, 0.01, 'reaction rate constant <i>k</i>',`${window["kInnerHTML"]}`);
   gui.newSlider('n', 0, 2, 1, 1, 'reaction order of B');
