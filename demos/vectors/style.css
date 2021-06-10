@@ -16,6 +16,12 @@ html, body {
   "ltx  ltx  ltx"
   "cnv  cnv  cnv";
 }
+
+body {
+  margin-left: 50vw;
+  transform: translateX(-50%);
+}
+
 canvas {
   display: block;
 }
@@ -185,14 +191,17 @@ canvas {
 
 #directionsButton {
   grid-area:btn1;
+  justify-self: center;
 }
 
 #detailsButton {
   grid-area:btn2;
+  justify-self: center;
 }
 
 #aboutButton {
   grid-area:btn3;
+  justify-self: center;
 }
 
 .guiImgI {
