@@ -12,7 +12,6 @@
         scale: 0.95,
         mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
         displayAlign: 'left', // default for indentalign when set to 'auto'
-        displayIndent: '-1', // default for indentshift when set to 'auto'
       }
     };
   </script>
@@ -86,9 +85,11 @@
             For steady-state, laminar flow of an incompressible viscous fluid between parallel plates, the ordinary differential equation (ODE) describing fluid velocity is
           </p>
 
-          $$
+          <p class="p-eqn" style="font-size: 1.2rem;">
+          \(
             \frac{ d^{ 2 } u }{ d y^{ 2 } } = \frac{ 1 }{ \mu } \frac{ dp }{ dx }
-          $$
+          \)
+          </p>
 
           <p>
             where \( u \) is fluid velocity, \( y \) is distance from the center line, \( \mu \) is dynamic viscosity of the fluid, and \( \frac{ dp }{ dx } \) is the pressure gradient along the x-axis. The boundary conditions are
@@ -106,9 +107,11 @@
             where \( 2h \) is the distance between the plates and \( U_{ 0 } \) is the velocity of the top plate. An analytical solution for this ODE is:
           </p>
 
-          $$
+          <p class="p-eqn" style="font-size: 1.05rem;">
+            \(
             u \left( y \right) = \frac{ U_{ 0 } }{ 2 } \left( 1 + \frac{ y }{ h } \right) - \frac{ dp }{ dx } \frac{ h^{ 2 } }{ 2 \mu } \left( 1 - \left( \frac{ y }{ h } \right)^{ 2 } \right)
-          $$
+            \)
+          </p>
 
           <div style="margin-top: 2rem;"></div>
         </div>
