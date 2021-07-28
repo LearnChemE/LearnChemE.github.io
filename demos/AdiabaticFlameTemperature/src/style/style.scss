@@ -3,9 +3,10 @@ $modal-lg: 980px;
 @import "bootstrap";
 
 #doc {
-  width: 1000px;
+  min-width: 1000px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 500px 500px;
+  justify-content: center;
 }
 
 #app {
@@ -54,6 +55,10 @@ $modal-lg: 980px;
   }
 }
 
+.modal-body {
+  font-size: 0.9rem;
+}
+
 .modal-body p {
   text-align: justify;
 }
@@ -80,19 +85,19 @@ $modal-lg: 980px;
 }
 
 .details-paragraph {
-  padding-bottom: 1rem;
+  padding-bottom: 0.5rem;
   max-width: 90ch;
 }
 
 .details-math {
   width: min-content;
   margin-left: 0.5rem;
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
+  // margin-top: 0.5rem;
+  // margin-bottom: 0.5rem;
 }
 
 .details-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
 }
 
 .details-reference {
