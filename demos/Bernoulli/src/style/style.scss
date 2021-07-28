@@ -1,6 +1,15 @@
 @import "bootstrap";
 @import "./slider.scss";
 
+#application {
+  width: 930px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
 #input-area {
   position: absolute;
   left: 570px;

@@ -10,52 +10,56 @@
 </head>
 
 <body>
-  <div id="input-area">
+  <div id="application">
+    <main></main>
+    <div id="input-area">
     
-    <div class="slider-container">
-      <div class="slider-label">Change in height </div>
-      <input type="range" class="slider" id="heightSlider" min="0" max="200" step="0.1" value="50" />
-      <div class="slider-value" id="height-value">2.7</div>
-      <div class="slider-metric">m</div>
-    </div>
-
-    <div class="slider-container">
-      <div class="slider-label">Outlet pipe diameter</div>
-      <input type="range" class="slider" id="outletDiameterSlider" min="10" max="50" step="0.1" value="20" />
-      <div class="slider-value" id="outlet-diameter-value">5</div>
-      <div class="slider-metric">cm</div>
-    </div>
-
-    <div class="slider-container">
-      <div class="slider-label">Inlet pressure</div>
-      <input type="range" class="slider" id="inletPressureSlider" min="1" max="1000" step="0.1" value="100" />
-      <div class="slider-value" id="inlet-pressure-value">100</div>
-      <div class="slider-metric">kPa</div>
-    </div>
-
-    <div class="slider-container">
-      <div class="slider-label">Inlet velocity</div>
-      <input type="range" class="slider" id="inletVelocitySlider" min="0.1" max="10" step="0.1" value="1" />
-      <div class="slider-value" id="inlet-velocity-value">1.0</div>
-      <div class="slider-metric">m/s</div>
-    </div>
-
-    <div class="btn-group btn-group-toggle" data-toggle="buttons">
-      Display:
-      <label class="btn btn-success active" id="toggle-1">
-        <input type="radio" name="options" id="option1" autocomplete="off" checked>Fluid properties
-      </label>
-      <label class="btn btn-success">
-        <input type="radio" name="options" id="option2" autocomplete="off">Energy
-      </label>
+      <div class="slider-container">
+        <div class="slider-label">Change in height </div>
+        <input type="range" class="slider" id="heightSlider" min="0" max="200" step="0.1" value="50" />
+        <div class="slider-value" id="height-value">2.7</div>
+        <div class="slider-metric">m</div>
+      </div>
+  
+      <div class="slider-container">
+        <div class="slider-label">Outlet pipe diameter</div>
+        <input type="range" class="slider" id="outletDiameterSlider" min="10" max="50" step="0.1" value="20" />
+        <div class="slider-value" id="outlet-diameter-value">5</div>
+        <div class="slider-metric">cm</div>
+      </div>
+  
+      <div class="slider-container">
+        <div class="slider-label">Inlet pressure</div>
+        <input type="range" class="slider" id="inletPressureSlider" min="1" max="1000" step="0.1" value="100" />
+        <div class="slider-value" id="inlet-pressure-value">100</div>
+        <div class="slider-metric">kPa</div>
+      </div>
+  
+      <div class="slider-container">
+        <div class="slider-label">Inlet velocity</div>
+        <input type="range" class="slider" id="inletVelocitySlider" min="0.1" max="10" step="0.1" value="1" />
+        <div class="slider-value" id="inlet-velocity-value">1.0</div>
+        <div class="slider-metric">m/s</div>
+      </div>
+  
+      <div class="btn-group btn-group-toggle" data-toggle="buttons">
+        Display:
+        <label class="btn btn-success active" id="toggle-1">
+          <input type="radio" name="options" id="option1" autocomplete="off" checked>Fluid properties
+        </label>
+        <label class="btn btn-success">
+          <input type="radio" name="options" id="option2" autocomplete="off">Energy
+        </label>
+      </div>
+    
     </div>
   
+    <button type="button" class="btn btn-primary" id="directions-button" data-toggle="modal" data-target=".main-modal">Directions</button>
+    <button type="button" class="btn btn-primary" id="details-button" data-toggle="modal" data-target=".main-modal">Details</button>
+    <button type="button" class="btn btn-primary" id="about-button" data-toggle="modal" data-target=".main-modal">About</button>
+  
   </div>
-
-  <button type="button" class="btn btn-primary" id="directions-button" data-toggle="modal" data-target=".main-modal">Directions</button>
-  <button type="button" class="btn btn-primary" id="details-button" data-toggle="modal" data-target=".main-modal">Details</button>
-  <button type="button" class="btn btn-primary" id="about-button" data-toggle="modal" data-target=".main-modal">About</button>
-
+  
   <div class="modal fade main-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
