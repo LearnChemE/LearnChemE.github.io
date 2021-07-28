@@ -13,6 +13,7 @@ body {
 .wrapper {
   display: grid;
   justify-items: center;
+	margin: 20px auto;
   max-width: 800px;
   grid-row-gap: 0.25rem;
   grid-template-rows: auto 40px 600px;
@@ -20,6 +21,12 @@ body {
 	"button1 button2 button3"
 	"title title title"
     "cnv cnv cnv"
+}
+
+.p5Canvas {
+	position: absolute;
+	left: 50vw;
+	transform: translateX(-50%);
 }
 
 .modal {
@@ -123,8 +130,13 @@ body {
 
 .title {
 	grid-area: title;
-	transform: translateY(40px) translateX(-80px);
+	/* transform: translateY(40px) translateX(-80px); */
 	z-index: 9;
+	position: absolute;
+	left: 50vw;
+	top: 90px;
+	transform: translateX(-45%);
+	width: max-content;
 }
 
 #title1 {

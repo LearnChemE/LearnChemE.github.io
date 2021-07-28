@@ -101,7 +101,7 @@ function windowResized() {
   resizeCanvas(clientWidth, clientHeight);
   mainPlot.GPLOT.setOuterDim(clientWidth, clientHeight);
   mainPlot.GPLOT.setPos(0, 0);
-  gui.prototype.setPosition(clientWidth, mainPlot.GPLOT.mar[2] + 100);
+  gui.prototype.setPosition(window.innerWidth / 2 + clientWidth / 2 - 150, mainPlot.GPLOT.mar[2] + 80);
 }
 
 /**
@@ -144,6 +144,8 @@ function setup() {
   mainPlot.addFuncs(CaFunction, CbFunction, CcFunction, selFunction);
 
   noLoop();
+  windowResized()
+  window.setTimeout(() => { windowResized() }, 2000)
 }
 
 /**
