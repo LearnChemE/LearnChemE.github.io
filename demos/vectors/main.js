@@ -85,12 +85,12 @@ let pageHeight = pageWidth * aspRatio;
 let myFont;
 
 function preload() {
-  iHat = loadImage('../../media/iHatWhite.png');
-  jHat = loadImage('../../media/jHatWhite.png');
-  kHat = loadImage('../../media/kHatWhite.png');
-  uvec = loadImage('../../media/uvec.png');
-  vvec = loadImage('../../media/vvec.png');
-  uxvvec = loadImage('../../media/uxvvec.png');
+  iHat = loadImage('https://learncheme.github.io/media/iHatWhite.png');
+  jHat = loadImage('https://learncheme.github.io/media/jHatWhite.png');
+  kHat = loadImage('https://learncheme.github.io/media/kHatWhite.png');
+  uvec = loadImage('https://learncheme.github.io/media/uvec.png');
+  vvec = loadImage('https://learncheme.github.io/media/vvec.png');
+  uxvvec = loadImage('https://learncheme.github.io/media/uxvvec.png');
   myFont = loadFont('Helvetica.otf');
 }
 

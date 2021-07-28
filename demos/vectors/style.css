@@ -19,7 +19,7 @@ html, body {
 
 body {
   margin-left: 50vw;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(20px);
 }
 
 canvas {
