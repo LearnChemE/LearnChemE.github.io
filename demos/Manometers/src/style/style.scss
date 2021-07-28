@@ -7,6 +7,10 @@ body {
   justify-items: center;
 }
 
+mjx-container {
+  transform: translateX(20px);
+}
+
 .modal-buttons-row {
   display: grid;
   grid-template-columns: repeat(3, 12ch );
