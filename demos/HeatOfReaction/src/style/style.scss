@@ -5,15 +5,15 @@
   display: grid;
   grid-template-columns: repeat(3, 12ch );
   gap: 30px;
-  margin: 0.5rem 0rem 0rem 1rem;
+  margin: 0.5rem auto;
+  justify-content: center;
 }
 
 .input-area {
   display: grid;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  margin-left: 10px;
+  margin: 20px auto;
   gap: 10px;
+  width: max-content;
 
   .input-row {
     display: grid;
@@ -54,15 +54,19 @@
   border-style: solid solid none solid;
   border-width: 1px;
   border-color: black;
-  margin-left: 10px;
+  margin: auto;
   align-items: center;
   justify-items: center;
   font-size: 1.25rem;
   background-color: rgb(253, 253, 253);
 }
 
+#p5-container {
+  width: max-content;
+  margin: auto;
+}
+
 canvas {
-  margin-left: 10px;
   border-style: none solid solid solid;
   border-width: 1px;
   border-color: black;
