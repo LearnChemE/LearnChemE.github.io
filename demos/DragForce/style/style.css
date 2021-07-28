@@ -13,6 +13,7 @@ body {
   grid-template-columns: 100%;
   width: 640px;
   margin-bottom: 1rem;
+  margin: auto;
 }
 
 div{
@@ -250,9 +251,10 @@ input[type=range]:focus::-ms-fill-upper {
 }
 
 #image-area {
-  width: 100%;
+  width: max-content;
   display: grid;
   grid-template-columns: repeat(3, max-content);
+  margin: 15px auto;
 }
 
 #object-fall-area {
