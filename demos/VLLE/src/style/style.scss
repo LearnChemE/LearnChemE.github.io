@@ -3,13 +3,12 @@
 
 .input-area {
   display: grid;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  margin-left: 10px;
+  margin: 10px auto;
   gap: 5px;
   grid-template-columns: max-content max-content;
   align-items: center;
   align-content: center;
+  width: max-content;
 
   .input-row {
     display: grid;
@@ -55,12 +54,17 @@
   }
 }
 
+#p5-container {
+  width: max-content;
+  margin: 0px auto;
+}
+
 canvas {
-  margin-left: 10px;
   border-style: solid;
   border-width: 1px;
   border-color: black;
   box-shadow: 0px 0px 2px black;
+  margin-top: 5px;
 }
 
 #loading {
