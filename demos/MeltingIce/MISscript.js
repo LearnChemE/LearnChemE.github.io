@@ -141,7 +141,7 @@ if (!Array.prototype.last){
 }
 
 // really bad at CSS so resizing functionality is with javascript .. don't judge me
-function windowResized() {
+window.windowResized = function() {
 	maxWidth = Math.min(document.documentElement.clientWidth * 0.95, 1200);
 	maxHeight = Math.min(document.documentElement.clientHeight * 0.95, 1000);
 	minWidth = Math.max(600, document.documentElement.clientWidth * 0.95);
@@ -196,12 +196,20 @@ function windowResized() {
 	let w1 = $("#topLeft").width();
 	let w2 = $("#topRight").width();
 	let w3 = 170;
+
+	let left1 = document.getElementById("topLeft").getBoundingClientRect().left - 20;
+	let left2 = document.getElementById("topRight").getBoundingClientRect().left + 20;
+	let left3 = document.getElementById("startButton").getBoundingClientRect().left;
+	let canv = document.getElementById("defaultCanvas0").getBoundingClientRect();
+	let top3 = canv.top + canv.height / 2 - 80;
+
 	panel1.setWidth(w1);
 	panel2.setWidth(w2);
-	panel1.setPosition(0, 10);
-	panel2.setPosition($("#bottomCenter").width() - w2, 10);
 	panel3.setWidth(w3);
-	panel3.setPosition($("#bottomCenter").width() - 170, clientHeight * 0.7 - 40);
+	document.getElementById("red").style.left = `${left1}px`;
+	document.getElementById("blue").style.left = `${left2}px`;
+	document.getElementById("graph").style.left = `${left3}px`;
+	document.getElementById("graph").style.top = `${top3}px`;
 
 	// retrieves the beaker height and the size to adjust falling distance
 	bkHeight = $("#beakersImg").height();
@@ -239,7 +247,7 @@ function windowResized() {
 window.onload = function () {
 	// creates the quicksettings panels, gives initial values to each slider, etc.
 	QuickSettings.useExtStyleSheet();
-	panel1 = QuickSettings.create(0, 30, "Beaker 1", document.body, "red")
+	panel1 = QuickSettings.create(10, 30, "Beaker 1", document.body, "red")
 		.addRange("Initial temperature", 1, 100, 30, 1, function (value) {
 			initialTemp1 = value;
 		}, "°C")
@@ -304,7 +312,8 @@ window.onload = function () {
 		.addRange("Animation speed", 0.5, 5, 1, 0.5, function (value) {
 			frMult = value;
 		}, "x");
-windowResized();
+	windowResized();
+	window.setTimeout(() => {windowResized()}, 2000);
 };
 
 /*

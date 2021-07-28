@@ -12,13 +12,17 @@
 	font-family: sans-serif;
 }
 
+body {
+	transform: translateY(20px);
+}
+
 .wrapper {
 	width: 500px;
-
+	margin: auto;
 	min-height: 500px;
 	min-width: 500px;
 	display: grid;
-	grid-template-columns: 25% 50% 25%;
+	grid-template-columns: 1fr 2fr 1fr;
 	grid-column-gap: 10px;
 	grid-row-gap: 0px;
 	background-color: none;
