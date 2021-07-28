@@ -63,6 +63,9 @@ window.onload = (event) => {
     addSliders();
     addBarChart();  
     resize();
+    window.setTimeout(() => { resize() }, 1000);
+    window.setTimeout(() => { resize() }, 10000)
+
     for(let i = 0; i < mols; i++) {
         if(i % 2 == 0) {mol.push(new Molecule({'component':'a'}))} else {mol.push(new Molecule({'component':'b'}))};
     }
@@ -194,6 +197,9 @@ function resize() {
     nav.style.height = `${buttonHeight}px`;
 
     dims = Math.min(Math.max(400, Math.min(wWidth, wHeight - 20)),800);
+
+    nav.style.width = `${dims - 30}px`;
+
     if(rowColumn) {dims *= 0.6} else {dims -= 100}
     evapFraction = ((1 - fracLiq) * (dims - liquidLine) / dims) / ((1 - fracLiq) * (dims - liquidLine) / dims + fracLiq * liquidLine / dims);
     condFraction = (fracLiq * liquidLine / dims) / ((1 - fracLiq) * (dims - liquidLine) / dims + fracLiq * liquidLine / dims);
@@ -202,13 +208,14 @@ function resize() {
     const vMarg = 20;
 
     if(rowColumn) {
-        sliderWidth = (dims * 1.5) / 3 - 40;
+        // sliderWidth = (dims * 1.5) / 3 - 20;
+        sliderWidth = 200;
         molNumberSlider.style.width = `${sliderWidth}px`;
         volatilitySlider.style.width = `${sliderWidth}px`;
         xSlider.style.width = `${sliderWidth}px`;
 
-        molNumberLabel.position(10, getCoords('nav').bottom);
-        molNumberSlider.position(0, getCoords('mnl').bottom + 10);
+        molNumberLabel.position(document.getElementById("vapCanvas").getBoundingClientRect().left + 10, getCoords('nav').bottom);
+        molNumberSlider.position(document.getElementById("vapCanvas").getBoundingClientRect().left, getCoords('mnl').bottom + 10);
         alphaLabel.position(Math.max(getCoords('mnl').right,getCoords('mns').right) + hMarg, getCoords('mnl').top);
         volatilitySlider.position(Math.max(getCoords('mnl').right,getCoords('mns').right) + hMarg, getCoords('al').bottom + 10);
         let xPos = wWidth < Math.max(getCoords('al').right, getCoords('vs').right) + 200 ? getCoords('mnl').left : Math.max(getCoords('al').right, getCoords('vs').right) + hMarg; 
@@ -249,9 +256,11 @@ function resize() {
     const bMarg = 10;
     barHeight = bcHeight - 2*bMarg - Math.max(getCoords('lbl').height, getCoords('rbl').height);
 
+    let c = document.getElementById("canvas0").getBoundingClientRect();
+
     if(rowColumn) {
         bcWidth = dims / 2;
-        bcLeft = dims + 10;
+        bcLeft = c.left + c.width + 10;
         bcTop = getCoords('canvas0').top;
     } else {
         bcWidth = dims;
@@ -289,7 +298,7 @@ function resize() {
     leftBarLabel.style.bottom = `0px`;
     rightBarLabel.style.bottom = `0px`;
 
-    nav.style.width = `${bcLeft + bcWidth}px`;
+    // nav.style.width = `${bcLeft + bcWidth}px`;
 }
 
 function getCoords(id) {

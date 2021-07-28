@@ -3,7 +3,7 @@ class Molecule {
         let colors = {'a': Acolor, 'b': Bcolor};
         this.component = _args['component'] || 'a';
         this.color = _args['color'] || colors[`${this.component}`];
-        this.diameter = _args['diameter'] || 22;
+        this.diameter = _args['diameter'] || 15;
         this.temperature = _args['temperature'] || 290;
         this.direction = Math.random() * Math.PI * 2;
         let determineState = Math.random();

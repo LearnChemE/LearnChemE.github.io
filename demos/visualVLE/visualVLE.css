@@ -7,8 +7,9 @@
 
 body {
   font-size:1.6rem;
-  margin:0px;
+  margin: 20px 0px;
   overflow: visible;
+  /* transform: translateY(20px); */
 }
 
 .molecule {
@@ -18,7 +19,11 @@ body {
 #canvas0 {
   background: rgb(255, 255, 255);
   border: 2px solid black;
+  /* margin: auto; */
   position: absolute;
+  /* left: 0px; */
+  left: calc(50vw - 125px);
+  transform: translateX(-50%);
 }
 
 #liqCanvas {
@@ -34,6 +39,7 @@ body {
 #nav {
   display: flex;
   justify-content: space-around;
+  margin: auto;
 }
 
 .slider {
@@ -70,6 +76,6 @@ body {
 }
 
 .label {
-  font-size: 1.7rem;
+  font-size: 1.5rem;
   font-family: sans-serif;
 }
