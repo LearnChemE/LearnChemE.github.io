@@ -9,8 +9,6 @@ html, body {
 body {
   margin: 0;
 	padding-top: 10px;
-	padding-left: 20px;
-	max-width: 600px;
 	display: grid;
 	grid-template-rows: min-content 1fr;
 }
@@ -19,6 +17,8 @@ body {
   display: grid;
   justify-items: center;
   max-width: 800px;
+	width: max-content;
+	margin: auto;
   grid-row-gap: 0.25rem;
   grid-template-rows: auto 40px 600px;
   grid-template-areas:

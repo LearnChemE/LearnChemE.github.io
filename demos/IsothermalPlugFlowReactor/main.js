@@ -160,14 +160,12 @@ function windowResized() {
   clientWidth = Math.min(window.innerWidth - 200, 600);
   aspRatio = 1;
   clientHeight = clientWidth * aspRatio;
-  wmax = window.innerWidth - 180;
-  wmin = 600;
-  w1 = Math.min(wmax, wmin);
+  w1 = (window.innerWidth / 2) + clientWidth / 2 - 150;
   // resize the canvas and plot, reposition the GUI 
   resizeCanvas(clientWidth, clientHeight);
   mainPlot.GPLOT.setOuterDim(clientWidth, clientHeight);
   mainPlot.GPLOT.setPos(0, 0);
-  gui.prototype.setPosition(w1, mainPlot.GPLOT.mar[2] + 100);
+  gui.prototype.setPosition(w1, mainPlot.GPLOT.mar[2] + 80);
 }
 
 /**
@@ -222,6 +220,7 @@ function setup() {
   GUIDOM.addEventListener("mouseup", e => {updateJax()});
 
   noLoop();
+  windowResized();
 }
 
 /**
