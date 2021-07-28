@@ -3,6 +3,10 @@ body {
   justify-content: center;
 }
 
+mjx-container {
+  transform: translateX(20px);
+}
+
 #fluid-selection {
   font-size: 1rem;
   padding: 0.25rem;
