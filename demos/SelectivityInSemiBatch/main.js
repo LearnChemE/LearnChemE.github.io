@@ -131,12 +131,14 @@ function windowResized() {
   clientWidth = Math.min(window.innerWidth - 200, 600);
   aspRatio = 1;
   clientHeight = clientWidth * aspRatio;
+  let plot = document.getElementById("plotContainer").getBoundingClientRect();
+  let controls_left = plot.left + plot.width + 5;
   
   // resize the canvas and plot, reposition the GUI 
   resizeCanvas(clientWidth, clientHeight);
   mainPlot.GPLOT.setOuterDim(clientWidth, clientHeight);
   mainPlot.GPLOT.setPos(0, 0);
-  gui.prototype.setPosition(clientWidth, mainPlot.GPLOT.mar[2] + 100);
+  gui.prototype.setPosition(controls_left, mainPlot.GPLOT.mar[2] + 100);
 }
 
 /**
@@ -198,6 +200,7 @@ function setup() {
   }, delay);
 
   noLoop();
+  windowResized();
 }
 
 /**

@@ -18,36 +18,50 @@ var closeAbout = document.getElementsByClassName("close")[2];
 
 // When the user clicks the button, open the modal 
 directionsButton.onclick = function() {
-  modalBG.style.display = "block";
-  modalDirections.style.display = "block";
+  modalBG.style.visibility = "visible";
+  modalBG.style.height = "1300px";
+  modalBG.style.overflow = "auto";
+  modalDirections.style.visibility = "visible";
 }
 detailsButton.onclick = function() {
-  modalBG.style.display = "block";
-  modalDetails.style.display = "block";
+  modalBG.style.visibility = "visible";
+  modalBG.style.height = "1300px";
+  modalBG.style.overflow = "auto";
+  modalDetails.style.visibility = "visible";
 }
 aboutButton.onclick = function() {
-  modalBG.style.display = "block";
-  modalAbout.style.display = "block";
+  modalBG.style.visibility = "visible";
+  modalBG.style.height = "1300px";
+  modalBG.style.overflow = "auto";
+  modalAbout.style.visibility = "visible";
 }
 // When the user clicks on <span> (x), close the modal
 closeDirections.onclick = function() {
-  modalBG.style.display = "none";
-  modalDirections.style.display = "none";
+  modalBG.style.visibility = "hidden";
+  modalBG.style.height = "0px";
+  modalBG.style.overflow = "hidden";
+  modalDirections.style.visibility = "hidden";
 }
 closeDetails.onclick = function() {
-  modalBG.style.display = "none";
-  modalDetails.style.display = "none";
+  modalBG.style.visibility = "hidden";
+  modalBG.style.height = "0px";
+  modalBG.style.overflow = "hidden";
+  modalDetails.style.visibility = "hidden";
 }
 closeAbout.onclick = function() {
-  modalBG.style.display = "none";
-  modalAbout.style.display = "none";
+  modalBG.style.visibility = "hidden";
+  modalBG.style.height = "0px";
+  modalBG.style.overflow = "hidden";
+  modalAbout.style.visibility = "hidden";
 }
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
   if (event.target == modalBG) {
-    modalBG.style.display = "none";
-    modalDirections.style.display = "none";
-    modalDetails.style.display = "none";
-    modalAbout.style.display = "none";
+    modalBG.style.visibility = "hidden";
+    modalDirections.style.visibility = "hidden";
+    modalDetails.style.visibility = "hidden";
+    modalAbout.style.visibility = "hidden";
+    modalBG.style.height = "0px";
+    modalBG.style.overflow = "hidden";
   }
 }

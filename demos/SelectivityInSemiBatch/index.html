@@ -34,140 +34,143 @@
 			<a href="javascript:" id="directionsButton" class="buttonMed" value="directions">Directions</a>
 			<a href="javascript:" id="detailsButton" class="buttonMed" value="details">Details</a>
 			<a href="javascript:" id="aboutButton" class="buttonMed" value="about">About</a>
-			<div class="modal">
-				<div id="modalDirections" class="modal-content" style="display:none;">
-					<div id="directions-content">
-						<span class="close">&times;</span>
-						<p class="popup paragraph">
-							The parallel reactions \( \mathrm{ A + B \mathrel{\stackrel{k_{D}}{\rightarrow}} D } \) and  \( \mathrm{ A + B \mathrel{\stackrel{k_{U}}{\rightarrow}} U } \) are carried out in an isothermal semibatch reactor. Both reactions are first-order in \( A \). The desired reaction to form the product \( D \) is second-order in \( B \), whereas the undesired reaction to form product \( U \) is first-order in \( B \). Both reactions are irreversible and are not elementary. This simulation compares two scenarios:<br><br>
-							
-							(1) pure \( A \) is fed to a reactor that initially contains only \( B \), and<br>
-							(2) pure \( B \) is fed to a reactor that initially contains only \( A \).<br><br>
-							
-							The overall selectivity (the number of moles of \( D \) in the reactor divided by the number of moles of \( U \) in the reactor \( \left( N_{D} / N_{U} \right) \), is much higher when all the \( B \) is initially in the reactor and \( A \) is fed to the reactor. This scenario keeps the concentration of \( B \) high, which favors the desired reaction, which is second-order in \( B \). For either scenario, the addition of the second reactant stops after 10 minutes, when the amount of the reactant added equals the amount of the other reactant initially in the reactor. Use sliders to vary the activation energy of each reaction and the isothermal reactor temperature to determine how selectivity and moles of products and reactants change with time. The amounts of both products increase with temperature because the reactions are irreversible.
-						</p>
-					</div>
-				</div>
-
-				<div id="modalDetails" class="modal-content" style="display:none;">
-					<div id="details-content">
-						<span class="close">&times;</span>
-						<p class="popup paragraph"> 
-							The rate laws for the reactions are:
-							$$
-							r_{D} = k_{D} C_{A} C_{B}^{2}
-							$$
-
-							$$
-							r_{U} = k_{U} C_{A} C_{B}
-							$$
-
-							$$
-							k_{D} = A_{D} e^{-E_{D}^{A}/R T}
-							$$
-
-							$$
-							k_{U} = A_{U} e^{-E_{U}^{A}/R T}
-							$$
-
-							where the subscripts \( D \) and \( U \) refer to the desired and undesired reactions, \( r_{D} \) and \( r_{U} \) are rates of reaction, \( k_{D} \) and \( k_{U} \) are rate constants, \( C_{A} \) and \( C_{B} \) are the concentrations of \( A \) and \( B \), \( A_{D} \) and \( A_{U} \) are pre-exponential factors, \( E_{D}^{A} \) and \( E_{U}^{A} \) are activation energies, \( R \) is the ideal gas constant, and \( T \) is temperature. <br><br>
-
-							The reactant and product concentrations and selectivity are:
-
-							$$
-							C_{A} = N_{A}/V,
-							$$
-
-							$$
-							C_{B} = N_{B}/V,
-							$$
-
-							$$
-							C_{D} = N_{D}/V,
-							$$
-
-							$$
-							C_{U} = N_{U}/V,
-							$$
-
-							$$
-							S_{D/U} = N_{D}/N_{U},
-							$$
-
-							where \( N_{A} \), \( N_{B} \), \( N_{D} \), and \( N_{U} \) are moles of the component in the reactor, \( C_{D} \) and \( C_{U} \) are concentrations of \( D \) and \( U \), \( V \) is volume, which changes with time, and \( S_{D/U} \) is the selectivity of the desired product.<br><br>
-
-							Material balances for system where \( A \) is fed into pure \( B \):
-
-							$$
-							\frac{d N_{A}}{dt} =  
-								\begin{cases} 
-									F_{A, 0} - r_{D} V - r_{U} V, & t\leq 10 \textrm{ min} \\
-									- r_{D} V - r_{U} V, & t\gt 10 \textrm{ min} \\
-								\end{cases}
-							$$
-
-							$$
-							\frac{d N_{B}}{dt} = -r_{D} V - r_{U} V
-							$$
-
-							$$
-							\frac{d N_{D}}{dt} = r_{D} V
-							$$
-
-							$$
-							\frac{d N_{U}}{dt} = r_{U} V
-							$$
-
-							$$
-							\frac{d V}{dt} = v_{0}
-							$$
-
-							where \( F_{A,0} \) is the inlet molar flow rate of \( A \), \( v_{0} \) is the inlet volumetric flow rate, and \( t \) is time.<br><br>
-
-							Mole balance for the system where \( B \) is fed into pure \( A \):
-
-							Only \( \frac{d N_{A}}{dt} \) and \( \frac{d N_{B}}{dt} \) differ from above balance:
-
-							$$
-							\frac{d N_{A}}{dt} = - r_{D} V - r_{U} V
-							$$
-
-							$$
-							\frac{d N_{B}}{dt} =  
-								\begin{cases} 
-									F_{B, 0} - r_{D} V - r_{U} V, & t\leq 10 \textrm{ min} \\
-									- r_{D} V - r_{U} V, & t\gt 10 \textrm{ min} \\
-								\end{cases}
-							$$
-
-							where \( F_{B,0} \) is the inlet molar flow rate of \( B \).
-
-							The screencast video at [1] shows how to use this Demonstration.<br><br>
-
-							Reference<br>
-
-							[1] Selectivity in a Semibatch Reactor. <a href="https://sites.google.com/a/learncheme.com/learncheme/simulations/kinetics-reactor-design/selectivity-in-a-semibatch-reactor" target="_blank">http://www.learncheme.com/simulations/kinetics-reactor-design/selectivity-in-a-semibatch-reactor</a>
-
-						</p>
-					</div>
-				</div>
-
-				<div id="modalAbout" class="modal-content" style="display:none;">
-					<div id="about-content">
-						<span class="close">&times;</span>
-						<p style="line-height: 1.5rem;">
-							This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/SelectivityInASemibatchReactor/" target="_blank">simulation by Rachael L. Baumann and Nick Bongiardina</a>. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.</p>
-						<p style="line-height: 3rem;">
-							If this simulation is too big for your screen, zoom out using&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Windows.
-						</p>
-					</div>
-				</div>
-			</div>
+			
 			<div id="title">
 				Loading . . .
 			</div>
 			<div id="plotContainer"></div>
 		</div>
+
+		<div class="modal">
+			<div id="modalDirections" class="modal-content" style="visibility:hidden;">
+				<div id="directions-content">
+					<span class="close">&times;</span>
+					<p class="popup paragraph">
+						The parallel reactions \( \mathrm{ A + B \mathrel{\stackrel{k_{D}}{\rightarrow}} D } \) and  \( \mathrm{ A + B \mathrel{\stackrel{k_{U}}{\rightarrow}} U } \) are carried out in an isothermal semibatch reactor. Both reactions are first-order in \( A \). The desired reaction to form the product \( D \) is second-order in \( B \), whereas the undesired reaction to form product \( U \) is first-order in \( B \). Both reactions are irreversible and are not elementary. This simulation compares two scenarios:<br><br>
+						
+						(1) pure \( A \) is fed to a reactor that initially contains only \( B \), and<br>
+						(2) pure \( B \) is fed to a reactor that initially contains only \( A \).<br><br>
+						
+						The overall selectivity (the number of moles of \( D \) in the reactor divided by the number of moles of \( U \) in the reactor \( \left( N_{D} / N_{U} \right) \), is much higher when all the \( B \) is initially in the reactor and \( A \) is fed to the reactor. This scenario keeps the concentration of \( B \) high, which favors the desired reaction, which is second-order in \( B \). For either scenario, the addition of the second reactant stops after 10 minutes, when the amount of the reactant added equals the amount of the other reactant initially in the reactor. Use sliders to vary the activation energy of each reaction and the isothermal reactor temperature to determine how selectivity and moles of products and reactants change with time. The amounts of both products increase with temperature because the reactions are irreversible.
+					</p>
+				</div>
+			</div>
+
+			<div id="modalDetails" class="modal-content" style="visibility:hidden;">
+				<div id="details-content">
+					<span class="close">&times;</span>
+					<p class="popup paragraph"> 
+						The rate laws for the reactions are:
+						$$
+						r_{D} = k_{D} C_{A} C_{B}^{2}
+						$$
+
+						$$
+						r_{U} = k_{U} C_{A} C_{B}
+						$$
+
+						$$
+						k_{D} = A_{D} e^{-E_{D}^{A}/R T}
+						$$
+
+						$$
+						k_{U} = A_{U} e^{-E_{U}^{A}/R T}
+						$$
+
+						where the subscripts \( D \) and \( U \) refer to the desired and undesired reactions, \( r_{D} \) and \( r_{U} \) are rates of reaction, \( k_{D} \) and \( k_{U} \) are rate constants, \( C_{A} \) and \( C_{B} \) are the concentrations of \( A \) and \( B \), \( A_{D} \) and \( A_{U} \) are pre-exponential factors, \( E_{D}^{A} \) and \( E_{U}^{A} \) are activation energies, \( R \) is the ideal gas constant, and \( T \) is temperature. <br><br>
+
+						The reactant and product concentrations and selectivity are:
+
+						$$
+						C_{A} = N_{A}/V,
+						$$
+
+						$$
+						C_{B} = N_{B}/V,
+						$$
+
+						$$
+						C_{D} = N_{D}/V,
+						$$
+
+						$$
+						C_{U} = N_{U}/V,
+						$$
+
+						$$
+						S_{D/U} = N_{D}/N_{U},
+						$$
+
+						where \( N_{A} \), \( N_{B} \), \( N_{D} \), and \( N_{U} \) are moles of the component in the reactor, \( C_{D} \) and \( C_{U} \) are concentrations of \( D \) and \( U \), \( V \) is volume, which changes with time, and \( S_{D/U} \) is the selectivity of the desired product.<br><br>
+
+						Material balances for system where \( A \) is fed into pure \( B \):
+
+						$$
+						\frac{d N_{A}}{dt} =  
+							\begin{cases} 
+								F_{A, 0} - r_{D} V - r_{U} V, & t\leq 10 \textrm{ min} \\
+								- r_{D} V - r_{U} V, & t\gt 10 \textrm{ min} \\
+							\end{cases}
+						$$
+
+						$$
+						\frac{d N_{B}}{dt} = -r_{D} V - r_{U} V
+						$$
+
+						$$
+						\frac{d N_{D}}{dt} = r_{D} V
+						$$
+
+						$$
+						\frac{d N_{U}}{dt} = r_{U} V
+						$$
+
+						$$
+						\frac{d V}{dt} = v_{0}
+						$$
+
+						where \( F_{A,0} \) is the inlet molar flow rate of \( A \), \( v_{0} \) is the inlet volumetric flow rate, and \( t \) is time.<br><br>
+
+						Mole balance for the system where \( B \) is fed into pure \( A \):
+
+						Only \( \frac{d N_{A}}{dt} \) and \( \frac{d N_{B}}{dt} \) differ from above balance:
+
+						$$
+						\frac{d N_{A}}{dt} = - r_{D} V - r_{U} V
+						$$
+
+						$$
+						\frac{d N_{B}}{dt} =  
+							\begin{cases} 
+								F_{B, 0} - r_{D} V - r_{U} V, & t\leq 10 \textrm{ min} \\
+								- r_{D} V - r_{U} V, & t\gt 10 \textrm{ min} \\
+							\end{cases}
+						$$
+
+						where \( F_{B,0} \) is the inlet molar flow rate of \( B \).
+
+						The screencast video at [1] shows how to use this Demonstration.<br><br>
+
+						Reference<br>
+
+						[1] Selectivity in a Semibatch Reactor. <a href="https://sites.google.com/a/learncheme.com/learncheme/simulations/kinetics-reactor-design/selectivity-in-a-semibatch-reactor" target="_blank">http://www.learncheme.com/simulations/kinetics-reactor-design/selectivity-in-a-semibatch-reactor</a>
+
+					</p>
+				</div>
+			</div>
+
+			<div id="modalAbout" class="modal-content" style="visibility:hidden;">
+				<div id="about-content">
+					<span class="close">&times;</span>
+					<p style="line-height: 1.5rem;">
+						This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/SelectivityInASemibatchReactor/" target="_blank">simulation by Rachael L. Baumann and Nick Bongiardina</a>. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.</p>
+					<p style="line-height: 3rem;">
+						If this simulation is too big for your screen, zoom out using&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Windows.
+					</p>
+				</div>
+			</div>
+		</div>
+
 		<script type="text/javascript" src="modals.min.js"></script>
 	</body>
 </html>
