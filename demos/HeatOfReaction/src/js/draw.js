@@ -103,7 +103,8 @@ function drawAxes() {
         p.textAlign(p.CENTER, p.BOTTOM);
         
         p.text("standard enthalpy H° (kJ/mol)", (gPix[0][1] - gPix[0][0] + margins[0][0]) / 2 + 50, gPix[1][1] + 3 * margins[1][1] / 4);
-        p.text("temperature (°C)", gPix[0][0] - 10, gPix[1][0] - 20);
+        p.rotate(-Math.PI/2);
+        p.text("temperature (°C)", gPix[0][0] - 280, gPix[1][0] - 10);
 
     p.pop();
 }

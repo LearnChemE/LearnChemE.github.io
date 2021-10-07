@@ -119,7 +119,7 @@ function changeReaction(rxn) {
             gvs.yRange = [0, 2100];
 
             tSlider.setAttribute("min", "25");
-            tSlider.setAttribute("max", "5500");
+            tSlider.setAttribute("max", "2000");
             tSlider.setAttribute("step", "5");
 
             gvs.T = gvs.p.constrain(gvs.T - 273.15, 30, 5500) + 273.15;
