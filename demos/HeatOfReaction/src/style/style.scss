@@ -1,12 +1,24 @@
 @import "bootstrap";
 @import "./slider.scss";
 
+.simulation-controls {
+  display: grid;
+  grid-template-columns: 430px 220px;
+  justify-content: center;
+  gap: 30px;
+  width: 100vw;
+}
+
 .modal-buttons-row {
   display: grid;
-  grid-template-columns: repeat(3, 12ch );
-  gap: 30px;
+  grid-template-columns: repeat(2, 12ch );
+  gap: 10px;
   margin: 0.5rem auto;
   justify-content: center;
+  align-content: center;
+  .btn {
+    height: max-content;
+  }
 }
 
 .input-area {
@@ -17,12 +29,16 @@
 
   .input-row {
     display: grid;
-    grid-template-columns: 100px 15rem max-content max-content;
+    grid-template-columns: 80px 15rem 30px 3ch;
     gap: 1ch;
     align-items: end;
   
     .data-name {
       justify-self: end;
+    }
+
+    .data-value {
+      text-align: end;
     }
 
     #t-value {
@@ -96,8 +112,8 @@ canvas {
 .simulation-title {
   width: 100vw;
   text-align: center;
-  padding: 5px;
-  margin-bottom: 5px;
+  padding: 8px;
+  padding-bottom: 10px;
   font-size: 1.25rem;
-  background-color: lightgrey;
+  background-color: rgb(240, 240, 240);
 }

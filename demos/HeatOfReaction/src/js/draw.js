@@ -18,7 +18,7 @@ function drawAxes() {
         break;
         case "carbon monoxide oxidation":
             incX = 30;
-            incY = 160;
+            incY = 80;
         break;
         case "haber bosch process":
             incX = 15;
@@ -54,7 +54,7 @@ function drawAxes() {
             if ( i % 5 === 0 ) {
                 p.noStroke();
                 p.fill(0);
-                p.textSize(14);
+                p.textSize(16);
                 const offsetX = p.textWidth(`${x}`) / 2;
                 p.text(`${x}`, xPix - offsetX, yPix + offsetY);
             }
@@ -90,7 +90,7 @@ function drawAxes() {
             if ( i % 5 === 0 && i !== 0 ) {
                 p.noStroke();
                 p.fill(0);
-                p.textSize(14);
+                p.textSize(16);
                 const offsetX = p.textWidth(`${y}`) + 10;
                 p.text(`${y}`, xPix - offsetX, yPix + offsetY);
             }

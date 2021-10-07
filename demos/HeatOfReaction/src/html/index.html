@@ -21,38 +21,41 @@
 
 <body>
   <div class="simulation-title">Heat of Reaction Temperature Dependence</div>
-  <div class="modal-buttons-row">
-    <div id="dir" class="btn btn-primary" data-toggle="modal" data-target="#directions-modal">Directions</div>
-    <div id="dir" class="btn btn-primary" data-toggle="modal" data-target="#details-modal">Details</div>
-    <div id="dir" class="btn btn-primary" data-toggle="modal" data-target="#about-modal">About</div>
-  </div>
 
-  <div class="input-area">
+  <div class="simulation-controls">
+    <div class="input-area">
 
-    <div class="input-select">
-      <div class="select-label">Reaction</div>
-      <select id="select-reaction">
-        <option value="1" selected>Acetylene hydrogenation</option>
-        <!-- <option value="2">Methane combustion</option> -->
-        <option value="3">Carbon monoxide oxidation</option>
-        <option value="4">Haber–Bosch process</option>
-      </select>
+      <div class="input-select">
+        <div class="select-label">Reaction</div>
+        <select id="select-reaction">
+          <option value="1" selected>Acetylene hydrogenation</option>
+          <!-- <option value="2">Methane combustion</option> -->
+          <option value="3">Carbon monoxide oxidation</option>
+          <option value="4">Haber–Bosch process</option>
+        </select>
+      </div>
+  
+      <div class="input-row">
+        <div class="data-name">Temperature&nbsp;</div>
+        <input type="range" id="t-slider" min="25" max="5000" step="1" value="150">
+        <div class="data-value" id="t-value">150</div>
+        <div class="data-metric">&deg; C</div>
+      </div>
+  
+      <div class="input-row" style="display:none;">
+        <div class="data-name">Reaction coordinate&nbsp;</div>
+        <input type="range" id="x-slider" min="0" max="1" step="0.01" value="0">
+        <div class="data-value" id="x-value">0.00</div>
+        <div class="data-metric"></div>
+      </div>
+  
     </div>
 
-    <div class="input-row">
-      <div class="data-name">Temperature&nbsp;</div>
-      <input type="range" id="t-slider" min="25" max="5000" step="1" value="150">
-      <div class="data-value" id="t-value">150</div>
-      <div class="data-metric">&deg; C</div>
+    <div class="modal-buttons-row">
+      <div id="directions-button" class="btn btn-primary" data-toggle="modal" data-target="#directions-modal">Directions</div>
+      <div id="details-button" class="btn btn-primary" data-toggle="modal" data-target="#details-modal">Details</div>
+      <div id="about-button" class="btn btn-primary" data-toggle="modal" data-target="#about-modal">About</div>
     </div>
-
-    <div class="input-row" style="display:none;">
-      <div class="data-name">Reaction coordinate&nbsp;</div>
-      <input type="range" id="x-slider" min="0" max="1" step="0.01" value="0">
-      <div class="data-value" id="x-value">0.00</div>
-      <div class="data-metric"></div>
-    </div>
-
   </div>
 
   <div id="reaction-container">
