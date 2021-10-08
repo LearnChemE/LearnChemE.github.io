@@ -18,6 +18,17 @@
   </script>
   <script type="text/javascript" id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6BN75500E9"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'G-6BN75500E9');
+  </script>
 </head>
 
 <body>
@@ -58,7 +69,7 @@
     </div>
 
     <div class="input-block slider hidden" id="angle-block">
-    <!-- <div class="input-block slider" id="angle-block"> -->
+      <!-- <div class="input-block slider" id="angle-block"> -->
       <div class="data-name">angle \( \theta \)</div>
       <input type="range" id="angle-slider" min="10" max="45" step="0.1" value="35">
       <div class="data-value" id="angle-value">35.0</div>
@@ -75,7 +86,8 @@
     <p style="font-size:0.9rem;">
 
     </p>
-    <button id="reset-camera" class="btn btn-sm btn-success" title="Click the directions button to learn how to use the camera">Reset camera</button>
+    <button id="reset-camera" class="btn btn-sm btn-success"
+      title="Click the directions button to learn how to use the camera">Reset camera</button>
   </div>
 
   <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
@@ -90,7 +102,14 @@
         </div>
         <div class="modal-body">
           <p>
-            In this simulation, the pressure of a fluid is measured using a piezometer, a U-tube manometer and an inclined-tube manometer. Use the selector buttons to choose the type of manometer and the manometer fluid (water, oil or mercury). Change the fluid pressure and the angle of the inclined manometer with the sliders. Move the camera along the x and z axes by dragging the image while holding the left mouse button. Rotate the camera by dragging the image while holding the right mouse button. Zoom in and out with the scroll wheel. Pan vertically by dragging the image while holding the center mouse button/scroll wheel button. Reset the camera to its default position by pressing the "Reset camera" button. On the inclined manometer, lengths may not appear exactly to-scale.
+            In this simulation, the pressure of a fluid is measured using a piezometer, a U-tube manometer and an
+            inclined-tube manometer. Use the selector buttons to choose the type of manometer and the manometer fluid
+            (water, oil or mercury). Change the fluid pressure and the angle of the inclined manometer with the sliders.
+            Move the camera along the x and z axes by dragging the image while holding the left mouse button. Rotate the
+            camera by dragging the image while holding the right mouse button. Zoom in and out with the scroll wheel.
+            Pan vertically by dragging the image while holding the center mouse button/scroll wheel button. Reset the
+            camera to its default position by pressing the "Reset camera" button. On the inclined manometer, lengths may
+            not appear exactly to-scale.
           </p>
 
         </div>
@@ -113,19 +132,22 @@
         <div class="modal-body">
 
           <p>
-            A piezometer consists of a vertical tube open to atmospheric pressure at one end. A force balance determines the height of the fluid:
+            A piezometer consists of a vertical tube open to atmospheric pressure at one end. A force balance determines
+            the height of the fluid:
           </p>
 
           $$
-            P_{f} = P_{atm} + \gamma_{f} h
+          P_{f} = P_{atm} + \gamma_{f} h
           $$
 
           <p>
-            where \( P_{f} \) is the absolute pressure of the fluid, \( P_{atm} \) is atmospheric pressure (101.3 kPa), \( \gamma_{f} \) is specific weight of the fluid, and \( h \) the height of fluid in the piezometer. Specific weight is:
+            where \( P_{f} \) is the absolute pressure of the fluid, \( P_{atm} \) is atmospheric pressure (101.3 kPa),
+            \( \gamma_{f} \) is specific weight of the fluid, and \( h \) the height of fluid in the piezometer.
+            Specific weight is:
           </p>
 
           $$
-            \gamma_{f} = \rho_{f} g
+          \gamma_{f} = \rho_{f} g
           $$
 
           <p>
@@ -133,11 +155,14 @@
           </p>
 
           <p>
-            Unlike the piezometer, a U-tube manometer has two components: the fluid being measured and the manometer fluid, which is typically a dense, non-volatile liquid like mercury. A U-tube manometer can measure the pressure of a gas or a liquid, whereas a piezometer can only measure liquid pressure, because gas would escape the manometer. For a U-tube manometer:
+            Unlike the piezometer, a U-tube manometer has two components: the fluid being measured and the manometer
+            fluid, which is typically a dense, non-volatile liquid like mercury. A U-tube manometer can measure the
+            pressure of a gas or a liquid, whereas a piezometer can only measure liquid pressure, because gas would
+            escape the manometer. For a U-tube manometer:
           </p>
 
           $$
-            P_{f} + \gamma_{f} h = P_{atm} + \gamma_{m} h
+          P_{f} + \gamma_{f} h = P_{atm} + \gamma_{m} h
           $$
 
           <p>
@@ -145,15 +170,16 @@
           </p>
 
           $$
-            P_{g} = h \left( \gamma_{m} - \gamma_{f} \right)
+          P_{g} = h \left( \gamma_{m} - \gamma_{f} \right)
           $$
 
           <p>
-            Where \( P_{g} \) is gauge pressure. For measurements of gas pressure, \( \gamma_{f} ≪ \gamma_{m} \), so gauge pressure is
+            Where \( P_{g} \) is gauge pressure. For measurements of gas pressure, \( \gamma_{f} ≪ \gamma_{m} \), so
+            gauge pressure is
           </p>
-          
+
           $$
-            P_{g} = \gamma_{m} h
+          P_{g} = \gamma_{m} h
           $$
 
           <p>
@@ -161,24 +187,31 @@
           </p>
 
           $$
-            h = L \; \mathrm{sin} \theta
+          h = L \; \mathrm{sin} \theta
           $$
 
           <p>
-            where \( L \) is the length of manometer fluid and \( \theta \) is the angle of the manometer tube relative to the horizontal. An inclined-tube manometer is used because it provides more precise measurements than an otherwise identical U-tube manometer.
+            where \( L \) is the length of manometer fluid and \( \theta \) is the angle of the manometer tube relative
+            to the horizontal. An inclined-tube manometer is used because it provides more precise measurements than an
+            otherwise identical U-tube manometer.
           </p>
 
           <p><br>References:</p>
 
           <ol class="references">
             <li>
-              B. R. Munson, T. H. Okiishi and W. W. Huebsch, <i>Fundamentals of Fluid Mechanics</i>, 6th ed., Hoboken, NJ: John Wiley & Sons, 2009.
+              B. R. Munson, T. H. Okiishi and W. W. Huebsch, <i>Fundamentals of Fluid Mechanics</i>, 6th ed., Hoboken,
+              NJ: John Wiley & Sons, 2009.
             </li>
             <li>
-              Cal Poly Pomona. <i>Force Balance on Inclined Manometer</i> [Video]. (Mar 28, 2017) <a href="https://www.youtube.com/watch?v=wHGUJTSMjOo&t=468s" target="_blank">www.youtube.com/watch?v=wHGUJTSMjOo&t=468s</a>.
+              Cal Poly Pomona. <i>Force Balance on Inclined Manometer</i> [Video]. (Mar 28, 2017) <a
+                href="https://www.youtube.com/watch?v=wHGUJTSMjOo&t=468s"
+                target="_blank">www.youtube.com/watch?v=wHGUJTSMjOo&t=468s</a>.
             </li>
             <li>
-              University of Colorado Boulder. <i>Manometer Example</i> [Video]. (Mar 28, 2017) <a href="https://www.youtube.com/watch?v=Q1opScBlMkA" target="_blank">www.youtube.com/watch?v=Q1opScBlMkA</a>.
+              University of Colorado Boulder. <i>Manometer Example</i> [Video]. (Mar 28, 2017) <a
+                href="https://www.youtube.com/watch?v=Q1opScBlMkA"
+                target="_blank">www.youtube.com/watch?v=Q1opScBlMkA</a>.
             </li>
           </ol>
           <div style="margin-top: 2rem;"></div>
@@ -200,9 +233,25 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. It is a JavaScript/HTML5 implementation of a simulation by Rachael L. Baumann<sup>1</sup>. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.</p>
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of
+            Professor John L. Falconer. It is a JavaScript/HTML5 implementation of a simulation by Rachael L.
+            Baumann<sup>1</sup>. Address any questions or comments to learncheme@gmail.com. All of our simulations are
+            open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/"
+              target="_blank">LearnChemE Github repository</a>.</p>
           <p style="line-height: 3rem;">
-            If this simulation is too big for your screen, zoom out using&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Windows.
+            If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows.
           </p>
 
           <p>
@@ -211,8 +260,9 @@
 
           <ol class="references">
             <li>
-              Baumann, R.L. (2017). <a href="https://demonstrations.wolfram.com/Manometers/" target="_blank">Manometers</a>. A <a
-                href="https://demonstrations.wolfram.com">Wolfram Demonstrations</a> Project.
+              Baumann, R.L. (2017). <a href="https://demonstrations.wolfram.com/Manometers/"
+                target="_blank">Manometers</a>. A <a href="https://demonstrations.wolfram.com">Wolfram
+                Demonstrations</a> Project.
             </li>
           </ol>
 

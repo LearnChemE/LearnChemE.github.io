@@ -1,6 +1,7 @@
 <!doctype html>
 
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta http-equiv="content-language" content="en">
@@ -15,7 +16,19 @@
       }
     };
   </script>
-  <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6BN75500E9"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'G-6BN75500E9');
+  </script>
 </head>
 
 <body>
@@ -59,7 +72,10 @@
         </div>
         <div class="modal-body">
           <p>
-            This demonstrates laminar flow of a viscous fluid between two plates. The plot shows fluid velocity as a function of vertical distance. Velocity is proportional to the length of the arrows. The lower plate is stationary and the upper plate is either stationary or moves to the right; its velocity is set using the slider. The pressure gradient is also set with a slider.
+            This demonstrates laminar flow of a viscous fluid between two plates. The plot shows fluid velocity as a
+            function of vertical distance. Velocity is proportional to the length of the arrows. The lower plate is
+            stationary and the upper plate is either stationary or moves to the right; its velocity is set using the
+            slider. The pressure gradient is also set with a slider.
           </p>
 
         </div>
@@ -82,34 +98,39 @@
         <div class="modal-body">
 
           <p>
-            For steady-state, laminar flow of an incompressible viscous fluid between parallel plates, the ordinary differential equation (ODE) describing fluid velocity is
+            For steady-state, laminar flow of an incompressible viscous fluid between parallel plates, the ordinary
+            differential equation (ODE) describing fluid velocity is
           </p>
 
           <p class="p-eqn" style="font-size: 1.2rem;">
-          \(
+            \(
             \frac{ d^{ 2 } u }{ d y^{ 2 } } = \frac{ 1 }{ \mu } \frac{ dp }{ dx }
-          \)
+            \)
           </p>
 
           <p>
-            where \( u \) is fluid velocity, \( y \) is distance from the center line, \( \mu \) is dynamic viscosity of the fluid, and \( \frac{ dp }{ dx } \) is the pressure gradient along the x-axis. The boundary conditions are
+            where \( u \) is fluid velocity, \( y \) is distance from the center line, \( \mu \) is dynamic viscosity of
+            the fluid, and \( \frac{ dp }{ dx } \) is the pressure gradient along the x-axis. The boundary conditions
+            are
           </p>
-          
+
           <p class="p-eqn">
             \( u \left( \mathop{\mbox{-$h$}} \right) = 0 \; \; \) (lower plate velocity)
           </p>
-          
+
           <p class="p-eqn">
             \( u \left( h \right) = U_{ 0 } \; \; \) (upper plate velocity)
           </p>
 
           <p>
-            where \( 2h \) is the distance between the plates and \( U_{ 0 } \) is the velocity of the top plate. An analytical solution for this ODE is:
+            where \( 2h \) is the distance between the plates and \( U_{ 0 } \) is the velocity of the top plate. An
+            analytical solution for this ODE is:
           </p>
 
           <p class="p-eqn" style="font-size: 1.05rem;">
             \(
-            u \left( y \right) = \frac{ U_{ 0 } }{ 2 } \left( 1 + \frac{ y }{ h } \right) - \frac{ dp }{ dx } \frac{ h^{ 2 } }{ 2 \mu } \left( 1 - \left( \frac{ y }{ h } \right)^{ 2 } \right)
+            u \left( y \right) = \frac{ U_{ 0 } }{ 2 } \left( 1 + \frac{ y }{ h } \right) - \frac{ dp }{ dx } \frac{ h^{
+            2 } }{ 2 \mu } \left( 1 - \left( \frac{ y }{ h } \right)^{ 2 } \right)
             \)
           </p>
 
@@ -132,11 +153,27 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. It is an HTML5/JavaScript implementation of the Wolfram Demonstration created by W.C. Guttner<sup>1</sup>. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of
+            Professor John L. Falconer. It is an HTML5/JavaScript implementation of the Wolfram Demonstration created by
+            W.C. Guttner<sup>1</sup>. Address any questions or comments to learncheme@gmail.com. All of our simulations
+            are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/"
+              target="_blank">LearnChemE Github repository</a>.
           </p>
 
           <p style="line-height: 3rem;">
-            If this simulation is too big for your screen, zoom out using&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Windows.
+            If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows.
           </p>
 
           <p>
@@ -145,7 +182,8 @@
 
           <ol class="references">
             <li>
-              Guttner, W.C. (2011).  <a href="https://demonstrations.wolfram.com/CouetteFlow/">Couette Flow</a>. A <a href="https://demonstrations.wolfram.com">Wolfram Demonstrations</a> Project.
+              Guttner, W.C. (2011). <a href="https://demonstrations.wolfram.com/CouetteFlow/">Couette Flow</a>. A <a
+                href="https://demonstrations.wolfram.com">Wolfram Demonstrations</a> Project.
             </li>
           </ol>
 

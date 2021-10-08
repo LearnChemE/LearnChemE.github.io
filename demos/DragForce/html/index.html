@@ -23,9 +23,20 @@
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6BN75500E9"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'G-6BN75500E9');
+  </script>
 </head>
 
-<body onload = "loadAxes()">
+<body onload="loadAxes()">
 
   <div id="app">
 
@@ -41,13 +52,13 @@
         <div id="other-buttons">
           <div id="start-pause-button" class="btn btn-success">Start</div>
           <div id="reset-button" class="btn btn-danger">Reset</div>
-         
+
         </div>
       </div>
 
       <div id="bottom-controls-row">
-                
-        <div id="variables-stack" >
+
+        <div id="variables-stack">
 
           <div class="data-area" id="input-variables">
 
@@ -58,7 +69,7 @@
               <div class="data-value" id="cdValue">0.50</div>
               <div class="data-metric"></div>
             </div>
-            
+
             <div class="input-row">
               <div class="data-name">Mass</div>
               <!-- The slider is the natural logarithm of the value, so the initial value must be ln(0.41) -->
@@ -66,7 +77,7 @@
               <div class="data-value" id="massValue">0.41</div>
               <div class="data-metric">kg</div>
             </div>
-    
+
             <div class="input-row">
               <div class="data-name">Cross-Sectional Area</div>
               <!-- The slider is the natural logarithm of the value, so the initial value must be ln(0.15) -->
@@ -78,7 +89,7 @@
 
             <div class="select-row">
               <div>Object</div>
-              <select id="object-selection"  style="width: 130px; font-size: 13px;">
+              <select id="object-selection" style="width: 130px; font-size: 13px;">
                 <option value="1">Soccer ball</option>
                 <option value="2">Parachutist</option>
                 <option value="3">Skydiver</option>
@@ -95,66 +106,67 @@
             <div class="data-value" id="GForce">0</div>
             <div class="data-metric">N</div>
           </div>
-          
+
           <div class="data-row">
             <div class="data-name">Drag Force = </div>
             <div class="data-value" id="HDrag">0</div>
             <div class="data-metric">N</div>
           </div>
-  
+
           <div class="data-row">
             <div class="data-name">Velocity = </div>
             <div class="data-value" id="HVelocity">0</div>
             <div class="data-metric">m/s</div>
           </div>
-  
+
           <div class="data-row">
             <div class="data-name">Height = </div>
             <div class="data-value" id="HHeight">0</div>
             <div class="data-metric">m</div>
           </div>
-  
+
           <div class="data-row">
             <div class="data-name">Acceleration = </div>
             <div class="data-value" id="HAcceleration">0</div>
             <div class="data-metric">(m/s<sup>2</sup>)</div>
           </div>
-  
-          
-  
+
+
+
         </div>
 
       </div>
 
     </div>
-       
+
     <div id="image-area">
-  
+
       <div id="object-fall-area">
         <img src="../img/ball.png" id="objImage" />
         <img src="../img/monument1.png" id="structureImage" />
-        
+
         <!-- <div class = "speed-row" id = "speedControl">
           <div class="data-name">Play speed: </div>
           <input type="text" class=" data-value" id="playspeed" value="1">
         </div > -->
         <div class="slidecontainer">
-          <div>Animation speed: <span id = "speed-display">1</span></div> 
+          <div>Animation speed: <span id="speed-display">1</span></div>
           <input type="range" min="0.1" max="4" step="0.1" value="1" class="slider" id="slider">
         </div>
       </div>
-  
+
       <div id="plot">
       </div>
 
-      
-    
+
+
     </div>
 
   </div>
 
   <!-- Modals -->
-  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel" aria-hidden="true">
+  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -172,43 +184,55 @@
           <!-- \( \frac{1}{2} \) -->
 
           <!-- Use the "Word wrap (Alt+Z) feature in VS Code to wrap text, rather than adding line breaks to the code.  This makes it easier to edit text, because you don't have to continually adjust the location of line breaks." -->
-           <p>
-            This simulation calculates the velocity of a falling object versus time. One of three preset objects or a "Custom" object can be selected from the dropdown menu. The drag coefficient, mass, and cross-sectional area are displayed above the drop-down menu. When "Custom" is selected from the drop-down menu, you can adjust the drag coefficient, mass, and cross-sectional area by moving the corresponding sliders. To adjust animation speed, use the "Animation speed" slider below the image. "Animation speed" is equivalent to a "fast forward/slow motion slider", in that it does not change simulation outcome. The velocity is plotted versus time, and the animation continues until the object hits the ground or the skydiver has dropped 1500 m. For all objects except the skydiver, height refers to distance above the ground. For the skydiver, height refers to the distance below the jump point. Press the Details button to examine the governing equations used in this simulation.
+          <p>
+            This simulation calculates the velocity of a falling object versus time. One of three preset objects or a
+            "Custom" object can be selected from the dropdown menu. The drag coefficient, mass, and cross-sectional area
+            are displayed above the drop-down menu. When "Custom" is selected from the drop-down menu, you can adjust
+            the drag coefficient, mass, and cross-sectional area by moving the corresponding sliders. To adjust
+            animation speed, use the "Animation speed" slider below the image. "Animation speed" is equivalent to a
+            "fast forward/slow motion slider", in that it does not change simulation outcome. The velocity is plotted
+            versus time, and the animation continues until the object hits the ground or the skydiver has dropped 1500
+            m. For all objects except the skydiver, height refers to distance above the ground. For the skydiver, height
+            refers to the distance below the jump point. Press the Details button to examine the governing equations
+            used in this simulation.
           </p>
-              
-           
-           
+
+
+
 
         </div>
       </div>
     </div>
   </div>
 
-  <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+  <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
-        
+
         <div class="modal-header">
           <h5 class="modal-title" id="detailsModalLabel">Details</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        
+
         <div class="modal-body">
-          
+
           <div class="modal-text">
             The equation for drag force is:
           </div>
-          
+
           <div class="modal-equation">
             $$
             F_D = \frac{C_D \rho_{air} V^2 A}{2}
             $$
           </div>
-          
+
           <div class="modal-text">
-            Where \( C_D \) is the drag coefficient, \( \rho_{air} \) is the density of air ( 1.23 kg/m<sup>3</sup> ), \( A \) is the cross-sectional area of the object, and \( V \) is its velocity. The following system of ordinary differential equations describes the velocity ( \( V \) ) and height ( \( Y \) ):
+            Where \( C_D \) is the drag coefficient, \( \rho_{air} \) is the density of air ( 1.23 kg/m<sup>3</sup> ),
+            \( A \) is the cross-sectional area of the object, and \( V \) is its velocity. The following system of
+            ordinary differential equations describes the velocity ( \( V \) ) and height ( \( Y \) ):
           </div>
 
           <div class="modal-equation no-padding">
@@ -216,7 +240,7 @@
             \frac{ dY }{ dt } = - V
             $$
           </div>
-          
+
           <div class="modal-equation no-padding">
             $$
             \frac{ dV }{ dt } = g - \frac{ F_{D} }{ m }
@@ -234,25 +258,30 @@
             V(0) = 0
             $$
           </div>
-          
+
           <div class="modal-text">
-            where \( m \) is the object's mass, \( g \) is gravitational acceleration (9.81 m/s<sup>2</sup>), \( t \) is time, and \( Y_{0} \) is the initial height of the object. In this simulation, velocity and height were calculated using Euler's Method of numerical integration, but an analytical solution exists to find velocity \( V(t) \) and height \( Y(t) \) as functions of time:
+            where \( m \) is the object's mass, \( g \) is gravitational acceleration (9.81 m/s<sup>2</sup>), \( t \) is
+            time, and \( Y_{0} \) is the initial height of the object. In this simulation, velocity and height were
+            calculated using Euler's Method of numerical integration, but an analytical solution exists to find velocity
+            \( V(t) \) and height \( Y(t) \) as functions of time:
           </div>
-          
+
           <div class="modal-equation">
             $$
-            V(t) = \mathrm{ tanh } \left[ \left( \alpha g \right)^{ \frac{1}{2} } t \right] \sqrt{ \frac{ g }{ \alpha } }
+            V(t) = \mathrm{ tanh } \left[ \left( \alpha g \right)^{ \frac{1}{2} } t \right] \sqrt{ \frac{ g }{ \alpha }
+            }
             $$
 
           </div>
-          
+
           <div class="modal-equation">
             $$
-            Y(t) = Y_0 - \frac{ \mathrm{ ln } \left[ \mathrm{ cosh } \left( g^{ \frac{1}{2} } t \right) \right] }{ \alpha }
+            Y(t) = Y_0 - \frac{ \mathrm{ ln } \left[ \mathrm{ cosh } \left( g^{ \frac{1}{2} } t \right) \right] }{
+            \alpha }
             $$
 
           </div>
-         
+
           <div class="modal-text">
             where
           </div>
@@ -264,17 +293,21 @@
           </div>
 
           <div class="modal-text">
-            A FIFA standard soccer ball has a circumference of 0.69 &#x00B1; 0.01 m and mass of 0.43 &#x00B1; 0.02 kg. The parachutist (without the parachute) was assumed to weigh 75 kg. The parachute used for reference is a <a href="http://www.paragear.com/skydiving/10000220/C88/PRECISION-AERODYNAMICS-FALCON-MAIN-PARACHUTE">Falcon 265</a> parachute, which 
+            A FIFA standard soccer ball has a circumference of 0.69 &#x00B1; 0.01 m and mass of 0.43 &#x00B1; 0.02 kg.
+            The parachutist (without the parachute) was assumed to weigh 75 kg. The parachute used for reference is a <a
+              href="http://www.paragear.com/skydiving/10000220/C88/PRECISION-AERODYNAMICS-FALCON-MAIN-PARACHUTE">Falcon
+              265</a> parachute, which
             has an area of 24.6 m<sup>2</sup> and mass of 5 kg.
           </div>
-        
+
         </div>
 
       </div>
     </div>
   </div>
 
-  <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel" aria-hidden="true">
+  <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -285,23 +318,45 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.</p>
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of
+            Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our
+            simulations are open source, and are available on our <a
+              href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+              repository</a>.</p>
           <p style="line-height: 3rem;">
-            If this simulation is too big for your screen, zoom out using&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Windows.
+            If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows.
           </p>
-          
+
           <p style="margin-bottom: 0.25rem;">Photo and clip art credits:</p>
           <p style="margin: 0.125rem 1rem ;">
             Photo of Washinton Monument: Photo by Mingyuan Lu
           </p>
           <p style="margin: 0.125rem 1rem ;">
-            Soccer ball clip art: <span><a href="https://freesvg.org/by/OpenClipart">OpenClipart</a> SVG ID: 179345 </span>
+            Soccer ball clip art: <span><a href="https://freesvg.org/by/OpenClipart">OpenClipart</a> SVG ID: 179345
+            </span>
           </p>
           <p style="margin: 0.125rem 1rem ;">
-            Photo of sky: <span>Photo by <a href="https://unsplash.com/@taylorvanriper925?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Taylor Van Riper</a> on <a href="https://unsplash.com/s/photos/sky?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
+            Photo of sky: <span>Photo by <a
+                href="https://unsplash.com/@taylorvanriper925?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Taylor
+                Van Riper</a> on <a
+                href="https://unsplash.com/s/photos/sky?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
           </p>
           <p style="margin: 0.125rem 1rem ;">
-            Physical data for skydiver simulation is acquired from: Mills N, Landell. 2017. “Buoyancy Explains Terminal Velocity in Skydiving.” <i>Journal of Aeronautics & Aerospace Engineering</i> 06(02). DOI: 10.4172/2168-9792.1000189
+            Physical data for skydiver simulation is acquired from: Mills N, Landell. 2017. “Buoyancy Explains Terminal
+            Velocity in Skydiving.” <i>Journal of Aeronautics & Aerospace Engineering</i> 06(02). DOI:
+            10.4172/2168-9792.1000189
           </p>
         </div>
       </div>

@@ -1,75 +1,142 @@
 <!DOCTYPE html>
 <html>
-	<head>
 
-		<meta charset="utf-8">
-    	<meta id="viewport" content="width=device-width, initial-scale=1.0">
-    	<title>Series Reactions in Batch Reactors</title>
-		<link rel="icon" type="image/png" href="../../resources/siteicon.png">
-		<!-- imports libraries from local folders -->
-		<script type="text/javascript" src="./libraries/ndsolve.js"></script>
-		<script type="text/javascript" src="./libraries/math.min.js"></script>
-		<script>math.import({ndsolve:ndsolve})</script>		
-		<script type="text/javascript" src="./libraries/p5/p5.min.js"></script>
-		<script type="text/javascript" src="./libraries/p5/p5.dom.min.js"></script>
-		<script type="text/javascript" src="./libraries/p5/grafica.min.js"></script>
-		<script type="text/javascript" src="./libraries/p5/dat.gui.min.js"></script>
-		<script type="text/javascript" src="./libraries/quicksettings3/quicksettings.min.js"></script>
-		<script type="text/javascript" src="./libraries/p5/p5.gui.js"></script>
-		<script type="text/javascript" src="./libraries/plotFun.min.js"></script>
+<head>
 
-		<!-- imports main file -->
-		<script type="text/javascript" src="main.min.js"></script>
-		
-		<!-- styling is minimal, but CSS sheets were included just in case-->
-		<link rel="stylesheet" type="text/css" href="style.css">
-		<!-- styling for the sliders / GUI -->
-		<link type="text/css" id="qs_styles" rel="stylesheet" href="libraries/quicksettings3/quicksettings_custom_tiny.min.css">
-		
-	</head>
+	<meta charset="utf-8">
+	<meta id="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Series Reactions in Batch Reactors</title>
+	<link rel="icon" type="image/png" href="../../resources/siteicon.png">
+	<!-- imports libraries from local folders -->
+	<script type="text/javascript" src="./libraries/ndsolve.js"></script>
+	<script type="text/javascript" src="./libraries/math.min.js"></script>
+	<script>
+		math.import({
+			ndsolve: ndsolve
+		})
+	</script>
+	<script type="text/javascript" src="./libraries/p5/p5.min.js"></script>
+	<script type="text/javascript" src="./libraries/p5/p5.dom.min.js"></script>
+	<script type="text/javascript" src="./libraries/p5/grafica.min.js"></script>
+	<script type="text/javascript" src="./libraries/p5/dat.gui.min.js"></script>
+	<script type="text/javascript" src="./libraries/quicksettings3/quicksettings.min.js"></script>
+	<script type="text/javascript" src="./libraries/p5/p5.gui.js"></script>
+	<script type="text/javascript" src="./libraries/plotFun.min.js"></script>
 
-	<body>
-		<div class="wrapper">
-			<a href="javascript:" id="directionsButton" class="buttonMed" value="directions">Directions</a>
-			<a href="javascript:" id="detailsButton" class="buttonMed" value="details">Details</a>
-			<a href="javascript:" id="aboutButton" class="buttonMed" value="about">About</a>
-			<div class="modal">
-				<div id="modalDirections" class="modal-content" style="display:none;">
-					<div id="directions-content">
-						<span class="close">&times;</span>
-						<p class="popup paragraph">Two first-order, liquid-phase reactions  <i>A</i>&#8594<i>B</i>&#8594<i>C</i>  take place in an isothermal batch reactor. The reactor initially contains only <i>A</i> at a concentration of 2  mol/L. The activation energy  <i>E</i><sub><i>a</i>,2</sub>  of the second reaction  (155 kJ/mol)  is higher than the activation energy  <i>E</i><sub><i>a</i>,1</sub>  of the first reaction  <br>(145 kJ/mol). Vary the temperature of the reaction with a slider. Select Display: "selectivity" to plot selectivity (C<sub><i>B</i></sub>/C<sub><i>C</i></sub>) versus time. The selectivity changes with temperature because the reactions have different activation energies.</p>
-					</div>
-				</div>
+	<!-- imports main file -->
+	<script type="text/javascript" src="main.min.js"></script>
 
-				<div id="modalDetails" class="modal-content" style="display:none;">
-					<div id="details-content">
-						<span class="close">&times;</span>
-						<p class="popup paragraph">Consider the first-order reactions <span><img class="latex" id="ABC" src="media/LaTex/ABC.png" style="background-color:transparent;"></span>.  The reactor is isothermal, and the temperature of the reactor is set with a slider. As the temperature changes, the selectivity C<sub><i>B</i></sub>/C<sub><i>C</i></sub> for the desired product <i>B</i> changes. Mole balances are done:<br><br><span><img class="latex" id="Eqn1" src="media/LaTex/Eqn1.png" style="background-color:transparent;"></span><br><span><img class="latex" id="Eqn2" src="media/LaTex/Eqn2.png" style="background-color:transparent;"></span><br><span><img class="latex" id="Eqn3" src="media/LaTex/Eqn3.png" style="background-color:transparent;"></span><br><span><img class="latex" id="Eqn4" src="media/LaTex/Eqn4.png" style="background-color:transparent;"></span><br><span><img class="latex" id="Eqn5" src="media/LaTex/Eqn5.png" style="background-color:transparent;"></span><br><br>where C<sub><i>A</i></sub>, C<sub><i>B</i></sub>, and C<sub><i>C</i></sub> are the concentrations of <i>A</i>, <i>B</i> and <i>C</i> (mol/L), <i>t</i> is time (h), <i>k</i><sub>1</sub> and <i>k</i><sub>2</sub> are the rate constants for the first and second reactions (1/h), <i>A</i><sub>1</sub> and <i>A</i><sub>2</sub> are pre-exponential factors (1/h), <i>E</i><sub><i>a</i>,1</sub> and <i>E</i><sub><i>a</i>,2</sub> are activation energies (kJ/mol) where <i>E</i><sub><i>a</i>,1</sub>&lt<i>E</i><sub><i>a</i>,2</sub>, <i>R</i> is the ideal gas constant (kJ/[mol K]), and <i>T</i> is temperature (K) of the reaction.<br><br>The screencast video at [2] shows how to use this Demonstration.<br><br>References<br><br>[1] H. Scott Fogler, Essentials of Chemical Reaction Engineering, Boston: Pearson Education, 2011 pp. 298-302.<br><br>[2] <i>Series Reactions in a Batch Reactor (Interactive Simulation).</i>&nbsp<br><a href="https://www.youtube.com/watch?v=ivJ_r3UwDv0" target="_blank">https://www.youtube.com/watch?v=ivJ_r3UwDv0.</a></p>
-					</div>
-				</div>
+	<!-- styling is minimal, but CSS sheets were included just in case-->
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<!-- styling for the sliders / GUI -->
+	<link type="text/css" id="qs_styles" rel="stylesheet"
+		href="libraries/quicksettings3/quicksettings_custom_tiny.min.css">
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-6BN75500E9"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
 
-				<div id="modalAbout" class="modal-content" style="display:none;">
-					<div id="about-content">
-						<span class="close">&times;</span>
-						<p style="line-height: 1.5rem;">
-							This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/SeriesReactionsInABatchReactor/" target="_blank">simulation by Rachael L. Baumann</a>. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.</p>
-						<p style="line-height: 3rem;">
-							If this simulation is too big for your screen, zoom out using&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Windows.
-						</p>
-					</div>
+		function gtag() {
+			dataLayer.push(arguments);
+		}
+		gtag('js', new Date());
+
+		gtag('config', 'G-6BN75500E9');
+	</script>
+</head>
+
+<body>
+	<div class="wrapper">
+		<a href="javascript:" id="directionsButton" class="buttonMed" value="directions">Directions</a>
+		<a href="javascript:" id="detailsButton" class="buttonMed" value="details">Details</a>
+		<a href="javascript:" id="aboutButton" class="buttonMed" value="about">About</a>
+		<div class="modal">
+			<div id="modalDirections" class="modal-content" style="display:none;">
+				<div id="directions-content">
+					<span class="close">&times;</span>
+					<p class="popup paragraph">Two first-order, liquid-phase reactions <i>A</i>&#8594<i>B</i>&#8594<i>C</i> take
+						place in an isothermal batch reactor. The reactor initially contains only <i>A</i> at a concentration of 2
+						mol/L. The activation energy <i>E</i><sub><i>a</i>,2</sub> of the second reaction (155 kJ/mol) is higher
+						than the activation energy <i>E</i><sub><i>a</i>,1</sub> of the first reaction <br>(145 kJ/mol). Vary the
+						temperature of the reaction with a slider. Select Display: "selectivity" to plot selectivity
+						(C<sub><i>B</i></sub>/C<sub><i>C</i></sub>) versus time. The selectivity changes with temperature because
+						the reactions have different activation energies.</p>
 				</div>
 			</div>
-			<div class="title">
-				<span>
-					<img class="latexTitle" id="title1" src="media/LaTex/ABC.png" style="background-color:transparent;">
-					&nbsp&nbsp&nbsp&nbsp
-					<img class="latexTitle" id="title2" src="media/LaTex/Ea1.png" style="background-color:transparent;">
-					&nbsp&nbsp
-					<img class="latexTitle" id="title3" src="media/LaTex/Ea2.png" style="background-color:transparent;">
-				</span>
+
+			<div id="modalDetails" class="modal-content" style="display:none;">
+				<div id="details-content">
+					<span class="close">&times;</span>
+					<p class="popup paragraph">Consider the first-order reactions <span><img class="latex" id="ABC"
+								src="media/LaTex/ABC.png" style="background-color:transparent;"></span>. The reactor is isothermal, and
+						the temperature of the reactor is set with a slider. As the temperature changes, the selectivity
+						C<sub><i>B</i></sub>/C<sub><i>C</i></sub> for the desired product <i>B</i> changes. Mole balances are
+						done:<br><br><span><img class="latex" id="Eqn1" src="media/LaTex/Eqn1.png"
+								style="background-color:transparent;"></span><br><span><img class="latex" id="Eqn2"
+								src="media/LaTex/Eqn2.png" style="background-color:transparent;"></span><br><span><img class="latex"
+								id="Eqn3" src="media/LaTex/Eqn3.png" style="background-color:transparent;"></span><br><span><img
+								class="latex" id="Eqn4" src="media/LaTex/Eqn4.png"
+								style="background-color:transparent;"></span><br><span><img class="latex" id="Eqn5"
+								src="media/LaTex/Eqn5.png" style="background-color:transparent;"></span><br><br>where
+						C<sub><i>A</i></sub>, C<sub><i>B</i></sub>, and C<sub><i>C</i></sub> are the concentrations of <i>A</i>,
+						<i>B</i> and <i>C</i> (mol/L), <i>t</i> is time (h), <i>k</i><sub>1</sub> and <i>k</i><sub>2</sub> are the
+						rate constants for the first and second reactions (1/h), <i>A</i><sub>1</sub> and <i>A</i><sub>2</sub> are
+						pre-exponential factors (1/h), <i>E</i><sub><i>a</i>,1</sub> and <i>E</i><sub><i>a</i>,2</sub> are
+						activation energies (kJ/mol) where <i>E</i><sub><i>a</i>,1</sub>&lt<i>E</i><sub><i>a</i>,2</sub>, <i>R</i>
+						is the ideal gas constant (kJ/[mol K]), and <i>T</i> is temperature (K) of the reaction.<br><br>The
+						screencast video at [2] shows how to use this Demonstration.<br><br>References<br><br>[1] H. Scott Fogler,
+						Essentials of Chemical Reaction Engineering, Boston: Pearson Education, 2011 pp. 298-302.<br><br>[2]
+						<i>Series Reactions in a Batch Reactor (Interactive Simulation).</i>&nbsp<br><a
+							href="https://www.youtube.com/watch?v=ivJ_r3UwDv0"
+							target="_blank">https://www.youtube.com/watch?v=ivJ_r3UwDv0.</a></p>
+				</div>
 			</div>
-			<div id="plotContainer"></div>
+
+			<div id="modalAbout" class="modal-content" style="display:none;">
+				<div id="about-content">
+					<span class="close">&times;</span>
+					<p style="line-height: 1.5rem;">
+						This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+							Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+							href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of
+						Professor John L. Falconer. It is a JavaScript/HTML5 implementation of a <a
+							href="https://demonstrations.wolfram.com/SeriesReactionsInABatchReactor/" target="_blank">simulation by
+							Rachael L. Baumann</a>. Address any questions or comments to learncheme@gmail.com. All of our simulations
+						are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/"
+							target="_blank">LearnChemE Github repository</a>.</p>
+					<p style="line-height: 3rem;">
+						If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+								src="https://learncheme.github.io/media/command.png"
+								style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img
+								src="https://learncheme.github.io/media/minus.png"
+								style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Mac or&nbsp;<span><img
+								src="https://learncheme.github.io/media/ctrl.png"
+								style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img
+								src="https://learncheme.github.io/media/minus.png"
+								style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
+								src="https://learncheme.github.io/media/command.png"
+								style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img
+								src="https://learncheme.github.io/media/plus.png"
+								style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Mac or&nbsp;<span><img
+								src="https://learncheme.github.io/media/ctrl.png"
+								style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img
+								src="https://learncheme.github.io/media/plus.png"
+								style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Windows.
+					</p>
+				</div>
+			</div>
 		</div>
-		<script type="text/javascript" src="modals.min.js"></script>
-	</body>
+		<div class="title">
+			<span>
+				<img class="latexTitle" id="title1" src="media/LaTex/ABC.png" style="background-color:transparent;">
+				&nbsp&nbsp&nbsp&nbsp
+				<img class="latexTitle" id="title2" src="media/LaTex/Ea1.png" style="background-color:transparent;">
+				&nbsp&nbsp
+				<img class="latexTitle" id="title3" src="media/LaTex/Ea2.png" style="background-color:transparent;">
+			</span>
+		</div>
+		<div id="plotContainer"></div>
+	</div>
+	<script type="text/javascript" src="modals.min.js"></script>
+</body>
+
 </html>

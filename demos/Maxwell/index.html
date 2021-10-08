@@ -6,7 +6,7 @@
     <meta id="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maxwell Relations Demo</title>
     <link rel="icon" type="image/png" href="../../resources/siteicon.png">
-    
+
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@0.10.2/lib/p5.min.js"></script>
     <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.0.0/es5/tex-mml-chtml.js"></script>
@@ -16,6 +16,17 @@
     <script type="text/javascript" src="latex.js"></script>
     <script type="text/javascript" src="effects.min.js"></script>
     <link rel="stylesheet" type="text/css" href="maxwell.css">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6BN75500E9"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-6BN75500E9');
+    </script>
 </head>
 
 <body>
@@ -25,10 +36,32 @@
             <span class="close">&times;</span>
             <p style="font-weight:bold;">Maxwell Relations Demonstration</p>
             <p>
-                This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.</p>
-              <p style="line-height: 3rem;">
-                If this simulation is too big for your screen, zoom out using&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Windows.
-              </p>
+                This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+                    Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+                    href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the
+                direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All
+                of our simulations are open source, and are available on our <a
+                    href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+                    repository</a>.</p>
+            <p style="line-height: 3rem;">
+                If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                        src="https://learncheme.github.io/media/command.png"
+                        style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img
+                        src="https://learncheme.github.io/media/minus.png"
+                        style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Mac or&nbsp;<span><img
+                        src="https://learncheme.github.io/media/ctrl.png"
+                        style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img
+                        src="https://learncheme.github.io/media/minus.png"
+                        style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Windows. To zoom in,
+                use&nbsp;<span><img src="https://learncheme.github.io/media/command.png"
+                        style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img
+                        src="https://learncheme.github.io/media/plus.png"
+                        style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Mac or&nbsp;<span><img
+                        src="https://learncheme.github.io/media/ctrl.png"
+                        style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img
+                        src="https://learncheme.github.io/media/plus.png"
+                        style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Windows.
+            </p>
         </div>
     </div>
     <script>
@@ -36,15 +69,15 @@
         var modalAbout = document.getElementById("modalAbout");
         var aboutButton = document.getElementById("aboutButton");
         var closeAbout = document.getElementsByClassName("close")[0];
-        aboutButton.onclick = function() {
+        aboutButton.onclick = function () {
             modalAbout.style.display = "block";
         }
-        closeAbout.onclick = function() {
+        closeAbout.onclick = function () {
             modalAbout.style.display = "none";
         }
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             if (event.target == modalAbout) {
-            modalAbout.style.display = "none";
+                modalAbout.style.display = "none";
             }
         }
     </script>
@@ -53,7 +86,8 @@
             <video id="cylVid">
                 <source src="cylinderNoAxes.webm" type="video/webm">
                 <source src="cylinderNoAxes.mp4" type="video/mp4">
-            Your browser does not support the video tag. Please use Chrome, Safari, Firefox, or Edge to view this simulation.
+                Your browser does not support the video tag. Please use Chrome, Safari, Firefox, or Edge to view this
+                simulation.
             </video>
         </div>
     </div>
