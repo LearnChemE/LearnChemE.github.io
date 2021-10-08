@@ -1,0 +1,44 @@
+{
+  "name": "reaction-state-function",
+  "version": "1.0.0",
+  "description": "A scientific demonstration of how enthalpy in a reaction is a state function",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --open --config ./_dev/webpack.config.js --mode=development",
+    "build": "webpack --config ./_dev/webpack.config.js --mode=production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LearnChemE/LearnChemE.github.io.git"
+  },
+  "keywords": [
+    "simulation",
+    "state",
+    "function",
+    "chemical",
+    "reaction",
+    "enthalpy",
+    "thermodynamics"
+  ],
+  "author": "Neil Hendren",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LearnChemE/LearnChemE.github.io/issues"
+  },
+  "homepage": "https://github.com/LearnChemE/LearnChemE.github.io#readme",
+  "dependencies": {
+    "bootstrap": "^5.1.2",
+    "css-loader": "^6.3.0",
+    "html-webpack-plugin": "^5.3.2",
+    "mini-css-extract-plugin": "^2.4.2",
+    "postcss-loader": "^6.1.1",
+    "sass": "^1.42.1",
+    "sass-loader": "^12.1.0",
+    "style-loader": "^3.3.0",
+    "terser-webpack-plugin": "^5.2.4",
+    "uglify-js": "^3.14.2",
+    "webpack": "^5.58.1",
+    "webpack-cli": "^4.9.0",
+    "webpack-dev-server": "^4.3.1"
+  }
+}
