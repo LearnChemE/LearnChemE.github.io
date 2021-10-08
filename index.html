@@ -9,7 +9,8 @@
     content="LearnChemE, Chemical Engineering, learncheme.github.io, github, open source, Engineering, Education, Simulation, Simulated Laboratory Experiment">
   <meta name=author content="LearnChemE, Neil Hendren">
   <meta name=application-name content="learncheme.github.io">
-  <meta name=description content="Open source simulations and demonstrations for Chemical Engineering undergraduate students">
+  <meta name=description
+    content="Open source simulations and demonstrations for Chemical Engineering undergraduate students">
   <link href="./home_page/style.css" rel=stylesheet>
   <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans&family=Open+Sans&display=swap" rel="stylesheet">
 
@@ -19,58 +20,43 @@
 <body>
   <div id="home">
     <h1>learncheme.github.io</h1>
-    <p>Learncheme.github.io is a collection of open-source, web-based scientific simulations built for <div id="lce">LearnChemE.com</div>, an educational website with a focus on chemical engineering and related disciplines.</p>
+    <p>Learncheme.github.io is a collection of open-source, web-based scientific simulations built for <div id="lce">
+        LearnChemE.com</div>, an educational website with a focus on chemical engineering and related disciplines.</p>
     <p>Browser-based simulations:</p>
-    <ul id="list"></ul>
+
+    <ul id="list">
+      <li><a href="/demos/AdiabaticFlameTemperature/dist/index.html">Adiabatic flame temperature</a></li>
+      <li><a href="/demos/DragForce/html/index.html">Drag force on a falling object</a></li>
+      <li><a href="/demos/MeltingIce/MIindex.html">Melting ice simulation</a></li>
+      <li><a href="/demos/Maxwell/index.html">Maxwell relations</a></li>
+      <li><a href="/demos/IsothermalPlugFlowReactor/index.html">Isothermal plug flow reactor</a></li>
+      <li><a href="/demos/SelectivityInSemiBatch/index.html">Selectivity in a semi-batch reactor</a></li>
+      <li><a href="/demos/SeriesReactionsInBatchReactor/index.html">Series reactions in a batch reactor</a></li>
+      <li><a href="/demos/vectors/app.min.html">Vector basics</a></li>
+      <li><a href="/demos/visualVLE/index.html">Visualization of vapor-liquid equilibrium</a></li>
+      <li><a href="/lab-experiments/single_stage_distillation/dist/index.html">Single-stage distillation (virtual process controls lab)</a></li>
+      <li><a href="/lab-experiments/single_stage_manualonly/dist/index.html">Single-stage distillation (manual control only)</a></li>
+      <li><a href="/demos/Streamlines/html/index.html">Streamlines Over a Sphere</a></li>
+      <li><a href="/demos/SurfaceRoughness/dist/index.html">Surface roughness effect on an object's trajectory</a></li>
+      <li><a href="/learnchemejs/html/harmonic.html">Quantum harmonic oscillator</a></li>
+      <li><a href="/learnchemejs/html/pib1.html">Quantum particle-in-a-box 1</a></li>
+      <li><a href="/learnchemejs/html/pib2.html">Quantum particle-in-a-box 2</a></li>
+      <li><a href="/learnchemejs/html/immiscibleP.html">Step-by-step P-x-y diagram for immiscible liquids</a></li>
+      <li><a href="/learnchemejs/html/immiscibleT.html">Step-by-step T-x-y diagram for immiscible liquids</a></li>
+      <li><a href="/learnchemejs/html/Pxy">Construct P-x-y diagrams for vapor-liquid-equilibrium</a></li>
+      <li><a href="/learnchemejs/html/Txy">Construct T-x-y diagrams for vapor-liquid-equilibrium</a></li>
+      <li><a href="/demos/Bernoulli/dist/index.html">Bernoulli Fluid Flow</a></li>
+      <li><a href="/demos/Buoyancy/dist/index.html">Buoyancy of a cube</a></li>
+      <li><a href="/demos/Couette/dist/index.html">Couette flow</a></li>
+      <li><a href="/demos/LaminarPipeFlow/html/index.html">Laminar pipe flow</a></li>
+      <li><a href="/demos/Manometers/dist/index.html">Manometers</a></li>
+      <li><a href="/demos/HeatOfReaction/dist/index.html">Heat of Reaction Temperature Dependence</a></li>
+      <li><a href="/demos/MultiStageBatchDistillation/dist/index.html">Multiple-Stage Batch Distillation</a></li>
+      <li><a href="/demos/VLLE/dist/index.html">Vapor Liquid-Liquid Equilibrium</a></li>
+      <li><a href="/demos/ReactionStateFunction/dist/index.html">Enthalpy as a State Function (in progress)</a></li>
+    </ul>
   </div>
 
-  <script type="text/javascript">
-    const list = document.getElementById("list");
-    const demos = {
-      "Adiabatic flame temperature" : "/demos/AdiabaticFlameTemperature/dist/index.html",
-      "Drag force on a falling object" : "/demos/DragForce/html/index.html",
-      "Melting ice simulation" : "/demos/MeltingIce/MIindex.html",
-      "Maxwell relations" : "/demos/Maxwell/index.html",
-      "Isothermal plug flow reactor" : "/demos/IsothermalPlugFlowReactor/index.html",
-      "Selectivity in a semi-batch reactor" : "/demos/SelectivityInSemiBatch/index.html",
-      "Series reactions in a batch reactor" : "/demos/SeriesReactionsInBatchReactor/index.html",
-      "Vector basics" : "/demos/vectors/app.min.html",
-      "Visualization of vapor-liquid equilibrium" : "/demos/visualVLE/index.html",
-      "Single-stage distillation (virtual process controls lab)" : "/lab-experiments/single_stage_distillation/dist/index.html",
-      "Single-stage distillation (manual control only)" : "/lab-experiments/single_stage_manualonly/dist/index.html",
-      "Streamlines Over a Sphere" : "/demos/Streamlines/html/index.html",
-      "Surface roughness effect on an object's trajectory" : "/demos/SurfaceRoughness/dist/index.html",
-      "Quantum harmonic oscillator" : "/learnchemejs/html/harmonic.html",
-      "Quantum particle-in-a-box 1" : "/learnchemejs/html/pib1.html",
-      "Quantum particle-in-a-box 2" : "/learnchemejs/html/pib2.html",
-      "Step-by-step P-x-y diagram for immiscible liquids" : "/learnchemejs/html/immiscibleP.html",
-      "Step-by-step T-x-y diagram for immiscible liquids" : "/learnchemejs/html/immiscibleT.html",
-      "Construct P-x-y diagrams for vapor-liquid-equilibrium" : "/learnchemejs/html/Pxy",
-      "Construct T-x-y diagrams for vapor-liquid-equilibrium" : "/learnchemejs/html/Txy",
-      "Bernoulli Fluid Flow" : "/demos/Bernoulli/dist/index.html",
-      "Buoyancy of a cube" : "/demos/Buoyancy/dist/index.html",
-      "Couette flow" : "/demos/Couette/dist/index.html",
-      "Laminar pipe flow" : "/demos/LaminarPipeFlow/html/index.html",
-      "Manometers" : "/demos/Manometers/dist/index.html",
-      "Heat of Reaction Temperature Dependence" : "/demos/HeatOfReaction/dist/index.html",
-      "Multiple-Stage Batch Distillation" : "/demos/MultiStageBatchDistillation/dist/index.html",
-      "Vapor Liquid-Liquid Equilibrium" : "/demos/VLLE/dist/index.html",
-      "Enthalpy as a State Function (in progress)" : "/demos/ReactionStateFunction/dist/index.html",
-    };
-
-    const demo = Object.keys(demos).sort();
-    for (let i = 0; i < demo.length; i++) {
-      const listItem = document.createElement("li");
-      list.appendChild(listItem);
-
-      const a = document.createElement("a");
-      a.setAttribute("href", "https://learncheme.github.io" + demos[demo[i]]);
-      a.innerHTML = "" + demo[i];
-      listItem.appendChild(a);
-    }
-    const lce = document.getElementById("lce");
-    lce.addEventListener('click', function() { window.location.href = "http://www.learncheme.com/" });
-  </script>
 </body>
 
 </html>
