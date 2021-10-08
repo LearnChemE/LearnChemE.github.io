@@ -13,6 +13,14 @@ const module_rules = [
       "sass-loader",
     ]
   },
+  {
+    test: /\.html$/i,
+    use: ["to-string-loader", "html-loader"]
+  },
+  {
+    test: /\.svg$/i,
+    use: ["to-string-loader", "html-loader"]
+  }
 ];
 
 const html_options = {
