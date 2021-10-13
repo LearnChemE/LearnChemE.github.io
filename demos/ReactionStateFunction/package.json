@@ -28,9 +28,12 @@
   "homepage": "https://github.com/LearnChemE/LearnChemE.github.io#readme",
   "dependencies": {
     "bootstrap": "^5.1.2",
+    "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.3.0",
+    "html-loader": "^2.1.2",
     "html-webpack-plugin": "^5.3.2",
     "mini-css-extract-plugin": "^2.4.2",
+    "popper.js": "^1.16.1",
     "postcss-loader": "^6.1.1",
     "sass": "^1.42.1",
     "sass-loader": "^12.1.0",

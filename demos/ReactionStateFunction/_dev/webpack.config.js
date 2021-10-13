@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const devMode = process.env.NODE_ENV !== "production";
 
 const module_rules = [
@@ -14,10 +15,6 @@ const module_rules = [
     ]
   },
   {
-    test: /\.html$/i,
-    use: ["to-string-loader", "html-loader"]
-  },
-  {
     test: /\.svg$/i,
     use: ["to-string-loader", "html-loader"]
   }
@@ -26,7 +23,7 @@ const module_rules = [
 const html_options = {
   title: "Enthalpy as a State Function",
   filename: "index.html",
-  template: path.resolve(__dirname, '../src/html/template.html'),
+  template: path.resolve(__dirname, '../src/html/index.html'),
   scriptLoading: "blocking",
   hash: true,
   meta: {
@@ -39,23 +36,35 @@ const html_options = {
 }
 
 module.exports = {
+  stats: 'errors-only',
   entry: {
     index: path.resolve(__dirname, '../src/index.js'),
   },
   devtool: 'inline-source-map',
   devServer: {
     static: path.resolve(__dirname, '../dist'),
+    client: {
+      logging: 'error',
+      progress: false,
+    },
+    hot: false,
   },
   plugins: [
     new HtmlWebpackPlugin(html_options),
     new MiniCssExtractPlugin({
-      filename: "style.[contenthash].css",
+      filename: "[name].[contenthash].css",
+    }),
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: [
+        '**/*',
+        '!assets/**',
+    ],
     }),
   ],
   output: {
     filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, '../dist'),
-    clean: true,
+    clean: false,
   },
   module: {
     rules: module_rules

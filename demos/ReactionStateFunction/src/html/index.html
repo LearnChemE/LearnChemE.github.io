@@ -1,0 +1,157 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en">
+  <title>Enthalpy of Reaction as a State Function</title>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.95,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6BN75500E9"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'G-6BN75500E9');
+  </script>
+</head>
+
+<body>
+  <div class="simulation-title">Enthalpy of Reaction as a State Function</div>
+
+  <div class="simulation-controls">
+    <div class="input-area">
+
+      <div class="input-select">
+        <div class="select-label">Reaction</div>
+        <select id="select-reaction">
+          <option value="1" selected>Acetylene hydrogenation</option>
+          <!-- <option value="2">Methane combustion</option> -->
+          <option value="3">Carbon monoxide oxidation</option>
+          <option value="4">Haber–Bosch process</option>
+        </select>
+      </div>
+  
+      <div class="input-row">
+        <div class="data-name">Temperature&nbsp;</div>
+        <input type="range" id="t-slider" min="25" max="5000" step="1" value="150">
+        <div class="data-value" id="t-value">150</div>
+        <div class="data-metric">&deg; C</div>
+      </div>
+  
+      <div class="input-row">
+        <div class="data-name">Reaction coordinate&nbsp;</div>
+        <input type="range" id="x-slider" min="0" max="1" step="0.01" value="0">
+        <div class="data-value" id="x-value">0.00</div>
+        <div class="data-metric"></div>
+      </div>
+  
+    </div>
+
+    <div class="modal-buttons-row">
+      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
+      <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
+      <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+    </div>
+  </div>
+
+  <div id="reaction-container">
+    \(
+      \mathrm{ C_{2} H_{2} + H_{2} \longrightarrow C_{2} H_{4} }
+    \)
+  </div>
+
+  <div id="p5-container"></div>
+    <div id="loading" style="display: block;">Loading . . .</div>
+  </div>
+
+  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="directions-modal-label">Directions</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This simulation shows how the heat of reaction changes with temperature.  The blue line represents the enthalpy of the reactants at a given temperature, and the green line represents the enthalpy of the products at a given temperature.  The black arrow between the two lines represents the heat of reaction, with the value for &Delta;H<sub>rxn</sub> written on top of the black arrow.  Choose a different set of reactants/products using the drop-down menu labelled "Reaction".  Change the temperature of the reaction using the slider labelled "Temperature".  A more detailed explanation of the governing equations is given by pressing the "Details" button.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="details-modal-label">Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+
+          <p>
+            Details
+          </p>
+
+          $$
+            1 + 1 = 2
+          $$
+
+          <p>
+            References:<br>
+          </p>
+
+          <ol class="references">
+            <li>
+              reference 1
+            </li>
+          </ol>
+
+          <div style="margin-top: 2rem;"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="about-modal-label">About</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
