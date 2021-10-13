@@ -1,6 +1,6 @@
 require("bootstrap");
 require("./style/style.scss");
-window.p5 = new require("./js/p5.js");
+window.p5 = new require("./js/p5.min.js");
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
