@@ -2,11 +2,11 @@ const path = require('path');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const devMode = process.env.NODE_ENV !== "production";
+const {
+  CleanWebpackPlugin
+} = require('clean-webpack-plugin');
 
-const module_rules = [
-  {
+const module_rules = [{
     test: /\.(sa|sc|c)ss$/,
     use: [
       MiniCssExtractPlugin.loader,
@@ -35,19 +35,26 @@ const html_options = {
   },
 }
 
-module.exports = {
+let config = {
   stats: 'errors-only',
   entry: {
     index: path.resolve(__dirname, '../src/index.js'),
   },
   devtool: 'inline-source-map',
   devServer: {
-    static: path.resolve(__dirname, '../dist'),
-    client: {
-      logging: 'error',
-      progress: false,
+    static: {
+      directory: path.resolve(__dirname, '../dist'),
+      watch: true,
     },
     hot: false,
+    liveReload: true,
+    client: {
+      overlay: {
+        errors: true,
+        warnings: false,
+      },
+      logging: 'error',
+    }
   },
   plugins: [
     new HtmlWebpackPlugin(html_options),
@@ -58,7 +65,7 @@ module.exports = {
       cleanOnceBeforeBuildPatterns: [
         '**/*',
         '!assets/**',
-    ],
+      ],
     }),
   ],
   output: {
@@ -69,12 +76,40 @@ module.exports = {
   module: {
     rules: module_rules
   },
-  optimization: {
-    minimizer: [
-      new TerserPlugin({
-        parallel: true,
-        minify: TerserPlugin.uglifyJsMinify
-      }),
-    ]
-  }
+  experiments: {
+    futureDefaults: true,
+  },
+  optimization: null
 };
+
+module.exports = (env, argv) => {
+  if (argv.mode === "production") {
+
+    config.optimization = {
+      minimizer: [
+        new TerserPlugin({
+          parallel: true,
+          minify: TerserPlugin.uglifyJsMinify
+        }),
+      ],
+      moduleIds: 'size',
+      chunkIds: 'total-size',
+      removeAvailableModules: true,
+    }
+  
+  } else {
+    
+    config.optimization = {
+      minimize: false,
+      moduleIds: 'named',
+      chunkIds: 'named',
+      removeAvailableModules: false,
+      realContentHash: false,
+    }
+    
+    config.devtool = 'source-map';
+ 
+  };
+
+  return config;
+}
