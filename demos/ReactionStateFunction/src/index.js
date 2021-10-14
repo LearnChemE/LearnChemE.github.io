@@ -230,5 +230,8 @@ function changeReaction(rxn) {
       break;
   };
   if(beginCalculation.innerHTML === "Reset") { beginCalculation.click() }
+  equationContainer_part1.innerHTML = `$$ \\int_{${Math.round(gvs.T_rxn - 273.15)}^{ \\circ }}^{25^{ \\circ }} c_{p,r} dT $$`;
+  equationContainer_part3.innerHTML = `$$ + \\int_{25^{ \\circ }}^{${Math.round(gvs.T_rxn - 273.15)}^{ \\circ }} c_{p,p} dT $$`;
+  equationContainer_part4.innerHTML = `$$ =  ${gvs.Hrxn.toFixed(1)} \\; \\mathrm{ \\frac{ kJ }{ mol } } $$`
   window.MathJax.typeset();
 }
