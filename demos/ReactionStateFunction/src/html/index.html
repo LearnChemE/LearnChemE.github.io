@@ -41,19 +41,16 @@
           <option value="4">Haber–Bosch process</option>
         </select>
       </div>
-  
-      <div class="input-row">
-        <div class="data-name">Temperature&nbsp;</div>
-        <input type="range" id="t-slider" min="25" max="5000" step="1" value="150">
-        <div class="data-value" id="t-value">150</div>
-        <div class="data-metric">&deg; C</div>
+
+      <div class="button-container">
+        <div id="begin-calculation" class="btn btn-success">Calculate &Delta;H<sub>rxn</sub></div>
       </div>
   
       <div class="input-row">
-        <div class="data-name">Reaction coordinate&nbsp;</div>
-        <input type="range" id="x-slider" min="0" max="1" step="0.01" value="0">
-        <div class="data-value" id="x-value">0.00</div>
-        <div class="data-metric"></div>
+        <div class="data-name">Initial temperature&nbsp;</div>
+        <input type="range" id="t-slider" min="25" max="5000" step="1" value="500">
+        <div class="data-value" id="t-value">150</div>
+        <div class="data-metric">&deg; C</div>
       </div>
   
     </div>
@@ -69,6 +66,34 @@
     \(
       \mathrm{ C_{2} H_{2} + H_{2} \longrightarrow C_{2} H_{4} }
     \)
+  </div>
+
+  <div id="equation-container">
+
+    <div id="equation-instructions">
+      Click "Calculate &Delta;H<sub>rxn</sub>" to begin
+    </div>
+
+    <div id="eq-1">
+      $$
+        \int_{500^{ \circ }}^{25^{ \circ }} c_{p, r} dT
+      $$
+    </div>
+    <div id="eq-2">
+      $$
+       + \Delta H_{rxn}^{^\ominus}
+      $$
+    </div>
+    <div id="eq-3">
+      $$
+       + \int_{25^{ \circ }}^{500^{ \circ }} c_{p, p} dT
+      $$
+    </div>
+    <div id="eq-4">
+      $$
+        = -183.8 \; \mathrm{ \frac{ kJ }{ mol } }
+      $$
+    </div>
   </div>
 
   <div id="p5-container"></div>
