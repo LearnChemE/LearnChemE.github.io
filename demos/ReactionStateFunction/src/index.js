@@ -91,6 +91,7 @@ beginCalculation.addEventListener("click", () => {
     beginCalculation.innerHTML = "Reset";
     beginCalculation.classList.remove("btn-success");
     beginCalculation.classList.add("btn-danger");
+    tSlider.setAttribute("disabled", "yes");
     runCalcs();
   } else {
     window.setTimeout(() => { equationInstructions.style.opacity = "1" }, 500);
@@ -102,6 +103,7 @@ beginCalculation.addEventListener("click", () => {
     equationContainer_part3.style.opacity = "0";
     equationContainer_part4.style.opacity = "0";
     gvs.position = 0;
+    tSlider.removeAttribute("disabled");
     P5.redraw();
   }
 });
@@ -121,7 +123,7 @@ function runCalcs() {
     equationContainer_part3.style.opacity = "1";
   }
 
-  if ( gvs.position === 3 ) {
+  if ( gvs.position >= 3 ) {
     equationContainer_part4.style.opacity = "1";
   }
 
@@ -134,6 +136,8 @@ function runCalcs() {
     }, 16.7);
   } else {
     equationContainer_part4.style.opacity = "1";
+    tSlider.removeAttribute("disabled");
+    
   }
 }
 
@@ -233,5 +237,6 @@ function changeReaction(rxn) {
   equationContainer_part1.innerHTML = `$$ \\int_{${Math.round(gvs.T_rxn - 273.15)}^{ \\circ }}^{25^{ \\circ }} c_{p,r} dT $$`;
   equationContainer_part3.innerHTML = `$$ + \\int_{25^{ \\circ }}^{${Math.round(gvs.T_rxn - 273.15)}^{ \\circ }} c_{p,p} dT $$`;
   equationContainer_part4.innerHTML = `$$ =  ${gvs.Hrxn.toFixed(1)} \\; \\mathrm{ \\frac{ kJ }{ mol } } $$`
+  tSlider.removeAttribute("disabled");
   window.MathJax.typeset();
 }

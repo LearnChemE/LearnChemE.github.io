@@ -151,3 +151,8 @@ canvas {
   font-size: 1.25rem;
   background-color: rgb(240, 240, 240);
 }
+
+input[disabled='yes'] {
+  opacity: 0.5;
+  pointer-events: none;
+}
