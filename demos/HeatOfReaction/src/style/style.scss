@@ -1,3 +1,5 @@
+$modal-lg: 1000px;
+
 @import "bootstrap";
 @import "./slider.scss";
 
@@ -116,4 +118,16 @@ canvas {
   padding-bottom: 10px;
   font-size: 1.25rem;
   background-color: rgb(240, 240, 240);
+}
+
+.smaller {
+  font-size: 0.9rem;
+}
+
+.modal-body mjx-container {
+  transform: translateX( 25px );
+}
+
+.mjx-c2218 {
+  transform: translateY(-3px);
 }

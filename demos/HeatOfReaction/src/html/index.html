@@ -12,7 +12,6 @@
         scale: 0.95,
         mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
         displayAlign: 'left', // default for indentalign when set to 'auto'
-        displayIndent: '0.01', // default for indentshift when set to 'auto'
       }
     };
   </script>
@@ -111,22 +110,38 @@
         <div class="modal-body">
 
           <p>
-            Details
+            The heat of reaction is a temperature-dependent property. It can be calculated from the standard heat of reaction \( H_{rxn}^{ ^{ ⊖ } } \) and the temperature-dependent heat capacities \( c_{p, i} \) where \( i \) is a component of the reaction. Standard heat of reaction \( H_{rxn}^{ ^{ ⊖ } } \) is the reaction enthalpy at 25&deg; C (298 K) and can be calculated from standard heats of formation \( H_{f,i}^{ \circ } \). Heat of reaction at temperature \( T \) is defined:
           </p>
 
           $$
-            1 + 1 = 2
+            \Delta H_{rxn} = \Delta H_{rxn}^{ ^{ ⊖ } } + \int_{298}^{T} \Delta C_{p} dT
           $$
 
           <p>
-            References:<br>
+            where the total heat capacity \( C_{p} \) is defined
           </p>
 
-          <ol class="references">
-            <li>
-              reference 1
-            </li>
-          </ol>
+          $$
+            \Delta C_{p} = \sum_{i}^{n} \nu_{i} c_{p, i}
+          $$
+
+          <p>
+            and \( \nu_{i} \) is the stoichiometric coefficient of component \( i \), and \( n \) is the number of components in the reaction. The heat capacity is often approximated using the Shomate equation:
+          </p>
+
+          $$
+            c_{p, i} = A + BT + CT^{2} + DT^{3} + \frac{ E }{ T^{2} }
+          $$
+
+          <p>
+            where the coefficients \( A \), \( B \), \( C \), \( D \), and \( E \) are determined experimentally, and \( T \) is temperature in Kelvin.  The resulting algebraic formula for heat of reaction \( \Delta H_{rxn} \) is therefore
+          </p>
+
+          <div class="smaller">
+            $$
+              \Delta H_{rxn} = \Delta H_{rxn}^{ ^{ ⊖ } } + \sum_{i}^{n} \left[ \nu_{i} A_{i} (T - 298) + \frac{ \nu_{i} B_{i} }{ 2 } ( T^{2} - 298^{2} ) + \frac{ \nu_{i} C_{i} }{ 3 } ( T^{3} - 298^{3} ) + \frac{ \nu_{i} D_{i} }{ 4 } ( T^{4} - 298^{4} ) - \frac{ \nu_{i} E_{i} }{ T } + \frac{ \nu_{i} E_{i} }{ 298 } \right]
+            $$
+          </div>
 
           <div style="margin-top: 2rem;"></div>
         </div>
