@@ -2,6 +2,7 @@ let p;
 let xMin, xMax, yMin, yMax, margins, gPix;
 const reactantsColor = "rgb(0, 0, 255)";
 const productsColor = "rgb(0, 150, 80)";
+const hrxnColor = "rgb(255, 120, 200)";
 
 function drawAxes() {
 
@@ -238,7 +239,7 @@ function drawReactionEnthalpy() {
         const xPix = gPix[0][0] + (( x - xMin ) / ( xMax - xMin )) * ( gPix[0][1] - gPix[0][0] );
         const xPix_init = gPix[0][0] + (( x_init - xMin ) / ( xMax - xMin )) * ( gPix[0][1] - gPix[0][0] );
         const yPix = gPix[1][1] - (( y - yMin ) / ( yMax - yMin )) * ( gPix[1][1] - gPix[1][0] );
-        p.stroke(0);
+        p.stroke(hrxnColor);
         p.strokeWeight(1);
         p.line(xPix_init, yPix, xPix, yPix);
         p.translate(xPix, yPix);
@@ -258,6 +259,7 @@ function drawHeatOfReaction() {
         const yPix = gPix[1][1] - (( y - yMin ) / ( yMax - yMin )) * ( gPix[1][1] - gPix[1][0] );
         p.textSize(15);
         p.textAlign(p.LEFT, p.BOTTOM);
+        p.fill(hrxnColor);
         const textLength = p.textWidth(`ΔH   = ${gvs.Hrxn.toFixed(1)} kJ/mol`);
         const deltaOffset = p.textWidth("ΔH");
         p.text(`ΔH    = ${gvs.Hrxn.toFixed(1)} kJ/mol`, (xPix0 + xPix1) / 2 - textLength / 2, yPix - 10);
