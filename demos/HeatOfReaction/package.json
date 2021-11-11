@@ -1,57 +1,59 @@
 {
-  "name": "heat-of-reaction",
-  "version": "1.0.0",
-  "description": "A simulation of how reaction enthalpy changes with temperature",
-  "main": "./src/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./_dev/compiler.js",
-    "build": "webpack --config ./_dev/webpack.config.js --env production=true --progress"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/LearnChemE/LearnChemE.github.io.git"
-  },
-  "keywords": [
-    "chemical",
-    "engineering",
-    "thermodynamics",
-    "chemistrys",
-    "heat of reaction",
-    "enthalpy",
-    "interactive"
-  ],
-  "author": "Neil Hendren",
-  "license": "ISC",
-  "dependencies": {
-    "@babel/core": "^7.13.10",
-    "@babel/preset-env": "^7.13.10",
-    "babel-loader": "^8.2.2",
-    "bootstrap": "^4.6.0",
-    "clean-webpack-plugin": "^3.0.0",
-    "css-loader": "^5.1.3",
-    "fibers": "^5.0.0",
-    "file-loader": "^6.2.0",
-    "html-loader": "^2.1.2",
-    "html-webpack-plugin": "^5.3.1",
-    "jquery": "^3.6.0",
-    "mini-css-extract-plugin": "^1.3.9",
-    "node-sass": "^5.0.0",
-    "optimize-css-assets-webpack-plugin": "^5.0.4",
-    "popper.js": "^1.16.1",
-    "postcss-loader": "^5.2.0",
-    "precss": "^4.0.0",
-    "raw-loader": "^4.0.2",
-    "sass-loader": "^11.0.1",
-    "style-loader": "^2.0.0",
-    "terser-webpack-plugin": "^5.1.1",
-    "to-string-loader": "^1.1.6",
-    "webpack": "^5.26.3",
-    "webpack-cli": "^4.5.0",
-    "webpack-dev-server": "^3.11.2"
-  },
-  "bugs": {
-    "url": "https://github.com/LearnChemE/LearnChemE.github.io/issues"
-  },
-  "homepage": "https://github.com/LearnChemE/LearnChemE.github.io#readme"
+    "name": "heat-of-reaction",
+    "version": "1.0.0",
+    "description": "A simulation of how reaction enthalpy changes with temperature",
+    "main": "./src/index.js",
+    "engines": {
+        "node": ">=12.0.0 <13"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node ./_dev/compiler.js",
+        "build": "webpack --config ./_dev/webpack.config.js --env production=true --progress"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/LearnChemE/LearnChemE.github.io.git"
+    },
+    "keywords": [
+        "chemical",
+        "engineering",
+        "thermodynamics",
+        "chemistrys",
+        "heat of reaction",
+        "enthalpy",
+        "interactive"
+    ],
+    "author": "Neil Hendren",
+    "license": "ISC",
+    "dependencies": {
+        "@babel/core": "^7.13.10",
+        "@babel/preset-env": "^7.13.10",
+        "babel-loader": "^8.2.2",
+        "bootstrap": "^4.6.0",
+        "clean-webpack-plugin": "^3.0.0",
+        "css-loader": "^5.1.3",
+        "file-loader": "^6.2.0",
+        "html-loader": "^2.1.2",
+        "html-webpack-plugin": "^5.3.1",
+        "jquery": "^3.6.0",
+        "mini-css-extract-plugin": "^1.3.9",
+        "node-sass": "^5.0.0",
+        "optimize-css-assets-webpack-plugin": "^5.0.4",
+        "popper.js": "^1.16.1",
+        "postcss-loader": "^5.2.0",
+        "precss": "^4.0.0",
+        "raw-loader": "^4.0.2",
+        "sass-loader": "^11.0.1",
+        "style-loader": "^2.0.0",
+        "terser-webpack-plugin": "^5.1.1",
+        "to-string-loader": "^1.1.6",
+        "webpack": "^5.26.3",
+        "webpack-cli": "^4.5.0",
+        "webpack-dev-server": "^3.11.2"
+    },
+    "bugs": {
+        "url": "https://github.com/LearnChemE/LearnChemE.github.io/issues"
+    },
+    "homepage": "https://github.com/LearnChemE/LearnChemE.github.io#readme"
 }
