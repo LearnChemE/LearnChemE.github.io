@@ -147,10 +147,10 @@ function changeReaction(rxn) {
       gvs.reaction = "acetylene hydrogenation";
       gvs.xRange = [-20, 320];
       gvs.yRange = [25, 1200];
-      tSlider.setAttribute("min", "100");
+      tSlider.setAttribute("min", "30");
       tSlider.setAttribute("max", "1000");
       tSlider.setAttribute("step", "1");
-      gvs.T = gvs.p.constrain(gvs.T - 273.15, 100, 1200) + 273.15;
+      gvs.T = gvs.p.constrain(gvs.T - 273.15, 30, 900) + 273.15;
       tSlider.value = String(gvs.T - 273.15);
       tValue.innerHTML = Number(Number(tSlider.value).toFixed(0));
       gvs.H = function (T, X) {
@@ -191,11 +191,11 @@ function changeReaction(rxn) {
       gvs.xRange = [-520, 20];
       gvs.yRange = [0, 1200];
 
-      tSlider.setAttribute("min", "100");
+      tSlider.setAttribute("min", "25");
       tSlider.setAttribute("max", "1000");
       tSlider.setAttribute("step", "5");
 
-      gvs.T = gvs.p.constrain(gvs.T - 273.15, 100, 1200) + 273.15;
+      gvs.T = gvs.p.constrain(gvs.T - 273.15, 30, 5500) + 273.15;
 
       tSlider.value = String(gvs.T - 273.15);
       tValue.innerHTML = Number(Number(tSlider.value).toFixed(0));
@@ -215,11 +215,11 @@ function changeReaction(rxn) {
       gvs.xRange = [-150, 150];
       gvs.yRange = [0, 1200];
 
-      tSlider.setAttribute("min", "100");
+      tSlider.setAttribute("min", "25");
       tSlider.setAttribute("max", "1000");
       tSlider.setAttribute("step", "5");
 
-      gvs.T = gvs.p.constrain(gvs.T - 273.15, 100, 1200) + 273.15;
+      gvs.T = gvs.p.constrain(gvs.T - 273.15, 30, 1200) + 273.15;
 
       tSlider.value = String(gvs.T - 273.15);
       tValue.innerHTML = Number(Number(tSlider.value).toFixed(0));
