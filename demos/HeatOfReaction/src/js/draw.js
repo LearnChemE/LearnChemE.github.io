@@ -102,9 +102,9 @@ function drawAxes() {
 
         p.textAlign(p.CENTER, p.BOTTOM);
         
-        p.text("enthalpy (kJ/mol)", (gPix[0][1] - gPix[0][0] + margins[0][0]) / 2 + 50, gPix[1][1] + 3 * margins[1][1] / 4);
+        p.text("standard enthalpy H° (kJ/mol)", (gPix[0][1] - gPix[0][0] + margins[0][0]) / 2 + 50, gPix[1][1] + 3 * margins[1][1] / 4);
         p.rotate(-Math.PI/2);
-        p.text("temperature (K)", gPix[0][0] - 280, gPix[1][0] - 10);
+        p.text("temperature (°C)", gPix[0][0] - 280, gPix[1][0] - 10);
 
     p.pop();
 }
@@ -117,10 +117,11 @@ function drawH0() {
         p.beginShape();
             let Tinc = ( yMax - yMin ) / 100;
             let H = 0;
-            for ( let T = 298; T < yMax - Tinc && H < xMax ; T += Tinc ) {
+            for ( let TC = 25; TC < yMax - Tinc && H < xMax ; TC += Tinc ) {
+                const T = 273.15 + TC;
                 H = gvs.H(T, 0);
                 const xPix = gPix[0][0] + (( H - xMin ) / ( xMax - xMin )) * ( gPix[0][1] - gPix[0][0] );
-                const yPix = gPix[1][1] - (( T - yMin ) / ( yMax - yMin )) * ( gPix[1][1] - gPix[1][0] );
+                const yPix = gPix[1][1] - (( TC - yMin ) / ( yMax - yMin )) * ( gPix[1][1] - gPix[1][0] );
                 p.vertex(xPix, yPix);
             }
         p.endShape();
@@ -135,10 +136,11 @@ function drawH1() {
         p.beginShape();
             Tinc = ( yMax - yMin ) / 100;
             let H = 0;
-            for ( let T = 298; T < yMax - Tinc && H < xMax ; T += Tinc ) {
+            for ( let TC = 25; TC < yMax - Tinc && H < xMax ; TC += Tinc ) {
+                const T = 273.15 + TC;
                 H = gvs.H(T, 1);
                 const xPix = gPix[0][0] + (( H - xMin ) / ( xMax - xMin )) * ( gPix[0][1] - gPix[0][0] );
-                const yPix = gPix[1][1] - (( T - yMin ) / ( yMax - yMin )) * ( gPix[1][1] - gPix[1][0] );
+                const yPix = gPix[1][1] - (( TC - yMin ) / ( yMax - yMin )) * ( gPix[1][1] - gPix[1][0] );
                 p.vertex(xPix, yPix);
             }
         p.endShape();
@@ -147,7 +149,7 @@ function drawH1() {
 
 function drawHorizontalLine() {
     p.push();
-        const y = gvs.T;
+        const y = gvs.T - 273.15;
         const x0 = Math.min(xMax, gvs.H(gvs.T, 0));
         const x1 = Math.min(xMax, gvs.H(gvs.T, 1));
         const xPix0 = gPix[0][0] + (( x0 - xMin ) / ( xMax - xMin )) * ( gPix[0][1] - gPix[0][0] );
@@ -176,8 +178,8 @@ function drawProductLabel() {
         p.noStroke();
         p.fill(productsColor);
         const y = (yMax + yMin) / 2;
-        const x = gvs.H(y, 1);
-        const x2 = gvs.H(y + 7, 1);
+        const x = gvs.H(y + 273.15, 1);
+        const x2 = gvs.H(y + 280, 1);
         const y2 = y + (280 - 273.15);
         const xPix = gPix[0][0] + (( x - xMin ) / ( xMax - xMin )) * ( gPix[0][1] - gPix[0][0] );
         const yPix = gPix[1][1] - (( y - yMin ) / ( yMax - yMin )) * ( gPix[1][1] - gPix[1][0] );
@@ -203,8 +205,8 @@ function drawReactantsLabel() {
         p.noStroke();
         p.fill(reactantsColor);
         const y = (yMax + yMin) / 3;
-        const x = gvs.H(y, 0);
-        const x2 = gvs.H(y + 7, 0);
+        const x = gvs.H(y + 273.15, 0);
+        const x2 = gvs.H(y + 280, 0);
         const y2 = y + (280 - 273.15);
         const xPix = gPix[0][0] + (( x - xMin ) / ( xMax - xMin )) * ( gPix[0][1] - gPix[0][0] );
         const yPix = gPix[1][1] - (( y - yMin ) / ( yMax - yMin )) * ( gPix[1][1] - gPix[1][0] );
@@ -229,7 +231,7 @@ function drawAll(p5obj) {
     if ( typeof(p) === "undefined" ) { p = p5obj }
     xMin = gvs.xRange[0];
     xMax = gvs.xRange[1];
-    yMin = 200;
+    yMin = 0;
     yMax = gvs.yRange[1];
     margins = [[75, 40], [36, 70]]; // margins of graph from edge of canvas
     gPix = [[margins[0][0], p.width - margins[0][1]], [margins[1][0], p.height - margins[1][1]]]; // Graph pixel values of the edges, i.e. [[pixels of left bound, pixels of right bound], [pixels of top bound, pixels of bottom bound]]

@@ -66,18 +66,17 @@ $modal-lg: 1000px;
 }
 
 #reaction-container {
-  display: inline-block;
+  display: grid;
   width: 600px;
-  height: 40px;
+  height: 45px;
   border-style: solid solid none solid;
   border-width: 1px;
   border-color: black;
   margin: auto;
-  padding-top: 5px;
-  text-align: center;
-  font-size: 1.35rem;
+  align-items: center;
+  justify-items: center;
+  font-size: 1.25rem;
   background-color: rgb(253, 253, 253);
-  transform: translateX(50vw) translateX(-50%);
 }
 
 #p5-container {
