@@ -44,9 +44,9 @@
   
       <div class="input-row">
         <div class="data-name">Temperature&nbsp;</div>
-        <input type="range" id="t-slider" min="25" max="5000" step="1" value="150">
-        <div class="data-value" id="t-value">150</div>
-        <div class="data-metric">&deg; C</div>
+        <input type="range" id="t-slider" min="298" max="1000" step="1" value="400">
+        <div class="data-value" id="t-value">400</div>
+        <div class="data-metric">&nbsp;K</div>
       </div>
   
       <div class="input-row" style="display:none;">
@@ -66,9 +66,7 @@
   </div>
 
   <div id="reaction-container">
-    \(
-      \mathrm{ C_{2} H_{2} + H_{2} \longrightarrow C_{2} H_{4} }
-    \)
+      C<sub>2</sub>H<sub>2</sub> + H<sub>2</sub> &rarr; C<sub>2</sub>H<sub>4</sub>
   </div>
 
   <div id="p5-container"></div>
@@ -87,7 +85,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation shows how the heat of reaction changes with temperature.  The blue line represents the enthalpy of the reactants at a given temperature, and the green line represents the enthalpy of the products at a given temperature.  The black arrow between the two lines represents the heat of reaction, with the value for &Delta;H<sub>rxn</sub> written on top of the black arrow.  Choose a different set of reactants/products using the drop-down menu labelled "Reaction".  Change the temperature of the reaction using the slider labelled "Temperature".  A more detailed explanation of the governing equations is given by pressing the "Details" button.
+            This simulation calculates the heat of reaction at the temperature selected by the slider. The blue line is the enthalpy of the reactants, and the green line is the enthalpy of the products. The black arrowed line represents the heat of reaction at the temperature selected. Choose among three reactions using the drop-down menu labelled "Reaction".  The governing equations are under Details.
           </p>
 
         </div>
@@ -110,36 +108,36 @@
         <div class="modal-body">
 
           <p>
-            The heat of reaction is a temperature-dependent property. It can be calculated from the standard heat of reaction \( H_{rxn}^{ ^{ ⊖ } } \) and the temperature-dependent heat capacities \( c_{p, i} \) where \( i \) is a component of the reaction. Standard heat of reaction \( H_{rxn}^{ ^{ ⊖ } } \) is the reaction enthalpy at 25&deg; C (298 K) and can be calculated from standard heats of formation \( H_{f,i}^{ \circ } \). Heat of reaction at temperature \( T \) is defined:
+            The heat of reaction at a given temperature \( \Delta H^{ \circ }_{T} \) is calculated from the standard state heat of reaction \( \Delta H^{ \circ }_{298} \) and temperature-dependent heat capacity \( C_{p} \) of the mixture:
           </p>
 
           $$
-            \Delta H_{rxn} = \Delta H_{rxn}^{ ^{ ⊖ } } + \int_{298}^{T} \Delta C_{p} dT
+            \Delta H^{ \circ }_{T} = \Delta H^{ \circ }_{298} + \int_{298}^{T} \Delta C_{p} dT
           $$
 
           <p>
-            where the total heat capacity \( C_{p} \) is defined
+            where
           </p>
 
           $$
-            \Delta C_{p} = \sum_{i}^{n} \nu_{i} c_{p, i}
+            \Delta C_{p} = \sum_{i}^{n} \nu_{i} C_{p, i}
           $$
 
           <p>
-            and \( \nu_{i} \) is the stoichiometric coefficient of component \( i \), and \( n \) is the number of components in the reaction. The heat capacity is often approximated using the Shomate equation:
+            where \( \nu_{i} \) is the stoichiometric coefficient of component \( i \), \( C_{p, i} \) is the heat capacity of component \( i \), and \( n \) is the number of components in the reaction. Heat capacity data are fit using the Shomate equation:
           </p>
 
           $$
-            c_{p, i} = A + BT + CT^{2} + DT^{3} + \frac{ E }{ T^{2} }
+            C_{p, i} = A + BT + CT^{2} + DT^{3} + \frac{ E }{ T^{2} }
           $$
 
           <p>
-            where the coefficients \( A \), \( B \), \( C \), \( D \), and \( E \) are determined experimentally, and \( T \) is temperature in Kelvin.  The resulting algebraic formula for heat of reaction \( \Delta H_{rxn} \) is therefore
+            where \( A \), \( B \), \( C \), \( D \), and \( E \) are constants, and \( T \) is temperature in Kelvin.  The resulting equation for heat of reaction \( \Delta H_{rxn} \) is therefore
           </p>
 
           <div class="smaller">
             $$
-              \Delta H_{rxn} = \Delta H_{rxn}^{ ^{ ⊖ } } + \sum_{i}^{n} \left[ \nu_{i} A_{i} (T - 298) + \frac{ \nu_{i} B_{i} }{ 2 } ( T^{2} - 298^{2} ) + \frac{ \nu_{i} C_{i} }{ 3 } ( T^{3} - 298^{3} ) + \frac{ \nu_{i} D_{i} }{ 4 } ( T^{4} - 298^{4} ) - \frac{ \nu_{i} E_{i} }{ T } + \frac{ \nu_{i} E_{i} }{ 298 } \right]
+              \Delta H^{ \circ }_{T} = \Delta H^{ \circ }_{298} + \sum_{i}^{n} \left[ \nu_{i} A_{i} (T - 298) + \frac{ \nu_{i} B_{i} }{ 2 } ( T^{2} - 298^{2} ) + \frac{ \nu_{i} C_{i} }{ 3 } ( T^{3} - 298^{3} ) + \frac{ \nu_{i} D_{i} }{ 4 } ( T^{4} - 298^{4} ) + \frac{ (T - 298) }{ 298 } \frac{ \nu_{i} E_{i} }{ T } \right]
             $$
           </div>
 

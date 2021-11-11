@@ -5,7 +5,7 @@ window.p5 = new require("./js/p5.min.js");
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
-    T: Number(document.getElementById("t-slider").value) + 273.15,
+    T: Number(document.getElementById("t-slider").value),
     X: Number(document.getElementById("x-slider").value),
     reaction: "acetylene hydrogenation",
     H: function(T, X) {},
@@ -52,7 +52,7 @@ const selectReaction = document.getElementById("select-reaction");
 const reactionContainer = document.getElementById("reaction-container");
 
 tSlider.addEventListener("input", () => {
-    gvs.T = Number(Number(tSlider.value).toFixed(0)) + 273.15;
+    gvs.T = Number(Number(tSlider.value).toFixed(0));
     tValue.innerHTML = Number(Number(tSlider.value).toFixed(0));
     P5.redraw();
 });
@@ -73,12 +73,12 @@ function changeReaction(rxn) {
         case "1":
             gvs.reaction = "acetylene hydrogenation";
             gvs.xRange = [0, 320];
-            gvs.yRange = [25, 1000];
-            tSlider.setAttribute("min", "30");
-            tSlider.setAttribute("max", "900");
+            gvs.yRange = [250, 1300];
+            tSlider.setAttribute("min", "298");
+            tSlider.setAttribute("max", "1298");
             tSlider.setAttribute("step", "1");
-            gvs.T = gvs.p.constrain(gvs.T - 273.15, 30, 900) + 273.15;
-            tSlider.value = String(gvs.T - 273.15);
+            gvs.T = gvs.p.constrain(gvs.T, 298, 1300);
+            tSlider.value = String(gvs.T);
             tValue.innerHTML = Number(Number(tSlider.value).toFixed(0));
             gvs.H = function(T, X) {
                 const H0 = gvs.chemicals.hydrogen.enthalpy(T) + gvs.chemicals.acetylene.enthalpy(T);
@@ -86,21 +86,21 @@ function changeReaction(rxn) {
                 return H0 + X * (H1 - H0);
             }
             gvs.Hrxn = gvs.H(gvs.T, 1) - gvs.H(gvs.T, 0);
-            reactionContainer.innerHTML = `\\( \\mathrm{ C_{2} H_{2} + H_{2} \\longrightarrow C_{2} H_{4} } \\)`;
+            reactionContainer.innerHTML = `C<sub>2</sub>H<sub>2</sub> + H<sub>2</sub> &rarr; C<sub>2</sub>H<sub>4</sub>`;
         break;
 
         case "2":
             gvs.reaction = "methane combustion";
 
             gvs.xRange = [-1200, 200];
-            gvs.yRange = [0, 220];
+            gvs.yRange = [250, 500];
 
-            tSlider.setAttribute("min", "25");
-            tSlider.setAttribute("max", "200");
+            tSlider.setAttribute("min", "298");
+            tSlider.setAttribute("max", "500");
             tSlider.setAttribute("step", "1");
 
-            gvs.T = gvs.p.constrain(gvs.T - 273.15, 25, 200) + 273.15;
-            tSlider.value = String(gvs.T - 273.15);
+            gvs.T = gvs.p.constrain(gvs.T, 298, 500);
+            tSlider.value = String(gvs.T);
             tValue.innerHTML = Number(Number(tSlider.value).toFixed(0));
 
             gvs.H = function(T, X) {
@@ -109,22 +109,22 @@ function changeReaction(rxn) {
                 return H0 + X * (H1 - H0);
             }
             gvs.Hrxn = gvs.H(gvs.T, 1) - gvs.H(gvs.T, 0);
-            reactionContainer.innerHTML = `\\( \\mathrm{ C_{2} H_{4} + 2 \\; O_{2} \\longrightarrow CO_{2} + 2 \\; H_{2} O } \\)`;
+            reactionContainer.innerHTML = `C<sub>2</sub>H<sub>4</sub> + 2 O<sub>2</sub> &rarr; CO<sub>2</sub> + 2 H<sub>2</sub> O`;
         break;
         
         case "3":
             gvs.reaction = "carbon monoxide oxidation";
 
             gvs.xRange = [-450, 20];
-            gvs.yRange = [0, 2100];
+            gvs.yRange = [250, 2300];
 
-            tSlider.setAttribute("min", "25");
-            tSlider.setAttribute("max", "2000");
-            tSlider.setAttribute("step", "5");
+            tSlider.setAttribute("min", "298");
+            tSlider.setAttribute("max", "2300");
+            tSlider.setAttribute("step", "1");
 
-            gvs.T = gvs.p.constrain(gvs.T - 273.15, 30, 5500) + 273.15;
+            gvs.T = gvs.p.constrain(gvs.T, 298, 5500);
             
-            tSlider.value = String(gvs.T - 273.15);
+            tSlider.value = String(gvs.T);
             tValue.innerHTML = Number(Number(tSlider.value).toFixed(0));
 
             gvs.H = function(T, X) {
@@ -133,22 +133,22 @@ function changeReaction(rxn) {
                 return H0 + X * (H1 - H0);
             }
             gvs.Hrxn = gvs.H(gvs.T, 1) - gvs.H(gvs.T, 0);
-            reactionContainer.innerHTML = `\\( \\mathrm{ C O + \\frac{1}{2} \\; O_{2} \\longrightarrow CO_{2} } \\)`;
+            reactionContainer.innerHTML = `CO + \\( \\sf{ \\frac{1}{2} } \\) O<sub>2</sub> &rarr; CO<sub>2</sub>`;
         break;
 
         case "4":
             gvs.reaction = "haber bosch process";
 
             gvs.xRange = [-150, 160];
-            gvs.yRange = [0, 2000];
+            gvs.yRange = [250, 2300];
 
-            tSlider.setAttribute("min", "25");
-            tSlider.setAttribute("max", "1200");
-            tSlider.setAttribute("step", "5");
+            tSlider.setAttribute("min", "298");
+            tSlider.setAttribute("max", "1600");
+            tSlider.setAttribute("step", "1");
 
-            gvs.T = gvs.p.constrain(gvs.T - 273.15, 30, 1200) + 273.15;
+            gvs.T = gvs.p.constrain(gvs.T, 298, 2300);
             
-            tSlider.value = String(gvs.T - 273.15);
+            tSlider.value = String(gvs.T);
             tValue.innerHTML = Number(Number(tSlider.value).toFixed(0));
 
             gvs.H = function(T, X) {
@@ -157,7 +157,7 @@ function changeReaction(rxn) {
                 return H0 + X * (H1 - H0);
             }
             gvs.Hrxn = gvs.H(gvs.T, 1) - gvs.H(gvs.T, 0);
-            reactionContainer.innerHTML = `\\( \\mathrm{ N_{2} + 3 \\; H_{2} \\longrightarrow 2 \\; NH_{3} } \\)`;
+            reactionContainer.innerHTML = `N<sub>2</sub> + 3 H<sub>2</sub> &rarr; 2 NH<sub>3</sub>`;
         break;
     };
     window.MathJax.typeset();
