@@ -1,0 +1,121 @@
+@import "bootstrap";
+@import "./slider.scss";
+
+.simulation-controls {
+  display: grid;
+  grid-template-columns: max-content 220px;
+  justify-content: center;
+  gap: 30px;
+  width: 100vw;
+}
+
+.modal-buttons-row {
+  display: grid;
+  grid-template-columns: repeat(2, 12ch );
+  gap: 10px;
+  margin: 0.5rem auto;
+  justify-content: center;
+  align-content: center;
+  .btn {
+    height: max-content;
+  }
+}
+
+.input-area {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  margin: 20px auto;
+  gap: 10px;
+  width: max-content;
+  justify-items: center;
+
+  .input-row {
+    display: grid;
+    grid-template-columns: 150px 10rem 27px 3ch;
+    gap: 1ch;
+    align-items: end;
+    grid-column: 1 / 3;
+  
+    .data-name {
+      justify-self: end;
+    }
+
+    .data-value {
+      text-align: end;
+    }
+// Was calc(max(3ch, max-content))
+    #t-value {
+      width: 3ch;
+      margin-right: -8px;
+    }
+  }
+
+  .input-select {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    gap: 15px;
+    align-items: center;
+
+    .select-label {
+      text-align: right;
+    }
+
+    #select-reaction {
+      padding: 0.25rem;
+    }
+  }
+}
+
+#equation-instructions {
+  position: absolute;
+  transition: opacity 0.25s;
+  color: #198754;
+}
+
+#begin-calculation {
+  width: 17ch;
+}
+
+#p5-container {
+  width: max-content;
+  margin: auto;
+}
+
+canvas {
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+  box-shadow: 0px 0px 2px 2px lightgrey;
+}
+
+#loading {
+  margin-left: 15px;
+  font-size: 1.5rem;
+  width: 100vw;
+  text-align: center;
+}
+
+.modal.show {
+  padding-left: 0px !important;
+}
+
+.modal-body {
+  text-align: left;
+
+  .references {
+    font-size: 0.8rem;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.simulation-title {
+  width: 100vw;
+  text-align: center;
+  padding: 8px;
+  padding-bottom: 10px;
+  font-size: 1.25rem;
+  background-color: rgb(240, 240, 240);
+}
