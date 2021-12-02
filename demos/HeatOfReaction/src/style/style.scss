@@ -1,134 +1,124 @@
 $modal-lg: 1000px;
-
+$modal-md: 95vw;
 @import "bootstrap";
 @import "./slider.scss";
-
 .simulation-controls {
-  display: grid;
-  grid-template-columns: 430px 220px;
-  justify-content: center;
-  gap: 30px;
-  width: 100vw;
+    display: grid;
+    grid-template-columns: 430px 220px;
+    justify-content: center;
+    gap: 30px;
+    width: 100vw;
 }
 
 .modal-buttons-row {
-  display: grid;
-  grid-template-columns: repeat(2, 12ch );
-  gap: 10px;
-  margin: 0.5rem auto;
-  justify-content: center;
-  align-content: center;
-  .btn {
-    height: max-content;
-  }
+    display: grid;
+    grid-template-columns: repeat(2, 12ch);
+    gap: 10px;
+    margin: 0.5rem auto;
+    justify-content: center;
+    align-content: center;
+    .btn {
+        height: max-content;
+    }
 }
 
 .input-area {
-  display: grid;
-  margin: 20px auto;
-  gap: 10px;
-  width: max-content;
-
-  .input-row {
     display: grid;
-    grid-template-columns: 80px 15rem 30px 3ch;
-    gap: 1ch;
-    align-items: end;
-  
-    .data-name {
-      justify-self: end;
+    margin: 20px auto;
+    gap: 10px;
+    width: max-content;
+    .input-row {
+        display: grid;
+        grid-template-columns: 80px 15rem 30px 3ch;
+        gap: 1ch;
+        align-items: end;
+        .data-name {
+            justify-self: end;
+        }
+        .data-value {
+            text-align: end;
+        }
+        #t-value {
+            width: calc(max(3ch, max-content));
+            margin-right: -8px;
+        }
     }
-
-    .data-value {
-      text-align: end;
+    .input-select {
+        display: grid;
+        grid-template-columns: 95px max-content;
+        gap: 15px;
+        align-items: center;
+        .select-label {
+            text-align: right;
+        }
+        #select-reaction {
+            padding: 0.25rem;
+        }
     }
-
-    #t-value {
-      width: calc(max(3ch, max-content));
-      margin-right: -8px;
-    }
-  }
-
-  .input-select {
-    display: grid;
-    grid-template-columns: 95px max-content;
-    gap: 15px;
-    align-items: center;
-
-    .select-label {
-      text-align: right;
-    }
-
-    #select-reaction {
-      padding: 0.25rem;
-    }
-  }
 }
 
 #reaction-container {
-  display: inline-block;
-  width: 600px;
-  height: 40px;
-  border-style: solid solid none solid;
-  border-width: 1px;
-  border-color: black;
-  margin: auto;
-  padding-top: 5px;
-  text-align: center;
-  font-size: 1.35rem;
-  background-color: rgb(253, 253, 253);
-  transform: translateX(50vw) translateX(-50%);
+    display: inline-block;
+    width: 600px;
+    height: 40px;
+    border-style: solid solid none solid;
+    border-width: 1px;
+    border-color: black;
+    margin: auto;
+    padding-top: 5px;
+    text-align: center;
+    font-size: 1.35rem;
+    background-color: rgb(253, 253, 253);
+    transform: translateX(50vw) translateX(-50%);
 }
 
 #p5-container {
-  width: max-content;
-  margin: auto;
+    width: max-content;
+    margin: auto;
 }
 
 canvas {
-  border-style: none solid solid solid;
-  border-width: 1px;
-  border-color: black;
+    border-style: none solid solid solid;
+    border-width: 1px;
+    border-color: black;
 }
 
 #loading {
-  margin-left: 15px;
-  font-size: 1.5rem;
+    margin-left: 15px;
+    font-size: 1.5rem;
 }
 
 .modal.show {
-  padding-left: 0px !important;
+    padding-left: 0px !important;
 }
 
 .modal-body {
-  text-align: left;
-
-  .references {
-    font-size: 0.8rem;
-  }
-
-  li {
-    margin-bottom: 0.5rem;
-  }
+    text-align: left;
+    .references {
+        font-size: 0.8rem;
+    }
+    li {
+        margin-bottom: 0.5rem;
+    }
 }
 
 .simulation-title {
-  width: 100vw;
-  text-align: center;
-  padding: 8px;
-  padding-bottom: 10px;
-  font-size: 1.25rem;
-  background-color: rgb(240, 240, 240);
+    width: 100vw;
+    text-align: center;
+    padding: 8px;
+    padding-bottom: 10px;
+    font-size: 1.25rem;
+    background-color: rgb(240, 240, 240);
 }
 
 .smaller {
-  font-size: 0.9rem;
+    font-size: 0.9rem;
 }
 
 .modal-body mjx-container {
-  transform: translateX( 25px );
+    transform: translateX( 25px);
 }
 
 .mjx-c2218 {
-  transform: translateY(-3px);
+    transform: translateY(-3px);
 }
