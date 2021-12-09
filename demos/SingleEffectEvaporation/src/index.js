@@ -4,7 +4,7 @@ window.p5 = new require("./js/p5.min.js");
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
-  t_inlet : 373, // feed temperature, K
+  t_inlet : 400, // feed temperature, K
   p_inlet : 1, // feed pressure, MPa
   t_steam : 500, // steam temperature, K
   p_steam : 2.6392, // steam pressure, MPa
@@ -16,6 +16,10 @@ window.gvs = {
   conc_flowrate : 8.6, // flow rate of concentrate, kg/s
   conc_concentrate : 0.088, // fraction of sugar in the concentrate stream
   steam_economy : 1.07, // steam economy, kg water/kg steam
+  hx_U : 2000, // overall heat transfer coefficient of heat exchanger, W / (m^2*K)
+  hx_A : 30, // heat exchanger area, m^2
+  Hvap_steam : 1835350, // latent heat of vaporization for steam at 2.64 MPa, J/kg
+  Hvap_conc : 2014160, // latent heat of vaporization for concentrate at 1 MPa, J/kg
 };
 
 // Handle sliders

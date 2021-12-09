@@ -38,7 +38,7 @@ function drawSteamLabel(p) {
   p.stroke(gvs.steam_label_color);
   p.noFill();
   p.rectMode(p.CENTER);
-  p.rect(center_width / 2 - 50, center_height, 200, 80);
+  p.rect(center_width / 2 - 50, center_height + 15, 200, 110);
 
   // draw text
   p.noStroke();
@@ -46,6 +46,7 @@ function drawSteamLabel(p) {
   p.text("saturated steam", center_width / 2 - 130, center_height - 10);
   p.text(`${Number(gvs.s_inlet).toFixed(1)} kg/s`, center_width / 2 - 130, center_height + 20);
   p.text(`${gvs.t_steam} K`, center_width / 2 - 45, center_height + 20);
+  p.text(`${Number(gvs.p_steam).toFixed(2)} MPa`, center_width / 2 - 130, center_height + 50);
   p.pop();
 }
 
@@ -78,14 +79,15 @@ function drawSteamCondensateLabel(p) {
   p.stroke(gvs.steam_label_color);
   p.noFill();
   p.rectMode(p.CENTER);
-  p.rect(3 * center_width / 2 + 50, center_height + 85, 200, 80);
+  p.rect(3 * center_width / 2 + 50, center_height + 70, 200, 110);
 
   // draw text
   p.noStroke();
   p.fill(gvs.steam_label_color);
-  p.text("saturated liquid water", 3 * center_width / 2 - 30, center_height + 75);
-  p.text(`${Number(gvs.s_inlet).toFixed(1)} kg/s`, 3 * center_width / 2 - 30, center_height + 105);
-  p.text(`${gvs.t_steam} K`, 3 * center_width / 2 + 60, center_height + 105);
+  p.text("saturated liquid water", 3 * center_width / 2 - 30, center_height + 45);
+  p.text(`${Number(gvs.s_inlet).toFixed(1)} kg/s`, 3 * center_width / 2 - 30, center_height + 75);
+  p.text(`${gvs.t_steam} K`, 3 * center_width / 2 + 60, center_height + 75);
+  p.text(`${Number(gvs.p_steam).toFixed(2)} MPa`, 3 * center_width / 2 - 30, center_height + 105);
   p.pop();
 }
 
