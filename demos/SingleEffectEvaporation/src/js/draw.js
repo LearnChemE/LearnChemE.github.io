@@ -16,10 +16,16 @@ function drawFeedLabel(p) {
   p.stroke(gvs.solution_label_color);
   p.noFill();
   p.rectMode(p.CENTER);
-  p.rect(center_width / 2 - 40, center_height - 110, 180, 100);
+  p.rect(center_width / 2 - 50, center_height - 110, 200, 100);
 
   // draw text
-
+  p.noStroke();
+  p.fill(gvs.solution_label_color);
+  p.text("feed", center_width / 2 - 130, center_height - 135);
+  p.text(`${gvs.f_inlet} kg/s`, center_width / 2 - 130, center_height - 105);
+  p.text(`${Number(gvs.p_inlet).toFixed(1)} MPa`, center_width / 2 - 130, center_height - 75);
+  p.text(`${gvs.t_inlet} K`, center_width / 2 - 45, center_height - 105);
+  p.text(`${Number(gvs.conc_inlet * 100).toFixed(1)}% sugar`, center_width / 2 - 45, center_height - 75);
   p.pop();
 }
 
@@ -32,10 +38,14 @@ function drawSteamLabel(p) {
   p.stroke(gvs.steam_label_color);
   p.noFill();
   p.rectMode(p.CENTER);
-  p.rect(center_width / 2 - 40, center_height, 180, 80);
+  p.rect(center_width / 2 - 50, center_height, 200, 80);
 
   // draw text
-
+  p.noStroke();
+  p.fill(gvs.steam_label_color);
+  p.text("saturated steam", center_width / 2 - 130, center_height - 10);
+  p.text(`${Number(gvs.s_inlet).toFixed(1)} kg/s`, center_width / 2 - 130, center_height + 20);
+  p.text(`${gvs.t_steam} K`, center_width / 2 - 45, center_height + 20);
   p.pop();
 }
 
@@ -48,10 +58,14 @@ function drawEvaporateLabel(p) {
   p.stroke(gvs.solution_label_color);
   p.noFill();
   p.rectMode(p.CENTER);
-  p.rect(center_width + 140, center_height - 180, 180, 80);
+  p.rect(center_width + 150, center_height - 180, 200, 80);
 
   // draw text
-
+  p.noStroke();
+  p.fill(gvs.solution_label_color);
+  p.text("evaporated water", center_width + 70, center_height - 195);
+  p.text(`${Number(gvs.evap_flowrate).toFixed(1)} kg/s`, center_width + 70, center_height - 165);
+  p.text(`${gvs.evaporator_t} K`, center_width + 155, center_height - 165);
   p.pop();
 }
 
@@ -64,10 +78,14 @@ function drawSteamCondensateLabel(p) {
   p.stroke(gvs.steam_label_color);
   p.noFill();
   p.rectMode(p.CENTER);
-  p.rect(3 * center_width / 2 + 40, center_height + 85, 180, 80);
+  p.rect(3 * center_width / 2 + 50, center_height + 85, 200, 80);
 
   // draw text
-
+  p.noStroke();
+  p.fill(gvs.steam_label_color);
+  p.text("saturated liquid water", 3 * center_width / 2 - 30, center_height + 75);
+  p.text(`${Number(gvs.s_inlet).toFixed(1)} kg/s`, 3 * center_width / 2 - 30, center_height + 105);
+  p.text(`${gvs.t_steam} K`, 3 * center_width / 2 + 60, center_height + 105);
   p.pop();
 }
 
@@ -80,10 +98,15 @@ function drawConcentrateLabel(p) {
   p.stroke(gvs.solution_label_color);
   p.noFill();
   p.rectMode(p.CENTER);
-  p.rect(center_width + 140, center_height + 180, 180, 80);
+  p.rect(center_width + 150, center_height + 190, 200, 100);
 
   // draw text
-  
+  p.noStroke();
+  p.fill(gvs.solution_label_color);
+  p.text("concentrate", center_width + 70, center_height + 165);
+  p.text(`${Number(gvs.evap_flowrate).toFixed(1)} kg/s`, center_width + 70, center_height + 195);
+  p.text(`${gvs.evaporator_t} K`, center_width + 155, center_height + 195);
+  p.text(`${Number(gvs.conc_concentrate * 100).toFixed(1)}% sugar`, center_width + 70, center_height + 225);
   p.pop();
 }
 
@@ -95,7 +118,9 @@ function drawEvaporatorConditionsLabel(p) {
 
 function drawSteamEconomyLabel(p) {
   p.push();
-
+  p.noStroke();
+  p.fill(0);
+  p.text(`steam economy: ${Number(gvs.steam_economy).toFixed(2)} kg water/kg steam`, p.width / 4 - 140, 50);
   p.pop();
 }
 
