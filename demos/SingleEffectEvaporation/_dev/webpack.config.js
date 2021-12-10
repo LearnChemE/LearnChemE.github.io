@@ -19,7 +19,7 @@ const module_rules = [{
 ];
 
 const html_options = {
-  title: "Single-Effect Evaporation",
+  title: "Single-Effect Evaporator",
   filename: "index.html",
   template: path.resolve(__dirname, '../src/html/index.html'),
   scriptLoading: "blocking",
@@ -29,7 +29,7 @@ const html_options = {
     "keywords": "LearnChemE, Chemical Engineering, Engineering, Education, Simulation, Thermodynamics",
     "author": "Neil Hendren",
     "application-name": "Single-Effect Evaporation",
-    "description": "An interactive simulation designed to teach engineering students about single-effect evaporation."
+    "description": "An interactive simulation designed to teach engineering students about single-effect evaporators."
   },
 }
 

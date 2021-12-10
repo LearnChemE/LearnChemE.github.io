@@ -4,7 +4,7 @@ const feedTempSlider = document.getElementById("t-slider");
 const feedTempValue = document.getElementById("t-value");
 
 flowRateSlider.addEventListener("input", () => {
-  flowRateValue.innerHTML = flowRateSlider.value;
+  flowRateValue.innerHTML = Number(flowRateSlider.value).toFixed(1);
   gvs.f_inlet = Number(flowRateSlider.value);
   gvs.p.redraw();
 });
