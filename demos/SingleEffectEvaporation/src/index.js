@@ -4,10 +4,7 @@ window.p5 = new require("./js/p5.min.js");
 
 // TO DO:
 // label tank pressure and temperature
-// change tank pressure to 0.3 MPa
-// boiling point dependence on sugar concentration
-// label sugar concentrations as wt%
-// view screencasts about single-effect evaporator
+// directions + details
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
