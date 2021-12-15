@@ -9,7 +9,7 @@
   <script>
     MathJax = {
       chtml: {
-        scale: 0.95,
+        scale: 0.9,
         mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
         displayAlign: 'left', // default for indentalign when set to 'auto'
       }
@@ -71,7 +71,7 @@
         </div>
         <div class="modal-body">
           <p>
-            Directions
+            This demonstration shows the efficacy of single-effect evaporation of a dilute sugar solution. The saturated or unsaturated liquid is fed into a tank, which contains a steam-fed heat exchanger. The user may adjust the feed flow rate and feed temperature of the feed solution. The conditions of each inlet and outlet stream are shown in colored boxes, with green boxes representing the sugar solution or vapor from the sugar solution, and red boxes representing the steam fed into the heat exchanger.
           </p>
 
         </div>
@@ -94,22 +94,32 @@
         <div class="modal-body">
 
           <p>
-            Details
+            The general equation for the heat rate of a heat exchanger is:
           </p>
 
           $$
-            equation
+          [1] \;\;\;\;\; \dot{ Q } = U A \Delta T_{ LM }
           $$
 
           <p>
-            References:<br>
+            where \( \dot{ Q } \) is heat rate (W), \( U \) is the overall heat transfer coefficient [W/(m<sup>2</sup>K)], \( A \) is the area of heat transfer (m<sup>2</sup>), and \( \Delta T_{ LM } \) is the log-mean temperature difference,
           </p>
 
-          <ol class="references">
-            <li>
-              reference 1
-            </li>
-          </ol>
+          $$
+          [2] \;\;\;\;\; \Delta T_{ LM } = \frac{ ( T_{ H, in } - T_{ H, out } ) - ( T_{ H, out } - T_{ C, out } ) }{ \mathrm{ ln } \left[ ( T_{ H, in } - T_{ C, in } ) / ( T_{ H, out } - T_{ C, out } ) \right] }
+          $$
+
+          <p>
+            where \( T_{ H, in } \) and \( T_{ H, out } \) are the temperatures of the hot fluid at the inlet and outlet, and \( T_{ C, in } \) and \( T_{ C, out } \) are the temperature of the cold fluid at the inlet and outlet, respectively. When one fluid is condensing and the other is boiling, the following equation should be used:
+          </p>
+
+          $$
+          [3] \;\;\;\;\; \dot{ Q } = U A ( T_{ in } - T{ out } ) 
+          $$
+
+          <p>
+            where \( T_{ in } \) and \( T_{ out  } \) are the temperatures of the hot fluid and cold fluid. The value of \( U \) depends on the type of fluid on each side of the heat exchanger, as the fluid's density, viscosity, velocity, thermal conductivity, and heat capacity affect its value.
+          </p>
 
           <div style="margin-top: 2rem;"></div>
         </div>
