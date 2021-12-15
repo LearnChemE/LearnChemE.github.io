@@ -601,7 +601,7 @@ const problem = {
         "questionelements": [
             [[{
                 "type": "text",
-                "label": `In this demonstration, the user is led through a step-by-step procedure to create a pressure-composition diagram for two immiscible liquids (water and an organic) at a fixed temperature. The organic can be benzene, toluene, or n-hexane.<br><br>After answering, the user clicks "Submit Answer" to check their answer, followed by "Next" to proceed with the question. The user can only move forward or select "Restart Problem" to start over at a different temperature and a different organic. For any step, click "Hint" for help.<br><br>In some steps, saturation pressures are calculated from Antoine's equation shown in a second graph. To begin, press the "Begin" button below.`,
+                "label": `In this demonstration, the user is led through a step-by-step procedure to create a temperature-composition diagram for two immiscible liquids (water and an organic) at a fixed pressure. The organic can be benzene, toluene, or n-hexane.<br><br>After answering, the user clicks "Submit Answer" to check their answer, followed by "Next" to proceed with the question. The user can only move forward or select "Restart Problem" to start over at a different pressure and a different organic. For any step, click "Hint" for help.<br><br>In some steps, saturation pressures are calculated from Antoine's equation shown in a second graph. To begin, press the "Begin" button below.`,
                 "class": "prompt"
             },
             {
