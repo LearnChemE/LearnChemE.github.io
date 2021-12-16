@@ -1,4 +1,6 @@
 function Hvap(T_K) {
+  // Equation for heat of vaporization of saturated water
+  // Source: https://mychemengmusings.wordpress.com/2019/01/08/handy-equations-to-calculate-heat-of-evaporation-and-condensation-of-water-steam/
   const T_C = T_K - 273; // temperature in celsius
   let H_vap = 193.1 - 10950 * Math.log( ( 374 - T_C ) / 647) * ( 374 - T_C )**0.785 / ( 273 + T_C ); // heat of vaporization (kJ/kg)
   H_vap *= 1000; // heat of vaporization converted to J/kg
@@ -15,9 +17,9 @@ function Cp(T_K, xs) {
   return cp;
 }
 
-// Calculates boiling temperature (K) from pressure (MPa)
-// Source: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7732185
 function T_boiling(P) {
+  // Calculates boiling temperature (K) from pressure (MPa)
+  // Source: https://webbook.nist.gov/cgi/cbook.cgi?ID=C7732185&Mask=4#Thermo-Phase
   const P_bar = P * 10; // Pressure in bar
   let T = 298; // boiling temperature (K)
   let Psat = 0;
