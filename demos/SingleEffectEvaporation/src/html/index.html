@@ -94,15 +94,16 @@
         <div class="modal-body">
 
           <p>
-            Assuming that the vapor in the hot-side of the heat exchanger is saturated, the equation for the heat rate of a heat exchanger in a single-effect evaporator is:
+            The rate of a heat exchange \( (Q) \) in Watts in a single-effect evaporator is:
           </p>
 
           $$
-            [1] \quad \dot{ Q } = U A ( T_{ h } - T_{ conc } )
+            [1] \quad \dot{ Q } = U A \; ( T_{ h } - T_{ conc } )
           $$
 
           <p>
-            where \( \dot{ Q } \) is heat rate (W), \( U \) is the overall heat transfer coefficient of the heat exchanger [W/(m<sup>2</sup>K)], \( A \) is the area of heat transfer of the heat exchanger (m<sup>2</sup>), \( T_{ conc } \) is the temperature of the concentrate in the evaporator (K), and \( T_{ h } \) is the temperature of the vapor in the heat exchanger (K), which is typically saturated steam. The value of \( U \) depends on the type of fluid on each side of the heat exchanger, because the fluid's density, viscosity, velocity, thermal conductivity, and heat capacity affect the value of \( U \). First, one can determine the values of \( T_{ h } \) and \( T_{ conc } \) using Antoine's equation, assuming the pressure of the evaporator and heat exchanger are known:
+
+            where \( U \) is the overall heat transfer coefficient [W/(m<sup>2</sup>K)], \( A \) is the area of heat transfer (m<sup>2</sup>), \( T_{conc} \)  is the temperature of the concentrated sugar solution (K), and \( T_{h} \) is the temperature of the steam (K), which is saturated. The value of \( U \) depends on the fluids' density, viscosity, velocity, thermal conductivity, and heat capacity. The values of \( T_h \) and \( T_{conc} \) are obtained from Antoine's equations:
           </p>
 
           $$
@@ -110,7 +111,7 @@
           $$
 
           <p>
-            where \( P \) is the pressure in the evaporator or heat exchanger (Pa), \( A \), \( B \), and \( C \) are constants, and \( T \) is the temperature (K) in the evaporator or heat exchanger. The Antoine's Equation constants used in this simulation are available from reference (1). For a first approximation, one can assume that the concentrate is a single component, e.g. pure water in this simulation. This will allow us to determine an initial value for \( T_{ conc } \). A more accurate method to determine \( T_{ conc } \) will be discussed later. Once the hot and cold-side temperatures have been determined, one can find the amount of steam required using the following equation:
+            where \( P \) is the pressure (Pa), \( A \), \( B \), and \( C \) are constants (obtained from reference 1), and \( T \) is the temperature (K). The concentrated solutions was assumed to be pure water initially. The required mass flow rate of steam \( F_h \) (kg/s) was calculated from:
           </p>
 
           $$
@@ -118,7 +119,7 @@
           $$
 
           <p>
-            where \( F_{ h } \) is the mass flow rate (kg/s) and \( \Delta H_{ vap, h } \) is the heat of vaporization (J/kg) of the hot-side fluid, which is steam in this simulation. The values for \( \Delta H_{ vap } \) of water in this simulation were determined using an approximation from reference (2). The rate of water evaporation (kg/s) of the solution in the evaporator is determined using the following equation: 
+            where \( \Delta H_{vap,h} \), which is the heat of vaporization (J/kg) of steam, was determined using an approximation from reference&nbsp;2. The mass flow rate (kg/s) of water vapor (\( F_{evap} \)) was calculated from:
           </p>
 
           $$
@@ -126,7 +127,7 @@
           $$
 
           <p>
-            where \( F_{ evap } \) is the mass flow rate of evaporated vapor (kg/s), \( F_{ in } \) is the inlet flow rate of the solution, \( C_{ p, c } \) is the heat capacity of the solution [J/(kg K)], \( T_{ in } \) is the temperature of the inlet liquid, and \( \Delta H_{ vap, c } \) is the heat of vaporization of the solution in the evaporator. In this simulation, \( \Delta H_{ vap, c } \) was determined from reference (1) and \( C_{ p, c } \) was determined from reference (3). Flow rate of the concentrate (kg/s) is determined using a mass balance:
+            where \( F_{in} \)  is the mass flow rate of the feed solution (kg/s), \( C_{p,c} \)  is the heat capacity of the solution [J/(kg K)] from reference 3, \( T_{in} \)  is the temperature of the feed solution (K), and \( \Delta H_{vap,c} \)  is the heat of vaporization of the solution (J/kg) from reference (1). The flow rate of the concentrated solution (kg/s) was determined from a mass balance:
           </p>
 
           $$
@@ -134,7 +135,7 @@
           $$
 
           <p>
-            where \( F_{ conc } \) is the flow rate of concentrate out of the bottom of the evaporator.  The mass fraction of solute in the concentrate can also be determined using a mass balance:
+            where \( F_{conc} \)  is the flow rate (kg/s) of concentrated solution. The mass fraction of solute in the concentrated solution was also determined from a mass balance:
           </p>
 
           $$
@@ -142,7 +143,7 @@
           $$
 
           <p>
-            where \( x_{ conc } \) is the mass fraction of solute in the concentrate stream (kg/kg) and \( x_{ in } \) is the mass fraction of solute in the inlet stream. The steam economy (kg/kg) is the ratio of the mass of liquid evaporated to the mass of steam used:
+            where \( x_{conc} \)  is the mass fraction of solute in the concentrates solution, and \( x_{in} \)  is the mass fraction of solute in the feed solution. The steam economy \( ( SE ) \) is the ratio of the mass flow rate of liquid evaporated to the mass flow rate of steam (assuming saturated water leaves the heat exchanger):
           </p>
 
           $$
@@ -150,7 +151,7 @@
           $$
 
           <p>
-            Equations [1] - [6] can be used to obtain a first-approximation of the concentration of solute in the concentrate stream and the flow rate of each stream.  However, we assumed in equations [1] and [2] that the concentrate is a single component, e.g. pure water. Using the mass fraction of solute (\( x_{ conc } \)) calculated from equation [6], one can determine a more accurate temperature of the concentrate using Raoult's law. First, calculate the saturation pressure of the concentrate:
+            An initial estimate of the concentration of solute in the concentrated sugar solution was obtained from equations&nbsp;[1]&nbsp;-&nbsp;[6]. and the flow rate of each stream. Raoult's law was then used to obtain the saturated pressure of the concentrated sugar solution:
           </p>
 
           $$
@@ -158,7 +159,7 @@
           $$
 
           <p>
-            where \( P_{ sat, conc } \) is the saturation pressure of the concentrate and \( P_{ evap } \) is the pressure inside the evaporator. Next, use \( P_{ sat, conc } \) to solve Antoine's Equation [2] for \( T_{ conc } \).  Finally, recalculate equations [1] and [3] - [7] using the updated temperature of the concentrate (\( T_{ conc } \)). Repeat until the desired precision is achieved.
+            where \( P_{sat,conc} \) is its saturation pressure, and \( P_{evap} \) is the pressure in the evaporator. Antoine's Equation [2] was then used to calculate \( T_{conc} \). Equations [1] and [3] - [7] were then recalculated using the updated \( T_{conc} \).
           </p>
 
           <p>References:</p>

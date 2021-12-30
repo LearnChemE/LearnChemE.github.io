@@ -1,3 +1,8 @@
+$modal-sm: calc( 100vw - 50px );
+$modal-md: calc( 100vw - 50px );
+$modal-lg: 800px;
+$modal-xl: 1140px;
+
 @import "bootstrap";
 @import "./slider.scss";
 

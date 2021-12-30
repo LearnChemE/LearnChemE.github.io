@@ -101,14 +101,23 @@ canvas {
 
 .modal-body {
   text-align: left;
+  font-size: 0.9rem;
 
   .references {
     font-size: 0.8rem;
   }
 
-  li {
-    margin-bottom: 0.5rem;
+  ol {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    &>li {
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
+    }
   }
+
 }
 
 .simulation-title {
