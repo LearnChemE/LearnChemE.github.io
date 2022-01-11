@@ -32,11 +32,31 @@
   <div class="simulation-controls">
     <div class="input-area">
   
-      <div class="input-row">
+      <div class="mode-selection-row">
+        <div class="mode-selection-label">Mode: </div>
+        <div class="mode-selection-menu">
+          <select id="select-mode" value="constant-p">
+            <option value="constant-p">Constant external pressure</option>
+            <option value="constant-v">Constant cylinder volume</option>
+            <option value="adiabatic-reversible">Adiabatic/reversible</option>
+            <option value="spring">Internal spring</option>
+            <option value="constant-t">Constant internal temperature</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-row" id="heat-row">
         <div class="data-name">Heat Added&nbsp;</div>
-        <input type="range" id="q-slider" min="0" max="999" step="1" value="0">
-        <div class="data-value" id="q-value">0</div>
-        <div class="data-metric">J</div>
+        <input type="range" id="q-slider" min="0" max="10" step="0.1" value="0">
+        <div class="data-value" id="q-value">0.0</div>
+        <div class="data-metric">kJ</div>
+      </div>
+
+      <div class="input-row" id="pressure-row">
+        <div class="data-name">External pressure&nbsp;</div>
+        <input type="range" id="p-slider" min="1" max="8" step="0.01" value="1">
+        <div class="data-value" id="p-value">1.0</div>
+        <div class="data-metric">atm</div>
       </div>
       
     </div>

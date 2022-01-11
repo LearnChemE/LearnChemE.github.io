@@ -1,11 +1,54 @@
-const R = 8.3144598; // Ideal gas constant, J/mol
-const Cp = 7 * R / 2; // Constant-pressure heat capacity, J/mol
-const cylinder_volume = 1; // m^3
+function constant_P() {
+  const dT = gvs.heat_added / gvs.Cp;
+  const T = 273 + dT;
+  gvs.T = T;
+  gvs.V = gvs.n * gvs.R * gvs.T / gvs.P;
+  gvs.piston_height = 0.35 * (gvs.V / 0.0224);
+}
 
-function T() {
-  const dT = 0;
+function constant_V() {
+  const dT = gvs.heat_added / gvs.Cv;
+  const T = 273 + dT;
+  gvs.T = T;
+  gvs.P = gvs.n * gvs.R * gvs.T / gvs.V;
+}
+
+function adiabatic_reversible() {
+  const T = 273 * (gvs.P / 101325)**(gvs.R / gvs.Cp);
+  gvs.T = T;
+  gvs.V = gvs.n * gvs.R * gvs.T / gvs.P;
+  gvs.piston_height = gvs.V / 0.064;
+}
+
+function spring() {
+
+}
+
+function constant_t() {
+
 }
 
 module.exports = function calcAll() {
+  const mode = gvs.piston_mode;
+  switch(mode) {
+    case "constant-p":
+      constant_P();
+    break;
 
+    case "constant-v":
+      constant_V();
+    break;
+
+    case "adiabatic-reversible":
+      adiabatic_reversible();
+    break;
+
+    case "spring":
+      spring();
+    break;
+
+    case "constant-t":
+      constant_t();
+    break;
+  }
 }
