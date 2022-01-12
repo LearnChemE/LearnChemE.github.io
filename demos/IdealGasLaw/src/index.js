@@ -31,6 +31,7 @@ const sketch = (p) => {
 
   p.preload = function () {
     gvs.spring_img = p.loadImage('assets/spring.png');
+    gvs.ice_cube_img = p.loadImage('assets/ice_cube.png');
   }
 
   p.setup = function () {

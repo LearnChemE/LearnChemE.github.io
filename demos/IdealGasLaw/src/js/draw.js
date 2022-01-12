@@ -10,11 +10,11 @@ function drawCylinder(p) {
   p.push();
   p.translate(shift_left, 0);
   if(gvs.piston_mode === "constant-t") {
-    p.fill(240, 240, 255);
+    p.fill(245, 245, 255);
     p.noStroke();
-    p.rect(centerX - c_width / 2 - 20, centerY - c_height / 2, 20, c_height);
-    p.rect(centerX + c_width / 2, centerY - c_height / 2, 20, c_height);
-    p.rect(centerX - c_width / 2 - 20, centerY + c_height / 2, c_width + 40, 20);
+    p.rect(centerX - c_width / 2 - 30, centerY - c_height / 2, 40, c_height + 40);
+    p.rect(centerX + c_width / 2, centerY - c_height / 2, 30, c_height + 40);
+    p.rect(centerX - c_width / 2 - 20, centerY + c_height / 2, c_width + 40, 40);
   }
 
   p.fill(230, 230, 250);
@@ -142,9 +142,43 @@ function drawPiston(p) {
       p.rectMode(p.CORNER);
       p.stroke(150);
       p.strokeWeight(1);
-      p.line(centerX - c_width / 2 - 20, centerY - c_height / 2, centerX - c_width / 2 - 20, centerY + c_height / 2 + 20);
-      p.line(centerX + c_width / 2 + 20, centerY - c_height / 2, centerX + c_width / 2 + 20, centerY + c_height / 2 + 20);
-      p.line(centerX - c_width / 2 - 20, centerY + c_height / 2 + 20, centerX + c_width / 2 + 20, centerY + c_height / 2 + 20);
+      p.line(centerX - c_width / 2 - 30, centerY - c_height / 2, centerX - c_width / 2 - 30, centerY + c_height / 2 + 40);
+      p.line(centerX + c_width / 2 + 30, centerY - c_height / 2, centerX + c_width / 2 + 30, centerY + c_height / 2 + 40);
+      p.line(centerX - c_width / 2 - 30, centerY + c_height / 2 + 40, centerX + c_width / 2 + 30, centerY + c_height / 2 + 40);
+      let i = Math.round( (-gvs.heat_added / 3100) * 10 ); // Number of ice cubes
+      if(i > 0) {
+        p.image(gvs.ice_cube_img, centerX, centerY + c_height / 2 + 15, 25, 25);
+      }
+      if(i > 1) {
+        p.image(gvs.ice_cube_img, centerX - 30, centerY + c_height / 2 + 15, 25, 25);
+      }
+      if(i > 2) {
+        p.image(gvs.ice_cube_img, centerX + 30, centerY + c_height / 2 + 12, 25, 25);
+      }
+      if(i > 3) {
+        p.image(gvs.ice_cube_img, centerX - 60, centerY + c_height / 2 + 13, 25, 25);
+      }
+      if(i > 4) {
+        p.image(gvs.ice_cube_img, centerX + 60, centerY + c_height / 2 + 18, 25, 25);
+      }
+      if(i > 5) {
+        p.image(gvs.ice_cube_img, centerX - 90, centerY + c_height / 2 + 11, 25, 25);
+      }
+      if(i > 6) {
+        p.image(gvs.ice_cube_img, centerX + 90, centerY + c_height / 2 + 12, 25, 25);
+      }
+      if(i > 7) {
+        p.image(gvs.ice_cube_img, centerX - 120, centerY + c_height / 2 + 14, 25, 25);
+      }
+      if(i > 8) {
+        p.image(gvs.ice_cube_img, centerX + 120, centerY + c_height / 2 + 15, 25, 25);
+      }
+      if(i > 9) {
+        p.image(gvs.ice_cube_img, centerX - 150, centerY + c_height / 2 + 19, 25, 25);
+      }
+      if(i > 10) {
+        p.image(gvs.ice_cube_img, centerX + 150, centerY + c_height / 2 + 11, 25, 25);
+      }
     break;
   }
 
@@ -278,7 +312,8 @@ function drawText(p) {
       p.textAlign(p.RIGHT);
       Q_color = p.color(100, 100, 100 + 155 * gvs.P / 800000);
       p.fill(Q_color);
-      p.text(`🧊 Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ`, centerX - c_width / 2 - 60, centerY + 140);
+      p.text(`Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ`, centerX - c_width / 2 - 60, centerY + 140);
+      p.image(gvs.ice_cube_img, centerX - c_width / 2 - 200, centerY + 120, 25, 25);
       p.stroke(Q_color);
       p.strokeWeight(2);
       p.line(centerX - c_width / 2 - 13, centerY + 132, centerX - c_width / 2 - 49, centerY + 132);
