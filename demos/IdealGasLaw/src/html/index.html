@@ -248,7 +248,7 @@
                 [3] \quad P_{spr} = k A \Delta z
               $$
 
-              where \( A \) is the area of the piston head (0.161 m<sup>2</sup> in this simulation), \( k \) is the spring constant (which is 1x10<sup>6</sup> N/m in this simulation per spring. Since there are two springs, the effective spring constant is 2x10<sup>6</sup> N/m), and \( \Delta z \) is the spring displacement (m).  In this simulation, the temperature and pressure are calculated iteratively. That is, temperature is first estimated assuming zero spring displacement:
+              where \( A \) is the area of the piston head (0.161 m<sup>2</sup> in this simulation), \( k \) is the spring constant (which is 1x10<sup>6</sup> N/m in this simulation per spring. Since there are two springs, the effective spring constant is 2x10<sup>6</sup> N/m), and \( \Delta z \) is the spring displacement (m).  In this simulation, the temperature, volume, and pressure are calculated iteratively. That is, temperature is first estimated assuming zero spring displacement:
             
               $$
                 [4] \quad C_{V} \; \Delta T = Q
@@ -260,13 +260,13 @@
                 [5] \quad PV = nRT
               $$
 
-              this pressure is used to calculate the spring displacement using equation [3], and the spring displacement is used to find a more accurate value for \( V \) (m<sup>3</sup>). Finally, the new value for \( V \) is substituted into the equation below to find a more accurate value for \( T \),
+              the resultant pressure is used to calculate the spring displacement using equation [3], and the spring displacement is used to find a more accurate value for \( V \) (m<sup>3</sup>). Finally, the new value for \( V \) is substituted into the equation below to find a more accurate value for \( T \) (the derivation of the equation below is beyond the scope of these details),
 
               $$
                 [6] \quad T = 273 + \frac{ Q - P_{ext} ( V - 0.032 ) - k \left[ \left( \frac{V^{2}}{2} - \frac{0.032^{2}}{2} \right) - 0.032 ( V - 0.032 ) \right] }{ C_{V} }
               $$
 
-              and the ideal gas law is then used to obtain a more accurate value for pressure. This process is repeated 10 times. The derivation of the equation above is beyond the scope of these details.
+              and the ideal gas law is then used to obtain a more accurate value for \( P \). This process is repeated 10 times, with values for \( P \), \( T \), and \( V \) each becoming more accurate with each iteration.
 
             </div>
             

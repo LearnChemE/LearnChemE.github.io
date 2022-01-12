@@ -158,7 +158,7 @@ canvas {
   grid-template-columns: repeat(5, max-content);
   gap: 0px;
   position: relative;
-  min-height: 700px;
+  min-height: 735px;
   justify-content: center;
 
   .tab-header {
@@ -186,7 +186,7 @@ canvas {
 
   .tab-content {
     grid-column: 1 / 6;
-    min-height: 690px;
+    min-height: 727px;
     position: absolute;
     width: 100%;
     top: 40px;
@@ -221,9 +221,22 @@ canvas {
   #details-tabs-container > .tab-header {
     font-size: 0.65rem;
     height: 35px;
+    padding: 8px 2px;
   }
   #details-tabs-container > .tab-content {
     font-size: 0.65rem;
+    top: 35px;
+  }
+}
+
+@media screen and (max-width: 575px) {
+  #details-tabs-container > .tab-header {
+    font-size: 0.5rem;
+    height: 35px;
+    padding: 8px 2px;
+  }
+  #details-tabs-container > .tab-content {
+    font-size: 0.5rem;
     top: 35px;
   }
 }
