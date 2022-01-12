@@ -10,20 +10,21 @@ window.p5 = new require("./js/p5.min.js");
 window.gvs = {
   t_inlet : 350, // feed temperature, K
   p_inlet : 0.3, // feed pressure, MPa
-  p_conc : 0.3, // concentrate pressure, MPa
+  P1 : 0.3, // concentrate pressure of first stage, MPa
+  P2 : 0.10, // concentrate pressure of first stage, MPa
+  P3 : 0.001, // concentrate pressure of first stage, MPa
   t_steam : 500, // steam temperature, K
   p_steam : 2.6392, // steam pressure, MPa
-  f_inlet : 10, // feed flowrate, kg/s
+  f_inlet : 20, // feed flowrate, kg/s
   s_inlet : 6, // steam flowrate, kg/s
   conc_inlet : 0.05, // weight fraction sugar
-  evap_flowrate : 6.4, // flow rate of evaporated water, kg/s
-  t_evaporator : 406.67, // temperature of the single-effect evaporator, K
-  conc_flowrate : 8.6, // flow rate of concentrate, kg/s
-  conc_concentrate : 0.088, // weight fraction of sugar in the concentrate stream
+  conc_outlet : 0.05, // weight fraction sugar in concentrate
   steam_economy : 1.07, // steam economy, kg water/kg steam
   hx_U : 2500, // overall heat transfer coefficient of heat exchanger, W / (m^2*K)
   hx_A : 56, // heat exchanger area, m^2
-  Q : 0, // heat exchanger heat transfer value, J
+  Q1 : 0, // 1st heat exchanger heat transfer value, J
+  Q2 : 0, // 2nd heat exchanger heat transfer value, J
+  Q3 : 0, // 3rd heat exchanger heat transfer value, J
   Hvap_steam : 1835350, // latent heat of vaporization for steam at 2.64 MPa, J/kg
   Hvap_conc : 2014160, // latent heat of vaporization for concentrate at 1 MPa, J/kg
   Cp_conc : 0, // heat capacity of sugar concentrate, J/kg
@@ -33,6 +34,15 @@ window.gvs = {
   xw_inlet : 0.9972, // mole fraction water in the inlet
   xs_conc : 0.0051, // mole fraction sugar in the concentrate
   xw_conc : 0.9949, // mole fraction water in the concentrate
+  V1 : 0,
+  L1 : 0,
+  T1 : 408,
+  V2 : 0,
+  L2 : 0,
+  T2 : 408,
+  V3 : 0,
+  L3 : 0,
+  T3 : 408,
 };
 
 // Handle sliders
@@ -43,7 +53,7 @@ const containerElement = document.getElementById("p5-container");
 const sketch = (p) => {
 
   p.setup = function () {
-    p.createCanvas(800, 530);
+    p.createCanvas(900, 580);
     p.noLoop();
     gvs.p = p;
     p.textSize(17);

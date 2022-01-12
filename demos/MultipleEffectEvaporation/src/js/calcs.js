@@ -44,55 +44,89 @@ function T_boiling(P) {
   return T;
 }
 
+function H_liquid(T_K) {
+  const t = T_K / 1000;
+  const A = -203.6060;
+  const B = 1523.6060;
+  const C = -3196.413;
+  const D = 2474.455;
+  const E = 3.855326;
+  const F = -256.5478;
+  const G = -488.7163;
+  const H = -285.8304;
+  const h = A*t + B*t**2/2 + C*t**3/3 + D*t**4/4 - E/t + F;
+  return h * 1000;
+}
+
+function H_vapor(T_K) {
+  const t = T_K / 1000;
+  const A = 30.092;
+  const B = 6.832514;
+  const C = 6.793435;
+  const D = -2.534480;
+  const E = 0.082139;
+  const F = -250.8810;
+  const G = 223.3967;
+  const H = -241.8264;
+  const h = A*t + B*t**2/2 + C*t**3/3 + D*t**4/4 - E/t + F;
+  return h * 1000;
+}
+
 let iterations = 0;
 
 function calcAll() {
-  iterations = 0;
-  iterate();
-}
+  // Find temperature of each evaporator
+  gvs.T1 = T_boiling(gvs.P1);
+  gvs.T2 = T_boiling(gvs.P2);
+  gvs.T3 = T_boiling(gvs.P3);
 
-function iterate() {
-  // Calculate the heat transfer value
-  gvs.Q = gvs.hx_U * gvs.hx_A * ( gvs.t_steam - gvs.t_evaporator );
+  gvs.Q1 = gvs.s_inlet * Hvap(gvs.t_steam);
+  const Hvap1 = Hvap(gvs.T1);
+  const Hsensible1 = gvs.f_inlet * (gvs.T1 - gvs.t_inlet) * Cp(gvs.t_inlet, gvs.xs_inlet);
+  gvs.V1 = Math.max((gvs.Q1 - Hsensible1) / Hvap1, 0);
+  gvs.L1 = gvs.f_inlet - gvs.V1;
 
-  // Calculate the heats of vaporization of steam and concentrate streams
-  gvs.Hvap_steam = Hvap(gvs.t_steam);
-  gvs.Hvap_conc = Hvap(gvs.t_evaporator);
+  // Find heat transfer of second evaporator
+  gvs.Q2 = gvs.hx_U * gvs.hx_A * (gvs.T1 - gvs.T2);
 
-  // Calculate the mole fractions at the inlet and in concentrate
-  gvs.xs_inlet = (gvs.conc_inlet / gvs.MW_sugar) / (gvs.conc_inlet / gvs.MW_sugar + (1 - gvs.conc_inlet) / gvs.MW_water);
-  gvs.xw_inlet = 1 - gvs.xs_inlet;
-  gvs.xs_conc = (gvs.conc_concentrate / gvs.MW_sugar) / (gvs.conc_concentrate / gvs.MW_sugar + (1 - gvs.conc_concentrate) / gvs.MW_water);
-  gvs.xw_conc = 1 - gvs.xs_conc;
-
-  // Limit the concentrations to reasonable values
-  gvs.xs_conc = Math.min(0.99999999, Math.max(0.00000001, gvs.xs_conc));
-  gvs.xw_conc = Math.min(0.99999999, Math.max(0.00000001, gvs.xw_conc));
-  gvs.conc_concentrate = gvs.xs_conc * gvs.MW_sugar / (gvs.xs_conc * gvs.MW_sugar + gvs.xw_conc * gvs.MW_water);
-
-  // Calculate the heat capacity of the concentrate (J/kg)
-  gvs.Cp_conc = Cp(gvs.t_evaporator, gvs.xs_conc);
-
-  // Calculate the flow rates of each stream
-  gvs.s_inlet = gvs.Q / gvs.Hvap_steam;
-  gvs.evap_flowrate = ( gvs.Q - gvs.f_inlet * gvs.Cp_conc * (gvs.t_evaporator - gvs.t_inlet) ) / gvs.Hvap_conc;
-  gvs.evap_flowrate = Math.max(0, gvs.evap_flowrate);
-  gvs.evap_flowrate = Math.min(gvs.f_inlet - gvs.f_inlet * gvs.conc_inlet, gvs.evap_flowrate); // maximum amount to evaporate is all of the water
-  gvs.conc_flowrate = gvs.f_inlet - gvs.evap_flowrate;
-
-  // Calculate the weight percent of sugar in the concentrate
-  gvs.conc_concentrate = (gvs.f_inlet * gvs.conc_inlet) / gvs.conc_flowrate;
-
-  // Calculate the boiling point of the concentrate
-  const Psat_conc = gvs.p_conc / gvs.xw_conc; // Raoult's law to calculate saturation pressure of the concentrate
-  gvs.t_evaporator = Math.min(gvs.t_steam, T_boiling(Psat_conc));
-  
-  gvs.steam_economy = gvs.evap_flowrate / gvs.s_inlet;
-
-  if(iterations < 100) {
-    iterations++;
-    iterate();
+  const H_liq1 = H_liquid(gvs.T1);
+  let delta1 = 10000000;
+  let q1 = 0.00;
+  // Find quality of steam entering second evaporator
+  for(var q = 0.000; q < 1.000; q += 0.001) {
+    const H_liq2 = H_liquid(gvs.T2);
+    const H_vap2 = H_vapor(gvs.T2);
+    let delta = Math.abs( ( q * H_liq2 + (1 - q) * H_vap2 ) - H_liq1);
+    if(delta < delta1) {delta1 = delta; q1 = q}
   }
+
+  const V1_in = (1 - q1) * gvs.L1; // vapor flowrate immediately after first valve
+  const evap_2 = Math.min(gvs.Q2 / Hvap(gvs.T2), gvs.V1);
+  gvs.V2 = Math.min(evap_2 + V1_in, gvs.L1);
+  gvs.L2 = gvs.L1 - gvs.V2;
+
+  // Find heat transfer of second evaporator
+  gvs.Q3 = gvs.hx_U * gvs.hx_A * (gvs.T2 - gvs.T3);
+
+  const H_liq2 = H_liquid(gvs.T2);
+  let delta2 = 100000000;
+  let q2 = 0.00;
+
+  for(var q = 0.000; q < 1.000; q += 0.001) {
+    const H_liq3 = H_liquid(gvs.T3);
+    const H_vap3 = H_vapor(gvs.T3);
+    let delta = Math.abs( ( q * H_liq3 + (1 - q) * H_vap3 ) - H_liq2);
+    if(delta < delta2) {delta2 = delta; q2 = q}
+  }
+
+  const V2_in = (1 - q2) * gvs.L2; // vapor flowrate immediately after first valve
+  const evap_3 = Math.min(gvs.Q3 / Hvap(gvs.T3), gvs.V2);
+  gvs.V3 = Math.min(evap_3 + V2_in, gvs.L2);
+  gvs.L3 = gvs.L2 - gvs.V3;
+
+  gvs.conc_outlet = (gvs.conc_inlet * gvs.f_inlet) / gvs.L3;
+
+  gvs.steam_economy = (gvs.f_inlet - gvs.L3) / gvs.s_inlet;
 }
 
 module.exports = calcAll;
