@@ -211,40 +211,46 @@
               The energy balance for the system is
               
               $$
-                [1] \quad \Delta U = Q + W
+                [1] \quad dU = Q + W
               $$
 
-              Where \( \Delta U \) is the change to internal energy (J/mol), \( Q \) is heat added to the system (J/mol), and \( W \) is work performed on the system (J/mol). For an adiabatic system, heat added to the system is zero \( ( Q = 0 ) \). Therefore
+              Where \( dU \) is the change to internal energy (J/mol), \( Q \) is heat added to the system (J/mol), and \( W \) is work performed on the system (J/mol). For an adiabatic system, heat added to the system is zero \( ( Q = 0 ) \). Therefore
 
               $$
-                [2] \quad \Delta U = W
+                [2] \quad dU = W
               $$
 
-              and since \( W = -P dV \) where \( V \) is volume and \( P \) is pressure, and \( \Delta U = C_{V} \; dT \) where \( C_{V} \) is the constant-volume heat capacity of the ideal gas,
+              and since \( W = -P dV \) where \( V \) is volume and \( P \) is pressure, and since \( dU = C_{V} \; dT \) where \( C_{V} \) is the constant-volume heat capacity of the ideal gas,
 
               $$
                 [3] \quad C_{V} \; dT = - P dV
               $$
 
-              Note that for an ideal diatomic gas, \( C_{V} \) is \( \frac{5}{2} R \) where \( R \) is the ideal gas constant, approximately 8.314 J/(mol K). We can substitute the ideal gas law \( P = \frac{nRT}{V} \) into the equation to yield
+              Note that for an ideal diatomic gas, \( C_{V} \) is \( 2.5 R \) where \( R \) is the ideal gas constant, approximately 8.314 J/(mol K). We can substitute the ideal gas law (\( P = nRT / V \)) into the equation to yield
 
               $$
-                [4] \quad \frac{ C_{V} \; dT }{ T } = - \frac{ n R }{ V } dV 
+                [4] \quad \frac{ C_{V} }{ T } dT = - \frac{ n R }{ V } dV 
               $$
 
-              Integrating each side of the equation yields
+              The equation can be integrated from the initial state to the final state
 
               $$
-                [5] \quad C_{V} \; \mathrm{ ln } \left( \frac{ T_{ 2 } }{ T_{ 1 } } \right) = -n R \; \mathrm{ ln } \left( \frac{ V_{ 2 } }{ V_{ 1 } } \right)
+                [5] \quad \int_{T_{1}}^{T_{2}} \frac{ C_{V} }{ T } dT = - \int_{V_{1}}^{V_{2}} \frac{ n R }{ V } dV
               $$
 
-              This can be rearranged and the ideal gas law can be substituted to yield
+              yielding
 
               $$
-                [6] \quad \frac{ T_{2} }{ T_{1} } = \left( \frac{ P_{ 2 } }{ P_{ 1 } } \right)^{ R / C_{P} }
+                [6] \quad C_{V} \; \mathrm{ ln } \left( \frac{ T_{ 2 } }{ T_{ 1 } } \right) = -n R \; \mathrm{ ln } \left( \frac{ V_{ 2 } }{ V_{ 1 } } \right)
               $$
 
-              In this simulation, \( T_{1} \) is the initial temperature 273 K and \( P_{1} \) is the initial pressure of 1 atm (101325 Pa).
+              This can be rearranged and the ideal gas law can be substituted to yield a relationship between temperature and pressure:
+
+              $$
+                [7] \quad \frac{ T_{2} }{ T_{1} } = \left( \frac{ P_{ 2 } }{ P_{ 1 } } \right)^{ R / C_{P} }
+              $$
+
+              In this simulation, \( T_{1} \) is 273 K and \( P_{1} \) is 1.0 atm (101,325 Pa). After temperature is determined using equation [7], the ideal gas law can be used to determine the final volume \( V_{2} \).
             </div>
             
             <div class="tab-content" id="external-spring-content">

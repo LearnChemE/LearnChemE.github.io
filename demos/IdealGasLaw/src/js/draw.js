@@ -336,45 +336,45 @@ function drawBarGraph(p) {
 
     switch(gvs.piston_mode) {
       case "constant-p":
-        p.fill(255, 100, 100);
+        p.fill(100, 254, 100);
         p.rect(610, 450, 55, -0.4 * bar_graph_height );
-        p.fill(100, 255, 100);
+        p.fill(255, 100, 100);
         p.rect(695, 450, 55, - 0.4 * bar_graph_height * (gvs.T / 273) );
         p.fill(100, 100, 255);
         p.rect(780, 450, 55, - 0.4 * bar_graph_height * (gvs.V / 0.0224) );
       break;
 
       case "constant-v":
-        p.fill(255, 100, 100);
+        p.fill(100, 254, 100);
         p.rect(610, 450, 55, -0.35 * bar_graph_height * gvs.P / 101325);
-        p.fill(100, 255, 100);
+        p.fill(255, 100, 100);
         p.rect(695, 450, 55, - 0.35 * bar_graph_height * (gvs.T / 273) );
         p.fill(100, 100, 255);
         p.rect(780, 450, 55, - 0.35 * bar_graph_height );
       break;
 
       case "adiabatic-reversible":
-        p.fill(255, 100, 100);
+        p.fill(100, 254, 100);
         p.rect(610, 450, 55, -0.1 * bar_graph_height * gvs.P / 101325);
-        p.fill(100, 255, 100);
+        p.fill(255, 100, 100);
         p.rect(695, 450, 55, - 0.35 * bar_graph_height * (gvs.T / 273) );
         p.fill(100, 100, 255);
         p.rect(780, 450, 55, - 0.35 * bar_graph_height * (gvs.V / 0.0224) );
       break;
 
       case "spring":
-        p.fill(255, 100, 100);
+        p.fill(100, 254, 100);
         p.rect(610, 450, 55, -0.35 * bar_graph_height * gvs.P / 101325);
-        p.fill(100, 255, 100);
+        p.fill(255, 100, 100);
         p.rect(695, 450, 55, - 0.35 * bar_graph_height * (gvs.T / 273) );
         p.fill(100, 100, 255);
         p.rect(780, 450, 55, - 0.35 * bar_graph_height * (gvs.V / 0.0320) );
       break;
 
       case "constant-t":
-        p.fill(255, 100, 100);
+        p.fill(100, 254, 100);
         p.rect(610, 450, 55, -0.2 * bar_graph_height * gvs.P / 101325);
-        p.fill(100, 255, 100);
+        p.fill(255, 100, 100);
         p.rect(695, 450, 55, - 0.35 * bar_graph_height * (gvs.T / 273) );
         p.fill(100, 100, 255);
         p.rect(780, 450, 55, - 0.35 * bar_graph_height * (gvs.V / 0.0224) );
@@ -383,9 +383,9 @@ function drawBarGraph(p) {
     p.textSize(22);
     p.fill(0);
     p.noStroke();
-    p.fill(255, 100, 100);
+    p.fill(50, 155, 50);
     p.text("P", 630, 475);
-    p.fill(0, 155, 0);
+    p.fill(255, 100, 100);
     p.text("T", 715, 475);
     p.fill(100, 100, 255);
     p.text("V", 800, 475);
