@@ -35,6 +35,8 @@ modeSelection.addEventListener("input", () => {
       gvs.n = 1;
       heatSlider.value = "0";
       heatValue.innerHTML = "0.0";
+      pressureSlider.value = "1.0";
+      pressureValue.innerHTML = "1.0";
     break;
 
     case "constant-v":
@@ -48,6 +50,8 @@ modeSelection.addEventListener("input", () => {
       gvs.n = gvs.P * gvs.V / ( gvs.R * gvs.T );
       heatSlider.value = "0";
       heatValue.innerHTML = "0.0";
+      pressureSlider.value = "1.0";
+      pressureValue.innerHTML = "1.0";
     break;
 
     case "adiabatic-reversible":
@@ -61,6 +65,9 @@ modeSelection.addEventListener("input", () => {
       gvs.n = 2.286;
       heatSlider.value = "0";
       heatValue.innerHTML = "0.0";
+      pressureSlider.value = "1.0";
+      pressureValue.innerHTML = "1.0";
+      pressureSlider.setAttribute("max", "8.0");
     break;
 
     case "spring":
@@ -74,10 +81,24 @@ modeSelection.addEventListener("input", () => {
       gvs.n = 1.429;
       heatSlider.value = "0";
       heatValue.innerHTML = "0.0";
+      pressureSlider.value = "1.0";
+      pressureValue.innerHTML = "1.0";
     break;
 
     case "constant-t":
-
+      heatRow.style.display = "none";
+      pressureRow.style.display = "grid";
+      gvs.piston_height = 0.8;
+      gvs.heat_added = 0;
+      gvs.T = 273;
+      gvs.P = 101325;
+      gvs.V = 0.0224 / 0.35 * 0.8;
+      gvs.n = 2.286;
+      heatSlider.value = "0";
+      heatValue.innerHTML = "0.0";
+      pressureSlider.value = "1.0";
+      pressureValue.innerHTML = "1.0";
+      pressureSlider.setAttribute("max", "4.0");
     break;
   }
   gvs.p.redraw();
