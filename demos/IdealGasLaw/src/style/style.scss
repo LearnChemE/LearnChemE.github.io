@@ -158,7 +158,7 @@ canvas {
   grid-template-columns: repeat(5, max-content);
   gap: 0px;
   position: relative;
-  min-height: 735px;
+  min-height: 765px;
   justify-content: center;
 
   .tab-header {
@@ -186,7 +186,7 @@ canvas {
 
   .tab-content {
     grid-column: 1 / 6;
-    min-height: 727px;
+    min-height: 747px;
     position: absolute;
     width: 100%;
     top: 40px;

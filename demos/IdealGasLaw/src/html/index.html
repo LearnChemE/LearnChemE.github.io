@@ -36,11 +36,11 @@
         <div class="mode-selection-label">Scenario: </div>
         <div class="mode-selection-menu">
           <select id="select-mode" value="constant-p">
-            <option value="constant-p">Constant external pressure</option>
-            <option value="constant-v">Constant cylinder volume</option>
-            <option value="adiabatic-reversible">Adiabatic/reversible</option>
-            <option value="spring">Internal spring</option>
-            <option value="constant-t">Constant internal temperature</option>
+            <option value="constant-p">Constant pressure</option>
+            <option value="constant-v">Constant volume</option>
+            <option value="adiabatic-reversible">Adiabatic and reversible</option>
+            <option value="spring">External spring</option>
+            <option value="constant-t">Constant temperature</option>
           </select>
         </div>
       </div>
@@ -109,11 +109,11 @@
 
           <div id="details-tabs-container">
             
-            <div class="tab-header active" id="constant-p-header">Constant external pressure</div>
+            <div class="tab-header active" id="constant-p-header">Constant pressure</div>
             <div class="tab-header" id="constant-v-header">Constant volume</div>
-            <div class="tab-header" id="adiabatic-reversible-header">Adiabatic/reversible</div>
-            <div class="tab-header" id="internal-spring-header">Internal spring</div>
-            <div class="tab-header" id="constant-t-header">Constant internal temperature</div>
+            <div class="tab-header" id="adiabatic-reversible-header">Adiabatic and reversible</div>
+            <div class="tab-header" id="external-spring-header">External spring</div>
+            <div class="tab-header" id="constant-t-header">Constant temperature</div>
 
             <div class="tab-content active" id="constant-p-content">
               The energy balance for the system is
@@ -229,7 +229,7 @@
               In this simulation, \( T_{1} \) is the initial temperature 273 K and \( P_{1} \) is the initial pressure of 1 atm (101325 Pa).
             </div>
             
-            <div class="tab-content" id="internal-spring-content">
+            <div class="tab-content" id="external-spring-content">
               The energy balance for the system is
               
               $$

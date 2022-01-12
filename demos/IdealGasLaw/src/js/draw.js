@@ -1,3 +1,5 @@
+const shift_left = -200;
+
 function drawCylinder(p) {
 
   const centerX = 3 * p.width / 5;
@@ -6,7 +8,7 @@ function drawCylinder(p) {
   const c_width = 250; // cylinder width, pixels
 
   p.push();
-
+  p.translate(shift_left, 0);
   if(gvs.piston_mode === "constant-t") {
     p.fill(240, 240, 255);
     p.noStroke();
@@ -47,7 +49,7 @@ function drawPiston(p) {
   const c_width = 250;
   let piston_height;
   p.push();
-
+  p.translate(shift_left, 0);
   const mode = gvs.piston_mode;
   switch(mode) {
     case "constant-p":
@@ -138,7 +140,11 @@ function drawPiston(p) {
       p.stroke(0);
       p.ellipse(centerX, piston_height - 12, c_width, 15);
       p.rectMode(p.CORNER);
-      p.stroke(0);
+      p.stroke(150);
+      p.strokeWeight(1);
+      p.line(centerX - c_width / 2 - 20, centerY - c_height / 2, centerX - c_width / 2 - 20, centerY + c_height / 2 + 20);
+      p.line(centerX + c_width / 2 + 20, centerY - c_height / 2, centerX + c_width / 2 + 20, centerY + c_height / 2 + 20);
+      p.line(centerX - c_width / 2 - 20, centerY + c_height / 2 + 20, centerX + c_width / 2 + 20, centerY + c_height / 2 + 20);
     break;
   }
 
@@ -156,6 +162,7 @@ function drawText(p) {
     case "constant-p":
       piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
       p.push();
+      p.translate(shift_left, 0);
       p.textSize(22);
       p.textAlign(p.CENTER);
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 120);
@@ -170,12 +177,17 @@ function drawText(p) {
       p.textAlign(p.RIGHT);
       Q_color = p.color(`${100 + 155 * gvs.heat_added / 10000}`, 100, 100);
       p.fill(Q_color);
-      p.text(`🔥 Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ ⟶`, centerX - c_width / 2 - 20, centerY + 140);
+      p.text(`🔥 Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ`, centerX - c_width / 2 - 50, centerY + 140);
+      p.stroke(Q_color);
+      p.strokeWeight(2);
+      p.line(centerX - c_width / 2 - 8, centerY + 132, centerX - c_width / 2 - 44, centerY + 132);
+      p.triangle(centerX - c_width / 2 - 8, centerY + 132, centerX - c_width / 2 - 20, centerY + 137, centerX - c_width / 2 - 20, centerY + 127);
       p.pop();
     break;
 
     case "constant-v":
       p.push();
+      p.translate(shift_left, 0);
       p.textSize(22);
       p.textAlign(p.CENTER);
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 100);
@@ -185,12 +197,17 @@ function drawText(p) {
       p.textAlign(p.RIGHT);
       Q_color = p.color(`${100 + 155 * gvs.heat_added / 10000}`, 100, 100);
       p.fill(Q_color);
-      p.text(`🔥 Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ ⟶`, centerX - c_width / 2 - 20, centerY + 140);
+      p.text(`🔥 Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ`, centerX - c_width / 2 - 50, centerY + 140);
+      p.stroke(Q_color);
+      p.strokeWeight(2);
+      p.line(centerX - c_width / 2 - 8, centerY + 132, centerX - c_width / 2 - 44, centerY + 132);
+      p.triangle(centerX - c_width / 2 - 8, centerY + 132, centerX - c_width / 2 - 20, centerY + 137, centerX - c_width / 2 - 20, centerY + 127);
       p.pop();
     break;
 
     case "adiabatic-reversible":
       p.push();
+      p.translate(shift_left, 0);
       p.textSize(22);
       p.textAlign(p.CENTER);
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
@@ -207,12 +224,17 @@ function drawText(p) {
       p.textAlign(p.RIGHT);
       Q_color = p.color(`${100 + 155 * gvs.heat_added / 10000}`, 100, 100);
       p.fill(Q_color);
-      p.text(`🔥 Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ ⟶`, centerX - c_width / 2 - 30, centerY + 140);
+      p.text(`🔥 Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ`, centerX - c_width / 2 - 70, centerY + 140);
+      p.stroke(Q_color);
+      p.strokeWeight(2);
+      p.line(centerX - c_width / 2 - 25, centerY + 132, centerX - c_width / 2 - 61, centerY + 132);
+      p.triangle(centerX - c_width / 2 - 25, centerY + 132, centerX - c_width / 2 - 37, centerY + 137, centerX - c_width / 2 - 37, centerY + 127);
       p.pop();
     break;
 
     case "spring":
       p.push();
+      p.translate(shift_left, 0);
       p.textSize(22);
       p.textAlign(p.CENTER);
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
@@ -229,12 +251,17 @@ function drawText(p) {
       p.textAlign(p.RIGHT);
       Q_color = p.color(`${100 + 155 * gvs.heat_added / 10000}`, 100, 100);
       p.fill(Q_color);
-      p.text(`🔥 Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ ⟶`, centerX - c_width / 2 - 30, centerY + 140);
+      p.text(`🔥 Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ`, centerX - c_width / 2 - 50, centerY + 140);
+      p.stroke(Q_color);
+      p.strokeWeight(2);
+      p.line(centerX - c_width / 2 - 8, centerY + 132, centerX - c_width / 2 - 44, centerY + 132);
+      p.triangle(centerX - c_width / 2 - 8, centerY + 132, centerX - c_width / 2 - 20, centerY + 137, centerX - c_width / 2 - 20, centerY + 127);
       p.pop();
     break;
 
     case "constant-t":
       p.push();
+      p.translate(shift_left, 0);
       p.textSize(22);
       p.textAlign(p.CENTER);
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
@@ -251,15 +278,90 @@ function drawText(p) {
       p.textAlign(p.RIGHT);
       Q_color = p.color(100, 100, 100 + 155 * gvs.P / 800000);
       p.fill(Q_color);
-      p.text(`🧊 Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ ⟵`, centerX - c_width / 2 - 30, centerY + 140);
+      p.text(`🧊 Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ`, centerX - c_width / 2 - 60, centerY + 140);
+      p.stroke(Q_color);
+      p.strokeWeight(2);
+      p.line(centerX - c_width / 2 - 13, centerY + 132, centerX - c_width / 2 - 49, centerY + 132);
+      p.triangle(centerX - c_width / 2 - 49, centerY + 132, centerX - c_width / 2 - 37, centerY + 137, centerX - c_width / 2 - 37, centerY + 127);
       p.pop();
     break;
   }
 
 }
 
+function drawBarGraph(p) {
+    const bar_graph_height = 350;
+    p.push();
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.noFill();
+    p.line(580, 100, 580, 100 + bar_graph_height);
+    p.line(580, 450, 860, 100 + bar_graph_height);
+    p.rectMode(p.CORNER);
+
+    switch(gvs.piston_mode) {
+      case "constant-p":
+        p.fill(255, 100, 100);
+        p.rect(610, 450, 55, -0.4 * bar_graph_height );
+        p.fill(100, 255, 100);
+        p.rect(695, 450, 55, - 0.4 * bar_graph_height * (gvs.T / 273) );
+        p.fill(100, 100, 255);
+        p.rect(780, 450, 55, - 0.4 * bar_graph_height * (gvs.V / 0.0224) );
+      break;
+
+      case "constant-v":
+        p.fill(255, 100, 100);
+        p.rect(610, 450, 55, -0.35 * bar_graph_height * gvs.P / 101325);
+        p.fill(100, 255, 100);
+        p.rect(695, 450, 55, - 0.35 * bar_graph_height * (gvs.T / 273) );
+        p.fill(100, 100, 255);
+        p.rect(780, 450, 55, - 0.35 * bar_graph_height );
+      break;
+
+      case "adiabatic-reversible":
+        p.fill(255, 100, 100);
+        p.rect(610, 450, 55, -0.1 * bar_graph_height * gvs.P / 101325);
+        p.fill(100, 255, 100);
+        p.rect(695, 450, 55, - 0.35 * bar_graph_height * (gvs.T / 273) );
+        p.fill(100, 100, 255);
+        p.rect(780, 450, 55, - 0.35 * bar_graph_height * (gvs.V / 0.0224) );
+      break;
+
+      case "spring":
+        p.fill(255, 100, 100);
+        p.rect(610, 450, 55, -0.35 * bar_graph_height * gvs.P / 101325);
+        p.fill(100, 255, 100);
+        p.rect(695, 450, 55, - 0.35 * bar_graph_height * (gvs.T / 273) );
+        p.fill(100, 100, 255);
+        p.rect(780, 450, 55, - 0.35 * bar_graph_height * (gvs.V / 0.0320) );
+      break;
+
+      case "constant-t":
+        p.fill(255, 100, 100);
+        p.rect(610, 450, 55, -0.2 * bar_graph_height * gvs.P / 101325);
+        p.fill(100, 255, 100);
+        p.rect(695, 450, 55, - 0.35 * bar_graph_height * (gvs.T / 273) );
+        p.fill(100, 100, 255);
+        p.rect(780, 450, 55, - 0.35 * bar_graph_height * (gvs.V / 0.0224) );
+      break;
+    }
+    p.textSize(22);
+    p.fill(0);
+    p.noStroke();
+    p.fill(255, 100, 100);
+    p.text("P", 630, 475);
+    p.fill(0, 155, 0);
+    p.text("T", 715, 475);
+    p.fill(100, 100, 255);
+    p.text("V", 800, 475);
+    p.fill(0);
+    p.text("Relative values", 645, 80);
+    p.pop();
+}
+
 module.exports = function drawAll(p) {
   drawCylinder(p);
   drawPiston(p);
   drawText(p);
+  drawBarGraph(p);
 }
