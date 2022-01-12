@@ -3,7 +3,7 @@ const shift_left = -200;
 function drawCylinder(p) {
 
   const centerX = 3 * p.width / 5;
-  const centerY = p.height / 2 + 20;
+  const centerY = p.height / 2;
   const c_height = p.height * 3 / 4; // cylinder height, pixels
   const c_width = 250; // cylinder width, pixels
 
@@ -12,9 +12,9 @@ function drawCylinder(p) {
   if(gvs.piston_mode === "constant-t") {
     p.fill(245, 245, 255);
     p.noStroke();
-    p.rect(centerX - c_width / 2 - 30, centerY - c_height / 2, 40, c_height + 40);
-    p.rect(centerX + c_width / 2, centerY - c_height / 2, 30, c_height + 40);
-    p.rect(centerX - c_width / 2 - 20, centerY + c_height / 2, c_width + 40, 40);
+    p.rect(centerX - c_width / 2 - 30, centerY - c_height / 2, 30, c_height + 50);
+    p.rect(centerX + c_width / 2, centerY - c_height / 2, 30, c_height + 50);
+    p.rect(centerX - c_width / 2 - 30, centerY + c_height / 2, c_width + 30, 50);
   }
 
   p.fill(230, 230, 250);
@@ -44,7 +44,7 @@ function drawCylinder(p) {
 function drawPiston(p) {
 
   const centerX = 3 * p.width / 5;
-  const centerY = p.height / 2 + 20;
+  const centerY = p.height / 2;
   const c_height = p.height * 3 / 4;
   const c_width = 250;
   let piston_height;
@@ -142,9 +142,9 @@ function drawPiston(p) {
       p.rectMode(p.CORNER);
       p.stroke(150);
       p.strokeWeight(1);
-      p.line(centerX - c_width / 2 - 30, centerY - c_height / 2, centerX - c_width / 2 - 30, centerY + c_height / 2 + 40);
-      p.line(centerX + c_width / 2 + 30, centerY - c_height / 2, centerX + c_width / 2 + 30, centerY + c_height / 2 + 40);
-      p.line(centerX - c_width / 2 - 30, centerY + c_height / 2 + 40, centerX + c_width / 2 + 30, centerY + c_height / 2 + 40);
+      p.line(centerX - c_width / 2 - 30, centerY - c_height / 2, centerX - c_width / 2 - 30, centerY + c_height / 2 + 50);
+      p.line(centerX + c_width / 2 + 30, centerY - c_height / 2, centerX + c_width / 2 + 30, centerY + c_height / 2 + 50);
+      p.line(centerX - c_width / 2 - 30, centerY + c_height / 2 + 50, centerX + c_width / 2 + 30, centerY + c_height / 2 + 50);
       let i = Math.round( (-gvs.heat_added / 3100) * 10 ); // Number of ice cubes
       if(i > 0) {
         p.image(gvs.ice_cube_img, centerX, centerY + c_height / 2 + 15, 25, 25);
@@ -187,7 +187,7 @@ function drawPiston(p) {
 
 function drawText(p) {
   const centerX = 3 * p.width / 5;
-  const centerY = p.height / 2 + 20;
+  const centerY = p.height / 2;
   const c_width = 250;
   const c_height = p.height * 3 / 4;
   let Q_color, piston_height;
@@ -312,12 +312,12 @@ function drawText(p) {
       p.textAlign(p.RIGHT);
       Q_color = p.color(100, 100, 100 + 155 * gvs.P / 800000);
       p.fill(Q_color);
-      p.text(`Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ`, centerX - c_width / 2 - 60, centerY + 140);
-      p.image(gvs.ice_cube_img, centerX - c_width / 2 - 200, centerY + 120, 25, 25);
+      p.text(`Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ`, centerX - c_width / 2 - 64, centerY + 140);
+      p.image(gvs.ice_cube_img, centerX - c_width / 2 - 205, centerY + 120, 25, 25);
       p.stroke(Q_color);
       p.strokeWeight(2);
-      p.line(centerX - c_width / 2 - 13, centerY + 132, centerX - c_width / 2 - 49, centerY + 132);
-      p.triangle(centerX - c_width / 2 - 49, centerY + 132, centerX - c_width / 2 - 37, centerY + 137, centerX - c_width / 2 - 37, centerY + 127);
+      p.line(centerX - c_width / 2 - 13, centerY + 132, centerX - c_width / 2 - 54, centerY + 132);
+      p.triangle(centerX - c_width / 2 - 54, centerY + 132, centerX - c_width / 2 - 42, centerY + 137, centerX - c_width / 2 - 42, centerY + 127);
       p.pop();
     break;
   }
