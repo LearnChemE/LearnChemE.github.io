@@ -21,7 +21,22 @@ function adiabatic_reversible() {
 }
 
 function spring() {
-
+  const block_height = 0.753; // the piston_height value corresponding to the blocks
+  const extended_height = 0.5; // the piston_height value corresponding to the fully-extended springs
+  const k = 3000000; // spring constant, N/m
+  let iterations = 0;
+  function find_values() {
+    gvs.T = 273 + gvs.heat_added / gvs.Cv;
+    gvs.P = 101325 + k * (gvs.V - 0.032);
+    gvs.V = gvs.n * gvs.R * gvs.T / gvs.P;
+    gvs.spring_length = 0.1 - ((gvs.V - 0.032) / 0.032) / ( block_height / extended_height ) * 0.1;
+    gvs.piston_height = block_height - (gvs.spring_length / 0.1) * (block_height - extended_height);
+    if(iterations < 100) {
+      iterations++;
+      find_values();
+    }
+  }
+  find_values()
 }
 
 function constant_t() {

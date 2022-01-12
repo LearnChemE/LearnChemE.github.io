@@ -93,7 +93,30 @@ function drawPiston(p) {
     break;
 
     case "spring":
+      p.push();
+      p.imageMode(p.CORNERS);
+      const spring_height = gvs.spring_length * 1000;
+      const block_height = centerY - 100;
 
+      piston_height = block_height + spring_height;
+      p.fill(160);
+      p.ellipse(centerX, piston_height, c_width, 15);
+      p.noStroke();
+      p.rectMode(p.CENTER);
+      p.rect(centerX, piston_height - 6, c_width - 1, 12);
+      p.stroke(0);
+      p.ellipse(centerX, piston_height - 12, c_width, 15);
+
+      p.image(gvs.spring_img, centerX - c_width / 2 + 5, block_height, centerX - c_width / 2 + 30, block_height + spring_height - 10);
+      p.image(gvs.spring_img, centerX + c_width / 2 - 30, block_height, centerX + c_width / 2 - 5, block_height + spring_height - 10);
+      p.fill(220);
+      p.stroke(0);
+      p.rectMode(p.CORNERS);
+      p.rect(centerX - c_width / 2, block_height, centerX - c_width / 2 + 35, block_height - 30);
+      p.rect(centerX + c_width / 2, block_height, centerX + c_width / 2 - 35, block_height - 30);
+
+
+      p.pop();
     break;
 
     case "constant-t":
@@ -109,7 +132,7 @@ function drawText(p) {
   const centerY = p.height / 2 + 20;
   const c_width = 250;
   const c_height = p.height * 3 / 4;
-  let Q_color
+  let Q_color, piston_height;
   const mode = gvs.piston_mode;
   switch(mode) {
     case "constant-p":
@@ -151,12 +174,12 @@ function drawText(p) {
       p.push();
       p.textSize(22);
       p.textAlign(p.CENTER);
-      p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 160);
-      p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 190);
-      p.text(`P = ${(gvs.P / 101325).toFixed(1)} atm`, centerX - 60, centerY + 160);
-      p.text(`n = ${Number(gvs.n).toFixed(1)} mol`, centerX - 60, centerY + 190);
+      p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
+      p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
+      p.text(`P = ${(gvs.P / 101325).toFixed(1)} atm`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height));
+      p.text(`n = ${Number(gvs.n).toFixed(1)} mol`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.textAlign(p.LEFT);
-      const piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
+      piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
       p.text(`P   = ${Number(gvs.P / 101325).toFixed(1)} atm`, centerX - 52, piston_height - 49);
       p.textSize(12);
       p.text(`ext`, centerX - 42, piston_height - 45);
@@ -170,7 +193,25 @@ function drawText(p) {
     break;
 
     case "spring":
-
+      p.push();
+      p.textSize(22);
+      p.textAlign(p.CENTER);
+      p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
+      p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
+      p.text(`P = ${(gvs.P / 101325).toFixed(1)} atm`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height));
+      p.text(`n = ${Number(gvs.n).toFixed(1)} mol`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
+      p.textAlign(p.LEFT);
+      piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
+      p.text(`P   = 1.0 atm`, centerX - 52, piston_height - 49);
+      p.textSize(12);
+      p.text(`ext`, centerX - 42, piston_height - 45);
+      p.textSize(22);
+      p.text(`↓`, centerX, piston_height - 28);
+      p.textAlign(p.RIGHT);
+      Q_color = p.color(`${255 * gvs.heat_added / 10000}`, 100, 100);
+      p.fill(Q_color);
+      p.text(`🔥 Q = ${Number(gvs.heat_added / 1000).toFixed(1)} kJ ⟶`, centerX - c_width / 2 - 30, centerY + 140);
+      p.pop();
     break;
 
     case "constant-t":

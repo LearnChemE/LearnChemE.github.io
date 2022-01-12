@@ -64,7 +64,16 @@ modeSelection.addEventListener("input", () => {
     break;
 
     case "spring":
-
+      heatRow.style.display = "grid";
+      pressureRow.style.display = "none";
+      gvs.piston_height = 0.5;
+      gvs.heat_added = 0;
+      gvs.T = 273;
+      gvs.P = 101325;
+      gvs.V = 0.0224 / 0.35 * 0.5;
+      gvs.n = 1.429;
+      heatSlider.value = "0";
+      heatValue.innerHTML = "0.0";
     break;
 
     case "constant-t":

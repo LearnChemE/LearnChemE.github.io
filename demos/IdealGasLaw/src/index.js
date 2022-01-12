@@ -17,6 +17,9 @@ window.gvs = {
   R : 8.3144598, // Ideal gas constant, J/mol
   Cp : 29.1006093, // Constant-pressure heat capacity, J/mol
   Cv : 20.7861495, // Constant-volume heat capacity, J/mol
+  spring_length : 0.1, // length of springs, m
+  A : 0.161, // area of the piston head, m^2
+  L : 0.3975, // length of the piston, m - about 1 pixel per centimeter
 };
 
 // Handle sliders
@@ -25,6 +28,10 @@ require("./js/inputs.js");
 const containerElement = document.getElementById("p5-container");
 
 const sketch = (p) => {
+
+  p.preload = function () {
+    gvs.spring_img = p.loadImage('assets/spring.png');
+  }
 
   p.setup = function () {
     p.createCanvas(800, 530);
