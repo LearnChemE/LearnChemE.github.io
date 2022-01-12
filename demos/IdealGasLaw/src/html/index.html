@@ -84,7 +84,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This is a simulation of a piston/cylinder system, used to observe the ideal gas law in a variety of scenarios. Change the scenario using the drop-down menu labelled, "Scenario".  Adjust the amount of heat added (or the external pressure) using the slider below the drop-down menu. View the governing equations by pressing the "Details" button to the right of the slider.
+            This simulation demonstrates the behavior of an ideal gas in a piston/cylinder system. Change the scenario using the drop-down menu. Adjust the amount of heat added (or the external pressure) using the slider. View the governing equations by pressing the "Details" button.
           </p>
         </div>
       </div>
@@ -122,43 +122,55 @@
                 [1] \quad \Delta U = Q + W
               $$
 
-              where \( \Delta U \) is the change to internal energy (J/mol), \( Q \) is heat added to the system (J/mol), and \( W \) is work performed on the system (J/mol).  Work is defined 
+              where \( \Delta U \) is the change to internal energy (J/mol), \( Q \) is heat added to the system (J/mol), and \( W \) is work performed on the system (J/mol).  Work is 
               
               $$
                 [2] \quad W = - P \Delta V
               $$
 
-              where \( P \) is internal pressure (Pa) and \( V \) is the volume of the piston/cylinder (m<sup>3</sup>). Therefore,
+              where \( P \) is external pressure (Pa) and \( V \) is the gas volume (m<sup>3</sup>). Combining equations [1] and [2] yields,
 
               $$
                 [3] \quad \Delta U + P \Delta V = Q
               $$
 
-              and
+              and since \( P \) is constant, this becomes
 
               $$
                 [4] \quad \Delta U + \Delta ( P V ) = Q
               $$
 
-              because \( \Delta P = 0 \). thus,
+              and since \( H = U + PV \), where \( H \) is enthalpy,
 
               $$
                 [5] \quad \Delta H = Q
               $$
 
-              where \( \Delta H \) is the change in enthalpy of the system (J/mol), because \( \Delta U + \Delta ( P V ) = \Delta H \).  We can find the change in temperature knowing \( C_{P} \; \Delta T = \Delta H \):
+              For an ideal gas,
 
               $$
-                [6] \quad C_{P} \; \Delta T = Q
+                [6] \quad \Delta H = C_{P} \; \Delta T
               $$
 
-              where \( C_{P} \) is the constant-pressure heat capacity of the gas.  For an ideal diatomic gas, \( C_{P} \) is \( \frac{7}{2} R \) where \( R \) is the ideal gas constant, approximately 8.314 J/(mol K). Finally, the volume of the cylinder can be calculated using the ideal gas law
+              so
 
               $$
-                [7] \quad PV = nRT
+                [7] \quad Q = C_{P} \; \Delta T
               $$
 
-              where \( n \) is the number of moles of gas in the cylinder.
+              where \( C_{P} \) is the constant-pressure heat capacity of the gas. For an ideal diatomic gas,
+
+              $$
+                [8] \quad C_{P} = 3.5 R
+              $$
+
+              where \( R \) is the ideal gas constant, which is 8.314 J/(mol K). The gas volume is calculated using the ideal gas law
+
+              $$
+                [9] \quad PV = nRT
+              $$
+
+              where \( n \) is the number of moles of gas.
             </div>
 
             <div class="tab-content" id="constant-v-content">
@@ -186,7 +198,13 @@
                 [4] \quad C_{V} \; \Delta T = Q
               $$
 
-              Using the equation above, we can determine temperature of the system based on the amount of heat added, and using the ideal gas law we can determine the pressure of the system.
+              Using the equation above, we can determine temperature of the system \( T \) based on the amount of heat added, and using the ideal gas law we can determine the pressure of the system:
+
+              $$
+                [5] \quad PV = nRT
+              $$
+
+              where \( n \) is the number of moles of gas, \( P \) is pressure, \( V \) is volume, and \( R \) is the ideal gas constant, which is 8.314 J/(mol K).
             </div>
             
             <div class="tab-content" id="adiabatic-reversible-content">
