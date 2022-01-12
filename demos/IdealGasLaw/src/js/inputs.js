@@ -102,4 +102,85 @@ modeSelection.addEventListener("input", () => {
     break;
   }
   gvs.p.redraw();
-})
+});
+
+const constantPHeader = document.getElementById("constant-p-header");
+const constantPContent = document.getElementById("constant-p-content");
+const constantVHeader = document.getElementById("constant-v-header");
+const constantVContent = document.getElementById("constant-v-content");
+const adiabaticReversibleHeader = document.getElementById("adiabatic-reversible-header");
+const adiabaticReversibleContent = document.getElementById("adiabatic-reversible-content");
+const internalSpringHeader = document.getElementById("internal-spring-header");
+const internalSpringContent = document.getElementById("internal-spring-content");
+const constantTHeader = document.getElementById("constant-t-header");
+const constantTContent = document.getElementById("constant-t-content");
+
+constantPHeader.addEventListener("click", () => {
+  constantPHeader.classList.add("active");
+  constantVHeader.classList.remove("active");
+  adiabaticReversibleHeader.classList.remove("active");
+  internalSpringHeader.classList.remove("active");
+  constantTHeader.classList.remove("active");
+
+  constantPContent.classList.add("active");
+  constantVContent.classList.remove("active");
+  adiabaticReversibleContent.classList.remove("active");
+  internalSpringContent.classList.remove("active");
+  constantTContent.classList.remove("active");
+});
+
+constantVHeader.addEventListener("click", () => {
+  constantPHeader.classList.remove("active");
+  constantVHeader.classList.add("active");
+  adiabaticReversibleHeader.classList.remove("active");
+  internalSpringHeader.classList.remove("active");
+  constantTHeader.classList.remove("active");
+
+  constantPContent.classList.remove("active");
+  constantVContent.classList.add("active");
+  adiabaticReversibleContent.classList.remove("active");
+  internalSpringContent.classList.remove("active");
+  constantTContent.classList.remove("active");
+});
+
+adiabaticReversibleHeader.addEventListener("click", () => {
+  constantPHeader.classList.remove("active");
+  constantVHeader.classList.remove("active");
+  adiabaticReversibleHeader.classList.add("active");
+  internalSpringHeader.classList.remove("active");
+  constantTHeader.classList.remove("active");
+
+  constantPContent.classList.remove("active");
+  constantVContent.classList.remove("active");
+  adiabaticReversibleContent.classList.add("active");
+  internalSpringContent.classList.remove("active");
+  constantTContent.classList.remove("active");
+});
+
+internalSpringHeader.addEventListener("click", () => {
+  constantPHeader.classList.remove("active");
+  constantVHeader.classList.remove("active");
+  adiabaticReversibleHeader.classList.remove("active");
+  internalSpringHeader.classList.add("active");
+  constantTHeader.classList.remove("active");
+
+  constantPContent.classList.remove("active");
+  constantVContent.classList.remove("active");
+  adiabaticReversibleContent.classList.remove("active");
+  internalSpringContent.classList.add("active");
+  constantTContent.classList.remove("active");
+});
+
+constantTHeader.addEventListener("click", () => {
+  constantPHeader.classList.remove("active");
+  constantVHeader.classList.remove("active");
+  adiabaticReversibleHeader.classList.remove("active");
+  internalSpringHeader.classList.remove("active");
+  constantTHeader.classList.add("active");
+
+  constantPContent.classList.remove("active");
+  constantVContent.classList.remove("active");
+  adiabaticReversibleContent.classList.remove("active");
+  internalSpringContent.classList.remove("active");
+  constantTContent.classList.add("active");
+});

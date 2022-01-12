@@ -154,18 +154,19 @@ function drawText(p) {
   const mode = gvs.piston_mode;
   switch(mode) {
     case "constant-p":
+      piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
       p.push();
       p.textSize(22);
       p.textAlign(p.CENTER);
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 120);
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 160);
       p.text(`n = 1.0 mol`, centerX - 60, centerY + 160);
-      p.text(`P = 1 atm`, centerX - 60, centerY + 120);
-      p.text(`P   = 1 atm`, centerX, centerY - 250);
+      p.text(`P = 1.0 atm`, centerX - 60, centerY + 120);
+      p.text(`P   = 1.0 atm`, centerX, piston_height - 50);
       p.textSize(12);
-      p.text(`ext`, centerX - 35, centerY - 246);
+      p.text(`ext`, centerX - 42, piston_height - 46);
       p.textSize(22);
-      p.text(`↓`, centerX, centerY - 223);
+      p.text(`↓`, centerX, piston_height - 28);
       p.textAlign(p.RIGHT);
       Q_color = p.color(`${100 + 155 * gvs.heat_added / 10000}`, 100, 100);
       p.fill(Q_color);
