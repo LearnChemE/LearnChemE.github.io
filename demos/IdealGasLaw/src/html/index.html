@@ -248,7 +248,7 @@
                 [3] \quad P_{spr} = k A \Delta z
               $$
 
-              where \( A \) is the area of the piston head (0.161 m<sup>2</sup> in this simulation), \( k \) is the spring constant (which is 2x10<sup>6</sup> N/m in this simulation), and \( \Delta z \) is the spring displacement (m).  In this simulation, the temperature and pressure are calculated iteratively. That is, temperature is first estimated assuming zero spring displacement:
+              where \( A \) is the area of the piston head (0.161 m<sup>2</sup> in this simulation), \( k \) is the spring constant (which is 1x10<sup>6</sup> N/m in this simulation per spring. Since there are two springs, the effective spring constant is 2x10<sup>6</sup> N/m), and \( \Delta z \) is the spring displacement (m).  In this simulation, the temperature and pressure are calculated iteratively. That is, temperature is first estimated assuming zero spring displacement:
             
               $$
                 [4] \quad C_{V} \; \Delta T = Q
