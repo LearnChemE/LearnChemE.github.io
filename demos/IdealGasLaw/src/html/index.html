@@ -210,16 +210,16 @@
               The energy balance for the system is
               
               $$
-                [1] \quad dU = Q + W
+                [1] \quad dU = dQ + dW
               $$
 
-              Where \( dU \) is the change to internal energy (J/mol), \( Q \) is heat added to the system (J/mol), and \( W \) is work performed on the system (J/mol). For an adiabatic system, heat added to the system is zero \( ( Q = 0 ) \). Therefore
+              Where \( dU \) is the change to internal energy (J/mol), \( dQ \) is heat added to the system (J/mol), and \( dW \) is work performed on the system (J/mol). For an adiabatic system, heat added to the system is zero \( ( dQ = 0 ) \). Therefore
 
               $$
-                [2] \quad dU = W
+                [2] \quad dU = dW
               $$
 
-              and since \( W = -P dV \) where \( V \) is volume and \( P \) is pressure, and since \( dU = C_{V} \; dT \) where \( C_{V} \) is the constant-volume heat capacity of the ideal gas,
+              and since \( dW = -P dV \) where \( V \) is volume and \( P \) is pressure, and since \( dU = C_{V} \; dT \) where \( C_{V} \) is the constant-volume heat capacity of the ideal gas,
 
               $$
                 [3] \quad C_{V} \; dT = - P dV
@@ -256,10 +256,10 @@
               The energy balance for the system is
               
               $$
-                [1] \quad \Delta U = Q + W
+                [1] \quad dU = dQ + dW
               $$
 
-              Where \( \Delta U \) is the change to internal energy (J/mol), \( Q \) is heat added to the system (J/mol), and \( W \) is work performed on the system (J/mol).  For a piston/cylinder with an external spring, the cylinder pressure is the sum of the external pressure and the pressure applied by the spring:
+              Where \( dU \) is the change to internal energy (J/mol), \( dQ \) is heat added to the system (J/mol), and \( dW \) is work performed on the system (J/mol).  For a piston/cylinder with an external spring, the cylinder pressure is the sum of the external pressure and the pressure applied by the spring:
 
               $$
                 [2] \quad dU = dQ - ( P_{ext} + P_{spr} ) dV
@@ -271,25 +271,25 @@
                 [3] \quad P_{spr} = k A \Delta z
               $$
 
-              where \( A \) is the area of the piston head (0.161 m<sup>2</sup> in this simulation), \( k \) is the spring constant (which is 2x10<sup>6</sup> N/m in this simulation), and \( \Delta z \) is the spring displacement (m).  In this simulation, the temperature, volume, and pressure are calculated iteratively. That is, temperature is first estimated assuming zero spring displacement:
+              where \( A \) is the area of the piston head (0.161 m<sup>2</sup> in this simulation), \( k \) is the spring constant (which is 2x10<sup>6</sup> N/m in this simulation), and \( \Delta z \) is the spring displacement (m).  In this simulation, the temperature, volume, and pressure are calculated iteratively. First, final temperature \( T \) is estimated assuming zero spring displacement:
             
               $$
-                [4] \quad C_{V} \; \Delta T = Q
+                [4] \quad T = \frac{ Q }{ C_{V} } + T_{init}
               $$
 
-              then, pressure is estimated using the ideal gas law:
+              where \( T_{init} \) is the initial temperature. Then, pressure is estimated using the ideal gas law:
 
               $$
-                [5] \quad PV = nRT
+                [5] \quad P = nRT / V
               $$
 
-              the resultant pressure is used to calculate the spring displacement using equation [3], and the spring displacement is used to find a more accurate value for \( V \) (m<sup>3</sup>). Finally, the new value for \( V \) is substituted into the equation below to find a more accurate value for \( T \). The derivation of the equation below is beyond the scope of these details.
+              with the value of \( V \) being equal to initial volume \( ( V_{init} ) \) in the first iteration. The resultant pressure is used to calculate the spring displacement using equation [3], and the spring displacement is used to find a more accurate value for \( V \), given that \( V = V_{init} + A \Delta z \). Finally, the new value for \( V \) is substituted into the equation below to find a more accurate value for \( T \):
 
               $$
-                [6] \quad T = 273 + \frac{ Q - P_{ext} ( V - 0.032 ) - k \left[ \left( \frac{V^{2}}{2} - \frac{0.032^{2}}{2} \right) - 0.032 ( V - 0.032 ) \right] }{ C_{V} }
+                [6] \quad T = T_{init} + \frac{ Q - P_{ext} ( V - V_{init} ) - k \left[ \left( \frac{V^{2}}{2} - \frac{V_{init}^{2}}{2} \right) - V_{init} ( V - V_{init} ) \right] }{ C_{V} }
               $$
 
-              The ideal gas law is then used to obtain a more accurate value for \( P \). This process is repeated 10 times, with values for \( P \), \( T \), and \( V \) each becoming more accurate with each iteration.
+              The ideal gas law is then used to recalculate \( P \). This process is repeated 10 times, with values for \( P, \) \( T, \) and \( V \) each becoming more accurate with each iteration.
 
             </div>
             
@@ -297,19 +297,19 @@
               The energy balance for the system is
               
               $$
-                [1] \quad \Delta U = Q + W
+                [1] \quad dU = dQ + dW
               $$
 
-              Where \( \Delta U \) is the change to internal energy (J/mol), \( Q \) is heat added to the system (J/mol), and \( W \) is work performed on the system (J/mol).  For a constant-temperature system, \( \Delta U = 0 \) because \( \Delta T = 0 \). Therefore,
+              Where \( dU \) is the change to internal energy (J/mol), \( dQ \) is heat added to the system (J/mol), and \( dW \) is work performed on the system (J/mol).  For a constant-temperature system, \( dU = 0 \) because temperature is constant \(( dT = 0 )\). Since \( dW = -PdV \),
 
               $$
                 [2] \quad 0 = dQ - PdV
               $$
 
-              the equation can be rearranged and integrated
+              the equation can be rearranged and integrated from initial to final conditions
 
               $$
-                [3] \quad Q = \int_{V_{1}}^{V_{2}} P dV
+                [3] \quad \int_{Q_{1}}^{Q_{2}} dQ = \int_{V_{1}}^{V_{2}} P dV
               $$
 
               using the ideal gas law to substitute \( nRT / V \) for \( P \):
@@ -321,10 +321,10 @@
               this yields
 
               $$
-                [5] \quad Q = RT \; \mathrm{ln} \left( \frac{V_{2}}{V_{1}} \right) = - RT \; \mathrm{ln} \left( \frac{P_{ext}}{P_{init}} \right)
+                [5] \quad Q = nRT \; \mathrm{ln} \left( \frac{V_{2}}{V_{1}} \right) = - nRT \; \mathrm{ln} \left( \frac{P_{2}}{P_{1}} \right)
               $$
 
-              where \( P_{ext} \) is the final external pressure and \( P_{init} \) is the initial external pressure (1 atm in this simulation).
+              where \( P_{2} \) is the final pressure and \( P_{1} \) is the initial pressure (1 atm in this simulation).
             </div>
 
           </div>
