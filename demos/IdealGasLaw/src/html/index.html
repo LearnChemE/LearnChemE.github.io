@@ -179,152 +179,160 @@
                 [1] \quad \Delta U = Q + W
               $$
 
-              Where \( \Delta U \) is the change to internal energy (J/mol), \( Q \) is heat added to the system (J/mol), and \( W \) is work performed on the system (J/mol). For a constant-volume system, there is no work done on the cylinder. Therefore,
+              Where \( \Delta U \) is the change to internal energy (J/mol), \( Q \) is heat added to the system (J/mol), and \( W \) is work performed on the system (J/mol). For a constant-volume system, \( W = 0 \) because \( \Delta V = 0 \) and
 
               $$
-                [2] \quad W = 0
+                [2] \quad \Delta U = Q
               $$
 
-              and
+              For one mole of an ideal gas, \( \Delta U = C_{V} \Delta T \), where \( C_{V} \) is the constant-volume heat capacity [J/(mol&nbsp;K)] and heat added per mole is
+
 
               $$
-                [3] \quad \Delta U = Q
+                [3] \quad Q = C_{V} \Delta T
               $$
 
-              Since \( \Delta U = C_{V} \; \Delta T \) where \( C_{V} \) is the constant-volume heat capacity [J/(mol K)],
+              Total heat added \( Q_{total} \) is
 
               $$
-                [4] \quad C_{V} \; \Delta T = Q
+                [4] \quad Q_{total} = n C_{V} \Delta T
               $$
 
-              Using the equation above, we can determine temperature of the system \( T \) based on the amount of heat added, and using the ideal gas law we can determine the pressure of the system:
+              where \( n \) is the number of moles of gas. Thus, the temperature change can be calculated from \( Q_{total} \), and the pressure calculated from the ideal gas law \( ( PV = nRT ) \).
 
-              $$
-                [5] \quad PV = nRT
-              $$
-
-              where \( n \) is the number of moles of gas, \( P \) is pressure, \( V \) is volume, and \( R \) is the ideal gas constant, which is 8.314 J/(mol K).
             </div>
             
             <div class="tab-content" id="adiabatic-reversible-content">
-              The energy balance for the system is
+              The differential energy balance for one mole of the system is 
               
               $$
                 [1] \quad dU = dQ + dW
               $$
 
-              Where \( dU \) is the change to internal energy (J/mol), \( dQ \) is heat added to the system (J/mol), and \( dW \) is work performed on the system (J/mol). For an adiabatic system, heat added to the system is zero \( ( dQ = 0 ) \). Therefore
+              where \( dU \) is the differential change in internal energy (kJ/mol), \( dQ \) is differential heat added to the system (kJ/mol), and \( dW \) is differential work performed on the system (kJ/mol). For an adiabatic system, \( Q = 0 \), so
 
               $$
                 [2] \quad dU = dW
               $$
 
-              and since \( dW = -P dV \) where \( V \) is volume and \( P \) is pressure, and since \( dU = C_{V} \; dT \) where \( C_{V} \) is the constant-volume heat capacity of the ideal gas,
+              since \( dW = -PdV \) where \( P \) is pressure and \( V \) is volume, and for an ideal gas, \( dU = C_{V} dT \) where \( C_{V} \) is the constant-volume heat capacity (kJ/[mol K]) and equation [2] becomes 
 
               $$
                 [3] \quad C_{V} \; dT = - P dV
               $$
 
-              Note that for an ideal diatomic gas, \( C_{V} \) is \( 2.5 R \) where \( R \) is the ideal gas constant, approximately 8.314 J/(mol K). We can substitute the ideal gas law (\( P = nRT / V \)) into equation [3] to yield
+              Pressure in this equation is replaced using the ideal gas for one mole \( ( PV = RT ) \), where \( R \) is the ideal gas constant, and rearranging yields
 
               $$
-                [4] \quad \frac{ C_{V} }{ T } dT = - \frac{ n R }{ V } dV 
+                [4] \quad \frac{ C_{V} }{ T } dT = - \frac{ R }{ V } dV 
               $$
 
-              The equation can be integrated from the initial state to the final state
+              Integrating both sides between initial conditions \( ( T_{1}, V_{1} ) \) and final conditions \( ( T_{2}, V_{2} ) \) yields
 
               $$
-                [5] \quad \int_{T_{1}}^{T_{2}} \frac{ C_{V} }{ T } dT = - \int_{V_{1}}^{V_{2}} \frac{ n R }{ V } dV
+                [5] \quad C_{V} \; \mathrm{ ln } \left( \frac{ T_{ 2 } }{ T_{ 1 } } \right) = - R \; \mathrm{ ln } \left( \frac{ V_{ 2 } }{ V_{ 1 } } \right)
               $$
 
-              yielding
+              Taking exponents of both sides yields
 
               $$
-                [6] \quad C_{V} \; \mathrm{ ln } \left( \frac{ T_{ 2 } }{ T_{ 1 } } \right) = -n R \; \mathrm{ ln } \left( \frac{ V_{ 2 } }{ V_{ 1 } } \right)
+                [6] \quad \frac{ T_{2} }{ T_{1} } = \left( \frac{ V_{ 1 } }{ V_{ 2 } } \right)^{ R / C_{V} }
               $$
 
-              This can be rearranged and the ideal gas law can be substituted to yield a relationship between temperature and pressure:
+              The ideal gas law can be used to replace \( V_1 \) and \( V_2 \) to yield
 
               $$
                 [7] \quad \frac{ T_{2} }{ T_{1} } = \left( \frac{ P_{ 2 } }{ P_{ 1 } } \right)^{ R / C_{P} }
               $$
 
-              In this simulation, \( T_{1} \) is 273 K and \( P_{1} \) is 1.0 atm (101,325 Pa). After temperature is determined using equation [7], the ideal gas law can be used to determine the final volume \( V_{2} \).
+              where the constant-pressure heat capacity \( C_P = C_V + R \). For an ideal diatomic gas,
+
+              $$
+                [8] \quad C_P = 3.5 R
+              $$
+
+              and \( R \) is 8.314x10<sup>-3</sup> kJ/[mol K]. In this simulation, the initial temperature \( T_{1} \) is 273 K and the initial pressure \( P_{1} \) is 1 atm.
             </div>
             
             <div class="tab-content" id="external-spring-content">
-              The energy balance for the system is
+              The differential energy balance for the total moles in the system is 
               
               $$
-                [1] \quad dU = dQ + dW
+                [1] \quad ndU = dQ_{total} + dW_{total} = dQ_{total} - n P dV
               $$
 
-              Where \( dU \) is the change to internal energy (J/mol), \( dQ \) is heat added to the system (J/mol), and \( dW \) is work performed on the system (J/mol).  For a piston/cylinder with an external spring, the cylinder pressure is the sum of the external pressure and the pressure applied by the spring:
+              where \( n \) is the number of moles, \( dU \) is the differential change in internal energy for one mole (J/mol), \( dQ_{total} \) is differential total heat added to the system (J), \( dW_{total} \) is differential work performed on the system (J), \( P \) is the external pressure (which is the same as the internal pressure for a reversible process), and \( V \) is the gas volume. For this system,
 
               $$
-                [2] \quad dU = dQ - ( P_{ext} + P_{spr} ) dV
+                [2] \quad P = P_{ext} + P_{spr}
               $$
 
-              where \( P_{ext} \) is the external pressure outside the cylinder (Pa), and \( P_{spr} \) is the pressure applied by the spring (Pa).  The pressure applied by the spring is
+              and
 
               $$
-                [3] \quad P_{spr} = k A \Delta z
+                [3] \quad dP_{spr} = k A dz
               $$
 
-              where \( A \) is the area of the piston head (0.161 m<sup>2</sup> in this simulation), \( k \) is the spring constant (which is 2x10<sup>6</sup> N/m in this simulation), and \( \Delta z \) is the spring displacement (m).  In this simulation, the temperature, volume, and pressure are calculated iteratively. First, final temperature \( T \) is estimated assuming zero spring displacement:
+              where \( k \) is the spring constant (2x10<sup>6</sup> N/m for the two springs), \( A \) is the area of the piston (0.161 m<sup>2</sup>), and \( dz \) is the differential spring displacement (m). For the initial molar volume \( V_{1} \), the pressure due to the spring is zero. Thus, integrating equation [3] and using \( A dz = dV \) yields
             
               $$
-                [4] \quad T = \frac{ Q }{ C_{V} } + T_{init}
+                [4] \quad P_{spr} = k ( nV - nV_{1} )
               $$
 
-              where \( T_{init} \) is the initial temperature. Then, pressure is estimated using the ideal gas law:
+              where \( n V_{1} \) (total initial volume) is 0.032 m<sup>3</sup>, and \( n V \) is the total gas volume at any time. The change in internal energy is
 
               $$
-                [5] \quad P = nRT / V
+                [5] \quad dU = C_{V} dT
               $$
 
-              with the value of \( V \) being equal to initial volume \( ( V_{init} ) \) in the first iteration. The resultant pressure is used to calculate the spring displacement using equation [3], and the spring displacement is used to find a more accurate value for \( V \), given that \( V = V_{init} + A \Delta z \). Finally, the new value for \( V \) is substituted into the equation below to find a more accurate value for \( T \):
+              The initial pressure \( V_{1} \) is 1.0 atm, and \( n \) = 1.4 mol. Equation [1] then becomes
 
               $$
-                [6] \quad T = T_{init} + \frac{ Q - P_{ext} ( V - V_{init} ) - k \left[ \left( \frac{V^{2}}{2} - \frac{V_{init}^{2}}{2} \right) - V_{init} ( V - V_{init} ) \right] }{ C_{V} }
+                [6] \quad n C_{V} dT = dQ_{total} - n [ P_{ext} + k ( nV - nV_{1} )] dV
               $$
 
-              The ideal gas law is then used to recalculate \( P \). This process is repeated 10 times, with values for \( P, \) \( T, \) and \( V \) each becoming more accurate with each iteration.
+              Integrating this yields
+
+              $$
+                [7] \quad nC_{V} ( T - T_{1} ) = Q_{total} - n \left[ P_{ext} ( V - V_{1} ) + kn \left( \frac{V^{2}}{2} - \frac{ V_{1}^{2} }{ 2 } - V_{1} ( V - V_{1} ) \right) \right]
+              $$
+
+              These equations are solved using an iterative procedure.
 
             </div>
             
             <div class="tab-content" id="constant-t-content">
-              The energy balance for the system is
+              The differential energy balance for one mole of the system is 
               
               $$
                 [1] \quad dU = dQ + dW
               $$
 
-              Where \( dU \) is the change to internal energy (J/mol), \( dQ \) is heat added to the system (J/mol), and \( dW \) is work performed on the system (J/mol).  For a constant-temperature system, \( dU = 0 \) because temperature is constant \(( dT = 0 )\). Since \( dW = -PdV \),
+              Where \( dU \) is the differential change to internal energy (J/mol), \( dQ \) is differential heat added to the system (J/mol), and \( dW \) is differential work performed on the system (J/mol). Since \( dU = C_{V} dT \) for an ideal gas, where \( C_V \) is the constant-volume heat capacity (kJ/[mol K]), and \( dT \) is zero for a constant-temperature process, then \( dU = 0 \), and the energy balance is
 
               $$
-                [2] \quad 0 = dQ - PdV
+                [2] \quad dQ = -dW = PdV
               $$
 
-              the equation can be rearranged and integrated from initial to final conditions
+              where \( P \) is the gas pressure (for a reversible process) and \( V \) is the gas volume per mole. Integrating eqn [2] yields
 
               $$
-                [3] \quad \int_{Q_{1}}^{Q_{2}} dQ = \int_{V_{1}}^{V_{2}} P dV
+                [3] \quad Q = \int_{V_{1}}^{V_{2}} P dV
               $$
 
-              using the ideal gas law to substitute \( nRT / V \) for \( P \):
+              When \( P \) is replaced using the ideal gas law for one mole \( (P = RT/V) \), then the heat added per mole is
 
               $$
-                [4] \quad Q = \int_{V_{1}}^{V_{2}} \frac{ nRT }{ V } dV
+                [4] \quad Q = \int_{V_{1}}^{V_{2}} \frac{ RT }{ V } dV = RT \; \mathrm{ln} \left( \frac{V_{2}}{V_{1}} \right) = - RT \; \mathrm{ln} \left( \frac{P_{2}}{P_{1}} \right)
               $$
 
-              this yields
+              where \( P_2 \) is the final pressure and \( P_1 \) is the initial pressure (1 atm). The total heat added \( Q_{total} \) is
 
               $$
-                [5] \quad Q = nRT \; \mathrm{ln} \left( \frac{V_{2}}{V_{1}} \right) = - nRT \; \mathrm{ln} \left( \frac{P_{2}}{P_{1}} \right)
+                [5] \quad Q_{total} =  - nRT \; \mathrm{ln} \left( \frac{P_{2}}{P_{1}} \right)
               $$
 
-              where \( P_{2} \) is the final pressure and \( P_{1} \) is the initial pressure (1 atm in this simulation).
+              where \( P_{2} \) is the final pressure.
             </div>
 
           </div>
