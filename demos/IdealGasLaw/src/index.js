@@ -4,7 +4,6 @@ window.p5 = new require("./js/p5.min.js");
 
 // TO DO:
 
-
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
   piston_mode : "constant-p", // Option selected using the drop-down menu
