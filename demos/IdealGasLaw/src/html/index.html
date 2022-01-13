@@ -106,8 +106,6 @@
 
         <div class="modal-body">
 
-          <p>Choose between the scenarios below</p>
-
           <div id="details-tabs-container">
             
             <div class="tab-header active" id="constant-p-header">Constant pressure</div>
@@ -193,7 +191,7 @@
                 [3] \quad \Delta U = Q
               $$
 
-              Since \( U = C_{V} \; \Delta T \) where \( C_{V} \) is the constant-volume heat capacity [J/(mol K)],
+              Since \( \Delta U = C_{V} \; \Delta T \) where \( C_{V} \) is the constant-volume heat capacity [J/(mol K)],
 
               $$
                 [4] \quad C_{V} \; \Delta T = Q
@@ -227,7 +225,7 @@
                 [3] \quad C_{V} \; dT = - P dV
               $$
 
-              Note that for an ideal diatomic gas, \( C_{V} \) is \( 2.5 R \) where \( R \) is the ideal gas constant, approximately 8.314 J/(mol K). We can substitute the ideal gas law (\( P = nRT / V \)) into the equation to yield
+              Note that for an ideal diatomic gas, \( C_{V} \) is \( 2.5 R \) where \( R \) is the ideal gas constant, approximately 8.314 J/(mol K). We can substitute the ideal gas law (\( P = nRT / V \)) into equation [3] to yield
 
               $$
                 [4] \quad \frac{ C_{V} }{ T } dT = - \frac{ n R }{ V } dV 
@@ -261,7 +259,7 @@
                 [1] \quad \Delta U = Q + W
               $$
 
-              Where \( \Delta U \) is the change to internal energy (J/mol), \( Q \) is heat added to the system (J/mol), and \( W \) is work performed on the system (J/mol).  For a piston/cylinder with an internal spring, the internal pressure is the sum of the external pressure and the pressure applied by the spring's displacement:
+              Where \( \Delta U \) is the change to internal energy (J/mol), \( Q \) is heat added to the system (J/mol), and \( W \) is work performed on the system (J/mol).  For a piston/cylinder with an external spring, the cylinder pressure is the sum of the external pressure and the pressure applied by the spring:
 
               $$
                 [2] \quad dU = dQ - ( P_{ext} + P_{spr} ) dV
@@ -273,25 +271,25 @@
                 [3] \quad P_{spr} = k A \Delta z
               $$
 
-              where \( A \) is the area of the piston head (0.161 m<sup>2</sup> in this simulation), \( k \) is the spring constant (which is 1x10<sup>6</sup> N/m in this simulation per spring. Since there are two springs, the effective spring constant is 2x10<sup>6</sup> N/m), and \( \Delta z \) is the spring displacement (m).  In this simulation, the temperature, volume, and pressure are calculated iteratively. That is, temperature is first estimated assuming zero spring displacement:
+              where \( A \) is the area of the piston head (0.161 m<sup>2</sup> in this simulation), \( k \) is the spring constant (which is 2x10<sup>6</sup> N/m in this simulation), and \( \Delta z \) is the spring displacement (m).  In this simulation, the temperature, volume, and pressure are calculated iteratively. That is, temperature is first estimated assuming zero spring displacement:
             
               $$
                 [4] \quad C_{V} \; \Delta T = Q
               $$
 
-              then, pressure is estimated using the ideal gas law (in the first iteration, volume is 0.032 m<sup>3</sup>, corresponding to zero spring displacement):
+              then, pressure is estimated using the ideal gas law:
 
               $$
                 [5] \quad PV = nRT
               $$
 
-              the resultant pressure is used to calculate the spring displacement using equation [3], and the spring displacement is used to find a more accurate value for \( V \) (m<sup>3</sup>). Finally, the new value for \( V \) is substituted into the equation below to find a more accurate value for \( T \) (the derivation of the equation below is beyond the scope of these details),
+              the resultant pressure is used to calculate the spring displacement using equation [3], and the spring displacement is used to find a more accurate value for \( V \) (m<sup>3</sup>). Finally, the new value for \( V \) is substituted into the equation below to find a more accurate value for \( T \). The derivation of the equation below is beyond the scope of these details.
 
               $$
                 [6] \quad T = 273 + \frac{ Q - P_{ext} ( V - 0.032 ) - k \left[ \left( \frac{V^{2}}{2} - \frac{0.032^{2}}{2} \right) - 0.032 ( V - 0.032 ) \right] }{ C_{V} }
               $$
 
-              and the ideal gas law is then used to obtain a more accurate value for \( P \). This process is repeated 10 times, with values for \( P \), \( T \), and \( V \) each becoming more accurate with each iteration.
+              The ideal gas law is then used to obtain a more accurate value for \( P \). This process is repeated 10 times, with values for \( P \), \( T \), and \( V \) each becoming more accurate with each iteration.
 
             </div>
             
