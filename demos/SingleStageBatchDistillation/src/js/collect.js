@@ -32,7 +32,7 @@ gvs.maximum_temperature_azeotrope_temperature = function(x) {
 
 gvs.differential_collection = function() {
   if(gvs.collection_progress < 1 && gvs.B > 0.05) {
-    const dP = 0.0007 / gvs.amount_to_collect;
+    const dP = 0.0005 / gvs.amount_to_collect;
     const collection_flask = gvs.flasks[gvs.flasks.length - 1];
     switch(gvs.eq_plot) {
       case "no azeotrope":

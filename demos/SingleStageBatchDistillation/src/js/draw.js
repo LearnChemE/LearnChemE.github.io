@@ -143,11 +143,24 @@ function otherLabels(p) {
   p.pop();
 }
 
+function pouringLiquid(p) {
+  p.push();
+  translate_to_column(p);
+  p.fill(liquid_color);
+  p.noStroke();
+  p.rectMode(p.CORNER);
+  p.rect(151, 10, 8, 100);
+  p.pop();
+}
+
 function drawAll(p) {
   drawStillLiquid(p, gvs.B);
   drawColumn(p);
   drawTemperatureLabel(p);
   otherLabels(p);
+  if(gvs.is_collecting) {
+    pouringLiquid(p);
+  }
   // If "flasks" is selected, draw every flask, otherwise just draw the last one under the collection spout
   if(gvs.display === "flasks") {
     for(let i = 0; i < gvs.flasks.length; i++) {
