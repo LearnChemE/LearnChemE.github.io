@@ -284,7 +284,7 @@ function drawAll(p) {
         p.push();
         p.textSize(16);
         p.textWrap(p.WORD);
-        p.text(`Choose an initial mole fraction, an amount to evaporate, and a mixture composition, then press "Collect". Your collected distillate will then appear here. You may also choose "display: Equilibrium plot" or "display: T-x-y diagram" from the drop-down menu to view the respective graphs. Up to 8 flasks may be collected, or 0.95 moles of total distillate, whichever comes first. Press "Reset" at any time to start over again.`, 355, 50, 435);
+        p.text(`Choose an initial mole fraction, an amount to evaporate, and a mixture composition, then press "Collect". Your collected distillate will then appear here. You may also choose "display: Equilibrium plot" or "display: T-x-y diagram" from the drop-down menu to view the respective graphs. Up to 8 flasks may be collected, or 0.99 moles of total distillate, whichever comes first. Press "Reset" at any time to start over again.`, 355, 50, 435);
         p.pop();
       }
     }

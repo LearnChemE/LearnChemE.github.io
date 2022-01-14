@@ -103,7 +103,7 @@ gvs.maximum_temperature_azeotrope_dew_point = function(x) {
 }
 
 gvs.differential_collection = function() {
-  if(gvs.collection_progress < 1 && gvs.B > 0.05) {
+  if(gvs.collection_progress < 1 && gvs.B > 0.01) {
     const dP = 0.0005 / gvs.amount_to_collect;
     const collection_flask = gvs.flasks[gvs.flasks.length - 1];
     switch(gvs.eq_plot_shape) {
@@ -136,7 +136,7 @@ gvs.differential_collection = function() {
   } else {
     gvs.is_collecting = false;
     document.getElementById("reset-simulation").removeAttribute("disabled");
-    if(gvs.B > 0.05) { document.getElementById("start-collection").removeAttribute("disabled") }
+    if(gvs.B > 0.01) { document.getElementById("start-collection").removeAttribute("disabled") }
     document.getElementById("evap-slider").removeAttribute("disabled");
     // Coordinates of the collection flasks (pixels)
     const coords = [
@@ -157,7 +157,7 @@ gvs.differential_collection = function() {
     gvs.flasks[f].y_loc = coords[f + 1][1];
     gvs.flasks.push(new gvs.Flask({ x_loc : 316, y_loc : 370 }));
     gvs.flasks[gvs.flasks.length - 1].id = gvs.flasks.length;
-    if( f >= 7 || gvs.B <= 0.05 ) {
+    if( f >= 7 || gvs.B <= 0.01 ) {
       document.getElementById("start-collection").setAttribute("disabled", "yes");
       document.getElementById("evap-slider").setAttribute("disabled", "yes");
     }
