@@ -3,7 +3,7 @@ const liquid_color = gvs.p.color(200, 200, 255);
 const top_of_liquid_color = gvs.p.color(170, 170, 255);
 
 function translate_to_column(p) {
-  p.translate(p.width / 4, p.height / 2);
+  p.translate(p.width / 4 - 40, p.height / 2);
 }
 
 function drawColumn(p) {
@@ -95,7 +95,7 @@ function drawTemperatureLabel(p) {
     p.fill(0);
     p.noStroke();
     p.textAlign(p.CENTER);
-    p.text(`${(gvs.T - 273.15).toFixed(1)}° C`, 0, -170);
+    p.text(`${(gvs.T).toFixed(1)}° C`, 0, -170);
 
     // Draw thermometer
     p.strokeWeight(2);
@@ -109,7 +109,7 @@ function drawTemperatureLabel(p) {
     p.rectMode(p.CORNER);
     p.noStroke();
     p.fill(255, 100, 100);
-    p.rect(-54, -157, 8, -5 - 45 * (gvs.T - 350.65) / ( 385 - 350.65 ));
+    p.rect(-54, -157, 8, -5 - 45 * (gvs.T - 77.5) / ( 118.85 - 77.5 ));
   p.pop();
 }
 

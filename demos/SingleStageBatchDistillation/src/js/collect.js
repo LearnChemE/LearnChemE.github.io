@@ -17,17 +17,89 @@ gvs.maximum_temperature_azeotrope = function(x) {
 
 gvs.no_azeotrope_temperature = function(x) {
   const T = 379 - 29 * x - 5 * Math.sin( Math.PI * x );
-  return T
+  return T - 273.15
 }
 
 gvs.minimum_temperature_azeotrope_temperature = function(x) {
   const T = 380 - 20 * x - 15 * Math.sin( 1.022 * Math.PI * x );
-  return T
+  return T - 273.15
 }
 
 gvs.maximum_temperature_azeotrope_temperature = function(x) {
   const T = 343 + 41 * x + 20 * Math.sin( Math.PI * ( x + 0.26 ) );
-  return T
+  return T - 273.15
+}
+
+gvs.no_azeotrope_dew_point = function(x) {
+  if(x == 0) {return gvs.no_azeotrope_temperature(0)}
+  if(x == 1) {return gvs.no_azeotrope_temperature(1)}
+  let y_vals = [];
+  let temp_vals = [];
+  for(let i = 0; i < 200; i++) {
+    const x = i / 200;
+    y_vals.push( gvs.no_azeotrope(x) );
+    temp_vals.push( gvs.no_azeotrope_temperature( x ) );
+  }
+  let j = 0;
+  while( y_vals[j] <= x ) {
+    j++
+  }
+  j = Math.min(200, j);
+  const upper = y_vals[j];
+  const lower = y_vals[j - 1];
+  const interp = (x - lower) / (upper - lower);
+  const temp_lower = temp_vals[j - 1];
+  const temp_upper = temp_vals[j];
+  const temp = temp_lower + interp * (temp_upper - temp_lower);
+  return temp
+}
+
+gvs.minimum_temperature_azeotrope_dew_point = function(x) {
+  if(x == 0) {return gvs.minimum_temperature_azeotrope_temperature(0)}
+  if(x == 1) {return gvs.minimum_temperature_azeotrope_temperature(1)}
+  let y_vals = [];
+  let temp_vals = [];
+  for(let i = 0; i < 200; i++) {
+    const x = i / 200;
+    y_vals.push( gvs.minimum_temperature_azeotrope(x) );
+    temp_vals.push( gvs.minimum_temperature_azeotrope_temperature( x ) );
+  }
+  let j = 0;
+  while( y_vals[j] <= x ) {
+    j++
+  }
+  j = Math.min(200, j);
+  const upper = y_vals[j];
+  const lower = y_vals[j - 1];
+  const interp = (x - lower) / (upper - lower);
+  const temp_lower = temp_vals[j - 1];
+  const temp_upper = temp_vals[j];
+  const temp = temp_lower + interp * (temp_upper - temp_lower);
+  return temp
+}
+
+gvs.maximum_temperature_azeotrope_dew_point = function(x) {
+  if(x == 0) {return gvs.maximum_temperature_azeotrope_temperature(0)}
+  if(x == 1) {return gvs.maximum_temperature_azeotrope_temperature(1)}
+  let y_vals = [];
+  let temp_vals = [];
+  for(let i = 0; i < 200; i++) {
+    const x = i / 200;
+    y_vals.push( gvs.maximum_temperature_azeotrope(x) );
+    temp_vals.push( gvs.maximum_temperature_azeotrope_temperature( x ) );
+  }
+  let j = 0;
+  while( y_vals[j] <= x ) {
+    j++
+  }
+  j = Math.min(200, j);
+  const upper = y_vals[j];
+  const lower = y_vals[j - 1];
+  const interp = (x - lower) / (upper - lower);
+  const temp_lower = temp_vals[j - 1];
+  const temp_upper = temp_vals[j];
+  const temp = temp_lower + interp * (temp_upper - temp_lower);
+  return temp
 }
 
 gvs.differential_collection = function() {
@@ -65,7 +137,7 @@ gvs.differential_collection = function() {
     document.getElementById("evap-slider").removeAttribute("disabled");
     // Coordinates of the collection flasks (pixels)
     const coords = [
-      [356, 370],
+      [316, 370],
       [500, 90],
       [650, 90],
       [500, 220],
@@ -80,7 +152,7 @@ gvs.differential_collection = function() {
     const f = gvs.flasks.length - 1;
     gvs.flasks[f].x_loc = coords[f + 1][0];
     gvs.flasks[f].y_loc = coords[f + 1][1];
-    gvs.flasks.push(new gvs.Flask({ x_loc : 356, y_loc : 370 }));
+    gvs.flasks.push(new gvs.Flask({ x_loc : 316, y_loc : 370 }));
     if( f >= 7 || gvs.B <= 0.05 ) {
       document.getElementById("start-collection").setAttribute("disabled", "yes");
       document.getElementById("evap-slider").setAttribute("disabled", "yes");

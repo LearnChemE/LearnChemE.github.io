@@ -193,3 +193,15 @@ canvas {
   opacity: 0.3 !important;
   pointer-events: none;
 }
+
+#plot-container {
+  position: absolute;
+  top: 260px;
+  left: 480px;
+  width: 440px;
+  height: 500px;
+}
+
+.dashed-curve {
+  stroke-dasharray: 7px;
+}
