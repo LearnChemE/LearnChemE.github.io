@@ -7,6 +7,7 @@ function Flask(args) {
   this.x = 0; // mole fraction of more volatile component
   this.x_loc = 0 || args.x_loc; // x location (pixels)
   this.y_loc = 0 || args.y_loc; // y location (pixels)
+  this.id = 1 || args.id;
 
   // Add a number of moles (amt) of a liquid of composition x (comp) to the flask
   this.add = function(amt, comp) {
@@ -85,11 +86,24 @@ function Flask(args) {
 
     p.push();
     p.textSize(14);
-    p.textAlign(p.CENTER);
-    p.text(`${this.n.toFixed(2)} mol`, this.x_loc, this.y_loc + 24);
-    p.text(`x  = ${this.x.toFixed(2)}`, this.x_loc, this.y_loc + 39);
+    p.textAlign(p.LEFT);
+    p.text(`${this.n.toFixed(2)} mol`, this.x_loc - 26, this.y_loc + 24);
+    const xB = (this.x < 0.01 || this.x > 0.99) && this.n !== 0 ? this.x.toFixed(3) : this.x.toFixed(2);
+    p.text(`x  = ${xB}`, this.x_loc - 26, this.y_loc + 39);
     p.textSize(8);
-    p.text("B", this.x_loc - 17, this.y_loc + 42);
+    p.text("B", this.x_loc - 19, this.y_loc + 42);
+    p.pop();
+
+    p.push();
+    p.textSize(16);
+    p.noStroke();
+    p.textAlign(p.CENTER);
+    p.translate(this.x_loc, this.y_loc);
+    p.fill(255, 255, 255, 200);
+    p.rectMode(p.CENTER);
+    p.rect(0, -20, 23, 20);
+    p.fill(0);
+    p.text(`#${this.id.toFixed(0)}`, 0, -15);
     p.pop();
   }
 }

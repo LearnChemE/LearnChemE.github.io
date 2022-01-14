@@ -6,7 +6,6 @@ window.p5 = new require("./js/p5.min.js");
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
-  F : 1, // initial amount of liquid (constant)
   B : 1, // moles of liquid in the bottom kettle
   D : 0, // total moles of distillate collected
   z : 0.50, // initial mole fraction in the still (adjusted with slider)
@@ -39,14 +38,14 @@ const sketch = (p) => {
     require("./js/inputs.js");
     require("./js/collect.js");
     gvs.flasks.push(new gvs.Flask({ x_loc : 316, y_loc : 370 }));
-    document.getElementById("loading").style.opacity = "0";
+    // document.getElementById("loading").style.opacity = "0";
 
     gvs.eq_plot = new SVG_Graph({
       id: "eq-plot",                  // id of the container element
       classList: ["svg-plot"],           // classes to add to the plot container element
       title: "Equilibrium plot",                         // text above the plot
       titleFontSize: 20,                 // font size of title, pixels
-      padding: [[70, 20], [40, 50]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
+      padding: [[50, 20], [40, 50]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
       parent: document.getElementById("plot-container"),             // the element to place the plot within.  If a parent is specified (besides document.body), the plot size will be 100% of parent's width and height.
       axes: {
         axesStrokeWidth: 0.5,            // stroke width of the axes lines: the vertical and horizontal x and y-axes (px)
@@ -86,7 +85,7 @@ const sketch = (p) => {
       classList: ["svg-plot"],           // classes to add to the plot container element
       title: "T-x-y diagram",                         // text above the plot
       titleFontSize: 20,                 // font size of title, pixels
-      padding: [[70, 20], [40, 50]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
+      padding: [[50, 20], [40, 50]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
       parent: document.getElementById("plot-container"),             // the element to place the plot within.  If a parent is specified (besides document.body), the plot size will be 100% of parent's width and height.
       axes: {
         axesStrokeWidth: 0.5,            // stroke width of the axes lines: the vertical and horizontal x and y-axes (px)
@@ -105,7 +104,7 @@ const sketch = (p) => {
           showZeroLabel: false,          // choose whether or not the "zero" value is displayed on the bottom-left part of the graph
         },
         y : {
-          labels: ["y<sub>B</sub>", ""],
+          labels: ["Temperature (°C)", ""],
           labelFontSize: 17,
           display: [true, true],
           range: [75, 110],

@@ -94,11 +94,12 @@ function drawStillLiquidLabel(p) {
     p.fill(0);
     p.noStroke();
     translate_to_column(p);
-    p.textAlign(p.CENTER);
-    p.text(`x  = ${gvs.xB.toFixed(2)}`, -105, 95);
-    p.text(`${gvs.B.toFixed(2)} mol`, -105, 125);
+    p.textAlign(p.LEFT);
+    const xB = gvs.xB < 0.01 || gvs.xB > 0.99 ? gvs.xB.toFixed(3) : gvs.xB.toFixed(2);
+    p.text(`x  = ${xB}`, -145, 95);
+    p.text(`${gvs.B.toFixed(2)} mol`, -145, 125);
     p.textSize(12);
-    p.text(`B`, -126, 100);
+    p.text(`B`, -135, 100);
     p.stroke(0);
     p.noFill();
     p.line(-65, 105, -30, 105);
@@ -136,7 +137,9 @@ function otherLabels(p) {
   p.push();
   translate_to_column(p);
   p.textSize(18);
-  p.text(`y  = ${gvs.xD.toFixed(2)}`, -105, -50);
+  p.textAlign(p.LEFT);
+  const y = gvs.xD < 0.01 || gvs.xD > 0.99 ? gvs.xD.toFixed(3) : gvs.xD.toFixed(2);
+  p.text(`y  = ${y}`, -115, -50);
   p.stroke(0);
   p.strokeWeight(1);
   p.line(-30, -60, 0, -70);
@@ -148,7 +151,7 @@ function otherLabels(p) {
   p.translate(0, 70);
   p.noStroke();
   p.textSize(11);
-  p.text(`B`, -96, -46);
+  p.text(`B`, -106, -46);
   p.textSize(15);
   p.text("coolant", 80, -150);
   p.translate(70, -140);
@@ -279,8 +282,9 @@ function drawAll(p) {
       flask.draw();
       if(gvs.flasks.length === 1) {
         p.push();
-        p.textSize(18);
-        p.text(`Press "Collect" and your collected\ndistillate will appear here`, 450, 100);
+        p.textSize(16);
+        p.textWrap(p.WORD);
+        p.text(`Choose an initial mole fraction, an amount to evaporate, and a mixture composition, then press "Collect". Your collected distillate will then appear here. You may also choose "display: Equilibrium plot" or "display: T-x-y diagram" from the drop-down menu to view the respective graphs. Up to 8 flasks may be collected, or 0.95 moles of total distillate, whichever comes first. Press "Reset" at any time to start over again.`, 355, 50, 435);
         p.pop();
       }
     }

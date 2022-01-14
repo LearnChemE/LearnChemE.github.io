@@ -109,16 +109,19 @@ gvs.differential_collection = function() {
     switch(gvs.eq_plot_shape) {
       case "no azeotrope":
         gvs.xD = gvs.no_azeotrope(gvs.xB);
+        gvs.xD = Math.min(0.999, gvs.xD);
         gvs.T = gvs.no_azeotrope_temperature(gvs.xB);
       break;
 
       case "minimum-temperature azeotrope":
         gvs.xD = gvs.minimum_temperature_azeotrope(gvs.xB);
+        gvs.xD = Math.min(0.999, gvs.xD);
         gvs.T = gvs.minimum_temperature_azeotrope_temperature(gvs.xB);
       break;
 
       case "maximum-temperature azeotrope":
         gvs.xD = gvs.maximum_temperature_azeotrope(gvs.xB);
+        gvs.xD = Math.min(0.999, gvs.xD);
         gvs.T = gvs.maximum_temperature_azeotrope_temperature(gvs.xB);
       break;
     }
@@ -153,10 +156,12 @@ gvs.differential_collection = function() {
     gvs.flasks[f].x_loc = coords[f + 1][0];
     gvs.flasks[f].y_loc = coords[f + 1][1];
     gvs.flasks.push(new gvs.Flask({ x_loc : 316, y_loc : 370 }));
+    gvs.flasks[gvs.flasks.length - 1].id = gvs.flasks.length;
     if( f >= 7 || gvs.B <= 0.05 ) {
       document.getElementById("start-collection").setAttribute("disabled", "yes");
       document.getElementById("evap-slider").setAttribute("disabled", "yes");
     }
+    gvs.p.noLoop();
   }
 }
 

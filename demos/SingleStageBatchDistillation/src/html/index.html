@@ -35,7 +35,7 @@
   
       <div class="input-row">
         <div class="data-name">Initial mole fraction in still</div>
-        <input type="range" id="z-slider" min="0.05" max="0.95" step="0.01" value="0.5">
+        <input type="range" id="z-slider" min="0.01" max="0.99" step="0.01" value="0.5">
         <div class="data-value" id="z-value">0.50</div>
         <div class="data-metric"></div>
       </div>
@@ -64,10 +64,11 @@
             <option value="txy">T-x-y diagram</option>
           </select>
 
+          <div class="selection-label" id="composition-label">composition:</div>
           <select id="eq-plot-select" value="no azeotrope">
             <option value="no azeotrope">No azeotrope</option>
-            <option value="minimum-temperature azeotrope">Minimum-temperature azeotrope</option>
-            <option value="maximum-temperature azeotrope">Maximum-temperature azeotrope</option>
+            <option value="minimum-temperature azeotrope">Minimum-T azeotrope</option>
+            <option value="maximum-temperature azeotrope">Maximum-T azeotrope</option>
           </select>
         </div>
 
@@ -79,8 +80,6 @@
   </div>
 
   <div id="p5-container"></div>
-    <div id="loading" style="display: block;">Loading . . .</div>
-  </div>
 
   <div id="plot-container"></div>
 
@@ -96,7 +95,7 @@
         </div>
         <div class="modal-body">
           <p>
-            In this simulation, one mole of a binary mixture undergoes a batch distillation. The first slider sets the mole fraction of the starting liquid. When you click the "Collect" button, liquid evaporates and the distillate is collected in a collection flask. The amount collected into each flask is set with the second slider. The collection flask is then set aside and an empty flask is substituted. The process repeats when you click the "Collect" again, until finally 0.05 mol remains in the still. The equilibrium temperature is shown next to the thermometer. Select either the collection flasks, an x-y plot (equilibrium plot), or a T-x-y plot to be displayed on the right. Click "Reset" to start over. You can choose either an ideal solution (no azeotrope), a minimum-boiling temperature azeotrope or a maximum-boiling temperature azeotrope with the drop-down menu.
+            In this simulation, one mole of a binary mixture undergoes a batch distillation. The first slider sets the mole fraction of the starting liquid. When you click the "Collect" button, liquid evaporates and the distillate is collected in a collection flask. The amount collected into each flask is set with the second slider. The collection flask is then set aside and an empty flask is substituted. The process repeats when you click the "Collect" again, until finally 0.02 mol remains in the still. The equilibrium temperature is shown next to the thermometer. Select either the collection flasks, an x-y plot (equilibrium plot), or a T-x-y plot to be displayed on the right. Click "Reset" to start over. You can choose either an ideal solution (no azeotrope), a minimum-boiling temperature azeotrope or a maximum-boiling temperature azeotrope with the drop-down menu.
           </p>
 
         </div>
