@@ -24,6 +24,10 @@ const containerElement = document.getElementById("p5-container");
 
 const sketch = (p) => {
 
+  p.preload = function() {
+    gvs.coil_img = p.loadImage("./assets/coil.png");
+  }
+
   p.setup = function () {
     p.createCanvas(800, 530);
     p.noLoop();
@@ -238,10 +242,10 @@ const sketch = (p) => {
       parent: gvs.eq_plot.SVG,
       stroke: "rgb(0, 0, 0)",
       strokeWidth: 1,
-      fill: "rgb(255, 205, 155)",
+      fill: "rgb(255, 255, 255)",
     });
 
-    gvs.txy_plot.txy_plot_point_x = gvs.txy_plot.createPoint({
+    gvs.txy_plot_point_x = gvs.txy_plot.createPoint({
       coord: [gvs.z, gvs.no_azeotrope_temperature(gvs.z)],
       radius: 1.5,
       classList: ["plot-point"],
@@ -250,10 +254,10 @@ const sketch = (p) => {
       parent: gvs.txy_plot.SVG,
       stroke: "rgb(0, 0, 0)",
       strokeWidth: 1,
-      fill: "rgb(255, 205, 155)",
+      fill: "rgb(255, 255, 255)",
     });
 
-    gvs.txy_plot.txy_plot_point_y = gvs.txy_plot.createPoint({
+    gvs.txy_plot_point_y = gvs.txy_plot.createPoint({
       coord: [gvs.no_azeotrope( gvs.z ), gvs.no_azeotrope_temperature(gvs.z)],
       radius: 1.5,
       classList: ["plot-point"],
@@ -262,7 +266,55 @@ const sketch = (p) => {
       parent: gvs.txy_plot.SVG,
       stroke: "rgb(0, 0, 0)",
       strokeWidth: 1,
-      fill: "rgb(255, 205, 155)",
+      fill: "rgb(50, 50, 50)",
+    });
+
+    gvs.txy_plot_xB_label = gvs.txy_plot.createText({
+      coord: [gvs.xB - 0.05, gvs.no_azeotrope_temperature( gvs.xB ) - 0.2],
+      content: "x",
+      classList: ["svg-text"],
+      usePlotCoordinates: true,
+      id: null,
+      parent: gvs.txy_plot.SVG,
+      color: "rgb(0, 0, 0)",
+      fontSize: 4,
+      alignment: ["left", "top"],
+    });
+
+    gvs.txy_plot_xB_label_subscript = gvs.txy_plot.createText({
+      coord: [gvs.xB - 0.025, gvs.no_azeotrope_temperature( gvs.xB ) - 1.05],
+      content: "B",
+      classList: ["svg-text"],
+      usePlotCoordinates: true,
+      id: null,
+      parent: gvs.txy_plot.SVG,
+      color: "rgb(0, 0, 0)",
+      fontSize: 2.5,
+      alignment: ["left", "top"],
+    });
+
+    gvs.txy_plot_xD_label = gvs.txy_plot.createText({
+      coord: [gvs.no_azeotrope( gvs.xB ) + 0.03, gvs.no_azeotrope_temperature( gvs.xB ) + 2],
+      content: "y",
+      classList: ["svg-text"],
+      usePlotCoordinates: true,
+      id: null,
+      parent: gvs.txy_plot.SVG,
+      color: "rgb(0, 0, 0)",
+      fontSize: 4,
+      alignment: ["left", "top"],
+    });
+
+    gvs.txy_plot_xD_label_subscript = gvs.txy_plot.createText({
+      coord: [gvs.no_azeotrope( gvs.xB ) + 0.055, gvs.no_azeotrope_temperature( gvs.xB ) + 1],
+      content: "B",
+      classList: ["svg-text"],
+      usePlotCoordinates: true,
+      id: null,
+      parent: gvs.txy_plot.SVG,
+      color: "rgb(0, 0, 0)",
+      fontSize: 2.5,
+      alignment: ["left", "top"],
     });
   };
 

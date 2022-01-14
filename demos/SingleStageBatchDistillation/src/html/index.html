@@ -96,7 +96,7 @@
         </div>
         <div class="modal-body">
           <p>
-
+            In this simulation, one mole of a binary mixture undergoes a batch distillation. The first slider sets the mole fraction of the starting liquid. When you click the "Collect" button, liquid evaporates and the distillate is collected in a collection flask. The amount collected into each flask is set with the second slider. The collection flask is then set aside and an empty flask is substituted. The process repeats when you click the "Collect" again, until finally 0.05 mol remains in the still. The equilibrium temperature is shown next to the thermometer. Select either the collection flasks, an x-y plot (equilibrium plot), or a T-x-y plot to be displayed on the right. Click "Reset" to start over. You can choose either an ideal solution (no azeotrope), a minimum-boiling temperature azeotrope or a maximum-boiling temperature azeotrope with the drop-down menu.
           </p>
 
         </div>
@@ -117,14 +117,54 @@
         </div>
 
         <div class="modal-body">
-
+          In batch distillation of a binary mixture, a fixed amount of the feed mixture \( F \) (mol), with initial mole fraction \( x_F \), evaporates into a distillate collection flask; \( D_i \) (mol) is the mass of distillate collected into flask \( i \), and \( x_{D, i} \) is the mole fraction within distillate flask \( i \). This process is repeated to fill several distillate collection flasks. The overall mass balance is:
           
+          $$
+            [1] \quad F = B_{final} + D_{total}
+          $$
+
+          and the balance for the more volatile component is:
+
+          $$
+            [2] \quad F x_{F} = B_{final} x_{B, final} + D_{total} x_{D,avg}
+          $$
+
+          where \( x_{D,avg} \) is the average mole fraction within the distillate collection flasks and \( B_{final} \) and \( x_{B, final} \) are the final mass and mole fraction within the bottom (boiler) vessel. The value of \( x_{D, avg} \) can be calculated as:
+
+          $$
+            [3] \quad x_{D,avg} = \sum_{ i = 1 }^{ n } \left(  \frac{ D_{i} x_{D,i} + D_{i + 1} x_{D, i+1} ... D_{n} x_{D, n} }{ D_{total} } \right)
+          $$
+
+          where the total number of collection stages is \( n \) (equivalent to the total number of distillate collection flasks). Total distillate is given by:
+
+          $$
+            [4] \quad D_{total} = \sum_{ i = 1 }^{ n } \left( D_{i} + D_{ i + 1 } ... D_{ n } \right)
+          $$
+
+          Because the saturated vapor is in thermodynamic equilibrium with the saturated liquid in the vessel (and there is only one equilibrium stage: the boiler/bottom vessel), the composition of the vapor \( y_{B} \) is a function of the composition in the bottom vessel. During evaporation, both compositions change with time, except when the composition of the liquid is an azeotrope. An equilibrium
+
+          $$
+            [5] \quad y_{B} = f(x_{B})
+          $$
+
+          Numerical approximations such as Antoine's equation are often used to model \( f_{x, B} \) using experimental data. Other cases, such as constant relative volatility, may also be used to approximate this relationship. Composition of \( x_{ B, i + 1 } \) can be calculated by integration. Equation [5] must be substituted for \( y_{B} \).
+
+          $$
+            [6] \quad \int_{B_{i}}^{B_{i + 1}} \frac{ 1 }{ B } dB = \int_{x_{B, i}}^{ x_{B, i + 1} } \frac{ 1 }{ y_{B} - x_{B} } dx_{B}
+          $$
+
+          Finally, a mass balance can be used to solve for the distillate composition, \( x_{D, i + 1} \):
+
+          $$
+            [7] \quad x_{ D, i + 1 } = \frac{ B_{i} x_{B, i} - B_{ i + 1 }{ x_{ B, i + 1 } } }{ B_{i} - B_{i + 1} }
+          $$
+
           <p>References:</p>
 
           <p class="references">
             <ol>
               <li>
-
+                [1] P. C. Wankat, "Chapter 9: Batch Distillation," <i>Separation Process Engineering: Includes Mass Transfer Analysis</i>, 3rd ed., Upper Saddle River, NJ: Prentice Hall, 2012 pp. 329-347.
               </li>
             </ol>
           </p>

@@ -28,6 +28,7 @@ zSlider.addEventListener("input", () => {
       gvs.T = gvs.maximum_temperature_azeotrope_temperature(gvs.xB);
     break;
   }
+  gvs.plot_points();
   gvs.p.redraw();
 });
 
@@ -85,7 +86,7 @@ resetButton.addEventListener("click", () => {
   gvs.B = 1.0;
   gvs.xB = gvs.z;
   gvs.flasks = [];
-  gvs.flasks.push(new gvs.Flask({ x_loc : 356, y_loc : 370 }));
+  gvs.flasks.push(new gvs.Flask({ x_loc : 316, y_loc : 370 }));
   gvs.D = 0;
   switch(gvs.eq_plot_shape) {
     case "no azeotrope":

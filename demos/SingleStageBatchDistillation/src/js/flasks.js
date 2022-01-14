@@ -49,7 +49,9 @@ function Flask(args) {
       // When liquid level gets low, an ellipse is used to represent the liquid in the flask
       p.push();
       p.fill(top_of_liquid_color);
-      p.ellipse(x, y + 4, 60 - (0.15 - lvl) * (60 / 0.15), 5 - 5 * (0.15 - lvl) / 0.15);
+      if(lvl >= 0.01) {
+        p.ellipse(x, y + 4, 60 - (0.15 - lvl) * (60 / 0.15), 5 - 5 * (0.15 - lvl) / 0.15);
+      }
       p.pop();
     }
   

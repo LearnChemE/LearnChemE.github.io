@@ -88,6 +88,25 @@ function drawStillLiquid(p, lvl) {
   p.pop();
 }
 
+function drawStillLiquidLabel(p) {
+  p.push();
+    p.textSize(18);
+    p.fill(0);
+    p.noStroke();
+    translate_to_column(p);
+    p.textAlign(p.CENTER);
+    p.text(`x  = ${gvs.xB.toFixed(2)}`, -105, 95);
+    p.text(`${gvs.B.toFixed(2)} mol`, -105, 125);
+    p.textSize(12);
+    p.text(`B`, -126, 100);
+    p.stroke(0);
+    p.noFill();
+    p.line(-65, 105, -30, 105);
+    p.fill(0);
+    p.triangle(-30, 105, -40, 108, -40, 102);
+  p.pop();
+}
+
 function drawTemperatureLabel(p) {
   p.push();
     translate_to_column(p);
@@ -153,7 +172,17 @@ function pouringLiquid(p) {
   p.pop();
 }
 
-function plotPoints() {
+function drawHeater(p) {
+  p.push();
+  translate_to_column(p);
+  p.rectMode(p.CENTER);
+  p.fill(255, 180, 180);
+  p.rect(0, 159, 100, 15);
+  p.image(gvs.coil_img, -44, 152.5, 88, 13);
+  p.pop();
+}
+
+gvs.plot_points = function() {
   switch(gvs.display) {
     case "flasks":
       return;
@@ -169,6 +198,62 @@ function plotPoints() {
     case "txy":
       gvs.txy_plot_point_x.coord = [gvs.xB, gvs.T];
       gvs.txy_plot_point_y.coord = [gvs.xD, gvs.T];
+      const x_pix = gvs.txy_plot.coordToPix(gvs.xB, gvs.T);
+      const y_pix = gvs.txy_plot.coordToPix(gvs.xD, gvs.T);
+      gvs.txy_plot_point_x.setAttribute("cx", x_pix[0]);
+      gvs.txy_plot_point_x.setAttribute("cy", x_pix[1]);
+      gvs.txy_plot_point_y.setAttribute("cx", y_pix[0]);
+      gvs.txy_plot_point_y.setAttribute("cy", y_pix[1]);
+
+      let label_x_pix, label_x_pix_sub, label_y_pix, label_y_pix_sub;
+
+      switch(gvs.eq_plot_shape) {
+        case "no azeotrope":
+          label_x_pix = gvs.txy_plot.coordToPix(gvs.xB - 0.05, gvs.no_azeotrope_temperature( gvs.xB ) - 0.2);
+          label_x_pix_sub = gvs.txy_plot.coordToPix(gvs.xB - 0.025, gvs.no_azeotrope_temperature( gvs.xB ) - 1.05);
+          label_y_pix = gvs.txy_plot.coordToPix(gvs.no_azeotrope( gvs.xB ) + 0.03, gvs.no_azeotrope_temperature( gvs.xB ) + 2);
+          label_y_pix_sub = gvs.txy_plot.coordToPix(gvs.no_azeotrope( gvs.xB ) + 0.055, gvs.no_azeotrope_temperature( gvs.xB ) + 1);
+        break;
+
+        case "minimum-temperature azeotrope":
+          if(gvs.xB <= 0.61) {
+            label_x_pix = gvs.txy_plot.coordToPix(gvs.xB - 0.05, gvs.minimum_temperature_azeotrope_temperature( gvs.xB ) - 0.2);
+            label_x_pix_sub = gvs.txy_plot.coordToPix(gvs.xB - 0.025, gvs.minimum_temperature_azeotrope_temperature( gvs.xB ) - 1.05);
+            label_y_pix = gvs.txy_plot.coordToPix(gvs.minimum_temperature_azeotrope( gvs.xB ) + 0.03, gvs.minimum_temperature_azeotrope_temperature( gvs.xB ) + 2);
+            label_y_pix_sub = gvs.txy_plot.coordToPix(gvs.minimum_temperature_azeotrope( gvs.xB ) + 0.055, gvs.minimum_temperature_azeotrope_temperature( gvs.xB ) + 1);
+          } else {
+            label_x_pix = gvs.txy_plot.coordToPix(gvs.xB + 0.025, gvs.minimum_temperature_azeotrope_temperature( gvs.xB ) - 0.2);
+            label_x_pix_sub = gvs.txy_plot.coordToPix(gvs.xB + 0.05, gvs.minimum_temperature_azeotrope_temperature( gvs.xB ) - 1.05);
+            label_y_pix = gvs.txy_plot.coordToPix(gvs.minimum_temperature_azeotrope( gvs.xB ) - 0.028, gvs.minimum_temperature_azeotrope_temperature( gvs.xB ) + 2.5);
+            label_y_pix_sub = gvs.txy_plot.coordToPix(gvs.minimum_temperature_azeotrope( gvs.xB ) - 0.005, gvs.minimum_temperature_azeotrope_temperature( gvs.xB ) + 1.5);
+          }
+        break;
+
+        case "maximum-temperature azeotrope":
+          if(gvs.xB <= 0.46) {
+            label_x_pix = gvs.txy_plot.coordToPix(gvs.xB + 0.02, gvs.maximum_temperature_azeotrope_temperature( gvs.xB ) - 0.2);
+            label_x_pix_sub = gvs.txy_plot.coordToPix(gvs.xB + 0.045, gvs.maximum_temperature_azeotrope_temperature( gvs.xB ) - 1.05);
+            label_y_pix = gvs.txy_plot.coordToPix(gvs.maximum_temperature_azeotrope( gvs.xB ) - 0.045, gvs.maximum_temperature_azeotrope_temperature( gvs.xB ) + 2.5);
+            label_y_pix_sub = gvs.txy_plot.coordToPix(gvs.maximum_temperature_azeotrope( gvs.xB ) - 0.02, gvs.maximum_temperature_azeotrope_temperature( gvs.xB ) + 1.5);
+          } else {
+            label_x_pix = gvs.txy_plot.coordToPix(gvs.xB - 0.04, gvs.maximum_temperature_azeotrope_temperature( gvs.xB ) - 0.2);
+            label_x_pix_sub = gvs.txy_plot.coordToPix(gvs.xB - 0.01, gvs.maximum_temperature_azeotrope_temperature( gvs.xB ) - 1.05);
+            label_y_pix = gvs.txy_plot.coordToPix(gvs.maximum_temperature_azeotrope( gvs.xB ) + 0.01, gvs.maximum_temperature_azeotrope_temperature( gvs.xB ) + 2.5);
+            label_y_pix_sub = gvs.txy_plot.coordToPix(gvs.maximum_temperature_azeotrope( gvs.xB ) + 0.035, gvs.maximum_temperature_azeotrope_temperature( gvs.xB ) + 1.5);
+          }
+        break;
+      }
+      
+      gvs.txy_plot_xB_label.setAttribute("x", label_x_pix[0]);
+      gvs.txy_plot_xB_label.setAttribute("y", label_x_pix[1]);
+      gvs.txy_plot_xB_label_subscript.setAttribute("x", label_x_pix_sub[0]);
+      gvs.txy_plot_xB_label_subscript.setAttribute("y", label_x_pix_sub[1]);
+
+      gvs.txy_plot_xD_label.setAttribute("x", label_y_pix[0]);
+      gvs.txy_plot_xD_label.setAttribute("y", label_y_pix[1]);
+      gvs.txy_plot_xD_label_subscript.setAttribute("x", label_y_pix_sub[0]);
+      gvs.txy_plot_xD_label_subscript.setAttribute("y", label_y_pix_sub[1]);
+
     break;
   }
 }
@@ -181,7 +266,9 @@ function drawAll(p) {
   drawColumn(p);
   drawTemperatureLabel(p);
   otherLabels(p);
-  plotPoints();
+  gvs.plot_points();
+  drawStillLiquidLabel(p);
+  drawHeater(p);
   if(gvs.is_collecting) {
     pouringLiquid(p);
   }
