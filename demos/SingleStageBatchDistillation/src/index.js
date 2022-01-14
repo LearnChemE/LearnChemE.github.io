@@ -14,7 +14,7 @@ window.gvs = {
   xD : 0.74, // concentration of more volatile component in the vapor
   T : 86.4, // Temperature of the liquid/vapor
   display : "flasks", // which graphic to display on the right-side of the screen
-  eq_plot : "no azeotrope", // which equilibrium plot to use
+  eq_plot_shape : "no azeotrope", // which equilibrium plot to use
   flasks : [], // array of flask objects
   is_collecting : false, // whether or not liquid is currently being collected
   amount_to_collect : 0.10, // amount to be collected when user presses "collect"
@@ -35,7 +35,7 @@ const sketch = (p) => {
     require("./js/inputs.js");
     require("./js/collect.js");
     gvs.flasks.push(new gvs.Flask({ x_loc : 316, y_loc : 370 }));
-    document.getElementById("loading").style.display = "none";
+    document.getElementById("loading").style.opacity = "0";
 
     gvs.eq_plot = new SVG_Graph({
       id: "eq-plot",                  // id of the container element
@@ -122,7 +122,7 @@ const sketch = (p) => {
        document.getElementById("eq-plot-tick-labels"),
        document.getElementById("txy-plot"),
        document.getElementById("txy-plot-tick-labels")
-    ].forEach(elt => { elt.style.display = "none" });
+    ].forEach(elt => { elt.style.opacity = "0" });
 
     gvs.no_azeotrope_curve = gvs.eq_plot.addCurve(gvs.no_azeotrope, {
       stroke: "rgba(100, 100, 255, 1)",
@@ -164,7 +164,7 @@ const sketch = (p) => {
     [
       document.getElementById("eq-minimum-temperature-azeotrope-curve"),
       document.getElementById("eq-maximum-temperature-azeotrope-curve")
-    ].forEach(curve => { curve.style.display = "none" });
+    ].forEach(curve => { curve.style.opacity = "0" });
 
     gvs.no_azeotrope_temperature_curve = gvs.txy_plot.addCurve(gvs.no_azeotrope_temperature, {
       stroke: "rgba(100, 100, 255, 1)",
@@ -226,8 +226,44 @@ const sketch = (p) => {
       gvs.maximum_temperature_azeotrope_temperature_curve,
       gvs.maximum_temperature_azeotrope_dew_point_curve
     ].forEach(curve => {
-      curve.elt.style.display = "none";
-    })
+      curve.elt.style.opacity = "0";
+    });
+
+    gvs.eq_plot_point = gvs.eq_plot.createPoint({
+      coord: [gvs.z, gvs.no_azeotrope(gvs.z)],
+      radius: 1.5,
+      classList: ["plot-point"],
+      usePlotCoordinates: true,
+      id: "eq-plot-point",
+      parent: gvs.eq_plot.SVG,
+      stroke: "rgb(0, 0, 0)",
+      strokeWidth: 1,
+      fill: "rgb(255, 205, 155)",
+    });
+
+    gvs.txy_plot.txy_plot_point_x = gvs.txy_plot.createPoint({
+      coord: [gvs.z, gvs.no_azeotrope_temperature(gvs.z)],
+      radius: 1.5,
+      classList: ["plot-point"],
+      usePlotCoordinates: true,
+      id: "eq-plot-point",
+      parent: gvs.txy_plot.SVG,
+      stroke: "rgb(0, 0, 0)",
+      strokeWidth: 1,
+      fill: "rgb(255, 205, 155)",
+    });
+
+    gvs.txy_plot.txy_plot_point_y = gvs.txy_plot.createPoint({
+      coord: [gvs.no_azeotrope( gvs.z ), gvs.no_azeotrope_temperature(gvs.z)],
+      radius: 1.5,
+      classList: ["plot-point"],
+      usePlotCoordinates: true,
+      id: "eq-plot-point",
+      parent: gvs.txy_plot.SVG,
+      stroke: "rgb(0, 0, 0)",
+      strokeWidth: 1,
+      fill: "rgb(255, 205, 155)",
+    });
   };
 
   p.draw = function () {

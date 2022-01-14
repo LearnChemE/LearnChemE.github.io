@@ -153,11 +153,35 @@ function pouringLiquid(p) {
   p.pop();
 }
 
+function plotPoints() {
+  switch(gvs.display) {
+    case "flasks":
+      return;
+    break;
+
+    case "eq":
+      gvs.eq_plot_point.coord = [gvs.xB, gvs.xD];
+      const pix = gvs.eq_plot.coordToPix(gvs.xB, gvs.xD);
+      gvs.eq_plot_point.setAttribute("cx", pix[0]);
+      gvs.eq_plot_point.setAttribute("cy", pix[1]);
+    break;
+
+    case "txy":
+      gvs.txy_plot_point_x.coord = [gvs.xB, gvs.T];
+      gvs.txy_plot_point_y.coord = [gvs.xD, gvs.T];
+    break;
+  }
+}
+
 function drawAll(p) {
+  if(gvs.is_collecting) {
+    gvs.differential_collection();
+  }
   drawStillLiquid(p, gvs.B);
   drawColumn(p);
   drawTemperatureLabel(p);
   otherLabels(p);
+  plotPoints();
   if(gvs.is_collecting) {
     pouringLiquid(p);
   }
@@ -175,9 +199,6 @@ function drawAll(p) {
     }
   } else {
     gvs.flasks[gvs.flasks.length - 1].draw();
-  }
-  if(gvs.is_collecting) {
-    gvs.differential_collection();
   }
 }
 
