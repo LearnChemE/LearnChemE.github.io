@@ -54,6 +54,28 @@
       <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
       <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
     </div>
+
+    <div class="input-buttons-row">
+        <div id="selection-wrapper">
+          <div class="selection-label">display: </div>
+          <select id="display-select" value="flasks">
+            <option value="flasks">Collected distillate</option>
+            <option value="eq">Equilibrium plot</option>
+            <option value="txy">T-x-y diagram</option>
+          </select>
+
+          <select id="eq-plot-select" value="no azeotrope">
+            <option value="no azeotrope">No azeotrope</option>
+            <option value="minimum-temperature azeotrope">Minimum-temperature azeotrope</option>
+            <option value="maximum-temperature azeotrope">Maximum-temperature azeotrope</option>
+          </select>
+        </div>
+
+        <div id="control-buttons-wrapper">
+          <div id="start-collection">Collect</div>
+          <div id="reset-simulation">Reset</div>
+        </div>
+    </div>
   </div>
 
   <div id="p5-container"></div>

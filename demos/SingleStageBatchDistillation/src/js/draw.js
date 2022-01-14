@@ -88,19 +88,83 @@ function drawStillLiquid(p, lvl) {
   p.pop();
 }
 
-let i = 1;
+function drawTemperatureLabel(p) {
+  p.push();
+    translate_to_column(p);
+    p.textSize(18);
+    p.fill(0);
+    p.noStroke();
+    p.textAlign(p.CENTER);
+    p.text(`${(gvs.T - 273.15).toFixed(1)}° C`, 0, -170);
+
+    // Draw thermometer
+    p.strokeWeight(2);
+    p.stroke(0);
+    p.fill(255, 100, 100);
+    p.circle(-50, -150, 20);
+    // p.noStroke();
+    p.fill(255);
+    p.rectMode(p.CENTER);
+    p.rect(-50, -183, 10, 50, 4, 4, 0, 0);
+    p.rectMode(p.CORNER);
+    p.noStroke();
+    p.fill(255, 100, 100);
+    p.rect(-54, -157, 8, -5 - 45 * (gvs.T - 350.65) / ( 385 - 350.65 ));
+  p.pop();
+}
+
+function otherLabels(p) {
+  p.push();
+  translate_to_column(p);
+  p.textSize(18);
+  p.text(`y  = ${gvs.xD.toFixed(2)}`, -105, -50);
+  p.stroke(0);
+  p.strokeWeight(1);
+  p.line(-30, -60, 0, -70);
+  p.translate(0, -70);
+  p.rotate(-0.3398);
+  p.fill(0);
+  p.triangle(0, 0, -10, -4, -10, 4);
+  p.rotate(0.3398);
+  p.translate(0, 70);
+  p.noStroke();
+  p.textSize(11);
+  p.text(`B`, -96, -46);
+  p.textSize(15);
+  p.text("coolant", 80, -150);
+  p.translate(70, -140);
+  p.rotate(-Math.PI / 4);
+  p.stroke(0);
+  p.line(10, 0, -10, 0);
+  p.triangle(-10, 0, 0, -3.5, 0, 3.5);
+  p.translate(-90, 120);
+  p.line(15, 0, -10, 0);
+  p.triangle(-10, 0, 0, -3.5, 0, 3.5);
+  p.pop();
+}
 
 function drawAll(p) {
   drawStillLiquid(p, gvs.B);
   drawColumn(p);
+  drawTemperatureLabel(p);
+  otherLabels(p);
   // If "flasks" is selected, draw every flask, otherwise just draw the last one under the collection spout
-  if(gvs.display = "flasks") {
+  if(gvs.display === "flasks") {
     for(let i = 0; i < gvs.flasks.length; i++) {
       const flask = gvs.flasks[i];
       flask.draw();
+      if(gvs.flasks.length === 1) {
+        p.push();
+        p.textSize(18);
+        p.text(`Press "Collect" and your collected\ndistillate will appear here`, 450, 100);
+        p.pop();
+      }
     }
   } else {
     gvs.flasks[gvs.flasks.length - 1].draw();
+  }
+  if(gvs.is_collecting) {
+    gvs.differential_collection();
   }
 }
 

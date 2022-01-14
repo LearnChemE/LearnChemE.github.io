@@ -1,4 +1,6 @@
 const top_of_liquid_color = gvs.p.color(170, 170, 255);
+const coolant_color = gvs.p.color(240, 240, 255);
+const liquid_color = gvs.p.color(200, 200, 255);
 
 function Flask(args) {
   this.n = 0;
@@ -18,7 +20,7 @@ function Flask(args) {
     const p = gvs.p;
     const x = this.x_loc;
     const y = this.y_loc;
-    const lvl = this.n;
+    const lvl = this.n * 4;
     if(lvl >= 0.15) {
       // Draw the liquid inside the flask first, so outline is drawn over top
       p.push();
@@ -77,6 +79,15 @@ function Flask(args) {
     p.rectMode(p.CENTER);
     p.rect(x, y - 73, 22, 5, 3);
   
+    p.pop();
+
+    p.push();
+    p.textSize(14);
+    p.textAlign(p.CENTER);
+    p.text(`${this.n.toFixed(2)} mol`, this.x_loc, this.y_loc + 24);
+    p.text(`x  = ${this.x.toFixed(2)}`, this.x_loc, this.y_loc + 39);
+    p.textSize(8);
+    p.text("B", this.x_loc - 17, this.y_loc + 42);
     p.pop();
   }
 }
