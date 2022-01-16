@@ -5,8 +5,20 @@ function vOut(h) {
   return Math.sqrt( 2 * g * h )
 }
 
-function calcAll() {
+function init() {
+  gvs.V = gvs.V0;
+}
 
+function dt() {
+
+}
+
+function calcAll() {
+  if(gvs.is_running === false) {
+    init();
+  } else {
+    dt();
+  }
 }
 
 module.exports = calcAll;
