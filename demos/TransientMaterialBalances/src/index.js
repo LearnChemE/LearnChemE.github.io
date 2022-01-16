@@ -10,7 +10,7 @@ window.gvs = {
   V0 : null, // Initial volume in tank
   CA0 : null, // Initial mole fraciton
   is_running : false, // Is "true" once "start simulation" is pressed
-  A : 0.785, // Area of the tank, m^2
+  A : 0.785, // Area of the tank cross-section, m^2
   Aout : 0.00785, // Area of the outlet pipe (diameter 10 cm)
   V : null, // Volume of liquid in the tank ( L )
   v : 0, // Volumetric flow rate leaving the bottom of vessel ( L / s )
