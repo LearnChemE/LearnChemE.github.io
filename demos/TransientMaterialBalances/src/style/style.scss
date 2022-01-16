@@ -91,6 +91,14 @@ $modal-xl: 1140px;
   margin: auto;
 }
 
+#plot-container {
+  position: absolute;
+  top: 230px;
+  left: calc(max(430px, 50vw + 30px));
+  width: 360px;
+  height: 420px;
+}
+
 canvas {
   border-style: solid;
   border-width: 1px;

@@ -7,19 +7,43 @@ function vOut(h) {
 }
 
 function init() {
+  gvs.t = 0;
   gvs.V = gvs.V0;
   gvs.CA = 1.0;
   gvs.v = 0;
   gvs.N = gvs.V0 * gvs.CA;
+  gvs.V_array = [[0, gvs.V], [0.01, gvs.V]];
+  gvs.CA_array = [[0, gvs.CA], [0.01, gvs.CA]];
+  gvs.h_array = [[0, gvs.h], [0.01, gvs.h]];
+  gvs.v_array = [[0, gvs.v], [0.01, gvs.v]];
 }
 
 function advance() {
-  gvs.h = (gvs.V / 1000) / gvs.A; // height of liquid (m)
-  gvs.v = vOut(gvs.h);
   const dt = gvs.speed / gvs.p.frameRate();
+  gvs.t += dt;
   gvs.V += dt * gvs.v0 - dt * gvs.v;
   gvs.N += dt * gvs.v0 * gvs.CA0 - dt * gvs.v * gvs.CA;
   gvs.CA = gvs.N / gvs.V;
+  gvs.h = (gvs.V / 1000) / gvs.A; // height of liquid (m)
+  gvs.v = vOut(gvs.h);
+
+  gvs.V_array.push([gvs.t, gvs.V]);
+  gvs.CA_array.push([gvs.t, gvs.CA]);
+  gvs.h_array.push([gvs.t, gvs.h]);
+  gvs.v_array.push([gvs.t, gvs.v]);
+
+  if(gvs.V_array.length > 10000) {
+    gvs.V_array.shift();
+  }
+  if(gvs.CA_array.length > 10000) {
+    gvs.CA_array.shift();
+  }
+  if(gvs.h_array.length > 10000) {
+    gvs.h_array.shift();
+  }
+  if(gvs.v_array.length > 10000) {
+    gvs.v_array.shift();
+  }
 }
 
 function calcAll() {

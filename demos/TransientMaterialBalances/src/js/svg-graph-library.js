@@ -783,6 +783,7 @@ function SVG_Graph(options) {
       fill: "none",
       id: `curve-${graph.curves.length}`,
       classList: ["curve"],
+      range: [graph.options.axes.x.range[0], graph.options.axes.x.range[1]],
       ...options
     };
 
@@ -792,8 +793,8 @@ function SVG_Graph(options) {
       func: func,
       updateCoords: function() {
         this.coords = [];
-        const x0 = graph.options.axes.x.range[0];
-        const x1 = graph.options.axes.x.range[1];
+        const x0 = this.range[0];
+        const x1 = this.range[1];
         const dx = (x1 - x0) / this.resolution;
         for ( let x = x0; x <= x1; x += dx ) {
           const y = this.func(x);
@@ -809,7 +810,7 @@ function SVG_Graph(options) {
           coords.push(graph.coordToPix(...coord));
         });
 
-        path.style.stroke = o.color;
+        path.style.stroke = this.stroke;
         path.style.strokeWidth = `${this.strokeWidth}px`;
         path.style.fill = this.fill;
         

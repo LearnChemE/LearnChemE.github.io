@@ -65,6 +65,23 @@ gvs.start_simulation = function() {
   v0_slider.setAttribute("disabled", "yes");
   CA0_slider.setAttribute("disabled", "yes");
   start_simulation_button.setAttribute("disabled", "yes");
+  switch(gvs.plot_selection) {
+    case "V" :
+      document.getElementById("V-curve").style.opacity = "1";
+    break;
+
+    case "CA":
+
+    break;
+
+    case "h":
+
+    break;
+
+    case "v":
+
+    break;
+  }
 }
 
 gvs.reset_simulation = function() {
@@ -72,4 +89,5 @@ gvs.reset_simulation = function() {
   v0_slider.removeAttribute("disabled");
   CA0_slider.removeAttribute("disabled");
   start_simulation_button.removeAttribute("disabled");
+  document.getElementById("V-curve").style.opacity = "0";
 }
