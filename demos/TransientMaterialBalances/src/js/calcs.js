@@ -10,7 +10,7 @@ function init() {
   gvs.V = gvs.V0;
   gvs.CA = 1.0;
   gvs.v = 0;
-  gvs.N = 500;
+  gvs.N = gvs.V0 * gvs.CA;
 }
 
 function advance() {
