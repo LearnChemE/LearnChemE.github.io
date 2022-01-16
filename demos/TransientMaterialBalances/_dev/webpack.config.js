@@ -73,9 +73,6 @@ let config = {
   module: {
     rules: module_rules
   },
-  experiments: {
-    futureDefaults: true,
-  },
 };
 
 module.exports = (env, argv) => {
