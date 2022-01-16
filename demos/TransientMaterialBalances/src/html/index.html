@@ -35,23 +35,30 @@
   
       <div class="input-row">
         <div class="data-name">Initial volume of solution</div>
-        <input type="range" id="V0-slider" min="0.2" max="0.75" step="0.01" value="0.45">
-        <div class="data-value" id="V0-value">0.45</div>
-        <div class="data-metric">m<sup>3</sup></div>
+        <input type="range" id="V0-slider" min="250" max="750" step="10" value="500">
+        <div class="data-value" id="V0-value">500</div>
+        <div class="data-metric">L</div>
       </div>
 
       <div class="input-row">
-        <div class="data-name">Inlet flow rate</div>
-        <input type="range" id="F0-slider" min="0.01" max="1.00" step="0.01" value="0.50">
-        <div class="data-value" id="F0-value">0.50</div>
-        <div class="data-metric">m<sup>3</sup>/s</div>
+        <div class="data-name">Inlet flow rate (𝜈<sub>0</sub>)</div>
+        <input type="range" id="v0-slider" min="20" max="34" step="1" value="27">
+        <div class="data-value" id="v0-value">50</div>
+        <div class="data-metric">L/s</div>
       </div>
 
       <div class="input-row">
-        <div class="data-name">Inlet mole fraction</div>
-        <input type="range" id="x0-slider" min="0.01" max="1.00" step="0.01" value="0.50">
-        <div class="data-value" id="x0-value">0.50</div>
-        <div class="data-metric"></div>
+        <div class="data-name">Inlet concentration A (C<sub>A,0</sub>)</div>
+        <input type="range" id="CA0-slider" min="0.1" max="5.0" step="0.1" value="1.0">
+        <div class="data-value" id="CA0-value">5.0</div>
+        <div class="data-metric">M</div>
+      </div>
+
+      <div class="input-row">
+        <div class="data-name">Simulation speed</div>
+        <input type="range" id="speed-slider" min="1" max="10" step="0.1" value="1.0">
+        <div class="data-value" id="speed-value">1.0</div>
+        <div class="data-metric">s/s</div>
       </div>
   
     </div>
