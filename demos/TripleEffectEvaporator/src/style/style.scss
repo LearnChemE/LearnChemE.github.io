@@ -3,7 +3,7 @@
 
 .simulation-controls {
   display: grid;
-  grid-template-columns: max-content 220px;
+  grid-template-columns: max-content max-content;
   justify-content: center;
   gap: 30px;
   width: 100vw;
@@ -11,7 +11,7 @@
 
 .modal-buttons-row {
   display: grid;
-  grid-template-columns: repeat(2, 12ch );
+  grid-template-columns: repeat(3, 12ch );
   gap: 10px;
   margin: 0.5rem auto;
   justify-content: center;
