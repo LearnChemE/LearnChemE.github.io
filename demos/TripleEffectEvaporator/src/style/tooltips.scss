@@ -1,0 +1,238 @@
+#tooltip-container {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  background-color: cornsilk;
+  padding: 3px 5px;
+  border: 1px solid black;
+  border-radius: 2px;
+  display: none;
+}
+
+#tooltip-hover-boxes {
+  position: absolute;
+  z-index: 9999999;
+}
+
+.tooltip-hover-box {
+  position: absolute;
+  // background-color: rgba(0, 0, 0, 0.2);
+}
+
+/********** TOOLTIP V1 ***********/
+
+#V1-tooltip-1 {
+  left: 257.5px;
+  top: 145px;
+  width: 10px;
+  height: 25px;
+}
+
+#V1-tooltip-2 {
+  left: 257.5px;
+  top: 135px;
+  width: 95px;
+  height: 10px;
+}
+
+#V1-tooltip-3 {
+  left: 342.5px;
+  top: 145px;
+  width: 10px;
+  height: 140px;
+}
+
+#V1-tooltip-4 {
+  left: 342.5px;
+  top: 285px;
+  width: 55px;
+  height: 20px;
+}
+
+/********** TOOLTIP L1 ***********/
+
+#L1-tooltip-1 {
+  left: 257.5px;
+  top: 449px;
+  width: 10px;
+  height: 35px;
+}
+
+#L1-tooltip-2 {
+  left: 267.5px;
+  top: 474px;
+  width: 30px;
+  height: 10px;
+}
+
+#L1-tooltip-3 {
+  left: 337.5px;
+  top: 474px;
+  width: 30px;
+  height: 10px;
+}
+
+#L1-tooltip-4 {
+  left: 357.5px;
+  top: 240px;
+  width: 10px;
+  height: 234px;
+}
+
+#L1-tooltip-5 {
+  left: 357.5px;
+  top: 220px;
+  width: 40px;
+  height: 20px;
+}
+
+/********** TOOLTIP V2 ***********/
+
+#V2-tooltip-1 {
+  left: 482.5px;
+  top: 145px;
+  width: 10px;
+  height: 25px;
+}
+
+#V2-tooltip-2 {
+  left: 482.5px;
+  top: 135px;
+  width: 95px;
+  height: 10px;
+}
+
+#V2-tooltip-3 {
+  left: 567.5px;
+  top: 145px;
+  width: 10px;
+  height: 140px;
+}
+
+#V2-tooltip-4 {
+  left: 567.5px;
+  top: 285px;
+  width: 55px;
+  height: 20px;
+}
+
+/********** TOOLTIP L2 ***********/
+
+#L2-tooltip-1 {
+  left: 482.5px;
+  top: 449px;
+  width: 10px;
+  height: 35px;
+}
+
+#L2-tooltip-2 {
+  left: 492.5px;
+  top: 474px;
+  width: 30px;
+  height: 10px;
+}
+
+#L2-tooltip-3 {
+  left: 562.5px;
+  top: 474px;
+  width: 30px;
+  height: 10px;
+}
+
+#L2-tooltip-4 {
+  left: 582.5px;
+  top: 240px;
+  width: 10px;
+  height: 234px;
+}
+
+#L2-tooltip-5 {
+  left: 582.5px;
+  top: 220px;
+  width: 40px;
+  height: 20px;
+}
+
+/********** TOOLTIP V3 ***********/
+
+#V3-tooltip {
+  left: 702.5px;
+  top: 110px;
+  width: 20px;
+  height: 60px;
+}
+
+/********** TOOLTIP L3 ***********/
+
+#L3-tooltip {
+  left: 702.5px;
+  top: 449px;
+  width: 20px;
+  height: 60px;
+}
+
+/********** TOOLTIP COND1 ***********/
+
+#cond1-tooltip-1 {
+  left: 352px;
+  top: 400px;
+  width: 45px;
+  height: 10px;
+}
+
+#cond1-tooltip-2 {
+  left: 377px;
+  top: 410px;
+  width: 20px;
+  height: 85px;
+}
+
+/********** TOOLTIP COND2 ***********/
+
+#cond2-tooltip-1 {
+  left: 577px;
+  top: 400px;
+  width: 50px;
+  height: 10px;
+}
+
+#cond2-tooltip-2 {
+  left: 607px;
+  top: 410px;
+  width: 20px;
+  height: 85px;
+}
+
+/********** TOOLTIP COND3 ***********/
+
+#cond3-tooltip-1 {
+  left: 802px;
+  top: 400px;
+  width: 35px;
+  height: 10px;
+}
+
+#cond3-tooltip-2 {
+  left: 817px;
+  top: 410px;
+  width: 20px;
+  height: 85px;
+}
+
+/********** TOOLTIP VALVE 1 *********/
+
+#valve1-tooltip {
+  left: 297.5px;
+  top: 470px;
+  width: 40px;
+  height: 20px;
+}
+
+/********** TOOLTIP VALVE 2 *********/
+
+#valve2-tooltip {
+  left: 522.5px;
+  top: 470px;
+  width: 40px;
+  height: 20px;
+}

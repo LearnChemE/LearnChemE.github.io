@@ -80,6 +80,9 @@ function calcAll() {
   gvs.T2 = T_boiling(gvs.P2);
   gvs.T3 = T_boiling(gvs.P3);
 
+  const H_HX1 = gvs.hx_U * gvs.hx_A * (gvs.t_steam - gvs.T1);
+  gvs.s_inlet = H_HX1 / Hvap(gvs.t_steam);
+
   gvs.Q1 = gvs.s_inlet * Hvap(gvs.t_steam);
   const Hvap1 = Hvap(gvs.T1);
   const Hsensible1 = gvs.f_inlet * (gvs.T1 - gvs.t_inlet) * Cp(gvs.t_inlet, gvs.xs_inlet);
@@ -87,38 +90,44 @@ function calcAll() {
   gvs.L1 = gvs.f_inlet - gvs.V1;
 
   // Find heat transfer of second evaporator
-  gvs.Q2 = gvs.hx_U * gvs.hx_A * (gvs.T1 - gvs.T2);
+  gvs.Q2 = Math.min(Hvap1 * gvs.V1, gvs.hx_U * gvs.hx_A * (gvs.T1 - gvs.T2));
+  const HX_liq2 = gvs.Q2 / Hvap1;
+  gvs.q_cond_2 = HX_liq2 / gvs.V1;
 
   const H_liq1 = H_liquid(gvs.T1);
   let delta1 = 10000000;
   let q1 = 0.00;
+  const H_liq2 = H_liquid(gvs.T2);
+  const H_vap2 = H_vapor(gvs.T2);
   // Find quality of steam entering second evaporator
   for(var q = 0.000; q < 1.000; q += 0.001) {
-    const H_liq2 = H_liquid(gvs.T2);
-    const H_vap2 = H_vapor(gvs.T2);
     let delta = Math.abs( ( q * H_liq2 + (1 - q) * H_vap2 ) - H_liq1);
     if(delta < delta1) {delta1 = delta; q1 = q}
   }
 
+  gvs.q1 = q1;
   const V1_in = (1 - q1) * gvs.L1; // vapor flowrate immediately after first valve
   const evap_2 = Math.min(gvs.Q2 / Hvap(gvs.T2), gvs.V1);
   gvs.V2 = Math.min(evap_2 + V1_in, gvs.L1);
   gvs.L2 = gvs.L1 - gvs.V2;
+  const Hvap2 = Hvap(gvs.T2);
 
   // Find heat transfer of second evaporator
-  gvs.Q3 = gvs.hx_U * gvs.hx_A * (gvs.T2 - gvs.T3);
+  gvs.Q3 = Math.min( gvs.V2 * Hvap2, gvs.hx_U * gvs.hx_A * (gvs.T2 - gvs.T3) );
+  const HX_liq3 = gvs.Q3 / Hvap2;
+  gvs.q_cond_3 = HX_liq3 / gvs.V2;
 
-  const H_liq2 = H_liquid(gvs.T2);
   let delta2 = 100000000;
   let q2 = 0.00;
+  const H_liq3 = H_liquid(gvs.T3);
+  const H_vap3 = H_vapor(gvs.T3);
 
   for(var q = 0.000; q < 1.000; q += 0.001) {
-    const H_liq3 = H_liquid(gvs.T3);
-    const H_vap3 = H_vapor(gvs.T3);
     let delta = Math.abs( ( q * H_liq3 + (1 - q) * H_vap3 ) - H_liq2);
     if(delta < delta2) {delta2 = delta; q2 = q}
   }
 
+  gvs.q2 = q2;
   const V2_in = (1 - q2) * gvs.L2; // vapor flowrate immediately after first valve
   const evap_3 = Math.min(gvs.Q3 / Hvap(gvs.T3), gvs.V2);
   gvs.V3 = Math.min(evap_3 + V2_in, gvs.L2);

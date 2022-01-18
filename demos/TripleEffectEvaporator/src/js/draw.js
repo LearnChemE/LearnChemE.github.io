@@ -45,23 +45,23 @@ function drawLabels(p) {
   p.text(`${Number(gvs.p_steam).toFixed(1)} MPa`, 25, center_height + 60);
   p.pop();
 
-  p.push();
-  p.noStroke();
-  p.fill(gvs.evaporate_color);
-  p.text(`${gvs.V1.toFixed(1)} kg/s`, 270, 118);
-  p.pop();
+  // p.push();
+  // p.noStroke();
+  // p.fill(gvs.evaporate_color);
+  // p.text(`${gvs.V1.toFixed(1)} kg/s`, 270, 118);
+  // p.pop();
 
-  p.push();
-  p.noStroke();
-  p.fill(gvs.steam_label_color);
-  p.text(`${gvs.V2.toFixed(1)} kg/s`, 495, 118);
-  p.pop();
+  // p.push();
+  // p.noStroke();
+  // p.fill(gvs.steam_label_color);
+  // p.text(`${gvs.V2.toFixed(1)} kg/s`, 495, 118);
+  // p.pop();
 
-  p.push();
-  p.noStroke();
-  p.fill(gvs.evaporate_color);
-  p.text(`${gvs.V3.toFixed(1)} kg/s`, 675, 98);
-  p.pop();
+  // p.push();
+  // p.noStroke();
+  // p.fill(gvs.evaporate_color);
+  // p.text(`${gvs.V3.toFixed(1)} kg/s`, 675, 98);
+  // p.pop();
 
   p.push();
   p.noStroke();
@@ -70,17 +70,17 @@ function drawLabels(p) {
   p.text(`${(gvs.conc_outlet * 100).toFixed(1)} wt% sugar`, 675, 553);
   p.pop();
 
-  p.push();
-  p.noStroke();
-  p.fill(gvs.solution_label_color);
-  p.text(`${gvs.L1.toFixed(1)} kg/s`, 280, 512);
-  p.pop();
+  // p.push();
+  // p.noStroke();
+  // p.fill(gvs.solution_label_color);
+  // p.text(`${gvs.L1.toFixed(1)} kg/s`, 280, 512);
+  // p.pop();
 
-  p.push();
-  p.noStroke();
-  p.fill(gvs.solution_label_color);
-  p.text(`${gvs.L2.toFixed(1)} kg/s`, 505, 512);
-  p.pop();
+  // p.push();
+  // p.noStroke();
+  // p.fill(gvs.solution_label_color);
+  // p.text(`${gvs.L2.toFixed(1)} kg/s`, 505, 512);
+  // p.pop();
 
   p.push();
   p.noStroke();
@@ -98,7 +98,9 @@ function drawSteamEconomyLabel(p) {
   p.push();
   p.noStroke();
   p.fill(0);
-  p.text(`steam economy: ${Number(gvs.steam_economy).toFixed(2)} kg water/kg steam`, p.width / 2 - 140, 50);
+  p.textAlign(p.CENTER);
+  p.text(`Hover your mouse over components or arrows to view more information.`, p.width / 2, 50);
+  p.text(`steam economy: ${Number(gvs.steam_economy).toFixed(2)} kg water/kg steam`, p.width / 2, 80);
   p.pop();
 }
 
