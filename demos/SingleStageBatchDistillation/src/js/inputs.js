@@ -45,6 +45,13 @@ displaySelect.addEventListener("change", () => {
   const txyPlot = document.getElementById("txy-plot");
   const eqPlotLabels = document.getElementById("eq-plot-tick-labels");
   const txyPlotLabels = document.getElementById("txy-plot-tick-labels");
+  // const eqNoAzeotropeCurve = document.getElementById("eq-no-azeotrope-temperature-curve");
+  // const eqMinimumAzeotropeCurve = document.getElementById("eq-minimum-temperature-azeotrope-temperature-curve");
+  // const eqMaximumAzeotropeCurve = document.getElementById("eq-maximum-temperature-azeotrope-temperature-curve");
+  // const txyNoAzeotropeCurve = document.getElementById("txy-no-azeotrope-temperature-curve");
+  // const txyMinimumAzeotropeCurve = document.getElementById("txy-minimum-temperature-azeotrope-temperature-curve");
+  // const txyMaximumAzeotropeCurve = document.getElementById("txy-maximum-temperature-azeotrope-temperature-curve");
+
   switch(gvs.display) {
     case "flasks":
       [eqPlot, txyPlot, eqPlotLabels, txyPlotLabels].forEach(plot => { plot.style.opacity = "0" })
@@ -55,6 +62,10 @@ displaySelect.addEventListener("change", () => {
       txyPlot.style.opacity = "0";
       eqPlotLabels.style.opacity = "1";
       txyPlotLabels.style.opacity = "0";
+      eqPlot.style.pointerEvents = "all";
+      txyPlot.style.pointerEvents = "none";
+      eqPlot.style.display = "block";
+      txyPlot.style.display = "none";
     break;
 
     case "txy":
@@ -62,6 +73,10 @@ displaySelect.addEventListener("change", () => {
       txyPlot.style.opacity = "1";
       eqPlotLabels.style.opacity = "0";
       txyPlotLabels.style.opacity = "1";
+      eqPlot.style.pointerEvents = "none";
+      txyPlot.style.pointerEvents = "all";
+      eqPlot.style.display = "none";
+      txyPlot.style.display = "block";
     break;
   }
   gvs.p.redraw();
@@ -115,42 +130,69 @@ eqPlotSelect.addEventListener("change", () => {
       gvs.xD = gvs.no_azeotrope(gvs.xB);
       gvs.T = gvs.no_azeotrope_temperature(gvs.xB);
       gvs.no_azeotrope_curve.elt.style.opacity = "1";
+      gvs.no_azeotrope_curve.elt.style.pointerEvents = "painted";
       gvs.minimum_temperature_azeotrope_curve.elt.style.opacity = "0";
+      gvs.minimum_temperature_azeotrope_curve.elt.style.pointerEvents = "none";
       gvs.maximum_temperature_azeotrope_curve.elt.style.opacity = "0";
+      gvs.maximum_temperature_azeotrope_curve.elt.style.pointerEvents = "none";
       gvs.no_azeotrope_temperature_curve.elt.style.opacity = "1";
+      gvs.no_azeotrope_temperature_curve.elt.style.pointerEvents = "painted";
       gvs.minimum_temperature_azeotrope_temperature_curve.elt.style.opacity = "0";
+      gvs.minimum_temperature_azeotrope_temperature_curve.elt.style.pointerEvents = "none";
       gvs.maximum_temperature_azeotrope_temperature_curve.elt.style.opacity = "0";
+      gvs.maximum_temperature_azeotrope_temperature_curve.elt.style.pointerEvents = "none";
       gvs.no_azeotrope_dew_point_curve.elt.style.opacity = "1";
+      gvs.no_azeotrope_dew_point_curve.elt.style.pointerEvents = "painted";
       gvs.minimum_temperature_azeotrope_dew_point_curve.elt.style.opacity = "0";
+      gvs.minimum_temperature_azeotrope_dew_point_curve.elt.style.pointerEvents = "none";
       gvs.maximum_temperature_azeotrope_dew_point_curve.elt.style.opacity = "0";
+      gvs.maximum_temperature_azeotrope_dew_point_curve.elt.style.pointerEvents = "none";
     break;
 
     case "minimum-temperature azeotrope":
       gvs.xD = gvs.minimum_temperature_azeotrope(gvs.xB);
       gvs.T = gvs.minimum_temperature_azeotrope_temperature(gvs.xB);
       gvs.no_azeotrope_curve.elt.style.opacity = "0";
+      gvs.no_azeotrope_curve.elt.style.pointerEvents = "none";
       gvs.minimum_temperature_azeotrope_curve.elt.style.opacity = "1";
+      gvs.minimum_temperature_azeotrope_curve.elt.style.pointerEvents = "painted";
       gvs.maximum_temperature_azeotrope_curve.elt.style.opacity = "0";
+      gvs.maximum_temperature_azeotrope_curve.elt.style.pointerEvents = "none";
       gvs.no_azeotrope_temperature_curve.elt.style.opacity = "0";
+      gvs.no_azeotrope_temperature_curve.elt.style.pointerEvents = "none";
       gvs.minimum_temperature_azeotrope_temperature_curve.elt.style.opacity = "1";
+      gvs.minimum_temperature_azeotrope_temperature_curve.elt.style.pointerEvents = "painted";
       gvs.maximum_temperature_azeotrope_temperature_curve.elt.style.opacity = "0";
+      gvs.maximum_temperature_azeotrope_temperature_curve.elt.style.pointerEvents = "none";
       gvs.no_azeotrope_dew_point_curve.elt.style.opacity = "0";
+      gvs.no_azeotrope_dew_point_curve.elt.style.pointerEvents = "none";
       gvs.minimum_temperature_azeotrope_dew_point_curve.elt.style.opacity = "1";
+      gvs.minimum_temperature_azeotrope_dew_point_curve.elt.style.pointerEvents = "painted";
       gvs.maximum_temperature_azeotrope_dew_point_curve.elt.style.opacity = "0";
+      gvs.maximum_temperature_azeotrope_dew_point_curve.elt.style.pointerEvents = "none";
     break;
 
     case "maximum-temperature azeotrope":
       gvs.xD = gvs.maximum_temperature_azeotrope(gvs.xB);
       gvs.T = gvs.maximum_temperature_azeotrope_temperature(gvs.xB);
       gvs.no_azeotrope_curve.elt.style.opacity = "0";
+      gvs.no_azeotrope_curve.elt.style.pointerEvents = "none";
       gvs.minimum_temperature_azeotrope_curve.elt.style.opacity = "0";
+      gvs.minimum_temperature_azeotrope_curve.elt.style.pointerEvents = "none";
       gvs.maximum_temperature_azeotrope_curve.elt.style.opacity = "1";
+      gvs.maximum_temperature_azeotrope_curve.elt.style.pointerEvents = "painted";
       gvs.no_azeotrope_temperature_curve.elt.style.opacity = "0";
+      gvs.no_azeotrope_temperature_curve.elt.style.pointerEvents = "none";
       gvs.minimum_temperature_azeotrope_temperature_curve.elt.style.opacity = "0";
+      gvs.minimum_temperature_azeotrope_temperature_curve.elt.style.pointerEvents = "none";
       gvs.maximum_temperature_azeotrope_temperature_curve.elt.style.opacity = "1";
+      gvs.maximum_temperature_azeotrope_temperature_curve.elt.style.pointerEvents = "painted";
       gvs.no_azeotrope_dew_point_curve.elt.style.opacity = "0";
+      gvs.no_azeotrope_dew_point_curve.elt.style.pointerEvents = "none";
       gvs.minimum_temperature_azeotrope_dew_point_curve.elt.style.opacity = "0";
+      gvs.minimum_temperature_azeotrope_dew_point_curve.elt.style.pointerEvents = "none";
       gvs.maximum_temperature_azeotrope_dew_point_curve.elt.style.opacity = "1";
+      gvs.maximum_temperature_azeotrope_dew_point_curve.elt.style.pointerEvents = "painted";
     break;
   }
   gvs.p.redraw();

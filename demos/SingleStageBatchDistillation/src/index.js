@@ -327,6 +327,8 @@ const sketch = (p) => {
             gvs.txy_plot.resize();
         }
 
+        require("./js/tooltips.js");
+
     };
 
     p.draw = function() {

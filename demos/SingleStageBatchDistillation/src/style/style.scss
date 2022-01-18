@@ -194,3 +194,31 @@ canvas {
 .dashed-curve {
     stroke-dasharray: 7px;
 }
+
+.tick-labels {
+    pointer-events: none;
+}
+
+.axes-labels {
+    pointer-events: none;
+}
+
+.curve {
+    pointer-events: painted;
+}
+
+#tooltip {
+    opacity: 0;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding: 5px;
+    background-color: cornsilk;
+    border: 1px solid black;
+    border-radius: 2px;
+    transform: translateX(-50%) translateY(calc(-100% - 10px));
+}
+
+#eq-minimum-temperature-azeotrope-curve, #eq-maximum-temperature-azeotrope-curve {
+    pointer-events: none;
+}
