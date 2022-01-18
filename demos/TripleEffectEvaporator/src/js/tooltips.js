@@ -1,9 +1,5 @@
 const tooltip_container = document.getElementById("tooltip-container");
 const tooltip_show_delay = 500;
-const blue_color = "rgb(0, 0, 255)";
-const red_color = "rgb(255, 0, 0)";
-const green_color = "rgb(20, 165, 20)";
-const black_color = "rgb(0, 0, 0)";
 
 /****** VAPOR STREAM FROM FIRST EVAPORATOR *******/
 
@@ -17,7 +13,7 @@ const V1_tooltips = [
 
 V1_tooltips.forEach(elt => {
   elt.addEventListener("mouseover", (e) => {
-    setTimeout(() => { gvs.tooltips.V1_is_over = true }, 50);
+    setTimeout(() => { gvs.tooltips.V1_is_over = true; gvs.p.redraw(); }, 10);
     clearTimeout(gvs.tooltip_timeout);
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.V1_is_over) {
@@ -27,9 +23,13 @@ V1_tooltips.forEach(elt => {
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
-        tooltip_container.style.color = blue_color;
+        tooltip_container.style.color = gvs.blue_color;
       }
     }, tooltip_show_delay);
+  });
+
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.V1_is_over = false;
   });
 });
 
@@ -43,7 +43,7 @@ const L1_tooltips_pre_valve = [
 
 L1_tooltips_pre_valve.forEach(elt => {
   elt.addEventListener("mouseover", (e) => {
-    setTimeout(() => { gvs.tooltips.L1_is_over_pre_valve = true }, 50);
+    setTimeout(() => { gvs.tooltips.L1_is_over_pre_valve = true; gvs.p.redraw(); }, 10);
     clearTimeout(gvs.tooltip_timeout);
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.L1_is_over_pre_valve) {
@@ -53,9 +53,13 @@ L1_tooltips_pre_valve.forEach(elt => {
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
-        tooltip_container.style.color = green_color;
+        tooltip_container.style.color = gvs.green_color;
       }
     }, tooltip_show_delay);
+  });
+  
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.L1_is_over_pre_valve = false;
   });
 })
 
@@ -70,7 +74,7 @@ const L1_tooltips_post_valve = [
 
 L1_tooltips_post_valve.forEach(elt => {
   elt.addEventListener("mouseover", (e) => {
-    setTimeout(() => { gvs.tooltips.L1_is_over_post_valve = true }, 50);
+    setTimeout(() => { gvs.tooltips.L1_is_over_post_valve = true; gvs.p.redraw(); }, 10);
     clearTimeout(gvs.tooltip_timeout);
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.L1_is_over_post_valve) {
@@ -80,9 +84,13 @@ L1_tooltips_post_valve.forEach(elt => {
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
-        tooltip_container.style.color = green_color;
+        tooltip_container.style.color = gvs.green_color;
       }
     }, tooltip_show_delay);
+  });
+  
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.L1_is_over_post_valve = false;
   });
 });
 
@@ -98,7 +106,7 @@ const V2_tooltips = [
 
 V2_tooltips.forEach(elt => {
   elt.addEventListener("mouseover", (e) => {
-    setTimeout(() => { gvs.tooltips.V2_is_over = true }, 50);
+    setTimeout(() => { gvs.tooltips.V2_is_over = true; gvs.p.redraw(); }, 10);
     clearTimeout(gvs.tooltip_timeout);
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.V2_is_over) {
@@ -108,9 +116,13 @@ V2_tooltips.forEach(elt => {
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
-        tooltip_container.style.color = red_color;
+        tooltip_container.style.color = gvs.red_color;
       }
     }, tooltip_show_delay);
+  });
+  
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.V2_is_over = false;
   });
 });
 
@@ -124,7 +136,7 @@ const L2_tooltips_pre_valve = [
 
 L2_tooltips_pre_valve.forEach(elt => {
   elt.addEventListener("mouseover", (e) => {
-    setTimeout(() => { gvs.tooltips.L2_is_over_pre_valve = true }, 50);
+    setTimeout(() => { gvs.tooltips.L2_is_over_pre_valve = true; gvs.p.redraw(); }, 10);
     clearTimeout(gvs.tooltip_timeout);
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.L2_is_over_pre_valve) {
@@ -134,9 +146,13 @@ L2_tooltips_pre_valve.forEach(elt => {
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
-        tooltip_container.style.color = green_color;
+        tooltip_container.style.color = gvs.green_color;
       }
     }, tooltip_show_delay);
+  });
+  
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.L2_is_over_pre_valve = false;
   });
 })
 
@@ -151,19 +167,23 @@ const L2_tooltips_post_valve = [
 
 L2_tooltips_post_valve.forEach(elt => {
   elt.addEventListener("mouseover", (e) => {
-    setTimeout(() => { gvs.tooltips.L2_is_over_post_valve = true }, 50);
+    setTimeout(() => { gvs.tooltips.L2_is_over_post_valve = true; gvs.p.redraw(); }, 10);
     clearTimeout(gvs.tooltip_timeout);
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.L2_is_over_post_valve) {
         tooltip_container.style.display = "block";
-        tooltip_container.innerHTML = `L<sub>1</sub> = ${gvs.L2.toFixed(1)} kg/s (${(gvs.q1 * 100).toFixed(0)}% liquid)`;
+        tooltip_container.innerHTML = `L<sub>1</sub> = ${gvs.L2.toFixed(1)} kg/s (${(gvs.q2 * 100).toFixed(0)}% liquid)`;
         const width = tooltip_container.getBoundingClientRect().width;
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
-        tooltip_container.style.color = green_color;
+        tooltip_container.style.color = gvs.green_color;
       }
     }, tooltip_show_delay);
+  });
+  
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.L2_is_over_post_valve = false;
   });
 });
 
@@ -177,7 +197,7 @@ const cond1_tooltips = [
 
 cond1_tooltips.forEach(elt => {
   elt.addEventListener("mouseover", (e) => {
-    setTimeout(() => { gvs.tooltips.cond1_is_over = true }, 50);
+    setTimeout(() => { gvs.tooltips.cond1_is_over = true; gvs.p.redraw(); }, 10);
     clearTimeout(gvs.tooltip_timeout);
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.cond1_is_over) {
@@ -187,9 +207,13 @@ cond1_tooltips.forEach(elt => {
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
-        tooltip_container.style.color = red_color;
+        tooltip_container.style.color = gvs.red_color;
       }
     }, tooltip_show_delay);
+  });
+  
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.cond1_is_over = false;
   });
 });
 
@@ -203,7 +227,7 @@ const cond2_tooltips = [
 
 cond2_tooltips.forEach(elt => {
   elt.addEventListener("mouseover", (e) => {
-    setTimeout(() => { gvs.tooltips.cond2_is_over = true }, 50);
+    setTimeout(() => { gvs.tooltips.cond2_is_over = true; gvs.p.redraw(); }, 10);
     clearTimeout(gvs.tooltip_timeout);
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.cond2_is_over) {
@@ -213,9 +237,13 @@ cond2_tooltips.forEach(elt => {
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
-        tooltip_container.style.color = blue_color;
+        tooltip_container.style.color = gvs.blue_color;
       }
     }, tooltip_show_delay);
+  });
+  
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.cond2_is_over = false;
   });
 });
 
@@ -229,7 +257,7 @@ const cond3_tooltips = [
 
 cond3_tooltips.forEach(elt => {
   elt.addEventListener("mouseover", (e) => {
-    setTimeout(() => { gvs.tooltips.cond3_is_over = true }, 50);
+    setTimeout(() => { gvs.tooltips.cond3_is_over = true; gvs.p.redraw(); }, 10);
     clearTimeout(gvs.tooltip_timeout);
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.cond3_is_over) {
@@ -239,9 +267,13 @@ cond3_tooltips.forEach(elt => {
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
-        tooltip_container.style.color = red_color;
+        tooltip_container.style.color = gvs.red_color;
       }
     }, tooltip_show_delay);
+  });
+  
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.cond3_is_over = false;
   });
 });
 
@@ -254,19 +286,23 @@ const valve1_tooltip = [
 
 valve1_tooltip.forEach(elt => {
   elt.addEventListener("mouseover", (e) => {
-    setTimeout(() => { gvs.tooltips.valve1_is_over = true }, 50);
+    setTimeout(() => { gvs.tooltips.valve1_is_over = true; gvs.p.redraw(); }, 10);
     clearTimeout(gvs.tooltip_timeout);
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.valve1_is_over) {
         tooltip_container.style.display = "block";
-        tooltip_container.innerHTML = `This valve has a pressure drop of ${Math.abs(gvs.P2 - gvs.P1).toFixed(2)} MPa.`;
+        tooltip_container.innerHTML = `This valve has a pressure drop of ${Math.abs(gvs.P2 - gvs.P1).toFixed(2)} MPa, causing ${ ( ( 1 - gvs.q1 ) * 100 ).toFixed(0) }% of the liquid to vaporize.`;
         const width = tooltip_container.getBoundingClientRect().width;
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
-        tooltip_container.style.color = black_color;
+        tooltip_container.style.color = gvs.black_color;
       }
     }, tooltip_show_delay);
+  });
+  
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.valve1_is_over = false;
   });
 });
 
@@ -279,19 +315,23 @@ const valve2_tooltip = [
 
 valve2_tooltip.forEach(elt => {
   elt.addEventListener("mouseover", (e) => {
-    setTimeout(() => { gvs.tooltips.valve2_is_over = true }, 50);
+    setTimeout(() => { gvs.tooltips.valve2_is_over = true; gvs.p.redraw(); }, 10);
     clearTimeout(gvs.tooltip_timeout);
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.valve2_is_over) {
         tooltip_container.style.display = "block";
-        tooltip_container.innerHTML = `This valve has a pressure drop of ${Math.abs(gvs.P3 - gvs.P2).toFixed(3)} MPa.`;
+        tooltip_container.innerHTML = `This valve has a pressure drop of ${Math.abs(gvs.P3 - gvs.P2).toFixed(3)} MPa, causing ${ ( ( 1 - gvs.q2 ) * 100 ).toFixed(0) }% of the liquid to vaporize.`;
         const width = tooltip_container.getBoundingClientRect().width;
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
-        tooltip_container.style.color = black_color;
+        tooltip_container.style.color = gvs.black_color;
       }
     }, tooltip_show_delay);
+  });
+  
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.valve2_is_over = false;
   });
 });
 
@@ -304,7 +344,7 @@ const V3_tooltip = [
 
 V3_tooltip.forEach(elt => {
   elt.addEventListener("mouseover", (e) => {
-    setTimeout(() => { gvs.tooltips.V3_is_over = true }, 50);
+    setTimeout(() => { gvs.tooltips.V3_is_over = true; gvs.p.redraw(); }, 10);
     clearTimeout(gvs.tooltip_timeout);
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.V3_is_over) {
@@ -314,34 +354,136 @@ V3_tooltip.forEach(elt => {
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
-        tooltip_container.style.color = blue_color;
+        tooltip_container.style.color = gvs.blue_color;
       }
     }, tooltip_show_delay);
   });
+  
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.V3_is_over = false;
+  });
 });
 
-/****** LIQUID FROM THIRD EVAPORATOR ******/
+// /****** LIQUID FROM THIRD EVAPORATOR ******/
 
-gvs.tooltips.L3_is_over = false;
-const L3_tooltip = [
-  document.getElementById("L3-tooltip")
+// gvs.tooltips.L3_is_over = false;
+// const L3_tooltip = [
+//   document.getElementById("L3-tooltip")
+// ];
+
+// L3_tooltip.forEach(elt => {
+//   elt.addEventListener("mouseover", (e) => {
+//     setTimeout(() => { gvs.tooltips.L3_is_over = true; gvs.p.redraw(); }, 10);
+//     clearTimeout(gvs.tooltip_timeout);
+//     gvs.tooltip_timeout = setTimeout(() => {
+//       if(gvs.tooltips.L3_is_over) {
+//         tooltip_container.style.display = "block";
+//         tooltip_container.innerHTML = `L<sub>3</sub> = ${(gvs.L3).toFixed(1)} kg/s (saturated liquid)`;
+//         const width = tooltip_container.getBoundingClientRect().width;
+//         const height = tooltip_container.getBoundingClientRect().height;
+//         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
+//         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
+//         tooltip_container.style.color = gvs.green_color;
+//       }
+//     }, tooltip_show_delay);
+//   });
+  
+//   elt.addEventListener("mouseleave", () => {
+//     gvs.tooltips.L3_is_over = false;
+//   });
+// });
+
+/****** FIRST HEAT EXCHANGER ******/
+
+gvs.tooltips.HX1_is_over = false;
+const HX1_tooltips = [
+  document.getElementById("HX1-tooltip-1"),
+  document.getElementById("HX1-tooltip-2"),
+  document.getElementById("HX1-tooltip-3"),
 ];
 
-L3_tooltip.forEach(elt => {
+HX1_tooltips.forEach(elt => {
   elt.addEventListener("mouseover", (e) => {
-    setTimeout(() => { gvs.tooltips.L3_is_over = true }, 50);
+    setTimeout(() => { gvs.tooltips.HX1_is_over = true; gvs.p.redraw(); }, 10);
     clearTimeout(gvs.tooltip_timeout);
     gvs.tooltip_timeout = setTimeout(() => {
-      if(gvs.tooltips.L3_is_over) {
+      if(gvs.tooltips.HX1_is_over) {
         tooltip_container.style.display = "block";
-        tooltip_container.innerHTML = `L<sub>3</sub> = ${(gvs.L3).toFixed(1)} kg/s (saturated liquid)`;
+        tooltip_container.innerHTML = `This heat exchanger has a heat transfer coefficient of ${gvs.hx_U.toFixed(0)} W/(m<sup>2</sup> K). It has an area of ${gvs.hx_A.toFixed(0)} m<sup>2</sup>, transferring ${(gvs.Q1 / 1000).toFixed(0)} kW of heat to the solution.`;
         const width = tooltip_container.getBoundingClientRect().width;
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
-        tooltip_container.style.color = green_color;
+        tooltip_container.style.color = gvs.black_color;
+        gvs.p.redraw();
       }
     }, tooltip_show_delay);
+  });
+  
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.HX1_is_over = false;
+  });
+});
+
+/****** SECOND HEAT EXCHANGER ******/
+
+gvs.tooltips.HX2_is_over = false;
+const HX2_tooltips = [
+  document.getElementById("HX2-tooltip-1"),
+  document.getElementById("HX2-tooltip-2"),
+  document.getElementById("HX2-tooltip-3"),
+];
+
+HX2_tooltips.forEach(elt => {
+  elt.addEventListener("mouseover", (e) => {
+    setTimeout(() => { gvs.tooltips.HX2_is_over = true; gvs.p.redraw(); }, 10);
+    clearTimeout(gvs.tooltip_timeout);
+    gvs.tooltip_timeout = setTimeout(() => {
+      if(gvs.tooltips.HX2_is_over) {
+        tooltip_container.style.display = "block";
+        tooltip_container.innerHTML = `This heat exchanger has a heat transfer coefficient of ${gvs.hx_U.toFixed(0)} W/(m<sup>2</sup> K). It has an area of ${gvs.hx_A.toFixed(0)} m<sup>2</sup>, transferring ${(gvs.Q2 / 1000).toFixed(0)} kW of heat to the solution.`;
+        const width = tooltip_container.getBoundingClientRect().width;
+        const height = tooltip_container.getBoundingClientRect().height;
+        tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
+        tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
+        tooltip_container.style.color = gvs.black_color;
+      }
+    }, tooltip_show_delay);
+  });
+  
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.HX2_is_over = false;
+  });
+});
+
+/****** THIRD HEAT EXCHANGER ******/
+
+gvs.tooltips.HX3_is_over = false;
+const HX3_tooltips = [
+  document.getElementById("HX3-tooltip-1"),
+  document.getElementById("HX3-tooltip-2"),
+  document.getElementById("HX3-tooltip-3"),
+];
+
+HX3_tooltips.forEach(elt => {
+  elt.addEventListener("mouseover", (e) => {
+    setTimeout(() => { gvs.tooltips.HX3_is_over = true; gvs.p.redraw(); }, 10);
+    clearTimeout(gvs.tooltip_timeout);
+    gvs.tooltip_timeout = setTimeout(() => {
+      if(gvs.tooltips.HX3_is_over) {
+        tooltip_container.style.display = "block";
+        tooltip_container.innerHTML = `This heat exchanger has a heat transfer coefficient of ${gvs.hx_U.toFixed(0)} W/(m<sup>2</sup> K). It has an area of ${gvs.hx_A.toFixed(0)} m<sup>2</sup>. It is transferring ${(gvs.Q3 / 1000).toFixed(0)} kW of heat to the solution.`;
+        const width = tooltip_container.getBoundingClientRect().width;
+        const height = tooltip_container.getBoundingClientRect().height;
+        tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
+        tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
+        tooltip_container.style.color = gvs.black_color;
+      }
+    }, tooltip_show_delay);
+  });
+  
+  elt.addEventListener("mouseleave", () => {
+    gvs.tooltips.HX3_is_over = false;
   });
 });
 
@@ -353,12 +495,15 @@ const all_hover_elts = [
   ...L2_tooltips_pre_valve,
   ...L2_tooltips_post_valve,
   ...V3_tooltip,
-  ...L3_tooltip,
+  // ...L3_tooltip,
   ...cond1_tooltips,
   ...cond2_tooltips,
   ...cond3_tooltips,
   ...valve1_tooltip,
   ...valve2_tooltip,
+  ...HX1_tooltips,
+  ...HX2_tooltips,
+  ...HX3_tooltips,
 ];
 
 document.addEventListener('mousemove', function (e) {
@@ -373,5 +518,10 @@ document.addEventListener('mousemove', function (e) {
   });
   if(!is_over) {
     tooltip_container.style.display = "none";
+    const tooltips = Object.keys(gvs.tooltips);
+    tooltips.forEach(key => {
+      gvs.tooltips[key] = false;
+    })
+    gvs.p.redraw();
   }
 }, false);

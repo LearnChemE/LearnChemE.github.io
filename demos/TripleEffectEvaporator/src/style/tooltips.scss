@@ -1,5 +1,6 @@
 #tooltip-container {
   position: absolute;
+  max-width: 70ch;
   left: 0px;
   top: 0px;
   background-color: cornsilk;
@@ -234,5 +235,71 @@
   left: 522.5px;
   top: 470px;
   width: 40px;
+  height: 20px;
+}
+
+/********** HEAT EXCHANGER 1 ********/
+#HX1-tooltip-1 {
+  left: 173px;
+  top: 285px;
+  width: 150px;
+  height: 20px;
+}
+
+#HX1-tooltip-2 {
+  left: 203px;
+  top: 305px;
+  width: 120px;
+  height: 90px;
+}
+
+#HX1-tooltip-3 {
+  left: 203px;
+  top: 395px;
+  width: 150px;
+  height: 20px;
+}
+
+/********** HEAT EXCHANGER 2 ********/
+#HX2-tooltip-1 {
+  left: 398px;
+  top: 285px;
+  width: 150px;
+  height: 20px;
+}
+
+#HX2-tooltip-2 {
+  left: 428px;
+  top: 305px;
+  width: 120px;
+  height: 90px;
+}
+
+#HX2-tooltip-3 {
+  left: 428px;
+  top: 395px;
+  width: 150px;
+  height: 20px;
+}
+
+/********** HEAT EXCHANGER 3 ********/
+#HX3-tooltip-1 {
+  left: 623px;
+  top: 285px;
+  width: 150px;
+  height: 20px;
+}
+
+#HX3-tooltip-2 {
+  left: 653px;
+  top: 305px;
+  width: 120px;
+  height: 90px;
+}
+
+#HX3-tooltip-3 {
+  left: 653px;
+  top: 395px;
+  width: 150px;
   height: 20px;
 }

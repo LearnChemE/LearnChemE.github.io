@@ -54,7 +54,6 @@ window.gvs = {
 
 // Handle sliders
 require("./js/inputs.js");
-require("./js/tooltips.js");
 
 const containerElement = document.getElementById("p5-container");
 
@@ -67,6 +66,7 @@ const sketch = (p) => {
     p.textSize(17);
     gvs.calcAll = require("./js/calcs.js");
     gvs.drawAll = require("./js/draw.js");
+    require("./js/tooltips.js");
     document.getElementById("loading").style.display = "none";
     const hover_boxes = document.getElementById("tooltip-hover-boxes");
     const canvas_elt = document.getElementsByTagName("canvas")[0];
