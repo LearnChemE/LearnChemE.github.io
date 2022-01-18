@@ -27,10 +27,6 @@ V1_tooltips.forEach(elt => {
       }
     }, tooltip_show_delay);
   });
-
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.V1_is_over = false;
-  });
 });
 
 /****** LIQUID STREAM FROM FIRST EVAPORATOR, BEFORE VALVE *******/
@@ -56,10 +52,6 @@ L1_tooltips_pre_valve.forEach(elt => {
         tooltip_container.style.color = gvs.green_color;
       }
     }, tooltip_show_delay);
-  });
-  
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.L1_is_over_pre_valve = false;
   });
 })
 
@@ -87,10 +79,6 @@ L1_tooltips_post_valve.forEach(elt => {
         tooltip_container.style.color = gvs.green_color;
       }
     }, tooltip_show_delay);
-  });
-  
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.L1_is_over_post_valve = false;
   });
 });
 
@@ -120,10 +108,6 @@ V2_tooltips.forEach(elt => {
       }
     }, tooltip_show_delay);
   });
-  
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.V2_is_over = false;
-  });
 });
 
 /****** LIQUID STREAM FROM SECOND EVAPORATOR, BEFORE VALVE *******/
@@ -149,10 +133,6 @@ L2_tooltips_pre_valve.forEach(elt => {
         tooltip_container.style.color = gvs.green_color;
       }
     }, tooltip_show_delay);
-  });
-  
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.L2_is_over_pre_valve = false;
   });
 })
 
@@ -181,10 +161,6 @@ L2_tooltips_post_valve.forEach(elt => {
       }
     }, tooltip_show_delay);
   });
-  
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.L2_is_over_post_valve = false;
-  });
 });
 
 /****** LIQUID STREAM FROM FIRST HEAT EXCHANGER ******/
@@ -210,10 +186,6 @@ cond1_tooltips.forEach(elt => {
         tooltip_container.style.color = gvs.red_color;
       }
     }, tooltip_show_delay);
-  });
-  
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.cond1_is_over = false;
   });
 });
 
@@ -241,10 +213,6 @@ cond2_tooltips.forEach(elt => {
       }
     }, tooltip_show_delay);
   });
-  
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.cond2_is_over = false;
-  });
 });
 
 /****** LIQUID STREAM FROM THIRD HEAT EXCHANGER ******/
@@ -271,10 +239,6 @@ cond3_tooltips.forEach(elt => {
       }
     }, tooltip_show_delay);
   });
-  
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.cond3_is_over = false;
-  });
 });
 
 /****** FIRST VALVE ******/
@@ -299,10 +263,6 @@ valve1_tooltip.forEach(elt => {
         tooltip_container.style.color = gvs.black_color;
       }
     }, tooltip_show_delay);
-  });
-  
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.valve1_is_over = false;
   });
 });
 
@@ -329,10 +289,6 @@ valve2_tooltip.forEach(elt => {
       }
     }, tooltip_show_delay);
   });
-  
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.valve2_is_over = false;
-  });
 });
 
 /****** VAPOR FROM THIRD EVAPORATOR ******/
@@ -358,40 +314,7 @@ V3_tooltip.forEach(elt => {
       }
     }, tooltip_show_delay);
   });
-  
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.V3_is_over = false;
-  });
 });
-
-// /****** LIQUID FROM THIRD EVAPORATOR ******/
-
-// gvs.tooltips.L3_is_over = false;
-// const L3_tooltip = [
-//   document.getElementById("L3-tooltip")
-// ];
-
-// L3_tooltip.forEach(elt => {
-//   elt.addEventListener("mouseover", (e) => {
-//     setTimeout(() => { gvs.tooltips.L3_is_over = true; gvs.p.redraw(); }, 10);
-//     clearTimeout(gvs.tooltip_timeout);
-//     gvs.tooltip_timeout = setTimeout(() => {
-//       if(gvs.tooltips.L3_is_over) {
-//         tooltip_container.style.display = "block";
-//         tooltip_container.innerHTML = `L<sub>3</sub> = ${(gvs.L3).toFixed(1)} kg/s (saturated liquid)`;
-//         const width = tooltip_container.getBoundingClientRect().width;
-//         const height = tooltip_container.getBoundingClientRect().height;
-//         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
-//         tooltip_container.style.top = `${gvs.clientY - height - 10}px`;
-//         tooltip_container.style.color = gvs.green_color;
-//       }
-//     }, tooltip_show_delay);
-//   });
-  
-//   elt.addEventListener("mouseleave", () => {
-//     gvs.tooltips.L3_is_over = false;
-//   });
-// });
 
 /****** FIRST HEAT EXCHANGER ******/
 
@@ -418,10 +341,6 @@ HX1_tooltips.forEach(elt => {
         gvs.p.redraw();
       }
     }, tooltip_show_delay);
-  });
-  
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.HX1_is_over = false;
   });
 });
 
@@ -450,10 +369,6 @@ HX2_tooltips.forEach(elt => {
       }
     }, tooltip_show_delay);
   });
-  
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.HX2_is_over = false;
-  });
 });
 
 /****** THIRD HEAT EXCHANGER ******/
@@ -472,7 +387,7 @@ HX3_tooltips.forEach(elt => {
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.HX3_is_over) {
         tooltip_container.style.display = "block";
-        tooltip_container.innerHTML = `This heat exchanger has a heat transfer coefficient of ${gvs.hx_U.toFixed(0)} W/(m<sup>2</sup> K). It has an area of ${gvs.hx_A.toFixed(0)} m<sup>2</sup>. It is transferring ${(gvs.Q3 / 1000).toFixed(0)} kW of heat to the solution.`;
+        tooltip_container.innerHTML = `This heat exchanger has a heat transfer coefficient of ${gvs.hx_U.toFixed(0)} W/(m<sup>2</sup> K). It has an area of ${gvs.hx_A.toFixed(0)} m<sup>2</sup>, transferring ${(gvs.Q3 / 1000).toFixed(0)} kW of heat to the solution.`;
         const width = tooltip_container.getBoundingClientRect().width;
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
@@ -480,10 +395,6 @@ HX3_tooltips.forEach(elt => {
         tooltip_container.style.color = gvs.black_color;
       }
     }, tooltip_show_delay);
-  });
-  
-  elt.addEventListener("mouseleave", () => {
-    gvs.tooltips.HX3_is_over = false;
   });
 });
 
@@ -495,7 +406,6 @@ const all_hover_elts = [
   ...L2_tooltips_pre_valve,
   ...L2_tooltips_post_valve,
   ...V3_tooltip,
-  // ...L3_tooltip,
   ...cond1_tooltips,
   ...cond2_tooltips,
   ...cond3_tooltips,
