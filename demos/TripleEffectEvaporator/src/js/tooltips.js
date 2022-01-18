@@ -332,7 +332,7 @@ HX1_tooltips.forEach(elt => {
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.HX1_is_over) {
         tooltip_container.style.display = "block";
-        tooltip_container.innerHTML = `This heat exchanger has a heat transfer coefficient of ${gvs.hx_U.toFixed(0)} W/(m<sup>2</sup> K). It has an area of ${gvs.hx_A.toFixed(0)} m<sup>2</sup>, transferring ${(gvs.Q1 / 1000).toFixed(0)} kW of heat to the solution.`;
+        tooltip_container.innerHTML = `This heat exchanger has a heat transfer coefficient of ${gvs.hx_U.toFixed(0)} W/(m<sup>2</sup> K). It has an area of ${gvs.hx_A.toFixed(0)} m<sup>2</sup>, transferring ${(gvs.Q1 / 1000).toFixed(0)} kW of heat to the solution. 100% of the vapor condenses.`;
         const width = tooltip_container.getBoundingClientRect().width;
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
@@ -360,7 +360,7 @@ HX2_tooltips.forEach(elt => {
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.HX2_is_over) {
         tooltip_container.style.display = "block";
-        tooltip_container.innerHTML = `This heat exchanger has a heat transfer coefficient of ${gvs.hx_U.toFixed(0)} W/(m<sup>2</sup> K). It has an area of ${gvs.hx_A.toFixed(0)} m<sup>2</sup>, transferring ${(gvs.Q2 / 1000).toFixed(0)} kW of heat to the solution.`;
+        tooltip_container.innerHTML = `This heat exchanger has a heat transfer coefficient of ${gvs.hx_U.toFixed(0)} W/(m<sup>2</sup> K). It has an area of ${gvs.hx_A.toFixed(0)} m<sup>2</sup>, transferring ${(gvs.Q2 / 1000).toFixed(0)} kW of heat to the solution. ${(gvs.q_cond_2 * 100).toFixed(0)}% of the vapor condenses.`;
         const width = tooltip_container.getBoundingClientRect().width;
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
@@ -387,7 +387,7 @@ HX3_tooltips.forEach(elt => {
     gvs.tooltip_timeout = setTimeout(() => {
       if(gvs.tooltips.HX3_is_over) {
         tooltip_container.style.display = "block";
-        tooltip_container.innerHTML = `This heat exchanger has a heat transfer coefficient of ${gvs.hx_U.toFixed(0)} W/(m<sup>2</sup> K). It has an area of ${gvs.hx_A.toFixed(0)} m<sup>2</sup>, transferring ${(gvs.Q3 / 1000).toFixed(0)} kW of heat to the solution.`;
+        tooltip_container.innerHTML = `This heat exchanger has a heat transfer coefficient of ${gvs.hx_U.toFixed(0)} W/(m<sup>2</sup> K). It has an area of ${gvs.hx_A.toFixed(0)} m<sup>2</sup>, transferring ${(gvs.Q3 / 1000).toFixed(0)} kW of heat to the solution. ${(gvs.q_cond_3 * 100).toFixed(0)}% of the vapor condenses.`;
         const width = tooltip_container.getBoundingClientRect().width;
         const height = tooltip_container.getBoundingClientRect().height;
         tooltip_container.style.left = `${gvs.clientX - width / 2}px`;
