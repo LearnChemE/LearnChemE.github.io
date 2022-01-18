@@ -64,7 +64,7 @@ function drawImpeller(p) {
   p.stroke(180);
   p.strokeWeight(5);
   p.line(0, -130, 0, 70);
-  const speed = 0.8; // how fast the impeller is spinning
+  const speed = 1; // how fast the impeller is spinning
   const inc = ( Math.abs( (50 / speed) - p.frameCount % (100 / speed)) ) / (50 / speed);
   p.line(-15 * inc, 70, 15 * inc, 70);
   p.strokeWeight(1);

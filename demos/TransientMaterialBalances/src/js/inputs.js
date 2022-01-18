@@ -8,11 +8,17 @@ const speed_slider = document.getElementById("speed-slider");
 const speed_value = document.getElementById("speed-value");
 const start_simulation_button = document.getElementById("start-button");
 const reset_simulation_button = document.getElementById("reset-button");
+const select_plot = document.getElementById("plot-select");
 
 gvs.handle_V0 = function() {
   const V0 = Number(V0_slider.value);
   gvs.V0 = V0;
   V0_value.innerHTML = `${(V0).toFixed(0)}`;
+  gvs.calcAll();
+  gvs.V_array = [[0, gvs.V0], [0.001, gvs.V0]];
+  gvs.CA_array = [[0, gvs.CA0], [0.001, gvs.CA0]];
+  gvs.h_array = [[0, gvs.h], [0.001, gvs.h]];
+  gvs.v_array = [[0, gvs.v0], [0.001, gvs.v0]];
 }
 
 gvs.handle_v0 = function() {
@@ -68,18 +74,30 @@ gvs.start_simulation = function() {
   switch(gvs.plot_selection) {
     case "V" :
       document.getElementById("V-curve").style.opacity = "1";
+      document.getElementById("CA-curve").style.opacity = "0";
+      document.getElementById("h-curve").style.opacity = "0";
+      document.getElementById("v-curve").style.opacity = "0";
     break;
 
     case "CA":
-
+      document.getElementById("V-curve").style.opacity = "0";
+      document.getElementById("CA-curve").style.opacity = "1";
+      document.getElementById("h-curve").style.opacity = "0";
+      document.getElementById("v-curve").style.opacity = "0";
     break;
 
     case "h":
-
+      document.getElementById("V-curve").style.opacity = "0";
+      document.getElementById("CA-curve").style.opacity = "0";
+      document.getElementById("h-curve").style.opacity = "1";
+      document.getElementById("v-curve").style.opacity = "0";
     break;
 
     case "v":
-
+      document.getElementById("V-curve").style.opacity = "0";
+      document.getElementById("CA-curve").style.opacity = "0";
+      document.getElementById("h-curve").style.opacity = "0";
+      document.getElementById("v-curve").style.opacity = "1";
     break;
   }
 }
@@ -90,4 +108,93 @@ gvs.reset_simulation = function() {
   CA0_slider.removeAttribute("disabled");
   start_simulation_button.removeAttribute("disabled");
   document.getElementById("V-curve").style.opacity = "0";
+  gvs.V_graph.options.axes.x.range[1] = 30;
+  gvs.V_graph.options.axes.y.range[0] = 400;
+  gvs.V_graph.options.axes.y.range[1] = 600;
+  gvs.V_graph.options.axes.x.step = 5;
+  gvs.V_graph.options.axes.y.step = 50;
+  gvs.V_graph.redrawAxes();
+  gvs.CA_graph.options.axes.x.range[1] = 30;
+  gvs.CA_graph.options.axes.x.step = 5;
+  gvs.CA_graph.redrawAxes();
+  gvs.h_graph.options.axes.x.range[1] = 30;
+  gvs.h_graph.options.axes.x.step = 5;
+  gvs.h_graph.redrawAxes();
+  gvs.v_graph.options.axes.x.range[1] = 30;
+  gvs.v_graph.options.axes.x.step = 5;
+  gvs.v_graph.redrawAxes();
 }
+
+select_plot.addEventListener("change", () => {
+  const plot = select_plot.value;
+  gvs.plot_selection = plot;
+  switch(gvs.plot_selection) {
+    case "V" :
+      document.getElementById("V-graph").style.opacity = "1";
+      document.getElementById("CA-graph").style.opacity = "0";
+      document.getElementById("h-graph").style.opacity = "0";
+      document.getElementById("v-graph").style.opacity = "0";
+
+      document.getElementById("V-graph-tick-labels").style.opacity = "1";
+      document.getElementById("CA-graph-tick-labels").style.opacity = "0";
+      document.getElementById("h-graph-tick-labels").style.opacity = "0";
+      document.getElementById("v-graph-tick-labels").style.opacity = "0";
+
+      document.getElementById("V-curve").style.opacity = "1";
+      document.getElementById("CA-curve").style.opacity = "0";
+      document.getElementById("h-curve").style.opacity = "0";
+      document.getElementById("v-curve").style.opacity = "0";
+    break;
+
+    case "CA":
+      document.getElementById("V-graph").style.opacity = "0";
+      document.getElementById("CA-graph").style.opacity = "1";
+      document.getElementById("h-graph").style.opacity = "0";
+      document.getElementById("v-graph").style.opacity = "0";
+
+      document.getElementById("V-graph-tick-labels").style.opacity = "0";
+      document.getElementById("CA-graph-tick-labels").style.opacity = "1";
+      document.getElementById("h-graph-tick-labels").style.opacity = "0";
+      document.getElementById("v-graph-tick-labels").style.opacity = "0";
+
+      document.getElementById("V-curve").style.opacity = "0";
+      document.getElementById("CA-curve").style.opacity = "1";
+      document.getElementById("h-curve").style.opacity = "0";
+      document.getElementById("v-curve").style.opacity = "0";
+    break;
+
+    case "h":
+      document.getElementById("V-graph").style.opacity = "0";
+      document.getElementById("CA-graph").style.opacity = "0";
+      document.getElementById("h-graph").style.opacity = "1";
+      document.getElementById("v-graph").style.opacity = "0";
+
+      document.getElementById("V-graph-tick-labels").style.opacity = "0";
+      document.getElementById("CA-graph-tick-labels").style.opacity = "0";
+      document.getElementById("h-graph-tick-labels").style.opacity = "1";
+      document.getElementById("v-graph-tick-labels").style.opacity = "0";
+
+      document.getElementById("V-curve").style.opacity = "0";
+      document.getElementById("CA-curve").style.opacity = "0";
+      document.getElementById("h-curve").style.opacity = "1";
+      document.getElementById("v-curve").style.opacity = "0";
+    break;
+
+    case "v":
+      document.getElementById("V-graph").style.opacity = "0";
+      document.getElementById("CA-graph").style.opacity = "0";
+      document.getElementById("h-graph").style.opacity = "0";
+      document.getElementById("v-graph").style.opacity = "1";
+
+      document.getElementById("V-graph-tick-labels").style.opacity = "0";
+      document.getElementById("CA-graph-tick-labels").style.opacity = "0";
+      document.getElementById("h-graph-tick-labels").style.opacity = "0";
+      document.getElementById("v-graph-tick-labels").style.opacity = "1";
+
+      document.getElementById("V-curve").style.opacity = "0";
+      document.getElementById("CA-curve").style.opacity = "0";
+      document.getElementById("h-curve").style.opacity = "0";
+      document.getElementById("v-curve").style.opacity = "1";
+    break;
+  }
+})

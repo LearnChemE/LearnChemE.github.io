@@ -6,7 +6,7 @@ window.p5 = new require("./js/p5.min.js");
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
-  v0 : 27, // Inlet flow rate ( m^3/s )
+  v0 : 23, // Inlet flow rate ( m^3/s )
   V0 : 500, // Initial volume in tank
   CA0 : 1.0, // Initial concentration A
   is_running : false, // Is "true" once "start simulation" is pressed

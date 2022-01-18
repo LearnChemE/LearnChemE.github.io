@@ -516,6 +516,15 @@ function SVG_Graph(options) {
       leftGroup.style.opacity = "1";
       const majorGroup = leftGroup.getElementsByClassName("major")[0]; 
       const minorGroup = leftGroup.getElementsByClassName("minor")[0];
+      // Erase the previous ticks
+      for(let i = majorGroup.children.length - 1; i >= 0; i--) {
+        const elt = majorGroup.children[i];
+        elt.remove();
+      };
+      for(let i = minorGroup.children.length - 1; i >= 0; i--) {
+        const elt = minorGroup.children[i];
+        elt.remove();
+      };
       for ( let i = 0; i <= majorTicksY; i++ ) {
         // For each major tick, create a line
         if ( i > 0 || this.options.axes.y.showZeroLabel ) {
@@ -570,6 +579,15 @@ function SVG_Graph(options) {
       rightGroup.style.opacity = "1";
       const majorGroup = rightGroup.getElementsByClassName("major")[0]; 
       const minorGroup = rightGroup.getElementsByClassName("minor")[0];
+      // Erase the previous ticks
+      for(let i = majorGroup.children.length - 1; i >= 0; i--) {
+        const elt = majorGroup.children[i];
+        elt.remove();
+      };
+      for(let i = minorGroup.children.length - 1; i >= 0; i--) {
+        const elt = minorGroup.children[i];
+        elt.remove();
+      };
       for ( let i = 0; i <= majorTicksY; i++ ) {
         // For each major tick, create a line
         if ( i > 0 ) {
@@ -613,6 +631,15 @@ function SVG_Graph(options) {
       topGroup.style.opacity = "1";
       const majorGroup = topGroup.getElementsByClassName("major")[0]; 
       const minorGroup = topGroup.getElementsByClassName("minor")[0];
+      // Erase the previous ticks
+      for(let i = majorGroup.children.length - 1; i >= 0; i--) {
+        const elt = majorGroup.children[i];
+        elt.remove();
+      };
+      for(let i = minorGroup.children.length - 1; i >= 0; i--) {
+        const elt = minorGroup.children[i];
+        elt.remove();
+      };
       for ( let i = 0; i <= majorTicksX; i++ ) {
         // For each major tick, create a line
         if ( i > 0 ) {
@@ -656,7 +683,15 @@ function SVG_Graph(options) {
       bottomGroup.style.opacity = "1";
       const majorGroup = bottomGroup.getElementsByClassName("major")[0]; 
       const minorGroup = bottomGroup.getElementsByClassName("minor")[0];
-
+      // Erase the previous ticks
+      for(let i = majorGroup.children.length - 1; i >= 0; i--) {
+        const elt = majorGroup.children[i];
+        elt.remove();
+      };
+      for(let i = minorGroup.children.length - 1; i >= 0; i--) {
+        const elt = minorGroup.children[i];
+        elt.remove();
+      };
       for ( let i = 0; i <= majorTicksX; i++ ) {
         // For each major tick, create a line
         if ( i > 0 || this.options.axes.x.showZeroLabel ) {

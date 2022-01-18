@@ -59,6 +59,19 @@ $modal-xl: 1140px;
   }
 }
 
+.plot-select-wrapper {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  align-items: center;
+  gap: 10px;
+  grid-column: 1 / 4;
+
+  select {
+    padding: 5px;
+  }
+}
+
 .buttons-row {
   display: grid;
   grid-template-columns: max-content max-content;
@@ -97,6 +110,30 @@ $modal-xl: 1140px;
   left: calc(max(430px, 50vw + 30px));
   width: 360px;
   height: 420px;
+}
+
+#CA-graph {
+  opacity: 0;
+}
+
+#CA-graph-tick-labels {
+  opacity: 0;
+}
+
+#h-graph {
+  opacity: 0;
+}
+
+#h-graph-tick-labels {
+  opacity: 0;
+}
+
+#v-graph {
+  opacity: 0;
+}
+
+#v-graph-tick-labels {
+  opacity: 0;
 }
 
 canvas {

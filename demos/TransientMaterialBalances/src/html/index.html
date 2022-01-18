@@ -42,8 +42,8 @@
 
       <div class="input-row">
         <div class="data-name">Inlet flow rate (𝜈<sub>0</sub>)</div>
-        <input type="range" id="v0-slider" min="20" max="34" step="1" value="20">
-        <div class="data-value" id="v0-value">20</div>
+        <input type="range" id="v0-slider" min="20" max="34" step="1" value="23">
+        <div class="data-value" id="v0-value">23</div>
         <div class="data-metric">L/s</div>
       </div>
 
@@ -71,6 +71,16 @@
       <div class="buttons-row">
         <div class="button btn-success" id="start-button">Start simulation</div>
         <div class="button btn-danger" id="reset-button">Reset</div>
+      </div>
+
+      <div class="plot-select-wrapper">
+        <div class="plot-select-label">Plot to display:</div>
+        <select id="plot-select">
+          <option value="V">Volume vs. time</option>
+          <option value="CA">Concentration of A vs. time</option>
+          <option value="h">Height of liquid vs. time</option>
+          <option value="v">Volumetric flowrate vs. time</option>
+        </select>
       </div>
     </div>
 
