@@ -59,7 +59,7 @@ function return_v(x) {
 gvs.V_graph = new SVG_Graph({
   id: "V-graph",                     // id of the container element
   classList: ["svg-plot"],           // classes to add to the plot container element
-  title: "Volume versus time",       // text above the plot
+  // title: "Volume versus time",       // text above the plot
   titleFontSize: 20,                 // font size of title, pixels
   padding: [[65, 20], [40, 50]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
   parent: document.getElementById("plot-container"),             // the element to place the plot within.  If a parent is specified (besides document.body), the plot size will be 100% of parent's width and height.
@@ -99,7 +99,7 @@ gvs.V_graph = new SVG_Graph({
 gvs.CA_graph = new SVG_Graph({
   id: "CA-graph",                     // id of the container element
   classList: ["svg-plot"],           // classes to add to the plot container element
-  title: "Concentration of A versus time",       // text above the plot
+  // title: "Concentration of A versus time",       // text above the plot
   titleFontSize: 20,                 // font size of title, pixels
   padding: [[55, 20], [40, 50]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
   parent: document.getElementById("plot-container"),             // the element to place the plot within.  If a parent is specified (besides document.body), the plot size will be 100% of parent's width and height.
@@ -140,7 +140,7 @@ gvs.CA_graph = new SVG_Graph({
 gvs.h_graph = new SVG_Graph({
   id: "h-graph",                     // id of the container element
   classList: ["svg-plot"],           // classes to add to the plot container element
-  title: "Tank liquid height versus time",       // text above the plot
+  // title: "Tank liquid height versus time",       // text above the plot
   titleFontSize: 20,                 // font size of title, pixels
   padding: [[65, 20], [40, 50]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
   parent: document.getElementById("plot-container"),             // the element to place the plot within.  If a parent is specified (besides document.body), the plot size will be 100% of parent's width and height.
@@ -181,7 +181,7 @@ gvs.h_graph = new SVG_Graph({
 gvs.v_graph = new SVG_Graph({
   id: "v-graph",                     // id of the container element
   classList: ["svg-plot"],           // classes to add to the plot container element
-  title: "Volumetric flow rate (𝜈<sub>out</sub>) versus time",       // text above the plot
+  // title: "Volumetric flow rate (𝜈<sub>out</sub>) versus time",       // text above the plot
   titleFontSize: 20,                 // font size of title, pixels
   padding: [[65, 20], [40, 50]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
   parent: document.getElementById("plot-container"),             // the element to place the plot within.  If a parent is specified (besides document.body), the plot size will be 100% of parent's width and height.

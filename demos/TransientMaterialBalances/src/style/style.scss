@@ -17,7 +17,7 @@ $modal-xl: 1140px;
 .modal-buttons-row {
   display: grid;
   grid-template-columns: repeat(3, max-content);
-  gap: 10px;
+  gap: 5px;
   margin: 0.5rem auto;
   justify-content: center;
   align-content: center;
@@ -25,19 +25,30 @@ $modal-xl: 1140px;
     height: max-content;
     width: 12ch;
   }
+
+  .input-row {
+    display: grid;
+    grid-template-columns: max-content 10rem 27px 50px;
+    gap: 1ch;
+    align-items: end;
+    grid-column: 1 / 4;
+    margin-bottom: 15px;
+    margin-top: 5px;
+  }
 }
 
 .input-area {
   display: grid;
   grid-template-columns: max-content;
   margin: 20px auto;
-  gap: 10px;
+  gap: 0px;
   width: max-content;
   justify-items: center;
+  align-content: space-evenly;
 
   .input-row {
     display: grid;
-    grid-template-columns: 200px 10rem 27px 50px;
+    grid-template-columns: 200px 10rem 35px 50px;
     grid-column: 1;
     gap: 1ch;
     align-items: end;
@@ -65,7 +76,10 @@ $modal-xl: 1140px;
   grid-template-columns: repeat(2, max-content);
   align-items: center;
   gap: 10px;
-  grid-column: 1 / 4;
+  position: absolute;
+  left: calc(50vw + 10px);
+  top: 230px;
+  // grid-column: 1 / 4;
 
   select {
     padding: 5px;
@@ -106,10 +120,11 @@ $modal-xl: 1140px;
 
 #plot-container {
   position: absolute;
-  top: 230px;
+  top: 245px;
   left: calc(max(430px, 50vw + 30px));
   width: 360px;
   height: 420px;
+  pointer-events: none;
 }
 
 #CA-graph {

@@ -48,6 +48,12 @@ const sketch = (p) => {
     gvs.h = (gvs.V / 1000) / gvs.A;
     gvs.drawGraphs = require("./js/graph.js");
     document.getElementById("V-curve").style.opacity = "0";
+    p.windowResized = function() {
+      gvs.V_graph.resize();
+      gvs.CA_graph.resize();
+      gvs.h_graph.resize();
+      gvs.v_graph.resize();
+    }
   };
 
   p.draw = function () {
