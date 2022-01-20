@@ -49,12 +49,19 @@ function drawTank(p) {
     p.fill(deep_sky_blue);
     p.noStroke();
     p.rectMode(p.CORNER);
-    p.rect(tank_width / 2, tank_height / 2 - 10, 30, -15);
+    if(gvs.is_running) {
+      p.rect(tank_width / 2, tank_height / 2 - 10, Math.min(30, (p.frameCount - gvs.start_frame) * 4), -15);
+    } else {
+      p.strokeWeight(4);
+      p.stroke(0);
+      p.line(tank_width / 2 + 1, 100, tank_width / 2 + 1, 115);
+    }
     p.stroke(0);
     p.strokeWeight(2);
     p.line(tank_width / 2, tank_height / 2 - 25, tank_width / 2 + 30, tank_height / 2 - 25);
     p.line(tank_width / 2, tank_height / 2 - 10, tank_width / 2 + 30, tank_height / 2 - 10);
     p.line(-tank_width / 2, tank_height / 2, tank_width / 2, tank_height / 2);
+
   p.pop();
 }
 
@@ -64,7 +71,7 @@ function drawImpeller(p) {
   p.stroke(180);
   p.strokeWeight(5);
   p.line(0, -130, 0, 70);
-  const speed = 1; // how fast the impeller is spinning
+  const speed = 1.5; // how fast the impeller is spinning
   const inc = ( Math.abs( (50 / speed) - p.frameCount % (100 / speed)) ) / (50 / speed);
   p.line(-15 * inc, 70, 15 * inc, 70);
   p.strokeWeight(1);
@@ -133,8 +140,8 @@ function drawText(p) {
   p.noStroke(0);
   p.textAlign(p.LEFT);
   // Label for inlet pipe
-  p.text(`𝜈  = ${(gvs.v0).toFixed(0)} L/s`, 1, 0);
-  p.text(`C   = ${(gvs.CA0).toFixed(1)} M`, -1, 30);
+  p.text(`𝜈  = ${(gvs.v0).toFixed(1)} L/s`, 1, 0);
+  p.text(`C   = ${(gvs.CA0).toFixed(1)} mol/L`, -1, 30);
   p.textSize(10);
   p.text("0", 11, 4);
   p.text("A,0", 12, 35);
@@ -142,16 +149,16 @@ function drawText(p) {
   // Label for tank
   p.translate(0, tank_height);
   p.textSize(18);
-  p.text(`V = ${(gvs.V).toFixed(0)} L`, -10, 80);
-  p.text(`C  = ${(gvs.CA).toFixed(1)} M`, -11, 110);
+  p.text(`V = ${(gvs.V).toFixed(0)} L`, -40, 80);
+  p.text(`C  = ${(gvs.CA).toFixed(2)} mol/L`, -41, 110);
   p.textSize(10);
-  p.text("A", 2, 115);
+  p.text("A", -28, 115);
   p.stroke(0);
   p.strokeWeight(1);
-  p.line(85, 95, 120, 95);
+  p.line(88, 95, 120, 95);
   p.triangle(120, 95, 111, 98, 111, 92);
   p.noFill();
-  p.rect(-25, 55, 110, 70);
+  p.rect(-50, 55, 138, 70);
 
   // Label for outlet
   p.translate(100, 150);
@@ -162,6 +169,17 @@ function drawText(p) {
   p.text(`𝜈    = ${gvs.v.toFixed(1)} L/s`, 50, 15);
   p.textSize(10);
   p.text("out", 59, 18);
+
+  p.pop();
+
+  p.push();
+  // Reaction information label
+  p.textSize(18);
+  p.text(`Reaction:  A ⟶ B`, 280, 55);
+  p.text(`Reaction rate:  r  = -kC`, 241, 85);
+  p.textSize(10);
+  p.text("A", 370.5, 90);
+  p.text("A", 422.5, 90);
   p.pop();
 }
 

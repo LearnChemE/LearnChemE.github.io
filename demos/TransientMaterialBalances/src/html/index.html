@@ -42,16 +42,23 @@
 
       <div class="input-row">
         <div class="data-name">Inlet flow rate (𝜈<sub>0</sub>)</div>
-        <input type="range" id="v0-slider" min="20" max="34" step="1" value="23">
-        <div class="data-value" id="v0-value">23</div>
+        <input type="range" id="v0-slider" min="20" max="34" step="0.1" value="27.7">
+        <div class="data-value" id="v0-value">27.7</div>
         <div class="data-metric">L/s</div>
       </div>
 
       <div class="input-row">
         <div class="data-name">Inlet concentration A (C<sub>A,0</sub>)</div>
         <input type="range" id="CA0-slider" min="0.1" max="5.0" step="0.1" value="1.0">
-        <div class="data-value" id="CA0-value">5.0</div>
-        <div class="data-metric">M</div>
+        <div class="data-value" id="CA0-value">1.0</div>
+        <div class="data-metric">mol/L</div>
+      </div>
+
+      <div class="input-row">
+        <div class="data-name">Reaction rate constant (k)</div>
+        <input type="range" id="k-slider" min="0.0" max="0.100" step="0.001" value="0.050">
+        <div class="data-value" id="k-value">0.050</div>
+        <div class="data-metric">s<sup>-1</sup></div>
       </div>
   
     </div>
@@ -78,7 +85,7 @@
   </div>
 
   <div class="plot-select-wrapper">
-    <div class="plot-select-label">Plot to display:</div>
+    <div class="plot-select-label">Plot:</div>
     <select id="plot-select">
       <option value="V">Volume vs. time</option>
       <option value="CA">Concentration of A vs. time</option>

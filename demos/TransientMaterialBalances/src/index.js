@@ -9,6 +9,8 @@ window.gvs = {
   v0 : 23, // Inlet flow rate ( m^3/s )
   V0 : 500, // Initial volume in tank
   CA0 : 1.0, // Initial concentration A
+  k : 0.050, // Reaction rate constant (s^-1)
+  r : 0.0, // Reaction rate (mol / (L s))
   is_running : false, // Is "true" once "start simulation" is pressed
   A : 0.785, // Area of the tank cross-section, m^2
   Aout : 0.00785, // Area of the outlet pipe (diameter 10 cm)
@@ -34,7 +36,7 @@ const containerElement = document.getElementById("p5-container");
 const sketch = (p) => {
 
   p.setup = function () {
-    p.createCanvas(800, 530);
+    p.createCanvas(800, 560);
     p.frameRate(60);
     gvs.p = p;
     gvs.drawAll = require("./js/draw.js");
@@ -44,6 +46,7 @@ const sketch = (p) => {
     gvs.handle_v0();
     gvs.handle_CA0();
     gvs.handle_speed();
+    gvs.handle_k();
     gvs.V = gvs.V0;
     gvs.h = (gvs.V / 1000) / gvs.A;
     gvs.drawGraphs = require("./js/graph.js");

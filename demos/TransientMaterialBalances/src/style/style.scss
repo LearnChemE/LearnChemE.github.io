@@ -17,7 +17,7 @@ $modal-xl: 1140px;
 .modal-buttons-row {
   display: grid;
   grid-template-columns: repeat(3, max-content);
-  gap: 5px;
+  gap: 10px;
   margin: 0.5rem auto;
   justify-content: center;
   align-content: center;
@@ -32,8 +32,6 @@ $modal-xl: 1140px;
     gap: 1ch;
     align-items: end;
     grid-column: 1 / 4;
-    margin-bottom: 15px;
-    margin-top: 5px;
   }
 }
 
@@ -41,10 +39,9 @@ $modal-xl: 1140px;
   display: grid;
   grid-template-columns: max-content;
   margin: 20px auto;
-  gap: 0px;
+  gap: 10px;
   width: max-content;
   justify-items: center;
-  align-content: space-evenly;
 
   .input-row {
     display: grid;
@@ -77,8 +74,8 @@ $modal-xl: 1140px;
   align-items: center;
   gap: 10px;
   position: absolute;
-  left: calc(50vw + 10px);
-  top: 230px;
+  left: calc(50vw + 90px);
+  top: 255px;
   // grid-column: 1 / 4;
 
   select {
@@ -120,7 +117,7 @@ $modal-xl: 1140px;
 
 #plot-container {
   position: absolute;
-  top: 245px;
+  top: 275px;
   left: calc(max(430px, 50vw + 30px));
   width: 360px;
   height: 420px;

@@ -23,7 +23,8 @@ function advance() {
   gvs.t += dt;
   gvs.v = vOut(gvs.h);
   gvs.V += dt * gvs.v0 - dt * gvs.v;
-  gvs.N += dt * gvs.v0 * gvs.CA0 - dt * gvs.v * gvs.CA;
+  gvs.r = -gvs.k * gvs.CA;
+  gvs.N += dt * gvs.v0 * gvs.CA0 - dt * gvs.v * gvs.CA + dt * gvs.r * gvs.V;
   gvs.CA = gvs.N / gvs.V;
   gvs.h = (gvs.V / 1000) / gvs.A; // height of liquid (m)
 

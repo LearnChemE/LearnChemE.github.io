@@ -6,6 +6,8 @@ const CA0_slider = document.getElementById("CA0-slider");
 const CA0_value = document.getElementById("CA0-value");
 const speed_slider = document.getElementById("speed-slider");
 const speed_value = document.getElementById("speed-value");
+const k_slider = document.getElementById("k-slider");
+const k_value = document.getElementById("k-value");
 const start_simulation_button = document.getElementById("start-button");
 const reset_simulation_button = document.getElementById("reset-button");
 const select_plot = document.getElementById("plot-select");
@@ -24,7 +26,7 @@ gvs.handle_V0 = function() {
 gvs.handle_v0 = function() {
   const v0 = Number(v0_slider.value);
   gvs.v0 = v0;
-  v0_value.innerHTML = `${(v0).toFixed(0)}`;
+  v0_value.innerHTML = `${(v0).toFixed(1)}`;
 }
 
 gvs.handle_CA0 = function() {
@@ -37,6 +39,12 @@ gvs.handle_speed = function() {
   const speed = Number(speed_slider.value);
   gvs.speed = speed;
   speed_value.innerHTML = `${speed.toFixed(1)}`;
+}
+
+gvs.handle_k = function() {
+  const k = Number(k_slider.value);
+  gvs.k = k;
+  k_value.innerHTML = `${k.toFixed(3)}`
 }
 
 V0_slider.addEventListener("input", () => {
@@ -53,6 +61,10 @@ CA0_slider.addEventListener("input", () => {
 
 speed_slider.addEventListener("input", () => {
   gvs.handle_speed();
+});
+
+k_slider.addEventListener("input", () => {
+  gvs.handle_k();
 })
 
 start_simulation_button.addEventListener("click", () => {
@@ -70,6 +82,7 @@ gvs.start_simulation = function() {
   V0_slider.setAttribute("disabled", "yes");
   v0_slider.setAttribute("disabled", "yes");
   CA0_slider.setAttribute("disabled", "yes");
+  k_slider.setAttribute("disabled", "yes");
   start_simulation_button.setAttribute("disabled", "yes");
   switch(gvs.plot_selection) {
     case "V" :
@@ -107,6 +120,7 @@ gvs.reset_simulation = function() {
   v0_slider.removeAttribute("disabled");
   CA0_slider.removeAttribute("disabled");
   start_simulation_button.removeAttribute("disabled");
+  k_slider.removeAttribute("disabled");
   document.getElementById("V-curve").style.opacity = "0";
   gvs.V_graph.options.axes.x.range[1] = 30;
   gvs.V_graph.options.axes.y.range[0] = 400;
