@@ -12,6 +12,7 @@ $modal-xl: 1140px;
   justify-content: center;
   gap: 0px 20px;
   width: 100vw;
+  margin-bottom: 15px;
 }
 
 .modal-buttons-row {
@@ -199,4 +200,8 @@ canvas {
 *[disabled="yes"] {
   opacity: 0.3 !important;
   pointer-events: none;
+}
+
+#volume-controls {
+  display: none;
 }

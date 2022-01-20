@@ -175,11 +175,22 @@ function drawText(p) {
   p.push();
   // Reaction information label
   p.textSize(18);
-  p.text(`Reaction:  A ⟶ B`, 280, 55);
-  p.text(`Reaction rate:  r  = -kC`, 241, 85);
-  p.textSize(10);
-  p.text("A", 370.5, 90);
-  p.text("A", 422.5, 90);
+  if(gvs.k < 0.0009) {
+    p.text(`(No chemical reaction)`, 230, 32);
+  } else {
+    p.text(`Reaction:  A ⟶ B`, 228, 32);
+    p.text(`r  = -${gvs.k.toFixed(3)}`, 230, 68);
+    p.text("C", 317, 68);
+    p.textSize(10);
+    p.text("A", 237, 73);
+    p.text("A", 330, 73);
+    p.textSize(14);
+    p.text("mol", 348, 55);
+    p.text("L·s", 350, 75);
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.line(346, 60, 373, 60);
+  }
   p.pop();
 }
 

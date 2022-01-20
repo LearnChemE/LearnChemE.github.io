@@ -33,7 +33,7 @@
   <div class="simulation-controls">
     <div class="input-area">
   
-      <div class="input-row">
+      <div class="input-row" id="volume-controls">
         <div class="data-name">Initial volume of solution</div>
         <input type="range" id="V0-slider" min="250" max="750" step="10" value="500">
         <div class="data-value" id="V0-value">500</div>
@@ -89,8 +89,8 @@
     <select id="plot-select">
       <option value="V">Volume vs. time</option>
       <option value="CA">Concentration of A vs. time</option>
-      <option value="h">Height of liquid vs. time</option>
-      <option value="v">Volumetric flowrate vs. time</option>
+      <!-- <option value="h">Height of liquid vs. time</option> -->
+      <option value="v">Outlet flowrate vs. time</option>
     </select>
   </div>
 
