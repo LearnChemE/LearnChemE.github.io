@@ -12,10 +12,10 @@ function init() {
   gvs.CA = 1.0;
   gvs.v = 0;
   gvs.N = gvs.V0 * gvs.CA;
-  gvs.V_array = [[0, gvs.V], [0.01, gvs.V]];
-  gvs.CA_array = [[0, gvs.CA], [0.01, gvs.CA]];
-  gvs.h_array = [[0, gvs.h], [0.01, gvs.h]];
-  gvs.v_array = [[0, gvs.v], [0.01, gvs.v]];
+  gvs.V_array = [[0, 500], [0.01, 500]];
+  gvs.CA_array = [[0, 1.0], [0.01, 1.0]];
+  gvs.h_array = [[0, 0.636943], [0.01, 0.636943]];
+  gvs.v_array = [[0, 27.7], [0.01, 27.7]];
 }
 
 function advance() {

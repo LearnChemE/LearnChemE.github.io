@@ -23,10 +23,10 @@ window.gvs = {
   h : 0.636943, // Height of the liquid (m)
   start_frame : 0, // Used for the liquid pouring out animation
   speed: 1, // Number of seconds simulated per second
-  V_array : [[0, 500], [1, 0]], // Used to graph volume over time
-  CA_array : [[0, 1.0], [1, 0]], // Used to graph concentration over time
-  h_array : [[0, 0.636943], [1, 0]], // Used to graph height over time
-  v_array : [[0, 0], [1, 0]], // Used to graph volumetric flow rate over time
+  V_array : [[0, 500], [1, 500]], // Used to graph volume over time
+  CA_array : [[0, 1.0], [1, 1.0]], // Used to graph concentration over time
+  h_array : [[0, 0.636943], [1, 0.636943]], // Used to graph height over time
+  v_array : [[0, 27.7], [1, 27.7]], // Used to graph volumetric flow rate over time
   t : 0, // Time since "start simulation" button was pressed
   plot_selection : "V", // Select which plot to show next to the vessel
 };
