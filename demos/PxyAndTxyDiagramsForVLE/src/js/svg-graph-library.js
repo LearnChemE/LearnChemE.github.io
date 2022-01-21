@@ -230,7 +230,7 @@ function SVG_Graph(options) {
   /****** CREATE CONTAINER AND SVG ELEMENTS ******/
   /***********************************************/
   this.container = document.createElement("div");
-  this.container.classList = this.options.classList;
+  this.container.classList.add( ...this.options.classList );
   this.container.id = this.options.id;
   this.container.style.position = "absolute";
   this.container.style.top = "0px";

@@ -27,14 +27,15 @@ $modal-xl: 1140px;
 
 .input-area {
     display: grid;
-    grid-template-columns: max-content;
+    grid-template-columns: max-content max-content;
     margin: 20px auto;
     gap: 10px;
     width: max-content;
     justify-items: center;
+    align-items: center;
     .input-row {
         display: grid;
-        grid-template-columns: 200px 10rem 27px 50px;
+        grid-template-columns: 100px 8rem 35px 25px;
         gap: 1ch;
         align-items: end;
         .data-name {
@@ -43,6 +44,38 @@ $modal-xl: 1140px;
         .data-value {
             text-align: end;
         }
+        .data-metric {
+            transform: translateX(-4px);
+        }
+    }
+
+    #select-plot-container {
+        display: grid;
+        grid-template-columns: max-content 80px;
+        align-items: center;
+        gap: 10px;
+
+        select {
+            padding: 5px;
+        }
+    }
+}
+
+#plot-container {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+
+    .hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+.tick-labels {
+    &.hidden {
+        opacity: 0;
+        pointer-events: none;
     }
 }
 
