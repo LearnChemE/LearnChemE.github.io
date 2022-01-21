@@ -90,7 +90,7 @@
       <option value="V">Volume vs. time</option>
       <option value="CA">Concentration of A vs. time</option>
       <!-- <option value="h">Height of liquid vs. time</option> -->
-      <option value="v">Outlet flowrate vs. time</option>
+      <option value="v">Outlet flow rate vs. time</option>
     </select>
   </div>
 
@@ -110,7 +110,7 @@
         </div>
         <div class="modal-body">
           <p>
-            
+            This is a simulation of a continuously-filled draining tank with a chemical reaction.  Adjust the inlet flow rate, inlet concentration, and reaction rate constant using the sliders, then press "Start simulation".  The volume, concentration of A in the tank, and outlet flow rate will be plotted to the right of the tank graphic.  Choose which plot to display using the drop-down menu directly above the plot.  Reset the simulation to initial conditions by pressing the "Reset" button. To run a simulation without a chemical reaction, set the reaction rate constant (k) to zero. View the equations used in this simulation by pressing the "Details" button.
           </p>
 
         </div>
@@ -131,15 +131,48 @@
         </div>
 
         <div class="modal-body">
+          <p>Because the liquid is assumed to have constant density, the overall differential material balance is:</p>
+
+          $$
+            [1] \quad \frac{ dV }{ dt } = \nu_{out} - \nu_{0}
+          $$
+
+          <p>Where \( V \) is volume of liquid in the tank, \( \nu_{out} \) is volumetric flow rate at the outlet, and \( \nu_{0} \) is volumetric flow rate at the inlet.  The velocity of the outlet \(( u_{out} )\) is found using Torricelli's equation:</p>
+
+          $$
+            [2] \quad u_{out} = \sqrt{ 2 g h }
+          $$
+
+          <p>where \( g \) is gravitational acceleration (9.81 m/s<sup>2</sup>) and \( h \) is the height of liquid in the tank. The two equations below are used to find a differential equation for volume:</p>
+
+          $$
+            [3] \quad h = \frac{ V }{ A_{tank} }
+          $$
+
+          $$
+            [4] \quad \nu_{out} = u_{out} A_{out}
+          $$
+
+          <p>where \( A_{tank} \) is the cross-sectional area of the tank, and \( A_{out} \) is the cross-sectional area of the outlet pipe. Plugging equations [2], [3], and [4] into equation [1] yields</p>
+
+          $$
+            [5] \quad \frac{ dV }{ dt } = \sqrt{ \frac{ 2 g V }{ A_{tank} } } A_{ out } - \nu_{0}
+          $$
+
+          <p>The first-order rate of reaction [\( r_{A} \), mol/(L s)] is</p>
           
-          <p>References:</p>
+          $$
+            [6] \quad r_{ A } = - k C_{ A }
+          $$  
 
-          <p class="references">
-            <ol>
+          <p>where \( k \) is the reaction rate constant (s<sup>-1</sup>). The differential equation for number of moles of component A in the tank is:</p>
 
-            </ol>
-          </p>
-          <div style="margin-top: 2rem;"></div>
+          $$
+            [7] \quad dN_{A} = \left( C_{A, 0} \, \nu_{ 0 } + r_{A} V - C_{A}\nu_{out} \right) dt
+          $$
+
+          <p>where \( N_{A} \) is number of moles of A in the tank, \( C_{ A, 0 } \) is the concentration of A in the inlet stream (mol/L). In this simulation, equations [5] and [7] were solved numerically using Euler's Method, though an analytical solution might exist.</p>
+
         </div>
 
       </div>
