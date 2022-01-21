@@ -72,6 +72,10 @@ $modal-xl: 1140px;
     }
 }
 
+.dashed {
+    stroke-dasharray: 5px;
+}
+
 .tick-labels {
     &.hidden {
         opacity: 0;

@@ -37,7 +37,7 @@ gvs.pxy_plot = new gvs.SVG_Graph({
       labels: ["pressure (bar)", ""],
       labelFontSize: 17,
       display: [true, true],
-      range: [0, 5],
+      range: [0, 5.5],
       step: 1,
       minorTicks: 3,
       majorTickSize: 2,
@@ -77,7 +77,7 @@ gvs.txy_plot = new gvs.SVG_Graph({
       labels: ["Temperature (°C)", ""],
       labelFontSize: 17,
       display: [true, true],
-      range: [40, 160],
+      range: [60, 160],
       step: 20,
       minorTicks: 3,
       majorTickSize: 2,
@@ -131,4 +131,116 @@ gvs.txy_dew_point = gvs.txy_plot.addCurve(gvs.Ty, {
   id: `txy-dew-point-curve`,
   classList: ["curve"],
   range: [0, 1]
+});
+
+gvs.pxy_vapor_tie_line = gvs.pxy_plot.createLine({
+  coord1: [gvs.pxy_x_bubble_point(), 1.5],
+  coord2: [0.45, 1.5],
+  classList: ["dashed", "vapor"],
+  usePlotCoordinates: true,
+  id: "pxy-vapor-tie-line",
+  stroke: "rgb(0, 150, 0)",
+  strokeWidth: 2,
+  parent: gvs.pxy_plot.SVG,
+});
+
+gvs.pxy_liquid_tie_line = gvs.pxy_plot.createLine({
+  coord1: [0.45, 1.5],
+  coord2: [gvs.pxy_x_dew_point(), 1.5],
+  classList: ["dashed", "vapor"],
+  usePlotCoordinates: true,
+  id: "pxy-liquid-tie-line",
+  stroke: "rgb(0, 0, 255)",
+  strokeWidth: 2,
+  parent: gvs.pxy_plot.SVG,
+});
+
+gvs.pxy_vapor_composition_line = gvs.pxy_plot.createLine({
+  coord1: [gvs.pxy_x_dew_point(), 1.5],
+  coord2: [gvs.pxy_x_dew_point(), 0],
+  classList: ["dashed", "vapor"],
+  usePlotCoordinates: true,
+  id: "pxy-vapor-composition-line",
+  stroke: "rgb(0, 150, 0)",
+  strokeWidth: 2,
+  parent: gvs.pxy_plot.SVG,
+});
+
+gvs.pxy_liquid_composition_line = gvs.pxy_plot.createLine({
+  coord1: [gvs.pxy_x_bubble_point(), 1.5],
+  coord2: [gvs.pxy_x_bubble_point(), 0],
+  classList: ["dashed", "vapor"],
+  usePlotCoordinates: true,
+  id: "pxy-liquid-composition-line",
+  stroke: "rgb(0, 0, 255)",
+  strokeWidth: 2,
+  parent: gvs.pxy_plot.SVG,
+});
+
+gvs.txy_vapor_tie_line = gvs.txy_plot.createLine({
+  coord1: [gvs.txy_x_bubble_point(), 115],
+  coord2: [0.45, 115],
+  classList: ["dashed", "vapor"],
+  usePlotCoordinates: true,
+  id: "txy-vapor-tie-line",
+  stroke: "rgb(0, 150, 0)",
+  strokeWidth: 2,
+  parent: gvs.txy_plot.SVG,
+});
+
+gvs.txy_liquid_tie_line = gvs.txy_plot.createLine({
+  coord1: [0.45, 115],
+  coord2: [gvs.txy_x_dew_point(), 115],
+  classList: ["dashed", "vapor"],
+  usePlotCoordinates: true,
+  id: "txy-liquid-tie-line",
+  stroke: "rgb(0, 0, 255)",
+  strokeWidth: 2,
+  parent: gvs.txy_plot.SVG,
+});
+
+gvs.txy_vapor_composition_line = gvs.txy_plot.createLine({
+  coord1: [gvs.txy_x_dew_point(), 115],
+  coord2: [gvs.txy_x_dew_point(), 60],
+  classList: ["dashed", "vapor"],
+  usePlotCoordinates: true,
+  id: "txy-vapor-composition-line",
+  stroke: "rgb(0, 150, 0)",
+  strokeWidth: 2,
+  parent: gvs.txy_plot.SVG,
+});
+
+gvs.txy_liquid_composition_line = gvs.txy_plot.createLine({
+  coord1: [gvs.txy_x_bubble_point(), 115],
+  coord2: [gvs.txy_x_bubble_point(), 60],
+  classList: ["dashed", "vapor"],
+  usePlotCoordinates: true,
+  id: "txy-liquid-composition-line",
+  stroke: "rgb(0, 0, 255)",
+  strokeWidth: 2,
+  parent: gvs.txy_plot.SVG,
+});
+
+gvs.txy_point = gvs.txy_plot.createPoint({
+  coord: [0.45, 115],
+  radius: 1.25,
+  classList: ["plot-point"],
+  usePlotCoordinates: true,
+  id: "txy-plot-point",
+  parent: gvs.txy_plot.SVG,
+  stroke: "rgb(0, 0, 0)",
+  strokeWidth: 1,
+  fill: "rgb(255, 255, 255)",
+});
+
+gvs.pxy_point = gvs.pxy_plot.createPoint({
+  coord: [0.45, 1.50],
+  radius: 1.25,
+  classList: ["plot-point"],
+  usePlotCoordinates: true,
+  id: "pxy-plot-point",
+  parent: gvs.pxy_plot.SVG,
+  stroke: "rgb(0, 0, 0)",
+  strokeWidth: 1,
+  fill: "rgb(255, 255, 255)",
 });

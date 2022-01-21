@@ -57,6 +57,34 @@ gvs.Py = function(x) {
   return 1 / numerator
 }
 
+gvs.pxy_x_bubble_point = function() {
+  return (gvs.P - gvs.saturation_pressure_B(gvs.T)) / (gvs.saturation_pressure_A(gvs.T) - gvs.saturation_pressure_B(gvs.T))
+}
+
+gvs.pxy_x_dew_point = function() {
+  for(let x = 0.000; x <= 1.000; x += 0.001) {
+    if( gvs.Py(x) >= gvs.P ) {
+      return x
+    }
+  }
+}
+
+gvs.txy_x_bubble_point = function() {
+  for(let x = 0.000; x <= 1.000; x += 0.001) {
+    if( gvs.Tx(x) <= gvs.T ) {
+      return x
+    }
+  }
+}
+
+gvs.txy_x_dew_point = function() {
+  for(let x = 0.000; x <= 1.000; x += 0.001) {
+    if( gvs.Ty(x) <= gvs.T ) {
+      return x
+    }
+  }
+}
+
 gvs.calc_Tsat = function() {
   const resolution = 100;
   const min_temperature = 40; // degrees C
