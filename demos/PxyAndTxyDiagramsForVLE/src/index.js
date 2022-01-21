@@ -3,7 +3,10 @@ require("./style/style.scss");
 window.p5 = new require("./js/p5.min.js");
 
 // TO DO:
+/*
+- When the tie lines are hidden and you switch graphs, make sure to update the opacity to show the correct ones
 
+*/
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
     z : 0.45, // overall mole fraction

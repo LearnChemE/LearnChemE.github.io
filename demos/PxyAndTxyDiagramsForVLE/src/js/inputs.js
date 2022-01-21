@@ -105,12 +105,20 @@ selectPlot.addEventListener("change", () => {
     gvs.txy_plot.tickLabels.classList.add("hidden");
     gvs.pxy_plot.container.classList.remove("hidden");
     gvs.pxy_plot.tickLabels.classList.remove("hidden");
+    document.getElementById("pxy-vapor-composition-line").style.opacity = "1";
+    document.getElementById("pxy-liquid-composition-line").style.opacity = "1";
+    document.getElementById("pxy-vapor-tie-line").style.opacity = "1";
+    document.getElementById("pxy-liquid-tie-line").style.opacity = "1";
     document.getElementById("pressure-slider-container").style.display = "none";
     document.getElementById("temperature-slider-container").style.display = "grid";
     const coord1 = gvs.pxy_plot.coordToPix(gvs.pxy_x_bubble_point(), 1.5);
     const coord2 = gvs.pxy_plot.coordToPix(gvs.pxy_x_dew_point(), 1.5);
     gvs.pxy_vapor_tie_line.setAttribute("x1", `${coord1[0]}`);
     gvs.pxy_liquid_tie_line.setAttribute("x2", `${coord2[0]}`);
+    gvs.pxy_liquid_composition_line.setAttribute("x1", `${coord1[0]}`);
+    gvs.pxy_liquid_composition_line.setAttribute("x2", `${coord1[0]}`);
+    gvs.pxy_vapor_composition_line.setAttribute("x1", `${coord2[0]}`);
+    gvs.pxy_vapor_composition_line.setAttribute("x2", `${coord2[0]}`);
   } else {
     gvs.P = 1.5;
     gvs.T = 115;
@@ -123,6 +131,10 @@ selectPlot.addEventListener("change", () => {
     gvs.txy_plot.tickLabels.classList.remove("hidden");
     gvs.pxy_plot.container.classList.add("hidden");
     gvs.pxy_plot.tickLabels.classList.add("hidden");
+    document.getElementById("txy-vapor-composition-line").style.opacity = "1";
+    document.getElementById("txy-liquid-composition-line").style.opacity = "1";
+    document.getElementById("txy-vapor-tie-line").style.opacity = "1";
+    document.getElementById("txy-liquid-tie-line").style.opacity = "1";
     document.getElementById("pressure-slider-container").style.display = "grid";
     document.getElementById("temperature-slider-container").style.display = "none";
     gvs.txy_bubble_point.updateCoords();
@@ -133,6 +145,10 @@ selectPlot.addEventListener("change", () => {
     const coord2 = gvs.txy_plot.coordToPix(gvs.txy_x_dew_point(), 115);
     gvs.txy_vapor_tie_line.setAttribute("x1", `${coord1[0]}`);
     gvs.txy_liquid_tie_line.setAttribute("x2", `${coord2[0]}`);
+    gvs.txy_vapor_composition_line.setAttribute("x1", `${coord2[0]}`);
+    gvs.txy_vapor_composition_line.setAttribute("x2", `${coord2[0]}`);
+    gvs.txy_liquid_composition_line.setAttribute("x1", `${coord1[0]}`);
+    gvs.txy_liquid_composition_line.setAttribute("x2", `${coord1[0]}`);
   }
   gvs.p.redraw();
 })
