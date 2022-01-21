@@ -62,7 +62,7 @@ gvs.pxy_x_bubble_point = function() {
 }
 
 gvs.pxy_x_dew_point = function() {
-  for(let x = 0.000; x <= 1.00; x += 0.01) {
+  for(let x = 0.000; x <= 1.00; x += 0.001) {
     if( gvs.Py(x) >= gvs.P ) {
       return x
     }
@@ -70,7 +70,7 @@ gvs.pxy_x_dew_point = function() {
 }
 
 gvs.txy_x_bubble_point = function() {
-  for(let x = 0.000; x <= 1.000; x += 0.01) {
+  for(let x = 0.000; x <= 1.000; x += 0.001) {
     if( gvs.Tx(x) <= gvs.T ) {
       return x
     }
@@ -78,7 +78,7 @@ gvs.txy_x_bubble_point = function() {
 }
 
 gvs.txy_x_dew_point = function() {
-  for(let x = 0.000; x <= 1.000; x += 0.01) {
+  for(let x = 0.000; x <= 1.000; x += 0.001) {
     if( gvs.Ty(x) <= gvs.T ) {
       return x
     }
