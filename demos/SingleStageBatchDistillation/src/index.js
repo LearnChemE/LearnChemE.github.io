@@ -43,7 +43,7 @@ const sketch = (p) => {
         gvs.eq_plot = new SVG_Graph({
             id: "eq-plot", // id of the container element
             classList: ["svg-plot"], // classes to add to the plot container element
-            title: "Equilibrium plot", // text above the plot
+            title: "x-y plot", // text above the plot
             titleFontSize: 20, // font size of title, pixels
             padding: [
                 [50, 20],

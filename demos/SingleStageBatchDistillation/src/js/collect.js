@@ -103,7 +103,7 @@ gvs.maximum_temperature_azeotrope_dew_point = function(x) {
 }
 
 gvs.differential_collection = function() {
-  if(gvs.collection_progress < 1 && gvs.B > 0.01) {
+  if(gvs.collection_progress < 1 && gvs.B > 0.1) {
     const dP = 0.0005 / gvs.amount_to_collect;
     const collection_flask = gvs.flasks[gvs.flasks.length - 1];
     switch(gvs.eq_plot_shape) {

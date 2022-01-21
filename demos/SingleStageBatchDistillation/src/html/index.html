@@ -60,11 +60,11 @@
           <div class="selection-label">display: </div>
           <select id="display-select" value="flasks">
             <option value="flasks">Collected distillate</option>
-            <option value="eq">Equilibrium plot</option>
+            <option value="eq">x-y plot</option>
             <option value="txy">T-x-y diagram</option>
           </select>
 
-          <div class="selection-label" id="composition-label">composition:</div>
+          <div class="selection-label" id="composition-label">azeotrope:</div>
           <select id="eq-plot-select" value="no azeotrope">
             <option value="no azeotrope">No azeotrope</option>
             <option value="minimum-temperature azeotrope">Minimum-T azeotrope</option>
@@ -97,7 +97,7 @@
         </div>
         <div class="modal-body">
           <p>
-            In this simulation, one mole of a binary mixture undergoes a batch distillation. The first slider sets the mole fraction of the starting liquid. When you click the "Collect" button, liquid evaporates and the distillate is collected in a collection flask. The amount collected into each flask is set with the second slider. The collection flask is then set aside and an empty flask is substituted. The process repeats when you click the "Collect" again, until finally 0.01 mol remains in the still. The equilibrium temperature is shown next to the thermometer. Select either the collection flasks, an x-y plot (equilibrium plot), or a T-x-y plot to be displayed on the right. Click "Reset" to start over. You can choose either an ideal solution (no azeotrope), a minimum-boiling temperature azeotrope or a maximum-boiling temperature azeotrope with the drop-down menu.
+            In this simulation, 1.0 mol of a binary mixture undergoes batch distillation. The first slider sets the mole fraction of the starting liquid, and the second slider sets the amount collected in each flask. You can choose an ideal solution (no azeotrope), a minimum-boiling temperature azeotrope or a maximum-boiling temperature azeotrope with the drop-down menu. When you click the "Collect" button, liquid evaporates and the distillate is collected in a flask. The flask is then set aside and an empty flask is substituted. The process repeats when you click the "Collect" again, until either 0.10 mol remains in the still or 8 flasks have been collected. The temperature is shown next to the thermometer. At any time select the collection flasks, an x-y plot, or a T-x-y plot to be displayed. Click "Reset" to start over. 
           </p>
 
         </div>
@@ -142,19 +142,19 @@
             [4] \quad D_{total} = \sum_{ i = 1 }^{ n } \left( D_{i} + D_{ i + 1 } ... D_{ n } \right)
           $$
 
-          Because the saturated vapor is in thermodynamic equilibrium with the saturated liquid in the vessel (and there is only one equilibrium stage: the boiler/bottom vessel), the composition of the vapor \( y_{B} \) is a function of the composition in the bottom vessel. During evaporation, both compositions change with time, except when the composition of the liquid is an azeotrope. At equilibrium,
+          Because the saturated vapor is in thermodynamic equilibrium with the saturated liquid in the vessel (and there is only one equilibrium stage: the boiler/bottom vessel), the composition of the vapor \( y_{B} \) is a function of the composition in the bottom vessel. During evaporation, both compositions change with time, except when a maximum temperature azeotrope is reached.  At equilibrium,
 
           $$
             [5] \quad y_{B} = f(x_{B})
           $$
 
-          Numerical approximations such as Antoine's equation are often used to model \( f_{x, B} \) using experimental data. Other cases, such as constant relative volatility, may also be used to approximate this relationship. Composition of \( x_{ B, i + 1 } \) can be calculated by integration. Equation [5] must be substituted for \( y_{B} \).
+          For an ideal system, Raoult's law is used to relate \( y_{B} \) to \( x_{B} \). The \( x_{B,i+1} \) composition is calculated by integration, where \( y_{B} \) is given by equation [5].
 
           $$
             [6] \quad \int_{B_{i}}^{B_{i + 1}} \frac{ 1 }{ B } dB = \int_{x_{B, i}}^{ x_{B, i + 1} } \frac{ 1 }{ y_{B} - x_{B} } dx_{B}
           $$
 
-          Finally, a mass balance can be used to solve for the distillate composition, \( x_{D, i + 1} \):
+          The distillate composition is determined from a mass balance:
 
           $$
             [7] \quad x_{ D, i + 1 } = \frac{ B_{i} x_{B, i} - B_{ i + 1 }{ x_{ B, i + 1 } } }{ B_{i} - B_{i + 1} }

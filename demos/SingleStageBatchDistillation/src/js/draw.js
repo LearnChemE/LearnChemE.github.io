@@ -284,7 +284,7 @@ function drawAll(p) {
         p.push();
         p.textSize(16);
         p.textWrap(p.WORD);
-        p.text(`Choose an initial mole fraction, an amount to evaporate, and a mixture composition, then press "Collect". Your collected distillate will then appear here. You may also choose "display: Equilibrium plot" or "display: T-x-y diagram" from the drop-down menu to view the respective graphs. Up to 8 flasks may be collected, or 0.99 moles of total distillate, whichever comes first. Press "Reset" at any time to start over again.`, 355, 50, 435);
+        p.text(`Choose an initial mole fraction, the amount to evaporate, and type of azeotrope (or no azeotrope). Press "Collect" and the collected distillate will appear here. The x-y plot or T-x-y plot can be selected at any time from the drop down display menu. Distillation stops when either eight flasks or 0.90 mol of total distillate have been collected. Press "Reset" at any time to restart.`, 355, 50, 435);
         p.pop();
       }
     }
