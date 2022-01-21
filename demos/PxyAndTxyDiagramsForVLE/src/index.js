@@ -12,6 +12,7 @@ window.gvs = {
     z : 0.45, // overall mole fraction
     P : 1.50, // pressure (for the T-x-y diagram) (bar)
     T : 115, // temperature (for the P-x-y diagram) (deg. C)
+    q : 0.5131228699981252, // quality (mole fraction liquid)
     bubble_point_temperature_array : [],
     dew_point_temperature_array: [],
     plot : "P-x-y"
@@ -26,7 +27,7 @@ const sketch = (p) => {
         p.noLoop();
         gvs.p = p;
         gvs.drawAll = require("./js/draw.js");
-        gvs.calcAll = require("./js/calcs.js");
+        require("./js/calcs.js");
         gvs.calc_Tsat();
         const { SVG_Graph } = require("./js/svg-graph-library.js");
         gvs.SVG_Graph = SVG_Graph;

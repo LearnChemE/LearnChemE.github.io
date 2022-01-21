@@ -62,7 +62,7 @@ gvs.pxy_x_bubble_point = function() {
 }
 
 gvs.pxy_x_dew_point = function() {
-  for(let x = 0.000; x <= 1.000; x += 0.001) {
+  for(let x = 0.000; x <= 1.00; x += 0.01) {
     if( gvs.Py(x) >= gvs.P ) {
       return x
     }
@@ -70,7 +70,7 @@ gvs.pxy_x_dew_point = function() {
 }
 
 gvs.txy_x_bubble_point = function() {
-  for(let x = 0.000; x <= 1.000; x += 0.001) {
+  for(let x = 0.000; x <= 1.000; x += 0.01) {
     if( gvs.Tx(x) <= gvs.T ) {
       return x
     }
@@ -78,7 +78,7 @@ gvs.txy_x_bubble_point = function() {
 }
 
 gvs.txy_x_dew_point = function() {
-  for(let x = 0.000; x <= 1.000; x += 0.001) {
+  for(let x = 0.000; x <= 1.000; x += 0.01) {
     if( gvs.Ty(x) <= gvs.T ) {
       return x
     }
@@ -120,8 +120,16 @@ gvs.Ty = function(x) {
   return dew_point_temperature
 }
 
-function calcAll() {
-
+gvs.calc_tie_lines = function() {
+  if(gvs.plot === "P-x-y") {
+    const vapor = (0.45 - gvs.pxy_x_bubble_point()) / (gvs.pxy_x_dew_point() - gvs.pxy_x_bubble_point());
+    const liquid = 1 - vapor;
+    gvs.q = Math.min(1, Math.max(0, liquid));
+  } else {
+    const vapor = (0.45 - gvs.txy_x_bubble_point()) / (gvs.txy_x_dew_point() - gvs.txy_x_bubble_point());
+    const liquid = 1 - vapor;
+    gvs.q = Math.min(1, Math.max(0, liquid));
+  }
 }
 
-module.exports = calcAll;
+gvs.calc_tie_lines();

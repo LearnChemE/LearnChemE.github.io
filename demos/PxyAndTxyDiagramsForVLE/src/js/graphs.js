@@ -15,7 +15,7 @@ gvs.pxy_plot = new gvs.SVG_Graph({
   classList: ["svg-plot"],           // classes to add to the plot container element
   title: "mixture is at 1.50 bar",       // text above the plot
   titleFontSize: 18,                 // font size of title, pixels
-  padding: [[65, 20], [40, 60]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
+  padding: [[65, 50], [40, 60]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
   parent: document.getElementById("plot-container"),             // the element to place the plot within.  If a parent is specified (besides document.body), the plot size will be 100% of parent's width and height.
   axes: {
     axesStrokeWidth: 0.5,            // stroke width of the axes lines: the vertical and horizontal x and y-axes (px)
@@ -55,7 +55,7 @@ gvs.txy_plot = new gvs.SVG_Graph({
   classList: ["svg-plot", "hidden"],           // classes to add to the plot container element
   title: "mixture is at 115° C",       // text above the plot
   titleFontSize: 18,                 // font size of title, pixels
-  padding: [[65, 20], [40, 60]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
+  padding: [[65, 50], [40, 60]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
   parent: document.getElementById("plot-container"),             // the element to place the plot within.  If a parent is specified (besides document.body), the plot size will be 100% of parent's width and height.
   axes: {
     axesStrokeWidth: 0.5,            // stroke width of the axes lines: the vertical and horizontal x and y-axes (px)

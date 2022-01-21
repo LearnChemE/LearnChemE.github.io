@@ -42,6 +42,7 @@ temperatureSlider.addEventListener("input", () => {
     document.getElementById("pxy-vapor-composition-line").style.opacity = "1";
   }
   temperatureValue.innerHTML = `${T.toFixed(0)}°`;
+  gvs.calc_tie_lines();
   gvs.p.redraw();
 });
 
@@ -83,6 +84,7 @@ pressureSlider.addEventListener("input", () => {
     document.getElementById("txy-vapor-composition-line").style.opacity = "1";
   }
   pressureValue.innerHTML = `${P.toFixed(2)}`;
+  gvs.calc_tie_lines();
   gvs.p.redraw();
 });
 
@@ -119,6 +121,8 @@ selectPlot.addEventListener("change", () => {
     gvs.pxy_liquid_composition_line.setAttribute("x2", `${coord1[0]}`);
     gvs.pxy_vapor_composition_line.setAttribute("x1", `${coord2[0]}`);
     gvs.pxy_vapor_composition_line.setAttribute("x2", `${coord2[0]}`);
+    gvs.calc_tie_lines();
+    gvs.p.redraw();
   } else {
     gvs.P = 1.5;
     gvs.T = 115;
@@ -149,6 +153,8 @@ selectPlot.addEventListener("change", () => {
     gvs.txy_vapor_composition_line.setAttribute("x2", `${coord2[0]}`);
     gvs.txy_liquid_composition_line.setAttribute("x1", `${coord1[0]}`);
     gvs.txy_liquid_composition_line.setAttribute("x2", `${coord1[0]}`);
+    gvs.calc_tie_lines();
+    gvs.p.redraw();
   }
   gvs.p.redraw();
 })
