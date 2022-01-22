@@ -244,3 +244,51 @@ gvs.pxy_point = gvs.pxy_plot.createPoint({
   strokeWidth: 1,
   fill: "rgb(0, 0, 0)",
 });
+
+gvs.pxy_liquid_label = gvs.pxy_plot.createText({
+  coord: [0.25, 4.0],
+  content: "liquid",
+  classList: ["svg-text"],
+  usePlotCoordinates: true,
+  id: "pxy-liquid-label",
+  parent: gvs.pxy_plot.SVG,
+  color: "rgb(0, 0, 255)",
+  fontSize: 4.5,
+  alignment: ["left", "top"],
+});
+
+gvs.pxy_vapor_label = gvs.pxy_plot.createText({
+  coord: [0.70, 0.65],
+  content: "vapor",
+  classList: ["svg-text"],
+  usePlotCoordinates: true,
+  id: "pxy-vapor-label",
+  parent: gvs.pxy_plot.SVG,
+  color: "rgb(0, 150, 0)",
+  fontSize: 4.5,
+  alignment: ["left", "top"],
+});
+
+gvs.txy_liquid_label = gvs.txy_plot.createText({
+  coord: [0.12, 80],
+  content: "liquid",
+  classList: ["svg-text"],
+  usePlotCoordinates: true,
+  id: "txy-liquid-label",
+  parent: gvs.txy_plot.SVG,
+  color: "rgb(0, 0, 255)",
+  fontSize: 4.5,
+  alignment: ["left", "top"],
+});
+
+gvs.txy_vapor_label = gvs.txy_plot.createText({
+  coord: [0.70, 150],
+  content: "vapor",
+  classList: ["svg-text"],
+  usePlotCoordinates: true,
+  id: "txy-vapor-label",
+  parent: gvs.txy_plot.SVG,
+  color: "rgb(0, 150, 0)",
+  fontSize: 4.5,
+  alignment: ["left", "top"],
+});
