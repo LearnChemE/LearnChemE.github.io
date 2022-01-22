@@ -235,12 +235,12 @@ gvs.txy_point = gvs.txy_plot.createPoint({
 
 gvs.pxy_point = gvs.pxy_plot.createPoint({
   coord: [0.45, 1.50],
-  radius: 1.25,
+  radius: 1.15,
   classList: ["plot-point"],
   usePlotCoordinates: true,
   id: "pxy-plot-point",
   parent: gvs.pxy_plot.SVG,
   stroke: "rgb(0, 0, 0)",
   strokeWidth: 1,
-  fill: "rgb(255, 255, 255)",
+  fill: "rgb(0, 0, 0)",
 });
