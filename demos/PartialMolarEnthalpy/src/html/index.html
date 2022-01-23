@@ -28,6 +28,12 @@
 </head>
 
 <body>
+  <div class="no-show">
+    $$
+    \newcommand{\overbar}[1]{\mkern 5.5mu\overline{\mkern-0.5mu#1\mkern-5.5mu}\mkern 0.5mu}
+    $$
+  </div>
+
   <div class="simulation-title">Partial Molar Enthalpy</div>
 
   <div class="simulation-controls">
@@ -35,14 +41,14 @@
   
       <div class="input-row">
         <div class="data-name">Non-ideal parameter</div>
-        <input type="range" id="NI-slider" min="-50" max="50" step="1" value="20">
+        <input type="range" id="NI-slider" min="-50" max="50" step="0.1" value="35">
         <div class="data-value" id="NI-value">20</div>
         <div class="data-metric"></div>
       </div>
 
       <div class="input-row">
         <div class="data-name">Mole Fraction A</div>
-        <input type="range" id="z-slider" min="0" max="1" step="0.01" value="0.5">
+        <input type="range" id="z-slider" min="0" max="1" step="0.001" value="0.5">
         <div class="data-value" id="z-value">0.50</div>
         <div class="data-metric"></div>
       </div>
@@ -59,6 +65,18 @@
 
   <div id="plot-container"></div>
 
+  <div id="plot-overlays-container">
+    <div id="partial-A-div" class="plot-dot"></div>
+    <div id="partial-B-div" class="plot-dot"></div>
+    <div id="pure-A-label" class="text-over-plot">\( H_{A} \)</div>
+    <div id="pure-B-label" class="text-over-plot">\( H_{B} \)</div>
+    <div id="partial-A-label" class="text-over-plot shift-left">\( \overbar{ H_{A} } \)</div>
+    <div id="partial-B-label" class="text-over-plot shift-left">\( \overbar{ H_{B} } \)</div>
+    <div id="above-plot-label">
+      \( \overbar{ H_{A} } = 59 \; \mathrm{ kJ / mol } \qquad \quad \overbar{ H_{B} } = 79 \; \mathrm{ kJ / mol } \)
+    </div>
+  </div>
+
   <div id="p5-container"></div>
 
   <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
@@ -73,7 +91,7 @@
         </div>
         <div class="modal-body">
           <p>
-            Directions
+            The molar enthalpy of a binary mixture (blue curve) of A and B is plotted as a function of the mole fraction of component A. The end points of the molar enthalpy are the pure-component enthalpies \( H_{A} \) and \( H_{B} \). The partial molar enthalpies \( \overbar{ H_{A} } \)&nbsp; and \( \overbar{ H_{B} } \) &nbsp;are obtained by drawing a tangent line (black, dashed) at the black point, which indicates the mole fraction of the solution. The intersections of this tangent with the y-axis at x<sub>A</sub> = 0 and x<sub>A</sub> = 1 correspond to \( \overbar{ H_{B} } \)&nbsp; and \( \overbar{ H_{A} } \), respectively. You can change the mole fraction of A in the mixture and the non-ideal parameter, which represents deviation from an ideal solution, with sliders. For an ideal solution the non-ideal parameter is zero, and the enthalpy of the mixture is a linear function of the molar enthalpies of the pure components.
           </p>
 
         </div>
@@ -94,15 +112,39 @@
         </div>
 
         <div class="modal-body">
-          Details
-
-          <p>References:</p>
-
-          <p class="references">
-            <ol>
-              
-            </ol>
+          <p>
+            The molar enthalpy \( H \) is:
           </p>
+
+          $$
+            [1] \quad H = x_{A} H_{A} + x_{B} H_{B} + \alpha \, x_{A} x_{B}
+          $$
+
+          <p>
+            where \( H_{i} \) is the enthalpy (kJ/mol), \( x_{A} \) and \( x_{B} \) are the compositions of A and B (where \( x_{B} = 1 - x_{A} \)), and \( \alpha \) is a non-ideal parameter. The partial molar enthalpy \( \overbar{ H_{i} } \) &nbsp; is represented by a line tangent to \( H \) at composition of the mixture \( x_{A, m} \)
+          </p>
+
+          $$
+            [2] \quad \overbar{ H_{ A } } = H + x_{B} \frac{ dH }{ dx_{A} }
+          $$
+
+          $$
+            [3] \quad \overbar{ H_{ B } } = H + x_{A} \frac{ dH }{ dx_{A} }
+          $$
+
+          <p>
+            Where \( \overbar{H_{A}} \)&nbsp; is the partial molar enthalpy of component A and \( \overbar{H_{B}} \)&nbsp; is the partial molar enthalpy of component B. A screencast video showing how to use this simulation is available by clicking "view instructional video" above the simulation. Reference (1) below presents a supplemental example of partial molar enthalpy.
+          </p>
+
+          <p style="margin-bottom: 0.5rem;">References:</p>
+
+          <div class="references">
+            <ol>
+              <li>
+                1.) <i>Partial Molar Properties: Binary Solutions</i> [Video]. (Apr 5, 2012) <a href="https://www.youtube.com/watch?v=TFmIPEG_X3A" target="_blank">www.youtube.com/watch?v=TFmIPEG_X3A</a>.
+              </li>
+            </ol>
+          </div>
           <div style="margin-top: 2rem;"></div>
         </div>
 

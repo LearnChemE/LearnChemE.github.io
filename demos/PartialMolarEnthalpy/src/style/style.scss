@@ -4,6 +4,16 @@ $modal-lg: 800px;
 $modal-xl: 1140px;
 @import "bootstrap";
 @import "./slider.scss";
+
+.no-show {
+    opacity: 0;
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
 .simulation-controls {
     display: grid;
     grid-template-columns: max-content max-content;
@@ -21,7 +31,7 @@ $modal-xl: 1140px;
     align-content: center;
     .btn {
         height: max-content;
-        width: 12ch;
+        width: 11ch;
     }
 }
 
@@ -34,7 +44,7 @@ $modal-xl: 1140px;
     justify-items: center;
     .input-row {
         display: grid;
-        grid-template-columns: 200px 10rem 27px 50px;
+        grid-template-columns: 160px 10rem 27px 0px;
         gap: 1ch;
         align-items: end;
         .data-name {
@@ -51,6 +61,55 @@ $modal-xl: 1140px;
     left: 0px;
     top: 0px;
     transform: translate(-50%, -50%);
+}
+
+.dashed {
+    stroke-dasharray: 5px;
+}
+
+#plot-overlays-container {
+    pointer-events: none;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100vw;
+    height: 100vh;
+
+    .plot-dot {
+        position: absolute;
+        width: 9px;
+        height: 9px;
+        background-color: blue;
+        border: 1px solid black;
+        border-radius: 4.5px;
+        transform: translate(-50%, -50%);
+    }
+
+    .text-over-plot {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        transform: translate(-50%, -50%);
+        background-color: rgb(253, 253, 253);
+        z-index: 1;
+        padding: 0px 3px;
+        border-radius: 8px;
+        opacity: 0;
+    }
+
+    .shift-left {
+        mjx-math {
+            transform: translateX(-3px);
+        }
+    }
+
+    #above-plot-label {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+    }
 }
 
 #p5-container {
@@ -87,6 +146,7 @@ canvas {
         margin: 0;
         padding: 0;
         &>li {
+            margin-left: 1rem;
             margin-bottom: 0.5rem;
             font-size: 0.8rem;
         }
