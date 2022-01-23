@@ -30,6 +30,8 @@ temperatureSlider.addEventListener("input", () => {
     gvs.pxy_vapor_composition_line.setAttribute("x2", `${coord2[0]}`);
     gvs.pxy_vapor_tie_line.setAttribute("x1", `${coord1[0]}`);
     gvs.pxy_liquid_tie_line.setAttribute("x2", `${coord2[0]}`);
+    const left = gvs.pxy_vapor_tie_line.getBoundingClientRect().left;
+    gvs.pxy_vapor_tie_line.style.strokeDashoffset = `${left}px`;
   }
   if(gvs.pxy_x_bubble_point() > 0.45) {
     gvs.pxy_liquid_composition_line.setAttribute("x1", `${coord1[0]}`);
@@ -68,6 +70,8 @@ pressureSlider.addEventListener("input", () => {
     document.getElementById("txy-liquid-tie-line").style.opacity = "1";
     gvs.txy_vapor_tie_line.setAttribute("x1", `${coord1[0]}`);
     gvs.txy_liquid_tie_line.setAttribute("x2", `${coord2[0]}`);
+    const left = gvs.txy_vapor_tie_line.getBoundingClientRect().left;
+    gvs.txy_vapor_tie_line.style.strokeDashoffset = `${left}px`;
     gvs.txy_vapor_composition_line.setAttribute("x1", `${coord2[0]}`);
     gvs.txy_vapor_composition_line.setAttribute("x2", `${coord2[0]}`);
     gvs.txy_liquid_composition_line.setAttribute("x1", `${coord1[0]}`);

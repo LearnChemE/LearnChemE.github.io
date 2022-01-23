@@ -144,6 +144,9 @@ gvs.pxy_vapor_tie_line = gvs.pxy_plot.createLine({
   parent: gvs.pxy_plot.SVG,
 });
 
+let left = gvs.pxy_vapor_tie_line.getBoundingClientRect().left;
+gvs.pxy_vapor_tie_line.style.strokeDashoffset = `${left}px`;
+
 gvs.pxy_liquid_tie_line = gvs.pxy_plot.createLine({
   coord1: [0.45, 1.5],
   coord2: [gvs.pxy_x_dew_point(), 1.5],
@@ -187,6 +190,9 @@ gvs.txy_vapor_tie_line = gvs.txy_plot.createLine({
   strokeWidth: 2,
   parent: gvs.txy_plot.SVG,
 });
+
+left = gvs.txy_vapor_tie_line.getBoundingClientRect().left;
+gvs.txy_vapor_tie_line.style.strokeDashoffset = `${left}px`;
 
 gvs.txy_liquid_tie_line = gvs.txy_plot.createLine({
   coord1: [0.45, 115],
