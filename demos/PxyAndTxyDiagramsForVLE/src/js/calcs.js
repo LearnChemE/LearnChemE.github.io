@@ -133,14 +133,32 @@ gvs.Ty = function(x) {
 }
 
 gvs.calc_tie_lines = function() {
-  if(gvs.plot === "P-x-y") {
+  if(gvs.plot_selection === "P-x-y") {
     let vapor = (gvs.z - gvs.pxy_x_bubble_point()) / (gvs.pxy_x_dew_point() - gvs.pxy_x_bubble_point());
+    if(isNaN(vapor)) {
+      if(gvs.P <= gvs.Px(0)) {
+        vapor = 1;
+      } else {
+        vapor = 0;
+      }
+    }
     const liquid = 1 - vapor;
     gvs.q = Math.min(1, Math.max(0, liquid));
+    gvs.q_list.push(gvs.q);
+    gvs.q_list.shift();
   } else {
-    const vapor = (gvs.z - gvs.txy_x_bubble_point()) / (gvs.txy_x_dew_point() - gvs.txy_x_bubble_point());
+    let vapor = (gvs.z - gvs.txy_x_bubble_point()) / (gvs.txy_x_dew_point() - gvs.txy_x_bubble_point());
+    if(isNaN(vapor)) {
+      if(gvs.T <= gvs.Tx(1)) {
+        vapor = 0;
+      } else {
+        vapor = 1;
+      }
+    }
     const liquid = 1 - vapor;
     gvs.q = Math.min(1, Math.max(0, liquid));
+    gvs.q_list.push(gvs.q);
+    gvs.q_list.shift();
   }
 }
 

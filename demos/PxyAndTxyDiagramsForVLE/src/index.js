@@ -15,11 +15,12 @@ window.gvs = {
     q : 0.5131228699981252, // quality (mole fraction liquid)
     bubble_point_temperature_array : [],
     dew_point_temperature_array: [],
-    plot : "P-x-y",
+    plot_selection : "P-x-y",
     isDragging : false,
     dotOriginalCoords : [0, 0], // the original coordinates of the black dot when the mouse is clicked over it
     mouseOriginalPixels : [0, 0], // the pixel coordinates of the mouse when it is first clicked
     mouseCurrentPixels : [0, 0], // the real-time pixel coordinates of the mouse while the black dot is being dragged
+    q_list : [0.514, 0.514, 0.514, 0.514, 0.514, 0.514], // this is used to average (smooth) out values for gvs.q in order to prevent "jittering" behavior
 };
 
 const containerElement = document.getElementById("p5-container");

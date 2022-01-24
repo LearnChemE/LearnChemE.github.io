@@ -13,9 +13,9 @@ plot_container.style.width = `${2 * gvs.p.width / 3 - p5_plot_margin_right}px`;
 gvs.pxy_plot = new gvs.SVG_Graph({
   id: "pxy-plot",                     // id of the container element
   classList: ["svg-plot"],           // classes to add to the plot container element
-  title: "mixture is at 1.50 bar",       // text above the plot
-  titleFontSize: 18,                 // font size of title, pixels
-  padding: [[65, 50], [40, 60]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
+  title: "click and drag the black dot, or adjust temperature with the slider",       // text above the plot
+  titleFontSize: 17,                 // font size of title, pixels
+  padding: [[60, 10], [35, 55]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
   parent: document.getElementById("plot-container"),             // the element to place the plot within.  If a parent is specified (besides document.body), the plot size will be 100% of parent's width and height.
   axes: {
     axesStrokeWidth: 0.5,            // stroke width of the axes lines: the vertical and horizontal x and y-axes (px)
@@ -53,9 +53,9 @@ gvs.pxy_plot = new gvs.SVG_Graph({
 gvs.txy_plot = new gvs.SVG_Graph({
   id: "txy-plot",                     // id of the container element
   classList: ["svg-plot", "hidden"],           // classes to add to the plot container element
-  title: "mixture is at 115° C",       // text above the plot
-  titleFontSize: 18,                 // font size of title, pixels
-  padding: [[65, 50], [40, 60]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
+  title: "click and drag the black dot, or adjust pressure with the slider",       // text above the plot
+  titleFontSize: 17,                 // font size of title, pixels
+  padding: [[60, 10], [35, 55]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
   parent: document.getElementById("plot-container"),             // the element to place the plot within.  If a parent is specified (besides document.body), the plot size will be 100% of parent's width and height.
   axes: {
     axesStrokeWidth: 0.5,            // stroke width of the axes lines: the vertical and horizontal x and y-axes (px)
@@ -91,7 +91,6 @@ gvs.txy_plot = new gvs.SVG_Graph({
 });
 
 gvs.txy_plot.tickLabels.classList.add("hidden");
-// gvs.pxy_plot.tickLabels.classList.add("hidden");
 
 gvs.pxy_bubble_point = gvs.pxy_plot.addCurve(gvs.Px, {
   stroke: "rgba(0, 0, 255, 1)",
@@ -229,26 +228,26 @@ gvs.txy_liquid_composition_line = gvs.txy_plot.createLine({
 
 gvs.txy_point = gvs.txy_plot.createPoint({
   coord: [0.45, 115],
-  radius: 1.25,
+  radius: 1.2,
   classList: ["plot-point"],
   usePlotCoordinates: true,
   id: "txy-plot-point",
   parent: gvs.txy_plot.SVG,
   stroke: "rgb(0, 0, 0)",
   strokeWidth: 1,
-  fill: "rgb(0, 0, 0)",
+  fill: "rgb(50, 50, 50)",
 });
 
 gvs.pxy_point = gvs.pxy_plot.createPoint({
   coord: [0.45, 1.50],
-  radius: 1.25,
+  radius: 1.2,
   classList: ["plot-point"],
   usePlotCoordinates: true,
   id: "pxy-plot-point",
   parent: gvs.pxy_plot.SVG,
   stroke: "rgb(0, 0, 0)",
   strokeWidth: 1,
-  fill: "rgb(0, 0, 0)",
+  fill: "rgb(50, 50, 50)",
 });
 
 gvs.pxy_liquid_label = gvs.pxy_plot.createText({
@@ -264,7 +263,7 @@ gvs.pxy_liquid_label = gvs.pxy_plot.createText({
 });
 
 gvs.pxy_vapor_label = gvs.pxy_plot.createText({
-  coord: [0.70, 0.65],
+  coord: [0.75, 0.95],
   content: "vapor",
   classList: ["svg-text"],
   usePlotCoordinates: true,
@@ -276,7 +275,7 @@ gvs.pxy_vapor_label = gvs.pxy_plot.createText({
 });
 
 gvs.txy_liquid_label = gvs.txy_plot.createText({
-  coord: [0.12, 80],
+  coord: [0.15, 85],
   content: "liquid",
   classList: ["svg-text"],
   usePlotCoordinates: true,
@@ -288,7 +287,7 @@ gvs.txy_liquid_label = gvs.txy_plot.createText({
 });
 
 gvs.txy_vapor_label = gvs.txy_plot.createText({
-  coord: [0.70, 150],
+  coord: [0.65, 145],
   content: "vapor",
   classList: ["svg-text"],
   usePlotCoordinates: true,

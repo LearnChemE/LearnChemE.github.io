@@ -14,6 +14,7 @@ temperatureSlider.addEventListener("input", () => {
   gvs.pxy_dew_point.drawCurve();
   const coord1 = gvs.pxy_plot.coordToPix(Math.min(gvs.z, gvs.pxy_x_bubble_point()), gvs.P);
   const coord2 = gvs.pxy_plot.coordToPix(Math.max(gvs.z, gvs.pxy_x_dew_point()), gvs.P);
+  const center_coord = gvs.pxy_plot.coordToPix(gvs.z, gvs.P);
   if(gvs.pxy_x_bubble_point() > gvs.z || gvs.pxy_x_dew_point() < gvs.z) {
     document.getElementById("pxy-vapor-tie-line").style.opacity = "0";
     document.getElementById("pxy-liquid-tie-line").style.opacity = "0";
@@ -29,7 +30,9 @@ temperatureSlider.addEventListener("input", () => {
     gvs.pxy_vapor_composition_line.setAttribute("x1", `${coord2[0]}`);
     gvs.pxy_vapor_composition_line.setAttribute("x2", `${coord2[0]}`);
     gvs.pxy_vapor_tie_line.setAttribute("x1", `${coord1[0]}`);
+    gvs.pxy_vapor_tie_line.setAttribute("x2", `${center_coord[0]}`);
     gvs.pxy_liquid_tie_line.setAttribute("x2", `${coord2[0]}`);
+    gvs.pxy_liquid_tie_line.setAttribute("x1", `${center_coord[0]}`);
     const left = gvs.pxy_vapor_tie_line.getBoundingClientRect().left;
     gvs.pxy_vapor_tie_line.style.strokeDashoffset = `${left}px`;
   }
@@ -58,6 +61,7 @@ pressureSlider.addEventListener("input", () => {
   gvs.txy_dew_point.drawCurve();
   const coord1 = gvs.txy_plot.coordToPix(Math.min(gvs.z, gvs.txy_x_bubble_point()), gvs.T);
   const coord2 = gvs.txy_plot.coordToPix(Math.max(gvs.z, gvs.txy_x_dew_point()), gvs.T);
+  const center_coord = gvs.txy_plot.coordToPix(gvs.z, gvs.T);
   if(gvs.txy_x_bubble_point() > gvs.z || gvs.txy_x_dew_point() < gvs.z) {
     document.getElementById("txy-vapor-tie-line").style.opacity = "0";
     document.getElementById("txy-liquid-tie-line").style.opacity = "0";
@@ -69,7 +73,9 @@ pressureSlider.addEventListener("input", () => {
     document.getElementById("txy-vapor-tie-line").style.opacity = "1";
     document.getElementById("txy-liquid-tie-line").style.opacity = "1";
     gvs.txy_vapor_tie_line.setAttribute("x1", `${coord1[0]}`);
+    gvs.txy_vapor_tie_line.setAttribute("x2", `${center_coord[0]}`);
     gvs.txy_liquid_tie_line.setAttribute("x2", `${coord2[0]}`);
+    gvs.txy_liquid_tie_line.setAttribute("x1", `${center_coord[0]}`);
     const left = gvs.txy_vapor_tie_line.getBoundingClientRect().left;
     gvs.txy_vapor_tie_line.style.strokeDashoffset = `${left}px`;
     gvs.txy_vapor_composition_line.setAttribute("x1", `${coord2[0]}`);
@@ -94,10 +100,11 @@ pressureSlider.addEventListener("input", () => {
 
 selectPlot.addEventListener("change", () => {
   const plot = selectPlot.value;
-  gvs.plot = plot;
+  gvs.plot_selection = plot;
   if(plot === "P-x-y") {
     gvs.T = 115;
     gvs.P = 1.50;
+    gvs.z = 0.45;
     temperatureSlider.value = "115";
     temperatureValue.innerHTML = `${gvs.T.toFixed(0)}°`;
     pressureSlider.value = "1.5";
@@ -119,17 +126,29 @@ selectPlot.addEventListener("change", () => {
     document.getElementById("temperature-slider-container").style.display = "grid";
     const coord1 = gvs.pxy_plot.coordToPix(gvs.pxy_x_bubble_point(), 1.5);
     const coord2 = gvs.pxy_plot.coordToPix(gvs.pxy_x_dew_point(), 1.5);
+    const center_coord = gvs.pxy_plot.coordToPix(gvs.z, 1.5);
     gvs.pxy_vapor_tie_line.setAttribute("x1", `${coord1[0]}`);
-    gvs.pxy_liquid_tie_line.setAttribute("x2", `${coord2[0]}`);
+    gvs.pxy_vapor_tie_line.setAttribute("y1", `${coord1[1]}`);
+    gvs.pxy_vapor_tie_line.setAttribute("x2", `${center_coord[0]}`);
+    gvs.pxy_vapor_tie_line.setAttribute("y2", `${center_coord[1]}`);
+    gvs.pxy_liquid_tie_line.setAttribute("x1", `${coord2[0]}`);
+    gvs.pxy_liquid_tie_line.setAttribute("y1", `${coord2[1]}`);
+    gvs.pxy_liquid_tie_line.setAttribute("x2", `${center_coord[0]}`);
+    gvs.pxy_liquid_tie_line.setAttribute("y2", `${center_coord[1]}`);
     gvs.pxy_liquid_composition_line.setAttribute("x1", `${coord1[0]}`);
     gvs.pxy_liquid_composition_line.setAttribute("x2", `${coord1[0]}`);
+    gvs.pxy_liquid_composition_line.setAttribute("y1", `${coord1[1]}`);
     gvs.pxy_vapor_composition_line.setAttribute("x1", `${coord2[0]}`);
     gvs.pxy_vapor_composition_line.setAttribute("x2", `${coord2[0]}`);
+    gvs.pxy_vapor_composition_line.setAttribute("y1", `${coord2[1]}`);
+    gvs.pxy_point.setAttribute("cx", `${center_coord[0]}`);
+    gvs.pxy_point.setAttribute("cy", `${center_coord[1]}`);
     gvs.calc_tie_lines();
     gvs.p.redraw();
   } else {
     gvs.P = 1.5;
     gvs.T = 115;
+    gvs.z = 0.45;
     pressureSlider.value = "1.5";
     pressureValue.innerHTML = `${gvs.P.toFixed(2)}`;
     temperatureSlider.value = "115";
@@ -151,16 +170,23 @@ selectPlot.addEventListener("change", () => {
     gvs.txy_dew_point.drawCurve();
     const coord1 = gvs.txy_plot.coordToPix(gvs.txy_x_bubble_point(), 115);
     const coord2 = gvs.txy_plot.coordToPix(gvs.txy_x_dew_point(), 115);
+    const center_coord = gvs.txy_plot.coordToPix(gvs.z, 115);
     gvs.txy_vapor_tie_line.setAttribute("x1", `${coord1[0]}`);
     gvs.txy_vapor_tie_line.setAttribute("y1", `${coord1[1]}`);
-    gvs.txy_vapor_tie_line.setAttribute("y2", `${coord2[1]}`);
-    gvs.txy_liquid_tie_line.setAttribute("x2", `${coord2[0]}`);
-    gvs.txy_liquid_tie_line.setAttribute("y1", `${coord1[1]}`);
-    gvs.txy_liquid_tie_line.setAttribute("y2", `${coord2[1]}`);
-    gvs.txy_vapor_composition_line.setAttribute("x1", `${coord2[0]}`);
-    gvs.txy_vapor_composition_line.setAttribute("x2", `${coord2[0]}`);
+    gvs.txy_vapor_tie_line.setAttribute("x2", `${center_coord[0]}`);
+    gvs.txy_vapor_tie_line.setAttribute("y2", `${center_coord[1]}`);
+    gvs.txy_liquid_tie_line.setAttribute("x1", `${coord2[0]}`);
+    gvs.txy_liquid_tie_line.setAttribute("y1", `${coord2[1]}`);
+    gvs.txy_liquid_tie_line.setAttribute("x2", `${center_coord[0]}`);
+    gvs.txy_liquid_tie_line.setAttribute("y2", `${center_coord[1]}`);
     gvs.txy_liquid_composition_line.setAttribute("x1", `${coord1[0]}`);
     gvs.txy_liquid_composition_line.setAttribute("x2", `${coord1[0]}`);
+    gvs.txy_liquid_composition_line.setAttribute("y1", `${coord1[1]}`);
+    gvs.txy_vapor_composition_line.setAttribute("x1", `${coord2[0]}`);
+    gvs.txy_vapor_composition_line.setAttribute("x2", `${coord2[0]}`);
+    gvs.txy_vapor_composition_line.setAttribute("y1", `${coord2[1]}`);
+    gvs.txy_point.setAttribute("cx", `${center_coord[0]}`);
+    gvs.txy_point.setAttribute("cy", `${center_coord[1]}`);
     gvs.calc_tie_lines();
     gvs.p.redraw();
   }
@@ -187,6 +213,8 @@ gvs.txy_point.addEventListener("mousedown", (e) => {
 
 document.addEventListener("mouseup", () => {
   gvs.isDragging = false;
+  gvs.q_list = [gvs.q, gvs.q, gvs.q, gvs.q, gvs.q, gvs.q];
+  gvs.p.redraw();
 });
 
 document.addEventListener("mousemove", (e) => {
@@ -196,7 +224,7 @@ document.addEventListener("mousemove", (e) => {
     const dy = gvs.mouseCurrentPixels[1] - gvs.mouseOriginalPixels[1];
     let rect;
     
-    if(gvs.plot === "P-x-y") {
+    if(gvs.plot_selection === "P-x-y") {
       rect = document.getElementById("pxy-plot").getElementsByClassName("svg-axes")[0].getBoundingClientRect();
     } else {
       rect = document.getElementById("txy-plot").getElementsByClassName("svg-axes")[0].getBoundingClientRect();
@@ -212,7 +240,7 @@ document.addEventListener("mousemove", (e) => {
     const new_y_coord = Number(Math.min(100, Math.max(0, gvs.dotOriginalCoords[1] + pts_moved_vertical)).toFixed(5));
     
     let plot_coords;
-    if(gvs.plot === "P-x-y") {
+    if(gvs.plot_selection === "P-x-y") {
       gvs.pxy_point.setAttribute("cx", `${new_x_coord}`);
       gvs.pxy_point.setAttribute("cy", `${new_y_coord}`);
       plot_coords = gvs.pxy_plot.pixToCoord(new_x_coord, new_y_coord);
@@ -227,17 +255,19 @@ document.addEventListener("mousemove", (e) => {
 
     gvs.z = plot_x;
 
-    if(gvs.plot === "P-x-y") {
+    if(gvs.plot_selection === "P-x-y") {
       gvs.P = plot_y;
       document.getElementById("P-slider").value = `${gvs.P}`;
+      // gvs.pxy_plot.container.getElementsByClassName("plot-title")[0].innerHTML = `mixture is at ${gvs.P.toFixed(2)} bar`;
     } else {
       gvs.T = plot_y;
       document.getElementById("T-slider").value = `${gvs.T}`;
+      // gvs.txy_plot.container.getElementsByClassName("plot-title")[0].innerHTML = `mixture is at ${Math.round(gvs.T).toFixed(0)}° C`;
     }
 
     gvs.calc_tie_lines();
 
-    if(gvs.plot === "P-x-y") {
+    if(gvs.plot_selection === "P-x-y") {
       let bubble_x = Math.min(gvs.z, Math.max(0, gvs.pxy_x_bubble_point()));
       let dew_x = Math.max(gvs.z, Math.min(1, gvs.pxy_x_dew_point()));
       if(isNaN(bubble_x)) { bubble_x = gvs.z }

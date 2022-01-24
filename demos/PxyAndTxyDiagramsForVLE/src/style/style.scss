@@ -162,3 +162,7 @@ canvas {
     opacity: 0.3 !important;
     pointer-events: none;
 }
+
+#pxy-plot-point:hover, #txy-plot-point:hover {
+    fill: lightslategrey !important;
+}

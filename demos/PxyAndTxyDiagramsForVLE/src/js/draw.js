@@ -3,7 +3,7 @@ function barGraph(p) {
   const bgh = p.height - 200;
   const left_padding = 30;
   p.push();
-  p.translate(5 * p.width / 6 - 30, p.height / 2);
+  p.translate(5 * p.width / 6, p.height / 2);
   p.line(-bgw / 2 + left_padding, -bgh / 2, -bgw / 2 + left_padding, bgh / 2);
   p.line(-bgw / 2 + left_padding, bgh / 2, bgw / 2, bgh / 2);
   p.textAlign(p.RIGHT);
@@ -21,8 +21,14 @@ function barGraph(p) {
   p.textAlign(p.CENTER);
   p.text("liquid", -25, bgh / 2 + 20);
   p.text("vapor", 60, bgh / 2 + 20);
-  const liquid_height = gvs.q * bgh;
-  const vapor_height = (1 - gvs.q) * bgh;
+  // we average a list of the previous 6 q values to prevent the bar graph from "jittering". It smooths the animation out a bit.
+  let q_avg = 0;
+  for(let i = 0; i < gvs.q_list.length; i++) {
+    q_avg += gvs.q_list[i];
+  }
+  q_avg /= gvs.q_list.length;
+  const liquid_height = q_avg * bgh;
+  const vapor_height = (1 - q_avg) * bgh;
   p.rectMode(p.CORNER);
   p.stroke(0);
   p.fill(0, 0, 255);
@@ -32,11 +38,11 @@ function barGraph(p) {
   p.noStroke();
   p.fill(0);
   let xA, yA;
-  if(gvs.plot === "P-x-y") {
-    if(gvs.pxy_x_bubble_point() > gvs.z || gvs.pxy_x_dew_point() < gvs.z) {
+  if(gvs.plot_selection === "P-x-y") {
+    if(gvs.pxy_x_bubble_point() >= gvs.z || gvs.pxy_x_dew_point() <= gvs.z) {
       xA = gvs.z;
       yA = gvs.z;
-      if(gvs.pxy_x_bubble_point() > gvs.z) {
+      if(gvs.pxy_x_bubble_point() >= gvs.z && gvs.P > gvs.Px(0)) {
         p.text(`x  = ${xA.toFixed(2)}`, -bgw / 4 + 30, bgh / 2 - liquid_height - 10);
         p.textSize(9);
         p.text("A", -bgw / 4 + 14, bgh / 2 - liquid_height - 5);
@@ -59,10 +65,10 @@ function barGraph(p) {
       p.text("A", 44, bgh / 2 - vapor_height - 5);
     }
   } else {
-    if(gvs.txy_x_bubble_point() > gvs.z || gvs.txy_x_dew_point() < gvs.z) {
+    if(gvs.txy_x_bubble_point() >= gvs.z || gvs.txy_x_dew_point() <= gvs.z) {
       xA = gvs.z;
       yA = gvs.z;
-      if(gvs.txy_x_bubble_point() > gvs.z) {
+      if(gvs.txy_x_bubble_point() >= gvs.z && gvs.T < gvs.Tx(0)) {
         p.text(`x  = ${xA.toFixed(2)}`, -bgw / 4 + 30, bgh / 2 - liquid_height - 10);
         p.textSize(9);
         p.text("A", -bgw / 4 + 14, bgh / 2 - liquid_height - 5);
@@ -88,13 +94,27 @@ function barGraph(p) {
   p.pop();
 
   p.push();
-  p.translate(5 * p.width / 6 - 30, p.height / 2);
+  p.translate(5 * p.width / 6 + 5, p.height / 2);
   p.translate(-bgw / 2 - 30, 80);
   p.rotate(-Math.PI / 2);
   p.fill(0);
   p.noStroke();
   p.textSize(14);
   p.text("liquid and vapor amounts (mol)", 0, 0);
+  p.pop();
+
+  p.push();
+  p.translate(5 * p.width / 6 + 5, p.height / 2);
+  p.translate(0, -bgh / 2);
+  p.fill(0);
+  p.noStroke();
+  p.textSize(16);
+  p.textAlign(p.CENTER, p.BOTTOM);
+  if(gvs.plot_selection === "P-x-y") {
+    p.text(`mixture is at ${gvs.P.toFixed(2)} bar`, 0, -40);
+  } else {
+    p.text(`mixture is at ${Math.round(gvs.T).toFixed(0)}° C`, 0, -40);
+  }
   p.pop();
 }
 
