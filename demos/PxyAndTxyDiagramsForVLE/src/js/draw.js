@@ -33,10 +33,10 @@ function barGraph(p) {
   p.fill(0);
   let xA, yA;
   if(gvs.plot === "P-x-y") {
-    if(gvs.pxy_x_bubble_point() > 0.45 || gvs.pxy_x_dew_point() < 0.45) {
-      xA = 0.45;
-      yA = 0.45;
-      if(gvs.pxy_x_bubble_point() > 0.45) {
+    if(gvs.pxy_x_bubble_point() > gvs.z || gvs.pxy_x_dew_point() < gvs.z) {
+      xA = gvs.z;
+      yA = gvs.z;
+      if(gvs.pxy_x_bubble_point() > gvs.z) {
         p.text(`x  = ${xA.toFixed(2)}`, -bgw / 4 + 30, bgh / 2 - liquid_height - 10);
         p.textSize(9);
         p.text("A", -bgw / 4 + 14, bgh / 2 - liquid_height - 5);
@@ -59,10 +59,10 @@ function barGraph(p) {
       p.text("A", 44, bgh / 2 - vapor_height - 5);
     }
   } else {
-    if(gvs.txy_x_bubble_point() > 0.45 || gvs.txy_x_dew_point() < 0.45) {
-      xA = 0.45;
-      yA = 0.45;
-      if(gvs.txy_x_bubble_point() > 0.45) {
+    if(gvs.txy_x_bubble_point() > gvs.z || gvs.txy_x_dew_point() < gvs.z) {
+      xA = gvs.z;
+      yA = gvs.z;
+      if(gvs.txy_x_bubble_point() > gvs.z) {
         p.text(`x  = ${xA.toFixed(2)}`, -bgw / 4 + 30, bgh / 2 - liquid_height - 10);
         p.textSize(9);
         p.text("A", -bgw / 4 + 14, bgh / 2 - liquid_height - 5);

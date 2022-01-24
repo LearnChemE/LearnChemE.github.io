@@ -48,17 +48,24 @@ gvs.saturation_pressure_B = function(T) {
 
 gvs.Px = function(x) {
   // Bubble-point pressure of the mixture, where x is the mole fraction of component A. Returns pressure in bar
-  return x * gvs.saturation_pressure_A( gvs.T ) + ( 1 - x ) * gvs.saturation_pressure_B( gvs.T )
+  const result = x * gvs.saturation_pressure_A( gvs.T ) + ( 1 - x ) * gvs.saturation_pressure_B( gvs.T );
+  return result
 }
 
 gvs.Py = function(x) {
   // Dew-point pressure of the mixture
   const numerator = x / gvs.saturation_pressure_A( gvs.T ) + ( 1 - x ) / gvs.saturation_pressure_B( gvs.T );
-  return 1 / numerator
+  const result = 1 / numerator;
+  return result
 }
 
 gvs.pxy_x_bubble_point = function() {
-  return (gvs.P - gvs.saturation_pressure_B(gvs.T)) / (gvs.saturation_pressure_A(gvs.T) - gvs.saturation_pressure_B(gvs.T))
+  for(let x = 0.000; x <= 1.00; x += 0.0001) {
+    if( gvs.Px(x) >= gvs.P ) {
+      return x
+    }
+  }
+  return 1
 }
 
 gvs.pxy_x_dew_point = function() {
@@ -67,6 +74,7 @@ gvs.pxy_x_dew_point = function() {
       return x
     }
   }
+  return 1
 }
 
 gvs.txy_x_bubble_point = function() {
@@ -75,6 +83,7 @@ gvs.txy_x_bubble_point = function() {
       return x
     }
   }
+  return 1
 }
 
 gvs.txy_x_dew_point = function() {
@@ -83,12 +92,14 @@ gvs.txy_x_dew_point = function() {
       return x
     }
   }
+  return 1
 }
 
 gvs.calc_Tsat = function() {
   const resolution = 100;
   const min_temperature = 40; // degrees C
   const max_temperature = 190;
+  const initial_temp = gvs.T;
   gvs.bubble_point_temperature_array = [];
   gvs.dew_point_temperature_array = [];
   for( let x = 0; x <= 1.01; x += 0.01 ) {
@@ -107,7 +118,8 @@ gvs.calc_Tsat = function() {
     gvs.bubble_point_temperature_array.push([x_2, gvs.arrayInterpolation(bubble_points, gvs.P)]);
     gvs.dew_point_temperature_array.push([x_2, gvs.arrayInterpolation(dew_points, gvs.P)]);
   }
-  gvs.T = Number(document.getElementById("T-slider").value); // Reset gvs.T so that the slider is still correct if they switch back to P-x-y
+  gvs.T = initial_temp;
+  // gvs.T = Number(document.getElementById("T-slider").value); // Reset gvs.T so that the slider is still correct if they switch back to P-x-y
 }
 
 gvs.Tx = function(x) {
@@ -122,11 +134,11 @@ gvs.Ty = function(x) {
 
 gvs.calc_tie_lines = function() {
   if(gvs.plot === "P-x-y") {
-    const vapor = (0.45 - gvs.pxy_x_bubble_point()) / (gvs.pxy_x_dew_point() - gvs.pxy_x_bubble_point());
+    let vapor = (gvs.z - gvs.pxy_x_bubble_point()) / (gvs.pxy_x_dew_point() - gvs.pxy_x_bubble_point());
     const liquid = 1 - vapor;
     gvs.q = Math.min(1, Math.max(0, liquid));
   } else {
-    const vapor = (0.45 - gvs.txy_x_bubble_point()) / (gvs.txy_x_dew_point() - gvs.txy_x_bubble_point());
+    const vapor = (gvs.z - gvs.txy_x_bubble_point()) / (gvs.txy_x_dew_point() - gvs.txy_x_bubble_point());
     const liquid = 1 - vapor;
     gvs.q = Math.min(1, Math.max(0, liquid));
   }
