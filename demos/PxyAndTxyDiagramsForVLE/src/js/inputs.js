@@ -220,8 +220,8 @@ document.addEventListener("mouseup", () => {
 document.addEventListener("mousemove", (e) => {
   if( gvs.isDragging && e.buttons === 1 ) {
     gvs.mouseCurrentPixels = [e.clientX, e.clientY];
-    const dx = gvs.mouseCurrentPixels[0] - gvs.mouseOriginalPixels[0];
-    const dy = gvs.mouseCurrentPixels[1] - gvs.mouseOriginalPixels[1];
+    const dx = e.ctrlKey ? 0 : gvs.mouseCurrentPixels[0] - gvs.mouseOriginalPixels[0];
+    const dy = e.shiftKey ? 0 : gvs.mouseCurrentPixels[1] - gvs.mouseOriginalPixels[1];
     let rect;
     
     if(gvs.plot_selection === "P-x-y") {
