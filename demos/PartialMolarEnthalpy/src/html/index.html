@@ -28,11 +28,7 @@
 </head>
 
 <body>
-  <div class="no-show">
-    $$
-    \newcommand{\overbar}[1]{\mkern 5.5mu\overline{\mkern-0.5mu#1\mkern-5.5mu}\mkern 0.5mu}
-    $$
-  </div>
+  <div class="no-show"></div>
 
   <div class="simulation-title">Partial Molar Enthalpy</div>
 
@@ -70,10 +66,10 @@
     <div id="partial-B-div" class="plot-dot"></div>
     <div id="pure-A-label" class="text-over-plot">\( H_{A} \)</div>
     <div id="pure-B-label" class="text-over-plot">\( H_{B} \)</div>
-    <div id="partial-A-label" class="text-over-plot shift-left">\( \overbar{ H_{A} } \)</div>
-    <div id="partial-B-label" class="text-over-plot shift-left">\( \overbar{ H_{B} } \)</div>
+    <div id="partial-A-label" class="text-over-plot shift-left">\( \overline{ H_{A} } \)</div>
+    <div id="partial-B-label" class="text-over-plot shift-left">\( \overline{ H_{B} } \)</div>
     <div id="above-plot-label">
-      \( \overbar{ H_{A} } = 59 \; \mathrm{ kJ / mol } \qquad \quad \overbar{ H_{B} } = 79 \; \mathrm{ kJ / mol } \)
+      \( \overline{ H_{A} } = 59 \; \mathrm{ kJ / mol } \qquad \quad \overline{ H_{B} } = 79 \; \mathrm{ kJ / mol } \)
     </div>
   </div>
 
@@ -91,7 +87,7 @@
         </div>
         <div class="modal-body">
           <p>
-            The molar enthalpy of a binary mixture (blue curve) of A and B is plotted as a function of the mole fraction of component A. The end points of the molar enthalpy are the pure-component enthalpies \( H_{A} \) and \( H_{B} \). The partial molar enthalpies \( \overbar{ H_{A} } \)&nbsp; and \( \overbar{ H_{B} } \) &nbsp;are obtained by drawing a tangent line (black, dashed) at the black point, which indicates the mole fraction of the solution. The intersections of this tangent with the y-axis at x<sub>A</sub> = 0 and x<sub>A</sub> = 1 correspond to \( \overbar{ H_{B} } \)&nbsp; and \( \overbar{ H_{A} } \), respectively. You can change the mole fraction of A in the mixture and the non-ideal parameter, which represents deviation from an ideal solution, with sliders. For an ideal solution the non-ideal parameter is zero, and the enthalpy of the mixture is a linear function of the molar enthalpies of the pure components.
+            The molar enthalpy of a binary mixture (blue curve) of A and B is plotted as a function of the mole fraction of component A. The end points of the molar enthalpy are the pure-component enthalpies \( H_{A} \) and \( H_{B} \). The partial molar enthalpies \( \overline{ H_{A} } \)&nbsp; and \( \overline{ H_{B} } \) &nbsp;are obtained by drawing a tangent line (black, dashed) at the black point, which indicates the mole fraction of the solution. The intersections of this tangent with the y-axis at x<sub>A</sub> = 0 and x<sub>A</sub> = 1 correspond to \( \overline{ H_{B} } \)&nbsp; and \( \overline{ H_{A} } \), respectively. You can change the mole fraction of A in the mixture and the non-ideal parameter, which represents deviation from an ideal solution, with sliders. For an ideal solution the non-ideal parameter is zero, and the enthalpy of the mixture is a linear function of the molar enthalpies of the pure components.
           </p>
 
         </div>
@@ -121,19 +117,19 @@
           $$
 
           <p>
-            where \( H_{i} \) is the enthalpy (kJ/mol), \( x_{A} \) and \( x_{B} \) are the compositions of A and B (where \( x_{B} = 1 - x_{A} \)), and \( \alpha \) is a non-ideal parameter. The partial molar enthalpy \( \overbar{ H_{i} } \) &nbsp; is represented by a line tangent to \( H \) at composition of the mixture \( x_{A, m} \)
+            where \( H_{i} \) is the enthalpy (kJ/mol), \( x_{A} \) and \( x_{B} \) are the compositions of A and B (where \( x_{B} = 1 - x_{A} \)), and \( \alpha \) is a non-ideal parameter. The partial molar enthalpy \( \overline{ H_{i} } \) &nbsp; is represented by a line tangent to \( H \) at composition of the mixture \( x_{A, m} \)
           </p>
 
           $$
-            [2] \quad \overbar{ H_{ A } } = H + x_{B} \frac{ dH }{ dx_{A} }
+            [2] \quad \overline{ H_{ A } } = H + x_{B} \frac{ dH }{ dx_{A} }
           $$
 
           $$
-            [3] \quad \overbar{ H_{ B } } = H + x_{A} \frac{ dH }{ dx_{A} }
+            [3] \quad \overline{ H_{ B } } = H + x_{A} \frac{ dH }{ dx_{A} }
           $$
 
           <p>
-            Where \( \overbar{H_{A}} \)&nbsp; is the partial molar enthalpy of component A and \( \overbar{H_{B}} \)&nbsp; is the partial molar enthalpy of component B. A screencast video showing how to use this simulation is available by clicking "view instructional video" above the simulation. Reference (1) below presents a supplemental example of partial molar enthalpy.
+            Where \( \overline{H_{A}} \)&nbsp; is the partial molar enthalpy of component A and \( \overline{H_{B}} \)&nbsp; is the partial molar enthalpy of component B. A screencast video showing how to use this simulation is available by clicking "view instructional video" above the simulation. Reference (1) below presents a supplemental example of partial molar enthalpy.
           </p>
 
           <p style="margin-bottom: 0.5rem;">References:</p>

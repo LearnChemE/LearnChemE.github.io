@@ -45,6 +45,7 @@ const sketch = (p) => {
                     plot_text[i].style.opacity = "1"
                 }
                 plot_label.style.opacity = "1";
+                gvs.updatePlot();
             } else {
                 first_resize = false;
             }

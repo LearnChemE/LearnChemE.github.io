@@ -60,7 +60,7 @@ function updateJax() {
   const HbarA = Math.round(gvs.partialMolar(1)).toFixed(0);
   const HbarB = Math.round(gvs.partialMolar(0)).toFixed(0);
   MathJax.typesetClear([plot_label]);
-  plot_label.innerHTML = `\\( \\overbar{ H_{A} } = ${HbarA} \\; \\mathrm{ kJ / mol } \\qquad \\quad \\overbar{ H_{B} } = ${HbarB} \\; \\mathrm{ kJ / mol } \\)`
+  plot_label.innerHTML = `\\( \\overline{ H_{A} } = ${HbarA} \\; \\mathrm{ kJ / mol } \\qquad \\quad \\overline{ H_{B} } = ${HbarB} \\; \\mathrm{ kJ / mol } \\)`
   MathJax.typesetPromise([plot_label]);
 }
 
