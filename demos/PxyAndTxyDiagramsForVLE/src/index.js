@@ -39,7 +39,19 @@ const sketch = (p) => {
         require("./js/graphs.js");
         require("./js/inputs.js");
         p.windowResized = function() {
-
+            const p5_container = document.getElementById("p5-container");
+            const p5_rect = p5_container.getBoundingClientRect();
+            const plot_container = document.getElementById("plot-container");
+            const p5_plot_margin_top = 20;
+            const p5_plot_margin_bottom = 20;
+            const p5_plot_margin_left = 15;
+            const p5_plot_margin_right = 50;
+            plot_container.style.top = `${p5_rect.top + p5_plot_margin_top}px`;
+            plot_container.style.left = `${p5_rect.left + p5_plot_margin_left}px`;
+            plot_container.style.height = `${gvs.p.height - p5_plot_margin_bottom - p5_plot_margin_top}px`;
+            plot_container.style.width = `${2 * gvs.p.width / 3 - p5_plot_margin_right}px`;
+            gvs.pxy_plot.redrawAxes();
+            gvs.txy_plot.redrawAxes();
         }
     };
 
