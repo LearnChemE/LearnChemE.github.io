@@ -25,7 +25,7 @@ function iterate() {
   gvs.F_CH4_7 = gvs.F_CH4_5 * (1 - gvs.R);
 
   iterations++;
-  if(iterations < 100) {
+  if(iterations < 500) {
     iterate()
   }
 }
