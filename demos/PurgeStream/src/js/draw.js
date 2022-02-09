@@ -5,20 +5,20 @@ function drawUnitOps(p) {
   p.stroke(0);
   p.strokeWeight(1);
   p.rectMode(p.CORNER);
-  p.rect(210, p.height / 2 - 100, 140, 80, 5);
+  p.rect(220, 165, 140, 80, 5);
   // Separator
-  p.rect(480, p.height / 2 - 100, 140, 80, 5);
+  p.rect(480, 165, 140, 80, 5);
 
   p.fill(0);
   p.noStroke();
   // Reactor
   p.textAlign(p.CENTER);
   p.textSize(18);
-  p.text(`reactor`, 280, p.height / 2 - 70);
-  p.text(`X = ${gvs.X.toFixed(2)}`, 280, p.height / 2 - 40);
+  p.text(`reactor`, 290, 195);
+  p.text(`X = ${gvs.X.toFixed(2)}`, 290, 225);
 
   // Separator
-  p.text(`separator`, 550, p.height / 2 - 60);
+  p.text(`separator`, 550, 205);
   p.pop();
 }
 
@@ -34,8 +34,23 @@ function arrow(p, x1, y1, x2, y2) {
   p.pop();
 }
 
-function drawArrows(p) {
-  // arrow(p, 10, 10, 50, 30);
+function drawIcons(p) {
+  arrow(p, 30, 205, 218, 205); // inlet
+  p.push();
+  p.fill(255);
+  p.strokeWeight(1);
+  p.circle(120, 205, 15);
+  p.pop();
+  arrow(p, 360, 205, 478, 205); // after reactor
+  arrow(p, 620, 205, 750, 205); // right of separator
+  arrow(p, 550, 245, 550, 450); // bottom of separator
+  p.line(550, 380, 120, 380);
+  p.push();
+  p.fill(255);
+  p.strokeWeight(1);
+  p.circle(550, 380, 15);
+  p.pop();
+  arrow(p, 120, 380, 120, 216);
 }
 
 function drawText(p) {
@@ -46,7 +61,7 @@ function drawText(p) {
 
 function drawAll(p) {
   drawUnitOps(p);
-  drawArrows(p);
+  drawIcons(p);
   drawText(p);
 }
 
