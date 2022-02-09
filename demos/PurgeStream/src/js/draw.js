@@ -15,7 +15,7 @@ function drawUnitOps(p) {
   p.textAlign(p.CENTER);
   p.textSize(18);
   p.text(`reactor`, 320, 195);
-  p.text(`X = ${gvs.X.toFixed(2)}`, 320, 225);
+  // p.text(`X = ${gvs.X.toFixed(2)}`, 320, 225);
 
   // Separator
   p.text(`separator`, 560, 205);

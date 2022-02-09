@@ -68,17 +68,17 @@ $modal-xl: 1140px;
 
 #flow-1 {
     top: 115px;
-    left: 15px;
+    left: 20px;
 }
 
 #flow-2 {
     top: 115px;
-    left: 155px;
+    left: 160px;
 }
 
 #flow-3 {
     top: 95px;
-    left: 393px;
+    left: 396px;
 }
 
 #flow-4 {
@@ -88,17 +88,24 @@ $modal-xl: 1140px;
 
 #flow-5 {
     top: 270px;
-    left: 590px;
+    left: 600px;
 }
 
 #flow-6 {
-    top: 400px;
-    left: 590px;
+    top: 420px;
+    left: 600px;
 }
 
 #flow-7 {
     top: 395px;
     left: 310px;
+}
+
+#conversion-text {
+    position: absolute;
+    left: 292px;
+    top: 204px;
+    font-size: 1.1rem;
 }
 
 canvas {
