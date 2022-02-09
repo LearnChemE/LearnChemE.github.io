@@ -43,8 +43,15 @@ const sketch = (p) => {
         require("./js/inputs.js");
         
         p.windowResized = function() {
-
+            const graphics_typesetting = document.getElementById("graphics-typesetting");
+            const p5_rect = document.getElementsByTagName("canvas")[0].getBoundingClientRect();
+            graphics_typesetting.style.left = `${p5_rect.left}px`;
+            graphics_typesetting.style.top = `${p5_rect.top}px`;
+            graphics_typesetting.style.width = `${p5_rect.width}px`;
+            graphics_typesetting.style.height = `${p5_rect.height}px`;
         }
+
+        p.windowResized();
     };
 
     p.draw = function() {
