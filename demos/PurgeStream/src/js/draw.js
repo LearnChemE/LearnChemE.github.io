@@ -63,10 +63,41 @@ function drawText(p) {
   p.pop();
 }
 
+function updateLabels() {
+  document.getElementById("FH2-1").innerHTML = `${gvs.F_H2_1.toFixed(1)}`;
+  document.getElementById("FN2-1").innerHTML = `${gvs.F_N2_1.toFixed(1)}`;
+  document.getElementById("FCH4-1").innerHTML = `${gvs.F_CH4_1.toFixed(1)}`;
+
+  document.getElementById("FH2-2").innerHTML = `${gvs.F_H2_2.toFixed(1)}`;
+  document.getElementById("FN2-2").innerHTML = `${gvs.F_N2_2.toFixed(1)}`;
+  document.getElementById("FCH4-2").innerHTML = `${gvs.F_CH4_2.toFixed(1)}`;
+
+  document.getElementById("FH2-3").innerHTML = `${gvs.F_H2_3.toFixed(1)}`;
+  document.getElementById("FN2-3").innerHTML = `${gvs.F_N2_3.toFixed(1)}`;
+  document.getElementById("FCH4-3").innerHTML = `${gvs.F_CH4_3.toFixed(1)}`;
+  document.getElementById("FNH3-3").innerHTML = `${gvs.F_NH3_3.toFixed(1)}`;
+
+  document.getElementById("FNH3-4").innerHTML = `${gvs.F_NH3_4.toFixed(1)}`;
+
+  document.getElementById("FH2-5").innerHTML = `${gvs.F_H2_5.toFixed(1)}`;
+  document.getElementById("FN2-5").innerHTML = `${gvs.F_N2_5.toFixed(1)}`;
+  document.getElementById("FCH4-5").innerHTML = `${gvs.F_CH4_5.toFixed(1)}`;
+
+  document.getElementById("FH2-6").innerHTML = `${gvs.F_H2_6.toFixed(1)}`;
+  document.getElementById("FN2-6").innerHTML = `${gvs.F_N2_6.toFixed(1)}`;
+  document.getElementById("FCH4-6").innerHTML = `${gvs.F_CH4_6.toFixed(1)}`;
+
+  document.getElementById("FH2-7").innerHTML = `${gvs.F_H2_7.toFixed(1)}`;
+  document.getElementById("FN2-7").innerHTML = `${gvs.F_N2_7.toFixed(1)}`;
+  document.getElementById("FCH4-7").innerHTML = `${gvs.F_CH4_7.toFixed(1)}`;
+
+}
+
 function drawAll(p) {
   drawUnitOps(p);
   drawIcons(p);
   drawText(p);
+  updateLabels();
 }
 
 module.exports = drawAll;
