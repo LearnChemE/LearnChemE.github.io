@@ -18,7 +18,7 @@ function drawUnitOps(p) {
   // p.text(`X = ${gvs.X.toFixed(2)}`, 320, 225);
 
   // Separator
-  p.text(`separator`, 560, 205);
+  p.text(`separator`, 560, 210);
   p.pop();
 }
 
@@ -35,6 +35,16 @@ function arrow(p, x1, y1, x2, y2) {
   p.pop();
 }
 
+function numberCircle(p, x, y, text) {
+  p.push();
+  p.textAlign(p.CENTER, p.CENTER);
+  p.strokeWeight(1);
+  p.circle(x, y, 25);
+  p.textSize(17);
+  p.text(text, x, y + 1);
+  p.pop();
+}
+
 function drawIcons(p) {
   arrow(p, 120, 205, 263, 205); // inlet
   arrow(p, 20, 205, 120, 205); // inlet
@@ -45,7 +55,7 @@ function drawIcons(p) {
   p.pop();
   arrow(p, 375, 205, 498, 205); // after reactor
   arrow(p, 620, 205, 750, 205); // right of separator
-  arrow(p, 560, 245, 560, 450); // bottom of separator
+  arrow(p, 560, 245, 560, 490); // bottom of separator
   arrow(p, 560, 245, 560, 370); // bottom of separator
   p.strokeWeight(2);
   arrow(p, 560, 380, 130, 380);
@@ -54,8 +64,15 @@ function drawIcons(p) {
   p.fill(255);
   p.strokeWeight(2);
   p.circle(560, 380, 15);
-  p.pop();
   arrow(p, 130, 380, 130, 216);
+  p.pop();
+  numberCircle(p, 60, 205, "1");
+  numberCircle(p, 200, 205, "2");
+  numberCircle(p, 430, 205, "3");
+  numberCircle(p, 690, 205, "4");
+  numberCircle(p, 560, 310, "5");
+  numberCircle(p, 560, 430, "6");
+  numberCircle(p, 260, 380, "7");
 }
 
 function drawText(p) {
@@ -63,10 +80,10 @@ function drawText(p) {
   p.textSize(18);
   p.text("All flow rates are in mol/s", 50, 50);
   p.text(`Fraction of feed lost to purge stream: ${(gvs.fraction_lost * 100).toFixed(1)}%`, 400, 40);
-  p.text(`Ratio of recycled CH  to feed CH  : ${(gvs.fraction_CH4).toFixed(1)}`, 400, 75);
+  p.text(`Ratio of recycled CH  to feed CH  : ${(gvs.fraction_CH4).toFixed(1)}`, 400, 70);
   p.textSize(13);
-  p.text(`4`, 565, 80);
-  p.text(`4`, 662, 80);
+  p.text(`4`, 565, 75);
+  p.text(`4`, 662, 75);
   p.pop();
 }
 
