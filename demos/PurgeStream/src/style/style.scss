@@ -102,6 +102,21 @@ $modal-xl: 1140px;
     margin-bottom: 0.25rem;
 }
 
+.flow-diagram {
+    width: 400px;
+    justify-self: center;
+}
+
+.equation-label {
+    margin-top: 15px;
+    margin-bottom: 10px !important;
+    margin-left: 0px !important;
+    font-size: 1rem;
+    text-decoration: underline;
+}
+
+
+
 #conversion-text {
     position: absolute;
     left: 292px;
@@ -130,6 +145,11 @@ canvas {
 .modal-body {
     text-align: left;
     font-size: 0.9rem;
+    display: grid;
+    p {
+        margin-bottom: 0px;
+        margin-left: 10px;
+    }
     .references {
         font-size: 0.8rem;
     }
