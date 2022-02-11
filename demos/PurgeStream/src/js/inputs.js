@@ -1,7 +1,7 @@
 const XSlider = document.getElementById("X-slider");
-const RSlider = document.getElementById("R-slider");
+const PSlider = document.getElementById("P-slider");
 const XValue = document.getElementById("X-value");
-const RValue = document.getElementById("R-value");
+const PValue = document.getElementById("P-value");
 
 XSlider.addEventListener("input", () => {
   gvs.X = Number(XSlider.value);
@@ -10,8 +10,8 @@ XSlider.addEventListener("input", () => {
   gvs.p.redraw();
 });
 
-RSlider.addEventListener("input", () => {
-  gvs.R = Number(RSlider.value);
-  RValue.innerHTML = `${gvs.R.toFixed(2)}`;
+PSlider.addEventListener("input", () => {
+  gvs.P = Number(PSlider.value);
+  PValue.innerHTML = `${gvs.P.toFixed(2)}`;
   gvs.p.redraw();
 });

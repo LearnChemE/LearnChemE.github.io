@@ -61,8 +61,12 @@ function drawIcons(p) {
 function drawText(p) {
   p.push();
   p.textSize(18);
-  p.text("All flow rates are in mol/s", p.width / 2 - 120, 50)
-  p.textSize(16);
+  p.text("All flow rates are in mol/s", 50, 50);
+  p.text(`Fraction of feed lost to purge stream: ${(gvs.fraction_lost * 100).toFixed(1)}%`, 400, 40);
+  p.text(`Ratio of recycled CH  to feed CH  : ${(gvs.fraction_CH4).toFixed(1)}`, 400, 80);
+  p.textSize(13);
+  p.text(`4`, 565, 85);
+  p.text(`4`, 662, 85);
   p.pop();
 }
 

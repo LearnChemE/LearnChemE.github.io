@@ -7,7 +7,7 @@ window.p5 = new require("./js/p5.min.js");
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
     X : 0.20,
-    R : 0.03,
+    P : 0.03,
     F_H2_1 : 74.1,
     F_N2_1 : 24.90,
     F_CH4_1 : 1.20,
@@ -28,6 +28,8 @@ window.gvs = {
     F_H2_7 : 256.7,
     F_N2_7 : 86.3,
     F_CH4_7 : 38.8,
+    fraction_lost : 0,
+    fraction_CH4 : 0,
 };
 
 const containerElement = document.getElementById("p5-container");
