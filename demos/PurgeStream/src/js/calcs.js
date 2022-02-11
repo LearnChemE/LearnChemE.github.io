@@ -7,7 +7,7 @@ function iterate() {
 
   gvs.F_H2_3 = (1 - gvs.X) * gvs.F_H2_2;
   gvs.F_N2_3 = (1 - gvs.X) * gvs.F_N2_2;
-  gvs.F_NH3_3 = gvs.X * gvs.F_N2_2;
+  gvs.F_NH3_3 = gvs.X * gvs.F_N2_2 / 2;
   gvs.F_CH4_3 = gvs.F_CH4_2;
 
   gvs.F_NH3_4 = gvs.F_NH3_3;

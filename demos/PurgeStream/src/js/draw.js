@@ -36,7 +36,8 @@ function arrow(p, x1, y1, x2, y2) {
 }
 
 function drawIcons(p) {
-  arrow(p, 20, 205, 263, 205); // inlet
+  arrow(p, 120, 205, 263, 205); // inlet
+  arrow(p, 20, 205, 120, 205); // inlet
   p.push();
   p.fill(255);
   p.strokeWeight(2);
@@ -45,8 +46,10 @@ function drawIcons(p) {
   arrow(p, 375, 205, 498, 205); // after reactor
   arrow(p, 620, 205, 750, 205); // right of separator
   arrow(p, 560, 245, 560, 450); // bottom of separator
+  arrow(p, 560, 245, 560, 370); // bottom of separator
   p.strokeWeight(2);
-  p.line(560, 380, 130, 380);
+  arrow(p, 560, 380, 130, 380);
+  arrow(p, 560, 380, 350, 380);
   p.push();
   p.fill(255);
   p.strokeWeight(2);
