@@ -63,10 +63,10 @@ function drawText(p) {
   p.textSize(18);
   p.text("All flow rates are in mol/s", 50, 50);
   p.text(`Fraction of feed lost to purge stream: ${(gvs.fraction_lost * 100).toFixed(1)}%`, 400, 40);
-  p.text(`Ratio of recycled CH  to feed CH  : ${(gvs.fraction_CH4).toFixed(1)}`, 400, 80);
+  p.text(`Ratio of recycled CH  to feed CH  : ${(gvs.fraction_CH4).toFixed(1)}`, 400, 75);
   p.textSize(13);
-  p.text(`4`, 565, 85);
-  p.text(`4`, 662, 85);
+  p.text(`4`, 565, 80);
+  p.text(`4`, 662, 80);
   p.pop();
 }
 
