@@ -45,6 +45,15 @@ const sketch = (p) => {
             plotPointContainer.style.height = `${rect.height}px`;
             plotPointContainer.style.left = `${rect.left}px`;
             plotPointContainer.style.top = `${rect.top}px`;
+            gvs.bottomLeftPoint = document.getElementsByClassName("bottom-left")[0];
+            gvs.bottomRightPoint = document.getElementsByClassName("bottom-right")[0];
+            gvs.topPoint = document.getElementsByClassName("top")[0];
+            gvs.bottomLeftPoint.style.top = `${gvs.t[0][1]}px`;
+            gvs.bottomLeftPoint.style.left = `${gvs.t[0][0]}px`;
+            gvs.bottomRightPoint.style.top = `${gvs.t[1][1]}px`;
+            gvs.bottomRightPoint.style.left = `${gvs.t[1][0]}px`;
+            gvs.topPoint.style.top = `${gvs.t[2][1]}px`;
+            gvs.topPoint.style.left = `${gvs.t[2][0]}px`;
         }
         p.windowResized();
     };
