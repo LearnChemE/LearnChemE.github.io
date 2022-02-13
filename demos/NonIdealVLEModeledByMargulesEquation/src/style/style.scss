@@ -1,0 +1,168 @@
+$modal-sm: calc( 100vw - 50px);
+$modal-md: calc( 100vw - 50px);
+$modal-lg: 800px;
+$modal-xl: 1140px;
+@import "bootstrap";
+@import "./slider.scss";
+.simulation-controls {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    justify-content: center;
+    gap: 0px 20px;
+    width: 100vw;
+}
+
+.modal-buttons-row {
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    gap: 10px;
+    margin: 0.5rem auto;
+    justify-content: center;
+    align-content: center;
+    .btn {
+        height: max-content;
+        width: 12ch;
+    }
+}
+
+.input-area {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    margin: 20px auto;
+    gap: 10px;
+    width: max-content;
+    justify-items: center;
+    align-items: center;
+    .input-row {
+        display: grid;
+        grid-template-columns: 100px 8rem 15px 25px;
+        gap: 1ch;
+        align-items: end;
+        .data-name {
+            justify-self: end;
+        }
+        .data-value {
+            text-align: end;
+        }
+        .data-metric {
+            transform: translateX(-4px);
+        }
+    }
+
+    #select-plot-container {
+        display: grid;
+        grid-template-columns: max-content 80px;
+        align-items: center;
+        gap: 10px;
+
+        select {
+            padding: 5px;
+        }
+    }
+}
+
+#plot-container {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+
+    .hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+.dashed {
+    stroke-dasharray: 5px;
+}
+
+.tick-labels {
+    &.hidden {
+        opacity: 0;
+        pointer-events: none;
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Safari */
+         -khtml-user-select: none; /* Konqueror HTML */
+           -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+                user-select: none;
+    }
+}
+
+.axes-labels {
+    pointer-events: none;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
+}
+
+.svg-text {
+    pointer-events: none;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
+}
+
+#p5-container {
+    width: max-content;
+    margin: auto;
+}
+
+canvas {
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    box-shadow: 0px 0px 2px 2px lightgrey;
+}
+
+#loading {
+    margin-left: 15px;
+    font-size: 1.5rem;
+    width: 100vw;
+    text-align: center;
+}
+
+.modal.show {
+    padding-left: 0px !important;
+}
+
+.modal-body {
+    text-align: left;
+    font-size: 0.9rem;
+    .references {
+        font-size: 0.8rem;
+    }
+    ol {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        &>li {
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+        }
+    }
+}
+
+.simulation-title {
+    width: 100vw;
+    text-align: center;
+    padding: 8px;
+    padding-bottom: 10px;
+    font-size: 1.25rem;
+    background-color: rgb(240, 240, 240);
+}
+
+*[disabled="yes"] {
+    opacity: 0.3 !important;
+    pointer-events: none;
+}
+
+#pxy-plot-point:hover, #txy-plot-point:hover {
+    fill: lightslategrey !important;
+}
