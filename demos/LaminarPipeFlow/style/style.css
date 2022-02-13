@@ -79,12 +79,17 @@ canvas {
   grid-template-columns: max-content max-content;
   align-items: center;
   gap: 0px 10px;
+  height: max-content;
 }
 
 #p5-container {
   display: grid;
   grid-template-columns: max-content  max-content;
   gap: 15px;
+  position: absolute;
+  top: 120px;
+  left: 50%;
+  transform:translateX(-50%);
 }
 
 .input-area {
