@@ -45,11 +45,11 @@ function barGraph(p) {
       if(gvs.pxy_x_bubble_point() >= gvs.z && gvs.P > gvs.Px(0)) {
         p.text(`x  = ${xA.toFixed(2)}`, -bgw / 4 + 30, bgh / 2 - liquid_height - 10);
         p.textSize(9);
-        p.text("h", -bgw / 4 + 14, bgh / 2 - liquid_height - 5);
+        p.text("H", -bgw / 4 + 14, bgh / 2 - liquid_height - 5);
       } else {
         p.text(`y  = ${yA.toFixed(2)}`, 60, bgh / 2 - vapor_height - 10);
         p.textSize(9);
-        p.text("h", 44, bgh / 2 - vapor_height - 5);
+        p.text("H", 44, bgh / 2 - vapor_height - 5);
       }
     } else {
       xA = Math.max(0, Math.min(1, gvs.pxy_x_bubble_point()));
@@ -58,11 +58,11 @@ function barGraph(p) {
       yA = yA.toFixed(2);
       p.text(`x  = ${xA}`, -bgw / 4 + 30, bgh / 2 - liquid_height - 10);
       p.textSize(9);
-      p.text("h", -bgw / 4 + 14, bgh / 2 - liquid_height - 5);
+      p.text("H", -bgw / 4 + 14, bgh / 2 - liquid_height - 5);
       p.textSize(14);
       p.text(`y  = ${yA}`, 60, bgh / 2 - vapor_height - 10);
       p.textSize(9);
-      p.text("h", 44, bgh / 2 - vapor_height - 5);
+      p.text("H", 44, bgh / 2 - vapor_height - 5);
     }
   } else {
     if(gvs.txy_x_bubble_point() >= gvs.z || gvs.txy_x_dew_point() <= gvs.z) {
@@ -71,11 +71,11 @@ function barGraph(p) {
       if(gvs.txy_x_bubble_point() >= gvs.z && gvs.T < gvs.Tx(0)) {
         p.text(`x  = ${xA.toFixed(2)}`, -bgw / 4 + 30, bgh / 2 - liquid_height - 10);
         p.textSize(9);
-        p.text("h", -bgw / 4 + 14, bgh / 2 - liquid_height - 5);
+        p.text("H", -bgw / 4 + 14, bgh / 2 - liquid_height - 5);
       } else {
         p.text(`y  = ${yA.toFixed(2)}`, 60, bgh / 2 - vapor_height - 10);
         p.textSize(9);
-        p.text("h", 44, bgh / 2 - vapor_height - 5);
+        p.text("H", 44, bgh / 2 - vapor_height - 5);
       }
     } else {
       xA = Math.max(0, Math.min(1, gvs.txy_x_bubble_point()));
@@ -84,11 +84,11 @@ function barGraph(p) {
       yA = yA.toFixed(2);
       p.text(`x  = ${xA}`, -bgw / 4 + 30, bgh / 2 - liquid_height - 10);
       p.textSize(9);
-      p.text("h", -bgw / 4 + 14, bgh / 2 - liquid_height - 5);
+      p.text("H", -bgw / 4 + 14, bgh / 2 - liquid_height - 5);
       p.textSize(14);
       p.text(`y  = ${yA}`, 60, bgh / 2 - vapor_height - 10);
       p.textSize(9);
-      p.text("h", 44, bgh / 2 - vapor_height - 5);
+      p.text("H", 44, bgh / 2 - vapor_height - 5);
     }
   }
   p.pop();
