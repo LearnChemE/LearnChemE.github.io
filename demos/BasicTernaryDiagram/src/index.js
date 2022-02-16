@@ -13,6 +13,13 @@ window.gvs = {
     center : [350, 300], // The center of the triangle
     t : [[], [], []], // triangle coordinates. Used a short variable name to reduce the amount of typing
     tL : 400, // Triangle side length. Used a short variable name to reduce amount of typing
+    colorA : "rgb(120, 180, 50)",
+    colorB : "rgb(0, 0, 0)",
+    colorC : "rgb(150, 150, 255)",
+    colorLines : "rgb(220, 220, 220)",
+    xA : 0.33,
+    xB : 0.33,
+    xC : 0.34,
 };
 
 gvs.pointLocation = [gvs.center[0], gvs.center[1]];

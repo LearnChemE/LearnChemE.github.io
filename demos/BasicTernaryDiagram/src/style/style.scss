@@ -89,20 +89,20 @@ canvas {
     #plot-point {
         pointer-events: all !important;
         position: absolute;
-        transform: translateX(5px);
+        transform: translate(-50%, -50%);
         left: 350px;
         top: 265px;
         background-color: darkslategray;
-        width: 11px;
-        height: 11px;
+        width: 8px;
+        height: 8px;
         border-radius: 5.5px;
         border: 1px solid black;
         box-shadow: 0px 0px 2px 1px black;
     }
     .plot-point-static {
         position: absolute;
-        width: 8px;
-        height: 8px;
+        width: 1px;
+        height: 1px;
         border-radius: 4px;
         background-color: black;
         transform: translate(-50%, -50%);
