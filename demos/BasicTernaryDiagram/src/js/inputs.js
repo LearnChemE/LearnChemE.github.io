@@ -1,6 +1,8 @@
 const plotPoint = document.getElementById("plot-point");
 const plotPointContainer = document.getElementById("plot-point-container");
 const containerRect = plotPointContainer.getBoundingClientRect();
+const viewSelect = document.getElementById("select-view");
+const showGrid = document.getElementById("show-grid-lines");
 
 plotPoint.addEventListener("mousedown", (e) => {
   gvs.mousedown = true;
@@ -78,16 +80,26 @@ document.addEventListener("mousemove", (e) => {
     let wtC = Math.round(1000 * (px - py / Math.sqrt(3)));
 
     if(wtA + wtB + wtA !== 1000) {
-      wtC = 1000 - wtA - wtB
-      if(wtC < 0) {wtC = 0; wtB = 1000 - wtB}
+      if(wtA + wtB > 1000) {
+        wtB = 1000 - wtA
+        wtC = 0;
+      }
+      if(wtA + wtC > 1000) {
+        wtC = 1000 - wtA
+        wtB = 0;
+      }
+      if(wtB + wtC > 1000) {
+        wtC = 1000 - wtB
+        wtA = 0;
+      }
     }
     wtA = wtA / 1000;
     wtB = wtB / 1000;
     wtC = wtC / 1000;
 
-    gvs.xA = wtA;
-    gvs.xB = wtB;
-    gvs.xC = wtC;
+    gvs.xA = Math.abs(wtA);
+    gvs.xB = Math.abs(wtB);
+    gvs.xC = Math.abs(wtC);
 
     plotPoint.style.left = `${gvs.dragCoords[0]}px`;
     plotPoint.style.top = `${gvs.dragCoords[1]}px`;
@@ -96,3 +108,14 @@ document.addEventListener("mousemove", (e) => {
   }
 });
 
+viewSelect.addEventListener("change", () => {
+  const selection = viewSelect.value;
+  gvs.view = selection;
+  gvs.p.redraw();
+});
+
+showGrid.addEventListener("change", () => {
+  const checked = showGrid.checked;
+  gvs.show_grid = checked;
+  gvs.p.redraw();
+})

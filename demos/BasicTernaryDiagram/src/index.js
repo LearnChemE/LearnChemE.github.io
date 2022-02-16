@@ -14,12 +14,21 @@ window.gvs = {
     t : [[], [], []], // triangle coordinates. Used a short variable name to reduce the amount of typing
     tL : 400, // Triangle side length. Used a short variable name to reduce amount of typing
     colorA : "rgb(120, 180, 50)",
-    colorB : "rgb(0, 0, 0)",
+    colorB : "rgb(255, 0, 0)",
     colorC : "rgb(150, 150, 255)",
     colorLines : "rgb(220, 220, 220)",
     xA : 0.33,
     xB : 0.33,
     xC : 0.34,
+    // the following are the pixel coordinates of the edges of the arrows
+    xA_x : 484,
+    xA_y : 300,
+    xB_x : 284,
+    xB_y : 183.4,
+    xC_x : 286,
+    xC_y : 415.5,
+    view : "standard",
+    show_grid : true,
 };
 
 gvs.pointLocation = [gvs.center[0], gvs.center[1]];
