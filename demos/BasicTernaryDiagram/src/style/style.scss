@@ -55,7 +55,11 @@ canvas {
     font-size: 0.9rem;
 
     .references {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
+        .list-link {
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
     }
 
     ol {
@@ -99,12 +103,12 @@ canvas {
         transform: translate(-50%, -50%);
         left: 350px;
         top: 265px;
-        background-color: darkslategray;
-        width: 10px;
-        height: 10px;
+        background-color: rgb(20, 20, 20);
+        width: 11px;
+        height: 11px;
         border-radius: 5.5px;
         border: 1px solid black;
-        box-shadow: 0px 0px 2px 1px black;
+        box-shadow: 0px 0px 2px 1px white;
     }
 
     .plot-point-static {
@@ -208,4 +212,9 @@ canvas {
             background-color: #2196F3;
         }
     }
+}
+
+.references-label {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
 }
