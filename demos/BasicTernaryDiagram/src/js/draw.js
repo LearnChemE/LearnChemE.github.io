@@ -210,7 +210,8 @@ function drawMoleFractionLines_alternate(p) {
     p.rect(label_xC_x - 19, label_xC_y - 11, label_xC_x + 19, label_xC_y + 11);
     p.fill(gvs.colorC);
     p.noStroke();
-    p.text(`${gvs.xC.toFixed(2)}`, label_xC_x, label_xC_y + 1);
+    const xC = (1 - Number(gvs.xA.toFixed(2)) - Number(gvs.xB.toFixed(2))).toFixed(2);
+    p.text(`${xC}`, label_xC_x, label_xC_y + 1);
   }
   p.pop();
 }
@@ -238,7 +239,8 @@ function drawMassFractionsLabel(p) {
   // xC
   p.fill(gvs.colorC);
   p.textSize(18);
-  p.text(`x  = ${gvs.xC.toFixed(2)}`, 65, 146);
+  const xC = (1 - Number(gvs.xA.toFixed(2)) - Number(gvs.xB.toFixed(2))).toFixed(2);
+  p.text(`x  = ${xC}`, 65, 146);
   p.textSize(11);
   p.text("C", 74, 152);
   p.pop();
@@ -272,7 +274,8 @@ function drawFloatingLabels_standard(p) {
   p.noStroke();
   p.fill(gvs.colorC);
   p.textSize(15);
-  p.text(`${gvs.xC.toFixed(2)}`, gvs.xC_x - 18, gvs.xC_y + 23);
+  const xC = (1 - Number(gvs.xA.toFixed(2)) - Number(gvs.xB.toFixed(2))).toFixed(2);
+  p.text(`${xC}`, gvs.xC_x - 18, gvs.xC_y + 23);
       
   p.pop();
 }

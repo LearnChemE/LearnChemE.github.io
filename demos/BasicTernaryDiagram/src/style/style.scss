@@ -111,6 +111,10 @@ canvas {
         box-shadow: 0px 0px 2px 1px white;
     }
 
+    #plot-point:hover {
+        box-shadow: 0px 0px 1px 1px rgb(176, 176, 176);
+    }
+
     .plot-point-static {
         position: absolute;
         width: 1px;

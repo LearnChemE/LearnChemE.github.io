@@ -12,10 +12,14 @@ plotPoint.addEventListener("mousedown", (e) => {
 document.addEventListener("mouseup", () => {
   gvs.mousedown = false;
   gvs.pointLocation = [ gvs.dragCoords[0], gvs.dragCoords[1] ];
+  document.getElementById("plot-point").style.removeProperty(`box-shadow`);
+  document.getElementById("plot-point").style.removeProperty(`background-color`);
 });
 
 document.addEventListener("mousemove", (e) => {
   if(gvs.mousedown) {
+    document.getElementById("plot-point").style.boxShadow = `0px 0px 3px 3px white`;
+    document.getElementById("plot-point").style.backgroundColor = `rgb(80, 80, 80)`;
     const dx = e.clientX - gvs.mouseStart[0];
     const dy = e.clientY - gvs.mouseStart[1];
     gvs.dragCoords[0] = gvs.pointLocation[0] + dx;
