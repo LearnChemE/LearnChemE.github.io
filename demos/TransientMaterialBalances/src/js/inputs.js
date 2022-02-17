@@ -137,6 +137,7 @@ gvs.reset_simulation = function() {
   gvs.v_graph.options.axes.x.range[1] = 30;
   gvs.v_graph.options.axes.x.step = 5;
   gvs.v_graph.redrawAxes();
+  gvs.init();
 }
 
 select_plot.addEventListener("change", () => {

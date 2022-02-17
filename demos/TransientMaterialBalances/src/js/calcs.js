@@ -6,7 +6,7 @@ function vOut(h) {
   return velocity * gvs.Aout * 1000; // outlet volumetric flow rate (L/s)
 }
 
-function init() {
+gvs.init = function() {
   gvs.t = 0;
   gvs.V = gvs.V0;
   gvs.CA = 1.0;
@@ -21,12 +21,12 @@ function init() {
 function advance() {
   const dt = gvs.speed / gvs.p.frameRate();
   gvs.t += dt;
+  gvs.h = (gvs.V / 1000) / gvs.A; // height of liquid (m)
   gvs.v = vOut(gvs.h);
   gvs.V += dt * gvs.v0 - dt * gvs.v;
   gvs.r = -gvs.k * gvs.CA;
   gvs.N += dt * gvs.v0 * gvs.CA0 - dt * gvs.v * gvs.CA + dt * gvs.r * gvs.V;
   gvs.CA = gvs.N / gvs.V;
-  gvs.h = (gvs.V / 1000) / gvs.A; // height of liquid (m)
 
   gvs.V_array.push([gvs.t, gvs.V]);
   gvs.CA_array.push([gvs.t, gvs.CA]);
@@ -66,7 +66,7 @@ function advance() {
 
 function calcAll() {
   if(gvs.is_running === false) {
-    init();
+    gvs.init();
   } else {
     advance();
   }
