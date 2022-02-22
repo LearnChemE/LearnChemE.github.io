@@ -169,9 +169,34 @@ function drawEquilibrium(p) {
   p.pop();
 }
 
+function drawConstantTemperature(p) {
+  const constant_temperature_lines = calcs.constant_temperature_lines;
+  p.push();
+  p.stroke(255, 0, 0);
+  p.strokeWeight(1);
+  p.noFill();
+  for(let i = 0; i < constant_temperature_lines.length; i++) {
+    const constant_temperature = constant_temperature_lines[i];
+    p.beginShape();
+    console.log(constant_temperature);
+    for(let j = 0; j < constant_temperature.length; j++) {
+      const V = constant_temperature[j][0];
+      const P = constant_temperature[j][1];
+      const V_coord = gvs.graph.width * (Math.log10(V) + 4) / 6;
+      const P_coord = gvs.graph.height - gvs.graph.height * (Math.log10(P) + 2) / 4;
+      if(P_coord <= gvs.graph.height && V_coord < gvs.graph.width) {
+        p.vertex(V_coord, P_coord);
+      }
+    }
+    p.endShape();
+  }
+  p.pop();
+}
+
 function drawAll(p) {
   drawAxes(p);
   drawEquilibrium(p);
+  drawConstantTemperature(p);
 }
 
 module.exports = drawAll;
