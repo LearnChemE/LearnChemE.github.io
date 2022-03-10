@@ -89,3 +89,16 @@
     opacity: 0;
     pointer-events: none;
 }
+
+#arrows-container {
+    position: absolute;
+    top: 80px;
+    padding: 20px;
+    display: grid;
+
+    .arrow {
+        width: 60px;
+        position: absolute;
+        display: none;
+    }
+}

@@ -1,3 +1,5 @@
+const { arrow } = require("@popperjs/core");
+
 require("bootstrap");
 require("./style/style.scss");
 // TO DO:
@@ -73,7 +75,7 @@ for (let row = 0; row < rows; row++) {
                 const start_left = bubble_rect.left;
                 const start_top = bubble_rect.top;
                 const end_left = page_width / 2 - start_left;
-                const end_top = container_margin_top + container_height / 2 - start_top;
+                const end_top = container_margin_top + container_height / 3 - start_top;
 
                 const topic_data = gvs.topics[topic_key];
                 const topics_to_learn_beforehand = topic_data.topics_to_learn_beforehand;
@@ -92,7 +94,7 @@ for (let row = 0; row < rows; row++) {
                         topic_i_elt.style.left = `${end_left}px`;
                         topic_i_elt.style.top = `${end_top}px`;
                         topic_i_elt.style.transform = `translate(-50%, -50%)`;
-
+                        let arrow_number = 1;
                         const exit = document.getElementById(`exit-${topic_id}`);
                         exit.style.display = "block";
                         exit.style.cursor = "pointer";
@@ -105,11 +107,17 @@ for (let row = 0; row < rows; row++) {
                             const topic_to_learn_beforehand = topics_to_learn_beforehand[j];
                             const id = gvs.topics[topic_to_learn_beforehand].id;
                             const elt = document.getElementById(id);
+                            const arrow_elt = document.getElementById(`arrow-${arrow_number}`);
                             const rect = elt.getBoundingClientRect();
                             const start_left = rect.left;
                             const start_top = rect.top;
                             const end_left = page_width / 2 - start_left + radius_x * Math.cos(angle);
-                            const end_top = container_margin_top + container_height / 2 - start_top + radius_y * Math.sin(angle);
+                            const end_top = container_margin_top + container_height / 3 - start_top + radius_y * Math.sin(angle);
+                            const middle_elt_left = topic_i_elt.getBoundingClientRect().left;
+                            const middle_elt_top = topic_i_elt.getBoundingClientRect().top;
+                            const arrow_elt_end_left = `${middle_elt_left}px`;
+                            const arrow_elt_end_top = `${middle_elt_top}px`;
+                            console.log();
                             window.setTimeout(() => {
                                 elt.classList.remove("hide");
                                 elt.classList.remove("unselected");
@@ -118,19 +126,24 @@ for (let row = 0; row < rows; row++) {
                                 elt.style.transform = `translate(-50%, -50%)`;
                                 elt.style.left = `${end_left}px`;
                                 elt.style.top = `${end_top}px`;
+                                arrow_elt.style.display = "block";
+                                arrow_elt.style.top = arrow_elt_end_top;
+                                arrow_elt.style.left = arrow_elt_end_left;
                             }, 100)
                             angle += angle_increment;
+                            arrow_number++;
                         }
 
                         for(let j = 0; j < topics_to_learn_afterwards.length; j++) {
                             const topic_to_learn_afterwards = topics_to_learn_afterwards[j];
                             const id = gvs.topics[topic_to_learn_afterwards].id;
                             const elt = document.getElementById(id);
+                            const arrow_elt = document.getElementById(`arrow-${arrow_number}`);
                             const rect = elt.getBoundingClientRect();
                             const start_left = rect.left;
                             const start_top = rect.top;
                             const end_left = page_width / 2 - start_left + radius_x * Math.cos(angle);
-                            const end_top = container_margin_top + container_height / 2 - start_top + radius_y * Math.sin(angle);
+                            const end_top = container_margin_top + container_height / 3 - start_top + radius_y * Math.sin(angle);
                             window.setTimeout(() => {
                                 elt.classList.remove("hide");
                                 elt.classList.remove("unselected");
@@ -139,8 +152,14 @@ for (let row = 0; row < rows; row++) {
                                 elt.style.transform = `translate(-50%, -50%)`;
                                 elt.style.left = `${end_left}px`;
                                 elt.style.top = `${end_top}px`;
+                                arrow_elt.style.display = "block";
                             }, 100)
                             angle += angle_increment;
+                            arrow_number++;
+                        }
+
+                        for(let k = arrow_number; k <= 8; k++) {
+                            document.getElementById(`arrow-${k}`).style.display = "none";
                         }
                     }
                 }
