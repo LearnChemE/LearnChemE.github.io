@@ -1,0 +1,91 @@
+@import "bootstrap";
+
+#map-label {
+    width: 100vw;
+    height: 60px;
+    display: grid;
+    text-align: center;
+    justify-items: center;
+    align-items: center;
+    font-size: 1.1rem;
+    grid-template-columns: repeat(2, max-content);
+    justify-content: center;
+    justify-items: center;
+}
+
+@media screen and (max-width: 820px) {
+    #map-label {
+        grid-template-columns: max-content;
+    }
+}
+
+#map-container {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: calc(100vh - 85px);
+    display: grid;
+    justify-content: space-around;
+    grid-template-rows: repeat(40, max-content);
+    row-gap: 20px;
+}
+
+.bubble {
+    height: 90px;
+    font-size: 0.9rem;
+    background-color: lightblue;
+    border: 1px solid black;
+    border-radius: 18px;
+    box-shadow: 0px 0px 2px 2px grey;
+    transition: left 1s, top 1s, transform 1s, opacity 750ms;
+    padding: 0px 15px;
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    top: 0px;
+    left: 0px;
+
+    .topic-innertext {
+        overflow-wrap: break-word;
+    }
+
+    .exit-topic {
+        position: absolute;
+        right: 12px;
+        top: 3px;
+        font-size: 0.8rem;
+    }
+}
+
+.bubble.unselected {
+    cursor: pointer;
+
+    .exit-topic {
+        display: none;
+    }
+}
+
+.bubble.unselected:hover {
+    box-shadow: 0px 0px 2px 2px lightgreen;
+    background-color: rgb(193, 236, 250);
+}
+
+.bubble.selected {
+    box-shadow: 0px 0px 2px 2px grey;
+    background-color: rgb(193, 236, 250);
+    cursor: default;
+    pointer-events: none;
+
+    .exit-topic:hover {
+        color: rgb(255, 100, 100);
+    }
+}
+
+.bubble.hide {
+    cursor: default;
+    opacity: 0;
+    pointer-events: none;
+}
