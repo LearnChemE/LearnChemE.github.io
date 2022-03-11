@@ -29,16 +29,27 @@
 
 .input-row {
   display: grid;
-  grid-template-columns: max-content 150px 20px max-content;
+  grid-template-columns: max-content 150px 15px max-content;
   gap: 10px;
   align-items: end;
   justify-items: center;
   height: 15px;
 }
 
+.select-row {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 10px;
+  align-items: center;
+}
+
+select {
+  padding: 2px 5px;
+}
+
 #graphics-wrapper {
   position: absolute;
-  top: 130px;
+  top: 135px;
   width: 100vw;
   height: max-content;
   display: grid;

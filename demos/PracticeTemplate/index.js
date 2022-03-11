@@ -1,14 +1,15 @@
-// Declare global variables within this object. They will be available across all files as "g.variable_name".You can make another script file aside from index.js by putting <script src="./path-to/other-js-file.js"></script> after the "index.js" HTML element. All the variables you declare in this file will be accessible there. But only variables declared at the top here will be accessible. It's best practice to store your global variables within an object E.G. g.rng_1_value because it will minimize the risk of namespace issues.
-let g = {
+// Declare global variables within this object. They will be available across all files as "g.variable_name".You can make another script file aside from index.js by putting <script src="./path-to/other-js-file.js"></script> after the "index.js" HTML element. All the variables you declare in this file will be accessible there. It's best practice to store your global variables within an object E.G. "g.rng_1_value" because it will minimize the risk of namespace issues.
+window.g = {
   cnv : undefined,
   rng_1_value : 0,
   rng_2_value : 0,
   rng_3_value : 0,
+  select_value : "value-1",
 }
 
-// See https://p5js.org/ to learn how to use this graphics library.
+// See https://p5js.org/ to learn how to use this graphics library. setup() and draw() are used to draw on the canvas object of the page.  Seriously, spend some time learning p5.js because it will make drawing graphics a lot easier.  You can watch tutorial videos on the "Coding Train" youtube channel. They have a p5.js crash course under their playlists section.  It will make these functions make a lot more sense.
 function setup() {
-  // Create a p5.js canvas 800px wide and 800px high, and assign it to the global variable "cnv".
+  // Create a p5.js canvas 800px wide and 600px high, and assign it to the global variable "cnv".
   g.cnv = createCanvas(800, 600);
 
   // Set the parent element to "graphics-wrapper"
@@ -41,6 +42,8 @@ const range_2_element = document.getElementById("range-2");
 const range_2_value_label = document.getElementById("range-2-value");
 const range_3_element = document.getElementById("range-3");
 const range_3_value_label = document.getElementById("range-3-value");
+const select_element = document.getElementById("select-1");
+const select_label = document.getElementById("select-value");
 
 range_1_element.addEventListener("input", function() {
   const rng_1_value = Number(range_1_element.value); // range_1_element.value is a string by default, so we need to convert it to a number.
@@ -62,3 +65,10 @@ range_3_element.addEventListener("input", function() {
   g.rng_3_value = rng_3_value;
   console.log(`g.rng_3_value is ${g.rng_3_value}`);
 });
+
+select_element.addEventListener("change", function() {
+  const select_value = select_element.value;
+  select_label.innerHTML = `Selection value is: <span style="color:orange" >${select_value}</span>.`
+  g.select_value = select_value;
+  console.log(`g.select_value is ${select_value}`);
+})
