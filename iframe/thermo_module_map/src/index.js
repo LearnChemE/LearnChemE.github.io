@@ -1,14 +1,50 @@
-const { arrow } = require("@popperjs/core");
+const {
+    arrow
+} = require("@popperjs/core");
 
 require("bootstrap");
 require("./style/style.scss");
+window.p5 = new require("./js/p5.js");
+
 // TO DO:
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
     topics: undefined,
     bubble_selected: false,
+    arrows: {
+        center: [],
+        before: [],
+        after: [],
+    }
 };
+
+const containerElement = document.getElementById("p5-container");
+
+const sketch = (p) => {
+
+    p.setup = function () {
+        const width = Number(window.innerWidth);
+        const height = Number(window.innerHeight);
+        window.canvasElt = p.createCanvas(width, height);
+        p.noLoop();
+        gvs.p = p;
+        gvs.drawAll = require("./js/draw.js");
+        p.windowResized = function () {
+            const width = Number(window.innerWidth);
+            const height = Number(window.innerHeight);
+            window.canvasElt.resize(width, height);
+        }
+    };
+
+    p.draw = function () {
+        gvs.drawAll(p);
+    };
+
+};
+
+const P5 = new p5(sketch, containerElement);
+// TO DO:
 
 require("./js/topics.js");
 
@@ -27,7 +63,7 @@ const topics_length = topics_list.length;
 const bubble_width = 180; // width of each map topic (a.k.a. bubble) (px)
 const margins = [
     [20, 20],
-    [80, 30]
+    [130, 30]
 ]; // margins on each side of the map container [[left, right], [top, bottom]] (px)
 const gap = 10; // gap between each bubble: [left/right, top/bottom] (px)
 
@@ -67,6 +103,11 @@ for (let row = 0; row < rows; row++) {
             map_container.appendChild(bubble);
 
             bubble.addEventListener("click", () => {
+                gvs.arrows = {
+                    center: [],
+                    before: [],
+                    after: [],
+                };
                 const page_width = window.innerWidth;
                 const container_rect = document.getElementById("map-container").getBoundingClientRect();
                 const bubble_rect = bubble.getBoundingClientRect();
@@ -74,9 +115,9 @@ for (let row = 0; row < rows; row++) {
                 const container_margin_top = container_rect.top;
                 const start_left = bubble_rect.left;
                 const start_top = bubble_rect.top;
-                const end_left = page_width / 2 - start_left;
-                const end_top = container_margin_top + container_height / 3 - start_top;
-
+                const center_bubble_end_left = page_width / 2 - start_left;
+                const center_bubble_end_top = container_margin_top + container_height / 3 - start_top;
+                gvs.arrows.center.push([center_bubble_end_left + start_left, center_bubble_end_top + start_top]);
                 const topic_data = gvs.topics[topic_key];
                 const topics_to_learn_beforehand = topic_data.topics_to_learn_beforehand;
                 const topics_to_learn_afterwards = topic_data.topics_to_learn_afterwards;
@@ -85,16 +126,15 @@ for (let row = 0; row < rows; row++) {
                 for (let i = 0; i < topics_length; i++) {
                     const topic_id_i = gvs.topics[topics_list[i]].id;
                     const topic_i_elt = document.getElementById(topic_id_i);
-                    
+
                     if (topic_id_i !== topic_id && gvs.bubble_selected == false) {
                         topic_i_elt.classList.add("hide");
                     } else if (gvs.bubble_selected == false) {
                         topic_i_elt.classList.add("selected");
                         topic_i_elt.classList.remove("unselected");
-                        topic_i_elt.style.left = `${end_left}px`;
-                        topic_i_elt.style.top = `${end_top}px`;
+                        topic_i_elt.style.left = `${center_bubble_end_left}px`;
+                        topic_i_elt.style.top = `${center_bubble_end_top}px`;
                         topic_i_elt.style.transform = `translate(-50%, -50%)`;
-                        let arrow_number = 1;
                         const exit = document.getElementById(`exit-${topic_id}`);
                         exit.style.display = "block";
                         exit.style.cursor = "pointer";
@@ -103,70 +143,67 @@ for (let row = 0; row < rows; row++) {
                         const radius_y = container_rect.width / 5.5;
                         let angle = 0;
                         let angle_increment = Math.PI * 2 / (total_to_learn + 1);
-                        for(let j = 0; j < topics_to_learn_beforehand.length; j++) {
+                        for (let j = 0; j < topics_to_learn_beforehand.length; j++) {
                             const topic_to_learn_beforehand = topics_to_learn_beforehand[j];
                             const id = gvs.topics[topic_to_learn_beforehand].id;
                             const elt = document.getElementById(id);
-                            const arrow_elt = document.getElementById(`arrow-${arrow_number}`);
                             const rect = elt.getBoundingClientRect();
                             const start_left = rect.left;
                             const start_top = rect.top;
-                            const end_left = page_width / 2 - start_left + radius_x * Math.cos(angle);
-                            const end_top = container_margin_top + container_height / 3 - start_top + radius_y * Math.sin(angle);
-                            const middle_elt_left = topic_i_elt.getBoundingClientRect().left;
-                            const middle_elt_top = topic_i_elt.getBoundingClientRect().top;
-                            const arrow_elt_end_left = `${middle_elt_left}px`;
-                            const arrow_elt_end_top = `${middle_elt_top}px`;
-                            console.log();
+                            const topics_before_end_left = page_width / 2 - start_left + radius_x * Math.cos(angle);
+                            const topics_before_end_top = container_margin_top + container_height / 3 - start_top + radius_y * Math.sin(angle);
+                            gvs.arrows.before.push([topics_before_end_left + start_left, topics_before_end_top + start_top]);
                             window.setTimeout(() => {
                                 elt.classList.remove("hide");
                                 elt.classList.remove("unselected");
                                 elt.classList.add("selected");
                                 document.getElementById(`exit-${id}`).style.display = "none";
                                 elt.style.transform = `translate(-50%, -50%)`;
-                                elt.style.left = `${end_left}px`;
-                                elt.style.top = `${end_top}px`;
-                                arrow_elt.style.display = "block";
-                                arrow_elt.style.top = arrow_elt_end_top;
-                                arrow_elt.style.left = arrow_elt_end_left;
-                            }, 100)
+                                elt.style.left = `${topics_before_end_left}px`;
+                                elt.style.top = `${topics_before_end_top}px`;
+                            }, 100);
                             angle += angle_increment;
-                            arrow_number++;
                         }
 
-                        for(let j = 0; j < topics_to_learn_afterwards.length; j++) {
+                        for (let j = 0; j < topics_to_learn_afterwards.length; j++) {
                             const topic_to_learn_afterwards = topics_to_learn_afterwards[j];
                             const id = gvs.topics[topic_to_learn_afterwards].id;
                             const elt = document.getElementById(id);
-                            const arrow_elt = document.getElementById(`arrow-${arrow_number}`);
                             const rect = elt.getBoundingClientRect();
                             const start_left = rect.left;
                             const start_top = rect.top;
-                            const end_left = page_width / 2 - start_left + radius_x * Math.cos(angle);
-                            const end_top = container_margin_top + container_height / 3 - start_top + radius_y * Math.sin(angle);
+                            const topics_after_end_left = page_width / 2 - start_left + radius_x * Math.cos(angle);
+                            const topics_after_end_top = container_margin_top + container_height / 3 - start_top + radius_y * Math.sin(angle);
+                            gvs.arrows.after.push([topics_after_end_left + start_left, topics_after_end_top + start_top]);
                             window.setTimeout(() => {
                                 elt.classList.remove("hide");
                                 elt.classList.remove("unselected");
                                 elt.classList.add("selected");
                                 document.getElementById(`exit-${id}`).style.display = "none";
                                 elt.style.transform = `translate(-50%, -50%)`;
-                                elt.style.left = `${end_left}px`;
-                                elt.style.top = `${end_top}px`;
-                                arrow_elt.style.display = "block";
-                            }, 100)
+                                elt.style.left = `${topics_after_end_left}px`;
+                                elt.style.top = `${topics_after_end_top}px`;
+                            }, 100);
+
                             angle += angle_increment;
-                            arrow_number++;
                         }
 
-                        for(let k = arrow_number; k <= 8; k++) {
-                            document.getElementById(`arrow-${k}`).style.display = "none";
-                        }
                     }
                 }
                 gvs.bubble_selected = true;
+                window.setTimeout(() => {
+                    gvs.p.redraw();
+                }, 1200);
             });
 
-            const bubble_exit = document.getElementById(`exit-${topic_id}`); bubble_exit.addEventListener("click", () => {
+            const bubble_exit = document.getElementById(`exit-${topic_id}`);
+            bubble_exit.addEventListener("click", () => {
+                gvs.arrows = {
+                    center: [],
+                    before: [],
+                    after: [],
+                };
+                gvs.p.redraw();
                 for (let i = 0; i < topics_length; i++) {
                     const topic_id_i = gvs.topics[topics_list[i]].id;
                     const topic_i_elt = document.getElementById(topic_id_i);
@@ -191,11 +228,11 @@ for (let row = 0; row < rows; row++) {
     }
 }
 
-    window.onresize = function () {
-        const map_container = document.getElementById("map-container");
-        const map_container_rect = map_container.getBoundingClientRect();
-        const map_container_width = map_container_rect.width;
-        const width_between_margins = map_container_width - margins[0][0] - margins[0][1] - 2 * gap;
-        const columns = Math.floor(width_between_margins / (bubble_width + gap));
-        map_container.style.gridTemplateColumns = `repeat(${columns}, ${bubble_width}px)`
-    }
+window.onresize = function () {
+    const map_container = document.getElementById("map-container");
+    const map_container_rect = map_container.getBoundingClientRect();
+    const map_container_width = map_container_rect.width;
+    const width_between_margins = map_container_width - margins[0][0] - margins[0][1] - 2 * gap;
+    const columns = Math.floor(width_between_margins / (bubble_width + gap));
+    map_container.style.gridTemplateColumns = `repeat(${columns}, ${bubble_width}px)`
+}

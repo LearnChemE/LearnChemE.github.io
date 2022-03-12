@@ -1,16 +1,40 @@
 @import "bootstrap";
 
+body {
+    overflow-x: hidden;
+}
+
+main {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: -1;
+}
+
 #map-label {
-    width: 100vw;
+    width: calc(100vw - 150px);
+    margin: auto;
     height: 60px;
+    word-wrap: break-all;
+    overflow-wrap: break-word;
+    white-space: normal;
     display: grid;
     text-align: center;
     justify-items: center;
     align-items: center;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     grid-template-columns: repeat(2, max-content);
     justify-content: center;
     justify-items: center;
+    z-index: 1;
+
+    div {
+        width: calc(100vw - 150px);
+        white-space: normal;
+        word-wrap: break-all;
+        overflow-wrap: break-word;
+        padding-top: 10px;
+    }
 }
 
 @media screen and (max-width: 820px) {
@@ -29,6 +53,8 @@
     justify-content: space-around;
     grid-template-rows: repeat(40, max-content);
     row-gap: 20px;
+    z-index: 1;
+    pointer-events: none;
 }
 
 .bubble {
@@ -47,6 +73,7 @@
     position: relative;
     top: 0px;
     left: 0px;
+    pointer-events: all;
 
     .topic-innertext {
         overflow-wrap: break-word;
@@ -101,4 +128,12 @@
         position: absolute;
         display: none;
     }
+}
+
+canvas {
+    pointer-events: none;
+}
+
+main {
+    pointer-events: none;
 }
