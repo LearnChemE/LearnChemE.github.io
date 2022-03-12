@@ -27,7 +27,7 @@ function draw() {
   
   let step = frameCount % 600; // Modulus operator limits step variable to between 0 and 600.
 
-  // An example of how to draw a graphic with the P5.js library.  This statement draws a line that moves across the canvas every 10 seconds (600 ms). Recall that 16.67 ms * 600 = 10000 ms or 10 seconds.
+  // An example of how to draw a graphic with the P5.js library.  This statement draws a line that moves across the canvas every 10 seconds (10000 ms). Recall that 16.67 ms * 600 = 10000 ms or 10 seconds.
 
   stroke(255, 100, 100); // Color of the line
   strokeWeight(3); // Width of the line
