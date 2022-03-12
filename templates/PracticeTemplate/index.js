@@ -31,8 +31,13 @@ function draw() {
 
   stroke(255, 100, 100); // Color of the line
   strokeWeight(3); // Width of the line
-  line((step / 600) * width, height / 2 - 150, (step / 600) * width, height / 2 + 150); // "line" syntax: line(x1, y2, x2, y2)
-
+  // "line" syntax: line(x1, y2, x2, y2)
+  line(
+    (step / 600) * width,
+    height / 2 - 150,
+    (step / 600) * width,
+    height / 2 + 150
+  );
   pop();
 }
 
