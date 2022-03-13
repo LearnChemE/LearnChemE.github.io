@@ -18,8 +18,6 @@ const sketch = (p) => {
         p.noLoop();
         gvs.p = p;
         gvs.drawAll = require("./js/draw.js");
-        const { SVG_Graph } = require("./js/svg-graph-library.js");
-        gvs.SVG_Graph = SVG_Graph;
         require("./js/inputs.js");
         p.windowResized = function() {
 
