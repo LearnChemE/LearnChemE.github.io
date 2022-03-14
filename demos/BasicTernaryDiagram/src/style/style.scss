@@ -30,6 +30,7 @@ $modal-xl: 1140px;
 #p5-container {
     width: max-content;
     margin: auto;
+    pointer-events: none;
 }
 
 canvas {
@@ -37,6 +38,7 @@ canvas {
     border-width: 1px;
     border-color: black;
     box-shadow: 0px 0px 2px 2px lightgrey;
+    pointer-events: none;
 }
 
 #loading {
@@ -111,6 +113,10 @@ canvas {
         border-radius: 5.5px;
         border: 1px solid black;
         box-shadow: 0px 0px 2px 1px white;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
 
     #plot-point:hover {

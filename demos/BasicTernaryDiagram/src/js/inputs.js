@@ -51,9 +51,10 @@ document.addEventListener("mousemove", (e) => {
 
     const diagonalDistance = (gvs.t[2][0] - gvs.t[0][0]) * Math.tan(Math.PI / 3);
 
-    const left = Math.max(0, Math.min(417, bl.top - container.top + Math.tan(Math.PI / 3) * (bl.left - e.clientX)));
-    const right = Math.max(0, Math.min(417, bl.top - container.top + Math.tan(Math.PI / 3) * (e.clientX - br.left)));
-    const bottom = Math.max(0, Math.min(diagonalDistance, bl.top - e.clientY));
+    // Not sure why max values of 460 seem to prevent a weird bug, but I won't question it...
+    const left = Math.max(0, Math.min(460, bl.top - container.top + Math.tan(Math.PI / 3) * (bl.left - e.clientX)));
+    const right = Math.max(0, Math.min(460, bl.top - container.top + Math.tan(Math.PI / 3) * (e.clientX - br.left)));
+    // const bottom = Math.max(0, Math.min(diagonalDistance, bl.top - e.clientY));
 
     gvs.dragCoords[1] = Math.min(Math.max(left, right, gvs.dragCoords[1]), bl.top - container.top);
     gvs.dragCoords[0] = Math.min(Math.max(bl.left - container.left, gvs.dragCoords[0]), br.left - container.left);

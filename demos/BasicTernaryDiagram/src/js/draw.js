@@ -101,7 +101,9 @@ function drawMoleFractionLines_standard(p) {
   p.stroke(gvs.colorA);
   p.fill(gvs.colorA);
   p.line(dotX, dotY, gvs.xA_x, gvs.xA_y);
-  p.triangle(gvs.xA_x - 1, gvs.xA_y, gvs.xA_x - 10, gvs.xA_y + 3, gvs.xA_x - 10, gvs.xA_y - 3);
+  let triangle_width = gvs.xB < 0.02 ? 1 : gvs.xB < 0.07 ? 2 : 3;
+  let triangle_height = gvs.xB < 0.02 ? 2 : gvs.xB < 0.07 ? 6 : 10;
+  p.triangle(gvs.xA_x - 1, gvs.xA_y, gvs.xA_x - triangle_height, gvs.xA_y + triangle_width, gvs.xA_x - triangle_height, gvs.xA_y - triangle_width);
 
   gvs.xB_x = gvs.t[0][0] + (1 - gvs.xB) * (gvs.t[2][0] - gvs.t[0][0]);
   gvs.xB_y = gvs.t[2][1] + gvs.xB * (gvs.t[0][1] - gvs.t[2][1]);
@@ -110,7 +112,9 @@ function drawMoleFractionLines_standard(p) {
   p.line(dotX, dotY, gvs.xB_x, gvs.xB_y);
   p.translate(gvs.xB_x, gvs.xB_y);
   p.rotate(Math.PI / 3);
-  p.triangle(0, 0, 10, 3, 10, -3);
+  triangle_width = gvs.xC < 0.02 ? 1 : gvs.xC < 0.07 ? 2 : 3;
+  triangle_height = gvs.xC < 0.02 ? 2 : gvs.xC < 0.07 ? 6 : 10;
+  p.triangle(0, 0, triangle_height, triangle_width, triangle_height, -triangle_width);
   p.rotate(-Math.PI / 3);
   p.translate(-gvs.xB_x, -gvs.xB_y);
 
@@ -121,7 +125,9 @@ function drawMoleFractionLines_standard(p) {
   p.line(dotX, dotY, gvs.xC_x, gvs.xC_y);
   p.translate(gvs.xC_x, gvs.xC_y);
   p.rotate(-Math.PI / 3);
-  p.triangle(0, 0, 10, 3, 10, -3);
+  triangle_width = gvs.xA < 0.02 ? 1 : gvs.xA < 0.07 ? 2 : 3;
+  triangle_height = gvs.xA < 0.02 ? 2 : gvs.xA < 0.07 ? 6 : 10;
+  p.triangle(0, 0, triangle_height, triangle_width, triangle_height, -triangle_width);
   p.translate(-gvs.xC_x, -gvs.xC_y);
   p.pop();
 }
@@ -144,9 +150,11 @@ function drawMoleFractionLines_alternate(p) {
   p.stroke(gvs.colorA);
   p.fill(gvs.colorA);
   p.line(dotX, dotY, gvs.xA_x, gvs.xA_y);
-  p.triangle(gvs.xA_x, gvs.xA_y, gvs.xA_x - 3, gvs.xA_y - 10, gvs.xA_x + 3, gvs.xA_y - 10);
-  p.triangle(dotX, dotY + 5, dotX - 3, dotY + 15, dotX + 3, dotY + 15);
-  if(gvs.xA > 0.15) {
+  let triangle_width = gvs.xA < 0.05 ? 0.5 : gvs.xA < 0.18 ? 2 : 3;
+  let triangle_height = gvs.xA < 0.05 ? 2 : gvs.xA < 0.18 ? 6 : 10;
+  p.triangle(gvs.xA_x, gvs.xA_y, gvs.xA_x - triangle_width, gvs.xA_y - triangle_height, gvs.xA_x + triangle_width, gvs.xA_y - triangle_height);
+  p.triangle(dotX, dotY + 5, dotX - triangle_width, dotY + 5 + triangle_height, dotX + triangle_width, dotY + 5 + triangle_height);
+  if(gvs.xA > 0.18) {
     const label_xA_x = dotX;
     const label_xA_y = gvs.xA_y - (gvs.xA_y - dotY) / 2;
     p.fill(255);
@@ -154,7 +162,7 @@ function drawMoleFractionLines_alternate(p) {
     p.rect(label_xA_x - 19, label_xA_y - 11, label_xA_x + 19, label_xA_y + 11);
     p.fill(gvs.colorA);
     p.noStroke();
-    p.text(`${gvs.xA.toFixed(2)}`, label_xA_x, label_xA_y + 1);
+    p.text(`${Math.abs(gvs.xA).toFixed(2)}`, label_xA_x, label_xA_y + 1);
   }
 
   // xB
@@ -166,15 +174,17 @@ function drawMoleFractionLines_alternate(p) {
   p.line(dotX, dotY, gvs.xB_x, gvs.xB_y);
   p.translate(gvs.xB_x, gvs.xB_y);
   p.rotate(Math.PI / 3);
-  p.triangle(0, 2, 3, 12, -3, 12);
+  triangle_width = gvs.xB < 0.05 ? 0.5 : gvs.xB < 0.18 ? 2 : 3;
+  triangle_height = gvs.xB < 0.05 ? 2 : gvs.xB < 0.18 ? 6 : 10;
+  p.triangle(0, 2, triangle_width, 2 + triangle_height, -1 * triangle_width, 2 + triangle_height);
   p.rotate(-Math.PI / 3);
   p.translate(-gvs.xB_x, -gvs.xB_y);
   p.translate(dotX, dotY);
   p.rotate(Math.PI / 3);
-  p.triangle(0, -5, 3, -15, -3, -15);
+  p.triangle(0, -5, triangle_width, -5 - triangle_height, -triangle_width, -5 - triangle_height);
   p.rotate(-Math.PI / 3);
   p.translate(-dotX, -dotY);
-  if(gvs.xB > 0.15) {
+  if(gvs.xB > 0.18) {
     const label_xB_x = dotX + (gvs.xB_x - dotX) / 2;
     const label_xB_y = gvs.xB_y - (gvs.xB_y - dotY) / 2;
     p.fill(255);
@@ -182,7 +192,7 @@ function drawMoleFractionLines_alternate(p) {
     p.rect(label_xB_x - 19, label_xB_y - 11, label_xB_x + 19, label_xB_y + 11);
     p.fill(gvs.colorB);
     p.noStroke();
-    p.text(`${gvs.xB.toFixed(2)}`, label_xB_x, label_xB_y + 1);
+    p.text(`${Math.abs(gvs.xB).toFixed(2)}`, label_xB_x, label_xB_y + 1);
   }
 
   // xC
@@ -194,15 +204,17 @@ function drawMoleFractionLines_alternate(p) {
   p.line(dotX, dotY, gvs.xC_x, gvs.xC_y);
   p.translate(gvs.xC_x, gvs.xC_y);
   p.rotate(-Math.PI / 3);
-  p.triangle(0, 2, 3, 12, -3, 12);
+  triangle_width = gvs.xC < 0.05 ? 0.5 : gvs.xC < 0.18 ? 2 : 3;
+  triangle_height = gvs.xC < 0.05 ? 2 : gvs.xC < 0.18 ? 6 : 10;
+  p.triangle(0, 2, triangle_width, 2 + triangle_height, -triangle_width, 2 + triangle_height);
   p.rotate(Math.PI / 3);
   p.translate(-gvs.xC_x, -gvs.xC_y);
   p.translate(dotX, dotY);
   p.rotate(-Math.PI / 3);
-  p.triangle(0, -5, 3, -15, -3, -15);
+  p.triangle(0, -5, triangle_width, -5 - triangle_height, -triangle_width, -5 - triangle_height);
   p.rotate(Math.PI / 3);
   p.translate(-dotX, -dotY);
-  if(gvs.xC > 0.15) {
+  if(gvs.xC > 0.18) {
     const label_xC_x = dotX + (gvs.xC_x - dotX) / 2;
     const label_xC_y = gvs.xC_y - (gvs.xC_y - dotY) / 2;
     p.fill(255);
@@ -211,7 +223,7 @@ function drawMoleFractionLines_alternate(p) {
     p.fill(gvs.colorC);
     p.noStroke();
     const xC = (1 - Number(gvs.xA.toFixed(2)) - Number(gvs.xB.toFixed(2))).toFixed(2);
-    p.text(`${xC}`, label_xC_x, label_xC_y + 1);
+    p.text(`${Math.abs(xC).toFixed(2)}`, label_xC_x, label_xC_y + 1);
   }
   p.pop();
 }
@@ -228,20 +240,20 @@ function drawMassFractionsLabel(p) {
   p.text("mass fractions", 36, 40);
   // xA
   p.fill(gvs.colorA);
-  p.text(`x  = ${gvs.xA.toFixed(2)}`, 55, 76);
+  p.text(`x  = ${Math.abs(gvs.xA).toFixed(2)}`, 55, 76);
   p.textSize(11);
   p.text("A", 64, 82);
   // xB
   p.fill(gvs.colorB);
   p.textSize(18);
-  p.text(`x  = ${gvs.xB.toFixed(2)}`, 55, 106);
+  p.text(`x  = ${Math.abs(gvs.xB).toFixed(2)}`, 55, 106);
   p.textSize(11);
   p.text("B", 64, 112);
   // xC
   p.fill(gvs.colorC);
   p.textSize(18);
   const xC = (1 - Number(gvs.xA.toFixed(2)) - Number(gvs.xB.toFixed(2))).toFixed(2);
-  p.text(`x  = ${xC}`, 55, 136);
+  p.text(`x  = ${Math.abs(xC).toFixed(2)}`, 55, 136);
   p.textSize(11);
   p.text("C", 64, 142);
   p.pop();
@@ -257,7 +269,7 @@ function drawFloatingLabels_standard(p) {
   p.noStroke();
   p.fill(gvs.colorA);
   p.textSize(15);
-  p.text(`${gvs.xA.toFixed(2)}`, gvs.xA_x + 14, gvs.xA_y + 5);
+  p.text(`${Math.abs(gvs.xA).toFixed(2)}`, gvs.xA_x + 14, gvs.xA_y + 5);
   // xB
   p.fill(255);
   p.stroke(gvs.colorB);
@@ -266,7 +278,7 @@ function drawFloatingLabels_standard(p) {
   p.noStroke();
   p.fill(gvs.colorB);
   p.textSize(15);
-  p.text(`${gvs.xB.toFixed(2)}`, gvs.xB_x - 40, gvs.xB_y - 9);
+  p.text(`${Math.abs(gvs.xB).toFixed(2)}`, gvs.xB_x - 40, gvs.xB_y - 9);
   // xC
   p.fill(255);
   p.stroke(gvs.colorC);
@@ -276,7 +288,7 @@ function drawFloatingLabels_standard(p) {
   p.fill(gvs.colorC);
   p.textSize(15);
   const xC = (1 - Number(gvs.xA.toFixed(2)) - Number(gvs.xB.toFixed(2))).toFixed(2);
-  p.text(`${xC}`, gvs.xC_x - 18, gvs.xC_y + 23);
+  p.text(`${Math.abs(xC).toFixed(2)}`, gvs.xC_x - 18, gvs.xC_y + 23);
       
   p.pop();
 }
@@ -293,7 +305,7 @@ function drawPlotLabel(p) {
   p.text(`2.)  click the "random composition" button`, 20, 69);
   p.text(`3.)  determine the correct mass fractions`, 20, 93);
   p.text(`4.)  check your answer by unchecking`, 20, 116.5);
-  p.text(` "hide mass fractions", and re-enable`, 44, 138);
+  p.text(` "hide mass fractions", or re-enable`, 44, 138);
   p.text(` arrows with the drop-down menu.`, 46.5, 159);
   p.pop();
 }
