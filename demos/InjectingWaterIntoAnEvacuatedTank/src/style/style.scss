@@ -1,9 +1,10 @@
-$modal-sm: calc( 100vw - 50px);
-$modal-md: calc( 100vw - 50px);
+$modal-sm: calc(100vw - 50px);
+$modal-md: calc(100vw - 50px);
 $modal-lg: 800px;
 $modal-xl: 1140px;
 @import "bootstrap";
 @import "./slider.scss";
+
 .simulation-controls {
     display: grid;
     grid-template-columns: max-content max-content;
@@ -19,6 +20,7 @@ $modal-xl: 1140px;
     margin: 0.5rem auto;
     justify-content: center;
     align-content: center;
+
     .btn {
         height: max-content;
         width: 12ch;
@@ -28,20 +30,95 @@ $modal-xl: 1140px;
 .input-area {
     display: grid;
     grid-template-columns: max-content;
-    margin: 20px auto;
+    margin: 10px auto 5px auto;
     gap: 10px;
     width: max-content;
     justify-items: center;
+
     .input-row {
         display: grid;
-        grid-template-columns: 200px 10rem 27px 50px;
-        gap: 1ch;
+        grid-template-columns: 200px 10rem 24px 50px;
+        gap: 0.75ch;
         align-items: end;
+
         .data-name {
             justify-self: end;
         }
+
         .data-value {
             text-align: end;
+        }
+    }
+}
+
+.simulation-controls-below {
+    display: grid;
+    width: 600px;
+    grid-template-columns: max-content max-content;
+    justify-items: center;
+    justify-content: space-between;
+    margin: 10px auto 20px auto;
+
+    .select-wrapper {
+        display: grid;
+        grid-template-columns: max-content max-content;
+        gap: 20px;
+        align-items: center;
+
+        select {
+            padding: 4px 20px 4px 10px;
+        }
+    }
+
+    .start-wrapper {
+        display: grid;
+        grid-template-columns: 12ch 12ch;
+        gap: 10px;
+        align-items: center;
+
+        #go-button {
+            display: grid;
+            align-items: center;
+            width: 100%;
+            height: 35px;
+            background-color: darkseagreen;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0px 0px 1px 1px grey;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        #go-button:hover {
+            background-color: rgb(163, 208, 163);
+        }
+
+        #reset-button {
+            display: grid;
+            align-items: center;
+            width: 100%;
+            height: 35px;
+            background-color: red;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0px 0px 1px 1px grey;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        #reset-button:hover {
+            background: rgb(255, 100, 100);
         }
     }
 }
@@ -72,13 +149,16 @@ canvas {
 .modal-body {
     text-align: left;
     font-size: 0.9rem;
+
     .references {
         font-size: 0.8rem;
     }
+
     ol {
         list-style-type: none;
         margin: 0;
         padding: 0;
+
         &>li {
             margin-bottom: 0.5rem;
             font-size: 0.8rem;

@@ -33,18 +33,25 @@ function drawLiquid(p) {
   p.fill(gvs.liquid_color);
   p.ellipse(-220, 0, tank_diameter, tank_diameter);
   p.fill(gvs.background_color);
-  const rect_height = (1 - gvs.liquid_level) * tank_diameter;
-  p.rect(-320, -100, tank_diameter, rect_height);
-  p.fill(gvs.liquid_color[0], gvs.liquid_color[1], gvs.liquid_color[2], gvs.vapor_density * 127);
-  p.ellipse(-220, 0, tank_diameter, tank_diameter);
   const triangle_height_top = 200 - 400 * Math.abs(0.5 - gvs.liquid_level);
   const triangle_height_bottom = 200 - triangle_height_top;
   const radius = tank_diameter * 0.5;
   let angle = Math.asin(triangle_height_bottom / (radius * 2));
+  let angle2 = gvs.liquid_level >= 0.5 ? -angle : angle;
+  p.beginShape();
+  for(let i = -Math.PI - angle2; i < angle2; i += 0.01) {
+    const x_value = Math.cos(i) * radius - 220;
+    const y_value = Math.sin(i) * radius;
+    p.vertex(x_value, y_value);
+  }
+  p.endShape();
+  p.fill(gvs.liquid_color[0], gvs.liquid_color[1], gvs.liquid_color[2], gvs.vapor_density * 127);
+  p.ellipse(-220, 0, tank_diameter, tank_diameter);
+
   if(Number.isNaN(angle)) {angle = 0.01}
   const ellipse_width = Math.sin(Math.PI / 2 - angle) * 2 * radius - 3;
   const ellipse_y = -100 + (1 - gvs.liquid_level) * tank_diameter;
-  const ellipse_height = 30 - 50 * Math.abs(gvs.liquid_level - 0.5);
+  const ellipse_height = 25 - 50 * Math.abs(gvs.liquid_level - 0.5);
   p.stroke(50);
   p.fill(gvs.liquid_color[0] - 30, gvs.liquid_color[1] - 30, gvs.liquid_color[2] - 30);
   if(ellipse_height > 6) {
@@ -74,6 +81,7 @@ function drawSyringe(p) {
   p.rectMode(p.CORNER);
   p.fill(180);
   p.rect(120 - 90 * gvs.syringe_fraction, -13, 3, 26);
+  p.rect(-82, -5, 2, 10);
   setGradient(p, -80, -12.5, 100, 25, p.color(240, 240, 240, 127), p.color(215, 215, 215, 127), 1);
   p.noFill();
   p.rectMode(p.CORNER);
