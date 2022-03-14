@@ -19,7 +19,7 @@ const module_rules = [{
 ];
 
 const html_options = {
-  title: "Triple-Effect Evaporator",
+  title: "Triple-Effect Evaporation",
   filename: "index.html",
   template: path.resolve(__dirname, '../src/html/index.html'),
   scriptLoading: "blocking",
@@ -28,7 +28,7 @@ const html_options = {
     "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
     "keywords": "LearnChemE, Chemical Engineering, Engineering, Education, Simulation, Thermodynamics",
     "author": "Neil Hendren",
-    "application-name": "Triple-Effect Evaporator",
+    "application-name": "Triple-Effect Evaporation",
     "description": "An interactive simulation designed to teach engineering students about multiple-effect evaporation."
   },
 }
