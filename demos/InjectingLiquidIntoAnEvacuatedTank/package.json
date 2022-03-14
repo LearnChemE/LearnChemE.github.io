@@ -16,7 +16,9 @@
     "Vapor-liquid equilibrium",
     "VLE",
     "phase equilibrium",
-    "Antoine's equation"
+    "Antoine's equation",
+    "saturation pressure",
+    "flash evaporation"
   ],
   "author": "Neil Hendren",
   "license": "ISC",

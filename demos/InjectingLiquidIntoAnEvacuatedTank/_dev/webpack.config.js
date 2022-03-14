@@ -19,7 +19,7 @@ const module_rules = [{
 ];
 
 const html_options = {
-  title: "Injecting Water Into and Evacuated Tank",
+  title: "Injecting Liquid Into and Evacuated Tank",
   filename: "index.html",
   template: path.resolve(__dirname, '../src/html/index.html'),
   scriptLoading: "blocking",
@@ -28,7 +28,7 @@ const html_options = {
     "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
     "keywords": "LearnChemE, chemical engineering, engineering, simulation",
     "author": "Neil Hendren",
-    "application-name": "Injecting Water Into and Evacuated Tank",
+    "application-name": "Injecting Liquid Into and Evacuated Tank",
     "description": "An interactive simulation designed to teach engineering students about vapor-liquid equilibrium and basic concepts of thermodynamics."
   },
 }
