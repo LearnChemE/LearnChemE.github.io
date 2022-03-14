@@ -10,7 +10,7 @@ window.gvs = {
     mouseStart : [0, 0], // When the mouse is pressed, this is used to determine dx and dy
     pointLocation : [], // When the mouse is released, this variable is updated with the new coordinate
     dragCoords : [], // A temporary variable used while the mouse is held down to keep track of point location. Couldn't think of a better variable name
-    center : [350, 300], // The center of the triangle
+    center : [275, 330], // The center of the triangle
     t : [[], [], []], // triangle coordinates. Used a short variable name to reduce the amount of typing
     tL : 400, // Triangle side length. Used a short variable name to reduce amount of typing
     colorA : "rgb(120, 180, 50)",
@@ -21,14 +21,15 @@ window.gvs = {
     xB : 0.33,
     xC : 0.34,
     // the following are the pixel coordinates of the edges of the arrows
-    xA_x : 484,
-    xA_y : 300,
-    xB_x : 284,
-    xB_y : 183.4,
-    xC_x : 286,
-    xC_y : 415.5,
+    xA_x : 409,
+    xA_y : 330,
+    xB_x : 229,
+    xB_y : 213.4,
+    xC_x : 231,
+    xC_y : 445.5,
     view : "standard",
     show_grid : true,
+    hide_mass_fractions : false,
 };
 
 gvs.pointLocation = [gvs.center[0], gvs.center[1]];
@@ -70,6 +71,9 @@ const sketch = (p) => {
             gvs.bottomRightPoint.style.left = `${gvs.t[1][0]}px`;
             gvs.topPoint.style.top = `${gvs.t[2][1]}px`;
             gvs.topPoint.style.left = `${gvs.t[2][0]}px`;
+            const randomContainer = document.getElementsByClassName("random-button-container")[0];
+            randomContainer.style.left = `${rect.left + 40}px`;
+            randomContainer.style.top = `${rect.top + 40}px`;
         }
         p.windowResized();
     };

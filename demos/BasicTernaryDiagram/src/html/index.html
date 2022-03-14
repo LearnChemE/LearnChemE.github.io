@@ -43,12 +43,23 @@
         <select id="select-view" value="standard">
           <option value="standard">standard view</option>
           <option value="alternate">alternate view</option>
+          <option value="no-arrows">hide arrows</option>
         </select>
       </div>
       <div class="grid-lines-container">
         <div class="grid-lines-label">show grid lines</div>
         <input type="checkbox" id="show-grid-lines" checked />
         <span class="checkmark"></span>
+      </div>
+      <div class="hide-label-container">
+        <div class="hide-label-label">hide mass fractions</div>
+        <input type="checkbox" id="show-composition-label" />
+        <span class="checkmark"></span>
+      </div>
+      <div class="random-button-container">
+        <div id="random-button">
+          random composition
+        </div>
       </div>
     </div>
 
@@ -75,7 +86,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation shows two ways to represent the composition of a ternary mixture on a equilateral-triangle phase diagram. Drag the black dot, which represents the overall composition of the mixture, to any location within the triangle. Each corner of the triangle corresponds to a pure component. The mass fraction of a component in the mixture is read off the axis that is the same color as that component in the standard view. These axes are labeled by drawing a line through the point; this line is parallel to the base of the triangle that is opposite the corner corresponding to that pure component. In the "alternate view", the mass fraction of a component is determined by drawing a line through the point and perpendicular to the base opposite that component. The fraction of the distance from the base to the corner is the mass fraction of that component. Ternary phase diagrams can also be drawn using mole fractions instead of mass fractions.
+            This simulation shows two ways to represent the composition of a ternary mixture on a equilateral-triangle phase diagram. Drag the black dot, which represents the overall composition of the mixture, to any location within the triangle. Each corner of the triangle corresponds to a pure component. The mass fraction of a component in the mixture is read off the axis of the same color. In the "alternate view", the mass fraction of a component is determined using a different method. To quiz yourself on reading a ternary phase diagram, follow the directions to the top-right of the diagram. Ternary phase diagrams can also represent mole fractions instead of mass fractions.
           </p>
         </div>
       </div>

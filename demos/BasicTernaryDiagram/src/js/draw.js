@@ -220,29 +220,30 @@ function drawMassFractionsLabel(p) {
   p.push();
   p.fill(255);
   p.stroke(0);
-  p.rect(40, 60, 125, 105);
+  p.translate(10, 0);
+  p.rect(30, 50, 125, 105);
   p.textSize(18);
   p.fill(0);
   p.noStroke();
-  p.text("mass fractions", 46, 50);
+  p.text("mass fractions", 36, 40);
   // xA
   p.fill(gvs.colorA);
-  p.text(`x  = ${gvs.xA.toFixed(2)}`, 65, 86);
+  p.text(`x  = ${gvs.xA.toFixed(2)}`, 55, 76);
   p.textSize(11);
-  p.text("A", 74, 92);
+  p.text("A", 64, 82);
   // xB
   p.fill(gvs.colorB);
   p.textSize(18);
-  p.text(`x  = ${gvs.xB.toFixed(2)}`, 65, 116);
+  p.text(`x  = ${gvs.xB.toFixed(2)}`, 55, 106);
   p.textSize(11);
-  p.text("B", 74, 122);
+  p.text("B", 64, 112);
   // xC
   p.fill(gvs.colorC);
   p.textSize(18);
   const xC = (1 - Number(gvs.xA.toFixed(2)) - Number(gvs.xB.toFixed(2))).toFixed(2);
-  p.text(`x  = ${xC}`, 65, 146);
+  p.text(`x  = ${xC}`, 55, 136);
   p.textSize(11);
-  p.text("C", 74, 152);
+  p.text("C", 64, 142);
   p.pop();
 }
 
@@ -280,9 +281,20 @@ function drawFloatingLabels_standard(p) {
   p.pop();
 }
 
-function drawFloatingLabels_alternate(p) {
+function drawPlotLabel(p) {
   p.push();
-
+  p.translate(2.7 * p.width / 5 - 10, 35);
+  p.textAlign(p.LEFT, p.CENTER);
+  p.textSize(15);
+  p.fill(0);
+  p.noStroke();
+  p.text("Drag the black dot with your mouse, or try quizzing yourself with this procedure:", 10, 0, 290);
+  p.text(`1.)  check "hide mass fractions"`, 20, 45);
+  p.text(`2.)  click the "random composition" button`, 20, 69);
+  p.text(`3.)  determine the correct mass fractions`, 20, 93);
+  p.text(`4.)  check your answer by unchecking`, 20, 116.5);
+  p.text(` "hide mass fractions", and re-enable`, 44, 138);
+  p.text(` arrows with the drop-down menu.`, 46.5, 159);
   p.pop();
 }
 
@@ -294,11 +306,13 @@ function drawAll(p) {
   if(gvs.view == "standard") {
     drawMoleFractionLines_standard(p);
     drawFloatingLabels_standard(p);
-  } else {
+  } else if(gvs.view == "alternate") {
     drawMoleFractionLines_alternate(p);
-    drawFloatingLabels_alternate(p);
   }
-  drawMassFractionsLabel(p);
+  if(!gvs.hide_mass_fractions) {
+    drawMassFractionsLabel(p);
+  }
+  drawPlotLabel(p);
 }
 
 module.exports = drawAll;

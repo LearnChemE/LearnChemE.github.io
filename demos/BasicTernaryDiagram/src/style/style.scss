@@ -56,6 +56,7 @@ canvas {
 
     .references {
         font-size: 0.85rem;
+
         .list-link {
             padding-left: 25px;
             margin-bottom: 10px;
@@ -92,6 +93,7 @@ canvas {
     position: absolute;
     left: 0px;
     top: 0px;
+    pointer-events: none;
 
     * {
         pointer-events: none;
@@ -129,42 +131,72 @@ canvas {
 .select-row {
     padding: 14px;
     display: grid;
-    grid-template-columns: max-content max-content;
-    gap: 20px;
+    grid-template-columns: repeat(3, max-content);
+    gap: 30px;
 
     .select-container {
+        position: relative;
         width: 100%;
         display: grid;
         justify-items: center;
         align-items: center;
 
         #select-view {
-            font-size: 1.1rem;
-            padding: 5px 15px;
+            font-size: 1rem;
+            width: 155px;
+            height: 38px;
+            padding-left: 16px;
+            background-color: rgb(248, 248, 248);
+            // border-radius: 2px;
+            appearance: none;
+        }
+
+        #select-view:focus-visible {
+            outline: none;
+        }
+
+        #select-view:hover {
+            background-color: rgb(255, 255, 255);
         }
     }
 
+    .select-container::after {
+        content: "^";
+        font-size: 1rem;
+        position: absolute;
+        top: 20px;
+        left: 134px;
+        transform: translate(-50%, -50%) rotate(180deg) scale(1.5, 1);
+        pointer-events: none;
+    }
+
     .grid-lines-container {
+        display: none !important;
+    }
+
+    .grid-lines-container,
+    .hide-label-container {
         display: grid;
         grid-template-columns: max-content max-content;
-        width: 148px;
+        width: max-content;
         position: relative;
         padding-right: 35px;
         margin: 8px;
         cursor: pointer;
-        font-size: 22px;
+        font-size: 19px;
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
 
-        .grid-lines-label {
-            font-size: 1.1rem;
+        .grid-lines-label,
+        .hide-label-label {
+            font-size: 1rem;
         }
 
         input[type="checkbox"] {
             position: absolute;
-            top: 0px;
+            top: -2px;
             right: 0px;
             opacity: 0;
             cursor: pointer;
@@ -176,7 +208,7 @@ canvas {
 
         .checkmark {
             position: absolute;
-            top: 0px;
+            top: -2px;
             right: 0px;
             height: 22px;
             width: 22px;
@@ -214,6 +246,48 @@ canvas {
 
         & input:checked~.checkmark {
             background-color: #2196F3;
+        }
+    }
+
+    .random-button-container {
+        display: none;
+        justify-content: center;
+        justify-items: center;
+        align-content: center;
+        align-items: center;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        // display: none;
+
+        #random-button {
+            display: grid;
+            font-size: 0.95rem;
+            padding: 7px 14px;
+            justify-content: center;
+            justify-items: center;
+            align-content: center;
+            align-items: center;
+            border: 1px solid darkslategray;
+            border-radius: 5px;
+            background-color: lightblue;
+            box-shadow: 0px 0px 2px 1px lightgrey;
+            cursor: pointer;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        #random-button:hover {
+            background-color: rgb(183, 226, 240);
+        }
+
+        #random-button.pressed {
+            background-color: rgb(203, 246, 255);
+            color: grey;
         }
     }
 }

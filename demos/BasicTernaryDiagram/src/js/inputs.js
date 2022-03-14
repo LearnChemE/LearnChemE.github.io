@@ -3,6 +3,9 @@ const plotPointContainer = document.getElementById("plot-point-container");
 const containerRect = plotPointContainer.getBoundingClientRect();
 const viewSelect = document.getElementById("select-view");
 const showGrid = document.getElementById("show-grid-lines");
+const showMassFractions = document.getElementById("show-composition-label");
+const randomButton = document.getElementById("random-button");
+const randomButtonContainer = document.getElementsByClassName("random-button-container")[0];
 
 plotPoint.addEventListener("mousedown", (e) => {
   gvs.mousedown = true;
@@ -115,11 +118,84 @@ document.addEventListener("mousemove", (e) => {
 viewSelect.addEventListener("change", () => {
   const selection = viewSelect.value;
   gvs.view = selection;
+  if(gvs.view !== "no-arrows") {
+    showMassFractions.checked = false;
+    gvs.hide_mass_fractions = false;
+    randomButtonContainer.style.display = "none";
+  }
   gvs.p.redraw();
 });
 
 showGrid.addEventListener("change", () => {
   const checked = showGrid.checked;
   gvs.show_grid = checked;
+  gvs.p.redraw();
+});
+
+showMassFractions.addEventListener("change", () => {
+  const checked = showMassFractions.checked;
+  gvs.hide_mass_fractions = checked;
+  if(checked) {
+    gvs.view = "no-arrows";
+    randomButtonContainer.style.display = "grid";
+  } else {
+    randomButtonContainer.style.display = "none";
+  }
+  viewSelect.value = "no-arrows";
+  gvs.p.redraw();
+});
+
+randomButton.addEventListener("mousedown", () => {
+  randomButton.classList.add("pressed");
+  const val1 = Math.random();
+  const val2 = Math.random();
+  const val3 = Math.random();
+  const total = val1 + val2 + val3;
+  gvs.xA = Number((val1 / total).toFixed(3));
+  gvs.xB = Number((val2 / total).toFixed(3));
+  gvs.xC = Number(1 - gvs.xA - gvs.xB).toFixed(3);
+
+  // The following few lines of code prevent any of the mole fractions from being below 0.05
+  if(gvs.xA < 0.05) {
+    gvs.xA = 0.05;
+    if(gvs.xB > gvs.xC) {
+      gvs.xB = 1 - gvs.xA - gvs.xC
+    } else {
+      gvs.xC = 1 - gvs.xA - gvs.xB
+    }
+  }
+  if(gvs.xB < 0.05) {
+    gvs.xB = 0.05;
+    if(gvs.xA > gvs.xC) {
+      gvs.xA = 1 - gvs.xB - gvs.xC
+    } else {
+      gvs.xC = 1 - gvs.xA - gvs.xB
+    }
+  }
+  if(gvs.xC < 0.05) {
+    gvs.xC = 0.05;
+    if(gvs.xA > gvs.xB) {
+      gvs.xA = 1 - gvs.xB - gvs.xC
+    } else {
+      gvs.xB = 1 - gvs.xA - gvs.xC
+    }
+  }
+
+  // Round to the nearest thousandth again
+  gvs.xA = Number(gvs.xA.toFixed(3));
+  gvs.xB = Number(gvs.xB.toFixed(3));
+  gvs.xC = Number((1 - gvs.xA - gvs.xB).toFixed(3));
+
+  const side_length = gvs.t[1][0] - gvs.t[0][0];
+  const cross_length = Math.sqrt(side_length**2 - (side_length / 2)**2);
+  const distance_from_A_corner = (1 - gvs.xA) * cross_length;
+  const x_coord = gvs.t[0][0] + gvs.xC * side_length + Math.tan(Math.PI / 6) * (gvs.xA * cross_length);
+  const y_coord = gvs.t[2][1] + distance_from_A_corner;
+  gvs.dragCoords = [x_coord, y_coord];
+  plotPoint.style.left = `${gvs.dragCoords[0]}px`;
+  plotPoint.style.top = `${gvs.dragCoords[1]}px`;
+  window.setTimeout(() => {
+    randomButton.classList.remove("pressed");
+  }, 100);
   gvs.p.redraw();
 })
