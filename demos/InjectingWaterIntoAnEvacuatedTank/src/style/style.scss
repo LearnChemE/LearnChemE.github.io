@@ -1,6 +1,6 @@
 $modal-sm: calc(100vw - 50px);
 $modal-md: calc(100vw - 50px);
-$modal-lg: 800px;
+$modal-lg: 820px;
 $modal-xl: 1140px;
 @import "bootstrap";
 @import "./slider.scss";
@@ -81,7 +81,8 @@ $modal-xl: 1140px;
             align-items: center;
             width: 100%;
             height: 35px;
-            background-color: darkseagreen;
+            background-color: rgb(127, 164, 127);
+            color: white;
             border-radius: 5px;
             text-align: center;
             box-shadow: 0px 0px 1px 1px grey;
@@ -119,6 +120,10 @@ $modal-xl: 1140px;
 
         #reset-button:hover {
             background: rgb(255, 100, 100);
+        }
+
+        #reset-button.bright {
+            background: rgb(255, 150, 150);
         }
     }
 }
@@ -163,6 +168,11 @@ canvas {
             margin-bottom: 0.5rem;
             font-size: 0.8rem;
         }
+    }
+
+    .block-eqn {
+        margin-left: 1rem;
+        font-size: 0.95rem;
     }
 }
 

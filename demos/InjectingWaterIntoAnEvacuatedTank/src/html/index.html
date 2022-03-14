@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="content-language" content="en">
-  <title>Injecting Water Into and Evacuated Tank</title>
+  <title>Injecting Water Into an Evacuated Tank</title>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script>
     MathJax = {
@@ -28,21 +28,21 @@
 </head>
 
 <body>
-  <div class="simulation-title">Injecting Water Into and Evacuated Tank</div>
+  <div class="simulation-title">Injecting Water Into an Evacuated Tank</div>
 
   <div class="simulation-controls">
     <div class="input-area">
   
       <div class="input-row">
         <div class="data-name">Temperature</div>
-        <input type="range" id="T-slider" min="25" max="45" step="0.1" value="35">
+        <input type="range" id="T-slider" min="15" max="55" step="0.01" value="35">
         <div class="data-value" id="T-value">35</div>
         <div class="data-metric">°C</div>
       </div>
 
       <div class="input-row">
         <div class="data-name">Moles to inject</div>
-        <input type="range" id="n-slider" min="0.5" max="2" step="0.01" value="1">
+        <input type="range" id="n-slider" min="0.2" max="2" step="0.001" value="1">
         <div class="data-value" id="n-value">1.0</div>
         <div class="data-metric">mol</div>
       </div>
@@ -86,9 +86,8 @@
         </div>
         <div class="modal-body">
           <p>
-            Directions
+            In this simulation, liquid propane or liquid toluene is injected into an evacuated 2-L spherical tank that is held at constant temperature. When propane is injected, it either vaporizes completely or forms two phases in vapor-liquid equilibrium (VLE), depending on the number of moles injected and the temperature (control both with sliders). Because toluene has a much lower saturation pressure, only a small amount of injected toluene liquid vaporizes. When the component is in VLE, the tank pressure equals the saturation pressure; otherwise, the pressure is calculated using the ideal gas law. The pressure is displayed at the top of the tank. Click the "inject" button to inject liquid into the tank. Press "reset" at any time to start from the beginning. The intensity of the blue color of the vapor is proportional to the vapor density. The liquid volume in the tank is exaggerated relative to the vapor volume for better visualization. The bar graph on the right shows the number of moles of liquid and vapor in the tank.
           </p>
-
         </div>
       </div>
     </div>
@@ -107,15 +106,62 @@
         </div>
 
         <div class="modal-body">
-          Details
-
-          <p>References:</p>
-
-          <p class="references">
-            <ol>
-              
-            </ol>
+          <p>When propane or toluene is in vapor-liquid equilibrium, the pressure in the tank is the saturation pressure, which is calculated using the Antoine equation:</p>
+          <p class="block-eqn">
+            $$
+            [1] \quad P_{i}^{sat} = 10^{\left( A_{i} - \frac{ B_{ i } }{ T + C_{ i } } \right)}
+            $$
           </p>
+          <p>where \( P_{i}^{sat} \) is the saturation pressure (bar), \( A_i \), \( B_i \), and \( C_i \) are Antoine constants, and \( T \) is temperature (K). When only vapor is present, the ideal gas law is used to calculate the pressure \( P \):</p>
+          <p class="block-eqn">
+            $$
+            [2] \quad P = \frac{ n R T }{ V }
+            $$
+          </p>
+          <p>where \( n \) is the total moles (moles of vapor in this case), \( R \) is the ideal gas constant [(L bar) / (mol K)], and \( V \) is the total volume (L). When the component is in VLE, the sum of the liquid \( V_L \) and vapor \( V_V \) volumes equal the volume of the tank \( V \):</p>
+          <p class="block-eqn">
+            $$
+            [3] \quad V = V_L + V_V
+            $$
+
+          <p>and the liquid volume is determined using the liquid density \( \rho_{ L } \):</p>
+
+            $$
+            [4] \quad V_L = \frac{ n_L }{ \rho_L }
+            $$
+          <p>The vapor volume is determined using the ideal gas law:</p>
+
+            $$
+            [5] \quad V_V = \frac{ n_V R T }{ P^{sat} }
+            $$
+          
+          </p>
+
+          <p>and the total moles (moles injected) equals the sum of the liquid \( n_L \) and vapor \( n_V \) moles:</p>
+
+          <p class="block-eqn">
+            $$
+            [6] \quad n = n_L + n_V
+            $$
+          </p>
+
+          <p>Finally, substitute equation [4] and [5] into equation [3],</p>
+
+          <p class="block-eqn">
+          
+            $$
+            [7] \quad V = \frac{ n_L }{ \rho_L } + \frac{ ( n - n_L ) R T }{ P^{sat} }
+            $$
+          
+            <p>and solve for \( n_L \):</p>
+
+            $$
+            [8] \quad n_L = \frac{ \rho_L (P^{sat} V - n R T) }{ P^{sat} - R T \rho_L }
+            $$
+
+          </p>
+
+          <p>Watch a guide via the "view instructional video" button at the top-left corner of this simulation, or view <a href="https://www.youtube.com/watch?v=0UuvRKilIEc" target="_blank">this video</a>.</p>
           <div style="margin-top: 2rem;"></div>
         </div>
 
