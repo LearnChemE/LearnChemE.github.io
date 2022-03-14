@@ -51,7 +51,7 @@ function calcAll() {
   gvs.V_final = Number((gvs.n - gvs.L_final).toFixed(4)); // Fix to 3-digit precision
   gvs.final_liquid_level = 1.5 * (gvs.L_final / gvs.rhoLm()) / V;
   const max_n = 2; // Max number of moles of vapor possible
-  gvs.final_vapor_density = gvs.V_final / max_n;
+  gvs.final_vapor_density = 0.05 + 0.95 * (gvs.V_final / max_n); // Even for tiny amounts of vapor, we want it to be at least 5% density
   gvs.P_final = P_final(); // Next, calculate the final pressure
 }
 

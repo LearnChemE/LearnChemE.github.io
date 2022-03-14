@@ -49,7 +49,7 @@ const sketch = (p) => {
     p.draw = function() {
         p.background.apply(this, gvs.background_color);
         gvs.drawAll(p);
-        const seconds_to_inject = 2;
+        const seconds_to_inject = 2.5;
         const frameRate = 60;
         const frames_per_second = frameRate;
         const frames = frames_per_second * seconds_to_inject;

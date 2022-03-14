@@ -30,7 +30,7 @@ n_slider.addEventListener("input", () => {
     gvs.syringe_fraction = 1 - n / 2;
   }
   gvs.syringe_initial = 1 - n / 2; // 2 is the max number of moles you can inject
-  n_value.innerHTML = `${n.toFixed(1)}`;
+  n_value.innerHTML = `${n.toFixed(2)}`;
   if(gvs.is_finished) {
     gvs.n = n;
     calcAll();

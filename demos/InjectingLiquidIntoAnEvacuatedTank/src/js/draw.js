@@ -45,7 +45,7 @@ function drawLiquid(p) {
     p.vertex(x_value, y_value);
   }
   p.endShape();
-  p.fill(gvs.liquid_color[0], gvs.liquid_color[1], gvs.liquid_color[2], gvs.vapor_density * 127);
+  p.fill(gvs.liquid_color[0], gvs.liquid_color[1], gvs.liquid_color[2], gvs.vapor_density * 137);
   p.ellipse(-220, 0, tank_diameter, tank_diameter);
 
   const ellipse_width = Math.sin(Math.PI / 2 - angle) * 2 * radius - 3;
@@ -151,7 +151,7 @@ function drawGraph(p) {
   p.text("moles in tank", -55 + graph_width / 2, -230);
   p.textSize(16);
   const V_text = gvs.V == 0 ? "0.00" : gvs.V < 0.01 ? gvs.V.toPrecision(1) : gvs.V.toFixed(2);
-  const L_text = gvs.L == 0 ? "0.00" : gvs.L < 0.01 ? gvs.L.toPrecision(1) : gvs.L.toFixed(2);
+  const L_text = gvs.L == 0 ? "0.00" : gvs.L < 0.01 ? gvs.L.toPrecision(1) : (Number(gvs.n.toFixed(2)) - Number(gvs.V.toFixed(2))).toFixed(2); // Have to be careful to avoid rounding errors .. make sure everything is exactly 2 significant figures
   if(gvs.is_running || gvs.is_finished) {
     p.text(`${V_text}`, -30 + graph_width / 6, -200 + graph_height - height_V_bar - 5);
     p.text(`${L_text}`, -10 + graph_width / 2, -200 + graph_height - height_L_bar - 5);
@@ -189,7 +189,6 @@ function drawText(p) {
     } else {
       text_over_tank = "vapor-liquid mixture"
     }
-    gvs.p.noLoop();
   }
   p.text(text_over_tank, -220, 0);
   p.text(text_above_syringe, -120, -45, 200);
@@ -204,6 +203,18 @@ function drawAll(p) {
   drawSyringe(p);
   drawGraph(p);
   drawText(p);
+  if(!gvs.is_finished && !gvs.is_running) {
+    document.getElementById("T-slider").removeAttribute("disabled");
+    document.getElementById("n-slider").removeAttribute("disabled");
+  } else if(gvs.is_running && gvs.percent_injected == 0) {
+    document.getElementById("T-slider").setAttribute("disabled", "yes");
+    document.getElementById("n-slider").setAttribute("disabled", "yes");
+  }
+  if(gvs.is_finished) {
+    document.getElementById("T-slider").removeAttribute("disabled");
+    document.getElementById("n-slider").removeAttribute("disabled");
+    gvs.p.noLoop();
+  }
 }
 
 module.exports = drawAll;
