@@ -30,6 +30,7 @@ window.gvs = {
     view : "standard",
     show_grid : true,
     hide_mass_fractions : false,
+    last_view : "standard",
 };
 
 gvs.pointLocation = [gvs.center[0], gvs.center[1]];

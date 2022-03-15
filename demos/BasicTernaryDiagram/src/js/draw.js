@@ -300,13 +300,12 @@ function drawPlotLabel(p) {
   p.textSize(15);
   p.fill(0);
   p.noStroke();
-  p.text("Drag the black dot with your mouse, or try quizzing yourself with this procedure:", 10, 0, 290);
-  p.text(`1.)  check "hide mass fractions"`, 20, 45);
-  p.text(`2.)  click the "random composition" button`, 20, 69);
-  p.text(`3.)  determine the correct mass fractions`, 20, 93);
-  p.text(`4.)  check your answer by unchecking`, 20, 116.5);
-  p.text(` "hide mass fractions", or re-enable`, 44, 138);
-  p.text(` arrows with the drop-down menu.`, 46.5, 159);
+  p.text("Drag the black dot with your mouse to learn how to read the diagram. Select \"alternate view\" to see it drawn differently. Alternatively, try quizzing yourself with this procedure:", 10, -10, 320);
+  p.text(`1.)  check "hide mass fractions"`, 30, 75);
+  p.text(`2.)  click the "random composition" button`, 30, 99);
+  p.text(`3.)  determine the correct mass fractions`, 30, 123);
+  p.text(`4.)  check your answer by unchecking`, 30, 146.5);
+  p.text(` "hide mass fractions".`, 54, 168);
   p.pop();
 }
 

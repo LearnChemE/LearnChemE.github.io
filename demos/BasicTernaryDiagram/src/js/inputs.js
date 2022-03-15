@@ -119,6 +119,7 @@ document.addEventListener("mousemove", (e) => {
 viewSelect.addEventListener("change", () => {
   const selection = viewSelect.value;
   gvs.view = selection;
+  gvs.last_view = selection;
   if(gvs.view !== "no-arrows") {
     showMassFractions.checked = false;
     gvs.hide_mass_fractions = false;
@@ -138,11 +139,13 @@ showMassFractions.addEventListener("change", () => {
   gvs.hide_mass_fractions = checked;
   if(checked) {
     gvs.view = "no-arrows";
+    viewSelect.value = "no-arrows";
     randomButtonContainer.style.display = "grid";
   } else {
+    gvs.view = gvs.last_view;
+    viewSelect.value = gvs.view;
     randomButtonContainer.style.display = "none";
   }
-  viewSelect.value = "no-arrows";
   gvs.p.redraw();
 });
 
