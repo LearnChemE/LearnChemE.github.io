@@ -1,8 +1,10 @@
 gvs.graph = {
   margin_left : 80,
-  margin_top : 60,
+  margin_top : 58,
   height: 400,
   width: 680,
+  constant_temp_color: gvs.p.color(255, 100, 100),
+  phase_label_color: gvs.p.color(84, 34, 11),
 }
 
 require("./water_properties");
@@ -171,7 +173,7 @@ function drawEquilibrium(p) {
 
 function drawConstantTemperature(p) {
   p.push();
-  p.stroke(255, 0, 0);
+  p.stroke(gvs.graph.constant_temp_color);
   p.strokeWeight(1);
   p.noFill();
   for(let i = 0; i < constant_temperature_lines.length; i++) {
@@ -199,10 +201,32 @@ function drawConstantTemperature(p) {
   p.pop();
 }
 
+function drawPhaseLabels(p) {
+
+  p.push();
+  p.textSize(18);
+  p.noStroke();
+  p.fill(gvs.graph.phase_label_color);
+  p.textAlign(p.CENTER, p.CENTER);
+  p.translate(gvs.graph.margin_left, gvs.graph.margin_top);
+  p.text("liquid", gvs.graph.width / 17 - 3, 3 * gvs.graph.height / 5);
+  p.text("vapor", 9 * gvs.graph.width / 11, gvs.graph.height / 2);
+  p.fill(253);
+  const width = p.textWidth("supercritical");
+  p.rectMode(p.CENTER);
+  const supercritical_coords = [2 * gvs.graph.width / 7 + 5, gvs.graph.height / 40];
+  p.rect(supercritical_coords[0], supercritical_coords[1], width + 3, 21);
+  p.fill(gvs.graph.phase_label_color);
+  p.text("supercritical", supercritical_coords[0], supercritical_coords[1]);
+  p.text("two-phase region", 2 * gvs.graph.width / 5, 7 * gvs.graph.height / 8);
+  p.pop();
+}
+
 function drawAll(p) {
   drawAxes(p);
   drawEquilibrium(p);
   drawConstantTemperature(p);
+  drawPhaseLabels(p);
 }
 
 module.exports = drawAll;
