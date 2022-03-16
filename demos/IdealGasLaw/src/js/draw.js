@@ -346,8 +346,18 @@ function drawBarGraph(p) {
     p.noFill();
     p.line(580, 100, 580, 100 + bar_graph_height);
     p.line(580, 450, 860, 100 + bar_graph_height);
+    let inc = 0;
+    for(let h = 100 + bar_graph_height; h >= 100; h -= bar_graph_height / 20) {
+      let tick_length;
+      if(inc % 4 == 0) {
+        tick_length = 6;
+      } else {
+        tick_length = 2;
+      }
+      p.line(580, h, 580 + tick_length, h);
+      inc++;
+    }
     p.rectMode(p.CORNER);
-
     switch(gvs.piston_mode) {
       case "constant-p":
         p.fill(100, 254, 100);
