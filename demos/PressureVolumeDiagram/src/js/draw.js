@@ -1,8 +1,8 @@
 gvs.graph = {
-  margin_left : 120,
-  margin_top : 70,
-  height: 370,
-  width: 590,
+  margin_left : 80,
+  margin_top : 60,
+  height: 400,
+  width: 680,
 }
 
 require("./water_properties");
@@ -25,7 +25,7 @@ function drawAxes(p) {
   p.line(0, 0, 0, gvs.graph.height);
   p.line(0, gvs.graph.height, gvs.graph.width, gvs.graph.height);
 
-  for(let i = 5; i <= 50; i++) {
+  for(let i = 5; i <= 53; i++) {
     let x_value, y_value;
     if ( i <= 10 ) {
       x_value = Number((0.001 * (i / 10)).toFixed(4));
@@ -38,11 +38,7 @@ function drawAxes(p) {
       y_value = Number((10 * (i - 20) / 10).toFixed(0));
     } else if ( i <= 40 ) {
       x_value = Number(((i - 30) / 10).toFixed(1));
-      if( i < 36 ) {
-        y_value = Number((100 * (i - 30) / 10).toFixed(0));
-      } else {
-        y_value = null;
-      }
+      y_value = Number((100 * (i - 30) / 10).toFixed(0));
     } else if ( i <= 50 ) {
       x_value = Number((10 * (i - 40) / 10).toFixed(0));
       y_value = null;
@@ -51,7 +47,7 @@ function drawAxes(p) {
       y_value = null;
     }
     const x_coord = gvs.graph.width * (Math.log10(x_value) + 3.5) / 5;
-    const y_coord = gvs.graph.height - gvs.graph.height * (Math.log10(y_value) + 2) / 3.7;
+    const y_coord = gvs.graph.height - gvs.graph.height * (Math.log10(y_value) + 2) / 4;
 
     // p.stroke(120);
     // p.strokeWeight(1);
@@ -150,7 +146,7 @@ function drawEquilibrium(p) {
     const TPHSV = eq[i];
     const P = TPHSV[1];
     const V = TPHSV[6];
-    const P_coord = gvs.graph.height - gvs.graph.height * (Math.log10(P) + 2) / 3.7;
+    const P_coord = gvs.graph.height - gvs.graph.height * (Math.log10(P) + 2) / 4;
     const V_coord = gvs.graph.width * (Math.log10(V) + 3.5) / 5;
     if(P_coord <= gvs.graph.height && V_coord < gvs.graph.width) {
       p.vertex(V_coord, P_coord);
@@ -163,7 +159,7 @@ function drawEquilibrium(p) {
     const TPHSV = eq[i];
     const P = TPHSV[1];
     const V = TPHSV[7];
-    const P_coord = gvs.graph.height - gvs.graph.height * (Math.log10(P) + 2) / 3.7;
+    const P_coord = gvs.graph.height - gvs.graph.height * (Math.log10(P) + 2) / 4;
     const V_coord = gvs.graph.width * (Math.log10(V) + 3.5) / 5;
     if(P_coord <= gvs.graph.height && V_coord < gvs.graph.width) {
       p.vertex(V_coord, P_coord);
@@ -184,14 +180,22 @@ function drawConstantTemperature(p) {
     for(let j = 0; j < constant_temperature.length; j++) {
       const V = constant_temperature[j][0];
       const P = constant_temperature[j][1];
-      const V_coord = gvs.graph.margin_left + gvs.graph.width * (Math.log10(V) + 3.5) / 5;
-      const P_coord = gvs.graph.margin_top + gvs.graph.height - gvs.graph.height * (Math.log10(P) + 2) / 3.7;
-      if(P_coord <= gvs.graph.height && V_coord < gvs.graph.width) {
+      let V_coord = gvs.graph.margin_left + gvs.graph.width * (Math.log10(V) + 3.5) / 5;
+      let P_coord = gvs.graph.margin_top + gvs.graph.height - gvs.graph.height * (Math.log10(P) + 2) / 4;
+      if(
+        P_coord <= gvs.graph.height + gvs.graph.margin_top &&
+        V_coord < gvs.graph.width + gvs.graph.margin_left
+      ) {
+        P_coord = Math.max(gvs.graph.margin_top - 10, P_coord);
         p.vertex(V_coord, P_coord);
       }
     }
     p.endShape();
   }
+  // Have to draw a white rectangle at the top to hide lines that extend above 100 MPa. Ghetto but it works
+  p.fill(253);
+  p.noStroke();
+  p.rect(150, 40, 125, 20);
   p.pop();
 }
 
