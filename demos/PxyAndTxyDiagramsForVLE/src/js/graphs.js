@@ -1,7 +1,7 @@
 const p5_container = document.getElementById("p5-container");
 const p5_rect = p5_container.getBoundingClientRect();
 const plot_container = document.getElementById("plot-container");
-const p5_plot_margin_top = 20;
+const p5_plot_margin_top = 58;
 const p5_plot_margin_bottom = 20;
 const p5_plot_margin_left = 15;
 const p5_plot_margin_right = 50;
@@ -13,8 +13,8 @@ plot_container.style.width = `${2 * gvs.p.width / 3 - p5_plot_margin_right}px`;
 gvs.pxy_plot = new gvs.SVG_Graph({
   id: "pxy-plot",                     // id of the container element
   classList: ["svg-plot"],           // classes to add to the plot container element
-  title: "click and drag the black dot, or adjust temperature with the slider",       // text above the plot
-  titleFontSize: 17,                 // font size of title, pixels
+  title: `Click and drag the black dot, or adjust temperature with the slider.<br>Hold "ctrl" key while dragging to maintain constant mole fraction,<br>or "shift" key to maintain constant pressure`,       // text above the plot
+  titleFontSize: 16,                 // font size of title, pixels
   padding: [[60, 10], [35, 55]],     // amount of padding (pixels) around the [[left, right], [top, bottom]] axes.
   parent: document.getElementById("plot-container"),             // the element to place the plot within.  If a parent is specified (besides document.body), the plot size will be 100% of parent's width and height.
   axes: {

@@ -771,7 +771,7 @@ function SVG_Graph(options) {
       plotTitle.style.position = "absolute";
       plotTitle.style.left = `calc(50% + ${this.options.padding[0][0] / 4}px)`;
       plotTitle.style.top = `0px`;
-      plotTitle.style.transform = "translate(-50%, -25%)";
+      plotTitle.style.transform = "translate(-50%, -68%)";
       plotTitle.style.fontSize = `${this.options.titleFontSize}px`;
       plotTitle.style.whiteSpace = "nowrap";
       plotTitle.classList.add("plot-title");

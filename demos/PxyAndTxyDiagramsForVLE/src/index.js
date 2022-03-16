@@ -28,7 +28,7 @@ const containerElement = document.getElementById("p5-container");
 const sketch = (p) => {
 
     p.setup = function() {
-        p.createCanvas(800, 530);
+        p.createCanvas(800, 560);
         p.noLoop();
         gvs.p = p;
         gvs.drawAll = require("./js/draw.js");
@@ -42,7 +42,7 @@ const sketch = (p) => {
             const p5_container = document.getElementById("p5-container");
             const p5_rect = p5_container.getBoundingClientRect();
             const plot_container = document.getElementById("plot-container");
-            const p5_plot_margin_top = 20;
+            const p5_plot_margin_top = 58;
             const p5_plot_margin_bottom = 20;
             const p5_plot_margin_left = 15;
             const p5_plot_margin_right = 50;

@@ -1,9 +1,9 @@
 function barGraph(p) {
   const bgw = p.width / 3 - 40; // bar graph width (pixels)
-  const bgh = p.height - 200;
+  const bgh = p.height - 160;
   const left_padding = 30;
   p.push();
-  p.translate(5 * p.width / 6, p.height / 2);
+  p.translate(5 * p.width / 6, p.height / 2 + 10);
   p.line(-bgw / 2 + left_padding, -bgh / 2, -bgw / 2 + left_padding, bgh / 2);
   p.line(-bgw / 2 + left_padding, bgh / 2, bgw / 2, bgh / 2);
   p.textAlign(p.RIGHT);
@@ -111,9 +111,9 @@ function barGraph(p) {
   p.textSize(16);
   p.textAlign(p.CENTER, p.BOTTOM);
   if(gvs.plot_selection === "P-x-y") {
-    p.text(`mixture is at ${gvs.P.toFixed(2)} bar`, 0, -40);
+    p.text(`mixture is at ${gvs.P.toFixed(2)} bar`, 0, -20);
   } else {
-    p.text(`mixture is at ${Math.round(gvs.T).toFixed(0)}° C`, 0, -40);
+    p.text(`mixture is at ${Math.round(gvs.T).toFixed(0)}° C`, 0, -20);
   }
   p.pop();
 }
