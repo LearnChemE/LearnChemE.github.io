@@ -1,5 +1,5 @@
-$modal-sm: calc( 100vw - 50px );
-$modal-md: calc( 100vw - 50px );
+$modal-sm: calc(100vw - 50px);
+$modal-md: calc(100vw - 50px);
 $modal-lg: 800px;
 $modal-xl: 1140px;
 
@@ -16,11 +16,12 @@ $modal-xl: 1140px;
 
 .modal-buttons-row {
   display: grid;
-  grid-template-columns: repeat(3, 12ch );
+  grid-template-columns: repeat(3, 12ch);
   gap: 10px;
   margin: 0.5rem 1rem;
   justify-content: center;
   align-content: center;
+
   .btn {
     height: max-content;
   }
@@ -40,6 +41,7 @@ $modal-xl: 1140px;
     grid-column: 1 / 3;
     gap: 10px;
     align-items: center;
+
     .mode-selection-menu {
       select {
         padding: 5px;
@@ -49,12 +51,12 @@ $modal-xl: 1140px;
 
   .input-row {
     display: grid;
-    grid-template-columns: 150px 12rem 27px 3ch;
+    grid-template-columns: 100px 15rem 27px 3ch;
     gap: 1ch;
     align-items: end;
     grid-column: 1 / 3;
     max-height: 30px;
-  
+
     .data-name {
       justify-self: end;
     }
@@ -62,7 +64,8 @@ $modal-xl: 1140px;
     .data-value {
       text-align: end;
     }
-// Was calc(max(3ch, max-content))
+
+    // Was calc(max(3ch, max-content))
     #t-value {
       width: 3ch;
       margin-right: -8px;
@@ -211,35 +214,38 @@ canvas {
 }
 
 @media screen and (max-width: 850px) {
-  #details-tabs-container > .tab-header {
+  #details-tabs-container>.tab-header {
     font-size: 0.75rem;
     height: 38px;
   }
-  #details-tabs-container > .tab-content {
+
+  #details-tabs-container>.tab-content {
     font-size: 0.75rem;
     top: 38px;
   }
 }
 
 @media screen and (max-width: 750px) {
-  #details-tabs-container > .tab-header {
+  #details-tabs-container>.tab-header {
     font-size: 0.65rem;
     height: 35px;
     padding: 8px 2px;
   }
-  #details-tabs-container > .tab-content {
+
+  #details-tabs-container>.tab-content {
     font-size: 0.65rem;
     top: 35px;
   }
 }
 
 @media screen and (max-width: 575px) {
-  #details-tabs-container > .tab-header {
+  #details-tabs-container>.tab-header {
     font-size: 0.5rem;
     height: 35px;
     padding: 8px 2px;
   }
-  #details-tabs-container > .tab-content {
+
+  #details-tabs-container>.tab-content {
     font-size: 0.5rem;
     top: 35px;
   }

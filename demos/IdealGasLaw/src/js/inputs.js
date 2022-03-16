@@ -13,11 +13,24 @@ heatSlider.addEventListener("input", () => {
   gvs.p.redraw();
 });
 
+heatSlider.addEventListener("mousedown", () => {
+  heatSlider.classList.add("mousedown");
+});
+
 pressureSlider.addEventListener("input", () => {
   const pressure = Number(pressureSlider.value);
   gvs.P = pressure * 101325;
   pressureValue.innerHTML = pressure.toFixed(1);
   gvs.p.redraw();
+});
+
+pressureSlider.addEventListener("mousedown", () => {
+  pressureSlider.classList.add("mousedown");
+});
+
+document.body.addEventListener("mouseup", () => {
+  heatSlider.classList.remove("mousedown");
+  pressureSlider.classList.remove("mousedown");
 })
 
 modeSelection.addEventListener("input", () => {
