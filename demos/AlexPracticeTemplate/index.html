@@ -32,19 +32,22 @@
   <!-- Generally, you want to use wrappers for just about everything because it makes styling things a lot easier. CSS is a bit nuanced and takes some practice, so CSS will probably be your lowest priority. I'll help you out with that, though. -->
   <div id="simulation-wrapper">
 
-    <div id="simulation-title">Simulation Template</div>
+    <div id="simulation-title">Alex's Template</div>
 
     <!-- First, we declare our inputs. The first one has an id "range-1", and you will see that referenced in the index.js file. -->
     <div class="inputs-wrapper">
       <!-- The attributes are self-explanatory. For more info on "ranges", just google "JavaScript input range" -->
       <div class="input-row">
+        <!-- First Slider Settings-->
         <div class="input-label">Range-1</div>
         <input type="range" id="range-1" min="0" max="100" value="0" step="1" />
-        <div id="range-1-value" class="value-label">0</div>
+        <div id="range-1-value" class="value-label">0
+        </div>
         <div class="units-label">units</div>
       </div>
 
       <div class="input-row">
+        <!-- Second Slider Settings-->
         <div class="input-label">Range-2</div>
         <input type="range" id="range-2" min="0" max="100" value="0" step="1" />
         <div id="range-2-value" class="value-label">0</div>
@@ -52,6 +55,7 @@
       </div>
 
       <div class="input-row">
+        <!-- Third Slider Settings -->
         <div class="input-label">Range-3</div>
         <input type="range" id="range-3" min="0" max="100" value="0" step="1" />
         <div id="range-3-value" class="value-label">0</div>
@@ -62,12 +66,13 @@
       <div class="select-row">
         <div class="select-label">Select:</div>
         <select id="select-1">
-          <option value="value-1">Option 1</option>
-          <option value="value-2">Option 2</option>
-          <option value="value-3">Option 3</option>
+          <option value="value-1">Adiabatic</option>
+          <option value="value-2">Isothermal</option>
+          <option value="value-3">Isobaric</option>
         </select>
         <div id="select-value">
-          Selection value is: <span style="color:orange">value-1</span>.
+          Selection value is: <span style="color:red">value-1</span>.
+          <!-- color of red-->
         </div>
       </div>
     </div>
