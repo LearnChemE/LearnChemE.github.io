@@ -1,23 +1,24 @@
 input[type="range"] {
   -webkit-appearance: none;
-  width: 100%;
-  height: 5px;
-  border-radius: 3px;
-  background: #d3d3d3;
-  outline: none;
-  opacity: 0.7;
-  margin-bottom: 0.5rem;
-  -webkit-transition: .2s;
-  transition: opacity .2s;
+  width: 100%; /* changes the slider width in the webpage*/
+  height: 5px; /* Changes the height of the slider space*/
+  border-radius: 3px; /* Not sure what this does*/
+  background: #472a2a; /* Changes slider background color */ 
+  outline: none; /* Slider outline I think*/
+  opacity: 0.7; /* Changes how dark the slider background color is (0 is transparent) */
+  margin-bottom: 0.5rem; /* changes the physical location of slider bars*/
+  -webkit-transition: .2s; /* No Idea what this does*/
+  transition: opacity .2s; /* no idea what this does */
 }
 
+/* slider circle settings */
 input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 15px;
+  -webkit-appearance: none; /* No idea what this does*/
+  appearance: none; /* No idearrr*/
+  width: 15px; /* changes the width of circle*/
   height: 15px;
-  border-radius: 50%;
-  background: #4CAF50;
+  border-radius: 50%; /* changes the shape of the slider button (square is 0, round -> 100 */
+  background: #37b13b; /* changes slider circle button */
   cursor: pointer;
 }
 

@@ -7,41 +7,42 @@
 /* Octothorpes (#) refer to an ID of an element, like <div id="simulation-title"></div>*/
 /* vw means "viewport width". It is a percentage of the window width, so 100vw means the width of the entire browser. Margin is essentially what it says it is - it adds a buffer between elements. */
 #simulation-title {
-  width: 100vw;
-  height: 35px;
-  text-align: center;
-  margin-top: 15px;
-  margin-bottom: 5px;
-  font-size: 18px;
+  width: 100vw; /* positions your Alex's Template title on the page*/
+  height: 35px; /* Changes the amoutn of weight space below the title */
+  text-align: center; /* Aligns text in the middle of the screen */
+  margin-top: 15px; /* Alters the whitespace at the top of the website  */
+  margin-bottom: 5px; /* same as above -- opposite*/
+  font-size: 18px; /* Changes the font size of the title*/
 }
 
 /* You can use calc() to calculate variables, so height in this context is the browser width minus 100 pixels */
 /* Position: absolute means that you can specify the exact placement in pixels of the element, instead of the browser trying to automatically detect where to put it. So it is 0px to the left and 0px from the top of the browser window.  I wouldn't recommend using position:absolute for most things, but in this context it makes the simulation-wrapper element essentially the same exact size as the browser window. */
 #simulation-wrapper {
-  position: absolute;
-  left: 0px;
-  top: 0px;
+  position: absolute; /* changes sizing of simulation*/
+  left: 0px; /* */
+  top: 0px; /* changes poisition of whole simulation */
   width: 100vw;
   height: calc(100vh - 100px);
 }
 
 /* Display: grid is my favorite way of placing elements. As you can tell, I use it a lot. See this website for a brief synopsis: https://grid.malven.co . Gap is the space between grid elements. */
 .inputs-wrapper {
-  display: grid;
+  display: grid; 
   grid-template-columns: max-content max-content;
   justify-content: center;
-  gap: 20px 50px;
+  gap: 20px 50px; /* changes positioning of the inputs above the simulation window*/
 }
-
+/* alters the text after sliders (0 and units)*/
 .input-row {
   display: grid;
   grid-template-columns: max-content 150px 15px max-content;
   gap: 10px;
   align-items: end;
   justify-items: center;
-  height: 15px;
+  height: 15px; /* moves the group of inputs up and down the page */
 }
 
+/*  Affects selection button and selection value spacing*/
 .select-row {
   display: grid;
   grid-template-columns: repeat(3, max-content);
@@ -64,6 +65,6 @@ select {
 
 /* Box shadows can often make elements appear as though they're "floating" above the page, and I really like the aesthetic of it, so I use it a lot alongside a 1 pixel black border */
 canvas {
-  border: 1px solid black;
+  border: 1px solid rgb(0, 0, 0); /* affects border colors around simulaiton window*/
   box-shadow: 0px 0px 2px 2px grey;
 }
