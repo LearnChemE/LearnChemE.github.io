@@ -5,7 +5,7 @@ window.g = {
   rng_2_value: 0,
   rng_3_value: 0,
   select_value: "value-1",
-  gate_angle = 45, // degrees
+  gate_angle: 45, // degrees
 }
 
 // See https://p5js.org/ to learn how to use this graphics library. setup() and draw() are used to draw on the canvas object of the page.  Seriously, spend some time learning p5.js because it will make drawing graphics a lot easier.  You can watch tutorial videos on the "Coding Train" youtube channel. They have a p5.js crash course under their playlists section.  It will make these functions make a lot more sense.
@@ -28,35 +28,34 @@ function draw() {
 
   let step = frameCount % 600; // Modulus operator limits step variable to between 0 and 600.
   // An example of how to draw a graphic with the P5.js library.  This statement draws a line that moves across the canvas every 10 seconds (10000 ms). Recall that 16.67 ms * 600 = 10000 ms or 10 seconds.
-
   fill(12); // come back and make brown
   // stroke(100, 100, 200); // Color of the line across screen
   strokeWeight(3); // Width of the line
   // "line" syntax: line(x1, y2, x2, y2)
+
+
   rect(100, 100, 15, 400)  // (x-cord, y-cord, x-length, y length)
   rect(100, 500, 400, 15)  // bottom rectangle
 
 
   pop()
 
+
   push();
+
   translate(10, 10);
   rotate(g.gate_angle);
   rect(700, -340, 25, 350);
 
   pop();
 
-  // push()
-  // rotate(PI / 4)
-  // fill(128); // come back and make brown
-  // rect(700, -340, 25, 350);
-
-  // pop()
 
   push()
   fill(128)
   ellipse(490, 510, 40, 40);
   pop();
+
+
 
 }
 
