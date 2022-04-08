@@ -43,9 +43,9 @@ function draw() {
 
   push();
 
-  translate(10, 10);
-  rotate(g.gate_angle);
-  rect(700, -340, 25, 350);
+  translate(0, 100);
+  rotate(g.gate_angle * 2 * PI / 360);
+  rect(250, -210, 25, 350);
 
   pop();
 
