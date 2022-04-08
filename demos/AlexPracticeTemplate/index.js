@@ -29,17 +29,28 @@ function draw() {
 
   // An example of how to draw a graphic with the P5.js library.  This statement draws a line that moves across the canvas every 10 seconds (10000 ms). Recall that 16.67 ms * 600 = 10000 ms or 10 seconds.
 
-  stroke(255, 100, 200); // Color of the line across screen
+  fill(128, 128, 19); // come back and make brown
+  // stroke(100, 100, 200); // Color of the line across screen
   strokeWeight(3); // Width of the line
   // "line" syntax: line(x1, y2, x2, y2)
-  line(
-    (step / 600) * width,
-    height / 2 - 150,
-    (step / 600) * width,
-    height / 2 + 150
-  );
+  rect(100, 100, 15, 400)  // (x-cord, y-cord, x-length, y length)
+  rect(100, 500, 400, 15)  // bottom rectangle
 
+
+  pop()
+
+  push()
+  rotate(PI / 4)
+  fill(128); // come back and make brown
+  rect(700, -340, 20, 350);
+
+  pop()
+
+  push()
+  fill(128)
+  ellipse(490, 510, 40, 40);
   pop();
+
 }
 
 // connects html to Javascript and assigns them to a const variable
