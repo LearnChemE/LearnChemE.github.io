@@ -87,6 +87,7 @@ function draw() {
   fill(0, 100, 200, 40);
   strokeWeight(0);
   beginShape();
+  // The four vertices are the four corners of the trapezoid
   vertex(100, 500);
   vertex(500, 500);
   vertex(water_top_right_x_coordinate, 500 - water_height_in_pixels);
