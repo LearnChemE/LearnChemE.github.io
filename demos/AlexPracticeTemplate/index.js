@@ -6,6 +6,7 @@ window.g = {
   rng_3_value: 0,
   select_value: "value-1",
   gate_angle: 45, // degrees
+  water_level: 10, // meters or ft
 }
 
 // See https://p5js.org/ to learn how to use this graphics library. setup() and draw() are used to draw on the canvas object of the page.  Seriously, spend some time learning p5.js because it will make drawing graphics a lot easier.  You can watch tutorial videos on the "Coding Train" youtube channel. They have a p5.js crash course under their playlists section.  It will make these functions make a lot more sense.
@@ -36,18 +37,28 @@ function draw() {
 
   rect(100, 100, 15, 400)  // (x-cord, y-cord, x-length, y length)
   rect(100, 500, 400, 15)  // bottom rectangle
+  pop()
+
+  push()
+  var ang_coverter = g.water_level * 200 / 350
+
+  fill(0, 100, 200, 40)
+  translate(590, 710);
+  rotate(PI)
+  rect(100, 200, 380, 300)
 
 
   pop()
 
-
   push();
 
   translate(490, 510);
-  rotate( g.gate_angle * 2 * PI / 360 - Math.PI);
-  rect(-12.5, 0, 25, 350);
+  rotate(g.gate_angle * 2 * PI / 360 - Math.PI); // Gate Angle Settings
+  rect(-12.5, 0, 25, 400);
 
   pop();
+
+
 
 
   push()
@@ -86,6 +97,8 @@ range_2_element.addEventListener("input", function () {
   range_2_value_label.innerHTML = `${rng_2_value}`;
   g.rng_2_value = rng_2_value;
   console.log(`g.rng_2_value is ${g.rng_2_value}`);
+  const height = Number(range_2_element.value)
+  g.water_level = height;
 });
 
 range_3_element.addEventListener("input", function () {
