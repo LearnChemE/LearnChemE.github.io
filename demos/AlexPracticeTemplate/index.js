@@ -40,13 +40,20 @@ function draw() {
   pop()
 
   push()
-  var ang_coverter = g.water_level * 200 / 350
+
 
   fill(0, 100, 200, 40)
-  translate(590, 710);
+  strokeWeight(0); // Width of the line
+  translate(590, 710);                   // square portion of the water
   rotate(PI)
-  rect(100, 200, 380, 300)
+  rect(100, 200, 380, g.water_level * 30)
 
+  pop()
+
+  push()
+  fill(0, 100, 200, 40)                   // triangle poriton of the water
+  strokeWeight(0); // Width of the line
+  triangle(490, 500, 490, g.water_level * 21, 700, g.water_level * 21)
 
   pop()
 
