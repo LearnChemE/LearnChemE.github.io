@@ -1,0 +1,39 @@
+TO DO LIST FOR PARTIALLY SUBMERGED GATE
+
+####### HTML file #######
+- Change the "id" attribute of the 3 sliders from "range-1", "range-2" etc. to descriptive ids such as "angle-slider" or "water-height-slider"
+- Change the "id" attribute of the 3 elements with the class "value-label" to descriptive ids such as "angle-value" or "water-height-value" 
+- Remove the "span" element from the simulation title, and instead specify the title color in the CSS file as such:
+
+#simulation-title {
+  ...
+  color: rgba(250, 133, 0, 0.767);
+}
+
+- Remove the following unnecessary element:
+
+<div id="select-value">
+  Selection value is: <span style="color:red">value-1</span>.
+  <!-- color of red-->
+</div>
+
+####### JS file #######
+- Change the following statements to reflect the new ids of the sliders:
+
+const range_1_element = document.getElementById("range-1");
+const range_1_value_label = document.getElementById("range-1-value");
+const range_2_element = document.getElementById("range-2");
+const range_2_value_label = document.getElementById("range-2-value");
+const range_3_element = document.getElementById("range-3");
+const range_3_value_label = document.getElementById("range-3-value");
+const select_element = document.getElementById("select-1");
+const select_label = document.getElementById("select-value");
+
+- For example:
+
+const angle_slider = document.getElementById("angle-slider");
+const angle_value_label = document.getElementById("angle-value");
+etc...
+
+- You will need to replace all instances of the variables "range_1_element", "range_1_value_label", etc. with the new variable names.
+- Instead of drawing a square and triangle for the liquid height, try using beginShape(), vertex(), and endShape() from the p5.js library. I got this started for you.
