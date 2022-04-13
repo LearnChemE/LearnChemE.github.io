@@ -72,8 +72,8 @@ function draw() {
   if(max_gate_angle_degrees < g.gate_angle) {
     max_gate_angle_degrees = Math.floor(max_gate_angle_degrees);
     angle_slider.setAttribute("value", `${max_gate_angle_degrees}`);
-    range_1_value_label.innerHTML = `${max_gate_angle_degrees}`; // Edit the text of the global var range_1_value
-    g.rng_1_value = max_gate_angle_degrees; // Assign the number to the global object.
+    range_1_value_label.innerHTML = `${max_gate_angle_degrees}`;
+    g.rng_1_value = max_gate_angle_degrees;
     g.gate_angle = max_gate_angle_degrees;
   }
   angle_slider.setAttribute("max", `${max_gate_angle_degrees}`);
