@@ -43,7 +43,7 @@ function constant_t() {
   gvs.T = 273;
   gvs.V = gvs.n * gvs.R * gvs.T / gvs.P;
   gvs.piston_height = gvs.V / 0.064;
-  gvs.heat_added = gvs.R * gvs.T * Math.log(gvs.V / (0.0224 / 0.35 * 0.8));
+  gvs.heat_added = gvs.n * gvs.R * gvs.T * Math.log(gvs.V / (gvs.n * gvs.R * 273 / 101325));
 }
 
 module.exports = function calcAll() {
