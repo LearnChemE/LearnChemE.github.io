@@ -230,7 +230,7 @@ function drawText(p) {
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 100);
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 140);
       p.text(`P = ${(gvs.P / 101325).toFixed(1)} atm`, centerX - 60, centerY + 100);
-      p.text(`n = ${Number(gvs.n).toFixed(1)} mol`, centerX - 60, centerY + 140);
+      p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 60, centerY + 140);
       p.textAlign(p.LEFT);
       Q_color = p.color(`${100 + 155 * gvs.heat_added / 10000}`, 100, 100);
       p.fill(Q_color);
@@ -254,7 +254,7 @@ function drawText(p) {
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.text(`P = ${(gvs.P / 101325).toFixed(1)} atm`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height));
-      p.text(`n = ${Number(gvs.n).toFixed(1)} mol`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
+      p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.textAlign(p.LEFT);
       piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
       p.text(`P   = ${Number(gvs.P / 101325).toFixed(1)} atm`, centerX - 52, piston_height - 49);
@@ -282,7 +282,7 @@ function drawText(p) {
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.text(`P = ${(gvs.P / 101325).toFixed(1)} atm`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height));
-      p.text(`n = ${Number(gvs.n).toFixed(1)} mol`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
+      p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.textAlign(p.LEFT);
       piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
       p.text(`P   = 1.0 atm`, centerX - 52, piston_height - 49);
@@ -311,7 +311,7 @@ function drawText(p) {
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.text(`P = ${(gvs.P / 101325).toFixed(1)} atm`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height));
-      p.text(`n = ${Number(gvs.n).toFixed(1)} mol`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
+      p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.textAlign(p.LEFT);
       piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
       p.text(`P   = ${Number(gvs.P / 101325).toFixed(1)} atm`, centerX - 52, piston_height - 49);

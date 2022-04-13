@@ -85,7 +85,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation demonstrates the behavior of an ideal gas in a piston/cylinder system. Change the scenario using the drop-down menu. Adjust the amount of heat added (or the external pressure) using the slider. View the governing equations by pressing the "Details" button.
+            This simulation demonstrates the behavior of an ideal gas in a piston/cylinder system. Change the scenario using the drop-down menu. Adjust the amount of heat added (or the external pressure) using the slider. View the governing equations by pressing the "Details" button. Note that the number of moles is not the same for each simulation in order to make the volumes fit into the graphic.
           </p>
         </div>
       </div>
@@ -115,19 +115,19 @@
             <div class="tab-header" id="constant-t-header">Constant temperature</div>
 
             <div class="tab-content active" id="constant-p-content">
-              The energy balance for the system is
+              The energy balance for one mole of gas in the system is
               
               $$
                 [1] \quad \Delta U = Q + W
               $$
 
-              where \( \Delta U \) is the change to internal energy (J/mol), \( Q \) is heat added to the system (J/mol), and \( W \) is work performed on the system (J/mol).  Work is 
+              where \( \Delta U \) is the change to internal energy (kJ/mol), \( Q \) is heat added to the system (kJ/mol), and \( W \) is work performed on the system (kJ/mol).  Work is 
               
               $$
                 [2] \quad W = - P \Delta V
               $$
 
-              where \( P \) is external pressure (Pa) and \( V \) is the gas volume (m<sup>3</sup>). Combining equations [1] and [2] yields,
+              where \( P \) is external pressure (Pa) and \( V \) is the specific gas volume (L/mol). Combining equations [1] and [2] yields,
 
               $$
                 [3] \quad \Delta U + P \Delta V = Q
@@ -139,7 +139,7 @@
                 [4] \quad \Delta U + \Delta ( P V ) = Q
               $$
 
-              and since \( H = U + PV \), where \( H \) is enthalpy,
+              and since \( H = U + PV \), where \( H \) is enthalpy (kJ/mol),
 
               $$
                 [5] \quad \Delta H = Q
@@ -163,42 +163,42 @@
                 [8] \quad C_{P} = 3.5 R
               $$
 
-              where \( R \) is the ideal gas constant, which is 8.314 J/(mol K). The gas volume is calculated using the ideal gas law
+              where \( R \) is the ideal gas constant, which is 8.314x10<sup>-3</sup> kJ/(mol K). The total gas volume (\( V_{tot} = nV \)) is calculated using the ideal gas law
 
               $$
-                [9] \quad PV = nRT
+                [9] \quad PV_{tot} = nRT
               $$
 
-              where \( n \) is the number of moles of gas.
+              where \( n \), the number of moles of gas, is equal to 1.0.
             </div>
 
             <div class="tab-content" id="constant-v-content">
-              The energy balance for the system is
+              The energy balance for one mole in the system is
               
               $$
                 [1] \quad \Delta U = Q + W
               $$
 
-              Where \( \Delta U \) is the change to internal energy (J/mol), \( Q \) is heat added to the system (J/mol), and \( W \) is work performed on the system (J/mol). For a constant-volume system, \( W = 0 \) because \( \Delta V = 0 \) and
+              Where \( \Delta U \) is the change to internal energy (kJ/mol), \( Q \) is heat added to the system (kJ/mol), and \( W \) is work performed on the system (kJ/mol). For a constant-volume system, \( W = 0 \) because \( \Delta V = 0 \) and
 
               $$
                 [2] \quad \Delta U = Q
               $$
 
-              For one mole of an ideal gas, \( \Delta U = C_{V} \Delta T \), where \( C_{V} \) is the constant-volume heat capacity [J/(mol&nbsp;K)] and heat added per mole is
+              For one mole of an ideal gas, \( \Delta U = C_{V} \Delta T \), where \( C_{V} \) is the constant-volume heat capacity [kJ/(mol&nbsp;K)] and heat added per mole is
 
 
               $$
                 [3] \quad Q = C_{V} \Delta T
               $$
 
-              Total heat added \( Q_{total} \) is
+              The total heat added \( Q_{total} \) is
 
               $$
                 [4] \quad Q_{total} = n C_{V} \Delta T
               $$
 
-              where \( n \) is the number of moles of gas. Thus, the temperature change can be calculated from \( Q_{total} \), and the pressure calculated from the ideal gas law \( ( PV = nRT ) \).
+              where \( n \) is the number of moles of gas. Thus, the temperature change can be calculated from \( Q_{total} \), and the pressure calculated from the ideal gas law \( ( PV_{tot} = nRT ) \), where \( V_{tot} \) is the total volume (L) and R is 8.206x10<sup>-2</sup> (L atm)/(mol K).
 
             </div>
             
@@ -215,7 +215,7 @@
                 [2] \quad dU = dW
               $$
 
-              since \( dW = -PdV \) where \( P \) is pressure and \( V \) is volume, and for an ideal gas, \( dU = C_{V} dT \) where \( C_{V} \) is the constant-volume heat capacity (kJ/[mol K]) and equation [2] becomes 
+              since \( dW = -PdV \) where \( P \) is pressure and \( V \) is the specific volume (L/mol), and for an ideal gas, \( dU = C_{V} dT \) where \( C_{V} \) is the constant-volume heat capacity (kJ/[mol K]) and equation [2] becomes 
 
               $$
                 [3] \quad C_{V} \; dT = - P dV
@@ -251,7 +251,7 @@
                 [8] \quad C_P = 3.5 R
               $$
 
-              and \( R \) is 8.314x10<sup>-3</sup> kJ/[mol K]. In this simulation, the initial temperature \( T_{1} \) is 273 K and the initial pressure \( P_{1} \) is 1 atm.
+              and \( R \) is 8.314x10<sup>-3</sup> kJ/[mol K]. In this simulation, the initial temperature \( T_{1} \) is 273 K and the initial pressure \( P_{1} \) is 1 atm. The total volume is \( V_{tot} = nV \) where \( n \) is the total number of moles.
             </div>
             
             <div class="tab-content" id="external-spring-content">
@@ -261,13 +261,13 @@
                 [1] \quad ndU = dQ_{total} + dW_{total} = dQ_{total} - n P dV
               $$
 
-              where \( n \) is the number of moles, \( dU \) is the differential change in internal energy for one mole (J/mol), \( dQ_{total} \) is differential total heat added to the system (J), \( dW_{total} \) is differential work performed on the system (J), \( P \) is the external pressure (which is the same as the internal pressure for a reversible process), and \( V \) is the gas volume. For this system,
+              where \( n \) is the number of moles, \( dU \) is the differential change in internal energy for one mole (kJ/mol), \( dQ_{total} \) is differential total heat added to the system (kJ), \( dW_{total} \) is differential work performed on the system (kJ), \( P \) is the gas pressure inside the piston, and \( V \) is the gas volume (L/mol). For this system,
 
               $$
-                [2] \quad P = P_{ext} + P_{spr}
+                [2] \quad P = P_{atm} + P_{spr}
               $$
 
-              and
+              where \( P_{atm} \) is the pressure of the external gas and \( P_{spr} \) is the pressure due to the springs. Differential spring pressure is determined as:
 
               $$
                 [3] \quad dP_{spr} = k A dz
@@ -279,7 +279,7 @@
                 [4] \quad P_{spr} = k ( nV - nV_{1} )
               $$
 
-              where \( n V_{1} \) (total initial volume) is 0.032 m<sup>3</sup>, and \( n V \) is the total gas volume at any time. The change in internal energy is
+              where \( n V_{1} \) (total initial volume) is 32 L, and \( n V \) is the total gas volume (L) at any time. The change in internal energy per mole is
 
               $$
                 [5] \quad dU = C_{V} dT
@@ -308,13 +308,13 @@
                 [1] \quad dU = dQ + dW
               $$
 
-              Where \( dU \) is the differential change to internal energy (J/mol), \( dQ \) is differential heat added to the system (J/mol), and \( dW \) is differential work performed on the system (J/mol). Since \( dU = C_{V} dT \) for an ideal gas, where \( C_V \) is the constant-volume heat capacity (kJ/[mol K]), and \( dT \) is zero for a constant-temperature process, then \( dU = 0 \), and the energy balance is
+              Where \( dU \) is the differential change to internal energy (kJ/mol), \( dQ \) is differential heat added to the system (kJ/mol), and \( dW \) is differential work performed on the system (kJ/mol). Since \( dU = C_{V} dT \) for an ideal gas, where \( C_V \) is the constant-volume heat capacity (kJ/[mol K]), and \( dT \) is zero for a constant-temperature process, then \( dU = 0 \), and the energy balance is
 
               $$
                 [2] \quad dQ = -dW = PdV
               $$
 
-              where \( P \) is the gas pressure (for a reversible process) and \( V \) is the gas volume per mole. Integrating eqn [2] yields
+              where \( P \) is the gas pressure (for a reversible process) and \( V \) is the specific gas volume (L/mol). Integrating eqn [2] yields
 
               $$
                 [3] \quad Q = \int_{V_{1}}^{V_{2}} P dV
@@ -331,8 +331,6 @@
               $$
                 [5] \quad Q_{total} =  - nRT \; \mathrm{ln} \left( \frac{P_{2}}{P_{1}} \right)
               $$
-
-              where \( P_{2} \) is the final pressure.
             </div>
 
           </div>
