@@ -1,6 +1,10 @@
+const P_atm = 101325; // atmospheric pressure, Pa
+const T_init = 273; // initial temperature, K
+const max_spring_length = 0.1; // the length of the spring when Q = 0;
+
 function constant_P() {
   const dT = gvs.heat_added / gvs.Cp;
-  const T = 273 + dT;
+  const T = T_init + dT;
   gvs.T = T;
   gvs.V = gvs.n * gvs.R * gvs.T / gvs.P;
   gvs.piston_height = 0.35 * (gvs.V / 0.0224);
@@ -8,13 +12,13 @@ function constant_P() {
 
 function constant_V() {
   const dT = gvs.heat_added / gvs.Cv;
-  const T = 273 + dT;
+  const T = T_init + dT;
   gvs.T = T;
   gvs.P = gvs.n * gvs.R * gvs.T / gvs.V;
 }
 
 function adiabatic_reversible() {
-  const T = 273 * (gvs.P / 101325)**(gvs.R / gvs.Cp);
+  const T = T_init * (gvs.P / 101325)**(gvs.R / gvs.Cp);
   gvs.T = T;
   gvs.V = gvs.n * gvs.R * gvs.T / gvs.P;
   gvs.piston_height = gvs.V / 0.064;
@@ -24,13 +28,14 @@ function spring() {
   const block_height = 0.753; // the piston_height value corresponding to the blocks
   const extended_height = 0.5; // the piston_height value corresponding to the fully-extended springs
   const k = 2000000; // spring constant, N/m
+  const V_init = 0.032; // initial volume, m^3
   let iterations = 0;
   function find_values() {
-    gvs.T = (gvs.heat_added - (gvs.V - 0.032) - k * ( ( gvs.V**2 / 2 - 0.032**2 / 2) - 0.032*( gvs.V - 0.032 ) )) / gvs.Cv + 273;
-    gvs.P = 101325 + k * (gvs.V - 0.032);
+    gvs.T = (gvs.heat_added - (gvs.V - V_init) - k * ( ( gvs.V**2 / 2 - V_init**2 / 2) - V_init*( gvs.V - V_init ) )) / gvs.Cv + T_init;
+    gvs.P = P_atm + k * (gvs.V - V_init);
     gvs.V = gvs.n * gvs.R * gvs.T / gvs.P;
-    gvs.spring_length = 0.1 - ((gvs.V - 0.032) / 0.032) / ( block_height / extended_height ) * 0.1;
-    gvs.piston_height = block_height - (gvs.spring_length / 0.1) * (block_height - extended_height);
+    gvs.spring_length = max_spring_length - ((gvs.V - V_init) / V_init) / ( block_height / extended_height ) * max_spring_length;
+    gvs.piston_height = block_height - (gvs.spring_length / max_spring_length) * (block_height - extended_height);
     if(iterations < 10) {
       iterations++;
       find_values();
@@ -40,10 +45,10 @@ function spring() {
 }
 
 function constant_t() {
-  gvs.T = 273;
+  gvs.T = T_init;
   gvs.V = gvs.n * gvs.R * gvs.T / gvs.P;
   gvs.piston_height = gvs.V / 0.064;
-  gvs.heat_added = gvs.n * gvs.R * gvs.T * Math.log(gvs.V / (gvs.n * gvs.R * 273 / 101325));
+  gvs.heat_added = gvs.n * gvs.R * gvs.T * Math.log(gvs.V / (gvs.n * gvs.R * T_init / P_atm));
 }
 
 module.exports = function calcAll() {
