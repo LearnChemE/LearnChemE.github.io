@@ -255,7 +255,58 @@
             </div>
             
             <div class="tab-content" id="external-spring-content">
-              This part of the details is currently being revised due to mathematical errors in the original. Please be patient, it will be completed soon.
+              The differential energy balance for the total moles of the system is
+              $$
+                [1] \quad n d U = dQ_{total} + dW_{total} = dQ_{total} - n P dV
+              $$
+
+              where \( d U \) is the change to internal energy (J/mol), \( Q_{total} \) is total heat added to the system (kJ/mol), \( W_{total} \) is differential work performed on the system (J/mol), \( n \) is number of moles, \( P \) is pressure (N/m<sup>2</sup>), and \( dV \) is the change to specific volume (m<sup>3</sup>). To solve the system, we first make an estimate of volume:
+
+              <!-- 
+                gvs.V = (gvs.P - P_atm) * gvs.A**2 / k + V_init;
+                gvs.P = gvs.n * gvs.R * gvs.T / gvs.V;
+                gvs.T = (gvs.heat_added - P_atm * (gvs.V - V_init) - k * gvs.n * ( gvs.V**2 / 2 - V_init**2 / 2 - V_init * ( gvs.V - V_init ) ) / gvs.A**2 ) / ( gvs.Cv * gvs.n ) + T_init;
+              -->
+
+              $$
+                [2] \quad V = \frac{ (P - P_{atm}) A^{2} }{ k } + V_{init}
+              $$
+
+              where \( P_{atm} \) is atmospheric pressure (Pa), \( A \) is area of the piston head (m<sup>3</sup>), \( k \) is the spring constant (N/m), and \( V_{init} \) is the initial volume of the system (m<sup>3</sup>). Next we estimate pressure using the ideal gas law:
+
+              $$
+                [3] \quad P = \frac{ n R T }{ V }
+              $$
+
+              
+
+              $$
+                [4] \quad 
+              $$
+
+
+
+              $$
+                [5] \quad 
+              $$
+
+
+
+              $$
+                [6] \quad 
+              $$
+
+
+
+              $$
+                [7] \quad 
+              $$
+
+
+
+              $$
+                [8] \quad 
+              $$
             </div>
             
             <div class="tab-content" id="constant-t-content">
