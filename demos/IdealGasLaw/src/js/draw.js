@@ -145,7 +145,7 @@ function drawPiston(p) {
       p.line(centerX - c_width / 2 - 30, centerY - c_height / 2, centerX - c_width / 2 - 30, centerY + c_height / 2 + 50);
       p.line(centerX + c_width / 2 + 30, centerY - c_height / 2, centerX + c_width / 2 + 30, centerY + c_height / 2 + 50);
       p.line(centerX - c_width / 2 - 30, centerY + c_height / 2 + 50, centerX + c_width / 2 + 30, centerY + c_height / 2 + 50);
-      let i = Math.round( (-gvs.heat_added / 3100) * 10 ); // Number of ice cubes
+      let i = Math.round( (-gvs.heat_added / 7200) * 10 ); // Number of ice cubes
       if(i > 0) {
         p.image(gvs.ice_cube_img, centerX, centerY + c_height / 2 + 15, 25, 25);
       }
@@ -175,9 +175,6 @@ function drawPiston(p) {
       }
       if(i > 9) {
         p.image(gvs.ice_cube_img, centerX - 150, centerY + c_height / 2 + 19, 25, 25);
-      }
-      if(i > 10) {
-        p.image(gvs.ice_cube_img, centerX + 150, centerY + c_height / 2 + 11, 25, 25);
       }
     break;
   }
@@ -228,9 +225,9 @@ function drawText(p) {
       p.textSize(22);
       p.textAlign(p.CENTER);
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 100);
-      p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 140);
+      p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 62, centerY + 140);
       p.text(`P = ${(gvs.P / 101325).toFixed(1)} atm`, centerX - 60, centerY + 100);
-      p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 60, centerY + 140);
+      p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 55, centerY + 140);
       p.textAlign(p.LEFT);
       Q_color = p.color(`${100 + 155 * gvs.heat_added / 10000}`, 100, 100);
       p.fill(Q_color);
@@ -254,7 +251,7 @@ function drawText(p) {
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.text(`P = ${(gvs.P / 101325).toFixed(1)} atm`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height));
-      p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
+      p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 55, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.textAlign(p.LEFT);
       piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
       p.text(`P   = ${Number(gvs.P / 101325).toFixed(1)} atm`, centerX - 52, piston_height - 49);
@@ -279,23 +276,23 @@ function drawText(p) {
       p.translate(shift_left, 0);
       p.textSize(22);
       p.textAlign(p.CENTER);
-      p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
-      p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
-      p.text(`P = ${(gvs.P / 101325).toFixed(1)} atm`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height));
-      p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
+      p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 65, centerY + 150 * (1.2 - gvs.piston_height));
+      p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 65, centerY + 150 * (1.2 - gvs.piston_height) + 40);
+      p.text(`P = ${(gvs.P / 101325).toFixed(2)} atm`, centerX - 55, centerY + 150 * (1.2 - gvs.piston_height));
+      p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 55, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.textAlign(p.LEFT);
       piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
       p.text(`P   = 1.0 atm`, centerX - 52, piston_height - 49);
       p.textSize(12);
-      p.text(`ext`, centerX - 42, piston_height - 45);
+      p.text(`atm`, centerX - 42, piston_height - 45);
       p.textSize(22);
       p.text(`↓`, centerX, piston_height - 28);
       Q_color = p.color(`${100 + 155 * gvs.heat_added / 10000}`, 100, 100);
       p.fill(Q_color);
-      const heat_text_3 = gvs.heat_added == 1e4 ? "10" : Number(gvs.heat_added / 1000).toFixed(1);
-      p.text(`Q     = ${heat_text_3} kJ`, centerX - c_width / 2 - 175, centerY + 140);
+      const heat_text_3 = gvs.heat_added == 1e4 ? "10.0" : Number(gvs.heat_added / 1000).toFixed(2);
+      p.text(`Q     = ${heat_text_3} kJ`, centerX - c_width / 2 - 190, centerY + 140);
       p.textSize(12);
-      p.text("total", centerX - c_width / 2 - 154, centerY + 145);
+      p.text("total", centerX - c_width / 2 - 169, centerY + 145);
       p.stroke(Q_color);
       p.strokeWeight(2);
       p.line(centerX - c_width / 2 - 8, centerY + 132, centerX - c_width / 2 - 44, centerY + 132);
@@ -311,7 +308,7 @@ function drawText(p) {
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.text(`P = ${(gvs.P / 101325).toFixed(1)} atm`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height));
-      p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
+      p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 55, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.textAlign(p.LEFT);
       piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
       p.text(`P   = ${Number(gvs.P / 101325).toFixed(1)} atm`, centerX - 52, piston_height - 49);

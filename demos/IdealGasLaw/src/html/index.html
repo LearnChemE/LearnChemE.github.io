@@ -255,50 +255,7 @@
             </div>
             
             <div class="tab-content" id="external-spring-content">
-              The differential energy balance for the total moles in the system is 
-              
-              $$
-                [1] \quad ndU = dQ_{total} + dW_{total} = dQ_{total} - n P dV
-              $$
-
-              where \( n \) is the number of moles, \( dU \) is the differential change in internal energy for one mole (kJ/mol), \( dQ_{total} \) is differential total heat added to the system (kJ), \( dW_{total} \) is differential work performed on the system (kJ), \( P \) is the gas pressure inside the piston, and \( V \) is the gas volume (L/mol). For this system,
-
-              $$
-                [2] \quad P = P_{atm} + P_{spr}
-              $$
-
-              where \( P_{atm} \) is the pressure of the external gas and \( P_{spr} \) is the pressure due to the springs. Differential spring pressure is determined as:
-
-              $$
-                [3] \quad dP_{spr} = k A dz
-              $$
-
-              where \( k \) is the spring constant (2x10<sup>6</sup> N/m for the two springs), \( A \) is the area of the piston (0.161 m<sup>2</sup>), and \( dz \) is the differential spring displacement (m). For the initial molar volume \( V_{1} \), the pressure due to the spring is zero. Thus, integrating equation [3] and using \( A dz = dV \) yields
-            
-              $$
-                [4] \quad P_{spr} = k ( nV - nV_{1} )
-              $$
-
-              where \( n V_{1} \) (total initial volume) is 32 L, and \( n V \) is the total gas volume (L) at any time. The change in internal energy per mole is
-
-              $$
-                [5] \quad dU = C_{V} dT
-              $$
-
-              The initial pressure \( V_{1} \) is 1.0 atm, and \( n \) = 1.4 mol. Equation [1] then becomes
-
-              $$
-                [6] \quad n C_{V} dT = dQ_{total} - n [ P_{ext} + k ( nV - nV_{1} )] dV
-              $$
-
-              Integrating this yields
-
-              $$
-                [7] \quad nC_{V} ( T - T_{1} ) = Q_{total} - n \left[ P_{ext} ( V - V_{1} ) + kn \left( \frac{V^{2}}{2} - \frac{ V_{1}^{2} }{ 2 } - V_{1} ( V - V_{1} ) \right) \right]
-              $$
-
-              These equations are solved using an iterative procedure.
-
+              This part of the details is currently being revised due to mathematical errors in the original. Please be patient, it will be completed soon.
             </div>
             
             <div class="tab-content" id="constant-t-content">
