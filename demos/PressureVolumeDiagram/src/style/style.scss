@@ -1,9 +1,10 @@
-$modal-sm: calc( 100vw - 50px);
-$modal-md: calc( 100vw - 50px);
+$modal-sm: calc(100vw - 50px);
+$modal-md: calc(100vw - 50px);
 $modal-lg: 800px;
 $modal-xl: 1140px;
 @import "bootstrap";
 @import "./slider.scss";
+
 .simulation-controls {
     display: grid;
     grid-template-columns: max-content max-content;
@@ -15,31 +16,34 @@ $modal-xl: 1140px;
 .modal-buttons-row {
     display: grid;
     grid-template-columns: repeat(3, max-content);
-    gap: 10px;
+    gap: 8px;
     margin: 0.5rem auto;
     justify-content: center;
     align-content: center;
+
     .btn {
         height: max-content;
-        width: 12ch;
+        width: 11ch;
     }
 }
 
 .input-area {
     display: grid;
-    grid-template-columns: max-content;
+    grid-template-columns: 250px 210px;
     margin: 20px auto;
-    gap: 10px;
+    gap: 6px;
     width: max-content;
-    justify-items: center;
+
     .input-row {
         display: grid;
         grid-template-columns: 200px 10rem 27px 50px;
         gap: 1ch;
         align-items: end;
+
         .data-name {
             justify-self: end;
         }
+
         .data-value {
             text-align: end;
         }
@@ -72,13 +76,16 @@ canvas {
 .modal-body {
     text-align: left;
     font-size: 0.9rem;
+
     .references {
         font-size: 0.8rem;
     }
+
     ol {
         list-style-type: none;
         margin: 0;
         padding: 0;
+
         &>li {
             margin-bottom: 0.5rem;
             font-size: 0.8rem;
@@ -98,4 +105,79 @@ canvas {
 *[disabled="yes"] {
     opacity: 0.3 !important;
     pointer-events: none;
+}
+
+.checkbox-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    align-items: center;
+    width: 16px;
+    height: max-content;
+    overflow: visible;
+    position: relative;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+        height: 16px;
+        width: 16px;
+    }
+
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 16px;
+        width: 16px;
+        background-color: #eee;
+        pointer-events: none;
+        outline: 1px solid slategray;
+        border-radius: 2px;
+    }
+
+    .checkbox-label {
+        padding-left: 25px;
+        font-size: 14px;
+        cursor: default;
+        transform: translateY(-3px);
+        pointer-events: none;
+    }
+}
+
+.checkbox-wrapper:hover input~.checkmark {
+    background-color: #ccc;
+}
+
+.checkbox-wrapper input:checked~.checkmark {
+    background-color: #2196F3;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox-wrapper input:checked~.checkmark:after {
+    display: block;
+}
+
+.checkbox-wrapper .checkmark:after {
+    left: 6px;
+    top: 3.5px;
+    width: 5px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
 }

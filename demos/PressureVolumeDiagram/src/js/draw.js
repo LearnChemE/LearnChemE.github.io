@@ -5,6 +5,9 @@ gvs.graph = {
   width: 680,
   constant_temp_color: gvs.p.color(255, 100, 100),
   phase_label_color: gvs.p.color(84, 34, 11),
+  constant_enthalpy_color: gvs.p.color(0, 150, 150),
+  constant_entropy_color: gvs.p.color(0, 0, 255),
+  constant_quality_color: gvs.p.color(155, 55, 0),
 }
 
 require("./water_properties.js");
@@ -13,13 +16,13 @@ function drawAxes(p) {
   p.push();
   p.translate(gvs.graph.margin_left, gvs.graph.margin_top);
   p.textAlign(p.CENTER, p.CENTER);
-  p.textSize(14);
+  p.textSize(13);
   p.fill(0);
   p.noStroke();
   p.text("0.01", -15, gvs.graph.height - 5);
   // p.text("0.0001", 0, gvs.graph.height + 15);
   p.textSize(16);
-  p.text("Pressure-Volume Diagram for Water", gvs.graph.width / 2, -35);
+  p.text("Select the properties to display by clicking the checkboxes above", gvs.graph.width / 2, -35);
   p.stroke(0);
   p.strokeWeight(1);
   p.noFill();
@@ -49,49 +52,6 @@ function drawAxes(p) {
     }
     const x_coord = gvs.graph.width * (Math.log10(x_value) + 3.5) / 5;
     const y_coord = gvs.graph.height - gvs.graph.height * (Math.log10(y_value) + 2) / 4;
-
-    // p.stroke(120);
-    // p.strokeWeight(1);
-    // for(let j = 0; j < 40; j++) {
-    //   let x_point_value;
-    //   if ( j <= 10 ) {
-    //     x_point_value = Number((0.01 * (j / 10)).toFixed(3));
-    //   } else if ( j <= 20 ) {
-    //     x_point_value = Number((0.1 * ((j - 10) / 10)).toFixed(2));
-    //   } else if ( j <= 30 ) {
-    //     x_point_value = Number(((j - 20) / 10).toFixed(1));
-    //   } else if ( j <= 40 ) {
-    //     x_point_value = Number((10 * (j - 30) / 10).toFixed(0));
-    //   } else {
-    //     x_point_value = null;
-    //   }
-    //   const x_point_coord = gvs.graph.width * (Math.log10(x_point_value) + 3) / 4;
-    //   if(j % 1 == 0) {
-    //     for(let k = 0; k < 40; k++) {
-    //       let y_point_value;
-    //       if ( k <= 10 ) {
-    //         y_point_value = Number((0.1 * (k / 10)).toFixed(2));
-    //       } else if ( k <= 20 ) {
-    //         y_point_value = Number(((k - 10) / 10).toFixed(1));
-    //       } else if ( k <= 30 ) {
-    //         y_point_value = Number((10 * (k - 20) / 10).toFixed(0));
-    //       } else if ( k <= 40 ) {
-    //         y_point_value = Number((100 * (k - 30) / 10).toFixed(0));
-    //       } else {
-    //         y_point_value = null;
-    //       }
-    //       const y_point_coord = gvs.graph.height - gvs.graph.height * (Math.log10(y_value) + 2) / 4
-    //       p.point(x_point_coord, y_point_coord);
-    //     }
-    //   }
-    // }
-
-    // p.stroke(230);
-    // p.strokeWeight(1);
-    // if(i != 1) {
-    //   p.line(x_coord, gvs.graph.height, x_coord, 0);
-    //   p.line(0, y_coord, gvs.graph.width, y_coord);
-    // }
 
     if(i % 10 == 0) {
       p.noFill();
@@ -200,6 +160,86 @@ function drawConstantTemperature(p) {
   p.pop();
 }
 
+function drawConstantEnthalpy(p) {
+  p.push();
+  p.stroke(gvs.graph.constant_enthalpy_color);
+  p.strokeWeight(1);
+  p.noFill();
+  for(let i = 0; i < constant_enthalpy_lines.length; i += 1) {
+    const constant_enthalpy = constant_enthalpy_lines[i];
+    p.beginShape();
+    for(let j = 0; j < constant_enthalpy.length; j++) {
+      const V = constant_enthalpy[j][0];
+      const P = constant_enthalpy[j][1];
+      let V_coord = gvs.graph.margin_left + gvs.graph.width * (Math.log10(V) + 3.5) / 5;
+      let P_coord = gvs.graph.margin_top + gvs.graph.height - gvs.graph.height * (Math.log10(P) + 2) / 4;
+      if(
+        P_coord <= gvs.graph.height + gvs.graph.margin_top &&
+        V_coord < gvs.graph.width + gvs.graph.margin_left
+      ) {
+        P_coord = Math.max(gvs.graph.margin_top - 10, P_coord);
+        p.vertex(V_coord, P_coord);
+      }
+    }
+    p.endShape();
+  }
+  p.pop();
+}
+
+function drawConstantEntropy(p) {
+  p.push();
+  p.stroke(gvs.graph.constant_entropy_color);
+  p.strokeWeight(1);
+  p.noFill();
+  for(let i = 0; i < constant_entropy_lines.length; i += 1) {
+    const constant_entropy = constant_entropy_lines[i];
+    p.beginShape();
+    for(let j = 0; j < constant_entropy.length; j++) {
+      const V = constant_entropy[j][0];
+      const P = constant_entropy[j][1];
+      let V_coord = gvs.graph.margin_left + gvs.graph.width * (Math.log10(V) + 3.5) / 5;
+      let P_coord = gvs.graph.margin_top + gvs.graph.height - gvs.graph.height * (Math.log10(P) + 2) / 4;
+      if(
+        P_coord <= gvs.graph.height + gvs.graph.margin_top &&
+        V_coord < gvs.graph.width + gvs.graph.margin_left
+      ) {
+        P_coord = Math.max(gvs.graph.margin_top - 10, P_coord);
+        p.vertex(V_coord, P_coord);
+      }
+    }
+    p.endShape();
+  }
+  p.pop();
+}
+
+function drawConstantQuality(p) {
+  p.push();
+  p.stroke(gvs.graph.constant_quality_color);
+  p.strokeWeight(1);
+  p.noFill();
+  const quality_indices = [0, 8, 18, 38, 58, 78, 93, 98, 99]; // qualities of: 0.01, 0.1, 0.2, 0.4, 0.6, 0.8, 0.95, 0.99, 0.999
+  for(let i = 0; i < quality_indices.length; i += 1) {
+    const index = quality_indices[i];
+    const constant_quality = constant_quality_lines[index];
+    p.beginShape();
+    for(let j = 0; j < constant_quality.length; j++) {
+      const V = constant_quality[j][0];
+      const P = constant_quality[j][1];
+      let V_coord = gvs.graph.margin_left + gvs.graph.width * (Math.log10(V) + 3.5) / 5;
+      let P_coord = gvs.graph.margin_top + gvs.graph.height - gvs.graph.height * (Math.log10(P) + 2) / 4;
+      if(
+        P_coord <= gvs.graph.height + gvs.graph.margin_top &&
+        V_coord < gvs.graph.width + gvs.graph.margin_left
+      ) {
+        P_coord = Math.max(gvs.graph.margin_top - 10, P_coord);
+        p.vertex(V_coord, P_coord);
+      }
+    }
+    p.endShape();
+  }
+  p.pop();
+}
+
 function drawPhaseLabels(p) {
 
   p.push();
@@ -223,8 +263,19 @@ function drawPhaseLabels(p) {
 
 function drawAll(p) {
   drawAxes(p);
+  if(gvs.show_constant_temperature) {
+    drawConstantTemperature(p);
+  }
+  if(gvs.show_constant_enthalpy) {
+    drawConstantEnthalpy(p);
+  }
+  if(gvs.show_constant_entropy) {
+    drawConstantEntropy(p);
+  }
+  if(gvs.show_constant_quality) {
+    drawConstantQuality(p);
+  }
   drawEquilibrium(p);
-  drawConstantTemperature(p);
   drawPhaseLabels(p);
 }
 
