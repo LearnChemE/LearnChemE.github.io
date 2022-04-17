@@ -7,8 +7,7 @@ gvs.graph = {
   phase_label_color: gvs.p.color(84, 34, 11),
 }
 
-require("./water_properties");
-const calcs = require("./calcs.js");
+require("./water_properties.js");
 
 function drawAxes(p) {
   p.push();
