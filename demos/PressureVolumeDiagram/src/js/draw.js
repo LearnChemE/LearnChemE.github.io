@@ -7,7 +7,7 @@ gvs.graph = {
   phase_label_color: gvs.p.color(84, 34, 11),
   constant_enthalpy_color: gvs.p.color(0, 150, 150),
   constant_entropy_color: gvs.p.color(0, 0, 255),
-  constant_quality_color: gvs.p.color(100, 100, 100),
+  constant_quality_color: gvs.p.color(0, 0, 0),
 }
 
 require("./water_properties.js");
@@ -243,6 +243,7 @@ function drawConstantQuality(p) {
   p.stroke(gvs.graph.constant_quality_color);
   p.strokeWeight(1);
   p.noFill();
+  setLineDash([2, 4]);
   const quality_indices = [0, 8, 18, 38, 58, 78, 93, 98, 99]; // qualities of: 0.01, 0.1, 0.2, 0.4, 0.6, 0.8, 0.95, 0.99, 0.999
   for (let i = 0; i < quality_indices.length; i += 1) {
     const index = quality_indices[i];
@@ -431,30 +432,39 @@ function drawLegend(p) {
   p.fill(253);
   p.translate(gvs.graph.margin_left, gvs.graph.margin_top);
   p.translate(gvs.graph.width - 85, 60);
-  p.rect(0, 0, 180, 130);
+  p.rect(-1, 8, 194, 155);
   p.noStroke();
   p.fill(0);
   p.textAlign(p.CENTER, p.CENTER);
-  p.text("Units:", 0, -48);
+  p.text("Legend:", 0, -52);
   p.textAlign(p.LEFT, p.CENTER);
   p.fill(gvs.graph.constant_enthalpy_color);
-  p.text("enthalpy: kJ/kg", -40, -24);
+  p.text("enthalpy (kJ/kg)", -40, -28);
   p.fill(gvs.graph.constant_entropy_color);
-  p.text("entropy: kJ/(kg °C)", -40, 0);
+  p.text("entropy [kJ/(kg °C)]", -40, -4);
   p.fill(gvs.graph.constant_temp_color);
-  p.text("temperature: °C", -40, 24);
+  p.text("temperature (°C)", -40, 20);
   p.fill(gvs.graph.constant_quality_color);
-  p.text("quality: kg/kg", -40, 48);
+  p.text("quality (kg/kg)", -40, 44);
+  p.fill(0);
+  p.text("phase envelope", -40, 68);
   p.noFill();
-  p.strokeWeight(2);
-  p.stroke(gvs.graph.constant_enthalpy_color);
-  p.line(-80, -24, -50, -24);
-  p.stroke(gvs.graph.constant_entropy_color);
-  p.line(-80, 0, -50, 0);
+  p.strokeWeight(1);
   p.stroke(gvs.graph.constant_temp_color);
-  p.line(-80, 24, -50, 24);
+  p.line(-83, 20, -47, 20);
+  p.stroke(0);
+  p.strokeWeight(2);
+  p.line(-83, 68, -47, 68);
+  p.strokeWeight(1);
+  setLineDash([7, 7]);
+  p.stroke(gvs.graph.constant_enthalpy_color);
+  p.line(-83, -28, -47, -28);
+  setLineDash([12, 4, 4, 4]);
+  p.stroke(gvs.graph.constant_entropy_color);
+  p.line(-83, -4, -47, -4);
+  setLineDash([2, 4]);
   p.stroke(gvs.graph.constant_quality_color);
-  p.line(-80, 48, -50, 48);
+  p.line(-83, 44, -47, 44);
   p.pop();
 }
 
