@@ -10,6 +10,7 @@ window.gvs = {
     show_constant_enthalpy: false,
     show_constant_quality: false,
     show_constant_entropy: false,
+    show_grid: true,
 };
 
 const containerElement = document.getElementById("p5-container");

@@ -19,9 +19,8 @@ function drawAxes(p) {
   p.textSize(13);
   p.fill(0);
   p.noStroke();
-  p.text("0.01", -15, gvs.graph.height - 5);
-  // p.text("0.0001", 0, gvs.graph.height + 15);
   p.textSize(16);
+  p.text("0.01", -18, gvs.graph.height - 1);
   p.text("Select the properties to display by clicking the checkboxes above", gvs.graph.width / 2, -35);
   p.stroke(0);
   p.strokeWeight(1);
@@ -52,6 +51,17 @@ function drawAxes(p) {
     }
     const x_coord = gvs.graph.width * (Math.log10(x_value) + 3.5) / 5;
     const y_coord = gvs.graph.height - gvs.graph.height * (Math.log10(y_value) + 2) / 4;
+
+    if(gvs.show_grid) {
+      p.strokeWeight(0.5);
+      p.stroke(210);
+      p.line(0, y_coord, gvs.graph.width, y_coord);
+      if(i >= 4) {
+        p.line(x_coord, gvs.graph.height, x_coord, 0);
+      }
+      p.stroke(0);
+      p.strokeWeight(1);
+    }
 
     if(i % 10 == 0) {
       p.noFill();
