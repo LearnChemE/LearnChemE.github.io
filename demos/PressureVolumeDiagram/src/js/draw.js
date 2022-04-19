@@ -29,7 +29,7 @@ function drawAxes(p) {
   p.line(0, 0, 0, gvs.graph.height);
   p.line(0, gvs.graph.height, gvs.graph.width, gvs.graph.height);
 
-  for(let i = 5; i <= 53; i++) {
+  for(let i = 2; i <= 53; i++) {
     let x_value, y_value;
     if ( i <= 10 ) {
       x_value = Number((0.001 * (i / 10)).toFixed(4));
@@ -66,7 +66,9 @@ function drawAxes(p) {
     } else {
       p.noFill();
       p.stroke(0);
-      p.line(x_coord, gvs.graph.height, x_coord, gvs.graph.height - 3);
+      if(i >= 4) {
+        p.line(x_coord, gvs.graph.height, x_coord, gvs.graph.height - 3);
+      }
       p.line(0, y_coord, 3, y_coord);
     }
   }
