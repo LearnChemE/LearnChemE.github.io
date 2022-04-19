@@ -44,12 +44,12 @@
       </div>
       <div class="checkbox-wrapper">
         <div class="checkbox-label">Constant temperature curves</div>
-        <input type="checkbox" id="show-temperature" />
+        <input type="checkbox" id="show-temperature" checked />
         <span class="checkmark"></span>
       </div>
       <div class="checkbox-wrapper">
         <div class="checkbox-label">Constant quality curves</div>
-        <input type="checkbox" id="show-quality" />
+        <input type="checkbox" id="show-quality" checked />
         <span class="checkmark"></span>
       </div>
       <div class="checkbox-wrapper">
@@ -81,7 +81,7 @@
         </div>
         <div class="modal-body">
           <p>
-            Directions
+            This simulation shows the constant enthalpy, entropy, temperature, and quality curves on a pressure-volume diagram for water. By default, the plot shows the phase envelope as a thick black line, and the constant temperature and quality curves in red and grey, respectively. Toggle property curves on or off by clicking the appropriate checkbox above the plot. Toggle the grid on and off using the "Show grid" checkbox. The units for each curve are shown in the top-right of the diagram, such that the numbers written over the curves have that unit. For example, a constant entropy curve with a "7.000" label represents an isentrope with a value of 7.000 kJ/(kg °C).
           </p>
 
         </div>
@@ -102,14 +102,8 @@
         </div>
 
         <div class="modal-body">
-          Details
-
-          <p>References:</p>
-
-          <p class="references">
-            <ol>
-              
-            </ol>
+          <p>
+            The thick black line on the pressure-volume diagram represents the phase envelope. Inside the phase envelope is the two-phase region where water vapor and liquid are in equilibrium. Outside of the phase envelope, the phase of water may be liquid, vapor, or supercritical fluid depending on the pressure and specific volume. For a given isotherm, pressure remains constant inside the phase envelope, resulting in horizontal lines inside the phase envelope. Curves of constant quality, enthalpy, or entropy do not have constant pressure within the two-phase region, though the slope of the curves may change abruptly when entering and exiting the two-phase region, due to the large difference in the thermodynamic properties of liquid water and steam. These constant-property curves were determined using steam tables, which provide thermodynamic properties of water with a very large range of pressures and temperatures. Download steam tables as an Excel spreadsheet or in other formats <a href="https://learncheme.com/student-resources/steam-tables/" target="_blank">here</a>.
           </p>
           <div style="margin-top: 2rem;"></div>
         </div>

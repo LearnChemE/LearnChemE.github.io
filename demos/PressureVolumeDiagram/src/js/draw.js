@@ -286,7 +286,7 @@ function drawPhaseLabels(p) {
 
   textBox(
     p,
-    "supercritical",
+    "supercritical fluid",
     gvs.graph.margin_left + 2 * gvs.graph.width / 7 + 5,
     gvs.graph.margin_top + gvs.graph.height / 40,
     gvs.graph.phase_label_color,
