@@ -135,8 +135,15 @@ function drawConstantTemperature(p) {
   p.stroke(gvs.graph.constant_temp_color);
   p.strokeWeight(1);
   p.noFill();
-  for(let i = 0; i < constant_temperature_lines.length; i++) {
-    const constant_temperature = constant_temperature_lines[i];
+  // temperatures: [60, 80, 100, 120, 160, 260, 300, 400, 800, 1800]
+  const temperature_indices = [1, 2, 3, 4, 6, 8, 11, 13, 18, 38, 88];
+  let temperature_list = [];
+  for(let T = 40; T < 2000; T += 20) {
+    temperature_list.push(T);
+  }
+  for(let i = 0; i < temperature_indices.length; i++) {
+    const index = temperature_indices[i];
+    const constant_temperature = constant_temperature_lines[index];
     p.beginShape();
     for(let j = 0; j < constant_temperature.length; j++) {
       const V = constant_temperature[j][0];
@@ -144,8 +151,10 @@ function drawConstantTemperature(p) {
       let V_coord = gvs.graph.margin_left + gvs.graph.width * (Math.log10(V) + 3.5) / 5;
       let P_coord = gvs.graph.margin_top + gvs.graph.height - gvs.graph.height * (Math.log10(P) + 2) / 4;
       if(
-        P_coord <= gvs.graph.height + gvs.graph.margin_top &&
-        V_coord < gvs.graph.width + gvs.graph.margin_left
+        P_coord > gvs.graph.margin_top &&
+        P_coord < gvs.graph.margin_top + gvs.graph.height &&
+        V_coord < gvs.graph.width + gvs.graph.margin_left &&
+        V_coord > gvs.graph.margin_left
       ) {
         P_coord = Math.max(gvs.graph.margin_top - 10, P_coord);
         p.vertex(V_coord, P_coord);
@@ -153,10 +162,6 @@ function drawConstantTemperature(p) {
     }
     p.endShape();
   }
-  // Have to draw a white rectangle at the top to hide lines that extend above 100 MPa. Ghetto but it works
-  p.fill(253);
-  p.noStroke();
-  p.rect(150, 40, 125, 20);
   p.pop();
 }
 
