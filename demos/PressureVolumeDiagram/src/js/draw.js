@@ -440,9 +440,9 @@ function drawLegend(p) {
   p.fill(gvs.graph.constant_enthalpy_color);
   p.text("enthalpy: kJ/kg", -40, -24);
   p.fill(gvs.graph.constant_entropy_color);
-  p.text("entropy: kJ/(kg K)", -40, 0);
+  p.text("entropy: kJ/(kg °C)", -40, 0);
   p.fill(gvs.graph.constant_temp_color);
-  p.text("temperature: K", -40, 24);
+  p.text("temperature: °C", -40, 24);
   p.fill(gvs.graph.constant_quality_color);
   p.text("quality: kg/kg", -40, 48);
   p.noFill();
