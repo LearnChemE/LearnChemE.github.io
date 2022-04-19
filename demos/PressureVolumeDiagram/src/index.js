@@ -11,6 +11,7 @@ window.gvs = {
     show_constant_quality: false,
     show_constant_entropy: false,
     show_grid: true,
+    cnv: undefined,
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -18,7 +19,7 @@ const containerElement = document.getElementById("p5-container");
 const sketch = (p) => {
 
     p.setup = function() {
-        p.createCanvas(800, 530);
+        gvs.cnv = p.createCanvas(800, 530);
         p.noLoop();
         gvs.p = p;
         gvs.drawAll = require("./js/draw.js");
