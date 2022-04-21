@@ -35,101 +35,87 @@ function draw() {
   // "line" syntax: line(x1, y2, x2, y2)
 
 
-  rect(100, 100, 15, 400)  // (x-cord, y-cord, x-length, y length)
-  rect(100, 500, 400, 15)  // bottom rectangle
+  rect(100, 100, 15, 400)     // (x-cord, y-cord, x-length, y length)
+  rect(100, 500, 270, 15)     // bottom rectangle
   pop()
 
-  // push()
 
-
-  // fill(0, 100, 200, 40)
-  // strokeWeight(0); // Width of the line
-  // translate(590, 710);                   // square portion of the water
-  // rotate(PI)
-  // rect(100, 200, 380, g.water_level * 30)
-
-  // pop()
-
-  // push()
-  // fill(0, 100, 200, 40)                   // triangle poriton of the water
-  // strokeWeight(0); // Width of the line
-  // triangle(490, 500, 490, g.water_level * 21, 700, g.water_level * 21)
-
-  // pop()
 
   /*
   * The code below determines the top-right coordinate of the trapezoid that comprises the water.
   * It also determines whether the max gate angle is too high to contain the water, and adjusts
   * the maximum value of the angle slider accordingly.
   */
+
   const gate_length = 400;
   const gate_angle_radians = g.gate_angle * 2 * PI / 360;
   const water_height_in_pixels = g.water_level * 25;
-  const water_top_right_x_coordinate = 500 + water_height_in_pixels * Math.tan(gate_angle_radians);
-  const max_gate_angle = Math.acos(water_height_in_pixels / gate_length);
-  let max_gate_angle_degrees = max_gate_angle * 360 / (2 * PI) - 1;
-  const angle_slider = document.getElementById("range-1");
-  if(max_gate_angle_degrees < g.gate_angle) {
-    max_gate_angle_degrees = Math.floor(max_gate_angle_degrees);
-    angle_slider.setAttribute("value", `${max_gate_angle_degrees}`);
-    range_1_value_label.innerHTML = `${max_gate_angle_degrees}`;
-    g.rng_1_value = max_gate_angle_degrees;
-    g.gate_angle = max_gate_angle_degrees;
-  }
-  angle_slider.setAttribute("max", `${max_gate_angle_degrees}`);
+  const water_top_right_x_coordinate = 400 + water_height_in_pixels * Math.tan(gate_angle_radians); // setting the height equal with gate_angle_radians and tangent
+  const max_gate_angle = Math.acos(water_height_in_pixels / gate_length); // uses the height of the water and gate length to deterine a max angle from a for loop that will be usd later
 
-  /*
-  * The code below utilizes the "beginShape()", "vertex()", and "endShape()" to generate an arbitrary shape
-  * using coordinates only. For the top-right corner of the trapezoid, the x value is water_top_right_x_coordinate
-  * and the y value is a function of water_height_in_pixels.
-  */
+  let max_gate_angle_degrees = max_gate_angle * 360 / (2 * PI) - 1; // conversion to radians (not sure why its subtracting by -1)
+  const angle_slider = document.getElementById("Angle_Slider");
+
+  if (max_gate_angle_degrees < g.gate_angle) {
+    max_gate_angle_degrees = Math.floor(max_gate_angle_degrees);     // changes max_gate_angle egrees to lowest gate angle
+    angle_slider.setAttribute("value", `${max_gate_angle_degrees}`); // sets the gate anlge to max_gate_angle (connecting HTML)
+    range_1_value_label.innerHTML = `${max_gate_angle_degrees}`;     // (connecting HTML)
+    g.rng_1_value = max_gate_angle_degrees;                          // sets object max angle  value
+    g.gate_angle = max_gate_angle_degrees;                           // sets abojected max angle_value
+  }
+  angle_slider.setAttribute("max", `${max_gate_angle_degrees}`);     // sets anglue slider to the max value in HTML(max between g.gate angle and )
+
+
   push();
   fill(0, 100, 200, 40);
   strokeWeight(0);
+
+
+
+  // Trapazoid Vertices for Water 
   beginShape();
-  // The four vertices are the four corners of the trapezoid
-  vertex(100, 500);
-  vertex(500, 500);
-  vertex(water_top_right_x_coordinate, 500 - water_height_in_pixels);
-  vertex(100, 500 - water_height_in_pixels);
+  vertex(100, 500);                                                     // bottom left
+  vertex(400, 500);                                                     // bottom right
+  vertex(water_top_right_x_coordinate, 500 - water_height_in_pixels);   // top left
+  vertex(100, 500 - water_height_in_pixels);                            // top right
   endShape();
   pop();
 
-  push();
-
-  translate(490, 510);
-  rotate(gate_angle_radians - Math.PI); // Gate Angle Settings
-  rect(-12.5, 0, 25, gate_length);
-
-  pop();
 
 
+  // Gate Rectangle That Rotates From The Fulcrum
+
+  push();                                     //
+  translate(390, 510);                        //
+  rotate(gate_angle_radians - Math.PI);       // Gate Angle Settings
+  rect(-12.5, 0, 30, gate_length);            //  
+  pop();                                      //
 
 
-  push()
-  fill(128)
-  ellipse(490, 510, 40, 40);
-  pop();
 
+  // Fulcrum Hinge
 
+  push()                                      //
+  fill(128)                                   //
+  ellipse(390, 510, 50, 50);                  //
+  pop();                                      //
 
 }
 
 // connects html to Javascript and assigns them to a const variable
-const range_1_element = document.getElementById("range-1");
-const range_1_value_label = document.getElementById("range-1-value");
-const range_2_element = document.getElementById("range-2");
-const range_2_value_label = document.getElementById("range-2-value");
-const range_3_element = document.getElementById("range-3");
-const range_3_value_label = document.getElementById("range-3-value");
-const select_element = document.getElementById("select-1");
-const select_label = document.getElementById("select-value");
+const range_1_element = document.getElementById("Angle_Slider");
+const range_1_value_label = document.getElementById("Angle_Slider_Value");
+const range_2_element = document.getElementById("Water_Height");
+const range_2_value_label = document.getElementById("Water_Height_Value");
+const range_3_element = document.getElementById("Gate_Weight");
+const range_3_value_label = document.getElementById("Gate_Weight_Value");
+const select_element = document.getElementById("Unit_Selection");
+const select_label = document.getElementById("Unit_Selection_Value");
 
 range_1_element.addEventListener("input", function () {
 
   const rng_1_value = Number(range_1_element.value); // range_1_element.value is a string by default, so we need to convert it to a number.
-
-  range_1_value_label.innerHTML = `${rng_1_value}`; // Edit the text of the global var range_1_value
+  range_1_value_label.innerHTML = `${Angle_Slider}`; // Edit the text of the global var range_1_value
   g.rng_1_value = rng_1_value; // Assign the number to the global object.
   const angle = Number(range_1_element.value); // convert the value of the slider from a string to a number
   g.gate_angle = angle;
@@ -137,20 +123,26 @@ range_1_element.addEventListener("input", function () {
 });
 
 range_2_element.addEventListener("input", function () {
+
   const rng_2_value = Number(range_2_element.value);
-  range_2_value_label.innerHTML = `${rng_2_value}`;
+  range_2_value_label.innerHTML = `${Water_height}`;
   g.rng_2_value = rng_2_value;
   const height = Number(range_2_element.value)
   g.water_level = height;
+
 });
 
 range_3_element.addEventListener("input", function () {
+
   const rng_3_value = Number(range_3_element.value);
-  range_3_value_label.innerHTML = `${rng_3_value}`;
+  range_3_value_label.innerHTML = `${Gate_Weight}`;
   g.rng_3_value = rng_3_value;
+
 });
 
 select_element.addEventListener("change", function () {
+
   const select_value = select_element.value;
   g.select_value = select_value;
+
 })
