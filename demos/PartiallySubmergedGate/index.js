@@ -1,12 +1,11 @@
 // Declare global variables within this object. They will be available across all files as "g.variable_name".You can make another script file aside from index.js by putting <script src="./path-to/other-js-file.js"></script> after the "index.js" HTML element. All the variables you declare in this file will be accessible there. It's best practice to store your global variables within an object E.G. "g.rng_1_value" because it will minimize the risk of namespace issues.
 window.g = {
   cnv: undefined,
-  rng_1_value: 0,
-  rng_2_value: 0,
   rng_3_value: 0,
   select_value: "value-1",
   gate_angle: 45, // degrees
   water_level: 5, // meters or ft
+
 }
 
 // See https://p5js.org/ to learn how to use this graphics library. setup() and draw() are used to draw on the canvas object of the page.  Seriously, spend some time learning p5.js because it will make drawing graphics a lot easier.  You can watch tutorial videos on the "Coding Train" youtube channel. They have a p5.js crash course under their playlists section.  It will make these functions make a lot more sense.
@@ -63,6 +62,7 @@ function draw() {
     g.rng_1_value = max_gate_angle_degrees;                          // sets object max angle  value
     g.gate_angle = max_gate_angle_degrees;                           // sets abojected max angle_value
   }
+
   angle_slider.setAttribute("max", `${max_gate_angle_degrees}`);     // sets anglue slider to the max value in HTML(max between g.gate angle and )
 
 
@@ -103,39 +103,45 @@ function draw() {
 }
 
 // connects html to Javascript and assigns them to a const variable
-const range_1_element = document.getElementById("Angle_Slider");
+const Angle_Slider_Element = document.getElementById("Angle_Slider");
 const range_1_value_label = document.getElementById("Angle_Slider_Value");
-const range_2_element = document.getElementById("Water_Height");
+const Water_Height_Element = document.getElementById("Water_Height");
 const range_2_value_label = document.getElementById("Water_Height_Value");
-const range_3_element = document.getElementById("Gate_Weight");
+const Gate_Weight_Element = document.getElementById("Gate_Weight");
 const range_3_value_label = document.getElementById("Gate_Weight_Value");
 const select_element = document.getElementById("Unit_Selection");
 const select_label = document.getElementById("Unit_Selection_Value");
 
-range_1_element.addEventListener("input", function () {
 
-  const rng_1_value = Number(range_1_element.value); // range_1_element.value is a string by default, so we need to convert it to a number.
-  range_1_value_label.innerHTML = `${rng_1_value}`; // Edit the text of the global var range_1_value
-  g.rng_1_value = rng_1_value; // Assign the number to the global object.
-  const angle = Number(range_1_element.value); // convert the value of the slider from a string to a number
+
+
+
+// Angle Slider Code 
+Angle_Slider_Element.addEventListener("input", function () {
+
+  const angle = Number(Angle_Slider_Element.value); // convert the value of the slider 
+  range_1_value_label.innerHTML = `${angle}`; // Edit the text of the global var range_1_value
   g.gate_angle = angle;
 
 });
 
-range_2_element.addEventListener("input", function () {
 
-  const rng_2_value = Number(range_2_element.value);
-  range_2_value_label.innerHTML = `${Water_height}`;
-  g.rng_2_value = rng_2_value;
-  const height = Number(range_2_element.value)
+// Water_Height Slider Code
+Water_Height_Element.addEventListener("input", function () {
+
+  const height = Number(Water_Height_Element.value);
+  range_2_value_label.innerHTML = `${height}`;
   g.water_level = height;
 
 });
 
-range_3_element.addEventListener("input", function () {
 
-  const rng_3_value = Number(range_3_element.value);
-  range_3_value_label.innerHTML = `${Gate_Weight}`;
+
+// Gate_Weight
+Gate_Weight_Element.addEventListener("input", function () {
+
+  const rng_3_value = Number(Gate_Weight_Element.value);
+  range_3_value_label.innerHTML = `${rng_3_value}`;
   g.rng_3_value = rng_3_value;
 
 });
