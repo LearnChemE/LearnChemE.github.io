@@ -115,7 +115,7 @@ const select_label = document.getElementById("Unit_Selection_Value");
 range_1_element.addEventListener("input", function () {
 
   const rng_1_value = Number(range_1_element.value); // range_1_element.value is a string by default, so we need to convert it to a number.
-  range_1_value_label.innerHTML = `${Angle_Slider}`; // Edit the text of the global var range_1_value
+  range_1_value_label.innerHTML = `${rng_1_value}`; // Edit the text of the global var range_1_value
   g.rng_1_value = rng_1_value; // Assign the number to the global object.
   const angle = Number(range_1_element.value); // convert the value of the slider from a string to a number
   g.gate_angle = angle;
