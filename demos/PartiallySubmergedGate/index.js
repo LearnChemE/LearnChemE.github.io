@@ -102,7 +102,7 @@ function draw() {
 
 }
 
-// connects html to Javascript and assigns them to a const variable
+// Connects HTML to Javascript and assigns them to a const variable
 const Angle_Slider_Element = document.getElementById("Angle_Slider");
 const range_1_value_label = document.getElementById("Angle_Slider_Value");
 const Water_Height_Element = document.getElementById("Water_Height");
@@ -111,6 +111,7 @@ const Gate_Weight_Element = document.getElementById("Gate_Weight");
 const range_3_value_label = document.getElementById("Gate_Weight_Value");
 const select_element = document.getElementById("Unit_Selection");
 const select_label = document.getElementById("Unit_Selection_Value");
+// const select_height_inits = document.getElementById("select_height_units")
 
 
 
