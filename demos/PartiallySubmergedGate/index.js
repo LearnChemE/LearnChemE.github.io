@@ -5,6 +5,7 @@ window.g = {
   select_value: "value-1",
   gate_angle: 45, // degrees
   water_level: 5, // meters or ft
+  water_units: 'm'
 
 }
 
@@ -102,7 +103,7 @@ function draw() {
 
 }
 
-// Connects HTML to Javascript and assigns them to a const variable
+// connects html to Javascript and assigns them to a const variable
 const Angle_Slider_Element = document.getElementById("Angle_Slider");
 const range_1_value_label = document.getElementById("Angle_Slider_Value");
 const Water_Height_Element = document.getElementById("Water_Height");
@@ -111,7 +112,9 @@ const Gate_Weight_Element = document.getElementById("Gate_Weight");
 const range_3_value_label = document.getElementById("Gate_Weight_Value");
 const select_element = document.getElementById("Unit_Selection");
 const select_label = document.getElementById("Unit_Selection_Value");
-// const select_height_inits = document.getElementById("select_height_units")
+
+// Code I added, trying to link the button units to unit selection.
+const select_water_units = document.getElementById('Unit_Selection_Height')
 
 
 
@@ -149,7 +152,11 @@ Gate_Weight_Element.addEventListener("input", function () {
 
 select_element.addEventListener("change", function () {
 
+  // I messed with this... a little confused how to connect multiple values to the unit seleciton
   const select_value = select_element.value;
-  g.select_value = select_value;
+  g.selected_value = select_value;
+
+  // I originally added an if statemnt, but was confused to match up the HTML units and unit values without using another pull down menu
+
 
 })
