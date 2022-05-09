@@ -255,6 +255,8 @@
             </div>
             
             <div class="tab-content" id="external-spring-content">
+              <span style="background:yellow">Disclaimer: the following section is under review, we will finish as soon as we can.<br></span>
+
               The differential energy balance for the total moles of the system is
               $$
                 [1] \quad n d U = dQ_{total} + dW_{total} = dQ_{total} - n P dV
@@ -278,35 +280,13 @@
                 [3] \quad P = \frac{ n R T }{ V }
               $$
 
-              
+              and temperature is determined:
 
               $$
-                [4] \quad 
+                [4] \quad T = \frac{ Q_{total} - P_{atm} ( V - V_{init} ) }{ n C_{v} } - k \frac{ \frac{ V^{2} - V_{init}^2 }{ 2 } - V_{ init }( V - V_{init} ) }{ C_{v} A^{ 2 } } + T_{init}
               $$
 
-
-
-              $$
-                [5] \quad 
-              $$
-
-
-
-              $$
-                [6] \quad 
-              $$
-
-
-
-              $$
-                [7] \quad 
-              $$
-
-
-
-              $$
-                [8] \quad 
-              $$
+              and equations [1 - 4] are iterated multiple times until the desired accuracy is reached.
             </div>
             
             <div class="tab-content" id="constant-t-content">
