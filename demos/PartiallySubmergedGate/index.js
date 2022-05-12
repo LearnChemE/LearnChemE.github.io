@@ -54,12 +54,12 @@ function draw() {
   const max_gate_angle = Math.acos(water_height_in_pixels / gate_length); // uses the height of the water and gate length to deterine a max angle from a for loop that will be usd later
 
   let max_gate_angle_degrees = max_gate_angle * 360 / (2 * PI) - 1; // conversion to radians (not sure why its subtracting by -1)
-  const angle_slider = document.getElementById("Angle_Slider");
+  const angle_slider = document.getElementById("angle-slider");
 
   if (max_gate_angle_degrees < g.gate_angle) {
     max_gate_angle_degrees = Math.floor(max_gate_angle_degrees);     // changes max_gate_angle egrees to lowest gate angle
     angle_slider.setAttribute("value", `${max_gate_angle_degrees}`); // sets the gate anlge to max_gate_angle (connecting HTML)
-    range_1_value_label.innerHTML = `${max_gate_angle_degrees}`;     // (connecting HTML)
+    angle_value_label.innerHTML = `${max_gate_angle_degrees}`;     // (connecting HTML)
     g.rng_1_value = max_gate_angle_degrees;                          // sets object max angle  value
     g.gate_angle = max_gate_angle_degrees;                           // sets abojected max angle_value
   }
@@ -104,48 +104,44 @@ function draw() {
 }
 
 // connects html to Javascript and assigns them to a const variable
-const Angle_Slider_Element = document.getElementById("Angle_Slider");
-const range_1_value_label = document.getElementById("Angle_Slider_Value");
-const Water_Height_Element = document.getElementById("Water_Height");
-const range_2_value_label = document.getElementById("Water_Height_Value");
-const Gate_Weight_Element = document.getElementById("Gate_Weight");
-const range_3_value_label = document.getElementById("Gate_Weight_Value");
-const select_element = document.getElementById("Unit_Selection");
-const select_label = document.getElementById("Unit_Selection_Value");
+const angle_slider_element = document.getElementById("angle-slider");
+const angle_value_label = document.getElementById("angle-slider-value");
+const water_height_element = document.getElementById("water-height");
+const water_height_value_label = document.getElementById("water-height-value");
+const gate_weight_element = document.getElementById("gate-weight");
+const gate_weight_value_label = document.getElementById("gate-weight-value");
+const select_element = document.getElementById("unit-selection");
+const select_label = document.getElementById("unit-selection-value");
 
 // Code I added, trying to link the button units to unit selection.
-const select_water_units = document.getElementById('Unit_Selection_Height')
+const select_water_units = document.getElementById('unit-selection-height')
 
+// angle slider Code 
+angle_slider_element.addEventListener("input", function () {
 
-
-
-
-// Angle Slider Code 
-Angle_Slider_Element.addEventListener("input", function () {
-
-  const angle = Number(Angle_Slider_Element.value); // convert the value of the slider 
-  range_1_value_label.innerHTML = `${angle}`; // Edit the text of the global var range_1_value
+  const angle = Number(angle_slider_element.value); // convert the value of the slider 
+  angle_value_label.innerHTML = `${angle}`; // Edit the text of the global var angle_value
   g.gate_angle = angle;
 
 });
 
 
-// Water_Height Slider Code
-Water_Height_Element.addEventListener("input", function () {
+// Water_height slider Code
+water_height_element.addEventListener("input", function () {
 
-  const height = Number(Water_Height_Element.value);
-  range_2_value_label.innerHTML = `${height}`;
+  const height = Number(water_height_element.value);
+  water_height_value_label.innerHTML = `${height}`;
   g.water_level = height;
 
 });
 
 
 
-// Gate_Weight
-Gate_Weight_Element.addEventListener("input", function () {
+// gate_weight
+gate_weight_element.addEventListener("input", function () {
 
-  const rng_3_value = Number(Gate_Weight_Element.value);
-  range_3_value_label.innerHTML = `${rng_3_value}`;
+  const rng_3_value = Number(gate_weight_element.value);
+  gate_weight_value_label.innerHTML = `${rng_3_value}`;
   g.rng_3_value = rng_3_value;
 
 });

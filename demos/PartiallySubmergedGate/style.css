@@ -8,7 +8,7 @@
 /* vw means "viewport width". It is a percentage of the window width, so 100vw means the width of the entire browser. Margin is essentially what it says it is - it adds a buffer between elements. */
 #simulation-title {
   width: 100vw; /* positions your Alex's Template title on the page*/
-  height: 35px; /* Changes the amoutn of weight space below the title */
+  height: 30px; /* Changes the amoutn of weight space below the title */
   text-align: center; /* Aligns text in the middle of the screen */
   margin-top: 15px; /* Alters the whitespace at the top of the website  */
   margin-bottom: 5px; /* same as above -- opposite*/
@@ -30,33 +30,66 @@
   display: grid; 
   grid-template-columns: max-content max-content;
   justify-content: center;
-  gap: 20px 50px; /* changes positioning of the inputs above the simulation window*/
+  align-content: center;
+  gap: 15px 20px; /* changes positioning of the inputs above the simulation window*/
 }
 /* alters the text after sliders (0 and units)*/
 .input-row {
   display: grid;
-  grid-template-columns: max-content 150px 15px max-content;
-  gap: 10px;
+  grid-template-columns: 120px 150px max-content max-content;
+  gap: 2px;
   align-items: end;
   justify-items: center;
   height: 15px; /* moves the group of inputs up and down the page */
 }
 
+.input-label {
+  margin-right: 10px;
+}
+
+input[type="range"] {
+  margin-right: 15px;
+}
+
+.value-label {
+  text-align: right;
+  width: 25px;
+}
+
+.input-label {
+  text-align: right;
+  justify-self: right;
+}
+
+#gate-weight-value {
+  width: 25px;
+  margin-right: 5px;
+}
+
+#water-height {
+  margin-left: 2px;
+}
+
 /*  Affects selection button and selection value spacing*/
 .select-row {
   display: grid;
-  grid-template-columns: repeat(3, max-content);
+  grid-template-columns: 100px max-content max-content;
   gap: 10px;
   align-items: center;
 }
 
+.select-label {
+  text-align: right;
+}
+
 select {
-  padding: 2px 5px;
+  padding: 4px 8px;
+  width: 150px;
 }
 
 #graphics-wrapper {
   position: absolute;
-  top: 135px;
+  top: 120px;
   width: 100vw;
   height: max-content;
   display: grid;
