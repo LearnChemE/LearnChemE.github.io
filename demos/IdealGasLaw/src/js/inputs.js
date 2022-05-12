@@ -9,7 +9,7 @@ const pressureRow = document.getElementById("pressure-row");
 heatSlider.addEventListener("input", () => {
   const heat = Number(heatSlider.value);
   gvs.heat_added = heat * 1000;
-  heatValue.innerHTML = heat.toFixed(1);
+  heatValue.innerHTML = heat.toFixed(2);
   gvs.p.redraw();
 });
 
@@ -20,7 +20,7 @@ heatSlider.addEventListener("mousedown", () => {
 pressureSlider.addEventListener("input", () => {
   const pressure = Number(pressureSlider.value);
   gvs.P = pressure * 101325;
-  pressureValue.innerHTML = pressure.toFixed(1);
+  pressureValue.innerHTML = pressure.toFixed(2);
   gvs.p.redraw();
 });
 
@@ -47,9 +47,9 @@ modeSelection.addEventListener("input", () => {
       gvs.V = 0.0224;
       gvs.n = 1;
       heatSlider.value = "0";
-      heatValue.innerHTML = "0.0";
-      pressureSlider.value = "1.0";
-      pressureValue.innerHTML = "1.0";
+      heatValue.innerHTML = "0.00";
+      pressureSlider.value = "1.00";
+      pressureValue.innerHTML = "1.00";
     break;
 
     case "constant-v":
@@ -62,9 +62,9 @@ modeSelection.addEventListener("input", () => {
       gvs.V = 0.05;
       gvs.n = gvs.P * gvs.V / ( gvs.R * gvs.T );
       heatSlider.value = "0";
-      heatValue.innerHTML = "0.0";
-      pressureSlider.value = "1.0";
-      pressureValue.innerHTML = "1.0";
+      heatValue.innerHTML = "0.00";
+      pressureSlider.value = "1.00";
+      pressureValue.innerHTML = "1.00";
     break;
 
     case "adiabatic-reversible":
@@ -77,9 +77,9 @@ modeSelection.addEventListener("input", () => {
       gvs.V = 0.0224 / 0.35 * 0.8;
       gvs.n = 2.286;
       heatSlider.value = "0";
-      heatValue.innerHTML = "0.0";
-      pressureSlider.value = "1.0";
-      pressureValue.innerHTML = "1.0";
+      heatValue.innerHTML = "0.00";
+      pressureSlider.value = "1.00";
+      pressureValue.innerHTML = "1.00";
       pressureSlider.setAttribute("max", "8.0");
     break;
 
@@ -93,9 +93,9 @@ modeSelection.addEventListener("input", () => {
       gvs.V = 0.0224 / 0.35 * 0.5;
       gvs.n = 1.429;
       heatSlider.value = "0";
-      heatValue.innerHTML = "0.0";
-      pressureSlider.value = "1.0";
-      pressureValue.innerHTML = "1.0";
+      heatValue.innerHTML = "0.00";
+      pressureSlider.value = "1.00";
+      pressureValue.innerHTML = "1.00";
     break;
 
     case "constant-t":
@@ -108,9 +108,9 @@ modeSelection.addEventListener("input", () => {
       gvs.V = 0.0224 / 0.35 * 0.8;
       gvs.n = 2.287;
       heatSlider.value = "0";
-      heatValue.innerHTML = "0.0";
-      pressureSlider.value = "1.0";
-      pressureValue.innerHTML = "1.0";
+      heatValue.innerHTML = "0.00";
+      pressureSlider.value = "1.00";
+      pressureValue.innerHTML = "1.00";
       pressureSlider.setAttribute("max", "4.0");
     break;
   }

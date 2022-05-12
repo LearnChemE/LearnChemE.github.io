@@ -194,16 +194,16 @@ function drawText(p) {
       piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
       p.push();
       p.translate(shift_left, 0);
-      p.textSize(22);
+      p.textSize(21);
       p.textAlign(p.CENTER);
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 120);
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 160);
       p.text(`n = 1.0 mol`, centerX - 60, centerY + 160);
-      p.text(`P = 1.0 atm`, centerX - 60, centerY + 120);
-      p.text(`P   = 1.0 atm`, centerX, piston_height - 50);
+      p.text(`P = 1.00 atm`, centerX - 60, centerY + 120);
+      p.text(`P   = 1.00 atm`, centerX, piston_height - 50);
       p.textSize(12);
-      p.text(`ext`, centerX - 42, piston_height - 46);
-      p.textSize(22);
+      p.text(`atm`, centerX - 47, piston_height - 46);
+      p.textSize(21);
       p.text(`↓`, centerX, piston_height - 28);
       p.textAlign(p.LEFT);
       Q_color = p.color(`${100 + 155 * gvs.heat_added / 10000}`, 100, 100);
@@ -211,7 +211,7 @@ function drawText(p) {
       const heat_text_1 = gvs.heat_added == 1e4 ? "10" : Number(gvs.heat_added / 1000).toFixed(2)
       p.text(`Q     = ${heat_text_1} kJ`, centerX - c_width / 2 - 190, centerY + 140);
       p.textSize(12);
-      p.text("total", centerX - c_width / 2 - 169, centerY + 145);
+      p.text("total", centerX - c_width / 2 - 171, centerY + 145);
       p.stroke(Q_color);
       p.strokeWeight(2);
       p.line(centerX - c_width / 2 - 8, centerY + 132, centerX - c_width / 2 - 44, centerY + 132);
@@ -222,11 +222,11 @@ function drawText(p) {
     case "constant-v":
       p.push();
       p.translate(shift_left, 0);
-      p.textSize(22);
+      p.textSize(21);
       p.textAlign(p.CENTER);
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 100);
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 62, centerY + 140);
-      p.text(`P = ${(gvs.P / 101325).toFixed(1)} atm`, centerX - 60, centerY + 100);
+      p.text(`P = ${(gvs.P / 101325).toFixed(2)} atm`, centerX - 60, centerY + 100);
       p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 55, centerY + 140);
       p.textAlign(p.LEFT);
       Q_color = p.color(`${100 + 155 * gvs.heat_added / 10000}`, 100, 100);
@@ -239,26 +239,26 @@ function drawText(p) {
       p.triangle(centerX - c_width / 2 - 8, centerY + 132, centerX - c_width / 2 - 20, centerY + 137, centerX - c_width / 2 - 20, centerY + 127);
       p.textSize(12);
       p.noStroke();
-      p.text("total", centerX - c_width / 2 - 169, centerY + 145);
+      p.text("total", centerX - c_width / 2 - 171, centerY + 145);
       p.pop();
     break;
 
     case "adiabatic-reversible":
       p.push();
       p.translate(shift_left, 0);
-      p.textSize(22);
+      p.textSize(21);
       p.textAlign(p.CENTER);
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
-      p.text(`P = ${(gvs.P / 101325).toFixed(1)} atm`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height));
+      p.text(`P = ${(gvs.P / 101325).toFixed(2)} atm`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 55, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.textAlign(p.LEFT);
       piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
-      p.text(`P   = ${Number(gvs.P / 101325).toFixed(1)} atm`, centerX - 52, piston_height - 49);
+      p.text(`P   = ${Number(gvs.P / 101325).toFixed(2)} atm`, centerX - 52, piston_height - 49);
       p.textSize(12);
-      p.text(`ext`, centerX - 42, piston_height - 45);
-      p.text("total", centerX - c_width / 2 - 188, centerY + 145);
-      p.textSize(22);
+      p.text(`atm`, centerX - 41, piston_height - 45);
+      p.text("total", centerX - c_width / 2 - 182, centerY + 145);
+      p.textSize(21);
       p.text(`↓`, centerX, piston_height - 28);
       p.textAlign(p.RIGHT);
       Q_color = p.color(`${100 + 155 * gvs.heat_added / 10000}`, 100, 100);
@@ -274,7 +274,7 @@ function drawText(p) {
     case "spring":
       p.push();
       p.translate(shift_left, 0);
-      p.textSize(22);
+      p.textSize(21);
       p.textAlign(p.CENTER);
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 65, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 65, centerY + 150 * (1.2 - gvs.piston_height) + 40);
@@ -282,17 +282,17 @@ function drawText(p) {
       p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 55, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.textAlign(p.LEFT);
       piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
-      p.text(`P   = 1.0 atm`, centerX - 52, piston_height - 49);
+      p.text(`P    = 1.00 atm`, centerX - 56, piston_height - 49);
       p.textSize(12);
-      p.text(`atm`, centerX - 42, piston_height - 45);
-      p.textSize(22);
+      p.text(`atm`, centerX - 41, piston_height - 49);
+      p.textSize(21);
       p.text(`↓`, centerX, piston_height - 28);
       Q_color = p.color(`${100 + 155 * gvs.heat_added / 10000}`, 100, 100);
       p.fill(Q_color);
       const heat_text_3 = gvs.heat_added == 1e4 ? "10.0" : Number(gvs.heat_added / 1000).toFixed(2);
       p.text(`Q     = ${heat_text_3} kJ`, centerX - c_width / 2 - 190, centerY + 140);
       p.textSize(12);
-      p.text("total", centerX - c_width / 2 - 169, centerY + 145);
+      p.text("total", centerX - c_width / 2 - 171, centerY + 145);
       p.stroke(Q_color);
       p.strokeWeight(2);
       p.line(centerX - c_width / 2 - 8, centerY + 132, centerX - c_width / 2 - 44, centerY + 132);
@@ -303,28 +303,28 @@ function drawText(p) {
     case "constant-t":
       p.push();
       p.translate(shift_left, 0);
-      p.textSize(22);
+      p.textSize(21);
       p.textAlign(p.CENTER);
       p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
-      p.text(`P = ${(gvs.P / 101325).toFixed(1)} atm`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height));
+      p.text(`P = ${(gvs.P / 101325).toFixed(2)} atm`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 55, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.textAlign(p.LEFT);
       piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
-      p.text(`P   = ${Number(gvs.P / 101325).toFixed(1)} atm`, centerX - 52, piston_height - 49);
+      p.text(`P   = ${Number(gvs.P / 101325).toFixed(2)} atm`, centerX - 52, piston_height - 49);
       p.textSize(12);
-      p.text(`ext`, centerX - 42, piston_height - 45);
-      p.textSize(22);
+      p.text(`atm`, centerX - 41, piston_height - 45);
+      p.textSize(21);
       p.text(`↓`, centerX, piston_height - 28);
       Q_color = p.color(100, 100, 100 + 155 * gvs.P / 800000);
       p.fill(Q_color);
       const heat_text_4 = gvs.P == 101325 ? " 0.0" : ` ${Number(Math.abs(gvs.heat_added / 1000)).toFixed(2)}`;
-      p.text(`Q     =`, centerX - c_width / 2 - 209, centerY + 140);
+      p.text(`Q     =`, centerX - c_width / 2 - 204, centerY + 140);
       p.text(`${heat_text_4} kJ`, centerX - c_width / 2 - 135, centerY + 140);
       const minus = gvs.P == 101325 ? "" : "-";
       p.text(`${minus}`, centerX - c_width / 2 - 138, centerY + 139);
       p.textSize(12);
-      p.text("total", centerX - c_width / 2 - 188, centerY + 145);
+      p.text("total", centerX - c_width / 2 - 186, centerY + 145);
       p.stroke(Q_color);
       p.strokeWeight(2);
       p.line(centerX - c_width / 2 - 13, centerY + 132, centerX - c_width / 2 - 54, centerY + 132);
@@ -401,7 +401,7 @@ function drawBarGraph(p) {
         p.rect(780, 450, 55, - 0.35 * bar_graph_height * (gvs.V / 0.0224) );
       break;
     }
-    p.textSize(22);
+    p.textSize(21);
     p.fill(0);
     p.noStroke();
     p.fill(50, 155, 50);
