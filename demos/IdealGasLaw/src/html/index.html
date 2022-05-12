@@ -321,13 +321,13 @@
               so,
 
               $$
-                [12] \quad n C_{v} (T - T_{init}) = Q_{total} - P_{atm} (V - V_{init}) + \frac{ k }{ A^{ 2 } } (\frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ))
+                [12] \quad n C_{v} (T - T_{init}) = Q_{total} - P_{atm} (V - V_{init}) + \frac{ k }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right)
               $$
 
               therefore temperature \( T \) (K) is:
 
               $$
-                [13] \quad T = \frac{ Q_{total} - P_{atm} (V - V_{init}) + \frac{ k }{ A^{ 2 } } (\frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} )) }{ n C_{v} } + T_{init}
+                [13] \quad T = \frac{ Q_{total} - P_{atm} (V - V_{init}) + \frac{ k }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right) }{ n C_{v} } + T_{init}
               $$
 
               Equations [5], [6], and [13] are iterated multiple times until the desired accuracy is reached (1000 iterations in this simulation). Note that while the calculations are performed with standard S.I. units, unit conversion is performed afterwards to show pressure in atm, volume in L, and heat added in kJ.
