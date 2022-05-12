@@ -191,6 +191,8 @@ canvas {
   .tab-content {
     grid-column: 1 / 6;
     min-height: 782px;
+    max-height: 782px;
+    overflow: auto;
     position: absolute;
     width: 100%;
     top: 40px;
