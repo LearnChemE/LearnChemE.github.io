@@ -9,7 +9,11 @@ const pressureRow = document.getElementById("pressure-row");
 heatSlider.addEventListener("input", () => {
   const heat = Number(heatSlider.value);
   gvs.heat_added = heat * 1000;
-  heatValue.innerHTML = heat.toFixed(2);
+  if(heat >= 1) {
+    heatValue.innerHTML = heat.toPrecision(3);
+  } else {
+    heatValue.innerHTML = heat.toPrecision(2);
+  }
   gvs.p.redraw();
 });
 
@@ -20,7 +24,11 @@ heatSlider.addEventListener("mousedown", () => {
 pressureSlider.addEventListener("input", () => {
   const pressure = Number(pressureSlider.value);
   gvs.P = pressure * 101325;
-  pressureValue.innerHTML = pressure.toFixed(2);
+  if(pressure >= 1) {
+    pressureValue.innerHTML = pressure.toPrecision(3);
+  } else {
+    pressureValue.innerHTML = pressure.toPrecision(2);
+  }
   gvs.p.redraw();
 });
 

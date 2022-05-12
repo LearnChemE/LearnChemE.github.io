@@ -48,14 +48,14 @@
 
       <div class="input-row" id="heat-row">
         <div class="data-name">Heat Added&nbsp;</div>
-        <input type="range" id="q-slider" min="0" max="8" step="0.01" value="0">
+        <input type="range" id="q-slider" min="0" max="10" step="0.01" value="0">
         <div class="data-value" id="q-value">0.00</div>
         <div class="data-metric">kJ</div>
       </div>
 
       <div class="input-row" id="pressure-row">
         <div class="data-name">Pressure&nbsp;</div>
-        <input type="range" id="p-slider" min="1" max="8" step="0.001" value="1">
+        <input type="range" id="p-slider" min="1" max="4" step="0.001" value="1">
         <div class="data-value" id="p-value">1.0</div>
         <div class="data-metric">atm</div>
       </div>
@@ -315,19 +315,19 @@
               the term \( W_{total} \) in equation [1] is found by integrating equation [1], given that \( dU = n C_{v} dT \) where \( C_{v} \) is the constant-volume heat capacity, and using equation [10] for \( P_{spr} \):
 
               $$
-                [11] \quad \int_{ T_{init} }^{ T } n C_{v} dT = Q_{total} - \int_{ V_{init} }^{ V } \left[ P_{atm} + \frac{ k }{ A^{ 2 } }(V - V_{init}) \right] dV
+                [11] \quad \int_{ T_{init} }^{ T } n C_{v} dT = Q_{total} - \int_{ V_{init} }^{ V } n \left[ P_{atm} + \frac{ k }{ A^{ 2 } }(V - V_{init}) \right] dV
               $$
 
               so,
 
               $$
-                [12] \quad n C_{v} (T - T_{init}) = Q_{total} - P_{atm} (V - V_{init}) + \frac{ k }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right)
+                [12] \quad n C_{v} (T - T_{init}) = Q_{total} - n P_{atm} (V - V_{init}) + \frac{ k n }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right)
               $$
 
               therefore temperature \( T \) (K) is:
 
               $$
-                [13] \quad T = \frac{ Q_{total} - P_{atm} (V - V_{init}) + \frac{ k }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right) }{ n C_{v} } + T_{init}
+                [13] \quad T = \frac{ Q_{total} - P_{atm} (V - V_{init}) + \frac{ k n }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right) }{ n C_{v} } + T_{init}
               $$
 
               Equations [5], [6], and [13] are iterated multiple times until the desired accuracy is reached (1000 iterations in this simulation). Note that while the calculations are performed with standard S.I. units, unit conversion is performed afterwards to show pressure in atm, volume in L, and heat added in kJ.
