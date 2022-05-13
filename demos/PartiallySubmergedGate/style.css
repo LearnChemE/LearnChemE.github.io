@@ -36,7 +36,7 @@
 /* alters the text after sliders (0 and units)*/
 .input-row {
   display: grid;
-  grid-template-columns: 120px 150px max-content max-content;
+  grid-template-columns: 120px 150px 4ch max-content;
   gap: 2px;
   align-items: end;
   justify-items: center;
