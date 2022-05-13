@@ -33,27 +33,27 @@
   <div class="simulation-controls">
     <div class="input-area">
       <div class="checkbox-wrapper">
-        <div class="checkbox-label">Constant enthalpy curves</div>
+        <div class="checkbox-label green">Constant enthalpy curves <img id="green-line-img" class="line-img" src="./assets/green_line.PNG" /></div>
         <input type="checkbox" id="show-enthalpy" />
         <span class="checkmark"></span>
       </div>
       <div class="checkbox-wrapper">
-        <div class="checkbox-label">Constant entropy curves</div>
+        <div class="checkbox-label blue">Constant entropy curves <img id="blue-line-img" class="line-img" src="./assets/blue_line.PNG" /></div>
         <input type="checkbox" id="show-entropy" />
         <span class="checkmark"></span>
       </div>
       <div class="checkbox-wrapper">
-        <div class="checkbox-label">Constant temperature curves</div>
-        <input type="checkbox" id="show-temperature" checked />
+        <div class="checkbox-label red">Constant temperature curves <img id="red-line-img" class="line-img" src="./assets/red_line.PNG" /></div>
+        <input type="checkbox" id="show-temperature" />
         <span class="checkmark"></span>
       </div>
       <div class="checkbox-wrapper">
-        <div class="checkbox-label">Constant quality curves</div>
+        <div class="checkbox-label black">Constant quality curves <img id="black-line-img" class="line-img" src="./assets/black_line.PNG" /></div>
         <input type="checkbox" id="show-quality" checked />
         <span class="checkmark"></span>
       </div>
       <div class="checkbox-wrapper">
-        <div class="checkbox-label">Show grid</div>
+        <div class="checkbox-label">Grid lines</div>
         <input type="checkbox" id="show-grid" checked />
         <span class="checkmark"></span>
       </div>
@@ -81,7 +81,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation shows the constant enthalpy, entropy, temperature, and quality curves on a pressure-volume diagram for water. By default, the plot shows the phase envelope as a thick black line, and the constant temperature and quality curves in red and grey, respectively. Toggle property curves on or off by clicking the appropriate checkbox above the plot. Toggle the grid on and off using the "Show grid" checkbox. The units for each curve are shown in the top-right of the diagram, such that the numbers written over the curves have that unit. For example, a constant entropy curve with a "7.000" label represents an isentrope with a value of 7.000 kJ/(kg °C).
+            This simulation shows constant enthalpy, entropy, temperature, and quality curves on a log pressure versus log volume diagram for water. The phase envelope is a thick black line. Toggle property curves on or off by clicking the appropriate checkbox above the plot. Toggle grid lines on and off using the "gridlines" checkbox.
           </p>
 
         </div>
@@ -103,7 +103,7 @@
 
         <div class="modal-body">
           <p>
-            The thick black line on the pressure-volume diagram represents the phase envelope. Inside the phase envelope is the two-phase region where water vapor and liquid are in equilibrium. Outside of the phase envelope, the phase of water may be liquid, vapor, or supercritical fluid depending on the pressure and specific volume. For a constant temperature curve (an isotherm), pressure remains constant inside the phase envelope, resulting in horizontal lines inside the phase envelope. Curves of constant quality, enthalpy, or entropy do not have constant pressure within the two-phase region, although the slope of the curves may change abruptly when entering and exiting the two-phase region due to the large difference in the thermodynamic properties of liquid water and steam. These constant-property curves were compiled using steam tables, which provide thermodynamic properties of water over a large range of pressures and temperatures. Download steam tables as an Excel spreadsheet or in other formats <a href="https://learncheme.com/student-resources/steam-tables/" target="_blank">here</a>.
+            The thick black line on the pressure-volume diagram represents the phase envelope. Inside the phase envelope is the two-phase region where vapor and liquid are in equilibrium. Outside of the phase envelope, only one phase is present (liquid, vapor, or supercritical fluid). For a constant temperature curve (an isotherm), pressure is constant inside the phase envelope. The constant-property curves were compiled using steam tables that can be downloaded as an Excel spreadsheet or in other formats <a href="https://learncheme.com/student-resources/steam-tables/" target="_blank">here</a>.
           </p>
           <div style="margin-top: 2rem;"></div>
         </div>

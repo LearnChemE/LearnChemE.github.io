@@ -181,3 +181,8 @@ canvas {
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
 }
+
+.line-img {
+    height: 14px;
+    transform: translateY(-1px);
+}

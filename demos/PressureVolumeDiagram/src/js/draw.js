@@ -3,12 +3,27 @@ gvs.graph = {
   margin_top: 58,
   height: 400,
   width: 680,
-  constant_temp_color: gvs.p.color(255, 120, 120),
+  constant_temp_color: gvs.p.color(255, 50, 50),
   phase_label_color: gvs.p.color(84, 34, 11),
-  constant_enthalpy_color: gvs.p.color(0, 150, 150),
+  constant_enthalpy_color: gvs.p.color(0, 200, 150),
   constant_entropy_color: gvs.p.color(0, 0, 255),
   constant_quality_color: gvs.p.color(0, 0, 0),
 }
+
+const green = document.getElementsByClassName("green")[0];
+const red = document.getElementsByClassName("red")[0];
+const blue = document.getElementsByClassName("blue")[0];
+const black = document.getElementsByClassName("black")[0];
+
+const green_rgb = gvs.graph.constant_enthalpy_color.levels;
+const red_rgb = gvs.graph.constant_temp_color.levels;
+const blue_rgb = gvs.graph.constant_entropy_color.levels;
+const black_rgb = gvs.graph.constant_quality_color.levels;
+
+green.style.color = `rgb(${green_rgb[0]}, ${green_rgb[1]}, ${green_rgb[2]})`;
+red.style.color = `rgb(${red_rgb[0]}, ${red_rgb[1]}, ${red_rgb[2]})`;
+blue.style.color = `rgb(${blue_rgb[0]}, ${blue_rgb[1]}, ${blue_rgb[2]})`;
+black.style.color = `rgb(${black_rgb[0]}, ${black_rgb[1]}, ${black_rgb[2]})`;
 
 require("./water_properties.js");
 
@@ -119,6 +134,7 @@ function drawEquilibrium(p) {
   p.noFill();
   p.beginShape();
   // Liquid Curve
+  // 373.95,22.064,2084.3,2084.3,4.407,4.407,.0031056,.0031056
   for (let i = 0; i < eq.length; i++) {
     const TPHSV = eq[i];
     const P = TPHSV[1];
@@ -143,6 +159,14 @@ function drawEquilibrium(p) {
     }
   }
   p.endShape();
+  const V = 0.0031056;
+  const P = 22.064;
+  const P_coord = gvs.graph.height - gvs.graph.height * (Math.log10(P) + 2) / 4;
+  const V_coord = gvs.graph.width * (Math.log10(V) + 3.5) / 5;
+  p.noFill();
+  p.stroke(0);
+  p.strokeWeight(8);
+  p.point(V_coord, P_coord);
   p.pop();
 }
 
@@ -152,7 +176,7 @@ function drawConstantTemperature(p) {
   p.strokeWeight(1);
   p.noFill();
   // temperatures: [60, 80, 100, 120, 160, 260, 300, 400, 800, 1800]
-  const temperature_indices = [1, 2, 3, 4, 6, 8, 11, 13, 18, 38, 88];
+  const temperature_indices = [1, 2, 3, 4, 6, 8, 11, 13, 15, 38, 88];
   let temperature_list = [];
   for (let T = 40; T < 2000; T += 20) {
     temperature_list.push(T);
@@ -189,7 +213,7 @@ function drawConstantEnthalpy(p) {
   p.stroke(gvs.graph.constant_enthalpy_color);
   p.strokeWeight(1);
   p.noFill();
-  setLineDash([7, 7]);
+  // setLineDash([7, 7]);
   for (let i = 0; i < constant_enthalpy_lines.length; i += 1) {
     const constant_enthalpy = constant_enthalpy_lines[i];
     p.beginShape();
@@ -216,7 +240,7 @@ function drawConstantEntropy(p) {
   p.stroke(gvs.graph.constant_entropy_color);
   p.strokeWeight(1);
   p.noFill();
-  setLineDash([12, 4, 4, 4]);
+  // setLineDash([12, 4, 4, 4]);
   for (let i = 0; i < constant_entropy_lines.length; i += 1) {
     const constant_entropy = constant_entropy_lines[i];
     p.beginShape();
@@ -288,7 +312,7 @@ function drawPhaseLabels(p) {
   textBox(
     p,
     "supercritical fluid",
-    gvs.graph.margin_left + 2 * gvs.graph.width / 7 + 5,
+    gvs.graph.margin_left + 2 * gvs.graph.width / 5 + 5,
     gvs.graph.margin_top + gvs.graph.height / 40,
     gvs.graph.phase_label_color,
     18
@@ -312,6 +336,16 @@ function drawPhaseLabels(p) {
     18
   );
 
+  if(!gvs.show_constant_temperature) {
+    textBox(
+      p,
+      "supercritical point",
+      gvs.graph.margin_left + 2 * gvs.graph.width / 9,
+      gvs.graph.margin_top + gvs.graph.height / 8,
+      gvs.graph.phase_label_color,
+      15
+    )
+  }
 
 }
 
@@ -319,23 +353,24 @@ function drawCurveLabels(p) {
   if (gvs.show_constant_temperature ) {
     // temperatures: [60, 80, 100, 120, 160, 200, 260, 300, 400, 800, 1500]
     p.push();
-    textBox(p, "60", 240, 400, gvs.graph.constant_temp_color, 15);
-    textBox(p, "80", 240, 358, gvs.graph.constant_temp_color, 15);
-    textBox(p, "100", 240, 334, gvs.graph.constant_temp_color, 15);
-    textBox(p, "120", 240, 305, gvs.graph.constant_temp_color, 15);
-    textBox(p, "160", 240, 260, gvs.graph.constant_temp_color, 15);
-    textBox(p, "200", 240, 224, gvs.graph.constant_temp_color, 15);
-    textBox(p, "260", 240, 153, gvs.graph.constant_temp_color, 15);
-    textBox(p, "300", 240, 155, gvs.graph.constant_temp_color, 15);
+    textBox(p, "60° C", 240, 400, gvs.graph.constant_temp_color, 15);
+    textBox(p, "80° C", 240, 358, gvs.graph.constant_temp_color, 15);
+    textBox(p, "100° C", 240, 334, gvs.graph.constant_temp_color, 15);
+    textBox(p, "120° C", 240, 305, gvs.graph.constant_temp_color, 15);
+    textBox(p, "160° C", 240, 260, gvs.graph.constant_temp_color, 15);
+    textBox(p, "200° C", 240, 224, gvs.graph.constant_temp_color, 15);
+    textBox(p, "260° C", 240, 181, gvs.graph.constant_temp_color, 15);
+    textBox(p, "300° C", 240, 155, gvs.graph.constant_temp_color, 15);
     p.translate(240, 111);
-    p.rotate(Math.PI / 12);
-    textBox(p, "400", 0, 0, gvs.graph.constant_temp_color, 15);
+    p.rotate(Math.PI / 2.45);
+    textBox(p, "373.95°", -38, 52, gvs.graph.constant_temp_color, 15);
+    p.rotate(Math.PI / 12 - Math.PI / 2.45);
     p.rotate(Math.PI / 8.4);
     p.translate(50, -43);
-    textBox(p, "800", 0, 0, gvs.graph.constant_temp_color, 15);
+    textBox(p, "800° C", 0, 0, gvs.graph.constant_temp_color, 15);
     p.rotate(Math.PI / 40);
     p.translate(40, -28);
-    textBox(p, "1800", 0, 0, gvs.graph.constant_temp_color, 15);
+    textBox(p, "1800° C", 0, 0, gvs.graph.constant_temp_color, 15);
     p.pop();
   }
 
@@ -344,15 +379,15 @@ function drawCurveLabels(p) {
     // enthalpies: [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500]
     p.translate(400, 362);
     p.rotate(Math.PI / 9);
-    textBox(p, "500", 0, 0, gvs.graph.constant_enthalpy_color, 15);
+    textBox(p, "500 kJ/kg", 0, 0, gvs.graph.constant_enthalpy_color, 15);
     p.translate(10, -59);
     p.rotate(Math.PI / 13);
-    textBox(p, "1000", 0, 0, gvs.graph.constant_enthalpy_color, 15);
+    textBox(p, "1000 kJ/kg", 0, 0, gvs.graph.constant_enthalpy_color, 15);
     p.translate(5, -40);
     p.rotate(Math.PI / 30);
-    textBox(p, "2000", 0, 0, gvs.graph.constant_enthalpy_color, 15);
+    textBox(p, "2000 kJ/kg", 0, 0, gvs.graph.constant_enthalpy_color, 15);
     p.translate(0, -27);
-    textBox(p, "3000", 0, 0, gvs.graph.constant_enthalpy_color, 15);
+    textBox(p, "3000 kJ/kg", 0, 0, gvs.graph.constant_enthalpy_color, 15);
     p.pop();
   }
 
@@ -395,31 +430,31 @@ function drawCurveLabels(p) {
     p.push();
     p.translate(320, 409);
     p.rotate(Math.PI / 40);
-    textBox(p, "1.000", 0, 0, gvs.graph.constant_entropy_color, 15);
+    textBox(p, "1.00 kJ/(kg °C)", 0, 0, gvs.graph.constant_entropy_color, 15);
     p.pop();
 
     p.push();
     p.translate(320, 297);
     p.rotate(Math.PI / 10);
-    textBox(p, "2.000", 0, 0, gvs.graph.constant_entropy_color, 15);
+    textBox(p, "2.00 kJ/(kg °C)", 0, 0, gvs.graph.constant_entropy_color, 15);
     p.pop();
 
     p.push();
     p.translate(330, 240);
     p.rotate(Math.PI / 6.5);
-    textBox(p, "3.000", 0, 0, gvs.graph.constant_entropy_color, 15);
+    textBox(p, "3.00 kJ/(kg °C)", 0, 0, gvs.graph.constant_entropy_color, 15);
     p.pop();
 
     p.push();
     p.translate(355, 198);
     p.rotate(Math.PI / 4.8);
-    textBox(p, "5.000", 0, 0, gvs.graph.constant_entropy_color, 15);
+    textBox(p, "5.00 kJ/(kg °C)", 0, 0, gvs.graph.constant_entropy_color, 15);
     p.pop();
 
     p.push();
     p.translate(390, 182);
     p.rotate(Math.PI / 3.9);
-    textBox(p, "7.000", 0, 0, gvs.graph.constant_entropy_color, 15);
+    textBox(p, "7.00 kJ/(kg °C)", 0, 0, gvs.graph.constant_entropy_color, 15);
     p.pop();
   }
 }
@@ -439,13 +474,13 @@ function drawLegend(p) {
   p.text("Legend:", 0, -52);
   p.textAlign(p.LEFT, p.CENTER);
   p.fill(gvs.graph.constant_enthalpy_color);
-  p.text("enthalpy (kJ/kg)", -40, -28);
+  p.text("enthalpy", -40, -28);
   p.fill(gvs.graph.constant_entropy_color);
-  p.text("entropy [kJ/(kg °C)]", -40, -4);
+  p.text("entropy", -40, -4);
   p.fill(gvs.graph.constant_temp_color);
-  p.text("temperature (°C)", -40, 20);
+  p.text("temperature", -40, 20);
   p.fill(gvs.graph.constant_quality_color);
-  p.text("quality (kg/kg)", -40, 44);
+  p.text("quality", -40, 44);
   p.fill(0);
   p.text("phase envelope", -40, 68);
   p.noFill();
@@ -456,10 +491,10 @@ function drawLegend(p) {
   p.strokeWeight(2);
   p.line(-83, 68, -47, 68);
   p.strokeWeight(1);
-  setLineDash([7, 7]);
+  // setLineDash([7, 7]);
   p.stroke(gvs.graph.constant_enthalpy_color);
   p.line(-83, -28, -47, -28);
-  setLineDash([12, 4, 4, 4]);
+  // setLineDash([12, 4, 4, 4]);
   p.stroke(gvs.graph.constant_entropy_color);
   p.line(-83, -4, -47, -4);
   setLineDash([2, 4]);
@@ -485,7 +520,7 @@ function drawAll(p) {
   drawEquilibrium(p);
   drawPhaseLabels(p);
   drawCurveLabels(p);
-  drawLegend(p);
+  // drawLegend(p);
 }
 
 module.exports = drawAll;

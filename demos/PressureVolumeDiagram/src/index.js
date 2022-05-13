@@ -6,7 +6,7 @@ window.p5 = new require("./js/p5.min.js");
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
-    show_constant_temperature : true,
+    show_constant_temperature : false,
     show_constant_enthalpy: false,
     show_constant_quality: true,
     show_constant_entropy: false,
