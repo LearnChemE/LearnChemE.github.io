@@ -36,7 +36,7 @@
 /* alters the text after sliders (0 and units)*/
 .input-row {
   display: grid;
-  grid-template-columns: 120px 150px 4ch max-content;
+  grid-template-columns: 120px 150px 3ch 3.5ch;
   gap: 2px;
   align-items: end;
   justify-items: center;
@@ -45,6 +45,93 @@
 
 .input-label {
   margin-right: 10px;
+}
+
+.options-wrapper {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  gap: 10px;
+}
+
+.checkbox-wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  align-items: center;
+  align-content: center;
+  width: 16px;
+  height: 25px;
+  overflow: visible;
+  position: relative;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  justify-self: center;
+}
+
+.checkbox-wrapper input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  cursor: pointer;
+  height: 16px;
+  width: 16px;
+}
+
+.checkbox-wrapper .checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 16px;
+  width: 16px;
+  background-color: #eee;
+  pointer-events: none;
+  outline: 1px solid slategray;
+  border-radius: 2px;
+}
+
+.checkbox-wrapper .checkbox-label {
+  padding-left: 28px;
+  font-size: 14px;
+  cursor: default;
+  transform: translateY(-1px);
+  pointer-events: none;
+}
+
+.checkbox-wrapper:hover input~.checkmark {
+  background-color: #ccc;
+}
+
+.checkbox-wrapper input:checked~.checkmark {
+  background-color: #2196F3;
+}
+
+.checkmark {
+  margin: 3px;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-wrapper input:checked~.checkmark:after {
+  display: block;
+}
+
+.checkbox-wrapper .checkmark:after {
+  left: 5.5px;
+  top: 1.5px;
+  width: 3px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
 }
 
 input[type="range"] {
@@ -73,9 +160,10 @@ input[type="range"] {
 /*  Affects selection button and selection value spacing*/
 .select-row {
   display: grid;
-  grid-template-columns: 100px max-content max-content;
+  grid-template-columns: 50px max-content max-content;
   gap: 10px;
   align-items: center;
+  margin-left: 5px;
 }
 
 .select-label {
@@ -84,12 +172,12 @@ input[type="range"] {
 
 select {
   padding: 4px 8px;
-  width: 150px;
+  width: 130px;
 }
 
 #graphics-wrapper {
   position: absolute;
-  top: 120px;
+  top: 130px;
   width: 100vw;
   height: max-content;
   display: grid;

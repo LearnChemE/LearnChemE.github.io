@@ -52,7 +52,7 @@
         <div class="input-label">Water Height</div>
         <input type="range" id="water-height" min="0.70" max="1.25" value="1.22" step="0.01" />
         <div id="water-height-value" class="value-label">1.22</div>
-        <div class="input-label" id="water-height">m</div>
+        <div class="input-label" id="water-height-units">m</div>
       </div>
 
       <div class="input-row">
@@ -60,17 +60,25 @@
         <div class="input-label">Gate Weight</div>
         <input type="range" id="gate-weight" min="0" max="22.2" value="22.2" step="0.1" />
         <div id="gate-weight-value" class="value-label">22.2</div>
-        <div class="units-label">kN</div>
+        <div class="units-label" id="gate-weight-units">kN</div>
       </div>
 
-      <!-- This is a drop-down menu. "#select-1" is also referenced in index.js. -->
-      <!-- <div class="select-row">
-        <div class="select-label">Units:</div>
-        <select id="unit-selection">
-          <option value="SI">SI</option>
-          <option value="imperial">British Imperial</option>
-        </select>
-      </div> -->
+      <div class="options-wrapper">
+        <!-- This is a drop-down menu. "#select-1" is also referenced in index.js. -->
+        <div class="select-row">
+          <div class="select-label">Units:</div>
+          <select id="unit-selection" value="SI">
+            <option value="SI">SI</option>
+            <option value="imperial">British Imperial</option>
+          </select>
+        </div>
+
+        <div class="checkbox-wrapper">
+          <div class="checkbox-label">Show distances</div>
+          <input type="checkbox" id="show-distances" checked />
+          <span class="checkmark"></span>
+        </div>
+      </div>
     </div>
 
     <!-- The canvas will be assigned to the following element. So for now it is empty, but you will notice that the HTML on the actual web page has a canvas inside this element. -->
@@ -80,6 +88,8 @@
   </div>
 
   <script src="index.js"></script>
+  <script src="inputs.js"></script>
+  <script src="draw.js"></script>
 </body>
 
 </html>
