@@ -354,23 +354,23 @@ function drawCurveLabels(p) {
     // temperatures: [60, 80, 100, 120, 160, 200, 260, 300, 400, 800, 1500]
     p.push();
     textBox(p, "60° C", 240, 400, gvs.graph.constant_temp_color, 15);
-    textBox(p, "80° C", 240, 358, gvs.graph.constant_temp_color, 15);
-    textBox(p, "100° C", 240, 334, gvs.graph.constant_temp_color, 15);
-    textBox(p, "120° C", 240, 305, gvs.graph.constant_temp_color, 15);
-    textBox(p, "160° C", 240, 260, gvs.graph.constant_temp_color, 15);
-    textBox(p, "200° C", 240, 224, gvs.graph.constant_temp_color, 15);
-    textBox(p, "260° C", 240, 181, gvs.graph.constant_temp_color, 15);
-    textBox(p, "300° C", 240, 155, gvs.graph.constant_temp_color, 15);
+    textBox(p, "80", 240, 358, gvs.graph.constant_temp_color, 15);
+    textBox(p, "100", 240, 334, gvs.graph.constant_temp_color, 15);
+    textBox(p, "120", 240, 305, gvs.graph.constant_temp_color, 15);
+    textBox(p, "160", 240, 260, gvs.graph.constant_temp_color, 15);
+    textBox(p, "200", 240, 224, gvs.graph.constant_temp_color, 15);
+    textBox(p, "260", 240, 181, gvs.graph.constant_temp_color, 15);
+    textBox(p, "300", 240, 155, gvs.graph.constant_temp_color, 15);
     p.translate(240, 111);
     p.rotate(Math.PI / 2.45);
-    textBox(p, "373.95°", -38, 52, gvs.graph.constant_temp_color, 15);
+    textBox(p, "373.95", -38, 52, gvs.graph.constant_temp_color, 15);
     p.rotate(Math.PI / 12 - Math.PI / 2.45);
     p.rotate(Math.PI / 8.4);
     p.translate(50, -43);
-    textBox(p, "800° C", 0, 0, gvs.graph.constant_temp_color, 15);
+    textBox(p, "800", 0, 0, gvs.graph.constant_temp_color, 15);
     p.rotate(Math.PI / 40);
     p.translate(40, -28);
-    textBox(p, "1800° C", 0, 0, gvs.graph.constant_temp_color, 15);
+    textBox(p, "1800", 0, 0, gvs.graph.constant_temp_color, 15);
     p.pop();
   }
 
@@ -382,12 +382,12 @@ function drawCurveLabels(p) {
     textBox(p, "500 kJ/kg", 0, 0, gvs.graph.constant_enthalpy_color, 15);
     p.translate(10, -59);
     p.rotate(Math.PI / 13);
-    textBox(p, "1000 kJ/kg", 0, 0, gvs.graph.constant_enthalpy_color, 15);
+    textBox(p, "1000", 0, 0, gvs.graph.constant_enthalpy_color, 15);
     p.translate(5, -40);
     p.rotate(Math.PI / 30);
-    textBox(p, "2000 kJ/kg", 0, 0, gvs.graph.constant_enthalpy_color, 15);
+    textBox(p, "2000", 0, 0, gvs.graph.constant_enthalpy_color, 15);
     p.translate(0, -27);
-    textBox(p, "3000 kJ/kg", 0, 0, gvs.graph.constant_enthalpy_color, 15);
+    textBox(p, "3000", 0, 0, gvs.graph.constant_enthalpy_color, 15);
     p.pop();
   }
 
@@ -436,25 +436,25 @@ function drawCurveLabels(p) {
     p.push();
     p.translate(320, 297);
     p.rotate(Math.PI / 10);
-    textBox(p, "2.00 kJ/(kg °C)", 0, 0, gvs.graph.constant_entropy_color, 15);
+    textBox(p, "2.00", 0, 0, gvs.graph.constant_entropy_color, 15);
     p.pop();
 
     p.push();
     p.translate(330, 240);
     p.rotate(Math.PI / 6.5);
-    textBox(p, "3.00 kJ/(kg °C)", 0, 0, gvs.graph.constant_entropy_color, 15);
+    textBox(p, "3.00", 0, 0, gvs.graph.constant_entropy_color, 15);
     p.pop();
 
     p.push();
     p.translate(355, 198);
     p.rotate(Math.PI / 4.8);
-    textBox(p, "5.00 kJ/(kg °C)", 0, 0, gvs.graph.constant_entropy_color, 15);
+    textBox(p, "5.00", 0, 0, gvs.graph.constant_entropy_color, 15);
     p.pop();
 
     p.push();
     p.translate(390, 182);
     p.rotate(Math.PI / 3.9);
-    textBox(p, "7.00 kJ/(kg °C)", 0, 0, gvs.graph.constant_entropy_color, 15);
+    textBox(p, "7.00", 0, 0, gvs.graph.constant_entropy_color, 15);
     p.pop();
   }
 }
