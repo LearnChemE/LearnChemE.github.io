@@ -1,12 +1,11 @@
 // Whatever is included in draw() will be calculated at 60 fps.  It is basically a loop that calls itself every 16.67 ms. You can pause it at any time with the noLoop() function and start it again with the loop() function. Be sure to include every graphics statement in a push() / pop() statement, because it minimizes the chance that you accidentally apply styling or properties to another graphics object.
 function draw() {
-
   background(250);
   calculate_coordinates();
   draw_water();
-  draw_cable();
   draw_gate();
   draw_container();
+  draw_cable();
   draw_arrows();
 }
 
@@ -17,7 +16,6 @@ function calculate_coordinates() {
    * the maximum value of the angle slider accordingly.
    */
 
-  g.gate_length = 400;
   g.gate_angle_radians = g.gate_angle * 2 * PI / 360;
   g.water_height_in_pixels = g.water_level * 200;
   g.water_top_right_x_coordinate = 400 + g.water_height_in_pixels * Math.tan(g.gate_angle_radians); // setting the height equal with g.gate_angle_radians and tangent
@@ -39,10 +37,54 @@ function draw_arrows() {
 function draw_cable() {
   // Draws the cable between the top of the gate and the edge of the container.
   push();
-  line(130, 500 - g.water_height_in_pixels - 20, g.water_top_right_x_coordinate - 45, 500 - g.water_height_in_pixels - 20);
-  fill(0);
-  triangle(130, 500 - g.water_height_in_pixels - 20, 145, 500 - g.water_height_in_pixels - 25, 145, 500 - g.water_height_in_pixels - 15);
-  triangle(g.water_top_right_x_coordinate - 45, 500 - g.water_height_in_pixels - 20, g.water_top_right_x_coordinate - 60, 500 - g.water_height_in_pixels - 25, g.water_top_right_x_coordinate - 60, 500 - g.water_height_in_pixels - 15);
+  const tip_of_gate_coordinate = [
+    g.gate_base_coordinate[0] + Math.sin(g.gate_angle_radians) * g.gate_length,
+    g.gate_base_coordinate[1] - Math.cos(g.gate_angle_radians) * g.gate_length,
+  ]
+  fill(0, 180, 50);
+  stroke(100);
+  strokeWeight(0);
+  const center_x = (108 + tip_of_gate_coordinate[0]) / 2;
+  triangle(
+    center_x - 80,
+    tip_of_gate_coordinate[1],
+    center_x - 110,
+    tip_of_gate_coordinate[1] + 10,
+    center_x - 110,
+    tip_of_gate_coordinate[1] - 10
+  );
+  triangle(
+    center_x + 80,
+    tip_of_gate_coordinate[1],
+    center_x + 110,
+    tip_of_gate_coordinate[1] + 10,
+    center_x + 110,
+    tip_of_gate_coordinate[1] - 10
+  );
+  strokeWeight(0);
+  // stroke(100);
+  fill(0, 180, 50);
+  rectMode(CORNERS);
+  rect(108, tip_of_gate_coordinate[1] - 2, tip_of_gate_coordinate[0], tip_of_gate_coordinate[1] + 2);
+  strokeWeight(1);
+  fill(255);
+  circle(108, tip_of_gate_coordinate[1], 15);
+  circle(tip_of_gate_coordinate[0], tip_of_gate_coordinate[1], 15);
+  translate(center_x, tip_of_gate_coordinate[1]);
+  textAlign(CENTER, CENTER);
+  textSize(19);
+  rectMode(CENTER);
+  fill(250);
+  noStroke();
+  const tension_value = g.select_value == "SI" ? g.cable_tension.toFixed(2) : (g.cable_tension * 0.224809).toFixed(2);
+  const units = g.select_value == "SI" ? "kN" : "klbf";
+  const txt = `tension = ${tension_value} ${units}`;
+  const rect_length = textWidth(txt) + 5;
+  const rect_height = textAscent() + 3;
+  rect(0, 0, rect_length, rect_height);
+  fill(0, 180, 50);
+  noStroke();
+  text(txt, 0, 0);
   pop();
 }
 
@@ -62,9 +104,12 @@ function draw_container() {
 
 function draw_gate() {
   push();
-  translate(390, 510);
+  g.gate_length = 400;
+  g.gate_base_coordinate = [390, 510];
+  translate(g.gate_base_coordinate[0], g.gate_base_coordinate[1]);
   rotate(g.gate_angle_radians - Math.PI);
-  rect(-12.5, 0, 30, g.gate_length);
+  fill(205);
+  rect(-12.5, 0, 22, g.gate_length);
   pop();
 }
 

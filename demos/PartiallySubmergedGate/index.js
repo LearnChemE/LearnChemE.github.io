@@ -6,6 +6,7 @@ window.g = {
   gate_weight: 22.2, // kg
   select_value: 'SI',
   draw_arrows: false,
+  cable_tension: 14.80,
 }
 
 // See https://p5js.org/ to learn how to use this graphics library. setup() and draw() are used to draw on the canvas object of the page.  Seriously, spend some time learning p5.js because it will make drawing graphics a lot easier.  You can watch tutorial videos on the "Coding Train" youtube channel. They have a p5.js crash course under their playlists section.  It will make these functions make a lot more sense.

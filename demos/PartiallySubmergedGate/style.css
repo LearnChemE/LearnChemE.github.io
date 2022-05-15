@@ -6,14 +6,6 @@
 
 /* Octothorpes (#) refer to an ID of an element, like <div id="simulation-title"></div>*/
 /* vw means "viewport width". It is a percentage of the window width, so 100vw means the width of the entire browser. Margin is essentially what it says it is - it adds a buffer between elements. */
-#simulation-title {
-  width: 100vw; /* positions your Alex's Template title on the page*/
-  height: 30px; /* Changes the amoutn of weight space below the title */
-  text-align: center; /* Aligns text in the middle of the screen */
-  margin-top: 15px; /* Alters the whitespace at the top of the website  */
-  margin-bottom: 5px; /* same as above -- opposite*/
-  font-size: 18px; /* Changes the font size of the title*/
-}
 
 /* You can use calc() to calculate variables, so height in this context is the browser width minus 100 pixels */
 /* Position: absolute means that you can specify the exact placement in pixels of the element, instead of the browser trying to automatically detect where to put it. So it is 0px to the left and 0px from the top of the browser window.  I wouldn't recommend using position:absolute for most things, but in this context it makes the simulation-wrapper element essentially the same exact size as the browser window. */
@@ -23,6 +15,7 @@
   top: 0px; /* changes poisition of whole simulation */
   width: 100vw;
   height: calc(100vh - 100px);
+  padding-top: 20px;
 }
 
 /* Display: grid is my favorite way of placing elements. As you can tell, I use it a lot. See this website for a brief synopsis: https://grid.malven.co . Gap is the space between grid elements. */
@@ -177,7 +170,7 @@ select {
 
 #graphics-wrapper {
   position: absolute;
-  top: 130px;
+  top: 95px;
   width: 100vw;
   height: max-content;
   display: grid;
