@@ -18,6 +18,8 @@ angle_slider_element.addEventListener("input", function () {
   const angle = Number(angle_slider_element.value);
   angle_value_label.innerHTML = `${angle.toFixed(0)}°`;
   g.gate_angle = angle;
+  calculate();
+  redraw();
 });
 
 
@@ -28,6 +30,8 @@ water_height_element.addEventListener("input", function () {
   if(g.select_value == "imperial") { imperial_height = 3.28084 * height }
   water_height_value_label.innerHTML = `${g.select_value == "SI" ? height.toFixed(2) : imperial_height.toFixed(1)}`;
   g.water_level = height;
+  calculate();
+  redraw();
 });
 
 
@@ -39,6 +43,8 @@ gate_weight_element.addEventListener("input", function () {
   if(g.select_value == "imperial") { imperial_gate_weight = 224.80894387096 * gate_weight }
   gate_weight_value_label.innerHTML = `${g.select_value == "SI" ? gate_weight.toFixed(1) : imperial_gate_weight.toFixed(0)}`;
   g.gate_weight = gate_weight;
+  calculate();
+  redraw();
 });
 
 select_element.addEventListener("change", function () {
@@ -67,4 +73,6 @@ select_element.addEventListener("change", function () {
     gate_weight_value_label.innerHTML = `${current_value_weight.toFixed(1)}`;
     water_height_value_label.innerHTML = `${current_value_water_height.toFixed(2)}`;
   }
+  calculate();
+  redraw();
 })

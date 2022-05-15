@@ -17,9 +17,9 @@ function calculate_coordinates() {
    */
 
   g.gate_angle_radians = g.gate_angle * 2 * PI / 360;
-  g.water_height_in_pixels = g.water_level * 200;
+  g.water_height_in_pixels = g.water_level * 150;
   g.water_top_right_x_coordinate = 400 + g.water_height_in_pixels * Math.tan(g.gate_angle_radians); // setting the height equal with g.gate_angle_radians and tangent
-  g.max_gate_angle = Math.acos(g.water_height_in_pixels / g.gate_length); // uses the height of the water and gate length to deterine a max angle from a for loop that will be usd later
+  g.max_gate_angle = Math.acos(g.water_level / g.gate_length); // uses the height of the water and gate length to deterine a max angle from a for loop that will be usd later
   g.max_gate_angle_degrees = g.max_gate_angle * 360 / (2 * PI) - 1; // conversion to radians (not sure why its subtracting by -1)
   if (g.max_gate_angle_degrees < g.gate_angle) {
     g.max_gate_angle_degrees = Math.floor(g.max_gate_angle_degrees); // changes g.max_gate_angle egrees to lowest gate angle
@@ -38,8 +38,8 @@ function draw_cable() {
   // Draws the cable between the top of the gate and the edge of the container.
   push();
   const tip_of_gate_coordinate = [
-    g.gate_base_coordinate[0] + Math.sin(g.gate_angle_radians) * g.gate_length,
-    g.gate_base_coordinate[1] - Math.cos(g.gate_angle_radians) * g.gate_length,
+    g.gate_base_coordinate[0] + Math.sin(g.gate_angle_radians) * g.gate_length_pixels,
+    g.gate_base_coordinate[1] - Math.cos(g.gate_angle_radians) * g.gate_length_pixels,
   ]
   fill(0, 180, 50);
   stroke(100);
@@ -104,12 +104,12 @@ function draw_container() {
 
 function draw_gate() {
   push();
-  g.gate_length = 400;
+  g.gate_length_pixels = 400;
   g.gate_base_coordinate = [390, 510];
   translate(g.gate_base_coordinate[0], g.gate_base_coordinate[1]);
   rotate(g.gate_angle_radians - Math.PI);
   fill(205);
-  rect(-12.5, 0, 22, g.gate_length);
+  rect(-12.5, 0, 22, g.gate_length_pixels);
   pop();
 }
 

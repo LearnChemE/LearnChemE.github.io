@@ -3,10 +3,17 @@ window.g = {
   cnv: undefined,
   gate_angle: 45, // degrees
   water_level: 1.22, // meters or ft
-  gate_weight: 22.2, // kg
+  water_height_in_pixels : 244,
+  gate_weight: 22.2, // kN
   select_value: 'SI',
   draw_arrows: false,
   cable_tension: 14.80,
+  gate_angle_radians: 45 * 2 * Math.PI / 360,
+  force_from_water : 10.32,
+  distance_to_center_of_mass : 0.41,
+  gate_length : 2.44, // m
+  max_gate_angle : 0.914735735869974, // radians
+  max_gate_angle_degrees : 51.410497035143145 // degrees
 }
 
 // See https://p5js.org/ to learn how to use this graphics library. setup() and draw() are used to draw on the canvas object of the page.  Seriously, spend some time learning p5.js because it will make drawing graphics a lot easier.  You can watch tutorial videos on the "Coding Train" youtube channel. They have a p5.js crash course under their playlists section.  It will make these functions make a lot more sense.
@@ -19,4 +26,6 @@ function setup() {
 
   // The "main" element is unnecessary. Don't worry about this too much
   document.getElementsByTagName("main")[0].remove();
+
+  noLoop();
 }
