@@ -15,7 +15,7 @@ $modal-xl: 1140px;
 
 .modal-buttons-row {
     display: grid;
-    grid-template-columns: repeat(3, max-content);
+    grid-template-columns: repeat(2, max-content);
     gap: 8px;
     margin: 0.5rem auto;
     justify-content: center;
@@ -29,7 +29,7 @@ $modal-xl: 1140px;
 
 .input-area {
     display: grid;
-    grid-template-columns: 250px 210px;
+    grid-template-columns: 250px 250px;
     margin: 20px auto;
     gap: 6px;
     width: max-content;

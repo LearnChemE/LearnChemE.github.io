@@ -353,7 +353,7 @@ function drawCurveLabels(p) {
   if (gvs.show_constant_temperature ) {
     // temperatures: [60, 80, 100, 120, 160, 200, 260, 300, 400, 800, 1500]
     p.push();
-    textBox(p, "60° C", 240, 400, gvs.graph.constant_temp_color, 15);
+    textBox(p, "T = 60° C", 240, 400, gvs.graph.constant_temp_color, 15);
     textBox(p, "80", 240, 358, gvs.graph.constant_temp_color, 15);
     textBox(p, "100", 240, 334, gvs.graph.constant_temp_color, 15);
     textBox(p, "120", 240, 305, gvs.graph.constant_temp_color, 15);
@@ -379,7 +379,7 @@ function drawCurveLabels(p) {
     // enthalpies: [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500]
     p.translate(400, 362);
     p.rotate(Math.PI / 9);
-    textBox(p, "500 kJ/kg", 0, 0, gvs.graph.constant_enthalpy_color, 15);
+    textBox(p, "H = 500 kJ/kg", 0, 0, gvs.graph.constant_enthalpy_color, 15);
     p.translate(10, -59);
     p.rotate(Math.PI / 13);
     textBox(p, "1000", 0, 0, gvs.graph.constant_enthalpy_color, 15);
@@ -396,31 +396,31 @@ function drawCurveLabels(p) {
     p.push();
     p.translate(276, 430);
     p.rotate(Math.PI / 4);
-    textBox(p, "0.999", 0, 0, gvs.graph.constant_quality_color, 15);
+    textBox(p, "q = 0.001", -10, 0, gvs.graph.constant_quality_color, 15);
     p.pop();
 
     p.push();
     p.translate(406, 430);
     p.rotate(Math.PI / 4.4);
-    textBox(p, "0.99", 0, 0, gvs.graph.constant_quality_color, 15);
+    textBox(p, "0.01", 0, 0, gvs.graph.constant_quality_color, 15);
     p.pop();
     
     p.push();
     p.translate(510, 430);
     p.rotate(Math.PI / 4.4);
-    textBox(p, "0.90", 0, 0, gvs.graph.constant_quality_color, 15);
+    textBox(p, "0.10", 0, 0, gvs.graph.constant_quality_color, 15);
     p.pop();
     
     p.push();
     p.translate(584, 430);
     p.rotate(Math.PI / 4.6);
-    textBox(p, "0.80", 0, 0, gvs.graph.constant_quality_color, 15);
+    textBox(p, "0.20", 0, 0, gvs.graph.constant_quality_color, 15);
     p.pop();
     
     p.push();
     p.translate(624, 430);
     p.rotate(Math.PI / 4.6);
-    textBox(p, "0.70", 0, 0, gvs.graph.constant_quality_color, 15);
+    textBox(p, "0.30", 0, 0, gvs.graph.constant_quality_color, 15);
     p.pop();
   
   }
@@ -430,7 +430,7 @@ function drawCurveLabels(p) {
     p.push();
     p.translate(320, 409);
     p.rotate(Math.PI / 40);
-    textBox(p, "1.00 kJ/(kg °C)", 0, 0, gvs.graph.constant_entropy_color, 15);
+    textBox(p, "S = 1.00 kJ/(kg °C)", 0, 0, gvs.graph.constant_entropy_color, 15);
     p.pop();
 
     p.push();
