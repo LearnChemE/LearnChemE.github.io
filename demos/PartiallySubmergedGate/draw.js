@@ -5,11 +5,11 @@ function draw() {
   calculate_coordinates();
   draw_water();
   draw_gate();
+  draw_cable();
   if(g.draw_distances) {
     draw_distances();
   }
   draw_container();
-  draw_cable();
   draw_force_vectors();
 }
 
@@ -38,13 +38,13 @@ function draw_distances() {
   push();
   rectMode(CENTER);
   translate(220, 500);
-  const cable_height_meters = g.gate_length * Math.cos(g.gate_angle_radians);
-  line(0, 0, 0, -1 * g.gate_length_pixels * Math.cos(g.gate_angle_radians) + 10);
+  const cable_height_meters = g.gate_length * Math.cos(Math.PI / 2 - g.gate_angle_radians);
+  line(0, 0, 0, -1 * g.gate_length_pixels * Math.cos(Math.PI / 2 - g.gate_angle_radians) + 10);
   line(
     -10,
-    -1 * g.gate_length_pixels * Math.cos(g.gate_angle_radians) + 10,
+    -1 * g.gate_length_pixels * Math.cos(Math.PI / 2 - g.gate_angle_radians) + 10,
     10,
-    -1 * g.gate_length_pixels * Math.cos(g.gate_angle_radians) + 10
+    -1 * g.gate_length_pixels * Math.cos(Math.PI / 2 - g.gate_angle_radians) + 10
   );
   const cable_height_text = g.select_value == "SI" ? `${cable_height_meters.toFixed(2)} m` : `${(cable_height_meters / 0.3048).toFixed(2)} ft`;
   const cable_height_text_length = textWidth(water_height_text) + 5;
@@ -63,7 +63,7 @@ function draw_distances() {
   const force_vector_height_meters = g.water_height / 3;
   const force_vector_height_pixels = g.water_height_in_pixels / 3;
   line(0, 0, 0, -1 * force_vector_height_pixels);
-  line(-10, -1 * force_vector_height_pixels, 35 + force_vector_height_pixels * Math.tan(g.gate_angle_radians), -1 * force_vector_height_pixels);
+  line(-10, -1 * force_vector_height_pixels, 35 + force_vector_height_pixels * Math.tan(Math.PI / 2 - g.gate_angle_radians), -1 * force_vector_height_pixels);
   const vector_height_text = g.select_value == "SI" ? `${force_vector_height_meters.toFixed(2)} m` : `${(force_vector_height_meters / 0.3048).toFixed(2)} ft`;
   const vector_height_text_length = textWidth(vector_height_text) + 5;
   const vector_height_text_height = textAscent() + 10;
@@ -79,21 +79,21 @@ function draw_distances() {
   translate(390, 510);
   stroke(160);
   noFill();
-  arc(0, 0, 75, 75, - Math.PI / 2 + g.gate_angle_radians, 0);
+  arc(0, 0, 75, 75, -1 * g.gate_angle_radians, 0);
   line(0, 0, 45, 0);
-  line(0, 0, 45 * Math.sin(g.gate_angle_radians), -45 * Math.cos(g.gate_angle_radians));
+  line(0, 0, 45 * Math.sin(Math.PI / 2 - g.gate_angle_radians), -45 * Math.cos(Math.PI / 2 - g.gate_angle_radians));
   fill(0);
   noStroke();
   textSize(g.label_font_size);
-  angle_text = `${90 - g.gate_angle}°`;
-  text(angle_text, 50, -20);
+  angle_text = `${g.gate_angle}°`;
+  text(angle_text, 55, -15);
   pop();
 
   // water length
   push();
   translate(390, 510);
   const water_length_coordinates = [
-    g.water_height_in_pixels * Math.tan(g.gate_angle_radians),
+    g.water_height_in_pixels * Math.tan(Math.PI / 2 - g.gate_angle_radians),
     -1 * g.water_height_in_pixels
   ];
   translate(70, 0);
@@ -115,7 +115,7 @@ function draw_distances() {
   );
   fill(250);
   noStroke();
-  const water_length_text = g.select_value == "SI" ? `${Math.sqrt(g.water_height**2 + (g.water_height * Math.tan(g.gate_angle_radians))**2).toFixed(2)} m` : `${(Math.sqrt(g.water_height**2 + (g.water_height * Math.tan(g.gate_angle_radians))**2) / 0.3048).toFixed(2)} ft`;
+  const water_length_text = g.select_value == "SI" ? `${Math.sqrt(g.water_height**2 + (g.water_height * Math.tan(Math.PI / 2 - g.gate_angle_radians))**2).toFixed(2)} m` : `${(Math.sqrt(g.water_height**2 + (g.water_height * Math.tan(Math.PI / 2 - g.gate_angle_radians))**2) / 0.3048).toFixed(2)} ft`;
   const text_length = textWidth(water_length_text);
   const text_ascent = textAscent();
   fill(250);
@@ -130,8 +130,8 @@ function draw_distances() {
   stroke(160);
   line(-10, 0, 10, 0);
   const gate_length_coordinates = [
-    g.gate_length_pixels * Math.sin(g.gate_angle_radians),
-    -1 * g.gate_length_pixels * Math.cos(g.gate_angle_radians)
+    g.gate_length_pixels * Math.sin(Math.PI / 2 - g.gate_angle_radians),
+    -1 * g.gate_length_pixels * Math.cos(Math.PI / 2 - g.gate_angle_radians)
   ];
   line(gate_length_coordinates[0] - 10, gate_length_coordinates[1], gate_length_coordinates[0] + 10, gate_length_coordinates[1])
   line(0, 0, gate_length_coordinates[0], gate_length_coordinates[1]);
@@ -154,8 +154,8 @@ function draw_cable() {
   // Draws the cable between the top of the gate and the edge of the container.
   push();
   const tip_of_gate_coordinate = [
-    g.gate_base_coordinate[0] + Math.sin(g.gate_angle_radians) * g.gate_length_pixels,
-    g.gate_base_coordinate[1] - Math.cos(g.gate_angle_radians) * g.gate_length_pixels,
+    g.gate_base_coordinate[0] + Math.sin(Math.PI / 2 - g.gate_angle_radians) * g.gate_length_pixels,
+    g.gate_base_coordinate[1] - Math.cos(Math.PI / 2 - g.gate_angle_radians) * g.gate_length_pixels,
   ]
   fill(0, 180, 50);
   stroke(100);
@@ -236,8 +236,8 @@ function draw_force_vectors() {
   // gate weight
   push();
   translate(g.gate_base_coordinate[0], g.gate_base_coordinate[1]);
-  const distance_right = g.gate_length_pixels * Math.sin(g.gate_angle_radians) / 2;
-  const distance_up = -1 * g.gate_length_pixels * Math.cos(g.gate_angle_radians) / 2;
+  const distance_right = g.gate_length_pixels * Math.sin(Math.PI / 2 - g.gate_angle_radians) / 2;
+  const distance_up = -1 * g.gate_length_pixels * Math.cos(Math.PI / 2 - g.gate_angle_radians) / 2;
   translate(distance_right, distance_up);
   fill(0, 0, 255);
   stroke(0, 0, 255);
@@ -263,14 +263,14 @@ function draw_force_vectors() {
   push();
   translate(g.gate_base_coordinate[0], g.gate_base_coordinate[1]);
   const force_vector_y = -1 * g.water_height_in_pixels / 3 - 10; // 10 pixel offset to account for half the width of the base
-  const force_vector_x = -1 * force_vector_y * Math.tan(g.gate_angle_radians);
+  const force_vector_x = -1 * force_vector_y * Math.tan(Math.PI / 2 - g.gate_angle_radians);
   translate(force_vector_x, force_vector_y);
   fill(150, 0, 255);
   stroke(150, 0, 255);
   strokeWeight(13);
   point(0, 0);
   const force_vector_length = 30 + (FR / 15000) * 80;
-  rotate(g.gate_angle_radians);
+  rotate(Math.PI / 2 - g.gate_angle_radians);
   strokeWeight(3);
   line(0, 0, -1 * force_vector_length, 0);
   triangle(
@@ -279,7 +279,7 @@ function draw_force_vectors() {
     -20, -5
   );
   translate(-1 * force_vector_length, 0);
-  rotate(-1 * g.gate_angle_radians);
+  rotate(g.gate_angle_radians - Math.PI / 2);
   translate(-45, -22);
   noStroke();
   textSize(g.label_font_size);
@@ -292,7 +292,7 @@ function draw_force_vectors() {
 function draw_gate() {
   push();
   translate(g.gate_base_coordinate[0], g.gate_base_coordinate[1]);
-  rotate(g.gate_angle_radians - Math.PI);
+  rotate(3 * Math.PI / 2 - g.gate_angle_radians);
   fill(205);
   rect(-10, 0, 20, g.gate_length_pixels);
   pop();
