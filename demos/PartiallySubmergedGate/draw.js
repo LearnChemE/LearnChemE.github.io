@@ -244,7 +244,7 @@ function draw_force_vectors() {
   noStroke();
   textSize(g.label_font_size);
   textAlign(CENTER, CENTER);
-  const force_water_text = g.select_value == "SI" ? `force from water\n${(FR / 1000).toFixed(2)} kN` : `gate weight = ${(FR * 0.224809 / 1000).toFixed(2)} klbf`;
+  const force_water_text = g.select_value == "SI" ? `force from water\n${(FR / 1000).toFixed(2)} kN` : `force from water\n${(FR * 0.224809 / 1000).toFixed(2)} klbf`;
   text(force_water_text, 0, 0);
   pop();
 }
