@@ -8,7 +8,7 @@ window.g = {
   gate_length_pixels : 400, // pixels
   gate_base_coordinate : [390, 510], // pixels
   select_value: 'SI',
-  draw_distances: true,
+  draw_distances: false,
   cable_tension: 14.80,
   gate_angle_radians: 45 * 2 * Math.PI / 360,
   force_from_water : 10.32,

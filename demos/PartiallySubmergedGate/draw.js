@@ -1,6 +1,7 @@
 // Whatever is included in draw() will be calculated at 60 fps.  It is basically a loop that calls itself every 16.67 ms. You can pause it at any time with the noLoop() function and start it again with the loop() function. Be sure to include every graphics statement in a push() / pop() statement, because it minimizes the chance that you accidentally apply styling or properties to another graphics object.
 function draw() {
   background(250);
+  translate(-50, -20);
   calculate_coordinates();
   draw_water();
   draw_gate();
@@ -90,7 +91,57 @@ function draw_distances() {
 
   // water length
   push();
-
+  translate(390, 510);
+  const water_length_coordinates = [
+    g.water_height_in_pixels * Math.tan(g.gate_angle_radians),
+    -1 * g.water_height_in_pixels
+  ];
+  translate(70, 0);
+  stroke(160);
+  noFill();
+  strokeWeight(1);
+  line(-10, 0, 10, 0);
+  line(
+    water_length_coordinates[0] - 10,
+    water_length_coordinates[1],
+    water_length_coordinates[0] + 10,
+    water_length_coordinates[1]
+  );
+  line(
+    0,
+    0,
+    water_length_coordinates[0],
+    water_length_coordinates[1]
+  );
+  fill(250);
+  noStroke();
+  const water_length_text = g.select_value == "SI" ? `${Math.sqrt(g.water_height**2 + (g.water_height * Math.tan(g.gate_angle_radians))**2).toFixed(2)} m` : `${(Math.sqrt(g.water_height**2 + (g.water_height * Math.tan(g.gate_angle_radians))**2) / 0.3048).toFixed(2)} ft`;
+  const text_length = textWidth(water_length_text);
+  const text_ascent = textAscent();
+  fill(250);
+  noStroke();
+  textSize(g.label_font_size);
+  textAlign(CENTER, CENTER);
+  rectMode(CENTER);
+  rect(water_length_coordinates[0] * 0.75, water_length_coordinates[1] * 0.75, text_length + 8, text_ascent + 5);
+  fill(0);
+  text(water_length_text, water_length_coordinates[0] * 0.75, water_length_coordinates[1] * 0.75);
+  translate(45, 0);
+  stroke(160);
+  line(-10, 0, 10, 0);
+  const gate_length_coordinates = [
+    g.gate_length_pixels * Math.sin(g.gate_angle_radians),
+    -1 * g.gate_length_pixels * Math.cos(g.gate_angle_radians)
+  ];
+  line(gate_length_coordinates[0] - 10, gate_length_coordinates[1], gate_length_coordinates[0] + 10, gate_length_coordinates[1])
+  line(0, 0, gate_length_coordinates[0], gate_length_coordinates[1]);
+  fill(250);
+  noStroke();
+  rect(gate_length_coordinates[0] * 0.8, gate_length_coordinates[1] * 0.8, text_length + 5, text_ascent + 10);
+  const gate_length_text = g.select_value == "SI" ? `${g.gate_length.toFixed(2)} m` : `${(g.gate_length / 0.3048).toFixed(2)} ft`;
+  fill(0);
+  noStroke();
+  text(gate_length_text, gate_length_coordinates[0] * 0.8, gate_length_coordinates[1] * 0.8);
   pop();
 
   // gate length
