@@ -3,9 +3,9 @@ gvs.graph = {
   margin_top: 58,
   height: 400,
   width: 680,
-  constant_temp_color: gvs.p.color(255, 50, 50),
+  constant_temp_color: gvs.p.color(255, 0, 0),
   phase_label_color: gvs.p.color(84, 34, 11),
-  constant_enthalpy_color: gvs.p.color(0, 200, 150),
+  constant_enthalpy_color: gvs.p.color(0, 150, 150),
   constant_entropy_color: gvs.p.color(0, 0, 255),
   constant_quality_color: gvs.p.color(0, 0, 0),
 }
