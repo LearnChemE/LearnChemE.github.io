@@ -2,7 +2,7 @@
 window.g = {
   cnv: undefined,
   gate_angle: 45, // degrees
-  water_level: 1.22, // meters or ft
+  water_height: 1.22, // meters or ft
   water_height_in_pixels : 244,
   gate_weight: 22.2, // kN
   gate_length_pixels : 400, // pixels
@@ -17,6 +17,7 @@ window.g = {
   max_gate_angle : 0.914735735869974, // radians
   max_gate_angle_degrees : 51.410497035143145, // degrees
   label_font_size : 19,
+  water_color: "rgb(210, 210, 255)",
 }
 
 // See https://p5js.org/ to learn how to use this graphics library. setup() and draw() are used to draw on the canvas object of the page.  Seriously, spend some time learning p5.js because it will make drawing graphics a lot easier.  You can watch tutorial videos on the "Coding Train" youtube channel. They have a p5.js crash course under their playlists section.  It will make these functions make a lot more sense.

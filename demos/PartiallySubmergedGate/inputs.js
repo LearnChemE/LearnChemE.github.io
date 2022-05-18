@@ -30,7 +30,7 @@ water_height_element.addEventListener("input", function () {
   let imperial_height;
   if(g.select_value == "imperial") { imperial_height = 3.28084 * height }
   water_height_value_label.innerHTML = `${g.select_value == "SI" ? height.toFixed(2) : imperial_height.toFixed(1)}`;
-  g.water_level = height;
+  g.water_height = height;
   calculate();
   redraw();
 });

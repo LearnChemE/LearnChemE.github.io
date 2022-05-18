@@ -4,11 +4,11 @@ function draw() {
   calculate_coordinates();
   draw_water();
   draw_gate();
-  draw_container();
-  draw_cable();
   if(g.draw_distances) {
     draw_distances();
   }
+  draw_container();
+  draw_cable();
   draw_force_vectors();
 }
 
@@ -20,9 +20,9 @@ function calculate_coordinates() {
    */
 
   g.gate_angle_radians = g.gate_angle * 2 * PI / 360;
-  g.water_height_in_pixels = g.water_level * 150;
+  g.water_height_in_pixels = g.water_height * 150;
   g.water_top_right_x_coordinate = 400 + g.water_height_in_pixels * Math.tan(g.gate_angle_radians); // setting the height equal with g.gate_angle_radians and tangent
-  g.max_gate_angle = Math.acos(g.water_level / g.gate_length); // uses the height of the water and gate length to deterine a max angle from a for loop that will be usd later
+  g.max_gate_angle = Math.acos(g.water_height / g.gate_length); // uses the height of the water and gate length to deterine a max angle from a for loop that will be usd later
   g.max_gate_angle_degrees = g.max_gate_angle * 360 / (2 * PI) - 1; // conversion to radians (not sure why its subtracting by -1)
   if (g.max_gate_angle_degrees < g.gate_angle) {
     g.max_gate_angle_degrees = Math.floor(g.max_gate_angle_degrees); // changes g.max_gate_angle egrees to lowest gate angle
@@ -34,7 +34,80 @@ function calculate_coordinates() {
 }
 
 function draw_distances() {
-  
+  fill(0);
+  stroke(160);
+  textSize(g.label_font_size);
+  textAlign(CENTER, CENTER);
+  // water height
+  push();
+  rectMode(CENTER);
+  translate(150, 500);
+  line(0, 0, 0, -1 * g.water_height_in_pixels);
+  line(-10, -1 * g.water_height_in_pixels, 10, -1 * g.water_height_in_pixels);
+  const water_height_text = g.select_value == "SI" ? `${g.water_height.toFixed(2)} m` : `${(g.water_height / 0.3048).toFixed(2)} ft`;
+  const water_height_text_length = textWidth(water_height_text) + 5;
+  const water_height_text_height = textAscent() + 10;
+  noStroke();
+  fill(g.water_color);
+  rect(0, -30, water_height_text_length, water_height_text_height);
+  fill(0);
+  text(water_height_text, 0, -30);
+  pop();
+
+  // cable height
+  push();
+  rectMode(CENTER);
+  translate(220, 500);
+  const cable_height_meters = g.gate_length * Math.cos(g.gate_angle_radians);
+  line(0, 0, 0, -1 * g.gate_length_pixels * Math.cos(g.gate_angle_radians) + 10);
+  line(
+    -10,
+    -1 * g.gate_length_pixels * Math.cos(g.gate_angle_radians) + 10,
+    10,
+    -1 * g.gate_length_pixels * Math.cos(g.gate_angle_radians) + 10
+  );
+  const cable_height_text = g.select_value == "SI" ? `${cable_height_meters.toFixed(2)} m` : `${(cable_height_meters / 0.3048).toFixed(2)} ft`;
+  const cable_height_text_length = textWidth(water_height_text) + 5;
+  const cable_height_text_height = textAscent() + 10;
+  noStroke();
+  fill(g.water_color);
+  rect(0, -30, cable_height_text_length, cable_height_text_height);
+  fill(0);
+  text(cable_height_text, 0, -30);
+  pop();
+
+  // force vector height
+  push();
+  rectMode(CENTER);
+  translate(360, 500);
+  const force_vector_height_meters = g.water_height / 3;
+  const force_vector_height_pixels = g.water_height_in_pixels / 3;
+  line(0, 0, 0, -1 * force_vector_height_pixels);
+  line(-10, -1 * force_vector_height_pixels, 35 + force_vector_height_pixels * Math.tan(g.gate_angle_radians), -1 * force_vector_height_pixels);
+  const vector_height_text = g.select_value == "SI" ? `${force_vector_height_meters.toFixed(2)} m` : `${(force_vector_height_meters / 0.3048).toFixed(2)} ft`;
+  const vector_height_text_length = textWidth(vector_height_text) + 5;
+  const vector_height_text_height = textAscent() + 10;
+  noStroke();
+  fill(g.water_color);
+  rect(-20, -20, vector_height_text_length, vector_height_text_height);
+  fill(0);
+  text(vector_height_text, -20, -20);
+  pop();
+
+  // angle
+  push();
+
+  pop();
+
+  // water length
+  push();
+
+  pop();
+
+  // gate length
+  push();
+
+  pop();
 }
 
 function draw_cable() {
@@ -149,7 +222,7 @@ function draw_force_vectors() {
   // force from water
   push();
   translate(g.gate_base_coordinate[0], g.gate_base_coordinate[1]);
-  const force_vector_y = -1 * g.water_height_in_pixels / 3 - 5; // 5 pixel offset to account for half the width of the base
+  const force_vector_y = -1 * g.water_height_in_pixels / 3 - 10; // 10 pixel offset to account for half the width of the base
   const force_vector_x = -1 * force_vector_y * Math.tan(g.gate_angle_radians);
   translate(force_vector_x, force_vector_y);
   fill(150, 0, 255);
@@ -187,7 +260,7 @@ function draw_gate() {
 
 function draw_water() {
   push();
-  fill(0, 100, 200, 40);
+  fill(g.water_color);
   strokeWeight(0);
   // Trapazoid Vertices for Water 
   beginShape();

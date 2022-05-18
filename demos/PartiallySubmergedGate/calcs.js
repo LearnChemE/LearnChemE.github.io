@@ -2,7 +2,7 @@ function calculate() {
   window.rdns = g.gate_angle_radians;
   window.conv1 = 0.3048;
   window.conv2 = 4.448;
-  window.h0 = g.water_level;
+  window.h0 = g.water_height;
   function a1(h) {
     return h/Math.sin(rdns)
   }
