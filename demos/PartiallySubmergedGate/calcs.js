@@ -52,4 +52,15 @@ function calculate() {
 
 }
 
+
+function calculate_coordinates() {
+  /*
+   * The code below determines the top-right coordinate of the trapezoid that comprises the water.
+   */
+
+  g.gate_angle_radians = g.gate_angle * 2 * PI / 360;
+  g.water_height_in_pixels = g.water_height * 150;
+  g.water_top_right_x_coordinate = 400 + g.water_height_in_pixels * Math.tan(g.gate_angle_radians); // setting the height equal with g.gate_angle_radians and tangent
+}
+
 calculate();

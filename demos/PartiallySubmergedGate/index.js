@@ -8,14 +8,12 @@ window.g = {
   gate_length_pixels : 400, // pixels
   gate_base_coordinate : [390, 510], // pixels
   select_value: 'SI',
-  draw_distances: false,
+  draw_distances: true,
   cable_tension: 14.80,
   gate_angle_radians: 45 * 2 * Math.PI / 360,
   force_from_water : 10.32,
   distance_to_center_of_mass : 0.41,
   gate_length : 2.44, // m
-  max_gate_angle : 0.914735735869974, // radians
-  max_gate_angle_degrees : 51.410497035143145, // degrees
   label_font_size : 19,
   water_color: "rgb(210, 210, 255)",
 }

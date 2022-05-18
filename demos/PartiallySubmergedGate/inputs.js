@@ -17,8 +17,9 @@ const water_height_units = document.getElementById("water-height-units");
 // angle slider Code 
 angle_slider_element.addEventListener("input", function () {
   const angle = Number(angle_slider_element.value);
+  const num = 90 - angle;
   angle_value_label.innerHTML = `${angle.toFixed(0)}°`;
-  g.gate_angle = angle;
+  g.gate_angle = num;
   calculate();
   redraw();
 });

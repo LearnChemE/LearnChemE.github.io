@@ -12,27 +12,6 @@ function draw() {
   draw_force_vectors();
 }
 
-function calculate_coordinates() {
-  /*
-   * The code below determines the top-right coordinate of the trapezoid that comprises the water.
-   * It also determines whether the max gate angle is too high to contain the water, and adjusts
-   * the maximum value of the angle slider accordingly.
-   */
-
-  g.gate_angle_radians = g.gate_angle * 2 * PI / 360;
-  g.water_height_in_pixels = g.water_height * 150;
-  g.water_top_right_x_coordinate = 400 + g.water_height_in_pixels * Math.tan(g.gate_angle_radians); // setting the height equal with g.gate_angle_radians and tangent
-  g.max_gate_angle = Math.acos(g.water_height / g.gate_length); // uses the height of the water and gate length to deterine a max angle from a for loop that will be usd later
-  g.max_gate_angle_degrees = g.max_gate_angle * 360 / (2 * PI) - 1; // conversion to radians (not sure why its subtracting by -1)
-  if (g.max_gate_angle_degrees < g.gate_angle) {
-    g.max_gate_angle_degrees = Math.floor(g.max_gate_angle_degrees); // changes g.max_gate_angle egrees to lowest gate angle
-    angle_slider_element.setAttribute("value", `${Math.floor(g.max_gate_angle_degrees)}`); // sets the gate anlge to g.max_gate_angle (connecting HTML)
-    angle_value_label.innerHTML = `${g.max_gate_angle_degrees}°`; // (connecting HTML)
-    g.gate_angle = g.max_gate_angle_degrees; // sets abojected max angle_value
-  }
-  angle_slider_element.setAttribute("max", Math.floor(g.max_gate_angle_degrees));
-}
-
 function draw_distances() {
   fill(0);
   stroke(160);
@@ -96,7 +75,17 @@ function draw_distances() {
 
   // angle
   push();
-
+  translate(390, 510);
+  stroke(160);
+  noFill();
+  arc(0, 0, 75, 75, - Math.PI / 2 + g.gate_angle_radians, 0);
+  line(0, 0, 45, 0);
+  line(0, 0, 45 * Math.sin(g.gate_angle_radians), -45 * Math.cos(g.gate_angle_radians));
+  fill(0);
+  noStroke();
+  textSize(g.label_font_size);
+  angle_text = `${90 - g.gate_angle}°`;
+  text(angle_text, 50, -20);
   pop();
 
   // water length
