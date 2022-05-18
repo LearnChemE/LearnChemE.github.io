@@ -15,7 +15,7 @@
   top: 0px; /* changes poisition of whole simulation */
   width: 100vw;
   height: calc(100vh - 100px);
-  padding-top: 20px;
+  padding-top: 15px;
 }
 
 /* Display: grid is my favorite way of placing elements. As you can tell, I use it a lot. See this website for a brief synopsis: https://grid.malven.co . Gap is the space between grid elements. */
@@ -24,7 +24,7 @@
   grid-template-columns: max-content max-content;
   justify-content: center;
   align-content: center;
-  gap: 15px 20px; /* changes positioning of the inputs above the simulation window*/
+  gap: 10px 20px; /* changes positioning of the inputs above the simulation window*/
 }
 /* alters the text after sliders (0 and units)*/
 .input-row {
@@ -33,7 +33,7 @@
   gap: 2px;
   align-items: end;
   justify-items: center;
-  height: 15px; /* moves the group of inputs up and down the page */
+  height: 25px; /* moves the group of inputs up and down the page */
 }
 
 .input-label {

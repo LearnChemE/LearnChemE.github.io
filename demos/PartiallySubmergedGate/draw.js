@@ -6,7 +6,10 @@ function draw() {
   draw_gate();
   draw_container();
   draw_cable();
-  draw_arrows();
+  if(g.draw_distances) {
+    draw_distances();
+  }
+  draw_force_vectors();
 }
 
 function calculate_coordinates() {
@@ -30,7 +33,7 @@ function calculate_coordinates() {
   angle_slider_element.setAttribute("max", Math.floor(g.max_gate_angle_degrees));
 }
 
-function draw_arrows() {
+function draw_distances() {
   
 }
 
@@ -72,7 +75,7 @@ function draw_cable() {
   circle(tip_of_gate_coordinate[0], tip_of_gate_coordinate[1], 15);
   translate(center_x, tip_of_gate_coordinate[1]);
   textAlign(CENTER, CENTER);
-  textSize(19);
+  textSize(g.label_font_size);
   rectMode(CENTER);
   fill(250);
   noStroke();
@@ -90,26 +93,95 @@ function draw_cable() {
 
 function draw_container() {
   push();
+  stroke(200);
+  noFill();
+  strokeWeight(1);
+  for(let x = 100; x < 360; x += 30) {
+    line(x, 540, x + 25, 510);
+  }
+  noStroke();
   fill(12);
   strokeWeight(3);
   rect(100, 100, 15, 400);
-  rect(100, 500, 270, 15);
+  rect(100, 500, 280, 15);
   pop();
   // Gate fulcrum
   push();
-  fill(128);
-  ellipse(390, 510, 50, 50);
+  fill(255);
+  stroke(0);
+  strokeWeight(5);
+  ellipse(390, 510, 40, 40);
+  noStroke();
+  fill(0);
+  textSize(g.label_font_size);
+  textAlign(CENTER, CENTER);
+  text("hinge", 400, 550);
+  pop();
+}
+
+function draw_force_vectors() {
+  // gate weight
+  push();
+  translate(g.gate_base_coordinate[0], g.gate_base_coordinate[1]);
+  const distance_right = g.gate_length_pixels * Math.sin(g.gate_angle_radians) / 2;
+  const distance_up = -1 * g.gate_length_pixels * Math.cos(g.gate_angle_radians) / 2;
+  translate(distance_right, distance_up);
+  fill(0, 0, 255);
+  stroke(0, 0, 255);
+  strokeWeight(13);
+  point(0, 0);
+  strokeWeight(3);
+  const vector_length = 30 + (g.gate_weight / 22.2) * 80;
+  line(0, 0, 0, vector_length);
+  triangle(
+    0, vector_length,
+    -5, vector_length - 15,
+    5, vector_length - 15
+  );
+  translate(0, vector_length + 20);
+  noStroke();
+  textAlign(CENTER, CENTER);
+  textSize(g.label_font_size);
+  const gate_weight_text = g.select_value == "SI" ? `gate weight = ${g.gate_weight.toFixed(1)} kN` : `gate weight = ${(g.gate_weight * 0.224809).toFixed(1)} klbf`;
+  text(gate_weight_text, 60, 0);
+  pop();
+
+  // force from water
+  push();
+  translate(g.gate_base_coordinate[0], g.gate_base_coordinate[1]);
+  const force_vector_y = -1 * g.water_height_in_pixels / 3 - 5; // 5 pixel offset to account for half the width of the base
+  const force_vector_x = -1 * force_vector_y * Math.tan(g.gate_angle_radians);
+  translate(force_vector_x, force_vector_y);
+  fill(150, 0, 255);
+  stroke(150, 0, 255);
+  strokeWeight(13);
+  point(0, 0);
+  const force_vector_length = 30 + (FR / 15000) * 80;
+  rotate(g.gate_angle_radians);
+  strokeWeight(3);
+  line(0, 0, -1 * force_vector_length, 0);
+  triangle(
+    -5, 0,
+    -20, 5,
+    -20, -5
+  );
+  translate(-1 * force_vector_length, 0);
+  rotate(-1 * g.gate_angle_radians);
+  translate(-45, -22);
+  noStroke();
+  textSize(g.label_font_size);
+  textAlign(CENTER, CENTER);
+  const force_water_text = g.select_value == "SI" ? `force from water\n${(FR / 1000).toFixed(2)} kN` : `gate weight = ${(FR * 0.224809 / 1000).toFixed(2)} klbf`;
+  text(force_water_text, 0, 0);
   pop();
 }
 
 function draw_gate() {
   push();
-  g.gate_length_pixels = 400;
-  g.gate_base_coordinate = [390, 510];
   translate(g.gate_base_coordinate[0], g.gate_base_coordinate[1]);
   rotate(g.gate_angle_radians - Math.PI);
   fill(205);
-  rect(-12.5, 0, 22, g.gate_length_pixels);
+  rect(-10, 0, 20, g.gate_length_pixels);
   pop();
 }
 
