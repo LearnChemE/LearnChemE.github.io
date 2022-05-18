@@ -28,7 +28,9 @@ angle_slider_element.addEventListener("input", function () {
 water_height_element.addEventListener("input", function () {
   const height = Number(water_height_element.value);
   let imperial_height;
-  if(g.select_value == "imperial") { imperial_height = 3.28084 * height }
+  if (g.select_value == "imperial") {
+    imperial_height = 3.28084 * height
+  }
   water_height_value_label.innerHTML = `${g.select_value == "SI" ? height.toFixed(2) : imperial_height.toFixed(1)}`;
   g.water_height = height;
   calculate();
@@ -40,7 +42,9 @@ water_height_element.addEventListener("input", function () {
 gate_weight_element.addEventListener("input", function () {
   const gate_weight = Number(gate_weight_element.value);
   let imperial_gate_weight;
-  if(g.select_value == "imperial") { imperial_gate_weight = 0.22480894387096 * gate_weight }
+  if (g.select_value == "imperial") {
+    imperial_gate_weight = 0.22480894387096 * gate_weight
+  }
   gate_weight_value_label.innerHTML = `${g.select_value == "SI" ? gate_weight.toFixed(1) : imperial_gate_weight.toFixed(1)}`;
   g.gate_weight = gate_weight;
   calculate();
@@ -54,7 +58,7 @@ select_element.addEventListener("change", function () {
   const current_value_water_height = Number(water_height_element.value);
   let new_value_weight, new_value_water_height;
 
-  if(select_value === "imperial") {
+  if (select_value === "imperial") {
     imperial_weight = current_value_weight * 0.22480894387096;
     imperial_water_height = current_value_water_height * 3.28084;
     gate_weight_units.innerHTML = "klb<sub>f</sub>";
@@ -79,7 +83,7 @@ select_element.addEventListener("change", function () {
 
 show_distances.addEventListener("change", () => {
   const show = show_distances.checked;
-  if(show) {
+  if (show) {
     g.draw_distances = true;
   } else {
     g.draw_distances = false;

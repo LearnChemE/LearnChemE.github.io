@@ -3,18 +3,18 @@ window.g = {
   cnv: undefined,
   gate_angle: 45, // degrees
   water_height: 0.95, // meters or ft
-  water_height_in_pixels : 244,
+  water_height_in_pixels: 244,
   gate_weight: 22.2, // kN
-  gate_length_pixels : 400, // pixels
-  gate_base_coordinate : [390, 510], // pixels
+  gate_length_pixels: 400, // pixels
+  gate_base_coordinate: [390, 510], // pixels
   select_value: 'SI',
   draw_distances: false,
   cable_tension: 14.80,
   gate_angle_radians: 45 * 2 * Math.PI / 360,
-  force_from_water : 10.32,
-  distance_to_center_of_mass : 0.41,
-  gate_length : 2.44, // m
-  label_font_size : 19,
+  force_from_water: 10.32,
+  distance_to_center_of_mass: 0.41,
+  gate_length: 2.44, // m
+  label_font_size: 19,
   water_color: "rgb(210, 210, 255)",
 }
 

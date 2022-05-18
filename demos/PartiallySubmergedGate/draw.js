@@ -6,7 +6,7 @@ function draw() {
   draw_water();
   draw_gate();
   draw_cable();
-  if(g.draw_distances) {
+  if (g.draw_distances) {
     draw_distances();
   }
   draw_container();
@@ -209,7 +209,7 @@ function draw_container() {
   stroke(200);
   noFill();
   strokeWeight(1);
-  for(let x = 100; x < 360; x += 30) {
+  for (let x = 100; x < 360; x += 30) {
     line(x, 540, x + 25, 510);
   }
   noStroke();
