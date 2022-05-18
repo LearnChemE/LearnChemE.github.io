@@ -115,7 +115,7 @@ function draw_distances() {
   );
   fill(250);
   noStroke();
-  const water_length_text = g.select_value == "SI" ? `${Math.sqrt(g.water_height**2 + (g.water_height * Math.tan(Math.PI / 2 - g.gate_angle_radians))**2).toFixed(2)} m` : `${(Math.sqrt(g.water_height**2 + (g.water_height * Math.tan(Math.PI / 2 - g.gate_angle_radians))**2) / 0.3048).toFixed(2)} ft`;
+  const water_length_text = g.select_value == "SI" ? `${Math.min(2.44, Number(Math.sqrt(g.water_height**2 + (g.water_height * Math.tan(Math.PI / 2 - g.gate_angle_radians))**2).toFixed(2))).toFixed(2)} m` : `${Math.min(Number((2.44 / 0.3048).toFixed(2)), Number(Math.sqrt(g.water_height**2 + (g.water_height * Math.tan(Math.PI / 2 - g.gate_angle_radians))**2).toFixed(2))).toFixed(2)} ft`;
   const text_length = textWidth(water_length_text);
   const text_ascent = textAscent();
   fill(250);
@@ -269,7 +269,7 @@ function draw_force_vectors() {
   stroke(150, 0, 255);
   strokeWeight(13);
   point(0, 0);
-  const force_vector_length = 30 + (FR / 15000) * 80;
+  const force_vector_length = 30 + (FR / 15000) * 50;
   rotate(Math.PI / 2 - g.gate_angle_radians);
   strokeWeight(3);
   line(0, 0, -1 * force_vector_length, 0);
