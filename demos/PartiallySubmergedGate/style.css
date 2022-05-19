@@ -9,27 +9,34 @@
 
 /* You can use calc() to calculate variables, so height in this context is the browser width minus 100 pixels */
 /* Position: absolute means that you can specify the exact placement in pixels of the element, instead of the browser trying to automatically detect where to put it. So it is 0px to the left and 0px from the top of the browser window.  I wouldn't recommend using position:absolute for most things, but in this context it makes the simulation-wrapper element essentially the same exact size as the browser window. */
+
 #simulation-wrapper {
+  display: grid;
+  grid-template-columns: min-content max-content;
   position: absolute; /* changes sizing of simulation*/
   left: 0px; /* */
   top: 0px; /* changes poisition of whole simulation */
-  width: 100vw;
   height: calc(100vh - 100px);
   padding-top: 15px;
+  align-items: start;
+  margin-left: 50vw;
+  transform: translateX(-50%);
+  justify-items: center;
 }
 
 /* Display: grid is my favorite way of placing elements. As you can tell, I use it a lot. See this website for a brief synopsis: https://grid.malven.co . Gap is the space between grid elements. */
 .inputs-wrapper {
-  display: grid; 
+  display: grid;
   grid-template-columns: max-content max-content;
   justify-content: center;
   align-content: center;
-  gap: 10px 20px; /* changes positioning of the inputs above the simulation window*/
+  gap: 10px 5px; /* changes positioning of the inputs above the simulation window*/
+  font-size: 15px;
 }
 /* alters the text after sliders (0 and units)*/
 .input-row {
   display: grid;
-  grid-template-columns: 120px 150px 3ch 3.5ch;
+  grid-template-columns: 100px 120px 3ch 3.5ch;
   gap: 2px;
   align-items: end;
   justify-items: center;
@@ -42,8 +49,18 @@
 
 .options-wrapper {
   display: grid;
-  grid-template-columns: max-content max-content;
-  gap: 10px;
+  grid-template-columns: max-content 130px;
+  align-items: center;
+  gap: 5px;
+}
+
+.modal-buttons-row {
+  height: 69px;
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  align-items: center;
+  gap: 7px;
+  margin-left: 5px;
 }
 
 .checkbox-wrapper {
@@ -60,7 +77,7 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  justify-self: center;
+  /* justify-self: center; */
 }
 
 .checkbox-wrapper input {
@@ -129,6 +146,7 @@
 
 input[type="range"] {
   margin-right: 15px;
+  width: 115px;
 }
 
 .value-label {
@@ -156,7 +174,7 @@ input[type="range"] {
   grid-template-columns: 50px max-content max-content;
   gap: 10px;
   align-items: center;
-  margin-left: 5px;
+  /* margin-left: 5px; */
 }
 
 .select-label {
@@ -165,13 +183,13 @@ input[type="range"] {
 
 select {
   padding: 4px 8px;
-  width: 130px;
+  width: 100px;
 }
 
 #graphics-wrapper {
   position: absolute;
   top: 95px;
-  width: 100vw;
+  /* width: 100vw; */
   height: max-content;
   display: grid;
   justify-content: center;
