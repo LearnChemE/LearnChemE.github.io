@@ -193,14 +193,21 @@ function draw_cable() {
   fill(250);
   noStroke();
   const tension_value = g.select_value == "SI" ? g.cable_tension.toFixed(2) : (g.cable_tension * 0.224809).toFixed(2);
-  const units = g.select_value == "SI" ? "kN" : "klbf";
-  const txt = `tension = ${tension_value} ${units}`;
+  const units = g.select_value == "SI" ? "kN" : "klb";
+  let txt = ` tension = ${tension_value} ${units}`;
+  if(g.select_value == "imperial") {
+    txt += " "
+  }
   const rect_length = textWidth(txt) + 5;
   const rect_height = textAscent() + 3;
   rect(0, 0, rect_length, rect_height);
   fill(0, 180, 50);
   noStroke();
   text(txt, 0, 0);
+  if(g.select_value == "imperial") {
+    textSize(14);
+    text("f", 78, 6);
+  }
   pop();
 }
 
@@ -255,8 +262,12 @@ function draw_force_vectors() {
   noStroke();
   textAlign(CENTER, CENTER);
   textSize(g.label_font_size);
-  const gate_weight_text = g.select_value == "SI" ? `gate weight = ${g.gate_weight.toFixed(1)} kN` : `gate weight = ${(g.gate_weight * 0.224809).toFixed(1)} klbf`;
+  const gate_weight_text = g.select_value == "SI" ? `gate weight = ${g.gate_weight.toFixed(1)} kN` : `gate weight = ${(g.gate_weight * 0.224809).toFixed(1)} klb`;
   text(gate_weight_text, 60, 0);
+  if(g.select_value == "imperial") {
+    textSize(14);
+    text("f", 150, 5);
+  }
   pop();
 
   // force from water
@@ -284,8 +295,12 @@ function draw_force_vectors() {
   noStroke();
   textSize(g.label_font_size);
   textAlign(CENTER, CENTER);
-  const force_water_text = g.select_value == "SI" ? `force from water\n${(FR / 1000).toFixed(2)} kN` : `force from water\n${(FR * 0.224809 / 1000).toFixed(2)} klbf`;
+  const force_water_text = g.select_value == "SI" ? `force from water\n${(FR / 1000).toFixed(2)} kN` : `force from water\n${(FR * 0.224809 / 1000).toFixed(2)} klb`;
   text(force_water_text, 0, 0);
+  if(g.select_value == "imperial") {
+    textSize(14);
+    text("f", 36, 17);
+  }
   pop();
 }
 
