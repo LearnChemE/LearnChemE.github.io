@@ -1,7 +1,7 @@
 // Whatever is included in draw() will be calculated at 60 fps.  It is basically a loop that calls itself every 16.67 ms. You can pause it at any time with the noLoop() function and start it again with the loop() function. Be sure to include every graphics statement in a push() / pop() statement, because it minimizes the chance that you accidentally apply styling or properties to another graphics object.
 function draw() {
   background(250);
-  translate(-50, -20);
+  translate(20, -20);
   calculate_coordinates();
   draw_water();
   draw_gate();
@@ -196,7 +196,7 @@ function draw_cable() {
   const units = g.select_value == "SI" ? "kN" : "klb";
   let txt = ` tension = ${tension_value} ${units}`;
   if(g.select_value == "imperial") {
-    txt += " "
+    txt += "  "
   }
   const rect_length = textWidth(txt) + 5;
   const rect_height = textAscent() + 3;
@@ -206,7 +206,7 @@ function draw_cable() {
   text(txt, 0, 0);
   if(g.select_value == "imperial") {
     textSize(14);
-    text("f", 78, 6);
+    text("f", 76, 6);
   }
   pop();
 }
@@ -266,7 +266,7 @@ function draw_force_vectors() {
   text(gate_weight_text, 60, 0);
   if(g.select_value == "imperial") {
     textSize(14);
-    text("f", 150, 5);
+    text("f", 151, 5);
   }
   pop();
 
@@ -299,7 +299,7 @@ function draw_force_vectors() {
   text(force_water_text, 0, 0);
   if(g.select_value == "imperial") {
     textSize(14);
-    text("f", 36, 17);
+    text("f", 37, 17);
   }
   pop();
 }
