@@ -174,8 +174,8 @@
 .checkbox-wrapper .checkmark:after {
   left: 5.5px;
   top: 1.5px;
-  width: 3px;
-  height: 8px;
+  width: 6px;
+  height: 10px;
   border: solid white;
   border-width: 0 3px 3px 0;
   -webkit-transform: rotate(45deg);
