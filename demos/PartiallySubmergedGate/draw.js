@@ -1,7 +1,17 @@
+function calculate_coordinates() {
+  /*
+   * The code below determines the top-right coordinate of the trapezoid that comprises the water.
+   */
+
+  g.gate_angle_radians = g.gate_angle * 2 * PI / 360;
+  g.water_height_in_pixels = g.water_height * 150;
+  g.water_top_right_x_coordinate = 400 + g.water_height_in_pixels * Math.tan(Math.PI / 2 - g.gate_angle_radians); // setting the height equal with g.gate_angle_radians and tangent
+}
+
 // Whatever is included in draw() will be calculated at 60 fps.  It is basically a loop that calls itself every 16.67 ms. You can pause it at any time with the noLoop() function and start it again with the loop() function. Be sure to include every graphics statement in a push() / pop() statement, because it minimizes the chance that you accidentally apply styling or properties to another graphics object.
 function draw() {
   background(250);
-  translate(20, -20);
+  translate(-65, -20);
   calculate_coordinates();
   draw_water();
   draw_gate();
@@ -192,7 +202,7 @@ function draw_cable() {
   rectMode(CENTER);
   fill(250);
   noStroke();
-  const tension_value = g.select_value == "SI" ? g.cable_tension.toFixed(2) : (g.cable_tension * 0.224809).toFixed(2);
+  const tension_value = g.select_value == "SI" ? g.cable_tension.toFixed(1) : (g.cable_tension * 0.224809).toFixed(1);
   const units = g.select_value == "SI" ? "kN" : "klb";
   let txt = ` tension = ${tension_value} ${units}`;
   if(g.select_value == "imperial") {
@@ -206,7 +216,7 @@ function draw_cable() {
   text(txt, 0, 0);
   if(g.select_value == "imperial") {
     textSize(14);
-    text("f", 76, 6);
+    text("f", 70, 6);
   }
   pop();
 }
@@ -295,11 +305,11 @@ function draw_force_vectors() {
   noStroke();
   textSize(g.label_font_size);
   textAlign(CENTER, CENTER);
-  const force_water_text = g.select_value == "SI" ? `force from water\n${(FR / 1000).toFixed(2)} kN` : `force from water\n${(FR * 0.224809 / 1000).toFixed(2)} klb`;
+  const force_water_text = g.select_value == "SI" ? `force from water\n${(FR / 1000).toFixed(1)} kN` : `force from water\n${(FR * 0.224809 / 1000).toFixed(1)} klb`;
   text(force_water_text, 0, 0);
   if(g.select_value == "imperial") {
     textSize(14);
-    text("f", 37, 17);
+    text("f", 31, 17);
   }
   pop();
 }

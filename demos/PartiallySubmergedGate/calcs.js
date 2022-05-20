@@ -1,4 +1,4 @@
-function calculate() {
+window.calculate = function() {
   window.rdns = g.gate_angle_radians;
   window.conv1 = 0.3048;
   window.conv2 = 4.448;
@@ -27,7 +27,7 @@ function calculate() {
   let xc;
   let xR;
   let delta = 2;
-  for (let x = 1.000; x <= 3.000; x += 0.001) {
+  for (let x = 1.0000; x <= 3.0000; x += 0.0001) {
     const lhs = 0.5 * a2 * Math.sin(rdns);
     const rhs = h2 / (w + a2 * Math.cos(rdns) - w) * (x - w);
     if (Math.abs(lhs - rhs) < delta) {
@@ -45,23 +45,11 @@ function calculate() {
     }
   }
   g.d = 1.2 * 0.85;
-  g.cable_tension = Number((FT / 1000).toPrecision(4));
-  g.force_from_water = Number((FR / 1000).toPrecision(4));
-  g.cable_height = Number((a1(h1)).toPrecision(3));
-  g.distance_to_center_of_mass = Number((h1 / 3).toFixed(2));
-  g.distance_to_water_surface = Number((a1(h1)).toFixed(2));
-
-}
-
-
-function calculate_coordinates() {
-  /*
-   * The code below determines the top-right coordinate of the trapezoid that comprises the water.
-   */
-
-  g.gate_angle_radians = g.gate_angle * 2 * PI / 360;
-  g.water_height_in_pixels = g.water_height * 150;
-  g.water_top_right_x_coordinate = 400 + g.water_height_in_pixels * Math.tan(Math.PI / 2 - g.gate_angle_radians); // setting the height equal with g.gate_angle_radians and tangent
+  g.cable_tension = FT / 1000;
+  g.force_from_water = FR / 1000;
+  g.cable_height = a1(h1);
+  g.distance_to_center_of_mass = h1 / 3;
+  g.distance_to_water_surface = a1(h1);
 }
 
 calculate();
