@@ -244,7 +244,7 @@ function draw_force_vectors() {
   strokeWeight(13);
   point(0, 0);
   strokeWeight(3);
-  const vector_length = 30 + (g.gate_weight / 22.2) * 80;
+  const vector_length = 30 + (g.gate_weight / 22.2) * 60;
   line(0, 0, 0, vector_length);
   triangle(
     0, vector_length,
