@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Practice Simulation Template</title>
+  <title>Partially Submerged Gate</title>
 
   <!-- Before we run any other scripts, we have to import P5.js (a library for graphics) -->
   <script src="./libraries/p5.js"></script>
@@ -15,15 +15,27 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
   <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
   <meta name="author" content="Alex Jimenez">
-  <meta name="application-name" content="LearnChemE simulation template">
-  <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
+  <meta name="application-name" content="Partially Submerged Gate">
+  <meta name="description" content="An interactive simulation to help engineers learn about fluid mechanics.">
 
   <!-- Finally, import the css files. "Sliders" doesn't need to be edited/changed, it just makes the sliders appear a bit prettier. You will want to make all your CSS changes in the style.css file. -->
   <link href="./sliders.css" rel="stylesheet">
   <link href="./style.css" rel="stylesheet">
   <link href="./bootstrap.min.css" rel="stylesheet">
 
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.9,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+
   <script src="./bootstrap.min.js"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
 
@@ -122,7 +134,86 @@
         </div>
 
         <div class="modal-body">
-          Details in progress
+          This simulation determines the cable tension necessary to support a gate submerged under water. The gate is \( a_{2} \) meters long, and the distance from the hinge to top of the water along the gate is \( a_{1} \) meters. The vertical distance down from the top of the liquid is \( h \), and \( y \) is the distance along the gate, starting from the water's surface, such that \( h = h_{1} \) at the bottom of the container, and \( y = a_{1} \) at the hinge:
+          
+          <div class="figures-wrapper">
+            <div class="combiner">
+              <div class="figures-caption">Figure 1</div>
+              <img src="./details_graphic_1.png" />
+            </div>
+
+            <div class="combiner">
+              <div class="figures-caption">Figure 2</div>
+              <img src="./details_graphic_2.png" />
+            </div>
+          </div>
+
+          The magnitude of the resultant force due to the water is found by summing the differential forces \( dF = \gamma \, h \, dA \) over the entire surface:
+          
+          $$
+          [1] \quad F_{R} = \int_{A} \gamma \, h \, dA = \int_{A} \, \gamma \, y \, \mathrm{sin ( \theta )} \, dA
+          $$
+          
+          where \( F_{R} \) is the resultant force (N), \( \gamma \) is the specific weight of water (9.807 kN/m<sup>3</sup>), \( h = y \, \mathrm{ sin ( \theta ) } \) is the vertical distance from the top of the water to any point in the water (m), \( \theta \) is the angle of the gate (degrees), \( dA = b \, dy \) is differential area of the gate (m<sup>2</sup>), and \( b \) is the width of the gate (m). Note that the specific weight \( \gamma \) is the specific gravity \( \rho \) times the acceleration of gravity \( g \). The total area of the gate that is in contact with water is \( A_{gate} = b \, a_{1} \). This integral is from \( y = 0 \) at the top of the water level to \( y = a_{1} \) at the hinge. Since \( \gamma \) is constant, and for a fixed value of \( \theta \), the resultant force becomes:
+          
+          $$
+          [2] \quad F_{R} = \gamma \, \mathrm{sin(\theta)} \int_{A} y \, dA
+          $$
+
+          The integral \( \int_{A} y \, dA \) is:
+
+          $$
+          [3] \quad \int_{A} y \, dA = \int_{0}^{a_{1}} y \, b \, dy = \frac{b \, y^{2}}{2} \biggr \rvert_{0}^{a_{1}}
+          $$
+
+          this is then equal to:
+
+          $$
+          [4] \quad \int_{A} y \, dA = \frac{b}{2} a^{2}_{1} = A_{gate} \frac{a_{1}}{2}
+          $$
+
+          the resultant force is then:
+
+          $$
+          [5] \quad F_{R} = \gamma \, \mathrm{sin( \theta )} A_{gate} \frac{a_{1}}{2}
+          $$
+
+          The sum of the moments around the hinge is equal to the moment of the resultant force at the y coordinate \( y_{R} \). Note that moment is proportional to the distance from the hinge to location of the force:
+
+          $$
+          [6] \quad F_{R} ( a_{1} - y_{R} ) = \int_{A} \gamma \, y \, (a_{1} - y) \, \mathrm{sin(\theta)} \, dA = \gamma \, \mathrm{sin(\theta)} \int_{0}^{a_{1}} y \, (a_{1} - y) \, b \, dy
+          $$
+
+          $$
+          [7] \quad F_{R} ( a_{1} - y_{R} ) = \gamma \, \mathrm{sin(\theta)} \left( \frac{a_{1} \, y^{2}}{2} - \frac{y^{3}}{3} \right) b \, \Biggr \rvert_{0}^{a_{1}} = \gamma \, \mathrm{sin(\theta)} \left( \frac{a_{1}^{3}}{2} - \frac{a_{1}^{3}}{3} \right) b 
+          $$
+
+          therefore,
+
+          $$
+          [8] \quad F_{R} ( a_{1} - y_{R} ) = \gamma \, \mathrm{sin(\theta)} \frac{a_{1}^{2}}{6} A_{gate}
+          $$
+
+          and substituting equation [5] into equation [8] and simplifying:
+
+          $$
+          [9] \quad y_{R} = \frac{ 2 \, a_{1} }{ 3 }
+          $$
+
+          That is, the resultant force is located 1/3 of the distance from the hinge to the water level along the gate (because \( y_{R} \) is the distance of the moment along the gate starting from the water's surface). A moment balance determines the tension \( T \) (kN) of the cable that is holding up the gate:
+
+          $$
+          [10] \quad \sum M_{i} = 0 = F_{R} \frac{a_{1}}{3} + W_{gate} \frac{a_{2}}{2} \mathrm{cos(\theta)} - T \, a_{2} \, \mathrm{sin(\theta)}
+          $$
+
+          where \( M_{i} \) is moment \( i \) and \( W_{gate} \) is the weight of the gate, which has its moment located at the center of the gate. The tension is then:
+
+          $$
+          [11] \quad T = \frac{ F_{R} \frac{ a_{1} }{ 3 } + W_{gate} \frac{ a_{2} }{ 2 } \mathrm{cos(\theta)} }{ a_{2} \, \mathrm{sin(\theta)} }
+          $$
+
+          <div style="height:50px"></div>
+
         </div>
 
       </div>
@@ -141,7 +232,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann, Alex Jimenez, Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann, Alex Jimenez, and Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
           </p>
         </div>
       </div>

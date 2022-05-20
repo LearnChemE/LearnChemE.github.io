@@ -63,6 +63,45 @@
   margin-left: 5px;
 }
 
+.modal-body {
+  font-size: 0.9rem;
+}
+
+.modal-body>mjx-container {
+  transform: translateX(20px);
+}
+
+.figures-wrapper {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  width: 100%;
+  justify-content: center;
+  justify-items: center;
+  margin-top: 15px;
+  gap: 20px;
+}
+
+.combiner {
+  display: grid;
+  justify-content: center;
+  justify-items: center;
+}
+
+.figures-caption {
+  font-size: 0.95rem;
+}
+
+.combiner>img {
+  max-height: 200px;
+  margin-bottom: 40px;
+}
+
+@media screen and (max-width: 700px) {
+  .figures-wrapper {
+    grid-template-columns: max-content
+  }
+}
+
 .checkbox-wrapper {
   display: grid;
   grid-template-columns: repeat(3, max-content);
