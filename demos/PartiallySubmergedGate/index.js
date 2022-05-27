@@ -4,7 +4,7 @@ window.g = {
   gate_angle: 45, // degrees
   water_height: 0.95, // meters or ft
   water_height_in_pixels: 244,
-  gate_weight: 22.2, // kN
+  gate_weight: 10.0, // kN
   gate_length_pixels: 400, // pixels
   gate_base_coordinate: [390, 510], // pixels
   select_value: 'SI',
