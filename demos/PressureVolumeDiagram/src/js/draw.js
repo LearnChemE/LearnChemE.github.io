@@ -336,11 +336,12 @@ function drawPhaseLabels(p) {
     18
   );
 
-  if(!gvs.show_constant_temperature) {
+  // if(!gvs.show_constant_temperature) {
+  if(true) {
     textBox(
       p,
-      "supercritical point",
-      gvs.graph.margin_left + 2 * gvs.graph.width / 9,
+      "critical point",
+      gvs.graph.margin_left + 2 * gvs.graph.width / 8.5,
       gvs.graph.margin_top + gvs.graph.height / 8,
       gvs.graph.phase_label_color,
       15
