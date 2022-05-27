@@ -34,8 +34,8 @@ function spring() {
     // gvs.V = (gvs.P - P_atm) * gvs.A**2 / k + V_init;
     gvs.V = V_init + (max_spring_length - gvs.spring_length) * gvs.A;
     gvs.P = gvs.n * gvs.R * gvs.T / gvs.V;
-    gvs.T = T_init + (gvs.heat_added - gvs.n * P_atm * (gvs.V - V_init) + (k * gvs.n / gvs.A**2) * (gvs.V**2 / 2 - V_init**2 / 2 - V_init * (gvs.V - V_init))) / (gvs.n * gvs.Cv)
-    gvs.spring_length = Math.min(0.1, Math.max(0, max_spring_length - (gvs.A / k) * (gvs.P - P_atm)));
+    gvs.T = T_init + (gvs.heat_added - P_atm * (gvs.V - V_init) + (k * gvs.n / gvs.A**2) * (gvs.V**2 / 2 - V_init**2 / 2 - V_init * (gvs.V - V_init))) / (gvs.n * gvs.Cv)
+    gvs.spring_length = Math.min(0.1, Math.max(0, max_spring_length - (gvs.A / (k * gvs.n)) * (gvs.P - P_atm)));
     gvs.piston_height = block_height - (gvs.spring_length / max_spring_length) * (block_height - extended_height);
     if(iterations < 1000) {
       iterations++;

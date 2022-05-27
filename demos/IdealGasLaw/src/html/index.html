@@ -255,14 +255,13 @@
             </div>
             
             <div class="tab-content" id="external-spring-content">
-              <span style="background:yellow">Disclaimer: the following section is under review, we will finish as soon as we can.<br></span>
 
-              The differential energy balance for the total moles of the system is
+              The significance of the "external spring" scenario is to show that it is possible for pressure, temperature, and volume to all increase (or decrease) simultaneously when heat is added (or removed). The differential energy balance for the total moles of the system is
               $$
                 [1] \quad n d U = dQ_{total} + dW_{total} = dQ_{total} - n P dV
               $$
 
-              where \( d U \) is the change to internal energy (J/mol), \( Q_{total} \) is total heat added to the system (J/mol), \( W_{total} \) is differential work performed on the system (J/mol), \( n \) is number of moles, \( P \) is pressure (N/m<sup>2</sup>), and \( dV \) is the change to specific volume (m<sup>3</sup>). The displacement of a spring is determined with Hooke's law:
+              where \( d U \) is the change to specific internal energy (J/mol), \( Q_{total} \) is total specific heat added to the system (J/mol), \( W_{total} \) is specific differential work performed on the system (J/mol), \( n \) is number of moles, \( P \) is pressure (N/m<sup>2</sup>), and \( dV \) is the change to specific volume (m<sup>3</sup>). The displacement of a spring is determined with Hooke's law:
 
               $$
                 [2] \quad F = k \Delta z
@@ -277,19 +276,19 @@
               where \( A \) is the cross-sectional area of the piston head (m<sup>2</sup>) and \( P_{atm} \) is atmospheric pressure (Pa). The volumetric displacement of the piston is \( \Delta z = \frac{ (P - P_{atm}) A }{ k } \) multiplied by \( A \):
 
               $$
-                [4] \quad V - V_{init} = \frac{ (P - P_{atm}) A^{2} }{ k }
+                [4] \quad n ( V - V_{init} ) = \frac{ (P - P_{atm}) A^{2} }{ k }
               $$
 
-              To solve the system, we first make an estimate of volume:
+              To solve the system, we first make an estimate of specific volume:
 
               $$
-                [5] \quad V = \frac{ (P - P_{atm}) A^{2} }{ k } + V_{init}
+                [5] \quad V = \frac{ (P - P_{atm}) A^{2} }{ k \, n } + V_{init}
               $$
 
-              where \( V_{init} \) is the initial volume of the piston-cylinder (m<sup>3</sup>) (i.e., the volume of the gas at atmospheric pressure and 273 K). We then make an estimate of pressure using the ideal gas law:
+              where \( V_{init} \) is the initial specific volume of the piston-cylinder (m<sup>3</sup>) (i.e., the specific volume of the gas at atmospheric pressure and 273 K). We then make an estimate of pressure using the ideal gas law:
               
               $$
-                [6] \quad P = \frac{ n R T }{ V }
+                [6] \quad P = \frac{ R T }{ V }
               $$
               
               Finally, we derive temperature using the energy balance of equation [1]. The pressure exerted by the spring \( P_{spr} \) (N/m<sup>2</sup>) is derived as follows:
@@ -303,31 +302,31 @@
               $$
 
               $$
-                [9] \quad dP_{spr} = \frac{ k \, dV }{ A^{2} }
+                [9] \quad dP_{spr} = \frac{ k \, d (n V) }{ A^{2} }
               $$
 
               integration yields the pressure exerted by the spring as a function of volumetric displacement:
 
               $$
-                [10] \quad P_{spr} = \int_{ V_{init} }^{ V } \frac{ k \, dV }{ A^{2} } = \frac{ k }{ A^{2} }(V - V_{init})
+                [10] \quad P_{spr} = \int_{ V_{init} }^{ V } \frac{ k \, n \, dV }{ A^{2} } = \frac{ k \, n }{ A^{2} }(V - V_{init})
               $$
 
               the term \( W_{total} \) in equation [1] is found by integrating equation [1], given that \( dU = n C_{v} dT \) where \( C_{v} \) is the constant-volume heat capacity, and using equation [10] for \( P_{spr} \):
 
               $$
-                [11] \quad \int_{ T_{init} }^{ T } n C_{v} dT = Q_{total} - \int_{ V_{init} }^{ V } n \left[ P_{atm} + \frac{ k }{ A^{ 2 } }(V - V_{init}) \right] dV
+                [11] \quad \int_{ T_{init} }^{ T } n C_{v} dT = Q_{total} - \int_{ V_{init} }^{ V } n \left[ P_{atm} + \frac{ k \, n }{ A^{ 2 } }(V - V_{init}) \right] dV
               $$
 
               so,
 
               $$
-                [12] \quad n C_{v} (T - T_{init}) = Q_{total} - n P_{atm} (V - V_{init}) + \frac{ k n }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right)
+                [12] \quad n C_{v} (T - T_{init}) = Q_{total} - n P_{atm} (V - V_{init}) + \frac{ k n^{2} }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right)
               $$
 
               therefore temperature \( T \) (K) is:
 
               $$
-                [13] \quad T = \frac{ Q_{total} - P_{atm} (V - V_{init}) + \frac{ k n }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right) }{ n C_{v} } + T_{init}
+                [13] \quad T = \frac{ Q_{total} - n \, P_{atm} (V - V_{init}) + \frac{ k n^{2} }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right) }{ n C_{v} } + T_{init}
               $$
 
               Equations [5], [6], and [13] are iterated multiple times until the desired accuracy is reached (1000 iterations in this simulation). Note that while the calculations are performed with standard S.I. units, unit conversion is performed afterwards to show pressure in atm, volume in L, and heat added in kJ.

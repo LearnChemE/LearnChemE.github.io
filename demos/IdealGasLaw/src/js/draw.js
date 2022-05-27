@@ -321,6 +321,7 @@ function drawText(p) {
       const heat_text_4 = gvs.P == 101325 ? " 0.0" : ` ${Number(Math.abs(gvs.heat_added / 1000)).toFixed(2)}`;
       p.text(`Q     =`, centerX - c_width / 2 - 204, centerY + 140);
       p.text(`${heat_text_4} kJ`, centerX - c_width / 2 - 135, centerY + 140);
+      p.text(`(ice cubes)`, centerX - c_width / 2 - 160, centerY + 230);
       const minus = gvs.P == 101325 ? "" : "-";
       p.text(`${minus}`, centerX - c_width / 2 - 138, centerY + 139);
       p.textSize(12);
@@ -329,6 +330,8 @@ function drawText(p) {
       p.strokeWeight(2);
       p.line(centerX - c_width / 2 - 13, centerY + 132, centerX - c_width / 2 - 54, centerY + 132);
       p.triangle(centerX - c_width / 2 - 54, centerY + 132, centerX - c_width / 2 - 42, centerY + 137, centerX - c_width / 2 - 42, centerY + 127);
+      p.line(centerX - c_width / 2 - 13, centerY + 222, centerX - c_width / 2 - 54, centerY + 222);
+      p.triangle(centerX - c_width / 2 - 0, centerY + 222, centerX - c_width / 2 - 12, centerY + 227, centerX - c_width / 2 - 12, centerY + 217);
       p.pop();
     break;
   }
