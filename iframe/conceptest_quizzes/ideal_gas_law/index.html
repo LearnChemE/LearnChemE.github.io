@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ideal Gas Law ConcepTest</title>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+
+    .question-wrapper {
+      width: 100vw;
+      height: 100vh;
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      display: grid;
+      justify-content: center;
+      grid-template-rows: max-content;
+    }
+
+    .question {
+      display: grid;
+      max-width: 600px;
+    }
+
+    .question-text {
+      margin: 10px;
+    }
+
+    .question-img {
+      width: 100%;
+      display: grid;
+      justify-content: center;
+    }
+
+    .box {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      justify-content: center;
+      align-content: center;
+      border: 1px solid black;
+    }
+
+    #box-1 {
+      background-color: rgb(173, 216, 230);
+    }
+
+    .answers-wrapper {
+      display: grid;
+      grid-template-columns: repeat(2, max-content);
+      justify-content: center;
+      margin-top: 15px;
+    }
+
+    .answer {
+      display: grid;
+      grid-template-columns: repeat(3, max-content);
+      height: max-content;
+      align-items: center;
+      margin: 8px;
+      transform: translateX(-10px);
+    }
+
+    .option {
+      width: 20px;
+      margin-left: 5px;
+      transform: translateY(1px);
+    }
+
+    .answer>.box {
+      margin-left: 10px;
+      margin-right: 20px;
+    }
+
+    #box-2 {
+      background-color: rgb(173, 216, 230);
+    }
+
+    #box-3 {
+      background-color: rgb(143, 186, 230);
+    }
+
+    #box-4 {
+      background-color: rgb(123, 166, 230);
+    }
+
+    #box-5 {
+      background-color: rgb(93, 126, 230);
+    }
+
+    .response {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .explanation {
+      width: 100%;
+      /* text-align: center; */
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-wrapper">
+    <div class="question-wrapper">
+      <div class="question">
+        <div class="question-text">
+          A fixed-volume tank contains a gas at 40°C. The gas is then heated to 120°C. Assume the color intensity is proportional to the gas density. Which figure best represents the gas at 120°C?
+        </div>
+        <div class="question-img">
+          <div id="box-1" class="box">40°C</div>
+        </div>
+        <div class="answers-wrapper">
+          <div class="answer">
+            <input id="q1-A" type="radio" name="q1">
+            <div class="option">A.</div>
+            <div id="box-2" class="box">120°C</div>
+          </div>
+          <div class="answer">
+            <input id="q1-B" type="radio" name="q1">
+            <div class="option">B.</div>
+            <div id="box-3" class="box">120°C</div>
+          </div>
+          <div class="answer">
+            <input id="q1-C" type="radio" name="q1">
+            <div class="option">C.</div>
+            <div id="box-4" class="box">120°C</div>
+          </div>
+          <div class="answer">
+            <input id="q1-D" type="radio" name="q1">
+            <div class="option">D.</div>
+            <div id="box-5" class="box">120°C</div>
+          </div>
+        </div>
+        <div id="question-1-response" class="response"></div>
+        <div id="question-1-explanation" class="explanation">
+         
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const explanation_1 = "When heating the gas the pressure increases, but the number of moles does not change. The volume also does not change, so the density does not change.";
+    const radio_1 = document.getElementsByName("q1");
+    const question_1_response = document.getElementById("question-1-response");
+    const question_1_explanation = document.getElementById("question-1-explanation");
+    for(let i = 0; i < radio_1.length; i++) {
+      const radio = radio_1[i];
+      const answer = 0;
+      radio.addEventListener("input", () => {
+        if(i == answer) {
+          question_1_response.innerHTML = `<span style="color: green;">Correct!</span>`;
+        } else {
+          question_1_response.innerHTML = `<span style="color: red;">Incorrect.</span>`;
+        }
+        question_1_explanation.innerHTML = explanation_1;
+        for(let j = 0; j < radio_1.length; j++) {
+          radio_1[j].setAttribute("disabled", "yes");
+        }
+      })
+    }
+  </script>
+</body>
+</html>
