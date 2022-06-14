@@ -24,6 +24,7 @@
     .question {
       display: grid;
       max-width: 600px;
+      justify-items: center;
     }
 
     #question-2 {
@@ -115,8 +116,6 @@
     }
 
     .explanation {
-      width: 100%;
-      /* text-align: center; */
       margin-top: 15px;
       margin-bottom: 15px;
     }
@@ -246,14 +245,15 @@
       radio.addEventListener("input", () => {
         if(i == answer) {
           question_1_response.innerHTML = `<span style="color: green;">Correct!</span>`;
+          question_1_explanation.innerHTML = explanation_1;
+          next_button.style.display = "block";
+          for(let j = 0; j < radio_1.length; j++) {
+            radio_1[j].setAttribute("disabled", "yes");
+          }
         } else {
           question_1_response.innerHTML = `<span style="color: red;">Incorrect.</span>`;
+          question_1_explanation.innerHTML = `Choose one of the other answers to try again.`;
         }
-        question_1_explanation.innerHTML = explanation_1;
-        for(let j = 0; j < radio_1.length; j++) {
-          radio_1[j].setAttribute("disabled", "yes");
-        }
-        next_button.style.display = "block";
       })
     }
 
@@ -269,12 +269,13 @@
       radio.addEventListener("input", () => {
         if(i == answer) {
           question_2_response.innerHTML = `<span style="color: green;">Correct!</span>`;
+          question_2_explanation.innerHTML = explanation_2;
+          for(let j = 0; j < radio_1.length; j++) {
+            radio_2[j].setAttribute("disabled", "yes");
+          }
         } else {
           question_2_response.innerHTML = `<span style="color: red;">Incorrect.</span>`;
-        }
-        question_2_explanation.innerHTML = explanation_2;
-        for(let j = 0; j < radio_1.length; j++) {
-          radio_2[j].setAttribute("disabled", "yes");
+          question_2_explanation.innerHTML = `Choose one of the other answers to try again.`;
         }
       })
     }
