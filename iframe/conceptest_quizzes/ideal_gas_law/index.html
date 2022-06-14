@@ -18,12 +18,22 @@
       top: 0px;
       display: grid;
       justify-content: center;
-      grid-template-rows: max-content;
+      grid-template-rows: repeat(5, max-content);
     }
 
     .question {
       display: grid;
       max-width: 600px;
+    }
+
+    #question-2 {
+      grid-template-rows: repeat(4, max-content);
+      height: 420px;
+      display: none;
+    }
+
+    #question-2>.question-text {
+      height: 70px;
     }
 
     .question-text {
@@ -51,9 +61,16 @@
 
     .answers-wrapper {
       display: grid;
-      grid-template-columns: repeat(2, max-content);
       justify-content: center;
       margin-top: 15px;
+    }
+
+    .answers-wrapper.one {
+      grid-template-columns: repeat(2, max-content);
+    }
+
+    .answers-wrapper.two {
+      grid-template-rows: repeat(3, 30px);
     }
 
     .answer {
@@ -101,20 +118,53 @@
       width: 100%;
       /* text-align: center; */
       margin-top: 15px;
+      margin-bottom: 15px;
+    }
+
+    .image-wrapper {
+      width: 100%;
+      display: grid;
+      justify-items: center;
+    }
+
+    .image-wrapper>img {
+      width: 250px;
+    }
+
+    .next-question-wrapper {
+      width: 100%;
+      display: grid;
+      grid-template-columns: max-content;
+      justify-content: center;
+    }
+
+    #next-question-button {
+      width: max-content;
+      height: max-content;
+      padding: 10px;
+      background-color: #d4edda;
+      border: 1px solid black;
+      border-radius: 5px;
+      display: none;
+      cursor: pointer;
+    }
+
+    #next-question-button:hover {
+      opacity: 0.6;
     }
   </style>
 </head>
 <body>
   <div class="quiz-wrapper">
     <div class="question-wrapper">
-      <div class="question">
+      <div class="question" id="question-1">
         <div class="question-text">
           A fixed-volume tank contains a gas at 40°C. The gas is then heated to 120°C. Assume the color intensity is proportional to the gas density. Which figure best represents the gas at 120°C?
         </div>
         <div class="question-img">
           <div id="box-1" class="box">40°C</div>
         </div>
-        <div class="answers-wrapper">
+        <div class="answers-wrapper one">
           <div class="answer">
             <input id="q1-A" type="radio" name="q1">
             <div class="option">A.</div>
@@ -141,14 +191,55 @@
          
         </div>
       </div>
+
+      <div class="question" id="question-2">
+        <div class="question-text">
+          For the system below, the gas in the piston/cylinder is initially at 180°C and the surroundings are at 20°C. The cylinder is thermally conductive. As the gas cools, the gas pressure ___________.
+        </div>
+        <div class="image-wrapper">
+          <img src="./q2.PNG" />
+        </div>
+        <div class="answers-wrapper two">
+          <div class="answer">
+            <input id="q2-A" type="radio" name="q2">
+            <div class="option">A.</div>
+            <div class="option-text">increases</div>
+          </div>
+          <div class="answer">
+            <input id="q2-B" type="radio" name="q2">
+            <div class="option">B.</div>
+            <div class="option-text">decreases</div>
+          </div>
+          <div class="answer">
+            <input id="q2-C" type="radio" name="q2">
+            <div class="option">C.</div>
+            <div class="option-text">does not change</div>
+          </div>
+        </div>
+        <div id="question-2-response" class="response"></div>
+        <div id="question-2-explanation" class="explanation"></div>
+      </div>
+
+      <div class="next-question-wrapper">
+        <div id="next-question-button">
+          next question &longrightarrow;
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
     const explanation_1 = "When heating the gas the pressure increases, but the number of moles does not change. The volume also does not change, so the density does not change.";
+    const explanation_2 = "The weight is constant, so the force it exerts is constant, so the pressure is constant. As the gas cools, its volume decreases, so the piston moves to the right to maintain equilibrium.";
     const radio_1 = document.getElementsByName("q1");
+    const radio_2 = document.getElementsByName("q2");
+    const question_1 = document.getElementById("question-1");
+    const question_2 = document.getElementById("question-2");
     const question_1_response = document.getElementById("question-1-response");
     const question_1_explanation = document.getElementById("question-1-explanation");
+    const question_2_response = document.getElementById("question-2-response");
+    const question_2_explanation = document.getElementById("question-2-explanation");
+    const next_button = document.getElementById("next-question-button");
     for(let i = 0; i < radio_1.length; i++) {
       const radio = radio_1[i];
       const answer = 0;
@@ -161,6 +252,29 @@
         question_1_explanation.innerHTML = explanation_1;
         for(let j = 0; j < radio_1.length; j++) {
           radio_1[j].setAttribute("disabled", "yes");
+        }
+        next_button.style.display = "block";
+      })
+    }
+
+    next_button.addEventListener("click", () => {
+      question_1.style.display = "none";
+      question_2.style.display = "grid";
+      next_button.style.display = "none";
+    })
+
+    for(let i = 0; i < radio_2.length; i++) {
+      const radio = radio_2[i];
+      const answer = 2;
+      radio.addEventListener("input", () => {
+        if(i == answer) {
+          question_2_response.innerHTML = `<span style="color: green;">Correct!</span>`;
+        } else {
+          question_2_response.innerHTML = `<span style="color: red;">Incorrect.</span>`;
+        }
+        question_2_explanation.innerHTML = explanation_2;
+        for(let j = 0; j < radio_1.length; j++) {
+          radio_2[j].setAttribute("disabled", "yes");
         }
       })
     }
