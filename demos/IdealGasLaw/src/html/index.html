@@ -185,7 +185,7 @@
                 [2] \quad \Delta U = Q
               $$
 
-              For one mole of an ideal gas, \( \Delta U = C_{V} \Delta T \), where \( C_{V} \) is the constant-volume heat capacity [kJ/(mol&nbsp;K)] and heat added per mole is
+              For one mole of an ideal gas, \( \Delta U = C_{V} \Delta T \), where \( C_{V} \) is the constant-volume heat capacity (2.5R, where R is the ideal gas constant) [kJ/(mol&nbsp;K)] and heat added per mole is
 
 
               $$
@@ -258,78 +258,70 @@
 
               The significance of the "external spring" scenario is to show that it is possible for pressure, temperature, and volume to all increase (or decrease) simultaneously when heat is added (or removed). The differential energy balance for the total moles of the system is
               $$
-                [1] \quad n d U = dQ_{total} + dW_{total} = dQ_{total} - n P dV
+                [1] \quad n d U = dQ_{total} + dW_{total} = n dQ - n P dV
               $$
 
-              where \( d U \) is the change to specific internal energy (J/mol), \( Q_{total} \) is total specific heat added to the system (J/mol), \( W_{total} \) is specific differential work performed on the system (J/mol), \( n \) is number of moles, \( P \) is pressure (N/m<sup>2</sup>), and \( dV \) is the change to specific volume (m<sup>3</sup>). The displacement of a spring is determined with Hooke's law:
+              where \( d U \) is the change to specific internal energy (J/mol), \( Q_{total} \) is total heat added to the system (J), \( Q \) is total specific heat (J/mol), \( W_{total} \) is total work performed on the system (J), \( W \) is work performed per mole (J/mol), \( n \) is number of moles, \( P \) is pressure (N/m<sup>2</sup>), and \( dV \) is the change to specific volume (m<sup>3</sup>/mol). The displacement of a spring is determined with Hooke's law:
 
               $$
                 [2] \quad F = k \Delta z
               $$
               
-              where \( k \) is the spring constant (N/m), \( F \) is the force on the spring and \( \Delta z \) is the spring displacement (m). Force due to pressure is:
-              
-              $$
-                [3] \quad F = (P - P_{atm}) A
-              $$
-              
-              where \( A \) is the cross-sectional area of the piston head (m<sup>2</sup>) and \( P_{atm} \) is atmospheric pressure (Pa). The volumetric displacement of the piston is \( \Delta z = \frac{ (P - P_{atm}) A }{ k } \) multiplied by \( A \):
+              where \( k \) is the spring constant (N/m), \( F \) is the force on the spring and \( \Delta z \) is the spring displacement (m). The total pressure is atmospheric pressure (\( P_{atm} \)) plus the pressure due to the force exerted by the spring on the piston (\( P_{spr} \)):
 
               $$
-                [4] \quad n ( V - V_{init} ) = \frac{ (P - P_{atm}) A^{2} }{ k }
-              $$
-
-              To solve the system, we first make an estimate of specific volume:
-
-              $$
-                [5] \quad V = \frac{ (P - P_{atm}) A^{2} }{ k \, n } + V_{init}
-              $$
-
-              where \( V_{init} \) is the initial specific volume of the piston-cylinder (m<sup>3</sup>) (i.e., the specific volume of the gas at atmospheric pressure and 273 K). We then make an estimate of pressure using the ideal gas law:
-              
-              $$
-                [6] \quad P = \frac{ R T }{ V }
+                [3] \quad P = P_{atm} + P_{spr} = P_{atm} + \frac{F}{A} = P_{atm} + \frac{k \Delta z}{A}
               $$
               
-              Finally, we derive temperature using the energy balance of equation [1]. The pressure exerted by the spring \( P_{spr} \) (N/m<sup>2</sup>) is derived as follows:
+              solving for \( \Delta z \) yields
 
               $$
-                [7] \quad dP_{spr} = \frac{ k \, dz }{ A }
+                [4] \quad \Delta z = \frac{ (P - P_{atm}) A}{ k }
               $$
 
-              $$
-                [8] \quad dP_{spr} = \frac{ k \, d (A z) }{ A^{ 2 } }
-              $$
+              The total volume change \( \Delta V_{total} \) is
 
               $$
-                [9] \quad dP_{spr} = \frac{ k \, d (n V) }{ A^{2} }
+                [5] \quad \Delta V_{total} = n (V - V_{init}) = A \Delta z = \frac{ (P - P_{atm}) A^{2} }{ k }
               $$
 
-              integration yields the pressure exerted by the spring as a function of volumetric displacement:
+              where \( V_{init} \) is the initial specific volume (m<sup>3</sup>/mol). The specific volume is then:
+              
+              $$
+                [6] \quad V = \frac{ (P - P_{atm}) A^{2} }{ k \, n } + V_{init}
+              $$
+              
+              The pressure is related to the specific volume by the ideal gas law:
 
               $$
-                [10] \quad P_{spr} = \int_{ V_{init} }^{ V } \frac{ k \, n \, dV }{ A^{2} } = \frac{ k \, n }{ A^{2} }(V - V_{init})
+                [7] \quad P = \frac{RT}{V}
               $$
 
-              the term \( W_{total} \) in equation [1] is found by integrating equation [1], given that \( dU = n C_{v} dT \) where \( C_{v} \) is the constant-volume heat capacity, and using equation [10] for \( P_{spr} \):
+              The pressure exerted by the spring (from equations [3] and [5]) is:
 
               $$
-                [11] \quad \int_{ T_{init} }^{ T } n C_{v} dT = Q_{total} - \int_{ V_{init} }^{ V } n \left[ P_{atm} + \frac{ k \, n }{ A^{ 2 } }(V - V_{init}) \right] dV
+                [8] \quad P_{spr} = \frac{k \Delta z}{ A } = \frac{ k n ( V - V_{init} ) }{ A^{2} }
               $$
 
-              so,
+              Subsituting eqn [8] and given that \( dU = C_{V} dT \) (where \( C_{V} \) is the constant volume heat capacity, 2.5R) into the energy balance (eqn [1]) and writing the equation in integral form yields:
 
+              $$
+                [9] \quad \int_{ T_{init} }^{ T } n C_{v} dT = Q_{total} - \int_{ V_{init} }^{ V } n \left[ P_{atm} + \frac{ k \, n }{ A^{ 2 } }(V - V_{init}) \right] dV
+              $$
+
+              Integrating equation [9] yields
+              
               $$
                 [12] \quad n C_{v} (T - T_{init}) = Q_{total} - n P_{atm} (V - V_{init}) + \frac{ k n^{2} }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right)
               $$
 
-              therefore temperature \( T \) (K) is:
+              Solving this for temperature yields
 
               $$
                 [13] \quad T = \frac{ Q_{total} - n \, P_{atm} (V - V_{init}) + \frac{ k n^{2} }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right) }{ n C_{v} } + T_{init}
               $$
 
-              Equations [5], [6], and [13] are iterated multiple times until the desired accuracy is reached (1000 iterations in this simulation). Note that while the calculations are performed with standard S.I. units, unit conversion is performed afterwards to show pressure in atm, volume in L, and heat added in kJ.
+              Equations [6], [7], and [11] are solved by iteration until the desired accuracy is reached. The calculations are carried out in SI units, but are displayed as atm, L, and kJ in the simulation after unit conversion.
             </div>
             
             <div class="tab-content" id="constant-t-content">
@@ -361,6 +353,12 @@
 
               $$
                 [5] \quad Q_{total} =  - nRT \; \mathrm{ln} \left( \frac{P_{2}}{P_{1}} \right)
+              $$
+
+              where \( n \) is the number of moles, and
+
+              $$
+                [6] \quad V_{total} = n V
               $$
             </div>
 

@@ -196,7 +196,7 @@ function drawText(p) {
       p.translate(shift_left, 0);
       p.textSize(21);
       p.textAlign(p.CENTER);
-      p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 120);
+      p.text(`V    = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 62, centerY + 120);
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 160);
       p.text(`n = 1.0 mol`, centerX - 60, centerY + 160);
       p.text(`P = 1.00 atm`, centerX - 60, centerY + 120);
@@ -212,6 +212,8 @@ function drawText(p) {
       p.text(`Q     = ${heat_text_1} kJ`, centerX - c_width / 2 - 190, centerY + 140);
       p.textSize(12);
       p.text("total", centerX - c_width / 2 - 171, centerY + 145);
+      p.fill(0);
+      p.text("total", centerX + 19, centerY + 124);
       p.stroke(Q_color);
       p.strokeWeight(2);
       p.line(centerX - c_width / 2 - 8, centerY + 132, centerX - c_width / 2 - 44, centerY + 132);
@@ -224,7 +226,7 @@ function drawText(p) {
       p.translate(shift_left, 0);
       p.textSize(21);
       p.textAlign(p.CENTER);
-      p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 100);
+      p.text(`V    = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 62, centerY + 100);
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 62, centerY + 140);
       p.text(`P = ${(gvs.P / 101325).toFixed(2)} atm`, centerX - 60, centerY + 100);
       p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 55, centerY + 140);
@@ -240,6 +242,8 @@ function drawText(p) {
       p.textSize(12);
       p.noStroke();
       p.text("total", centerX - c_width / 2 - 171, centerY + 145);
+      p.fill(0);
+      p.text("total", centerX + 20, centerY + 105);
       p.pop();
     break;
 
@@ -248,7 +252,7 @@ function drawText(p) {
       p.translate(shift_left, 0);
       p.textSize(21);
       p.textAlign(p.CENTER);
-      p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
+      p.text(`V    = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 62, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.text(`P = ${(gvs.P / 101325).toFixed(2)} atm`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 55, centerY + 150 * (1.2 - gvs.piston_height) + 40);
@@ -258,6 +262,8 @@ function drawText(p) {
       p.textSize(12);
       p.text(`atm`, centerX - 41, piston_height - 45);
       p.text("total", centerX - c_width / 2 - 182, centerY + 145);
+      p.fill(0);
+      p.text("total", centerX + 19, centerY + 150 * (1.2 - gvs.piston_height) + 5)
       p.textSize(21);
       p.text(`↓`, centerX, piston_height - 28);
       p.textAlign(p.RIGHT);
@@ -276,9 +282,9 @@ function drawText(p) {
       p.translate(shift_left, 0);
       p.textSize(21);
       p.textAlign(p.CENTER);
-      p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 65, centerY + 150 * (1.2 - gvs.piston_height));
+      p.text(`V    = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 65, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 65, centerY + 150 * (1.2 - gvs.piston_height) + 40);
-      p.text(`P = ${(gvs.P / 101325).toFixed(2)} atm`, centerX - 55, centerY + 150 * (1.2 - gvs.piston_height));
+      p.text(`P = ${(gvs.P / 101325).toFixed(2)} atm`, centerX - 58, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 55, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.textAlign(p.LEFT);
       piston_height = centerY + c_height / 2 - gvs.piston_height * c_height;
@@ -293,6 +299,8 @@ function drawText(p) {
       p.text(`Q     = ${heat_text_3} kJ`, centerX - c_width / 2 - 190, centerY + 140);
       p.textSize(12);
       p.text("total", centerX - c_width / 2 - 171, centerY + 145);
+      p.fill(0);
+      p.text("total", centerX + 21, centerY + 150 * (1.2 - gvs.piston_height) + 5);
       p.stroke(Q_color);
       p.strokeWeight(2);
       p.line(centerX - c_width / 2 - 8, centerY + 132, centerX - c_width / 2 - 44, centerY + 132);
@@ -305,7 +313,7 @@ function drawText(p) {
       p.translate(shift_left, 0);
       p.textSize(21);
       p.textAlign(p.CENTER);
-      p.text(`V = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height));
+      p.text(`V    = ${Number(1000 * gvs.V).toFixed(1)} L`, centerX + 62, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`T = ${Number(gvs.T).toFixed(0)} K`, centerX + 60, centerY + 150 * (1.2 - gvs.piston_height) + 40);
       p.text(`P = ${(gvs.P / 101325).toFixed(2)} atm`, centerX - 60, centerY + 150 * (1.2 - gvs.piston_height));
       p.text(`n = ${Number(gvs.n).toFixed(2)} mol`, centerX - 55, centerY + 150 * (1.2 - gvs.piston_height) + 40);
@@ -326,6 +334,8 @@ function drawText(p) {
       p.text(`${minus}`, centerX - c_width / 2 - 138, centerY + 139);
       p.textSize(12);
       p.text("total", centerX - c_width / 2 - 186, centerY + 145);
+      p.fill(0);
+      p.text("total", centerX + 19, centerY + 150 * (1.2 - gvs.piston_height) + 5);
       p.stroke(Q_color);
       p.strokeWeight(2);
       p.line(centerX - c_width / 2 - 13, centerY + 132, centerX - c_width / 2 - 54, centerY + 132);
