@@ -261,13 +261,13 @@
                 [1] \quad n d U = dQ_{total} + dW_{total} = n dQ - n P dV
               $$
 
-              where \( d U \) is the change to specific internal energy (J/mol), \( Q_{total} \) is total heat added to the system (J), \( Q \) is total specific heat (J/mol), \( W_{total} \) is total work performed on the system (J), \( W \) is work performed per mole (J/mol), \( n \) is number of moles, \( P \) is pressure (N/m<sup>2</sup>), and \( dV \) is the change to specific volume (m<sup>3</sup>/mol). The displacement of a spring is determined with Hooke's law:
+              where \( d U \) is the differential change in internal energy (J/mol), \( dQ_{total} \) is differential total heat added (J), \( dQ \) is differential change in total specific heat added (J/mol), \( dW_{total} \) is differential total work performed on the system (J), \( n \) is number of moles, \( P \) is pressure (N/m<sup>2</sup>), and \( dV \) is the differential change in specific volume (m<sup>3</sup>/mol). The displacement of a spring is determined with Hooke's law:
 
               $$
                 [2] \quad F = k \Delta z
               $$
               
-              where \( k \) is the spring constant (N/m), \( F \) is the force on the spring and \( \Delta z \) is the spring displacement (m). The total pressure is atmospheric pressure (\( P_{atm} \)) plus the pressure due to the force exerted by the spring on the piston (\( P_{spr} \)):
+              where \( k \) is the spring constant (N/m), \( F \) is the force on the spring and \( \Delta z \) is the spring displacement (m). The total pressure is atmospheric pressure (\( P_{atm} \)) plus the pressure (\( P_{spr} \)) due to the force exerted by the spring on the piston:
 
               $$
                 [3] \quad P = P_{atm} + P_{spr} = P_{atm} + \frac{F}{A} = P_{atm} + \frac{k \Delta z}{A}
@@ -309,19 +309,19 @@
                 [9] \quad \int_{ T_{init} }^{ T } n C_{v} dT = Q_{total} - \int_{ V_{init} }^{ V } n \left[ P_{atm} + \frac{ k \, n }{ A^{ 2 } }(V - V_{init}) \right] dV
               $$
 
-              Integrating equation [9] yields
+              where \( T_{init} \) is the initial temperature. Integrating equation [9] yields
               
               $$
-                [12] \quad n C_{v} (T - T_{init}) = Q_{total} - n P_{atm} (V - V_{init}) + \frac{ k n^{2} }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right)
+                [10] \quad n C_{v} (T - T_{init}) = Q_{total} - n P_{atm} (V - V_{init}) + \frac{ k n^{2} }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right)
               $$
 
               Solving this for temperature yields
 
               $$
-                [13] \quad T = \frac{ Q_{total} - n \, P_{atm} (V - V_{init}) + \frac{ k n^{2} }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right) }{ n C_{v} } + T_{init}
+                [11] \quad T = \frac{ Q_{total} - n \, P_{atm} (V - V_{init}) + \frac{ k n^{2} }{ A^{ 2 } } \left( \frac{ V^{2} }{ 2 } - \frac{ V_{init}^{2} }{ 2 } - V_{init} ( V - V_{init} ) \right) }{ n C_{v} } + T_{init}
               $$
 
-              Equations [6], [7], and [11] are solved by iteration until the desired accuracy is reached. The calculations are carried out in SI units, but are displayed as atm, L, and kJ in the simulation after unit conversion.
+              Equations [6], [7], and [11] are solved by iteration. The calculations are carried out in SI units and the units are then converted to atm, L, and kJ in the graphic.
             </div>
             
             <div class="tab-content" id="constant-t-content">
