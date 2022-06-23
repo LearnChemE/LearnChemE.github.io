@@ -11,7 +11,11 @@ function constant_P() {
 }
 
 function constant_V() {
+<<<<<<< HEAD
   const dT = gvs.heat_added / (gvs.Cv * gvs.n);
+=======
+  const dT = gvs.heat_added / (gvs.n * gvs.Cv);
+>>>>>>> 48d275a630b11d3c49269bc1020f9f82781a0a55
   const T = T_init + dT;
   gvs.T = T;
   gvs.P = gvs.n * gvs.R * gvs.T / gvs.V;
