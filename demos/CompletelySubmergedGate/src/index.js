@@ -4,8 +4,8 @@ window.p5 = new require("./js/p5.min.js");
 
 // GLOBAL VARIABLES OBJECT
 window.g = {
-    waterValue : 0.5,
-    weightValue : 2.0,
+    waterValue : 2.0,
+    weightValue : 2.5,
 };
 
 const containerElement = document.getElementById("p5-container");
