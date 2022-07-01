@@ -10,7 +10,21 @@ function drawGate(p) {
   p.noStroke();
   p.rect(30, 30, 10, 400);
   p.rect(30, 430, 400, 10);
-  p.rect(180, 40, 10, 210)
+  p.rect(180, 40, 10, 210);
+  p.translate(180, 250);
+  p.rotate(-0.92);
+  p.fill("#999999");
+  p.rect(0, 0, 15, 320, 10);
+  p.pop();
+
+  p.push();
+  p.fill("white");
+  p.stroke(0);
+  p.strokeWeight(2);
+  p.circle(186, 243, 30);
+  p.fill("purple");
+  p.noStroke();
+  p.circle(432, 433, 10);
   p.pop();
 }
 
@@ -31,6 +45,12 @@ function drawWater(p) {
   p.rectMode(p.CORNERS);
   const trim = 50 - ( g.waterValue / 3.0 ) * 50;
   p.rect(30, heightOfWaterInPixels + trim, 180, 250);
+  p.beginShape();
+  p.vertex(30, 250);
+  p.vertex(30, 430);
+  p.vertex(430, 430);
+  p.vertex(180, 250);
+  p.endShape();
   p.pop();
 }
 
