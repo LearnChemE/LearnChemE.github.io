@@ -10,6 +10,7 @@ function drawGate(p) {
   p.noStroke();
   p.rect(30, 30, 10, 400);
   p.rect(30, 430, 400, 10);
+  p.rect(180, 40, 10, 210)
   p.pop();
 }
 
