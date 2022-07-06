@@ -18,6 +18,7 @@ const sketch = (p) => {
         p.noLoop();
         g.p = p;
         require("./js/elements.js");
+        require("./js/calcs.js");
         g.drawAll = require("./js/draw.js");
         g.align();
         
@@ -28,6 +29,7 @@ const sketch = (p) => {
 
     p.draw = function() {
         p.background(253);
+        g.calcAll();
         g.drawAll(p);
     };
 

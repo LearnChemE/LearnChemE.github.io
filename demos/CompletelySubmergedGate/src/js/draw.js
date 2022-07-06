@@ -1,3 +1,7 @@
+const theta = -0.92;
+const gateLength = 320; // length of the gate horizontally
+const gate_coords = [[186, 243], [432, 433]]; // the coordinates of the left and right edges of the gate
+
 function offset(x, y, p) {
   p.push();
   p.translate(x, y, p);
@@ -28,12 +32,95 @@ function drawGate(p) {
   p.pop();
 }
 
+function textBox(p, str, fontSize, color) {
+  p.push();
+  p.textSize(fontSize);
+  const height1 = p.textAscent(str);
+  const height2 = p.textDescent(str);
+  const padding = [15, 2.5];
+  const height = height1 + height2 + padding[1];
+  const length = p.textWidth(str) + padding[0];
+  p.fill("white");
+  p.noStroke();
+  p.rectMode(p.CENTER);
+  p.rect(0, 0, length, height);
+  p.fill(color);
+  p.noStroke();
+  p.textAlign(p.CENTER, p.CENTER);
+  p.text(str, 0, 0);
+  p.pop();
+}
+
 function drawArrows(p) {
 
+  p.push();
+  p.fill("green");
+  p.stroke("green");
+  p.strokeWeight("5");
+  p.translate(186, 243, 30);
+  p.rotate(Math.PI / 2 + theta);
+  p.translate( gateLength * (g.dF / 2.5), 2);
+  p.circle(0, 0, 7);
+  p.noStroke();
+  p.triangle(0, 5, 6, 18, -6, 18);
+  const minForceWater = 1500;
+  const maxForceWater = 5000;
+  const dForceWater = maxForceWater - minForceWater;
+  p.stroke("green");
+  p.strokeWeight(2);
+  p.line(0, 0, 0, 95 + 75 * (g.waterValue * 1000 - minForceWater) / dForceWater);
+  p.translate(0, 95 + 75 * (g.waterValue * 1000 - minForceWater) / dForceWater);
+  p.translate(0, 20);
+  p.rotate(-1 * (Math.PI / 2 + theta));
+  textBox(p, `force from water = ${(g.FR / 1000).toFixed(1)} kN`, 15, "green");
+  p.pop();
+
+  p.push();
+  p.fill(0, 0, 255);
+  p.stroke(0, 0, 255);
+  p.strokeWeight(5);
+  p.translate(186, 243, 30);
+  p.rotate(Math.PI / 2 + theta);
+  p.translate(gateLength / 2, 2);
+  p.circle(0, 0, 7);
+  p.rotate(-1 * (Math.PI / 2 + theta));
+  p.strokeWeight(2);
+  const minForceGate = 1500;
+  const maxForceGate = 5000;
+  const dForceGate = maxForceGate - minForceGate;
+  p.line(0, 0, 0, 25 + 25 * (g.weightValue * 1000 - minForceGate) / dForceGate);
+  p.translate(0, 25 + 25 * (g.weightValue * 1000 - minForceGate) / dForceGate);
+  p.noStroke();
+  p.triangle(6, 0, -6, 0, 0, 13);
+  p.translate(-50, 30);
+  textBox(p, `gate weight = ${g.weightValue.toFixed(2)} kN`, 15, "blue");
+  p.pop();
 }
 
 function drawDistances(p) {
+  const dxy = 30; // distance in pixels between each distance line
+  const edgeLength = 5; // length of the little "edge" perpendicular to the distance lines on both sides
+  
+  p.push();
+  p.stroke(0);
+  p.strokeWeight(1);
+  p.translate(gate_coords[0][0], gate_coords[0][1]);
+  p.rotate(Math.PI / 2 + theta);
+  // gate length
+  p.line(0, -dxy, gateLength, -dxy);
+  p.line(0, -dxy - edgeLength, 0, -dxy + edgeLength);
+  p.line(gateLength, -dxy - edgeLength, gateLength, -dxy + edgeLength);
+  // water force vector
+  p.line(0, -2 * dxy, (g.dF / 2.5) * gateLength, -2 * dxy);
+  p.line(0, -2 * dxy + edgeLength, 0, -2 * dxy - edgeLength);
+  p.line((g.dF / 2.5) * gateLength, -2 * dxy + edgeLength, (g.dF / 2.5) * gateLength, -2 * dxy - edgeLength);
+  // gate force vector
+  p.line(0, -3 * dxy, gateLength / 2, -3 * dxy);
+  p.line(gateLength / 2, -3 * dxy + edgeLength, gateLength / 2, -3 * dxy - edgeLength);
+  p.line(0, -3 * dxy + edgeLength, 0, -3 * dxy - edgeLength);
+  p.pop();
 
+  
 }
 
 function drawWater(p) {
@@ -52,10 +139,10 @@ function drawWater(p) {
   p.vertex(180, 250);
   p.endShape();
   p.pop();
-}
-
-function drawDistances(p) {
-  
+  p.push();
+  p.translate(145, 265);
+  textBox(p, "hinge", 16, "black");
+  p.pop();
 }
 
 function drawContainer(p) {
