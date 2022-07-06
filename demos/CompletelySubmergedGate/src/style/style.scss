@@ -16,10 +16,9 @@ $modal-xl: 1140px;
     display: grid;
     grid-template-columns: repeat(3, max-content);
     gap: 10px;
-    margin: 0.5rem auto;
+    margin: 1.5rem auto;
     justify-content: center;
     align-content: center;
-    transform: translate(0px, 560px);
     .btn {
         height: max-content;
         width: 12ch;
