@@ -92,7 +92,7 @@ function drawArrows(p) {
   p.translate(0, 25 + 25 * (g.weightValue * 1000 - minForceGate) / dForceGate);
   p.noStroke();
   p.triangle(6, 0, -6, 0, 0, 13);
-  p.translate(-50, 30);
+  p.translate(-40, 26);
   textBox(p, `gate weight = ${g.weightValue.toFixed(2)} kN`, 15, "blue");
   p.pop();
 }
@@ -120,6 +120,35 @@ function drawDistances(p) {
   p.line(0, -3 * dxy + edgeLength, 0, -3 * dxy - edgeLength);
   p.pop();
 
+  p.push();
+  p.translate(186, 430);
+  p.stroke(0);
+  p.strokeWeight(1);
+  p.noFill();
+  // hinge distance
+  p.line(0, 0, 0, 243 - 430);
+  p.line(-1*edgeLength, 243 - 430, edgeLength, 243 - 430);
+  p.translate(-80, 0);
+  const wHeightPixels = 250 + 0;
+  const maximumHeight = 3;
+  const heightOfWaterInPixels = -1 * (360 * (g.waterValue / maximumHeight));
+  const trim = 20 - ( g.waterValue / 3.0 ) * 50;
+  p.line(0, heightOfWaterInPixels + trim, 0, 0);
+  p.line(-1*edgeLength, heightOfWaterInPixels + trim, edgeLength, heightOfWaterInPixels + trim);
+  p.pop();
+
+  p.push();
+  p.translate(310, 300);
+  textBox(p, `2.5 m`, 15, "black");
+  p.translate(0, -80);
+  textBox(p, `1.25 m`, 15, "black");
+  p.translate(0, 40);
+  textBox(p, `${g.dF.toFixed(2)} m`, 15, "black");
+  p.translate(-123, 70);
+  textBox(p, `1.43 m`, 15, "black");
+  p.translate(-80, 0);
+  textBox(p, `${g.waterValue.toFixed(2)} m`, 15, "black");
+  p.pop();
   
 }
 
