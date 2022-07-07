@@ -107,17 +107,17 @@ function drawDistances(p) {
   p.translate(gate_coords[0][0], gate_coords[0][1]);
   p.rotate(Math.PI / 2 + theta);
   // gate length
-  p.line(0, -dxy, gateLength, -dxy);
-  p.line(0, -dxy - edgeLength, 0, -dxy + edgeLength);
-  p.line(gateLength, -dxy - edgeLength, gateLength, -dxy + edgeLength);
+  p.line(0, -3* dxy, gateLength, -3 * dxy);
+  p.line(0, -3 * dxy - edgeLength, 0, -3 * dxy + edgeLength);
+  p.line(gateLength, -3 * dxy - edgeLength, gateLength, -3 * dxy + edgeLength);
   // water force vector
   p.line(0, -2 * dxy, (g.dF / 2.5) * gateLength, -2 * dxy);
   p.line(0, -2 * dxy + edgeLength, 0, -2 * dxy - edgeLength);
   p.line((g.dF / 2.5) * gateLength, -2 * dxy + edgeLength, (g.dF / 2.5) * gateLength, -2 * dxy - edgeLength);
   // gate force vector
-  p.line(0, -3 * dxy, gateLength / 2, -3 * dxy);
-  p.line(gateLength / 2, -3 * dxy + edgeLength, gateLength / 2, -3 * dxy - edgeLength);
-  p.line(0, -3 * dxy + edgeLength, 0, -3 * dxy - edgeLength);
+  p.line(0, -1 * dxy, gateLength / 2, -1 * dxy);
+  p.line(gateLength / 2, -1 * dxy + edgeLength, gateLength / 2, -1 * dxy - edgeLength);
+  p.line(0, -1 * dxy + edgeLength, 0, -1 * dxy - edgeLength);
   p.pop();
 
   p.push();
@@ -138,7 +138,7 @@ function drawDistances(p) {
   p.pop();
 
   p.push();
-  p.translate(310, 300);
+  p.translate(285, 280);
   textBox(p, `2.5 m`, 15, "black");
   p.translate(0, -80);
   textBox(p, `1.25 m`, 15, "black");
@@ -148,6 +148,16 @@ function drawDistances(p) {
   textBox(p, `1.43 m`, 15, "black");
   p.translate(-80, 0);
   textBox(p, `${g.waterValue.toFixed(2)} m`, 15, "black");
+  p.pop();
+
+  p.push();
+  p.noFill();
+  p.stroke(0);
+  p.strokeWeight(1);
+  p.translate(432, 433);
+  p.arc(0, 0, 120, 120, Math.PI, 5 * Math.PI / 4.12);
+  p.translate(-30, 20);
+  textBox(p, "35°", 15, "black");
   p.pop();
   
 }
