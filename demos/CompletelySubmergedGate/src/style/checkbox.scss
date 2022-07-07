@@ -1,0 +1,82 @@
+.checkbox-wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  align-items: center;
+  width: 16px;
+  height: max-content;
+  overflow: visible;
+  position: relative;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      cursor: pointer;
+      height: 16px;
+      width: 16px;
+  }
+
+  .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 16px;
+      width: 16px;
+      background-color: #eee;
+      pointer-events: none;
+      outline: 1px solid slategray;
+      border-radius: 2px;
+  }
+
+  .checkbox-label {
+      padding-left: 25px;
+      font-size: 14px;
+      cursor: default;
+      transform: translateY(-3px);
+      pointer-events: none;
+  }
+}
+
+.checkbox-wrapper:hover input~.checkmark {
+  background-color: #ccc;
+}
+
+.checkbox-wrapper input:checked~.checkmark {
+  background-color: #2196F3;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-wrapper input:checked~.checkmark:after {
+  display: block;
+}
+
+.checkbox-wrapper .checkmark:after {
+  left: 6px;
+  top: 3.5px;
+  width: 5px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+/*
+<div class="checkbox-wrapper">
+  <div class="checkbox-label">Label Text Here</div>
+  <input type="checkbox" id="checkbox-id" />
+  <span class="checkmark"></span>
+</div>
+*/

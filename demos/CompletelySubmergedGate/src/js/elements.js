@@ -3,6 +3,7 @@ window.g.weightSlider = document.getElementById("weight-slider");
 window.g.waterValueDisplay = document.getElementById("water-value");
 window.g.weightValueDisplay = document.getElementById("weight-value");
 window.g.inputArea = document.getElementsByClassName("input-area")[0];
+const showDistancesInput = document.getElementById("show-distances");
 
 g.waterSlider.addEventListener("input", () => {
   g.waterValue = Number(Number(g.waterSlider.value).toFixed(2));
@@ -19,3 +20,13 @@ g.weightSlider.addEventListener("input", () => {
 g.align = () => {
 
 }
+
+showDistancesInput.addEventListener("change", () => {
+  const checked = showDistancesInput.checked;
+  if(checked) {
+    g.showDistances = true
+  } else {
+    g.showDistances = false
+  }
+  g.p.redraw();
+})

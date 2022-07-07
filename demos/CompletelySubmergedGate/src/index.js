@@ -7,6 +7,7 @@ window.g = {
     waterValue : 2.0,
     weightValue : 2.5,
     F_Applied : 10000,
+    showDistances : false,
 };
 
 const containerElement = document.getElementById("p5-container");

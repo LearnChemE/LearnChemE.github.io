@@ -4,6 +4,7 @@ $modal-lg: 800px;
 $modal-xl: 1140px;
 @import "bootstrap";
 @import "./slider.scss";
+@import "./checkbox.scss";
 .simulation-controls {
     display: grid;
     grid-template-columns: max-content max-content;
@@ -16,7 +17,7 @@ $modal-xl: 1140px;
     display: grid;
     grid-template-columns: repeat(3, max-content);
     gap: 10px;
-    margin: 1.5rem auto;
+    margin: 0.5rem auto;
     justify-content: center;
     align-content: center;
     .btn {
@@ -109,4 +110,14 @@ canvas {
 *[disabled="yes"] {
     opacity: 0.3 !important;
     pointer-events: none;
+}
+
+.checkbox-wrapper {
+    justify-self: start;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+.checkbox-label {
+    font-size: 16px !important;
 }

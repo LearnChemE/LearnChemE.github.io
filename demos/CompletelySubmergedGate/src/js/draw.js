@@ -2,12 +2,6 @@ const theta = -0.92;
 const gateLength = 320; // length of the gate horizontally
 const gate_coords = [[186, 243], [432, 433]]; // the coordinates of the left and right edges of the gate
 
-function offset(x, y, p) {
-  p.push();
-  p.translate(x, y, p);
-  p.pop();
-}
-
 function drawGate(p) {
   p.push();
   p.fill(0);
@@ -206,11 +200,13 @@ function drawContainer(p) {
 }
 
 function drawAll(p) {
-  offset(100, 20, p);
+  p.translate(50, 10);
   drawWater(p);
   drawGate(p);
   drawArrows(p);
-  drawDistances(p);
+  if(g.showDistances) {
+    drawDistances(p);
+  }
 }
 
 module.exports = drawAll;
