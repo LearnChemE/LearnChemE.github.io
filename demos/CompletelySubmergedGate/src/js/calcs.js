@@ -15,4 +15,16 @@ g.calcAll = function() {
   const Ixc = b * L**3 / 12;
   const yR = Ixc / (yc * A) + yc;
   g.dF = yR - d; // distance to resultant force from water
+  let dif = 1e6;
+  let F;
+  let F_Estimate = 10000;
+  for(F = 10000; F < 32000; F++) {
+    let RHS = -g.FR * (yR - d) + g.weightValue * 1000 * (yc - d) * Math.cos(theta) + F * L;
+    RHS = Math.abs(RHS);
+    if(RHS < dif) {
+      dif = RHS;
+      F_Estimate = F
+    }
+  }
+  g.F_Applied = F_Estimate
 }

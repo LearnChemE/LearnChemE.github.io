@@ -76,6 +76,23 @@ function drawArrows(p) {
   p.pop();
 
   p.push();
+  p.fill("purple");
+  p.strokeWeight("5");
+  p.translate(432, 433);
+  p.rotate(Math.PI / 2 + theta);
+  p.noStroke();
+  p.triangle(0, -3, -6, -16, 6, -16);
+  p.noFill();
+  p.stroke("purple");
+  p.strokeWeight(2);
+  p.line(0, -3, 0, -20 - 45 * (g.F_Applied - 10000) / (32000 - 10000));
+  p.translate(0, -20 - 45 * (g.F_Applied - 10000) / (32000 - 10000));
+  p.rotate(-1 * (Math.PI / 2 + theta));
+  p.translate(85, 0);
+  textBox(p, `applied force = ${(g.F_Applied / 1000).toFixed(1)} kN`, 15, "purple");
+  p.pop();
+
+  p.push();
   p.fill(0, 0, 255);
   p.stroke(0, 0, 255);
   p.strokeWeight(5);

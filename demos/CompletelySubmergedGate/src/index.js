@@ -6,6 +6,7 @@ window.p5 = new require("./js/p5.min.js");
 window.g = {
     waterValue : 2.0,
     weightValue : 2.5,
+    F_Applied : 10000,
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -28,7 +29,7 @@ const sketch = (p) => {
     };
 
     p.draw = function() {
-        p.background(253);
+        p.background(255);
         g.calcAll();
         g.drawAll(p);
     };
