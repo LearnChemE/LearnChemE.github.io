@@ -150,9 +150,9 @@ function drawDistances(p) {
 
   p.push();
   p.translate(285, 280);
-  textBox(p, `2.5 m`, 15, "black");
-  p.translate(0, -80);
   textBox(p, `1.25 m`, 15, "black");
+  p.translate(0, -80);
+  textBox(p, `2.50 m`, 15, "black");
   p.translate(0, 40);
   textBox(p, `${g.dF.toFixed(2)} m`, 15, "black");
   p.translate(-123, 70);
