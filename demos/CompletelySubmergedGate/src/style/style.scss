@@ -1,10 +1,11 @@
-$modal-sm: calc( 100vw - 50px);
-$modal-md: calc( 100vw - 50px);
+$modal-sm: calc(100vw - 50px);
+$modal-md: calc(100vw - 50px);
 $modal-lg: 800px;
 $modal-xl: 1140px;
 @import "bootstrap";
 @import "./slider.scss";
 @import "./checkbox.scss";
+
 .simulation-controls {
     display: grid;
     grid-template-columns: max-content max-content;
@@ -20,6 +21,7 @@ $modal-xl: 1140px;
     margin: 0.5rem auto;
     justify-content: center;
     align-content: center;
+
     .btn {
         height: max-content;
         width: 12ch;
@@ -37,18 +39,22 @@ $modal-xl: 1140px;
     justify-self: center;
     height: 70px;
     align-content: space-between;
+
     .input-row {
         display: grid;
         grid-template-columns: 100px 10rem 27px 50px;
         gap: 1ch;
         align-items: end;
+
         .data-name {
             justify-self: end;
         }
+
         .data-value {
             text-align: end;
         }
     }
+
     transform: translate(200px, 30px);
 }
 
@@ -84,13 +90,16 @@ canvas {
 .modal-body {
     text-align: left;
     font-size: 0.9rem;
+
     .references {
         font-size: 0.8rem;
     }
+
     ol {
         list-style-type: none;
         margin: 0;
         padding: 0;
+
         &>li {
             margin-bottom: 0.5rem;
             font-size: 0.8rem;
@@ -120,4 +129,15 @@ canvas {
 
 .checkbox-label {
     font-size: 16px !important;
+}
+
+.img-wrapper {
+    width: 100%;
+    display: grid;
+    justify-content: center;
+    justify-items: center;
+}
+
+img {
+    width: 300px;
 }
