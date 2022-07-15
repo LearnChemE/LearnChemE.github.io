@@ -140,4 +140,27 @@ canvas {
 
 img {
     width: 300px;
+    outline: 1px solid black;
+    padding: 10px;
+}
+
+mjx-container {
+    transform: translateX(20px);
+}
+
+.figure-label {
+    width: 100%;
+    text-align: center;
+    padding-bottom: 0px;
+    margin-bottom: 10px;
+}
+
+.refs {
+    font-size: 0.8rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.see-also {
+    padding-left: 1rem;
 }

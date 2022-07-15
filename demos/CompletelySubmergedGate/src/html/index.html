@@ -109,11 +109,11 @@
 
         <div class="modal-body">
           This simulation determines the magnitude of the applied force needed to keep a gate, which is \( w_{2} \)
-          meters wide and \( h_{1} \) meters tall, closed (see Figure 1). The magnitude of the resultant force is found
+          meters wide and \( h_{1} \) meters tall, closed (see Figure 1 below). The magnitude of the resultant force is found
           by summing the differential forces over the gate surface:
 
           $$
-          F_{R} = \int_{A} \gamma \, h \, dA = \int_{A} y \, \mathrm{sin} ( \theta ) dA
+          [1] \quad F_{R} = \int_{A} \gamma \, h \, dA = \int_{A} \gamma \, y \, \mathrm{sin} ( \theta ) dA
           $$
 
           where \( h = y \, \mathrm{sin} ( \theta ) \) is the vertical distance from the water surface (m), \( y \) is
@@ -121,11 +121,11 @@
           y-coordinate (along the diagonal) from the water surface (m), \( F_{R} \) is the resultant force (N), \( A = L
           \, b \) is the gate area (m<sup>2</sup>), \( b \) is the width of the gate (m), \( L \) is the length of the
           gate
-          (m) as shown in Figure 1, \( \theta \) is the angle (degrees) and \( \gamma \) is the specific weight of water
+          (m) as shown in Figure 1 below, \( \theta \) is the angle (degrees) and \( \gamma \) is the specific weight of water
           (N/m<sup>3</sup>). Solving the integral for \( F_{R} \):
 
           $$
-          F_{R} = \gamma \, h_{c} \, A = \gamma \, y_{c} \, \mathrm{sin} (\theta) A
+          [2] \quad F_{R} = \gamma \, h_{c} \, A = \gamma \, y_{c} \, \mathrm{sin} (\theta) A
           $$
 
           where \( h_{c} = y_{c} \, \mathrm{sin} (\theta) \) is the vertical distance from the fluid surface to the
@@ -133,40 +133,46 @@
           y-coordinate \( y_{R} \) of the resultant force can be found by summing moments around the hinge:
 
           $$
-          F_{R} (y_{R} - D) = \int_{A} (y - D) dF = \int_{A} \gamma \, y (y - D) \mathrm{sin}(\theta) dA
+          [3] \quad F_{R} (y_{R} - D) = \int_{A} (y - D) dF = \int_{A} \gamma \, y (y - D) \mathrm{sin}(\theta) dA
           $$
 
           When \( F_{R} \) is substituted into this equation, and the right side is integrated from \( D \) to \( D + L
           \), then \( y_{R} \) becomes:
 
           $$
-          y_{R} = D + \frac{(D + L)^{2} (2L - D) + D^{3}}{6 L \, y_{c}}
+          [4] \quad y_{R} = D + \frac{(D + L)^{2} (2L - D) + D^{3}}{6 L \, y_{c}}
           $$
 
           A moment balance is done to determine the applied force that keeps the gate closed:
 
           $$
-          \sum M = 0 = -F_{R} ( y_{R} - D ) + W (y_{c} - D) \mathrm{cos} (\theta) + F_{A} \, L
+          [5] \quad \sum M = 0 = -F_{R} ( y_{R} - D ) + W (y_{c} - D) \mathrm{cos} (\theta) + F_{A} \, L
           $$
 
           rearranging to solve for \( F_{A} \):
 
           $$
-          F_{A} = \frac{F_{R} (y_{R} - D) - W (y_{c} - D) \mathrm{cos} (\theta)}{L}
+          [6] \quad F_{A} = \frac{F_{R} (y_{R} - D) - W (y_{c} - D) \mathrm{cos} (\theta)}{L}
           $$
 
           where \( W \) is the weight of the gate (N), \( D \) is the diagonal length from the hinge to the top of the
-          water (m) and \( F_{A} \) is the applied force (N).<br><br>
+          water (m) and \( F_{A} \) is the applied force (N).
+          
+          <br>
 
-          <p>Figure 1</p>
+          <p class="figure-label">Figure 1</p>
 
           <div class="img-wrapper">
             <img src="./assets/gatedistances.png" />
           </div>
 
           <p>References:</p>
-          [1] B. R. Munson, D. F. Young, T. H. Okiishi and W. W. Huebsch, Fundamentals of Fluid Mechanics, 6th ed.,
-          Hoboken, NJ: John Wiley and Sons, 2009 pp. 58-60
+          <p class="refs">- B. R. Munson, D. F. Young, T. H. Okiishi and W. W. Huebsch, Fundamentals of Fluid Mechanics, 6th ed.,
+          Hoboken, NJ: John Wiley and Sons, 2009 pp. 58-60</p>
+          <p>Related simulations:</p>
+          <p class="see-also">
+            - <a href="https://www.learncheme.com/simulations/fluid-mechanics/forces-on-a-partially-submerged-gate/" target="_blank">Forces on a Partially Submerged Gate</a>
+          </p>
 
           <div style="margin-top: 2rem;">
           </div>
@@ -190,7 +196,7 @@
           <p>
             This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
               Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
-              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann and Neil Hendren under the direction of
             Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our
             simulations are open source, and are available on our <a
               href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
