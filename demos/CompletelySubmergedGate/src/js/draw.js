@@ -118,9 +118,9 @@ function drawDistances(p) {
   p.translate(gate_coords[0][0], gate_coords[0][1]);
   p.rotate(Math.PI / 2 + theta);
   // gate length
-  p.line(0, -3* dxy, gateLength, -3 * dxy);
+  p.line(0, -3* dxy, gateLength - 8, -3 * dxy);
   p.line(0, -3 * dxy - edgeLength, 0, -3 * dxy + edgeLength);
-  p.line(gateLength, -3 * dxy - edgeLength, gateLength, -3 * dxy + edgeLength);
+  p.line(gateLength - 8, -3 * dxy - edgeLength, gateLength - 8, -3 * dxy + edgeLength);
   // water force vector
   p.line(0, -2 * dxy, (g.dF / 2.5) * gateLength, -2 * dxy);
   p.line(0, -2 * dxy + edgeLength, 0, -2 * dxy - edgeLength);
