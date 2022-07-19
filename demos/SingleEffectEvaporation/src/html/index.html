@@ -72,7 +72,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This demonstration shows the efficacy of single-effect evaporation of a dilute sugar solution. The saturated or unsaturated liquid is fed into a tank, which contains a steam-fed heat exchanger. The user may adjust the feed flow rate and feed temperature of the feed solution. The conditions of each inlet and outlet stream are shown in colored boxes, with green boxes representing the sugar solution or vapor from the sugar solution, and red boxes representing the steam fed into the heat exchanger.
+            This simulation shows the efficacy of single-effect evaporation of a dilute sugar solution. The saturated or unsaturated liquid is fed into a tank, which contains a steam-fed heat exchanger. The user may adjust the feed flow rate and feed temperature of the feed solution. The conditions of each inlet and outlet stream are shown in colored boxes, with green boxes representing the sugar solution or vapor from the sugar solution, and red boxes representing the steam fed into the heat exchanger.
           </p>
 
         </div>
@@ -104,7 +104,7 @@
 
           <p>
 
-            where \( U \) is the overall heat transfer coefficient [W/(m<sup>2</sup>K)], \( A \) is the area of heat transfer (m<sup>2</sup>), \( T_{conc} \)  is the temperature of the concentrated sugar solution (K), and \( T_{h} \) is the temperature of the steam (K), which is saturated. The value of \( U \) depends on the fluids' density, viscosity, velocity, thermal conductivity, and heat capacity. The values of \( T_h \) and \( T_{conc} \) are obtained from Antoine's equations:
+            where \( U \) is the overall heat transfer coefficient [2,500 W/(m<sup>2</sup>K)], \( A \) is the area of heat transfer (56 m<sup>2</sup>), \( T_{conc} \)  is the temperature of the concentrated sugar solution (K), and \( T_{h} \) is the temperature of the steam (K), which is saturated. In real-life situations, the value of \( U \) depends on the fluids' density, viscosity, velocity, thermal conductivity, and heat capacity, but \( U \) is assumed to be constant in this simulation. The values of \( T_h \) and \( T_{conc} \) are obtained from Antoine's equations:
           </p>
 
           $$
@@ -112,7 +112,7 @@
           $$
 
           <p>
-            where \( P \) is the pressure (Pa), \( A \), \( B \), and \( C \) are constants (obtained from reference 1), and \( T \) is the temperature (K). The concentrated solutions was assumed to be pure water initially. The required mass flow rate of steam \( F_h \) (kg/s) was calculated from:
+            where \( P \) is the pressure (Pa), \( A \), \( B \), and \( C \) are constants (obtained from reference 1), and \( T \) is the temperature (K). The concentrated solution was assumed to be pure water initially. The required mass flow rate of steam \( F_h \) (kg/s) was calculated from:
           </p>
 
           $$
@@ -120,7 +120,7 @@
           $$
 
           <p>
-            where \( \Delta H_{vap,h} \), which is the heat of vaporization (J/kg) of steam, was determined using an approximation from reference&nbsp;2. The mass flow rate (kg/s) of water vapor (\( F_{evap} \)) was calculated from:
+            where \( \Delta H_{vap,h} \), which is the heat of vaporization (assumed to be 1,835 kJ/kg at the pressure in this simulation) of steam, was determined using an approximation from reference&nbsp;2. The mass flow rate (kg/s) of water vapor (\( F_{evap} \)) was calculated from:
           </p>
 
           $$
@@ -128,7 +128,7 @@
           $$
 
           <p>
-            where \( F_{in} \)  is the mass flow rate of the feed solution (kg/s), \( C_{p,c} \)  is the heat capacity of the solution [J/(kg K)] from reference 3, \( T_{in} \)  is the temperature of the feed solution (K), and \( \Delta H_{vap,c} \)  is the heat of vaporization of the solution (J/kg) from reference (1). The flow rate of the concentrated solution (kg/s) was determined from a mass balance:
+            where \( F_{in} \)  is the mass flow rate of the feed solution (kg/s), \( C_{p,c} \) is the temperature-dependent heat capacity of the solution [J/(kg K), calculated using an equation from reference 3], \( T_{in} \)  is the temperature of the feed solution (K), and \( \Delta H_{vap,c} \)  is the heat of vaporization of the solution (assumed to be 2,014 kJ/kg, calculated from reference (1)). The flow rate of the concentrated solution (kg/s) was determined from a mass balance:
           </p>
 
           $$
