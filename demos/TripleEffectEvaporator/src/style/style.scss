@@ -103,6 +103,7 @@ canvas {
 .modal-body {
   text-align: left;
   font-size: 0.9rem;
+  z-index: 2;
 
   .references {
     font-size: 0.8rem;
@@ -128,4 +129,8 @@ canvas {
   padding-bottom: 10px;
   font-size: 1.25rem;
   background-color: rgb(240, 240, 240);
+}
+
+#tooltip-hover-boxes {
+  z-index: 1;
 }
