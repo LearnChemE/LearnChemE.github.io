@@ -50,6 +50,7 @@ const sim = math.parser();
 function updateData() {
   // set initial conditions and constants
   const R = 0.008314;
+  console.log({Ed, Eu})
   const con1 = Math.exp(-Ed/(R*T));
   const con2 = Math.exp(-Eu/(R*T))
   const kd = 1.22*(10**22)*con1;
