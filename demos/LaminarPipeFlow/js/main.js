@@ -119,7 +119,7 @@ function update()
   calcAverageVelocity();
   calcReynolds();
 
-  document.getElementById("radius-value").innerHTML = ( 100 * R ).toFixed(1);
+  document.getElementById("radius-value").innerHTML = ( 100 * R ).toFixed(2);
   document.getElementById("viscosity-value").innerHTML = formatNumber( mu );
   coords.topPlateY = 200 - R * pixelsPerMeter - 10;
   coords.bottomPlateY = 200 + R * pixelsPerMeter;
@@ -266,6 +266,27 @@ function drawContour() {
         vertex(u_pix, i);
       }
     endShape();
+    const pixels_between_plates = coords.bottomPlateY - coords.topPlateY - 10;
+    let number_of_arrows =  Math.max(5, pixels_between_plates / 25 - (pixels_between_plates / 25) % 1);
+    if(number_of_arrows % 2 == 0) {
+      number_of_arrows += 1;
+    }
+    const distance_between_arrows = pixels_between_plates / number_of_arrows;
+    const first_arrow_y_coordinate = ((coords.bottomPlateY + coords.topPlateY + 10) / 2) - ((number_of_arrows - 1) / 2) * distance_between_arrows;
+    fill(0, 0, 255);
+    for( let i = first_arrow_y_coordinate; i < coords.bottomPlateY; i += distance_between_arrows ) {
+      const r = ( i - 200 ) / pixelsPerMeter;
+      const u = calcVelocity( r );
+      u_pix = u * pixelsPerMeter / 2 + 100;
+      stroke(0, 0, 255);
+      line(100, i, u_pix, i);
+      noStroke();
+      if(u_pix - 100 > 10) {
+        triangle(u_pix, i, u_pix - 10, i - 2.5, u_pix - 10, i + 2.5);
+      } else if (u_pix - 100 < -10) {
+        triangle(u_pix, i, u_pix + 10, i - 2.5, u_pix + 10, i + 2.5);
+      }
+    }
   pop();
 }
 
@@ -278,17 +299,18 @@ function formatNumber(num) {
   if (isNaN(n)) { n = 0 }
   n = Math.round(n * 10000) / 10000;
   if ( n === 0 ) { return 0 }
-  else if ( Math.abs( n ) >= 10 ) { return Number.parseInt(n).toFixed(0) }
-  else if ( Math.abs( n ) >= 1 ) { return Number( Math.round( n * 100 ) / 100 ).toFixed(1) }
+  else if ( Math.abs( n ) >= 100 ) { return Number.parseInt(n).toFixed(0) }
+  else if ( Math.abs( n ) >= 10 ) { return Number(n).toFixed(1) }
+  else if ( Math.abs( n ) >= 1 ) { return Number( Math.round( n * 100 ) / 100 ).toFixed(2) }
   else if ( Math.abs( n ) >= 0.01 ) {
-      return Number( Math.round( n * 1000 ) / 1000 ).toFixed(2);
+      return Number( Math.round( n * 1000 ) / 1000 ).toFixed(3);
   }
   else if ( Math.abs( n ) >= 0.001 ) {
-    return Number( Math.round( n * 10000 ) / 10000 ).toFixed(3);
+    return Number( Math.round( n * 10000 ) / 10000 ).toFixed(4);
   }
 
   else if ( Math.abs( n ) >= 0.0001 ) {
-    return Number( Math.round( n * 1000000 ) / 1000000 ).toFixed(4);
+    return Number( Math.round( n * 1000000 ) / 1000000 ).toFixed(5);
   }
 
   else throw "formatNumber() received an invalid number";
