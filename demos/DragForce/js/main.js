@@ -78,9 +78,9 @@ function updateAxes(curT) {
 // This function is called once every animation frame.
 function animationFunction() {
   index++; // Increment our arbitrary "index" variable by 1
-  updateAxes(elapsed / 1000*speed);
+  updateAxes(elapsed/1000*speed);
   advance(); // See calculation.js
-  graphData.push([elapsed / 1000*speed, velocity]); // Add new data to the "graphData" variable
+  graphData.push([elapsed/1000*speed, velocity]); // Add new data to the "graphData" variable
   updateDOM();
   updateGraph(graphData);
 }

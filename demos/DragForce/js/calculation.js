@@ -26,7 +26,7 @@ function advance()
 function VT() 
 {
     initValue();
-    dt = 0.01;
+    dt = 0.001;
 
     const timeStart = Date.now(); 
     let timeElapsed = 0;
@@ -34,11 +34,6 @@ function VT()
     while( height > 0 && timeElapsed < 3000 ) { 
         advance();
         timeElapsed = Date.now() - timeStart;
-    }
-    // so we don't get stuck in a while loop - refresh the page if it cannot solve in reasonable time frame
-    // not the perfect bug fix but it will never freeze up the browser
-    if (timeElapsed >= 3000) {
-        window.location.reload();
     }
 
     max_velocity = velocity;
