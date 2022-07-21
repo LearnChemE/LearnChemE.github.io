@@ -121,11 +121,11 @@ class options {
     // "if" statement ensures this is only ever called once.
     if (newVectorButton === undefined) {
     newVectorButton = createButton('insert vector');
-    newVectorButton.position(width-100, 90 + cnvOffset);
+    newVectorButton.position(width-50, 90 + cnvOffset);
     newVectorButton.mousePressed(newVector);
   
     sumVectorButton = createButton('sum vectors');
-    sumVectorButton.position(width-100, 140 + cnvOffset);
+    sumVectorButton.position(width-50, 140 + cnvOffset);
     sumVectorButton.mousePressed(sumVector);
 
     /*removeVectorButton = createButton('remove vector');
@@ -133,29 +133,29 @@ class options {
     removeVectorButton.mousePressed(removeVector);*/
 
     resetVectorsButton = createButton('reset');
-    resetVectorsButton.position(width-100, 240 + cnvOffset);
+    resetVectorsButton.position(width-50, 240 + cnvOffset);
     resetVectorsButton.mousePressed(reset);
 
     dotProductButton = createButton('dot product');
-    dotProductButton.position(width-100, 90 + cnvOffset);
+    dotProductButton.position(width-50, 90 + cnvOffset);
     dotProductButton.mousePressed(dot.product);
     dotProductButton.hide();
 
     dpResetButton = createButton('reset');
-    dpResetButton.position(width-100, 140 + cnvOffset);
+    dpResetButton.position(width-50, 140 + cnvOffset);
     dpResetButton.mousePressed(dot.reset);
     dpResetButton.hide();
 
     crossVectorCheckbox = createCheckbox('show cross product', false);
-    crossVectorCheckbox.position(width-80, 80 + cnvOffset);
+    crossVectorCheckbox.position(width-30, 80 + cnvOffset);
     crossVectorCheckbox.changed(mySelectEvent);
 
     normPlaneCheckbox = createCheckbox('show normal plane', false);
-    normPlaneCheckbox.position(width-80, 110 + cnvOffset);
+    normPlaneCheckbox.position(width-30, 110 + cnvOffset);
     normPlaneCheckbox.changed(mySelectEvent);
 
     selectOptions = createSelect();
-    selectOptions.position(width-100, 40 + cnvOffset);
+    selectOptions.position(width-50, 40 + cnvOffset);
     selectOptions.option('vector addition');
     selectOptions.option('scalar multiplication');
     selectOptions.option('dot product');
@@ -164,7 +164,7 @@ class options {
     selectOptions.changed(reInitialize);
 
     QuickSettings.useExtStyleSheet();
-    gui2D = createGui('scalar multiplier', width - 100, 180 + cnvOffset);
+    gui2D = createGui('scalar multiplier', width - 50, 180 + cnvOffset);
     gui2D.newSlider("multFac", -4, 4, 1, 0.1, "multiply by", "");
     gui2D.addButton("multiply!", function() {
       scalar.Mult();
@@ -363,19 +363,19 @@ function setup() {
     //removeVectorButton.hide();
     resetVectorsButton.hide();
     normPlaneCheckbox.show();
-    selectOptions.position(width + 10, 40 + cnvOffset);
+    selectOptions.position(width + 60, 40 + cnvOffset);
 
     normalMaterial();
     ambientMaterial(39, 235, 91);
     camera(200, -300, (height/1.5) / tan(PI*30.0 / 180.0), 0, 0, 0, 0, 1, 0);
 
     QuickSettings.useExtStyleSheet();
-    guiU = createGui('$$\\vec{u}$$', width + 10, 145  + cnvOffset,"uGUI");
+    guiU = createGui('$$\\vec{u}$$', width + 60, 145  + cnvOffset,"uGUI");
     guiU.newSlider("x1", -4, 4, 1, 0.1, "x-component: ", ' <img class="guiImgI" src="../../media/iHat.png"></img>');
     guiU.newSlider("y1", -4, 4, 1, 0.1, "y-component: ", ' <img class="guiImgJ" src="../../media/jHat.png"></img>');
     guiU.newSlider("z1", -4, 4, 1, 0.1, "z-component: ", ' <img class="guiImgK" src="../../media/kHat.png"></img>');
     
-    guiV = createGui('$$\\vec{v}$$', width + 10, 360  + cnvOffset,"vGUI");
+    guiV = createGui('$$\\vec{v}$$', width + 60, 360  + cnvOffset,"vGUI");
     guiV.newSlider("x2", -4, 4, 1, 0.1, "x-component: ", ' <img class="guiImgI" src="../../media/iHat.png"></img>');
     guiV.newSlider("y2", -4, 4, 1, 0.1, "y-component: ", ' <img class="guiImgJ" src="../../media/jHat.png"></img>');
     guiV.newSlider("z2", -4, 4, 1, 0.1, "z-component: ", ' <img class="guiImgK" src="../../media/kHat.png"></img>');

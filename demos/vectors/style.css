@@ -6,10 +6,17 @@
   overflow-x: visible;
 }
 
+label {
+  margin-left: 10px;
+  transform: translateY(-2px);
+}
+
 html, body {
+  width: 100vw;
   margin: 0;
   padding: 0;
   display: grid;
+  
   grid-row-gap: 0.5rem;
   grid-template-areas: 
   "btn1 btn2 btn3"
@@ -18,6 +25,7 @@ html, body {
 }
 
 body {
+  padding-left: 30px;
   margin-left: 50vw;
   transform: translateX(-50%) translateY(20px);
 }
