@@ -35,13 +35,17 @@ body {
 
 #control-sliders {
   display: grid;
-  grid-template-columns: max-content 150px 7ch;
+  grid-template-columns: 120px 150px 7ch;
   white-space: nowrap;
   align-items: end;
   gap: 10px;
   .label {
     text-align: end;
   }
+}
+
+.overflow-label {
+  transform: translateX(-110px);
 }
 
 #start-button, #reset-button {

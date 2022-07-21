@@ -28,7 +28,7 @@
   <div id="controls">
         
     <div class="control-box" id="control-sliders">
-      <div class="label">Surface roughness \( \frac{ \Large { \varepsilon } }{ D } \):</div>      
+      <div class="label overflow"><div class="overflow-label">Relative surface roughness \( \frac{ \Large { \varepsilon } }{ D } \):</div></div>      
       <select id="select-ball"></select>
       <div class="value"></div>
 
@@ -103,7 +103,7 @@
         </div>
         
         <div class="modal-body">
-          This simulation plots the trajectory of a non-rotating sphere when launched; the surface roughness determines the sphere's drag profile. First, select the surface roughness using the drop-down menu,
+          This simulation plots the trajectory of a non-rotating sphere when launched; the surface roughness determines the sphere's drag profile. First, select the relative surface roughness using the drop-down menu,
           <div class="modal-image" id="roughness-select"></div>
           where \( \large{ \varepsilon } \) is the depth of imperfections and \( \small{ D } \) is the sphere's diameter. Then, choose a launch angle and launch velocity using the sliders:
           <div class="modal-image" id="launch-angle-velocity"></div>
