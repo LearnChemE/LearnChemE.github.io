@@ -117,8 +117,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation generates a vector field around a sphere with radius \( r = 1 \; \mathrm{ m } \). One of three
-            fluids can be selected from the dropdown menu. The slider changes the fluid velocity. The vector field automaticaly updates if a parameter is changed. The fluid velocity may change when a new fluid is selected in order to keep the Reynold's number within a valid range.
+            This simulation generates a vector field around a sphere with diameter \( d = 1 \; \mathrm{ m } \). One of three fluids can be selected from the dropdown menu. The slider changes the fluid velocity. The vector field automaticaly updates if a parameter is changed. The fluid velocity may change when a new fluid is selected in order to keep the Reynold's number within a valid range.
           </p>
 
         </div>
@@ -195,7 +194,7 @@
           $$
 
           <p>
-            where \( R \) is the radius of the sphere. The numerical Galerkin method used in this simulation approximates the stream function \( \Psi \) as a polynomial in which coefficients are determined experimentally. This solution is only valid for the laminar flow regime \( 0 \leq Re \leq 500 \), with error increasing as Reynold's number increases<sup>3,4</sup>.
+            where \( R \) is the radius of the sphere (0.5 meters in this simulation). The numerical Galerkin method used in this simulation approximates the stream function \( \Psi \) as a polynomial in which coefficients are determined experimentally. This solution is only valid for the laminar flow regime \( 0 \leq Re \leq 500 \), with error increasing as Reynold's number increases<sup>3,4</sup>.
           </p>
 
           <p>
@@ -205,7 +204,7 @@
             <ol class="references">
               <li>
                 n.a. (2021) Navier–Stokes Equations. <i>Wikipedia.com.</i>  <a
-                  href="https://en.wikipedia.org/wiki/Navier–Stokes_equations">https://en.wikipedia.org/wiki/Navier–Stokes_equations</a>
+                  href="https://en.wikipedia.org/wiki/Navier–Stokes_equations" target="_blank">https://en.wikipedia.org/wiki/Navier–Stokes_equations</a>
               </li>
 
               <li>
@@ -239,7 +238,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. It is a JavaScript/HTML5 implementation of a simulation by M.D. Mikhailov<sup>1</sup>. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.</p>
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Mingyuan Lu and Neil Hendren under the direction of Professor John L. Falconer. It is a JavaScript/HTML5 implementation of a simulation by M.D. Mikhailov<sup>1</sup>. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.</p>
           <p style="line-height: 3rem;">
             If this simulation is too big for your screen, zoom out using&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Mac or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png" style="height: 4ch;vertical-align:middle;"></span>&nbsp;on Windows.
           </p>
@@ -250,7 +249,7 @@
 
           <ol class="references">
             <li>
-              Mikhailov, M.D. (2013).  <a href="http://demonstrations.wolfram.com/FlowAroundASphereAtFiniteReynoldsNumberByGalerkinMethod/">Flow around a Sphere at Finite Reynolds Number by Galerkin Method.</a> A <a href="https://demonstrations.wolfram.com">Wolfram Demonstrations</a> Project.
+              Mikhailov, M.D. (2013).  <a href="http://demonstrations.wolfram.com/FlowAroundASphereAtFiniteReynoldsNumberByGalerkinMethod/" target="_blank">Flow around a Sphere at Finite Reynolds Number by Galerkin Method.</a> A <a href="https://demonstrations.wolfram.com" target="_blank">Wolfram Demonstrations</a> Project.
             </li>
 
             <li>
@@ -264,16 +263,6 @@
               Viscosity and density of water:
               Gerhart, P. M., Gerhart, A. L., & Hochstein, J. I. (2016). Munson, Young and Okiishi's Fundamentals of
               Fluid Mechanics. John Wiley & Sons.
-            </li>
-
-            <li>
-              <a href="http://www.vp-scientific.com/Viscosity_Tables.htm"> V&P Scientific</a><br>
-            </li>
-
-            <li>
-              <a
-                href="https://www.uoguelph.ca/foodscience/book/export/html/1988#:~:text=With%20all%20of%20this%20in,m3%20at%2020%C2%B0%20C.">
-                University of Guelph</a>
             </li>
           </ol>
 
