@@ -1,0 +1,43 @@
+{
+  "name": "venturi-meter",
+  "version": "1.0.0",
+  "description": "An interactive simulation designed to teach engineering students about measuring flow rates with a Venturi Meter",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --open --config ./_dev/webpack.config.js --mode=development",
+    "build": "webpack --config ./_dev/webpack.config.js --mode=production"
+  },
+  "keywords": [
+    "chemical",
+    "engineering",
+    "chemistry",
+    "fluid mechanics",
+    "simulation",
+    "fluid dynamics",
+    "venturi meter",
+    "bernoulli's equation",
+    "velocity measurement"
+  ],
+  "author": "Neil Hendren",
+  "license": "ISC",
+  "dependencies": {
+    "@popperjs/core": "^2.11.5",
+    "bootstrap": "^5.2.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "css-loader": "^6.7.1",
+    "html-loader": "^4.1.0",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.6.1",
+    "popper.js": "^1.16.1",
+    "postcss-loader": "^7.0.1",
+    "sass": "^1.54.2",
+    "sass-loader": "^13.0.2",
+    "style-loader": "^3.3.1",
+    "terser-webpack-plugin": "^5.3.3",
+    "to-string-loader": "^1.2.0",
+    "uglify-js": "^3.16.3",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.9.3"
+  }
+}
