@@ -6,7 +6,8 @@ window.p5 = new require("./js/p5.js");
 
 // GLOBAL VARIABLES OBJECT
 window.g = {
-
+    venturi_outer : 100,
+    venturi_inner : 50,
 };
 
 const containerElement = document.getElementById("p5-container");
