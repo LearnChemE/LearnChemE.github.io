@@ -46,6 +46,16 @@ $modal-xl: 1140px;
     }
 }
 
+.checkbox-row {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    align-content: center;
+    align-items: center;
+    .checkbox-label {
+        margin-right: 10px;
+    }
+}
+
 #p5-container {
     width: max-content;
     margin: auto;

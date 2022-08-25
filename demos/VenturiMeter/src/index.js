@@ -8,6 +8,11 @@ window.p5 = new require("./js/p5.js");
 window.g = {
     venturi_outer : 100,
     venturi_inner : 50,
+    manometer_1_height : 100,
+    manometer_2_height : 100,
+    manometer_3_height : 100,
+    manometer_4_height : 100,
+    manometer_5_height : 100
 };
 
 const containerElement = document.getElementById("p5-container");
