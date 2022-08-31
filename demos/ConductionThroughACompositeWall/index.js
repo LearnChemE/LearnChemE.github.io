@@ -24,6 +24,87 @@ function setup() {
 function draw() {
   background(250);
 
+  // Here's where I'm starting
+  // Building the box
+  fill(255); strokeWeight(1);
+  rect(150,50,600,450);
+
+  // These were the last thing I did but needed to be on top for the ticks to be able to be seen
+  fill(0,255,255);
+  strokeWeight(0);
+  quad(150,500,150,150,250,300,250,500);
+
+  fill(255,255,0);
+  quad(250,300,250,500,350,500,350,400);
+
+  fill(255,0,255);
+  quad(350,400,350,500,600,500,600,425);
+
+  fill(0,255,0);
+  quad(600,500,600,425,750,450,750,500);
+
+  fill(0); strokeWeight(2.5);
+  line(150,150,250,300); line(250,300,350,400);
+  line(350,400,600,425); line(600,425,750,450);
+
+  // Variable declarations 
+  let temps = [40,50,60,70,80,90,100,110]; // I tried converting these to strings but it didn't really work
+  let dists = [0,2,4,6,8,10];
+
+  strokeWeight(1);
+  textSize(25);
+  let start = 500, counter0 = 0, left = 150, right = 750;
+  //TEMP LINES AND LABELS
+  for(let i = 0; i < 38; i++){
+    if(i == 0){
+      fill(0);
+      text(temps[counter0],left-30,start-12*i+10);
+      counter0++;
+    }else if(i%5==0){ // Checking remainder to draw longer lines
+      line(left,start-12*i,left+10,start-12*i); // left long lines
+      line(right,start-12*i,right-10,start-12*i); // right long lines
+      // Using this to display if-else to display the numbers at roughly the same distance from left edge
+      // Without this the 2 digit numbers were spaced kind of far
+      if(counter0 <= 5){ 
+        text(temps[counter0],left-33,start-12*i+10);
+        counter0++;
+      }else{
+        text(temps[counter0],left-45,start-12*i+10);
+        counter0++;
+      }
+    }else{
+      line(left,start-12*i,left+5,start-12*i); // Left short lines
+      line(right,start-12*i,right-5,start-12*i); // right short lines
+    }
+  }
+
+  let counter1 = 0, start2 = 150, top = 50, bottom = 500;
+  //DISTANCE LINES AND LABELS
+  for(let i = 0; i < 21; i++){
+    
+    if(i == 0){
+      text(dists[counter1],start2+30*i-5,bottom+30);
+      counter1++;
+    } else if(i%4==0){
+      line(start2+30*i,top,start2+30*i,top+10);
+      line(start2+30*i,bottom,start2+30*i,bottom-10);
+      text(dists[counter1],start2+30*i-10,bottom+30);
+      counter1++;
+    } else{
+        line(start2+30*i,top,start2+30*i,top+5);
+        line(start2+30*i,bottom,start2+30*i,bottom-5);
+    }
+  }
+
+  fill(0);
+  text("Wall Thickness (cm)",350,575);
+  //push(); Solution I found online to rotate text had this with push and pop around it but I can't tell why
+  let angle1 = radians(270);
+  translate(85,400);
+  rotate(angle1);
+  text("Temperature (\xB0C)",0,0);
+  //pop();
+  
 }
 
 const temperature_slider = document.getElementById("temperature-slider");
