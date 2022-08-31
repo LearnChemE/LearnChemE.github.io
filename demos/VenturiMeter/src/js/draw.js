@@ -82,15 +82,49 @@ function drawTube(p) {
   p.textSize(14);
   p.noStroke();
   p.text("100 mm", 10, 0);
+
+  sigmaCurve(p, 0);
   p.pop();
+
 }
 
 function manometerHeight(P) {
   const fraction = P / maxPressure;
   let height = -1 * fraction * 250;
   height = Math.min(height, -0.5 * g.venturi_inner) - 1;
-  console.log(height)
   return height
+}
+
+function sigmaCurve(p, n) {
+  p.push();
+
+  for(let n = 0; n < 5; n++) {
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.noFill();
+    const y_pix_start = ((n - 2) / 2) * 35;
+    const y_pix_middle = ((n - 2) / 2) * 35 * g.venturi_inner / 100;
+    
+    p.beginShape();
+    p.curveVertex(80, y_pix_start);
+    p.curveVertex(80, y_pix_start);
+    p.curveVertex(150, y_pix_start);
+    p.curveVertex(250, y_pix_middle);
+    p.curveVertex(350, y_pix_middle);
+    p.curveVertex(450, y_pix_start);
+    p.curveVertex(600, y_pix_start);
+    p.curveVertex(600, y_pix_start);
+    p.endShape();
+
+    p.fill(0);
+    p.noStroke();
+    p.triangle(88, y_pix_start, 78, y_pix_start - 3, 78, y_pix_start + 3);
+    p.triangle(258, y_pix_middle, 248, y_pix_middle - 3, 248, y_pix_middle + 3);
+    p.triangle(358, y_pix_middle, 348, y_pix_middle - 3, 348, y_pix_middle + 3);
+    p.triangle(608, y_pix_start, 598, y_pix_start - 3, 598, y_pix_start + 3);
+  }
+
+  p.pop();
 }
 
 function drawAxis(p) {
