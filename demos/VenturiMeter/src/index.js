@@ -6,13 +6,18 @@ window.p5 = new require("./js/p5.js");
 
 // GLOBAL VARIABLES OBJECT
 window.g = {
-    venturi_outer : 100,
-    venturi_inner : 50,
-    manometer_1_height : 100,
-    manometer_2_height : 100,
-    manometer_3_height : 100,
-    manometer_4_height : 100,
-    manometer_5_height : 100
+    venturi_outer : 100, // mm
+    venturi_inner : 0, // mm
+    pressure_1 : 100, // mmH2O
+    pressure_2 : 0, // mmH2O
+    pressure_3 : 0, // mmH2O
+    pressure_4 : 0, // mmH2O
+    pressure_5 : 0, // mmH2O
+    velocity_1 : 0, // mm/s
+    velocity_2 : 0, // mm/s
+    velocity_3 : 0, // mm/s
+    velocity_4 : 0, // mm/s
+    velocity_5 : 0, // mm/s
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -24,7 +29,8 @@ const sketch = (p) => {
         p.noLoop();
         g.p = p;
         g.drawAll = require("./js/draw.js");
-        require("./js/elements.js");       
+        require("./js/elements.js");
+        g.calcAll = require("./js/calcs.js");  
         p.windowResized = function() {
 
         }
@@ -32,6 +38,7 @@ const sketch = (p) => {
 
     p.draw = function() {
         p.background(253);
+        g.calcAll();
         g.drawAll(p);
     };
 

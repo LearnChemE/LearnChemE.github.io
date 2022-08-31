@@ -1,20 +1,22 @@
 
 
+  const maxPressure = 120;
+
 function drawTube(p) {
   p.push();
 
-  p.translate(30, g.p.height / 1.5);
+  p.translate(70, g.p.height / 1.5);
   const outer_dia = g.venturi_outer;
   const inner_dia = g.venturi_inner;
   const delta_dia = g.venturi_outer - g.venturi_inner;
   p.fill("cyan");
   
   p.stroke("blue");
-  p.rect(100, 0, 20, -0.5 * outer_dia - g.manometer_1_height);
-  p.rect(240, 0, 20, -0.5 * outer_dia - g.manometer_2_height);
-  p.rect(335, 0, 20, -0.5 * outer_dia - g.manometer_3_height);
-  p.rect(440, 0, 20, -0.5 * outer_dia - g.manometer_4_height);
-  p.rect(585, 0, 20, -0.5 * outer_dia - g.manometer_5_height);
+  p.rect(100, 0, 20, manometerHeight(g.pressure_1));
+  p.rect(240, 0, 20, manometerHeight(g.pressure_2));
+  p.rect(335, 0, 20, manometerHeight(g.pressure_3));
+  p.rect(440, 0, 20, manometerHeight(g.pressure_4));
+  p.rect(585, 0, 20, manometerHeight(g.pressure_5));
 
   p.noStroke();
   p.beginShape();
@@ -66,21 +68,64 @@ function drawTube(p) {
   p.line(585, -0.5 * outer_dia, 585, -0.5 * outer_dia - 200);
   p.line(605, -0.5 * outer_dia, 605, -0.5 * outer_dia - 200);
 
-  p.noStroke();
+  p.stroke(0);
   p.fill(0);
-  p.textAlign(p.CENTER, p.CENTER);
-  p.textSize(18);
-  p.text(`${g.manometer_1_height.toFixed(0)} mmH₂O`, 110, -280);
-  p.text(`${g.manometer_2_height.toFixed(0)}`, 250, -280);
-  p.text(`${g.manometer_3_height.toFixed(0)}`, 345, -280);
-  p.text(`${g.manometer_4_height.toFixed(0)}`, 450, -280);
-  p.text(`${g.manometer_5_height.toFixed(0)}`, 595, -280);
+  p.line(50, -0.5 * outer_dia, 50, 0.5 * outer_dia);
+  p.translate(50, -0.5 * outer_dia);
+  p.line(0, 0, 10, 8);
+  p.line(0, 0, -10, 8);
+  p.translate(0, outer_dia);
+  p.line(0, 0, 10, -8);
+  p.line(0, 0, -10, -8);
+  p.translate(0, -0.5 * outer_dia);
+  p.textAlign(p.LEFT);
+  p.textSize(14);
+  p.noStroke();
+  p.text("100 mm", 10, 0);
+  p.pop();
+}
 
+function manometerHeight(P) {
+  const fraction = P / maxPressure;
+  let height = -1 * fraction * 250;
+  height = Math.min(height, -0.5 * g.venturi_inner) - 1;
+  console.log(height)
+  return height
+}
+
+function drawAxis(p) {
+  p.push();
+  p.translate(50, p.height / 1.5);
+  p.textSize(15);
+  p.textAlign(p.CENTER);
+  p.text("mmH", -10, -275);
+  p.text("O", 19, -275);
+  p.textSize(10);
+  p.text("2", 11, -270);
+  p.textSize(15);
+  p.line(0, 0, 0, -250);
+  p.textAlign(p.RIGHT);
+  const numberOfMajorTicks = 6;
+  const minorTicksPerMajorTick = 5;
+  const i_max = numberOfMajorTicks * minorTicksPerMajorTick;
+  for(let i = 0; i <= i_max; i++) {
+    const y = -250 * i / i_max;
+    let tickWidth;
+    if(i % minorTicksPerMajorTick === 0) {
+      tickWidth = 8;
+      const pressure = `${((i / i_max) * maxPressure)}`;
+      p.text(pressure, -5, y + 5)
+    } else {
+      tickWidth = 3;
+    }
+    p.line(0, y, tickWidth, y);
+  }
   p.pop();
 }
 
 function drawAll(p) {
   drawTube(p);
+  drawAxis(p);
 }
 
 module.exports = drawAll;
