@@ -1,7 +1,7 @@
 // Declare global variables within this object. They will be available across all files as "g.variable_name".You can make another script file aside from index.js by putting <script src="./path-to/other-js-file.js"></script> after the "index.js" HTML element. All the variables you declare in this file will be accessible there. It's best practice to store your global variables within an object E.G. "g.rng_1_value" because it will minimize the risk of namespace issues.
 window.g = {
   cnv : undefined,
-  temperature_value : 1.0,
+  temperature_value : 75,
   glass_thickness : 1.0,
   concrete_thickness : 1.0,
   steel_thickness : 1.0,
