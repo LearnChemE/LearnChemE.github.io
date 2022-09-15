@@ -6,8 +6,6 @@ window.g = {
   concrete_thickness : 1.0,
   steel_thickness : 1.0,
   right_wall_material : "fiberglass",
-
-  // Variables I added
   temperature_left_wall : 75,
 
 }
@@ -112,21 +110,58 @@ function draw() {
   fill(0,255,255); strokeWeight(0);
   quad(x[0],y[0],x[1],y[1],x[2],y[2],x[3],y[3]);
   pop();
+
+  let angletemp = radians(-90);
+  if (g.glass_thickness > .4 && g.temperature_left_wall > 55){
+    push(); fill(0);
+    translate(x[1] + .6*(x[2]-x[1])+5, y[0] - .2*(y[0]-y[1]));
+    rotate(angletemp);
+    text("Glass",0,0);
+    pop();
+  }
+
   //Concrete wall
   push();
   fill(255,255,0); strokeWeight(0);
   quad(x[3],y[3],x[2],y[2],x[4],y[4],x[5],y[5]);
   pop();
+
+  if (g.concrete_thickness > .4 && (y[5]-y[4]) > 120){
+    push(); fill(0);
+    translate(x[2] + .6*(x[4]-x[2])+5,y[3] - .2*(y[3]-y[2]));
+    rotate(angletemp);
+    text("Concrete",0,0);
+    pop();
+  }
+
   // Stainless Steel wall
   push();
   fill(255,0,255); strokeWeight(0);
   quad(x[5],y[5],x[4],y[4],x[6],y[6],x[7],y[7]);
   pop();
+
+  if (g.steel_thickness > .4 && (y[7]-y[6] > 110)){
+    push(); fill(0);
+    translate(x[4] + .6*(x[6]-x[4])+5, y[5] - .2*(y[5]-y[4]));
+    rotate(angletemp);
+    text("S. Steel",0,0);
+    pop();
+  }
+
   // Other wall
   push();
   fill(0,255,0); strokeWeight(0);
   quad(x[7],y[7],x[6],y[6],x[8],y[8],x[9],y[9]);
   pop();
+
+  if (y[7] - y[6] > 75){
+    push(); fill(0);
+    translate(x[6] + .13*(x[8]-x[6]), y[7] - .2*(y[7]-y[6]));
+    text(g.right_wall_material,0,0);
+    pop();
+  }
+  
+  
 
   // Line that goes over the tope of the wall
   fill(0); strokeWeight(2.5);
@@ -134,7 +169,7 @@ function draw() {
   line(x[4],y[4],x[6],y[6]); line(x[6],y[6],x[8],y[8]);
 
   // Variable declarations 
-  let temps = [40,50,60,70,80,90,100,110]; // I tried converting these to strings but it didn't really work
+  let temps = [40,50,60,70,80,90,100,110]; 
   let dists = [0,2,4,6,8,10];
 
   strokeWeight(1);
