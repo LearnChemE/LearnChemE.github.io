@@ -1,11 +1,15 @@
 // Declare global variables within this object. They will be available across all files as "g.variable_name".You can make another script file aside from index.js by putting <script src="./path-to/other-js-file.js"></script> after the "index.js" HTML element. All the variables you declare in this file will be accessible there. It's best practice to store your global variables within an object E.G. "g.rng_1_value" because it will minimize the risk of namespace issues.
 window.g = {
   cnv : undefined,
-  temperature_value : 75,
+  //temperature_value : 75,
   glass_thickness : 1.0,
   concrete_thickness : 1.0,
   steel_thickness : 1.0,
   right_wall_material : "fiberglass",
+
+  // Variables I added
+  temperature_left_wall : 75,
+
 }
 
 // See https://p5js.org/ to learn how to use this graphics library. setup() and draw() are used to draw on the canvas object of the page.  Seriously, spend some time learning p5.js because it will make drawing graphics a lot easier.  You can watch tutorial videos on the "Coding Train" youtube channel. They have a p5.js crash course under their playlists section.  It will make these functions make a lot more sense.
@@ -24,28 +28,110 @@ function setup() {
 function draw() {
   background(250);
 
-  // Here's where I'm starting
+  console.log(g.right_wall_material);
   // Building the box
   fill(255); strokeWeight(1);
   rect(150,50,600,450);
 
-  // These were the last thing I did but needed to be on top for the ticks to be able to be seen
-  fill(0,255,255);
-  strokeWeight(0);
-  quad(150,500,150,150,250,300,250,500);
+  let Temp_final = 45; // Fixed temperature of the right wall
 
-  fill(255,255,0);
-  quad(250,300,250,500,350,500,350,400);
+  // Vectors to hold x and y positions for the shapes
+  let x = new Array(10);
+  let y = new Array(10);
 
-  fill(255,0,255);
-  quad(350,400,350,500,600,500,600,425);
+  // Left wall
+  x[0] = 150; y[0] = 500;
+  x[1] = 150; y[1] = 500 - 6*(g.temperature_left_wall - 40); // Sets height of left wall based on input
 
-  fill(0,255,0);
-  quad(600,500,600,425,750,450,750,500);
+  // Glass & Concrete connection
+  x[2] = x[1] + 6*10*g.glass_thickness; 
+  x[3] = x[2]; y[3] = y[0];
 
+  quad(x[0],y[0],x[1],y[1],x[2],y[2],x[3],y[3]);
+
+  // Concrete & Stainless Steel connection
+  x[4] = x[2] + 6*10*g.concrete_thickness; //y[4] = 100;
+  x[5] = x[4]; y[5] = y[3];
+  
+  // Stainless Steel and Right Wall connection
+  x[6] = x[5] + 6*10*g.steel_thickness; //y[6] = 100;
+  x[7] = x[6]; y[7] = y[5];
+
+  // Fixed temperature right wall
+  x[8] = 750; y[8] = 500 - 6*(Temp_final-40);
+  x[9] = 750; y[9] = 500;
+
+  // Material Properties -- From the mathematica sim
+  let k_glass = .96/100;
+  let k_concrete = 1.4/100;
+  let k_steel = 16.3/100;
+  let k_other;
+  
+  // Defining final k_value
+  switch(g.right_wall_material) {
+    case 'fiberglass':
+      k_other = .04/100;
+      break;
+    case 'brick' :
+      k_other = 1.4/100;
+      break;
+    case 'lead' :
+      k_other = 35/100;
+      break;
+  }
+
+  // Lengths of each wall segment
+  let x_glass = (x[2] - x[1])/60;
+  let x_concrete = (x[4] - x[2])/60;
+  let x_steel = (x[6] - x[4])/60;
+  let x_other = (x[8] - x[6])/60;
+
+  // Total Resistance
+  let R_total = x_glass/k_glass + x_concrete/k_concrete + x_steel/k_steel + x_other/k_other;
+
+  // Heat flux
+  let qx = (g.temperature_left_wall - Temp_final)/R_total;
+  //console.log(qx*(10^4));
+
+  // Defining temperature values at each connection
+  let Tglass_conc = g.temperature_left_wall - qx*x_glass/k_glass;
+  let Tconc_steel = Tglass_conc - qx*x_concrete/k_concrete;
+  let Tsteel_other = Tconc_steel - qx*x_steel/k_steel;
+  let Tlast = Tconc_steel - qx*x_other/k_other;
+
+
+  //500 - 6*(g.temperature_left_wall - 40);
+  y[2] = 500 - 6*(Tglass_conc - 40);
+  y[4] = 500 - 6*(Tconc_steel - 40);
+  y[6] = 500 - 6*(Tsteel_other - 40);
+  y[8] = 500 - 6*(Tlast - 40);
+
+  // Wall sections and Labels
+  // Glass wall
+  push();
+  fill(0,255,255); strokeWeight(0);
+  quad(x[0],y[0],x[1],y[1],x[2],y[2],x[3],y[3]);
+  pop();
+  //Concrete wall
+  push();
+  fill(255,255,0); strokeWeight(0);
+  quad(x[3],y[3],x[2],y[2],x[4],y[4],x[5],y[5]);
+  pop();
+  // Stainless Steel wall
+  push();
+  fill(255,0,255); strokeWeight(0);
+  quad(x[5],y[5],x[4],y[4],x[6],y[6],x[7],y[7]);
+  pop();
+  // Other wall
+  push();
+  fill(0,255,0); strokeWeight(0);
+  quad(x[7],y[7],x[6],y[6],x[8],y[8],x[9],y[9]);
+  pop();
+
+  // Line that goes over the tope of the wall
   fill(0); strokeWeight(2.5);
-  line(150,150,250,300); line(250,300,350,400);
-  line(350,400,600,425); line(600,425,750,450);
+  line(x[1],y[1],x[2],y[2]); line(x[2],y[2],x[4],y[4]);
+  line(x[4],y[4],x[6],y[6]); line(x[6],y[6],x[8],y[8]);
 
   // Variable declarations 
   let temps = [40,50,60,70,80,90,100,110]; // I tried converting these to strings but it didn't really work
@@ -98,12 +184,12 @@ function draw() {
 
   fill(0);
   text("Wall Thickness (cm)",350,575);
-  //push(); Solution I found online to rotate text had this with push and pop around it but I can't tell why
+  push(); // Solution I found online to rotate text had this with push and pop around it but I can't tell why
   let angle1 = radians(270);
   translate(85,400);
   rotate(angle1);
   text("Temperature (\xB0C)",0,0);
-  //pop();
+  pop();
   
 }
 
