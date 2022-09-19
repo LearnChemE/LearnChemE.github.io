@@ -137,26 +137,35 @@ function draw() {
   //console.log(answer.summation[0]);
 
   ///////////////////////////// MATH /////////////////////////////
-  let mathInfo;
+  let mathInfo; let positions = [R,R-segmentSize,R-segmentSize-15,L+segmentSize+15,L+segmentSize,L];
   switch (g.uniformGen){
     case 'A' :
       //console.log('Is this working');
       mathInfo = AgenMath();
       points = Acurve(mathInfo.T_vec[5],mathInfo.T_vec[4]);
-      //console.log(mathInfo.T_vec[4]);
-      //console.log(points.y);
-      
+      push();
+      noFill();
+      stroke(255,0,0); strokeWeight(2);
+      bezier(L,B-5*points.y[0]+150,L+17.7*4,B-5*points.y[3]+150,L+17.7*8,B-5*points.y[7]+150,L+segmentSize,B-5*points.y[10]+150);
+      pop();
+      tempDisplayA(mathInfo.T_vec,positions);
       break;
     case 'B' :
-      //console.log('Yes, it is');
+      mathInfo = BgenMath();
+      points = Bcurve(mathInfo.T_vec[3],mathInfo.T_vec[2]);
+      push();
+      noFill();
+      stroke(255,0,0); strokeWeight(2);
+      bezier(L+segmentSize+15,B-5*points.y[0]+150,L+segmentSize + 15 + 11.5*4,B-5*points.y[3]+150,L+segmentSize+15+11.5*8,B-5*points.y[7]+150,R-segmentSize-15,B-5*points.y[10]+150);
+      pop();
+      extraBpoints(mathInfo.T_vec[3]);
+      tempDisplayB(mathInfo.T_vec,positions);
       break;
   }
 
   // Drawing temperature profile 
-  // Need to add in the last bit of profile via vec.push(); and all L to positions
-  // Use curve vertex to draw the non-linear section
   push();
-  let positions = [R,R-segmentSize,R-segmentSize-15,L+segmentSize+15,L+segmentSize,L];
+  
   fill(255,0,0);
   for(let i = 0; i < mathInfo.T_vec.length; i++){
     strokeWeight(0);
@@ -168,32 +177,10 @@ function draw() {
     line(positions[i],B-5*mathInfo.T_vec[i]+150,positions[i+1],B-5*mathInfo.T_vec[i+1]+150);
   }
   pop();
-  push();
-  // beginShape(); stroke(255,0,0); strokeWeight(2); noFill();
-  // curveVertex(L-1000,B-5*points.y[0]+175);
-  // for(let i = 1; i < points.y.length; i++){
-    
-  //    curveVertex(L+17.7*(i),B-5*points.y[i]+150);
-  //    console.log(L+17.7*(i),B-5*points.y[i]+150);
-  //   //  if (i == 2) {
-  //   //   curveVertex(L,B-5*points.y[0]+150);
-  //   //   console.log(L,B-5*points.y[0]+150);
-  //   //  }
-  //   //  if (i == points.y.length-2) {
-  //   //   curveVertex(L+segmentSize,B-5*points.y[10]);
-  //   //   console.log(L+segmentSize,B-5*points.y[10]);
-  //   //   console.log(points.y[10]);
-  //   //  }
-  //   curveVertex(L+segmentSize,B-5*points.y[10]+150);
-     
-  // }
-  
 
-  // endShape();
-  noFill();
-  stroke(255,0,0); strokeWeight(2)
-  bezier(L,B-5*points.y[0]+150,L+17.7*4,B-5*points.y[3]+150,L+17.7*8,B-5*points.y[7]+150,L+segmentSize,B-5*points.y[10]+150);
-  pop();
+
+
+  
 
 }
 
@@ -225,6 +212,75 @@ function Acurve(constant2,Ts5){
   return{y};
 }
 
+// Solves temperatues at points for when wall B is generating heat
+function BgenMath(){
+  let T_vec = new Array(3);
+  let heatflux = g.lengthB*g.Q*1000;
+  T_vec[0] = heatflux/g.h + g.Tinf;
+  T_vec[1] = heatflux*g.lengthC/g.kC + T_vec[0];
+  T_vec[2] = heatflux*g.Rtc + T_vec[1];
+  let C2 = T_vec[2] + g.Q*Math.pow(g.lengthB,2)*1000/(2*g.kB);
+  T_vec.push(C2);
+  return{T_vec};
+}
+
+function tempDisplayA(temps,pos){
+  let temp1 = "\xB0C"
+  let T1 = Math.round(temps[0]).toString(); let T2 = Math.round(temps[1]).toString(); let T3 = Math.round(temps[2]).toString();
+  let T4 = Math.round(temps[3]).toString(); let T5 = Math.round(temps[4]).toString(); let T6 = Math.round(temps[5]).toString();
+
+  let L1 = T1.concat(temp1); let L2 = T2.concat(temp1); let L3 = T3.concat(temp1);
+  let L4 = T4.concat(temp1); let L5 = T5.concat(temp1); let L6 = T6.concat(temp1);
+
+  textSize(20);
+  text(L1, 5+pos[0],550-5*temps[0]+150-5);
+  text(L2, 5+pos[1],550-5*temps[1]+150-5);
+  text(L3, -50+pos[2],550-5*temps[2]+150+25);
+  text(L4, 5+pos[3],550-5*temps[3]+150-5);
+  text(L5, -50+pos[4],550-5*temps[4]+150+25);
+  text(L6, 5+pos[5],550-5*temps[5]+150-5);
+}
+
+// Generates series of points to plot B temperature profile when B is generating heat
+function Bcurve(constant2,Ts3){
+  let x = [];
+  let y = [];
+  
+  for(let i = 0; i < 10; i++){
+    x.push(0.013*i);
+    y.push(-1*g.Q*Math.pow(x[i],2)/(2*g.kB) + constant2);
+  }
+  x.push(.013); y.push(Ts3);
+  return{y};
+}
+// Function to draw remaining curve through wall A when B is generating heat
+function extraBpoints(mm){
+  let value_temp = 550 - 5*mm + 150;
+  push();
+  strokeWeight(0); fill(255,0,0);
+  circle(75, value_temp,12);
+  circle(252, value_temp,12);
+  strokeWeight(2); stroke(255,0,0);
+  line(75,value_temp, 252+15, value_temp);
+  pop();
+}
+
+function tempDisplayB(temps,pos){
+  let temp1 = "\xB0C"
+  let T1 = Math.round(temps[0]).toString(); let T2 = Math.round(temps[1]).toString(); let T3 = Math.round(temps[2]).toString();
+  let T4 = Math.round(temps[3]).toString();
+
+  let L1 = T1.concat(temp1); let L2 = T2.concat(temp1); let L3 = T3.concat(temp1);
+  let L4 = T4.concat(temp1);
+
+  textSize(20);
+  text(L1, 5+pos[0],550-5*temps[0]+150-5);
+  text(L2, 5+pos[1],550-5*temps[1]+150-5);
+  text(L3, -50+pos[2],550-5*temps[2]+150+25);
+  text(L4, 5+pos[3],550-5*temps[3]+150-5);
+  text(L4,5+pos[5],550-5*temps[3]+150-5);
+  
+}
 
 
 
