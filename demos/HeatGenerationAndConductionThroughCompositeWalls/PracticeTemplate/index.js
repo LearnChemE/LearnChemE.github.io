@@ -2,7 +2,7 @@
 window.g = {
   cnv: undefined,
   Q: 6,
-  rng_2_value: 0,
+  //rng_2_value: 0,
   Rtc: 0,
   uniformGen: "A",
   Tinf: 20,  
@@ -301,12 +301,12 @@ range_1_element.addEventListener("input", function () {
   //console.log(`g.Q is ${g.Q}`); // console.log is the easiest way to see a variable value in the javascript prompt.
 });
 
-range_2_element.addEventListener("input", function () {
-  const rng_2_value = Number(range_2_element.value);
-  range_2_value_label.innerHTML = `${rng_2_value}`;
-  g.rng_2_value = rng_2_value;
-  //console.log(`g.rng_2_value is ${g.rng_2_value}`);
-});
+// range_2_element.addEventListener("input", function () {
+//   const rng_2_value = Number(range_2_element.value);
+//   range_2_value_label.innerHTML = `${rng_2_value}`;
+//   g.rng_2_value = rng_2_value;
+//   //console.log(`g.rng_2_value is ${g.rng_2_value}`);
+// });
 
 range_3_element.addEventListener("input", function () {
   const rng_3_value = Number(range_3_element.value);
