@@ -3,9 +3,20 @@ window.g = {
   cnv : undefined,
   m_dothot : 0.3,
   m_dotcold : 0.3,
-  HEX_length : 0,
+  HEX_length : 15,
   hot_fluid : "liquid water",
   flow_type : "parallel",
+
+  // HEX properties
+  di : 0.025,
+  do : 0.045,
+  T_hot1 : 400,
+  T_cold1 : 300,
+  // For graphing purposes
+  left : 100,
+  right : 750,
+  top : 50,
+  bottom : 500,
 }
 
 // See https://p5js.org/ to learn how to use this graphics library. setup() and draw() are used to draw on the canvas object of the page.  Seriously, spend some time learning p5.js because it will make drawing graphics a lot easier.  You can watch tutorial videos on the "Coding Train" youtube channel. They have a p5.js crash course under their playlists section.  It will make these functions make a lot more sense.
@@ -24,11 +35,75 @@ function setup() {
 function draw() {
   background(250);
 
-  push();
-  pop();
+  // BUILDING THE GRAPH \\
 
-  console.log(mu_water[2][1]);
+  // Temperature lines & labels
+  push();
+  rect(100,50,650,450);
+  let tempInfo = drawTemplines(); // Drawing temperature lines returning values relevant to temperature (pixel value of T = 295K, pixels between lines, and scale between lines)
+  let T295 = tempInfo[0];
+  let spacePer_Temp = tempInfo[1];
+  let scaleTemperature = tempInfo[2];
+
+  let distanceInfo = drawDistlines(); // Drawing distance lines and returning values relevant to positioning (pixel value of 0m, pixels between lines, and scale between lines)
+  let zeroPosition = distanceInfo[0];
+  let spacePer_Positon = distanceInfo[1];
+  let scalePosition = distanceInfo[2];
+
+ let cp_vec, mu_vec, k_vec;
+ let cp_hot, mu_hot, k_hot;
+ let cp_cold, mu_cold, k_cold;
+ let properties;
+
+ // Grabbing hot fluid properties based on fluid type and initial hot temperature (400 K)
+  switch(g.hot_fluid){
+    case 'liquid water':
+      cp_vec = cp_water;
+      mu_vec = mu_water;
+      k_vec = k_water;
+      properties = getProperties(g.T_hot1,cp_vec,mu_vec,k_vec);
+      cp_hot = properties[0];
+      mu_hot = properties[1];
+      k_hot = properties[2];
+      break;
+    case 'air': // Air uses set values
+      cp_hot = cp_air;
+      mu_hot = mu_air;
+      k_hot = k_air; 
+      break;
+    case 'liquid sodium':
+      cp_vec = cp_na;
+      mu_vec = mu_na;
+      k_vec = k_na;
+      properties = getProperties(g.T_hot1,cp_vec,mu_vec,k_vec);
+      cp_hot = properties[0];
+      mu_hot = properties[1];
+      k_hot = properties[2];
+      break;
+  }
+
+  // Grabbing cold fluid properties (fixed fluid: water)
+  let properties_cold;
+  properties_cold = getProperties(g.T_cold1,cp_water,mu_water,k_water);
+  cp_cold = properties_cold[0];
+  mu_cold = properties_cold[1];
+  k_cold = properties_cold[2];
   
+  
+  
+  switch(g.flow_type){
+    case 'parallel':
+
+    break;
+    case 'counterflow':
+
+    break;
+  }
+  
+  //console.log(cp_water[1][0])
+  //console.log(cpH)
+  //console.log(g.hot_fluid)
+  //console.log(cp_hot);
 }
 
 const range_1_element = document.getElementById("range-1");
@@ -44,28 +119,28 @@ range_1_element.addEventListener("input", function() {
   const m_dothot = Number(range_1_element.value); // range_1_element.value is a string by default, so we need to convert it to a number.
   range_1_value_label.innerHTML = `${m_dothot}`; // Edit the text of the global var range_1_value
   g.m_dothot = m_dothot; // Assign the number to the global object.
-  console.log(`g.m_dothot is ${g.m_dothot}`); // console.log is the easiest way to see a variable value in the javascript prompt.
+  //console.log(`g.m_dothot is ${g.m_dothot}`); // console.log is the easiest way to see a variable value in the javascript prompt.
 });
 
 range_2_element.addEventListener("input", function() {
   const m_dotcold = Number(range_2_element.value);
   range_2_value_label.innerHTML = `${m_dotcold}`;
   g.m_dotcold = m_dotcold;
-  console.log(`g.m_dotcold is ${g.m_dotcold}`);
+  //console.log(`g.m_dotcold is ${g.m_dotcold}`);
 });
 
 range_3_element.addEventListener("input", function() {
   const HEX_length = Number(range_3_element.value);
   range_3_value_label.innerHTML = `${HEX_length}`;
   g.HEX_length = HEX_length;
-  console.log(`g.HEX_length is ${g.HEX_length}`);
+  //console.log(`g.HEX_length is ${g.HEX_length}`);
 });
 
 select_element.addEventListener("change", function() {
   const hot_fluid = select_element.value;
   //select_label.innerHTML = `Selection value is: <span style="color:orange" >${hot_fluid}</span>.`
   g.hot_fluid = hot_fluid;
-  console.log(`g.hot_fluid is ${hot_fluid}`);
+ //console.log(`g.hot_fluid is ${hot_fluid}`);
 })
 
 
@@ -88,7 +163,7 @@ select_element.addEventListener("change", function() {
 
 
 // // // MATERIAL PROPERTIES FROM WOLFRAM SIM \\ \\ \\
-
+// After looking through the wolfram sim, I don't understand why they have these large vectors for values. My interpretation of the wolfram math is that they use the fluid properties based on the initial temperature
 // Water properties
 let mu_water = [[300., 0.000855], [305, 0.0007689], [310, 0.000695], [315, 0.0006309], [320, 0.0005769], [325, 0.0005279], [330, 0.000489], [335, 0.000453], [340, 0.00041996], [345, 0.00038897], [350, 0.000365], [355, 0.000343], [360, 0.00032396], [365, 0.000306], [370, 0.000289], [373.15, 0.000279], [375, 0.000274], [380, 0.00026], [385, 0.000248], [390, 0.000237], [400, 0.000217], [410, 0.00019998], [420, 0.000185], [430, 0.000173], [440, 0.00016198], [450, 0.00015198], [460, 0.000143], [470, 0.000136], [480, 0.000129], [490, 0.000124], [500, 0.000118]];
 let cp_water = [[300, 4.179], [305, 4.178], [310, 4.1785], [315, 4.179], [320, 4.180], [325, 4.182], [330, 4.184], [335, 4.186], [340, 4.188], [345, 4.191], [350, 4.195], [355, 4.199], [360, 4.203], [365, 4.209], [370, 4.214], [373.15, 4.217], [375, 4.220], [380, 4.226], [385, 4.232], [390, 4.239], [400, 4.256], [410, 4.278], [420, 4.302], [430, 4.331], [440, 4.36], [450, 4.4], [460, 4.44], [470, 4.48], [480, 4.53], [490, 4.59], [500, 4.66]];
@@ -121,5 +196,182 @@ function interpolate(x,x1,x2,y1,y2){
   return(y);
 }
 
+function drawTemplines(){
+  let T_labels = [300, 320, 340, 360, 380, 400]; // Temperature labels
+  let counter = 0; // for placing temp labels
+  let biglines = 1; // Conditional for where larger lines should be
+  textSize(22);
+  for(let i = 0; i < 23; i++){
+    if(i == biglines){ // Bigger lines
+      line(g.left,g.bottom-19*(i+1),g.left+10,g.bottom-19*(i+1)); // Temperature lines every 19 pixels, first T @ 295 & last T @ 405 (every 5K)
+      line(g.right,g.bottom-19*(i+1),g.right-10,g.bottom-19*(i+1));
+      text(T_labels[counter],g.left-40,g.bottom-19*(i+1)+5);
+      counter++;
+      biglines = biglines + 4;
+    } else { // Smaller lines
+      line(g.left, g.bottom-19*(i+1), g.left+4, g.bottom-19*(i+1));
+      line(g.right,g.bottom-19*(i+1),g.right-4,g.bottom-19*(i+1));
+    } 
+  }
+  textSize(25);
+  let angle1 = radians(270);
+  translate(45,370);
+  rotate(angle1);
+  text("Temperature (K)",0,0); // Temperature axis label
+  pop();
 
+  let temp = [g.bottom-19,19,5];
+  return(temp);
+  
+}
 
+function drawDistlines(){
+  // Distance lines and labels
+  // Defining last distance label // Based on wolfram sim
+  push();
+  let last_distlabel;
+  if(g.HEX_length > 13 && g.HEX_length < 23){
+    last_distlabel = Math.round((g.HEX_length-1)/5)*5;
+  } else if(g.HEX_length >= 23){
+    last_distlabel = Math.round(g.HEX_length/5)*5;
+  } else if(g.HEX_length == 13){
+    last_distlabel = 14;
+  } else if(g.HEX_length == 12 || g.HEX_length == 11){
+    last_distlabel = 12;
+  } else if(g.HEX_length == 10){
+    last_distlabel = 10;
+  }
+
+  let last_distance = g.HEX_length+1;
+
+  // Defining distance labels and scale
+  let dist_labels = [], scale;
+  if(g.HEX_length > 13 && g.HEX_length < 23){
+    for(let i=0; i < last_distlabel + 1; i+=5){
+      dist_labels.push(i);
+    }
+    scale = 1; // Defining scale
+  } else if(g.HEX_length >= 23){
+    for(let i=0; i < last_distlabel + 1; i+=5){
+      dist_labels.push(i);
+    }
+    scale = 1;
+  } else {
+    for(let i=0; i < last_distlabel+1; i+=2){
+      dist_labels.push(i);
+    }
+    scale = .5;
+  }
+
+  // Number of lines
+  let points = last_distance/scale + 1;
+  let space = (g.right-g.left-30)/points; // -30 to make sure points don't span whole width of plot
+  let counter0 = 0, counter1 = 0;
+  textSize(22);
+
+  // Drawing distance lines
+  if(g.HEX_length > 13 && g.HEX_length < 23){
+    for(let i = 0; i < points+1; i++){
+      if(i == counter0){
+        line(30+g.left+space*i,g.bottom,30+g.left+space*i,g.bottom-10); // Shifted over by 30 to allow space for temperature labels
+        line(30+g.left+space*i,g.top,30+g.left+space*i,g.top+10);
+        text(dist_labels[counter1],20+g.left+space*i,g.bottom+25);
+        counter0 = counter0 + 5; // Increase by 5 to correspond to scale of lines 1 line/m with big marks every 5th line
+        counter1 = counter1 + 1;
+      } else{
+        line(30+g.left+space*i,g.bottom,30+g.left+space*i,g.bottom-4);
+        line(30+g.left+space*i,g.top,30+g.left+space*i,g.top+4);
+      }
+    
+    }
+  } else if(g.HEX_length >= 23){
+    space = space - 1; // Need to slightly shift spacing so that the 25 m label isn't displayed on the edge of the graph
+    for(let i = 0; i < points+2; i++){ // iterating to points + 2 to allow an extra line to be drawn @ 25 m
+      if(i == counter0){
+        line(30+g.left+space*i,g.bottom,30+g.left+space*i,g.bottom-10);
+        line(30+g.left+space*i,g.top,30+g.left+space*i,g.top+10);
+        text(dist_labels[counter1],20+g.left+space*i,g.bottom+25);
+        counter0 = counter0 + 5; 
+        counter1 = counter1 + 1;
+      } else if(i<points+1){ // Extra conditional to make sure a line doesn't exceed the graph
+        line(30+g.left+space*i,g.bottom,30+g.left+space*i,g.bottom-4);
+        line(30+g.left+space*i,g.top,30+g.left+space*i,g.top+4);
+      }
+    }
+  } else if(g.HEX_length == 13){
+    for(let i = 0; i < points+1; i++){ 
+      if(i == counter0){
+        line(30+g.left+space*i,g.bottom,30+g.left+space*i,g.bottom-10);
+        line(30+g.left+space*i,g.top,30+g.left+space*i,g.top+10);
+        text(dist_labels[counter1],20+g.left+space*i,g.bottom+25);
+        counter0 = counter0 + 4; // Increase by 4 to correspond to scale of lines 1 line/.5m with big marks every 4th line
+        counter1 = counter1 + 1;
+      } else {
+        line(30+g.left+space*i,g.bottom,30+g.left+space*i,g.bottom-4);
+        line(30+g.left+space*i,g.top,30+g.left+space*i,g.top+4);
+      }
+    }
+  } else if(g.HEX_length == 11 || g.HEX_length == 12){
+    for(let i = 0; i < points+1; i++){
+      if(i == counter0){
+        line(30+g.left+space*i,g.bottom,30+g.left+space*i,g.bottom-10);
+        line(30+g.left+space*i,g.top,30+g.left+space*i,g.top+10);
+        text(dist_labels[counter1],20+g.left+space*i,g.bottom+25);
+        counter0 = counter0 + 4;
+        counter1 = counter1 + 1;
+      } else{ 
+        line(30+g.left+space*i,g.bottom,30+g.left+space*i,g.bottom-4);
+        line(30+g.left+space*i,g.top,30+g.left+space*i,g.top+4);
+      }
+    }
+  } else if(g.HEX_length == 10){
+    for(let i = 0; i < points+1; i++){ 
+      if(i == counter0){
+        line(30+g.left+space*i,g.bottom,30+g.left+space*i,g.bottom-10);
+        line(30+g.left+space*i,g.top,30+g.left+space*i,g.top+10);
+        text(dist_labels[counter1],20+g.left+space*i,g.bottom+25);
+        counter0 = counter0 + 4;
+        counter1 = counter1 + 1;
+      } else{
+        line(30+g.left+space*i,g.bottom,30+g.left+space*i,g.bottom-4);
+        line(30+g.left+space*i,g.top,30+g.left+space*i,g.top+4);
+      }
+    }
+  }
+  textSize(25);
+  text("Distance down heat exchanger (m)",250,g.bottom+75);
+
+  let zerometers = 30+g.left;
+  let temp = [zerometers,space,scale];
+
+  pop();
+  return(temp);
+}
+
+function getProperties(temp,cp_vec,mu_vec,k_vec){
+  let cp, mu, k;
+  for(let i=0; i<cp_vec.length; i++){
+    if(temp == cp_vec[i][0]){
+      cp = cp_vec[i][1];
+    } else if(temp > cp_vec[i][0] && temp < cp_vec[i+1][0]){ // Required for liquid sodium as values are T = 366, 644, and 977K, need to interpolate for hot values at T = 400K
+      cp = interpolate(temp,cp_vec[i][0],cp_vec[i+1][0],cp_vec[i][1],cp_vec[i+1][1]);
+    }
+  }
+
+  for(let i=0; i<mu_vec.length; i++){
+    if(temp == mu_vec[i][0]){
+      mu = mu_vec[i][1];
+    } else if(temp > mu_vec[i][0] && temp < mu_vec[i+1][0]){
+      mu = interpolate(temp,mu_vec[i][0],mu_vec[i+1][0],mu_vec[i][1],mu_vec[i+1][1]);
+    }
+  }
+
+  for(let i=0; i<k_vec.length; i++){
+    if(temp == k_vec[i][0]){
+      k = k_vec[i][1];
+    } else if(temp > k_vec[i][0] && temp < k_vec[i+1][0]){
+      k = interpolate(temp,k_vec[i][0],k_vec[i+1][0],k_vec[i][1],k_vec[i+1][1]);
+    }
+  }
+  return([cp,mu,k]);
+}
