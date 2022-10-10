@@ -1,17 +1,18 @@
 // Declare global variables within this object. They will be available across all files as "g.variable_name".You can make another script file aside from index.js by putting <script src="./path-to/other-js-file.js"></script> after the "index.js" HTML element. All the variables you declare in this file will be accessible there. It's best practice to store your global variables within an object E.G. "g.m_dothot" because it will minimize the risk of namespace issues.
 window.g = {
   cnv : undefined,
-  m_dothot : 0.3,
+  m_dothot : 0.3, // kg/s
   m_dotcold : 0.3,
-  HEX_length : 15,
+  HEX_length : 15, // m
   hot_fluid : "liquid water",
   flow_type : "parallel",
 
   // HEX properties
-  di : 0.025,
+  di : 0.025, // m
   do : 0.045,
-  T_hot1 : 400,
+  T_hot1 : 400, // K
   T_cold1 : 300,
+
   // For graphing purposes
   left : 100,
   right : 750,
@@ -88,7 +89,22 @@ function draw() {
   cp_cold = properties_cold[0];
   mu_cold = properties_cold[1];
   k_cold = properties_cold[2];
+
+  // Calculating Reynold's numbers
+  d_hot = g.do - g.di;
+  d_cold = g.di;
+  crt_hot = (g.do + g.di)/(g.do - g.di); // Not really sure what this is but I think it has to do with the annular flow
+  crt_cold = 1;
+
+  Re_hot = 4*g.m_dothot/(Math.PI*mu_hot*d_hot*crt_hot);
+  Re_cold = 4*g.m_dotcold/(Math.PI*mu_cold*d_cold*crt_cold);
+
+  // Calculating Nusselt number
+  nus_hot = nusselt(Re_hot,cp_hot,mu_hot,k_hot,.3);
+  nus_cold = nusselt(Re_cold,cp_cold,mu_cold,k_cold,.4);
   
+  let U = 1/Math.pow((nus_cold*k_cold/d_cold)+(nus_hot*k_hot/d_hot),-1);
+  console.log(U)
   
   
   switch(g.flow_type){
@@ -100,10 +116,7 @@ function draw() {
     break;
   }
   
-  //console.log(cp_water[1][0])
-  //console.log(cpH)
-  //console.log(g.hot_fluid)
-  //console.log(cp_hot);
+  
 }
 
 const range_1_element = document.getElementById("range-1");
@@ -374,4 +387,14 @@ function getProperties(temp,cp_vec,mu_vec,k_vec){
     }
   }
   return([cp,mu,k]);
+}
+
+function nusselt(Re,cp,mu,k,factor){
+  let nus;
+  if(Re >= 10000){
+    nus = 0.023*Math.pow(Re,0.8)*Math.pow((cp*mu)/k,factor);
+  } else {
+    nus = 4.36;
+  }
+  return(nus);
 }
