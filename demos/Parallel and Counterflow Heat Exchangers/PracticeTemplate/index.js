@@ -4,7 +4,7 @@ window.g = {
   m_dothot : 0.3, // kg/s
   m_dotcold : 0.3,
   HEX_length : 15, // m
-  hot_fluid : "air",
+  hot_fluid : "liquid water",
   flow_type : "parallel",
 
   // HEX properties
