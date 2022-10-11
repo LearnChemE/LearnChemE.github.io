@@ -43,12 +43,12 @@ function draw() {
   rect(100,50,650,450);
   let tempInfo = drawTemplines(); // Drawing temperature lines returning values relevant to temperature (pixel value of T = 295K, pixels between lines, and scale between lines)
   let T295 = tempInfo[0];
-  let spacePer_Temp = tempInfo[1];
+  let spacePer_Tempmark = tempInfo[1];
   let scaleTemperature = tempInfo[2];
 
   let distanceInfo = drawDistlines(); // Drawing distance lines and returning values relevant to positioning (pixel value of 0m, pixels between lines, and scale between lines)
   let zeroPosition = distanceInfo[0];
-  let spacePer_Positon = distanceInfo[1];
+  let spacePer_Position = distanceInfo[1];
   let scalePosition = distanceInfo[2];
 
  let cp_vec, mu_vec, k_vec;
@@ -103,20 +103,79 @@ function draw() {
   nus_hot = nusselt(Re_hot,cp_hot,mu_hot,k_hot,.3);
   nus_cold = nusselt(Re_cold,cp_cold,mu_cold,k_cold,.4);
   
-  let U = 1/Math.pow((nus_cold*k_cold/d_cold)+(nus_hot*k_hot/d_hot),-1);
-  console.log(U)
+
+  // Calculating overall heat transfer coefficient
+  let U; 
+  U = Math.pow(d_hot/(nus_hot*k_hot)+d_cold/(nus_cold*k_cold),-1);
+
   
-  
+ 
+  let temperatures; // Variable to hold temperature values
+  let step = .1; // Used for resolution in Euler's method
+  let delta1, delta2, LMTD; // Used for calculating log-mean temperature difference
+  let Q; // For displaying heat transfer rate
   switch(g.flow_type){
     case 'parallel':
+    temperatures = parallelMATH(U,cp_hot,cp_cold,step);
+    // Vector used to plot positions
+    let positions = []; 
+    for(let i = 0; i<temperatures.length; i++){ 
+      positions.push((step*i).toFixed(1)); // Tofixed 1 decimal to avoid slight error
+    } // Note: if step size is adjusted value in 'toFixed' needs to be modified
+    //console.log(positions)
+    drawParallel(temperatures,0,T295,spacePer_Tempmark,scaleTemperature,zeroPosition,spacePer_Position,positions);
+    drawParallel(temperatures,1,T295,spacePer_Tempmark,scaleTemperature,zeroPosition,spacePer_Position,positions);
+    delta1 = temperatures[0][0]-temperatures[0][1];
+    delta2 = temperatures[temperatures.length-1][0]-temperatures[temperatures.length-1][1];
+    LMTD = (delta1-delta2)/Math.log(delta1/delta2);
+    Q = U*Math.PI*g.di*g.HEX_length*LMTD/1000;
 
     break;
     case 'counterflow':
 
     break;
+
+    
+
   }
+
+  // Heat transfer rate label
+  push();
+  textSize(25);
+  let Q_temp = Q.toFixed(1);
+  let Q_label = Q_temp.toString();
+  let title = "Heat transfer rate = ";
+  let units = "kW";
+  let temp1 = title.concat(Q_label);
+  let HT_display = temp1.concat(units);
+  text(HT_display,250,40);
+  pop();
+
+  // Labels for turbulent or laminar flow
+  push();
+  rect(525,70,200,72);
+  let hotFlow = "Hot flow = ";
+  let coldFlow = "Cold flow = ";
+  let hotType, coldType;
+  if(Re_hot >= 10000){
+    hotType = "turbulent";
+  } else {
+    hotType = "laminar"
+  }
+  if(Re_cold >= 10000){
+    coldType = "turbulent";
+  } else {
+    coldType = "laminar";
+  }
+  let hotLabel = hotFlow.concat(hotType);
+  let coldLabel = coldFlow.concat(coldType);
+  textSize(20);
+  text(hotLabel,535,100);
+  text(coldLabel,534,125);
+  pop();
+    
   
-  
+ 
 }
 
 const range_1_element = document.getElementById("range-1");
@@ -189,7 +248,7 @@ let mu_na = [[366,6.983*Math.pow(10,-4)],[644,2.813*Math.pow(10,-4)],[977,1.779*
 let cp_na = [[366,1.36],[644,1.3],[977,1.26]];
 let k_na = [[366,86.2],[644,72.3],[977,59.7]];
 
-cp_na = correction(cp_na);
+//cp_na = correction(cp_na);
 
 // Air properties
 let mu_air = 1014;
@@ -397,4 +456,97 @@ function nusselt(Re,cp,mu,k,factor){
     nus = 4.36;
   }
   return(nus);
+}
+
+function parallelMATH(U,cp_hot,cp_cold,step){
+  
+  let y1, y2; // Temperature values
+  let y1next, y2next, y1prime, y2prime; // Temperature values and derivative values
+  let A, B, C; // Substitute variables
+  let TEMPS = []; // Vector to hold temperatures
+  let sub; // Vector to fill TEMPS (will make it easier to correspond with position)
+ 
+
+  // Values to be used in Euler's method, rather than typing them out several times
+  A = U*Math.PI*g.di;
+  B = g.m_dothot*cp_hot;
+  C = g.m_dotcold*cp_cold;
+
+  // Initial values (y1 refers to hot fluid and y2 refers to cold fluid)
+  y1 = g.T_hot1;
+  y2 = g.T_cold1;
+
+  // Adding initial values to the temperature arrays
+  sub = [y1, y2];
+  TEMPS.push(sub);
+
+  for(let i = 0; i<g.HEX_length-step; i += step){
+    // Calculating the change in temperature with respect to length down HEX
+    y1prime = -(A/B)*y1 + (A/B)*y2;
+    y2prime = (A/C)*y1 - (A/C)*y2;
+
+    // Calculating next temperature value
+    y1next = y1 + y1prime*step;
+    y2next = y2 + y2prime*step;
+
+    // Storing calculated temperature values
+    sub = [y1next, y2next];
+    TEMPS.push(sub);
+
+    // Resetting temperature values for next calc
+    y1 = y1next;
+    y2 = y2next;
+  }
+  return(TEMPS);
+
+
+
+}
+
+function drawParallel(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,positions){
+  let x, y; // Variables for positioning
+  let deltay;
+
+  // Correction for x-positions for changing graph scale at lengths < 14 m
+  let factor = 1;
+  if(g.HEX_length < 14){
+    factor = 2;
+  }
+
+  push();
+  if(value == 0){ // changing color based on hot and cold
+    stroke(255,0,0);
+  } else{
+    stroke(0,0,255);
+  }
+
+  deltay = spacePerTemp/Tempscale;
+
+  beginShape();
+  for(let i=0; i<temps.length;i++){
+    x = zeroPos + positions[i]*spacePerM*factor; // Defining x position based on zero position then increased based on current position times distance between each meter mark 
+    y = T295 - (temps[i][value]-295)*deltay; // Defining y position based on difference from 295K
+    vertex(x,y);
+    
+    // Temperature labels
+    push();
+    stroke(0);
+    if(i == 0 && value == 0){
+      textSize(20); text("T",x+5,y-5);
+      textSize(15); text("h,1",x+17,y); // I'm unsure how to get subscripts in JS, kind of a weak solution
+    } else if(i+1 == temps.length && value == 0){
+      textSize(20); text("T",x+5,y-5);
+      textSize(15); text("h,2",x+17,y);
+    } else if(i == 0 && value == 1){
+      textSize(20); text("T",x+15,y+10);
+      textSize(15); text("c,1",x+27,y+15);
+    } else if(i+1 == temps.length && value == 1){
+      textSize(20); text("T",x+5,y+15);
+      textSize(15); text("c,2",x+17,y+20);
+    }
+    pop();
+  }
+  endShape();
+
+  pop();
 }
