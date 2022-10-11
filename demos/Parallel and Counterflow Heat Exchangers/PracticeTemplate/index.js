@@ -4,7 +4,7 @@ window.g = {
   m_dothot : 0.3, // kg/s
   m_dotcold : 0.3,
   HEX_length : 15, // m
-  hot_fluid : "liquid water",
+  hot_fluid : "air",
   flow_type : "parallel",
 
   // HEX properties
@@ -30,6 +30,7 @@ function setup() {
 
   // The "main" element is unnecessary. Don't worry about this too much
   document.getElementsByTagName("main")[0].remove();
+  
 }
 
 // Whatever is included in draw() will be calculated at 60 fps.  It is basically a loop that calls itself every 16.67 ms. You can pause it at any time with the noLoop() function and start it again with the loop() function. Be sure to include every graphics statement in a push() / pop() statement, because it minimizes the chance that you accidentally apply styling or properties to another graphics object.
@@ -83,6 +84,7 @@ function draw() {
       break;
   }
 
+  console.log(g.hot_fluid)
   // Grabbing cold fluid properties (fixed fluid: water)
   let properties_cold;
   properties_cold = getProperties(g.T_cold1,cp_water,mu_water,k_water);
@@ -107,6 +109,15 @@ function draw() {
   // Calculating overall heat transfer coefficient
   let U; 
   U = Math.pow(d_hot/(nus_hot*k_hot)+d_cold/(nus_cold*k_cold),-1);
+
+  // console.log(Re_hot);
+  // console.log(Re_cold);
+  // console.log(nus_hot);
+  // console.log(nus_cold);
+  // console.log(U);
+  console.log(cp_hot);
+  console.log(mu_hot);
+  console.log(k_hot);
 
   
  
@@ -135,9 +146,11 @@ function draw() {
 
     break;
 
-    
+  
 
   }
+
+  //console.log(positions)
 
   // Heat transfer rate label
   push();
@@ -248,11 +261,11 @@ let mu_na = [[366,6.983*Math.pow(10,-4)],[644,2.813*Math.pow(10,-4)],[977,1.779*
 let cp_na = [[366,1.36],[644,1.3],[977,1.26]];
 let k_na = [[366,86.2],[644,72.3],[977,59.7]];
 
-//cp_na = correction(cp_na);
+cp_na = correction(cp_na);
 
 // Air properties
-let mu_air = 1014;
-let cp_air = 230.1*Math.pow(10,-7);
+let cp_air = 1014;
+let mu_air = 230.1*Math.pow(10,-7);
 let k_air = 33.8*Math.pow(10,-3);
 
 // Used to increase cp values by 1000
@@ -485,8 +498,6 @@ function parallelMATH(U,cp_hot,cp_cold,step){
     y1prime = -(A/B)*y1 + (A/B)*y2;
     y2prime = (A/C)*y1 - (A/C)*y2;
 
-    //asdfasdf
-
     // Calculating next temperature value
     y1next = y1 + y1prime*step;
     y2next = y2 + y2prime*step;
@@ -528,6 +539,7 @@ function drawParallel(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,
   for(let i=0; i<temps.length;i++){
     x = zeroPos + positions[i]*spacePerM*factor; // Defining x position based on zero position then increased based on current position times distance between each meter mark 
     y = T295 - (temps[i][value]-295)*deltay; // Defining y position based on difference from 295K
+    
     vertex(x,y);
     
     // Temperature labels
