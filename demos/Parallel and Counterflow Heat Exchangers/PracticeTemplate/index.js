@@ -485,6 +485,8 @@ function parallelMATH(U,cp_hot,cp_cold,step){
     y1prime = -(A/B)*y1 + (A/B)*y2;
     y2prime = (A/C)*y1 - (A/C)*y2;
 
+    //asdfasdf
+
     // Calculating next temperature value
     y1next = y1 + y1prime*step;
     y2next = y2 + y2prime*step;
