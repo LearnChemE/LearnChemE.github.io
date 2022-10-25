@@ -1,11 +1,9 @@
 
 window.g = {
   cnv : undefined,
-  x_over_xc : 0,
-  rng_2_value : 0,
-  rng_3_value : 0,
-  Pr_no : "0.6",
-  boundaryType : "Velocity",
+  x_pos : 0.5,
+  Pr_no : 0.6,
+  boundaryType : "velocity",
 }
 
 // Variables filled with boundaryLayer function
@@ -22,7 +20,7 @@ let b = {
   nu : 15.89*Math.pow(10,-6),
   Lcrit : 5*Math.pow(10,5)*(15.89*Math.pow(10,-6))/1, // 5e5*nu/Uinf
   x : [],
-  x_pos : 5,
+  // x_pos : 5, This value is represented by g.x_pos
   Rex : [],
   delta : [],
   vProfX : [],
@@ -41,7 +39,7 @@ let b = {
 }
 
 function setup() {
-  g.cnv = createCanvas(800, 600);
+  g.cnv = createCanvas(900, 700);
 
   g.cnv.parent("graphics-wrapper");
   document.getElementsByTagName("main")[0].remove();
@@ -55,15 +53,31 @@ function setup() {
   b.TH = temp[4];
   b.dTH_deta = temp[5];
   
-  
   addValues(); // Values calculated outside of boundaryLayer function
+  
+  
 }
 
 function draw() {
   background(250);
+
+  plateDraw();
+
+  
+  switch (g.boundaryType){
+    case 'velocity':
+      drawBlue(); // Draws du/dy @ y = 0 && Cf,x
+      velocityBoundaryDraw();
+
+      break;
+    case 'temperature':
+      drawRed(); // Draws dT/dy @ y = 0 && Nux
+      break;
+  }
  
-
-
+ 
+ 
+  
   
 }
 
@@ -73,30 +87,33 @@ const range_1_value_label = document.getElementById("range-1-value");
 const range_2_element = document.getElementById("range-2");
 const range_2_value_label = document.getElementById("range-2-value");
 const select_element = document.getElementById("select-1");
-
+let xlabel = document.getElementById("xLabel");
 const select_element2 = document.getElementById("select-2");
 
 
 // x/x_crit or Re_x/Re_crit
 range_1_element.addEventListener("input", function() {
-  const x_over_xc = Number(range_1_element.value); // range_1_element.value is a string by default, so we need to convert it to a number.
-  range_1_value_label.innerHTML = `${x_over_xc}`; // Edit the text of the global var range_1_value
-  g.x_over_xc = x_over_xc; // Assign the number to the global object.
-  console.log(`g.x_over_xc is ${g.x_over_xc}`); // console.log is the easiest way to see a variable value in the javascript prompt.
+  const x_pos = Number(range_1_element.value); // range_1_element.value is a string by default, so we need to convert it to a number.
+  range_1_value_label.innerHTML = `${x_pos}`; // Edit the text of the global var range_1_value
+  g.x_pos = x_pos; // Assign the number to the global object.
+  //console.log(`g.x_pos is ${g.x_pos}`); // console.log is the easiest way to see a variable value in the javascript prompt.
+  xDependentChanges(g.x_pos);
+  xAndPrDependentChanges(g.x_pos,g.Pr_no);
 });
 
 // Prandtl number
 select_element.addEventListener("change", function() {
   const Pr_no = select_element.value;
   g.Pr_no = Pr_no;
-  console.log(`g.Pr_no is ${Pr_no}`);
+  //console.log(`g.Pr_no is ${Pr_no}`);
+  xAndPrDependentChanges(g.x_pos,g.Pr_no);
 })
 
 // Boundary type
 select_element2.addEventListener("change", function() {
   const boundaryType = select_element2.value;
   g.boundaryType = boundaryType;
-  console.log(`g.boundaryType is ${boundaryType}`);
+  //console.log(`g.boundaryType is ${boundaryType}`);
 })
 
 
@@ -163,6 +180,9 @@ function addValues(){
     counter++;
   }
   
+  let temp = [];
+  let temp2 = [];
+  let temp3 = [];
   // Adding values to delta
   //let val; I was using val to fix the number to 4 decimal places but that was just how Matlab was showing me the numbers
   // Might need to do something like that... My numbers are slightly different than what comes out of the matlab code
@@ -177,47 +197,295 @@ function addValues(){
 
     b.deltaT.push(b.eta[3266]*Math.pow(b.nu*b.x[i]/b.Uinf,2));
 
-    // for(let j = 0; j < 3; j++){
-    //   temp.push(-1*b.dTH_deta[i][j]*Math.pow(b.Uinf/(b.nu*b.x[i]),0.5));
-    //   temp2.push(-1*x[i]*temp[j]/b.delT);
-    //   temp3.push(-1*temp[j]*b.kf/b.delT);
-    // }
-    // b.dT_dy0.push(temp);
-    // b.Nu_x.push(temp2);
-    // b.h_x.push(temp3);
-    // temp = [];
-    // temp2 = [];
-    // temp3 = [];
+    for(let j = 0; j < 3; j++){
+      temp.push(-1*b.dTH_deta[0][j]*Math.pow(b.Uinf/(b.nu*b.x[i]),0.5));
+      temp2.push(-1*b.x[i]*temp[j]/b.delT);
+      temp3.push(-1*temp[j]*b.kf/b.delT);
+    }
+    b.dT_dy0.push(temp);
+    b.Nu_x.push(temp2);
+    b.h_x.push(temp3);
+    temp = [];
+    temp2 = [];
+    temp3 = [];
   }
-  
+
+
+  // These values are set for inital Pr and x position and then will change based on those inputs
+  for(let i = 0; i < b.df_deta.length; i++){
+    b.vProfX.push(b.Uinf*b.df_deta[i] + 10*g.x_pos);
+    b.vProfY.push(b.eta[i]*Math.pow(b.nu*g.x_pos*10/b.Uinf,1/2));
+    for(let j = 0; j < 3; j++){
+      temp.push(-1*b.TH[i][j]+1+10*g.x_pos);
+    }
+    b.tProfx.push(temp);
+    temp = [];
+    b.tProfy.push(b.eta[i]*Math.pow(b.nu*10*g.x_pos/b.Uinf,1/2));
+  }
+
+  b.h_avg = 0.664*b.kf*Math.pow(g.Pr_no,1/3)*Math.pow(b.Uinf/b.nu,1/2)/Math.pow(10*g.x_pos,1/2)
+  b.h_local = b.h_x[Math.round(12600*g.x_pos)+1][0];
+}
+
+
+
+// For changing the values of vProfX, vProfY, tProfx, and tProfY
+function xDependentChanges(x){
+  // Clear old values out
+  b.vProfX = [];
+  b.vProfY = [];
+  b.tProfx = [];
+  b.tProfy = [];
+
+  // Redefine values
   let temp = [];
-  let temp2 = [];
-  let temp3 = [];
-  // Defining initial values in these vectors to avoid errors in computation
-  b.dT_dy0[0] = [-1/0, -1/0, -1/0];
-  b.Nu_x[0] = [NaN, NaN, NaN];
-  b.h_x[0] = [1/0, 1/0, 1/0];
-  let counter1 = 0;
-  // To avoid the errors I'm iterating from 1 to 12601 rather than 0
-  // for(let i = 1; i < b.x.length; i++){
-  //   for(let j = 0; j < 3; j++){
-  //     temp.push(-1*b.dTH_deta[i][j]*Math.pow(b.Uinf/(b.nu*b.x[i]),0.5));
-  //     counter1++;
-  //     console.log(counter1)
-  //     console.log(temp[j])
-  //     //temp2.push(-1*x[i]*temp[j]/b.delT);
-  //     //temp3.push(-1*temp[j]*b.kf/b.delT);
-  //   }
-  //   b.dT_dy0.push(temp);
-  //   b.Nu_x.push(temp2);
-  //   b.h_x.push(temp3);
-  //   temp = [];
-  //   temp2 = [];
-  //   temp3 = [];
-  // }
+  for(let i = 0; i < b.df_deta.length; i++){
+    b.vProfX.push(b.Uinf*b.df_deta[i] + 10*x);
+    b.vProfY.push(b.eta[i]*Math.pow(b.nu*x*10/b.Uinf,1/2));
+    for(let j = 0; j < 3; j++){
+      temp.push(-1*b.TH[i][j]+1+10*x);
+    }
+    b.tProfx.push(temp);
+    temp = [];
+    b.tProfy.push(b.eta[i]*Math.pow(b.nu*10*x/b.Uinf,1/2));
+  }
+}
+
+// For chaning the values of h_avg and h_local
+function xAndPrDependentChanges(x,Pr){
+  let index;
+
+  if(Pr == .6){
+    index = 0;
+  } else if (Pr == 1){
+    index = 1;
+  } else {
+    index = 2;
+  }
+
+  b.h_avg = 0.664*b.kf*Math.pow(Pr,1/3)*Math.pow(b.Uinf/b.nu,1/2)/Math.pow(10*x,1/2)
+  b.h_local = b.h_x[Math.round(12600*x)][index];
+}
+
+function drawBlue(){
+
+  let xTicks = ['0','0.2','0.4','0.6','0.8','1'];
+  let yTicks1 = ['0', '50', '100', '150', '200'];
+  let yTicks2 = ['0', '0.002', '0.004', '0.006', '0.008', '0.01']
+  let yTicks3 = ['0','2','4','6','8','10'];
+
+  push();
+  strokeWeight(2);
+  for(let i = 0; i < 3; i++){
+    rect(60+i*width/3+20,height/2+50,200,200); // Graph frame
+    textSize(15);
+    push();
+    textStyle(ITALIC);
+    text("x/x_crit or Re_x/Re_x,crit",90+i*width/3,650); // X-label
+    pop();
+
+    // x lines
+    for(let j = 0; j < 4; j++){
+      line(80+i*width/3+40*(j+1),height/2+250,80+i*width/3+40*(j+1),height/2+245);
+      line(80+i*width/3+40*(j+1),height/2+50,80+i*width/3+40*(j+1),height/2+55);
+    }
+    // x tick labels
+    for(let j = 0; j < xTicks.length; j++){
+      if(j == 0 || j == 5){
+        text(xTicks[j],80+i*width/3+40*j-5,height/2+267);
+      } else {
+        text(xTicks[j],80+i*width/3+40*j-10,height/2+267);
+      }
+    }
+  }
+
+  // du/dy y Ticks and Labels 
+  for(let j = 0; j < yTicks1.length; j++){
+    line(80,height/2+250-50*j,85,height/2+250-50*j);
+    if(j == 0){
+    
+      text(yTicks1[j],65,height/2+255-50*j);
+    } else if (j == 1){
+      text(yTicks1[j],60,height/2+255-50*j);
+    } else {
+      text(yTicks1[j],50,height/2+255-50*j);
+    }
+  }
+
+  // Cf,x y Ticks and Labels
+  for(let j = 0; j < yTicks2.length; j++){
+    line(80+width/3,height/2+250-40*j,85+width/3,height/2+250-40*j);
+    if(j == 0){
+      text(yTicks2[j],65+width/3,height/2+255-40*j);
+    } else if (j == yTicks2.length-1){
+      text(yTicks2[j],47+width/3,height/2+255-40*j);
+    } else {
+      text(yTicks2[j],38+width/3,height/2+255-40*j);
+    }
+  }
 
 
+  // hx y Ticks and Labels
+  for(let j = 0; j < yTicks3.length; j++){
+    line(80+2*width/3,height/2+250-40*j,85+2*width/3,height/2+250-40*j);
+    if(j == yTicks3.length-1){
+      text(yTicks3[j],60+2*width/3,height/2+255-40*j);
+    } else {
+      text(yTicks3[j],65+2*width/3,height/2+255-40*j);
+    }
+  }
+
+  let xRep = map(g.x_pos,0,1,0,200);
+  for(let i = 0; i < 3; i++){
+    line(80+i*width/3+xRep,height/2+50,80+i*width/3+xRep,height/2+250);
+  }
+
+  pop();
+  push();
+  textSize(20);
+  translate(25,600);
+  rotate(radians(270));
+  textStyle(ITALIC)
+  text('∂u/∂y @ y = 0 [m/s/m]',15,5);
+  text('C_f,x',80,width/3);
+  text('h_x',80,2*width/3+20);
+  pop();
+  
+  
+  
+}
+
+function drawRed(){
+  
+  let xTicks = ['0','0.2','0.4','0.6','0.8','1'];
+  let yTicks1 = ['-300','-250','-200','-150','-100','-50','0'];
+  let yTicks2 = ['0','100','200','300','400'];
+  let yTicks3 = ['0','2','4','6','8','10'];
+  push();
+  strokeWeight(2);
+  for(let i = 0; i < 3; i++){
+    rect(80+i*width/3,height/2+50,200,200); // Graph frame
+    textSize(15);
+    push();
+    textStyle(ITALIC);
+    text("x/x_crit or Re_x/Re_x,crit",90+i*width/3,650); // X-label
+    pop();
+    
+    // x lines
+    for(let j = 0; j < 4; j++){
+      line(80+i*width/3+40*(j+1),height/2+250,80+i*width/3+40*(j+1),height/2+245);
+      line(80+i*width/3+40*(j+1),height/2+50,80+i*width/3+40*(j+1),height/2+55);
+    }
+    // x tick labels
+    for(let j = 0; j < xTicks.length; j++){
+      if(j == 0 || j == 5){
+        text(xTicks[j],80+i*width/3+40*j-5,height/2+267);
+      } else {
+        text(xTicks[j],80+i*width/3+40*j-10,height/2+267);
+      }
+    }
+  }
+
+  // du/dy y Ticks and Labels 
+  for(let j = 0; j < yTicks1.length; j++){
+    line(80,height/2+250-200/6*j,85,height/2+250-200/6*j);
+    if(j == yTicks1.length-1){
+      text(yTicks1[j],67,height/2+255-200/6*j);
+    } else if (j == yTicks1.length-2){
+      text(yTicks1[j],52,height/2+255-200/6*j);
+    } else {
+      text(yTicks1[j],45,height/2+255-200/6*j);
+    }
+  }
+
+
+  // Nu_x y Ticks and Labels
+  for(let j = 0; j < yTicks2.length; j++){
+    line(80+width/3,height/2+250-50*j,85+width/3,height/2+250-50*j);
+    if(j == 0){
+      text(yTicks2[j],65+width/3,height/2+255-50*j);
+    } else {
+      text(yTicks2[j],50+width/3,height/2+255-50*j);
+    }
+    
+  }
+
+  // hx y Ticks and Labels
+  for(let j = 0; j < yTicks3.length; j++){
+    line(80+2*width/3,height/2+250-40*j,85+2*width/3,height/2+250-40*j);
+    if(j == yTicks3.length-1){
+      text(yTicks3[j],60+2*width/3,height/2+255-40*j);
+    } else {
+      text(yTicks3[j],65+2*width/3,height/2+255-40*j);
+    }
+  }
+
+  let xRep = map(g.x_pos,0,1,0,200);
+  for(let i = 0; i < 3; i++){
+    line(80+i*width/3+xRep,height/2+50,80+i*width/3+xRep,height/2+250);
+  }
+
+  pop();
+  push();
+  textSize(20);
+  translate(25,600);
+  rotate(radians(270));
+  textStyle(ITALIC)
+  text('∂T/∂y @ y = 0 [K/m]',15,5);
+  text('Nu_x',80,width/3);
+  text('h_x',80,2*width/3+20);
+  pop();
+}
+
+function velocityBoundaryDraw(){
  
- 
- 
+}
+
+function plateDraw(){
+  let xTicks = ['0','0.2','0.4','0.6','0.8','1'];
+  
+  push();
+  let xRep = map(g.x_pos,0,1,75,825);
+  strokeWeight(2);
+  //rect(75,50,750,250);
+  line(75,300,825,300);
+  textSize(20); textStyle(ITALIC);
+  text("x/x_crit or Re_x/Re_x,crit",330,360); // X-label
+  line(xRep,300,xRep,100);
+  fill(0);
+  triangle(xRep,95,xRep-5,105,xRep+5,105);
+  pop();
+
+  push();
+  strokeWeight(2);
+  textSize(15);
+  for(let i = 0; i < xTicks.length; i++){
+    line(75+150*i,300,75+150*i,308);
+    if(i == 0 || i == xTicks.length-1){
+      text(xTicks[i],70+150*i,325);
+    } else {
+      text(xTicks[i],65+150*i,325);
+    }
+  }
+  pop();
+
+  push();
+  fill(130);
+  rect(75,275,750,25);
+  pop();
+
+  push();
+  line(75,270,75,50);
+  fill(0);
+  triangle(75,45,72,55,78,55);
+  textSize(15); textStyle(ITALIC);
+  text('y',72,40); 
+
+  line(30,270,30,100);
+  for(let i = 0; i < 7; i++){
+    line(30,270-170/6*i,70,270-170/6*i);
+    triangle(72,270-170/6*i,62,273-170/6*i,62,267-170/6*i);
+  }
+  text('U_∞, T_∞',5,80);
+  pop();
 }
