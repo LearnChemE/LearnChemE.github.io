@@ -4,6 +4,7 @@ window.g = {
   x_pos : 0.5,
   Pr_no : 0.6,
   boundaryType : "velocity",
+  targetIndex : 6293,
 }
 
 // Variables filled with boundaryLayer function
@@ -61,20 +62,28 @@ function setup() {
 function draw() {
   background(250);
 
+  push();
+  textSize(20);
+  text('Laminar flow over an isothermal, flat plate',100,70);
+  pop();
   plateDraw();
 
   
   switch (g.boundaryType){
     case 'velocity':
+  
       drawBlue(); // Draws du/dy @ y = 0 && Cf,x
-      velocityBoundaryDraw();
+      setTimeout(velocityBoundaryDraw(),2000);
+      setTimeout(drawHx(),2000);
+      setTimeout(velocityProf(),2000);
+  
+      
 
       break;
     case 'temperature':
       drawRed(); // Draws dT/dy @ y = 0 && Nux
       break;
   }
- 
  
  
   
@@ -99,6 +108,7 @@ range_1_element.addEventListener("input", function() {
   //console.log(`g.x_pos is ${g.x_pos}`); // console.log is the easiest way to see a variable value in the javascript prompt.
   xDependentChanges(g.x_pos);
   xAndPrDependentChanges(g.x_pos,g.Pr_no);
+  g.targetIndex = findClosest(b.x,10*g.x_pos);
 });
 
 // Prandtl number
@@ -277,7 +287,10 @@ function drawBlue(){
   push();
   strokeWeight(2);
   for(let i = 0; i < 3; i++){
+    push();
+    noFill();
     rect(60+i*width/3+20,height/2+50,200,200); // Graph frame
+    pop();
     textSize(15);
     push();
     textStyle(ITALIC);
@@ -337,7 +350,11 @@ function drawBlue(){
 
   let xRep = map(g.x_pos,0,1,0,200);
   for(let i = 0; i < 3; i++){
-    line(80+i*width/3+xRep,height/2+50,80+i*width/3+xRep,height/2+250);
+    if(i == 2){
+      line(80+i*width/3+xRep,height/2+250,80+i*width/3+xRep,height/2+150)
+    } else {
+      line(80+i*width/3+xRep,height/2+50,80+i*width/3+xRep,height/2+250);
+    }
   }
 
   pop();
@@ -438,7 +455,89 @@ function drawRed(){
 }
 
 function velocityBoundaryDraw(){
- 
+  // Velocity Boundary \\
+  // origin @ px(75,275)
+  // top right corner @px(825,50)
+  let x, y;
+  // pulling values for use in mapping values
+  let xlower = b.x[0];
+  let xupper = b.x[b.x.length-1];
+  let ylower = b.delta[0];
+  let yupper = b.delta[b.delta.length-1];
+  push();
+  stroke(0,0,255); strokeWeight(2);
+  beginShape();
+  noFill();
+  for(let i = 0; i < b.x.length; i++){
+    x = map(b.x[i],xlower,xupper,75,825);
+    y = map(b.delta[i],ylower,yupper,275,105); // 105 corresponds to the top of the array at @g.xpos
+    curveVertex(x,y);
+  }
+  endShape();
+  
+
+  //////////\\\\\\\\
+  // du/dy @ y = 0 \\
+  //////////\\\\\\\\\
+  
+  // evaluating for du_dy0 ~= 200, so values can be mapped accordingly
+  let temp = true; let index = 0;
+  while (temp){
+    yupper = b.du_dy0[index];
+    if (Math.abs(yupper-200) < 0.1){
+      temp = false;
+    }
+    index++;
+  }
+
+  ylower = b.du_dy0[b.du_dy0.length-1];
+  beginShape();
+  for(let i = 1; i < b.x.length; i++){
+    x = map(b.x[i],xlower,xupper,80,280);
+    y = map(b.du_dy0[i],ylower,yupper,height/2+250-ylower,height/2);
+    if (y < height/2+50){ // Correction for very large terms at low x-values
+      y = height/2 + 50;
+    }
+    curveVertex(x,y);
+  }
+  endShape();
+  
+
+  //////////\\\\\\\\
+  /////// Cfx \\\\\\\
+  //////////\\\\\\\\\
+  // Evaluating for Cfx ~=.01, so values can be mapped accordingly
+  temp = true; index = 0;
+  while (temp){
+    yupper = b.Cfx[index];
+    if (Math.abs(yupper-.01) < 0.001){
+      temp = false;
+    }
+    index++;
+  }
+
+  ylower = b.Cfx[b.Cfx.length-1];
+  let shift = ylower/0.002*40; // Account for values not going to zero
+  beginShape();
+  for(let i = 1; i < b.x.length; i++){
+    x = map(b.x[i],xlower,xupper,80+width/3,280+width/3);
+    y = map(b.Cfx[i],ylower,yupper,height/2+250-shift,height/2);
+    if (y < height/2 + 50){
+      y = height/2 + 50;
+    }
+    curveVertex(x,y);
+  }
+  endShape();
+  pop();
+
+  push();
+  //////////\\\\\\\\
+  //////// hx \\\\\\\
+  //////////\\\\\\\\\
+
+
+  pop();
+
 }
 
 function plateDraw(){
@@ -447,7 +546,7 @@ function plateDraw(){
   push();
   let xRep = map(g.x_pos,0,1,75,825);
   strokeWeight(2);
-  //rect(75,50,750,250);
+  
   line(75,300,825,300);
   textSize(20); textStyle(ITALIC);
   text("x/x_crit or Re_x/Re_x,crit",330,360); // X-label
@@ -489,3 +588,148 @@ function plateDraw(){
   text('U_∞, T_∞',5,80);
   pop();
 }
+
+function drawHx(){
+  push();
+  strokeWeight(2); noFill();
+  let index, yupper, xlower, xupper, shift;
+  if (g.Pr_no == .6){
+    index = 0;
+  } else if (g.Pr_no == 1){
+    index = 1;
+  } else {
+    index = 2;
+  }
+  let temp = true; let index1 = 0;
+  while(temp){
+    yupper = b.h_x[index1][index];
+    if(Math.abs(yupper-10) < .1){
+      temp = false;
+    }
+    index1++;
+  }
+  
+  xlower = b.x[0];
+  xupper = b.x[b.x.length-1];
+  ylower = b.h_x[b.h_x.length-1][index];
+  shift = ylower/2*40;
+  let xTemp = []; // Variables used to store x and y coordinates and plot filled area
+  let yTemp = [];
+
+  beginShape();
+  for(let i = g.targetIndex; i < b.x.length; i++){
+    x = map(b.x[i],xlower,xupper,80+2*width/3,280+2*width/3);
+    y = map(b.h_x[i][index],ylower,yupper,height/2+250-shift,height/2);
+    if (y < height/2 + 50){
+      y = height/2 + 50;
+    }
+    curveVertex(x,y);
+  }
+  endShape();
+  pop();
+  push();
+  beginShape();
+  
+  strokeWeight(2);
+  fill(255,0,0);
+  
+  for(let i = 1; i < g.targetIndex; i++){
+    x = map(b.x[i],xlower,xupper,80+2*width/3,280+2*width/3);
+    y = map(b.h_x[i][index],ylower,yupper,height/2+250-shift,height/2);
+    if (y < height/2 + 50){
+      y = height/2 + 50;
+    }
+    curveVertex(x,y);
+    
+  }
+
+  for(let j = 0; j < Math.round(height/2+250 - y);j++){
+    curveVertex(x,y+j);
+  }
+  for(let j = g.targetIndex; j > 0; j--){
+    x = map(b.x[j],xlower,xupper,80+2*width/3,280+2*width/3);
+    curveVertex(x,height/2+250);
+  }
+  endShape();
+  pop();
+  b.h_avg = 0.664*b.kf*Math.pow(g.Pr_no,1/3)*Math.pow(b.Uinf/b.nu,1/2)/Math.pow(10*g.x_pos,1/2);
+  b.h_local = b.h_x[Math.round(12600*g.x_pos)][index];
+  let hbarLabel = 'h_0-x = ' + b.h_avg.toFixed(2) + ' W/m^2-K';
+  let hLabel = 'h_x = ' + b.h_local.toFixed(2) + ' W/m^2-K';
+  push();
+  textSize(15);
+  line(700,435,705,435);
+  text(hbarLabel,700,450);
+  text(hLabel,700,475);
+  pop();
+}
+
+function velocityProf(){
+  let xRep = map(g.x_pos,0,1,75,825);
+  let x, y;
+  let xlower,xupper,ylower,yupper;
+  xlower = b.vProfX[0];
+  xupper = b.vProfX[b.vProfX.length-1];
+  ylower = b.vProfY[0];
+  yupper = b.vProfY[b.vProfY.length-1];
+
+  let ylower2 = b.delta[0];
+  let yupper2 = b.delta[b.delta.length-1];
+  let ymax = map(b.delta[g.targetIndex],ylower2,yupper2,275,105);
+
+  push();
+  noFill();
+  beginShape(); strokeWeight(2); stroke(0,0,255);
+  for(let i = 0; i < b.vProfX.length; i++){
+    x = map(b.vProfX[i],xlower,xupper,xRep,xRep+100);
+    y = map(b.vProfY[i],ylower,yupper,275,ymax-50);
+    curveVertex(x,y);
+    
+  }
+  endShape();
+  pop();
+  push();
+  let temp = Math.round(g.targetIndex/6);
+  temp = Math.round(10001/12601*temp);
+  //console.log(b.vProfY)
+  //console.log(5*temp)
+  yupper = b.vProfY[5*temp-1];
+  fill(0);
+  let slope;
+  for(let i = 1; i < 6; i++){
+    x = map(b.vProfX[i*temp-1],xlower,xupper,xRep,xRep+100);
+    y = map(b.vProfY[i*temp-1],ylower,yupper,275,ymax);
+    //console.log(b.vProfY[i*temp-1])
+    // console.log(ylower)
+    // console.log(yupper)
+    triangle(x+3,y,x-5,y-5,x-5,y+5);
+    line(xRep,y,x,y);
+    if(i == 1){
+      slope = (y-275)/(x-xRep);
+    }
+  }
+  strokeWeight(2);
+  let yPos = slope*(125)+275
+  line(xRep,275,xRep+125,yPos)
+  pop();
+}
+
+// For finding x-coord to close off filled area of h_x graph
+function findClosest(array,target){
+  let bestDif = 10000;
+  let diff, position;
+
+  for(let i = 0; i < array.length; i++){
+    diff = Math.abs(array[i]-target);
+    
+    if(diff < bestDif){
+      bestDif = diff;
+      position = i;
+    }
+  }
+  return(position);
+}
+
+
+
+
