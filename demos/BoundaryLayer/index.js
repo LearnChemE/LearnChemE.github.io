@@ -61,7 +61,7 @@ function setup() {
 
 function draw() {
   background(250);
-
+  //frameRate(1);
   push();
   textSize(20);
   text('Laminar flow over an isothermal, flat plate',100,70);
@@ -109,6 +109,7 @@ range_1_element.addEventListener("input", function() {
   xDependentChanges(g.x_pos);
   xAndPrDependentChanges(g.x_pos,g.Pr_no);
   g.targetIndex = findClosest(b.x,10*g.x_pos);
+  
 });
 
 // Prandtl number
@@ -117,6 +118,7 @@ select_element.addEventListener("change", function() {
   g.Pr_no = Pr_no;
   //console.log(`g.Pr_no is ${Pr_no}`);
   xAndPrDependentChanges(g.x_pos,g.Pr_no);
+  
 })
 
 // Boundary type
@@ -690,7 +692,7 @@ function velocityProf(){
   pop();
   push();
   let temp = Math.round(g.targetIndex/6);
-  temp = Math.round(10001/12601*temp);
+  //temp = Math.round(10001/12601*temp);
   //console.log(b.vProfY)
   //console.log(5*temp)
   yupper = b.vProfY[5*temp-1];
