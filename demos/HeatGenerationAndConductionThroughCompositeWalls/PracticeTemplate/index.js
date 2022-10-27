@@ -319,5 +319,21 @@ select_element.addEventListener("change", function () {
   const select_value = select_element.value;
   select_label.innerHTML = `Selection value is: <span style="color:orange" >${select_value}</span>.`
   g.uniformGen = select_value;
+  //4-6, 8-12
+  const mode = select_element.value;
+  if(mode === "A") {
+    range_1_element.setAttribute("min", "4");
+    range_1_element.setAttribute("max", "6");
+    range_1_element.value = "4";
+    // TODO
+    // change global variables of heat generation rate accordingly
+    // change innerHTML of the label
+
+    // range_1_element.getAttribute("min"); // "4"
+  } else {
+    range_1_element.setAttribute("min", "8");
+    range_1_element.setAttribute("max", "12");
+    range_1_element.value = "8";
+  }
   //console.log(`g.uniformGen is ${select_value}`);
 })
