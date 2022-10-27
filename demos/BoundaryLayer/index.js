@@ -3,8 +3,10 @@ window.g = {
   cnv : undefined,
   x_pos : 0.5,
   Pr_no : 0.6,
-  boundaryType : "velocity",
+  boundaryType : "temperature",
   targetIndex : 6293,
+  deltaTupper : 0,
+  deltaTupper2 : 0.075,
 }
 
 // Variables filled with boundaryLayer function
@@ -55,13 +57,14 @@ function setup() {
   b.dTH_deta = temp[5];
   
   addValues(); // Values calculated outside of boundaryLayer function
-  
+  noLoop();
+ 
   
 }
 
 function draw() {
   background(250);
-  //frameRate(1);
+  frameRate(1);
   push();
   textSize(20);
   text('Laminar flow over an isothermal, flat plate',100,70);
@@ -76,12 +79,11 @@ function draw() {
       setTimeout(velocityBoundaryDraw(),2000);
       setTimeout(drawHx(),2000);
       setTimeout(velocityProf(),2000);
-  
-      
-
       break;
     case 'temperature':
       drawRed(); // Draws dT/dy @ y = 0 && Nux
+      setTimeout(drawHx(),2000);
+      setTimeout(temperatureBoundaryDraw(),2000);
       break;
   }
  
@@ -109,7 +111,7 @@ range_1_element.addEventListener("input", function() {
   xDependentChanges(g.x_pos);
   xAndPrDependentChanges(g.x_pos,g.Pr_no);
   g.targetIndex = findClosest(b.x,10*g.x_pos);
-  
+  redraw();
 });
 
 // Prandtl number
@@ -118,7 +120,7 @@ select_element.addEventListener("change", function() {
   g.Pr_no = Pr_no;
   //console.log(`g.Pr_no is ${Pr_no}`);
   xAndPrDependentChanges(g.x_pos,g.Pr_no);
-  
+  redraw();
 })
 
 // Boundary type
@@ -126,6 +128,7 @@ select_element2.addEventListener("change", function() {
   const boundaryType = select_element2.value;
   g.boundaryType = boundaryType;
   //console.log(`g.boundaryType is ${boundaryType}`);
+  redraw();
 })
 
 
@@ -207,7 +210,7 @@ function addValues(){
 
     b.Cfx.push(2*b.nu*b.du_dy0[i]/Math.pow(b.Uinf,2));
 
-    b.deltaT.push(b.eta[3266]*Math.pow(b.nu*b.x[i]/b.Uinf,2));
+    b.deltaT.push(b.eta[5948]*Math.pow(b.nu*b.x[i]/b.Uinf,1/2));
 
     for(let j = 0; j < 3; j++){
       temp.push(-1*b.dTH_deta[0][j]*Math.pow(b.Uinf/(b.nu*b.x[i]),0.5));
@@ -220,6 +223,7 @@ function addValues(){
     temp = [];
     temp2 = [];
     temp3 = [];
+    g.deltaTupper = b.deltaT[b.deltaT.length-1];
   }
 
 
@@ -265,18 +269,25 @@ function xDependentChanges(x){
 
 // For chaning the values of h_avg and h_local
 function xAndPrDependentChanges(x,Pr){
-  let index;
+  let index, index2;
 
   if(Pr == .6){
     index = 0;
+    index2 = 5947;
   } else if (Pr == 1){
     index = 1;
+    index2 = 4891;
   } else {
     index = 2;
+    index2 = 3266;
   }
 
   b.h_avg = 0.664*b.kf*Math.pow(Pr,1/3)*Math.pow(b.Uinf/b.nu,1/2)/Math.pow(10*x,1/2)
   b.h_local = b.h_x[Math.round(12600*x)][index];
+  b.deltaT = [];
+  for(let i = 0; i < b.x.length; i++){
+    b.deltaT.push(b.eta[index2]*Math.pow(b.nu*b.x[i]/b.Uinf,1/2));
+  }
 }
 
 function drawBlue(){
@@ -441,7 +452,11 @@ function drawRed(){
 
   let xRep = map(g.x_pos,0,1,0,200);
   for(let i = 0; i < 3; i++){
-    line(80+i*width/3+xRep,height/2+50,80+i*width/3+xRep,height/2+250);
+    if(i == 2){
+      line(80+i*width/3+xRep,height/2+250,80+i*width/3+xRep,height/2+150);
+    } else {
+      line(80+i*width/3+xRep,height/2+50,80+i*width/3+xRep,height/2+250);
+    }
   }
 
   pop();
@@ -474,6 +489,13 @@ function velocityBoundaryDraw(){
     x = map(b.x[i],xlower,xupper,75,825);
     y = map(b.delta[i],ylower,yupper,275,105); // 105 corresponds to the top of the array at @g.xpos
     curveVertex(x,y);
+
+    if(i == b.x.length-1){
+      push();
+      textSize(15); stroke(0); strokeWeight(1);
+      text('δ(x)',x+5,y)
+      pop();
+    }
   }
   endShape();
   
@@ -678,42 +700,143 @@ function velocityProf(){
   let ylower2 = b.delta[0];
   let yupper2 = b.delta[b.delta.length-1];
   let ymax = map(b.delta[g.targetIndex],ylower2,yupper2,275,105);
+  //console.log(ymax)
+  let xTemp = []; let yTemp = [];
+  //let temp = Math.round(10001/12601*g.targetIndex/5); // target index multiplied by ratio of lengths of v-profiles to x
 
   push();
   noFill();
   beginShape(); strokeWeight(2); stroke(0,0,255);
   for(let i = 0; i < b.vProfX.length; i++){
-    x = map(b.vProfX[i],xlower,xupper,xRep,xRep+100);
+    x = map(b.vProfX[i],xlower,xupper,xRep,xRep+70);
     y = map(b.vProfY[i],ylower,yupper,275,ymax-50);
+    xTemp.push(x); yTemp.push(y);
     curveVertex(x,y);
     
   }
   endShape();
   pop();
+
+ 
   push();
-  let temp = Math.round(g.targetIndex/6);
-  //temp = Math.round(10001/12601*temp);
-  //console.log(b.vProfY)
-  //console.log(5*temp)
-  yupper = b.vProfY[5*temp-1];
   fill(0);
-  let slope;
-  for(let i = 1; i < 6; i++){
-    x = map(b.vProfX[i*temp-1],xlower,xupper,xRep,xRep+100);
-    y = map(b.vProfY[i*temp-1],ylower,yupper,275,ymax);
-    //console.log(b.vProfY[i*temp-1])
-    // console.log(ylower)
-    // console.log(yupper)
-    triangle(x+3,y,x-5,y-5,x-5,y+5);
-    line(xRep,y,x,y);
-    if(i == 1){
-      slope = (y-275)/(x-xRep);
-    }
+  let temp = findClosest(yTemp,ymax);
+  let scale = Math.round(temp/6);
+  for(let i = 1; i < 7; i++){
+    line(xRep,yTemp[scale*i],xTemp[scale*i]-3,yTemp[scale*i])
+    triangle(xTemp[scale*i],yTemp[scale*i],xTemp[scale*i]-7,yTemp[scale*i]+3,xTemp[scale*i]-7,yTemp[scale*i]-3)
   }
   strokeWeight(2);
-  let yPos = slope*(125)+275
-  line(xRep,275,xRep+125,yPos)
+  let slope = (yTemp[scale]-275)/(xTemp[scale]-xRep);
+  line(xRep,275,xRep+100,275+slope*100)
   pop();
+}
+
+
+function temperatureBoundaryDraw(){
+  let xRep = map(g.x_pos,0,1,75,825);
+  let index = 0;
+  let xlower, xupper;
+  let ylower, yupper;
+  if(g.Pr_no == .6){
+    index = 0;
+  } else if (g.Pr_no == 1){
+    index = 1;
+  } else if (g.Pr_no == 3) {
+    index = 2;
+  }
+
+  let ylower2 = b.deltaT[0];
+  let yupper2 = b.deltaT[b.deltaT.length-1];
+  // console.log(`ylower2: ${ylower2}`)
+  // console.log(`yupper2: ${yupper2}`)
+  let ymax = map(b.deltaT[g.targetIndex],ylower2,g.deltaTupper2,275,105);
+  // console.log(`deltaT @ target: ${b.deltaT[g.targetIndex]}`)
+  // console.log(`ymax: ${ymax}`)
+  let xTemp = [];
+  let yTemp = [];
+
+  xlower = b.x[0];
+  xupper = b.x[b.x.length-1];
+  ylower = b.deltaT[0];
+  push();
+  strokeWeight(2); stroke(255,0,0);
+  noFill();
+  beginShape();
+  for(let i = 0; i < b.x.length;i++){
+    x = map(b.x[i],xlower,xupper,75,825);
+    y = map(b.deltaT[i],ylower,g.deltaTupper,275,75); // deltaTupper used to appropriately scale the values across Pr numbers
+    curveVertex(x,y);
+  }
+  
+  endShape();
+  // Temperature profile
+  xlower = b.tProfx[0][index];
+  xupper = b.tProfx[b.tProfx.length-1][index];
+  ylower = b.tProfy[0];
+  yupper = b.tProfy[b.tProfy.length-1];
+  let xtemp2,ytemp2;
+  beginShape();
+  for(let i = 0; i < b.tProfx.length; i++){
+    
+    x = map(b.tProfx[i][index],xlower,xupper,xRep+70,xRep);
+    y = map(b.tProfy[i],ylower,yupper,275,ymax-30);
+    xTemp.push(x); yTemp.push(y);
+    curveVertex(x,y);
+    
+  }
+  
+  endShape();
+  push();
+  strokeWeight(1); stroke(0);
+  let slope = (yTemp[1]-yTemp[0])/(xRep+70-xTemp[1]);
+  line(xRep-20,275+slope*90,xRep+70,275)
+  pop();
+
+  //dT/dy 
+  let temp = true; 
+  let index2 = 1;
+  while(temp){
+    
+    ylower = b.dT_dy0[index2][index];
+    if(Math.abs(b.dT_dy0[index2][index]+300) < 2){
+      temp = false;
+    }
+    index2++;
+  }
+  
+
+  yupper = b.dT_dy0[b.dT_dy0.length-1][0];
+  
+  xlower = b.x[0];
+  xupper = b.x[b.x.length-1];
+  beginShape();
+  for(let i = 1; i < b.x.length; i++){
+    x = map(b.x[i],xlower,xupper,80,280);
+    y = map(b.dT_dy0[i][index],ylower,yupper,height/2+250,height/2+50-(200/300)*yupper);
+    if(y > height/2+250){
+      y = height/2+250;
+    }
+    curveVertex(x,y);
+  }
+  endShape();
+
+
+
+  // Nu_x
+  yupper = b.Nu_x[b.Nu_x.length-1][2];
+  ylower = b.Nu_x[1][index];
+  beginShape();
+  for(let i = 1; i < b.x.length; i++){
+    x = map(b.x[i],xlower,xupper,80+width/3,280+width/3);
+    y = map(b.Nu_x[i][index],ylower,yupper,height/2+250,height/2+50+.5*(400-yupper));
+    curveVertex(x,y);
+  }
+  endShape();
+
+
+  pop();
+
 }
 
 // For finding x-coord to close off filled area of h_x graph
@@ -731,6 +854,7 @@ function findClosest(array,target){
   }
   return(position);
 }
+
 
 
 
