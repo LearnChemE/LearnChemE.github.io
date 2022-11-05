@@ -30,13 +30,13 @@ function setup() {
 
   // The "main" element is unnecessary. Don't worry about this too much
   document.getElementsByTagName("main")[0].remove();
-  
+  noLoop();
 }
 
 // Whatever is included in draw() will be calculated at 60 fps.  It is basically a loop that calls itself every 16.67 ms. You can pause it at any time with the noLoop() function and start it again with the loop() function. Be sure to include every graphics statement in a push() / pop() statement, because it minimizes the chance that you accidentally apply styling or properties to another graphics object.
 function draw() {
   background(250);
-
+  console.log(g.flow_type);
   // BUILDING THE GRAPH \\
 
   // Temperature lines & labels
@@ -84,7 +84,7 @@ function draw() {
       break;
   }
 
-  console.log(g.hot_fluid)
+
   // Grabbing cold fluid properties (fixed fluid: water)
   let properties_cold;
   properties_cold = getProperties(g.T_cold1,cp_water,mu_water,k_water);
@@ -109,45 +109,41 @@ function draw() {
   // Calculating overall heat transfer coefficient
   let U; 
   U = Math.pow(d_hot/(nus_hot*k_hot)+d_cold/(nus_cold*k_cold),-1);
-
-  // console.log(Re_hot);
-  // console.log(Re_cold);
-  // console.log(nus_hot);
-  // console.log(nus_cold);
-  // console.log(U);
-  console.log(cp_hot);
-  console.log(mu_hot);
-  console.log(k_hot);
-
-  
  
   let temperatures; // Variable to hold temperature values
   let step = .1; // Used for resolution in Euler's method
   let delta1, delta2, LMTD; // Used for calculating log-mean temperature difference
   let Q; // For displaying heat transfer rate
+  let positions = []; // Vector used to plot positions
   switch(g.flow_type){
     case 'parallel':
-    temperatures = parallelMATH(U,cp_hot,cp_cold,step);
-    // Vector used to plot positions
-    let positions = []; 
-    for(let i = 0; i<temperatures.length; i++){ 
-      positions.push((step*i).toFixed(1)); // Tofixed 1 decimal to avoid slight error
-    } // Note: if step size is adjusted value in 'toFixed' needs to be modified
-    //console.log(positions)
-    drawParallel(temperatures,0,T295,spacePer_Tempmark,scaleTemperature,zeroPosition,spacePer_Position,positions);
-    drawParallel(temperatures,1,T295,spacePer_Tempmark,scaleTemperature,zeroPosition,spacePer_Position,positions);
-    delta1 = temperatures[0][0]-temperatures[0][1];
-    delta2 = temperatures[temperatures.length-1][0]-temperatures[temperatures.length-1][1];
-    LMTD = (delta1-delta2)/Math.log(delta1/delta2);
-    Q = U*Math.PI*g.di*g.HEX_length*LMTD/1000;
+      temperatures = parallelMATH(U,cp_hot,cp_cold,step);
+      for(let i = 0; i<temperatures.length; i++){ 
+       positions.push((step*i).toFixed(1)); // Tofixed 1 decimal to avoid slight error
+      } // Note: if step size is adjusted value in 'toFixed' needs to be modified
+    
+      drawParallel(temperatures,0,T295,spacePer_Tempmark,scaleTemperature,zeroPosition,spacePer_Position,positions);
+      drawParallel(temperatures,1,T295,spacePer_Tempmark,scaleTemperature,zeroPosition,spacePer_Position,positions);
+      delta1 = temperatures[0][0]-temperatures[0][1];
+      delta2 = temperatures[temperatures.length-1][0]-temperatures[temperatures.length-1][1];
+      LMTD = (delta1-delta2)/Math.log(delta1/delta2);
+      Q = U*Math.PI*g.di*g.HEX_length*LMTD/1000;
 
     break;
     case 'counterflow':
+      temperatures = counterMATH(U,cp_hot,cp_cold,step);
+      
+      for(let i = 0; i < temperatures.length; i++){
+        positions.push((step*i).toFixed(1));
+      }
+      drawCounter(temperatures,0,T295,spacePer_Tempmark,scaleTemperature,zeroPosition,spacePer_Position,positions);
+      drawCounter(temperatures,1,T295,spacePer_Tempmark,scaleTemperature,zeroPosition,spacePer_Position,positions);
 
+      delta1 = temperatures[0][0]-temperatures[0][1];
+      delta2 = temperatures[temperatures.length-1][0]-temperatures[temperatures.length-1][1];
+      LMTD = (delta1-delta2)/Math.log(delta1/delta2);
+      Q = U*Math.PI*g.di*g.HEX_length*LMTD/1000;
     break;
-
-  
-
   }
 
   //console.log(positions)
@@ -198,13 +194,14 @@ const range_2_value_label = document.getElementById("range-2-value");
 const range_3_element = document.getElementById("range-3");
 const range_3_value_label = document.getElementById("range-3-value");
 const select_element = document.getElementById("select-1");
-const select_label = document.getElementById("select-value");
+const select_element2 = document.getElementById("select-2");
 
 range_1_element.addEventListener("input", function() {
   const m_dothot = Number(range_1_element.value); // range_1_element.value is a string by default, so we need to convert it to a number.
   range_1_value_label.innerHTML = `${m_dothot}`; // Edit the text of the global var range_1_value
   g.m_dothot = m_dothot; // Assign the number to the global object.
   //console.log(`g.m_dothot is ${g.m_dothot}`); // console.log is the easiest way to see a variable value in the javascript prompt.
+  redraw();
 });
 
 range_2_element.addEventListener("input", function() {
@@ -212,6 +209,7 @@ range_2_element.addEventListener("input", function() {
   range_2_value_label.innerHTML = `${m_dotcold}`;
   g.m_dotcold = m_dotcold;
   //console.log(`g.m_dotcold is ${g.m_dotcold}`);
+  redraw();
 });
 
 range_3_element.addEventListener("input", function() {
@@ -219,6 +217,7 @@ range_3_element.addEventListener("input", function() {
   range_3_value_label.innerHTML = `${HEX_length}`;
   g.HEX_length = HEX_length;
   //console.log(`g.HEX_length is ${g.HEX_length}`);
+  redraw();
 });
 
 select_element.addEventListener("change", function() {
@@ -226,25 +225,14 @@ select_element.addEventListener("change", function() {
   //select_label.innerHTML = `Selection value is: <span style="color:orange" >${hot_fluid}</span>.`
   g.hot_fluid = hot_fluid;
  //console.log(`g.hot_fluid is ${hot_fluid}`);
+ redraw();
 })
 
-
-
-// I was trying to copy the method used in the manometers sim to make a button but I couldn't get it to work
-
-//const selectFlow = document.getElementById("select-flow").children;
-// for(let i = 0; i < selectFlow.length; i++){
-//   selectFlow[i].addEventListener("click", function(){
-
-//     for(let j = 0; j < selectFlow.length; j++){
-//       selectFlow[j].classList.remove("selected");
-//     }
-
-//     selectFlow[i].classList.add("selected");
-//     g.flow_type = selectFlow[i].value;
-//   })
-// }
-
+select_element2.addEventListener("change",function(){
+  const flow_type = select_element2.value;
+  g.flow_type = flow_type;
+  redraw();
+})
 
 
 // // // MATERIAL PROPERTIES FROM WOLFRAM SIM \\ \\ \\
@@ -509,11 +497,84 @@ function parallelMATH(U,cp_hot,cp_cold,step){
     // Resetting temperature values for next calc
     y1 = y1next;
     y2 = y2next;
+    
   }
   return(TEMPS);
 
+}
 
+function counterMATH(U,cp_hot,cp_cold,step){
+  let y1, y2start; // Temperature values
+  let y1next, y2next, y1prime, y2prime; // Temperature values and derivative values
+  let A, B, C; // Substitute variables
+  
+  let sub; // Vector to fill TEMPS (will make it easier to correspond with position)
+  let difference = 100;
 
+  // Values to be used in Euler's method, rather than typing them out several times
+  A = U*Math.PI*g.di;
+  B = g.m_dothot*cp_hot;
+  C = g.m_dotcold*cp_cold;
+
+  y1 = g.T_hot1;
+  // y2start is set to a guess value and will be set based on default setting for each fluid
+  if(g.hot_fluid == 'liquid water'){
+    y2start = 360;
+  } else if (g.hot_fluid == 'air'){
+    y2start = 320;
+  } else {
+    y2start = 330;
+  }
+  let counter = 0;
+  let returnVar;
+
+  // While loop to solve until last temperature is approximately 300K
+  while (Math.abs(difference) > 2){
+    let TEMPS = []; // Used to clear out old stored data
+    y1 = g.T_hot1;
+    sub = [y1, y2start];
+    TEMPS.push(sub);
+    
+    
+    for(let i = 0; i<g.HEX_length-step; i += step){
+      // Calculating the change in temperature with respect to length down HEX
+      if (i == 0){
+        y1prime = -(A/B)*y1 + (A/B)*y2start;
+        y2prime = -(A/C)*y1 + (A/C)*y2start;
+        y1next = y1 + y1prime*step;
+        y2next = y2start + y2prime*step;
+      } else {
+        y1prime = -(A/B)*y1 + (A/B)*y2;
+        y2prime = -(A/C)*y1 + (A/C)*y2;
+        y1next = y1 + y1prime*step;
+        y2next = y2 + y2prime*step;
+      }
+  
+      // Storing calculated temperature values
+      sub = [y1next, y2next];
+      TEMPS.push(sub);
+  
+      // Resetting temperature values for next calc
+      y1 = y1next;
+      y2 = y2next;
+    }
+    
+
+    
+    // evaluating difference
+    difference = y2 - 300;
+    if(difference < 0){
+      y2start = y2start + .5;
+    } else {
+      y2start = y2start - .5;
+    }
+    returnVar = TEMPS;
+    counter++;
+    
+   
+   
+  }
+  return(returnVar);
 }
 
 function drawParallel(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,positions){
@@ -534,7 +595,7 @@ function drawParallel(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,
   }
 
   deltay = spacePerTemp/Tempscale;
-
+  noFill();
   beginShape();
   for(let i=0; i<temps.length;i++){
     x = zeroPos + positions[i]*spacePerM*factor; // Defining x position based on zero position then increased based on current position times distance between each meter mark 
@@ -545,6 +606,7 @@ function drawParallel(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,
     // Temperature labels
     push();
     stroke(0);
+    fill(0);
     if(i == 0 && value == 0){
       textSize(20); text("T",x+5,y-5);
       textSize(15); text("h,1",x+17,y); // I'm unsure how to get subscripts in JS, kind of a weak solution
@@ -558,6 +620,56 @@ function drawParallel(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,
       textSize(20); text("T",x+5,y+15);
       textSize(15); text("c,2",x+17,y+20);
     }
+    pop();
+  }
+  endShape();
+
+  pop();
+}
+
+function drawCounter(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,positions){
+  let x, y; // Variables for positioning
+  let deltay;
+
+  // Correction for x-positions for changing graph scale at lengths < 14 m
+  let factor = 1;
+  if(g.HEX_length < 14){
+    factor = 2;
+  }
+
+  push();
+  if(value == 0){ // changing color based on hot and cold
+    stroke(255,0,0);
+  } else{
+    stroke(0,0,255);
+  }
+
+  deltay = spacePerTemp/Tempscale;
+  noFill();
+  beginShape();
+  for(let i=0; i<temps.length;i++){
+    x = zeroPos + positions[i]*spacePerM*factor; // Defining x position based on zero position then increased based on current position times distance between each meter mark 
+    y = T295 - (temps[i][value]-295)*deltay; // Defining y position based on difference from 295K
+    
+    vertex(x,y);
+    
+    // Temperature labels
+    push();
+    stroke(0);
+    fill(0);
+    if(i == 0 && value == 0){
+      textSize(20); text("T",x+5,y-5);
+      textSize(15); text("h,1",x+17,y); // I'm unsure how to get subscripts in JS, kind of a weak solution
+    } else if(i+1 == temps.length && value == 0){
+      textSize(20); text("T",x+5,y-5);
+      textSize(15); text("h,2",x+17,y);
+    } else if(i == 0 && value == 1){
+      textSize(20); text("T",x,y-15);
+      textSize(15); text("c,2",x+10,y-10);
+    } else if(i+1 == temps.length && value == 1){
+      textSize(20); text("T",x+5,y+15);
+      textSize(15); text("c,1",x+17,y+20);
+    } 
     pop();
   }
   endShape();
