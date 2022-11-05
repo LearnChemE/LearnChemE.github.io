@@ -39,27 +39,27 @@
       <!-- The attributes are self-explanatory. For more info on "ranges", just google "JavaScript input range" -->
       <div class="input-row">
         <div class="input-label">Mass flow rates (kg/s): Hot</div>
-        <input type="range" id="range-1" min="0.2" max="0.4" value="0.3" step=".01" />
-        <div id="range-1-value" class="value-label">0.3</div>
+        <input type="range" id="m-dot-hot" min="0.2" max="0.4" value="0.3" step=".01" />
+        <div id="m-dot-hot-value" class="value-label">0.3</div>
       </div>
 
       <div class="input-row">
         <div class="input-label">Cold</div>
-        <input type="range" id="range-2" min="0.2" max="0.4" value="0.3" step=".01" />
-        <div id="range-2-value" class="value-label">0.3</div>
+        <input type="range" id="m-dot-cold" min="0.2" max="0.4" value="0.3" step=".01" />
+        <div id="m-dot-cold-value" class="value-label">0.3</div>
       </div>
 
       <div class="input-row">
         <div class="input-label">Heat exchanger length</div>
-        <input type="range" id="range-3" min="10" max="25" value="15" step="1" />
-        <div id="range-3-value" class="value-label">15</div>
+        <input type="range" id="hex-length" min="10" max="25" value="15" step="1" />
+        <div id="hex-length-value" class="value-label">15</div>
         <div class="units-label">meters</div>
       </div>
 
       <!-- This is a drop-down menu. "#select-1" is also referenced in index.js. -->
       <div class="select-row">
         <div class="select-label">Hot fluid:</div>
-        <select id="select-1">
+        <select id="hot-fluid">
           <option value="liquid water">liquid water</option>
           <option value="air">air</option>
           <option value="liquid sodium">liquid sodium</option>
@@ -68,7 +68,7 @@
 
       <div class="select-row">
         <div class="select-label">Flow type:</div>
-        <select id="select-2">
+        <select id="flow-type">
           <option value="parallel">parallel</option>
           <option value="counterflow">counterflow</option>
         </select>

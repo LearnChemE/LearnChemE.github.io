@@ -36,7 +36,6 @@ function setup() {
 // Whatever is included in draw() will be calculated at 60 fps.  It is basically a loop that calls itself every 16.67 ms. You can pause it at any time with the noLoop() function and start it again with the loop() function. Be sure to include every graphics statement in a push() / pop() statement, because it minimizes the chance that you accidentally apply styling or properties to another graphics object.
 function draw() {
   background(250);
-  console.log(g.flow_type);
   // BUILDING THE GRAPH \\
 
   // Temperature lines & labels
@@ -146,7 +145,6 @@ function draw() {
     break;
   }
 
-  //console.log(positions)
 
   // Heat transfer rate label
   push();
@@ -182,54 +180,46 @@ function draw() {
   text(hotLabel,535,100);
   text(coldLabel,534,125);
   pop();
-    
-  
- 
 }
 
-const range_1_element = document.getElementById("range-1");
-const range_1_value_label = document.getElementById("range-1-value");
-const range_2_element = document.getElementById("range-2");
-const range_2_value_label = document.getElementById("range-2-value");
-const range_3_element = document.getElementById("range-3");
-const range_3_value_label = document.getElementById("range-3-value");
-const select_element = document.getElementById("select-1");
-const select_element2 = document.getElementById("select-2");
+const mdothot = document.getElementById("m-dot-hot");
+const mdothot_label = document.getElementById("m-dot-hot-value");
+const mdotcold = document.getElementById("m-dot-cold");
+const mdotcold_label = document.getElementById("m-dot-cold-value");
+const hexlength = document.getElementById("hex-length");
+const hexlength_label = document.getElementById("hex-length-value");
+const hotfluid = document.getElementById("hot-fluid");
+const flowtype = document.getElementById("flow-type");
 
-range_1_element.addEventListener("input", function() {
-  const m_dothot = Number(range_1_element.value); // range_1_element.value is a string by default, so we need to convert it to a number.
-  range_1_value_label.innerHTML = `${m_dothot}`; // Edit the text of the global var range_1_value
+mdothot.addEventListener("input", function() {
+  const m_dothot = Number(mdothot.value); // range_1_element.value is a string by default, so we need to convert it to a number.
+  mdothot_label.innerHTML = `${m_dothot}`; // Edit the text of the global var range_1_value
   g.m_dothot = m_dothot; // Assign the number to the global object.
-  //console.log(`g.m_dothot is ${g.m_dothot}`); // console.log is the easiest way to see a variable value in the javascript prompt.
   redraw();
 });
 
-range_2_element.addEventListener("input", function() {
-  const m_dotcold = Number(range_2_element.value);
-  range_2_value_label.innerHTML = `${m_dotcold}`;
+mdotcold.addEventListener("input", function() {
+  const m_dotcold = Number(mdotcold.value);
+  mdotcold_label.innerHTML = `${m_dotcold}`;
   g.m_dotcold = m_dotcold;
-  //console.log(`g.m_dotcold is ${g.m_dotcold}`);
   redraw();
 });
 
-range_3_element.addEventListener("input", function() {
-  const HEX_length = Number(range_3_element.value);
-  range_3_value_label.innerHTML = `${HEX_length}`;
+hexlength.addEventListener("input", function() {
+  const HEX_length = Number(hexlength.value);
+  hexlength_label.innerHTML = `${HEX_length}`;
   g.HEX_length = HEX_length;
-  //console.log(`g.HEX_length is ${g.HEX_length}`);
   redraw();
 });
 
-select_element.addEventListener("change", function() {
-  const hot_fluid = select_element.value;
-  //select_label.innerHTML = `Selection value is: <span style="color:orange" >${hot_fluid}</span>.`
+hotfluid.addEventListener("change", function() {
+  const hot_fluid = hotfluid.value;
   g.hot_fluid = hot_fluid;
- //console.log(`g.hot_fluid is ${hot_fluid}`);
  redraw();
 })
 
-select_element2.addEventListener("change",function(){
-  const flow_type = select_element2.value;
+flowtype.addEventListener("change",function(){
+  const flow_type = flowtype.value;
   g.flow_type = flow_type;
   redraw();
 })
@@ -292,10 +282,8 @@ function drawTemplines(){
   rotate(angle1);
   text("Temperature (K)",0,0); // Temperature axis label
   pop();
-
   let temp = [g.bottom-19,19,5];
   return(temp);
-  
 }
 
 function drawDistlines(){
@@ -525,8 +513,8 @@ function counterMATH(U,cp_hot,cp_cold,step){
   } else {
     y2start = 330;
   }
-  let counter = 0;
-  let returnVar;
+
+  let returnVar; // Cant access TEMPS variable outside of the while loop so this is the variable being returned
 
   // While loop to solve until last temperature is approximately 300K
   while (Math.abs(difference) > 2){
@@ -538,7 +526,7 @@ function counterMATH(U,cp_hot,cp_cold,step){
     
     for(let i = 0; i<g.HEX_length-step; i += step){
       // Calculating the change in temperature with respect to length down HEX
-      if (i == 0){
+      if (i == 0){ // First step based on guess which will be adjusted based on final temperature
         y1prime = -(A/B)*y1 + (A/B)*y2start;
         y2prime = -(A/C)*y1 + (A/C)*y2start;
         y1next = y1 + y1prime*step;
@@ -550,17 +538,13 @@ function counterMATH(U,cp_hot,cp_cold,step){
         y2next = y2 + y2prime*step;
       }
   
-      // Storing calculated temperature values
       sub = [y1next, y2next];
       TEMPS.push(sub);
   
-      // Resetting temperature values for next calc
       y1 = y1next;
       y2 = y2next;
     }
-    
 
-    
     // evaluating difference
     difference = y2 - 300;
     if(difference < 0){
@@ -569,10 +553,6 @@ function counterMATH(U,cp_hot,cp_cold,step){
       y2start = y2start - .5;
     }
     returnVar = TEMPS;
-    counter++;
-    
-   
-   
   }
   return(returnVar);
 }
@@ -600,13 +580,14 @@ function drawParallel(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,
   for(let i=0; i<temps.length;i++){
     x = zeroPos + positions[i]*spacePerM*factor; // Defining x position based on zero position then increased based on current position times distance between each meter mark 
     y = T295 - (temps[i][value]-295)*deltay; // Defining y position based on difference from 295K
-    
+    strokeWeight(2);
     vertex(x,y);
     
     // Temperature labels
     push();
     stroke(0);
     fill(0);
+    strokeWeight(1);
     if(i == 0 && value == 0){
       textSize(20); text("T",x+5,y-5);
       textSize(15); text("h,1",x+17,y); // I'm unsure how to get subscripts in JS, kind of a weak solution
@@ -650,16 +631,16 @@ function drawCounter(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,p
   for(let i=0; i<temps.length;i++){
     x = zeroPos + positions[i]*spacePerM*factor; // Defining x position based on zero position then increased based on current position times distance between each meter mark 
     y = T295 - (temps[i][value]-295)*deltay; // Defining y position based on difference from 295K
-    
+    strokeWeight(2);
     vertex(x,y);
     
     // Temperature labels
     push();
-    stroke(0);
+    stroke(0); strokeWeight(1);
     fill(0);
     if(i == 0 && value == 0){
       textSize(20); text("T",x+5,y-5);
-      textSize(15); text("h,1",x+17,y); // I'm unsure how to get subscripts in JS, kind of a weak solution
+      textSize(15); text("h,1",x+17,y); 
     } else if(i+1 == temps.length && value == 0){
       textSize(20); text("T",x+5,y-5);
       textSize(15); text("h,2",x+17,y);
@@ -673,6 +654,5 @@ function drawCounter(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,p
     pop();
   }
   endShape();
-
   pop();
 }
