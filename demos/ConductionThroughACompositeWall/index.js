@@ -62,6 +62,7 @@ function draw() {
   let k_concrete = 1.4 / 100;
   let k_steel = 16.3 / 100;
   let k_other;
+  let squaredpos;
 
   // Assigning k-value based on last wall material
   switch (g.right_wall_material) {
@@ -235,12 +236,17 @@ function draw() {
   // Heat flux display
   fill(0);
   let heatflux = Math.round(qx * 100 * 100); // Rounding heat flux value
-  let HF_value = heatflux.toString(); // Converting it to a string
-  let title = "Heat flux = ";
-  let units = " W/m^2";
-  let HF_temp = title.concat(HF_value); // Combining phrases
-  let HF_display = HF_temp.concat(units);
-  text(HF_display, 300, 100);
+  text('Heat flux = '+ heatflux + ' W/m', 300, 100);
+  textSize(17);
+  if(heatflux < 100){
+    squaredpos = 514;
+  } else if(heatflux >= 100 && heatflux <= 1000){
+    squaredpos = 527;
+  } else if(heatflux >= 1000){
+    squaredpos = 540;
+  }
+  
+  text('2',squaredpos,90);
   // Arrow
   rect(325, 125, 170, 2);
   triangle(495, 135, 495, 115, 530, 125)
