@@ -54,8 +54,8 @@
       <!-- The attributes are self-explanatory. For more info on "ranges", just google "JavaScript input range" -->
       <div class="input-row">
         <div class="input-label">x/x<sub>crit</sub> or Re<sub>x</sub>/Re<sub>crit</sub></div>
-        <input type="range" id="range-1" min="0" max="1" value="0.5" step="0.01" />
-        <div id="range-1-value" class="value-label">0.5</div>
+        <input type="range" id="x-position" min="0" max="1" value="0.5" step="0.01" />
+        <div id="x-position-value" class="value-label">0.5</div>
 
       </div>
 
@@ -63,7 +63,7 @@
 
       <div class="select-row">
         <div class="select-label">Boundary Type</div>
-        <select id="select-2">
+        <select id="boundary-selection">
           <option value="velocity">Velocity</option>
           <option value="temperature">Temperature</option>
         </select>
@@ -72,7 +72,7 @@
       <!-- This is a drop-down menu. "#select-1" is also referenced in index.js. -->
       <div class="select-row">
         <div class="select-label">Prandtl number:</div>
-        <select id="select-1">
+        <select id="prandtl-number">
           <option value="0.6">0.6</option>
           <option value="1">1</option>
           <option value="3">3</option>

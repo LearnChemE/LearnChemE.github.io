@@ -3,7 +3,7 @@ window.g = {
   cnv : undefined,
   x_pos : 0.5,
   Pr_no : 0.6,
-  boundaryType : "temperature",
+  boundaryType : "velocity",
   targetIndex : 6293,
   deltaTupper : 0,
   deltaTupper2 : 0.075,
@@ -86,26 +86,20 @@ function draw() {
       setTimeout(temperatureBoundaryDraw(),2000);
       break;
   }
- 
- 
-  
-  
+
 }
 
 
-const range_1_element = document.getElementById("range-1");
-const range_1_value_label = document.getElementById("range-1-value");
-const range_2_element = document.getElementById("range-2");
-const range_2_value_label = document.getElementById("range-2-value");
-const select_element = document.getElementById("select-1");
-let xlabel = document.getElementById("xLabel");
-const select_element2 = document.getElementById("select-2");
+const xposition = document.getElementById("x-position");
+const xposition_value = document.getElementById("x-position-value");
+const prandtlnumber = document.getElementById("prandtl-number");
+const boundarytype = document.getElementById("boundary-selection");
 
 
 // x/x_crit or Re_x/Re_crit
-range_1_element.addEventListener("input", function() {
-  const x_pos = Number(range_1_element.value); // range_1_element.value is a string by default, so we need to convert it to a number.
-  range_1_value_label.innerHTML = `${x_pos}`; // Edit the text of the global var range_1_value
+xposition.addEventListener("input", function() {
+  const x_pos = Number(xposition.value); // range_1_element.value is a string by default, so we need to convert it to a number.
+  xposition_value.innerHTML = `${x_pos}`; // Edit the text of the global var range_1_value
   g.x_pos = x_pos; // Assign the number to the global object.
   //console.log(`g.x_pos is ${g.x_pos}`); // console.log is the easiest way to see a variable value in the javascript prompt.
   xDependentChanges(g.x_pos);
@@ -115,8 +109,8 @@ range_1_element.addEventListener("input", function() {
 });
 
 // Prandtl number
-select_element.addEventListener("change", function() {
-  const Pr_no = select_element.value;
+prandtlnumber.addEventListener("change", function() {
+  const Pr_no = prandtlnumber.value;
   g.Pr_no = Pr_no;
   //console.log(`g.Pr_no is ${Pr_no}`);
   xAndPrDependentChanges(g.x_pos,g.Pr_no);
@@ -124,8 +118,8 @@ select_element.addEventListener("change", function() {
 })
 
 // Boundary type
-select_element2.addEventListener("change", function() {
-  const boundaryType = select_element2.value;
+boundarytype.addEventListener("change", function() {
+  const boundaryType = boundarytype.value;
   g.boundaryType = boundaryType;
   //console.log(`g.boundaryType is ${boundaryType}`);
   redraw();
@@ -199,8 +193,7 @@ function addValues(){
   let temp2 = [];
   let temp3 = [];
   // Adding values to delta
-  //let val; I was using val to fix the number to 4 decimal places but that was just how Matlab was showing me the numbers
-  // Might need to do something like that... My numbers are slightly different than what comes out of the matlab code
+  
   for(let i = 0; i < b.x.length; i++){
     //val = b.eta[4920]*Math.pow(b.nu*b.x[i]/b.Uinf,0.5);
     b.delta.push(b.eta[4920]*Math.pow(b.nu*b.x[i]/b.Uinf,0.5));
@@ -307,7 +300,11 @@ function drawBlue(){
     textSize(15);
     push();
     textStyle(ITALIC);
-    text("x/x_crit or Re_x/Re_x,crit",90+i*width/3,650); // X-label
+    text("x/x     or Re  /Re",115+i*width/3,650); // X-label
+    textSize(12);
+    text("crit",135+i*width/3,653);
+    text("x",192+i*width/3,653);
+    text("x,crit",224+i*width/3,653);
     pop();
 
     // x lines
@@ -369,20 +366,20 @@ function drawBlue(){
       line(80+i*width/3+xRep,height/2+50,80+i*width/3+xRep,height/2+250);
     }
   }
-
   pop();
+
   push();
   textSize(20);
   translate(25,600);
   rotate(radians(270));
   textStyle(ITALIC)
   text('∂u/∂y @ y = 0 [m/s/m]',15,5);
-  text('C_f,x',80,width/3);
-  text('h_x',80,2*width/3+20);
+  text('C',80,width/3);
+  text('h',80,2*width/3+20);
+  textSize(15);
+  text('f,x',95,width/3+5);
+  text('x',92,2*width/3+25);
   pop();
-  
-  
-  
 }
 
 function drawRed(){
@@ -398,7 +395,11 @@ function drawRed(){
     textSize(15);
     push();
     textStyle(ITALIC);
-    text("x/x_crit or Re_x/Re_x,crit",90+i*width/3,650); // X-label
+    text("x/x     or Re  /Re",115+i*width/3,650); // X-label
+    textSize(12);
+    text("crit",135+i*width/3,653);
+    text("x",192+i*width/3,653);
+    text("x,crit",224+i*width/3,653);
     pop();
     
     // x lines
@@ -466,8 +467,11 @@ function drawRed(){
   rotate(radians(270));
   textStyle(ITALIC)
   text('∂T/∂y @ y = 0 [K/m]',15,5);
-  text('Nu_x',80,width/3);
-  text('h_x',80,2*width/3+20);
+  text('Nu',80,width/3);
+  text('h',80,2*width/3+20);
+  textSize(15);
+  text('x',107,width/3+3);
+  text('x',92,2*width/3+25);
   pop();
 }
 
@@ -485,14 +489,14 @@ function velocityBoundaryDraw(){
   stroke(0,0,255); strokeWeight(2);
   beginShape();
   noFill();
-  for(let i = 0; i < b.x.length; i++){
+  for(let i = 0; i < b.x.length; i+=2){
     x = map(b.x[i],xlower,xupper,75,825);
     y = map(b.delta[i],ylower,yupper,275,105); // 105 corresponds to the top of the array at @g.xpos
     curveVertex(x,y);
 
     if(i == b.x.length-1){
       push();
-      textSize(15); stroke(0); strokeWeight(1);
+      textSize(15); stroke(0); strokeWeight(1); fill(0);
       text('δ(x)',x+5,y)
       pop();
     }
@@ -516,7 +520,7 @@ function velocityBoundaryDraw(){
 
   ylower = b.du_dy0[b.du_dy0.length-1];
   beginShape();
-  for(let i = 1; i < b.x.length; i++){
+  for(let i = 1; i < b.x.length; i+=2){
     x = map(b.x[i],xlower,xupper,80,280);
     y = map(b.du_dy0[i],ylower,yupper,height/2+250-ylower,height/2);
     if (y < height/2+50){ // Correction for very large terms at low x-values
@@ -543,7 +547,7 @@ function velocityBoundaryDraw(){
   ylower = b.Cfx[b.Cfx.length-1];
   let shift = ylower/0.002*40; // Account for values not going to zero
   beginShape();
-  for(let i = 1; i < b.x.length; i++){
+  for(let i = 1; i < b.x.length; i+=2){
     x = map(b.x[i],xlower,xupper,80+width/3,280+width/3);
     y = map(b.Cfx[i],ylower,yupper,height/2+250-shift,height/2);
     if (y < height/2 + 50){
@@ -553,15 +557,6 @@ function velocityBoundaryDraw(){
   }
   endShape();
   pop();
-
-  push();
-  //////////\\\\\\\\
-  //////// hx \\\\\\\
-  //////////\\\\\\\\\
-
-
-  pop();
-
 }
 
 function plateDraw(){
@@ -573,10 +568,14 @@ function plateDraw(){
   
   line(75,300,825,300);
   textSize(20); textStyle(ITALIC);
-  text("x/x_crit or Re_x/Re_x,crit",330,360); // X-label
+  text("x/x     or Re  /Re",360,360); // X-label
   line(xRep,300,xRep,100);
   fill(0);
   triangle(xRep,95,xRep-5,105,xRep+5,105);
+  textSize(15);
+  text('crit',385,365);
+  text('x',462,365);
+  text('x,crit',504,365);
   pop();
 
   push();
@@ -601,7 +600,7 @@ function plateDraw(){
   line(75,270,75,50);
   fill(0);
   triangle(75,45,72,55,78,55);
-  textSize(15); textStyle(ITALIC);
+  textSize(20); textStyle(ITALIC);
   text('y',72,40); 
 
   line(30,270,30,100);
@@ -609,7 +608,10 @@ function plateDraw(){
     line(30,270-170/6*i,70,270-170/6*i);
     triangle(72,270-170/6*i,62,273-170/6*i,62,267-170/6*i);
   }
-  text('U_∞, T_∞',5,80);
+  text('U  , T  ',15,80);
+  textSize(16);
+  text('∞',30,85);
+  text('∞',60,85);
   pop();
 }
 
@@ -678,13 +680,16 @@ function drawHx(){
   pop();
   b.h_avg = 0.664*b.kf*Math.pow(g.Pr_no,1/3)*Math.pow(b.Uinf/b.nu,1/2)/Math.pow(10*g.x_pos,1/2);
   b.h_local = b.h_x[Math.round(12600*g.x_pos)][index];
-  let hbarLabel = 'h_0-x = ' + b.h_avg.toFixed(2) + ' W/m^2-K';
-  let hLabel = 'h_x = ' + b.h_local.toFixed(2) + ' W/m^2-K';
+  let hbarLabel = 'h     = ' + b.h_avg.toFixed(2) + ' W/m^2-K';
+  let hLabel = 'h   = ' + b.h_local.toFixed(2) + ' W/m^2-K';
   push();
   textSize(15);
   line(700,435,705,435);
   text(hbarLabel,700,450);
   text(hLabel,700,475);
+  textSize(12);
+  text('0-x',710,455);
+  text('x',710,480);
   pop();
 }
 
@@ -700,9 +705,7 @@ function velocityProf(){
   let ylower2 = b.delta[0];
   let yupper2 = b.delta[b.delta.length-1];
   let ymax = map(b.delta[g.targetIndex],ylower2,yupper2,275,105);
-  //console.log(ymax)
   let xTemp = []; let yTemp = [];
-  //let temp = Math.round(10001/12601*g.targetIndex/5); // target index multiplied by ratio of lengths of v-profiles to x
 
   push();
   noFill();
@@ -748,11 +751,7 @@ function temperatureBoundaryDraw(){
 
   let ylower2 = b.deltaT[0];
   let yupper2 = b.deltaT[b.deltaT.length-1];
-  // console.log(`ylower2: ${ylower2}`)
-  // console.log(`yupper2: ${yupper2}`)
   let ymax = map(b.deltaT[g.targetIndex],ylower2,g.deltaTupper2,275,105);
-  // console.log(`deltaT @ target: ${b.deltaT[g.targetIndex]}`)
-  // console.log(`ymax: ${ymax}`)
   let xTemp = [];
   let yTemp = [];
 
@@ -763,10 +762,19 @@ function temperatureBoundaryDraw(){
   strokeWeight(2); stroke(255,0,0);
   noFill();
   beginShape();
-  for(let i = 0; i < b.x.length;i++){
+  for(let i = 0; i < b.x.length; i+=2){
     x = map(b.x[i],xlower,xupper,75,825);
     y = map(b.deltaT[i],ylower,g.deltaTupper,275,75); // deltaTupper used to appropriately scale the values across Pr numbers
     curveVertex(x,y);
+
+    if(i == b.x.length-1){
+      push();
+      textSize(15); stroke(0); strokeWeight(1); fill(0);
+      text('δ  (x)',x+5,y);
+      textSize(12); textStyle(ITALIC);
+      text('t',x+15,y+5);
+      pop();
+    }
   }
   
   endShape();
@@ -775,9 +783,9 @@ function temperatureBoundaryDraw(){
   xupper = b.tProfx[b.tProfx.length-1][index];
   ylower = b.tProfy[0];
   yupper = b.tProfy[b.tProfy.length-1];
-  let xtemp2,ytemp2;
+  
   beginShape();
-  for(let i = 0; i < b.tProfx.length; i++){
+  for(let i = 0; i < b.tProfx.length; i+=2){
     
     x = map(b.tProfx[i][index],xlower,xupper,xRep+70,xRep);
     y = map(b.tProfy[i],ylower,yupper,275,ymax-30);
@@ -805,13 +813,11 @@ function temperatureBoundaryDraw(){
     index2++;
   }
   
-
   yupper = b.dT_dy0[b.dT_dy0.length-1][0];
-  
   xlower = b.x[0];
   xupper = b.x[b.x.length-1];
   beginShape();
-  for(let i = 1; i < b.x.length; i++){
+  for(let i = 1; i < b.x.length; i+=2){
     x = map(b.x[i],xlower,xupper,80,280);
     y = map(b.dT_dy0[i][index],ylower,yupper,height/2+250,height/2+50-(200/300)*yupper);
     if(y > height/2+250){
@@ -827,7 +833,7 @@ function temperatureBoundaryDraw(){
   yupper = b.Nu_x[b.Nu_x.length-1][2];
   ylower = b.Nu_x[1][index];
   beginShape();
-  for(let i = 1; i < b.x.length; i++){
+  for(let i = 1; i < b.x.length; i+=2){
     x = map(b.x[i],xlower,xupper,80+width/3,280+width/3);
     y = map(b.Nu_x[i][index],ylower,yupper,height/2+250,height/2+50+.5*(400-yupper));
     curveVertex(x,y);
