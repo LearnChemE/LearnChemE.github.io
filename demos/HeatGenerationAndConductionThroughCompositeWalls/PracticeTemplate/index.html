@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Practice Simulation Template</title>
+  <title>Heat Generation and Conduction Through Composite Walls</title>
 
   <!-- Before we run any other scripts, we have to import P5.js (a library for graphics) -->
   <script src="./libraries/p5.js"></script>
@@ -39,8 +39,8 @@
       <!-- The attributes are self-explanatory. For more info on "ranges", just google "JavaScript input range" -->
       <div class="input-row">
         <div class="input-label">Heat Generation Rate </div>
-        <input type="range" id="range-1" min="6" max="12" value="6" step=".1" />
-        <div id="range-1-value" class="value-label">6</div>
+        <input type="range" id="heat-gen-rate" min="4" max="6" value="4" step=".1" />
+        <div id="heat-gen-rate-value" class="value-label">4</div>
         <div class="units-label">kW/m<sup>3</sup></div>
       </div>
 
@@ -48,22 +48,19 @@
 
       <div class="input-row">
         <div class="input-label">Contact Resistance</div>
-        <input type="range" id="range-3" min="0" max="0.08" value="0" step=".01" />
-        <div id="range-3-value" class="value-label">0</div>
+        <input type="range" id="contact-resistance" min="0" max="0.08" value="0" step=".01" />
+        <div id="contact-resistance-value" class="value-label">0</div>
         <div class="units-label">m<sup>2</sup>K/W</div>
       </div>
 
       <!-- This is a drop-down menu. "#select-1" is also referenced in index.js. -->
       <div class="select-row">
-        <div class="select-label">Wall with Uniform Generation</div>
-        <select id="select-1">
+        <div class="heatgen-wall">Wall with Uniform Generation</div>
+        <select id="heatgen-wall">
           <option value="A">A</option>
           <option value="B">B</option>
     
         </select>
-        <div id="select-value">
-          Selection value is: <span style="color:orange">value-1</span>.
-        </div>
       </div>
     </div>
 

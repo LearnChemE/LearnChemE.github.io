@@ -1,7 +1,7 @@
 // Declare global variables within this object. They will be available across all files as "g.variable_name".You can make another script file aside from index.js by putting <script src="./path-to/other-js-file.js"></script> after the "index.js" HTML element. All the variables you declare in this file will be accessible there. It's best practice to store your global variables within an object E.G. "g.rng_1_value" because it will minimize the risk of namespace issues.
 window.g = {
   cnv: undefined,
-  Q: 6,
+  Q: 4,
   //rng_2_value: 0,
   Rtc: 0,
   uniformGen: "A",
@@ -28,6 +28,12 @@ function setup() {
 
 function draw() {
   background(250);
+  let shift;
+  if (g.uniformGen == "A"){
+    shift = 100;
+  } else {
+    shift = 50;
+  }
 
   // Variables used for positioning wall segments
   let L = 75, R = 575, T = 50, B = 550; // Left, Right, Top, Bottom
@@ -110,31 +116,14 @@ function draw() {
   text("C", 460, 300);
   pop();
 
-  // Convection and conduction labels
-  //let k_a = .24, k_b = .13, k_c = .5;
-  push();
-  textSize(20);
-  text("k_a = 0.24", 120, 85);
-  text("W/[m K]", 130, 115);
-
-  text("k_b = 0.13", 280, 85);
-  text("W/[m K]", 290, 115);
-
-  text("k_c = 0.50", 440, 85);
-  text("W/[m K]", 450, 115);
-
-  textSize(25);
-  text("T_∞ = 20\xB0C", 625, 100);
-  text("h = 10 W/[m^2 K]", 595, 150);
+  labels();
 
   fill(0);
   for(let i = 0; i <= 2; i++){
     rect(640+50*i, 200,1, 300);
     triangle(630+50*i,200,650+50*i,200,640+50*i,170);
   }
-  pop();
-  //let answer = math();
-  //console.log(answer.summation[0]);
+  
 
   ///////////////////////////// MATH /////////////////////////////
   let mathInfo; let positions = [R,R-segmentSize,R-segmentSize-15,L+segmentSize+15,L+segmentSize,L];
@@ -146,7 +135,7 @@ function draw() {
       push();
       noFill();
       stroke(255,0,0); strokeWeight(2);
-      bezier(L,B-5*points.y[0]+150,L+17.7*4,B-5*points.y[3]+150,L+17.7*8,B-5*points.y[7]+150,L+segmentSize,B-5*points.y[10]+150);
+      bezier(L,B-5*points.y[0]+150-shift,L+17.7*4,B-5*points.y[3]+150-shift,L+17.7*8,B-5*points.y[7]+150-shift,L+segmentSize,B-5*points.y[10]+150-shift);
       pop();
       tempDisplayA(mathInfo.T_vec,positions);
       break;
@@ -156,7 +145,7 @@ function draw() {
       push();
       noFill();
       stroke(255,0,0); strokeWeight(2);
-      bezier(L+segmentSize+15,B-5*points.y[0]+150,L+segmentSize + 15 + 11.5*4,B-5*points.y[3]+150,L+segmentSize+15+11.5*8,B-5*points.y[7]+150,R-segmentSize-15,B-5*points.y[10]+150);
+      bezier(L+segmentSize+15,B-5*points.y[0]+150-shift,L+segmentSize + 15 + 11.5*4,B-5*points.y[3]+150-shift,L+segmentSize+15+11.5*8,B-5*points.y[7]+150-shift,R-segmentSize-15,B-5*points.y[10]+150-shift);
       pop();
       extraBpoints(mathInfo.T_vec[3]);
       tempDisplayB(mathInfo.T_vec,positions);
@@ -169,18 +158,14 @@ function draw() {
   fill(255,0,0);
   for(let i = 0; i < mathInfo.T_vec.length; i++){
     strokeWeight(0);
-    circle(positions[i],B - 5*mathInfo.T_vec[i]+150,12); // 6p for every degree C with 32C at y=458
+    circle(positions[i],B - 5*mathInfo.T_vec[i]+150-shift,12); // 6p for every degree C with 32C at y=458
   }
 
   for(let i = 0; i < mathInfo.T_vec.length-2; i++){ // -2 to account for the curve in A
     strokeWeight(2); stroke(255,0,0);
-    line(positions[i],B-5*mathInfo.T_vec[i]+150,positions[i+1],B-5*mathInfo.T_vec[i+1]+150);
+    line(positions[i],B-5*mathInfo.T_vec[i]+150-shift,positions[i+1],B-5*mathInfo.T_vec[i+1]+150-shift);
   }
   pop();
-
-
-
-  
 
 }
 
@@ -226,6 +211,12 @@ function BgenMath(){
 
 function tempDisplayA(temps,pos){
   let temp1 = "\xB0C"
+  let shift;
+  if (g.uniformGen == "A"){
+    shift = 100;
+  } else {
+    shift = 50;
+  }
   let T1 = Math.round(temps[0]).toString(); let T2 = Math.round(temps[1]).toString(); let T3 = Math.round(temps[2]).toString();
   let T4 = Math.round(temps[3]).toString(); let T5 = Math.round(temps[4]).toString(); let T6 = Math.round(temps[5]).toString();
 
@@ -233,12 +224,12 @@ function tempDisplayA(temps,pos){
   let L4 = T4.concat(temp1); let L5 = T5.concat(temp1); let L6 = T6.concat(temp1);
 
   textSize(20);
-  text(L1, 5+pos[0],550-5*temps[0]+150-5);
-  text(L2, 5+pos[1],550-5*temps[1]+150-5);
-  text(L3, -50+pos[2],550-5*temps[2]+150+25);
-  text(L4, 5+pos[3],550-5*temps[3]+150-5);
-  text(L5, -50+pos[4],550-5*temps[4]+150+25);
-  text(L6, 5+pos[5],550-5*temps[5]+150-5);
+  text(L1, 5+pos[0],550-5*temps[0]+150-5-shift);
+  text(L2, 5+pos[1],550-5*temps[1]+150-5-shift);
+  text(L3, -50+pos[2],550-5*temps[2]+150+25-shift);
+  text(L4, 5+pos[3],550-5*temps[3]+150-5-shift);
+  text(L5, -50+pos[4],550-5*temps[4]+150+25-shift);
+  text(L6, 5+pos[5],550-5*temps[5]+150-5-shift);
 }
 
 // Generates series of points to plot B temperature profile when B is generating heat
@@ -255,7 +246,13 @@ function Bcurve(constant2,Ts3){
 }
 // Function to draw remaining curve through wall A when B is generating heat
 function extraBpoints(mm){
-  let value_temp = 550 - 5*mm + 150;
+  let shift;
+  if (g.uniformGen == "A"){
+    shift = 100;
+  } else {
+    shift = 50;
+  }
+  let value_temp = 550 - 5*mm + 150 - shift;
   push();
   strokeWeight(0); fill(255,0,0);
   circle(75, value_temp,12);
@@ -266,7 +263,13 @@ function extraBpoints(mm){
 }
 
 function tempDisplayB(temps,pos){
-  let temp1 = "\xB0C"
+  let temp1 = "\xB0C";
+  let shift;
+  if (g.uniformGen == "A"){
+    shift = 100;
+  } else {
+    shift = 50;
+  }
   let T1 = Math.round(temps[0]).toString(); let T2 = Math.round(temps[1]).toString(); let T3 = Math.round(temps[2]).toString();
   let T4 = Math.round(temps[3]).toString();
 
@@ -274,66 +277,85 @@ function tempDisplayB(temps,pos){
   let L4 = T4.concat(temp1);
 
   textSize(20);
-  text(L1, 5+pos[0],550-5*temps[0]+150-5);
-  text(L2, 5+pos[1],550-5*temps[1]+150-5);
-  text(L3, -50+pos[2],550-5*temps[2]+150+25);
-  text(L4, 5+pos[3],550-5*temps[3]+150-5);
-  text(L4,5+pos[5],550-5*temps[3]+150-5);
+  text(L1, 5+pos[0],550-5*temps[0]+150-5-shift);
+  text(L2, 5+pos[1],550-5*temps[1]+150-5-shift);
+  text(L3, -50+pos[2],550-5*temps[2]+150+25-shift);
+  text(L4, 5+pos[3],550-5*temps[3]+150-5-shift);
+  text(L4,5+pos[5],550-5*temps[3]+150-5-shift);
   
 }
 
+function labels(){
+    // Convection and conduction labels
+  //let k_a = .24, k_b = .13, k_c = .5;
+  push();
+  textStyle(ITALIC)
+  textSize(20);
+  text("k   = ", 120, 85);
+  text("W/[m K]", 130, 115);
+
+  text("k   = ", 280, 85);
+  text("W/[m K]", 290, 115);
+
+  text("k   = ", 440, 85);
+  text("W/[m K]", 450, 115);
+  textSize(15);
+  text('A',132,90);
+  text('B',292,90);
+  text('C',452,90)
+
+  textSize(25);
+  text("T  =     \xB0C", 625, 100);
+  text("h =      W/[m  K]", 595, 150);
+  
+  textSize(20);
+  textStyle(NORMAL);
+  text("∞",635,105);
+  text("2",730,138);
+  text('0.24',165,85);
+  text('0.13',325,85);
+  text('0.50',485,85);
+  textSize(25);
+  text('10',640,150);
+  text('20',675,100);
+  pop();
+}
+
+const heatGenRate = document.getElementById("heat-gen-rate");
+const heatGenRateValue = document.getElementById("heat-gen-rate-value");
+const contactResistance = document.getElementById("contact-resistance");
+const contactResistanceValue = document.getElementById("contact-resistance-value");
+const heatGenWall = document.getElementById("heatgen-wall");
 
 
-
-const range_1_element = document.getElementById("range-1");
-const range_1_value_label = document.getElementById("range-1-value");
-const range_2_element = document.getElementById("range-2");
-const range_2_value_label = document.getElementById("range-2-value");
-const range_3_element = document.getElementById("range-3");
-const range_3_value_label = document.getElementById("range-3-value");
-const select_element = document.getElementById("select-1");
-const select_label = document.getElementById("select-value");
-
-range_1_element.addEventListener("input", function () {
-  const rng_1_value = Number(range_1_element.value); // range_1_element.value is a string by default, so we need to convert it to a number.
-  range_1_value_label.innerHTML = `${rng_1_value}`; // Edit the text of the global var range_1_value
-  g.Q = rng_1_value; // Assign the number to the global object.
-  //console.log(`g.Q is ${g.Q}`); // console.log is the easiest way to see a variable value in the javascript prompt.
+heatGenRate.addEventListener("input", function () {
+  const heatGen = Number(heatGenRate.value); // heatGenRate.value is a string by default, so we need to convert it to a number.
+  g.Q = heatGen; // Assign the number to the global object.
+  heatGenRateValue.innerHTML = `${g.Q}`;
 });
 
-// range_2_element.addEventListener("input", function () {
-//   const rng_2_value = Number(range_2_element.value);
-//   range_2_value_label.innerHTML = `${rng_2_value}`;
-//   g.rng_2_value = rng_2_value;
-//   //console.log(`g.rng_2_value is ${g.rng_2_value}`);
-// });
-
-range_3_element.addEventListener("input", function () {
-  const rng_3_value = Number(range_3_element.value);
-  range_3_value_label.innerHTML = `${rng_3_value}`;
-  g.Rtc = rng_3_value;
-  //console.log(`g.Rtc is ${g.Rtc}`);
+contactResistance.addEventListener("input", function () {
+  const Rtc = Number(contactResistance.value);
+  contactResistanceValue.innerHTML = `${Rtc}`;
+  g.Rtc = Rtc;
 });
 
-select_element.addEventListener("change", function () {
-  const select_value = select_element.value;
-  select_label.innerHTML = `Selection value is: <span style="color:orange" >${select_value}</span>.`
+heatGenWall.addEventListener("change", function () {
+  const select_value = heatGenWall.value;
   g.uniformGen = select_value;
   //4-6, 8-12
-  const mode = select_element.value;
+  const mode = heatGenWall.value;
   if(mode === "A") {
-    range_1_element.setAttribute("min", "4");
-    range_1_element.setAttribute("max", "6");
-    range_1_element.value = "4";
-    // TODO
-    // change global variables of heat generation rate accordingly
-    // change innerHTML of the label
-
-    // range_1_element.getAttribute("min"); // "4"
+    heatGenRate.setAttribute("min", "4");
+    heatGenRate.setAttribute("max", "6");
+    heatGenRate.value = "4";
+    g.Q = heatGenRate.value;
+    heatGenRateValue.innerHTML = `${g.Q}`;
   } else {
-    range_1_element.setAttribute("min", "8");
-    range_1_element.setAttribute("max", "12");
-    range_1_element.value = "8";
+    heatGenRate.setAttribute("min", "8");
+    heatGenRate.setAttribute("max", "12");
+    heatGenRate.value = "8";
+    g.Q = heatGenRate.value; // Assigning new value to global heat transfer rate
+    heatGenRateValue.innerHTML = `${g.Q}`; // Rewriting innner HTML label
   }
-  //console.log(`g.uniformGen is ${select_value}`);
 })
