@@ -31,6 +31,7 @@
   grid-template-columns: max-content max-content;
   justify-content: center;
   gap: 20px 50px;
+  margin-top: 20px;
 }
 
 .input-row {
@@ -66,4 +67,29 @@ select {
 canvas {
   border: 1px solid black;
   box-shadow: 0px 0px 2px 2px grey;
+}
+
+#modal-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.modal-body .modal-text {
+  max-width: 70ch;
+  text-align: justify;
+}
+
+.modal-body .modal-equation {
+  width: max-content;
+  margin-left: 15px;
+  padding: 2px;
+}
+
+.modal-text+.modal-text {
+  margin-top: 10px;
+}
+
+.modal-equation.no-padding {
+  padding: 0px;
 }
