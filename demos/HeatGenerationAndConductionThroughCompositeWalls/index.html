@@ -102,7 +102,7 @@
         </div>
         <div class="modal-body">
           <p>
-
+            In this application, the temperature profile through a composite wall is displayed. You can adjust the heat generation rate and contact resistance using the sliders. Additionally, the wall generating heat can be switched to either wall A or B using the dropdown menu. The temperature profile is calculated by representing the wall as a thermal circuit. To learn more about how the temperatures are calculated click the “Details” button.
           </p>
         </div>
       </div>
@@ -123,15 +123,67 @@
 
         <div class="modal-body">
           <div class="modal-text">
-            The equation for drag force is:
-          </div>
-          
-          <div class="modal-equation">
-            $$
-            F_D = \frac{C_D \rho_{air} V^2 A}{2}
-            $$
-          </div>
-
+            The heat flux \(q’’ \) from the wall with uniform generation is directed to the right and is represented by:
+            </div>
+            
+            <div class="modal-equation">
+              $$
+              q’’ = QL_i
+              $$
+            </div>
+            
+            <div class="modal-text">
+            Where \(q’’ \) is in \(W/m^2 \), \(Q \) is the volumetric heat generation rate in \( W/m^3 \), and \(L_i \) is the thickness of the wall with uniform generation (either A or B) in \(m \).
+            </div>
+            
+            <div class="modal-text">
+            A thermal circuit is modeled from the right side of the wall with generation to the air with forced convection. If wall A is generating heat, then the heat flux can be written as:
+            </div>
+            
+            <div class="modal-equation">
+              $$
+              q’’ = \frac{T_{s,1}\ – \ T_∞}{1/h} = \frac{T_{s,2} \ – \ T_{s,3}}{L_C/k_C} = \frac{T_{s,3} \ – \ T_{s,2}}{R_{tc}^”} = \frac{T_{s,4} \ – \ T_{s,3}}{L_B/k_B} = \frac{T_{s,5} \ – \ T_{s,4}}{R_{tc}^”}
+              $$
+            </div> 
+            
+            <div class="modal-text">
+            Where \(R_{tc}^” \) is the contact resistance (\(m^2K/W \)), \(T_{s,1} \) is the right surface of wall \(C \) and \(T_{s,5} \) right side of wall \(A \) (°C). However, if wall \(B \) is the wall with generation, then the thermal circuit can only be used to solve up to \(T_{s,3} \), the right side of wall \(B \).
+            </div>
+            
+            <div class="modal-text">
+            The temperature profile for heat generation in either wall \(A \) or \(B \) is calculating using: 
+            </div>
+            
+            <div class="modal-equation">
+              $$
+              \frac{d^2T}{dx^2} = -\frac{Q}{k_i}
+              $$
+            </div>
+            
+            <div class="modal-text">
+            Where \(k_i \) is the thermal conductivity of the wall with generation.
+            </div>
+            
+            <div class="modal-text">
+            The boundary conditions are:
+            </div>
+            
+            <div class="modal-equation no-padding">
+              $$
+              \frac{dT}{dx} = 0
+              $$
+            </div>
+            
+            <div class="modal-equation no-padding">
+              $$
+              T(L_i) = T_{s, \ right \ side \ of \ wall}
+              $$
+            </div>
+            
+            <div class ="modal-text">
+            The left side \((L_i = 0 \)) is well insulated so the flux is zero. The temperature of the right side of the wall with generation is determined from the thermal circuit.
+            </div>
+            
           <div style="height: 30px;"></div>
         </div>
       </div>

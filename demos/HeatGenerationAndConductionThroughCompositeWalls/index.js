@@ -32,7 +32,7 @@ function draw() {
   if (g.uniformGen == "A"){
     shift = 100;
   } else {
-    shift = 50;
+    shift = 75;
   }
 
   // Variables used for positioning wall segments
@@ -215,7 +215,7 @@ function tempDisplayA(temps,pos){
   if (g.uniformGen == "A"){
     shift = 100;
   } else {
-    shift = 50;
+    shift = 75;
   }
   let T1 = Math.round(temps[0]).toString(); let T2 = Math.round(temps[1]).toString(); let T3 = Math.round(temps[2]).toString();
   let T4 = Math.round(temps[3]).toString(); let T5 = Math.round(temps[4]).toString(); let T6 = Math.round(temps[5]).toString();
@@ -250,7 +250,7 @@ function extraBpoints(mm){
   if (g.uniformGen == "A"){
     shift = 100;
   } else {
-    shift = 50;
+    shift = 75;
   }
   let value_temp = 550 - 5*mm + 150 - shift;
   push();

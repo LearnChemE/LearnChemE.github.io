@@ -23,6 +23,16 @@
   <link href="./style.css" rel="stylesheet">
   <link href="./bootstrap.min.css" rel="stylesheet">
 
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.95,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <script src="./jquery.js"></script>
@@ -42,28 +52,28 @@
     <div class="inputs-wrapper">
       <!-- The attributes are self-explanatory. For more info on "ranges", just google "JavaScript input range" -->
       <div class="input-row">
-        <div class="input-label">temperature of left wall</div>
+        <div class="input-label">Temperature of left wall</div>
         <input type="range" id="temperature-slider" min="50" max="100" value="75" step="1" />
         <div id="temperature-value" class="value-label">75</div>
         <div class="units-label">° C</div>
       </div>
 
       <div class="input-row">
-        <div class="input-label">glass thickness</div>
+        <div class="input-label">Glass thickness</div>
         <input type="range" id="glass-thickness-slider" min="0" max="2.5" value="1" step="0.1" />
         <div id="glass-thickness-value" class="value-label">1.0</div>
         <div class="units-label">cm</div>
       </div>
 
       <div class="input-row">
-        <div class="input-label">concrete thickness</div>
+        <div class="input-label">Concrete thickness</div>
         <input type="range" id="concrete-thickness-slider" min="0" max="2.5" value="1" step="0.1" />
         <div id="concrete-thickness-value" class="value-label">1.0</div>
         <div class="units-label">cm</div>
       </div>
 
       <div class="input-row">
-        <div class="input-label">steel thickness</div>
+        <div class="input-label">Steel thickness</div>
         <input type="range" id="steel-thickness-slider" min="0" max="2.5" value="1" step="0.1" />
         <div id="steel-thickness-value" class="value-label">1.0</div>
         <div class="units-label">cm</div>
@@ -104,7 +114,7 @@
       </div>
       <div class="modal-body">
         <p>
-
+          In this simulation, heat flux is measured through a composite wall, with a length of 10 cm and a fixed temperature of 45°C at the right wall. You can adjust the left wall temperature, the thickness of the glass, concrete, and stainless steel walls using the sliders. The right wall material can be chosen with the dropdown menu. Press the Details button to examine the governing equations used in this simulation.
         </p>
       </div>
     </div>
@@ -125,14 +135,66 @@
 
       <div class="modal-body">
         <div class="modal-text">
-          The equation for drag force is:
+          The equation for heat flux is:
+          </div>
+          
+          <div class ="modal-equation">
+          $$
+          q’’ = \frac{T_0 \ – \ T_4}{R_{total}}
+          $$
+          </div>
+          
+          <div class="modal-text">
+          Where \(T_0 \) is the temperature at the left wall, \(T_4 \) is the temperature at the right wall (45°C), and \(R_{total} \) is the combined resistance of the four wall segments (\(cm^2 K/W\)). The equation for \(R_{total} \) is:
+          </div>
+          
+          <div class="modal-equation">
+          $$
+          R_{total} = \sum_{i=1}^4 \frac{x_i}{k_i}
+          $$
+          </div>
+          
+          <div class="modal-text">
+          Where \(x_i \) is the thickness of each wall segment (cm) and \(k_i \) is the thermal conductivity of the wall’s material (W/[cm K]). The thermal conductivities of the materials are: 
+          </div>
+          
+          <div class="modal-equation no-padding">
+          $$
+          k_{glass} = 0.0096 \ W/[cm \ K]
+          $$
+          </div>
+          
+          <div class="modal-equation no-padding">
+          $$
+          k_{concrete} = 0.014 \ W/[cm \ K]
+          $$
+          </div>
+          
+          <div class="modal-equation no-padding">
+          $$
+          k_{steel} = 0.163 \ W/[cm \ K]
+          $$
+          </div>
+          
+          <div class="modal-equation no-padding">
+          $$
+          k_{fiberglass} = 0.0004 \ W/[cm \ K]
+          $$
+          </div>
+          
+          <div class="modal-equation no-padding">
+          $$
+          k_{brick} = 0.014 \ W/[cm \ K]
+          $$
+          </div>
+          
+          <div class="modal-equation no-padding">
+          $$
+          k_{lead} = 0.35 \ W/[cm \ K]
+          $$
+          </div>
         </div>
         
-        <div class="modal-equation">
-          $$
-          F_D = \frac{C_D \rho_{air} V^2 A}{2}
-          $$
-        </div>
 
         <div style="height: 30px;"></div>
       </div>

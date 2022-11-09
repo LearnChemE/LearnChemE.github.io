@@ -144,6 +144,7 @@ function draw() {
       Q = U*Math.PI*g.di*g.HEX_length*LMTD/1000;
     break;
   }
+  //console.log(temperatures)
 
 
   // Heat transfer rate label
@@ -560,6 +561,9 @@ function counterMATH(U,cp_hot,cp_cold,step){
 function drawParallel(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,positions){
   let x, y; // Variables for positioning
   let deltay;
+  let xTemp = [];
+  let yTemp = [];
+  let counter = 0;
 
   // Correction for x-positions for changing graph scale at lengths < 14 m
   let factor = 1;
@@ -582,7 +586,10 @@ function drawParallel(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,
     y = T295 - (temps[i][value]-295)*deltay; // Defining y position based on difference from 295K
     strokeWeight(2);
     vertex(x,y);
-    
+
+    xTemp[counter] = x; // .push was giving me an error for some reason
+    yTemp[counter] = y;
+
     // Temperature labels
     push();
     stroke(0);
@@ -602,8 +609,30 @@ function drawParallel(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,
       textSize(15); text("c,2",x+17,y+20);
     }
     pop();
+    counter++;
   }
   endShape();
+  push();
+  if(value == 0){
+    stroke(255,0,0);
+    fill(255,0,0);
+  } else {
+    stroke(0,0,255);
+    fill(0,0,255);
+  }
+ 
+  for(let j = 0; j < xTemp.length; j++){
+    if(j%30 == 0 && j > 0 && j < xTemp.length-3){
+      ay = yTemp[j] - yTemp[j-3];
+      ax = xTemp[j] - xTemp[j-3];
+      amag = Math.pow(Math.pow(ay,2)+Math.pow(ax,2),1/2);
+      axunit = ax/amag;
+      ayunit = ay/amag;
+      triangle(xTemp[j],yTemp[j],xTemp[j-3],yTemp[j-3],xTemp[j-3]-8*ayunit,yTemp[j-3]+8*axunit)
+      triangle(xTemp[j],yTemp[j],xTemp[j-3],yTemp[j-3],xTemp[j-3]+8*ayunit,yTemp[j-3]-8*axunit)
+    }
+  }
+  pop();
 
   pop();
 }
@@ -611,6 +640,9 @@ function drawParallel(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,
 function drawCounter(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,positions){
   let x, y; // Variables for positioning
   let deltay;
+  let xTemp = [];
+  let yTemp = [];
+  let counter = 0;
 
   // Correction for x-positions for changing graph scale at lengths < 14 m
   let factor = 1;
@@ -633,6 +665,9 @@ function drawCounter(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,p
     y = T295 - (temps[i][value]-295)*deltay; // Defining y position based on difference from 295K
     strokeWeight(2);
     vertex(x,y);
+
+    xTemp[counter] = x; // .push was giving me an error for some reason
+    yTemp[counter] = y;
     
     // Temperature labels
     push();
@@ -652,7 +687,43 @@ function drawCounter(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,p
       textSize(15); text("c,1",x+17,y+20);
     } 
     pop();
+    counter++;
   }
   endShape();
+
+  push();
+  if(value == 0){
+    stroke(255,0,0);
+    fill(255,0,0);
+  } else {
+    stroke(0,0,255);
+    fill(0,0,255);
+  }
+  if(value == 0){
+    for(let j = 0; j < xTemp.length; j++){
+      if(j%30 == 0 && j > 0 && j < xTemp.length-3){
+        ay = yTemp[j] - yTemp[j-3];
+        ax = xTemp[j] - xTemp[j-3];
+        amag = Math.pow(Math.pow(ay,2)+Math.pow(ax,2),1/2);
+        axunit = ax/amag;
+        ayunit = ay/amag;
+        triangle(xTemp[j-3],yTemp[j-3],xTemp[j],yTemp[j],xTemp[j-3]-8*ayunit,yTemp[j-3]+8*axunit)
+        triangle(xTemp[j],yTemp[j],xTemp[j-3],yTemp[j-3],xTemp[j-3]+8*ayunit,yTemp[j-3]-8*axunit)
+      }
+    }
+  } else {
+    for(let j = 0; j < xTemp.length; j++){
+      if(j%30 == 0 && j > 0 && j < xTemp.length-3){
+        ay = yTemp[j] - yTemp[j-3];
+        ax = xTemp[j] - xTemp[j-3];
+        amag = Math.pow(Math.pow(ay,2)+Math.pow(ax,2),1/2);
+        axunit = ax/amag;
+        ayunit = ay/amag;
+        triangle(xTemp[j-3],yTemp[j-3],xTemp[j],yTemp[j],xTemp[j]-8*ayunit,yTemp[j]+8*axunit)
+        triangle(xTemp[j-3],yTemp[j-3],xTemp[j],yTemp[j],xTemp[j]+8*ayunit,yTemp[j]-8*axunit)
+      }
+    }
+  }
+  pop();
   pop();
 }
