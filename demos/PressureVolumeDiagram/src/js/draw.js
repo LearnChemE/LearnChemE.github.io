@@ -354,14 +354,14 @@ function drawCurveLabels(p) {
   if (gvs.show_constant_temperature ) {
     // temperatures: [60, 80, 100, 120, 160, 200, 260, 300, 400, 800, 1500]
     p.push();
-    textBox(p, "T = 60° C", 240, 400, gvs.graph.constant_temp_color, 15);
-    textBox(p, "80", 240, 358, gvs.graph.constant_temp_color, 15);
-    textBox(p, "100", 240, 334, gvs.graph.constant_temp_color, 15);
-    textBox(p, "120", 240, 305, gvs.graph.constant_temp_color, 15);
-    textBox(p, "160", 240, 260, gvs.graph.constant_temp_color, 15);
-    textBox(p, "200", 240, 224, gvs.graph.constant_temp_color, 15);
-    textBox(p, "260", 240, 181, gvs.graph.constant_temp_color, 15);
-    textBox(p, "300", 240, 155, gvs.graph.constant_temp_color, 15);
+    textBox(p, "T = 80° C", 240, 400, gvs.graph.constant_temp_color, 15);
+    textBox(p, "100", 240, 358, gvs.graph.constant_temp_color, 15);
+    textBox(p, "120", 240, 334, gvs.graph.constant_temp_color, 15);
+    textBox(p, "140", 240, 305, gvs.graph.constant_temp_color, 15);
+    textBox(p, "180", 240, 260, gvs.graph.constant_temp_color, 15);
+    textBox(p, "220", 240, 224, gvs.graph.constant_temp_color, 15);
+    textBox(p, "280", 240, 181, gvs.graph.constant_temp_color, 15);
+    textBox(p, "320", 240, 155, gvs.graph.constant_temp_color, 15);
     p.translate(240, 111);
     p.rotate(Math.PI / 2.45);
     textBox(p, "373.95", -38, 52, gvs.graph.constant_temp_color, 15);
@@ -397,7 +397,7 @@ function drawCurveLabels(p) {
     p.push();
     p.translate(276, 430);
     p.rotate(Math.PI / 4);
-    textBox(p, "q = 0.001", -10, 0, gvs.graph.constant_quality_color, 15);
+    textBox(p, "q = 0.001", -3, 0, gvs.graph.constant_quality_color, 15);
     p.pop();
 
     p.push();
