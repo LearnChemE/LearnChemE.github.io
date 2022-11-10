@@ -38,6 +38,16 @@
   <link href="./style.css" rel="stylesheet">
   <link href="./bootstrap.min.css" rel="stylesheet">
 
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.95,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <script src="./jquery.js"></script>
@@ -108,7 +118,13 @@
       </div>
       <div class="modal-body">
         <p>
-
+          This simulation shows laminar flow over an isothermal, flat plate where the plate temperature \( T_s \) is greater than the free stream fluid temperature \(T_∞ \). The hydrodynamic effects or thermal effects can be studied by switching the boundary type, either velocity or temperature, using the dropdown menu. Both boundary types are plotted against normalized position along the length of the plate, where \(x_{crit} \) is the critical location for transition from laminar to turbulent flow.
+        </p>
+        <p>
+          When the velocity boundary is selected, the boundary layer thickness \(\delta(x)\) is plotted on the upper plot. Additionally, the velocity profile inside the boundary layer (\(x \)-component of velocity \(u\) with height \(y\) above the plate) is plotted with respect to the selected \(x/x_{crit}\) value that can be adjusted with the slider. The slope of the velocity profile at the surface of the plate \(\partial u / \partial y |_{y=0} \), is plotted as a function of \(x/x_{crit}\) and is shown in the lower left plot. The nondimensional quantity local coefficient of friction \(C_{f,x}\) is plotted as a function of \(x/x_{crit}\) and is shown in the lower middle plot. The lower right plot shows the location convection coefficient as a function of position for a specific fluid and flow velocity.
+        </p>
+        <p>
+          When the temperature boundary is selected, the thermal boundary layer thickness \(\delta_t(x)\) is plotted on the upper plot over \(x/x_{crit}\). Additionally, the temperature profile inside the boundary layer (fluid temperature \(T\) with height \(y\) above the plate is plotted at the selected position \(x/x_{crit}\). The slope of the temperature profile at the surface of the plate \(\partial T/ \partial y|_{y=0}\), is plotted as a function of \(x/x_{crit}\) in the lower left plot. The nondimensional quantity local Nusselt number \(Nu_x\) is plotted as a function of \(x/x_{crit}\) in the lower middle plot. The local convection coefficient \(h_x \) as a function of \(x/x_{crit}\) is shown in the lower right plot. The average convection coefficient between the leading edge and the position of \(x/x_{crit}\), \(\bar{h}_{0-x}\), is related to the integral of \(h_x\) and is indicated. The Prandtl number can be selected with the dropdown menu to observe how it affects \(\delta_t\), \(\partial T/\partial y|_{y=0}\), \(Nu_x\), \(h_x\), and \(\bar{h}_{0-x}\). To learn more about the equations governing this simulation, press the "Details" button.
         </p>
       </div>
     </div>
@@ -129,15 +145,223 @@
 
       <div class="modal-body">
         <div class="modal-text">
-          The equation for drag force is:
+          $$
+          \textbf{Velocity}
+          $$
         </div>
-        
+        <div class="modal-text">
+          For two-dimensional laminar flow with negligible gravitational effects, the Navier-Stokes equations can be reduced to:
+        </div>
         <div class="modal-equation">
           $$
-          F_D = \frac{C_D \rho_{air} V^2 A}{2}
+          (1) \quad u\frac{\partial u}{\partial x} + v\frac{\partial u}{\partial y} = -\frac{1}{\rho}\frac{\partial p}{\partial x} + v(\frac{\partial^2u}{\partial x^2} \ + \ \frac{\partial^2u}{\partial y^2})
+          $$
+        </div>
+        <div class="modal-equation">
+          $$
+          (2) \quad u\frac{\partial v}{\partial x} + v\frac{\partial v}{\partial y} = -\frac{1}{\rho}\frac{\partial p}{\partial y} + v(\frac{\partial^2v}{\partial x^2} \ + \ \frac{\partial^2v}{\partial y^2})
+          $$
+        </div>
+        <div class="modal-text">
+          The conservation of mass equation for incompressible flow is:
+        </div>
+        <div class="modal-equation">
+          $$
+          (3) \quad \frac{\partial u}{\partial x} \ + \ \frac{\partial v}{\partial y} \ = \ 0
+          $$
+        </div>
+        <div class="modal-text">
+          With a thin boundary layer, the velocity component normal to the plate is much smaller than the component parallel to the plate. Additionally, the rate of change for a parameter across the boundary layer should much greater than any in the flow's direction, meaning:
+        </div>
+        <div class="modal-equation">
+          $$
+          v \lt \lt u \quad \text{and} \quad \frac{\partial}{\partial x} \lt \lt \frac{\partial}{\partial y}
+          $$
+        </div>
+        <div class="modal-text">
+          These assumptions enable Eqs. 1, 2, and 3, to be simplified to:
+        </div>
+        <div class="modal-equation">
+          $$
+          (4) \quad \frac{\partial u}{\partial x} \ + \ \frac{\partial v}{\partial y} \ = \ 0
+          $$
+        </div>
+        <div class="modal-equation">
+          $$
+          (5) \quad u\frac{\partial u}{\partial x} \ + \ v\frac{\partial u}{\partial y} = v\frac{\partial^2 u}{\partial y^2}
+          $$
+        </div>
+        <div class="modal-text">
+          With boundary conditions:
+        </div>
+        <div class="modal-equation no-padding">
+          $$
+          u  =  v  = 0 \ \ \text{at} \ \ y \ = \ 0
+          $$
+        </div>
+        <div class="modal-equation no-padding">
+          $$
+          u \rightarrow U \ \ \text{as} \ \ y \rightarrow ∞
+          $$
+        </div>
+        <div class="modal-text">
+          As the solutions to nonlinear partial differential equations such as Eqs. 4 and 5, are difficult to obtain, the Prandtl/Blasius solution is applied. By using a dimensionless form and assuming the velocity profile should be similar regardless of location along the plate, the dimensionless velocity profile can be represented by:
+        </div>
+        <div class="modal-equation">
+          $$
+          \frac{u}{U} \ = \ g(\frac{y}{\delta})
+          $$
+        </div>
+        <div class="modal-text">
+          Where \(g(y/\delta)\) is an unknown function. By applying an order of magnitude analysis on the forces acting on a fluid in the boundary layer:
+        </div>
+        <div class="modal-equation">
+          $$
+          \delta \propto (\frac{vx}{U})^{1/2}
+          $$
+        </div>
+        <div class="modal-text">
+          Now, a dimensionless \(\textit{similarity variable}\) \(\eta = (U/vx)^{1/2}y\) and stream function \(\Psi = (v\ x \ U)^{1/2}f(\eta)\), where \(f = f(\eta)\) is an unknown function, can be applied. For two-dimensional flow, velocity components in terms of the stream function are \(u = \partial \Psi / \partial y\) and \(v = -\partial \Psi/ \partial x\). Thus:
+        </div>
+        <div class="modal-equation">
+          $$
+          (6) \quad u = Uf'(\eta)
+          $$
+        </div>
+        <div class="modal-equation">
+          $$
+          (7) \quad v = (\frac{vU}{4x})^{1/2}(\eta f'-f)
+          $$
+        </div>
+        <div class="modal-text">
+          Then Eqs. 6 and 7 can be substituted into Eqs. 4 and 5 and manipulated into the form:
+        </div>
+        <div class="modal-equation">
+          $$
+          (8) \quad 2f''' + ff'' = 0
+          $$
+        </div>
+        <div class="modal-text">
+          With boundary conditions:
+        </div>
+        <div class="modal-equation">
+          $$
+          (9) \quad f = f' = 0 \ \text{at} \ \eta = 0 \ \ and f' \rightarrow 1 \ \text{as} \ \eta \rightarrow ∞
+          $$
+        </div>
+        <div class="modal-text">
+          And so the nonlinear partial differential equation and associated boundary conditions have been reduced to a third order ordinary differential equation. From this solution it is found that \(u/U \approx 0.99\) when \(\eta = 5\). Thus the velocity boundary layer is:
+        </div>
+        <div class="modal-equation">
+          $$
+          (10) \quad \delta = 5\sqrt{\frac{vx}{U}}
+          $$
+        </div>
+        <div class="modal-text">
+          With a solution found to the ordinary differential equation and the similarity variable \(\eta\) and the stream function \(\Psi\), as well as the boundary conditions in Eq. 9. The quantity \(\partial u/\partial y|_{y=0}\) can be evaluated according to: 
+        </div>
+        <div class="modal-equation">
+          $$
+          (11) \quad \frac{\partial u}{\partial y}|_{y=0} = U\sqrt{\frac{U}{vx}}\frac{d^2f}{d\eta^2}|_{\eta = 0}
+          $$
+        </div>
+        <div class="modal-text">
+          Eq. 11 can then be related to the shear stress at the plate surface through:
+        </div>
+        <div class="modal-equation">
+          $$
+          (12) \quad \tau_{s,x} = \mu \frac{\partial u}{\partial y}|_{y=0} = \mu U \sqrt{\frac{U}{vx}} \frac{d^2f}{d\eta^2}|_{\eta = 0}
+          $$
+        </div>
+        <div class="modal-text">
+          The local coefficient of friction is then:
+        </div>
+        <div class="modal-equation">
+          $$
+          (13) \quad C_{f,x} = \frac{\tau_{s,x}}{\rho U^2/2}
+          $$
+        </div>
+        <div style="height: 20px;"></div>
+        <div class="modal-text">
+          $$
+          \textbf{Thermal}
+          $$
+        </div>
+        <div class="modal-text">
+          The thermal boundary solution also utilizes the Prandtl/Blasius similarity solution with Eqs. 4 and 5. An additional conservation equation is needed, energy:
+        </div>
+        <div class="modal-equation">
+          $$
+          (14) \quad u\frac{\partial T}{\partial x} + v\frac{\partial T}{\partial y} = \alpha \frac{\partial^2T}{\partial y^2}
+          $$
+        </div>
+        <div class="modal-text">
+          Where \(\alpha\) is the thermal diffusivity, related to the Prandtl number through: 
+        </div>
+        <div class="modal-equation">
+          $$
+          (15) \quad Pr = \frac{\nu}{\alpha}
+          $$
+        </div>
+        <div class="modal-text">
+          Then dimensionless temperature \(T^* = (T \ - \ T_s)/(T_∞ \ - \ T_s)\) is used with an assumed similarity solution in the form \(T^* \ = \ T^*(\eta)\). Appropriate substitutions and reductions are made with Eq. 14 to yield:
+        </div>
+        <div class="modal-equation">
+          $$
+          (16) \quad \frac{d^2T^*}{d\eta^2} + \frac{Pr}{2}f\frac{dT^*}{d\eta} = 0
+          $$
+        </div>
+        <div class="modal-text">
+          Where \(f\) is the solution to the velocity boundary similarity solution. Eq. 16 is subject to the boundary conditions:
+        </div>
+        <div class="modal-equation">
+          $$
+          (17) \quad T^*(0) = 0 \quad \text{and} \quad T^*(∞) = 1
+          $$
+        </div>
+        <div class="modal-text">
+          With these boundary conditions, Eq. 16 can be solved for a ratio of velocity to thermal boundary layer thickness, for Pr \(\geq 0.6\):
+        </div>
+        <div class="modal-equation">
+          $$
+          (18) \quad \frac{\delta}{\delta_t} \approx Pr^{1/3} 
           $$
         </div>
 
+        <div class="modal-text">
+          Again for Pr \(\geq 0.6\), the temperature gradient \(dT^*/d\eta|_{\eta=0} \) can be correlated with:
+        </div>
+        <div class="modal-equation">
+          $$
+          \frac{dT^*}{d\eta}|_{\eta = 0}= 0.332\ Pr^{1/3}
+          $$
+        </div>
+        <div class="modal-text">
+          The local convection coefficient can be evaluted through:
+        </div>
+        <div class="modal-equation">
+          $$
+          (19) \quad h_x = -\frac{T_∞ \ - \ T_s}{T_s \ - \ T_∞}k\frac{\partial T^*}{\partial y}|_{y=0} = k(\frac{U}{vx})^{1/2}\frac{dT^*}{d\eta}|_{\eta=0}
+          $$
+        </div>
+        <div class="modal-text">
+          The local Nusselt number can be evaluated through:
+        </div>
+        <div class="modal-equation">
+          $$
+          (20) \quad Nu_x = \frac{h_xx}{k} = 0.332 \ Re_x^{1/2} Pr^{1/3} \qquad Pr \geq 0.6
+          $$
+        </div>
+        <div class="modal-text">
+          References:
+        </div>
+        <ol class="references">
+          <li>
+            Bergman, T. L., & Incropera, F. P. <i>Fundamentals of Heat and Mass Transfer </i>,7th ed., Hoboken, NJ :John Wiley & Sons, Inc., 2011.
+          </li>
+          <li>
+            Munson, Bruce Roy, 1940-. <i>Fundamentals of Fluid Mechanics</i>,7th ed., Hoboken, NJ :John Wiley & Sons, Inc., 2013.
+          </li>
         <div style="height: 30px;"></div>
       </div>
     </div>

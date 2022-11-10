@@ -23,6 +23,16 @@
   <link href="./style.css" rel="stylesheet">
   <link href="./bootstrap.min.css" rel="stylesheet">
 
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.95,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <script src="./jquery.js"></script>
@@ -103,7 +113,7 @@
         </div>
         <div class="modal-body">
           <p>
-  
+            In this simulation, the heat transfer rate and temperatures are measured in a concentric tube heat exchanger with water as the cold fluid. The hot fluid and flow type can be selected from the drop down menus. The heat exchanger length and the mass flow rates can be adjusted using the sliders. To learn more about the equations governing this simulation, click the “Details” button. 
           </p>
         </div>
       </div>
@@ -124,15 +134,79 @@
   
         <div class="modal-body">
           <div class="modal-text">
-            The equation for drag force is:
+            The temperatures of the hot stream \(T_h \) and the cold stream \(T_c \) of the heat exchanger are calculated from these differential equations:
           </div>
-          
           <div class="modal-equation">
             $$
-            F_D = \frac{C_D \rho_{air} V^2 A}{2}
+            C_h\frac{dT_h}{dz} = -U\pi d_i(T_h \ - \ T_c)
             $$
           </div>
-  
+          <div class="modal-text">
+            for parallel flow:
+          </div>
+          <div class="modal-equation">
+            $$
+            C_c\frac{dT_c}{dz} = U\pi d_i(T_h \ - \ T_c)
+            $$
+          </div>
+          <div class="modal-text">
+            for counterflow:
+          </div>
+          <div class="modal-equation">
+            $$
+            C_c\frac{dT_c}{dz} = -U\pi d_i(T_h \ - \ T_c)
+            $$
+          </div>
+
+          <div class="modal-text">
+            Where \(C_j = \dot{m}_jCp_j \), with \(\dot{m}_j \) is the mass flow rate \((kg/s)\), \(Cp_j \) is heat capacity \((J/[kg K] )\). \(z \) is the length down the heat exchanger \((m)\), \(U \) is the overall heat transfer coefficient (\(W/[m^2 K]\)) and \(d_i\) is the inner diameter \((m)\).
+          </div>
+          <div class="modal-text">
+            The overall heat transfer coefficient is calculated using the heat transfer coefficients of the cold \(\eta_c\) and hot \(\eta_h\) streams:
+          </div>
+          <div class="modal-equation">
+            $$
+            U = (\frac{1}{\eta_c} \ + \ \frac{1}{\eta_h})^{-1}
+            $$
+          </div>
+          <div class="modal-text">
+            The heat transfer coefficients are calculated from Nusselt correlations. The Reynolds number is:
+          </div>
+          <div class="modal-equation">
+            $$
+            Re_j = \frac{\dot{m}_j}{\mu_j \  \pi/4 \ d_j}
+            $$
+          </div>
+          <div class="modal-text">
+            Where \(\mu_j\) is the dynamic viscosity \(([Ns]/m^2)\), \(d_j\) is the diameter \((m)\) where \(j\) is \(c\) or \(h\) for the cold or hot streams. The diameter of the tube that the cold fluid flows through is \(d_c \ = \ d_i\), and the hydraulic diameter of the annulus that the hot fluid flows through is \(d_h \ = \ d_o \ - \ d_i\), where \(d_o\) is the outer diameter.
+          </div>
+          <div class="modal-text">
+            For turbulent flow \((Re_j \ \gt \ 10000)\), the Dittus-Boelter correlation for the Nusselt number is used:
+          </div>
+          <div class="modal-equation">
+            $$
+            Nu_j \ = \ 0.023Re_j^{4/5}Pr_j^n
+            $$
+          </div>
+          <div class="modal-text">
+            Otherwise, \(Nu_j = 4.36\) is used for laminar flow,
+          </div>
+          <div style="height: 10px;"></div>
+          <div class="modal-text">
+            Where \(Pr_j^n = \frac{Cp_j \ \mu_j}{k_j}\) is the Prandtl number, \(k_j\) is the thermal conductivity \((W/[m \ K])\), \(n = 0.4\) for heating and \(n = 0.3\) for cooling.
+          </div>
+          <div style="height: 10px;"></div>
+          <div class="modal-text">
+            The heat transfer coefficients for each stream are calculated from \(Nu_j = \frac{\eta_j \ d_j}{k_j}\)
+          </div>
+          <div class="modal-text">
+            References:
+          </div>
+          <ol class="references">
+            <li>
+              T. L. Bergman, A. S. Lavine, F. P. Incropera and D. P. DeWitt, <i>Introduction to Heat Transfer</i>, 6th ed., Hoboken: John Wiley and Sons, 2011.
+            </li>
+          </ol>
           <div style="height: 30px;"></div>
         </div>
       </div>
