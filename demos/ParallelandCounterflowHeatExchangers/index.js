@@ -153,7 +153,7 @@ function draw() {
   let Q_temp = Q.toFixed(1);
   let Q_label = Q_temp.toString();
   let title = "Heat transfer rate = ";
-  let units = "kW";
+  let units = " kW";
   let temp1 = title.concat(Q_label);
   let HT_display = temp1.concat(units);
   text(HT_display,250,40);
@@ -516,9 +516,10 @@ function counterMATH(U,cp_hot,cp_cold,step){
   }
 
   let returnVar; // Cant access TEMPS variable outside of the while loop so this is the variable being returned
-
+  let counter = 0;
+  let shift = 4;
   // While loop to solve until last temperature is approximately 300K
-  while (Math.abs(difference) > 2){
+  while (Math.abs(difference) > .1){
     let TEMPS = []; // Used to clear out old stored data
     y1 = g.T_hot1;
     sub = [y1, y2start];
@@ -545,16 +546,22 @@ function counterMATH(U,cp_hot,cp_cold,step){
       y1 = y1next;
       y2 = y2next;
     }
-
+    counter++;
+    if(counter%5 == 0){
+      shift = shift/2;
+    }
     // evaluating difference
     difference = y2 - 300;
     if(difference < 0){
-      y2start = y2start + .5;
+      y2start = y2start + shift;
     } else {
-      y2start = y2start - .5;
+      y2start = y2start - shift;
     }
     returnVar = TEMPS;
   }
+  // Use these to see how many iterations and the difference 
+  // console.log(`Counter got to: ${counter}`)
+  // console.log(`Final difference: ${difference}`)
   return(returnVar);
 }
 
@@ -594,19 +601,19 @@ function drawParallel(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,
     push();
     stroke(0);
     fill(0);
-    strokeWeight(1);
+    strokeWeight(.4);
     if(i == 0 && value == 0){
-      textSize(20); text("T",x+5,y-5);
-      textSize(15); text("h,1",x+17,y); // I'm unsure how to get subscripts in JS, kind of a weak solution
+      textSize(22); text("T",x+5,y-5);
+      textSize(17); text("h,1",x+17,y); // I'm unsure how to get subscripts in JS, kind of a weak solution
     } else if(i+1 == temps.length && value == 0){
-      textSize(20); text("T",x+5,y-5);
-      textSize(15); text("h,2",x+17,y);
+      textSize(22); text("T",x+5,y-5);
+      textSize(17); text("h,2",x+17,y);
     } else if(i == 0 && value == 1){
-      textSize(20); text("T",x+15,y+10);
-      textSize(15); text("c,1",x+27,y+15);
+      textSize(22); text("T",x+15,y+10);
+      textSize(17); text("c,1",x+27,y+15);
     } else if(i+1 == temps.length && value == 1){
-      textSize(20); text("T",x+5,y+15);
-      textSize(15); text("c,2",x+17,y+20);
+      textSize(22); text("T",x+5,y+15);
+      textSize(17); text("c,2",x+17,y+20);
     }
     pop();
     counter++;
@@ -661,8 +668,13 @@ function drawCounter(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,p
   noFill();
   beginShape();
   for(let i=0; i<temps.length;i++){
-    x = zeroPos + positions[i]*spacePerM*factor; // Defining x position based on zero position then increased based on current position times distance between each meter mark 
-    y = T295 - (temps[i][value]-295)*deltay; // Defining y position based on difference from 295K
+    if(i == temps.length-1 && value == 1){
+      x = zeroPos + positions[i]*spacePerM*factor;
+      y = T295 - (300-295)*deltay;
+    } else{
+      x = zeroPos + positions[i]*spacePerM*factor; // Defining x position based on zero position then increased based on current position times distance between each meter mark 
+      y = T295 - (temps[i][value]-295)*deltay; // Defining y position based on difference from 295K
+    }
     strokeWeight(2);
     vertex(x,y);
 
@@ -671,20 +683,20 @@ function drawCounter(temps,value,T295,spacePerTemp,Tempscale,zeroPos,spacePerM,p
     
     // Temperature labels
     push();
-    stroke(0); strokeWeight(1);
+    stroke(0); strokeWeight(.4);
     fill(0);
     if(i == 0 && value == 0){
-      textSize(20); text("T",x+5,y-5);
-      textSize(15); text("h,1",x+17,y); 
+      textSize(22); text("T",x+5,y-5);
+      textSize(17); text("h,1",x+17,y); 
     } else if(i+1 == temps.length && value == 0){
-      textSize(20); text("T",x+5,y-5);
-      textSize(15); text("h,2",x+17,y);
+      textSize(22); text("T",x+5,y-5);
+      textSize(17); text("h,2",x+17,y);
     } else if(i == 0 && value == 1){
-      textSize(20); text("T",x,y-15);
-      textSize(15); text("c,2",x+10,y-10);
+      textSize(22); text("T",x,y-15);
+      textSize(17); text("c,2",x+10,y-10);
     } else if(i+1 == temps.length && value == 1){
-      textSize(20); text("T",x+5,y+15);
-      textSize(15); text("c,1",x+17,y+20);
+      textSize(22); text("T",x+5,y+15);
+      textSize(17); text("c,1",x+17,y+20);
     } 
     pop();
     counter++;
