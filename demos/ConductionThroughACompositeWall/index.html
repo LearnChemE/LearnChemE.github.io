@@ -55,7 +55,7 @@
         <div class="input-label">Temperature of left wall</div>
         <input type="range" id="temperature-slider" min="50" max="100" value="75" step="1" />
         <div id="temperature-value" class="value-label">75</div>
-        <div class="units-label">° C</div>
+        <div class="units-label">°C</div>
       </div>
 
       <div class="input-row">
@@ -73,7 +73,7 @@
       </div>
 
       <div class="input-row">
-        <div class="input-label">Steel thickness</div>
+        <div class="input-label">Stainless steel thickness</div>
         <input type="range" id="steel-thickness-slider" min="0" max="2.5" value="1" step="0.1" />
         <div id="steel-thickness-value" class="value-label">1.0</div>
         <div class="units-label">cm</div>
@@ -114,7 +114,7 @@
       </div>
       <div class="modal-body">
         <p>
-          In this simulation, heat flux is measured through a composite wall, with a length of 10 cm and a fixed temperature of 45°C at the right wall. You can adjust the left wall temperature, the thickness of the glass, concrete, and stainless steel walls using the sliders. The right wall material can be chosen with the dropdown menu. Press the Details button to examine the governing equations used in this simulation.
+          This simulation calculates the temperature profiles and the heat flux for steady-state conduction through a composite wall that consists of four walls in series. The total wall thickness is 10 cm. Change the temperature of the left side of the compoosite wall with a slider; the temperature of the right side of the composite wall is fixed at 45°C. Change the thickness of the glass, concrete, and stainless steel walls using sliders. Use the dropdown menu to select the material (fiberglass, brick, or lead) of the right wall. The heat flux is the same through each wall.
         </p>
       </div>
     </div>
@@ -140,12 +140,12 @@
           
           <div class ="modal-equation">
           $$
-          q’’ = \frac{T_0 \ – \ T_4}{R_{total}}
+          q = \frac{T_0 \ – \ T_4}{R_{total}}
           $$
           </div>
           
           <div class="modal-text">
-          Where \(T_0 \) is the temperature at the left wall, \(T_4 \) is the temperature at the right wall (45°C), and \(R_{total} \) is the combined resistance of the four wall segments (\(cm^2 K/W\)). The equation for \(R_{total} \) is:
+          Where \(T_0 \) is the temperature of the left side of the left wall and \(T_4 \) is the temperature (45°C) on the right side of the right wall. The equation for \(R_{total} \) is:
           </div>
           
           <div class="modal-equation">
@@ -155,9 +155,17 @@
           </div>
           
           <div class="modal-text">
-          Where \(x_i \) is the thickness of each wall segment (cm) and \(k_i \) is the thermal conductivity of the wall’s material (W/[cm K]). The thermal conductivities of the materials are: 
+          Where \(x_i \) is the thickness of each wall segment (cm) and \(k_i \) is the thermal conductivity of the wall’s material (W/[cm K]). The wall temperatures can be calculated from left to right according to:
           </div>
-          
+          <div class="modal-equation">
+            $$
+            T_i = T_{i-1}  - qR_i \ = \ T_{i-1} - q\frac{x_i}{k_i}
+            $$
+          </div>
+          <div class="modal-text">
+            Where \(R_i\) is the thermal resistance and \(T_i\) is the temperature. The thermal conductivities of the materials are: 
+          </div>
+      
           <div class="modal-equation no-padding">
           $$
           k_{glass} = 0.0096 \ W/[cm \ K]

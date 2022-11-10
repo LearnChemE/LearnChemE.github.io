@@ -114,7 +114,7 @@ function draw() {
     push(); fill(0);
     translate(x[1] + .6 * (x[2] - x[1]) + 5, y[0] - .2 * (y[0] - y[1])); // Position for the text
     rotate(angletemp);
-    text("Glass", 0, 0);
+    text("glass", 0, 0);
     pop();
   }
 
@@ -130,7 +130,7 @@ function draw() {
     push(); fill(0);
     translate(x[2] + .6 * (x[4] - x[2]) + 5, y[3] - .2 * (y[3] - y[2]));
     rotate(angletemp);
-    text("Concrete", 0, 0);
+    text("concrete", 0, 0);
     pop();
   }
 
@@ -145,7 +145,7 @@ function draw() {
     push(); fill(0);
     translate(x[4] + .6 * (x[6] - x[4]) + 5, y[5] - .2 * (y[5] - y[4]));
     rotate(angletemp);
-    text("S. Steel", 0, 0);
+    text("s. steel", 0, 0);
     pop();
   }
 
@@ -223,7 +223,7 @@ function draw() {
   // GRAPH LABELS
   // X-axis label
   fill(0);
-  text("Wall Thickness (cm)", 350, 575);
+  text("Wall thickness (cm)", 350, 575);
 
   // Y-axis label
   push();
