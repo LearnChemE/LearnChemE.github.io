@@ -278,9 +278,9 @@ function tempDisplayB(temps,pos){
 
   textSize(20);
   text(L1, 5+pos[0],550-5*temps[0]+150-5-shift);
-  text(L2, 5+pos[1],550-5*temps[1]+150-5-shift);
-  text(L3, -50+pos[2],550-5*temps[2]+150+25-shift);
-  text(L4, 5+pos[3],550-5*temps[3]+150-5-shift);
+  text(L2, 5+pos[1],550-5*temps[1]+150-30-shift);
+  text(L3, -50+pos[2],550-5*temps[2]+150-shift);
+  text(L4, 5+pos[3],550-5*temps[3]+150-30-shift);
   text(L4,5+pos[5],550-5*temps[3]+150-5-shift);
   
 }

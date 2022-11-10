@@ -52,7 +52,7 @@
     <div class="inputs-wrapper">
       <!-- The attributes are self-explanatory. For more info on "ranges", just google "JavaScript input range" -->
       <div class="input-row">
-        <div class="input-label">Heat Generation Rate </div>
+        <div class="input-label">Heat generation rate </div>
         <input type="range" id="heat-gen-rate" min="4" max="6" value="4" step=".1" />
         <div id="heat-gen-rate-value" class="value-label">4</div>
         <div class="units-label">kW/m<sup>3</sup></div>
@@ -61,15 +61,15 @@
      
 
       <div class="input-row">
-        <div class="input-label">Contact Resistance</div>
+        <div class="input-label">Contact resistance</div>
         <input type="range" id="contact-resistance" min="0" max="0.08" value="0" step=".01" />
         <div id="contact-resistance-value" class="value-label">0</div>
-        <div class="units-label">m<sup>2</sup>K/W</div>
+        <div class="units-label">[m<sup>2</sup> K]/W</div>
       </div>
 
       <!-- This is a drop-down menu. "#select-1" is also referenced in index.js. -->
       <div class="select-row">
-        <div class="heatgen-wall">Wall with Uniform Generation</div>
+        <div class="heatgen-wall">Wall with uniform generation</div>
         <select id="heatgen-wall">
           <option value="A">A</option>
           <option value="B">B</option>
@@ -102,7 +102,7 @@
         </div>
         <div class="modal-body">
           <p>
-            In this application, the temperature profile through a composite wall is displayed. You can adjust the heat generation rate and contact resistance using the sliders. Additionally, the wall generating heat can be switched to either wall A or B using the dropdown menu. The temperature profile is calculated by representing the wall as a thermal circuit. To learn more about how the temperatures are calculated click the “Details” button.
+           Temperature profiles are calculated through three walls in series with a contact resistance (selected with a slider) between each pair of walls. Heat is generated at a constant rate in either wall A or B (selected with the dropdown menu), and a slider selects the rate of heat generations. The left side of wall A is insulated, and heat is transferred from the right side of wall C to flowing air, which is at 20°C. The distance between walls is exaggerated in the figure so the temperature profile is more easily seen.
           </p>
         </div>
       </div>
@@ -123,35 +123,35 @@
 
         <div class="modal-body">
           <div class="modal-text">
-            The heat flux \(q’’ \) from the wall with uniform generation is directed to the right and is represented by:
+            The heat flux \(q \) from the wall with uniform generation is to the right and is:
             </div>
             
             <div class="modal-equation">
               $$
-              q’’ = QL_i
+              q = QL_i
               $$
             </div>
             
             <div class="modal-text">
-            Where \(q’’ \) is in \(W/m^2 \), \(Q \) is the volumetric heat generation rate in \( W/m^3 \), and \(L_i \) is the thickness of the wall with uniform generation (either A or B) in \(m \).
+            where \(q \) is in \(W/m^2 \), \(Q \) is the volumetric heat generation rate in \( W/m^3 \), and \(L_i \) is the thickness of the wall with uniform generation (either A or B) in \(m \).
             </div>
             
             <div class="modal-text">
-            A thermal circuit is modeled from the right side of the wall with generation to the air with forced convection. If wall A is generating heat, then the heat flux can be written as:
+            A thermal circuit is modeled from the right side of the wall with generation to the air with forced convection. If wall A generates heat, then the heat flux is:
             </div>
             
             <div class="modal-equation">
               $$
-              q’’ = \frac{T_{s,1}\ – \ T_∞}{1/h} = \frac{T_{s,2} \ – \ T_{s,3}}{L_C/k_C} = \frac{T_{s,3} \ – \ T_{s,2}}{R_{tc}^”} = \frac{T_{s,4} \ – \ T_{s,3}}{L_B/k_B} = \frac{T_{s,5} \ – \ T_{s,4}}{R_{tc}^”}
+              q = \frac{T_{s,1}\ – \ T_∞}{1/h} = \frac{T_{s,2} \ – \ T_{s,3}}{L_C/k_C} = \frac{T_{s,3} \ – \ T_{s,2}}{R_{tc}} = \frac{T_{s,4} \ – \ T_{s,3}}{L_B/k_B} = \frac{T_{s,5} \ – \ T_{s,4}}{R_{tc}}
               $$
             </div> 
             
             <div class="modal-text">
-            Where \(R_{tc}^” \) is the contact resistance (\(m^2K/W \)), \(T_{s,1} \) is the right surface of wall \(C \) and \(T_{s,5} \) right side of wall \(A \) (°C). However, if wall \(B \) is the wall with generation, then the thermal circuit can only be used to solve up to \(T_{s,3} \), the right side of wall \(B \).
+            where \(R_{tc} \) is the contact resistance (\([m^2 \ K]/W \)), \(T_{s,1} \) is the temperature on the right surface of wall C and \(T_{s,5} \) is the temperature on right side of wall A (°C). However, if wall B generates heat, then the thermal circuit can only be used to solve up to \(T_{s,3} \), the temperature on the right side of wall B.
             </div>
             
             <div class="modal-text">
-            The temperature profile for heat generation in either wall \(A \) or \(B \) is calculating using: 
+            The temperature profile for heat generation in either wall A  or B  is calculating using: 
             </div>
             
             <div class="modal-equation">
@@ -161,7 +161,7 @@
             </div>
             
             <div class="modal-text">
-            Where \(k_i \) is the thermal conductivity of the wall with generation.
+            where \(k_i \) is the thermal conductivity of the wall generating heat.
             </div>
             
             <div class="modal-text">
