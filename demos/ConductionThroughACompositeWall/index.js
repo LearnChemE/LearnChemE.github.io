@@ -242,8 +242,10 @@ function draw() {
     squaredpos = 514;
   } else if(heatflux >= 100 && heatflux <= 1000){
     squaredpos = 527;
-  } else if(heatflux >= 1000){
+  } else if(heatflux >= 1000 && heatflux < 10000){
     squaredpos = 540;
+  } else if(heatflux >= 10000){
+    squaredpos = 555;
   }
   
   text('2',squaredpos,90);
