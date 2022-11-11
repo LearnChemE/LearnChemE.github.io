@@ -84,7 +84,7 @@
         <div class="select-label">Flow type:</div>
         <select id="flow-type">
           <option value="parallel">parallel</option>
-          <option value="counterflow">counterflow</option>
+          <option value="countercurrent">countercurrent</option>
         </select>
       </div>
 
@@ -113,7 +113,7 @@
         </div>
         <div class="modal-body">
           <p>
-            In this simulation, the heat transfer rate and temperatures are measured in a concentric tube heat exchanger with water as the cold fluid, with a feed temperature of 300K. The hot fluid, with a feed temperature of 400K, and flow type can be selected from the drop down menus. The heat exchanger length and the mass flow rates can be adjusted using the sliders. To learn more about the equations governing this simulation, click the “Details” button. 
+            This simulation calculates the heat transfer rate and temperature profiles in a concentric tube heat exchanger that can be operated in either parallel or countercurrent flow (selected with Flow type dropdown menu). The cold fluid, liquid water fed at 300K, flows through the center of the tube, and the hot fluid, which is fed at 400K, flows through the annular region. The type of hot fluid (liquid water, air, or liquid sodium) is selected from the dropdown menu. Hot and cold fluid flow rates are selected with sliders. The heat exchanger length is changed using the slider.
           </p>
         </div>
       </div>
@@ -150,7 +150,7 @@
             $$
           </div>
           <div class="modal-text">
-            for counterflow:
+            for countercurrent flow:
           </div>
           <div class="modal-equation">
             $$
@@ -178,10 +178,10 @@
             $$
           </div>
           <div class="modal-text">
-            where \(\mu_j\) is the dynamic viscosity \(([Ns]/m^2)\), \(d_j\) is the diameter \((m)\) where \(j\) is \(c\) or \(h\) for the cold or hot streams. The diameter of the tube that the cold fluid flows through is \(d_c \ = \ d_i\), and the hydraulic diameter of the annulus that the hot fluid flows through is \(d_h \ = \ d_o \ - \ d_i\), where \(d_o\) is the outer diameter.
+            where \(\mu_j\) is the dynamic viscosity \(([N \ s]/m^2)\), \(d_j\) is the diameter \((m)\) where \(j\) is \(c\) or \(h\) for the cold or hot streams. The diameter of the tube that the cold fluid flows through is \(d_c \ = \ d_i\), and the hydraulic diameter of the annulus that the hot fluid flows through is \(d_h \ = \ d_o \ - \ d_i\), where \(d_o\) is the outer diameter.
           </div>
           <div class="modal-text">
-            For turbulent flow \((Re_j \ \gt \ 10000)\), the Dittus-Boelter correlation for the Nusselt number is used:
+            For turbulent flow \((Re_j \ \gt \ 10,000)\), the Dittus-Boelter correlation for the Nusselt number is used:
           </div>
           <div class="modal-equation">
             $$

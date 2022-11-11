@@ -129,7 +129,7 @@ function draw() {
       Q = U*Math.PI*g.di*g.HEX_length*LMTD/1000;
 
     break;
-    case 'counterflow':
+    case 'countercurrent':
       temperatures = counterMATH(U,cp_hot,cp_cold,step);
       
       for(let i = 0; i < temperatures.length; i++){
