@@ -66,6 +66,7 @@ const sketch = (p) => {
   p.draw = function() {
     p.background(255);
     p.ambientLight(100);
+    console.log(selectFluid)
     p.pointLight(250, 250, 250, 50, 50, 50);
     p.noStroke();
     switch(gvs.manometerChoice) {

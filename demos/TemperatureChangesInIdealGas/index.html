@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Temperature Changes in an Ideal Gas</title>
+
+  <script src="./libraries/p5.js"></script>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+  <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
+  <meta name="author" content="Alex Jimenez">
+  <meta name="application-name" content="LearnChemE simulation template">
+  <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
+
+  <link href="./sliders.css" rel="stylesheet">
+  <link href="./style.css" rel="stylesheet">
+  <link href="./bootstrap.min.css" rel="stylesheet">
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.95,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="./jquery.js"></script>
+  <script src="./popper.js"></script>
+  <script src="./bootstrap.min.js"></script>
+
+</head>
+
+
+<body>
+
+
+  <div id="simulation-wrapper">
+
+    <div id="simulation-title">Temperature Changes in an Ideal Gas</div>
+
+    <div class="inputs-wrapper">
+      <div class="input-row">
+        <div class="input-label" id="HEAT-label">Heat added (kJ/mol)</div>
+        <input type="range" id="HEAT" min="0" max="10" value="5" step="0.1" />
+        <div id="HEAT-VALUE" class="value-label">5</div>
+      </div>
+
+      <div class="btn-group btn-group-sm" id="heating-cooling">
+        <input type="radio" class="btn-check" name="btnradio" id="heat-gas" autocomplete="off" value = "heat-gas" checked>
+        <label class="btn btn-outline-primary" for="heat-gas">Heat gas</label>
+      
+        <input type="radio" class="btn-check" name="btnradio" id="cool-gas" autocomplete="off" value = "cool-gas">
+        <label class="btn btn-outline-primary" for="cool-gas">Cool gas</label>
+      </div>
+      <!--
+      <div class="btn-group btn-group-sm" id="controls">
+        <input type="radio" class="btn-check" name="btnradio" id="playy" autocomplete="off" value = "playy" checked>
+        <label class="btn btn-outline-primary" for="playy">Play</label>
+      
+        <input type="radio" class="btn-check" name="btnradio" id="pausee" autocomplete="off" value = "pausee">
+        <label class="btn btn-outline-primary" for="pausee">Pause</label>
+
+        <input type="radio" class="btn-check" name="btnradio" id="resett" autocomplete="off" value = "resett">
+        <label class="btn btn-outline-primary" for="resett">Reset</label>
+      
+      </div>
+      -->
+
+    
+    
+    </div>
+
+    <div id="graphics-wrapper">
+
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+
+</html>
