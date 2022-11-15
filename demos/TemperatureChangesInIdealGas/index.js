@@ -109,6 +109,8 @@ function fillProps(){
 const heat = document.getElementById("HEAT"); // Gets value for heat into system
 const heat_label = document.getElementById("HEAT-VALUE"); // Gets label for heat into the system
 const addORremoveHeat = document.getElementById("heating-cooling").children; // Radio button for heating/cooling gas
+const startPauseButton = document.getElementById("start-pause-button");
+const resetButton = document.getElementById("reset-button"); 
 
 // For 
 heat.addEventListener("input", function() {
