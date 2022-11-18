@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Right and Equilateral Triangle Ternary Phase Diagrams</title>
+
+  <!-- Before we run any other scripts, we have to import P5.js (a library for graphics) -->
+  <script src="./libraries/p5.js"></script>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+  <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
+  <meta name="author" content="Alex Jimenez">
+  <meta name="application-name" content="LearnChemE simulation template">
+  <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
+
+  <link href="./sliders.css" rel="stylesheet">
+  <link href="./style.css" rel="stylesheet">
+  <link href="./bootstrap.min.css" rel="stylesheet">
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.95,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="./jquery.js"></script>
+  <script src="./popper.js"></script>
+  <script src="./bootstrap.min.js"></script>
+
+</head>
+
+
+<body>
+
+
+  <div id="simulation-wrapper">
+
+    <div id="simulation-title">Right and Equilateral Triangle Ternary Phase Diagrams</div>
+
+    <div class="inputs-wrapper">
+      <div class="btn-group btn-group-sm" id="triangle-type">
+        <input type="radio" class="btn-check" name="btnradio" id="right-triangle" autocomplete="off" value = "right-triangle" checked>
+        <label class="btn btn-outline-primary" for="right-triangle" style="margin-right: 0px">Right</label>
+      
+        <input type="radio" class="btn-check" name="btnradio" id="equilateral-triangle" autocomplete="off" value = "equilateral-triangle">
+        <label class="btn btn-outline-primary" for="equilateral-triangle">Equilateral</label>
+      </div>
+      
+      <div class="select-container">
+        <form>
+           <label class="checkbox-inline">
+              <input type="checkbox" id="phase-envelope"> Phase envelope
+              <span class="checkmark"></span>
+            </label>
+           <label class="checkbox-inline">
+              <input type="checkbox" id="grid-lines" checked> Grid lines
+              <span class="checkmark"></span>
+           </label>
+           <label class="checkbox-inline">
+              <input type="checkbox" id="solute"> Solute
+           </label>
+           <label class="checkbox-inline">
+              <input type="checkbox" id="solvent"> Solvent
+           </label>
+           <label class="checkbox-inline">
+              <input type="checkbox" id="carrier"> Carrier
+           </label>
+        </form>
+     </div>
+          
+
+          
+
+    <div id="graphics-wrapper">
+
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+
+</html>
