@@ -34,7 +34,7 @@ function setup() {
     g.points.push(createVector(200,350));
   }
 
-  //frameRate(.5)
+  //frameRate(1)
   //noLoop();
  
 }
@@ -42,7 +42,7 @@ function setup() {
 function draw() {
   background(250);
   push(); fill(0);
-  //console.log(g.inPhaseEnvelope)
+  
  
  
   //temp.show();

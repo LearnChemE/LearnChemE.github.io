@@ -11,11 +11,19 @@ function rightTriangle() {
     if (g.gridTruth) {
         rightGrid();
     }
-    rightMassFracs();
-    rightRep();
-    if(g.phaseTruth){
-        rightPhaseDraw();
+    if(!g.phaseTruth){
+        rightMassFracs();
     }
+    
+    if(g.phaseTruth){
+        let tieInfo = [];
+        tieInfo = rightPhaseDraw();
+        if(g.inPhaseEnvelope){
+            rightPhaseRep(tieInfo);
+        }
+    }
+    rightRep();
+    
 }
 
 // Labels for right triangle
@@ -88,119 +96,118 @@ function rightGrid() {
 // Mass fraction lines for right triangle
 function rightRep() {
     let temp = g.points[0];
-    // Solute line
-    push();
-    stroke(0, 0, 255);
-    strokeWeight(2);
-    fill(0, 0, 255);
-    for (let i = temp.x; i > 105; i -= 10) {
-        line(i, temp.y, i - 5, temp.y);
-    }
-    if (temp.x - 100 > 5) {
-        triangle(102, temp.y, 125, temp.y + 5, 125, temp.y - 5);
-    }
-    pop();
-    let soluteVal = map(temp.y, 450, 50, 0, 1); // Defines mass fraction based on position
-    let sVal = soluteVal.toFixed(2);
-    g.soluteFrac = sVal; // Assigns to global variable for display in mass fractions box
-    push();
-    if (g.soluteTruth) { // Displaying on the triangle axis for when checkbox is checked
-        fill(255);
-        rect(45, temp.y - 20, 45, 30);
-        textSize(18);
+    if(!g.inPhaseEnvelope){
+        // Solute line
+        push();
         stroke(0, 0, 255);
+        strokeWeight(2);
         fill(0, 0, 255);
-        text(sVal, 50, temp.y);
+        for (let i = temp.x; i > 105; i -= 10) {
+            line(i, temp.y, i - 5, temp.y);
+        }
+        if (temp.x - 100 > 5) {
+            triangle(102, temp.y, 125, temp.y + 5, 125, temp.y - 5);
+        }
+        pop();
+        let soluteVal = map(temp.y, 450, 50, 0, 1); // Defines mass fraction based on position
+        let sVal = soluteVal.toFixed(2);
+        g.soluteFrac = sVal; // Assigns to global variable for display in mass fractions box
+        push();
+        if (g.soluteTruth) { // Displaying on the triangle axis for when checkbox is checked
+            fill(255);
+            rect(45, temp.y - 20, 45, 30);
+            textSize(18);
+            stroke(0, 0, 255);
+            fill(0, 0, 255);
+            text(sVal, 50, temp.y);
 
-    }
-    pop();
-    // Solvent line
-    push();
-    stroke(128, 0, 128);
-    strokeWeight(2);
-    fill(128, 0, 128);
-    for (let i = temp.y; i < 445; i += 10) {
-        line(temp.x, i, temp.x, i + 5);
-    }
-    if (450 - temp.y > 5) {
-        triangle(temp.x, 448, temp.x + 5, 425, temp.x - 5, 425);
-    }
-    pop();
-    push();
-    let solventVal = map(temp.x, 100, 500, 0, 1); // Defines mass fraction based on position
-    let soVal = solventVal.toFixed(2);
-    g.solventFrac = soVal; // Assigns to global variable
-    if (g.solventTruth) { // Displaying on the triangle axis for when checkbox is checked
-        fill(255);
-        rect(temp.x - 20, 460, 45, 30);
-        textSize(18);
+        }
+        pop();
+        // Solvent line
+        push();
         stroke(128, 0, 128);
+        strokeWeight(2);
         fill(128, 0, 128);
-        text(soVal, temp.x - 15, 480);
-    }
-    pop();
-
-    // Draws the carrier line
-    push();
-    stroke(255, 100, 0);
-    strokeWeight(2);
-    drawingContext.setLineDash([5, 5]);
-    let diff1, diff2;
-    diff1 = 450 - temp.y;
-    diff2 = temp.x - 100;
-    line(temp.x, temp.y, diff1 + temp.x, 450);
-    line(temp.x, temp.y, 100, temp.y - diff2);
-    if (g.carrierTruth && diff1 > 25 && g.solventTruth) { // These conditionals keep the display nice when both solvent and carrier boxes are checked
-        line(diff1 + temp.x, 450, diff1 + temp.x, 500);
-        push();
-        drawingContext.setLineDash([0, 0]);
-        stroke(0);
-        strokeWeight(1);
-        fill(255);
-        rect(diff1 + temp.x - 20, 500, 45, 30);
-        strokeWeight(.8);
-        textSize(18);
-        stroke(255, 100, 0);
-        fill(255, 100, 0);
-        text(g.carrierFrac, diff1 + temp.x - 15, 520);
+        for (let i = temp.y; i < 445; i += 10) {
+            line(temp.x, i, temp.x, i + 5);
+        }
+        if (450 - temp.y > 5) {
+            triangle(temp.x, 448, temp.x + 5, 425, temp.x - 5, 425);
+        }
         pop();
-    } else if (g.carrierTruth && diff1 < 25 && g.solventTruth) {
-        line(diff1 + temp.x, 450, diff1 + temp.x, 460);
-        line(diff1 + temp.x, 492, diff1 + temp.x, 500);
         push();
-        drawingContext.setLineDash([0, 0]);
-        stroke(0);
-        strokeWeight(1);
-        fill(255);
-        rect(diff1 + temp.x - 20, 500, 45, 30);
-        strokeWeight(.8);
-        textSize(18);
-        stroke(255, 100, 0);
-        fill(255, 100, 0);
-        text(g.carrierFrac, diff1 + temp.x - 15, 520);
+        let solventVal = map(temp.x, 100, 500, 0, 1); // Defines mass fraction based on position
+        let soVal = solventVal.toFixed(2);
+        g.solventFrac = soVal; // Assigns to global variable
+        if (g.solventTruth) { // Displaying on the triangle axis for when checkbox is checked
+            fill(255);
+            rect(temp.x - 20, 460, 45, 30);
+            textSize(18);
+            stroke(128, 0, 128);
+            fill(128, 0, 128);
+            text(soVal, temp.x - 15, 480);
+        }
         pop();
-    } else if (g.carrierTruth && !g.solventTruth) {
-        line(diff1 + temp.x, 450, diff1 + temp.x, 500);
+
+        // Draws the carrier line
         push();
-        drawingContext.setLineDash([0, 0]);
-        stroke(0);
-        strokeWeight(1);
-        fill(255);
-        rect(diff1 + temp.x - 20, 500, 45, 30);
-        strokeWeight(.8);
-        textSize(18);
         stroke(255, 100, 0);
-        fill(255, 100, 0);
-        text(g.carrierFrac, diff1 + temp.x - 15, 520);
+        strokeWeight(2);
+        drawingContext.setLineDash([5, 5]);
+        let diff1, diff2;
+        diff1 = 450 - temp.y;
+        diff2 = temp.x - 100;
+        line(temp.x, temp.y, diff1 + temp.x, 450);
+        line(temp.x, temp.y, 100, temp.y - diff2);
+        if (g.carrierTruth && diff1 > 25 && g.solventTruth) { // These conditionals keep the display nice when both solvent and carrier boxes are checked
+            line(diff1 + temp.x, 450, diff1 + temp.x, 500);
+            push();
+            drawingContext.setLineDash([0, 0]);
+            stroke(0);
+            strokeWeight(1);
+            fill(255);
+            rect(diff1 + temp.x - 20, 500, 45, 30);
+            strokeWeight(.8);
+            textSize(18);
+            stroke(255, 100, 0);
+            fill(255, 100, 0);
+            text(g.carrierFrac, diff1 + temp.x - 15, 520);
+            pop();
+        } else if (g.carrierTruth && diff1 < 25 && g.solventTruth) {
+            line(diff1 + temp.x, 450, diff1 + temp.x, 460);
+            line(diff1 + temp.x, 492, diff1 + temp.x, 500);
+            push();
+            drawingContext.setLineDash([0, 0]);
+            stroke(0);
+            strokeWeight(1);
+            fill(255);
+            rect(diff1 + temp.x - 20, 500, 45, 30);
+            strokeWeight(.8);
+            textSize(18);
+            stroke(255, 100, 0);
+            fill(255, 100, 0);
+            text(g.carrierFrac, diff1 + temp.x - 15, 520);
+            pop();
+        } else if (g.carrierTruth && !g.solventTruth) {
+            line(diff1 + temp.x, 450, diff1 + temp.x, 500);
+            push();
+            drawingContext.setLineDash([0, 0]);
+            stroke(0);
+            strokeWeight(1);
+            fill(255);
+            rect(diff1 + temp.x - 20, 500, 45, 30);
+            strokeWeight(.8);
+            textSize(18);
+            stroke(255, 100, 0);
+            fill(255, 100, 0);
+            text(g.carrierFrac, diff1 + temp.x - 15, 520);
+            pop();
+        }
         pop();
-    }
-    pop();
-
-    let temp1 = 1 - sVal - soVal;
-    let temp2 = temp1.toFixed(2);
-    g.carrierFrac = temp2;
-
-
+        let temp1 = 1 - sVal - soVal;
+        let temp2 = temp1.toFixed(2);
+        g.carrierFrac = temp2;
+    } 
 }
 
 // Mass fraction display for right triangle
@@ -259,7 +266,7 @@ function rightPhaseDraw(){
     }
     endShape();
     
-
+    let tieLineInfo = [];
     // Points from mathematica for tie lines
     let xLeft = [0.1014, 0.1036, 0.1072, 0.1127, 0.1218, 0.1391];
     let xRight = [0.8404, 0.7544, 0.6532, 0.5463, 0.4395, 0.3322];
@@ -284,15 +291,19 @@ function rightPhaseDraw(){
 
     // Drawing tie lines
     let x1, x2, y1, y2;
+    let slopes = [];
+    let positions = [];
     for(let i = 0; i < xLeft.length; i++){
         x1 = map(xLeft[i],0,1,100,500);
         x2 = map(xRight[i],0,1,100,500);
         y1 = map(yLeft[i],0,1,450,50);
         y2 = map(yRight[i],0,1,450,50);
         line(x1,y1,x2,y2);
+        positions.push([x1,y1,x2,y2]);
+        slopes.push((y2-y1)/(x2-x1))
     }
     pop();
-
+    tieLineInfo.push(positions,slopes);
 
     // Checking to see if dot is within the the phase envelope
     temp = g.points[0]; // Get coordinates of dot
@@ -328,13 +339,37 @@ function rightPhaseDraw(){
     // huge list of conditions to be met for the dot to be within the phase envelope curve
     if(temp.y >= ymin && temp.y <= 450 && temp.x > set1[0][0] && temp.y > set1[set1.length-1][1] && ((temp.x > set2[0][0]||temp.x < set2[set2.length-1][0])&&(temp.y > set2[0][1]||temp.y > set2[set2.length-1][1])) && temp.x < set3[set3.length-1][0] && temp.y > set3[0][1]){
         //console.log('in phase envelope')
-        //g.inPhaseEnvelope = true;
+        g.inPhaseEnvelope = true;
     } else{
         //console.log('not in phase envelope')
-        //g.inPhaseEnvelope = false;
+        g.inPhaseEnvelope = false;
     }
 
+    return(tieLineInfo);
 
+}
+
+function rightPhaseRep(tieInfo){
+    let temp = g.points[0];
+    let slopes = tieInfo[1];
+    let pos = tieInfo[0]; // 6 vectors that hold x1,y1,x2,y2 
+    
+    // console.log(pos);
+    // console.log(slopes);
+    let region;
+
+    slopes.splice(0,0,0);
+    pos.splice(0,0,[140,450,460,450]);
+
+    for(let i = 0; i < slopes.length-1; i++){
+       let b = temp.y - slopes[i]*temp.x;
+       let yTest = slopes[i]*pos[i][0] + b;
+       if(yTest >= pos[i+1][1] && yTest <= pos[i][1]){
+            region = i+1;  
+       }
+    }
+    console.log(`region: ${region}`)
+    
 }
 
 function interpolate(xcurrent, x1, x2, y1, y2){
