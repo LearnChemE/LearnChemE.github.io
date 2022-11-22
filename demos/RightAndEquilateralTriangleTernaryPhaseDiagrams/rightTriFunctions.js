@@ -49,6 +49,7 @@ function rightLabels() {
         text(labels[i], 70, 450 - 40 * (i + 1));
         if (i == labels.length - 1) {
             textSize(22);
+            noStroke();
             text('solute', 70, 40);
         }
     }
@@ -56,6 +57,7 @@ function rightLabels() {
     push();
     textSize(22);
     fill(255, 100, 0);
+    noStroke();
     text('carrier', 35, 470)
     pop();
     push();
@@ -117,7 +119,7 @@ function rightRep() {
             fill(255);
             rect(45, temp.y - 20, 45, 30);
             textSize(18);
-            stroke(0, 0, 255);
+            noStroke();
             fill(0, 0, 255);
             text(sVal, 50, temp.y);
 
@@ -143,7 +145,7 @@ function rightRep() {
             fill(255);
             rect(temp.x - 20, 460, 45, 30);
             textSize(18);
-            stroke(128, 0, 128);
+            noStroke();
             fill(128, 0, 128);
             text(soVal, temp.x - 15, 480);
         }
@@ -167,9 +169,8 @@ function rightRep() {
             strokeWeight(1);
             fill(255);
             rect(diff1 + temp.x - 20, 500, 45, 30);
-            strokeWeight(.8);
             textSize(18);
-            stroke(255, 100, 0);
+            noStroke();
             fill(255, 100, 0);
             text(g.carrierFrac, diff1 + temp.x - 15, 520);
             pop();
@@ -184,7 +185,7 @@ function rightRep() {
             rect(diff1 + temp.x - 20, 500, 45, 30);
             strokeWeight(.8);
             textSize(18);
-            stroke(255, 100, 0);
+            noStroke();
             fill(255, 100, 0);
             text(g.carrierFrac, diff1 + temp.x - 15, 520);
             pop();
@@ -198,7 +199,7 @@ function rightRep() {
             rect(diff1 + temp.x - 20, 500, 45, 30);
             strokeWeight(.8);
             textSize(18);
-            stroke(255, 100, 0);
+            noStroke();
             fill(255, 100, 0);
             text(g.carrierFrac, diff1 + temp.x - 15, 520);
             pop();
@@ -226,13 +227,11 @@ function rightMassFracs() {
     rect(350, 100, 150, 88);
     textSize(20);
     strokeWeight(.2);
-    stroke(0, 0, 255);
+    noStroke();
     fill(0, 0, 255);
     text('solute = ' + g.soluteFrac, 365, 125);
-    stroke(128, 0, 128);
     fill(128, 0, 128);
     text('solvent = ' + g.solventFrac, 363, 150);
-    stroke(255, 100, 0);
     fill(255, 100, 0);
     text('carrier = ' + g.carrierFrac, 365, 175);
     pop();
