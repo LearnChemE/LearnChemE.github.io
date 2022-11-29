@@ -289,20 +289,27 @@ function rightPhaseDraw(){
     }
 
     // Drawing tie lines
-    let x1, x2, y1, y2;
+    let x1, x2, y1, y2, b;
     let slopes = [];
     let positions = [];
+    let bvec = [];
     for(let i = 0; i < xLeft.length; i++){
         x1 = map(xLeft[i],0,1,100,500);
         x2 = map(xRight[i],0,1,100,500);
         y1 = map(yLeft[i],0,1,450,50);
         y2 = map(yRight[i],0,1,450,50);
         line(x1,y1,x2,y2);
+        b = y1 - ((y2-y1)/(x2-x1))*x1;
+        bvec.push(b)
         positions.push([x1,y1,x2,y2]);
         slopes.push((y2-y1)/(x2-x1))
+        // for(let i = 0; i < slopes.length; i++){
+        //     let b = pos[i][1]-slopes[i]*pos[i][0];
+        //     bvec.push(b)
+        // }
     }
     pop();
-    tieLineInfo.push(positions,slopes);
+    tieLineInfo.push(positions,slopes,bvec);
 
     // Checking to see if dot is within the the phase envelope
     temp = g.points[0]; // Get coordinates of dot
@@ -352,23 +359,29 @@ function rightPhaseRep(tieInfo){
     let temp = g.points[0];
     let slopes = tieInfo[1];
     let pos = tieInfo[0]; // 6 vectors that hold x1,y1,x2,y2 
-    
-    // console.log(pos);
-    // console.log(slopes);
-    let region;
+    let bvec = tieInfo[2];
 
     slopes.splice(0,0,0);
     pos.splice(0,0,[140,450,460,450]);
-
+    bvec.splice(0,0,450);
+    
+    let tempYvals = new Array(7);
+    for(let i = 0; i < slopes.length; i++){
+        tempYvals[i] = slopes[i]*temp.x + bvec[i];
+    }
+    //console.log(tempYvals)
+    let region = 0;
     for(let i = 0; i < slopes.length-1; i++){
-       let b = temp.y - slopes[i]*temp.x;
-       let yTest = slopes[i]*pos[i][0] + b;
-       if(yTest >= pos[i+1][1] && yTest <= pos[i][1]){
-            region = i+1;  
-       }
+        if(temp.y < tempYvals[i] && temp.y > tempYvals[i+1]){
+            region = i+1;
+        } else if(temp.y < tempYvals[slopes.length-1]){
+            region = 7;
+        } else if(temp.y == 450){
+            region = 1;
+        }
     }
     console.log(`region: ${region}`)
-    
+
 }
 
 function interpolate(xcurrent, x1, x2, y1, y2){

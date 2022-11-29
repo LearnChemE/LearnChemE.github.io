@@ -150,7 +150,7 @@ function mouseDragged(){
         } else if(mouseX > 100 && mouseX < 500 && mouseY >= 450){ // Under the triangle
           g.dragPoint.x = mouseX;
           g.dragPoint.y = 450;
-        } else if(mouseX-mouseY >= 50 && mouseX < 500 && mouseY > 50){ // Above the hypotenuse
+        } else if(mouseX-mouseY >= 50 && mouseX < 500 && mouseX > 100){ // Above the hypotenuse
           g.dragPoint.x = mouseX;
           g.dragPoint.y = mouseX-50;
         } 
