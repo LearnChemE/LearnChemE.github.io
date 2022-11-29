@@ -1,10 +1,10 @@
-﻿version,,1.4
-author, Neil Hendren
-copyright, 2022 University of Colorado Boulder
-license, "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the software), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
-date, 11/28/2022
+﻿version,1.4
+author,Neil Hendren
+copyright,2022 University of Colorado Boulder
+license,"Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the software), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+date,11/28/2022
 
-P (MPa),T (°C),Density Liquid (kg/m^3),Density Vapor (kg/m^3),Internal Energy Liquid (kJ/kg),Internal Energy Vapor (kJ/kg),Internal Energy of Vaporization (kJ/kg),Enthalpy Liquid (kJ/kg),Enthalpy Vapor (kJ/kg),Enthalpy of Vaporization (kJ/kg),Entropy Liquid [kJ/(kg K)],Entropy Vapor [kJ/(kg K)],Entropy of Vaporization [kJ/(kg K)],Specific Volume Liquid (m^3/kg),Specific Volume Vapor (m^3/kg)
+P (MPa),T (°C),Specific Volume Liquid (m^3/kg),Specific Volume Vapor (m^3/kg),Internal Energy Liquid (kJ/kg),Internal Energy Vapor (kJ/kg),Internal Energy of Vaporization (kJ/kg),Enthalpy Liquid (kJ/kg),Enthalpy Vapor (kJ/kg),Enthalpy of Vaporization (kJ/kg),Entropy Liquid [kJ/(kg K)],Entropy Vapor [kJ/(kg K)],Entropy of Vaporization [kJ/(kg K)]
 0.000611657,0.01,0.00100021,205.991,0,2374.9,2374.9,0,2500.9,2500.9,0,9.1555,9.1555
 0.0007,1.881,0.00100011,181.217,7.89,2377.4,2369.51,7.89,2504.3,2496.5,0.02878,9.1058,9.077
 0.0008,3.761,0.00100008,159.64,15.81,2380.1,2364.29,15.81,2507.8,2492,0.05748,9.0567,8.9992
