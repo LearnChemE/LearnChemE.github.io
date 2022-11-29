@@ -369,18 +369,25 @@ function rightPhaseRep(tieInfo){
     for(let i = 0; i < slopes.length; i++){
         tempYvals[i] = slopes[i]*temp.x + bvec[i];
     }
-    //console.log(tempYvals)
+    
     let region = 0;
+    let delY, delc, mx;
     for(let i = 0; i < slopes.length-1; i++){
         if(temp.y < tempYvals[i] && temp.y > tempYvals[i+1]){
             region = i+1;
+            delY = tempYvals[i]-tempYvals[i+1];
+            delc = tempYvals[i]-temp.y;
+            mx = slopes[i]*(1-delc/delY) + slopes[i+1]*(delc/delY);
         } else if(temp.y < tempYvals[slopes.length-1]){
             region = 7;
+            let ratio = tempYvals[slopes.length-1]/temp.y;
+            mx = slopes[slopes.length-1]*ratio;
         } else if(temp.y == 450){
             region = 1;
+            mx = 0;
         }
     }
-    console.log(`region: ${region}`)
+    //console.log(`region: ${region}`)
 
 }
 
