@@ -249,6 +249,7 @@ for(let i = 0; i < rightPhaseinfo.length-1; i+=2){
 
 
 
+
 function rightPhaseDraw(){
 
     let rightPhasePositions = [];
@@ -366,27 +367,90 @@ function rightPhaseRep(tieInfo){
     bvec.splice(0,0,450);
     
     let tempYvals = new Array(7);
+    // These are the points in each line in line with the current x position of the dot
     for(let i = 0; i < slopes.length; i++){
         tempYvals[i] = slopes[i]*temp.x + bvec[i];
     }
+
+    // Plait point
+    let xP = 0.1956;
+    let index = findClosest2D(rightPhaseinfo,xP,0);
+    let yP = interpolate(xP,rightPhaseinfo[index][0],rightPhaseinfo[index+1][0],rightPhaseinfo[index][1],rightPhaseinfo[index+1][1]);
+    push();
+    strokeWeight(3);
+    stroke(50,205,50);
+    beginShape();
+    noFill();
+    let x, y;
+    for(let i = 0; i <= index; i++){
+        x = map(rightPhaseinfo[i][0],0,1,100,500);
+        y = map(rightPhaseinfo[i][1],0,1,450,50);
+        vertex(x,y);
+    }
+    endShape();
+    pop();
+    push();
+    strokeWeight(3);
+    stroke(255,0,255);
+    beginShape();
+    noFill();
+    for(let i = index; i < rightPhaseinfo.length; i++){
+        x = map(rightPhaseinfo[i][0],0,1,100,500);
+        y = map(rightPhaseinfo[i][1],0,1,450,50);
+        vertex(x,y);
+    }
+    endShape();
+    pop();
     
+    //console.log(rightPhaseinfo[index])
+    
+  
     let region = 0;
-    let delY, delc, mx;
+    let deltaY, deltaToCurrentPosition, mx, xL, xR, yL, yR, bx;
     for(let i = 0; i < slopes.length-1; i++){
+        // To solve for the tie line at a given point, lever rule is used vertically between current position and the lines above and below it
         if(temp.y < tempYvals[i] && temp.y > tempYvals[i+1]){
-            region = i+1;
-            delY = tempYvals[i]-tempYvals[i+1];
-            delc = tempYvals[i]-temp.y;
-            mx = slopes[i]*(1-delc/delY) + slopes[i+1]*(delc/delY);
+            //region = i+1;
+            deltaY = tempYvals[i]-tempYvals[i+1]; // Total distance between lines
+            deltaToCurrentPosition = tempYvals[i]-temp.y; // Distance from lower line to current position
+
+            mx = slopes[i]*(1-deltaToCurrentPosition/deltaY) + slopes[i+1]*(deltaToCurrentPosition/deltaY); // Calculating line slope based on current position as fraction of slopes bounding the dot
+            bx = temp.y - mx*temp.x; // Solving for y-intercept of line
+
+            // Calculating left and right x-positions to represent tie-line at a given position
+            xL = pos[i][0]*(1-deltaToCurrentPosition/deltaY) + pos[i+1][0]*(deltaToCurrentPosition/deltaY);
+            xR = pos[i][2]*(1-deltaToCurrentPosition/deltaY) + pos[i+1][2]*(deltaToCurrentPosition/deltaY);
+            yL = mx*xL + bx;
+            yR = mx*xR + bx;
+           
+            // Region 7 needs more work!
         } else if(temp.y < tempYvals[slopes.length-1]){
-            region = 7;
+            
             let ratio = tempYvals[slopes.length-1]/temp.y;
             mx = slopes[slopes.length-1]*ratio;
-        } else if(temp.y == 450){
-            region = 1;
-            mx = 0;
+            bx = temp.y - mx*temp.x;
+            xL = pos[i][0]*ratio;
+            xR = pos[i+1][0]/ratio;
+            yL = mx*xL + bx;
+            yR = mx*xR + bx;
+        } else if(temp.y == 450){ // Condition for the line being at the bottom of the triangle
+            xL = 140; yL = 450; xR = 460; yR = 450;
+
         }
     }
+
+    push();
+    strokeWeight(3);
+    drawingContext.setLineDash([10,10])
+    line(xL,yL,xR,yR);
+    pop();
+    push();
+    fill(255,0,255); noStroke();
+    ellipse(xR,yR,13);
+    fill(50,205,50);
+    ellipse(xL,yL,13);
+    pop();
+    
     //console.log(`region: ${region}`)
 
 }
