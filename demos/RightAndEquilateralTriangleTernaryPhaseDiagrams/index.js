@@ -2,7 +2,7 @@
 
 window.g = {
   cnv : undefined,
-  triangle : 'right-triangle',
+  triangle : 'equilateral-triangle',
   phaseTruth : false,
   gridTruth : true,
   soluteTruth : false,
@@ -46,22 +46,9 @@ function draw() {
     g.inPhaseEnvelope = null;
   }
   
- 
- 
-  //temp.show();
-  
-  // console.log(`phase: ${g.phaseTruth}`)
-  // console.log(`grid: ${g.gridTruth}`)
-  // console.log(`solute: ${g.soluteTruth}`)
-  // console.log(`solvent: ${g.solventTruth}`)
-  // console.log(`carrier: ${g.carrierTruth}`)
-
   switch (g.triangle){
     case 'right-triangle':
       rightTriangle();
-      // if(mouseX >= 100 && mouseY <= 450 && mouseX-mouseY <= 50){
-      //   ellipse(mouseX,mouseY,10,10)
-      // }
       break;
     case 'equilateral-triangle':
       equilateralTriangle();
@@ -73,16 +60,7 @@ function draw() {
   }
   //console.log(g.points[0].y);
   pop();
- 
 }
-
-function equilateralTriangle(){
-  push();
-  noFill(); strokeWeight(2);
-  ellipse(100,100,50,50);
-  pop();
-}
-
 
 // For determining equilateral or right triangle
 const triangleType = document.getElementById('triangle-type').children;
@@ -104,7 +82,6 @@ const gridLines = document.getElementById("grid-lines");
 const solute = document.getElementById("solute");
 const solvent = document.getElementById("solvent");
 const carrier = document.getElementById("carrier");
-
 
 phaseEnvelope.addEventListener("change",() => {
   g.phaseTruth = phaseEnvelope.checked;
@@ -160,6 +137,33 @@ function mouseDragged(){
       }
       break;
     case 'equilateral-triangle':
+      let angle = 60*Math.PI/180;
+      let ytip = 70; let xtip = 300;
+      let dx = 450*Math.cos(angle);
+      let dy = 450*Math.sin(angle);
+      let mL, mR, bL, bR;
+      mL = -dy/dx;
+      mR = dy/dx;
+      bL = (ytip+dy) - mL*(xtip-dx);
+      bR = (ytip+dy) - mR*(xtip+dx);
+
+      if(g.dragPoint){
+        if(mouseY - mL*mouseX >= bL && mouseY <= ytip+dy && mouseY - mR*mouseX >= bR){ // Within the triangle
+          g.dragPoint.x = mouseX;
+          g.dragPoint.y = mouseY;
+        } else if(mouseY - mL*mouseX <= bL && mouseX < xtip && mouseX > xtip-dx){ // To the left of triangle
+          g.dragPoint.x = mouseX;
+          g.dragPoint.y = mL*mouseX + bL;
+        } else if(mouseY > ytip+dy && mouseX > xtip-dx && mouseX < xtip+dx){ // Under the triangle
+          g.dragPoint.x = mouseX;
+          g.dragPoint.y = ytip+dy
+        } else if(mouseY - mR*mouseX <= bR && mouseX < xtip+dx){
+          g.dragPoint.x = mouseX;
+          g.dragPoint.y = mR*mouseX + bR;
+        }
+      }
+      
+    
 
       break;
   
