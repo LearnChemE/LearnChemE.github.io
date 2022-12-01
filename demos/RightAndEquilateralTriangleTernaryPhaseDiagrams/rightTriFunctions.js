@@ -1,4 +1,4 @@
-// Functions for the right triangle
+// Functions for the right triangle mode \\
 
 function rightTriangle() {
     push();
@@ -11,7 +11,7 @@ function rightTriangle() {
     if (g.gridTruth) {
         rightGrid();
     }
-    if(!g.phaseTruth){
+    if(!g.inPhaseEnvelope){
         rightMassFracs();
     }
     
@@ -214,6 +214,7 @@ function rightRep() {
 // Mass fraction display for right triangle
 function rightMassFracs() {
     // Slight correction to avoid displaying -0.00
+    
     if (g.carrierFrac == 0) {
         let temp = 0;
         let temp1 = temp.toFixed(2);
@@ -235,6 +236,7 @@ function rightMassFracs() {
     fill(255, 100, 0);
     text('carrier = ' + g.carrierFrac, 365, 175);
     pop();
+    
 }
 
 // Copied from Mathematica's source code
@@ -246,7 +248,6 @@ for(let i = 0; i < rightPhaseinfo.length-1; i+=2){
     y = rightPhaseinfo[i][1] + 1/2*(rightPhaseinfo[i+1][1]-rightPhaseinfo[i][1]);
     rightPhaseinfo.splice(i+1,0,[x,y]);
 }
-
 
 
 
@@ -288,6 +289,7 @@ function rightPhaseDraw(){
             } 
         }
     }
+    
 
     // Drawing tie lines
     let x1, x2, y1, y2, b;
@@ -353,6 +355,7 @@ function rightPhaseDraw(){
     }
 
     return(tieLineInfo);
+    
 
 }
 
@@ -402,7 +405,13 @@ function rightPhaseRep(tieInfo){
     endShape();
     pop();
     
-    //console.log(rightPhaseinfo[index])
+    let rightPhasePositions = [];
+    for(let i = 0; i < rightPhaseinfo.length; i++){
+        temp2 = rightPhaseinfo[i];
+        x = map(temp2[0],0,1,100,500);
+        y = map(temp2[1],0,1,450,50);
+        rightPhasePositions.push([x,y]); // Storing the x & y coords of the phase curve  
+    }
     
   
     let region = 0;
@@ -410,7 +419,7 @@ function rightPhaseRep(tieInfo){
     for(let i = 0; i < slopes.length-1; i++){
         // To solve for the tie line at a given point, lever rule is used vertically between current position and the lines above and below it
         if(temp.y < tempYvals[i] && temp.y > tempYvals[i+1]){
-            //region = i+1;
+            region = i+1;
             deltaY = tempYvals[i]-tempYvals[i+1]; // Total distance between lines
             deltaToCurrentPosition = tempYvals[i]-temp.y; // Distance from lower line to current position
 
@@ -423,22 +432,20 @@ function rightPhaseRep(tieInfo){
             yL = mx*xL + bx;
             yR = mx*xR + bx;
            
-            // Region 7 needs more work!
         } else if(temp.y < tempYvals[slopes.length-1]){
-            
             let ratio = tempYvals[slopes.length-1]/temp.y;
             mx = slopes[slopes.length-1]*ratio;
             bx = temp.y - mx*temp.x;
-            xL = pos[i][0]*ratio;
-            xR = pos[i+1][0]/ratio;
+            let t = rightRegionSevenCoordinates(mx,bx,rightPhasePositions,index);
+            xL = t[0]; xR = t[1];
             yL = mx*xL + bx;
             yR = mx*xR + bx;
         } else if(temp.y == 450){ // Condition for the line being at the bottom of the triangle
             xL = 140; yL = 450; xR = 460; yR = 450;
-
         }
     }
-
+    
+    rightInPhaseDisplay(xL,xR,yL,yR);
     push();
     strokeWeight(3);
     drawingContext.setLineDash([10,10])
@@ -451,7 +458,7 @@ function rightPhaseRep(tieInfo){
     ellipse(xL,yL,13);
     pop();
     
-    //console.log(`region: ${region}`)
+    
 
 }
 
@@ -519,4 +526,166 @@ function findClosestLEFT(arr,target,pos,start){
         temp = [index-1, index, index+1]
     }
     return(temp);
+}
+
+// This function is for finding the coordinates of left and right points when in region 7 of phase envelope (R7 is highest section)
+function rightRegionSevenCoordinates(mx,bx,phasePos,index){
+    
+    //let temp = g.points[0];
+    let xL, xR, m, b, x, y;
+    for(let i = 0; i < phasePos.length-1; i++){
+        m = (phasePos[i+1][1]-phasePos[i][1])/(phasePos[i+1][0]-phasePos[i][0]);
+        b = phasePos[i][1] - m*phasePos[i][0];
+        x = (bx-b)/(m-mx);
+        
+        if(x > phasePos[i][0] && x < phasePos[i+1][0] && i < index){
+            xL = x;
+        } else if(x == phasePos[i][0] && i < index){
+            xL = phasePos[i][0];
+        } 
+
+        if(x > phasePos[i][0] && x < phasePos[i+1][0] && i > index){
+            xR = x;
+        } else if (x == phasePos[i][0] && i > index){
+            xR = phasePos[i][0];
+        }
+    }
+    return([xL,xR])
+}
+
+function rightInPhaseDisplay(xL,xR,yL,yR){
+    let diff = new Array(4);
+    push();
+    // Orange carrier lines
+    stroke(255,100,0);
+    strokeWeight(2);
+    drawingContext.setLineDash([5,5]);
+    diff[0] = 450 - yL;
+    diff[1] = xL - 100;
+    line(xL,yL,xL+diff[0],450);
+    line(xL,yL,100,yL-diff[1]);
+    diff[2] = 450 - yR;
+    diff[3] = xR - 100;
+    line(xR,yR,xR+diff[2],450);
+    line(xR,yR,100,yR-diff[3]);
+    // Blue solute lines
+    stroke(0,0,255); fill(0,0,255);
+    line(xL,yL,105,yL);
+    line(xR,yR,105,yR);
+    push();
+    drawingContext.setLineDash([0,0]);
+    triangle(102,yL,125,yL+5,125,yL-5);
+    triangle(102,yR,125,yR+5,125,yR-5);
+    pop();
+
+    // Purple solvent lines
+    stroke(128,0,128); fill(128,0,128);
+    line(xL,yL,xL,445);
+    line(xR,yR,xR,445)
+    push();
+    drawingContext.setLineDash([0,0]);
+    triangle(xL,448,xL+5,425,xL-5,425);
+    triangle(xR,448,xR+5,425,xR-5,425);
+    pop();
+    pop();
+
+    // Labels for display when checkboxes are selected
+    // First determine mass fractions
+    let solu_raf, solv_raf, car_raf;
+    let solu_ext, solv_ext, car_ext;
+
+    solu_raf = (map(yL,450,50,0,1)).toFixed(2);
+    solv_raf = (map(xL,100,500,0,1)).toFixed(2);
+    car_raf = (1 - solu_raf - solv_raf).toFixed(2);
+    
+    solu_ext = (map(yR,450,50,0,1)).toFixed(2);
+    solv_ext = (map(xR,100,500,0,1)).toFixed(2);
+    car_ext = (1 - solu_ext - solv_ext).toFixed(2);
+    
+    if(g.soluteTruth){
+        push();
+        textSize(18);
+        fill(255);
+        stroke(50,205,50);
+        rect(45,yL-20,45,30);
+        push();
+        noStroke(); fill(0,0,255);
+        text(solu_raf,50,yL);
+        pop();
+        stroke(255,0,255);
+        rect(45,yR-20,45,30);
+        noStroke(); fill(0,0,255);
+        text(solu_ext,50,yR);
+        pop();
+    }
+
+    // Using these conditions to prevent overlap
+    if(g.carrierTruth){
+        push();
+        strokeWeight(2);
+        drawingContext.setLineDash([5,5]);
+        stroke(255,100,0);
+        line(diff[0]+xL,450,diff[0]+xL,500);
+        line(diff[2]+xR,450,diff[2]+xR,500);
+        pop();
+        push();
+        stroke(50,205,50); fill(255);
+        rect(diff[0]+xL-20,500,45,30);
+        noStroke(); textSize(18);
+        fill(255,100,0);
+        text(solv_ext,diff[0]+xL-15,520);
+        stroke(255,0,255); fill(255);
+        rect(diff[2]+xR-20,500,45,30);
+        noStroke(); 
+        fill(255,100,0);
+        text(solv_raf,diff[2]+xR-15,520);
+        pop();
+    }
+
+    if(g.solventTruth){
+        push();
+        fill(255); stroke(50,205,50);
+        rect(xL-20,460,45,30);
+        textSize(18); noStroke();
+        fill(128,0,128);
+        text(solv_raf,xL-15,480);
+        pop();
+        push();
+        fill(255); stroke(255,0,255);
+        rect(xR-20,460,45,30);
+        textSize(18); noStroke();
+        fill(128,0,128);
+        text(solv_ext,xR-15,480);
+        pop();
+    }
+
+   
+    
+    
+    
+    
+    // Mass fraction display
+    push();
+    textSize(22); noStroke();
+    text('mass fractions',330,50);
+    textSize(20)
+    fill(50,205,50);
+    text('raffinate phase',260,80);
+    fill(255,0,255);
+    text('extract phase',430,80);
+    fill(0,0,255);
+    text('solute = '+solu_raf,265,115);
+    text('solute = '+solu_ext,432,115);
+    fill(128,0,128);
+    text('solvent = '+solv_raf,263,140);
+    text('solvent = '+solv_ext,430,140);
+    fill(255,100,0);
+    text('carrier = '+car_raf,265,165);
+    text('carrier = '+car_ext,432,165);
+    noFill();
+    stroke(50,205,50);
+    rect(250,90,150,88);
+    stroke(255,0,255);
+    rect(417,90,150,88);
+    pop();
 }

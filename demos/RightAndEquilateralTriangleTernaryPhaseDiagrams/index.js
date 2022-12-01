@@ -42,6 +42,9 @@ function setup() {
 function draw() {
   background(250);
   push(); fill(0);
+  if(!g.phaseTruth){
+    g.inPhaseEnvelope = null;
+  }
   
  
  
