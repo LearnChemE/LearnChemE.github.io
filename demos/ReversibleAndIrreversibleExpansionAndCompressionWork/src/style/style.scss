@@ -1,0 +1,191 @@
+$modal-sm: calc( 100vw - 50px);
+$modal-md: calc( 100vw - 50px);
+$modal-lg: 800px;
+$modal-xl: 1140px;
+@import "bootstrap";
+@import "./slider.scss";
+.simulation-controls {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    justify-content: center;
+    gap: 0px 20px;
+    width: 100vw;
+}
+
+.input-area {
+    display: grid;
+    grid-template-columns: max-content;
+    margin: 20px auto;
+    gap: 10px;
+    width: max-content;
+    justify-items: center;
+
+    .button-bar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+
+        .selector {
+            text-align: center;
+            padding: 5px 9px 2px 9px;
+            background: rgb(240, 240, 255);
+            border: 1px solid grey;
+            cursor: pointer;
+
+            &:hover {
+                background: rgb(230, 230, 255);
+            }
+
+            &:first-child {
+                border-radius: 8px 0px 0px 8px;
+            }
+
+            &:last-child {
+                border-radius: 0px 8px 8px 0px;
+            }
+        }
+
+        .selector.selected {
+            background: rgb(200, 200, 255);
+        }
+    }
+
+    .choose-conditions-container {
+        display: grid;
+        grid-template-columns: max-content max-content;
+        gap: 5px;
+        align-items: center;
+
+        .choose-conditions-label {
+            text-align: end;
+        }
+
+        .conditions-selector {
+            padding: 3px;
+        }
+    }
+}
+
+
+.right-side-controls {
+    display: grid;
+    grid-template-rows: repeat(3, min-content);
+    gap: 5px;
+    padding-top: 10px;
+
+    .modal-buttons-row {
+        display: grid;
+        grid-template-columns: repeat(3, max-content);
+        height: 45px;
+        gap: 10px;
+        margin: 0.5rem auto;
+        justify-content: center;
+        align-content: center;
+        .btn {
+            height: max-content;
+            width: 12ch;
+        }
+    }
+
+    .input-row {
+        display: grid;
+        grid-template-columns: max-content 10rem 27px 50px;
+        gap: 1ch;
+        align-items: end;
+        .data-name {
+            justify-self: end;
+        }
+        .data-value {
+            text-align: end;
+        }
+    }
+
+    .play-reset-container {
+        display: grid;
+        grid-template-columns: repeat(3, max-content);
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        font-size: 20px;
+        padding-top: 5px;
+        padding-bottom: 20px;
+
+        .play-reset-label {
+            font-size: 16px;
+        }
+
+        #play, #reset {
+            padding: 0px 9px;
+            border-radius: 8px;
+            border: 2px solid black;
+        }
+
+        #play {
+            background-color: rgb(200, 255, 210);
+            &:hover {
+                background-color: rgb(220, 255, 230);
+            }
+            &.clicked {
+                background-color: rgb(180, 255, 190);
+            }
+        }
+
+        #reset {
+            background-color: rgb(255, 210, 210);
+            &:hover {
+                background-color: rgb(255, 230, 230);
+            }
+            &.clicked {
+                background-color: rgb(255, 190, 190);
+            }
+        }
+    }
+}
+
+#p5-container {
+    width: max-content;
+    margin: auto;
+}
+
+canvas {
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    box-shadow: 0px 0px 2px 2px lightgrey;
+}
+
+#loading {
+    margin-left: 15px;
+    font-size: 1.5rem;
+    width: 100vw;
+    text-align: center;
+}
+
+.modal.show {
+    padding-left: 0px !important;
+}
+
+.modal-body {
+    text-align: left;
+    font-size: 0.9rem;
+    .details-text {
+
+    }
+
+    .details-eqn {
+        margin-left: 20px;
+    }
+}
+
+.simulation-title {
+    width: 100vw;
+    text-align: center;
+    padding: 8px;
+    padding-bottom: 10px;
+    font-size: 1.25rem;
+    background-color: rgb(240, 240, 240);
+}
+
+*[disabled="yes"] {
+    opacity: 0.3 !important;
+    pointer-events: none;
+}
