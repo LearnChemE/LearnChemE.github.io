@@ -25,6 +25,7 @@
 
     gtag('config', 'UA-204988035-3');
   </script>
+  <script src="https://kit.fontawesome.com/e9f4c78fcc.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -32,19 +33,51 @@
   <div class="simulation-controls">
     <div class="input-area">
   
-      <div class="input-row">
-        <div class="data-name">Initial mole fraction in still</div>
-        <input type="range" id="z-slider" min="0.01" max="0.99" step="0.01" value="0.5">
-        <div class="data-value" id="z-value">0.50</div>
-        <div class="data-metric"></div>
+      <div class="button-bar">
+        <div id="select-compression" class="selected selector">compression</div>
+        <div id="select-expansion" class="selector">expansion</div>
+      </div>
+
+      <div class="choose-conditions-container">
+        <div class="choose-conditions-label">condition 1 (left side):</div>
+        <select id="condition-1" class="conditions-selector">
+          <option value="reversible-adiabatic">reversible adiabatic</option>
+          <option value="reversible-isothermal">reversible isothermal</option>
+          <option value="irreversible-adiabatic">irreversible adiabatic</option>
+          <option value="irreversible-isothermal">irreversible isothermal</option>
+        </select>
+        <div class="choose-conditions-label">condition 2 (right side):</div>
+        <select id="condition-2" class="conditions-selector">
+          <option value="reversible-adiabatic">reversible adiabatic</option>
+          <option value="reversible-isothermal">reversible isothermal</option>
+          <option value="irreversible-adiabatic">irreversible adiabatic</option>
+          <option value="irreversible-isothermal">irreversible isothermal</option>
+        </select>
       </div>
   
     </div>
 
-    <div class="modal-buttons-row">
-      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
-      <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
-      <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+    <div class="right-side-controls">
+
+      <div class="modal-buttons-row">
+        <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
+        <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
+        <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+      </div>
+
+      <div class="input-row">
+        <div class="data-name">final pressure</div>
+        <input type="range" id="p-final-slider" min="1.10" max="2.00" step="0.01" value="1.50">
+        <div class="data-value" id="p-final-value">1.50</div>
+        <div class="data-metric">MPa</div>
+      </div>
+
+      <div class="play-reset-container">
+        <div class="play-reset-label">start or reset simulation:</div>
+        <div id="play"><i class="fa-solid fa-play"></i></div>
+        <div id="reset"><i class="fa-solid fa-backward-fast"></i></div>
+      </div>
+
     </div>
 
   </div>
@@ -63,7 +96,7 @@
         </div>
         <div class="modal-body">
           <p>
-            Directions
+            This simulation shows animations and calculates work for reversible and irreversible expansions and compressions (adiabatic or isothermal) of an ideal diatomic gas in a piston-cylinder system. Select either compression or expansion using the buttons, and compare two processes side-by-side using drop-down menus. Change the final pressure with the slider; the pressure ranges are different for compression and expansion. The blue square blocks represent weights on the piston. Each block represents 0.10 MPa pressure; zero blocks represents 0.10 MPa pressure (atmospheric pressure).  For adiabatic processes, the final temperature is calculated. For all processes, the final volume is calculated. Press the play button to start compression or expansion. For reversible processes, more weights (blue squares) are added to the piston for compression or removed for expansion. For irreversible processes, the external pressure P<sub>ext</sub> is constant at the final value, so the number of weights is fixed, and initially stops (red triangles) prevent the piston from moving until the play button is pressed. Animations of reversible processes represent slow processes; irreversible processes are much faster and the piston overshoots the final volume, but these behaviors are not shown in the animations.
           </p>
 
         </div>
@@ -84,15 +117,79 @@
         </div>
 
         <div class="modal-body">
-          Details
 
-          <p>References:</p>
+          <div class="details-text">Expansion-compression work \( W \) for all four processes is calculated from</div>
 
-          <p class="references">
-            <ol>
-              
-            </ol>
-          </p>
+          <div class="details-eqn">
+            $$
+            [1] \qquad W = - \int P_{ext} \, dV
+            $$
+          </div>
+
+          <div class="details-text">where \( P_{ext} \) is the external pressure and \( W \) is in units of kJ/mol. The external pressure and the gas pressure are equal for a reversible process, whereas for an irreversible process the external pressure is the final pressure.<br><br><b>Initial state:</b></div>
+
+          <div class="details-eqn">
+            $$
+            [2] \qquad V_{1} = \frac{R T_{1}}{P_{1}}
+            $$    
+          </div>
+
+          <div class="details-text"></div>
+
+          <div class="details-eqn">
+            $$
+            [3] \qquad 
+            $$    
+          </div>
+
+          <div class="details-text"></div>
+
+          <div class="details-eqn">
+            $$
+            [4] \qquad 
+            $$    
+          </div>
+
+          <div class="details-text"></div>
+
+          <div class="details-eqn">
+            $$
+            [5] \qquad 
+            $$    
+          </div>
+
+          <div class="details-text"></div>
+
+          <div class="details-eqn">
+            $$
+            [6] \qquad 
+            $$    
+          </div>
+
+          <div class="details-text"></div>
+
+          <div class="details-eqn">
+            $$
+            [7] \qquad 
+            $$    
+          </div>
+
+          <div class="details-text"></div>
+
+          <div class="details-eqn">
+            $$
+            [8] \qquad 
+            $$    
+          </div>
+
+          <div class="details-text"></div>
+
+          <div class="details-eqn">
+            $$
+            [9] \qquad 
+            $$    
+          </div>
+
           <div style="margin-top: 2rem;"></div>
         </div>
 

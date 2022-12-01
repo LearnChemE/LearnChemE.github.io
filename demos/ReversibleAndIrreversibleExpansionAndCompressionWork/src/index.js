@@ -6,7 +6,8 @@ window.p5 = new require("./js/p5.min.js");
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
-
+    work_type : "compression",
+    P_final : 1.50,
 };
 
 const containerElement = document.getElementById("p5-container");
