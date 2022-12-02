@@ -84,6 +84,23 @@ function equilatLabels(L,R,dx,dy){
         }
     }
     pop();
+
+    // Axis labels
+    push();
+    textSize(22);
+    text('solvent mass fraction',205,520);
+    push();
+    translate(80,320);
+    rotate(radians(-60));
+    text('carrier mass fraction',0,0);
+    pop();
+    push();
+    translate(420,150);
+    rotate(radians(60));
+    text('solute mass fraction',0,0);
+    pop();
+
+    pop();
 } 
 
 // Grid lines for equilateral triangle
