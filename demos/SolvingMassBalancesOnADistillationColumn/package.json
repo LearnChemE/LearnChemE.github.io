@@ -1,7 +1,7 @@
 {
-  "name": "simulations-template",
+  "name": "solving-mass-balances-on-a-distillation-column",
   "version": "1.0.0",
-  "description": "An interactive simulation of ________ used for Chemical Engineering education",
+  "description": "An interactive quiz used to teach students how to perform mass balances",
   "main": "index.js",
   "scripts": {
     "start": "webpack serve --open --config ./_dev/webpack.config.js --mode=development",
@@ -10,7 +10,11 @@
   "keywords": [
     "chemical engineering",
     "simulation",
-    "interactive"
+    "interactive",
+    "mass balances",
+    "distillation",
+    "quiz",
+    "study"
   ],
   "author": "Neil Hendren",
   "license": "ISC",

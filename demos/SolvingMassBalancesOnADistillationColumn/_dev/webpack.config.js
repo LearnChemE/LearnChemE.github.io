@@ -19,17 +19,17 @@ const module_rules = [{
 ];
 
 const html_options = {
-  title: "Simulations template",
+  title: "Solving Mass Balances on a Distillation Column",
   filename: "index.html",
   template: path.resolve(__dirname, '../src/html/index.html'),
   scriptLoading: "blocking",
   hash: true,
   meta: {
     "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
-    "keywords": "LearnChemE, chemical engineering, engineering, simulation",
+    "keywords": "LearnChemE, chemical engineering, engineering, simulation, quiz, distillation",
     "author": "Neil Hendren",
-    "application-name": "Simulations template",
-    "description": "An interactive simulation designed to teach engineering students about ___________."
+    "application-name": "Solving Mass Balances on a Distillation Column",
+    "description": "An interactive simulation designed to teach engineering students about mass balances."
   },
 }
 
