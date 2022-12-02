@@ -1,4 +1,4 @@
-function drawAll() {
+function drawAll(p) {
 
 }
 

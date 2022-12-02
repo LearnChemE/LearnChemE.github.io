@@ -8,17 +8,9 @@
     "build": "webpack --config ./_dev/webpack.config.js --mode=production"
   },
   "keywords": [
-    "chemical",
-    "engineering",
-    "chemistry",
-    "thermodynamics",
+    "chemical engineering",
     "simulation",
-    "Vapor-liquid equilibrium",
-    "VLE",
-    "phase equilibrium",
-    "Txy diagram",
-    "Pxy diagram",
-    "Raoults law"
+    "interactive"
   ],
   "author": "Neil Hendren",
   "license": "ISC",
