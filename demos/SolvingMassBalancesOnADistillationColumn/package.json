@@ -1,0 +1,37 @@
+{
+  "name": "simulations-template",
+  "version": "1.0.0",
+  "description": "An interactive simulation of ________ used for Chemical Engineering education",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --open --config ./_dev/webpack.config.js --mode=development",
+    "build": "webpack --config ./_dev/webpack.config.js --mode=production"
+  },
+  "keywords": [
+    "chemical engineering",
+    "simulation",
+    "interactive"
+  ],
+  "author": "Neil Hendren",
+  "license": "ISC",
+  "dependencies": {
+    "@popperjs/core": "^2.11.6",
+    "bootstrap": "^5.2.3",
+    "clean-webpack-plugin": "^4.0.0",
+    "css-loader": "^6.7.2",
+    "html-loader": "^4.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.7.1",
+    "popper.js": "^1.16.1",
+    "postcss-loader": "^7.0.2",
+    "sass": "^1.56.1",
+    "sass-loader": "^13.2.0",
+    "style-loader": "^3.3.1",
+    "terser-webpack-plugin": "^5.3.6",
+    "to-string-loader": "^1.2.0",
+    "uglify-js": "^3.17.4",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.0",
+    "webpack-dev-server": "^4.11.1"
+  }
+}
