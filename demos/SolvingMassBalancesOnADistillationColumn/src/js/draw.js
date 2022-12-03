@@ -64,6 +64,31 @@ function question2(p) {
   p.textSize(18);
   p.text("feed 1", -200, -150);
   p.text("feed 2", -200, -10);
+
+  p.translate(0, -70);
+
+  p.text(`z     = ${gvs.Q2zF1.toFixed(2)}`, -220, -40);
+  p.text(`${gvs.Q2F1.toFixed(2)} kmol/h`, -220, -5);
+  p.textSize(12);
+  p.text("F,1", -209, -34);
+
+  p.textSize(18);
+  p.text(`z     = ${gvs.Q2zF2.toFixed(2)}`, -220, 100);
+  p.text(`${gvs.Q2F2.toFixed(2)} kmol/h`, -220, 135);
+  p.textSize(12);
+  p.text("F,2", -209, 106);
+
+  p.textSize(18);
+  p.text(`x   = ${gvs.Q2xD.toFixed(2)}`, 90, -115);
+  p.text(`${gvs.Q2D.toFixed(2)} kmol/h`, 90, -80);
+  p.textSize(12);
+  p.text("D", 101, -109);
+
+  p.textSize(18);
+  p.text(`x   = ${gvs.Q2xB.toFixed(2)}`, 90, 185);
+  p.text(`${gvs.Q2B.toFixed(2)} kmol/h`, 90, 220);
+  p.textSize(12);
+  p.text("B", 101, 191);
   p.pop();
 }
 
@@ -79,12 +104,66 @@ function question3(p) {
   p.noStroke();
   p.textSize(18);
   p.text("feed", -200, -10);
+
+  p.text(`z     = ${gvs.Q3zF1.toFixed(2)}`, -220, 30);
+  p.text(`z     = ${gvs.Q3zF2.toFixed(2)}`, -220, 65);
+  p.text(`${gvs.Q3F.toFixed(2)} kmol/h`, -220, 100);
+  p.textSize(12);
+  p.text("F,A", -209, 36);
+  p.text("F,B", -209, 71);
+
+  p.textSize(18);
+  p.text(`x     = ${gvs.Q3xD1.toFixed(2)}`, 90, -115);
+  p.text(`x     = ${gvs.Q3xD2.toFixed(2)}`, 90, -80);
+  p.text(`${gvs.Q3D.toFixed(2)} kmol/h`, 90, -45);
+  p.textSize(12);
+  p.text("D,A", 101, -109);
+  p.text("D,B", 101, -74);
+
+  p.textSize(18);
+  p.text(`x     = ${gvs.Q3xB1.toFixed(2)}`, 90, 185);
+  p.text(`x     = ${gvs.Q3xB2.toFixed(2)}`, 90, 220);
+  p.text(`${gvs.Q3B.toFixed(2)} kmol/h`, 90, 255);
+  p.textSize(12);
+  p.text("B,A", 101, 191);
+  p.text("B,B", 101, 226);
+
   p.pop();
 }
 
 function showScore(p) {
   p.push();
+  let correct_answers = 0;
+  for(let i = 0; i < 7; i++) {
+    const guess = Math.round(Number(gvs.guesses[i]) * 100) / 100;
+    const answer = gvs.answers[i];
+    if(Math.abs(guess - answer) <= 0.01) {
+      correct_answers++
+    }
+  }
+  p.pop();
 
+  for(let i = 0; i < 10; i++) {
+    for(let j = 0; j < 15; j++) {
+      p.push();
+      p.textSize(16);
+      p.noStroke();
+      p.fill(220);
+      p.translate((i / 10) * p.width, (j / 15) * p.height);
+      p.rotate(p.PI / 4);
+      p.text("LearnChemE", 0, 0);
+      p.pop();
+    }
+  }
+
+  p.push();
+  p.noStroke();
+  p.fill(0);
+  p.textSize(36);
+  p.textAlign(p.CENTER, p.CENTER);
+  p.translate(p.width / 2, p.height / 2);
+  p.text(`Name: ${gvs.name}`, 0, -50);
+  p.text(`Your score: ${correct_answers} / 7`, 0, 0);
   p.pop();
 }
 

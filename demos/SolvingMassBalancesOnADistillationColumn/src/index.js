@@ -7,6 +7,7 @@ window.gvs = {
     name : "",
     solution_shown : false,
     answers : [null, null, null, null, null, null, null],
+    guesses : [null, null, null, null, null, null, null],
     Q1zF : 0.5,
     Q1xD : 1,
     Q1xB : 0,
@@ -30,6 +31,13 @@ window.gvs = {
     Q3F : 1,
     Q3D : 1,
     Q3B : 0,
+    Q1_input1 : 1,
+    Q1_input2 : 1,
+    Q2_input1 : 1,
+    Q2_input2 : 1,
+    Q3_input1 : 1,
+    Q3_input2 : 1,
+    Q3_input3 : 1,
 };
 
 const containerElement = document.getElementById("p5-container");

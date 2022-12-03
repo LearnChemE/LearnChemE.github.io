@@ -27,6 +27,7 @@ startResetButton.addEventListener("click", () => {
     if(gvs.step === 0) {
       gvs.step = 1;
       generateAnswers();
+      randomizeInputs();
       startResetButton.innerHTML = `<i class="fa-solid fa-backward-fast"></i><div>reset quiz</div>`;
       inputName.classList.add("hidden");
       inputQ1A1.classList.remove("hidden");
@@ -42,7 +43,7 @@ startResetButton.addEventListener("click", () => {
         input.classList.add("hidden");
         input.value = "";
       });
-      gvs.answers = [null, null, null, null, null, null, null];
+      gvs.guesses = [null, null, null, null, null, null, null];
     }
   }
   gvs.p.redraw();
@@ -102,8 +103,8 @@ inputQ1A1.addEventListener("input", () => {
   const value2 = inputQ1A2.value;
   if(value1 !== "" && value2 !== "") {
     showSolutionNextButton.removeAttribute("disabled");
-    gvs.answers[0] = value1;
-    gvs.answers[1] = value2;
+    gvs.guesses[0] = value1;
+    gvs.guesses[1] = value2;
   } else {
     showSolutionNextButton.setAttribute("disabled", "yes");
   }
@@ -114,8 +115,8 @@ inputQ1A2.addEventListener("input", () => {
   const value2 = inputQ1A2.value;
   if(value1 !== "" && value2 !== "") {
     showSolutionNextButton.removeAttribute("disabled");
-    gvs.answers[0] = value1;
-    gvs.answers[1] = value2;
+    gvs.guesses[0] = value1;
+    gvs.guesses[1] = value2;
   } else {
     showSolutionNextButton.setAttribute("disabled", "yes");
   }
@@ -126,8 +127,8 @@ inputQ2A1.addEventListener("input", () => {
   const value2 = inputQ2A2.value;
   if(value1 !== "" && value2 !== "") {
     showSolutionNextButton.removeAttribute("disabled");
-    gvs.answers[2] = value1;
-    gvs.answers[3] = value2;
+    gvs.guesses[2] = value1;
+    gvs.guesses[3] = value2;
   } else {
     showSolutionNextButton.setAttribute("disabled", "yes");
   }
@@ -138,8 +139,8 @@ inputQ2A2.addEventListener("input", () => {
   const value2 = inputQ2A2.value;
   if(value1 !== "" && value2 !== "") {
     showSolutionNextButton.removeAttribute("disabled");
-    gvs.answers[2] = value1;
-    gvs.answers[3] = value2;
+    gvs.guesses[2] = value1;
+    gvs.guesses[3] = value2;
   } else {
     showSolutionNextButton.setAttribute("disabled", "yes");
   }
@@ -151,9 +152,9 @@ inputQ3A1.addEventListener("input", () => {
   const value3 = inputQ3A3.value;
   if(value1 !== "" && value2 !== "" && value3 !== "") {
     showSolutionNextButton.removeAttribute("disabled");
-    gvs.answers[4] = value1;
-    gvs.answers[5] = value2;
-    gvs.answers[6] = value3;
+    gvs.guesses[4] = value1;
+    gvs.guesses[5] = value2;
+    gvs.guesses[6] = value3;
   } else {
     showSolutionNextButton.setAttribute("disabled", "yes");
   }
@@ -165,9 +166,9 @@ inputQ3A2.addEventListener("input", () => {
   const value3 = inputQ3A3.value;
   if(value1 !== "" && value2 !== "" && value3 !== "") {
     showSolutionNextButton.removeAttribute("disabled");
-    gvs.answers[4] = value1;
-    gvs.answers[5] = value2;
-    gvs.answers[6] = value3;
+    gvs.guesses[4] = value1;
+    gvs.guesses[5] = value2;
+    gvs.guesses[6] = value3;
   } else {
     showSolutionNextButton.setAttribute("disabled", "yes");
   }
@@ -179,9 +180,9 @@ inputQ3A3.addEventListener("input", () => {
   const value3 = inputQ3A3.value;
   if(value1 !== "" && value2 !== "" && value3 !== "") {
     showSolutionNextButton.removeAttribute("disabled");
-    gvs.answers[4] = value1;
-    gvs.answers[5] = value2;
-    gvs.answers[6] = value3;
+    gvs.guesses[4] = value1;
+    gvs.guesses[5] = value2;
+    gvs.guesses[6] = value3;
   } else {
     showSolutionNextButton.setAttribute("disabled", "yes");
   }
@@ -230,4 +231,157 @@ function generateAnswers() {
   gvs.Q3xB1 = Math.round(((volatile_in_feed - gvs.Q3xD1 * gvs.Q3D) / gvs.Q3B) * 100) / 100;
   gvs.Q3xB2 = Math.round((1 - gvs.Q3xB1) * 100) / 100;
 
+}
+
+function randomizeInputs() {
+  const Q1_input1 = Math.ceil(3 * Math.random());
+  const Q1_input2 = Math.ceil(3 * Math.random());
+  const Q2_input1 = Math.ceil(4 * Math.random());
+  const Q2_input2 = Math.ceil(4 * Math.random());
+  const Q3_input1 = Math.ceil(3 * Math.random());
+  const Q3_input2 = Math.ceil(3 * Math.random());
+  const Q3_input3 = Math.ceil(3 * Math.random());
+  gvs.Q1_input1 = Q1_input1;
+  gvs.Q1_input2 = Q1_input2;
+  gvs.Q2_input1 = Q2_input1;
+  gvs.Q2_input2 = Q2_input2;
+  gvs.Q3_input1 = Q3_input1;
+  gvs.Q3_input2 = Q3_input2;
+  gvs.Q3_input3 = Q3_input3;
+  
+  switch(Q1_input1) {
+    case 1: 
+      gvs.answers[0] = gvs.Q1zF;
+      inputQ1A1.style.left = "220px";
+      inputQ1A1.style.top = "253px";
+    break;
+    case 2:
+      gvs.answers[0] = gvs.Q1xD;
+      inputQ1A1.style.left = "527px";
+      inputQ1A1.style.top = "109px";
+    break;
+    case 3:
+      gvs.answers[0] = gvs.Q1xB;
+      inputQ1A1.style.left = "527px";
+      inputQ1A1.style.top = "409px";
+    break;
+  }
+  
+  switch(Q1_input2) {
+    case 1:
+      gvs.answers[1] = gvs.Q1F;
+      inputQ1A2.style.left = "165px";
+      inputQ1A2.style.top = "289px";
+    break;
+    case 2:
+      gvs.answers[1] = gvs.Q1D;
+      inputQ1A2.style.left = "475px";
+      inputQ1A2.style.top = "144px";
+    break;
+    case 3:
+      gvs.answers[1] = gvs.Q1B;
+      inputQ1A2.style.left = "475px";
+      inputQ1A2.style.top = "444px";
+    break;
+  }
+  
+  switch(Q2_input1) {
+    case 1: 
+      gvs.answers[2] = gvs.Q2zF1;
+      inputQ2A1.style.left = "230px";
+      inputQ2A1.style.top = "184px";
+    break;
+    case 2:
+      gvs.answers[2] = gvs.Q2zF2;
+      inputQ2A1.style.left = "230px";
+      inputQ2A1.style.top = "322px";
+    break;
+    case 3:
+      gvs.answers[2] = gvs.Q2xD;
+      inputQ2A1.style.left = "527px";
+      inputQ2A1.style.top = "109px";
+    break;
+    case 4:
+      gvs.answers[2] = gvs.Q2xB;
+      inputQ2A1.style.left = "527px";
+      inputQ2A1.style.top = "409px";
+    break;
+  }
+  
+  switch(Q2_input2) {
+    case 1:
+      gvs.answers[3] = gvs.Q2F1;
+      inputQ2A2.style.left = "165px";
+      inputQ2A2.style.top = "218px";
+    break;
+    case 2:
+      gvs.answers[3] = gvs.Q2F2;
+      inputQ2A2.style.left = "165px";
+      inputQ2A2.style.top = "358px";
+    break;
+    case 3:
+      gvs.answers[3] = gvs.Q2D;
+      inputQ2A2.style.left = "475px";
+      inputQ2A2.style.top = "143px";
+    break;
+    case 4:
+      gvs.answers[3] = gvs.Q2B;
+      inputQ2A2.style.left = "475px";
+      inputQ2A2.style.top = "443px";
+    break;
+  }
+
+  switch(Q3_input1) {
+    case 1:
+      gvs.answers[4] = gvs.Q3zF1;
+      inputQ3A1.style.left = "228px";
+      inputQ3A1.style.top = "253px";
+    break;
+    case 2:
+      gvs.answers[4] = gvs.Q3xD1;
+      inputQ3A1.style.left = "537px";
+      inputQ3A1.style.top = "108px";
+    break;
+    case 3:
+      gvs.answers[4] = gvs.Q3xB1;
+      inputQ3A1.style.left = "537px";
+      inputQ3A1.style.top = "408px";
+    break;
+  }
+  
+  switch(Q3_input2) {
+    case 1: 
+      gvs.answers[5] = gvs.Q3zF2;
+      inputQ3A2.style.left = "228px";
+      inputQ3A2.style.top = "288px";
+    break;
+    case 2:
+      gvs.answers[5] = gvs.Q3xD2;
+      inputQ3A2.style.left = "537px";
+      inputQ3A2.style.top = "143px";
+    break;
+    case 3:
+      gvs.answers[5] = gvs.Q3xB2;
+      inputQ3A2.style.left = "537px";
+      inputQ3A2.style.top = "443px";
+    break;
+  }
+  
+  switch(Q3_input3) {
+    case 1:
+      gvs.answers[6] = gvs.Q3F;
+      inputQ3A3.style.left = "166px";
+      inputQ3A3.style.top = "323px";
+    break;
+    case 2:
+      gvs.answers[6] = gvs.Q3D;
+      inputQ3A3.style.left = "476px";
+      inputQ3A3.style.top = "178px";
+    break;
+    case 3:
+      gvs.answers[6] = gvs.Q3B;
+      inputQ3A3.style.left = "476px";
+      inputQ3A3.style.top = "478px";
+    break;
+  }
 }
