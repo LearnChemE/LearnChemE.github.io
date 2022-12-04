@@ -296,7 +296,7 @@ function equilatPhaseDraw(dx,dy){
     let ytip = 70;
     let xtip = 300;
     let temp, x, y, xtemp;
-    let angle = radians(60);
+    let angle = radians(30);
     let equilatPhasePositions = [];
     push(); noFill(); strokeWeight(2.5);
     beginShape();
@@ -310,8 +310,91 @@ function equilatPhaseDraw(dx,dy){
         vertex(x,y);
     }
     endShape();
+    
+    let tieLineInfo = [];
+    let xLeft = [0.1014, 0.1036, 0.1072, 0.1127, 0.1218, 0.1391];
+    let xRight = [0.8404, 0.7544, 0.6532, 0.5463, 0.4395, 0.3322];
+    let yLeft = [];
+    let yRight = [];
+    // Solving for the y-points on the tie lines
+    for(let i = 0; i < xLeft.length; i++){
+        for(let j = 0; j < phaseInfo.length; j++){
+            if(xLeft[i] > phaseInfo[j][0] && xLeft[i] < phaseInfo[j+1][0]){
+                yLeft.push(interpolate(xLeft[i],phaseInfo[j][0],phaseInfo[j+1][0],phaseInfo[j][1],phaseInfo[j+1][1]));
+            } else if(xLeft[i] == phaseInfo[j][0]){
+                yLeft.push(phaseInfo[j][1]);
+            }
+
+            if(xRight[i] > phaseInfo[j][0] && xRight[i] < phaseInfo[j+1][0]){
+                yRight.push(interpolate(xRight[i],phaseInfo[j][0],phaseInfo[j+1][0],phaseInfo[j][1],phaseInfo[j+1][1]));
+            } else if(xRight[i] == phaseInfo[j][0]){
+                yRight.push(phaseInfo[j][1]);
+            } 
+        }
+    }
+
+    // Drawing tie lines
+    let x1, x2, y1, y2, b, x1temp, x2temp;
+    let slopes = [];
+    let positions = [];
+    let bvec = [];
+    for(let i = 0; i < xLeft.length; i++){
+        x1temp = map(xLeft[i],0,1,xtip-dx,xtip+dx);
+        x2temp = map(xRight[i],0,1,xtip-dx,xtip+dx);
+        y1 = map(yLeft[i],0,1,ytip+dy,ytip);
+        y2 = map(yRight[i],0,1,ytip+dy,ytip);
+        x1 = (ytip+dy-y1)*Math.tan(angle) + x1temp;
+        x2 = (ytip+dy-y2)*Math.tan(angle) + x2temp;
+        line(x1,y1,x2,y2);
+        b = y1 - ((y2-y1)/(x2-x1))*x1;
+        bvec.push(b)
+        positions.push([x1,y1,x2,y2]);
+        slopes.push((y2-y1)/(x2-x1))
+    }
     pop();
-    //console.log(equilatPhasePositions)
+    tieLineInfo.push(positions,slopes,bvec);
+
+    // Checking to see if dot is within the the phase envelope
+    temp = g.points[0]; // Get coordinates of dot
+    let index = findClosest2D(equilatPhasePositions,temp.x,0);
+    // s1,2,3 are the indices for the points that make up sets 1, 2, and 3. These sets will be used to ensure the dot is within the phase envelope
+    let s1 = findClosestLEFT(equilatPhasePositions,temp.y,1,index);
+    let s2;
+    if(index == equilatPhasePositions.length-1){
+        s2 = [equilatPhasePositions.length-2, equilatPhasePositions.length-1];
+    } else if (index == 0){
+        s2 = [0, 1];
+    } else {
+        s2 = [index-1, index, index+1];
+    }
+    let s3 = findClosestRIGHT(equilatPhasePositions,temp.y,1,index);
+    let ymin = 1000;
+    for(let i = 0; i < equilatPhasePositions.length; i++){
+        if(equilatPhasePositions[i][1] < ymin){
+            ymin = equilatPhasePositions[i][1];
+        }
+    }
+    let set1 = []; let set2 = []; let set3 = [];
+    for(let i = 0; i < s1.length; i++){
+        set1.push(equilatPhasePositions[s1[i]]);
+    }
+    for(let i = 0; i < s2.length; i++){
+        set2.push(equilatPhasePositions[s2[i]]);
+    }
+    for(let i = 0; i < s3.length; i++){
+        set3.push(equilatPhasePositions[s3[i]]);
+    }
+
+    // huge list of conditions to be met for the dot to be within the phase envelope curve
+    if(temp.y >= ymin && temp.y <= 450 && temp.x > set1[0][0] && temp.y > set1[set1.length-1][1] && ((temp.x > set2[0][0]||temp.x < set2[set2.length-1][0])&&(temp.y > set2[0][1]||temp.y > set2[set2.length-1][1])) && temp.x < set3[set3.length-1][0] && temp.y > set3[0][1]){
+        //console.log('in phase envelope')
+        g.inPhaseEnvelope = true;
+    } else{
+        //console.log('not in phase envelope')
+        g.inPhaseEnvelope = false;
+    }
+
+    return(tieLineInfo);
 }
 
 // For evaluating vertices of triangle on solvent representation line

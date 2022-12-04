@@ -293,10 +293,6 @@ function rightPhaseDraw(){
         bvec.push(b)
         positions.push([x1,y1,x2,y2]);
         slopes.push((y2-y1)/(x2-x1))
-        // for(let i = 0; i < slopes.length; i++){
-        //     let b = pos[i][1]-slopes[i]*pos[i][0];
-        //     bvec.push(b)
-        // }
     }
     pop();
     tieLineInfo.push(positions,slopes,bvec);

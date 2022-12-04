@@ -18,9 +18,6 @@ window.g = {
   solventFrac : 0.25,
   carrierFrac : 0.50,
   inPhaseEnvelope : null,
-
-
-
 }
 
 
