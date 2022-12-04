@@ -116,7 +116,6 @@ function equilatLabels(L,R,dx,dy){
     rotate(radians(60));
     text('solute mass fraction',0,0);
     pop();
-
     pop();
 } 
 
@@ -186,7 +185,7 @@ function equilatRep(L,R,dx,dy){
         pop();
         triangle(x2,y2,x2-15,y2+5,x2-15,y2-5)
         pop();
-
+        let solFractemp = map(temp.y,ytip+dy,ytip,0,1); // storing a non-fixed version for improved graphics of the carrier line
         g.soluteFrac = (map(temp.y,ytip+dy,ytip,0,1)).toFixed(2);
         if(g.soluteFrac == 0){ // Correction for -0.00
             let t = (0).toFixed(2);
@@ -221,7 +220,7 @@ function equilatRep(L,R,dx,dy){
         let pos = equilatSolventTriangleRep(x2,y2);
         triangle(pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
         pop();
-
+        let solvFractemp = map(x2,xtip-dx,xtip+dx,0,1); // Non-fixed version
         g.solventFrac = (map(x2,xtip-dx,xtip+dx,0,1)).toFixed(2);
         if(g.solventFrac == 0){ // Correction for -0.00
             let t = (0).toFixed(2);
@@ -239,14 +238,14 @@ function equilatRep(L,R,dx,dy){
         }
         
         // Carrier line
-        let carFrac = (1 - g.solventFrac - g.soluteFrac);
-        g.carrierFrac = carFrac.toFixed(2);
+        let carFractemp = 1 - solFractemp - solvFractemp; // For drawing the carrier line
+        g.carrierFrac = (1 - g.solventFrac - g.soluteFrac).toFixed(2);
         if(g.carrierFrac == 0){ // Correcting for -0.00
             let t = (0).toFixed(2);
             g.carrierFrac = t;
         }
         
-        x2 = map(carFrac,0,1,xtip,xtip-dx); // This is kind of clunky -> I should work on a better method
+        x2 = map(carFractemp,0,1,xtip,xtip-dx); // This is kind of clunky -> I should work on a better method
         y2 = L[0]*x2 + L[1];
         push();
         stroke(255,100,0); strokeWeight(2); fill(255,100,0);
@@ -530,6 +529,7 @@ function equilatInPhaseDisplay(xL,xR,yL,yR,L,R,dx,dy){
     line(x1_raf,y1_raf,x2_raf-3,y2_raf);
     pop();
     triangle(x2_raf,y2_raf,x2_raf-15,y2_raf+5,x2_raf-15,y2_raf-5);
+    let solu_raftemp = map(yL,ytip+dy,ytip,0,1);
     solu_raf = (map(yL,ytip+dy,ytip,0,1)).toFixed(2);
     if(solu_raf == 0){
         solu_raf = (0).toFixed(2);
@@ -543,6 +543,7 @@ function equilatInPhaseDisplay(xL,xR,yL,yR,L,R,dx,dy){
     pop();
     triangle(x2_ext,y2_ext,x2_ext-15,y2_ext+5,x2_ext-15,y2_ext-5);
     pop();
+    let solu_exttemp = map(yR,ytip+dy,ytip,0,1);
     solu_ext = (map(yR,ytip+dy,ytip,0,1)).toFixed(2);
     if(solu_ext == 0){
         solu_ext = (0).toFixed(2);
@@ -575,6 +576,7 @@ function equilatInPhaseDisplay(xL,xR,yL,yR,L,R,dx,dy){
     y2_raf = y2_raf+5; x2_raf = (y2_raf-btemp)/L[0];
     let pos = equilatSolventTriangleRep(x2_raf,y2_raf);
     triangle(pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+    let solv_raftemp = map(x2_raf,xtip-dx,xtip+dx,0,1);
     solv_raf = (map(x2_raf,xtip-dx,xtip+dx,0,1)).toFixed(2);
 
     x1_ext = xR; y1_ext = yR;
@@ -589,31 +591,32 @@ function equilatInPhaseDisplay(xL,xR,yL,yR,L,R,dx,dy){
     pos = equilatSolventTriangleRep(x2_ext,y2_ext);
     triangle(pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
     pop();
+    let solv_exttemp = map(x2_ext,xtip-dx,xtip+dx,0,1);
     solv_ext = (map(x2_ext,xtip-dx,xtip+dx,0,1)).toFixed(2);
 
     if(g.solventTruth){
         push();
         fill(255); stroke(50,205,50); strokeWeight(1);
         rect(x2_raf-22.5,y2_raf+10,45,30);
-        textSize(18); noStroke(); fill(0,0,255);
+        textSize(18); noStroke(); fill(12,0,128);
         text(solv_raf,x2_raf-17.5,y2_raf+30);
         stroke(255,0,255); fill(255);
         rect(x2_ext-22.5,y2_ext+10,45,30);
-        fill(0,0,255); noStroke();
+        fill(12,0,128); noStroke();
         text(solv_ext,x2_ext-17.5,y2_ext+30);
         pop();
     }
 
     // Carrier lines
-    car_raf = (1 - solv_raf - solu_raf).toFixed(2);
-    car_ext = (1 - solv_ext - solu_ext).toFixed(2);
+    let car_raftemp = (1 - solv_raftemp - solu_raftemp);
+    let car_exttemp = (1 - solv_exttemp - solu_exttemp);
 
     x1_raf = xL; y1_raf = yL;
-    x2_raf = map(car_raf,0,1,xtip,xtip-dx);
+    x2_raf = map(car_raftemp,0,1,xtip,xtip-dx);
     y2_raf = L[0]*x2_raf + L[1];
 
     x1_ext = xR; y1_ext = yR;
-    x2_ext = map(car_ext,0,1,xtip,xtip-dx);
+    x2_ext = map(car_exttemp,0,1,xtip,xtip-dx);
     y2_ext = L[0]*x2_ext + L[1];
 
     push();
@@ -628,6 +631,10 @@ function equilatInPhaseDisplay(xL,xR,yL,yR,L,R,dx,dy){
     pos = equilatCarrierTriangleRep(x2_ext,y2_ext);
     triangle(pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
     pop();
+    
+    car_raf = car_raftemp.toFixed(2);
+    car_ext = car_exttemp.toFixed(2);
+    
 
     if(g.carrierTruth){
         push();
@@ -671,10 +678,9 @@ function equilatInPhaseDisplay(xL,xR,yL,yR,L,R,dx,dy){
     text('solvent = '+solv_ext,425,115);
     fill(255,100,0);
     text('carrier = '+car_ext,427,140);
-
     pop();
 
-    
+
 }
 
 // For evaluating vertices of triangle on solvent representation line

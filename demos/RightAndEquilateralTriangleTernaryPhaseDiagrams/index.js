@@ -2,7 +2,7 @@
 
 window.g = {
   cnv : undefined,
-  triangle : 'equilateral-triangle',
+  triangle : 'right-triangle',
   phaseTruth : false,
   gridTruth : true,
   soluteTruth : false,
@@ -55,7 +55,6 @@ function draw() {
   for(let p of g.points){
     circle(p.x,p.y,g.radius*2);
   }
-  //console.log(g.points[0].y);
   pop();
 }
 
@@ -70,7 +69,15 @@ for(let i = 0; i < triangleType.length; i++){
     };
     triangleType[i].classList.add("selected");
     g.triangle = triangleType[i].value;
-    redraw();
+    switch (g.triangle){
+      case 'right-triangle':
+        g.points[0].x = 200;
+        g.points[0].y = 350;
+        break;
+      case 'equilateral-triangle':
+        g.points[0].x = 300;
+        g.points[0].y = 305;
+    }
   });
 };
 
@@ -82,23 +89,18 @@ const carrier = document.getElementById("carrier");
 
 phaseEnvelope.addEventListener("change",() => {
   g.phaseTruth = phaseEnvelope.checked;
-  redraw();
 });
 gridLines.addEventListener("change",() => {
   g.gridTruth = gridLines.checked;
-  redraw();
 });
 solute.addEventListener("change",() => {
   g.soluteTruth = solute.checked;
-  redraw();
 });
 solvent.addEventListener("change",() => {
   g.solventTruth = solvent.checked;
-  redraw();
 });
 carrier.addEventListener("change",() => {
   g.carrierTruth = carrier.checked;
-  redraw();
 });
 
 
