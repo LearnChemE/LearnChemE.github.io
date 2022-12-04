@@ -6,7 +6,7 @@ function rightTriangle() {
     strokeWeight(2);
     triangle(100, 50, 100, 450, 500, 450)
     pop();
-    rightRep();
+    
     rightLabels();
     if (g.gridTruth) {
         rightGrid();
@@ -23,7 +23,6 @@ function rightTriangle() {
         }
     }
     rightRep();
-    
 }
 
 // Labels for right triangle
@@ -239,18 +238,6 @@ function rightMassFracs() {
     
 }
 
-// Copied from Mathematica's source code
-const rightPhaseinfo = [[0.1, 0], [0.1021, 0.05104], [0.105, 0.098], [0.108, 0.1422], [0.113, 0.183], [0.1181, 0.22], [0.125, 0.254], [0.132, 0.2853], [0.14, 0.313], [0.149, 0.338], [0.159, 0.36], [0.17, 0.379], [0.181, 0.396], [0.194, 0.4093], [0.2082, 0.42], [0.222, 0.429], [0.2382, 0.435], [0.254, 0.438], [0.271, 0.44], [0.29, 0.438], [0.309, 0.435], [0.329, 0.429], [0.3503, 0.422], [0.372, 0.4123], [0.395, 0.4], [0.419, 0.387], [0.444, 0.371], [0.4703, 0.354], [0.497, 0.335], [0.525, 0.315], [0.554, 0.292], [0.584, 0.269], [0.615, 0.244], [0.647, 0.217], [0.68, 0.19], [0.714, 0.161], [0.749, 0.131], [0.785, 0.099], [0.8231, 0.067], [0.861, 0.034], [0.9, 0.]];
-// Adds additional points to help the resolution on whether or not the dot is within the phase envelope
-for(let i = 0; i < rightPhaseinfo.length-1; i+=2){
-    let x, y;
-    x = rightPhaseinfo[i][0] + 1/2*(rightPhaseinfo[i+1][0]-rightPhaseinfo[i][0]);
-    y = rightPhaseinfo[i][1] + 1/2*(rightPhaseinfo[i+1][1]-rightPhaseinfo[i][1]);
-    rightPhaseinfo.splice(i+1,0,[x,y]);
-}
-
-
-
 function rightPhaseDraw(){
 
     let rightPhasePositions = [];
@@ -258,8 +245,8 @@ function rightPhaseDraw(){
     push(); noFill(); strokeWeight(2.5);
     beginShape();
     
-    for(let i = 0; i < rightPhaseinfo.length; i++){
-        temp = rightPhaseinfo[i];
+    for(let i = 0; i < phaseInfo.length; i++){
+        temp = phaseInfo[i];
         x = map(temp[0],0,1,100,500);
         y = map(temp[1],0,1,450,50);
         rightPhasePositions.push([x,y]); // Storing the x & y coords of the phase curve
@@ -275,17 +262,17 @@ function rightPhaseDraw(){
     let yRight = [];
     // Solving for the y-points on the tie lines
     for(let i = 0; i < xLeft.length; i++){
-        for(let j = 0; j < rightPhaseinfo.length; j++){
-            if(xLeft[i] > rightPhaseinfo[j][0] && xLeft[i] < rightPhaseinfo[j+1][0]){
-                yLeft.push(interpolate(xLeft[i],rightPhaseinfo[j][0],rightPhaseinfo[j+1][0],rightPhaseinfo[j][1],rightPhaseinfo[j+1][1]));
-            } else if(xLeft[i] == rightPhaseinfo[j][0]){
-                yLeft.push(rightPhaseinfo[j][1]);
+        for(let j = 0; j < phaseInfo.length; j++){
+            if(xLeft[i] > phaseInfo[j][0] && xLeft[i] < phaseInfo[j+1][0]){
+                yLeft.push(interpolate(xLeft[i],phaseInfo[j][0],phaseInfo[j+1][0],phaseInfo[j][1],phaseInfo[j+1][1]));
+            } else if(xLeft[i] == phaseInfo[j][0]){
+                yLeft.push(phaseInfo[j][1]);
             }
 
-            if(xRight[i] > rightPhaseinfo[j][0] && xRight[i] < rightPhaseinfo[j+1][0]){
-                yRight.push(interpolate(xRight[i],rightPhaseinfo[j][0],rightPhaseinfo[j+1][0],rightPhaseinfo[j][1],rightPhaseinfo[j+1][1]));
-            } else if(xRight[i] == rightPhaseinfo[j][0]){
-                yRight.push(rightPhaseinfo[j][1]);
+            if(xRight[i] > phaseInfo[j][0] && xRight[i] < phaseInfo[j+1][0]){
+                yRight.push(interpolate(xRight[i],phaseInfo[j][0],phaseInfo[j+1][0],phaseInfo[j][1],phaseInfo[j+1][1]));
+            } else if(xRight[i] == phaseInfo[j][0]){
+                yRight.push(phaseInfo[j][1]);
             } 
         }
     }
@@ -377,8 +364,8 @@ function rightPhaseRep(tieInfo){
 
     // Plait point
     let xP = 0.1956;
-    let index = findClosest2D(rightPhaseinfo,xP,0);
-    let yP = interpolate(xP,rightPhaseinfo[index][0],rightPhaseinfo[index+1][0],rightPhaseinfo[index][1],rightPhaseinfo[index+1][1]);
+    let index = findClosest2D(phaseInfo,xP,0);
+    let yP = interpolate(xP,phaseInfo[index][0],phaseInfo[index+1][0],phaseInfo[index][1],phaseInfo[index+1][1]);
     push();
     strokeWeight(3);
     stroke(50,205,50);
@@ -386,8 +373,8 @@ function rightPhaseRep(tieInfo){
     noFill();
     let x, y;
     for(let i = 0; i <= index; i++){
-        x = map(rightPhaseinfo[i][0],0,1,100,500);
-        y = map(rightPhaseinfo[i][1],0,1,450,50);
+        x = map(phaseInfo[i][0],0,1,100,500);
+        y = map(phaseInfo[i][1],0,1,450,50);
         vertex(x,y);
     }
     endShape();
@@ -397,17 +384,17 @@ function rightPhaseRep(tieInfo){
     stroke(255,0,255);
     beginShape();
     noFill();
-    for(let i = index; i < rightPhaseinfo.length; i++){
-        x = map(rightPhaseinfo[i][0],0,1,100,500);
-        y = map(rightPhaseinfo[i][1],0,1,450,50);
+    for(let i = index; i < phaseInfo.length; i++){
+        x = map(phaseInfo[i][0],0,1,100,500);
+        y = map(phaseInfo[i][1],0,1,450,50);
         vertex(x,y);
     }
     endShape();
     pop();
     
     let rightPhasePositions = [];
-    for(let i = 0; i < rightPhaseinfo.length; i++){
-        temp2 = rightPhaseinfo[i];
+    for(let i = 0; i < phaseInfo.length; i++){
+        temp2 = phaseInfo[i];
         x = map(temp2[0],0,1,100,500);
         y = map(temp2[1],0,1,450,50);
         rightPhasePositions.push([x,y]); // Storing the x & y coords of the phase curve  
