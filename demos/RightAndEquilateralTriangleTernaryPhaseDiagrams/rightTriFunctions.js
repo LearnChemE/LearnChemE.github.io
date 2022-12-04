@@ -361,7 +361,7 @@ function rightPhaseRep(tieInfo){
     // Plait point
     let xP = 0.1956;
     let index = findClosest2D(phaseInfo,xP,0);
-    let yP = interpolate(xP,phaseInfo[index][0],phaseInfo[index+1][0],phaseInfo[index][1],phaseInfo[index+1][1]);
+    //let yP = interpolate(xP,phaseInfo[index][0],phaseInfo[index+1][0],phaseInfo[index][1],phaseInfo[index+1][1]);
     push();
     strokeWeight(3);
     stroke(50,205,50);
@@ -388,6 +388,7 @@ function rightPhaseRep(tieInfo){
     endShape();
     pop();
     
+    let temp2;
     let rightPhasePositions = [];
     for(let i = 0; i < phaseInfo.length; i++){
         temp2 = phaseInfo[i];

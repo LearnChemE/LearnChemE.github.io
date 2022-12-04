@@ -30,10 +30,10 @@ function equilateralTriangle(){
 
     if(g.phaseTruth){
         let tieInfo = [];
-        equilatPhaseDraw(dx,dy);
-        // if(g.inPhaseEnvelope){
-        //     rightPhaseRep(tieInfo);
-        // }
+        tieInfo = equilatPhaseDraw(dx,dy);
+        if(g.inPhaseEnvelope){
+            equilatPhaseRep(tieInfo,dx,dy,leftLine,rightLine);
+        }
     }
     
     equilatRep(leftLine,rightLine,dx,dy);
@@ -386,7 +386,7 @@ function equilatPhaseDraw(dx,dy){
     }
 
     // huge list of conditions to be met for the dot to be within the phase envelope curve
-    if(temp.y >= ymin && temp.y <= 450 && temp.x > set1[0][0] && temp.y > set1[set1.length-1][1] && ((temp.x > set2[0][0]||temp.x < set2[set2.length-1][0])&&(temp.y > set2[0][1]||temp.y > set2[set2.length-1][1])) && temp.x < set3[set3.length-1][0] && temp.y > set3[0][1]){
+    if(temp.y >= ymin && temp.y <= ytip+dy && temp.x > set1[0][0] && temp.y > set1[set1.length-1][1] && ((temp.x > set2[0][0]||temp.x < set2[set2.length-1][0])&&(temp.y > set2[0][1]||temp.y > set2[set2.length-1][1])) && temp.x < set3[set3.length-1][0] && temp.y > set3[0][1]){
         //console.log('in phase envelope')
         g.inPhaseEnvelope = true;
     } else{
@@ -395,6 +395,286 @@ function equilatPhaseDraw(dx,dy){
     }
 
     return(tieLineInfo);
+}
+
+function equilatPhaseRep(tieInfo,dx,dy,L,R){
+    let temp = g.points[0];
+    let slopes = tieInfo[1];
+    let pos = tieInfo[0];
+    let bvec = tieInfo[2];
+
+    let ytip = 70;
+    let xtip = 300;
+    let angle = radians(30);
+
+    slopes.splice(0,0,0);
+    let xt1, xt2;
+    xt1 = map(.1,0,1,xtip-dx,xtip+dx);
+    xt2 = map(.9,0,1,xtip-dx,xtip+dx);
+    pos.splice(0,0,[xt1,ytip+dy,xt2,ytip+dy]);
+    bvec.splice(0,0,ytip+dy);
+
+    let tempYvals = new Array(7);
+    // These are the points in each line in line with the current x position of the dot
+    for(let i = 0; i < slopes.length; i++){
+        tempYvals[i] = slopes[i]*temp.x + bvec[i];
+    }
+
+    // Plait point
+    let xP = 0.1956;
+    let index = findClosest2D(phaseInfo,xP,0);
+
+    push();
+    strokeWeight(3);
+    stroke(50,205,50);
+    beginShape();
+    noFill();
+    let x, y, xtemp;
+    for(let i = 0; i <= index; i++){
+        xtemp = map(phaseInfo[i][0],0,1,xtip-dx,xtip+dx);
+        y = map(phaseInfo[i][1],0,1,ytip+dy,ytip);
+        x = (ytip+dy-y)*Math.tan(angle) + xtemp;
+        vertex(x,y);
+    }
+    endShape();
+    pop();
+    push();
+    strokeWeight(3);
+    stroke(255,0,255);
+    beginShape();
+    noFill();
+    for(let i = index; i < phaseInfo.length; i++){
+        xtemp = map(phaseInfo[i][0],0,1,xtip-dx,xtip+dx);
+        y = map(phaseInfo[i][1],0,1,ytip+dy,ytip);
+        x = (ytip+dy-y)*Math.tan(angle) + xtemp;
+        vertex(x,y);
+    }
+    endShape();
+    pop();
+
+    let temp2;
+    let rightPhasePositions = [];
+    for(let i = 0; i < phaseInfo.length; i++){
+        temp2 = phaseInfo[i];
+        xtemp = map(temp2[0],0,1,xtip-dx,xtip+dx);
+        y = map(temp2[1],0,1,ytip+dy,ytip);
+        x = (ytip+dy-y)*Math.tan(angle) + xtemp;
+        rightPhasePositions.push([x,y]); // Storing the x & y coords of the phase curve  
+    }
+    
+    let region = 0;
+    let deltaY, deltaToCurrentPosition, mx, xL, xR, yL, yR, bx;
+    for(let i = 0; i < slopes.length-1; i++){
+        // To solve for the tie line at a given point, lever rule is used vertically between current position and the lines above and below it
+        if(temp.y < tempYvals[i] && temp.y > tempYvals[i+1]){
+            //region = i+1;
+            deltaY = tempYvals[i]-tempYvals[i+1]; // Total distance between lines
+            deltaToCurrentPosition = tempYvals[i]-temp.y; // Distance from lower line to current position
+
+            mx = slopes[i]*(1-deltaToCurrentPosition/deltaY) + slopes[i+1]*(deltaToCurrentPosition/deltaY); // Calculating line slope based on current position as fraction of slopes bounding the dot
+            bx = temp.y - mx*temp.x; // Solving for y-intercept of line
+
+            // Calculating left and right x-positions to represent tie-line at a given position
+            xL = pos[i][0]*(1-deltaToCurrentPosition/deltaY) + pos[i+1][0]*(deltaToCurrentPosition/deltaY);
+            xR = pos[i][2]*(1-deltaToCurrentPosition/deltaY) + pos[i+1][2]*(deltaToCurrentPosition/deltaY);
+            yL = mx*xL + bx;
+            yR = mx*xR + bx;
+           
+        } else if(temp.y < tempYvals[slopes.length-1]){
+            //region = 7;
+            let ratio = tempYvals[slopes.length-1]/temp.y;
+            mx = slopes[slopes.length-1]*ratio;
+            bx = temp.y - mx*temp.x;
+            let t = rightRegionSevenCoordinates(mx,bx,rightPhasePositions,index);
+            xL = t[0]; xR = t[1];
+            yL = mx*xL + bx;
+            yR = mx*xR + bx;
+        } else if(temp.y == ytip+dy){ // Condition for the line being at the bottom of the triangle
+            xL = map(.1,0,1,xtip-dx,xtip+dx); yL = ytip+dy; xR = map(.9,0,1,xtip-dx,xtip+dx); yR = ytip+dy;
+        }
+    }
+
+    equilatInPhaseDisplay(xL,xR,yL,yR,L,R,dx,dy);
+    push();
+    strokeWeight(3);
+    drawingContext.setLineDash([10,10])
+    line(xL,yL,xR,yR);
+    pop();
+    push();
+    fill(255,0,255); noStroke();
+    ellipse(xR,yR,13);
+    fill(50,205,50);
+    ellipse(xL,yL,13);
+    pop();
+    
+}
+
+function equilatInPhaseDisplay(xL,xR,yL,yR,L,R,dx,dy){
+    let temp = g.points[0];
+    let ytip = 70;
+    let xtip = 300;
+    let angle = radians(30);
+
+    let solu_raf, solv_raf, car_raf;
+    let solu_ext, solv_ext, car_ext;
+
+    let x1_raf, y1_raf, x2_raf, y2_raf;
+    let x1_ext, y1_ext, x2_ext, y2_ext;
+    // Solute Lines
+    push();
+    stroke(0,0,255); strokeWeight(2); fill(0,0,255);
+    x1_raf = xL; y1_raf = yL;
+    y2_raf = yL; x2_raf = (y2_raf - R[1])/R[0];
+    push();
+    drawingContext.setLineDash([5,5]);
+    line(x1_raf,y1_raf,x2_raf-3,y2_raf);
+    pop();
+    triangle(x2_raf,y2_raf,x2_raf-15,y2_raf+5,x2_raf-15,y2_raf-5);
+    solu_raf = (map(yL,ytip+dy,ytip,0,1)).toFixed(2);
+    if(solu_raf == 0){
+        solu_raf = (0).toFixed(2);
+    }
+    
+    x1_ext = xR; y1_ext = yR;
+    y2_ext = yR; x2_ext = (y2_ext - R[1])/R[0];
+    push();
+    drawingContext.setLineDash([5,5]);
+    line(x1_ext,y1_ext,x2_ext-3,y2_ext);
+    pop();
+    triangle(x2_ext,y2_ext,x2_ext-15,y2_ext+5,x2_ext-15,y2_ext-5);
+    pop();
+    solu_ext = (map(yR,ytip+dy,ytip,0,1)).toFixed(2);
+    if(solu_ext == 0){
+        solu_ext = (0).toFixed(2);
+    }
+
+    if(g.soluteTruth){
+        push();
+        fill(255); stroke(50,205,50); strokeWeight(1);
+        rect(x2_raf+10,y2_raf-15,45,30);
+        textSize(18); noStroke(); fill(0,0,255);
+        text(solu_raf,x2_raf+15,y2_raf+5);
+        stroke(255,0,255); fill(255);
+        rect(x2_ext+10,y2_ext-15,45,30);
+        fill(0,0,255); noStroke();
+        text(solu_ext,x2_ext+15,y2_ext+5);
+        pop();
+    }
+
+    // Solvent lines
+    push();
+    stroke(128,0,128); strokeWeight(2); fill(128,0,128);
+    x1_raf = xL; y1_raf = yL;
+    y2_raf = ytip+dy-5;
+    let btemp = y1_raf-L[0]*x1_raf;
+    x2_raf = (y2_raf-btemp)/L[0];
+    push();
+    drawingContext.setLineDash([5,5]);
+    line(x1_raf,y1_raf,x2_raf,y2_raf);
+    pop();
+    y2_raf = y2_raf+5; x2_raf = (y2_raf-btemp)/L[0];
+    let pos = equilatSolventTriangleRep(x2_raf,y2_raf);
+    triangle(pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+    solv_raf = (map(x2_raf,xtip-dx,xtip+dx,0,1)).toFixed(2);
+
+    x1_ext = xR; y1_ext = yR;
+    y2_ext = ytip+dy-5;
+    btemp = y1_ext-L[0]*x1_ext;
+    x2_ext = (y2_ext-btemp)/L[0];
+    push();
+    drawingContext.setLineDash([5,5]);
+    line(x1_ext,y1_ext,x2_ext,y2_ext);
+    pop();
+    y2_ext = y2_ext+5; x2_ext = (y2_ext-btemp)/L[0];
+    pos = equilatSolventTriangleRep(x2_ext,y2_ext);
+    triangle(pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+    pop();
+    solv_ext = (map(x2_ext,xtip-dx,xtip+dx,0,1)).toFixed(2);
+
+    if(g.solventTruth){
+        push();
+        fill(255); stroke(50,205,50); strokeWeight(1);
+        rect(x2_raf-22.5,y2_raf+10,45,30);
+        textSize(18); noStroke(); fill(0,0,255);
+        text(solv_raf,x2_raf-17.5,y2_raf+30);
+        stroke(255,0,255); fill(255);
+        rect(x2_ext-22.5,y2_ext+10,45,30);
+        fill(0,0,255); noStroke();
+        text(solv_ext,x2_ext-17.5,y2_ext+30);
+        pop();
+    }
+
+    // Carrier lines
+    car_raf = (1 - solv_raf - solu_raf).toFixed(2);
+    car_ext = (1 - solv_ext - solu_ext).toFixed(2);
+
+    x1_raf = xL; y1_raf = yL;
+    x2_raf = map(car_raf,0,1,xtip,xtip-dx);
+    y2_raf = L[0]*x2_raf + L[1];
+
+    x1_ext = xR; y1_ext = yR;
+    x2_ext = map(car_ext,0,1,xtip,xtip-dx);
+    y2_ext = L[0]*x2_ext + L[1];
+
+    push();
+    stroke(255,100,0); strokeWeight(2); fill(255,100,0);
+    push();
+    drawingContext.setLineDash([5,5]);
+    line(x1_raf,y1_raf,x2_raf,y2_raf);
+    line(x1_ext,y1_ext,x2_ext,y2_ext);
+    pop();
+    pos = equilatCarrierTriangleRep(x2_raf,y2_raf);
+    triangle(pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+    pos = equilatCarrierTriangleRep(x2_ext,y2_ext);
+    triangle(pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+    pop();
+
+    if(g.carrierTruth){
+        push();
+        fill(255); stroke(50,205,50); strokeWeight(1);
+        rect(x2_raf-45,y2_raf-30,45,30);
+        textSize(18); noStroke(); fill(255,100,0);
+        text(car_raf,x2_raf-40,y2_raf-10);
+        stroke(255,0,255); fill(255);
+        rect(x2_ext-45,y2_ext-30,45,30);
+        fill(255,100,0); noStroke();
+        text(car_ext,x2_ext-40,y2_ext-10);
+        pop();
+    }
+
+    // Mass fraction display
+    push();
+    textSize(22);
+    text('mass fractions',40,30);
+    text('mass fractions',410,30);
+    noStroke(); fill(50,205,50);
+    text('raffinate phase',40,55);
+    fill(255,0,255);
+    text('extract phase',415,55);
+
+    stroke(50,205,50); fill(255);
+    rect(37,65,150,88);
+    noStroke(); textSize(20);
+    fill(0,0,255);
+    text('solute = '+solu_raf,52,90);
+    fill(128,0,128);
+    text('solvent = '+solv_raf,50,115);
+    fill(255,100,0);
+    text('carrier = '+car_raf,52,140);
+
+    stroke(255,0,255); fill(255);
+    rect(412,65,150,88);
+    noStroke(); textSize(20);
+    fill(0,0,255);
+    text('solute = '+solu_ext,427,90);
+    fill(128,0,128);
+    text('solvent = '+solv_ext,425,115);
+    fill(255,100,0);
+    text('carrier = '+car_ext,427,140);
+
+    pop();
+
+    
 }
 
 // For evaluating vertices of triangle on solvent representation line
