@@ -3,11 +3,11 @@
 window.g = {
   cnv : undefined,
   triangle : 'right-triangle',
-  phaseTruth : false,
-  gridTruth : true,
-  soluteTruth : false,
-  solventTruth : false,
-  carrierTruth : false,
+  phaseTruth : true,
+  gridTruth : false,
+  soluteTruth : true,
+  solventTruth : true,
+  carrierTruth : true,
 
   radius : 8,
   points : [],
@@ -17,7 +17,7 @@ window.g = {
   soluteFrac : 0.25,
   solventFrac : 0.25,
   carrierFrac : 0.50,
-  inPhaseEnvelope : null,
+  inPhaseEnvelope : true,
 }
 
 

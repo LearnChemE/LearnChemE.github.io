@@ -222,10 +222,11 @@ function equilatRep(L,R,dx,dy){
         pop();
         let solvFractemp = map(x2,xtip-dx,xtip+dx,0,1); // Non-fixed version
         g.solventFrac = (map(x2,xtip-dx,xtip+dx,0,1)).toFixed(2);
-        if(g.solventFrac == 0){ // Correction for -0.00
-            let t = (0).toFixed(2);
-            g.solventFrac == t;
+        if(g.solventFrac <= 0){ // Correction for -0.00
+            
+            g.solventFrac = g.solventFrac.replace(/-/g,'')
         }
+        
 
         if(g.solventTruth){
             push();
