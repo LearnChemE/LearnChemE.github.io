@@ -453,13 +453,13 @@ function equilatPhaseRep(tieInfo,dx,dy,L,R){
     pop();
 
     let temp2;
-    let rightPhasePositions = [];
+    let phasePositions = [];
     for(let i = 0; i < phaseInfo.length; i++){
         temp2 = phaseInfo[i];
         xtemp = map(temp2[0],0,1,xtip-dx,xtip+dx);
         y = map(temp2[1],0,1,ytip+dy,ytip);
         x = (ytip+dy-y)*Math.tan(angle) + xtemp;
-        rightPhasePositions.push([x,y]); // Storing the x & y coords of the phase curve  
+        phasePositions.push([x,y]); // Storing the x & y coords of the phase curve  
     }
     
     let region = 0;
@@ -485,7 +485,7 @@ function equilatPhaseRep(tieInfo,dx,dy,L,R){
             let ratio = tempYvals[slopes.length-1]/temp.y;
             mx = slopes[slopes.length-1]*ratio;
             bx = temp.y - mx*temp.x;
-            let t = rightRegionSevenCoordinates(mx,bx,rightPhasePositions,index);
+            let t = rightRegionSevenCoordinates(mx,bx,phasePositions,index); // This algorithm works for either equilat or right triangles
             xL = t[0]; xR = t[1];
             yL = mx*xL + bx;
             yR = mx*xR + bx;
@@ -599,11 +599,11 @@ function equilatInPhaseDisplay(xL,xR,yL,yR,L,R,dx,dy){
         push();
         fill(255); stroke(50,205,50); strokeWeight(1);
         rect(x2_raf-22.5,y2_raf+10,45,30);
-        textSize(18); noStroke(); fill(12,0,128);
+        textSize(18); noStroke(); fill(128,0,128);
         text(solv_raf,x2_raf-17.5,y2_raf+30);
         stroke(255,0,255); fill(255);
         rect(x2_ext-22.5,y2_ext+10,45,30);
-        fill(12,0,128); noStroke();
+        fill(128,0,128); noStroke();
         text(solv_ext,x2_ext-17.5,y2_ext+30);
         pop();
     }

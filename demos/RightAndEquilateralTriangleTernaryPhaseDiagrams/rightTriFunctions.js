@@ -617,12 +617,12 @@ function rightInPhaseDisplay(xL,xR,yL,yR){
         rect(diff[0]+xL-20,500,45,30);
         noStroke(); textSize(18);
         fill(255,100,0);
-        text(solv_ext,diff[0]+xL-15,520);
+        text(car_raf,diff[0]+xL-15,520);
         stroke(255,0,255); fill(255);
         rect(diff[2]+xR-20,500,45,30);
         noStroke(); 
         fill(255,100,0);
-        text(solv_raf,diff[2]+xR-15,520);
+        text(car_ext,diff[2]+xR-15,520);
         pop();
     }
 
