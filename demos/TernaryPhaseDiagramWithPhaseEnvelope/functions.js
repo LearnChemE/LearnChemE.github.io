@@ -257,6 +257,8 @@ function inPhaseRep(){
     let ytemp = -2.165*Math.pow(xP,2) + 2.165*xP - 0.1949;
     xP = map(xP,0,1,g.xtip-g.dx,g.xtip+g.dx);
     let yP = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+    let alphaPoints = [];
+    let betaPoints = [];
 
     push();
     strokeWeight(2.5);
@@ -267,8 +269,10 @@ function inPhaseRep(){
         ytemp = ytemp = -2.165*Math.pow(i,2) + 2.165*i - 0.1949;
         y1 = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
         vertex(x1,y1);
+        alphaPoints.push([x1,y1]);
         if(i == .34){
             vertex(xP,yP);
+            alphaPoints.push([xP,yP])
         }
     }
     endShape();
@@ -277,16 +281,58 @@ function inPhaseRep(){
     for(let i = .34; i < .91; i+=.01){
         if(i == .34){
             vertex(xP,yP);
+            betaPoints.push([xP,yP])
         }
         x1 = map(i,0,1,g.xtip-g.dx,g.xtip+g.dx);
         ytemp = ytemp = -2.165*Math.pow(i,2) + 2.165*i - 0.1949;
         y1 = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
         vertex(x1,y1);
+        betaPoints.push([x1,y1]);
     }
     endShape();
     pop();
     
-     
+    let yVals = new Array(8);
+    for(let i = 0; i < yVals.length; i++){
+        yVals[i] = tieSlopes[i]*temp.x + tieBs[i];
+    }
+
+    let region = 0;
+    let dY, dC, mx, xL, xR, yL, yR, bx;
+    for(let i = 0; i < tieSlopes.length-1; i++){
+        if(temp.y < yVals[i] && temp.y > yVals[i+1]){
+            dY = yVals[i]-yVals[i+1];
+            dC = yVals[i]-temp.y;
+
+            mx = tieSlopes[i]*(1-dC/dY) + tieSlopes[i+1]*(dC/dY);
+            bx = temp.y - mx*temp.x;
+
+            xL = tieCoords[i][0]*(1-dC/dY) + tieCoords[i+1][0]*(dC/dY);
+            xR = tieCoords[i][2]*(1-dC/dY) + tieCoords[i+1][2]*(dC/dY);
+            yL = mx*xL + bx;
+            yR = mx*xR + bx;
+        } else if(temp.y < yVals[tieSlopes.length-1]){
+            let ratio = yVals[tieSlopes.length-1]/temp.y;
+            mx = tieSlopes[tieSlopes.length-1]*ratio;
+            bx = temp.y - mx*temp.x;
+            let t = region8Coords(mx,bx,alphaPoints,betaPoints);
+            xL = t[0]; xR = t[1];
+            yL = mx*xL + bx;
+            yR = mx*xR + bx;
+        } else if(temp.y == g.ytip+g.dy){
+            xL = map(.1,0,1,g.xtip-g.dx,g.xtip+g.dx);
+            xR = map(.9,0,1,g.xtip-g.dx,g.xtip+g.dx);
+            yL = g.ytip+g.dy;
+            yR = yL;
+        }
+    }
+    push();
+    drawingContext.setLineDash([10,10]);
+    strokeWeight(3);
+    line(xL,yL,xR,yR);
+    pop();
+    
+    alphaBetaMassFracs(xL,yL,xR,yR);
 }
 
 function cTriangleRep(x1,y1){
@@ -327,5 +373,72 @@ function bTriangleRep(x1,y1){
     y3 = y1 + dy2;
 
     return([x1,y1,x2,y2,x3,y3])
+}
+
+function region8Coords(mx,bx,alphaP,betaP){
+    let xL, xR, m, b, x, y;
+    for(let i = 0; i < alphaP.length-1; i++){
+        m = (alphaP[i+1][1]-alphaP[i][1])/(alphaP[i+1][0]-alphaP[i][0]);
+        b = alphaP[i][1] - m*alphaP[i][0];
+        x = (bx-b)/(m-mx);
+
+        if(x > alphaP[i][0] && x < alphaP[i+1][0]){
+            xL = x;
+        } else if(x == alphaP[i][0]){
+            xL = alphaP[i][0];
+        }
+    }
+
+    for(let i = 0; i < betaP.length-1; i++){
+        m = (betaP[i+1][1]-betaP[i][1])/(betaP[i+1][0]-betaP[i][0]);
+        b = betaP[i][1] - m*betaP[i][0];
+        x = (bx-b)/(m-mx);
+
+        if(x > betaP[i][0] && x < betaP[i+1][0]){
+            xR = x;
+        } else if(x == betaP[i][0]){
+            xR = betaP[i][0];
+        }
+    }
+    return([xL,xR]);
+}
+
+function alphaBetaMassFracs(xL,yL,xR,yR){
+    let alpha_a_NF, alpha_a_F;
+    let alpha_b_NF, alpha_b_F;
+    let alpha_c_NF, alpha_c_F;
+    let beta_a_NF, beta_a_F;
+    let beta_b_NF, beta_b_F;
+    let beta_c_NF, beta_c_F;
+    // xL and yL
+    if(g.alphaTruth){
+        push();
+        // A line
+        stroke(28,183,0); fill(48,183,0); strokeWeight(2);
+        x1 = xL; y1 = yL;
+        y2 = yL; x2 = (y2 - g.R[1])/g.R[0];
+        push(); drawingContext.setLineDash([5,5]);
+        line(x1,y1,x2-3,y2);
+        pop(); 
+        triangle(x2-3,y2,x2-18,y2+5,x2-18,y2-5)
+        pop();
+
+        push();
+        // C line
+        
+    }
+    // xR and yR
+    if(g.betaTruth){
+        push();
+        // A line
+        stroke(28,183,0); fill(48,183,0); strokeWeight(2);
+        x1 = xR; y1 = yR;
+        y2 = yR; x2 = (y2 - g.R[1])/g.R[0];
+        push(); drawingContext.setLineDash([5,5]);
+        line(x1,y1,x2-3,y2);
+        pop(); 
+        triangle(x2-3,y2,x2-18,y2+5,x2-18,y2-5)
+        pop();
+    }
 }
 

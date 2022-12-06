@@ -6,8 +6,8 @@ window.g = {
   diagramORphase : 'diagram',
   gridTruth : false,
   tieTruth : true,
-  // alphaTruth : true,
-  // betaTruth : true,
+  alphaTruth : true,
+  betaTruth : true,
 
   radius : 10,
   points : [],
