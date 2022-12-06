@@ -4,7 +4,7 @@ window.g = {
   cnv : undefined,
   
   diagramORphase : 'diagram',
-  gridTruth : true,
+  gridTruth : false,
   tieTruth : true,
   // alphaTruth : true,
   // betaTruth : true,
@@ -36,7 +36,7 @@ function setup() {
 
   document.getElementsByTagName("main")[0].remove();
   for(let i = 0; i < g.nP; i++){
-    g.points.push(createVector(200,350));
+    g.points.push(createVector(347,276));
   }
 
   triSetup();
@@ -49,6 +49,10 @@ function draw() {
     g.DISABLED[0] = true;
     g.DISABLED[1] = true;
   }
+  // if(g.diagramORphase == 'diagram'){
+  //   alphap.disabled = g.DISABLED[0];
+  //   beta.disabled = g.DISABLED[1];
+  // }
   
 
   // how to disable/enable alpha phase and beta phase boxes
@@ -71,19 +75,27 @@ function draw() {
       if(g.tieTruth){
         tieDraw();
       }
+      phaseCheck();
       diagramConstDraw();
+      if(g.inPhaseEnvelope){
+        inPhaseRep();
+      } else {
+        notInPhaseRep();
+      }
       break;
     case 'phase':
       
 
       break;
   }
- 
-  push(); fill(0);
-  for(let p of g.points){
-    circle(p.x,p.y,g.radius*2);
+  if(g.diagramORphase == 'diagram'){
+    push(); fill(0);
+    for(let p of g.points){
+      circle(p.x,p.y,g.radius*2);
+    }
+    pop();
   }
-  pop();
+
 }
 
 
@@ -121,8 +133,10 @@ for(let i = 0; i < diaORphase.length; i++){
       case 'diagram':
         gridLines.disabled = false;
         tie.disabled = false;
-        alphap.disabled = g.DISABLED[0];
-        beta.disabled = g.DISABLED[1];
+        alphap.disabled = true;
+        beta.disabled = true;
+        g.points[0].x = 347;
+        g.points[0].y = 276;
         break;
       case 'phase':
         gridLines.disabled = true;
