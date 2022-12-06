@@ -134,7 +134,7 @@ function equilatGrid(L,R,dx,dy){
     // Carrier grid
     stroke(255,100,0,80);
     for(let i = 0; i < yVals.length; i++){
-        y1 = yVals[i];
+        y1 = yVals[i];  
         x1 = (y1-L[1])/L[0];
         y2 = ytip + dy;
         x2 = (xtip-dx) + xChange*(i+1);

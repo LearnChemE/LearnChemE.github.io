@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Right and Equilateral Triangle Ternary Phase Diagrams</title>
+
+  <!-- Before we run any other scripts, we have to import P5.js (a library for graphics) -->
+  <script src="./libraries/p5.js"></script>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+  <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
+  <meta name="author" content="Alex Jimenez">
+  <meta name="application-name" content="LearnChemE simulation template">
+  <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
+
+  <link href="./sliders.css" rel="stylesheet">
+  <link href="./style.css" rel="stylesheet">
+  <link href="./bootstrap.min.css" rel="stylesheet">
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.95,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="./jquery.js"></script>
+  <script src="./popper.js"></script>
+  <script src="./bootstrap.min.js"></script>
+
+</head>
+
+
+<body>
+
+  <div style="position:relative; top:30px">
+  <div id="simulation-wrapper">
+
+    <div class="inputs-wrapper">
+      <div class="btn-group btn-group-sm" id="diagram-or-phase">
+        <input type="radio" class="btn-check" name="btnradio" id="diagram" autocomplete="off" value = "diagram" checked>
+        <label class="btn btn-outline-primary" for="diagram" style="margin-right: 0px">Diagram</label>
+      
+        <input type="radio" class="btn-check" name="btnradio" id="phase" autocomplete="off" value = "phase">
+        <label class="btn btn-outline-primary" for="phase">Phases</label>
+      </div>
+      
+     
+
+     <div id="modal-buttons">
+      <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
+      <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+      <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
+      
+    </div>
+    
+  </div>
+  <div style = "position:relative;left:calc(50vw - 250px);top:20px">
+    <div class="select-container">
+      <form>
+        
+        <label class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="grid-lines" value="grid-on">
+          <label class="for-check-label" for="grid-lines">Grid lines</label>
+        </label>
+        <label class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="tie-lines" value="tie-on" checked>
+          <label class="for-check-label" for="tie-lines">Tie lines</label>
+        </label>
+        <label class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="alphap" value="alpha-on" checked disabled>
+            <label class="for-check-label" for="alphap">Alpha phase</label>
+        </label>
+        <label class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="beta" value="beta-on" checked disabled>
+          <label class="for-check-label" for="beta">Alpha phase</label>
+        </label>
+      </form>
+    </div>
+  </div>
+</div>
+ 
+
+  <div id="graphics-wrapper">
+
+  </div>
+  </div>
+
+  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+         
+          
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-text">
+          The screencast video at [1] explains how to use this simulation. For another explanation of how to use an equilateral ternary phase diagram, view the screencast at [2].
+        </div>
+        <div style="height:10px"></div>
+        <ol class="references">
+          <li>
+           <i>Right and Equilateral Ternary Phase Diagrams</i> [Video]. (Sep 1, 2016) <a 
+            href="https://www.youtube.com/watch?v=mvQE7fElYDs"
+            target="_blank">www.youtube.com/watch?v=mvQE7fElYDs</a>.
+          </li>
+          <li>
+            <i>Using a Triangular (Ternary) Phase Diagram</i> [Video]. (Jul 30, 2015) <a 
+            href="https://www.youtube.com/watch?v=gGYHXhcKM5s"
+            target="_blank">www.youtube.com/watch?v=gGYHXhcKM5s</a>.
+          </li>
+        </ol>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aboutModalLabel">About</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+            Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under the direction of Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional contributions by Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of our
+          simulations are open source, and are available on our <a
+            href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+            repository</a>.</p>
+        <p style="line-height: 3rem;">
+          If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+              src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+              src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
+          or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+              style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
+              style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
+              src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+              src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac
+          or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+              style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+              style="height: 4ch;"></span>&nbsp;on Windows.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+  <script src="functions.js"></script>
+ 
+</body>
+
+</html>
+
