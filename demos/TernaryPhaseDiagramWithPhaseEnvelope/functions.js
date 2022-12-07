@@ -159,7 +159,6 @@ function notInPhaseRep(){
 
     // C display
     push();
-    let angle = 30*Math.PI/180;
     stroke(170,0,0); fill(170,0,0); strokeWeight(2);
     x1 = temp.x;
     x2 = temp.y;
@@ -417,14 +416,72 @@ function alphaBetaMassFracs(xL,yL,xR,yR){
         stroke(28,183,0); fill(48,183,0); strokeWeight(2);
         x1 = xL; y1 = yL;
         y2 = yL; x2 = (y2 - g.R[1])/g.R[0];
-        push(); drawingContext.setLineDash([5,5]);
+        push(); drawingContext.setLineDash([6,6]);
         line(x1,y1,x2-3,y2);
+        alpha_a_NF = map(yL,g.ytip+g.dy,g.ytip,0,1);
+        alpha_a_F = alpha_a_NF.toFixed(2);
         pop(); 
         triangle(x2-3,y2,x2-18,y2+5,x2-18,y2-5)
+
+    
+    
+        // C line
+        stroke(170,0,0); fill(170,0,0);
+        y2 = g.ytip+g.dy-2;
+        let btemp = y1 - g.L[0]*x1;
+        x2 = (y2-btemp)/g.L[0];
+        push(); drawingContext.setLineDash([6,6]);
+        line(x1,y1,x2,y2);
+        alpha_c_NF = map(x2,g.xtip-g.dx,g.xtip+g.dx,0,1);
+        alpha_c_F = alpha_c_NF.toFixed(2);
+        let pos = cTriangleRep(x2,y2);
+        pop();
+        triangle(pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+
+        // B line
+        stroke(0,0,255); fill(0,0,255);
+        alpha_b_NF = 1 - alpha_a_NF - alpha_c_NF;
+        alpha_b_F = alpha_b_NF.toFixed(2);
+        x2 = map(alpha_b_NF,0,1,g.xtip,g.xtip-g.dx);
+        y2 = g.L[0]*x2 + g.L[1];
+        push(); drawingContext.setLineDash([6,6]);
+        line(x1,y1,x2,y2);
+        pos = bTriangleRep(x2,y2);
+        pop();
+        triangle(pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+
+        fill(255,172,28); stroke(255,172,28);
+        ellipse(xL,yL,12);
         pop();
 
+        // Mass fraction display
         push();
-        // C line
+        textSize(25);
+        text('mass fractions',43,45);
+        strokeWeight(2); fill(255);
+        rect(37,55,175,125);
+        push();
+        textStyle(ITALIC);
+        fill(48,183,0);
+        text('x  = ',85,85);
+        fill(0,0,255);
+        text('x  =',85,125);
+        fill(170,0,0);
+        text('x  =',85,165);
+        pop();
+        fill(48,183,0); textSize(23);
+        text(alpha_a_F,132,85);
+        fill(0,0,255);
+        text(alpha_b_F,132,125);
+        fill(170,0,0);
+        text(alpha_c_F,132,165);
+        fill(48,183,0); textSize(18);
+        text('A',97,93); text('α',98,75);
+        fill(0,0,255);
+        text('B',97,133); text('α',98,115);
+        fill(170,0,0); 
+        text('C',97,173); text('α',98,155);
+        pop();
         
     }
     // xR and yR
@@ -436,9 +493,70 @@ function alphaBetaMassFracs(xL,yL,xR,yR){
         y2 = yR; x2 = (y2 - g.R[1])/g.R[0];
         push(); drawingContext.setLineDash([5,5]);
         line(x1,y1,x2-3,y2);
+        beta_a_NF = map(yR,g.ytip+g.dy,g.ytip,0,1);
+        beta_a_F = beta_a_NF.toFixed(2);
         pop(); 
         triangle(x2-3,y2,x2-18,y2+5,x2-18,y2-5)
+
+        // C line
+        stroke(170,0,0); fill(170,0,0);
+        y2 = g.ytip+g.dy-2;
+        let btemp = y1 - g.L[0]*x1;
+        x2 = (y2-btemp)/g.L[0];
+        push(); drawingContext.setLineDash([6,6]);
+        line(x1,y1,x2,y2);
+        beta_c_NF = map(x2,g.xtip-g.dx,g.xtip+g.dx,0,1);
+        beta_c_F = beta_c_NF.toFixed(2);
+        let pos = cTriangleRep(x2,y2);
         pop();
+        triangle(pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+
+        // B line
+        stroke(0,0,255); fill(0,0,255);
+        beta_b_NF = 1 - beta_a_NF - beta_c_NF;
+        beta_b_F = beta_b_NF.toFixed(2);
+        x2 = map(beta_b_NF,0,1,g.xtip,g.xtip-g.dx);
+        y2 = g.L[0]*x2 + g.L[1];
+        push(); drawingContext.setLineDash([6,6]);
+        line(x1,y1,x2,y2);
+        pos = bTriangleRep(x2,y2);
+        pop();
+        triangle(pos[0],pos[1],pos[2],pos[3],pos[4],pos[5]);
+
+
+        fill(255,0,255); stroke(255,0,255);
+        ellipse(xR,yR,12);
+        pop();
+
+        // Mass fraction display
+        push();
+        textSize(25);
+        text('mass fractions',494,45);
+        strokeWeight(2); fill(255);
+        rect(488,55,175,125);
+        push();
+        textStyle(ITALIC);
+        fill(48,183,0);
+        text('x  = ',536,85);
+        fill(0,0,255);
+        text('x  =',536,125);
+        fill(170,0,0);
+        text('x  =',536,165);
+        pop();
+        fill(48,183,0); textSize(23);
+        text(beta_a_F,583,85);
+        fill(0,0,255);
+        text(beta_b_F,583,125);
+        fill(170,0,0);
+        text(beta_c_F,583,165);
+        fill(48,183,0); textSize(18);
+        text('A',548,93); text('ß',549,75);
+        fill(0,0,255);
+        text('B',548,133); text('ß',549,115);
+        fill(170,0,0);
+        text('C',548,173); text('ß',549,155);
+        pop();
+         
     }
 }
 
