@@ -560,3 +560,134 @@ function alphaBetaMassFracs(xL,yL,xR,yR){
     }
 }
 
+function phasesMode(){
+    push();
+    strokeWeight(2);
+    fill(255,130,10,60);
+    triangle(g.xtip,g.ytip,g.xtip+g.dx,g.ytip+g.dy,g.xtip-g.dx,g.ytip+g.dy);
+    pop();
+
+    push();
+    noStroke(); textSize(30);
+    fill(48,183,0);
+    text('A',g.xtip-10,g.ytip-5);
+    fill(0,0,255);
+    text('B',g.xtip-g.dx-25,g.ytip+g.dy+12);
+    fill(170,0,0);
+    text('C',g.xtip+g.dx+4,g.ytip+g.dy+12);
+    pop();
+
+    let x, y, ytemp;
+    // Phase curve with solid white fill to avoid color blending
+    push();
+    noStroke(); fill(255);
+    beginShape();
+    for(let i = .1; i < .91; i+=0.01){
+        x = map(i,0,1,g.xtip-g.dx,g.xtip+g.dx);
+        ytemp = ytemp = -2.165*Math.pow(i,2) + 2.165*i - 0.1949;
+        y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+        vertex(x,y);
+    }
+    endShape();
+    pop();
+
+    // Blue background of curve
+    push();
+    noStroke(); fill(0,0,255,30);
+    beginShape();
+    for(let i = .1; i < .91; i+=0.01){
+        x = map(i,0,1,g.xtip-g.dx,g.xtip+g.dx);
+        ytemp = ytemp = -2.165*Math.pow(i,2) + 2.165*i - 0.1949;
+        y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+        vertex(x,y);
+    }
+    endShape();
+    pop();
+    
+
+    // Alpha phase curve
+    push();
+    strokeWeight(2.5);
+    stroke(255,172,28); noFill();
+    beginShape();
+    for(let i = .1; i < .35; i+=.01){
+        x = map(i,0,1,g.xtip-g.dx,g.xtip+g.dx);
+        ytemp = ytemp = -2.165*Math.pow(i,2) + 2.165*i - 0.1949;
+        y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+        vertex(x,y);
+        
+    }
+    endShape();
+    // Beta phase curve
+    stroke(255,0,255);
+    beginShape();
+    for(let i = .34; i < .91; i+=.01){
+        x = map(i,0,1,g.xtip-g.dx,g.xtip+g.dx);
+        ytemp = ytemp = -2.165*Math.pow(i,2) + 2.165*i - 0.1949;
+        y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+        vertex(x,y);
+        
+    }
+    endShape();
+    pop();
+
+    push();
+    strokeWeight(2);
+    line(g.xtip-g.dx,g.ytip+g.dy,g.xtip+g.dx,g.ytip+g.dy);
+    strokeWeight(15);
+    let xP = .3457;
+    ytemp = -2.165*Math.pow(xP,2) + 2.165*xP - 0.1949;
+    xP = map(xP,0,1,g.xtip-g.dx,g.xtip+g.dx);
+    let yP = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+    point(xP,yP);
+    pop();
+
+    push();
+    textSize(25);
+    text('two phases',g.xtip-65,g.ytip+g.dy-50);
+    text('one phase',g.xtip-60,g.ytip+150);
+    text('plait point',g.xtip-70,g.ytip+230);
+    pop();
+
+    // Plait point arrow and curve
+    let bpoints = [[0.349, 0.428], [0.3225, 0.417], [0.2754, 0.378], [0.333, 0.315]];
+    let bezierpx = [];
+    for(let i = 0; i < bpoints.length; i++){
+        x = map(bpoints[i][0],0,1,g.xtip-g.dx,g.xtip+g.dx);
+        y = map(bpoints[i][1],0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+        bezierpx.push([x,y]);
+    }
+    push();
+    strokeWeight(2); noFill();
+    bezier(bezierpx[0][0],bezierpx[0][1],bezierpx[1][0],bezierpx[1][1],bezierpx[2][0],bezierpx[2][1],bezierpx[3][0],bezierpx[3][1]);
+    pop();
+
+    x = bezierpx[3][0]; y = bezierpx[3][1];
+    push();
+    fill(0); strokeWeight(2);
+    triangle(x,y,x-14,y-11,x-5,y-16);
+    pop();
+
+    push();
+    noStroke(); textSize(22);
+    translate(g.xtip-g.dx+75,g.ytip+g.dy-30);
+    rotate(radians(-52));
+    fill(255);
+    rect(-2,-18,124,25);
+    fill(255,172,28);
+    text('alpha phase',0,0);
+    pop();
+
+    push();
+    noStroke(); textSize(22);
+    translate(g.xtip+g.dx-175,g.ytip+g.dy-145);
+    rotate(radians(46))
+    rect(-2,-18,114,25);
+    fill(255,0,255);
+    text('beta phase',0,0);
+    pop();
+
+
+
+}
+

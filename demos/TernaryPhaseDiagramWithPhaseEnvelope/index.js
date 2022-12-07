@@ -23,8 +23,7 @@ window.g = {
   // For storing m and b values of left and right edges of triangle
   L : [0,0],
   R : [0,0],
-  // For storing state when switching between diagram and phase
-  DISABLED : [true, true],
+  
   
 }
 
@@ -45,27 +44,6 @@ function setup() {
 
 function draw() {
   background(250);
-  if(g.inPhaseEnvelope && g.diagramORphase == 'diagram'){
-    g.DISABLED[0] = true;
-    g.DISABLED[1] = true;
-  }
-  // if(g.diagramORphase == 'diagram'){
-  //   alphap.disabled = g.DISABLED[0];
-  //   beta.disabled = g.DISABLED[1];
-  // }
-  
-
-  // how to disable/enable alpha phase and beta phase boxes
-  if(g.gridTruth){
-    alphap.disabled = false;
-  } else if(!g.gridTruth){
-    alphap.disabled = true;
-  }
-
-  // if(g.tieTruth){
-  //   alphap.disabled = true;
-  // }
-
 
   switch (g.diagramORphase){
     case 'diagram':
@@ -84,10 +62,11 @@ function draw() {
       }
       break;
     case 'phase':
-      
+      phasesMode();
 
       break;
   }
+  
   if(g.diagramORphase == 'diagram'){
     push(); fill(0);
     for(let p of g.points){
