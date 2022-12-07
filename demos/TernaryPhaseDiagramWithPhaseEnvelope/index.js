@@ -66,7 +66,7 @@ function draw() {
 
       break;
   }
-  
+
   if(g.diagramORphase == 'diagram'){
     push(); fill(0);
     for(let p of g.points){
@@ -85,6 +85,11 @@ const gridLines = document.getElementById("grid-lines");
 const tie = document.getElementById("tie-lines");
 const alphap = document.getElementById("alphap");
 const beta = document.getElementById("beta");
+
+const gridLabel = document.getElementById("grid-lines-label");
+const tieLabel = document.getElementById("tie-lines-label");
+const alphapLabel = document.getElementById("alphap-label");
+const betaLabel = document.getElementById("beta-label");
 
 gridLines.addEventListener("click",() => {
   g.gridTruth = gridLines.checked;

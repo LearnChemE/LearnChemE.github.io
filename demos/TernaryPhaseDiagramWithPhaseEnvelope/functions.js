@@ -1,6 +1,8 @@
 // Functions to be used
 // Phase curve eq: -2.165*x^2 + 2.165*x -0.1949
 function diagramConstDraw(){
+    gridLabel.style.color = 'black';
+    tieLabel.style.color = 'black';
     push();
     strokeWeight(2);
     noFill();
@@ -130,10 +132,14 @@ function phaseCheck(){
         g.inPhaseEnvelope = true;
         alphap.disabled = false;
         beta.disabled = false;
+        alphapLabel.style.color = 'black';
+        betaLabel.style.color = 'black';
     } else {
         g.inPhaseEnvelope = false;
         alphap.disabled = true;
         beta.disabled = true;
+        alphapLabel.style.color = 'grey';
+        betaLabel.style.color = 'grey';
     }
 }
 
@@ -296,7 +302,6 @@ function inPhaseRep(){
         yVals[i] = tieSlopes[i]*temp.x + tieBs[i];
     }
 
-    let region = 0;
     let dY, dC, mx, xL, xR, yL, yR, bx;
     for(let i = 0; i < tieSlopes.length-1; i++){
         if(temp.y < yVals[i] && temp.y > yVals[i+1]){
@@ -457,10 +462,13 @@ function alphaBetaMassFracs(xL,yL,xR,yR){
         // Mass fraction display
         push();
         textSize(25);
-        text('mass fractions',43,45);
-        strokeWeight(2); fill(255);
+        text('mass fractions',43,45);push();
+        strokeWeight(2); fill(255); stroke(255,172,28);
         rect(37,55,175,125);
-        push();
+        noStroke(); fill(255,172,28);
+        text('alpha phase',60,210);
+        pop();
+        push(); 
         textStyle(ITALIC);
         fill(48,183,0);
         text('x  = ',85,85);
@@ -482,6 +490,7 @@ function alphaBetaMassFracs(xL,yL,xR,yR){
         fill(170,0,0); 
         text('C',97,173); text('α',98,155);
         pop();
+        
         
     }
     // xR and yR
@@ -531,9 +540,12 @@ function alphaBetaMassFracs(xL,yL,xR,yR){
         // Mass fraction display
         push();
         textSize(25);
-        text('mass fractions',494,45);
-        strokeWeight(2); fill(255);
+        text('mass fractions',494,45); push();
+        strokeWeight(2); fill(255); stroke(255,0,255);
         rect(488,55,175,125);
+        noStroke(); fill(255,0,255);
+        text('beta phase',520,210)
+        pop();
         push();
         textStyle(ITALIC);
         fill(48,183,0);
@@ -561,6 +573,11 @@ function alphaBetaMassFracs(xL,yL,xR,yR){
 }
 
 function phasesMode(){
+
+    gridLabel.style.color = 'grey';
+    tieLabel.style.color = 'grey';
+    alphapLabel.style.color = 'grey';
+    betaLabel.style.color = 'grey';
     push();
     strokeWeight(2);
     fill(255,130,10,60);
