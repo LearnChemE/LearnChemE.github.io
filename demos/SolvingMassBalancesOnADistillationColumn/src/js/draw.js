@@ -4,14 +4,25 @@ function landingPage(p) {
   p.fill(0);
   p.textSize(18);
   p.textAlign(p.LEFT, p.CENTER);
-  const intro1 = 'This is a quiz simulation to test your ability to perform mass balances.';
-  const intro2 = 'It is three questions long and your score will be displayed at the end.'
-  const intro3 = 'To begin, enter your name in the input box below then press the blue "start" button above.';
-  const intro_width = p.textWidth(intro3);
-  p.text(intro1, p.width / 2 - intro_width / 2, 100);
-  p.text(intro2, p.width / 2 - intro_width / 2, 130);
-  p.text(intro3, p.width / 2 - intro_width / 2, 160);
-  p.text("name:", 200, 240);
+  const intro1 =  `This is a quiz simulation to test your ability to perform mass balances on a distillation column.`;
+  const intro2 =  `One or two feeds enter the column and a distillate stream leaves the top while a bottoms stream`;
+  const intro3 = `leaves the bottom of the column. The unknown variables must be solved for; enter the correct`;
+  const intro4 = `answer into the yellow input boxes then press "show solution" to check your answer. Click the`;
+  const intro5 = `"reset quiz" button to start again from the beginning with new, randomized flow rates and`;
+  const intro6 = `compositions. This quiz is 3 questions long, with a total of 7 variables that must be solved for.`;
+  const intro7 = `On the 3rd question, there is a ternary feed rather than a binary feed like on questions 1 and 2.`; const intro8 = `Your score will be displayed at the end of the quiz. To begin, enter your name in the input box`;
+  const intro9 = `below then press the blue "start" button above.`;
+  const intro_width = p.textWidth(intro1) + 20;
+  p.text(intro1, p.width / 2 - intro_width / 2, 80);
+  p.text(intro2, p.width / 2 - intro_width / 2, 105);
+  p.text(intro3, p.width / 2 - intro_width / 2, 130);
+  p.text(intro4, p.width / 2 - intro_width / 2, 155);
+  p.text(intro5, p.width / 2 - intro_width / 2, 180);
+  p.text(intro6, p.width / 2 - intro_width / 2, 205);
+  p.text(intro7, p.width / 2 - intro_width / 2, 230);
+  p.text(intro8, p.width / 2 - intro_width / 2, 255);
+  p.text(intro9, p.width / 2 - intro_width / 2, 280);
+  p.text("name:", 200, 340);
   p.pop();
 }
 
