@@ -79,7 +79,7 @@ function gridDraw(){
         yVals.push((g.ytip+g.dy)-yChange*(i+1));
     }
     push();
-    stroke(0,50);
+    stroke(0,20);
     let x1, y1, x2, y2;
     for(let i = 0; i < yVals.length; i++){
         // A lines

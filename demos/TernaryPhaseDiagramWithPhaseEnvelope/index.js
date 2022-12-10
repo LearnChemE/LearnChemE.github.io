@@ -4,7 +4,7 @@ window.g = {
   cnv : undefined,
   
   diagramORphase : 'diagram',
-  gridTruth : false,
+  gridTruth : true,
   tieTruth : true,
   alphaTruth : true,
   betaTruth : true,

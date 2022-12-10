@@ -98,3 +98,9 @@ label {
 .modal-equation.no-padding {
   padding: 0px;
 }
+
+#triangle-type {
+  display: grid;
+  grid-template-columns: repeat(2, 110px);
+  align-content: center;
+}
