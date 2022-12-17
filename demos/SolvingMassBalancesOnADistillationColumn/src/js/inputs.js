@@ -16,6 +16,7 @@ inputName.addEventListener("input", () => {
 
 startResetButton.addEventListener("click", () => {
   const enabled = startResetButton.getAttribute("disabled") === "yes" ? false : true;
+  gvs.solution_shown = false;
   if(enabled) {
     if(gvs.step === 0) {
       gvs.step = 1;
@@ -231,22 +232,15 @@ function generateAnswers() {
 }
 
 function randomizeInputs() {
-  const Q1_input1 = Math.ceil(3 * Math.random());
-  const Q1_input2 = Math.ceil(3 * Math.random());
-  const Q2_input1 = Math.ceil(4 * Math.random());
-  const Q2_input2 = Math.ceil(4 * Math.random());
-  const Q3_input1 = Math.ceil(3 * Math.random());
-  const Q3_input2 = Math.ceil(3 * Math.random());
-  const Q3_input3 = Math.ceil(3 * Math.random());
-  gvs.Q1_input1 = Q1_input1;
-  gvs.Q1_input2 = Q1_input2;
-  gvs.Q2_input1 = Q2_input1;
-  gvs.Q2_input2 = Q2_input2;
-  gvs.Q3_input1 = Q3_input1;
-  gvs.Q3_input2 = Q3_input2;
-  gvs.Q3_input3 = Q3_input3;
+  gvs.Q1_input1 = Math.ceil(3 * Math.random());
+  gvs.Q1_input2 = Math.ceil(3 * Math.random());
+  gvs.Q2_input1 = Math.ceil(4 * Math.random());
+  gvs.Q2_input2 = Math.ceil(4 * Math.random());
+  gvs.Q3_input1 = Math.ceil(3 * Math.random());
+  gvs.Q3_input2 = Math.ceil(3 * Math.random());
+  gvs.Q3_input3 = Math.ceil(3 * Math.random());
   
-  switch(Q1_input1) {
+  switch(gvs.Q1_input1) {
     case 1: 
       gvs.answers[0] = gvs.Q1zF;
       inputQ1A1.style.left = "220px";
@@ -264,7 +258,7 @@ function randomizeInputs() {
     break;
   }
   
-  switch(Q1_input2) {
+  switch(gvs.Q1_input2) {
     case 1:
       gvs.answers[1] = gvs.Q1F;
       inputQ1A2.style.left = "165px";
@@ -282,7 +276,7 @@ function randomizeInputs() {
     break;
   }
   
-  switch(Q2_input1) {
+  switch(gvs.Q2_input1) {
     case 1: 
       gvs.answers[2] = gvs.Q2zF1;
       inputQ2A1.style.left = "230px";
@@ -305,7 +299,7 @@ function randomizeInputs() {
     break;
   }
   
-  switch(Q2_input2) {
+  switch(gvs.Q2_input2) {
     case 1:
       gvs.answers[3] = gvs.Q2F1;
       inputQ2A2.style.left = "165px";
@@ -328,7 +322,7 @@ function randomizeInputs() {
     break;
   }
 
-  switch(Q3_input1) {
+  switch(gvs.Q3_input1) {
     case 1:
       gvs.answers[4] = gvs.Q3zF1;
       inputQ3A1.style.left = "228px";
@@ -346,7 +340,7 @@ function randomizeInputs() {
     break;
   }
   
-  switch(Q3_input2) {
+  switch(gvs.Q3_input2) {
     case 1: 
       gvs.answers[5] = gvs.Q3zF2;
       inputQ3A2.style.left = "228px";
@@ -364,7 +358,7 @@ function randomizeInputs() {
     break;
   }
   
-  switch(Q3_input3) {
+  switch(gvs.Q3_input3) {
     case 1:
       gvs.answers[6] = gvs.Q3F;
       inputQ3A3.style.left = "166px";

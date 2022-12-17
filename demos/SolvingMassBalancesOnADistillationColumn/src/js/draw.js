@@ -45,6 +45,71 @@ function question1(p) {
   p.text("B", 101, 191);
 
   p.pop();
+
+  p.push();
+
+  if(gvs.solution_shown) {
+
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.fill(255, 255, 224);
+    p.rect(30, 45, 165, 105);
+
+    p.textSize(18);
+    p.fill(255, 0, 0);
+    p.noStroke();
+    p.text("your answers:", 40, 72);
+    p.textAlign(p.RIGHT);
+    
+    switch(gvs.Q1_input1) {
+      case 1:
+        p.text("z   =", 85, 100);
+        p.textSize(12);
+        p.text("F", 69, 105);
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[0] * 100) / 100).toFixed(2)}`, 90, 100);
+      break;
+      case 2:
+        p.text("x   =", 85, 100);
+        p.textSize(12);
+        p.text("D", 69, 105);
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[0] * 100) / 100).toFixed(2)}`, 90, 100);
+      break;
+      case 3:
+        p.text("x   =", 85, 100);
+        p.textSize(12);
+        p.text("B", 69, 105);
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[0] * 100) / 100).toFixed(2)}`, 90, 100);
+      break;
+    }
+
+    p.textAlign(p.RIGHT);
+
+    switch(gvs.Q1_input2) {
+      case 1:
+        p.text("F =", 85, 128);
+        p.textAlign(p.LEFT);
+        p.text(`${(Math.round(gvs.guesses[1] * 100) / 100).toFixed(2)} kmol/h`, 90, 128);
+      break;
+      case 2:
+        p.text("D =", 85, 128);
+        p.textAlign(p.LEFT);
+        p.text(`${(Math.round(gvs.guesses[1] * 100) / 100).toFixed(2)} kmol/h`, 90, 128);
+      break;
+      case 3:
+        p.text("B =", 85, 128);
+        p.textAlign(p.LEFT);
+        p.text(`${(Math.round(gvs.guesses[1] * 100) / 100).toFixed(2)} kmol/h`, 90, 128);
+      break;
+    }
+  }
+
+  p.pop();
 }
 
 function question2(p) {
@@ -90,6 +155,90 @@ function question2(p) {
   p.textSize(12);
   p.text("B", 101, 191);
   p.pop();
+
+  p.push();
+
+  if(gvs.solution_shown) {
+
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.fill(255, 255, 224);
+    p.rect(30, 45, 165, 105);
+
+    p.textSize(18);
+    p.fill(255, 0, 0);
+    p.noStroke();
+    p.text("your answers:", 40, 72);
+    p.textAlign(p.RIGHT);
+    
+    switch(gvs.Q2_input1) {
+      case 1:
+        p.text("z     =", 85, 100);
+        p.textSize(12);
+        p.text("F,1", 68, 105);
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[2] * 100) / 100).toFixed(2)}`, 90, 100);
+      break;
+      case 2:
+        p.text("z     =", 85, 100);
+        p.textSize(12);
+        p.text("F,2", 68, 105);
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[2] * 100) / 100).toFixed(2)}`, 90, 100);
+      break;
+      case 3:
+        p.text("x   =", 85, 100);
+        p.textSize(12);
+        p.text("D", 70, 105);
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[2] * 100) / 100).toFixed(2)}`, 90, 100);
+      break;
+      case 4:
+        p.text("x   =", 85, 100);
+        p.textSize(12);
+        p.text("B", 70, 105);
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[2] * 100) / 100).toFixed(2)}`, 90, 100);
+      break;
+    }
+
+    p.textAlign(p.RIGHT);
+
+    switch(gvs.Q2_input2) {
+      case 1:
+        p.text("F   =", 85, 128);
+        p.textSize(12);
+        p.text("1", 67, 133)
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[3] * 100) / 100).toFixed(2)} kmol/h`, 90, 128);
+      break;
+      case 2:
+        p.text("F   =", 85, 128);
+        p.textSize(12);
+        p.text("2", 67, 133)
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[3] * 100) / 100).toFixed(2)} kmol/h`, 90, 128);
+      break;
+      case 3:
+        p.text("D =", 85, 128);
+        p.textAlign(p.LEFT);
+        p.text(`${(Math.round(gvs.guesses[3] * 100) / 100).toFixed(2)} kmol/h`, 90, 128);
+      break;
+      case 4:
+        p.text("B =", 85, 128);
+        p.textAlign(p.LEFT);
+        p.text(`${(Math.round(gvs.guesses[3] * 100) / 100).toFixed(2)} kmol/h`, 90, 128);
+      break;
+    }
+  }
+
+  p.pop();
 }
 
 function question3(p) {
@@ -127,6 +276,100 @@ function question3(p) {
   p.textSize(12);
   p.text("B,A", 101, 191);
   p.text("B,B", 101, 226);
+
+  p.pop();
+
+  p.push();
+
+  if(gvs.solution_shown) {
+
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.fill(255, 255, 224);
+    p.rect(26, 45, 168, 133);
+
+    p.textSize(18);
+    p.fill(255, 0, 0);
+    p.noStroke();
+    p.text("your answers:", 40, 72);
+    p.textAlign(p.RIGHT);
+    
+    switch(gvs.Q3_input1) {
+      case 1:
+        p.text("z     =", 85, 100);
+        p.textSize(12);
+        p.text("F,A", 70, 105);
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[4] * 100) / 100).toFixed(2)}`, 90, 100);
+      break;
+      case 2:
+        p.text("x     =", 85, 100);
+        p.textSize(12);
+        p.text("D,A", 71, 105);
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[4] * 100) / 100).toFixed(2)}`, 90, 100);
+      break;
+      case 3:
+        p.text("x     =", 85, 100);
+        p.textSize(12);
+        p.text("B,A", 71, 105);
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[4] * 100) / 100).toFixed(2)}`, 90, 100);
+      break;
+    }
+
+    p.textAlign(p.RIGHT);
+
+    switch(gvs.Q3_input2) {
+      case 1:
+        p.text("z     =", 85, 128);
+        p.textSize(12);
+        p.text("F,B", 70, 133);
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[5] * 100) / 100).toFixed(2)}`, 90, 128);
+      break;
+      case 2:
+        p.text("x     =", 85, 128);
+        p.textSize(12);
+        p.text("D,B", 71, 133);
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[5] * 100) / 100).toFixed(2)}`, 90, 128);
+      break;
+      case 3:
+        p.text("x     =", 85, 128);
+        p.textSize(12);
+        p.text("B,B", 71, 133);
+        p.textAlign(p.LEFT);
+        p.textSize(18);
+        p.text(`${(Math.round(gvs.guesses[5] * 100) / 100).toFixed(2)}`, 90, 128);
+      break;
+    }
+
+    p.textAlign(p.RIGHT);
+
+    switch(gvs.Q3_input3) {
+      case 1:
+        p.text("F =", 85, 156);
+        p.textAlign(p.LEFT);
+        p.text(`${(Math.round(gvs.guesses[6] * 100) / 100).toFixed(2)} kmol/h`, 90, 156);
+      break;
+      case 2:
+        p.text("D =", 85, 156);
+        p.textAlign(p.LEFT);
+        p.text(`${(Math.round(gvs.guesses[6] * 100) / 100).toFixed(2)} kmol/h`, 90, 156);
+      break;
+      case 3:
+        p.text("B =", 85, 156);
+        p.textAlign(p.LEFT);
+        p.text(`${(Math.round(gvs.guesses[6] * 100) / 100).toFixed(2)} kmol/h`, 90, 156);
+      break;
+    }
+  }
 
   p.pop();
 }
@@ -175,7 +418,11 @@ function drawColumn(p) {
   p.noStroke();
   p.fill("red");
   if(gvs.solution_shown) {
-    p.text(`press "next question" to proceed`, 260, 40);
+    if(gvs.step < 3) {
+      p.text(`press "next question" to proceed`, 260, 40);
+    } else {
+      p.text(`press "display results" to proceed`, 260, 40);
+    }
   } else {
     p.text(`type the answers in the input boxes, then press "show solution" to check your answers`, 50, 40);
   }
