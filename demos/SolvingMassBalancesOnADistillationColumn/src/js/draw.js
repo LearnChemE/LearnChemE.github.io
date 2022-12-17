@@ -425,6 +425,9 @@ function drawColumn(p) {
     }
   } else {
     p.text(`type the answers in the input boxes, then press "show solution" to check your answers`, 50, 40);
+    if(gvs.step === 3) {
+      p.text(`this is a ternary mixture (there are 3 components)`, 50, 65);
+    }
   }
   p.pop();
 
