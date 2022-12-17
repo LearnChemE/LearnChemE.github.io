@@ -58,7 +58,7 @@ function question1(p) {
     p.textSize(18);
     p.fill(255, 0, 0);
     p.noStroke();
-    p.text("your answers:", 40, 72);
+    p.text("your answers:", 50, 72);
     p.textAlign(p.RIGHT);
     
     switch(gvs.Q1_input1) {
@@ -168,7 +168,7 @@ function question2(p) {
     p.textSize(18);
     p.fill(255, 0, 0);
     p.noStroke();
-    p.text("your answers:", 40, 72);
+    p.text("your answers:", 50, 72);
     p.textAlign(p.RIGHT);
     
     switch(gvs.Q2_input1) {
@@ -291,7 +291,7 @@ function question3(p) {
     p.textSize(18);
     p.fill(255, 0, 0);
     p.noStroke();
-    p.text("your answers:", 40, 72);
+    p.text("your answers:", 50, 72);
     p.textAlign(p.RIGHT);
     
     switch(gvs.Q3_input1) {
