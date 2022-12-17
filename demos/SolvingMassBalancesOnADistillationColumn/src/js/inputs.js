@@ -1,5 +1,3 @@
-const { start } = require("@popperjs/core");
-
 const startResetButton = document.getElementById("start-reset");
 const showSolutionNextButton = document.getElementById("show-solution-next");
 const inputName = document.getElementById("input-name");
@@ -13,12 +11,7 @@ const inputQ3A3 = document.getElementById("input-q3-3");
 
 inputName.addEventListener("input", () => {
   const input = inputName.value;
-  if(input === "") {
-    startResetButton.setAttribute("disabled", "yes");
-  } else {
-    startResetButton.removeAttribute("disabled");
-    gvs.name = input;
-  }
+  gvs.name = input;
 });
 
 startResetButton.addEventListener("click", () => {
@@ -217,20 +210,24 @@ function generateAnswers() {
   gvs.Q2xB = Math.round(((volatile_in_feed - gvs.Q2xD * gvs.Q2D) / gvs.Q2B) * 100) / 100;
 
   // Generate random values for question 3
-  gvs.Q3zF1 = Number((0.25 + Math.random() * 0.5).toFixed(2));
-  gvs.Q3zF2 = Math.round((1 - gvs.Q3zF1) * 100) / 100;
+  let A = Math.random();
+  let B = Math.random();
+  let C = Math.random();
+  let total = A + B + C;
+  gvs.Q3zF1 = Math.round(100 * A / total) / 100;
+  gvs.Q3zF2 = Math.round(100 * B / total) / 100;
   gvs.Q3F = Number((1 + 4 * Math.random()).toFixed(2));
   gvs.Q3D = Number((0.3 * gvs.Q3F + 0.4 * Math.random() * gvs.Q3F).toFixed(2));
   gvs.Q3B = Math.round((gvs.Q3F - gvs.Q3D) * 100) / 100;
-  volatile_in_feed = gvs.Q3zF1 * gvs.Q3F;
-  gvs.Q3xD1 = Number((0.8 + 0.19 * Math.random()).toFixed(2));
-  if(gvs.Q3xD1 * gvs.Q3D > 0.9 * volatile_in_feed) {
-    gvs.Q3xD1 = Number((0.9 * volatile_in_feed / gvs.Q3D).toFixed(2));
-  }
-  gvs.Q3xD2 = Math.round((1 - gvs.Q3xD1) * 100) / 100;
-  gvs.Q3xB1 = Math.round(((volatile_in_feed - gvs.Q3xD1 * gvs.Q3D) / gvs.Q3B) * 100) / 100;
-  gvs.Q3xB2 = Math.round((1 - gvs.Q3xB1) * 100) / 100;
-
+  const volatile_in_feed_1 = gvs.Q3zF1 * gvs.Q3F;
+  const volatile_in_feed_2 = gvs.Q3zF2 * gvs.Q3F;
+  A *= 1.5 + Math.random();
+  B *= 1 + Math.random();
+  total = A + B + C;
+  gvs.Q3xD1 = Math.round(100 * A / total) / 100;
+  gvs.Q3xD2 = Math.round(100 * B / total) / 100;
+  gvs.Q3xB1 = Math.round(((volatile_in_feed_1 - gvs.Q3xD1 * gvs.Q3D) / gvs.Q3B) * 100) / 100;
+  gvs.Q3xB2 = Math.round(((volatile_in_feed_2 - gvs.Q3xD2 * gvs.Q3D) / gvs.Q3B) * 100) / 100;
 }
 
 function randomizeInputs() {

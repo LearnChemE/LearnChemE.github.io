@@ -34,13 +34,14 @@
     <div class="input-area">
   
       <div class="controls-container">
-        <div id="start-reset" class="btn btn-primary" disabled="yes"><i class="fa-solid fa-play"></i><div>start</div></div>
+        <div id="start-reset" class="btn btn-primary"><i class="fa-solid fa-play"></i><div>start</div></div>
         <div id="show-solution-next" class="btn btn-success" disabled="yes"><i class="fa-solid fa-forward"></i><div>show solution</div></div>
       </div>
   
     </div>
 
     <div class="modal-buttons-row">
+      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
       <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
       <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
     </div>
@@ -57,6 +58,27 @@
       <input id="input-q3-1" class="answer-box hidden" type="number">
       <input id="input-q3-2" class="answer-box hidden" type="number">
       <input id="input-q3-3" class="answer-box hidden" type="number">
+    </div>
+  </div>
+
+  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="directions-modal-label">Directions</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+
+          <div style="margin-top: 2rem;"></div>
+        </div>
+
+      </div>
     </div>
   </div>
 
