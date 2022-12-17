@@ -189,8 +189,16 @@ function phaseCheck(){
 
     if(leftTest && rightTest){
         g.inPhaseEnvelope = true;
-    } else{
+        alphap.disabled = false;
+        beta.disabled = false;
+        alphapLabel.style.color = 'black';
+        betaLabel.style.color = 'black';
+    } else {
         g.inPhaseEnvelope = false;
+        alphap.disabled = true;
+        beta.disabled = true;
+        alphapLabel.style.color = 'grey';
+        betaLabel.style.color = 'grey';
     }
 }
 
@@ -280,6 +288,7 @@ function notInPhaseRep(){
 // Need work here
 function inPhaseRep(){
     let temp = g.points[0];
+    let ytemp;
 
     // Determining m and b values of tie lines
     // Get the points first
@@ -303,7 +312,14 @@ function inPhaseRep(){
     }
 
     // Adding top right edge of phase envelope to coordinates, slopes, and b vectors
-    tieCoords.splice(0,0,[g.xtip,g.ytip,g.xtip+g.dx,g.ytip+g.dy]);
+    //tieCoords.splice(0,0,[g.xtip,g.ytip,g.xtip+g.dx,g.ytip+g.dy]);
+    x1 = map(.5833,0,1,g.xtip-g.dx,g.xtip+g.dx);
+    ytemp = -.8921*Math.pow(.5833,2) + 2.427*.5833 - .3903;
+    y1 = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+    x2 = map(.915,0,1,g.xtip-g.dx,g.xtip+g.dx);
+    ytemp = 1.732*.915-1.438;
+    y2 = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+    tieCoords.splice(0,0,[x1,y1,x2,y2]);
     tieSlopes.splice(0,0,g.R[0]);
     tieBs.splice(0,0,g.R[1]);
 
@@ -358,8 +374,7 @@ function inPhaseRep(){
     tieCoords = tieCoords.reverse();
     tieSlopes = tieSlopes.reverse();
     tieBs = tieBs.reverse();
-    
-    
+   
     let yVals = new Array(8);
     for(let i = 0; i < yVals.length; i++){
         yVals[i] = tieSlopes[i]*temp.x + tieBs[i];
@@ -380,30 +395,25 @@ function inPhaseRep(){
             yL = mx*xL + bx;
             yR = mx*xR + bx;
             region = i+1;
-        // } else if(temp.y < yVals[tieSlopes.length-1]){
-        //     let ratio = yVals[tieSlopes.length-1]/temp.y;
-        //     mx = tieSlopes[tieSlopes.length-1]*ratio;
-        //     bx = temp.y - mx*temp.x;
-            // let t = region8Coords(mx,bx,alphaPoints,betaPoints);
-            // xL = t[0]; xR = t[1];
-            // yL = mx*xL + bx;
-            // yR = mx*xR + bx;
-            region = i+1;
-        } else if(temp.y == g.ytip+g.dy){
-            xL = map(.1,0,1,g.xtip-g.dx,g.xtip+g.dx);
-            xR = map(.9,0,1,g.xtip-g.dx,g.xtip+g.dx);
+        } else if(temp.y == g.ytip+g.dy){ // Condition for on the bottom of the triangle
+            xL = map(.1717,0,1,g.xtip-g.dx,g.xtip+g.dx);
+            xR = map(.83,0,1,g.xtip-g.dx,g.xtip+g.dx);
             yL = g.ytip+g.dy;
             yR = yL;
+        } else if(temp.y - g.R[0]*temp.x == g.R[1]){
+            xL = tieCoords[7][0]; yL = tieCoords[7][1];
+            xR = tieCoords[7][2]; yR = tieCoords[7][3];
+
         }
     }
-    console.log(region)
+    
     push();
     drawingContext.setLineDash([10,10]);
     strokeWeight(3);
     line(xL,yL,xR,yR);
     pop();
     
-    //alphaBetaMassFracs(xL,yL,xR,yR);
+    alphaBetaMassFracs(xL,yL,xR,yR);
 }
 
 function cTriangleRep(x1,y1){
@@ -445,34 +455,6 @@ function bTriangleRep(x1,y1){
 
     return([x1,y1,x2,y2,x3,y3])
 }
-
-// function region8Coords(mx,bx,alphaP,betaP){
-//     let xL, xR, m, b, x, y;
-//     for(let i = 0; i < alphaP.length-1; i++){
-//         m = (alphaP[i+1][1]-alphaP[i][1])/(alphaP[i+1][0]-alphaP[i][0]);
-//         b = alphaP[i][1] - m*alphaP[i][0];
-//         x = (bx-b)/(m-mx);
-
-//         if(x > alphaP[i][0] && x < alphaP[i+1][0]){
-//             xL = x;
-//         } else if(x == alphaP[i][0]){
-//             xL = alphaP[i][0];
-//         }
-//     }
-
-//     for(let i = 0; i < betaP.length-1; i++){
-//         m = (betaP[i+1][1]-betaP[i][1])/(betaP[i+1][0]-betaP[i][0]);
-//         b = betaP[i][1] - m*betaP[i][0];
-//         x = (bx-b)/(m-mx);
-
-//         if(x > betaP[i][0] && x < betaP[i+1][0]){
-//             xR = x;
-//         } else if(x == betaP[i][0]){
-//             xR = betaP[i][0];
-//         }
-//     }
-//     return([xL,xR]);
-// }
 
 function alphaBetaMassFracs(xL,yL,xR,yR){
     let alpha_a_NF, alpha_a_F;
@@ -666,110 +648,169 @@ function phasesMode(){
     push();
     noStroke(); fill(255);
     beginShape();
-    for(let i = .1; i < .91; i+=0.01){
+    for(let i = .18; i < .59; i+=.01){
+        if(i==.18){
+            x = map(.1717,0,1,g.xtip-g.dx,g.xtip+g.dx);
+            ytemp = -0.8921*Math.pow(.1717,2) + 2.427*.1717 - .3903;
+            y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+            vertex(x,y);
+        }
         x = map(i,0,1,g.xtip-g.dx,g.xtip+g.dx);
-        ytemp = ytemp = -2.165*Math.pow(i,2) + 2.165*i - 0.1949;
+        ytemp = -0.8921*Math.pow(i,2) + 2.427*i - .3903;
+        y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+        vertex(x,y);
+        if(i == .58){
+            x = map(.5833,0,1,g.xtip-g.dx,g.xtip+g.dx);
+            ytemp = 1.732*.5833 - 1.438;
+            y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+            vertex(x,y);
+        }
+    }
+    for(let i = .91; i > .82; i-=.01){
+        if(i == .91){
+            x = map(.915,0,1,g.xtip-g.dx,g.xtip+g.dx);
+            ytemp = 1.732*.915 - 1.438;
+            y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+            vertex(x,y);
+        }
+        x = map(i,0,1,g.xtip-g.dx,g.xtip+g.dx);
+        ytemp = 1.732*i - 1.438;
         y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
         vertex(x,y);
     }
     endShape();
     pop();
-
-    // Blue background of curve
+    // Same bit of code but with correct color filling two phase section
     push();
     noStroke(); fill(0,0,255,30);
     beginShape();
-    for(let i = .1; i < .91; i+=0.01){
+    for(let i = .18; i < .59; i+=.01){
+        if(i==.18){
+            x = map(.1717,0,1,g.xtip-g.dx,g.xtip+g.dx);
+            ytemp = -0.8921*Math.pow(.1717,2) + 2.427*.1717 - .3903;
+            y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+            vertex(x,y);
+        }
         x = map(i,0,1,g.xtip-g.dx,g.xtip+g.dx);
-        ytemp = ytemp = -2.165*Math.pow(i,2) + 2.165*i - 0.1949;
+        ytemp = -0.8921*Math.pow(i,2) + 2.427*i - .3903;
+        y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+        vertex(x,y);
+        if(i == .58){
+            x = map(.5833,0,1,g.xtip-g.dx,g.xtip+g.dx);
+            ytemp = 1.732*.5833 - 1.438;
+            y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+            vertex(x,y);
+        }
+    }
+    for(let i = .91; i > .82; i-=.01){
+        if(i == .91){
+            x = map(.915,0,1,g.xtip-g.dx,g.xtip+g.dx);
+            ytemp = 1.732*.915 - 1.438;
+            y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+            vertex(x,y);
+        }
+        x = map(i,0,1,g.xtip-g.dx,g.xtip+g.dx);
+        ytemp = 1.732*i - 1.438;
         y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
         vertex(x,y);
     }
     endShape();
     pop();
-    
 
-    // Alpha phase curve
+    push(); // Bit of crossover onto triangle edges with the color fill, redrawing triangle edges
+    noFill(); strokeWeight(2);
+    triangle(g.xtip,g.ytip,g.xtip+g.dx,g.ytip+g.dy,g.xtip-g.dx,g.ytip+g.dy);
+    pop();
+
     push();
-    strokeWeight(2.5);
+    strokeWeight(3);
     stroke(255,172,28); noFill();
     beginShape();
-    for(let i = .1; i < .35; i+=.01){
+    for(let i = 0.18; i < 0.59; i+=.01){
+        if(i==.18){
+            x = map(.1717,0,1,g.xtip-g.dx,g.xtip+g.dx);
+            ytemp = -0.8921*Math.pow(.1717,2) + 2.427*.1717 - .3903;
+            y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+            vertex(x,y);
+        }
         x = map(i,0,1,g.xtip-g.dx,g.xtip+g.dx);
-        ytemp = ytemp = -2.165*Math.pow(i,2) + 2.165*i - 0.1949;
+        ytemp = -0.8921*Math.pow(i,2) + 2.427*i - .3903;
         y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
         vertex(x,y);
-        
+        if(i == .58){
+            x = map(.5833,0,1,g.xtip-g.dx,g.xtip+g.dx);
+            ytemp = 1.732*.5833 - 1.438;
+            y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+            vertex(x,y);
+        }
     }
     endShape();
-    // Beta phase curve
     stroke(255,0,255);
     beginShape();
-    for(let i = .34; i < .91; i+=.01){
+    for(let i = .83; i < .92; i+=.01){
         x = map(i,0,1,g.xtip-g.dx,g.xtip+g.dx);
-        ytemp = ytemp = -2.165*Math.pow(i,2) + 2.165*i - 0.1949;
+        ytemp = 1.732*i - 1.438;
         y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
         vertex(x,y);
-        
+        if(i == .91){
+            x = map(.915,0,1,g.xtip-g.dx,g.xtip+g.dx);
+            ytemp = 1.732*.915 - 1.438;
+            y = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+            vertex(x,y);
+        }
     }
     endShape();
     pop();
 
-    push();
-    strokeWeight(2);
-    line(g.xtip-g.dx,g.ytip+g.dy,g.xtip+g.dx,g.ytip+g.dy);
-    strokeWeight(15);
-    let xP = .3457;
-    ytemp = -2.165*Math.pow(xP,2) + 2.165*xP - 0.1949;
-    xP = map(xP,0,1,g.xtip-g.dx,g.xtip+g.dx);
-    let yP = map(ytemp,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
-    point(xP,yP);
-    pop();
-
-    push();
-    textSize(25);
-    text('two phases',g.xtip-65,g.ytip+g.dy-50);
-    text('one phase',g.xtip-60,g.ytip+150);
-    text('plait point',g.xtip-70,g.ytip+230);
-    pop();
-
-    // Plait point arrow and curve
-    let bpoints = [[0.349, 0.428], [0.3225, 0.417], [0.2754, 0.378], [0.333, 0.315]];
+    let bpoints = [[.874,.289],[.7925,.226],[.7925,.119],[.86,.065]];
     let bezierpx = [];
+
     for(let i = 0; i < bpoints.length; i++){
         x = map(bpoints[i][0],0,1,g.xtip-g.dx,g.xtip+g.dx);
         y = map(bpoints[i][1],0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
         bezierpx.push([x,y]);
     }
     push();
-    strokeWeight(2); noFill();
+    strokeWeight(2); stroke(255,0,255); noFill();
     bezier(bezierpx[0][0],bezierpx[0][1],bezierpx[1][0],bezierpx[1][1],bezierpx[2][0],bezierpx[2][1],bezierpx[3][0],bezierpx[3][1]);
     pop();
 
     x = bezierpx[3][0]; y = bezierpx[3][1];
     push();
-    fill(0); strokeWeight(2);
-    triangle(x,y,x-14,y-11,x-5,y-16);
+    fill(255,0,255); stroke(255,0,255);
+    triangle(x,y,x-15,y-5,x-7,y-15);
+    noStroke();
+    textSize(25);
+    text('beta phase',bezierpx[0][0]-23,bezierpx[0][1]-10);
     pop();
 
     push();
-    noStroke(); textSize(22);
-    translate(g.xtip-g.dx+75,g.ytip+g.dy-30);
-    rotate(radians(-52));
+    textSize(25);
+    text('two phases',g.xtip-40,375);
+    translate(280,245);
+    rotate(radians(-60));
+    text('one phase',0,0);
+    pop();
+
+    push();
+    textSize(25);
+    noStroke(); 
+    translate(g.xtip-g.dx+110,g.ytip+g.dy-30);
+    rotate(radians(-63));
     fill(255);
-    rect(-2,-18,124,25);
+    rect(-5,-20,145,25);
     fill(255,172,28);
     text('alpha phase',0,0);
     pop();
+    
+    
 
-    push();
-    noStroke(); textSize(22);
-    translate(g.xtip+g.dx-175,g.ytip+g.dy-145);
-    rotate(radians(46))
-    rect(-2,-18,114,25);
-    fill(255,0,255);
-    text('beta phase',0,0);
-    pop();
+   
+   
+
+   
+
+   
 
 
 

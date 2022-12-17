@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ternary Phase Diagram with Phase Envelope</title>
+  <title>Ternary Phase Diagram with Alternate Phase Envelope</title>
 
   <!-- Before we run any other scripts, we have to import P5.js (a library for graphics) -->
   <script src="./libraries/p5.js"></script>
@@ -67,7 +67,7 @@
       <form>
         
         <label class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="grid-lines" value="grid-on" checked>
+          <input class="form-check-input" type="checkbox" id="grid-lines" value="grid-on">
           <label class="for-check-label" id="grid-lines-label" for="grid-lines">Grid lines</label>
         </label>
         <label class="form-check form-check-inline">
@@ -75,11 +75,11 @@
           <label class="for-check-label" id="tie-lines-label" for="tie-lines">Tie lines</label>
         </label>
         <label class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="alphap" value="alpha-on" checked disabled>
+            <input class="form-check-input" type="checkbox" id="alphap" value="alpha-on" checked>
             <label class="for-check-label" id="alphap-label" for="alphap">Alpha phase</label>
         </label>
         <label class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="beta" value="beta-on" checked disabled>
+          <input class="form-check-input" type="checkbox" id="beta" value="beta-on" checked>
           <label class="for-check-label" id="beta-label" for="beta">Beta phase</label>
         </label>
       </form>
@@ -107,7 +107,7 @@
           This simulation shows a ternary phase diagram with a phase envelope. This diagram represents the phase behavior for mixtures of three components that are only partially miscible over a range of compositions so that phase separations occurs. 
         </p>
         <p>
-          Click and drag the black dot, which represents the composition of the phase of the mixture, within the triangle. Each corner of the triangle is a pure component. The mass fractions for a phase or phases are displayed in a table(s). Click the "phases" button to view the one and two-phase regions (phase envelope). In the "diagram" view, check "tie lines" to view tie lines in the two-phase region. The endpoints of each tie line correspond to the compositions of the two phases in equilibrium (α and ß phases). Check "alpha phase" and "beta phase" to view these compositions. Points along the orange phase boundary are in the α phase and points along the magenta boundary are in the ß phase. The point at which the α phase switches to the ß phase on the phase envelope is the plait point; it is found by following the tie lines up until a tie line is tangent to the phase envelope boundary. Ternary phase diagrams can also be drawn with mole fractions instead of mass fractions.
+          Click and drag the black dot, which represents the composition of the phase of the mixture, within the triangle. Each corner of the triangle is a pure component. The mass fractions for a phase or phases are displayed in a table(s). Click the "phases" button to view the one and two-phase regions (phase envelope). In the "diagram" view, check "tie lines" to view tie lines in the two-phase region. The endpoints of each tie line correspond to the compositions of the two phases in equilibrium (α and ß phases). Check "alpha phase" and "beta phase" to view these compositions. Points along the orange phase boundary are in the α phase and points along the magenta boundary are in the ß phase. Ternary phase diagrams can also be drawn with mole fractions instead of mass fractions.
         </p>
           
       </div>
@@ -129,14 +129,14 @@
 
       <div class="modal-body">
         <div class="modal-text">
-          The screencast video at [1] explains how to use this simulation. For another explanation of how to use an equilateral ternary phase diagram, view the screencasts at [2] and [3].
+          The screencast video at [1] explains how to use this simulation. For another explanation of how to use a ternary phase diagram, view the screencasts at [2] and [3].
         </div>
         <div style="height:10px"></div>
         <ol class="references">
           <li>
-           <i>Ternary Phase diagram with Phase Envelope</i>. <a 
-            href="https://www.youtube.com/watch?v=mIjbkhpwo_Q"
-            target="_blank">www.youtube.com/watch?v=mIjbkhpwo_Q</a>.
+           <i>Ternary Phase diagram with Alternative Phase Envelope</i>. <a 
+            href="https://www.youtube.com/watch?v=AKJt3l68kFY"
+            target="_blank">www.youtube.com/watch?v=AKJt3l68kFY</a>.
           </li>
           <li>
             <i>Using a Triangular (Ternary) Phase Diagram</i> [Video]. <a 
