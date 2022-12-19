@@ -53,12 +53,12 @@ function question1(p) {
     p.stroke(0);
     p.strokeWeight(1);
     p.fill(255, 255, 224);
-    p.rect(30, 45, 165, 105);
+    p.rect(0, 45, 195, 105);
 
     p.textSize(18);
     p.fill(255, 0, 0);
     p.noStroke();
-    p.text("your answers:", 50, 72);
+    p.text("your answers:", 40, 72);
     p.textAlign(p.RIGHT);
     
     switch(gvs.Q1_input1) {
@@ -92,17 +92,17 @@ function question1(p) {
 
     switch(gvs.Q1_input2) {
       case 1:
-        p.text("F =", 85, 128);
+        p.text("feed =", 85, 128);
         p.textAlign(p.LEFT);
         p.text(`${(Math.round(gvs.guesses[1] * 100) / 100).toFixed(2)} kmol/h`, 90, 128);
       break;
       case 2:
-        p.text("D =", 85, 128);
+        p.text("distillate =", 85, 128);
         p.textAlign(p.LEFT);
         p.text(`${(Math.round(gvs.guesses[1] * 100) / 100).toFixed(2)} kmol/h`, 90, 128);
       break;
       case 3:
-        p.text("B =", 85, 128);
+        p.text("bottoms =", 85, 128);
         p.textAlign(p.LEFT);
         p.text(`${(Math.round(gvs.guesses[1] * 100) / 100).toFixed(2)} kmol/h`, 90, 128);
       break;
@@ -163,12 +163,12 @@ function question2(p) {
     p.stroke(0);
     p.strokeWeight(1);
     p.fill(255, 255, 224);
-    p.rect(30, 45, 165, 105);
+    p.rect(0, 45, 195, 105);
 
     p.textSize(18);
     p.fill(255, 0, 0);
     p.noStroke();
-    p.text("your answers:", 50, 72);
+    p.text("your answers:", 40, 72);
     p.textAlign(p.RIGHT);
     
     switch(gvs.Q2_input1) {
@@ -210,28 +210,22 @@ function question2(p) {
 
     switch(gvs.Q2_input2) {
       case 1:
-        p.text("F   =", 85, 128);
-        p.textSize(12);
-        p.text("1", 67, 133)
+        p.text("feed 1 =", 85, 128);
         p.textAlign(p.LEFT);
-        p.textSize(18);
         p.text(`${(Math.round(gvs.guesses[3] * 100) / 100).toFixed(2)} kmol/h`, 90, 128);
       break;
       case 2:
-        p.text("F   =", 85, 128);
-        p.textSize(12);
-        p.text("2", 67, 133)
+        p.text("feed 2 =", 85, 128);
         p.textAlign(p.LEFT);
-        p.textSize(18);
         p.text(`${(Math.round(gvs.guesses[3] * 100) / 100).toFixed(2)} kmol/h`, 90, 128);
       break;
       case 3:
-        p.text("D =", 85, 128);
+        p.text("distillate =", 85, 128);
         p.textAlign(p.LEFT);
         p.text(`${(Math.round(gvs.guesses[3] * 100) / 100).toFixed(2)} kmol/h`, 90, 128);
       break;
       case 4:
-        p.text("B =", 85, 128);
+        p.text("bottoms =", 85, 128);
         p.textAlign(p.LEFT);
         p.text(`${(Math.round(gvs.guesses[3] * 100) / 100).toFixed(2)} kmol/h`, 90, 128);
       break;
@@ -286,12 +280,12 @@ function question3(p) {
     p.stroke(0);
     p.strokeWeight(1);
     p.fill(255, 255, 224);
-    p.rect(26, 45, 168, 133);
+    p.rect(0, 45, 195, 133);
 
     p.textSize(18);
     p.fill(255, 0, 0);
     p.noStroke();
-    p.text("your answers:", 50, 72);
+    p.text("your answers:", 40, 72);
     p.textAlign(p.RIGHT);
     
     switch(gvs.Q3_input1) {
@@ -354,17 +348,17 @@ function question3(p) {
 
     switch(gvs.Q3_input3) {
       case 1:
-        p.text("F =", 85, 156);
+        p.text("feed =", 85, 156);
         p.textAlign(p.LEFT);
         p.text(`${(Math.round(gvs.guesses[6] * 100) / 100).toFixed(2)} kmol/h`, 90, 156);
       break;
       case 2:
-        p.text("D =", 85, 156);
+        p.text("distillate =", 85, 156);
         p.textAlign(p.LEFT);
         p.text(`${(Math.round(gvs.guesses[6] * 100) / 100).toFixed(2)} kmol/h`, 90, 156);
       break;
       case 3:
-        p.text("B =", 85, 156);
+        p.text("bottoms =", 85, 156);
         p.textAlign(p.LEFT);
         p.text(`${(Math.round(gvs.guesses[6] * 100) / 100).toFixed(2)} kmol/h`, 90, 156);
       break;
