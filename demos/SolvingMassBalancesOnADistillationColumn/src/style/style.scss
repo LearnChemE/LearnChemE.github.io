@@ -144,6 +144,25 @@ canvas {
     }
 }
 
+.directions-image-wrapper {
+    display: grid;
+    width: 100%;
+    justify-content: center;
+    padding: 10px;
+    .directions-image {
+        width: 400px;
+    }
+}
+
+.directions-image-small {
+    display: inline;
+    width: 100px;
+}
+
+.details-eqn {
+    margin-left: 30px;
+}
+
 *[disabled="yes"] {
     opacity: 0.3 !important;
     pointer-events: none;
