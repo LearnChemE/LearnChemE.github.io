@@ -58,23 +58,20 @@
         <input type="radio" class="btn-check" name="btnradio" id="cool-gas" autocomplete="off" value = "cool-gas">
         <label class="btn btn-outline-primary" for="cool-gas">Cool gas</label>
       </div>
-      <div id="other-buttons">
-        <div id="start-pause-button" class="btn btn-success">Start</div>
-        <div id="reset-button" class="btn btn-danger">Reset</div>
-      </div>
-      <!--
-      <div class="btn-group btn-group-sm" id="controls">
-        <input type="radio" class="btn-check" name="btnradio" id="playy" autocomplete="off" value = "playy" checked>
-        <label class="btn btn-outline-primary" for="playy">Play</label>
-      
-        <input type="radio" class="btn-check" name="btnradio" id="pausee" autocomplete="off" value = "pausee">
-        <label class="btn btn-outline-primary" for="pausee">Pause</label>
 
-        <input type="radio" class="btn-check" name="btnradio" id="resett" autocomplete="off" value = "resett">
-        <label class="btn btn-outline-primary" for="resett">Reset</label>
-      
+      <div id="other-buttons">
+        <div style="position:relative;left:60px">
+          <div id="play-button" class="btn btn-success">Play</div>
+          <div id="pause-button" class="btn btn-danger">Pause</div>
+          <div id="reset-button" class="btn btn-warning">Reset</div>
+        </div>
       </div>
-      -->
+      <div id="modal-buttons">
+        <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
+        <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+        <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
+      </div>
+      
 
     
     
@@ -85,7 +82,164 @@
     </div>
   </div>
 
+  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          In this simulation, an ideal gas is heated or cooled in two containers, one at constant pressure and one at constant volume. You can vary the amount of heat added or removed with the slider and you can switch between heating and cooling the gas with the button. Click the play button to initiate heat transfer and use the reset button to revert back to the systems' original states. Heat transfer can be stopped with the pause button and resumed with the play button.
+        </p>
+        <p>
+          The first law and ideal gas law are used to calculate the final temperature \(T\) and the changes in internal energy (\(\Delta U\)) and enthalpy (\(\Delta H\)) for each system. The work \(W\) is calculated for the constant-pressure process, and the final pressure \(P\) is calculated for the constant-volume process.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-text">
+          The final temperatures \(T \) of the constant-pressure and constant-volume systems are found using:
+        </div>
+        <div class="modal-equation">
+          $$
+          \Delta U = Q + W
+          $$
+        </div>
+        <div class="modal-text">
+          where \(\Delta U\) is the change in internal energy, \(Q\) is the heat added or removed and \(W\) is work, all in kJ/mol.
+        </div>
+        <div class="modal-text">
+          For the constant-volume process: \(W = 0\).
+        </div>
+        <div class="modal-text">
+          For the constant-pressure process: \(W = -P\Delta V\) or \(W = -R\Delta T\),
+        </div>
+        <div class="modal-text">
+          so \(\Delta U = Q - P\Delta V = Q - R\Delta T\),
+        </div>
+        <div class="modal-text">
+          and so \(\Delta H = Q\) for a constant-pressure process.
+        </div>
+        <div class="modal-text">
+          Here \(P\) is pressure (Pa), \(V\) is molar volume (m\(^3\)/mol), \(R\) is the ideal gas constant, \(T\) is the temperature in K and \(\Delta H\) is the enthalpy change (kJ/mol).
+        </div>
+        <div class="modal-text">
+          For both processes:
+        </div>
+        <div class="modal-equation">
+          $$
+          \Delta U = C_v \Delta T,
+          $$
+        </div>
+        <div class="modal-equation">
+          $$
+          \Delta H = C_p \Delta T,
+          $$
+        </div>
+        <div class="modal-equation">
+          $$
+          C_v = 5R/2,
+          $$
+        </div>
+        <div class="modal-equation">
+          $$
+          C_p = 7R/2,
+          $$
+        </div>
+        <div class="modal-text">
+          where \(C_v\) and \(C_p\) are the constant-volume and constant-pressure heat capacities (kJ/[mol K]).
+        </div>
+        <div class="modal-text">
+          The ideal gas law is used to calculate the final volume for the constant-pressure process and the final pressure for the constant-volume process:
+        </div>
+        <div class="modal-equation">
+          $$
+          V = RT/P \ \text{for constant pressure,}
+          $$
+        </div>
+        <div class="modal-equation">
+          $$
+          P = RT/V \ \text{for constant volume.}
+          $$
+        </div>
+        <div class="modal-text">
+          The screencast video at [1] explains how to use this simulation.
+        </div>
+        <div style="height:20px"></div>
+        <ol class="references">
+          <li>
+            <i>Temperature Changes in an Ideal Gas</i> [Video]. (Sep 1, 2016) <a
+            href="https://www.youtube.com/watch?v=8oMXAioe2p8"
+            target="_blank">www.youtube.com/watch?v=8oMXAioe2p8</a>
+          </li>
+        </ol>
+      </div>
+        <div style="height: 30px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aboutModalLabel">About</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+            Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under the direction of
+          Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional contributions by Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of our
+          simulations are open source, and are available on our <a
+            href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+            repository</a>.</p>
+        <p style="line-height: 3rem;">
+          If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+              src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+              src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
+          or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+              style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
+              style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
+              src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+              src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac
+          or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+              style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+              style="height: 4ch;"></span>&nbsp;on Windows.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script src="flame.js"></script>
   <script src="index.js"></script>
+
 </body>
 
 </html>
