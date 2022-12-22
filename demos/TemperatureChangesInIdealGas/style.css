@@ -55,7 +55,7 @@ select {
 
 #graphics-wrapper {
   position: absolute;
-  top: 160px;
+  top: 110px;
   width: 100vw;
   height: max-content;
   display: grid;

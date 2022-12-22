@@ -39,45 +39,48 @@
 
 <body>
 
-  <div style="position:relative; top:30px"></div>
-  <div id="simulation-wrapper">
+  <div style="position:relative; top:50px">
+    <div id="simulation-wrapper">
 
 
-    <div class="inputs-wrapper">
-      <div class="input-row">
-        <div class="input-label" id="HEAT-label">Heat added (kJ/mol)</div>
-        <input type="range" id="HEAT" min="0" max="10" value="5" step="0.1" />
-        <div id="HEAT-VALUE" class="value-label">5</div>
-      </div>
-
-      <div class="btn-group btn-group-sm" id="heating-cooling">
-        <input type="radio" class="btn-check" name="btnradio" id="heat-gas" autocomplete="off" value="heat-gas" checked>
-        <label class="btn btn-outline-primary" for="heat-gas">Heat gas</label>
-
-        <input type="radio" class="btn-check" name="btnradio" id="cool-gas" autocomplete="off" value="cool-gas">
-        <label class="btn btn-outline-primary" for="cool-gas">Cool gas</label>
-      </div>
-
-      <div id="other-buttons">
-        <div style="position:relative;left:60px">
-          <div id="play-button" class="btn btn-success">Play</div>
-          <div id="pause-button" class="btn btn-danger">Pause</div>
-          <div id="reset-button" class="btn btn-warning">Reset</div>
+      <div class="inputs-wrapper">
+        <div class="input-row">
+          <div class="input-label" id="HEAT-label">Heat added (kJ/mol)</div>
+          <input type="range" id="HEAT" min="0" max="10" value="5" step="0.1" />
+          <div id="HEAT-VALUE" class="value-label">5</div>
         </div>
+
+        <div class="btn-group btn-group-sm" id="heating-cooling">
+          <input type="radio" class="btn-check" name="btnradio" id="heat-gas" autocomplete="off" value="heat-gas"
+            checked>
+          <label class="btn btn-outline-primary" for="heat-gas">Heat gas</label>
+
+          <input type="radio" class="btn-check" name="btnradio" id="cool-gas" autocomplete="off" value="cool-gas">
+          <label class="btn btn-outline-primary" for="cool-gas">Cool gas</label>
+        </div>
+
+        <div id="other-buttons">
+          <div style="position:relative;left:60px">
+            <div id="play-button" class="btn btn-success">Play</div>
+            <div id="pause-button" class="btn btn-danger">Pause</div>
+            <div id="reset-button" class="btn btn-warning">Reset</div>
+          </div>
+        </div>
+        <div id="modal-buttons">
+          <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions
+          </div>
+          <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+          <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
+        </div>
+
+
+
+
       </div>
-      <div id="modal-buttons">
-        <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
-        <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
-        <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
+
+      <div id="graphics-wrapper">
+
       </div>
-
-
-
-
-    </div>
-
-    <div id="graphics-wrapper">
-
     </div>
   </div>
 
