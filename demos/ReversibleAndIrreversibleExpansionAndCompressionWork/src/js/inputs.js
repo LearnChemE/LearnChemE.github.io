@@ -10,12 +10,12 @@ select_compression.addEventListener("click", () => {
   select_expansion.classList.remove("selected");
   p_final_slider.setAttribute("min", "1.1");
   p_final_slider.setAttribute("max", "2.0");
-  if(gvs.work_mode !== "compression") {
+  if(gvs.work_type !== "compression") {
     p_final_slider.value = "1.50";
   }
   p_final_value.innerHTML = `${Number(p_final_slider.value).toFixed(2)}`;
-  gvs.P_final = Number(p_final_slider.value);
-  gvs.work_mode = "compression";
+  gvs.P_final = Number(p_final_slider.value) * 1e6;
+  gvs.work_type = "compression";
   gvs.p.redraw();
 });
 
@@ -24,23 +24,25 @@ select_expansion.addEventListener("click", () => {
   select_expansion.classList.add("selected");
   p_final_slider.setAttribute("min", "0.1");
   p_final_slider.setAttribute("max", "0.9");
-  if(gvs.work_mode !== "expansion") {
+  if(gvs.work_type !== "expansion") {
     p_final_slider.value = "0.50";
   }
   p_final_value.innerHTML = `${Number(p_final_slider.value).toFixed(2)}`;
-  gvs.P_final = Number(p_final_slider.value);
-  gvs.work_mode = "expansion";
+  gvs.P_final = Number(p_final_slider.value) * 1e6;
+  gvs.work_type = "expansion";
   gvs.p.redraw();
 });
 
 p_final_slider.addEventListener("input", () => {
   const P = Number(p_final_slider.value);
-  gvs.P_final = P;
+  gvs.P_final = P * 1e6;
   p_final_value.innerHTML = `${P.toFixed(2)}`;
 });
 
 play_button.addEventListener("mousedown", () => {
   play_button.classList.add("clicked");
+  gvs.calculateFinalConditions();
+  animate();
 });
 
 play_button.addEventListener("mouseup", () => {
@@ -54,3 +56,7 @@ reset_button.addEventListener("mousedown", () => {
 reset_button.addEventListener("mouseup", () => {
   reset_button.classList.remove("clicked");
 });
+
+function animate() {
+
+}
