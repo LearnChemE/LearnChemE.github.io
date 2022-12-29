@@ -213,9 +213,11 @@ function math(progress) {
   } else {
     let height;
     push();
-    noStroke(); fill(0, 255, 255);
-    rect(width / 2 - 300, 525, 250, -100); // *progress
-    rect(width / 2 + 50, 525, 250, -100); // *progress
+    if (progress > 0 && progress < 10) {
+      noStroke(); fill(0, 255, 255);
+      rect(width / 2 - 300, 525, 250, -100); // *progress
+      rect(width / 2 + 50, 525, 250, -100); // *progress
+    }
     pop();
 
     push();
