@@ -286,5 +286,21 @@ function initialStateDetermine(){
     g.heatTriple = (273.16 - g.Ti)*g.cp_ice;
 }
 
+// Below is a series of mathematical functions that will be called repeatedly
+function pi_p(P){
+    return(P/611.6571);
+}
 
+function tau_T(T){
+    return(T/c.Tt);
+}
 
+function r2p(P){
+    let x = c.r21/611.6571 + c.r22*2/611.6571*(pi_p(P) - c.pi0); // What is P?
+    return(x);
+}
+
+function g0p(P){
+    let x = c.g01/611.6571 + c.g02*2/611.6571*(pi_p(P) - c.pi0) + c.g03*3/611.6571*(pi_p(P) - c.pi0)**2 + c.g04*4/611.6571*(pi_P(P) - c.pi0)**3;
+    return(x);
+}

@@ -33,6 +33,7 @@
   <script src="./jquery.js"></script>
   <script src="./popper.js"></script>
   <script src="./bootstrap.min.js"></script>
+  <script src="./libraries/math.js" type="text/javascript"></script>
 
 </head>
 
@@ -44,9 +45,9 @@
 
     <div class="inputs-wrapper">
       <div class="input-row">
-        <div class="input-label" id="heat-label">heat (kJ)</div>
-        <input type="range" id="heat" min="0" max="14" value="0" step="0.01" />
-        <div id="heat-value" class="value-label">0</div>
+        <div class="input-label" id="slider-label">specific volume (L/mol)</div>
+        <input type="range" id="slider" min="-34" max="2" value="2" step="0.01" />
+        <div id="slider-value" class="value-label">2</div>
       </div>
       <div id="modal-buttons">
         <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
