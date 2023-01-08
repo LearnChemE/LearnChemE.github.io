@@ -227,25 +227,23 @@ function yPlotting(y){
 
 // Based on dropdown menus, initial state (T & P) is determined. Once these are determined the heats of sublimation, melting, vaporization, and triple point are determined
 function initialStateDetermine(){
-
-    let lx = 120; // left x
-    let rx = 770; // right x
-    let by = 500; // bottom y
-    let ty = 50; // top y
-
     switch (g.isotype){
         case 'isothermal':
             switch(g.transition){
                 case 'sublimation':
+                    g.T = 250;
                     g.Ti = 250;
                     break;
                 case 'melting':
+                    g.T = 273.07;
                     g.Ti = 273.07;
                     break;
                 case 'vaporization':
+                    g.T = 325;
                     g.Ti = 325;
                     break;
                 case 'triple-point':
+                    g.T = 273.16
                     g.Ti = 273.16;
                     break;
             }
@@ -253,37 +251,97 @@ function initialStateDetermine(){
         case 'isobaric':
             switch(g.transition){
                 case 'sublimation':
+                    g.T = 200
                     g.Ti = 200;
                     g.Pi = 1*Math.pow(10,-4);
+                    g.P = 1*Math.pow(10,-4);
                     break;
                 case 'melting':
+                    g.T = 200;
                     g.Ti = 200;
                     g.Pi = 0.1;
+                    g.P = 0.1;
                     break;
                 case 'vaporization':
+                    g.T = 303;
                     g.Ti = 303;
                     g.Pi = 0.1;
+                    g.P = 0.1;
                     break;
                 case 'triple-point':
+                    g.T = 303;
                     g.Ti = 200;
                     g.Pi = 0.00061;
+                    g.P = 0.00061;
                     break;
             }
             break;
     }
-    let x, y;
-    x = map(g.Ti,200,680,lx+(rx-lx)/25,rx);
-    y = yPlotting(g.Pi);
-    
-    push();
-    fill(0);
-    ellipse(x,y,12);
-    pop();
 
     g.heatSublime = (250 - g.Ti)*g.cp_ice;
     g.heatMelt = (273 - g.Ti)*g.cp_ice;
     g.heatVapor = (373 - g.Ti)*g.cp_water;
     g.heatTriple = (273.16 - g.Ti)*g.cp_ice;
+}
+
+// Plots the point using global variable for the current T & P
+function plotPoint(){
+    let x, y;
+    let lx = 120; // left x
+    let rx = 770; // right x
+
+    x = map(g.T,200,680,lx+(rx-lx)/25,rx);
+    y = yPlotting(g.P);
+    
+    push();
+    fill(0);
+    ellipse(x,y,12);
+    pop();
+}
+
+// Determines pressure based on slider for isothermal mode (maybe?)
+function isothermPressure(){
+    
+    let pressure; // Might need to make this into a global variable of sorts
+    
+    switch (g.transition){
+        case 'sublimation':
+            if (g.slider > -9.4){
+                pressure = g.slider;
+            } else if (g.slider <= -9.4 && g.slider >= -21.4){
+                pressure = -9.4;
+            } else if (g.slider < -21.4){
+                pressure = -9.4 + (g.slider + 21.4)/5;
+            }
+            break;
+        case 'melting':
+            if (g.slider > .25){
+                pressure = g.slider;
+            } else if (g.slider <= .25 && g.slider >= -1){
+                pressure = 0.25;
+            } else if (g.slider < -1){
+                pressure = -1 + g.slider;
+            }
+            break;
+        case 'vaporization':
+            if (g.slider > -4.4){
+                pressure = g.slider;
+            } else if (g.slider <= -4.4 && g.slider >= -7.8){
+                pressure = -4.4;
+            } else if (g.slider < -7.8){
+                pressure = -4.4 + (7.8 + g.slider)/1.5;
+            }
+            break;
+        case 'triple-point':
+            if (g.slider > -7.4){
+                pressure = g.slider;
+            } else if (g.slider <= -7.4 && g.slider >= -10.8){
+                pressure = -7.4;
+            } else if (g.slider < -10.8){
+                pressure = -7.4 + (10.8 + g.slider)/1.5;
+            }
+            break;
+    }
 }
 
 // Below is a series of mathematical functions that will be called repeatedly

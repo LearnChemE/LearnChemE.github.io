@@ -1,6 +1,6 @@
 window.g = {
   cnv : undefined,
-  slider : 0,
+  slider : 2,
   isotype : 'isothermal',
   transition : 'sublimation',
 
@@ -25,6 +25,9 @@ window.g = {
   heatMelt : 0, // Heat required to get from Ti to melting point at 273K
   heatVapor : 0,
   heatTriple : 0,
+
+  P : 0, // These will be used for plotting the displayed point
+  T : 0,
 }
 
 // Object for storing the various necessary coefficients
@@ -50,24 +53,23 @@ function setup() {
   g.cnv.parent("graphics-wrapper");
   document.getElementsByTagName("main")[0].remove();
  
-  
+  initialStateDetermine();
 }
 
 function draw() {
   background(250);
 
+  if(g.isotype == 'isothermal'){
+    isothermPressure();
+  }
+  
   graphDraw();
   subGraphDraw();
-  initialStateDetermine();
   
-  //console.log(5**2) returns 25
   curveDraw();
   gibbsPhase();
 
-  // let x = 10 + addd(1,2);
-  // console.log(x)
-  
-  //console.log(g.isotype)
+  plotPoint();
   
 }
                 
@@ -87,12 +89,14 @@ isotype.addEventListener("change", function(){
   const iso_temp = isotype.value;
   g.isotype = iso_temp;
   sliderLimits();
+  initialStateDetermine();
 });
 
 transition.addEventListener("change", function(){
   const trans_temp = transition.value;
   g.transition = trans_temp;
   sliderLimits();
+  initialStateDetermine();
 });
 
 // Changes the range on the slider depending on isothermal/-baric and transition type
