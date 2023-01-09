@@ -15,9 +15,12 @@ window.gvs = {
     W_2 : 0,
     T_final_1 : 300,
     T_final_2 : 300,
+    V_initial_1 : 1,
+    V_initial_2 : 1,
     V_final_1 : 1,
     V_final_2 : 1,
     animation_fraction : 0,
+    running : false,
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -39,6 +42,13 @@ const sketch = (p) => {
 
     p.draw = function() {
         p.background(253);
+        if(gvs.running) {
+            gvs.animation_fraction += 0.005;
+            if(gvs.animation_fraction >= 1) {
+                gvs.running = false;
+                p.noLoop();
+            }
+        }
         gvs.drawAll(p);
     };
 
