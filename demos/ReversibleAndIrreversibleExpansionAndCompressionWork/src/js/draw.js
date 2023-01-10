@@ -55,9 +55,29 @@ function drawPistons(p) {
   p.fill(240, 240, 200);
   p.rect(-100, 0, 200, -1 * height_1);
 
+  const P_ext_1 = gvs.condition_1 == "reversible adiabatic" || gvs.condition_1 == "reversible isothermal" ? (gvs.P_initial / 1e6 + gvs.animation_fraction * (gvs.P_final - gvs.P_initial) / 1e6).toFixed(2) : (gvs.P_final / 1e6).toFixed(2);
+  const P_int_1 = ((gvs.P_initial + (gvs.P_final - gvs.P_initial) * gvs.animation_fraction) / 1e6).toFixed(2);
+
+  p.fill(0);
+  p.noStroke();
+  p.textSize(18);
+  p.text(`P    = ${P_ext_1} MPa`, -60, -1 * height_1 - 60);
+  p.text(`P = ${P_int_1} MPa`, -50, -0.5 * height_1 + 6);
+  p.textSize(12);
+  p.text("ext", -50, -1 * height_1 - 55);
+
   const number_of_blocks = Math.round((gvs.P_final / 2.00e6) * 20);
 
-  const number_of_blocks_1 = gvs.condition_1 == "reversible adiabatic" || gvs.condition_1 == "reversible isothermal" ? Math.round(gvs.animation_fraction * number_of_blocks) : number_of_blocks;
+  let number_of_blocks_1;
+  if(gvs.condition_1 == "reversible adiabatic" || gvs.condition_1 == "reversible isothermal") {
+    if(gvs.work_type == "compression") {
+      number_of_blocks_1 = Math.round(1 + gvs.animation_fraction * (number_of_blocks - 1));
+    } else {
+      number_of_blocks_1 = Math.round(10 - gvs.animation_fraction * (10 - number_of_blocks));
+    }
+  } else {
+    number_of_blocks_1 = number_of_blocks
+  }
 
   p.fill(180);
   p.stroke(0);
@@ -130,8 +150,28 @@ function drawPistons(p) {
   p.fill(240, 240, 200);
   p.rect(-100, 0, 200, -1 * height_2);
 
-  const number_of_blocks_2 = gvs.condition_2 == "reversible adiabatic" || gvs.condition_2 == "reversible isothermal" ? Math.round(gvs.animation_fraction * number_of_blocks) : number_of_blocks;
+  const P_ext_2 = gvs.condition_2 == "reversible adiabatic" || gvs.condition_2 == "reversible isothermal" ? (gvs.P_initial / 1e6 + gvs.animation_fraction * (gvs.P_final - gvs.P_initial) / 1e6).toFixed(2) : (gvs.P_final / 1e6).toFixed(2);
+  const P_int_2 = ((gvs.P_initial + (gvs.P_final - gvs.P_initial) * gvs.animation_fraction) / 1e6).toFixed(2);
 
+  p.fill(0);
+  p.noStroke();
+  p.textSize(18);
+  p.text(`P    = ${P_ext_2} MPa`, -60, -1 * height_2 - 60);
+  p.text(`P = ${P_int_2} MPa`, -50, -0.5 * height_2 + 6);
+  p.textSize(12);
+  p.text("ext", -50, -1 * height_2 - 55);
+
+  let number_of_blocks_2;
+  if(gvs.condition_2 == "reversible adiabatic" || gvs.condition_2 == "reversible isothermal") {
+    if(gvs.work_type == "compression") {
+      number_of_blocks_2 = Math.round(1 + gvs.animation_fraction * (number_of_blocks - 1));
+    } else {
+      number_of_blocks_2 = Math.round(10 - gvs.animation_fraction * (10 - number_of_blocks));
+    }
+  } else {
+    number_of_blocks_2 = number_of_blocks
+  }
+  
   p.fill(180);
   p.stroke(0);
   p.strokeWeight(1);
@@ -153,14 +193,16 @@ function drawPistons(p) {
 
 function drawLabels(p) {
   p.push();
-  p.translate(230, 100);
+  p.translate(230, 90);
   p.rectMode(p.CENTER);
   p.rect(0, 0, 250, 150);
   p.noStroke();
   p.fill(0);
   p.textSize(18);
   const label1 = gvs.condition_1;
-  p.text(label1, -75, -45);
+  p.textAlign(p.CENTER);
+  p.text(label1, 0, -45);
+  p.textAlign(p.LEFT);
   const W1 = (gvs.W_1 * gvs.animation_fraction / 1000).toFixed(1);
   const T1 = Math.round(300 + (gvs.T_final_1 - 300) * gvs.animation_fraction);
   let V1 = ((gvs.V_initial_1 - (gvs.V_initial_1 - gvs.V_final_1) * gvs.animation_fraction) / gvs.V_initial_1).toFixed(2);
@@ -179,7 +221,9 @@ function drawLabels(p) {
   p.fill(0);
   p.textSize(18);
   const label2 = gvs.condition_2;
-  p.text(label2, -75, -45);
+  p.textAlign(p.CENTER);
+  p.text(label2, 0, -45);
+  p.textAlign(p.LEFT);
   const W2 = (gvs.W_2 * gvs.animation_fraction / 1000).toFixed(1);
   const T2 = Math.round(300 + (gvs.T_final_2 - 300) * gvs.animation_fraction);
   let V2 = ((gvs.V_initial_2 - (gvs.V_initial_2 - gvs.V_final_2) * gvs.animation_fraction) / gvs.V_initial_2).toFixed(2);

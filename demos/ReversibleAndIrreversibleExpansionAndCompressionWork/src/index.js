@@ -7,10 +7,11 @@ window.p5 = new require("./js/p5.min.js");
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
     work_type : "compression",
+    P_initial : 0.1e6,
     P_final : 1.5e6,
     calculateFinalConditions : null,
     condition_1 : "reversible adiabatic",
-    condition_2 : "reversible adiabatic",
+    condition_2 : "irreversible adiabatic",
     W_1 : 0,
     W_2 : 0,
     T_final_1 : 300,
@@ -49,6 +50,8 @@ const sketch = (p) => {
                 document.getElementById("p-final-slider").removeAttribute("disabled");
                 document.getElementById("condition-1").removeAttribute("disabled");
                 document.getElementById("condition-2").removeAttribute("disabled");
+                document.getElementById("select-compression").removeAttribute("disabled");
+                document.getElementById("select-expansion").removeAttribute("disabled");
                 p.noLoop();
             }
         }

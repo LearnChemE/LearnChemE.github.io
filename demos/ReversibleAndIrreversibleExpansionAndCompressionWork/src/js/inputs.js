@@ -18,6 +18,9 @@ select_compression.addEventListener("click", () => {
   p_final_value.innerHTML = `${Number(p_final_slider.value).toFixed(2)}`;
   gvs.P_final = Number(p_final_slider.value) * 1e6;
   gvs.work_type = "compression";
+  gvs.animation_fraction = 0;
+  gvs.running = false;
+  play_button.removeAttribute("disabled");
   gvs.calculateFinalConditions();
   gvs.p.redraw();
 });
@@ -28,11 +31,14 @@ select_expansion.addEventListener("click", () => {
   p_final_slider.setAttribute("min", "0.1");
   p_final_slider.setAttribute("max", "0.9");
   if(gvs.work_type !== "expansion") {
-    p_final_slider.value = "0.50";
+    p_final_slider.value = "0.20";
   }
   p_final_value.innerHTML = `${Number(p_final_slider.value).toFixed(2)}`;
   gvs.P_final = Number(p_final_slider.value) * 1e6;
   gvs.work_type = "expansion";
+  gvs.animation_fraction = 0;
+  gvs.running = false;
+  play_button.removeAttribute("disabled");
   gvs.calculateFinalConditions();
   gvs.p.redraw();
 });
@@ -87,6 +93,8 @@ play_button.addEventListener("mousedown", () => {
   play_button.classList.add("clicked");
   play_button.setAttribute("disabled", "yes");
   p_final_slider.setAttribute("disabled", "yes");
+  select_compression.setAttribute("disabled", "yes");
+  select_expansion.setAttribute("disabled", "yes");
   condition_1.setAttribute("disabled", "yes");
   condition_2.setAttribute("disabled", "yes");
   gvs.calculateFinalConditions();

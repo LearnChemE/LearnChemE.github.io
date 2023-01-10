@@ -2,6 +2,7 @@ gvs.calculateFinalConditions = function() {
   const R = 8.314;
   const T1 = 300;
   const P1 = gvs.work_type === "compression" ? 1e5 : 1e6;
+  gvs.P_initial = P1;
   const V1 = R * T1 / P1;
   gvs.V_initial_1 = V1;
   gvs.V_initial_2 = V1;
