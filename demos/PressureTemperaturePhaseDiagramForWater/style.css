@@ -35,7 +35,7 @@
 
 .input-row {
   display: grid;
-  grid-template-columns: max-content 150px 15px max-content;
+  grid-template-columns: max-content 150px 50px max-content;
   gap: 10px;
   align-items: end;
   justify-items: center;
