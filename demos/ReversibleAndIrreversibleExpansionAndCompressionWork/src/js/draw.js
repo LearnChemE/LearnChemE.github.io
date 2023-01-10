@@ -1,17 +1,51 @@
 function drawPistons(p) {
   p.push();
   p.translate(230, 450);
-  p.beginShape();
-  p.vertex(-100, 0);
-  p.vertex(100, 0);
-  p.vertex(100, -250);
-  p.vertex(130, -250);
-  p.vertex(130, 30);
-  p.vertex(-130, 30);
-  p.vertex(-130, -250);
-  p.vertex(-100, -250);
-  p.endShape(p.CLOSE);
 
+  if(gvs.condition_1 === "reversible adiabatic" || gvs.condition_1 === "irreversible adiabatic") {
+    p.beginShape();
+    p.vertex(-100, 0);
+    p.vertex(100, 0);
+    p.vertex(100, -250);
+    p.vertex(130, -250);
+    p.vertex(130, 30);
+    p.vertex(-130, 30);
+    p.vertex(-130, -250);
+    p.vertex(-100, -250);
+    p.endShape(p.CLOSE);
+    for(let i = 0; i <= 10; i++) {
+      const x1 = -130;
+      const y1 = -250 + 250 * (i / 10);
+      const x2 = -100;
+      const y2 = -220 + 250 * (i / 10);
+      p.line(x1, y1, x2, y2);
+    }
+    p.line(-100, 5, -75, 30);
+    for(let i = 0; i <= 6; i++) {
+      const x1 = -80 + 160 * (i / 6);
+      const y1 = 0;
+      const x2 = -50 + 160 * (i / 6);
+      const y2 = 30;
+      p.line(x1, y1, x2, y2);
+    }
+    for(let i = 0; i <= 9; i++) {
+      const x1 = 100;
+      const y1 = -250 + 250 * (i / 10);
+      const x2 = 130;
+      const y2 = -220 + 250 * (i / 10);
+      p.line(x1, y1, x2, y2);
+    }
+  } else {
+    p.strokeWeight(2);
+    p.beginShape();
+    p.vertex(-100, -250);
+    p.vertex(-100, 0);
+    p.vertex(100, 0);
+    p.vertex(100, -250);
+    p.endShape();
+  }
+
+  p.strokeWeight(1);
   let height_initial_1 = gvs.work_type === "compression" ? 200 : 20;
   let height_final_1 = height_initial_1 * (gvs.V_final_1 / gvs.V_initial_1);
   let height_1 = height_initial_1 - (height_initial_1 - height_final_1) * gvs.animation_fraction;
@@ -43,17 +77,50 @@ function drawPistons(p) {
 
   p.fill(255);
   p.translate(350, 0);
-  p.beginShape();
-  p.vertex(-100, 0);
-  p.vertex(100, 0);
-  p.vertex(100, -250);
-  p.vertex(130, -250);
-  p.vertex(130, 30);
-  p.vertex(-130, 30);
-  p.vertex(-130, -250);
-  p.vertex(-100, -250);
-  p.endShape(p.CLOSE);
+  if(gvs.condition_2 === "reversible adiabatic" || gvs.condition_2 === "irreversible adiabatic") {
+    p.beginShape();
+    p.vertex(-100, 0);
+    p.vertex(100, 0);
+    p.vertex(100, -250);
+    p.vertex(130, -250);
+    p.vertex(130, 30);
+    p.vertex(-130, 30);
+    p.vertex(-130, -250);
+    p.vertex(-100, -250);
+    p.endShape(p.CLOSE);
+    for(let i = 0; i <= 10; i++) {
+      const x1 = -130;
+      const y1 = -250 + 250 * (i / 10);
+      const x2 = -100;
+      const y2 = -220 + 250 * (i / 10);
+      p.line(x1, y1, x2, y2);
+    }
+    p.line(-100, 5, -75, 30);
+    for(let i = 0; i <= 6; i++) {
+      const x1 = -80 + 160 * (i / 6);
+      const y1 = 0;
+      const x2 = -50 + 160 * (i / 6);
+      const y2 = 30;
+      p.line(x1, y1, x2, y2);
+    }
+    for(let i = 0; i <= 9; i++) {
+      const x1 = 100;
+      const y1 = -250 + 250 * (i / 10);
+      const x2 = 130;
+      const y2 = -220 + 250 * (i / 10);
+      p.line(x1, y1, x2, y2);
+    }
+  } else {
+    p.strokeWeight(2);
+    p.beginShape();
+    p.vertex(-100, -250);
+    p.vertex(-100, 0);
+    p.vertex(100, 0);
+    p.vertex(100, -250);
+    p.endShape();
+  }
 
+  p.strokeWeight(1);
   let height_initial_2 = gvs.work_type === "compression" ? 200 : 20;
   let height_final_2 = height_initial_2 * (gvs.V_final_2 / gvs.V_initial_2);
   let height_2 = height_initial_2 - (height_initial_2 - height_final_2) * gvs.animation_fraction;

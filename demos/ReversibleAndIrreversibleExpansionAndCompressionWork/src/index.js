@@ -46,6 +46,9 @@ const sketch = (p) => {
             gvs.animation_fraction += 0.005;
             if(gvs.animation_fraction >= 1) {
                 gvs.running = false;
+                document.getElementById("p-final-slider").removeAttribute("disabled");
+                document.getElementById("condition-1").removeAttribute("disabled");
+                document.getElementById("condition-2").removeAttribute("disabled");
                 p.noLoop();
             }
         }

@@ -85,6 +85,10 @@ p_final_slider.addEventListener("input", () => {
 
 play_button.addEventListener("mousedown", () => {
   play_button.classList.add("clicked");
+  play_button.setAttribute("disabled", "yes");
+  p_final_slider.setAttribute("disabled", "yes");
+  condition_1.setAttribute("disabled", "yes");
+  condition_2.setAttribute("disabled", "yes");
   gvs.calculateFinalConditions();
   animate();
 });
@@ -95,6 +99,10 @@ play_button.addEventListener("mouseup", () => {
 
 reset_button.addEventListener("mousedown", () => {
   reset_button.classList.add("clicked");
+  play_button.removeAttribute("disabled");
+  gvs.animation_fraction = 0;
+  gvs.running = false;
+  gvs.p.redraw();
 });
 
 reset_button.addEventListener("mouseup", () => {
