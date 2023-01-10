@@ -102,6 +102,9 @@ function drawPistons(p) {
     if(gvs.work_type === "compression" && (gvs.condition_1 === "irreversible adiabatic" || gvs.condition_1 === "irreversible isothermal")) {
       p.triangle(-100, -1 * height_1, -80, -1 * height_1, -100, -1 * height_1 + 20);
       p.triangle(100, -1 * height_1, 80, -1 * height_1, 100, -1 * height_1 + 20);
+    } else if(gvs.work_type === "expansion" && (gvs.condition_1 === "irreversible adiabatic" || gvs.condition_1 === "irreversible isothermal")) {
+      p.triangle(-100, -1 * height_1 - 15, -80, -1 * height_1 - 15, -100, -1 * height_1 - 35);
+      p.triangle(100, -1 * height_1 - 15, 80, -1 * height_1 - 15, 100, -1 * height_1 - 35);
     }
   }
 
@@ -205,6 +208,9 @@ function drawPistons(p) {
     if(gvs.work_type === "compression" && (gvs.condition_2 === "irreversible adiabatic" || gvs.condition_2 === "irreversible isothermal")) {
       p.triangle(-100, -1 * height_2, -80, -1 * height_2, -100, -1 * height_2 + 20);
       p.triangle(100, -1 * height_2, 80, -1 * height_2, 100, -1 * height_2 + 20);
+    } else if(gvs.work_type === "expansion" && (gvs.condition_2 === "irreversible adiabatic" || gvs.condition_2 === "irreversible isothermal")) {
+      p.triangle(-100, -1 * height_2 - 15, -80, -1 * height_2 - 15, -100, -1 * height_2 - 35);
+      p.triangle(100, -1 * height_2 - 15, 80, -1 * height_2 - 15, 100, -1 * height_2 - 35);
     }
   }
 
