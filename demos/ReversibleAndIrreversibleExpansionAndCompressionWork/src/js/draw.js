@@ -95,6 +95,16 @@ function drawPistons(p) {
     }
   }
 
+  if(!gvs.running && gvs.animation_fraction === 0) {
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.fill(255, 0, 0);
+    if(gvs.work_type === "compression" && (gvs.condition_1 === "irreversible adiabatic" || gvs.condition_1 === "irreversible isothermal")) {
+      p.triangle(-100, -1 * height_1, -80, -1 * height_1, -100, -1 * height_1 + 20);
+      p.triangle(100, -1 * height_1, 80, -1 * height_1, 100, -1 * height_1 + 20);
+    }
+  }
+
   p.fill(255);
   p.translate(350, 0);
   if(gvs.condition_2 === "reversible adiabatic" || gvs.condition_2 === "irreversible adiabatic") {
@@ -185,6 +195,16 @@ function drawPistons(p) {
     }
     for(let i = 11; i <= number_of_blocks_2; i++) {
       p.rect(-81 + (i - 11) * 18, -1 * height_2 - 32, 15, -15);
+    }
+  }
+
+  if(!gvs.running && gvs.animation_fraction === 0) {
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.fill(255, 0, 0);
+    if(gvs.work_type === "compression" && (gvs.condition_2 === "irreversible adiabatic" || gvs.condition_2 === "irreversible isothermal")) {
+      p.triangle(-100, -1 * height_2, -80, -1 * height_2, -100, -1 * height_2 + 20);
+      p.triangle(100, -1 * height_2, 80, -1 * height_2, 100, -1 * height_2 + 20);
     }
   }
 
