@@ -66,14 +66,14 @@ function drawPistons(p) {
   p.textSize(12);
   p.text("ext", -50, -1 * height_1 - 55);
 
-  const number_of_blocks = Math.round((gvs.P_final / 2.00e6) * 20);
+  const number_of_blocks = Math.round((gvs.P_final / 2.00e6) * 20 - 1);
 
   let number_of_blocks_1;
   if(gvs.condition_1 == "reversible adiabatic" || gvs.condition_1 == "reversible isothermal") {
     if(gvs.work_type == "compression") {
-      number_of_blocks_1 = Math.round(1 + gvs.animation_fraction * (number_of_blocks - 1));
+      number_of_blocks_1 = Math.round(gvs.animation_fraction * number_of_blocks);
     } else {
-      number_of_blocks_1 = Math.round(10 - gvs.animation_fraction * (10 - number_of_blocks));
+      number_of_blocks_1 = Math.round(9 - gvs.animation_fraction * (9 - number_of_blocks));
     }
   } else {
     number_of_blocks_1 = number_of_blocks
@@ -91,7 +91,7 @@ function drawPistons(p) {
       p.rect(-90 + i * 18, -1 * height_1 - 15, 15, -15);
     }
     for(let i = 11; i <= number_of_blocks_1; i++) {
-      p.rect(-90 + (i - 11) * 18, -1 * height_1 - 31, 15, -15);
+      p.rect(-81 + (i - 11) * 18, -1 * height_1 - 32, 15, -15);
     }
   }
 
@@ -164,9 +164,9 @@ function drawPistons(p) {
   let number_of_blocks_2;
   if(gvs.condition_2 == "reversible adiabatic" || gvs.condition_2 == "reversible isothermal") {
     if(gvs.work_type == "compression") {
-      number_of_blocks_2 = Math.round(1 + gvs.animation_fraction * (number_of_blocks - 1));
+      number_of_blocks_2 = Math.round(gvs.animation_fraction * number_of_blocks);
     } else {
-      number_of_blocks_2 = Math.round(10 - gvs.animation_fraction * (10 - number_of_blocks));
+      number_of_blocks_2 = Math.round(9 - gvs.animation_fraction * (9 - number_of_blocks));
     }
   } else {
     number_of_blocks_2 = number_of_blocks
@@ -184,7 +184,7 @@ function drawPistons(p) {
       p.rect(-90 + i * 18, -1 * height_2 - 15, 15, -15);
     }
     for(let i = 11; i <= number_of_blocks_2; i++) {
-      p.rect(-90 + (i - 11) * 18, -1 * height_2 - 31, 15, -15);
+      p.rect(-81 + (i - 11) * 18, -1 * height_2 - 32, 15, -15);
     }
   }
 
