@@ -31,7 +31,7 @@ select_expansion.addEventListener("click", () => {
   p_final_slider.setAttribute("min", "0.1");
   p_final_slider.setAttribute("max", "0.9");
   if(gvs.work_type !== "expansion") {
-    p_final_slider.value = "0.20";
+    p_final_slider.value = "0.50";
   }
   p_final_value.innerHTML = `${Number(p_final_slider.value).toFixed(2)}`;
   gvs.P_final = Number(p_final_slider.value) * 1e6;
