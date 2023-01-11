@@ -81,8 +81,8 @@ function graphDraw(){
 function subGraphDraw(){
     push();
     fill(255);
-    rect(400,250,300,200);
-    let lx = 400; let rx = 700; // left and right graph edges
+    rect(420,250,330,200);
+    let lx = 420; let rx = 750; // left and right graph edges
     let by = 450; let ty = 250; // bottom and top graph edges
     let yLabels = ['0.0','0.2','0.4','0.6','0.8','1.0','1.2'];
     let xLabels = ['solid','liquid','vapor'];
@@ -104,7 +104,7 @@ function subGraphDraw(){
     text(yLabels[0],lx-30,by+7);
     text(yLabels[yLabels.length-1],lx-30,ty+7);
     textSize(23);
-    translate(360,by-20);
+    translate(380,by-20);
     rotate(radians(-90));
     text('relative amount',0,0);
     pop();
@@ -112,6 +112,36 @@ function subGraphDraw(){
         line(lx+(rx-lx)/4*i,by,lx+(rx-lx)/4*i,by-5);
         line(lx+(rx-lx)/4*i,ty,lx+(rx-lx)/4*i,ty+5);
     }
+
+    // Filling the relative amounts based on global variable g.comp
+    push();
+    stroke(0); strokeWeight(.5); textSize(25);
+    let max = 283.333; // px location of 1.0
+    let height;
+    for(let i = 0; i < 3; i++){
+        if(i == 0){
+            fill(0,255,0,90); // solid color (green)
+        } else if (i == 1){
+            fill(255,0,0,90); // liquid color (red)
+        } else {
+            fill(0,0,255,90); // vapor color (blue)
+        }
+        height = map(g.comp[i],0,1,by,max); // Solving the height based on relative composition
+        height = by - height; // Adjusting the height value to account for bottom of the graph
+        rect(lx+(rx-lx)/4*(i+1)-35,by,70,-height); // Plotting relative amount
+       
+        push();
+        fill(0); noStroke();
+        let shift = 28; // shift for placing text 
+        if (i != 0){
+            shift = 30; // slight adjustment for liquid and vapor text
+        }
+        text(xLabels[i],lx+(rx-lx)/4*(i+1)-shift,by-height-5);
+        pop();
+    
+
+    }
+    pop();
 }
 
 // Draws curves
@@ -347,6 +377,7 @@ function isothermPressure(){
     g.P = Math.exp(pressure);
 }
 
+// Determines the temperature for isobaric mode and the relative amounts of solid/liquid/gas for all modes
 function compositionDetermine(){
     switch (g.isotype){
         case 'isothermal':
@@ -417,7 +448,7 @@ function compositionDetermine(){
             switch (g.transition){
                 case 'sublimation':
                     if (g.slider*1000 <= g.heatSublime){
-                        g.T = g.Ti + 1000*g.slider/cpIce;
+                        g.T = g.Ti + 1000*g.slider/g.cp_ice;
                         g.comp[0] = 1;
                         g.comp[1] = 0;
                         g.comp[2] = 0;
@@ -452,12 +483,44 @@ function compositionDetermine(){
                     }
                     break; 
                 case 'vaporization':
-                    
+                    if (1000*g.slider <= g.heatVapor){
+                        g.T = g.Ti + 1000*g.slider/g.cp_water;
+                        g.comp[0] = 0;
+                        g.comp[1] = 1;
+                        g.comp[2] = 0;
+                    } else if (1000*g.slider > g.heatVapor && 1000*g.slider < g.heatVapor + g.Hv){
+                        g.T = 373;
+                        g.comp[0] = 0;
+                        g.comp[1] = (g.heatVapor + g.Hv - 1000*g.slider)/g.Hv;
+                        g.comp[2] = 1 - g.comp[1];
+                    } else if (1000*g.slider >= g.heatVapor + g.Hv){
+                        g.T = 373 + (1000*g.slider - g.heatVapor - g.Hv)/g.cp_vapor;
+                        g.comp[0] = 0;
+                        g.comp[1] = 0;
+                        g.comp[2] = 1;
+                    }
                     break;
                 case 'triple-point':
-                    
+                    if (1000*g.slider <= g.heatTriple){
+                        g.T = g.Ti + 1000*g.slider/g.cp_ice;
+                        g.comp[0] = 1;
+                        g.comp[1] = 0;
+                        g.comp[2] = 0;
+                    } else if (1000*g.slider > g.heatTriple && 1000*g.slider < g.heatTriple + g.Hs){
+                        g.T = 273.16;
+                        g.comp[0] = 1 - 2*(1000*g.slider - g.heatTriple)/g.Hs + ((1000*g.slider - g.heatTriple)/g.Hs)**2;
+                        g.comp[1] = 2*((1000*g.slider - g.heatTriple)/g.Hs)*(1 - (1000*g.slider-g.heatTriple)/g.Hs);
+                        g.comp[2] = ((1000*g.slider - g.heatTriple)/g.Hs)**2;
+                    } else if (1000*g.slider >= g.heatTriple + g.Hs){
+                        g.T = 273.16 + (1000*g.slider - g.heatTriple - g.Hs)/g.cp_vapor;
+                        g.comp[0] = 0;
+                        g.comp[1] = 0;
+                        g.comp[2] = 1;
+                    }
                     break;    
             }
             break;
     }
 }
+
+
