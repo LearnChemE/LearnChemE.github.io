@@ -134,62 +134,79 @@
             $$    
           </div>
 
-          <div class="details-text"></div>
+          <div class="details-text">where the subscript 1 refers to the initial state, \( R \) is the ideal gas constant [kJ/(mol K)], \( V \) is volume (m<sup>3</sup>/mol), \( T \) is temperature (K) and \( P \) is pressure (Pa).<br><br><b>For an isothermal process:</b></div>
 
           <div class="details-eqn">
             $$
-            [3] \qquad 
+            [3] \qquad V_{2} = \frac{R T_{1}}{P_{2}}
             $$    
           </div>
 
-          <div class="details-text"></div>
+          <div class="details-text">where the subscript 2 refers to the final condition.<br><br>&nbsp;&nbsp;Reversible work:</div>
 
           <div class="details-eqn">
             $$
-            [4] \qquad 
+            [4] \qquad W = - R T_{1} \, \mathrm{ln} \left( \frac{V_{2}}{V_{1}} \right)
             $$    
           </div>
 
-          <div class="details-text"></div>
+          <div class="details-text">&nbsp;&nbsp;Irreversible work:</div>
 
           <div class="details-eqn">
             $$
-            [5] \qquad 
+            [5] \qquad W = - P_{2} ( V_{2} - V_{1} )
             $$    
           </div>
 
-          <div class="details-text"></div>
+          <div class="details-text"><b>For an adiabatic process on an ideal diatomic gas:</b></div>
 
           <div class="details-eqn">
             $$
-            [6] \qquad 
+            [6] \qquad \gamma = \frac{7}{5}
             $$    
           </div>
-
-          <div class="details-text"></div>
 
           <div class="details-eqn">
             $$
-            [7] \qquad 
+            [7] \qquad C_{V} = \frac{5 R}{2}
             $$    
           </div>
-
-          <div class="details-text"></div>
 
           <div class="details-eqn">
             $$
-            [8] \qquad 
+            [8] \qquad W = C_{V} ( T_{2} - T_{1} )
             $$    
           </div>
 
-          <div class="details-text"></div>
+          <div class="details-text">where \( \gamma = \frac{ C_{P} }{ C_{V} } \), \( C_{V} \) is the constant volume heat capacity, and \( C_{P} \) is the constant pressure heat capacity [kJ/(mol K)].<br><br>&nbsp;&nbsp;Reversible process:</div>
 
           <div class="details-eqn">
             $$
-            [9] \qquad 
+            [9] \qquad V_{2} = V_{1} \left( \frac{P_{1}}{P_{2}} \right)^{1 / \gamma}
             $$    
           </div>
 
+          <div class="details-eqn">
+            $$
+            [10] \qquad T_{2} = T_{1} \left( \frac{V_{1}}{V_{2}} \right)^{\gamma - 1}
+            $$    
+          </div>
+
+          <div class="details-text">&nbsp;&nbsp;Irreversible process:</div>
+
+          <div class="details-eqn">
+            $$
+            [11] \qquad T_{2} = T_{1} - \frac{P_{2}(V_{2} - V_{1})}{C_{V}}
+            $$    
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [12] \qquad V_{2} = \frac{R(C_{V} T_{1} + P_{2} V_{1})}{P_{2}(C_{V} + R)}
+            $$    
+          </div>
+
+          <div class="references">References:<br>(1) J. R. Elliott and C. T. Lira, Introductory Chemical Engineering Thermodynamics, New York: Pearson Education, 2012.</div>
           <div style="margin-top: 2rem;"></div>
         </div>
 
@@ -209,7 +226,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren and Rachael L. Baumann under the direction of Professor John L. Falconer, with additional contributions by Derek M. Machalek, Nathan S. Nelson and Garrison J. Vigil. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
           </p>
         </div>
       </div>
