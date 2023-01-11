@@ -116,6 +116,7 @@ function subGraphDraw(){
 
 // Draws curves
 function curveDraw(){
+    // Clausius curve below
     // 0.101325*exp(-5268*(1/T - 1/373))
     let lx = 120; // left x
     let rx = 770; // right x
@@ -129,7 +130,7 @@ function curveDraw(){
     beginShape(); 
     for(let i = 200; i < 647; i++){
         x = map(i,200,680,lx+(rx-lx)/25,rx);
-        ytemp = 0.101325*Math.exp(-5268*(1/i - 1/373));
+        ytemp = 0.101325*Math.exp(-5268.134*(1/i - 1/373));
         y = yPlotting(ytemp);
         vertex(x,y);
         yStorage.push(ytemp);
@@ -137,7 +138,7 @@ function curveDraw(){
         if(i == 646){
             // plot 647.096
             x = map(647.096,200,680,lx+(rx-lx)/25,rx);
-            ytemp = 0.101325*Math.exp(-5268*(1/647.096 - 1/373));
+            ytemp = 0.101325*Math.exp(-5268.134*(1/647.096 - 1/373));
             y = yPlotting(ytemp);
             vertex(x,y);
         }
@@ -146,9 +147,10 @@ function curveDraw(){
 
     push();
     noStroke(); fill(100);
-    ellipse(x,y,12);
+    ellipse(x,y,14);
     pop();
 
+    // Ice curve below here
     let iceInfo = [[252., 203.5357], [253., 195.8644], [254., 188.1245], [255., 180.3019], [256., 172.3814], [257., 164.3468], [258., 156.1811], [259., 147.866], [260., 139.3821], [261., 130.7087], [262., 121.8238], [263., 112.7041], [264., 103.3243], [265., 93.6579], [266., 83.6765], [267., 73.3496], [268.,62.645], [269., 51.5281], [270., 39.962], [271., 27.90750], [272., 15.32260], [273., 2.1627], [273.1, 1.], [273.16, 0.0006117]];
     
     beginShape();
@@ -168,7 +170,7 @@ function curveDraw(){
     x = map(273.15,200,680,lx+(rx-lx)/25,rx);
     ytemp = 0.101325*Math.exp(-5268*(1/273.15 - 1/373));
     y = yPlotting(ytemp);
-    ellipse(x,y,12);
+    ellipse(x,y,14);
     pop();
 }
 
@@ -299,7 +301,7 @@ function plotPoint(){
     pop();
 }
 
-// Determines pressure based on slider for isothermal mode (maybe?)
+// Determines pressure based on slider for isothermal mode
 function isothermPressure(){
     
     let pressure; // Might need to make this into a global variable of sorts
@@ -342,23 +344,120 @@ function isothermPressure(){
             }
             break;
     }
+    g.P = Math.exp(pressure);
 }
 
-// Below is a series of mathematical functions that will be called repeatedly
-function pi_p(P){
-    return(P/611.6571);
-}
-
-function tau_T(T){
-    return(T/c.Tt);
-}
-
-function r2p(P){
-    let x = c.r21/611.6571 + c.r22*2/611.6571*(pi_p(P) - c.pi0); // What is P?
-    return(x);
-}
-
-function g0p(P){
-    let x = c.g01/611.6571 + c.g02*2/611.6571*(pi_p(P) - c.pi0) + c.g03*3/611.6571*(pi_p(P) - c.pi0)**2 + c.g04*4/611.6571*(pi_P(P) - c.pi0)**3;
-    return(x);
+function compositionDetermine(){
+    switch (g.isotype){
+        case 'isothermal':
+            switch (g.transition){
+                case 'sublimation':
+                    if (g.slider > -9.4){
+                        g.comp[0] = 1;
+                        g.comp[1] = 0;
+                        g.comp[2] = 0;
+                    } else if (g.slider <= -9.4 && g.slider >= -21.4){
+                        g.comp[0] = (-21.4 - g.slider)/-12;
+                        g.comp[1] = 0;
+                        g.comp[2] = (g.slider + 9.4)/-12;
+                    } else if (g.slider < -21.4){
+                        g.comp[0] = 0;
+                        g.comp[1] = 0;
+                        g.comp[2] = 1;
+                    }
+                    break;
+                case 'melting':
+                    if (g.slider > 0.25){
+                        g.comp[0] = 0;
+                        g.comp[1] = 1;
+                        g.comp[2] = 0;
+                    } else if (g.slider <= 0.25 && g.slider >= -1){
+                        g.comp[0] = (g.slider - 0.25)/-1.25;
+                        g.comp[1] = (-1 - g.slider)/-1.25;
+                        g.comp[2] = 0;
+                    } else if (g.slider < -1){
+                        g.comp[0] = 1;
+                        g.comp[1] = 0;
+                        g.comp[2] = 0;
+                    }
+                    break;
+                case 'vaporization':
+                    if (g.slider > -4.4){
+                        g.comp[0] = 0;
+                        g.comp[1] = 1;
+                        g.comp[2] = 0;
+                    } else if (g.slider <= -4.4 && g.slider >= -7.8){
+                        g.comp[0] = 0;
+                        g.comp[1] = (-7.8 - g.slider)/-3.4;
+                        g.comp[2] = (g.slider + 4.4)/-3.4;
+                    } else if (g.slider < -7.8){
+                        g.comp[0] = 0;
+                        g.comp[1] = 0;
+                        g.comp[2] = 1;
+                    }
+                    break;
+                case 'triple-point':
+                    if (g.slider > -7.4){
+                        g.comp[0] = 0;
+                        g.comp[1] = 1;
+                        g.comp[2] = 0;
+                    } else if (g.slider <= -7.4 && g.slider >= -10.8){
+                        g.comp[0] = 2*((g.slider+7.4)/-3.4)*(1-(g.slider+7.4)/-3.4);
+                        g.comp[1] = 1 - 2*((g.slider+7.4)/-3.4) + ((g.slider+7.4)/-3.4)**2
+                        g.comp[2] = ((g.slider+7.4)/-3.4)**2;
+                    } else if (g.slider < -10.8){
+                        g.comp[0] = 0;
+                        g.comp[1] = 0;
+                        g.comp[2] = 1;
+                    }
+                    break;    
+            }
+            break;
+        case 'isobaric':
+            switch (g.transition){
+                case 'sublimation':
+                    if (g.slider*1000 <= g.heatSublime){
+                        g.T = g.Ti + 1000*g.slider/cpIce;
+                        g.comp[0] = 1;
+                        g.comp[1] = 0;
+                        g.comp[2] = 0;
+                    } else if (g.slider*1000 > g.heatSublime && g.slider*1000 < g.heatSublime + g.Hs){
+                        g.T = 250;
+                        g.comp[0] = (g.heatSublime+g.Hs-1000*g.slider)/g.Hs;
+                        g.comp[1] = 0;
+                        g.comp[2] = 1 - g.comp[0];
+                    } else if (1000*g.slider >= g.heatSublime + g.Hs){
+                        g.T = 250 + (1000*g.slider-g.heatSublime-g.Hs)/g.cp_vapor;
+                        g.comp[0] = 0;
+                        g.comp[1] = 0;
+                        g.comp[2] = 1;
+                    }
+                    break;
+                case 'melting':
+                    if (1000*g.slider <= g.heatMelt){
+                        g.T = g.Ti + 1000*g.slider/g.cp_ice;
+                        g.comp[0] = 1;
+                        g.comp[1] = 0;
+                        g.comp[2] = 0;
+                    } else if (1000*g.slider > g.heatMelt && 1000*g.slider < g.heatMelt + g.Hm){
+                        g.T = 273;
+                        g.comp[0] = (g.heatMelt+g.Hm-1000*g.slider)/g.Hm;
+                        g.comp[1] = 1 - g.comp[0];
+                        g.comp[2] = 0;
+                    } else if (1000*g.slider >= g.heatMelt + g.Hm){
+                        g.T = 273 + (1000*g.slider-g.heatMelt-g.Hm)/g.cp_water;
+                        g.comp[0] = 0;
+                        g.comp[1] = 1;
+                        g.comp[2] = 0;
+                    }
+                    break; 
+                case 'vaporization':
+                    
+                    break;
+                case 'triple-point':
+                    
+                    break;    
+            }
+            break;
+    }
 }

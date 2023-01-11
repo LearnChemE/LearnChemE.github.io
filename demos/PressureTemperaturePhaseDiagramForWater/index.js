@@ -28,6 +28,8 @@ window.g = {
 
   P : 0, // These will be used for plotting the displayed point
   T : 0,
+
+  comp : [0, 0, 0], // Percentage solid, liquid, vapor
 }
 
 // Object for storing the various necessary coefficients
@@ -45,6 +47,7 @@ let c = {
   r22 : math.complex(0.234801409215913*(10**-10), -0.285651142904972*(10**-10)),
   Tt : 273.16,
   pi0 : 101325/611.6571,
+  R2 : 0.461526,
 
 }
 
@@ -52,12 +55,13 @@ function setup() {
   g.cnv = createCanvas(800, 600);
   g.cnv.parent("graphics-wrapper");
   document.getElementsByTagName("main")[0].remove();
- 
+  //frameRate(2)
   initialStateDetermine();
 }
 
 function draw() {
   background(250);
+  
 
   if(g.isotype == 'isothermal'){
     isothermPressure();
@@ -70,7 +74,7 @@ function draw() {
   gibbsPhase();
 
   plotPoint();
-  
+  //console.log(nuVapor(1,1))
 }
                 
 const slider = document.getElementById("slider"); // Using slider as var name since it switches between specific volume and heat
