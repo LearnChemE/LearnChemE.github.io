@@ -3,6 +3,7 @@ window.g = {
   slider : 2,
   isotype : 'isothermal',
   transition : 'sublimation',
+  gibbsTruth : false,
 
   R : 8.314*Math.pow(10,-6), // Gas constant (m^3*MPa/[mol-K])
   Tcrit : 647.096, // Critical temperature (K)
@@ -30,6 +31,7 @@ window.g = {
   T : 0,
 
   comp : [0, 0, 0], // Percentage solid, liquid, vapor
+  F : 0, // Gibbs phase rule degree of freedom
 }
 
 // Object for storing the various necessary coefficients
@@ -42,8 +44,8 @@ let c = {
   t1 : math.complex(0.368017112855051*(10**-1),0.510878114959572*(10**-1)),
   t2 : math.complex(0.337315741065416, 0.335449415919309),
   r1 : math.complex(0.447050716285388*(10**2), 0.656876847463481*(10**2)),
-  r20 : math.complex(-0.725974574329220*(10**2), 0.781008427112870*(10**2)),
-  r21 : math.complex(-0.557107698030123*(10**-4), -0.464578634580806*(10**-4)),
+  r20 : math.complex(-0.725974574329220*(10**2), -0.781008427112870*(10**2)),
+  r21 : math.complex(-0.557107698030123*(10**-4), 0.464578634580806*(10**-4)),
   r22 : math.complex(0.234801409215913*(10**-10), -0.285651142904972*(10**-10)),
   Tt : 273.16,
   pi0 : 101325/611.6571,
@@ -55,7 +57,6 @@ function setup() {
   g.cnv = createCanvas(800, 600);
   g.cnv.parent("graphics-wrapper");
   document.getElementsByTagName("main")[0].remove();
-  //frameRate(2)
   initialStateDetermine();
 }
 
@@ -80,8 +81,9 @@ function draw() {
 const slider = document.getElementById("slider"); // Using slider as var name since it switches between specific volume and heat
 const slider_label = document.getElementById("slider-label");
 const slider_value = document.getElementById("slider-value");
-const isotype = document.getElementById("isotype");
-const transition = document.getElementById("state-transition");
+const isotype = document.getElementById("isotype"); // isobaric or isothermal
+const transition = document.getElementById("state-transition"); // sublimation, melting, vaporization, triple point
+const gibbs = document.getElementById("gibbs-phase"); // checked or unchecked
 
 slider.addEventListener("input", function(){
   const slider_temp = Number(slider.value);
@@ -103,6 +105,11 @@ transition.addEventListener("change", function(){
   initialStateDetermine();
 });
 
+gibbs.addEventListener("click",()=>{
+  g.gibbsTruth = gibbs.checked;
+});
+
+// These functions are here rather than functions.js since they have more to do with HTML labels/limits
 // Changes the range on the slider depending on isothermal/-baric and transition type
 function sliderLimits(){
   switch (g.isotype){
@@ -171,6 +178,7 @@ function sliderLimits(){
   }
 }
 
+// Changes range of slider from base value to actual specific volume using the specific volume functions
 function isothermSliderLabel(){
   let label, label1;
   switch (g.transition){

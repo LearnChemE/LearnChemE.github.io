@@ -187,7 +187,7 @@ function curveDraw(){
     for(let i = 0; i < iceInfo.length; i++){
         x = map(iceInfo[i][0],200,680,lx+(rx-lx)/25,rx);
         y = yPlotting(iceInfo[i][1]);
-        if(y != ty){
+        if(y > ty){
             vertex(x,y);
         }
     }
@@ -206,7 +206,13 @@ function curveDraw(){
 
 // Displays Gibbs phase rule
 function gibbsPhase(){
-
+    if(g.gibbsTruth){
+        push();
+        textSize(28); textStyle(ITALIC);
+        let ans = 1 - g.F + 2;
+        text('F = C - P + 2 = 1 - '+g.F+' + 2 = '+ans,width/2-130,35);
+        pop();
+    }
 }
 
 // For plotting the points on logarithmic y-axis
@@ -387,14 +393,17 @@ function compositionDetermine(){
                         g.comp[0] = 1;
                         g.comp[1] = 0;
                         g.comp[2] = 0;
+                        g.F = 1;
                     } else if (g.slider <= -9.4 && g.slider >= -21.4){
                         g.comp[0] = (-21.4 - g.slider)/-12;
                         g.comp[1] = 0;
                         g.comp[2] = (g.slider + 9.4)/-12;
+                        g.F = 2;
                     } else if (g.slider < -21.4){
                         g.comp[0] = 0;
                         g.comp[1] = 0;
                         g.comp[2] = 1;
+                        g.F = 1;
                     }
                     break;
                 case 'melting':
@@ -402,14 +411,17 @@ function compositionDetermine(){
                         g.comp[0] = 0;
                         g.comp[1] = 1;
                         g.comp[2] = 0;
+                        g.F = 1;
                     } else if (g.slider <= 0.25 && g.slider >= -1){
                         g.comp[0] = (g.slider - 0.25)/-1.25;
                         g.comp[1] = (-1 - g.slider)/-1.25;
                         g.comp[2] = 0;
+                        g.F = 2;
                     } else if (g.slider < -1){
                         g.comp[0] = 1;
                         g.comp[1] = 0;
                         g.comp[2] = 0;
+                        g.F = 1;
                     }
                     break;
                 case 'vaporization':
@@ -417,14 +429,17 @@ function compositionDetermine(){
                         g.comp[0] = 0;
                         g.comp[1] = 1;
                         g.comp[2] = 0;
+                        g.F = 1;
                     } else if (g.slider <= -4.4 && g.slider >= -7.8){
                         g.comp[0] = 0;
                         g.comp[1] = (-7.8 - g.slider)/-3.4;
                         g.comp[2] = (g.slider + 4.4)/-3.4;
+                        g.F = 2;
                     } else if (g.slider < -7.8){
                         g.comp[0] = 0;
                         g.comp[1] = 0;
                         g.comp[2] = 1;
+                        g.F = 1;
                     }
                     break;
                 case 'triple-point':
@@ -432,14 +447,17 @@ function compositionDetermine(){
                         g.comp[0] = 0;
                         g.comp[1] = 1;
                         g.comp[2] = 0;
+                        g.F = 1;
                     } else if (g.slider <= -7.4 && g.slider >= -10.8){
                         g.comp[0] = 2*((g.slider+7.4)/-3.4)*(1-(g.slider+7.4)/-3.4);
                         g.comp[1] = 1 - 2*((g.slider+7.4)/-3.4) + ((g.slider+7.4)/-3.4)**2
                         g.comp[2] = ((g.slider+7.4)/-3.4)**2;
+                        g.F = 3;
                     } else if (g.slider < -10.8){
                         g.comp[0] = 0;
                         g.comp[1] = 0;
                         g.comp[2] = 1;
+                        g.F = 1;
                     }
                     break;    
             }
@@ -452,16 +470,19 @@ function compositionDetermine(){
                         g.comp[0] = 1;
                         g.comp[1] = 0;
                         g.comp[2] = 0;
+                        g.F = 1;
                     } else if (g.slider*1000 > g.heatSublime && g.slider*1000 < g.heatSublime + g.Hs){
                         g.T = 250;
                         g.comp[0] = (g.heatSublime+g.Hs-1000*g.slider)/g.Hs;
                         g.comp[1] = 0;
                         g.comp[2] = 1 - g.comp[0];
+                        g.F = 2;
                     } else if (1000*g.slider >= g.heatSublime + g.Hs){
                         g.T = 250 + (1000*g.slider-g.heatSublime-g.Hs)/g.cp_vapor;
                         g.comp[0] = 0;
                         g.comp[1] = 0;
                         g.comp[2] = 1;
+                        g.F = 1;
                     }
                     break;
                 case 'melting':
@@ -470,16 +491,19 @@ function compositionDetermine(){
                         g.comp[0] = 1;
                         g.comp[1] = 0;
                         g.comp[2] = 0;
+                        g.F = 1;
                     } else if (1000*g.slider > g.heatMelt && 1000*g.slider < g.heatMelt + g.Hm){
                         g.T = 273;
                         g.comp[0] = (g.heatMelt+g.Hm-1000*g.slider)/g.Hm;
                         g.comp[1] = 1 - g.comp[0];
                         g.comp[2] = 0;
+                        g.F = 2;
                     } else if (1000*g.slider >= g.heatMelt + g.Hm){
                         g.T = 273 + (1000*g.slider-g.heatMelt-g.Hm)/g.cp_water;
                         g.comp[0] = 0;
                         g.comp[1] = 1;
                         g.comp[2] = 0;
+                        g.F = 1;
                     }
                     break; 
                 case 'vaporization':
@@ -488,16 +512,19 @@ function compositionDetermine(){
                         g.comp[0] = 0;
                         g.comp[1] = 1;
                         g.comp[2] = 0;
+                        g.F = 1;
                     } else if (1000*g.slider > g.heatVapor && 1000*g.slider < g.heatVapor + g.Hv){
                         g.T = 373;
                         g.comp[0] = 0;
                         g.comp[1] = (g.heatVapor + g.Hv - 1000*g.slider)/g.Hv;
                         g.comp[2] = 1 - g.comp[1];
+                        g.F = 2;
                     } else if (1000*g.slider >= g.heatVapor + g.Hv){
                         g.T = 373 + (1000*g.slider - g.heatVapor - g.Hv)/g.cp_vapor;
                         g.comp[0] = 0;
                         g.comp[1] = 0;
                         g.comp[2] = 1;
+                        g.F = 1;
                     }
                     break;
                 case 'triple-point':
@@ -506,16 +533,19 @@ function compositionDetermine(){
                         g.comp[0] = 1;
                         g.comp[1] = 0;
                         g.comp[2] = 0;
+                        g.F = 1;
                     } else if (1000*g.slider > g.heatTriple && 1000*g.slider < g.heatTriple + g.Hs){
                         g.T = 273.16;
                         g.comp[0] = 1 - 2*(1000*g.slider - g.heatTriple)/g.Hs + ((1000*g.slider - g.heatTriple)/g.Hs)**2;
                         g.comp[1] = 2*((1000*g.slider - g.heatTriple)/g.Hs)*(1 - (1000*g.slider-g.heatTriple)/g.Hs);
                         g.comp[2] = ((1000*g.slider - g.heatTriple)/g.Hs)**2;
+                        g.F = 3;
                     } else if (1000*g.slider >= g.heatTriple + g.Hs){
                         g.T = 273.16 + (1000*g.slider - g.heatTriple - g.Hs)/g.cp_vapor;
                         g.comp[0] = 0;
                         g.comp[1] = 0;
                         g.comp[2] = 1;
+                        g.F = 1;
                     }
                     break;    
             }
