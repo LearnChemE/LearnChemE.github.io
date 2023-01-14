@@ -63,10 +63,6 @@ function setup() {
 function draw() {
   background(250);
   
-  if(g.isotype == 'isothermal'){
-    isothermPressure();
-    isothermSliderLabel();
-  }
   compositionDetermine();
   
   graphDraw();
@@ -74,6 +70,14 @@ function draw() {
   
   curveDraw();
   gibbsPhase();
+
+  if(g.isotype == 'isothermal'){
+    isothermPressure();
+    isothermSliderLabel();
+    if(g.transition == 'melting'){
+      meltingGraph();
+    }
+  }
 
   plotPoint();
 }

@@ -98,7 +98,12 @@
         </button>
       </div>
       <div class="modal-body">
-       
+       <p>
+        The phase behavior for water is represented on a log pressure versus temperature diagram. Use the first drop-down menu to select either an isothermal or isobaric process. Use the second drop-down menu to select a particular phase transition (sublimation, melting, vaporization, or triple-point).
+       </p>
+       <p>
+        For isobaric transtions, you can add heat with the slider. For isothermal transitions, the specific volume is changed with the slider. The relative amounts of each phase present are shown in the bar graph. A log pressure-temperature graph with an expanded temperature scale is inserted for isothermal melting because of the steepness of the phase transition line. At the triple point, the three phases are present simultaneously. Select "display Gibbs phase rule" to show the phase rule applied at the location of the black dot.
+       </p>
       </div>
     </div>
   </div>
@@ -117,7 +122,57 @@
       </div>
 
       <div class="modal-body">
-        
+        <div class="modal-text">
+          The Gibbs phase rule, which determines how many intensive variables (e.g., temperature, pressure) can be varied independently, is:
+        </div>
+        <div class="modal-equation">
+          $$
+          F = C - P + 2,
+          $$
+        </div>
+        <div class="modal-text">
+          where \(F\) is the number of degrees of freedom, \(C\) is the number of components and \(P\) is the number of phases. In a single-phase region, heat may be added isobarically to increase the temperature:
+        </div>
+        <div class="modal-equation">
+          $$
+          \Delta H = nc_p(T_2 - T_1) = Q,
+          $$
+        </div>
+        <div class="modal-text">
+          Where \(Q\) is the amount of heat added, \(c_p\) (kJ/[kmol K]) is the constant-pressure heat capacity, \(n\) is the number of moles, and \(T_1\) and \(T_2\) (K) are the initial and final temperatures. For isothermal processes, changes in the specific volume (L/mol) accompany phase changes; heat must be added or removed for these phase changes to take place.
+        </div>
+        <div class="modal-text">
+          In a two-phase region, the amount of each pahse can be determined from:
+        </div>
+        <div class="modal-equation">
+          $$
+          \frac{P_H}{P_HP_L} = \frac{H - H_L}{H_H - H_L}
+          $$
+        </div>
+        <div class="modal-text">
+          where \(P_H\) (mol) is the amount of the higher-energy phase, \(P_L\) (mol) is the amount of the lower-energy phase, \(H\) (kJ/mol) is the specific enthalpy of the system, \(H_H\) (kJ/mol) is the specific enthalpy of the saturated high-energy phase and \(H_L\) (kJ/mol) is the specific enthalpy of the saturated low-energy phase. Note that \(H\), \(H_H\), and \(H_L\) must be evaluated at the same temperature and pressure.
+        </div>
+        <div class="modal-text">
+          Withing the triple point, the amounts of each phase composition is complex [1, 2].
+        </div>
+        <div class="modal-text">
+          References:
+        </div>
+        <ol class="references">
+          <li>
+            <i>Revised Release on the Equation of State 2006 for H<sub>2</sub>O Ice Ih</i>, Report Number IAPWS R10-06(2009), Doorwerth, Netherlands: The International Association for the Properties of Water and Steam. (Jan 13, 2023) <a
+             href=www.iapws.org/relguide/Ice-2009.html"
+             target="_blank">www.iapws.org/relguide/Ice-2009.html</a>.
+          </li>
+          <li>
+            <i>Revised Release on the IAPWS Industrial Formulation 1997 for the Thermodynamic Properties of Water and Steam</i>, Report Number IAPWS R7-97(2012), Lucerne, Switzerland: The International Association for the Properties of Water and Steam. (Jan 13, 2023) <a
+            href="www.iapws.org/relguide/IF97-Rev.html"
+            target="_blank">www.iapws.org/relguide/IF97-Rev.html</a>.
+          </li>
+          <li>
+            J. R. Elliott and C. T. Lira, <i></i>Introductory Chemical Engineering Thermodynamics</i>, 2nd ed., Upper Saddle River, NJ: Prentice Hall, 2012.
+          </li>
+        </ol>
       </div>
         <div style="height: 30px;"></div>
       </div>
@@ -139,8 +194,8 @@
         <p>
           This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
             Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
-            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under the direction of
-          Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional contributions by Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of our
+            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of
+          Professor John L. Falconer and Rachael Baumann and was converted to HTML5 by Patrick Doyle, with additional contributions by Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of our
           simulations are open source, and are available on our <a
             href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
             repository</a>.</p>

@@ -1,4 +1,6 @@
 let yTicks;
+let iceInfo = [[252., 203.5357], [253., 195.8644], [254., 188.1245], [255., 180.3019], [256., 172.3814], [257., 164.3468], [258., 156.1811], [259., 147.866], [260., 139.3821], [261., 130.7087], [262., 121.8238], [263., 112.7041], [264., 103.3243], [265., 93.6579], [266., 83.6765], [267., 73.3496], [268.,62.645], [269., 51.5281], [270., 39.962], [271., 27.90750], [272., 15.32260], [273., 2.1627], [273.1, 1.], [273.16, 0.0006117]];
+
 // Draws overall graph frame
 function graphDraw(){
     yTicks = [];
@@ -19,19 +21,9 @@ function graphDraw(){
             line(lx+(rx-lx)/25*(i+1),ty,lx+(rx-lx)/25*(i+1),ty+7);
             text(xLabels[counter],lx+(rx-lx)/25*(i+1)-20,by+30);
             counter++;
-            // REMOVE THIS BEFORE YOU FINISH
-            push();
-            stroke(0,20);
-            line(lx+(rx-lx)/25*(i+1),by,lx+(rx-lx)/25*(i+1),ty);
-            pop();
         } else{
             line(lx+(rx-lx)/25*(i+1),by,lx+(rx-lx)/25*(i+1),by-4);
             line(lx+(rx-lx)/25*(i+1),ty,lx+(rx-lx)/25*(i+1),ty+4);
-            // REMOVE THIS BEFORE YOU FINISH
-            push();
-            stroke(0,20);
-            line(lx+(rx-lx)/25*(i+1),by,lx+(rx-lx)/25*(i+1),ty);
-            pop();
         }
     }
     text('Temperature (K)',width/2-40,570);
@@ -40,22 +32,12 @@ function graphDraw(){
         if(i%3 == 0){
             line(lx,by-(by-ty)/9*i,lx+7,by-(by-ty)/9*i);
             yTicks.push(by-(by-ty)/9*i);
-            // REMOVE THIS BEFORE YOU FINISH
-            push();
-            stroke(0,20);
-            line(lx,by-(by-ty)/9*i,rx,by-(by-ty)/9*i);
-            pop();
         } else {
             line(lx,by-(by-ty)/9*i,lx+4,by-(by-ty)/9*i);
             yTicks.push(by-(by-ty)/9*i);
-            // REMOVE THIS BEFORE YOU FINISH
-            push();
-            stroke(0,20);
-            line(lx,by-(by-ty)/9*i,rx,by-(by-ty)/9*i);
-            pop();
         }
     }
-
+    
     // Adding bottom and top of the graph to yTicks array (for use in logarithmic plotting)
     yTicks.splice(0,0,500);
     yTicks.splice(yTicks.length,0,50);
@@ -73,7 +55,16 @@ function graphDraw(){
     translate(50,height/2+60);
     rotate(radians(-90));
     text('Pressure (MPa)',0,0);
+    pop();
 
+    push();
+    textSize(25);
+    fill(2,100,32,200);
+    text('solid',lx+30,250);
+    fill(180,0,32,200);
+    text('liquid',320,100);
+    fill(0,0,255,195);
+    text('vapor',550,220)
     pop();
 }
 
@@ -81,9 +72,9 @@ function graphDraw(){
 function subGraphDraw(){
     push();
     fill(255);
-    rect(420,250,330,200);
+    rect(420,280,330,200);
     let lx = 420; let rx = 750; // left and right graph edges
-    let by = 450; let ty = 250; // bottom and top graph edges
+    let by = 480; let ty = 280; // bottom and top graph edges
     let yLabels = ['0.0','0.2','0.4','0.6','0.8','1.0','1.2'];
     let xLabels = ['solid','liquid','vapor'];
     pop();
@@ -116,7 +107,7 @@ function subGraphDraw(){
     // Filling the relative amounts based on global variable g.comp
     push();
     stroke(0); strokeWeight(.5); textSize(25);
-    let max = 283.333; // px location of 1.0
+    let max = 313.333; // px location of 1.0
     let height;
     for(let i = 0; i < 3; i++){
         if(i == 0){
@@ -180,9 +171,7 @@ function curveDraw(){
     ellipse(x,y,14);
     pop();
 
-    // Ice curve below here
-    let iceInfo = [[252., 203.5357], [253., 195.8644], [254., 188.1245], [255., 180.3019], [256., 172.3814], [257., 164.3468], [258., 156.1811], [259., 147.866], [260., 139.3821], [261., 130.7087], [262., 121.8238], [263., 112.7041], [264., 103.3243], [265., 93.6579], [266., 83.6765], [267., 73.3496], [268.,62.645], [269., 51.5281], [270., 39.962], [271., 27.90750], [272., 15.32260], [273., 2.1627], [273.1, 1.], [273.16, 0.0006117]];
-    
+    // Ice curve below here    
     beginShape();
     for(let i = 0; i < iceInfo.length; i++){
         x = map(iceInfo[i][0],200,680,lx+(rx-lx)/25,rx);
@@ -553,4 +542,131 @@ function compositionDetermine(){
     }
 }
 
+function meltingGraph(){
+    // let lx = 120; // left x
+    // let rx = 770; // right x
+    // let by = 500; // bottom y
+    // let ty = 50; // top y
+    
+    push();
+    fill(255); stroke(0);
+    rect(300,50,330,200);
+    pop();
+
+    // Rectangle edges
+    let lx, rx, by, ty;
+    lx = 300; rx = 630; 
+    ty = 50; by = 250;
+
+    // Drawing the graph edges
+    line(lx+30,by-25,rx-20,by-25);
+    line(lx+30,by-25,lx+30,ty+10);
+
+    push();
+    textSize(18);
+    text('273.00',lx+10,by-5);
+    text('273.16',rx-80,by-5);
+    text('Temperature (K)',lx+90,by-5);
+    translate(318,210);
+    rotate(radians(-90));
+    text('Pressure (MPa)',0,0);
+    pop();
+
+    // Adjusting the graph edges based on where the lines were drawn (previously using these values for rectangle edges)
+    lx = lx + 30; rx = rx - 20;
+    by = by - 25; ty = ty + 10;
+    labels = ['0.1','1'];
+
+    let yTicks2 = []; // For storing the pixel values of yticks in subplot (#2 because global variable yTicks for main plot y points)
+    
+    push();
+    textSize(18);
+    for(let i = 0; i < 3; i++){
+        if (i < 2){
+            line(lx,by-(by-ty)/3*(i+1),lx+4,by-(by-ty)/3*(i+1));
+            text(labels[i],lx+6,by-(by-ty)/3*(i+1)+7);
+        }
+        yTicks2.push(by-(by-ty)/3*(i+1));
+    }
+    
+    // Placing the line for P = 5 MPa
+    let pxUpper = yTicks2[2];
+    let temp = -(Math.log10(5) - 1);
+    line(lx,pxUpper + temp*55,lx+4,pxUpper + temp*55);
+    text('5',lx+6,pxUpper + temp*55+7);
+    pop();
+
+    let x, y;
+    let temp1, temp2;
+    push();
+    noFill(); strokeWeight(1.5);
+    stroke(0,0,255,200);
+    beginShape();
+    for(let i = 273; i < 273.16; i += 0.001){
+        temp1 = findNearest(i);
+        temp2 = interpolate(i,temp1[0],temp1[1],temp1[2],temp1[3]);
+        x = map(i,273,273.18,lx,rx);
+        y = yPlotting2(temp2,yTicks2);
+        if(y < by){
+            vertex(x,y);
+        }
+    }
+    x = map(273.16,273,273.18,lx,rx)-.6; // Adding an additional point to close off the loop
+    y = by;
+    vertex(x,y);
+    endShape();
+    pop();
+
+    // Plotting the point of current position
+    x = lx + (0.07/.18)*(rx-lx); // Mapping  273.07 between 273 and 273.18 wasn't working for some reason so this is a manual map calculation
+    y = yPlotting2(g.P,yTicks2);
+    push();
+    fill(0);
+    ellipse(x,y,12);
+    pop();
+}
+
+// For plotting the points in the isothermal, melting subgraph
+function interpolate(x,x1,x2,y1,y2){
+    let y = y1 + (x-x1)*(y2-y1)/(x2-x1);
+    return(y);
+}
+
+// Used to find corresponding x1, x2, y1, y2 for interpolation with the ice data
+function findNearest(x){
+    let found = false;
+    let i = 0;
+    let vec = [[273, 2.1627], [273.1, 1.], [273.16, 0.0006117]]; // From iceInfo vector, but only holds the relevant points
+
+    while(!found){
+        if(x == vec[i][0]){
+            found = true;
+            return([vec[i][0],0,vec[i][1],0])
+        } else if (x > vec[i][0] && x < vec[i+1][0] && i < 2){
+            found = true;
+            return([vec[i][0],vec[i+1][0],vec[i][1],vec[i+1][1]])
+        } else {
+            i++;
+        }
+    }
+}
+
+// For plotting on the isothermal melting graph
+function yPlotting2(y,vec){
+    let upper, temp, output;
+    if(y <= 0.1){
+        upper = vec[0];
+        temp = -(Math.log10(y) + 1);
+        output = upper + temp*55;
+    } else if (y <= 1){
+        upper = vec[1];
+        temp = -(Math.log10(y));
+        output = upper + temp*55;
+    } else if (y <= 10){
+        upper = vec[2];
+        temp = -(Math.log10(y) - 1);
+        output = upper + temp*55;
+    }
+    return(output);
+}
 
