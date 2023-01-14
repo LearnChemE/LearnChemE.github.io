@@ -2,7 +2,7 @@ window.g = {
   cnv : undefined,
   slider : 2,
   isotype : 'isothermal',
-  transition : 'melting',
+  transition : 'sublimation',
   gibbsTruth : false,
 
   R : 8.314*Math.pow(10,-6), // Gas constant (m^3*MPa/[mol-K])
