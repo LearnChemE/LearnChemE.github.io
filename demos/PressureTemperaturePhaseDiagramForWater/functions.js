@@ -551,7 +551,11 @@ function meltingGraph(){
     push();
     fill(255); stroke(0);
     rect(300,50,330,200);
+    strokeWeight(1.5);
+    line(250,150,290,45);
+    line(250,150,290,255);
     pop();
+    
 
     // Rectangle edges
     let lx, rx, by, ty;
