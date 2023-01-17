@@ -5,21 +5,20 @@ window.g = {
  
   gridTruth: false,
   compTruth: false,
+  pointType_2 : 'plot-points',
 
   radius: 8,
   points: [],
   nP: 1,
   dragPoint: null,
 
-  // soluteFrac: 0.25,
-  // solventFrac: 0.25,
-  // carrierFrac: 0.50,
-  // inPhaseEnvelope: true,
+  
+  R : [1,-100], // m and b values for right edge of triangle
 }
 
 
 function setup() {
-  g.cnv = createCanvas(600, 550);
+  g.cnv = createCanvas(700, 600);
 
   g.cnv.parent("graphics-wrapper");
 
@@ -32,7 +31,9 @@ function setup() {
 
 function draw() {
   background(250);
-
+  triangleDraw();
+ 
+ 
  
   
 }
@@ -61,7 +62,7 @@ function draw() {
 //   });
 // };
 
-
+const pointType = document.getElementById("point-type").children;
 const gridLines = document.getElementById("grid-lines");
 const carrierComp = document.getElementById("carrier-compositions");
 
@@ -70,7 +71,17 @@ gridLines.addEventListener("change", () => {
 });
 carrierComp.addEventListener("change", () =>{
   g.compTruth = carrierComp.checked;
-})
+});
+
+for(let i = 0; i < pointType.length; i++){
+  pointType[i].addEventListener("click",function (){
+    for(let j = 0; j < pointType.length; j++){
+      pointType[j].classList.remove("selected");
+    };
+    pointType[i].classList.add("selected");
+    g.pointType_2 = pointType[i].value;
+  });
+};
 
 
 // For manipulating the position of dot within the triangle
@@ -97,12 +108,13 @@ function inCircle(pos, radius) {
 }
 
 
-// // Copied from Mathematica's source code
-// const phaseInfo = [[0.1, 0], [0.1021, 0.05104], [0.105, 0.098], [0.108, 0.1422], [0.113, 0.183], [0.1181, 0.22], [0.125, 0.254], [0.132, 0.2853], [0.14, 0.313], [0.149, 0.338], [0.159, 0.36], [0.17, 0.379], [0.181, 0.396], [0.194, 0.4093], [0.2082, 0.42], [0.222, 0.429], [0.2382, 0.435], [0.254, 0.438], [0.271, 0.44], [0.29, 0.438], [0.309, 0.435], [0.329, 0.429], [0.3503, 0.422], [0.372, 0.4123], [0.395, 0.4], [0.419, 0.387], [0.444, 0.371], [0.4703, 0.354], [0.497, 0.335], [0.525, 0.315], [0.554, 0.292], [0.584, 0.269], [0.615, 0.244], [0.647, 0.217], [0.68, 0.19], [0.714, 0.161], [0.749, 0.131], [0.785, 0.099], [0.8231, 0.067], [0.861, 0.034], [0.9, 0.]];
-// // Adds additional points to help the resolution on whether or not the dot is within the phase envelope
-// for (let i = 0; i < phaseInfo.length - 1; i += 2) {
-//   let x, y;
-//   x = phaseInfo[i][0] + 1 / 2 * (phaseInfo[i + 1][0] - phaseInfo[i][0]);
-//   y = phaseInfo[i][1] + 1 / 2 * (phaseInfo[i + 1][1] - phaseInfo[i][1]);
-//   phaseInfo.splice(i + 1, 0, [x, y]);
-// }
+// Copied from Mathematica's source code
+const phaseInfo = [[0.1, 0], [0.1021, 0.05104], [0.105, 0.098], [0.108, 0.1422], [0.113, 0.183], [0.1181, 0.22], [0.125, 0.254], [0.132, 0.2853], [0.14, 0.313], [0.149, 0.338], [0.159, 0.36], [0.17, 0.379], [0.181, 0.396], [0.194, 0.4093], [0.2082, 0.42], [0.222, 0.429], [0.2382, 0.435], [0.254, 0.438], [0.271, 0.44], [0.29, 0.438], [0.309, 0.435], [0.329, 0.429], [0.3503, 0.422], [0.372, 0.4123], [0.395, 0.4], [0.419, 0.387], [0.444, 0.371], [0.4703, 0.354], [0.497, 0.335], [0.525, 0.315], [0.554, 0.292], [0.584, 0.269], [0.615, 0.244], [0.647, 0.217], [0.68, 0.19], [0.714, 0.161], [0.749, 0.131], [0.785, 0.099], [0.8231, 0.067], [0.861, 0.034], [0.9, 0.]];
+// Adds additional points to help the resolution on whether or not the dot is within the phase envelope
+for (let i = 0; i < phaseInfo.length - 1; i += 2) {
+  let x, y;
+  x = phaseInfo[i][0] + 1 / 2 * (phaseInfo[i + 1][0] - phaseInfo[i][0]);
+  y = phaseInfo[i][1] + 1 / 2 * (phaseInfo[i + 1][1] - phaseInfo[i][1]);
+  phaseInfo.splice(i + 1, 0, [x, y]);
+}
+
