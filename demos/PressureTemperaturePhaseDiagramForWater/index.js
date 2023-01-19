@@ -271,7 +271,7 @@ function expLabel(num){
   }
 
   if(num > 1 && num < 10){
-    return([num.toFixed(3),0])
+    return([num.toFixed(1),0])
   }
 }
 
