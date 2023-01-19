@@ -1,6 +1,6 @@
 window.g = {
   cnv : undefined,
-  slider : 2,
+  slider : -2,
   isotype : 'isothermal',
   transition : 'sublimation',
   gibbsTruth : false,
@@ -62,6 +62,7 @@ function setup() {
 
 function draw() {
   background(250);
+
   
   compositionDetermine();
   
@@ -92,7 +93,14 @@ const gibbs = document.getElementById("gibbs-phase"); // checked or unchecked
 slider.addEventListener("input", function(){
   const slider_temp = Number(slider.value);
   slider_value.innerHTML = `${slider_temp}`;
-  g.slider = slider_temp;
+ 
+  if(g.isotype == 'isothermal'){
+    g.slider = -1*slider_temp;
+  } else {
+    g.slider = slider_temp;
+  }
+  
+  
 });
 
 isotype.addEventListener("change", function(){
@@ -121,27 +129,27 @@ function sliderLimits(){
       slider_label.innerHTML = "specific volume (L/mol)";
       switch (g.transition){
         case 'sublimation':
-          slider.setAttribute("min", "-34");
-          slider.setAttribute("max", "2");
-          slider.value = "2";
+          slider.setAttribute("max", "34");
+          slider.setAttribute("min", "-2");
+          slider.value = "-2";
           g.slider = slider.value;
           break;
         case 'melting':
-          slider.setAttribute("min", "-2.25");
-          slider.setAttribute("max", "1.5");
+          slider.setAttribute("max", "2.25");
+          slider.setAttribute("min", "-1.5");
           slider.value = "1.5";
           g.slider = slider.value;
           break;
         case 'vaporization':
-          slider.setAttribute("min", "-11.2");
-          slider.setAttribute("max", "-1");
-          slider.value = "-1";
+          slider.setAttribute("max", "11.2");
+          slider.setAttribute("min", "1");
+          slider.value = "1";
           g.slider = slider.value;
           break;
         case 'triple-point':
-          slider.setAttribute("min", "-14.2");
-          slider.setAttribute("max", "-2");
-          slider.value = "-2";
+          slider.setAttribute("max", "14.2");
+          slider.setAttribute("min", "2");
+          slider.value = "2";
           g.slider = slider.value;
           break;
       }
@@ -248,7 +256,7 @@ function expLabel(num){
       num = num/10;
       pos++;
     }
-    num = num.toFixed(3);
+    num = num.toFixed(1);
     return([num,pos]);
   } 
 
@@ -257,7 +265,7 @@ function expLabel(num){
       num = num*10;
       neg++;
     }
-    num = num.toFixed(3);
+    num = num.toFixed(1);
     neg = -1*neg;
     return([num,neg]);
   }
