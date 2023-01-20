@@ -5,7 +5,11 @@ window.g = {
  
   gridTruth: false,
   compTruth: false,
-  pointType_2 : 'plot-points',
+  pointType : 'plot-points',
+  
+  mix : 'feed',
+  e1Truth : false,
+  tieSlider : 0,
 
   radius: 8,
   points: [],
@@ -16,6 +20,17 @@ window.g = {
   R : [1,-100], // m and b values for right edge of triangle
 }
 
+let sFracs = {
+  solu : 0,
+  solv : 0.05,
+  carr : 0.95,
+}
+
+let rFracs = {
+  solu : 0.02,
+  solv : 0.88,
+  carr : 0.10,
+}
 
 function setup() {
   g.cnv = createCanvas(700, 600);
@@ -24,7 +39,7 @@ function setup() {
 
   document.getElementsByTagName("main")[0].remove();
   for (let i = 0; i < g.nP; i++) {
-    g.points.push(createVector(200, 350));
+    g.points.push(createVector(300, 250));
   }
 
 }
@@ -32,39 +47,43 @@ function setup() {
 function draw() {
   background(250);
   triangleDraw();
- 
- 
- 
+  disabler(); // This function is used for enabling/disabled the extraneous buttons
+
   
+  switch (g.pointType){
+    case 'plot-points':
+      plotPoints();
+      break;
+    case 'mixing-point':
+      mixingPoint();
+      break;
+    case 'operating-point':
+      operatingPoint();
+      break;
+    case 'count-stages':
+      countStages();
+      break;
+  }
+ 
+  push();
+  fill(0);
+  for (let p of g.points) {
+    circle(p.x, p.y, g.radius * 2);
+  }
+  pop();
 }
 
-// For determining equilateral or right triangle
-// const triangleType = document.getElementById('triangle-type').children;
-
-// // Determines which radio button is selected
-// for (let i = 0; i < triangleType.length; i++) {
-//   triangleType[i].addEventListener("click", function () {
-//     for (let j = 0; j < triangleType.length; j++) {
-//       triangleType[j].classList.remove("selected");
-//     };
-//     triangleType[i].classList.add("selected");
-//     g.triangle = triangleType[i].value;
-//     switch (g.triangle) {
-//       case 'right-triangle':
-//         g.points[0].x = 200;
-//         g.points[0].y = 350;
-//         break;
-//       case 'equilateral-triangle':
-//         g.points[0].x = 300;
-//         g.points[0].y = 305;
-//         break;
-//     }
-//   });
-// };
-
-const pointType = document.getElementById("point-type").children;
+const firstRadio = document.getElementById("point-type").children;
 const gridLines = document.getElementById("grid-lines");
 const carrierComp = document.getElementById("carrier-compositions");
+
+
+const secondRadio = document.getElementById("plot-points-options").children;
+const e1 = document.getElementById("E1");
+const tie_slider = document.getElementById("tie-slider");
+const tie_label = document.getElementById("tie-slider-value");
+
+
 
 gridLines.addEventListener("change", () => {
   g.gridTruth = gridLines.checked;
@@ -73,18 +92,63 @@ carrierComp.addEventListener("change", () =>{
   g.compTruth = carrierComp.checked;
 });
 
-for(let i = 0; i < pointType.length; i++){
-  pointType[i].addEventListener("click",function (){
-    for(let j = 0; j < pointType.length; j++){
-      pointType[j].classList.remove("selected");
+for(let i = 0; i < firstRadio.length; i++){
+  firstRadio[i].addEventListener("click",function (){
+    for(let j = 0; j < firstRadio.length; j++){
+      firstRadio[j].classList.remove("selected");
     };
-    pointType[i].classList.add("selected");
-    g.pointType_2 = pointType[i].value;
+    firstRadio[i].classList.add("selected");
+    g.pointType = firstRadio[i].value;
   });
 };
 
+for(let i = 0; i < secondRadio.length; i++){
+  secondRadio[i].addEventListener("click", function(){
+    for(let j = 0; j < secondRadio.length; j++){
+      secondRadio[j].classList.remove("selected");
+    };
+    secondRadio[i].classList.add("selected");
+    g.mix = secondRadio[i].value;
+  });
+}
 
-// For manipulating the position of dot within the triangle
+e1.addEventListener("change", () => {
+  g.e1Truth = e1.checked;
+});
+
+tie_slider.addEventListener("input", function(){
+  const temp = Number(tie_slider.value);
+  tie_label.innerHTML = `${temp}`;
+  g.tieSlider = temp;
+});
+
+
+function disabler(){
+  switch (g.pointType){
+    case 'plot-points':
+      secondRadio.disabled = false;
+      e1.disabled = true;
+      tie_slider.disabled = true;
+      break;
+    case 'mixing-point':
+      secondRadio.disabled = true;
+      e1.disabled = false;
+      tie_slider.disabled = true;
+      break;
+    case 'operating-point':
+      secondRadio.disabled = true;
+      e1.disabled = true;
+      tie_slider.disabled = true;
+      break;
+    case 'count-stages':
+      secondRadio.disabled = true;
+      e1.disabled = true;
+      tie_slider.disabled = false;
+      break;
+  }
+}
+
+// For manipulating the position of dot within the triangle (limited range of compositions)
 function mousePressed() {
   for (let i = g.points.length - 1; i >= 0; i--) {
     const isPressed = inCircle(g.points[i], g.radius);
@@ -95,9 +159,41 @@ function mousePressed() {
     }
   }
 }
+
 function mouseDragged() {
-  g.dragPoint.x = mouseX;
-  g.dragPoint.y = mouseY;
+  let lx = 262.5; let rx = 316.5; // left and right x
+  let by = 288.5; let ty = 230; // top and bottom y
+
+  if(g.dragPoint){
+    if(mouseX < lx && mouseY > ty && mouseY < by){ // left of square within y-lims
+      g.dragPoint.x = lx;
+      g.dragPoint.y = mouseY;
+    } else if (mouseX < lx && mouseY < ty){ // left and above square
+      g.dragPoint.x = lx;
+      g.dragPoint.y = ty;
+    } else if (mouseX < lx && mouseY > by){ // left and below square
+      g.dragPoint.x = lx;
+      g.dragPoint.y = by;
+    } else if (mouseX > lx && mouseX < rx && mouseY < ty){ // above square
+      g.dragPoint.x = mouseX;
+      g.dragPoint.y = ty;
+    } else if (mouseX > rx && mouseY < ty){// right and above square
+      g.dragPoint.x = rx;
+      g.dragPoint.y = ty;
+    } else if (mouseX > rx && mouseY > ty && mouseY < by){ // right of square
+      g.dragPoint.x = rx;
+      g.dragPoint.y = mouseY;
+    } else if (mouseX > rx && mouseY >= by){ // right and below square
+      g.dragPoint.x = rx;
+      g.dragPoint.y = by;
+    } else if (mouseY > by){ // below square
+      g.dragPoint.x = mouseX;
+      g.dragPoint.y = by;
+    } else if (mouseX < rx && mouseX > lx && mouseY > ty && mouseY < by){ // within the square
+      g.dragPoint.x = mouseX;
+      g.dragPoint.y = mouseY;
+    }
+  }
 }
 
 function mouseReleased() {
