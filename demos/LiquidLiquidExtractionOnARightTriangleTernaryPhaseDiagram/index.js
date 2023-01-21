@@ -5,16 +5,18 @@ window.g = {
  
   gridTruth: false,
   compTruth: false,
-  pointType : 'mixing-point',
+  pointType : 'operating-point',
   
   mix : 'feed',
   e1Truth : false,
   tieSlider : 0,
 
-  radius: 8,
+  radius: 7,
   points: [],
   nP: 1,
   dragPoint: null,
+
+  phaseInfopx : [],
 
   
   R : [1,-100], // m and b values for right edge of triangle
@@ -41,6 +43,7 @@ function setup() {
   for (let i = 0; i < g.nP; i++) {
     g.points.push(createVector(300, 250));
   }
+  phaseToPixels();
 
 }
 
@@ -48,9 +51,10 @@ function draw() {
   background(250);
   triangleDraw();
   disabler(); // This function is used for enabling/disabled the extraneous buttons
-  phaseToPixels();
   
-
+  
+  
+  
   
   switch (g.pointType){
     case 'plot-points':
@@ -216,15 +220,14 @@ for (let i = 0; i < phaseInfo.length - 1; i += 2) {
   phaseInfo.splice(i + 1, 0, [x, y]);
 }
 
-let phaseInfopx = [];
+
 // For converting the phase info to pixel coordinates
 function phaseToPixels(){
-  phaseInfopx = [];
   for(let i = 0; i < phaseInfo.length; i++){
     let x,y;
     x = map(phaseInfo[i][0],0,1,150,600);
     y = map(phaseInfo[i][1],0,1,500,50);
-    phaseInfopx.push([x,y]);
+    g.phaseInfopx.push([x,y]);
   }
 }
 
