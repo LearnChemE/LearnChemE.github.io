@@ -5,7 +5,7 @@ window.g = {
  
   gridTruth: false,
   compTruth: false,
-  pointType : 'plot-points',
+  pointType : 'mixing-point',
   
   mix : 'feed',
   e1Truth : false,
@@ -48,6 +48,8 @@ function draw() {
   background(250);
   triangleDraw();
   disabler(); // This function is used for enabling/disabled the extraneous buttons
+  phaseToPixels();
+  
 
   
   switch (g.pointType){
@@ -213,4 +215,17 @@ for (let i = 0; i < phaseInfo.length - 1; i += 2) {
   y = phaseInfo[i][1] + 1 / 2 * (phaseInfo[i + 1][1] - phaseInfo[i][1]);
   phaseInfo.splice(i + 1, 0, [x, y]);
 }
+
+let phaseInfopx = [];
+// For converting the phase info to pixel coordinates
+function phaseToPixels(){
+  phaseInfopx = [];
+  for(let i = 0; i < phaseInfo.length; i++){
+    let x,y;
+    x = map(phaseInfo[i][0],0,1,150,600);
+    y = map(phaseInfo[i][1],0,1,500,50);
+    phaseInfopx.push([x,y]);
+  }
+}
+
 

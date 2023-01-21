@@ -316,6 +316,9 @@ function plotPoints(){
 }
 
 function mixingPoint(){
+    let lx = 150; let rx = 600; // left and right edges of triangle
+    let by = 500; let ty = 50; // top and bottom of triangle
+
     let xF, yF;
     let xS, yS;
     let xM, yM;
@@ -323,9 +326,79 @@ function mixingPoint(){
     let xRn, yRn;
     let xE, yE;
 
-    xF = g.points[0].x; yF = g.points[0].y;
-    xS = 0.05; yS = 0;
-    xM = (xF + xS)/2; yM = (yF + yS)/2;
+    let temp = g.points[0]; // Holds X and Y of feed in pixels
+    xF = map(temp.x,lx,rx,0,1); yF = map(temp.y,by,ty,0,1); // X and Y feed 
+    xS = sFracs.solv; yS = sFracs.solu; // X and Y solvent
+    xRn = rFracs.solv; yRn = rFracs.solu; // X and Y raffinate
+    xM = (xF + xS)/2; yM = (yF + yS)/2; // X and Y mixing point
+
+    let xRnpx = map(xRn,0,1,lx,rx); // X raff (pixels) 
+    let yRnpx = map(yRn,0,1,by,ty); // Y raff (pixels)
+    let xSpx = map(xS,0,1,lx,rx); // X solv (pixels);
+    let ySpx = map(yS,0,1,by,ty); // Y solv (pixels)
+    let xMpx = map(xM,0,1,lx,rx); // X mixing point (pixels)
+    let yMpx = map(yM,0,1,by,ty); // Y mixing point (pixels)
+
+    
+
+    if(g.e1Truth){
+        e1func(); // e1 checkbox is checked
+    } else {
+        feed_solvent_flow(); // e1 checkbox isn't checked
+    }
+    
+
+    // F, S, and R_N labels
+    F_S_Rn_MLabels(); // I put this into a function so I could minimize the code for it
+    function F_S_Rn_MLabels(){
+        let x,y;
+        push();
+        fill(255); stroke(0); strokeWeight(1.5);
+        ellipse(temp.x+27,temp.y-27,22*2);
+        textStyle(ITALIC);
+        noStroke(); fill(0); textSize(30);
+        text('F',temp.x+16,temp.y-16);
+        x = map(sFracs.solv,0,1,lx,rx);
+        y = map(sFracs.solu,0,1,by,ty);
+        fill(255); stroke(0); strokeWeight(1.5);
+        ellipse(x-27,y-27,22*2);
+        noStroke(); fill(0); textSize(30);
+        text('S',x-38,y-16);
+        x = map(rFracs.solv,0,1,lx,rx);
+        y = map(rFracs.solu,0,1,by,ty);
+        fill(255); stroke(0); strokeWeight(1.5);
+        ellipse(x+27,y-27,22*2);
+        noStroke(); fill(0); textSize(25);
+        text('R',x+10,y-19);
+        textSize(17);
+        text('N',x+28,y-14)
+        fill(255); stroke(0); strokeWeight(1.5);
+        ellipse(xMpx+27,yMpx+18,22*2);
+        noStroke(); fill(0); textSize(30);
+        text('M',xMpx+13,yMpx+28)
+        pop();
+    }
+
+    function e1func(){
+        // Define line equation through Rn and M
+        // using phaseInfopx, test x and y-coords against the y-coord Rn-M line would have
+        // when it's bounded between 2 points (or equal to one)
+
+    }
+
+    function feed_solvent_flow(){
+         
+    }
+
+    push();
+    noStroke(); fill(100);
+    ellipse(xMpx,yMpx,2*g.radius); // Mixing point
+    fill(255,0,0);
+    ellipse(xSpx,ySpx,2*g.radius); // Solvent point
+    fill(0,100,100);
+    ellipse(xRnpx,yRnpx,2*g.radius); // Raffinate point
+    pop();
+    
 }
 
 function operatingPoint(){
