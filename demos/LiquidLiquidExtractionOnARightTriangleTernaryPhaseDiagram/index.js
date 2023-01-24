@@ -5,7 +5,7 @@ window.g = {
  
   gridTruth: false,
   compTruth: false,
-  pointType : 'operating-point',
+  pointType : 'count-stages',
   
   mix : 'feed',
   e1Truth : false,
@@ -34,6 +34,16 @@ let rFracs = {
   carr : 0.10,
 }
 
+// Holds info about tie lines slope and y-intercept and x & y coords of intercepts
+let tie = {
+  b : [600],
+  m : [0],
+  pos : [[195,555,500,500]],
+  // x-coords of tie lines from mathematica
+  xLeft : [0.1014, 0.1036, 0.1072, 0.1127, 0.1218, 0.1391],
+  xRight : [0.8404, 0.7544, 0.6532, 0.5463, 0.4395, 0.3322],
+}
+
 function setup() {
   g.cnv = createCanvas(700, 600);
 
@@ -44,6 +54,7 @@ function setup() {
     g.points.push(createVector(300, 250));
   }
   phaseToPixels();
+  tieInfo();
 
 }
 
@@ -231,4 +242,5 @@ function phaseToPixels(){
   }
 }
 
-
+// Data for generating squiggle thing in operating point mode
+let squiggle = [[145.7205387205387, 11.176206509539844],[148.72951739618406, 16.334455667789],[154.31762065095398, 29.230078563411897],[147.86980920314255, 44.704826038159375],[154.74747474747474, 63.61840628507295],[147.43995510662177, 80.38271604938272],[154.74747474747474, 96.71717171717172],[147.86980920314255, 113.91133557800225],[147.86980920314255, 122.93827160493828]]

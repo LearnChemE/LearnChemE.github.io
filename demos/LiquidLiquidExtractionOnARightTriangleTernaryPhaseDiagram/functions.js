@@ -63,6 +63,7 @@ function triangleDraw(){
 
     // Draws the phase curve
     function phase(){
+        // Phase curve
         push();
         strokeWeight(2.5); beginShape(); noFill();
         for(let i = 0; i < phaseInfo.length; i++){
@@ -74,42 +75,16 @@ function triangleDraw(){
         endShape();
         pop();
 
-        let xLeft = [0.1014, 0.1036, 0.1072, 0.1127, 0.1218, 0.1391];
-        let xRight = [0.8404, 0.7544, 0.6532, 0.5463, 0.4395, 0.3322];
-        let yLeft = []; let yRight = [];
-        // Solving for the y-points on the tie lines
-        for(let i = 0; i < xLeft.length; i++){
-            for(let j = 0; j < phaseInfo.length; j++){
-                if(xLeft[i] > phaseInfo[j][0] && xLeft[i] < phaseInfo[j+1][0]){
-                    yLeft.push(interpolate(xLeft[i],phaseInfo[j][0],phaseInfo[j+1][0],phaseInfo[j][1],phaseInfo[j+1][1]));
-                } else if(xLeft[i] == phaseInfo[j][0]){
-                    yLeft.push(phaseInfo[j][1]);
-                }
-
-                if(xRight[i] > phaseInfo[j][0] && xRight[i] < phaseInfo[j+1][0]){
-                    yRight.push(interpolate(xRight[i],phaseInfo[j][0],phaseInfo[j+1][0],phaseInfo[j][1],phaseInfo[j+1][1]));
-                } else if(xRight[i] == phaseInfo[j][0]){
-                    yRight.push(phaseInfo[j][1]);
-                } 
-            }
-        }
-        // Drawing tie lines
-        let x1, x2, y1, y2, b;
-        let slopes = [];
-        let positions = [];
-        let bvec = [];
+        // Tie lines
         push();
         strokeWeight(2);
-        for(let i = 0; i < xLeft.length; i++){
-            x1 = map(xLeft[i],0,1,150,600);
-            x2 = map(xRight[i],0,1,150,600);
-            y1 = map(yLeft[i],0,1,500,50);
-            y2 = map(yRight[i],0,1,500,50);
+        let x1, x2, y1, y2;
+        for(let i = 0; i < tie.pos.length; i++){
+            x1 = tie.pos[i][0];
+            x2 = tie.pos[i][1];
+            y1 = tie.pos[i][2];
+            y2 = tie.pos[i][3];
             line(x1,y1,x2,y2);
-            b = y1 - ((y2-y1)/(x2-x1))*x1;
-            bvec.push(b)
-            positions.push([x1,y1,x2,y2]);
-            slopes.push((y2-y1)/(x2-x1))
         }
         pop();
     }
@@ -166,9 +141,6 @@ function interpolate(xcurrent, x1, x2, y1, y2){
     y = y1 + (xcurrent-x1)*(y2-y1)/(x2-x1);
     return(y);
 }
-
-
-
 
 function plotPoints(){
     //console.log(g.points[0].x,g.points[0].y)
@@ -421,7 +393,7 @@ function mixingPoint(){
         push();
         strokeWeight(2);
         line(x2,y2,xe1,ye1);
-        arrow([x2,y2],[xe1,ye1],[0,0,0]);
+        arrow([x2,y2],[xe1,ye1],[0,0,0],15,5);
         fill(255,100,51); noStroke();
         ellipse(xe1,ye1,g.radius*2);
 
@@ -490,10 +462,10 @@ function mixingPoint(){
        text('solvent flow',0,0);
        pop();
 
-       arrow(p[1],p[0],[0,0,0]);
-       arrow(p[0],p[1],[0,0,0]);
-       arrow(p[1],p[2],[255,0,0]);
-       arrow(p[2],p[1],[255,0,0]);
+       arrow(p[1],p[0],[0,0,0],15,5);
+       arrow(p[0],p[1],[0,0,0],15,5);
+       arrow(p[1],p[2],[255,0,0],15,5);
+       arrow(p[2],p[1],[255,0,0],15,5);
 
 
     }
@@ -557,6 +529,7 @@ function operatingPoint(){
     F_S_Rn_MLabels();
     let e1_coords = e1();
     operatingPointLine();
+    upperRightImage();
     function F_S_Rn_MLabels(){
         let x,y;
         push();
@@ -644,8 +617,9 @@ function operatingPoint(){
 
         // Connecting lines
         push();
-        strokeWeight(3); stroke(112,41,99); fill(112,41,99);
+        stroke(112,41,99); fill(112,41,99);
         ellipse(x,y,2*g.radius);
+        strokeWeight(3);
         drawingContext.setLineDash([5,10]);
         line(x,y,temp.x,temp.y);
         line(x,y,xRnpx,yRnpx);
@@ -659,16 +633,70 @@ function operatingPoint(){
         noStroke(); fill(0); textSize(30);
         text('P',x-32,y-12);
         pop();
+    }
 
+    function upperRightImage(){
+        // Rectangles and label
         push();
-        textStyle(ITALIC); textSize(25);
-        text('P = E  - F = R  - S',400,250);
+        strokeWeight(2);
+        for(let i = 0; i < 3; i++){
+            rect(380+80*i,100,40,80);
+        }
+        noStroke(); textSize(25);
+        text('1',393,150);
+        text('n',473,150);
+        text('N',551,150);
+        pop();
+        
+        // Squiggly bit
+        push();
+        strokeWeight(2); noFill(); 
+        for(let i = 0; i < 2; i++){
+            beginShape();
+            for(let j = 0; j < squiggle.length; j++){
+                let x = squiggle[j][0]+290+80*i;
+                let y = squiggle[j][1]+70;
+                curveVertex(x,y);
+            }
+            endShape();
+        }
+        pop();
+
+        // lines and arrows
+        push(); strokeWeight(2);
+        for(let i = 0; i < 2; i++){
+            for(let j = 0; j < 4; j++){
+                line(340+80*j,120+40*i,380+80*j,120+40*i);
+                if(i == 0){
+                    arrow([380+80*j,120+40*i],[340+80*j,120+40*i],[0,0,0],15,4);
+                } else {
+                    arrow([340+80*j,120+40*i],[380+80*j,120+40*i],[0,0,0],15,4);
+                }
+            }
+        }
+        pop();
+
+        // Labels on arrows
+        push();
+        textSize(25); noStroke(); textStyle(ITALIC);
+        text('E',313,127);
+        text('F',315,167);
+        text('S',620,129);
+        text('R',620,168);
         textStyle(NORMAL); textSize(18);
-        text('1',462,257);
-        text('N',552,257);
+        text('1',327,133);
+        text('N',637,174);
         pop();
 
 
+        // Equation
+        push();
+        textStyle(ITALIC); textSize(25);
+        text('P = E  - F = R  - S',380,225);
+        textStyle(NORMAL); textSize(18);
+        text('1',442,232);
+        text('N',532,232);
+        pop();
     }
 
     push();
@@ -682,19 +710,217 @@ function operatingPoint(){
 }
 
 function countStages(){
+    let lx = 150; let rx = 600; // left and right edges of triangle
+    let by = 500; let ty = 50; // top and bottom of triangle
 
+    let xF, yF;
+    let xS, yS;
+    let xM, yM;
+    let xRn, yRn;
+
+    let temp = g.points[0]; // Holds X and Y of feed in pixels
+    xF = map(temp.x,lx,rx,0,1); yF = map(temp.y,by,ty,0,1); // X and Y feed 
+    xS = sFracs.solv; yS = sFracs.solu; // X and Y solvent
+    xRn = rFracs.solv; yRn = rFracs.solu; // X and Y raffinate
+    xM = (xF + xS)/2; yM = (yF + yS)/2; // X and Y mixing point
+
+    let xRnpx = map(xRn,0,1,lx,rx); // X raff (pixels) 
+    let yRnpx = map(yRn,0,1,by,ty); // Y raff (pixels)
+    let xSpx = map(xS,0,1,lx,rx); // X solv (pixels);
+    let ySpx = map(yS,0,1,by,ty); // Y solv (pixels)
+    let xMpx = map(xM,0,1,lx,rx); // X mixing point (pixels)
+    let yMpx = map(yM,0,1,by,ty); // Y mixing point (pixels)
+
+    let e1_coords = e1();
+
+    push();
+    noStroke(); fill(255,100,51);
+    ellipse(e1_coords[0],e1_coords[1],2*g.radius);
+    fill(255,0,0);
+    ellipse(xSpx,ySpx,2*g.radius); // Solvent point
+    fill(0,100,100);
+    ellipse(xRnpx,yRnpx,2*g.radius); // Raffinate point
+    pop();
+
+    
+    F_S_Rn_MLabels();
+    upperRightImage();
+    operatingPointDot();
+
+    function upperRightImage(){
+        push();
+        strokeWeight(2);
+        
+        // Rectangles and text
+        for(let i = 0; i < 6; i++){
+            rect(260+70*i,30,35,70);
+            push();
+            textSize(25);
+            text(i+1,270+70*i,73);
+            pop();
+        }
+
+        // Lines, arrows, and labels
+        push();
+        textSize(20); textStyle(ITALIC);
+        for(let j = 0; j < 2; j++){
+            for(let i = 0; i < 7; i++){
+                if(j == 0){
+                    line(225+70*i,45,260+70*i,45);
+                    arrow([260+70*i,45],[225+70*i,45],[0,0,0],14,4);
+                    if(i != 6){
+                        text('E',235+70*i,33);
+                        push();
+                        textStyle(NORMAL); textSize(15);
+                        text(i+1,248+70*i,37);
+                        pop();
+                    } else {
+                        text('S',235+70*i,35);
+                    }
+                    
+                } else {
+                    line(225+70*i,85,260+70*i,85);
+                    arrow([225+70*i,85],[260+70*i,85],[0,0,0],14,4);
+                    if(i == 0){
+                        text('F',235+70*i,110);
+                    } else {
+                        text('R',235+70*i,110);
+                        push();
+                        textStyle(NORMAL); textSize(15);
+                        text(i,249+70*i,115);
+                        pop();
+                    }
+                }
+            }
+        }
+        pop();
+        pop();
+        push();
+        textSize(25);
+        text('number of orange lines = ',370,200);
+        text('number of stages needed',370,230);
+        pop();
+    }
+    
+    function e1(){
+        let x1, x2, y1, y2;
+        let m1, b1, m2, b2; // y = mx+b 
+
+        x1 = xMpx; y1 = yMpx;
+        x2 = xRnpx; y2 = yRnpx;
+        
+        m1 = (y2-y1)/(x2-x1); // slope of line through M and Rn
+        b1 = y1 - m1*x1; // y intercept of line through M and Rn
+
+        let yL, yU, yC, yUU; // lower and upper bounds and x & y current. Added yUU as yupperupper which resolved an issue when the line passed through one of the points that make up the phase curve
+        let xe1, ye1;
+
+        for(let i = 11; i < 19; i++){ // less than 19 because M never really gets past about .25 so we don't need to iterate through the full array
+            yL = g.phaseInfopx[i][1];
+            yU = g.phaseInfopx[i+1][1];
+            yC = m1*g.phaseInfopx[i][0] + b1; 
+            yUU = g.phaseInfopx[i+2][1];
+
+            if(yC <= yL && yC >= yU){ // Finding where the line passes between lower and upper bounds
+                m2 = (yL-yU)/(g.phaseInfopx[i][0]-g.phaseInfopx[i+1][0]);
+                b2 = yL - m2*g.phaseInfopx[i][0];
+                xe1 = (b2-b1)/(m1-m2); // x location of E1
+                ye1 = m1*xe1 + b1; // y location of E1
+
+            } else if(yC <= yU && yC > yUU){
+                xe1 = g.phaseInfopx[i+1][0];
+                ye1 = g.phaseInfopx[i+1][1];
+            }
+        }
+
+        push();
+        // E1 label
+        fill(255); stroke(0); strokeWeight(1.5);
+        ellipse(xe1-25,ye1-20,20*2);
+        textStyle(ITALIC);
+        noStroke(); fill(0); textSize(25);
+        text('E',xe1-37,ye1-12);
+        textSize(18); textStyle(NORMAL);
+        text('1',xe1-22,ye1-7)
+        pop();
+        return([xe1,ye1])
+    }
+
+    function F_S_Rn_MLabels(){
+        let x,y;
+        push();
+        fill(255); stroke(0); strokeWeight(1.5);
+        ellipse(temp.x+27,temp.y-27,22*2);
+        textStyle(ITALIC);
+        noStroke(); fill(0); textSize(30);
+        text('F',temp.x+16,temp.y-16);
+        x = map(sFracs.solv,0,1,lx,rx);
+        y = map(sFracs.solu,0,1,by,ty);
+        fill(255); stroke(0); strokeWeight(1.5);
+        ellipse(x-27,y+27,22*2);
+        noStroke(); fill(0); textSize(30);
+        text('S',x-38,y+38);
+        x = map(rFracs.solv,0,1,lx,rx);
+        y = map(rFracs.solu,0,1,by,ty);
+        fill(255); stroke(0); strokeWeight(1.5);
+        ellipse(x+27,y-27,22*2);
+        noStroke(); fill(0); textSize(25);
+        text('R',x+10,y-19);
+        textSize(17);
+        text('N',x+28,y-14)
+        pop();
+    }
+
+    function operatingPointDot(){
+        let m_EF, b_EF, m_RS, b_RS;
+
+        m_EF = (temp.y - e1_coords[1])/(temp.x - e1_coords[0]);
+        b_EF = temp.y - m_EF*temp.x;
+
+        m_RS = (yRnpx - ySpx)/(xRnpx - xSpx);
+        b_RS = yRnpx - m_RS*xRnpx;
+
+        let x = (b_RS - b_EF)/(m_EF - m_RS);
+        let y = m_EF*x + b_EF;
+
+        // P Dot
+        push();
+        stroke(112,41,99); fill(112,41,99);
+        ellipse(x,y,2*g.radius);
+        pop();
+
+        // P label
+        push();
+        fill(255); stroke(0); strokeWeight(1.5);
+        ellipse(x-22,y-23,20*2);
+        textStyle(ITALIC);
+        noStroke(); fill(0); textSize(30);
+        text('P',x-32,y-12);
+        pop();
+    }
+
+    function equilibStages(){
+        // Generate the tie lines and then draw them depending on the slider
+        let yVals = new Array(7);
+        for(let i = 0; i < tie.slopes.length; i++){
+            yVals[i] = slopes[i]*e1_coords[0] + tie.b[i];
+        }
+
+        let xR = [];
+        let xE = [];
+
+        
+    }
 }
 
-function arrow(base,tip,color){ 
+function arrow(base,tip,color,arrowLength,arrowWidth){ 
 
-    let arrowLength = 20; // Length of arrow
-    let arrowWidth = 5; // width of arrow (1/2)
+    // let arrowLength = 20; // Length of arrow
+    // let arrowWidth = 5; // width of arrow (1/2)
     let dx, dy, mag;
     let u_hat, u_perp;
     let point = new Array(2); // Point along unit vector that is base of triangle
     let vert = new Array(6); // Holds vertices of arrow
-
-    
 
     // Need to define a unit vector
     dx = tip[0] - base[0];
@@ -723,5 +949,46 @@ function arrow(base,tip,color){
     triangle(vert[0],vert[1],vert[2],vert[3],vert[4],vert[5]);
     pop();
 
-
 }
+
+function tieInfo(){
+    let yLeft = [];
+    let yRight = [];
+
+    // Solving for the y-points on the tie lines
+    for(let i = 0; i < tie.xLeft.length; i++){
+        for(let j = 0; j < phaseInfo.length; j++){
+            if(tie.xLeft[i] > phaseInfo[j][0] && tie.xLeft[i] < phaseInfo[j+1][0]){
+                yLeft.push(interpolate(tie.xLeft[i],phaseInfo[j][0],phaseInfo[j+1][0],phaseInfo[j][1],phaseInfo[j+1][1]));
+            } else if(tie.xLeft[i] == phaseInfo[j][0]){
+                yLeft.push(phaseInfo[j][1]);
+            }
+
+            if(tie.xRight[i] > phaseInfo[j][0] && tie.xRight[i] < phaseInfo[j+1][0]){
+                yRight.push(interpolate(tie.xRight[i],phaseInfo[j][0],phaseInfo[j+1][0],phaseInfo[j][1],phaseInfo[j+1][1]));
+            } else if(tie.xRight[i] == phaseInfo[j][0]){
+                yRight.push(phaseInfo[j][1]);
+            } 
+        }
+    }
+
+    let x1, x2, y1, y2;
+    let b;
+    for(let i = 0; i < tie.xLeft.length; i++){
+        x1 = map(tie.xLeft[i],0,1,150,600);
+        x2 = map(tie.xRight[i],0,1,150,600);
+        y1 = map(yLeft[i],0,1,500,50);
+        y2 = map(yRight[i],0,1,500,50);
+        b = y1 - ((y2-y1)/(x2-x1))*x1;
+        tie.b.push(b);
+        tie.pos.push([x1,x2,y1,y2]);
+        tie.m.push((y2-y1)/(x2-x1));
+    }
+}
+
+function nextEquilibTie(){
+    
+}
+
+
+
