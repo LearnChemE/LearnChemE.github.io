@@ -1,8 +1,9 @@
 window.g = {
   cnv : undefined,
-  slider : 2,
+  slider : -2,
   isotype : 'isothermal',
   transition : 'sublimation',
+  gibbsTruth : false,
 
   R : 8.314*Math.pow(10,-6), // Gas constant (m^3*MPa/[mol-K])
   Tcrit : 647.096, // Critical temperature (K)
@@ -30,6 +31,7 @@ window.g = {
   T : 0,
 
   comp : [0, 0, 0], // Percentage solid, liquid, vapor
+  F : 0, // Gibbs phase rule degree of freedom
 }
 
 // Object for storing the various necessary coefficients
@@ -42,8 +44,8 @@ let c = {
   t1 : math.complex(0.368017112855051*(10**-1),0.510878114959572*(10**-1)),
   t2 : math.complex(0.337315741065416, 0.335449415919309),
   r1 : math.complex(0.447050716285388*(10**2), 0.656876847463481*(10**2)),
-  r20 : math.complex(-0.725974574329220*(10**2), 0.781008427112870*(10**2)),
-  r21 : math.complex(-0.557107698030123*(10**-4), -0.464578634580806*(10**-4)),
+  r20 : math.complex(-0.725974574329220*(10**2), -0.781008427112870*(10**2)),
+  r21 : math.complex(-0.557107698030123*(10**-4), 0.464578634580806*(10**-4)),
   r22 : math.complex(0.234801409215913*(10**-10), -0.285651142904972*(10**-10)),
   Tt : 273.16,
   pi0 : 101325/611.6571,
@@ -55,17 +57,13 @@ function setup() {
   g.cnv = createCanvas(800, 600);
   g.cnv.parent("graphics-wrapper");
   document.getElementsByTagName("main")[0].remove();
-  //frameRate(2)
   initialStateDetermine();
 }
 
 function draw() {
   background(250);
+
   
-  if(g.isotype == 'isothermal'){
-    isothermPressure();
-    isothermSliderLabel();
-  }
   compositionDetermine();
   
   graphDraw();
@@ -74,19 +72,35 @@ function draw() {
   curveDraw();
   gibbsPhase();
 
+  if(g.isotype == 'isothermal'){
+    isothermPressure();
+    isothermSliderLabel();
+    if(g.transition == 'melting'){
+      meltingGraph();
+    }
+  }
+
   plotPoint();
 }
                 
 const slider = document.getElementById("slider"); // Using slider as var name since it switches between specific volume and heat
 const slider_label = document.getElementById("slider-label");
 const slider_value = document.getElementById("slider-value");
-const isotype = document.getElementById("isotype");
-const transition = document.getElementById("state-transition");
+const isotype = document.getElementById("isotype"); // isobaric or isothermal
+const transition = document.getElementById("state-transition"); // sublimation, melting, vaporization, triple point
+const gibbs = document.getElementById("gibbs-phase"); // checked or unchecked
 
 slider.addEventListener("input", function(){
   const slider_temp = Number(slider.value);
   slider_value.innerHTML = `${slider_temp}`;
-  g.slider = slider_temp;
+ 
+  if(g.isotype == 'isothermal'){
+    g.slider = -1*slider_temp;
+  } else {
+    g.slider = slider_temp;
+  }
+  
+  
 });
 
 isotype.addEventListener("change", function(){
@@ -103,6 +117,11 @@ transition.addEventListener("change", function(){
   initialStateDetermine();
 });
 
+gibbs.addEventListener("click",()=>{
+  g.gibbsTruth = gibbs.checked;
+});
+
+// These functions are here rather than functions.js since they have more to do with HTML labels/limits
 // Changes the range on the slider depending on isothermal/-baric and transition type
 function sliderLimits(){
   switch (g.isotype){
@@ -110,27 +129,27 @@ function sliderLimits(){
       slider_label.innerHTML = "specific volume (L/mol)";
       switch (g.transition){
         case 'sublimation':
-          slider.setAttribute("min", "-34");
-          slider.setAttribute("max", "2");
-          slider.value = "2";
+          slider.setAttribute("max", "34");
+          slider.setAttribute("min", "-2");
+          slider.value = "-2";
           g.slider = slider.value;
           break;
         case 'melting':
-          slider.setAttribute("min", "-2.25");
-          slider.setAttribute("max", "1.5");
+          slider.setAttribute("max", "2.25");
+          slider.setAttribute("min", "-1.5");
           slider.value = "1.5";
           g.slider = slider.value;
           break;
         case 'vaporization':
-          slider.setAttribute("min", "-11.2");
-          slider.setAttribute("max", "-1");
-          slider.value = "-1";
+          slider.setAttribute("max", "11.2");
+          slider.setAttribute("min", "1");
+          slider.value = "1";
           g.slider = slider.value;
           break;
         case 'triple-point':
-          slider.setAttribute("min", "-14.2");
-          slider.setAttribute("max", "-2");
-          slider.value = "-2";
+          slider.setAttribute("max", "14.2");
+          slider.setAttribute("min", "2");
+          slider.value = "2";
           g.slider = slider.value;
           break;
       }
@@ -171,6 +190,7 @@ function sliderLimits(){
   }
 }
 
+// Changes range of slider from base value to actual specific volume using the specific volume functions
 function isothermSliderLabel(){
   let label, label1;
   switch (g.transition){
@@ -236,7 +256,7 @@ function expLabel(num){
       num = num/10;
       pos++;
     }
-    num = num.toFixed(3);
+    num = num.toFixed(1);
     return([num,pos]);
   } 
 
@@ -245,13 +265,13 @@ function expLabel(num){
       num = num*10;
       neg++;
     }
-    num = num.toFixed(3);
+    num = num.toFixed(1);
     neg = -1*neg;
     return([num,neg]);
   }
 
   if(num > 1 && num < 10){
-    return([num.toFixed(3),0])
+    return([num.toFixed(1),0])
   }
 }
 
