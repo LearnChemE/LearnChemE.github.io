@@ -109,7 +109,7 @@ function triangleDraw(){
 
     // Displays carrier compositions
     function carrier(){
-        let labels = ['0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9'];
+        let labels = ['0.9', '0.8', '0.7', '0.6', '0.5', '0.4', '0.3', '0.2', '0.1'];
         let by = 500; let lx = 150;
         let x, y;
 
