@@ -35,7 +35,7 @@
 
 .input-row {
   display: grid;
-  grid-template-columns: max-content 150px 15px max-content;
+  grid-template-columns: max-content 250px 15px max-content; /* 250 px was formerly 150 px, Dr. F asked me to make it much longer*/
   gap: 10px;
   align-items: end;
   justify-items: center;
@@ -76,8 +76,8 @@ label {
 
 #modal-buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: 100px 100px 100px; /* These were all previously 1fr. I changed them to hopefully get the on the same line as the feed,solvent,raffinate button or the slider once we can make them appear/disappear */
+  gap: 5px;
 }
 
 .modal-body .modal-text {

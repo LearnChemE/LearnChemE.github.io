@@ -5,10 +5,9 @@ window.g = {
  
   gridTruth: false,
   compTruth: false,
-  pointType : 'plot-points',
+  pointType : 'determine-e1',
   
   mix : 'feed',
-  e1Truth : false,
   tieSlider : 0,
 
   radius: 7,
@@ -63,16 +62,15 @@ function draw() {
   triangleDraw();
   disabler(); // This function is used for enabling/disabled the extraneous buttons
   
-  //console.log(map(.9,0,1,150,600))
-  //console.log(phaseInfo[25])
-  
-  
   switch (g.pointType){
     case 'plot-points':
       plotPoints();
       break;
     case 'mixing-point':
       mixingPoint();
+      break;
+    case 'determine-e1':
+      determineE1();
       break;
     case 'operating-point':
       operatingPoint();
@@ -96,7 +94,6 @@ const carrierComp = document.getElementById("carrier-compositions");
 
 
 const secondRadio = document.getElementById("plot-points-options").children;
-const e1 = document.getElementById("E1");
 const tie_slider = document.getElementById("tie-slider");
 const tie_label = document.getElementById("tie-slider-value");
 
@@ -129,10 +126,6 @@ for(let i = 0; i < secondRadio.length; i++){
   });
 }
 
-e1.addEventListener("change", () => {
-  g.e1Truth = e1.checked;
-});
-
 tie_slider.addEventListener("input", function(){
   const temp = Number(tie_slider.value);
   tie_label.innerHTML = `${temp}`;
@@ -144,22 +137,22 @@ function disabler(){
   switch (g.pointType){
     case 'plot-points':
       secondRadio.disabled = false;
-      e1.disabled = true;
       tie_slider.disabled = true;
       break;
     case 'mixing-point':
       secondRadio.disabled = true;
-      e1.disabled = false;
+      tie_slider.disabled = true;
+      break;
+    case 'determine-e1':
+      secondRadio.disabled = true;
       tie_slider.disabled = true;
       break;
     case 'operating-point':
       secondRadio.disabled = true;
-      e1.disabled = true;
       tie_slider.disabled = true;
       break;
     case 'count-stages':
       secondRadio.disabled = true;
-      e1.disabled = true;
       tie_slider.disabled = false;
       break;
   }
