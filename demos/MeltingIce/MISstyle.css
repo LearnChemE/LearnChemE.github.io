@@ -132,16 +132,19 @@ body {
 #infoButton {
 	justify-self: end;
 	grid-area: dir;
+	transform: translateY(-10px);
 }
 
 #temps1 {
 	grid-area:wt1;
 	background-color: rgb(255, 203, 203);
+	transform: translateY(25px);
 }
 
 #temps2 {
 	grid-area:wt2;
 	background-color: rgb(202, 220, 255);
+	transform: translateY(25px);
 }
 
 #bk1Text {
@@ -262,8 +265,8 @@ body {
 #aboutButton {
 	text-decoration:none;
 	position: absolute;
-	right: 0px;
-	bottom: 0px;
+	right: 5px;
+	top: 30px;
 }
 
 #aboutButton:active {
