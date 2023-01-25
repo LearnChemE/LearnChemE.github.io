@@ -5,7 +5,7 @@ window.g = {
  
   gridTruth: false,
   compTruth: false,
-  pointType : 'count-stages',
+  pointType : 'plot-points',
   
   mix : 'feed',
   e1Truth : false,
@@ -36,7 +36,7 @@ let rFracs = {
 
 // Holds info about tie lines slope and y-intercept and x & y coords of intercepts
 let tie = {
-  b : [600],
+  b : [500],
   m : [0],
   pos : [[195,555,500,500]],
   // x-coords of tie lines from mathematica
@@ -63,8 +63,8 @@ function draw() {
   triangleDraw();
   disabler(); // This function is used for enabling/disabled the extraneous buttons
   
-  
-  
+  //console.log(map(.9,0,1,150,600))
+  //console.log(phaseInfo[25])
   
   
   switch (g.pointType){

@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Liquid-Liquid Extraction on a Right Triangle Ternary Phase Diagram</title>
+  <title>Liquid-Liquid Extraction on a Right-Triangle Ternary Phase Diagram</title>
 
   <!-- Before we run any other scripts, we have to import P5.js (a library for graphics) -->
   <script src="./libraries/p5.js"></script>
@@ -133,11 +133,11 @@
         </button>
       </div>
       <div class="modal-body">
-        <p>
-          This simulation shows two ways to represent a ternary phase diagram. Ternary phase diagrams represent the phase behavior of a three-component mixture. These diagrams are labeled with solute, solvent, and carrier as the three components used in liquid-liquid extraction.
+          <p>
+            This simulation shows how to use the Hunter-Nash method on a right-triangle ternary phase diagram. Check "grid lines" to show grid lines on the diagram. Check "carrier compositions" to show the carrier mass fractions on the diagram. The Hunter-Nash method uses material balances and a ternary phase diagram with phase separation to determine the number of equilibrium stages needed for liquid-liquid extraction (LLE). The solvent mass flow rate and the desired raffinate (refined product) composition R <sub>N</sub> are given. Select "plot points" and then drag the black feed point (labeled with a circled F) to a desired feed composition within a restricted range of compositions. Use buttons to view the compositions of the feed F, solvent S, or raffinate R<sub>N</sub> in the solute (blue), solvent (red) and carrier (green) phases. Select "mixing point" to see how the mixing point M and the extract composition E<sub>1</sub> in the first stage are determined. Check "show E<sub>1</sub>" to show the extract composition. Next, select "operating point" to show how the operating point P is found.
           </p>
           <p>
-          Click and drag the black dot, which represents the composition of the mixture, within the triangle. Each corner of the triangle is a pure component. The mass fractions for a phase or phases are displayed in a table(s). Select a right or equilateral triangular diagram with the button. Uncheck the “phase envelope” box to view diagrams for completely miscible systems. Selecting “phase envelope” represents the type of diagram important for liquid-liquid extraction. The region inside the phase envelope consists of two phases in equilibrium: the raffinate (green) and extract (magenta). Select solute (blue), solvent (purple), or carrier (orange) to view their mass fractions next to the corresponding axis. Select “grid lines” to display a grid on the phase diagram. These diagrams can also be drawn using mole fractions instead of mass fractions.
+            This simulation also displays a schematic of the flow system and mass balances. The operating point is used to determine the number of stages. Finally, select "count stages" to use the "draw tie lines" slider to determine the number of stages and the extract and raffinate compositions in each stage. The solid orange lines follow the black tie lines, and the dashed blue lines trace back to the operating point. A diagram of the stages is shown above the ternary phase diagram.
           </p>
           
       </div>
@@ -158,20 +158,91 @@
       </div>
 
       <div class="modal-body">
+
         <div class="modal-text">
-          The screencast video at [1] explains how to use this simulation. For another explanation of how to use an equilateral ternary phase diagram, view the screencast at [2].
+          The feed composition is selected within a narrow range of compositions, but the solvent composition and the desired raffinate composition are specified. The extract composition and the number of stages to obtain the desired raffinate composition are determined by mass balances. First, the composition of the mixing point is calculated and located on the ternary phase diagram. The mixing point corresponds to the composition that would be obtained if the feed and the solvent flows were mixed together.
+        </div>
+        <div class="modal-text">
+          The mixing point \(M\) is located on the phase diagram between the feed and solvent points:
+        </div>
+        <div class="modal-equation">
+          $$
+          M = \frac{x^F + x^S}{2},
+          $$
+        </div>
+        <div class="modal-text">
+          where \(x^F\) and \(x^S\) are the feed and solvent compositions.
+        </div>
+        <div class="modal-text">
+          A line is drawn from the desired raffinate composition \(R_N\) through the mixing point until it intersects the phase boundary; this gives the extract composition \(E_1\) leaving stage 1.
+        </div>
+        <div class="modal-text">
+          The operating point \(P\) is located at the intersection of a line drawn through points \(F\) and \(E_1\) and a line drawn through \(R_N\) and \(S\) because the overall mass balance for the system is:
+        </div>
+        <div class="modal-equation">
+          $$
+          F + S = E_1 + R_N.
+          $$
+        </div>
+        <div class="modal-text">
+          This equation is rearranged to determine the operating point:
+        </div>
+        <div class="modal-equation">
+          $$
+          P = E_1 - F = R_N - S.
+          $$
+        </div>
+        <div class="modal-text">
+          A tie line from \(E_1\) to the right side of the phase boundary yields the raffinate composition \(R_1\) leaving stage 1; this line represents the first equilibrium stage (orange).
+        </div>
+        <div class="modal-text">
+          A mass balance in stage 1 (total feed in = total feed out) is:
+        </div>
+        <div class="modal-equation">
+          $$
+          E_2 + F = E_1 + R_1,
+          $$
+        </div>
+        <div class="modal-text">
+          which can be written as:
+        </div>
+        <div class="modal-equation">
+          $$
+          E_2 - R_1 = E_1 - F = P.
+          $$
+        </div>
+        <div class="modal-text">
+          Thus, the extract composition \(E_2\) leaving stage 2 is found by drawing a straight line from \(R_1\) to \(P\) (because \(P + R_1 = E_2\) from the previous equation). Where this line intersects the left side of the phase boundary is the composition of \(E_2\).
+        </div>
+        <div class="modal-text">
+          This procedure is repeated for additional stages until the raffinate composition is nearly equal to the desired value of \(R_N\) without being less than \(R_N\). The number of orange equilibrium lines drawn is the number of equilibrium stages needed to obtain \(R_N\).
+        </div>
+    
+
+        <div class="modal-text">
+          See [1-4] for screencasts that describe the Hunter-Nash method and present examples.
         </div>
         <div style="height:10px"></div>
         <ol class="references">
           <li>
-           <i>Right and Equilateral Ternary Phase Diagrams</i> [Video]. (Sep 1, 2016) <a 
-            href="https://www.youtube.com/watch?v=mvQE7fElYDs"
-            target="_blank">www.youtube.com/watch?v=mvQE7fElYDs</a>.
+           <i>Hunter-Nash Method: Liquid-Liquid Extraction</i> [Video]. (July 31, 2017) <a 
+            href="https://www.youtube.com/watch?v=e0Yt5RMkyj4"
+            target="_blank">www.youtube.com/watch?v=e0Yt5RMkyj4</a>.
           </li>
           <li>
-            <i>Using a Triangular (Ternary) Phase Diagram</i> [Video]. (Jul 30, 2015) <a 
-            href="https://www.youtube.com/watch?v=gGYHXhcKM5s"
-            target="_blank">www.youtube.com/watch?v=gGYHXhcKM5s</a>.
+            <i>Hunter-Nash Method: Liquid-Liquid Extraction Example</i> [Video]. (July 31, 2017) <a 
+            href="https://www.youtube.com/watch?v=FaKIZU3XPR8"
+            target="_blank">www.youtube.com/watch?v=FaKIZU3XPR8</a>.
+          </li>
+          <li>
+            <i>Hunter-Nash Method 1: Mixing and Operating Points</i> [Video]. (July 31, 2017) <a 
+            href="https://www.youtube.com/watch?v=-yW0jIcH0_E"
+            target="_blank">www.youtube.com/watch?v=-yW0jIcH0_E</a>.
+          </li>
+          <li>
+            <i>Hunter-Nash Method 2: Number of Stages</i> [Video]. (July 31, 2017) <a 
+            href="https://www.youtube.com/watch?v=JZuavrt8ksQ"
+            target="_blank">www.youtube.com/watch?v=JZuavrt8ksQ</a>.
           </li>
         </ol>
         

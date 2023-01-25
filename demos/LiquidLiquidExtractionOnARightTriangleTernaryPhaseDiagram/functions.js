@@ -744,8 +744,8 @@ function countStages(){
 
     
     F_S_Rn_MLabels();
-    upperRightImage();
-    operatingPointDot();
+    let opPoint = operatingPointDot();
+    equilibPoints();
 
     function upperRightImage(){
         push();
@@ -753,9 +753,10 @@ function countStages(){
         
         // Rectangles and text
         for(let i = 0; i < 6; i++){
-            rect(260+70*i,30,35,70);
             push();
-            textSize(25);
+            noFill();
+            rect(260+70*i,30,35,70);
+            textSize(25); fill(0);
             text(i+1,270+70*i,73);
             pop();
         }
@@ -797,8 +798,8 @@ function countStages(){
         pop();
         push();
         textSize(25);
-        text('number of orange lines = ',370,200);
-        text('number of stages needed',370,230);
+        text('number of orange lines = ',370,170);
+        text('number of stages needed',370,200);
         pop();
     }
     
@@ -897,20 +898,141 @@ function countStages(){
         noStroke(); fill(0); textSize(30);
         text('P',x-32,y-12);
         pop();
+        return([x,y]);
     }
 
-    function equilibStages(){
+    function equilibPoints(){
         // Generate the tie lines and then draw them depending on the slider
         let yVals = new Array(7);
-        for(let i = 0; i < tie.slopes.length; i++){
-            yVals[i] = slopes[i]*e1_coords[0] + tie.b[i];
+        for(let i = 0; i < tie.m.length; i++){
+            yVals[i] = tie.m[i]*e1_coords[0] + tie.b[i];
         }
 
-        let xR = [];
-        let xE = [];
-
+        let extractPoints = [];
+        let raffinatePoints = [];
         
+        extractPoints.push(e1_coords); // E1
+        raffinatePoints.push(nextRaffinate(extractPoints[0])); // R1
+
+        extractPoints.push(nextExtract(raffinatePoints[0],opPoint)); // E2
+        raffinatePoints.push(nextRaffinate(extractPoints[1])); // R2
+
+        extractPoints.push(nextExtract(raffinatePoints[1],opPoint)); // E3
+        raffinatePoints.push(nextRaffinate(extractPoints[2])); // R3
+
+        extractPoints.push(nextExtract(raffinatePoints[2],opPoint)); // E4
+        raffinatePoints.push(nextRaffinate(extractPoints[3])); // R4
+
+        extractPoints.push(nextExtract(raffinatePoints[3],opPoint)); // E5
+        raffinatePoints.push(nextRaffinate(extractPoints[4])); // R5
+
+        extractPoints.push(nextExtract(raffinatePoints[4],opPoint)); // E6
+        raffinatePoints.push(nextRaffinate(extractPoints[5])); // R6
+        
+        
+
+        let test = false;
+        let stages;
+        let counter = 0;
+        while(!test){
+            if(raffinatePoints[counter][0] > xRnpx || counter == 5){
+                stages = counter;
+                test = true;
+            }
+            counter++;
+        }
+        stages = stages + 1;
+
+        drawEquilibLines(extractPoints,raffinatePoints,stages);
     }
+
+    function drawEquilibLines(ex,raf,stages){
+        if(g.tieSlider <= stages){
+            for(let i = 0; i < g.tieSlider; i++){
+                push();
+                strokeWeight(2); stroke(255,100,51);
+                line(ex[i][0],ex[i][1],raf[i][0],raf[i][1]);
+                noStroke(); fill(0,100,190);
+                ellipse(raf[i][0],raf[i][1],2*g.radius);
+                pop();
+                if(g.tieSlider == 1){
+                    push();
+                    fill(255); stroke(0); strokeWeight(1.5);
+                    ellipse(raf[i][0]+25,raf[i][1]-20,20*2);
+                    textStyle(ITALIC);
+                    noStroke(); fill(0); textSize(25);
+                    text('R',raf[i][0]+11,raf[i][1]-13);
+                    textStyle(NORMAL); textSize(18);
+                    text('1',raf[i][0]+28,raf[i][1]-8)
+                    pop();
+
+                    push();
+                    noStroke(); fill(255,100,51);
+                    rect(260+70*i,30,35,70);
+                    pop();
+                    
+                } else if (i > 0 && i == g.tieSlider-1){
+                    push(); stroke(0,100,190); strokeWeight(2);
+                    drawingContext.setLineDash([5,5]);
+                    line(raf[i-1][0],raf[i-1][1],opPoint[0],opPoint[1]);
+                    pop();
+
+                    push();
+                    fill(255); stroke(0); strokeWeight(1.5);
+                    ellipse(raf[i][0]+25,raf[i][1]-20,20*2);
+                    ellipse(ex[i][0]-23,ex[i][1]-17,20*2)
+                    textStyle(ITALIC);
+                    noStroke(); fill(0); textSize(25);
+                    text('R',raf[i][0]+11,raf[i][1]-13);
+                    text('E',ex[i][0]-35,ex[i][1]-10);
+                    textStyle(NORMAL); textSize(18);
+                    text(i+1,raf[i][0]+28,raf[i][1]-8);
+                    text(i+1,ex[i][0]-19,ex[i][1]-5);
+                    pop();
+
+                    push();
+                    noStroke(); fill(255,100,51);
+                    for(let j = i; j >= 0; j--){
+                        rect(260+70*j,30,35,70);
+                    }
+                    pop();
+                }
+                push();
+                fill(255,100,51); noStroke();
+                ellipse(ex[i][0],ex[i][1],2*g.radius);
+                pop();
+            }
+
+            push();
+            textSize(25); noStroke();
+            text(g.tieSlider+' equilibrium stages drawn',380,270);
+            pop();
+
+        } else {
+            for(let i = 0; i < stages; i++){
+                push();
+                strokeWeight(2); stroke(255,100,51);
+                line(ex[i][0],ex[i][1],raf[i][0],raf[i][1]);
+                noStroke(); fill(0,100,190);
+                ellipse(raf[i][0],raf[i][1],2*g.radius);
+                fill(255,100,51);
+                ellipse(ex[i][0],ex[i][1],2*g.radius);
+                pop();
+
+                push();
+                noStroke(); fill(255,100,51);
+                rect(260+70*i,30,35,70);
+                pop();
+            }
+            push();
+            textSize(25); 
+            text(stages+' equilibrium stages drawn',380,270);
+            pop();
+        }
+    }
+
+    upperRightImage();
+
 }
 
 function arrow(base,tip,color,arrowLength,arrowWidth){ 
@@ -986,9 +1108,90 @@ function tieInfo(){
     }
 }
 
-function nextEquilibTie(){
-    
+function nextExtract(r,op){
+    // Line from raffinate point to operating point
+    // Find intersection of that line with phase envelope to get next extract point
+
+    let x1, x2, y1, y2;
+    let m1, b1, m2, b2;
+
+    x1 = op[0]; y1 = op[1]; // operating point
+    x2 = r[0]; y2 = r[1]; // last raffinate point
+
+    m1 = (y2-y1)/(x2-x1);
+    b1 = y1 - m1*x1;
+
+    let yL, yU, yC, yUU;
+    let xe, ye;
+
+    for(let i = 0; i < 20; i++){
+        yL = g.phaseInfopx[i][1];
+        yU = g.phaseInfopx[i+1][1];
+        yC = m1*g.phaseInfopx[i][0] + b1;
+        yUU = g.phaseInfopx[i+2][1];
+
+        if(yC <= yL && yC >= yU){
+            m2 = (yL-yU)/(g.phaseInfopx[i][0]-g.phaseInfopx[i+1][0]);
+            b2 = yL - m2*g.phaseInfopx[i][0];
+            xe = (b2-b1)/(m1-m2);
+            ye = m1*xe + b1;
+        } else if (yC <= yU && yC > yUU){
+            xe = g.phaseInfopx[i+1][0];
+            ye = g.phaseInfopx[i+1][0];
+        }
+    }
+    return([xe,ye]);
 }
 
+function nextRaffinate(e){
+    let lx = 150; let rx = 600; // left and right edges of triangle
+    let by = 500; let ty = 50; // top and bottom of triangle
+
+    let yVals = new Array(7);
+    for(let i = 0; i < tie.m.length; i++){
+        yVals[i] = tie.m[i]*e[0] + tie.b[i];
+    }
+
+    let dY, dC, mx, xL, xR, yL, yR, bx;
+    for(let i = 0; i < tie.m.length-1; i++){
+        if(e[1] < yVals[i] && e[1] > yVals[i+1]){
+            dY = yVals[i] - yVals[i+1];
+            dC = yVals[i]-e[1];
+
+            mx = tie.m[i]*(1-dC/dY) + tie.m[i+1]*(dC/dY);
+            bx = e[1] - mx*e[0];
+
+            xR = tie.pos[i][1]*(1-dC/dY) + tie.pos[i+1][1]*(dC/dY);
+            yR = mx*xR + bx;
+        } else if (e[1] < yVals[tie.m.length-1]){
+            ratio = yVals[tie.m.length-1]/e[1];
+            mx = tie.m[tie.m.length-1]*ratio;
+            bx = e[1] - mx*e[0];
+            xR = regionSevenCoords(mx,bx);
+            yR = mx*xR + bx;
+        } else if (e[1] == by){
+            xR = map(.9,0,1,lx,rx);
+            yR = by;
+        }
+    }
+    return([xR,yR])
+}
+
+
+function regionSevenCoords(mx,bx){
+    let xR, m, b, x;
+    for(let i = 20; i < g.phaseInfopx.length-1; i++){
+        m = (g.phaseInfopx[i+1][1]-g.phaseInfopx[i][1])/(g.phaseInfopx[i+1][0]-g.phaseInfopx[i][0]);
+        b = g.phaseInfopx[i][1] - m*g.phaseInfopx[i][0];
+        x = (bx-b)/(m-mx);
+
+        if(x > g.phaseInfopx[i][0] && x < g.phaseInfopx[i+1][0]){
+            xR = x;
+        } else if (x == g.phaseInfopx[i][0]){
+            xR = g.phaseInfopx[i][0];
+        }
+    }
+    return(xR);
+}
 
 
