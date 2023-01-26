@@ -11,7 +11,7 @@
   },
   "private": true,
   "devDependencies": {
-    "browser-sync": "^2.24.6",
+    "browser-sync": "^2.27.11",
     "concat-with-sourcemaps": "^1.1.0",
     "mathjax": "2.7.5",
     "uglify-js": "^3.0.0",
