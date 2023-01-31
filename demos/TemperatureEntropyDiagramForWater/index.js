@@ -3,7 +3,7 @@ window.g = {
 
   pressureTruth : false,
   enthalpyTruth : false,
-  qualityTruth : false,
+  qualityTruth : true,
   gridTruth : false,
   phaseTruth : false,
 
@@ -12,13 +12,23 @@ window.g = {
   xR : 700,
   by : 540,
   ty : 40,
+
+  
   
 }
+
+let SQ = []; 
+let SL = []; // Saturated liquid
+let SV = []; // Saturated vapor
+let qualityLines = [];
 
 function setup() {
   g.cnv = createCanvas(800, 600);
   g.cnv.parent("graphics-wrapper");
   document.getElementsByTagName("main")[0].remove();
+
+  phaseEnvelopeCalcs();
+  qualityLineCalcs();
 
 
 }
@@ -26,7 +36,16 @@ function setup() {
 function draw() {
   background(250);
   graphDraw();
-
+ 
+  if(g.gridTruth){
+    drawGrid();
+  }
+  if(g.phaseTruth){
+    phaseCurveDraw();
+  }
+  if(g.qualityTruth){
+    qualityLineDraw();
+  }
   
   
 }
