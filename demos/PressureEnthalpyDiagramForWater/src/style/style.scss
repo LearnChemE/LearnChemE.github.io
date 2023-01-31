@@ -47,6 +47,19 @@ $modal-xl: 1140px;
     }
 }
 
+
+#p5-container {
+    width: max-content;
+    margin: auto;
+}
+
+canvas {
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    box-shadow: 0px 0px 2px 2px lightgrey;
+}
+
 .modal.show {
     padding-left: 0px !important;
 }
