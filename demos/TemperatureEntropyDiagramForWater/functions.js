@@ -201,13 +201,87 @@ function qualityLineDraw(){
     }
     pop();
 
-    push();
-    translate(250,500);
-    rotate(radians(-54));
-    noStroke(); textStyle(ITALIC); textSize(22);
-    
+    labels();
+    function labels(){
+        push();
+        translate(255,500);
+        rotate(radians(-54));
+        noStroke(); textStyle(ITALIC); textSize(22);
+        fill(255);
+        rect(-3,-15,38,20);
+        fill(100,0,100);
+        text('0.2',0,0)
+        pop();
 
-    fill(100,0,100);
-    text('0.2',0,0)
-    pop();
+        push();
+        translate(295,500);
+        rotate(radians(-54));
+        noStroke(); textStyle(ITALIC); textSize(22);
+        fill(255);
+        rect(-3,-15,38,20);
+        fill(100,0,100);
+        text('0.3',0,0);
+        pop();
+
+        push();
+        translate(340,500);
+        rotate(radians(-54));
+        noStroke(); textStyle(ITALIC); textSize(22);
+        fill(255);
+        rect(-3,-15,38,20);
+        fill(100,0,100);
+        text('0.4',0,0);
+        pop();
+
+        push();
+        translate(385,500);
+        rotate(radians(-54));
+        noStroke(); textStyle(ITALIC); textSize(22);
+        fill(255);
+        rect(-3,-18,45,20);
+        fill(100,0,100);
+        text('0.5',0,0);
+        pop();
+
+        push();
+        translate(430,500);
+        rotate(radians(-54));
+        noStroke(); textStyle(ITALIC); textSize(22);
+        fill(255);
+        rect(-3,-20,45,23);
+        fill(100,0,100);
+        text('0.6',0,0);
+        pop();
+
+        push();
+        translate(475,500);
+        rotate(radians(-54));
+        noStroke(); textStyle(ITALIC); textSize(22);
+        fill(255);
+        rect(-3,-20,45,23);
+        fill(100,0,100);
+        text('0.7',0,0);
+        pop();
+
+        push();
+        translate(515,500);
+        rotate(radians(-54));
+        noStroke(); textStyle(ITALIC); textSize(22);
+        fill(255);
+        rect(-3,-20,45,23);
+        fill(100,0,100);
+        text('0.8',0,0);
+        pop();
+
+        push();
+        translate(560,500);
+        rotate(radians(-54));
+        noStroke(); textStyle(ITALIC); textSize(22);
+        fill(255);
+        rect(-3,-20,45,23);
+        fill(100,0,100);
+        text('0.9',0,0);
+        pop();
+    }
+    
 }
