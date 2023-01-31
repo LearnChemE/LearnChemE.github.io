@@ -95,7 +95,7 @@ function triangleDraw(){
         let x, y;
         
         // Solvent lines
-        push(); strokeWeight(1.5); stroke(0,60);
+        push(); strokeWeight(1.5); stroke(0,20);
         for(let i = 0; i < 20; i++){
             x = lx+45/2*(i+1); y = lx+45/2*(i+1)+g.R[1];
             line(x,by,x,y);

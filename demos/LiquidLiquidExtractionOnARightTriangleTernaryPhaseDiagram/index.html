@@ -40,7 +40,7 @@
 
 <body>
 
-  <div style="position:relative; top:30px">
+  <div id="master-wrapper">
   <div id="simulation-wrapper">
 
     <div class="inputs-wrapper">
@@ -91,19 +91,16 @@
       </div>
 
       <!-- this should show up when count stages is selected-->
-      <div class="input-row">
+      <div class="input-row" id="slider-container" style="display: none;">
         <div class="input-label">Draw tie lines</div>
         <input type="range" id="tie-slider" min="0" max="7" value="0" step="1" />
         <div id="tie-slider-value" class="value-label">0</div>
-      </div>
-      
-      
-     
+      </div>     
 
      <div id="modal-buttons">
-      <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
-      <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
-      <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
+      <div id="dir" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
+      <div id="detail" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+      <div id="about" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
       
       </div>
     

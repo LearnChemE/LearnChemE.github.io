@@ -88,6 +88,9 @@ function draw() {
   pop();
 }
 
+const plotPointsOptions = document.getElementById("plot-points-options");
+const pointType = document.getElementById("point-type");
+const sliderContainer = document.getElementById("slider-container");
 const firstRadio = document.getElementById("point-type").children;
 const gridLines = document.getElementById("grid-lines");
 const carrierComp = document.getElementById("carrier-compositions");
@@ -115,6 +118,34 @@ for(let i = 0; i < firstRadio.length; i++){
     g.pointType = firstRadio[i].value;
   });
 };
+
+
+pointType.addEventListener("input", () => {
+  if(firstRadio[0].checked) {
+    plotPointsOptions.style.display = "inline-flex";
+    sliderContainer.style.display = "none";
+  }
+  
+  if(firstRadio[2].checked) {
+    plotPointsOptions.style.display = "none";
+    sliderContainer.style.display = "none";
+  }
+  
+  if(firstRadio[4].checked) {
+    plotPointsOptions.style.display = "none";
+    sliderContainer.style.display = "none";
+  }
+  
+  if(firstRadio[6].checked) {
+    plotPointsOptions.style.display = "none";
+    sliderContainer.style.display = "none";
+  }
+  
+  if(firstRadio[8].checked) {
+    plotPointsOptions.style.display = "none";
+    sliderContainer.style.display = "grid";
+  }
+});
 
 for(let i = 0; i < secondRadio.length; i++){
   secondRadio[i].addEventListener("click", function(){
