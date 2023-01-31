@@ -75,8 +75,8 @@ function drawGrid(){
         line(g.xL,g.by-(g.by-g.ty)/12*i,g.xR,g.by-(g.by-g.ty)/12*i);
     }
 
-    for(let i = 0; i < 10; i++){
-        line(g.xL+10+(g.xR-g.xL-20)/9*i,g.by,g.xL+10+(g.xR-g.xL-20)/9*i,g.ty);
+    for(let i = 0; i < 19; i++){
+        line(g.xL+10+(g.xR-g.xL-20)/18*i,g.by,g.xL+10+(g.xR-g.xL-20)/18*i,g.ty);
     }
     pop();
 }
@@ -208,7 +208,7 @@ function qualityLineDraw(){
         rotate(radians(-54));
         noStroke(); textStyle(ITALIC); textSize(22);
         fill(255);
-        rect(-3,-15,38,20);
+        rect(-2,-15,36,20);
         fill(100,0,100);
         text('0.2',0,0)
         pop();
@@ -218,7 +218,7 @@ function qualityLineDraw(){
         rotate(radians(-54));
         noStroke(); textStyle(ITALIC); textSize(22);
         fill(255);
-        rect(-3,-15,38,20);
+        rect(-2,-15,36,20);
         fill(100,0,100);
         text('0.3',0,0);
         pop();
@@ -228,7 +228,7 @@ function qualityLineDraw(){
         rotate(radians(-54));
         noStroke(); textStyle(ITALIC); textSize(22);
         fill(255);
-        rect(-3,-15,38,20);
+        rect(-2,-15,36,20);
         fill(100,0,100);
         text('0.4',0,0);
         pop();
@@ -238,7 +238,7 @@ function qualityLineDraw(){
         rotate(radians(-54));
         noStroke(); textStyle(ITALIC); textSize(22);
         fill(255);
-        rect(-3,-18,45,20);
+        rect(-2,-18,35,20);
         fill(100,0,100);
         text('0.5',0,0);
         pop();
@@ -248,7 +248,7 @@ function qualityLineDraw(){
         rotate(radians(-54));
         noStroke(); textStyle(ITALIC); textSize(22);
         fill(255);
-        rect(-3,-20,45,23);
+        rect(-2,-17,35,20);
         fill(100,0,100);
         text('0.6',0,0);
         pop();
@@ -258,7 +258,7 @@ function qualityLineDraw(){
         rotate(radians(-54));
         noStroke(); textStyle(ITALIC); textSize(22);
         fill(255);
-        rect(-3,-20,45,23);
+        rect(-2,-17,35,20);
         fill(100,0,100);
         text('0.7',0,0);
         pop();
@@ -268,7 +268,7 @@ function qualityLineDraw(){
         rotate(radians(-54));
         noStroke(); textStyle(ITALIC); textSize(22);
         fill(255);
-        rect(-3,-20,45,23);
+        rect(-2,-17,35,20);
         fill(100,0,100);
         text('0.8',0,0);
         pop();
@@ -278,10 +278,97 @@ function qualityLineDraw(){
         rotate(radians(-54));
         noStroke(); textStyle(ITALIC); textSize(22);
         fill(255);
-        rect(-3,-20,45,23);
+        rect(-2,-17,37,20);
         fill(100,0,100);
         text('0.9',0,0);
         pop();
     }
     
+}
+
+function pressureLineCalcs(){
+    let n = [0,2,4,9,10,13,18,19,22,27,28,31,36,38,42,44,48];
+    let index;
+
+    for(let i = 0; i < n.length; i++){
+        index = n[i];
+        let a_line = [];
+        for(let j = 0; j < PTSH[index].length; j++){
+            let temp = [];
+            temp.push(PTSH[index][j][2]);
+            temp.push(PTSH[index][j][1]);
+            a_line.push(temp);
+        }
+        pressureLines.push(a_line);
+    }
+}
+
+function pressureLineDraw(){
+    push(); noFill(); stroke(0,0,255);
+    for(let i = 0; i < pressureLines.length; i++){
+        beginShape();
+        for(let j = 0; j < pressureLines[i].length; j++){
+            let x = map(pressureLines[i][j][0],0,9,g.xL+10,g.xR-10);
+            let y = map(pressureLines[i][j][1],0,600,g.by,g.ty);
+            if(x <= g.xR){
+                vertex(x,y);
+            }
+        }
+        endShape();
+    }
+    pop();
+
+    labels();
+
+    function labels(){
+        push();
+        textSize(18); fill(0,0,255); noStroke();
+        text('100',422,35);
+        text('60',462,35);
+        text('40',490,35);
+        text('20',520,35);
+        text('10',548,35);
+        text('5',577,35);
+        text('2',602,35);
+        text('1',621,35);
+        text('0.5',638,35);
+        text('0.2',670,35);
+
+        translate(390,155);
+        rotate(radians(-63)); textStyle(ITALIC);
+        fill(255);
+        rect(-3,-12,110,15);
+        fill(0,0,255);
+        text('P = 100 MPa',0,0);
+        pop();
+
+        push();
+        translate(504,240); textSize(18);
+        rotate(radians(-71)); textStyle(ITALIC); noStroke();
+        fill(255);
+        rect(-3,-12,70,15);
+        fill(0,0,255);
+        text('10 MPa',0,0);
+        pop();
+
+        push();
+        translate(570,310);
+        rotate(radians(-75));
+        textSize(18); textStyle(ITALIC); noStroke();
+        fill(255);
+        rect(-3,-12,57,15);
+        fill(0,0,255);
+        text('1 MPa',0,0);
+        pop();
+
+        push();
+        translate(622,370);
+        rotate(radians(-75));
+        textSize(18); noStroke(); textStyle(ITALIC);
+        fill(255);
+        rect(-3,-12,72,15);
+        fill(0,0,255);
+        text('0.1 MPa',0,0);
+        pop();
+    }
 }

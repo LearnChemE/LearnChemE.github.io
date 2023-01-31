@@ -1,10 +1,10 @@
 window.g = {
   cnv : undefined,
 
-  pressureTruth : false,
+  pressureTruth : true,
   enthalpyTruth : false,
   qualityTruth : true,
-  gridTruth : false,
+  gridTruth : true,
   phaseTruth : false,
 
   // Edge locations of the graph, will be used repeatedly
@@ -21,6 +21,7 @@ let SQ = [];
 let SL = []; // Saturated liquid
 let SV = []; // Saturated vapor
 let qualityLines = [];
+let pressureLines = [];
 
 function setup() {
   g.cnv = createCanvas(800, 600);
@@ -29,6 +30,7 @@ function setup() {
 
   phaseEnvelopeCalcs();
   qualityLineCalcs();
+  pressureLineCalcs();
 
 
 }
@@ -42,6 +44,10 @@ function draw() {
   }
   if(g.phaseTruth){
     phaseCurveDraw();
+  }
+  
+  if(g.pressureTruth){
+    pressureLineDraw();
   }
   if(g.qualityTruth){
     qualityLineDraw();
