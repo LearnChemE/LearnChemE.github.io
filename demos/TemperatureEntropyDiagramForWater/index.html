@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Temperature Entropy Diagram for Water</title>
+  <title>Temperature-Entropy Diagram for Water</title>
 
   <script src="./libraries/p5.js"></script>
 
@@ -55,17 +55,17 @@
         <form class="form-inline">
           <span><b>View lines of constant:</b></span>
           <label class="checkbox-inline">
-            <input type="checkbox" id="pressure"> Pressure
+            <input type="checkbox" id="pressure" checked> Pressure
             <span class="checkmark"></span>
           </label>
 
           <label class="checkbox-inline">
-            <input type="checkbox" id="enthalpy"> Enthalpy
+            <input type="checkbox" id="enthalpy" checked> Enthalpy
             <span class="checkmark"></span>
           </label>
 
           <label class="checkbox-inline">
-            <input type="checkbox" id="quality"> Quality
+            <input type="checkbox" id="quality" checked> Quality
             <span class="checkmark"></span>
           </label>
 
@@ -85,6 +85,104 @@
     </div>
     
     <div id="graphics-wrapper">
+    </div>
+  </div>
+
+  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This simulation shows a temperature-entropy \((\textit{T-S})\) diagram for water. Use the checkboxes to add or remove a property from the diagram. You can show lines of constant enthalpy (green), pressure (blue), and and quality (mass% vapor, purple). Check "phase envelope" to view the saturated liquid (magenta) and saturated vapor (orange) curves and the location of the critical point. Check "grid lines" to display grid lines.
+          </p>
+          <p>
+            
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="modal-text">
+            See [2] for more information on how to read a \(\textit{T-S}\) diagram.
+          </div>
+          <div style="height:20px"></div>
+          <ol class="references">
+            <li>
+              "Thermophysical Properties of Fluid Systems." (Aug 11, 2016) <a
+                href="https://webbook.nist.gov/chemistry/fluid/"
+                target="_blank">webbook.nist.gov/chemistry/fluid/</a>
+            </li>
+            <li>
+              <i>T-S and P-H Diagrams</i> [Video]. (Aug 11, 2016). <a
+                href="https://www.youtube.com/watch?v=10q0akdZ7QQ"
+                target="_blank">www.youtube.com/watch?v=10q0akdZ7QQ</a>
+            </li>
+          </ol>
+        </div>
+        <div style="height: 30px;"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+
+
+  <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="aboutModalLabel">About</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Adam J. Johnston under the direction
+            of
+            Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional contributions by
+            Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of our
+            simulations are open source, and are available on our <a
+              href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+              repository</a>.</p>
+          <p style="line-height: 3rem;">
+            If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows.
+          </p>
+        </div>
+      </div>
     </div>
   </div>
   <script src="data.js"></script>

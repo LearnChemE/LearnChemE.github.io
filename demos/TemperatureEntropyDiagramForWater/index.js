@@ -2,9 +2,9 @@ window.g = {
   cnv : undefined,
 
   pressureTruth : true,
-  enthalpyTruth : false,
+  enthalpyTruth : true,
   qualityTruth : true,
-  gridTruth : true,
+  gridTruth : false,
   phaseTruth : false,
 
   // Edge locations of the graph, will be used repeatedly
@@ -38,19 +38,25 @@ function setup() {
 function draw() {
   background(250);
   graphDraw();
+  
  
   if(g.gridTruth){
     drawGrid();
   }
-  if(g.phaseTruth){
-    phaseCurveDraw();
-  }
   
+  
+  if(g.enthalpyTruth){
+    enthalpyLineDraw();
+  }
   if(g.pressureTruth){
     pressureLineDraw();
   }
+  
   if(g.qualityTruth){
     qualityLineDraw();
+  }
+  if(g.phaseTruth){
+    phaseCurveDraw();
   }
   
   

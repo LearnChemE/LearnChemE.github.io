@@ -39,6 +39,7 @@ function graphDraw(){
     translate(35,height/2+70);
     rotate(radians(-90));
     text("temperature (\xB0C)",0,0);
+    text("enthalpy (kJ/kg)",10,740)
     pop();
 
     if(!g.phaseTruth){
@@ -104,13 +105,16 @@ function phaseCurveDraw(){
     noStroke(); fill(0);
     ellipse(map(SV[SV.length-1][0],0,9,g.xL+10,g.xR-10),map(SV[SV.length-1][1],0,600,g.by,g.ty),13);
     textSize(23);
+    fill(255);
+    rect(width/2-68,height/2-100,130,20);
+    fill(0);
     text('critical point',width/2-65,height/2-82);
     push();
     
     translate(210,450);
     rotate(radians(-52));
     fill(255);
-    rect(-2,-15,160,15);
+    rect(-2,-18,160,20);
     fill(255,0,255);
     text('saturated liquid',0,0);
     pop();
@@ -208,7 +212,7 @@ function qualityLineDraw(){
         rotate(radians(-54));
         noStroke(); textStyle(ITALIC); textSize(22);
         fill(255);
-        rect(-2,-15,36,20);
+        rect(-2,-17,36,21);
         fill(100,0,100);
         text('0.2',0,0)
         pop();
@@ -218,7 +222,7 @@ function qualityLineDraw(){
         rotate(radians(-54));
         noStroke(); textStyle(ITALIC); textSize(22);
         fill(255);
-        rect(-2,-15,36,20);
+        rect(-2,-17,36,21);
         fill(100,0,100);
         text('0.3',0,0);
         pop();
@@ -228,7 +232,7 @@ function qualityLineDraw(){
         rotate(radians(-54));
         noStroke(); textStyle(ITALIC); textSize(22);
         fill(255);
-        rect(-2,-15,36,20);
+        rect(-2,-16,36,22);
         fill(100,0,100);
         text('0.4',0,0);
         pop();
@@ -369,6 +373,136 @@ function pressureLineDraw(){
         rect(-3,-12,72,15);
         fill(0,0,255);
         text('0.1 MPa',0,0);
+        pop();
+    }
+}
+
+function enthalpyLineDraw(){
+    push(); noFill(); stroke(0,150,0);
+    for(let i = 0; i < HeqPlot.length; i++){
+        beginShape();
+        
+        for(let j = 0; j < HeqPlot[i].length; j++){
+            let x = map(HeqPlot[i][j][0],0,9,g.xL+10,g.xR-10);
+            let y = map(HeqPlot[i][j][1],0,600,g.by,g.ty);
+            vertex(x,y);
+        }
+        endShape();
+    }
+
+    for(let i = 0; i < consH.length; i++){
+        beginShape();
+        for(let j = 0; j < consH[i].length; j++){
+            let x = map(consH[i][j][0],0,9,g.xL+10,g.xR-10);
+            let y = map(consH[i][j][1],0,600,g.by,g.ty);
+            vertex(x,y);
+        }
+        endShape();
+    }
+
+    for(let i = 0; i < consH3.length; i++){
+        beginShape();
+        for(let j = 0; j < consH3[i].length; j++){
+            let x = map(consH3[i][j][0],0,9,g.xL+10,g.xR-10);
+            let y = map(consH3[i][j][1],0,600,g.by,g.ty);
+            vertex(x,y);
+        }
+        endShape();
+    }
+
+    beginShape();
+    for(let i = 0; i < Heq2600.length; i++){
+        let x = map(Heq2600[i][0],0,9,g.xL+10,g.xR-10);
+        let y = map(Heq2600[i][1],0,600,g.by,g.ty);
+        vertex(x,y);
+    }   
+    endShape();
+
+    beginShape();
+    for(let i = 0; i < Heq2700.length; i++){
+        let x = map(Heq2700[i][0],0,9,g.xL+10,g.xR-10);
+        let y = map(Heq2700[i][1],0,600,g.by,g.ty);
+        vertex(x,y);
+    }   
+    endShape();
+
+
+    beginShape();
+    for(let i = 0; i < S26001.length; i++){
+        let x = map(S26001[i][0],0,9,g.xL+10,g.xR-10);
+        let y = map(S26001[i][1],0,600,g.by,g.ty);
+        vertex(x,y);
+    }
+    endShape();
+
+    beginShape();
+    for(let i = 0; i < S26002.length; i++){
+        let x = map(S26002[i][0],0,9,g.xL+10,g.xR-10);
+        let y = map(S26002[i][1],0,600,g.by,g.ty);
+        vertex(x,y);
+    }
+    endShape();
+
+    beginShape();
+    for(let i = 0; i < S27001.length; i++){
+        let x = map(S27001[i][0],0,9,g.xL+10,g.xR-10);
+        let y = map(S27001[i][1],0,600,g.by,g.ty);
+        vertex(x,y);
+    }
+    endShape();
+    beginShape();
+    for(let i = 0; i < S27002.length; i++){
+        let x = map(S27002[i][0],0,9,g.xL+10,g.xR-10);
+        let y = map(S27002[i][1],0,600,g.by,g.ty);
+        vertex(x,y);
+    }
+    endShape();
+    pop();
+
+    push(); // Enthalpy data runs over the graph edges and this covers those bits that fall off
+    noStroke();
+    fill(250);
+    rect(g.xR+1,g.ty,150,height)
+    rect(width/2,0,width,39);
+    pop();
+
+    push();
+    textSize(20);
+    translate(35,height/2+70);
+    rotate(radians(-90));
+    text("enthalpy (kJ/kg)",10,740)
+    pop();
+
+    labels();
+
+    function labels(){
+        push();
+        textSize(18); noStroke(); fill(0,100,0);
+        text('200',g.xL+10,g.by-30);
+        text('400',g.xL+38,g.by-60);
+        text('600',g.xL+70,g.by-105);
+        text('800',g.xL+102,g.by-145);
+        text('1000',g.xL+118,g.by-178);
+        text('1200',g.xL+145,g.by-220);
+        text('1400',g.xL+166,g.by-260);
+        text('1600',g.xL+190,g.by-300);
+        text('1800',g.xL+207,g.ty+160);
+        text('2000',g.xL+228,g.ty+132);
+        text('2200',g.xL+242,g.ty+103);
+        text('2400',g.xL+257,g.ty+74);
+        text('2600',g.xL+272,g.ty+44);
+        
+        text('2600',g.xR+7,g.by-40);
+        text('2700',g.xR+7,g.by-82);
+        text('2800',g.xR+7,g.by-124);
+        text('2900',g.xR+7,g.by-168);
+        text('3000',g.xR+7,g.by-211);
+        text('3100',g.xR+7,g.by-252);
+        text('3200',g.xR+7,g.by-293);
+        text('3300',g.xR+7,g.ty+166);
+        text('3400',g.xR+7,g.ty+126);
+        text('3500',g.xR+7,g.ty+86);
+        text('3600',g.xR+7,g.ty+47);
         pop();
     }
 }
