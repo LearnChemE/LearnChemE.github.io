@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liquid-Liquid Extraction on a Right-Triangle Ternary Phase Diagram</title>
+
+  <!-- Before we run any other scripts, we have to import P5.js (a library for graphics) -->
+  <script src="./libraries/p5.js"></script>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+  <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
+  <meta name="author" content="Alex Jimenez">
+  <meta name="application-name" content="LearnChemE simulation template">
+  <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
+
+  <link href="./sliders.css" rel="stylesheet">
+  <link href="./style.css" rel="stylesheet">
+  <link href="./bootstrap.min.css" rel="stylesheet">
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.95,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="./jquery.js"></script>
+  <script src="./popper.js"></script>
+  <script src="./bootstrap.min.js"></script>
+
+</head>
+
+
+<body>
+
+  <div id="master-wrapper">
+  <div id="simulation-wrapper">
+
+    <div class="inputs-wrapper">
+      <div class="btn-group btn-group-sm" id="point-type">
+        <input type="radio" class="btn-check" name="main-radio" id="plot-points" autocomplete="off" value = "plot-points" checked>
+        <label class="btn btn-outline-primary" for="plot-points" style="margin-right: 0px">Plot points</label>
+
+        <input type="radio" class="btn-check" name="main-radio" id="mixing-point" autocomplete="off" value = "mixing-point">
+        <label class="btn btn-outline-primary" for="mixing-point" style="margin-right: 0px">Mixing point</label>
+
+        <input type="radio" class="btn-check" name="main-radio" id="determine-e1" autocomplete="off" value="determine-e1">
+        <label class="btn btn-outline-primary" for="determine-e1" style="margin-right: 0px">Determine E<sub>1</sub></label>
+
+        <input type="radio" class="btn-check" name="main-radio" id="operating-point" autocomplete="off" value = "operating-point">
+        <label class="btn btn-outline-primary" for="operating-point" style="margin-right: 0px">Operating point</label>
+
+        <input type="radio" class="btn-check" name="main-radio" id="count-stages" autocomplete="off" value = "count-stages">
+        <label class="btn btn-outline-primary" for="count-stages">Count stages</label>
+      </div>
+
+      <div class="select-container">
+        <form>
+          <label class="checkbox-inline">
+              <input type="checkbox" id="grid-lines"> Grid lines
+              <span class="checkmark"></span>
+            </label>
+          <label class="checkbox-inline">
+              <input type="checkbox" id="carrier-compositions"> Carrier compositions
+              <span class="checkmark"></span>
+          </label>
+    
+          </label>
+        </form>
+      </div>
+
+      <!-- The buttons below here are the ones that would ideally show up and disappear as needed-->
+
+      <!-- plot-point-options is linked to when the first button group is on plot points-->
+      <div class="btn-group btn-group-sm" id="plot-points-options">
+        <input type="radio" class="btn-check" name="plot-points-radio" id="feed" autocomplete="off" value="feed" checked>
+        <label class="btn btn-outline-primary" for="feed" style="margin-right: 0px">Feed</label>
+
+        <input type="radio" class="btn-check" name="plot-points-radio" id="solvent" autocomplete="off" value="solvent">
+        <label class="btn btn-outline-primary" for="solvent" style="margin-right: 0px">Solvent</label>
+
+        <input type="radio" class="btn-check" name="plot-points-radio" id="raffinate" autocomplete="off" value="raffinate">
+        <label class="btn btn-outline-primary" for="raffinate">Raffinate</label>
+      </div>
+
+      <!-- this should show up when count stages is selected-->
+      <div class="input-row" id="slider-container" style="display: none;">
+        <div class="input-label">Draw tie lines</div>
+        <input type="range" id="tie-slider" min="0" max="7" value="0" step="1" />
+        <div id="tie-slider-value" class="value-label">0</div>
+      </div>     
+
+     <div id="modal-buttons">
+      <div id="dir" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
+      <div id="detail" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+      <div id="about" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
+      
+      </div>
+    
+    </div>
+  </div>
+ 
+
+  <div id="graphics-wrapper">
+
+  </div>
+  </div>
+
+  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <p>
+            This simulation shows how to use the Hunter-Nash method on a right-triangle ternary phase diagram. Check "grid lines" to show grid lines on the diagram. Check "carrier compositions" to show the carrier mass fractions on the diagram. The Hunter-Nash method uses material balances and a ternary phase diagram with phase separation to determine the number of equilibrium stages needed for liquid-liquid extraction (LLE). The solvent mass flow rate and the desired raffinate (refined product) composition R <sub>N</sub> are given. Select "plot points" and then drag the black feed point (labeled with a circled F) to a desired feed composition within a restricted range of compositions. Use buttons to view the compositions of the feed F, solvent S, or raffinate R<sub>N</sub> in the solute (blue), solvent (red) and carrier (green) phases. Select "mixing point" to see how the mixing point M and the extract composition E<sub>1</sub> in the first stage are determined. Check "show E<sub>1</sub>" to show the extract composition. Next, select "operating point" to show how the operating point P is found.
+          </p>
+          <p>
+            This simulation also displays a schematic of the flow system and mass balances. The operating point is used to determine the number of stages. Finally, select "count stages" to use the "draw tie lines" slider to determine the number of stages and the extract and raffinate compositions in each stage. The solid orange lines follow the black tie lines, and the dashed blue lines trace back to the operating point. A diagram of the stages is shown above the ternary phase diagram.
+          </p>
+          
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="modal-text">
+          The feed composition is selected within a narrow range of compositions, but the solvent composition and the desired raffinate composition are specified. The extract composition and the number of stages to obtain the desired raffinate composition are determined by mass balances. First, the composition of the mixing point is calculated and located on the ternary phase diagram. The mixing point corresponds to the composition that would be obtained if the feed and the solvent flows were mixed together.
+        </div>
+        <div class="modal-text">
+          The mixing point \(M\) is located on the phase diagram between the feed and solvent points:
+        </div>
+        <div class="modal-equation">
+          $$
+          M = \frac{x^F + x^S}{2},
+          $$
+        </div>
+        <div class="modal-text">
+          where \(x^F\) and \(x^S\) are the feed and solvent compositions.
+        </div>
+        <div class="modal-text">
+          A line is drawn from the desired raffinate composition \(R_N\) through the mixing point until it intersects the phase boundary; this gives the extract composition \(E_1\) leaving stage 1.
+        </div>
+        <div class="modal-text">
+          The operating point \(P\) is located at the intersection of a line drawn through points \(F\) and \(E_1\) and a line drawn through \(R_N\) and \(S\) because the overall mass balance for the system is:
+        </div>
+        <div class="modal-equation">
+          $$
+          F + S = E_1 + R_N.
+          $$
+        </div>
+        <div class="modal-text">
+          This equation is rearranged to determine the operating point:
+        </div>
+        <div class="modal-equation">
+          $$
+          P = E_1 - F = R_N - S.
+          $$
+        </div>
+        <div class="modal-text">
+          A tie line from \(E_1\) to the right side of the phase boundary yields the raffinate composition \(R_1\) leaving stage 1; this line represents the first equilibrium stage (orange).
+        </div>
+        <div class="modal-text">
+          A mass balance in stage 1 (total feed in = total feed out) is:
+        </div>
+        <div class="modal-equation">
+          $$
+          E_2 + F = E_1 + R_1,
+          $$
+        </div>
+        <div class="modal-text">
+          which can be written as:
+        </div>
+        <div class="modal-equation">
+          $$
+          E_2 - R_1 = E_1 - F = P.
+          $$
+        </div>
+        <div class="modal-text">
+          Thus, the extract composition \(E_2\) leaving stage 2 is found by drawing a straight line from \(R_1\) to \(P\) (because \(P + R_1 = E_2\) from the previous equation). Where this line intersects the left side of the phase boundary is the composition of \(E_2\).
+        </div>
+        <div class="modal-text">
+          This procedure is repeated for additional stages until the raffinate composition is nearly equal to the desired value of \(R_N\) without being less than \(R_N\). The number of orange equilibrium lines drawn is the number of equilibrium stages needed to obtain \(R_N\).
+        </div>
+    
+
+        <div class="modal-text">
+          See [1-4] for screencasts that describe the Hunter-Nash method and present examples.
+        </div>
+        <div style="height:10px"></div>
+        <ol class="references">
+          <li>
+           <i>Hunter-Nash Method: Liquid-Liquid Extraction</i> [Video]. (July 31, 2017) <a 
+            href="https://www.youtube.com/watch?v=e0Yt5RMkyj4"
+            target="_blank">www.youtube.com/watch?v=e0Yt5RMkyj4</a>.
+          </li>
+          <li>
+            <i>Hunter-Nash Method: Liquid-Liquid Extraction Example</i> [Video]. (July 31, 2017) <a 
+            href="https://www.youtube.com/watch?v=FaKIZU3XPR8"
+            target="_blank">www.youtube.com/watch?v=FaKIZU3XPR8</a>.
+          </li>
+          <li>
+            <i>Hunter-Nash Method 1: Mixing and Operating Points</i> [Video]. (July 31, 2017) <a 
+            href="https://www.youtube.com/watch?v=-yW0jIcH0_E"
+            target="_blank">www.youtube.com/watch?v=-yW0jIcH0_E</a>.
+          </li>
+          <li>
+            <i>Hunter-Nash Method 2: Number of Stages</i> [Video]. (July 31, 2017) <a 
+            href="https://www.youtube.com/watch?v=JZuavrt8ksQ"
+            target="_blank">www.youtube.com/watch?v=JZuavrt8ksQ</a>.
+          </li>
+        </ol>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aboutModalLabel">About</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+            Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under the direction of Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional contributions by Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of our
+          simulations are open source, and are available on our <a
+            href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+            repository</a>.</p>
+        <p style="line-height: 3rem;">
+          If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+              src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+              src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
+          or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+              style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
+              style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
+              src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+              src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac
+          or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+              style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+              style="height: 4ch;"></span>&nbsp;on Windows.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+  <script src="functions.js"></script>
+</body>
+
+</html>
+
