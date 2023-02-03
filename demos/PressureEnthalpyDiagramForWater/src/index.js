@@ -11,6 +11,7 @@ window.gvs = {
         height : 400,
         width : 650,
         axes_range : [[0, 3500], [0.05, 10000]], // [[xMin, xMax], [yMin, yMax]]
+        show_grid : true,
     }
 };
 

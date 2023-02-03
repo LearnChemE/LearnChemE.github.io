@@ -18,3 +18,4 @@ gvs.coordToPix = function(x, y) {
 
   return [xPix, yPix]
 }
+
