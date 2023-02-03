@@ -7,7 +7,7 @@ $modal-xl: 1140px;
 
 .simulation-controls {
     display: grid;
-    grid-template-columns: max-content max-content;
+    grid-template-columns: max-content;
     justify-content: center;
     gap: 0px 20px;
     width: 100vw;
@@ -28,25 +28,92 @@ $modal-xl: 1140px;
 
 .input-area {
     display: grid;
-    grid-template-columns: max-content;
-    margin: 20px auto;
+    grid-template-columns: repeat(3, max-content);
+    margin: 10px auto;
     gap: 10px;
     width: max-content;
     justify-items: center;
-    .input-row {
+    align-items: center;
+    
+    .input-label {
+        grid-row: 1 / 3;
+    }
+
+    .checkbox-area {
         display: grid;
-        grid-template-columns: 200px 10rem 27px 50px;
-        gap: 1ch;
-        align-items: end;
-        .data-name {
-            justify-self: end;
+        grid-template-columns: repeat(3, max-content);
+        justify-items: end;
+        gap: 10px 20px;
+        background-color: rgb(250, 250, 250);
+        padding: 10px 20px;
+        border: 1px solid grey;
+        border-radius: 8px;
+        .checkbox-container {
+            display: grid;
+            grid-template-columns: max-content max-content;
+            align-items: center;
+            gap: 0px 8px;
+            div {
+                transform: translateY(-2px);
+            }
         }
-        .data-value {
-            text-align: end;
+    }
+
+    .color-select-container {
+        display: grid;
+        grid-template-columns: max-content max-content;
+        padding-left: 30px;
+        #display-color {
+            display: grid;
+            align-content: center;
+            width: 70px;
+            height: 35px;
+            background-color: lightblue;
+            text-align: center;
+            border: 1px solid grey;
+            border-radius: 5px 0px 0px 5px;
+            cursor: pointer;
+        }
+        #display-black-white {
+            display: grid;
+            align-content: center;
+            width: 140px;
+            height: 35px;
+            background-color: rgb(240, 240, 240);
+            text-align: center;
+            border: 1px solid grey;
+            border-radius: 0px 5px 5px 0px;
+            cursor: pointer;
+        }
+        #display-color:hover, #display-black-white:hover {
+            opacity: 0.7;
         }
     }
 }
 
+#checkbox-label-quality {
+    color: rgb(0, 0, 150);
+}
+
+#checkbox-label-temperature {
+    color: rgb(255, 0, 0);
+}
+
+#checkbox-label-density {
+    color: rgb(155, 155, 0);
+}
+
+#checkbox-label-entropy {
+    color: rgb(255, 0, 155);
+}
+
+#checkbox-label-gridlines {
+    color: rgb(0, 0, 0);
+}
+
+#checkbox-label-critical {
+    color: rgb(100, 0, 255);
+}
 
 #p5-container {
     width: max-content;
