@@ -29,7 +29,7 @@ function drawPlot(p) {
     p.strokeWeight(1);
     p.line(coords1[0], coords1[1], coords1[0] + tickWidth, coords1[1]);
     p.line(coords2[0], coords2[1], coords2[0] - tickWidth, coords2[1]);
-    if(gvs.plot.show_grid) {
+    if(gvs.show_grid) {
       p.stroke(gridStroke);
       p.strokeWeight(0.5);
       p.line(coords1[0], coords1[1], coords2[0], coords1[1]);
@@ -47,7 +47,7 @@ function drawPlot(p) {
     p.strokeWeight(1);
     p.line(coords1[0], coords1[1], coords1[0] + tickWidth, coords1[1]);
     p.line(coords2[0], coords2[1], coords2[0] - tickWidth, coords2[1]);
-    if(gvs.plot.show_grid) {
+    if(gvs.show_grid) {
       p.stroke(gridStroke);
       p.strokeWeight(0.5);
       p.line(coords1[0], coords1[1], coords2[0], coords1[1]);
@@ -65,7 +65,7 @@ function drawPlot(p) {
     p.strokeWeight(1);
     p.line(coords1[0], coords1[1], coords1[0] + tickWidth, coords1[1]);
     p.line(coords2[0], coords2[1], coords2[0] - tickWidth, coords2[1]);
-    if(gvs.plot.show_grid) {
+    if(gvs.show_grid) {
       p.stroke(gridStroke);
       p.strokeWeight(0.5);
       p.line(coords1[0], coords1[1], coords2[0], coords1[1]);
@@ -83,7 +83,7 @@ function drawPlot(p) {
     p.strokeWeight(1);
     p.line(coords1[0], coords1[1], coords1[0] + tickWidth, coords1[1]);
     p.line(coords2[0], coords2[1], coords2[0] - tickWidth, coords2[1]);
-    if(gvs.plot.show_grid) {
+    if(gvs.show_grid) {
       p.stroke(gridStroke);
       p.strokeWeight(0.5);
       p.line(coords1[0], coords1[1], coords2[0], coords1[1]);
@@ -101,7 +101,7 @@ function drawPlot(p) {
     p.strokeWeight(1);
     p.line(coords1[0], coords1[1], coords1[0] + tickWidth, coords1[1]);
     p.line(coords2[0], coords2[1], coords2[0] - tickWidth, coords2[1]);
-    if(gvs.plot.show_grid) {
+    if(gvs.show_grid) {
       p.stroke(gridStroke);
       p.strokeWeight(0.5);
       p.line(coords1[0], coords1[1], coords2[0], coords1[1]);
@@ -119,7 +119,7 @@ function drawPlot(p) {
     p.strokeWeight(1);
     p.line(coords1[0], coords1[1], coords1[0] + tickWidth, coords1[1]);
     p.line(coords2[0], coords2[1], coords2[0] - tickWidth, coords2[1]);
-    if(gvs.plot.show_grid) {
+    if(gvs.show_grid) {
       p.stroke(gridStroke);
       p.strokeWeight(0.5);
       p.line(coords1[0], coords1[1], coords2[0], coords1[1]);
@@ -141,7 +141,7 @@ function drawPlot(p) {
     p.strokeWeight(1);
     p.line(coords1[0], coords1[1], coords1[0], coords1[1] - tickWidth);
     p.line(coords2[0], coords2[1], coords2[0], coords2[1] + tickWidth);
-    if(gvs.plot.show_grid) {
+    if(gvs.show_grid) {
       p.stroke(gridStroke);
       p.strokeWeight(0.5);
       p.line(coords1[0], coords1[1], coords1[0], coords2[1]);
@@ -183,7 +183,11 @@ function drawEnvelope(p) {
 function drawQuality(p) {
   p.push();
   p.noFill();
-  p.stroke(0, 0, 150);
+  if(gvs.color) {
+    p.stroke(0, 0, 150);
+  } else {
+    p.stroke(0);
+  }
   p.strokeWeight(1);
   for(let i = 10; i <= 90; i += 10) {
     const variable_name = `Q${Math.round(i)}`;
@@ -202,7 +206,11 @@ function drawQuality(p) {
 function drawTemperature(p) {
   p.push();
   p.noFill();
-  p.stroke(255, 0, 0);
+  if(gvs.color) {
+    p.stroke(255, 0, 0);
+  } else {
+    p.stroke(0);
+  }
   p.strokeWeight(1);
   for(let i = 50; i <= 550; i += 50) {
     if(i == 200) {i += 50}
@@ -223,7 +231,11 @@ function drawCritical(p) {
   p.push();
   p.noFill();
   p.strokeWeight(2);
-  p.stroke(100, 0, 255);
+  if(gvs.color) {
+    p.stroke(100, 0, 255);
+  } else {
+    p.stroke(0);
+  }
   const temperature_array = gvs.coords.Tc;
   p.beginShape();
   for(let j = 0; j < temperature_array.length; j++) {
@@ -232,13 +244,20 @@ function drawCritical(p) {
     p.vertex(pix[0], pix[1]);
   }
   p.endShape();
+  p.strokeWeight(10);
+  const critical_pix = gvs.coordToPix(2084.26, 220.62);
+  p.point(critical_pix[0], critical_pix[1]);
   p.pop();
 }
 
 function drawDensity(p) {
   p.push();
   p.noFill();
-  p.stroke(155, 155, 0);
+  if(gvs.color) {
+    p.stroke(155, 155, 0);
+  } else {
+    p.stroke(0);
+  }
   p.strokeWeight(1);
   
   let density_array = gvs.coords.Rho1000;
@@ -364,7 +383,11 @@ function drawDensity(p) {
 function drawEntropy(p) {
   p.push();
   p.noFill();
-  p.stroke(255, 0, 155);
+  if(gvs.color) {
+    p.stroke(255, 0, 155);
+  } else {
+    p.stroke(0);
+  }
   p.strokeWeight(1);
   for(let i = 5; i <= 85; i += 5) {
     const variable_name = `S${Math.round(i)}`;
@@ -418,11 +441,27 @@ function drawLabels(p) {
 function drawAll(p) {
   drawPlot(p);
   drawEnvelope(p);
-  drawQuality(p);
-  drawTemperature(p);
-  drawCritical(p);
-  drawDensity(p);
-  drawEntropy(p);
+
+  if(gvs.show_quality) {
+    drawQuality(p);
+  }
+
+  if(gvs.show_temperature) {
+    drawTemperature(p);
+  }
+
+  if(gvs.show_density) {
+    drawDensity(p);
+  }
+
+  if(gvs.show_entropy) {
+    drawEntropy(p);
+  }
+
+  if(gvs.show_critical) {
+    drawCritical(p);
+  }
+
   drawLabels(p);
 }
 

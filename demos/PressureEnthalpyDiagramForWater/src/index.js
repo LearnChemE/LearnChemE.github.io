@@ -11,10 +11,15 @@ window.gvs = {
         height : 400,
         width : 650,
         axes_range : [[0, 3500], [0.05, 10000]], // [[xMin, xMax], [yMin, yMax]]
-        show_grid : true,
     },
     coords : {},
-    
+    show_quality : false,
+    show_temperature : false,
+    show_density : false,
+    show_entropy : false,
+    show_critical : false,
+    show_grid : true,
+    color : true,
 };
 
 const containerElement = document.getElementById("p5-container");
