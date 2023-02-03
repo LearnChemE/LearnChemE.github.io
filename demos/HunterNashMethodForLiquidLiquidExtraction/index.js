@@ -3,89 +3,85 @@
 window.g = {
   cnv: undefined,
  
-  gridTruth: false,
-  compTruth: false,
-  pointType : 'determine-e1',
-  
+  gridTruth: true,
+  pointType : 'plot-points',
+  feedMoleFracs : [0.53,0.05,0.42],
   mix : 'feed',
   tieSlider : 0,
-
   radius: 7,
-  points: [],
-  nP: 1,
-  dragPoint: null,
-
   phaseInfopx : [],
 
-  
-  R : [1,-100], // m and b values for right edge of triangle
+
+  // Info about triangle 
+  xtip : 475,
+  ytip : 70,
+  dx : 0,
+  dy : 0,
+  angle : 60,
+  L : [], // m and b value for left edge of triangle
+  R : [], // m and b values for right edge of triangle
 }
 
 let sFracs = {
   solu : 0,
-  solv : 0.05,
-  carr : 0.95,
+  solv : 1,
+  carr : 0,
 }
 
 let rFracs = {
-  solu : 0.02,
-  solv : 0.88,
-  carr : 0.10,
+  solu : 0.03,
+  solv : 0.01,
+  carr : 0.96,
 }
 
 // Holds info about tie lines slope and y-intercept and x & y coords of intercepts
 let tie = {
-  b : [500],
-  m : [0],
-  pos : [[195,555,500,500]],
   // x-coords of tie lines from mathematica
-  xLeft : [0.1014, 0.1036, 0.1072, 0.1127, 0.1218, 0.1391],
-  xRight : [0.8404, 0.7544, 0.6532, 0.5463, 0.4395, 0.3322],
+  xLeft : [0.03507,0.05151,0.07973,0.1258,0.1839],
+  xRight : [0.976,0.9318,0.8286,0.7182,0.5766],
 }
 
 function setup() {
-  g.cnv = createCanvas(700, 600);
+  g.cnv = createCanvas(800, 600);
 
   g.cnv.parent("graphics-wrapper");
 
   document.getElementsByTagName("main")[0].remove();
-  for (let i = 0; i < g.nP; i++) {
-    g.points.push(createVector(300, 250));
-  }
-  phaseToPixels();
-  tieInfo();
+  
+  // phaseToPixels();
+  // tieInfo();
+  triangleDataFill();
 
 }
 
 function draw() {
   background(250);
   triangleDraw();
-  disabler(); // This function is used for enabling/disabled the extraneous buttons
-  
-  switch (g.pointType){
-    case 'plot-points':
-      plotPoints();
-      break;
-    case 'mixing-point':
-      mixingPoint();
-      break;
-    case 'determine-e1':
-      determineE1();
-      break;
-    case 'operating-point':
-      operatingPoint();
-      break;
-    case 'count-stages':
-      countStages();
-      break;
-  }
+
  
-  push();
-  fill(0);
-  for (let p of g.points) {
-    circle(p.x, p.y, g.radius * 2);
-  }
-  pop();
+  
+  
+  // switch (g.pointType){
+  //   case 'plot-points':
+  //     plotPoints();
+  //     break;
+  //   case 'mixing-point':
+  //     mixingPoint();
+  //     break;
+  //   case 'determine-e1':
+  //     determineE1();
+  //     break;
+  //   case 'operating-point':
+  //     operatingPoint();
+  //     break;
+  //   case 'count-stages':
+  //     countStages();
+  //     break;
+  // }
+
+  
+ 
+  
 }
 
 const plotPointsOptions = document.getElementById("plot-points-options");
@@ -93,7 +89,8 @@ const pointType = document.getElementById("point-type");
 const sliderContainer = document.getElementById("slider-container");
 const firstRadio = document.getElementById("point-type").children;
 const gridLines = document.getElementById("grid-lines");
-const carrierComp = document.getElementById("carrier-compositions");
+const feedFracs = document.getElementById("feed-mole-fracs");
+
 
 
 const secondRadio = document.getElementById("plot-points-options").children;
@@ -105,9 +102,7 @@ const tie_label = document.getElementById("tie-slider-value");
 gridLines.addEventListener("change", () => {
   g.gridTruth = gridLines.checked;
 });
-carrierComp.addEventListener("change", () =>{
-  g.compTruth = carrierComp.checked;
-});
+
 
 for(let i = 0; i < firstRadio.length; i++){
   firstRadio[i].addEventListener("click",function (){
@@ -147,6 +142,24 @@ pointType.addEventListener("input", () => {
   }
 });
 
+feedFracs.addEventListener("change", function () {
+  const temp = feedFracs.value;
+
+  if(temp == "0.53/0.05/0.42"){
+    g.feedMoleFracs[0] = 0.53;
+    g.feedMoleFracs[1] = 0.05;
+    g.feedMoleFracs[2] = 0.42;
+  } else if (temp == "0.45/0.08/0.48"){
+    g.feedMoleFracs[0] = 0.45;
+    g.feedMoleFracs[1] = 0.08;
+    g.feedMoleFracs[2] = 0.48;
+  } else if (temp == "0.48/0.15/0.36"){
+    g.feedMoleFracs[0] = 0.48;
+    g.feedMoleFracs[1] = 0.15;
+    g.feedMoleFracs[2] = 0.36;
+  }
+});
+
 for(let i = 0; i < secondRadio.length; i++){
   secondRadio[i].addEventListener("click", function(){
     for(let j = 0; j < secondRadio.length; j++){
@@ -164,85 +177,6 @@ tie_slider.addEventListener("input", function(){
 });
 
 
-function disabler(){
-  switch (g.pointType){
-    case 'plot-points':
-      secondRadio.disabled = false;
-      tie_slider.disabled = true;
-      break;
-    case 'mixing-point':
-      secondRadio.disabled = true;
-      tie_slider.disabled = true;
-      break;
-    case 'determine-e1':
-      secondRadio.disabled = true;
-      tie_slider.disabled = true;
-      break;
-    case 'operating-point':
-      secondRadio.disabled = true;
-      tie_slider.disabled = true;
-      break;
-    case 'count-stages':
-      secondRadio.disabled = true;
-      tie_slider.disabled = false;
-      break;
-  }
-}
-
-// For manipulating the position of dot within the triangle (limited range of compositions)
-function mousePressed() {
-  for (let i = g.points.length - 1; i >= 0; i--) {
-    const isPressed = inCircle(g.points[i], g.radius);
-    if (isPressed) {
-      g.dragPoint = g.points.splice(i, 1)[0];
-      g.points.push(g.dragPoint);
-
-    }
-  }
-}
-
-function mouseDragged() {
-  let lx = 262.5; let rx = 316.5; // left and right x
-  let by = 288.5; let ty = 230; // top and bottom y
-
-  if(g.dragPoint){
-    if(mouseX < lx && mouseY > ty && mouseY < by){ // left of square within y-lims
-      g.dragPoint.x = lx;
-      g.dragPoint.y = mouseY;
-    } else if (mouseX < lx && mouseY < ty){ // left and above square
-      g.dragPoint.x = lx;
-      g.dragPoint.y = ty;
-    } else if (mouseX < lx && mouseY > by){ // left and below square
-      g.dragPoint.x = lx;
-      g.dragPoint.y = by;
-    } else if (mouseX > lx && mouseX < rx && mouseY < ty){ // above square
-      g.dragPoint.x = mouseX;
-      g.dragPoint.y = ty;
-    } else if (mouseX > rx && mouseY < ty){// right and above square
-      g.dragPoint.x = rx;
-      g.dragPoint.y = ty;
-    } else if (mouseX > rx && mouseY > ty && mouseY < by){ // right of square
-      g.dragPoint.x = rx;
-      g.dragPoint.y = mouseY;
-    } else if (mouseX > rx && mouseY >= by){ // right and below square
-      g.dragPoint.x = rx;
-      g.dragPoint.y = by;
-    } else if (mouseY > by){ // below square
-      g.dragPoint.x = mouseX;
-      g.dragPoint.y = by;
-    } else if (mouseX < rx && mouseX > lx && mouseY > ty && mouseY < by){ // within the square
-      g.dragPoint.x = mouseX;
-      g.dragPoint.y = mouseY;
-    }
-  }
-}
-
-function mouseReleased() {
-  g.dragPoint = null;
-}
-function inCircle(pos, radius) {
-  return dist(mouseX, mouseY, pos.x, pos.y) < radius;
-}
 
 
 // Copied from Mathematica's source code

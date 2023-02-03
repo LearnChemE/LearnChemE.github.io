@@ -5,7 +5,7 @@ window.g = {
  
   gridTruth: false,
   compTruth: false,
-  pointType : 'determine-e1',
+  pointType : 'plot-points',
   
   mix : 'feed',
   tieSlider : 0,
