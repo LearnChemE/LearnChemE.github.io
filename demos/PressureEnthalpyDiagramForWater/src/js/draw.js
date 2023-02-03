@@ -1,3 +1,22 @@
+function textBox(p, x, y, theta, text, color) {
+  p.push();
+  p.textAlign(p.CENTER, p.CENTER);
+  p.textSize(16);
+  p.noStroke();
+  p.fill(253);
+  const textLength = p.textWidth(text);
+  const textHeight = p.textAscent(text);
+  p.rectMode(p.CENTER);
+  const xPix = gvs.coordToPix(x, y)[0];
+  const yPix = gvs.coordToPix(x, y)[1];
+  p.translate(xPix, yPix);
+  p.rotate(theta * 2 * Math.PI / 360);
+  p.rect(0, 0, textLength + 2, textHeight + 2);
+  p.fill(color);
+  p.text(text, 0, 0);
+  p.pop();
+}
+
 function drawPlot(p) {
   const margins = gvs.plot.margins;
   const height = gvs.plot.height;
@@ -181,6 +200,9 @@ function drawEnvelope(p) {
 }
 
 function drawQuality(p) {
+  const color = gvs.color ? "rgb(0, 0, 150)" : "rgb(0, 0, 0)";
+  let label_coords = gvs.coords.Q0[11];
+  textBox(p, label_coords[0], label_coords[1], -45, `q = 0`, color);
   p.push();
   p.noFill();
   if(gvs.color) {
@@ -188,6 +210,7 @@ function drawQuality(p) {
   } else {
     p.stroke(0);
   }
+
   p.strokeWeight(1);
   for(let i = 10; i <= 90; i += 10) {
     const variable_name = `Q${Math.round(i)}`;
@@ -199,7 +222,11 @@ function drawQuality(p) {
       p.vertex(pix[0], pix[1]);
     }
     p.endShape();
+    const label_coords = quality_array[10];
+    textBox(p, label_coords[0], label_coords[1], -45, `${Math.round(i) / 100}`, color);
   }
+  label_coords = gvs.coords.Q100[10];
+  textBox(p, label_coords[0], label_coords[1], -45, `1.0`, color);
   p.pop();
 }
 
@@ -225,6 +252,18 @@ function drawTemperature(p) {
     p.endShape();
   }
   p.pop();
+
+  const color = gvs.color ? "rgb(255, 0, 0)" : "rgb(0, 0, 0)";
+  textBox(p, 1500, 0.12, 0, "T = 50° C", color);
+  textBox(p, 1600, 1.02, 0, "100", color);
+  textBox(p, 1800, 4.8, 0, "150", color);
+  textBox(p, 2000, 40, 0, "250", color);
+  textBox(p, 2100, 90, 0, "300", color);
+  textBox(p, 2150, 160, 0, "350", color);
+  textBox(p, 1950, 400, 20, "400", color);
+  textBox(p, 2130, 700, 30, "450", color);
+  textBox(p, 2320, 1000, 35, "500", color);
+  textBox(p, 2480, 1500, 40, "550", color);
 }
 
 function drawCritical(p) {
@@ -259,7 +298,8 @@ function drawDensity(p) {
     p.stroke(0);
   }
   p.strokeWeight(1);
-  
+  const color = gvs.color ? "rgb(155, 155, 0)" : "rgb(0, 0, 0)";
+
   let density_array = gvs.coords.Rho1000;
   p.beginShape();
   for(let j = 0; j < density_array.length; j++) {
@@ -268,6 +308,8 @@ function drawDensity(p) {
     p.vertex(pix[0], pix[1]);
   }
   p.endShape();
+  let textCoord = density_array[10];
+  textBox(p, textCoord[0], textCoord[1] - 150, -33, "ρ = 1000 kg/m³", color);
 
   density_array = gvs.coords.Rho950;
   p.beginShape();
@@ -277,6 +319,8 @@ function drawDensity(p) {
     p.vertex(pix[0], pix[1]);
   }
   p.endShape();
+  textCoord = density_array[10];
+  textBox(p, textCoord[0], textCoord[1] - 50, -33, "950", color);
 
   density_array = gvs.coords.Rho900;
   p.beginShape();
@@ -286,7 +330,9 @@ function drawDensity(p) {
     p.vertex(pix[0], pix[1]);
   }
   p.endShape();
-  
+  textCoord = density_array[10];
+  textBox(p, textCoord[0], textCoord[1] - 50, -33, "900", color);
+
   density_array = gvs.coords.Rho800;
   p.beginShape();
   for(let j = 0; j < density_array.length; j++) {
@@ -295,6 +341,8 @@ function drawDensity(p) {
     p.vertex(pix[0], pix[1]);
   }
   p.endShape();
+  textCoord = density_array[10];
+  textBox(p, textCoord[0], textCoord[1] - 50, -33, "800", color);
 
   density_array = gvs.coords.Rho700;
   p.beginShape();
@@ -304,6 +352,8 @@ function drawDensity(p) {
     p.vertex(pix[0], pix[1]);
   }
   p.endShape();
+  textCoord = density_array[10];
+  textBox(p, textCoord[0], textCoord[1] - 50, -30, "700", color);
 
   density_array = gvs.coords.Rho600;
   p.beginShape();
@@ -313,6 +363,8 @@ function drawDensity(p) {
     p.vertex(pix[0], pix[1]);
   }
   p.endShape();
+  textCoord = density_array[10];
+  textBox(p, textCoord[0], textCoord[1] - 50, -33, "600", color);
 
   density_array = gvs.coords.Rho400;
   p.beginShape();
@@ -322,6 +374,8 @@ function drawDensity(p) {
     p.vertex(pix[0], pix[1]);
   }
   p.endShape();
+  textCoord = density_array[8];
+  textBox(p, textCoord[0], textCoord[1] - 30, -18, "400", color);
 
   density_array = gvs.coords.Rho200;
   p.beginShape();
@@ -331,6 +385,8 @@ function drawDensity(p) {
     p.vertex(pix[0], pix[1]);
   }
   p.endShape();
+  textCoord = density_array[6];
+  textBox(p, textCoord[0], textCoord[1] - 30, -10, "200", color);
 
   density_array = gvs.coords.Rho50;
   p.beginShape();
@@ -340,6 +396,8 @@ function drawDensity(p) {
     p.vertex(pix[0], pix[1]);
   }
   p.endShape();
+  textCoord = density_array[3];
+  textBox(p, textCoord[0] + 300, textCoord[1] + 20, -10, "50", color);
 
   density_array = gvs.coords.Rho10;
   p.beginShape();
@@ -349,6 +407,8 @@ function drawDensity(p) {
     p.vertex(pix[0], pix[1]);
   }
   p.endShape();
+  textCoord = density_array[3];
+  textBox(p, textCoord[0] + 350, textCoord[1] + 5, -7, "10", color);
 
   density_array = gvs.coords.Rho2;
   p.beginShape();
@@ -358,6 +418,8 @@ function drawDensity(p) {
     p.vertex(pix[0], pix[1]);
   }
   p.endShape();
+  textCoord = density_array[3];
+  textBox(p, textCoord[0] - 100, textCoord[1] - 0.8, -7, "2", color);
 
   density_array = gvs.coords.Rho02;
   p.beginShape();
@@ -367,6 +429,8 @@ function drawDensity(p) {
     p.vertex(pix[0], pix[1]);
   }
   p.endShape();
+  textCoord = density_array[3];
+  textBox(p, textCoord[0] - 100, textCoord[1] - 0.07, -7, "0.2", color);
 
   density_array = gvs.coords.Rho002;
   p.beginShape();
@@ -399,6 +463,13 @@ function drawEntropy(p) {
       p.vertex(pix[0], pix[1]);
     }
     p.endShape();
+    const color = gvs.color ? "rgb(255, 0, 155)" : "rgb(0, 0, 0)";
+    const coords = entropy_array[12];
+    if(i == 5) {
+      textBox(p, coords[0] - 30, coords[1] - 500, -80, "S = 0.5 kJ/(kg K)", color);
+    } else {
+      textBox(p, coords[0], coords[1], -45, (Math.round(i) / 10).toFixed(1), color);
+    }
   }
   p.pop();
 }
