@@ -16,7 +16,7 @@ window.gvs = {
     show_quality : false,
     show_temperature : false,
     show_density : false,
-    show_entropy : true,
+    show_entropy : false,
     show_critical : false,
     show_grid : true,
     color : true,
