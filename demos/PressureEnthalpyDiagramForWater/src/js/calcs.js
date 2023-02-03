@@ -17,5 +17,4 @@ gvs.coordToPix = function(x, y) {
   const yPix = margins[1][0] + height - fraction_y * height;
 
   return [xPix, yPix]
-}
-
+};

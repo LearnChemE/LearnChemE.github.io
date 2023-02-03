@@ -12,7 +12,9 @@ window.gvs = {
         width : 650,
         axes_range : [[0, 3500], [0.05, 10000]], // [[xMin, xMax], [yMin, yMax]]
         show_grid : true,
-    }
+    },
+    coords : {},
+    
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -24,6 +26,7 @@ const sketch = (p) => {
         p.noLoop();
         gvs.p = p;
         gvs.drawAll = require("./js/draw.js");
+        require("./js/coords.js");
         require("./js/calcs.js");
         require("./js/inputs.js");
         

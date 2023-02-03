@@ -150,6 +150,245 @@ function drawPlot(p) {
 
   p.pop();
 
+}
+
+function drawEnvelope(p) {
+  p.push();
+  p.stroke(0);
+  p.strokeWeight(2);
+  p.noFill();
+  
+  const Q0 = gvs.coords.Q0;
+  const Q100 = gvs.coords.Q100;
+  
+  p.beginShape();
+  for(let i = 0; i < Q0.length; i++) {
+    const coord = Q0[i];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+  
+  p.beginShape();
+  for(let i = 0; i < Q100.length; i++) {
+    const coord = Q100[i];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+  
+  p.pop();
+}
+
+function drawQuality(p) {
+  p.push();
+  p.noFill();
+  p.stroke(0, 0, 150);
+  p.strokeWeight(1);
+  for(let i = 10; i <= 90; i += 10) {
+    const variable_name = `Q${Math.round(i)}`;
+    const quality_array = gvs.coords[variable_name];
+    p.beginShape();
+    for(let j = 0; j < quality_array.length; j++) {
+      const coord = quality_array[j];
+      const pix = gvs.coordToPix(coord[0], coord[1]);
+      p.vertex(pix[0], pix[1]);
+    }
+    p.endShape();
+  }
+  p.pop();
+}
+
+function drawTemperature(p) {
+  p.push();
+  p.noFill();
+  p.stroke(255, 0, 0);
+  p.strokeWeight(1);
+  for(let i = 50; i <= 550; i += 50) {
+    if(i == 200) {i += 50}
+    const variable_name = `T${Math.round(i)}`;
+    const temperature_array = gvs.coords[variable_name];
+    p.beginShape();
+    for(let j = 0; j < temperature_array.length; j++) {
+      const coord = temperature_array[j];
+      const pix = gvs.coordToPix(coord[0], coord[1]);
+      p.vertex(pix[0], pix[1]);
+    }
+    p.endShape();
+  }
+  p.pop();
+}
+
+function drawCritical(p) {
+  p.push();
+  p.noFill();
+  p.strokeWeight(2);
+  p.stroke(100, 0, 255);
+  const temperature_array = gvs.coords.Tc;
+  p.beginShape();
+  for(let j = 0; j < temperature_array.length; j++) {
+    const coord = temperature_array[j];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+  p.pop();
+}
+
+function drawDensity(p) {
+  p.push();
+  p.noFill();
+  p.stroke(155, 155, 0);
+  p.strokeWeight(1);
+  
+  let density_array = gvs.coords.Rho1000;
+  p.beginShape();
+  for(let j = 0; j < density_array.length; j++) {
+    const coord = density_array[j];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+
+  density_array = gvs.coords.Rho950;
+  p.beginShape();
+  for(let j = 0; j < density_array.length; j++) {
+    const coord = density_array[j];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+
+  density_array = gvs.coords.Rho900;
+  p.beginShape();
+  for(let j = 0; j < density_array.length; j++) {
+    const coord = density_array[j];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+  
+  density_array = gvs.coords.Rho800;
+  p.beginShape();
+  for(let j = 0; j < density_array.length; j++) {
+    const coord = density_array[j];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+
+  density_array = gvs.coords.Rho700;
+  p.beginShape();
+  for(let j = 0; j < density_array.length; j++) {
+    const coord = density_array[j];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+
+  density_array = gvs.coords.Rho600;
+  p.beginShape();
+  for(let j = 0; j < density_array.length; j++) {
+    const coord = density_array[j];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+
+  density_array = gvs.coords.Rho400;
+  p.beginShape();
+  for(let j = 0; j < density_array.length; j++) {
+    const coord = density_array[j];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+
+  density_array = gvs.coords.Rho200;
+  p.beginShape();
+  for(let j = 0; j < density_array.length; j++) {
+    const coord = density_array[j];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+
+  density_array = gvs.coords.Rho50;
+  p.beginShape();
+  for(let j = 0; j < density_array.length; j++) {
+    const coord = density_array[j];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+
+  density_array = gvs.coords.Rho10;
+  p.beginShape();
+  for(let j = 0; j < density_array.length; j++) {
+    const coord = density_array[j];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+
+  density_array = gvs.coords.Rho2;
+  p.beginShape();
+  for(let j = 0; j < density_array.length; j++) {
+    const coord = density_array[j];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+
+  density_array = gvs.coords.Rho02;
+  p.beginShape();
+  for(let j = 0; j < density_array.length; j++) {
+    const coord = density_array[j];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+
+  density_array = gvs.coords.Rho002;
+  p.beginShape();
+  for(let j = 0; j < density_array.length; j++) {
+    const coord = density_array[j];
+    const pix = gvs.coordToPix(coord[0], coord[1]);
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+
+  p.pop();
+}
+
+function drawEntropy(p) {
+  p.push();
+  p.noFill();
+  p.stroke(255, 0, 155);
+  p.strokeWeight(1);
+  for(let i = 5; i <= 85; i += 5) {
+    const variable_name = `S${Math.round(i)}`;
+    const entropy_array = gvs.coords[variable_name];
+    p.beginShape();
+    for(let j = 0; j < entropy_array.length; j++) {
+      const coord = entropy_array[j];
+      const pix = gvs.coordToPix(coord[0], coord[1]);
+      p.vertex(pix[0], pix[1]);
+    }
+    p.endShape();
+  }
+  p.pop();
+}
+
+function drawLabels(p) {
+  p.push();
+  p.noStroke();
+  p.fill(253);
+  p.rectMode(p.CORNERS);
+  p.rect(gvs.plot.margins[0][0] + gvs.plot.width + 1, 0, p.width, p.height);
+  p.rect(0, gvs.plot.margins[1][0] + gvs.plot.height + 1, p.width, p.height);
+  p.pop();
+
   p.push();
   p.noStroke();
   p.fill(0);
@@ -178,6 +417,13 @@ function drawPlot(p) {
 
 function drawAll(p) {
   drawPlot(p);
+  drawEnvelope(p);
+  drawQuality(p);
+  drawTemperature(p);
+  drawCritical(p);
+  drawDensity(p);
+  drawEntropy(p);
+  drawLabels(p);
 }
 
 module.exports = drawAll;
