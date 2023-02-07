@@ -4,9 +4,9 @@ window.g = {
   cnv: undefined,
  
   gridTruth: true,
-  pointType : 'plot-points',
+  pointType : 'count-stages',
   feedMoleFracs : [0.53,0.05,0.42],
-  mix : 'feed',
+  mix : 'raffinate',
   tieSlider : 0,
   radius: 7,
   phaseInfopx : [],
@@ -57,27 +57,26 @@ function setup() {
 function draw() {
   background(250);
   triangleDraw();
-
  
   
   
-  // switch (g.pointType){
-  //   case 'plot-points':
-  //     plotPoints();
-  //     break;
-  //   case 'mixing-point':
-  //     mixingPoint();
-  //     break;
-  //   case 'determine-e1':
-  //     determineE1();
-  //     break;
-  //   case 'operating-point':
-  //     operatingPoint();
-  //     break;
-  //   case 'count-stages':
-  //     countStages();
-  //     break;
-  // }
+  switch (g.pointType){
+    case 'plot-points':
+      plotPoints();
+      break;
+    case 'mixing-point':
+      mixingPoint();
+      break;
+    case 'determine-e1':
+      determineE1();
+      break;
+    case 'operating-point':
+      operatingPoint();
+      break;
+    case 'count-stages':
+      countStages();
+      break;
+  }
 
   
  
