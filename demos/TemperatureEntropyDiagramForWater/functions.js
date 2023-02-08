@@ -374,6 +374,16 @@ function pressureLineDraw(){
         fill(0,0,255);
         text('0.1 MPa',0,0);
         pop();
+
+        push();
+        translate(660,460);
+        rotate(radians(-73));
+        textSize(18); noStroke(); textStyle(ITALIC);
+        fill(255);
+        rect(-3,-12,83,15);
+        fill(0,0,255);
+        text('0.01 MPa',0,0);
+        pop();
     }
 }
 
