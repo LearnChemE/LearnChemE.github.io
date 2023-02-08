@@ -15,7 +15,7 @@
   align-items: center;
   width: 100vw;
   height: min-content;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .inputs-wrapper {
@@ -79,7 +79,7 @@ label {
 
 #modal-buttons {
   display: grid;
-  grid-template-columns: 80px 80px 80px; /* These were all previously 1fr. I changed them to hopefully get the on the same line as the feed,solvent,raffinate button or the slider once we can make them appear/disappear */
+  grid-template-columns: 100px 100px 100px; /* These were all previously 1fr. I changed them to hopefully get the on the same line as the feed,solvent,raffinate button or the slider once we can make them appear/disappear */
   gap: 5px;
   grid-column: 3;
   justify-self: end;
@@ -109,4 +109,18 @@ label {
   display: grid;
   grid-template-columns: repeat(2, 110px);
   align-content: center;
+}
+
+.simulation-controls {
+  display: grid;
+  grid-template-columns: 80px 80px 80px;
+  justify-content: center;
+  gap: 0px 20px;
+  width: 100vw;
+}
+
+.feed-mole-fracs span {
+  display: block;
+  line-height:1.7em;
+  font-size: 80%;
 }

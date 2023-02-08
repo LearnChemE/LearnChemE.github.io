@@ -599,7 +599,12 @@ function determineE1(){
     push();
     strokeWeight(2);
     line(xS,yS,xF,yF);
-    line(xR,yR,xe1,ye1);
+    if(e1Fracs[0] == .24 || e1Fracs[0] == .21){
+        line(xR,yR,xe1,ye1);
+    } else {
+        line(xR,yR,xe1,ye1+2);
+    }
+    
     pop();
 
     push();
@@ -918,6 +923,10 @@ function countStages(){
     }
     stages = stages + 1;
     labels();
+    push();
+    fill(0);
+    ellipse(xF,yF,2*g.radius);
+    pop();
     drawEquilibLines(ePoints,rPoints,stages);
 
     upperRightImage(); 
@@ -1039,9 +1048,9 @@ function countStages(){
                     ellipse(raf[i][0]+25,raf[i][1]-25,23*2);
                     textStyle(ITALIC);
                     noStroke(); fill(0); textSize(25);
-                    text('R',raf[i][0]+11,raf[i][1]-13);
+                    text('R',raf[i][0]+11,raf[i][1]-17);
                     textStyle(NORMAL); textSize(18);
-                    text('1',raf[i][0]+28,raf[i][1]-8);
+                    text('1',raf[i][0]+28,raf[i][1]-12);
                     pop();
 
                     push();
@@ -1107,8 +1116,6 @@ function countStages(){
     }
 
     push();
-    fill(0);
-    ellipse(xF,yF,2*g.radius);
     fill(255,0,0); stroke(255,0,0);
     ellipse(xS,yS,2*g.radius);
     fill(0,100,100); stroke(0,100,100);

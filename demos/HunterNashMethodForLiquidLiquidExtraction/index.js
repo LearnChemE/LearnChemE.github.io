@@ -4,10 +4,10 @@ window.g = {
   cnv: undefined,
  
   gridTruth: true,
-  pointType : 'count-stages',
+  pointType : 'plot-points',
   feedMoleFracs : [0.53,0.05,0.42],
-  mix : 'raffinate',
-  tieSlider : 2,
+  mix : 'feed',
+  tieSlider : 0,
   radius: 7,
   phaseInfopx : [],
 

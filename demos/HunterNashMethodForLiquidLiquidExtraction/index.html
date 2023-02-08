@@ -43,6 +43,15 @@
   <div id="master-wrapper">
   <div id="simulation-wrapper">
 
+    <div class="simulation-controls">
+      <div id="modal-buttons">
+        <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
+        <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+        <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>  
+      </div>
+    </div>
+    <div style="position:relative; top:20px">
+
     <div class="inputs-wrapper">
       <div class="btn-group btn-group-sm" id="point-type">
         <input type="radio" class="btn-check" name="main-radio" id="plot-points" autocomplete="off" value = "plot-points" checked>
@@ -71,21 +80,15 @@
       </div>
 
       <div class="select-row">
-        <div class="feed-mole-fracs">Feed mole fractions (solu/solv/car)</div>
+        <div class="feed-mole-fracs">Feed mole fractions <span>(solute/solvent/carrier)</span></div>
         <select id="feed-mole-fracs">
           <option value="0.53/0.05/0.42">0.53/0.05/0.42</option>
           <option value="0.45/0.08/0.48">0.45/0.08/0.48</option>
           <option value="0.48/0.15/0.36">0.48/0.15/0.36</option>
         </select>
       </div>
-      <div id="modal-buttons">
-        <div id="dir" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
-        <div id="detail" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
-        <div id="about" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
-        
-      </div>
+      
 
-   
       <div class="btn-group btn-group-sm" id="plot-points-options">
         <input type="radio" class="btn-check" name="plot-points-radio" id="feed" autocomplete="off" value="feed" checked>
         <label class="btn btn-outline-primary" for="feed" style="margin-right: 0px">Feed</label>
@@ -96,12 +99,13 @@
         <input type="radio" class="btn-check" name="plot-points-radio" id="raffinate" autocomplete="off" value="raffinate">
         <label class="btn btn-outline-primary" for="raffinate">Raffinate</label>
       </div>
-      <!--style="display: none;"-->
-      <div class="input-row" id="slider-container" >
+      
+      <div class="input-row" id="slider-container" style="display: none;">
         <div class="input-label">Draw tie lines</div>
         <input type="range" id="tie-slider" min="0" max="5" value="0" step="1" />
         <div id="tie-slider-value" class="value-label">0</div>
-      </div>     
+      </div>    
+    </div> 
 
     
     
@@ -125,12 +129,11 @@
       </div>
       <div class="modal-body">
           <p>
-            This simulation shows how to use the Hunter-Nash method on a right-triangle ternary phase diagram. Check "grid lines" to show grid lines on the diagram. Check "carrier compositions" to show the carrier mass fractions on the diagram. The Hunter-Nash method uses material balances and a ternary phase diagram with phase separation to determine the number of equilibrium stages needed for liquid-liquid extraction (LLE). The solvent mass flow rate and the desired raffinate (refined product) composition R <sub>N</sub> are given. Select "plot points" and then drag the black feed point (labeled with a circled F) to a desired feed composition within a restricted range of compositions. Use buttons to view the compositions of the feed F, solvent S, or raffinate R<sub>N</sub> in the solute (blue), solvent (red) and carrier (green) phases. Select "mixing point" to see how the mixing point M and the extract composition E<sub>1</sub> in the first stage are determined. Check "show E<sub>1</sub>" to show the extract composition. Next, select "operating point" to show how the operating point P is found.
+            This simulation shows how to use the Hunter-Nash method on an equilateral-triangle ternary phase diagram. The Hunter-Nash method uses material balances and a ternary phase diagram with phase separation to determine the number of equilibrium stages needed for liquid-liquid extraction (LLE). The system contains a solvent, carrier and solute. 
           </p>
           <p>
-            This simulation also displays a schematic of the flow system and mass balances. The operating point is used to determine the number of stages. Finally, select "count stages" to use the "draw tie lines" slider to determine the number of stages and the extract and raffinate compositions in each stage. The solid orange lines follow the black tie lines, and the dashed blue lines trace back to the operating point. A diagram of the stages is shown above the ternary phase diagram.
+            Use the drop-down menu to select a feed composition. The solvent mass flow rate is given, and the desired raffinate (refined product) composition \(R\)<sub>N</sub> is given. Select "plot-points" to display the feed (\(F\)), solvent (\(S\)) or raffinate (\(R\)<sub>N</sub>) on the phase diagram. Select "mixing point" to see how the lever rule is used to determine the mixing point (\(M\)). Select "Determine E<sub>1</sub>" to see how the extract composition from the first stage is found. Next, select "operating point" to see how the operating point (\(P\)) is found and a small schematic of the flow system will be displayed. Finally, select "count stages" to use the "draw tie lines" slider to see how to determine the number of stages and show the raffinate composition leaving each stage. For any of the displays, check "grid lines" to display grid lines on the ternary diagram.
           </p>
-          
       </div>
     </div>
   </div>
@@ -151,40 +154,57 @@
       <div class="modal-body">
 
         <div class="modal-text">
-          The feed composition is selected within a narrow range of compositions, but the solvent composition and the desired raffinate composition are specified. The extract composition and the number of stages to obtain the desired raffinate composition are determined by mass balances. First, the composition of the mixing point is calculated and located on the ternary phase diagram. The mixing point corresponds to the composition that would be obtained if the feed and the solvent flows were mixed together.
-        </div>
-        <div class="modal-text">
-          The mixing point \(M\) is located on the phase diagram between the feed and solvent points:
+        The feed (\(f\) = 1000 kg/hr) flow rate, solvent (\(s\) = 1500 kg/hr) flow rate and feed composition (select one of three compositions) are given. The desired raffinate composition is specified, and the extract composition and the number of stages to obtain the desired raffinate composition are determined by mass balances. First, the mixing point composition is calculated and located on the ternary phase diagram. The mixing point corresponds to the composition that would be obtained if the feed and the solvent flows were mixed together:
         </div>
         <div class="modal-equation">
           $$
-          M = \frac{x^F + x^S}{2},
+          f + s = m,
           $$
         </div>
         <div class="modal-text">
-          where \(x^F\) and \(x^S\) are the feed and solvent compositions.
+          solute A: \(x_A^Ff = x_A^Mm\) (because the solvent feed contains no solute),
         </div>
         <div class="modal-text">
-          A line is drawn from the desired raffinate composition \(R_N\) through the mixing point until it intersects the phase boundary; this gives the extract composition \(E_1\) leaving stage 1.
+          solvent S: \(x_S^Ff + s = x_S^Mm\),
         </div>
         <div class="modal-text">
-          The operating point \(P\) is located at the intersection of a line drawn through points \(F\) and \(E_1\) and a line drawn through \(R_N\) and \(S\) because the overall mass balance for the system is:
+          carrier C: \(x_A^M + x_S^M + x_C^M = 1\).
+        </div>
+        <div class="modal-text">
+          Here \(m\) is the combined feed and solvent flow rate (kg/hr) and \(x_A^i\), \(x_S^i\), \(x_C^i\) refer to the mass fractions of solute, solvent, and carrier in \(i\) (feed F, solvent S, mixed M), which is the stream fed to the cascade.
+        </div>
+        <div class="modal-text">
+          The mixing point \(M\) is located on the phase diagram using the lever rule:
         </div>
         <div class="modal-equation">
           $$
-          F + S = E_1 + R_N.
+          s/f = \overline{MF}/\overline{MS} = 1500/1000 = 1.5,
           $$
         </div>
         <div class="modal-text">
-          This equation is rearranged to determine the operating point:
+          where \(\overline{MF}\) is the line segment from the mixing point M to the feed location \(F\), and \(\overline{MS}\) is the line segment from the mixing point \(M\) to the solvent location \(S\).
+        </div>
+        <div class="modal-text">
+          A line drawn from the desired raffinate composition \(R\)<sub>N</sub> through the mixing point until it intersects the phase  boundary gives the extract composition leaving stage 1, \(E\)<sub>1</sub>.
+        </div>
+        <div class="modal-text">
+          The operating point \(P\) is located at the intersection of a line drawn through points \(F\) and \(E\)<sub>1</sub> and a line drawn through \(R\)<sub>N</sub> and \(S\) because the overall mass balance for the system is:
         </div>
         <div class="modal-equation">
           $$
-          P = E_1 - F = R_N - S.
+          F + S = E_1 R_N.
           $$
         </div>
         <div class="modal-text">
-          A tie line from \(E_1\) to the right side of the phase boundary yields the raffinate composition \(R_1\) leaving stage 1; this line represents the first equilibrium stage (orange).
+          This equation is rearranged to define the operating point:
+        </div>
+        <div class="modal-equation">
+          $$
+          P = E_1 - F = R_N  - S.
+          $$
+        </div>
+        <div class="modal-text">
+          A tie line from \(E\)<sub>1</sub> to the right side of the phase boundary yields the raffinate composition leaving stage 1, \(R\)<sub>1</sub>; this line represents the first equilbrium stage (orange).
         </div>
         <div class="modal-text">
           A mass balance in stage 1 (total feed in = total feed out) is:
@@ -208,6 +228,7 @@
         <div class="modal-text">
           This procedure is repeated for additional stages until the raffinate composition is nearly equal to the desired value of \(R_N\) without being less than \(R_N\). The number of orange equilibrium lines drawn is the number of equilibrium stages needed to obtain \(R_N\).
         </div>
+        
     
 
         <div class="modal-text">
