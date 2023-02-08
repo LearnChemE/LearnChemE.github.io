@@ -1200,7 +1200,7 @@ function nextExtract(r,op){
             ye = m1*xe + b1;
         } else if (yC <= yU && yC > yUU){
             xe = g.phaseInfopx[i+1][0];
-            ye = g.phaseInfopx[i+1][0];
+            ye = g.phaseInfopx[i+1][1];
         }
     }
     return([xe,ye]);
@@ -1214,12 +1214,13 @@ function nextRaffinate(e){
     for(let i = 0; i < tie.m.length; i++){
         yVals[i] = tie.m[i]*e[0] + tie.b[i];
     }
-
+    
     let dY, dC, mx, xL, xR, yL, yR, bx;
     for(let i = 0; i < tie.m.length-1; i++){
         if(e[1] < yVals[i] && e[1] > yVals[i+1]){
             dY = yVals[i] - yVals[i+1];
             dC = yVals[i]-e[1];
+            console.log(dC/dY)
 
             mx = tie.m[i]*(1-dC/dY) + tie.m[i+1]*(dC/dY);
             bx = e[1] - mx*e[0];

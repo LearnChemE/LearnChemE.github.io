@@ -875,8 +875,53 @@ function countStages(){
     xP = (b2 - b1)/(m1 - m2); // x solution for where the lines connect
     yP = m1*xP + b1; // y location at that point
 
-    upperRightImage(); 
+
+    let ePoints = [];
+    let rPoints = [];
+
+    // Stop at R4
+    ePoints.push([xe1,ye1]); // E1
+    rPoints.push(nextRaffinate(ePoints[0])); // R1
+
+    ePoints.push(nextExtract(rPoints[0],[xP,yP])); // E2
+    rPoints.push(nextRaffinate(ePoints[1])); // R2
+
+    ePoints.push(nextExtract(rPoints[1],[xP,yP])); // E3
+    rPoints.push(nextRaffinate(ePoints[2])); // R3
+
+    if(g.feedMoleFracs[0] != .48){
+        ePoints.push(nextExtract(rPoints[2],[xP,yP])); // E4
+        rPoints.push(nextRaffinate(ePoints[3])); // R4
+    }
+    
+
+
+    let test = false;
+    let stages; 
+    let counter = 0;
+
+    while(!test){
+        if(g.feedMoleFracs[0] != .48){
+            if(rPoints[counter][0] > xR || counter == 3){
+                stages = counter;
+                test = true;
+            }
+            counter++;
+        } else {
+            if(rPoints[counter][0] > xR || counter == 2){
+                stages = counter;
+                test = true;
+            }
+            counter++;
+        }
+        
+    }
+    stages = stages + 1;
     labels();
+    drawEquilibLines(ePoints,rPoints,stages);
+
+    upperRightImage(); 
+
     function upperRightImage(){
         push();
         strokeWeight(2);
@@ -928,8 +973,8 @@ function countStages(){
         pop();
         push();
         textSize(25);
-        text('number of orange lines = ',40,170);
-        text('number of stages needed',40,200);
+        text('number of orange lines = ',40,145);
+        text('number of stages needed',40,170);
         pop();
     }
 
@@ -976,6 +1021,89 @@ function countStages(){
         textStyle(ITALIC); textSize(30);
         text('P',xP-34,yP-14);
         pop();
+    }
+
+  
+    function drawEquilibLines(ex,raf,stages){
+        if(g.tieSlider <= stages){
+            for(let i = 0; i < g.tieSlider; i++){
+                push();
+                strokeWeight(2); stroke(255,100,51);
+                line(ex[i][0],ex[i][1],raf[i][0],raf[i][1]);
+                noStroke(); fill(0,100,190);
+                ellipse(raf[i][0],raf[i][1],2*g.radius);
+                pop();
+                if(g.tieSlider == 1){
+                    push(); 
+                    fill(255); stroke(0); strokeWeight(1.5);
+                    ellipse(raf[i][0]+25,raf[i][1]-25,23*2);
+                    textStyle(ITALIC);
+                    noStroke(); fill(0); textSize(25);
+                    text('R',raf[i][0]+11,raf[i][1]-13);
+                    textStyle(NORMAL); textSize(18);
+                    text('1',raf[i][0]+28,raf[i][1]-8);
+                    pop();
+
+                    push();
+                    noStroke(); fill(255,100,51);
+                    rect(80+70*i,30,35,70);
+                    pop();
+                } else if (i > 0 && i == g.tieSlider-1){
+                    push(); stroke(0,100,190); strokeWeight(2);
+                    drawingContext.setLineDash([5,5]);
+                    line(raf[i-1][0],raf[i-1][1],xP,yP);
+                    pop();
+
+                    push();
+                    fill(255); stroke(0); strokeWeight(1.5);
+                    ellipse(raf[i][0]+25,raf[i][1]-25,23*2);
+                    ellipse(ex[i][0]-25,ex[i][1]-25,23*2);
+                    textStyle(ITALIC);
+                    noStroke(); fill(0); textSize(27);
+                    text('R',raf[i][0]+11,raf[i][1]-17);
+                    text('E',ex[i][0]-38,ex[i][1]-18);
+                    textStyle(NORMAL); textSize(18);
+                    text(i+1,raf[i][0]+30,raf[i][1]-10);
+                    text(i+1,ex[i][0]-21,ex[i][1]-12);
+                    pop();
+
+                    push();
+                    noStroke(); fill(255,100,51);
+                    for(let j = i; j >= 0; j--){
+                        rect(80+70*j,30,35,70);
+                    }
+                    pop();
+                }
+                push();
+                fill(255,100,51); noStroke();
+                ellipse(ex[i][0],ex[i][1],2*g.radius);
+                pop();
+            }
+            push();
+            textSize(25); noStroke();
+            text(g.tieSlider+' equilibrium stages drawn',20,225);
+            pop();
+        } else {
+            for(let i = 0; i < stages; i++){
+                push();
+                strokeWeight(2); stroke(255,100,51);
+                line(ex[i][0],ex[i][1],raf[i][0],raf[i][1]);
+                noStroke(); fill(0,100,190);
+                ellipse(raf[i][0],raf[i][1],2*g.radius);
+                fill(255,100,51);
+                ellipse(ex[i][0],ex[i][1],2*g.radius);
+                pop();
+
+                push();
+                noStroke(); fill(255,100,51);
+                rect(80+70*i,30,35,70);
+                pop();
+            }
+            push();
+            textSize(25);
+            text(stages+' equilibrium stages drawn',20,225);
+            pop();
+        }
     }
 
     push();
@@ -1027,5 +1155,98 @@ function arrow(base,tip,color,arrowLength,arrowWidth){
     stroke(color); fill(color);
     triangle(vert[0],vert[1],vert[2],vert[3],vert[4],vert[5]);
     pop();
+
+}
+
+function nextExtract(r,op){
+    // Line from raffinate point to operating point
+    // Find intersection of that line with phase envelope to get next extract point
+
+    let x1, x2, y1, y2;
+    let m1, b1, m2, b2;
+
+    x1 = op[0]; y1 = op[1];
+    x2 = r[0]; y2 = r[1];
+
+    m1 = (y2-y1)/(x2-x1);
+    b1 = y1 - m1*x1;
+
+    let yL, yU, yC, yUU;
+    let xe, ye;
+
+    for(let i = 0; i < 50; i++){
+        yL = tie.pix[i][1];
+        yU = tie.pix[i+1][1];
+        yC = m1*tie.pix[i][0] + b1;
+        yUU = tie.pix[i+2][1];
+        if(yC <= yL && yC >= yU){
+            m2 = (yL-yU)/(tie.pix[i][0]-tie.pix[i+1][0]);
+            b2 = yL - m2*tie.pix[i][0];
+            xe = (b2-b1)/(m1-m2);
+            ye = m1*xe + b1;
+        } else if (yC <= yU && yC > yUU){
+            xe = tie.pix[i+1][0];
+            ye = tie.pix[i+1][1];
+        }
+    }
+    return([xe,ye]);
+}
+
+function nextRaffinate(e){
+    let yVals = new Array(6);
+    for(let i = 0; i < tie.m.length; i++){
+        yVals[i] = tie.m[i]*e[0] + tie.b[i];
+    }
+   
+
+    let dY, dC, mx, xR, yR, bx;
+    for(let i = 0; i < tie.m.length-1; i++){
+        if(e[1] < yVals[i] && e[1] > yVals[i+1]){
+            dY = yVals[i] - yVals[i+1];
+            dC = yVals[i] - e[1];
+    
+            mx = tie.m[i]*(1-dC/dY) + tie.m[i+1]*(dC/dY);
+            bx = e[1] - mx*e[0];
+    
+            xR = tie.pos[i][1]*(1-dC/dY) + tie.pos[i+1][1]*(dC/dY);
+            yR = mx*xR + bx;
+        
+        } else if (e[1] == g.ytip+g.dy){
+            xR = map(.99,0,1,g.xtip-g.dx,g.xtip+g.dx);
+            yR = g.ytip + g.dy;
+        }
+    }
+
+    
+    return([xR,yR]);
+}
+
+// Gets m and b values of the tie lines and generates pixel array for the phase locations
+function phaseInfo(){
+    for(let i = 0; i < 1; i += 0.01){
+        let x = map(i,0,1,g.xtip-g.dx,g.xtip+g.dx);
+        let y = map(-1.551*i**2 + 1.536*i,0,3**(1/2)/2,g.ytip+g.dy,g.ytip);
+        tie.pix.push([x,y]);
+    }
+
+    for(let i = 0; i < tie.xLeft.length; i++){
+        let x1 = map(tie.xLeft[i],0,1,g.xtip-g.dx,g.xtip+g.dx);
+        let x2 = map(tie.xRight[i],0,1,g.xtip-g.dx,g.xtip+g.dx);
+        let y1 = map(-1.551*tie.xLeft[i]**2 + 1.536*tie.xLeft[i],0,3**(1/2)/2,g.ytip+g.dy,g.ytip);
+        let y2 = map(-1.551*tie.xRight[i]**2 + 1.536*tie.xRight[i],0,3**(1/2)/2,g.ytip+g.dy,g.ytip);
+
+        let m = (y2 - y1)/(x2 - x1);
+        let b = y1 - m*x1;
+        tie.m.push(m);
+        tie.b.push(b);
+        tie.pos.push([x1,x2,y1,y2]);
+    }
+
+    let x1 = g.xtip-g.dx;
+    let x2 = map(.99,0,1,g.xtip-g.dx,g.xtip+g.dx);
+
+    tie.m.splice(0,0,0);
+    tie.b.splice(0,0,g.ytip+g.dy);
+    tie.pos.splice(0,0,[x1,x2,g.ytip+g.dy,g.ytip+g.dy]);
 
 }

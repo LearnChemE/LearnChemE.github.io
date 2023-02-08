@@ -7,7 +7,7 @@ window.g = {
   pointType : 'count-stages',
   feedMoleFracs : [0.53,0.05,0.42],
   mix : 'raffinate',
-  tieSlider : 0,
+  tieSlider : 2,
   radius: 7,
   phaseInfopx : [],
 
@@ -39,6 +39,10 @@ let tie = {
   // x-coords of tie lines from mathematica
   xLeft : [0.03507,0.05151,0.07973,0.1258,0.1839],
   xRight : [0.976,0.9318,0.8286,0.7182,0.5766],
+  m : [],
+  b : [],
+  pos : [],
+  pix : [],
 }
 
 function setup() {
@@ -51,13 +55,14 @@ function setup() {
   // phaseToPixels();
   // tieInfo();
   triangleDataFill();
+  phaseInfo();
 
 }
 
 function draw() {
   background(250);
   triangleDraw();
- 
+  
   
   
   switch (g.pointType){
@@ -175,29 +180,6 @@ tie_slider.addEventListener("input", function(){
   g.tieSlider = temp;
 });
 
-
-
-
-// Copied from Mathematica's source code
-const phaseInfo = [[0.1, 0], [0.1021, 0.05104], [0.105, 0.098], [0.108, 0.1422], [0.113, 0.183], [0.1181, 0.22], [0.125, 0.254], [0.132, 0.2853], [0.14, 0.313], [0.149, 0.338], [0.159, 0.36], [0.17, 0.379], [0.181, 0.396], [0.194, 0.4093], [0.2082, 0.42], [0.222, 0.429], [0.2382, 0.435], [0.254, 0.438], [0.271, 0.44], [0.29, 0.438], [0.309, 0.435], [0.329, 0.429], [0.3503, 0.422], [0.372, 0.4123], [0.395, 0.4], [0.419, 0.387], [0.444, 0.371], [0.4703, 0.354], [0.497, 0.335], [0.525, 0.315], [0.554, 0.292], [0.584, 0.269], [0.615, 0.244], [0.647, 0.217], [0.68, 0.19], [0.714, 0.161], [0.749, 0.131], [0.785, 0.099], [0.8231, 0.067], [0.861, 0.034], [0.9, 0.]];
-// Adds additional points to help the resolution on whether or not the dot is within the phase envelope
-for (let i = 0; i < phaseInfo.length - 1; i += 2) {
-  let x, y;
-  x = phaseInfo[i][0] + 1 / 2 * (phaseInfo[i + 1][0] - phaseInfo[i][0]);
-  y = phaseInfo[i][1] + 1 / 2 * (phaseInfo[i + 1][1] - phaseInfo[i][1]);
-  phaseInfo.splice(i + 1, 0, [x, y]);
-}
-
-
-// For converting the phase info to pixel coordinates
-function phaseToPixels(){
-  for(let i = 0; i < phaseInfo.length; i++){
-    let x,y;
-    x = map(phaseInfo[i][0],0,1,150,600);
-    y = map(phaseInfo[i][1],0,1,500,50);
-    g.phaseInfopx.push([x,y]);
-  }
-}
 
 // Data for generating squiggle thing in operating point mode
 let squiggle = [[145.7205387205387, 11.176206509539844],[148.72951739618406, 16.334455667789],[154.31762065095398, 29.230078563411897],[147.86980920314255, 44.704826038159375],[154.74747474747474, 63.61840628507295],[147.43995510662177, 80.38271604938272],[154.74747474747474, 96.71717171717172],[147.86980920314255, 113.91133557800225],[147.86980920314255, 122.93827160493828]]
