@@ -3,7 +3,7 @@
 window.g = {
   cnv: undefined,
  
-  gridTruth: true,
+  gridTruth: false,
   pointType : 'plot-points',
   feedMoleFracs : [0.53,0.05,0.42],
   mix : 'feed',
