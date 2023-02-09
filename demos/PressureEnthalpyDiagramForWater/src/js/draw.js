@@ -173,7 +173,11 @@ function drawPlot(p) {
 
 function drawEnvelope(p) {
   p.push();
-  p.stroke(0);
+  if(gvs.show_critical) {
+    p.stroke(155, 155, 255);
+  } else {
+    p.stroke(0);
+  }
   p.strokeWeight(2);
   p.noFill();
   
@@ -188,6 +192,12 @@ function drawEnvelope(p) {
   }
   p.endShape();
   
+  if(gvs.show_critical) {
+    p.stroke(255, 200, 200);
+  } else {
+    p.stroke(0);
+  }
+
   p.beginShape();
   for(let i = 0; i < Q100.length; i++) {
     const coord = Q100[i];
@@ -196,6 +206,12 @@ function drawEnvelope(p) {
   }
   p.endShape();
   
+  if(gvs.show_critical) {
+    p.noStroke();
+    textBox(p, 800, 10, -45, "saturated liquid", "rgb(155, 155, 255)");
+    textBox(p, 2720, 3, -78, "saturated vapor", "rgb(255, 200, 200)");
+  }
+
   p.pop();
 }
 
@@ -286,6 +302,9 @@ function drawCritical(p) {
   p.strokeWeight(10);
   const critical_pix = gvs.coordToPix(2084.26, 220.62);
   p.point(critical_pix[0], critical_pix[1]);
+  if(gvs.show_critical) {
+    textBox(p, 3220, 1, -90, "critical temperature", "rgb(0, 0, 255)");
+  }
   p.pop();
 }
 
