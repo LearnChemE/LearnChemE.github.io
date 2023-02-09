@@ -95,11 +95,6 @@ label {
   transform: translateX(-30px);
 }
 
-.modal-body .modal-text {
-  max-width: 70ch;
-  text-align: justify;
-}
-
 .modal-body .modal-equation {
   width: max-content;
   margin-left: 15px;
