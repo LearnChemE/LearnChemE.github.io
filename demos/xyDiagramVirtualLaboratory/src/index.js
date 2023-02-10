@@ -89,7 +89,7 @@ while(gvs.yA(0.05) > 0.5 || gvs.yA(0.05) < 0.05) {
         const P = 760; // atmospheric pressure, mmHg
         let delta = 1e6;
         let T_sat = -273.1;
-        for(let T = -273.1; T < 1000; T += 0.1) {
+        for(let T = -273.1; T < 200; T += 0.01) {
             const PsatA = gvs.PsatA(T);
             const PsatB = gvs.PsatB(T);
             const Psat_mixture = xA * gvs.gamma_A(xA) * PsatA + xB * gvs.gamma_B(xA) * PsatB;
