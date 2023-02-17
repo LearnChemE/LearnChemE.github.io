@@ -35,7 +35,61 @@
 
 <body>
     <div id="simulation-wrapper">
+      <div class="simulation-controls">
+        <div id="modal-buttons">
+          <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
+          <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+          <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>  
+        </div>
+      </div>
 
+
+      <div class="inputs-wrapper">
+
+        <button type="button" class="btn btn-primary" id="new-problem">New problem</button>
+
+        <div class="select-container">
+          <form class="form-inline">
+            <label class="checkbox-inline">
+              <input type="checkbox" id="hint"> Hint 
+              <span class="checkmark"></span>
+            </label>
+            <label class="checkbox-inline">
+              <input type="checkbox" id="solution"> Solution
+              <span class="checkmark"></span>
+            </label>
+          </form>
+        </div>
+
+        <button type="button" class="btn btn-success" id="next-part">Next</button>
+        
+      </div>
+
+        <!-- Answer choices -->
+        <div style = "position:relative;left:calc(50vw - 210px);">
+          <span>Answer choices: </span>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="answerChoices" id="answerA" value="A">
+            <label class="form-check-label" for="answerA">A</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="answerChoices" id="answerB" value="B">
+            <label class="form-check-label" for="answerB">B</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="answerChoices" id="answerC" value="C">
+            <label class="form-check-label" for="answerC">C</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="answerChoices" id="answerD" value="D">
+            <label class="form-check-label" for="answerD">D</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="answerChoices" id="answerE" value="E">
+            <label class="form-check-label" for="answerE">E</label>
+          </div>
+        </div>
+      
     </div>
 
     <div id="graphics-wrapper">

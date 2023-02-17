@@ -5,7 +5,7 @@ function frameDraw(){
     push();
     fill(0);
     for(let i = 0; i <= 2; i++){ // Arrows that indicate air flow
-        rect(640+50*i, 230, 1, 300);
+        rect(640+50*i, 230, 1, 200);
         triangle(630+50*i,230,650+50*i,230,640+50*i,200);
     }
     textSize(25); noStroke();
@@ -42,6 +42,25 @@ function frameDraw(){
             rect(70+170*i,100,160,450);
         } 
     }
+    pop();
+
+    // Lines that approximate resistance between walls
+    push();
+    if(g.Rtc != 0){
+        for(let i = 0; i < 2; i++){
+
+            let j = 0;
+            let shift = 1/g.Rtc/2;
+            while(110+j*shift <= 600){
+                line(230+170*i,100+j*shift,240+170*i,110+j*shift);
+                line(240+170*i,100+j*shift,230+170*i,110+j*shift);    
+                j++;
+            }
+            console.log('hello');
+        }
+    }
+    fill(250); noStroke();
+    rect(228,551,200,150);
     pop();
 
     // Insulation lines
@@ -91,12 +110,12 @@ function frameDraw(){
 // This is used to modify the alpha value to highlight the wall segment that is generating heat
 function alphaManipulation(){
     if(g.alfa < 255 && g.upORdown){
-        g.alfa++;
+        g.alfa += 1.2;
         if(g.alfa >= 255){
             g.upORdown = false;
         }
     } else if (!g.upORdown){
-        g.alfa--;
+        g.alfa -= 1.2;
         if(g.alfa <= 25){
             g.upORdown = true;
         }
@@ -138,8 +157,26 @@ function assignThermalProps(){
 
 function question(){
     push();
-    textSize(27);
-    text('Heat generation in wall '+g.heatWall+' = '+g.Q+' kW/m.',70,85);
+    textSize(22);
+    if(g.problemPart == 0){
+        text('Select the button that shows the correct temperature profile for wall A.',70,40);
+    } else if (g.problemPart == 1 && !nextPart.disabled){
+        text('Select the button that shows the correct temperature profile for wall B.',70,40);
+    } else if (nextPart.disabled){
+        text('Select the button that shows the correct temperature profile for wall C.',70,40);
+    }
+
+    text('Heat generation in wall '+g.heatWall+' = '+g.Q+' kW/m.',70,65);
+    if(g.Rtc == 0){
+        text('Contact resistance between walls: '+g.Rtc+' [m  K]/W',70,90);
+        push(); textSize(17);
+        text('2',453,83);
+        pop();
+    } else {
+        text('Contact resistance between walls: '+g.Rtc+' [m  K]/W',70,90);
+        textSize(17);
+        text('2',483,83);
+    }
     pop();
 }
 
@@ -193,4 +230,12 @@ function arrow(base,tip,color,arrowLength,arrowWidth){
     triangle(vert[0],vert[1],vert[2],vert[3],vert[4],vert[5]);
     pop();
 
+}
+
+function solveProblemA(){
+
+}
+
+function solveProblemB(){
+    
 }
