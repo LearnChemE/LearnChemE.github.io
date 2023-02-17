@@ -4,9 +4,14 @@ window.g = {
     upORdown: true,
 
     heatWall: 'A',
-    kvalues: [0,0,0], // W/m-K
+    kvalues: [0,0,0], // W/m-K (A,B,C)
     Rtc: 0.08, // m^2-K/W
     Q: 0, // kW/M
+    length: 20/1000, // 20 mm for each wall
+    h: 10, // W/[m^2-K]
+    Tinf: 20, // C
+
+    wallX: [570,410,400,240,230,70], // Positions of wall edges
 
     answers: [0,0,0,0,0],
     chosenAnswer: null,
@@ -32,6 +37,10 @@ function draw(){
     alphaManipulation();
     frameDraw();
     question();
+
+    if(g.heatWall == 'A'){
+        solveProblemA();
+    }
     
     
     

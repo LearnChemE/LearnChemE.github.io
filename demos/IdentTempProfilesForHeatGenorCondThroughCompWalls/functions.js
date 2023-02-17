@@ -56,7 +56,6 @@ function frameDraw(){
                 line(240+170*i,100+j*shift,230+170*i,110+j*shift);    
                 j++;
             }
-            console.log('hello');
         }
     }
     fill(250); noStroke();
@@ -136,7 +135,7 @@ function assignThermalProps(){
     let temp;
 
     // Wall A
-    temp = 25 + Math.round(Math.random()*5); // Between .25 and .3
+    temp = 20 + Math.round(Math.random()*5); // Between .25 and .3
     g.kvalues[0] = (temp/100).toFixed(2);
 
     // Wall B
@@ -148,10 +147,10 @@ function assignThermalProps(){
     g.kvalues[2] = (temp/100).toFixed(2);
 
     // Thermal resistance
-    g.Rtc = Math.round(Math.random()*8)/100;
+    g.Rtc = Math.round(Math.random()*4)/100;
 
     // Thermal generation
-    g.Q = 7 + Math.round(Math.random()*3);
+    g.Q = 3 + Math.round(Math.random()*3);
 
 }
 
@@ -232,10 +231,49 @@ function arrow(base,tip,color,arrowLength,arrowWidth){
 
 }
 
+// Generates the correct solution when wall A is generating heat
 function solveProblemA(){
+    // Heat flux
+    let HF = g.length*g.Q*1000; // Heatflux
+    let tempVec = new Array(5); // Vec to hold temperatures
+    
+    tempVec[0] = HF/g.h + g.Tinf; // Ts1
+    tempVec[1] = HF*g.length/g.kvalues[2] + tempVec[0]; // Ts2
+    tempVec[2] = HF*g.Rtc + tempVec[1]; // Ts3
+    tempVec[3] = HF*g.length/g.kvalues[1] + tempVec[2]; // Ts4
+    tempVec[4] = HF*g.Rtc + tempVec[3]; // Ts5
 
+    let c2 = tempVec[4] + g.Q*g.length**2*1000/(2*g.kvalues[0]);
+   
+    let Acurve = [];
+    for(let i = 0; i < 11; i++){
+        let x = 0.02*i;
+        let y = -1*g.Q*x**2/(2*g.kvalues[0]) + c2;
+        Acurve.push([x,y]);
+    }
+
+    console.log(c2,tempVec[0])
+    let upperLim = 80; let lowerLim = 25;
+    let upperPx = 120; let lowerPx = 300;
+    for(let i = 0; i < tempVec.length; i++){
+        let y = map(tempVec[i],lowerLim,upperLim,lowerPx,upperPx);
+        ellipse(g.wallX[i],y,10);
+    }
+
+    push(); strokeWeight(2); noFill();
+    beginShape();
+    for(let i = 0; i < Acurve.length; i += 2){
+        let x = map(Acurve[i][0],0,.2,g.wallX[5],g.wallX[4]);
+        let y = map(Acurve[i][1],lowerLim,upperLim,lowerPx,upperPx);
+        vertex(x,y)
+    }
+    endShape();
+    pop();
 }
 
+// Generates the correct solution when wall B is generating heat
 function solveProblemB(){
+    
+
     
 }
