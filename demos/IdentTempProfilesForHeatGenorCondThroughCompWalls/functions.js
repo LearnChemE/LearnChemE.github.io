@@ -246,11 +246,13 @@ function solveProblemA(){
     let c2 = tempVec[4] + g.Q*g.length**2*1000/(2*g.kvalues[0]);
    
     let Acurve = [];
-    for(let i = 0; i < 11; i++){
+    for(let i = 0; i < 10; i++){
         let x = 0.02*i;
-        let y = -1*g.Q*x**2/(2*g.kvalues[0]) + c2;
+        let y = -10*g.Q*x**2/(2*g.kvalues[0]) + c2; // Hand-solved the differential equation (the 10x is a unit correction)
         Acurve.push([x,y]);
     }
+    Acurve.push([.2,tempVec[4]]);
+    console.log(Acurve)
 
     console.log(c2,tempVec[0])
     let upperLim = 80; let lowerLim = 25;
@@ -262,7 +264,7 @@ function solveProblemA(){
 
     push(); strokeWeight(2); noFill();
     beginShape();
-    for(let i = 0; i < Acurve.length; i += 2){
+    for(let i = 0; i < Acurve.length; i++){
         let x = map(Acurve[i][0],0,.2,g.wallX[5],g.wallX[4]);
         let y = map(Acurve[i][1],lowerLim,upperLim,lowerPx,upperPx);
         vertex(x,y)
