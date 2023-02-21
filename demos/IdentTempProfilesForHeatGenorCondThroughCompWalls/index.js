@@ -16,10 +16,12 @@ window.g = {
     answers: [0,0,0,0,0],
     chosenAnswer: null,
     correctAnswer: null, 
-    problemPart: 1,
+    problemPart: 0,
     solutionTruth: false,
+    hintTruth: false,
 
     qAprops: [0,0,0,0,0],
+    bottomText: '', // Text along the bottom of the screen that displays hints or tells if question is right/wrong
 
 }
 
@@ -42,12 +44,13 @@ function draw(){
     alphaManipulation();
     frameDraw();
     question();
+    bottomText();
 
     if(g.heatWall == 'A'){
         solveProblemA();
     }
     
-    console.log(g.solutionTruth);
+    console.log(g.correctAnswer);
     
 }
 
@@ -57,8 +60,10 @@ const newProblem = document.getElementById("new-problem");
 const nextPart = document.getElementById("next-part");
 const answerChoices = [document.getElementById("answerA"),document.getElementById("answerB"),document.getElementById("answerC"),document.getElementById("answerD"),document.getElementById("answerE")];
 const solutionButton = document.getElementById("solution");
+const hintButton = document.getElementById("hint");
 
 newProblem.addEventListener("click", function(){
+    g.solutionTruth = false;
     assignWall(); // Reassigns wall that's generating heat
     assignThermalProps(); // Reassigns various thermal properties
     g.answers = assignAnswers(); // Reassigns the answer choices
@@ -67,6 +72,8 @@ newProblem.addEventListener("click", function(){
     nextPart.disabled = false;
     g.correctAnswer = null;
     solutionButton.checked = false;
+    hintButton.checked = false;
+    g.bottomText = '';
     fillquestionAprops();
 
     // Removes the previously selected answer choice
@@ -80,6 +87,7 @@ newProblem.addEventListener("click", function(){
 });
 
 nextPart.addEventListener("click", function(){
+    g.solutionTruth = false;
     if(g.problemPart < 1){
         g.problemPart++;
     } else {
@@ -89,6 +97,8 @@ nextPart.addEventListener("click", function(){
     g.answers = assignAnswers();
     g.correctAnswer = null;
     solutionButton.checked = false;
+    hintButton.checked = false;
+    g.bottomText = '';
     redraw();
 });
 
@@ -105,4 +115,8 @@ for(let i = 0; i < answerChoices.length; i++){
 
 solutionButton.addEventListener("click", function(){
     g.solutionTruth = solutionButton.checked;
+});
+
+hintButton.addEventListener("click", function(){
+    g.hintTruth = hintButton.checked;
 });

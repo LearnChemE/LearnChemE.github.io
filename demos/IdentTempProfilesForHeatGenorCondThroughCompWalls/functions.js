@@ -136,7 +136,7 @@ function assignThermalProps(){
     let temp;
 
     // Wall A
-    temp = 20 + Math.round(Math.random()*5); // Between .20 and .25
+    temp = 15 + Math.round(Math.random()*5); // Between .20 and .25
     g.kvalues[0] = (temp/100).toFixed(2);
 
     // Wall B
@@ -243,18 +243,17 @@ function solveProblemA(){
 
     let availableAnswers = g.answers;
     rightAnswer = availableAnswers[count[0]];
-    //console.log(rightAnswer,availableAnswers)
     let counter = 0;
 
     let incorrectPartB = incorrectApartBSolution(right);
     let incorrectPartC = incorrectApartCSolution(right);
     
     // Display answers
-    if(g.problemPart == 0){
+    if(g.problemPart == 0 && !g.solutionTruth){
         displayAnswersA();
-    } else if (g.problemPart == 1 && !nextPart.disabled){
+    } else if (g.problemPart == 1 && !nextPart.disabled && !g.solutionTruth){
         displayAnswersApartB();
-    } else if(nextPart.disabled) {
+    } else if(nextPart.disabled && !g.solutionTruth) {
         displayAnswersApartC();
     }
 
@@ -567,10 +566,17 @@ function solveProblemA(){
         ellipse(right[5][right[5].length-1][0],right[5][right[5].length-1][1],6);
         ellipse(right[5][0][0],right[5][0][1],6);
         ellipse(right[3][0],right[3][1],6);
+        ellipse(right[2][0],right[2][1],6);
+        
         
 
         pop();
     }
+
+    if(g.solutionTruth){
+        checkAnswerQuestionA(right,rightAnswer);
+    }
+    
     
 }
 
@@ -881,8 +887,132 @@ function incorrectApartCSolution(correct){
 
 }
 
-function checkAnswerQA(){
-    
+function checkAnswerQuestionA(ans,rightAnswerPartA){
+    let x,y;
+    let m,b;
+    if(g.problemPart == 0){
+        if(g.chosenAnswer == null){
+            g.bottomText = "Select an answer choice first.";
+            solutionButton.checked = false;
+            g.solutionTruth = false;
+        } else if (g.chosenAnswer == g.correctAnswer){
+            g.bottomText = "Correct, move on to the next part."
+            push(); noFill(); strokeWeight(2); stroke(120,0,120);
+            beginShape();
+            for(let i = 0; i < ans[5].length; i++){
+                vertex(ans[5][i][0],ans[5][i][1]);
+                if(i == 5){
+                    x = ans[5][i][0];
+                    y = ans[5][i][1];
+                }
+            }
+            endShape();
+            push();
+            noStroke(); fill(255);
+            rect(x-1,y-7,12,13);
+            fill(0); textSize(15);
+            text(g.correctAnswer,x,y+5);
+            pop();
+            pop();
+
+            push();
+            strokeWeight(2); stroke(120,0,120); fill(120,0,120);
+            ellipse(ans[5][ans[5].length-1][0],ans[5][ans[5].length-1][1],6);
+            ellipse(ans[5][0][0],ans[5][0][1],6);
+            pop();
+        } else if (g.chosenAnswer != g.correctAnswer){
+            g.bottomText = "Incorrect, try again.";
+            solutionButton.checked = false;
+            g.solutionTruth = false;
+        }
+
+    } else if (g.problemPart == 1 && !nextPart.disabled){
+        if(g.chosenAnswer == null){
+            g.bottomText = "Select an answer choice first.";
+            solutionButton.checked = false;
+            g.solutionTruth = false;
+        } else if (g.chosenAnswer == g.correctAnswer){
+            g.bottomText = "Correct, move on to the next part."
+            // Segment for wall A
+            push(); noFill(); strokeWeight(2); stroke(120,0,120);
+            beginShape();
+            for(let i = 0; i < ans[5].length; i++){
+                vertex(ans[5][i][0],ans[5][i][1]);
+                if(i == 5){
+                    x = ans[5][i][0];
+                    y = ans[5][i][1];
+                }
+            }
+            endShape();
+            fill(120,0,120);
+            ellipse(ans[5][ans[5].length-1][0],ans[5][ans[5].length-1][1],6);
+            ellipse(ans[5][0][0],ans[5][0][1],6);
+            line(ans[5][ans[5].length-1][0],ans[5][ans[5].length-1][1],ans[3][0],ans[3][1]);
+            ellipse(ans[3][0],ans[3][1],6);
+            ellipse(ans[2][0],ans[2][1],6);
+            line(ans[3][0],ans[3][1],ans[2][0],ans[2][1]);
+            pop();
+
+        
+            m = (ans[2][1] - ans[3][1])/(ans[2][0] - ans[3][0]);
+            b = ans[3][1] - m*ans[3][0];
+            push(); noStroke();
+            x = ans[2][0] - 20;
+            y = m*x + b+6;
+            rect(x-1,y-9,12,13);
+            fill(0); textSize(15);
+            text(g.correctAnswer,x,y+3);
+            pop();
+        } else if (g.chosenAnswer != g.correctAnswer){
+            g.bottomText = "Incorrect, try again.";
+            solutionButton.checked = false;
+            g.solutionTruth = false;
+        }
+    } else if (nextPart.disabled){
+        if(g.chosenAnswer == null){
+            g.bottomText = "Select an answer choice first.";
+            solutionButton.checked = false;
+            g.solutionTruth = false;
+        } else if (g.chosenAnswer == g.correctAnswer){
+            g.bottomText = "Correct, move on to a new problem."
+            push(); noFill(); strokeWeight(2); stroke(120,0,120);
+            beginShape();
+            for(let i = 0; i < ans[5].length; i++){
+                vertex(ans[5][i][0],ans[5][i][1]);
+                if(i == 5){
+                    x = ans[5][i][0];
+                    y = ans[5][i][1];
+                }
+            }
+            endShape();
+            fill(120,0,120);
+            ellipse(ans[5][ans[5].length-1][0],ans[5][ans[5].length-1][1],6);
+            ellipse(ans[5][0][0],ans[5][0][1],6);
+            line(ans[5][ans[5].length-1][0],ans[5][ans[5].length-1][1],ans[3][0],ans[3][1]);
+            ellipse(ans[3][0],ans[3][1],6);
+            ellipse(ans[2][0],ans[2][1],6);
+            line(ans[3][0],ans[3][1],ans[2][0],ans[2][1]);
+            line(ans[2][0],ans[2][1],ans[1][0],ans[1][1]);
+            ellipse(ans[1][0],ans[1][1],6);
+            line(ans[1][0],ans[1][1],ans[0][0],ans[0][1]);
+            ellipse(ans[0][0],ans[0][1],6);
+
+            m = (ans[1][1] - ans[0][1])/(ans[1][0] - ans[0][0]);
+            b = ans[1][1] - m*ans[1][0];
+            push();
+            noStroke(); fill(255);
+            x = ans[0][0] - 40; y = m*x + b;
+            rect(x-1,y-7,12,13);
+            fill(0); textSize(15);
+            text(g.correctAnswer,x,y+5);
+            pop();
+            pop();
+        } else if (g.chosenAnswer != g.correctAnswer){
+            g.bottomText = "Incorrect, try again.";
+            solutionButton.checked = false;
+            g.solutionTruth = false;
+        }
+    }
 }
 
 // Generates the correct solution when wall B is generating heat
@@ -890,6 +1020,13 @@ function solveProblemB(){
     
 
     
+}
+
+function bottomText(){
+    push();
+    textSize(25); noStroke();
+    text(g.bottomText,70,580)
+    pop();
 }
 
 
