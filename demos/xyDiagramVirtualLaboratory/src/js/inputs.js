@@ -1,6 +1,12 @@
 const volumeASlider = document.getElementById("ml-of-a-slider");
 const volumeAValue = document.getElementById("ml-of-a-value");
 const collectSampleButton = document.getElementById("collection-button");
+const proceedToSubmitButton = document.getElementById("proceed-to-submit-button");
+const submitButton = document.getElementById("submit-button");
+const inputA12 = document.getElementById("submit-A12");
+const inputA12CI = document.getElementById("submit-A12-CI");
+const inputA21 = document.getElementById("submit-A21");
+const inputA21CI = document.getElementById("submit-A21-CI");
 
 collectSampleButton.addEventListener("mousedown", () => {
   collectSampleButton.classList.add("pressed");
@@ -9,6 +15,24 @@ collectSampleButton.addEventListener("mousedown", () => {
 
 collectSampleButton.addEventListener("mouseup", () => {
   collectSampleButton.classList.remove("pressed");
+});
+
+proceedToSubmitButton.addEventListener("mousedown", () => {
+  proceedToSubmitButton.classList.add("pressed");
+  go_to_submission_stage();
+});
+
+proceedToSubmitButton.addEventListener("mouseup", () => {
+  proceedToSubmitButton.classList.remove("pressed");
+});
+
+submitButton.addEventListener("mousedown", () => {
+  submitButton.classList.add("pressed");
+  submit();
+});
+
+submitButton.addEventListener("mouseup", () => {
+  submitButton.classList.remove("pressed");
 });
 
 volumeASlider.addEventListener("input", () => {
@@ -47,5 +71,29 @@ function collectSample() {
     gvs.volume_B_remaining = volume_B_remaining;
     gvs.yA_sample = Math.min(1, (0.95 + 0.1 * Math.random()) * gvs.yA(gvs.xA_flask));
   }
+  gvs.p.redraw();
+}
+
+function go_to_submission_stage() {
+  gvs.submission_stage = 2;
+  proceedToSubmitButton.style.opacity = "0";
+  proceedToSubmitButton.style.pointerEvents = "none";
+  collectSampleButton.style.opacity = "0";
+  collectSampleButton.style.pointerEvents = "none";
+  inputA12.style.display = "grid";
+  inputA12CI.style.display = "grid";
+  inputA21.style.display = "grid";
+  inputA21CI.style.display = "grid";
+  submitButton.style.display = "grid";
+  gvs.p.redraw();
+}
+
+function submit() {
+  gvs.submission_stage = 3;
+  inputA12.style.display = "none";
+  inputA12CI.style.display = "none";
+  inputA21.style.display = "none";
+  inputA21CI.style.display = "none";
+  submitButton.style.display = "none";
   gvs.p.redraw();
 }

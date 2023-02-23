@@ -81,8 +81,35 @@ function drawInfo(p) {
   p.pop();
 }
 
+function drawSubmissionPage(p) {
+  p.push();
+  p.fill(0);
+  p.noStroke();
+  p.textSize(16);
+  p.textWrap(p.WORD);
+  p.text(`Enter the Margules Equation constants and their respective 95% confidence intervals in the input boxes below. The Margules Equation constants will be values between 0.00 and 2.00. Enter your answers with two decimal places of precision, e.g. 1.53.`, 120, 50, 550);
+  p.text(`A     = `, 150, 212);
+  p.text(`A     = `, 150, 272);
+  p.text(`±`, 420, 212);
+  p.text(`±`, 420, 272);
+  p.textSize(12);
+  p.text(`12`, 162, 217);
+  p.text(`21`, 162, 277);
+  p.pop();
+}
+
+function drawResultsPage(p) {
+
+}
+
 function drawAll(p) {
-  drawInfo(p);
+  if(gvs.submission_stage == 1) {
+    drawInfo(p);
+  } else if(gvs.submission_stage == 2) {
+    drawSubmissionPage(p);
+  } else {
+    drawResultsPage(p);
+  }
 }
 
 module.exports = drawAll;
