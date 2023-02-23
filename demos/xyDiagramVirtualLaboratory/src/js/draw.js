@@ -76,8 +76,12 @@ function drawInfo(p) {
   p.text(`boiling flask conditions`, 0, -5);
   p.text(`760 mmHg`, 0, 25);
   p.text(`${gvs.temperature_flask.toFixed(1)}° C`, 0, 45);
-  p.text(`${gvs.volume_A.toFixed(1)} mL component A`, 0, 65);
-  p.text(`${(Math.round((10 - gvs.volume_A) * 10) / 10).toFixed(1)} mL component B`, 0, 85);
+  p.text(`mL component A`, 13, 65);
+  p.text(`mL component B`, 13, 85);
+  p.textAlign(p.RIGHT);
+  p.fill(0, 0, 255);
+  p.text(`${gvs.volume_A.toFixed(1)}`, -45, 65);
+  p.text(`${(Math.round((10 - gvs.volume_A) * 10) / 10).toFixed(1)}`, -45, 85);
   p.pop();
 }
 
