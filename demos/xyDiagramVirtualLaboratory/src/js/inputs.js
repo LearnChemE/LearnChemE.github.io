@@ -3,6 +3,7 @@ const volumeAValue = document.getElementById("ml-of-a-value");
 const collectSampleButton = document.getElementById("collection-button");
 const proceedToSubmitButton = document.getElementById("proceed-to-submit-button");
 const submitButton = document.getElementById("submit-button");
+const backButton = document.getElementById("back-button");
 const inputA12 = document.getElementById("submit-A12");
 const inputA12CI = document.getElementById("submit-A12-CI");
 const inputA21 = document.getElementById("submit-A21");
@@ -33,6 +34,15 @@ submitButton.addEventListener("mousedown", () => {
 
 submitButton.addEventListener("mouseup", () => {
   submitButton.classList.remove("pressed");
+});
+
+backButton.addEventListener("mousedown", () => {
+  backButton.classList.add("pressed");
+  go_back();
+});
+
+backButton.addEventListener("mouseup", () => {
+  backButton.classList.remove("pressed");
 });
 
 volumeASlider.addEventListener("input", () => {
@@ -74,17 +84,64 @@ function collectSample() {
   gvs.p.redraw();
 }
 
+inputA12.addEventListener("input", () => {
+  const A = inputA12.value;
+  const B = inputA12CI.value;
+  const C = inputA21.value;
+  const D = inputA21CI.value;
+  if(A !== "" && B !== "" && C !== "" & D !== "") {
+    submitButton.removeAttribute("disabled");
+  } else {
+    submitButton.setAttribute("disabled", "yes");
+  }
+});
+
+inputA12CI.addEventListener("input", () => {
+  const A = inputA12.value;
+  const B = inputA12CI.value;
+  const C = inputA21.value;
+  const D = inputA21CI.value;
+  if(A !== "" && B !== "" && C !== "" & D !== "") {
+    submitButton.removeAttribute("disabled");
+  } else {
+    submitButton.setAttribute("disabled", "yes");
+  }
+});
+
+inputA21.addEventListener("input", () => {
+  const A = inputA12.value;
+  const B = inputA12CI.value;
+  const C = inputA21.value;
+  const D = inputA21CI.value;
+  if(A !== "" && B !== "" && C !== "" & D !== "") {
+    submitButton.removeAttribute("disabled");
+  } else {
+    submitButton.setAttribute("disabled", "yes");
+  }
+});
+
+inputA21CI.addEventListener("input", () => {
+  const A = inputA12.value;
+  const B = inputA12CI.value;
+  const C = inputA21.value;
+  const D = inputA21CI.value;
+  if(A !== "" && B !== "" && C !== "" & D !== "") {
+    submitButton.removeAttribute("disabled");
+  } else {
+    submitButton.setAttribute("disabled", "yes");
+  }
+});
+
 function go_to_submission_stage() {
   gvs.submission_stage = 2;
   proceedToSubmitButton.style.opacity = "0";
-  proceedToSubmitButton.style.pointerEvents = "none";
   collectSampleButton.style.opacity = "0";
-  collectSampleButton.style.pointerEvents = "none";
   inputA12.style.display = "grid";
   inputA12CI.style.display = "grid";
   inputA21.style.display = "grid";
   inputA21CI.style.display = "grid";
   submitButton.style.display = "grid";
+  backButton.style.display = "grid";
   gvs.p.redraw();
 }
 
@@ -95,5 +152,27 @@ function submit() {
   inputA21.style.display = "none";
   inputA21CI.style.display = "none";
   submitButton.style.display = "none";
+  backButton.style.display = "none";
+  const A12 = Number(inputA12.value);
+  const A12_CI = Number(inputA12CI.value);
+  const A21 = Number(inputA21.value);
+  const A21_CI = Number(inputA21CI.value);
+  gvs.A12_submission = Math.round(A12 * 100) / 100;
+  gvs.A12_CI_submission = Math.round(A12_CI * 100) / 100;
+  gvs.A21_submission = Math.round(A21 * 100) / 100;
+  gvs.A21_CI_submission = Math.round(A21_CI * 100) / 100;
+  gvs.p.redraw();
+}
+
+function go_back() {
+  gvs.submission_stage = 1;
+  inputA12.style.display = "none";
+  inputA12CI.style.display = "none";
+  inputA21.style.display = "none";
+  inputA21CI.style.display = "none";
+  submitButton.style.display = "none";
+  backButton.style.display = "none";
+  proceedToSubmitButton.style.opacity = "1";
+  collectSampleButton.style.opacity = "1";
   gvs.p.redraw();
 }

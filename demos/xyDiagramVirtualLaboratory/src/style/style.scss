@@ -107,15 +107,6 @@ $modal-xl: 1140px;
     margin: auto;
 }
 
-#plot-container {
-    width: 800px;
-    height: 600px;
-    border: 1px solid black;
-    margin: auto;
-    margin-top: 10px;
-    position: relative;
-}
-
 #submit-inputs-container {
     position: absolute;
     left: calc(50vw - 200px);
@@ -131,7 +122,7 @@ $modal-xl: 1140px;
 #submit-button {
     position: absolute;
     top: 480px;
-    left: calc(50vw - 80px);
+    left: calc(50vw + 40px);
     display: grid;
     align-content: center;
     justify-content: center;
@@ -153,6 +144,34 @@ $modal-xl: 1140px;
     }
     &.pressed {
         background: rgb(255, 130, 130);
+    }
+}
+
+#back-button {
+    position: absolute;
+    top: 480px;
+    left: calc(50vw - 150px);
+    display: grid;
+    align-content: center;
+    justify-content: center;
+    height: 40px;
+    width: 130px;
+    border: 1px solid grey;
+    border-radius: 7px;
+    background: rgb(75, 243, 190);
+    color: black;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+    cursor: pointer;
+    &:hover {
+        background: rgb(105, 255, 220);
+    }
+    &.pressed {
+        background: rgb(125, 255, 240);
     }
 }
 

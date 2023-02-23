@@ -87,11 +87,11 @@ function drawSubmissionPage(p) {
   p.noStroke();
   p.textSize(16);
   p.textWrap(p.WORD);
-  p.text(`Enter the Margules Equation constants and their respective 95% confidence intervals in the input boxes below. The Margules Equation constants will be values between 0.00 and 2.00. Enter your answers with two decimal places of precision, e.g. 1.53.`, 120, 50, 550);
+  p.text(`Enter the Margules Equation constants and their respective 95% confidence intervals in the input boxes below. The Margules Equation constants will be values between 0.00 and 2.00. Enter your answers with two decimal places of precision, e.g. 1.53. The "view results" button will become enabled once values are entered into all four input boxes.`, 120, 50, 550);
   p.text(`A     = `, 150, 212);
   p.text(`A     = `, 150, 272);
-  p.text(`±`, 420, 212);
-  p.text(`±`, 420, 272);
+  p.text(`±`, 410, 212);
+  p.text(`±`, 410, 272);
   p.textSize(12);
   p.text(`12`, 162, 217);
   p.text(`21`, 162, 277);
@@ -99,7 +99,45 @@ function drawSubmissionPage(p) {
 }
 
 function drawResultsPage(p) {
+  
+  const number_horizontal = 12;
+  const number_vertical = 8;
+  for(let i = -1; i < number_horizontal; i++) {
+    for(let j = 0; j <= number_vertical; j++) {
+      p.push();
+      p.fill(235);
+      p.noStroke();
+      p.textSize(24);
+      const x = i * p.width / number_horizontal;
+      const y = j * p.height / number_vertical;
+      p.translate(x, y);
+      p.rotate(-1 * Math.PI / 7);
+      p.text(`LearnChemE`, 0, 0);
+      p.pop();
+    }
+  }
 
+  p.push();
+  p.noFill();
+  p.stroke(0);
+  p.strokeWeight(1);
+  p.rect(100, 115, 200, 80);
+  p.rect(460, 115, 200, 80);
+  p.fill(0);
+  p.noStroke();
+  p.textSize(18);
+  p.text(`Your answer submission`, 100, 100);
+  p.text(`Correct values`, 500, 100);
+  p.text(`A    = ${gvs.A12_submission.toFixed(2)} ± ${gvs.A12_CI_submission.toFixed(2)}`, 130, 140);
+  p.text(`A    = ${gvs.A21_submission.toFixed(2)} ± ${gvs.A21_CI_submission.toFixed(2)}`, 130, 180);
+  p.text(`A    = ${gvs.A12.toFixed(2)}`, 520, 140);
+  p.text(`A    = ${gvs.A21.toFixed(2)}`, 520, 180);
+  p.textSize(12);
+  p.text(`12`, 143, 144);
+  p.text(`21`, 143, 184);
+  p.text(`12`, 533, 144);
+  p.text(`21`, 533, 184);
+  p.pop();
 }
 
 function drawAll(p) {

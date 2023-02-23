@@ -22,6 +22,10 @@ window.gvs = {
     temperature_flask : undefined,
     not_enough_liquid : false,
     submission_stage : 1,
+    A12_submission : undefined,
+    A12_CI_submission : undefined,
+    A21_submission : undefined,
+    A21_CI_submission : undefined,
 };
 
 require("./js/initialize.js");
@@ -35,9 +39,6 @@ const sketch = (p) => {
         p.noLoop();
         gvs.p = p;
         gvs.drawAll = require("./js/draw.js");
-        const { SVG_Graph } = require("./js/svg-graph-library.js");
-        gvs.SVG_Graph = SVG_Graph;
-        require("./js/plot.js");
         require("./js/inputs.js");
         
         p.windowResized = function() {
