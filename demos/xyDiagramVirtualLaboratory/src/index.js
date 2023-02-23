@@ -8,6 +8,19 @@ window.p5 = new require("./js/p5.min.js");
 
 window.gvs = {
     yA : function(xA) {return 1},
+    volume_A : 5,
+    MW_A : undefined,
+    MW_B : undefined,
+    density_A : undefined,
+    density_B : undefined,
+    molar_density_A : undefined,
+    molar_density_B : undefined,
+    xA_flask : undefined,
+    volume_A_remaining : 100,
+    volume_B_remaining : 100,
+    yA_sample : NaN,
+    temperature_flask : undefined,
+    not_enough_liquid : false,
 };
 
 while(gvs.yA(0.05) > 0.5 || gvs.yA(0.05) < 0.05) {
@@ -89,7 +102,7 @@ while(gvs.yA(0.05) > 0.5 || gvs.yA(0.05) < 0.05) {
         const P = 760; // atmospheric pressure, mmHg
         let delta = 1e6;
         let T_sat = -273.1;
-        for(let T = -273.1; T < 200; T += 0.01) {
+        for(let T = -273.1; T < 400; T += 0.01) {
             const PsatA = gvs.PsatA(T);
             const PsatB = gvs.PsatB(T);
             const Psat_mixture = xA * gvs.gamma_A(xA) * PsatA + xB * gvs.gamma_B(xA) * PsatB;
@@ -98,6 +111,9 @@ while(gvs.yA(0.05) > 0.5 || gvs.yA(0.05) < 0.05) {
                 T_sat = Math.round(T * 100) / 100;
                 delta = diff;
             }
+        }
+        if(xA == 0.50) {
+            gvs.temperature_flask = T_sat;
         }
         const yA = Math.max(0, Math.min(1, xA * gvs.gamma_A(xA) * gvs.PsatA(T_sat) / P));
         gvs.eq_line.push([xA, yA])
@@ -122,8 +138,18 @@ while(gvs.yA(0.05) > 0.5 || gvs.yA(0.05) < 0.05) {
         }
         return y
     }
+
 }
 
+gvs.MW_A = Number((25 + Math.random() * 125).toFixed(1));
+gvs.MW_B = Number((25 + Math.random() * 125).toFixed(1));
+gvs.density_A = Number((0.5 + Math.random() * 0.75).toFixed(2));
+gvs.density_B = Number((0.5 + Math.random() * 0.75).toFixed(2));
+gvs.molar_density_A = Number((gvs.density_A / gvs.MW_A).toPrecision(3));
+gvs.molar_density_B = Number((gvs.density_B / gvs.MW_B).toPrecision(3));
+const mol_A = gvs.volume_A * gvs.molar_density_A;
+const mol_B = (10 - gvs.volume_A) * gvs.molar_density_B;
+gvs.xA_flask = mol_A / (mol_A + mol_B);
 
 const containerElement = document.getElementById("p5-container");
 

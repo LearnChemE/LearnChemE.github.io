@@ -35,7 +35,7 @@ $modal-xl: 1140px;
     justify-items: center;
     .input-row {
         display: grid;
-        grid-template-columns: 200px 10rem 27px 50px;
+        grid-template-columns: 280px 15rem 27px 50px;
         gap: 1ch;
         align-items: end;
         .data-name {
@@ -43,6 +43,37 @@ $modal-xl: 1140px;
         }
         .data-value {
             text-align: end;
+        }
+    }
+    .collection-button-container {
+        display: grid;
+        grid-template-columns: max-content max-content;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+        #collection-button {
+            display: grid;
+            align-content: center;
+            justify-content: center;
+            height: 40px;
+            width: 120px;
+            border: 1px solid grey;
+            border-radius: 7px;
+            background: rgb(200, 235, 200);
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+            cursor: pointer;
+            &:hover {
+                background: rgb(210, 245, 210);
+            }
+            &.pressed {
+                background: rgb(220, 255, 220);
+            }
         }
     }
 }
