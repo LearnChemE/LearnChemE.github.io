@@ -4,6 +4,7 @@ const collectSampleButton = document.getElementById("collection-button");
 const proceedToSubmitButton = document.getElementById("proceed-to-submit-button");
 const submitButton = document.getElementById("submit-button");
 const backButton = document.getElementById("back-button");
+const resetButton = document.getElementById("reset-button");
 const inputA12 = document.getElementById("submit-A12");
 const inputA12CI = document.getElementById("submit-A12-CI");
 const inputA21 = document.getElementById("submit-A21");
@@ -132,10 +133,14 @@ inputA21CI.addEventListener("input", () => {
   }
 });
 
+resetButton.addEventListener("click", () => {
+  location.reload();
+});
+
 function go_to_submission_stage() {
   gvs.submission_stage = 2;
-  proceedToSubmitButton.style.opacity = "0";
-  collectSampleButton.style.opacity = "0";
+  proceedToSubmitButton.style.visibility = "hidden";
+  collectSampleButton.style.visibility = "hidden";
   inputA12.style.display = "grid";
   inputA12CI.style.display = "grid";
   inputA21.style.display = "grid";
@@ -153,6 +158,7 @@ function submit() {
   inputA21CI.style.display = "none";
   submitButton.style.display = "none";
   backButton.style.display = "none";
+  resetButton.style.display = "grid";
   const A12 = Number(inputA12.value);
   const A12_CI = Number(inputA12CI.value);
   const A21 = Number(inputA21.value);
@@ -172,7 +178,10 @@ function go_back() {
   inputA21CI.style.display = "none";
   submitButton.style.display = "none";
   backButton.style.display = "none";
-  proceedToSubmitButton.style.opacity = "1";
-  collectSampleButton.style.opacity = "1";
+  proceedToSubmitButton.classList.remove("pressed");
+  collectSampleButton.classList.remove("pressed");
+  proceedToSubmitButton.style.visibility = "visible";
+  collectSampleButton.style.visibility = "visible";
+  backButton.classList.remove("pressed");
   gvs.p.redraw();
 }

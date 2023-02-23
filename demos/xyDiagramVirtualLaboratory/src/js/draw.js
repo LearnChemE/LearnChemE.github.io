@@ -132,6 +132,10 @@ function drawResultsPage(p) {
   p.text(`A    = ${gvs.A21_submission.toFixed(2)} ± ${gvs.A21_CI_submission.toFixed(2)}`, 130, 180);
   p.text(`A    = ${gvs.A12.toFixed(2)}`, 520, 140);
   p.text(`A    = ${gvs.A21.toFixed(2)}`, 520, 180);
+
+  p.textWrap(p.WORD);
+  p.text(`Click this button to attempt the lab again with new, randomized compounds and Margules Equation constants`, 170, 300, 500);
+
   p.textSize(12);
   p.text(`12`, 143, 144);
   p.text(`21`, 143, 184);

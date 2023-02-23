@@ -175,6 +175,34 @@ $modal-xl: 1140px;
     }
 }
 
+#reset-button {
+    position: absolute;
+    top: 510px;
+    left: calc(50vw - 65px);
+    display: grid;
+    align-content: center;
+    justify-content: center;
+    height: 40px;
+    width: 130px;
+    border: 1px solid grey;
+    border-radius: 7px;
+    background: rgb(112, 111, 195);
+    color: white;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+    cursor: pointer;
+    &:hover {
+        background: rgb(168, 167, 253);
+    }
+    &.pressed {
+        background: rgb(180, 180, 255);
+    }
+}
+
 canvas {
     border-style: solid;
     border-width: 1px;
