@@ -38,6 +38,10 @@ $modal-xl: 1140px;
         grid-template-columns: 280px 15rem 27px 50px;
         gap: 1ch;
         align-items: end;
+        background: rgb(250, 250, 250);
+        padding: 10px;
+        border: 1px solid grey;
+        border-radius: 3px;
         .data-name {
             justify-self: end;
         }
@@ -110,7 +114,7 @@ $modal-xl: 1140px;
 #submit-inputs-container {
     position: absolute;
     left: calc(50vw - 200px);
-    top: 320px;
+    top: 340px;
     display: grid;
     grid-template-columns: max-content max-content;
     gap: 30px 50px;
