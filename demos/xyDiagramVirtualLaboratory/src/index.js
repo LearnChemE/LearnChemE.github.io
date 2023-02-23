@@ -34,10 +34,15 @@ const containerElement = document.getElementById("p5-container");
 
 const sketch = (p) => {
 
+    p.preload = function() {
+        gvs.VLE_apparatus_image = p.loadImage(`assets/VLE_Apparatus.png`);
+    }
+
     p.setup = function() {
         p.createCanvas(800, 530);
         p.noLoop();
         gvs.p = p;
+
         gvs.drawAll = require("./js/draw.js");
         require("./js/inputs.js");
         

@@ -64,7 +64,7 @@ function drawInfo(p) {
   p.pop();
 
   p.push();
-  p.translate(580, 30);
+  p.translate(440, 350);
   p.fill(250);
   p.stroke(0);
   p.strokeWeight(1);
@@ -148,9 +148,16 @@ function drawResultsPage(p) {
   p.pop();
 }
 
+function drawDiagram(p) {
+  p.push();
+  p.image(gvs.VLE_apparatus_image, 530, -10, gvs.VLE_apparatus_image.width / 2.5, gvs.VLE_apparatus_image.height / 2.5);
+  p.pop();
+}
+
 function drawAll(p) {
   if(gvs.submission_stage == 1) {
     drawInfo(p);
+    drawDiagram(p);
   } else if(gvs.submission_stage == 2) {
     drawSubmissionPage(p);
   } else {
