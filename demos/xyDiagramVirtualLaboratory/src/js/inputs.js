@@ -9,10 +9,12 @@ const inputA12 = document.getElementById("submit-A12");
 const inputA12CI = document.getElementById("submit-A12-CI");
 const inputA21 = document.getElementById("submit-A21");
 const inputA21CI = document.getElementById("submit-A21-CI");
+const inputNames = document.getElementById("submit-name");
 const testTube = document.getElementById("path1218-9");
 const testTubeRim = document.getElementById("path1244");
 const pouringLiquid = document.getElementById("rect1216");
 const liquidInTestTube = document.getElementById("path1218");
+const VLE_apparatus_svg = document.getElementById("VLE_apparatus_svg");
 
 collectSampleButton.addEventListener("mousedown", () => {
   collectSampleButton.classList.add("pressed");
@@ -128,7 +130,8 @@ inputA12.addEventListener("input", () => {
   const B = inputA12CI.value;
   const C = inputA21.value;
   const D = inputA21CI.value;
-  if(A !== "" && B !== "" && C !== "" & D !== "") {
+  const E = inputNames.value;
+  if(A !== "" && B !== "" && C !== "" & D !== "" && E !== "") {
     submitButton.removeAttribute("disabled");
   } else {
     submitButton.setAttribute("disabled", "yes");
@@ -140,7 +143,8 @@ inputA12CI.addEventListener("input", () => {
   const B = inputA12CI.value;
   const C = inputA21.value;
   const D = inputA21CI.value;
-  if(A !== "" && B !== "" && C !== "" & D !== "") {
+  const E = inputNames.value;
+  if(A !== "" && B !== "" && C !== "" & D !== "" && E !== "") {
     submitButton.removeAttribute("disabled");
   } else {
     submitButton.setAttribute("disabled", "yes");
@@ -152,7 +156,8 @@ inputA21.addEventListener("input", () => {
   const B = inputA12CI.value;
   const C = inputA21.value;
   const D = inputA21CI.value;
-  if(A !== "" && B !== "" && C !== "" & D !== "") {
+  const E = inputNames.value;
+  if(A !== "" && B !== "" && C !== "" & D !== "" && E !== "") {
     submitButton.removeAttribute("disabled");
   } else {
     submitButton.setAttribute("disabled", "yes");
@@ -164,7 +169,22 @@ inputA21CI.addEventListener("input", () => {
   const B = inputA12CI.value;
   const C = inputA21.value;
   const D = inputA21CI.value;
-  if(A !== "" && B !== "" && C !== "" & D !== "") {
+  const E = inputNames.value;
+  if(A !== "" && B !== "" && C !== "" & D !== "" && E !== "") {
+    submitButton.removeAttribute("disabled");
+  } else {
+    submitButton.setAttribute("disabled", "yes");
+  }
+});
+
+inputNames.addEventListener("input", () => {
+  gvs.names = inputNames.value;
+  const A = inputA12.value;
+  const B = inputA12CI.value;
+  const C = inputA21.value;
+  const D = inputA21CI.value;
+  const E = inputNames.value;
+  if(A !== "" && B !== "" && C !== "" & D !== "" && E !== "") {
     submitButton.removeAttribute("disabled");
   } else {
     submitButton.setAttribute("disabled", "yes");
@@ -183,8 +203,10 @@ function go_to_submission_stage() {
   inputA12CI.style.display = "grid";
   inputA21.style.display = "grid";
   inputA21CI.style.display = "grid";
+  inputNames.style.display = "grid";
   submitButton.style.display = "grid";
   backButton.style.display = "grid";
+  VLE_apparatus_svg.style.display = "none";
   gvs.p.redraw();
 }
 
@@ -194,6 +216,7 @@ function submit() {
   inputA12CI.style.display = "none";
   inputA21.style.display = "none";
   inputA21CI.style.display = "none";
+  inputNames.style.display = "none";
   submitButton.style.display = "none";
   backButton.style.display = "none";
   resetButton.style.display = "grid";
@@ -214,8 +237,10 @@ function go_back() {
   inputA12CI.style.display = "none";
   inputA21.style.display = "none";
   inputA21CI.style.display = "none";
+  inputNames.style.display = "none";
   submitButton.style.display = "none";
   backButton.style.display = "none";
+  VLE_apparatus_svg.style.display = "block";
   proceedToSubmitButton.classList.remove("pressed");
   collectSampleButton.classList.remove("pressed");
   proceedToSubmitButton.style.visibility = "visible";

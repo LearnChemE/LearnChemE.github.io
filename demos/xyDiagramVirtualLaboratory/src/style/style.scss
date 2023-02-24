@@ -133,7 +133,7 @@ $modal-xl: 1140px;
 
 #submit-button {
     position: absolute;
-    top: 480px;
+    top: 580px;
     left: calc(50vw + 40px);
     display: grid;
     align-content: center;
@@ -161,7 +161,7 @@ $modal-xl: 1140px;
 
 #back-button {
     position: absolute;
-    top: 480px;
+    top: 580px;
     left: calc(50vw - 150px);
     display: grid;
     align-content: center;
@@ -213,6 +213,13 @@ $modal-xl: 1140px;
     &.pressed {
         background: rgb(180, 180, 255);
     }
+}
+
+#submit-name {
+    position: absolute;
+    left: 160px;
+    top: 117px;
+    width: 270px;
 }
 
 canvas {

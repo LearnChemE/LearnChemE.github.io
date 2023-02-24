@@ -98,6 +98,7 @@ function drawSubmissionPage(p) {
   p.text(`A     = `, 147, 272);
   p.text(`±`, 410, 212);
   p.text(`±`, 410, 272);
+  p.text(`Your name(s):`, 250, 330);
   p.textSize(12);
   p.text(`12`, 159, 217);
   p.text(`21`, 159, 277);
@@ -134,6 +135,7 @@ function drawResultsPage(p) {
   p.textSize(18);
   p.text(`Your answer submission`, 100, 100);
   p.text(`Correct values`, 500, 100);
+  p.text(`Name(s): ${gvs.names}`, 40, 50);
   p.text(`A    = ${gvs.A12_submission.toFixed(2)} ± ${gvs.A12_CI_submission.toFixed(2)}`, 130, 140);
   p.text(`A    = ${gvs.A21_submission.toFixed(2)} ± ${gvs.A21_CI_submission.toFixed(2)}`, 130, 180);
   p.text(`A    = ${gvs.A12.toFixed(2)}`, 520, 140);
