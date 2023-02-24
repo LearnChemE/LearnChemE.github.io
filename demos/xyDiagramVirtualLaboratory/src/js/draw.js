@@ -15,11 +15,11 @@ function drawInfo(p) {
   p.text(`B`, -20, 197.5);
   p.text(`C`, -20, 230);
   p.textAlign(p.CENTER);
-  p.text(`${gvs.component_A_antoine_parameters[0]}`, 55, 165);
-  p.text(`${gvs.component_A_antoine_parameters[1].toFixed(1)}`, 55, 197.5);
+  p.text(`${(Math.round(1000 * gvs.component_A_antoine_parameters[0]) / 1000).toFixed(3)}`, 55, 165);
+  p.text(`${Math.round(gvs.component_A_antoine_parameters[1])}`, 55, 197.5);
   p.text(`${gvs.component_A_antoine_parameters[2].toFixed(1)}`, 55, 230);
-  p.text(`${gvs.component_B_antoine_parameters[0]}`, 165, 165);
-  p.text(`${gvs.component_B_antoine_parameters[1].toFixed(1)}`, 165, 197.5);
+  p.text(`${(Math.round(1000 * gvs.component_B_antoine_parameters[0]) / 1000).toFixed(3)}`, 165, 165);
+  p.text(`${Math.round(gvs.component_B_antoine_parameters[1])}`, 165, 197.5);
   p.text(`${gvs.component_B_antoine_parameters[2].toFixed(1)}`, 165, 230);
   p.textAlign(p.LEFT);
   p.text(`volume of component A remaining:           mL`, 0, 275);
@@ -57,9 +57,11 @@ function drawInfo(p) {
     p.fill(255, 0, 0);
     p.text(`not enough liquid remaining to perform this test!`, -20, 440);
   } else {
+    p.fill(255, 100, 100);
     if(!Number.isNaN(gvs.yA_sample)) {
       p.text(`${(Math.round(gvs.yA_sample * 1000) / 1000).toFixed(3)}`, 103, 386);
     }
+    p.fill(0);
   }
   p.pop();
 
@@ -148,16 +150,9 @@ function drawResultsPage(p) {
   p.pop();
 }
 
-function drawDiagram(p) {
-  p.push();
-  p.image(gvs.VLE_apparatus_image, 530, -10, gvs.VLE_apparatus_image.width / 2.5, gvs.VLE_apparatus_image.height / 2.5);
-  p.pop();
-}
-
 function drawAll(p) {
   if(gvs.submission_stage == 1) {
     drawInfo(p);
-    drawDiagram(p);
   } else if(gvs.submission_stage == 2) {
     drawSubmissionPage(p);
   } else {

@@ -29,14 +29,13 @@ window.gvs = {
 };
 
 require("./js/initialize.js");
+const VLE_apparatus_svg = require("./assets/VLE_Apparatus.svg");
 
 const containerElement = document.getElementById("p5-container");
 
-const sketch = (p) => {
+containerElement.innerHTML = VLE_apparatus_svg;
 
-    p.preload = function() {
-        gvs.VLE_apparatus_image = p.loadImage(`assets/VLE_Apparatus.png`);
-    }
+const sketch = (p) => {
 
     p.setup = function() {
         p.createCanvas(800, 530);

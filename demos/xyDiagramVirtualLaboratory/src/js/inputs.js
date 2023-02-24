@@ -9,6 +9,10 @@ const inputA12 = document.getElementById("submit-A12");
 const inputA12CI = document.getElementById("submit-A12-CI");
 const inputA21 = document.getElementById("submit-A21");
 const inputA21CI = document.getElementById("submit-A21-CI");
+const testTube = document.getElementById("path1218-9");
+const testTubeRim = document.getElementById("path1244");
+const pouringLiquid = document.getElementById("rect1216");
+const liquidInTestTube = document.getElementById("path1218");
 
 collectSampleButton.addEventListener("mousedown", () => {
   collectSampleButton.classList.add("pressed");
@@ -72,6 +76,9 @@ volumeASlider.addEventListener("input", () => {
 });
 
 function collectSample() {
+  gvs.yA_sample = NaN;
+  gvs.p.redraw();
+  collectSampleButton.setAttribute("disabled", "yes");
   const volume_A_remaining = Math.round((gvs.volume_A_remaining - gvs.volume_A) * 10) / 10;
   const volume_B_remaining = Math.round((gvs.volume_B_remaining - (10 - gvs.volume_A)) * 10) / 10;
   if(volume_A_remaining < 0 || volume_B_remaining < 0) {
@@ -80,9 +87,40 @@ function collectSample() {
     gvs.not_enough_liquid = false;
     gvs.volume_A_remaining = volume_A_remaining;
     gvs.volume_B_remaining = volume_B_remaining;
-    gvs.yA_sample = Math.min(1, (0.95 + 0.1 * Math.random()) * gvs.yA(gvs.xA_flask));
+    gvs.yA_sample = Math.min(1, Math.max(0, -0.03 + 0.06 * Math.random() + gvs.yA(gvs.xA_flask)));
+    if(gvs.xA_flask == 0) {
+      gvs.yA_sample = 0;
+    }
+    if(gvs.xA_flask == 1) {
+      gvs.yA_sample = 1;
+    }
+    testTube.style.opacity = "1";
+    testTubeRim.style.opacity = "1";
+    pouringLiquid.style.opacity = "1";
+    liquidInTestTube.style.opacity = "1";
+    let i = 0;
+    const fillTestTubeInterval = setInterval(() => {
+      if(i < 1) {
+        const v = 25 * i;
+        const m = 188 - v;
+        const d = `m 110.2,${m.toFixed(2)} v ${v.toFixed(2)} c 0.50,1.45 2.2,1.3 2.2,1.3 0,0 1.375,0.15 2.2,-1.3 v -${v.toFixed(2)}`;
+        liquidInTestTube.setAttribute("d", d);
+        i += 0.005;
+      } else {
+        clearInterval(fillTestTubeInterval);
+        pouringLiquid.style.opacity = "0";
+        setTimeout(() => {
+          gvs.p.redraw();
+        }, 1000);
+        setTimeout(() => {
+          testTube.style.opacity = "0";
+          testTubeRim.style.opacity = "0";
+          liquidInTestTube.style.opacity = "0";
+          collectSampleButton.removeAttribute("disabled");
+        }, 3000);
+      }
+    }, 20);
   }
-  gvs.p.redraw();
 }
 
 inputA12.addEventListener("input", () => {

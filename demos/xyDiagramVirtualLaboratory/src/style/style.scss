@@ -109,6 +109,14 @@ $modal-xl: 1140px;
 #p5-container {
     width: max-content;
     margin: auto;
+    position: relative;
+    &>svg {
+        position: absolute;
+        left: 540px;
+        top: -10px;
+        width: 245px;
+        height: min-content;
+    }
 }
 
 #submit-inputs-container {
