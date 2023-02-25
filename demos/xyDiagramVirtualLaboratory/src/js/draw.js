@@ -93,7 +93,7 @@ function drawSubmissionPage(p) {
   p.noStroke();
   p.textSize(16);
   p.textWrap(p.WORD);
-  p.text(`Enter the Margules Equation constants and their respective 95% confidence intervals in the input boxes below. The Margules Equation constants are each between 0.00 and 2.00. Enter your answers with two decimal places of precision, e.g. 1.53. The "view results" button will become enabled once values are entered into all four input boxes.`, 120, 50, 550);
+  p.text(`Enter the Margules Equation constants and their respective 95% confidence intervals in the input boxes below. The Margules Equation constants are each between 0.00 and 2.00. Enter your answers with two decimal places of precision, e.g. 1.53. The "view results" button will become enabled once values are entered into all five input boxes.`, 120, 50, 550);
   p.text(`A     = `, 147, 212);
   p.text(`A     = `, 147, 272);
   p.text(`±`, 410, 212);
