@@ -5,6 +5,7 @@ const proceedToSubmitButton = document.getElementById("proceed-to-submit-button"
 const submitButton = document.getElementById("submit-button");
 const backButton = document.getElementById("back-button");
 const resetButton = document.getElementById("reset-button");
+const downloadButton = document.getElementById("download-data-button");
 const inputA12 = document.getElementById("submit-A12");
 const inputA12CI = document.getElementById("submit-A12-CI");
 const inputA21 = document.getElementById("submit-A21");
@@ -50,6 +51,15 @@ backButton.addEventListener("mousedown", () => {
 
 backButton.addEventListener("mouseup", () => {
   backButton.classList.remove("pressed");
+});
+
+downloadButton.addEventListener("mousedown", () => {
+  downloadButton.classList.add("pressed");
+  download_data();
+});
+
+downloadButton.addEventListener("mouseup", () => {
+  downloadButton.classList.remove("pressed");
 });
 
 volumeASlider.addEventListener("input", () => {
@@ -123,6 +133,12 @@ function collectSample() {
       }
     }, 20);
   }
+  gvs.measurements.push([
+    gvs.volume_A.toFixed(1),
+    (Math.round((10 - gvs.volume_A) * 10) / 10).toFixed(1),
+    (Math.round(gvs.yA_sample * 1000) / 1000).toFixed(3),
+    (Math.round(gvs.temperature_flask * 10) / 10).toFixed(1)
+  ])
 }
 
 inputA12.addEventListener("input", () => {
@@ -247,4 +263,42 @@ function go_back() {
   collectSampleButton.style.visibility = "visible";
   backButton.classList.remove("pressed");
   gvs.p.redraw();
+}
+
+function download_data() {
+  let csv = `MW component A (g/mol),MW component B (g/mol),density component A (g/mL),density component B (g/mL)\n${gvs.MW_A},${gvs.MW_B},${gvs.density_A},${gvs.density_B}\n\nAntoine constants for component A:,A,B,C\n,${gvs.component_A_antoine_parameters[0]},${gvs.component_A_antoine_parameters[1]},${gvs.component_A_antoine_parameters[2]}\n\nAntoine constants for component B:,A,B,C\n,${gvs.component_B_antoine_parameters[0]},${gvs.component_B_antoine_parameters[1]},${gvs.component_B_antoine_parameters[2]}\n\nPressure (mmHg):,760\n\nMeasurements:\nVolume A (mL),Volume B (mL),yA,temperature (deg. C)`;
+
+  for(let i = 0; i < gvs.measurements.length; i++) {
+    const measurements = gvs.measurements[i];
+    const V_A = measurements[0];
+    const V_B = measurements[1];
+    const yA = measurements[2];
+    const T = measurements[3];
+    csv += `\n${V_A},${V_B},${yA},${T}`;
+  }
+
+  const d = new Date();
+  const day = d.getDay();
+  const month = d.getMonth();
+  const year = d.getFullYear();
+  let hour = d.getHours();
+  let AMPM = "AM";
+  if(hour > 12) {
+    hour -= 12;
+    AMPM = "PM";
+  }
+  let minute = d.getMinutes();
+  if(minute < 10) {
+    minute = `0${minute}`;
+  }
+
+  const filename = `measurement_data_${month}-${day}-${year}_${hour}-${minute}-${AMPM}.csv`;
+
+  const element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
+  element.setAttribute('download', filename)
+  element.style.display = "none";
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
 }
