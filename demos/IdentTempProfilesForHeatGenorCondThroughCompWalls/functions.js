@@ -887,13 +887,12 @@ function incorrectApartCSolution(correct){
 
 }
 
-function checkAnswerQuestionA(ans,rightAnswerPartA){
+function checkAnswerQuestionA(ans){
     let x,y;
     let m,b;
     if(g.problemPart == 0){
         if(g.chosenAnswer == null){
             g.bottomText = "Select an answer choice first.";
-            solutionButton.checked = false;
             g.solutionTruth = false;
         } else if (g.chosenAnswer == g.correctAnswer){
             g.bottomText = "Correct, move on to the next part."
@@ -922,14 +921,12 @@ function checkAnswerQuestionA(ans,rightAnswerPartA){
             pop();
         } else if (g.chosenAnswer != g.correctAnswer){
             g.bottomText = "Incorrect, try again.";
-            solutionButton.checked = false;
             g.solutionTruth = false;
         }
 
     } else if (g.problemPart == 1 && !nextPart.disabled){
         if(g.chosenAnswer == null){
             g.bottomText = "Select an answer choice first.";
-            solutionButton.checked = false;
             g.solutionTruth = false;
         } else if (g.chosenAnswer == g.correctAnswer){
             g.bottomText = "Correct, move on to the next part."
@@ -965,13 +962,11 @@ function checkAnswerQuestionA(ans,rightAnswerPartA){
             pop();
         } else if (g.chosenAnswer != g.correctAnswer){
             g.bottomText = "Incorrect, try again.";
-            solutionButton.checked = false;
             g.solutionTruth = false;
         }
     } else if (nextPart.disabled){
         if(g.chosenAnswer == null){
             g.bottomText = "Select an answer choice first.";
-            solutionButton.checked = false;
             g.solutionTruth = false;
         } else if (g.chosenAnswer == g.correctAnswer){
             g.bottomText = "Correct, move on to a new problem."
@@ -1009,7 +1004,6 @@ function checkAnswerQuestionA(ans,rightAnswerPartA){
             pop();
         } else if (g.chosenAnswer != g.correctAnswer){
             g.bottomText = "Incorrect, try again.";
-            solutionButton.checked = false;
             g.solutionTruth = false;
         }
     }
@@ -1037,4 +1031,16 @@ function fillquestionAprops(){
     g.qAprops[2] = 10+Math.round(Math.random()*10);
     g.qAprops[3] = -1 + Math.round(Math.random()*2);
     //g.qAprops[4] = -1 + Math.round(Math.random()*2);
+}
+
+function hint(){
+    if(g.heatWall == 'A'){
+        if(g.problemPart == 0){
+            g.bottomText = 'Hint: There is no heat transfer to the left side.';
+        } else if (g.problemPart == 1){
+            g.bottomText = 'Hint: Be sure to account for contact resistances.';
+        }
+    } else {
+
+    }
 }
