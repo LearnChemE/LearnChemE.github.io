@@ -26,6 +26,8 @@ window.gvs = {
     A12_CI_submission : undefined,
     A21_submission : undefined,
     A21_CI_submission : undefined,
+    names : "no names specified",
+    measurements : [],
 };
 
 require("./js/initialize.js");

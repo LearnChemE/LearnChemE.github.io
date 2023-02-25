@@ -51,20 +51,18 @@ $modal-xl: 1140px;
     }
     .collection-button-container {
         display: grid;
-        grid-template-columns: max-content max-content max-content;
+        grid-template-columns: repeat(4, max-content);
         width: 100%;
         justify-content: center;
         align-items: center;
-        gap: 30px;
-        #collection-button {
+        gap: 10px;
+        #collection-button, #proceed-to-submit-button, #download-data-button {
             display: grid;
             align-content: center;
             justify-content: center;
             height: 40px;
-            width: 120px;
             border: 1px solid grey;
             border-radius: 7px;
-            background: rgb(200, 235, 200);
             -webkit-touch-callout: none; /* iOS Safari */
             -webkit-user-select: none; /* Safari */
             -khtml-user-select: none; /* Konqueror HTML */
@@ -72,6 +70,10 @@ $modal-xl: 1140px;
             -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
             cursor: pointer;
+        }
+        #collection-button {
+            background: rgb(200, 235, 200);
+            width: 120px;
             &:hover {
                 background: rgb(210, 245, 210);
             }
@@ -80,27 +82,24 @@ $modal-xl: 1140px;
             }
         }
         #proceed-to-submit-button {
-            display: grid;
-            align-content: center;
-            justify-content: center;
-            height: 40px;
-            width: 130px;
-            border: 1px solid grey;
-            border-radius: 7px;
             background: rgb(194, 52, 52);
+            width: 120px;
             color: white;
-            -webkit-touch-callout: none; /* iOS Safari */
-            -webkit-user-select: none; /* Safari */
-            -khtml-user-select: none; /* Konqueror HTML */
-            -moz-user-select: none; /* Old versions of Firefox */
-            -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
-            cursor: pointer;
             &:hover {
                 background: rgb(234, 100, 100);
             }
             &.pressed {
                 background: rgb(255, 130, 130);
+            }
+        }
+        #download-data-button {
+            background:rgb(24, 199, 214);
+            width: 190px;
+            &:hover {
+                background: rgb(44, 210, 230);
+            }
+            &.pressed {
+                background: rgb(60, 220, 240);
             }
         }
     }
@@ -133,7 +132,7 @@ $modal-xl: 1140px;
 
 #submit-button {
     position: absolute;
-    top: 480px;
+    top: 580px;
     left: calc(50vw + 40px);
     display: grid;
     align-content: center;
@@ -161,7 +160,7 @@ $modal-xl: 1140px;
 
 #back-button {
     position: absolute;
-    top: 480px;
+    top: 580px;
     left: calc(50vw - 150px);
     display: grid;
     align-content: center;
@@ -213,6 +212,13 @@ $modal-xl: 1140px;
     &.pressed {
         background: rgb(180, 180, 255);
     }
+}
+
+#submit-name {
+    position: absolute;
+    left: 160px;
+    top: 117px;
+    width: 270px;
 }
 
 canvas {
