@@ -243,7 +243,11 @@ canvas {
     }
 }
 
-
+.video-container {
+    display: grid;
+    width: 100%;
+    justify-content: center;
+}
 
 *[disabled="yes"] {
     opacity: 0.3 !important;
