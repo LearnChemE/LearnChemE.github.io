@@ -125,3 +125,24 @@ gvs.molar_density_B = Number((gvs.density_B / gvs.MW_B).toPrecision(3));
 const mol_A = gvs.volume_A * gvs.molar_density_A;
 const mol_B = (10 - gvs.volume_A) * gvs.molar_density_B;
 gvs.xA_flask = mol_A / (mol_A + mol_B);
+
+const isFirstTime = localStorage.getItem("first_time");
+const directionsButton = document.getElementById("directions-button");
+if(isFirstTime === null) {
+    let button_is_lighter = false;
+    window.directionsButtonInterval = setInterval(() => {
+        if(button_is_lighter == false) {
+            directionsButton.style.background = "rgb(200, 200, 255)";
+            button_is_lighter = true;
+        } else {
+            directionsButton.style.background = "rgb(13, 110, 253)";
+            button_is_lighter = false;
+        }
+    }, 1000);
+}
+
+directionsButton.addEventListener("click", () => {
+    localStorage.setItem("first_time", "false");
+    directionsButton.style.background = "rgb(13, 110, 253)";
+    clearInterval(directionsButtonInterval);
+})

@@ -26,6 +26,10 @@ $modal-xl: 1140px;
     }
 }
 
+#directions-button {
+    transition: background 1s;
+}
+
 .input-area {
     display: grid;
     grid-template-columns: max-content;
