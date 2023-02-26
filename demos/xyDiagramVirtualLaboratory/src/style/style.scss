@@ -238,7 +238,12 @@ canvas {
     .details-text {
         margin-left: 20px;
     }
+    .details-eqn {
+        margin-left: 50px;
+    }
 }
+
+
 
 *[disabled="yes"] {
     opacity: 0.3 !important;
@@ -254,4 +259,10 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
   -moz-appearance: textfield;
+}
+
+.about-reference-2 {
+    margin-top: 10px;
+    margin-left: 20px;
+    font-size: 12px;
 }

@@ -100,13 +100,81 @@
         </div>
 
         <div class="modal-body">
-          <div class="details-text">Details</div>
+          <div class="details-text">The saturation pressure of component \( i = (A, B) \) is calculated using the Antoine equation:</div>
 
           <div class="details-eqn">
             $$
-
+            [1] \qquad P_{i}^{sat} = 10^{ ( A_{i} - \frac{ B_{i} }{ T + C_{i} } ) }
             $$
           </div>
+
+          <div class="details-text">where \( P_{i}^{sat} \) is saturation pressure of component \( i \) (mmHg), \( A_{i} \), \( B_{i} \), and \( C_{i} \) are Antoine constants of component \( i \), and \( T \) is temperature (°C). The two-parameter Margules model is used to calculate the activity coefficients for a non-ideal liquid mixture of components A and B. This model fits the excess Gibbs free energy:</div>
+
+          <div class="details-eqn">
+            $$
+            [2] \qquad \frac{G^{E}}{RT} = x_{A} x_{B} (A_{21} x_{A} + A_{12} x_{B})
+            $$
+          </div>
+
+          <div class="details-text">where \( G_{E} \) is excess Gibbs energy, and \( R \) is the ideal gas constant. The activity coefficients \( \gamma_{A} \) and \( \gamma_{B} \) are given by:</div>
+
+          <div class="details-eqn">
+            $$
+            [3] \qquad \mathrm{ln} \, \gamma_{A} = x_{B}^{2} (A_{12} + 2 ( A_{21} - A_{12} ) x_{A} )
+            $$
+
+            $$
+            [4] \qquad \mathrm{ln} \, \gamma_{B} = x_{A}^{2} (A_{21} + 2 ( A_{12} - A_{21} ) x_{B} )
+            $$
+          </div>
+
+          <div class="details-text">where \( x_{A} \) and \( x_{B} \) are the liquid mole fractions of components  and A and B, and \( x_{A} + x_{B} = 1 \), and \( A_{12} \) and \( A_{21} \) are the Margules parameters. The modified Raoult's law is used to calculate the bubble-point and dew-point pressures using the  \( K \) factors:</div>
+
+          <div class="details-eqn">
+            $$
+            [5] \qquad K_{i} = \frac{y_{i}}{x_{i}} = \gamma_{i} \frac{P_{i}^{sat}}{P}
+            $$
+          </div>
+
+          <div class="details-text">where \( y_{i} \) is the vapor mole fraction and \( y_{A} + y_{B} = 1 \), and \( P \) is the total pressure (mmHg). Bubble-point pressure calculation:</div>
+
+          <div class="details-eqn">
+            $$
+            [6] \qquad P = x_{A} \gamma_{A} P_{A}^{sat} + x_{B} \gamma_{B} P_{B}^{sat}
+            $$
+          </div>
+
+          <div class="details-text">Dew-point pressure calculation:</div>
+
+          <div class="details-eqn">
+            $$
+            [7] \qquad P = \left( \frac{y_{A}}{\gamma_{A} P_{A}^{sat}} + \frac{y_{B}}{\gamma_{B} P_{B}^{sat}} \right)^{-1}
+            $$
+          </div>
+
+          <div class="details-text">The mole fractions of components A and B in the liquid in the boiling flask (\(x_{A}\) and \(x_{B}\)) can be determined using the volumes \( V_{i} \) (mL), molecular weights \( MW_{i} \) (g/mol), and densities \( \rho_{i} \) (g/mL) of components A and B. First, molar density \( C_{i} \) (mol/mL) must be determined:</div>
+
+          <div class="details-eqn">
+            $$
+            [8] \qquad C_{i} = \frac{ \rho_{i} }{ MW_{i} }
+            $$
+          </div>
+
+          <div class="details-text">The mole fractions of components A and B can then be determined from the molar densities and volumes of each component:</div>
+
+          <div class="details-eqn">
+            $$
+            [9] \qquad x_{A} = \frac{ V_{A} C_{A} }{ V_{A} C_{A} + V_{B} C_{B} }
+            $$
+          </div>
+          
+          <div class="details-eqn">
+            $$
+            [10] \qquad x_{B} = 1 - x_{A}
+            $$
+          </div>
+
+          <div class="details-text">Watch <a href="" target="_blank">this screencast</a> to learn how to use Excel to determine Margules parameters and their 95% confidence intervals.</div>
           
           <div style="margin-top: 2rem;"></div>
         </div>
@@ -129,6 +197,12 @@
           <p>
             This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
           </p>
+          <div class="about-reference-1">
+            The vapor-liquid equilibrium measurement apparatus in this virtual laboratory is based on <a href="https://patentimages.storage.googleapis.com/f9/04/f4/299224a5e2bc7c/WO2017085744A1.pdf" target="_blank">a patent by N. Atmaram<sup>1</sup></a>.
+          </div>
+          <div class="about-reference-2">
+            <sup>1</sup>Atmaram, N. (2020). U.S. Patent No. 10,866,199. Washington, DC: U.S. Patent and Trademark Office.
+          </div>
         </div>
       </div>
     </div>
