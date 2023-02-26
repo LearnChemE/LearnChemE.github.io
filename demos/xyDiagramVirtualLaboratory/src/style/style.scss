@@ -26,6 +26,10 @@ $modal-xl: 1140px;
     }
 }
 
+#directions-button {
+    transition: background 1s;
+}
+
 .input-area {
     display: grid;
     grid-template-columns: max-content;
@@ -238,6 +242,15 @@ canvas {
     .details-text {
         margin-left: 20px;
     }
+    .details-eqn {
+        margin-left: 50px;
+    }
+}
+
+.video-container {
+    display: grid;
+    width: 100%;
+    justify-content: center;
 }
 
 *[disabled="yes"] {
@@ -254,4 +267,10 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
   -moz-appearance: textfield;
+}
+
+.about-reference-2 {
+    margin-top: 10px;
+    margin-left: 20px;
+    font-size: 12px;
 }
