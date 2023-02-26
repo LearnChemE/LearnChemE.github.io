@@ -16,7 +16,7 @@ window.g = {
     answers: [0,0,0,0,0],
     chosenAnswer: null,
     correctAnswer: null, 
-    problemPart: 0,
+    problemPart: 1,
     solutionTruth: false,
     hintTruth: false,
 
@@ -48,9 +48,11 @@ function draw(){
 
     if(g.heatWall == 'A'){
         solveProblemA();
+    } else {
+        solveProblemB();
     }
     
-    console.log(g.correctAnswer,g.chosenAnswer);
+    //console.log(g.correctAnswer,g.chosenAnswer);
     
 }
 
