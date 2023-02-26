@@ -28,7 +28,7 @@
 /* Display: grid is my favorite way of placing elements. As you can tell, I use it a lot. See this website for a brief synopsis: https://grid.malven.co . Gap is the space between grid elements. */
 .inputs-wrapper {
   display: grid;
-  grid-template-columns: max-content max-content max-content;
+  grid-template-columns: max-content max-content max-content max-content;
   justify-content: center;
   gap: 20px 20px;
   margin-bottom: 10px;

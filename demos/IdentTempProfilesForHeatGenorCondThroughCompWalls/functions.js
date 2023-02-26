@@ -129,7 +129,7 @@ function assignWall(){
     // } else {
     //     g.heatWall = 'B';
     // }
-    g.heatWall = 'A';
+    g.heatWall = 'B';
 }
 
 function assignThermalProps(){
@@ -574,7 +574,7 @@ function solveProblemA(){
     }
 
     if(g.solutionTruth){
-        checkAnswerQuestionA(right,rightAnswer);
+        checkAnswerQuestionA(right);
     }
     
     
@@ -628,6 +628,7 @@ function correctAsolution(){
     return(answer);
 }
 
+// Generates incorrect solutions for wall A profile when wall A is generating heat
 function incorrectAsolution(correct){
 
     // First check height between top of wall and top of correct A solution
@@ -769,6 +770,7 @@ function incorrectAsolution(correct){
     return(incorrectPartA)
 }
 
+// Generates incorrect solutions for wall B profile when wall A is generating heat
 function incorrectApartBSolution(correct){
     //let rightAnswer = Math.round(Math.random()*4);
     let incorrect = [];
@@ -842,6 +844,7 @@ function incorrectApartBSolution(correct){
     return(incorrect);
 }
 
+// Generates incorrect solutions for wall C profile when wall A is generating heat
 function incorrectApartCSolution(correct){
     let incorrect = [];
     let x1, y1, x2, y2;
@@ -887,13 +890,12 @@ function incorrectApartCSolution(correct){
 
 }
 
-function checkAnswerQuestionA(ans,rightAnswerPartA){
+function checkAnswerQuestionA(ans){
     let x,y;
     let m,b;
     if(g.problemPart == 0){
         if(g.chosenAnswer == null){
             g.bottomText = "Select an answer choice first.";
-            solutionButton.checked = false;
             g.solutionTruth = false;
         } else if (g.chosenAnswer == g.correctAnswer){
             g.bottomText = "Correct, move on to the next part."
@@ -922,14 +924,12 @@ function checkAnswerQuestionA(ans,rightAnswerPartA){
             pop();
         } else if (g.chosenAnswer != g.correctAnswer){
             g.bottomText = "Incorrect, try again.";
-            solutionButton.checked = false;
             g.solutionTruth = false;
         }
 
     } else if (g.problemPart == 1 && !nextPart.disabled){
         if(g.chosenAnswer == null){
             g.bottomText = "Select an answer choice first.";
-            solutionButton.checked = false;
             g.solutionTruth = false;
         } else if (g.chosenAnswer == g.correctAnswer){
             g.bottomText = "Correct, move on to the next part."
@@ -965,13 +965,11 @@ function checkAnswerQuestionA(ans,rightAnswerPartA){
             pop();
         } else if (g.chosenAnswer != g.correctAnswer){
             g.bottomText = "Incorrect, try again.";
-            solutionButton.checked = false;
             g.solutionTruth = false;
         }
     } else if (nextPart.disabled){
         if(g.chosenAnswer == null){
             g.bottomText = "Select an answer choice first.";
-            solutionButton.checked = false;
             g.solutionTruth = false;
         } else if (g.chosenAnswer == g.correctAnswer){
             g.bottomText = "Correct, move on to a new problem."
@@ -1009,7 +1007,6 @@ function checkAnswerQuestionA(ans,rightAnswerPartA){
             pop();
         } else if (g.chosenAnswer != g.correctAnswer){
             g.bottomText = "Incorrect, try again.";
-            solutionButton.checked = false;
             g.solutionTruth = false;
         }
     }
@@ -1017,10 +1014,316 @@ function checkAnswerQuestionA(ans,rightAnswerPartA){
 
 // Generates the correct solution when wall B is generating heat
 function solveProblemB(){
-    
+    ans = correctBsolution();
+    console.log(ans)
+    // Temporary correct answer display
+    for(let i  = 0; i < ans.length-2; i++){
+        if(i != 3){
+            line(ans[i][0],ans[i][1],ans[i+1][0],ans[i+1][1]);
+        }
+    }
+
+    let incorrectPartA = incorrectBsolution(ans);
+    let incorrectPartB = incorrectBpartBsolution(ans);
+    let incorrectPartC = incorrectBpartCsolution(ans);
+
+    if(g.problemPart == 0 && !g.solutionTruth){
+        BdisplayAnswersB();
+    } else if (g.problemPart == 1 && !nextPart.disabled && !g.solutionTruth){
+        BdisplayAnswersBpartB();
+    } else if (nextPart.disabled && !g.solutionTruth){
+        BdisplayAnswersBpartC();
+    }
+
+    function BdisplayAnswersB(){
+        let x, y;
+        let m, b;
+        push();
+        drawingContext.setLineDash([5,5]); noFill();
+        strokeWeight(2); stroke(120,0,120);
+        for(let i = 0; i < incorrectPartA.length; i++){
+            if(i == 0){
+                let temp = incorrectPartA[i];
+                beginShape();
+                for(let j = 0; j < temp.length; j++){
+                    vertex(temp[j][0],temp[j][1]);
+                    if(j == 7){
+                        x = temp[j][0]; y = temp[j][1];
+                    }
+                }
+                endShape();
+                push();
+                noStroke(); fill(255);
+                rect(x-1,y-7,12,13);
+                fill(0); textSize(15);
+                text(g.answers[i],x,y+5);
+                pop();
+            } else if (i == 1){
+                let temp = incorrectPartA[i];
+                line(temp[0],temp[1],temp[2],temp[3]);
+                m = (temp[3] - temp[1])/(temp[2] - temp[0]);
+                b = temp[1] - m*temp[0];
+                x = g.wallX[4] - 30;
+                y = m*x + b;
+                push();
+                noStroke(); fill(255);
+                rect(x-1,y-7,12,13);
+                fill(0); textSize(15);
+                text(g.answers[i],x,y+5);
+                pop();
+            } else if (i == 2){
+                let temp = incorrectPartA[i];
+                if(temp.length == 8){
+                    bezier(temp[0],temp[1],temp[2],temp[3],temp[4],temp[5],temp[6],temp[7]);
+                    x = temp[2]; y = temp[3]+7;
+                    push();
+                    noStroke(); fill(255);
+                    rect(x-1,y-7,12,13);
+                    fill(0); textSize(15);
+                    text(g.answers[i],x,y+5);
+                pop();
+                } else {
+                    line(temp[0],temp[1],temp[2],temp[3]);
+                    m = (temp[3] - temp[1])/(temp[2] - temp[0]);
+                    b = temp[1] - m*temp[0];
+                    x = g.wallX[5] + 30;
+                    y = m*x + b;
+                    push();
+                    noStroke(); fill(255);
+                    rect(x-1,y-7,12,13);
+                    fill(0); textSize(15);
+                    text(g.answers[i],x,y+5);
+                    pop();
+                }
+            } else if (i == 3){
+                let temp = incorrectPartA[i];
+                bezier(temp[0],temp[1],temp[2],temp[3],temp[4],temp[5],temp[6],temp[7]);
+                x = temp[2]; y = temp[3]-10;
+                push();
+                noStroke(); fill(255);
+                rect(x-1,y-7,12,13);
+                fill(0); textSize(15);
+                text(g.answers[i],x,y+5);
+                pop();
+            }
+        }
+
+        line(ans[5][0],ans[5][1],ans[4][0],ans[4][1]);
+        push();
+        noStroke(); fill(255);
+        rect(g.wallX[4]-30,ans[5][1]-7,12,13);
+        fill(0); textSize(15);
+        text(g.answers[4],g.wallX[4]-29,ans[5][1]+5);
+        g.correctAnswer = g.answers[4];
+        pop();
+        pop();
+    }
+
+    function BdisplayAnswersBpartB(){
+        let x, y, m, b;
+        push();
+        strokeWeight(2); stroke(120,0,120); fill(120,0,120);
+        line(ans[5][0],ans[5][1],ans[4][0],ans[4][1]);
+        ellipse(ans[5][0],ans[5][1],6);
+        ellipse(ans[4][0],ans[4][1],6);
+        noFill(); drawingContext.setLineDash([5,5]);
+
+
+        beginShape();
+        let temp = ans[3];
+        for(let i = 0; i < temp.length; i++){
+            vertex(temp[i][0],temp[i][1]);
+        }
+        endShape();
+        pop();
+    }
+
+    function BdisplayAnswersBpartC(){
+
+    }
+
+    if(g.solutionTruth){
+        checkAnswerQuestionB(ans);
+    }
 
     
 }
+
+// Generates the correct solution when wall B is generating heat
+function correctBsolution(){
+    
+    let HF = g.length*g.Q*1000; // Heat flux
+    let tempVec = new Array(3);
+
+    tempVec[0] = HF/g.h + g.Tinf; // Ts1
+    tempVec[1] = HF*g.length/g.kvalues[2] + tempVec[0]; // Ts2
+    tempVec[2] = HF*g.Rtc + tempVec[1]; // Ts3
+
+    let c2 = tempVec[2] + g.Q*g.length**2*1000/(2*g.kvalues[1]);
+    let answer = [];
+    let Bcurve = [];
+
+    // Solves for the curve in wall B
+    for(let i = 0; i < 10; i++){
+        let x = 0.02*i;
+        let y = -10*g.Q*x**2/(2*g.kvalues[1]) + c2;
+        Bcurve.push([x,y]);
+    }
+    Bcurve.push([.2,tempVec[2]]);
+    let Bcurvepx = [];
+
+    let upperLim = 80; let lowerLim = 25;
+    let upperPx = 170; let lowerPx = 325;
+
+    // Converts the temperature values and x-locations into pixel coords
+    for(let i = 0; i < tempVec.length; i++){
+        let y = map(tempVec[i],lowerLim,upperLim,lowerPx,upperPx);
+        answer.push([g.wallX[i],y]);
+    }
+
+    for(let i = 0; i < Bcurve.length; i++){
+        let x = map(Bcurve[i][0],0,.2,g.wallX[3],g.wallX[2]);
+        let y = map(Bcurve[i][1],lowerLim,upperLim,lowerPx,upperPx);
+        Bcurvepx.push([x,y]);
+    }
+
+    answer.push(Bcurvepx);
+    answer.push([g.wallX[4],Bcurvepx[0][1]]);
+    answer.push([g.wallX[5],Bcurvepx[0][1]]);
+    return(answer);
+}
+
+// Generates incorrect solutions for wall A profile when wall B is generating heat
+function incorrectBsolution(ans){
+    let incorrect = [];
+    let x, y;
+    let x1, y1, x2, y2, x3, y3;
+
+    // Correct solution for part B as a choice
+    let choice1 = []; 
+    for(let i = 0; i < ans[3].length; i++){
+        x = ans[3][i][0] - 170;
+        y = ans[3][i][1] + g.qAprops[2];
+        choice1.push([x,y]);
+    }
+    incorrect.push(choice1);
+
+    // Upward sloped line
+    let choice2 = [];
+    x = g.wallX[5]; y = ans[5][1] - 1.2*g.qAprops[2];
+    choice2.push(x,y);
+    x = g.wallX[4]; y = ans[4][1] - 1*2*g.qAprops[2] - 20;
+    choice2.push(x,y);
+    incorrect.push(choice2);
+    
+    // Bezier or downward line
+    if(g.Rtc <= 0.03){
+        x = g.wallX[5]; y = choice2[3] - g.qAprops[3]*g.qAprops[1];
+        x1 = x + 20; y1 = y - 25;
+        x2 = x1 + 20 + g.qAprops[2]; y2 = y1 - g.qAprops[1];
+        x3 = g.wallX[4]; y3 = choice2[3] - 1.3*g.qAprops[1];
+        incorrect.push([x,y,x1,y1,x2,y2,x3,y3]);
+    } else {
+        x = g.wallX[5]; y = choice1[0][1] + 15 + g.qAprops[1];
+        x1 = g.wallX[4]; y1 = choice1[choice1.length-1][1] + 5 + g.qAprops[2];
+        incorrect.push([x,y,x1,y1]);
+    }
+
+    // Lower bezier
+    if(incorrect[2].length == 8){
+        x = g.wallX[5]; y = choice1[0][1] + g.qAprops[2];
+        x1 = x + 40; y1 = y + 50;
+        x2 = x1 + 30; y2 = y1 + g.qAprops[3]*g.qAprops[2];
+        x3 = g.wallX[4]; y3 = y2;
+        incorrect.push([x,y,x1,y1,x2,y2,x3,y3]);
+    } else {
+        x = g.wallX[5]; y = incorrect[2][1] + g.qAprops[2];
+        x1 = x + 40; y1 = y + 50;
+        x2 = x1 + 30; y2 = y1 + g.qAprops[3]*g.qAprops[2];
+        x3 = g.wallX[4]; y3 = y2;
+        incorrect.push([x,y,x1,y1,x2,y2,x3,y3]);
+    }
+    
+    return(incorrect);
+}
+
+// Generates incorrect solutions for wall B profile when wall B is generating heat
+function incorrectBpartBsolution(ans){
+    let correct = ans[3];
+    let incorrect = [];
+
+    let x, y;
+    let x1, y1, x2, y2, x3, y3;
+
+    // Upward slanting answer
+    x = g.wallX[3]; y = correct[0][1] - g.qAprops[2];
+    x1 = g.wallX[2]; y1 = y - 25 - g.qAprops[1];
+    line(x,y,x1,y1);
+    incorrect.push([x,y,x1,y1]);
+
+    // Flat answer
+    let diff = correct[0][1] - y;
+    x = g.wallX[3]; y = correct[correct.length-1][1] + diff/2;
+    x1 = g.wallX[2]; y1 = y;
+    line(x,y,x1,y1);
+    incorrect.push([x,y,x1,y1]);
+
+
+
+    return(incorrect);
+}
+
+// Generates incorrect solutions for wall C profile when wall B is generating heat
+function incorrectBpartCsolution(ans){
+
+}
+
+function checkAnswerQuestionB(ans){
+    let x, y;
+    let m, b;
+    if(g.problemPart == 0){
+        if(g.chosenAnswer == null){
+            g.bottomText = "Select an answer choice first.";
+            g.solutionTruth = false;
+        } else if (g.chosenAnswer == g.correctAnswer){
+            g.bottomText = "Correct, move on to the next part.";
+            push(); 
+            strokeWeight(2); stroke(120,0,120);
+            line(ans[5][0],ans[5][1],ans[4][0],ans[4][1]);
+            push();
+            noStroke(); fill(255);
+            rect(g.wallX[4]-30,ans[5][1]-7,12,13);
+            fill(0); textSize(15);
+            text(g.answers[4],g.wallX[4]-29,ans[5][1]+5);
+            pop();
+            pop();
+        } else if (g.chosenAnswer != g.correctAnswer){
+            g.bottomText = "Incorrect, try again.";
+            g.solutionTruth = false;
+        }
+    } else if (g.problemPart == 1 && !nextPart.disabled){
+        if(g.chosenAnswer == null){
+            g.bottomText = "Select an answer choice first.";
+            g.solutionTruth = false;
+        } else if (g.chosenAnswer == g.correctAnswer){
+            g.bottomText = "Correct, move on to the next part.";
+
+        } else if (g.chosenAnswer != g.correctAnswer){
+            g.bottomText = "Incorrect, try again.";
+            g.solutionTruth = false;
+        }
+    } else if (nextPart.disabled){
+        if(g.chosenAnswer == null){
+            g.bottomText = "Select an answer choice first.";
+            g.solutionTruth = false;
+        } else if (g.chosenAnswer == g.correctAnswer){
+            g.bottomText = "Correct, move on to a new problem.";
+            g.solutionTruth = false;
+        }
+    }
+}
+
+
 
 function bottomText(){
     push();
@@ -1037,4 +1340,16 @@ function fillquestionAprops(){
     g.qAprops[2] = 10+Math.round(Math.random()*10);
     g.qAprops[3] = -1 + Math.round(Math.random()*2);
     //g.qAprops[4] = -1 + Math.round(Math.random()*2);
+}
+
+function hint(){
+    if(g.heatWall == 'A'){
+        if(g.problemPart == 0){
+            g.bottomText = 'Hint: There is no heat transfer to the left side.';
+        } else if (g.problemPart == 1){
+            g.bottomText = 'Hint: Be sure to account for contact resistances.';
+        }
+    } else {
+
+    }
 }

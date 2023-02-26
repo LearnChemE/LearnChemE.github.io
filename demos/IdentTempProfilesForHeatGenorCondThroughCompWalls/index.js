@@ -16,7 +16,7 @@ window.g = {
     answers: [0,0,0,0,0],
     chosenAnswer: null,
     correctAnswer: null, 
-    problemPart: 0,
+    problemPart: 1,
     solutionTruth: false,
     hintTruth: false,
 
@@ -48,9 +48,11 @@ function draw(){
 
     if(g.heatWall == 'A'){
         solveProblemA();
+    } else {
+        solveProblemB();
     }
     
-    console.log(g.correctAnswer);
+    //console.log(g.correctAnswer,g.chosenAnswer);
     
 }
 
@@ -71,9 +73,10 @@ newProblem.addEventListener("click", function(){
     g.problemPart = 0;
     nextPart.disabled = false;
     g.correctAnswer = null;
-    solutionButton.checked = false;
-    hintButton.checked = false;
+    solutionButton.disabled = false;
+    hintButton.disabled = false;
     g.bottomText = '';
+    g.chosenAnswer = null;
     fillquestionAprops();
 
     // Removes the previously selected answer choice
@@ -96,9 +99,15 @@ nextPart.addEventListener("click", function(){
     fillquestionAprops();
     g.answers = assignAnswers();
     g.correctAnswer = null;
-    solutionButton.checked = false;
-    hintButton.checked = false;
+    g.chosenAnswer = null;
+    solutionButton.disabled = false;
+    hintButton.disabled = false;
     g.bottomText = '';
+    for(let i = 0; i < answerChoices.length; i++){
+        if(answerChoices[i].checked){
+            answerChoices[i].checked = false;
+        }
+    }
     redraw();
 });
 
@@ -114,9 +123,15 @@ for(let i = 0; i < answerChoices.length; i++){
 };
 
 solutionButton.addEventListener("click", function(){
-    g.solutionTruth = solutionButton.checked;
+    g.solutionTruth = true;
+    if(g.chosenAnswer == g.correctAnswer){
+        solutionButton.disabled = true;
+    }
 });
 
 hintButton.addEventListener("click", function(){
-    g.hintTruth = hintButton.checked;
+    g.hintTruth = true;
+    hintButton.disabled = true;
+    hint();
+    redraw();
 });
