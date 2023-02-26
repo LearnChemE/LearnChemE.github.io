@@ -52,7 +52,7 @@
 
         <button type="button" class="btn btn-danger" id="solution">Submit answer</button>
 
-        <button type="button" class="btn btn-success" id="next-part" >Next</button>
+        <button type="button" class="btn btn-success" id="next-part">Next</button>
         
       </div>
 
@@ -99,7 +99,10 @@
         </div>
         <div class="modal-body">
           <p>
-            
+            Heat is generated at a constate rate in either wall A or B (whichever wall is slowly changing color intensity). The object of this simulation is to identify the correct steady-state temperature profile in each wall. The thermal conductivity for each wall is indicated on the figure, and the contact resistance is indicated above the figure. The left side of wall A is insulated and heat is transferred from the right side of wall C to flowing air at 20°C. 
+          </p>
+          <p>
+            Use the buttons to select the correct temperature profile for each wall in sequence and check your answer with the "submit answer" button. Click the "show hint" button for help, and click the "next" button to move onto the next wall section. Click the "new problem" button to start over with a new set of conditions.
           </p>
           
         </div>
@@ -120,15 +123,120 @@
         </div>
 
         <div class="modal-body">
-          
-          <div style="height:20px"></div>
-          <ol class="references">
-            <li>
-              <i>Temperature Changes in an Ideal Gas</i> [Video]. (Sep 1, 2016) <a
-                href="https://www.youtube.com/watch?v=8oMXAioe2p8"
-                target="_blank">www.youtube.com/watch?v=8oMXAioe2p8</a>
-            </li>
-          </ol>
+          <div class="modal-text">
+            Heat is conducted through a composite wall with heat generation in either wall A or wall B. Differential equations determine the temperature profile of each wall. When heat is generated in wall A:
+          </div>
+          <div class="modal-equation">
+            $$
+            \frac{d^2T}{dz^2} = -\frac{Q}{k_A},
+            $$
+          </div>
+          <div class="modal-equation">
+            $$
+            \frac{dT}{dz}|_{z=0} = 0,
+            $$
+          </div>
+          <div class="modal-equation">
+            $$
+            T|_{z=L_A} = T_{s,5},
+            $$
+          </div>
+          <div class="modal-text">
+            where \(T\) is temperature (°C), \(z\) is wall thickness (m), \(Q\) is the volumentric heat generation (W/m\(^3\)), \(k_A\) is the thermal conductivity in wall A (W/[m K]), \(L_A\) is the thickness of wall A (m), and \(T_{s,5}\) is the surface temperature of the right side of wall A (°C), and \(T_{s,1}\) is the right side of wall C.
+          </div>
+          <div class="modal-text">
+            A thermal circuit is considered starting from the right side of the wall with heat transfer to the air by forced convection. If wall A generates heat, then the heat flux is:
+          </div>
+          <div class="modal-equation">
+            $$
+            q = \frac{T_{s,1} - T_∞}{1/h} = \frac{T_{s,2} - T_{s,1}}{L_C/k_C} = \frac{T_{s,3} - T_{s,2}}{R_{tc}} = \frac{T_{s,4} - T_{s,3}}{L_B/k_B} = \frac{T_{s,5} - T_{s,4}}{R_{tc}}.
+            $$
+          </div>
+          <div class="modal-text">
+            The heat flux when wall A generates heat is:
+          </div>
+          <div class="modal-equation">
+            $$
+            q = QL_A,
+            $$
+          </div>
+          <div class="modal-text">
+            where \(q\) is heat flux (W/m\(^2\)).
+          </div>
+          <div class="modal-text">
+            For generation in either wall, the surface temperatures are:
+          </div>
+          <div class="modal-equation">
+            $$
+            T_{s,1} = T_∞ + \frac{q}{h},
+            $$
+          </div>
+          <div class="modal-equation">
+            $$
+            T_{s,2} = T_{s,1} + q\frac{L_C}{k_C},
+            $$
+          </div>
+          <div class="modal-equation">
+            $$
+            T_{s,3} = T_{s,2} + qR_{tc}, 
+            $$
+          </div>
+          <div class="modal-text">
+            where \(h\) is the heat transfer coefficient (W/[m\(^2\) K]), and \(R_{tc}\) is the contact resistance ([m\(^2\) K]/W).
+          </div>
+          <div class="modal-text">
+            For heat generation in wall A, the rest of the surface temperatures are:
+          </div>
+          <div class="modal-equation">
+            $$
+            T_{s,4} = T_{s,3} + q\frac{L_B}{k_B},
+            $$
+          </div>
+          <div class="modal-equation">
+            $$
+            T_{s,5} = T_{s,4} + qR_{tc},
+            $$
+          </div>
+          <div class="modal-text">
+            \(\quad T_{s,6} = T(z)\) the solution to the differential equations.
+          </div>
+          <div class="modal-text">
+            The heat flux when wall B generates heat is:
+          </div>
+          <div class="modal-equation">
+            $$
+             q = QL_B
+            $$
+          </div>
+          <div class="modal-text">
+            and
+          </div>
+          <div class="modal-equation">
+            $$
+            \frac{d^2T}{dz^2} = -\frac{Q}{k_B},
+            $$
+          </div>
+          <div class="modal-equation">
+            $$
+            \frac{dT}{dz}|_{z=L_A} = 0,
+            $$
+          </div>
+          <div class="modal-equation">
+            $$
+            T|_{z=L_A+L_B} = T_{s,3}.
+            $$
+          </div>
+          <div class="modal-text">
+            For heat generation in wall B, the remaining surface temperatures are:
+          </div>
+          <div class="modal-text">
+            \(\quad T_{s,4} = T(z)\) the solution to the differential equations,
+          </div>
+          <div class="modal-equation">
+            $$
+            T_{s,6} = T_{s,5} = T_{s,4}.
+            $$
+          </div>
         </div>
         <div style="height: 30px;"></div>
       </div>
