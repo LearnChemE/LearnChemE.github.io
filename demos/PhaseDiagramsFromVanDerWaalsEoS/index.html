@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Phase Diagrams from Van der Waals Equation of State</title>
+
+        <script src="./libraries/p5.js"></script>
+        <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+        <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
+        <meta name="author" content="Patrick Doyle">
+        <meta name="application-name" content="LearnChemE simulation template">
+        <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
+
+        <link href="./sliders.css" rel="stylesheet">
+        <link href="./style.css" rel="stylesheet">
+        <link href="./bootstrap.min.css" rel="stylesheet">
+        <script>
+          MathJax = {
+            chtml: {
+              scale: 0.95,
+              mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+              displayAlign: 'left', // default for indentalign when set to 'auto'
+            }
+          };
+        </script>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="./jquery.js"></script>
+        <script src="./popper.js"></script>
+        <script src="./bootstrap.min.js"></script>
+    </head>
+
+    <body>
+        <div id="simulation-wrapper">
+            <div class="simulation-controls">
+                <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
+                <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+                <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>    
+            </div>
+            <div class="inputs-wrapper">
+                <div class="btn-group btn-group-sm" id="diagram-type">
+                    <input type="radio" class="btn-check" name="btnradio" id="P-V-diagram" autocomplete="off" value="P-V-diagram" checked>
+                    <label class="btn btn-outline-primary" for="P-V-diagram" style="margin-right: 0px">P-V diagram</label>
+
+                    <input type="radio" class="btn-check" name="btnradio" id="T-V-diagram" autocomplete="off" value="T-V-diagram">
+                    <label class="btn btn-outline-primary" for="T-V-diagram">T-V diagram</label>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-label" id="units">Temperature (K)</div>
+                    <input type="range" id="slider" min="275" max="750" value="500" step="5" />
+                    <div id="slider-value" class="value-label">500</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="graphics-wrapper">
+
+        </div>
+
+
+        <script src="index.js"></script>
+        <script src="functions.js"></script>
+        <script src="data.js"></script>
+    
+    </body>
+</html>
