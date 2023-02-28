@@ -129,21 +129,28 @@ function assignWall(){
     } else {
         g.heatWall = 'B';
     }
+    g.heatWall = 'B';
 }
 
 function assignThermalProps(){
     let temp;
 
     // Wall A
-    temp = 15 + Math.round(Math.random()*5); // Between .20 and .25
+    temp = 15 + Math.round(Math.random()*10); // Between .20 and .25
     g.kvalues[0] = (temp/100).toFixed(2);
 
     // Wall B
-    temp = 14 + Math.round(Math.random()*2); // Between .12 and .14
-    g.kvalues[1] = (temp/100).toFixed(2);
+    if(g.heatWall == 'A'){
+        temp = 35 + Math.round(Math.random()*10); // Between .12 and .14
+        g.kvalues[1] = (temp/100).toFixed(2);
+    } else {
+        temp = 20 + Math.round(Math.random()*10);
+        g.kvalues[1] = (temp/100).toFixed(2);
+    }
+    
 
     // Wall C
-    temp = 14 + Math.round(Math.random()*5); // Between .14 and .19
+    temp = 10 + Math.round(Math.random()*5); // Between .14 and .19
     g.kvalues[2] = (temp/100).toFixed(2);
 
     // Thermal resistance
@@ -603,8 +610,8 @@ function correctAsolution(){
     }
     Acurve.push([.2,tempVec[4]]);
     Acurvepx = [];
-    
-    let upperLim = 80; let lowerLim = 25;
+
+    let upperLim = 97; let lowerLim = 25;
     let upperPx = 170; let lowerPx = 375;
 
     // Converts the temperature values and x-locations into pixel coords
@@ -1342,8 +1349,8 @@ function correctBsolution(){
     Bcurve.push([.2,tempVec[2]]);
     let Bcurvepx = [];
 
-    let upperLim = 80; let lowerLim = 25;
-    let upperPx = 170; let lowerPx = 325;
+    let upperLim = 65; let lowerLim = 25;
+    let upperPx = 180; let lowerPx = 325;
 
     // Converts the temperature values and x-locations into pixel coords
     for(let i = 0; i < tempVec.length; i++){
