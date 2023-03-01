@@ -2,7 +2,7 @@
 window.g = {
     cnv: undefined,
     slider: 500,
-    diagram: "T-V-diagram",
+    diagram: "P-V-diagram",
 
     // Constants to be used 
     R: 8.314,
@@ -33,6 +33,16 @@ function setup() {
 function draw() {
     background(250);
     graphDraw();
+    
+    if(g.diagram == 'P-V-diagram'){
+        pressureVolume();
+    } else {
+        temperatureVolume();
+    }
+
+    graphLabels();
+    
+    
     
 }
 
