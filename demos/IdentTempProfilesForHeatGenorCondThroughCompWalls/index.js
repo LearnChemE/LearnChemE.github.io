@@ -16,7 +16,7 @@ window.g = {
     answers: [0,0,0,0,0],
     chosenAnswer: null,
     correctAnswer: null, 
-    problemPart: 1,
+    problemPart: 0,
     solutionTruth: false,
     hintTruth: false,
 

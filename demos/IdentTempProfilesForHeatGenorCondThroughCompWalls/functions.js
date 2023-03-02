@@ -124,11 +124,11 @@ function alphaManipulation(){
 // *Randomly* assigns wall for either A or B
 function assignWall(){
     let wall = Math.round(Math.random());
-    // if(wall == 0){
-    //     g.heatWall = 'A';
-    // } else {
-    //     g.heatWall = 'B';
-    // }
+    if(wall == 0){
+        g.heatWall = 'A';
+    } else {
+        g.heatWall = 'B';
+    }
     g.heatWall = 'B';
 }
 
@@ -136,15 +136,21 @@ function assignThermalProps(){
     let temp;
 
     // Wall A
-    temp = 15 + Math.round(Math.random()*5); // Between .20 and .25
+    temp = 15 + Math.round(Math.random()*10); // Between .20 and .25
     g.kvalues[0] = (temp/100).toFixed(2);
 
     // Wall B
-    temp = 14 + Math.round(Math.random()*2); // Between .12 and .14
-    g.kvalues[1] = (temp/100).toFixed(2);
+    if(g.heatWall == 'A'){
+        temp = 35 + Math.round(Math.random()*10); // Between .12 and .14
+        g.kvalues[1] = (temp/100).toFixed(2);
+    } else {
+        temp = 20 + Math.round(Math.random()*10);
+        g.kvalues[1] = (temp/100).toFixed(2);
+    }
+    
 
     // Wall C
-    temp = 14 + Math.round(Math.random()*5); // Between .14 and .19
+    temp = 10 + Math.round(Math.random()*5); // Between .14 and .19
     g.kvalues[2] = (temp/100).toFixed(2);
 
     // Thermal resistance
@@ -604,8 +610,8 @@ function correctAsolution(){
     }
     Acurve.push([.2,tempVec[4]]);
     Acurvepx = [];
-    
-    let upperLim = 80; let lowerLim = 25;
+
+    let upperLim = 97; let lowerLim = 25;
     let upperPx = 170; let lowerPx = 375;
 
     // Converts the temperature values and x-locations into pixel coords
@@ -1015,13 +1021,6 @@ function checkAnswerQuestionA(ans){
 // Generates the correct solution when wall B is generating heat
 function solveProblemB(){
     ans = correctBsolution();
-    console.log(ans)
-    // Temporary correct answer display
-    for(let i  = 0; i < ans.length-2; i++){
-        if(i != 3){
-            line(ans[i][0],ans[i][1],ans[i+1][0],ans[i+1][1]);
-        }
-    }
 
     let incorrectPartA = incorrectBsolution(ans);
     let incorrectPartB = incorrectBpartBsolution(ans);
@@ -1031,7 +1030,7 @@ function solveProblemB(){
         BdisplayAnswersB();
     } else if (g.problemPart == 1 && !nextPart.disabled && !g.solutionTruth){
         BdisplayAnswersBpartB();
-    } else if (nextPart.disabled && !g.solutionTruth){
+    } else if (nextPart.disabled && !g.solutionTruth && !solutionButton.disabled){
         BdisplayAnswersBpartC();
     }
 
@@ -1121,6 +1120,7 @@ function solveProblemB(){
 
     function BdisplayAnswersBpartB(){
         let x, y, m, b;
+        let temp1 = incorrectPartB;
         push();
         strokeWeight(2); stroke(120,0,120); fill(120,0,120);
         line(ans[5][0],ans[5][1],ans[4][0],ans[4][1]);
@@ -1128,18 +1128,195 @@ function solveProblemB(){
         ellipse(ans[4][0],ans[4][1],6);
         noFill(); drawingContext.setLineDash([5,5]);
 
+        for(let i = 0; i < temp1.length; i++){
+            if(i == 0){
+                let t = temp1[i];
+                line(t[0],t[1],t[2],t[3]);
+                m = (t[3] - t[1])/(t[2] - t[0]);
+                b = t[1] - m*t[0];
+                x = g.wallX[3] + 30;
+                y = m*x + b;
+                push();
+                noStroke(); fill(255);
+                rect(x-1,y-7,12,13);
+                fill(0); textSize(15);
+                text(g.answers[i],x,y+5);
+                pop();
+            } else if (i == 1){
+                let t = temp1[i];
+                line(t[0],t[1],t[2],t[3]);
+                x = g.wallX[3] + 15;
+                y = t[1];
+                push();
+                noStroke(); fill(255);
+                rect(x-1,y-7,12,13);
+                fill(0); textSize(15);
+                text(g.answers[i],x,y+5);
+                pop();
+            } else if (i == 2){
+                let t = temp1[i]; 
+                beginShape();
+                for(let j = 0; j < t.length; j++){
+                    vertex(t[j][0],t[j][1]);
+                    if(j == t.length-3){
+                        x = t[j][0];
+                        y = t[j][1];
+                    }
+
+                }
+                endShape();push();
+                noStroke(); fill(255);
+                rect(x-1,y-7,12,13);
+                fill(0); textSize(15);
+                text(g.answers[i],x,y+5);
+                pop();
+            } else if (i == 3){
+                let t = temp1[i];
+                if(t.length == 8){
+                    bezier(t[0],t[1],t[2],t[3],t[4],t[5],t[6],t[7]);
+                    push();
+                    noStroke(); fill(255);
+                    rect(t[2],t[3],12,13);
+                    fill(0); textSize(15);
+                    text(g.answers[i],t[2]+1,t[3]+12);
+                    pop();
+                } else {
+                    line(t[0],t[1],t[2],t[3]);
+                    m = (t[3] - t[1])/(t[2] - t[0]);
+                    b = t[1] - m*t[0];
+                    x = g.wallX[3] + 80;
+                    y = m*x + b;
+                    push();
+                    noStroke(); fill(255);
+                    rect(x-1,y-7,12,13);
+                    fill(0); textSize(15);
+                    text(g.answers[i],x,y+5);
+                    pop();
+
+                }
+            }
+        }
+
 
         beginShape();
         let temp = ans[3];
         for(let i = 0; i < temp.length; i++){
             vertex(temp[i][0],temp[i][1]);
+            if(i == temp.length-3){
+                x = temp[i][0];
+                y = temp[i][1];
+            }
         }
         endShape();
+        push();
+        noStroke(); fill(255);
+        rect(x-1,y-7,12,13);
+        fill(0); textSize(15);
+        text(g.answers[4],x,y+5);
         pop();
+        pop();
+        g.correctAnswer = g.answers[4];
     }
 
     function BdisplayAnswersBpartC(){
+        let t = ans[3];
+        let m, b;
+        push();
+        strokeWeight(2); stroke(120,0,120); fill(120,0,120);
+        line(ans[5][0],ans[5][1],ans[4][0],ans[4][1]);
+        ellipse(ans[5][0],ans[5][1],6);
+        ellipse(ans[4][0],ans[4][1],6);
+        line(ans[4][0],ans[4][1],t[0][0],t[0][1]);
+        ellipse(t[0][0],t[0][1],6);
+        ellipse(t[t.length-1][0],t[t.length-1][1],6);
+        noFill(); beginShape();
+        for(let i = 0; i < t.length; i++){
+            vertex(t[i][0],t[i][1]);
+            if(i == t.length-3){
+                x = t[i][0]; y = t[i][1];
+            }
+        }
+        endShape();
+        drawingContext.setLineDash([5,5]);
+        let temp = incorrectPartC;
 
+        for(let i = 0; i < temp.length; i++){
+            if(i == 0){
+                let c = temp[i];
+                line(c[0],c[1],c[2],c[3]);
+                m = (c[3] - c[1])/(c[2] - c[0]);
+                b = c[1] - m*c[0];
+                x = g.wallX[0] - 20;
+                y = m*x + b;
+                push();
+                noStroke(); fill(255);
+                rect(x-1,y-7,12,13);
+                fill(0); textSize(15);
+                text(g.answers[i],x,y+5);
+                pop();
+            } else if (i == 1){
+                let c = temp[i];
+                bezier(c[0],c[1],c[2],c[3],c[4],c[5],c[6],c[7]);
+                x = c[2]; y = c[3];
+                push();
+                noStroke(); fill(255);
+                rect(x,y-15,12,13);
+                fill(0); textSize(15);
+                text(g.answers[i],x+1,y-3);
+                pop();
+            } else if (i == 2){
+                let c = temp[i];
+                line(c[0],c[1],c[2],c[3]);
+                m = (c[3] - c[1])/(c[2] - c[0]);
+                b = c[1] - m*c[0];
+                x = g.wallX[0] - 40;
+                y = m*x + b;
+                push();
+                noStroke(); fill(255);
+                rect(x-1,y-7,12,13);
+                fill(0); textSize(15);
+                text(g.answers[i],x,y+5);
+                pop();
+            } else if (i == 3){
+                let c = temp[i];
+                if(c.length == 8){
+                    bezier(c[0],c[1],c[2],c[3],c[4],c[5],c[6],c[7]);
+                    x = c[2]; y = c[3];
+                    push();
+                    noStroke(); fill(255);
+                    rect(x,y,12,13);
+                    fill(0); textSize(15);
+                    text(g.answers[i],x+1,y+12);
+                    pop();
+                } else {
+                    line(c[0],c[1],c[2],c[3]);
+                    m = (c[3] - c[1])/(c[2] - c[0]);
+                    b = c[1] - m*c[0];
+                    x = g.wallX[1] + 40;
+                    y = m*x + b;
+                    push();
+                    noStroke(); fill(255);
+                    rect(x-1,y-7,12,13);
+                    fill(0); textSize(15);
+                    text(g.answers[i],x,y+5);
+                    pop();
+                }
+            }
+        }
+
+        line(ans[0][0],ans[0][1],ans[1][0],ans[1][1]);
+        m = (ans[1][1] - ans[0][1])/(ans[1][0] - ans[0][0]);
+        b = ans[1][1] - m*ans[1][0];
+        x = g.wallX[1] + 50;
+        y = m*x + b;
+        push();
+        noStroke(); fill(255);
+        rect(x-1,y-5,12,13);
+        fill(0); textSize(15);
+        text(g.answers[4],x,y+7);
+        pop();
+        pop();
+        g.correctAnswer = g.answers[4];
     }
 
     if(g.solutionTruth){
@@ -1172,8 +1349,8 @@ function correctBsolution(){
     Bcurve.push([.2,tempVec[2]]);
     let Bcurvepx = [];
 
-    let upperLim = 80; let lowerLim = 25;
-    let upperPx = 170; let lowerPx = 325;
+    let upperLim = 65; let lowerLim = 25;
+    let upperPx = 180; let lowerPx = 325;
 
     // Converts the temperature values and x-locations into pixel coords
     for(let i = 0; i < tempVec.length; i++){
@@ -1258,24 +1435,86 @@ function incorrectBpartBsolution(ans){
     // Upward slanting answer
     x = g.wallX[3]; y = correct[0][1] - g.qAprops[2];
     x1 = g.wallX[2]; y1 = y - 25 - g.qAprops[1];
-    line(x,y,x1,y1);
     incorrect.push([x,y,x1,y1]);
 
     // Flat answer
     let diff = correct[0][1] - y;
     x = g.wallX[3]; y = correct[correct.length-1][1] + diff/2;
     x1 = g.wallX[2]; y1 = y;
-    line(x,y,x1,y1);
     incorrect.push([x,y,x1,y1]);
 
+    // Inversion of correct answer
+    let choice3 = []; 
+    for(let i = 0; i < correct.length; i++){
+        let ref = correct[0][1];
+        let dif = correct[i][1] - ref;
+        let y = ref - dif;
+        choice3.push([correct[i][0],y]);
+    }
+    incorrect.push(choice3);
 
+    // Downward slant or bezier
+    if(g.Rtc >= 0.03){
+        x = g.wallX[3]; y = incorrect[1][1] + g.qAprops[2]*1.4;
+        x1 = g.wallX[2]; y1 = y + 10*g.qAprops[1];
+        incorrect.push([x,y,x1,y1]);
+    } else {
+        x = g.wallX[3]; y = incorrect[1][1] + g.qAprops[2]*1.4;
+        x1 = x + 30; y1 = y + 5*g.qAprops[1];
+        x2 = x1 + 20; y2 = y1 + 30;
+        x3 = g.wallX[2]; y3 = y2 + g.qAprops[3]*g.qAprops[1];
+        incorrect.push([x,y,x1,y1,x2,y2,x3,y3])
+    }
 
     return(incorrect);
 }
 
 // Generates incorrect solutions for wall C profile when wall B is generating heat
 function incorrectBpartCsolution(ans){
+    let incorrect = [];
 
+    let x, y;
+    let x1, y1, x2, y2, x3, y3;
+    let m;
+
+    // Downward sloping line with no Rtc or flat line
+    if(g.Rtc > 0.02){
+        m = (ans[0][1] - ans[1][1])/(ans[0][0] - ans[1][0]);
+        x = g.wallX[1]; y = ans[3][ans[3].length-1][1];
+        x1 = g.wallX[0]; y1 = y + m*(x1-x);
+        incorrect.push([x,y,x1,y1]);
+    } else {
+        x = g.wallX[1]; y = ans[3][ans[3].length-1][1];
+        x1 = g.wallX[0]; y1 = y;
+        incorrect.push([x,y,x1,y1]);
+    }
+
+    // Low bezier
+    x = g.wallX[1]; y = ans[1][1] + 5*g.qAprops[2];
+    x1 = x + 20; y1 = y + 30;
+    x2 = x1 + 30; y2 = y1 + 5;
+    x3 = g.wallX[0]; y3 = ans[0][1] + 10 + g.qAprops[1];
+    incorrect.push([x,y,x1,y1,x2,y2,x3,y3]);
+
+    // Upward tilt
+    x = g.wallX[1]; y = incorrect[0][1] - 3*g.qAprops[1];
+    x1 = g.wallX[0]; y1 = y - 5*g.qAprops[1];
+    incorrect.push([x,y,x1,y1]);
+
+    // Upper bezier or another upward tilt
+    if(g.Rtc < 0.04){
+        x = g.wallX[1]; y = incorrect[2][1] - g.qAprops[2];
+        x1 = x + 30; y1 = y - 25;
+        x2 = x1 + 30; y2 = y1 - 10; 
+        x3 = g.wallX[0]; y3 = incorrect[2][3] - g.qAprops[1];
+        incorrect.push([x,y,x1,y1,x2,y2,x3,y3]);
+    } else {
+        x = g.wallX[1]; y = incorrect[1][1] - g.qAprops[1];
+        x1 = g.wallX[0]; y1 = ans[0][1] + g.qAprops[1];
+        incorrect.push([x,y,x1,y1]);
+    }
+    
+    return(incorrect);
 }
 
 function checkAnswerQuestionB(ans){
@@ -1288,8 +1527,10 @@ function checkAnswerQuestionB(ans){
         } else if (g.chosenAnswer == g.correctAnswer){
             g.bottomText = "Correct, move on to the next part.";
             push(); 
-            strokeWeight(2); stroke(120,0,120);
+            strokeWeight(2); stroke(120,0,120); fill(120,0,120);
             line(ans[5][0],ans[5][1],ans[4][0],ans[4][1]);
+            ellipse(ans[5][0],ans[5][1],6);
+            ellipse(ans[4][0],ans[4][1],6);
             push();
             noStroke(); fill(255);
             rect(g.wallX[4]-30,ans[5][1]-7,12,13);
@@ -1307,6 +1548,30 @@ function checkAnswerQuestionB(ans){
             g.solutionTruth = false;
         } else if (g.chosenAnswer == g.correctAnswer){
             g.bottomText = "Correct, move on to the next part.";
+            let temp = ans[3];
+            push();
+            strokeWeight(2); stroke(120,0,120); fill(120,0,120);
+            line(ans[5][0],ans[5][1],ans[4][0],ans[4][1]);
+            ellipse(ans[5][0],ans[5][1],6);
+            ellipse(ans[4][0],ans[4][1],6);
+            line(ans[4][0],ans[4][1],temp[0][0],temp[0][1]);
+            ellipse(temp[0][0],temp[0][1],6);
+            ellipse(temp[temp.length-1][0],temp[temp.length-1][1],6);
+            noFill(); beginShape();
+            for(let i = 0; i < temp.length; i++){
+                vertex(temp[i][0],temp[i][1]);
+                if(i == temp.length-3){
+                    x = temp[i][0]; y = temp[i][1];
+                }
+            }
+            endShape();
+            push();
+            noStroke(); fill(255);
+            rect(x-1,y-7,12,13);
+            fill(0); textSize(15);
+            text(g.correctAnswer,x,y+5);
+            pop();
+            pop();
 
         } else if (g.chosenAnswer != g.correctAnswer){
             g.bottomText = "Incorrect, try again.";
@@ -1318,6 +1583,40 @@ function checkAnswerQuestionB(ans){
             g.solutionTruth = false;
         } else if (g.chosenAnswer == g.correctAnswer){
             g.bottomText = "Correct, move on to a new problem.";
+            let temp = ans[3];
+            push();
+            strokeWeight(2); stroke(120,0,120); fill(120,0,120);
+            line(ans[5][0],ans[5][1],ans[4][0],ans[4][1]);
+            ellipse(ans[5][0],ans[5][1],6);
+            ellipse(ans[4][0],ans[4][1],6);
+            line(ans[4][0],ans[4][1],temp[0][0],temp[0][1]);
+            ellipse(temp[0][0],temp[0][1],6);
+            ellipse(temp[temp.length-1][0],temp[temp.length-1][1],6);
+            line(temp[temp.length-1][0],temp[temp.length-1][1],ans[1][0],ans[1][1]);
+            line(ans[0][0],ans[0][1],ans[1][0],ans[1][1]);
+            ellipse(ans[0][0],ans[0][1],6);
+            ellipse(ans[1][0],ans[1][1],6);
+            
+            noFill(); beginShape();
+            for(let i = 0; i < temp.length; i++){
+                vertex(temp[i][0],temp[i][1]);
+               
+            }
+            endShape();
+
+            m = (ans[0][1] - ans[1][1])/(ans[0][0] - ans[1][0]);
+            b = ans[0][1] - m*ans[0][0];
+            x = g.wallX[1] + 50;
+            y = m*x + b;
+            push();
+            noStroke(); fill(255);
+            rect(x-1,y-5,12,13);
+            fill(0); textSize(15);
+            text(g.correctAnswer,x,y+7);
+            pop();
+            pop();
+        } else if (g.chosenAnswer != g.correctAnswer){
+            g.bottomText = "Incorrect, try again.";
             g.solutionTruth = false;
         }
     }
@@ -1339,7 +1638,6 @@ function fillquestionAprops(){
     g.qAprops[1] = Math.round(Math.random()*10);
     g.qAprops[2] = 10+Math.round(Math.random()*10);
     g.qAprops[3] = -1 + Math.round(Math.random()*2);
-    //g.qAprops[4] = -1 + Math.round(Math.random()*2);
 }
 
 function hint(){
@@ -1350,6 +1648,12 @@ function hint(){
             g.bottomText = 'Hint: Be sure to account for contact resistances.';
         }
     } else {
-
+        if(g.problemPart == 0){
+            g.bottomText = 'Hint: There is no heat transfer to the left side.';
+        } else if (g.problemPart == 1 && !nextPart.disabled){
+            g.bottomText = 'Hint: There is no heat transfer to the left side.';
+        } else {
+            g.bottomText = 'Hint: Be sure to account for contact resistances.';
+        }
     }
 }
