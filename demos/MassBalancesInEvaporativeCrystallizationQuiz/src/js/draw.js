@@ -156,37 +156,69 @@ function drawText(p) {
   p.textAlign(p.LEFT, p.CENTER);
   p.textSize(14);
   // feed
+  if(gvs.unknown_1 === "mfeed" || gvs.unknown_2 === "mfeed") {
+    p.fill(0, 0, 255);
+  }
   const space1 = (gvs.unknown_1 === "mfeed" || gvs.unknown_2 === "mfeed") && gvs.display_results === false ? "  " : "";
   p.text(`m      = ${gvs.mfeed.toFixed(1)} ${space1}kg/h`, 30, 185);
+  p.fill(0);
+  if(gvs.unknown_1 === "zfeed" || gvs.unknown_1 === "zfeed") {
+    p.fill(0, 0, 255);
+  }
   if(gvs.unknown_1 !== "zwater" || gvs.display_results === true) {
     p.text(`z   = ${(Math.round(gvs.zfeed * 100) / 100).toFixed(2)}`, 40, 215);
+  }
+  p.fill(0);
+  if(gvs.unknown_1 === "zwater" || gvs.unknown_1 === "zwater") {
+    p.fill(0, 0, 255);
   }
   if(gvs.unknown_1 !== "zfeed" || gvs.display_results === true) {
     p.text(`z   = ${(Math.round((1 - gvs.zfeed) * 100) / 100).toFixed(2)}`, 40, 238);
   }
+  p.fill(0);
   // m1
   p.text(`m   = ${gvs.m1.toFixed(1)} kg/h`, 160, 185);
   p.text(`x     = ${(Math.round(gvs.x1 * 100) / 100).toFixed(2)}`, 180, 215);
   p.text(`x     = ${(Math.round((1 - gvs.x1) * 100) / 100).toFixed(2)}`, 180, 238);
   // m2
+  if(gvs.unknown_1 === "m2" || gvs.unknown_2 === "m2") {
+    p.fill(0, 0, 255);
+  }
   const space2 = (gvs.unknown_1 === "m2" || gvs.unknown_2 === "m2") && gvs.display_results === false ? "  " : "";
   p.text(`m   = ${(Math.round(gvs.m2 * 10) / 10).toFixed(1)} ${space2}kg/h`, 275, 75);
+  p.fill(0);
   // m3
   p.text(`m   = ${(Math.round(gvs.m3 * 10) / 10).toFixed(1)} kg/h`, 380, 185);
   p.text(`x     = ${(Math.round(gvs.x3 * 100) / 100).toFixed(2)}`, 400, 215);
   p.text(`x     = ${(Math.round((1 - gvs.x3) * 100) / 100).toFixed(2)}`, 400, 238);
   // m4
+  if(gvs.unknown_1 === "m4" || gvs.unknown_2 === "m4") {
+    p.fill(0, 0, 255);
+  }
   const space3 = (gvs.unknown_1 === "m4" || gvs.unknown_2 === "m4") && gvs.display_results === false ? "  " : "";
   p.text(`m   = ${(Math.round(gvs.m4 * 10) / 10).toFixed(1)} ${space3}kg/h`, 495, 75);
+  p.fill(0);
   // m5
+  if(gvs.unknown_1 === "m5" || gvs.unknown_2 === "m5") {
+    p.fill(0, 0, 255);
+  }
   const space4 = (gvs.unknown_1 === "m5" || gvs.unknown_2 === "m5") && gvs.display_results === false ? "    " : "";
   p.text(`m   = ${(Math.round(gvs.m5 * 10) / 10).toFixed(1)} ${space4}kg/h`, 600, 185);
+  p.fill(0);
+  if(gvs.unknown_2 === "x5") {
+    p.fill(0, 0, 255);
+  }
   if(gvs.unknown_2 !== "xw5" || gvs.display_results === true) {
     p.text(`x     = ${(Math.round(gvs.x5 * 100) / 100).toFixed(2)}`, 620, 215);
+  }
+  p.fill(0);
+  if(gvs.unknown_2 === "xw5") {
+    p.fill(0, 0, 255);
   }
   if(gvs.unknown_2 !== "x5" || gvs.display_results === true) {
     p.text(`x     = ${(Math.round((1 - gvs.x5) * 100) / 100).toFixed(2)}`, 620, 238);
   }
+  p.fill(0);
   // recycle
   p.text(`m   = ${(Math.round(gvs.mR * 10) / 10).toFixed(1)} kg/h`, 278, 305);
   p.text(`x      = ${(Math.round(gvs.xR * 100) / 100).toFixed(2)}`, 290, 335);
@@ -194,33 +226,65 @@ function drawText(p) {
   // subscript
   p.textSize(10);
   // feed
+  if(gvs.unknown_1 === "mfeed" || gvs.unknown_2 === "mfeed") {
+    p.fill(0, 0, 255);
+  }
   p.text("feed", 43, 192);
+  p.fill(0);
+  if(gvs.unknown_1 === "zfeed") {
+    p.fill(0, 0, 255);
+  }
   if(gvs.unknown_1 !== "zwater" || gvs.display_results === true) {
     p.text("k", 49, 221);
+  }
+  p.fill(0);
+  if(gvs.unknown_1 === "zwater") {
+    p.fill(0, 0, 255);
   }
   if(gvs.unknown_1 !== "zfeed" || gvs.display_results === true) {
     p.text("w", 49, 244);
   }
+  p.fill(0);
   // m1
   p.text("1", 173, 192);
   p.text("k,1", 189, 221);
   p.text("w,1", 189, 244);
   // m2
+  if(gvs.unknown_1 === "m2" || gvs.unknown_2 === "m2") {
+    p.fill(0, 0, 255);
+  }
   p.text("2", 288, 82);
+  p.fill(0);
   // m3
   p.text("3", 393, 192);
   p.text("k,3", 409, 221);
   p.text("w,3", 409, 244);
   // m4
+  if(gvs.unknown_1 === "m4" || gvs.unknown_2 === "m4") {
+    p.fill(0, 0, 255);
+  }
   p.text("4", 508, 82);
+  p.fill(0);
   // m5
+  if(gvs.unknown_1 === "m5" || gvs.unknown_2 === "m5") {
+    p.fill(0, 0, 255);
+  }
   p.text("5", 613, 192);
+  p.fill(0);
+  if(gvs.unknown_2 === "x5") {
+    p.fill(0, 0, 255);
+  }
   if(gvs.unknown_2 !== "xw5" || gvs.display_results === true) {
     p.text("k,5", 629, 221);
+  }
+  p.fill(0);
+  if(gvs.unknown_2 === "xw5") {
+    p.fill(0, 0, 255);
   }
   if(gvs.unknown_2 !== "x5" || gvs.display_results === true) {
     p.text("w,5", 629, 244);
   }
+  p.fill(0);
   // recycle
   p.text("R", 291, 312);
   p.text("k,R", 299, 341);
