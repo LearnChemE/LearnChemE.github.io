@@ -30,15 +30,10 @@
 <body>
 
   <div class="simulation-controls">
-    <div class="input-area">
-  
-      <div class="input-row">
-        <div class="data-name">Label</div>
-        <input type="range" id="adjustable-slider" min="0" max="1" step="0.01" value="0.50">
-        <div class="data-value" id="adjustable-value">0.50</div>
-        <div class="data-metric"></div>
-      </div>
-  
+
+    <div class="control-buttons-container">
+      <div id="show-answer-button">show answers</div>
+      <div id="reset-button">new problem</div>
     </div>
 
     <div class="modal-buttons-row">
@@ -49,7 +44,16 @@
 
   </div>
 
-  <div id="p5-container"></div>
+  <div id="p5-container">
+    <input id="mfeed-input" type="number" />
+    <input id="m2-input" type="number" />
+    <input id="m4-input" type="number" />
+    <input id="m5-input" type="number" />
+    <input id="zfeed-input" type="number" />
+    <input id="zwater-input" type="number" />
+    <input id="x5-input" type="number" />
+    <input id="xw5-input" type="number" />
+  </div>
 
   <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
     aria-hidden="true">
@@ -63,7 +67,7 @@
         </div>
         <div class="modal-body">
           <p>
-            Directions
+            In this simulation, you can perform mass balances on an evaporative crystallization process. Perform mass balances to determine the unknown values, then enter those values into the blue input boxes. Press the green "show answers" button above the canvas to check your work. Press "new problem" to reset the simulation with a new set of conditions.
           </p>
 
         </div>
@@ -84,13 +88,127 @@
         </div>
 
         <div class="modal-body">
-          <div class="details-text">Details</div>
+          <div class="details-text"><b>Overall material balances</b></div>
 
           <div class="details-eqn">
             $$
-
+            [1] \quad m_{feed} = m_{2} + m_{4} + m_{5}
             $$
           </div>
+
+          <div class="details-eqn">
+            $$
+            [2] \quad z_{w} \, m_{feed} = m_{2} + x_{w,5} \, m_{5}
+            $$
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [3] \quad z_{k} \, m_{feed} = m_{4} + x_{k,5} \, m_{5}
+            $$
+          </div>
+
+          <div class="details-text definition">\( m_{feed} = \) mass flow rate of fresh feed (kg/h)</div>
+
+          <div class="details-text definition">\( m_{2} = \) mass flow rate of water exiting evaporator (kg/h)</div>
+
+          <div class="details-text definition">\( m_{4} = \) mass flow rate of solid KCl crystals exiting the crystallizer and filter (kg/h)</div>
+
+          <div class="details-text definition">\( m_{5} = \) mass flow rate of slurry exiting the crystalizer and filter (kg/h)</div>
+
+          <div class="details-text definition">\( z_{k} = \) mass fraction of KCl in fresh feed</div>
+
+          <div class="details-text definition">\( z_{w} = \) mass fraction of water in fresh feed</div>
+
+          <div class="details-text"><br><b>Material balance around crystallizer and filter</b></div>
+
+          <div class="details-eqn">
+            $$
+            [4] \quad m_{3} = m_{4} + m_{5} + m_{R}
+            $$
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [5] \quad x_{k,3} \, m_{3} = m_{4} + x_{k,5} \, m_{5} + x_{k,R} \, m_{R}
+            $$
+          </div>
+
+          <div class="details-text definition">\( m_{3} = \) mass flow rate of solution exiting evaporator (kg/h)</div>
+
+          <div class="details-text definition">\( m_{R} = \) mass flow rate of recycle (kg/h)</div>
+
+          <div class="details-text definition">\( x_{k,3} = \) mass fraction of KCl in stream exiting evaporator</div>
+
+          <div class="details-text definition">\( x_{k,5} = \) mass fraction of KCl in solution exiting crystallizer and filter</div>
+
+          <div class="details-text definition">\( x_{w,5} = \) mass fraction of water in solution exiting crystallizer and filter (this is equivalent to \( x_{k,R} \) as the exit stream from the crystallizer is split).</div>
+
+          <div class="details-text definition">\( x_{k,R} = \) mass flow rate of solution exiting evaporator (kg/h)</div>
+
+          <div class="details-text"><br><b>Material balances around mixing point</b></div>
+
+          <div class="details-eqn">
+            $$
+            [6] \quad m_{feed} + m_{R} = m_{1}
+            $$
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [7] \quad z_{k} \, m_{feed} + x_{k,R} \, m_{R} = x_{k,1} \, m_{1}
+            $$
+          </div>
+
+          <div class="details-text definition">\( m_{1} = \) mass flow rate entering evaporator (kg/h)</div>
+
+          <div class="details-text definition">\( x_{k,1} = \) mass fraction of KCl in stream entering evaporator</div>
+
+          <div class="details-text"><br><b>Material balance around evaporator</b></div>
+
+          <div class="details-eqn">
+            $$
+            [8] \quad m_{1} = m_{2} + m_{3}
+            $$
+          </div>
+
+          <div class="details-text"><br><b>Dependence of solubility on temperature</b></div>
+
+          <div class="details-eqn">
+            $$
+            [9] \quad s_{3} = 0.2881 \, T_{evap} + 28.123
+            $$
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [10] \quad x_{k,3} = \frac{s_{3}}{s_{3} + 100 \; \mathrm{kg}}
+            $$
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [11] \quad s_{5} = 0.2881 \, T_{crys} + 28.123
+            $$
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [12] \quad x_{k,3} = \frac{s_{5}}{s_{5} + 100 \; \mathrm{kg}}
+            $$
+          </div>
+
+          <div class="details-text definition">\( s_{3} = \) solubility of KCl in 100 kg H<sub>2</sub>O</div>
+
+          <div class="details-text definition">\( T_{evap} = \) evaporator operating temperature (°C)</div>
+
+          <div class="details-text definition">\( s_{5} = \) solubility of KCl in 100 kg H<sub>2</sub>O</div>
+
+          <div class="details-text definition">\( T_{crys} = \) crystallizer and filter operating temperature (°C)</div>
+
+          <div class="details-text"><br>Note that \( z_{k} + z_{w} = 1 \) and \( x_{k,i} + x_{w,i} = 1 \) where \( i \) is the stream. Recovery rate \( R = m_{4} / ( z_{k} \, m_{feed} ) \).</div>
+
+          <div class="details-text">View <a href="https://www.youtube.com/watch?v=Dnfgc4_OFhI" target="_blank">this screencast</a> for more practice with material balances on a crystallizer.</div>
           
           <div style="margin-top: 2rem;"></div>
         </div>
