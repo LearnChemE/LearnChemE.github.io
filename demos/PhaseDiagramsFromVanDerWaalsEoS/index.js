@@ -2,7 +2,7 @@
 window.g = {
     cnv: undefined,
     slider: 500,
-    diagram: "P-V-diagram",
+    diagram: "T-V-diagram",
 
     // Constants to be used 
     R: 8.314,
@@ -12,6 +12,8 @@ window.g = {
     w: 0.344,
     a: 0,
     b: 0,
+
+    topText: 0,
 
 
     // Graph edge coordinates to be used when plotting
@@ -28,6 +30,8 @@ function setup() {
     g.cnv.parent("graphics-wrapper");
     document.getElementsByTagName("main")[0].remove();
     fillConstants();
+    generatePixelData();
+    sliderProps();
 }
 
 function draw() {
@@ -41,6 +45,7 @@ function draw() {
     }
 
     graphLabels();
+    PsatORTsat();
     
     
     

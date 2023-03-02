@@ -102,16 +102,16 @@ function graphDraw(){
     } else {
         beginShape();
         for(let i = 0; i < tvg.length; i++){
-            y = map(tvg[i][1],270,780,g.by,g.ty);
+            y = map(tvg[i][1],275,760,g.by-10,g.ty);
             x = xPlotting(tvg[i][0]);
-            vertex(x,y);
+            point(x,y);
         }
         endShape();
         beginShape();
         for(let i = 0; i < tvl.length; i++){
-            y = map(tvl[i][1],270,780,g.by,g.ty);
+            y = map(tvl[i][1],275,760,g.by-10,g.ty);
             x = xPlotting(tvl[i][0]);
-            vertex(x,y);
+            point(x,y);
         }
         endShape();
     }
@@ -147,16 +147,13 @@ function pressureVolume(){
         }
     }
 
-    push(); noFill(); strokeWeight(2); stroke(0,0,255);
-    beginShape();
-    for(let i = 0; i < curve.length; i++){
-        let x = xPlotting(curve[i][0]);
-        let y = map(curve[i][1],0,28,g.by,g.ty);
-        vertex(x,y);
-        
+    if(g.slider > 645){
+        tempOver645(curve);
+    } else {
+        tempUnder645(curve);
     }
-    endShape();
-    pop();
+
+    
 
     // This covers up the part of the curve that exceeds the graph's bounds
     push();
@@ -166,6 +163,186 @@ function pressureVolume(){
     rect(0,g.by+.5,width,height-g.by);
     rect(g.rx+1,0,width-g.rx,height);
     pop();
+}
+
+// Can just draw the curve when T > 645K
+function tempOver645(curve){
+    push(); noFill(); strokeWeight(2); stroke(0,0,255);
+    beginShape();
+    for(let i = 0; i < curve.length; i++){
+        let x = xPlotting(curve[i][0]);
+        let y = map(curve[i][1],0,28,g.by,g.ty);
+        vertex(x,y);
+    }
+    endShape();
+    pop();
+}
+
+function tempUnder645(curve){
+    let curvepx = [];
+    
+    for(let i = 0; i < curve.length; i++){
+        let x = xPlotting(curve[i][0]);
+        let y = map(curve[i][1],0,28,g.by,g.ty);
+        curvepx.push([x,y]);
+    }
+
+    let x1c, y1c, x2c, y2c; // Points to be used with the custom curve
+    let x1l, y1l, x2l, y2l; // Points to be used with the liquid part of the phase curve
+    let mc, bc, ml, bl;
+    let xVL, yVL;
+
+    // FIRST INTERSECTION
+    // Iterate through liquid curve and find where there is a line intersection with points of custom curve to find VL
+    let c = 0;
+    let test = true;
+    let storage1 = 0; // Used to keep track of index in curve for later intersection points
+
+    while (test){
+        x1l = pvl_px[c][0]; y1l = pvl_px[c][1];
+        x2l = pvl_px[c+1][0]; y2l = pvl_px[c+1][1];
+        ml = (y2l - y1l)/(x2l - x1l);
+        bl = y1l - ml*x1l;
+        for(let i = 0; i < curvepx.length-1; i++){
+            x1c = curvepx[i][0]; y1c = curvepx[i][1];
+            x2c = curvepx[i+1][0]; y2c = curvepx[i+1][1];
+            mc = (y2c - y1c)/(x2c - x1c);
+            bc = y1c - mc*x1c;
+
+            let xsol = (bl - bc)/(mc - ml); // Potential x-solution
+            let ysol = mc*xsol + bc;
+            // Checks to make sure xsol and ysol aren't intersected out of bounds
+            if(xsol >= x1c && xsol <= x2c && ysol >= y1c && ysol <= y2c && xsol >= x1l && xsol <= x2l && ysol <= y1l && ysol >= y2l){ 
+                xVL = xsol;
+                yVL = ysol;
+                storage1 = i;
+                test = false;
+            }
+        }
+        c++;
+    }
+
+    // SECOND INTERSECTION
+    let x2, y2;
+    let m, b;
+    let storage2 = 0;
+    for(let i = storage1+1; i < curvepx.length-1; i++){
+        y2 = yVL;
+        if(curvepx[i][1] >= y2 && curvepx[i+1][1] < y2){
+            
+            m = (curvepx[i+1][1] - curvepx[i][1])/(curvepx[i+1][0] - curvepx[i][0]);
+            b = curvepx[i][1] - m*curvepx[i][0];
+            x2 = (yVL - b)/m;
+            storage2 = i;
+            break;
+        }
+    }
+    
+    // THIRD INTERSECTION
+    let x3, y3;
+    let storage3;
+    for(let i = storage2+1; i < curvepx.length-1; i++){
+        y3 = yVL;
+        if(curvepx[i][1] <= y3 && curvepx[i+1][1] > y3){
+            m = (curvepx[i+1][1] - curvepx[i][1])/(curvepx[i+1][0] - curvepx[i][0]);
+            b = curvepx[i][1] - m*curvepx[i][0];
+            x3 = (yVL - b)/m;
+            storage3 = i;
+            break;
+        }
+    }
+
+    g.topText = (map(yVL,g.by,g.ty,0,28)).toFixed(1); // Saturated Pressure
+
+    // With all intersections defined the original curve needs to be broken up into 4 segments
+    // Curve up to first intersection
+    push();
+    strokeWeight(2); stroke(0,0,255); noFill();
+    beginShape();
+    for(let i = 0; i <= storage1; i++){
+        vertex(curvepx[i][0],curvepx[i][1]);
+        if(i == storage1){
+            vertex(xVL,yVL);
+        }
+    }
+    endShape();
+    pop();
+
+    // Curve from first intersection to second intersection
+    push();
+    strokeWeight(2); drawingContext.setLineDash([5,7]); fill(0,255,0,100); stroke(0,0,255);
+    beginShape();
+    for(let i = storage1+1; i <= storage2; i++){
+        if(i == storage1+1){
+            vertex(xVL,yVL);
+        }
+        vertex(curvepx[i][0],curvepx[i][1]);
+        if(i == storage2){
+            vertex(x2,y2);
+        }
+    }
+    endShape();
+
+    // Curve from second intersection to third intersection
+    beginShape();
+    for(let i = storage2+1; i <= storage3; i++){
+        if(i == storage2+1){
+            vertex(x2,y2);
+        }
+        vertex(curvepx[i][0],curvepx[i][1]);
+        if(i == storage3){
+            vertex(x3,y3);
+        }
+    }
+    endShape();
+    pop();
+
+    // Curve from third intersection on
+    push();
+    strokeWeight(2); noFill(); stroke(0,0,255);
+    beginShape();
+    for(let i = storage3+1; i < curvepx.length; i++){
+        if(i == storage3+1){
+            vertex(x3,y3);
+        }
+        vertex(curvepx[i][0],curvepx[i][1]);
+    }
+    endShape();
+    pop();
+
+    push();
+    fill(255,87,51); noStroke();
+    ellipse(xVL,yVL,12);
+    ellipse(x3,y3,12);
+    strokeWeight(2); stroke(255,87,51);
+    drawingContext.setLineDash([5,7]);
+    line(xVL,yVL,x3,y3);
+    pop();
+
+    let vL = reverseXPlotting(xVL);
+    let vV = reverseXPlotting(x3);
+
+    push();
+    textSize(22); noStroke(); textStyle(ITALIC);
+    text('V',550,150);
+    text('V',550,190);
+    textStyle(NORMAL); textSize(17);
+    text('L',567,140);
+    text('V',567,180);
+    text('3',657,140);
+    textSize(22);
+    text('= '+vL+' cm /mol',580,150);
+    if (vV < 1000){
+        text('= '+vV+' cm /mol',580,190);
+        textSize(17);
+        text('3',669,180);
+    } else {
+        text('= '+vV+' cm /mol',580,190);
+        textSize(17);
+        text('3',682,180);
+    }
+    pop();
+    
 }
 
 // Creates the custom curve for T-V diagram
@@ -186,6 +363,34 @@ function temperatureVolume(){
 
     }
 
+    if(g.slider > 22){
+        pressureOver22(curve);
+    } else {
+        pressureUnder22(curve);
+    }
+    // push(); noFill(); strokeWeight(2); stroke(0,0,255);
+    // beginShape();
+    // for(let i = 0; i < curve.length; i++){
+    //     let x = xPlotting(curve[i][0]);
+    //     let y = map(curve[i][1],275,760,g.by-10,g.ty);
+    //     vertex(x,y);
+        
+    // }
+    // endShape();
+    // pop();
+
+    // This covers up the part of the curve that exceeds the graph's bounds
+    push();
+    fill(250); noStroke();
+    rect(0,0,g.lx-1,height);
+    rect(0,0,width,g.ty-.5);
+    rect(0,g.by+.5,width,height-g.by);
+    rect(g.rx+1,0,width-g.rx,height);
+    pop();
+}
+
+// Can just draw the curve when P > 22
+function pressureOver22(curve){
     push(); noFill(); strokeWeight(2); stroke(0,0,255);
     beginShape();
     for(let i = 0; i < curve.length; i++){
@@ -196,15 +401,61 @@ function temperatureVolume(){
     }
     endShape();
     pop();
+}
 
-    // This covers up the part of the curve that exceeds the graph's bounds
-    push();
-    fill(250); noStroke();
-    rect(0,0,g.lx-1,height);
-    rect(0,0,width,g.ty-.5);
-    rect(0,g.by+.5,width,height-g.by);
-    rect(g.rx+1,0,width-g.rx,height);
+function pressureUnder22(curve){
+    let curvepx = [];
+    push(); noFill(); strokeWeight(2); stroke(0,0,255);
+    beginShape();
+    for(let i = 0; i < curve.length; i++){
+        let x = xPlotting(curve[i][0]);
+        let y = map(curve[i][1],275,760,g.by-10,g.ty);
+        point(x,y);
+        curvepx.push([x,y]);
+    }
+    endShape();
     pop();
+
+    let x1c, y1c, x2c, y2c; // Points to be used with the custom curve
+    let x1g, y1g, x2g, y2g; // Points to be used with the liquid part of the phase curve
+    let mc, bc, ml, bl;
+    let xVL, yVL;
+
+    // FIRST INTERSECTION
+    // Iterate through liquid curve and find where there is a line intersection with points of custom curve to find VL
+    let c = 0;
+    let test = true;
+    let storage1 = 0; // Used to keep track of index in curve for later intersection points
+
+    ellipse(tvg_px[tvg_px.length-3][0],tvg_px[tvg_px.length-3][1],6)
+    
+    
+    // while (test){
+    //     console.log(c)
+    //     x1g = tvg_px[c][0]; y1g = tvg_px[c][1];
+    //     x2g = tvg_px[c+1][0]; y2g = tvg_px[c+1][1];
+    //     ml = (y2g - y1g)/(x2g - x1g);
+    //     bl = y1g - ml*x1g;
+    //     for(let i = curvepx.length-1; i >= 0; i--){
+    //         console.log(i)
+    //         x1c = curvepx[i][0]; y1c = curvepx[i][1];
+    //         x2c = curvepx[i-1][0]; y2c = curvepx[i-1][1];
+    //         mc = (y2c - y1c)/(x2c - x1c);
+    //         bc = y1c - mc*x1c;
+
+    //         let xsol = (bl - bc)/(mc - ml); // Potential x-solution
+    //         let ysol = mc*xsol + bc;
+    //         // Checks to make sure xsol and ysol aren't intersected out of bounds
+    //         if(xsol <= x1c && xsol >= x2c && ysol >= y1c && ysol <= y2c && xsol <= x1g && xsol >= x2g && ysol >= y1g && ysol <= y2g){ 
+    //             xVL = xsol;
+    //             yVL = ysol;
+    //             storage1 = i;
+    //             test = false;
+    //         }
+    //     }
+    //     c++;
+    // }
+
 }
 
 // To avoid clipping the custom curve the labels are placed on afterwards so the part of the curve that exceeds the graph can be covered up
@@ -320,9 +571,39 @@ function xPlotting(x){
     return(output);
 }
 
+// Used for converting pixel coordinates to logarithmic value
+function reverseXPlotting(x){
+    let output;
+
+    if(x <= g.lx+g.dx){
+        output = Math.round(10**(((x - g.lx)/g.dx) + 1));
+    } else if (x <= xTicks[0]+g.dx){
+        output = Math.round(10**(((x - xTicks[0])/g.dx) + 2));
+    } else if (x <= xTicks[1]+g.dx){
+        output = Math.round(10**(((x - xTicks[1])/g.dx) + 3));
+    } else {
+        output = Math.round(10**(((x - xTicks[2])/g.dx) + 4));
+    }
+    return(output)
+}
+
 // Fills in values for Vc, a, b
 function fillConstants(){
     g.a = (27/64)*((g.R**2)*(g.Tc**2))/g.Pc
     g.b = (g.R*g.Tc)/(8*g.Pc);
     g.Vc = 0.359*(g.R*g.Tc)/g.Pc;
+}
+
+function PsatORTsat(){
+    let x;
+    if(g.diagram == 'P-V-diagram'){
+        if(g.slider <= 645){
+            push();
+            noStroke(); textSize(25);
+            text('P    = '+g.topText + ' MPa',width/2-50,60);
+            textSize(18);
+            text('sat',width/2-32,47);
+            pop();
+        }
+    }
 }
