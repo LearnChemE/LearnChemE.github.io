@@ -375,13 +375,13 @@ function temperatureVolume(){
     
 
     // This covers up the part of the curve that exceeds the graph's bounds
-    // push();
-    // fill(250); noStroke();
-    // rect(0,0,g.lx-1,height);
-    // rect(0,0,width,g.ty-.5);
-    // rect(0,g.by+.5,width,height-g.by);
-    // rect(g.rx+1,0,width-g.rx,height);
-    // pop();
+    push();
+    fill(250); noStroke();
+    rect(0,0,g.lx-1,height);
+    rect(0,0,width,g.ty-.5);
+    rect(0,g.by+.5,width,height-g.by);
+    rect(g.rx+1,0,width-g.rx,height);
+    pop();
 }
 
 // Can just draw the curve when P > 22
@@ -390,7 +390,7 @@ function pressureOver22(curve){
     beginShape();
     for(let i = 0; i < curve.length; i++){
         let x = xPlotting(curve[i][0]);
-        let y = map(curve[i][1],275,760,g.by-10,g.ty);
+        let y = map(curve[i][1],270.86,760,g.by,g.ty);
         vertex(x,y);
         
     }
@@ -404,7 +404,7 @@ function pressureUnder22(curve){
     beginShape();
     for(let i = 0; i < curve.length; i++){
         let x = xPlotting(curve[i][0]);
-        let y = map(curve[i][1],275,760,g.by-10,g.ty);
+        let y = map(curve[i][1],270.86,760,g.by,g.ty);
         curvepx.push([x,y]);
     }
     endShape();
@@ -413,7 +413,7 @@ function pressureUnder22(curve){
     let tvgpx = []; // Have to redo this for some reason unsure why, the generate pixel data only works for the liquid data
     for(let i = 0; i < tvg.length; i++){
         let x = xPlotting(tvg[i][0]);
-        let y = map(tvg[i][1],275,760,g.by-10,g.ty);
+        let y = map(tvg[i][1],270.86,760,g.by,g.ty);
         tvgpx.push([x,y]);
     }
 
@@ -451,7 +451,7 @@ function pressureUnder22(curve){
         c--;
     }
 
-    g.topText = Math.round(map(yVV,275,760,g.by-10,g.ty));
+    g.topText = Math.round(map(yVV,g.by,g.ty,270.86,760));
     
     // SECOND INTERSECTION
     let x2, y2;

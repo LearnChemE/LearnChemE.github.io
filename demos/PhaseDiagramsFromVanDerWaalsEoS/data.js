@@ -29,13 +29,13 @@ function generatePixelData(){
 
     for(let i = 0; i < tvg.length; i++){
         let x = xPlotting(tvg[i][0]);
-        let y = map(tvg[i][1],275,760,g.by-10,g.ty);
+        let y = map(tvg[i][1],270.86,760,g.by,g.ty);
         tvg_px.push([x,y]);
     }
 
     for(let i = 0; i < tvl.length; i++){
         let x = xPlotting(tvl[i][0]);
-        let y = map(tvl[i][1],275,760,g.by-10,g.ty);
+        let y = map(tvl[i][1],270.86,760,g.by,g.ty);
         tvl_px.push([x,y]);
     }
 }
