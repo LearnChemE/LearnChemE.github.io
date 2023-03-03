@@ -6,6 +6,8 @@ function graphDraw(){
     g.lx = 100; g.rx = 100 + 650;
     g.ty = 75; g.by = 75 + 450;
 
+    let temp = [];
+
     // Y ticks for temperature and pressure
     textSize(20); fill(0);
     if(g.diagram == "P-V-diagram"){
@@ -24,13 +26,15 @@ function graphDraw(){
             if((i-1)%5 == 0){
                 line(g.lx,g.by+10-(g.by+10-g.ty)/25*(i+1),g.lx+8,g.by+10-(g.by+10-g.ty)/25*(i+1));
                 line(g.rx,g.by+10-(g.by+10-g.ty)/25*(i+1),g.rx-8,g.by+10-(g.by+10-g.ty)/25*(i+1));
+                temp.push(g.by+10-(g.by+10-g.ty)/25*(i+1))
             } else {
                 line(g.lx,g.by+10-(g.by+10-g.ty)/25*(i+1),g.lx+3,g.by+10-(g.by+10-g.ty)/25*(i+1));
                 line(g.rx,g.by+10-(g.by+10-g.ty)/25*(i+1),g.rx-3,g.by+10-(g.by+10-g.ty)/25*(i+1));
             }
         }
-       
     }
+
+    console.log(temp)
 
     // Primary x-tick marks
     xTicks = [];
@@ -104,14 +108,14 @@ function graphDraw(){
         for(let i = 0; i < tvg.length; i++){
             y = map(tvg[i][1],275,760,g.by-10,g.ty);
             x = xPlotting(tvg[i][0]);
-            point(x,y);
+            vertex(x,y);
         }
         endShape();
         beginShape();
         for(let i = 0; i < tvl.length; i++){
             y = map(tvl[i][1],275,760,g.by-10,g.ty);
             x = xPlotting(tvl[i][0]);
-            point(x,y);
+            vertex(x,y);
         }
         endShape();
     }
@@ -368,25 +372,16 @@ function temperatureVolume(){
     } else {
         pressureUnder22(curve);
     }
-    // push(); noFill(); strokeWeight(2); stroke(0,0,255);
-    // beginShape();
-    // for(let i = 0; i < curve.length; i++){
-    //     let x = xPlotting(curve[i][0]);
-    //     let y = map(curve[i][1],275,760,g.by-10,g.ty);
-    //     vertex(x,y);
-        
-    // }
-    // endShape();
-    // pop();
+    
 
     // This covers up the part of the curve that exceeds the graph's bounds
-    push();
-    fill(250); noStroke();
-    rect(0,0,g.lx-1,height);
-    rect(0,0,width,g.ty-.5);
-    rect(0,g.by+.5,width,height-g.by);
-    rect(g.rx+1,0,width-g.rx,height);
-    pop();
+    // push();
+    // fill(250); noStroke();
+    // rect(0,0,g.lx-1,height);
+    // rect(0,0,width,g.ty-.5);
+    // rect(0,g.by+.5,width,height-g.by);
+    // rect(g.rx+1,0,width-g.rx,height);
+    // pop();
 }
 
 // Can just draw the curve when P > 22
@@ -410,51 +405,181 @@ function pressureUnder22(curve){
     for(let i = 0; i < curve.length; i++){
         let x = xPlotting(curve[i][0]);
         let y = map(curve[i][1],275,760,g.by-10,g.ty);
-        point(x,y);
         curvepx.push([x,y]);
     }
     endShape();
     pop();
 
+    let tvgpx = []; // Have to redo this for some reason unsure why, the generate pixel data only works for the liquid data
+    for(let i = 0; i < tvg.length; i++){
+        let x = xPlotting(tvg[i][0]);
+        let y = map(tvg[i][1],275,760,g.by-10,g.ty);
+        tvgpx.push([x,y]);
+    }
+
     let x1c, y1c, x2c, y2c; // Points to be used with the custom curve
-    let x1g, y1g, x2g, y2g; // Points to be used with the liquid part of the phase curve
-    let mc, bc, ml, bl;
-    let xVL, yVL;
+    let x1g, y1g, x2g, y2g; // Points to be used with the gas part of the phase curve
+    let mc, bc, mg, bg;
+    let xVV, yVV;
 
     // FIRST INTERSECTION
     // Iterate through liquid curve and find where there is a line intersection with points of custom curve to find VL
-    let c = 0;
+    let c = tvgpx.length-1;
     let test = true;
     let storage1 = 0; // Used to keep track of index in curve for later intersection points
 
-    ellipse(tvg_px[tvg_px.length-3][0],tvg_px[tvg_px.length-3][1],6)
+    while(test && c >= 1){
+        x1g = tvgpx[c][0]; y1g = tvgpx[c][1];
+        x2g = tvgpx[c-1][0]; y2g = tvgpx[c-1][1];
+        mg = (y2g - y1g)/(x2g - x1g);
+        bg = y1g - mg*x1g;
+        for(let i = 0; i < curvepx.length-1; i++){
+            x1c = curvepx[i][0]; y1c = curvepx[i][1];
+            x2c = curvepx[i+1][0]; y2c = curvepx[i+1][1];
+            mc = (y2c - y1c)/(x2c - x1c);
+            bc = y1c - mc*x1c;
+            let xsol = (bg - bc)/(mc - mg);
+            let ysol = mc*xsol + bc;
+            if(xsol >= x1c && xsol <= x2c && xsol <= x2g && xsol >= x1g && ysol <= y2g && ysol >= y1g && ysol <= y1c && ysol >= y2c){
+                xVV = xsol;
+                yVV = ysol;
+                storage1 = i;
+                test = false;
+            }
     
-    
-    // while (test){
-    //     console.log(c)
-    //     x1g = tvg_px[c][0]; y1g = tvg_px[c][1];
-    //     x2g = tvg_px[c+1][0]; y2g = tvg_px[c+1][1];
-    //     ml = (y2g - y1g)/(x2g - x1g);
-    //     bl = y1g - ml*x1g;
-    //     for(let i = curvepx.length-1; i >= 0; i--){
-    //         console.log(i)
-    //         x1c = curvepx[i][0]; y1c = curvepx[i][1];
-    //         x2c = curvepx[i-1][0]; y2c = curvepx[i-1][1];
-    //         mc = (y2c - y1c)/(x2c - x1c);
-    //         bc = y1c - mc*x1c;
+        }
+        c--;
+    }
 
-    //         let xsol = (bl - bc)/(mc - ml); // Potential x-solution
-    //         let ysol = mc*xsol + bc;
-    //         // Checks to make sure xsol and ysol aren't intersected out of bounds
-    //         if(xsol <= x1c && xsol >= x2c && ysol >= y1c && ysol <= y2c && xsol <= x1g && xsol >= x2g && ysol >= y1g && ysol <= y2g){ 
-    //             xVL = xsol;
-    //             yVL = ysol;
-    //             storage1 = i;
-    //             test = false;
-    //         }
-    //     }
-    //     c++;
-    // }
+    g.topText = Math.round(map(yVV,275,760,g.by-10,g.ty));
+    
+    // SECOND INTERSECTION
+    let x2, y2;
+    let m, b;
+    let storage2 = 0;
+    for(let i = storage1; i >= 1; i--){
+        y2 = yVV;
+        if(curvepx[i][1] >= y2 && curvepx[i-1][1] <= y2){
+            m = (curvepx[i][1] - curvepx[i-1][1])/(curvepx[i][0] - curvepx[i-1][0]);
+            b = curvepx[i][1] - m*curvepx[i][0];
+            x2 = (yVV - b)/m;
+            storage2 = i;
+            break;
+        }
+    }
+
+    // THIRD INTERSECTION
+    let x3, y3;
+    let storage3;
+    for(let i = storage2-1; i >= 1; i--){
+        y3 = yVV;
+        if(curvepx[i][1] <= y3 && curvepx[i-1][1] >= y3){
+            m = (curvepx[i][1] - curvepx[i-1][1])/(curvepx[i][0] - curvepx[i-1][0]);
+            b = curvepx[i][1] - m*curvepx[i][0];
+            x3 = (yVV - b)/m;
+            storage3 = i;
+            break;
+        }
+    }
+
+    // With all intersections defined the original curve needs to be broken up into 4 segments
+    // Curve up to third intersection
+    push();
+    strokeWeight(2); stroke(0,0,255); noFill();
+    beginShape();
+    for(let i = 0; i < storage3; i++){
+        vertex(curvepx[i][0],curvepx[i][1]);
+        if(i == storage3-1){
+            vertex(x3,y3);
+        }
+    }
+    endShape();
+    pop();
+
+    // Curve from third to second intersection
+    push();
+    strokeWeight(2); drawingContext.setLineDash([5,7]); noFill(); stroke(0,0,255);
+    beginShape();
+    for(let i = storage3; i < storage2; i++){
+        if(i == storage3){
+            vertex(x3,y3);
+        }
+        vertex(curvepx[i][0],curvepx[i][1]);
+        if(i == storage2-1){
+            vertex(x2,y2);
+        }
+    }
+    endShape();
+    
+
+    // Curve from second to first intersection
+    beginShape();
+    for(let i = storage2; i < storage1; i++){
+        if(i == storage2){
+            vertex(x2,y2);
+        }
+        vertex(curvepx[i][0],curvepx[i][1]);
+        if(i == storage1-1){
+            vertex(xVV,yVV);
+        }
+    }
+    endShape();
+    pop();
+
+    // Remainder of curve after first intersection
+    push();
+    strokeWeight(2); noFill(); stroke(0,0,255);
+    beginShape();
+    for(let i = storage1; i < curvepx.length; i++){
+        if(i == storage1){
+            vertex(xVV,yVV);
+        }
+        vertex(curvepx[i][0],curvepx[i][1]);
+    }
+    endShape();
+    pop();
+
+    push();
+    fill(255,87,51); noStroke();
+    ellipse(xVV,yVV,12);
+    ellipse(x3,y3,12);
+    strokeWeight(2); stroke(255,87,51);
+    drawingContext.setLineDash([5,7]);
+    line(x3,y3,xVV,yVV);
+    pop();
+
+    let vV = reverseXPlotting(xVV);
+    let vL = reverseXPlotting(x3);
+
+    push();
+    textSize(22); noStroke(); textStyle(ITALIC);
+    text('V',550,150);
+    text('V',550,190);
+    textStyle(NORMAL); textSize(17);
+    text('L',567,140);
+    text('V',567,180);
+    text('3',657,140);
+    textSize(22);
+    text('= '+vL+' cm /mol',580,150);
+    if(vV < 100){
+        text('= '+vV+' cm /mol',580,190);
+        textSize(17);
+        text('3',656,180);
+    } else if (vV < 1000){
+        text('= '+vV+' cm /mol',580,190);
+        textSize(17);
+        if(vV == 111){
+            text('3',666,180);
+        } else {  
+            text('3',669,180);
+        }
+    } else {
+        text('= '+vV+' cm /mol',580,190);
+        textSize(17);
+        text('3',682,180);
+    }
+    pop();
+    
 
 }
 
@@ -595,12 +720,24 @@ function fillConstants(){
 }
 
 function PsatORTsat(){
-    let x;
     if(g.diagram == 'P-V-diagram'){
         if(g.slider <= 645){
             push();
-            noStroke(); textSize(25);
-            text('P    = '+g.topText + ' MPa',width/2-50,60);
+            noStroke(); textSize(25); textStyle(ITALIC);
+            text('P',width/2-50,60);
+            textStyle(NORMAL);
+            text('  = '+g.topText + ' MPa',width/2-20,60);
+            textSize(18);
+            text('sat',width/2-32,47);
+            pop();
+        }
+    } else {
+        if(g.slider <= 22){
+            push();
+            noStroke(); textSize(25); textStyle(ITALIC);
+            text('T',width/2-50,60);
+            textStyle(NORMAL);
+            text('  = '+g.topText+' K',width/2-20,60);
             textSize(18);
             text('sat',width/2-32,47);
             pop();

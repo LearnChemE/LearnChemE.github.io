@@ -91,7 +91,7 @@ function sliderProps() {
         slider.setAttribute("min","0.2");
         slider.setAttribute("max","25");
         slider.setAttribute("step","0.2");
-        slider.value = "7";
+        slider.value = "9";
         g.slider = Number(slider.value);
         slider_label.innerHTML = `${g.slider}`;
         slider_units.innerHTML = "Pressure (MPa)";
