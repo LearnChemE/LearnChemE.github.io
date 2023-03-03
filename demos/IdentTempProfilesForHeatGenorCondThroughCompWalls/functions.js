@@ -129,7 +129,6 @@ function assignWall(){
     } else {
         g.heatWall = 'B';
     }
-    g.heatWall = 'A';
 }
 
 function assignThermalProps(){
