@@ -129,7 +129,7 @@ function assignWall(){
     } else {
         g.heatWall = 'B';
     }
-    g.heatWall = 'B';
+    g.heatWall = 'A';
 }
 
 function assignThermalProps(){
@@ -150,7 +150,7 @@ function assignThermalProps(){
     
 
     // Wall C
-    temp = 10 + Math.round(Math.random()*5); // Between .14 and .19
+    temp = 5 + Math.round(Math.random()*5); // Between .14 and .19
     g.kvalues[2] = (temp/100).toFixed(2);
 
     // Thermal resistance
@@ -525,7 +525,7 @@ function solveProblemA(){
                 b = ans[i][1] - m*ans[i][0];
                 push();
                 noStroke(); fill(255);
-                x = ans[i][0] + 40;
+                x = ans[i][0] + 130;
                 y = m*x + b;
                 rect(x-1, y-4,12,13);
                 fill(0); textSize(15);
@@ -869,10 +869,9 @@ function incorrectApartCSolution(correct){
     x2 = correct[0][0]; y2 = m*(x2-x1) + y1;
     incorrect.push([x1,y1,x2,y2]);
 
-    // More aggressive downward slope
-    m = (correct[0][1] - correct[1][1])/(correct[0][0] - correct[0][1]);
-    m = 4*m;
-    x1 = correct[1][0]; y1 = correct[1][1]+12;
+    // Same slope as wall b's answer
+    m = (correct[3][1] - correct[2][1])/(correct[3][0] - correct[2][0]);
+    x1 = correct[1][0]; y1 = correct[1][1];
     x2 = correct[0][0]; y2 = m*(x2-x1) + y1;
     incorrect.push([x1,y1,x2,y2]);
 
@@ -888,7 +887,7 @@ function incorrectApartCSolution(correct){
         x1 = correct[1][0]; y1 = correct[1][1]+12;
         x2 = x1 + 20; y2 = y1 + 70;
         x3 = x2 + 25; y3 = y2 + 45;
-        x4 = correct[0][0]; y4 = incorrect[2][3]+1.4*g.qAprops[2];
+        x4 = correct[0][0]; y4 = correct[0][1]+1.4*g.qAprops[2]+30;
         //bezier(x1,y1,x2,y2,x3,y3,x4,y4);
         incorrect.push([x1,y1,x2,y2,x3,y3,x4,y4]);
     }
@@ -1350,7 +1349,7 @@ function correctBsolution(){
     let Bcurvepx = [];
 
     let upperLim = 65; let lowerLim = 25;
-    let upperPx = 180; let lowerPx = 325;
+    let upperPx = 230; let lowerPx = 325;
 
     // Converts the temperature values and x-locations into pixel coords
     for(let i = 0; i < tempVec.length; i++){
@@ -1476,11 +1475,12 @@ function incorrectBpartCsolution(ans){
     let x, y;
     let x1, y1, x2, y2, x3, y3;
     let m;
-
+    console.log(g.answers)
     // Downward sloping line with no Rtc or flat line
     if(g.Rtc > 0.02){
         m = (ans[0][1] - ans[1][1])/(ans[0][0] - ans[1][0]);
-        x = g.wallX[1]; y = ans[3][ans[3].length-1][1];
+        m = m/3;
+        x = g.wallX[1]; y = ans[1][1];
         x1 = g.wallX[0]; y1 = y + m*(x1-x);
         incorrect.push([x,y,x1,y1]);
     } else {
@@ -1622,15 +1622,12 @@ function checkAnswerQuestionB(ans){
     }
 }
 
-
-
 function bottomText(){
     push();
     textSize(25); noStroke();
     text(g.bottomText,70,580)
     pop();
 }
-
 
 // This is used to make the answer choices look a bit different each time 
 function fillquestionAprops(){
@@ -1645,7 +1642,11 @@ function hint(){
         if(g.problemPart == 0){
             g.bottomText = 'Hint: There is no heat transfer to the left side.';
         } else if (g.problemPart == 1){
-            g.bottomText = 'Hint: Be sure to account for contact resistances.';
+            if(g.chosenAnswer == g.answers[2]){
+                g.bottomText = 'Hint: Keep in mind the ratios of thermal conductivities.';
+            } else {
+                g.bottomText = 'Hint: Be sure to account for contact resistances.';
+            }
         }
     } else {
         if(g.problemPart == 0){
@@ -1653,7 +1654,11 @@ function hint(){
         } else if (g.problemPart == 1 && !nextPart.disabled){
             g.bottomText = 'Hint: There is no heat transfer to the left side.';
         } else {
-            g.bottomText = 'Hint: Be sure to account for contact resistances.';
+            if(g.chosenAnswer == g.answers[0] && g.Rtc > 0.02){
+                g.bottomText = 'Hint: Keep in mind the ratios of thermal conductivities.';
+            } else {
+                g.bottomText = 'Hint: Be sure to account for contact resistances.';
+            }
         }
     }
 }
