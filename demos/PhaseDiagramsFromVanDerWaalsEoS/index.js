@@ -2,7 +2,7 @@
 window.g = {
     cnv: undefined,
     slider: 500,
-    diagram: "T-V-diagram",
+    diagram: "P-V-diagram",
 
     // Constants to be used 
     R: 8.314,

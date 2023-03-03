@@ -106,14 +106,14 @@ function graphDraw(){
     } else {
         beginShape();
         for(let i = 0; i < tvg.length; i++){
-            y = map(tvg[i][1],275,760,g.by-10,g.ty);
+            y = map(tvg[i][1],270.86,760,g.by,g.ty);
             x = xPlotting(tvg[i][0]);
             vertex(x,y);
         }
         endShape();
         beginShape();
         for(let i = 0; i < tvl.length; i++){
-            y = map(tvl[i][1],275,760,g.by-10,g.ty);
+            y = map(tvl[i][1],270.86,760,g.by,g.ty);
             x = xPlotting(tvl[i][0]);
             vertex(x,y);
         }
