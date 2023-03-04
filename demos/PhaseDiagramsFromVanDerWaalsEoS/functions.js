@@ -315,10 +315,10 @@ function tempUnder645(curve){
     pop();
 
     push();
-    fill(255,87,51); noStroke();
+    fill(255,150,0); noStroke();
     ellipse(xVL,yVL,12);
     ellipse(x3,y3,12);
-    strokeWeight(2); stroke(255,87,51);
+    strokeWeight(2); stroke(255,150,0);
     drawingContext.setLineDash([5,7]);
     line(xVL,yVL,x3,y3);
     pop();
@@ -540,10 +540,10 @@ function pressureUnder22(curve){
     pop();
 
     push();
-    fill(255,87,51); noStroke();
+    fill(255,150,0); noStroke();
     ellipse(xVV,yVV,12);
     ellipse(x3,y3,12);
-    strokeWeight(2); stroke(255,87,51);
+    strokeWeight(2); stroke(255,150,0);
     drawingContext.setLineDash([5,7]);
     line(x3,y3,xVV,yVV);
     pop();
