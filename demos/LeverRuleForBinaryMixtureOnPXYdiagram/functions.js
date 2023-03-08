@@ -125,7 +125,7 @@ function everythingElse(){
 
     // Pixel value of y-coord of liquid line at the x-coord of purple dot
     let ytest1 = g.liquidLine[0]*x + g.liquidLine[1];
-    if(y > ytest1){ // Purple dot y-coord "under" liquid curve
+    if(y > ytest1){ // Purple dot y-coord under liquid curve
         test1 = true;
     } else {
         test1 = false;
@@ -133,7 +133,7 @@ function everythingElse(){
 
     // Pixel value of y-coord of vapor curve at the x-coord of purple dot
     let ytest2 = map((g.pStarA*g.pStarB)/(g.pStarA + (g.pStarB-g.pStarA)*g.moleFrac),2.4,10,g.by,g.ty);
-    if(y < ytest2){ // Purple dot y-coord "above" vapor curve
+    if(y < ytest2){ // Purple dot y-coord above vapor curve
         test2 = true;
     } else {
         test2 = false;
@@ -212,7 +212,7 @@ function everythingElse(){
     pop();
 
 
-    noStroke(); fill(100,0,100);
+    noStroke(); fill(150,0,200);
     ellipse(x,y,10);
     pop();
 }
