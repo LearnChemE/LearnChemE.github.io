@@ -34,28 +34,11 @@
 
     <body>
         <div id="simulation-wrapper">
-            
-        
-            <div class="inputs-wrapper" style="margin-top: 15px">
-                <div class="input-row" style="margin-bottom: 10px">
-                    <div class="input-label" id="label">Mole fraction A (purple dot):</div>
-                    <input type="range" id="mole-fraction" min="0" max="1" step=".004" value="0.5"/>
-                    <div id="mole-fraction-value" class="value-label">0.5</div>
-                </div>
-            </div>
-        
-            <div class="inputs-wrapper" style="grid-template-columns: max-content max-content max-content max-content">
-                <div class="input-row" style="grid-template-columns: max-content 150px 15px max-content">
-                    <div class="input-label" id="label">Pressure (kPa)</div>
-                    <input type="range" id="pressure" min="2.4" max="10" step=".1" value="5"/>
-                    <div id="pressure-value" class="value-label">5</div>
-                </div>
-                
-                <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
-                <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
-                <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>    
-            
-            </div>
+          <div class="simulation-controls">           
+            <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
+            <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+            <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>   
+          </div>
         </div>
 
         
@@ -74,11 +57,12 @@
                 </div>
                 <div class="modal-body">
                   <p>
-                    A vapor pressure diagram shows the regions of phase stability for a two-componenent mixture as a function of pressure and composition at a fixed temperature. This simulation considers a nearly ideal solution and the vapor pressure diagram for this mixture can be calculated from the vapor pressures of the two pure substances at a given temperature. When the pressure and composition of the mixture are at a point inside the region bounded by the red and blue lines, both phases can coexist. At all other combinations of pressure and composition, only one phase, either liquid or vapor, is stable. In the vapor pressure diagram, the solid red line indicates the composition of the liquid and the solid blue line indicates the composition of the vapor. 
+                    This P-x-y diagram shows the regions of phase stability for a benzene-toluene mixture at 20°C. This mixture is modeled as an ideal solution that obeys Raoult's law. The solid red line is the bubble pressure and represents the liquid mole fraction. The solid blue curve is the dew pressure and represents the vapor composition. 
                   </p>  
                   <p>
-                    For a point inside the two-phase region, the compositions of the two phases are determined by drawing horizontal lines (the shown dashed lines) to the red liquid composition line and the blue vapor composition line. These are called "tie lines" or "levers". The lever rule is used to calculate the relative amounts of the two phases, which are shown on the bar graph on the right. The compositions of the two phases aree indicated by dotted lines on the phase diagram and numerically below the bar graph. Use the "pressure" slider to adjust the pressure of the mixture and use the "mole fraction" slider to adjust the mole fraction of element A in the liquid and/or vapor phases.
+                    Click and drag the purple dot to adjust the mixture's pressure and mole fraction of the benzene. Two phases only co-exist in equilibrium in the region bounded by the red and blue curves. When two phases co-exist, a horizontal line (a tie line) through the purple point (the dashed line in the diagram) intersects the bubble and dew pressure curves at the liquid and vapor compositions, respectively, that are in equilibrium. The mole fractions of the phases are indicated by the vertical dotted lines. The relative amounts of liquid and vapor, which are shown in the bar graph, are calculated using the lever rule. The amount of vapor is proportional to the length of the dashed horizontal blue line and the amount of liquid is proportional to the length of the dashed horizontal red line.
                   </p>
+                  
                   
                 </div>
               </div>
@@ -99,23 +83,11 @@
       
             <div class="modal-body">
                 <div class="modal-text">
-                    The mixture in this simulation forms a nearly ideal solution that obeys Raoult's law (\(p_A = x_Ap_A^*\)) over the entire range of composition. Composition is usually expressed as a mole fraction but sometimes other units such as mole percent or mass percent are used. An "\(x\)" usually indicates the mole fraction of the liquid phase, a "\(y\)" is used for the vapor phase, and a "\(z\)" for the total composition of all phases together.
+                  Benzene and toluene form a nearly ideal solution obeying Raoult's law (\(p_A = x_Ap_A^*\)) over the entire range of composition. Composition is usually expressed as a mole fraction but sometimes other units such as mole percent or mass percent are used. An "\(x\)" usually indicates the mole fraction of the liquid phase, a "\(y\)" is used for the vapor phase, and a "\(z\)" for the total composition of all phases together.
                 </div>
                 <div class="modal-text">
                     The amounts in the phases are calculated from the lever rule: \(\frac{n_{liquid}}{n_{vapor}} = \frac{l_{vapor}}{l_{liquid}}\). Here \(n_{liquid}\) is the moles of liquid phase, \(n_{vapor}\) is the moles of vapor phase, and \(l_{vapor}\) and \(l_{liquid}\) are the lengths of the levers indicated by dashed lines on the phase diagrams. The "relative amount" on the bar chart is calculated from \(\frac{n_{liquid}}{n_{liquid} + n_{vapor}}\) and \(\frac{n_{vapor}}{n_{liquid} + n_{vapor}}\).
                 </div>
-              
-                <div style="height:10px"></div>
-                <ol class="references">
-                  <li>
-                   L. D. Schmidt, <i>The Engineering of Chemical Reactions</i>, New York: Oxford University Press, 1998. 
-                  </li>
-                  <li>
-                    D. Pearson, "A Polynomial-Time Algorithm for the Change-Making Problem," <i>Operations Research Letters</i>, <b>33</b>(3), 2005 pp. 231-234.
-                  </li>
-                </ol>
-              
-              
             </div>
           </div>
         </div>
@@ -135,8 +107,9 @@
         <div class="modal-body">
             <p>
               This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
-                Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
-                href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Lisa Goss under the direction of Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional contributions by Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of our
+                Chemical and Biological Engineering</a> at University of Colorado Boulder for <a
+                href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Patrick Doyle. It is based on a Mathematica simulation on the Wolfram Demonstration Project website prepared by Lisa Goss and modified by Tachael Baumann. Addre
+                ss any questions or comments to learncheme@gmail.com. All of our
               simulations are open source, and are available on our <a
                 href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
                 repository</a>.</p>
