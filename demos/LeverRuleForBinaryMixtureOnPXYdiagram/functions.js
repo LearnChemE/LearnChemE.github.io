@@ -198,6 +198,8 @@ function everythingElse(){
         push();
         strokeWeight(.5); fill(g.blue);
         rect(g.rx+130,g.by-40,30,-300);
+        strokeWeight(1.5); drawingContext.setLineDash([1,6]); stroke(g.blue);
+        line(x,y,x,g.by);
         pop();
         g.ybz = (map(x,g.lx,g.rx,0,1)).toFixed(2);
         g.xbz = (0).toFixed(2);
@@ -217,6 +219,8 @@ function everythingElse(){
         push();
         strokeWeight(.5); fill(g.red);
         rect(g.rx+65,g.by-40,30,-300);
+        strokeWeight(1.5); drawingContext.setLineDash([1,6]); stroke(g.red);
+        line(x,y,x,g.by);
         pop();
         g.ybz = (0).toFixed(2);
         g.xbz = (map(x,g.lx,g.rx,0,1)).toFixed(2);
