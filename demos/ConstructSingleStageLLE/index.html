@@ -46,6 +46,26 @@
             <button type="button" class="btn btn-success" id="next-part">Next</button>
             <button type="button" class="btn btn-danger" id="solution">Submit answer</button>
             <span id="question"><div style="margin-top:5px"></div>(1) feed composition</span>
+        
+        </div>
+        <div class="inputs-wrapper" style="grid-template-columns: max-content max-content max-content; margin-bottom:20px">
+            <div class="input-row" id="slider1" style="display: none;">
+                <div class="input-label">mass percent (%): solute</div>
+                <input type="range" id="solute-mass-slider" min="0" max="100" value="80" step="1"/>
+                <div id="solute-mass-value" class="value-label">80</div>
+            </div>
+            <div class="input-row" id="slider2" style="display: none;">
+                <div class="input-label">carrier</div>
+                <input type="range" id="carrier-mass-slider" min="0" max="100" value="20" step="1"/>
+                <div id="carrier-mass-value" class="value-label">20</div>
+            </div>
+            <div class="input-row" id="slider3" style="display: none;">
+                <div class="input-label">solvent</div>
+                <input type="range" id="solvent-mass-slider" min="0" max="100" value="0" step="1"/>
+                <div id="solvent-mass-value" class="value-label">0</div>
+            </div>
+        
+        
         </div>
         <div id="graphics-wrapper">
 

@@ -167,7 +167,54 @@ function phaseAndTieDraw(){
 }
 
 
+function questionDetails(){
+    // Part 1
+    switch(g.problemPart){
+        case (0):
+            push(); strokeWeight(1.5);
+            rect(80,90,150,80);
+            pop();
+            push();
+            noStroke(); textSize(22);
+            text('mass % in feed',80,80);
+            textSize(20);
+            text('solute = '+g.step1[0]+'%',100,110);
+            text('carrier = '+g.step1[1]+'%',98,135);
+            text('solvent = '+g.step1[2]+'%',100,160);
+            pop();
+            break;
+        case (1):
+            push(); strokeWeight(1.5);
+            rect(80,90,150,80);
+            pop();
+            push();
+            noStroke(); textSize(22);
+            text('mass % in solvent',68,80);
+            textSize(20);
+            text('solute = '+g.step2[0]+'%',102,110);
+            text('carrier = '+g.step2[1]+'%',100,135);
+            text('solvent = '+g.step2[2]+'%',90,160);
+            pop();
+            break;
+        case(3):
+            push(); strokeWeight(1.5);
+            rect(80,90,150,55);
+            pop();
+            push();
+            noStroke(); textSize(22);
+            text('mass flow (kg/h)',75,80);
+            textSize(20);
+            text('feed = '+g.step4[0],116,110);
+            text('solvent = '+g.step4[2],90,135);
+            textStyle(ITALIC);
+            text('F/S',115,170);
+            textStyle(NORMAL);
+            text('= '+g.step4[1],155,170);
+            pop();
+            break;
 
+    }
+}
 
 
 // Changes the label in html side and adds text to the drawing
@@ -204,4 +251,20 @@ function questionTextLabel(){
 
 function assignPhase(){
     g.phaseNumber = Math.round(Math.random()*4);
+}
+
+function assignAnswers(){
+    // Part 1
+    g.step1[0] = 25 + Math.round(Math.random()*30);
+    g.step1[1] = 100 - g.step1[0];
+    g.step1[2] = 0;
+    // Part 2
+    g.step2[0] = 0;
+    g.step2[1] = 0;
+    g.step2[2] = 100;
+
+    // Part 4
+    g.step4[0] = 50;
+    g.step4[1] = ((1 + Math.round(Math.random()*49))/10).toFixed(1);
+    g.step4[2] = (g.step4[0]/g.step4[1]).toFixed(1);
 }
