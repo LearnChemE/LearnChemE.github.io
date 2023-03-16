@@ -1,7 +1,7 @@
 window.g = {
     cnv: undefined,
 
-    problemPart: 3, // Keeps track of what part of the question we're on
+    problemPart: 0, // Keeps track of what part of the question we're on
     massPercents: [80,20,0], // Solute, carrier, solvent
 
     // Triangle information
@@ -17,16 +17,32 @@ window.g = {
 
     question: 'Step 1: move the point to the correct feed composition', // Question text
     phaseNumber: 0, // For which phase curve and tie lines will be used
+    solutionTruth: false, // For keeping track of the answer being submitted
     
     // Color information to be used repeatedly
     blue: [0,0,255],
     red: [100,0,0],
     green: [0,100,0],
 
+    // Colors to be used in the various parts
+    color1: [200,100,0], // Step 1
+    color2: [0,100,0], // Step 2
+    color3: [200,0,200], // Step 3
+    color4: [120,0,120], // Step 4
+    color6R: [0,100,255], // Step 6 Raffinate
+    color6E: [255,0,0], // Step 6 Extract
+
+
     // The various answers for each part
     step1: [0,0,0], // Solute, carrier, solvent
     step2: [0,0,0], // Solute, carrier, solvent
     step4: [0,0,0], // Feed, F/S, solvent
+
+    // Variables for use in manipulating dots to submit answers
+    radius: 8,
+    points: [],
+    nP: 1,
+    dragPoint: null,
 
 }
 
@@ -35,10 +51,12 @@ function setup(){
     g.cnv.parent("graphics-wrapper");
     document.getElementsByTagName("main")[0].remove();
     triSetup();
-    //addPhasePoints();
     phaseAndTietoPx();
     assignPhase();
     assignAnswers();
+    for(let i = 0; i < g.nP; i++){
+        g.points.push(createVector(g.xtip,g.ytip+94));
+    }
 }
 
 function draw(){
@@ -47,8 +65,15 @@ function draw(){
     phaseAndTieDraw(); // Changes with new problem
     questionDetails();
     hideSliders();
-    console.log(g.massPercents)
+    
+    
+    answersAndInput();
 
+    
+
+    // for(let p of g.points){
+    //     ellipse(p.x,p.y,g.radius*2);
+    // }
 }
 
 
@@ -71,14 +96,19 @@ const carrierSlider = document.getElementById("slider2");
 const solventSlider = document.getElementById("slider3");
 
 newProblem.addEventListener("click", function(){
+    g.solutionTruth = false;
+    solutionButton.disabled = false;
     g.problemPart = 0;
     nextPart.disabled = false;
+    startingPoints();
     questionTextLabel();
     assignPhase();
     assignAnswers();
 });
 
 nextPart.addEventListener("click", function(){
+    g.solutionTruth = false;
+    solutionButton.disabled = false;
     if(g.problemPart < 5){
         g.problemPart++;
     } 
@@ -86,8 +116,13 @@ nextPart.addEventListener("click", function(){
     if(g.problemPart == 5){
         nextPart.disabled = true;
     }
-
+    startingPoints();
     questionTextLabel();
+});
+
+solutionButton.addEventListener("click", function(){
+    g.solutionTruth = true;
+    solutionButton.disabled = true;
 });
 
 soluteMass.addEventListener("input", function(){
@@ -165,6 +200,35 @@ function hideSliders(){
         solventLabel.innerHTML = '0';
         g.massPercents[2] = 0;
     }
+}
+
+// For manipulating the position of dot within the triangle
+function mousePressed(){
+    for (let i = g.points.length - 1; i >= 0; i--) {
+      const isPressed = inCircle(g.points[i], g.radius);
+      if (isPressed) {
+        g.dragPoint = g.points.splice(i, 1)[0];
+        g.points.push(g.dragPoint);
+  
+      }
+    }
+}
+
+function mouseDragged(){
+    if(!g.solutionTruth){
+        if(g.dragPoint){
+            g.dragPoint.x = mouseX;
+            g.dragPoint.y = mouseY;
+        }
+    }
+}
+
+function mouseReleased(){
+    g.dragPoint = null;
+}
+
+function inCircle(pos,radius){
+    return dist(mouseX, mouseY, pos.x, pos.y) < radius;
 }
 
 

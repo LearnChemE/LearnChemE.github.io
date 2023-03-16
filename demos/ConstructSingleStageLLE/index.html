@@ -36,7 +36,6 @@
         <div id="simulation-wrapper">
             <div class="simulation-controls">           
               <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
-              <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
               <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>   
             </div>
         </div>
@@ -69,6 +68,86 @@
         </div>
         <div id="graphics-wrapper">
 
+        </div>
+
+        <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+                      <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            This simulation shows the outlet compositions from a single-stage, liquid-liquid extraction by following a step-by-step procedure on a ternary phase diagram. When you select the "new problem" button, a new phase envelope is shown and new feed composition and feed flow rates are set. In the steps, the feed and solvent compositions are located on the diagram, and a line connecting them is drawn to determine the mixing point location. The mixing point composition from the phase diagram is indicated by moving the sliders in Step 5. The extract and raffinate compositions are located on a tie line in the last step.
+                        </p>  
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+            aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                    
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                
+                    <div class="modal-body">
+                        <div class="modal-text">
+                            Benzene and toluene form a nearly ideal solution obeying Raoult's law (\(p_A = x_Ap_A^*\)) over the entire range of composition. Composition is usually expressed as a mole fraction but sometimes other units such as mole percent or mass percent are used. An "\(x\)" usually indicates the mole fraction of the liquid phase, a "\(y\)" is used for the vapor phase, and a "\(z\)" for the total composition of all phases together.
+                        </div>
+                        <div class="modal-text">
+                            The amounts in the phases are calculated from the lever rule: \(\frac{n_{liquid}}{n_{vapor}} = \frac{l_{vapor}}{l_{liquid}}\). Here \(n_{liquid}\) is the moles of liquid phase, \(n_{vapor}\) is the moles of vapor phase, and \(l_{vapor}\) and \(l_{liquid}\) are the lengths of the levers indicated by dashed lines on the phase diagrams. The "relative amount" on the bar chart is calculated from \(\frac{n_{liquid}}{n_{liquid} + n_{vapor}}\) and \(\frac{n_{vapor}}{n_{liquid} + n_{vapor}}\).
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+
+        <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="aboutModalLabel">About</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+                                Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+                                href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under the direction of Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional contributions by Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of our
+                            simulations are open source, and are available on our <a
+                                href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+                                repository</a>.
+                        </p>
+                        <p style="line-height: 3rem;">
+                            If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
+                            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
+                                style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
+                                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac
+                            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+                                style="height: 4ch;"></span>&nbsp;on Windows.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
 
 

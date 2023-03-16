@@ -19,8 +19,6 @@ function addPhasePoints(){
 function phaseAndTietoPx(){
     let x, y, x1, y1;
     let ytemp;
-    
-    
 
     for(let i = 0; i < tie.length; i++){
         let temp_tie = [];
@@ -36,4 +34,5 @@ function phaseAndTietoPx(){
         g.tiepx.push(temp_tie);
     }
 }
+
 
