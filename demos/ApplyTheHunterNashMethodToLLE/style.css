@@ -1,0 +1,108 @@
+/* :root basically means the entire document. By default, it uses serif (e.g. times new roman) font, which looks awful */
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+}
+
+/* Octothorpes (#) refer to an ID of an element, like <div id="simulation-title"></div>*/
+#master-wrapper {
+  margin-top: 10px;
+  display: grid;
+}
+
+#simulation-wrapper {
+  display: grid;
+  grid-template-rows: min-content max-content;
+  justify-items: center;
+  align-items: center;
+  width: 100vw;
+  height: min-content;
+  margin-bottom: 20px;
+}
+
+.inputs-wrapper {
+  display: grid;
+  grid-template-columns: max-content max-content max-content 100px 200px;
+  justify-content: center;
+  gap: 15px 10px;
+  margin-bottom: 10px;
+  transform: translateX(15px);
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: max-content 100px 15px max-content; 
+  gap: 10px;
+  align-items: end;
+  justify-items: center;
+}
+
+.select-row {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 10px;
+  align-items: center;
+}
+
+.select-container>form {
+  display: grid;
+}
+
+#point-type {
+  height: min-content;
+  grid-column: 1 / 3;
+}
+
+select {
+  padding: 2px 5px;
+}
+
+#graphics-wrapper {
+  width: 100vw;
+  height: max-content;
+  display: grid;
+  justify-content: center;
+}
+
+/* Box shadows can often make elements appear as though they're "floating" above the page, and I really like the aesthetic of it, so I use it a lot alongside a 1 pixel black border */
+canvas {
+  border: 1px solid black;
+  box-shadow: 0px 0px 2px 2px grey;
+}
+
+label {
+  margin-right: 20px;
+}
+
+#modal-buttons {
+  display: grid;
+  grid-template-columns: 60px 60px 60px; /* These were all previously 1fr. I changed them to hopefully get the on the same line as the feed,solvent,raffinate button or the slider once we can make them appear/disappear */
+  gap: 5px;
+  grid-column: 3;
+  justify-self: end;
+  transform: translateX(-30px);
+}
+
+.modal-body .modal-equation {
+  width: max-content;
+  margin-left: 15px;
+  padding: 2px;
+}
+
+.modal-text+.modal-text {
+  margin-top: 10px;
+}
+
+.modal-equation.no-padding {
+  padding: 0px;
+}
+
+.simulation-controls {
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+  justify-content: center;
+  gap: 0px 20px;
+  width: 100vw;
+  margin-bottom: 5px;
+  margin-top: 15px;
+}
