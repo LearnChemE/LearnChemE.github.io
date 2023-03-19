@@ -101,11 +101,11 @@ function phaseDraw(){
     push();
     noFill(); strokeWeight(2); beginShape();
     for(let i = g.phaseLims[0]; i <= g.phaseLims[1]; i += dx){
-        let x = map(i,0,1,g.xtip+g.dx,g.xtip-g.dx);
+        let x = map(i,0,1,g.xtip-g.dx,g.xtip+g.dx);
         let y = map(a*i**2 + b*i + c,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
         vertex(x,y);
     }
-    let xt = map(g.phaseLims[1],0,1,g.xtip+g.dx,g.xtip-g.dx);
+    let xt = map(g.phaseLims[1],0,1,g.xtip-g.dx,g.xtip+g.dx);
     let yt = map(a*g.phaseLims[1]**2 + b*g.phaseLims[1] + c,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
     vertex(xt,yt); // Additional vertex to account for numerical error in i
     endShape();
@@ -123,34 +123,58 @@ function answersAndUserInput(){
             partOneAnswer();
             break;
         case (1):
-            
+            partTwoInput();
+            partOneAnswer();
+            partTwoAnswer();
             break;
         case(2):
-            
+            partThreeInput();
+            partOneAnswer();
+            partTwoAnswer();
+            partThreeAnswer();
             break;
         case (3):
-            
+            partFourAnswer();
+            partFourInput();
+            partOneAnswer();
+            partTwoAnswer();
+            partThreeAnswer();
             break;
         case (4):
-            
+            partFiveInput();
+            partOneAnswer();
+            partTwoAnswer();
+            partThreeAnswer();
+            partFourAnswer();
             break;
         case (5):
-            
+            partSixInput();
+            partOneAnswer();
+            partTwoAnswer();
             break;
         case (6):
-            
+            partSevenInput();
+            partOneAnswer();
+            partTwoAnswer();
             break;
         case (7):
-            
+            partEightInput();
+            partOneAnswer();
+            partTwoAnswer();
             break;
         case (8):
-            
+            partNineInput();
+            partOneAnswer();
+            partTwoAnswer();
             break;
         case (9):
-            
+            partTenInput();
+            partOneAnswer();
+            partTwoAnswer();
             break;
         case (10):
-            
+            partOneAnswer();
+            partTwoAnswer();
             break;
 
     }
@@ -173,13 +197,180 @@ function partOneInput(){
 }
 
 function partOneAnswer(){
-   let x, y;
-   let dx, dy;
-   y = map(ans.step1[0],0,1,g.ytip+g.dy,g.ytip);
-   dy = g.ytip + g.dy - y;
-   x = map(ans.step1[1],0,1,g.xtip+g.dx,g.xtip-g.dx);
-   dx =  dy/Math.tan(radians(g.angle));
+    let x, y;
+    let dx, dy;
+    y = map(ans.step1[0],0,1,g.ytip+g.dy,g.ytip);
+    dy = g.ytip + g.dy - y;
+    x = map(ans.step1[1],0,1,g.xtip+g.dx,g.xtip-g.dx);
+    dx =  dy/Math.tan(radians(g.angle));
+    if (g.solutionTruth || g.problemPart > 0){
+        push(); noStroke(); fill(0);
+        ellipse(x-dx,y,14);
+        pop();
+    }
+    if(g.problemPart > 0){
+        push();
+        fill(255);
+        ellipse(x-dx,y-27,30);
+        noStroke(); fill(0);
+        textSize(22); textStyle(ITALIC);
+        text('F',x-8-dx,y-20);
+        pop();
+    }
 }
+
+function partTwoInput(){
+    let temp = g.points[0];
+    push();
+    fill(g.red); noStroke();
+    ellipse(temp.x,temp.y,2*g.radius);
+    fill(255);
+    ellipse(temp.x,temp.y,g.radius);
+    stroke(g.red);
+    ellipse(temp.x,temp.y-27,30);
+    noStroke(); fill(g.red);
+    textSize(22); textStyle(ITALIC);
+    text('S',temp.x-8,temp.y-20);
+    pop();
+}
+
+function partTwoAnswer(){
+    let x = g.xtip - g.dx;
+    let y = g.ytip + g.dy;
+
+    if (g.solutionTruth || g.problemPart > 1){
+        push();
+        noStroke(); fill(g.red);
+        ellipse(x,y,14);
+        pop();
+    }
+    if (g.problemPart > 1){
+        push();
+        fill(255); stroke(g.red);
+        ellipse(x,y-27,30);
+        noStroke(); fill(g.red);
+        textSize(22); textStyle(ITALIC);
+        text('S',x-8,y-20);
+        pop();
+    }
+}
+
+function partThreeInput(){
+    let temp = g.points[0];
+    push();
+    fill(g.part4); noStroke();
+    ellipse(temp.x,temp.y,2*g.radius);
+    fill(255);
+    ellipse(temp.x,temp.y,g.radius);
+    stroke(g.part4);
+    ellipse(temp.x,temp.y-27,30);
+    noStroke(); fill(g.part4);
+    textSize(18); textStyle(ITALIC);
+    text('R',temp.x-12,temp.y-22);
+    textSize(14); textStyle(NORMAL);
+    text('N',temp.x,temp.y-17);
+    pop();
+}
+
+function partThreeAnswer(){
+    let x,y;
+    let xRN = .99*g.phaseLims[1];
+    let yRN = g.phaseConstants[0]*xRN**2 + g.phaseConstants[1]*xRN + g.phaseConstants[2];
+    y = map(yRN,0,1,g.ytip+g.dy,g.ytip);
+    x = map(xRN,0,1,g.xtip-g.dx,g.xtip+g.dx);
+    if (g.solutionTruth || g.problemPart > 2){
+        push(); noStroke(); fill(g.part4);
+        ellipse(x,y,14);
+        pop();
+    }
+    if (g.problemPart > 2){
+        push();
+        fill(255); stroke(g.part4);
+        ellipse(x,y-27,30);
+        noStroke(); fill(g.part4);
+        textSize(18); textStyle(ITALIC);
+        text('R',x-12,y-22);
+        textSize(14); textStyle(NORMAL);
+        text('N',x,y-17);
+        pop();
+    }
+
+    
+    
+}
+
+function partFourInput(){
+    let temp = g.points[0];
+    push();
+    fill(60); noStroke();
+    ellipse(temp.x,temp.y,2*g.radius);
+    fill(255);
+    ellipse(temp.x,temp.y,g.radius);
+    stroke(60);
+    ellipse(temp.x,temp.y-27,30);
+    noStroke(); fill(60);
+    textSize(22); textStyle(ITALIC);
+    text('M',temp.x-10,temp.y-20)
+    pop();
+}
+
+function partFourAnswer(){
+    let x, y;
+    let dx, dy;
+    y = map(ans.step1[0],0,1,g.ytip+g.dy,g.ytip);
+    dy = g.ytip + g.dy - y;
+    x = map(ans.step1[1],0,1,g.xtip+g.dx,g.xtip-g.dx);
+    dx =  dy/Math.tan(radians(g.angle));
+
+    push(); strokeWeight(2); stroke(60);
+    if(g.problemPart == 3){
+        drawingContext.setLineDash([5,5]);
+        line(x-dx,y,g.xtip-g.dx,g.ytip+g.dy);
+    } 
+
+    y = map(ans.step4[0],0,1,g.ytip+g.dy,g.ytip);
+    dy = g.ytip + g.dy - y;
+    dx = dy/Math.tan(radians(g.angle));
+    x = map(ans.step4[1],0,1,g.xtip+g.dx,g.xtip-g.dx);
+    if (g.solutionTruth || g.problemPart > 3){
+        noStroke(); fill(60);
+        ellipse(x-dx,y,14);
+    }
+    if (g.problemPart > 3){
+        stroke(60); fill(255); strokeWeight(1);
+        ellipse(x-dx,y-27,30);
+        noStroke(); fill(60);
+        textSize(22); textStyle(ITALIC);
+        text('M',x-dx-10,y-20);
+    }
+    pop();
+}
+
+function partFiveInput(){
+
+}
+
+function partSixInput(){
+
+}
+
+function partSevenInput(){
+
+}
+
+function partEightInput(){
+
+}
+
+function partNineInput(){
+
+}
+
+function partTenInput(){
+
+}
+
+
 
 function startingPoints(){
     g.points[0].x = g.xtip;
@@ -191,6 +382,7 @@ function questionOrHintDisplay(){
     let y = 30;
     let x2 = 70;
     let y2 = 120;
+    let temp;
     push();
     noStroke(); textSize(20);
     switch (g.problemPart){
@@ -260,12 +452,16 @@ function questionOrHintDisplay(){
             stroke(0); strokeWeight(1.5);
             rect(x2+20,y2,135,80);
             textSize(20); noStroke();
+            temp = [0,0,0];
+            temp[0] = (Math.round(ans.step3[0]*100)/100).toFixed(2);
+            temp[1] = (Math.round(ans.step3[1]*100)/100).toFixed(2);
+            temp[2] = (1 - temp[0] - temp[1]).toFixed(2);
             fill(g.blue);
-            text('solute = '+ans.step3[0],x2+30,y2+20);
+            text('solute = '+temp[0],x2+30,y2+20);
             fill(g.red);
-            text('solvent = '+ans.step3[1],x2+26,y2+45);
+            text('solvent = '+temp[1],x2+26,y2+45);
             fill(g.green);
-            text('carrier = '+ans.step3[2],x2+30,y2+70);
+            text('carrier = '+temp[2],x2+30,y2+70);
             pop();
             break;
         case (3):
@@ -280,6 +476,35 @@ function questionOrHintDisplay(){
             } else {
                 text('Hint: use the lever rule',x,y);
             }
+            push();
+            textSize(22);
+            text('mixing mole fractions',x2-10,y2-7);
+            text('flow rates',x2+550,y2-7);
+            stroke(0); strokeWeight(1.5);
+            rect(x2+20,y2,135,80);
+            rect(x2+527,y2,140,60);
+            textSize(20); noStroke();
+            push();
+            textStyle(ITALIC);
+            text('F',x2+534,y2+22);
+            fill(g.red);
+            text('S',x2+534,y2+49);
+            textStyle(NORMAL);
+            text(' = '+ans.step4[4]+' kg/h',x2+549,y2+49);
+            fill(0);
+            text(' = '+ans.step4[3]+' kg/h',x2+549,y2+22);
+            pop();
+            temp = [0,0,0];
+            temp[0] = (Math.round(ans.step4[0]*100)/100).toFixed(2);
+            temp[1] = (Math.round(ans.step4[1]*100)/100).toFixed(2);
+            temp[2] = (1 - temp[0] - temp[1]).toFixed(2);
+            fill(g.blue);
+            text('solute = '+temp[0],x2+30,y2+20);
+            fill(g.red);
+            text('solvent = '+temp[1],x2+26,y2+45);
+            fill(g.green);
+            text('carrier = '+temp[2],x2+30,y2+70);
+            pop();
             break;
         case (4):
             if(!g.hintTruth){
@@ -451,12 +676,12 @@ function defineTieLines(){
     y2px = map(y2,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
     // x1
     a = g.phaseConstants[0]; b = g.phaseConstants[1]; c = g.phaseConstants[2]-y1;
-    x1 = (-b - Math.sqrt(b**2 - 4*a*c))/(2*a);
-    x1px = map(x1,0,1,g.xtip+g.dx,g.xtip-g.dx);
+    x1 = (-b + Math.sqrt(b**2 - 4*a*c))/(2*a);
+    x1px = map(x1,0,1,g.xtip-g.dx,g.xtip+g.dx);
     // x2
     c = g.phaseConstants[2]-y2;
-    x2 = (-b + Math.sqrt(b**2 -4*a*c))/(2*a);
-    x2px = map(x2,0,1,g.xtip+g.dx,g.xtip-g.dx);
+    x2 = (-b - Math.sqrt(b**2 -4*a*c))/(2*a);
+    x2px = map(x2,0,1,g.xtip-g.dx,g.xtip+g.dx);
     g.tiepx.push([x1px,x2px,y1px,y2px]);
 
     // Line 2
@@ -466,12 +691,12 @@ function defineTieLines(){
     y2px = map(y2,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
     // x1
     c = g.phaseConstants[2]-y1;
-    x1 = (-b - Math.sqrt(b**2 - 4*a*c))/(2*a);
-    x1px = map(x1,0,1,g.xtip+g.dx,g.xtip-g.dx);
+    x1 = (-b + Math.sqrt(b**2 - 4*a*c))/(2*a);
+    x1px = map(x1,0,1,g.xtip-g.dx,g.xtip+g.dx);
     // x2
     c = g.phaseConstants[2]-y2;
-    x2 = (-b + Math.sqrt(b**2 - 4*a*c))/(2*a);
-    x2px = map(x2,0,1,g.xtip+g.dx,g.xtip-g.dx);
+    x2 = (-b - Math.sqrt(b**2 - 4*a*c))/(2*a);
+    x2px = map(x2,0,1,g.xtip-g.dx,g.xtip+g.dx);
     g.tiepx.push([x1px,x2px,y1px,y2px]);
 
     // Line 3
@@ -481,12 +706,12 @@ function defineTieLines(){
     y2px = map(y2,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
     // x1
     c = g.phaseConstants[2]-y1;
-    x1 = (-b - Math.sqrt(b**2 - 4*a*c))/(2*a);
-    x1px = map(x1,0,1,g.xtip+g.dx,g.xtip-g.dx);
+    x1 = (-b + Math.sqrt(b**2 - 4*a*c))/(2*a);
+    x1px = map(x1,0,1,g.xtip-g.dx,g.xtip+g.dx);
     // x2
     c = g.phaseConstants[2]-y2;
-    x2 = (-b + Math.sqrt(b**2 - 4*a*c))/(2*a);
-    x2px = map(x2,0,1,g.xtip+g.dx,g.xtip-g.dx);
+    x2 = (-b - Math.sqrt(b**2 - 4*a*c))/(2*a);
+    x2px = map(x2,0,1,g.xtip-g.dx,g.xtip+g.dx);
     g.tiepx.push([x1px,x2px,y1px,y2px]);
 
     // Line 4
@@ -496,12 +721,12 @@ function defineTieLines(){
     y2px = map(y2,0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
     // x1
     c = g.phaseConstants[2]-y1;
-    x1 = (-b - Math.sqrt(b**2 - 4*a*c))/(2*a);
-    x1px = map(x1,0,1,g.xtip+g.dx,g.xtip-g.dx);
+    x1 = (-b + Math.sqrt(b**2 - 4*a*c))/(2*a);
+    x1px = map(x1,0,1,g.xtip-g.dx,g.xtip+g.dx);
     // x2
     c = g.phaseConstants[2]-y2;
-    x2 = (-b + Math.sqrt(b**2 - 4*a*c))/(2*a);
-    x2px = map(x2,0,1,g.xtip+g.dx,g.xtip-g.dx);
+    x2 = (-b - Math.sqrt(b**2 - 4*a*c))/(2*a);
+    x2px = map(x2,0,1,g.xtip-g.dx,g.xtip+g.dx);
     g.tiepx.push([x1px,x2px,y1px,y2px]);
 
     // Define slopes and vertical shifts of tie lines
@@ -524,17 +749,116 @@ function defineTieLines(){
 }
 
 function generateAnswers(){
-    // Part 1
+    // Step 1
     ans.step1[0] = (Math.round((46 + Math.random()*6))/100).toFixed(2);
     ans.step1[2] = (Math.round((35 + Math.random()*11))/100).toFixed(2);
     ans.step1[1] = (1 - ans.step1[0] - ans.step1[2]).toFixed(2);
 
-    // Part 3
+    // Step 3
     let xRN = .99*g.phaseLims[1];
-    let yRN = (g.phaseConstants[0]*xRN**2 + g.phaseConstants[1]*xRN + g.phaseConstants[2]).toFixed(2);
+    let yRN = (g.phaseConstants[0]*xRN**2 + g.phaseConstants[1]*xRN + g.phaseConstants[2]);
     ans.step3[0] = yRN;
-    ans.step3[2] = xRN.toFixed(2);
-    ans.step3[1] = (1 - yRN - ans.step3[2]).toFixed(2);
+    ans.step3[2] = xRN;
+    ans.step3[1] = (1 - yRN - ans.step3[2]);
 
+    // Step 4
+    ans.step4[3] = Math.round(1000 + Math.random()*500);
+    ans.step4[4] = Math.round(1500 + Math.random()*500);
+    ans.step4[5] = ans.step4[3] + ans.step4[4];
+    // solve mixing point with lever rule
+    let xS, yS, xF, yF, xtemp, dx, dy;
+    yF = map(ans.step1[0],0,1,g.ytip+g.dy,g.ytip);
+    yS = g.ytip+g.dy; xS = g.xtip-g.dx;
+    
+    xtemp = map(ans.step1[1],0,1,g.xtip+g.dx,g.xtip-g.dx);
+    dy = g.ytip+g.dy-yF;
+    dx = dy/Math.tan(radians(g.angle));
+    xF = xtemp - dx;
+
+    let FS = dist(xF,yF,xS,yS);
+    let SoverF = ans.step4[4]/ans.step4[3];
+    let MSconstant = 1 + SoverF;
+    let MS = FS/MSconstant; // Solvent to mixing point
+
+    // Need unit vector now
+    dx = xF - (g.xtip-g.dx);
+    dy = yF - (g.ytip+g.dy);
+    let mag = Math.sqrt(dx**2 + dy**2);
+    let unit = [dx/mag,dy/mag];
+
+    g.temp[0] = unit[0];
+    g.temp[1] = unit[1];
+    let xM = xS + unit[0]*MS; // in pixels
+    let yM = yS + unit[1]*MS; // in pixels
+    ans.step4[0] = map(yM,g.ytip+g.dy,g.ytip,0,1);
+    dy = g.ytip+g.dy-yM;
+    dx = dy/Math.tan(radians(g.angle));
+    ans.step4[1] = map(xM+dx,g.xtip+g.dx,g.xtip-g.dx,0,1);
+    ans.step4[2] = 1 - ans.step4[1] - ans.step4[0];
+
+    // Step 5 solving for the first extract point
+    // Generate points that make up the phase array
+    let phasePx = []; 
+    let coeffs = g.phaseConstants;
+    dx = (g.phaseLims[1] - g.phaseLims[0])/100;
+    push();
+    for(let i = g.phaseLims[0]; i <= g.phaseLims[1]; i += dx){
+        x = map(i,0,1,g.xtip-g.dx,g.xtip+g.dx);
+        y = map(coeffs[0]*i**2 + coeffs[1]*i + coeffs[2],0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+        phasePx.push([x,y]);
+    }
+    x = map(g.phaseLims[1],0,1,g.xtip-g.dx,g.xtip+g.dx);
+    y = map(coeffs[0]*g.phaseLims[1]**2 + coeffs[1]*g.phaseLims[1] + coeffs[2],0,Math.sqrt(3)/2,g.ytip+g.dy,g.ytip);
+    phasePx.push([x,y]);
+
+    // Get pixel locations of xRN and yRN
+    let xRNpx, yRNpx;
+    yRNpx = map(yRN,0,1,g.ytip+g.dy,g.ytip);
+    xRNpx = map(xRN,0,1,g.xtip-g.dx,g.xtip+g.dx);
+
+    // Equation of line that passes through M and Rn
+    let x1, y1, x2, y2, m1, b1, m2, b2;
+    x1 = xM; y1 = yM;
+    x2 = xRNpx; y2 = yRNpx;
+    m1 = (y2 - y1)/(x2 - x1);
+    b1 = y1 - m1*x1;
+
+    let yL, yU, yC, yUU; // Lower and upper bounds and y current. yUU = yupperupper which helps with an issue when the line passes through one of the points that make up the phase curve
+    for(let i = 0; i < phasePx.length-2; i++){
+        yL = phasePx[i][1];
+        yU = phasePx[i+1][1];
+        yC = m1*phasePx[i][0] + b1;
+        yUU = phasePx[i+2][1];
+
+        if(yC <= yL && yC >= yU){
+            m2 = (yL - yU)/(phasePx[i][0] - phasePx[i+1][0]);
+            b2 = yL - m2*phasePx[i][0];
+            ans.step5[0] = (b2 - b1)/(m1 - m2);
+            ans.step5[1] = m1*ans.step5[0] + b1;
+            break;
+        } else if (yC <= yU && yC > yUU){
+            ans.step5[0] = phasePx[i+1][0];
+            ans.step5[1] = phasePx[i+1][1];
+            break;
+        }
+    }
+
+    // Step 6 solving for the operating point
+    // At the intersection of E1F and RnS
+    // Line 1 - F through E1
+    let xe1 = ans.step5[0];
+    let ye1 = ans.step5[1];
+    m1 = (yF - ye1)/(xF - xe1);
+    b1 = yF - m1*xF;
+
+    // Line 2- Rn through S
+    m2 = (yRNpx - (g.ytip+g.dy))/(xRNpx - (g.xtip-g.dx));
+    b2 = yRNpx - m2*xRNpx;
+    ans.step6[0] = (b2 - b1)/(m1 - m2);
+    ans.step6[1] = m1*ans.step6[0] + b1;
+
+    
+    
 }
+
 

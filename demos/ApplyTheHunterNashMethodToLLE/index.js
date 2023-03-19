@@ -22,26 +22,30 @@ window.g = {
     // Variables related to buttons
     solutionTruth: false,
     hintTruth: false,
-    problemPart: 2,
+    problemPart: 4,
     hintText: 'Hint: read the compositions on the axes',
 
     // Colors to be used repeatedly
     blue: [0,0,200],
     red: [100,0,0],
     green: [0,100,0],
+    part4: [0,100,200],
 
     // Variables for use in manipulating dots to submit answers
     radius: 8,
     points: [],
     nP: 1,
     dragPoint: null,
+    temp: [0,0],
 }
 
 ans = {
-    step1: [0,0,0], // solute, solvent, carrier
-    step2: [0,1,0], // solute, solvent, carrier
-    step3: [0,0,0], // solute, solvent, carrier
-    step4: [0,0,0,0,0], // solute, solvent, carrier, F, S
+    step1: [0,0,0], // solute, solvent, carrier (Feed)
+    step2: [0,1,0], // solute, solvent, carrier (Solvent)
+    step3: [0,0,0], // solute, solvent, carrier (Rn)
+    step4: [0,0,0,0,0,0], // solute, solvent, carrier, F, S, M (Mixing point)
+    step5: [0,0], // Pixel values (x and y) for extract1
+    step6: [0,0], // Pixel values (x and y) for operating point
 
 }
 
@@ -63,7 +67,10 @@ function draw(){
     phaseDraw();
     questionOrHintDisplay();
     answersAndUserInput();
-  
+
+    ellipse(ans.step5[0],ans.step5[1],10);
+    ellipse(ans.step6[0],ans.step6[1],10);
+
 }
 
 
