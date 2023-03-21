@@ -149,9 +149,6 @@ function answersAndUserInput(){
             partFiveAnswer();
             break;
         case (5):
-            
-            
-            
             partThreeAnswer();
             partSixAnswer();
             partFiveAnswer();
@@ -159,10 +156,10 @@ function answersAndUserInput(){
             partSixInput();
             partOneAnswer();
             partThreeAnswer();
-            
             break;
         case (6):
             partSevenInput();
+            partSevenAnswer();
             partOneAnswer();
             partTwoAnswer();
             partThreeAnswer();
@@ -171,24 +168,49 @@ function answersAndUserInput(){
             break;
         case (7):
             partEightInput();
+            partEightAnswer();
             partOneAnswer();
             partTwoAnswer();
+            partThreeAnswer();
+            partSixAnswer();
+            partSevenAnswer();
+            partFiveAnswer();
             break;
         case (8):
+            partThreeAnswer();
             partNineInput();
+            partNineAnswer();
+            partEightAnswer();
             partOneAnswer();
             partTwoAnswer();
+            partSixAnswer();
+            partSevenAnswer();
+            partFiveAnswer();
             break;
         case (9):
             partTenInput();
+            partThreeAnswer();
+            partEightAnswer();
             partOneAnswer();
             partTwoAnswer();
+            partSixAnswer();
+            partSevenAnswer();
+            partFiveAnswer();
+            partTenAnswer();
+            partNineAnswer();
             break;
         case (10):
+            partThreeAnswer();
+            partEightAnswer();
             partOneAnswer();
             partTwoAnswer();
+            partSixAnswer();
+            partSevenAnswer();
+            partFiveAnswer();
+            partTenAnswer();
+            partNineAnswer();
+            partElevenAnswer();
             break;
-
     }
 }
 
@@ -456,18 +478,364 @@ function partSixAnswer(){
 }
 
 function partSevenInput(){
+    let temp = g.points[0];
+    push();
+    strokeWeight(2); drawingContext.setLineDash([5,5]); stroke(g.part4);
+    line(temp.x,temp.y,ans.step5[0],ans.step5[1]);
+    pop();
+    push();
+    noStroke(); fill(g.part4);
+    ellipse(temp.x,temp.y,2*g.radius);
+    fill(255); 
+    ellipse(temp.x,temp.y,g.radius);
+    
+    if (!g.solutionTruth){
+        stroke(g.part4);
+        ellipse(temp.x,temp.y-27,30);
+        noStroke(); fill(g.part4);
+        textSize(18); textStyle(ITALIC);
+        text('R',temp.x-10,temp.y-22);
+        textSize(14); textStyle(NORMAL);
+        text('1',temp.x+2,temp.y-17);
+    }
+    
+    pop();
+}
 
+function partSevenAnswer(){
+    let temp = ans.step7[0];
+
+    if(g.solutionTruth || g.problemPart > 6){
+        push();
+        strokeWeight(2); drawingContext.setLineDash([5,5]); stroke(g.part4);
+        line(ans.step5[0],ans.step5[1],temp[0],temp[1]);
+        pop();
+        push();
+        noStroke(); fill(g.part4);
+        ellipse(temp[0],temp[1],14);
+        stroke(g.part4); fill(255);
+        ellipse(temp[0],temp[1]-27,30);
+        noStroke(); fill(g.part4);
+        textSize(18); textStyle(ITALIC);
+        text('R',temp[0]-10,temp[1]-22);
+        textSize(14); textStyle(NORMAL);
+        text('1',temp[0]+2,temp[1]-17);
+        pop();
+    }
 }
 
 function partEightInput(){
+    let temp = g.points[0];
+    push();
+    if(g.problemPart == 7 && !g.solutionTruth){
+        strokeWeight(2); stroke(g.part5); drawingContext.setLineDash([5,5]);
+        line(ans.step6[0],ans.step6[1],ans.step7[0][0],ans.step7[0][1]);
+    }
+    pop();
+    push();
+    stroke(g.part5); 
+    if(!g.solutionTruth){
+        ellipse(temp.x,temp.y-27,30);
+        noStroke(); fill(g.part5);
+        ellipse(temp.x,temp.y,2*g.radius);
+        textSize(18); textStyle(ITALIC);
+        text('E',temp.x-10,temp.y-22);
+        textSize(14); textStyle(NORMAL);
+        text('2',temp.x+2,temp.y-17);
+    }
+    noStroke();
+    fill(g.part5);
+    ellipse(temp.x,temp.y,2*g.radius);
+    fill(255);
+    ellipse(temp.x,temp.y,g.radius);
+    pop();
+}
 
+function partEightAnswer(){
+    let temp = ans.step8[0];
+    if(g.solutionTruth || g.problemPart > 7){
+        push();
+        strokeWeight(2); stroke(g.part5); drawingContext.setLineDash([5,5]);
+        line(ans.step7[0][0],ans.step7[0][1],temp[0],temp[1]);
+        pop();
+        push();
+        noStroke(); fill(g.part5);
+        ellipse(temp[0],temp[1],14);
+        pop();
+        push();
+        stroke(g.part5);
+        ellipse(temp[0],temp[1]-27,30);
+        noStroke(); fill(g.part5);
+        textSize(18); textStyle(ITALIC);
+        text('E',temp[0]-10,temp[1]-22);
+        textSize(14); textStyle(NORMAL);
+        text('2',temp[0]+2,temp[1]-17);
+        pop();
+    }
+
+    
 }
 
 function partNineInput(){
+    let temp = g.points[0];
+    push();
+    strokeWeight(2); drawingContext.setLineDash([5,5]); stroke(g.part4);
+    line(temp.x,temp.y,ans.step8[0][0],ans.step8[0][1]);
+    pop();
+    push();
+    noStroke(); fill(g.part4);
+    ellipse(temp.x,temp.y,2*g.radius);
+    fill(255); 
+    ellipse(temp.x,temp.y,g.radius);
+    
+    if (!g.solutionTruth){
+        stroke(g.part4);
+        ellipse(temp.x,temp.y-27,30);
+        noStroke(); fill(g.part4);
+        textSize(18); textStyle(ITALIC);
+        text('R',temp.x-10,temp.y-22);
+        textSize(14); textStyle(NORMAL);
+        text('2',temp.x+2,temp.y-17);
+    }
+    
+    pop();
+}
 
+function partNineAnswer(){
+    let temp = ans.step9[0];
+
+    if(g.solutionTruth || g.problemPart > 8){
+        push();
+        strokeWeight(2); drawingContext.setLineDash([5,5]); stroke(g.part4);
+        line(ans.step8[0][0],ans.step8[0][1],temp[0],temp[1]);
+        pop();
+        push();
+        noStroke(); fill(g.part4);
+        ellipse(temp[0],temp[1],14);
+        stroke(g.part4); fill(255);
+        ellipse(temp[0],temp[1]-27,30);
+        noStroke(); fill(g.part4);
+        textSize(18); textStyle(ITALIC);
+        text('R',temp[0]-10,temp[1]-22);
+        textSize(14); textStyle(NORMAL);
+        text('2',temp[0]+2,temp[1]-17);
+        pop();
+    }
 }
 
 function partTenInput(){
+    let temp = g.points[0];
+    push();
+    if(g.problemPart == 9 && !g.solutionTruth){
+        strokeWeight(2); stroke(g.part5); drawingContext.setLineDash([5,5]);
+        line(ans.step6[0],ans.step6[1],ans.step9[0][0],ans.step9[0][1]);
+    }
+    pop();
+    push();
+    stroke(g.part5); 
+    if(!g.solutionTruth){
+        ellipse(temp.x,temp.y-27,30);
+        noStroke(); fill(g.part5);
+        ellipse(temp.x,temp.y,2*g.radius);
+        textSize(18); textStyle(ITALIC);
+        text('E',temp.x-10,temp.y-22);
+        textSize(14); textStyle(NORMAL);
+        text('3',temp.x+2,temp.y-17);
+    }
+    noStroke();
+    fill(g.part5);
+    ellipse(temp.x,temp.y,2*g.radius);
+    fill(255);
+    ellipse(temp.x,temp.y,g.radius);
+    pop();
+}
+
+function partTenAnswer(){
+    let temp = ans.step10[0];
+    if(g.solutionTruth || g.problemPart > 9){
+        push();
+        strokeWeight(2); stroke(g.part5); drawingContext.setLineDash([5,5]);
+        line(ans.step9[0][0],ans.step9[0][1],temp[0],temp[1]);
+        pop();
+        push();
+        noStroke(); fill(g.part5);
+        ellipse(temp[0],temp[1],14);
+        pop();
+        push();
+        stroke(g.part5);
+        ellipse(temp[0],temp[1]-27,30);
+        noStroke(); fill(g.part5);
+        textSize(18); textStyle(ITALIC);
+        text('E',temp[0]-10,temp[1]-22);
+        textSize(14); textStyle(NORMAL);
+        text('3',temp[0]+2,temp[1]-17);
+        pop();
+    }
+}
+
+function partElevenAnswer(){
+
+    // Lines between points
+    push();
+    strokeWeight(2); drawingContext.setLineDash([5,5]);
+    stroke(g.part4);
+    line(ans.step10[0][0],ans.step10[0][1],ans.step11[0][0],ans.step11[0][1]); // E3 to R3
+    stroke(g.part5); 
+    line(ans.step11[0][0],ans.step11[0][1],ans.step11[1][0],ans.step11[1][1]); // R3 to E4
+    stroke(g.part4);
+    line(ans.step11[1][0],ans.step11[1][1],ans.step11[2][0],ans.step11[2][1]); // E4 to R4
+    if(ans.step11.length == 5){
+        stroke(g.part5);
+        line(ans.step11[2][0],ans.step11[2][1],ans.step11[3][0],ans.step11[3][1]); // R4 to E5
+        stroke(g.part4);
+        line(ans.step11[3][0],ans.step11[3][1],ans.step11[4][0],ans.step11[4][1]); // E5 to R5
+    }
+
+    pop();
+   
+    // Raffinate labels and points
+    push();
+    noStroke(); fill(g.part4);
+    ellipse(ans.step11[0][0]-3,ans.step11[0][1],14);
+    ellipse(ans.step11[2][0]-3,ans.step11[2][1],14);
+    if(ans.step11.length == 5){
+        ellipse(ans.step11[4][0],ans.step11[4][1],14);
+    }
+    pop();
+    push();
+    stroke(g.part4); fill(255);
+    ellipse(ans.step11[0][0]-3,ans.step11[0][1]-27,30);
+    noStroke(); fill(g.part4);
+    textSize(18); textStyle(ITALIC);
+    text('R',ans.step11[0][0]-13,ans.step11[0][1]-22);
+    textSize(14); textStyle(NORMAL);
+    text('3',ans.step11[0][0]-1,ans.step11[0][1]-17);
+    pop();
+    push();
+    stroke(g.part4); fill(255);
+    ellipse(ans.step11[2][0]-3,ans.step11[2][1]-27,30);
+    noStroke(); fill(g.part4);
+    textSize(18); textStyle(ITALIC);
+    text('R',ans.step11[2][0]-13,ans.step11[2][1]-22);
+    textSize(14); textStyle(NORMAL);
+    text('4',ans.step11[2][0]-1,ans.step11[2][1]-17);
+    pop();
+    if(ans.step11.length == 5){
+        push();
+        stroke(g.part4); fill(255);
+        ellipse(ans.step11[4][0]-3,ans.step11[4][1]-27,30);
+        noStroke(); fill(g.part4);
+        textSize(18); textStyle(ITALIC);
+        text('R',ans.step11[4][0]-13,ans.step11[4][1]-22);
+        textSize(14); textStyle(NORMAL);
+        text('5',ans.step11[4][0]-1,ans.step11[4][1]-17);
+        pop();
+    }
+
+    // Extract labels and points
+    push();
+    fill(g.part5); noStroke();
+    ellipse(ans.step11[1][0],ans.step11[1][1],14);
+    if(ans.step11.length == 5){
+        ellipse(ans.step11[3][0],ans.step11[3][1],14);
+    }
+    pop();
+    push();
+    stroke(g.part5); fill(255);
+    ellipse(ans.step11[1][0],ans.step11[1][1]-27,30);
+    noStroke(); fill(g.part5);
+    textSize(18); textStyle(ITALIC);
+    text('E',ans.step11[1][0]-8,ans.step11[1][1]-22);
+    textSize(14); textStyle(NORMAL);
+    text('4',ans.step11[1][0]+3,ans.step11[1][1]-17);
+    pop();
+    if(ans.step11.length == 5){
+        push();
+        stroke(g.part5); fill(255);
+        ellipse(ans.step11[3][0],ans.step11[3][1]-27,30);
+        noStroke(); fill(g.part5);
+        textSize(18); textStyle(ITALIC);
+        text('E',ans.step11[3][0]-9,ans.step11[3][1]-22);
+        textSize(14); textStyle(NORMAL);
+        text('5',ans.step11[3][0]+3,ans.step11[3][1]-17);
+        pop();
+    }
+
+    // Labels for the stages
+    let x1, x2, y1, y2;
+    let m, b;
+    let x,y;
+
+    // E1 to R1
+    x1 = ans.step5[0]; y1 = ans.step5[1];
+    x2 = ans.step7[0][0]; y2 = ans.step7[0][1];
+    m = (y2 - y1)/(x2 - x1); 
+    b = y2 - m*x2;
+    x = x1 + 20;
+    y = m*x + b;
+    push();
+    noStroke();
+    rect(x,y-8,16,16);
+    textSize(18);
+    text('1',x+3,y+6)
+    pop();
+
+    // E2 to R2
+    x1 = ans.step8[0][0]; y1 = ans.step8[0][1];
+    x2 = ans.step9[0][0]; y2 = ans.step9[0][1];
+    m = (y2 - y1)/(x2 - x1);
+    b = y2 - m*x2;
+    x = x1 + 30;
+    y = m*x + b;
+    push();
+    noStroke();
+    rect(x,y-8,16,16);
+    textSize(18);
+    text('2',x+3,y+6);
+    pop();
+
+    // E3 to R3
+    x1 = ans.step10[0][0]; y1 = ans.step10[0][1];
+    x2 = ans.step11[0][0]; y2 = ans.step11[0][1];
+    m = (y2 - y1)/(x2 - x1);
+    b = y2 - m*x2;
+    x = x1 + 80;
+    y = m*x + b;
+    push();
+    noStroke();
+    rect(x,y-8,16,16);
+    textSize(18);
+    text('3',x+3,y+6);
+    pop();
+
+    // E4 to R4
+    x1 = ans.step11[1][0]; y1 = ans.step11[1][1];
+    x2 = ans.step11[2][0]; y2 = ans.step11[2][1];
+    m = (y2 - y1)/(x2 - x1);
+    b = y2 - m*x2;
+    x = x1 + 150;
+    y = m*x + b;
+    push();
+    noStroke();
+    rect(x,y-8,16,16);
+    textSize(18);
+    text('4',x+3,y+6);
+    pop();
+
+    if(ans.step11.length == 5){
+        x1 = ans.step11[3][0]; y1 = ans.step11[3][1];
+        x2 = ans.step11[4][0]; y2 = ans.step11[4][1];
+        m = (y2 - y1)/(x2 - x1);
+        b = y2 - m*x2;
+        x = x1 + 200;
+        y = m*x + b;
+        push();
+        noStroke();
+        rect(x,y-8,16,16);
+        textSize(18);
+        text('5',x+3,y+6);
+        pop();
+    }
 
 }
 
@@ -476,6 +844,7 @@ function partTenInput(){
 function startingPoints(){
     g.points[0].x = g.xtip;
     g.points[0].y = g.ytip+94;
+    
 }
 
 function questionOrHintDisplay(){
@@ -661,30 +1030,30 @@ function questionOrHintDisplay(){
             break;
         case (7):
             if(!g.hintTruth){
-                text('Step 8: move the yellow point to the correct extraction composition',x,y);
+                text('Step 8: move the orange point to the correct extraction composition',x,y);
             } else {
                 text('Hint: draw a line to the operating point',x,y);
             }
             break;
         case (8): 
             if(!g.hintTruth){
-                text('Step 9: mvoe the blue point to the correct raffinate composition',x,y);
+                text('Step 9: move the blue point to the correct raffinate composition',x,y);
             } else {
                 text('Hint: follow the tie line to the other side of the phase boundary',x,y);
             }
             break;
         case (9):
             if(!g.hintTruth){
-                text('Step 10: move the yellow point to the correct extract composition',x,y);
+                text('Step 10: move the orange point to the correct extract composition',x,y);
             } else {
                 text('Hint: draw a line to the operating point',x,y);
             }
             break;
         case (10):
-            if(!g.hintTruth){
+            if(ans.step11.length == 5){
                 text('Finished, five stages needed',x,y);
             } else {
-                
+                text('Finished, four stages needed',x,y);
             }
             break;
     }
@@ -960,8 +1329,84 @@ function generateAnswers(){
     ans.step6[0] = (b2 - b1)/(m1 - m2);
     ans.step6[1] = m1*ans.step6[0] + b1;
 
+    // Step 7 R1
+    ans.step7 = [];
+    ans.step7.push(nextRaffinate(ans.step5[0],ans.step5[1]));
+
+    // Step 8 E2
+    ans.step8 = [];
+    ans.step8.push(nextExtract(ans.step7[0][0],ans.step7[0][1],phasePx));
+
+    // Step 9 R2
+    ans.step9 = [];
+    ans.step9.push(nextRaffinate(ans.step8[0][0],ans.step8[0][1]));
+    ans.step9[0][0] = ans.step9[0][0]-2;
+
+    // Step 10 E3
+    ans.step10 = [];
+    ans.step10.push(nextExtract(ans.step9[0][0],ans.step9[0][1],phasePx));
     
-    
+    // Step 11 R3, E4, R4, E5, and R5
+    ans.step11 = [];
+    ans.step11.push(nextRaffinate(ans.step10[0][0],ans.step10[0][1])); // R3
+    ans.step11.push(nextExtract(ans.step11[0][0],ans.step11[0][1],phasePx)); // E4
+    ans.step11.push(nextRaffinate(ans.step11[1][0],ans.step11[1][1])); // R4
+    if(ans.step11[2][0] > xRNpx || ans.step11[2][0] < xRNpx){
+        let m1 = (ans.step11[0][1] - ans.step3px[1])/(ans.step11[0][0] - ans.step3px[0]);
+        let b1 = ans.step3px[1] - m1*ans.step3px[0];
+        ans.step11[2][0] = (ans.step11[2][1] - b1)/m1 + 2;
+    }
+    if(yRNpx - ans.step11[2][1] > 5){
+        ans.step11.push(nextExtract(ans.step11[2][0],ans.step11[2][1],phasePx)); // E5
+        ans.step11.push([ans.step3px[0],ans.step3px[1]]); // R5
+    } 
+}
+
+function nextRaffinate(ex,ey){
+    let yVals = new Array(5);
+    for(let i = 0; i < g.tieslopes.length; i++){
+        yVals[i] = g.tieslopes[i]*ex + g.tiebs[i];
+    }
+
+    let dY, dC, mx, xR, yR, bx;
+    for(let i = 0; i < g.tieslopes.length-1; i++){
+        
+        if(ey < yVals[i] && ey > yVals[i+1]){
+            dY = yVals[i] - yVals[i+1];
+            dC = yVals[i] - ey;
+            mx = g.tieslopes[i]*(1-dC/dY) + g.tieslopes[i+1]*(dC/dY);
+            bx = ey - mx*ex;
+            xR = g.tiepx[i][1]*(1-dC/dY) + g.tiepx[i+1][1]*(dC/dY);
+            yR = mx*xR + bx;
+        }
+    }
+    return([xR+3,yR]);
+}
+
+function nextExtract(rx,ry,phasepx){
+    let m1, b1, m2, b2;
+
+    m1 = (ry - ans.step6[1])/(rx - ans.step6[0]);
+    b1 = ry - m1*rx;
+
+    let yL, yU, yC, yUU;
+    let xe, ye;
+    for(let i = 0; i < phasepx.length-2; i++){
+        yL = phasepx[i][1];
+        yU = phasepx[i+1][1];
+        yC = m1*phasepx[i][0] + b1;
+        yUU = phasepx[i+2][1];
+        if(yC <= yL && yC >= yU){
+            m2 = (yL - yU)/(phasepx[i][0] - phasepx[i+1][0]);
+            b2 = yL - m2*phasepx[i][0];
+            xe = (b2 - b1)/(m1 - m2);
+            ye = m1*xe + b1;
+        } else if (yC <= yU && yC > yUU){
+            xe = phasepx[i+1][0];
+            ye = phasepx[i+1][1];
+        }
+    }
+    return([xe,ye]);
 }
 
 

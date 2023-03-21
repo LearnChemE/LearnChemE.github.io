@@ -22,7 +22,7 @@ window.g = {
     // Variables related to buttons
     solutionTruth: false,
     hintTruth: false,
-    problemPart: 6,
+    problemPart: 10,
     hintText: 'Hint: read the compositions on the axes',
 
     // Colors to be used repeatedly
@@ -49,6 +49,11 @@ ans = {
     step3px: [0,0], // Keeping these stored as well to make step 5 easier
     step5: [0,0], // Pixel values (x and y) for extract1
     step6: [0,0], // Pixel values (x and y) for operating point
+    step7: [], // Pixel values (x and y) for raffinate1
+    step8: [], // Pixel values (x and y) for extract2
+    step9: [], // Pixel values (x and y) for raffinate2
+    step10: [], // Pixel values (x and y) for extract3
+    step11: [], // Pixels values (x and y) for R3, E4, R4, E5, and R5 (R5 ~= RN)
 
 }
 
@@ -60,8 +65,8 @@ function setup(){
     g.points.push(createVector(g.xtip,g.ytip+94));
     startingPoints();
     definePhaseCurve();
-    generateAnswers();
     defineTieLines();
+    generateAnswers();
 }
 
 function draw(){
@@ -93,10 +98,10 @@ newProblem.addEventListener("click",function(){
     g.problemPart = 0;
 
     definePhaseCurve();
+    defineTieLines();
     generateAnswers();
     startingPoints();
     
-    defineTieLines();
     questionTextLabel();
 });
 
