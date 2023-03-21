@@ -22,7 +22,7 @@ window.g = {
     // Variables related to buttons
     solutionTruth: false,
     hintTruth: false,
-    problemPart: 10,
+    problemPart: 0,
     hintText: 'Hint: read the compositions on the axes',
 
     // Colors to be used repeatedly
