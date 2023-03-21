@@ -76,11 +76,11 @@ function frameDraw(){
     push();
     noStroke(); textSize(22);
     fill(g.blue);
-    text('solute',g.xtip-30,g.ytip-5);
+    text('solute',g.xtip-70,g.ytip+10);
     fill(g.green);
-    text('carrier',g.xtip+g.dx+5,g.ytip+g.dy+6);
+    text('carrier',g.xtip+g.dx,g.ytip+g.dy-10);
     fill(g.red);
-    text('solvent',g.xtip-g.dx-78,g.ytip+g.dy+8);
+    text('solvent',g.xtip-g.dx-50,g.ytip+g.dy+30);
     pop();
 
     // Overall triangle
@@ -141,21 +141,33 @@ function answersAndUserInput(){
             partThreeAnswer();
             break;
         case (4):
-            partFiveInput();
+            partFourAnswer();
             partOneAnswer();
             partTwoAnswer();
+            partFiveInput();
             partThreeAnswer();
-            partFourAnswer();
+            partFiveAnswer();
             break;
         case (5):
+            
+            
+            
+            partThreeAnswer();
+            partSixAnswer();
+            partFiveAnswer();
+            partTwoAnswer();
             partSixInput();
             partOneAnswer();
-            partTwoAnswer();
+            partThreeAnswer();
+            
             break;
         case (6):
             partSevenInput();
             partOneAnswer();
             partTwoAnswer();
+            partThreeAnswer();
+            partFiveAnswer();
+            partSixAnswer();
             break;
         case (7):
             partEightInput();
@@ -347,11 +359,100 @@ function partFourAnswer(){
 }
 
 function partFiveInput(){
+    let temp = g.points[0];
+    push(); 
+    strokeWeight(2); stroke(g.part5);
+    line(ans.step3px[0],ans.step3px[1],temp.x,temp.y);
+    noStroke(); fill(g.part5);
+    ellipse(temp.x,temp.y,2*g.radius);
+    fill(255); 
+    ellipse(temp.x,temp.y,g.radius);
+    stroke(g.part5); strokeWeight(1);
+    ellipse(temp.x,temp.y-27,30);
+    noStroke(); fill(g.part5);
+    textSize(18); textStyle(ITALIC);
+    text('E',temp.x-10,temp.y-22);
+    textSize(14); textStyle(NORMAL);
+    text('1',temp.x+2,temp.y-17);
+    pop();
+}
 
+function partFiveAnswer(){
+    push();
+    if (g.solutionTruth || g.problemPart > 4){
+        noStroke(); fill(g.part5);
+        ellipse(ans.step5[0],ans.step5[1],2*g.radius);
+    }
+    pop();
+    push();
+    if (g.problemPart > 4){
+        stroke(g.part5); fill(255);
+        ellipse(ans.step5[0],ans.step5[1]-27,30);
+        noStroke(); fill(g.part5);
+        textSize(18); textStyle(ITALIC);
+        text('E',ans.step5[0]-10,ans.step5[1]-22);
+        textSize(14); textStyle(NORMAL);
+        text('1',ans.step5[0]+2,ans.step5[1]-17);
+    }
+    pop();
 }
 
 function partSixInput(){
+    let temp = g.points[0];
+    // Need xF and yF
+    yF = map(ans.step1[0],0,1,g.ytip+g.dy,g.ytip);
+    let xtemp = map(ans.step1[1],0,1,g.xtip+g.dx,g.xtip-g.dx);
+    let dx = (g.ytip+g.dy-yF)/Math.tan(radians(g.angle));
+    xF = xtemp - dx;
+    
+    xRN = ans.step3px[0]; yRN = ans.step3px[1];
 
+    push();
+    
+    stroke(g.part6);
+    ellipse(temp.x,temp.y-27,30);
+    textSize(22); textStyle(ITALIC); noStroke(); fill(g.part6);
+    text('P',temp.x-8,temp.y-19);
+    stroke(g.part6); strokeWeight(2);
+    drawingContext.setLineDash([1,6]);
+    line(xF,yF,temp.x,temp.y);
+    line(xRN,yRN,temp.x,temp.y);
+    noStroke(); fill(g.part6);
+    ellipse(temp.x,temp.y,2*g.radius);
+    fill(255);
+    ellipse(temp.x,temp.y,g.radius);
+    pop();
+}
+
+function partSixAnswer(){
+    yF = map(ans.step1[0],0,1,g.ytip+g.dy,g.ytip);
+    let xtemp = map(ans.step1[1],0,1,g.xtip+g.dx,g.xtip-g.dx);
+    let dx = (g.ytip+g.dy-yF)/Math.tan(radians(g.angle));
+    xF = xtemp - dx;
+    
+    xRN = ans.step3px[0]; yRN = ans.step3px[1];
+
+    if(g.problemPart == 5 && g.solutionTruth){
+        push();
+        stroke(g.part6); strokeWeight(2); drawingContext.setLineDash([5,5]);
+        line(ans.step6[0],ans.step6[1],xF,yF);
+        line(ans.step6[0],ans.step6[1],xRN,yRN);
+        pop();
+    }
+    if(g.solutionTruth || g.problemPart > 5){
+        push();
+        noStroke(); fill(g.part6);
+        ellipse(ans.step6[0],ans.step6[1],14);
+        pop();
+    }
+    if(g.problemPart > 5){
+        push();
+        stroke(g.part6); fill(255);
+        ellipse(ans.step6[0],ans.step6[1]-27,30);
+        noStroke(); textSize(22); textStyle(ITALIC); fill(g.part6);
+        text('P',ans.step6[0]-7,ans.step6[1]-19);
+        pop();
+    }
 }
 
 function partSevenInput(){
@@ -815,6 +916,8 @@ function generateAnswers(){
     let xRNpx, yRNpx;
     yRNpx = map(yRN,0,1,g.ytip+g.dy,g.ytip);
     xRNpx = map(xRN,0,1,g.xtip-g.dx,g.xtip+g.dx);
+    ans.step3px[0] = xRNpx;
+    ans.step3px[1] = yRNpx;
 
     // Equation of line that passes through M and Rn
     let x1, y1, x2, y2, m1, b1, m2, b2;

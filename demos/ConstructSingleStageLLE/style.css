@@ -110,9 +110,9 @@ label {
 
 .simulation-controls {
   display: grid;
-  grid-template-columns: 100px 100px;
+  grid-template-columns: 100px 100px 100px;
   justify-content: center;
-  gap: 0px 20px;
+  gap: 0px 10px;
   width: 100vw;
   margin-bottom: 5px;
   margin-top: 15px;

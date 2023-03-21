@@ -569,6 +569,7 @@ function partSixAnswer(xM,yM){
         fill(g.color4);
         ellipse(xM,yM,14);
         pop();
+        g.question = 'Finished, start a new problem'
     }
 }
 
@@ -639,7 +640,7 @@ function questionTextLabel(){
     } else if (g.problemPart == 4){
         questionText.style = "margin-top: 5px";
         questionText.innerHTML = "(5) Mixing point composition";
-        g.question = 'Step 5: use sliders to set the correct mass percentages of the mixing point';
+        g.question = 'Step 5: use sliders to indicate the correct mass percentages of the mixing point';
     } else if (g.problemPart == 5){
         questionText.style = "margin-top: 5px";
         questionText.innerHTML = "(6) Outlet streams";

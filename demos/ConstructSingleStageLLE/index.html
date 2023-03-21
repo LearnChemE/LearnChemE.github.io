@@ -36,6 +36,7 @@
         <div id="simulation-wrapper">
             <div class="simulation-controls">           
               <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
+              <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
               <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>   
             </div>
         </div>
@@ -89,7 +90,7 @@
             </div>
         </div>
 
-        <!--<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
             aria-hidden="true">
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
@@ -103,15 +104,20 @@
                 
                     <div class="modal-body">
                         <div class="modal-text">
-                            Benzene and toluene form a nearly ideal solution obeying Raoult's law (\(p_A = x_Ap_A^*\)) over the entire range of composition. Composition is usually expressed as a mole fraction but sometimes other units such as mole percent or mass percent are used. An "\(x\)" usually indicates the mole fraction of the liquid phase, a "\(y\)" is used for the vapor phase, and a "\(z\)" for the total composition of all phases together.
+                            See [1] for more information on how to construct liquid-liquid extraction on a ternary diagram.
                         </div>
-                        <div class="modal-text">
-                            The amounts in the phases are calculated from the lever rule: \(\frac{n_{liquid}}{n_{vapor}} = \frac{l_{vapor}}{l_{liquid}}\). Here \(n_{liquid}\) is the moles of liquid phase, \(n_{vapor}\) is the moles of vapor phase, and \(l_{vapor}\) and \(l_{liquid}\) are the lengths of the levers indicated by dashed lines on the phase diagrams. The "relative amount" on the bar chart is calculated from \(\frac{n_{liquid}}{n_{liquid} + n_{vapor}}\) and \(\frac{n_{vapor}}{n_{liquid} + n_{vapor}}\).
-                        </div>
+                        <div style="height:20px"></div>
+                        <ol class="references">
+                            <li>
+                                "Hunter-Nash Method LLE." (March 21, 2023) <a
+                                href="https://learncheme.com/simulations/separations/hunter-nash-method-lle/"
+                                target="_blank">learncheme.com/simulations/separations/hunter-nash-method-lle/</a>
+                            </li>
+                        </ol>
                     </div>
                 </div>
             </div>
-        </div>-->
+        </div>
 
         <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
             aria-hidden="true">
