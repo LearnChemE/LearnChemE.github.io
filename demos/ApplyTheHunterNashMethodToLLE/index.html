@@ -51,6 +51,182 @@
 
         </div>
 
+        <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        In this simulation, you can construct a ternary phase diagram step by step using the Hunter-Nash method to determine the number of equilibrium stages needed to achieve a certain separation. Press the "new problem" button to generate a new set of conditions; pressing this button takes you back to the beginning of the simulation. Click the "submit answer" to see the answer. Once you click "submit answer", you cannot change your answers. Click the "next" button to move onto the next step, but once your press "next", you cannot go backwards.
+                    </p>
+                    
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="modal-text">
+            The feed flow rate, solvent flow rate, and feed compositions are given. The desired raffinate composition is specified, and the extract composition and the number of stages to obtain the desired raffinate composition are determined by mass balances. First, the mixing point composition is calculated and located on the ternary phase diagram. The mixing point corresponds to the composition that would be obtained if the feed and the solvent flows were mixed together:
+        </div>
+        <div class="modal-text">
+          overall: \(\dot{F} + \dot{S} = \dot{M}\),
+        </div>
+        <div class="modal-text">
+          solute A: \(x_A^F\dot{F} = x_A^M\dot{M}\) (because the solvent feed contains no solute),
+        </div>
+        <div class="modal-text">
+          solvent S: \(x_S^F\dot{F} + \dot{S} = x_S^M\dot{M}\),
+        </div>
+        <div class="modal-text">
+          carrier C: \(x_A^M + x_S^M + x_C^M = 1\),
+        </div>
+        <div class="modal-text">
+            where \(\dot{F}\) is the feed flow rate (kg/h); \(\dot{S}\) is the solvent flow rate (kg/h); \(\dot{M}\) is the combined feed and solvent flow rate (kg/h); \(x_A^i\), \(x_S^i\), and \(x_C^i\) refer to the mass fractions of the solute, solvent, and carrier in \(i\) = (F, S, M), where the superscripts F, S, and M refer to the three kinds of stream: feed, solvent, and mixed. The coordinates of the mixing point \(M\) on the ternary diagram are (\(x_A^M\), \(x_A^M\), \(x_A^M\)).
+        </div>
+        <div class="modal-text">
+          The mixing point \(M\) can also located on the phase diagram using the lever rule:
+        </div>
+        <div class="modal-equation">
+          $$
+          \dot{F}/\dot{S} = \overline{MF}/\overline{MS},
+          $$
+        </div>
+        <div class="modal-text">
+          where \(\overline{MF}\) is the line segment from the mixing point \(M\) to the feed location \(F\), and \(\overline{MS}\) is the line segment from the mixing point \(M\) to the solvent location \(S\).
+        </div>
+        <div class="modal-text">
+          A line drawn from the desired raffinate composition \(R\)<sub>N</sub> through the mixing point until it intersects the phase  boundary gives the extract composition leaving stage 1, \(E\)<sub>1</sub>.
+        </div>
+        <div class="modal-text">
+          The operating point \(P\) is located at the intersection of a line drawn through points \(F\) and \(E\)<sub>1</sub> and a line drawn through \(R\)<sub>N</sub> and \(S\) because the overall mass balance for the system is:
+        </div>
+        <div class="modal-equation">
+          $$
+          F + S = E_1 + R_N.
+          $$
+        </div>
+        <div class="modal-text">
+          This equation is rearranged to define the operating point:
+        </div>
+        <div class="modal-equation">
+          $$
+          P = E_1 - F = R_N  - S.
+          $$
+        </div>
+        <div class="modal-text">
+          A tie line from \(E\)<sub>1</sub> to the right side of the phase boundary yields the raffinate composition leaving stage 1, \(R\)<sub>1</sub>; this line represents the first equilbrium stage (orange).
+        </div>
+        <div class="modal-text">
+          A mass balance in stage 1 is:
+        </div>
+        <div class="modal-equation">
+          $$
+          E_2 + F = E_1 + R_1,
+          $$
+        </div>
+        <div class="modal-text">
+          which can be written as:
+        </div>
+        <div class="modal-equation">
+          $$
+          E_2 - R_1 = E_1 - F = P.
+          $$
+        </div>
+        <div class="modal-text">
+          Thus, the extract composition \(E_2\) leaving stage 2 is found by drawing a straight line from \(R_1\) to \(P\) (because \(P + R_1 = E_2\) from the previous equation). Where this line intersects the left side of the phase boundary is the composition of \(E_2\).
+        </div>
+        <div class="modal-text">
+          This procedure is repeated for additional stages until the raffinate composition is nearly equal to the desired value of \(R_N\) without being less than \(R_N\). The number of blue equilibrium lines drawn is the number of equilibrium stages needed to obtain \(R_N\).
+        </div>
+        
+    
+
+        <div class="modal-text">
+          See [1-4] for screencasts that describe the Hunter-Nash method and present examples.
+        </div>
+        <div style="height:10px"></div>
+        <ol class="references">
+          <li>
+           <i>Hunter-Nash Method: Liquid-Liquid Extraction</i> [Video]. (July 31, 2017) <a 
+            href="https://www.youtube.com/watch?v=e0Yt5RMkyj4"
+            target="_blank">www.youtube.com/watch?v=e0Yt5RMkyj4</a>.
+          </li>
+          <li>
+            <i>Hunter-Nash Method: Liquid-Liquid Extraction Example</i> [Video]. (July 31, 2017) <a 
+            href="https://www.youtube.com/watch?v=FaKIZU3XPR8"
+            target="_blank">www.youtube.com/watch?v=FaKIZU3XPR8</a>.
+          </li>
+          <li>
+            <i>Hunter-Nash Method 1: Mixing and Operating Points</i> [Video]. (July 31, 2017) <a 
+            href="https://www.youtube.com/watch?v=-yW0jIcH0_E"
+            target="_blank">www.youtube.com/watch?v=-yW0jIcH0_E</a>.
+          </li>
+          <li>
+            <i>Hunter-Nash Method 2: Number of Stages</i> [Video]. (July 31, 2017) <a 
+            href="https://www.youtube.com/watch?v=JZuavrt8ksQ"
+            target="_blank">www.youtube.com/watch?v=JZuavrt8ksQ</a>.
+          </li>
+        </ol>
+        
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aboutModalLabel">About</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+            Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under the direction of Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional contributions by Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of our
+          simulations are open source, and are available on our <a
+            href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+            repository</a>.</p>
+        <p style="line-height: 3rem;">
+          If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+              src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+              src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
+          or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+              style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
+              style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
+              src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+              src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac
+          or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+              style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+              style="height: 4ch;"></span>&nbsp;on Windows.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
         <script src="index.js"></script>
         <script src="functions.js"></script>
     </body>
