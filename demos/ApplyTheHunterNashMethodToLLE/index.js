@@ -22,7 +22,7 @@ window.g = {
     // Variables related to buttons
     solutionTruth: false,
     hintTruth: false,
-    problemPart: 0,
+    problemPart: 9,
     hintText: 'Hint: read the compositions on the axes',
 
     // Colors to be used repeatedly
@@ -85,7 +85,6 @@ const newProblem = document.getElementById("new-problem");
 const nextPart = document.getElementById("next-part");
 const solutionButton = document.getElementById("solution");
 const hintButton = document.getElementById("hint");
-const questionText = document.getElementById("question");
 
 newProblem.addEventListener("click",function(){
     g.solutionTruth = false;
@@ -169,53 +168,5 @@ function inCircle(pos,radius){
     return dist(mouseX, mouseY, pos.x, pos.y) < radius;
 }
 
-// For modifying span element in HTML
-function questionTextLabel(){
-    switch (g.problemPart){
-        case (0):
-            questionText.style = "margin-top: 5px";
-            questionText.innerHTML = "(1) locate feed point";
-            break;
-        case (1):
-            questionText.style = "margin-top: 5px";
-            questionText.innerHTML = "(2) locate solvent point";
-            break;
-        case (2): 
-            questionText.style = "margin-top: 5px";
-            questionText.innerHTML = "(3) locate raffinate point";
-            break;
-        case (3):
-            questionText.style = "margin-top: 5px";
-            questionText.innerHTML = "(4) locate mixing point";
-            break;
-        case (4):
-            questionText.style = "margin-top: 5px";
-            questionText.innerHTML = "(5) locate first extract point";
-            break;
-        case (5):
-            questionText.style = "margin-top: 5px";
-            questionText.innerHTML = "(6) locate operating point";
-            break;
-        case (6):
-            questionText.style = "margin-top: 5px";
-            questionText.innerHTML = "(7) determine R<sub>1</sub>";
-            break;
-        case (7):
-            questionText.style = "margin-top: 5px";
-            questionText.innerHTML = "(8) determine E<sub>2</sub>";
-            break;
-        case (8):
-            questionText.style = "margin-top: 5px";
-            questionText.innerHTML = "(9) determine R<sub>2</sub>";
-            break;
-        case (9): 
-            questionText.style = "margin-top: 5px";
-            questionText.innerHTML = "(10) determine E<sub>3</sub>";
-            break;
-        case (10):
-            questionText.style = "margin-top: 5px";
-            questionText.innerHTML = "(11) solution";
-            break;
-    }
-}
+
 

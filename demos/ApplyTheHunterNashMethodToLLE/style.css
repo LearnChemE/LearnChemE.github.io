@@ -22,11 +22,11 @@
 
 .inputs-wrapper {
   display: grid;
-  grid-template-columns: max-content max-content max-content 100px 200px;
+  grid-template-columns: max-content max-content max-content 100px ;
   justify-content: center;
   gap: 15px 10px;
   margin-bottom: 10px;
-  transform: translateX(15px);
+  transform: translateX(-10px);
 }
 
 .input-row {
@@ -105,4 +105,5 @@ label {
   width: 100vw;
   margin-bottom: 5px;
   margin-top: 15px;
+  transform: translateX(-10px);
 }

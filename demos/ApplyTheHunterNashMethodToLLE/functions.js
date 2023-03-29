@@ -134,8 +134,8 @@ function answersAndUserInput(){
             partThreeAnswer();
             break;
         case (3):
-            partFourAnswer();
             partFourInput();
+            partFourAnswer();
             partOneAnswer();
             partTwoAnswer();
             partThreeAnswer();
@@ -858,7 +858,7 @@ function questionOrHintDisplay(){
     switch (g.problemPart){
         case (0):
             if(!g.hintTruth){
-                text('Step 1: move the feed point     to the correction location, then check solution',x,y);
+                text('Step 1: move the feed point     to the correction location, then submit answer',x,y);
                 push();
                 textStyle(ITALIC);
                 text('F',x+252,y);
@@ -882,7 +882,7 @@ function questionOrHintDisplay(){
             break;
         case (1):
             if(!g.hintTruth){
-                text('Step 2: move the solvent point     to the correct location, then check solution',x,y);
+                text('Step 2: move the solvent point     to the correct location, then submit answer',x,y);
                 push();
                 textStyle(ITALIC);
                 text('S',x+275,y);
@@ -906,7 +906,7 @@ function questionOrHintDisplay(){
             break;
         case (2):
             if(!g.hintTruth){
-                text('Step 3: move the desired raffinate point      to the correct location, then check solution',x,y);
+                text('Step 3: move the desired raffinate point      to the correct location, then submit answer',x,y);
                 push();
                 textStyle(ITALIC);
                 text('R',x+353,y);
@@ -936,19 +936,18 @@ function questionOrHintDisplay(){
             break;
         case (3):
             if(!g.hintTruth){
-                text('Step 4: use mass balance for two entering stream (  ,   ) to determine the average',x,y);
-                text('composition    , then check solution',x+70,y+25);
+                text('Step 4: for the indicated flow rates (       ), use mass balances to determine the ',x,y);
+                text('mixing point composition    , then submit answer',x+70,y+25);
                 push();
                 textStyle(ITALIC);
-                text('F S',x+453,y);
-                text('M',x+183,y+25);
+                text('F, S',x+317,y);
+                text('M',x+295,y+25);
                 pop();
             } else {
                 text('Hint: use the lever rule',x,y);
             }
             push();
             textSize(22);
-            text('mixing mole fractions',x2-10,y2-7);
             text('flow rates',x2+550,y2-7);
             stroke(0); strokeWeight(1.5);
             rect(x2+20,y2,135,80);
@@ -978,13 +977,12 @@ function questionOrHintDisplay(){
             break;
         case (4):
             if(!g.hintTruth){
-                text('Step 5: move the point for the first extract composition      to the correct location,',x,y)
-                text('then check solution',x+70,y+25);
+                text('Step 5: move the first extract point      to the correct location, then submit answer',x,y)
                 push();
                 textStyle(ITALIC);
-                text('E',x+485,y);
+                text('E',x+310,y);
                 textSize(15); textStyle(NORMAL);
-                text('1',x+497,y+4);
+                text('1',x+323,y+4);
                 pop();
             } else {
                 text('Hint: use mass balance for two exit streams (     ,     )',x,y);
@@ -1000,7 +998,7 @@ function questionOrHintDisplay(){
             break;
         case (5):
             if(!g.hintTruth){
-                text('Step 6: move the operating point     to the correct location, then check solution',x,y);
+                text('Step 6: move the operating point     to the correct location, then submit answer',x,y);
                 push();
                 textStyle(ITALIC);
                 text('P',x+296,y);
@@ -1023,28 +1021,52 @@ function questionOrHintDisplay(){
             break;
         case (6):
             if(!g.hintTruth){
-                text('Step 7: move the blue point to the correct raffinate composition',x,y);
+                text('Step 7: move the first raffinate point      to the correct location, then submit answer',x,y);
+                push();
+                textStyle(ITALIC);
+                text('R',x+323,y);
+                textSize(15); textStyle(NORMAL);
+                text('1',x+336,y+4);
+                pop();
             } else {
                 text('Hint: follow the tie line to the other side of the phase boundary',x,y);
             }
             break;
         case (7):
             if(!g.hintTruth){
-                text('Step 8: move the orange point to the correct extraction composition',x,y);
+                text('Step 8: move the second extract point      to the correct location, then submit answer',x,y)
+                push();
+                textStyle(ITALIC);
+                text('E',x+342,y);
+                textSize(15); textStyle(NORMAL);
+                text('2',x+355,y+4);
+                pop();
             } else {
                 text('Hint: draw a line to the operating point',x,y);
             }
             break;
         case (8): 
             if(!g.hintTruth){
-                text('Step 9: move the blue point to the correct raffinate composition',x,y);
+                text('Step 9: move the second raffinate point      to the correct location, then submit answer',x,y);
+                push();
+                textStyle(ITALIC);
+                text('R',x+354,y);
+                textSize(15); textStyle(NORMAL);
+                text('2',x+368,y+4);
+                pop();
             } else {
                 text('Hint: follow the tie line to the other side of the phase boundary',x,y);
             }
             break;
         case (9):
             if(!g.hintTruth){
-                text('Step 10: move the orange point to the correct extract composition',x,y);
+                text('Step 5: move the third extract point      to the correct location, then submit answer',x,y)
+                push();
+                textStyle(ITALIC);
+                text('E',x+316,y);
+                textSize(15); textStyle(NORMAL);
+                text('3',x+329,y+4);
+                pop();
             } else {
                 text('Hint: draw a line to the operating point',x,y);
             }
