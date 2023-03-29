@@ -66,6 +66,163 @@
 
         </div>
 
+        <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>
+                  This simulation shows \(P-x-y\) and \(T-x-y\) diagrams for vapor-liquid equilibrium (VLE) of a benzene/ethanol mixture. This liquid mixture is non-ideal, and the system has an azeotrope (a condition where liquid and vapor have the same composition). The blue curve represents the liquid-phase boundary (bubble point), and the green curve represents the vapor-phase boundary (dew point). Use the slider to vary the temperature for the \(P-x-y\) diagram. Click and drag the black dot to change the benzene mole fraction and the temperature or pressure.
+                </p>
+                <p>
+                  The bar chart shows the moles of liquid (blue) and vapor (green) in equilibrium and the mole fraction of benzene in each phase (\(x_B\) for liquid phase, \(y_B\) for vapor phase). The system contains a total of 1 mole. The activity coefficients used in the modified Raoult's law are calculated using the two-parameter Margules model.
+                </p>
+                
+                  
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-text">
+          The saturation pressure of component \(i\) = (1,2) is calculated using the Antoine equation:
+        </div>
+        <div class="modal-equation">
+          $$
+          P_i^{sat} = 10^{(A_i - \frac{B_i}{T+C_i})}
+          $$
+        </div>
+        <div class="modal-text">
+          where \(A_i\), \(B_i\), and \(C_i\) are Antoine constants, \(T\) is temperature (°C), and \(P_i^{sat}\) is in bar.
+        </div>
+        <div class="modal-text">
+          The two-parameter Margules model is used to calculate the activity coefficients for a non-ideal liquid mixture of beneze 1 and ethanol 2. This model fits the excess Gibbs free energy:
+        </div>
+        <div class="modal-text">
+          $$
+          \frac{G^E}{RT} = x_1x_2(A_{21}x1 + A_{12}x_2),
+          $$
+        </div>
+        <div class="modal-text">
+          where \(G^E\) is excess Gibbs energy, and \(R\) is the ideal gas constant.
+        </div>
+        <div class="modal-text">
+          The activity coefficients \(\gamma_1\), \(\gamma_2\) are given by:
+        </div>
+        <div class="modal-text">
+          ln\((\gamma_1) = x_2^2(A_{12} + 2(A_{21}-A_{12})x_1)\),
+        </div>
+        <div class="modal-text">
+          ln\((\gamma_2) = x_1^2(A_{21} + 2(A_{12}-A_{21})x_2)\),
+        </div>
+        <div class="modal-text">
+          where \(x_1\) and \(x_2\) are the liquid mole fractions of benzene and ethanol and \(x_1\) + \(x_2\) = 1, and \(A_{21}\) and \(A_{12}\) are the Margules parameters.
+        </div>
+        <div class="modal-text">
+          The modified Raoult's law is used to calculate the bubble-point and dew-point pressures using the \(K\) factors:
+        </div>
+        <div class="modal-equation">
+          $$
+          K_i = \frac{y_i}{x_i} = \gamma_i\frac{P_i^{sat}}{P},
+          $$
+        </div>
+        <div class="modal-text">
+          where \(\gamma_i\) is the vapor mole fraction and \(y_1\) + \(y_2\) = 1, and \(P\) is the total pressure (bar).
+        </div>
+        <div class="modal-text">
+          Bubble-point pressure calculation:
+        </div>
+        <div class="modal-equation">
+          $$
+          P = x_1\gamma_1P_1^{sat} + x_2\gamma_2P_2^{sat}.
+          $$
+        </div>
+        <div class="modal-text">
+          Dew-point pressure calculation:
+        </div>
+        <div class="modal-equation">
+          $$
+          P = (\frac{y_1}{\gamma_1P_1^{sat}} + \frac{y_2}{\gamma_2P_2^{sat}})^{-1}.
+          $$
+        </div>
+        <div class="modal-text">
+          The screencast video at [2] shows how to use this simulation.
+        </div>
+
+        <div style="height:10px"></div>
+        <ol class="references">
+          <li>
+           J. R. Elliott and C. T. Lira, <i>Introductory Chemical Engineering Thermodynamics</i>, New York: Prentice Hall, 2012 pp. 372-377, 430.
+          </li>
+          <li>
+            <i>Vapor-liquid Equilibrium Diagram for Non-Ideal Mixture</i> [Video]. <a 
+            href="https://www.youtube.com/watch?v=v2ICxyxmTZU"
+            target="_blank">www.youtube.com/watch?v=v2ICxyxmTZU</a>.
+          </li>
+        </ol>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="aboutModalLabel">About</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under the direction
+            of
+            Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional contributions by
+            Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of our
+            simulations are open source, and are available on our <a
+              href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+              repository</a>.</p>
+          <p style="line-height: 3rem;">
+            If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
         <script src="index.js"></script>
         <script src="functions.js"></script>
     </body>

@@ -98,8 +98,6 @@ function graphDraw(){
 
 function curveDraw(){
     let x,y;
-
-
     if(g.diagram == 'P-x-y'){
         push();
         noFill(); strokeWeight(2); stroke(g.blue);
@@ -131,7 +129,7 @@ function curveDraw(){
         pop();
         
     } else {
-        // X curve (blue)
+        // liquid curve (blue)
         push();
         noFill(); strokeWeight(2); stroke(g.blue);
         beginShape();
@@ -148,7 +146,7 @@ function curveDraw(){
         endShape();
         pop();
 
-        // Y curve (vapor)
+        // vapor curve (green)
         push();
         noFill(); strokeWeight(2); stroke(g.green);
         beginShape();
@@ -361,6 +359,196 @@ function txyDraw(){
 
     let moleFrac = map(temp.x,g.lx,g.rx,0,1); // Mole fraction location of the dot
     let temperature = map(temp.y,g.by,g.ty,63,82); // Temperature location of the dot
+
+    // Liquid test - is dot above or below liquid curve
+    liqTemp = findRoot(moleFrac);
+    if(temperature > liqTemp){
+        liquidTest = true;
+    } else {
+        liquidTest = false;
+    }
+
+    // Vapor test - is dot above or below liquid curve
+    // x-values for vapor are not directly in line with the x-value of the dot
+    let T = findRoot(moleFrac);
+    let vaporTestFrac = temperatureVaporTest(moleFrac,T);
+    
+    let vapTemp = findRoot(vaporTestFrac);
+    if(temperature > vapTemp){
+        vaporTest = false;
+    } else {
+        vaporTest = true;
+    }
+
+    // Line down from the dot when not in between the curves and bar graph details
+    push();
+    drawingContext.setLineDash([2,6]); strokeWeight(1.5);
+    if(!liquidTest && vaporTest){
+        stroke(g.blue);
+        line(temp.x,temp.y,temp.x,g.by);
+        push();
+        noStroke();
+        textSize(14); textStyle(ITALIC);
+        text('x  = ',g.rx+55,g.by-20);
+        textStyle(NORMAL);
+        text(moleFrac.toFixed(2),g.rx+80,g.by-20);
+        textSize(11);
+        text('B',g.rx+62,g.by-15);
+        strokeWeight(.5); fill(g.blue);
+        rect(g.rx+65,g.by-40,30,-300);
+        pop();
+    } else if(liquidTest && !vaporTest){
+        stroke(g.green);
+        line(temp.x,temp.y,temp.x,g.by);
+        push();
+        noStroke(); 
+        textSize(14); textStyle(ITALIC);
+        text('y  = ',g.rx+120,g.by-20);
+        textStyle(NORMAL);
+        text(moleFrac.toFixed(2),g.rx+145,g.by-20);
+        textSize(11);
+        text('B',g.rx+127,g.by-15);
+        strokeWeight(.5); fill(g.green);
+        rect(g.rx+130,g.by-40,30,-300);
+        pop();
+    }
+    pop();
+
+    push();
+    if(vaporTest && liquidTest){
+        let liquidFrac = temperatureSolve(moleFrac,temperature); // Liquid mole fraction
+        let liquidX = map(liquidFrac,0,1,g.lx,g.rx); // Pixel x-coord of liquid fraction
+        let liquidY = map(findRoot(liquidFrac),63,82,g.by,g.ty); // Pixel y-coord of liquid fraction
+
+        let vaporFrac = temperatureSolve(moleFrac,temperature); // Vapor mole fraction
+        let vaporX = map(gammaB(vaporFrac)*PsatB(temperature)*vaporFrac,0,1,g.lx,g.rx); // Pixel x-coord of vapor fraction
+        let vaporY = map(findRoot(vaporFrac),63,82,g.by,g.ty); // Pixel y-coord of vapor fraction
+        vaporFrac = map(vaporX,g.lx,g.rx,0,1);
+
+        // Apply lever rule to find relative amounts
+        let vaporLever = (moleFrac - liquidFrac)/(vaporFrac - liquidFrac);
+        let liquidLever = (vaporFrac - moleFrac)/(vaporFrac - liquidFrac);
+
+
+        push();
+        drawingContext.setLineDash([5,5]);
+        strokeWeight(2); stroke(g.blue);
+        line(temp.x,temp.y,vaporX,vaporY);
+        stroke(g.green);
+        line(temp.x,temp.y,liquidX,liquidY);
+
+        drawingContext.setLineDash([2,6]);
+        strokeWeight(1.5); stroke(g.green);
+        line(vaporX,vaporY,vaporX,g.by);
+        stroke(g.blue);
+        line(liquidX,liquidY,liquidX,g.by);
+
+        noStroke(); fill(g.green);
+        ellipse(vaporX,vaporY,2*g.radius);
+        fill(g.blue);
+        ellipse(liquidX,liquidY,2*g.radius);
+        pop();
+
+        push();
+        noStroke(); 
+        textSize(14); textStyle(ITALIC);
+        text('y  = ',g.rx+120,g.by-20);
+        text('x  = ',g.rx+55,g.by-20);
+        textStyle(NORMAL);
+        text(vaporFrac.toFixed(2),g.rx+145,g.by-20);
+        text(liquidFrac.toFixed(2),g.rx+80,g.by-20);
+        textSize(11);
+        text('B',g.rx+127,g.by-15);
+        text('B',g.rx+62,g.by-15);
+        strokeWeight(.5); fill(g.green);
+        pop();
+
+        push();
+        strokeWeight(.5); fill(g.green);
+        rect(g.rx+130,g.by-40,30,map(vaporLever,0,1,0,-300));
+        fill(g.blue);
+        rect(g.rx+65,g.by-40,30,map(liquidLever,0,1,0,-300));
+        pop();
+    }
+    pop();
+    
+
+}
+
+function temperatureVaporTest(x,T){
+    // Need to align x-coordinates of dot and x value along the curve for associated temp
+    let currentX = map(gammaB(x)*PsatB(T)*x,0,1,g.lx,g.rx); // Current x position 
+    let temp = g.points[0];
+
+
+    let storedDiff = temp.x - currentX; // Used to change mole fraction iteration to account for the change in the curve's slope
+
+    let difference = 1000; // Variable to stop iteration
+    let change = 0.01; // Value to change test mole fraction value
+    let count = 0; // Used to refine step size
+    let testFrac = x + change;
+
+
+    while(Math.abs(difference) > 2){
+        // Refines step size
+        if(count > 0 && count%10 == 0){
+            change = change/2;
+        }
+
+        let testTemp = findRoot(testFrac);
+        let testX = gammaB(testFrac)*PsatB(testTemp)*testFrac;
+
+        currentX = map(testX,0,1,g.lx,g.rx);
+        difference = temp.x - currentX;
+
+        // Test to make sure iteration is going the right way
+        if(Math.abs(difference) < Math.abs(storedDiff)){
+            storedDiff = difference
+        } else if(Math.abs(difference) > Math.abs(storedDiff)){
+            change = -change;
+            storedDiff = difference;
+        }
+
+        if(Math.abs(difference) > 2){
+            testFrac = testFrac + change;
+        }
+        count++;
+    }
+    return(testFrac);
+}
+
+function temperatureSolve(x,T){
+    let currentT = findRoot(x);
+    let storedDiff = T - currentT;
+
+    let difference = 100;
+    let change = 0.01;
+    let count = 0;
+    let testFrac = x + change;
+
+    while(Math.abs(difference) > 0.001){
+        // Refines step size
+        if(count > 0 && count%10 == 0){
+            change = change/2;
+        }
+
+        let testTemp = findRoot(testFrac);
+        difference = T - testTemp;
+
+        // Test to make sure iteration is going the right way
+        if(Math.abs(difference) < Math.abs(storedDiff)){
+            storedDiff = difference;
+        } else if(Math.abs(difference) > Math.abs(storedDiff)){
+            change = -change;
+            storedDiff = difference;
+        }
+
+        if(Math.abs(difference) > 0.001){
+            testFrac = testFrac + change;
+        }
+        count++;
+    }
+    return(testFrac);
 }
 
 function PsatB(temp){
@@ -444,6 +632,6 @@ function barGraphFrame(){
     rect(g.rx+65,g.by-40,95,-300);
     textSize(15); noStroke(); fill(0);
     text('Liquid and vapor',g.rx+50,g.ty+20);
-    text('relative amounts',g.rx+50,g.ty+35);
+    text('mole amounts',g.rx+58,g.ty+35);
     pop();
 }

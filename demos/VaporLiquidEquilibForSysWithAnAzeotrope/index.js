@@ -1,7 +1,7 @@
 
 window.g = {
     cnv: undefined,
-    diagram: "T-x-y",
+    diagram: "P-x-y",
 
     temperature: 75, // slider value
 
