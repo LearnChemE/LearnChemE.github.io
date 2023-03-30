@@ -23,6 +23,10 @@ const inputs = [
   gvs.xw5_input
 ];
 
+inputs.forEach(input => {
+  input.value = "";
+});
+
 const input_1 = gvs[`${gvs.unknown_1}_input`];
 const input_2 = gvs[`${gvs.unknown_2}_input`];
 
