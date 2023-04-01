@@ -6,7 +6,7 @@ function graphDraw(){
 
     let xLabels = ['0','0.2','0.4','0.6','0.8','1.0'];
     let yLabelsP = ['0','0.5','1.0','1.5'];
-    let yLabelsT = ['65','70','75','80'];
+    let yLabelsT = ['50','60','70','80','90','100'];
     let count = 1;
 
     // Y-tick marks
@@ -34,22 +34,25 @@ function graphDraw(){
         pop();
     } else {
         count = 0;
-        for(let i = 0; i < 19; i++){
-            if((i-1)%5 == 0){
-                line(g.lx,g.by-(g.by-g.ty)/19*(i+1),g.lx+7,g.by-(g.by-g.ty)/19*(i+1));
-                line(g.rx,g.by-(g.by-g.ty)/19*(i+1),g.rx-7,g.by-(g.by-g.ty)/19*(i+1));
+        for(let i = 0; i < 25; i++){
+            if((i)%5 == 0){
+                line(g.lx,g.by-(g.by-g.ty)/25*(i),g.lx+7,g.by-(g.by-g.ty)/25*(i));
+                line(g.rx,g.by-(g.by-g.ty)/25*(i),g.rx-7,g.by-(g.by-g.ty)/25*(i));
                 push();
                 noStroke(); textSize(15);
-                text(yLabelsT[count],g.lx-22,g.by-(g.by-g.ty)/19*(i+1)+6);
+                text(yLabelsT[count],g.lx-22,g.by-(g.by-g.ty)/25*(i)+6);
                 count++;
                 pop();
             } else {
-                line(g.lx,g.by-(g.by-g.ty)/19*(i+1),g.lx+4,g.by-(g.by-g.ty)/19*(i+1));
-                line(g.rx,g.by-(g.by-g.ty)/19*(i+1),g.rx-4,g.by-(g.by-g.ty)/19*(i+1));
+                line(g.lx,g.by-(g.by-g.ty)/25*(i),g.lx+4,g.by-(g.by-g.ty)/25*(i));
+                line(g.rx,g.by-(g.by-g.ty)/25*(i),g.rx-4,g.by-(g.by-g.ty)/25*(i));
             }
         }
         push();
-        noStroke(); fill(100); textSize(18);
+        noStroke(); 
+        textSize(15);
+        text('100',g.lx-30,g.ty+6);
+        fill(100); textSize(18);
         text('liquid',g.rx-70,g.by-10);
         text('vapor',g.lx+20,g.ty+25);
         pop();
@@ -85,7 +88,7 @@ function graphDraw(){
     // X & Y-axis labels
     push();
     textSize(18); noStroke();
-    text('Mole fraction benzene',g.lx+105,g.by+45);
+    text('Benzene mole fraction',g.lx+105,g.by+45);
     translate(40,height/2+40);
     rotate(radians(-90));
     if(g.diagram == "P-x-y"){
@@ -104,11 +107,11 @@ function curveDraw(){
         beginShape();
         for(let i = 0; i <= 1; i += 0.01){
             x = i;
-            y = Px(i,g.temperature);
+            y = Px(i,g.slider);
             vertex(map(x,0,1,g.lx,g.rx),map(y,0,1.6,g.by,g.ty));
             if(i > .99){
                 x = 1;
-                y = Px(x,g.temperature);
+                y = Px(x,g.slider);
                 vertex(map(x,0,1,g.lx,g.rx),map(y,0,1.6,g.by,g.ty));
             }
         }
@@ -117,11 +120,11 @@ function curveDraw(){
         beginShape();
         for(let i = 0; i <= 1; i += 0.01){
             x = i;
-            y = Py(i,g.temperature);
+            y = Py(i,g.slider);
             vertex(map(x,0,1,g.lx,g.rx),map(y,0,1.6,g.by,g.ty));
             if(i > .99){
                 x = 1;
-                y = Py(x,g.temperature);
+                y = Py(x,g.slider);
                 vertex(map(x,0,1,g.lx,g.rx),map(y,0,1.6,g.by,g.ty));
             }
         }
@@ -136,10 +139,10 @@ function curveDraw(){
         for(let i = 0; i < 1; i += 0.01){
             x = i;
             y = findRoot(i);
-            vertex(map(x,0,1,g.lx,g.rx),map(y,63,82,g.by,g.ty));
+            vertex(map(x,0,1,g.lx,g.rx),map(y,50,100,g.by,g.ty));
             if(i > .99){
                 x = 1; y = findRoot(1);
-                vertex(map(x,0,1,g.lx,g.rx),map(y,63,82,g.by,g.ty));
+                vertex(map(x,0,1,g.lx,g.rx),map(y,50,100,g.by,g.ty));
             }
         }
         
@@ -152,11 +155,11 @@ function curveDraw(){
         beginShape();
         for(let i = 0; i < 1; i += 0.01){
             let Te = findRoot(i);
-            y = gammaB(i)*PsatB(Te)*i;
-            vertex(map(y,0,1,g.lx,g.rx),map(Te,63,82,g.by,g.ty));
+            y = (gammaB(i)*PsatB(Te)*i)/g.slider;
+            vertex(map(y,0,1,g.lx,g.rx),map(Te,50,100,g.by,g.ty));
             if(i > .99){
                 x = 1; y = findRoot(1);
-                vertex(map(x,0,1,g.lx,g.rx),map(y,63,82,g.by,g.ty));
+                vertex(map(x,0,1,g.lx,g.rx),map(y,50,100,g.by,g.ty));
             }
         }
         endShape();
@@ -173,7 +176,7 @@ function pxyDraw(){
     let pressure = map(temp.y,g.by,g.ty,0,1.6); // Pressure location of the dot
 
     // Liquid test - is dot above or below the liquid curve
-    let liqPressure = Px(moleFrac,g.temperature); // Equivalent pressure value at given mole fraction on liquid curve
+    let liqPressure = Px(moleFrac,g.slider); // Equivalent pressure value at given mole fraction on liquid curve
     if(pressure > liqPressure){
         liquidTest = false;
     } else {
@@ -181,7 +184,7 @@ function pxyDraw(){
     }
 
     // Vapor test - is dot above or below the vapor curve
-    let vapPressure = Py(moleFrac,g.temperature);
+    let vapPressure = Py(moleFrac,g.slider);
     if(pressure > vapPressure){
         vaporTest = true;
     } else {
@@ -225,12 +228,12 @@ function pxyDraw(){
     // When in between the curves
     if(liquidTest && vaporTest){
         let greenMoleFrac = pressureVaporSolve(moleFrac,pressure); // Vapor mole fraction
-        let greenPressure = Py(greenMoleFrac,g.temperature); // Vapor pressure value
+        let greenPressure = Py(greenMoleFrac,g.slider); // Vapor pressure value
         let vaporX = map(greenMoleFrac,0,1,g.lx,g.rx); // Pixel x-coordinate of vapor connection
         let vaporY = map(greenPressure,0,1.6,g.by,g.ty); // Pixel y-coordinate of vapor connection
 
         let blueMoleFrac = pressureLiquidSolve(moleFrac,pressure); // Liquid mole fraction
-        let bluePressure = Px(blueMoleFrac,g.temperature); // Liquid pressure value
+        let bluePressure = Px(blueMoleFrac,g.slider); // Liquid pressure value
         let liquidX = map(blueMoleFrac,0,1,g.lx,g.rx); // Pixel x-coord of liquid connection
         let liquidY = map(bluePressure,0,1.6,g.by,g.ty); // Pixel y-coord of vapor connection
 
@@ -283,7 +286,7 @@ function pxyDraw(){
 }
 
 function pressureVaporSolve(x,P){
-    let currentP = Py(x,g.temperature); // Evaluate pressure value for current mole fraction value
+    let currentP = Py(x,g.slider); // Evaluate pressure value for current mole fraction value
     let storedDiff1 = P - currentP; // Used to change mole fraction iteration to account for the change in the curve's slope
     
     let difference = 100; // Variable to stop iteration
@@ -291,13 +294,13 @@ function pressureVaporSolve(x,P){
     let count = 0;
     let testFrac = x + change;
 
-    while(Math.abs(difference) > 0.00001){
+    while(Math.abs(difference) > 0.00001 && count < 200){
         // Refines step size
         if(count > 0 && count%10 == 0){
             change = change/2;
         }
 
-        let testPressure = Py(testFrac,g.temperature);
+        let testPressure = Py(testFrac,g.slider);
         difference = P - testPressure;
 
         // Test to make sure iteration is going the right way
@@ -318,7 +321,7 @@ function pressureVaporSolve(x,P){
 }
 
 function pressureLiquidSolve(x,P){
-    let currentP = Px(x,g.temperature); // Evaluate pressure value for current mole fraction value
+    let currentP = Px(x,g.slider); // Evaluate pressure value for current mole fraction value
     let storedDiff1 = P - currentP; // Used to change mole fraction iteration to account for the change in the curve's slope
 
     let difference = 100; // Variable to stop iteration
@@ -326,13 +329,13 @@ function pressureLiquidSolve(x,P){
     let count = 0;
     let testFrac = x + change;
 
-    while(Math.abs(difference) > 0.00001){
+    while(Math.abs(difference) > 0.00001 && count < 200){
         // Refines step size
         if(count > 0 && count%10 == 0){
             change = change/2;
         }
 
-        let testPressure = Px(testFrac,g.temperature);
+        let testPressure = Px(testFrac,g.slider);
         difference = P - testPressure;
 
         // Test to make sure iteration is going the right way
@@ -358,7 +361,7 @@ function txyDraw(){
     let vaporTest = false;
 
     let moleFrac = map(temp.x,g.lx,g.rx,0,1); // Mole fraction location of the dot
-    let temperature = map(temp.y,g.by,g.ty,63,82); // Temperature location of the dot
+    let temperature = map(temp.y,g.by,g.ty,50,100); // Temperature location of the dot
 
     // Liquid test - is dot above or below liquid curve
     liqTemp = findRoot(moleFrac);
@@ -418,11 +421,11 @@ function txyDraw(){
     if(vaporTest && liquidTest){
         let liquidFrac = temperatureSolve(moleFrac,temperature); // Liquid mole fraction
         let liquidX = map(liquidFrac,0,1,g.lx,g.rx); // Pixel x-coord of liquid fraction
-        let liquidY = map(findRoot(liquidFrac),63,82,g.by,g.ty); // Pixel y-coord of liquid fraction
+        let liquidY = map(findRoot(liquidFrac),50,100,g.by,g.ty); // Pixel y-coord of liquid fraction
 
         let vaporFrac = temperatureSolve(moleFrac,temperature); // Vapor mole fraction
-        let vaporX = map(gammaB(vaporFrac)*PsatB(temperature)*vaporFrac,0,1,g.lx,g.rx); // Pixel x-coord of vapor fraction
-        let vaporY = map(findRoot(vaporFrac),63,82,g.by,g.ty); // Pixel y-coord of vapor fraction
+        let vaporX = map((gammaB(vaporFrac)*PsatB(temperature)*vaporFrac)/g.slider,0,1,g.lx,g.rx); // Pixel x-coord of vapor fraction
+        let vaporY = map(findRoot(vaporFrac),50,100,g.by,g.ty); // Pixel y-coord of vapor fraction
         vaporFrac = map(vaporX,g.lx,g.rx,0,1);
 
         // Apply lever rule to find relative amounts
@@ -477,7 +480,7 @@ function txyDraw(){
 
 function temperatureVaporTest(x,T){
     // Need to align x-coordinates of dot and x value along the curve for associated temp
-    let currentX = map(gammaB(x)*PsatB(T)*x,0,1,g.lx,g.rx); // Current x position 
+    let currentX = map((gammaB(x)*PsatB(T)*x)/g.slider,0,1,g.lx,g.rx); // Current x position 
     let temp = g.points[0];
 
 
@@ -489,14 +492,14 @@ function temperatureVaporTest(x,T){
     let testFrac = x + change;
 
 
-    while(Math.abs(difference) > 2){
+    while(Math.abs(difference) > 2 && count < 200){
         // Refines step size
         if(count > 0 && count%10 == 0){
             change = change/2;
         }
 
         let testTemp = findRoot(testFrac);
-        let testX = gammaB(testFrac)*PsatB(testTemp)*testFrac;
+        let testX = (gammaB(testFrac)*PsatB(testTemp)*testFrac)/g.slider;
 
         currentX = map(testX,0,1,g.lx,g.rx);
         difference = temp.x - currentX;
@@ -526,7 +529,7 @@ function temperatureSolve(x,T){
     let count = 0;
     let testFrac = x + change;
 
-    while(Math.abs(difference) > 0.001){
+    while(Math.abs(difference) > 0.001 && count < 200){
         // Refines step size
         if(count > 0 && count%10 == 0){
             change = change/2;
@@ -591,7 +594,7 @@ function findRoot(x){
         }
         
         let ans = Px(x,Te);
-        difference = ans - g.P;
+        difference = ans - g.slider;
 
         if(Math.abs(difference) > 0.000001){ // Prevents Te from being changed once difference is reached
             if(difference > 0){

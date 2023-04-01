@@ -3,7 +3,7 @@ window.g = {
     cnv: undefined,
     diagram: "P-x-y",
 
-    temperature: 75, // slider value
+    slider: 75, // slider value
 
     // Graph edges
     lx: 75,
@@ -75,9 +75,20 @@ for(let i = 0; i < diagramType.length; i++){
         g.diagram = diagramType[i].value;
         
         if(g.diagram == "T-x-y"){
-            hideSlider.style.display = 'none';;
+            tempSlider.setAttribute("min","0.6");
+            tempSlider.setAttribute("max","1.75");
+            tempSlider.setAttribute("step","0.01");
+            tempSlider.value = "1";
+            g.slider = 1;
+            tempValue.innerHTML = `${1}`;
+           
         } else {
-            hideSlider.style.display = 'grid';
+            tempSlider.setAttribute("min","20");
+            tempSlider.setAttribute("max","80");
+            tempSlider.setAttribute("step","1");
+            tempSlider.value = "75";
+            g.slider = 75;
+            tempValue.innerHTML = `${g.slider}`;
         }
     });
 };
@@ -85,7 +96,7 @@ for(let i = 0; i < diagramType.length; i++){
 tempSlider.addEventListener("input", function(){
     const temp = Number(tempSlider.value);
     tempValue.innerHTML = `${temp}`;
-    g.temperature = temp;
+    g.slider = temp;
 });
 
 // For manipulating the position of the purple dot
@@ -117,7 +128,7 @@ function mouseDragged() {
         } else if (mouseX > g.rx && mouseY < g.ty){ // Upper right corner of the graph
             g.dragPoint.x = g.rx;
             g.dragPoint.y = g.ty;
-        } else if (mouseX > g.rx && mouseY >= g.ty && mouseY <= g.ty){ // Right of the graph
+        } else if (mouseX > g.rx && mouseY >= g.ty && mouseY <= g.by){ // Right of the graph
             g.dragPoint.x = g.rx;
             g.dragPoint.y = mouseY;
         } else if (mouseX > g.rx && mouseY > g.by){ // Lower right corner of the graph
