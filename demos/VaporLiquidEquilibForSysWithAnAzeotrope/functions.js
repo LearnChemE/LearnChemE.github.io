@@ -26,7 +26,10 @@ function graphDraw(){
             }
         }
         push();
-        noStroke(); textSize(15);
+        noStroke();
+        textSize(20);
+        text("mixture is at "+map(g.points[0].y,g.by,g.ty,0,1.6).toFixed(2)+" bar",width/2-170,g.ty-10);
+        textSize(15);
         text(yLabelsP[0],g.lx-13,g.by+4);
         fill(100); textSize(18);
         text('vapor',g.rx-70,g.by-10);
@@ -50,6 +53,8 @@ function graphDraw(){
         }
         push();
         noStroke(); 
+        textSize(20);
+        text("mixture is at "+map(g.points[0].y,g.by,g.ty,50,100).toFixed(1)+"°C ",width/2-170,g.ty-10);
         textSize(15);
         text('100',g.lx-30,g.ty+6);
         fill(100); textSize(18);

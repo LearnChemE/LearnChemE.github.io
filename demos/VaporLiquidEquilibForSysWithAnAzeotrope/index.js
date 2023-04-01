@@ -61,8 +61,8 @@ function draw(){
 }
 
 const diagramType = document.getElementById("diagram-type").children;
-const hideSlider = document.getElementById("hide-slider");
 const tempSlider = document.getElementById("temp-slider");
+const sliderLabel = document.getElementById("slider-label");
 const tempValue = document.getElementById("temp-value");
 
 for(let i = 0; i < diagramType.length; i++){
@@ -78,6 +78,7 @@ for(let i = 0; i < diagramType.length; i++){
             tempSlider.setAttribute("min","0.6");
             tempSlider.setAttribute("max","1.75");
             tempSlider.setAttribute("step","0.01");
+            sliderLabel.innerHTML = "Pressure (bar)"
             tempSlider.value = "1";
             g.slider = 1;
             tempValue.innerHTML = `${1}`;
@@ -86,6 +87,7 @@ for(let i = 0; i < diagramType.length; i++){
             tempSlider.setAttribute("min","20");
             tempSlider.setAttribute("max","80");
             tempSlider.setAttribute("step","1");
+            sliderLabel.innerHTML = "Temperature (°C)"
             tempSlider.value = "75";
             g.slider = 75;
             tempValue.innerHTML = `${g.slider}`;
