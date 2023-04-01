@@ -158,7 +158,10 @@ function curveDraw(){
         push();
         noFill(); strokeWeight(2); stroke(g.green);
         beginShape();
-        for(let i = 0; i < 1; i += 0.01){
+        for(let i = 0.01; i < 1; i += 0.01){
+            if(i == 0.01){
+                vertex(g.lx,map(findRoot(0),50,100,g.by,g.ty));
+            }
             let Te = findRoot(i);
             y = (gammaB(i)*PsatB(Te)*i)/g.slider;
             vertex(map(y,0,1,g.lx,g.rx),map(Te,50,100,g.by,g.ty));
