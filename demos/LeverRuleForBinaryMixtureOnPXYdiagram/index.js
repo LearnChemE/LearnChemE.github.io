@@ -76,7 +76,7 @@ function mouseDragged() {
         } else if (mouseX > g.rx && mouseY < g.ty){ // Upper right corner of the graph
             g.dragPoint.x = g.rx;
             g.dragPoint.y = g.ty;
-        } else if (mouseX > g.rx && mouseY >= g.ty && mouseY <= g.ty){ // Right of the graph
+        } else if (mouseX > g.rx && mouseY >= g.ty && mouseY <= g.by){ // Right of the graph
             g.dragPoint.x = g.rx;
             g.dragPoint.y = mouseY;
         } else if (mouseX > g.rx && mouseY > g.by){ // Lower right corner of the graph
