@@ -1,0 +1,100 @@
+function calcAll() {
+  const nonzero_coefficients = [];
+  const coefficients_list = Object.keys(gvs.coefficients);
+  gvs.individual_p_states_arrays = [];
+  gvs.real_component_array = [];
+  gvs.imaginary_component_array = [];
+  gvs.product_array = [];
+  for(let i = 0; i < coefficients_list.length; i++) {
+    const coefficient = gvs.coefficients[coefficients_list[i]];
+    const k = coefficient.k;
+    const ck = coefficient.ck;
+    if(ck !== 0) {
+      nonzero_coefficients.push({
+        k : k,
+        ck : ck,
+      });
+    }
+  }
+  // Normalize c_k coefficients
+  let ck_total = 0;
+  for(let i = 0; i < nonzero_coefficients.length; i++) {
+    const coefficient = nonzero_coefficients[i];
+    const ck = coefficient.ck;
+    ck_total += ck;
+  }
+  for(let i = 0; i < nonzero_coefficients.length; i++) {
+    const coefficient = nonzero_coefficients[i];
+    const ck = coefficient.ck / ck_total;
+    coefficient.ck = ck;
+  }
+  const psis = [];
+  // Write an array of [x, y] coordinates for each non-zero coefficient
+  for(let i = 0; i < nonzero_coefficients.length; i++) {
+    const coefficient = nonzero_coefficients[i];
+    const k = coefficient.k;
+    const psi_i = function(x, t) {
+      const exp = k * x * 2 * Math.PI - k**2 * t / gvs.mass;
+      let y = math.exp(math.complex(0, exp));
+      return y
+    }
+    psis.push(psi_i);
+    const individual_p_states_array = [];
+    for(let x = -0.5; x <= 0.5; x += 0.001) {
+      const y = psi_i(x, gvs.t);
+      individual_p_states_array.push([x, y.re + k])
+    }
+    gvs.individual_p_states_arrays.push(individual_p_states_array)
+  }
+  const re = function(x, t) {
+    let y = 0;
+    for(let i = 0; i < nonzero_coefficients.length; i++) {
+      const coefficient = nonzero_coefficients[i];
+      const ck = coefficient.ck;
+      y += ck * psis[i](x, t).re;
+    }
+    return y
+  }
+  const im = function(x, t) {
+    let y = 0;
+    for(let i = 0; i < nonzero_coefficients.length; i++) {
+      const coefficient = nonzero_coefficients[i];
+      const ck = coefficient.ck;
+      y += ck * psis[i](x, t).im;
+    }
+    return y
+  }
+  for(let x = -0.5; x <= 0.5; x += 0.001) {
+    const y = re(x, gvs.t);
+    gvs.real_component_array.push([x, y]);
+  }
+  for(let x = -0.5; x <= 0.5; x += 0.001) {
+    const y = im(x, gvs.t);
+    gvs.imaginary_component_array.push([x, y]);
+  }
+  const temp_product_array = [];
+  for(let i = 0; i < gvs.real_component_array.length; i++) {
+    const real_component = gvs.real_component_array[i][1];
+    const imaginary_component = gvs.imaginary_component_array[i][1];
+    const complex_number = math.complex(real_component, imaginary_component);
+    const y = Math.abs(math.multiply(complex_number, complex_number).re);
+    if(!Number.isNaN(y)) {
+      temp_product_array.push(y);
+    }
+  }
+  let max_product = 0;
+  for(let i = 0; i < temp_product_array.length; i++) {
+    if(temp_product_array[i] > max_product) {
+      max_product = temp_product_array[i]
+    }
+  }
+  
+  for(let i = 0; i < temp_product_array.length; i++) {
+    const x = gvs.real_component_array[i][0];
+    const y = temp_product_array[i];
+    const corrected = y / max_product;
+    gvs.product_array.push([x, corrected]);
+  }
+}
+
+module.exports = calcAll;
