@@ -29,13 +29,34 @@ $modal-xl: 1140px;
 .input-area {
     display: grid;
     grid-template-columns: max-content;
+    position: absolute;
+    left: 20px;
     margin: 20px auto;
-    gap: 10px;
+    gap: 20px;
     width: max-content;
     justify-items: center;
+    align-items: center;
+    .buttons-box {
+        display: grid;
+        grid-template-columns: 120px 120px;
+        gap: 8px;
+        div {
+            padding: 8px;
+            border: 1px solid grey;
+            border-radius: 3px;
+            text-align: center;
+            cursor: pointer;
+            &:hover {
+                opacity: 0.8;
+            }
+            &.mousedown {
+                opacity: 0.5;
+            }
+        }
+    }
     .input-row {
         display: grid;
-        grid-template-columns: 200px 10rem 27px 50px;
+        grid-template-columns: max-content 10rem 27px;
         gap: 1ch;
         align-items: end;
         .data-name {
@@ -45,11 +66,100 @@ $modal-xl: 1140px;
             text-align: end;
         }
     }
+    #inputs-container {
+        display: grid;
+        gap: 3px;
+    }
+    #inputs-box-label {
+        display: grid;
+        grid-template-columns: 85px 85px;
+        text-align: center;
+        margin-left: 50px;
+    }
+    #inputs-box {
+        display: grid;
+        grid-template-columns: max-content;
+        gap: 2px;
+        width: 250px;
+        height: 480px;
+        border: 1px solid black;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        font-size: 12px;
+        box-shadow: 0px 0px 2px 2px lightgrey;
+        .inputs-container {
+            display: grid;
+            grid-template-columns: 40px 85px 85px;
+            width: 250px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            gap: 8px;
+            .list-number {
+                text-align: center;
+                display: grid;
+                align-items: center;
+            }
+            .k-input {
+
+            }
+            .ck-input {
+
+            }
+            &.even {
+                background-color: rgb(240, 240, 240);
+            }
+            input {
+                border: 1px solid black;
+                padding: 2px 8px;
+            }
+        }
+    }
+}
+
+#start-stop {
+    background-color: rgb(0, 130, 0);
+    color: white;
+}
+
+#reset-t {
+    background-color: rgb(255, 100, 100);
+    color: white;
+}
+
+#measure-p {
+    background-color: rgb(65, 105, 255);
+    color: white;
+}
+
+#reset-defaults {
+    background-color: rgb(255, 100, 100);
+    color: white;
+}
+
+#individual-states-label {
+    position: absolute;
+    left: 460px;
+    top: 5px;
+    text-align: center;
+}
+
+#real-imaginary-label {
+    position: absolute;
+    left: 460px;
+    top: 330px;
+    text-align: center;
+}
+
+#probability-density-function-label {
+    position: absolute;
+    left: 480px;
+    top: 510px;
 }
 
 #p5-container {
     width: max-content;
     margin: auto;
+    position: relative;
 }
 
 canvas {
@@ -74,4 +184,36 @@ canvas {
 *[disabled="yes"] {
     opacity: 0.3 !important;
     pointer-events: none;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
