@@ -1,7 +1,7 @@
 
 window.g = {
     cnv: undefined,
-    diaORcycle: "cycle",
+    diaORcycle: "diagram",
     axes: "pressure-enthalpy",
 
     Pcond: 1, // Condenser pressure value
