@@ -123,6 +123,12 @@ function graphDraw(){
         rotate(radians(-90));
         text('temperature (K)',0,0);
         pop();
+        push();
+        noStroke(); textSize(18); fill(100);
+        text('liquid',g.lx+25,height/2+20);
+        text('two phases',width/2-50,g.by-20);
+        text('vapor',g.rx-70,height/2+20);
+        pop();
     }
     pop();
 
