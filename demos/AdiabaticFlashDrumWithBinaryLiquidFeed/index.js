@@ -3,7 +3,7 @@ window.g = {
     cnv: undefined,
 
     // Slider inputs
-    P: 3,
+    P: .25,
     T: 271,
     moleFrac: .5,
 
@@ -50,6 +50,7 @@ function setup(){
     g.cnv = createCanvas(700,500);
     g.cnv.parent("graphics-wrapper");
     document.getElementsByTagName("main")[0].remove();
+    noLoop();
 }
 
 function draw(){
@@ -70,16 +71,19 @@ pressure.addEventListener("input", function(){
     const temp = Number(pressure.value);
     g.P = temp;
     pressureLabel.innerHTML = `${temp}`;
+    setTimeout(redraw(),3000);
 });
 
 temperature.addEventListener("input", function(){
     const temp = Number(temperature.value);
     g.T = temp;
     temperatureLabel.innerHTML = `${temp}`;
+    setTimeout(redraw(),2000);
 });
 
 moleFrac.addEventListener("input", function(){
     const temp = Number(moleFrac.value);
     g.moleFrac = temp;
     moleFracLabel.innerHTML = `${temp}`;
+    setTimeout(redraw(),2000);
 });
