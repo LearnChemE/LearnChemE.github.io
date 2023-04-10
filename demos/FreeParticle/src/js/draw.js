@@ -77,6 +77,11 @@ function drawIndividualPStates(p) {
     p.fill(0);
     p.noStroke();
     p.text(`${i}`, tick_coords[0], tick_coords[1] + 5);
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.line(tick_coords[0] - 10, tick_coords[1] + 20, tick_coords[0] + 10, tick_coords[1] + 20);
+    p.noStroke();
+    p.text(`λ`, tick_coords[0], tick_coords[1] + 22);
   }
   for(let i = 0; i < gvs.individual_p_states_arrays.length; i++) {
     p.noFill();
@@ -97,7 +102,7 @@ function drawIndividualPStates(p) {
 
 function drawRealAndImagComponents(p) {
   p.push();
-  p.translate(p.width / 2 + 200, 420);
+  p.translate(p.width / 2 + 200, 435);
   const number_to_coord = function(x, y) {
     const plot_width = 350;
     const plot_height = 120;
@@ -134,6 +139,11 @@ function drawRealAndImagComponents(p) {
     p.fill(0);
     p.noStroke();
     p.text(`${i}`, tick_coords[0], tick_coords[1] + 5);
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.line(tick_coords[0] - 10, tick_coords[1] + 20, tick_coords[0] + 10, tick_coords[1] + 20);
+    p.noStroke();
+    p.text(`λ`, tick_coords[0], tick_coords[1] + 22);
   }
   p.noFill();
   p.stroke(255, 150, 0);
@@ -161,7 +171,7 @@ function drawRealAndImagComponents(p) {
 
 function drawProbabilityDensityFunction(p) {
   p.push();
-  p.translate(p.width / 2 + 200, 660);
+  p.translate(p.width / 2 + 200, 690);
   const number_to_coord = function(x, y) {
     const plot_width = 350;
     const plot_height = 240;
@@ -198,6 +208,11 @@ function drawProbabilityDensityFunction(p) {
     p.fill(0);
     p.noStroke();
     p.text(`${i}`, tick_coords[0], tick_coords[1] + 5);
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.line(tick_coords[0] - 10, tick_coords[1] + 20, tick_coords[0] + 10, tick_coords[1] + 20);
+    p.noStroke();
+    p.text(`λ`, tick_coords[0], tick_coords[1] + 22);
   }
   p.noFill();
   p.stroke(0, 0, 0);
@@ -214,10 +229,27 @@ function drawProbabilityDensityFunction(p) {
   p.pop();
 }
 
+function drawPlotLabels(p) {
+  p.push();
+  p.translate(p.width / 2 - 5, 180);
+  p.noStroke();
+  p.fill(0);
+  p.textAlign(p.CENTER);
+  p.textSize(16);
+  p.rotate(-1 * Math.PI / 2);
+  p.text("amplitude", 0, 0);
+  p.translate(-260, 0);
+  p.text("amplitude", 0, 0);
+  p.translate(-190, 0);
+  p.text("relative probability", 0, 0);
+  p.pop();
+}
+
 function drawAll(p) {
   drawIndividualPStates(p);
   drawRealAndImagComponents(p);
   drawProbabilityDensityFunction(p);
+  drawPlotLabels(p);
 }
 
 module.exports = drawAll;

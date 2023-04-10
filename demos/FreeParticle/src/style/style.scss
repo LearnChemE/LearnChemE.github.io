@@ -72,7 +72,7 @@ $modal-xl: 1140px;
     }
     #inputs-box-label {
         display: grid;
-        grid-template-columns: 85px 85px;
+        grid-template-columns: 85px 115px;
         text-align: center;
         margin-left: 50px;
     }
@@ -81,7 +81,7 @@ $modal-xl: 1140px;
         grid-template-columns: max-content;
         gap: 2px;
         width: 250px;
-        height: 430px;
+        height: 435px;
         border: 1px solid black;
         overflow-y: scroll;
         overflow-x: hidden;
@@ -146,20 +146,20 @@ $modal-xl: 1140px;
 #real-imaginary-label {
     position: absolute;
     left: 460px;
-    top: 330px;
+    top: 350px;
     text-align: center;
 }
 
 #probability-density-function-label {
     position: absolute;
     left: 480px;
-    top: 510px;
+    top: 545px;
 }
 
 #populate-container {
     position: absolute;
     left: 20px;
-    top: 650px;
+    top: 685px;
     display: grid;
     grid-template-columns: max-content 180px max-content;
     gap: 10px;

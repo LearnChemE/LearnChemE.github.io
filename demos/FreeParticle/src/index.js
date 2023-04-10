@@ -24,7 +24,7 @@ const containerElement = document.getElementById("p5-container");
 const sketch = (p) => {
 
     p.setup = function() {
-        p.createCanvas(800, 700);
+        p.createCanvas(800, 740);
         p.noLoop();
         gvs.p = p;
         gvs.drawAll = require("./js/draw.js");
