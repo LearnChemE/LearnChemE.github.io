@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="content-language" content="en">
-  <title>Reversible and Irreversible Expansion and Compression Work</title>
+  <title>Reversible Expansion and Compression Work</title>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script>
     MathJax = {
@@ -118,15 +118,15 @@
 
         <div class="modal-body">
 
-          <div class="details-text">Expansion-compression work \( W \) for all four processes is calculated from</div>
+          <div class="details-text">Expansion-compression work \( W \) for a reversible process is</div>
 
           <div class="details-eqn">
             $$
-            [1] \qquad W = - \int P_{ext} \, dV
+            [1] \qquad W = - \int P \, dV
             $$
           </div>
 
-          <div class="details-text">where \( P_{ext} \) is the external pressure and \( W \) is in units of kJ/mol. The external pressure and the gas pressure are equal for a reversible process, whereas for an irreversible process the external pressure is the final pressure.<br><br><b>Initial state:</b></div>
+          <div class="details-text">where \( P \) is the pressure of the gas. Because the process is reversible, the external pressure and the gas pressure are equal.<br><br><b>Initial state:</b></div>
 
           <div class="details-eqn">
             $$
@@ -134,75 +134,39 @@
             $$    
           </div>
 
-          <div class="details-text">where the subscript 1 refers to the initial state, \( R \) is the ideal gas constant [kJ/(mol K)], \( V \) is volume (m<sup>3</sup>/mol), \( T \) is temperature (K) and \( P \) is pressure (Pa).<br><br><b>For an isothermal process:</b></div>
+          <div class="details-text">where the subscript 1 refers to the initial state, \( R \) is the ideal gas constant [kJ/(mol K)], \( V \) is volume (m<sup>3</sup>/mol), \( T \) is temperature (K) and \( P \) is pressure (Pa).<br><br><b>For an adiabatic, reversible process on an ideal diatomic gas:</b></div>
+
+          <div class="details-text"></div>
 
           <div class="details-eqn">
             $$
-            [3] \qquad V_{2} = \frac{R T_{1}}{P_{2}}
-            $$    
-          </div>
-
-          <div class="details-text">where the subscript 2 refers to the final condition.<br><br>&nbsp;&nbsp;Reversible work:</div>
-
-          <div class="details-eqn">
-            $$
-            [4] \qquad W = - R T_{1} \, \mathrm{ln} \left( \frac{V_{2}}{V_{1}} \right)
-            $$    
-          </div>
-
-          <div class="details-text">&nbsp;&nbsp;Irreversible work:</div>
-
-          <div class="details-eqn">
-            $$
-            [5] \qquad W = - P_{2} ( V_{2} - V_{1} )
-            $$    
-          </div>
-
-          <div class="details-text"><b>For an adiabatic process on an ideal diatomic gas:</b></div>
-
-          <div class="details-eqn">
-            $$
-            [6] \qquad \gamma = \frac{7}{5}
+            [3] \qquad \gamma = \frac{7}{5}
             $$    
           </div>
 
           <div class="details-eqn">
             $$
-            [7] \qquad C_{V} = \frac{5 R}{2}
+            [4] \qquad C_{V} = \frac{5 R}{2}
             $$    
           </div>
 
           <div class="details-eqn">
             $$
-            [8] \qquad W = C_{V} ( T_{2} - T_{1} )
+            [5] \qquad W = C_{V} ( T_{2} - T_{1} )
             $$    
           </div>
 
-          <div class="details-text">where \( \gamma = \frac{ C_{P} }{ C_{V} } \), \( C_{V} \) is the constant volume heat capacity, and \( C_{P} \) is the constant pressure heat capacity [kJ/(mol K)].<br><br>&nbsp;&nbsp;Reversible process:</div>
+          <div class="details-text">where \( \gamma = \frac{ C_{P} }{ C_{V} } \), \( C_{V} \) is the constant volume heat capacity, and \( C_{P} \) is the constant pressure heat capacity [kJ/(mol K)]. Volume and temperature can be calculated as follows:</div>
 
           <div class="details-eqn">
             $$
-            [9] \qquad V_{2} = V_{1} \left( \frac{P_{1}}{P_{2}} \right)^{1 / \gamma}
-            $$    
-          </div>
-
-          <div class="details-eqn">
-            $$
-            [10] \qquad T_{2} = T_{1} \left( \frac{V_{1}}{V_{2}} \right)^{\gamma - 1}
-            $$    
-          </div>
-
-          <div class="details-text">&nbsp;&nbsp;Irreversible process:</div>
-
-          <div class="details-eqn">
-            $$
-            [11] \qquad T_{2} = T_{1} - \frac{P_{2}(V_{2} - V_{1})}{C_{V}}
+            [6] \qquad V_{2} = V_{1} \left( \frac{P_{1}}{P_{2}} \right)^{1 / \gamma}
             $$    
           </div>
 
           <div class="details-eqn">
             $$
-            [12] \qquad V_{2} = \frac{R(C_{V} T_{1} + P_{2} V_{1})}{P_{2}(C_{V} + R)}
+            [7] \qquad T_{2} = T_{1} \left( \frac{V_{1}}{V_{2}} \right)^{\gamma - 1}
             $$    
           </div>
 
