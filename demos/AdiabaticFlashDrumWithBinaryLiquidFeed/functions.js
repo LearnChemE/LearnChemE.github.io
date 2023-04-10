@@ -115,43 +115,26 @@ function mathAndDisplay(){
 
 function mathSolve(){
   let HF1, HF2, L, V, t, x, y;
+
+  // These two values are dependent on the sliders \\
   HF1 = g.moleFrac*g.nf*g.cpL1*(g.T-g.Tref);
   HF2 = (1-g.moleFrac)*g.nf*g.cpL2*(g.T-g.Tref);
 
   // Starting points for solving variables
-  L = 5; V = 10 - L; t = 100; x = .5; y = .5;
-  let x0 = [L,t,x,y] // Not including V since it and L are dependent on each other
-  // let dx = [.1,5,.1,.1]; // Iteration step for (L/V,t,x,y)
-  // let counts = [0,0,0,0];
+  L = 5; V = 5; t = 100; x = .5; y = .5; // These were the starting points for the variables used in Mathematica
+
+  // Info on the bounds of the variables
+  // 0 <= x,y <= 1
+  // 0 <= V <= 8.4 (I think theoretically 10 but given the ranges of the sliders that's the upper limit)
+  // 1.6 <= L <= 10 
+  // 33 <= t <= 143
+
   let error;
-  let errorStored = 100000; // For comparison in steps
-  // let iterVar = 0; // Will range between 0 and 3
-  // let direction = 1; // 1 or -1, used to change iteration value (if == -1 then forward and backwards have been tested -> move onto next variable)
-  // let count = 0;
-  // let limit = .1; // Value used to stop iteration
+  let errorStored = 100000;
   let x0Stored;
 
-  
-  for(let i = 1.6; i <= 10; i+=.1){ // L
-    L = i; V = 10-L;
-    for(let j = 33; j <= 143; j++){ // t
-      t = j;
-      for(let k = 0; k <= 1; k+=0.01){ // x
-        x = k;
-        for(let n = 0; n <= 1; n+=0.01){ // y
-          y = n;
-          error = (eq1(HF1,HF2,L,V,t,x,y)**2 + eq2(L,V)**2 + eq3(x,L,y,V)**2 + eq4(x,t,y)**2 + eq5(x,t,y)**2)**(1/2);
-          if(error < errorStored){
-            errorStored = error;
-            x0Stored = [L,10-L,t,x,y];
-          }
-        }
-      }
-    }
-  }
-  // console.log(errorStored)
 
-  // Various equations used but set equal to 0
+  // These are the equations used but all set equal to 0 so ideally val == 0 for all 5 equations
   function eq1(Hf1,Hf2,L,V,t,x,y){
     let val = x*L*g.cpL1*(t-g.Tref) + (1-x)*L*g.cpL2*(t-g.Tref) + y*V*(g.dHvap1 + g.cpV1*(t-g.Tref)) + (1-y)*V*(g.dHvap2 + g.cpV2*(t-g.Tref)) - Hf1 - Hf2;
     return val;
@@ -173,6 +156,25 @@ function mathSolve(){
     return val;
   }
 
+  // Brute force method since I couldn't figure anything else out
+  for(let i = 1.6; i <= 10; i+=.1){ // L
+    L = i; V = 10-L;
+    for(let j = 33; j <= 143; j++){ // t
+      t = j;
+      for(let k = 0; k <= 1; k+=0.01){ // x
+        x = k;
+        for(let n = 0; n <= 1; n+=0.01){ // y
+          y = n;
+          error = (eq1(HF1,HF2,L,V,t,x,y)**2 + eq2(L,V)**2 + eq3(x,L,y,V)**2 + eq4(x,t,y)**2 + eq5(x,t,y)**2)**(1/2);
+          if(error < errorStored){
+            errorStored = error;
+            x0Stored = [L,10-L,t,x,y];
+          }
+        }
+      }
+    }
+  }
+
   return(x0Stored);
 
 }
@@ -189,6 +191,7 @@ function PsatW(T){
   return(val);
 }
 
+// Attempted algorithm for setting better starting conditions
 function defineICs(){
   let L0, V0, t0, x0, y0;
 
@@ -347,7 +350,10 @@ function GaussianElimination(A,b){
   //   L = x0[0]; V = 10 - L; t = x0[1]; x = x0[2]; y = x0[3];
   //   error = (eq1(HF1,HF2,L,V,t,x,y)**2 + eq2(L,V)**2 + eq3(x,L,y,V)**2 + eq4(x,t,y)**2 + eq5(x,t,y)**2)**(1/2); // L2 norm
   //   let test1 = true; let test2 = true;
-
+  // let iterVar = 0; // Will range between 0 and 3
+  // let direction = 1; // 1 or -1, used to change iteration value (if == -1 then forward and backwards have been tested -> move onto next variable)
+  // let count = 0;
+  // let limit = .1; // Value used to stop iteration
   //   // Iterating chosen variable
   //   if(error < errorStored && direction == 1 && iterVar < 4){ // Decreased value in error (positive iteration)
   //     errorStored = error; test2 = false;
