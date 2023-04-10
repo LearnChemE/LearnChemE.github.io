@@ -81,7 +81,7 @@ $modal-xl: 1140px;
         grid-template-columns: max-content;
         gap: 2px;
         width: 250px;
-        height: 480px;
+        height: 430px;
         border: 1px solid black;
         overflow-y: scroll;
         overflow-x: hidden;
@@ -154,6 +154,32 @@ $modal-xl: 1140px;
     position: absolute;
     left: 480px;
     top: 510px;
+}
+
+#populate-container {
+    position: absolute;
+    left: 20px;
+    top: 650px;
+    display: grid;
+    grid-template-columns: max-content 180px max-content;
+    gap: 10px;
+    align-items: center;
+    #populate-button {
+        padding: 5px 10px;
+        border: 1px solid grey;
+        border-radius: 5px;
+        background-color: beige;
+        cursor: pointer;
+        &:hover {
+            opacity: 0.8;
+        }
+        &.mousedown {
+            opacity: 0.5;
+        }
+    }
+    input {
+        transform: translateY(4px);
+    }
 }
 
 #p5-container {

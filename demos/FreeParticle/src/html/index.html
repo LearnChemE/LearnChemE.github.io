@@ -68,7 +68,13 @@
 
     <div id="individual-states-label">Individual p-states \( \psi_{j} = e^{ikx} \)<br>(\( \mathrm{Re[\psi]} \) only, offset by k for visibility)</div>
     <div id="real-imaginary-label">\( \sum \psi_{j} \;\) Real and Imaginary Components</div>
-    <div id="probability-density-function-label">\(  | \Psi |^{2} = \Psi * \Psi = \sum \psi_{j} * \sum \psi_{j} \)</div>
+    <div id="probability-density-function-label">\(  | \Psi |^{2} = \Psi^{*} * \Psi = \sum \psi_{j}^{*} * \sum \psi_{j} \)</div>
+
+    <div id="populate-container">
+      <div id="populate-button">populate</div>
+      <input type="range" id="populate-slider" min="20" max="200" step="10">
+      <div id="populate-units">100 rows</div>
+    </div>
   </div>
 
   <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"

@@ -4,6 +4,9 @@ const measurePButton = document.getElementById("measure-p");
 const resetDefaultsButton = document.getElementById("reset-defaults");
 const massSlider = document.getElementById("mass-slider");
 const massValue = document.getElementById("mass-value");
+const populateSlider = document.getElementById("populate-slider");
+const populateValue = document.getElementById("populate-units");
+const populateButton = document.getElementById("populate-button");
 
 const buttons = [
   startStopButton,
@@ -86,6 +89,7 @@ measurePButton.addEventListener("click", () => {
     const coefficient_number = coefficients_list[i];
     if(coefficient_number !== chosen_number) {
       gvs.coefficients[coefficient_number].ck = 0;
+      console.log(i);
       document.getElementById(`ck-${coefficient_number}-input`).value = "0";
     }
   }
@@ -94,4 +98,70 @@ measurePButton.addEventListener("click", () => {
   gvs.t = 0;
   gvs.p.noLoop();
   gvs.p.redraw();
-})
+});
+
+populateButton.addEventListener("mousedown", () => {
+  populateButton.classList.add("mousedown");
+});
+
+populateButton.addEventListener("mouseup", () => {
+  populateButton.classList.remove("mousedown");
+});
+
+populateSlider.addEventListener("input", () => {
+  const populateNumber = Number(populateSlider.value);
+  gvs.populate_quantity = populateNumber;
+  populateValue.innerHTML = `${Math.round(populateNumber)} rows`;
+});
+
+populateButton.addEventListener("click", () => {
+  const inputsBox = document.getElementById("inputs-box");
+  inputsBox.innerHTML = "";
+  gvs.coefficients = {};
+  for(let i = 0; i <= gvs.populate_quantity; i++) {
+    if(i == gvs.populate_quantity / 2) {i++}
+    const k = Math.round(-1 * gvs.populate_quantity / 2 + i);
+    const container = document.createElement("div");
+    const numberDiv = document.createElement("div");
+    const kDiv = document.createElement("input");
+    const CkDiv = document.createElement("input");
+    container.classList.add("inputs-container");
+    numberDiv.classList.add("list-number");
+    kDiv.classList.add("k-input");
+    CkDiv.classList.add("ck-input");
+    kDiv.setAttribute("type", "number");
+    CkDiv.setAttribute("type", "number");
+    let number;
+    if(k < 0) {number = i + 1} else {number = i}
+    if(number % 2 === 0) {
+      container.classList.add("even");
+    }
+    numberDiv.innerHTML = `${Math.round(number)}`;
+    CkDiv.value = "1";
+    kDiv.value = `${k}`;
+    container.appendChild(numberDiv);
+    container.appendChild(numberDiv);
+    container.appendChild(kDiv);
+    container.appendChild(CkDiv);
+    inputsBox.appendChild(container);
+    kDiv.id = `k-${number}-input`;
+    CkDiv.id = `ck-${number}-input`;
+    gvs.coefficients[`${number}`] = {
+      k : k,
+      ck : Number(CkDiv.value),
+    }
+    kDiv.addEventListener("change", () => {
+      const k = Math.max(-100, Math.min(100, Math.round(kDiv.value)));
+      kDiv.value = `${k}`;
+      gvs.coefficients[`${number}`].k = k;
+      gvs.p.redraw();
+    });
+    CkDiv.addEventListener("change", () => {
+      const ck = Math.max(0, Number(CkDiv.value));
+      CkDiv.value = `${ck}`;
+      gvs.coefficients[`${number}`].ck = ck;
+      gvs.p.redraw();
+    })
+  }
+  gvs.p.redraw();
+});

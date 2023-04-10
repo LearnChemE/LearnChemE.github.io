@@ -77,7 +77,8 @@ function calcAll() {
     const real_component = gvs.real_component_array[i][1];
     const imaginary_component = gvs.imaginary_component_array[i][1];
     const complex_number = math.complex(real_component, imaginary_component);
-    const y = Math.abs(math.multiply(complex_number, complex_number).re);
+    const complex_conjugate = math.conj(complex_number);
+    const y = Math.abs(math.multiply(complex_number, complex_conjugate).re);
     if(!Number.isNaN(y)) {
       temp_product_array.push(y);
     }
@@ -92,8 +93,12 @@ function calcAll() {
   for(let i = 0; i < temp_product_array.length; i++) {
     const x = gvs.real_component_array[i][0];
     const y = temp_product_array[i];
-    const corrected = y / max_product;
-    gvs.product_array.push([x, corrected]);
+    if(max_product > 1) {
+      const corrected = y / max_product;
+      gvs.product_array.push([x, corrected]);
+    } else {
+      gvs.product_array.push([x, y]);
+    }
   }
 }
 
