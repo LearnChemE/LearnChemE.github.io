@@ -22,6 +22,10 @@ window.g = {
     nf: 10,
 }
 
+let data;
+function preload(){
+    data = loadJSON("solutions.json");
+}
 // Moles in feed
 mf = {
     lx: 50,
@@ -50,13 +54,14 @@ function setup(){
     g.cnv = createCanvas(700,500);
     g.cnv.parent("graphics-wrapper");
     document.getElementsByTagName("main")[0].remove();
-    noLoop();
+    //noLoop();
 }
 
 function draw(){
     background(250);
     frame();
-    mathAndDisplay();
+    //console.log(data[1])
+    //mathAndDisplay();
 }
 
 // Event listeners and such
