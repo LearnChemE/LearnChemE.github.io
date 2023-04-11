@@ -24,7 +24,7 @@ window.g = {
 
 let data;
 function preload(){
-    data = loadJSON("solutions.json");
+    data = loadJSON("solutions.json"); // in the form: [Tf,xf,P,L,V,t,x,y]
 }
 // Moles in feed
 mf = {
@@ -60,8 +60,9 @@ function setup(){
 function draw(){
     background(250);
     frame();
-    //console.log(data[1])
-    //mathAndDisplay();
+    //console.log(data[1][5])
+    mathAndDisplay();
+    //tempFunc();
 }
 
 // Event listeners and such
