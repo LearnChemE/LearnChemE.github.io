@@ -242,6 +242,21 @@ function drawPlotLabels(p) {
   p.text("amplitude", 0, 0);
   p.translate(-190, 0);
   p.text("relative probability", 0, 0);
+  p.fill(255);
+  p.stroke(0);
+  p.strokeWeight(1);
+  p.rotate(Math.PI / 2);
+  p.translate(350, -230);
+  p.rectMode(p.CENTER);
+  p.rect(-7, 0, 70, 40);
+  p.stroke(255, 150, 0);
+  p.line(-30, -10, -5, -10);
+  p.stroke(0, 0, 255);
+  p.line(-30, 8, -5, 8);
+  p.noStroke();
+  p.fill(0);
+  p.text("re", 10, -5);
+  p.text("im", 10, 13);
   p.pop();
 }
 
