@@ -54,15 +54,12 @@ function setup(){
     g.cnv = createCanvas(700,500);
     g.cnv.parent("graphics-wrapper");
     document.getElementsByTagName("main")[0].remove();
-    //noLoop();
 }
 
 function draw(){
     background(250);
     frame();
-    //console.log(data[1][5])
     mathAndDisplay();
-    //tempFunc();
 }
 
 // Event listeners and such

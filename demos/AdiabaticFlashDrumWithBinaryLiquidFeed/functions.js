@@ -72,6 +72,22 @@ function mathAndDisplay(){
   }
   
   let answers = mathSolve(); // L, V, t, x, y
+  if(answers[3] < 0){
+    answers[3] = 0;
+  } 
+  if (answers[4] < 0){
+    answers[4] = 0;
+  }
+  if(answers[0] > 10){
+    answers[0] = 10;
+  } else if (answers[0] < 0){
+    answers[0] = 0;
+  }
+  if(answers[1] > 10){
+    answers[1] = 10;
+  } else if (answers[1] < 0){
+    answers[1] = 0;
+  }
   answerDisplay();
   function answerDisplay(){
 
@@ -103,10 +119,18 @@ function mathAndDisplay(){
     push();
     noStroke(); textSize(18);
     //let temp = (answers[1]*answers[4]).toFixed(1)
+    let t1 = answers[1]*(1-answers[4]);
+    if(t1 < 0){
+      t1 = 0;
+    }
+    let t2 = answers[0]*(1-answers[3]);
+    if(t2 < 0){
+      t2 = 0;
+    }
     text((answers[1]*answers[4]).toFixed(1),mv.lx+26,mv.by+map(answers[1]*answers[4],0,10,0,-95)-5);
-    text((answers[1]*(1-answers[4])).toFixed(1),mv.lx+96,mv.by+map(answers[1]*(1-answers[4]),0,10,0,-95)-5);
+    text(t1.toFixed(1),mv.lx+96,mv.by+map(answers[1]*(1-answers[4]),0,10,0,-95)-5);
     text((answers[0]*answers[3]).toFixed(1),ml.lx+26,ml.by+map(answers[0]*answers[3],0,10,0,-95)-5);
-    text((answers[0]*(1-answers[3])).toFixed(1),ml.lx+96,ml.by+map(answers[0]*(1-answers[3]),0,10,0,-95)-5);
+    text(t2.toFixed(1),ml.lx+96,ml.by+map(answers[0]*(1-answers[3]),0,10,0,-95)-5);
     pop();
   }
 
@@ -117,9 +141,9 @@ function mathSolve(){
   // Temperature values change on intervals of 1616
   // mole frac values change on intervals of 16
   // Pressure values change on intervals of 1 [.25, .5, .75, 1, ...]
-  let ind = (g.T-120)*1616 + 100*g.moleFrac*16 + (g.P/.25 - 1);
+  let ind = Math.round((g.T-120)*1616 + 100*g.moleFrac*16 + (g.P/.25 - 1));
   let t = data[ind];
-
+  
   return([t[3],t[4],t[5],t[6],t[7]])
 
 }
