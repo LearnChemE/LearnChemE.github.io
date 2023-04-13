@@ -250,6 +250,8 @@ function drawPlotLabels(p) {
   p.textSize(16);
   p.textAlign(p.CENTER, p.CENTER);
   p.text("fractions of λ", 0, 0);
+  p.textSize(10);
+  p.text("1", 50, 6);
   p.pop();
 }
 

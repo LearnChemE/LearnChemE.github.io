@@ -89,7 +89,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This is a simulation of the wave functions of a free particle with momentum states indexed by k and weighted by coefficients C<sub>k</sub> where k is any integer, positive or negative. To alter the contributing states and their corresponding weights, click the input boxes on the left side of the simulation and change k to any positive or negative integer value, and C<sub>k</sub> to any real number (note that k and C<sub>k</sub> can theoretically be complex numbers, but this simulation was not designed to handle complex values for k and C<sub>k</sub>). The sum of all coefficients (\( \sum \) C<sub>k</sub>) must not be zero. You can observe time evolution of the wave function by clicking "start/stop", and can reset the time value to zero at any time by clicking "reset t = 0". During time evolution of the wave function, you can click "measure P" to collapse the wave function to a specific momentum state, with probabilities proportional to squares of the states' C<sub>k</sub> values. The “populate” button and slide allow you to quickly populate the inputs section with between 20 and 200 input boxes with C<sub>k</sub> values of 1 to examine the contributing waves and overall wave function of a particle with many contributing momentum states. Press "reset defaults" at any point to reset the simulation to its default state.
+            This is a simulation of the wave functions of a free particle with momentum states indexed by k and weighted by coefficients C<sub>k</sub> where k is any integer, positive or negative. To alter the contributing states and their corresponding weights, click the input boxes on the left side of the simulation and change k to any positive or negative integer value, and C<sub>k</sub> to any real number (note that C<sub>k</sub> can theoretically be a complex number, but this simulation was not designed to handle complex values for C<sub>k</sub>). The sum of all coefficients (\( \sum \) C<sub>k</sub>) must not be zero. You can observe time evolution of the wave function by clicking "start/stop", and can reset the time value to zero at any time by clicking "reset t = 0". During time evolution of the wave function, you can click "measure P" to collapse the wave function to a specific momentum state, with probabilities proportional to squares of the states' C<sub>k</sub> values. The “populate” button and slide allow you to quickly populate the inputs section with between 20 and 200 input boxes with C<sub>k</sub> values of 1 to examine the contributing waves and overall wave function of a particle with many contributing momentum states. Press "reset defaults" at any point to reset the simulation to its default state.
           </p>
 
         </div>
@@ -114,7 +114,7 @@
 
           <div class="details-eqn">
             $$
-            [1] \quad \psi_{k} = e^{ikx}
+            [1] \quad \psi_{k}(x) = e^{ikx}
             $$
           </div>
 
@@ -124,25 +124,25 @@
           
           <div class="details-eqn">
             $$
-            [2] \quad \Psi = \sum_{k = -\infty}^{\infty} C_{k} \psi_{k}
+            [2] \quad \Psi(x) = \sum_{k = -\infty}^{\infty} C_{k} \psi_{k}
             $$
           </div>
 
-          <div class="details-text">where \( C_{k} \) is the coefficient of momentum state \( k \), which corresponds to the weight of that state in the overall wave function. That is, a particle is more likely to be in a momentum state with a large coefficient. Time evolution of the wave function depends on the energy of each component wave, where \( E_{k} = \hbar k^{2} / 2m \) so that:</div>
+          <div class="details-text">where \( C_{k} \) is the coefficient of momentum state \( k \), which corresponds to the weight of that state in the overall wave function. That is, a particle is more likely to be in a momentum state with a large coefficient. Time evolution of each component wave function depends on that component's energy \( E_{k} \):</div>
 
           <div class="details-eqn">
             $$
-            [3] \quad \psi (k, t) = \sum_{k = -\infty}^{\infty} \psi_{k} e^{-i \hbar k^{2} t / 2 m}
+            [3] \quad \psi (x, t) = \psi_{k} (x, 0) e^{-i E_{k} t / \hbar}
             $$
           </div>
 
           <div class="details-text">
-            where \( \hbar \) is the Planck constant and \( t \) is time. Thus, the definition of the time-dependent wave function of the particle is:
+            where \( \hbar \) is the Planck constant and \( t \) is time. The energy of each component wave is \( E_{k} = \hbar^{2} k^{2} / 2m \), thus, the definition of the time-dependent wave function of the particle is:
           </div>
 
           <div class="details-eqn">
             $$
-            [4] \quad \Psi(k, t) = \sum_{k = -\infty}^{\infty} C_{k} \psi_{k} e^{-i \hbar k^{2} t / 2 m}
+            [4] \quad \Psi(x, t) = \sum_{k = -\infty}^{\infty} C_{k} \psi_{k} e^{-i \hbar k^{2} t / 2 m}
             $$
           </div>
 
