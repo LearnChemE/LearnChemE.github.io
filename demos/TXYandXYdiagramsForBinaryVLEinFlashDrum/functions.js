@@ -402,7 +402,6 @@ function mathSolve(){
         let q = g.ratio/(g.ratio + 1);
         let Vamt = 100*(1-q);
         let Lamt = 100*q;
-        console.log(Vamt,Lamt);
 
         // Lower right image
         push();
