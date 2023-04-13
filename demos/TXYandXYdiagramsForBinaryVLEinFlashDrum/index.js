@@ -12,6 +12,10 @@ window.g = {
     by: 450,
     lx1: 425, // lx1 & rx1 for when there's two graphs
     rx1: 650,
+
+    // Colors to be used repeatedly
+    blue: [0,0,200],
+    green: [0,100,0],
 }
 
 function setup(){
@@ -27,6 +31,7 @@ function draw(){
     } else {
         doubleGraph();
     }
+    curveDraw();
 }
 
 
