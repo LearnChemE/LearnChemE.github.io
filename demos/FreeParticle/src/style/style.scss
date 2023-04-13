@@ -75,6 +75,7 @@ $modal-xl: 1140px;
         grid-template-columns: 85px 115px;
         text-align: center;
         margin-left: 50px;
+        align-items: end;
     }
     #inputs-box {
         display: grid;
@@ -145,15 +146,15 @@ $modal-xl: 1140px;
 
 #real-imaginary-label {
     position: absolute;
-    left: 460px;
-    top: 350px;
+    left: 445px;
+    top: 325px;
     text-align: center;
 }
 
 #probability-density-function-label {
     position: absolute;
     left: 480px;
-    top: 545px;
+    top: 505px;
 }
 
 #populate-container {
