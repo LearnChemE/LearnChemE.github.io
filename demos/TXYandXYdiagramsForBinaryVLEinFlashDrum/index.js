@@ -1,7 +1,7 @@
 
 window.g = {
     cnv: undefined,
-    diagram: "both",
+    diagram: "x-y",
     x: 0.5,
     ratio: 2,
 
@@ -16,6 +16,7 @@ window.g = {
     // Colors to be used repeatedly
     blue: [0,0,200],
     green: [0,100,0],
+    mag: [100,0,100],
 }
 
 function setup(){
@@ -32,6 +33,7 @@ function draw(){
         doubleGraph();
     }
     curveDraw();
+    mathSolve();
 }
 
 
