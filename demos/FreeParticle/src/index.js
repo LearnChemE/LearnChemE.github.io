@@ -17,6 +17,8 @@ window.gvs = {
     playing : false,
     colors : [],
     populate_quantity : 100,
+    re_im_max_value : 1,
+    Psi_max_value : 1,
 };
 
 const containerElement = document.getElementById("p5-container");

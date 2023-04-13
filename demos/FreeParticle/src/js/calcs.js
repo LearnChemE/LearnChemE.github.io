@@ -64,6 +64,8 @@ function calcAll() {
     }
     return y
   }
+  
+
   for(let x = -0.5; x <= 0.5; x += 0.001) {
     const y = re(x, gvs.t);
     gvs.real_component_array.push([x, y]);
@@ -72,6 +74,26 @@ function calcAll() {
     const y = im(x, gvs.t);
     gvs.imaginary_component_array.push([x, y]);
   }
+
+  for(let i = 0; i < gvs.real_component_array.length; i++) {
+    const re = gvs.real_component_array[i][1];
+    const im = gvs.imaginary_component_array[i][1];
+    if(( re > 1 || re < -1 ) && Math.abs(re) > gvs.re_im_max_value) {
+      gvs.re_im_max_value = Math.abs(re);
+    }
+    if(( im > 1 || im < -1 ) && Math.abs(im) > gvs.re_im_max_value) {
+      gvs.re_im_max_value = Math.abs(im);
+    }
+  }
+  if(gvs.re_im_max_value > 1) {
+    for(let i = 0; i < gvs.real_component_array.length; i++) {
+      const re = gvs.real_component_array[i][1] / gvs.re_im_max_value;
+      const im = gvs.imaginary_component_array[i][1] / gvs.re_im_max_value;
+      gvs.real_component_array[i][1] = re;
+      gvs.imaginary_component_array[i][1] = im;
+    }
+  }
+
   const temp_product_array = [];
   for(let i = 0; i < gvs.real_component_array.length; i++) {
     const real_component = gvs.real_component_array[i][1];
@@ -83,18 +105,18 @@ function calcAll() {
       temp_product_array.push(y);
     }
   }
-  let max_product = 0;
+
   for(let i = 0; i < temp_product_array.length; i++) {
-    if(temp_product_array[i] > max_product) {
-      max_product = temp_product_array[i]
+    if(Math.abs(temp_product_array[i]) > gvs.Psi_max_value) {
+      gvs.Psi_max_value = Math.abs(temp_product_array[i])
     }
   }
   
   for(let i = 0; i < temp_product_array.length; i++) {
     const x = gvs.real_component_array[i][0];
     const y = temp_product_array[i];
-    if(max_product > 1) {
-      const corrected = y / max_product;
+    if(gvs.Psi_max_value > 1) {
+      const corrected = y / gvs.Psi_max_value;
       gvs.product_array.push([x, corrected]);
     } else {
       gvs.product_array.push([x, y]);

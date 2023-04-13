@@ -56,8 +56,8 @@
   
       <div id="inputs-container">
         <div id="inputs-box-label">
-          <div>energy state (k)</div>
-          <div>expansion coefficient (C<sub>k</sub>)</div>
+          <div>momentum state (k)</div>
+          <div>coefficient (C<sub>k</sub>)</div>
         </div>
         <div id="inputs-box">
   
@@ -89,7 +89,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This is a simulation of the wave functions of a free particle with energy states \( k \) and expansion coefficients \( C_{k} \) where \( k \) is any integer, positive, negative, or imaginary. To alter the energy state \( k \) and its corresponding expansion coefficient \( C_{k} \), click the input boxes on the left side of the simulation and change \( k \) to any positive or negative integer value, and \( C_{k} \) to any real, positive number. You can observe time evolution of the wave function by clicking "start/stop", and can reset the time value to zero at any time by clicking "reset t = 0".  During time evolution of the wave function, you can click "measure P" to collapse the wave function and display the energy state chosen randomly, with probabilities proportional to the energy states' \( C_{k} \) value. You can populate the inputs section with between 20 and 200 input boxes with \( C_{k} \) values of 1 to examine the probability density function for a particle with equal expansion coefficients of every energy state. Press "reset defaults" at any point to reset the simulation to its default state.
+            This is a simulation of the wave functions of a free particle with momentum states indexed by k and weighted by coefficients C<sub>k</sub> where k is any integer, positive or negative. To alter the contributing states and their corresponding weights, click the input boxes on the left side of the simulation and change k to any positive or negative integer value, and C<sub>k</sub> to any real number (note that C<sub>k</sub> can theoretically be a complex number, but this simulation was not designed to handle complex values for C<sub>k</sub>). The sum of all coefficients (\( \sum \) C<sub>k</sub>) must not be zero. You can observe time evolution of the wave function by clicking "start/stop", and can reset the time value to zero at any time by clicking "reset t = 0". During time evolution of the wave function, you can click "measure P" to collapse the wave function to a specific momentum state, with probabilities proportional to squares of the states' C<sub>k</sub> values. The “populate” button and slide allow you to quickly populate the inputs section with between 20 and 200 input boxes with C<sub>k</sub> values of 1 to examine the contributing waves and overall wave function of a particle with many contributing momentum states. Press "reset defaults" at any point to reset the simulation to its default state.
           </p>
 
         </div>
@@ -110,39 +110,39 @@
         </div>
 
         <div class="modal-body">
-          <div class="details-text">The wave function of energy state \( k \) is defined as:</div>
+          <div class="details-text">The wave function of momentum eigenstate \( k \) is defined as:</div>
 
           <div class="details-eqn">
             $$
-            [1] \quad \psi_{k} = e^{ikx}
+            [1] \quad \psi_{k}(x) = e^{ikx}
             $$
           </div>
 
           <div class="details-text">
-            where \( x \) is the position of the particle in one dimension and \( \psi_{k} \) is the wave function of energy state \( k \). The wave function of the particle is a function of the wave functions of its' individual energy states, and their corresponding expansion coefficients.
+            where \( x \) is the position of the particle in one dimension and \( \psi_{k} \) is the wave function of state \( k \). The wave function of the particle is defined to be a linear combination of momentum eigenstates, and with corresponding coefficients:
           </div>
           
           <div class="details-eqn">
             $$
-            [2] \quad \Psi = \sum_{k = -\infty}^{\infty} C_{k} \psi_{k}
+            [2] \quad \Psi(x) = \sum_{k = -\infty}^{\infty} C_{k} \psi_{k}
             $$
           </div>
 
-          <div class="details-text">where \( C_{k} \) is the expansion coefficient of energy state \( k \), which corresponds to the likelihood of a particle being in that energy state. That is, a particle is most likely to be in an energy state with a large expansion coefficient. Time evolution of the wave function depends on the particle's mass \( m \):</div>
+          <div class="details-text">where \( C_{k} \) is the coefficient of momentum state \( k \), which corresponds to the weight of that state in the overall wave function. That is, a particle is more likely to be in a momentum state with a large coefficient. Time evolution of each component wave function depends on that component's energy \( E_{k} \):</div>
 
           <div class="details-eqn">
             $$
-            [3] \quad \psi_{k, t} = \sum_{k = -\infty}^{\infty} \psi_{k} e^{-i \hbar k^{2} t / 2 m}
+            [3] \quad \psi (x, t) = \psi_{k} (x, 0) e^{-i E_{k} t / \hbar}
             $$
           </div>
 
           <div class="details-text">
-            where \( \hbar \) is the Planck constant and \( t \) is time. Thus, the definition of the time-dependent wave function of the particle is 
+            where \( \hbar \) is the Planck constant and \( t \) is time. The energy of each component wave is \( E_{k} = \hbar^{2} k^{2} / 2m \), thus, the definition of the time-dependent wave function of the particle is:
           </div>
 
           <div class="details-eqn">
             $$
-            [4] \quad \Psi(t) = \sum_{j = -\infty}^{\infty} C_{k,j} \psi_{j} e^{-i \hbar k^{2} t / 2 m}
+            [4] \quad \Psi(x, t) = \sum_{k = -\infty}^{\infty} C_{k} \psi_{k} e^{-i \hbar k^{2} t / 2 m}
             $$
           </div>
 
@@ -165,7 +165,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Adam Holewinski and Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
           </p>
         </div>
       </div>

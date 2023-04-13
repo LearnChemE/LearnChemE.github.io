@@ -49,12 +49,16 @@ for(let i = 0; i <= 20; i++) {
     const k = Math.max(-100, Math.min(100, Math.round(kDiv.value)));
     kDiv.value = `${k}`;
     gvs.coefficients[`${number}`].k = k;
+    gvs.re_im_max_value = 1;
+    gvs.Psi_max_value = 1;
     gvs.p.redraw();
   });
   CkDiv.addEventListener("change", () => {
-    const ck = Math.max(0, Number(CkDiv.value));
+    const ck = Number(CkDiv.value);
     CkDiv.value = `${ck}`;
     gvs.coefficients[`${number}`].ck = ck;
+    gvs.re_im_max_value = 1;
+    gvs.Psi_max_value = 1;
     gvs.p.redraw();
-  })
+  });
 }
