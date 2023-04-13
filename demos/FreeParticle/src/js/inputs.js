@@ -62,18 +62,17 @@ measurePButton.addEventListener("click", () => {
   for(let i = 0; i < coefficients_list.length; i++) {
     const coefficient_number = coefficients_list[i];
     const coefficient = gvs.coefficients[`${coefficient_number}`];
-    const ck = coefficient.ck;
-    coefficient_total += ck;
+    const ck2 = coefficient.ck**2;
+    coefficient_total += ck2;
   }
   for(let i = 0; i < coefficients_list.length; i++) {
     const coefficient_number = coefficients_list[i];
     const coefficient = gvs.coefficients[`${coefficient_number}`];
-    const k = coefficient.k;
-    const ck = coefficient.ck / coefficient_total;
-    if(ck > 0) {
+    const ck2 = coefficient.ck**2 / coefficient_total;
+    if(ck2 > 0) {
       weights_array.push([coefficient_number, coefficient_weight]);
     }
-    coefficient_weight = coefficient_weight + ck;
+    coefficient_weight = coefficient_weight + ck2;
   }
   weights_array.push([coefficients_list[coefficients_list.length - 1], 1]);
   const random_weight = Math.random();
@@ -89,7 +88,6 @@ measurePButton.addEventListener("click", () => {
     const coefficient_number = coefficients_list[i];
     if(coefficient_number !== chosen_number) {
       gvs.coefficients[coefficient_number].ck = 0;
-      console.log(i);
       document.getElementById(`ck-${coefficient_number}-input`).value = "0";
     }
   }
