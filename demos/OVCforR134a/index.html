@@ -1,165 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Ordinary Vapor Compression (OVC) Cycle for Refrigerant R-134a</title>
-        <script src="./libraries/p5.js"></script>
-        <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
-        <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
-        <meta name="author" content="Patrick Doyle">
-        <meta name="application-name" content="LearnChemE simulation template">
-        <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
 
-        <link href="./sliders.css" rel="stylesheet">
-        <link href="./style.css" rel="stylesheet">
-        <link href="./bootstrap.min.css" rel="stylesheet">
-        <script>
-          MathJax = {
-            chtml: {
-              scale: 0.95,
-              mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
-              displayAlign: 'left', // default for indentalign when set to 'auto'
-            }
-          };
-        </script>
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-        <script src="./jquery.js"></script>
-        <script src="./popper.js"></script>
-        <script src="./bootstrap.min.js"></script>
-    </head>
-    <body>
-        <div id="simulation-wrapper">
-            <div class="inputs-wrapper">
-                <div id="modal-buttons">
-                    <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
-                    <div id="detail" class="btn btn-primary" class="modal-dialog modal-xl" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
-                    <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>   
-                </div>
-                <div class="btn-group btn-group-sm" id="diagram-type">
-                    <input type="radio" class="btn-check" name="btnradio1" id="diagram" autocomplete="off" value="diagram" checked>
-                    <label class="btn btn-outline-primary" id="PElabel" for="diagram" style="margin-right: 0px; margin-left: 20px;">Diagrams</label>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ordinary Vapor Compression (OVC) Cycle for Refrigerant R-134a</title>
+  <script src="./libraries/p5.js"></script>
+  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+  <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
+  <meta name="author" content="Patrick Doyle">
+  <meta name="application-name" content="LearnChemE simulation template">
+  <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
 
-                    <input type="radio" class="btn-check" name="btnradio1" id="cycle" autocomplete="off" value="cycle">
-                    <label class="btn btn-outline-primary" for="cycle" style="margin-right: 20px;">Cycle</label>
-                </div>
-                <div class="btn-group btn-group-sm" id="axes">
-                    <input type="radio" class="btn-check" name="btnradio2" id="pressure-enthalpy" autocomplete="off" value="pressure-enthalpy" checked>
-                    <label class="btn btn-outline-primary" for="pressure-enthalpy" style="margin-right:0px;">Pressure-enthalpy</label>
+  <link href="./sliders.css" rel="stylesheet">
+  <link href="./style.css" rel="stylesheet">
+  <link href="./bootstrap.min.css" rel="stylesheet">
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.95,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="./jquery.js"></script>
+  <script src="./popper.js"></script>
+  <script src="./bootstrap.min.js"></script>
+</head>
 
-                    <input type="radio" class="btn-check" name="btnradio2" id="temperature-entropy" autocomplete="off" value="temperature-entropy">
-                    <label class="btn btn-outline-primary" for="temperature-entropy">Temperature-entropy</label>
-                </div>
-            </div>
-            <div class="inputs-wrapper" style="grid-template-columns: max-content max-content max-content; transform: translateX(45px);">
-                <span style="transform: translateX(-50px); margin-top: 10px;" id="pressure"><b>pressures (MPa):</b></span>
-                <div class="input-row" id="condenser">
-                    <div class="input-label" style="color:rgb(150, 0, 200)">condenser</div>
-                    <input type="range" id="condenser-slider" min="0.6" max="1" step="0.1" value="1"/>
-                    <div id="condenser-value" class="value-label">1</div>
-                </div>
-                <div class="input-row" id="evaporator">
-                    <div class="input-label" style="color:rgb(200, 100, 0)">evaporator</div>
-                    <input type="range" id="evaporator-slider" min="0.15" max="0.45" step="0.05" value="0.15"/>
-                    <div id="evaporator-value" class="value-label">0.15</div>
-                </div>
-            </div>
-        </div>
+<body>
+  <div id="simulation-wrapper">
+    <div class="inputs-wrapper">
+      <div id="modal-buttons">
+        <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
+        <div id="detail" class="btn btn-primary" class="modal-dialog modal-xl" data-bs-toggle="modal"
+          data-bs-target="#detailsModal">Details</div>
+        <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
+      </div>
+      <div class="btn-group btn-group-sm" id="diagram-type">
+        <input type="radio" class="btn-check" name="btnradio1" id="diagram" autocomplete="off" value="diagram" checked>
+        <label class="btn btn-outline-primary" id="PElabel" for="diagram"
+          style="margin-right: 0px; margin-left: 20px;">Diagrams</label>
 
-        <div id="graphics-wrapper">
+        <input type="radio" class="btn-check" name="btnradio1" id="cycle" autocomplete="off" value="cycle">
+        <label class="btn btn-outline-primary" for="cycle" style="margin-right: 20px;">Cycle</label>
+      </div>
+      <div class="btn-group btn-group-sm" id="axes">
+        <input type="radio" class="btn-check" name="btnradio2" id="pressure-enthalpy" autocomplete="off"
+          value="pressure-enthalpy" checked>
+        <label class="btn btn-outline-primary" for="pressure-enthalpy"
+          style="margin-right:0px;">Pressure-enthalpy</label>
 
-        </div>
-        <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
-                  <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        Pressure-enthalpy (\(P-H\)) and temperature-entropy (\(T-S\)) diagrams for refrigerant R-134a are used to demonstrate an ordinary vapor compression (OVC) cycle. The condenser pressure (high pressure) and evaporator pressure (low pressure) can be varied with the sliders. The coefficient of performance (COP), which is the heat transferred to the evaporator \(Q_c\) divided by the compressor work \(W\), is calculated. Selecting "cycle" shows the components of the cycle, and moving the mouse over the circled numbers displays the phases present at those points.
-                    </p>
-                    
-                </div>
-              </div>
-            </div>
-        </div>
+        <input type="radio" class="btn-check" name="btnradio2" id="temperature-entropy" autocomplete="off"
+          value="temperature-entropy">
+        <label class="btn btn-outline-primary" for="temperature-entropy">Temperature-entropy</label>
+      </div>
+    </div>
+    <div class="inputs-wrapper"
+      style="grid-template-columns: max-content max-content max-content; transform: translateX(45px);">
+      <span style="transform: translateX(-50px); margin-top: 10px;" id="pressure"><b>pressures (MPa):</b></span>
+      <div class="input-row" id="condenser">
+        <div class="input-label" style="color:rgb(150, 0, 200)">condenser</div>
+        <input type="range" id="condenser-slider" min="0.6" max="1" step="0.1" value="1" />
+        <div id="condenser-value" class="value-label">1</div>
+      </div>
+      <div class="input-row" id="evaporator">
+        <div class="input-label" style="color:rgb(200, 100, 0)">evaporator</div>
+        <input type="range" id="evaporator-slider" min="0.15" max="0.45" step="0.05" value="0.15" />
+        <div id="evaporator-value" class="value-label">0.15</div>
+      </div>
+    </div>
+  </div>
 
-        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
+  <div id="graphics-wrapper">
+
+  </div>
+  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
         <div class="modal-header">
-        <h5 class="modal-title" id="detailsModalLabel">Details</h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-        </button>
+          <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Pressure-enthalpy (\(P-H\)) and temperature-entropy (\(T-S\)) diagrams for refrigerant R-134a are used to
+            demonstrate an ordinary vapor compression (OVC) cycle. The condenser pressure (high pressure) and evaporator
+            pressure (low pressure) can be varied with the sliders. The coefficient of performance (COP), which is the
+            heat transferred to the evaporator \(Q_c\) divided by the compressor work \(W\), is calculated. Selecting
+            "cycle" shows the components of the cycle, and moving the mouse over the circled numbers displays the phases
+            present at those points.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
 
         <div class="modal-body">
-        <div class="modal-text">
+          <div class="modal-text">
             The coefficient of performance COP is calculated from the enthalpies \(H_i\) of the streams:
-        </div>
-        <div class="modal-equation">
+          </div>
+          <div class="modal-equation">
             $$
             \text{COP} = \frac{H_2 - H_1}{H_3 - H_2}.
             $$
-        </div>
-        <div class="modal-text">
+          </div>
+          <div class="modal-text">
             1,1,1,2-Tetrafluoroethane or R-134a is the hydrofluorocarbon (HFC) refrigerant used in this simulation.
-        </div>
-        <div class="modal-text">
-        
-        </div>
-        </div>
-        </div>
-        </div>
+          </div>
+          <div class="modal-text">
 
-        <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
         <div class="modal-header">
-        <h5 class="modal-title" id="aboutModalLabel">About</h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+          <h5 class="modal-title" id="aboutModalLabel">About</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
         <div class="modal-body">
-        <p>
-          This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
-            Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
-            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under the direction of Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional contributions by Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of our
-          simulations are open source, and are available on our <a
-            href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
-            repository</a>.</p>
-        <p style="line-height: 3rem;">
-          If this simulation is too big for your screen, zoom out using&nbsp;<span><img
-              src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
-              src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
-          or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
-              style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
-              style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
-              src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
-              src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac
-          or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
-              style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
-              style="height: 4ch;"></span>&nbsp;on Windows.
-        </p>
+          <p>
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under the
+            direction of Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional
+            contributions by Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of our
+            simulations are open source, and are available on our <a
+              href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+              repository</a>.</p>
+          <p style="line-height: 3rem;">
+            If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows.
+          </p>
         </div>
-        </div>
-        </div>
-        </div>
+      </div>
+    </div>
+  </div>
 
 
 
-        <script src="index.js"></script>
-        <script src="functions.js"></script>
-        <script src="data.js"></script>
-    </body>
+  <script src="index.js"></script>
+  <script src="functions.js"></script>
+  <script src="data.js"></script>
+</body>
+
 </html>
