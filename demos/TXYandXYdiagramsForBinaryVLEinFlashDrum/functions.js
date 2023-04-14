@@ -92,7 +92,7 @@ function singleGraph(){
         }
         push();
         textSize(20); noStroke();
-        text('mole fraction  methanol',width/2-80,g.by+50);
+        text('mole fraction methanol',width/2-80,g.by+50);
         translate(50,height/2+58);
         rotate(radians(-90));
         text('temperature (°C)',0,0);
@@ -368,9 +368,9 @@ function mathSolve(){
         textSize(18); fill(0);
         text('slope = ',tempx+20,tempy-20);
         textStyle(ITALIC);
-        text(' -L / V = ',tempx+80,tempy-20);
+        text(' -L / V = -',tempx+80,tempy-20);
         textStyle(NORMAL); 
-        text(g.ratio,tempx+147,tempy-20);
+        text(g.ratio,tempx+158,tempy-20);
         pop();
         push();
         noStroke(); fill(250);
