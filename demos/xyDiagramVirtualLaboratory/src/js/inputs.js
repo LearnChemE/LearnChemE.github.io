@@ -11,11 +11,11 @@ const inputA12CI = document.getElementById("submit-A12-CI");
 const inputA21 = document.getElementById("submit-A21");
 const inputA21CI = document.getElementById("submit-A21-CI");
 const inputNames = document.getElementById("submit-name");
-const testTube = document.getElementById("path1218-9");
-const testTubeRim = document.getElementById("path1244");
-const pouringLiquid = document.getElementById("rect1216");
-const liquidInTestTube = document.getElementById("path1218");
+const testTube = document.getElementById("path844");
+const pouringLiquid = document.getElementById("test-tube-pour");
+const liquidInTestTube = document.getElementById("test-tube-liquid");
 const VLE_apparatus_svg = document.getElementById("VLE_apparatus_svg");
+const temperature_svg = document.getElementById("tspan850");
 
 collectSampleButton.addEventListener("mousedown", () => {
   collectSampleButton.classList.add("pressed");
@@ -65,9 +65,9 @@ downloadButton.addEventListener("mouseup", () => {
 volumeASlider.addEventListener("input", () => {
   const sliderValue = Number(volumeASlider.value);
   gvs.volume_A = sliderValue;
-  volumeAValue.innerHTML = `${sliderValue.toFixed(1)}`;
+  volumeAValue.innerHTML = `${sliderValue.toFixed(0)}`;
   const mol_A = gvs.volume_A * gvs.molar_density_A;
-  const mol_B = (10 - gvs.volume_A) * gvs.molar_density_B;
+  const mol_B = (100 - gvs.volume_A) * gvs.molar_density_B;
   gvs.xA_flask = mol_A / (mol_A + mol_B);
   const xB = 1 - gvs.xA_flask;
   const P = 760; // atmospheric pressure, mmHg
@@ -83,7 +83,17 @@ volumeASlider.addEventListener("input", () => {
           delta = diff;
       }
   }
+  const volume_A_remaining = Math.round((gvs.volume_A_remaining - gvs.volume_A) * 100) / 100;
+  const volume_B_remaining = Math.round((gvs.volume_B_remaining - (100 - gvs.volume_A)) * 100) / 100;
+  if(volume_A_remaining < 0 || volume_B_remaining < 0) {
+    gvs.not_enough_liquid = true;
+    collectSampleButton.setAttribute("disabled", "yes");
+  } else {
+    collectSampleButton.removeAttribute("disabled");
+    gvs.not_enough_liquid = false;
+  }
   gvs.temperature_flask = Math.round(T_sat * 10) / 10;
+  temperature_svg.innerHTML = `${gvs.temperature_flask.toFixed(1)}°C`;
   gvs.p.redraw();
 });
 
@@ -91,8 +101,8 @@ function collectSample() {
   gvs.yA_sample = NaN;
   gvs.p.redraw();
   collectSampleButton.setAttribute("disabled", "yes");
-  const volume_A_remaining = Math.round((gvs.volume_A_remaining - gvs.volume_A) * 10) / 10;
-  const volume_B_remaining = Math.round((gvs.volume_B_remaining - (10 - gvs.volume_A)) * 10) / 10;
+  const volume_A_remaining = Math.round((gvs.volume_A_remaining - gvs.volume_A) * 100) / 100;
+  const volume_B_remaining = Math.round((gvs.volume_B_remaining - (100 - gvs.volume_A)) * 100) / 100;
   if(volume_A_remaining < 0 || volume_B_remaining < 0) {
     gvs.not_enough_liquid = true;
   } else {
@@ -107,15 +117,14 @@ function collectSample() {
       gvs.yA_sample = 1;
     }
     testTube.style.opacity = "1";
-    testTubeRim.style.opacity = "1";
     pouringLiquid.style.opacity = "1";
     liquidInTestTube.style.opacity = "1";
     let i = 0;
     const fillTestTubeInterval = setInterval(() => {
       if(i < 1) {
-        const v = 25 * i;
-        const m = 188 - v;
-        const d = `m 110.2,${m.toFixed(2)} v ${v.toFixed(2)} c 0.50,1.45 2.2,1.3 2.2,1.3 0,0 1.375,0.15 2.2,-1.3 v -${v.toFixed(2)}`;
+        const v = 5 * i;
+        const m = 169 - v;
+        const d = `m 142,${m} h 4.6 v ${0.25 + v} c 0,2.3 -2.3,2.3 -2.3,2.3 0,0 -2.3,0 -2.3,-2.3 z`;
         liquidInTestTube.setAttribute("d", d);
         i += 0.005;
       } else {
@@ -126,7 +135,6 @@ function collectSample() {
         }, 1000);
         setTimeout(() => {
           testTube.style.opacity = "0";
-          testTubeRim.style.opacity = "0";
           liquidInTestTube.style.opacity = "0";
           collectSampleButton.removeAttribute("disabled");
         }, 3000);

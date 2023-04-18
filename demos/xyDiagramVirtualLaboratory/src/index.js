@@ -8,7 +8,7 @@ window.p5 = new require("./js/p5.min.js");
 
 window.gvs = {
     yA : function(xA) {return 1},
-    volume_A : 5,
+    volume_A : 50,
     MW_A : undefined,
     MW_B : undefined,
     density_A : undefined,
@@ -16,8 +16,8 @@ window.gvs = {
     molar_density_A : undefined,
     molar_density_B : undefined,
     xA_flask : undefined,
-    volume_A_remaining : 100,
-    volume_B_remaining : 100,
+    volume_A_remaining : 1000,
+    volume_B_remaining : 1000,
     yA_sample : NaN,
     temperature_flask : undefined,
     not_enough_liquid : false,
@@ -46,7 +46,7 @@ const sketch = (p) => {
 
         gvs.drawAll = require("./js/draw.js");
         require("./js/inputs.js");
-        
+        document.getElementById("tspan850").innerHTML = `${gvs.temperature_flask.toFixed(1)}°C`;
         p.windowResized = function() {
 
         }

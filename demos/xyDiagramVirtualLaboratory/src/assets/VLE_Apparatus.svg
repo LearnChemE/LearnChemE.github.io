@@ -22,9 +22,9 @@
      showgrid="false"
      inkscape:current-layer="layer1"
      inkscape:document-units="mm"
-     inkscape:cy="281.71992"
-     inkscape:cx="45.986976"
-     inkscape:zoom="1.4646891"
+     inkscape:cy="230.78097"
+     inkscape:cx="356.13599"
+     inkscape:zoom="2.8910439"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -95,34 +95,24 @@
        id="path837"
        d="m 129.23715,143.20594 1.65556,-6.10488 5.69099,8.58822 1.65556,-6.72571 z"
        style="fill:#ffffff;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-    <path
-       sodipodi:nodetypes="ccccccc"
-       id="path841"
-       d="m 141.91101,164.90289 v 12.39007 c 0,0 0.0633,1.80643 3.12884,1.80643 1.91599,0.12773 2.02118,-2.02118 2.02118,-2.02118 v -22.39393 l -5.27775,-0.12773 z"
-       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-    <path
-       sodipodi:nodetypes="cccccc"
-       id="path843"
-       d="m 141.78328,171.28953 5.26736,0.1129 v 5.3796 c 0.3387,2.09996 -2.01079,2.31736 -2.01079,2.31736 0,0 -3.15142,-0.0593 -3.12884,-2.31736 z"
-       style="opacity:0.3;fill:#0000ff;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <ellipse
-       cx="65.301826"
+       cx="65.210312"
        cy="79.030571"
-       rx="8.5804615"
+       rx="12.241191"
        ry="7.2256517"
        id="path848"
        style="fill:#ffffff;stroke:#000000;stroke-width:0.232292" />
     <text
        id="text852"
-       y="80.8162"
-       x="58.808403"
+       y="80.999237"
+       x="56.520447"
        style="font-style:normal;font-weight:normal;font-size:5.30853px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
        xml:space="preserve"><tspan
-         y="80.8162"
-         x="58.808403"
+         y="80.999237"
+         x="56.520447"
          style="stroke-width:0.264583"
          id="tspan850"
-         sodipodi:role="line">77°C</tspan></text>
+         sodipodi:role="line">77.0°C</tspan></text>
     <rect
        y="140.28864"
        x="116.41486"
@@ -130,5 +120,22 @@
        width="3.7617629"
        id="rect857"
        style="fill:#ffffff;stroke-width:0.132292" />
+    <path
+       sodipodi:nodetypes="cccccc"
+       id="test-tube-liquid"
+       d="m 142,168.5 h 4.6 v 0.25 c 0,2.3 -2.3,2.3 -2.3,2.3 0,0 -2.3,0 -2.3,-2.3 z"
+       style="fill:#bebeff;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 142,154 h 4.6 v 14.75 c 0,2.3 -2.3,2.3 -2.3,2.3 0,0 -2.3,0 -2.3,-2.3 z"
+       id="path844"
+       sodipodi:nodetypes="cccccc" />
+    <rect
+       style="fill:#bebeff;stroke-width:0.132292"
+       id="test-tube-pour"
+       width="1.5200167"
+       height="26.717386"
+       x="143.46072"
+       y="142.89655" />
   </g>
 </svg>

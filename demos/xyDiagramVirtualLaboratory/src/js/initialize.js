@@ -52,9 +52,14 @@ while(gvs.yA(0.05) > 0.5 || gvs.yA(0.05) < 0.05) {
       gvs.component_B_antoine_parameters = component_1_antoine_parameters;
   }
   
-  gvs.A12 = Number((Math.random() * 2.00).toFixed(2));
-  gvs.A21 = Number((Math.random() * 2.00).toFixed(2));
+  gvs.A12 = Math.round((0.3 + Number((Math.random() * 1.70).toFixed(2))) * 100) / 100;
+  gvs.A21 = Math.round((0.3 + Number((Math.random() * 1.70).toFixed(2))) * 100) / 100;
   
+  const negative = Math.random() >= 0.25 ? 1 : -1;
+
+  gvs.A12 *= negative;
+  gvs.A21 *= negative;
+
   gvs.gamma_A = function(xA) {
       const xB = 1 - xA;
       const ln_gamma_A = xB**2 * (gvs.A12 + 2 * (gvs.A21 - gvs.A12) * xA);
@@ -123,7 +128,7 @@ gvs.density_B = Number((0.5 + Math.random() * 0.75).toFixed(2));
 gvs.molar_density_A = Number((gvs.density_A / gvs.MW_A).toPrecision(3));
 gvs.molar_density_B = Number((gvs.density_B / gvs.MW_B).toPrecision(3));
 const mol_A = gvs.volume_A * gvs.molar_density_A;
-const mol_B = (10 - gvs.volume_A) * gvs.molar_density_B;
+const mol_B = (100 - gvs.volume_A) * gvs.molar_density_B;
 gvs.xA_flask = mol_A / (mol_A + mol_B);
 
 const isFirstTime = localStorage.getItem("first_time");

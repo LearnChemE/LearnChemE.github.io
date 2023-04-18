@@ -22,12 +22,12 @@ function drawInfo(p) {
   p.text(`${Math.round(gvs.component_B_antoine_parameters[1])}`, 165, 197.5);
   p.text(`${gvs.component_B_antoine_parameters[2].toFixed(1)}`, 165, 230);
   p.textAlign(p.LEFT);
-  p.text(`volume of component A remaining:           mL`, 0, 275);
-  p.text(`volume of component B remaining:           mL`, 0, 300);
+  p.text(`volume of component A remaining:            mL`, 0, 275);
+  p.text(`volume of component B remaining:            mL`, 0, 300);
   p.fill(0, 0, 255);
   p.textAlign(p.CENTER);
-  p.text(`${gvs.volume_A_remaining.toFixed(1)}`, 238, 275);
-  p.text(`${gvs.volume_B_remaining.toFixed(1)}`, 238, 300);
+  p.text(`${gvs.volume_A_remaining.toFixed(0)}`, 240, 275);
+  p.text(`${gvs.volume_B_remaining.toFixed(0)}`, 240, 300);
   p.textAlign(p.LEFT);
   p.fill(0);
   p.textSize(18);
@@ -52,16 +52,15 @@ function drawInfo(p) {
   p.fill(0);
   p.noStroke();
   p.textSize(18);
+  p.fill(255, 100, 100);
+  if(!Number.isNaN(gvs.yA_sample)) {
+    p.text(`${(Math.round(gvs.yA_sample * 1000) / 1000).toFixed(3)}`, 103, 386);
+  }
+  p.fill(0);
   if(gvs.not_enough_liquid) {
     p.textSize(16);
     p.fill(255, 0, 0);
     p.text(`not enough liquid remaining to perform this test!`, -20, 440);
-  } else {
-    p.fill(255, 100, 100);
-    if(!Number.isNaN(gvs.yA_sample)) {
-      p.text(`${(Math.round(gvs.yA_sample * 1000) / 1000).toFixed(3)}`, 103, 386);
-    }
-    p.fill(0);
   }
   p.pop();
 
@@ -70,20 +69,19 @@ function drawInfo(p) {
   p.fill(250);
   p.stroke(0);
   p.strokeWeight(1);
-  p.rect(-85, 5, 170, 90);
+  p.rect(-85, 5, 170, 70);
   p.textSize(14);
   p.fill(0);
   p.noStroke();
   p.textAlign(p.CENTER);
   p.text(`boiling flask conditions`, 0, -5);
   p.text(`760 mmHg`, 0, 25);
-  p.text(`${gvs.temperature_flask.toFixed(1)}° C`, 0, 45);
-  p.text(`mL component A`, 13, 65);
-  p.text(`mL component B`, 13, 85);
+  p.text(`mL component A`, 13, 45);
+  p.text(`mL component B`, 13, 65);
   p.textAlign(p.RIGHT);
   p.fill(0, 0, 255);
-  p.text(`${gvs.volume_A.toFixed(1)}`, -45, 65);
-  p.text(`${(Math.round((10 - gvs.volume_A) * 10) / 10).toFixed(1)}`, -45, 85);
+  p.text(`${gvs.volume_A.toFixed(0)}`, -45, 45);
+  p.text(`${(Math.round((100 - gvs.volume_A) * 100) / 100).toFixed(0)}`, -45, 65);
   p.pop();
 }
 

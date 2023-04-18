@@ -39,7 +39,7 @@ $modal-xl: 1140px;
     justify-items: center;
     .input-row {
         display: grid;
-        grid-template-columns: 280px 15rem 27px 50px;
+        grid-template-columns: 280px 15rem 23px 45px;
         gap: 1ch;
         align-items: end;
         background: rgb(250, 250, 250);
@@ -273,4 +273,16 @@ input[type=number] {
     margin-top: 10px;
     margin-left: 20px;
     font-size: 12px;
+}
+
+#path844 {
+    opacity: 0;
+}
+
+#test-tube-liquid {
+    opacity: 0;
+}
+
+#test-tube-pour {
+    opacity: 0;
 }
