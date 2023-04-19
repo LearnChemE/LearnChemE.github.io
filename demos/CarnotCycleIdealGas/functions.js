@@ -25,6 +25,7 @@ function PV_diagram(){
 
     let yMax;
     let xMax;
+    let V_right;
     
 
     // g.by-10 == 0.0 kPa
@@ -38,22 +39,22 @@ function PV_diagram(){
         // Red segments 1 and 3
         push(); noFill(); strokeWeight(2); stroke(g.red); beginShape();
         for(let i = 0; i < seg1.length; i++){
-            vertex(map(seg1[i][0],0,xMax,g.lx+10,g.rx-10),map(seg1[i][1],0,yMax,g.by-10,g.ty+10));
+            vertex(map(seg1[i][0],0,V_right,g.lx+10,g.rx-10),map(seg1[i][1],0,yMax,g.by-10,g.ty+10));
             if(i == Math.round(seg1.length/3) || i == 2*Math.round(seg1.length/3)){
-                let x1 = map(seg1[i][0],0,xMax,g.lx+10,g.rx-10);
+                let x1 = map(seg1[i][0],0,V_right,g.lx+10,g.rx-10);
                 let y1 = map(seg1[i][1],0,yMax,g.by-10,g.ty+10);
-                let x2 = map(seg1[i+1][0],0,xMax,g.lx+10,g.rx-10);
+                let x2 = map(seg1[i+1][0],0,V_right,g.lx+10,g.rx-10);
                 let y2 = map(seg1[i+1][1],0,yMax,g.by-10,g.ty+10);
                 arrow([x2,y2],[x1,y1],g.red,12,4);
             }
         }
         endShape(); beginShape();
         for(let i = 0; i < seg3.length; i++){
-            vertex(map(seg3[i][0],0,xMax,g.lx+10,g.rx-10),map(seg3[i][1],0,yMax,g.by-10,g.ty+10));
+            vertex(map(seg3[i][0],0,V_right,g.lx+10,g.rx-10),map(seg3[i][1],0,yMax,g.by-10,g.ty+10));
             if(i == Math.round(seg3.length/3) || i == 2*Math.round(seg3.length/3)){
-                let x1 = map(seg3[i+1][0],0,xMax,g.lx+10,g.rx-10);
+                let x1 = map(seg3[i+1][0],0,V_right,g.lx+10,g.rx-10);
                 let y1 = map(seg3[i+1][1],0,yMax,g.by-10,g.ty+10);
-                let x2 = map(seg3[i][0],0,xMax,g.lx+10,g.rx-10);
+                let x2 = map(seg3[i][0],0,V_right,g.lx+10,g.rx-10);
                 let y2 = map(seg3[i][1],0,yMax,g.by-10,g.ty+10);
                 arrow([x2,y2],[x1,y1],g.red,12,4);
             }
@@ -63,22 +64,22 @@ function PV_diagram(){
         // Blue segments 2 and 4
         push(); noFill(); strokeWeight(2); stroke(g.blue); beginShape();
         for(let i = 0; i < seg2.length; i++){
-            vertex(map(seg2[i][0],0,xMax,g.lx+10,g.rx-10),map(seg2[i][1],0,yMax,g.by-10,g.ty+10));
+            vertex(map(seg2[i][0],0,V_right,g.lx+10,g.rx-10),map(seg2[i][1],0,yMax,g.by-10,g.ty+10));
             if(i == Math.round(seg2.length/3) || i == 2*Math.round(seg2.length/3)){
-                let x1 = map(seg2[i+1][0],0,xMax,g.lx+10,g.rx-10);
+                let x1 = map(seg2[i+1][0],0,V_right,g.lx+10,g.rx-10);
                 let y1 = map(seg2[i+1][1],0,yMax,g.by-10,g.ty+10);
-                let x2 = map(seg2[i][0],0,xMax,g.lx+10,g.rx-10);
+                let x2 = map(seg2[i][0],0,V_right,g.lx+10,g.rx-10);
                 let y2 = map(seg2[i][1],0,yMax,g.by-10,g.ty+10);
                 arrow([x2,y2],[x1,y1],g.blue,12,4);
             }
         }
         endShape(); beginShape();
         for(let i = 0; i < seg4.length; i++){
-            vertex(map(seg4[i][0],0,xMax,g.lx+10,g.rx-10),map(seg4[i][1],0,yMax,g.by-10,g.ty+10));
+            vertex(map(seg4[i][0],0,V_right,g.lx+10,g.rx-10),map(seg4[i][1],0,yMax,g.by-10,g.ty+10));
             if(i == Math.round(seg4.length/3) || i == 2*Math.round(seg4.length/3)){
-                let x1 = map(seg4[i][0],0,xMax,g.lx+10,g.rx-10);
+                let x1 = map(seg4[i][0],0,V_right,g.lx+10,g.rx-10);
                 let y1 = map(seg4[i][1],0,yMax,g.by-10,g.ty+10);
-                let x2 = map(seg4[i+1][0],0,xMax,g.lx+10,g.rx-10);
+                let x2 = map(seg4[i+1][0],0,V_right,g.lx+10,g.rx-10);
                 let y2 = map(seg4[i+1][1],0,yMax,g.by-10,g.ty+10);
                 arrow([x2,y2],[x1,y1],g.blue,12,4);
             }
@@ -136,9 +137,10 @@ function PV_diagram(){
         xMax = seg3[seg3.length-1][0];
         if(xMax < 15){
             xLabels = ['0','2','4','6','8','10','12','14'];
-            let xTemp = Math.round(seg3[seg3.length-1][0]);
-            count = Math.round(xTemp/.5);
+            let xTemp = seg3[seg3.length-1][0];
+            count = Math.round(xTemp/.5+1);
             ticks = 4;
+            V_right = (xLabels[1]-xLabels[0])/ticks*(count);
             for(let i = 0; i < count+1; i++){
                 if(i%ticks == 0){
                     line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-6);
@@ -154,35 +156,84 @@ function PV_diagram(){
             }
         } else if (xMax < 39){
             xLabels = ['0','5','10','15','20','25','30','35','40'];
-            let xTemp = Math.round(seg3[seg3.length-1][0]);
-            count = xTemp/1;
+            let xTemp = seg3[seg3.length-1][0];
             ticks = 4;
-            console.log(xMax)
+            count = Math.round(xTemp/((xLabels[1]-xLabels[0])/ticks)+1);
+            V_right = (xLabels[1]-xLabels[0])/ticks*(count);
             for(let i = 0; i < count+1; i++){
                 if(i%ticks == 0){
                     line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-6);
                     line(lx+(rx-lx)/count*i,g.ty,lx+(rx-lx)/count*i,g.ty+6);
                     push();
                     textSize(15); noStroke();
-                    text(xLabels[i/ticks],lx+(rx-lx)/count*i-4,g.by+14);
+                    text(xLabels[i/ticks],lx+(rx-lx)/count*i-8,g.by+14);
                     pop();
                 } else {
                     line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-3);
                     line(lx+(rx-lx)/count*i,g.ty,lx+(rx-lx)/count*i,g.ty+3);
                 }
             }
-        } else if (xMax < 76){
+        } else if (xMax < 80){
             xLabels = [0,10,20,30,40,50,60,70,80,90,100];
-            let xTemp = Math.round(seg3[seg3.length-1][0]);
-            count = xTemp/2;
+            let xTemp = seg3[seg3.length-1][0];
+            count = Math.round(xTemp/2.5+1);
             ticks = 4;
+            V_right = (xLabels[1]-xLabels[0])/ticks*(count);
             for(let i = 0; i < count+1; i++){
                 if(i%ticks == 0){
                     line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-6);
                     line(lx+(rx-lx)/count*i,g.ty,lx+(rx-lx)/count*i,g.ty+6);
                     push();
                     textSize(15); noStroke();
-                    text(xLabels[i/ticks],lx+(rx-lx)/count*i-4,g.by+14);
+                    text(xLabels[i/ticks],lx+(rx-lx)/count*i-8,g.by+14);
+                    pop();
+                } else {
+                    line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-3);
+                    line(lx+(rx-lx)/count*i,g.ty,lx+(rx-lx)/count*i,g.ty+3);
+                }
+            }
+        } else if (xMax < 150){
+            xLabels = [0,20,40,60,80,100,120,140];
+            ticks = 4;
+            let xTemp = seg3[seg3.length-1][0];
+            count = Math.round(xTemp/5 + 1);
+            V_right = (xLabels[1]-xLabels[0])/ticks*count;
+            console.log(xMax);
+            for(let i = 0; i < count+1; i++){
+                if(i%ticks == 0){
+                    line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-6);
+                    line(lx+(rx-lx)/count*i,g.ty,lx+(rx-lx)/count*i,g.ty+6);
+                    push();
+                    textSize(15); noStroke();
+                    if(xLabels[i/ticks] < 100){
+                        text(xLabels[i/ticks],lx+(rx-lx)/count*i-8,g.by+14);
+                    } else {
+                        text(xLabels[i/ticks],lx+(rx-lx)/count*i-12,g.by+14);
+                    }
+                    pop();
+                } else {
+                    line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-3);
+                    line(lx+(rx-lx)/count*i,g.ty,lx+(rx-lx)/count*i,g.ty+3);
+                }
+            }
+        } else if (xMax < 350){
+            xLabels = [0,50,100,150,200,250,300,350];
+            ticks = 5;
+            let xTemp = seg3[seg3.length-1][0];
+            count = Math.round(xTemp/10);
+            V_right = (xLabels[1]-xLabels[0])/ticks*count;
+            console.log(xMax);
+            for(let i = 0; i < count+1; i++){
+                if(i%ticks == 0){
+                    line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-6);
+                    line(lx+(rx-lx)/count*i,g.ty,lx+(rx-lx)/count*i,g.ty+6);
+                    push();
+                    textSize(15); noStroke();
+                    if(xLabels[i/ticks] < 100){
+                        text(xLabels[i/ticks],lx+(rx-lx)/count*i-8,g.by+14);
+                    } else {
+                        text(xLabels[i/ticks],lx+(rx-lx)/count*i-12,g.by+14);
+                    }
                     pop();
                 } else {
                     line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-3);

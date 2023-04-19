@@ -3,10 +3,10 @@ window.g = {
     cnv: undefined,
 
     Tc: 250,
-    Th: 350,
+    Th: 480,
     V1: 2,
     V2: 6,
-    ratio: 1.66,
+    ratio: 1.2,
     diagram: "P-V",
     engine: "heat-engine",
 
