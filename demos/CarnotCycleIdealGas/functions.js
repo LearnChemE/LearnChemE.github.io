@@ -1,17 +1,59 @@
 
 // Draws overall graph shape and determines bounds on the axes
 function graphDraw(){
-    
+    g.eta = 1 - g.Tc/g.Th;
+    g.COP = 1/(1-g.Tc/g.Th);
+    //╖ η
+   
+    // Graph title
+    push();
+    noStroke(); textSize(21);
+    if(g.engine == 'heat-engine'){
+        text('heat engine',180,40);
+    } else {
+        text('heat pump',185,40);
+    }
+    pop();
+
+    // Legend
+    push();
+    translate(-120,24)
+    strokeWeight(3); stroke(g.red);
+    line(g.rx+30,g.by,g.rx+45,g.by);
+    stroke(g.blue);
+    line(g.rx+30,g.by+16,g.rx+45,g.by+16);
+    noStroke(); textSize(15);
+    text('isothermal',g.rx+50,g.by+4);
+    text('adiabatic',g.rx+50,g.by+20);
+    pop();
+
+    push();
+    fill(250); strokeWeight(4);
+    ellipse(535,height/2,60);
+    pop();
 }
 
 // Figure on the right when in heat engine mode
 function HE_figure(){
+    push();
+    noStroke(); textSize(20); textStyle(ITALIC);
+    text('η = ',500,50);
+    text('W',545,38);
+    text('Q',540,64);
+    textStyle(NORMAL);
+    text('= '+g.eta.toFixed(2),583,50);
+    textSize(16);
+    text('H',557,69);
 
+    pop();
+    line(534,44,578,44);
+    line(542,20,542,41);
+    line(570,20,570,41);
 }
 
 // Figure on the right when in heat pump mode
 function HP_figure(){
-
+    
 }
 
 // Fills the graph when diagram is on PV mode
@@ -45,7 +87,12 @@ function PV_diagram(){
                 let y1 = map(seg1[i][1],0,yMax,g.by-10,g.ty+10);
                 let x2 = map(seg1[i+1][0],0,V_right,g.lx+10,g.rx-10);
                 let y2 = map(seg1[i+1][1],0,yMax,g.by-10,g.ty+10);
-                arrow([x2,y2],[x1,y1],g.red,12,4);
+                if(g.engine == "heat-engine"){
+                    arrow([x1,y1],[x2,y2],g.red,12,4);
+                } else {
+                    arrow([x2,y2],[x1,y1],g.red,12,4);
+                }
+                
             }
         }
         endShape(); beginShape();
@@ -56,7 +103,11 @@ function PV_diagram(){
                 let y1 = map(seg3[i+1][1],0,yMax,g.by-10,g.ty+10);
                 let x2 = map(seg3[i][0],0,V_right,g.lx+10,g.rx-10);
                 let y2 = map(seg3[i][1],0,yMax,g.by-10,g.ty+10);
-                arrow([x2,y2],[x1,y1],g.red,12,4);
+                if(g.engine == "heat-engine"){
+                    arrow([x1,y1],[x2,y2],g.red,12,4);
+                } else {
+                    arrow([x2,y2],[x1,y1],g.red,12,4);
+                }
             }
         }
         endShape(); pop();
@@ -70,7 +121,11 @@ function PV_diagram(){
                 let y1 = map(seg2[i+1][1],0,yMax,g.by-10,g.ty+10);
                 let x2 = map(seg2[i][0],0,V_right,g.lx+10,g.rx-10);
                 let y2 = map(seg2[i][1],0,yMax,g.by-10,g.ty+10);
-                arrow([x2,y2],[x1,y1],g.blue,12,4);
+                if(g.engine == "heat-engine"){
+                    arrow([x1,y1],[x2,y2],g.blue,12,4);
+                } else {
+                    arrow([x2,y2],[x1,y1],g.blue,12,4);
+                }
             }
         }
         endShape(); beginShape();
@@ -81,7 +136,11 @@ function PV_diagram(){
                 let y1 = map(seg4[i][1],0,yMax,g.by-10,g.ty+10);
                 let x2 = map(seg4[i+1][0],0,V_right,g.lx+10,g.rx-10);
                 let y2 = map(seg4[i+1][1],0,yMax,g.by-10,g.ty+10);
-                arrow([x2,y2],[x1,y1],g.blue,12,4);
+                if(g.engine == "heat-engine"){
+                    arrow([x1,y1],[x2,y2],g.blue,12,4);
+                } else {
+                    arrow([x2,y2],[x1,y1],g.blue,12,4);
+                }
             }
         }
         endShape(); pop();
@@ -240,6 +299,53 @@ function PV_diagram(){
                     line(lx+(rx-lx)/count*i,g.ty,lx+(rx-lx)/count*i,g.ty+3);
                 }
             }
+        } else if (xMax < 800){
+            xLabels = [0,100,200,300,400,500,600,700,800];
+            ticks = 5;
+            let xTemp = seg3[seg3.length-1][0];
+            count = Math.round(xTemp/20);
+            V_right = (xLabels[1]-xLabels[0])/ticks*count;
+            console.log(xMax);
+            for(let i = 0; i < count+1; i++){
+                if(i%ticks == 0){
+                    line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-6);
+                    line(lx+(rx-lx)/count*i,g.ty,lx+(rx-lx)/count*i,g.ty+6);
+                    push();
+                    textSize(15); noStroke();
+                    if(xLabels[i/ticks] < 100){
+                        text(xLabels[i/ticks],lx+(rx-lx)/count*i-8,g.by+14);
+                    } else {
+                        text(xLabels[i/ticks],lx+(rx-lx)/count*i-12,g.by+14);
+                    }
+                    pop();
+                } else {
+                    line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-3);
+                    line(lx+(rx-lx)/count*i,g.ty,lx+(rx-lx)/count*i,g.ty+3);
+                }
+            }
+        } else {
+            xLabels = [0,200,400,600,800,1000,1200];
+            ticks = 4;
+            let xTemp = seg3[seg3.length-1][0];
+            count = Math.round(xTemp/50);
+            V_right = (xLabels[1]-xLabels[0])/ticks*count;
+            for(let i = 0; i < count+1; i++){
+                if(i%ticks == 0){
+                    line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-6);
+                    line(lx+(rx-lx)/count*i,g.ty,lx+(rx-lx)/count*i,g.ty+6);
+                    push();
+                    textSize(15); noStroke();
+                    if(xLabels[i/ticks] < 1000){
+                        text(xLabels[i/ticks],lx+(rx-lx)/count*i-12,g.by+14);
+                    } else {
+                        text(xLabels[i/ticks],lx+(rx-lx)/count*i-16,g.by+14);
+                    }
+                    pop();
+                } else {
+                    line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-3);
+                    line(lx+(rx-lx)/count*i,g.ty,lx+(rx-lx)/count*i,g.ty+3);
+                }
+            }
         }
     }
 
@@ -262,6 +368,132 @@ function PV_diagram(){
 // Fills the graph when diagram is on TS mode
 function TS_diagram(){
     push(); fill(250); rect(70,50,350,350); pop();
+    let S1 = s1(g.V1,g.Th,g.ratio);
+    let S2 = s2(g.V2,g.Th,g.ratio);
+    let sLower, sHigher;
+    let tLower, tHigher;
+
+    yAxes();
+    xAxes();
+    function yAxes(){
+        let ylower = Math.round((g.Tc-20)/10)*10;
+        let yupper = Math.round((g.Th+20)/10)*10;
+        if(yupper-ylower < 150){
+            let ticks = 4; let count = (yupper-ylower)/5;
+            let labels = [];
+            for(let i = ylower; i <= yupper; i+=20){
+                labels.push(i);
+            }
+            for(let i = 0; i < count+1; i++){
+                if(i%ticks == 0){
+                    line(g.lx,g.by-(g.by-g.ty)/count*i,g.lx+6,g.by-(g.by-g.ty)/count*i);
+                    line(g.rx,g.by-(g.by-g.ty)/count*i,g.rx-6,g.by-(g.by-g.ty)/count*i);
+                    push();
+                    textSize(15); noStroke();
+                    text(labels[i/ticks],g.lx-30,g.by-(g.by-g.ty)/count*i+4)
+                    pop();
+                } else {
+                    line(g.lx,g.by-(g.by-g.ty)/count*i,g.lx+3,g.by-(g.by-g.ty)/count*i);
+                    line(g.rx,g.by-(g.by-g.ty)/count*i,g.rx-3,g.by-(g.by-g.ty)/count*i);
+                }
+            }
+        } else {
+            let ticks = 5; let count = (yupper-ylower)/10;
+            let labels = [];
+            for(let i = ylower; i <= yupper; i+=50){
+                labels.push(i);
+            }
+            for(let i = 0; i < count+1; i++){
+                if(i%ticks == 0){
+                    line(g.lx,g.by-(g.by-g.ty)/count*i,g.lx+6,g.by-(g.by-g.ty)/count*i);
+                    line(g.rx,g.by-(g.by-g.ty)/count*i,g.rx-6,g.by-(g.by-g.ty)/count*i);
+                    push();
+                    textSize(15); noStroke();
+                    text(labels[i/ticks],g.lx-30,g.by-(g.by-g.ty)/count*i+4)
+                    pop();
+                } else {
+                    line(g.lx,g.by-(g.by-g.ty)/count*i,g.lx+3,g.by-(g.by-g.ty)/count*i);
+                    line(g.rx,g.by-(g.by-g.ty)/count*i,g.rx-3,g.by-(g.by-g.ty)/count*i);
+                }
+            }
+        }
+        tLower = ylower; tHigher = yupper;
+    }
+
+    function xAxes(){
+        //let labels = [100,120,140,160,180,200,220,240,260,280,300,320,340,360];
+        let labels = [100,150,200,250,300,350];
+        let ticks = 5; let count = (350-100)/10;
+        // for(let i = 0; i < count+1; i++){
+        //     if(i%ticks == 0){
+        //         line(g.lx+10+(g.rx-(g.lx+10))/count*i,g.by,g.lx+10+(g.rx-(g.lx+10))/count*i,g.by-6);
+        //         push();
+        //         textSize(15); noStroke();
+        //         text(labels[i/ticks],g.lx+10+(g.rx-(g.lx+10))/count*i-12,g.by+14);
+        //         pop();
+        //     } else {
+        //         line(g.lx+10+(g.rx-(g.lx+10))/count*i,g.by,g.lx+10+(g.rx-(g.lx+10))/count*i,g.by-3);
+        //     }
+        // }
+
+        let temp = Math.round((S1-10)/10)*10;
+        sLower = temp; sHigher = temp+30;
+        labels = [temp,temp+10,temp+20,temp+30];
+        ticks = 5; count = 30/2;
+        for(let i = 0; i < count+1; i++){
+            if(i%ticks == 0){
+                line(g.lx+10+(g.rx-(g.lx+10))/count*i,g.by,g.lx+10+(g.rx-(g.lx+10))/count*i,g.by-6);
+                push();
+                textSize(15); noStroke();
+                text(labels[i/ticks],g.lx+10+(g.rx-(g.lx+10))/count*i-12,g.by+14);
+                pop();
+            } else {
+                line(g.lx+10+(g.rx-(g.lx+10))/count*i,g.by,g.lx+10+(g.rx-(g.lx+10))/count*i,g.by-3);
+            }
+        }
+
+    }
+
+    push();
+    noStroke(); textSize(16);
+    text('entropy (J/mol K)',187,g.by+35);
+    translate(25,height/2+50);
+    rotate(radians(-90));
+    text('temperature (K)',0,0);
+    pop();
+
+    let x1, y1, x2, y2;
+    x1 = map(S1,sLower,sHigher,g.lx+10,g.rx);
+    x2 = map(S2,sLower,sHigher,g.lx+10,g.rx);
+    y1 = map(g.Tc,tLower,tHigher,g.by,g.ty);
+    y2 = map(g.Th,tLower,tHigher,g.by,g.ty);
+
+    let xmid, ymid;
+    xmid = x1 + (x2-x1)/2;
+    ymid = y2 + (y1-y2)/2;
+    if(g.engine == 'heat-engine'){
+        arrow([x2,y1],[xmid-6,y1],g.red,12,4);
+        arrow([x1,y2],[xmid+6,y2],g.red,12,4);
+        arrow([x1,y1],[x1,ymid-6],g.blue,12,4);
+        arrow([x2,y2],[x2,ymid+6],g.blue,12,4);
+    } else {
+        arrow([x1,y1],[xmid+6,y1],g.red,12,4);
+        arrow([x2,y2],[xmid-6,y2],g.red,12,4);
+        arrow([x1,y2],[x1,ymid+6],g.blue,12,4);
+        arrow([x2,y1],[x2,ymid-6],g.blue,12,4);
+    }
+
+    push();
+    strokeWeight(2);
+    stroke(g.red);
+    line(x1,y1,x2,y1);
+    line(x1,y2,x2,y2);
+    stroke(g.blue);
+    line(x1,y1,x1,y2);
+    line(x2,y1,x2,y2);
+    pop();
+
+  
 }
 
 // For creating arrows
@@ -351,4 +583,14 @@ function c4(T1,T2,V1,V2,gamma){
         arr.push([i,val]);
     }
     return(arr);
+}
+
+function s1(V1,T2,gamma){
+    let val = (g.R/(gamma-1))*Math.log(g.R*T2*V1**(gamma-1));
+    return(val);
+}
+
+function s2(V2,T2,gamma){
+    let val = (g.R/(gamma-1))*Math.log(g.R*T2*V2**(gamma-1));
+    return(val);
 }

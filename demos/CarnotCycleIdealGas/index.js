@@ -3,12 +3,14 @@ window.g = {
     cnv: undefined,
 
     Tc: 250,
-    Th: 480,
+    Th: 351,
     V1: 2,
     V2: 6,
-    ratio: 1.2,
+    ratio: 1.66,
     diagram: "P-V",
     engine: "heat-engine",
+    eta: 0,
+    COP: 0,
 
     // Graph edges
     lx: 70,
@@ -45,7 +47,6 @@ function draw(){
     } else {
         TS_diagram();
     }
-    //console.log(Math.round(1.43*10))
 }
 
 // Event listeners and such
