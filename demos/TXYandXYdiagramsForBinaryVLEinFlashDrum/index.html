@@ -1,123 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Flash drum: x-y and T-x-y diagrams</title>
-        <script src="./libraries/p5.js"></script>
-        <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
-        <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
-        <meta name="author" content="Patrick Doyle">
-        <meta name="application-name" content="LearnChemE simulation template">
-        <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
 
-        <link href="./sliders.css" rel="stylesheet">
-        <link href="./style.css" rel="stylesheet">
-        <link href="./bootstrap.min.css" rel="stylesheet">
-        <script>
-          MathJax = {
-            chtml: {
-              scale: 0.95,
-              mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
-              displayAlign: 'left', // default for indentalign when set to 'auto'
-            }
-          };
-        </script>
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-        <script src="./jquery.js"></script>
-        <script src="./popper.js"></script>
-        <script src="./bootstrap.min.js"></script>
-    </head>
-    <body>
-        <div id="simulation-wrapper">
-            <div class="inputs-wrapper">
-            
-                <span style="margin-right:5px; ">diagram:</span>
-                <div class="btn-group btn-group-sm" id="diagram-type">
-                    <input type="radio" class="btn-check" name="btnradio" id="x-y" autocomplete="off" value="x-y" checked>
-                    <label class="btn btn-outline-primary" for="x-y" style="margin-right: 0px;">x-y</label>
-    
-                    <input type="radio" class="btn-check" name="btnradio" id="T-x-y" autocomplete="off" value="T-x-y">
-                    <label class="btn btn-outline-primary" for="T-x-y" style="margin-right:0px;">T-x-y</label>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flash drum: x-y and T-x-y diagrams</title>
+  <script src="./libraries/p5.js"></script>
+  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+  <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
+  <meta name="author" content="Patrick Doyle">
+  <meta name="application-name" content="LearnChemE simulation template">
+  <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
 
-                    <input type="radio" class="btn-check" name="btnradio" id="both" autocomplete="off" value="both">
-                    <label class="btn btn-outline-primary" for="both" style="margin-right:80px;">both</label>
-                </div>
-                <div id="modal-buttons">
-                    <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
-                    <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
-                    <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>   
-                </div>
-                
-            </div>
-            <div class="inputs-wrapper2">
-                <div class="input-row">
-                    <div class="input-label">liquid/vapor ratio</div>
-                    <input type="range" id="ratio-slider" min="0.1" max="10" value="2" step=".1"/>
-                    <div id="ratio-value" class="value-label">2</div>
-                </div>
-                <div class="input-row">
-                    <div class="input-label">feed mole fraction methanol</div>
-                    <input type="range" id="methanol-slider" min="0.3" max="0.7" value="0.5" step=".01"/>
-                    <div id="methanol-value" class="value-label">0.5</div>
-                </div>
-            </div>
-            <div class="inputs-wrapper">
-                
-            </div>
+  <link href="./sliders.css" rel="stylesheet">
+  <link href="./style.css" rel="stylesheet">
+  <link href="./bootstrap.min.css" rel="stylesheet">
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.95,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="./jquery.js"></script>
+  <script src="./popper.js"></script>
+  <script src="./bootstrap.min.js"></script>
+</head>
 
-            
-            
-           
+<body>
+  <div id="simulation-wrapper">
+    <div class="inputs-wrapper">
 
+      <span style="margin-right:5px; ">diagram:</span>
+      <div class="btn-group btn-group-sm" id="diagram-type">
+        <input type="radio" class="btn-check" name="btnradio" id="x-y" autocomplete="off" value="x-y" checked>
+        <label class="btn btn-outline-primary" for="x-y" style="margin-right: 0px;">x-y</label>
+
+        <input type="radio" class="btn-check" name="btnradio" id="T-x-y" autocomplete="off" value="T-x-y">
+        <label class="btn btn-outline-primary" for="T-x-y" style="margin-right:0px;">T-x-y</label>
+
+        <input type="radio" class="btn-check" name="btnradio" id="both" autocomplete="off" value="both">
+        <label class="btn btn-outline-primary" for="both" style="margin-right:80px;">both</label>
+      </div>
+      <div id="modal-buttons">
+        <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
+        <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+        <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
+      </div>
+
+    </div>
+    <div class="inputs-wrapper2">
+      <div class="input-row">
+        <div class="input-label">liquid/vapor ratio</div>
+        <input type="range" id="ratio-slider" min="0.1" max="10" value="2" step=".1" />
+        <div id="ratio-value" class="value-label">2</div>
+      </div>
+      <div class="input-row">
+        <div class="input-label">feed mole fraction methanol</div>
+        <input type="range" id="methanol-slider" min="0.3" max="0.7" value="0.5" step=".01" />
+        <div id="methanol-value" class="value-label">0.5</div>
+      </div>
+    </div>
+    <div class="inputs-wrapper">
+
+    </div>
+
+
+
+
+
+  </div>
+  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
-            <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+        <div class="modal-body">
+          <p>
+            The \(x-y\) diagram (vapor mole fraction versus liquid mole fraction) for vapor-liquid equilibrium (VLE) is
+            shown for a methanol/water mixture being fed to a flash drum. The corresponding \(T-x-y\) diagram shows how
+            the points on the \(x-y\) diagram are obtained; each point corresponds to a different temperature. Use
+            buttons to view the \(x-y\) and \(T-x-y\) diagrams separately or to view both simultaneously. Use the
+            "liquid/vapor ratio" slider to select the ratio leaving the flash drum; use the other slider to select the
+            feed composition to the flash separation.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
-            </button>
-            </div>
-            <div class="modal-body">
-            <p>
-                The \(x-y\) diagram (vapor mole fraction versus liquid mole fraction) for vapor-liquid equilibrium (VLE) is shown for a methanol/water mixture being fed to a flash drum. The corresponding \(T-x-y\) diagram shows how the points on the \(x-y\) diagram are obtained; each point corresponds to a different temperature. Use buttons to view the \(x-y\) and \(T-x-y\) diagrams separately or to view both simultaneously. Use the "liquid/vapor ratio" slider to select the ratio leaving the flash drum; use the other slider to select the feed composition to the flash separation.
-            </p>
-            </div>
-            </div>
-            </div>
-            </div>
+          </button>
+        </div>
 
-            <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="detailsModalLabel">Details</h5>
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-            </button>
-            </div>
+        <div class="modal-body">
+          <div class="modal-text">
+            A feed with composition \(z_m\) is flashed (vaporized). On the \(x-y\) diagram, the slope of the purple line
+            is \(-L/V\), where \(L\) and \(V\) are the numbers of moles of liquid and vapor leaving per time,
+            respectively. The intersection of the \(L/V\) line with the black equilibrium curve gives the mole fractions
+            of methanol in the exiting vapor (green) and liquid (blue) streams. Because VLE is assumed, the mole
+            fractions of methanol in these streams correspond to the horizontal line on the \(T-x-y\) diagram. The
+            purple dot on the \(T-x-y\) diagram represents the feed mole fraction of methanol, and the lever rule is
+            used to determine the liquid/vapor molar ratio.
+          </div>
+          <div style="height:20px"></div>
+          <ol class="references">
+            <li>
+              P. C. Wankat, <i>Separation Process Engineering: Includes Mass Transfer Analysis</i>, 3rd ed., Upper
+              Saddle River, NJ: Prentice Hall, 2012.
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
 
-            <div class="modal-body">
-            <div class="modal-text">
-                A feed with composition \(z_m\) is flashed (vaporized). On the \(x-y\) diagram, the slope of the purple line is \(-L/V\), where \(L\) and \(V\) are the numbers of moles of liquid and vapor leaving per time, respectively. The intersection of the \(L/V\) line with the black equilibrium curve gives the mole fractions of methanol in the exiting vapor (green) and liquid (blue) streams. Because VLE is assumed, the mole fractions of methanol in these streams correspond to the horizontal line on the \(T-x-y\) diagram. The purple dot on the \(T-x-y\) diagram represents the feed mole fraction of methanol, and the lever rule is used to determine the liquid/vapor molar ratio.
-            </div>
-            <div style="height:20px"></div>
-            <ol class="references">
-                <li>
-                    P. C. Wankat, <i>Separation Process Engineering: Includes Mass Transfer Analysis</i>, 3rd ed., Upper Saddle River, NJ: Prentice Hall, 2012.
-                </li>
-            </ol>
-            </div>
-            </div>
-            </div>
-            </div>
-
-            <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+  <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -131,7 +146,8 @@
           <p>
             This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
               Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
-              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Adam J. Johnston and Rachael Baumann under the direction
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Adam J. Johnston and Rachael
+            Baumann under the direction
             of
             Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional contributions by
             Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of our
@@ -157,10 +173,11 @@
   </div>
 
 
-        <div id="graphics-wrapper">
+  <div id="graphics-wrapper">
 
-        </div>
-        <script src="index.js"></script>
-        <script src="functions.js"></script>
-    </body>
+  </div>
+  <script src="index.js"></script>
+  <script src="functions.js"></script>
+</body>
+
 </html>

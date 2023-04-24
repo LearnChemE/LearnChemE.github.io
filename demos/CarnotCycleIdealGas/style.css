@@ -20,25 +20,43 @@
   align-items: center;
   width: 100vw;
   height: min-content;
-  margin-bottom: 20px;
 }
 
 /* Display: grid is my favorite way of placing elements. As you can tell, I use it a lot. See this website for a brief synopsis: https://grid.malven.co . Gap is the space between grid elements. */
 .inputs-wrapper {
   display: grid;
-  grid-template-columns: max-content max-content max-content 220px;
-  justify-content: center;
-  gap: 15px 10px;
-  margin-bottom: 10px;
-  transform: translateX(15px);
+  grid-template-columns: max-content max-content max-content max-content;
+  justify-items: center;
+  align-items: center;
+  gap: 15px 5px;
+  margin-top: 10px;
+}
+
+.inputs-wrapper2 {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-items: center;
+  align-items: center;
+  gap: 15px 5px;
+  margin-top:-15px;
+}
+
+.inputs-wrapper3 {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-items: center;
+  align-items: center;
+  gap: 15px 5px;
+  margin-top: -15px;
 }
 
 .input-row {
   display: grid;
-  grid-template-columns: max-content 100px 15px max-content; 
+  grid-template-columns: max-content 180px 25px max-content; /* 250 px was formerly 150 px, Dr. F asked me to make it much longer*/
   gap: 10px;
   align-items: end;
   justify-items: center;
+  margin-top: 10px;
 }
 
 .select-row {
@@ -52,24 +70,14 @@
   display: grid;
 }
 
-#point-type {
-  height: min-content;
-  grid-column: 1 / 3;
-}
-
-#plot-points-options {
-  height: min-content;
-  grid-column: 1 / 3;
-  width: 300px;
-  transform: translateX(-30px);
-}
-
 select {
   padding: 2px 5px;
 }
 
 #graphics-wrapper {
+  position: absolute;
   width: 100vw;
+  top: 185px;
   height: max-content;
   display: grid;
   justify-content: center;
@@ -87,11 +95,9 @@ label {
 
 #modal-buttons {
   display: grid;
-  grid-template-columns: 60px 60px 60px; /* These were all previously 1fr. I changed them to hopefully get the on the same line as the feed,solvent,raffinate button or the slider once we can make them appear/disappear */
+  grid-template-columns: 95px 70px 70px; /* These were all previously 1fr. I changed them to hopefully get the on the same line as the feed,solvent,raffinate button or the slider once we can make them appear/disappear */
   gap: 5px;
   grid-column: 3;
-  justify-self: end;
-  transform: translateX(-30px);
 }
 
 .modal-body .modal-equation {
@@ -108,12 +114,11 @@ label {
   padding: 0px;
 }
 
-.simulation-controls {
+.input-area {
   display: grid;
-  grid-template-columns: 100px 100px 100px;
-  justify-content: center;
-  gap: 0px 10px;
-  width: 100vw;
-  margin-bottom: 5px;
-  margin-top: 15px;
+  grid-template-columns: max-content;
+  margin: 20px auto;
+  gap: 10px;
+  width: max-content;
+  justify-items: center;
 }
