@@ -55,6 +55,8 @@
 
   <div id="p5-container"></div>
 
+  <div id="reset-exercise-button" data-bs-toggle="modal" data-bs-target="#reset-modal">reset laboratory</div>
+
   <div id="submit-inputs-container">
     <input type="number" id="submit-A12" placeholder="enter value for A12 here" style="display: none;"/>
     <input type="number" id="submit-A12-CI" placeholder="enter 95% CI for A12 here" style="display: none;"/>
@@ -66,6 +68,24 @@
   <div id="submit-button" style="display: none;" disabled="yes">view results</div>
   <div id="back-button" style="display: none;">go back to lab</div>
   <div id="reset-button" style="display: none;">reset exercise</div>
+
+  <div class="modal fade" id="reset-modal" tabindex="-1" role="dialog" aria-labelledby="reset-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="reset-modal-label">Reset virtual laboratory</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="modal-body warning">
+          <div class="warning-text">Warning: resetting the virtual laboratory will erase all of your measurement data PERMANENTLY and assign new Margules constants, molecular weights of components A and B, densities of components A and B, and all Antoine constants. You will also receive 1000 mL of components A and B. Click the button below to reset the virtual laboratory. Otherwise, exit this window to continue your laboratory.</div>
+          <div id="reset-permanently">reset laboratory</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
     aria-hidden="true">

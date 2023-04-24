@@ -16,6 +16,9 @@ const pouringLiquid = document.getElementById("test-tube-pour");
 const liquidInTestTube = document.getElementById("test-tube-liquid");
 const VLE_apparatus_svg = document.getElementById("VLE_apparatus_svg");
 const temperature_svg = document.getElementById("tspan850");
+const resetExerciseButton = document.getElementById("reset-exercise-button");
+const p5_container = document.getElementById("p5-container");
+const resetPermanently = document.getElementById("reset-permanently");
 
 collectSampleButton.addEventListener("mousedown", () => {
   collectSampleButton.classList.add("pressed");
@@ -62,6 +65,21 @@ downloadButton.addEventListener("mouseup", () => {
   downloadButton.classList.remove("pressed");
 });
 
+resetExerciseButton.addEventListener("mousedown", () => {
+  resetExerciseButton.classList.add("pressed");
+});
+
+resetExerciseButton.addEventListener("mouseup", () => {
+  resetExerciseButton.classList.remove("pressed");
+});
+
+resetPermanently.addEventListener("click", () => {
+  localStorage.clear();
+  location.reload();
+})
+
+p5_container.appendChild(resetExerciseButton);
+
 volumeASlider.addEventListener("input", () => {
   const sliderValue = Number(volumeASlider.value);
   gvs.volume_A = sliderValue;
@@ -85,6 +103,7 @@ volumeASlider.addEventListener("input", () => {
   }
   const volume_A_remaining = Math.round((gvs.volume_A_remaining - gvs.volume_A) * 100) / 100;
   const volume_B_remaining = Math.round((gvs.volume_B_remaining - (100 - gvs.volume_A)) * 100) / 100;
+
   if(volume_A_remaining < 0 || volume_B_remaining < 0) {
     gvs.not_enough_liquid = true;
     collectSampleButton.setAttribute("disabled", "yes");
@@ -103,6 +122,8 @@ function collectSample() {
   collectSampleButton.setAttribute("disabled", "yes");
   const volume_A_remaining = Math.round((gvs.volume_A_remaining - gvs.volume_A) * 100) / 100;
   const volume_B_remaining = Math.round((gvs.volume_B_remaining - (100 - gvs.volume_A)) * 100) / 100;
+  localStorage.setItem("volume_A_remaining", `${volume_A_remaining}`);
+  localStorage.setItem("volume_B_remaining", `${volume_B_remaining}`);
   if(volume_A_remaining < 0 || volume_B_remaining < 0) {
     gvs.not_enough_liquid = true;
   } else {
@@ -126,7 +147,7 @@ function collectSample() {
         const m = 169 - v;
         const d = `m 142,${m} h 4.6 v ${0.25 + v} c 0,2.3 -2.3,2.3 -2.3,2.3 0,0 -2.3,0 -2.3,-2.3 z`;
         liquidInTestTube.setAttribute("d", d);
-        i += 0.005;
+        i += 0.01;
       } else {
         clearInterval(fillTestTubeInterval);
         pouringLiquid.style.opacity = "0";
@@ -137,7 +158,7 @@ function collectSample() {
           testTube.style.opacity = "0";
           liquidInTestTube.style.opacity = "0";
           collectSampleButton.removeAttribute("disabled");
-        }, 3000);
+        }, 2000);
       }
     }, 20);
   }
@@ -146,7 +167,9 @@ function collectSample() {
     (Math.round((10 - gvs.volume_A) * 10) / 10).toFixed(1),
     (Math.round(gvs.yA_sample * 1000) / 1000).toFixed(3),
     (Math.round(gvs.temperature_flask * 10) / 10).toFixed(1)
-  ])
+  ]);
+
+  localStorage.setItem("measurements", JSON.stringify(gvs.measurements));
 }
 
 inputA12.addEventListener("input", () => {
@@ -216,6 +239,7 @@ inputNames.addEventListener("input", () => {
 });
 
 resetButton.addEventListener("click", () => {
+  localStorage.clear();
   location.reload();
 });
 
