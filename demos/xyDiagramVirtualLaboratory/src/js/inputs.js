@@ -164,7 +164,7 @@ function collectSample() {
   }
   gvs.measurements.push([
     gvs.volume_A.toFixed(1),
-    (Math.round((10 - gvs.volume_A) * 10) / 10).toFixed(1),
+    (Math.round((100 - gvs.volume_A) * 100) / 100).toFixed(0),
     (Math.round(gvs.yA_sample * 1000) / 1000).toFixed(3),
     (Math.round(gvs.temperature_flask * 10) / 10).toFixed(1)
   ]);
