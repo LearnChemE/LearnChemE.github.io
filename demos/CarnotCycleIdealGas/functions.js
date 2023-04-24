@@ -26,34 +26,174 @@ function graphDraw(){
     text('isothermal',g.rx+50,g.by+4);
     text('adiabatic',g.rx+50,g.by+20);
     pop();
+}
+
+// Figure on the right when in heat engine mode
+function HE_figure(){
+    
+    let S1 = s1(g.V1,g.Th,g.ratio);
+    let S2 = s2(g.V2,g.Th,g.ratio);
+    let Q1 = (-1*g.Tc*(S2-S1)/1000).toFixed(2);
+    let Q2 = (g.Th*(S2-S1)/1000).toFixed(2);
+    let W = (g.eta*Q2).toFixed(2);
+
+    efficiency(); // Top equation and label
+    function efficiency(){
+        push();
+        noStroke(); textSize(20); textStyle(ITALIC);
+        text('η = ',500,50);
+        text('W',545,38);
+        text('Q',540,64);
+        textStyle(NORMAL);
+        text('= '+g.eta.toFixed(2),583,50);
+        textSize(16);
+        text('H',557,69);
+        pop();
+
+        line(534,44,578,44);
+        line(542,20,542,41);
+        line(570,20,570,41);
+    }
+    
+    push();
+    translate(-30,0);
+    TH(); // TH box and label
+    function TH(){
+        push();
+        stroke(g.red); strokeWeight(3);
+        line(535,height/2-80,535,height/2-35);
+        arrow([535,height/2-80],[535,height/2-29],g.red,20,5);
+        rect(480,height/2-115,110,35);
+        noStroke(); fill(g.red); textSize(18);
+        text('T  = '+g.Th+' K',495,height/2-90);
+        textSize(16);
+        text('Q   = '+Q2+' kJ/mol',550,height/2-55);
+        textSize(15);
+        text('H',504,height/2-86);
+        textSize(14);
+        text('H',563,height/2-51);
+        pop();
+    }
+    
+
+    TC(); // TC box and label
+    function TC(){
+        push();
+        stroke(0,200,0); strokeWeight(3);
+        line(535,height/2+30,535,height/2+75);
+        arrow([535,height/2-80],[535,height/2+80],[0,200,0],20,5);
+        rect(480,height/2+80,110,35);
+        noStroke(); fill([0,200,0]); textSize(18);
+        text('T  = '+g.Tc+' K',495,height/2+105);
+        text('Q   = '+Q1+' kJ/mol',550,height/2+65);
+        textSize(15);
+        text('C',504,height/2+109);
+        textSize(14);
+        text('C',565,height/2+69)
+        pop();
+    }
+
+    work(); // Work arrow and label
+    function work(){
+        push();
+        strokeWeight(3);
+        line(565,height/2,585,height/2);
+        arrow([565,height/2],[605,height/2],0,20,5);
+        noStroke(); fill(0); textSize(18);
+        text('W = -'+W+' kJ/mol',570,height/2-12);
+        pop();
+    }
+    
 
     push();
     fill(250); strokeWeight(4);
     ellipse(535,height/2,60);
     pop();
-}
-
-// Figure on the right when in heat engine mode
-function HE_figure(){
-    push();
-    noStroke(); textSize(20); textStyle(ITALIC);
-    text('η = ',500,50);
-    text('W',545,38);
-    text('Q',540,64);
-    textStyle(NORMAL);
-    text('= '+g.eta.toFixed(2),583,50);
-    textSize(16);
-    text('H',557,69);
-
     pop();
-    line(534,44,578,44);
-    line(542,20,542,41);
-    line(570,20,570,41);
 }
 
 // Figure on the right when in heat pump mode
 function HP_figure(){
+    let S1 = s1(g.V1,g.Th,g.ratio);
+    let S2 = s2(g.V2,g.Th,g.ratio);
+    let Q1 = (-1*g.Tc*(S2-S1)/1000).toFixed(2);
+    let Q2 = (g.Th*(S2-S1)/1000).toFixed(2);
+    let W = (g.eta*Q2).toFixed(2);
+
+    efficiency(); // Top equation and label
+    function efficiency(){
+        push();
+        noStroke(); textSize(20); 
+        text('COP = ',468,50);
+        textStyle(ITALIC);
+        text('W',545,64);
+        text('Q',540,38);
+        textStyle(NORMAL);
+        text('= '+(-1*Q1/W).toFixed(2),583,50);
+        textSize(16);
+        text('C',557,42);
+        pop();
+
+        line(534,44,578,44);
+        line(542,46,542,67);
+        line(570,46,570,67);
+    }
     
+    push();
+    translate(-30,0);
+    TH(); // TH box and label
+    function TH(){
+        push();
+        stroke(g.red); strokeWeight(3);
+        line(535,height/2-80,535,height/2-35);
+        arrow([535,height/2-80],[535,height/2-29],g.red,20,5);
+        rect(480,height/2-115,110,35);
+        noStroke(); fill(g.red); textSize(18);
+        text('T  = '+g.Th+' K',495,height/2-90);
+        textSize(16);
+        text('Q   = '+-1*Q2+' kJ/mol',550,height/2-55);
+        textSize(15);
+        text('H',504,height/2-86);
+        textSize(14);
+        text('H',563,height/2-51);
+        pop();
+    }
+    
+
+    TC(); // TC box and label
+    function TC(){
+        push();
+        stroke(0,200,0); strokeWeight(3);
+        line(535,height/2+30,535,height/2+75);
+        arrow([535,height/2-80],[535,height/2+80],[0,200,0],20,5);
+        rect(480,height/2+80,110,35);
+        noStroke(); fill([0,200,0]); textSize(18);
+        text('T  = '+g.Tc+' K',495,height/2+105);
+        text('Q   = '+-1*Q1+' kJ/mol',550,height/2+65);
+        textSize(15);
+        text('C',504,height/2+109);
+        textSize(14);
+        text('C',565,height/2+69)
+        pop();
+    }
+
+    work(); // Work arrow and label
+    function work(){
+        push();
+        strokeWeight(3);
+        line(565,height/2,585,height/2);
+        arrow([565,height/2],[605,height/2],0,20,5);
+        noStroke(); fill(0); textSize(18);
+        text('W = '+W+' kJ/mol',570,height/2-12);
+        pop();
+    }
+    
+
+    push();
+    fill(250); strokeWeight(4);
+    ellipse(535,height/2,60);
+    pop();
+    pop();
 }
 
 // Fills the graph when diagram is on PV mode
@@ -257,7 +397,7 @@ function PV_diagram(){
             let xTemp = seg3[seg3.length-1][0];
             count = Math.round(xTemp/5 + 1);
             V_right = (xLabels[1]-xLabels[0])/ticks*count;
-            console.log(xMax);
+            
             for(let i = 0; i < count+1; i++){
                 if(i%ticks == 0){
                     line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-6);
@@ -281,7 +421,7 @@ function PV_diagram(){
             let xTemp = seg3[seg3.length-1][0];
             count = Math.round(xTemp/10);
             V_right = (xLabels[1]-xLabels[0])/ticks*count;
-            console.log(xMax);
+            
             for(let i = 0; i < count+1; i++){
                 if(i%ticks == 0){
                     line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-6);
@@ -305,7 +445,6 @@ function PV_diagram(){
             let xTemp = seg3[seg3.length-1][0];
             count = Math.round(xTemp/20);
             V_right = (xLabels[1]-xLabels[0])/ticks*count;
-            console.log(xMax);
             for(let i = 0; i < count+1; i++){
                 if(i%ticks == 0){
                     line(lx+(rx-lx)/count*i,g.by,lx+(rx-lx)/count*i,g.by-6);
@@ -421,21 +560,8 @@ function TS_diagram(){
     }
 
     function xAxes(){
-        //let labels = [100,120,140,160,180,200,220,240,260,280,300,320,340,360];
         let labels = [100,150,200,250,300,350];
         let ticks = 5; let count = (350-100)/10;
-        // for(let i = 0; i < count+1; i++){
-        //     if(i%ticks == 0){
-        //         line(g.lx+10+(g.rx-(g.lx+10))/count*i,g.by,g.lx+10+(g.rx-(g.lx+10))/count*i,g.by-6);
-        //         push();
-        //         textSize(15); noStroke();
-        //         text(labels[i/ticks],g.lx+10+(g.rx-(g.lx+10))/count*i-12,g.by+14);
-        //         pop();
-        //     } else {
-        //         line(g.lx+10+(g.rx-(g.lx+10))/count*i,g.by,g.lx+10+(g.rx-(g.lx+10))/count*i,g.by-3);
-        //     }
-        // }
-
         let temp = Math.round((S1-10)/10)*10;
         sLower = temp; sHigher = temp+30;
         labels = [temp,temp+10,temp+20,temp+30];
@@ -456,7 +582,7 @@ function TS_diagram(){
 
     push();
     noStroke(); textSize(16);
-    text('entropy (J/mol K)',187,g.by+35);
+    text('entropy (kJ/mol K)',180,g.by+35);
     translate(25,height/2+50);
     rotate(radians(-90));
     text('temperature (K)',0,0);

@@ -1,101 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Carnot Cycle for Ideal Gas</title>
 
-        <script src="./libraries/p5.js"></script>
-        <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
-        <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
-        <meta name="author" content="Patrick Doyle">
-        <meta name="application-name" content="LearnChemE simulation template">
-        <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carnot Cycle for Ideal Gas</title>
 
-        <link href="./sliders.css" rel="stylesheet">
-        <link href="./style.css" rel="stylesheet">
-        <link href="./bootstrap.min.css" rel="stylesheet">
-        <script>
-            MathJax = {
-                chtml: {
-                    scale: 0.95,
-                    mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
-                    displayAlign: 'left', // default for indentalign when set to 'auto'
-                }
-            };
-        </script>
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-        <script src="./jquery.js"></script>
-        <script src="./popper.js"></script>
-        <script src="./bootstrap.min.js"></script>
-    </head>
-    <body>
-        <div id="simulation-wrapper">
-            <div class="inputs-wrapper2">
-                <div class="input-area">
-                    <div class="input-row" style="margin-bottom:-10px">
-                        <div class="input-label">cold reservoir T<sub>C</sub> (K)</div>
-                        <input type="range" id="cold-temp-slider" min="250" max="350" value="250" step="1"/>
-                        <div id="cold-temp-label" class="value-label">250</div>
-                    </div>
-                    <div class="input-row">
-                        <div class="input-label">hot reservoir T<sub>H</sub> (K)</div>
-                        <input type="range" id="hot-temp-slider" min="351" max="650" value="351" step="1"/>
-                        <div id="hot-temp-label" class="value-label">351</div>
-                    </div>
+    <script src="./libraries/p5.js"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+    <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
+    <meta name="author" content="Patrick Doyle">
+    <meta name="application-name" content="LearnChemE simulation template">
+    <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
+
+    <link href="./sliders.css" rel="stylesheet">
+    <link href="./style.css" rel="stylesheet">
+    <link href="./bootstrap.min.css" rel="stylesheet">
+    <script>
+        MathJax = {
+            chtml: {
+                scale: 0.95,
+                mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+                displayAlign: 'left', // default for indentalign when set to 'auto'
+            }
+        };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="./jquery.js"></script>
+    <script src="./popper.js"></script>
+    <script src="./bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div id="simulation-wrapper">
+        <div class="inputs-wrapper2">
+            <div class="input-area">
+                <div class="input-row" style="margin-bottom:-10px">
+                    <div class="input-label">cold reservoir T<sub>C</sub> (K)</div>
+                    <input type="range" id="cold-temp-slider" min="250" max="350" value="250" step="1" />
+                    <div id="cold-temp-label" class="value-label">250</div>
                 </div>
-                <div id="modal-buttons" style="margin-top:10px;">
-                    <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
-                    <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
-                    <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>   
+                <div class="input-row">
+                    <div class="input-label">hot reservoir T<sub>H</sub> (K)</div>
+                    <input type="range" id="hot-temp-slider" min="351" max="650" value="351" step="1" />
+                    <div id="hot-temp-label" class="value-label">351</div>
                 </div>
             </div>
-            <div class="inputs-wrapper3" style="margin-top:-45px">
-                <div class="input-area" style="margin-right:30px;">
-                    <div class="input-row" style="margin-bottom:-10px">
-                        <div class="input-label">volume V<sub>1</sub> (m<sup>3</sup>/mol)</div>
-                        <input type="range" id="vol1-slider" min="2" max="5" value="2" step=".1"/>
-                        <div id="vol1-label" class="value-label">2</div>
-                    </div>
-                    <div class="input-row">
-                        <div class="input-label">volume V<sub>2</sub> (m<sup>3</sup>/mol)</div>
-                        <input type="range" id="vol2-slider" min="5.1" max="10" value="6" step=".1"/>
-                        <div id="vol2-label" class="value-label">6</div>
-                    </div>
+            <div id="modal-buttons" style="margin-top:10px;">
+                <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">
+                    Directions</div>
+                <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details
                 </div>
-                <div class="btn-group btn-group-sm" id="engine-type" style="margin-top:10px;">
-                    <input type="radio" class="btn-check" name="btnradio2" id="heat-engine" autocomplete="off" value="heat-engine" checked>
-                    <label class="btn btn-outline-primary" for="heat-engine" style="margin-right:0px;">heat engine</label>
-
-                    <input type="radio" class="btn-check" name="btnradio2" id="heat-pump" autocomplete="off" value="heat-pump">
-                    <label class="btn btn-outline-primary" for="heat-pump" style="margin-right:20px;">heat pump</label>
-                </div>
-                
+                <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
             </div>
-            <div class="inputs-wrapper" style="margin-top:-25px">
-                <div class="input-row" style="margin-right: 25px;">
-                    <div class="input-label">heat capacity ratio (C<sub>p</sub>/C<sub>v</sub>)</div>
-                    <input type="range" id="ratio-slider" min="1.2" max="1.66" value="1.66" step=".01"/>
-                    <div id="ratio-label" class="value-label">1.66</div>
-                </div>
-                <span style="margin-right:5px; margin-top:10px;">diagram:</span>
-                <div class="btn-group btn-group-sm" id="diagram-type" style="margin-top:10px;">
-                    <input type="radio" class="btn-check" name="btnradio" id="P-V" autocomplete="off" value="P-V" checked>
-                    <label class="btn btn-outline-primary" for="P-V" style="margin-right:0px;"><i>P-V</i></label>
-
-                    <input type="radio" class="btn-check" name="btnradio" id="T-S" autocomplete="off" value="T-S">
-                    <label class="btn btn-outline-primary" for="T-S" style="margin-right:20px;"><i>T-S</i></label>
-                </div>
-            </div>
-            
-           
         </div>
-        <div id="graphics-wrapper">
+        <div class="inputs-wrapper3" style="margin-top:-45px">
+            <div class="input-area" style="margin-right:30px;">
+                <div class="input-row" style="margin-bottom:-10px">
+                    <div class="input-label">volume V<sub>1</sub> (m<sup>3</sup>/mol)</div>
+                    <input type="range" id="vol1-slider" min="2" max="5" value="2" step=".1" />
+                    <div id="vol1-label" class="value-label">2</div>
+                </div>
+                <div class="input-row">
+                    <div class="input-label">volume V<sub>2</sub> (m<sup>3</sup>/mol)</div>
+                    <input type="range" id="vol2-slider" min="5.1" max="10" value="6" step=".1" />
+                    <div id="vol2-label" class="value-label">6</div>
+                </div>
+            </div>
+            <div class="btn-group btn-group-sm" id="engine-type" style="margin-top:10px;">
+                <input type="radio" class="btn-check" name="btnradio2" id="heat-engine" autocomplete="off"
+                    value="heat-engine" checked>
+                <label class="btn btn-outline-primary" for="heat-engine" style="margin-right:0px;">heat engine</label>
+
+                <input type="radio" class="btn-check" name="btnradio2" id="heat-pump" autocomplete="off"
+                    value="heat-pump">
+                <label class="btn btn-outline-primary" for="heat-pump" style="margin-right:20px;">heat pump</label>
+            </div>
 
         </div>
-        <script src="index.js"></script>
-        <script src="functions.js"></script>
-    </body>
+        <div class="inputs-wrapper" style="margin-top:-25px">
+            <div class="input-row" style="margin-right: 25px;">
+                <div class="input-label">heat capacity ratio (C<sub>p</sub>/C<sub>v</sub>)</div>
+                <input type="range" id="ratio-slider" min="1.2" max="1.66" value="1.66" step=".01" />
+                <div id="ratio-label" class="value-label">1.66</div>
+            </div>
+            <span style="margin-right:5px; margin-top:10px;">diagram:</span>
+            <div class="btn-group btn-group-sm" id="diagram-type" style="margin-top:10px;">
+                <input type="radio" class="btn-check" name="btnradio" id="P-V" autocomplete="off" value="P-V" checked>
+                <label class="btn btn-outline-primary" for="P-V" style="margin-right:0px;"><i>P-V</i></label>
+
+                <input type="radio" class="btn-check" name="btnradio" id="T-S" autocomplete="off" value="T-S">
+                <label class="btn btn-outline-primary" for="T-S" style="margin-right:20px;"><i>T-S</i></label>
+            </div>
+        </div>
+
+
+    </div>
+    <div id="graphics-wrapper">
+
+    </div>
+    <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        The Carnot cycle for an ideal gas is shown on a pressure-volume diagram or on a
+                        temperature-entropy diagram, chosen with the buttons. The cycle consists of two reversible isothermal steps and two
+                        reversible adiabatic steps. The temperatures of the hot and cold reservoirs (T<sub>H</sub> and
+                        T<sub>C</sub>, respectively) are set with sliders. The largest volume (V<sub>2</sub>) and the
+                        smallest volume (V<sub>1</sub>) are set with sliders, as is the heat capacity ratio
+                        (C<sub>p</sub>/C<sub>v</sub>) for the ideal gas. Use the buttons to switch the cycle between heat engine and heat pump configurations. The diagram on the right shows the values for
+                        heat transfer per mol; the signs of these values are for the cycle as the system.
+                    </p>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="modal-text">
+                        The efficiency \(\eta\) for a Carnot cycle heat engine is:
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        \eta = \frac{|W|}{Q_H} = 1 - \frac{T_C}{T_H},
+                        $$
+                    </div>
+                    <div class="modal-text">
+                        where \(W\) is the work per mol, which is negative, \(Q_H\) is the head added per mol to the cycle (positive), \(Q_C\) is the heat removed per mol from the cycle (negative), \(T_C\) is the temperature (K) of the cold reservoir and \(T_H\) is the temperature (K) of the hot reservoir.
+                    </div>
+                    <div class="modal-text">
+                        The entropy change for the cycle is zero
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        \delta S = \frac{Q_H}{T_H} + \frac{Q_C}{T_C},
+                        $$
+                    </div>
+                    <div class="modal-text">
+                        so the efficiency can also be written as
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        \eta = 1 - \frac{Q_C}{Q_H}.
+                        $$
+                    </div>
+                    <div class="modal-text">
+                        The area enclosed by curves on either the P-V or T-S diagram equals the negative of the work per cycle.
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutModalLabel">About</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This simulation was created in the <a href="https://www.colorado.edu/chbe"
+                            target="_blank">Department of
+                            Chemical and Biological Engineering</a> at University of Colorado Boulder for <a
+                            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Patrick Doyle. It is
+                        based on a
+                        Mathematica simulation on the Wolfram Demonstration Project website prepared by S. M. Blinder
+                        (<a href="https://demonstrations.wolfram.com/CarnotCycleOnIdealGas/" target="_blank">Carnot
+                            Cycle on Ideal Gas</a>).
+                        Address any questions or comments to learncheme@gmail.com. All of our
+                        simulations are open source, and are available on our <a
+                            href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+                            repository</a>.</p>
+                    <p style="line-height: 3rem;">
+                        If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                                src="https://learncheme.github.io/media/command.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on
+                        Mac
+                        or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on
+                        Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on
+                        Mac
+                        or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on
+                        Windows.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="index.js"></script>
+    <script src="functions.js"></script>
+</body>
+
 </html>
