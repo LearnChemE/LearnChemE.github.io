@@ -27,7 +27,7 @@
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.4.7",
     "popper.js": "^1.16.1",
-    "postcss-loader": "^6.2.1",
+    "postcss-loader": "^7.2.4",
     "sass": "^1.48.0",
     "sass-loader": "^12.4.0",
     "style-loader": "^3.3.1",
