@@ -8,7 +8,7 @@ window.g = {
     V2: 6,
     ratio: 1.66,
     diagram: "P-V",
-    engine: "heat-pump",
+    engine: "heat-engine",
     eta: 0,
     COP: 0,
 
