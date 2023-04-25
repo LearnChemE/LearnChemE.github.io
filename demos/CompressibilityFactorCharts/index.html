@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="en"></html>
+<html lang="en">
+
+</html>
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -36,11 +39,14 @@
     <div id="simulation-wrapper">
         <div class="inputs-wrapper">
             <div class="btn-group btn-group-sm" style="margin-top:10px" id="element">
-                <input type="radio" class="btn-check" name="btnradio" id="n-hexane" autocomplete="off" value="n-hexane" checked>
+                <input type="radio" class="btn-check" name="btnradio" id="n-hexane" autocomplete="off" value="n-hexane"
+                    checked>
                 <label class="btn btn-outline-primary" for="n-hexane" style="margin-right:0px"><i>n</i>-hexane</label>
 
-                <input type="radio" class="btn-check" name="btnradio" id="carbon-dioxide" autocomplete="off" value="carbon-dioxide">
-                <label class="btn btn-outline-primary" for="carbon-dioxide" style="margin-right:0px">carbon dioxide</label>
+                <input type="radio" class="btn-check" name="btnradio" id="carbon-dioxide" autocomplete="off"
+                    value="carbon-dioxide">
+                <label class="btn btn-outline-primary" for="carbon-dioxide" style="margin-right:0px">carbon
+                    dioxide</label>
 
                 <input type="radio" class="btn-check" name="btnradio" id="ethane" autocomplete="off" value="ethane">
                 <label class="btn btn-outline-primary" for="ethane" style="margin-right:0px">ethane</label>
@@ -52,8 +58,10 @@
                 <label class="btn btn-outline-primary" for="hydrogen" style="margin-right:40px">hydrogen</label>
             </div>
             <div id="modal-buttons" style="margin-top:10px;">
-                <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
-                <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+                <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">
+                    Directions</div>
+                <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details
+                </div>
                 <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
             </div>
         </div>
@@ -74,7 +82,14 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        
+                        The compressibility factor chart plots the compressibility factor \(Z\), equal to
+                        \(\frac{PV}{RT}\), where \(V\) is the volume per mole, versus the reduced pressure \(P_r\) for
+                        several values of the reduced temperature \(T_r\). The reduced pressure and temperature are
+                        defined by \(P_t = P/P_c\) and \(T_r = T/T_c\), respectively where \(P_c\) is the critical
+                        pressure and \(T_c\) is the critical temperature. Use buttons to select one of five molecules,
+                        and move the black dot to display the compressibility factor curve (blue) for any value \(T_r\)
+                        between 1.0 and 1.8. The \(Z\) and \(P_r\) values for the location of the black dot are
+                        displayed on the chart. For an ideal gas, \(Z\) = 1 (green line).
                     </p>
 
 
@@ -96,8 +111,102 @@
                 </div>
 
                 <div class="modal-body">
-                   
+                    <div class="modal-text">
+                        The Soave modification of the Redlich-Kwong (SRK) equation of state is used to calculate the
+                        compressibility factor:
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        P = \frac{RT}{V-b} - \frac{a \alpha}{V(V+b)}.
+                        $$
+                    </div>
+                    <div class="modal-text">
+                        This equation can be written in terms of the reduced temperature \(T_r = T/T_c\):
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        P = \frac{RT_rT_c}{V-b} - \frac{a \alpha}{V(V-b)},
+                        $$
+                    </div>
+                    <div class="modal-text">
+                        where \(P\) is pressure (bar), \(R\) is the ideal gas constant (cm<sup>3</sup>bar/mol K), \(T\)
+                        is temperature (K), \(T_c\) is the critical temperature (K), \(V\) is volume
+                        (cm<sup>3</sup>/mol), and \(a\), \(b\), and \(\alpha\) are constants:
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        a = 0.427\frac{R^2T_c^2}{P_c}\alpha,
+                        $$
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        b = 0.087\frac{RT_c}{P_c},
+                        $$
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        \alpha = (1 + \kappa(1-\sqrt{T_r}))^2,
+                        $$
+                    </div>
+                    <div class="modal-text">
+                        where \(P_c\) is the critical pressure \(\kappa = 0.48 + 1.574\omega - 0.176\omega^2\), and
+                        \(\omega\) is the acentric factor.
+                    </div>
+                    <div class="modal-text">
+                        The compressibility factor is defined by:
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        Z = \frac{PV}{RT}.
+                        $$
+                    </div>
 
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutModalLabel">About</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This simulation was created in the <a href="https://www.colorado.edu/chbe"
+                            target="_blank">Department of
+                            Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+                            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under
+                        the direction of
+                        Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional
+                        contributions by Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of
+                        our
+                        simulations are open source, and are available on our <a
+                            href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+                            repository</a>.</p>
+                    <p style="line-height: 3rem;">
+                        If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                                src="https://learncheme.github.io/media/command.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on
+                        Mac
+                        or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on
+                        Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on
+                        Mac
+                        or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on
+                        Windows.
+                    </p>
                 </div>
             </div>
         </div>
@@ -107,4 +216,5 @@
     <script src="data.js"></script>
     <script src="functions.js"></script>
 </body>
+
 </html>

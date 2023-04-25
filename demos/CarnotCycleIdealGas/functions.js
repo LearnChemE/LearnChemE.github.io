@@ -28,6 +28,7 @@ function graphDraw(){
     text('isothermal',g.rx+50,g.by+4);
     text('adiabatic',g.rx+50,g.by+20);
     pop();
+    //#2YRCCGGYR
 }
 
 // Figure on the right when in heat engine mode
