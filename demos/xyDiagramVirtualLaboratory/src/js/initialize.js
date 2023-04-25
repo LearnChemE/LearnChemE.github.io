@@ -146,6 +146,7 @@ if (check === null) {
     localStorage.setItem("density_B", `${gvs.density_B}`);
     localStorage.setItem("volume_A_remaining", `1000`);
     localStorage.setItem("volume_B_remaining", `1000`);
+    localStorage.setItem("measurements", "[]");
 } else {
     let component_1_antoine_parameters = localStorage.getItem("component_1_antoine_parameters");
     let component_2_antoine_parameters = localStorage.getItem("component_2_antoine_parameters");
