@@ -19,7 +19,9 @@ function graphDraw(){
     push();
     translate(-120,24)
     strokeWeight(3); stroke(g.red);
-    line(g.rx+30,g.by,g.rx+45,g.by);
+    line(g.rx+30,g.by+3,g.rx+45,g.by+3);
+    stroke(0,200,0);
+    line(g.rx+30,g.by-3,g.rx+45,g.by-3);
     stroke(g.blue);
     line(g.rx+30,g.by+16,g.rx+45,g.by+16);
     noStroke(); textSize(15);
@@ -145,8 +147,8 @@ function HP_figure(){
     function TH(){
         push();
         stroke(g.red); strokeWeight(3);
-        line(535,height/2-80,535,height/2-35);
-        arrow([535,height/2-80],[535,height/2-29],g.red,20,5);
+        line(535,height/2-70,535,height/2-30);
+        arrow([535,height/2],[535,height/2-80],g.red,20,5);
         rect(480,height/2-115,110,35);
         noStroke(); fill(g.red); textSize(18);
         text('T  = '+g.Th+' K',495,height/2-90);
@@ -164,8 +166,8 @@ function HP_figure(){
     function TC(){
         push();
         stroke(0,200,0); strokeWeight(3);
-        line(535,height/2+30,535,height/2+75);
-        arrow([535,height/2-80],[535,height/2+80],[0,200,0],20,5);
+        line(535,height/2+35,535,height/2+80);
+        arrow([535,height/2+80],[535,height/2+30],[0,200,0],20,5);
         rect(480,height/2+80,110,35);
         noStroke(); fill([0,200,0]); textSize(18);
         text('T  = '+g.Tc+' K',495,height/2+105);
@@ -181,8 +183,8 @@ function HP_figure(){
     function work(){
         push();
         strokeWeight(3);
-        line(565,height/2,585,height/2);
-        arrow([565,height/2],[605,height/2],0,20,5);
+        line(610,height/2,585,height/2);
+        arrow([605,height/2],[565,height/2],0,20,5);
         noStroke(); fill(0); textSize(18);
         text('W = '+W+' kJ/mol',570,height/2-12);
         pop();
@@ -209,7 +211,6 @@ function PV_diagram(){
     let xMax;
     let V_right;
     
-
     // g.by-10 == 0.0 kPa
     // g.rx-10 == max value volume
     // g.lx+10 == 0 m^3
@@ -235,7 +236,7 @@ function PV_diagram(){
                 
             }
         }
-        endShape(); beginShape();
+        endShape(); beginShape(); stroke(0,200,0);
         for(let i = 0; i < seg3.length; i++){
             vertex(map(seg3[i][0],0,V_right,g.lx+10,g.rx-10),map(seg3[i][1],0,yMax,g.by-10,g.ty+10));
             if(i == Math.round(seg3.length/3) || i == 2*Math.round(seg3.length/3)){
@@ -244,9 +245,9 @@ function PV_diagram(){
                 let x2 = map(seg3[i][0],0,V_right,g.lx+10,g.rx-10);
                 let y2 = map(seg3[i][1],0,yMax,g.by-10,g.ty+10);
                 if(g.engine == "heat-engine"){
-                    arrow([x1,y1],[x2,y2],g.red,12,4);
+                    arrow([x1,y1],[x2,y2],[0,200,0],12,4);
                 } else {
-                    arrow([x2,y2],[x1,y1],g.red,12,4);
+                    arrow([x2,y2],[x1,y1],[0,200,0],12,4);
                 }
             }
         }
@@ -598,12 +599,12 @@ function TS_diagram(){
     xmid = x1 + (x2-x1)/2;
     ymid = y2 + (y1-y2)/2;
     if(g.engine == 'heat-engine'){
-        arrow([x2,y1],[xmid-6,y1],g.red,12,4);
+        arrow([x2,y1],[xmid-6,y1],[0,200,0],12,4);
         arrow([x1,y2],[xmid+6,y2],g.red,12,4);
         arrow([x1,y1],[x1,ymid-6],g.blue,12,4);
         arrow([x2,y2],[x2,ymid+6],g.blue,12,4);
     } else {
-        arrow([x1,y1],[xmid+6,y1],g.red,12,4);
+        arrow([x1,y1],[xmid+6,y1],[0,200,0],12,4);
         arrow([x2,y2],[xmid-6,y2],g.red,12,4);
         arrow([x1,y2],[x1,ymid+6],g.blue,12,4);
         arrow([x2,y1],[x2,ymid-6],g.blue,12,4);
@@ -611,8 +612,9 @@ function TS_diagram(){
 
     push();
     strokeWeight(2);
-    stroke(g.red);
+    stroke(0,200,0);
     line(x1,y1,x2,y1);
+    stroke(g.red);
     line(x1,y2,x2,y2);
     stroke(g.blue);
     line(x1,y1,x1,y2);
