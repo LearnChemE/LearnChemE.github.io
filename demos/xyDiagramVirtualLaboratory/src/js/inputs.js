@@ -334,3 +334,84 @@ function download_data() {
   element.click();
   document.body.removeChild(element);
 }
+
+const directionsTabGettingStarted = document.getElementById("directions-tab-getting-started");
+const directionsTabLearningObjectives = document.getElementById("directions-tab-learning-objectives");
+const directionsTabVideo = document.getElementById("directions-tab-video");
+const directionsTabAnalysis = document.getElementById("directions-tab-analysis");
+const directionsTabPostLab = document.getElementById("directions-tab-post-lab");
+const directionsContentGettingStarted = document.getElementById("directions-content-getting-started");
+const directionsContentLearningObjectives = document.getElementById("directions-content-learning-objectives");
+const directionsContentVideo = document.getElementById("directions-content-video");
+const directionsContentAnalysis = document.getElementById("directions-content-analysis");
+const directionsContentPostLab = document.getElementById("directions-content-post-lab");
+
+directionsTabGettingStarted.addEventListener("click", () => {
+  directionsTabGettingStarted.classList.add("active");
+  directionsTabLearningObjectives.classList.remove("active");
+  directionsTabVideo.classList.remove("active");
+  directionsTabAnalysis.classList.remove("active");
+  directionsTabPostLab.classList.remove("active");
+
+  directionsContentGettingStarted.classList.add("active");
+  directionsContentLearningObjectives.classList.remove("active");
+  directionsContentVideo.classList.remove("active");
+  directionsContentAnalysis.classList.remove("active");
+  directionsContentPostLab.classList.remove("active");
+});
+
+directionsTabLearningObjectives.addEventListener("click", () => {
+  directionsTabGettingStarted.classList.remove("active");
+  directionsTabLearningObjectives.classList.add("active");
+  directionsTabVideo.classList.remove("active");
+  directionsTabAnalysis.classList.remove("active");
+  directionsTabPostLab.classList.remove("active");
+
+  directionsContentGettingStarted.classList.remove("active");
+  directionsContentLearningObjectives.classList.add("active");
+  directionsContentVideo.classList.remove("active");
+  directionsContentAnalysis.classList.remove("active");
+  directionsContentPostLab.classList.remove("active");
+});
+
+directionsTabVideo.addEventListener("click", () => {
+  directionsTabGettingStarted.classList.remove("active");
+  directionsTabLearningObjectives.classList.remove("active");
+  directionsTabVideo.classList.add("active");
+  directionsTabAnalysis.classList.remove("active");
+  directionsTabPostLab.classList.remove("active");
+
+  directionsContentGettingStarted.classList.remove("active");
+  directionsContentLearningObjectives.classList.remove("active");
+  directionsContentVideo.classList.add("active");
+  directionsContentAnalysis.classList.remove("active");
+  directionsContentPostLab.classList.remove("active");
+});
+
+directionsTabAnalysis.addEventListener("click", () => {
+  directionsTabGettingStarted.classList.remove("active");
+  directionsTabLearningObjectives.classList.remove("active");
+  directionsTabVideo.classList.remove("active");
+  directionsTabAnalysis.classList.add("active");
+  directionsTabPostLab.classList.remove("active");
+
+  directionsContentGettingStarted.classList.remove("active");
+  directionsContentLearningObjectives.classList.remove("active");
+  directionsContentVideo.classList.remove("active");
+  directionsContentAnalysis.classList.add("active");
+  directionsContentPostLab.classList.remove("active");
+});
+
+directionsTabPostLab.addEventListener("click", () => {
+  directionsTabGettingStarted.classList.remove("active");
+  directionsTabLearningObjectives.classList.remove("active");
+  directionsTabVideo.classList.remove("active");
+  directionsTabAnalysis.classList.remove("active");
+  directionsTabPostLab.classList.add("active");
+
+  directionsContentGettingStarted.classList.remove("active");
+  directionsContentLearningObjectives.classList.remove("active");
+  directionsContentVideo.classList.remove("active");
+  directionsContentAnalysis.classList.remove("active");
+  directionsContentPostLab.classList.add("active");
+});
