@@ -346,12 +346,12 @@ input[type=number] {
 
     .directions-tabs {
         display: grid;
-        grid-template-columns: repeat(4, max-content) 1fr;
+        grid-template-columns: repeat(5, max-content) 1fr;
         .directions-tab {
             display: grid;
             align-content: center;
             justify-content: center;
-            padding: 8px 15px;
+            padding: 8px 8px;
             background-color: rgb(240, 240, 240);
             border: 1px solid black;
             cursor: pointer;

@@ -67,7 +67,7 @@
 
   <div id="submit-button" style="display: none;" disabled="yes">view results</div>
   <div id="back-button" style="display: none;">go back to lab</div>
-  <div id="reset-button" style="display: none;">reset exercise</div>
+  <div id="reset-button" style="display: none;">reset laboratory</div>
 
   <div class="modal fade" id="reset-modal" tabindex="-1" role="dialog" aria-labelledby="reset-modal-label"
     aria-hidden="true">
@@ -100,7 +100,8 @@
         <div class="modal-body">
           <div class="directions-container">
             <div class="directions-tabs">
-              <div class="directions-tab active" id="directions-tab-getting-started">Getting started</div>
+              <div class="directions-tab active" id="directions-tab-prerequisites">Prerequisites</div>
+              <div class="directions-tab" id="directions-tab-getting-started">Getting started</div>
               <div class="directions-tab" id="directions-tab-learning-objectives">Learning objectives</div>
               <div class="directions-tab" id="directions-tab-video">Video instructions</div>
               <div class="directions-tab" id="directions-tab-analysis">Analyzing data</div>
@@ -108,7 +109,11 @@
             </div>
             <div class="directions-contents">
               
-              <div class="directions-content active" id="directions-content-getting-started">
+              <div class="directions-content active" id="directions-content-prerequisites">
+
+              </div>
+
+              <div class="directions-content" id="directions-content-getting-started">
                 This is a virtual laboratory in which you will use nonlinear regression to determine the Margules parameters of a randomized binary mixture (for more information on the Margules parameters, exit this window and click the "details" button near the top of the page). You are given 1000 mL of two liquids, and for each measurement you will use a total of 100 mL of a liquid mixture to find the vapor composition for that given mixture. For example, you may put 80 mL of liquid A into the flask alongside 20 mL of liquid B, then press "collect sample" to find that the vapor mole fraction of A for that mixture is 0.951. Your results will be different, this is just an example.<br><br>You may collect up to 20 samples, and the virtual laboratory will store the data you have collected so you may download your data as a spreadsheet at a later time. If you close the web page and come back, you will still be able to access your stored data by clicking "download measurements". In other words, all of your data is stored in your web browser should you exit out of the laboratory. The virtual laboratory will also remember how much liquid you have used, as well as the density/molecular weights/antoine constants. If for any reason you want to restart the virtual laboratory with new, randomized Margules parameters and liquid properties, you may click "reset laboratory" at the bottom-right of the screen. For video instructions on how to use this virtual laboratory, click the "video instructions" tab and view the YouTube video.<br><br>You should carefully plan what liquid volumes to use for your data points. You must use the liquid's molecular weight and density to determine the volume of each liquid necessary for a given liquid mole fraction. Since the volume of vapor collected is negligible compared to the volume of liquid in the flask, you can assume that the liquid mole fraction can be determined from the volumes of liquid A and B in the flask.<br><br>Once you have taken a sufficient number of data points, you will need to analyze your data and use nonlinear regression to determine the Margules parameters. Navigate to the "Analyzing data" tab to learn more about this process and view relevant screencasts.  After you have completed your data analysis, click the red "submit answers" button near the top of the virtual laboratory to enter your esimated Margules parameters and 95% confidence intervals, and to view the correct Margules parameters. You may screenshot the answer submission page and send this to your instructor for reference.
               </div>
 
@@ -176,15 +181,15 @@
             $$
           </div>
 
-          <div class="details-text">where \( x_{A} \) and \( x_{B} \) are the liquid mole fractions of components  and A and B, and \( x_{A} + x_{B} = 1 \), and \( A_{12} \) and \( A_{21} \) are the Margules parameters. The modified Raoult's law is used to calculate the bubble-point and dew-point pressures using the  \( K \) factors:</div>
+          <div class="details-text">where \( x_{A} \) and \( x_{B} \) are the liquid mole fractions of components  and A and B, and \( x_{A} + x_{B} = 1 \), and \( A_{12} \) and \( A_{21} \) are the Margules parameters, which are independent of temperature. The modified Raoult's law is used to calculate the bubble-point and dew-point pressures using the  \( K \) factors:</div>
 
           <div class="details-eqn">
             $$
-            [5] \qquad K_{i} = \frac{y_{i}}{x_{i}} = \gamma_{i} \frac{P_{i}^{sat}}{P}
+            [5] \qquad K_{i} = \frac{y_{i}}{x_{i}} = \frac{\gamma_{i} P_{i}^{sat}}{P}
             $$
           </div>
 
-          <div class="details-text">where \( y_{i} \) is the vapor mole fraction and \( y_{A} + y_{B} = 1 \), and \( P \) is the total pressure (mmHg). Bubble-point pressure calculation:</div>
+          <div class="details-text">where \( y_{i} \) is the vapor mole fraction, \( y_{A} + y_{B} = 1 \), and \( P \) is the total pressure (mmHg). Bubble-point pressure calculation:</div>
 
           <div class="details-eqn">
             $$

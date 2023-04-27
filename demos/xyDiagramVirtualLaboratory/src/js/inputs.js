@@ -255,6 +255,7 @@ function go_to_submission_stage() {
   submitButton.style.display = "grid";
   backButton.style.display = "grid";
   VLE_apparatus_svg.style.display = "none";
+  resetExerciseButton.style.display = "none";
   gvs.p.redraw();
 }
 
@@ -289,6 +290,7 @@ function go_back() {
   submitButton.style.display = "none";
   backButton.style.display = "none";
   VLE_apparatus_svg.style.display = "block";
+  resetExerciseButton.style.display = "grid";
   proceedToSubmitButton.classList.remove("pressed");
   collectSampleButton.classList.remove("pressed");
   proceedToSubmitButton.style.visibility = "visible";
@@ -335,24 +337,44 @@ function download_data() {
   document.body.removeChild(element);
 }
 
+const directionsTabPrerequisites = document.getElementById("directions-tab-prerequisites");
 const directionsTabGettingStarted = document.getElementById("directions-tab-getting-started");
 const directionsTabLearningObjectives = document.getElementById("directions-tab-learning-objectives");
 const directionsTabVideo = document.getElementById("directions-tab-video");
 const directionsTabAnalysis = document.getElementById("directions-tab-analysis");
 const directionsTabPostLab = document.getElementById("directions-tab-post-lab");
+const directionsContentPrerequisites = document.getElementById("directions-content-prerequisites");
 const directionsContentGettingStarted = document.getElementById("directions-content-getting-started");
 const directionsContentLearningObjectives = document.getElementById("directions-content-learning-objectives");
 const directionsContentVideo = document.getElementById("directions-content-video");
 const directionsContentAnalysis = document.getElementById("directions-content-analysis");
 const directionsContentPostLab = document.getElementById("directions-content-post-lab");
 
+directionsTabPrerequisites.addEventListener("click", () => {
+  directionsTabPrerequisites.classList.add("active");
+  directionsTabGettingStarted.classList.remove("active");
+  directionsTabLearningObjectives.classList.remove("active");
+  directionsTabVideo.classList.remove("active");
+  directionsTabAnalysis.classList.remove("active");
+  directionsTabPostLab.classList.remove("active");
+
+  directionsContentPrerequisites.classList.add("active");
+  directionsContentGettingStarted.classList.remove("active");
+  directionsContentLearningObjectives.classList.remove("active");
+  directionsContentVideo.classList.remove("active");
+  directionsContentAnalysis.classList.remove("active");
+  directionsContentPostLab.classList.remove("active");
+});
+
 directionsTabGettingStarted.addEventListener("click", () => {
+  directionsTabPrerequisites.classList.remove("active");
   directionsTabGettingStarted.classList.add("active");
   directionsTabLearningObjectives.classList.remove("active");
   directionsTabVideo.classList.remove("active");
   directionsTabAnalysis.classList.remove("active");
   directionsTabPostLab.classList.remove("active");
 
+  directionsContentPrerequisites.classList.remove("active");
   directionsContentGettingStarted.classList.add("active");
   directionsContentLearningObjectives.classList.remove("active");
   directionsContentVideo.classList.remove("active");
@@ -361,12 +383,14 @@ directionsTabGettingStarted.addEventListener("click", () => {
 });
 
 directionsTabLearningObjectives.addEventListener("click", () => {
+  directionsTabPrerequisites.classList.remove("active");
   directionsTabGettingStarted.classList.remove("active");
   directionsTabLearningObjectives.classList.add("active");
   directionsTabVideo.classList.remove("active");
   directionsTabAnalysis.classList.remove("active");
   directionsTabPostLab.classList.remove("active");
 
+  directionsContentPrerequisites.classList.remove("active");
   directionsContentGettingStarted.classList.remove("active");
   directionsContentLearningObjectives.classList.add("active");
   directionsContentVideo.classList.remove("active");
@@ -375,12 +399,14 @@ directionsTabLearningObjectives.addEventListener("click", () => {
 });
 
 directionsTabVideo.addEventListener("click", () => {
+  directionsTabPrerequisites.classList.remove("active");
   directionsTabGettingStarted.classList.remove("active");
   directionsTabLearningObjectives.classList.remove("active");
   directionsTabVideo.classList.add("active");
   directionsTabAnalysis.classList.remove("active");
   directionsTabPostLab.classList.remove("active");
 
+  directionsContentPrerequisites.classList.remove("active");
   directionsContentGettingStarted.classList.remove("active");
   directionsContentLearningObjectives.classList.remove("active");
   directionsContentVideo.classList.add("active");
@@ -389,12 +415,14 @@ directionsTabVideo.addEventListener("click", () => {
 });
 
 directionsTabAnalysis.addEventListener("click", () => {
+  directionsTabPrerequisites.classList.remove("active");
   directionsTabGettingStarted.classList.remove("active");
   directionsTabLearningObjectives.classList.remove("active");
   directionsTabVideo.classList.remove("active");
   directionsTabAnalysis.classList.add("active");
   directionsTabPostLab.classList.remove("active");
 
+  directionsContentPrerequisites.classList.remove("active");
   directionsContentGettingStarted.classList.remove("active");
   directionsContentLearningObjectives.classList.remove("active");
   directionsContentVideo.classList.remove("active");
@@ -403,12 +431,14 @@ directionsTabAnalysis.addEventListener("click", () => {
 });
 
 directionsTabPostLab.addEventListener("click", () => {
+  directionsTabPrerequisites.classList.remove("active");
   directionsTabGettingStarted.classList.remove("active");
   directionsTabLearningObjectives.classList.remove("active");
   directionsTabVideo.classList.remove("active");
   directionsTabAnalysis.classList.remove("active");
   directionsTabPostLab.classList.add("active");
 
+  directionsContentPrerequisites.classList.remove("active");
   directionsContentGettingStarted.classList.remove("active");
   directionsContentLearningObjectives.classList.remove("active");
   directionsContentVideo.classList.remove("active");
