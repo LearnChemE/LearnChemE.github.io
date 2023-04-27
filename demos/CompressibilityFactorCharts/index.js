@@ -30,12 +30,21 @@ window.g = {
 
 }
 
+let data1, data2, data3, data4, data5;
+function preload(){
+    data1 = loadJSON("nhexaneData.json");
+    data2 = loadJSON("co2Data.json")
+    data3 = loadJSON("ethaneData.json");
+    data4 = loadJSON("nitrogenData.json");
+    data5 = loadJSON("hydrogenData.json");
+}
+
 function setup() {
     g.cnv = createCanvas(700, 500);
     g.cnv.parent("graphics-wrapper");
     document.getElementsByTagName("main")[0].remove();
     defineVecs();
-    g.points.push(createVector(320, 240));
+    g.points.push(createVector(280, 290));
 }
 
 function draw() {
@@ -45,12 +54,11 @@ function draw() {
     curveDraw(); // Draws the various curve representations for the Tr values
     currentComp(); // Line that shows Z vs Pr for current dot position
     legs(); // Draws the lines from dot to Z and Pr axes
-
-
-
+    //console.log(data[0][1])
+  
     push();
     fill(0);
-    temp = g.points[0];
+    let temp = g.points[0];
     ellipse(temp.x, temp.y, 2 * g.radius);
     pop();
 }
@@ -65,8 +73,14 @@ for (let i = 0; i < element.length; i++) {
         element[i].classList.add("selected");
         g.element = element[i].value;
         defineVecs();
-        g.points[0].x = 320;
-        g.points[0].y = 240;
+     
+        let temp = g.points[0];
+        let Pr = map(temp.x,g.lx,g.rx,0,5);
+        let Ztest = map(temp.y,g.by,g.ty,0,1.1);
+        let Zactual = find2D(Pr,g.vec[7]);
+        if(Ztest > Zactual){
+            g.points[0].y = map(Zactual,0,1.1,g.by,g.ty);
+        }
     });
 };
 
