@@ -77,7 +77,6 @@ function relHumDisplay(){
     let a = radians(-45);
     push();
     noStroke(); fill(g.green); textSize(19);
-
     push();
     translate(g.rx-160,g.by-43); rotate(a);
     push();
@@ -152,18 +151,54 @@ function relHumDisplay(){
     pop();
     textSize(22);
     translate(385,170); rotate(radians(-63));
+    fill(250);
+    rect(-5,-17,145,21);
+    fill(g.green);
     text('saturation line',0,0);
     pop();
 }
 
 function enthalpDisplay(){
-    push();
-    noFill(); strokeWeight(2); beginShape();
-    for(let i = -10; i <= 55; i++){
-        vertex(map(i,-10,55,g.lx,g.rx),map(hOmega(50,i),0,.033,g.by,g.ty));
+    let xStart = [-10,-4,1.5,6.0,10.5,14.0,17.5,20.3,22.5,24.5,26.4,27.55,37.55,47.55];
+    let xEnd = [0,10,20,30,40,50,60,70,80,90,100,110,120,130];
+   
+    for(let i = 0; i < xStart.length; i++){
+        push(); noFill(); strokeWeight(.8); stroke(g.blue[0],g.blue[1],g.blue[2],120); beginShape();
+        for(let j = xStart[i]; j <= xEnd[i]; j++){
+            if(i > 0 && i < 10 && j == xStart[i]){
+                push();
+                noStroke(); fill(g.blue); textSize(18);
+                text(10*i,map(j,-10,55,g.lx,g.rx)-23,map(hOmega(xEnd[i],j),0,.033,g.by,g.ty)+5);
+                pop();
+            } else if (i == 10 && j == xStart[i]){
+                push();
+                noStroke(); fill(g.blue); textSize(18);
+                text('100',355,85);
+                pop();
+            }
+            if(j <= 55.3){
+                vertex(map(j,-10,55,g.lx,g.rx),map(hOmega(xEnd[i],j),0,.033,g.by,g.ty));
+            }
+        }
+        if(i > 5){
+            vertex(g.rx,map(hOmega(xEnd[i],55),0,.033,g.by,g.ty));
+        } else if (i == 5){
+            vertex(map(50,-10,55,g.lx,g.rx),map(0,0,.033,g.by,g.ty));
+        } else if (i == 4){
+            vertex(map(40,-10,55,g.lx,g.rx),g.by);
+        }
+        endShape(); pop();
     }
-    endShape();
-    pop();
+    push();
+    noStroke(); textSize(18); fill(g.blue);
+    translate(50,g.by-85);
+    rotate(radians(-30));
+    text('enthalpy (kJ/kg)',0,0);
+    pop();  
+}
+
+function volDisplay(){
+
 }
 
 function Psat(T){
@@ -176,5 +211,21 @@ function phiOmega(phi,T){
 }
 
 function hOmega(T,T1){
-    return((-4)**(-4)*(T-T1))
+    return((T-T1)/2500);
+}
+
+function vOmega(T,T1){
+    return(-.0065 - .0021*(T-T1));
+}
+
+function pointTest(){
+    let temp = g.points[0];
+    let T = map(temp.x,g.lx,g.rx,0,5);
+    let Hlimit = phiOmega(1,T);
+    let Hactual = map(temp.y,g.by,g.ty,0,.033);
+    if(Hactual > Hlimit){
+        g.test = true;
+    } else {
+        g.test = false;
+    }
 }

@@ -25,22 +25,40 @@ window.g = {
     MW: 28.97/18.02,
     P: 1,
 
+    // For manipulating the dot
+    radius: 5,
+    points: [],
+    nP: 1,
+    dragPoint: null,
+    test: true,
+
 }
 
 function setup(){
     g.cnv = createCanvas(780,600);
     g.cnv.parent("graphics-wrapper");
+    g.points.push(createVector(350, 350));
 }
 
 function draw(){
     background(250);
     frameDraw();
-    if(g.humidTruth){
-        relHumDisplay();
-    }
+    pointTest();
     if(g.enthalpTruth){
         enthalpDisplay();
     }
+    if(g.humidTruth){
+        relHumDisplay();
+    }
+    if(g.specVolTruth){
+        volDisplay();
+    }
+    
+    push();
+    fill(0); noStroke();
+    let temp = g.points[0];
+    ellipse(temp.x,temp.y,2*g.radius);
+    pop();
 }
 
 // Event listeners
@@ -74,3 +92,34 @@ displayVals.addEventListener("change", () => {
 gridLines.addEventListener("change", () => {
     g.gridTruth = gridLines.checked;
 });
+
+
+// For manipulating the position of dot within the triangle
+function mousePressed() {
+    for (let i = g.points.length - 1; i >= 0; i--) {
+        const isPressed = inCircle(g.points[i], g.radius);
+        if (isPressed) {
+            g.dragPoint = g.points.splice(i, 1)[0];
+            g.points.push(g.dragPoint);
+
+        }
+    }
+}
+
+function mouseDragged() {
+   
+    if (g.dragPoint) {
+        if(mouseX >= g.lx && mouseX <= g.rx && mouseY >= g.ty && g.test){
+            g.dragPoint.x = mouseX;
+            g.dragPoint.y = mouseY;
+        }
+    }
+}
+
+function mouseReleased() {
+    g.dragPoint = null;
+}
+
+function inCircle(pos, radius) {
+    return dist(mouseX, mouseY, pos.x, pos.y) < radius;
+}
