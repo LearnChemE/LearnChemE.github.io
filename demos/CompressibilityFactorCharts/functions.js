@@ -241,18 +241,15 @@ function currentComp() {
                     let dz, dc;
                     dz = Z - zL;
                     dc = zU - zL;
-                    g.Tr = 1 * (1 - dz / dc) + 1.1 * (dz / dc);
+                    //g.Tr = 1 * (1 - dz / dc) + 1.1 * (dz / dc);
                     push();
                     noFill();
                     strokeWeight(2);
                     stroke(g.blue);
                     beginShape();
-                    for (let j = 0; j < Z10.length; j++) {
-                        let x = Z10[j][0];
-                        let t = find2D(x, g.vec[0]);
-                        let y = t * (dz / dc) + Z10[j][1] * (1 - dz / dc);
-                        vertex(map(x, 0, 5, g.lx, g.rx), map(y, 0, 1.1, g.by, g.ty));
-
+                    let arr = findArray();
+                    for(let j = 0; j < arr.length; j++){
+                        vertex(map(arr[j][0],0,5,g.lx,g.rx),map(arr[j][1],0,1.1,g.by,g.ty));
                     }
                     endShape();
                     pop();
@@ -402,6 +399,41 @@ function currentComp() {
 
 }
 
+function findArray(){
+    let data;
+    switch(g.element){
+        case 'n-hexane':
+            data = data1;
+            break;
+        case 'carbon-dioxide':
+            data = data2;
+            break;
+        case 'ethane':
+            data = data3;
+            break;
+        case 'nitrogen':
+            data = data4;
+            break;
+        case 'hydrogen':
+            data = data5;
+            break;
+    }
+    let temp = g.points[0];
+    let Pr = Math.round(map(temp.x,g.lx,g.rx,0,5)/0.01);
+    let Z = map(temp.y,g.by,g.ty,0,1.1);
+    let diff = 10000; let count = 0;
+    while (diff > .002 && count < 1000){
+        let y = data[count][1][Pr][1];
+        diff = Math.abs(y-Z);
+        if(diff > .002){
+            count++;
+        }
+    }
+    g.Tr = data[count][0];
+    return(data[count][1]);
+    
+}
+
 function translations() {
 
     let arr;
@@ -459,22 +491,22 @@ function legs() {
 }
 
 function defineVecs() {
-    g.vec = [];
+    //g.vec = [];
     switch (g.element) {
         case "n-hexane":
-            g.vec.push(xZ11, xZ12, xZ13, xZ14, xZ15, xZ16, xZ17, xZ18);
+            g.vec = [xZ11, xZ12, xZ13, xZ14, xZ15, xZ16, xZ17, xZ18];
             break;
         case "carbon-dioxide":
-            g.vec.push(cZ11, cZ12, cZ13, cZ14, cZ15, cZ16, cZ17, cZ18);
+            g.vec = [cZ11, cZ12, cZ13, cZ14, cZ15, cZ16, cZ17, cZ18];
             break;
         case "ethane":
-            g.vec.push(eZ11, eZ12, eZ13, eZ14, eZ15, eZ16, eZ17, eZ18);
+            g.vec = [eZ11, eZ12, eZ13, eZ14, eZ15, eZ16, eZ17, eZ18];
             break;
         case "nitrogen":
-            g.vec.push(nZ11, nZ12, nZ13, nZ14, nZ15, nZ16, nZ17, nZ18);
+            g.vec = [nZ11, nZ12, nZ13, nZ14, nZ15, nZ16, nZ17, nZ18];
             break;
         case "hydrogen":
-            g.vec.push(hZ11, hZ12, hZ13, hZ14, hZ15, hZ16, hZ17, hZ18);
+            g.vec = [hZ11, hZ12, hZ13, hZ14, hZ15, hZ16, hZ17, hZ18];
             break;
     }
 }
