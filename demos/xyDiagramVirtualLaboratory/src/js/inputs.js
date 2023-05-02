@@ -343,18 +343,21 @@ const directionsTabLearningObjectives = document.getElementById("directions-tab-
 const directionsTabVideo = document.getElementById("directions-tab-video");
 const directionsTabAnalysis = document.getElementById("directions-tab-analysis");
 const directionsTabPostLab = document.getElementById("directions-tab-post-lab");
+const directionsTabEquations = document.getElementById("directions-tab-equations");
 const directionsContentPrerequisites = document.getElementById("directions-content-prerequisites");
 const directionsContentGettingStarted = document.getElementById("directions-content-getting-started");
 const directionsContentLearningObjectives = document.getElementById("directions-content-learning-objectives");
 const directionsContentVideo = document.getElementById("directions-content-video");
 const directionsContentAnalysis = document.getElementById("directions-content-analysis");
 const directionsContentPostLab = document.getElementById("directions-content-post-lab");
+const directionsContentEquations = document.getElementById("directions-content-equations");
 
 directionsTabPrerequisites.addEventListener("click", () => {
   directionsTabPrerequisites.classList.add("active");
   directionsTabGettingStarted.classList.remove("active");
   directionsTabLearningObjectives.classList.remove("active");
   directionsTabVideo.classList.remove("active");
+  directionsTabEquations.classList.remove("active");
   directionsTabAnalysis.classList.remove("active");
   directionsTabPostLab.classList.remove("active");
 
@@ -362,6 +365,7 @@ directionsTabPrerequisites.addEventListener("click", () => {
   directionsContentGettingStarted.classList.remove("active");
   directionsContentLearningObjectives.classList.remove("active");
   directionsContentVideo.classList.remove("active");
+  directionsContentEquations.classList.remove("active");
   directionsContentAnalysis.classList.remove("active");
   directionsContentPostLab.classList.remove("active");
 });
@@ -371,6 +375,7 @@ directionsTabGettingStarted.addEventListener("click", () => {
   directionsTabGettingStarted.classList.add("active");
   directionsTabLearningObjectives.classList.remove("active");
   directionsTabVideo.classList.remove("active");
+  directionsTabEquations.classList.remove("active");
   directionsTabAnalysis.classList.remove("active");
   directionsTabPostLab.classList.remove("active");
 
@@ -378,6 +383,7 @@ directionsTabGettingStarted.addEventListener("click", () => {
   directionsContentGettingStarted.classList.add("active");
   directionsContentLearningObjectives.classList.remove("active");
   directionsContentVideo.classList.remove("active");
+  directionsContentEquations.classList.remove("active");
   directionsContentAnalysis.classList.remove("active");
   directionsContentPostLab.classList.remove("active");
 });
@@ -387,6 +393,7 @@ directionsTabLearningObjectives.addEventListener("click", () => {
   directionsTabGettingStarted.classList.remove("active");
   directionsTabLearningObjectives.classList.add("active");
   directionsTabVideo.classList.remove("active");
+  directionsTabEquations.classList.remove("active");
   directionsTabAnalysis.classList.remove("active");
   directionsTabPostLab.classList.remove("active");
 
@@ -394,6 +401,7 @@ directionsTabLearningObjectives.addEventListener("click", () => {
   directionsContentGettingStarted.classList.remove("active");
   directionsContentLearningObjectives.classList.add("active");
   directionsContentVideo.classList.remove("active");
+  directionsContentEquations.classList.remove("active");
   directionsContentAnalysis.classList.remove("active");
   directionsContentPostLab.classList.remove("active");
 });
@@ -403,6 +411,7 @@ directionsTabVideo.addEventListener("click", () => {
   directionsTabGettingStarted.classList.remove("active");
   directionsTabLearningObjectives.classList.remove("active");
   directionsTabVideo.classList.add("active");
+  directionsTabEquations.classList.remove("active");
   directionsTabAnalysis.classList.remove("active");
   directionsTabPostLab.classList.remove("active");
 
@@ -410,6 +419,25 @@ directionsTabVideo.addEventListener("click", () => {
   directionsContentGettingStarted.classList.remove("active");
   directionsContentLearningObjectives.classList.remove("active");
   directionsContentVideo.classList.add("active");
+  directionsContentEquations.classList.remove("active");
+  directionsContentAnalysis.classList.remove("active");
+  directionsContentPostLab.classList.remove("active");
+});
+
+directionsTabEquations.addEventListener("click", () => {
+  directionsTabPrerequisites.classList.remove("active");
+  directionsTabGettingStarted.classList.remove("active");
+  directionsTabLearningObjectives.classList.remove("active");
+  directionsTabVideo.classList.remove("active");
+  directionsTabEquations.classList.add("active");
+  directionsTabAnalysis.classList.remove("active");
+  directionsTabPostLab.classList.remove("active");
+
+  directionsContentPrerequisites.classList.remove("active");
+  directionsContentGettingStarted.classList.remove("active");
+  directionsContentLearningObjectives.classList.remove("active");
+  directionsContentVideo.classList.remove("active");
+  directionsContentEquations.classList.add("active");
   directionsContentAnalysis.classList.remove("active");
   directionsContentPostLab.classList.remove("active");
 });
@@ -419,6 +447,7 @@ directionsTabAnalysis.addEventListener("click", () => {
   directionsTabGettingStarted.classList.remove("active");
   directionsTabLearningObjectives.classList.remove("active");
   directionsTabVideo.classList.remove("active");
+  directionsTabEquations.classList.remove("active");
   directionsTabAnalysis.classList.add("active");
   directionsTabPostLab.classList.remove("active");
 
@@ -426,6 +455,7 @@ directionsTabAnalysis.addEventListener("click", () => {
   directionsContentGettingStarted.classList.remove("active");
   directionsContentLearningObjectives.classList.remove("active");
   directionsContentVideo.classList.remove("active");
+  directionsContentEquations.classList.remove("active");
   directionsContentAnalysis.classList.add("active");
   directionsContentPostLab.classList.remove("active");
 });
@@ -435,6 +465,7 @@ directionsTabPostLab.addEventListener("click", () => {
   directionsTabGettingStarted.classList.remove("active");
   directionsTabLearningObjectives.classList.remove("active");
   directionsTabVideo.classList.remove("active");
+  directionsTabEquations.classList.remove("active");
   directionsTabAnalysis.classList.remove("active");
   directionsTabPostLab.classList.add("active");
 
@@ -442,6 +473,7 @@ directionsTabPostLab.addEventListener("click", () => {
   directionsContentGettingStarted.classList.remove("active");
   directionsContentLearningObjectives.classList.remove("active");
   directionsContentVideo.classList.remove("active");
+  directionsContentEquations.classList.remove("active");
   directionsContentAnalysis.classList.remove("active");
   directionsContentPostLab.classList.add("active");
 });

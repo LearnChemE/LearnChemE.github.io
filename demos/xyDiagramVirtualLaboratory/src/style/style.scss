@@ -22,7 +22,7 @@ $modal-xl: 1140px;
     align-content: center;
     .btn {
         height: max-content;
-        width: 12ch;
+        width: 16ch;
     }
 }
 
@@ -346,7 +346,8 @@ input[type=number] {
 
     .directions-tabs {
         display: grid;
-        grid-template-columns: repeat(5, max-content) 1fr;
+        grid-template-columns: repeat(6, max-content) 1fr;
+        font-size: 13px;
         .directions-tab {
             display: grid;
             align-content: center;
@@ -377,16 +378,28 @@ input[type=number] {
         display: grid;
         border: 1px solid black;
         border-top: none;
-        height: 500px;
+        height: calc(100vh - 230px);
         background-color: rgb(252, 252, 252);
 
         .directions-content {
             display: none;
             margin: 20px;
             overflow: auto;
+            &>ul>li {
+                padding-bottom: 10px;
+            }
             &.active {
                 display: grid;
             }
         }
     }
+}
+
+.iframe-container {
+    display: grid;
+    justify-content: center;
+}
+
+#directions-content-post-lab {
+    max-width: 680px;
 }
