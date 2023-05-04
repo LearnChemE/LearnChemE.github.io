@@ -25,7 +25,7 @@ function frameDraw(){
     }
     push();
     noStroke(); textSize(22);
-    text('temperature (°C)',230,510);
+    text('temperature (°C)',238,510);
     pop();
 
     // y-labels and ticks
@@ -198,7 +198,70 @@ function enthalpDisplay(){
 }
 
 function volDisplay(){
+    let endTemp = [-5.5, 12.2, 29.9, 47.6, 65.3]; // Values from mathematica
+    let startTemp = [-9.42,6.35,20,31.1,46.50];
 
+    for(let i = 0; i < endTemp.length; i++){
+        push(); noFill(); strokeWeight(.8); stroke(g.pink[0],g.pink[1],g.pink[2],80); beginShape();
+        for(let j = startTemp[i]; j <= endTemp[i]; j++){
+            if(j < 55 && i != 3){
+                vertex(map(j,-10,55,g.lx,g.rx),map(vOmega(j,endTemp[i]),0,.033,g.by,g.ty));
+            }  else if (i == 3 && j < 47){
+                vertex(map(j,-10,55,g.lx,g.rx),map(vOmega(j,endTemp[i]),0,.033,g.by,g.ty));
+                vertex(map(46.7,-10,55,g.lx,g.rx),map(vOmega(46.7,endTemp[i]),0,0.033,g.by,g.ty));
+            }
+        }
+        if(i == endTemp.length-1){
+            vertex(g.rx,map(vOmega(55,65.3),0,0.033,g.by,g.ty));  
+        }
+        endShape(); pop();
+    }
+    push();
+    noStroke(); fill(g.pink[0],g.pink[1],g.pink[2]); textSize(19);
+    text('0.75',g.lx+20,g.by+80);
+    text('0.80',g.lx+200,g.by+80);
+    text('0.85',g.lx+370,g.by+80);
+    text('0.90',g.lx+545,g.by+80);
+    fill(0); textSize(22);
+    text('volume (m  /kg dry air)',360,g.by+110);
+    textSize(19);
+    text('3',463,g.by+105);
+    pop();
+}
+
+function gridLinesFunc(){
+    // X lines
+    let x = [-5,0,5,10,15,20,25,30,35,40,45,50];
+    let yend = [.0025,.0036,.0052,.00745,.0103,.0142,0.01945,.0265,.033,.033,.033,.033];
+    // Y lines
+    let y = [.005,.01,.015,.02,.025,.03];
+    let xstart = [4.8,14.5,20.7,25.3,29.05,32.3];
+
+    push();
+    stroke(0,50);
+    for(let i = 0; i < x.length; i++){
+        let xc = map(x[i],-10,55,g.lx,g.rx);
+        let yc = map(yend[i],0,.033,g.by,g.ty);
+        line(xc,g.by,xc,yc);
+    }
+    for(let i = 0; i < y.length; i++){
+        let yc = map(y[i],0,.033,g.by,g.ty);
+        let xc = map(xstart[i],-10,55,g.lx,g.rx);
+        line(xc,yc,g.rx,yc);
+    }
+    pop();
+
+
+}
+
+function tempDisplay(){
+    let temp = g.points[0];
+
+    push();
+    drawingContext.setLineDash([5,5]); strokeWeight(2);
+    line(temp.x,temp.y,temp.x,g.by-5);
+    pop();
+    arrow([temp.x,temp.y],[temp.x,g.by],0,16,4);
 }
 
 function Psat(T){
@@ -220,12 +283,92 @@ function vOmega(T,T1){
 
 function pointTest(){
     let temp = g.points[0];
-    let T = map(temp.x,g.lx,g.rx,0,5);
+    let T = map(temp.x,g.lx,g.rx,-10,55);
     let Hlimit = phiOmega(1,T);
-    let Hactual = map(temp.y,g.by,g.ty,0,.033);
-    if(Hactual > Hlimit){
+    let Hactual = map(mouseY,g.by,g.ty,0,.033);
+    if(Hactual < Hlimit){
         g.test = true;
     } else {
         g.test = false;
     }
 }
+
+// For creating arrows
+function arrow(base,tip,color,arrowLength,arrowWidth){ 
+    // base = [x,y] tip = [x,y]
+
+    // let arrowLength = 20; // Length of arrow
+    // let arrowWidth = 5; // width of arrow (1/2)
+    let dx, dy, mag;
+    let u_hat, u_perp;
+    let point = new Array(2); // Point along unit vector that is base of triangle
+    let vert = new Array(6); // Holds vertices of arrow
+
+    // Need to define a unit vector
+    dx = tip[0] - base[0];
+    dy = tip[1] - base[1];
+    mag = (dx**2 + dy**2)**(1/2);
+    u_hat = [dx/mag,dy/mag];
+
+    vert[0] = tip[0] - 2*u_hat[0]; // Shifts the arrow back some to keep the tip from going out too far
+    vert[1] = tip[1] - 2*u_hat[1];
+
+    // Perpendicular unit vector
+    u_perp = [-u_hat[1],u_hat[0]];
+
+    // Base of arrow
+    point[0] = vert[0]+ -arrowLength*u_hat[0];
+    point[1] = vert[1]+ -arrowLength*u_hat[1];
+    
+    vert[2] = point[0] + u_perp[0]*arrowWidth;
+    vert[3] = point[1] + u_perp[1]*arrowWidth;
+
+    vert[4] = point[0] + -u_perp[0]*arrowWidth;
+    vert[5] = point[1] + -u_perp[1]*arrowWidth;
+
+    push();
+    stroke(color); fill(color); strokeWeight(1);
+    triangle(vert[0],vert[1],vert[2],vert[3],vert[4],vert[5]);
+    pop();
+
+}
+
+// Defines data sets and info for the lines displayed
+// enthalpy info
+
+function defineLines(){
+    // Enthalpy info
+    let HxStart = [-10,-4,1.5,6.0,10.5,14.0,17.5,20.3,22.5,24.5,26.4,27.55,37.55,47.55];
+    let HxEnd = [0,10,20,30,40,50,60,70,80,90,100,110,120,130];
+    for(let i = 0; i < HxStart.length; i++){
+        let x1 = map(HxStart[i],-10,55,g.lx,g.rx);
+        let x2 = map(HxEnd[i],-10,55,g.lx,g.rx);
+        let y1 = map(hOmega(HxEnd[i],HxStart[i]),0,.033,g.by,g.ty);
+        let y2 = g.by;
+        if(i == 0){
+            H.m = (y2 - y1)/(x2 - x1);
+        }
+        H.b.push(y1-H.m*x1)
+    }
+
+    // Volume info
+    let endTemp = [-5.5, 12.2, 29.9, 47.6, 65.3];
+    let startTemp = [-9.42,6.35,20,31.1,46.50];
+    for(let i = 0; i < endTemp.length; i++){
+        let x1 = map(startTemp[i],-10,55,g.lx,g.rx);
+        let x2 = map(endTemp[i],-10,55,g.lx,g.rx);
+        let y1 = map(vOmega(startTemp[i],endTemp[i]),0,.033,g.by,g.ty);
+        let y2 = map(vOmega(endTemp[i],endTemp[i]),0,.033,g.by,g.ty);
+        if(i == 0){
+            V.m = (y2 - y1)/(x2 - x1);
+        }
+        V.b.push(y1-V.m*x1);
+    }
+
+    for(let i = -10; i <= 55; i+=.01){
+        let y = phiOmega(1,i);
+        let x = i;
+        w.px.push([map(x,-10,55,g.lx,g.rx),map(y,0,.033,g.by,g.ty)]);
+    }
+}
+
