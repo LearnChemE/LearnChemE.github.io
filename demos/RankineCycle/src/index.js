@@ -11,7 +11,7 @@ window.gvs = {
     inlet_p3_pressure: 2.00,
     outlet_p4_pressure: 0.01,
     plot : {
-        margins: [[100, 50], [80, 80]],
+        margins: [[100, 50], [40, 80]],
         labels: [["pressure (MPa)", ""], ["", "enthalpy (kJ/kg)"]],
         domain: [-200, 4000, 1000, 200],
         range: [0.001, 100],
