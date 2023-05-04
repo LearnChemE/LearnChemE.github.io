@@ -9,7 +9,7 @@ $modal-xl: 1140px;
     display: grid;
     grid-template-columns: max-content max-content;
     justify-content: center;
-    gap: 0px 20px;
+    gap: 0px 0px;
     width: 100vw;
 }
 
@@ -35,14 +35,16 @@ $modal-xl: 1140px;
     justify-items: center;
     .input-row {
         display: grid;
-        grid-template-columns: 200px 10rem 27px 50px;
-        gap: 1ch;
+        grid-template-columns: 170px 15rem 35px 30px;
         align-items: end;
+        font-size: 14px;
         .data-name {
             justify-self: end;
+            margin-right: 1ch;
         }
         .data-value {
             text-align: end;
+            margin-right:3px;
         }
     }
 }
