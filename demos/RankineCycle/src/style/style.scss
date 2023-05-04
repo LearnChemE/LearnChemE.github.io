@@ -15,34 +15,86 @@ $modal-xl: 1140px;
 
 .modal-buttons-row {
     display: grid;
-    grid-template-columns: repeat(3, max-content);
-    gap: 10px;
+    grid-template-columns: max-content max-content;
+    gap: 5px;
     margin: 0.5rem auto;
     justify-content: center;
     align-content: center;
     .btn {
         height: max-content;
-        width: 12ch;
+        width: 11ch;
     }
 }
 
-.input-area {
+.controls {
     display: grid;
-    grid-template-columns: max-content;
-    margin: 20px auto;
-    gap: 10px;
-    width: max-content;
-    justify-items: center;
-    .input-row {
+    font-size: 14px;
+    .input-area {
         display: grid;
-        grid-template-columns: 200px 10rem 27px 50px;
-        gap: 1ch;
-        align-items: end;
-        .data-name {
-            justify-self: end;
+        grid-template-columns: max-content;
+        margin: 5px auto;
+        gap: 15px;
+        width: max-content;
+        justify-items: center;
+        &.top {
+            grid-template-columns: 300px 310px;
+            margin-top: 10px;
+
+            .input-row {
+                grid-template-columns: max-content 8rem 27px;
+                justify-self: start;
+                transform: translate(0px, -7px);
+            }
         }
-        .data-value {
-            text-align: end;
+        &.bottom {
+            grid-template-columns: repeat(2, max-content);
+            margin-bottom: 17px;
+        }
+        .button-row {
+            display: grid;
+            grid-template-columns: repeat(3, max-content);
+            height: min-content;
+            align-self: end;
+            .row-button {
+                border: 1px solid grey;
+                padding: 5px 10px;
+                background-color: rgb(227, 227, 255);
+                cursor: pointer;
+                -webkit-touch-callout: none; /* iOS Safari */
+                -webkit-user-select: none; /* Safari */
+                -khtml-user-select: none; /* Konqueror HTML */
+                -moz-user-select: none; /* Old versions of Firefox */
+                -ms-user-select: none; /* Internet Explorer/Edge */
+                user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+                &:hover {
+                    background-color: aliceblue;
+                }
+                &.active {
+                    background-color: rgb(193, 193, 255);
+                }
+            }
+            #p-h-diagram-button {
+                border-top-left-radius: 5px;
+                border-bottom-left-radius: 5px;
+                border-right: none;
+            }
+            #rankine-cycle-button {
+                border-top-right-radius: 5px;
+                border-bottom-right-radius: 5px;
+                border-left: none;
+            }
+        }
+        .input-row {
+            display: grid;
+            grid-template-columns: max-content 8rem 22px 27px;
+            gap: 1ch;
+            align-items: end;
+            .data-name {
+                justify-self: end;
+            }
+            .data-value {
+                text-align: end;
+            }
         }
     }
 }

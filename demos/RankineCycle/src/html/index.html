@@ -30,15 +30,39 @@
 <body>
 
   <div class="simulation-controls">
-    <div class="input-area">
+
+    <div class="controls">
+      <div class="input-area top">
   
-      <div class="input-row">
-        <div class="data-name">Label</div>
-        <input type="range" id="adjustable-slider" min="0" max="1" step="0.01" value="0.50">
-        <div class="data-value" id="adjustable-value">0.50</div>
-        <div class="data-metric"></div>
+        <div class="button-row">
+          <div class="row-button active" id="p-h-diagram-button">P-H diagram</div>
+          <div class="row-button" id="turbine-button">turbine</div>
+          <div class="row-button" id="rankine-cycle-button">Rankine cycle</div>
+        </div>
+  
+        <div class="input-row">
+          <div class="data-name">turbine efficiency</div>
+          <input type="range" id="turbine-efficiency-slider" min="0.5" max="0.95" step="0.01" value="0.75">
+          <div class="data-value" id="turbine-efficiency-value">0.75</div>
+        </div>
+    
       </div>
   
+      <div class="input-area bottom">
+        <div class="input-row">
+          <div class="data-name">inlet P<sub>3</sub> pressure</div>
+          <input type="range" id="inlet-p3-pressure-slider" min="0.5" max="2.00" step="0.05" value="2.00">
+          <div class="data-value" id="inlet-p3-pressure-value">2.00</div>
+          <div class="data-metric">MPa</div>
+        </div>
+  
+        <div class="input-row">
+          <div class="data-name">outlet P<sub>4</sub> pressure</div>
+          <input type="range" id="outlet-p4-pressure-slider" min="1" max="4" step="1" value="1">
+          <div class="data-value" id="outlet-p4-pressure-value">0.01</div>
+          <div class="data-metric">MPa</div>
+        </div>
+      </div>
     </div>
 
     <div class="modal-buttons-row">
