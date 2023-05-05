@@ -69,7 +69,7 @@
         </div>
         <div class="modal-body">
           <p>
-            Directions
+            This simulation displays the residence time distribution (RTD) of a compound that is injected into a continuously-stirred tank reactor (CSTR). In this simulation, multiple CSTRs are in series, such that the outlet of each CSTR is fed into the inlet of the next CSTR. A compound is pulse-injected into the first CSTR, and the plot displays the RTD of the last CSTR in the series. The RTD is a probability density function that shows the likelihood that a single particle of the injected compound will spend a certain amount of time within the last reactor. Adjust the "number of CSTRs in series" slider to change the number of CSTRs, and adjust the "spacetime" slider to change the mean residence time \( \tau = V / \upsilon \), where \( V \) is the volume of a CSTR and \( \upsilon \) is the volumetric flowrate of the liquid.
           </p>
 
         </div>
@@ -90,14 +90,96 @@
         </div>
 
         <div class="modal-body">
-          <div class="details-text">Details</div>
+          <div class="details-text">
+            A dye is pulse-injected into a CSTR or a CSTR in series, such that all of the dye enters the first CSTR within a negligibly small amount of time. The mass balance for the first CSTR in the series is
+          </div>
 
           <div class="details-eqn">
             $$
+            [1] \quad V \frac{dC_{1}}{dt} = \upsilon \, C_{0} - \upsilon \, C_{1}
+            $$
+          </div>
 
+          <div class="details-text">
+            where \( V \) is the volume of the CSTR (L), \( C_{0} \) is the concentration of dye in the inlet stream (mol/L), \( C_{1} \) is the concentration of dye in the first CSTR's outlet stream (mol/L), \( \upsilon \) is volumetric flowrate, and \( t \) is time (s). The boundary condition is \( C_{1} = C_{init} \) at \( t = 0 \), where \( C_{init} \) is the concentration of dye in the first reactor immediately after the dye is injected (this assumes perfect mixing). \( C_{0} = 0 \) because the concentration of dye in the inlet stream is zero after the dye is injected. The equation can be rearranged and integrated (given that \( \upsilon \, C_{0} = 0 \)):
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [2] \quad \int_{C_{init}}^{C_{1}} \frac{d C_{1}}{C_{1}} = - \int_{0}^{t} \frac{\upsilon \, dt}{V}
             $$
           </div>
           
+          <div class="details-text">
+            we assign a variable for spacetime \( \tau = V / \upsilon \) and evaluate the integral:
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [3] \quad \mathrm{ln} \left( \frac{C_{1}}{C_{init}} \right) = - \frac{t}{\tau}
+            $$
+          </div>
+
+          <div class="details-text">
+            Solving for \( C_{1} \), we find \( C_{1} = C_{init} e^{-t/\tau} \). The mass balance for the second CSTR in the series is
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [4] \quad V \frac{C_{2}}{dt} = \upsilon \, C_{1} - \upsilon \, C_{2} = \upsilon \, C_{init} e^{-t/\tau} - \upsilon \, C_{2}
+            $$
+          </div>
+
+          <div class="details-text">
+            where \( C_{2} \) is the concentration of dye in the second reactor. The boundary condition for the second reactor is \( C_{2} = 0 \) at \( t = 0 \). When equation [4] is integrated, we find
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [5] \quad C_{2} = \frac{C_{init} \, t \, e^{-t / \tau}}{\tau}
+            $$
+          </div>
+
+          <div class="details-text">
+            This can be generalized to \( n \) reactors in series, such that \( n^{th} \) reactor's concentration of dye \( C_{n} \) is
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [6] \quad C_{n} = \frac{C_{init} \, t^{n - 1} \, e^{-t / \tau}}{(n - 1)! \, \tau^{n - 1}}
+            $$
+          </div>
+
+          <div class="details-text">
+            The residence time distribution (RTD) is a normalized concentration curve, such that
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [7] \quad \int_{0}^{\infty} E(t) \, dt = 1
+            $$
+          </div>
+
+          <div class="details-text">
+            where \( E(t) \) is the RTD curve as a function of time and
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [8] \quad \frac{C_{n}}{\alpha} = E(t)
+            $$
+          </div>
+
+          <div class="details-text">
+            where \( \alpha \) is a constant. Combining equations [6], [7], and [8], then evaluating the integral, we find that \( \alpha = \tau \, C_{init} \), so the general function for RTD over time with \( n \) CSTRs is
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [9] \quad E_{n}(t) = \frac{t^{n - 1} \, e^{-t / \tau}}{(n - 1)! \, \tau^{n}}
+            $$
+          </div>
+
           <div style="margin-top: 2rem;"></div>
         </div>
 

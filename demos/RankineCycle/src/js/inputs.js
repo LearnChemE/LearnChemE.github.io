@@ -13,6 +13,7 @@ PHDiagramButton.addEventListener("click", () => {
   PHDiagramButton.classList.add("active");
   turbineButton.classList.remove("active");
   rankineCycleButton.classList.remove("active");
+  gvs.p.noLoop();
   gvs.p.redraw();
 });
 
@@ -21,6 +22,7 @@ turbineButton.addEventListener("click", () => {
   PHDiagramButton.classList.remove("active");
   turbineButton.classList.add("active");
   rankineCycleButton.classList.remove("active");
+  gvs.p.noLoop();
   gvs.p.redraw();
 });
 
@@ -29,7 +31,7 @@ rankineCycleButton.addEventListener("click", () => {
   PHDiagramButton.classList.remove("active");
   turbineButton.classList.remove("active");
   rankineCycleButton.classList.add("active");
-  gvs.p.redraw();
+  gvs.p.loop();
 });
 
 turbineEfficiencySlider.addEventListener("input", () => {
