@@ -322,8 +322,7 @@ function otherCalcs(){
             inter[0] = (H.b[0]-b)/(m-H.m);
             inter[1] = m*temp.x + b;
             let currentDist = ((inter[1]-temp.y)**2 + (inter[0]-temp.x)**2)**(1/2);
-            
-
+        
             g.enthalp = (0-10*currentDist/Hmag_dist).toFixed(0)
         } else if(temp.y <= y1 && temp.y >= y2){ // Everywhere else
             let dY = (y1 - y2);
@@ -341,18 +340,36 @@ function otherCalcs(){
         }
     }
 
+    p1[0] = map(-9.42,-10,55,g.lx,g.rx);
+    p1[1] = map(vOmega(-9.42,-5.5),0,0.033,g.by,g.ty);
+    m = -1/V.m;
+    b = p1[1] - m*p1[0];
+    p2[0] = (V.b[1]-b)/(m-V.m);
+    p2[1] = m*p2[0] + b;
+    let Vmag_dist = ((p2[1]-p1[1])**2 + (p2[0]-p1[1])**2)**(1/2);
+
     for(let i = 0; i < V.b.length-1; i++){
         let y1 = V.m*temp.x + V.b[i];
         let y2 = V.m*temp.x + V.b[i+1];
         if(temp.y >= y1 && temp.y >= y2){
-
+            let inter = [0,0];
+            inter[0] = (V.b[0]-b)/(m-V.m);
+            inter[1] = m*temp.x + b;
+            let currentDist = ((inter[1]-temp.y)**2 + (inter[0]-temp.x)**2)**(1/2);
+            g.volume = (.75-.05*currentDist/Vmag_dist).toFixed(2);
         } else if(temp.y <= y1 && temp.y >= y2){
             let dY = (y1 - y2);
             let dC = (y1 - temp.y);
             g.volume = ((0.05*i+.75)*(1-dC/dY) + (0.05*(i+1)+.75)*(dC/dY)).toFixed(2);
+            break;
         } else if (temp.y <= y1 && temp.y <= y2){ // Above the .95 line
-            let ratio = y2/temp.y;
-            //g.volume = .95 + .05*(ratio-1);
+            b = temp.y - m*temp.x;
+            let inter = [0,0];
+            inter[0] = (V.b[V.b.length-1]-b)/(m-V.m);
+            inter[1] = m*temp.x + b;
+            let currentDist = ((inter[1]-temp.y)**2 + (inter[0]-temp.x)**2)**(1/2);
+
+            g.volume = (.95 + .05*currentDist/Vmag_dist).toFixed(2);
         }
     }
 }

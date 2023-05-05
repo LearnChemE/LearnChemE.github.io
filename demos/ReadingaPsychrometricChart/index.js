@@ -76,7 +76,7 @@ function draw(){
    
     tempDisplay();
     otherCalcs();
-    //console.log(g.enthalp)
+    console.log(g.volume)
     if(g.humidTruth){
         relHumDisplay();
     }
