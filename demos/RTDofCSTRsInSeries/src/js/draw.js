@@ -116,8 +116,9 @@ function drawCurve(p) {
     x = Math.round(x * 1000) / 1000;
     const t = x;
     const n = gvs.n;
-    const tau = gvs.tau;
+    const tau = gvs.tau / n;
     const y = ((n / tau)**n) * ((t**(n - 1)) / math.factorial(n - 1)) * Math.exp((-1 * n * t) / tau);
+    // const y = t**(n - 1) * Math.exp(-1 * t / tau) / (math.factorial(n - 1) * tau**n);
     const pix = coordToPix(x, y);
     p.vertex(pix[0], pix[1]);
   }
