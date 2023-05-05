@@ -108,14 +108,40 @@
         </div>
 
         <div class="modal-body">
-          <div class="details-text">Details</div>
+          <div class="details-text">
+            The inlet temperature to the turbine, \( T_{3} \) (°C) is set; you can vary the inlet \( P_{3} \) and outlet \( P_{4} \) pressures (MPa). From these conditions the enthalpy \( H_{3} \) (kJ/kg) and entropy \( S_{3} \) (kJ/[kg K]) are obtained from the superheated steam tables. The superscript \( R \) denotes reversibility. A reversible steam turbine is isentropic, so \( S_{3} = S_{4}^{R} \), where \( S_{4}^{R} \) is the entropy of the steam exiting a reversible turbine. If \( S_{4}^{R} \gt S_{4}^{V} \) at \( P_{4} \), then the reversible outlet state is superheated.If \( S_{4}^{R} \lt S_{4}^{V} \) at \( P_{4} \), then the outlet steam is at saturation temperature and consists of liquid and vapor. The quality of the steam in a reversible turbine is:
+          </div>
 
           <div class="details-eqn">
             $$
-
+            q = \frac{s_{4}^{R} - s_{4}^{L}}{s_{4}^{V} - s_{4}^{L}}
             $$
           </div>
+
+          <div class="details-text">
+            where \( q \) is the fraction of vapor (quality), and the superscripts \( L \) and \( V \) refer to saturated liquid and saturated vapor. Depending on the quality of the exiting steam, \( H_{4}^{R} \) is obtained from either the saturated steam tables or the superheated steam tables. If \( S_{4}^{R} \gt S_{4}^{V} \), \( q = 1 \) and \( H_{4}^{R} \) is found in the superheated steam tables at \( P_{4} \) and \( S_{4}^{R} \). If \( S_{4}^{R} \lt S_{4}^{V} \), \( 0 \lt q \lt 1 \), and \( H_{4}^{R} = q \, H_{4}^{V} + (1 - q) H_{4}^{L} \). The change in enthalpy for the reversible turbine \( \Delta H^{R} = H_{4}^{R} - H_{3} \) is the work for the reversible process. The turbine efficiency \( \eta_{T} \) indicates the turbine irreversibility and is the ratio of irreversible work to reversible work. For the irreversible turbine:
+          </div>
+
+          <div class="details-eqn">
+            $$
+            \Delta H = \eta_{T} \Delta H^{R} = H_{4} - H_{3}
+            $$
+          </div>
+
+          <div class="details-text">
+            The cycle efficiency is:
+          </div>
           
+          <div class="details-eqn">
+            $$
+            \eta_{c} = \frac{ | {W} | }{Q_{H}}
+            $$
+          </div>
+
+          <div class="details-text">
+            where \( | W | = | H_{4} - H_{3} | - | H_{1} - H_{5} | \) is the net work (kJ/kg), and \( Q_{H} = H_{3} - H_{1} \) is heat added (kJ/kg). View <a href="https://www.youtube.com/watch?v=BA77fu3zAbs" target="_blank">this video</a> for an explanation of the Rankine cycle.
+          </div>
+
           <div style="margin-top: 2rem;"></div>
         </div>
 
