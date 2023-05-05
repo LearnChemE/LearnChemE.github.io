@@ -263,7 +263,9 @@ function drawTurbine(p) {
   const state4 = gvs.H4 > gvs.H(gvs.outlet_p4_pressure, 2) ? "superheated steam" : "vapor-liquid mixture";
   p.text(state4, 180, 150);
   p.text(`P  = ${gvs.outlet_p4_pressure.toFixed(2)} MPa`, 180, 180);
-  p.text(`T  = ${Math.round(gvs.T4)}°C`, 180, 210);
+  p.textAlign(p.LEFT);
+  p.text(`T  = ${Math.round(gvs.T4)}°C`, 138, 210);
+  p.textAlign(p.CENTER);
   if(state4 === "vapor-liquid mixture") {
     const HSatVapor = gvs.H(gvs.outlet_p4_pressure, 2);
     const HSatLiquid = gvs.H5;
