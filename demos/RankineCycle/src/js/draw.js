@@ -257,7 +257,7 @@ function drawTurbine(p) {
   p.triangle(40, 185, 40, 155, 85, 170);
   p.textAlign(p.CENTER, p.CENTER);
   p.textSize(20);
-  p.text(`η  = ${gvs.turbine_efficiency.toFixed(2)}`, 10, 0);
+  p.text(`η   = ${gvs.turbine_efficiency.toFixed(2)}`, 10, 0);
   p.text("superheated steam", -250, -170);
   p.text(`P  = ${gvs.inlet_p3_pressure.toFixed(2)} MPa`, -250, -140);
   p.text(`T  = 500°C`, -250, -110);
@@ -279,6 +279,7 @@ function drawTurbine(p) {
   p.text("3", -283, -102);
   p.text("4", 132, 189);
   p.text("4", 154, 219);
+  p.text("T", -14, 11);
   p.pop();
 }
 
