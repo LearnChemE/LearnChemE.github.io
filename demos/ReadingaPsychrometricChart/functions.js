@@ -208,11 +208,12 @@ function volDisplay(){
                 vertex(map(j,-10,55,g.lx,g.rx),map(vOmega(j,endTemp[i]),0,.033,g.by,g.ty));
             }  else if (i == 3 && j < 47){
                 vertex(map(j,-10,55,g.lx,g.rx),map(vOmega(j,endTemp[i]),0,.033,g.by,g.ty));
-                vertex(map(46.7,-10,55,g.lx,g.rx),map(vOmega(46.7,endTemp[i]),0,0.033,g.by,g.ty));
             }
         }
         if(i == endTemp.length-1){
             vertex(g.rx,map(vOmega(55,65.3),0,0.033,g.by,g.ty));  
+        } else if (i == 3){
+            vertex(map(46.7,-10,55,g.lx,g.rx),map(vOmega(46.7,endTemp[i]),0,0.033,g.by,g.ty));
         }
         endShape(); pop();
     }
@@ -256,12 +257,104 @@ function gridLinesFunc(){
 
 function tempDisplay(){
     let temp = g.points[0];
+    let xH = find2D(temp.y,w.px);
+    let t = find2Dint(w.px);
+    if(g.tempTruth){
+        push();
+        drawingContext.setLineDash([5,5]); strokeWeight(2);
+        line(temp.x,temp.y,temp.x,g.by-5);
+        
+        if(temp.y <= g.by-20){
+            line(temp.x,temp.y,xH+5,temp.y);
+        } else {
+            line(temp.x,temp.y,g.lx+5,temp.y);
+        }
+        
+        if(t[1] >= g.ty){
+            line(temp.x,temp.y,t[0]+3,t[1]+2);
+        } else {
+            let xtemp = (g.ty - t[2])/H.m;
+            line(temp.x,temp.y,xtemp,g.ty);
+        }
 
-    push();
-    drawingContext.setLineDash([5,5]); strokeWeight(2);
-    line(temp.x,temp.y,temp.x,g.by-5);
-    pop();
-    arrow([temp.x,temp.y],[temp.x,g.by],0,16,4);
+        pop();
+        arrow([temp.x,temp.y],[temp.x,g.by],0,16,4);
+        if(temp.y <= g.by-20){
+            arrow([temp.x,temp.y],[xH,temp.y],0,16,4);
+        } else {
+            arrow([temp.x,temp.y],[g.lx-2,temp.y],0,16,4);
+        }
+        if(t[1] >= g.ty){
+            arrow([temp.x,temp.y],t,0,16,4);
+        }
+    }
+    
+
+    g.dewPoint = (map(xH,g.lx,g.rx,-10,55)).toFixed(0);
+    g.dryBulb = (map(temp.x,g.lx,g.rx,-10,55)).toFixed(0);
+    g.wetBulb = (map(t[0],g.lx,g.rx,-10,55)).toFixed(0);
+
+
+}
+
+function otherCalcs(){
+    // Enthalpy calculation
+    let temp = g.points[0];
+
+    // Need the perpendicular distance between each line
+    let p1 = [0,0];
+    p1[0] = g.lx;
+    p1[1] = map(hOmega(0,-10),0,.033,g.by,g.ty);
+    let m = -1/H.m;
+    let b = p1[1] - m*p1[0];
+    let p2 = [0,0];
+    p2[0] = (H.b[1]-b)/(m - H.m);
+    p2[1] = m*p2[0] + b;
+    let Hmag_dist = ((p2[1]-p1[1])**2 + (p2[0]-p1[0])**2)**(1/2);
+
+
+    for(let i = 0; i < H.b.length-1; i++){
+        let y1 = H.m*temp.x + H.b[i];
+        let y2 = H.m*temp.x + H.b[i+1];
+        if(temp.y >= y1 && temp.y >= y2){ // Under the 0 line
+            b = temp.y - m*temp.x;
+            let inter = [0,0];
+            inter[0] = (H.b[0]-b)/(m-H.m);
+            inter[1] = m*temp.x + b;
+            let currentDist = ((inter[1]-temp.y)**2 + (inter[0]-temp.x)**2)**(1/2);
+            
+
+            g.enthalp = (0-10*currentDist/Hmag_dist).toFixed(0)
+        } else if(temp.y <= y1 && temp.y >= y2){ // Everywhere else
+            let dY = (y1 - y2);
+            let dC = (y1 - temp.y);
+            g.enthalp = ((10*i)*(1-dC/dY) + (10*(i+1))*(dC/dY)).toFixed(0);
+            break;
+        } else if(temp.y <= y1 && temp.y <= y2){ // Above the 130 line
+            b = temp.y - m*temp.x;
+            let inter = [0,0];
+            inter[0] = (H.b[H.b.length-1]-b)/(m-H.m);
+            inter[1] = m*temp.x + b;
+            let currentDist = ((inter[1]-temp.y)**2 + (inter[0]-temp.x)**2)**(1/2);
+            
+            g.enthalp = (130 + 10*currentDist/Hmag_dist).toFixed(0);
+        }
+    }
+
+    for(let i = 0; i < V.b.length-1; i++){
+        let y1 = V.m*temp.x + V.b[i];
+        let y2 = V.m*temp.x + V.b[i+1];
+        if(temp.y >= y1 && temp.y >= y2){
+
+        } else if(temp.y <= y1 && temp.y >= y2){
+            let dY = (y1 - y2);
+            let dC = (y1 - temp.y);
+            g.volume = ((0.05*i+.75)*(1-dC/dY) + (0.05*(i+1)+.75)*(dC/dY)).toFixed(2);
+        } else if (temp.y <= y1 && temp.y <= y2){ // Above the .95 line
+            let ratio = y2/temp.y;
+            //g.volume = .95 + .05*(ratio-1);
+        }
+    }
 }
 
 function Psat(T){
@@ -365,10 +458,44 @@ function defineLines(){
         V.b.push(y1-V.m*x1);
     }
 
-    for(let i = -10; i <= 55; i+=.01){
+    for(let i = -100; i <= 55; i+=.01){
         let y = phiOmega(1,i);
         let x = i;
         w.px.push([map(x,-10,55,g.lx,g.rx),map(y,0,.033,g.by,g.ty)]);
     }
 }
 
+
+function find2D(y, arr) {
+    let x;
+    for (let i = 0; i < arr.length - 1; i++) {
+        if (y <= arr[i][1] && y >= arr[i + 1][1]) {
+            x = arr[i][0] + (y - arr[i][1]) * (arr[i + 1][0] - arr[i][0]) / (arr[i + 1][1] - arr[i][1]);
+        }
+    }
+    return (x);
+}
+
+function find2Dint(arr){
+    let m1, m2, b1, b2;
+    let x1, x2, y1, y2;
+    let x, y;
+    
+    let temp = g.points[0];
+    m2 = H.m;
+    b2 = temp.y - temp.x*m2;
+    
+    for(let i = 0; i < arr.length-1; i++){
+        x1 = arr[i][0]; x2 = arr[i+1][0];
+        y1 = arr[i][1]; y2 = arr[i+1][1];
+        m1 = (y2 - y1)/(x2 - x1);
+        b1 = y1 - m1*x1;
+        let t = (b2 - b1)/(m1 - m2);
+        if(t >= x1 && t <= x2){
+            x = t;
+        }
+    }
+    y = m2*x + b2;
+    return([x,y,b2]);
+    
+}

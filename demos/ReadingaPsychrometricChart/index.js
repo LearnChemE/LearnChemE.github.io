@@ -32,6 +32,13 @@ window.g = {
     dragPoint: null,
     test: true,
 
+    // Values determined based on the position of the dot
+    dewPoint: 0,
+    wetBulb: 0,
+    dryBulb: 0,
+    enthalp: 0,
+    volume: 0,
+
 }
 
 H = { // For enthalpy info
@@ -66,9 +73,10 @@ function draw(){
     if(g.specVolTruth){
         volDisplay();
     }
-    if(g.tempTruth){
-        tempDisplay();
-    }
+   
+    tempDisplay();
+    otherCalcs();
+    //console.log(g.enthalp)
     if(g.humidTruth){
         relHumDisplay();
     }
@@ -128,16 +136,16 @@ function mousePressed() {
 function mouseDragged() {
    
     if (g.dragPoint) {
-        if(mouseX >= g.lx && mouseX <= g.rx && mouseY <= g.by && mouseY >= g.ty && g.test){ // Within the area
+        if(mouseX >= g.lx && mouseX <= g.rx && mouseY <= g.by-2 && mouseY >= g.ty && g.test){ // Within the area
             g.dragPoint.x = mouseX;
             g.dragPoint.y = mouseY;
-        } else if(mouseX < g.lx && g.test && mouseY <= g.by){ // To the left under the curve and outside graph
+        } else if(mouseX < g.lx && g.test && mouseY <= g.by-2){ // To the left under the curve and outside graph
             g.dragPoint.x = g.lx;
             g.dragPoint.y = mouseY;
-        } else if (mouseX >= g.lx && mouseX <= g.rx && mouseY >= g.by){ // Under the graph
+        } else if (mouseX >= g.lx && mouseX <= g.rx && mouseY >= g.by-2){ // Under the graph
             g.dragPoint.x = mouseX;
-            g.dragPoint.y = g.by;
-        } else if (mouseX >= g.rx && mouseY <= g.by && mouseY >= g.ty){ // To the right of the graph
+            g.dragPoint.y = g.by-2;
+        } else if (mouseX >= g.rx && mouseY <= g.by-2 && mouseY >= g.ty){ // To the right of the graph
             g.dragPoint.x = g.rx;
             g.dragPoint.y = mouseY;
         } else if (mouseX <= g.rx && mouseX >= 462 && mouseY <= g.ty && g.test){// Above the graph to the right of 100% rel hum
