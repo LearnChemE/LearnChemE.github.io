@@ -185,7 +185,7 @@ function drawCycle(p) {
   p.textSize(18);
   p.textAlign(p.LEFT, p.CENTER);
   p.text(`work = ${Math.round(gvs.W)} kJ`, gvs.plot.margins[0][0] + 150, gvs.plot.margins[1][0] + 30);
-  p.text(`cycle efficiency = ${(Math.round(100 * gvs.eff) / 100).toFixed(2)}`, gvs.plot.margins[0][0] + 350, gvs.plot.margins[1][0] + 30);
+  p.text(`cycle efficiency = ${(Math.round(1000 * gvs.eff) / 1000).toFixed(3)}`, gvs.plot.margins[0][0] + 350, gvs.plot.margins[1][0] + 30);
   if(gvs.H4 < gvs.H(gvs.outlet_p4_pressure, 2)) {
     const HSatVapor = gvs.H(gvs.outlet_p4_pressure, 2);
     const HSatLiquid = gvs.H5;
