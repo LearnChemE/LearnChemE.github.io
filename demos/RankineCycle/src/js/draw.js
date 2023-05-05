@@ -201,6 +201,7 @@ function drawCycle(p) {
 
 function drawTurbine(p) {
   p.push();
+  p.translate(0, -30);
   p.stroke(0);
   p.strokeWeight(2);
   p.translate(p.width / 2, p.height / 2);
@@ -283,6 +284,174 @@ function drawTurbine(p) {
   p.pop();
 }
 
+function isCursorOver(cursorX, cursorY, objectX, objectY, objectRadius) {
+  const distance_from_object = Math.sqrt((cursorX - objectX - gvs.p.width / 2)**2 + (cursorY - objectY - gvs.p.height / 2)**2);
+  if(distance_from_object <= objectRadius) {
+    return true
+  } else {
+    return false
+  }
+}
+
+function drawRankine(p) {
+  p.push();
+  p.translate(p.width / 2, p.height / 2);
+  p.fill(255, 190, 190);
+  p.stroke(0);
+  p.strokeWeight(1);
+  p.rect(-200, -100, 80, 160, 10);
+  p.fill(200, 200, 0);
+  p.beginShape();
+  p.vertex(150, -147);
+  p.vertex(220, -170);
+  p.vertex(220, -100);
+  p.vertex(150, -123);
+  p.endShape(p.CLOSE);
+  p.fill(220, 220, 255);
+  p.circle(180, 150, 90);
+  p.fill(220);
+  p.translate(0, 4);
+  p.circle(-50, 120, 70);
+  p.noStroke();
+  p.rect(5, 155, -60, -20);
+  p.rect(-55, 85, -55, 20);
+  p.stroke(0);
+  p.line(5, 155, -55, 155);
+  p.line(5, 135, -18, 135);
+  p.line(-55, 85, -110, 85);
+  p.line(-110, 105, -83, 105);
+  p.line(5, 155, 5, 135);
+  p.line(-110, 85, -110, 105);
+  p.strokeWeight(2);
+  p.translate(0, -4);
+  p.line(-160, -100, -160, -200);
+  p.line(-160, -200, 180, -200);
+  p.line(180, -200, 180, -160);
+  p.line(135, 150, 6, 150);
+  p.line(-110, 99, -160, 99);
+  p.line(-160, 99, -160, 61);
+  p.line(180, -110, 180, 105);
+  p.line(220, -135, 280, -135);
+  p.line(-280, -20, -200, -20);
+  p.noStroke();
+  p.fill(0);
+  p.triangle(180, -158, 186, -175, 174, -175);
+  p.triangle(180, 107, 186, 90, 174, 90);
+  p.triangle(4, 150, 19, 156, 19, 144);
+  p.triangle(-160, 58, -166, 73, -154, 73);
+  p.triangle(-198, -20, -213, -26, -213, -14);
+  p.triangle(282, -135, 267, -141, 267, -129);
+  p.fill(200);
+  p.strokeWeight(1);
+  p.stroke(0);
+  p.rect(220, -139, 30, 8);
+  p.noFill();
+  p.strokeWeight(2);
+  p.translate(0, 8);
+  p.beginShape();
+  p.vertex(160, 220);
+  p.vertex(160, 160);
+  p.vertex(170, 170);
+  p.vertex(180, 160);
+  p.vertex(190, 170);
+  p.vertex(200, 160);
+  p.vertex(200, 220);
+  p.endShape();
+  p.noStroke();
+  p.fill(0);
+  p.triangle(200, 222, 206, 207, 194, 207);
+  p.translate(0, -8);
+  p.textSize(16);
+  p.textAlign(p.CENTER, p.CENTER);
+  p.text("boiler", -160, -20);
+  p.text("turbine", 188, -135);
+  p.text("condenser", 180, 150);
+  p.text("pump", -50, 124);
+  p.textAlign(p.LEFT, p.CENTER);
+  p.text(`Q   = ${Math.round(gvs.H3 - gvs.H1)} kJ`, -385, -20);
+  p.text(`Q   = ${Math.round(gvs.H5 - gvs.H4)} kJ`, 190, 245);
+  p.text(`W = ${-1 * Math.round(gvs.W)} kJ`, 285, -135);
+  p.textSize(12);
+  p.text("H", -371, -14);
+  p.text("C", 204, 251);
+  p.textSize(16);
+  p.textAlign(p.CENTER, p.CENTER);
+  p.rectMode(p.CENTER);
+  p.strokeWeight(1);
+  const coord1 = [-225, 100];
+  const coord3 = [-225, -200];
+  const coord4 = [240, 0];
+  const coord5 = [50, 100];
+  if(isCursorOver(p.mouseX, p.mouseY, coord1[0], coord1[1], 15)) {
+    p.stroke(0);
+    p.fill(255);
+    p.rect(coord1[0], coord1[1], 110, 50, 5);
+    p.noStroke();
+    p.fill(0);
+    p.text("high-pressure\nliquid", coord1[0], coord1[1]);
+  } else {
+    p.stroke(0);
+    p.fill(255);
+    p.circle(coord1[0], coord1[1], 25);
+    p.noStroke();
+    p.fill(0);
+    p.text("1", coord1[0], coord1[1] + 1);
+  }
+
+  if(isCursorOver(p.mouseX, p.mouseY, coord3[0], coord3[1], 15)) {
+    p.stroke(0);
+    p.fill(255);
+    p.rect(coord3[0], coord3[1], 110, 50, 5);
+    p.noStroke();
+    p.fill(0);
+    p.text("superheated\nsteam", coord3[0], coord3[1]);
+  } else {
+    p.stroke(0);
+    p.fill(255);
+    p.circle(coord3[0], coord3[1], 25);
+    p.noStroke();
+    p.fill(0);
+    p.text("3", coord3[0], coord3[1] + 1);
+  }
+
+  if(isCursorOver(p.mouseX, p.mouseY, coord4[0], coord4[1], 15)) {
+    p.stroke(0);
+    p.fill(255);
+    p.rect(coord4[0], coord4[1], 110, 50, 5);
+    p.noStroke();
+    p.fill(0);
+    const state = gvs.H4 > gvs.H(gvs.outlet_p4_pressure, 2) ? "superheated\nsteam" : "vapor-liquid\nmixture";
+    p.text(state, coord4[0], coord4[1]);
+  } else {
+    p.stroke(0);
+    p.fill(255);
+    p.circle(coord4[0], coord4[1], 25);
+    p.noStroke();
+    p.fill(0);
+    p.text("4", coord4[0], coord4[1] + 1);
+  }
+
+  if(isCursorOver(p.mouseX, p.mouseY, coord5[0], coord5[1], 15)) {
+    p.stroke(0);
+    p.fill(255);
+    p.rect(coord5[0], coord5[1], 90, 50, 5);
+    p.noStroke();
+    p.fill(0);
+    p.text("saturated\nliquid", coord5[0], coord5[1]);
+  } else {
+    p.stroke(0);
+    p.fill(255);
+    p.circle(coord5[0], coord5[1], 25);
+    p.noStroke();
+    p.fill(0);
+    p.text("5", coord5[0], coord5[1] + 1);
+  }
+  p.fill(0);
+  p.noStroke();
+  p.text("move cursor over numbers to show phases present", 0, -240);
+  p.pop();
+}
+
 function drawAll(p) {
   if(gvs.display === "P-H diagram") {
     drawPhaseEnvelope(p);
@@ -293,7 +462,7 @@ function drawAll(p) {
     drawTurbine(p);
   }
   if(gvs.display === "Rankine cycle") {
-
+    drawRankine(p);
   }
 }
 
