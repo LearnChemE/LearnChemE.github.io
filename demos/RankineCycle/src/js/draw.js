@@ -185,6 +185,16 @@ function drawCycle(p) {
   p.textAlign(p.LEFT, p.CENTER);
   p.text(`work = ${Math.round(gvs.W)} kJ`, gvs.plot.margins[0][0] + 150, gvs.plot.margins[1][0] + 30);
   p.text(`cycle efficiency = ${(Math.round(100 * gvs.eff) / 100).toFixed(2)}`, gvs.plot.margins[0][0] + 350, gvs.plot.margins[1][0] + 30);
+  if(gvs.H4 < gvs.H(gvs.outlet_p4_pressure, 2)) {
+    const HSatVapor = gvs.H(gvs.outlet_p4_pressure, 2);
+    const HSatLiquid = gvs.H5;
+    const q = (HSatVapor - gvs.H4) / (HSatVapor - HSatLiquid);
+    const x = (gvs.saturation_list[0][0] + gvs.saturation_list[gvs.saturation_list.length - 1][0]) / 2;
+    const yPix = p.height - gvs.plot.margins[1][1] - 30;
+    const pix = coordToPix(x, 0.001);
+    p.textAlign(p.CENTER);
+    p.text(`${(Math.round(q * 1000) / 10).toFixed(1)}% liquid  ${(Math.round((1 - q) * 1000) / 10).toFixed(1)}% vapor`, pix[0], yPix);
+  }
   p.pop();
 }
 
