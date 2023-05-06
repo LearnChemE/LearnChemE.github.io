@@ -17,12 +17,12 @@ window.g = {
     by: 460,
 
     // Colors to be used repeatedly
-    green: [0,150,0],
-    blue: [0,50,255],
-    pink: [150,0,200],
+    green: [0, 150, 0],
+    blue: [0, 50, 255],
+    pink: [150, 0, 200],
 
     // Constants
-    MW: 28.97/18.02,
+    MW: 28.97 / 18.02,
     P: 1,
 
     // For manipulating the dot
@@ -41,6 +41,9 @@ window.g = {
 
 }
 
+// Test
+// Test 2
+
 H = { // For enthalpy info
     m: 0,
     b: [],
@@ -53,38 +56,38 @@ w = { // For relative humidity = 100%
     px: [],
 }
 
-function setup(){
-    g.cnv = createCanvas(780,600);
+function setup() {
+    g.cnv = createCanvas(780, 600);
     g.cnv.parent("graphics-wrapper");
     g.points.push(createVector(350, 350));
     defineLines();
 }
 
-function draw(){
+function draw() {
     background(250);
     frameDraw();
     pointTest();
-    if(g.enthalpTruth){
+    if (g.enthalpTruth) {
         enthalpDisplay();
     }
-    if(g.gridTruth){
+    if (g.gridTruth) {
         gridLinesFunc();
     }
-    if(g.specVolTruth){
+    if (g.specVolTruth) {
         volDisplay();
     }
-   
+
     tempDisplay();
     otherCalcs();
     //console.log(g.enthalp)
-    if(g.humidTruth){
+    if (g.humidTruth) {
         relHumDisplay();
     }
     //console.log(V.b)
     push();
     fill(0); noStroke();
     let temp = g.points[0];
-    ellipse(temp.x,temp.y,2*g.radius);
+    ellipse(temp.x, temp.y, 2 * g.radius);
     pop();
 }
 
@@ -134,28 +137,28 @@ function mousePressed() {
 }
 
 function mouseDragged() {
-   
+
     if (g.dragPoint) {
-        if(mouseX >= g.lx && mouseX <= g.rx && mouseY <= g.by-2 && mouseY >= g.ty && g.test){ // Within the area
+        if (mouseX >= g.lx && mouseX <= g.rx && mouseY <= g.by - 2 && mouseY >= g.ty && g.test) { // Within the area
             g.dragPoint.x = mouseX;
             g.dragPoint.y = mouseY;
-        } else if(mouseX < g.lx && g.test && mouseY <= g.by-2){ // To the left under the curve and outside graph
+        } else if (mouseX < g.lx && g.test && mouseY <= g.by - 2) { // To the left under the curve and outside graph
             g.dragPoint.x = g.lx;
             g.dragPoint.y = mouseY;
-        } else if (mouseX >= g.lx && mouseX <= g.rx && mouseY >= g.by-2){ // Under the graph
+        } else if (mouseX >= g.lx && mouseX <= g.rx && mouseY >= g.by - 2) { // Under the graph
             g.dragPoint.x = mouseX;
-            g.dragPoint.y = g.by-2;
-        } else if (mouseX >= g.rx && mouseY <= g.by-2 && mouseY >= g.ty){ // To the right of the graph
+            g.dragPoint.y = g.by - 2;
+        } else if (mouseX >= g.rx && mouseY <= g.by - 2 && mouseY >= g.ty) { // To the right of the graph
             g.dragPoint.x = g.rx;
             g.dragPoint.y = mouseY;
-        } else if (mouseX <= g.rx && mouseX >= 462 && mouseY <= g.ty && g.test){// Above the graph to the right of 100% rel hum
+        } else if (mouseX <= g.rx && mouseX >= 462 && mouseY <= g.ty && g.test) {// Above the graph to the right of 100% rel hum
             g.dragPoint.x = mouseX;
             g.dragPoint.y = g.ty;
-        } else if (!g.test && mouseX >= g.lx && mouseX <= 462){
+        } else if (!g.test && mouseX >= g.lx && mouseX <= 462) {
             g.dragPoint.x = mouseX;
-            let T = map(mouseX,g.lx,g.rx,-10,55);
-            let phi = phiOmega(1,T);
-            let y = map(phi,0,.033,g.by,g.ty);
+            let T = map(mouseX, g.lx, g.rx, -10, 55);
+            let phi = phiOmega(1, T);
+            let y = map(phi, 0, .033, g.by, g.ty);
             g.dragPoint.y = y;
         }
     }
