@@ -1,4 +1,4 @@
-/*! p5.js v1.5.0 October 18, 2022 */
+/*! p5.js v1.6.0 February 22, 2023 */
 (function (f) {
   if (typeof exports === 'object' && typeof module !== 'undefined') {
     module.exports = f()
@@ -1282,7 +1282,7 @@
               'params': [
                 {
                   'name': 'cap',
-                  'description': '<p>either ROUND, SQUARE or PROJECT</p>\n',
+                  'description': '<p>either ROUND, SQUARE, or PROJECT</p>\n',
                   'type': 'Constant'
                 }
               ],
@@ -1294,7 +1294,7 @@
               'params': [
                 {
                   'name': 'join',
-                  'description': '<p>either MITER, BEVEL, ROUND</p>\n',
+                  'description': '<p>either MITER, BEVEL, or ROUND</p>\n',
                   'type': 'Constant'
                 }
               ],
@@ -2698,6 +2698,11 @@
                   ]
                 }
               ]
+            },
+            'getTargetFrameRate': {
+              'name': 'getTargetFrameRate',
+              'class': 'p5',
+              'module': 'Environment'
             },
             'noCursor': {
               'name': 'noCursor',
@@ -11292,7 +11297,23 @@
             'copy': {
               'name': 'copy',
               'class': 'p5.Vector',
-              'module': 'Math'
+              'module': 'Math',
+              'overloads': [
+                {
+                  'params': [
+                  ]
+                },
+                {
+                  'params': [
+                    {
+                      'name': 'v',
+                      'description': '<p>the <a href="#/p5.Vector">p5.Vector</a> to create a copy of</p>\n',
+                      'type': 'p5.Vector'
+                    }
+                  ],
+                  'static': 1
+                }
+              ]
             },
             'add': {
               'name': 'add',
@@ -11789,7 +11810,23 @@
             'magSq': {
               'name': 'magSq',
               'class': 'p5.Vector',
-              'module': 'Math'
+              'module': 'Math',
+              'overloads': [
+                {
+                  'params': [
+                  ]
+                },
+                {
+                  'params': [
+                    {
+                      'name': 'vecT',
+                      'description': '<p>the vector to return the squared magnitude of</p>\n',
+                      'type': 'p5.Vector'
+                    }
+                  ],
+                  'static': 1
+                }
+              ]
             },
             'dot': {
               'name': 'dot',
@@ -11934,32 +11971,100 @@
             },
             'limit': {
               'name': 'limit',
-              'params': [
-                {
-                  'name': 'max',
-                  'description': '<p>The maximum magnitude for the vector</p>\n',
-                  'type': 'Number'
-                }
-              ],
               'class': 'p5.Vector',
-              'module': 'Math'
+              'module': 'Math',
+              'overloads': [
+                {
+                  'params': [
+                    {
+                      'name': 'max',
+                      'description': '<p>The maximum magnitude for the vector</p>\n',
+                      'type': 'Number'
+                    }
+                  ],
+                  'chainable': 1
+                },
+                {
+                  'params': [
+                    {
+                      'name': 'v',
+                      'description': '<p>the vector to limit</p>\n',
+                      'type': 'p5.Vector'
+                    },
+                    {
+                      'name': 'max',
+                      'description': '',
+                      'type': 'Number'
+                    },
+                    {
+                      'name': 'target',
+                      'description': '<p>the vector to receive the result (Optional)</p>\n',
+                      'type': 'p5.Vector',
+                      'optional': true
+                    }
+                  ],
+                  'static': 1
+                }
+              ]
             },
             'setMag': {
               'name': 'setMag',
-              'params': [
-                {
-                  'name': 'len',
-                  'description': '<p>The new length for this vector</p>\n',
-                  'type': 'Number'
-                }
-              ],
               'class': 'p5.Vector',
-              'module': 'Math'
+              'module': 'Math',
+              'overloads': [
+                {
+                  'params': [
+                    {
+                      'name': 'len',
+                      'description': '<p>The new length for this vector</p>\n',
+                      'type': 'Number'
+                    }
+                  ],
+                  'chainable': 1
+                },
+                {
+                  'params': [
+                    {
+                      'name': 'v',
+                      'description': '<p>the vector to set the magnitude of</p>\n',
+                      'type': 'p5.Vector'
+                    },
+                    {
+                      'name': 'len',
+                      'description': '',
+                      'type': 'Number'
+                    },
+                    {
+                      'name': 'target',
+                      'description': '<p>the vector to receive the result (Optional)</p>\n',
+                      'type': 'p5.Vector',
+                      'optional': true
+                    }
+                  ],
+                  'static': 1
+                }
+              ]
             },
             'heading': {
               'name': 'heading',
               'class': 'p5.Vector',
-              'module': 'Math'
+              'module': 'Math',
+              'overloads': [
+                {
+                  'params': [
+                  ]
+                },
+                {
+                  'params': [
+                    {
+                      'name': 'v',
+                      'description': '<p>the vector to find the angle of</p>\n',
+                      'type': 'p5.Vector'
+                    }
+                  ],
+                  'static': 1
+                }
+              ]
             },
             'setHeading': {
               'name': 'setHeading',
@@ -12013,15 +12118,34 @@
             },
             'angleBetween': {
               'name': 'angleBetween',
-              'params': [
-                {
-                  'name': 'value',
-                  'description': '<p>The x, y, and z components of a <a href="#/p5.Vector">p5.Vector</a></p>\n',
-                  'type': 'p5.Vector'
-                }
-              ],
               'class': 'p5.Vector',
-              'module': 'Math'
+              'module': 'Math',
+              'overloads': [
+                {
+                  'params': [
+                    {
+                      'name': 'value',
+                      'description': '<p>The x, y, and z components of a <a href="#/p5.Vector">p5.Vector</a></p>\n',
+                      'type': 'p5.Vector'
+                    }
+                  ]
+                },
+                {
+                  'params': [
+                    {
+                      'name': 'v1',
+                      'description': '<p>the first vector</p>\n',
+                      'type': 'p5.Vector'
+                    },
+                    {
+                      'name': 'v2',
+                      'description': '<p>the second vector</p>\n',
+                      'type': 'p5.Vector'
+                    }
+                  ],
+                  'static': 1
+                }
+              ]
             },
             'lerp': {
               'name': 'lerp',
@@ -12098,20 +12222,62 @@
             },
             'reflect': {
               'name': 'reflect',
-              'params': [
-                {
-                  'name': 'surfaceNormal',
-                  'description': '<p>The <a href="#/p5.Vector">p5.Vector</a> to reflect about; will be normalized by this method.</p>\n',
-                  'type': 'p5.Vector'
-                }
-              ],
               'class': 'p5.Vector',
-              'module': 'Math'
+              'module': 'Math',
+              'overloads': [
+                {
+                  'params': [
+                    {
+                      'name': 'surfaceNormal',
+                      'description': '<p>the <a href="#/p5.Vector">p5.Vector</a>\n                                   to reflect about.</p>\n',
+                      'type': 'p5.Vector'
+                    }
+                  ],
+                  'chainable': 1
+                },
+                {
+                  'params': [
+                    {
+                      'name': 'incidentVector',
+                      'description': '<p>vector to be reflected</p>\n',
+                      'type': 'p5.Vector'
+                    },
+                    {
+                      'name': 'surfaceNormal',
+                      'description': '',
+                      'type': 'p5.Vector'
+                    },
+                    {
+                      'name': 'target',
+                      'description': '<p>the vector to receive the result (Optional)</p>\n',
+                      'type': 'p5.Vector',
+                      'optional': true
+                    }
+                  ],
+                  'static': 1
+                }
+              ]
             },
             'array': {
               'name': 'array',
               'class': 'p5.Vector',
-              'module': 'Math'
+              'module': 'Math',
+              'overloads': [
+                {
+                  'params': [
+                  ]
+                },
+                {
+                  'params': [
+                    {
+                      'name': 'v',
+                      'description': '<p>the vector to convert to an array</p>\n',
+                      'type': 'p5.Vector'
+                    }
+                  ],
+                  'static': 1
+                }
+              ]
             },
             'equals': {
               'name': 'equals',
@@ -12148,6 +12314,21 @@
                       'type': 'p5.Vector|Array'
                     }
                   ]
+                },
+                {
+                  'params': [
+                    {
+                      'name': 'v1',
+                      'description': '<p>the first vector to compare</p>\n',
+                      'type': 'p5.Vector|Array'
+                    },
+                    {
+                      'name': 'v2',
+                      'description': '<p>the second vector to compare</p>\n',
+                      'type': 'p5.Vector|Array'
+                    }
+                  ],
+                  'static': 1
                 }
               ]
             },
@@ -54966,7 +55147,7 @@
         };
         /**
  * All drawing that follows <a href="#/p5/erase">erase()</a> will subtract from
- * the canvas.Erased areas will reveal the web page underneath the canvas.Erasing
+ * the canvas. Erased areas will reveal the web page underneath the canvas. Erasing
  * can be canceled with <a href="#/p5/noErase">noErase()</a>.
  *
  * Drawing done with <a href="#/p5/image">image()</a> and <a href="#/p5/background">
@@ -55111,7 +55292,7 @@
  * @property {String} VERSION
  * @final
  */
-        var VERSION = '1.5.0'; // GRAPHICS RENDERER
+        var VERSION = '1.6.0'; // GRAPHICS RENDERER
         /**
  * The default, two-dimensional renderer.
  * @property {String} P2D
@@ -56342,6 +56523,23 @@
  */
         _main.default.prototype.setFrameRate = function (fps) {
           return this.frameRate(fps);
+        };
+        /**
+ * Returns _targetFrameRate variable. The default _targetFrameRate is set to 60.
+ * This could be changed by calling frameRate() and setting it to the desired
+ * value. When getTargetFrameRate() is called, it should return the value that was set.
+ * @method getTargetFrameRate
+ * @return {Number} _targetFrameRate
+ * @example
+ * <div><code>
+ * function draw() {
+ *   frameRate(20);
+ *   text(getTargetFrameRate(), width / 2, height / 2);
+ * }
+ * </code></div>
+ */
+        _main.default.prototype.getTargetFrameRate = function () {
+          return this._targetFrameRate;
         };
         /**
  * Hides the cursor from view.
@@ -60649,7 +60847,8 @@
               resize: null,
               blur: null
             };
-            this._millisStart = - 1; // States used in the custom random generators
+            this._millisStart = - 1;
+            this._recording = false; // States used in the custom random generators
             this._lcg_random_state = null;
             this._gaussian_previous = false;
             this._events.wheel = null;
@@ -60725,7 +60924,9 @@
                 _this._runIfPreloadsAreDone();
               } else {
                 _this._setup();
-                _this._draw();
+                if (!_this._recording) {
+                  _this._draw();
+                }
               }
             };
             this._runIfPreloadsAreDone = function () {
@@ -60736,9 +60937,12 @@
                   loadingScreen.parentNode.removeChild(loadingScreen);
                 }
                 if (!this._setupDone) {
-                  this._lastFrameTime = window.performance.now();
+                  this._lastTargetFrameTime = window.performance.now();
+                  this._lastRealFrameTime = window.performance.now();
                   context._setup();
-                  context._draw();
+                  if (!this._recording) {
+                    context._draw();
+                  }
                 }
               }
             };
@@ -60813,7 +61017,8 @@
                   }
                 }
               }
-              _this._lastFrameTime = window.performance.now();
+              _this._lastTargetFrameTime = window.performance.now();
+              _this._lastRealFrameTime = window.performance.now();
               _this._setupDone = true;
               if (_this._accessibleOutputs.grid || _this._accessibleOutputs.text) {
                 _this._updateAccsOutput();
@@ -60821,7 +61026,7 @@
             };
             this._draw = function () {
               var now = window.performance.now();
-              var time_since_last = now - _this._lastFrameTime;
+              var time_since_last = now - _this._lastTargetFrameTime;
               var target_time_between_frames = 1000 / _this._targetFrameRate; // only draw if we really need to; don't overextend the browser.
               // draw if we're within 5ms of when our next frame should paint
               // (this will prevent us from giving up opportunities to draw
@@ -60834,10 +61039,11 @@
               if (!_this._loop || time_since_last >= target_time_between_frames - epsilon) {
                 //mandatory update values(matrixes and stack)
                 _this.redraw();
-                _this._frameRate = 1000 / (now - _this._lastFrameTime);
-                _this.deltaTime = now - _this._lastFrameTime;
+                _this._frameRate = 1000 / (now - _this._lastRealFrameTime);
+                _this.deltaTime = now - _this._lastRealFrameTime;
                 _this._setProperty('deltaTime', _this.deltaTime);
-                _this._lastFrameTime = now; // If the user is actually using mouse module, then update
+                _this._lastTargetFrameTime = Math.max(_this._lastTargetFrameTime + target_time_between_frames, now);
+                _this._lastRealFrameTime = now; // If the user is actually using mouse module, then update
                 // coordinates, otherwise skip. We can test this by simply
                 // checking if any of the mouse functions are available or not.
                 // NOTE : This reflects only in complete build or modular build.
@@ -62670,6 +62876,7 @@
             if (typeof maxHeight !== 'undefined') {
               if (this._rectMode === constants.CENTER) {
                 y -= maxHeight / 2;
+                finalMinHeight -= maxHeight / 2;
               }
               var originalY = y;
               var ascent = p.textAscent();
@@ -62798,7 +63005,7 @@
             } // Renders lines of text at any line breaks present in the original string
 
             for (var i = 0; i < lines.length; i++) {
-              this._renderText(p, lines[i], x, y - _offset2, finalMaxHeight, finalMinHeight);
+              this._renderText(p, lines[i], x, y - _offset2, finalMaxHeight, finalMinHeight - _offset2);
               y += p.textLeading();
             }
           }
@@ -63111,6 +63318,9 @@
             img._animateGif(this._pInst);
           }
           try {
+            if (_main.default.MediaElement && img instanceof _main.default.MediaElement) {
+              img._ensureCanvas();
+            }
             if (this._tint && img.canvas) {
               cnv = this._getTintedImageCanvas(img);
             }
@@ -65262,7 +65472,7 @@
           }
           _main.default._validateParameters('quad', args);
           if (this._renderer._doStroke || this._renderer._doFill) {
-            if (this._renderer.isP3D && args.length <= 12) {
+            if (this._renderer.isP3D && args.length < 12) {
               // if 3D and we weren't passed 12 args, assume Z is 0
               this._renderer.quad.call(this._renderer, args[0], args[1], 0, args[2], args[3], 0, args[4], args[5], 0, args[6], args[7], 0, args[8], args[9]);
             } else {
@@ -65584,19 +65794,19 @@
  * which parameters given to <a href="#/p5/ellipse">ellipse()</a>,
  * <a href="#/p5/circle">circle()</a> and <a href="#/p5/arc">arc()</a> are interpreted.
  *
- * The default mode is CENTER, in which the first two parameters are interpreted
+ * The default mode is `CENTER`, in which the first two parameters are interpreted
  * as the shape's center point's x and y coordinates respectively, while the third
  * and fourth parameters are its width and height.
  *
- * ellipseMode(RADIUS) also uses the first two parameters as the shape's center
+ * `ellipseMode(RADIUS)` also uses the first two parameters as the shape's center
  * point's x and y coordinates, but uses the third and fourth parameters to
  * specify half of the shapes's width and height.
  *
- * ellipseMode(CORNER) interprets the first two parameters as the upper-left
+ * `ellipseMode(CORNER)` interprets the first two parameters as the upper-left
  * corner of the shape, while the third and fourth parameters are its width
  * and height.
  *
- * ellipseMode(CORNERS) interprets the first two parameters as the location of
+ * `ellipseMode(CORNERS)` interprets the first two parameters as the location of
  * one corner of the ellipse's bounding box, and the third and fourth parameters
  * as the location of the opposite corner.
  *
@@ -65644,11 +65854,15 @@
           return this;
         };
         /**
- * Draws all geometry with jagged (aliased) edges. Note that <a href="#/p5/smooth">smooth()</a> is
- * active by default in 2D mode, so it is necessary to call <a href="#/p5/noSmooth">noSmooth()</a> to disable
- * smoothing of geometry, images, and fonts. In 3D mode, <a href="#/p5/noSmooth">noSmooth()</a> is enabled
- * by default, so it is necessary to call <a href="#/p5/smooth">smooth()</a> if you would like
- * smooth (antialiased) edges on your geometry.
+ * Draws all geometry with jagged (aliased) edges.
+ *
+ * Note that <a href="#/p5/smooth">smooth()</a> is active by default in 2D mode, so it is
+ * necessary to call <a href="#/p5/noSmooth">noSmooth()</a> to disable smoothing of geometry,
+ * images, and fonts.
+ *
+ * In 3D mode, <a href="#/p5/noSmooth">noSmooth()</a> is enabled by default, so it is necessary
+ * to call <a href="#/p5/smooth">smooth()</a> if you would like smooth (antialiased) edges on your
+ * geometry.
  *
  * @method noSmooth
  * @chainable
@@ -65681,20 +65895,20 @@
  * Modifies the location from which rectangles are drawn by changing the way
  * in which parameters given to <a href="#/p5/rect">rect()</a> are interpreted.
  *
- * The default mode is CORNER, which interprets the first two parameters as the
+ * The default mode is `CORNER`, which interprets the first two parameters as the
  * upper-left corner of the shape, while the third and fourth parameters are its
  * width and height.
  *
- * rectMode(CORNERS) interprets the first two parameters as the location of
+ * `rectMode(CORNERS)` interprets the first two parameters as the location of
  * one of the corners, and the third and fourth parameters as the location of
  * the diagonally opposite corner. Note, the rectangle is drawn between the
  * coordinates, so it is not necessary that the first corner be the upper left
  * corner.
  *
- * rectMode(CENTER) interprets the first two parameters as the shape's center
+ * `rectMode(CENTER)` interprets the first two parameters as the shape's center
  * point, while the third and fourth parameters are its width and height.
  *
- * rectMode(RADIUS) also uses the first two parameters as the shape's center
+ * `rectMode(RADIUS)` also uses the first two parameters as the shape's center
  * point, but uses the third and fourth parameters to specify half of the shape's
  * width and height respectively.
  *
@@ -65742,11 +65956,15 @@
         };
         /**
  * Draws all geometry with smooth (anti-aliased) edges. <a href="#/p5/smooth">smooth()</a> will also
- * improve image quality of resized images. Note that <a href="#/p5/smooth">smooth()</a> is active by
- * default in 2D mode; <a href="#/p5/noSmooth">noSmooth()</a> can be used to disable smoothing of geometry,
- * images, and fonts. In 3D mode, <a href="#/p5/noSmooth">noSmooth()</a> is enabled
- * by default, so it is necessary to call <a href="#/p5/smooth">smooth()</a> if you would like
- * smooth (antialiased) edges on your geometry.
+ * improve image quality of resized images.
+ *
+ * Note that <a href="#/p5/smooth">smooth()</a> is active by default in 2D mode;
+ * <a href="#/p5/noSmooth">noSmooth()</a> can be used to disable smoothing of geometry,
+ * images, and fonts.
+ *
+ * In 3D mode, <a href="#/p5/noSmooth">noSmooth()</a> is enabled by default, so it is
+ * necessary to call <a href="#/p5/smooth">smooth()</a> if you would like smooth (antialiased)
+ * edges on your geometry.
  *
  * @method smooth
  * @chainable
@@ -65776,14 +65994,14 @@
         };
         /**
  * Sets the style for rendering line endings. These ends are either rounded,
- * squared or extended, each of which specified with the corresponding
- * parameters: ROUND, SQUARE and PROJECT. The default cap is ROUND.
+ * squared, or extended, each of which specified with the corresponding
+ * parameters: `ROUND`, `SQUARE`, or `PROJECT`. The default cap is `ROUND`.
  *
  * The parameter to this method must be written in ALL CAPS because they are
  * predefined as constants in ALL CAPS and Javascript is a case-sensitive language.
  *
  * @method strokeCap
- * @param  {Constant} cap either ROUND, SQUARE or PROJECT
+ * @param  {Constant} cap either ROUND, SQUARE, or PROJECT
  * @chainable
  * @example
  * <div>
@@ -65811,15 +66029,15 @@
         };
         /**
  * Sets the style of the joints which connect line segments. These joints
- * are either mitered, beveled or rounded and specified with the
- * corresponding parameters MITER, BEVEL and ROUND. The default joint is
- * MITER.
+ * are either mitered, beveled, or rounded and specified with the
+ * corresponding parameters: `MITER`, `BEVEL`, or `ROUND`. The default joint is
+ * `MITER` in 2D mode and `ROUND` in WebGL mode.
  *
  * The parameter to this method must be written in ALL CAPS because they are
  * predefined as constants in ALL CAPS and Javascript is a case-sensitive language.
  *
  * @method strokeJoin
- * @param  {Constant} join either MITER, BEVEL, ROUND
+ * @param  {Constant} join either MITER, BEVEL, or ROUND
  * @chainable
  * @example
  * <div>
@@ -65877,7 +66095,7 @@
           return this;
         };
         /**
- * Sets the width of the stroke used for lines, points and the border around
+ * Sets the width of the stroke used for lines, points, and the border around
  * shapes. All widths are set in units of pixels.
  *
  * Note that it is affected by any transformation or scaling that has
@@ -66409,12 +66627,13 @@
  */
         _main.default.prototype.curvePoint = function (a, b, c, d, t) {
           _main.default._validateParameters('curvePoint', arguments);
-          var t3 = t * t * t,
+          var s = this._renderer._curveTightness,
+          t3 = t * t * t,
           t2 = t * t,
-          f1 = - 0.5 * t3 + t2 - 0.5 * t,
-          f2 = 1.5 * t3 - 2.5 * t2 + 1,
-          f3 = - 1.5 * t3 + 2 * t2 + 0.5 * t,
-          f4 = 0.5 * t3 - 0.5 * t2;
+          f1 = (s - 1) / 2 * t3 + (1 - s) * t2 + (s - 1) / 2 * t,
+          f2 = (s + 3) / 2 * t3 + ( - 5 - s) / 2 * t2 + 1,
+          f3 = ( - 3 - s) / 2 * t3 + (s + 2) * t2 + (1 - s) / 2 * t,
+          f4 = (1 - s) / 2 * t3 + (s - 1) / 2 * t2;
           return a * f1 + b * f2 + c * f3 + d * f4;
         };
         /**
@@ -66454,11 +66673,13 @@
  */
         _main.default.prototype.curveTangent = function (a, b, c, d, t) {
           _main.default._validateParameters('curveTangent', arguments);
-          var t2 = t * t,
-          f1 = - 3 * t2 / 2 + 2 * t - 0.5,
-          f2 = 9 * t2 / 2 - 5 * t,
-          f3 = - 9 * t2 / 2 + 4 * t + 0.5,
-          f4 = 3 * t2 / 2 - t;
+          var s = this._renderer._curveTightness,
+          tt3 = t * t * 3,
+          t2 = t * 2,
+          f1 = (s - 1) / 2 * tt3 + (1 - s) * t2 + (s - 1) / 2,
+          f2 = (s + 3) / 2 * tt3 + ( - 5 - s) / 2 * t2,
+          f3 = ( - 3 - s) / 2 * tt3 + (s + 2) * t2 + (1 - s) / 2,
+          f4 = (1 - s) / 2 * tt3 + (s - 1) / 2 * t2;
           return a * f1 + b * f2 + c * f3 + d * f4;
         };
         var _default = _main.default;
@@ -72646,7 +72867,11 @@
             promise.catch(function (e) {
               // if it's an autoplay failure error
               if (e.name === 'NotAllowedError') {
-                _main.default._friendlyAutoplayError(_this.src);
+                if (typeof IS_MINIFIED === 'undefined') {
+                  _main.default._friendlyAutoplayError(_this.src);
+                } else {
+                  console.error(e);
+                }
               } else {
                 // any other kind of error
                 console.error('Media play method encountered an unexpected error', e);
@@ -72895,7 +73120,11 @@
         _main.default.MediaElement.prototype._setupAutoplayFailDetection = function () {
           var _this2 = this;
           var timeout = setTimeout(function () {
-            return _main.default._friendlyAutoplayError(_this2.src);
+            if (typeof IS_MINIFIED === 'undefined') {
+              _main.default._friendlyAutoplayError(_this2.src);
+            } else {
+              console.error(e);
+            }
           }, 500);
           this.elt.addEventListener('play', function () {
             return clearTimeout(timeout);
@@ -75081,7 +75310,7 @@
  *   y += floor(movedY / 5);
  *   background(237, 34, 93);
  *   fill(0);
- *   rect(y, 50, 50, 50);
+ *   rect(50, y, 50, 50);
  *   describe(`box moves up and down according to mouse movement then
  *     slowly back towards the center`);
  * }
@@ -77624,7 +77853,6 @@
         _dereq_('core-js/modules/es.symbol.description');
         _dereq_('core-js/modules/es.symbol.iterator');
         _dereq_('core-js/modules/es.array.copy-within');
-        _dereq_('core-js/modules/es.array.every');
         _dereq_('core-js/modules/es.array.includes');
         _dereq_('core-js/modules/es.array.index-of');
         _dereq_('core-js/modules/es.array.iterator');
@@ -77687,7 +77915,6 @@
           return _typeof(obj);
         }
         _dereq_('core-js/modules/es.array.copy-within');
-        _dereq_('core-js/modules/es.array.every');
         _dereq_('core-js/modules/es.array.includes');
         _dereq_('core-js/modules/es.array.index-of');
         _dereq_('core-js/modules/es.array.iterator');
@@ -77887,6 +78114,7 @@
               }, function (e) {
                 if (typeof failureCallback === 'function') {
                   failureCallback(e);
+                  self._decrementPreload();
                 } else {
                   console.error(e);
                 }
@@ -77908,6 +78136,7 @@
                 _main.default._friendlyFileLoadError(0, img.src);
                 if (typeof failureCallback === 'function') {
                   failureCallback(e);
+                  self._decrementPreload();
                 } else {
                   console.error(e);
                 }
@@ -77927,6 +78156,7 @@
             _main.default._friendlyFileLoadError(0, path);
             if (typeof failureCallback === 'function') {
               failureCallback(e);
+              self._decrementPreload();
             } else {
               console.error(e);
             }
@@ -77951,8 +78181,7 @@
  * will be created. If 'frames', the arguments now correspond to the number of frames you want your
  * animation to be, if you are very sure of this number.
  *
- * It is not recommended to write this function inside setup, since it won't work properly.
- * The recommended use can be seen in the example, where we use it inside an event function,
+ * This may be called in setup, or, like in the example below, inside an event function,
  * like keyPressed or mousePressed.
  *
  * @method saveGif
@@ -78005,8 +78234,8 @@
           var _ref = _asyncToGenerator(          /*#__PURE__*/
           regeneratorRuntime.mark(function _callee(fileName, duration) {
             var options,
-            units,
             delay,
+            units,
             _frameRate,
             gifFrameDelay,
             nFrames,
@@ -78022,18 +78251,14 @@
             data,
             gif,
             globalPalette,
+            paletteCache,
+            getIndexedFrame,
             transparentIndex,
+            prevIndexedFrame,
             i,
-            _indexedFrame,
-            currFramePixels,
-            lastFramePixels,
-            matchingPixelsInFrames,
-            _p,
-            currPixel,
-            lastPixel,
             indexedFrame,
+            originalIndexedFrame,
             _i,
-            pixelIndex,
             buffer,
             extension,
             blob,
@@ -78058,22 +78283,23 @@
                     }
                     throw TypeError('Duration parameter must be a number');
                   case 5:
-                    if (!(typeof options.delay !== 'number')) {
-                      _context.next = 7;
-                      break;
-                    }
-                    throw TypeError('Delay parameter must be a number');
-                  case 7:
-                    if (!(options.units !== 'seconds' && options.units !== 'frames')) {
+                    // extract variables for more comfortable use
+                    delay = options && options.delay || 0; // in seconds
+                    units = options && options.units || 'seconds'; // either 'seconds' or 'frames'
+                    // if arguments in the options object are not correct, cancel operation
+                    if (!(typeof delay !== 'number')) {
                       _context.next = 9;
                       break;
                     }
-                    throw TypeError('Units parameter must be either "frames" or "seconds"');
+                    throw TypeError('Delay parameter must be a number');
                   case 9:
-                    // extract variables for more comfortable use
-                    units = options.units;
-                    delay = options.delay; //   console.log(options);
-                    // get the project's framerate
+                    if (!(units !== 'seconds' && units !== 'frames')) {
+                      _context.next = 11;
+                      break;
+                    }
+                    throw TypeError('Units parameter must be either "frames" or "seconds"');
+                  case 11:
+                    this._recording = true; // get the project's framerate
                     _frameRate = this._targetFrameRate; // if it is undefined or some non useful value, assume it's 60
                     if (_frameRate === Infinity || _frameRate === undefined || _frameRate === 0) {
                       _frameRate = 60;
@@ -78114,9 +78340,9 @@
                     } // stop the loop since we are going to manually redraw
 
                     this.noLoop();
-                  case 35:
+                  case 36:
                     if (!(frameIterator < totalNumberOfFrames)) {
-                      _context.next = 46;
+                      _context.next = 47;
                       break;
                     }                    /*
               we draw the next frame. this is important, since
@@ -78138,97 +78364,86 @@
                     frames.push(data);
                     frameIterator++;
                     p.html('Saved frame <b>' + frames.length.toString() + '</b> out of ' + nFrames.toString());
-                    _context.next = 44;
+                    _context.next = 45;
                     return new Promise(function (resolve) {
                       return setTimeout(resolve, 0);
                     });
-                  case 44:
-                    _context.next = 35;
+                  case 45:
+                    _context.next = 36;
                     break;
-                  case 46:
+                  case 47:
                     p.html('Frames processed, generating color palette...');
                     this.loop();
                     this.pixelDensity(lastPixelDensity); // create the gif encoder and the colorspace format
                     gif = (0, _gifenc.GIFEncoder) (); // calculate the global palette for this set of frames
-                    globalPalette = _generateGlobalPalette(frames); // the way we designed the palette means we always take the last index for transparency
-                    transparentIndex = globalPalette.length - 1; // we are going to iterate the frames in pairs, n-1 and n
-                    i = 0;
-                  case 53:
-                    if (!(i < frames.length)) {
-                      _context.next = 71;
-                      break;
-                    }
-                    if (!(i === 0)) {
-                      _context.next = 58;
-                      break;
-                    }
-                    _indexedFrame = (0, _gifenc.applyPalette) (frames[i], globalPalette, {
-                      format: 'rgba4444'
-                    });
-                    gif.writeFrame(_indexedFrame, this.width, this.height, {
-                      palette: globalPalette,
-                      delay: gifFrameDelay,
-                      dispose: 1
-                    });
-                    return _context.abrupt('continue', 68);
-                  case 58:
-                    // matching pixels between frames can be set to full transparency,
-                    // kinda digging a "hole" into the frame to see the pixels that where behind it
-                    // (which would be the exact same, so not noticeable changes)
-                    // this helps make the file quite smaller
-                    currFramePixels = frames[i];
-                    lastFramePixels = frames[i - 1];
-                    matchingPixelsInFrames = [
-                    ];
-                    for (_p = 0; _p < currFramePixels.length; _p += 4) {
-                      currPixel = [
-                        currFramePixels[_p],
-                        currFramePixels[_p + 1],
-                        currFramePixels[_p + 2],
-                        currFramePixels[_p + 3]
-                      ];
-                      lastPixel = [
-                        lastFramePixels[_p],
-                        lastFramePixels[_p + 1],
-                        lastFramePixels[_p + 2],
-                        lastFramePixels[_p + 3]
-                      ]; // if the pixels are equal, save this index to be used later
-                      if (_pixelEquals(currPixel, lastPixel)) {
-                        matchingPixelsInFrames.push(_p / 4);
+                    globalPalette = _generateGlobalPalette(frames); // Rather than using applyPalette() from the gifenc library, we use our
+                    // own function to map frame pixels to a palette color. This way, we can
+                    // cache palette color mappings between frames for extra performance, and
+                    // use our own caching mechanism to avoid flickering colors from cache
+                    // key collisions.
+                    paletteCache = {
+                    };
+                    getIndexedFrame = function getIndexedFrame(frame) {
+                      var length = frame.length / 4;
+                      var index = new Uint8Array(length);
+                      for (var i = 0; i < length; i++) {
+                        var key = frame[i * 4] << 24 | frame[i * 4 + 1] << 16 | frame[i * 4 + 2] << 8 | frame[i * 4 + 3];
+                        if (paletteCache[key] === undefined) {
+                          paletteCache[key] = (0, _gifenc.nearestColorIndex) (globalPalette, frame.slice(i * 4, (i + 1) * 4));
+                        }
+                        index[i] = paletteCache[key];
                       }
-                    } // we decide on one of this colors to be fully transparent
-                    // Apply palette to RGBA data to get an indexed bitmap
+                      return index;
+                    }; // the way we designed the palette means we always take the last index for transparency
+                    transparentIndex = globalPalette.length - 1; // we are going to iterate the frames in pairs, n-1 and n
+                    prevIndexedFrame = [
+                    ];
+                    i = 0;
+                  case 57:
+                    if (!(i < frames.length)) {
+                      _context.next = 68;
+                      break;
+                    } //const indexedFrame = applyPalette(frames[i], globalPaletteWithoutAlpha, 'rgba565');
 
-                    indexedFrame = (0, _gifenc.applyPalette) (currFramePixels, globalPalette, {
-                      format: 'rgba4444'
-                    });
-                    for (_i = 0; _i < matchingPixelsInFrames.length; _i++) {
-                      // here, we overwrite whatever color this pixel was assigned to
-                      // with the color that we decided we are going to use as transparent.
-                      // down in writeFrame we are going to tell the encoder that whenever
-                      // it runs into "transparentIndex", just dig a hole there allowing to
-                      // see through what was in the frame before it.
-                      pixelIndex = matchingPixelsInFrames[_i];
-                      indexedFrame[pixelIndex] = transparentIndex;
-                    } // Write frame into the encoder
+                    indexedFrame = getIndexedFrame(frames[i]); // Make a copy of the palette-applied frame before editing the original
+                    // to use transparent pixels
+                    originalIndexedFrame = indexedFrame.slice();
+                    if (i === 0) {
+                      gif.writeFrame(indexedFrame, this.width, this.height, {
+                        palette: globalPalette,
+                        delay: gifFrameDelay,
+                        dispose: 1
+                      });
+                    } else {
+                      // Matching pixels between frames can be set to full transparency,
+                      // allowing the previous frame's pixels to show through. We only do
+                      // this for pixels that get mapped to the same quantized color so that
+                      // the resulting image would be the same.
+                      for (_i = 0; _i < indexedFrame.length; _i++) {
+                        if (indexedFrame[_i] === prevIndexedFrame[_i]) {
+                          indexedFrame[_i] = transparentIndex;
+                        }
+                      } // Write frame into the encoder
 
-                    gif.writeFrame(indexedFrame, this.width, this.height, {
-                      delay: gifFrameDelay,
-                      transparent: true,
-                      transparentIndex: transparentIndex,
-                      dispose: 1
-                    });
+                      gif.writeFrame(indexedFrame, this.width, this.height, {
+                        delay: gifFrameDelay,
+                        transparent: true,
+                        transparentIndex: transparentIndex,
+                        dispose: 1
+                      });
+                    }
+                    prevIndexedFrame = originalIndexedFrame;
                     p.html('Rendered frame <b>' + i.toString() + '</b> out of ' + nFrames.toString()); // this just makes the process asynchronous, preventing
                     // that the encoding locks up the browser
-                    _context.next = 68;
+                    _context.next = 65;
                     return new Promise(function (resolve) {
                       return setTimeout(resolve, 0);
                     });
-                  case 68:
+                  case 65:
                     i++;
-                    _context.next = 53;
+                    _context.next = 57;
                     break;
-                  case 71:
+                  case 68:
                     gif.finish(); // Get a direct typed array view into the buffer to avoid copying it
                     buffer = gif.bytesView();
                     extension = 'gif';
@@ -78237,10 +78452,11 @@
                     });
                     frames = [
                     ];
+                    this._recording = false;
                     this.loop();
                     p.html('Done. Downloading your gif!🌸');
                     _main.default.prototype.downloadFile(blob, fileName, extension);
-                  case 79:
+                  case 77:
                   case 'end':
                     return _context.stop();
                 }
@@ -78276,11 +78492,11 @@
           // this array will hold absolutely every pixel from the animation.
           // the set function on the Uint8Array works super fast tho!
           for (var f = 0; f < frames.length; f++) {
-            allColors.set(frames[0], f * frames[0].length);
+            allColors.set(frames[f], f * frames[0].length);
           } // quantize this massive array into 256 colors and return it!
 
           var colorPalette = (0, _gifenc.quantize) (allColors, 256, {
-            format: 'rgba444',
+            format: 'rgba4444',
             oneBitAlpha: true
           }); // when generating the palette, we have to leave space for 1 of the
           // indices to be a random color that does not appear anywhere in our
@@ -78304,11 +78520,6 @@
             0]);
           }
           return colorPalette;
-        }
-        function _pixelEquals(a, b) {
-          return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every(function (val, index) {
-            return val === b[index];
-          });
         }        /**
  * Helper function for loading GIF-based images
  */
@@ -78941,7 +79152,6 @@
         '../core/helpers': 286,
         '../core/main': 290,
         'core-js/modules/es.array.copy-within': 168,
-        'core-js/modules/es.array.every': 169,
         'core-js/modules/es.array.includes': 174,
         'core-js/modules/es.array.index-of': 175,
         'core-js/modules/es.array.iterator': 176,
@@ -87664,7 +87874,9 @@
  * and `z` components of the vector are all divided by the scalar. When dividing a vector by a vector,
  * the `x`, `y`, `z` components of the source vector are treated as the dividend, and the `x`, `y`, `z` components
  * of the argument is treated as the divisor. (For example, with two vectors
- * `a` and `b`: `a.x / b.x`, `a.y / b.y`, `a.z / b.z`.)
+ * `a` and `b`: `a.x / b.x`, `a.y / b.y`, `a.z / b.z`.) If any component of the second vector is 0, a division by 0
+ * error will be logged, unless both two vectors have 0 in their `z` components, in which case only the `x` and `y`
+ * components will be divided.
  * The static version of this method creates a
  * new <a href="#/p5.Vector">p5.Vector</a> while the non-static version acts on the vector directly.
  * Additionally, you may provide arguments to this method as an array.
@@ -87774,13 +87986,16 @@
             // that someone could change the value of a component after creation, which is why we still
             // perform this check
             if (Number.isFinite(x.x) && Number.isFinite(x.y) && Number.isFinite(x.z) && typeof x.x === 'number' && typeof x.y === 'number' && typeof x.z === 'number') {
-              if (x.x === 0 || x.y === 0 || x.z === 0) {
+              var isLikely2D = x.z === 0 && this.z === 0;
+              if (x.x === 0 || x.y === 0 || !isLikely2D && x.z === 0) {
                 console.warn('p5.Vector.prototype.div:', 'divide by 0');
                 return this;
               }
               this.x /= x.x;
               this.y /= x.y;
-              this.z /= x.z;
+              if (!isLikely2D) {
+                this.z /= x.z;
+              }
             } else {
               console.warn('p5.Vector.prototype.div:', 'x contains components that are either undefined or not finite numbers');
             }
@@ -88280,7 +88495,7 @@
  * Calculate the angle of rotation for this vector (only 2D vectors).
  * p5.Vectors created using <a href="#/p5/createVector">createVector()</a>
  * will take the current <a href="#/p5/angleMode">angleMode()</a> into
- * consideration, and give the angle in radians or degree accordingly.
+ * consideration, and give the angle in radians or degrees accordingly.
  *
  * @method heading
  * @return {Number} The angle of rotation
@@ -88442,11 +88657,11 @@
         /**
  * Calculates and returns the angle between two vectors. This method will take
  * the current <a href="#/p5/angleMode">angleMode</a> into consideration, and
- * give the angle in radians or degree accordingly.
+ * give the angle in radians or degrees accordingly.
  *
  * @method angleBetween
  * @param  {p5.Vector}    value The x, y, and z components of a <a href="#/p5.Vector">p5.Vector</a>
- * @return {Number}       The angle between (in radians)
+ * @return {Number}       The angle between
  * @example
  * <div class="norender">
  * <code>
@@ -88606,11 +88821,12 @@
           return this;
         };
         /**
- * Reflect the incoming vector about a normal to a line in 2D, or about a normal to a plane in 3D.
- * This method acts on the vector directly.
+ * Reflect a vector about a normal to a line in 2D, or about a normal to a
+ * plane in 3D.
  *
  * @method reflect
- * @param  {p5.Vector} surfaceNormal   The <a href="#/p5.Vector">p5.Vector</a> to reflect about; will be normalized by this method.
+ * @param  {p5.Vector} surfaceNormal  the <a href="#/p5.Vector">p5.Vector</a>
+ *                                    to reflect about.
  * @chainable
  * @example
  * <div class="norender">
@@ -88662,8 +88878,8 @@
         /**
  * Return a representation of this vector as a float array. This is only
  * for temporary use. If used in any other fashion, the contents should be
- * copied by using the <b>p5.Vector.<a href="#/p5.Vector/copy">copy()</a></b> method to copy into your own
- * array.
+ * copied by using the <b>p5.Vector.<a href="#/p5.Vector/copy">copy()</a></b>
+ * method to copy into your own vector.
  *
  * @method array
  * @return {Number[]} An Array with the 3 values
@@ -88916,6 +89132,15 @@
           var vx = vzBase * Math.cos(angle);
           var vy = vzBase * Math.sin(angle);
           return new _main.default.Vector(vx, vy, vz);
+        }; // Returns a copy of a vector.
+        /**
+ * @method copy
+ * @static
+ * @param  {p5.Vector} v the <a href="#/p5.Vector">p5.Vector</a> to create a copy of
+ * @return {p5.Vector} the copy of the <a href="#/p5.Vector">p5.Vector</a> object
+ */
+        _main.default.Vector.copy = function copy(v) {
+          return v.copy(v);
         }; // Adds two vectors together and returns a new one.
         /**
  * @method add
@@ -89167,11 +89392,22 @@
  * @return {Number}        The magnitude of vecT
  */
         _main.default.Vector.mag = function mag(vecT) {
-          var x = vecT.x,
-          y = vecT.y,
-          z = vecT.z;
-          var magSq = x * x + y * y + z * z;
-          return Math.sqrt(magSq);
+          return vecT.mag();
+        };
+        /**
+ * Calculates the squared magnitude of the vector and returns the result
+ * as a float (this is simply the equation <em>(x\*x + y\*y + z\*z)</em>.)
+ * Faster if the real length is not required in the
+ * case of comparing vectors, etc.
+ */
+        /**
+ * @method magSq
+ * @static
+ * @param {p5.Vector} vecT the vector to return the squared magnitude of
+ * @return {Number}        the squared magnitude of vecT
+ */
+        _main.default.Vector.magSq = function magSq(vecT) {
+          return vecT.magSq();
         };
         /**
  * Normalize the vector to length 1 (make it a unit vector).
@@ -89193,6 +89429,141 @@
             target.set(v);
           }
           return target.normalize();
+        };
+        /**
+ * Limit the magnitude of the vector to the value used for the <b>max</b>
+ * parameter.
+ */
+        /**
+ * @method limit
+ * @static
+ * @param {p5.Vector} v  the vector to limit
+ * @param {Number}    max
+ * @param {p5.Vector} [target] the vector to receive the result (Optional)
+ * @return {p5.Vector} v with a magnitude limited to max
+ */
+        _main.default.Vector.limit = function limit(v, max, target) {
+          if (arguments.length < 3) {
+            target = v.copy();
+          } else {
+            if (!(target instanceof _main.default.Vector)) {
+              _main.default._friendlyError('The target parameter should be of type p5.Vector', 'p5.Vector.limit');
+            }
+            target.set(v);
+          }
+          return target.limit(max);
+        };
+        /**
+ * Set the magnitude of the vector to the value used for the <b>len</b>
+ * parameter.
+ */
+        /**
+ * @method setMag
+ * @static
+ * @param {p5.Vector} v  the vector to set the magnitude of
+ * @param {number}    len
+ * @param {p5.Vector} [target] the vector to receive the result (Optional)
+ * @return {p5.Vector} v with a magnitude set to len
+ */
+        _main.default.Vector.setMag = function setMag(v, len, target) {
+          if (arguments.length < 3) {
+            target = v.copy();
+          } else {
+            if (!(target instanceof _main.default.Vector)) {
+              _main.default._friendlyError('The target parameter should be of type p5.Vector', 'p5.Vector.setMag');
+            }
+            target.set(v);
+          }
+          return target.setMag(len);
+        };
+        /**
+ * Calculate the angle of rotation for this vector (only 2D vectors).
+ * p5.Vectors created using <a href="#/p5/createVector">createVector()</a>
+ * will take the current <a href="#/p5/angleMode">angleMode</a> into
+ * consideration, and give the angle in radians or degrees accordingly.
+ */
+        /**
+ * @method heading
+ * @static
+ * @param {p5.Vector} v the vector to find the angle of
+ * @return {Number} the angle of rotation
+ */
+        _main.default.Vector.heading = function heading(v) {
+          return v.heading();
+        };
+        /**
+ * Calculates and returns the angle between two vectors. This function will take
+ * the <a href="#/p5/angleMode">angleMode</a> on v1 into consideration, and
+ * give the angle in radians or degrees accordingly.
+ */
+        /**
+ * @method angleBetween
+ * @static
+ * @param  {p5.Vector}    v1 the first vector
+ * @param  {p5.Vector}    v2 the second vector
+ * @return {Number}       the angle between the two vectors
+ */
+        _main.default.Vector.angleBetween = function angleBetween(v1, v2) {
+          return v1.angleBetween(v2);
+        };
+        /**
+ * Reflect a vector about a normal to a line in 2D, or about a normal to a
+ * plane in 3D.
+ */
+        /**
+ * @method reflect
+ * @static
+ * @param  {p5.Vector} incidentVector vector to be reflected
+ * @param  {p5.Vector} surfaceNormal
+ * @param  {p5.Vector} [target] the vector to receive the result (Optional)
+ * @return {p5.Vector} the reflected vector
+ */
+        _main.default.Vector.reflect = function reflect(incidentVector, surfaceNormal, target) {
+          if (arguments.length < 3) {
+            target = incidentVector.copy();
+          } else {
+            if (!(target instanceof _main.default.Vector)) {
+              _main.default._friendlyError('The target parameter should be of type p5.Vector', 'p5.Vector.reflect');
+            }
+            target.set(incidentVector);
+          }
+          return target.reflect(surfaceNormal);
+        };
+        /**
+ * Return a representation of this vector as a float array. This is only
+ * for temporary use. If used in any other fashion, the contents should be
+ * copied by using the <b>p5.Vector.<a href="#/p5.Vector/copy">copy()</a></b>
+ * method to copy into your own vector.
+ */
+        /**
+ * @method array
+ * @static
+ * @param  {p5.Vector} v the vector to convert to an array
+ * @return {Number[]} an Array with the 3 values
+ */
+        _main.default.Vector.array = function array(v) {
+          return v.array();
+        };
+        /**
+ * Equality check against a <a href="#/p5.Vector">p5.Vector</a>
+ */
+        /**
+ * @method equals
+ * @static
+ * @param {p5.Vector|Array} v1 the first vector to compare
+ * @param {p5.Vector|Array} v2 the second vector to compare
+ * @return {Boolean}
+ */
+        _main.default.Vector.equals = function equals(v1, v2) {
+          var v;
+          if (v1 instanceof _main.default.Vector) {
+            v = v1;
+          } else if (v1 instanceof Array) {
+            v = new _main.default.Vector().set(v1);
+          } else {
+            _main.default._friendlyError('The v1 parameter should be of type Array or p5.Vector', 'p5.Vector.equals');
+          }
+          return v.equals(v2);
         };
         var _default = _main.default.Vector;
         exports.default = _default;
@@ -93599,6 +93970,8 @@
         _dereq_('core-js/modules/es.symbol.iterator');
         _dereq_('core-js/modules/es.array.concat');
         _dereq_('core-js/modules/es.array.iterator');
+        _dereq_('core-js/modules/es.array.slice');
+        _dereq_('core-js/modules/es.math.hypot');
         _dereq_('core-js/modules/es.number.to-fixed');
         _dereq_('core-js/modules/es.object.get-own-property-descriptor');
         _dereq_('core-js/modules/es.object.to-string');
@@ -93634,6 +94007,8 @@
         _dereq_('core-js/modules/es.symbol.iterator');
         _dereq_('core-js/modules/es.array.concat');
         _dereq_('core-js/modules/es.array.iterator');
+        _dereq_('core-js/modules/es.array.slice');
+        _dereq_('core-js/modules/es.math.hypot');
         _dereq_('core-js/modules/es.number.to-fixed');
         _dereq_('core-js/modules/es.object.to-string');
         _dereq_('core-js/modules/es.string.iterator');
@@ -94693,8 +95068,8 @@
               var vertices = [
               ];
               vertices.push(new _main.default.Vector(0, 0, 0));
-              vertices.push(new _main.default.Vector(0, 1, 0));
               vertices.push(new _main.default.Vector(1, 0, 0));
+              vertices.push(new _main.default.Vector(0, 1, 0));
               this.strokeIndices = [
                 [0,
                 1],
@@ -94716,8 +95091,8 @@
               this.uvs = [
                 0,
                 0,
-                0,
                 1,
+                0,
                 1,
                 1
               ];
@@ -95183,7 +95558,9 @@
             _x,
             _y,
             _z,
-            i;
+            i,
+            k,
+            m; // variable i for bezierPoints, k for components, and m for anchor points.
             var argLength = arguments.length;
             t = 0;
             if (this._lookUpTableBezier.length === 0 || this._lutBezierDetail !== this._pInst._curveDetail) {
@@ -95208,7 +95585,23 @@
                 ++j;
               }
             }
-            var LUTLength = this._lookUpTableBezier.length;
+            var LUTLength = this._lookUpTableBezier.length; // fillColors[0]: start point color
+            // fillColors[1],[2]: control point color
+            // fillColors[3]: end point color
+            var fillColors = [
+            ];
+            for (m = 0; m < 4; m++) {
+              fillColors.push([]);
+            }
+            fillColors[0] = this.immediateMode.geometry.vertexColors.slice( - 4);
+            fillColors[3] = this.curFillColor.slice(); // Do the same for strokeColor.
+            var strokeColors = [
+            ];
+            for (m = 0; m < 4; m++) {
+              strokeColors.push([]);
+            }
+            strokeColors[0] = this.immediateMode.geometry.vertexStrokeColors.slice( - 4);
+            strokeColors[3] = this.curStrokeColor.slice();
             if (argLength === 6) {
               this.isBezier = true;
               w_x = [
@@ -95222,12 +95615,48 @@
                 arguments.length <= 1 ? undefined : arguments[1],
                 arguments.length <= 3 ? undefined : arguments[3],
                 arguments.length <= 5 ? undefined : arguments[5]
-              ];
-              for (i = 0; i < LUTLength; i++) {
-                _x = w_x[0] * this._lookUpTableBezier[i][0] + w_x[1] * this._lookUpTableBezier[i][1] + w_x[2] * this._lookUpTableBezier[i][2] + w_x[3] * this._lookUpTableBezier[i][3];
-                _y = w_y[0] * this._lookUpTableBezier[i][0] + w_y[1] * this._lookUpTableBezier[i][1] + w_y[2] * this._lookUpTableBezier[i][2] + w_y[3] * this._lookUpTableBezier[i][3];
-                this.vertex(_x, _y);
+              ]; // The ratio of the distance between the start point, the two control-
+              // points, and the end point determines the intermediate color.
+              var d0 = Math.hypot(w_x[0] - w_x[1], w_y[0] - w_y[1]);
+              var d1 = Math.hypot(w_x[1] - w_x[2], w_y[1] - w_y[2]);
+              var d2 = Math.hypot(w_x[2] - w_x[3], w_y[2] - w_y[3]);
+              var totalLength = d0 + d1 + d2;
+              d0 /= totalLength;
+              d2 /= totalLength;
+              for (k = 0; k < 4; k++) {
+                fillColors[1].push(fillColors[0][k] * (1 - d0) + fillColors[3][k] * d0);
+                fillColors[2].push(fillColors[0][k] * d2 + fillColors[3][k] * (1 - d2));
+                strokeColors[1].push(strokeColors[0][k] * (1 - d0) + strokeColors[3][k] * d0);
+                strokeColors[2].push(strokeColors[0][k] * d2 + strokeColors[3][k] * (1 - d2));
               }
+              for (i = 0; i < LUTLength; i++) {
+                // Interpolate colors using control points
+                this.curFillColor = [
+                  0,
+                  0,
+                  0,
+                  0
+                ];
+                this.curStrokeColor = [
+                  0,
+                  0,
+                  0,
+                  0
+                ];
+                _x = _y = 0;
+                for (m = 0; m < 4; m++) {
+                  for (k = 0; k < 4; k++) {
+                    this.curFillColor[k] += this._lookUpTableBezier[i][m] * fillColors[m][k];
+                    this.curStrokeColor[k] += this._lookUpTableBezier[i][m] * strokeColors[m][k];
+                  }
+                  _x += w_x[m] * this._lookUpTableBezier[i][m];
+                  _y += w_y[m] * this._lookUpTableBezier[i][m];
+                }
+                this.vertex(_x, _y);
+              } // so that we leave currentColor with the last value the user set it to
+
+              this.curFillColor = fillColors[3];
+              this.curStrokeColor = strokeColors[3];
               this.immediateMode._bezierVertex[0] = arguments.length <= 4 ? undefined : arguments[4];
               this.immediateMode._bezierVertex[1] = arguments.length <= 5 ? undefined : arguments[5];
             } else if (argLength === 9) {
@@ -95249,13 +95678,49 @@
                 arguments.length <= 2 ? undefined : arguments[2],
                 arguments.length <= 5 ? undefined : arguments[5],
                 arguments.length <= 8 ? undefined : arguments[8]
-              ];
-              for (i = 0; i < LUTLength; i++) {
-                _x = w_x[0] * this._lookUpTableBezier[i][0] + w_x[1] * this._lookUpTableBezier[i][1] + w_x[2] * this._lookUpTableBezier[i][2] + w_x[3] * this._lookUpTableBezier[i][3];
-                _y = w_y[0] * this._lookUpTableBezier[i][0] + w_y[1] * this._lookUpTableBezier[i][1] + w_y[2] * this._lookUpTableBezier[i][2] + w_y[3] * this._lookUpTableBezier[i][3];
-                _z = w_z[0] * this._lookUpTableBezier[i][0] + w_z[1] * this._lookUpTableBezier[i][1] + w_z[2] * this._lookUpTableBezier[i][2] + w_z[3] * this._lookUpTableBezier[i][3];
-                this.vertex(_x, _y, _z);
+              ]; // The ratio of the distance between the start point, the two control-
+              // points, and the end point determines the intermediate color.
+              var _d = Math.hypot(w_x[0] - w_x[1], w_y[0] - w_y[1], w_z[0] - w_z[1]);
+              var _d2 = Math.hypot(w_x[1] - w_x[2], w_y[1] - w_y[2], w_z[1] - w_z[2]);
+              var _d3 = Math.hypot(w_x[2] - w_x[3], w_y[2] - w_y[3], w_z[2] - w_z[3]);
+              var _totalLength = _d + _d2 + _d3;
+              _d /= _totalLength;
+              _d3 /= _totalLength;
+              for (k = 0; k < 4; k++) {
+                fillColors[1].push(fillColors[0][k] * (1 - _d) + fillColors[3][k] * _d);
+                fillColors[2].push(fillColors[0][k] * _d3 + fillColors[3][k] * (1 - _d3));
+                strokeColors[1].push(strokeColors[0][k] * (1 - _d) + strokeColors[3][k] * _d);
+                strokeColors[2].push(strokeColors[0][k] * _d3 + strokeColors[3][k] * (1 - _d3));
               }
+              for (i = 0; i < LUTLength; i++) {
+                // Interpolate colors using control points
+                this.curFillColor = [
+                  0,
+                  0,
+                  0,
+                  0
+                ];
+                this.curStrokeColor = [
+                  0,
+                  0,
+                  0,
+                  0
+                ];
+                _x = _y = _z = 0;
+                for (m = 0; m < 4; m++) {
+                  for (k = 0; k < 4; k++) {
+                    this.curFillColor[k] += this._lookUpTableBezier[i][m] * fillColors[m][k];
+                    this.curStrokeColor[k] += this._lookUpTableBezier[i][m] * strokeColors[m][k];
+                  }
+                  _x += w_x[m] * this._lookUpTableBezier[i][m];
+                  _y += w_y[m] * this._lookUpTableBezier[i][m];
+                  _z += w_z[m] * this._lookUpTableBezier[i][m];
+                }
+                this.vertex(_x, _y, _z);
+              } // so that we leave currentColor with the last value the user set it to
+
+              this.curFillColor = fillColors[3];
+              this.curStrokeColor = strokeColors[3];
               this.immediateMode._bezierVertex[0] = arguments.length <= 6 ? undefined : arguments[6];
               this.immediateMode._bezierVertex[1] = arguments.length <= 7 ? undefined : arguments[7];
               this.immediateMode._bezierVertex[2] = arguments.length <= 8 ? undefined : arguments[8];
@@ -95276,7 +95741,9 @@
             _x,
             _y,
             _z,
-            i;
+            i,
+            k,
+            m; // variable i for bezierPoints, k for components, and m for anchor points.
             var argLength = arguments.length;
             t = 0;
             if (this._lookUpTableQuadratic.length === 0 || this._lutQuadraticDetail !== this._pInst._curveDetail) {
@@ -95301,7 +95768,23 @@
                 ++j;
               }
             }
-            var LUTLength = this._lookUpTableQuadratic.length;
+            var LUTLength = this._lookUpTableQuadratic.length; // fillColors[0]: start point color
+            // fillColors[1]: control point color
+            // fillColors[2]: end point color
+            var fillColors = [
+            ];
+            for (m = 0; m < 3; m++) {
+              fillColors.push([]);
+            }
+            fillColors[0] = this.immediateMode.geometry.vertexColors.slice( - 4);
+            fillColors[2] = this.curFillColor.slice(); // Do the same for strokeColor.
+            var strokeColors = [
+            ];
+            for (m = 0; m < 3; m++) {
+              strokeColors.push([]);
+            }
+            strokeColors[0] = this.immediateMode.geometry.vertexStrokeColors.slice( - 4);
+            strokeColors[2] = this.curStrokeColor.slice();
             if (argLength === 4) {
               this.isQuadratic = true;
               w_x = [
@@ -95313,12 +95796,44 @@
                 this.immediateMode._quadraticVertex[1],
                 arguments.length <= 1 ? undefined : arguments[1],
                 arguments.length <= 3 ? undefined : arguments[3]
-              ];
-              for (i = 0; i < LUTLength; i++) {
-                _x = w_x[0] * this._lookUpTableQuadratic[i][0] + w_x[1] * this._lookUpTableQuadratic[i][1] + w_x[2] * this._lookUpTableQuadratic[i][2];
-                _y = w_y[0] * this._lookUpTableQuadratic[i][0] + w_y[1] * this._lookUpTableQuadratic[i][1] + w_y[2] * this._lookUpTableQuadratic[i][2];
-                this.vertex(_x, _y);
+              ]; // The ratio of the distance between the start point, the control-
+              // point, and the end point determines the intermediate color.
+              var d0 = Math.hypot(w_x[0] - w_x[1], w_y[0] - w_y[1]);
+              var d1 = Math.hypot(w_x[1] - w_x[2], w_y[1] - w_y[2]);
+              var totalLength = d0 + d1;
+              d0 /= totalLength;
+              for (k = 0; k < 4; k++) {
+                fillColors[1].push(fillColors[0][k] * (1 - d0) + fillColors[2][k] * d0);
+                strokeColors[1].push(strokeColors[0][k] * (1 - d0) + strokeColors[2][k] * d0);
               }
+              for (i = 0; i < LUTLength; i++) {
+                // Interpolate colors using control points
+                this.curFillColor = [
+                  0,
+                  0,
+                  0,
+                  0
+                ];
+                this.curStrokeColor = [
+                  0,
+                  0,
+                  0,
+                  0
+                ];
+                _x = _y = 0;
+                for (m = 0; m < 3; m++) {
+                  for (k = 0; k < 4; k++) {
+                    this.curFillColor[k] += this._lookUpTableQuadratic[i][m] * fillColors[m][k];
+                    this.curStrokeColor[k] += this._lookUpTableQuadratic[i][m] * strokeColors[m][k];
+                  }
+                  _x += w_x[m] * this._lookUpTableQuadratic[i][m];
+                  _y += w_y[m] * this._lookUpTableQuadratic[i][m];
+                }
+                this.vertex(_x, _y);
+              } // so that we leave currentColor with the last value the user set it to
+
+              this.curFillColor = fillColors[2];
+              this.curStrokeColor = strokeColors[2];
               this.immediateMode._quadraticVertex[0] = arguments.length <= 2 ? undefined : arguments[2];
               this.immediateMode._quadraticVertex[1] = arguments.length <= 3 ? undefined : arguments[3];
             } else if (argLength === 6) {
@@ -95337,13 +95852,45 @@
                 this.immediateMode._quadraticVertex[2],
                 arguments.length <= 2 ? undefined : arguments[2],
                 arguments.length <= 5 ? undefined : arguments[5]
-              ];
-              for (i = 0; i < LUTLength; i++) {
-                _x = w_x[0] * this._lookUpTableQuadratic[i][0] + w_x[1] * this._lookUpTableQuadratic[i][1] + w_x[2] * this._lookUpTableQuadratic[i][2];
-                _y = w_y[0] * this._lookUpTableQuadratic[i][0] + w_y[1] * this._lookUpTableQuadratic[i][1] + w_y[2] * this._lookUpTableQuadratic[i][2];
-                _z = w_z[0] * this._lookUpTableQuadratic[i][0] + w_z[1] * this._lookUpTableQuadratic[i][1] + w_z[2] * this._lookUpTableQuadratic[i][2];
-                this.vertex(_x, _y, _z);
+              ]; // The ratio of the distance between the start point, the control-
+              // point, and the end point determines the intermediate color.
+              var _d4 = Math.hypot(w_x[0] - w_x[1], w_y[0] - w_y[1], w_z[0] - w_z[1]);
+              var _d5 = Math.hypot(w_x[1] - w_x[2], w_y[1] - w_y[2], w_z[1] - w_z[2]);
+              var _totalLength2 = _d4 + _d5;
+              _d4 /= _totalLength2;
+              for (k = 0; k < 4; k++) {
+                fillColors[1].push(fillColors[0][k] * (1 - _d4) + fillColors[2][k] * _d4);
+                strokeColors[1].push(strokeColors[0][k] * (1 - _d4) + strokeColors[2][k] * _d4);
               }
+              for (i = 0; i < LUTLength; i++) {
+                // Interpolate colors using control points
+                this.curFillColor = [
+                  0,
+                  0,
+                  0,
+                  0
+                ];
+                this.curStrokeColor = [
+                  0,
+                  0,
+                  0,
+                  0
+                ];
+                _x = _y = _z = 0;
+                for (m = 0; m < 3; m++) {
+                  for (k = 0; k < 4; k++) {
+                    this.curFillColor[k] += this._lookUpTableQuadratic[i][m] * fillColors[m][k];
+                    this.curStrokeColor[k] += this._lookUpTableQuadratic[i][m] * strokeColors[m][k];
+                  }
+                  _x += w_x[m] * this._lookUpTableQuadratic[i][m];
+                  _y += w_y[m] * this._lookUpTableQuadratic[i][m];
+                  _z += w_z[m] * this._lookUpTableQuadratic[i][m];
+                }
+                this.vertex(_x, _y, _z);
+              } // so that we leave currentColor with the last value the user set it to
+
+              this.curFillColor = fillColors[2];
+              this.curStrokeColor = strokeColors[2];
               this.immediateMode._quadraticVertex[0] = arguments.length <= 3 ? undefined : arguments[3];
               this.immediateMode._quadraticVertex[1] = arguments.length <= 4 ? undefined : arguments[4];
               this.immediateMode._quadraticVertex[2] = arguments.length <= 5 ? undefined : arguments[5];
@@ -95445,6 +95992,7 @@
           }
           this._pInst.push();
           this._pInst.noLights();
+          this._pInst.noStroke();
           this._pInst.texture(img);
           this._pInst.textureMode(constants.NORMAL);
           var u0 = 0;
@@ -95483,6 +96031,8 @@
         './p5.Geometry': 339,
         'core-js/modules/es.array.concat': 167,
         'core-js/modules/es.array.iterator': 176,
+        'core-js/modules/es.array.slice': 180,
+        'core-js/modules/es.math.hypot': 185,
         'core-js/modules/es.number.to-fixed': 189,
         'core-js/modules/es.object.get-own-property-descriptor': 191,
         'core-js/modules/es.object.to-string': 195,
@@ -98803,7 +99353,7 @@
         _main.default.RendererGL.prototype._applyColorBlend = function (colors) {
           var gl = this.GL;
           var isTexture = this.drawMode === constants.TEXTURE;
-          var doBlend = isTexture || this.curBlendMode !== constants.BLEND || colors[colors.length - 1] < 1 || this._isErasing;
+          var doBlend = this.userFillShader || this.userStrokeShader || this.userPointShader || isTexture || this.curBlendMode !== constants.BLEND || colors[colors.length - 1] < 1 || this._isErasing;
           if (doBlend !== this._isBlending) {
             if (doBlend || this.curBlendMode !== constants.BLEND && this.curBlendMode !== constants.ADD) {
               gl.enable(gl.BLEND);
@@ -98829,23 +99379,23 @@
           switch (this.curBlendMode) {
             case constants.BLEND:
               gl.blendEquation(gl.FUNC_ADD);
-              gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+              gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
               break;
             case constants.ADD:
               gl.blendEquation(gl.FUNC_ADD);
-              gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+              gl.blendFunc(gl.ONE, gl.ONE);
               break;
             case constants.REMOVE:
-              gl.blendEquation(gl.FUNC_REVERSE_SUBTRACT);
-              gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
+              gl.blendEquation(gl.FUNC_ADD);
+              gl.blendFunc(gl.ZERO, gl.ONE_MINUS_SRC_ALPHA);
               break;
             case constants.MULTIPLY:
-              gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
-              gl.blendFuncSeparate(gl.ZERO, gl.SRC_COLOR, gl.ONE, gl.ONE);
+              gl.blendEquation(gl.FUNC_ADD);
+              gl.blendFunc(gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA);
               break;
             case constants.SCREEN:
-              gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
-              gl.blendFuncSeparate(gl.ONE_MINUS_DST_COLOR, gl.ONE, gl.ONE, gl.ONE);
+              gl.blendEquation(gl.FUNC_ADD);
+              gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_COLOR);
               break;
             case constants.EXCLUSION:
               gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
@@ -98857,7 +99407,7 @@
               break;
             case constants.SUBTRACT:
               gl.blendEquationSeparate(gl.FUNC_REVERSE_SUBTRACT, gl.FUNC_ADD);
-              gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE);
+              gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
               break;
             case constants.DARKEST:
               if (this.blendExt) {
@@ -99269,9 +99819,22 @@
  * }
  *
  * function draw() {
+ *   background(0);
+ *   // The camera will automatically
+ *   // rotate to look at [0, 0, 0].
  *   camera.lookAt(0, 0, 0);
+ *
+ *   // The camera will move on the
+ *   // x axis.
  *   camera.setPosition(sin(frameCount / 60) * 200, 0, 100);
  *   box(20);
+ *
+ *   // A 'ground' box to give the viewer
+ *   // a better idea of where the camera
+ *   // is looking.
+ *   translate(0, 50, 0);
+ *   rotateX(HALF_PI);
+ *   box(150, 150, 20);
  * }
  * </code></div>
  *
@@ -100223,7 +100786,7 @@
             local.z[1] * z,
             local.z[2] * z
           ];
-          this.camera(this.eyeX + dx[0] + dy[0] + dz[0], this.eyeY + dx[1] + dy[1] + dz[1], this.eyeZ + dx[2] + dy[2] + dz[2], this.centerX + dx[0] + dy[0] + dz[0], this.centerY + dx[1] + dy[1] + dz[1], this.centerZ + dx[2] + dy[2] + dz[2], 0, 1, 0);
+          this.camera(this.eyeX + dx[0] + dy[0] + dz[0], this.eyeY + dx[1] + dy[1] + dz[1], this.eyeZ + dx[2] + dy[2] + dz[2], this.centerX + dx[0] + dy[0] + dz[0], this.centerY + dx[1] + dy[1] + dz[1], this.centerZ + dx[2] + dy[2] + dz[2], this.upX, this.upY, this.upZ);
         };
         /**
  * Set camera position in world-space while maintaining current camera
@@ -100273,7 +100836,7 @@
           var diffX = x - this.eyeX;
           var diffY = y - this.eyeY;
           var diffZ = z - this.eyeZ;
-          this.camera(x, y, z, this.centerX + diffX, this.centerY + diffY, this.centerZ + diffZ, 0, 1, 0);
+          this.camera(x, y, z, this.centerX + diffX, this.centerY + diffY, this.centerZ + diffZ, this.upX, this.upY, this.upZ);
         }; ////////////////////////////////////////////////////////////////////////////////
         // Camera Helper Methods
         ////////////////////////////////////////////////////////////////////////////////
@@ -100414,24 +100977,22 @@
           var camRadius = Math.sqrt(diffX * diffX + diffY * diffY + diffZ * diffZ); // from https://github.com/mrdoob/three.js/blob/dev/src/math/Spherical.js#L72-L73
           var camTheta = Math.atan2(diffX, diffZ); // equatorial angle
           var camPhi = Math.acos(Math.max( - 1, Math.min(1, diffY / camRadius))); // polar angle
-          // add change
-          camTheta += dTheta;
-          camPhi += dPhi;
+          var newUpY = this.upY > 0 ? 1 : - 1; // add change according to the direction of newupY
+          camTheta += newUpY * dTheta;
+          camPhi += newUpY * dPhi; // if camPhi becomes >= PI or <= 0,
+          // upY of camera need to be flipped to the other side
+          if (camPhi <= 0 || camPhi >= Math.PI) {
+            newUpY *= - 1;
+          }
           camRadius += dRadius; // prevent zooming through the center:
           if (camRadius < 0) {
             camRadius = 0.1;
-          } // prevent rotation over the zenith / under bottom
-
-          if (camPhi > Math.PI) {
-            camPhi = Math.PI;
-          } else if (camPhi <= 0) {
-            camPhi = 0.001;
           } // from https://github.com/mrdoob/three.js/blob/dev/src/math/Vector3.js#L628-L632
 
           var _x = Math.sin(camPhi) * camRadius * Math.sin(camTheta);
           var _y = Math.cos(camPhi) * camRadius;
           var _z = Math.sin(camPhi) * camRadius * Math.cos(camTheta);
-          this.camera(_x + this.centerX, _y + this.centerY, _z + this.centerZ, this.centerX, this.centerY, this.centerZ, 0, 1, 0);
+          this.camera(_x + this.centerX, _y + this.centerY, _z + this.centerZ, this.centerX, this.centerY, this.centerZ, 0, newUpY, 0);
         };
         /**
  * Returns true if camera is currently attached to renderer.
@@ -100530,7 +101091,9 @@
     339: [
       function (_dereq_, module, exports) {
         'use strict';
+        _dereq_('core-js/modules/es.array.slice');
         _dereq_('core-js/modules/es.string.sub');
+        _dereq_('core-js/modules/es.array.slice');
         _dereq_('core-js/modules/es.string.sub');
         Object.defineProperty(exports, '__esModule', {
           value: true
@@ -100565,11 +101128,19 @@
           this.vertices = [
           ]; //an array containing every vertex for stroke drawing
           this.lineVertices = [
-          ]; //an array 1 normal per lineVertex with
-          //final position representing which direction to
-          //displace for strokeWeight
-          //[[0,0,-1,1], [0,1,0,-1] ...];
-          this.lineNormals = [
+          ]; // The tangents going into or out of a vertex on a line. Along a straight
+          // line segment, both should be equal. At an endpoint, one or the other
+          // will not exist and will be all 0. In joins between line segments, they
+          // may be different, as they will be the tangents on either side of the join.
+          this.lineTangentsIn = [
+          ];
+          this.lineTangentsOut = [
+          ]; // When drawing lines with thickness, entries in this buffer represent which
+          // side of the centerline the vertex will be placed. The sign of the number
+          // will represent the side of the centerline, and the absolute value will be
+          // used as an enum to determine which part of the cap or join each vertex
+          // represents. See the doc comments for _addCap and _addJoin for diagrams.
+          this.lineSides = [
           ]; //an array containing 1 normal per vertex
           //@type [p5.Vector]
           //[p5.Vector, p5.Vector, p5.Vector,p5.Vector, p5.Vector, p5.Vector,...]
@@ -100585,6 +101156,11 @@
           this.edges = [
           ];
           this.vertexColors = [
+          ]; // One color per vertex representing the stroke color at that vertex
+          this.vertexStrokeColors = [
+          ]; // One color per line vertex, generated automatically based on
+          // vertexStrokeColors in _edgesToVertices()
+          this.lineVertexColors = [
           ];
           this.detailX = detailX !== undefined ? detailX : 1;
           this.detailY = detailY !== undefined ? detailY : 1;
@@ -100597,10 +101173,14 @@
         };
         _main.default.Geometry.prototype.reset = function () {
           this.lineVertices.length = 0;
-          this.lineNormals.length = 0;
+          this.lineTangentsIn.length = 0;
+          this.lineTangentsOut.length = 0;
+          this.lineSides.length = 0;
           this.vertices.length = 0;
           this.edges.length = 0;
           this.vertexColors.length = 0;
+          this.vertexStrokeColors.length = 0;
+          this.lineVertexColors.length = 0;
           this.vertexNormals.length = 0;
           this.uvs.length = 0;
           this.dirtyFlags = {
@@ -100749,30 +101329,193 @@
           return this;
         };
         /**
- * Create 4 vertices for each stroke line, two at the beginning position
- * and two at the end position. These vertices are displaced relative to
- * that line's normal on the GPU
+ * Converts each line segment into the vertices and vertex attributes needed
+ * to turn the line into a polygon on screen. This will include:
+ * - Two triangles line segment to create a rectangle
+ * - Two triangles per endpoint to create a stroke cap rectangle. A fragment
+ *   shader is responsible for displaying the appropriate cap style within
+ *   that rectangle.
+ * - Four triangles per join between adjacent line segments, creating a quad on
+ *   either side of the join, perpendicular to the lines. A vertex shader will
+ *   discard the quad in the "elbow" of the join, and a fragment shader will
+ *   display the appropriate join style within the remaining quad.
+ *
  * @private
  * @chainable
  */
         _main.default.Geometry.prototype._edgesToVertices = function () {
           this.lineVertices.length = 0;
-          this.lineNormals.length = 0;
+          this.lineTangentsIn.length = 0;
+          this.lineTangentsOut.length = 0;
+          this.lineSides.length = 0;
+          var closed = this.edges.length > 1 && this.edges[0][0] === this.edges[this.edges.length - 1][1];
+          var addedStartingCap = false;
+          var lastValidDir;
           for (var i = 0; i < this.edges.length; i++) {
-            var begin = this.vertices[this.edges[i][0]];
-            var end = this.vertices[this.edges[i][1]];
+            var prevEdge = this.edges[i - 1];
+            var currEdge = this.edges[i];
+            var begin = this.vertices[currEdge[0]];
+            var end = this.vertices[currEdge[1]];
+            var fromColor = this.vertexStrokeColors.length > 0 ? this.vertexStrokeColors.slice(currEdge[0] * 4, (currEdge[0] + 1) * 4) : [
+              0,
+              0,
+              0,
+              0
+            ];
+            var toColor = this.vertexStrokeColors.length > 0 ? this.vertexStrokeColors.slice(currEdge[1] * 4, (currEdge[1] + 1) * 4) : [
+              0,
+              0,
+              0,
+              0
+            ];
             var dir = end.copy().sub(begin).normalize();
-            var a = begin.array();
-            var b = begin.array();
-            var c = end.array();
-            var d = end.array();
-            var dirAdd = dir.array();
-            var dirSub = dir.array(); // below is used to displace the pair of vertices at beginning and end
-            // in opposite directions
-            dirAdd.push(1);
-            dirSub.push( - 1);
-            this.lineNormals.push(dirAdd, dirSub, dirAdd, dirAdd, dirSub, dirSub);
-            this.lineVertices.push(a, b, c, c, b, d);
+            var dirOK = dir.magSq() > 0;
+            if (dirOK) {
+              this._addSegment(begin, end, fromColor, toColor, dir);
+            }
+            if (i > 0 && prevEdge[1] === currEdge[0]) {
+              // Add a join if this segment shares a vertex with the previous. Skip
+              // actually adding join vertices if either the previous segment or this
+              // one has a length of 0.
+              //
+              // Don't add a join if the tangents point in the same direction, which
+              // would mean the edges line up exactly, and there is no need for a join.
+              if (lastValidDir && dirOK && dir.dot(lastValidDir) < 1 - 1e-8) {
+                this._addJoin(begin, lastValidDir, dir, fromColor);
+              }
+              if (dirOK && !addedStartingCap && !closed) {
+                this._addCap(begin, dir.copy().mult( - 1), fromColor);
+                addedStartingCap = true;
+              }
+            } else {
+              addedStartingCap = false; // Start a new line
+              if (dirOK && (!closed || i > 0)) {
+                this._addCap(begin, dir.copy().mult( - 1), fromColor);
+                addedStartingCap = true;
+              }
+              if (lastValidDir && (!closed || i < this.edges.length - 1)) {
+                // Close off the last segment with a cap
+                this._addCap(this.vertices[prevEdge[1]], lastValidDir, fromColor);
+                lastValidDir = undefined;
+              }
+            }
+            if (i === this.edges.length - 1) {
+              if (closed) {
+                this._addJoin(end, dir, this.vertices[this.edges[0][1]].copy().sub(end).normalize(), toColor);
+              } else {
+                this._addCap(end, dir, toColor);
+              }
+            }
+            if (dirOK) {
+              lastValidDir = dir;
+            }
+          }
+          return this;
+        };
+        /**
+ * Adds the vertices and vertex attributes for two triangles making a rectangle
+ * for a straight line segment. A vertex shader is responsible for picking
+ * proper coordinates on the screen given the centerline positions, the tangent,
+ * and the side of the centerline each vertex belongs to. Sides follow the
+ * following scheme:
+ *
+ *  -1            -1
+ *   o-------------o
+ *   |             |
+ *   o-------------o
+ *   1             1
+ *
+ * @private
+ * @chainable
+ */
+        _main.default.Geometry.prototype._addSegment = function (begin, end, fromColor, toColor, dir) {
+          var a = begin.array();
+          var b = end.array();
+          var dirArr = dir.array();
+          this.lineSides.push(1, - 1, 1, 1, - 1, - 1);
+          for (var _i4 = 0, _arr = [
+            this.lineTangentsIn,
+            this.lineTangentsOut
+          ]; _i4 < _arr.length; _i4++) {
+            var tangents = _arr[_i4];
+            tangents.push(dirArr, dirArr, dirArr, dirArr, dirArr, dirArr);
+          }
+          this.lineVertices.push(a, a, b, b, a, b);
+          this.lineVertexColors.push(fromColor, fromColor, toColor, toColor, fromColor, toColor);
+          return this;
+        };
+        /**
+ * Adds the vertices and vertex attributes for two triangles representing the
+ * stroke cap of a line. A fragment shader is responsible for displaying the
+ * appropriate cap style within the rectangle they make.
+ *
+ * The lineSides buffer will include the following values for the points on
+ * the cap rectangle:
+ *
+ *           -1  -2
+ * -----------o---o
+ *            |   |
+ * -----------o---o
+ *            1   2
+ * @private
+ * @chainable
+ */
+        _main.default.Geometry.prototype._addCap = function (point, tangent, color) {
+          var ptArray = point.array();
+          var tanInArray = tangent.array();
+          var tanOutArray = [
+            0,
+            0,
+            0
+          ];
+          for (var i = 0; i < 6; i++) {
+            this.lineVertices.push(ptArray);
+            this.lineTangentsIn.push(tanInArray);
+            this.lineTangentsOut.push(tanOutArray);
+            this.lineVertexColors.push(color);
+          }
+          this.lineSides.push( - 1, - 2, 2, 2, 1, - 1);
+          return this;
+        };
+        /**
+ * Adds the vertices and vertex attributes for four triangles representing a
+ * join between two adjacent line segments. This creates a quad on either side
+ * of the shared vertex of the two line segments, with each quad perpendicular
+ * to the lines. A vertex shader will discard all but the quad in the "elbow" of
+ * the join, and a fragment shader will display the appropriate join style
+ * within the remaining quad.
+ *
+ * The lineSides buffer will include the following values for the points on
+ * the join rectangles:
+ *
+ *            -1     -2
+ * -------------o----o
+ *              |    |
+ *       1 o----o----o -3
+ *         |    | 0  |
+ * --------o----o    |
+ *        2|    3    |
+ *         |         |
+ *         |         |
+ * @private
+ * @chainable
+ */
+        _main.default.Geometry.prototype._addJoin = function (point, fromTangent, toTangent, color) {
+          var ptArray = point.array();
+          var tanInArray = fromTangent.array();
+          var tanOutArray = toTangent.array();
+          for (var i = 0; i < 12; i++) {
+            this.lineVertices.push(ptArray);
+            this.lineTangentsIn.push(tanInArray);
+            this.lineTangentsOut.push(tanOutArray);
+            this.lineVertexColors.push(color);
+          }
+          for (var _i5 = 0, _arr2 = [
+            - 1,
+            1
+          ]; _i5 < _arr2.length; _i5++) {
+            var side = _arr2[_i5];
+            this.lineSides.push(side, 2 * side, 3 * side, side, 3 * side, 0);
           }
           return this;
         };
@@ -100798,9 +101541,9 @@
             var dist = _main.default.Vector.sub(maxPosition, minPosition);
             var longestDist = Math.max(Math.max(dist.x, dist.y), dist.z);
             var scale = 200 / longestDist;
-            for (var _i4 = 0; _i4 < this.vertices.length; _i4++) {
-              this.vertices[_i4].sub(center);
-              this.vertices[_i4].mult(scale);
+            for (var _i6 = 0; _i6 < this.vertices.length; _i6++) {
+              this.vertices[_i6].sub(center);
+              this.vertices[_i6].mult(scale);
             }
           }
           return this;
@@ -100810,6 +101553,7 @@
       },
       {
         '../core/main': 290,
+        'core-js/modules/es.array.slice': 180,
         'core-js/modules/es.string.sub': 210
       }
     ],
@@ -101719,6 +102463,14 @@
             } // enable the attribute
 
             shader.enableAttrib(attr, this.size);
+          } else {
+            var loc = attr.location;
+            if (loc === - 1 || !this._renderer.registerEnabled[loc]) {
+              return;
+            } // Disable register corresponding to unused attribute
+
+            gl.disableVertexAttribArray(loc); // Record register availability
+            this._renderer.registerEnabled[loc] = false;
           }
         };
         var _default = _main.default.RenderBuffer;
@@ -101871,7 +102623,7 @@
  */
 
         _main.default.RendererGL.prototype.beginShape = function (mode) {
-          this.immediateMode.shapeMode = mode !== undefined ? mode : constants.TRIANGLE_FAN;
+          this.immediateMode.shapeMode = mode !== undefined ? mode : constants.TESS;
           this.immediateMode.geometry.reset();
           return this;
         };
@@ -101879,6 +102631,7 @@
           vertices: 1,
           vertexNormals: 1,
           vertexColors: 4,
+          vertexStrokeColors: 4,
           uvs: 2
         };
         /**
@@ -101938,13 +102691,20 @@
             1
           ];
           this.immediateMode.geometry.vertexColors.push(vertexColor[0], vertexColor[1], vertexColor[2], vertexColor[3]);
+          var lineVertexColor = this.curStrokeColor || [
+            0.5,
+            0.5,
+            0.5,
+            1
+          ];
+          this.immediateMode.geometry.vertexStrokeColors.push(lineVertexColor[0], lineVertexColor[1], lineVertexColor[2], lineVertexColor[3]);
           if (this.textureMode === constants.IMAGE) {
             if (this._tex !== null) {
               if (this._tex.width > 0 && this._tex.height > 0) {
                 u /= this._tex.width;
                 v /= this._tex.height;
               }
-            } else if (this._tex === null && arguments.length >= 4) {
+            } else if (!this.isProcessingVertices && this._tex === null && arguments.length >= 4) {
               // Only throw this warning if custom uv's have  been provided
               console.warn('You must first call texture() before using' + ' vertex() with image based u and v coordinates');
             }
@@ -101987,7 +102747,9 @@
             this._drawPoints(this.immediateMode.geometry.vertices, this.immediateMode.buffers.point);
             return this;
           }
+          this.isProcessingVertices = true;
           this._processVertices.apply(this, arguments);
+          this.isProcessingVertices = false;
           if (this._doFill) {
             if (this.immediateMode.geometry.vertices.length > 1) {
               this._drawImmediateFill();
@@ -102017,7 +102779,7 @@
  */
         _main.default.RendererGL.prototype._processVertices = function (mode) {
           if (this.immediateMode.geometry.vertices.length === 0) return;
-          var calculateStroke = this._doStroke && this.drawMode !== constants.TEXTURE;
+          var calculateStroke = this._doStroke;
           var shouldClose = mode === constants.CLOSE;
           if (calculateStroke) {
             this.immediateMode.geometry.edges = this._calculateEdges(this.immediateMode.shapeMode, this.immediateMode.geometry.vertices, shouldClose);
@@ -102025,7 +102787,7 @@
           } // For hollow shapes, user must set mode to TESS
 
           var convexShape = this.immediateMode.shapeMode === constants.TESS; // We tesselate when drawing curves or convex shapes
-          var shouldTess = (this.isBezier || this.isQuadratic || this.isCurve || convexShape) && this.immediateMode.shapeMode !== constants.LINES;
+          var shouldTess = this._doFill && (this.isBezier || this.isQuadratic || this.isCurve || convexShape) && this.immediateMode.shapeMode !== constants.LINES;
           if (shouldTess) {
             this._tesselateShape();
           }
@@ -102050,6 +102812,16 @@
               }
               res.push([i,
               i + 1]);
+              break;
+            case constants.TRIANGLE_FAN:
+              for (i = 1; i < verts.length - 1; i++) {
+                res.push([0,
+                i]);
+                res.push([i,
+                i + 1]);
+              }
+              res.push([0,
+              verts.length - 1]);
               break;
             case constants.TRIANGLES:
               for (i = 0; i < verts.length - 2; i = i + 3) {
@@ -102143,7 +102915,7 @@
           ];
           var colors = [
           ];
-          for (var j = 0, polyTriLength = polyTriangles.length; j < polyTriLength; j = j + 12) {
+          for (var j = 0, polyTriLength = polyTriangles.length; j < polyTriLength; j = j + _main.default.RendererGL.prototype.tessyVertexSize) {
             colors.push.apply(colors, _toConsumableArray(polyTriangles.slice(j + 5, j + 9)));
             this.normal.apply(this, _toConsumableArray(polyTriangles.slice(j + 9, j + 12)));
             this.vertex.apply(this, _toConsumableArray(polyTriangles.slice(j, j + 5)));
@@ -102157,6 +102929,7 @@
  */
         _main.default.RendererGL.prototype._drawImmediateFill = function () {
           var gl = this.GL;
+          this._useVertexColor = this.immediateMode.geometry.vertexColors.length > 0;
           var shader = this._getImmediateFillShader();
           this._setFillUniforms(shader);
           var _iteratorNormalCompletion = true;
@@ -102205,7 +102978,10 @@
  */
         _main.default.RendererGL.prototype._drawImmediateStroke = function () {
           var gl = this.GL;
+          var faceCullingEnabled = gl.isEnabled(gl.CULL_FACE); // Prevent strokes from getting removed by culling
+          gl.disable(gl.CULL_FACE);
           var shader = this._getImmediateStrokeShader();
+          this._useLineColor = this.immediateMode.geometry.vertexStrokeColors.length > 0;
           this._setStrokeUniforms(shader);
           var _iteratorNormalCompletion2 = true;
           var _didIteratorError2 = false;
@@ -102231,6 +103007,9 @@
           }
           this._applyColorBlend(this.curStrokeColor);
           gl.drawArrays(gl.TRIANGLES, 0, this.immediateMode.geometry.lineVertices.length);
+          if (faceCullingEnabled) {
+            gl.enable(gl.CULL_FACE);
+          }
           shader.unbindShader();
         };
         var _default = _main.default.RendererGL;
@@ -102459,7 +103238,10 @@
           var gl = this.GL;
           var geometry = this.retainedMode.geometry[gId];
           if (this._doStroke && geometry.lineVertexCount > 0) {
+            var faceCullingEnabled = gl.isEnabled(gl.CULL_FACE); // Prevent strokes from getting removed by culling
+            gl.disable(gl.CULL_FACE);
             var strokeShader = this._getRetainedStrokeShader();
+            this._useLineColor = geometry.model.vertexStrokeColors.length > 0;
             this._setStrokeUniforms(strokeShader);
             var _iteratorNormalCompletion2 = true;
             var _didIteratorError2 = false;
@@ -102485,9 +103267,13 @@
             }
             this._applyColorBlend(this.curStrokeColor);
             this._drawArrays(gl.TRIANGLES, gId);
+            if (faceCullingEnabled) {
+              gl.enable(gl.CULL_FACE);
+            }
             strokeShader.unbindShader();
           }
           if (this._doFill) {
+            this._useVertexColor = geometry.model.vertexColors.length > 0;
             var fillShader = this._getRetainedFillShader();
             this._setFillUniforms(fillShader);
             var _iteratorNormalCompletion3 = true;
@@ -102817,24 +103603,44 @@
             return arr2;
           }
         }
+        var STROKE_CAP_ENUM = {
+        };
+        var STROKE_JOIN_ENUM = {
+        };
+        var lineDefs = '';
+        var defineStrokeCapEnum = function defineStrokeCapEnum(key, val) {
+          lineDefs += '#define STROKE_CAP_'.concat(key, ' ').concat(val, '\n');
+          STROKE_CAP_ENUM[constants[key]] = val;
+        };
+        var defineStrokeJoinEnum = function defineStrokeJoinEnum(key, val) {
+          lineDefs += '#define STROKE_JOIN_'.concat(key, ' ').concat(val, '\n');
+          STROKE_JOIN_ENUM[constants[key]] = val;
+        }; // Define constants in line shaders for each type of cap/join, and also record
+        // the values in JS objects
+        defineStrokeCapEnum('ROUND', 0);
+        defineStrokeCapEnum('PROJECT', 1);
+        defineStrokeCapEnum('SQUARE', 2);
+        defineStrokeJoinEnum('ROUND', 0);
+        defineStrokeJoinEnum('MITER', 1);
+        defineStrokeJoinEnum('BEVEL', 2);
         var lightingShader = 'precision highp float;\nprecision highp int;\n\nuniform mat4 uViewMatrix;\n\nuniform bool uUseLighting;\n\nuniform int uAmbientLightCount;\nuniform vec3 uAmbientColor[5];\n\nuniform int uDirectionalLightCount;\nuniform vec3 uLightingDirection[5];\nuniform vec3 uDirectionalDiffuseColors[5];\nuniform vec3 uDirectionalSpecularColors[5];\n\nuniform int uPointLightCount;\nuniform vec3 uPointLightLocation[5];\nuniform vec3 uPointLightDiffuseColors[5];\t\nuniform vec3 uPointLightSpecularColors[5];\n\nuniform int uSpotLightCount;\nuniform float uSpotLightAngle[5];\nuniform float uSpotLightConc[5];\nuniform vec3 uSpotLightDiffuseColors[5];\nuniform vec3 uSpotLightSpecularColors[5];\nuniform vec3 uSpotLightLocation[5];\nuniform vec3 uSpotLightDirection[5];\n\nuniform bool uSpecular;\nuniform float uShininess;\n\nuniform float uConstantAttenuation;\nuniform float uLinearAttenuation;\nuniform float uQuadraticAttenuation;\n\nconst float specularFactor = 2.0;\nconst float diffuseFactor = 0.73;\n\nstruct LightResult {\n  float specular;\n  float diffuse;\n};\n\nfloat _phongSpecular(\n  vec3 lightDirection,\n  vec3 viewDirection,\n  vec3 surfaceNormal,\n  float shininess) {\n\n  vec3 R = reflect(lightDirection, surfaceNormal);\n  return pow(max(0.0, dot(R, viewDirection)), shininess);\n}\n\nfloat _lambertDiffuse(vec3 lightDirection, vec3 surfaceNormal) {\n  return max(0.0, dot(-lightDirection, surfaceNormal));\n}\n\nLightResult _light(vec3 viewDirection, vec3 normal, vec3 lightVector) {\n\n  vec3 lightDir = normalize(lightVector);\n\n  //compute our diffuse & specular terms\n  LightResult lr;\n  if (uSpecular)\n    lr.specular = _phongSpecular(lightDir, viewDirection, normal, uShininess);\n  lr.diffuse = _lambertDiffuse(lightDir, normal);\n  return lr;\n}\n\nvoid totalLight(\n  vec3 modelPosition,\n  vec3 normal,\n  out vec3 totalDiffuse,\n  out vec3 totalSpecular\n) {\n\n  totalSpecular = vec3(0.0);\n\n  if (!uUseLighting) {\n    totalDiffuse = vec3(1.0);\n    return;\n  }\n\n  totalDiffuse = vec3(0.0);\n\n  vec3 viewDirection = normalize(-modelPosition);\n\n  for (int j = 0; j < 5; j++) {\n    if (j < uDirectionalLightCount) {\n      vec3 lightVector = (uViewMatrix * vec4(uLightingDirection[j], 0.0)).xyz;\n      vec3 lightColor = uDirectionalDiffuseColors[j];\n      vec3 specularColor = uDirectionalSpecularColors[j];\n      LightResult result = _light(viewDirection, normal, lightVector);\n      totalDiffuse += result.diffuse * lightColor;\n      totalSpecular += result.specular * lightColor * specularColor;\n    }\n\n    if (j < uPointLightCount) {\n      vec3 lightPosition = (uViewMatrix * vec4(uPointLightLocation[j], 1.0)).xyz;\n      vec3 lightVector = modelPosition - lightPosition;\n    \n      //calculate attenuation\n      float lightDistance = length(lightVector);\n      float lightFalloff = 1.0 / (uConstantAttenuation + lightDistance * uLinearAttenuation + (lightDistance * lightDistance) * uQuadraticAttenuation);\n      vec3 lightColor = lightFalloff * uPointLightDiffuseColors[j];\n      vec3 specularColor = lightFalloff * uPointLightSpecularColors[j];\n\n      LightResult result = _light(viewDirection, normal, lightVector);\n      totalDiffuse += result.diffuse * lightColor;\n      totalSpecular += result.specular * lightColor * specularColor;\n    }\n\n    if(j < uSpotLightCount) {\n      vec3 lightPosition = (uViewMatrix * vec4(uSpotLightLocation[j], 1.0)).xyz;\n      vec3 lightVector = modelPosition - lightPosition;\n    \n      float lightDistance = length(lightVector);\n      float lightFalloff = 1.0 / (uConstantAttenuation + lightDistance * uLinearAttenuation + (lightDistance * lightDistance) * uQuadraticAttenuation);\n\n      vec3 lightDirection = (uViewMatrix * vec4(uSpotLightDirection[j], 0.0)).xyz;\n      float spotDot = dot(normalize(lightVector), normalize(lightDirection));\n      float spotFalloff;\n      if(spotDot < uSpotLightAngle[j]) {\n        spotFalloff = 0.0;\n      }\n      else {\n        spotFalloff = pow(spotDot, uSpotLightConc[j]);\n      }\n      lightFalloff *= spotFalloff;\n\n      vec3 lightColor = uSpotLightDiffuseColors[j];\n      vec3 specularColor = uSpotLightSpecularColors[j];\n     \n      LightResult result = _light(viewDirection, normal, lightVector);\n      \n      totalDiffuse += result.diffuse * lightColor * lightFalloff;\n      totalSpecular += result.specular * lightColor * specularColor * lightFalloff;\n    }\n  }\n\n  totalDiffuse *= diffuseFactor;\n  totalSpecular *= specularFactor;\n}\n';
         var defaultShaders = {
           immediateVert: 'attribute vec3 aPosition;\nattribute vec4 aVertexColor;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform float uResolution;\nuniform float uPointSize;\n\nvarying vec4 vColor;\nvoid main(void) {\n  vec4 positionVec4 = vec4(aPosition, 1.0);\n  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n  vColor = aVertexColor;\n  gl_PointSize = uPointSize;\n}\n',
           vertexColorVert: 'attribute vec3 aPosition;\nattribute vec4 aVertexColor;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\n\nvarying vec4 vColor;\n\nvoid main(void) {\n  vec4 positionVec4 = vec4(aPosition, 1.0);\n  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n  vColor = aVertexColor;\n}\n',
-          vertexColorFrag: 'precision mediump float;\nvarying vec4 vColor;\nvoid main(void) {\n  gl_FragColor = vColor;\n}',
-          normalVert: 'attribute vec3 aPosition;\nattribute vec3 aNormal;\nattribute vec2 aTexCoord;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform mat3 uNormalMatrix;\n\nvarying vec3 vVertexNormal;\nvarying highp vec2 vVertTexCoord;\n\nvoid main(void) {\n  vec4 positionVec4 = vec4(aPosition, 1.0);\n  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n  vVertexNormal = normalize(vec3( uNormalMatrix * aNormal ));\n  vVertTexCoord = aTexCoord;\n}\n',
+          vertexColorFrag: 'precision mediump float;\nvarying vec4 vColor;\nvoid main(void) {\n  gl_FragColor = vec4(vColor.rgb, 1.) * vColor.a;\n}\n',
+          normalVert: 'attribute vec3 aPosition;\nattribute vec3 aNormal;\nattribute vec2 aTexCoord;\nattribute vec4 aVertexColor;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform mat3 uNormalMatrix;\n\nuniform vec4 uMaterialColor;\nuniform bool uUseVertexColor;\n\nvarying vec3 vVertexNormal;\nvarying highp vec2 vVertTexCoord;\nvarying vec4 vColor;\n\nvoid main(void) {\n  vec4 positionVec4 = vec4(aPosition, 1.0);\n  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n  vVertexNormal = normalize(vec3( uNormalMatrix * aNormal ));\n  vVertTexCoord = aTexCoord;\n  vColor = (uUseVertexColor ? aVertexColor : uMaterialColor);\n}\n',
           normalFrag: 'precision mediump float;\nvarying vec3 vVertexNormal;\nvoid main(void) {\n  gl_FragColor = vec4(vVertexNormal, 1.0);\n}',
-          basicFrag: 'precision mediump float;\nuniform vec4 uMaterialColor;\nvoid main(void) {\n  gl_FragColor = uMaterialColor;\n}',
-          lightVert: lightingShader + '// include lighting.glgl\n\nattribute vec3 aPosition;\nattribute vec3 aNormal;\nattribute vec2 aTexCoord;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform mat3 uNormalMatrix;\n\nvarying highp vec2 vVertTexCoord;\nvarying vec3 vDiffuseColor;\nvarying vec3 vSpecularColor;\n\nvoid main(void) {\n\n  vec4 viewModelPosition = uModelViewMatrix * vec4(aPosition, 1.0);\n  gl_Position = uProjectionMatrix * viewModelPosition;\n\n  vec3 vertexNormal = normalize(uNormalMatrix * aNormal);\n  vVertTexCoord = aTexCoord;\n\n  totalLight(viewModelPosition.xyz, vertexNormal, vDiffuseColor, vSpecularColor);\n\n  for (int i = 0; i < 8; i++) {\n    if (i < uAmbientLightCount) {\n      vDiffuseColor += uAmbientColor[i];\n    }\n  }\n}\n',
-          lightTextureFrag: 'precision highp float;\n\nuniform vec4 uMaterialColor;\nuniform vec4 uTint;\nuniform sampler2D uSampler;\nuniform bool isTexture;\nuniform bool uEmissive;\n\nvarying highp vec2 vVertTexCoord;\nvarying vec3 vDiffuseColor;\nvarying vec3 vSpecularColor;\n\nvoid main(void) {\n  if(uEmissive && !isTexture) {\n    gl_FragColor = uMaterialColor;\n  }\n  else {\n    gl_FragColor = isTexture ? texture2D(uSampler, vVertTexCoord) * (uTint / vec4(255, 255, 255, 255)) : uMaterialColor;\n    gl_FragColor.rgb = gl_FragColor.rgb * vDiffuseColor + vSpecularColor;\n  }\n}',
-          phongVert: 'precision highp float;\nprecision highp int;\n\nattribute vec3 aPosition;\nattribute vec3 aNormal;\nattribute vec2 aTexCoord;\n\nuniform vec3 uAmbientColor[5];\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform mat3 uNormalMatrix;\nuniform int uAmbientLightCount;\n\nvarying vec3 vNormal;\nvarying vec2 vTexCoord;\nvarying vec3 vViewPosition;\nvarying vec3 vAmbientColor;\n\nvoid main(void) {\n\n  vec4 viewModelPosition = uModelViewMatrix * vec4(aPosition, 1.0);\n\n  // Pass varyings to fragment shader\n  vViewPosition = viewModelPosition.xyz;\n  gl_Position = uProjectionMatrix * viewModelPosition;  \n\n  vNormal = uNormalMatrix * aNormal;\n  vTexCoord = aTexCoord;\n\n  // TODO: this should be a uniform\n  vAmbientColor = vec3(0.0);\n  for (int i = 0; i < 5; i++) {\n    if (i < uAmbientLightCount) {\n      vAmbientColor += uAmbientColor[i];\n    }\n  }\n}\n',
-          phongFrag: lightingShader + '// include lighting.glsl\nprecision highp float;\nprecision highp int;\n\nuniform vec4 uSpecularMatColor;\nuniform vec4 uAmbientMatColor;\nuniform vec4 uEmissiveMatColor;\n\nuniform vec4 uMaterialColor;\nuniform vec4 uTint;\nuniform sampler2D uSampler;\nuniform bool isTexture;\n\nvarying vec3 vNormal;\nvarying vec2 vTexCoord;\nvarying vec3 vViewPosition;\nvarying vec3 vAmbientColor;\n\nvoid main(void) {\n\n  vec3 diffuse;\n  vec3 specular;\n  totalLight(vViewPosition, normalize(vNormal), diffuse, specular);\n\n  // Calculating final color as result of all lights (plus emissive term).\n\n  gl_FragColor = isTexture ? texture2D(uSampler, vTexCoord) * (uTint / vec4(255, 255, 255, 255)) : uMaterialColor;\n  gl_FragColor.rgb = diffuse * gl_FragColor.rgb + \n                    vAmbientColor * uAmbientMatColor.rgb + \n                    specular * uSpecularMatColor.rgb + \n                    uEmissiveMatColor.rgb;\n}',
-          fontVert: 'precision mediump float;\n\nattribute vec3 aPosition;\nattribute vec2 aTexCoord;\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\n\nuniform vec4 uGlyphRect;\nuniform float uGlyphOffset;\n\nvarying vec2 vTexCoord;\nvarying float w;\n\nvoid main() {\n  vec4 positionVec4 = vec4(aPosition, 1.0);\n\n  // scale by the size of the glyph\'s rectangle\n  positionVec4.xy *= uGlyphRect.zw - uGlyphRect.xy;\n\n  // move to the corner of the glyph\n  positionVec4.xy += uGlyphRect.xy;\n\n  // move to the letter\'s line offset\n  positionVec4.x += uGlyphOffset;\n  \n  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n  vTexCoord = aTexCoord;\n  w = gl_Position.w;\n}\n',
-          fontFrag: '#extension GL_OES_standard_derivatives : enable\nprecision mediump float;\n\n#if 0\n  // simulate integer math using floats\n\t#define int float\n\t#define ivec2 vec2\n\t#define INT(x) float(x)\n\n\tint ifloor(float v) { return floor(v); }\n\tivec2 ifloor(vec2 v) { return floor(v); }\n\n#else\n  // use native integer math\n\tprecision highp int;\n\t#define INT(x) x\n\n\tint ifloor(float v) { return int(v); }\n\tint ifloor(int v) { return v; }\n\tivec2 ifloor(vec2 v) { return ivec2(v); }\n\n#endif\n\nuniform sampler2D uSamplerStrokes;\nuniform sampler2D uSamplerRowStrokes;\nuniform sampler2D uSamplerRows;\nuniform sampler2D uSamplerColStrokes;\nuniform sampler2D uSamplerCols;\n\nuniform ivec2 uStrokeImageSize;\nuniform ivec2 uCellsImageSize;\nuniform ivec2 uGridImageSize;\n\nuniform ivec2 uGridOffset;\nuniform ivec2 uGridSize;\nuniform vec4 uMaterialColor;\n\nvarying vec2 vTexCoord;\n\n// some helper functions\nint round(float v) { return ifloor(v + 0.5); }\nivec2 round(vec2 v) { return ifloor(v + 0.5); }\nfloat saturate(float v) { return clamp(v, 0.0, 1.0); }\nvec2 saturate(vec2 v) { return clamp(v, 0.0, 1.0); }\n\nint mul(float v1, int v2) {\n  return ifloor(v1 * float(v2));\n}\n\nivec2 mul(vec2 v1, ivec2 v2) {\n  return ifloor(v1 * vec2(v2) + 0.5);\n}\n\n// unpack a 16-bit integer from a float vec2\nint getInt16(vec2 v) {\n  ivec2 iv = round(v * 255.0);\n  return iv.x * INT(128) + iv.y;\n}\n\nvec2 pixelScale;\nvec2 coverage = vec2(0.0);\nvec2 weight = vec2(0.5);\nconst float minDistance = 1.0/8192.0;\nconst float hardness = 1.05; // amount of antialias\n\n// the maximum number of curves in a glyph\nconst int N = INT(250);\n\n// retrieves an indexed pixel from a sampler\nvec4 getTexel(sampler2D sampler, int pos, ivec2 size) {\n  int width = size.x;\n  int y = ifloor(pos / width);\n  int x = pos - y * width;  // pos % width\n\n  return texture2D(sampler, (vec2(x, y) + 0.5) / vec2(size));\n}\n\nvoid calulateCrossings(vec2 p0, vec2 p1, vec2 p2, out vec2 C1, out vec2 C2) {\n\n  // get the coefficients of the quadratic in t\n  vec2 a = p0 - p1 * 2.0 + p2;\n  vec2 b = p0 - p1;\n  vec2 c = p0 - vTexCoord;\n\n  // found out which values of \'t\' it crosses the axes\n  vec2 surd = sqrt(max(vec2(0.0), b * b - a * c));\n  vec2 t1 = ((b - surd) / a).yx;\n  vec2 t2 = ((b + surd) / a).yx;\n\n  // approximate straight lines to avoid rounding errors\n  if (abs(a.y) < 0.001)\n    t1.x = t2.x = c.y / (2.0 * b.y);\n\n  if (abs(a.x) < 0.001)\n    t1.y = t2.y = c.x / (2.0 * b.x);\n\n  // plug into quadratic formula to find the corrdinates of the crossings\n  C1 = ((a * t1 - b * 2.0) * t1 + c) * pixelScale;\n  C2 = ((a * t2 - b * 2.0) * t2 + c) * pixelScale;\n}\n\nvoid coverageX(vec2 p0, vec2 p1, vec2 p2) {\n\n  vec2 C1, C2;\n  calulateCrossings(p0, p1, p2, C1, C2);\n\n  // determine on which side of the x-axis the points lie\n  bool y0 = p0.y > vTexCoord.y;\n  bool y1 = p1.y > vTexCoord.y;\n  bool y2 = p2.y > vTexCoord.y;\n\n  // could web be under the curve (after t1)?\n  if (y1 ? !y2 : y0) {\n    // add the coverage for t1\n    coverage.x += saturate(C1.x + 0.5);\n    // calculate the anti-aliasing for t1\n    weight.x = min(weight.x, abs(C1.x));\n  }\n\n  // are we outside the curve (after t2)?\n  if (y1 ? !y0 : y2) {\n    // subtract the coverage for t2\n    coverage.x -= saturate(C2.x + 0.5);\n    // calculate the anti-aliasing for t2\n    weight.x = min(weight.x, abs(C2.x));\n  }\n}\n\n// this is essentially the same as coverageX, but with the axes swapped\nvoid coverageY(vec2 p0, vec2 p1, vec2 p2) {\n\n  vec2 C1, C2;\n  calulateCrossings(p0, p1, p2, C1, C2);\n\n  bool x0 = p0.x > vTexCoord.x;\n  bool x1 = p1.x > vTexCoord.x;\n  bool x2 = p2.x > vTexCoord.x;\n\n  if (x1 ? !x2 : x0) {\n    coverage.y -= saturate(C1.y + 0.5);\n    weight.y = min(weight.y, abs(C1.y));\n  }\n\n  if (x1 ? !x0 : x2) {\n    coverage.y += saturate(C2.y + 0.5);\n    weight.y = min(weight.y, abs(C2.y));\n  }\n}\n\nvoid main() {\n\n  // calculate the pixel scale based on screen-coordinates\n  pixelScale = hardness / fwidth(vTexCoord);\n\n  // which grid cell is this pixel in?\n  ivec2 gridCoord = ifloor(vTexCoord * vec2(uGridSize));\n\n  // intersect curves in this row\n  {\n    // the index into the row info bitmap\n    int rowIndex = gridCoord.y + uGridOffset.y;\n    // fetch the info texel\n    vec4 rowInfo = getTexel(uSamplerRows, rowIndex, uGridImageSize);\n    // unpack the rowInfo\n    int rowStrokeIndex = getInt16(rowInfo.xy);\n    int rowStrokeCount = getInt16(rowInfo.zw);\n\n    for (int iRowStroke = INT(0); iRowStroke < N; iRowStroke++) {\n      if (iRowStroke >= rowStrokeCount)\n        break;\n\n      // each stroke is made up of 3 points: the start and control point\n      // and the start of the next curve.\n      // fetch the indices of this pair of strokes:\n      vec4 strokeIndices = getTexel(uSamplerRowStrokes, rowStrokeIndex++, uCellsImageSize);\n\n      // unpack the stroke index\n      int strokePos = getInt16(strokeIndices.xy);\n\n      // fetch the two strokes\n      vec4 stroke0 = getTexel(uSamplerStrokes, strokePos + INT(0), uStrokeImageSize);\n      vec4 stroke1 = getTexel(uSamplerStrokes, strokePos + INT(1), uStrokeImageSize);\n\n      // calculate the coverage\n      coverageX(stroke0.xy, stroke0.zw, stroke1.xy);\n    }\n  }\n\n  // intersect curves in this column\n  {\n    int colIndex = gridCoord.x + uGridOffset.x;\n    vec4 colInfo = getTexel(uSamplerCols, colIndex, uGridImageSize);\n    int colStrokeIndex = getInt16(colInfo.xy);\n    int colStrokeCount = getInt16(colInfo.zw);\n    \n    for (int iColStroke = INT(0); iColStroke < N; iColStroke++) {\n      if (iColStroke >= colStrokeCount)\n        break;\n\n      vec4 strokeIndices = getTexel(uSamplerColStrokes, colStrokeIndex++, uCellsImageSize);\n\n      int strokePos = getInt16(strokeIndices.xy);\n      vec4 stroke0 = getTexel(uSamplerStrokes, strokePos + INT(0), uStrokeImageSize);\n      vec4 stroke1 = getTexel(uSamplerStrokes, strokePos + INT(1), uStrokeImageSize);\n      coverageY(stroke0.xy, stroke0.zw, stroke1.xy);\n    }\n  }\n\n  weight = saturate(1.0 - weight * 2.0);\n  float distance = max(weight.x + weight.y, minDistance); // manhattan approx.\n  float antialias = abs(dot(coverage, weight) / distance);\n  float cover = min(abs(coverage.x), abs(coverage.y));\n  gl_FragColor = uMaterialColor;\n  gl_FragColor.a *= saturate(max(antialias, cover));\n}',
-          lineVert: '/*\n  Part of the Processing project - http://processing.org\n  Copyright (c) 2012-15 The Processing Foundation\n  Copyright (c) 2004-12 Ben Fry and Casey Reas\n  Copyright (c) 2001-04 Massachusetts Institute of Technology\n  This library is free software; you can redistribute it and/or\n  modify it under the terms of the GNU Lesser General Public\n  License as published by the Free Software Foundation, version 2.1.\n  This library is distributed in the hope that it will be useful,\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n  Lesser General Public License for more details.\n  You should have received a copy of the GNU Lesser General\n  Public License along with this library; if not, write to the\n  Free Software Foundation, Inc., 59 Temple Place, Suite 330,\n  Boston, MA  02111-1307  USA\n*/\n\n#define PROCESSING_LINE_SHADER\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform float uStrokeWeight;\n\nuniform vec4 uViewport;\nuniform int uPerspective;\n\nattribute vec4 aPosition;\nattribute vec4 aDirection;\n  \nvoid main() {\n  // using a scale <1 moves the lines towards the camera\n  // in order to prevent popping effects due to half of\n  // the line disappearing behind the geometry faces.\n  vec3 scale = vec3(0.9995);\n\n  vec4 posp = uModelViewMatrix * aPosition;\n  vec4 posq = uModelViewMatrix * (aPosition + vec4(aDirection.xyz, 0));\n\n  // Moving vertices slightly toward the camera\n  // to avoid depth-fighting with the fill triangles.\n  // Discussed here:\n  // http://www.opengl.org/discussion_boards/ubbthreads.php?ubb=showflat&Number=252848  \n  posp.xyz = posp.xyz * scale;\n  posq.xyz = posq.xyz * scale;\n\n  vec4 p = uProjectionMatrix * posp;\n  vec4 q = uProjectionMatrix * posq;\n\n  // formula to convert from clip space (range -1..1) to screen space (range 0..[width or height])\n  // screen_p = (p.xy/p.w + <1,1>) * 0.5 * uViewport.zw\n\n  // prevent division by W by transforming the tangent formula (div by 0 causes\n  // the line to disappear, see https://github.com/processing/processing/issues/5183)\n  // t = screen_q - screen_p\n  //\n  // tangent is normalized and we don\'t care which aDirection it points to (+-)\n  // t = +- normalize( screen_q - screen_p )\n  // t = +- normalize( (q.xy/q.w+<1,1>)*0.5*uViewport.zw - (p.xy/p.w+<1,1>)*0.5*uViewport.zw )\n  //\n  // extract common factor, <1,1> - <1,1> cancels out\n  // t = +- normalize( (q.xy/q.w - p.xy/p.w) * 0.5 * uViewport.zw )\n  //\n  // convert to common divisor\n  // t = +- normalize( ((q.xy*p.w - p.xy*q.w) / (p.w*q.w)) * 0.5 * uViewport.zw )\n  //\n  // remove the common scalar divisor/factor, not needed due to normalize and +-\n  // (keep uViewport - can\'t remove because it has different components for x and y\n  //  and corrects for aspect ratio, see https://github.com/processing/processing/issues/5181)\n  // t = +- normalize( (q.xy*p.w - p.xy*q.w) * uViewport.zw )\n\n  vec2 tangent = normalize((q.xy*p.w - p.xy*q.w) * uViewport.zw);\n\n  // flip tangent to normal (it\'s already normalized)\n  vec2 normal = vec2(-tangent.y, tangent.x);\n\n  float thickness = aDirection.w * uStrokeWeight;\n  vec2 offset = normal * thickness / 2.0;\n\n  vec2 curPerspScale;\n\n  if(uPerspective == 1) {\n    // Perspective ---\n    // convert from world to clip by multiplying with projection scaling factor\n    // to get the right thickness (see https://github.com/processing/processing/issues/5182)\n    // invert Y, projections in Processing invert Y\n    curPerspScale = (uProjectionMatrix * vec4(1, -1, 0, 0)).xy;\n  } else {\n    // No Perspective ---\n    // multiply by W (to cancel out division by W later in the pipeline) and\n    // convert from screen to clip (derived from clip to screen above)\n    curPerspScale = p.w / (0.5 * uViewport.zw);\n  }\n\n  gl_Position.xy = p.xy + offset.xy * curPerspScale;\n  gl_Position.zw = p.zw;\n}\n',
-          lineFrag: 'precision mediump float;\nprecision mediump int;\n\nuniform vec4 uMaterialColor;\n\nvoid main() {\n  gl_FragColor = uMaterialColor;\n}',
+          basicFrag: 'precision mediump float;\nvarying vec4 vColor;\nvoid main(void) {\n  gl_FragColor = vec4(vColor.rgb, 1.) * vColor.a;\n}\n',
+          lightVert: lightingShader + '// include lighting.glgl\n\nattribute vec3 aPosition;\nattribute vec3 aNormal;\nattribute vec2 aTexCoord;\nattribute vec4 aVertexColor;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform mat3 uNormalMatrix;\n\nuniform bool uUseVertexColor;\nuniform vec4 uMaterialColor;\n\nvarying highp vec2 vVertTexCoord;\nvarying vec3 vDiffuseColor;\nvarying vec3 vSpecularColor;\nvarying vec4 vColor;\n\nvoid main(void) {\n\n  vec4 viewModelPosition = uModelViewMatrix * vec4(aPosition, 1.0);\n  gl_Position = uProjectionMatrix * viewModelPosition;\n\n  vec3 vertexNormal = normalize(uNormalMatrix * aNormal);\n  vVertTexCoord = aTexCoord;\n\n  totalLight(viewModelPosition.xyz, vertexNormal, vDiffuseColor, vSpecularColor);\n\n  for (int i = 0; i < 8; i++) {\n    if (i < uAmbientLightCount) {\n      vDiffuseColor += uAmbientColor[i];\n    }\n  }\n  \n  vColor = (uUseVertexColor ? aVertexColor : uMaterialColor);\n}\n',
+          lightTextureFrag: 'precision highp float;\n\nuniform vec4 uTint;\nuniform sampler2D uSampler;\nuniform bool isTexture;\nuniform bool uEmissive;\n\nvarying highp vec2 vVertTexCoord;\nvarying vec3 vDiffuseColor;\nvarying vec3 vSpecularColor;\nvarying vec4 vColor;\n\nvoid main(void) {\n  if(uEmissive && !isTexture) {\n    gl_FragColor = vColor;\n  }\n  else {\n    vec4 baseColor = isTexture ? texture2D(uSampler, vVertTexCoord) * (uTint / vec4(255, 255, 255, 255)) : vColor;\n    gl_FragColor = vec4(gl_FragColor.rgb * vDiffuseColor + vSpecularColor, 1.) * baseColor.a;\n  }\n}\n',
+          phongVert: 'precision highp float;\nprecision highp int;\n\nattribute vec3 aPosition;\nattribute vec3 aNormal;\nattribute vec2 aTexCoord;\nattribute vec4 aVertexColor;\n\nuniform vec3 uAmbientColor[5];\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform mat3 uNormalMatrix;\nuniform int uAmbientLightCount;\n\nuniform bool uUseVertexColor;\nuniform vec4 uMaterialColor;\n\nvarying vec3 vNormal;\nvarying vec2 vTexCoord;\nvarying vec3 vViewPosition;\nvarying vec3 vAmbientColor;\nvarying vec4 vColor;\n\nvoid main(void) {\n\n  vec4 viewModelPosition = uModelViewMatrix * vec4(aPosition, 1.0);\n\n  // Pass varyings to fragment shader\n  vViewPosition = viewModelPosition.xyz;\n  gl_Position = uProjectionMatrix * viewModelPosition;  \n\n  vNormal = uNormalMatrix * aNormal;\n  vTexCoord = aTexCoord;\n\n  // TODO: this should be a uniform\n  vAmbientColor = vec3(0.0);\n  for (int i = 0; i < 5; i++) {\n    if (i < uAmbientLightCount) {\n      vAmbientColor += uAmbientColor[i];\n    }\n  }\n  \n  vColor = (uUseVertexColor ? aVertexColor : uMaterialColor);\n}\n',
+          phongFrag: lightingShader + '// include lighting.glsl\nprecision highp float;\nprecision highp int;\n\nuniform vec4 uSpecularMatColor;\nuniform vec4 uAmbientMatColor;\nuniform vec4 uEmissiveMatColor;\n\nuniform vec4 uTint;\nuniform sampler2D uSampler;\nuniform bool isTexture;\n\nvarying vec3 vNormal;\nvarying vec2 vTexCoord;\nvarying vec3 vViewPosition;\nvarying vec3 vAmbientColor;\nvarying vec4 vColor;\n\nvoid main(void) {\n\n  vec3 diffuse;\n  vec3 specular;\n  totalLight(vViewPosition, normalize(vNormal), diffuse, specular);\n\n  // Calculating final color as result of all lights (plus emissive term).\n\n  vec4 baseColor = isTexture ? texture2D(uSampler, vTexCoord) * (uTint / vec4(255, 255, 255, 255)) : vColor;\n  gl_FragColor = vec4(diffuse * baseColor.rgb + \n                    vAmbientColor * uAmbientMatColor.rgb + \n                    specular * uSpecularMatColor.rgb + \n                    uEmissiveMatColor.rgb, 1.) * baseColor.a;\n}\n',
+          fontVert: 'precision mediump float;\n\nattribute vec3 aPosition;\nattribute vec2 aTexCoord;\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\n\nuniform vec4 uGlyphRect;\nuniform float uGlyphOffset;\n\nvarying vec2 vTexCoord;\nvarying float w;\n\nvoid main() {\n  vec4 positionVec4 = vec4(aPosition, 1.0);\n\n  // scale by the size of the glyph\'s rectangle\n  positionVec4.xy *= uGlyphRect.zw - uGlyphRect.xy;\n\n  // Expand glyph bounding boxes by 1px on each side to give a bit of room\n  // for antialiasing\n  vec2 pixelScale = vec2(\n    1. / uModelViewMatrix[0][0],\n    1. / uModelViewMatrix[1][1]\n  );\n  vec2 offset = pixelScale * normalize(aTexCoord - vec2(0.5, 0.5)) * vec2(1., -1.);\n  vec2 textureOffset = offset * (1. / vec2(\n    uGlyphRect.z - uGlyphRect.x,\n    uGlyphRect.w - uGlyphRect.y\n  ));\n\n  // move to the corner of the glyph\n  positionVec4.xy += uGlyphRect.xy;\n\n  // move to the letter\'s line offset\n  positionVec4.x += uGlyphOffset;\n\n  positionVec4.xy += offset;\n  \n  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n  vTexCoord = aTexCoord + textureOffset;\n  w = gl_Position.w;\n}\n',
+          fontFrag: '#extension GL_OES_standard_derivatives : enable\nprecision mediump float;\n\n#if 0\n  // simulate integer math using floats\n\t#define int float\n\t#define ivec2 vec2\n\t#define INT(x) float(x)\n\n\tint ifloor(float v) { return floor(v); }\n\tivec2 ifloor(vec2 v) { return floor(v); }\n\n#else\n  // use native integer math\n\tprecision highp int;\n\t#define INT(x) x\n\n\tint ifloor(float v) { return int(v); }\n\tint ifloor(int v) { return v; }\n\tivec2 ifloor(vec2 v) { return ivec2(v); }\n\n#endif\n\nuniform sampler2D uSamplerStrokes;\nuniform sampler2D uSamplerRowStrokes;\nuniform sampler2D uSamplerRows;\nuniform sampler2D uSamplerColStrokes;\nuniform sampler2D uSamplerCols;\n\nuniform ivec2 uStrokeImageSize;\nuniform ivec2 uCellsImageSize;\nuniform ivec2 uGridImageSize;\n\nuniform ivec2 uGridOffset;\nuniform ivec2 uGridSize;\nuniform vec4 uMaterialColor;\n\nvarying vec2 vTexCoord;\n\n// some helper functions\nint round(float v) { return ifloor(v + 0.5); }\nivec2 round(vec2 v) { return ifloor(v + 0.5); }\nfloat saturate(float v) { return clamp(v, 0.0, 1.0); }\nvec2 saturate(vec2 v) { return clamp(v, 0.0, 1.0); }\n\nint mul(float v1, int v2) {\n  return ifloor(v1 * float(v2));\n}\n\nivec2 mul(vec2 v1, ivec2 v2) {\n  return ifloor(v1 * vec2(v2) + 0.5);\n}\n\n// unpack a 16-bit integer from a float vec2\nint getInt16(vec2 v) {\n  ivec2 iv = round(v * 255.0);\n  return iv.x * INT(128) + iv.y;\n}\n\nvec2 pixelScale;\nvec2 coverage = vec2(0.0);\nvec2 weight = vec2(0.5);\nconst float minDistance = 1.0/8192.0;\nconst float hardness = 1.05; // amount of antialias\n\n// the maximum number of curves in a glyph\nconst int N = INT(250);\n\n// retrieves an indexed pixel from a sampler\nvec4 getTexel(sampler2D sampler, int pos, ivec2 size) {\n  int width = size.x;\n  int y = ifloor(pos / width);\n  int x = pos - y * width;  // pos % width\n\n  return texture2D(sampler, (vec2(x, y) + 0.5) / vec2(size));\n}\n\nvoid calulateCrossings(vec2 p0, vec2 p1, vec2 p2, out vec2 C1, out vec2 C2) {\n\n  // get the coefficients of the quadratic in t\n  vec2 a = p0 - p1 * 2.0 + p2;\n  vec2 b = p0 - p1;\n  vec2 c = p0 - vTexCoord;\n\n  // found out which values of \'t\' it crosses the axes\n  vec2 surd = sqrt(max(vec2(0.0), b * b - a * c));\n  vec2 t1 = ((b - surd) / a).yx;\n  vec2 t2 = ((b + surd) / a).yx;\n\n  // approximate straight lines to avoid rounding errors\n  if (abs(a.y) < 0.001)\n    t1.x = t2.x = c.y / (2.0 * b.y);\n\n  if (abs(a.x) < 0.001)\n    t1.y = t2.y = c.x / (2.0 * b.x);\n\n  // plug into quadratic formula to find the corrdinates of the crossings\n  C1 = ((a * t1 - b * 2.0) * t1 + c) * pixelScale;\n  C2 = ((a * t2 - b * 2.0) * t2 + c) * pixelScale;\n}\n\nvoid coverageX(vec2 p0, vec2 p1, vec2 p2) {\n\n  vec2 C1, C2;\n  calulateCrossings(p0, p1, p2, C1, C2);\n\n  // determine on which side of the x-axis the points lie\n  bool y0 = p0.y > vTexCoord.y;\n  bool y1 = p1.y > vTexCoord.y;\n  bool y2 = p2.y > vTexCoord.y;\n\n  // could web be under the curve (after t1)?\n  if (y1 ? !y2 : y0) {\n    // add the coverage for t1\n    coverage.x += saturate(C1.x + 0.5);\n    // calculate the anti-aliasing for t1\n    weight.x = min(weight.x, abs(C1.x));\n  }\n\n  // are we outside the curve (after t2)?\n  if (y1 ? !y0 : y2) {\n    // subtract the coverage for t2\n    coverage.x -= saturate(C2.x + 0.5);\n    // calculate the anti-aliasing for t2\n    weight.x = min(weight.x, abs(C2.x));\n  }\n}\n\n// this is essentially the same as coverageX, but with the axes swapped\nvoid coverageY(vec2 p0, vec2 p1, vec2 p2) {\n\n  vec2 C1, C2;\n  calulateCrossings(p0, p1, p2, C1, C2);\n\n  bool x0 = p0.x > vTexCoord.x;\n  bool x1 = p1.x > vTexCoord.x;\n  bool x2 = p2.x > vTexCoord.x;\n\n  if (x1 ? !x2 : x0) {\n    coverage.y -= saturate(C1.y + 0.5);\n    weight.y = min(weight.y, abs(C1.y));\n  }\n\n  if (x1 ? !x0 : x2) {\n    coverage.y += saturate(C2.y + 0.5);\n    weight.y = min(weight.y, abs(C2.y));\n  }\n}\n\nvoid main() {\n\n  // calculate the pixel scale based on screen-coordinates\n  pixelScale = hardness / fwidth(vTexCoord);\n\n  // which grid cell is this pixel in?\n  ivec2 gridCoord = ifloor(vTexCoord * vec2(uGridSize));\n\n  // intersect curves in this row\n  {\n    // the index into the row info bitmap\n    int rowIndex = gridCoord.y + uGridOffset.y;\n    // fetch the info texel\n    vec4 rowInfo = getTexel(uSamplerRows, rowIndex, uGridImageSize);\n    // unpack the rowInfo\n    int rowStrokeIndex = getInt16(rowInfo.xy);\n    int rowStrokeCount = getInt16(rowInfo.zw);\n\n    for (int iRowStroke = INT(0); iRowStroke < N; iRowStroke++) {\n      if (iRowStroke >= rowStrokeCount)\n        break;\n\n      // each stroke is made up of 3 points: the start and control point\n      // and the start of the next curve.\n      // fetch the indices of this pair of strokes:\n      vec4 strokeIndices = getTexel(uSamplerRowStrokes, rowStrokeIndex++, uCellsImageSize);\n\n      // unpack the stroke index\n      int strokePos = getInt16(strokeIndices.xy);\n\n      // fetch the two strokes\n      vec4 stroke0 = getTexel(uSamplerStrokes, strokePos + INT(0), uStrokeImageSize);\n      vec4 stroke1 = getTexel(uSamplerStrokes, strokePos + INT(1), uStrokeImageSize);\n\n      // calculate the coverage\n      coverageX(stroke0.xy, stroke0.zw, stroke1.xy);\n    }\n  }\n\n  // intersect curves in this column\n  {\n    int colIndex = gridCoord.x + uGridOffset.x;\n    vec4 colInfo = getTexel(uSamplerCols, colIndex, uGridImageSize);\n    int colStrokeIndex = getInt16(colInfo.xy);\n    int colStrokeCount = getInt16(colInfo.zw);\n    \n    for (int iColStroke = INT(0); iColStroke < N; iColStroke++) {\n      if (iColStroke >= colStrokeCount)\n        break;\n\n      vec4 strokeIndices = getTexel(uSamplerColStrokes, colStrokeIndex++, uCellsImageSize);\n\n      int strokePos = getInt16(strokeIndices.xy);\n      vec4 stroke0 = getTexel(uSamplerStrokes, strokePos + INT(0), uStrokeImageSize);\n      vec4 stroke1 = getTexel(uSamplerStrokes, strokePos + INT(1), uStrokeImageSize);\n      coverageY(stroke0.xy, stroke0.zw, stroke1.xy);\n    }\n  }\n\n  weight = saturate(1.0 - weight * 2.0);\n  float distance = max(weight.x + weight.y, minDistance); // manhattan approx.\n  float antialias = abs(dot(coverage, weight) / distance);\n  float cover = min(abs(coverage.x), abs(coverage.y));\n  gl_FragColor = vec4(uMaterialColor.rgb, 1.) * uMaterialColor.a;\n  gl_FragColor *= saturate(max(antialias, cover));\n}\n',
+          lineVert: lineDefs + '/*\n  Part of the Processing project - http://processing.org\n  Copyright (c) 2012-15 The Processing Foundation\n  Copyright (c) 2004-12 Ben Fry and Casey Reas\n  Copyright (c) 2001-04 Massachusetts Institute of Technology\n  This library is free software; you can redistribute it and/or\n  modify it under the terms of the GNU Lesser General Public\n  License as published by the Free Software Foundation, version 2.1.\n  This library is distributed in the hope that it will be useful,\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n  Lesser General Public License for more details.\n  You should have received a copy of the GNU Lesser General\n  Public License along with this library; if not, write to the\n  Free Software Foundation, Inc., 59 Temple Place, Suite 330,\n  Boston, MA  02111-1307  USA\n*/\n\n#define PROCESSING_LINE_SHADER\n\nprecision mediump float;\nprecision mediump int;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform float uStrokeWeight;\n\nuniform bool uUseLineColor;\nuniform vec4 uMaterialColor;\n\nuniform vec4 uViewport;\nuniform int uPerspective;\nuniform int uStrokeJoin;\n\nattribute vec4 aPosition;\nattribute vec3 aTangentIn;\nattribute vec3 aTangentOut;\nattribute float aSide;\nattribute vec4 aVertexColor;\n\nvarying vec4 vColor;\nvarying vec2 vTangent;\nvarying vec2 vCenter;\nvarying vec2 vPosition;\nvarying float vMaxDist;\nvarying float vCap;\nvarying float vJoin;\n\nvec2 lineIntersection(vec2 aPoint, vec2 aDir, vec2 bPoint, vec2 bDir) {\n  // Rotate and translate so a starts at the origin and goes out to the right\n  bPoint -= aPoint;\n  vec2 rotatedBFrom = vec2(\n    bPoint.x*aDir.x + bPoint.y*aDir.y,\n    bPoint.y*aDir.x - bPoint.x*aDir.y\n  );\n  vec2 bTo = bPoint + bDir;\n  vec2 rotatedBTo = vec2(\n    bTo.x*aDir.x + bTo.y*aDir.y,\n    bTo.y*aDir.x - bTo.x*aDir.y\n  );\n  float intersectionDistance =\n    rotatedBTo.x + (rotatedBFrom.x - rotatedBTo.x) * rotatedBTo.y /\n    (rotatedBTo.y - rotatedBFrom.y);\n  return aPoint + aDir * intersectionDistance;\n}\n\nvoid main() {\n  // using a scale <1 moves the lines towards the camera\n  // in order to prevent popping effects due to half of\n  // the line disappearing behind the geometry faces.\n  vec3 scale = vec3(0.9995);\n\n  // Caps have one of either the in or out tangent set to 0\n  vCap = (aTangentIn == vec3(0.)) != (aTangentOut == (vec3(0.)))\n    ? 1. : 0.;\n\n  // Joins have two unique, defined tangents\n  vJoin = (\n    aTangentIn != vec3(0.) &&\n    aTangentOut != vec3(0.) &&\n    aTangentIn != aTangentOut\n  ) ? 1. : 0.;\n\n  vec4 posp = uModelViewMatrix * aPosition;\n  vec4 posqIn = uModelViewMatrix * (aPosition + vec4(aTangentIn, 0));\n  vec4 posqOut = uModelViewMatrix * (aPosition + vec4(aTangentOut, 0));\n\n  // Moving vertices slightly toward the camera\n  // to avoid depth-fighting with the fill triangles.\n  // Discussed here:\n  // http://www.opengl.org/discussion_boards/ubbthreads.php?ubb=showflat&Number=252848  \n  posp.xyz = posp.xyz * scale;\n  posqIn.xyz = posqIn.xyz * scale;\n  posqOut.xyz = posqOut.xyz * scale;\n\n  vec4 p = uProjectionMatrix * posp;\n  vec4 qIn = uProjectionMatrix * posqIn;\n  vec4 qOut = uProjectionMatrix * posqOut;\n  vCenter = p.xy;\n\n  // formula to convert from clip space (range -1..1) to screen space (range 0..[width or height])\n  // screen_p = (p.xy/p.w + <1,1>) * 0.5 * uViewport.zw\n\n  // prevent division by W by transforming the tangent formula (div by 0 causes\n  // the line to disappear, see https://github.com/processing/processing/issues/5183)\n  // t = screen_q - screen_p\n  //\n  // tangent is normalized and we don\'t care which aDirection it points to (+-)\n  // t = +- normalize( screen_q - screen_p )\n  // t = +- normalize( (q.xy/q.w+<1,1>)*0.5*uViewport.zw - (p.xy/p.w+<1,1>)*0.5*uViewport.zw )\n  //\n  // extract common factor, <1,1> - <1,1> cancels out\n  // t = +- normalize( (q.xy/q.w - p.xy/p.w) * 0.5 * uViewport.zw )\n  //\n  // convert to common divisor\n  // t = +- normalize( ((q.xy*p.w - p.xy*q.w) / (p.w*q.w)) * 0.5 * uViewport.zw )\n  //\n  // remove the common scalar divisor/factor, not needed due to normalize and +-\n  // (keep uViewport - can\'t remove because it has different components for x and y\n  //  and corrects for aspect ratio, see https://github.com/processing/processing/issues/5181)\n  // t = +- normalize( (q.xy*p.w - p.xy*q.w) * uViewport.zw )\n\n  vec2 tangentIn = normalize((qIn.xy*p.w - p.xy*qIn.w) * uViewport.zw);\n  vec2 tangentOut = normalize((qOut.xy*p.w - p.xy*qOut.w) * uViewport.zw);\n\n  vec2 curPerspScale;\n  if(uPerspective == 1) {\n    // Perspective ---\n    // convert from world to clip by multiplying with projection scaling factor\n    // to get the right thickness (see https://github.com/processing/processing/issues/5182)\n    // invert Y, projections in Processing invert Y\n    curPerspScale = (uProjectionMatrix * vec4(1, -1, 0, 0)).xy;\n  } else {\n    // No Perspective ---\n    // multiply by W (to cancel out division by W later in the pipeline) and\n    // convert from screen to clip (derived from clip to screen above)\n    curPerspScale = p.w / (0.5 * uViewport.zw);\n  }\n\n  vec2 offset;\n  if (vJoin == 1.) {\n    vTangent = normalize(tangentIn + tangentOut);\n    vec2 normalIn = vec2(-tangentIn.y, tangentIn.x);\n    vec2 normalOut = vec2(-tangentOut.y, tangentOut.x);\n    float side = sign(aSide);\n    float sideEnum = abs(aSide);\n\n    // We generate vertices for joins on either side of the centerline, but\n    // the "elbow" side is the only one needing a join. By not setting the\n    // offset for the other side, all its vertices will end up in the same\n    // spot and not render, effectively discarding it.\n    if (sign(dot(tangentOut, vec2(-tangentIn.y, tangentIn.x))) != side) {\n      // Side enums:\n      //   1: the side going into the join\n      //   2: the middle of the join\n      //   3: the side going out of the join\n      if (sideEnum == 2.) {\n        // Calculate the position + tangent on either side of the join, and\n        // find where the lines intersect to find the elbow of the join\n        vec2 c = (posp.xy/posp.w + vec2(1.,1.)) * 0.5 * uViewport.zw;\n        vec2 intersection = lineIntersection(\n          c + (side * normalIn * uStrokeWeight / 2.) * curPerspScale,\n          tangentIn,\n          c + (side * normalOut * uStrokeWeight / 2.) * curPerspScale,\n          tangentOut\n        );\n        offset = (intersection - c);\n\n        // When lines are thick and the angle of the join approaches 180, the\n        // elbow might be really far from the center. We\'ll apply a limit to\n        // the magnitude to avoid lines going across the whole screen when this\n        // happens.\n        float mag = length(offset);\n        float maxMag = 3. * uStrokeWeight;\n        if (mag > maxMag) {\n          offset *= maxMag / mag;\n        }\n      } else if (sideEnum == 1.) {\n        offset = side * normalIn * curPerspScale * uStrokeWeight / 2.;\n      } else if (sideEnum == 3.) {\n        offset = side * normalOut * curPerspScale * uStrokeWeight / 2.;\n      }\n    }\n    if (uStrokeJoin == STROKE_JOIN_BEVEL) {\n      vec2 avgNormal = vec2(-vTangent.y, vTangent.x);\n      vMaxDist = abs(dot(avgNormal, normalIn * uStrokeWeight / 2.));\n    } else {\n      vMaxDist = uStrokeWeight / 2.;\n    }\n  } else {\n    vec2 tangent = aTangentIn == vec3(0.) ? tangentOut : tangentIn;\n    vTangent = tangent;\n    vec2 normal = vec2(-tangent.y, tangent.x);\n\n    float normalOffset = sign(aSide);\n    // Caps will have side values of -2 or 2 on the edge of the cap that\n    // extends out from the line\n    float tangentOffset = abs(aSide) - 1.;\n    offset = (normal * normalOffset + tangent * tangentOffset) *\n      uStrokeWeight * 0.5 * curPerspScale;\n    vMaxDist = uStrokeWeight / 2.;\n  }\n  vPosition = vCenter + offset / curPerspScale;\n\n  gl_Position.xy = p.xy + offset.xy;\n  gl_Position.zw = p.zw;\n  \n  vColor = (uUseLineColor ? aVertexColor : uMaterialColor);\n}\n',
+          lineFrag: lineDefs + 'precision mediump float;\nprecision mediump int;\n\nuniform vec4 uMaterialColor;\nuniform int uStrokeCap;\nuniform int uStrokeJoin;\nuniform float uStrokeWeight;\n\nvarying vec4 vColor;\nvarying vec2 vTangent;\nvarying vec2 vCenter;\nvarying vec2 vPosition;\nvarying float vMaxDist;\nvarying float vCap;\nvarying float vJoin;\n\nfloat distSquared(vec2 a, vec2 b) {\n  vec2 aToB = b - a;\n  return dot(aToB, aToB);\n}\n\nvoid main() {\n  if (vCap > 0.) {\n    if (\n      uStrokeCap == STROKE_CAP_ROUND &&\n      distSquared(vPosition, vCenter) > uStrokeWeight * uStrokeWeight * 0.25\n    ) {\n      discard;\n    } else if (\n      uStrokeCap == STROKE_CAP_SQUARE &&\n      dot(vPosition - vCenter, vTangent) > 0.\n    ) {\n      discard;\n    }\n    // Use full area for PROJECT\n  } else if (vJoin > 0.) {\n    if (\n      uStrokeJoin == STROKE_JOIN_ROUND &&\n      distSquared(vPosition, vCenter) > uStrokeWeight * uStrokeWeight * 0.25\n    ) {\n      discard;\n    } else if (uStrokeJoin == STROKE_JOIN_BEVEL) {\n      vec2 normal = vec2(-vTangent.y, vTangent.x);\n      if (abs(dot(vPosition - vCenter, normal)) > vMaxDist) {\n        discard;\n      }\n    }\n    // Use full area for MITER\n  }\n  gl_FragColor = vec4(vColor.rgb, 1.) * vColor.a;\n}\n',
           pointVert: 'attribute vec3 aPosition;\nuniform float uPointSize;\nvarying float vStrokeWeight;\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nvoid main() {\n\tvec4 positionVec4 =  vec4(aPosition, 1.0);\n\tgl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n\tgl_PointSize = uPointSize;\n\tvStrokeWeight = uPointSize;\n}',
-          pointFrag: 'precision mediump float;\nprecision mediump int;\nuniform vec4 uMaterialColor;\nvarying float vStrokeWeight;\n\nvoid main(){\n\tfloat mask = 0.0;\n\n\t// make a circular mask using the gl_PointCoord (goes from 0 - 1 on a point)\n    // might be able to get a nicer edge on big strokeweights with smoothstep but slightly less performant\n\n\tmask = step(0.98, length(gl_PointCoord * 2.0 - 1.0));\n\n\t// if strokeWeight is 1 or less lets just draw a square\n\t// this prevents weird artifacting from carving circles when our points are really small\n\t// if strokeWeight is larger than 1, we just use it as is\n\n\tmask = mix(0.0, mask, clamp(floor(vStrokeWeight - 0.5),0.0,1.0));\n\n\t// throw away the borders of the mask\n    // otherwise we get weird alpha blending issues\n\n\tif(mask > 0.98){\n      discard;\n  \t}\n\n  \tgl_FragColor = vec4(uMaterialColor.rgb * (1.0 - mask), uMaterialColor.a) ;\n}'
+          pointFrag: 'precision mediump float;\nprecision mediump int;\nuniform vec4 uMaterialColor;\nvarying float vStrokeWeight;\n\nvoid main(){\n  float mask = 0.0;\n\n  // make a circular mask using the gl_PointCoord (goes from 0 - 1 on a point)\n  // might be able to get a nicer edge on big strokeweights with smoothstep but slightly less performant\n\n  mask = step(0.98, length(gl_PointCoord * 2.0 - 1.0));\n\n  // if strokeWeight is 1 or less lets just draw a square\n  // this prevents weird artifacting from carving circles when our points are really small\n  // if strokeWeight is larger than 1, we just use it as is\n\n  mask = mix(0.0, mask, clamp(floor(vStrokeWeight - 0.5),0.0,1.0));\n\n  // throw away the borders of the mask\n  // otherwise we get weird alpha blending issues\n\n  if(mask > 0.98){\n    discard;\n  }\n\n  gl_FragColor = vec4(uMaterialColor.rgb, 1.) * uMaterialColor.a;\n}\n'
         };
         /**
  * 3D graphics class
@@ -102895,10 +103701,10 @@
             1
           ];
           this.curAmbientColor = this._cachedFillStyle = [
-            0,
-            0,
-            0,
-            0
+            1,
+            1,
+            1,
+            1
           ];
           this.curSpecularColor = this._cachedFillStyle = [
             0,
@@ -102926,6 +103732,10 @@
           this._useEmissiveMaterial = false;
           this._useNormalMaterial = false;
           this._useShininess = 1;
+          this._useLineColor = false;
+          this._useVertexColor = false;
+          this.registerEnabled = [
+          ];
           this._tint = [
             255,
             255,
@@ -102960,8 +103770,11 @@
             },
             buffers: {
               stroke: [
-                new _main.default.RenderBuffer(3, 'lineVertices', 'lineVertexBuffer', 'aPosition', this, this._flatten),
-                new _main.default.RenderBuffer(4, 'lineNormals', 'lineNormalBuffer', 'aDirection', this, this._flatten)
+                new _main.default.RenderBuffer(4, 'lineVertexColors', 'lineColorBuffer', 'aVertexColor', this, this._flatten),
+                new _main.default.RenderBuffer(3, 'lineVertices', 'lineVerticesBuffer', 'aPosition', this, this._flatten),
+                new _main.default.RenderBuffer(3, 'lineTangentsIn', 'lineTangentsInBuffer', 'aTangentIn', this, this._flatten),
+                new _main.default.RenderBuffer(3, 'lineTangentsOut', 'lineTangentsOutBuffer', 'aTangentOut', this, this._flatten),
+                new _main.default.RenderBuffer(1, 'lineSides', 'lineSidesBuffer', 'aSide', this)
               ],
               fill: [
                 new _main.default.RenderBuffer(3, 'vertices', 'vertexBuffer', 'aPosition', this, this._vToNArray),
@@ -102995,14 +103808,19 @@
                 new _main.default.RenderBuffer(2, 'uvs', 'uvBuffer', 'aTexCoord', this, this._flatten)
               ],
               stroke: [
-                new _main.default.RenderBuffer(3, 'lineVertices', 'lineVertexBuffer', 'aPosition', this, this._flatten),
-                new _main.default.RenderBuffer(4, 'lineNormals', 'lineNormalBuffer', 'aDirection', this, this._flatten)
+                new _main.default.RenderBuffer(4, 'lineVertexColors', 'lineColorBuffer', 'aVertexColor', this, this._flatten),
+                new _main.default.RenderBuffer(3, 'lineVertices', 'lineVerticesBuffer', 'aPosition', this, this._flatten),
+                new _main.default.RenderBuffer(3, 'lineTangentsIn', 'lineTangentsInBuffer', 'aTangentIn', this, this._flatten),
+                new _main.default.RenderBuffer(3, 'lineTangentsOut', 'lineTangentsOutBuffer', 'aTangentOut', this, this._flatten),
+                new _main.default.RenderBuffer(1, 'lineSides', 'lineSidesBuffer', 'aSide', this)
               ],
               point: this.GL.createBuffer()
             }
           };
           this.pointSize = 5; //default point size
-          this.curStrokeWeight = 1; // array of textures created in this gl context via this.getTexture(src)
+          this.curStrokeWeight = 1;
+          this.curStrokeCap = constants.ROUND;
+          this.curStrokeJoin = constants.ROUND; // array of textures created in this gl context via this.getTexture(src)
           this.textures = [
           ];
           this.textureMode = constants.IMAGE; // default wrap settings
@@ -103015,7 +103833,8 @@
           this._lookUpTableQuadratic = [
           ]; // current curveDetail in the Bezier lookUpTable
           this._lutBezierDetail = 0; // current curveDetail in the Quadratic lookUpTable
-          this._lutQuadraticDetail = 0;
+          this._lutQuadraticDetail = 0; // Used to distinguish between user calls to vertex() and internal calls
+          this.isProcessingVertices = false;
           this._tessy = this._initTessy();
           this.fontInfos = {
           };
@@ -103029,11 +103848,11 @@
           // See issue #3850, safer to enable AA in Safari
           var applyAA = navigator.userAgent.toLowerCase().includes('safari');
           var defaults = {
-            alpha: false,
+            alpha: true,
             depth: true,
             stencil: true,
             antialias: applyAA,
-            premultipliedAlpha: false,
+            premultipliedAlpha: true,
             preserveDrawingBuffer: true,
             perPixelLighting: true
           };
@@ -103120,7 +103939,7 @@
  * The available attributes are:
  * <br>
  * alpha - indicates if the canvas contains an alpha buffer
- * default is false
+ * default is true
  *
  * depth - indicates whether the drawing buffer has a depth buffer
  * of at least 16 bits - default is true
@@ -103133,7 +103952,7 @@
  *
  * premultipliedAlpha - indicates that the page compositor will assume
  * the drawing buffer contains colors with pre-multiplied alpha
- * default is false
+ * default is true
  *
  * preserveDrawingBuffer - if true the buffers will not be cleared and
  * and will preserve their values until cleared or overwritten by author
@@ -103337,8 +104156,7 @@
           var _g = _col.levels[1] / 255;
           var _b = _col.levels[2] / 255;
           var _a = _col.levels[3] / 255;
-          this.GL.clearColor(_r, _g, _b, _a);
-          this.GL.clear(this.GL.COLOR_BUFFER_BIT);
+          this.clear(_r, _g, _b, _a);
         }; //////////////////////////////////////////////
         // COLOR
         //////////////////////////////////////////////
@@ -103413,20 +104231,14 @@
  * black canvas with purple cube with pink outline spinning
  */
         _main.default.RendererGL.prototype.stroke = function (r, g, b, a) {
-          //@todo allow transparency in stroking currently doesn't have
-          //any impact and causes problems with specularMaterial
-          arguments[3] = 255;
           var color = _main.default.prototype.color.apply(this._pInst, arguments);
           this.curStrokeColor = color._array;
         };
         _main.default.RendererGL.prototype.strokeCap = function (cap) {
-          // @TODO : to be implemented
-          console.error('Sorry, strokeCap() is not yet implemented in WEBGL mode');
+          this.curStrokeCap = cap;
         };
         _main.default.RendererGL.prototype.strokeJoin = function (join) {
-          // @TODO : to be implemented
-          // https://processing.org/reference/strokeJoin_.html
-          console.error('Sorry, strokeJoin() is not yet implemented in WEBGL mode');
+          this.curStrokeJoin = join;
         };
         _main.default.RendererGL.prototype.filter = function (filterType) {
           // filter can be achieved using custom shaders.
@@ -103584,7 +104396,7 @@
           var _g = (arguments.length <= 1 ? undefined : arguments[1]) || 0;
           var _b = (arguments.length <= 2 ? undefined : arguments[2]) || 0;
           var _a = (arguments.length <= 3 ? undefined : arguments[3]) || 0;
-          this.GL.clearColor(_r, _g, _b, _a);
+          this.GL.clearColor(_r * _a, _g * _a, _b * _a, _a);
           this.GL.clearDepth(1);
           this.GL.clear(this.GL.COLOR_BUFFER_BIT | this.GL.DEPTH_BUFFER_BIT);
         };
@@ -103709,7 +104521,7 @@
           return style;
         };
         _main.default.RendererGL.prototype.resetMatrix = function () {
-          this.uMVMatrix = _main.default.Matrix.identity(this._pInst);
+          this.uMVMatrix.set(this._curCamera.cameraMatrix.mat4[0], this._curCamera.cameraMatrix.mat4[1], this._curCamera.cameraMatrix.mat4[2], this._curCamera.cameraMatrix.mat4[3], this._curCamera.cameraMatrix.mat4[4], this._curCamera.cameraMatrix.mat4[5], this._curCamera.cameraMatrix.mat4[6], this._curCamera.cameraMatrix.mat4[7], this._curCamera.cameraMatrix.mat4[8], this._curCamera.cameraMatrix.mat4[9], this._curCamera.cameraMatrix.mat4[10], this._curCamera.cameraMatrix.mat4[11], this._curCamera.cameraMatrix.mat4[12], this._curCamera.cameraMatrix.mat4[13], this._curCamera.cameraMatrix.mat4[14], this._curCamera.cameraMatrix.mat4[15]);
           return this;
         }; //////////////////////////////////////////////
         // SHADER
@@ -103871,11 +104683,15 @@
         };
         _main.default.RendererGL.prototype._setStrokeUniforms = function (strokeShader) {
           strokeShader.bindShader(); // set the uniform values
+          strokeShader.setUniform('uUseLineColor', this._useLineColor);
           strokeShader.setUniform('uMaterialColor', this.curStrokeColor);
           strokeShader.setUniform('uStrokeWeight', this.curStrokeWeight);
+          strokeShader.setUniform('uStrokeCap', STROKE_CAP_ENUM[this.curStrokeCap]);
+          strokeShader.setUniform('uStrokeJoin', STROKE_JOIN_ENUM[this.curStrokeJoin]);
         };
         _main.default.RendererGL.prototype._setFillUniforms = function (fillShader) {
           fillShader.bindShader(); // TODO: optimize
+          fillShader.setUniform('uUseVertexColor', this._useVertexColor);
           fillShader.setUniform('uMaterialColor', this.curFillColor);
           fillShader.setUniform('isTexture', !!this._tex);
           if (this._tex) {
@@ -104031,6 +104847,7 @@
         _main.default.prototype._assert3d = function (name) {
           if (!this._renderer.isP3D) throw new Error(''.concat(name, '() is only supported in WEBGL mode. If you\'d like to use 3D graphics and WebGL, see  https://p5js.org/examples/form-3d-primitives.html for more information.'));
         }; // function to initialize GLU Tesselator
+        _main.default.RendererGL.prototype.tessyVertexSize = 12;
         _main.default.RendererGL.prototype._initTessy = function initTesselator() {
           // function called for each vertex of tesselator output
           function vertexCallback(data, polyVertArray) {
@@ -104049,20 +104866,7 @@
           } // callback for when segments intersect and must be split
 
           function combinecallback(coords, data, weight) {
-            var result = [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ];
+            var result = new Array(_main.default.RendererGL.prototype.tessyVertexSize).fill(0);
             for (var i = 0; i < weight.length; i++) {
               for (var j = 0; j < result.length; j++) {
                 if (weight[i] === 0 || !data[i]) continue;
@@ -104082,19 +104886,54 @@
           return tessy;
         };
         _main.default.RendererGL.prototype._triangulate = function (contours) {
-          // libtess will take 3d verts and flatten to a plane for tesselation
-          // since only doing 2d tesselation here, provide z=1 normal to skip
-          // iterating over verts only to get the same answer.
-          // comment out to test normal-generation code
-          this._tessy.gluTessNormal(0, 0, 1);
+          // libtess will take 3d verts and flatten to a plane for tesselation.
+          // libtess is capable of calculating a plane to tesselate on, but
+          // if all of the vertices have the same z values, we'll just
+          // assume the face is facing the camera, letting us skip any performance
+          // issues or bugs in libtess's automatic calculation.
+          var z = contours[0] ? contours[0][2] : undefined;
+          var allSameZ = true;
+          var _iteratorNormalCompletion3 = true;
+          var _didIteratorError3 = false;
+          var _iteratorError3 = undefined;
+          try {
+            for (var _iterator3 = contours[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+              var _contour = _step3.value;
+              for (var _j = 0; _j < _contour.length; _j += _main.default.RendererGL.prototype.tessyVertexSize) {
+                if (_contour[_j + 2] !== z) {
+                  allSameZ = false;
+                  break;
+                }
+              }
+            }
+          } catch (err) {
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+                _iterator3.return();
+              }
+            } finally {
+              if (_didIteratorError3) {
+                throw _iteratorError3;
+              }
+            }
+          }
+          if (allSameZ) {
+            this._tessy.gluTessNormal(0, 0, 1);
+          } else {
+            // Let libtess pick a plane for us
+            this._tessy.gluTessNormal(0, 0, 0);
+          }
           var triangleVerts = [
           ];
           this._tessy.gluTessBeginPolygon(triangleVerts);
           for (var i = 0; i < contours.length; i++) {
             this._tessy.gluTessBeginContour();
             var contour = contours[i];
-            for (var j = 0; j < contour.length; j += 12) {
-              var coords = contour.slice(j, j + 12);
+            for (var j = 0; j < contour.length; j += _main.default.RendererGL.prototype.tessyVertexSize) {
+              var coords = contour.slice(j, j + _main.default.RendererGL.prototype.tessyVertexSize);
               this._tessy.gluTessVertex(coords, coords);
             }
             this._tessy.gluTessEndContour();
@@ -104469,8 +105308,29 @@
             }
           }
         };
-        _main.default.Shader.prototype.unbindTextures = function () { // TODO: migrate stuff from material.js here
-          // - OR - have material.js define this function
+        _main.default.Shader.prototype.unbindTextures = function () {
+          var _iteratorNormalCompletion3 = true;
+          var _didIteratorError3 = false;
+          var _iteratorError3 = undefined;
+          try {
+            for (var _iterator3 = this.samplers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+              var uniform = _step3.value;
+              this.setUniform(uniform.name, this._renderer._getEmptyTexture());
+            }
+          } catch (err) {
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+                _iterator3.return();
+              }
+            } finally {
+              if (_didIteratorError3) {
+                throw _iteratorError3;
+              }
+            }
+          }
         };
         _main.default.Shader.prototype._setMatrixUniforms = function () {
           var viewMatrix = this._renderer._curCamera.cameraMatrix;
@@ -104676,6 +105536,9 @@
               gl.activeTexture(gl.TEXTURE0 + uniform.samplerIndex);
               uniform.texture = data instanceof _main.default.Texture ? data : this._renderer.getTexture(data);
               gl.uniform1i(location, uniform.samplerIndex);
+              if (uniform.texture.src.gifProperties) {
+                uniform.texture.src._animateGif(this._renderer._pInst);
+              }
               break;
               //@todo complete all types
           }
@@ -104720,10 +105583,10 @@
             }
             var loc = attr.location;
             if (loc !== - 1) {
-              var gl = this._renderer.GL;
-              if (!attr.enabled) {
-                gl.enableVertexAttribArray(loc);
-                attr.enabled = true;
+              var gl = this._renderer.GL; // Enable register even if it is disabled
+              if (!this._renderer.registerEnabled[loc]) {
+                gl.enableVertexAttribArray(loc); // Record register availability
+                this._renderer.registerEnabled[loc] = true;
               }
               this._renderer.GL.vertexAttribPointer(loc, size, type || gl.FLOAT, normalized || false, stride || 0, offset || 0);
             }
@@ -105146,8 +106009,18 @@
           var isPowerOfTwo = function isPowerOfTwo(x) {
             return (x & x - 1) === 0;
           };
-          var widthPowerOfTwo = isPowerOfTwo(this.width);
-          var heightPowerOfTwo = isPowerOfTwo(this.height);
+          var textureData = this._getTextureDataFromSource();
+          var wrapWidth;
+          var wrapHeight;
+          if (textureData.naturalWidth && textureData.naturalHeight) {
+            wrapWidth = textureData.naturalWidth;
+            wrapHeight = textureData.naturalHeight;
+          } else {
+            wrapWidth = this.width;
+            wrapHeight = this.height;
+          }
+          var widthPowerOfTwo = isPowerOfTwo(wrapWidth);
+          var heightPowerOfTwo = isPowerOfTwo(wrapHeight);
           if (wrapX === constants.REPEAT) {
             if (widthPowerOfTwo && heightPowerOfTwo) {
               this.glWrapS = gl.REPEAT;
@@ -105527,18 +106400,23 @@
                   min: min,
                   max: max
                 };
-              } // loop through the rows & columns that the curve intersects
-              // adding the curve to those slices
+              } // Expand the bounding box of the glyph by the number of cells below
+              // before rounding. Curves only partially through a cell won't be added
+              // to adjacent cells, but ones that are close will be. This helps fix
+              // small visual glitches that occur when curves are close to grid cell
+              // boundaries.
 
+              var cellOffset = 0.5; // loop through the rows & columns that the curve intersects
+              // adding the curve to those slices
               var mmX = minMax(xs, 1, 0);
-              var ixMin = Math.max(Math.floor(mmX.min * charGridWidth), 0);
-              var ixMax = Math.min(Math.ceil(mmX.max * charGridWidth), charGridWidth);
+              var ixMin = Math.max(Math.floor(mmX.min * charGridWidth - cellOffset), 0);
+              var ixMax = Math.min(Math.ceil(mmX.max * charGridWidth + cellOffset), charGridWidth);
               for (var iCol = ixMin; iCol < ixMax; ++iCol) {
                 cols[iCol].push(index);
               }
               var mmY = minMax(ys, 1, 0);
-              var iyMin = Math.max(Math.floor(mmY.min * charGridHeight), 0);
-              var iyMax = Math.min(Math.ceil(mmY.max * charGridHeight), charGridHeight);
+              var iyMin = Math.max(Math.floor(mmY.min * charGridHeight - cellOffset), 0);
+              var iyMax = Math.min(Math.ceil(mmY.max * charGridHeight + cellOffset), charGridHeight);
               for (var iRow = iyMin; iRow < iyMax; ++iRow) {
                 rows[iRow].push(index);
               }
