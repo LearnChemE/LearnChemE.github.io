@@ -8,6 +8,7 @@ window.p5 = new require("./js/p5.js");
 window.gvs = {
     step: 1,
     show_solution: false,
+    HS: "enthalpy",
     plot : {
         margins: [[100, 50], [60, 80]],
         labels: [["molar enthalpy (kJ/mol)", ""], ["", "mole fraction A"]],
@@ -24,8 +25,8 @@ const sketch = (p) => {
         p.createCanvas(800, 530);
         gvs.p = p;
         gvs.drawAll = require("./js/draw.js");
+        require("./js/initialize.js");
         require("./js/inputs.js");
-        
         p.windowResized = function() {
 
         }

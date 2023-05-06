@@ -66,6 +66,9 @@ $modal-xl: 1140px;
 
     #next-step-solution-button {
         background-color: lightgoldenrodyellow;
+        &.blue {
+            background-color: aliceblue;
+        }
     }
 }
 

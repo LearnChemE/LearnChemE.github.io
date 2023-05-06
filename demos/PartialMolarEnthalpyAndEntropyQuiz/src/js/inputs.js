@@ -18,11 +18,16 @@ nextStepSolutionButton.addEventListener("mouseup", () => {
 });
 
 nextStepSolutionButton.addEventListener("click", () => {
+  const max_step = gvs.HS === "enthalpy" ? 7 : 5;
   if(!gvs.show_solution) {
     gvs.show_solution = true;
-    if(gvs.step < 7) { nextStepSolutionButton.innerHTML = "next step" }
-  } else if(gvs.step < 7) {
+    if(gvs.step < max_step) { 
+      nextStepSolutionButton.innerHTML = "next step";
+      nextStepSolutionButton.classList.add("blue");
+    }
+  } else if(gvs.step < max_step) {
     nextStepSolutionButton.innerHTML = "show solution";
+    nextStepSolutionButton.classList.remove("blue");
     gvs.show_solution = false;
     gvs.step++;
   }
@@ -31,5 +36,7 @@ nextStepSolutionButton.addEventListener("click", () => {
 newProblemButton.addEventListener("click", () => {
   gvs.step = 1;
   nextStepSolutionButton.innerHTML = "show solution";
+  nextStepSolutionButton.classList.remove("blue");
   gvs.show_solution = false;
+  gvs.generate_random_conditions();
 });

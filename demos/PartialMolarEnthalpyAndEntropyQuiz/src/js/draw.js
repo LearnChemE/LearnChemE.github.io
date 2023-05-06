@@ -1,25 +1,35 @@
-const xMin = gvs.plot.domain[0];
-const xMax = gvs.plot.domain[1];
-const xStepMajor = gvs.plot.domain[2];
-const xStepMinor = gvs.plot.domain[3];
-const yMin = gvs.plot.range[0];
-const yMax = gvs.plot.range[1];
-const yStepMajor = gvs.plot.range[2];
-const yStepMinor = gvs.plot.range[3];
+let xMin, xMax, xStepMajor, xStepMinor, yMin, yMax, yStepMajor, yStepMinor, margin_left, margin_right, margin_top, margin_bottom, plot_width, plot_height;
 
-const margin_left = gvs.plot.margins[0][0];
-const margin_right = gvs.plot.margins[0][1];
-const margin_top = gvs.plot.margins[1][0];
-const margin_bottom = gvs.plot.margins[1][1];
-const plot_width = gvs.p.width - margin_left - margin_right;
-const plot_height = gvs.p.height - margin_bottom - margin_top;
+function determineGraphingParameters() {
+  xMin = gvs.plot.domain[0];
+  xMax = gvs.plot.domain[1];
+  xStepMajor = gvs.plot.domain[2];
+  xStepMinor = gvs.plot.domain[3];
+  yMin = gvs.plot.range[0];
+  yMax = gvs.plot.range[1];
+  yStepMajor = gvs.plot.range[2];
+  yStepMinor = gvs.plot.range[3];
+  
+  margin_left = gvs.plot.margins[0][0];
+  margin_right = gvs.plot.margins[0][1];
+  margin_top = gvs.plot.margins[1][0];
+  margin_bottom = gvs.plot.margins[1][1];
+  plot_width = gvs.p.width - margin_left - margin_right;
+  plot_height = gvs.p.height - margin_bottom - margin_top;
+}
 
 function coordToPix(x, y) {
-
   const xPix = margin_left + ((x - xMin) / (xMax - xMin)) * plot_width;
   const yPix = margin_top + plot_height - ((y - yMin) / (yMax - yMin)) * plot_height;
   
   return [xPix, yPix]
+}
+
+function pixToCoord(x, y) {
+  const xCoord = xMin + ((x - margin_left) / plot_width) * (xMax - xMin);
+  const yCoord = yMin + ((margin_top + plot_height - y) / plot_height) * (yMax - yMin);
+
+  return [xCoord, yCoord]
 }
 
 function drawAxes(p) {
@@ -114,35 +124,144 @@ function drawInstructions(p) {
   p.textSize(15);
   p.translate(p.width / 2, 30);
   let instructions_text;
-  switch(gvs.step) {
-    case 1:
-      instructions_text = `step 1. Locate the pure component enthalpy of component A`;
-      break;
-    case 2:
-      instructions_text = `step 2. Locate the pure component enthalpy of component B`;
-      break;
-    case 3:
-      instructions_text = `step 3. Determine the mixture enthalpy`;
-      break;
-    case 4:
-      instructions_text = `step 4. Move the line to represent the ideal mixing curve`;
-      break;
-    case 5:
-      instructions_text = `step 5. Move the solid black dot to calculate excess enthalpy,\nthen input your answer into the input box below`;
-      break;
-    case 6:
-      instructions_text = `step 6. Determine temperature change for adiabatic mixing at the heat capacity\nC  = 0.05 kJ/[mol K], then input your answer into the input box below`;
-      break;
-    case 7:
-      instructions_text = `step 7. Determine the partial molar enthalpy for each\ncomponent by sliding the points along the y-axis`;
+  if(gvs.HS === "enthalpy") {
+    switch(gvs.step) {
+      case 1:
+        instructions_text = `step 1. Locate the pure component enthalpy of component A`;
+        break;
+      case 2:
+        instructions_text = `step 2. Locate the pure component enthalpy of component B`;
+        break;
+      case 3:
+        instructions_text = `step 3. Determine the mixture enthalpy, given that\nthe mole fraction of A in the mixture is ${gvs.randx}`;
+        break;
+      case 4:
+        instructions_text = `step 4. Move the line to represent the ideal mixing curve`;
+        break;
+      case 5:
+        instructions_text = `step 5. Move the solid black dot to calculate excess enthalpy,\nthen input your answer into the input box below`;
+        break;
+      case 6:
+        instructions_text = `step 6. Determine temperature change for adiabatic mixing at the heat capacity\nC  = 0.05 kJ/[mol K], then input your answer into the input box below`;
+        break;
+      case 7:
+        instructions_text = `step 7. Determine the partial molar enthalpy for each\ncomponent by sliding the points along the y-axis`;
+    }
+  } else {
+    switch(gvs.step) {
+      case 1:
+        instructions_text = `step 1. Locate the pure component entropy of component A`;
+        break;
+      case 2:
+        instructions_text = `step 2. Locate the pure component entropy of component B`;
+        break;
+      case 3:
+        instructions_text = `step 3. Determine the mixture entropy, given that\nthe mole fraction of A in the mixture is ${gvs.randx}`;
+        break;
+      case 4:
+        instructions_text = `step 4. Move the solid dot to find excess entropy relative to ideal\nmixing (black curve), then input your answer into the input box below`;
+        break;
+      case 5:
+        instructions_text = `step 5. Determine the partial molar entropy for each\ncomponent by sliding the points along the y axis.`;
+        break;
+      case 6:
+        instructions_text = ``;
+        break;
+      case 7:
+        instructions_text = ``;
+    }
   }
   p.text(instructions_text, 0, 0);
   p.pop();
 }
 
+function drawCurve(p) {
+  p.push();
+  p.noFill();
+  p.stroke(0, 0, 255);
+  p.strokeWeight(2);
+  p.beginShape();
+  if(gvs.HS === "enthalpy") {
+    const coord1 = coordToPix(0, gvs.hB);
+    const coord2 = coordToPix(1, gvs.hA);
+    p.vertex(coord1[0], coord1[1]);
+    for(let x = 0.01; x <= 0.99; x += 0.01) {
+      x = Math.round(100 * x) / 100;
+      const pix = coordToPix(x, gvs.molarH(x));
+      p.vertex(pix[0], pix[1]);
+    }
+    p.vertex(coord2[0], coord2[1]);
+  } else {
+    const coord1 = coordToPix(0, gvs.sB);
+    const coord2 = coordToPix(1, gvs.sA);
+    p.vertex(coord1[0], coord1[1]);
+    for(let x = 0; x <= 0.99; x += 0.01) {
+      x = Math.round(100 * x) / 100;
+      const pix = coordToPix(x, gvs.molarS(x));
+      p.vertex(pix[0], pix[1]);
+    }
+    p.vertex(coord2[0], coord2[1]);
+  }
+  p.endShape();
+  p.pop();
+}
+
+function step1(p) {
+  p.push();
+
+  p.pop();
+}
+
+function step2(p) {
+  p.push();
+
+  p.pop();
+}
+
+function step3(p) {
+  p.push();
+
+  p.pop();
+}
+
+function step4(p) {
+  p.push();
+
+  p.pop();
+}
+
+function step5(p) {
+  p.push();
+
+  p.pop();
+}
+
+function step6(p) {
+  p.push();
+
+  p.pop();
+}
+
+function step7(p) {
+  p.push();
+
+  p.pop();
+}
+
 function drawAll(p) {
+  determineGraphingParameters()
   drawAxes(p);
+  drawCurve(p);
   drawInstructions(p);
+  switch(gvs.step) {
+    case 1: step1(p); break;
+    case 2: step2(p); break;
+    case 3: step3(p); break;
+    case 4: step4(p); break;
+    case 5: step5(p); break;
+    case 6: step6(p); break;
+    case 7: step7(p); break;
+  }
 }
 
 module.exports = drawAll;
