@@ -171,12 +171,22 @@
           </div>
 
           <div class="details-text">
-            where \( \alpha \) is a constant. Combining equations [6], [7], and [8], then evaluating the integral, we find that \( \alpha = \tau \, C_{init} \), so the general function for RTD over time with \( n \) CSTRs is
+            where \( \alpha \) is a constant. Combining equations [6], [7], and [8], then evaluating the integral, we find a value for \( \alpha \):
+          </div>
+            
+          <div class="details-eqn">
+            $$
+            [9] \quad \alpha = \frac{\tau \, C_{init}}{n^{n} \, e^{ (1 - n) t / \tau }}
+            $$
+          </div>
+
+          <div class="details-text">
+            so the general function for RTD over time with \( n \) CSTRs is
           </div>
 
           <div class="details-eqn">
             $$
-            [9] \quad E_{n}(t) = \frac{t^{n - 1} \, e^{-t / \tau}}{(n - 1)! \, \tau^{n}}
+            [10] \quad E_{n}(t) = \frac{t^{n - 1}}{(n - 1)!} \left( \frac{n}{\tau} \right)^{n} e^{-t n / \tau}
             $$
           </div>
 
