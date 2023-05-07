@@ -131,19 +131,19 @@ function drawInstructions(p) {
   if (gvs.HS === "enthalpy") {
     switch (gvs.step) {
       case 1:
-        instructions_text = `step 1. Locate the pure component enthalpy of component A`;
+        instructions_text = `step 1. Locate the pure component enthalpy of component A \nby dragging the black dot to the correct location.`;
         break;
       case 2:
-        instructions_text = `step 2. Locate the pure component enthalpy of component B`;
+        instructions_text = `step 2. Locate the pure component enthalpy of component B \nby dragging the black dot to the correct location.`;
         break;
       case 3:
         instructions_text = `step 3. Determine the mixture enthalpy, given that\nthe mole fraction of A in the mixture is ${gvs.randx}`;
         break;
       case 4:
-        instructions_text = `step 4. Move the line to represent the ideal mixing curve`;
+        instructions_text = `step 4. Move the line to represent the ideal mixing curve by dragging the black dots.`;
         break;
       case 5:
-        instructions_text = `step 5. Move the solid black dot to calculate excess enthalpy,\nthen input your answer into the input box below`;
+        instructions_text = `step 5. Move the black dot to calculate excess enthalpy,\nthen input your answer into the input box below`;
         break;
       case 6:
         instructions_text = `step 6. Determine temperature change for adiabatic mixing at the heat capacity\nC   = ${gvs.cp.toFixed(2)} kJ/[mol K], then input your answer into the input box below`;
@@ -159,16 +159,16 @@ function drawInstructions(p) {
   } else {
     switch (gvs.step) {
       case 1:
-        instructions_text = `step 1. Locate the pure component entropy of component A`;
+        instructions_text = `step 1. Locate the pure component entropy of component A \nby dragging the black dot to the correct location.`;
         break;
       case 2:
-        instructions_text = `step 2. Locate the pure component entropy of component B`;
+        instructions_text = `step 2. Locate the pure component entropy of component B \nby dragging the black dot to the correct location.`;
         break;
       case 3:
         instructions_text = `step 3. Determine the mixture entropy, given that\nthe mole fraction of A in the mixture is ${gvs.randx}`;
         break;
       case 4:
-        instructions_text = `step 4. Move the solid dot to find excess entropy relative to ideal\nmixing (black curve), then input your answer into the input box below`;
+        instructions_text = `step 4. Move the black dot to find excess entropy relative to ideal\nmixing (black curve), then input your answer into the input box below`;
         break;
       case 5:
         if(gvs.show_solution) {
@@ -469,7 +469,7 @@ function step3(p) {
     labelText = `z   = ${(Math.round(100 * gvs.loc_S_3[0]) / 100).toFixed(2)}\nS = ${(Math.round(gvs.loc_S_3[1] * 10) / 10).toFixed(1)} J/(mol K)`;
     textLength = p.textWidth(`S = ${(Math.round(10 * gvs.loc_S_3[1]) / 10).toFixed(1)} J/(mol K)`);
     if (gvs.show_solution) {
-      labelText = `z   = ${(Math.round(100 * gvs.answer_S_3[0]) / 100).toFixed(2)}\nH = ${(Math.round(10 * gvs.answer_S_3[1]) / 10).toFixed(1)} kJ/mol`
+      labelText = `z   = ${(Math.round(100 * gvs.answer_S_3[0]) / 100).toFixed(2)}\nS = ${(Math.round(10 * gvs.answer_S_3[1]) / 10).toFixed(1)} J/(mol K)`
     }
   }
   const offset = textBoxShift(locPix[0], locPix[1], textLength + 10, 40);
