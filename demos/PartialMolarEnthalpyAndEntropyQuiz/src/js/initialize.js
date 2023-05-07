@@ -49,6 +49,41 @@ gvs.generate_random_conditions = function() {
     gvs.plot.labels[0][0] = "molar entropy [J/(mol K)]";
     gvs.plot.range = [45, 75, 5, 1];
   }
+  gvs.loc_H_1 = [0.5, 80];
+  gvs.loc_H_2 = [0.5, 80];
+  gvs.loc_H_3 = [0.5, 80];
+  gvs.loc_H_4_1 = [0.4, 80];
+  gvs.loc_H_4_2 = [0.6, 80];
+  gvs.loc_H_5 = [0.5, 80];
+  gvs.loc_H_7_B = [0, 80];
+  gvs.loc_H_7_A = [1, 80];
+  gvs.loc_S_1 = [0.5, 50];
+  gvs.loc_S_2 = [0.5, 50];
+  gvs.loc_S_3 = [0.5, 50];
+  gvs.loc_S_4 = [0.5, 50];
+  gvs.loc_S_5_B = [0, 50];
+  gvs.loc_S_5_A = [1, 50];
+  gvs.input_S_4_value = "";
+  gvs.input_H_5_value = "";
+  gvs.input_H_6_value = "";
+
+  gvs.answer_H_1 = [1, gvs.hA];
+  gvs.answer_H_2 = [0, gvs.hB];
+  gvs.answer_H_3 = [gvs.randx, gvs.molarH(gvs.randx)];
+  gvs.answer_H_4_B = [0, 0];
+  gvs.answer_H_4_A = [0, 0];
+  gvs.answer_H_5 = [0, 0];
+  gvs.answer_H_5_input = "";
+  gvs.answer_H_6_input = "";
+  gvs.answer_H_7_B = [0, 0];
+  gvs.answer_H_7_A = [0, 0];
+  gvs.answer_S_1 = [1, gvs.sA];
+  gvs.answer_S_2 = [0, gvs.sB];
+  gvs.answer_S_3 = [gvs.randx, gvs.molarS(gvs.randx)];
+  gvs.answer_S_4 = [0, 0];
+  gvs.answer_S_4_input = "";
+  gvs.answer_S_5_B = [0, 0];
+  gvs.answer_S_5_A = [0, 0];
 }
 
 gvs.generate_random_conditions();

@@ -1,4 +1,4 @@
-let xMin, xMax, xStepMajor, xStepMinor, yMin, yMax, yStepMajor, yStepMinor, margin_left, margin_right, margin_top, margin_bottom, plot_width, plot_height;
+let xMin, xMax, xStepMajor, xStepMinor, yMin, yMax, yStepMajor, yStepMinor, margin_left, margin_right, margin_top, margin_bottom, plot_width, plot_height, pointDiameter;
 
 function determineGraphingParameters() {
   xMin = gvs.plot.domain[0];
@@ -17,6 +17,8 @@ function determineGraphingParameters() {
   plot_width = gvs.p.width - margin_left - margin_right;
   plot_height = gvs.p.height - margin_bottom - margin_top;
 }
+
+pointDiameter = 10;
 
 function coordToPix(x, y) {
   const xPix = margin_left + ((x - xMin) / (xMax - xMin)) * plot_width;
@@ -206,21 +208,264 @@ function drawCurve(p) {
   p.pop();
 }
 
+function textBoxShift(xCoord, yCoord, textWidth, textHeight) {
+  const x_shift = ((margin_left + plot_width / 2 - xCoord) / (plot_width / 2)) * (textWidth / 2 + 10)
+  let y_shift;
+  let xyB, xyA;
+  if(gvs.HS === "enthalpy") {
+    xyB = coordToPix(0, gvs.hB)[1];
+    xyA = coordToPix(1, gvs.hA)[1];
+  } else {
+    xyB = coordToPix(0, gvs.sB)[1];
+    xyA = coordToPix(1, gvs.sA)[1];
+  }
+  const x = (xCoord - margin_left) / plot_width;
+  const ySwitch = (1 - x) * xyB + x * xyA;
+  if(yCoord < ySwitch) {
+    y_shift = -0.5 * textHeight - 10;
+  } else {
+    y_shift = 0.5 * textHeight + 10;
+  }
+  return [x_shift, y_shift]
+}
+
 function step1(p) {
   p.push();
-
+  let locPix;
+  p.noStroke();
+  if(!gvs.show_solution) {
+    const mousePix = [p.mouseX, p.mouseY];
+    if(gvs.HS === "enthalpy") {
+      locPix = coordToPix(gvs.loc_H_1[0], gvs.loc_H_1[1]);
+    } else {
+      locPix = coordToPix(gvs.loc_S_1[0], gvs.loc_S_1[1]);
+    }
+    const distance = Math.sqrt((mousePix[0] - locPix[0])**2 + (mousePix[1] - locPix[1])**2);
+    if(p.mouseIsPressed && distance < 10) {
+      gvs.dragging_loc_1 = true;
+    }
+    if(!p.mouseIsPressed) {
+      gvs.dragging_loc_1 = false;
+    }
+    if(gvs.dragging_loc_1) {
+      locPix = mousePix;
+      locPix[0] = Math.min(margin_left + plot_width, Math.max(margin_left, locPix[0]));
+      locPix[1] = Math.min(margin_top + plot_height, Math.max(margin_top, locPix[1]));
+    }
+    const locCoords = pixToCoord(locPix[0], locPix[1]);
+    if(gvs.HS === "enthalpy") {
+      if(gvs.dragging_loc_1) {
+        gvs.loc_H_1 = [Math.round(locCoords[0] * 100) / 100, Math.round(locCoords[1] * 100) / 100];
+      }
+    } else {
+      if(gvs.dragging_loc_1) {
+        gvs.loc_S_1 = [Math.round(locCoords[0] * 100) / 100, Math.round(locCoords[1] * 100) / 100];
+      }
+    }
+    p.fill(0);
+  } else {
+    let answerPix;
+    if(gvs.HS === "enthalpy") {
+      answerPix = coordToPix(gvs.answer_H_1[0], gvs.answer_H_1[1]);
+    } else {
+      answerPix = coordToPix(gvs.answer_S_1[0], gvs.answer_S_1[1]);
+    }
+    locPix = answerPix;
+    p.fill(0, 150, 0);
+  }
+  p.circle(locPix[0], locPix[1], pointDiameter);
+  p.fill(253);
+  p.rectMode(p.CENTER);
+  p.textAlign(p.LEFT, p.CENTER);
+  p.textSize(15);
+  let labelText;
+  let textLength;
+  if(gvs.HS === "enthalpy") {
+    labelText = `z   = ${(Math.round(100 * gvs.loc_H_1[0]) / 100).toFixed(2)}\nH = ${(Math.round(10 * gvs.loc_H_1[1]) / 10).toFixed(1)} kJ/mol`;
+    textLength = p.textWidth(`H = ${(Math.round(10 * gvs.loc_H_1[1]) / 10).toFixed(1)} kJ/mol`);
+    if(gvs.show_solution) {
+      labelText = `z   = ${(Math.round(100 * gvs.answer_H_1[0]) / 100).toFixed(2)}\nH = ${(Math.round(10 * gvs.answer_H_1[1]) / 10).toFixed(1)} kJ/mol`
+    }
+  } else {
+    labelText = `z   = ${(Math.round(100 * gvs.loc_S_1[0]) / 100).toFixed(2)}\nS = ${(Math.round(gvs.loc_S_1[1] * 10) / 10).toFixed(1)} J/(mol K)`;
+    textLength = p.textWidth(`S = ${(Math.round(10 * gvs.loc_S_1[1]) / 10).toFixed(1)} J/(mol K)`);
+    if(gvs.show_solution) {
+      labelText = `z   = ${(Math.round(100 * gvs.answer_S_1[0]) / 100).toFixed(2)}\nH = ${(Math.round(10 * gvs.answer_S_1[1]) / 10).toFixed(1)} kJ/mol`
+    }
+  }
+  const offset = textBoxShift(locPix[0], locPix[1], textLength + 10, 40);
+  const x = locPix[0] + offset[0];
+  const y = locPix[1] + offset[1];
+  p.noStroke();
+  p.rect(x, y, textLength + 10, 40);
+  if(gvs.show_solution) {
+    p.fill(0, 150, 0);
+  } else {
+    p.fill(0);
+  }
+  p.text(labelText, x - textLength / 2, y);
+  p.textSize(10);
+  p.text("A", x - textLength / 2 + 9, y - 4);
   p.pop();
 }
 
 function step2(p) {
   p.push();
-
+  let locPix;
+  p.noStroke();
+  if(!gvs.show_solution) {
+    const mousePix = [p.mouseX, p.mouseY];
+    if(gvs.HS === "enthalpy") {
+      locPix = coordToPix(gvs.loc_H_2[0], gvs.loc_H_2[1]);
+    } else {
+      locPix = coordToPix(gvs.loc_S_2[0], gvs.loc_S_2[1]);
+    }
+    const distance = Math.sqrt((mousePix[0] - locPix[0])**2 + (mousePix[1] - locPix[1])**2);
+    if(p.mouseIsPressed && distance < 10) {
+      gvs.dragging_loc_1 = true;
+    }
+    if(!p.mouseIsPressed) {
+      gvs.dragging_loc_1 = false;
+    }
+    if(gvs.dragging_loc_1) {
+      locPix = mousePix;
+      locPix[0] = Math.min(margin_left + plot_width, Math.max(margin_left, locPix[0]));
+      locPix[1] = Math.min(margin_top + plot_height, Math.max(margin_top, locPix[1]));
+    }
+    const locCoords = pixToCoord(locPix[0], locPix[1]);
+    if(gvs.HS === "enthalpy") {
+      if(gvs.dragging_loc_1) {
+        gvs.loc_H_2 = [Math.round(locCoords[0] * 100) / 100, Math.round(locCoords[1] * 100) / 100];
+      }
+    } else {
+      if(gvs.dragging_loc_1) {
+        gvs.loc_S_2 = [Math.round(locCoords[0] * 100) / 100, Math.round(locCoords[1] * 100) / 100];
+      }
+    }
+    p.fill(0);
+  } else {
+    let answerPix;
+    if(gvs.HS === "enthalpy") {
+      answerPix = coordToPix(gvs.answer_H_2[0], gvs.answer_H_2[1]);
+    } else {
+      answerPix = coordToPix(gvs.answer_S_2[0], gvs.answer_S_2[1]);
+    }
+    locPix = answerPix;
+    p.fill(0, 150, 0);
+  }
+  p.circle(locPix[0], locPix[1], pointDiameter);
+  p.fill(253);
+  p.rectMode(p.CENTER);
+  p.textAlign(p.LEFT, p.CENTER);
+  p.textSize(15);
+  let labelText;
+  let textLength;
+  if(gvs.HS === "enthalpy") {
+    labelText = `z   = ${(Math.round(100 * gvs.loc_H_2[0]) / 100).toFixed(2)}\nH = ${(Math.round(10 * gvs.loc_H_2[1]) / 10).toFixed(1)} kJ/mol`;
+    textLength = p.textWidth(`H = ${(Math.round(10 * gvs.loc_H_2[1]) / 10).toFixed(1)} kJ/mol`);
+    if(gvs.show_solution) {
+      labelText = `z   = ${(Math.round(100 * gvs.answer_H_2[0]) / 100).toFixed(2)}\nH = ${(Math.round(10 * gvs.answer_H_2[1]) / 10).toFixed(1)} kJ/mol`
+    }
+  } else {
+    labelText = `z   = ${(Math.round(100 * gvs.loc_S_2[0]) / 100).toFixed(2)}\nS = ${(Math.round(gvs.loc_S_2[1] * 10) / 10).toFixed(1)} J/(mol K)`;
+    textLength = p.textWidth(`S = ${(Math.round(10 * gvs.loc_S_2[1]) / 10).toFixed(1)} J/(mol K)`);
+    if(gvs.show_solution) {
+      labelText = `z   = ${(Math.round(100 * gvs.answer_S_2[0]) / 100).toFixed(2)}\nH = ${(Math.round(10 * gvs.answer_S_2[1]) / 10).toFixed(1)} kJ/mol`
+    }
+  }
+  const offset = textBoxShift(locPix[0], locPix[1], textLength + 10, 40);
+  const x = locPix[0] + offset[0];
+  const y = locPix[1] + offset[1];
+  p.noStroke();
+  p.rect(x, y, textLength + 10, 40);
+  if(gvs.show_solution) {
+    p.fill(0, 150, 0);
+  } else {
+    p.fill(0);
+  }
+  p.text(labelText, x - textLength / 2, y);
+  p.textSize(10);
+  p.text("A", x - textLength / 2 + 9, y - 4);
   p.pop();
 }
 
 function step3(p) {
   p.push();
-
+  let locPix;
+  p.noStroke();
+  if(!gvs.show_solution) {
+    const mousePix = [p.mouseX, p.mouseY];
+    if(gvs.HS === "enthalpy") {
+      locPix = coordToPix(gvs.loc_H_3[0], gvs.loc_H_3[1]);
+    } else {
+      locPix = coordToPix(gvs.loc_S_3[0], gvs.loc_S_3[1]);
+    }
+    const distance = Math.sqrt((mousePix[0] - locPix[0])**2 + (mousePix[1] - locPix[1])**2);
+    if(p.mouseIsPressed && distance < 10) {
+      gvs.dragging_loc_1 = true;
+    }
+    if(!p.mouseIsPressed) {
+      gvs.dragging_loc_1 = false;
+    }
+    if(gvs.dragging_loc_1) {
+      locPix = mousePix;
+      locPix[0] = Math.min(margin_left + plot_width, Math.max(margin_left, locPix[0]));
+      locPix[1] = Math.min(margin_top + plot_height, Math.max(margin_top, locPix[1]));
+    }
+    const locCoords = pixToCoord(locPix[0], locPix[1]);
+    if(gvs.HS === "enthalpy") {
+      if(gvs.dragging_loc_1) {
+        gvs.loc_H_3 = [Math.round(locCoords[0] * 100) / 100, Math.round(locCoords[1] * 100) / 100];
+      }
+    } else {
+      if(gvs.dragging_loc_1) {
+        gvs.loc_S_3 = [Math.round(locCoords[0] * 100) / 100, Math.round(locCoords[1] * 100) / 100];
+      }
+    }
+    p.fill(0);
+  } else {
+    let answerPix;
+    if(gvs.HS === "enthalpy") {
+      answerPix = coordToPix(gvs.answer_H_3[0], gvs.answer_H_3[1]);
+    } else {
+      answerPix = coordToPix(gvs.answer_S_3[0], gvs.answer_S_3[1]);
+    }
+    locPix = answerPix;
+    p.fill(0, 150, 0);
+  }
+  p.circle(locPix[0], locPix[1], pointDiameter);
+  p.fill(253);
+  p.rectMode(p.CENTER);
+  p.textAlign(p.LEFT, p.CENTER);
+  p.textSize(15);
+  let labelText;
+  let textLength;
+  if(gvs.HS === "enthalpy") {
+    labelText = `z   = ${(Math.round(100 * gvs.loc_H_3[0]) / 100).toFixed(2)}\nH = ${(Math.round(10 * gvs.loc_H_3[1]) / 10).toFixed(1)} kJ/mol`;
+    textLength = p.textWidth(`H = ${(Math.round(10 * gvs.loc_H_3[1]) / 10).toFixed(1)} kJ/mol`);
+    if(gvs.show_solution) {
+      labelText = `z   = ${(Math.round(100 * gvs.answer_H_3[0]) / 100).toFixed(2)}\nH = ${(Math.round(10 * gvs.answer_H_3[1]) / 10).toFixed(1)} kJ/mol`
+    }
+  } else {
+    labelText = `z   = ${(Math.round(100 * gvs.loc_S_3[0]) / 100).toFixed(2)}\nS = ${(Math.round(gvs.loc_S_3[1] * 10) / 10).toFixed(1)} J/(mol K)`;
+    textLength = p.textWidth(`S = ${(Math.round(10 * gvs.loc_S_3[1]) / 10).toFixed(1)} J/(mol K)`);
+    if(gvs.show_solution) {
+      labelText = `z   = ${(Math.round(100 * gvs.answer_S_3[0]) / 100).toFixed(2)}\nH = ${(Math.round(10 * gvs.answer_S_3[1]) / 10).toFixed(1)} kJ/mol`
+    }
+  }
+  const offset = textBoxShift(locPix[0], locPix[1], textLength + 10, 40);
+  const x = locPix[0] + offset[0];
+  const y = locPix[1] + offset[1];
+  p.noStroke();
+  p.rect(x, y, textLength + 10, 40);
+  if(gvs.show_solution) {
+    p.fill(0, 150, 0);
+  } else {
+    p.fill(0);
+  }
+  p.text(labelText, x - textLength / 2, y);
+  p.textSize(10);
+  p.text("A", x - textLength / 2 + 9, y - 4);
   p.pop();
 }
 
