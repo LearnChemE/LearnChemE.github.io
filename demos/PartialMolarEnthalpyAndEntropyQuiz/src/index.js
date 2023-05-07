@@ -6,7 +6,7 @@ window.p5 = new require("./js/p5.js");
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
-    step: 1,
+    step: 4,
     show_solution: false,
     HS: "enthalpy",
     plot : {

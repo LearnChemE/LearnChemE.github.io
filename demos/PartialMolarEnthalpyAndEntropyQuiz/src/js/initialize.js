@@ -10,11 +10,10 @@ gvs.generate_random_conditions = function() {
   gvs.alpha = Math.round(45 + 15 * Math.random());
   gvs.alpha = Math.random() > 0.5 ? -1 * gvs.alpha : gvs.alpha;
   let randChoice = Math.random(); randChoice = randChoice < 0.33 ? 0.2 : randChoice < 0.67 ? 0.3 : 0.35;
-  let randChoice2 = Math.random(); randChoice2 = randChoice2 < 0.33 ? 0.2 : randChoice2 < 0.67 ? 0.3 : 0.35;
   gvs.molarS = function(x) {return -8.314 * (x * Math.log(x) + (1 - x) * Math.log(1 - x)) + x * gvs.sA + (1 - x) * gvs.sB}
   gvs.molarS2 = function(x) {
     if(gvs.choice === 1) {
-      return (1 - randChoice) * (x * gvs.sA + (1 - x) * gvs.sB) + gvs.molarS(x) * randChoice2;
+      return (1 - randChoice) * (x * gvs.sA + (1 - x) * gvs.sB) + gvs.molarS(x) * randChoice;
     } else {
       return -0.3 * (x * gvs.sA + (1 - x) * gvs.sB) + 1.3 * gvs.molarS(x);
     }
@@ -70,8 +69,8 @@ gvs.generate_random_conditions = function() {
   gvs.answer_H_1 = [1, gvs.hA];
   gvs.answer_H_2 = [0, gvs.hB];
   gvs.answer_H_3 = [gvs.randx, gvs.molarH(gvs.randx)];
-  gvs.answer_H_4_B = [0, 0];
-  gvs.answer_H_4_A = [0, 0];
+  gvs.answer_H_4_B = [0, gvs.molarH(0)];
+  gvs.answer_H_4_A = [1, gvs.molarH(1)];
   gvs.answer_H_5 = [0, 0];
   gvs.answer_H_5_input = "";
   gvs.answer_H_6_input = "";
@@ -79,8 +78,8 @@ gvs.generate_random_conditions = function() {
   gvs.answer_H_7_A = [0, 0];
   gvs.answer_S_1 = [1, gvs.sA];
   gvs.answer_S_2 = [0, gvs.sB];
-  gvs.answer_S_3 = [gvs.randx, gvs.molarS(gvs.randx)];
-  gvs.answer_S_4 = [0, 0];
+  gvs.answer_S_3 = [gvs.randx, gvs.molarS2(gvs.randx)];
+  gvs.answer_S_4 = [gvs.randx, gvs.molarS(gvs.randx)];
   gvs.answer_S_4_input = "";
   gvs.answer_S_5_B = [0, 0];
   gvs.answer_S_5_A = [0, 0];
