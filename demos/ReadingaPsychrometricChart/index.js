@@ -85,12 +85,7 @@ function draw() {
 
     tempDisplay();
     otherCalcs();
-<<<<<<< HEAD
     if(g.humidTruth){
-=======
-    //console.log(g.enthalp)
-    if (g.humidTruth) {
->>>>>>> a974027e02828ac718eb3a577d701a86e567d5db
         relHumDisplay();
     }
     //console.log(V.b)
