@@ -7,7 +7,7 @@ window.g = {
     enthalpTruth: true,
     specVolTruth: true,
     tempTruth: false,
-    displayTruth: true,
+    displayTruth: false,
     gridTruth: false,
 
     // Graph edges
