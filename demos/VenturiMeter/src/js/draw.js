@@ -1,6 +1,6 @@
 
 
-  const maxPressure = 120;
+const maxPressure = 120;
 
 function drawTube(p) {
   p.push();
@@ -72,16 +72,16 @@ function drawTube(p) {
   p.fill(0);
   p.line(50, -0.5 * outer_dia, 50, 0.5 * outer_dia);
   p.translate(50, -0.5 * outer_dia);
-  p.line(0, 0, 10, 8);
-  p.line(0, 0, -10, 8);
+  p.line(0, 0, 6, 8);
+  p.line(0, 0, -6, 8);
   p.translate(0, outer_dia);
-  p.line(0, 0, 10, -8);
-  p.line(0, 0, -10, -8);
+  p.line(0, 0, 6, -8);
+  p.line(0, 0, -6, -8);
   p.translate(0, -0.5 * outer_dia);
   p.textAlign(p.LEFT);
   p.textSize(14);
   p.noStroke();
-  p.text("100 mm", 10, 0);
+  p.text("20 mm", 10, 4);
 
   sigmaCurve(p, 0);
   p.pop();
@@ -98,12 +98,12 @@ function manometerHeight(P) {
 function sigmaCurve(p, n) {
   p.push();
 
-  for(let n = 0; n < 5; n++) {
+  for(let n = 0; n < 3; n++) {
     p.stroke(0);
     p.strokeWeight(1);
     p.noFill();
-    const y_pix_start = ((n - 2) / 2) * 35;
-    const y_pix_middle = ((n - 2) / 2) * 35 * g.venturi_inner / 100;
+    const y_pix_start = ((n - 1) / 2) * 25;
+    const y_pix_middle = ((n - 1) / 2) * 60 * g.venturi_inner / 100;
     
     p.beginShape();
     p.curveVertex(80, y_pix_start);
