@@ -22,18 +22,18 @@ gvs.generate_random_conditions = function() {
   gvs.dS = -1 * gvs.molarS(gvs.randx) + gvs.molarS2(gvs.randx);
   gvs.molarH = function(x) {return x * gvs.hA + (1 - x) * gvs.hB + gvs.alpha * x * (1 - x)}
   gvs.dMolarH = function(x) {
-    const x1 = x - 0.001;
-    const x2 = x + 0.001;
+    const x1 = x - 0.0001;
+    const x2 = x + 0.0001;
     const y1 = gvs.molarH(x1);
     const y2 = gvs.molarH(x2);
     return (y2 - y1) / (x2 - x1)
   }
   gvs.dMolarS = function(x) {
-    const x1 = x - 0.001;
-    const x2 = x + 0.001;
-    const y1 = gvs.molarS(x1);
-    const y2 = gvs.molarS(x2);
-    return (y2 - y1) / (x2 - x1)
+    const x1 = x - 0.0001;
+    const x2 = x + 0.0001;
+    const y1 = gvs.molarS2(x1);
+    const y2 = gvs.molarS2(x2);
+    return ((y2 - y1) / (x2 - x1))
   }
   gvs.partMolarH = function(x) {
     return gvs.dMolarH(gvs.randx) * (x - gvs.randx) + gvs.molarH(gvs.randx);
@@ -81,8 +81,10 @@ gvs.generate_random_conditions = function() {
   gvs.answer_S_3 = [gvs.randx, gvs.molarS2(gvs.randx)];
   gvs.answer_S_4 = [gvs.randx, gvs.molarS(gvs.randx)];
   gvs.answer_S_4_input = "";
-  gvs.answer_S_5_B = [0, 0];
-  gvs.answer_S_5_A = [0, 0];
+  const step_5_answer_sB = gvs.molarS2(gvs.randx) - gvs.randx * gvs.dMolarS(gvs.randx);
+  const step_5_answer_sA = gvs.molarS2(gvs.randx) + (1 - gvs.randx) * gvs.dMolarS(gvs.randx);
+  gvs.answer_S_5_B = [0, step_5_answer_sB];
+  gvs.answer_S_5_A = [1, step_5_answer_sA];
 }
 
 gvs.generate_random_conditions();

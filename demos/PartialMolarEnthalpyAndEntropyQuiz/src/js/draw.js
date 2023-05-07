@@ -1,5 +1,7 @@
 let xMin, xMax, xStepMajor, xStepMinor, yMin, yMax, yStepMajor, yStepMinor, margin_left, margin_right, margin_top, margin_bottom, plot_width, plot_height, pointDiameter;
 
+const answerColor = "rgb(0, 140, 0)";
+
 function determineGraphingParameters() {
   xMin = gvs.plot.domain[0];
   xMax = gvs.plot.domain[1];
@@ -164,7 +166,7 @@ function drawInstructions(p) {
         instructions_text = `step 4. Move the solid dot to find excess entropy relative to ideal\nmixing (black curve), then input your answer into the input box below`;
         break;
       case 5:
-        instructions_text = `step 5. Determine the partial molar entropy for each\ncomponent by sliding the points along the y axis.`;
+        instructions_text = `step 5. Determine the partial molar entropy for each component by sliding the\npoints along the y axis. The white dot represents the mixture entropy.`;
         break;
       case 6:
         instructions_text = ``;
@@ -212,12 +214,11 @@ function textBoxShift(xPix, yPix, textWidth, textHeight) {
   const x_shift = ((margin_left + plot_width / 2 - xPix) / (plot_width / 2)) * (textWidth / 2 + 10)
   let y_shift;
   const xCoord = pixToCoord(xPix, yPix)[0];
-  let ySwitch = gvs.HS === "enthalpy" ? coordToPix(xCoord, gvs.molarH(xCoord))[1] : coordToPix(xCoord, gvs.molarS2
-  (xCoord))[1];
-  if(gvs.HS === "entropy" && (gvs.molarS(xCoord) > gvs.molarS2(xCoord)) && gvs.step === 4) {
+  let ySwitch = gvs.HS === "enthalpy" ? coordToPix(xCoord, gvs.molarH(xCoord))[1] : coordToPix(xCoord, gvs.molarS2(xCoord))[1];
+  if (gvs.HS === "entropy" && (gvs.molarS(xCoord) > gvs.molarS2(xCoord)) && gvs.step === 4) {
     ySwitch -= 10
   }
-  if(gvs.HS === "entropy" && (gvs.molarS(xCoord) < gvs.molarS2(xCoord)) && gvs.step === 4) {
+  if (gvs.HS === "entropy" && (gvs.molarS(xCoord) < gvs.molarS2(xCoord)) && gvs.step === 4) {
     ySwitch += 10
   }
   if (yPix < ySwitch) {
@@ -270,7 +271,7 @@ function step1(p) {
       answerPix = coordToPix(gvs.answer_S_1[0], gvs.answer_S_1[1]);
     }
     locPix = answerPix;
-    p.fill(0, 150, 0);
+    p.fill(answerColor);
   }
   p.circle(locPix[0], locPix[1], pointDiameter);
   p.fill(253);
@@ -298,7 +299,7 @@ function step1(p) {
   p.noStroke();
   p.rect(x, y, textLength + 10, 40);
   if (gvs.show_solution) {
-    p.fill(0, 150, 0);
+    p.fill(answerColor);
   } else {
     p.fill(0);
   }
@@ -350,7 +351,7 @@ function step2(p) {
       answerPix = coordToPix(gvs.answer_S_2[0], gvs.answer_S_2[1]);
     }
     locPix = answerPix;
-    p.fill(0, 150, 0);
+    p.fill(answerColor);
   }
   p.circle(locPix[0], locPix[1], pointDiameter);
   p.fill(253);
@@ -378,7 +379,7 @@ function step2(p) {
   p.noStroke();
   p.rect(x, y, textLength + 10, 40);
   if (gvs.show_solution) {
-    p.fill(0, 150, 0);
+    p.fill(answerColor);
   } else {
     p.fill(0);
   }
@@ -430,7 +431,7 @@ function step3(p) {
       answerPix = coordToPix(gvs.answer_S_3[0], gvs.answer_S_3[1]);
     }
     locPix = answerPix;
-    p.fill(0, 150, 0);
+    p.fill(answerColor);
   }
   p.circle(locPix[0], locPix[1], pointDiameter);
   p.fill(253);
@@ -458,7 +459,7 @@ function step3(p) {
   p.noStroke();
   p.rect(x, y, textLength + 10, 40);
   if (gvs.show_solution) {
-    p.fill(0, 150, 0);
+    p.fill(answerColor);
   } else {
     p.fill(0);
   }
@@ -512,12 +513,12 @@ function step4(p) {
       const answerPix2 = coordToPix(1, gvs.answer_H_4_A[1]);
       locPix1 = answerPix1;
       locPix2 = answerPix2;
-      p.fill(0, 150, 0);
+      p.fill(answerColor);
     }
     p.circle(locPix1[0], locPix1[1], pointDiameter);
     p.circle(locPix2[0], locPix2[1], pointDiameter);
-    if(gvs.show_solution) {
-      p.stroke(0, 150, 0);
+    if (gvs.show_solution) {
+      p.stroke(answerColor);
     } else {
       p.stroke(0);
     }
@@ -560,22 +561,48 @@ function step4(p) {
       p.fill(0);
     } else {
       let answerPix;
-      answerPix = coordToPix(gvs.answer_S_3[0], gvs.answer_S_3[1]);
+      answerPix = coordToPix(gvs.answer_S_4[0], gvs.answer_S_4[1]);
       locPix = answerPix;
-      p.fill(0, 150, 0);
+      p.fill(answerColor);
       // add text box with answer here
     }
     p.circle(locPix[0], locPix[1], pointDiameter);
+    const S_pix = coordToPix(gvs.randx, gvs.molarS2(gvs.randx));
+    if (gvs.show_solution) {
+      p.noFill();
+      p.stroke(answerColor);
+      p.strokeWeight(2);
+      p.line(S_pix[0], S_pix[1], locPix[0], locPix[1]);
+    }
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.fill(255);
+    if (gvs.show_solution) {
+      p.fill(answerColor);
+      p.noStroke();
+    }
+    p.circle(S_pix[0], S_pix[1], pointDiameter);
+    p.noStroke();
     p.fill(253);
     p.rectMode(p.CENTER);
     p.textAlign(p.LEFT, p.CENTER);
     p.textSize(15);
+    const S_text = `z   = ${(Math.round(100 * gvs.randx) / 100).toFixed(2)}\nS = ${(Math.round(gvs.molarS2(gvs.randx) * 10) / 10).toFixed(1)} J/(mol K)`;
+    const S_textLength = p.textWidth(`S = ${(Math.round(gvs.answer_S_4[1] * 10) / 10).toFixed(1)} J/(mol K)`);
+    const S_yOffset = gvs.molarS(gvs.randx) < gvs.molarS2(gvs.randx) ? -40 : 40;
+    p.rect(S_pix[0], S_pix[1] + S_yOffset, S_textLength + 10, 40);
+    p.fill(0);
+    p.text(S_text, S_pix[0] - S_textLength / 2, S_pix[1] + S_yOffset);
+    p.textSize(10);
+    p.text("A", S_pix[0] - S_textLength / 2 + 9, S_pix[1] + S_yOffset - 4);
+    p.textSize(15);
+    p.fill(253);
     let labelText;
     let textLength;
     labelText = `z   = ${(Math.round(100 * gvs.loc_S_4[0]) / 100).toFixed(2)}\nS = ${(Math.round(gvs.loc_S_4[1] * 10) / 10).toFixed(1)} J/(mol K)`;
     textLength = p.textWidth(`S = ${(Math.round(10 * gvs.loc_S_4[1]) / 10).toFixed(1)} J/(mol K)`);
     if (gvs.show_solution) {
-      labelText = `z   = ${(Math.round(100 * gvs.answer_S_4[0]) / 100).toFixed(2)}\nH = ${(Math.round(10 * gvs.answer_S_4[1]) / 10).toFixed(1)} kJ/mol`
+      labelText = `z   = ${(Math.round(100 * gvs.answer_S_4[0]) / 100).toFixed(2)}\nS = ${(Math.round(10 * gvs.answer_S_4[1]) / 10).toFixed(1)} J/(mol K)`
     }
     const offset = textBoxShift(locPix[0], locPix[1], textLength + 10, 40);
     const x = locPix[0] + offset[0];
@@ -583,20 +610,135 @@ function step4(p) {
     p.noStroke();
     p.rect(x, y, textLength + 10, 40);
     if (gvs.show_solution) {
-      p.fill(0, 150, 0);
+      p.fill(answerColor);
     } else {
       p.fill(0);
     }
     p.text(labelText, x - textLength / 2, y);
     p.textSize(10);
     p.text("A", x - textLength / 2 + 9, y - 4);
+    if (gvs.show_solution) {
+      p.textSize(20);
+      p.fill(253);
+      p.stroke(0);
+      const answerValue = (Math.round(10 * (Math.round(10 * gvs.molarS2(gvs.randx)) / 10 - Math.round(10 * gvs.answer_S_4[1]) / 10)) / 10).toFixed(1);
+      const answerText = `S   = ${answerValue} J/(mol K)`;
+      const answerTextLength = p.textWidth(answerText);
+      p.rect(margin_left + plot_width - answerTextLength / 2 - 30, margin_top + plot_height - 21, answerTextLength + 15, 30);
+      p.fill(answerColor);
+      p.noStroke();
+      p.text(answerText, margin_left + plot_width - answerTextLength - 30, margin_top + plot_height - 20);
+      p.textSize(12);
+      p.text("E", margin_left + plot_width - answerTextLength - 15, margin_top + plot_height - 14);
+    }
   }
   p.pop();
 }
 
 function step5(p) {
   p.push();
+  if (gvs.HS === "enthalpy") {
 
+  } else {
+    let locPix1, locPix2;
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.fill(255);
+    const mixturePix = coordToPix(gvs.randx, gvs.molarS2(gvs.randx));
+    p.circle(mixturePix[0], mixturePix[1], 8);
+    p.noStroke();
+    if (!gvs.show_solution) {
+      const mousePix = [p.mouseX, p.mouseY];
+      locPix1 = coordToPix(gvs.loc_S_5_B[0], gvs.loc_S_5_B[1]);
+      locPix2 = coordToPix(gvs.loc_S_5_A[0], gvs.loc_S_5_A[1]);
+      const distance1 = Math.sqrt((mousePix[0] - locPix1[0]) ** 2 + (mousePix[1] - locPix1[1]) ** 2);
+      const distance2 = Math.sqrt((mousePix[0] - locPix2[0]) ** 2 + (mousePix[1] - locPix2[1]) ** 2);
+      if (p.mouseIsPressed && distance1 < 10) {
+        gvs.dragging_loc_1 = true;
+      } else if (p.mouseIsPressed && distance2 < 10) {
+        gvs.dragging_loc_2 = true;
+      }
+      if (!p.mouseIsPressed) {
+        gvs.dragging_loc_1 = false;
+        gvs.dragging_loc_2 = false;
+      }
+      if (gvs.dragging_loc_1) {
+        locPix1 = mousePix;
+        locPix1[0] = margin_left;
+        locPix1[1] = Math.min(margin_top + plot_height, Math.max(margin_top, locPix1[1]));
+      }
+      if (gvs.dragging_loc_2) {
+        locPix2 = mousePix;
+        locPix2[0] = margin_left + plot_width;
+        locPix2[1] = Math.min(margin_top + plot_height, Math.max(margin_top, locPix2[1]));
+      }
+      const locCoords1 = pixToCoord(locPix1[0], locPix1[1]);
+      const locCoords2 = pixToCoord(locPix2[0], locPix2[1]);
+      if (gvs.dragging_loc_1) {
+        gvs.loc_S_5_B = [Math.round(locCoords1[0] * 100) / 100, Math.round(locCoords1[1] * 100) / 100];
+      }
+      if (gvs.dragging_loc_2) {
+        gvs.loc_S_5_A = [Math.round(locCoords2[0] * 100) / 100, Math.round(locCoords2[1] * 100) / 100];
+      }
+      p.fill(0);
+    } else {
+      const answerPix1 = coordToPix(0, gvs.answer_S_5_B[1]);
+      const answerPix2 = coordToPix(1, gvs.answer_S_5_A[1]);
+      locPix1 = answerPix1;
+      locPix2 = answerPix2;
+      gvs.loc_S_5_B = gvs.answer_S_5_B;
+      gvs.loc_S_5_A = gvs.answer_S_5_A;
+      p.fill(answerColor);
+    }
+    p.circle(locPix1[0], locPix1[1], pointDiameter);
+    p.circle(locPix2[0], locPix2[1], pointDiameter);
+    p.strokeWeight(1);
+    if (gvs.show_solution) {
+      p.stroke(answerColor);
+    } else {
+      p.stroke(0);
+    }
+    p.line(locPix1[0], locPix1[1], locPix2[0], locPix2[1]);
+    const labelTextB = `S   = ${(Math.round(gvs.loc_S_5_B[1] * 10) / 10).toFixed(1)} J/(mol K)`;
+    const labelTextBLength = p.textWidth(labelTextB);
+    const labelTextA = `S   = ${(Math.round(gvs.loc_S_5_A[1] * 10) / 10).toFixed(1)} J/(mol K)`;
+    const labelTextALength = p.textWidth(labelTextA);
+    p.rectMode(p.CENTER);
+    p.noStroke();
+    p.fill(253);
+    const rectXB = locPix1[0] + labelTextBLength / 2 + 20
+    const rectYB = locPix1[1] - 20;
+    const rectXA = locPix2[0] - labelTextALength / 2 - 20;
+    const rectYA = locPix2[1] - 20;
+    p.rect(rectXB, rectYB, labelTextBLength + 35, 25);
+    p.rect(rectXA, rectYA, labelTextALength + 35, 25);
+    if (gvs.show_solution) {
+      p.fill(answerColor);
+    } else {
+      p.fill(0);
+    }
+    p.textAlign(p.CENTER, p.CENTER);
+    p.textSize(15);
+    p.text(labelTextB, rectXB, rectYB);
+    p.text(labelTextA, rectXA, rectYA);
+    p.noFill();
+    if(gvs.show_solution) {
+      p.stroke(answerColor);
+    } else {
+      p.stroke(0);
+    }
+    p.line(rectXB - labelTextBLength / 2 - 13, rectYB - 9, rectXB - labelTextBLength / 2 - 4, rectYB - 9);
+    p.line(rectXA - labelTextALength / 2 - 13, rectYA - 9, rectXA - labelTextALength / 2 - 4, rectYA - 9);
+    p.noStroke();
+    p.textSize(10);
+    if(gvs.show_solution) {
+      p.fill(answerColor);
+    } else {
+      p.fill(0);
+    }
+    p.text("B", rectXB - labelTextBLength / 2 + 2, rectYB + 5);
+    p.text("A", rectXA - labelTextALength / 2 + 2, rectYA + 5);
+  }
   p.pop();
 }
 
