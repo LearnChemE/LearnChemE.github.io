@@ -50,7 +50,7 @@ gvs.generate_random_conditions = function() {
   }
   if(gvs.HS === "enthalpy") {
     gvs.plot.labels[0][0] = "molar enthalpy (kJ/mol)";
-    gvs.plot.range = [30, 90, 10, 2];
+    gvs.plot.range = [25, 95, 10, 2];
   } else {
     gvs.plot.labels[0][0] = "molar entropy [J/(mol K)]";
     gvs.plot.range = [45, 75, 5, 1];

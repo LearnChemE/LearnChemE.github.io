@@ -44,9 +44,9 @@
   </div>
 
   <div id="p5-container">
-    <div class="input-container" id="input-H-5"><div>H<sub>E</sub> = </div><input /><div>kJ/mol</div></div>
+    <div class="input-container" id="input-H-5"><div>H<sup>E</sup> = </div><input /><div>kJ/mol</div></div>
     <div class="input-container" id="input-H-6"><div>ΔT = </div><input /><div>K</div></div>
-    <div class="input-container" id="input-S-4"><div>S<sub>E</sub> = </div><input /><div>J/(mol K)</div></div>
+    <div class="input-container" id="input-S-4"><div>S<sup>E</sup> = </div><input /><div>J/(mol K)</div></div>
   </div>
 
   <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
@@ -61,7 +61,7 @@
         </div>
         <div class="modal-body">
           <p>
-            An interactive step-by-step procedure requires the user to identify pure component and mixture enthalpies or entropies in a binary solution. The user determines the excess enthalpy or entropy (differences from an ideal solution). For enthalpies, the user then calculates the temperature change for adiabatic mixing. The partial molar enthalpies and entropies are determined from lines tangent to the enthalpy or entropy curves. Selecting "new problem" at any time resets to step 1 with different numerical values and enthalpy instead of entropy (or entropy instead of enthalpy).
+            This is a step-by-step simulation to teach the user about non-ideal mixing and partial molar quantities. The simulation will randomly select between entropy or enthalpy, and the user will learn how to calculate excess entropy or enthalpy, temperature change of mixing, and partial molar entropy and enthalpy. Directions for each step are given at the top of the plot. After completing each step, the user presses the "show solution" button above the plot to see the answer (shown in green). When the step-by-step simulation has been completed, the user can press "new problem" and the simulation will switch from enthalpy to entropy, or from entropy to enthalpy and start again from step one. The properties of components A and B (pure-component enthalpy/entropy, deviation from ideal behavior, etc.) is randomized every time "new problem" is pressed, so the answers to each step will be different each time the user completes the simulation. The equations used in this simulation are available by clicking "details" above the plot.
           </p>
 
         </div>
@@ -82,12 +82,76 @@
         </div>
 
         <div class="modal-body">
-          <div class="details-text">Details</div>
+          <div class="details-text">
+            The molar enthalpy \( H \) is given by:
+          </div>
 
           <div class="details-eqn">
             $$
+            [1] \quad H^{E} = x_{A} H_{A} + x_{B} H_{B} + \alpha x_{A} x_{B}
+            $$
+          </div>
+
+          <div class="details-text">
+            where \( H_{A} \) and \( H_{B} \) are the pure-component enthalpies (kJ/mol), \( x_{A} \) and \( x_{B} \) are the mole fractions of \( A \) and \( B \) and \( \alpha \) is a non-ideal parameter, which can be either a positive or negative value. The excess enthalpy \( H^{E} \) is:
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [2] \quad H^{E} = H - H^{IS} = \alpha \, x_{A} \, x_{B}
+            $$
+          </div>
+
+          <div class="details-text">
+            where \( H^{IS} \) is the enthalpy of an ideal solution. The change in temperature for adiabatic mixing \( \Delta T_{mix} \) is a function of the excess enthalpy \( H^{E} \) and the heat capacity of the solution (\( C_{p} \)).
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [3] \quad H^{E} = - C_{p} \, \Delta T_{mix} = - C_{p} (T_{f} - T_{i})
+            $$
+          </div>
+
+          <div class="details-text">
+            where \( T_{i} \) and \( T_{f} \) represent the initial and final temperatures of the solution. The partial molar enthalpies for components \( A \) and \( B \), \( \; \overline{H}_{A} \) and \( \overline{H}_{B} \), are at the intersections at \( x_{A} = 1 \) and \( x_{B} = 1 \), respectively, of a line tangent to the \( H \) versus \( x_{A} \) curve at the mixture mole fraction \( x_{A} \):
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [4] \quad \overline{H}_{A} = H + x_{B} \frac{dH}{dx_{A}}
+            $$
 
             $$
+            [5] \quad \overline{H}_{B} = H - x_{A} \frac{dH}{dx_{A}}
+            $$
+          </div>
+
+          <div class="details-text">
+            The molar entropy \( S \) of an ideal solution is:
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [6] \quad S^{IS} = (x_{A} S_{A} + x_{B} S_{B}) - R (x_{A} \, \mathrm{ln} (x_{A}) + x_{B} \, \mathrm{ln} (x_{B}))
+            $$
+          </div>
+
+          <div class="details-text">
+            Where \( R \) is the ideal gas constant. The excess entropy \( S^{E} \) can be derived from excess Gibbs energy of mixing \( G^{E} \) and an interaction parameter for the two components \( A_{AB} \).
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [7] \quad G^{E} = A_{AB} \, R \, T \, x_{A} \, x_{B}
+            $$
+
+            $$
+            [8] \quad S^{E} = - \left( \frac{\partial G^{E}}{\partial T} \right)_{p, n_{A}, n_{B}} = -R \, A_{AB} \, x_{A} \, x_{B}
+            $$
+          </div>
+
+          <div class="details-text">
+            The partial molar entropies can be found from interactions of a line tangent to the \( S \) versus \( x_{A} \) curve using equations analogous to equations [4] and [5].
           </div>
           
           <div style="margin-top: 2rem;"></div>

@@ -82,10 +82,12 @@ function drawAxes(p) {
 
   for (let y = yMin; y <= yMax; y += yStepMinor) {
     y = Math.round(y);
+    if(y === 25) {y = 26}
     const pix_left = coordToPix(0, y);
     const pix_right = coordToPix(1, y);
     let tickLength;
-    if (Math.round((y - yMin) % yStepMajor) === 0 || Math.round((y - yMin) % yStepMajor) === yStepMajor) {
+    const adjustment_factor = gvs.HS === "enthalpy" ? 5 : 0;
+    if (Math.round((y - yMin) % yStepMajor) === adjustment_factor || Math.round((y - yMin) % yStepMajor) === yStepMajor - adjustment_factor) {
       tickLength = 8;
       p.noStroke();
       p.fill(0);
@@ -146,13 +148,13 @@ function drawInstructions(p) {
         instructions_text = `step 5. Move the black dot to calculate excess enthalpy,\nthen input your answer into the input box below`;
         break;
       case 6:
-        instructions_text = `step 6. Determine temperature change for adiabatic mixing at the heat capacity\nC   = ${gvs.cp.toFixed(2)} kJ/[mol K], then input your answer into the input box below`;
+        instructions_text = `step 6. Determine temperature change for adiabatic mixing at the heat capacity\nC   = ${gvs.cp.toFixed(2)} kJ/(mol K), then input your answer into the input box below`;
         break;
       case 7:
         if(gvs.show_solution) {
           instructions_text = `You have finished this quiz simulation. Click "new problem" to\ntry this exercise again with entropy instead of enthalpy.`
         } else {
-          instructions_text = `step 7. Determine the partial molar enthalpy for each component by sliding the\npoints along the y-axis. The white dot represents the mixture enthalpy.`;
+          instructions_text = `step 7. Determine the partial molar enthalpy for each component by sliding the\npoints along the y-axis. The yellow dot represents the mixture enthalpy.`;
         }
         break;
     }
@@ -174,7 +176,7 @@ function drawInstructions(p) {
         if(gvs.show_solution) {
           instructions_text = `You have finished this quiz simulation. Click "new problem" to\ntry this exercise again with enthalpy instead of entropy.`
         } else {
-          instructions_text = `step 5. Determine the partial molar entropy for each component by sliding the\npoints along the y axis. The white dot represents the mixture entropy.`;
+          instructions_text = `step 5. Determine the partial molar entropy for each component by sliding the\npoints along the y axis. The yellow dot represents the mixture entropy.`;
         }
         break;
       case 6:
@@ -648,7 +650,7 @@ function step4(p) {
       p.noStroke();
       p.text(answerText, margin_left + plot_width - answerTextLength - 50, margin_top + 36);
       p.textSize(12);
-      p.text("E", margin_left + plot_width - answerTextLength - 35, margin_top + 42);
+      p.text("E", margin_left + plot_width - answerTextLength - 35, margin_top + 28);
     }
   }
   p.pop();
@@ -750,7 +752,7 @@ function step5(p) {
       p.noStroke();
       p.text(answerText, margin_left + plot_width - answerTextLength - 50, margin_top + 39);
       p.textSize(12);
-      p.text("E", margin_left + plot_width - answerTextLength - 35, margin_top + 45);
+      p.text("E", margin_left + plot_width - answerTextLength - 35, margin_top + 31);
       p.stroke(answerColor);
       p.noFill();
       p.strokeWeight(2);
@@ -760,9 +762,9 @@ function step5(p) {
     let locPix1, locPix2;
     p.stroke(0);
     p.strokeWeight(1);
-    p.fill(255);
+    p.fill(255, 255, 0);
     const mixturePix = coordToPix(gvs.randx, gvs.molarS2(gvs.randx));
-    p.circle(mixturePix[0], mixturePix[1], 8);
+    p.circle(mixturePix[0], mixturePix[1], 9);
     p.noStroke();
     if (!gvs.show_solution) {
       const mousePix = [p.mouseX, p.mouseY];
@@ -889,7 +891,7 @@ function step6(p) {
   p.textSize(15);
   p.text(labelText, textPix[0] - textLength / 2 - 10, textPix[1]);
   p.textSize(10);
-  p.text("E", textPix[0] - textLength / 2 + 2, textPix[1] + 6);
+  p.text("E", textPix[0] - textLength / 2 + 2, textPix[1] - 8);
   if (gvs.show_solution) {
     p.textSize(20);
     p.translate(p.width / 2 + 160, 97);
@@ -912,9 +914,9 @@ function step7(p) {
   let locPix1, locPix2;
   p.stroke(0);
   p.strokeWeight(1);
-  p.fill(255);
+  p.fill(255, 255, 0);
   const mixturePix = coordToPix(gvs.randx, gvs.molarH(gvs.randx));
-  p.circle(mixturePix[0], mixturePix[1], 8);
+  p.circle(mixturePix[0], mixturePix[1], 9);
   p.noStroke();
   if (!gvs.show_solution) {
     const mousePix = [p.mouseX, p.mouseY];
