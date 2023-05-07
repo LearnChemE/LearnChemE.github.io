@@ -86,7 +86,7 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                      
+                      This simulation shows to read a psychrometric chart (also known as a humidity chart). Click and drag the black dot to adjust the properties of air. Unchecking the "relative humidity" (green) box removes the labels for the relative-humidity lines. Check the boxes for "enthalpy" (blue) and "specific volume" (purple) to display lines of constant enthalpy and constant volume, respectively. Check the box for "temperatures" to display dashed black lines that point to dry-bulb, wet-bulb and dew point temperatures that correspond to those values at the black dot. When the "temperatures" box is checked, move the mouse over each dashed line to identify which temperature it corresponds to. All temperatures are read on the \(x\) axis. Check "display values" to see a table of the values obtained from the chart for the selected point; only the moisture content and the values whose boxes are checked are displayed. The values per kg are per kg of dry air.
                     </p>
 
 
@@ -108,7 +108,49 @@
                 </div>
 
                 <div class="modal-body">
-                    
+                    <div class="modal-text">
+                        Relative humidity is defined by:
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        \phi = \frac{P}{P^{sat}}100,
+                        $$
+                    </div>
+                    <div class="modal-text">
+                        where \(P\) is the pressure and \(P^{sat}\) is the saturation pressure (bar).
+                    </div>
+                    <div class="modal-text">
+                        The saturation pressure is calculated from the Antoine equation:
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        P^{sat} = 10^{A - \frac{B}{T+C}},
+                        $$
+                    </div>
+                    <div class="modal-text">
+                        where \(A\), \(B\) and \(C\) are Antoine constants and \(T\) is temperature (°C).
+                    </div>
+                    <div class="modal-text">
+                        For additional resources on the psychrometric chart, view the screencasts at [1-3].
+                    </div>
+                    <div style="height:10px"></div>
+                        <ol class="references">
+                          <li>
+                           <i>Psychrometric Charts (Humidity Charts)</i> [Video]. (Dec 8, 2016) <a 
+                            href="https://www.youtube.com/watch?v=WU5J6XdG_TM"
+                            target="_blank">www.youtube.com/watch?v=WU5J6XdG_TM</a>.
+                          </li>
+                          <li>
+                            <i>Humidity Chart Example</i> [Video]. (Dec 8, 2016) <a
+                            href="https://www.youtube.com/watch?v=czZpZl9crTM"
+                            target="_blank">www.youtube.com/watch?v=czZpZl9crTM</a>
+                          </li>
+                          <li>
+                            <i>Humidity Chart: Adiabatic Humidification</i> [Video]. (Dec 8, 2016) <a
+                            href="https://www.youtube.com/watch?v=1oMwioiEl-Q"
+                            target="_blank">www.youtube.com/watch?v=1oMwioiEl-Q</a>
+                          </li>
+                        </ol>
                 </div>
             </div>
         </div>
@@ -133,7 +175,7 @@
                             href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under
                         the direction of
                         Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional
-                        contributions by Neil Hendren. Address any questions or comments to learncheme@gmail.com. All of
+                        contributions by Neil Hendren. This simulation was prepared with financial support from the National Science Foundation. Address any questions or comments to learncheme@gmail.com. All of
                         our
                         simulations are open source, and are available on our <a
                             href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github

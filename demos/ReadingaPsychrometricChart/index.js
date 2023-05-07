@@ -7,7 +7,7 @@ window.g = {
     enthalpTruth: true,
     specVolTruth: true,
     tempTruth: false,
-    displayTruth: false,
+    displayTruth: true,
     gridTruth: false,
 
     // Graph edges
@@ -38,6 +38,7 @@ window.g = {
     dryBulb: 0,
     enthalp: 0,
     volume: 0,
+    relativeHum: 0,
 
 }
 
@@ -66,17 +67,21 @@ function draw(){
     pointTest();
     if(g.enthalpTruth){
         enthalpDisplay();
+        enthalpValueDisp();
     }
     if(g.gridTruth){
         gridLinesFunc();
     }
     if(g.specVolTruth){
         volDisplay();
+        volValueDisp();
+    }
+    if(g.displayTruth){
+        displayValues();
     }
    
     tempDisplay();
     otherCalcs();
-    console.log(g.volume)
     if(g.humidTruth){
         relHumDisplay();
     }
