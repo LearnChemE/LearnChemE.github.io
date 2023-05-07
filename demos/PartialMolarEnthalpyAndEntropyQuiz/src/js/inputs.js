@@ -31,6 +31,33 @@ nextStepSolutionButton.addEventListener("click", () => {
     gvs.show_solution = false;
     gvs.step++;
   }
+  if(gvs.HS === "enthalpy" && gvs.step === 5) {
+    document.getElementById("input-H-5").style.display = "grid";
+    if(gvs.show_solution) {
+      document.getElementById("input-H-5").setAttribute("disabled", "yes");
+    }
+  } else {
+    document.getElementById("input-H-5").style.display = "none";
+    document.getElementById("input-H-5").removeAttribute("disabled");
+  }
+  if(gvs.HS === "enthalpy" && gvs.step === 6) {
+    document.getElementById("input-H-6").style.display = "grid";
+    if(gvs.show_solution) {
+      document.getElementById("input-H-6").setAttribute("disabled", "yes");
+    }
+  } else {
+    document.getElementById("input-H-6").style.display = "none";
+    document.getElementById("input-H-6").removeAttribute("disabled");
+  }
+  if(gvs.HS === "entropy" && gvs.step === 4) {
+    document.getElementById("input-S-4").style.display = "grid";
+    if(gvs.show_solution) {
+      document.getElementById("input-S-4").setAttribute("disabled", "yes");
+    }
+  } else {
+    document.getElementById("input-S-4").style.display = "none";
+    document.getElementById("input-S-4").removeAttribute("disabled");
+  }
 });
 
 newProblemButton.addEventListener("click", () => {
@@ -39,4 +66,10 @@ newProblemButton.addEventListener("click", () => {
   nextStepSolutionButton.classList.remove("blue");
   gvs.show_solution = false;
   gvs.generate_random_conditions();
+  document.getElementById("input-H-5").style.display = "none";
+  document.getElementById("input-H-5").removeAttribute("disabled");
+  document.getElementById("input-H-6").style.display = "none";
+  document.getElementById("input-H-6").removeAttribute("disabled");
+  document.getElementById("input-S-4").style.display = "none";
+  document.getElementById("input-S-4").removeAttribute("disabled");
 });

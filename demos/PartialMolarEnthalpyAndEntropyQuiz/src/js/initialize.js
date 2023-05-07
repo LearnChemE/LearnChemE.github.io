@@ -4,9 +4,16 @@ gvs.generate_random_conditions = function() {
   gvs.sA = 50 + Math.round(Math.random() * 10);
   gvs.sB = gvs.sA >= 55 ? 50 + Math.round(Math.random() * 3) : 57 + Math.round(Math.random() * 3);
   gvs.cp = Math.round(5 + Math.random() * 5) / 100;
-  gvs.HS = Math.random() > 0.5 ? "enthalpy" : "entropy";
+  if(gvs.HS === null) {
+    gvs.HS = Math.random() > 0.5 ? "enthalpy" : "entropy";
+  } else {
+    if(gvs.HS === "enthalpy") {
+      gvs.HS = "entropy"
+    } else {
+      gvs.HS = "enthalpy"
+    }
+  }
   gvs.randx = Math.round(35 + Math.random() * 30) / 100;
-  gvs.choice = Math.random() > 0.5 ? 1 : 2;
   gvs.alpha = Math.round(45 + 15 * Math.random());
   gvs.alpha = Math.random() > 0.5 ? -1 * gvs.alpha : gvs.alpha;
   let randChoice = Math.random(); randChoice = randChoice < 0.33 ? 0.2 : randChoice < 0.67 ? 0.3 : 0.35;
@@ -71,11 +78,13 @@ gvs.generate_random_conditions = function() {
   gvs.answer_H_3 = [gvs.randx, gvs.molarH(gvs.randx)];
   gvs.answer_H_4_B = [0, gvs.molarH(0)];
   gvs.answer_H_4_A = [1, gvs.molarH(1)];
-  gvs.answer_H_5 = [0, 0];
+  gvs.answer_H_5 = [gvs.randx, gvs.hB + gvs.randx * (gvs.hA - gvs.hB)];
   gvs.answer_H_5_input = "";
   gvs.answer_H_6_input = "";
-  gvs.answer_H_7_B = [0, 0];
-  gvs.answer_H_7_A = [0, 0];
+  const step_7_answer_hB = gvs.molarH(gvs.randx) - gvs.randx * gvs.dMolarH(gvs.randx);
+  const step_7_answer_hA = gvs.molarH(gvs.randx) + (1 - gvs.randx) * gvs.dMolarH(gvs.randx);
+  gvs.answer_H_7_B = [0, step_7_answer_hB];
+  gvs.answer_H_7_A = [0, step_7_answer_hA];
   gvs.answer_S_1 = [1, gvs.sA];
   gvs.answer_S_2 = [0, gvs.sB];
   gvs.answer_S_3 = [gvs.randx, gvs.molarS2(gvs.randx)];

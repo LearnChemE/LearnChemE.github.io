@@ -146,10 +146,15 @@ function drawInstructions(p) {
         instructions_text = `step 5. Move the solid black dot to calculate excess enthalpy,\nthen input your answer into the input box below`;
         break;
       case 6:
-        instructions_text = `step 6. Determine temperature change for adiabatic mixing at the heat capacity\nC  = 0.05 kJ/[mol K], then input your answer into the input box below`;
+        instructions_text = `step 6. Determine temperature change for adiabatic mixing at the heat capacity\nC   = ${gvs.cp.toFixed(2)} kJ/[mol K], then input your answer into the input box below`;
         break;
       case 7:
-        instructions_text = `step 7. Determine the partial molar enthalpy for each\ncomponent by sliding the points along the y-axis`;
+        if(gvs.show_solution) {
+          instructions_text = `You have finished this quiz simulation. Click "new problem" to\ntry this exercise again with entropy instead of enthalpy.`
+        } else {
+          instructions_text = `step 7. Determine the partial molar enthalpy for each component by sliding the\npoints along the y-axis. The white dot represents the mixture enthalpy.`;
+        }
+        break;
     }
   } else {
     switch (gvs.step) {
@@ -166,16 +171,25 @@ function drawInstructions(p) {
         instructions_text = `step 4. Move the solid dot to find excess entropy relative to ideal\nmixing (black curve), then input your answer into the input box below`;
         break;
       case 5:
-        instructions_text = `step 5. Determine the partial molar entropy for each component by sliding the\npoints along the y axis. The white dot represents the mixture entropy.`;
+        if(gvs.show_solution) {
+          instructions_text = `You have finished this quiz simulation. Click "new problem" to\ntry this exercise again with enthalpy instead of entropy.`
+        } else {
+          instructions_text = `step 5. Determine the partial molar entropy for each component by sliding the\npoints along the y axis. The white dot represents the mixture entropy.`;
+        }
         break;
       case 6:
         instructions_text = ``;
         break;
       case 7:
         instructions_text = ``;
+        break;
     }
   }
   p.text(instructions_text, 0, 0);
+  if (gvs.step === 6) {
+    p.textSize(10);
+    p.text("P", -213, 14);
+  }
   p.pop();
 }
 
@@ -215,6 +229,11 @@ function textBoxShift(xPix, yPix, textWidth, textHeight) {
   let y_shift;
   const xCoord = pixToCoord(xPix, yPix)[0];
   let ySwitch = gvs.HS === "enthalpy" ? coordToPix(xCoord, gvs.molarH(xCoord))[1] : coordToPix(xCoord, gvs.molarS2(xCoord))[1];
+  if (gvs.HS === "enthalpy" && gvs.molarH(gvs.randx) > gvs.hB + gvs.randx * (gvs.hA - gvs.hB)) {
+    ySwitch += 5
+  } else {
+    ySwitch -= 5
+  }
   if (gvs.HS === "entropy" && (gvs.molarS(xCoord) > gvs.molarS2(xCoord)) && gvs.step === 4) {
     ySwitch -= 10
   }
@@ -624,12 +643,12 @@ function step4(p) {
       const answerValue = (Math.round(10 * (Math.round(10 * gvs.molarS2(gvs.randx)) / 10 - Math.round(10 * gvs.answer_S_4[1]) / 10)) / 10).toFixed(1);
       const answerText = `S   = ${answerValue} J/(mol K)`;
       const answerTextLength = p.textWidth(answerText);
-      p.rect(margin_left + plot_width - answerTextLength / 2 - 30, margin_top + plot_height - 21, answerTextLength + 15, 30);
+      p.rect(margin_left + plot_width - answerTextLength / 2 - 50, margin_top + 35, answerTextLength + 15, 30);
       p.fill(answerColor);
       p.noStroke();
-      p.text(answerText, margin_left + plot_width - answerTextLength - 30, margin_top + plot_height - 20);
+      p.text(answerText, margin_left + plot_width - answerTextLength - 50, margin_top + 36);
       p.textSize(12);
-      p.text("E", margin_left + plot_width - answerTextLength - 15, margin_top + plot_height - 14);
+      p.text("E", margin_left + plot_width - answerTextLength - 35, margin_top + 42);
     }
   }
   p.pop();
@@ -638,7 +657,105 @@ function step4(p) {
 function step5(p) {
   p.push();
   if (gvs.HS === "enthalpy") {
-
+    p.stroke(0);
+    p.noFill();
+    p.strokeWeight(2);
+    const idealPix = [coordToPix(0, gvs.hB), coordToPix(1, gvs.hA)];
+    p.line(idealPix[0][0], idealPix[0][1], idealPix[1][0], idealPix[1][1]);
+    const mixturePix = coordToPix(gvs.randx, gvs.molarH(gvs.randx));
+    p.strokeWeight(1);
+    if (gvs.show_solution) {
+      p.fill(answerColor);
+      p.noStroke();
+    } else {
+      p.fill(255);
+    }
+    p.circle(mixturePix[0], mixturePix[1], pointDiameter);
+    const mixtureLabelText = `z   = ${(Math.round(100 * gvs.randx) / 100).toFixed(2)}\nH = ${(Math.round(gvs.molarH(gvs.randx) * 10) / 10).toFixed(1)} kJ/mol`;
+    const mixtureTextLength = p.textWidth(`H = ${(Math.round(gvs.molarH(gvs.randx) * 10) / 10).toFixed(1)} kJ/mol`);
+    const mixtureOffset = textBoxShift(mixturePix[0], mixturePix[1], mixtureTextLength, 40);
+    const mixtureX = mixturePix[0] + mixtureOffset[0];
+    const mixtureY = mixturePix[1] + mixtureOffset[1];
+    p.noStroke();
+    p.rectMode(p.CENTER);
+    p.fill(253);
+    p.rect(mixtureX, mixtureY, mixtureTextLength + 30, 40);
+    p.textAlign(p.LEFT, p.CENTER);
+    p.textSize(15);
+    p.fill(0);
+    p.text(mixtureLabelText, mixturePix[0] + mixtureOffset[0] - mixtureTextLength / 2 - 10, mixturePix[1] + mixtureOffset[1]);
+    p.textSize(10);
+    p.text("A", mixturePix[0] + mixtureOffset[0] - mixtureTextLength / 2 - 1, mixturePix[1] + mixtureOffset[1] - 4);
+    let locPix;
+    p.noStroke();
+    if (!gvs.show_solution) {
+      const mousePix = [p.mouseX, p.mouseY];
+      locPix = coordToPix(gvs.loc_H_5[0], gvs.loc_H_5[1]);
+      const distance = Math.sqrt((mousePix[0] - locPix[0]) ** 2 + (mousePix[1] - locPix[1]) ** 2);
+      if (p.mouseIsPressed && distance < 10) {
+        gvs.dragging_loc_1 = true;
+      }
+      if (!p.mouseIsPressed) {
+        gvs.dragging_loc_1 = false;
+      }
+      if (gvs.dragging_loc_1) {
+        locPix = mousePix;
+        locPix[0] = Math.min(margin_left + plot_width, Math.max(margin_left, locPix[0]));
+        locPix[1] = Math.min(margin_top + plot_height, Math.max(margin_top, locPix[1]));
+      }
+      const locCoords = pixToCoord(locPix[0], locPix[1]);
+      if (gvs.dragging_loc_1) {
+        gvs.loc_H_5 = [Math.round(locCoords[0] * 100) / 100, Math.round(locCoords[1] * 100) / 100];
+      }
+      p.fill(0);
+    } else {
+      const answerPix = coordToPix(gvs.answer_H_5[0], gvs.answer_H_5[1]);
+      locPix = answerPix;
+      p.fill(answerColor);
+    }
+    p.circle(locPix[0], locPix[1], pointDiameter);
+    p.fill(253);
+    p.rectMode(p.CENTER);
+    p.textAlign(p.LEFT, p.CENTER);
+    p.textSize(15);
+    let labelText;
+    let textLength;
+    labelText = `z   = ${(Math.round(100 * gvs.loc_H_5[0]) / 100).toFixed(2)}\nH = ${(Math.round(10 * gvs.loc_H_5[1]) / 10).toFixed(1)} kJ/mol`;
+    textLength = p.textWidth(`H = ${(Math.round(10 * gvs.loc_H_5[1]) / 10).toFixed(1)} kJ/mol`);
+    if (gvs.show_solution) {
+      labelText = `z   = ${(Math.round(100 * gvs.answer_H_5[0]) / 100).toFixed(2)}\nH = ${(Math.round(10 * gvs.answer_H_5[1]) / 10).toFixed(1)} kJ/mol`
+    }
+    const offset = textBoxShift(locPix[0], locPix[1], textLength + 10, 40);
+    const x = locPix[0] + offset[0];
+    const y = locPix[1] + offset[1];
+    p.noStroke();
+    p.rect(x, y, textLength + 10, 40);
+    if (gvs.show_solution) {
+      p.fill(answerColor);
+    } else {
+      p.fill(0);
+    }
+    p.text(labelText, x - textLength / 2, y);
+    p.textSize(10);
+    p.text("A", x - textLength / 2 + 9, y - 4);
+    if (gvs.show_solution) {
+      p.textSize(20);
+      p.fill(253);
+      p.stroke(0);
+      const answerValue = (Math.round(10 * (Math.round(10 * gvs.molarH(gvs.randx)) / 10 - Math.round(10 * gvs.answer_H_5[1]) / 10)) / 10).toFixed(1);
+      const answerText = `H   = ${answerValue} kJ/mol`;
+      const answerTextLength = p.textWidth(answerText);
+      p.rect(margin_left + plot_width - answerTextLength / 2 - 50, margin_top + 38, answerTextLength + 15, 30);
+      p.fill(answerColor);
+      p.noStroke();
+      p.text(answerText, margin_left + plot_width - answerTextLength - 50, margin_top + 39);
+      p.textSize(12);
+      p.text("E", margin_left + plot_width - answerTextLength - 35, margin_top + 45);
+      p.stroke(answerColor);
+      p.noFill();
+      p.strokeWeight(2);
+      p.line(locPix[0], locPix[1], mixturePix[0], mixturePix[1]);
+    }
   } else {
     let locPix1, locPix2;
     p.stroke(0);
@@ -722,7 +839,7 @@ function step5(p) {
     p.text(labelTextB, rectXB, rectYB);
     p.text(labelTextA, rectXA, rectYA);
     p.noFill();
-    if(gvs.show_solution) {
+    if (gvs.show_solution) {
       p.stroke(answerColor);
     } else {
       p.stroke(0);
@@ -731,7 +848,7 @@ function step5(p) {
     p.line(rectXA - labelTextALength / 2 - 13, rectYA - 9, rectXA - labelTextALength / 2 - 4, rectYA - 9);
     p.noStroke();
     p.textSize(10);
-    if(gvs.show_solution) {
+    if (gvs.show_solution) {
       p.fill(answerColor);
     } else {
       p.fill(0);
@@ -744,13 +861,152 @@ function step5(p) {
 
 function step6(p) {
   p.push();
-
+  const mixturePix = coordToPix(gvs.randx, gvs.hB + gvs.randx * (gvs.hA - gvs.hB));
+  const nonIdealPix = coordToPix(gvs.randx, gvs.molarH(gvs.randx));
+  const hBPix = coordToPix(0, gvs.hB);
+  const hAPix = coordToPix(1, gvs.hA);
+  p.stroke(0);
+  p.strokeWeight(2);
+  p.line(hAPix[0], hAPix[1], hBPix[0], hBPix[1]);
+  p.fill(0);
+  p.noStroke();
+  p.circle(mixturePix[0], mixturePix[1], pointDiameter);
+  p.circle(nonIdealPix[0], nonIdealPix[1], pointDiameter);
+  p.drawingContext.setLineDash([5, 8]);
+  p.stroke(0);
+  // p.strokeWeight(1);
+  p.line(mixturePix[0], mixturePix[1], nonIdealPix[0], nonIdealPix[1]);
+  const excessHValue = (Math.round(10 * (Math.round(10 * gvs.molarH(gvs.randx)) / 10 - Math.round(10 * gvs.answer_H_5[1]) / 10)) / 10).toFixed(1);
+  const labelText = `H   = ${excessHValue} kJ/mol`;
+  const textLength = p.textWidth(labelText);
+  const textPix = [mixturePix[0], (mixturePix[1] + nonIdealPix[1]) / 2];
+  p.rectMode(p.CENTER);
+  p.textAlign(p.LEFT, p.CENTER);
+  p.noStroke();
+  p.fill(253);
+  p.rect(textPix[0], textPix[1], textLength + 30, 20);
+  p.fill(0);
+  p.textSize(15);
+  p.text(labelText, textPix[0] - textLength / 2 - 10, textPix[1]);
+  p.textSize(10);
+  p.text("E", textPix[0] - textLength / 2 + 2, textPix[1] + 6);
+  if (gvs.show_solution) {
+    p.textSize(20);
+    p.translate(p.width / 2 + 160, 97);
+    const answerText = `ΔT = ${Math.round(Number(excessHValue) / gvs.cp)} K`;
+    const answerTextWidth = p.textWidth(answerText);
+    p.fill(253);
+    p.stroke(0);
+    p.drawingContext.setLineDash([1, 0]);
+    p.strokeWeight(1);
+    p.rect(0, 0, answerTextWidth + 20, 30);
+    p.fill(answerColor);
+    p.noStroke();
+    p.text(answerText, -1 * answerTextWidth / 2, 1);
+  }
   p.pop();
 }
 
 function step7(p) {
   p.push();
-
+  let locPix1, locPix2;
+  p.stroke(0);
+  p.strokeWeight(1);
+  p.fill(255);
+  const mixturePix = coordToPix(gvs.randx, gvs.molarH(gvs.randx));
+  p.circle(mixturePix[0], mixturePix[1], 8);
+  p.noStroke();
+  if (!gvs.show_solution) {
+    const mousePix = [p.mouseX, p.mouseY];
+    locPix1 = coordToPix(gvs.loc_H_7_B[0], gvs.loc_H_7_B[1]);
+    locPix2 = coordToPix(gvs.loc_H_7_A[0], gvs.loc_H_7_A[1]);
+    const distance1 = Math.sqrt((mousePix[0] - locPix1[0]) ** 2 + (mousePix[1] - locPix1[1]) ** 2);
+    const distance2 = Math.sqrt((mousePix[0] - locPix2[0]) ** 2 + (mousePix[1] - locPix2[1]) ** 2);
+    if (p.mouseIsPressed && distance1 < 10) {
+      gvs.dragging_loc_1 = true;
+    } else if (p.mouseIsPressed && distance2 < 10) {
+      gvs.dragging_loc_2 = true;
+    }
+    if (!p.mouseIsPressed) {
+      gvs.dragging_loc_1 = false;
+      gvs.dragging_loc_2 = false;
+    }
+    if (gvs.dragging_loc_1) {
+      locPix1 = mousePix;
+      locPix1[0] = margin_left;
+      locPix1[1] = Math.min(margin_top + plot_height, Math.max(margin_top, locPix1[1]));
+    }
+    if (gvs.dragging_loc_2) {
+      locPix2 = mousePix;
+      locPix2[0] = margin_left + plot_width;
+      locPix2[1] = Math.min(margin_top + plot_height, Math.max(margin_top, locPix2[1]));
+    }
+    const locCoords1 = pixToCoord(locPix1[0], locPix1[1]);
+    const locCoords2 = pixToCoord(locPix2[0], locPix2[1]);
+    if (gvs.dragging_loc_1) {
+      gvs.loc_H_7_B = [Math.round(locCoords1[0] * 100) / 100, Math.round(locCoords1[1] * 100) / 100];
+    }
+    if (gvs.dragging_loc_2) {
+      gvs.loc_H_7_A = [Math.round(locCoords2[0] * 100) / 100, Math.round(locCoords2[1] * 100) / 100];
+    }
+    p.fill(0);
+  } else {
+    const answerPix1 = coordToPix(0, gvs.answer_H_7_B[1]);
+    const answerPix2 = coordToPix(1, gvs.answer_H_7_A[1]);
+    locPix1 = answerPix1;
+    locPix2 = answerPix2;
+    gvs.loc_H_7_B = gvs.answer_H_7_B;
+    gvs.loc_H_7_A = gvs.answer_H_7_A;
+    p.fill(answerColor);
+  }
+  p.circle(locPix1[0], locPix1[1], pointDiameter);
+  p.circle(locPix2[0], locPix2[1], pointDiameter);
+  p.strokeWeight(1);
+  if (gvs.show_solution) {
+    p.stroke(answerColor);
+  } else {
+    p.stroke(0);
+  }
+  p.line(locPix1[0], locPix1[1], locPix2[0], locPix2[1]);
+  const labelTextB = `H   = ${(Math.round(gvs.loc_H_7_B[1] * 10) / 10).toFixed(1)} kJ/mol`;
+  const labelTextBLength = p.textWidth(labelTextB);
+  const labelTextA = `H   = ${(Math.round(gvs.loc_H_7_A[1] * 10) / 10).toFixed(1)} kJ/mol`;
+  const labelTextALength = p.textWidth(labelTextA);
+  p.rectMode(p.CENTER);
+  p.noStroke();
+  p.fill(253);
+  const rectXB = locPix1[0] + labelTextBLength / 2 + 20
+  const rectYB = locPix1[1] - 20;
+  const rectXA = locPix2[0] - labelTextALength / 2 - 20;
+  const rectYA = locPix2[1] - 20;
+  p.rect(rectXB, rectYB, labelTextBLength + 35, 25);
+  p.rect(rectXA, rectYA, labelTextALength + 35, 25);
+  if (gvs.show_solution) {
+    p.fill(answerColor);
+  } else {
+    p.fill(0);
+  }
+  p.textAlign(p.CENTER, p.CENTER);
+  p.textSize(15);
+  p.text(labelTextB, rectXB, rectYB);
+  p.text(labelTextA, rectXA, rectYA);
+  p.noFill();
+  if (gvs.show_solution) {
+    p.stroke(answerColor);
+  } else {
+    p.stroke(0);
+  }
+  p.line(rectXB - labelTextBLength / 2 - 11, rectYB - 10, rectXB - labelTextBLength / 2 - 1, rectYB - 10);
+  p.line(rectXA - labelTextALength / 2 - 11, rectYA - 10, rectXA - labelTextALength / 2 - 1, rectYA - 10);
+  p.noStroke();
+  p.textSize(10);
+  if (gvs.show_solution) {
+    p.fill(answerColor);
+  } else {
+    p.fill(0);
+  }
+  p.text("B", rectXB - labelTextBLength / 2 + 4, rectYB + 5);
+  p.text("A", rectXA - labelTextALength / 2 + 4, rectYA + 5);
   p.pop();
 }
 

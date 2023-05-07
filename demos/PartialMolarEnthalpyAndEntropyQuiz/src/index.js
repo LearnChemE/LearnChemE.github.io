@@ -6,9 +6,9 @@ window.p5 = new require("./js/p5.js");
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
-    step: 5,
+    step: 1,
     show_solution: false,
-    HS: "enthalpy",
+    HS: null,
     plot : {
         margins: [[100, 50], [60, 80]],
         labels: [["molar enthalpy (kJ/mol)", ""], ["", "mole fraction A"]],
