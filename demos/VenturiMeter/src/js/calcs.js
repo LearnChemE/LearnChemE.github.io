@@ -22,11 +22,17 @@ module.exports = function calcAll() {
   v5 = v1 * (A1 / A5);
 
   // pressure for each portion of the venturi meter (Pa)
-  const P1 = g.pressure_1 * 9.80665; // 9.80665 Pa per mmH2O
-  const P2 = calcP(P1, v1, v2);
-  const P3 = calcP(P1, v1, v3);
-  const P4 = calcP(P1, v1, v4);
-  const P5 = calcP(P1, v1, v5);
+  let P1 = g.pressure_1 * 9.80665; // 9.80665 Pa per mmH2O
+  let P2 = calcP(P1, v1, v2);
+  let P3 = calcP(P1, v1, v3);
+  let P4 = calcP(P1, v1, v4);
+  let P5 = calcP(P1, v1, v5);
+
+  const pressureLoss = 0.2 * (P1 - P3);
+  if(g.friction_loss) {
+    P5 -= pressureLoss;
+    P4 -= pressureLoss;
+  }
 
   // set the global variables in their respective units
   g.velocity_2 = v2 * 1000; // (mm/s)
@@ -44,6 +50,6 @@ function calcP(P1, v1, v2) {
   const rho = 1000; // density of water (kg / m^3)
   // left-hand side of Bernoulli eqn with v2 term moved to lhs (Pa)
   const P2 = (P1 + 101325) + 0.5 * rho * v1**2 - 0.5 * rho * v2**2;
-  const P = (P2 - 101325);
+  const P = Math.max(0, (P2 - 101325));
   return P
 }
