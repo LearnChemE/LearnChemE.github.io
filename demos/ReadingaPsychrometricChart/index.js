@@ -1,4 +1,3 @@
-
 window.g = {
     cnv: undefined,
 
@@ -79,18 +78,19 @@ function draw() {
         volDisplay();
         volValueDisp();
     }
-    if(g.displayTruth){
+    if (g.displayTruth) {
         displayValues();
     }
 
     tempDisplay();
     otherCalcs();
-    if(g.humidTruth){
+    if (g.humidTruth) {
         relHumDisplay();
     }
     //console.log(V.b)
     push();
-    fill(0); noStroke();
+    fill(0);
+    noStroke();
     let temp = g.points[0];
     ellipse(temp.x, temp.y, 2 * g.radius);
     pop();
@@ -156,7 +156,7 @@ function mouseDragged() {
         } else if (mouseX >= g.rx && mouseY <= g.by - 2 && mouseY >= g.ty) { // To the right of the graph
             g.dragPoint.x = g.rx;
             g.dragPoint.y = mouseY;
-        } else if (mouseX <= g.rx && mouseX >= 462 && mouseY <= g.ty && g.test) {// Above the graph to the right of 100% rel hum
+        } else if (mouseX <= g.rx && mouseX >= 462 && mouseY <= g.ty && g.test) { // Above the graph to the right of 100% rel hum
             g.dragPoint.x = mouseX;
             g.dragPoint.y = g.ty;
         } else if (!g.test && mouseX >= g.lx && mouseX <= 462) {
