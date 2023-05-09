@@ -34,55 +34,66 @@
 
     <body>
         <div id="simulation-wrapper">
-            <div class="inputs-wrapper">
-                <div class="input-row" id="label1">
-                    <div class="input-label" >inlet vapor mole ratio <i>y<sub>N</sub></i><sub>+1</sub> (ppm)</div>
-                    <input type="range" id="inlet-vapor-mole-ratio" min="40" max="120" value="100" step="1"/>
-                    <div id="inlet-vapor-mole-ratio-label" class="value-label">100</div>
+            <div class="simulation-controls">
+                <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
+                <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+                <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>    
+            </div>
+            <div class="inputs-wrapper" style="transform:translateX(10px)">
+                <div class="input-area">
+                    <div class="input-row" id="label1">
+                        <div class="input-label" >inlet vapor mole ratio <i>y<sub>N</sub></i><sub>+1</sub> (ppm)</div>
+                        <input type="range" id="inlet-vapor-mole-ratio" min="40" max="120" value="100" step="1"/>
+                        <div id="inlet-vapor-mole-ratio-label" class="value-label">100</div>
+                    </div>
+                    <div class="input-row" id="label4" style="margin-left:50px">
+                        <div class="input-label">solvent flow rate (Mmol/h)</div>
+                        <input type="range" id="solvent-flow-rate" min="50" max="300" value="100" step="5"/>
+                        <div id="solvent-flow-rate-label" class="value-label">100</div>
+                    </div>
+                    <div class="input-row" id="label5">
+                        <div class="input-label"><b>mole ratios (ppm):</b> outlet vapor <i>y</i><sub>1</sub></div>
+                        <input type="range" id="outlet-vapor" min="10" max="100" value="10" step="1"/>
+                        <div id="outlet-vapor-label" class="value-label">10</div>
+                    </div>
+                    
                 </div>
-                <div class="input-row" id="label2">
-                    <div class="input-label">temperature (°C)</div>
-                    <input type="range" id="temperature" min="20" max="100" value="25" step="5"/>
-                    <div id="temperature-label" class="value-label">25</div>
+                <div class="input-area" style="margin-left:10px">
+                    <div class="input-row" id="label3" style="margin-left:15px">
+                        <div class="input-label">pressure (atm)</div>
+                        <input type="range" id="pressure" min="1.5" max="3" value="2.5" step=".1"/>
+                        <div id="pressure-label" class="value-label">2.5</div>
+                    </div>
+                    <div class="input-row" id="label2">
+                        <div class="input-label">temperature (°C)</div>
+                        <input type="range" id="temperature" min="20" max="100" value="25" step="5"/>
+                        <div id="temperature-label" class="value-label">25</div>
+                    </div>
+                    <div class="input-row" id="label6" style="margin-left:25px">
+                        <div class="input-label">inlet liquid <i>x</i><sub>0</sub></div>
+                        <input type="range" id="inlet-liquid" min="0" max=".25" value="0.05" step=".01"/>
+                        <div id="inlet-liquid-label" class="value-label">0.05</div>
+                    </div>
                 </div>
-                <div class="input-row" id="label3">
-                    <div class="input-label">pressure (atm)</div>
-                    <input type="range" id="pressure" min="1.5" max="3" value="2.5" step=".1"/>
-                    <div id="pressure-label" class="value-label">2.5</div>
-                </div>
-                <div class="input-row" id="label4">
-                    <div class="input-label">solvent flow rate (Mmol/h)</div>
-                    <input type="range" id="solvent-flow-rate" min="50" max="300" value="100" step="5"/>
-                    <div id="solvent-flow-rate-label" class="value-label">100</div>
-                </div>
-                <div class="input-row" id="label5">
-                    <div class="input-label">mole ratios (ppm): outlet vapor <i>y</i><sub>1</sub></div>
-                    <input type="range" id="outlet-vapor" min="10" max="100" value="10" step="1"/>
-                    <div id="outlet-vapor-label" class="value-label">10</div>
-                </div>
-                <div class="input-row" id="label6">
-                    <div class="input-label">inlet liquid <i>x</i><sub>0</sub></div>
-                    <input type="range" id="inlet-liquid" min="0" max=".25" value="0.05" step=".01"/>
-                    <div id="inlet-liquid-label" class="value-label">0.05</div>
-                </div>
-
-                <div class="select-container">
+                
+                <div class="select-container" style="margin-top:-30px; margin-right:-90px">
                     <form>
-                        <label class="checkbox-inline">
-                            <span class="checkmark" id="label7">(<i>L/V</i>)<sub>min</sub></span>
+                        <label class="checkbox-inline" style="transform: translateX(0px)">
+                            <span class="checkmark" id="label7" style="margin-right:5px">(<i>L/V</i>)<sub>min</sub></span>
                             <input type="checkbox" id="L-V-min">
                         </label>
                         <label class="checkbox-inline">
-                            <span class="checkmark">show diagram with 5 stages</span>
+                            <span class="checkmark" style="margin-right:5px">show diagram with 5 stages</span>
                             <input type="checkbox" id="show-diagram">
                         </label>
                     </form>
                 </div>
-                <div class="input-row" id="stage-slider" style="display:none;">
+                <div class="input-row2" id="stage-slider">
                     <div class="input-label">stage</div>
                     <input type="range" id="stage" min="1" max="5" value="1" step="1"/>
                     <div id="stage-label" class="value-label">1</div>
                 </div>
+                
             </div>
         </div>
 

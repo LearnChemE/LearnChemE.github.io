@@ -34,12 +34,39 @@
 
 .input-row {
   display: grid;
-  grid-template-columns: max-content 150px 15px max-content; /* 250 px was formerly 150 px, Dr. F asked me to make it much longer*/
+  grid-template-columns: max-content 175px 15px max-content; /* 250 px was formerly 150 px, Dr. F asked me to make it much longer*/
   gap: 10px;
   align-items: end;
   justify-items: center;
-  margin-top: 10px;
+  margin-top: -7px;
   transform: translateX(-35px);
+}
+.input-row2 {
+  display: grid;
+  grid-template-columns: max-content 175px 15px max-content; /* 250 px was formerly 150 px, Dr. F asked me to make it much longer*/
+  gap: 10px;
+  align-items: end;
+  justify-items: center;
+  margin-top: -40px;
+  transform: translateX(10px);
+}
+
+#control {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-items: center;
+  align-items: center;
+  gap: 15px 5px;
+
+}
+
+.input-area {
+  display: grid;
+  grid-template-columns: max-content;
+  margin: 20px auto;
+  gap: 10px;
+  width: max-content;
+  justify-items: center;
 }
 
 .select-row {
@@ -49,9 +76,10 @@
   align-items: center;
 }
 
-/*.select-container>form {
+.select-container>form {
   display: grid;
-}*/
+  grid-template-columns: repeat(2,max-content);
+}
 
 #point-type {
   height: min-content;
@@ -107,5 +135,15 @@ label {
 
 .modal-equation.no-padding {
   padding: 0px;
+}
+
+.simulation-controls {
+  display: grid;
+  grid-template-columns: 100px 100px 100px;
+  justify-content: center;
+  gap: 0px 20px;
+  width: 100vw;
+  margin-bottom: -10px;
+  margin-top: 10px;
 }
 

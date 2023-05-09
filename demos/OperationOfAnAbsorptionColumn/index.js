@@ -14,16 +14,23 @@ window.g = {
     LVmin: false,
     show5: false,
 
+    // Colors to be used repeatedly
+    blue: [0,0,200],
+    green: [0,130,0],
+    orange: [255,80,0],
+    pink: [150,0,200],
+
 
 }
 
 function setup(){
-    g.cnv = createCanvas(500,500);
+    g.cnv = createCanvas(700,450);
     g.cnv.parent("graphics-wrapper");
 }
 
 function draw(){
     background(250);
+    frame();
 }
 
 // EVENT LISTENERS
@@ -64,6 +71,9 @@ const label4 = document.getElementById("label4");
 const label5 = document.getElementById("label5");
 const label6 = document.getElementById("label6");
 const label7 = document.getElementById("label7");
+
+// For preventing movement when slider shows up
+let control = document.getElementById("control");
 
 IVMR.addEventListener("input", function(){
     const temp = Number(IVMR.value);
@@ -147,6 +157,7 @@ show5.addEventListener("change", () => {
         label6.style.color = "grey";
 
         label7.style.color = "grey";
+        //control.style.transform("translateY(-2px)")
 
         // Disabling sliders
         IVMR.disabled = true;
