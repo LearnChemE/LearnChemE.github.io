@@ -1,4 +1,4 @@
-const liquid_color = "rgb(180, 180, 255)";
+const liquid_color = "rgb(220, 220, 255)";
 
 function mmToPix(x, y) {
   const xPix = (x / 100) * (gvs.p.width / 3);
@@ -11,6 +11,7 @@ function drawVenturiMeter(p) {
   p.translate(p.width / 2, p.height / 2 + 170);
 
   // start of manometer fluid section
+
   p.rectMode(p.CORNERS);
   p.fill(liquid_color);
   p.noStroke();
@@ -34,6 +35,30 @@ function drawVenturiMeter(p) {
   coord2 = mmToPix(78, -1 * gvs.manometer_5_pressure);
   p.rect(coord1[0], coord1[1], coord2[0], coord2[1]);
 
+  p.stroke(100, 100, 255);
+  p.strokeWeight(1);
+  coord1 = mmToPix(-78, -1 * gvs.manometer_1_pressure);
+  coord2 = mmToPix(-72, -1 * gvs.manometer_1_pressure);
+  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+
+  coord1 = mmToPix(-33, -1 * gvs.manometer_2_pressure);
+  coord2 = mmToPix(-27, -1 * gvs.manometer_2_pressure);
+  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+
+  coord1 = mmToPix(-3, -1 * gvs.manometer_3_pressure);
+  coord2 = mmToPix(3, -1 * gvs.manometer_3_pressure);
+  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+
+  coord1 = mmToPix(27, -1 * gvs.manometer_4_pressure);
+  coord2 = mmToPix(33, -1 * gvs.manometer_4_pressure);
+  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+
+  coord1 = mmToPix(78, -1 * gvs.manometer_5_pressure);
+  coord2 = mmToPix(72, -1 * gvs.manometer_5_pressure);
+  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+
+  // start of venturi meter outline section
+  
   const outline_list_mm = [
     [-100, -1 * gvs.outer_diameter / 2],
     [-50, -1 * gvs.outer_diameter / 2],
