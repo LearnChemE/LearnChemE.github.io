@@ -12,7 +12,7 @@ window.g = {
 
     // Checkboxes
     LVmin: false,
-    show5: false,
+    show5: true,
 
     // Colors to be used repeatedly
     blue: [0,0,200],
@@ -20,17 +20,27 @@ window.g = {
     orange: [255,80,0],
     pink: [150,0,200],
 
+    // Graph edges
+    lx: 80,
+    rx: 400,
+    ty: 40,
+    by: 360,
+
 
 }
 
 function setup(){
-    g.cnv = createCanvas(700,450);
+    g.cnv = createCanvas(700,420);
     g.cnv.parent("graphics-wrapper");
 }
 
 function draw(){
     background(250);
     frame();
+
+    if(g.show5){
+        show5Display();
+    }
 }
 
 // EVENT LISTENERS

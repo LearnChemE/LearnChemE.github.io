@@ -2,18 +2,21 @@ let flashDrum = [[25.3231031543052, 52.80136402387042],[25.861892583120206, 49.0
 
 // Overall graph shape and graphic on the right
 function frame(){
-    push(); // Flash drum
-    beginShape(); strokeWeight(2); 
-    for(let i = 0; i < flashDrum.length; i++){
-        vertex(430+1.1*flashDrum[i][0],100+.8*flashDrum[i][1]);
+    
+    if(!g.show5){
+        push();
+        scale(.8); translate(160,40);
+        push(); // Flash drum
+        beginShape(); strokeWeight(2); fill(250);
+        for(let i = 0; i < flashDrum.length; i++){
+            vertex(430+1.1*flashDrum[i][0],100+.8*flashDrum[i][1]);
+        }
+        endShape();
+        pop();
+        arrowDraw();
+        figureLabels();
     }
-    endShape();
-    pop();
-
-    arrowDraw();
-    figureLabels();
-
-
+    
     function arrowDraw(){
         push();
         strokeWeight(2.5); stroke(g.blue);
@@ -48,10 +51,105 @@ function frame(){
             text('L',width-139,40);
         }
         pop();
+        push();
+        noStroke(); fill(250);
+        rect(width-140,54,120,23);
+        textSize(18); fill(g.blue); textStyle(ITALIC);
+        text('x',width-135,70);
+        textSize(15); textStyle(NORMAL);
+        text('0',width-125,75);
+        textSize(18);
+        text('= '+g.x0.toFixed(2)+' ppm',width-115,70);
+        pop();
         
+        // Upper left
+        push();
+        noStroke(); fill(250);
+        rect(420,54,120,23);
+        textSize(18); fill(g.green); textStyle(ITALIC);
+        text('y',425,70);
+        textSize(15); textStyle(NORMAL);
+        text('1',435,75);
+        textSize(18);
+        text('= '+g.y1+' ppm',445,70);
+        pop();
+
+        // Lower left
+        push();
+        textStyle(ITALIC); textSize(18); noStroke(); fill(g.green);
+        text('V',400,height+20);
+        textStyle(NORMAL);
+        text(' = 1 Mmol/h',413,height+20);
+        text('vapor feed',400,height);
+        pop();
+
+        // In the column L/V
+        push();
+        textStyle(ITALIC); textSize(18); noStroke();
+        text('L/V',500,280); 
+        textStyle(NORMAL);
+        text('= '+g.L,532,280);
+        pop();
     }
+    pop();
+
+    // Graph shape
+    push(); fill(250);
+    rect(80,40,320,320);
+    textSize(18); noStroke(); fill(0);
+    text('solute/(solute-free liquid)     (ppm)',g.lx+30,height-10);
+    textStyle(ITALIC); 
+    text('x',g.lx+235,height-10);
+    textStyle(NORMAL);
+    translate(25,330); rotate(radians(-90));
+    text('solute/(solute-free vapor)     (ppm)',0,0);
+    textStyle(ITALIC);
+    text('y',207,0);
+    pop();
+}
+
+
+function show5Display(){
+    let xLabels = ['0.0','0.1','0.2','0.3','0.4','0.5','0.6'];
+    let yLabels = ['0','10','20','30','40','50','60'];
+    let x = [0.05,0.12,0.20,0.29,0.41,0.54];
+    let y = [10,17,25,34,49,59];
     
-    
+    // X-ticks
+
+    // Y-ticks
+
+
+    figure();
+    function figure(){
+        push();
+        scale(.8); translate(160,40);
+
+        push();
+        for(let i = 1; i < 6; i++){
+            if(i == g.stage){
+                strokeWeight(4); fill(255,255,0);
+                rect(480,50+80*(i-1),110,40)
+            } else {
+                strokeWeight(1.5); fill(250);
+                rect(480,50+80*(i-1),110,40)
+            }
+        }
+        pop();
+        push();
+        strokeWeight(2); 
+        for(let i = 0; i < 5; i++){
+            stroke(g.blue);
+            line(565,10+80*i,565,45+80*i);
+            arrow([565,10+80*i],[565,50+80*i],g.blue,20,6);
+            stroke(g.green);
+            line(505,530-80*(i+1),505,495-80*(i+1));
+            arrow([505,530-80*(i+1)],[505,490-80*(i+1)],g.green,20,6);
+        }
+        pop();
+        pop();
+    }
+
 }
 
 // For creating arrows
