@@ -26,10 +26,10 @@ const html_options = {
   hash: true,
   meta: {
     "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
-    "keywords": "LearnChemE, chemical engineering, engineering, simulation, fluid dynamics, fluid mechanics, bernoulli's equation, bernoulli, pipe flow, velocity measurement",
+    "keywords": "LearnChemE, chemical engineering, engineering, simulation",
     "author": "Neil Hendren",
     "application-name": "Venturi Meter",
-    "description": "An interactive simulation designed to teach engineering students about measuring flow rates with a Venturi Meter"
+    "description": "An interactive simulation designed to teach engineering students about venturi meters."
   },
 }
 
