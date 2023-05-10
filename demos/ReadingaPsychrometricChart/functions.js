@@ -197,6 +197,110 @@ function enthalpDisplay(){
     pop();  
 }
 
+function enthalpValueDisp(){
+    let temp = g.points[0];
+    let ans = find2Dint(w.px);
+    let x = ans[0]-50;
+    let y = H.m*x + ans[2];
+
+    push();
+    if(y > g.ty && g.enthalp < 100 && g.enthalp > 9){
+        stroke(g.blue); strokeWeight(1.5); rect(x-30,y-23,30,23); strokeWeight(2);
+        line(temp.x,temp.y,x,y);
+        noStroke(); fill(g.blue); textSize(18);
+        text(g.enthalp,x-25,y-5);
+    } else if (y > g.ty && g.enthalp >= 100){
+        stroke(g.blue); strokeWeight(1.5); rect(x-35,y-23,35,23); strokeWeight(2);
+        line(temp.x,temp.y,x,y);
+        noStroke(); fill(g.blue); textSize(18);
+        text(g.enthalp,x-33,y-5);
+    } else if (y < g.ty){
+        let xt = (g.ty - ans[2])/H.m-5;
+        let yt = H.m*xt + ans[2];
+        stroke(g.blue); strokeWeight(1.5); rect(xt-35,yt-23,35,23); strokeWeight(2);
+        line(temp.x,temp.y,xt,yt);
+        noStroke(); fill(g.blue); textSize(18);
+        text(g.enthalp,xt-33,yt-5);
+    } else if (g.enthalp <= 9 && x > g.lx){
+        stroke(g.blue); strokeWeight(1.5); rect(x-25,y-23,25,23); strokeWeight(2);
+        line(temp.x,temp.y,x,y);
+        noStroke(); fill(g.blue); textSize(18);
+        text(g.enthalp,x-18,y-5);
+    } else if (x < g.lx){
+        let xt = g.lx-1;
+        let yt = H.m*xt + ans[2];
+        stroke(g.blue); strokeWeight(1.5); rect(xt-25,yt-23,25,23); strokeWeight(2);
+        line(temp.x,temp.y,xt,yt);
+        noStroke(); fill(g.blue); textSize(18);
+        text(g.enthalp,xt-20,yt-5);
+    }
+    
+    pop();
+}
+
+function volValueDisp(){
+    let temp = g.points[0];
+    let b = temp.y - V.m*temp.x;
+    let x = (g.by - b)/V.m + 25;
+    let y = V.m*x + b;
+
+    if(x > g.rx+40){
+        x = g.rx + 40;
+        y = V.m*x + b;
+    }
+    
+    push();
+    stroke(g.pink); strokeWeight(1.5); rect(x,y,44,23); strokeWeight(2);
+    line(temp.x,temp.y,x,y);
+    noStroke(); fill(g.pink); textSize(18);
+    text(g.volume,x+4,y+18);
+    pop();
+
+}
+
+function displayValues(){
+    let c = 0;
+    let ticks = [50,75,100,125,150,175,200,225];
+    let temp = g.points[0];
+    //°C
+
+    push();
+    noStroke(); textSize(20); 
+    text('moisture content = '+(map(temp.y,g.by,g.ty,0,.033)).toFixed(3)+' kg/kg DA',g.lx+5,ticks[c]);
+    c++;
+    if(g.tempTruth){
+        fill(100);
+        text('dew point temperature = '+g.dewPoint+'°C',g.lx+5,ticks[c]);
+        c++;
+        text('wet-bulb temperature = '+g.wetBulb+'°C',g.lx+5,ticks[c]);
+        c++;
+        text('dry-bulb temperature = '+g.dryBulb+'°C',g.lx+5,ticks[c]);
+        c++;
+    }
+    if(g.specVolTruth){
+        fill(g.pink);
+        text('volume = '+g.volume+' m /kg DA',g.lx+5,ticks[c]);
+        textSize(16);
+        text('3',g.lx+152,ticks[c]-8)
+        c++;
+        textSize(20);
+    }
+    if(g.enthalpTruth){
+        fill(g.blue);
+        text('enthalpy = '+g.enthalp+' kJ/kg DA',g.lx+5,ticks[c]);
+        c++;
+    }
+    if(g.humidTruth){
+        fill(g.green);
+        text('relative humidity = '+g.relativeHum+'%',g.lx+5,ticks[c]);
+        c++;
+    }
+
+    fill(0);
+    text('DA = dry air',g.lx+5,ticks[c])
+    pop();
+}
+
 function volDisplay(){
     let endTemp = [-5.5, 12.2, 29.9, 47.6, 65.3]; // Values from mathematica
     let startTemp = [-9.42,6.35,20,31.1,46.50];
@@ -260,41 +364,147 @@ function tempDisplay(){
     let xH = find2D(temp.y,w.px);
     let t = find2Dint(w.px);
     if(g.tempTruth){
-        push();
-        drawingContext.setLineDash([5,5]); strokeWeight(2);
-        line(temp.x,temp.y,temp.x,g.by-5);
-        
-        if(temp.y <= g.by-20){
-            line(temp.x,temp.y,xH+5,temp.y);
+        let test = true;
+        let test1 = true;
+        // Horizontal line (dew point temp)
+        if(mouseX > xH && mouseX < temp.x && mouseY < temp.y+5 && mouseY > temp.y-5){
+            
+            if(temp.y <= g.by-20){
+                push();
+                strokeWeight(3); drawingContext.setLineDash([5,5]);
+                line(temp.x,temp.y,xH+5,temp.y);
+                push();
+                drawingContext.setLineDash([0,0]);
+                arrow([temp.x,temp.y],[xH,temp.y],0,20,6);
+                pop();
+                pop();  
+                push();
+                drawingContext.setLineDash([5,5]);
+                rect(xH,temp.y+10,82,20);
+                noStroke(); textSize(18);
+                text('dew point',xH+2,temp.y+25);
+                pop();
+            } else {
+                push();
+                strokeWeight(3); drawingContext.setLineDash([5,5]);
+                line(temp.x,temp.y,g.lx+5,temp.y);
+                push();
+                drawingContext.setLineDash([0,0]);
+                arrow([temp.x,temp.y],[g.lx,temp.y],0,20,6);
+                pop();
+                pop();  
+                push();
+                drawingContext.setLineDash([5,5]);
+                rect(g.lx,temp.y+10,82,20);
+                noStroke(); textSize(18);
+                text('dew point',g.lx+2,temp.y+25);
+                pop();
+            }
+            test = false; test1 = false;
         } else {
-            line(temp.x,temp.y,g.lx+5,temp.y);
+            test = true; test1 = true;
+            push();
+            strokeWeight(2); drawingContext.setLineDash([5,5]);
+            if(temp.y <= g.by-20){
+                line(temp.x,temp.y,xH+5,temp.y);
+                push();
+                drawingContext.setLineDash([0,0]);
+                arrow([temp.x,temp.y],[xH,temp.y],0,16,4);
+                pop();
+            } else {
+                line(temp.x,temp.y,g.lx+5,temp.y);
+                push();
+                drawingContext.setLineDash([0,0]);
+                arrow([temp.x,temp.y],[g.lx-2,temp.y],0,16,4);
+                pop();
+            }
+            pop();
         }
         
-        if(t[1] >= g.ty){
-            line(temp.x,temp.y,t[0]+3,t[1]+2);
+        
+        // Vertical line (dry bulb temp)
+        if(mouseX > temp.x-5 && mouseX < temp.x+5 && mouseY > temp.y && mouseY < g.by && test){
+            test = false;
+            push();
+            strokeWeight(3); drawingContext.setLineDash([5,5]);
+            line(temp.x,temp.y,temp.x,g.by-5);
+            strokeWeight(1);
+            rect(temp.x+6,g.by-50,68,20);
+            pop();
+            arrow([temp.x,temp.y],[temp.x,g.by],0,20,6);
+            push();
+            noStroke(); textSize(18);
+            text('dry bulb',temp.x+8,g.by-34)
+            pop();
         } else {
-            let xtemp = (g.ty - t[2])/H.m;
-            line(temp.x,temp.y,xtemp,g.ty);
+            test = true; 
+            push();
+            strokeWeight(2); drawingContext.setLineDash([5,5]);
+            line(temp.x,temp.y,temp.x,g.by-5);
+            pop();
+            arrow([temp.x,temp.y],[temp.x,g.by],0,16,4);
         }
+        console.log(test,test1)
+        // Sloped line (dew point)
+        let ytest = H.m*mouseX + t[2];
+        if(mouseX >= t[0] && mouseX < temp.x && mouseY < ytest+4 && mouseY > ytest-4 && test && test1){
+            if(t[1] >= g.ty){
+                push();
+                strokeWeight(3); drawingContext.setLineDash([5,5]);
+                line(temp.x,temp.y,t[0]+3,t[1]+2);
+                strokeWeight(1);
+                rect(temp.x-10,temp.y-30,72,20);
+                pop();
+                arrow([temp.x,temp.y],t,0,20,6);
+                push();
+                noStroke(); textSize(18);
+                text('wet bulb',temp.x-8,temp.y-14);
+                pop();
+            } else {
+                push();
+                strokeWeight(3); drawingContext.setLineDash([5,5]);
+                let xtemp = (g.ty - t[2])/H.m;
+                line(temp.x,temp.y,xtemp,g.ty);
+                strokeWeight(1);
+                rect(temp.x-10,temp.y-30,72,20);
+                noStroke(); textSize(18);
+                text('wet bulb',temp.x-8,temp.y-14);
+                pop();
+            }
+            
+        } else {
+            push();
+            drawingContext.setLineDash([5,5]); strokeWeight(2);
+            if(t[1] >= g.ty){
+                line(temp.x,temp.y,t[0]+4,t[1]+3);
+                push();
+                drawingContext.setLineDash([0,0]);
+                arrow([temp.x,temp.y],t,0,16,4);
+                pop();
+            } else {
+                let xtemp = (g.ty - t[2])/H.m;
+                line(temp.x,temp.y,xtemp,g.ty);
+            }
+            pop();
+            
+        }
+        
 
-        pop();
-        arrow([temp.x,temp.y],[temp.x,g.by],0,16,4);
-        if(temp.y <= g.by-20){
-            arrow([temp.x,temp.y],[xH,temp.y],0,16,4);
-        } else {
-            arrow([temp.x,temp.y],[g.lx-2,temp.y],0,16,4);
-        }
-        if(t[1] >= g.ty){
-            arrow([temp.x,temp.y],t,0,16,4);
-        }
+        //pop();
+        
+        // if(temp.y <= g.by-20){
+        //     //arrow([temp.x,temp.y],[xH,temp.y],0,16,4);
+        // } else {
+        //     arrow([temp.x,temp.y],[g.lx-2,temp.y],0,16,4);
+        // }
+        
     }
-    
+
+    let test = false;
 
     g.dewPoint = (map(xH,g.lx,g.rx,-10,55)).toFixed(0);
     g.dryBulb = (map(temp.x,g.lx,g.rx,-10,55)).toFixed(0);
     g.wetBulb = (map(t[0],g.lx,g.rx,-10,55)).toFixed(0);
-
-
 }
 
 function otherCalcs(){
@@ -322,8 +532,7 @@ function otherCalcs(){
             inter[0] = (H.b[0]-b)/(m-H.m);
             inter[1] = m*temp.x + b;
             let currentDist = ((inter[1]-temp.y)**2 + (inter[0]-temp.x)**2)**(1/2);
-            
-
+        
             g.enthalp = (0-10*currentDist/Hmag_dist).toFixed(0)
         } else if(temp.y <= y1 && temp.y >= y2){ // Everywhere else
             let dY = (y1 - y2);
@@ -341,18 +550,52 @@ function otherCalcs(){
         }
     }
 
+    p1[0] = map(-9.42,-10,55,g.lx,g.rx);
+    p1[1] = map(vOmega(-9.42,-5.5),0,0.033,g.by,g.ty);
+    m = -1/V.m;
+    b = p1[1] - m*p1[0];
+    p2[0] = (V.b[1]-b)/(m-V.m);
+    p2[1] = m*p2[0] + b;
+    let Vmag_dist = ((p2[1]-p1[1])**2 + (p2[0]-p1[1])**2)**(1/2);
+
     for(let i = 0; i < V.b.length-1; i++){
         let y1 = V.m*temp.x + V.b[i];
         let y2 = V.m*temp.x + V.b[i+1];
         if(temp.y >= y1 && temp.y >= y2){
-
+            let inter = [0,0];
+            inter[0] = (V.b[0]-b)/(m-V.m);
+            inter[1] = m*temp.x + b;
+            let currentDist = ((inter[1]-temp.y)**2 + (inter[0]-temp.x)**2)**(1/2);
+            g.volume = (.75-.05*currentDist/Vmag_dist).toFixed(2);
         } else if(temp.y <= y1 && temp.y >= y2){
             let dY = (y1 - y2);
             let dC = (y1 - temp.y);
             g.volume = ((0.05*i+.75)*(1-dC/dY) + (0.05*(i+1)+.75)*(dC/dY)).toFixed(2);
+            break;
         } else if (temp.y <= y1 && temp.y <= y2){ // Above the .95 line
-            let ratio = y2/temp.y;
-            //g.volume = .95 + .05*(ratio-1);
+            b = temp.y - m*temp.x;
+            let inter = [0,0];
+            inter[0] = (V.b[V.b.length-1]-b)/(m-V.m);
+            inter[1] = m*temp.x + b;
+            let currentDist = ((inter[1]-temp.y)**2 + (inter[0]-temp.x)**2)**(1/2);
+
+            g.volume = (.95 + .05*currentDist/Vmag_dist).toFixed(2);
+        }
+    }
+
+    // Calculating relative humidity value
+    for(let i = 1; i < 10; i++){
+        let T = map(temp.x,g.lx,g.rx,-10,55);
+        let h = map(temp.y,g.by,g.ty,0,.033);
+        let y1 = phiOmega(i/10,T);
+        let y2 = phiOmega((i+1)/10,T);
+        if(h >= y1 && h <= y2){
+            let dY = y2 - y1;
+            let dC = h - y1;
+            g.relativeHum = ((10*i)*(1-dC/dY) + (10*(i+1))*(dC/dY)).toFixed(0);
+        } else if (i == 1 && h < y1){
+            let ratio = h/y1;
+            g.relativeHum = (10-9*(1-ratio)).toFixed(0);
         }
     }
 }
