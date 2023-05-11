@@ -32,10 +32,36 @@ gvs.Ty2 = function(z) {
   return T_sol
 }
 
+gvs.inverse_Ty1 = function(T) {
+  let delta = 1e6;
+  let x_guess = 0;
+  for(let x = gvs.intersection_point; x < 1; x += 0.01) {
+    const T_error = Math.abs(T - gvs.Ty1(x));
+    if(T_error < delta) {
+      delta = T_error;
+      x_guess = x;
+    }
+  }
+  return x_guess
+}
+
+gvs.inverse_Ty2 = function(T) {
+  let delta = 1e6;
+  let x_guess = 0;
+  for(let x = 0; x < gvs.intersection_point; x += 0.0025) {
+    const T_error = Math.abs(T - gvs.Ty2(x));
+    if(T_error < delta) {
+      delta = T_error;
+      x_guess = x;
+    }
+  }
+  return x_guess
+}
+
 function intersectionPoint() {
   let delta = 1e6;
   let x_guess = 0.5;
-  for(let x = 0.54; x < 0.60; x += 0.01) {
+  for(let x = 0.54; x < 0.60; x += 0.0025) {
     const d = Math.abs(gvs.Ty2(x) - gvs.Ty1(x));
     if(d < delta) {
       delta = d;
@@ -61,48 +87,59 @@ function calculateTemperature() {
   const Q = gvs.Q * 1000;
   let Q_bubble;
   let Q_dew;
-  let moles_of_other_liquid_evaporated;
-  let moles_of_liquid_remaining;
   let Hvap;
   if(gvs.x < gvs.intersection_point) {
-    const moles_of_benzene = gvs.x;
-    Hvap = Hvap_benzene * moles_of_benzene;
-    Q_bubble = Q_subcooled + Hvap * 2;
-    moles_of_other_liquid_evaporated = Hvap / Hvap_water;
-    moles_of_liquid_remaining = (1 - gvs.x) - moles_of_other_liquid_evaporated;
-    Q_dew = Q_bubble + moles_of_liquid_remaining * Hvap_water;
+    Hvap = Hvap_water * (1 - gvs.x) * 2;
+    Q_bubble = Q_subcooled + Hvap;
   } else {
-    const moles_of_water = (1 - gvs.x);
-    Hvap = Hvap_water * moles_of_water;
+    Hvap = Hvap_benzene * gvs.x * 2;
     Q_bubble = Q_subcooled + Hvap * 2;
-    moles_of_other_liquid_evaporated = Hvap / Hvap_benzene;
-    moles_of_liquid_remaining = gvs.x - moles_of_other_liquid_evaporated;
-    Q_dew = Q_bubble + moles_of_liquid_remaining * Hvap_benzene;
   }
+  Q_dew = Q_bubble + (1 - gvs.x) * Hvap_water + gvs.x * Hvap_benzene;
   if(Q < Q_subcooled) {
+    gvs.show_yB = false;
     gvs.T = gvs.T_initial + Q / Cp_liquid;
     gvs.moles_liquid_water = 1 - gvs.x;
     gvs.moles_liquid_benzene = gvs.x;
     gvs.moles_vapor = 0;
     gvs.vapor_composition = gvs.intersection_point;
   } else if(Q < Q_bubble) {
+    gvs.show_yB = true;
+    gvs.yB = gvs.intersection_point;
     gvs.T = gvs.bubble_point;
     if(gvs.x < gvs.intersection_point) {
-      gvs.moles_liquid_water = 1 - gvs.x - ((Q - Q_subcooled) / (Q_bubble - Q_subcooled)) * (1 - gvs.x);
-      gvs.moles_liquid_benzene = gvs.x - (Q - Q_subcooled) / Hvap_benzene / 2;
-    } else {
-      gvs.moles_liquid_water = (1 - gvs.x) - (Q - Q_subcooled) / Hvap_water / 2;
+      const moles_water_remaining = (gvs.intersection_point - gvs.x) / gvs.intersection_point;
+      gvs.moles_liquid_water = 1 - gvs.x - ((Q - Q_subcooled) / (Q_bubble - Q_subcooled)) * (1 - gvs.x) + ((Q - Q_subcooled) / (Q_bubble - Q_subcooled)) * moles_water_remaining;
       gvs.moles_liquid_benzene = gvs.x - ((Q - Q_subcooled) / (Q_bubble - Q_subcooled)) * gvs.x;
+    } else {
+      const moles_benzene_remaining = (gvs.x - gvs.intersection_point) / (1 - gvs.intersection_point);
+      gvs.moles_liquid_water = 1 - gvs.x - ((Q - Q_subcooled) / (Q_bubble - Q_subcooled)) * (1 - gvs.x);
+      gvs.moles_liquid_benzene = gvs.x - ((Q - Q_subcooled) / (Q_bubble - Q_subcooled)) * gvs.x + ((Q - Q_subcooled) / (Q_bubble - Q_subcooled)) * moles_benzene_remaining;
     }
-    gvs.moles_vapor = gvs.x - gvs.moles_liquid_benzene + (1 - gvs.x) - gvs.moles_liquid_water;
+    gvs.moles_vapor = 1 - gvs.moles_liquid_benzene - gvs.moles_liquid_water;
     gvs.vapor_composition = gvs.intersection_point;
   } else if(Q < Q_dew) {
+    gvs.show_yB = true;
     if(gvs.x < gvs.intersection_point) {
       gvs.T = gvs.bubble_point + ((Q - Q_bubble) / (Q_dew - Q_bubble)) * (gvs.Ty2(gvs.x) - gvs.bubble_point);
+      const x_dew = gvs.inverse_Ty2(gvs.T);
+      gvs.moles_liquid_water = (x_dew - gvs.x) / (x_dew - 0);
+      gvs.moles_liquid_benzene = 0;
+      gvs.moles_vapor = 1 - gvs.moles_liquid_water;
+      gvs.yB = x_dew;
     } else {
       gvs.T = gvs.bubble_point + ((Q - Q_bubble) / (Q_dew - Q_bubble)) * (gvs.Ty1(gvs.x) - gvs.bubble_point);
+      const x_dew = gvs.inverse_Ty1(gvs.T);
+      gvs.moles_liquid_water = 0;
+      gvs.moles_liquid_benzene = (gvs.x - x_dew) / (1 - x_dew);
+      gvs.moles_vapor = 1 - gvs.moles_liquid_benzene;
+      gvs.yB = x_dew;
     }
   } else {
+    gvs.show_yB = true;
+    gvs.moles_liquid_water = 0;
+    gvs.moles_liquid_benzene = 0;
+    gvs.yB = gvs.x;
     if(gvs.x < gvs.intersection_point) {
       gvs.T = gvs.Ty2(gvs.x) + (Q - Q_dew) / Cp_vapor;
     } else {

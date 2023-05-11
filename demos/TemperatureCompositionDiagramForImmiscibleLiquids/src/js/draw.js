@@ -143,10 +143,58 @@ function drawPoint(p) {
   p.pop();
 }
 
+function drawBarChart(p) {
+  p.push();
+  p.translate(margin_left + plot_width + 100, margin_top + plot_height);
+  p.noFill();
+  p.stroke(0);
+  p.strokeWeight(1);
+  p.line(0, 0, 0, -1 * plot_height);
+  p.line(0, 0, 200, 0);
+  p.textSize(15);
+  p.textAlign(p.RIGHT, p.CENTER);
+  p.rectMode(p.CORNERS);
+  for(let y = 0; y <= 1.00; y += 0.05) {
+    y = Math.round(y * 100) / 100;
+    let tickLength;
+    let modulus = Math.round((y % 0.20) * 100) / 100;
+    const y_Pix = -1 * plot_height * y;
+    if(modulus === 0 || modulus === 0.20) {
+      tickLength = 5;
+      p.fill(0);
+      p.noStroke();
+      p.text(y.toFixed(1), -5, y_Pix);
+    } else {
+      tickLength = 2;
+    }
+    p.noFill();
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.line(0, y_Pix, tickLength, y_Pix);
+  }
+  p.fill(0, 0, 255);
+  p.stroke(0);
+  p.rect(5, 0, 60, gvs.moles_liquid_water * -1 * plot_height);
+  p.fill(255, 200, 150);
+  p.rect(70, 0, 125, gvs.moles_liquid_benzene * -1 * plot_height);
+  p.fill(100, 255, 100);
+  p.rect(135, 0, 190, gvs.moles_vapor * -1 * plot_height);
+  if(gvs.show_yB) {
+    p.fill(0);
+    p.noStroke();
+    p.textAlign(p.CENTER, p.CENTER);
+    p.text(`y  = ${(Math.round(gvs.yB * 100) / 100).toFixed(2)}`, 160, gvs.moles_vapor * -1 * plot_height - 12);
+    p.textSize(9);
+    p.text("B", 142, gvs.moles_vapor * -1 * plot_height - 7)
+  }
+  p.pop();
+}
+
 function drawAll(p) {
   drawLines(p);
   drawAxes(p);
   drawPoint(p);
+  drawBarChart(p);
 }
 
 module.exports = drawAll;

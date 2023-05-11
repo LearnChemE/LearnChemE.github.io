@@ -9,6 +9,8 @@ window.gvs = {
     P : 12.5,
     Q : 0,
     x : 0.5,
+    yB : 0.5,
+    show_yB : false,
     show_labels : false,
     plot : {
         margins: [[80, 350], [80, 80]],
