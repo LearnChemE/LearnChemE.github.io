@@ -6,7 +6,12 @@ window.p5 = new require("./js/p5.min.js");
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
-
+    plot : {
+        margins: [[100, 50], [40, 80]],
+        labels: [["vapor mole fraction", ""], ["", "liquid mole fraction"]],
+        domain: [0, 1, 0.2, 0.05],
+        range: [0, 1, 0.2, 0.05],
+    },
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -17,9 +22,8 @@ const sketch = (p) => {
         p.createCanvas(800, 530);
         p.noLoop();
         gvs.p = p;
+        gvs.calcAll = require("./js/calcs.js");
         gvs.drawAll = require("./js/draw.js");
-        // const { SVG_Graph } = require("./js/svg-graph-library.js");
-        // gvs.SVG_Graph = SVG_Graph;
         require("./js/inputs.js");
         
         p.windowResized = function() {
