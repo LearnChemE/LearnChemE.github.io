@@ -8,8 +8,8 @@ gvs.Psat2 = function(T) {
 
 gvs.Ty1 = function(z) {
   let delta = 1e6;
-  let T_sol = 100;
-  for(let T = 100; T <= 220; T += 0.1) {
+  let T_sol = 140;
+  for(let T = 140; T <= 220; T += 0.1) {
     const T_error = Math.abs(gvs.Psat1(T) / gvs.P - z);
     if(T_error < delta) {
       T_sol = T;
@@ -21,8 +21,8 @@ gvs.Ty1 = function(z) {
 
 gvs.Ty2 = function(z) {
   let delta = 1e6;
-  let T_sol = 100;
-  for(let T = 100; T <= 220; T += 0.1) {
+  let T_sol = 140;
+  for(let T = 140; T <= 220; T += 0.1) {
     const T_error = Math.abs(1 - gvs.Psat2(T) / gvs.P - z);
     if(T_error < delta) {
       T_sol = T;
@@ -35,7 +35,7 @@ gvs.Ty2 = function(z) {
 gvs.inverse_Ty1 = function(T) {
   let delta = 1e6;
   let x_guess = 0;
-  for(let x = gvs.intersection_point; x < 1; x += 0.01) {
+  for(let x = gvs.intersection_point; x < 1; x += 0.005) {
     const T_error = Math.abs(T - gvs.Ty1(x));
     if(T_error < delta) {
       delta = T_error;
@@ -48,7 +48,7 @@ gvs.inverse_Ty1 = function(T) {
 gvs.inverse_Ty2 = function(T) {
   let delta = 1e6;
   let x_guess = 0;
-  for(let x = 0; x < gvs.intersection_point; x += 0.0025) {
+  for(let x = 0; x < gvs.intersection_point; x += 0.005) {
     const T_error = Math.abs(T - gvs.Ty2(x));
     if(T_error < delta) {
       delta = T_error;
@@ -61,7 +61,7 @@ gvs.inverse_Ty2 = function(T) {
 function intersectionPoint() {
   let delta = 1e6;
   let x_guess = 0.5;
-  for(let x = 0.54; x < 0.60; x += 0.0025) {
+  for(let x = 0.54; x < 0.60; x += 0.005) {
     const d = Math.abs(gvs.Ty2(x) - gvs.Ty1(x));
     if(d < delta) {
       delta = d;
@@ -87,13 +87,22 @@ function calculateTemperature() {
   const Q = gvs.Q * 1000;
   let Hvap;
   if(gvs.x < gvs.intersection_point) {
-    Hvap = Hvap_water * (1 - gvs.x) * 2;
+    Hvap = Hvap_benzene * gvs.x + Hvap_water * ((1 - gvs.x) - ( gvs.intersection_point - gvs.x) / gvs.intersection_point);
     gvs.Q_bubble = gvs.Q_subcooled + Hvap;
   } else {
-    Hvap = Hvap_benzene * gvs.x * 2;
-    gvs.Q_bubble = gvs.Q_subcooled + Hvap * 2;
+    Hvap = Hvap_water * (1 - gvs.x) + Hvap_benzene * (gvs.x - (gvs.x - gvs.intersection_point) / (1 - gvs.intersection_point));
+    gvs.Q_bubble = gvs.Q_subcooled + Hvap;
   }
-  gvs.Q_dew = gvs.Q_bubble + (1 - gvs.x) * Hvap_water + gvs.x * Hvap_benzene;
+  if(gvs.x < gvs.intersection_point) {
+    gvs.Q_dew = gvs.Q_bubble + Hvap_water * (gvs.intersection_point - gvs.x) / gvs.intersection_point;
+  } else {
+    gvs.Q_dew = gvs.Q_bubble + Hvap_benzene * (gvs.x - gvs.intersection_point) / (1 - gvs.intersection_point);
+  }
+  if(gvs.x < gvs.intersection_point) {
+    gvs.Q_dew += (gvs.Ty2(gvs.x) - gvs.bubble_point) * Cp_benzene_vapor * gvs.moles_vapor + (gvs.Ty2(gvs.x) - gvs.bubble_point) * Cp_water_liquid * gvs.moles_liquid_water;
+  } else {
+    gvs.Q_dew += (gvs.Ty1(gvs.x) - gvs.bubble_point) * Cp_water_vapor * gvs.moles_vapor + (gvs.Ty1(gvs.x) - gvs.bubble_point) * Cp_benzene_liquid * gvs.moles_liquid_benzene;
+  }
   if(Q < gvs.Q_subcooled) {
     gvs.show_yB = false;
     gvs.T = gvs.T_initial + Q / Cp_liquid;

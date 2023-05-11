@@ -59,7 +59,7 @@ $modal-xl: 1140px;
         }
 
         &.long-slider {
-            grid-template-columns: 80px 13rem 20px 50px;
+            grid-template-columns: 80px 13rem 13px 50px;
             width: 300px;
         }
     }
@@ -67,7 +67,7 @@ $modal-xl: 1140px;
     .buttons-row {
         display: grid;
         grid-template-columns: max-content max-content;
-        gap: 20px;
+        gap: 15px;
         align-items: center;
         justify-self: start;
         transform: translateX(80px);

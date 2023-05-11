@@ -145,9 +145,9 @@ function drawLines(p) {
   p.endShape();
 
   p.beginShape();
-  for(let x = 0; x < gvs.intersection_point; x += 0.01) {
-    x = Math.round(x * 1000) / 1000;
-    const pix = coordToPix(x, gvs.Ty2(x));
+  for(let x = 0; x <= gvs.intersection_point; x += 0.01) {
+    x = Math.min(gvs.intersection_point, Math.round(x * 1000) / 1000);
+    const pix = coordToPix(x, Math.max(gvs.bubble_point, gvs.Ty2(x)));
     p.vertex(pix[0], pix[1]);
   }
   p.endShape();
@@ -207,7 +207,22 @@ function drawPoint(p) {
   p.fill(0);
   const point_pix = coordToPix(gvs.x, gvs.T);
   p.circle(point_pix[0], point_pix[1], 8);
-
+  if(gvs.Q * 1000 > gvs.Q_subcooled) {
+    p.fill(253);
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.drawingContext.setLineDash([1, 0]);
+    const y_label_pix = coordToPix(gvs.yB, 115);
+    p.rectMode(p.CENTER);
+    p.rect(y_label_pix[0], y_label_pix[1], 70, 24);
+    p.fill(0);
+    p.noStroke();
+    p.textAlign(p.CENTER, p.CENTER);
+    p.textSize(14);
+    p.text(`y  = ${(Math.round(100 * gvs.yB) / 100).toFixed(2)}`, y_label_pix[0], y_label_pix[1]);
+    p.textSize(9);
+    p.text("B", y_label_pix[0] - 17, y_label_pix[1] + 5);
+  }
   p.pop();
 }
 

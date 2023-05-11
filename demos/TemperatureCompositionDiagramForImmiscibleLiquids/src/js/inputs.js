@@ -41,11 +41,11 @@ function resetConditions() {
   gvs.P = 12.5;
   gvs.Q = 0;
   gvs.x = 0.5;
-  gvs.show_labels = false;
+  gvs.show_labels = true;
   pressureSlider.value = "12.5";
   pressureValue.innerHTML = "12.5";
-  xSlider.value = "0.5";
-  xValue.innerHTML = "0.50";
+  xSlider.value = "0.4";
+  xValue.innerHTML = "0.40";
   QSlider.value = "0";
   QValue.innerHTML = "0";
   gvs.p.redraw();
