@@ -45,7 +45,7 @@
         <div class="data-value" id="x-value">0.40</div>
       </div>
 
-      <div class="input-row short">
+      <div class="input-row long-slider">
         <div class="data-name">Add heat</div>
         <input type="range" id="Q-slider" min="0" max="160" step="0.01" value="0">
         <div class="data-value" id="Q-value">0</div>
@@ -53,7 +53,7 @@
       </div>
 
       <div class="buttons-row">
-        <div id="reset">reset to original conditions</div>
+        <div id="reset">reset conditions</div>
         <div class="checkbox-container">
           <div>show labels</div>
           <input type="checkbox" id="show-labels" checked>
@@ -84,7 +84,7 @@
         </div>
         <div class="modal-body">
           <p>
-            Directions
+            The temperature-composition phase diagram for two immiscible liquids, benzene and water, is at constant pressure. Set the pressure with a slider to change the saturation temperature. Set the overall benzene mole fraction with its slider. The bar graph shows the moles of liquid water (blue), liquid benzene (orange) and vapor (red), which contain both components. The system contains one mole total. You can add heat to change the temperature and the amounts in each phase. At a given pressure, all three phases co-exist at only one temperature. When heat is added at this temperature, one of the liquid phases completely evaporates before the temperature increases.
           </p>
 
         </div>
@@ -105,12 +105,48 @@
         </div>
 
         <div class="modal-body">
-          <div class="details-text">Details</div>
+          <div class="details-text">
+            The pressure \( P \) of the vapor above two immiscible liquids, benzene and water, is the sum of the individual saturation pressures \( P_{b}^{sat} \) (benzene) and \( P_{w}^{sat} \) (water):
+          </div>
 
           <div class="details-eqn">
             $$
-
+            [1] \quad P = P_{b}^{sat} + P_{w}^{sat}
             $$
+          </div>
+
+          <div class="details-text">
+            The Antoine equation is used to calculate the saturation pressures:
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [2] \quad P_{i}^{sat} = 10^{(A_{i} - \frac{B_{i}}{T + C_{i}})}
+            $$
+          </div>
+
+          <div class="details-text">
+            where \( A_{i} \), \( B_{i} \), and \( C_{i} \) are Antoine constants for component \( i = b,w \), and \( T \) is temperature (°C). The dew point curves for the two liquids can be found by solving the following equations for temperature. For conditions where liquid water is present:
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [3] \quad \frac{P_{b}^{sat}(T)}{P} = y_{b}
+            $$
+          </div>
+
+          <div class="details-text">
+            and for conditions where liquid benzene is present:
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [4] \quad \frac{P_{w}^{sat}(T)}{P} = y_{w}
+            $$
+          </div>
+
+          <div class="details-text">
+            where \( y_{b} \) and \( y_{w} \) are the vapor mole fractions for benzene and water.
           </div>
           
           <div style="margin-top: 2rem;"></div>

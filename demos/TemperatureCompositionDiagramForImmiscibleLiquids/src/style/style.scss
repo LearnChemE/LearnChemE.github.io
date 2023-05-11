@@ -57,6 +57,11 @@ $modal-xl: 1140px;
         &.short {
             grid-template-columns: 80px 8rem 27px 50px;
         }
+
+        &.long-slider {
+            grid-template-columns: 80px 13rem 20px 50px;
+            width: 300px;
+        }
     }
 
     .buttons-row {
@@ -65,6 +70,7 @@ $modal-xl: 1140px;
         gap: 20px;
         align-items: center;
         justify-self: start;
+        transform: translateX(80px);
 
         #reset {
             background-color: rgb(255, 81, 81);
