@@ -6,9 +6,11 @@ window.p5 = new require("./js/p5.min.js");
 
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
+    include_friction: false,
     inlet_pressure: 100, // mmH2O
     outer_diameter: 20, // mm
-    inner_diameter: 10, // mm
+    inner_diameter: 12, // mm
+    flow_velocity: 0.25, // m/s
     manometer_1_pressure: 100, // mmH2O
     manometer_2_pressure: 100, // mmH2O
     manometer_3_pressure: 100, // mmH2O
