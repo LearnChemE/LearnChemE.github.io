@@ -14,6 +14,10 @@ const margin_bottom = gvs.plot.margins[1][1];
 const plot_width = gvs.p.width - margin_left - margin_right;
 const plot_height = gvs.p.height - margin_bottom - margin_top;
 
+const water_color = "rgb(0, 0, 255)";
+const benzene_color = "rgb(255, 200, 150)";
+const vapor_color = "rgb(255, 0, 0)";
+
 function coordToPix(x, y) {
 
   const xPix = margin_left + ((x - xMin) / (xMax - xMin)) * plot_width;
@@ -108,6 +112,27 @@ function drawAxes(p) {
 
 function drawLines(p) {
   p.push();
+  if(gvs.show_labels) {
+    p.noStroke();
+    p.textSize(15);
+    p.fill(water_color);
+    const pix1 = coordToPix(0.05, gvs.bubble_point + 2);
+    p.text("water + ", pix1[0], pix1[1]);
+    p.fill(vapor_color);
+    p.text("vapor", pix1[0] + 55, pix1[1]);
+    const pix2 = coordToPix(0.66, gvs.bubble_point + 2);
+    p.text("vapor + ", pix2[0], pix2[1]);
+    p.fill(benzene_color);
+    p.text("benzene", pix2[0] + 55, pix2[1]);
+    const pix3 = coordToPix(0.05, 105);
+    p.fill(water_color);
+    p.text("water + ", pix3[0], pix3[1]);
+    p.fill(benzene_color);
+    p.text("benzene", pix3[0] + 55, pix3[1]);
+    p.fill(vapor_color);
+    const pix4 = coordToPix(0.8, 210);
+    p.text("vapor", pix4[0], pix4[1]);
+  }
   p.stroke(0);
   p.noFill();
   p.strokeWeight(1);
@@ -136,10 +161,53 @@ function drawLines(p) {
 
 function drawPoint(p) {
   p.push();
+  p.noFill();
+  p.strokeWeight(2);
+  p.drawingContext.setLineDash([5, 5]);
+  if(gvs.Q * 1000 < gvs.Q_subcooled) {
+    p.stroke(benzene_color);
+    let pix1 = coordToPix(gvs.x, gvs.T);
+    let pix2 = coordToPix(0, gvs.T);
+    p.line(pix1[0], pix1[1], pix2[0], pix2[1]);
+    p.stroke(water_color);
+    pix2 = coordToPix(1, gvs.T);
+    p.line(pix1[0], pix1[1], pix2[0], pix2[1]);
+  }
+  if(gvs.Q * 1000 > gvs.Q_subcooled && gvs.Q * 1000 < gvs.Q_dew && gvs.x < gvs.intersection_point) {
+    p.stroke(vapor_color);
+    let pix1 = coordToPix(gvs.x, gvs.T);
+    let pix2 = coordToPix(0, gvs.T);
+    p.line(pix1[0], pix1[1], pix2[0], pix2[1]);
+    p.stroke(water_color);
+    pix2 = coordToPix(gvs.yB, gvs.T);
+    p.line(pix1[0], pix1[1], pix2[0], pix2[1]);
+    p.stroke(vapor_color);
+    let pix3 = coordToPix(gvs.yB, 100);
+    p.line(pix2[0], pix2[1], pix3[0], pix3[1]);
+  }
+  if(gvs.Q * 1000 > gvs.Q_subcooled && gvs.Q * 1000 < gvs.Q_dew && gvs.x >= gvs.intersection_point) {
+    p.stroke(vapor_color);
+    let pix1 = coordToPix(gvs.x, gvs.T);
+    let pix2 = coordToPix(1, gvs.T);
+    p.line(pix1[0], pix1[1], pix2[0], pix2[1]);
+    p.stroke(benzene_color);
+    pix2 = coordToPix(gvs.yB, gvs.T);
+    p.line(pix1[0], pix1[1], pix2[0], pix2[1]);
+    p.stroke(vapor_color);
+    let pix3 = coordToPix(gvs.yB, 100);
+    p.line(pix2[0], pix2[1], pix3[0], pix3[1]);
+  }
+  if(gvs.Q * 1000 >= gvs.Q_dew) {
+    p.stroke(vapor_color);
+    let pix1 = coordToPix(gvs.x, gvs.T);
+    let pix2 = coordToPix(gvs.x, 100);
+    p.line(pix1[0], pix1[1], pix2[0], pix2[1]);
+  }
   p.noStroke();
   p.fill(0);
   const point_pix = coordToPix(gvs.x, gvs.T);
   p.circle(point_pix[0], point_pix[1], 8);
+
   p.pop();
 }
 
@@ -172,12 +240,12 @@ function drawBarChart(p) {
     p.strokeWeight(1);
     p.line(0, y_Pix, tickLength, y_Pix);
   }
-  p.fill(0, 0, 255);
+  p.fill(water_color);
   p.stroke(0);
   p.rect(5, 0, 60, gvs.moles_liquid_water * -1 * plot_height);
-  p.fill(255, 200, 150);
+  p.fill(benzene_color);
   p.rect(70, 0, 125, gvs.moles_liquid_benzene * -1 * plot_height);
-  p.fill(100, 255, 100);
+  p.fill(vapor_color);
   p.rect(135, 0, 190, gvs.moles_vapor * -1 * plot_height);
   if(gvs.show_yB) {
     p.fill(0);
@@ -187,6 +255,30 @@ function drawBarChart(p) {
     p.textSize(9);
     p.text("B", 142, gvs.moles_vapor * -1 * plot_height - 7)
   }
+  p.pop();
+  p.push();
+  p.translate(margin_left + plot_width + 110, margin_top + plot_height + 37);
+  p.fill(0);
+  p.noStroke();
+  p.textSize(14);
+  p.rotate(-1 * Math.PI / 4);
+  p.text("water\n(liquid)", 0, 0);
+  p.pop();
+  p.push();
+  p.translate(margin_left + plot_width + 180, margin_top + plot_height + 47);
+  p.fill(0);
+  p.noStroke();
+  p.textSize(14);
+  p.rotate(-1 * Math.PI / 4);
+  p.text("benzene\n(liquid)", 0, 0);
+  p.pop();
+  p.push();
+  p.translate(margin_left + plot_width + 250, margin_top + plot_height + 37);
+  p.fill(0);
+  p.noStroke();
+  p.textSize(14);
+  p.rotate(-1 * Math.PI / 4);
+  p.text("vapor", 0, 0);
   p.pop();
 }
 

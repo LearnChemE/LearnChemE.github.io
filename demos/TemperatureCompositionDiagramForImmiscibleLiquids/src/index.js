@@ -8,10 +8,10 @@ window.p5 = new require("./js/p5.min.js");
 window.gvs = {
     P : 12.5,
     Q : 0,
-    x : 0.5,
+    x : 0.4,
     yB : 0.5,
     show_yB : false,
-    show_labels : false,
+    show_labels : true,
     plot : {
         margins: [[80, 350], [80, 80]],
         labels: [["temperature (°C)", ""], ["benzene + water", "benzene mole fraction"]],
@@ -26,6 +26,9 @@ window.gvs = {
     moles_liquid_benzene : 0.5,
     moles_vapor : 0,
     vapor_composition : 0.555,
+    Q_subcooled: 0,
+    Q_bubble: 0,
+    Q_dew: 0,
 };
 
 const containerElement = document.getElementById("p5-container");

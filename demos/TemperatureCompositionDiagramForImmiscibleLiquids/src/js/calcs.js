@@ -83,52 +83,50 @@ function calculateTemperature() {
 
   const Cp_liquid = gvs.x * Cp_benzene_liquid + (1 - gvs.x) * Cp_water_liquid;
   const Cp_vapor = gvs.x * Cp_benzene_vapor + (1 - gvs.x) * Cp_water_vapor;
-  const Q_subcooled = (gvs.bubble_point - gvs.T_initial) * Cp_liquid;
+  gvs.Q_subcooled = (gvs.bubble_point - gvs.T_initial) * Cp_liquid;
   const Q = gvs.Q * 1000;
-  let Q_bubble;
-  let Q_dew;
   let Hvap;
   if(gvs.x < gvs.intersection_point) {
     Hvap = Hvap_water * (1 - gvs.x) * 2;
-    Q_bubble = Q_subcooled + Hvap;
+    gvs.Q_bubble = gvs.Q_subcooled + Hvap;
   } else {
     Hvap = Hvap_benzene * gvs.x * 2;
-    Q_bubble = Q_subcooled + Hvap * 2;
+    gvs.Q_bubble = gvs.Q_subcooled + Hvap * 2;
   }
-  Q_dew = Q_bubble + (1 - gvs.x) * Hvap_water + gvs.x * Hvap_benzene;
-  if(Q < Q_subcooled) {
+  gvs.Q_dew = gvs.Q_bubble + (1 - gvs.x) * Hvap_water + gvs.x * Hvap_benzene;
+  if(Q < gvs.Q_subcooled) {
     gvs.show_yB = false;
     gvs.T = gvs.T_initial + Q / Cp_liquid;
     gvs.moles_liquid_water = 1 - gvs.x;
     gvs.moles_liquid_benzene = gvs.x;
     gvs.moles_vapor = 0;
     gvs.vapor_composition = gvs.intersection_point;
-  } else if(Q < Q_bubble) {
+  } else if(Q < gvs.Q_bubble) {
     gvs.show_yB = true;
     gvs.yB = gvs.intersection_point;
     gvs.T = gvs.bubble_point;
     if(gvs.x < gvs.intersection_point) {
       const moles_water_remaining = (gvs.intersection_point - gvs.x) / gvs.intersection_point;
-      gvs.moles_liquid_water = 1 - gvs.x - ((Q - Q_subcooled) / (Q_bubble - Q_subcooled)) * (1 - gvs.x) + ((Q - Q_subcooled) / (Q_bubble - Q_subcooled)) * moles_water_remaining;
-      gvs.moles_liquid_benzene = gvs.x - ((Q - Q_subcooled) / (Q_bubble - Q_subcooled)) * gvs.x;
+      gvs.moles_liquid_water = 1 - gvs.x - ((Q - gvs.Q_subcooled) / (gvs.Q_bubble - gvs.Q_subcooled)) * (1 - gvs.x) + ((Q - gvs.Q_subcooled) / (gvs.Q_bubble - gvs.Q_subcooled)) * moles_water_remaining;
+      gvs.moles_liquid_benzene = gvs.x - ((Q - gvs.Q_subcooled) / (gvs.Q_bubble - gvs.Q_subcooled)) * gvs.x;
     } else {
       const moles_benzene_remaining = (gvs.x - gvs.intersection_point) / (1 - gvs.intersection_point);
-      gvs.moles_liquid_water = 1 - gvs.x - ((Q - Q_subcooled) / (Q_bubble - Q_subcooled)) * (1 - gvs.x);
-      gvs.moles_liquid_benzene = gvs.x - ((Q - Q_subcooled) / (Q_bubble - Q_subcooled)) * gvs.x + ((Q - Q_subcooled) / (Q_bubble - Q_subcooled)) * moles_benzene_remaining;
+      gvs.moles_liquid_water = 1 - gvs.x - ((Q - gvs.Q_subcooled) / (gvs.Q_bubble - gvs.Q_subcooled)) * (1 - gvs.x);
+      gvs.moles_liquid_benzene = gvs.x - ((Q - gvs.Q_subcooled) / (gvs.Q_bubble - gvs.Q_subcooled)) * gvs.x + ((Q - gvs.Q_subcooled) / (gvs.Q_bubble - gvs.Q_subcooled)) * moles_benzene_remaining;
     }
     gvs.moles_vapor = 1 - gvs.moles_liquid_benzene - gvs.moles_liquid_water;
     gvs.vapor_composition = gvs.intersection_point;
-  } else if(Q < Q_dew) {
+  } else if(Q < gvs.Q_dew) {
     gvs.show_yB = true;
     if(gvs.x < gvs.intersection_point) {
-      gvs.T = gvs.bubble_point + ((Q - Q_bubble) / (Q_dew - Q_bubble)) * (gvs.Ty2(gvs.x) - gvs.bubble_point);
+      gvs.T = gvs.bubble_point + ((Q - gvs.Q_bubble) / (gvs.Q_dew - gvs.Q_bubble)) * (gvs.Ty2(gvs.x) - gvs.bubble_point);
       const x_dew = gvs.inverse_Ty2(gvs.T);
       gvs.moles_liquid_water = (x_dew - gvs.x) / (x_dew - 0);
       gvs.moles_liquid_benzene = 0;
       gvs.moles_vapor = 1 - gvs.moles_liquid_water;
       gvs.yB = x_dew;
     } else {
-      gvs.T = gvs.bubble_point + ((Q - Q_bubble) / (Q_dew - Q_bubble)) * (gvs.Ty1(gvs.x) - gvs.bubble_point);
+      gvs.T = gvs.bubble_point + ((Q - gvs.Q_bubble) / (gvs.Q_dew - gvs.Q_bubble)) * (gvs.Ty1(gvs.x) - gvs.bubble_point);
       const x_dew = gvs.inverse_Ty1(gvs.T);
       gvs.moles_liquid_water = 0;
       gvs.moles_liquid_benzene = (gvs.x - x_dew) / (1 - x_dew);
@@ -141,9 +139,9 @@ function calculateTemperature() {
     gvs.moles_liquid_benzene = 0;
     gvs.yB = gvs.x;
     if(gvs.x < gvs.intersection_point) {
-      gvs.T = gvs.Ty2(gvs.x) + (Q - Q_dew) / Cp_vapor;
+      gvs.T = gvs.Ty2(gvs.x) + (Q - gvs.Q_dew) / Cp_vapor;
     } else {
-      gvs.T = gvs.Ty1(gvs.x) + (Q - Q_dew) / Cp_vapor;
+      gvs.T = gvs.Ty1(gvs.x) + (Q - gvs.Q_dew) / Cp_vapor;
     }
   }
   gvs.T = Math.min(220, gvs.T);
