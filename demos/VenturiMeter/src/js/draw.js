@@ -6,7 +6,7 @@ function mmToPix(x, y) {
   return [xPix, yPix]
 }
 
-function drawVenturiMeter(p) {
+function drawAll(p) {
   p.push();
   p.translate(p.width / 2, p.height / 2 + 170);
 
@@ -336,11 +336,13 @@ function drawVenturiMeter(p) {
   coord3 = mmToPix(68, 0.5 * gvs.outer_diameter / 2 - 1);
   p.triangle(coord1[0], coord1[1], coord2[0], coord2[1], coord3[0], coord3[1]);
 
+  p.fill(0);
+  p.noStroke();
+  p.textSize(16);
+  p.textAlign(p.CENTER, p.CENTER);
+  p.text(`inlet velocity = ${gvs.flow_velocity} m/s`, -250, 60);
+  p.text(`choke velocity = ${(Math.round(gvs.v2 * 100) / 100).toFixed(2)} m/s`, 0, 60);
   p.pop();
-}
-
-function drawAll(p) {
-  drawVenturiMeter(p);
 }
 
 module.exports = drawAll;

@@ -11,6 +11,7 @@ window.gvs = {
     outer_diameter: 20, // mm
     inner_diameter: 12, // mm
     flow_velocity: 0.25, // m/s
+    v2: 0, // m/s
     manometer_1_pressure: 100, // mmH2O
     manometer_2_pressure: 100, // mmH2O
     manometer_3_pressure: 100, // mmH2O
