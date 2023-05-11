@@ -1,0 +1,129 @@
+$modal-sm: calc(100vw - 50px);
+$modal-md: calc(100vw - 50px);
+$modal-lg: 800px;
+$modal-xl: 1140px;
+@import "bootstrap";
+@import "./slider.scss";
+
+.simulation-controls {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    justify-content: center;
+    gap: 20px 30px;
+    width: 100vw;
+}
+
+.modal-buttons-row {
+    display: grid;
+    grid-template-columns: repeat(1, max-content);
+    gap: 5px;
+    margin: 0.5rem auto;
+    justify-content: center;
+    align-content: center;
+
+    .btn {
+        height: max-content;
+        width: 12ch;
+    }
+}
+
+#benzene-container {
+    grid-template-columns: max-content 8rem 27px;
+}
+
+.input-area {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    margin: 10px auto;
+    gap: 10px 20px;
+    width: max-content;
+    justify-items: center;
+    align-items: center;
+
+    .input-row {
+        display: grid;
+        grid-template-columns: 160px 8rem 27px 50px;
+        gap: 1ch;
+        align-items: end;
+
+        .data-name {
+            justify-self: end;
+        }
+
+        .data-value {
+            text-align: end;
+        }
+
+        &.short {
+            grid-template-columns: 80px 8rem 27px 50px;
+        }
+    }
+
+    .buttons-row {
+        display: grid;
+        grid-template-columns: max-content max-content;
+        gap: 20px;
+        align-items: center;
+        justify-self: start;
+
+        #reset {
+            background-color: rgb(255, 81, 81);
+            color: white;
+            border: 1px solid grey;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            cursor: pointer;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+
+            &:hover {
+                opacity: 0.8;
+            }
+
+            &.mousedown {
+                opacity: 0.5;
+            }
+        }
+
+        .checkbox-container {
+            display: grid;
+            grid-template-columns: max-content max-content;
+            gap: 10px;
+        }
+    }
+}
+
+#p5-container {
+    width: max-content;
+    margin: auto;
+}
+
+canvas {
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    box-shadow: 0px 0px 2px 2px lightgrey;
+}
+
+.modal.show {
+    padding-left: 0px !important;
+}
+
+.modal-body {
+    text-align: left;
+    font-size: 0.9rem;
+
+    .details-text {
+        margin-left: 20px;
+    }
+}
+
+*[disabled="yes"] {
+    opacity: 0.3 !important;
+    pointer-events: none;
+}

@@ -1,0 +1,37 @@
+{
+  "name": "t-x-diagram-for-immiscible-liquids",
+  "version": "1.0.0",
+  "description": "An interactive simulation designed to teach engineering students about T-x diagrams for immiscible liquids.",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --open --config ./_dev/webpack.config.js --mode=development",
+    "build": "webpack --config ./_dev/webpack.config.js --mode=production"
+  },
+  "keywords": [
+    "chemical engineering",
+    "simulation",
+    "interactive"
+  ],
+  "author": "Neil Hendren",
+  "license": "ISC",
+  "dependencies": {
+    "@popperjs/core": "^2.11.7",
+    "bootstrap": "^5.2.3",
+    "clean-webpack-plugin": "^4.0.0",
+    "css-loader": "^6.7.3",
+    "html-loader": "^4.2.0",
+    "html-webpack-plugin": "^5.5.1",
+    "mini-css-extract-plugin": "^2.7.5",
+    "popper.js": "^1.16.1",
+    "postcss-loader": "^7.3.0",
+    "sass": "^1.62.1",
+    "sass-loader": "^13.2.2",
+    "style-loader": "^3.3.2",
+    "terser-webpack-plugin": "^5.3.8",
+    "to-string-loader": "^1.2.0",
+    "uglify-js": "^3.17.4",
+    "webpack": "^5.82.1",
+    "webpack-cli": "^5.1.1",
+    "webpack-dev-server": "^4.15.0"
+  }
+}
