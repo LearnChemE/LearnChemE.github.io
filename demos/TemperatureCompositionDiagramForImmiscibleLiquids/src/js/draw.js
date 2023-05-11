@@ -112,7 +112,7 @@ function drawLines(p) {
   p.noFill();
   p.strokeWeight(1);
   p.beginShape();
-  for(let x = gvs.intersection_point; x < 1; x += 0.001) {
+  for(let x = gvs.intersection_point; x < 1; x += 0.01) {
     x = Math.round(x * 1000) / 1000;
     const pix = coordToPix(x, gvs.Ty1(x));
     p.vertex(pix[0], pix[1]);
@@ -120,7 +120,7 @@ function drawLines(p) {
   p.endShape();
 
   p.beginShape();
-  for(let x = 0; x < gvs.intersection_point; x += 0.001) {
+  for(let x = 0; x < gvs.intersection_point; x += 0.01) {
     x = Math.round(x * 1000) / 1000;
     const pix = coordToPix(x, gvs.Ty2(x));
     p.vertex(pix[0], pix[1]);
@@ -134,9 +134,19 @@ function drawLines(p) {
   p.pop();
 }
 
+function drawPoint(p) {
+  p.push();
+  p.noStroke();
+  p.fill(0);
+  const point_pix = coordToPix(gvs.x, gvs.T);
+  p.circle(point_pix[0], point_pix[1], 8);
+  p.pop();
+}
+
 function drawAll(p) {
   drawLines(p);
   drawAxes(p);
+  drawPoint(p);
 }
 
 module.exports = drawAll;

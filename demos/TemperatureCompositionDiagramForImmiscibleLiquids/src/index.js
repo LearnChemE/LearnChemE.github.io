@@ -18,6 +18,12 @@ window.gvs = {
     },
     intersection_point : 0.555,
     bubble_point : 156,
+    T_initial : 120,
+    T : 120,
+    moles_liquid_water : 0.5,
+    moles_liquid_benzene : 0.5,
+    moles_vapor : 0,
+    vapor_composition : 0.555,
 };
 
 const containerElement = document.getElementById("p5-container");
