@@ -129,10 +129,18 @@ function show5Display(){
         for(let i = 1; i < 6; i++){
             if(i == g.stage){
                 strokeWeight(4); fill(255,255,0);
-                rect(480,50+80*(i-1),110,40)
+                rect(480,50+80*(i-1),110,40);
+                push();
+                textSize(30); fill(0); 
+                text(i,525,81+80*(i-1));
+                pop();
             } else {
                 strokeWeight(1.5); fill(250);
                 rect(480,50+80*(i-1),110,40)
+                push();
+                textSize(22); fill(0); 
+                text(i,528,77+80*(i-1));
+                pop();
             }
         }
         pop();
@@ -146,7 +154,51 @@ function show5Display(){
             line(505,530-80*(i+1),505,495-80*(i+1));
             arrow([505,530-80*(i+1)],[505,490-80*(i+1)],g.green,20,6);
         }
+
+        // Other arrows and lines
+        line(480,450,505,450);
+        line(490,10,505,10);
+        line(505,10,505,50);
+        arrow([505,10],[470,10],g.green,20,6);
+        stroke(g.blue);
+        line(565,410,565,450);
+        line(565,450,580,450);
+        arrow([565,450],[600,450],g.blue,20,6);
+        line(590,10,565,10);
         pop();
+
+        // Non-italic elements
+        push();
+        textSize(22); fill(g.green); noStroke();
+        text('1 Mmol/h',400,-5);
+        text('1 Mmol/h',400,475);
+        fill(g.blue);
+        text('100 Mmol/h',580,-5);
+        text('100 Mmol/h',580,475);
+        pop();
+
+        // Value labels for x and y
+        push();
+        noStroke(); textSize(19);
+        for(let i = 0; i < 6; i++){
+            if(i == 0 || i == 5){
+                fill(g.green);
+
+                fill(g.blue);
+                
+            } else {
+                fill(g.green);
+
+                fill(g.blue);
+
+
+            }
+        }
+        pop();
+
+
+
+
         pop();
     }
 

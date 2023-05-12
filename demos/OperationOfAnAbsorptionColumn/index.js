@@ -26,6 +26,12 @@ window.g = {
     ty: 40,
     by: 360,
 
+    // Constants to be used
+    Ea: 5000,
+    R: 8.314,
+    T0: 298,
+    H0: 211.19,
+
 
 }
 
