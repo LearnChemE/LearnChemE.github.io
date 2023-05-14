@@ -15,6 +15,7 @@ function frame(){
         pop();
         arrowDraw();
         figureLabels();
+        pop();
     }
     
     function arrowDraw(){
@@ -91,7 +92,7 @@ function frame(){
         text('= '+g.L,532,280);
         pop();
     }
-    pop();
+    
 
     // Graph shape
     push(); fill(250);
@@ -112,15 +113,16 @@ function frame(){
 function show5Display(){
     let xLabels = ['0.0','0.1','0.2','0.3','0.4','0.5','0.6'];
     let yLabels = ['0','10','20','30','40','50','60'];
+    let flux = [21.6,36.5,54.1,74.9,99.6];
     let x = [0.05,0.12,0.20,0.29,0.41,0.54];
-    let y = [10,17,25,34,49,59];
-    
-    // X-ticks
-
-    // Y-ticks
+    let y = [10,17,25,34,46,59];
 
 
     figure();
+    graphAxes();
+    curves();
+    graphText();
+    // Figure on the right and all text associated
     function figure(){
         push();
         scale(.8); translate(160,40);
@@ -179,19 +181,57 @@ function show5Display(){
 
         // Value labels for x and y
         push();
-        noStroke(); textSize(19);
-        for(let i = 0; i < 6; i++){
-            if(i == 0 || i == 5){
+        noStroke(); textSize(20); 
+        for(let i = 0; i < 5; i++){
+            if(i == 0){
                 fill(g.green);
-
+                text(' = '+y[0],430,35);
+                text(' = '+y[y.length-1],430,445);
+                push();
+                textStyle(ITALIC);
+                text('y',410,35);
+                text('y',410,445);
+                pop();
+                push();
+                textSize(16);
+                text('1',421,42);
+                text('6',421,452);
+                pop();
                 fill(g.blue);
-                
+                text(' = '+x[0],630,35);
+                text('= '+x[x.length-1],630,445);
+                push();
+                textStyle(ITALIC);
+                text('x',610,35);
+                text('x',610,445);
+                pop();
+                push();
+                textSize(16);
+                text('0',621,42);
+                text('5',621,452);
+                pop();
+
             } else {
                 fill(g.green);
-
+                text(' = '+y[i],450,35+80*(i));
+                push();
+                textStyle(ITALIC);
+                text('y',430,35+80*(i));
+                pop();
+                push();
+                textSize(16);
+                text(i+1,441,42+80*i);
+                pop();
                 fill(g.blue);
-
-
+                text(' = '+x[i],600,35+80*i);
+                push();
+                textStyle(ITALIC);
+                text('x',580,35+80*i);
+                pop();
+                push();
+                textSize(16);
+                text(i,591,42+80*i);
+                pop();
             }
         }
         pop();
@@ -202,6 +242,216 @@ function show5Display(){
         pop();
     }
 
+    // Tick marks on x and y axes + labels
+    function graphAxes(){
+        // X-ticks
+        let ticks = 5;
+        let count = .7/.02;
+        for(let i = 0; i < count; i++){
+            if(i%ticks == 0){
+                line(g.lx+(g.rx-g.lx)/count*i,g.by,g.lx+(g.rx-g.lx)/count*i,g.by-5);
+                line(g.lx+(g.rx-g.lx)/count*i,g.ty,g.lx+(g.rx-g.lx)/count*i,g.ty+5);
+                push();
+                noStroke(); textSize(17);
+                text(xLabels[i/ticks],g.lx+(g.rx-g.lx)/count*i-10,g.by+20);
+                pop();
+            } else {
+                line(g.lx+(g.rx-g.lx)/count*i,g.by,g.lx+(g.rx-g.lx)/count*i,g.by-3);
+                line(g.lx+(g.rx-g.lx)/count*i,g.ty,g.lx+(g.rx-g.lx)/count*i,g.ty+3);
+            }
+        }
+        // Y-ticks
+        count = 64/2;
+        for(let i = 0; i < count; i++){
+            if(i%ticks == 0){
+                line(g.lx,g.by-(g.by-g.ty)/count*i,g.lx+5,g.by-(g.by-g.ty)/count*i);
+                line(g.rx,g.by-(g.by-g.ty)/count*i,g.rx-5,g.by-(g.by-g.ty)/count*i);
+                push();
+                noStroke(); textSize(17);
+                if(i == 0){
+                    text(yLabels[i/ticks],g.lx-13,g.by-(g.by-g.ty)/count*i+6);
+                } else {
+                    text(yLabels[i/ticks],g.lx-23,g.by-(g.by-g.ty)/count*i+6);
+                }
+                
+                pop();
+            } else {
+                line(g.lx,g.by-(g.by-g.ty)/count*i,g.lx+3,g.by-(g.by-g.ty)/count*i);
+                line(g.rx,g.by-(g.by-g.ty)/count*i,g.rx-3,g.by-(g.by-g.ty)/count*i);
+            }
+        }
+    }
+
+    // Draws the curve and connection points on the graph
+    function curves(){
+        let x1, x2, y1, y2;
+        x1 = map(x[0],0,.7,g.lx,g.rx);
+        x2 = map(x[1],0,.7,g.lx,g.rx);
+        y1 = map(y[0],0,64,g.by,g.ty);
+        y2 = map(y[1],0,64,g.by,g.ty);
+
+        let m = (y2 - y1)/(x2 - x1);
+        let b = y1 - m*x1;
+        let yL, xR;
+
+        yL = m*g.lx + b;
+        xR = (g.ty - b)/m;
+
+        push(); strokeWeight(2); stroke(g.pink);
+        line(g.lx,yL,xR,g.ty);
+        pop();
+
+        x1 = map(0,0,.7,g.lx,g.rx);
+        x2 = map(.7,0,.7,g.lx,g.rx);
+        y1 = map(0,0,64,g.by,g.ty);
+        y2 = map(59,0,64,g.by,g.ty);
+        m1 = (y2 - y1)/(x2 - x1);
+        b1 = y1 - m*x1;
+        // let xL = (g.by-b1)/m1;
+        // let yR = m1*g.rx + b1;
+
+        push(); strokeWeight(2); stroke(g.orange); 
+        line(x1,y1,x2,y2);
+        pop();
+
+        
+        for(let i = 1; i < 6; i++){
+            x1 = map(x[i],0,.7,g.lx,g.rx);
+            y1 = map(y[i-1],0,64,g.by,g.ty);
+            y2 = map(y[i],0,64,g.by,g.ty);
+            x2 = map(x[i-1],0,.7,g.lx,g.rx);
+            if(i == 4){
+                x1 = x1 - 1;
+                y1 = y1 - 1;
+            } else if(i == 5){
+                x1 = x1 + 1; 
+                y1 = y1 + 1;
+            } else if(i == 3){
+                x1 = x1 + 1;
+                y1 = y1 + 1;
+            }
+            push();
+            strokeWeight(2);
+            line(x1,y1,x1,y2);
+            line(x2,y1,x1,y1);
+            pop();
+        }
+        for(let i = 0; i < 6; i++){
+            if(i == 0){
+                x1 = map(0.05,0,.7,g.lx,g.rx);
+                y1 = map(10,0,64,g.by,g.ty);
+                push(); fill(g.blue); noStroke();
+                ellipse(x1,g.by,9);
+                fill(g.green);
+                ellipse(x1,y1,9);
+                pop();
+            } else {
+                x1 = map(x[i],0,.7,g.lx,g.rx);
+                y1 = map(y[i-1],0,64,g.by,g.ty);
+                y2 = map(y[i],0,64,g.by,g.ty);
+                x2 = map(x[i-1],0,.7,g.lx,g.rx);
+                if(i == 4){
+                    x1 = x1 - 1;
+                    y1 = y1 - 1;
+                } else if (i == 5){
+                    x1 = x1 + 1;
+                    y1 = y1 + 1;
+                } else if(i == 3){
+                    x1 = x1 + 1;
+                    y1 = y1 + 1;
+                }
+                
+                push();
+                fill(g.blue); noStroke();
+                ellipse(x1,y1,9);
+                pop();
+                push();
+                fill(g.green); noStroke(); 
+                ellipse(x1,y2,9);
+                pop();
+                
+            }
+        }
+
+        push();
+        strokeWeight(2); stroke(g.green); drawingContext.setLineDash([5,5]);
+        line(g.lx,y2,g.lx+51,y2);
+        line(g.lx+75,y2,g.rx,y2);
+        pop();
+       
+    }
+
+    // All the text and labels on the graph
+    function graphText(){
+        push();
+        noStroke(); textSize(16);
+
+        // Flux label
+        text('stage '+g.stage+' solute fluxes:',g.lx+10,g.ty+60);
+        text('in: '+flux[g.stage-1]+' mol/h',g.lx+40,g.ty+80);
+        text('out: '+flux[g.stage-1]+' mol/h',g.lx+33,g.ty+100);
+
+        // Equilibrium statement
+        text('is in equilibrium with',g.lx+100,g.by-15);
+        push();
+        fill(g.green); textStyle(ITALIC);
+        text('y',g.lx+80,g.by-15);
+        fill(g.blue);
+        text('x',g.lx+248,g.by-15);
+        textStyle(NORMAL); textSize(14);
+        text('n',g.lx+256,g.by-11);
+        fill(g.green);
+        text('n',g.lx+88,g.by-11);
+        pop();
+
+        // Top and bottom labels
+        push(); strokeWeight(1);
+        fill(250);
+        rect(g.lx+6,g.by-37.5,25,17);
+        fill(0);
+        text('top',g.lx+8,g.by-25);
+        text('bottom',g.rx-56,g.ty+20);
+        pop();
+
+        // Point labels
+        text('1,     ,',145,320);
+        text('2,     ,',180,285);
+        text('3,     ,',225,245);
+        text('4,     ,',275,200);
+        text('5,     ,',335,145);
+        textStyle(ITALIC);
+        fill(g.blue);
+        text('x',165,320);
+        text('x',200,285);
+        text('x',245,245);
+        text('x',295,200);
+        text('x',355,145);
+        text('x',g.lx+27,g.by-10);
+        fill(g.green);
+        text('y',190,320);
+        text('y',225,285);
+        text('y',270,245);
+        text('y',320,200);
+        text('y',380,145);
+        text('y',g.lx+55,68);
+
+        textStyle(NORMAL); textSize(13);
+        fill(g.blue);
+        text('0',g.lx+35,g.by-6);
+        text('1',173,324);
+        text('2,',208,289);
+        text('3',253,249);
+        text('4',303,204);
+        text('5',363,149);
+        fill(g.green);
+        text('1',198,324);
+        text('2',233,289);
+        text('3',278,249);
+        text('4',328,204);
+        text('5',388,149);
+        text('6',g.lx+63,72);
+        pop();
+    }
 }
 
 // For creating arrows

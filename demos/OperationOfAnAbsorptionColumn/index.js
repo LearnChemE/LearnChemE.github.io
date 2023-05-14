@@ -12,13 +12,13 @@ window.g = {
 
     // Checkboxes
     LVmin: false,
-    show5: true,
+    show5: false,
 
     // Colors to be used repeatedly
     blue: [0,0,200],
     green: [0,130,0],
     orange: [255,80,0],
-    pink: [150,0,200],
+    pink: [250,0,200],
 
     // Graph edges
     lx: 80,
