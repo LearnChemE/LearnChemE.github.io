@@ -34,11 +34,17 @@ window.g = {
     Lo: [0,0], // lower
     Up: [0,0], // upper
 
+    // Variables for determining if separation is possible
+    leftTest: true,
+    rightTest: true,
+
     // Constants to be used
     Ea: 5000,
     R: 8.314,
     T0: 298,
     H0: 211.19,
+
+    diam: 9,
 
 
 }
@@ -51,14 +57,17 @@ function setup(){
 function draw(){
     background(250);
     frame();
-    //console.log(xeq())
+    console.log(g.rightTest)
     if(g.show5){
         show5Display();
     } else {
         graphAxes();
         defineLines();
-        displayStages();
+        if(!g.LVmin){
+            displayStages(); 
+        }
     }
+    infiniteStageTest();
 }
 
 // EVENT LISTENERS

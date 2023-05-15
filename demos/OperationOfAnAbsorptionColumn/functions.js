@@ -229,11 +229,76 @@ function displayStages(){
     } else {
         xR = g.rx;
     }
-
     push();
     strokeWeight(2); stroke(g.pink);
     line(xL,yL,xR,yR);
     pop();
+
+    let x0, y1;
+
+    if(g.rightTest && g.leftTest){
+        x0andy1Disp();
+    }
+
+    function x0andy1Disp(){
+        x0 = map(g.x0,0,g.maxX,g.lx,g.rx);
+        y1 = map(g.y1,0,g.maxY,g.by,g.ty);
+        
+        push();
+        drawingContext.setLineDash([5,5]); strokeWeight(2);
+        stroke(g.blue);
+        line(x0,g.by,x0,y1);
+        stroke(g.green);
+        line(g.lx,y1,x0,y1);
+        pop();
+
+        push();
+        noStroke(); fill(250);
+        rect(x0-12,g.by+6,23,18);
+        rect(g.lx-26,y1-7,23,18);
+        textSize(19); fill(g.blue); textStyle(ITALIC);
+        text('x',x0-9,g.by+18);
+        fill(g.green);
+        text('y',g.lx-23,y1+5);
+        textStyle(NORMAL); textSize(14);
+        fill(g.blue);
+        text('0',x0+1,g.by+22);
+        fill(g.green);
+        text('1',g.lx-13,y1+9);
+        pop();
+
+        push();
+        noStroke(); fill(g.blue);
+        ellipse(x0,g.by,g.diam);
+        fill(g.green);
+        ellipse(g.lx,y1,g.diam);
+        pop();
+    }
+    
+}
+
+function infiniteStageTest(){
+    let yTest;
+
+    // Left side test (is pink line lower than orange line at left x-axis lim)
+    yTest = g.Up[0]*g.lx + g.Up[1];
+
+    if(yTest > g.by){
+        g.leftTest = false;
+    } else {
+        g.leftTest = true;
+    }
+
+    // Right side test (is pink line lower than orange line at right x-axis lim)
+
+    yTest = g.Up[0]*g.rx + g.Up[1];
+    let yComp = map(g.yN1,0,g.maxY,g.by,g.ty);
+    
+    if(yTest > yComp){
+        g.rightTest = false;
+    } else {
+        g.rightTest = true;
+    }
 }
 
 function show5Display(){
