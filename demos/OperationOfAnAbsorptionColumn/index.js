@@ -26,6 +26,14 @@ window.g = {
     ty: 40,
     by: 360,
 
+    // X and Y limit values for as the graph limits change
+    maxY: 105,
+    maxX: 0,
+
+    // Curve equations m and b values (pink and orange lines)
+    Lo: [0,0], // lower
+    Up: [0,0], // upper
+
     // Constants to be used
     Ea: 5000,
     R: 8.314,
@@ -43,9 +51,13 @@ function setup(){
 function draw(){
     background(250);
     frame();
-
+    //console.log(xeq())
     if(g.show5){
         show5Display();
+    } else {
+        graphAxes();
+        defineLines();
+        displayStages();
     }
 }
 

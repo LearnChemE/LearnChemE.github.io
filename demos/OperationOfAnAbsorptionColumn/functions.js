@@ -109,6 +109,132 @@ function frame(){
     pop();
 }
 
+// For drawing the changing axes
+function graphAxes(){
+    // Y axis
+    g.maxY = g.yN1 + 5;
+    let ticks, count;
+    let xLabels, yLabels;
+
+    if(g.yN1 < 75){
+        yLabels = [0,10,20,30,40,50,60,70];
+        ticks = 5;
+        count = g.maxY/2;
+    } else {
+        yLabels = [0,20,40,60,80,100,120];
+        ticks = 4;
+        count = g.maxY/5;
+    }
+
+    for(let i = 0; i < count; i++){
+        if(i%ticks == 0){
+            line(g.lx,g.by-(g.by-g.ty)/count*i,g.lx+5,g.by-(g.by-g.ty)/count*i);
+            line(g.rx,g.by-(g.by-g.ty)/count*i,g.rx-5,g.by-(g.by-g.ty)/count*i);
+            push();
+            noStroke(); textSize(17);
+            if(i == 0){
+                text(yLabels[i/ticks],g.lx-13,g.by-(g.by-g.ty)/count*i+6);
+            } else if(yLabels[i/ticks] > 99){
+                text(yLabels[i/ticks],g.lx-32,g.by-(g.by-g.ty)/count*i+6);
+            } else {
+                text(yLabels[i/ticks],g.lx-23,g.by-(g.by-g.ty)/count*i+6);
+            }
+            pop();
+        } else {
+            line(g.lx,g.by-(g.by-g.ty)/count*i,g.lx+3,g.by-(g.by-g.ty)/count*i);
+            line(g.rx,g.by-(g.by-g.ty)/count*i,g.rx-3,g.by-(g.by-g.ty)/count*i);
+        }
+    }
+
+    // X axis
+    //g.maxX = Math.round(xeq()*100)/100; 
+    g.maxX = xeq();
+    if (g.maxX < .8){
+        xLabels = [0,.1,.2,.3,.4,.5,.6,.7,.8,.9];
+        ticks = 5;
+        count = g.maxX/.02;
+    } else if (g.maxX <= 1.5){
+        xLabels = [0,.2,.4,.6,.8,1,1.2,1.4,1.6];
+        ticks = 4;
+        count = g.maxX/.05;
+    } else {
+        xLabels = [0,.5,1,1.5,2];
+        ticks = 5;
+        count = g.maxX/.1;
+    }
+
+    for(let i = 0; i < count; i++){
+        if(i%ticks == 0){
+            line(g.lx+(g.rx-g.lx)/count*i,g.by,g.lx+(g.rx-g.lx)/count*i,g.by-5);
+            line(g.lx+(g.rx-g.lx)/count*i,g.ty,g.lx+(g.rx-g.lx)/count*i,g.ty+5);
+            push();
+            noStroke(); textSize(17);
+            text(xLabels[i/ticks].toFixed(1),g.lx+(g.rx-g.lx)/count*i-12,g.by+20);
+            pop();
+        } else {
+            line(g.lx+(g.rx-g.lx)/count*i,g.by,g.lx+(g.rx-g.lx)/count*i,g.by-3);
+            line(g.lx+(g.rx-g.lx)/count*i,g.ty,g.lx+(g.rx-g.lx)/count*i,g.ty+3);
+        }
+    }
+}
+
+
+
+function defineLines(){
+    let x1, x2, y1, y2;
+    
+    // Orange line (g.Lo)
+    x1 = g.lx; y1 = g.by;
+    x2 = g.rx;
+    y2 = map(g.yN1,0,g.maxY,g.by,g.ty);
+
+    g.Lo[0] = (y2 - y1)/(x2 - x1);
+    g.Lo[1] = y1 - g.Lo[0]*x1;
+
+    // Pink line (g.Up)
+    // Values first to be converted to pixels
+    x1 = 0; y1 = YN1(0);
+    x2 = .2; y2 = YN1(.2);
+    x1 = map(x1,0,g.maxX,g.lx,g.rx);
+    y1 = map(y1,0,g.maxY,g.by,g.ty);
+    x2 = map(x2,0,g.maxX,g.lx,g.rx);
+    y2 = map(y2,0,g.maxY,g.by,g.ty);
+    g.Up[0] = (y2 - y1)/(x2 - x1);
+    g.Up[1] = y1 - g.Up[0]*x1;
+}
+
+function displayStages(){
+    // Draw boundary curves
+
+    // Orange line
+    push();
+    strokeWeight(2); stroke(g.orange);
+    line(g.lx,g.Lo[0]*g.lx+g.Lo[1],g.rx,g.Lo[0]*g.rx+g.Lo[1]);
+    pop();
+
+    // Pink line
+    // Need to determine where this line hits on the graph
+    let xL, xR, yL, yR;
+    yL = g.Up[0]*g.lx + g.Up[1];
+    if(yL > g.by){
+        yL = g.by;
+        xL = (g.by-g.Up[1])/g.Up[0];
+    } else {
+        xL = g.lx;
+    }
+    yR = g.Up[0]*g.rx + g.Up[1];
+    if(yR < g.ty){
+        yR = g.ty;
+        xR = (g.ty-g.Up[1])/g.Up[0];
+    } else {
+        xR = g.rx;
+    }
+
+    push();
+    strokeWeight(2); stroke(g.pink);
+    line(xL,yL,xR,yR);
+    pop();
+}
 
 function show5Display(){
     let xLabels = ['0.0','0.1','0.2','0.3','0.4','0.5','0.6'];
@@ -485,4 +611,22 @@ function arrow(base,tip,color,arrowLength,arrowWidth){
     triangle(vert[0],vert[1],vert[2],vert[3],vert[4],vert[5]);
     pop();
   
+}
+
+// Equation functions
+function HB(){
+    return(g.H0*Math.E**((-g.Ea/g.R)*(1/(g.T+273)-1/g.T0)))
+}
+
+function YN1(x){
+    return(g.L*(x-g.x0) + g.y1)
+}
+
+function yeq(x){
+    return(HB()*x/g.P);
+}
+
+function xeq(){
+    let x = g.yN1*g.P/HB();
+    return(x);
 }
