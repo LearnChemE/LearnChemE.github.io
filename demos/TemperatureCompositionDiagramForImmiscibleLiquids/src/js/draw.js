@@ -15,7 +15,7 @@ const plot_width = gvs.p.width - margin_left - margin_right;
 const plot_height = gvs.p.height - margin_bottom - margin_top;
 
 const water_color = "rgb(0, 0, 255)";
-const benzene_color = "rgb(255, 200, 150)";
+const benzene_color = "rgb(225, 170, 120)";
 const vapor_color = "rgb(255, 0, 0)";
 
 function coordToPix(x, y) {
@@ -294,6 +294,11 @@ function drawBarChart(p) {
   p.textSize(14);
   p.rotate(-1 * Math.PI / 4);
   p.text("vapor", 0, 0);
+  p.rotate(Math.PI / 4);
+  p.translate(-195, -160);
+  p.rotate(-1 * Math.PI / 2);
+  p.textSize(16);
+  p.text("moles of each phase", 0, 0);
   p.pop();
 }
 
