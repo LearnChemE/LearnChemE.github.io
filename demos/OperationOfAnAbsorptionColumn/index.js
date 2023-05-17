@@ -46,6 +46,8 @@ window.g = {
 
     diam: 9,
 
+    stagesCount: 8,
+
 
 }
 
@@ -57,7 +59,7 @@ function setup(){
 function draw(){
     background(250);
     frame();
-    console.log(g.rightTest)
+
     if(g.show5){
         show5Display();
     } else {

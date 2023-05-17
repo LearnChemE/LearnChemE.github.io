@@ -91,6 +91,23 @@ function frame(){
         textStyle(NORMAL);
         text('= '+g.L,532,280);
         pop();
+
+        // Number of stages on absorption column
+        if(!g.LVmin){
+            push();
+            noStroke(); textSize(18);
+            if(g.stagesCount == '∞'){
+                textSize(27);
+                text('∞',466,203);
+                textSize(18);
+                text('stages needed',487,200);
+            } else if(g.stagesCount < 10){
+                text(g.stagesCount+' stages needed',470,200);
+            } else {
+                text(g.stagesCount+' stages needed',465,200);
+            }
+            pop();
+        }
     }
     
 
@@ -238,6 +255,7 @@ function displayStages(){
 
     if(g.rightTest && g.leftTest){
         x0andy1Disp();
+        stagesSolveAndDisp();
     }
 
     function x0andy1Disp(){
@@ -273,7 +291,111 @@ function displayStages(){
         fill(g.green);
         ellipse(g.lx,y1,g.diam);
         pop();
+    }   
+    
+}
+
+function stagesSolveAndDisp(){
+    let xLim = map(g.x0,0,g.maxX,g.lx,g.rx);
+    let yStart = map(g.yN1,0,g.maxY,g.by,g.ty);
+
+    // xStart variable used to determine number of stages
+    let xStart = (yStart - g.Up[1])/g.Up[0];
+    let count = 0;
+    let x = 10000; 
+    let y;
+
+    let p = [];
+    p.push([xStart,yStart]);
+
+
+    while(x > xLim && count < 100){
+        // Find next vertical point (orange line)
+        if(count == 0){
+            x = xStart;
+            y = g.Lo[0]*xStart + g.Lo[1];
+        } else {
+            y = g.Lo[0]*x + g.Lo[1];
+        }
+        
+        p.push([x,y]);
+
+        // Find next horizontal point (pink line)
+        x = (y - g.Up[1])/g.Up[0];
+        
+        // Test if x < xLim
+        if(x < xLim){
+            x = xLim;
+        }
+        p.push([x,y]);
+        count++;
+        
     }
+
+    g.stagesCount = (p.length-1)/2;
+
+    push();
+    strokeWeight(2);
+    for(let i = 0; i < p.length-1; i++){
+        line(p[i][0],p[i][1],p[i+1][0],p[i+1][1]);
+    }
+    pop();
+
+    // Vertical dashed line for last x stage
+    push();
+    strokeWeight(2); drawingContext.setLineDash([5,5]); stroke(g.blue);
+    line(p[1][0],p[1][1],p[1][0],g.by);
+    noStroke(); fill(g.blue);
+    ellipse(p[1][0],p[1][1],g.diam);
+    pop();
+
+    // Y1 line
+    push();
+    strokeWeight(2); stroke(g.green); drawingContext.setLineDash([5,5]);
+    line(g.lx,yStart,g.rx,yStart);
+    pop();
+
+    // Text labels for last x stage and last y stage
+    push();
+    fill(250); noStroke();
+    if(g.stagesCount < 9){
+        rect(g.lx+51,yStart-8,21,20);
+    } else {
+        rect(g.lx+51,yStart-8,29,20);
+    }
+    if(g.stageCount < 10){
+        rect(p[1][0]-10,g.by-62,21,20);
+    } else {
+        rect(p[1][0]-10,g.by-62,29,20);
+    }
+    
+    textSize(16); textStyle(ITALIC); fill(g.green);
+    text('y',g.lx+55,yStart+3);
+    fill(g.blue);
+    text('x',p[1][0]-7,g.by-50);
+    textStyle(NORMAL); textSize(13);
+    text(g.stagesCount,p[1][0]+1,g.by-45);
+    fill(g.green);
+    text(g.stagesCount+1,g.lx+63,yStart+7);
+    pop();
+
+    if(g.stagesCount < 10){
+        for(let i = 1; i < 2*g.stagesCount; i+= 2){
+            push();
+            noStroke(); textSize(17); 
+            text(g.stagesCount-.5*(i-1),p[i][0]+5,p[i][1]+10)
+            pop();
+        }
+    } else {
+        push();
+        noStroke(); textSize(17);
+        text('1',p[p.length-2][0]+5,p[p.length-2][1]+10);
+        for(let i = 1; i < 16; i+=2){
+            text(g.stagesCount-.5*(i-1),p[i][0]+5,p[i][1]+10);
+        }
+        pop();
+    }
+
     
 }
 
@@ -294,8 +416,9 @@ function infiniteStageTest(){
     yTest = g.Up[0]*g.rx + g.Up[1];
     let yComp = map(g.yN1,0,g.maxY,g.by,g.ty);
     
-    if(yTest > yComp){
+    if(yTest >= yComp){
         g.rightTest = false;
+        g.stagesCount = '∞';
     } else {
         g.rightTest = true;
     }
