@@ -1,107 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Operation of an Absorption Column</title>
 
-        <script src="./libraries/p5.js"></script>
-        <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
-        <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
-        <meta name="author" content="Patrick Doyle">
-        <meta name="application-name" content="LearnChemE simulation template">
-        <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operation of an Absorption Column</title>
 
-        <link href="./sliders.css" rel="stylesheet">
-        <link href="./style.css" rel="stylesheet">
-        <link href="./bootstrap.min.css" rel="stylesheet">
-        <script>
-            MathJax = {
-                chtml: {
-                    scale: 0.95,
-                    mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
-                    displayAlign: 'left', // default for indentalign when set to 'auto'
-                }
-            };
-        </script>
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-        <script src="./jquery.js"></script>
-        <script src="./popper.js"></script>
-        <script src="./bootstrap.min.js"></script>
-    </head>
+    <script src="./libraries/p5.js"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+    <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
+    <meta name="author" content="Patrick Doyle">
+    <meta name="application-name" content="LearnChemE simulation template">
+    <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
 
-    <body>
-        <div id="simulation-wrapper">
-            <div class="simulation-controls">
-                <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
-                <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
-                <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>    
+    <link href="./sliders.css" rel="stylesheet">
+    <link href="./style.css" rel="stylesheet">
+    <link href="./bootstrap.min.css" rel="stylesheet">
+    <script>
+        MathJax = {
+            chtml: {
+                scale: 0.95,
+                mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+                displayAlign: 'left', // default for indentalign when set to 'auto'
+            }
+        };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="./jquery.js"></script>
+    <script src="./popper.js"></script>
+    <script src="./bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div id="simulation-wrapper">
+        <div class="simulation-controls">
+            <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions
             </div>
-            <div class="inputs-wrapper" style="transform:translateX(10px)">
-                <div class="input-area">
-                    <div class="input-row" id="label1">
-                        <div class="input-label" >inlet vapor mole ratio <i>y<sub>N</sub></i><sub>+1</sub> (ppm)</div>
-                        <input type="range" id="inlet-vapor-mole-ratio" min="40" max="120" value="100" step="1"/>
-                        <div id="inlet-vapor-mole-ratio-label" class="value-label">100</div>
-                    </div>
-                    <div class="input-row" id="label4" style="margin-left:50px">
-                        <div class="input-label">solvent flow rate (Mmol/h)</div>
-                        <input type="range" id="solvent-flow-rate" min="50" max="300" value="100" step="5"/>
-                        <div id="solvent-flow-rate-label" class="value-label">100</div>
-                    </div>
-                    <div class="input-row" id="label5">
-                        <div class="input-label"><b>mole ratios (ppm):</b> outlet vapor <i>y</i><sub>1</sub></div>
-                        <input type="range" id="outlet-vapor" min="10" max="25" value="10" step="1"/>
-                        <div id="outlet-vapor-label" class="value-label">10</div>
-                    </div>
-                    
-                </div>
-                <div class="input-area" style="margin-left:10px">
-                    <div class="input-row" id="label3" style="margin-left:15px">
-                        <div class="input-label">pressure (atm)</div>
-                        <input type="range" id="pressure" min="1.5" max="3" value="2.5" step=".1"/>
-                        <div id="pressure-label" class="value-label">2.5</div>
-                    </div>
-                    <div class="input-row" id="label2">
-                        <div class="input-label">temperature (°C)</div>
-                        <input type="range" id="temperature" min="20" max="100" value="25" step="5"/>
-                        <div id="temperature-label" class="value-label">25</div>
-                    </div>
-                    <div class="input-row" id="label6" style="margin-left:25px">
-                        <div class="input-label">inlet liquid <i>x</i><sub>0</sub></div>
-                        <input type="range" id="inlet-liquid" min="0" max=".25" value="0.05" step=".01"/>
-                        <div id="inlet-liquid-label" class="value-label">0.05</div>
-                    </div>
-                </div>
-                
-                <div class="select-container" style="margin-top:-30px; margin-right:-90px">
-                    <form>
-                        <label class="checkbox-inline" style="transform: translateX(0px)">
-                            <span class="checkmark" id="label7" style="margin-right:5px">(<i>L/V</i>)<sub>min</sub></span>
-                            <input type="checkbox" id="L-V-min">
-                        </label>
-                        <label class="checkbox-inline">
-                            <span class="checkmark" style="margin-right:5px">show diagram with 5 stages</span>
-                            <input type="checkbox" id="show-diagram">
-                        </label>
-                    </form>
-                </div>
-                <div class="input-row2" id="stage-slider" style="display:none;">
-                    <div class="input-label">stage</div>
-                    <input type="range" id="stage" min="1" max="5" value="1" step="1"/>
-                    <div id="stage-label" class="value-label">1</div>
-                </div>
-                
-            </div>
+            <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+            <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
         </div>
+        <div class="inputs-wrapper" style="transform:translateX(10px)">
+            <div class="input-area">
+                <div class="input-row" id="label1">
+                    <div class="input-label">inlet vapor mole ratio <i>y<sub>N</sub></i><sub>+1</sub> (ppm)</div>
+                    <input type="range" id="inlet-vapor-mole-ratio" min="40" max="120" value="100" step="1" />
+                    <div id="inlet-vapor-mole-ratio-label" class="value-label">100</div>
+                </div>
+                <div class="input-row" id="label4" style="margin-left:50px">
+                    <div class="input-label">solvent flow rate (Mmol/h)</div>
+                    <input type="range" id="solvent-flow-rate" min="50" max="300" value="100" step="5" />
+                    <div id="solvent-flow-rate-label" class="value-label">100</div>
+                </div>
+                <div class="input-row" id="label5">
+                    <div class="input-label"><b>mole ratios (ppm):</b> outlet vapor <i>y</i><sub>1</sub></div>
+                    <input type="range" id="outlet-vapor" min="10" max="25" value="10" step="1" />
+                    <div id="outlet-vapor-label" class="value-label">10</div>
+                </div>
 
-        <div id="graphics-wrapper">
+            </div>
+            <div class="input-area" style="margin-left:10px">
+                <div class="input-row" id="label3" style="margin-left:15px">
+                    <div class="input-label">pressure (atm)</div>
+                    <input type="range" id="pressure" min="1.5" max="3" value="2.5" step=".1" />
+                    <div id="pressure-label" class="value-label">2.5</div>
+                </div>
+                <div class="input-row" id="label2">
+                    <div class="input-label">temperature (°C)</div>
+                    <input type="range" id="temperature" min="20" max="100" value="25" step="5" />
+                    <div id="temperature-label" class="value-label">25</div>
+                </div>
+                <div class="input-row" id="label6" style="margin-left:25px">
+                    <div class="input-label">inlet liquid <i>x</i><sub>0</sub></div>
+                    <input type="range" id="inlet-liquid" min="0" max=".25" value="0.05" step=".01" />
+                    <div id="inlet-liquid-label" class="value-label">0.05</div>
+                </div>
+            </div>
+
+            <div class="select-container" style="margin-top:-30px; margin-right:-90px">
+                <form>
+                    <label class="checkbox-inline" style="transform: translateX(0px)">
+                        <span class="checkmark" id="label7" style="margin-right:5px">(<i>L/V</i>)<sub>min</sub></span>
+                        <input type="checkbox" id="L-V-min">
+                    </label>
+                    <label class="checkbox-inline">
+                        <span class="checkmark" style="margin-right:5px">show diagram with 5 stages</span>
+                        <input type="checkbox" id="show-diagram">
+                    </label>
+                </form>
+            </div>
+            <div class="input-row2" id="stage-slider" style="display:none;">
+                <div class="input-label">stage</div>
+                <input type="range" id="stage" min="1" max="5" value="1" step="1" />
+                <div id="stage-label" class="value-label">1</div>
+            </div>
 
         </div>
+    </div>
 
-        <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+    <div id="graphics-wrapper">
+
+    </div>
+
+    <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -113,10 +115,21 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        
+                        In this simulation, a trayed absorption column is used to remove an impurity solute (chloroform)
+                        from a gas feed by absorbing the inpurity in a liquid solvent. The number of trays/stages needed
+                        to obtain an outlet solute mole ratio of <i>y</i><sub>1</sub> ppm in the gas stream (set with a
+                        slider) is calculated. A stage is a plate that contacts the liquid solvent and the gas to
+                        promote transfer. Use a slider to set the solute mole ratio <i>x</i><sub>0</sub> of the liquid
+                        feed stream. When a partial stage is calculated, the number of stages is rounded down to the
+                        nearest full stage. Use slider to change the pressure and temperature in the column, the solvent
+                        flow rate <i>L</i> and the solute mole ratio in the gas feed, <i>y</i><sub><i>N</i>+1</sub>. The
+                        slope of the pink operating line, <i>L/V</i>, is shown on the column on the right. Checking the
+                        "(<i>L/V</i>)<sub>min</sub>" boxs shows the minimum slope for the operating line; the desired
+                        separation would require an infinite number of stages at a lower slope. The equilibrium line is
+                        orange. Check the "show diagram with 5 stages" to set conditions that require 5 stages and
+                        display the mole ratios entering and leaving each stage. Move your mouse over the pink and
+                        orange lines on the <i>x-y</i> diagram to see their labels.
                     </p>
-
-
                 </div>
             </div>
         </div>
@@ -135,7 +148,71 @@
                 </div>
 
                 <div class="modal-body">
-                    
+                    <div class="modal-text">
+                        A mole balance on the absorption column for the impurity species gives:
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        x_0L + y_{N+1}V = x_NL + y_1V.
+                        $$
+                    </div>
+                    <div class="modal-text">
+                        Rearranging this yields the operating line for the absorber:
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        y_{N+1} = \frac{L}{V}(x_N-x_0) + y_1,
+                        $$
+                    </div>
+                    <div class="modal-text">
+                        where \(L\) is the solvent liquid flow rate (Mmol/h), \(V\) is the gas molar flow rate (Mmol/h),
+                        \(x_n\) and \(y_n\) are the mole ratios of the impurity (ppm) in the liquid and gas streams
+                        leaving stage \(n\) (these streams leaving stage \(n\) are in equilibrium), \(x_0\) is the mole
+                        ratio of impurity in the inlet sovlent stream, \(y_{N+1}\) is the mole ratio of impurity in the
+                        feed gas stream, \(x_N\) is the mole ratio of impurity in the outlet solvent stream, and \(y_1\)
+                        is the mole ratio of impurity in the treated gas stream.
+                    </div>
+                    <div class="modal-text">
+                        The equilibrium line is calculated using Henry's law:
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        y_{eq} = \frac{H}{P}x_N,
+                        $$
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        H = H^0e^{-\frac{E}{R}(\frac{1}{T}-\frac{1}{T_0})},
+                        $$
+                    </div>
+                    <div class="modal-text">
+                        where \(H\) is Henry's constant (atm), \(H^0\) is Henry's constant at \(T_0\) = 298K, \(P\) is
+                        pressure (atm), \(E\) is the activation energy (J/mol), \(R\) is the ideal gas constant (J/mol
+                        K), and \(T\) is temperature (K).
+                    </div>
+                    <div class="modal-text">
+                        Stages are counted by locating \(y_{N+1}\) on the operating line. The corresponding \(x_N\)
+                        value on the operating line is from the mass balance:
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        x_N = x_0 + \frac{y_{N+1}-y_1}{L/V}.
+                        $$
+                    </div>
+                    <div class="modal-text">
+                        A vertical line is then drawn from (\(x_N, y_{N+1}\)) to the equilibrium line. These values
+                        (\(x_N, y_N\)) to the operating line. From this point (\(x_{N-1}, y_N\)) on the operating line,
+                        a vertical line is drawn to the equilibrium line, and this process is repeated until \(x_1\) is
+                        reached.
+                    </div>
+                    <div class="modal-text">
+                        References:
+                    </div>
+                    <ol class="references">
+                        <li>
+                          P.C. Wankat, <i>Separation Process Engineering: Includes Mass Transfer Analysis</i> , 3rd ed., Upper Saddle River, NJ: Prentice Hall, 2012.
+                        </li>
+                    </ol>
                 </div>
             </div>
         </div>
@@ -157,7 +234,7 @@
                         This simulation was created in the <a href="https://www.colorado.edu/chbe"
                             target="_blank">Department of
                             Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
-                            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under
+                            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann and Adam Johnston under
                         the direction of
                         Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional
                         contributions by Neil Hendren. This simulation was prepared with financial support from the
@@ -188,10 +265,11 @@
             </div>
         </div>
     </div>
-        <script src="index.js"></script>
-        <script src="functions.js"></script>
-    </body>
-    
+    <script src="index.js"></script>
+    <script src="functions.js"></script>
+</body>
 
-    </div>
+
+</div>
+
 </html>

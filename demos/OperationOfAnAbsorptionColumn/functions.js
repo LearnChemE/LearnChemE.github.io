@@ -107,6 +107,19 @@ function frame(){
                 text(g.stagesCount+' stages needed',465,200);
             }
             pop();
+        } else {
+            let LVmin = (yeq(g.maxX)-g.y1)/(g.maxX-g.x0);
+
+            push();
+            noStroke(); textSize(18); fill(100,0,100);
+            text('= '+LVmin.toFixed(1),550,200);
+            text('(',477,200);
+            text(')',512,200);
+            textStyle(ITALIC);
+            text('L/V',483,200);
+            textSize(15); textStyle(NORMAL);
+            text('min',520,203);
+            pop();
         }
     }
     
@@ -256,6 +269,8 @@ function displayStages(){
     if(g.rightTest && g.leftTest){
         x0andy1Disp();
         stagesSolveAndDisp();
+    } else {
+        infStages();
     }
 
     function x0andy1Disp(){
@@ -292,6 +307,17 @@ function displayStages(){
         ellipse(g.lx,y1,g.diam);
         pop();
     }   
+
+    function infStages(){
+        push();
+        fill(250);
+        rect(g.lx+60,g.ty+134,200,41);
+        fill(255,0,0); noStroke(); textSize(18);
+        text('separation not possible',g.lx+68,g.ty+150);
+        fill(0);
+        text('*inifinite stages needed*',g.lx+65,g.ty+170);
+        pop();
+    }
     
 }
 
@@ -397,6 +423,68 @@ function stagesSolveAndDisp(){
     }
 
     
+}
+
+function equilibLines(){
+    if(mouseX > g.lx && mouseX < g.rx && mouseY > g.ty && mouseY < g.by){
+        x = mouseX;
+        y = mouseY;
+        let check = true;
+
+        let yL, yU, theta;
+        yL = g.Lo[0]*x + g.Lo[1];
+        yU = g.Up[0]*x + g.Up[1];
+
+        // For figuring out the angle on equilib line
+        let x1, x2, y1, y2;
+        x1 = g.lx; y1 = g.Lo[0]*g.lx + g.Lo[1];
+        x2 = g.rx; y2 = g.Lo[0]*g.rx + g.Lo[1];
+
+        theta = Math.atan((y2-y1)/(x2-x1));
+        if(mouseY <= yL+7 && mouseY >= yL-7){
+            check = false;
+
+            // Remapping x1 to a value to start text at
+            x = g.lx+40;
+            y = g.Lo[0]*x + g.Lo[1];
+            push();
+            translate(x+45,y); rotate(theta);
+            noStroke(); textSize(16); fill(g.orange);
+            text('operating line',0,0);
+            pop();
+        }
+
+        // Rewriting for operating line
+        y1 = g.Up[0]*x1 + g.Lo[1];
+        y2 = g.Up[0]*x2 + g.Up[1];
+        theta = Math.atan((y2-y1)/(x2-x1));
+
+        if(check && mouseY <= yU+7 && mouseY >= yU-7){
+            x = g.lx+40;
+            y = g.Up[0]*x + g.Up[1];
+            push();
+            translate(x-10,y-2); rotate(theta);
+            noStroke(); textSize(16); fill(g.pink);
+            text('equilibrium line',0,0);
+            pop();
+        }
+
+    }
+}
+
+function LVminDisp(){
+    let x1, y1, x2, y2;
+    x1 = g.lx;
+    y1 = map((yeq(g.maxX)-g.y1)/(g.maxX - g.x0)*(-g.x0) + g.y1,0,g.maxY,g.by,g.ty);
+    x2 = g.rx;
+    y2 = map((yeq(g.maxX)-g.y1)/(g.maxX - g.x0)*(g.maxX-g.x0) + g.y1,0,g.maxY,g.by,g.ty);
+
+    push();
+    strokeWeight(2); stroke(g.pink);
+    line(x1,y1,x2,y2);
+    stroke(g.orange);
+    line(g.lx,g.by,x2,y2);
+    pop();
 }
 
 function infiniteStageTest(){
