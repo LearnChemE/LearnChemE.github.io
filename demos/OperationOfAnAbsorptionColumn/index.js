@@ -12,7 +12,7 @@ window.g = {
 
     // Checkboxes
     LVmin: false,
-    show5: false,
+    show5: true,
 
     // Colors to be used repeatedly
     blue: [0,0,200],

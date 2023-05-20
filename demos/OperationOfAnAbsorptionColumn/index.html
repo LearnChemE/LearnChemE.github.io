@@ -54,7 +54,7 @@
                     <div id="solvent-flow-rate-label" class="value-label">100</div>
                 </div>
                 <div class="input-row" id="label5">
-                    <div class="input-label"><b>mole ratios (ppm):</b> outlet vapor <i>y</i><sub>1</sub></div>
+                    <div class="input-label">mole ratios (ppm): outlet vapor <i>y</i><sub>1</sub></div>
                     <input type="range" id="outlet-vapor" min="10" max="25" value="10" step="1" />
                     <div id="outlet-vapor-label" class="value-label">10</div>
                 </div>
@@ -121,9 +121,11 @@
                         slider) is calculated. A stage is a plate that contacts the liquid solvent and the gas to
                         promote transfer. Use a slider to set the solute mole ratio <i>x</i><sub>0</sub> of the liquid
                         feed stream. When a partial stage is calculated, the number of stages is rounded down to the
-                        nearest full stage. Use slider to change the pressure and temperature in the column, the solvent
+                        nearest full stage. Use sliders to change the pressure and temperature in the column, the liquid
+                        solvent molar
                         flow rate <i>L</i> and the solute mole ratio in the gas feed, <i>y</i><sub><i>N</i>+1</sub>. The
-                        slope of the pink operating line, <i>L/V</i>, is shown on the column on the right. Checking the
+                        vapor molar flow rate is fixed at 1 Mmol/h. The
+                        slope of the pink operating line is <i>L/V</i>. Checking the
                         "(<i>L/V</i>)<sub>min</sub>" boxs shows the minimum slope for the operating line; the desired
                         separation would require an infinite number of stages at a lower slope. The equilibrium line is
                         orange. Check the "show diagram with 5 stages" to set conditions that require 5 stages and
@@ -149,36 +151,44 @@
 
                 <div class="modal-body">
                     <div class="modal-text">
-                        A mole balance on the absorption column for the impurity species gives:
+                        A mole balance on the solute impurity for stages from 1 to \(n\) (where \(n\) is any
+                        integer from 1 to \(N\), and \(N\) is the total number of stages) is:
                     </div>
                     <div class="modal-equation">
                         $$
-                        x_0L + y_{N+1}V = x_NL + y_1V.
+                        x_0L + y_{n+1}V = x_nL + y_1V.
                         $$
                     </div>
                     <div class="modal-text">
-                        Rearranging this yields the operating line for the absorber:
+                        Rearranging this yields the operating line for the column:
                     </div>
                     <div class="modal-equation">
                         $$
-                        y_{N+1} = \frac{L}{V}(x_N-x_0) + y_1,
+                        y_{n+1} = \frac{L}{V}(x_n-x_0) + y_1,
                         $$
                     </div>
                     <div class="modal-text">
-                        where \(L\) is the solvent liquid flow rate (Mmol/h), \(V\) is the gas molar flow rate (Mmol/h),
+                        where \(L\) is the liquid solvent molar flow rate (Mmol/h), \(V\) is the gas molar flow rate
+                        (Mmol/h),
                         \(x_n\) and \(y_n\) are the mole ratios of the impurity (ppm) in the liquid and gas streams
-                        leaving stage \(n\) (these streams leaving stage \(n\) are in equilibrium), \(x_0\) is the mole
-                        ratio of impurity in the inlet sovlent stream, \(y_{N+1}\) is the mole ratio of impurity in the
-                        feed gas stream, \(x_N\) is the mole ratio of impurity in the outlet solvent stream, and \(y_1\)
-                        is the mole ratio of impurity in the treated gas stream.
+                        leaving stage \(n\) (these streams leaving stage \(n\) are in equilibrium), \(x_0\) is the
+                        solute mole ratio in the liquid feed to the column (stage 1), \(y_{n+1}\) is the solute mole
+                        ratio in the gas stream entering stage \(n\), \(x_n\) is the solute mole ratio in the liquid
+                        stream leaving stage \(n\), and \(y_1\)
+                        is the solute mole ratio in the gas stream leaving the column from stage 1.
                     </div>
                     <div class="modal-text">
                         The equilibrium line is calculated using Henry's law:
                     </div>
                     <div class="modal-equation">
                         $$
-                        y_{eq} = \frac{H}{P}x_N,
+                        y_{n} = \frac{H}{P}x_n,
                         $$
+                    </div>
+                    <div class="modal-text">
+                        where \(x_n\) and \(y_n\) are the solute mole ratios in the liquid and gas streams,
+                        respectively, leaving stage \(n\) (these streams are in equilibrium), H(atm) is Henry's constant
+                        at temperature T(K), and P is pressure (atm). The Henry's constant is related to temperature by:
                     </div>
                     <div class="modal-equation">
                         $$
@@ -186,31 +196,43 @@
                         $$
                     </div>
                     <div class="modal-text">
-                        where \(H\) is Henry's constant (atm), \(H^0\) is Henry's constant at \(T_0\) = 298K, \(P\) is
-                        pressure (atm), \(E\) is the activation energy (J/mol), \(R\) is the ideal gas constant (J/mol
-                        K), and \(T\) is temperature (K).
+                        where \(H^0\) is Henry's constant at \(T_0\) = 298 K, \(E\) is the activation energy (J/mol),
+                        and \(R\) is the ideal gas constant (J/(mol K)).
                     </div>
                     <div class="modal-text">
-                        Stages are counted by locating \(y_{N+1}\) on the operating line. The corresponding \(x_N\)
-                        value on the operating line is from the mass balance:
+                        A solute mole balance around stage \(n\) is:
                     </div>
                     <div class="modal-equation">
                         $$
-                        x_N = x_0 + \frac{y_{N+1}-y_1}{L/V}.
+                        x_{n-1}L + y_{n+1}V = x_nL + y_nV
                         $$
                     </div>
                     <div class="modal-text">
-                        A vertical line is then drawn from (\(x_N, y_{N+1}\)) to the equilibrium line. These values
-                        (\(x_N, y_N\)) to the operating line. From this point (\(x_{N-1}, y_N\)) on the operating line,
-                        a vertical line is drawn to the equilibrium line, and this process is repeated until \(x_1\) is
-                        reached.
+                        where \(x_{n-1}\) is the solute mole ratio in the liquid stream entering stage \(n\).
+                    </div>
+                    <div class="modal-text">
+                        Stages are counted by locating \(y_{n+1}\) on the operating line, where \(N\) is the last stage.
+                        The corresponding \(x_N\) value on the operating line is from the mole balance:
+                    </div>
+                    <div class="modal-equation">
+                        $$
+                        x_N = x_0 + \frac{y_{N+1} - y_1}{L/V}.
+                        $$
+                    </div>
+                    <div class="modal-text">
+                        A vertical line is then drawn from (\(x_N, y_{N+1}\)), to the equilibrium line. The values
+                        (\(x_N, y_N\)) are the equilibrium mole fractions leaving stage \(N\). Next draw a horizontal
+                        line from (\(x_N, y_N\)) to the operating line. From this point (\(x_{N-1}, y_N\)) on the
+                   \     operating line, a vertical line is drawn to the equilibrium line, and this process is repeated
+                        until \(x_1\) is reached.
                     </div>
                     <div class="modal-text">
                         References:
                     </div>
                     <ol class="references">
                         <li>
-                          P.C. Wankat, <i>Separation Process Engineering: Includes Mass Transfer Analysis</i> , 3rd ed., Upper Saddle River, NJ: Prentice Hall, 2012.
+                            P.C. Wankat, <i>Separation Process Engineering: Includes Mass Transfer Analysis</i> , 3rd
+                            ed., Upper Saddle River, NJ: Prentice Hall, 2012.
                         </li>
                     </ol>
                 </div>
@@ -234,7 +256,8 @@
                         This simulation was created in the <a href="https://www.colorado.edu/chbe"
                             target="_blank">Department of
                             Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
-                            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann and Adam Johnston under
+                            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann and
+                        Adam Johnston under
                         the direction of
                         Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional
                         contributions by Neil Hendren. This simulation was prepared with financial support from the

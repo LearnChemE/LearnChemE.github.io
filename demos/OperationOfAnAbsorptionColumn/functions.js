@@ -528,22 +528,27 @@ function show5Display(){
     function figure(){
         push();
         scale(.8); translate(160,40);
+        push();
+        textSize(22); noStroke();
+        text('mole ratios are in ppm',435,-15);
+        pop();
+        translate(0,10);
 
         push();
         for(let i = 1; i < 6; i++){
             if(i == g.stage){
                 strokeWeight(4); fill(255,255,0);
-                rect(480,50+80*(i-1),110,40);
+                rect(480,50+70*(i-1),110,40);
                 push();
                 textSize(30); fill(0); 
-                text(i,525,81+80*(i-1));
+                text(i,525,81+70*(i-1));
                 pop();
             } else {
                 strokeWeight(1.5); fill(250);
-                rect(480,50+80*(i-1),110,40)
+                rect(480,50+70*(i-1),110,40)
                 push();
                 textSize(22); fill(0); 
-                text(i,528,77+80*(i-1));
+                text(i,528,77+70*(i-1));
                 pop();
             }
         }
@@ -552,33 +557,34 @@ function show5Display(){
         strokeWeight(2); 
         for(let i = 0; i < 5; i++){
             stroke(g.blue);
-            line(565,10+80*i,565,45+80*i);
-            arrow([565,10+80*i],[565,50+80*i],g.blue,20,6);
+            line(565,20+70*i,565,45+70*i);
+            arrow([565,10+70*i],[565,50+70*i],g.blue,20,6);
             stroke(g.green);
-            line(505,530-80*(i+1),505,495-80*(i+1));
-            arrow([505,530-80*(i+1)],[505,490-80*(i+1)],g.green,20,6);
+            line(505,470-70*(i+1),505,442-70*(i+1));
+            arrow([505,600-70*(i+1)],[505,439-70*(i+1)],g.green,20,6);
         }
 
         // Other arrows and lines
-        line(480,450,505,450);
-        line(490,10,505,10);
-        line(505,10,505,50);
-        arrow([505,10],[470,10],g.green,20,6);
+        line(480,400,505,400);
+        line(490,20,505,20);
+        line(505,20,505,50);
+        arrow([505,20],[470,20],g.green,20,6);
         stroke(g.blue);
-        line(565,410,565,450);
-        line(565,450,580,450);
-        arrow([565,450],[600,450],g.blue,20,6);
-        line(590,10,565,10);
+        line(565,370,565,400);
+        line(565,400,580,400);
+        arrow([565,400],[600,400],g.blue,20,6);
+        line(590,20,565,20);
         pop();
 
         // Non-italic elements
         push();
-        textSize(22); fill(g.green); noStroke();
-        text('1 Mmol/h',400,-5);
-        text('1 Mmol/h',400,475);
+        textSize(22); noStroke();
+        fill(g.green);
+        text('1 Mmol/h',400,5);
+        text('1 Mmol/h',400,425);
         fill(g.blue);
-        text('100 Mmol/h',580,-5);
-        text('100 Mmol/h',580,475);
+        text('100 Mmol/h',580,5);
+        text('100 Mmol/h',580,425);
         pop();
 
         // Value labels for x and y
@@ -587,60 +593,60 @@ function show5Display(){
         for(let i = 0; i < 5; i++){
             if(i == 0){
                 fill(g.green);
-                text(' = '+y[0],430,35);
-                text(' = '+y[y.length-1],430,445);
+                text(' = '+y[0],430,45);
+                text(' = '+y[y.length-1],430,395);
                 push();
                 textStyle(ITALIC);
-                text('y',410,35);
-                text('y',410,445);
+                text('y',410,45);
+                text('y',410,395);
                 pop();
                 push();
                 textSize(16);
-                text('1',421,42);
-                text('6',421,452);
+                text('1',421,52);
+                text('6',421,402);
                 pop();
                 fill(g.blue);
-                text(' = '+x[0],630,35);
-                text('= '+x[x.length-1],630,445);
+                text(' = '+x[0],630,45);
+                text(' = '+x[x.length-1],630,395);
                 push();
                 textStyle(ITALIC);
-                text('x',610,35);
-                text('x',610,445);
+                text('x',610,45);
+                text('x',610,395);
                 pop();
                 push();
                 textSize(16);
-                text('0',621,42);
-                text('5',621,452);
+                text('0',621,52);
+                text('5',621,402);
                 pop();
 
             } else {
                 fill(g.green);
-                text(' = '+y[i],450,35+80*(i));
+                text(' = '+y[i],450,40+70*(i));
                 push();
                 textStyle(ITALIC);
-                text('y',430,35+80*(i));
+                text('y',430,40+70*(i));
                 pop();
                 push();
                 textSize(16);
-                text(i+1,441,42+80*i);
+                text(i+1,441,47+70*i);
                 pop();
                 fill(g.blue);
-                text(' = '+x[i],600,35+80*i);
+                if(i == 2){
+                    text(' = 0.20',600,40+70*i);  
+                } else {
+                    text(' = '+x[i],600,40+70*i);  
+                }
                 push();
                 textStyle(ITALIC);
-                text('x',580,35+80*i);
+                text('x',580,40+70*i);
                 pop();
                 push();
                 textSize(16);
-                text(i,591,42+80*i);
+                text(i,591,47+70*i);
                 pop();
             }
         }
         pop();
-
-
-
-
         pop();
     }
 
