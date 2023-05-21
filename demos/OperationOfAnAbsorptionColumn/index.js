@@ -47,6 +47,7 @@ window.g = {
     diam: 9,
 
     stagesCount: 8,
+    xOut: .95,
 
 
 }

@@ -92,6 +92,46 @@ function frame(){
         text('= '+g.L,532,280);
         pop();
 
+        // Last stage concentration labels
+        push();
+        translate(0,-5);
+        fill(250); noStroke();
+        rect(395,374,130,23); 
+        if(g.stagesCount < 9 && g.stagesCount != '∞'){
+            textStyle(ITALIC); textSize(18); fill(g.green);
+            text('y',400,390);
+            textStyle(NORMAL);
+            text(' = '+g.yN1+' ppm',420,390);
+            textSize(15);
+            text(g.stagesCount+1,411,394);
+        } else if(g.stagesCount != '∞') {
+            textStyle(ITALIC); textSize(18); noStroke(); fill(g.green);
+            text('y',400,390);
+            textStyle(NORMAL);
+            text(' = '+g.yN1+' ppm',428,390);
+            textSize(15);
+            text(g.stagesCount+1,411,394);
+        } 
+        fill(250); //noStroke();
+        rect(555,374,130,23);
+        if(g.stagesCount < 10 && g.stagesCount != '∞'){
+            textStyle(ITALIC); textSize(18); fill(g.blue);
+            text('x',560,390);
+            textStyle(NORMAL);
+            text(' = '+g.xOut+' ppm',580,390);
+            textSize(15);
+            text(g.stagesCount,571,394);
+        } else if (g.stagesCount != '∞'){
+            textStyle(ITALIC); textSize(18); fill(g.blue);
+            text('x',560,390);
+            textStyle(NORMAL);
+            text(' = '+g.xOut+' ppm',588,390);
+            textSize(15);
+            text(g.stagesCount,571,394);
+        }
+        
+        pop();
+
         // Number of stages on absorption column
         if(!g.LVmin){
             push();
@@ -334,6 +374,7 @@ function stagesSolveAndDisp(){
     let p = [];
     p.push([xStart,yStart]);
 
+    g.xOut = (map(xStart,g.lx,g.rx,0,g.maxX)).toFixed(2);
 
     while(x > xLim && count < 100){
         // Find next vertical point (orange line)
