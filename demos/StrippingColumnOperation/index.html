@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stripping Column Operation</title>
+
+    <script src="./libraries/p5.js"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+    <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
+    <meta name="author" content="Patrick Doyle">
+    <meta name="application-name" content="LearnChemE simulation template">
+    <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
+
+    <link href="./sliders.css" rel="stylesheet">
+    <link href="./style.css" rel="stylesheet">
+    <link href="./bootstrap.min.css" rel="stylesheet">
+    <script>
+        MathJax = {
+            chtml: {
+                scale: 0.95,
+                mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+                displayAlign: 'left', // default for indentalign when set to 'auto'
+            }
+        };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="./jquery.js"></script>
+    <script src="./popper.js"></script>
+    <script src="./bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div id="simulation-wrapper">
+        <div class="simulation-controls">
+            <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions
+            </div>
+            <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+            <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
+        </div>
+        <div class="inputs-wrapper" style="transform:translateX(10px)">
+            <div class="input-area">
+                <div class="input-row" id="label1">
+                    <div class="input-label">inlet gas mole ratio <i>y<sub>N</sub></i><sub>+1</sub></div>
+                    <input type="range" id="inlet-vapor-mole-ratio" min="0" max="2" value="1" step=".10" />
+                    <div id="inlet-vapor-mole-ratio-label" class="value-label">1</div>
+                </div>
+                <div class="input-row" id="label2" style="margin-left:-55px">
+                    <div class="input-label">liquid mole ratios (ppm): inlet <i>x</i><sub>0</sub></div>
+                    <input type="range" id="inlet-x" min=".1" max=".5" value=".35" step=".05" />
+                    <div id="inlet-x-label" class="value-label">0.35</div>
+                </div>
+                <div class="input-row" id="label3" style="margin-right:-55px">
+                    <div class="input-label">temperature (°C)</div>
+                    <input type="range" id="temperature" min="10" max="80" value="13" step="1" />
+                    <div id="temperature-label" class="value-label">13</div>
+                </div>
+
+
+            </div>
+            <div class="input-area2" style="margin-left:10px">
+                <div class="input-row" id="label4">
+                    <div class="input-label">target mole ratio <i>x</i><sub>N</sub></div>
+                    <input type="range" id="target-x" min="0.01" max=".25" value=".11" step=".01" />
+                    <div id="target-x-label" class="value-label">0.11</div>
+                </div>
+                <div class="input-row" id="label5" style="margin-left:40px">
+                    <div class="input-label">pressure (atm)</div>
+                    <input type="range" id="pressure" min="1.5" max="3" value="2.5" step=".1"/>
+                    <div id="pressure-label" class="value-label">2.5</div>
+                </div>
+            </div>
+
+            <div class="select-container" style="margin-top:-30px; margin-right:-90px">
+                <form>
+                    <label class="checkbox-inline" style="transform: translateX(0px)">
+                        <span class="checkmark" id="label6" style="margin-right:5px">(<i>L/V</i>)<sub>max</sub></span>
+                        <input type="checkbox" id="L-V-min">
+                    </label>
+                    <label class="checkbox-inline">
+                        <span class="checkmark" style="margin-right:5px">show diagram with 5 stages</span>
+                        <input type="checkbox" id="show-diagram">
+                    </label>
+                </form>
+            </div>
+            <div class="input-row2" id="stage-slider" style="display:none;">
+                <div class="input-label">stage</div>
+                <input type="range" id="stage" min="1" max="5" value="1" step="1" />
+                <div id="stage-label" class="value-label">1</div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="graphics-wrapper">
+
+    </div>
+
+    <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutModalLabel">About</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This simulation was created in the <a href="https://www.colorado.edu/chbe"
+                            target="_blank">Department of
+                            Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+                            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann and
+                        Adam Johnston under
+                        the direction of
+                        Professor John L. Falconer and was converted to HTML5 by Patrick Doyle, with additional
+                        contributions by Neil Hendren. This simulation was prepared with financial support from the
+                        National Science Foundation. Address any questions or comments to learncheme@gmail.com. All of
+                        our
+                        simulations are open source, and are available on our <a
+                            href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+                            repository</a>.</p>
+                    <p style="line-height: 3rem;">
+                        If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                                src="https://learncheme.github.io/media/command.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on
+                        Mac
+                        or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on
+                        Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on
+                        Mac
+                        or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on
+                        Windows.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="index.js"></script>
+    <script src="functions.js"></script>
+</body>
+
+
+</div>
+
+</html>
