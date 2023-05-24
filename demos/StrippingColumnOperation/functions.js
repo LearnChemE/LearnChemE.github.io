@@ -129,25 +129,147 @@ function frame(){
         } 
 
         // Graph axes ticks \\
-        let ticks, count, xLabels;
+        // x-axis
+        let ticks, count, xLabels, yLabels;
         if(g.x0 == .1){
-
-        } else if(g.x0 < .4){
-            xLabels = [0,.05,.1,.15,.2,.25,.3,.35,.4];
-            ticks = 5;
-            count = g.maxX/.1;
+            xLabels = [0,0.02,.04,.06,.08,.1];
+            ticks = 4;
+            count = .11/.005;
+            g.maxX = .11;
             for(let i = 0; i < count; i++){
                 if(i%ticks == 0){
                     line(g.lx+(g.rx-g.lx)/count*i,g.by,g.lx+(g.rx-g.lx)/count*i,g.by-5);
-                    line(g.lx+(g.rx-g.lx)/count*i,g.ty,g.lx+(g.rx-g.lx)/count*i,g.ty+5)
+                    line(g.lx+(g.rx-g.lx)/count*i,g.ty,g.lx+(g.rx-g.lx)/count*i,g.ty+5);
+                    push();
+                    noStroke(); textSize(14);
+                    if(i == 0){
+                        text(xLabels[i/ticks].toFixed(2),g.lx+(g.rx-g.lx)/count*i-15,g.by+16);
+                    } else {
+                        text(xLabels[i/ticks].toFixed(2),g.lx+(g.rx-g.lx)/count*i-15,g.by+15);
+                    }
+                    pop();
                 } else {
-
+                    line(g.lx+(g.rx-g.lx)/count*i,g.by,g.lx+(g.rx-g.lx)/count*i,g.by-3);
+                    line(g.lx+(g.rx-g.lx)/count*i,g.ty,g.lx+(g.rx-g.lx)/count*i,g.ty+3);
+                }
+            }
+        } else if(g.x0 < .4){
+            xLabels = [0,.05,.1,.15,.2,.25,.3,.35,.4];
+            ticks = 5;
+            count = g.maxX/.01;
+            for(let i = 0; i < count; i++){
+                if(i%ticks == 0){
+                    line(g.lx+(g.rx-g.lx)/count*i,g.by,g.lx+(g.rx-g.lx)/count*i,g.by-5);
+                    line(g.lx+(g.rx-g.lx)/count*i,g.ty,g.lx+(g.rx-g.lx)/count*i,g.ty+5);
+                    push();
+                    noStroke(); textSize(14);
+                    if(i == 0){
+                        text(xLabels[i/ticks].toFixed(2),g.lx+(g.rx-g.lx)/count*i-15,g.by+16);
+                    } else {
+                        text(xLabels[i/ticks].toFixed(2),g.lx+(g.rx-g.lx)/count*i-15,g.by+15);
+                    }
+                    pop();
+                } else {
+                    line(g.lx+(g.rx-g.lx)/count*i,g.by,g.lx+(g.rx-g.lx)/count*i,g.by-3);
+                    line(g.lx+(g.rx-g.lx)/count*i,g.ty,g.lx+(g.rx-g.lx)/count*i,g.ty+3);
                 }
             }
         } else {
+            xLabels = [0,.1,.2,.3,.4,.5];
+            ticks = 5;
+            count = g.maxX/.02;
+            for(let i = 0; i < count; i++){
+                if(i%ticks == 0){
+                    line(g.lx+(g.rx-g.lx)/count*i,g.by,g.lx+(g.rx-g.lx)/count*i,g.by-5);
+                    line(g.lx+(g.rx-g.lx)/count*i,g.ty,g.lx+(g.rx-g.lx)/count*i,g.ty+5);
+                    push();
+                    noStroke(); textSize(14);
+                    if(i == 0){
+                        text(xLabels[i/ticks].toFixed(1),g.lx+(g.rx-g.lx)/count*i-10,g.by+16);
+                    } else {
+                        text(xLabels[i/ticks].toFixed(1),g.lx+(g.rx-g.lx)/count*i-10,g.by+15);
+                    }
+                    pop();
+                } else {
+                    line(g.lx+(g.rx-g.lx)/count*i,g.by,g.lx+(g.rx-g.lx)/count*i,g.by-3);
+                    line(g.lx+(g.rx-g.lx)/count*i,g.ty,g.lx+(g.rx-g.lx)/count*i,g.ty+3);
+                }
+            }
+        }
 
+        // y-axis
+        if(g.maxY < 1){
+
+        } else if (g.maxY < 40){
+            ticks = 5;
+            count = g.maxY/1;
+            yLabels = [0,5,10,15,20,25,30,35,40];
+            for(let i = 0; i < count; i++){
+                if(i%ticks == 0){
+                    line(g.lx,g.by-(g.by-g.ty)/count*i,g.lx+5,g.by-(g.by-g.ty)/count*i);
+                    line(g.rx,g.by-(g.by-g.ty)/count*i,g.rx-5,g.by-(g.by-g.ty)/count*i);
+                    push();
+                    noStroke(); textSize(14);
+                    if(i == 0 || i == 5){
+                        text(yLabels[i/ticks],g.lx-12,g.by-(g.by-g.ty)/count*i+4);
+                    } else {
+                        text(yLabels[i/ticks],g.lx-20,g.by-(g.by-g.ty)/count*i+4);
+                    }
+                    pop();
+                } else {
+                    line(g.lx,g.by-(g.by-g.ty)/count*i,g.lx+3,g.by-(g.by-g.ty)/count*i);
+                    line(g.rx,g.by-(g.by-g.ty)/count*i,g.rx-3,g.by-(g.by-g.ty)/count*i);
+                }
+            }
         }
     }
+}
+
+function lineDraw(){
+
+    let x1, y1, x2, y2;
+    
+    // Operating line
+    x1 = g.lx;
+    y1 = map(yop(0),0,g.maxY,g.by,g.ty);
+    x2 = g.rx;
+    y2 = map(yop(g.maxX),0,g.maxY,g.by,g.ty);
+
+    g.R[0] = (y2 - y1)/(x2 - x1);
+    g.R[1] = y1 - g.R[0]*x1;
+    
+
+    if(y1 > g.by){
+        x1 = (g.by-g.R[1])/g.R[0];
+        y1 = g.by;
+    }
+
+    if(y2 < g.ty){
+        x2 = (g.ty-g.R[1])/g.R[0];
+        y2 = g.ty;
+    }
+    push();
+    strokeWeight(2); stroke(g.pink);
+    line(x1,y1,x2,y2);
+
+    x1 = g.lx; x2 = g.rx;
+
+    // Equilibrium line
+    y1 = map(yeq(0),0,g.maxY,g.by,g.ty);
+    y2 = map(yeq(g.maxX),0,g.maxY,g.by,g.ty);
+    g.L[0] = (y2 - y1)/(x2 - x1);
+    g.L[1] = y1 - g.L[0]*x1;
+    
+    if(y2 < g.ty){
+        x2 = (g.ty-g.L[1])/g.L[0];
+        y2 = g.ty;
+    }
+    
+    stroke(g.orange);
+    line(x1,y1,x2,y2);
+    pop();
+
+
 }
 
 function show5Display(){
@@ -155,7 +277,10 @@ function show5Display(){
 }
 
 function graphLims(){
-    g.maxX = g.x0 + .05;
+    g.y1 = 100*(g.x0-g.xN) + g.yN1;
+
+    g.maxX = 1.1*g.x0;
+    g.maxY = 1.1*g.y1;
 }
 
 // For creating arrows
@@ -193,9 +318,13 @@ function arrow(base,tip,color,arrowLength,arrowWidth){
 
 // Equation functions
 function HB(){
-    return(g.H0*Math.E**((-g.Ea/g.R)*(1/(g.T+273)-1/g.T0)))
+    return(g.H0*Math.E**((-5000/8.314)*(1/(g.T+273)-1/298)));
 }
 
 function yeq(x){
     return(HB()*x/g.P);
+}
+
+function yop(x){
+    return(100*(x-g.x0)+g.y1);
 }

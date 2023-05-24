@@ -37,6 +37,11 @@ window.g = {
     y1 : 25,
     LoverV: 100,
     maxX: .4,
+    maxY: 30,
+
+    // Equations of the pink and orange line
+    R: [0,0], // Operating line
+    L: [0,0], // Equilibrium line
     
 
 
@@ -51,6 +56,9 @@ function draw(){
     background(250);
     frame();
     graphLims();
+    if(!g.LVmin && !g.show5){
+        lineDraw();
+    }
 }
 
 // Event listeners
