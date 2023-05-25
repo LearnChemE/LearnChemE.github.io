@@ -20,7 +20,7 @@ function coordToPix(x, y) {
 
   const xPix = margin_left + ((x - xMin) / (xMax - xMin)) * plot_width;
   const yPix = margin_top + plot_height - ((y - yMin) / (yMax - yMin)) * plot_height;
-  
+
   return [xPix, yPix]
 }
 
@@ -39,12 +39,12 @@ function drawAxes(p) {
   p.line(topRight[0], topRight[1], bottomRight[0], bottomRight[1]);
   p.line(bottomLeft[0], bottomLeft[1], bottomRight[0], bottomRight[1]);
 
-  for(let x = xMin; x <= xMax; x += xStepMinor) {
+  for (let x = xMin; x <= xMax; x += xStepMinor) {
     x = Math.round(x * 100) / 100;
     const pix_bottom = coordToPix(x, gvs.plot.range[0]);
     const pix_top = coordToPix(x, gvs.plot.range[1]);
     let tickLength;
-    if((Math.round(100 * (x - xMin)) / 100) % xStepMajor === 0) {
+    if ((Math.round(100 * (x - xMin)) / 100) % xStepMajor === 0) {
       tickLength = 8;
       p.noStroke();
       p.fill(0);
@@ -60,15 +60,15 @@ function drawAxes(p) {
     p.line(pix_top[0], pix_top[1], pix_top[0], pix_top[1] + tickLength);
   }
 
-  for(let y = yMin; y <= yMax; y += yStepMinor) {
+  for (let y = yMin; y <= yMax; y += yStepMinor) {
     y = Math.round(y * 100) / 100;
     const pix_left = coordToPix(gvs.plot.domain[0], y);
     const pix_right = coordToPix(gvs.plot.domain[1], y);
     let tickLength;
     const discrepancy = Math.round(100 * (y - yMin)) / 100;
-    if(
+    if (
       ((Math.round((discrepancy % yStepMajor) * 100) / 100) === 0
-      || (Math.round((discrepancy % yStepMajor) * 100) / 100) === yStepMajor)
+        || (Math.round((discrepancy % yStepMajor) * 100) / 100) === yStepMajor)
       && y !== 0) {
       tickLength = 8;
       p.noStroke();
@@ -112,13 +112,13 @@ function drawCurve(p) {
   p.stroke(0, 0, 255);
   p.strokeWeight(2);
   p.beginShape();
-  for(let x = xMin; x < xMax; x += (xMax - xMin) / 1000) {
+  for (let x = xMin; x < xMax; x += (xMax - xMin) / 1000) {
     x = Math.round(x * 1000) / 1000;
     const t = x;
     const n = gvs.n;
     const tau = gvs.tau / n;
-    const y = ((n / tau)**n) * ((t**(n - 1)) / math.factorial(n - 1)) * Math.exp((-1 * n * t) / tau);
-    // const y = t**(n - 1) * Math.exp(-1 * t / tau) / (math.factorial(n - 1) * tau**n);
+    // const y = ((n / tau) ** n) * ((t ** (n - 1)) / math.factorial(n - 1)) * Math.exp((-1 * n * t) / tau);
+    const y = t ** (n - 1) * Math.exp(-1 * t / tau) / (math.factorial(n - 1) * tau ** n);
     const pix = coordToPix(x, y);
     p.vertex(pix[0], pix[1]);
   }
