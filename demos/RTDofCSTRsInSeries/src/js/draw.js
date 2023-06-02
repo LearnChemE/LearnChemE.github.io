@@ -105,7 +105,6 @@ function drawCurve(p) {
     const n = gvs.n;
     const tau = gvs.tau;
     const y = ((n / tau) ** n) * ((t ** (n - 1)) / math.factorial(n - 1)) * Math.exp((-1 * n * t) / tau);
-    // const y = t**(n - 1) * Math.exp(-1 * t / tau) / (math.factorial(n - 1) * tau**n);
     y_list.push(y);
     if (y > maxY) {
       maxY = y;
