@@ -91,6 +91,76 @@ function frame(){
         textStyle(NORMAL);
         text('= '+g.L,532,280);
         pop();
+
+        // Last stage concentration labels
+        push();
+        translate(0,-5);
+        fill(250); noStroke();
+        rect(395,374,130,23); 
+        if(g.stagesCount < 9 && g.stagesCount != '∞'){
+            textStyle(ITALIC); textSize(18); fill(g.green);
+            text('y',400,390);
+            textStyle(NORMAL);
+            text(' = '+g.yN1+' ppm',420,390);
+            textSize(15);
+            text(g.stagesCount+1,411,394);
+        } else if(g.stagesCount != '∞') {
+            textStyle(ITALIC); textSize(18); noStroke(); fill(g.green);
+            text('y',400,390);
+            textStyle(NORMAL);
+            text(' = '+g.yN1+' ppm',428,390);
+            textSize(15);
+            text(g.stagesCount+1,411,394);
+        } 
+        fill(250); //noStroke();
+        rect(555,374,130,23);
+        if(g.stagesCount < 10 && g.stagesCount != '∞'){
+            textStyle(ITALIC); textSize(18); fill(g.blue);
+            text('x',560,390);
+            textStyle(NORMAL);
+            text(' = '+g.xOut+' ppm',580,390);
+            textSize(15);
+            text(g.stagesCount,571,394);
+        } else if (g.stagesCount != '∞'){
+            textStyle(ITALIC); textSize(18); fill(g.blue);
+            text('x',560,390);
+            textStyle(NORMAL);
+            text(' = '+g.xOut+' ppm',588,390);
+            textSize(15);
+            text(g.stagesCount,571,394);
+        }
+        
+        pop();
+
+        // Number of stages on absorption column
+        if(!g.LVmin){
+            push();
+            noStroke(); textSize(18);
+            if(g.stagesCount == '∞'){
+                textSize(27);
+                text('∞',466,203);
+                textSize(18);
+                text('stages needed',487,200);
+            } else if(g.stagesCount < 10){
+                text(g.stagesCount+' stages needed',470,200);
+            } else {
+                text(g.stagesCount+' stages needed',465,200);
+            }
+            pop();
+        } else {
+            let LVmin = (yeq(g.maxX)-g.y1)/(g.maxX-g.x0);
+
+            push();
+            noStroke(); textSize(18); fill(100,0,100);
+            text('= '+LVmin.toFixed(1),550,200);
+            text('(',477,200);
+            text(')',512,200);
+            textStyle(ITALIC);
+            text('L/V',483,200);
+            textSize(15); textStyle(NORMAL);
+            text('min',520,203);
+            pop();
+        }
     }
     
 
@@ -178,8 +248,6 @@ function graphAxes(){
     }
 }
 
-
-
 function defineLines(){
     let x1, x2, y1, y2;
     
@@ -238,6 +306,9 @@ function displayStages(){
 
     if(g.rightTest && g.leftTest){
         x0andy1Disp();
+        stagesSolveAndDisp();
+    } else {
+        infStages();
     }
 
     function x0andy1Disp(){
@@ -273,8 +344,186 @@ function displayStages(){
         fill(g.green);
         ellipse(g.lx,y1,g.diam);
         pop();
+    }   
+
+    function infStages(){
+        push();
+        fill(250);
+        rect(g.lx+60,g.ty+134,200,41);
+        fill(255,0,0); noStroke(); textSize(18);
+        text('separation not possible',g.lx+68,g.ty+150);
+        fill(0);
+        text('*inifinite stages needed*',g.lx+65,g.ty+170);
+        pop();
     }
     
+}
+
+function stagesSolveAndDisp(){
+    let xLim = map(g.x0,0,g.maxX,g.lx,g.rx);
+    let yStart = map(g.yN1,0,g.maxY,g.by,g.ty);
+
+    // xStart variable used to determine number of stages
+    let xStart = (yStart - g.Up[1])/g.Up[0];
+    let count = 0;
+    let x = 10000; 
+    let y;
+
+    let p = [];
+    p.push([xStart,yStart]);
+
+    g.xOut = (map(xStart,g.lx,g.rx,0,g.maxX)).toFixed(2);
+
+    while(x > xLim && count < 100){
+        // Find next vertical point (orange line)
+        if(count == 0){
+            x = xStart;
+            y = g.Lo[0]*xStart + g.Lo[1];
+        } else {
+            y = g.Lo[0]*x + g.Lo[1];
+        }
+        
+        p.push([x,y]);
+
+        // Find next horizontal point (pink line)
+        x = (y - g.Up[1])/g.Up[0];
+        
+        // Test if x < xLim
+        if(x < xLim){
+            x = xLim;
+        }
+        p.push([x,y]);
+        count++;
+        
+    }
+
+    g.stagesCount = (p.length-1)/2;
+
+    push();
+    strokeWeight(2);
+    for(let i = 0; i < p.length-1; i++){
+        line(p[i][0],p[i][1],p[i+1][0],p[i+1][1]);
+    }
+    pop();
+
+    // Vertical dashed line for last x stage
+    push();
+    strokeWeight(2); drawingContext.setLineDash([5,5]); stroke(g.blue);
+    line(p[1][0],p[1][1],p[1][0],g.by);
+    noStroke(); fill(g.blue);
+    ellipse(p[1][0],p[1][1],g.diam);
+    pop();
+
+    // Y1 line
+    push();
+    strokeWeight(2); stroke(g.green); drawingContext.setLineDash([5,5]);
+    line(g.lx,yStart,g.rx,yStart);
+    pop();
+
+    // Text labels for last x stage and last y stage
+    push();
+    fill(250); noStroke();
+    if(g.stagesCount < 9){
+        rect(g.lx+51,yStart-8,21,20);
+    } else {
+        rect(g.lx+51,yStart-8,29,20);
+    }
+    if(g.stageCount < 10){
+        rect(p[1][0]-10,g.by-62,21,20);
+    } else {
+        rect(p[1][0]-10,g.by-62,29,20);
+    }
+    
+    textSize(16); textStyle(ITALIC); fill(g.green);
+    text('y',g.lx+55,yStart+3);
+    fill(g.blue);
+    text('x',p[1][0]-7,g.by-50);
+    textStyle(NORMAL); textSize(13);
+    text(g.stagesCount,p[1][0]+1,g.by-45);
+    fill(g.green);
+    text(g.stagesCount+1,g.lx+63,yStart+7);
+    pop();
+
+    if(g.stagesCount < 10){
+        for(let i = 1; i < 2*g.stagesCount; i+= 2){
+            push();
+            noStroke(); textSize(17); 
+            text(g.stagesCount-.5*(i-1),p[i][0]+5,p[i][1]+10)
+            pop();
+        }
+    } else {
+        push();
+        noStroke(); textSize(17);
+        text('1',p[p.length-2][0]+5,p[p.length-2][1]+10);
+        for(let i = 1; i < 16; i+=2){
+            text(g.stagesCount-.5*(i-1),p[i][0]+5,p[i][1]+10);
+        }
+        pop();
+    }
+
+    
+}
+
+function equilibLines(){
+    if(mouseX > g.lx && mouseX < g.rx && mouseY > g.ty && mouseY < g.by){
+        x = mouseX;
+        y = mouseY;
+        let check = true;
+
+        let yL, yU, theta;
+        yL = g.Lo[0]*x + g.Lo[1];
+        yU = g.Up[0]*x + g.Up[1];
+
+        // For figuring out the angle on equilib line
+        let x1, x2, y1, y2;
+        x1 = g.lx; y1 = g.Lo[0]*g.lx + g.Lo[1];
+        x2 = g.rx; y2 = g.Lo[0]*g.rx + g.Lo[1];
+
+        theta = Math.atan((y2-y1)/(x2-x1));
+        if(mouseY <= yL+7 && mouseY >= yL-7){
+            check = false;
+
+            // Remapping x1 to a value to start text at
+            x = g.lx+40;
+            y = g.Lo[0]*x + g.Lo[1];
+            push();
+            translate(x+45,y); rotate(theta);
+            noStroke(); textSize(16); fill(g.orange);
+            text('operating line',0,0);
+            pop();
+        }
+
+        // Rewriting for operating line
+        y1 = g.Up[0]*x1 + g.Lo[1];
+        y2 = g.Up[0]*x2 + g.Up[1];
+        theta = Math.atan((y2-y1)/(x2-x1));
+
+        if(check && mouseY <= yU+7 && mouseY >= yU-7){
+            x = g.lx+40;
+            y = g.Up[0]*x + g.Up[1];
+            push();
+            translate(x-10,y-2); rotate(theta);
+            noStroke(); textSize(16); fill(g.pink);
+            text('equilibrium line',0,0);
+            pop();
+        }
+
+    }
+}
+
+function LVminDisp(){
+    let x1, y1, x2, y2;
+    x1 = g.lx;
+    y1 = map((yeq(g.maxX)-g.y1)/(g.maxX - g.x0)*(-g.x0) + g.y1,0,g.maxY,g.by,g.ty);
+    x2 = g.rx;
+    y2 = map((yeq(g.maxX)-g.y1)/(g.maxX - g.x0)*(g.maxX-g.x0) + g.y1,0,g.maxY,g.by,g.ty);
+
+    push();
+    strokeWeight(2); stroke(g.pink);
+    line(x1,y1,x2,y2);
+    stroke(g.orange);
+    line(g.lx,g.by,x2,y2);
+    pop();
 }
 
 function infiniteStageTest(){
@@ -294,8 +543,9 @@ function infiniteStageTest(){
     yTest = g.Up[0]*g.rx + g.Up[1];
     let yComp = map(g.yN1,0,g.maxY,g.by,g.ty);
     
-    if(yTest > yComp){
+    if(yTest >= yComp){
         g.rightTest = false;
+        g.stagesCount = '∞';
     } else {
         g.rightTest = true;
     }
@@ -317,22 +567,27 @@ function show5Display(){
     function figure(){
         push();
         scale(.8); translate(160,40);
+        push();
+        textSize(22); noStroke();
+        text('mole ratios are in ppm',435,-15);
+        pop();
+        translate(0,10);
 
         push();
         for(let i = 1; i < 6; i++){
             if(i == g.stage){
                 strokeWeight(4); fill(255,255,0);
-                rect(480,50+80*(i-1),110,40);
+                rect(480,50+70*(i-1),110,40);
                 push();
                 textSize(30); fill(0); 
-                text(i,525,81+80*(i-1));
+                text(i,525,81+70*(i-1));
                 pop();
             } else {
                 strokeWeight(1.5); fill(250);
-                rect(480,50+80*(i-1),110,40)
+                rect(480,50+70*(i-1),110,40)
                 push();
                 textSize(22); fill(0); 
-                text(i,528,77+80*(i-1));
+                text(i,528,77+70*(i-1));
                 pop();
             }
         }
@@ -341,33 +596,34 @@ function show5Display(){
         strokeWeight(2); 
         for(let i = 0; i < 5; i++){
             stroke(g.blue);
-            line(565,10+80*i,565,45+80*i);
-            arrow([565,10+80*i],[565,50+80*i],g.blue,20,6);
+            line(565,20+70*i,565,45+70*i);
+            arrow([565,10+70*i],[565,50+70*i],g.blue,20,6);
             stroke(g.green);
-            line(505,530-80*(i+1),505,495-80*(i+1));
-            arrow([505,530-80*(i+1)],[505,490-80*(i+1)],g.green,20,6);
+            line(505,470-70*(i+1),505,442-70*(i+1));
+            arrow([505,600-70*(i+1)],[505,439-70*(i+1)],g.green,20,6);
         }
 
         // Other arrows and lines
-        line(480,450,505,450);
-        line(490,10,505,10);
-        line(505,10,505,50);
-        arrow([505,10],[470,10],g.green,20,6);
+        line(480,400,505,400);
+        line(490,20,505,20);
+        line(505,20,505,50);
+        arrow([505,20],[470,20],g.green,20,6);
         stroke(g.blue);
-        line(565,410,565,450);
-        line(565,450,580,450);
-        arrow([565,450],[600,450],g.blue,20,6);
-        line(590,10,565,10);
+        line(565,370,565,400);
+        line(565,400,580,400);
+        arrow([565,400],[600,400],g.blue,20,6);
+        line(590,20,565,20);
         pop();
 
         // Non-italic elements
         push();
-        textSize(22); fill(g.green); noStroke();
-        text('1 Mmol/h',400,-5);
-        text('1 Mmol/h',400,475);
+        textSize(22); noStroke();
+        fill(g.green);
+        text('1 Mmol/h',400,5);
+        text('1 Mmol/h',400,425);
         fill(g.blue);
-        text('100 Mmol/h',580,-5);
-        text('100 Mmol/h',580,475);
+        text('100 Mmol/h',580,5);
+        text('100 Mmol/h',580,425);
         pop();
 
         // Value labels for x and y
@@ -376,60 +632,60 @@ function show5Display(){
         for(let i = 0; i < 5; i++){
             if(i == 0){
                 fill(g.green);
-                text(' = '+y[0],430,35);
-                text(' = '+y[y.length-1],430,445);
+                text(' = '+y[0],430,45);
+                text(' = '+y[y.length-1],430,395);
                 push();
                 textStyle(ITALIC);
-                text('y',410,35);
-                text('y',410,445);
+                text('y',410,45);
+                text('y',410,395);
                 pop();
                 push();
                 textSize(16);
-                text('1',421,42);
-                text('6',421,452);
+                text('1',421,52);
+                text('6',421,402);
                 pop();
                 fill(g.blue);
-                text(' = '+x[0],630,35);
-                text('= '+x[x.length-1],630,445);
+                text(' = '+x[0],630,45);
+                text(' = '+x[x.length-1],630,395);
                 push();
                 textStyle(ITALIC);
-                text('x',610,35);
-                text('x',610,445);
+                text('x',610,45);
+                text('x',610,395);
                 pop();
                 push();
                 textSize(16);
-                text('0',621,42);
-                text('5',621,452);
+                text('0',621,52);
+                text('5',621,402);
                 pop();
 
             } else {
                 fill(g.green);
-                text(' = '+y[i],450,35+80*(i));
+                text(' = '+y[i],450,40+70*(i));
                 push();
                 textStyle(ITALIC);
-                text('y',430,35+80*(i));
+                text('y',430,40+70*(i));
                 pop();
                 push();
                 textSize(16);
-                text(i+1,441,42+80*i);
+                text(i+1,441,47+70*i);
                 pop();
                 fill(g.blue);
-                text(' = '+x[i],600,35+80*i);
+                if(i == 2){
+                    text(' = 0.20',600,40+70*i);  
+                } else {
+                    text(' = '+x[i],600,40+70*i);  
+                }
                 push();
                 textStyle(ITALIC);
-                text('x',580,35+80*i);
+                text('x',580,40+70*i);
                 pop();
                 push();
                 textSize(16);
-                text(i,591,42+80*i);
+                text(i,591,47+70*i);
                 pop();
             }
         }
         pop();
-
-
-
-
         pop();
     }
 

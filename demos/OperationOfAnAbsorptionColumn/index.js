@@ -46,6 +46,9 @@ window.g = {
 
     diam: 9,
 
+    stagesCount: 8,
+    xOut: .95,
+
 
 }
 
@@ -55,9 +58,9 @@ function setup(){
 }
 
 function draw(){
+    push();
     background(250);
     frame();
-    console.log(g.rightTest)
     if(g.show5){
         show5Display();
     } else {
@@ -65,9 +68,13 @@ function draw(){
         defineLines();
         if(!g.LVmin){
             displayStages(); 
+            equilibLines();
+        } else {
+            LVminDisp();
         }
     }
     infiniteStageTest();
+    pop();
 }
 
 // EVENT LISTENERS
@@ -204,6 +211,7 @@ show5.addEventListener("change", () => {
         OV.disabled = true;
         IL.disabled = true;
         LVmin.disabled = true;
+        LVmin.checked = false;
     } else {
         stageSlider.style.display = "none";
         label1.style.color = "black";

@@ -69,7 +69,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation displays the residence time distribution (RTD) of a compound that is injected into a continuously-stirred tank reactor (CSTR). In this simulation, multiple CSTRs are in series, such that the outlet of each CSTR is fed into the inlet of the next CSTR. A compound is pulse-injected into the first CSTR, and the plot displays the RTD of the last CSTR in the series. The RTD is a probability density function that shows the likelihood that a single particle of the injected compound will spend a certain amount of time within the last reactor. Adjust the "number of CSTRs in series" slider to change the number of CSTRs, and adjust the "spacetime" slider to change the mean residence time \( \tau = V / \upsilon \), where \( V \) is the volume of a CSTR and \( \upsilon \) is the volumetric flowrate of the liquid.
+            This simulation displays the residence time distribution (RTD), which is measured by injecting a tracer pulse into the first continuously-stirred tank reactor (CSTR) in a series and detecting the tracer concentration at the outlet of the last CSTR. The outlet of each CSTR is the inlet to the next CSTR. The RTD for the system of CSTRs is a probability that a molecule will spend a certain amount of time in the reactor system. Use the sliders to change the number of CSTRs in series and the space time of the system (i.e., the space time \( \tau \) is the total volume of CSTRs divided by the volumetric flow rate).
           </p>
 
         </div>
@@ -91,102 +91,100 @@
 
         <div class="modal-body">
           <div class="details-text">
-            A dye is pulse-injected into a CSTR or a CSTR in series, such that all of the dye enters the first CSTR within a negligibly small amount of time. The mass balance for the first CSTR in the series is
+            A pulse of tracer is injected into the first CSTR in a series such that at time \( t = 0 \), all the tracer is in the CSTR and the material balance on the first CSTR is
           </div>
 
           <div class="details-eqn">
             $$
-            [1] \quad V \frac{dC_{1}}{dt} = \upsilon \, C_{0} - \upsilon \, C_{1}
+            [1] \quad V \frac{dC_{1}}{dt} = - \upsilon \, C_{1}
             $$
           </div>
 
           <div class="details-text">
-            where \( V \) is the volume of the CSTR (L), \( C_{0} \) is the concentration of dye in the inlet stream (mol/L), \( C_{1} \) is the concentration of dye in the first CSTR's outlet stream (mol/L), \( \upsilon \) is volumetric flowrate, and \( t \) is time (s). The boundary condition is \( C_{1} = C_{init} \) at \( t = 0 \), where \( C_{init} \) is the concentration of dye in the first reactor immediately after the dye is injected (this assumes perfect mixing). \( C_{0} = 0 \) because the concentration of dye in the inlet stream is zero after the dye is injected. The equation can be rearranged and integrated (given that \( \upsilon \, C_{0} = 0 \)):
+            with initial condition \( C_{1} = C_{0} \) at \( t = 0 \). In equation [1], \( V \) is the volume of the CSTR (L), \( C_{1} \) is the concentration of tracer in the CSTR (and in the outlet from the CSTR) at time \( t \) (s), and \( \upsilon \) is volumetric flowrate (L/s). Rearranging this equation yields
           </div>
 
           <div class="details-eqn">
             $$
-            [2] \quad \int_{C_{init}}^{C_{1}} \frac{d C_{1}}{C_{1}} = - \int_{0}^{t} \frac{\upsilon \, dt}{V}
+            [2] \quad \int_{C_{0}}^{C_{1}} \frac{d C_{1}}{C_{1}} = - \int_{0}^{t} \frac{\upsilon \, dt}{V}
             $$
           </div>
           
           <div class="details-text">
-            we assign a variable for spacetime \( \tau = V / \upsilon \) and evaluate the integral:
+            Space time for a series of \( N \) CSTRs is defined as \( \tau = V_{total} / \upsilon \) where the total volume \( V_{total} = NV \). Thus, integrating equation 2 yeilds
           </div>
 
           <div class="details-eqn">
             $$
-            [3] \quad \mathrm{ln} \left( \frac{C_{1}}{C_{init}} \right) = - \frac{t}{\tau}
+            [3] \quad \mathrm{ln} \left( \frac{C_{1}}{C_{0}} \right) = - \frac{N t}{\tau}
+            $$
+          </div>
+
+          <div class="details-text">or</div>
+
+          <div class="details-eqn">
+            $$
+            [4] \quad C_{1} = C_{0} e^{- N t / \tau}
             $$
           </div>
 
           <div class="details-text">
-            Solving for \( C_{1} \), we find \( C_{1} = C_{init} e^{-t/\tau} \). The mass balance for the second CSTR in the series is
+            The material balance for the second CSTR is
           </div>
 
           <div class="details-eqn">
             $$
-            [4] \quad V \frac{C_{2}}{dt} = \upsilon \, C_{1} - \upsilon \, C_{2} = \upsilon \, C_{init} e^{-t/\tau} - \upsilon \, C_{2}
+            [5] \quad \frac{V d C_{2}}{dt} = \upsilon C_{1} - \upsilon C_{2}
             $$
           </div>
 
           <div class="details-text">
-            where \( C_{2} \) is the concentration of dye in the second reactor. The boundary condition for the second reactor is \( C_{2} = 0 \) at \( t = 0 \). When equation [4] is integrated, we find
+            with initial condition \( C_{2} = 0 \) at \( t = 0 \). In equation [5], \( C_{2} \) is the concentration of tracer in the second CSTR (and thus leaving the second CSTR). Solving this equation yields
           </div>
 
           <div class="details-eqn">
             $$
-            [5] \quad C_{2} = \frac{C_{init} \, t \, e^{-t / \tau}}{\tau}
+            [6] \quad C_{2} = \frac{C_{0} N t e^{-Nt / \tau}}{\tau}
             $$
           </div>
 
           <div class="details-text">
-            This can be generalized to \( n \) reactors in series, such that \( n^{th} \) reactor's concentration of dye \( C_{n} \) is
+            Solving material balances for additional CSTRs leads to the general equation for the n<sup>th</sup> CSTR
           </div>
 
           <div class="details-eqn">
             $$
-            [6] \quad C_{n} = \frac{C_{init} \, t^{n - 1} \, e^{-t / \tau}}{(n - 1)! \, \tau^{n - 1}}
+            [7] \quad C_{n} = (C_{0} t^{n - 1})\left( \frac{n}{\tau} \right)^{n - 1} \frac{e^{-n t / \tau}}{(n - 1)!}
             $$
           </div>
 
           <div class="details-text">
-            The residence time distribution (RTD) is a normalized concentration curve, such that
+            The residence time distribution (RTD) for \( N \) CSTRs \( E_{N} (t) \) is a probability function so that
           </div>
 
           <div class="details-eqn">
             $$
-            [7] \quad \int_{0}^{\infty} E(t) \, dt = 1
+            [8] \quad \int_{0}^{\infty} E_{N} (t) dt = 1
             $$
           </div>
 
           <div class="details-text">
-            where \( E(t) \) is the RTD curve as a function of time and
+            thus,
           </div>
 
           <div class="details-eqn">
             $$
-            [8] \quad \frac{C_{n}}{\alpha} = E(t)
+            [8] \quad E(t) = \frac{C_{N}}{\int_{0}^{\infty} C_{N} dt}
             $$
           </div>
 
           <div class="details-text">
-            where \( \alpha \) is a constant. Combining equations [6], [7], and [8], then evaluating the integral, we find a value for \( \alpha \):
-          </div>
-            
-          <div class="details-eqn">
-            $$
-            [9] \quad \alpha = \frac{\tau \, C_{init}}{n^{n} \, e^{ (1 - n) t / \tau }}
-            $$
-          </div>
-
-          <div class="details-text">
-            so the general function for RTD over time with \( n \) CSTRs is
+            and since \( \int_{0}^{\infty} C_{N} dt = \int_{0}^{\infty} C_{1} = \frac{C_{0} \tau}{N} \), then for a series of \( N \) CSTRs,
           </div>
 
           <div class="details-eqn">
             $$
-            [10] \quad E_{n}(t) = \frac{t^{n - 1}}{(n - 1)!} \left( \frac{n}{\tau} \right)^{n} e^{-t n / \tau}
+            [9] \quad E_{N} (t) = \frac{t^{N - 1}}{(N - 1)!} \left( \frac{N}{\tau} \right)^{N} e^{- N t / \tau}
             $$
           </div>
 
@@ -209,7 +207,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. This simulation was prepared with financial support from the National Science Foundation. Address any questions or comments to learncheme@gmail.com.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
           </p>
         </div>
       </div>
