@@ -12,7 +12,7 @@ numberOfCSTRsSlider.addEventListener("input", () => {
 
 spacetimeSlider.addEventListener("input", () => {
   const tau = Number(spacetimeSlider.value);
-  spacetimeValue.innerHTML = `${tau.toFixed(1)}`;
+  spacetimeValue.innerHTML = `${Math.round(tau / 60)}`;
   gvs.tau = tau;
   gvs.p.redraw();
 });

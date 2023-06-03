@@ -7,12 +7,12 @@ window.p5 = new require("./js/p5.min.js");
 // GLOBAL VARIABLES OBJECT
 window.gvs = {
     n : 1,
-    tau : 18,
+    tau : 6000,
     plot : {
         margins: [[100, 50], [80, 80]],
-        labels: [["RTD", ""], ["residence time distribution", "time (s)"]],
-        domain: [0, 30, 5, 1],
-        range: [0, 0.25, 0.05, 0.01],
+        labels: [["RTD", ""], ["residence time distribution", "time (min)"]],
+        domain: [0, 12000, 3000, 600],
+        range: [0, 0.001, 0.0002, 0.00005],
     },
     curveCoords : []
 };
