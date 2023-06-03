@@ -36,9 +36,9 @@
     </div>
 
     <div class="modal-buttons-row">
-      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">directions</div>
-      <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">details</div>
-      <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">about</div>
+      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
+      <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
+      <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
     </div>
 
   </div>
@@ -61,7 +61,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This is a step-by-step simulation to teach the user about non-ideal mixing and partial molar quantities. The simulation will randomly select between entropy or enthalpy, and the user will learn how to calculate excess entropy or enthalpy, temperature change of mixing, and partial molar entropy and enthalpy. Directions for each step are given at the top of the plot. After completing each step, the user presses the "show solution" button above the plot to see the answer (shown in green). When the step-by-step simulation has been completed, the user can press "new problem" and the simulation will switch from enthalpy to entropy, or from entropy to enthalpy and start again from step one. The properties of components A and B (pure-component enthalpy/entropy, deviation from ideal behavior, etc.) is randomized every time "new problem" is pressed, so the answers to each step will be different each time the user completes the simulation. The equations used in this simulation are available by clicking "details" above the plot.
+            This step-by-step simulation that concerns non-ideal mixing and partial molar quantities. The simulation randomly selects between entropy or enthalpy, and the user determines excess entropy or enthalpy, temperature change of mixing, and partial molar entropy or enthalpy. Directions for each step are given at the top of the plot. After completing each step, the user selects "show solution" to see the answer (green button above the plot). At any time, the user can select "new problem" to start over: it switches between entropy and enthalpy every time it starts over. The properties of components A and B (pure-component enthalpy/entropy, deviation from ideal behavior, etc.) are randomized every time "new problem" is selected.
           </p>
 
         </div>
@@ -127,7 +127,7 @@
           </div>
 
           <div class="details-text">
-            The molar entropy \( S \) of an ideal solution is:
+            The molar entropy of an ideal solution \( S^{IS} \) is:
           </div>
 
           <div class="details-eqn">
@@ -137,16 +137,12 @@
           </div>
 
           <div class="details-text">
-            Where \( R \) is the ideal gas constant. The excess entropy \( S^{E} \) can be derived from excess Gibbs energy of mixing \( G^{E} \) and an interaction parameter for the two components \( A_{AB} \).
+            where \( R \) is the ideal gas constant. The excess entropy \( S^{E} \) is
           </div>
 
           <div class="details-eqn">
             $$
-            [7] \quad G^{E} = A_{AB} \, R \, T \, x_{A} \, x_{B}
-            $$
-
-            $$
-            [8] \quad S^{E} = - \left( \frac{\partial G^{E}}{\partial T} \right)_{p, n_{A}, n_{B}} = -R \, A_{AB} \, x_{A} \, x_{B}
+            [7] \quad S^{E} = S - S^{IS}
             $$
           </div>
 
@@ -173,7 +169,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. This simulation was prepared with financial support from the National Science Foundation. Address any questions or comments to learncheme@gmail.com. <br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
           </p>
         </div>
       </div>
