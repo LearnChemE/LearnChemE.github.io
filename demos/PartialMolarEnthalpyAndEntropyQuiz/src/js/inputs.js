@@ -72,4 +72,7 @@ newProblemButton.addEventListener("click", () => {
   document.getElementById("input-H-6").removeAttribute("disabled");
   document.getElementById("input-S-4").style.display = "none";
   document.getElementById("input-S-4").removeAttribute("disabled");
+  document.getElementById("input-H-5").value = "";
+  document.getElementById("input-H-6").value = "";
+  document.getElementById("input-S-4").value = "";
 });
