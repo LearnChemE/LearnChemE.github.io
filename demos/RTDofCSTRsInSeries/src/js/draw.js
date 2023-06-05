@@ -35,8 +35,7 @@ function drawAxes(p) {
       p.fill(0);
       p.textAlign(p.CENTER, p.TOP);
       p.textSize(14);
-      const xText = Math.round(x / 60).toFixed(0);
-      p.text(xText, pix_bottom[0], pix_bottom[1] + 5);
+      p.text(`${Math.round(x)}`, pix_bottom[0], pix_bottom[1] + 5);
       p.stroke(0);
       p.noFill();
     } else {
@@ -47,26 +46,22 @@ function drawAxes(p) {
   }
 
   for (let y = yMin; y <= yMax; y += yStepMinor) {
-    y = Math.round(y * 100000) / 100000;
+    y = Math.round(y * 1000) / 1000;
     const pix_left = coordToPix(gvs.plot.domain[0], y);
     const pix_right = coordToPix(gvs.plot.domain[1], y);
     let tickLength;
-    const discrepancy = Math.round(100000 * (y - yMin)) / 100000;
+    const discrepancy = Math.round(1000 * (y - yMin)) / 1000;
     if (
-      ((Math.round((discrepancy % yStepMajor) * 100000) / 100000) === 0 ||
-        (Math.round((discrepancy % yStepMajor) * 100000) / 100000) === yStepMajor) &&
+      ((Math.round((discrepancy % yStepMajor) * 1000) / 1000) === 0 ||
+        (Math.round((discrepancy % yStepMajor) * 1000) / 1000) === yStepMajor) &&
       y !== 0) {
       tickLength = 8;
       p.noStroke();
       p.fill(0);
       p.textAlign(p.RIGHT, p.CENTER);
       p.textSize(14);
-      let yText = y.toExponential(1).split("e")[0];
-      let yExp = y.toExponential(1).split("e")[1];
-      yText += "x10";
-      p.text(yText, pix_left[0] - 15, pix_left[1]);
-      p.textSize(10);
-      p.text(yExp, pix_left[0] - 6, pix_left[1] - 6);
+      const yText = yMax > 0.025 ? y.toFixed(2) : y.toFixed(3);
+      p.text(yText, pix_left[0] - 5, pix_left[1]);
       p.stroke(0);
       p.noFill();
     } else {
@@ -86,7 +81,7 @@ function drawAxes(p) {
   p.text(gvs.plot.labels[1][1], bottomLabelCoords[0], bottomLabelCoords[1] + 40);
   p.translate(leftLabelCoords[0], leftLabelCoords[1]);
   p.rotate(-1 * Math.PI / 2);
-  p.text(gvs.plot.labels[0][0], 0, -75);
+  p.text(gvs.plot.labels[0][0], 0, -60);
   p.rotate(Math.PI / 2);
   p.translate(-1 * leftLabelCoords[0], -1 * leftLabelCoords[1]);
   p.fill(253);
@@ -105,7 +100,7 @@ function drawCurve(p) {
   let maxY = 0;
   let y_list = [];
   for (let x = xMin; x < xMax; x += (xMax - xMin) / 1000) {
-    x = Math.round(x);
+    x = Math.round(x * 1000) / 1000;
     const t = x;
     const n = gvs.n;
     const tau = gvs.tau;
@@ -113,37 +108,40 @@ function drawCurve(p) {
     y_list.push(y);
     if (y > maxY) {
       maxY = y;
-      if (maxY > 0.0005) {
-        const yAxisMaxY = (Math.round(maxY * 10000) + (5 - Math.round(maxY * 10000) % 5)) / 10000;
+      if (maxY > 0.025) {
+        const yAxisMaxY = (Math.round(maxY * 100) + (5 - Math.round(maxY * 100) % 5)) / 100;
         gvs.plot.range[1] = yAxisMaxY;
         yMax = gvs.plot.range[1];
-        if(yMax >= 0.001) {
-          gvs.plot.range[2] = 0.0002;
-          gvs.plot.range[3] = 0.00004;
+        gvs.plot.range[2] = 0.01;
+        gvs.plot.range[3] = 0.002;
+        yStepMajor = gvs.plot.range[2];
+        yStepMinor = gvs.plot.range[3];
+        if(yMax >= 0.1) {
+          gvs.plot.range[2] = 0.02;
+          gvs.plot.range[3] = 0.005;
           yStepMajor = gvs.plot.range[2];
           yStepMinor = gvs.plot.range[3];
         }
-        if(yMax >= 0.002) {
-          gvs.plot.range[2] = 0.0004;
-          gvs.plot.range[3] = 0.0001;
+        if(yMax >= 0.2) {
+          gvs.plot.range[2] = 0.04;
+          gvs.plot.range[3] = 0.01;
           yStepMajor = gvs.plot.range[2];
           yStepMinor = gvs.plot.range[3];
         }
       } else {
-        gvs.plot.range[1] = 0.0005;
+        gvs.plot.range[1] = 0.025;
         yMax = gvs.plot.range[1];
-        gvs.plot.range[2] = 0.0001;
-        gvs.plot.range[3] = 0.00002;
+        gvs.plot.range[2] = 0.005;
+        gvs.plot.range[3] = 0.001;
         yStepMajor = gvs.plot.range[2];
         yStepMinor = gvs.plot.range[3];
       }
     }
-
   }
   p.beginShape();
   let n = 0;
   for (let x = xMin; x < xMax; x += (xMax - xMin) / 1000) {
-    x = Math.round(x);
+    x = Math.round(x * 1000) / 1000;
     const pix = coordToPix(x, y_list[n]);
     p.vertex(pix[0], pix[1]);
     n++;
