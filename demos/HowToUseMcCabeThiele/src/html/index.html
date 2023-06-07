@@ -32,11 +32,39 @@
   <div class="simulation-controls">
     <div class="input-area">
   
-      <div class="input-row">
-        <div class="data-name">Label</div>
-        <input type="range" id="adjustable-slider" min="0" max="1" step="0.01" value="0.50">
-        <div class="data-value" id="adjustable-value">0.50</div>
-        <div class="data-metric"></div>
+      <div id="steps-button-row-container" class="buttons-row">
+        <div id="plot-points" class="first selected">plot points</div>
+        <div id="draw-operating-lines">draw operating lines</div>
+        <div id="count-stages">count stages</div>
+        <div id="optimal-feed-location" class="last">optimal feed location</div>
+      </div>
+
+      <div id="changing-inputs-container">
+        <div id="step-1-buttons-row" class="buttons-row">
+          <div id="step-1-feed" class="first selected">feed</div>
+          <div id="step-1-distillate">distillate</div>
+          <div id="step-1-bottoms" class="last">bottoms</div>
+        </div>
+
+        <div id="steps-2-through-4-container" style="display: none;">
+          <div id="step-2-buttons-row" class="buttons-row">
+            <div id="step-2-feed" class="first selected">feed</div>
+            <div id="step-2-rectifying">rectifying</div>
+            <div id="step-2-stripping" class="last">stripping</div>
+          </div>
+
+          <div class="input-row">
+            <div class="data-name">feed quality</div>
+            <input type="range" id="feed-quality-slider" min="-0.2" max="1.5" step="0.1" value="0.50">
+            <div class="data-value" id="feed-quality-value">0.5</div>
+          </div>
+
+          <div id="step-stages-container" class="input-row">
+            <div class="data-name">step off stages</div>
+            <input type="range" id="step-stages-slider" min="0" max="5" step="1" value="0">
+          </div>
+        </div>
+
       </div>
   
     </div>

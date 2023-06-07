@@ -30,21 +30,84 @@ $modal-xl: 1140px;
     display: grid;
     grid-template-columns: max-content;
     margin: 20px auto;
+    height: 75px;
     gap: 10px;
-    width: max-content;
     justify-items: center;
-    .input-row {
-        display: grid;
-        grid-template-columns: 200px 10rem 27px 50px;
-        gap: 1ch;
-        align-items: end;
-        .data-name {
-            justify-self: end;
-        }
-        .data-value {
-            text-align: end;
-        }
+    &>div {
+        width: 515px;
+        justify-content: center;
     }
+}
+
+.input-row {
+    display: grid;
+    grid-template-columns: max-content 8rem 28px;
+    gap: 1ch;
+    align-items: end;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 3px 8px;
+    .data-name {
+        justify-self: end;
+    }
+    .data-value {
+        text-align: end;
+    }
+}
+
+.buttons-row {
+    display: grid;
+    font-size: 14px;
+    div {
+        padding: 5px 8px;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+        border-right: 1px solid black;
+        background-color: rgb(238, 238, 255);
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: pointer;
+    }
+    div:hover {
+        background-color: rgb(250, 250, 255);
+    }
+    .first {
+        border-left: 1px solid black;
+        border-radius: 5px 0px 0px 5px;
+    }
+    .last {
+        border-radius: 0px 5px 5px 0px;
+    }
+    .selected {
+        background-color: rgb(212, 212, 252);
+    }
+    .selected:hover {
+        background-color: rgb(212, 212, 252);
+    }
+}
+
+#steps-button-row-container {
+    grid-template-columns: repeat(4, max-content);
+}
+
+#changing-inputs-container {
+    display: grid;
+}
+
+#step-1-buttons-row, #step-2-buttons-row {
+    grid-template-columns: repeat(3, max-content);
+}
+
+#steps-2-through-4-container {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    font-size: 14px;
+    gap: 15px;
+}
+
+#step-stages-container {
+    grid-template-columns: max-content 8rem;
 }
 
 #p5-container {

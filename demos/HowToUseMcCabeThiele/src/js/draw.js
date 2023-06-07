@@ -102,8 +102,27 @@ function drawAxes(p) {
   p.pop();
 }
 
+function drawEquilb(p) {
+  p.push();
+  p.stroke(0);
+  p.noFill();
+  p.strokeWeight(2);
+  p.beginShape();
+  for(let x = 0; x <= 1; x += 0.01) {
+    x = Math.round(x * 100) / 100;
+    const pix = coordToPix(x, gvs.equilb(x));
+    p.vertex(pix[0], pix[1]);
+  }
+  p.endShape();
+  const xy_pix_1 = coordToPix(0, 0);
+  const xy_pix_2 = coordToPix(1, 1);
+  p.line(xy_pix_1[0], xy_pix_1[1], xy_pix_2[0], xy_pix_2[1]);
+  p.pop();
+}
+
 function drawAll(p) {
   setupPlot();
+  drawEquilb(p);
   drawAxes(p);
 }
 

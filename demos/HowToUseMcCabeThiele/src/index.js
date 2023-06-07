@@ -12,7 +12,16 @@ window.gvs = {
         domain: [0, 1, 0.2, 0.05],
         range: [0, 1, 0.2, 0.05],
     },
+    step : 1,
+    substep : 1,
+    q : 0.5,
+    stage_inc : 0,
+    z : 0.5,
+    xD : 0.85,
+    xB : 0.05,
 };
+
+require("./js/equilb.js");
 
 const containerElement = document.getElementById("p5-container");
 
