@@ -166,6 +166,17 @@ function drawCycle(p) {
   p.triangle(H5_pix[0], H5_pix[1], H5_pix[0] + 18, H5_pix[1] + 5, H5_pix[0] + 18, H5_pix[1] - 5);
   const angle_irrev = Math.PI / 2 + p.atan2(H4_pix[0] - H3_pix[0], H3_pix[1] - H4_pix[1]);
   const angle_rev = Math.PI / 2 + p.atan2(H4rev_pix[0] - H3_pix[0], H3_pix[1] - H4rev_pix[1]);
+  if(gvs.H4 < gvs.H(gvs.outlet_p4_pressure, 2)) {
+    const HSatVapor = gvs.H(gvs.outlet_p4_pressure, 2);
+    const HSatLiquid = gvs.H5;
+    const q = (HSatVapor - gvs.H4) / (HSatVapor - HSatLiquid);
+    const x = (gvs.saturation_list[0][0] + gvs.saturation_list[gvs.saturation_list.length - 1][0]) / 2;
+    const yPix = p.height - gvs.plot.margins[1][1] - 30;
+    const pix = coordToPix(x, 0.001);
+    p.textAlign(p.LEFT, p.CENTER);
+    p.text(`${(Math.round(q * 1000) / 10).toFixed(1)}% liquid`, H4_pix[0] + 38, H4_pix[1] + 10);
+    p.text(`${(Math.round((1 - q) * 1000) / 10).toFixed(1)}% vapor`, H4_pix[0] + 38, H4_pix[1] + 30)
+  }
   p.translate(H4rev_pix[0], H4rev_pix[1]);
   p.rotate(angle_rev);
   p.fill(50, 150, 50);
@@ -186,16 +197,6 @@ function drawCycle(p) {
   p.textAlign(p.LEFT, p.CENTER);
   p.text(`work = ${Math.round(gvs.W)} kJ`, gvs.plot.margins[0][0] + 150, gvs.plot.margins[1][0] + 30);
   p.text(`cycle efficiency = ${(Math.round(1000 * gvs.eff) / 1000).toFixed(3)}`, gvs.plot.margins[0][0] + 350, gvs.plot.margins[1][0] + 30);
-  if(gvs.H4 < gvs.H(gvs.outlet_p4_pressure, 2)) {
-    const HSatVapor = gvs.H(gvs.outlet_p4_pressure, 2);
-    const HSatLiquid = gvs.H5;
-    const q = (HSatVapor - gvs.H4) / (HSatVapor - HSatLiquid);
-    const x = (gvs.saturation_list[0][0] + gvs.saturation_list[gvs.saturation_list.length - 1][0]) / 2;
-    const yPix = p.height - gvs.plot.margins[1][1] - 30;
-    const pix = coordToPix(x, 0.001);
-    p.textAlign(p.CENTER);
-    p.text(`${(Math.round(q * 1000) / 10).toFixed(1)}% liquid  ${(Math.round((1 - q) * 1000) / 10).toFixed(1)}% vapor`, pix[0], yPix);
-  }
   p.pop();
 }
 
@@ -448,7 +449,7 @@ function drawRankine(p) {
   }
   p.fill(0);
   p.noStroke();
-  p.text("move cursor over numbers to show phases present", 0, -240);
+  p.text("move cursor over circled numbers to show phases present", 0, -240);
   p.pop();
 }
 
