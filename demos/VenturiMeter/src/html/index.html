@@ -77,7 +77,7 @@
         </div>
         <div class="modal-body">
           <p>
-            Directions
+            This is a simulation of a venturi meter, which is a device that allows one to calculate the flow rate of a liquid through a pipe. Adjust the inner diameter and volumetric flow rate with the sliders at the top of the simulation. A value for volumetric flow rate is not shown by default, allowing for users to calculate flow rate using Bernoulli's equation without seeing the answer. If you want to see the volumetric flow rate to check your calculations, click on the "show volumetric flow rate" checkbox. To include frictional losses due to the Venturi meter, click on the "include fluid friction" checkbox.
           </p>
 
         </div>
@@ -98,14 +98,46 @@
         </div>
 
         <div class="modal-body">
-          <div class="details-text">Details</div>
+          <div class="details-text">
+            Venturi meters can be used to calculate liquid flow rate using the Bernoulli equation:
+          </div>
 
           <div class="details-eqn">
             $$
+            [1] \quad \frac{1}{2} \rho v_{1}^{2} + \rho g z_{1} + p_{1} = \frac{1}{2} \rho v_{2}^{2} + \rho g z_{2} + p_{2}
+            $$
+          </div>
 
+          <div class="details-text">
+            where \( \rho \) is the density of the liquid, \( v_{1} \) and \( v_{2} \) are the velocities of the liquid at the inlet and choke point, \( z_{1} \) and \( z_{2} \) are the heights of the liquid at the inlet and choke point, and \( p_{1} \) and \( p_{2} \) are the pressures at the inlet and choke point. Since the height of the liquid doesn't change, equation [1] can be simplified:
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [2] \quad \frac{1}{2} \rho v_{1}^{2} + p_{1} = \frac{1}{2} \rho v_{2}^{2} + p_{2}
+            $$
+          </div>
+
+          <div class="details-text">
+            Volumetric flow rate \( \dot{V} \) can be calculated from the velocity and pipe diameter:
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [3] \quad \dot{V} = \frac{1}{4} \pi D^{2} v_{1} = \frac{1}{4} \pi d^{2} v_{2}
             $$
           </div>
           
+          <div class="details-text">
+            where \( D \) is the diameter of the pipe at the inlet, and \( d \) is the diameter of the pipe at the choke point. Combining equations [2] and [3], we can calculate volumetric flow rate using the pressures read from the manometers:
+          </div>
+
+          <div class="details-eqn">
+            $$
+            [4] \quad \dot{V} = \frac{\pi d^{2}}{4 \sqrt{1 - (d/D)^{4}}} \sqrt{\frac{2(p_{1} - p_{2})}{\rho}}
+            $$
+          </div>
+
           <div style="margin-top: 2rem;"></div>
         </div>
 

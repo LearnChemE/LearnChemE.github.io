@@ -352,11 +352,11 @@ function drawAll(p) {
   p.noStroke();
   p.textSize(16);
   p.textAlign(p.CENTER);
-  p.text(`${Math.round(gvs.manometer_1_pressure)}`, 197, 50);
-  p.text(`${Math.round(gvs.manometer_2_pressure)}`, 319, 50);
-  p.text(`${Math.round(gvs.manometer_3_pressure)}`, 397, 50);
-  p.text(`${Math.round(gvs.manometer_4_pressure)}`, 479, 50);
-  p.text(`${Math.round(gvs.manometer_5_pressure)}`, 597, 50);
+  p.text(`${(Math.round(100 * gvs.manometer_1_pressure) / 100).toFixed(1)}`, 197, 50);
+  p.text(`${(Math.round(100 * gvs.manometer_2_pressure) / 100).toFixed(1)}`, 319, 50);
+  p.text(`${(Math.round(100 * gvs.manometer_3_pressure) / 100).toFixed(1)}`, 397, 50);
+  p.text(`${(Math.round(100 * gvs.manometer_4_pressure) / 100).toFixed(1)}`, 479, 50);
+  p.text(`${(Math.round(100 * gvs.manometer_5_pressure) / 100).toFixed(1)}`, 597, 50);
   p.pop();
 }
 
