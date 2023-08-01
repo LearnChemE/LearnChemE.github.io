@@ -336,12 +336,27 @@ function drawAll(p) {
   coord3 = mmToPix(68, 0.5 * gvs.outer_diameter / 2 - 1);
   p.triangle(coord1[0], coord1[1], coord2[0], coord2[1], coord3[0], coord3[1]);
 
+  if(gvs.show_flow_rate) {
+    p.fill(0);
+    p.noStroke();
+    p.textSize(16);
+    p.textAlign(p.CENTER, p.CENTER);
+    p.text(`volumetric flow rate = ${(Math.round(gvs.volumetric_flow_rate * 10000 * 100) / 100).toFixed(2)} cm  /s`, 0, 60);
+    p.textSize(10);
+    p.text(`3`, 99, 56);
+  }
+  p.pop();
+
+  p.push();
   p.fill(0);
   p.noStroke();
   p.textSize(16);
-  p.textAlign(p.CENTER, p.CENTER);
-  p.text(`inlet velocity = ${gvs.flow_velocity} m/s`, -250, 60);
-  p.text(`choke velocity = ${(Math.round(gvs.v2 * 100) / 100).toFixed(2)} m/s`, 0, 60);
+  p.textAlign(p.CENTER);
+  p.text(`${Math.round(gvs.manometer_1_pressure)}`, 197, 50);
+  p.text(`${Math.round(gvs.manometer_2_pressure)}`, 319, 50);
+  p.text(`${Math.round(gvs.manometer_3_pressure)}`, 397, 50);
+  p.text(`${Math.round(gvs.manometer_4_pressure)}`, 479, 50);
+  p.text(`${Math.round(gvs.manometer_5_pressure)}`, 597, 50);
   p.pop();
 }
 

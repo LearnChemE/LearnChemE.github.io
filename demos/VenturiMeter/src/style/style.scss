@@ -47,10 +47,17 @@ $modal-xl: 1140px;
     }
     .checkbox-container {
         display: grid;
-        grid-template-columns: max-content max-content;
-        gap: 10px;
-        transform: translateX(-53px);
+        grid-template-columns: repeat(4, max-content);
+        gap: 5px;
     }
+}
+
+#include-friction {
+    margin-right: 30px;
+}
+
+input[type="checkbox"] {
+    transform: translateY(1px);
 }
 
 #p5-container {

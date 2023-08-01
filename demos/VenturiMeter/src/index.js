@@ -9,9 +9,12 @@ window.gvs = {
     include_friction: false,
     inlet_pressure: 100, // mmH2O
     outer_diameter: 20, // mm
-    inner_diameter: 12, // mm
-    flow_velocity: 0.25, // m/s
-    v2: 0, // m/s
+    inner_diameter: 12.5, // mm
+    inlet_velocity: 0.2546479089470326, // m/s
+    volumetric_flow_rate: 0.00008, // m^3/s
+    choke_velocity: 0, // m/s
+    discharge_coefficient: 0.8864406779661017,
+    show_flow_rate: false,
     manometer_1_pressure: 100, // mmH2O
     manometer_2_pressure: 100, // mmH2O
     manometer_3_pressure: 100, // mmH2O

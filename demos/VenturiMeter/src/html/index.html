@@ -34,14 +34,23 @@
   
       <div class="input-row">
         <div class="data-name">inner diameter</div>
-        <input type="range" id="inner-diameter-slider" min="8" max="15" step="0.1" value="12.0">
-        <div class="data-value" id="inner-diameter-value">12.0</div>
+        <input type="range" id="inner-diameter-slider" min="9.1" max="15" step="0.1" value="12.5">
+        <div class="data-value" id="inner-diameter-value">12.5</div>
         <div class="data-metric">mm</div>
+      </div>
+
+      <div class="input-row">
+        <div class="data-name">volumetric flow rate</div>
+        <input type="range" id="v-slider" min="0.4" max="1.0" step="0.01" value="0.8">
+        <!-- <div class="data-value" id="v-value">0.80</div>
+        <div class="data-metric">cm<sup>3</sup>/s</div> -->
       </div>
   
       <div class="checkbox-container">
         <div class="checkbox-label">include fluid friction</div>
         <input type="checkbox" id="include-friction" />
+        <div class="checkbox-label">show volumetric flow rate</div>
+        <input type="checkbox" id="show-flow-rate" />
       </div>
 
     </div>
