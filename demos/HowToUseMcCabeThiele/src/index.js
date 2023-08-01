@@ -15,6 +15,7 @@ window.gvs = {
     step : 1,
     substep : 1,
     q : 0.5,
+    R : 1.5,
     stage_inc : 0,
     z : 0.5,
     xD : 0.85,

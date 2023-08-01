@@ -28,6 +28,65 @@ gvs.inverse_equilb = function(y) {
   return x_guess
 }
 
+gvs.feed = function(x) {
+  if(gvs.q !== 1) {
+    return (gvs.q / (gvs.q - 1)) * x - (gvs.z / (gvs.q - 1));
+  } else {
+    const q = gvs.q + 0.001;
+    return (q / (q - 1)) * x - (gvs.z / (q - 1));
+  }
+}
+
+gvs.x_eq = function() {
+  let error = 1e6;
+  let guess = 0;
+  for(let x = 0; x <= 1; x += 0.001) {
+    x = Math.round(x * 1000) / 1000;
+    const eq_x = gvs.equilb(x);
+    const feed_x = gvs.feed(x);
+    const difference = Math.abs(eq_x - feed_x);
+    if(difference < error) {
+      error = difference;
+      guess = x;
+    }
+  }
+  return guess
+}
+
+gvs.rect = function(x) {
+  return (x * gvs.R) / (gvs.R + 1) + gvs.xD / (gvs.R + 1)
+}
+
+gvs.xi = function() {
+  let error = 1e6;
+  let guess = 0;
+  for(let x = 0; x <= 1; x += 0.001) {
+    x = Math.round(x * 1000) / 1000;
+    const rect_x = gvs.rect(x);
+    const feed_x = gvs.feed(x);
+    const difference = Math.abs(rect_x - feed_x);
+    if(difference < error) {
+      error = difference;
+      guess = x;
+    }
+  }
+  return guess
+}
+
+gvs.yi = function() {
+  return gvs.rect(gvs.xi())
+}
+
+gvs.Vb = function() {
+  const xi = gvs.xi();
+  return (gvs.xB - xi) / (xi - gvs.yi())
+}
+
+gvs.strip = function(x) {
+  const Vb = gvs.Vb();
+  return x * (Vb + 1) / Vb - gvs.xB / Vb
+}
+
 function calcAll() {
 
 }
