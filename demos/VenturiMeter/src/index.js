@@ -9,7 +9,7 @@ window.gvs = {
     include_friction: false,
     inlet_pressure: 100, // mmH2O
     outer_diameter: 20, // mm
-    inner_diameter: 12.5, // mm
+    inner_diameter: 10.0, // mm
     inlet_velocity: 0.2546479089470326, // m/s
     volumetric_flow_rate: 0.00008, // m^3/s
     choke_velocity: 0, // m/s

@@ -189,8 +189,35 @@ function drawAll(p) {
   coord2 = mmToPix(72, -1 * gvs.outer_diameter / 2 - 130);
   p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
+  // start of middle arrow and label section
+
+  coord1 = mmToPix(7, -1 * gvs.inner_diameter / 2);
+  coord2 = mmToPix(7, -1 * gvs.inner_diameter / 2 - 10);
+  let coord3 = mmToPix(8.3, -1 * gvs.inner_diameter / 2 - 3);
+  let coord4 = mmToPix(5.7, -1 * gvs.inner_diameter / 2 - 3);
+  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  p.line(coord1[0], coord1[1], coord3[0], coord3[1]);
+  p.line(coord1[0], coord1[1], coord4[0], coord4[1]);
+
+  coord1 = mmToPix(7, gvs.inner_diameter / 2);
+  coord2 = mmToPix(7, gvs.inner_diameter / 2 + 10);
+  coord3 = mmToPix(8.5, gvs.inner_diameter / 2 + 3);
+  coord4 = mmToPix(5.5, gvs.inner_diameter / 2 + 3);
+  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  p.line(coord1[0], coord1[1], coord3[0], coord3[1]);
+  p.line(coord1[0], coord1[1], coord4[0], coord4[1]);
+
+  p.textSize(14);
+  p.fill(0);
+  p.noStroke();
+  p.textAlign(p.CENTER, p.CENTER);
+  let labelCoord = mmToPix(7, 20);
+  p.text("10 mm", labelCoord[0], labelCoord[1]);
+
   // start of axis section
 
+  p.noFill();
+  p.stroke(0);
   coord1 = mmToPix(-120, 0);
   coord2 = mmToPix(-120, -130 - gvs.outer_diameter / 2);
   p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
@@ -213,13 +240,12 @@ function drawAll(p) {
   p.fill(0);
   p.noStroke();
   p.textAlign(p.CENTER, p.CENTER);
-  const labelCoord = mmToPix(-122, -142 - gvs.outer_diameter / 2);
-  p.text("mmH O", labelCoord[0], labelCoord[1]);
-  p.textSize(10);
-  p.text("2", labelCoord[0] + 13, labelCoord[1] + 5);
+  labelCoord = mmToPix(-139, -70);
+  p.text("mm", labelCoord[0], labelCoord[1]);
+
+  p.textSize(14);
 
   p.stroke(0);
-  p.textSize(14);
   coord1 = mmToPix(-95, -1 * gvs.outer_diameter / 2);
   coord2 = mmToPix(-95, gvs.outer_diameter / 2);
   p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
@@ -293,7 +319,7 @@ function drawAll(p) {
   p.noStroke();
   coord1 = mmToPix(-66, 0);
   coord2 = mmToPix(-70, 1);
-  let coord3 = mmToPix(-70, -1);
+  coord3 = mmToPix(-70, -1);
   p.triangle(coord1[0], coord1[1], coord2[0], coord2[1], coord3[0], coord3[1]);
 
   coord1 = mmToPix(-66, 0.5 * -1 * gvs.outer_diameter / 2);
