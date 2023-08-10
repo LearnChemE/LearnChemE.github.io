@@ -77,9 +77,8 @@
         </div>
         <div class="modal-body">
           <p>
-            This is a simulation of a venturi meter, which is a device that allows one to calculate the flow rate of a liquid through a pipe. Adjust the inner diameter and volumetric flow rate with the sliders at the top of the simulation. A value for volumetric flow rate is not shown by default, allowing for users to calculate flow rate using Bernoulli's equation without seeing the answer. If you want to see the volumetric flow rate to check your calculations, click on the "show volumetric flow rate" checkbox. To include frictional losses due to the Venturi meter, click on the "include fluid friction" checkbox.
+            A venturi meter allows one to calculate the flow rate of a liquid through a pipe by measuring the pressure drop across a constricted section (the "choke") and using Bernoulli's equation. In this simulation, water flows through a pipe whose innder diameter is 20 mm, and the manometers along the pipe show the pressure in mm H<sub>2</sub>O. A slider is used to adjust volumetric flow rate, which can be achieved by opening or closing a valve in front of the venturi meter. Click on the "show volumetric flow rate" box to display the volumetric flow rate. Click on the "include fluid friction" box to introduce friction in the pipe.
           </p>
-
         </div>
       </div>
     </div>
@@ -138,6 +137,9 @@
             $$
           </div>
 
+          <div class="details-text">
+            When fluid friction is included, there is <a href="https://www.wermac.org/specials/venturiflowmeter.html" target="_blank">typically a head loss of between 10% and 20% across the venturi meter</a>. In this simulation, the head loss is approximately 11% of the pressure of the first manometer, which results in 13.7 mmH<sub>2</sub>O lower pressure in the last manometer.
+          </div>
           <div style="margin-top: 2rem;"></div>
         </div>
 
@@ -157,7 +159,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. This simulation was prepared with financial support from the National Science Foundation.Address any questions or comments to learncheme@gmail.com. This simulation is based on a desktop learning module developed at the School of Chemical Engineering and Bioengineering at Washington State University (<a href="https://labs.wsu.edu/educ-ate/desktop-learning-modules/fluid-mechanics-kit/" target="_blank">https://labs.wsu.edu/educ-ate/desktop-learning-modules/fluid-mechanics-kit/</a>).<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
           </p>
         </div>
       </div>

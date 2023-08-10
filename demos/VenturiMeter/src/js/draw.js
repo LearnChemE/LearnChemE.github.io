@@ -367,9 +367,9 @@ function drawAll(p) {
     p.noStroke();
     p.textSize(16);
     p.textAlign(p.CENTER, p.CENTER);
-    p.text(`volumetric flow rate = ${(Math.round(gvs.volumetric_flow_rate * 10000 * 100) / 100).toFixed(2)} cm  /s`, 0, 60);
+    p.text(`volumetric flow rate = ${(Math.round(gvs.volumetric_flow_rate * 10000 * 100) / 100).toFixed(2)} cm  /s`, -200, 60);
     p.textSize(10);
-    p.text(`3`, 99, 56);
+    p.text(`3`, -101, 56);
   }
   p.pop();
 
