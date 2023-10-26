@@ -6,7 +6,9 @@ var nNH3 = 1;
 
 // ----------------------------------------------------------------
 
-const labels = ['N2', 'H2', 'NH3'];
+
+const barLabels = ['N2', 'H2', 'NH3'];
+const labels = ['', '', ''];
 
 chartDataset = [nN2, nH2, nNH3]
 
@@ -40,6 +42,7 @@ const config = {
   type: 'bar',
   data: data,
   plugins: [ChartDataLabels],
+  responsive: true,
   options: {
     plugins: {
       tooltip: {
@@ -50,26 +53,74 @@ const config = {
       },
       datalabels: {
         formatter: function (value, context) {
-          return context.chart.data.labels[context.dataIndex] + ' = ' + value;
+          return barLabels[context.dataIndex] + ' = ' + value;
         },
-        font: {
-          size: 20
+        font: function (context) {
+          var width = context.chart.width;
+          var size;
+          if (width < 400) {
+            size = 12;
+          } else if (width < 800) {
+            size = 16;
+          } else {
+            size = 18;
+          }
+          return {
+            size: size
+          };
         }
       }
     },
     scales: {
       y: {
         beginAtZero: true,
-        max: 16,
-        title: {
-          display: true,
-          text: 'Equilibrium Amount (mol)',
-          font: {
-            size: 25
+        max: 12,
+        ticks: {
+          font: function (context) {
+            var width = context.chart.width;
+            var size;
+            if (width < 400) {
+              size = 10;
+            } else if (width < 800) {
+              size = 16;
+            } else {
+              size = 25;
+            }
+            return {
+              size: size
+            };
           }
         },
-
-
+        title: {
+          display: true,
+          text: 'equilibrium amount (mol)',
+          font: function (context) {
+            var width = context.chart.width;
+            var size;
+            if (width < 400) {
+              size = 10;
+            } else if (width < 600) {
+              size = 12;
+            } else {
+              size = 18;
+            }
+            return {
+              size: size
+            };
+          }
+        },
+        grid: {
+          display: false,
+          drawOnChartArea: true,
+          drawTicks: true,
+        }
+      },
+      x: {
+        grid: {
+          display: false,
+          drawOnChartArea: true,
+          drawTicks: true,
+        }
       }
     },
 
@@ -167,17 +218,9 @@ function calculateEquilibrium(P, T, nN2, nH2, nNH3) {
     }
   }
 
-  let nN2Final = nEQ(1, zeta).toFixed(2);
-  let nH2Final = nEQ(2, zeta).toFixed(2);
-  let nNH3Final = nEQ(3, zeta).toFixed(2);
-
-  // // Adjust for the case when starting with NH3
-  // if (nN2 === 0 && nH2 === 0 && nNH3 > 0) {
-  //   const xNH3 = nNH3 - nNH3Final;
-  //   nN2Final = Number((xNH3 / 2).toFixed(2)); // Given the stoichiometry of the reaction
-  //   nH2Final = Number(((3 * xNH3) / 2).toFixed(2)); // Given the stoichiometry of the reaction
-  // }
-
+  let nN2Final = nEQ(1, zeta).toFixed(3);
+  let nH2Final = nEQ(2, zeta).toFixed(3);
+  let nNH3Final = nEQ(3, zeta).toFixed(3);
 
   if (nN2Final < 0)
     nN2Final = 0
@@ -190,6 +233,11 @@ function calculateEquilibrium(P, T, nN2, nH2, nNH3) {
 }
 
 // ----------------------------------------------------------------
+
+
+window.addEventListener('resize', function () {
+  myChart.resize();
+});
 
 initValues();
 var canvas = document.getElementById('myChart').getContext('2d');

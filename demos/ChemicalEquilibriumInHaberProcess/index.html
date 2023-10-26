@@ -5,8 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chemical Equilibrium In Haber Process</title>
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.2.0/math.min.js"></script>
   <script
     src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
@@ -22,155 +25,178 @@
 </head>
 
 <body>
-  <!-- References -->
+  <div class="container mt-5" style="min-width:700px">
+    <div class="d-flex flex-column w-75 align-items-center mx-auto" style="max-width: 400px;">
+      <div class="d-flex justify-content-around w-75">
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+          data-bs-target="#directionsModal">Directions</button>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</button>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#aboutModal">About</button>
+      </div>
+      <div class="d-flex px-1 align-items-center mb-0 w-100">
+        <label class="form-label me-2" for="pressure">pressure(bar):</label>
+        <input type="range" class="form-range me-2" id="pressure" min="50" max="250" step="10" value="50"
+          oninput="updatePressure(this.value)" />
+        <span id="pressureValue"></span>
+      </div>
 
-  <div class="container">
-    <h1 class="py-3 text-primary">Chemical Equilibrium In Haber Process</h1>
-    <hr />
-    <div class="row">
-      <div class="col-md-4">
-        <label class="form-label" for="pressure">Pressure (bar): <span id="pressureValue"></span></label>
-        <div class="range">
-          <input type="range" class="form-range" id="pressure" min="50" max="250" step="10" value="50"
-            oninput="updatePressure(this.value)" />
-        </div>
-      </div>
-      <div class="col-md-4">
-        <label class="form-label" for="temperature">Temperature (K): <span id="temperatureValue"></span></label>
-        <div class="range">
-          <input type="range" class="form-range" id="temperature" min="300" max="750" step="10" value="300"
-            oninput="updateTemperature(this.value)" />
-        </div>
+      <div class="d-flex px-1 align-items-center mb-0 w-100">
+        <label class="form-label me-2" for="temperature">temperature(K):</label>
+        <input type="range" class="form-range me-2" id="temperature" min="300" max="750" step="10" value="300"
+          oninput="updateTemperature(this.value)" />
+        <span id="temperatureValue"></span>
       </div>
     </div>
-    <div class="row mt-3">
-      <h6>Moles Added:</h6>
-      <div class="col-md-3">
-        <label class="form-label" for="N2_moles">N<sub>2</sub>: <span id="N2MoleValue"></span></label>
-        <div class="range">
-          <input type="range" class="form-range" id="N2_moles" min="0" max="10" step="0.1" value="0"
-            oninput="updateN2Mole(this.value)" />
-        </div>
+
+
+    <div class="d-flex flex-column align-items-center mt-1 w-75 mx-auto" style="max-width: 400px; min-width: 300px;">
+      <h6 class="mb-1 me-3">moles added:</h6>
+
+      <div class="d-flex align-items-center mb-0 w-100">
+        <label class="form-label me-2" for="N2_moles">\(N_2:\)</label>
+        <input type="range" class="form-range me-2" id="N2_moles" min="0" max="10" step="0.1" value="0"
+          oninput="updateN2Mole(this.value)" />
+        <span id="N2MoleValue"></span>
       </div>
-      <div class="col-md-3">
-        <label class="form-label" for="H2_moles">H<sub>2</sub>: <span id="H2MoleValue"></span></label>
-        <div class="range">
-          <input type="range" class="form-range" id="H2_moles" min="0" max="8" step="0.1" value="0"
-            oninput="updateH2Mole(this.value)" />
-        </div>
+
+      <div class="d-flex align-items-center mb-0 w-100">
+        <label class="form-label me-2" for="H2_moles">\(H_2:\)</label>
+        <input type="range" class="form-range me-2" id="H2_moles" min="0" max="8" step="0.1" value="0"
+          oninput="updateH2Mole(this.value)" />
+        <span id="H2MoleValue"></span>
       </div>
-      <div class="col-md-3">
-        <label class="form-label" for="NH3_moles">NH<sub>3</sub>: <span id="NH3MoleValue"></span></label>
-        <div class="range">
-          <input type="range" class="form-range" id="NH3_moles" min="1" max="5" step="0.1" value="1"
-            oninput="updateNH3Mole(this.value)" />
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-3 ms-5 p-5">
-        <h4 class="fst-italic text-center">N<sub>2</sub> + 3H<sub>2</sub> &#x21c4; 2NH<sub>3</sub></h4>
-      </div>
-      <div class="col-3 ms-5 p-5">
-        <h4 class="fst-italic text-center">
-          K = <div class="frac">
-            <span>(y<sub>NH<sub>3</sub></sub>)<sup>2</sup></span>
-            <span class="symbol">/</span>
-            <span class="bottom">y<sub>N<sub>2</sub></sub> (y<sub>H<sub>2</sub></sub>)<sup>3</sup></span>
-          </div>
-          <div class="frac">
-            <span>1</span>
-            <span class="symbol">/</span>
-            <span class="bottom">P<sup>2</sup></span>
-          </div>
-        </h4>
+
+      <div class="d-flex align-items-center mb-0 w-100">
+        <label class="form-label me-2" for="NH3_moles">\(NH_3:\)</label>
+        <input type="range" class="form-range me-2" id="NH3_moles" min="1" max="5" step="0.1" value="1"
+          oninput="updateNH3Mole(this.value)" />
+        <span id="NH3MoleValue"></span>
       </div>
     </div>
-    <div class="row">
-      <div class="col">
-        <div class="chart" style="width: 100%; max-width: 800px;">
-          <canvas id="myChart" width="400" height="200"></canvas>
-        </div>
+
+    <div class="d-flex justify-content-evenly align-items-center mx-auto" style="min-width: 400px; max-width: 800px;">
+      <div class="ms-5 pt-2">
+        <h5 class="fst-italic text-center">\[N_2 + 3H_2 \rightleftharpoons 2NH_3 \]</h5>
+      </div>
+      <div class="ms-5 pt-2">
+        <h5 class="fst-italic text-center">
+          \[K = {{(Y_{NH_3})^2} \over {Y_{N_2} (Y_{H_2})^3}} \cdot {1 \over P^2} \]
+        </h5>
       </div>
     </div>
-    <div class="row mt-5">
-      <h5 class="text-danger">Caption:</h5>
-      <p>This Demonstration calculates the number of moles at equilibrium for the reversible, exothermic reaction that
-        synthesizes ammonia NH<sub>3</sub> from hydrogen H<sub>2</sub> and nitrogen N<sub>2</sub>, known as
-        the Haber process. This reaction typically takes place near 200 bar and 675 to 725 K. The system starts with 1
-        mol
-        NH<sub>3</sub> and goes to equilibrium. Use sliders to add additional moles of N<sub>2</sub>, H<sub>2</sub>
-        and NH<sub>3</sub> at constant pressure and temperature and observe how they change equilibrium. Vary pressure
-        and temperature with sliders. Because 4 mol of reactants form 2 mol of product, raising the pressure shifts
-        equilibrium toward products. Gases are assumed ideal, but at the high pressures used for this reaction,
-        significant deviation from ideal behavior is likely.
-      </p>
+
+    <div class="d-flex border align-items-center mx-auto w-50" style="min-width: 400px; max-width: 800px;">
+      <div class="chart w-100 h-100 p-3">
+        <canvas id="myChart"></canvas>
+      </div>
     </div>
-    <div class="row mt-5">
-      <h5 class="text-danger">Details:</h5>
-      <p>
-        The reaction N<sub>2</sub> H<sub> 2</sub> &#x21c4; 2NH<sub>3</sub> is used in the Haber process. The moles of
-        each
-        component at equilibrium is:
-        <br />
-        <b>
-          <i>n</i><sub><i>i</i>, eq</sub> = <i>n</i><sub><i>i</i>,add</sub> + <i>&nu;</i><sub><i>i</i></sub>&zeta;</i>
-          <br />
-        </b>
-        where <i>n</i><sub><i>i</i>, add</sub> are the moles of component i=(N<sub>2</sub>, H<sub>2</sub>,
-        NH<sub>3</sub>) added, <i>&nu<sub>i</sub></i> is the stoichiometric coefficient and &zeta; is extent of reaction
-        (mol). Initially only 1 mol NH<sub>3</sub> is present.
-        <br />
-        The mole fraction at equilibrium y<sub>i</sub> is:
-      <h6>
-        <i>
-          y<sub>i</sub> =
-          <div class="frac"><span>n<sub>i, eq</sub></span><span class="symbol">/</span><span
-              class="bottom">n<sub>total</sub></span>
-          </div>
-        </i>,
-      </h6>
-      <h6><i>n<sub>total</sub> = &Sigma;n<sub>i, eq</sub></i> ,</h6>
-      <br />
-      <span>where <i>n<sub>total</sub></i> &nbsp;is the total number of moles.</span>
-      <br />
-      <span>The extent of reaction is found by setting the equilibrium constant K<sub>eq</sub> equal to the equilibrium
-        rate
-        constant K and solving for &zeta;:</span>
-      <span>K<sub>eq</sub>=e<sup>-&Delta;G/(R T)
-        </sup>,</span>
-      <span class="fst-italic">K = &Pi;(y<sub>i</sub>P)<sup> -V<sub>i</sub></sup> = <div class="frac">
-          <span>(y<sub>NH<sub>3</sub></sub> P)<sup>2</sup></span><span class="symbol">/</span><span
-            class="bottom">(y<sub>N<sub>2</sub></sub>P)(y<sub>H<sub>2</sub></sub>P)<sup>3</sup></span>
-        </div> = <div class="frac">
-          <span>(y<sub>NH<sub>3</sub></sub></sup>)<sup>2</sup></span><span class="symbol">/</span><span
-            class="bottom">(y<sub>N<sub>2</sub></sub>)(y<sub>H<sub>2</sub></sub>)<sup>3</sup>
-          </span>
+
+  </div>
+  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Directions</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="frac">
-          <span>1</span><span class="symbol">/</span><span class="bottom">P <sup>2</sup></span>
+        <div class="modal-body">
+          <p>This Demonstration calculates the number of moles at equilibrium for the reversible, exothermic reaction
+            that synthesizes ammonia \(NH_3\) from hydrogen \(H_2\) and nitrogen \(N_2\), known as
+            the Haber process. This reaction typically takes place near 200 bar and 675 to 725 K. The system starts with
+            1 mol \(NH_3\) and goes to equilibrium. Use sliders to add additional moles of \(N_2\) ,
+            \(H_2\) and \(NH_3\) at constant pressure and temperature and observe how they change
+            equilibrium. Vary pressure and temperature with sliders. Because 4 mol of reactants form 2 mol of product,
+            raising the pressure shifts equilibrium toward products. Gases are assumed ideal, but at the high pressures
+            used for this reaction, significant deviation from ideal behavior is likely.
+          </p>
         </div>
-      </span>
-      <br />
-      <span>where &Delta;G = &Delta;H<sub>r</sub> - T &Delta;S<sub>r</sub> is Gibbs free energy (J/mol),
-        &Delta;H<sub>r</sub> is the heat of reaction (J/mol), &Delta;S<sub>r</sub> is the entropy change of reaction
-        (J/(mol K)), T is temperature (K), R is the ideal gas constant (J/(mol K)) and P is pressure (bar).</span>
-      </br>
-      The screencast video at [1] shows how to use this Demonstration. The screencast at [2] show solutions of an
-      example problem on gas phase equilibrium.
-      <br /><br />
-      <b>References:</b>
-      <br />
-      <span>
-        [1] Chemical Equilibrium in the Haber Process [Video]. (Jan 20, 2017) <a
-          href="https://www.colorado.edu/learncheme/thermodynamics/HaberProcess.html"
-          target="_blank">www.colorado.edu/learncheme/thermodynamics/HaberProcess.html</a>.
-        <br />
-        [2] Gas Phase Chemical Equilibrium [Video]. (Jan 20, 2017) <a href="https://www.youtube.com/watch?v=3ArBH_gbsNw"
-          target="_blank">www.youtube.com/watch?v=3ArBH_gbsNw</a>.</span>
-      </p>
+      </div>
     </div>
   </div>
+  <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            The reaction \(N_2 + 3H_2 \rightleftharpoons 2NH_3\) is used in the Haber process. The moles of each
+            component at equilibrium is:
+            <br />
+            <b>
+              \(\eta_{i,eq} = \eta_{i,add} + \nu_i \xi\)
+              <br />
+            </b>
+            where \(\eta_{i,add}\), are the moles of component \(i=(N_2, H_2, NH_3\)) added, \(\nu_i\) is
+            the stoichiometric coefficient and \(\xi\) is extent of
+            reaction (mol). Initially only 1 mol NH<sub>3</sub> is present.
+            <br />
+            The mole fraction at equilibrium \(y_i\) is:
+            \[ y_i = {{\eta_{i,eq}} \over {\eta_{total}}}\]
+            \[\eta_{total} = \sum \eta_{i,eq}\]
+
+            <span>where \(\eta_{total}\) is the total number of moles.</span>
+            <br />
+            <span>The extent of reaction is found by setting the equilibrium constant \(K_eq\) equal to the
+              equilibrium rate constant K and solving for \(\xi\) : \(K_{eq} = e^{-\Delta G / RT }\) ,
+              \[ K = \Pi(Y_i P)^{-V_i}
+              = {{(Y_{NH_3} P)^2} \over {(Y_{N_2} P) (Y_{H_2}P)^3}}
+              = {{(Y_{NH_3})^2} \over {Y_{N_2} (Y_{H_2})^3}} \cdot {1 \over P^2}\]
+            </span>
+            <span>where \(\Delta G = \Delta H_r - T\Delta S_r\) is Gibbs free energy (J/mol),
+              \(\Delta H_r\) is the heat of reaction (J/mol), \(\Delta S_r\) is the entropy change of
+              reaction (J/(mol K)), \(T\) is temperature (\(K\)), \(R\) is the ideal gas constant (J/(mol K)) and \(P\)
+              is pressure (bar).</span>
+            </br>
+            The screencast video at [1] shows how to use this Demonstration. The screencast at [2] show solutions of an
+            example problem on gas phase equilibrium.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="about-modal-label">About</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Abijith Trichur Ramachandran under
+            the direction of
+            Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our
+            simulations are open source, and are available on our <a
+              href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+              repository</a>.</p>
+          <p style="line-height: 3rem;">
+            If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+    crossorigin="anonymous"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="index.js"></script>
   <link rel="stylesheet" type="text/css" href="css/index.css">
 </body>
