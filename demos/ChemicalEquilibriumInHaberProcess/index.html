@@ -50,15 +50,15 @@
       <div class="d-flex flex-column align-items-center mt-1 w-100 mx-auto justify-content-center align-items-center"
         style="max-width: 700px; min-width: 400px;">
         <div class="d-flex flex-row justify-content-evenly align-items-center mb-0 w-100">
-          <label class="form-label me-2 my-auto" for="N2_moles">\(N_2:\)</label>
+          <label class="form-label me-2 my-auto" for="N2_moles">\(\text{N}_2:\)</label>
           <input type="range" class="form-range me-2 my-auto" id="N2_moles" min="0" max="10" step="0.1" value="0"
             oninput="updateN2Mole(this.value)" />
           <span id="N2MoleValue"></span>
-          <label class="form-label ms-3 me-2 my-auto" for="H2_moles">\(H_2:\)</label>
+          <label class="form-label ms-3 me-2 my-auto" for="H2_moles">\(\text{H}_2:\)</label>
           <input type="range" class="form-range me-2 my-auto" id="H2_moles" min="0" max="8" step="0.1" value="0"
             oninput="updateH2Mole(this.value)" />
           <span id="H2MoleValue"></span>
-          <label class="form-label ms-3 me-2 my-auto" for="NH3_moles">\(NH_3:\)</label>
+          <label class="form-label ms-3 me-2 my-auto" for="NH3_moles">\(\text{NH}_3:\)</label>
           <input type="range" class="form-range me-2 my-auto" id="NH3_moles" min="1" max="5" step="0.1" value="1"
             oninput="updateNH3Mole(this.value)" />
           <span id="NH3MoleValue"></span>
@@ -67,11 +67,12 @@
         <div class="d-flex justify-content-evenly align-items-center mx-auto"
           style="min-width: 400px; max-width: 800px;">
           <div class="ms-5 pt-2">
-            <p class="fst-italic fs-5 text-center">\[N_2 + 3H_2 \rightleftharpoons 2NH_3 \]</p>
+            <p class="fst-italic fs-5 text-center">\[\text{N}_2 + 3\text{H}_2 \rightleftharpoons 2\text{NH}_3 \]</p>
           </div>
           <div class="ms-5 pt-2">
             <p class="fst-italic fs-5 text-center">
-              \[K = {{(Y_{NH_3})^2} \over {Y_{N_2} (Y_{H_2})^3}} \cdot {1 \over P^2} \]
+              \[K = {{(\text{Y}_{\text{NH}_3})^2} \over {\text{Y}_{\text{N}_2} (\text{Y}_{\text{H}_2})^3}} \cdot {1
+              \over \text{P}^2} \]
             </p>
           </div>
         </div>
