@@ -7,7 +7,7 @@ var nNH3 = 1;
 // ----------------------------------------------------------------
 
 
-const barLabels = ['N2', 'H2', 'NH3'];
+const barLabels = ['N\u2082', 'H\u2082', 'NH\u2083'];
 const labels = ['', '', ''];
 
 chartDataset = [nN2, nH2, nNH3]
@@ -84,7 +84,7 @@ const config = {
             } else if (width < 800) {
               size = 16;
             } else {
-              size = 25;
+              size = 20;
             }
             return {
               size: size

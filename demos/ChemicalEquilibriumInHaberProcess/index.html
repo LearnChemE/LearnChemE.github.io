@@ -25,68 +25,62 @@
 </head>
 
 <body>
-  <div class="container mt-5" style="min-width:700px">
-    <div class="d-flex flex-column w-75 align-items-center mx-auto" style="max-width: 400px;">
-      <div class="d-flex justify-content-around w-75">
+  <div class="container mt-5" style="min-width:600px">
+    <div class="d-flex flex-column w-100 mx-auto align-items-center">
+      <div class="d-flex  flex-row justify-content-around align-items-center w-100" style="max-width: 300px;">
         <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
           data-bs-target="#directionsModal">Directions</button>
         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</button>
         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#aboutModal">About</button>
       </div>
-      <div class="d-flex px-1 align-items-center mb-0 w-100">
-        <label class="form-label me-2" for="pressure">pressure(bar):</label>
-        <input type="range" class="form-range me-2" id="pressure" min="50" max="250" step="10" value="50"
+      <div class="d-flex flex-row px-1 align-items-center mt-3 w-100" style="max-width: 700px;">
+        <label class="form-label me-2 my-auto" for="pressure">pressure&nbsp;(bar):</label>
+        <input type="range" class="form-range me-2 my-auto" id="pressure" min="50" max="250" step="10" value="50"
           oninput="updatePressure(this.value)" />
         <span id="pressureValue"></span>
-      </div>
-
-      <div class="d-flex px-1 align-items-center mb-0 w-100">
-        <label class="form-label me-2" for="temperature">temperature(K):</label>
-        <input type="range" class="form-range me-2" id="temperature" min="300" max="750" step="10" value="300"
+        <label class="form-label ms-3 me-2 my-auto" for="temperature">temperature&nbsp;(K):</label>
+        <input type="range" class="form-range my-auto" id="temperature" min="300" max="750" step="10" value="300"
           oninput="updateTemperature(this.value)" />
         <span id="temperatureValue"></span>
       </div>
+      <br />
     </div>
+    <div class="d-flex flex-column justify-content-center align-items-center">
+      <p class="my-auto text-center">moles added:</p>
+      <div class="d-flex flex-column align-items-center mt-1 w-100 mx-auto justify-content-center align-items-center"
+        style="max-width: 700px; min-width: 400px;">
+        <div class="d-flex flex-row justify-content-evenly align-items-center mb-0 w-100">
+          <label class="form-label me-2 my-auto" for="N2_moles">\(N_2:\)</label>
+          <input type="range" class="form-range me-2 my-auto" id="N2_moles" min="0" max="10" step="0.1" value="0"
+            oninput="updateN2Mole(this.value)" />
+          <span id="N2MoleValue"></span>
+          <label class="form-label ms-3 me-2 my-auto" for="H2_moles">\(H_2:\)</label>
+          <input type="range" class="form-range me-2 my-auto" id="H2_moles" min="0" max="8" step="0.1" value="0"
+            oninput="updateH2Mole(this.value)" />
+          <span id="H2MoleValue"></span>
+          <label class="form-label ms-3 me-2 my-auto" for="NH3_moles">\(NH_3:\)</label>
+          <input type="range" class="form-range me-2 my-auto" id="NH3_moles" min="1" max="5" step="0.1" value="1"
+            oninput="updateNH3Mole(this.value)" />
+          <span id="NH3MoleValue"></span>
+        </div>
 
-
-    <div class="d-flex flex-column align-items-center mt-1 w-75 mx-auto" style="max-width: 400px; min-width: 300px;">
-      <h6 class="mb-1 me-3">moles added:</h6>
-
-      <div class="d-flex align-items-center mb-0 w-100">
-        <label class="form-label me-2" for="N2_moles">\(N_2:\)</label>
-        <input type="range" class="form-range me-2" id="N2_moles" min="0" max="10" step="0.1" value="0"
-          oninput="updateN2Mole(this.value)" />
-        <span id="N2MoleValue"></span>
-      </div>
-
-      <div class="d-flex align-items-center mb-0 w-100">
-        <label class="form-label me-2" for="H2_moles">\(H_2:\)</label>
-        <input type="range" class="form-range me-2" id="H2_moles" min="0" max="8" step="0.1" value="0"
-          oninput="updateH2Mole(this.value)" />
-        <span id="H2MoleValue"></span>
-      </div>
-
-      <div class="d-flex align-items-center mb-0 w-100">
-        <label class="form-label me-2" for="NH3_moles">\(NH_3:\)</label>
-        <input type="range" class="form-range me-2" id="NH3_moles" min="1" max="5" step="0.1" value="1"
-          oninput="updateNH3Mole(this.value)" />
-        <span id="NH3MoleValue"></span>
-      </div>
-    </div>
-
-    <div class="d-flex justify-content-evenly align-items-center mx-auto" style="min-width: 400px; max-width: 800px;">
-      <div class="ms-5 pt-2">
-        <h5 class="fst-italic text-center">\[N_2 + 3H_2 \rightleftharpoons 2NH_3 \]</h5>
-      </div>
-      <div class="ms-5 pt-2">
-        <h5 class="fst-italic text-center">
-          \[K = {{(Y_{NH_3})^2} \over {Y_{N_2} (Y_{H_2})^3}} \cdot {1 \over P^2} \]
-        </h5>
+        <div class="d-flex justify-content-evenly align-items-center mx-auto"
+          style="min-width: 400px; max-width: 800px;">
+          <div class="ms-5 pt-2">
+            <p class="fst-italic fs-5 text-center">\[N_2 + 3H_2 \rightleftharpoons 2NH_3 \]</p>
+          </div>
+          <div class="ms-5 pt-2">
+            <p class="fst-italic fs-5 text-center">
+              \[K = {{(Y_{NH_3})^2} \over {Y_{N_2} (Y_{H_2})^3}} \cdot {1 \over P^2} \]
+            </p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="d-flex border align-items-center mx-auto w-50" style="min-width: 400px; max-width: 800px;">
-      <div class="chart w-100 h-100 p-3">
+    <div class="d-flex border align-items-center justify-content-center mx-auto w-100"
+      style="min-width: 600px; max-width: 1000px;">
+      <div class="chart w-100 p-3">
         <canvas id="myChart"></canvas>
       </div>
     </div>
@@ -101,13 +95,17 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p>This Demonstration calculates the number of moles at equilibrium for the reversible, exothermic reaction
+          <p>This Demonstration calculates the number of moles at equilibrium for the reversible, exothermic
+            reaction
             that synthesizes ammonia \(NH_3\) from hydrogen \(H_2\) and nitrogen \(N_2\), known as
-            the Haber process. This reaction typically takes place near 200 bar and 675 to 725 K. The system starts with
+            the Haber process. This reaction typically takes place near 200 bar and 675 to 725 K. The system starts
+            with
             1 mol \(NH_3\) and goes to equilibrium. Use sliders to add additional moles of \(N_2\) ,
             \(H_2\) and \(NH_3\) at constant pressure and temperature and observe how they change
-            equilibrium. Vary pressure and temperature with sliders. Because 4 mol of reactants form 2 mol of product,
-            raising the pressure shifts equilibrium toward products. Gases are assumed ideal, but at the high pressures
+            equilibrium. Vary pressure and temperature with sliders. Because 4 mol of reactants form 2 mol of
+            product,
+            raising the pressure shifts equilibrium toward products. Gases are assumed ideal, but at the high
+            pressures
             used for this reaction, significant deviation from ideal behavior is likely.
           </p>
         </div>
@@ -141,19 +139,17 @@
 
             <span>where \(\eta_{total}\) is the total number of moles.</span>
             <br />
-            <span>The extent of reaction is found by setting the equilibrium constant \(K_eq\) equal to the
+            <span>The extent of reaction is found by setting the equilibrium constant \(K_{eq}\) equal to the
               equilibrium rate constant K and solving for \(\xi\) : \(K_{eq} = e^{-\Delta G / RT }\) ,
-              \[ K = \Pi(Y_i P)^{-V_i}
-              = {{(Y_{NH_3} P)^2} \over {(Y_{N_2} P) (Y_{H_2}P)^3}}
-              = {{(Y_{NH_3})^2} \over {Y_{N_2} (Y_{H_2})^3}} \cdot {1 \over P^2}\]
+              \[ K = \Pi(y_i P)^{-V_i}
+              = {{(y_{NH_3} P)^2} \over {(y_{N_2} P) (y_{H_2}P)^3}}
+              = {{(y_{NH_3})^2} \over {y_{N_2} (y_{H_2})^3}} \cdot {1 \over P^2}\]
             </span>
             <span>where \(\Delta G = \Delta H_r - T\Delta S_r\) is Gibbs free energy (J/mol),
               \(\Delta H_r\) is the heat of reaction (J/mol), \(\Delta S_r\) is the entropy change of
-              reaction (J/(mol K)), \(T\) is temperature (\(K\)), \(R\) is the ideal gas constant (J/(mol K)) and \(P\)
+              reaction (J/(mol K)), \(T\) is temperature (\(K\)), \(R\) is the ideal gas constant (J/(mol K)) and
+              \(P\)
               is pressure (bar).</span>
-            </br>
-            The screencast video at [1] shows how to use this Demonstration. The screencast at [2] show solutions of an
-            example problem on gas phase equilibrium.
           </p>
         </div>
       </div>
@@ -170,7 +166,8 @@
           <p>
             This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
               Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
-              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Abijith Trichur Ramachandran under
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Abijith Trichur Ramachandran
+            under
             the direction of
             Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our
             simulations are open source, and are available on our <a
@@ -182,9 +179,10 @@
                 src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
             or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
                 style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
-                style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
-                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
-                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac
+                style="height: 4ch;"></span>&nbsp;on Windows. To
+            zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+                style="height: 4ch;"></span>&nbsp;on Mac
             or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
                 style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
                 style="height: 4ch;"></span>&nbsp;on Windows.
@@ -193,6 +191,7 @@
       </div>
     </div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
     crossorigin="anonymous"></script>

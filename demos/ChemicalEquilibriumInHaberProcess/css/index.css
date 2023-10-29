@@ -1,3 +1,7 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
 .frac {
   display: inline-block;
   position: relative;
