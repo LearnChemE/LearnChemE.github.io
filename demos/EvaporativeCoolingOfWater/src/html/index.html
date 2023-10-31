@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evaporative Cooling of Water</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+
+
+</head>
+
+<body>
+  <div class="container mt-5" style="min-width:600px">
+    <div class="d-flex flex-column w-100 mx-auto align-items-center">
+      <div class="d-flex  flex-row justify-content-around align-items-center w-100" style="max-width: 300px;">
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+          data-bs-target="#directionsModal">Directions</button>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</button>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#aboutModal">About</button>
+      </div>
+      <div class="d-flex flex-row px-1 align-items-center mt-3 w-100" style="max-width: 650px;">
+        <label class="form-label me-2 my-auto" for="mass">mass&nbsp;to&nbsp;be&nbsp;evaporated&nbsp;(kg):</label>
+        <input type="range" class="form-range me-2 my-auto" id="mass" min="0.00" max="1.75" step="0.01" value="0"
+          oninput="updateMass(this.value)" />
+        <span id="massValue"></span>
+        <button class="btn btn-secondary btn-sm ms-3 px-0 py-0 my-auto" onclick="play()"><svg
+            xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill"
+            viewBox="0 0 16 16">
+            <path
+              d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z" />
+          </svg></button>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex border align-items-center justify-content-center mx-auto mt-3 w-100"
+    style="min-width: 600px; max-width: 1200px;">
+    <div class="chart p-3" id="figure" style="width: 60%;">
+    </div>
+    <div class="chart w-25 p-3" style="min-height: 650px; width: 40%;">
+      <canvas class="w-100" id="myChart"></canvas>
+    </div>
+  </div>
+
+
+  <!-- Modals -->
+  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Directions</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="about-modal-label">About</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by <a
+              href="https://www.linkedin.com/in/abijith-ramachandran/" target="_blank">Abijith Trichur Ramachandran</a>
+            under
+            the direction of
+            Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our
+            simulations are open source, and are available on our <a
+              href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+              repository</a>.</p>
+          <p style="line-height: 3rem;">
+            If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows. To
+            zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+                style="height: 4ch;"></span>&nbsp;on Mac
+            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+                style="height: 4ch;"></span>&nbsp;on Windows.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+</body>
+
+</html>

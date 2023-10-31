@@ -63,7 +63,7 @@ const config = {
           } else if (width < 800) {
             size = 16;
           } else {
-            size = 18;
+            size = 22;
           }
           return {
             size: size
@@ -181,56 +181,44 @@ function initValues() {
 //  ----------------------------------------------------------------
 
 function calculateEquilibrium(P, T, nN2, nH2, nNH3) {
-  const R = 8.314;
-  const deltaH = -92200;
-  const deltaS = -198.75;
-  const keq = Math.exp(-((deltaH - T * deltaS) / (R * T)));
+  const K_T_value = -23.84 + (11051 / T);
+  const K_T = Math.exp(K_T_value);
+  const RHS = Math.pow(P, 2) * K_T;
 
-  const gamma = [0, 1, 3, -2];
-  const nadd = [0, nN2, nH2, nNH3];
+  let xi_lower = 0;
+  let xi_upper = Math.min(nN2, nH2 / 3);  // upper bound for xi
+  let xi = (xi_lower + xi_upper) / 2;
+  const tolerance = 0.01;
+  const maxIterations = 10000;
 
-  function nEQ(i, x) {
-    return nadd[i] - gamma[i] * x;
-  }
+  //Identifying the value of xi that fits within the equation
+  for (let i = 0; i < maxIterations; i++) {
+    let value = (25 * Math.pow((2 * xi + nNH3), 2)) / ((nN2 - xi) * (nH2 - 3 * xi));
 
-  function total(x) {
-    return nEQ(1, x) + nEQ(2, x) + nEQ(3, x);
-  }
-
-  function z(i, x) {
-    return nEQ(i, x) / total(x);
-  }
-
-  function k(x) {
-    return Math.pow((z(1, x) * P), -gamma[1]) *
-      Math.pow((z(2, x) * P), -gamma[2]) *
-      Math.pow((z(3, x) * P), -gamma[3]);
-  }
-
-  let x = 0;
-  let minDiff = Infinity;
-  let zeta = 0;
-  for (let i = 0; i < 10; i += 0.01) {
-    let diff = Math.abs(keq - k(i));
-    if (diff < minDiff) {
-      minDiff = diff;
-      zeta = i;
+    if (Math.abs(value - RHS) < tolerance) {
+      break;
     }
+
+    if (value < RHS) {
+      xi_lower = xi;
+    } else {
+      xi_upper = xi;
+    }
+    xi = (xi_lower + xi_upper) / 2;
+
   }
 
-  let nN2Final = nEQ(1, zeta).toFixed(3);
-  let nH2Final = nEQ(2, zeta).toFixed(3);
-  let nNH3Final = nEQ(3, zeta).toFixed(3);
+  if (xi_upper - xi_lower > tolerance) {
+    console.log("Equilibrium not found within tolerance.");
+    return null;
+  }
 
-  if (nN2Final < 0)
-    nN2Final = 0
-  if (nH2Final < 0)
-    nH2Final = 0
-  if (nNH3Final < 0)
-    nNH3 = 0
-
-  return [nN2Final, nH2Final, nNH3Final];
+  let nN2Final = nN2 - xi;
+  let nH2Final = nH2 - (3 * xi);
+  let nNH3Final = Number(nNH3) + (2 * xi);
+  return [parseFloat(nN2Final.toFixed(3)), parseFloat(nH2Final.toFixed(3)), parseFloat(nNH3Final.toFixed(3))];
 }
+
 
 // ----------------------------------------------------------------
 

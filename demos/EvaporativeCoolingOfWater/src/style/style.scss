@@ -1,0 +1,30 @@
+@import "bootstrap";
+@import "./slider.scss";
+
+.chart {
+  position: relative;
+  /* Makes sure the canvas stretches to the size of its container */
+}
+
+.mjx-math {
+  font-family: Arial, sans-serif !important;
+}
+
+.mjx-mtext,
+.mjx-mi,
+.mjx-mo,
+.mjx-mn,
+.mjx-ms {
+  font-family: Arial, sans-serif !important;
+  font-style: normal !important;
+}
+
+.btn {
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.d-flex {
+  height: 100%;
+  /* Ensures that the .d-flex element takes up the full height of its parent */
+}
