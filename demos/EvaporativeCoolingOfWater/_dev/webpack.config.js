@@ -19,7 +19,7 @@ const module_rules = [{
 ];
 
 const html_options = {
-  title: "Venturi Meter",
+  title: "Evaporative Cooling of Water",
   filename: "index.html",
   template: path.resolve(__dirname, '../src/html/index.html'),
   scriptLoading: "blocking",
@@ -27,8 +27,8 @@ const html_options = {
   meta: {
     "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
     "keywords": "LearnChemE, chemical engineering, engineering, simulation",
-    "author": "Neil Hendren",
-    "application-name": "Venturi Meter",
+    "author": "Abijith Trichur Ramachandran",
+    "application-name": "Evaporative Cooling Of Water",
     "description": "An interactive simulation designed to teach engineering students about evaporative cooling of water."
   },
 }

@@ -25,7 +25,7 @@
 </head>
 
 <body>
-  <div class="container mt-5" style="min-width:600px">
+  <div class="container mt-3" style="min-width:600px">
     <div class="d-flex flex-column w-100 mx-auto align-items-center">
       <div class="d-flex  flex-row justify-content-around align-items-center w-100" style="max-width: 300px;">
         <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
@@ -33,7 +33,7 @@
         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</button>
         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#aboutModal">About</button>
       </div>
-      <div class="d-flex flex-row px-1 align-items-center mt-3 w-100" style="max-width: 700px;">
+      <div class="d-flex flex-row px-1 align-items-center mt-1 w-100" style="max-width: 700px;">
         <label class="form-label me-2 my-auto" for="pressure">pressure&nbsp;(bar):</label>
         <input type="range" class="form-range me-2 my-auto" id="pressure" min="50" max="250" step="10" value="50"
           oninput="updatePressure(this.value)" />
@@ -43,11 +43,10 @@
           oninput="updateTemperature(this.value)" />
         <span id="temperatureValue"></span>
       </div>
-      <br />
     </div>
     <div class="d-flex flex-column justify-content-center align-items-center">
       <p class="my-auto text-center">moles added:</p>
-      <div class="d-flex flex-column align-items-center mt-1 w-100 mx-auto justify-content-center align-items-center"
+      <div class="d-flex flex-column align-items-center mt-0 w-100 mx-auto justify-content-center align-items-center"
         style="max-width: 700px; min-width: 400px;">
         <div class="d-flex flex-row justify-content-evenly align-items-center mb-0 w-100">
           <label class="form-label me-2 my-auto" for="N2_moles">\(\text{N}_2:\)</label>
@@ -67,10 +66,10 @@
         <div class="d-flex justify-content-evenly align-items-center mx-auto"
           style="min-width: 400px; max-width: 800px;">
           <div class="ms-5 pt-2">
-            <p class="fst-italic fs-5 text-center">\[\text{N}_2 + 3\text{H}_2 \rightleftharpoons 2\text{NH}_3 \]</p>
+            <p class="fst-italic fs-6 text-center">\[\text{N}_2 + 3\text{H}_2 \rightleftharpoons 2\text{NH}_3 \]</p>
           </div>
           <div class="ms-5 pt-2">
-            <p class="fst-italic fs-5 text-center">
+            <p class="fst-italic fs-6 text-center">
               \[K = {{(\text{y}_{\text{NH}_3})^2} \over {\text{y}_{\text{N}_2} (\text{y}_{\text{H}_2})^3}} \cdot {1
               \over \text{P}^2} \]
             </p>
@@ -79,7 +78,7 @@
       </div>
     </div>
 
-    <div class="d-flex border align-items-center justify-content-center mx-auto"
+    <div class="d-flex border align-items-center justify-content-center mt-0 mx-auto"
       style="min-width: 600px; max-width: 900px; width: 80%;">
       <div class="chart w-100 p-3">
         <canvas id="myChart"></canvas>

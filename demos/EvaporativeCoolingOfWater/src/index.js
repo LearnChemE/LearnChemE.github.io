@@ -1,4 +1,3 @@
-import p5 from 'p5';
 import Chart from 'chart.js/auto';
 import barChartConfig from './js/barChartConfig.js';
 import { calculate } from './js/calculation.js';
