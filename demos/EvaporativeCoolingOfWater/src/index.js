@@ -23,17 +23,21 @@ window.play = () => {
   updateFigure(100)
 }
 
+var intervalID = null;
+
 function updateChart(simulate) {
+
+  clearInterval(intervalID);
   let calculated_data;
   let temp_mass = 0;
   if (simulate == 1 && mass != 0) {
-    let intervalID = setInterval(function () {
+    intervalID = setInterval(function () {
       calculated_data = calculate(temp_mass)
       myChart.config.data.datasets[0].data = [calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), calculated_data.V.toFixed(2)];
       T2 = calculated_data.T2;
       myChart.update();
 
-      updateFigure(calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), false);
+      updateFigure(calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), T2, false);
       temp_mass = temp_mass + 0.01;
       document.getElementById('massValue').innerText = temp_mass.toFixed(2);
       document.getElementById('mass').value = temp_mass.toFixed(2);
@@ -42,19 +46,17 @@ function updateChart(simulate) {
         clearInterval(intervalID);
       }
       if (temp_mass == mass && mass == 1.75)
-        updateFigure(calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), true);
+        updateFigure(calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), T2, true);
     }, 50);
   }
   else {
+    debugger;
     calculated_data = calculate(mass)
     myChart.config.data.datasets[0].data = [calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), calculated_data.V.toFixed(2)];
     T2 = calculated_data.T2;
     myChart.update();
 
-    updateFigure(calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), false);
-    if (temp_mass == mass && mass == 1.75)
-      updateFigure(calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), true);
-    updateFigure()
+    updateFigure(calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), T2, mass == 1.75);
   }
 }
 
