@@ -6,8 +6,6 @@ require("bootstrap");
 require("./style/style.scss");
 
 
-
-
 var mass = 0;
 var T2 = 40;
 
@@ -19,7 +17,12 @@ window.updateMass = (value) => {
 
 window.play = () => {
   updateChart(1);
-  updateFigure(100)
+
+}
+
+window.reset = () => {
+  updateMass(0);
+  updateChart(0);
 }
 
 var intervalID = null;
@@ -49,7 +52,6 @@ function updateChart(simulate) {
     }, 50);
   }
   else {
-    debugger;
     calculated_data = calculate(mass)
     myChart.config.data.datasets[0].data = [calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), calculated_data.V.toFixed(2)];
     T2 = calculated_data.T2;

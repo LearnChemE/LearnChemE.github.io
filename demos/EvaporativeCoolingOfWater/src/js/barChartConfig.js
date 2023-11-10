@@ -1,7 +1,7 @@
 // import Chart from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-const labels = ['liquid', 'solid', 'gas'];
+const labels = ['liquid', 'solid', 'vapor'];
 let chartDataset = [10.00, 0.00, 0.00]
 
 const data = {
@@ -37,6 +37,18 @@ const config = {
   options: {
     maintainAspectRatio: false,
     plugins: {
+      title: {
+        display: true,
+        text: 'amount in each phase', // Replace with your desired title
+        font: {
+          size: 24,
+          weight: 'normal'
+        },
+        padding: {
+          top: 10,
+          bottom: 30
+        }
+      },
       tooltip: {
         enabled: false
       },
@@ -68,7 +80,7 @@ const config = {
     scales: {
       y: {
         display: false,
-        max: 12,
+        max: 11,
       },
       x: {
         ticks: {
