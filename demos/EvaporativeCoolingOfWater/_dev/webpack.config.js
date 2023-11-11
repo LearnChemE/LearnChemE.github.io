@@ -4,18 +4,27 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-const module_rules = [{
-  test: /\.(sa|sc|c)ss$/,
-  use: [
-    MiniCssExtractPlugin.loader,
-    "css-loader",
-    "sass-loader",
-  ]
-},
-{
-  test: /\.svg$/i,
-  use: ["to-string-loader", "html-loader"]
-}
+const module_rules = [
+  {
+    test: /\.(sa|sc|c)ss$/,
+    use: [
+      MiniCssExtractPlugin.loader,
+      "css-loader",
+      "sass-loader",
+    ],
+  },
+  {
+    test: /\.svg$/i,
+    use: ["to-string-loader", "html-loader"],
+  },
+  // Add a new rule for image assets
+  {
+    test: /\.(png|jpe?g|gif)$/i,
+    type: 'asset/resource',
+    generator: {
+      filename: 'assets/images/[hash][ext][query]', // Outputs images to dist/assets/images folder
+    }
+  }
 ];
 
 const html_options = {
@@ -68,6 +77,7 @@ let config = {
   output: {
     filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, '../dist'),
+    publicPath: '/',
     clean: false,
   },
   module: {
@@ -81,7 +91,6 @@ let config = {
 
 module.exports = (env, argv) => {
   if (argv.mode === "production") {
-
     config.optimization = {
       minimizer: [
         new TerserPlugin({
@@ -93,9 +102,7 @@ module.exports = (env, argv) => {
       chunkIds: 'total-size',
       removeAvailableModules: true,
     }
-
   } else {
-
     config.optimization = {
       minimize: false,
       moduleIds: 'named',
@@ -103,10 +110,8 @@ module.exports = (env, argv) => {
       removeAvailableModules: false,
       realContentHash: false,
     }
-
     config.devtool = 'source-map';
-
   };
 
   return config;
-}
+};
