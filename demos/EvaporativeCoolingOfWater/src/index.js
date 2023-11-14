@@ -9,20 +9,30 @@ require("./style/style.scss");
 var mass = 0;
 var T2 = 40;
 
-window.updateMass = (value) => {
+window.updateMass = (value, reset = false) => {
+  if (reset) {
+    let temp_mass = mass;
+    mass = 0;
+    updateChart(0);
+    mass = temp_mass;
+    return;
+  }
   document.getElementById('massValue').innerText = value;
   mass = value;
   updateChart(0);
 }
 
+
+
 window.play = () => {
   updateChart(1);
-
 }
 
 window.reset = () => {
-  updateMass(0);
-  updateChart(0);
+  // const slider = document.getElementById('mass');
+  // slider.value = 0; // Reset the slider to the beginning
+  // updateMass(slider.value); // Update the mass value accordingly  
+  updateMass(0, true);
 }
 
 var intervalID = null;
