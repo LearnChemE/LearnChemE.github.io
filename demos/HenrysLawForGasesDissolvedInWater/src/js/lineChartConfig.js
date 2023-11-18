@@ -90,8 +90,35 @@ const lineChartConfig = {
         }
       },
       x: {
-        max: 250,
+        max: 251,
         beginAtZero: true,
+        title: {
+          display: true,
+          text: "Temperate (°C)",
+          font: {
+            size: 20,
+            weight: 'bold', // You can set the font weight here
+          },
+        },
+        ticks: {
+          font: function (context) {
+            var width = context.chart.width;
+            var size;
+            if (width < 400) {
+              size = 12;
+            } else if (width < 800) {
+              size = 14;
+            } else {
+              size = 16;
+            }
+            return {
+              size: size,
+            };
+          }
+        },
+        grid: {
+          display: false
+        }
       }
 
     }
