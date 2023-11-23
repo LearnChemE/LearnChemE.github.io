@@ -97,7 +97,7 @@ const lineChartConfig = {
           text: "Temperate (°C)",
           font: {
             size: 20,
-            weight: 'bold', // You can set the font weight here
+            weight: 'bold',
           },
         },
         ticks: {
@@ -114,19 +114,35 @@ const lineChartConfig = {
             return {
               size: size,
             };
+          },
+          callback: function (value, index, values) {
+            return index % 50 === 0 ? value : undefined;
           }
         },
         grid: {
-          display: false
+          display: true,
+          drawOnChartArea: false,
+          drawTicks: true,
+          tickMarkLength: 10,
+          zeroLineWidth: 10,
+          zeroLineColor: '#000',
+          zeroLineBorderDash: [],
+          zeroLineBorderDashOffset: 0,
+          offsetGridLines: false,
+          borderDash: [],
+          borderDashOffset: 0,
+          lineWidth: function (context) {
+            // Draw a line for every 10th tick
+            return context.tick.value % 10 === 0 ? 1 : 0;
+          }
         }
       }
-
     }
   }
 };
 
 
-function updateLineChart(legendsSelected, elementValues) {
+function updateLineChart(legendsSelected, elementValues, isPChanged) {
   data.datasets = [];
   for (let i = 0; i < 10; i++) {
     data.datasets.push({
@@ -134,7 +150,7 @@ function updateLineChart(legendsSelected, elementValues) {
       borderColor: colourList[i],
       backgroundColor: colourList[i],
       label: legends[i],
-      borderWidth: 2,
+      borderWidth: 0,
     });
   }
 
@@ -147,7 +163,11 @@ function updateLineChart(legendsSelected, elementValues) {
     }
   }
 
+  if (!isPChanged) {
+    let flatData = data.datasets.flatMap(dataset => dataset.data);
+    let maxVal = Math.max(...flatData);
+    lineChartConfig.options.scales.y.max = maxVal + 0.00001;
+  }
 }
-
 
 export { lineChartConfig, updateLineChart };

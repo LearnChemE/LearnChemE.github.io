@@ -24,7 +24,7 @@ function calculateContinousOutput(T, P) {
   let element_9 = [];
   let element_10 = [];
 
-  for (let i = 0; i < 251; i++) {
+  for (let i = 0; i < 251; i = i + 0.5) {
     result.push(calculateOutput(i, P))
   }
   for (let i = 0; i < result.length; i++) {

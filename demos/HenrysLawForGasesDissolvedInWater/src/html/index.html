@@ -12,63 +12,69 @@
 
 <body>
   <div class="container mt-5" style="min-width:600px">
-    <div class="d-flex flex-column w-100 mx-auto align-items-center">
-      <div class="d-flex  flex-row justify-content-around align-items-center w-100" style="max-width: 300px;">
-        <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-          data-bs-target="#directionsModal">Directions</button>
-        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</button>
-        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#aboutModal">About</button>
+    <div class="d-flex flex-column w-70 mx-auto align-items-center">
+      <!-- Row for Buttons and Checkboxes -->
+      <div class="d-flex flex-row align-items-start w-100" style="max-width: 800px;">
+        <!-- Checkboxes in a horizontal layout -->
+        <div class="d-flex flex-column my-auto w-100">
+          <div class="mb-2">select species to plot:</div>
+          <div class="d-flex flex-row flex-wrap justify-content-start align-items-end">
+            <div class="text-end me-5">
+              <label>acetylene</label>
+              <input type="checkbox" id="acetylene" name="element" checked="true">
+            </div>
+            <div class="text-end me-5">
+              <label>carbon dioxide</label>
+              <input type="checkbox" id="carbonDioxide" name="element" checked="true">
+            </div>
+            <div class="text-end me-5">
+              <label>carbon monoxide</label>
+              <input type="checkbox" id="carbonMonoxide" name="element" checked="true">
+            </div>
+            <div class="text-end me-5">
+              <label>ethane</label>
+              <input type="checkbox" id="ethane" name="element" checked="true">
+            </div>
+            <div class="text-end me-5">
+              <label>ethylene</label>
+              <input type="checkbox" id="ethylene" name="element" checked="true">
+            </div>
+            <div class="text-end me-4">
+              <label>helium</label>
+              <input type="checkbox" id="helium" name="element" checked="true">
+            </div>
+            <div class="text-end me-4">
+              <label>hydrogen</label>
+              <input type="checkbox" id="hydrogen" name="element" checked="true">
+            </div>
+            <div class="text-end me-4">
+              <label>methane</label>
+              <input type="checkbox" id="methane" name="element" checked="true">
+            </div>
+            <div class="text-end me-4">
+              <label>nitrogen</label>
+              <input type="checkbox" id="nitrogen" name="element" checked="true">
+            </div>
+            <div class="text-end me-4">
+              <label>oxygen</label>
+              <input type="checkbox" id="oxygen" name="element" checked="true">
+            </div>
+          </div>
+        </div>
+        <!-- Buttons in a vertical layout -->
+        <div class="d-flex flex-column me-3">
+          <button class="btn btn-primary btn-xs p-1 mb-1" data-bs-toggle="modal"
+            data-bs-target="#directionsModal">Directions</button>
+          <button class="btn btn-primary btn-xs p-1 mb-1" data-bs-toggle="modal"
+            data-bs-target="#detailsModal">Details</button>
+          <button class="btn btn-primary btn-xs p-1" data-bs-toggle="modal" data-bs-target="#aboutModal">About</button>
+        </div>
       </div>
-      <div class="d-flex mt-2 flex-row  align-items-start w-100" style="max-width: 800px;">
-        select species to plot:
-      </div>
-      <div class="d-flex mt-2 flex-row justify-content-around align-items-end w-100" style="max-width: 800px;">
-        <div class="w-100 text-end">
-          <label>acetylene</label>
-          <input type="checkbox" id="acetylene" name="element" checked="true">
-        </div>
-        <div class="w-100 text-end">
-          <label>carbon dioxide</label>
-          <input type="checkbox" id="carbonDioxide" name="element" checked="true">
-        </div>
-        <div class="w-100 text-end">
-          <label>carbon monoxide</label>
-          <input type="checkbox" id="carbonMonoxide" name="element" checked="true">
-        </div>
-        <div class="w-100 text-end">
-          <label>ethane</label>
-          <input type="checkbox" id="ethane" name="element" checked="true">
-        </div>
-        <div class="w-100 text-end">
-          <label>ethylene</label>
-          <input type="checkbox" id="ethylene" name="element" checked="true">
-        </div>
-      </div>
-      <div class="d-flex mt-1 flex-row justify-content-around align-items-end w-100" style="max-width: 800px;">
-        <div class="w-100 text-end">
-          <label>helium</label>
-          <input type="checkbox" id="helium" name="element" checked="true">
-        </div>
-        <div class="w-100 text-end">
-          <label>hydrogen</label>
-          <input type="checkbox" id="hydrogen" name="element" checked="true">
-        </div>
-        <div class="w-100 text-end">
-          <label>methane</label>
-          <input type="checkbox" id="methane" name="element" checked="true">
-        </div>
-        <div class="w-100 text-end">
-          <label>nitrogen</label>
-          <input type="checkbox" id="nitrogen" name="element" checked="true">
-        </div>
-        <div class="w-100 text-end">
-          <label>oxygen</label>
-          <input type="checkbox" id="oxygen" name="element" checked="true">
-        </div>
-      </div>
-      <div class="d-flex flex-row px-1 align-items-center mt-3 w-100" style="max-width: 800px;">
+
+      <!-- Remaining controls -->
+      <div class="d-flex flex-row px-1 align-items-center w-100" style="max-width: 800px;">
         <div class="d-flex align-items-center me-3">
-          <label class="me-1 my-auto">set temperature</label>
+          <label class="me-1 my-auto">set&nbsp;temperature</label>
           <input type="checkbox" onchange="changeChart()" checked="true">
         </div>
         <div class="d-flex align-items-center me-3">
@@ -84,13 +90,12 @@
           <span class="my-auto" id="temperatureValue"></span>
         </div>
       </div>
-
-
     </div>
+
   </div>
 
   <div class="d-flex border align-items-center justify-content-center mx-auto mt-1 w-100"
-    style="min-width: 600px; max-width: 1000px;">
+    style="min-width: 600px; max-width: 800px;">
     <div class="chart w-100 p-3" style="min-height: 600px; min-width: 300px;">
       <canvas id="lineChart" style="display: none;"></canvas>
       <canvas id="barChart"></canvas>

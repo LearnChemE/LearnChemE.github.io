@@ -63,7 +63,7 @@ document.querySelectorAll('input[name="element"]').forEach((checkbox) => {
       barChart.update();
     }
     else {
-      updateLineChart(selectedLabels, outputValues);
+      updateLineChart(selectedLabels, outputValues, false);
       lineChart.update();
     }
   });
@@ -73,13 +73,13 @@ function performComputation() {
   if (isTemperatureSelected) {
     document.getElementById("temperatureDiv").style.display = "block";
     outputValues = calculateOutput(T, P);
-    updateBarChart(selectedLabels, outputValues);
+    updateBarChart(selectedLabels, outputValues, true);
     barChart.update();
   }
   else {
     outputValues = calculateContinousOutput(T, P);
     document.getElementById("temperatureDiv").style.display = "none";
-    updateLineChart(selectedLabels, outputValues);
+    updateLineChart(selectedLabels, outputValues, true);
     lineChart.update();
   }
 }
