@@ -43,6 +43,20 @@ const lineChartConfig = {
       datalabels: {
         display: false,
       },
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          title: function (tooltipItems) {
+            let tooltipItem = tooltipItems[0];
+            // This will set the title of the tooltip to 'T = x °C'
+            return 'T = ' + tooltipItem.parsed.x + ' °C';
+          },
+          label: function (tooltipItem) {
+            // This will set the label of the tooltip to 'Custom Label'
+            return tooltipItem.parsed.y + ' mol fraction of gas in water';
+          }
+        }
+      }
     },
     interaction: {
       intersect: false,
@@ -82,7 +96,7 @@ const lineChartConfig = {
             return {
               size: size,
             };
-          }
+          }, stepSize: 0.001,
         },
         beginAtZero: true,
         grid: {
@@ -150,7 +164,8 @@ function updateLineChart(legendsSelected, elementValues, isPChanged) {
       borderColor: colourList[i],
       backgroundColor: colourList[i],
       label: legends[i],
-      borderWidth: 0,
+      borderWidth: 0.1,
+      pointRadius: 1.1
     });
   }
 

@@ -51,7 +51,7 @@ const barChartConfig = {
               label += ': ';
             }
             if (context.parsed.y !== null) {
-              label += context.parsed.y.toFixed(6); // Show value up to six decimal places
+              label += context.parsed.y.toFixed(6) + ' mol'; // Show value up to six decimal places
             }
             return label;
           }
@@ -92,12 +92,14 @@ const barChartConfig = {
             }
             return {
               size: size,
-            };
-          }
+            }
+          },
+          stepSize: 0.001,
         },
         beginAtZero: true,
         grid: {
-          display: false
+          display: true,
+          lineWidth: 2
         }
       },
       x: {
@@ -126,7 +128,7 @@ const barChartConfig = {
 };
 
 
-function updateBarChart(isDatalabelListSelected, elementValues) {
+function updateBarChart(isDatalabelListSelected, elementValues, isPChanged) {
   const values = Object.values(isDatalabelListSelected);
   chartDataset = [];
   selectedLabels = [];
@@ -142,6 +144,12 @@ function updateBarChart(isDatalabelListSelected, elementValues) {
   data.datasets[0].data = chartDataset;
   data.datasets[0].backgroundColor = colourListSelected;
   data.datasets[0].borderColor = colourListSelected;
+  if (!isPChanged) {
+    let maxVal = Math.max(...chartDataset);
+    barChartConfig.options.scales.y.max = maxVal;
+    let stepSize = maxVal / 10;
+    barChartConfig.options.scales.y.ticks.stepSize = stepSize;
+  }
 }
 
 
