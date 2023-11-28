@@ -49,7 +49,7 @@ const lineChartConfig = {
           title: function (tooltipItems) {
             let tooltipItem = tooltipItems[0];
             // This will set the title of the tooltip to 'T = x °C'
-            return 'T = ' + tooltipItem.parsed.x + ' °C';
+            return tooltipItem.dataset.label + ' T = ' + tooltipItem.parsed.x + ' °C';
           },
           label: function (tooltipItem) {
             // This will set the label of the tooltip to 'Custom Label'
@@ -174,7 +174,7 @@ function updateLineChart(legendsSelected, elementValues, isPChanged) {
   if (!isPChanged) {
     let flatData = data.datasets.flatMap(dataset => dataset.data);
     let maxVal = Math.max(...flatData);
-    lineChartConfig.options.scales.y.max = maxVal + 0.00001;
+    lineChartConfig.options.scales.y.max = maxVal + 0.0001;
     let stepSize = maxVal / 7;
     lineChartConfig.options.scales.y.ticks.stepSize = stepSize;
   }
