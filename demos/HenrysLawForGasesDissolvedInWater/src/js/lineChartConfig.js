@@ -168,7 +168,6 @@ function updateLineChart(legendsSelected, elementValues, isPChanged) {
         label: legends[i],
         borderWidth: 0.1,
         pointRadius: 1.1,
-        tension: 1
       });
     }
   }
