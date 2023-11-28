@@ -158,15 +158,17 @@ const lineChartConfig = {
 
 function updateLineChart(legendsSelected, elementValues, isPChanged) {
   data.datasets = [];
+  const keys = Object.keys(legendsSelected);
   for (let i = 0; i < 10; i++) {
-    if (legendsSelected[legends[i]]) { // Check if the legend is selected
+    if (legendsSelected[keys[i]]) { // Check if the legend is selected      
       data.datasets.push({
         data: elementValues[i],
         borderColor: colourList[i],
         backgroundColor: colourList[i],
         label: legends[i],
         borderWidth: 0.1,
-        pointRadius: 1.1
+        pointRadius: 1.1,
+        tension: 1
       });
     }
   }
