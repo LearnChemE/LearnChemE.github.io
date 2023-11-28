@@ -147,7 +147,7 @@ function updateBarChart(isDatalabelListSelected, elementValues, isPChanged) {
   if (!isPChanged) {
     let maxVal = Math.max(...chartDataset);
     barChartConfig.options.scales.y.max = maxVal;
-    let stepSize = maxVal / 10;
+    let stepSize = maxVal / 7;
     barChartConfig.options.scales.y.ticks.stepSize = stepSize;
   }
 }

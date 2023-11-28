@@ -159,22 +159,15 @@ const lineChartConfig = {
 function updateLineChart(legendsSelected, elementValues, isPChanged) {
   data.datasets = [];
   for (let i = 0; i < 10; i++) {
-    data.datasets.push({
-      data: elementValues[i],
-      borderColor: colourList[i],
-      backgroundColor: colourList[i],
-      label: legends[i],
-      borderWidth: 0.1,
-      pointRadius: 1.1
-    });
-  }
-
-  const values = Object.values(legendsSelected);
-  let count = 0;
-  for (let i = 0; i < data.datasets.length; i++) {
-    if (!values[i]) {
-      data.datasets.splice(i - count, 1);
-      count++;
+    if (legendsSelected[legends[i]]) { // Check if the legend is selected
+      data.datasets.push({
+        data: elementValues[i],
+        borderColor: colourList[i],
+        backgroundColor: colourList[i],
+        label: legends[i],
+        borderWidth: 0.1,
+        pointRadius: 1.1
+      });
     }
   }
 
@@ -182,6 +175,8 @@ function updateLineChart(legendsSelected, elementValues, isPChanged) {
     let flatData = data.datasets.flatMap(dataset => dataset.data);
     let maxVal = Math.max(...flatData);
     lineChartConfig.options.scales.y.max = maxVal + 0.00001;
+    let stepSize = maxVal / 7;
+    lineChartConfig.options.scales.y.ticks.stepSize = stepSize;
   }
 }
 
