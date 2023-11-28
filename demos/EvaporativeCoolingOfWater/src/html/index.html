@@ -64,10 +64,11 @@
         </div>
         <div class="modal-body">
           First, choose the amount of mass to be evaporated. Then, when you click the play button, a vacuum pump
-          continuously removes water vapor from a tank initially containing 10 kg of liquid water at a temperature of 40
-          °C. Water in the tank evaporates because the vapor pressure is below the saturation pressure when water vapor
-          is removed by the vacuum pump. Because the tank is well insulated, as water evaporates, the remaining water
-          cools until it reaches 0 °C. Additional pumping causes some of the remaining water to freeze at 0 °C. The bar
+          continuously removes water vapor from a tank initially containing 10 kg of liquid water at a temperature of
+          40°C. Water in the tank evaporates because the vapor pressure is below the saturation pressure when water
+          vapor is removed by the vacuum pump. Because the tank is well insulated, as water evaporates, the remaining
+          water cools until it reaches 0°C. Additional pumping causes some of the remaining water to freeze at 0°C. The
+          bar
           graph on the right shows the amounts of each phase present (liquid, solid, or vapor). The amounts for each
           phase are determined using mass balance and unsteady-state energy balance.
         </div>
@@ -88,10 +89,9 @@
           determine
           the final temperature \(T_2\): <br />
           \( m_L\;Cp\;dT = - \Delta H_{vap,20}\;dm_v \) <br />
-          where \( Cp \) is the liquid heat capacity (kJ/kg \( ^\circ \)C), \( \Delta H_{vap,20} \) is the heat of
+          where \( Cp \) is the liquid heat capacity (kJ/kg \(^\circ \)C), \( \Delta H_{vap,20} \) is the heat of
           vaporization
-          at 20 \( ^\circ \)C (average of initial temperature and 0 \( ^\circ \)C) in kJ/kg, and \( T_2 \) is in \(
-          ^\circ \)C.
+          at 20°C (average of initial temperature and 0°C) in kJ/kg, and \( T_2 \) is in °C.
           <br />
           The amount of liquid \( m_L \) is 10 kg minus the amount of water vaporized \( m_v \) (both in kg):
           <br />
@@ -99,25 +99,26 @@
           <br />
           Integrating between the initial conditions (\( m_L = 10, m_v = 0 \)) and the final conditions yields:
           <br />
-          \[ \int_{40}^{T_2} \frac{Cp dT}{\Delta H_{vap,20}} = -\int_{0}^{m_v} \frac{dm_v}{(10-m_s)} \]
+          \[ \int_{40}^{T_2} \frac{Cp dT}{\Delta H_{vap,20}} = -\int_{0}^{m_v} \frac{dm_v}{(10-m_v)} \]
 
-          \[ \frac{Cp}{\Delta H_{vap,20}} (T_2 - 40) = \ln (10 - m_v) \bigg|_{0}^{m_v} = \ln \left( \frac{10-m_v}{10}
-          \right). \]
+          \[ \frac{Cp}{\Delta H_{vap,20}} (T_2 - 40) = - \ln (10 - m_v) \bigg|_{0}^{m_v} = - \ln \left(
+          \frac{10-m_v}{10}
+          \right) \]
 
           Thus the final temperature for a given amount of water vaporized is:
 
           \[ T_2 = 40 + \frac{\Delta H_{vap,20}}{Cp} \ln \left( \frac{10-m_v}{10} \right), \text{ where } T_2 \geq
-          0^\circ C.
+          0^\circ C
           \]
 
-          When 0.66 kg of water vaporizes, the liquid temperature is 0 \( ^\circ \)C and additional vaporization freezes
-          some of the remaining liquid. An energy balance at 0 \( ^\circ \)C determines the amount of liquid that forms
+          When 0.66 kg of water vaporizes, the liquid temperature is 0°C and additional vaporization freezes
+          some of the remaining liquid. An energy balance at 0°C determines the amount of liquid that forms
           solid ice:
 
-          \[ m_s \Delta H_f = (m_v - 0.66) \Delta H_{vap,0}. \]
+          \[ m_s \Delta H_f = (m_v - 0.66) \Delta H_{vap,0} \]
 
-          Where \( m_s \) is the mass of ice formed (kg), \( \Delta H_f \) is the heat of fusion (kJ/kg) and \( \Delta
-          H_{vap,0} \) is the heat of vaporization at 0 \( ^\circ \)C (kJ/kg).
+          where \( m_s \) is the mass of ice formed (kg), \( \Delta H_f \) is the heat of fusion (kJ/kg) and \( \Delta
+          H_{vap,0} \) is the heat of vaporization at 0°C (kJ/kg).
 
         </div>
       </div>
