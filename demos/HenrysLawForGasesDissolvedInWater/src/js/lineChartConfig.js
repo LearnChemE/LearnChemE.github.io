@@ -166,8 +166,11 @@ function updateLineChart(legendsSelected, elementValues, isPChanged) {
         borderColor: colourList[i],
         backgroundColor: colourList[i],
         label: legends[i],
-        borderWidth: 0.1,
-        pointRadius: 1.1,
+        borderWidth: 1.0,
+        pointRadius: 0.5,
+        lineWidth: 1.0,
+        showLine: true, // Show line
+        tension: 1, // Make the line super smooth
       });
     }
   }
