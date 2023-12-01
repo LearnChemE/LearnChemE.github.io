@@ -247,7 +247,7 @@ function calculateEquilibrium(P, T, nN2, nH2, nNH3) {
   const maxIterations = 10000;
 
   for (let i = 0; i < maxIterations; i++) {
-    let value = (25 * Math.pow((2 * xi + nNH3), 2)) / ((nN2 - xi) * (nH2 - 3 * xi));
+    let value = (Math.pow(T, 2) * Math.pow((2 * xi + nNH3), 2)) / ((nN2 - xi) * Math.pow((nH2 - 3 * xi), 3));
 
     if (Math.abs(value - RHS) < tolerance) {
       break;
