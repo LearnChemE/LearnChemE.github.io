@@ -1,7 +1,7 @@
 var P = 50;
 var T = 300;
-var nN2 = 0;
-var nH2 = 0;
+var nN2 = 0.1;
+var nH2 = 0.1;
 var nNH3 = 1;
 
 // ----------------------------------------------------------------
@@ -172,8 +172,8 @@ updateChart = () => {
 function initValues() {
   document.getElementById('pressureValue').innerText = 50;
   document.getElementById('temperatureValue').innerText = 300;
-  document.getElementById('N2MoleValue').innerText = 0;
-  document.getElementById('H2MoleValue').innerText = 0;
+  document.getElementById('N2MoleValue').innerText = 0.1;
+  document.getElementById('H2MoleValue').innerText = 0.1;
   document.getElementById('NH3MoleValue').innerText = 1;
 }
 
