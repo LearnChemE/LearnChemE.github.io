@@ -53,7 +53,7 @@ const lineChartConfig = {
           },
           label: function (tooltipItem) {
             // This will set the label of the tooltip to 'Custom Label'
-            return tooltipItem.parsed.y + ' mol fraction of gas in water';
+            return tooltipItem.parsed.y + ' mole fraction of gas in water';
           }
         }
       }
@@ -66,7 +66,7 @@ const lineChartConfig = {
         max: 0.0072,
         title: {
           display: true,
-          text: 'mol fraction gas in water',
+          text: 'mole fraction gas in water',
           font: function (context) {
             var width = context.chart.width;
             var size;
@@ -100,7 +100,7 @@ const lineChartConfig = {
         },
         beginAtZero: true,
         grid: {
-          display: false
+          display: true
         }
       },
       x: {
@@ -108,10 +108,10 @@ const lineChartConfig = {
         beginAtZero: true,
         title: {
           display: true,
-          text: "Temperate (°C)",
+          text: "temperate (°C)",
           font: {
             size: 20,
-            weight: 'bold',
+            weight: 'normal',
           },
         },
         ticks: {
@@ -178,8 +178,8 @@ function updateLineChart(legendsSelected, elementValues, isPChanged) {
   if (!isPChanged) {
     let flatData = data.datasets.flatMap(dataset => dataset.data);
     let maxVal = Math.max(...flatData);
-    lineChartConfig.options.scales.y.max = maxVal + 0.0001;
-    let stepSize = maxVal / 7;
+    lineChartConfig.options.scales.y.max = maxVal
+    let stepSize = maxVal / 7;    
     lineChartConfig.options.scales.y.ticks.stepSize = stepSize;
   }
 }

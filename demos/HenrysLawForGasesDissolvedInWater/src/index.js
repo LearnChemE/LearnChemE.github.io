@@ -46,6 +46,7 @@ window.changeChart = () => {
     temperatureDiv.style.opacity = '0';
   }
   performComputation();
+
 }
 
 
@@ -77,9 +78,10 @@ function performComputation() {
     barChart.update();
   }
   else {
+    debugger;
     outputValues = calculateContinousOutput(T, P);
     document.getElementById("temperatureDiv").style.display = "none";
-    updateLineChart(selectedLabels, outputValues, true);
+    updateLineChart(selectedLabels, outputValues, false);
     lineChart.update();
   }
 }

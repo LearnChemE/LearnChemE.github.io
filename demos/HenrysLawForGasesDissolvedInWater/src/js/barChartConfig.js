@@ -99,7 +99,6 @@ const barChartConfig = {
         beginAtZero: true,
         grid: {
           display: true,
-          lineWidth: 2
         }
       },
       x: {
@@ -127,6 +126,10 @@ const barChartConfig = {
   }
 };
 
+function roundUp(num, precision) {
+  let factor = Math.pow(10, precision);
+  return Math.ceil(num * factor) / factor;
+}
 
 function updateBarChart(isDatalabelListSelected, elementValues, isPChanged) {
   const values = Object.values(isDatalabelListSelected);
@@ -146,8 +149,16 @@ function updateBarChart(isDatalabelListSelected, elementValues, isPChanged) {
   data.datasets[0].borderColor = colourListSelected;
   if (!isPChanged) {
     let maxVal = Math.max(...chartDataset);
+    console.log(maxVal);
+
+    // Determine the number of decimal places
+    // let decimals = (maxVal.toString().split('.')[1] || []).length;
+
+    // // Round up to the next significant digit
+    // maxVal = roundUp(maxVal, decimals - 3);
+
     barChartConfig.options.scales.y.max = maxVal;
-    let stepSize = maxVal / 7;
+    let stepSize = maxVal / 6;
     barChartConfig.options.scales.y.ticks.stepSize = stepSize;
   }
 }
