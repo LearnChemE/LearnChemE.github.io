@@ -95,28 +95,33 @@
           <br />
           The amount of liquid \( m_L \) is 10 kg minus the amount of water vaporized \( m_v \) (both in kg):
           <br />
-          \[ (10 - m_v) Cp\; dT = \Delta H_{vap,20}\; dm_v \]
+          \( (10 - m_v) Cp\; dT = - \Delta H_{vap,20}\; dm_v \)
           <br />
           Integrating between the initial conditions (\( m_L = 10, m_v = 0 \)) and the final conditions yields:
+          <br /><span style="font-size:large;">
+            \( \int_{40}^{T_2} \frac{Cp dT}{\Delta H_{vap,20}} = -\int_{0}^{m_v} \frac{dm_v}{(10-m_v)} \)
+            <br />
+            \( \frac{Cp}{\Delta H_{vap,20}} (T_2 - 40) = \ln (10 - m_v) \Big|_{0}^{m_v} = \ln \left(
+            \frac{10-m_v}{10}
+            \right) \)
+          </span>
           <br />
-          \[ \int_{40}^{T_2} \frac{Cp dT}{\Delta H_{vap,20}} = -\int_{0}^{m_v} \frac{dm_v}{(10-m_v)} \]
-
-          \[ \frac{Cp}{\Delta H_{vap,20}} (T_2 - 40) = - \ln (10 - m_v) \(\bigg|_{0}^{m_v}\) = - \ln \left(
-          \frac{10-m_v}{10}
-          \right) \]
-
           Thus the final temperature for a given amount of water vaporized is:
-
-          \[ T_2 = 40 + \frac{\Delta H_{vap,20}}{Cp} \ln \left( \frac{10-m_v}{10} \right), \text{ where } T_2 \geq
-          0^\circ C
-          \]
-
+          <br />
+          <span style="font-size:large;">
+            \( T_2 = 40 + \frac{\Delta H_{vap,20}}{Cp} \ln \left( \frac{10-m_v}{10} \right), \text{ where } T_2 \geq
+            0^\circ C
+            \)
+          </span>
+          <br />
           When 0.66 kg of water vaporizes, the liquid temperature is 0°C and additional vaporization freezes
           some of the remaining liquid. An energy balance at 0°C determines the amount of liquid that forms
           solid ice:
-
-          \[ m_s \Delta H_f = (m_v - 0.66) \Delta H_{vap,0} \]
-
+          <br />
+          <span style="font-size:large;">
+            \( m_s \Delta H_f = (m_v - 0.66) \Delta H_{vap,0} \)
+          </span>
+          <br />
           where \( m_s \) is the mass of ice formed (kg), \( \Delta H_f \) is the heat of fusion (kJ/kg) and \( \Delta
           H_{vap,0} \) is the heat of vaporization at 0°C (kJ/kg).
 
