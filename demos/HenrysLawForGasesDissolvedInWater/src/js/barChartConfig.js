@@ -131,7 +131,7 @@ function roundUp(num, precision) {
   return Math.ceil(num * factor) / factor;
 }
 
-function updateBarChart(isDatalabelListSelected, elementValues, isPChanged) {
+function updateBarChart(isDatalabelListSelected, elementValues, isPChanged, forceVal = 0) {
   const values = Object.values(isDatalabelListSelected);
   chartDataset = [];
   selectedLabels = [];
@@ -147,7 +147,7 @@ function updateBarChart(isDatalabelListSelected, elementValues, isPChanged) {
   data.datasets[0].data = chartDataset;
   data.datasets[0].backgroundColor = colourListSelected;
   data.datasets[0].borderColor = colourListSelected;
-  if (!isPChanged) {
+  if (!isPChanged && forceVal === 0) {
     let maxVal = Math.max(...chartDataset);
     console.log(maxVal);
 
@@ -161,6 +161,12 @@ function updateBarChart(isDatalabelListSelected, elementValues, isPChanged) {
     let stepSize = maxVal / 6;
     barChartConfig.options.scales.y.ticks.stepSize = stepSize;
   }
+  if (forceVal != 0) {
+    barChartConfig.options.scales.y.max = forceVal;
+    let stepSize = forceVal / 6;
+    barChartConfig.options.scales.y.ticks.stepSize = stepSize;
+  }
+
 }
 
 

@@ -179,7 +179,7 @@ function updateLineChart(legendsSelected, elementValues, isPChanged) {
     let flatData = data.datasets.flatMap(dataset => dataset.data);
     let maxVal = Math.max(...flatData);
     lineChartConfig.options.scales.y.max = maxVal
-    let stepSize = maxVal / 7;    
+    let stepSize = maxVal / 7;
     lineChartConfig.options.scales.y.ticks.stepSize = stepSize;
   }
 }

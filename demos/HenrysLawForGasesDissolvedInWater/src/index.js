@@ -27,7 +27,7 @@ var isTemperatureSelected = true;
 window.updatePressure = (value) => {
   document.getElementById('pressureValue').innerText = value;
   P = value;
-  performComputation();
+  performComputation(true, false, false);
 }
 
 window.changeChart = () => {
@@ -45,43 +45,61 @@ window.changeChart = () => {
     lineChart.style.display = "block";
     temperatureDiv.style.opacity = '0';
   }
-  performComputation();
-
+  performComputation(false, false, true);
 }
 
 
 window.updateTemperature = (value) => {
   document.getElementById('temperatureValue').innerText = value;
   T = value;
-  performComputation();
+  performComputation(false, true, false);
 }
 
 document.querySelectorAll('input[name="element"]').forEach((checkbox) => {
   checkbox.addEventListener('change', () => {
     selectedLabels[checkbox.id] = checkbox.checked;
-    if (isTemperatureSelected) {
-      updateBarChart(selectedLabels, outputValues);
-      barChart.update();
-    }
-    else {
-      updateLineChart(selectedLabels, outputValues, false);
-      lineChart.update();
-    }
+    performComputation(false, false, false, true);
+    // if (isTemperatureSelected) {
+    //   updateBarChart(selectedLabels, outputValues, true);
+    //   barChart.update();
+    // }
+    // else {
+    //   updateLineChart(selectedLabels, outputValues, false);
+    //   lineChart.update();
+    // }
   });
 });
 
-function performComputation() {
+function performComputation(isPChanged, isTChanged, isChartChanged, elementChange = false) {
+  if (isChartChanged) {
+    updatePressure(5);
+  }
   if (isTemperatureSelected) {
     document.getElementById("temperatureDiv").style.display = "block";
     outputValues = calculateOutput(T, P);
-    updateBarChart(selectedLabels, outputValues, true);
+    if (!elementChange) {
+      updateBarChart(selectedLabels, outputValues, isPChanged || isTChanged);
+    }
+    else {
+      let arrayList = calculateOutput(T, 5);
+      let finalList = []
+      for (let i = 0; i < arrayList.length; i++) {
+        if (selectedLabels[Object.keys(selectedLabels)[i]]) {
+          finalList.push(arrayList[i])
+        }
+      }
+      let maxOutputValue = finalList.flat().reduce((a, b) => Math.max(a, b));
+      updateBarChart(selectedLabels, outputValues, isPChanged || isTChanged, maxOutputValue);
+    }
     barChart.update();
+
   }
   else {
-    debugger;
     outputValues = calculateContinousOutput(T, P);
     document.getElementById("temperatureDiv").style.display = "none";
-    updateLineChart(selectedLabels, outputValues, false);
+    var maxValue = calculateContinousOutput(T, 5).flat().reduce((a, b) => Math.max(a, b));
+    console.log(maxValue)
+    updateLineChart(selectedLabels, outputValues, isPChanged);
     lineChart.update();
   }
 }
@@ -89,7 +107,7 @@ function performComputation() {
 function init() {
   document.getElementById('pressureValue').innerText = 5;
   document.getElementById('temperatureValue').innerText = 0;
-  performComputation();
+  performComputation(false, false, false);
 }
 
 var barChartCanvas = document.getElementById('barChart').getContext('2d');
