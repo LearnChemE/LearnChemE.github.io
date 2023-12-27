@@ -60,7 +60,6 @@ const barChartConfig = {
     },
     scales: {
       y: {
-        max: 0.0071,
         title: {
           display: true,
           text: 'mol fraction gas in water',
@@ -94,9 +93,7 @@ const barChartConfig = {
               size: size,
             }
           },
-          stepSize: 0.001,
         },
-        beginAtZero: true,
         grid: {
           display: true,
         }
@@ -158,13 +155,13 @@ function updateBarChart(isDatalabelListSelected, elementValues, isPChanged, forc
     // maxVal = roundUp(maxVal, decimals - 3);
 
     barChartConfig.options.scales.y.max = maxVal;
-    let stepSize = maxVal / 6;
-    barChartConfig.options.scales.y.ticks.stepSize = stepSize;
+    // let stepSize = maxVal / 6;
+    // barChartConfig.options.scales.y.ticks.stepSize = stepSize;
   }
   if (forceVal != 0) {
     barChartConfig.options.scales.y.max = forceVal;
-    let stepSize = forceVal / 6;
-    barChartConfig.options.scales.y.ticks.stepSize = stepSize;
+    // let stepSize = forceVal / 6;
+    // barChartConfig.options.scales.y.ticks.stepSize = stepSize;
   }
 
 }
