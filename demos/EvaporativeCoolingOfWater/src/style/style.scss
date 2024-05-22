@@ -1,6 +1,5 @@
 @import "bootstrap";
 @import "./slider.scss";
-
 .chart {
   position: relative;
   /* Makes sure the canvas stretches to the size of its container */
@@ -9,7 +8,6 @@
 body {
   font-family: Arial, sans-serif;
 }
-
 
 .mjx-math {
   font-family: Arial, sans-serif !important;
@@ -24,12 +22,51 @@ body {
   font-style: normal !important;
 }
 
-.btn {
-  padding: 0.5rem;
-  margin-bottom: 1rem;
+.controls-box {
+  display: grid;
+  grid-template-columns: auto max-content;
+  margin: 25px 20px;
+  gap: 20px;
+  justify-content: center;
 }
 
-.d-flex {
-  height: 100%;
-  /* Ensures that the .d-flex element takes up the full height of its parent */
+.slider-box {
+  display: grid;
+  grid-template-columns: max-content minmax(100px, 200px) 30px max-content 40px 40px;
+  gap: 8px;
+  align-content: center;
+  align-items: center;
+  justify-self: end;
+}
+
+#mass-metric {
+  width: 25px;
+}
+
+.button {
+  border: 1px solid black;
+  border-radius: 5px;
+  display: grid;
+  align-items: center;
+  align-content: center;
+  justify-items: center;
+  justify-content: center;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  &.play {
+    background-color: rgba(157, 227, 157);
+    &:hover {
+      background-color: rgb(197, 232, 197);
+    }
+  }
+  &.reset {
+    background-color: rgb(227, 157, 157);
+    &:hover {
+      background-color: rgb(232, 197, 197);
+    }
+  }
+}
+
+.info-buttons-box {
+  justify-self: start;
 }

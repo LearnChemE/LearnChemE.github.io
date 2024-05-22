@@ -17,7 +17,7 @@ window.updateMass = (value, reset = false) => {
     mass = temp_mass;
     return;
   }
-  document.getElementById('massValue').innerText = value;
+  document.getElementById('massValue').innerText = Number(value).toFixed(2);
   mass = value;
   updateChart(0);
 }
@@ -43,7 +43,7 @@ function updateChart(simulate) {
   let calculated_data;
   let temp_mass = 0;
   if (simulate == 1 && mass != 0) {
-    intervalID = setInterval(function () {
+    intervalID = setInterval(function() {
       calculated_data = calculate(temp_mass)
       myChart.config.data.datasets[0].data = [calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), calculated_data.V.toFixed(2)];
       T2 = calculated_data.T2;
@@ -60,8 +60,7 @@ function updateChart(simulate) {
       if (temp_mass == mass && mass == 1.75)
         updateFigure(calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), T2, true);
     }, 50);
-  }
-  else {
+  } else {
     calculated_data = calculate(mass)
     myChart.config.data.datasets[0].data = [calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), calculated_data.V.toFixed(2)];
     T2 = calculated_data.T2;
@@ -72,19 +71,18 @@ function updateChart(simulate) {
 }
 
 function initValues() {
-  document.getElementById('massValue').innerText = 0;
+  document.getElementById('massValue').innerText = "0.00";
 }
 
-window.addEventListener('resize', function () {
+window.addEventListener('resize', function() {
   myChart.resize();
 });
 
 var canvas = document.getElementById('myChart').getContext('2d');
 var myChart = new Chart(canvas, barChartConfig);
-window.addEventListener('resize', function () {
+window.addEventListener('resize', function() {
   myChart.resize();
 });
 
 
 initValues();
-

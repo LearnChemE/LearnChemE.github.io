@@ -1,9 +1,9 @@
-let waterHeight = 100;  // Start with full height as liquid
-let solidHeight = 0;  // No solid at the beginning
-let containerHeight = 180;  // Total height of the container
-let isSolidComplete = false;  // Flag to check if solidification is complete
-let solidifyingRate = 0.5;  // Assumed rate at which solidification happens
-let temperature = 40;  // Starting temperature
+let waterHeight = 100; // Start with full height as liquid
+let solidHeight = 0; // No solid at the beginning
+let containerHeight = 180; // Total height of the container
+let isSolidComplete = false; // Flag to check if solidification is complete
+let solidifyingRate = 0.5; // Assumed rate at which solidification happens
+let temperature = 40; // Starting temperature
 import rotorImageSrc from '../assets/rotor.PNG';
 
 let sketch = (p) => {
@@ -36,38 +36,37 @@ let sketch = (p) => {
 
 
     p.stroke(0);
-    p.fill(205);  // Light gray for tank
-    p.ellipse(startX * scaleFactor, (100 * scaleFactor) + startY, 150 * scaleFactor, 20 * scaleFactor);  // Top ellipse
-    p.fill(100);  // Light gray for tank
+    p.fill(205); // Light gray for tank
+    p.ellipse(startX * scaleFactor, (100 * scaleFactor) + startY, 150 * scaleFactor, 20 * scaleFactor); // Top ellipse
+    p.fill(100); // Light gray for tank
     p.rect(startX - 56, ((100 * scaleFactor) - 20) + startY, 150 * scaleFactor, 15 * scaleFactor)
     p.fill(255);
-    p.ellipse(startX * scaleFactor, (280 * scaleFactor) + startY, 150 * scaleFactor, 20 * scaleFactor);  // Bottom ellipse
-    p.rect(95 * scaleFactor, (100 * scaleFactor) + startY, 150 * scaleFactor, 180 * scaleFactor);  // Bigger tank body
+    p.ellipse(startX * scaleFactor, (280 * scaleFactor) + startY, 150 * scaleFactor, 20 * scaleFactor); // Bottom ellipse
+    p.rect(95 * scaleFactor, (100 * scaleFactor) + startY, 150 * scaleFactor, 180 * scaleFactor); // Bigger tank body
 
     // Draw the water
-    p.fill(0, 0, 255);  // Dark blue for liquid
+    p.fill(0, 0, 255); // Dark blue for liquid
     let waterTopY = 280 * scaleFactor - waterHeight * scaleFactor;
-    p.ellipse(startX * scaleFactor, (waterTopY) + startY, 150 * scaleFactor, 20 * scaleFactor);  // Liquid top ellipse
-    p.rect(95 * scaleFactor, (waterTopY) + startY, 150 * scaleFactor, waterHeight * scaleFactor);  // Liquid body
+    p.ellipse(startX * scaleFactor, (waterTopY) + startY, 150 * scaleFactor, 20 * scaleFactor); // Liquid top ellipse
+    p.rect(95 * scaleFactor, (waterTopY) + startY, 150 * scaleFactor, waterHeight * scaleFactor); // Liquid body
 
     // Draw the solid from the top down
     if (solidHeight > 0) {
-      p.fill(135, 206, 235);  // Light blue for solid
+      p.fill(135, 206, 235); // Light blue for solid
       let solidTopY = waterTopY - solidHeight * scaleFactor;
-      p.ellipse(startX * scaleFactor, (solidTopY) + startY, 150 * scaleFactor, 20 * scaleFactor);  // Solid top ellipse
-      p.rect(95 * scaleFactor, (solidTopY) + startY, 150 * scaleFactor, solidHeight * scaleFactor);  // Solid body
+      p.ellipse(startX * scaleFactor, (solidTopY) + startY, 150 * scaleFactor, 20 * scaleFactor); // Solid top ellipse
+      p.rect(95 * scaleFactor, (solidTopY) + startY, 150 * scaleFactor, solidHeight * scaleFactor); // Solid body
     }
 
     // Check if solidification is complete
     if (waterHeight <= 4) {
       isSolidComplete = true;
       p.fill(135, 206, 235);
-      p.ellipse(startX * scaleFactor, (280 * scaleFactor) + startY, 150 * scaleFactor, 20 * scaleFactor);  // Bottom ellipse
-    }
-    else {
+      p.ellipse(startX * scaleFactor, (280 * scaleFactor) + startY, 150 * scaleFactor, 20 * scaleFactor); // Bottom ellipse
+    } else {
       // Bottom cap of the container
       p.fill(0, 0, 255);
-      p.ellipse(startX * scaleFactor, (280 * scaleFactor) + startY, 150 * scaleFactor, 20 * scaleFactor);  // Bottom ellipse
+      p.ellipse(startX * scaleFactor, (280 * scaleFactor) + startY, 150 * scaleFactor, 20 * scaleFactor); // Bottom ellipse
     }
 
     if (rotorImage) { // Check if the image is loaded           
