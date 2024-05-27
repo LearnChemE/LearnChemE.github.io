@@ -30,9 +30,9 @@ let sketch = (p) => {
     p.rect(100, 0, p.width - 200, 70); // Adjust size and position as needed
     // Now draw the text over the cleared area
     p.fill(0); // Black color for the text
-    p.textSize(26);
+    p.textSize(18);
     p.text("T = " + String(temperature.toFixed(0)) + "°C", 100, 30);
-    p.text(String((solidHeight / 10).toFixed(2)) + " kg of water evaporated", 100, 60);
+    p.text(String((solidHeight / 10).toFixed(2)) + " kg of water frozen", 100, 60);
 
 
     p.stroke(0);
