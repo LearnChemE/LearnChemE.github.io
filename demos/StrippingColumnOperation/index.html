@@ -69,7 +69,7 @@
                 </div>
                 <div class="input-row" id="label5" style="margin-left:40px">
                     <div class="input-label">pressure (atm)</div>
-                    <input type="range" id="pressure" min="1.5" max="3" value="2.5" step=".1"/>
+                    <input type="range" id="pressure" min="1.5" max="3" value="2.5" step=".1" />
                     <div id="pressure-label" class="value-label">2.5</div>
                 </div>
             </div>
@@ -111,7 +111,25 @@
                 </div>
                 <div class="modal-body">
                     <p>
-
+                        In this Demonstration, a trayed stripping column is used to remove an impurity from a liquid
+                        feed by stripping the impurity into a gas stream. The pink operating line is obtained from a
+                        mass balance, and its slope \(L/V\) (the ratio of liquid flow rate to gas flow rate) is shown on
+                        the column on the right. The phase equilibrium line, which is obtained from Henry's law, is
+                        orange.
+                        The top and bottom of the column are labeled on the \(x\)-\(y\) diagram. Move your mouse
+                        over the
+                        pink
+                        and orange lines to see their labels. The number of trays/stages needed to obtain an outlet
+                        solute mole ratio of \(x_N\) ppm in the liquid stream is calculated. A stage is a plate
+                        that contacts the liquid solvent and the gas to promote mass transfer. When a partial stage is
+                        calculated, the number of stages is rounded down to the nearest full stage. Use the sliders to
+                        change the pressure and temperature in the column, the gas flow rate \(V\) and the solute mole
+                        ratio
+                        in the gas feed, \(y_{N+1}\). Check the "\((L/V)_{max}\)" box to show the maximum
+                        slope for the operating line; this condition would require an infinite number of stages. Check
+                        "show diagram with 5 stages" to set conditions that require five stages and display the mole
+                        ratios entering and leaving each stage. Use the "stage" slider to move through each stage and
+                        display the solute fluxes in and out of that stage on the \(x\)-\(y\) diagram.
                     </p>
                 </div>
             </div>
@@ -131,8 +149,40 @@
                 </div>
 
                 <div class="modal-body">
-
-
+                    <p>
+                        The equilibrium line is calculated using Henry's law:
+                        $$y_{eq}=\frac{H}{P}x$$
+                        $$H=H_0 \ e^{-\frac{E}{R}(\frac{1}{T}-\frac{1}{T_0})}$$
+                        where \(H\) is Henry's constant (atm), \(P\) is pressure (atm), \(H_0\) is Henry's constant at
+                        \(T_0\) = 298 K (atm), \(R\) is the ideal gas constant (J/(mol K)) and \(T\) is temperature (K).
+                    </p>
+                    <p>
+                        The operating line is calculated from a mass balance around the stripper:
+                        $$x_0 L+y_{N+1} V=x_N L+y_1 V,$$
+                        which rearranges to:
+                        $$y_{N+1}=\frac{L}{V}x+(y_1-\frac{L}{V}x_0),$$
+                        where \(L\) is the liquid solvent molar flow rate (Mmol/h), \(V\) is the gas molar flow rate
+                        (Mmol/h),
+                        \(x_0\) is the mole ratio of the impurity in the inlet liquid solvent stream (ppm),
+                        \(y_{N+1}\) is the mole ratio of the impurity in the inlet gas stream (ppm), \(x_N\) is the mole
+                        ratio of the impurity in the outlet liquid solvent stream (ppm) and \(y_1\) is the mole ratio of
+                        the impurity in the outlet gas stream (ppm).
+                    </p>
+                    <p>
+                        To count off stages, start at \(x_0\) on the operating line (\(x_0, y_1\)), then draw a
+                        horizontal line to the equilibrium line (\(x_1, y_1\)). Then draw a vertical line down to the
+                        operating line. Repeat these steps until \(x_N\) is reached.
+                    </p>
+                    <p>
+                        The outlet liquid mole ratio \(x_N\) is calculated from the mass balance:
+                        $$x_N = x_0 + \frac{y_{N+1}-y_1}{L/V}.$$
+                        Reference
+                    </p>
+                    <p>
+                        [1] P. C. Wankat, <i>Separation Process Engineering: Includes Mass Transfer Analysis</i>, 3rd
+                        ed.,
+                        Upper Saddle River, NJ: Prentice Hall, 2011.
+                    </p>
                 </div>
             </div>
         </div>
