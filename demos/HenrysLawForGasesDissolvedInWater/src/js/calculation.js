@@ -5,7 +5,7 @@ const DH = [0, -0.00110261, 0, 0, 0, 0, 0, -0.0425831, 0, 0];
 
 
 function calculateOutput(T, P) {
-  T = t + 273;
+  T = T + 273;
   const H = AH.map((ah, i) => 1 / Math.exp(ah + (BH[i] / T) + CH[i] * Math.log(T) + DH[i] * (T)));
   const x = H.map(h => (P / h).toFixed(6));
   return x;
