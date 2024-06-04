@@ -1,5 +1,15 @@
 {
   "dependencies": {
     "live-server": "^1.2.2"
-  }
+  },
+  "name": "learncheme.github.io",
+  "version": "1.0.0",
+  "description": "Simulations created for https://www.learncheme.com/ to demonstrate the fundamental concepts of chemical and biological engineering, among other related topics. Contact us at learncheme@gmail.com to collaborate or inquire.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
