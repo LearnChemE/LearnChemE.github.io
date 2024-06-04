@@ -272,6 +272,78 @@ function lineDraw() {
 
 }
 
+function countStages() {
+    push();
+
+    x = g.x0;
+    y = g.y1;
+    xN = g.xN;
+    yN1 = g.yN1;
+
+    // (x0, y1)
+    noStroke();
+    fill('black');
+    u = map(x, 0, g.maxX, g.lx, g.rx);
+    v = map(y, 0, g.maxY, g.by, g.ty);
+    circle(u, v, 5);
+
+    text('(x0, y1)', u - 10, v + 15); // FIX ME add box to look better
+
+
+    // (xN, yN+1)
+    u = map(xN, 0, g.maxX, g.lx, g.rx);
+    v = map(yN1, 0, g.maxY, g.by, g.ty);
+    circle(u, v, 5);
+
+    text('(xN, yN+1)', u - 10, v + 15); // FIX ME
+
+
+    // Draw Stages
+    g.stagesCount = 0;
+    stroke('black');
+    while (x > xN) {
+        g.stagesCount += 1;
+        temp = xeq(y);
+        if (temp >= x) {
+            g.stagesCount = -1;
+            break;
+        }
+
+        u = map(x, 0, g.maxX, g.lx, g.rx);
+        v = map(y, 0, g.maxY, g.by, g.ty);
+        t = map(temp, 0, g.maxX, g.lx, g.rx);
+        line(u, v, t, v);
+        x = temp;
+
+        if (x > xN) {
+            temp = yop(x);
+
+            u = map(x, 0, g.maxX, g.lx, g.rx);
+            v = map(y, 0, g.maxY, g.by, g.ty);
+            t = map(temp, 0, g.maxY, g.by, g.ty);
+            line(u, v, u, t);
+            y = temp;
+        }
+    }
+
+    str = g.stagesCount + " Stages Needed";
+    textSize(20);
+    textAlign(CENTER, CENTER);
+    text(str, 550, 200);
+
+    pop();
+}
+
+function graphPointLabel(str, x, y) { // FIX ME
+    push();
+    noStroke();
+    fill(250);
+    rect(x, y, x + 20, y + 20);
+
+
+    pop();
+}
+
 function show5Display() {
 
 }

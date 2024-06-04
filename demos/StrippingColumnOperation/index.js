@@ -59,6 +59,7 @@ function draw() {
     graphLims();
     if (!g.LVmin && !g.show5) {
         lineDraw();
+        countStages();
     }
 }
 
@@ -97,7 +98,7 @@ IGMR.addEventListener("input", function () {
     g.yN1 = temp;
 });
 
-inletX.addEventListener("input", function () {
+inletX.addEventListener("input", function () { // FIX ME bug: graph axes break if slider is used too fast
     const temp = Number(inletX.value);
     inletXlabel.innerHTML = `${temp}`;
     g.x0 = temp;
