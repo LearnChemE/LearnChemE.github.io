@@ -35,13 +35,16 @@
 
 <body>
     <div id="simulation-wrapper">
+        <!-- Info Buttons -->
         <div class="simulation-controls">
             <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions
             </div>
             <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
             <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
         </div>
+        <!-- Inputs -->
         <div class="inputs-wrapper" style="transform:translateX(10px)">
+            <!-- Left Col Sliders -->
             <div class="input-area">
                 <div class="input-row" id="label1">
                     <div class="input-label">inlet gas mole ratio <i>y<sub>N</sub></i><sub>+1</sub></div>
@@ -61,6 +64,7 @@
 
 
             </div>
+            <!-- Right Col Sliders -->
             <div class="input-area2" style="margin-left:10px">
                 <div class="input-row" id="label4">
                     <div class="input-label">target mole ratio <i>x</i><sub>N</sub></div>
@@ -74,6 +78,7 @@
                 </div>
             </div>
 
+            <!-- Checkboxes -->
             <div class="select-container" style="margin-top:-30px; margin-right:-90px">
                 <form>
                     <label class="checkbox-inline" style="transform: translateX(0px)">
@@ -98,6 +103,8 @@
     <div id="graphics-wrapper">
 
     </div>
+
+    <!-- Modal information panels -->
 
     <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
         aria-hidden="true">

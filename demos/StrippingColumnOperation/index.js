@@ -11,10 +11,10 @@ window.g = {
     LVmin: false,
 
     // Colors to be used repeatedly
-    blue: [0,0,200],
-    green: [0,130,0],
-    orange: [255,80,0],
-    pink: [250,0,200],
+    blue: [0, 0, 200],
+    green: [0, 130, 0],
+    orange: [255, 80, 0],
+    pink: [250, 0, 200],
 
     // Graph edges
     lx: 80,
@@ -34,29 +34,30 @@ window.g = {
 
     stagesCount: 5,
     yOut: 25,
-    y1 : 25,
+    y1: 25,
     LoverV: 100,
     maxX: .4,
     maxY: 30,
 
     // Equations of the pink and orange line
-    R: [0,0], // Operating line
-    L: [0,0], // Equilibrium line
-    
+    // [slope, intercept]
+    R: [0, 0], // Operating line
+    L: [0, 0], // Equilibrium line
+
 
 
 }
 
-function setup(){
-    g.cnv = createCanvas(700,420);
+function setup() {
+    g.cnv = createCanvas(700, 420);
     g.cnv.parent("graphics-wrapper");
 }
 
-function draw(){
+function draw() {
     background(250);
     frame();
     graphLims();
-    if(!g.LVmin && !g.show5){
+    if (!g.LVmin && !g.show5) {
         lineDraw();
     }
 }
@@ -81,6 +82,7 @@ const LVmin = document.getElementById("L-V-min");
 const show5 = document.getElementById("show-diagram");
 
 const stageSlider = document.getElementById("stage-slider");
+const stageLabel = document.getElementById("stage-label");
 
 const label1 = document.getElementById("label1");
 const label2 = document.getElementById("label2");
@@ -89,34 +91,40 @@ const label4 = document.getElementById("label4");
 const label5 = document.getElementById("label5");
 const label6 = document.getElementById("label6");
 
-IGMR.addEventListener("input", function(){
+IGMR.addEventListener("input", function () {
     const temp = Number(IGMR.value);
     IGMRlabel.innerHTML = `${temp}`;
     g.yN1 = temp;
 });
 
-inletX.addEventListener("input", function(){
+inletX.addEventListener("input", function () {
     const temp = Number(inletX.value);
     inletXlabel.innerHTML = `${temp}`;
     g.x0 = temp;
 });
 
-tempe.addEventListener("input", function(){
+tempe.addEventListener("input", function () {
     const temp = Number(tempe.value);
     templabel.innerHTML = `${temp}`;
     g.T = temp;
 });
 
-TMR.addEventListener("input", function(){
+TMR.addEventListener("input", function () {
     const temp = Number(TMR.value);
     TMRlabel.innerHTML = `${temp}`;
     g.xN = temp;
 });
 
-pres.addEventListener("input", function(){
+pres.addEventListener("input", function () {
     const temp = Number(pres.value);
     preslabel.innerHTML = `${temp}`;
     g.P = temp;
+});
+
+stageSlider.addEventListener("input", function () {
+    const temp = Number(stageSlider.value);
+    stageLabel.innerHTML = `${temp}`;
+    g.stagesCount = temp;
 });
 
 LVmin.addEventListener("change", () => {
@@ -125,7 +133,7 @@ LVmin.addEventListener("change", () => {
 
 show5.addEventListener("change", () => {
     g.show5 = show5.checked;
-    if(g.show5){
+    if (g.show5) {
         stageSlider.style.display = "grid";
 
         IGMR.value = 1;
