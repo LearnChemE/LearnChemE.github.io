@@ -128,98 +128,102 @@ function frame() {
             pop();
         }
 
-        // Graph axes ticks \\
-        // x-axis
-        let ticks, count, xLabels, yLabels;
-        if (g.x0 == .1) {
-            xLabels = [0, 0.02, .04, .06, .08, .1];
-            ticks = 4;
-            count = .11 / .005;
-            g.maxX = .11;
-            for (let i = 0; i < count; i++) {
-                if (i % ticks == 0) {
-                    line(g.lx + (g.rx - g.lx) / count * i, g.by, g.lx + (g.rx - g.lx) / count * i, g.by - 5);
-                    line(g.lx + (g.rx - g.lx) / count * i, g.ty, g.lx + (g.rx - g.lx) / count * i, g.ty + 5);
-                    push();
-                    noStroke(); textSize(14);
-                    if (i == 0) {
-                        text(xLabels[i / ticks].toFixed(2), g.lx + (g.rx - g.lx) / count * i - 15, g.by + 16);
-                    } else {
-                        text(xLabels[i / ticks].toFixed(2), g.lx + (g.rx - g.lx) / count * i - 15, g.by + 15);
-                    }
-                    pop();
+        drawGraphTicks();
+    }
+}
+
+function drawGraphTicks() {
+    // Graph axes ticks \\
+    // x-axis
+    let ticks, count, xLabels, yLabels;
+    if (g.x0 == .1) {
+        xLabels = [0, 0.02, .04, .06, .08, .1];
+        ticks = 4;
+        count = .11 / .005;
+        g.maxX = .11;
+        for (let i = 0; i < count; i++) {
+            if (i % ticks == 0) {
+                line(g.lx + (g.rx - g.lx) / count * i, g.by, g.lx + (g.rx - g.lx) / count * i, g.by - 5);
+                line(g.lx + (g.rx - g.lx) / count * i, g.ty, g.lx + (g.rx - g.lx) / count * i, g.ty + 5);
+                push();
+                noStroke(); textSize(14);
+                if (i == 0) {
+                    text(xLabels[i / ticks].toFixed(2), g.lx + (g.rx - g.lx) / count * i - 15, g.by + 16);
                 } else {
-                    line(g.lx + (g.rx - g.lx) / count * i, g.by, g.lx + (g.rx - g.lx) / count * i, g.by - 3);
-                    line(g.lx + (g.rx - g.lx) / count * i, g.ty, g.lx + (g.rx - g.lx) / count * i, g.ty + 3);
+                    text(xLabels[i / ticks].toFixed(2), g.lx + (g.rx - g.lx) / count * i - 15, g.by + 15);
                 }
-            }
-        } else if (g.x0 < .4) {
-            xLabels = [0, .05, .1, .15, .2, .25, .3, .35, .4];
-            ticks = 5;
-            count = g.maxX / .01;
-            for (let i = 0; i < count; i++) {
-                if (i % ticks == 0) {
-                    line(g.lx + (g.rx - g.lx) / count * i, g.by, g.lx + (g.rx - g.lx) / count * i, g.by - 5);
-                    line(g.lx + (g.rx - g.lx) / count * i, g.ty, g.lx + (g.rx - g.lx) / count * i, g.ty + 5);
-                    push();
-                    noStroke(); textSize(14);
-                    if (i == 0) {
-                        text(xLabels[i / ticks].toFixed(2), g.lx + (g.rx - g.lx) / count * i - 15, g.by + 16);
-                    } else {
-                        text(xLabels[i / ticks].toFixed(2), g.lx + (g.rx - g.lx) / count * i - 15, g.by + 15);
-                    }
-                    pop();
-                } else {
-                    line(g.lx + (g.rx - g.lx) / count * i, g.by, g.lx + (g.rx - g.lx) / count * i, g.by - 3);
-                    line(g.lx + (g.rx - g.lx) / count * i, g.ty, g.lx + (g.rx - g.lx) / count * i, g.ty + 3);
-                }
-            }
-        } else {
-            xLabels = [0, .1, .2, .3, .4, .5];
-            ticks = 5;
-            count = g.maxX / .02;
-            for (let i = 0; i < count; i++) {
-                if (i % ticks == 0) {
-                    line(g.lx + (g.rx - g.lx) / count * i, g.by, g.lx + (g.rx - g.lx) / count * i, g.by - 5);
-                    line(g.lx + (g.rx - g.lx) / count * i, g.ty, g.lx + (g.rx - g.lx) / count * i, g.ty + 5);
-                    push();
-                    noStroke(); textSize(14);
-                    if (i == 0) {
-                        text(xLabels[i / ticks].toFixed(1), g.lx + (g.rx - g.lx) / count * i - 10, g.by + 16);
-                    } else {
-                        text(xLabels[i / ticks].toFixed(1), g.lx + (g.rx - g.lx) / count * i - 10, g.by + 15);
-                    }
-                    pop();
-                } else {
-                    line(g.lx + (g.rx - g.lx) / count * i, g.by, g.lx + (g.rx - g.lx) / count * i, g.by - 3);
-                    line(g.lx + (g.rx - g.lx) / count * i, g.ty, g.lx + (g.rx - g.lx) / count * i, g.ty + 3);
-                }
+                pop();
+            } else {
+                line(g.lx + (g.rx - g.lx) / count * i, g.by, g.lx + (g.rx - g.lx) / count * i, g.by - 3);
+                line(g.lx + (g.rx - g.lx) / count * i, g.ty, g.lx + (g.rx - g.lx) / count * i, g.ty + 3);
             }
         }
-
-        // y-axis
-        if (g.maxY < 1) {
-
-        } else if (g.maxY < 40) {
-            ticks = 5;
-            count = g.maxY / 1;
-            yLabels = [0, 5, 10, 15, 20, 25, 30, 35, 40];
-            for (let i = 0; i < count; i++) {
-                if (i % ticks == 0) {
-                    line(g.lx, g.by - (g.by - g.ty) / count * i, g.lx + 5, g.by - (g.by - g.ty) / count * i);
-                    line(g.rx, g.by - (g.by - g.ty) / count * i, g.rx - 5, g.by - (g.by - g.ty) / count * i);
-                    push();
-                    noStroke(); textSize(14);
-                    if (i == 0 || i == 5) {
-                        text(yLabels[i / ticks], g.lx - 12, g.by - (g.by - g.ty) / count * i + 4);
-                    } else {
-                        text(yLabels[i / ticks], g.lx - 20, g.by - (g.by - g.ty) / count * i + 4);
-                    }
-                    pop();
+    } else if (g.x0 < .4) {
+        xLabels = [0, .05, .1, .15, .2, .25, .3, .35, .4];
+        ticks = 5;
+        count = g.maxX / .01;
+        for (let i = 0; i < count; i++) {
+            if (i % ticks == 0) {
+                line(g.lx + (g.rx - g.lx) / count * i, g.by, g.lx + (g.rx - g.lx) / count * i, g.by - 5);
+                line(g.lx + (g.rx - g.lx) / count * i, g.ty, g.lx + (g.rx - g.lx) / count * i, g.ty + 5);
+                push();
+                noStroke(); textSize(14);
+                if (i == 0) {
+                    text(xLabels[i / ticks].toFixed(2), g.lx + (g.rx - g.lx) / count * i - 15, g.by + 16);
                 } else {
-                    line(g.lx, g.by - (g.by - g.ty) / count * i, g.lx + 3, g.by - (g.by - g.ty) / count * i);
-                    line(g.rx, g.by - (g.by - g.ty) / count * i, g.rx - 3, g.by - (g.by - g.ty) / count * i);
+                    text(xLabels[i / ticks].toFixed(2), g.lx + (g.rx - g.lx) / count * i - 15, g.by + 15);
                 }
+                pop();
+            } else {
+                line(g.lx + (g.rx - g.lx) / count * i, g.by, g.lx + (g.rx - g.lx) / count * i, g.by - 3);
+                line(g.lx + (g.rx - g.lx) / count * i, g.ty, g.lx + (g.rx - g.lx) / count * i, g.ty + 3);
+            }
+        }
+    } else {
+        xLabels = [0, .1, .2, .3, .4, .5];
+        ticks = 5;
+        count = g.maxX / .02;
+        for (let i = 0; i < count; i++) {
+            if (i % ticks == 0) {
+                line(g.lx + (g.rx - g.lx) / count * i, g.by, g.lx + (g.rx - g.lx) / count * i, g.by - 5);
+                line(g.lx + (g.rx - g.lx) / count * i, g.ty, g.lx + (g.rx - g.lx) / count * i, g.ty + 5);
+                push();
+                noStroke(); textSize(14);
+                if (i == 0) {
+                    text(xLabels[i / ticks].toFixed(1), g.lx + (g.rx - g.lx) / count * i - 10, g.by + 16);
+                } else {
+                    text(xLabels[i / ticks].toFixed(1), g.lx + (g.rx - g.lx) / count * i - 10, g.by + 15);
+                }
+                pop();
+            } else {
+                line(g.lx + (g.rx - g.lx) / count * i, g.by, g.lx + (g.rx - g.lx) / count * i, g.by - 3);
+                line(g.lx + (g.rx - g.lx) / count * i, g.ty, g.lx + (g.rx - g.lx) / count * i, g.ty + 3);
+            }
+        }
+    }
+
+    // y-axis
+    if (g.maxY < 1) {
+
+    } else if (g.maxY < 40) {
+        ticks = 5;
+        count = g.maxY / 1;
+        yLabels = [0, 5, 10, 15, 20, 25, 30, 35, 40];
+        for (let i = 0; i < count; i++) {
+            if (i % ticks == 0) {
+                line(g.lx, g.by - (g.by - g.ty) / count * i, g.lx + 5, g.by - (g.by - g.ty) / count * i);
+                line(g.rx, g.by - (g.by - g.ty) / count * i, g.rx - 5, g.by - (g.by - g.ty) / count * i);
+                push();
+                noStroke(); textSize(14);
+                if (i == 0 || i == 5) {
+                    text(yLabels[i / ticks], g.lx - 12, g.by - (g.by - g.ty) / count * i + 4);
+                } else {
+                    text(yLabels[i / ticks], g.lx - 20, g.by - (g.by - g.ty) / count * i + 4);
+                }
+                pop();
+            } else {
+                line(g.lx, g.by - (g.by - g.ty) / count * i, g.lx + 3, g.by - (g.by - g.ty) / count * i);
+                line(g.rx, g.by - (g.by - g.ty) / count * i, g.rx - 3, g.by - (g.by - g.ty) / count * i);
             }
         }
     }
@@ -423,13 +427,13 @@ function show5Display() {
     pop();
 
     // Blue text
-    // upper right
     push();
     fill(250); noStroke();
 
     textSize(16); fill(g.blue);
-    text('liquid solvent feed', ml + 2, top - 50);
-    text(' = 100 Mmol/h', ml + 28, top - 35);
+    // text('liquid solvent feed', ml + 2, top - 50);
+    text('L = 100 Mmol/h', ml + 28, top - 37);
+    text('100 Mmol/h', ml + 48, top + 325);
     textStyle(ITALIC);
     text('L', ml + 17, top - 72);
 
@@ -445,6 +449,41 @@ function show5Display() {
         text(' = ' + ratioLabels[i].toFixed(2) + ' ppm', ml + 60, top - 10 + i * dy);
     }
 
+    pop();
+
+    // Green text
+    push();
+    fill(250); noStroke();
+
+    textSize(16); fill(g.green);
+    text('V = 1 Mmol/h', ml - 128, top - 37);
+    text('1 Mmol/h', ml - 108, top + 325);
+    textStyle(ITALIC);
+    text('L', ml + 17, top - 72);
+
+    ratioLabels = [25, 21, 16, 10, 2, 1];
+    for (i = 0; i < 6; i++) {
+        textStyle(ITALIC);
+        text('y', ml - 135, top - 12 + i * dy);
+
+        textStyle(NORMAL); textSize(14);
+        text(i + 1, ml - 126, top - 6 + i * dy);
+
+        textSize(16);
+        text(' = ' + ratioLabels[i].toFixed(0) + ' ppm', ml - 120, top - 10 + i * dy);
+    }
+
+    pop();
+
+    drawGraphTicks();
+
+    // Graph label
+    let soluteFluxes = [56, 47, 36, 22, 4];
+    push();
+    noStroke(); fill('black');
+    textSize(20);
+    text('Stage ' + g.stageSelected + ' solute fluxes:\nIn: ' + soluteFluxes[g.stageSelected - 1].toFixed(1)
+        + '\nOut: ' + soluteFluxes[g.stageSelected - 1].toFixed(1), 100, 100);
     pop();
 }
 
