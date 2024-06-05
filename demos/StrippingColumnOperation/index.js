@@ -44,8 +44,6 @@ window.g = {
     R: [0, 0], // Operating line
     L: [0, 0], // Equilibrium line
 
-
-
 }
 
 function setup() {
@@ -63,7 +61,7 @@ function draw() {
         countStages();
     }
     else if (g.show5) {
-
+        show5Display();
     }
     else { // LVmin
         showLVmax();
@@ -90,6 +88,7 @@ const LVmin = document.getElementById("L-V-min");
 const show5 = document.getElementById("show-diagram");
 
 const stageSlider = document.getElementById("stage-slider");
+const stage = document.getElementById("stage");
 const stageLabel = document.getElementById("stage-label");
 
 const label1 = document.getElementById("label1");
@@ -129,8 +128,8 @@ pres.addEventListener("input", function () {
     g.P = temp;
 });
 
-stageSlider.addEventListener("input", function () {
-    const temp = Number(stageSlider.value);
+stage.addEventListener("input", function () {
+    const temp = Number(stage.value);
     stageLabel.innerHTML = `${temp}`;
     g.stagesCount = temp;
 });
