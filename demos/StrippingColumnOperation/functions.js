@@ -560,13 +560,24 @@ function showLVmax() {
     }
 
     // LV Max
-    textAlign(CENTER, CENTER);
-    textSize(16);
-    text('Infinite Stages Needed', 550, 150);
-
     LVm = (yeq(g.x0) - g.yN1) / (g.x0 - g.xN);
-    text('L/V max = ' + LVm.toFixed(1), 550, 200);
+    textAlign(CENTER, CENTER);
 
+    if (LVm < 0) {
+        textSize(20);
+        text("Separation not possible\n *Infinite stages needed*", 225, 200);
+    }
+    else if (LVm < 100) {
+        textSize(20);
+        text("Separation not possible\n *Zero stages needed*", 225, 200);
+    }
+    else {
+        textSize(16);
+        text('Infinite Stages Needed', 550, 175);
+
+        text('L/V max = ' + LVm.toFixed(1), 550, 225);
+
+    }
     pop();
 }
 
