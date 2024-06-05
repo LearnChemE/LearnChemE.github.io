@@ -330,7 +330,7 @@ function countStages() {
         textSize(26);
         text(" Separation Impossible\n*Infinite Stages Needed*", 200, 200)
     }
-    else {
+    else if (!g.show5) {
         str = g.stagesCount + " Stages Needed";
         textSize(20);
         textAlign(CENTER, CENTER);
@@ -351,7 +351,101 @@ function graphPointLabel(str, x, y) { // FIX ME
 }
 
 function show5Display() {
+    let ml = 550, top = 70, dy = 60;
+    let w = 70, h = 30;
+    // Boxes on right
+    push();
+    fill(250);
+    strokeWeight(3);
+    stroke('black');
+    textAlign(CENTER, CENTER);
+    textSize(18);
 
+    let i;
+    // Boxes
+    for (i = 0; i < 5; i++) {
+        if (i + 1 == g.stageSelected) {
+            fill('yellow');
+            rect(ml - 35, top + dy * i, w, h);
+            fill(250);
+        }
+        else {
+            rect(ml - 35, top + dy * i, w, h);
+        }
+    }
+
+    fill('black');
+    noStroke();
+
+    // Numbers
+    for (i = 0; i < 5; i++) {
+        text(i + 1, ml, top + h / 2 + 2 + dy * i);
+    }
+    pop();
+
+    // Blue lines
+    push();
+    strokeWeight(2); stroke(g.blue);
+    let halign = ml + w / 4
+    line(halign, top - h, halign + 50, top - h); // Top H
+    // line(halign, top - h, halign, top); // Top V
+    // arrow([halign, top - h], [halign, top], g.blue, 12, 5); // Top arrow
+
+    for (i = 0; i < 5; i++) {
+        line(halign, top + dy * i, halign, top + dy * i - h);
+        arrow([halign, top + dy * i - h], [halign, top + dy * i], g.blue, 12, 5);
+    }
+
+    line(halign, top + dy * 5, halign, top + dy * 5 - h);
+    line(halign, top + dy * 5, halign + 50, top + dy * 5);
+    arrow([halign, top + dy * 5], [halign + 53, top + dy * 5], g.blue, 12, 5);
+
+    pop();
+
+
+    // Green lines
+    push();
+    strokeWeight(2); stroke(g.green);
+    halign = ml - w / 4
+    line(halign, top - h, halign - 50, top - h); // Top H
+    // line(halign, top - h, halign, top); // Top V
+    // arrow([halign, top - h], [halign, top], g.blue, 12, 5); // Top arrow
+
+    for (i = 0; i < 5; i++) {
+        line(halign, top + dy * i, halign, top + dy * i - h);
+        arrow([halign, top + dy * (i + 1)], [halign, top + dy * (i + 1) - h], g.green, 12, 5);
+    }
+
+    line(halign, top + dy * 5, halign, top + dy * 5 - h);
+    line(halign, top + dy * 5, halign - 50, top + dy * 5);
+    arrow([halign, top - h], [halign - 53, top - h], g.green, 12, 5);
+
+    pop();
+
+    // Blue text
+    // upper right
+    push();
+    fill(250); noStroke();
+
+    textSize(16); fill(g.blue);
+    text('liquid solvent feed', ml + 2, top - 50);
+    text(' = 100 Mmol/h', ml + 28, top - 35);
+    textStyle(ITALIC);
+    text('L', ml + 17, top - 72);
+
+    let ratioLabels = [.35, .31, .26, .2, .12, .11];
+    for (i = 0; i < 6; i++) {
+        textStyle(ITALIC);
+        text('x', ml + 45, top - 12 + i * dy);
+
+        textStyle(NORMAL); textSize(14);
+        text(i, ml + 54, top - 6 + i * dy);
+
+        textSize(16);
+        text(' = ' + ratioLabels[i].toFixed(2) + ' ppm', ml + 60, top - 10 + i * dy);
+    }
+
+    pop();
 }
 
 function showLVmax() {

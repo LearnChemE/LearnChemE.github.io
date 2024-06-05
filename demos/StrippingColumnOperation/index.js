@@ -6,6 +6,7 @@ window.g = {
     x0: .35,
     P: 2.5,
     T: 13,
+    stageSelected: 1,
 
     show5: false,
     LVmin: false,
@@ -61,6 +62,8 @@ function draw() {
         countStages();
     }
     else if (g.show5) {
+        lineDraw();
+        countStages();
         show5Display();
     }
     else { // LVmin
@@ -131,7 +134,7 @@ pres.addEventListener("input", function () {
 stage.addEventListener("input", function () {
     const temp = Number(stage.value);
     stageLabel.innerHTML = `${temp}`;
-    g.stagesCount = temp;
+    g.stageSelected = temp;
 });
 
 LVmin.addEventListener("change", () => {
