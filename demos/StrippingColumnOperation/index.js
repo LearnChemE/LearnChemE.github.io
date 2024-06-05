@@ -57,9 +57,16 @@ function draw() {
     background(250);
     frame();
     graphLims();
+
     if (!g.LVmin && !g.show5) {
         lineDraw();
         countStages();
+    }
+    else if (g.show5) {
+
+    }
+    else { // LVmin
+        showLVmax();
     }
 }
 
@@ -134,7 +141,12 @@ LVmin.addEventListener("change", () => {
 
 show5.addEventListener("change", () => {
     g.show5 = show5.checked;
+
     if (g.show5) {
+        LVmin.checked = false;
+        LVmin.disabled = true;
+        g.LVmin = false;
+
         stageSlider.style.display = "grid";
 
         IGMR.value = 1;
@@ -170,6 +182,8 @@ show5.addEventListener("change", () => {
         TMR.disabled = true;
         pres.disabled = true;
     } else {
+        LVmin.disabled = false;
+
         stageSlider.style.display = "none";
         label1.style.color = "black";
         label2.style.color = "black";

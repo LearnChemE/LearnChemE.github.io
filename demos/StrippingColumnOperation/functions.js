@@ -295,7 +295,7 @@ function countStages() {
     v = map(yN1, 0, g.maxY, g.by, g.ty);
     circle(u, v, 5);
 
-    text('(xN, yN+1)', u - 10, v + 15); // FIX ME
+    text('(xN, yN+1)', u + 15, v); // FIX ME
 
 
     // Draw Stages
@@ -326,10 +326,16 @@ function countStages() {
         }
     }
 
-    str = g.stagesCount + " Stages Needed";
-    textSize(20);
-    textAlign(CENTER, CENTER);
-    text(str, 550, 200);
+    if (g.stagesCount == -1) {
+        textSize(26);
+        text(" Separation Impossible\n*Infinite Stages Needed*", 200, 200)
+    }
+    else {
+        str = g.stagesCount + " Stages Needed";
+        textSize(20);
+        textAlign(CENTER, CENTER);
+        text(str, 550, 200);
+    }
 
     pop();
 }
@@ -346,6 +352,89 @@ function graphPointLabel(str, x, y) { // FIX ME
 
 function show5Display() {
 
+}
+
+function showLVmax() {
+    push();
+
+    let u, v, u2, v2;
+
+    // Equilibrium line
+    u = g.lx; u2 = g.rx;
+    v = map(yeq(0), 0, g.maxY, g.by, g.ty);
+    v2 = map(yeq(g.maxX), 0, g.maxY, g.by, g.ty);
+    g.L[0] = (v2 - v) / (u2 - u);
+    g.L[1] = v - g.L[0] * u;
+
+    if (v2 < g.ty) {
+        u2 = (g.ty - g.L[1]) / g.L[0];
+        v2 = g.ty;
+    }
+
+    strokeWeight(2);
+    stroke(g.orange);
+    line(u, v, u2, v2);
+
+    // (xN, yN+1)
+    x0 = map(g.x0, 0, g.maxX, g.lx, g.rx);
+    yPinch = map(yeq(g.x0), 0, g.maxY, g.by, g.ty);
+    xN = map(g.xN, 0, g.maxX, g.lx, g.rx);
+    yN1 = map(g.yN1, 0, g.maxY, g.by, g.ty);
+
+    u = xN;
+    v = yN1;
+    u2 = x0;
+    v2 = yPinch;
+
+    // Operating line
+
+    g.R[0] = (v2 - v) / (u2 - u);
+    g.R[1] = v - g.R[0] * u;
+
+
+    if (v != g.by) {
+        u = (g.by - g.R[1]) / g.R[0];
+        v = g.by;
+    }
+
+
+    if (v2 != g.ty) {
+        u2 = (g.ty - g.R[1]) / g.R[0];
+        v2 = g.ty;
+    }
+    if (u2 > g.rx) {
+        u2 = g.rx;
+        v2 = g.R[0] * u2 + g.R[1];
+    }
+
+    strokeWeight(2); stroke(g.pink);
+    line(u, v, u2, v2);
+
+    pop();
+    push();
+
+    noStroke();
+    fill('black');
+
+    // (xN, yN+1)
+    circle(xN, yN1, 5);
+    text('(xN, yN+1)', xN + 15, yN1); // FIX ME
+
+    // Pinch Point
+    if (yPinch > g.ty) {
+        circle(x0, yPinch, 5);
+        text('Pinch Point', x0 + 10, yPinch - 5); // FIX ME
+    }
+
+    // LV Max
+    textAlign(CENTER, CENTER);
+    textSize(16);
+    text('Infinite Stages Needed', 550, 150);
+
+    LVm = (yeq(g.x0) - g.yN1) / (g.x0 - g.xN);
+    text('L/V max = ' + LVm.toFixed(1), 550, 200);
+
+    pop();
 }
 
 function graphLims() {
