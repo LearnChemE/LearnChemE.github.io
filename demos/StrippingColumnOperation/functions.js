@@ -338,6 +338,12 @@ function countStages() {
         line(u, v, t, v);
         x = temp;
 
+        if (u - t > 5 || g.stagesCount % 3 == 1) {
+            fill('black'); noStroke();
+            text(g.stagesCount, t - 10, v - 5);
+            stroke('black');
+        }
+
         if (x > xN) {
             temp = yop(x);
 
@@ -348,6 +354,7 @@ function countStages() {
             y = temp;
         }
     }
+
 
     if (g.stagesCount == -1) {
         fill(250);
