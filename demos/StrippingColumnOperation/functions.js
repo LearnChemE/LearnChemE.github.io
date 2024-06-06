@@ -9,17 +9,17 @@ function frame() {
 
     // X-axis label
     fill(0); textSize(18); noStroke();
-    text('solute/(solute-free liquid)', g.lx + 30, g.by + 45);
+    text('Solute/(Solute-free liquid)', g.lx + 30, g.by + 45);
     text('(ppm)', g.lx + 250, g.by + 45);
     textStyle(ITALIC);
-    text('x', g.lx + 234, g.by + 45);
+    text('x', g.lx + 237, g.by + 45);
 
     // Y-axis label
     translate(25, height / 2 + 110);
     rotate(radians(-90));
-    text('y', 192, 0);
+    text('y', 195, 0);
     textStyle(NORMAL);
-    text('solute/(solute-free gas)', 0, 0);
+    text('Solute/(Solute-free gas)', 0, 0);
     text('(ppm)', 208, 0);
     pop();
 
@@ -78,7 +78,7 @@ function frame() {
             fill(250); noStroke();
             rect(ml + 28, top - 54, 105, 20);
             textSize(16); fill(g.blue);
-            text('liquid solvent feed', ml + 2, top - 92);
+            text('Liquid solvent feed', ml + 2, top - 92);
             text(' = 100 Mmol/h', ml + 28, top - 72);
             text(' = ' + g.x0 + ' ppm', ml + 45, top - 40);
             textStyle(ITALIC);
@@ -247,11 +247,20 @@ function lineDraw() {
         x1 = (g.by - g.R[1]) / g.R[0];
         y1 = g.by;
     }
+    else if (y1 < g.ty) {
+        y1 = g.ty;
+        x1 = (g.ty - g.R[1]) / g.R[0];
+    }
 
     if (y2 < g.ty) {
         x2 = (g.ty - g.R[1]) / g.R[0];
         y2 = g.ty;
     }
+    else if (y2 > g.by) {
+        y2 = g.by;
+        x2 = (g.by - g.R[1]) / g.R[0];
+    }
+
     push();
     strokeWeight(2); stroke(g.pink);
     line(x1, y1, x2, y2);
@@ -263,6 +272,11 @@ function lineDraw() {
     y2 = map(yeq(g.maxX), 0, g.maxY, g.by, g.ty);
     g.L[0] = (y2 - y1) / (x2 - x1);
     g.L[1] = y1 - g.L[0] * x1;
+
+    if (g.L[0] > 0) {
+        pop();
+        return;
+    }
 
     if (y2 < g.ty) {
         x2 = (g.ty - g.L[1]) / g.L[0];
@@ -291,14 +305,19 @@ function countStages() {
     v = map(y, 0, g.maxY, g.by, g.ty);
     circle(u, v, 5);
 
-    text('(x0, y1)', u - 10, v + 15); // FIX ME add box to look better
-
+    fill(250);
+    rect(u - 11, v + 4, 42, 15);
+    fill('black');
+    text('(x0, y1)', u - 10, v + 15);
 
     // (xN, yN+1)
     u = map(xN, 0, g.maxX, g.lx, g.rx);
     v = map(yN1, 0, g.maxY, g.by, g.ty);
     circle(u, v, 5);
 
+    fill(250);
+    rect(u + 14, v - 11, 57, 15);
+    fill('black');
     text('(xN, yN+1)', u + 15, v); // FIX ME
 
 
@@ -331,10 +350,27 @@ function countStages() {
     }
 
     if (g.stagesCount == -1) {
+        fill(250);
+        stroke('black'); strokeWeight(2);
+        rect(196, 176, 290, 65);
         textSize(26);
-        text(" Separation Impossible\n*Infinite Stages Needed*", 200, 200)
+        fill('red'); noStroke();
+        text(" Separation Impossible", 200, 200);
+        fill('black');
+        text("\n*Infinite Stages Needed*", 200, 200);
+    }
+    else if (g.stagesCount == 0) {
+        fill(250);
+        stroke('black'); strokeWeight(2);
+        rect(196, 176, 290, 65);
+        textSize(26);
+        fill('red'); noStroke();
+        text(" Separation Impossible", 200, 200);
+        fill('black'); textSize(22);
+        text("\n*Less than 1 Stage Needed*", 200, 200);
     }
     else if (!g.show5) {
+        noStroke(); fill('black'); textStyle(BOLD);
         str = g.stagesCount + " Stages Needed";
         textSize(20);
         textAlign(CENTER, CENTER);
@@ -357,6 +393,9 @@ function graphPointLabel(str, x, y) { // FIX ME
 function show5Display() {
     let ml = 550, top = 70, dy = 60;
     let w = 70, h = 30;
+
+    drawGraphTicks();
+
     // Boxes on right
     push();
     fill(250);
@@ -475,8 +514,6 @@ function show5Display() {
 
     pop();
 
-    drawGraphTicks();
-
     // Graph label
     let soluteFluxes = [56, 47, 36, 22, 4];
     push();
@@ -503,6 +540,10 @@ function showLVmax() {
         u2 = (g.ty - g.L[1]) / g.L[0];
         v2 = g.ty;
     }
+    else if (v2 > g.by) {
+        u2 = (g.by - g.L[1]) / g.L[0];
+        v2 = g.by;
+    }
 
     strokeWeight(2);
     stroke(g.orange);
@@ -514,27 +555,31 @@ function showLVmax() {
     xN = map(g.xN, 0, g.maxX, g.lx, g.rx);
     yN1 = map(g.yN1, 0, g.maxY, g.by, g.ty);
 
-    u = xN;
-    v = yN1;
-    u2 = x0;
-    v2 = yPinch;
 
     // Operating line
 
-    g.R[0] = (v2 - v) / (u2 - u);
-    g.R[1] = v - g.R[0] * u;
+    g.R[0] = (yPinch - yN1) / (x0 - xN);
+    g.R[1] = yN1 - g.R[0] * xN;
 
 
-    if (v != g.by) {
+    u = g.lx;
+    v = yop(u);
+    v2 = g.ty;
+    u2 = (v2 - g.R[1]) / g.R[0];
+
+    if (v > g.by) {
         u = (g.by - g.R[1]) / g.R[0];
         v = g.by;
+        if (u > g.rx) {
+            pop();
+            return;
+        }
+    }
+    else if (v < g.ty) {
+        u = (g.ty - g.R[1]) / g.R[0];
+        v = g.ty;
     }
 
-
-    if (v2 != g.ty) {
-        u2 = (g.ty - g.R[1]) / g.R[0];
-        v2 = g.ty;
-    }
     if (u2 > g.rx) {
         u2 = g.rx;
         v2 = g.R[0] * u2 + g.R[1];
@@ -551,27 +596,53 @@ function showLVmax() {
 
     // (xN, yN+1)
     circle(xN, yN1, 5);
-    text('(xN, yN+1)', xN + 15, yN1); // FIX ME
+    fill(250);
+    rect(xN + 14, yN1 - 11, 57, 15);
+    fill('black');
+    text('(xN, yN+1)', xN + 15, yN1);
 
     // Pinch Point
     if (yPinch > g.ty) {
         circle(x0, yPinch, 5);
-        text('Pinch Point', x0 + 10, yPinch - 5); // FIX ME
+
+        fill(250);
+        rect(x0 + 10, yPinch - 16, 62, 13);
+        fill('black');
+        text('Pinch Point', x0 + 10, yPinch - 5);
     }
+
+    pop();
+}
+
+function showMaxLVinfo() {
+    push();
 
     // LV Max
     LVm = (yeq(g.x0) - g.yN1) / (g.x0 - g.xN);
-    textAlign(CENTER, CENTER);
+
 
     if (LVm < 0) {
-        textSize(20);
-        text("Separation not possible\n *Infinite stages needed*", 225, 200);
+        fill(250);
+        stroke('black'); strokeWeight(2);
+        rect(196, 176, 290, 65);
+        textSize(26);
+        fill('red'); noStroke();
+        text(" Separation Impossible", 200, 200);
+        fill('black'); textSize(22);
+        text("\n*Less than 1 Stage Needed*", 200, 200);
     }
     else if (LVm < 100) {
-        textSize(20);
-        text("Separation not possible\n *Zero stages needed*", 225, 200);
+        fill(250);
+        stroke('black'); strokeWeight(2);
+        rect(196, 176, 290, 65);
+        textSize(26);
+        fill('red'); noStroke();
+        text(" Separation Impossible", 200, 200);
+        fill('black');
+        text("\n*Infinite Stages Needed*", 200, 200);
     }
     else {
+        textAlign(CENTER, CENTER);
         textSize(16);
         text('Infinite Stages Needed', 550, 175);
 

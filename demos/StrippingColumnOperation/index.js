@@ -62,12 +62,13 @@ function draw() {
         countStages();
     }
     else if (g.show5) {
+        show5Display();
         lineDraw();
         countStages();
-        show5Display();
     }
     else { // LVmin
         showLVmax();
+        showMaxLVinfo();
     }
 }
 
