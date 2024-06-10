@@ -3,7 +3,7 @@ window.g = {
 
     // Slider vars
     temp: 385,
-    xA: .5,
+    xa: .5,
 
     // Colors
     orange: [255, 80, 0],
@@ -18,6 +18,8 @@ window.g = {
     by: 380,
     w: 540,
     h: 340,
+    minY: 360,
+    maxY: 432,
 
 
 }
@@ -32,4 +34,24 @@ function draw() {
     frame();
     drawGraphTicks();
     drawEqFunction();
+    findPhaseComps();
+    drawDot();
 }
+
+const temper = document.getElementById("temp");
+const tempLabel = document.getElementById("temp-label");
+
+const compos = document.getElementById("mole-frac");
+const compLabel = document.getElementById("mole-frac-label");
+
+temper.addEventListener("input", function () {
+    let tmp = Number(temper.value);
+    g.temp = tmp;
+    tempLabel.innerHTML = `${tmp}`;
+})
+
+compos.addEventListener("input", function () {
+    let tmp = Number(compos.value);
+    g.xa = tmp;
+    compLabel.innerHTML = `${tmp}`;
+})

@@ -1,5 +1,8 @@
 // Curve data
-eqVertices = [[0.1, 360], [0.15, 369], [0.2, 379], [0.25, 387], [0.4, 398], [0.55, 400], [0.65, 395], [.7, 387], [0.8, 360]];
+const eqVerticesOrange = [[0.1, 360], [.12, 363.2], [.14, 366.8], [0.161, 371.2], [0.181, 375.3], [.2, 379.1], [.22, 382.4], [0.241, 385.7], [.26, 388.3], [.28, 390.5],
+[.3, 392.5], [.342, 395.4], [.361, 396.4], [.38, 397.2], [0.4, 398], [.419, 398.6], [.44, 399.2], [.459, 399.6], [.481, 400], [.5, 400.1]];
+const eqVerticesPurp = [[0.5, 400.1], [.52, 400.2], [.54, 400.1], [.58, 399.3], [.6, 398.6], [.62, 397.4], [.64, 395.9], [.66, 393.9], [.68, 391.4], [.7, 388.3],
+[.72, 384.3], [.74, 379.6], [.76, 373.8], [.78, 367], [.8, 360]];
 
 function frame() {
     push();
@@ -44,7 +47,7 @@ function drawGraphTicks() {
     text('1', g.rx, g.by + 15);
     pop();
 
-    yLabels = [360, 400, 420, 440];
+    yLabels = [360, 380, 400, 420];
     ticks = 5;
     count = 18;
 
@@ -95,25 +98,88 @@ function drawEqFunction() {
     vertex(134, 380);
 
     let i, xVert, yVert;
-    for (i = 0; i < 6; i++) {
-        xVert = map(eqVertices[i][0], 0, 1, g.lx, g.rx);
-        yVert = map(eqVertices[i][1], 360, 452, g.by, g.ty);
-
+    let n = eqVerticesOrange.length;
+    for (i = 0; i < n; i++) {
+        xVert = map(eqVerticesOrange[i][0], 0, 1, g.lx, g.rx);
+        yVert = map(eqVerticesOrange[i][1], g.minY, g.maxY, g.by, g.ty);
         vertex(xVert, yVert);
     }
-    vertex(xVert, yVert);
     endShape();
 
     stroke(g.pink);
     beginShape();
     vertex(xVert, yVert);
-    for (i = 5; i < eqVertices.length; i++) {
-        xVert = map(eqVertices[i][0], 0, 1, g.lx, g.rx);
-        yVert = map(eqVertices[i][1], 360, 452, g.by, g.ty);
+    n = eqVerticesPurp.length;
+    for (i = 0; i < n; i++) {
+        xVert = map(eqVerticesPurp[i][0], 0, 1, g.lx, g.rx);
+        yVert = map(eqVerticesPurp[i][1], g.minY, g.maxY, g.by, g.ty);
 
         vertex(xVert, yVert);
     }
-    vertex(512, 380);
     endShape();
+    pop();
+}
+
+function drawDot() {
+    let T = map(g.temp, g.minY, g.maxY, g.by, g.ty);
+    let x = map(g.xa, 0, 1, g.lx, g.rx);
+
+    push();
+    noStroke(); fill('black');
+    circle(x, T, 7);
+    pop();
+}
+
+function findPhaseComps() {
+    let t = g.temp, thisTemp;
+    if (t > 400.1) return;
+
+    let i, maxIdx;
+    let n = eqVerticesOrange.length;
+    // Find idx of largest orange line temp lower than current temp 
+    for (i = 0; i < n; i++) {
+        thisTemp = eqVerticesOrange[i][1];
+        if (thisTemp > t) {
+            break;
+        }
+        maxIdx = i;
+    }
+
+    xOrng = map(t, eqVerticesOrange[maxIdx][1], eqVerticesOrange[maxIdx + 1][1], eqVerticesOrange[maxIdx][0], eqVerticesOrange[maxIdx + 1][0])
+
+    n = eqVerticesPurp.length;
+    // Find idx of largest purple line temp lower than current temp 
+    for (i = n - 1; i >= 0; i--) {
+        thisTemp = eqVerticesPurp[i][1];
+        if (thisTemp > t) {
+            break;
+        }
+        maxIdx = i;
+    }
+
+    xPurp = map(t, eqVerticesPurp[maxIdx][1], eqVerticesPurp[maxIdx - 1][1], eqVerticesPurp[maxIdx][0], eqVerticesPurp[maxIdx - 1][0]);
+
+    x = g.xa;
+    if (x < xPurp && x > xOrng) phasesOverlay(xOrng, xPurp);
+}
+
+function phasesOverlay(xOrng, xPurp) {
+    let x = map(g.xa, 0, 1, g.lx, g.rx), y = map(g.temp, g.minY, g.maxY, g.by, g.ty);
+    let x1 = map(xOrng, 0, 1, g.lx, g.rx), x2 = map(xPurp, 0, 1, g.lx, g.rx);
+
+    push();
+    noStroke(); fill(g.green);
+    circle(x1, y, 8);
+    fill(g.blue);
+    circle(x2, y, 8);
+
+    stroke(g.green); strokeWeight(2);
+    drawingContext.setLineDash([5, 5]);
+    line(x1, y, x, y);
+    line(x1, g.by, x1, y);
+
+    stroke(g.blue);
+    line(x2, y, x, y);
+    line(x2, g.by, x2, y);
     pop();
 }
