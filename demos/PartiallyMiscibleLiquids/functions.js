@@ -132,7 +132,10 @@ function drawDot() {
 
 function findPhaseComps() {
     let t = g.temp, thisTemp;
-    if (t > 400.1) return;
+    if (t > 400.1) {
+        singlePhaseOverlay();
+        return;
+    }
 
     let i, maxIdx;
     let n = eqVerticesOrange.length;
@@ -160,13 +163,18 @@ function findPhaseComps() {
     xPurp = map(t, eqVerticesPurp[maxIdx][1], eqVerticesPurp[maxIdx - 1][1], eqVerticesPurp[maxIdx][0], eqVerticesPurp[maxIdx - 1][0]);
 
     x = g.xa;
-    if (x < xPurp && x > xOrng) phasesOverlay(xOrng, xPurp);
+    if (x < xPurp && x > xOrng) {
+        phasesOverlay(xOrng, xPurp);
+        boxesOverlay(xOrng, xPurp);
+    }
+    else singlePhaseOverlay();
 }
 
 function phasesOverlay(xOrng, xPurp) {
     let x = map(g.xa, 0, 1, g.lx, g.rx), y = map(g.temp, g.minY, g.maxY, g.by, g.ty);
     let x1 = map(xOrng, 0, 1, g.lx, g.rx), x2 = map(xPurp, 0, 1, g.lx, g.rx);
 
+    // Lines and dots
     push();
     noStroke(); fill(g.green);
     circle(x1, y, 8);
@@ -181,5 +189,76 @@ function phasesOverlay(xOrng, xPurp) {
     stroke(g.blue);
     line(x2, y, x, y);
     line(x2, g.by, x2, y);
+    pop();
+
+    push();
+    stroke('black'); strokeWeight(2);
+    rect(x1 - 30, g.by - 40, 60, 24); // left rectangle for label
+    rect(x2 - 30, g.by - 40, 60, 24); // right rect
+
+    textAlign(CENTER, CENTER); textSize(14);
+    noStroke(); fill('black');
+    text('x  = ' + xOrng.toFixed(2), x1, g.by - 26);
+    text('x  = ' + xPurp.toFixed(2), x2, g.by - 26);
+
+    textSize(11);
+    text('A', x1 - 16, g.by - 22);
+    text('β', x1 - 16, g.by - 32);
+
+    text('A', x2 - 16, g.by - 22);
+    text('α', x2 - 16, g.by - 32);
+    pop();
+}
+
+function boxesOverlay(xOrng, xPurp) {
+    let midline = (g.maxInputY + g.ty) / 2;
+    let x1 = g.lx + 70, x2 = 300, x3 = g.rx - 170;
+    let w = 100;
+    let hmax = g.maxInputY - g.ty;
+
+    let h1 = hmax * g.xa; h2 = hmax * (1 - g.xa);
+    let h3 = map(g.xa, xPurp, xOrng, 0, hmax - 8);
+
+    // Boxes
+    push();
+    stroke('black'); strokeWeight(2);
+    rect(x1, midline - h1 / 2, w, h1);
+    rect(x2, midline - h2 / 2, w, h2);
+
+
+    rect(x3, g.ty + 2, w, h3);
+    rect(x3, g.ty + h3 + 8, w, hmax - h3 - 8);
+
+    pop();
+
+    // Labels and text
+    push();
+    fill('black'); noStroke();
+    textSize(24); textAlign(CENTER, CENTER);
+    text('+', x2 - 25, midline);
+    textSize(36);
+    text('→', x3 - 25, midline - 4);
+    pop();
+    return;
+}
+
+function singlePhaseOverlay() {
+    let x = map(g.xa, 0, 1, g.lx, g.rx), y = map(g.temp, g.minY, g.maxY, g.by, g.ty);
+    push();
+    stroke('black'); strokeWeight(2);
+    drawingContext.setLineDash([5, 5]);
+    line(x, g.by, x, y)
+    pop();
+
+    push();
+    stroke('black'); strokeWeight(2);
+    rect(x - 30, g.by - 40, 60, 24);
+
+    textAlign(CENTER, CENTER); textSize(14);
+    noStroke(); fill('black');
+    text('x  = ' + g.xa.toFixed(2), x, g.by - 26);
+
+    textSize(11);
+    text('A', x - 16, g.by - 22);
     pop();
 }

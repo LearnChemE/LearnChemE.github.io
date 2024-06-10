@@ -16,10 +16,13 @@ window.g = {
     rx: 620,
     ty: 40,
     by: 380,
+
     w: 540,
     h: 340,
+
     minY: 360,
     maxY: 432,
+    maxInputY: 148,
 
 
 }
@@ -27,6 +30,7 @@ window.g = {
 function setup() {
     g.cnv = createCanvas(700, 420);
     g.cnv.parent("graphics-wrapper");
+    console.log(map(409, g.minY, g.maxY, g.by, g.ty));
 }
 
 function draw() {
@@ -36,6 +40,11 @@ function draw() {
     drawEqFunction();
     findPhaseComps();
     drawDot();
+
+    push();
+    stroke('black');
+    line(g.lx, g.maxInputY, g.rx, g.maxInputY);
+    pop();
 }
 
 const temper = document.getElementById("temp");
