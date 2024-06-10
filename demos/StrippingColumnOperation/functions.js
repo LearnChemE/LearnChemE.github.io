@@ -355,7 +355,7 @@ function countStages() {
         }
     }
 
-
+    1
     if (g.stagesCount == -1) {
         fill(250);
         stroke('black'); strokeWeight(2);
