@@ -28,6 +28,8 @@ window.g = {
     currParticles: 0,
     particleList1: Array(50),
     particleList2: Array(50),
+    particleList3: Array(50),
+    particleList4: Array(50),
 
     hmax: 108,
     h1: 0,
@@ -43,6 +45,8 @@ function setup() {
     for (i = 0; i < g.totalParticles; i++) {
         g.particleList1[i] = new Particle(1);
         g.particleList2[i] = new Particle(2);
+        g.particleList3[i] = new Particle(3);
+        g.particleList4[i] = new Particle(4);
     }
 
 }
@@ -54,23 +58,8 @@ function draw() {
     drawEqFunction();
     findPhaseComps();
     drawDot();
+    drawParticles()
 
-    // Draw Particles
-    push();
-    stroke('black'); strokeWeight(2);
-    let i;
-    for (i = 0; i < g.totalParticles * g.xa; i++) {
-        g.particleList1[i].draw();
-    }
-    for (i = 0; i < g.totalParticles * (1 - g.xa); i++) {
-        g.particleList2[i].draw();
-    }
-    pop();
-
-    push();
-    stroke('black');
-    line(g.lx, g.maxInputY, g.rx, g.maxInputY);
-    pop();
 }
 
 const temper = document.getElementById("temp");
@@ -97,7 +86,8 @@ class Particle {
         this.velocity = [random(-2, 2), random(-2, 2)];
         switch (box) {
             case 1:
-                this.position = [g.lx + 70 + random(0, 100), (g.maxInputY + g.ty) / 2];
+                this.startY = (g.maxInputY + g.ty) / 2;
+                this.position = [g.lx + 72 + random(0, 96), this.startY];
                 this.color = g.blue;
 
                 this.lb = g.lx + 72; // left bound
@@ -105,14 +95,32 @@ class Particle {
 
                 break;
             case 2:
-                this.position = [300 + random(0, 100), (g.maxInputY + g.ty) / 2];
+                this.startY = (g.maxInputY + g.ty) / 2;
+                this.position = [302 + random(0, 96), this.startY];
                 this.color = g.green;
 
                 this.lb = 302;
                 this.rb = 398;
 
                 break;
+            case 3:
+                this.startY = g.ty + 2;
+                this.position = [g.rx - 168 + random(0, 96), this.startY];
+                this.color = g.green;
 
+                this.lb = g.rx - 168;
+                this.rb = g.rx - 72;
+
+                break;
+            case 4:
+                this.startY = g.maxInputY - 2;
+                this.position = [g.rx - 168 + random(0, 96), this.startY];
+                this.color = g.green;
+
+                this.lb = g.rx - 168;
+                this.rb = g.rx - 72;
+
+                break;
         }
     }
 
@@ -124,22 +132,18 @@ class Particle {
     }
 
     _update() {
-        let h = this.height();
-        if (h < 4) return false;
-
         let newPos = [this.position[0] + this.velocity[0], this.position[1] + this.velocity[1]];
-        let ty = (g.maxInputY + g.ty) / 2 - h / 2 + 2;
-        let by = (g.maxInputY + g.ty) / 2 + h / 2 - 2;
+        let b = this.bounds();
 
         if (newPos[0] < this.lb || newPos[0] > this.rb) {
             this.velocity[0] = - this.velocity[0];
             newPos[0] += 2 * this.velocity[0];
         }
-        if (newPos[1] < ty || newPos[1] > by) {
+        if (newPos[1] < b[0] || newPos[1] > b[1]) {
             this.velocity[1] = - this.velocity[1];
             newPos[1] += 2 * this.velocity[1];
-            if (newPos[1] < ty || newPos[1] > by) {
-                newPos[1] = (g.maxInputY + g.ty) / 2
+            if (newPos[1] < b[0] || newPos[1] > b[1]) {
+                newPos[1] = this.startY;
             }
         }
 
@@ -147,17 +151,27 @@ class Particle {
         return true;
     }
 
-    height() {
+    bounds() { // this could be optimized by caclulating outside in a ParticleList class if needed
+        let ty, by;
         switch (this.box) {
             case 1:
-                return g.h1;
+                ty = (g.maxInputY + g.ty) / 2 - g.h1 / 2 + 2;
+                by = (g.maxInputY + g.ty) / 2 + g.h1 / 2 - 2;
+                break;
             case 2:
-                return g.h2;
+                ty = (g.maxInputY + g.ty) / 2 - g.h2 / 2 + 2;
+                by = (g.maxInputY + g.ty) / 2 + g.h2 / 2 - 2;
+                break;
             case 3:
-                return g.h3;
+                ty = g.ty + 2;
+                by = g.ty + g.h3 - 2;
+                break;
             case 4:
-                return g.hmax - g.h3;
+                ty = g.ty + g.h3 + 10;
+                by = g.maxInputY - 2;
+                break;
         }
+        return [ty, by];
     }
 
 }

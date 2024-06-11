@@ -223,6 +223,7 @@ function boxesOverlay(xOrng, xPurp) {
     g.h1 = g.hmax * g.xa;
     g.h2 = g.hmax * (1 - g.xa);
     g.h3 = map(g.xa, xPurp, xOrng, 0, g.hmax - 8);
+    if (g.h3 == Infinity) g.h3 = 0;
 
     // Boxes
     push();
@@ -272,3 +273,29 @@ function singlePhaseOverlay() {
     pop();
 }
 
+function drawParticles() {
+    push();
+    stroke('black'); strokeWeight(2);
+
+    let i, n1, n2, n3, n4;
+    n1 = g.totalParticles * g.xa;
+    n2 = g.totalParticles * (1 - g.xa);
+    n3 = g.totalParticles * g.h3 / g.hmax - 1;
+    n4 = g.totalParticles * (1 - g.h3 / g.hmax) - 1;
+
+    console.log(g.h3);
+
+    for (i = 0; i < n1; i++) {
+        g.particleList1[i].draw();
+    }
+    for (i = 0; i < n2; i++) {
+        g.particleList2[i].draw();
+    }
+    for (i = 0; i < n3; i++) {
+        g.particleList3[i].draw();
+    }
+    for (i = 0; i < n4; i++) {
+        g.particleList4[i].draw();
+    }
+    pop();
+}
