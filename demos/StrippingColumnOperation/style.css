@@ -34,16 +34,19 @@
 
 .input-row {
   display: grid;
-  grid-template-columns: max-content 175px 15px max-content; /* 250 px was formerly 150 px, Dr. F asked me to make it much longer*/
+  grid-template-columns: max-content 175px 15px max-content;
+  /* 250 px was formerly 150 px, Dr. F asked me to make it much longer*/
   gap: 10px;
   align-items: end;
   justify-items: center;
   margin-top: -7px;
   transform: translateX(-35px);
 }
+
 .input-row2 {
   display: grid;
-  grid-template-columns: max-content 175px 15px max-content; /* 250 px was formerly 150 px, Dr. F asked me to make it much longer*/
+  grid-template-columns: max-content 175px 15px max-content;
+  /* 250 px was formerly 150 px, Dr. F asked me to make it much longer*/
   gap: 10px;
   align-items: end;
   justify-items: center;
@@ -88,7 +91,7 @@
 
 .select-container>form {
   display: grid;
-  grid-template-columns: repeat(2,max-content);
+  grid-template-columns: repeat(2, max-content);
 }
 
 #point-type {
@@ -128,7 +131,7 @@ label {
 
 #modal-buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr; 
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 5px;
   grid-column: 3;
 }
@@ -156,4 +159,3 @@ label {
   margin-bottom: -10px;
   margin-top: 10px;
 }
-
