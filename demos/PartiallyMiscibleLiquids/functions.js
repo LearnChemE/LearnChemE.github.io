@@ -133,41 +133,45 @@ function drawDot() {
 function findPhaseComps() {
     let t = g.temp, thisTemp;
     if (t > 400.1) {
-        singlePhaseOverlay();
-        return;
+        xOrng = 0;
+        xPurp = 0;
     }
-
-    let i, maxIdx;
-    let n = eqVerticesOrange.length;
-    // Find idx of largest orange line temp lower than current temp 
-    for (i = 0; i < n; i++) {
-        thisTemp = eqVerticesOrange[i][1];
-        if (thisTemp > t) {
-            break;
+    else {
+        let i, maxIdx;
+        let n = eqVerticesOrange.length;
+        // Find idx of largest orange line temp lower than current temp 
+        for (i = 0; i < n; i++) {
+            thisTemp = eqVerticesOrange[i][1];
+            if (thisTemp > t) {
+                break;
+            }
+            maxIdx = i;
         }
-        maxIdx = i;
-    }
 
-    xOrng = map(t, eqVerticesOrange[maxIdx][1], eqVerticesOrange[maxIdx + 1][1], eqVerticesOrange[maxIdx][0], eqVerticesOrange[maxIdx + 1][0])
+        xOrng = map(t, eqVerticesOrange[maxIdx][1], eqVerticesOrange[maxIdx + 1][1], eqVerticesOrange[maxIdx][0], eqVerticesOrange[maxIdx + 1][0])
 
-    n = eqVerticesPurp.length;
-    // Find idx of largest purple line temp lower than current temp 
-    for (i = n - 1; i >= 0; i--) {
-        thisTemp = eqVerticesPurp[i][1];
-        if (thisTemp > t) {
-            break;
+        n = eqVerticesPurp.length;
+        // Find idx of largest purple line temp lower than current temp 
+        for (i = n - 1; i >= 0; i--) {
+            thisTemp = eqVerticesPurp[i][1];
+            if (thisTemp > t) {
+                break;
+            }
+            maxIdx = i;
         }
-        maxIdx = i;
-    }
 
-    xPurp = map(t, eqVerticesPurp[maxIdx][1], eqVerticesPurp[maxIdx - 1][1], eqVerticesPurp[maxIdx][0], eqVerticesPurp[maxIdx - 1][0]);
+        xPurp = map(t, eqVerticesPurp[maxIdx][1], eqVerticesPurp[maxIdx - 1][1], eqVerticesPurp[maxIdx][0], eqVerticesPurp[maxIdx - 1][0]);
+    }
 
     x = g.xa;
     if (x < xPurp && x > xOrng) {
         phasesOverlay(xOrng, xPurp);
         boxesOverlay(xOrng, xPurp);
     }
-    else singlePhaseOverlay();
+    else {
+        singlePhaseOverlay();
+        boxesOverlay(0, 0);
+    };
 }
 
 function phasesOverlay(xOrng, xPurp) {
@@ -210,24 +214,29 @@ function phasesOverlay(xOrng, xPurp) {
     pop();
 }
 
+// Creates the overlay for the boxes. If one phase present, pass either x as 0
 function boxesOverlay(xOrng, xPurp) {
     let midline = (g.maxInputY + g.ty) / 2;
     let x1 = g.lx + 70, x2 = 300, x3 = g.rx - 170;
     let w = 100;
-    let hmax = g.maxInputY - g.ty;
 
-    let h1 = hmax * g.xa; h2 = hmax * (1 - g.xa);
-    let h3 = map(g.xa, xPurp, xOrng, 0, hmax - 8);
+    g.h1 = g.hmax * g.xa;
+    g.h2 = g.hmax * (1 - g.xa);
+    g.h3 = map(g.xa, xPurp, xOrng, 0, g.hmax - 8);
 
     // Boxes
     push();
     stroke('black'); strokeWeight(2);
-    rect(x1, midline - h1 / 2, w, h1);
-    rect(x2, midline - h2 / 2, w, h2);
+    rect(x1, midline - g.h1 / 2, w, g.h1);
+    rect(x2, midline - g.h2 / 2, w, g.h2);
 
-
-    rect(x3, g.ty + 2, w, h3);
-    rect(x3, g.ty + h3 + 8, w, hmax - h3 - 8);
+    if (xOrng == 0 || xPurp == 0) {
+        rect(x3, g.ty + 2, w, g.hmax - 4);
+    }
+    else {
+        rect(x3, g.ty + 2, w, g.h3);
+        rect(x3, g.ty + g.h3 + 8, w, g.hmax - g.h3 - 8);
+    }
 
     pop();
 
@@ -262,3 +271,4 @@ function singlePhaseOverlay() {
     text('A', x - 16, g.by - 22);
     pop();
 }
+
