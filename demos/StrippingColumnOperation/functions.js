@@ -9,19 +9,20 @@ function frame() {
 
     // X-axis label
     fill(0); textSize(18); noStroke();
-    text('Solute/(Solute-free liquid)', g.lx + 30, g.by + 45);
+    text('solute/(solute-free liquid)', g.lx + 30, g.by + 45);
     text('(ppm)', g.lx + 250, g.by + 45);
     textStyle(ITALIC);
     text('x', g.lx + 237, g.by + 45);
 
     // Y-axis label
-    translate(25, height / 2 + 110);
+    translate(40, height / 2 + 110);
     rotate(radians(-90));
     text('y', 195, 0);
     textStyle(NORMAL);
-    text('Solute/(Solute-free gas)', 0, 0);
+    text('solute/(solute-free gas)', 0, 0);
     text('(ppm)', 208, 0);
     pop();
+
 
     // Figure on the right constant elements (column, arrows, and lines)
     let ml; // Mid line of column to make drawing arrows and such easier
@@ -78,7 +79,7 @@ function frame() {
             fill(250); noStroke();
             rect(ml + 28, top - 54, 105, 20);
             textSize(16); fill(g.blue);
-            text('Liquid solvent feed', ml + 2, top - 92);
+            text('liquid solvent feed', ml + 2, top - 92);
             text(' = 100 Mmol/h', ml + 28, top - 72);
             text(' = ' + g.x0 + ' ppm', ml + 45, top - 40);
             textStyle(ITALIC);
@@ -307,8 +308,11 @@ function countStages() {
 
     fill(250);
     rect(u - 11, v + 4, 42, 15);
-    fill('black');
-    text('(x0, y1)', u - 10, v + 15);
+    fill('black'); textSize(12);
+    text('(x  , y  )', u - 10, v + 15);
+    textSize(10);
+    text('0', u, v + 20);
+    text('1', u + 19, v + 20);
 
     // (xN, yN+1)
     u = map(xN, 0, g.maxX, g.lx, g.rx);
@@ -316,9 +320,12 @@ function countStages() {
     circle(u, v, 5);
 
     fill(250);
-    rect(u + 14, v - 11, 57, 15);
-    fill('black');
-    text('(xN, yN+1)', u + 15, v); // FIX ME
+    rect(u + 14, v - 11, 57, 17);
+    fill('black'); textSize(12);
+    text('(x  , y     )', u + 15, v);
+    textSize(9);
+    text('N', u + 25, v + 5);
+    text('N+1', u + 44, v + 5);
 
 
     // Draw Stages
@@ -355,16 +362,16 @@ function countStages() {
         }
     }
 
-
     if (g.stagesCount == -1) {
         fill(250);
         stroke('black'); strokeWeight(2);
         rect(196, 176, 290, 65);
         textSize(26);
         fill('red'); noStroke();
-        text(" Separation Impossible", 200, 200);
+        text(" separation impossible", 200, 200);
         fill('black');
-        text("\n*Infinite Stages Needed*", 200, 200);
+        text("\n*infinite stages needed*", 200, 200);
+        pop();
     }
     else if (g.stagesCount == 0) {
         fill(250);
@@ -372,18 +379,35 @@ function countStages() {
         rect(196, 176, 290, 65);
         textSize(26);
         fill('red'); noStroke();
-        text(" Separation Impossible", 200, 200);
+        text(" separation impossible", 200, 200);
         fill('black'); textSize(22);
         text("\n*Less than 1 Stage Needed*", 200, 200);
+        pop();
     }
     else if (!g.show5) {
-        noStroke(); fill('black'); textStyle(BOLD);
-        str = g.stagesCount + " Stages Needed";
+        noStroke(); fill('black');
+        str = g.stagesCount + " stages needed";
         textSize(20);
         textAlign(CENTER, CENTER);
-        text(str, 550, 200);
-    }
+        text(str, 550, 180);
+        text('L/V = 100', 550, 220)
+        pop();
 
+        topBottomLabel();
+    }
+    else pop();
+}
+
+function topBottomLabel() {
+    // Top and bottom labels
+    push();
+    noStroke();
+    fill(250);
+    rect(g.rx - 36, g.ty + 8, 25, 15);
+    rect(g.lx + 14, g.by - 22, 55, 13);
+    fill('black'); textSize(18);
+    text('top', g.rx - 35, g.ty + 20);
+    text('bottom', g.lx + 15, g.by - 10);
     pop();
 }
 
@@ -615,7 +639,7 @@ function showLVmax() {
         fill(250);
         rect(x0 + 10, yPinch - 16, 62, 13);
         fill('black');
-        text('Pinch Point', x0 + 10, yPinch - 5);
+        text('pinch point', x0 + 10, yPinch - 5);
     }
 
     pop();
@@ -637,6 +661,7 @@ function showMaxLVinfo() {
         text(" Separation Impossible", 200, 200);
         fill('black'); textSize(22);
         text("\n*Less than 1 Stage Needed*", 200, 200);
+        pop();
     }
     else if (LVm < 100) {
         fill(250);
@@ -647,6 +672,7 @@ function showMaxLVinfo() {
         text(" Separation Impossible", 200, 200);
         fill('black');
         text("\n*Infinite Stages Needed*", 200, 200);
+        pop();
     }
     else {
         textAlign(CENTER, CENTER);
@@ -654,9 +680,10 @@ function showMaxLVinfo() {
         text('Infinite Stages Needed', 550, 175);
 
         text('L/V max = ' + LVm.toFixed(1), 550, 225);
+        pop();
 
+        topBottomLabel();
     }
-    pop();
 }
 
 function graphLims() {
