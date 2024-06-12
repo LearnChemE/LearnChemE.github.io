@@ -86,7 +86,7 @@ compos.addEventListener("input", function () {
 class Particle {
     constructor(box) {
         this.box = box;
-        this.velocity = [random(-1.5, 1.5), random(-1.5, 1.5)];
+        this.velocity = [random(-1, 1), random(-1, 1)];
         switch (box) {
             case 1:
                 this.startY = (g.maxInputY + g.ty) / 2;

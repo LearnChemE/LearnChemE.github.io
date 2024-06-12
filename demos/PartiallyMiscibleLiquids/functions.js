@@ -85,8 +85,20 @@ function drawGraphTicks() {
     textSize(14);
     fill(g.blue);
     text('pure B', g.lx - 10, g.by + 32);
+    text('x  = 1', g.lx - 70, g.by + 16);
+    text('x  = 0', g.rx + 30, g.by + 32);
+
     fill(g.green);
     text('pure A', g.rx - 30, g.by + 32);
+    text('x  = 1', g.rx + 30, g.by + 16);
+    text('x  = 0', g.lx - 70, g.by + 32);
+
+    textSize(11);
+    text('A', g.rx + 37, g.by + 20);
+    text('A', g.lx - 63, g.by + 36);
+    fill(g.blue);
+    text('A', g.lx - 63, g.by + 20);
+    text('A', g.rx + 37, g.by + 36);
 
     pop();
 }
@@ -126,7 +138,7 @@ function drawDot() {
 
     push();
     noStroke(); fill('black');
-    circle(x, T, 7);
+    circle(x, T, 8);
     pop();
 }
 
@@ -357,8 +369,6 @@ function drawParticles() {
     n2 = g.totalParticles * (1 - g.xa);
     n3 = g.totalParticles * g.h3 / g.hmax;
     n4 = g.totalParticles * (1 - g.h3 / g.hmax);
-
-    console.log(g.h3);
 
     for (i = 0; i < n1; i++) {
         g.particleList1[i].draw();
