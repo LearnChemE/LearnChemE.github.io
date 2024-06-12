@@ -65,6 +65,7 @@ function draw() {
         show5Display();
         lineDraw();
         countStages();
+        topBottomLabel();
     }
     else { // LVmin
         showLVmax();

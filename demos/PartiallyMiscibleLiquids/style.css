@@ -117,7 +117,7 @@ select {
 }
 
 #graphics-wrapper {
-  position: absolute;
+  /* position: absolute; */
   width: 100vw;
   top: 200px;
   height: max-content;
