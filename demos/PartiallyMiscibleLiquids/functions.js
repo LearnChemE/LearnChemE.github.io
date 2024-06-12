@@ -74,19 +74,19 @@ function drawGraphTicks() {
     // Labels
     push();
     noStroke(); textSize(18);
-    text('Mole fraction A', (g.rx - g.lx) / 2, g.by + 32);
+    text('mole fraction A', (g.rx - g.lx) / 2, g.by + 32);
 
     push();
     translate(35, (3 * g.by + g.ty) / 4);
     rotate(radians(-90));
-    text('Temperature (K)', 0, 0);
+    text('temperature (K)', 0, 0);
     pop();
 
     textSize(14);
     fill(g.blue);
-    text('Pure B', g.lx - 10, g.by + 32);
+    text('pure B', g.lx - 10, g.by + 32);
     fill(g.green);
-    text('Pure A', g.rx - 30, g.by + 32);
+    text('pure A', g.rx - 30, g.by + 32);
 
     pop();
 }
@@ -165,12 +165,16 @@ function findPhaseComps() {
 
     x = g.xa;
     if (x < xPurp && x > xOrng) {
+        g.xBeta = xOrng; g.xAlpha = xPurp;
         phasesOverlay(xOrng, xPurp);
         boxesOverlay(xOrng, xPurp);
+        boxLabels2phase();
     }
     else {
+        g.xAlpha = 0; g.xBeta = 0;
         singlePhaseOverlay();
         boxesOverlay(0, 0);
+        boxLabels1phase();
     };
 }
 
@@ -222,8 +226,13 @@ function boxesOverlay(xOrng, xPurp) {
 
     g.h1 = g.hmax * g.xa;
     g.h2 = g.hmax * (1 - g.xa);
-    g.h3 = map(g.xa, xPurp, xOrng, 0, g.hmax - 8);
-    if (g.h3 == Infinity) g.h3 = 0;
+    if (xOrng) {
+        g.h3 = map(g.xa, xPurp, xOrng, 0, g.hmax - 8);
+    }
+    else {
+        g.h3 = 0;
+    }
+    // if (g.h3 == Infinity) g.h3 = 0;
 
     // Boxes
     push();
@@ -244,10 +253,12 @@ function boxesOverlay(xOrng, xPurp) {
     // Labels and text
     push();
     fill('black'); noStroke();
-    textSize(24); textAlign(CENTER, CENTER);
+    textSize(24);
+    textAlign(CENTER, CENTER);
     text('+', x2 - 25, midline);
     textSize(36);
     text('→', x3 - 25, midline - 4);
+
     pop();
     return;
 }
@@ -273,15 +284,79 @@ function singlePhaseOverlay() {
     pop();
 }
 
+function boxLabels2phase() {
+    // White text boxes
+    push();
+    fill(250); noStroke();
+    rect(g.rx - 54, g.ty - 17 + g.h3 / 2, 45, 34);
+    rect(g.rx - 54, g.ty + 42 + g.h3 / 2, 45, 38);
+    pop();
+
+    // Text Labels
+    push()
+    textSize(18); textAlign(CENTER, CENTER);
+    text('pure A', g.lx + 120, g.ty + g.h1 / 2 + 70);
+    text('pure B', 350, g.ty + g.h2 / 2 + 70);
+    textSize(16);
+    text('α\nphase', g.rx - 30, g.ty + g.h3 / 2);
+    text('β\nphase', g.rx - 30, g.maxInputY + g.h3 / 2 - 47);
+    pop()
+
+    // Brackets
+    push();
+    strokeWeight(2);
+    stroke('black');
+    line(g.rx - 66, g.ty + 2, g.rx - 62, g.ty + 2);
+    line(g.rx - 66, g.ty + 2 + g.h3, g.rx - 62, g.ty + 2 + g.h3);
+    line(g.rx - 66, g.ty + 8 + g.h3, g.rx - 62, g.ty + 8 + g.h3);
+    line(g.rx - 66, g.ty + g.hmax, g.rx - 62, g.ty + g.hmax);
+
+    line(g.rx - 62, g.ty + 2, g.rx - 62, g.ty + 2 + g.h3);
+    line(g.rx - 62, g.ty + g.h3 + 8, g.rx - 62, g.ty + g.hmax);
+
+    line(g.rx - 62, g.ty + 2 + g.h3 / 2, g.rx - 58, g.ty + 2 + g.h3 / 2);
+    line(g.rx - 62, g.ty + g.h3 / 2 + 58, g.rx - 58, g.ty + g.h3 / 2 + 58);
+    pop();
+}
+
+function boxLabels1phase() {
+    // White text boxes
+    push();
+    fill(250); noStroke();
+    rect(g.rx - 54, g.ty + 38, 45, 38);
+    pop();
+
+    // Text Labels
+    push();
+    textSize(18); textAlign(CENTER, CENTER);
+    text('pure A', g.lx + 120, g.ty + g.h1 / 2 + 70);
+    text('pure B', 350, g.ty + g.h2 / 2 + 70);
+    textSize(16);
+    text('one\nphase', g.rx - 30, g.ty + g.hmax / 2);
+    pop()
+
+    // Brackets
+    push();
+    strokeWeight(2);
+    stroke('black');
+    line(g.rx - 66, g.ty + 2 + g.h3, g.rx - 62, g.ty + 2 + g.h3);
+    line(g.rx - 66, g.ty + g.hmax - 2, g.rx - 62, g.ty + g.hmax - 2);
+
+    line(g.rx - 62, g.ty + g.h3 + 2, g.rx - 62, g.ty + g.hmax - 2);
+
+    line(g.rx - 62, g.ty + g.h3 / 2 + 58, g.rx - 58, g.ty + g.h3 / 2 + 58);
+    pop();
+}
+
 function drawParticles() {
     push();
-    stroke('black'); strokeWeight(2);
+    noStroke();
 
     let i, n1, n2, n3, n4;
     n1 = g.totalParticles * g.xa;
     n2 = g.totalParticles * (1 - g.xa);
-    n3 = g.totalParticles * g.h3 / g.hmax - 1;
-    n4 = g.totalParticles * (1 - g.h3 / g.hmax) - 1;
+    n3 = g.totalParticles * g.h3 / g.hmax;
+    n4 = g.totalParticles * (1 - g.h3 / g.hmax);
 
     console.log(g.h3);
 
@@ -291,11 +366,23 @@ function drawParticles() {
     for (i = 0; i < n2; i++) {
         g.particleList2[i].draw();
     }
-    for (i = 0; i < n3; i++) {
-        g.particleList3[i].draw();
+
+    let colors = [g.green, g.blue];
+    let numWithColor = floor(n3 * g.xAlpha);
+    for (i = 0; i < numWithColor; i++) {
+        g.particleList3[i].draw(colors[0]);
     }
-    for (i = 0; i < n4; i++) {
-        g.particleList4[i].draw();
+    for (i; i < n3; i++) {
+        g.particleList3[i].draw(colors[1]);
+    }
+
+    if (g.xBeta == 0) numWithColor = floor(n4 * g.xa);
+    else numWithColor = floor(n4 * g.xBeta);
+    for (i = 0; i < numWithColor; i++) {
+        g.particleList4[i].draw(colors[0]);
+    }
+    for (i; i < n4; i++) {
+        g.particleList4[i].draw(colors[1]);
     }
     pop();
 }

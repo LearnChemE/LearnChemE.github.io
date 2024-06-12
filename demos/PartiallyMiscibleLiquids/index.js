@@ -5,11 +5,14 @@ window.g = {
     temp: 385,
     xa: .5,
 
+    xAlpha: .72,
+    xBeta: .24,
+
     // Colors
     orange: [255, 80, 0],
     pink: [250, 0, 200],
-    blue: [0, 0, 150],
-    green: [0, 80, 0],
+    blue: [0, 60, 255],
+    green: [60, 100, 0],
 
     // Graph frame
     lx: 80,
@@ -83,12 +86,12 @@ compos.addEventListener("input", function () {
 class Particle {
     constructor(box) {
         this.box = box;
-        this.velocity = [random(-2, 2), random(-2, 2)];
+        this.velocity = [random(-1.5, 1.5), random(-1.5, 1.5)];
         switch (box) {
             case 1:
                 this.startY = (g.maxInputY + g.ty) / 2;
                 this.position = [g.lx + 72 + random(0, 96), this.startY];
-                this.color = g.blue;
+                this.color = g.green;
 
                 this.lb = g.lx + 72; // left bound
                 this.rb = g.lx + 168;
@@ -97,7 +100,7 @@ class Particle {
             case 2:
                 this.startY = (g.maxInputY + g.ty) / 2;
                 this.position = [302 + random(0, 96), this.startY];
-                this.color = g.green;
+                this.color = g.blue;
 
                 this.lb = 302;
                 this.rb = 398;
@@ -124,10 +127,10 @@ class Particle {
         }
     }
 
-    draw() {
+    draw(color = this.color) {
         if (this._update()) {
-            fill(this.color);
-            circle(this.position[0], this.position[1], 5);
+            fill(color);
+            circle(this.position[0], this.position[1], 8);
         }
     }
 
