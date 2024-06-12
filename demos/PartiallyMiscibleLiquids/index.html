@@ -28,6 +28,7 @@
     </script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script id="Math.js" src="https://cdn.jsdelivr.net/npm/mathjs@13.0.0/lib/browser/math.min.js"></script>
     <script src="./jquery.js"></script>
     <script src="./popper.js"></script>
     <script src="./bootstrap.min.js"></script>
@@ -42,22 +43,17 @@
             <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
             <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
         </div>
-        <div class="title-wrapper" style="transform:translateY(20px)">
-            <div class="title">
-                <div id="title-text">Partially Miscible Liquids</div>
-            </div>
-        </div>
         <!-- Inputs -->
         <div class="inputs-wrapper" style="transform:translateX(10px)">
             <!-- Left Col Sliders -->
             <div class="input-area">
                 <div class="input-row" id="label1">
-                    <div class="input-label">Temperature (K)</div>
+                    <div class="input-label">temperature (K)</div>
                     <input type="range" id="temp" min="372" max="409" value="385" step="1" />
                     <div id="temp-label" class="value-label">385</div>
                 </div>
                 <div class="input-row" id="label2" style="margin-left: -70px;">
-                    <div class="input-label">Overall mole fraction of A</div>
+                    <div class="input-label">overall mole fraction of A</div>
                     <input type="range" id="mole-frac" min="0" max="1" value=".5" step=".01" />
                     <div id="mole-frac-label" class="value-label">0.5</div>
                 </div>
@@ -84,7 +80,17 @@
                 </div>
                 <div class="modal-body">
                     <p>
-
+                        A temperature-composition diagram is shown for two liquids (A, B) that are only partially
+                        miscible within the region enclosed by the orange and pink curve. Each phase in the two-phase
+                        region contains both A and B; the \(\alpha\) phase (represented by the pink line, mole fraction
+                        \(x_A^{\alpha}\)) is enriched in A and the \(\beta\) phase (orange line,
+                        \(x_A^{\beta}\)) is enriched in B. Outside the phase envelope, A and B are
+                        completely miscible. Sliders for temperature and overall mole fraction of A move the black dot
+                        around the diagram. The sizes of the rectangles at the top for pure A and pure B are
+                        proportional to the overall mole fraction of that component. The sizes of the containers on the
+                        right are proportional to the amounts of the phases (either \(\alpha\) and \(\beta\) or a
+                        single miscible phase) in equilibrium, and the mole fractions are represented by the relative
+                        numbers of green (A) and blue (B) circles.
                     </p>
                 </div>
             </div>
@@ -102,10 +108,14 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-
                 <div class="modal-body">
                     <p>
-
+                        The equilibrium data shown in a temperature-composition diagram is useful for determining the
+                        composition of each liquid phase after separating at different temperatures. This data is
+                        gathered empirically or with a thermodynamic model. Using a mass balance, the mixing point
+                        composition of two liquids can be determined, and by drawing a horizontal line to each
+                        respective phase equilibrium curve, the composition of the respective equilibrium phases can be
+                        found.
                 </div>
             </div>
         </div>
