@@ -53,7 +53,7 @@ const lineChartConfig = {
           },
           label: function (tooltipItem) {
             // This will set the label of the tooltip to 'Custom Label'
-            return tooltipItem.parsed.y + ' mole fraction of gas in water';
+            return tooltipItem.parsed.y.toFixed(5) + ' mole fraction of gas in water';
           }
         }
       }

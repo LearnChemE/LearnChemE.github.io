@@ -3,10 +3,9 @@ const BH = [8160.2, 8741.68, 8296.9, 12695.6, 7965.2, 4259.62, 5528.45, 13282.1,
 const CH = [21.403, 21.6694, 23.3376, 34.7413, 20.5248, 14.0094, 16.8893, 51.9144, 24.7981, 23.24323];
 const DH = [0, -0.00110261, 0, 0, 0, 0, 0, -0.0425831, 0, 0];
 
-
 function calculateOutput(T, P) {
-  T = T / 10 + 273;
-  const H = AH.map((ah, i) => 1 / Math.exp(ah + BH[i] / (T) + CH[i] * Math.log(T) + DH[i] * (T)));
+  T = T + 273;
+  const H = AH.map((ah, i) => 1 / Math.exp(ah + (BH[i] / T) + CH[i] * Math.log(T) + DH[i] * (T)));
   const x = H.map(h => (P / h).toFixed(6));
   return x;
 }
@@ -24,7 +23,7 @@ function calculateContinousOutput(T, P) {
   let element_9 = [];
   let element_10 = [];
 
-  for (let i = 0; i < 251; i = i + 0.5) {
+  for (let i = 0; i < 251; i = i + 1) {
     result.push(calculateOutput(i, P))
   }
   for (let i = 0; i < result.length; i++) {
