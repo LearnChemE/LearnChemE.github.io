@@ -8,30 +8,44 @@ require("./style/style.scss");
 
 var mass = 0;
 var T2 = 40;
+window.playing = false;
 
 window.updateMass = (value, reset = false) => {
   if (reset) {
+    window.playing = false;
     let temp_mass = mass;
     mass = 0;
-    updateChart(0);
+    updateChart(false);
     mass = temp_mass;
     return;
   }
   document.getElementById('massValue').innerText = Number(value).toFixed(2);
   mass = value;
-  updateChart(mass == 1.75 ? 0 : 1);
+  updateChart(mass == 1.75 || window.playing);
 }
 
 
 
 window.play = () => {
-  updateChart(1);
+  window.playing = !window.playing;
+  const play_pause = document.getElementById("play-pause");
+  const play = document.getElementById("play");
+  const pause = document.getElementById("pause");
+  if (window.playing) {
+    play.style.display = "none";
+    pause.style.display = "block";
+  } else {
+    play.style.display = "block";
+    pause.style.display = "none";
+  }
+  updateChart(window.playing);
 }
 
 let reset = false;
 
 window.reset = () => {
   reset = true;
+  window.playing = false;
   clearInterval(intervalID);
   const slider = document.getElementById('mass');
   slider.value = 0; // Reset the slider to the beginning
@@ -49,7 +63,7 @@ function updateChart(simulate) {
 
   clearInterval(intervalID);
 
-  if (!reset) {
+  if (!reset && simulate) {
     intervalID = setInterval(function() {
         let current_mass_evaporated = parseFloat(document.getElementById("mass").value);
         if (current_mass_evaporated < 1.75) {
@@ -65,37 +79,16 @@ function updateChart(simulate) {
         myChart.update();
       },
       30);
+  } else if (!reset) {
+    mass = parseFloat(document.getElementById("mass").value);
+    let calculated_data = calculate(mass)
+    myChart.config.data.datasets[0].data = [calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), calculated_data.V.toFixed(2)];
+    T2 = calculated_data.T2;
+    updateFigure(calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), T2, false);
+    myChart.update();
   }
 
   reset = false;
-  // let calculated_data;
-  // let temp_mass = 0;
-  // if (simulate == 1 && mass == 0) {
-  //   intervalID = setInterval(function() {
-  //     calculated_data = calculate(temp_mass)
-  //     myChart.config.data.datasets[0].data = [calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), calculated_data.V.toFixed(2)];
-  //     T2 = calculated_data.T2;
-  //     myChart.update();
-
-  //     updateFigure(calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), T2, false);
-  //     temp_mass = temp_mass + 0.01;
-  //     document.getElementById('massValue').innerText = temp_mass.toFixed(2);
-  //     document.getElementById('mass').value = temp_mass.toFixed(2);
-  //     if (temp_mass >= mass) {
-  //       updateChart(0);
-  //       clearInterval(intervalID);
-  //     }
-  //     if (temp_mass == mass && mass == 1.75)
-  //       updateFigure(calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), T2, true);
-  //   }, 50);
-  // } else {
-  //   calculated_data = calculate(mass)
-  //   myChart.config.data.datasets[0].data = [calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), calculated_data.V.toFixed(2)];
-  //   T2 = calculated_data.T2;
-  //   myChart.update();
-
-  //   updateFigure(calculated_data.L.toFixed(2), calculated_data.S.toFixed(2), T2, mass == 1.75);
-  // }
 }
 
 function initValues() {
