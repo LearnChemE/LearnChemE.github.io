@@ -196,17 +196,17 @@ function phasesOverlay(xOrng, xPurp) {
 
     // Lines and dots
     push();
-    noStroke(); fill(g.green);
+    noStroke(); fill(g.orange);
     circle(x1, y, 8);
-    fill(g.blue);
+    fill(g.pink);
     circle(x2, y, 8);
 
-    stroke(g.green); strokeWeight(2);
+    stroke(g.orange); strokeWeight(2);
     drawingContext.setLineDash([5, 5]);
     line(x1, y, x, y);
     line(x1, g.by, x1, y);
 
-    stroke(g.blue);
+    stroke(g.pink);
     line(x2, y, x, y);
     line(x2, g.by, x2, y);
     pop();
@@ -239,7 +239,7 @@ function boxesOverlay(xOrng, xPurp) {
     g.h1 = g.hmax * g.xa;
     g.h2 = g.hmax * (1 - g.xa);
     if (xOrng) {
-        g.h3 = map(g.xa, xPurp, xOrng, 0, g.hmax - 8);
+        g.h3 = map(g.xa, xOrng, xPurp, 0, g.hmax - 8);
     }
     else {
         g.h3 = 0;
