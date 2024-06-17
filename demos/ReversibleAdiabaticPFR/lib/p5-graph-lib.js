@@ -202,6 +202,27 @@ class P5_Graph {
         pop();
     }
 
+    // Draw a function
+    drawFunction(func, color, n = 100) {
+        let i, x, y, u, v;
+        let x0 = this.xRange[0];
+        let dx = (this.xRange[1] - x0) / n;
+
+        push();
+        stroke(color); strokeWeight(2);
+        noFill();
+
+        beginShape();
+        for (i = 0; i < n; i++) {
+            x = x0 + i * dx;
+            y = func(x);
+            [u, v] = this.mapPoint(x, y);
+            vertex(u, v);
+        }
+        endShape();
+        pop();
+    }
+
     mapPoint(x, y) {
         let u = map(x, this.xRange[0], this.xRange[1], this.lx, this.rx);
         let v = map(y, this.yRange[0], this.yRange[1], this.by, this.ty);
