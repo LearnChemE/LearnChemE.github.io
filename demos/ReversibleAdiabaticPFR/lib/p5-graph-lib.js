@@ -154,4 +154,58 @@ class P5_Graph {
         // TODO: Optional super title
         pop();
     }
+
+    // Draw a line from lineEq arg where lineEq[0] is y-intercept, lineEq[1] is slope
+    drawLine(lineEq, color = 'black') {
+        let u1, v1, u2, v2;
+
+        let b = lineEq[0];
+        let m = lineEq[1];
+
+        let x1 = this.xRange[0];
+        let x2 = this.xRange[1];
+
+        let y1 = b + m * x1;
+        let y2 = b + m * x2;
+
+        // Fix line to box edges
+        if (y1 < this.yRange[0]) {
+            if (y2 <= this.yRange[0]) { console.log('Line below graph\n'); return } // Line is completely off screen
+
+            y1 = this.yRange[0];
+            x1 = (y1 - b) / m;
+
+        }
+        else if (y1 > this.yRange[1]) {
+            if (y2 >= this.yRange[1]) return // Line is completely off screen
+
+            y1 = this.yRange[1];
+            x1 = (y1 - b) / m;
+            i
+        }
+
+        if (y2 > this.yRange[1]) {
+            y2 = this.yRange[1];
+            x2 = (y2 - b) / m;
+        }
+        else if (y2 < this.yRange[0]) {
+            y2 = this.yRange[0];
+            x2 = (y2 - b) / m;
+        }
+
+        [u1, v1] = this.mapPoint(x1, y1);
+        [u2, v2] = this.mapPoint(x2, y2);
+
+        push();
+        stroke(color); strokeWeight(2);
+        line(u1, v1, u2, v2);
+        pop();
+    }
+
+    mapPoint(x, y) {
+        let u = map(x, this.xRange[0], this.xRange[1], this.lx, this.rx);
+        let v = map(y, this.yRange[0], this.yRange[1], this.by, this.ty);
+        return [u, v]
+    }
+
 }
