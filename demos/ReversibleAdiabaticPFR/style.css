@@ -68,6 +68,11 @@ input {
   width: 15em;
 }
 
+#reaction-title {
+  display: grid;
+  font-size: medium;
+}
+
 .hide {
   display: none;
 }

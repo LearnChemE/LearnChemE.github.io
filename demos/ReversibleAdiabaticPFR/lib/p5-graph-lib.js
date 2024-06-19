@@ -1,3 +1,4 @@
+// const { sqrt } = require("mathjs");
 
 
 class P5_Graph {
@@ -81,7 +82,7 @@ class P5_Graph {
 
 
         ticks = 5;
-        count = 24;
+        count = 25;
 
         // X Axis ticks
         push();
@@ -111,7 +112,7 @@ class P5_Graph {
         pop();
 
         ticks = 5;
-        count = 24;
+        count = 25;
 
         // Y Axis ticks
         let yPos;
@@ -181,7 +182,6 @@ class P5_Graph {
 
             y1 = this.yRange[1];
             x1 = (y1 - b) / m;
-            i
         }
 
         if (y2 > this.yRange[1]) {
@@ -213,7 +213,7 @@ class P5_Graph {
         noFill();
 
         beginShape();
-        for (i = 0; i < n; i++) {
+        for (i = 0; i <= n; i++) {
             x = x0 + i * dx;
             y = func(x);
             [u, v] = this.mapPoint(x, y);
@@ -227,6 +227,39 @@ class P5_Graph {
         let u = map(x, this.xRange[0], this.xRange[1], this.lx, this.rx);
         let v = map(y, this.yRange[0], this.yRange[1], this.by, this.ty);
         return [u, v]
+    }
+
+    // Returns unit vector pointing from p1 to p2
+    getDirection(p1, p2) {
+        let dx = p2[0] - p1[0], dy = p2[1] - p1[1];
+        let magnitude = Math.sqrt(dx ** 2 + dy ** 2);
+        let ihat = dx / magnitude, jhat = dy / magnitude;
+        return [ihat, jhat];
+    }
+
+    drawArrow(tail, head, options = {
+        color: 'black',
+        arrowSize: 12,
+        dashed: false,
+    }) {
+        let p1 = this.mapPoint(tail[0], tail[1]);
+        let p2 = this.mapPoint(head[0], head[1]);
+        let dir = this.getDirection(p2, p1);
+        let perp = [dir[1], -dir[0]];
+        let size = options.arrowSize;
+
+        push();
+        stroke(options.color); strokeWeight(2);
+        if (options.dashed) drawingContext.setLineDash([8, 5]);
+
+        line(p1[0], p1[1], p2[0], p2[1]);
+
+        noStroke(); fill(options.color);
+        triangle(p2[0], p2[1],
+            p2[0] + size * (dir[0] + perp[0] / 3), p2[1] + size * (dir[1] + perp[1] / 3),
+            p2[0] + size * (dir[0] - perp[0] / 3), p2[1] + size * (dir[1] - perp[1] / 3));
+
+        pop();
     }
 
 }
