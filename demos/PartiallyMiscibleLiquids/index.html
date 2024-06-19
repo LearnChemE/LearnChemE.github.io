@@ -10,9 +10,8 @@
     <script src="./libraries/p5.js"></script>
     <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
     <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
-    <meta name="author" content="Patrick Doyle">
-    <meta name="application-name" content="LearnChemE simulation template">
-    <meta name="description" content="An interactive simulation to help young programmers learn to make simulations.">
+    <meta name="author" content="Drew Smith">
+    <meta name="application-name" content="LearnChemE Partially Miscible Liquids">
 
     <link href="./sliders.css" rel="stylesheet">
     <link href="./style.css" rel="stylesheet">
@@ -110,27 +109,22 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        The equilibrium data shown in a temperature-composition diagram is useful for determining the
-                        composition of each liquid phase after separating at different temperatures. This data is
-                        gathered empirically or with a thermodynamic model and represents the compositions at each
-                        temperature where the fugacities of each phase are equal. Using a mass balance, the mixing point
-                        composition of two liquids can be determined, and by drawing a horizontal line to each
-                        respective phase equilibrium curve, the composition of the respective equilibrium phases can be
-                        found. Using this information, a mass balance can be performed to find the relative amounts of
-                        liquid present in each phase:
-                        $$\text{In}-\text{Out}+\text{Generation}-\text{Consumption}=\text{Accumulation}$$
-                        $$\text{In }=\text{ Out}$$
-                        $$n^\text{(in)}=n^{\alpha}+n^{\beta}$$
-                        $$x_A^\text{(in)} n^\text{(in)} = x_A^{\alpha}n^{\alpha} + x_A^{\beta}n^{\beta}$$
-                        Where \(n^\text{(in)}\) represents the total amount of moles put into the system, \(n^\alpha\)
-                        and \(n^\beta\) represent the amount of moles in each phase, and \(x_A\) represents the mole
-                        fraction of A in each phase. This can be rearranged into the lever rule:
-                        $$ x_A^\text{(in)} n^I + x_A^\text{(in)} n^{II} = x_A^I n^I + x_A^{II} n^{II}$$
-                        $$ (x_A^\text{(in)}-x_A^I)n^I=(x_A^{II}-x_A^\text{(in)})n^{II}$$
-                        $$ n^I=\frac{(x_A^{II}-x_A^\text{(in)})}{(x_A^\text{(in)}-x_A^I)}n^{II}$$
-                        Thus, by applying the lever rule between the points, \(x_A^\beta\), \(x_A^\alpha\), and
-                        x_A^\text{(in)}, the relative amounts of the alpha and beta phases can be calculated, as shown
-                        by the heights of the boxes in the simulation.
+                        The temperature-mole fraction diagram shows phase separation for a binary liquid mixture of
+                        component A (green) and component B (blue). The region under the orange and pink curves
+                        corresponds to two liquid phases in equilibrium. For a composition in the two-phase region, a
+                        horizontal line intersects the orange and pink curves at the compositions of the two phases that
+                        are in equilibrium. The lever rule is used to determine the amounts of \(\alpha\) and \(\beta\)
+                        phases.
+
+                        $$\frac{x^\alpha_A -x_A}{x_A-x_A^\beta} = \frac{n^\beta}{n^\alpha}=
+                        \frac{\text{number of moles of β phase}}{\text{number of moles of α phase}}$$
+                        where \(x_A\) is the overall mole fraction of A.
+                    </p>
+                    <p>
+                        That is, the amount of b phase is proportional to the length of the horizontal dashed orange
+                        line, and the amount of the a phase is proportional to the length of the horizontal dashed pink
+                        line.
+                    </p>
                 </div>
             </div>
         </div>
@@ -154,8 +148,8 @@
                             Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
                             href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under
                         the direction of
-                        Professor John L. Falconer and was converted to HTML5 by Drew Smith, with additional
-                        contributions by Neil Hendren. This simulation was prepared with financial support from the
+                        Professor John L. Falconer and was converted to HTML5 by Drew Smith. This simulation was
+                        prepared with financial support from the
                         National Science Foundation. Address any questions or comments to learncheme@gmail.com. All of
                         our
                         simulations are open source, and are available on our <a
