@@ -12,8 +12,19 @@
   <!-- jQuery CDN -->
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <!-- bootstrap -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
-    integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="lib/bootstrap.min.css">
+  <!-- MathJax -->
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.95,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <link rel="stylesheet" href="style.css">
 
@@ -21,15 +32,18 @@
 </head>
 
 <body>
-  <div class="overlay close-modal-toggle hide"></div>
+  <!-- <div class="overlay close-modal-toggle hide"></div> -->
 
   <div class="nav-bar">
     <!-- <h1>Reversible Reaction in an Adiabatic Plug-Flow Reactor</h1> -->
     <div class="buttons-container">
-      <button type="button" class="btn btn-primary" id="directions-button">Directions</button>
-      <button type="button" class="btn btn-primary" id="details-button">Details</button>
-      <button type="button" class="btn btn-primary" id="about-button">About</button>
+      <button type="button" id="dir" class="btn btn-primary" data-bs-toggle="modal"
+        data-bs-target="#directionsModal">Directions
+      </button>
+      <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+      <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
     </div>
+
     <div class="slider-container">
       <div class="slider-row" style="margin-left: -70px;">
         <div>molar ratio of inert to reactant in feed</div>
@@ -45,8 +59,8 @@
     </div>
 
     <div class="buttons-container" style="grid-template-columns: 100px 100px; margin-top: 0.5em;">
-      <div class="btn btn-success btn-sm" id="exothermic-btn">exothermic</div>
-      <div class="btn btn-light btn-sm" id="endothermic-btn">endothermic</div>
+      <div class="btn btn-danger btn-sm" id="exothermic-btn">exothermic</div>
+      <div class="btn btn-outline-success btn-sm" id="endothermic-btn">endothermic</div>
     </div>
 
     <div id="reaction-title">A ⇌ B</div>
@@ -55,34 +69,150 @@
   </div>
 
   <div id="graphics-wrapper"></div>
-  <div class="directions-container close-modal hide">
+
+  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>A reversible reaction, A ⇌ B, takes place in an adiabatic plug-flow reactor (PFR). Select either an
+            exothermic
+            (\(\Delta H < 0 \)) or an endothermic (\(\Delta H> 0 \)) reaction. The black curve is the equilibrium
+              conversion
+              as a function of temperature from the Van't Hoff equation. The blue line is conversion as a function of
+              temperature
+              from the adiabatic energy balance. The intersection of the curve and the line is the conversion at
+              equilibrium
+              (\(X_e \)) and the adiabatic temperature at equilibrium (\(T_e \)). You can vary the feed
+              temperature
+              and the molar ratio of inert to reactant in the feed using the respective sliders.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>For the reversible reaction A ⇌ B with both reactant A and inert component I in the adiabatic PFR feed, the
+            equilibrium constant is:
+            $$ K_e = K_m \exp{[\frac{\Delta H}{R} (\frac{1}{T_m} - \frac{1}{T})]} $$
+            where K<sub>m</sub> is the equilibrium constant at temperature T<sub>m</sub> (K), ∆H is the heat of reaction
+            (J/mol), R is the ideal gas constant (J/[mol K]), and T is the temperature of the reaction (K).</p>
+          <p>The equilibrium conversion is obtained from the equilibrium constant, assuming ideal gases:
+            $$ X_e = \frac{K_e}{1+K_e}$$
+            $$ X_{EB}=\Large\Sigma \normalsize\frac{\alpha C_p (T-T_f)}{-\Delta H} $$
+            where \(X_e\) is the equilibrium conversion, \(X_{EB}\) is the conversion calculated from the energy
+            balance, \(\alpha\) is the ratio in the feed of total mols/mols of reactant, \(C_p\) is the heat capacity
+            (J/[mol
+            K])
+            of
+            both the reactant and the inert, and \(T_f\) is the feed temperature (K).</p>
+          <p>References:</p>
+          <p>[1] H. S. Fogler, Essentials of Chemical Reaction Engineering, Upper Saddle River, NJ: Prentice Hall, 2011
+            pp.
+            503 - 505.</p>
+          <p>[2] Reversible Reaction in an Adiabatic Plug-Flow Reactor. <a
+              href="https://learncheme.com/simulations/kinetics-reactor-design/reversible-reaction-in-an-adiabatic-pfr/"
+              target="_blank"
+              rel="noopener noreferrer">https://learncheme.com/simulations/kinetics-reactor-design/reversible-reaction-in-an-adiabatic-pfr/</a>
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="aboutModalLabel">Details</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank"
+              rel="noopener noreferrer">Department of Chemical and Biological Engineering</a> at University of Colorado
+            Boulder for <a href="https://learncheme.com/" target="_blank" rel="noopener noreferrer">LearnChemE.com</a>
+            by
+            Jason Horst under the direction of Professor John L. Falconer. This simulation was prepared with financial
+            support
+            from the National Science Foundation. It is based on a Mathematica simulation on the Wolfram Demonstration
+            Project
+            website prepared by Rachael L. Baumann (<a
+              href="https://learncheme.com/simulations/kinetics-reactor-design/reversible-reaction-in-an-adiabatic-pfr/"
+              target="_blank" rel="noopener noreferrer">Reversible Reaction in an Adiabatic Plug-Flow Reactor</a>).
+            Address
+            any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available
+            on
+            our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank"
+              rel="noopener noreferrer">LearnChemE Github repository</a>.</p>
+          <p>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL + "-" and CTRL +
+            "=" on
+            Windows, or ⌘ + "-" and ⌘ + "=" on Mac), then refreshing the page. This application is not compatible with
+            Internet
+            Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions
+            of:
+            Chrome, Safari, Firefox, Edge, and Opera.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="directions-container  close-modal hide">
     <div class="btn btn-danger btn-sm close-modal-toggle close-button">Close X</div>
     <h4>Directions:</h4>
     <p>A reversible reaction, A ⇌ B, takes place in an adiabatic plug-flow reactor (PFR). Select either an exothermic
-      (∆H
-
-      < 0) or an endothermic (∆H \> 0) reaction. The black curve is the equilibrium conversion as a function of
-        temperature from the van't Hoff equation. The blue line is conversion as a function of temperature from the
-        adiabatic energy balance. The intersection of the curve and the line is the conversion at equilibrium
-        (X<sub>e</sub>) and the adiabatic temperature at equilibrium (T<sub>e</sub>). You can vary the feed
+      (\(\Delta H < 0 \)) or an endothermic (\(\Delta H> 0 \)) reaction. The black curve is the equilibrium conversion
+        as a function of temperature from the van't Hoff equation. The blue line is conversion as a function of
         temperature
-        and the molar ratio of inert to reactant in the feed.
+        from the adiabatic energy balance. The intersection of the curve and the line is the conversion at equilibrium
+        (\(X_e \)) and the adiabatic temperature at equilibrium (\(T_e \)). You can vary the feed
+        temperature
+        and the molar ratio of inert to reactant in the feed using the respective sliders.
     </p>
   </div>
   <div class="details-container close-modal hide">
     <div class="btn btn-danger btn-sm close-modal-toggle close-button">Close X</div>
     <h4>Details:</h4>
     <p>For the reversible reaction A ⇌ B with both reactant A and inert component I in the adiabatic PFR feed, the
-      equilibrium constant is:</p>
-    <p>K<sub>e</sub> = K<sub>m</sub><sup>e<sup>[∆H/R (1/T<sub>m</sub> - 1/T)]</sup></sup></p>
-    <p>where K<sub>m</sub> is the equilibrium constant at temperature T<sub>m</sub> (K), ∆H is the heat of reaction
+      equilibrium constant is:
+      $$ K_e = K_m \exp{[\frac{\Delta H}{R} (\frac{1}{T_m} - \frac{1}{T})]} $$
+      where K<sub>m</sub> is the equilibrium constant at temperature T<sub>m</sub> (K), ∆H is the heat of reaction
       (J/mol), R is the ideal gas constant (J/[mol K]), and T is the temperature of the reaction (K).</p>
-    <p>The equilibrium conversion is obtained from the equilibrium constant, assuming ideal gases:</p>
-    <p>X<sub>e</sub> = K<sub>e</sub>/1 + K<sub>e</sub></p>
-    <p>X<sub>EB</sub> = &Epsilon;&alpha;Cp(T - T<sub>f</sub>)/-∆H </p>
-    <p>where X<sub>e</sub> is the equilibrium conversion, X<sub>EB</sub> is the conversion calculated from the energy
-      balance, &alpha; is the ratio in the feed of total mols/mols of reactant, Cp is the heat capacity (J/[mol K]) of
-      both the reactant and the inert, and T<sub>f</sub> is the feed temperature (K).</p>
+    <p>The equilibrium conversion is obtained from the equilibrium constant, assuming ideal gases:
+      $$ X_e = \frac{K_e}{1+K_e}$$
+      $$ X_{EB}=\Large\Sigma \normalsize\frac{\alpha C_p (T-T_f)}{-\Delta H} $$
+      where \(X_e\) is the equilibrium conversion, \(X_{EB}\) is the conversion calculated from the energy
+      balance, \(\alpha\) is the ratio in the feed of total mols/mols of reactant, \(C_p\) is the heat capacity (J/[mol
+      K])
+      of
+      both the reactant and the inert, and \(T_f\) is the feed temperature (K).</p>
     <p>References:</p>
     <p>[1] H. S. Fogler, Essentials of Chemical Reaction Engineering, Upper Saddle River, NJ: Prentice Hall, 2011 pp.
       503 - 505.</p>
@@ -112,7 +242,7 @@
       Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet
       Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of:
       Chrome, Safari, Firefox, Edge, and Opera.</p>
-  </div>
+  </div> -->
 
 </body>
 
