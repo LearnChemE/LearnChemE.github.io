@@ -32,23 +32,24 @@
 </head>
 
 <body>
+
+    <div class="buttons-container">
+        <button type="button" id="dir-btn" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#directionsModal">Directions</button>
+        <button type="button" id="det-btn" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#detailsModal">Details</button>
+        <button type="button" id="abt-btn" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#aboutModal">About</button>
+    </div>
+
     <div class="nav-bar">
         <div class="nav-bar-left">
-            <div class="buttons-container">
-                <button type="button" id="dir-btn" class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#directionsModal">Directions</button>
-                <button type="button" id="det-btn" class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#detailsModal">Details</button>
-                <button type="button" id="abt-btn" class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#aboutModal">About</button>
-            </div>
+
 
             <div class="buttons-container" id="plot-input-wrapper">
                 <div id="btn-toggle-label">plot:</div>
-                <button type="button" id="lin-btn" class="btn btn-success" data-bs-toggle="modal"
-                    data-bs-target="#detailsModal">Lineweaver-Burke</button>
-                <button type="button" id="mic-btn" class="btn btn-success" data-bs-toggle="modal"
-                    data-bs-target="#aboutModal">Michaelis-Menten</button>
+                <button type="button" id="lin-btn" class="btn btn-success btn-sm">Lineweaver-Burke</button>
+                <button type="button" id="mic-btn" class="btn btn-outline-success btn-sm">Michaelis-Menten</button>
             </div>
 
             <div class="slider-wrapper">
@@ -58,7 +59,18 @@
             </div>
         </div>
         <div class="nav-bar-right">
-            <div class="buttons-container">hello</div>
+            <div class="quad-container">
+                <div></div>
+                <button type="button" id="competitive-btn" class="btn btn-secondary btn-sm">competitive</button>
+                <button type="button" id="uncompetitive-btn"
+                    class="btn btn-outline-secondary btn-sm">uncompetitive</button>
+
+                <!-- Row 2 -->
+                <div id="quad-label">inhibition mechanism:</div>
+                <button type="button" id="noncompetitive-btn" class="btn btn-outline-secondary btn-sm">noncompetitive
+                    (mixed)</button>
+                <button type="button" id="self-btn" class="btn btn-outline-secondary btn-sm">self-inhibited</button>
+            </div>
         </div>
     </div>
 
@@ -67,5 +79,6 @@
 
 </html>
 
+<script src="js/button.js"></script>
 <script src="js/index.js"></script>
 <script src="js/functions.js"></script>

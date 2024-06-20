@@ -36,6 +36,14 @@ canvas {
 
 .nav-bar-left {
     display: grid;
+    width: 400px;
+    justify-items: center;
+}
+
+.nav-bar-right {
+    display: grid;
+    width: 400px;
+    justify-items: center;
 }
 
 .buttons-container {
@@ -45,7 +53,19 @@ canvas {
     justify-content: center;
     align-items: center;
     gap: 0px 20px;
-    width: 100vw;
+    width: inherit;
+    margin-bottom: 0.5em;
+}
+
+.quad-container {
+    display: grid;
+    padding: 5px;
+    grid-template-columns: 100px max-content max-content;
+    grid-template-rows: max-content max-content;
+    justify-content: center;
+    align-items: center;
+    gap: 0px 10px;
+    width: inherit;
     margin-bottom: 0.5em;
 }
 
@@ -56,7 +76,7 @@ canvas {
     justify-items: center;
     gap: 0px 10px;
     align-items: center;
-    width: 100vw
+    width: inherit;
 }
 
 .slider-wrapper {
