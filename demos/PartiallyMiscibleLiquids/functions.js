@@ -196,19 +196,19 @@ function phasesOverlay(xOrng, xPurp) {
 
     // Lines and dots
     push();
+    stroke(g.pink); strokeWeight(2);
+    drawingContext.setLineDash([5, 5]);
+    line(x1, y, x, y);
+    line(x2, g.by, x2, y);
+
+    stroke(g.orange);
+    line(x2, y, x, y);
+    line(x1, g.by, x1, y);
+
     noStroke(); fill(g.pink);
     circle(x1, y, 8);
     fill(g.orange);
     circle(x2, y, 8);
-
-    stroke(g.pink); strokeWeight(2);
-    drawingContext.setLineDash([5, 5]);
-    line(x1, y, x, y);
-    line(x1, g.by, x1, y);
-
-    stroke(g.orange);
-    line(x2, y, x, y);
-    line(x2, g.by, x2, y);
     pop();
 
     push();
