@@ -54,8 +54,8 @@
 
             <div class="slider-wrapper">
                 <div class="slider-label">inhibitor concentration</div>
-                <input type="range" id="conc" min="0" max="10" value="2" step=".1" />
-                <div class="slider-val-label">2.0</div>
+                <input type="range" id="conc-slider" min="0" max="10" value="2" step=".1" />
+                <div class="slider-val-label" id="conc-slider-label">2.0</div>
             </div>
         </div>
         <div class="nav-bar-right">
@@ -150,9 +150,25 @@
                         $$(3) E \cdot S \rightarrow P + E$$
                         $$(4) I + E \rightarrow E \cdot I (\text{inactive})$$
                         $$(5) E \cdot I \rightarrow E + I$$
-                        $$-r_s=r_p=\frac{V_\text{max}|S|}{|S|+K_M(1+\frac{|I|}{K_I})} $$
-                        $$-\frac{1}{r_s}=\frac{1}{|S|}\frac{K_M}{V_\text{max}}(1+\frac{|I|}{K_I})+\frac{1}{V_\text{max}}$$
-
+                        $$-r_s=r_p=\frac{V_\text{max}|S|}{|S|+K_M(1+\frac{|I|}{K_I})} ,$$
+                        $$-\frac{1}{r_s}=\frac{1}{|S|}\frac{K_M}{V_\text{max}}(1+\frac{|I|}{K_I})+\frac{1}{V_\text{max}},$$
+                        $$m=\frac{K_M}{V_\text{max}}(1+\frac{|I|}{K_I}) ,$$
+                        $$b=\frac{1}{V_\text{max}},$$
+                        $$c=\frac{1}{K_M(1+\frac{|I|}{K_I})}.$$
+                    </p>
+                    <h6>Uncompetitive (Anti-Competitive) Inhibition:</h6>
+                    <p>The inhibitor binds to the enzyme-substrate complex forming an inhibitor-enzyme-substrate
+                        complex.
+                        $$(1) E+S \rightarrow E \cdot S$$
+                        $$(2) E \cdot S \rightarrow E + S$$
+                        $$(3) E \cdot S \rightarrow P + E$$
+                        $$(4) I + E \cdot S \rightarrow I \cdot E \cdot S (\text{inactive})$$
+                        $$(5) I \cdot E \cdot S \rightarrow I + E \cdot S$$
+                        $$-r_s=r_p=\frac{V_\text{max}|S|}{K_M+|S|(1+\frac{|I|}{K_I})} ,$$
+                        $$-\frac{1}{r_s}=\frac{1}{|S|}\frac{K_M}{V_\text{max}}+\frac{1}{V_\text{max}}(1+\frac{|I|}{K_I}),$$
+                        $$m=\frac{K_M}{V_\text{max}} ,$$
+                        $$b=\frac{1}{V_\text{max}}(1+\frac{|I|}{K_I}),$$
+                        $$c=\frac{1}{K_M}(1+\frac{|I|}{K_I}).$$
                     </p>
                 </div>
                 <div class="modal-footer">
@@ -184,6 +200,6 @@
 
 </html>
 
-<script src="js/button.js"></script>
 <script src="js/index.js"></script>
 <script src="js/functions.js"></script>
+<script src="js/button.js"></script>

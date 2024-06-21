@@ -2,7 +2,7 @@
 
 
 class P5_Graph {
-    constructor(options) {
+    constructor(width, height, options) {
         // const graphNumber = document.getElementsByClassName("p5-plot");
         this.options = {
             title: '',
@@ -22,6 +22,12 @@ class P5_Graph {
             ...this.options,
             ...options,
         };
+
+        this.width = width;
+        this.height = height;
+
+        this.setLabelRanges([0, 1], [0, 1]);
+        this.setBounds(width, height)
     }
 
     setBounds(width, height) {
@@ -50,7 +56,7 @@ class P5_Graph {
     clear() {
         push();
         noStroke(); fill(this.options.fill);
-        rect(0, 0, 700, 420);
+        rect(0, 0, this.width, this.height);
         pop();
     }
 
@@ -143,11 +149,12 @@ class P5_Graph {
 
         // Axis Labels
         push();
+        textAlign(CENTER, CENTER);
         noStroke(); textSize(18);
-        text(this.options.xTitle, (rx - lx) / 2, by + 36);
+        text(this.options.xTitle, (rx + lx) / 2, by + 36);
 
         push();
-        translate(this.lx - 40, (2 * by + ty) / 3);
+        translate(this.lx - 40, (by + ty) / 2);
         rotate(radians(-90));
         text(this.options.yTitle, 0, 0);
         pop();
