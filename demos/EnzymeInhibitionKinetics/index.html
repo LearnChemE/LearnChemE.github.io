@@ -75,6 +75,111 @@
     </div>
 
     <div id="graphics-wrapper"></div>
+
+    <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-l" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This Demonstration plots rate data for Michaelis-Menten enzyme kinetics for four types of
+                        inhibition. For competitive inhibition, an inhibitor forms an inactive complex with the enzyme.
+                        For uncompetitive inhibition, an inhibitor forms an inactive complex with the enzyme-substrate
+                        complex. For mixed inhibition, the inhibitor forms both types of inactive complexes. For
+                        self-inhibition, the substrate itself inhibits the reaction by forming an inactive complex with
+                        the enzyme-substrate complex.
+                    </p>
+                    <p>
+                        Select "Michaelis-Menten" to plot the rate of substrate consumption versus substrate
+                        concentration. Select "Lineweaver-Burke" to plot -1/rate versus 1/(substrate
+                        concentration) so as to obtain a straight line (except for the self-inhibited case). The slope
+                        and intercept of this line are related to \(K_M\), \(K_I\), and \(V_\text{max}\). Use the slider
+                        to change the inhibitor concentration, which changes the slope and/or the y
+                        intercept, depending on which type of inhibition is selected. When self-inhibited is selected,
+                        the substrate concentration is the inhibitor concentration, so the slider is hidden.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h6>Reaction Pathways</h6>
+                    <p>\(k\) values come from respective reaction coefficients</p>
+                    <p>\([E \cdot S]\) represents the concentration of an enzyme-substrate complex</p>
+                    <p>\([E \cdot I]\) represents the concentration of an enzyme-inhibitor complex</p>
+                    <p>\([E \cdot I \cdot S]\) represents the concentration of an enzyme-inhibitor-substrate complex</p>
+                    <p>\([E]\) is the total enzyme concentration \([E]+[E \cdot S]+[E \cdot I]\)</p>
+                    <p>
+                        $$V_\text{max}=k_3 [E_t] ,$$
+                        $$K_M=\frac{k_2+k_3}{k_1} ,$$
+                        $$K_I = \frac{k_5}{k_4} ,$$
+                        The Lineweaver-Burke method in a method of linearizing experimental data. The slope and y
+                        intercept from experimental data can be used to determine \(V_\text{max}\),
+                        \(K_M\), and \(K_I\) from plotted data.
+                    </p>
+                    <p>
+                        The line is given by
+                        $$y=mx+b$$
+                        where \(m\) is the slope, \(b\) is the y intercept, and \(c\) is the x intercept (the value of x
+                        when y=0).
+                    </p>
+                    <h6>Competitive Inhibition:</h6>
+                    <p>The inhibitor competes with the substrate for the enzyme to form an inactive complex.
+                        $$(1) E+S \rightarrow E \cdot S$$
+                        $$(2) E \cdot S \rightarrow E + S$$
+                        $$(3) E \cdot S \rightarrow P + E$$
+                        $$(4) I + E \rightarrow E \cdot I (\text{inactive})$$
+                        $$(5) E \cdot I \rightarrow E + I$$
+                        $$-r_s=r_p=\frac{V_\text{max}|S|}{|S|+K_M(1+\frac{|I|}{K_I})} $$
+                        $$-\frac{1}{r_s}=\frac{1}{|S|}\frac{K_M}{V_\text{max}}(1+\frac{|I|}{K_I})+\frac{1}{V_\text{max}}$$
+
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutModalLabel">About</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

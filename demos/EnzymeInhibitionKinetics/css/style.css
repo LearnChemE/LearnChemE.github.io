@@ -86,3 +86,15 @@ canvas {
     grid-template-columns: max-content 150px max-content;
     gap: 10px;
 }
+
+@media (min-width: 768px) {
+    .modal-l {
+        width: 80%;
+        max-width: 1000px;
+    }
+
+    .modal-xl {
+        width: 90%;
+        max-width: 1200px;
+    }
+}
