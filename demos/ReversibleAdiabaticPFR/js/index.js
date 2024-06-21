@@ -119,7 +119,7 @@ function drawArrowsAndLabels() {
     let eqConv = eqmCurve(eqTemp);
 
     graph.drawArrow([eqTemp, eqConv], [eqTemp, 0], options);
-    graph.drawArrow([eqTemp, eqConv], [300, eqConv], options);
+    graph.drawArrow([eqTemp, eqConv], [graph.xRange[0], eqConv], options);
 
     eqPt = graph.mapPoint(eqTemp, eqConv);
 
