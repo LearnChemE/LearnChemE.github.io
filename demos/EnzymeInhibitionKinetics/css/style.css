@@ -83,7 +83,7 @@ canvas {
     display: grid;
     justify-content: center;
     align-items: end;
-    grid-template-columns: max-content 150px max-content;
+    grid-template-columns: max-content 150px 20px;
     gap: 10px;
 }
 
