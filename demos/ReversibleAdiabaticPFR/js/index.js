@@ -94,6 +94,8 @@ const tempLabel = document.getElementById("temp-label");
 const molElement = document.getElementById("molar-slider");
 const molLabel = document.getElementById("molar-label");
 
+const form = document.getElementById("myForm");
+
 tempElement.addEventListener("input", function () {
     let tmp = Number(tempElement.value);
     g.temp = tmp;
@@ -173,10 +175,13 @@ $(() => {
         g.temp = 350;
         tempLabel.innerHTML = `350`;
 
+        form.reset();
+
         // Change Min and Max of the slider
         $("#temperature-slider").attr({
             min: 300,
             max: 400,
+            value: 350,
         });
         // toggleGraph();
     });
@@ -193,9 +198,11 @@ $(() => {
         tempLabel.innerHTML = `475`;
 
         // Change Min and Max of the slider
+        form.reset();
         $("#temperature-slider").attr({
             min: 400,
             max: 500,
+            value: 475,
         });
         // toggleGraph();
     });
