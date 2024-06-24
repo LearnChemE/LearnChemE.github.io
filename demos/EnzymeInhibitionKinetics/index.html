@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation, PFR">
+    <meta name="author" content="Drew Smith">
+    <meta name="application-name" content="LearnChemE Reversible Adiabatic PFR">
+    <!-- Libs -->
+    <script src="lib/p5.js"></script>
+    <script src="lib/p5-graph-lib.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="lib/bootstrap.min.css">
+    <script>
+        MathJax = {
+            chtml: {
+                scale: 0.95,
+                mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+                displayAlign: 'left', // default for indentalign when set to 'auto'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Style sheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/sliders.css">
+
+    <title>Enzyme Inhibition Kinetics</title>
+</head>
+
+<body>
+
+    <div class="buttons-container">
+        <button type="button" id="dir-btn" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#directionsModal">Directions</button>
+        <button type="button" id="det-btn" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#detailsModal">Details</button>
+        <button type="button" id="abt-btn" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#aboutModal">About</button>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-bar-left">
+
+
+            <div class="buttons-container" id="plot-input-wrapper">
+                <div id="btn-toggle-label">plot:</div>
+                <button type="button" id="lin-btn" class="btn btn-success btn-sm">Lineweaver-Burke</button>
+                <button type="button" id="mic-btn" class="btn btn-outline-success btn-sm">Michaelis-Menten</button>
+            </div>
+
+            <div class="slider-wrapper" id="conc-slider-container">
+                <div class="slider-label">inhibitor concentration</div>
+                <input type="range" id="conc-slider" min="0" max="10" value="2" step=".1" />
+                <div class="slider-val-label" id="conc-slider-label">2.0</div>
+            </div>
+        </div>
+        <div class="nav-bar-right">
+            <div class="quad-container">
+                <div></div>
+                <button type="button" id="competitive-btn" class="btn btn-secondary btn-sm">competitive</button>
+                <button type="button" id="uncompetitive-btn"
+                    class="btn btn-outline-secondary btn-sm">uncompetitive</button>
+
+                <!-- Row 2 -->
+                <div id="quad-label">inhibition mechanism:</div>
+                <button type="button" id="noncompetitive-btn" class="btn btn-outline-secondary btn-sm">noncompetitive
+                    (mixed)</button>
+                <button type="button" id="self-btn" class="btn btn-outline-secondary btn-sm">self-inhibited</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="graphics-wrapper"></div>
+
+    <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-l" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This Demonstration plots rate data for Michaelis-Menten enzyme kinetics for four types of
+                        inhibition. For competitive inhibition, an inhibitor forms an inactive complex with the enzyme.
+                        For uncompetitive inhibition, an inhibitor forms an inactive complex with the enzyme-substrate
+                        complex. For mixed inhibition, the inhibitor forms both types of inactive complexes. For
+                        self-inhibition, the substrate itself inhibits the reaction by forming an inactive complex with
+                        the enzyme-substrate complex.
+                    </p>
+                    <p>
+                        Select "Michaelis-Menten" to plot the rate of substrate consumption versus substrate
+                        concentration. Select "Lineweaver-Burke" to plot -1/rate versus 1/(substrate
+                        concentration) so as to obtain a straight line (except for the self-inhibited case). The slope
+                        and intercept of this line are related to \(K_M\), \(K_I\), and \(V_\text{max}\). Use the slider
+                        to change the inhibitor concentration, which changes the slope and/or the y
+                        intercept, depending on which type of inhibition is selected. When self-inhibited is selected,
+                        the substrate concentration is the inhibitor concentration, so the slider is hidden.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-l" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h6>Reaction Pathways</h6>
+                    <p>\(k\) values come from respective reaction coefficients</p>
+                    <p>\([E \cdot S]\) represents the concentration of an enzyme-substrate complex</p>
+                    <p>\([E \cdot I]\) represents the concentration of an enzyme-inhibitor complex</p>
+                    <p>\([E \cdot I \cdot S]\) represents the concentration of an enzyme-inhibitor-substrate complex</p>
+                    <p>\([E]\) is the total enzyme concentration \([E]+[E \cdot S]+[E \cdot I]\)</p>
+                    <p>
+                        $$V_\text{max}=k_3 [E_t] ,$$
+                        $$K_M=\frac{k_2+k_3}{k_1} ,$$
+                        $$K_I = \frac{k_5}{k_4} ,$$
+                        The Lineweaver-Burke method in a method of linearizing experimental data. The slope and y
+                        intercept from experimental data can be used to determine \(V_\text{max}\),
+                        \(K_M\), and \(K_I\) from plotted data.
+                    </p>
+                    <p>
+                        The line is given by
+                        $$y=mx+b$$
+                        where \(m\) is the slope, \(b\) is the y intercept, and \(c\) is the x intercept (the value of x
+                        when y=0).
+                    </p>
+                    <h6>Competitive Inhibition:</h6>
+                    <p>The inhibitor competes with the substrate for the enzyme to form an inactive complex.
+                        $$(1) E+S \rightarrow E \cdot S$$
+                        $$(2) E \cdot S \rightarrow E + S$$
+                        $$(3) E \cdot S \rightarrow P + E$$
+                        $$(4) I + E \rightarrow E \cdot I (\text{inactive})$$
+                        $$(5) E \cdot I \rightarrow E + I$$
+                        $$-r_s=r_p=\frac{V_\text{max}|S|}{|S|+K_M(1+\frac{|I|}{K_I})} ,$$
+                        $$-\frac{1}{r_s}=\frac{1}{|S|}\frac{K_M}{V_\text{max}}(1+\frac{|I|}{K_I})+\frac{1}{V_\text{max}},$$
+                        $$m=\frac{K_M}{V_\text{max}}(1+\frac{|I|}{K_I}) ,$$
+                        $$b=\frac{1}{V_\text{max}},$$
+                        $$c=\frac{1}{K_M(1+\frac{|I|}{K_I})}.$$
+                    </p>
+                    <h6>Uncompetitive (Anti-Competitive) Inhibition:</h6>
+                    <p>The inhibitor binds to the enzyme-substrate complex forming an inhibitor-enzyme-substrate
+                        complex.
+                        $$(1) E+S \rightarrow E \cdot S$$
+                        $$(2) E \cdot S \rightarrow E + S$$
+                        $$(3) E \cdot S \rightarrow P + E$$
+                        $$(4) I + E \cdot S \rightarrow I \cdot E \cdot S (\text{inactive})$$
+                        $$(5) I \cdot E \cdot S \rightarrow I + E \cdot S$$
+                        $$-r_s=r_p=\frac{V_\text{max}|S|}{K_M+|S|(1+\frac{|I|}{K_I})} ,$$
+                        $$-\frac{1}{r_s}=\frac{1}{|S|}\frac{K_M}{V_\text{max}}+\frac{1}{V_\text{max}}(1+\frac{|I|}{K_I}),$$
+                        $$m=\frac{K_M}{V_\text{max}} ,$$
+                        $$b=\frac{1}{V_\text{max}}(1+\frac{|I|}{K_I}),$$
+                        $$c=\frac{1}{K_M}(1+\frac{|I|}{K_I}).$$
+                    </p>
+                    <h6>Noncompetitive Inhibition (Mixed Inhibition):</h6>
+                    <p>
+                        Mixed inhibition is most commonly seen for enzymes with two or more substrates. The inhibitor
+                        can bind to the enzyme or enzyme-substrate complex. The substrate can also bind to the
+                        inhibitor-enzyme complex.
+                        $$(1) E+S ⇌ E \cdot S$$
+                        $$(2) E + I ⇌ I \cdot E (\text{inactive})$$
+                        $$(3) E \cdot S \rightarrow P + E$$
+                        $$(4) I + E \cdot S ⇌ I \cdot E \cdot S (\text{inactive})$$
+                        $$(5) S + I\cdot E ⇌ I \cdot E \cdot S (\text{inactive})$$
+                        $$-r_s=r_p=\frac{V_\text{max}|S|}{(K_M+|S|)(1+\frac{|I|}{K_I})} ,$$
+                        $$-\frac{1}{r_s}=\frac{1}{|S|}\frac{K_M}{V_\text{max}}(1+\frac{|I|}{K_I})+\frac{1}{V_\text{max}}(1+\frac{|I|}{K_I}),$$
+                        $$m=\frac{K_M}{V_\text{max}}(1+\frac{|I|}{K_I}) ,$$
+                        $$b=\frac{1}{V_\text{max}}(1+\frac{|I|}{K_I}),$$
+                        $$c=K_M.$$
+                    </p>
+                    <h6>Substrate (self) inhibition:</h6>
+                    <p>
+                        In the case of uncompetitive inhibition, the inhibitor ties up the enzyme-substrate complex to
+                        form an inactive substrate-enzyme-substrate complex.
+                        $$(1) E+S \rightarrow E \cdot S$$
+                        $$(2) E \cdot S \rightarrow E + S$$
+                        $$(3) E \cdot S \rightarrow P + E$$
+                        $$(4) S + E \cdot S \rightarrow S \cdot E \cdot S (\text{inactive})$$
+                        $$(5) S \cdot E \cdot S \rightarrow S + E \cdot S$$
+                        $$-r_s=r_p=\frac{V_\text{max}|S|}{K_M+|S|+\frac{|S|^2}{K_I}} ,$$
+                        $$-\frac{1}{r_s}=\frac{1}{|S|}\frac{K_M}{V_\text{max}}+\frac{1}{V_\text{max}}(1+\frac{|S|}{K_I}).$$
+                        This plot is not linear because the y intercept depends on the substrate concentration \([S]\).
+                    </p>
+                    <p>Reference</p>
+                    <p>
+                        [1] H. S. Fogler, <i>Essentials of Chemical Reaction Engineering</i>, 1st ed., Upper Saddle
+                        River, NJ:
+                        Pearson Higher Education, 2010 pp. 364-370.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-l" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutModalLabel">About</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This simulation was created in the <a href="https://www.colorado.edu/chbe"
+                            target="_blank">Department of
+                            Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+                            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Nicholas Larson under
+                        the direction of
+                        Professor John L. Falconer and was converted to HTML5 by Drew Smith. This simulation was
+                        prepared with financial support from the
+                        National Science Foundation. Address any questions or comments to learncheme@gmail.com. All of
+                        our
+                        simulations are open source, and are available on our <a
+                            href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+                            repository</a>.</p>
+                    <p style="line-height: 3rem;">
+                        If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                                src="https://learncheme.github.io/media/command.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on
+                        Mac
+                        or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on
+                        Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on
+                        Mac
+                        or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on
+                        Windows.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+<script src="js/index.js"></script>
+<script src="js/functions.js"></script>
+<script src="js/button.js"></script>
