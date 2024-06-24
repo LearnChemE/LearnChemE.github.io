@@ -164,8 +164,9 @@ class P5_Graph {
     }
 
     // Draw a line from lineEq arg where lineEq[0] is y-intercept, lineEq[1] is slope
-    drawLine(lineEq, color = 'black') {
+    drawLine(lineEq, color = 'black', dottedTo = NaN) {
         let u1, v1, u2, v2;
+        let yDot, uDot, vDot;
 
         let b = lineEq[0];
         let m = lineEq[1];
@@ -175,6 +176,11 @@ class P5_Graph {
 
         let y1 = b + m * x1;
         let y2 = b + m * x2;
+
+        if (dottedTo == dottedTo) {
+            yDot = b + m * dottedTo;
+            [uDot, vDot] = this.mapPoint(dottedTo, yDot);
+        }
 
         // Fix line to box edges
         if (y1 < this.yRange[0]) {
@@ -205,7 +211,16 @@ class P5_Graph {
 
         push();
         stroke(color); strokeWeight(2);
-        line(u1, v1, u2, v2);
+        if (dottedTo == dottedTo) {
+            push();
+            drawingContext.setLineDash([10, 5]);
+            line(uDot, vDot, u1, v1);
+            pop();
+            line(uDot, vDot, u2, v2);
+        }
+        else {
+            line(u1, v1, u2, v2);
+        }
         pop();
     }
 

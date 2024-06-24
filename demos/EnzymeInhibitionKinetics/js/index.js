@@ -13,6 +13,10 @@ window.g = {
     mechType: COMPETITIVE,
 
     inhConc: 2.0,
+
+    Vmax: 2,
+    KM: .5,
+    KI: 5,
 }
 
 function setup() {
@@ -38,6 +42,7 @@ const graph = new P5_Graph(800, 480, {
 function draw() {
     findGraphAxesRange();
     graph.on_draw();
+    drawFunctions();
 }
 
 concElement = document.getElementById("conc-slider");
