@@ -6,6 +6,10 @@ unc = $("#uncompetitive-btn");
 non = $("#noncompetitive-btn");
 self = $("#self-btn");
 
+slide = document.getElementById("conc-slider-container");
+
+
+
 $(() => {
 
     // Toggle plot type
@@ -18,6 +22,9 @@ $(() => {
 
         g.plotType = LINE_BURKE;
         findGraphAxesRange();
+
+        graph.options.xTitle = '1 / (substrate concentration) (L/mol)';
+        graph.options.yTitle = '-1 / (rate substrate) ([L s]/mol)';
     });
     mic.click(() => {
         lin.removeClass("btn-success");
@@ -28,6 +35,9 @@ $(() => {
 
         g.plotType = MICH_MENT;
         findGraphAxesRange();
+
+        graph.options.xTitle = 'substrate concentration (mol/L)';
+        graph.options.yTitle = '-(rate substrate) (mol/[L s])';
     });
 
     com.click(() => {
@@ -45,6 +55,8 @@ $(() => {
 
         g.mechType = COMPETITIVE;
         findGraphAxesRange();
+
+        slide.style.display = "grid";
     });
     unc.click(() => {
         unc.addClass("btn-secondary");
@@ -61,6 +73,8 @@ $(() => {
 
         g.mechType = UNCOMPETITIVE;
         findGraphAxesRange();
+
+        slide.style.display = "grid";
     });
     non.click(() => {
         non.addClass("btn-secondary");
@@ -77,6 +91,8 @@ $(() => {
 
         g.mechType = NONCOMPETITIVE;
         findGraphAxesRange();
+
+        slide.style.display = "grid";
     });
     self.click(() => {
         self.addClass("btn-secondary");
@@ -93,6 +109,8 @@ $(() => {
 
         g.mechType = SELF_INHIBITED;
         findGraphAxesRange();
+
+        slide.style.display = "none";
     });
 
 });

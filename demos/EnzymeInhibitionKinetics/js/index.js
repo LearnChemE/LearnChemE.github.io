@@ -35,8 +35,8 @@ const graph = new P5_Graph(800, 480, {
     parent: document.getElementById("graph-container"),
     xLabelPrecision: 1,
     yLabelPrecision: 1,
-    xTitle: '1/(substrate concentration) (L/mol)',
-    yTitle: '1/(substrate concentration) (L/mol)',
+    xTitle: '1 / (substrate concentration) (L/mol)',
+    yTitle: '-1 / (rate substrate) ([L s]/mol)',
 })
 
 function draw() {

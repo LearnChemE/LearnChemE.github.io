@@ -238,6 +238,7 @@ class P5_Graph {
         for (i = 0; i <= n; i++) {
             x = x0 + i * dx;
             y = func(x);
+            if (y > this.yRange[1]) continue;
             [u, v] = this.mapPoint(x, y);
             vertex(u, v);
         }
