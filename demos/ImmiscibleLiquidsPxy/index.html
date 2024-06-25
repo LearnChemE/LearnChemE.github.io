@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation, PFR">
+    <meta name="author" content="Drew Smith">
+    <meta name="application-name" content="LearnChemE Reversible Adiabatic PFR">
+    <!-- Libs -->
+    <script src="lib/p5.js"></script>
+    <script src="lib/p5-graph-lib.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="lib/bootstrap.min.css">
+    <script>
+        MathJax = {
+            chtml: {
+                scale: 0.95,
+                mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+                displayAlign: 'left', // default for indentalign when set to 'auto'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Style sheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/sliders.css">
+
+    <title>Immiscible Liquids Pxy</title>
+</head>
+
+<body>
+    <div class="buttons-container">
+        <button type="button" id="dir-btn" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#directionsModal">Directions</button>
+        <button type="button" id="det-btn" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#detailsModal">Details</button>
+        <button type="button" id="abt-btn" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#aboutModal">About</button>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-bar-left">
+            <div id="display-btn-wrapper">
+                <button type="button" id="piston-btn" class="btn btn-success">piston-cylinder</button>
+                <button type="button" id="bar-btn" class="btn btn-outline-success">amounts of each phase</button>
+            </div>
+            <div class="slider-wrapper" id="temp-slider-wrapper">
+                <div class="slider-label">temperature (°C)</div>
+                <input type="range" id="temp-slider" min="105" max="125" value="122" step="1">
+                <div class="slider-val-label" id="temp-slider-label">122</div>
+            </div>
+        </div>
+
+        <div class="nav-bar-right">
+            <button type="button" id="label-btn" class="btn btn-outline-secondary">show labels</button>
+            <div class="buttons-container" id="labelled-btn-container">
+                <div id="comp-label">benzene mole fraction</div>
+                <button type="button" id="comp-btn-lo" class="btn btn-success">0.25</button>
+                <button type="button" id="comp-btn-md" class="btn btn-outline-success">0.60</button>
+                <button type="button" id="comp-btn-hi" class="btn btn-outline-success">0.85</button>
+            </div>
+        </div>
+    </div>
+
+    <form action="reset" id="piston-slider-form">
+        <div class="slider-wrapper" id="piston-slider-wrapper">
+            <div class="slider-label">piston height</div>
+            <input type="range" id="piston-slider" min="0" max="100" value="0" step="1">
+            <button type="button" id="reset-piston-btn" class="btn btn-outline-danger">reset piston height</button>
+        </div>
+    </form>
+
+    <div id="graphics-wrapper"></div>
+</body>
+
+</html>
+
+<script src="js/index.js"></script>
+<script src="js/functions.js"></script>
+<script src="js/buttons.js"></script>
