@@ -53,7 +53,7 @@
             </div>
 
             <div class="slider-wrapper" id="conc-slider-container">
-                <div class="slider-label">inhibitor concentration</div>
+                <div class="slider-label">inhibitor concentration (mol/L)</div>
                 <input type="range" id="conc-slider" min="0" max="10" value="2" step=".1" />
                 <div class="slider-val-label" id="conc-slider-label">2.0</div>
             </div>
@@ -66,7 +66,7 @@
                     class="btn btn-outline-secondary btn-sm">uncompetitive</button>
 
                 <!-- Row 2 -->
-                <div id="quad-label">inhibition mechanism:</div>
+                <div id="quad-label">inhibition mechanism</div>
                 <button type="button" id="noncompetitive-btn" class="btn btn-outline-secondary btn-sm">noncompetitive
                     (mixed)</button>
                 <button type="button" id="self-btn" class="btn btn-outline-secondary btn-sm">self-inhibited</button>
@@ -88,7 +88,7 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        This Demonstration plots rate data for Michaelis-Menten enzyme kinetics for four types of
+                        This simulation plots rate data for Michaelis-Menten enzyme kinetics for four types of
                         inhibition. For competitive inhibition, an inhibitor forms an inactive complex with the enzyme.
                         For uncompetitive inhibition, an inhibitor forms an inactive complex with the enzyme-substrate
                         complex. For mixed inhibition, the inhibitor forms both types of inactive complexes. For
@@ -123,12 +123,12 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <h6>Reaction Pathways</h6>
+                    <h6><b>Reaction Pathways</b></h6>
                     <p>\(k\) values come from respective reaction coefficients</p>
                     <p>\([E \cdot S]\) represents the concentration of an enzyme-substrate complex</p>
                     <p>\([E \cdot I]\) represents the concentration of an enzyme-inhibitor complex</p>
                     <p>\([E \cdot I \cdot S]\) represents the concentration of an enzyme-inhibitor-substrate complex</p>
-                    <p>\([E]\) is the total enzyme concentration \([E]+[E \cdot S]+[E \cdot I]\)</p>
+                    <p>\([E_t]\) is the total enzyme concentration \([E]+[E \cdot S]+[E \cdot I]\)</p>
                     <p>
                         $$V_\text{max}=k_3 [E_t] ,$$
                         $$K_M=\frac{k_2+k_3}{k_1} ,$$
@@ -143,20 +143,20 @@
                         where \(m\) is the slope, \(b\) is the y intercept, and \(c\) is the x intercept (the value of x
                         when y=0).
                     </p>
-                    <h6>Competitive Inhibition:</h6>
+                    <h6><b>Competitive Inhibition:</b></h6>
                     <p>The inhibitor competes with the substrate for the enzyme to form an inactive complex.
                         $$(1) E+S \rightarrow E \cdot S$$
                         $$(2) E \cdot S \rightarrow E + S$$
                         $$(3) E \cdot S \rightarrow P + E$$
                         $$(4) I + E \rightarrow E \cdot I (\text{inactive})$$
                         $$(5) E \cdot I \rightarrow E + I$$
-                        $$-r_s=r_p=\frac{V_\text{max}|S|}{|S|+K_M(1+\frac{|I|}{K_I})} ,$$
-                        $$-\frac{1}{r_s}=\frac{1}{|S|}\frac{K_M}{V_\text{max}}(1+\frac{|I|}{K_I})+\frac{1}{V_\text{max}},$$
-                        $$m=\frac{K_M}{V_\text{max}}(1+\frac{|I|}{K_I}) ,$$
+                        $$-r_s=r_p=\frac{V_\text{max}[S]}{[S]+K_M(1+\frac{[I]}{K_I})} ,$$
+                        $$-\frac{1}{r_s}=\frac{1}{[S]}\frac{K_M}{V_\text{max}}(1+\frac{[I]}{K_I})+\frac{1}{V_\text{max}},$$
+                        $$m=\frac{K_M}{V_\text{max}}(1+\frac{[I]}{K_I}) ,$$
                         $$b=\frac{1}{V_\text{max}},$$
-                        $$c=\frac{1}{K_M(1+\frac{|I|}{K_I})}.$$
+                        $$c=\frac{1}{K_M(1+\frac{[I]}{K_I})}.$$
                     </p>
-                    <h6>Uncompetitive (Anti-Competitive) Inhibition:</h6>
+                    <h6><b>Uncompetitive (Anti-Competitive) Inhibition:</b></h6>
                     <p>The inhibitor binds to the enzyme-substrate complex forming an inhibitor-enzyme-substrate
                         complex.
                         $$(1) E+S \rightarrow E \cdot S$$
@@ -164,13 +164,13 @@
                         $$(3) E \cdot S \rightarrow P + E$$
                         $$(4) I + E \cdot S \rightarrow I \cdot E \cdot S (\text{inactive})$$
                         $$(5) I \cdot E \cdot S \rightarrow I + E \cdot S$$
-                        $$-r_s=r_p=\frac{V_\text{max}|S|}{K_M+|S|(1+\frac{|I|}{K_I})} ,$$
-                        $$-\frac{1}{r_s}=\frac{1}{|S|}\frac{K_M}{V_\text{max}}+\frac{1}{V_\text{max}}(1+\frac{|I|}{K_I}),$$
+                        $$-r_s=r_p=\frac{V_\text{max}[S]}{K_M+[S](1+\frac{[I]}{K_I})} ,$$
+                        $$-\frac{1}{r_s}=\frac{1}{[S]}\frac{K_M}{V_\text{max}}+\frac{1}{V_\text{max}}(1+\frac{[I]}{K_I}),$$
                         $$m=\frac{K_M}{V_\text{max}} ,$$
-                        $$b=\frac{1}{V_\text{max}}(1+\frac{|I|}{K_I}),$$
-                        $$c=\frac{1}{K_M}(1+\frac{|I|}{K_I}).$$
+                        $$b=\frac{1}{V_\text{max}}(1+\frac{[I]}{K_I}),$$
+                        $$c=\frac{1}{K_M}(1+\frac{[I]}{K_I}).$$
                     </p>
-                    <h6>Noncompetitive Inhibition (Mixed Inhibition):</h6>
+                    <h6><b>Noncompetitive Inhibition (Mixed Inhibition):</b></h6>
                     <p>
                         Mixed inhibition is most commonly seen for enzymes with two or more substrates. The inhibitor
                         can bind to the enzyme or enzyme-substrate complex. The substrate can also bind to the
@@ -180,13 +180,13 @@
                         $$(3) E \cdot S \rightarrow P + E$$
                         $$(4) I + E \cdot S ⇌ I \cdot E \cdot S (\text{inactive})$$
                         $$(5) S + I\cdot E ⇌ I \cdot E \cdot S (\text{inactive})$$
-                        $$-r_s=r_p=\frac{V_\text{max}|S|}{(K_M+|S|)(1+\frac{|I|}{K_I})} ,$$
-                        $$-\frac{1}{r_s}=\frac{1}{|S|}\frac{K_M}{V_\text{max}}(1+\frac{|I|}{K_I})+\frac{1}{V_\text{max}}(1+\frac{|I|}{K_I}),$$
-                        $$m=\frac{K_M}{V_\text{max}}(1+\frac{|I|}{K_I}) ,$$
-                        $$b=\frac{1}{V_\text{max}}(1+\frac{|I|}{K_I}),$$
+                        $$-r_s=r_p=\frac{V_\text{max}[S]}{(K_M+[S])(1+\frac{[I]}{K_I})} ,$$
+                        $$-\frac{1}{r_s}=\frac{1}{[S]}\frac{K_M}{V_\text{max}}(1+\frac{[I]}{K_I})+\frac{1}{V_\text{max}}(1+\frac{[I]}{K_I}),$$
+                        $$m=\frac{K_M}{V_\text{max}}(1+\frac{[I]}{K_I}) ,$$
+                        $$b=\frac{1}{V_\text{max}}(1+\frac{[I]}{K_I}),$$
                         $$c=K_M.$$
                     </p>
-                    <h6>Substrate (self) inhibition:</h6>
+                    <h6><b>Substrate (self) inhibition:</b></h6>
                     <p>
                         In the case of uncompetitive inhibition, the inhibitor ties up the enzyme-substrate complex to
                         form an inactive substrate-enzyme-substrate complex.
@@ -195,11 +195,11 @@
                         $$(3) E \cdot S \rightarrow P + E$$
                         $$(4) S + E \cdot S \rightarrow S \cdot E \cdot S (\text{inactive})$$
                         $$(5) S \cdot E \cdot S \rightarrow S + E \cdot S$$
-                        $$-r_s=r_p=\frac{V_\text{max}|S|}{K_M+|S|+\frac{|S|^2}{K_I}} ,$$
-                        $$-\frac{1}{r_s}=\frac{1}{|S|}\frac{K_M}{V_\text{max}}+\frac{1}{V_\text{max}}(1+\frac{|S|}{K_I}).$$
+                        $$-r_s=r_p=\frac{V_\text{max}[S]}{K_M+[S]+\frac{[S]^2}{K_I}} ,$$
+                        $$-\frac{1}{r_s}=\frac{1}{[S]}\frac{K_M}{V_\text{max}}+\frac{1}{V_\text{max}}(1+\frac{[S]}{K_I}).$$
                         This plot is not linear because the y intercept depends on the substrate concentration \([S]\).
                     </p>
-                    <p>Reference</p>
+                    <p><b>Reference</b></p>
                     <p>
                         [1] H. S. Fogler, <i>Essentials of Chemical Reaction Engineering</i>, 1st ed., Upper Saddle
                         River, NJ:
