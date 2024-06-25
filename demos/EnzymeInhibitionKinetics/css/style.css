@@ -69,6 +69,11 @@ canvas {
     margin-bottom: 0.5em;
 }
 
+#quad-label {
+    text-align: end;
+    margin-top: -30px;
+}
+
 #plot-input-wrapper {
     display: grid;
     padding: 5px;

@@ -100,11 +100,11 @@ class P5_Graph {
                 line(xPos, by, xPos, by - 5);
                 line(xPos, ty, xPos, ty + 5);
                 push();
-                noStroke(); textSize(14);
+                noStroke(); textSize(18);
                 if (i == 0) {
-                    text(xLabels[i / ticks].toFixed(this.options.xLabelPrecision), xPos - 10, by + 16);
+                    text(xLabels[i / ticks].toFixed(this.options.xLabelPrecision), xPos - 10, by + 18);
                 } else {
-                    text(xLabels[i / ticks].toFixed(this.options.xLabelPrecision), xPos - 10, by + 15);
+                    text(xLabels[i / ticks].toFixed(this.options.xLabelPrecision), xPos - 10, by + 17);
                 }
                 pop();
             } else {
@@ -113,7 +113,7 @@ class P5_Graph {
             }
         }
         push();
-        noStroke(); textSize(14);
+        noStroke(); textSize(18);
         text(xLabels[5], rx - 10, by + 15);
         pop();
 
@@ -130,7 +130,7 @@ class P5_Graph {
                 line(rx, yPos, rx - 5, yPos);
 
                 push();
-                noStroke(); textSize(14);
+                noStroke(); textSize(18);
                 text(yLabels[i / ticks].toFixed(this.options.yLabelPrecision), lx - 28, yPos + 3);
                 pop();
             }
@@ -142,7 +142,7 @@ class P5_Graph {
 
         pop();
         push();
-        noStroke(); textSize(14);
+        noStroke(); textSize(18);
         text(yLabels[5].toFixed(this.options.yLabelPrecision), lx - 28, ty + 3);
         pop();
 
