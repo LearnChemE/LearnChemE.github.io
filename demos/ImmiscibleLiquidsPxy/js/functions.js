@@ -24,3 +24,30 @@ function drawExtraGraphLabels() {
     text('b', graph.rx - 8, graph.by + 42);
     pop();
 }
+
+function drawPiston() {
+    push();
+    noStroke();
+    translate(250, 0, 0);
+    ambientLight(25);
+    directionalLight(255, 255, 255, 0, 0, -1);
+
+    let s = 1 - g.pistonHeight / g.pistonHeightMax;
+    // Piston arm
+    push();
+    translate(0, s * 80 - 100, 0);
+    fill(100, 100, 100);
+    cylinder(10, s * 160 + 50, 24, 1);
+
+    translate(0, s * 80 + 20, 0);
+    cylinder(28, 18, 24, 1);
+    pop();
+
+    // outline needs to be drawn last
+    push();
+    fill(255, 255, 255, 100);
+    cylinder(30, 200, 24, 1, false, true);
+    pop();
+
+    pop();
+}

@@ -101,7 +101,7 @@ class P5_Graph {
                 line(xPos, by, xPos, by - 5);
                 line(xPos, ty, xPos, ty + 5);
                 push();
-                noStroke(); textSize(18);
+                noStroke(); textSize(18); fill('black');
                 if (i == 0) {
                     text(xLabels[i / ticks].toFixed(this.options.xLabelPrecision), xPos - 10, by + 18);
                 } else {
@@ -114,7 +114,7 @@ class P5_Graph {
             }
         }
         push();
-        noStroke(); textSize(18);
+        noStroke(); textSize(18); fill('black');
         text(this.xRange[1].toFixed(this.options.xLabelPrecision), rx - 10, by + 15);
         pop();
 
@@ -136,7 +136,7 @@ class P5_Graph {
                 line(rx, yPos, rx - 5, yPos);
 
                 push();
-                noStroke(); textSize(18);
+                noStroke(); textSize(18); fill('black');
                 text(yLabels[i / ticks].toFixed(this.options.yLabelPrecision), lx - 28, yPos + 3);
                 pop();
             }
@@ -148,7 +148,7 @@ class P5_Graph {
 
         pop();
         push();
-        noStroke(); textSize(18);
+        noStroke(); textSize(18); fill('black');
         text(this.yRange[1].toFixed(this.options.yLabelPrecision), lx - 28, ty + 3);
         pop();
 
@@ -156,7 +156,7 @@ class P5_Graph {
         // Axis Labels
         push();
         textAlign(CENTER, CENTER);
-        noStroke(); textSize(18);
+        noStroke(); textSize(18); fill('black');
         text(this.options.xTitle, (rx + lx) / 2, by + 36);
 
         push();

@@ -14,11 +14,21 @@ window.g = {
     x_b: .25,
     pistonHeight: 0,
     labels: false,
+
+    pistonHeightMax: 100,
+}
+
+let cam;
+function preload() {
+    font = loadFont('assets/Ubuntu-R.ttf');
 }
 
 function setup() {
-    g.cnv = createCanvas(g.width, g.height);
+    g.cnv = createCanvas(g.width, g.height, WEBGL);
     g.cnv.parent("graphics-wrapper");
+
+    cam = createCamera();
+    setCamera(cam);
 }
 
 const graph = new P5_Graph(g.width, g.height, {
@@ -35,8 +45,14 @@ const graph = new P5_Graph(g.width, g.height, {
 }, [0, 1], [0, 7])
 
 function draw() {
+    push();
+    translate(-400, -240);
+    textFont(font);
     graph.on_draw();
     drawExtraGraphLabels();
+    pop();
+
+    drawPiston();
 }
 
 const tempSlider = document.getElementById("temp-slider");
