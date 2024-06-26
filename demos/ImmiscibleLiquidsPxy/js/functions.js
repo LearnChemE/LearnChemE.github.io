@@ -29,6 +29,12 @@ function drawEqm() {
     let hline = liqLine();
     graph.drawLine(hline);
     graph.drawFunction(eqmCurve);
+
+    push();
+    noStroke(); fill('black');
+    let pt = graph.mapPoint(g.x_b, getPressure())
+    circle(pt[0], pt[1], 8);
+    pop();
 }
 
 function drawPiston() {

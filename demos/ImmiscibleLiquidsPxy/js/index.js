@@ -12,10 +12,10 @@ window.g = {
     display: PISTON,
     temp: 122,
     x_b: .25,
-    pistonHeight: 0,
+    pistonHeight: 10,
     labels: false,
 
-    pistonHeightMax: 100,
+    pistonHeightMax: 60,
 }
 
 function preload() {
@@ -81,4 +81,8 @@ function eqmCurve(x) {
         y = 1.14 + 3 * (1 - x) + 6.875 * (1 - x) ** 2; // 3.45
     }
     return y * (s * .4 + .60) + 1.11 * s + 1.2;
+}
+
+function getPressure() {
+    return .1507 * (g.temp + 273) / g.pistonHeight;
 }
