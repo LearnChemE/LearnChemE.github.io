@@ -18,7 +18,6 @@ window.g = {
     pistonHeightMax: 100,
 }
 
-let cam;
 function preload() {
     font = loadFont('assets/Ubuntu-R.ttf');
 }
@@ -26,9 +25,6 @@ function preload() {
 function setup() {
     g.cnv = createCanvas(g.width, g.height, WEBGL);
     g.cnv.parent("graphics-wrapper");
-
-    cam = createCamera();
-    setCamera(cam);
 }
 
 const graph = new P5_Graph(g.width, g.height, {
@@ -50,6 +46,7 @@ function draw() {
     textFont(font);
     graph.on_draw();
     drawExtraGraphLabels();
+    drawEqm();
     pop();
 
     drawPiston();
@@ -69,3 +66,19 @@ tempSlider.addEventListener("input", function () {
 pistSlider.addEventListener("input", function () {
     g.pistonHeight = Number(pistSlider.value);
 })
+
+function liqLine() {
+    return [(g.temp - 125) / 20 * 2.5 + 5.75, 0];
+}
+
+function eqmCurve(x) {
+    let y;
+    let s = (g.temp - 105) / 20;
+    if (x <= .6) {
+        y = 4 + 2 * (x - 2) + 6.22 * x ** 2; // 6.31
+    }
+    else {
+        y = 1.14 + 3 * (1 - x) + 6.875 * (1 - x) ** 2; // 3.45
+    }
+    return y * (s * .4 + .60) + 1.11 * s + 1.2;
+}

@@ -25,6 +25,12 @@ function drawExtraGraphLabels() {
     pop();
 }
 
+function drawEqm() {
+    let hline = liqLine();
+    graph.drawLine(hline);
+    graph.drawFunction(eqmCurve);
+}
+
 function drawPiston() {
     push();
     noStroke();

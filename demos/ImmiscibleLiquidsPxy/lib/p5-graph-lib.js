@@ -231,7 +231,7 @@ class P5_Graph {
     }
 
     // Draw a function
-    drawFunction(func, color, n = 100) {
+    drawFunction(func, color = 'black', n = 100) {
         let i, x, y, u, v;
         let x0 = this.xRange[0];
         let dx = (this.xRange[1] - x0) / n;
