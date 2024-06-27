@@ -21,6 +21,7 @@ window.g = {
     temp: 122,
     x_b: .25,
     pistonHeight: 10,
+    press: 6,
     labels: false,
 
     pistonHeightMax: 60,
@@ -54,13 +55,24 @@ const graph = new P5_Graph(g.width, g.height, {
 }, [0, 1], [0, 7])
 
 function draw() {
+    background(250);
     push();
     translate(-400, -240);
     textFont(font);
     graph.on_draw();
     drawExtraGraphLabels();
     drawEqm();
+
+    push();
+    if (g.yb != 0) ybLabel();
+    noStroke(); fill('black');
+    let pt = graph.mapPoint(g.x_b, g.press)
+    circle(...pt, 8);
     pop();
+
+    pop();
+
+
 
     drawPiston();
 }

@@ -37,6 +37,7 @@ function drawEqm() {
     strokeWeight(2);
     if (pressure >= g.Pw + g.Pb) { // 2 liq phases
         g.vap = 0;
+        g.yb = 0;
 
         stroke(g.orange);
         graph.dashedLine([0, pressure], [g.x_b, pressure], [10, 10]);
@@ -48,8 +49,10 @@ function drawEqm() {
     }
     else if (pressure >= eqmCurve(g.x_b)) { // 1 liq 1 vap phase
         function ybHelper(y) { return eqmCurve(y) - pressure };
+        let tripleGuess = map(g.temp, 105, 125, .68, .62);
+
         if (g.x_b == .85) {
-            g.yb = secantMethod(ybHelper, .61, 1);
+            if ((g.yb = secantMethod(ybHelper, map(g.temp, 105, 125, .68, .62), 1)) == undefined) g.yb = tripleGuess;
 
             stroke(g.orange);
             graph.dashedLine([g.yb, pressure], [g.x_b, pressure], [10, 10]);
@@ -58,10 +61,19 @@ function drawEqm() {
             stroke(g.green);
             graph.dashedLine([1, pressure], [g.x_b, pressure], [10, 10]);
             graph.dashedLine([g.yb, 0], [g.yb, pressure], [10, 10]);
+
         }
         else {
-            g.yb = secantMethod(ybHelper, 0, .6);
-            console.log(g.yb);
+            tripleGuess -= .01;
+            if ((g.yb = secantMethod(ybHelper, 0, tripleGuess)) == undefined) g.yb = tripleGuess;
+
+            stroke(g.blue);
+            graph.dashedLine([g.yb, pressure], [g.x_b, pressure], [10, 10]);
+            graph.dashedLine([0, 0], [0, pressure], [10, 10]);
+
+            stroke(g.green);
+            graph.dashedLine([0, pressure], [g.x_b, pressure], [10, 10]);
+            graph.dashedLine([g.yb, 0], [g.yb, pressure], [10, 10]);
         }
     }
     else { // vapour only
@@ -71,12 +83,7 @@ function drawEqm() {
     }
     pop();
 
-
-    push();
-    noStroke(); fill('black');
-    let pt = graph.mapPoint(g.x_b, pressure)
-    circle(...pt, 8);
-    pop();
+    g.press = pressure;
 }
 
 function drawPiston() {
@@ -106,3 +113,18 @@ function drawPiston() {
     pop();
 }
 
+function ybLabel() {
+    let u = map(g.yb, 0, 1, graph.lx, graph.rx);
+    push();
+
+    stroke('black'); fill(250);
+    rect(u - 40, graph.by - 50, 80, 28);
+
+    noStroke(); fill('black');
+    textAlign(CENTER, CENTER); textSize(18);
+    text('y  = ' + g.yb.toFixed(2), u, graph.by - 40);
+    textSize(14);
+    text('b', u - 20, graph.by - 32);
+
+    pop();
+}
