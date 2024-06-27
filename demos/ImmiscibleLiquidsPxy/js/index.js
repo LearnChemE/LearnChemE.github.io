@@ -113,5 +113,16 @@ function eqmCurve(x) {
 }
 
 function getPressure() {
-    return .1507 * (g.temp + 273) / g.pistonHeight;
+    let p = 1.5 * (g.temp + 273) / (g.pistonHeight + 50) - 3;
+    let bubble = g.Pw + g.Pb;
+    if (p > bubble) {
+        let buffer = .95;
+        g.vap = (p - buffer) / p;
+
+        if (p - buffer < bubble) {
+            p = bubble;
+        }
+        else p = p - buffer;
+    }
+    return p;
 }

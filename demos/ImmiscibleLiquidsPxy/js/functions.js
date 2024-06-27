@@ -60,7 +60,8 @@ function drawEqm() {
 
             stroke(g.green);
             graph.dashedLine([1, pressure], [g.x_b, pressure], [10, 10]);
-            graph.dashedLine([g.yb, 0], [g.yb, pressure], [10, 10]);
+            graph.dashedLine([g.yb, 1], [g.yb, pressure], [10, 10]);
+            graph.drawArrow([g.yb, .4], [g.yb, 0], { color: g.green, arrowSize: 10 });
 
         }
         else {
@@ -73,13 +74,17 @@ function drawEqm() {
 
             stroke(g.green);
             graph.dashedLine([0, pressure], [g.x_b, pressure], [10, 10]);
-            graph.dashedLine([g.yb, 0], [g.yb, pressure], [10, 10]);
+            graph.dashedLine([g.yb, 1], [g.yb, pressure], [10, 10]);
+            graph.drawArrow([g.yb, .4], [g.yb, 0], { color: g.green, arrowSize: 10 });
         }
     }
     else { // vapour only
         g.vap = 1;
         g.yb = g.x_b;
 
+        stroke(g.green);
+        graph.dashedLine([g.yb, 1], [g.yb, pressure], [10, 10]);
+        graph.drawArrow([g.yb, .4], [g.yb, 0], { color: g.green, arrowSize: 10 });
     }
     pop();
 
@@ -117,7 +122,7 @@ function ybLabel() {
     let u = map(g.yb, 0, 1, graph.lx, graph.rx);
     push();
 
-    stroke('black'); fill(250);
+    stroke('black'); strokeWeight(2); fill(250);
     rect(u - 40, graph.by - 50, 80, 28);
 
     noStroke(); fill('black');
