@@ -26,14 +26,56 @@ function drawExtraGraphLabels() {
 }
 
 function drawEqm() {
-    let hline = liqLine();
-    graph.drawLine(hline);
-    graph.drawFunction(eqmCurve);
+    g.Pb = 10 ** (BENZ_ANT_A - BENZ_ANT_B / (g.temp + 273.15 + BENZ_ANT_C));
+    g.Pw = 10 ** (WATER_ANT_A - WATER_ANT_B / (g.temp + 273.15 + WATER_ANT_C));
+
+    graph.drawLine(liqLine());
+    graph.drawFunction(eqmCurve, 'black');
+
+    let pressure = getPressure();
+    push();
+    strokeWeight(2);
+    if (pressure >= g.Pw + g.Pb) { // 2 liq phases
+        g.vap = 0;
+
+        stroke(g.orange);
+        graph.dashedLine([0, pressure], [g.x_b, pressure], [10, 10]);
+        graph.dashedLine([1, 0], [1, pressure], [10, 10]);
+
+        stroke(g.blue);
+        graph.dashedLine([1, pressure], [g.x_b, pressure], [10, 10]);
+        graph.dashedLine([0, 0], [0, pressure], [10, 10]);
+    }
+    else if (pressure >= eqmCurve(g.x_b)) { // 1 liq 1 vap phase
+        function ybHelper(y) { return eqmCurve(y) - pressure };
+        if (g.x_b == .85) {
+            g.yb = secantMethod(ybHelper, .61, 1);
+
+            stroke(g.orange);
+            graph.dashedLine([g.yb, pressure], [g.x_b, pressure], [10, 10]);
+            graph.dashedLine([1, 0], [1, pressure], [10, 10]);
+
+            stroke(g.green);
+            graph.dashedLine([1, pressure], [g.x_b, pressure], [10, 10]);
+            graph.dashedLine([g.yb, 0], [g.yb, pressure], [10, 10]);
+        }
+        else {
+            g.yb = secantMethod(ybHelper, 0, .6);
+            console.log(g.yb);
+        }
+    }
+    else { // vapour only
+        g.vap = 1;
+        g.yb = g.x_b;
+
+    }
+    pop();
+
 
     push();
     noStroke(); fill('black');
-    let pt = graph.mapPoint(g.x_b, getPressure())
-    circle(pt[0], pt[1], 8);
+    let pt = graph.mapPoint(g.x_b, pressure)
+    circle(...pt, 8);
     pop();
 }
 
@@ -63,3 +105,4 @@ function drawPiston() {
 
     pop();
 }
+

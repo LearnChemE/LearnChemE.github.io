@@ -266,6 +266,10 @@ class P5_Graph {
         return [ihat, jhat];
     }
 
+    getMagnitude(vec) {
+        return Math.sqrt(vec[0] ** 2 + vec[1] ** 2);
+    }
+
     drawArrow(tail, head, options = {
         color: 'black',
         arrowSize: 12,
@@ -291,4 +295,46 @@ class P5_Graph {
         pop();
     }
 
+    // Dashed line function useful for creating lines in WEBGL mode
+    dashedLine(p1, p2, dashSettings) {
+        let dash = dashSettings[0];
+        let space = dash + dashSettings[1];
+
+        p1 = this.mapPoint(...p1);
+        p2 = this.mapPoint(...p2);
+
+        let dir = this.getDirection(p1, p2);
+        let dist = this.getMagnitude([p2[0] - p1[0], p2[1] - p1[1]]);
+
+        push();
+        let n = Math.floor(dist / space);
+        let i;
+        for (i = 0; i < n; i++) {
+            line(...p1, p1[0] + dir[0] * dash, p1[1] + dir[1] * dash);
+            p1 = [p1[0] + dir[0] * space, p1[1] + dir[1] * space];
+        }
+        line(...p1, ...p2);
+        pop();
+    }
+
+}
+
+// secant method for basic solving
+function secantMethod(func, x1 = 0, x2 = 1, tol = .01) {
+    let x0, n = 0, c;
+
+    if (func(x1) * func(x2) < 0) {
+        do {
+            x0 = (x1 * func(x2) - x2 * func(x1)) / (func(x2) - func(x1));
+            c = func(x1) * func(x0);
+            x1 = x2;
+            x2 = x0;
+            n++;
+
+            if (c == 0) break;
+            xm = (x1 * func(x2) - x2 * func(x1)) / (func(x2) - func(x1));
+        } while (Math.abs(xm - x0) >= tol);
+    }
+
+    return x0;
 }

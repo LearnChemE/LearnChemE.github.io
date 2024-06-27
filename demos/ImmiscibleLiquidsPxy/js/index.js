@@ -1,5 +1,12 @@
-PISTON = 0;
-BAR = 1;
+const PISTON = 0;
+const BAR = 1;
+
+const BENZ_ANT_A = 4.72583;
+const BENZ_ANT_B = 1660.652;
+const BENZ_ANT_C = -1.461;
+const WATER_ANT_A = 3.55959;
+const WATER_ANT_B = 643.748;
+const WATER_ANT_C = -198.043;
 
 window.g = {
     cnv: undefined,
@@ -8,6 +15,7 @@ window.g = {
 
     orange: [230, 100, 0],
     blue: [0, 0, 255],
+    green: [0, 150, 0],
 
     display: PISTON,
     temp: 122,
@@ -16,6 +24,11 @@ window.g = {
     labels: false,
 
     pistonHeightMax: 60,
+    Pb: 3,
+    Pw: 2,
+
+    vap: 0,
+    yb: 0,
 }
 
 function preload() {
@@ -68,19 +81,23 @@ pistSlider.addEventListener("input", function () {
 })
 
 function liqLine() {
-    return [(g.temp - 125) / 20 * 2.5 + 5.75, 0];
+    // return [(g.temp - 125) / 20 * 2.5 + 5.75, 0];
+    return [g.Pb + g.Pw, 0]
 }
 
 function eqmCurve(x) {
-    let y;
-    let s = (g.temp - 105) / 20;
-    if (x <= .6) {
-        y = 4 + 2 * (x - 2) + 6.22 * x ** 2; // 6.31
-    }
-    else {
-        y = 1.14 + 3 * (1 - x) + 6.875 * (1 - x) ** 2; // 3.45
-    }
-    return y * (s * .4 + .60) + 1.11 * s + 1.2;
+    // let y;
+    // let s = (g.temp - 105) / 20;
+    // if (x <= .6) {
+    //     y = 4 + 2 * (x - 2) + 6.22 * x ** 2; // 6.31
+    // }
+    // else {
+    //     y = 1.14 + 3 * (1 - x) + 6.875 * (1 - x) ** 2; // 3.45
+    // }
+    // return y * (s * .4 + .60) + 1.11 * s + 1.2;
+
+
+    return Math.min(g.Pw / (1 - x), g.Pb / x);
 }
 
 function getPressure() {
