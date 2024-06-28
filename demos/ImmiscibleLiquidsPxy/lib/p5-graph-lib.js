@@ -52,13 +52,13 @@ class P5_Graph {
     /* ************************** */
 
     // Call this every draw loop to render the graph with p5
-    on_draw() {
-        this.clear();
+    on_draw(clearCnv = false) {
+        if (clearCnv) this._clear();
         this.drawAxesAndBounds();
         this.drawGraphTicks();
     }
 
-    clear() {
+    _clear() {
         push();
         noStroke(); fill(this.options.fill);
         rect(0, 0, this.width, this.height);

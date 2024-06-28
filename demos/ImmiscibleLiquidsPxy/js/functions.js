@@ -88,7 +88,6 @@ function drawEqm() {
     }
     pop();
 
-    g.press = pressure;
 }
 
 function drawPiston() {
@@ -116,6 +115,10 @@ function drawPiston() {
     pop();
 
     pop();
+}
+
+function drawBarGraph() {
+
 }
 
 function ybLabel() {

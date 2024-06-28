@@ -52,7 +52,9 @@ const graph = new P5_Graph(g.width, g.height, {
     yTitle: 'pressure (bar)',
 
     yTickCount: 35,
-}, [0, 1], [0, 7])
+}, [0, 1], [0, 7]);
+
+const barGraph = new P5_Graph(g.width, g.height, {});
 
 function draw() {
     background(250);
@@ -64,17 +66,22 @@ function draw() {
     drawEqm();
 
     push();
-    if (g.yb != 0) ybLabel();
+    translate(0, 0, 1);
+
     noStroke(); fill('black');
     let pt = graph.mapPoint(g.x_b, g.press)
-    circle(...pt, 8);
+    console.log(pt)
+    circle(...pt, 10);
+    if (g.yb != 0) ybLabel();
     pop();
 
     pop();
 
+    if (g.display == PISTON)
+        drawPiston();
+    else
+        drawBarGraph();
 
-
-    drawPiston();
 }
 
 const tempSlider = document.getElementById("temp-slider");
@@ -124,5 +131,6 @@ function getPressure() {
         }
         else p = p - buffer;
     }
+    g.press = p;
     return p;
 }
