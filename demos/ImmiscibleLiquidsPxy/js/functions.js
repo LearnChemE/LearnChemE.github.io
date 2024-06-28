@@ -33,11 +33,11 @@ function drawEqm() {
     graph.drawFunction(eqmCurve, 'black');
 
     let pressure = getPressure();
+    let tripleGuess = map(g.temp, 105, 125, .68, .62);
     push();
     strokeWeight(2);
     if (pressure >= g.Pw + g.Pb) { // 2 liq phases
-        g.vap = 0;
-        g.yb = 0;
+        g.yb = tripleGuess;
 
         stroke(g.orange);
         graph.dashedLine([0, pressure], [g.x_b, pressure], [10, 10]);
@@ -49,10 +49,11 @@ function drawEqm() {
     }
     else if (pressure >= eqmCurve(g.x_b)) { // 1 liq 1 vap phase
         function ybHelper(y) { return eqmCurve(y) - pressure };
-        let tripleGuess = map(g.temp, 105, 125, .68, .62);
 
         if (g.x_b == .85) {
             if ((g.yb = secantMethod(ybHelper, map(g.temp, 105, 125, .68, .62), 1)) == undefined) g.yb = tripleGuess;
+
+            g.vap = .15 / (1 - g.yb);
 
             stroke(g.orange);
             graph.dashedLine([g.yb, pressure], [g.x_b, pressure], [10, 10]);
@@ -67,6 +68,8 @@ function drawEqm() {
         else {
             tripleGuess -= .01;
             if ((g.yb = secantMethod(ybHelper, 0, tripleGuess)) == undefined) g.yb = tripleGuess;
+
+            g.vap = g.x_b / g.yb;
 
             stroke(g.blue);
             graph.dashedLine([g.yb, pressure], [g.x_b, pressure], [10, 10]);
@@ -97,15 +100,61 @@ function drawPiston() {
     ambientLight(25);
     directionalLight(255, 255, 255, 0, 0, -1);
 
+    const PIST_BASE = 100;
     let s = 1 - g.pistonHeight / g.pistonHeightMax;
+    let pistCiel = (s * 180 - 75);
+    let x;
+    if (g.x_b != .85)
+        x = g.x_b - g.vap * (g.x_b + g.yb);
+    else
+        x = g.x_b - g.vap * (g.x_b + g.yb);
+    if (x < 0) x = 0;
+    let liq = 1 - g.vap;
+
+    let liqHeight = liq / (liq + 10 * g.vap) * (PIST_BASE - pistCiel);
+    let waterHeight = liqHeight * (1 - x);
+    let benzHeight = liqHeight - waterHeight;
+    let vapHeight = PIST_BASE - pistCiel - liqHeight;
+
     // Piston arm
     push();
-    translate(0, s * 80 - 100, 0);
+    translate(0, s * 90 - 100, 0);
     fill(100, 100, 100);
-    cylinder(10, s * 160 + 50, 24, 1);
+    cylinder(10, s * 180 + 48, 24, 1);
+    pop();
 
-    translate(0, s * 80 + 20, 0);
-    cylinder(28, 18, 24, 1);
+    push();
+    translate(0, pistCiel - 10, 0);
+    cylinder(28, 20, 24, 1);
+    pop();
+
+    push();
+    translate(0, 100, 0);
+    ambientLight(100);
+
+
+    if (waterHeight > 0) {
+        push();
+        translate(0, -waterHeight / 2, 0);
+        fill(g.blue);
+        cylinder(28, waterHeight);
+        pop();
+    }
+    if (benzHeight > 0) {
+        push();
+        fill(g.orange);
+        translate(0, -waterHeight - benzHeight / 2, 0);
+        cylinder(28, benzHeight);
+        pop();
+    }
+    if (vapHeight > 0) {
+        push();
+        fill(0, 200, 0, 150);
+        translate(0, -waterHeight - benzHeight - vapHeight / 2, 0);
+        cylinder(28, vapHeight);
+        pop();
+    }
+
     pop();
 
     // outline needs to be drawn last
@@ -114,11 +163,26 @@ function drawPiston() {
     cylinder(30, 200, 24, 1, false, true);
     pop();
 
+    // rims
+    push();
+    translate(0, -100);
+    noFill(); stroke(100, 100, 100); strokeWeight(2);
+    cylinder(31, 0, 24, 1);
+    translate(0, 200);
+    fill(100, 100, 100);
+    cylinder(31, 0);
     pop();
+
 }
 
 function drawBarGraph() {
+    barGraph.on_draw();
 
+    push();
+    translate(660, 20, 1)
+    fill('black'); textSize(20); textAlign(CENTER, CENTER);
+    text('moles of each phase', 0, 0);
+    pop();
 }
 
 function ybLabel() {

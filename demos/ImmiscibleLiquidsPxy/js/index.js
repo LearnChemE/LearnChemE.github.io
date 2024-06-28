@@ -24,12 +24,13 @@ window.g = {
     press: 6,
     labels: false,
 
-    pistonHeightMax: 60,
+    pistonHeightMax: 100,
     Pb: 3,
     Pw: 2,
 
     vap: 0,
     yb: 0,
+
 }
 
 function preload() {
@@ -54,7 +55,17 @@ const graph = new P5_Graph(g.width, g.height, {
     yTickCount: 35,
 }, [0, 1], [0, 7]);
 
-const barGraph = new P5_Graph(g.width, g.height, {});
+const barGraph = new P5_Graph(g.width, g.height, {
+    padding: [
+        [graph.rx + 50, 40],
+        [20, 80]
+    ],
+    xTickEvery: 1,
+    xTickCount: 4,
+    yLabelPrecision: 1,
+    yTickCount: 25,
+    disableXLabels: true,
+}, [0, 4], [0, 1]);
 
 function draw() {
     background(250);
@@ -69,18 +80,34 @@ function draw() {
     translate(0, 0, 1);
 
     noStroke(); fill('black');
-    let pt = graph.mapPoint(g.x_b, g.press)
-    console.log(pt)
+    let pt = graph.mapPoint(g.x_b, g.press);
     circle(...pt, 10);
     if (g.yb != 0) ybLabel();
     pop();
 
     pop();
 
-    if (g.display == PISTON)
+    if (g.display == PISTON) {
         drawPiston();
-    else
+
+        // text label
+        push();
+        textFont(font);
+        translate(0, 0, 1);
+        fill('black');
+        noStroke();
+        textSize(24); textAlign(CENTER, CENTER);
+        text('log volume', 0, 130);
+        pop();
+
+    }
+    else {
+        push();
+        textFont(font);
+        translate(-400, -240);
         drawBarGraph();
+        pop();
+    }
 
 }
 
@@ -120,13 +147,25 @@ function eqmCurve(x) {
 }
 
 function getPressure() {
-    let p = 1.5 * (g.temp + 273) / (g.pistonHeight + 50) - 3;
+    let p = 2 * (g.temp + 273) / (g.pistonHeight + 50) - 4.2;
     let bubble = g.Pw + g.Pb;
+    let x_triple = map(g.temp, 105, 125, .68, .62);
+
     if (p > bubble) {
-        let buffer = .95;
-        g.vap = (p - buffer) / p;
+        let buffer = 3;
+        g.vap = 0;
 
         if (p - buffer < bubble) {
+
+            if (g.x_b == .85) {
+                let maxVap = (1 - g.x_b) / (1 - x_triple)
+                g.vap = map(p - bubble, buffer, 0, 0, maxVap);
+            }
+            else {
+                let maxVap = g.x_b / x_triple;
+                g.vap = map(p - bubble, buffer, 0, 0, maxVap);
+            }
+
             p = bubble;
         }
         else p = p - buffer;
