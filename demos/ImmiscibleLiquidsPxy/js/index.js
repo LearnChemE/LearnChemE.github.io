@@ -23,6 +23,7 @@ window.g = {
     pistonHeight: 10,
     press: 6,
     labels: false,
+    targetHeight: 10,
 
     pistonHeightMax: 100,
     Pb: 3,
@@ -68,6 +69,8 @@ const barGraph = new P5_Graph(g.width, g.height, {
 }, [0, 4], [0, 1]);
 
 function draw() {
+    g.pistonHeight = lerp(g.pistonHeight, g.targetHeight, .2);
+
     background(250);
     push();
     translate(-400, -240);
@@ -82,7 +85,7 @@ function draw() {
     noStroke(); fill('black');
     let pt = graph.mapPoint(g.x_b, g.press);
     circle(...pt, 10);
-    if (g.yb != 0) ybLabel();
+    if (g.press <= g.Pw + g.Pb) ybLabel();
     pop();
 
     pop();
@@ -123,7 +126,7 @@ tempSlider.addEventListener("input", function () {
 })
 
 pistSlider.addEventListener("input", function () {
-    g.pistonHeight = Number(pistSlider.value);
+    g.targetHeight = Number(pistSlider.value);
 })
 
 function liqLine() {

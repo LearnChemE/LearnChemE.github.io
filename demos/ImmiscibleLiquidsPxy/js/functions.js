@@ -23,6 +23,40 @@ function drawExtraGraphLabels() {
     text('b', graph.lx - 8, graph.by + 67);
     text('b', graph.rx - 8, graph.by + 42);
     pop();
+
+    push();
+    translate(0, 0, 1);
+    textSize(22);
+    if (g.labels) {
+        let bubble = map(g.Pb + g.Pw, 0, 7, graph.by, graph.ty);
+
+        fill(250);
+        rect(graph.rx - 100, bubble + 3, 88, 43);
+
+        fill('black');
+        text('+', graph.lx + 68, graph.ty + 23);
+        text('+', graph.lx + 68, bubble + 23);
+        text('+', graph.rx - 90, bubble + 43);
+
+        fill(g.blue);
+        text('water', graph.lx + 5, graph.ty + 23);
+        text('water', graph.lx + 5, bubble + 23);
+
+        fill(g.orange);
+        text('benzene', graph.lx + 85, graph.ty + 23);
+        text('benzene', graph.rx - 100, bubble + 23);
+
+        fill(g.green);
+        text('vapor', graph.rx - 80, graph.by - 8);
+        text('vapor', graph.lx + 85, bubble + 23);
+        text('vapor', graph.rx - 73, bubble + 43);
+    }
+    else {
+        fill(100, 100, 100);
+        text('two immiscible liquids', graph.lx + 5, graph.ty + 23);
+        text('vapor', graph.rx - 80, graph.by - 8);
+    }
+    pop();
 }
 
 function drawEqm() {
@@ -46,6 +80,12 @@ function drawEqm() {
         stroke(g.blue);
         graph.dashedLine([1, pressure], [g.x_b, pressure], [10, 10]);
         graph.dashedLine([0, 0], [0, pressure], [10, 10]);
+
+        if (pressure == g.Pw + g.Pb) {
+            stroke(g.green);
+            graph.dashedLine([tripleGuess, 1], [tripleGuess, pressure], [10, 10]);
+            graph.drawArrow([tripleGuess, .4], [tripleGuess, 0], { color: g.green, arrowSize: 10 });
+        }
     }
     else if (pressure >= eqmCurve(g.x_b)) { // 1 liq 1 vap phase
         function ybHelper(y) { return eqmCurve(y) - pressure };
@@ -105,10 +145,10 @@ function drawPiston() {
     let pistCiel = (s * 180 - 75);
     let x;
     if (g.x_b != .85)
-        x = g.x_b - g.vap * (g.x_b + g.yb);
+        x = (g.x_b - g.yb * g.vap) / (1 - g.vap);
     else
-        x = g.x_b - g.vap * (g.x_b + g.yb);
-    if (x < 0) x = 0;
+        x = (g.x_b - g.yb * g.vap) / (1 - g.vap);
+    if (x < 0 || x != x) x = 0;
     let liq = 1 - g.vap;
 
     let liqHeight = liq / (liq + 10 * g.vap) * (PIST_BASE - pistCiel);
@@ -116,7 +156,9 @@ function drawPiston() {
     let benzHeight = liqHeight - waterHeight;
     let vapHeight = PIST_BASE - pistCiel - liqHeight;
 
+    console.log(x)
     // Piston arm
+
     push();
     translate(0, s * 90 - 100, 0);
     fill(100, 100, 100);
@@ -157,7 +199,7 @@ function drawPiston() {
 
     pop();
 
-    // outline needs to be drawn last
+    // outline 
     push();
     fill(255, 255, 255, 100);
     cylinder(30, 200, 24, 1, false, true);
@@ -179,9 +221,67 @@ function drawBarGraph() {
     barGraph.on_draw();
 
     push();
-    translate(660, 20, 1)
+    translate(660, 20, 1);
     fill('black'); textSize(20); textAlign(CENTER, CENTER);
     text('moles of each phase', 0, 0);
+
+    translate(0, 410);
+    push();
+    translate(-70, 0, 0);
+    rotate(radians(-60));
+    text('water', 0, 0);
+    fill(100, 100, 100);
+    text('(liquid)', 0, 17);
+    pop();
+
+    push();
+    translate(-5, 0, 0);
+    rotate(radians(-60));
+    text('benzene', -5, 0);
+    fill(100, 100, 100);
+    text('(liquid)', 0, 17);
+    pop();
+
+    push();
+    translate(50, 0, 0);
+    rotate(radians(-60));
+    text('vapor', 0, 0);
+    pop();
+
+    pop();
+
+    let x;
+    if (g.x_b != .85)
+        x = (g.x_b - g.yb * g.vap) / (1 - g.vap);
+    else
+        x = (g.x_b - g.yb * g.vap) / (1 - g.vap);
+
+    let vapHeight = g.vap
+    let benzHeight = x * (1 - vapHeight);
+    let waterHeight = 1 - vapHeight - benzHeight;
+
+    let blue = barGraph.mapPoint(.6, waterHeight);
+    let orange = barGraph.mapPoint(1.6, benzHeight);
+    let green = barGraph.mapPoint(2.6, vapHeight)
+    let graphHeight = barGraph.by - barGraph.ty;
+
+    push();
+    // stroke('black'); strokeWeight(2);
+
+    if (waterHeight > 0) {
+        fill(g.blue);
+        rect(...blue, 48, waterHeight * graphHeight);
+    }
+
+    if (benzHeight > 0) {
+        fill(g.orange);
+        rect(...orange, 48, benzHeight * graphHeight);
+    }
+
+    if (vapHeight > 0) {
+        fill(g.green);
+        rect(...green, 48, vapHeight * graphHeight);
+    }
     pop();
 }
 

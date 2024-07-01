@@ -76,7 +76,7 @@ $(() => {
     });
 
     resetBtn.click(() => {
-        g.pistonHeight = 10;
+        g.targetHeight = 10;
         document.getElementById("piston-slider-form").reset();
     });
 });
