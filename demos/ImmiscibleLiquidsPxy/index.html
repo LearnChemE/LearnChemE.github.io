@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation, PFR">
+    <meta name="author" content="Drew Smith">
+    <meta name="application-name" content="LearnChemE Reversible Adiabatic PFR">
+    <!-- Libs -->
+    <script src="lib/p5.js"></script>
+    <script src="lib/p5-graph-lib.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="lib/bootstrap.min.css">
+    <script>
+        MathJax = {
+            chtml: {
+                scale: 0.95,
+                mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+                displayAlign: 'left', // default for indentalign when set to 'auto'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Style sheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/sliders.css">
+
+    <title>Immiscible Liquids Pxy</title>
+</head>
+
+<body>
+    <div class="buttons-container">
+        <button type="button" id="dir-btn" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#directionsModal">Directions</button>
+        <button type="button" id="det-btn" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#detailsModal">Details</button>
+        <button type="button" id="abt-btn" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#aboutModal">About</button>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-bar-left">
+            <div id="display-btn-wrapper">
+                <button type="button" id="piston-btn" class="btn btn-success">piston-cylinder</button>
+                <button type="button" id="bar-btn" class="btn btn-outline-success">amounts of each phase</button>
+            </div>
+            <div class="slider-wrapper" id="temp-slider-wrapper">
+                <div class="slider-label">temperature (°C)</div>
+                <input type="range" id="temp-slider" min="105" max="125" value="122" step="1">
+                <div class="slider-val-label" id="temp-slider-label">122</div>
+            </div>
+        </div>
+
+        <div class="nav-bar-right">
+            <button type="button" id="label-btn" class="btn btn-outline-secondary">show labels</button>
+            <div class="buttons-container" id="labelled-btn-container">
+                <div id="comp-label">benzene mole fraction</div>
+                <button type="button" id="comp-btn-lo" class="btn btn-success">0.25</button>
+                <button type="button" id="comp-btn-md" class="btn btn-outline-success">0.60</button>
+                <button type="button" id="comp-btn-hi" class="btn btn-outline-success">0.85</button>
+            </div>
+        </div>
+    </div>
+
+    <form action="reset" id="piston-slider-form">
+        <div class="slider-wrapper" id="piston-slider-wrapper">
+            <div class="slider-label">piston height</div>
+            <input type="range" id="piston-slider" min="10" max="100" value="0" step=".5">
+            <button type="button" id="reset-piston-btn" class="btn btn-outline-danger">reset piston height</button>
+        </div>
+    </form>
+
+    <div id="graphics-wrapper"></div>
+
+    <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>The pressure-composition phase diagram for two immiscible liquids, benzene and water, is at
+                        constant temperature. Set the temperature with a slider to change the saturation pressures. Set
+                        the overall benzene mole fraction with buttons on the right. The bar graph shows the moles of
+                        liquid water
+                        (blue), liquid benzene (orange) and vapor (green), which contains both components. The system
+                        contains one mole total. You can change the piston height to change the pressure and the amounts
+                        of each phase. At a given temperature, all three phases co-exist at only one pressure. When the
+                        piston height increases at this pressure, one of the liquid phases completely evaporates before
+                        the pressure decreases. Select "piston-cylinder" instead of "amounts of each phase" to view a
+                        representation of a piston-cylinder with the volume of each phase on a log scale.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Immiscible components do not mix in the liquid phase, and each exerts its own saturation
+                        pressure \(P_b^\text{sat}\) and \(P_w^\text{sat}\) when present as a liquid; the
+                        subscripts \(b\) and \(w\) refer to benzene and water. The total pressure \(P\) above the two
+                        immiscible
+                        liquids is equal to the sum of their saturation pressures:
+                        $$P_i^\text{sat}=10^{(A_i-\frac{B_i}{T+C_i})},$$
+                        where \(A_i\), \(B_i\), and \(C_i\) are Antoine constants for component \(i=(b,w)\),
+                        and \(T\) is temperature (°C).
+                    </p>
+                    <p>For the benzene-water system, for conditions where benzene condenses, the dew point curve is:
+                        $$P=P_b^\text{sat}/y_b ,$$
+                        where \(y_b\) is the mole fraction of benzene in the vapor phase.
+                    </p>
+                    <p>For conditions where water condenses, the dew point curve is:
+                        $$P=P_w^\text{sat}/y_w ,$$
+                        where \(y_w\) is the mole fraction of water in the vapor phase.
+                    </p>
+                    <p>The screencast video at [1] explains how to use this Demonstration.</p>
+                    <h6>Reference</h6>
+                    <p>[1] Immiscible Liquids on a Pressure-Composition Diagram.
+                        <a
+                            href="http://www.learncheme.com/simulations/thermodynamics/thermo-2/immiscible-liquids-on-pxy-diagram">http://www.learncheme.com/simulations/thermodynamics/thermo-2/immiscible-liquids-on-pxy-diagram</a>.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutModalLabel">About</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This simulation was created in the <a href="https://www.colorado.edu/chbe"
+                            target="_blank">Department of
+                            Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+                            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under
+                        the direction of
+                        Professor John L. Falconer and was converted to HTML5 by Drew Smith. This simulation was
+                        prepared with financial support from the
+                        National Science Foundation. Address any questions or comments to learncheme@gmail.com. All of
+                        our
+                        simulations are open source, and are available on our <a
+                            href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+                            repository</a>.</p>
+                    <p style="line-height: 3rem;">
+                        If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                                src="https://learncheme.github.io/media/command.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on
+                        Mac
+                        or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on
+                        Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on
+                        Mac
+                        or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on
+                        Windows.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script src="js/index.js"></script>
+<script src="js/functions.js"></script>
+<script src="js/buttons.js"></script>
