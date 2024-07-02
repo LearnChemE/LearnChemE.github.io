@@ -67,7 +67,7 @@ function drawEqm() {
     graph.drawFunction(eqmCurve, 'black');
 
     let pressure = getPressure();
-    let tripleGuess = map(g.temp, 105, 125, .68, .62);
+    let tripleGuess = map(g.temp, 105, 125, .685, .61);
     push();
     strokeWeight(2);
     if (pressure >= g.Pw + g.Pb) { // 2 liq phases
