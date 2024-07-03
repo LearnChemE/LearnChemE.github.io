@@ -51,7 +51,7 @@ window.changeChart = () => {
 
 window.updateTemperature = (value) => {
   document.getElementById('temperatureValue').innerText = value;
-  T = value;
+  T = parseFloat(value);
   performComputation(false, true, false);
 }
 
@@ -74,31 +74,41 @@ function performComputation(isPChanged, isTChanged, isChartChanged, elementChang
   if (isChartChanged) {
     updatePressure(5);
   }
+
   if (isTemperatureSelected) {
     document.getElementById("temperatureDiv").style.display = "block";
+
+
     outputValues = calculateOutput(T, P);
+
+
+
     if (!elementChange) {
       updateBarChart(selectedLabels, outputValues, isPChanged || isTChanged);
-    }
-    else {
+    } else {
       let arrayList = calculateOutput(T, 5);
-      let finalList = []
+      let finalList = [];
+
       for (let i = 0; i < arrayList.length; i++) {
         if (selectedLabels[Object.keys(selectedLabels)[i]]) {
-          finalList.push(arrayList[i])
+          finalList.push(arrayList[i]);
         }
       }
-      let maxOutputValue = finalList.flat().reduce((a, b) => Math.max(a, b));
+
+      let maxOutputValue = Math.max(...finalList.flat());
       updateBarChart(selectedLabels, outputValues, isPChanged || isTChanged, maxOutputValue);
     }
+
     barChart.update();
 
-  }
-  else {
+  } else {
     outputValues = calculateContinousOutput(T, P);
+
+
+
     document.getElementById("temperatureDiv").style.display = "none";
-    var maxValue = calculateContinousOutput(T, 5).flat().reduce((a, b) => Math.max(a, b));
-    console.log(maxValue)
+    var maxValue = Math.max(...calculateContinousOutput(T, 5).flat());
+    console.log(maxValue);
     updateLineChart(selectedLabels, outputValues, isPChanged);
     lineChart.update();
   }
