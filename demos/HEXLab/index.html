@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation, PFR">
+    <meta name="author" content="Drew Smith">
+    <meta name="application-name" content="LearnChemE HEX Lab">
+    <!-- Libs -->
+    <script src="lib/p5.js"></script>
+    <script src="lib/p5-graph-lib.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="lib/bootstrap.min.css">
+    <script>
+        MathJax = {
+            chtml: {
+                scale: 0.95,
+                mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+                displayAlign: 'left', // default for indentalign when set to 'auto'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Style sheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/sliders.css">
+
+    <title>Heat Exchanger Virtual Lab</title>
+</head>
+
+<body>
+    <div class="nav-bar">
+        <div class="nav-bar-column" id="nav-bar-left">
+            <div class="button-container">
+                <div id="hex-type-label">heat exchanger type</div>
+                <button type="button" id="double-tube-btn" class="btn btn-primary">Double Tube</button>
+                <button type="button" id="shell-tube-btn" class="btn btn-outline-primary">Shell and Tube</button>
+            </div>
+            <div class="slider-wrapper" id="flow-slider-wrapper">
+                <div class="slider-label">flowrate</div>
+                <input type="range" id="temp-slider" min="105" max="125" value="122" step="1">
+                <div class="slider-val-label" id="temp-slider-label">10</div>
+            </div>
+        </div>
+        <div class="nav-bar-column" id="nav-bar-right"></div>
+    </div>
+
+    <div id="graphics-wrapper"></div>
+</body>
+
+</html>
+
+<script src="js/index.js"></script>
+<script src="js/functions.js"></script>
