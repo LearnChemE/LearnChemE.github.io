@@ -52,6 +52,12 @@ canvas {
     margin-bottom: 0.5em;
 }
 
+#hex-btn-container {
+    grid-template-columns: 100px 100px;
+    justify-self: center;
+    gap: 20px;
+}
+
 .slider-wrapper {
     display: grid;
     justify-self: baseline;

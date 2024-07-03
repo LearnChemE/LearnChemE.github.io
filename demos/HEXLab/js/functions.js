@@ -1,3 +1,7 @@
+/* ********************************************* */
+/* *************** GRAPHICS ******************** */
+/* ********************************************* */
+
 function doubleTubeGraphic(w, h) {
     let lx = 50, rx = 450;
     let ty = 50, by = 350;
@@ -100,6 +104,124 @@ function drawArrow(graphicsObject, tail, head, options = {
     dt.pop();
 }
 
+function shellTubeGraphic(w, h) {
+    background(250);
+    push();
+    rotateY(g.rotX);
+    rotateX(-g.rotY);
+    ambientLight(100);
+    directionalLight(255, 255, 255, -1, -1, -1);
+
+    let bw = 500;
+    let bh = 250;
+    let bt = 50;
+    let pad = 4;
+
+    shellOrangeGraphic(bw, bh, bt, pad);
+    shellBlueGraphic(bw, bh, bt, pad);
+
+    shellOuterGraphic(bw, bh, bt, pad);
+
+    pop();
+
+}
+
+function shellOuterGraphic(bw, bh, bt, pad) {
+    fill(250, 250, 250, 50);
+    box(bw, bh, bt);
+
+    // pipes
+    push();
+    translate(-bw / 2 + bt / 2, -bh / 2 - 25, 0); noStroke();
+    cylinder(12 + pad, 52);
+    translate(bt, 0, 0);
+    cylinder(12 + pad, 52);
+    translate(-bt, bh + 50, 0);
+    cylinder(12 + pad, 52);
+    pop();
+    push();
+    translate(bw / 2 - 77, bh / 2 + 25, 0); noStroke();
+    cylinder(12 + pad, 52); // bottom right
+    pop();
+}
+
+function shellOrangeGraphic(bw, bh, bt, pad) {
+    push();
+    fill(g.orangeFluidColor); noStroke();
+
+    push();
+    translate(-bw / 2 + bt / 2, 0, 0);
+    box(bt - pad, bh - pad, bt - pad);
+    translate(0, -bh / 2 - 25, 0);
+    cylinder(12, 50);
+    translate(0, bh + 50, 0);
+    cylinder(12, 50);
+    pop();
+
+    push();
+    translate(bw / 2 - bt / 2, 0, 0);
+    box(bt - pad, bh - pad, bt - pad);
+    pop();
+
+    push();
+    translate(0, -100, 0);
+    rotateZ(radians(90));
+
+    for (let i = 0; i < 4; i++) {
+        cylinder(12, 408);
+        translate(bh / 4 + pad, 0, 0);
+    }
+    pop();
+
+    pop();
+}
+
+function shellBlueGraphic(bw, bh, bt, pad) {
+    push();
+    fill(g.blueFluidColor); noStroke();
+    translate(-bw / 2 + 3 * bt / 2, 0, 0);
+
+    // top left box and pipe
+    push();
+    translate(0, -bh / 8, 0);
+    box(bt - pad, bh * 3 / 4 - pad, bt - pad);
+    translate(0, -bh / 2 + 6, 0);
+    cylinder(12, 50);
+    pop();
+
+    // middle boxes
+    push();
+    // middle connecting boxes
+    for (let i = 0; i < 5; i++) {
+        translate(bt + 2 * pad, 0, 0);
+        box(bt - pad, bh / 2 - pad, bt - pad);
+    }
+    // bottom right box
+    translate(bt + 2 * pad, bh / 8, 0);
+    box(bt - pad, bh * 3 / 4 - pad, bt - pad);
+    translate(0, bh / 2 - 6, 0);
+    cylinder(12, 50);
+    pop();
+
+    push();
+    translate(bt / 2 + pad, 3 * bh / 8 - pad, 0);
+    for (let i = 0; i < 3; i++) {
+        box(2 * bt + pad, bh / 4, bt - pad);
+        translate(2 * bt + pad * 4, 0, 0);
+    }
+    pop();
+
+    push()
+    translate(bt * 3 / 2 + pad * 3, -3 * bh / 8 + 2, 0);
+    for (let i = 0; i < 3; i++) {
+        box(2 * bt + pad, bh / 4, bt - pad);
+        translate(2 * bt + pad * 4, 0, 0);
+    }
+    pop();
+
+    pop();
+}
+
 // Dashed line function useful for creating lines in WEBGL mode
 function dashedLine(p1, p2, dashSettings) {
     let dash = dashSettings[0];
@@ -129,3 +251,56 @@ function getDirection(p1, p2) {
     return [ihat, jhat];
 }
 
+function effectiveness(cmin, cmax) {
+    let C = cmin / cmax;
+    let NTU = g.UA / cmin;
+
+    if (C == 1) return NTU / (1 + NTU); // This is the limit so it doesnt become NaN
+    else return (1 - Math.exp(-NTU * (1 - C))) / (1 - C * Math.exp(-NTU * (1 - C)));
+}
+
+function heatTransferRate() {
+    let cmin = g.cpH * g.mDotH;
+    let cmax = g.cpC * g.mDotC;
+
+    if (cmin > cmax) { // Swap if need be
+        let tmp = cmin;
+        cmin = cmax;
+        cmax = tmp;
+    }
+
+    let epsilon = effectiveness(cmin, cmax);
+    let QdotMax = cmin * (g.Th_in - g.Tc_in);
+    g.Qdot = epsilon * QdotMax;
+
+    g.Th_out = g.Th_in - g.Qdot / g.cpH / g.mDotH;
+    g.Tc_out = g.Tc_in + g.Qdot / g.cpC / g.mDotC;
+}
+
+function extraLabels() {
+    l = createGraphics(600, 450);
+    l.push();
+
+    l.textSize(20);
+    l.text('T    = ' + g.Th_in.toFixed(1) + ' K', 456, 120);
+    l.text('ṁ  = ' + g.mDotH.toFixed(1) + ' g / s', 463, 145);
+    l.text('T     = ' + g.Th_out.toFixed(1) + ' K', 452, 320);
+
+    l.text('T      = ' + g.Tc_out.toFixed(1) + ' K', 266, 40);
+    l.text('T    = ' + g.Tc_in.toFixed(1) + ' K', 270, 370);
+    l.text('ṁ  = ' + g.mDotC.toFixed(1) + ' g / s', 277, 395);
+
+    l.text('Q̇ = ' + g.Qdot.toFixed(1) + ' W', 100, 385);
+
+    l.textSize(14);
+    l.text('h,in', 466, 125);
+    l.text('h', 480, 150);
+    l.text('h,out', 461, 325);
+    l.text('c,out', 277, 45);
+    l.text('c,in', 280, 375);
+    l.text('c', 294, 400);
+
+    l.pop();
+
+    return l;
+}
