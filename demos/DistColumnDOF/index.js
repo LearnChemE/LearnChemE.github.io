@@ -25,6 +25,7 @@ let textElements = [
     { mainText: '   x \n 1-x ', sub: '3,A \n \n 3,A', x: 320, y: 530, size: 20, xsub: 5, altText: '   x \n   x', altSub: '3,A \n \n3,B' },
 ];
 
+
 function shuffleArray(array) {
     console.log('shuffling');
     for (let i = array.length - 1; i > 0; i--) {
@@ -65,6 +66,7 @@ unknowns.addEventListener("input", function () {
     // drawVar(unk);
 });
 
+
 import { drawRectangle, drawArrow, drawBorder, drawText, drawSub } from './functions.mjs';
 
 function drawTextElements(nUnknowns) {
@@ -82,6 +84,8 @@ function drawTextElements(nUnknowns) {
         drawSub(element.mainText, element.sub, element.x, element.y, element.size, element.xsub, element.altText, element.altSub, g.showZb);
     }
     pop();
+
+
 }
 
 function drawDisplay(value) {
@@ -109,7 +113,7 @@ function drawDisplay(value) {
         case 'distillation column':
             borderVars = [100, 120, 200, 380, 10, 'green'];
             colcon = 'green';
-            colreb = 'green';
+            colreb = 'green';<<<<<<< dof-dist
             coltot = 'green';
 
             break;
