@@ -150,9 +150,14 @@ function shellOrangeGraphic(bw, bh, bt, pad) {
     fill(g.orangeFluidColor); noStroke();
 
     push();
-    translate(-bw / 2 + bt / 2, 0, 0);
-    box(bt - pad, bh - pad, bt - pad);
-    translate(0, -bh / 2 - 25, 0);
+
+    translate(-bw / 2 + bt / 2, -bh / 4, 0);
+    box(bt - pad, bh / 2 - pad, bt - pad);
+    translate(0, bh / 2, 0);
+    box(bt - pad, bh / 2 - pad, bt - pad);
+
+
+    translate(0, -bh * 3 / 4 - 25, 0);
     cylinder(12, 50);
     translate(0, bh + 50, 0);
     cylinder(12, 50);
@@ -303,4 +308,72 @@ function extraLabels() {
     l.pop();
 
     return l;
+}
+
+function shellTubeLabels() {
+    let bounds;
+
+    rotateY(g.rotX);
+    rotateX(-g.rotY);
+
+    push();
+    translate(-220, -95, 0);
+    textSize(20);
+    stroke('black'); strokeWeight(2); fill(250);
+
+    bounds = font.textBounds('T    = ' + g.Th_in.toFixed(1), 0, 0, 20);
+    rect(bounds.x - 4, bounds.y - 2, bounds.w + 8, bounds.h + 68);
+
+    push();
+    translate(0, 0, 1);
+    fill('black'); noStroke();
+    text('T    = ' + g.Th_in.toFixed(1), 0, 0);
+    text('m  = ' + g.mDotH.toFixed(1), 0, 20);
+    text('.', 6, 8);
+    text('T    = ' + g.Tc_in.toFixed(1), 0, 40);
+    text('m  = ' + g.mDotC.toFixed(1), 0, 60);
+    text('.', 6, 48);
+    textSize(12);
+    text('h,in', 10, 3);
+    text('h', 17, 23);
+    text('c,in', 10, 43);
+    text('c', 17, 63);
+    pop();
+
+    translate(0, 195, 0);
+    bounds = font.textBounds('T      = ' + g.Th_in.toFixed(1), 0, 0, 20);
+    rect(bounds.x - 4, bounds.y - 2, bounds.w + 8, bounds.h + 10);
+
+    push();
+    translate(0, 0, 1);
+    fill('black'); noStroke();
+    text('T      = ' + g.Th_out.toFixed(1), 0, 0);
+    textSize(12);
+    text('h,out', 10, 3);
+    pop();
+
+    translate(300, 0, 0);
+    bounds = font.textBounds('T      = ' + g.Th_in.toFixed(1), 0, 0, 20);
+    rect(bounds.x - 4, bounds.y - 2, bounds.w + 8, bounds.h + 10);
+
+    push();
+    translate(0, 0, 1);
+    fill('black'); noStroke();
+    text('T      = ' + g.Tc_out.toFixed(1), 0, 0);
+    textSize(12);
+    text('c,out', 10, 3);
+    pop();
+
+    translate(8, -180, 0);
+    bounds = font.textBounds('Q = ' + g.Qdot.toFixed(1), 0, 0, 20);
+    rect(bounds.x - 4, bounds.y - 6, bounds.w + 8, bounds.h + 10);
+
+    push();
+    translate(0, 0, 1);
+    fill('black'); noStroke();
+    text('Q = ' + g.Qdot.toFixed(1), 0, 0);
+    text('.', 5, -15);
+    pop();
+
+    pop();
 }

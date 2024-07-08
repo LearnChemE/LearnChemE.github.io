@@ -23,7 +23,7 @@ window.g = {
 
     Qdot: 0,
 
-    hexType: DOUBLE_TUBE,
+    hexType: SHELL_TUBE,
     rotTargX: 0,
     rotTargY: 0,
     rotX: 0,
@@ -31,6 +31,7 @@ window.g = {
 }
 
 function preload() {
+    font = loadFont('assets/Ubuntu-R.ttf');
 }
 
 function setup() {
@@ -38,10 +39,16 @@ function setup() {
     g.cnv.parent("graphics-wrapper");
 
     dt = doubleTubeGraphic(500, 400);
+
+    // labels = createGraphics(100, 100, WEBGL);
+    textFont(font);
+    // labels.background(250);
 }
 
 function draw() {
     background(250);
+    // labels.clear();
+
     heatTransferRate();
 
     if (g.hexType == DOUBLE_TUBE) {
@@ -50,12 +57,20 @@ function draw() {
         image(labels, -250, -200);
     }
     else {
+
+        clear();
         drag();
+
+        push();
         rotateY(g.rotX);
         rotateX(-g.rotY);
-        translate(0, 0, 100);
 
+        translate(0, 0, 90);
         shellTubeGraphic(500, 400);
+
+        translate(0, 0, 50);
+        shellTubeLabels();
+        pop();
     }
 }
 
