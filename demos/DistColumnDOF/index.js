@@ -2,6 +2,7 @@
 var dropdownvalue = "condenser";
 window.g = {
     unknowns: 1,
+    displayUnknowns: 1,
     cnv: undefined,
     opt: 1,
     showZb: false,
@@ -9,20 +10,20 @@ window.g = {
 
 //storing variables
 let textElements = [
-    { mainText: 'm', sub: '5', x: 694, y: 500, size: 20, xsub: 8 },
-    { mainText: 'm', sub: '1', x: 60, y: 290, size: 20, xsub: 8 },
-    { mainText: '   y \n 1-y ', sub: '7,A \n \n 7,A', x: 320, y: 410, size: 20, xsub: 5, altText: '   y \n   y', altSub: '7,A \n \n7,B' },
-    { mainText: '   x \n 1-x ', sub: '5,A \n \n 5,A', x: 684, y: 530, size: 20, xsub: 5, altText: '   x \n   x', altSub: '5,A \n \n5,B' },
-    { mainText: 'm', sub: '3', x: 330, y: 500, size: 20, xsub: 8 },
-    { mainText: '   y \n 1-y ', sub: '4,A \n \n 4,A', x: 684, y: 130, size: 20, xsub: 5, altText: '   y \n   y', altSub: '4,A \n \n4,B' },
-    { mainText: '   z \n 1-z ', sub: '1,A \n \n  1,A', x: 50, y: 320, size: 20, xsub: 5, altText: '   z \n   z', altSub: '1,A \n \n1,B' },
-    { mainText: 'm', sub: '4', x: 694, y: 100, size: 20, xsub: 8 },
-    { mainText: 'm', sub: '2', x: 330, y: 100, size: 20, xsub: 8 },
-    { mainText: 'm', sub: '6', x: 330, y: 220, size: 20, xsub: 8 },
-    { mainText: 'm', sub: '7', x: 330, y: 380, size: 20, xsub: 8 },
-    { mainText: '   x \n 1-x ', sub: '6,A \n \n 6,A', x: 320, y: 250, size: 20, xsub: 5, altText: '   x \n   x', altSub: '6,A \n \n6,B' },
-    { mainText: '   y \n 1-y ', sub: '2,A \n \n 2,A', x: 320, y: 130, size: 20, xsub: 5, altText: '   y \n   y', altSub: '2,A \n \n2,B' },
-    { mainText: '   x \n 1-x ', sub: '3,A \n \n 3,A', x: 320, y: 530, size: 20, xsub: 5, altText: '   x \n   x', altSub: '3,A \n \n3,B' },
+    { mainText: 'm', sub: '5', x: 694, y: 500, size: 20, xsub: 8, countsAsTwo: false },
+    { mainText: 'm', sub: '1', x: 60, y: 290, size: 20, xsub: 8, countsAsTwo: false },
+    { mainText: '   y \n 1-y ', sub: '7,A \n \n 7,A', x: 320, y: 410, size: 20, xsub: 5, altText: '   y \n   y', altSub: '7,A \n \n7,B', countsAsTwo: true },
+    { mainText: '   x \n 1-x ', sub: '5,A \n \n 5,A', x: 684, y: 530, size: 20, xsub: 5, altText: '   x \n   x', altSub: '5,A \n \n5,B', countsAsTwo: true },
+    { mainText: 'm', sub: '3', x: 330, y: 500, size: 20, xsub: 8, countsAsTwo: false },
+    { mainText: '   y \n 1-y ', sub: '4,A \n \n 4,A', x: 684, y: 130, size: 20, xsub: 5, altText: '   y \n   y', altSub: '4,A \n \n4,B', countsAsTwo: true },
+    { mainText: '   z \n 1-z ', sub: '1,A \n \n  1,A', x: 50, y: 320, size: 20, xsub: 5, altText: '   z \n   z', altSub: '1,A \n \n1,B', countsAsTwo: true },
+    { mainText: 'm', sub: '4', x: 694, y: 100, size: 20, xsub: 8, countsAsTwo: false },
+    { mainText: 'm', sub: '2', x: 330, y: 100, size: 20, xsub: 8, countsAsTwo: false },
+    { mainText: 'm', sub: '6', x: 330, y: 220, size: 20, xsub: 8, countsAsTwo: false },
+    { mainText: 'm', sub: '7', x: 330, y: 380, size: 20, xsub: 8, countsAsTwo: false },
+    { mainText: '   x \n 1-x ', sub: '6,A \n \n 6,A', x: 320, y: 250, size: 20, xsub: 5, altText: '   x \n   x', altSub: '6,A \n \n6,B', countsAsTwo: true },
+    { mainText: '   y \n 1-y ', sub: '2,A \n \n 2,A', x: 320, y: 130, size: 20, xsub: 5, altText: '   y \n   y', altSub: '2,A \n \n2,B', countsAsTwo: true },
+    { mainText: '   x \n 1-x ', sub: '3,A \n \n 3,A', x: 320, y: 530, size: 20, xsub: 5, altText: '   x \n   x', altSub: '3,A \n \n3,B', countsAsTwo: true },
 ];
 
 
@@ -42,12 +43,15 @@ function shuffleArray(array) {
 $(() => {
     $("#shuffle-btn").click(() => {
         shuffleArray(textElements);
+        updateUnkowns(g.unknowns);
     });
     $("#equationB").click(() => {
         g.showZb = false;
+        updateUnkowns(g.unknowns);
     });
     $("#fractionB").click(() => {
         g.showZb = true;
+        updateUnkowns(g.unknowns);
     });
 });
 
@@ -61,10 +65,21 @@ const activeColor = 'blue';
 
 unknowns.addEventListener("input", function () {
     let unk = Number(unknowns.value);
-    g.unknowns = unk;
-    unknownsLabel.innerHTML = `${unk}`;
-    // drawVar(unk);
+    updateUnkowns(unk);
 });
+
+function updateUnkowns(unk) {
+    var displayUnknowns = unk;
+
+    for (let i = 0; i < unk; i++) {
+        if (textElements[i].countsAsTwo) displayUnknowns++;
+    }
+
+    g.unknowns = unk;
+    g.displayUnknowns = displayUnknowns;
+    if (g.showZb) unknownsLabel.innerHTML = `${displayUnknowns}`;
+    else unknownsLabel.innerHTML = `${unk}`
+}
 
 
 import { drawRectangle, drawArrow, drawBorder, drawText, drawSub } from './functions.mjs';
@@ -234,23 +249,23 @@ function updateView() {
     }
 }
 
-function updateForEquationB() {
-    console.log("Updating display for Equation B (1-zA)");
-    drawDisplay('condenser');
-    if (window.myP5) {
-        window.myP5.drawEquationB();
-    }
-}
+// function updateForEquationB() {
+//     console.log("Updating display for Equation B (1-zA)");
+//     drawDisplay('condenser');
+//     if (window.myP5) {
+//         window.myP5.drawEquationB();
+//     }
+// }
 
-function updateForFractionB() {
-    console.log("Updating display for Fraction B (zB)");
-    push();
-    text('O', 100, 100)
-    pop();
-    if (window.myP5) {
-        window.myP5.drawFractionB();
-    }
-}
+// function updateForFractionB() {
+//     console.log("Updating display for Fraction B (zB)");
+//     push();
+//     text('O', 100, 100)
+//     pop();
+//     if (window.myP5) {
+//         window.myP5.drawFractionB();
+//     }
+// }
 
 window.setup = setup;
 window.draw = draw;
