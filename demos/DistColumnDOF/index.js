@@ -89,7 +89,7 @@ function drawTextElements(nUnknowns) {
     for (let i = nUnknowns; i < textElements.length; i++) {
         element = textElements[i];
 
-        // Check if condenser type is "total" and change the variable
+    
         if (g.condenserType === 'total' && element.mainText === '   y \n 1-y ' && element.sub === '4,A \n \n 4,A') {
             element.mainText = '   x \n 1-x '; 
             element.sub = '4,A \n \n 4,A'; 
