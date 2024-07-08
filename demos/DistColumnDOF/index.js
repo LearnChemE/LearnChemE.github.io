@@ -113,7 +113,7 @@ function drawDisplay(value) {
         case 'distillation column':
             borderVars = [100, 120, 200, 380, 10, 'green'];
             colcon = 'green';
-            colreb = 'green';<<<<<<< dof-dist
+            colreb = 'green';
             coltot = 'green';
 
             break;
