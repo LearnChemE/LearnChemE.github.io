@@ -8,7 +8,7 @@
     <title>DOF On A Distillation Process</title>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script> -->
     <!-- <script src="./libraries/math.js" type="text/javascript"></script> -->
-     <script src="p5.js"></script>
+    <script src="p5.js"></script>
     <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
     <link href="./styles.css" rel="stylesheet">
     <link href="./sliders.css" rel="stylesheet">
@@ -19,51 +19,56 @@
 </head>
 
 <body>
-    
+
     <div id="simulation-wrapper">
         <!-- Info Buttons -->
         <div class="controls-wrapper">
-       
-        <!-- Inputs -->
-        <div class="inputs">
-        <div class="inputs-wrapper" style="transform:translateX(10px)"> 
-            
-            <!-- Unknowns slider -->
-            <div class="balance">
-                <div class="btn-group btn-group-sm" id="speciesBrep">
-                  <input type="radio" class="btn-check" name="btnradio" id="equationB" autocomplete="off" value = "equationB" checked>
-                  <label class="btn btn-outline-primary" for="equationB" style="margin-right: 0px">1-zA</label>
-                
-                  <input type="radio" class="btn-check" name="btnradio" id="fractionB" autocomplete="off" value = "fractionB">
-                  <label class="btn btn-outline-primary" for="fractionB">zB</label>
+
+            <!-- Inputs -->
+            <div class="inputs">
+                <div class="inputs-wrapper" style="transform:translateX(10px)">
+
+                    <!-- Unknowns slider -->
+                    <div class="balance">
+                        <div class="btn-group btn-group-sm" id="speciesBrep">
+                            <input type="radio" class="btn-check" name="btnradio" id="equationB" autocomplete="off"
+                                value="equationB" checked>
+                            <label class="btn btn-outline-primary" for="equationB"
+                                style="margin-right: 0px">1-zA</label>
+
+                            <input type="radio" class="btn-check" name="btnradio" id="fractionB" autocomplete="off"
+                                value="fractionB">
+                            <label class="btn btn-outline-primary" for="fractionB">zB</label>
+                        </div>
+                        <div class="select-row">
+                            <select id="isotype">
+                                <option value="condenser">condenser</option>
+                                <option value="reboiler">reboiler</option>
+                                <option value="distillation column">distillation column</option>
+                                <option value="overall">overall</option>
+                            </select>
+                            <button type="button" id="shuffle-btn" class="btn btn-outline-danger">New Problem</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="select-row">
-                    <select id="isotype">
-                      <option value="condenser">condenser</option>
-                      <option value="reboiler">reboiler</option>
-                      <option value="distillation column">distillation column</option>
-                      <option value="overall">overall</option>
-                    </select>
-                    <button type="button" id="shuffle-btn" class="btn btn-outline-danger">New Problem</button>
+            </div>
+            <div class="simulation-controls">
+                <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">
+                    Directions
                 </div>
+                <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details
+                </div>
+                <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
             </div>
         </div>
-    </div>
-        <div class="simulation-controls">
-            <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions
+        <div class="input-area">
+            <div class="input-row" id="label1">
+                <div class="input-label">Total Number of Unknowns</div>
+                <input type="range" id="unknown" min="1" max="13" value="1" step="1" />
+                <div id="unknown-label" class="value-label">1</div>
             </div>
-            <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
-            <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
         </div>
-    </div>
-            <div class="input-area">
-                <div class="input-row" id="label1">
-                    <div class="input-label">Total Number of Unknowns</div>
-                    <input type="range" id="unknown" min="1" max="13" value="1" step="1"/>
-                    <div id="unknown-label" class="value-label">1</div>
-                </div>
-            </div>
-        
+
     </div>
 
     <div id="graphics-wrapper">
@@ -84,7 +89,10 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        When solving material balances for this distillation process, start with a unit that has zero degrees of freedom or start with the complete system if it has zero degrees of freedom. Then, do a degree-of-freedom analysis on another unit to see if it now has zero degrees of freedom. Repeat this procedure until all of the unknown variables are determined. 
+                        When solving material balances for this distillation process, start with a unit that has zero
+                        degrees of freedom or start with the complete system if it has zero degrees of freedom. Then, do
+                        a degree-of-freedom analysis on another unit to see if it now has zero degrees of freedom.
+                        Repeat this procedure until all of the unknown variables are determined.
                     </p>
                 </div>
             </div>
@@ -104,10 +112,23 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        In this simulation, a degree-of-freedom analysis is performed on a distillation process to determine whether the system has sufficient information to solve for the unknown variables. Use buttons to select the unit on which to do mass balances (distillation column, condenser, or reboiler) or to do a balance on the overall system. When “condenser” is selected, use buttons to select “partial condenser” or “total condenser”. Set the “total number of unknowns” with the slider; unknown variables are colored blue on the diagram and known variables are black. The known variables are selected randomly, and they change when you click the “new problem” button. Use buttons to select how species B is represented: as zB or as 1 – zA; the degree-of-freedom analysis is different for each representation. An explanation of the analysis is shown on the right. For zero degrees of freedom, the balances are solvable. The system is overspecified if it has more equations than unknowns and it is underspecified if it has more unknowns than equations. For a reboiler, the equilibrium ratio Kr, is known, and for a partial condenser the equilibrium ratio Kc is known. Temperatures and pressures are known for this analysis. Mass balances and phase equilibrium relations are solved to determine the unknown variables.
+                        In this simulation, a degree-of-freedom analysis is performed on a distillation process to
+                        determine whether the system has sufficient information to solve for the unknown variables. Use
+                        buttons to select the unit on which to do mass balances (distillation column, condenser, or
+                        reboiler) or to do a balance on the overall system. When “condenser” is selected, use buttons to
+                        select “partial condenser” or “total condenser”. Set the “total number of unknowns” with the
+                        slider; unknown variables are colored blue on the diagram and known variables are black. The
+                        known variables are selected randomly, and they change when you click the “new problem” button.
+                        Use buttons to select how species B is represented: as zB or as 1 – zA; the degree-of-freedom
+                        analysis is different for each representation. An explanation of the analysis is shown on the
+                        right. For zero degrees of freedom, the balances are solvable. The system is overspecified if it
+                        has more equations than unknowns and it is underspecified if it has more unknowns than
+                        equations. For a reboiler, the equilibrium ratio Kr, is known, and for a partial condenser the
+                        equilibrium ratio Kc is known. Temperatures and pressures are known for this analysis. Mass
+                        balances and phase equilibrium relations are solved to determine the unknown variables.
                     </p>
-                    
-                
+
+
                 </div>
             </div>
         </div>
@@ -160,10 +181,10 @@
             </div>
         </div>
     </div>
-    
+
     <script type="module" src="functions.mjs"></script>
     <script type="module" src="index.js"></script>
-    
+
 </body>
 
 
