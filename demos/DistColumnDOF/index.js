@@ -8,21 +8,21 @@ window.g = {
 
 //storing variables
 let textElements = [
-    { text: 'm5', x: 690, y: 500 },
-    { text: 'm1', x: 60, y: 290 },
-    { text: 'y7,A \n 1-y7,A', x: 320, y: 410 },
-    { text: 'x5,A \n 1-x5,A', x: 684, y: 530 },
-    { text: 'm3', x: 330, y: 500 },
-    { text: 'y4,A \n 1-y4,A', x: 684, y: 130 },
-    { text: 'z1,A \n 1-z1,A', x: 50, y: 320 },
-    { text: 'm4', x: 684, y: 100 },
-    { text: 'm2', x: 330, y: 100 },
-    { text: 'm6', x: 330, y: 220 },
-    { text: 'm7', x: 330, y: 380 },
-    { text: 'x6,A \n 1-x6,A', x: 320, y: 250 },
-    { text: 'y2,A \n 1-y2,A', x: 320, y: 130 },
-    { text: 'x3,A \n 1-x3,A', x: 320, y: 530 },
-];
+    { mainText: 'm', sub: '5', x: 694, y: 500, size: 20, xsub: 18 },
+    { mainText: 'm', sub: '1', x: 60, y: 290, size: 20, xsub: 18 },
+    { mainText: '   y \n 1-y ', sub: '7,A \n \n   7,A', x: 320, y: 410, size: 20, xsub: 26 },
+    { mainText: '   x \n 1-x ', sub: ' 5,A \n \n   5,A', x: 684, y: 530, size: 20, xsub: 26 },
+    { mainText: 'm', sub: '3', x: 330, y: 500, size: 20, xsub:18},
+    { mainText: '   y \n 1-y ', sub: '4,A \n \n  4,A', x: 684, y: 130, size: 20, xsub: 26 },
+    { mainText: '   z \n 1-z ', sub: ' 1,A \n \n   1,A', x: 50, y: 320, size: 20, xsub: 26 },
+    { mainText: 'm', sub: '4', x: 694, y: 100, size: 20, xsub:18},
+    { mainText: 'm', sub: '2', x: 330, y: 100, size: 20, xsub:18},
+    { mainText: 'm', sub: '6', x: 330, y: 220, size: 20, xsub:18},
+    { mainText: 'm', sub: '7', x: 330, y: 380, size: 20, xsub:18},
+    { mainText: '   x \n 1-x ', sub: ' 6,A \n \n   6,A', x: 320, y: 250, size: 20, xsub: 26 },
+    { mainText: '   y \n 1-y ', sub: '2,A \n \n   2,A', x: 320, y: 130, size: 20, xsub: 26 },
+    { mainText: '   x \n 1-x ', sub: ' 3,A \n \n   3,A', x: 320, y: 530, size: 20, xsub: 26 },
+ ];
 
 function shuffleArray(array) {
     console.log('shuffling');
@@ -56,26 +56,23 @@ unknowns.addEventListener("input", function() {
     // drawVar(unk);
 });
 
-import { drawRectangle, drawArrow, drawBorder, drawText} from './functions.mjs';
+import { drawRectangle, drawArrow, drawBorder, drawText, drawSub} from './functions.mjs';
 
 function drawTextElements() {
-    push();
     textElements.forEach(element => {
-        fill(defaultColor); noStroke();
-        text(element.text, element.x, element.y);
+        fill(defaultColor);
+        noStroke();
+        drawSub(element.mainText, element.sub, element.x, element.y, element.size, element.xsub);
     });
-    pop();
 }
 
-function drawActiveTextElements(nUnknowns) {
-    push();
-    textElements.slice(0, nUnknowns).forEach(element => {
-        fill(activeColor); //stroke(activeColor); //noStroke();
-        text(element.text, element.x, element.y);
+function drawActiveTextElements(value) {
+    textElements.slice(0, value).forEach(element => {
+        fill(activeColor);
+        noStroke();
+        drawSub(element.mainText, element.sub, element.x, element.y, element.size, element.xsub);
     });
-    pop();
 }
-
 
 function drawDisplay(value) {
     // console.log(value);

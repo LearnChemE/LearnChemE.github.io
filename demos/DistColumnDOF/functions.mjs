@@ -76,8 +76,20 @@ function drawText(textContent, xPos, yPos, textColor, bold=false) {
   text(textContent, xPos, yPos);
 }
  
- 
+function drawSub(mainText, subText, x, y, size, xsub) {
+
+  x = Number(x);
+  y = Number(y);
+  size = Number(size);
+  xsub = Number(xsub);
+
+  textSize(size);
+  text(mainText, x, y);
+
+  textSize(size * 0.5); 
+  text(subText, x + xsub, y + size * 0.25);
+}
 
     
   
-export { drawRectangle, drawArrow, drawBorder, drawText};
+export { drawRectangle, drawArrow, drawBorder, drawText, drawSub};
