@@ -5,6 +5,7 @@ window.g = {
     cnv: undefined,
     opt: 1,
     showZb: false,
+    condenserType: 'partial'
 };
 
 //storing variables
@@ -75,18 +76,43 @@ function drawTextElements(nUnknowns) {
     push();
     for (let i = 0; i < nUnknowns; i++) {
         element = textElements[i];
+        
+        
+        if (g.condenserType === 'part' && element.mainText === '   y \n 1-y ' && element.sub === '4,A \n \n 4,A') {
+            element.mainText = '   y \n 1-y '; 
+            element.sub = '4,A \n \n 4,A'; 
+        }
+
         fill(activeColor); //stroke(activeColor); //noStroke();
         drawSub(element.mainText, element.sub, element.x, element.y, element.size, element.xsub, element.altText, element.altSub, g.showZb);
     }
     for (let i = nUnknowns; i < textElements.length; i++) {
         element = textElements[i];
+
+        // Check if condenser type is "total" and change the variable
+        if (g.condenserType === 'total' && element.mainText === '   y \n 1-y ' && element.sub === '4,A \n \n 4,A') {
+            element.mainText = '   x \n 1-x '; 
+            element.sub = '4,A \n \n 4,A'; 
+        }
+
         fill(defaultColor); //stroke(activeColor); //noStroke();
         drawSub(element.mainText, element.sub, element.x, element.y, element.size, element.xsub, element.altText, element.altSub, g.showZb);
     }
     pop();
-
-
 }
+document.getElementById('partial').addEventListener('change', function () {
+    if (this.checked) {
+        g.condenserType = 'partial';
+    }
+});
+
+document.getElementById('total').addEventListener('change', function () {
+    if (this.checked) {
+        g.condenserType = 'total';
+    }
+});
+
+const condenserType = document.getElementById('condenser-type');
 
 function drawDisplay(value) {
     // console.log(value);
@@ -102,29 +128,31 @@ function drawDisplay(value) {
             borderVars = [475, 420, 200, 180, 10, 'green'];
             colreb = 'green';
             rebtot = 'green';
-
+            condenserType.style.display = 'none';
             break;
         case 'condenser':
             borderVars = [475, 20, 200, 180, 10, 'green'];
             colcon = 'green';
             contot = 'green';
-
+            condenserType.style.display = 'block';
             break;
         case 'distillation column':
             borderVars = [100, 120, 200, 380, 10, 'green'];
             colcon = 'green';
             colreb = 'green';
             coltot = 'green';
-
+            condenserType.style.display = 'none';
             break;
         case 'overall':
             borderVars = [60, 30, 670, 560, 10, 'green'];
             contot = 'green';
             rebtot = 'green';
             coltot = 'green';
-
+            condenserType.style.display = 'none';
             break;
-
+        default: 
+            condenserType.style.display = 'none';
+            break; 
     }
 
     push();
@@ -164,7 +192,6 @@ function drawDisplay(value) {
     line(575, 170, 575, 230);
 
     drawText(value, 940, 120, 'black', true);
-
     // drawTextElements();
     pop();
 }
@@ -180,6 +207,7 @@ function setup() {
     // console.log('state 0');
     g.cnv = createCanvas(1100, 600);
     g.cnv.parent("graphics-wrapper");
+    g.cnv.id("defaultCanvas0");
 }
 
 document.getElementById('unknown').addEventListener('change', function () {
