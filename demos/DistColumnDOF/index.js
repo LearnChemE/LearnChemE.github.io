@@ -6,27 +6,46 @@ window.g = {
     cnv: undefined,
     opt: 1,
     showZb: false,
+
+    extraInfo: 1,
+    dof: -3,
+
+    nCol: 0,
+    nReb: 0,
+    nCon: 0,
+    nTot: 0,
+  
     condenserType: 'partial'
 };
 
+const CON_COL = 0;
+const REB_COL = 1;
+const CON_TOT = 2;
+const REB_TOT = 3;
+const COL_TOT = 4;
+
 //storing variables
 let textElements = [
-    { mainText: 'm', sub: '5', x: 694, y: 500, size: 20, xsub: 8, countsAsTwo: false },
-    { mainText: 'm', sub: '1', x: 60, y: 290, size: 20, xsub: 8, countsAsTwo: false },
-    { mainText: '   y \n 1-y ', sub: '7,A \n \n 7,A', x: 320, y: 410, size: 20, xsub: 5, altText: '   y \n   y', altSub: '7,A \n \n7,B', countsAsTwo: true },
-    { mainText: '   x \n 1-x ', sub: '5,A \n \n 5,A', x: 684, y: 530, size: 20, xsub: 5, altText: '   x \n   x', altSub: '5,A \n \n5,B', countsAsTwo: true },
-    { mainText: 'm', sub: '3', x: 330, y: 500, size: 20, xsub: 8, countsAsTwo: false },
-    { mainText: '   y \n 1-y ', sub: '4,A \n \n 4,A', x: 684, y: 130, size: 20, xsub: 5, altText: '   y \n   y', altSub: '4,A \n \n4,B', countsAsTwo: true },
-    { mainText: '   z \n 1-z ', sub: '1,A \n \n  1,A', x: 50, y: 320, size: 20, xsub: 5, altText: '   z \n   z', altSub: '1,A \n \n1,B', countsAsTwo: true },
-    { mainText: 'm', sub: '4', x: 694, y: 100, size: 20, xsub: 8, countsAsTwo: false },
-    { mainText: 'm', sub: '2', x: 330, y: 100, size: 20, xsub: 8, countsAsTwo: false },
-    { mainText: 'm', sub: '6', x: 330, y: 220, size: 20, xsub: 8, countsAsTwo: false },
-    { mainText: 'm', sub: '7', x: 330, y: 380, size: 20, xsub: 8, countsAsTwo: false },
-    { mainText: '   x \n 1-x ', sub: '6,A \n \n 6,A', x: 320, y: 250, size: 20, xsub: 5, altText: '   x \n   x', altSub: '6,A \n \n6,B', countsAsTwo: true },
-    { mainText: '   y \n 1-y ', sub: '2,A \n \n 2,A', x: 320, y: 130, size: 20, xsub: 5, altText: '   y \n   y', altSub: '2,A \n \n2,B', countsAsTwo: true },
-    { mainText: '   x \n 1-x ', sub: '3,A \n \n 3,A', x: 320, y: 530, size: 20, xsub: 5, altText: '   x \n   x', altSub: '3,A \n \n3,B', countsAsTwo: true },
+    { mainText: 'm', sub: '5', x: 694, y: 500, size: 20, xsub: 8, countsAsTwo: false, gid: REB_TOT },
+    { mainText: 'm', sub: '1', x: 60, y: 290, size: 20, xsub: 8, countsAsTwo: false, gid: COL_TOT },
+    { mainText: '   y \n 1-y ', sub: '7,A \n \n 7,A', x: 320, y: 410, size: 20, xsub: 5, altText: '   y \n   y', altSub: '7,A \n \n7,B', countsAsTwo: true, gid: REB_COL },
+    { mainText: '   x \n 1-x ', sub: '5,A \n \n 5,A', x: 684, y: 530, size: 20, xsub: 5, altText: '   x \n   x', altSub: '5,A \n \n5,B', countsAsTwo: true, gid: REB_TOT },
+    { mainText: 'm', sub: '3', x: 330, y: 500, size: 20, xsub: 8, countsAsTwo: false, gid: REB_COL },
+    { mainText: '   y \n 1-y ', sub: '4,A \n \n 4,A', x: 684, y: 130, size: 20, xsub: 5, altText: '   y \n   y', altSub: '4,A \n \n4,B', countsAsTwo: true, gid: CON_TOT },
+    { mainText: '   z \n 1-z ', sub: '1,A \n \n  1,A', x: 50, y: 320, size: 20, xsub: 5, altText: '   z \n   z', altSub: '1,A \n \n1,B', countsAsTwo: true, gid: COL_TOT },
+    { mainText: 'm', sub: '4', x: 694, y: 100, size: 20, xsub: 8, countsAsTwo: false, gid: CON_TOT },
+    { mainText: 'm', sub: '2', x: 330, y: 100, size: 20, xsub: 8, countsAsTwo: false, gid: CON_COL },
+    { mainText: 'm', sub: '6', x: 330, y: 220, size: 20, xsub: 8, countsAsTwo: false, gid: CON_COL },
+    { mainText: 'm', sub: '7', x: 330, y: 380, size: 20, xsub: 8, countsAsTwo: false, gid: REB_COL },
+    { mainText: '   x \n 1-x ', sub: '6,A \n \n 6,A', x: 320, y: 250, size: 20, xsub: 5, altText: '   x \n   x', altSub: '6,A \n \n6,B', countsAsTwo: true, gid: CON_COL },
+    { mainText: '   y \n 1-y ', sub: '2,A \n \n 2,A', x: 320, y: 130, size: 20, xsub: 5, altText: '   y \n   y', altSub: '2,A \n \n2,B', countsAsTwo: true, gid: CON_COL },
+    { mainText: '   x \n 1-x ', sub: '3,A \n \n 3,A', x: 320, y: 530, size: 20, xsub: 5, altText: '   x \n   x', altSub: '3,A \n \n3,B', countsAsTwo: true, gid: REB_COL },
 ];
 
+let colUnknowns = new Array(15);
+let conUnknowns = new Array(9);
+let rebUnknowns = new Array(9);
+let totUnknowns = new Array(9);
 
 function shuffleArray(array) {
     console.log('shuffling');
@@ -45,14 +64,17 @@ $(() => {
     $("#shuffle-btn").click(() => {
         shuffleArray(textElements);
         updateUnkowns(g.unknowns);
+        updateDOF();
     });
     $("#equationB").click(() => {
         g.showZb = false;
         updateUnkowns(g.unknowns);
+        updateDOF();
     });
     $("#fractionB").click(() => {
         g.showZb = true;
         updateUnkowns(g.unknowns);
+        updateDOF();
     });
 });
 
@@ -67,6 +89,7 @@ const activeColor = 'blue';
 unknowns.addEventListener("input", function () {
     let unk = Number(unknowns.value);
     updateUnkowns(unk);
+    updateDOF();
 });
 
 function updateUnkowns(unk) {
@@ -82,6 +105,125 @@ function updateUnkowns(unk) {
     else unknownsLabel.innerHTML = `${unk}`
 }
 
+function updateDOF() {
+    const species = 2;
+    var unk = g.unknowns;
+
+    let element, val;
+
+
+    let nCol = 0, nReb = 0, nCon = 0, nTot = 0;
+    let str, j;
+    for (let i = 0; i < unk; i++) {
+        element = textElements[i];
+        str = '', j = 0;
+        // console.log(element.mainText)
+        while (str == '' || str == ' ') {
+            str = element.mainText[j++];
+        }
+        str = str + element.sub[0];
+
+        switch (element.gid) {
+            case CON_COL:
+                colUnknowns[nCol] = str;
+                nCol++;
+
+                conUnknowns[nCon] = str;
+                nCon++;
+                break;
+            case REB_COL:
+                rebUnknowns[nReb] = str;
+                nReb++;
+
+                colUnknowns[nCol] = str;
+                nCol++;
+                break;
+            case CON_TOT:
+                conUnknowns[nCon] = str;
+                nCon++;
+
+                totUnknowns[nTot] = str;
+                nTot++;
+                break;
+            case REB_TOT:
+                rebUnknowns[nReb] = str;
+                nReb++;
+
+                totUnknowns[nTot] = str;
+                nTot++;
+                break;
+            case COL_TOT:
+                colUnknowns[nCol] = str;
+                nCol++;
+
+                totUnknowns[nTot] = str;
+                nTot++;
+                break;
+        }
+    }
+
+    g.nCol = nCol;
+    g.nCon = nCon;
+    g.nReb = nReb;
+    g.nTot = nTot;
+
+}
+
+function updateExtra() {
+    var nExtra = 0;
+    let extras;
+
+    if (g.showZb) {
+        extras = findExtraXInfo();
+        nExtra = extras.length;
+    }
+    else extras = new Array(0);
+
+    if (dropdownvalue == 'reboiler') {
+        extras.push('K');
+        nExtra++;
+    }
+    else if (dropdownvalue == 'condenser') {
+        extras.push('K');
+        nExtra++;
+        // if (g.totalCondenser) nExtra++;
+    }
+
+    g.extraInfo = nExtra;
+    return extras;
+}
+
+function findExtraXInfo() {
+    let numUnk, elements;
+    switch (dropdownvalue) {
+        case 'condenser':
+            numUnk = g.nCon;
+            elements = conUnknowns;
+            break;
+        case 'reboiler':
+            numUnk = g.nReb;
+            elements = rebUnknowns;
+            break;
+        case 'distillation column':
+            numUnk = g.nCol;
+            elements = colUnknowns;
+            break;
+        case 'overall':
+            numUnk = g.nTot;
+            elements = totUnknowns;
+            break;
+    }
+
+    let array = new Array(0);
+    // let n = 0;
+    for (let i = 0; i < numUnk; i++) {
+        if (elements[i][0] != 'm') {
+            array.push(elements[i]);
+        };
+    }
+
+    return array;
+}
 
 import { drawRectangle, drawArrow, drawBorder, drawText, drawSub } from './functions.mjs';
 
@@ -206,7 +348,7 @@ function drawDisplay(value) {
     line(200, 150, 200, 110);
     line(575, 170, 575, 230);
 
-    drawText(value, 940, 120, 'black', true);
+    // drawText(value, 940, 120, 'black', true);
     // drawTextElements();
     pop();
 }
@@ -232,68 +374,134 @@ document.getElementById('unknown').addEventListener('change', function () {
 
 document.getElementById('isotype').addEventListener('change', function () {
     dropdownvalue = this.value;
+    updateDOF();
     // drawDisplay(dropdownvalue);
 });
+
+function rightDisplay() {
+    push();
+    translate(800, 0);
+    let rx = 300;
+    let by = 600;
+
+    textAlign(CENTER, CENTER);
+    fill('black');
+
+    push();
+    textStyle('bold'); textSize(22);
+    text(dropdownvalue, rx / 2, 50);
+    pop();
+
+    let numUnk, elements;
+    switch (dropdownvalue) {
+        case 'condenser':
+            numUnk = g.nCon;
+            elements = conUnknowns;
+            break;
+        case 'reboiler':
+            numUnk = g.nReb;
+            elements = rebUnknowns;
+            break;
+        case 'distillation column':
+            numUnk = g.nCol;
+            elements = colUnknowns;
+            break;
+        case 'overall':
+            numUnk = g.nTot;
+            elements = totUnknowns;
+            break;
+    }
+
+    push();
+    fill('blue');
+    let n = 0, repeatxyz = g.showZb, str, sub;
+
+    for (let i = 0; i < numUnk; i++) {
+        str = elements[i][0];
+
+        if (str != 'm') sub = elements[i][1] + ',A';
+        else sub = elements[i][1];
+
+        textSize(20); text(str, 40 + n % 6 * 40, 130 + floor(n / 6) * 30);
+        textSize(14); text(sub, 54 + n % 6 * 40, 137 + floor(n / 6) * 30);
+        n++;
+
+        if (repeatxyz && str != 'm') {
+            textSize(20); text(str, 40 + n % 6 * 40, 130 + floor(n / 6) * 30);
+            textSize(14); text(elements[i][1] + ',B', 54 + n % 6 * 40, 137 + floor(n / 6) * 30);
+            n++;
+        }
+    }
+    fill('black'); textSize(20);
+    text('unknowns = ' + n, 150, 100);
+    pop();
+
+    let extras = updateExtra();
+
+    push();
+    text("species balances = 2\nA B", 150, 240);
+    text('extra information = ' + g.extraInfo, 150, 300);
+    pop();
+
+    push();
+    fill('blue');
+    for (let i = 0; i < g.extraInfo; i++) {
+        if (extras[i][0] == 'K') {
+            if (dropdownvalue == 'reboiler') {
+                text('K  = y  /x', 150, 330 + ceil(i / 3) * 30);
+                push(); textSize(14);
+                text('r', 130, 337 + ceil(i / 3) * 30);
+                text('7', 165, 337 + ceil(i / 3) * 30);
+                text('5', 190, 337 + ceil(i / 3) * 30);
+                pop();
+            }
+            // else if (g.totalCondenser) {
+            //     text('y  = x  = x');
+            // }
+            else {
+                text('K  = y  /x', 150, 330 + ceil(i / 3) * 30);
+                push(); textSize(14);
+                text('c', 130, 337 + ceil(i / 3) * 30);
+                text('4', 165, 337 + ceil(i / 3) * 30);
+                text('6', 190, 337 + ceil(i / 3) * 30);
+                pop();
+            }
+        }
+        else {
+            text('Σ' + extras[i][0] + '  = 1', 75 + i % 3 * 75, 330 + 30 * floor(i / 3));
+
+            push(); textSize(14);
+            text(extras[i][1], 72 + i % 3 * 75, 337 + 30 * floor(i / 3));
+            pop();
+        }
+    }
+    pop();
+
+    push();
+    let dof = n - g.extraInfo;
+    text('degrees of freedom = ' + dof, 150, 420);
+    if (dof == 0) {
+        text('solvable', 150, 450);
+    }
+    else if (dof < 0) {
+        text('overspecified', 150, 450);
+    }
+    else {
+        text('underspecified', 150, 450);
+    }
+    pop();
+
+    pop();
+}
 
 function draw() {
     // console.log('state 1');
     background(255);
     drawVar(g.unknowns);
+    rightDisplay();
     // updateView();
 
 }
-
-// document.addEventListener("DOMContentLoaded", function() {
-//     // Default to first option, corresponding to 'equationB'
-//     //  references to radio buttons
-//     const equationB = document.getElementById('equationB');
-//     const fractionB = document.getElementById('fractionB');
-
-
-//     // Initial update (in case the initial state needs to be set)
-//     // updateView();
-// });
-
-// Event listeners for radio buttons
-equationB.addEventListener('change', function () {
-    if (this.checked) {
-        g.opt = 1; // Set to the option for '1-zA'
-        // updateView();
-    }
-});
-fractionB.addEventListener('change', function () {
-    if (this.checked) {
-        g.opt = 2; // Set to the option for 'zB'
-        // updateView();
-    }
-});
-
-// Function to update the view based on 'opt'
-function updateView() {
-    if (g.opt === 1) {
-        updateForEquationB();
-    } else if (g.opt === 2) {
-        updateForFractionB();
-    }
-}
-
-// function updateForEquationB() {
-//     console.log("Updating display for Equation B (1-zA)");
-//     drawDisplay('condenser');
-//     if (window.myP5) {
-//         window.myP5.drawEquationB();
-//     }
-// }
-
-// function updateForFractionB() {
-//     console.log("Updating display for Fraction B (zB)");
-//     push();
-//     text('O', 100, 100)
-//     pop();
-//     if (window.myP5) {
-//         window.myP5.drawFractionB();
-//     }
-// }
 
 window.setup = setup;
 window.draw = draw;
