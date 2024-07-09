@@ -43,14 +43,25 @@
         <div class="nav-bar-column" id="nav-bar-right">
 
             <div class="slider-wrapper" id="hot-slider-wrapper">
-                <div class="slider-label">process fluid flowrate</div>
+                <div class="slider-label">process fluid flowrate (g/s)</div>
                 <input type="range" id="hot-flow-slider" min="0.5" max="5" value="1" step="0.1">
                 <div class="slider-val-label" id="hot-flow-label">1.0</div>
             </div>
+            <div class="slider-wrapper" id="hottemp-slider-wrapper">
+                <div class="slider-label">process fluid temperature (°C)</div>
+                <input type="range" id="hot-temp-slider" min="20" max="50" value="40" step="1">
+                <div class="slider-val-label" id="hot-temp-label">40</div>
+            </div>
+
             <div class="slider-wrapper" id="cold-slider-wrapper">
-                <div class="slider-label">coolant flowrate</div>
+                <div class="slider-label">coolant flowrate (g/s)</div>
                 <input type="range" id="cold-flow-slider" min="0.5" max="5" value="1" step="0.1">
                 <div class="slider-val-label" id="cold-flow-label">1.0</div>
+            </div>
+            <div class="slider-wrapper" id="coldtemp-slider-wrapper">
+                <div class="slider-label">coolant temperature (°C)</div>
+                <input type="range" id="cold-temp-slider" min="1" max="15" value="10" step="1">
+                <div class="slider-val-label" id="cold-temp-label">10</div>
             </div>
         </div>
     </div>

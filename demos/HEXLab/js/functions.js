@@ -260,8 +260,14 @@ function effectiveness(cmin, cmax) {
     let C = cmin / cmax;
     let NTU = g.UA / cmin;
 
-    if (C == 1) return NTU / (1 + NTU); // This is the limit so it doesnt become NaN
-    else return (1 - Math.exp(-NTU * (1 - C))) / (1 - C * Math.exp(-NTU * (1 - C)));
+    if (g.hexType == DOUBLE_TUBE) {
+        if (C == 1) return NTU / (1 + NTU); // This is the limit so it doesnt become NaN
+        else return (1 - Math.exp(-NTU * (1 - C))) / (1 - C * Math.exp(-NTU * (1 - C)));
+    }
+    else {
+        let eterm = (1 + Math.exp(-NTU * Math.sqrt(1 + C ** 2))) / (1 - C * Math.exp(-NTU * Math.sqrt(1 + C ** 2)));
+        return 2 / (1 + C + Math.sqrt(1 + C ** 2) * eterm);
+    }
 }
 
 function heatTransferRate() {
@@ -321,17 +327,17 @@ function shellTubeLabels() {
     textSize(20);
     stroke('black'); strokeWeight(2); fill(250);
 
-    bounds = font.textBounds('T    = ' + g.Th_in.toFixed(1), 0, 0, 20);
+    bounds = font.textBounds('T    = ' + g.Th_in.toFixed(1) + ' °C', 0, 0, 20);
     rect(bounds.x - 4, bounds.y - 2, bounds.w + 8, bounds.h + 68);
 
     push();
     translate(0, 0, 1);
     fill('black'); noStroke();
-    text('T    = ' + g.Th_in.toFixed(1), 0, 0);
-    text('m  = ' + g.mDotH.toFixed(1), 0, 20);
+    text('T    = ' + g.Th_in.toFixed(1) + ' °C', 0, 0);
+    text('m  = ' + g.mDotH.toFixed(1) + ' g/s', 0, 20);
     text('.', 6, 8);
-    text('T    = ' + g.Tc_in.toFixed(1), 0, 40);
-    text('m  = ' + g.mDotC.toFixed(1), 0, 60);
+    text('T    = ' + g.Tc_in.toFixed(1) + ' °C', 0, 40);
+    text('m  = ' + g.mDotC.toFixed(1) + ' g/s', 0, 60);
     text('.', 6, 48);
     textSize(12);
     text('h,in', 10, 3);
@@ -341,37 +347,37 @@ function shellTubeLabels() {
     pop();
 
     translate(0, 195, 0);
-    bounds = font.textBounds('T      = ' + g.Th_in.toFixed(1), 0, 0, 20);
+    bounds = font.textBounds('T      = ' + g.Th_in.toFixed(1) + ' °C', 0, 0, 20);
     rect(bounds.x - 4, bounds.y - 2, bounds.w + 8, bounds.h + 10);
 
     push();
     translate(0, 0, 1);
     fill('black'); noStroke();
-    text('T      = ' + g.Th_out.toFixed(1), 0, 0);
+    text('T      = ' + g.Th_out.toFixed(1) + ' °C', 0, 0);
     textSize(12);
     text('h,out', 10, 3);
     pop();
 
     translate(300, 0, 0);
-    bounds = font.textBounds('T      = ' + g.Th_in.toFixed(1), 0, 0, 20);
+    bounds = font.textBounds('T      = ' + g.Th_in.toFixed(1) + ' °C', 0, 0, 20);
     rect(bounds.x - 4, bounds.y - 2, bounds.w + 8, bounds.h + 10);
 
     push();
     translate(0, 0, 1);
     fill('black'); noStroke();
-    text('T      = ' + g.Tc_out.toFixed(1), 0, 0);
+    text('T      = ' + g.Tc_out.toFixed(1) + ' °C', 0, 0);
     textSize(12);
     text('c,out', 10, 3);
     pop();
 
     translate(8, -180, 0);
-    bounds = font.textBounds('Q = ' + g.Qdot.toFixed(1), 0, 0, 20);
+    bounds = font.textBounds('Q = ' + g.Qdot.toFixed(1) + ' W', 0, 0, 20);
     rect(bounds.x - 4, bounds.y - 6, bounds.w + 8, bounds.h + 10);
 
     push();
     translate(0, 0, 1);
     fill('black'); noStroke();
-    text('Q = ' + g.Qdot.toFixed(1), 0, 0);
+    text('Q = ' + g.Qdot.toFixed(1) + ' W', 0, 0);
     text('.', 5, -15);
     pop();
 
