@@ -106,12 +106,9 @@ function updateUnkowns(unk) {
 function updateDOF() {
     const species = 2;
     var unk = g.unknowns;
-    var extra = 0;
+
     let element, val;
 
-    if (dropdownvalue == 'condenser' || dropdownvalue == 'reboiler') {
-        extra++;
-    }
 
     let nCol = 0, nReb = 0, nCon = 0, nTot = 0;
     let str, j;
@@ -167,8 +164,63 @@ function updateDOF() {
     g.nCon = nCon;
     g.nReb = nReb;
     g.nTot = nTot;
-    g.extraInfo = extra;
 
+}
+
+function updateExtra() {
+    var nExtra = 0;
+    let extras;
+
+    if (g.showZb) {
+        extras = findExtraXInfo();
+        nExtra = extras.length;
+    }
+    else extras = new Array(0);
+
+    if (dropdownvalue == 'reboiler') {
+        extras.push('K');
+        nExtra++;
+    }
+    else if (dropdownvalue == 'condenser') {
+        extras.push('K');
+        nExtra++;
+        // if (g.totalCondenser) nExtra++;
+    }
+
+    g.extraInfo = nExtra;
+    return extras;
+}
+
+function findExtraXInfo() {
+    let numUnk, elements;
+    switch (dropdownvalue) {
+        case 'condenser':
+            numUnk = g.nCon;
+            elements = conUnknowns;
+            break;
+        case 'reboiler':
+            numUnk = g.nReb;
+            elements = rebUnknowns;
+            break;
+        case 'distillation column':
+            numUnk = g.nCol;
+            elements = colUnknowns;
+            break;
+        case 'overall':
+            numUnk = g.nTot;
+            elements = totUnknowns;
+            break;
+    }
+
+    let array = new Array(0);
+    // let n = 0;
+    for (let i = 0; i < numUnk; i++) {
+        if (elements[i][0] != 'm') {
+            array.push(elements[i]);
+        };
+    }
+
+    return array;
 }
 
 import { drawRectangle, drawArrow, drawBorder, drawText, drawSub } from './functions.mjs';
@@ -355,9 +407,59 @@ function rightDisplay() {
     text('unknowns = ' + n, 150, 100);
     pop();
 
+    let extras = updateExtra();
+
     push();
     text("species balances = 2\nA B", 150, 240);
     text('extra information = ' + g.extraInfo, 150, 300);
+    pop();
+
+    push();
+    fill('blue');
+    for (let i = 0; i < g.extraInfo; i++) {
+        if (extras[i][0] == 'K') {
+            if (dropdownvalue == 'reboiler') {
+                text('K  = y  /x', 150, 330 + ceil(i / 3) * 30);
+                push(); textSize(14);
+                text('r', 130, 337 + ceil(i / 3) * 30);
+                text('7', 165, 337 + ceil(i / 3) * 30);
+                text('5', 190, 337 + ceil(i / 3) * 30);
+                pop();
+            }
+            // else if (g.totalCondenser) {
+            //     text('y  = x  = x');
+            // }
+            else {
+                text('K  = y  /x', 150, 330 + ceil(i / 3) * 30);
+                push(); textSize(14);
+                text('c', 130, 337 + ceil(i / 3) * 30);
+                text('4', 165, 337 + ceil(i / 3) * 30);
+                text('6', 190, 337 + ceil(i / 3) * 30);
+                pop();
+            }
+        }
+        else {
+            text('Σ' + extras[i][0] + '  = 1', 75 + i % 3 * 75, 330 + 30 * floor(i / 3));
+
+            push(); textSize(14);
+            text(extras[i][1], 72 + i % 3 * 75, 337 + 30 * floor(i / 3));
+            pop();
+        }
+    }
+    pop();
+
+    push();
+    let dof = n - g.extraInfo;
+    text('degrees of freedom = ' + dof, 150, 420);
+    if (dof == 0) {
+        text('solvable', 150, 450);
+    }
+    else if (dof < 0) {
+        text('overspecified', 150, 450);
+    }
+    else {
+        text('underspecified', 150, 450);
+    }
     pop();
 
     pop();
