@@ -51,7 +51,7 @@ const barChartConfig = {
               label += ': ';
             }
             if (context.parsed.y !== null) {
-              label += context.parsed.y.toFixed(6) + ' mol'; // Show value up to six decimal places
+              label += context.parsed.y.toFixed(6); // Show value up to six decimal places
             }
             return label;
           }
