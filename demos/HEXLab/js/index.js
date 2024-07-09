@@ -23,7 +23,7 @@ window.g = {
 
     Qdot: 0,
 
-    hexType: SHELL_TUBE,
+    hexType: DOUBLE_TUBE,
     rotTargX: 0,
     rotTargY: 0,
     rotX: 0,
