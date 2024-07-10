@@ -234,29 +234,41 @@ function drawTextElements(nUnknowns) {
     for (let i = 0; i < nUnknowns; i++) {
         element = textElements[i];
         
-        
-        if (g.condenserType === 'part' && element.mainText === '   y \n 1-y ' && element.sub === '4,A \n \n 4,A') {
-            element.mainText = '   y \n 1-y '; 
-            element.sub = '4,A \n \n 4,A'; 
-        }
+        if (g.condenserType === 'partial' && element.mainText === '   y \n 1-y ' && element.sub === '4,A \n \n 4,A') {
+            element.mainText = '   y \n 1-y ';    
+        } else if ((g.condenserType === 'partial' && element.altText === '   y \n   y' && element.altSub === '4,A \n \n4,B'))
+            element.altText = '   y \n   y'; 
 
-        fill(activeColor); //stroke(activeColor); //noStroke();
+        fill(activeColor); 
         drawSub(element.mainText, element.sub, element.x, element.y, element.size, element.xsub, element.altText, element.altSub, g.showZb);
     }
     for (let i = nUnknowns; i < textElements.length; i++) {
         element = textElements[i];
 
-    
         if (g.condenserType === 'total' && element.mainText === '   y \n 1-y ' && element.sub === '4,A \n \n 4,A') {
             element.mainText = '   x \n 1-x '; 
-            element.sub = '4,A \n \n 4,A'; 
-        }
+           
+        } else if ((g.condenserType === 'partial' && element.mainText === '   x \n 1-x ' && element.sub === '4,A \n \n 4,A'))
+            element.mainText = '   y \n 1-y '; 
 
-        fill(defaultColor); //stroke(activeColor); //noStroke();
+        fill(defaultColor); 
+        drawSub(element.mainText, element.sub, element.x, element.y, element.size, element.xsub, element.altText, element.altSub, g.showZb);
+    }
+    for (let i = nUnknowns; i < textElements.length; i++) {
+        element = textElements[i];
+
+        if (g.condenserType === 'total' && element.altText === '   y \n   y' && element.altSub === '4,A \n \n4,B') {
+            element.altText = '   x \n   x'; 
+           
+        } else if ((g.condenserType === 'partial' && element.altText === '   x \n   x' && element.altSub === '4,A \n \n4,B'))
+            element.altText = '   y \n   y'; 
+
+        fill(defaultColor); 
         drawSub(element.mainText, element.sub, element.x, element.y, element.size, element.xsub, element.altText, element.altSub, g.showZb);
     }
     pop();
 }
+
 document.getElementById('partial').addEventListener('change', function () {
     if (this.checked) {
         g.condenserType = 'partial';
@@ -455,9 +467,14 @@ function rightDisplay() {
                 text('5', 190, 337 + ceil(i / 3) * 30);
                 pop();
             }
-            // else if (g.totalCondenser) {
-            //     text('y  = x  = x');
-            // }
+            else if (g.condenserType === 'total') {
+                text('y  = x  = x', 150, 330 + ceil(i / 3) * 30);
+                push(); textSize(14);
+                text('2', 124, 337 + ceil(i / 3) * 30);
+                text('4', 158, 337 + ceil(i / 3) * 30);
+                text('6', 194, 337 + ceil(i / 3) * 30);
+                pop();
+            }
             else {
                 text('K  = y  /x', 150, 330 + ceil(i / 3) * 30);
                 push(); textSize(14);
