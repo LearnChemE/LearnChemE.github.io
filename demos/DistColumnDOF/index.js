@@ -18,6 +18,8 @@ window.g = {
     condenserType: 'partial'
 };
 
+
+
 const CON_COL = 0;
 const REB_COL = 1;
 const CON_TOT = 2;
@@ -183,12 +185,16 @@ function updateExtra() {
         extras.push('K');
         nExtra++;
     }
+    
     else if (dropdownvalue == 'condenser') {
         extras.push('K');
         nExtra++;
-        // if (g.totalCondenser) nExtra++;
     }
-
+    if (g.condenserType === 'total') {
+        extras.push('K');
+        nExtra++;
+    } 
+   
     g.extraInfo = nExtra;
     return extras;
 }
@@ -225,7 +231,7 @@ function findExtraXInfo() {
     return array;
 }
 
-import { drawRectangle, drawArrow, drawBorder, drawText, drawSub } from './functions.mjs';
+import { drawRectangle, drawArrow, drawBorder, drawSub, drawTextBox } from './functions.mjs';
 
 function drawTextElements(nUnknowns) {
     let element;
@@ -284,7 +290,7 @@ document.getElementById('total').addEventListener('change', function () {
 const condenserType = document.getElementById('condenser-type');
 
 function drawDisplay(value) {
-    // console.log(value);
+   
     let borderVars;
     let colcon = 'black';
     let colreb = 'black';
@@ -377,6 +383,7 @@ function setup() {
     g.cnv = createCanvas(1100, 600);
     g.cnv.parent("graphics-wrapper");
     g.cnv.id("defaultCanvas0");
+    draw(); 
 }
 
 document.getElementById('unknown').addEventListener('change', function () {
@@ -391,6 +398,7 @@ document.getElementById('isotype').addEventListener('change', function () {
 });
 
 function rightDisplay() {
+    
     push();
     translate(800, 0);
     let rx = 300;
@@ -457,6 +465,7 @@ function rightDisplay() {
 
     push();
     fill('blue');
+
     for (let i = 0; i < g.extraInfo; i++) {
         if (extras[i][0] == 'K') {
             if (dropdownvalue == 'reboiler') {
@@ -467,7 +476,8 @@ function rightDisplay() {
                 text('5', 190, 337 + ceil(i / 3) * 30);
                 pop();
             }
-            else if (g.condenserType === 'total') {
+            if (g.condenserType === 'total') {
+              
                 text('y  = x  = x', 150, 330 + ceil(i / 3) * 30);
                 push(); textSize(14);
                 text('2', 124, 337 + ceil(i / 3) * 30);
@@ -476,6 +486,7 @@ function rightDisplay() {
                 pop();
             }
             else {
+                
                 text('K  = y  /x', 150, 330 + ceil(i / 3) * 30);
                 push(); textSize(14);
                 text('c', 130, 337 + ceil(i / 3) * 30);
@@ -483,8 +494,11 @@ function rightDisplay() {
                 text('6', 190, 337 + ceil(i / 3) * 30);
                 pop();
             }
+           
         }
+       
         else {
+            
             text('Σ' + extras[i][0] + '  = 1', 75 + i % 3 * 75, 330 + 30 * floor(i / 3));
 
             push(); textSize(14);
@@ -498,13 +512,13 @@ function rightDisplay() {
     let dof = n - g.extraInfo;
     text('degrees of freedom = ' + dof, 150, 420);
     if (dof == 0) {
-        text('solvable', 150, 450);
+        drawTextBox('solvable', 150, 450, color(81, 214, 117));
     }
     else if (dof < 0) {
-        text('overspecified', 150, 450);
+        drawTextBox('overspecified', 150, 450, color(237, 237, 55));
     }
     else {
-        text('underspecified', 150, 450);
+        drawTextBox('underspecified', 150, 450, color(242, 111, 116));
     }
     pop();
 

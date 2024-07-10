@@ -91,6 +91,19 @@ function drawSub(mainText, subscript, x, y, mainTextSize, xsub, altText = '', al
   text(smText, x + textWidth(mainText) + xsub, y + subscriptOffset);
 }
 
+function drawTextBox(txt, x, y, bgColor) {
+  let padding = 10;
+  let textWidthValue = textWidth(txt);
+  let textHeight = textAscent() + textDescent();
 
 
-export { drawRectangle, drawArrow, drawBorder, drawText, drawSub };
+  fill(bgColor); 
+  stroke(0); 
+  rectMode(CENTER);
+  rect(x, y, textWidthValue + padding * 2.5, textHeight + padding * 1);
+  fill(0); 
+  noStroke();
+  text(txt, x, y);
+}
+
+export { drawRectangle, drawArrow, drawBorder, drawSub, drawTextBox };

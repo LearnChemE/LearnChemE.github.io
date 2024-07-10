@@ -80,8 +80,15 @@ top: 20px;
 }
 
 #condenser-type {
-  position: relative;
-  left: 430px;
-  top: 30px;
-  
+  display: grid;
+  position: absolute;
+  left: 460px;
+  top: 39px;
+  width: 200px;
+  height: 40px;
 }
+
+#shuffle-btn{
+    position: relative;
+    left: 40px;
+  }
