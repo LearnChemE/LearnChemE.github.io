@@ -5,11 +5,13 @@ window.g = {
     cnv: undefined,
     width: 800,
     height: 480,
-    state: 1,
+    state: 0,
 
     name: '',
+
     playS1: false,
     s1time: 0,
+    s1measure: -1,
 
     orangeFluidColor: [255, 50, 0, 200],
     blueFluidColor: [0, 80, 255, 180],
@@ -46,9 +48,9 @@ function setup() {
     dt = doubleTubeGraphic(500, 400);
     dtb = doubleTubeBlue(500, 400, 50, 450, 50);
     dto = doubleTubeOrng(500, 400, 50, 450, 50);
-    // labels = createGraphics(100, 100, WEBGL);
+    b = createBeaker();
+
     textFont(font);
-    // labels.background(250);
 }
 
 function draw() {
@@ -115,3 +117,4 @@ coldTempSlider.addEventListener("input", function () {
     g.Tc_in = tmp;
     coldTempLabel.innerHTML = `${tmp.toFixed(1)}`;
 })
+

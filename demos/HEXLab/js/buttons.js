@@ -25,6 +25,7 @@
 const startButton = document.getElementById("start-reset-btn");
 const inputName = document.getElementById("input-name");
 const playBtn = document.getElementById("play-btn");
+const measureBtn = document.getElementById("measure-btn");
 
 inputName.addEventListener("input", () => {
     const input = inputName.value;
@@ -34,7 +35,7 @@ inputName.addEventListener("input", () => {
 startButton.addEventListener("click", () => {
     if (g.state == 0) {
         g.state = 1;
-        startButton.innerHTML = `<i class="fa-solid fa-backward-fast"></i><div>reset</div>`;
+        startButton.innerHTML = `<i class="fa-solid fa-arrow-rotate-left"></i><div>reset</div>`;
         inputName.classList.add("hidden");
     }
     else {
@@ -45,14 +46,13 @@ startButton.addEventListener("click", () => {
 });
 
 playBtn.addEventListener("click", () => {
-    console.log('clicked')
     if (g.playS1) {
         g.playS1 = false;
         playBtn.classList.remove("btn-outline-danger");
         playBtn.classList.add("btn-outline-success");
         playBtn.innerHTML = `<i class="fa-solid fa-play"></i>`;
     }
-    else if (g.s1time >= 15) {
+    else if (g.s1time >= 16.0) {
         g.s1time = 0;
         timeSlider.value = 0;
         timeLabel.innerHTML = `0.0`;
@@ -69,18 +69,21 @@ playBtn.addEventListener("click", () => {
     }
 })
 
+measureBtn.addEventListener("click", () => {
+    g.s1measure = g.s1time;
+});
+
 timeSlider = document.getElementById("progress-bar");
 timeLabel = document.getElementById("time-label");
 
 function playTime() {
     time = Number(timeSlider.value);
-    console.log(deltaTime);
     time = time + deltaTime / 1000;
     g.s1time = time;
     timeSlider.value = time;
     timeLabel.innerHTML = `${time.toFixed(1)}`;
 
-    if (time >= 15) {
+    if (time >= 16.0) {
         g.playS1 = false;
         playBtn.classList.remove("btn-outline-danger");
         playBtn.classList.add("btn-outline-success");

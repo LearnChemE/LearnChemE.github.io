@@ -189,21 +189,55 @@ function extraLabels() {
     return l;
 }
 
+function createBeaker() {
+    let b = createGraphics(120, 120);
+
+    b.strokeWeight(5); b.stroke('black');
+    // lip
+    b.line(0, 2, 10, 2);
+    b.line(110, 2, 120, 2);
+    // sides
+    b.line(10, 2, 10, 118);
+    b.line(110, 2, 110, 118);
+    // bottom
+    b.line(10, 118, 110, 118);
+    // measuring lines
+    b.strokeWeight(2);
+    for (let i = 0; i < 9; i++) {
+        if (i % 2 == 0) {
+            b.line(30, i * 10 + 20, 90, i * 10 + 20);
+        }
+        else {
+            b.line(45, i * 10 + 20, 75, i * 10 + 20);
+        }
+    }
+    return b;
+}
+
+function fillBeaker(b, vol, color = 'pink') {
+    let newb = createGraphics(120, 120);
+    newb.fill(color); newb.noStroke();
+    newb.rect(10, 120 - vol, 100, vol);
+    newb.image(b, 0, 0);
+    return newb;
+}
+
 /* ********************************************* */
 /* **************** DRAW DISPLAYS ************** */
 /* ********************************************* */
 
 function drawAll() {
     switch (g.state) {
+        case -1: // dev mode
+            break;
         case 0:
             landingPage();
             break;
         case 1:
             // labels = extraLabels();
-            image(dt, 0, 0);
-            image(dto, 0, 0);
-            image(dtb, 0, 0);
-            // image(labels, 0, 0);
+            image(dt, 0, 25);
+            fillAnimation(0, 25);
+            placeBeakers();
             if (g.playS1) playTime();
             break;
     }
@@ -223,6 +257,60 @@ function landingPage() {
     if (g.name != '') {
         stroke('green'); strokeWeight(2); noFill();
         rect(300, 180, 250, 30);
+    }
+    pop();
+}
+
+function fillAnimation(x = 0, y = 0) {
+    let s;
+    let partOrng;
+
+    push();
+    translate(x, y);
+    if ((time = g.s1time) <= 1.5) {
+        s = 88 + g.s1time * 218
+        partOrng = dto.get(0, 0, 500, s);
+        partBlue = dtb.get(0, 450 - s, 500, 50 + s);
+        image(partOrng, 0, 0);
+        image(partBlue, 0, 450 - s);
+    }
+    else {
+        image(dto, 0, 0);
+        image(dtb, 0, 0);
+    }
+    pop();
+}
+
+function placeBeakers() {
+    let volumeH0 = map(g.s1time, 0, 16, 100, 20);
+    let volumeH1 = map(g.s1time, 0, 16, 20, 100);
+    let volumeC0 = map(g.s1time, 0, 16, 100, 20);
+    let volumeC1 = map(g.s1time, 0, 16, 20, 100);
+
+    bh0 = fillBeaker(b, volumeH0, g.orangeFluidColor);
+    bh1 = fillBeaker(b, volumeH1, g.orangeFluidColor);
+    bc0 = fillBeaker(b, volumeC0, g.blueFluidColor);
+    bc1 = fillBeaker(b, volumeC1, g.blueFluidColor);
+
+    image(bh0, 500, 110);
+    image(bh1, 500, 250);
+    image(bc1, 640, 40);
+    image(bc0, 640, 330);
+
+    push();
+    fill('black'); noStroke(); textSize(18);
+    text('volume = ' + volumeC1.toFixed(1) + ' mL', 630, 30);
+    text('volume = ' + volumeH0.toFixed(1) + ' mL', 490, 100);
+    text('volume = ' + volumeC0.toFixed(1) + ' mL', 630, 470);
+    text('volume = ' + volumeH1.toFixed(1) + ' mL', 490, 390);
+
+    text('initial: 100.0 mL', 640, 200);
+    text('at: 0.0 s', 670, 225);
+
+    let m;
+    if ((m = g.s1measure) != -1) {
+        text('measured: ' + (100 - m * 5).toFixed(1) + ' mL', 640, 265);
+        text('at: ' + m.toFixed(1) + ' s', 670, 290);
     }
     pop();
 }

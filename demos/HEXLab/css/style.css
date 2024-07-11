@@ -101,7 +101,8 @@ canvas {
 
 .buttons-container {
     display: grid;
-    grid-template-columns: max-content;
+    grid-template-columns: max-content max-content;
+    gap: 10px;
 
     .btn {
         display: grid;
@@ -116,7 +117,11 @@ canvas {
     }
 
     #start-reset-btn {
-        width: 120px;
+        width: 90px;
+    }
+
+    #next-button {
+        width: 90px;
     }
 }
 
