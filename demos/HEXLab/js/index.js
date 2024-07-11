@@ -5,6 +5,11 @@ window.g = {
     cnv: undefined,
     width: 800,
     height: 480,
+    state: 1,
+
+    name: '',
+    playS1: false,
+    s1time: 0,
 
     orangeFluidColor: [255, 50, 0, 200],
     blueFluidColor: [0, 80, 255, 180],
@@ -35,11 +40,12 @@ function preload() {
 }
 
 function setup() {
-    g.cnv = createCanvas(g.width, g.height, WEBGL);
+    g.cnv = createCanvas(g.width, g.height);
     g.cnv.parent("graphics-wrapper");
 
     dt = doubleTubeGraphic(500, 400);
-
+    dtb = doubleTubeBlue(500, 400, 50, 450, 50);
+    dto = doubleTubeOrng(500, 400, 50, 450, 50);
     // labels = createGraphics(100, 100, WEBGL);
     textFont(font);
     // labels.background(250);
@@ -50,28 +56,7 @@ function draw() {
     // labels.clear();
 
     heatTransferRate();
-
-    if (g.hexType == DOUBLE_TUBE) {
-        labels = extraLabels();
-        image(dt, -250, -200);
-        image(labels, -250, -200);
-    }
-    else {
-
-        clear();
-        drag();
-
-        push();
-        rotateY(g.rotX);
-        rotateX(-g.rotY);
-
-        translate(0, 0, 90);
-        shellTubeGraphic(500, 400);
-
-        translate(0, 0, 50);
-        shellTubeLabels();
-        pop();
-    }
+    drawAll();
 }
 
 function drag() {

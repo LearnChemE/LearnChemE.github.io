@@ -27,6 +27,7 @@
     <!-- Style sheets -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/sliders.css">
+    <script src="https://kit.fontawesome.com/9d19ad28f4.js" crossorigin="anonymous"></script>
 
     <title>Heat Exchanger Virtual Lab</title>
 </head>
@@ -34,39 +35,62 @@
 <body>
     <div class="nav-bar">
         <div class="nav-bar-column" id="nav-bar-left">
-            <div class="button-container" id="hex-btn-container">
-                <div id="hex-type-label">heat exchanger type</div>
+            <div class="buttons-container">
+                <button type="button" id="start-reset-btn" class="btn btn-primary">
+                    <i class="fa-solid fa-play"></i>
+                    <div>start</div>
+                </button>
+            </div>
+
+            <!-- <div class="button-container" id="hex-btn-container">
+                    <div id="hex-type-label">heat exchanger type</div>
                 <button type="button" id="double-tube-btn" class="btn btn-primary">Double Tube</button>
                 <button type="button" id="shell-tube-btn" class="btn btn-outline-primary">Shell and Tube</button>
+
+                </div> -->
+        </div>
+        <div class="nav-bar-column" id="nav-bar-center">
+            <div class="time-wrapper">
+                <input type="range" id="progress-bar" min="0" max="15" value="0" step="0.016">
+                <div id="time-label">0.0</div>
+                <button type="button" id="play-btn" class="btn btn-outline-success">
+                    <i class="fa-solid fa-play"></i>
+                </button>
             </div>
         </div>
         <div class="nav-bar-column" id="nav-bar-right">
 
-            <div class="slider-wrapper" id="hot-slider-wrapper">
-                <div class="slider-label">process fluid flowrate (g/s)</div>
-                <input type="range" id="hot-flow-slider" min="0.5" max="5" value="1" step="0.1">
-                <div class="slider-val-label" id="hot-flow-label">1.0</div>
-            </div>
-            <div class="slider-wrapper" id="hottemp-slider-wrapper">
-                <div class="slider-label">process fluid temperature (°C)</div>
-                <input type="range" id="hot-temp-slider" min="20" max="50" value="40" step="1">
-                <div class="slider-val-label" id="hot-temp-label">40</div>
-            </div>
+            <div class="controls-wrapper hidden" id="sim-sliders">
+                <div class="slider-wrapper" id="hot-slider-wrapper">
+                    <div class="slider-label">process fluid flowrate (g/s)</div>
+                    <input type="range" id="hot-flow-slider" min="0.5" max="5" value="1" step="0.1">
+                    <div class="slider-val-label" id="hot-flow-label">1.0</div>
+                </div>
+                <div class="slider-wrapper" id="hottemp-slider-wrapper">
+                    <div class="slider-label">process fluid temperature (°C)</div>
+                    <input type="range" id="hot-temp-slider" min="20" max="50" value="40" step="1">
+                    <div class="slider-val-label" id="hot-temp-label">40</div>
+                </div>
 
-            <div class="slider-wrapper" id="cold-slider-wrapper">
-                <div class="slider-label">coolant flowrate (g/s)</div>
-                <input type="range" id="cold-flow-slider" min="0.5" max="5" value="1" step="0.1">
-                <div class="slider-val-label" id="cold-flow-label">1.0</div>
-            </div>
-            <div class="slider-wrapper" id="coldtemp-slider-wrapper">
-                <div class="slider-label">coolant temperature (°C)</div>
-                <input type="range" id="cold-temp-slider" min="1" max="15" value="10" step="1">
-                <div class="slider-val-label" id="cold-temp-label">10</div>
+                <div class="slider-wrapper" id="cold-slider-wrapper">
+                    <div class="slider-label">coolant flowrate (g/s)</div>
+                    <input type="range" id="cold-flow-slider" min="0.5" max="5" value="1" step="0.1">
+                    <div class="slider-val-label" id="cold-flow-label">1.0</div>
+                </div>
+                <div class="slider-wrapper" id="coldtemp-slider-wrapper">
+                    <div class="slider-label">coolant temperature (°C)</div>
+                    <input type="range" id="cold-temp-slider" min="1" max="15" value="10" step="1">
+                    <div class="slider-val-label" id="cold-temp-label">10</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="graphics-wrapper"></div>
+    <div id="graphics-wrapper">
+        <div id="inputs-wrapper">
+            <input type="text" id="input-name">
+        </div>
+    </div>
 
 </body>
 
@@ -75,3 +99,4 @@
 <script src="js/index.js"></script>
 <script src="js/functions.js"></script>
 <script src="js/buttons.js"></script>
+<script src="js/draw.js"></script>
