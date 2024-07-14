@@ -1,0 +1,94 @@
+:root {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+  }
+  
+  #simulation-title {
+    width: 100vw;
+    height: 35px;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-size: 18px;
+  }
+  
+  #simulation-wrapper {
+    /* position: absolute; */
+    /* left: 0px; */
+    /* top: 10px; */
+    width: 100vw;
+    /* height: calc(100vh - 100px); */
+  }
+.inputs-wrapper {
+    display: inline-grid;
+    grid-template-columns: max-content max-content;
+    justify-items: center;
+    align-items: center;
+    gap: 15px 5px;
+    margin-top: 10px;
+  }
+  .input-row {
+    display: grid;
+    grid-template-columns: max-content 150px 15px max-content; 
+    gap: 10px;
+    align-items: end;
+    justify-items: center;
+    margin-top: 10px;
+    margin-right: 15px;
+  
+  }
+  
+ .balance {
+  display: grid;
+  grid-template-columns: max-content 320px 35px max-content;
+  gap: 10px;
+  align-items: center;
+  justify-items: center;
+  margin-top: 0px;
+  margin-right: 15px;
+ }
+
+.simulation-wrapper {
+    float: right;
+    margin-right: 15px;
+}
+.simulation-controls {
+float: right;
+margin-right: 15px;
+min-width: 300px;
+}
+
+.inputs { 
+  display: inline-block;
+}
+#defaultCanvas0 {
+position:relative;
+top: 20px;
+}
+
+#equation {
+  display: inline;
+  position: relative;
+  top: 20px;
+  left: 230px;
+  font-size: 19px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.first {
+  color: blue; 
+  display: inline;
+}
+
+#condenser-type {
+  display: grid;
+  position: absolute;
+  left: 460px;
+  top: 39px;
+  width: 200px;
+  height: 40px;
+}
+
+#shuffle-btn{
+    position: relative;
+    left: 40px;
+  }
