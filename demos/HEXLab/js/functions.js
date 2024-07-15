@@ -172,6 +172,51 @@ function heatTransferRate() {
     g.Tc_out = g.Tc_in + g.Qdot / g.cpC / g.mDotC;
 }
 
+function showSimulationControls() {
+    hideExtraControls();
+    switch (g.state) {
+        case 0:
+            inputName.classList.remove("hidden");
+            break;
+        case 1:
+            nextBtn.classList.remove("hidden");
+            document.getElementById("time-wrapper").classList.remove("hidden");
+            measureBtn.classList.remove("hidden");
+            break;
+        case 2:
+            nextBtn.classList.remove("hidden");
+            break;
+        case 3:
+            nextBtn.classList.remove("hidden");
+            measureBtn.classList.remove("hidden");
+            document.getElementById("t-selection-btn-wrapper").classList.remove("hidden");
+            break;
+    }
+}
+
+// Hides all controls but the start/reset button
+function hideExtraControls() {
+    inputName.classList.remove("hidden");
+    nextBtn.classList.add("hidden");
+    document.getElementById("time-wrapper").classList.add("hidden");
+    measureBtn.classList.add("hidden");
+    inputName.classList.add("hidden");
+    document.getElementById("t-selection-btn-wrapper").classList.add("hidden");
+}
+
+function outlineSelectionButtons(n) {
+    for (let i = 0; i < 4; i++) {
+        if (i == n) {
+            tempSelectionBtns[i].classList.remove("btn-outline-success");
+            tempSelectionBtns[i].classList.add("btn-success");
+        }
+        else {
+            tempSelectionBtns[i].classList.add("btn-outline-success");
+            tempSelectionBtns[i].classList.remove("btn-success");
+        }
+    }
+}
+
 // function shellTubeLabels() {
 //     let bounds;
 

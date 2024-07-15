@@ -11,10 +11,6 @@ input {
     cursor: pointer;
 }
 
-hidden {
-    display: none;
-}
-
 #graphics-wrapper {
     position: relative;
     width: max-content;
@@ -88,7 +84,7 @@ canvas {
     gap: 10px;
 }
 
-.time-wrapper {
+#time-wrapper {
     display: grid;
     grid-template-columns: 300px 40px 40px;
     gap: 5px;
@@ -137,4 +133,18 @@ canvas {
     width: 250px;
     left: 300px;
     top: 180px;
+}
+
+
+.hidden,
+.btn.hidden,
+#time-wrapper.hidden,
+.close-btns-wrapper.hidden {
+    display: none;
+}
+
+.close-btns-wrapper {
+    display: grid;
+    grid-template-columns: max-content max-content max-content max-content;
+    gap: 5px;
 }

@@ -5,13 +5,17 @@ window.g = {
     cnv: undefined,
     width: 800,
     height: 480,
-    state: 0,
+    state: 3,
 
     name: '',
 
     playS1: false,
     s1time: 0,
     s1measure: -1,
+    animationStartTime: 0,
+
+    s3select: -1,
+    s3measure: [-1, -1, -1, -1],
 
     orangeFluidColor: [255, 50, 0, 200],
     blueFluidColor: [0, 80, 255, 180],
@@ -29,12 +33,6 @@ window.g = {
     Tc_out: 10,
 
     Qdot: 0,
-
-    hexType: DOUBLE_TUBE,
-    rotTargX: 0,
-    rotTargY: 0,
-    rotX: 0,
-    rotY: 0,
 }
 
 function preload() {
@@ -49,6 +47,8 @@ function setup() {
     dtb = doubleTubeBlue(500, 400, 50, 450, 50);
     dto = doubleTubeOrng(500, 400, 50, 450, 50);
     b = createBeaker();
+
+    if (g.state != 0) { showSimulationControls() } // used for debug
 
     textFont(font);
 }

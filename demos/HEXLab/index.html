@@ -25,8 +25,8 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <!-- Style sheets -->
-    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/sliders.css">
+    <link rel="stylesheet" href="css/style.css">
     <script src="https://kit.fontawesome.com/9d19ad28f4.js" crossorigin="anonymous"></script>
 
     <title>Heat Exchanger Virtual Lab</title>
@@ -40,7 +40,7 @@
                     <i class="fa-solid fa-play"></i>
                     <div>start</div>
                 </button>
-                <button type="button" id="next-btn" class="btn btn-primary" disabled>
+                <button type="button" id="next-btn" class="btn btn-primary hidden" disabled aria-disabled="true">
                     <i class="fa-solid fa-play"></i>
                     <div>next</div>
                 </button>
@@ -54,17 +54,23 @@
                 </div> -->
         </div>
         <div class="nav-bar-column" id="nav-bar-center">
-            <div class="time-wrapper">
+            <div class="hidden" id="time-wrapper">
                 <input type="range" id="progress-bar" min="0" max="16" value="0" step="0.016">
                 <div id="time-label">0.0</div>
                 <button type="button" id="play-btn" class="btn btn-outline-success">
                     <i class="fa-solid fa-play"></i>
                 </button>
             </div>
+            <div class="close-btns-wrapper hidden" id="t-selection-btn-wrapper">
+                <button type="button" id="thi-btn" class="btn btn-outline-success">\(T_\text{h,in}\)</button>
+                <button type="button" id="tho-btn" class="btn btn-outline-success">\(T_\text{h,out}\)</button>
+                <button type="button" id="tci-btn" class="btn btn-outline-success">\(T_\text{c,in}\)</button>
+                <button type="button" id="tco-btn" class="btn btn-outline-success">\(T_\text{c,out}\)</button>
+            </div>
         </div>
         <div class="nav-bar-column" id="nav-bar-right">
 
-            <button type="button" id="measure-btn" class="btn btn-secondary">take measurement</button>
+            <button type="button" id="measure-btn" class="btn btn-secondary hidden">take measurement</button>
 
             <div class="controls-wrapper hidden" id="sim-sliders">
                 <div class="slider-wrapper" id="hot-slider-wrapper">
