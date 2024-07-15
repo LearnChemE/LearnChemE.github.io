@@ -1,4 +1,3 @@
-
 var dropdownvalue = "condenser";
 window.g = {
     unknowns: 1,
@@ -14,7 +13,7 @@ window.g = {
     nReb: 0,
     nCon: 0,
     nTot: 0,
-  
+
     condenserType: 'partial'
 };
 
@@ -185,7 +184,7 @@ function updateExtra() {
         extras.push('K');
         nExtra++;
     }
-    
+
     else if (dropdownvalue == 'condenser') {
         extras.push('K');
         nExtra++;
@@ -193,8 +192,8 @@ function updateExtra() {
     if (g.condenserType === 'total') {
         extras.push('K');
         nExtra++;
-    } 
-   
+    }
+
     g.extraInfo = nExtra;
     return extras;
 }
@@ -239,37 +238,37 @@ function drawTextElements(nUnknowns) {
     push();
     for (let i = 0; i < nUnknowns; i++) {
         element = textElements[i];
-        
-        if (g.condenserType === 'partial' && element.mainText === '   y \n 1-y ' && element.sub === '4,A \n \n 4,A') {
-            element.mainText = '   y \n 1-y ';    
-        } else if ((g.condenserType === 'partial' && element.altText === '   y \n   y' && element.altSub === '4,A \n \n4,B'))
-            element.altText = '   y \n   y'; 
 
-        fill(activeColor); 
+        if (g.condenserType === 'partial' && element.mainText === '   y \n 1-y ' && element.sub === '4,A \n \n 4,A') {
+            element.mainText = '   y \n 1-y ';
+        } else if ((g.condenserType === 'partial' && element.altText === '   y \n   y' && element.altSub === '4,A \n \n4,B'))
+            element.altText = '   y \n   y';
+
+        fill(activeColor);
         drawSub(element.mainText, element.sub, element.x, element.y, element.size, element.xsub, element.altText, element.altSub, g.showZb);
     }
     for (let i = nUnknowns; i < textElements.length; i++) {
         element = textElements[i];
 
         if (g.condenserType === 'total' && element.mainText === '   y \n 1-y ' && element.sub === '4,A \n \n 4,A') {
-            element.mainText = '   x \n 1-x '; 
-           
-        } else if ((g.condenserType === 'partial' && element.mainText === '   x \n 1-x ' && element.sub === '4,A \n \n 4,A'))
-            element.mainText = '   y \n 1-y '; 
+            element.mainText = '   x \n 1-x ';
 
-        fill(defaultColor); 
+        } else if ((g.condenserType === 'partial' && element.mainText === '   x \n 1-x ' && element.sub === '4,A \n \n 4,A'))
+            element.mainText = '   y \n 1-y ';
+
+        fill(defaultColor);
         drawSub(element.mainText, element.sub, element.x, element.y, element.size, element.xsub, element.altText, element.altSub, g.showZb);
     }
     for (let i = nUnknowns; i < textElements.length; i++) {
         element = textElements[i];
 
         if (g.condenserType === 'total' && element.altText === '   y \n   y' && element.altSub === '4,A \n \n4,B') {
-            element.altText = '   x \n   x'; 
-           
-        } else if ((g.condenserType === 'partial' && element.altText === '   x \n   x' && element.altSub === '4,A \n \n4,B'))
-            element.altText = '   y \n   y'; 
+            element.altText = '   x \n   x';
 
-        fill(defaultColor); 
+        } else if ((g.condenserType === 'partial' && element.altText === '   x \n   x' && element.altSub === '4,A \n \n4,B'))
+            element.altText = '   y \n   y';
+
+        fill(defaultColor);
         drawSub(element.mainText, element.sub, element.x, element.y, element.size, element.xsub, element.altText, element.altSub, g.showZb);
     }
     pop();
@@ -290,7 +289,7 @@ document.getElementById('total').addEventListener('change', function () {
 const condenserType = document.getElementById('condenser-type');
 
 function drawDisplay(value) {
-   
+
     let borderVars;
     let colcon = 'black';
     let colreb = 'black';
@@ -325,9 +324,9 @@ function drawDisplay(value) {
             coltot = 'green';
             condenserType.style.display = 'none';
             break;
-        default: 
+        default:
             condenserType.style.display = 'none';
-            break; 
+            break;
     }
 
     push();
@@ -373,7 +372,7 @@ function drawDisplay(value) {
 
 function drawVar(nUnknowns) {
     clear();
-    drawDisplay(dropdownvalue); // Ensure the display is updated
+    drawDisplay(dropdownvalue);
     textSize(18);
     drawTextElements(nUnknowns);
 }
@@ -383,7 +382,7 @@ function setup() {
     g.cnv = createCanvas(1100, 600);
     g.cnv.parent("graphics-wrapper");
     g.cnv.id("defaultCanvas0");
-    draw(); 
+    draw();
 }
 
 document.getElementById('unknown').addEventListener('change', function () {
@@ -398,7 +397,6 @@ document.getElementById('isotype').addEventListener('change', function () {
 });
 
 function rightDisplay() {
-    
     push();
     translate(800, 0);
     let rx = 300;
@@ -463,68 +461,75 @@ function rightDisplay() {
     text('extra information = ' + g.extraInfo, 150, 300);
     pop();
 
+    let addedEquations = new Set();
+
     push();
     fill('blue');
 
     for (let i = 0; i < g.extraInfo; i++) {
+        let equation = "";
+
         if (extras[i][0] == 'K') {
             if (dropdownvalue == 'reboiler') {
+                equation = 'Kr = y7/x5';
+            }
+            if (g.condenserType === 'total') {
+                equation = 'y2 = x4 = x6';
+            } else {
+                equation = 'Kc = y4/x6';
+            }
+        } else {
+            equation = 'Σ' + extras[i][0] + ' = 1';
+        }
+
+        if (!addedEquations.has(equation)) {
+            if (equation === 'Kr = y7/x5') {
                 text('K  = y  /x', 150, 330 + ceil(i / 3) * 30);
                 push(); textSize(14);
                 text('r', 130, 337 + ceil(i / 3) * 30);
                 text('7', 165, 337 + ceil(i / 3) * 30);
                 text('5', 190, 337 + ceil(i / 3) * 30);
                 pop();
-            }
-            if (g.condenserType === 'total') {
-              
+            } else if (equation === 'y2 = x4 = x6') {
                 text('y  = x  = x', 150, 330 + ceil(i / 3) * 30);
                 push(); textSize(14);
                 text('2', 124, 337 + ceil(i / 3) * 30);
                 text('4', 158, 337 + ceil(i / 3) * 30);
                 text('6', 194, 337 + ceil(i / 3) * 30);
                 pop();
-            }
-            else {
-                
+            } else if (equation === 'Kc = y4/x6') {
                 text('K  = y  /x', 150, 330 + ceil(i / 3) * 30);
                 push(); textSize(14);
                 text('c', 130, 337 + ceil(i / 3) * 30);
                 text('4', 165, 337 + ceil(i / 3) * 30);
                 text('6', 190, 337 + ceil(i / 3) * 30);
                 pop();
+            } else {
+                text('Σ' + extras[i][0] + ' = 1', 75 + i % 3 * 75, 330 + 30 * floor(i / 3));
+                push(); textSize(14);
+                text(extras[i][1], 72 + i % 3 * 75, 337 + 30 * floor(i / 3));
+                pop();
             }
-           
-        }
-       
-        else {
-            
-            text('Σ' + extras[i][0] + '  = 1', 75 + i % 3 * 75, 330 + 30 * floor(i / 3));
 
-            push(); textSize(14);
-            text(extras[i][1], 72 + i % 3 * 75, 337 + 30 * floor(i / 3));
-            pop();
+            addedEquations.add(equation);
         }
     }
     pop();
 
     push();
-    let dof = n - g.extraInfo;
+    let dof = n - g.extraInfo - 2;
     text('degrees of freedom = ' + dof, 150, 420);
     if (dof == 0) {
         drawTextBox('solvable', 150, 450, color(81, 214, 117));
-    }
-    else if (dof < 0) {
+    } else if (dof < 0) {
         drawTextBox('overspecified', 150, 450, color(237, 237, 55));
-    }
-    else {
+    } else {
         drawTextBox('underspecified', 150, 450, color(242, 111, 116));
     }
     pop();
 
     pop();
 }
-
 function draw() {
     // console.log('state 1');
     background(255);
