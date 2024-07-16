@@ -248,6 +248,18 @@ function drawAll() {
             image(dto, 0, 25);
             image(dtb, 0, 25);
             stage3Labels();
+            break;
+        case 4:
+            lmtdGraph.on_draw();
+            push();
+            plotEulersFuncs(lmtdGraph, 0, g.Tc_out, g.Th_in);
+            fill('black'); noStroke();
+            circle(...lmtdGraph.mapPoint(0, g.Th_in), 8);
+            circle(...lmtdGraph.mapPoint(0, g.Tc_out), 8);
+            circle(...lmtdGraph.mapPoint(1, g.Tc_in), 8);
+            circle(...lmtdGraph.mapPoint(1, g.Th_out), 8);
+            pop();
+            break;
     }
 }
 
@@ -433,3 +445,4 @@ function stage3Labels() {
 
     pop();
 }
+

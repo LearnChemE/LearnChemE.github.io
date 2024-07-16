@@ -5,7 +5,7 @@ window.g = {
     cnv: undefined,
     width: 800,
     height: 480,
-    state: 3,
+    state: 4,
 
     name: '',
 
@@ -26,6 +26,7 @@ window.g = {
     mDotH: 1, // g / s
 
     UA: 10, // W / K
+    eU: 10,
 
     Th_in: 40.0,
     Tc_in: 10.0,
@@ -38,6 +39,29 @@ window.g = {
 function preload() {
     font = loadFont('assets/Ubuntu-R.ttf');
 }
+
+lmtdGraph = new P5_Graph(500, 450, {
+    title: '',
+    titleFontSize: 20,
+    padding:
+        [[70, 20],
+        [40, 50]],
+    parent: document.body,
+    fill: 250, // This is very slightly darker than the white of the page
+
+    xTitle: 'location in heat exchanger',
+    yTitle: 'temperature (°C)',
+    xLabelPrecision: 0,
+    yLabelPrecision: 0,
+
+    xTickEvery: 5,
+    xTickCount: 0,
+    yTickEvery: 5,
+    yTickCount: 25,
+
+    disableXLabels: true,
+    disableYLabels: false,
+}, [0, 1], [0, 50]);
 
 function setup() {
     g.cnv = createCanvas(g.width, g.height);

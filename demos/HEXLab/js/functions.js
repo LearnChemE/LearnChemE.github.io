@@ -167,6 +167,7 @@ function heatTransferRate() {
     let epsilon = effectiveness(cmin, cmax);
     let QdotMax = cmin * (g.Th_in - g.Tc_in);
     g.Qdot = epsilon * QdotMax;
+    g.eU = epsilon * g.UA;
 
     g.Th_out = g.Th_in - g.Qdot / g.cpH / g.mDotH;
     g.Tc_out = g.Tc_in + g.Qdot / g.cpC / g.mDotC;
@@ -190,6 +191,10 @@ function showSimulationControls() {
             nextBtn.classList.remove("hidden");
             measureBtn.classList.remove("hidden");
             document.getElementById("t-selection-btn-wrapper").classList.remove("hidden");
+            break;
+        case 4:
+            nextBtn.classList.remove("hidden");
+            document.getElementById("sim-sliders").classList.remove("hidden");
             break;
     }
 }
@@ -215,6 +220,35 @@ function outlineSelectionButtons(n) {
             tempSelectionBtns[i].classList.remove("btn-success");
         }
     }
+}
+
+// Plot Diff Eq. 
+function plotEulersFuncs(graph, x0, y01, y02, n = 100) {
+    let dx = (graph.xRange[1] - x0) / n;
+    let i, dy1dx, dy2dx;
+    let y1 = y01, y2 = new Array(n), x = new Array(n);
+    y2[0] = y02;
+    x[0] = x0;
+
+    push();
+    beginShape(); noFill(); stroke('black'); strokeWeight(2);
+    vertex(...graph.mapPoint(x[0], y01));
+    for (i = 1; i < n; i++) {
+        dy1dx = -g.eU * (y2[i - 1] - y1) / g.cpC / g.mDotC;
+        dy2dx = -g.eU * (y2[i - 1] - y1) / g.cpH / g.mDotH;
+
+        x[i] = x[i - 1] + dx;
+        y1 += dy1dx * dx;
+        y2[i] = y2[i - 1] + dy2dx * dx;
+        vertex(...graph.mapPoint(x[i], y1));
+    }
+    endShape();
+    beginShape();
+    for (i = 0; i < n; i++) {
+        vertex(...graph.mapPoint(x[i], y2[i]));
+    }
+    endShape();
+    pop();
 }
 
 // function shellTubeLabels() {

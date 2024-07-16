@@ -259,6 +259,27 @@ class P5_Graph {
         pop();
     }
 
+    // Plot Diff Eq. The mapPoint could stand to be more optimised
+    plotEulersMethod(func, x0, y0, n = 100, color = 'black') {
+        let dx = (this.xRange[1] - x0) / n;
+        let i, x = x0, y = y0, dydx;
+
+        push();
+        stroke(color); strokeWeight(2);
+        noFill();
+
+        beginShape();
+        vertex(...this.mapPoint(x, y));
+        for (i = 0; i < n; i++) {
+            dydx = func(x);
+            x += dx;
+            y += dydx * x;
+            vertex(...this.mapPoint(x, y));
+        }
+        endShape();
+        pop();
+    }
+
     mapPoint(x, y) {
         let u = map(x, this.xRange[0], this.xRange[1], this.lx, this.rx);
         let v = map(y, this.yRange[0], this.yRange[1], this.by, this.ty);
