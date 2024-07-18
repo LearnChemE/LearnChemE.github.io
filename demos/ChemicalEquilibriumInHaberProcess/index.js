@@ -37,11 +37,24 @@ const data = {
     }
   }]
 };
+const customTextPlugin = {
+  id: 'customTextPlugin',
+  afterDraw: function (chart) {
+    const ctx = chart.ctx;
+    ctx.save();
+    ctx.font = '16px Arial';
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+    ctx.fillText('2', 440, 80);
+    ctx.restore();
+  }
+};
+
 
 const config = {
   type: 'bar',
   data: data,
-  plugins: [ChartDataLabels],
+  plugins: [ChartDataLabels, customTextPlugin],
   responsive: true,
   options: {
     plugins: {
@@ -123,13 +136,19 @@ const config = {
         }
       }
     },
-
   },
 };
 
+
 // --------------------------------
 
+window.addEventListener('resize', function () {
+  myChart.resize();
+});
 
+initValues();
+var canvas = document.getElementById('myChart').getContext('2d');
+var myChart = new Chart(canvas, config);
 updatePressure = (value) => {
   document.getElementById('pressureValue').innerText = value;
   P = value;
