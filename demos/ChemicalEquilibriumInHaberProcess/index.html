@@ -21,7 +21,9 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
   <!-- MDB -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css" rel="stylesheet" />
-
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.js"></script>
+  <script src="p5.js"></script>
 </head>
 
 <body>
@@ -63,18 +65,7 @@
           <span id="NH3MoleValue"></span>
         </div>
 
-        <div class="d-flex justify-content-evenly align-items-center mx-auto"
-          style="min-width: 400px; max-width: 800px;">
-          <div class="ms-5 pt-2">
-            <p class="fst-italic fs-6 text-center">\[\text{N}_2 + 3\text{H}_2 \rightleftharpoons 2\text{NH}_3 \]</p>
-          </div>
-          <div class="ms-5 pt-2">
-            <p class="fst-italic fs-6 text-center">
-              \[K = {{(\text{y}_{\text{NH}_3})^2} \over {\text{y}_{\text{N}_2} (\text{y}_{\text{H}_2})^3}} \cdot {1
-              \over \text{P}^2} \]
-            </p>
-          </div>
-        </div>
+
       </div>
     </div>
 
@@ -198,6 +189,7 @@
     crossorigin="anonymous"></script>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="index.js"></script>
+  <script src="functions.js"></script>
   <link rel="stylesheet" type="text/css" href="css/index.css">
 </body>
 

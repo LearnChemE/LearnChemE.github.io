@@ -38,10 +38,34 @@ const data = {
   }]
 };
 
+const imageSrc = 'equations.jpg';
+const image = new Image();
+image.src = imageSrc;
+
+const customImagePlugin = {
+  id: 'customImagePlugin',
+  afterDraw: function (chart) {
+    const ctx = chart.ctx;
+    ctx.save();
+
+
+    if (image.complete) {
+      const x = 290;
+      const y = 24;
+      const width = 380;
+      const height = 80;
+
+      ctx.drawImage(image, x, y, width, height);
+    }
+
+    ctx.restore();
+  }
+};
+
 const config = {
   type: 'bar',
   data: data,
-  plugins: [ChartDataLabels],
+  plugins: [ChartDataLabels, customImagePlugin],
   responsive: true,
   options: {
     plugins: {
@@ -76,6 +100,9 @@ const config = {
         beginAtZero: true,
         max: 21,
         ticks: {
+          callback: function (value, index, values) {
+            return value === 21 ? '' : value;
+          },
           font: function (context) {
             var width = context.chart.width;
             var size;
@@ -123,12 +150,23 @@ const config = {
         }
       }
     },
-
   },
 };
 
+
+image.onload = function () {
+  var canvas = document.getElementById('myChart').getContext('2d');
+  var myChart = new Chart(canvas, config);
+};
 // --------------------------------
 
+window.addEventListener('resize', function () {
+  myChart.resize();
+});
+
+initValues();
+var canvas = document.getElementById('myChart').getContext('2d');
+var myChart = new Chart(canvas, config);
 
 updatePressure = (value) => {
   document.getElementById('pressureValue').innerText = value;
@@ -168,7 +206,6 @@ updateChart = () => {
   myChart.update()
 }
 
-
 function initValues() {
   document.getElementById('pressureValue').innerText = 50;
   document.getElementById('temperatureValue').innerText = 300;
@@ -176,6 +213,7 @@ function initValues() {
   document.getElementById('H2MoleValue').innerText = 0.1;
   document.getElementById('NH3MoleValue').innerText = 1;
 }
+
 
 
 //  ----------------------------------------------------------------
