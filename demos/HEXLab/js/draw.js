@@ -250,15 +250,20 @@ function drawAll() {
             stage3Labels();
             break;
         case 4:
+        case 5:
             lmtdGraph.on_draw();
             push();
-            plotEulersFuncs(lmtdGraph, 0, g.Tc_out, g.Th_in);
+            let arrays;
+            arrays = calcEulersFuncs(lmtdGraph, 0, g.Tc_out, g.Th_in);
+            console.log()
             fill('black'); noStroke();
             circle(...lmtdGraph.mapPoint(0, g.Th_in), 8);
             circle(...lmtdGraph.mapPoint(0, g.Tc_out), 8);
             circle(...lmtdGraph.mapPoint(1, g.Tc_in), 8);
             circle(...lmtdGraph.mapPoint(1, g.Th_out), 8);
             pop();
+            quizDeltaT(arrays);
+            if (g.showLmtd) lmtdAnimation();
             break;
     }
 }
@@ -268,7 +273,7 @@ function landingPage() {
     fill('black'); noStroke();
     textAlign(CENTER, CENTER); textSize(18);
     const label1 = 'This is a virtual lab made for LearnChemE'
-    const label2 = 'by Drew Smith :3'
+    const label2 = 'by Drew Smith'
     const label3 = 'Please input your name.';
     text(label1, g.width / 2, 90);
     text(label2, g.width / 2, 120);
@@ -302,10 +307,10 @@ function fillAnimation(x = 0, y = 0) {
 }
 
 function placeBeakers() {
-    let volumeH0 = map(g.s1time, 0, 16, 100, 20);
-    let volumeH1 = map(g.s1time, 0, 16, 20, 100);
-    let volumeC0 = map(g.s1time, 0, 16, 100, 20);
-    let volumeC1 = map(g.s1time, 0, 16, 20, 100);
+    let volumeH0 = 100 - g.s1time * g.mDotH; // map(g.s1time, 0, 16, 100, 20);
+    let volumeH1 = 20 + g.s1time * g.mDotH; // map(g.s1time, 0, 16, 20, 100);
+    let volumeC0 = 100 - g.s1time * g.mDotC;// map(g.s1time, 0, 16, 100, 20);
+    let volumeC1 = 20 + g.s1time * g.mDotC;// map(g.s1time, 0, 16, 20, 100);
 
     bh0 = fillBeaker(b, volumeH0, g.orangeFluidColor);
     bh1 = fillBeaker(b, volumeH1, g.orangeFluidColor);
@@ -324,13 +329,15 @@ function placeBeakers() {
     text('volume = ' + volumeC0.toFixed(1) + ' mL', 630, 470);
     text('volume = ' + volumeH1.toFixed(1) + ' mL', 490, 390);
 
-    text('initial: 100.0 mL', 640, 200);
-    text('at: 0.0 s', 670, 225);
+    text('initial: 100.0 mL', 640, 190);
+    text('at 0.0 s (both)', 650, 215);
 
     let m;
     if ((m = g.s1measure) != -1) {
-        text('measured: ' + (100 - m * 5).toFixed(1) + ' mL', 640, 265);
-        text('at: ' + m.toFixed(1) + ' s', 670, 290);
+        text('measured: ', 640, 245);
+        text((100 - m * g.mDotH).toFixed(1) + ' mL (h),', 665, 270);
+        text((100 - m * g.mDotC).toFixed(1) + ' mL (c)', 665, 295);
+        text('at ' + m.toFixed(1) + ' s', 670, 320);
     }
     pop();
 
@@ -363,46 +370,96 @@ function _flowAnimationHelper(t) {
     textSize(18);
 
     let x1 = 640, y1 = 200;
-    let x2 = 500, y2 = 100;
+    let x2 = 500 - x1, y2 = 80 - y1;
     let s = t / 1000; s = constrain(s, 0, 1);
-    let x = lerp(x1, x2, s);
-    let y = lerp(y1, y2, s);
+    let x = lerp(0, x2, s);
+    let y = lerp(0, y2, s);
+    let m = g.s1measure;
 
-    text('initial: 100.0 mL', x, y);
-    text('at: 0.0 s', x + 30, y + 25);
-    text('measured: ' + (100 - g.s1measure * 5).toFixed(1) + ' mL', x, y + 65);
-    text('at: ' + g.s1measure.toFixed(1) + ' s', x + 30, y + 90);
+    push();
+    translate(x, y);
+    text('initial: 100.0 mL', 640, 190);
+    text('at 0.0 s (both)', 650, 215);
+    text('measured: ', 640, 245);
+    text((100 - m * g.mDotH).toFixed(1) + ' mL (h),', 665, 270);
+    text((100 - m * g.mDotC).toFixed(1) + ' mL (c)', 665, 295);
+    text('at ' + m.toFixed(1) + ' s', 670, 320);
+    pop();
 
     s = t / 500 - 2; s = constrain(s, 0, 1);
     fill(0, 0, 0, s * 255);
-    text('flowrate: ', x, 250);
+    text('process\nflowrate: ', 500, 235);
 
     // delta V / delta t
     s = t / 500 - 4; s = constrain(s, 0, 1);
     fill(0, 0, 0, s * 255);
-    text('ΔV', x + 90, 240);
-    text('Δt', x + 90, 260);
+    text('ΔV', 590, 240);
+    text('Δt', 590, 260);
 
     push();
     stroke(0, 0, 0, s * 255);
-    line(x + 90, 245, x + 112, 245);
+    line(590, 245, 612, 245);
     pop();
 
     // eqn
     s = t / 500 - 6; s = constrain(s, 0, 1);
     fill(0, 0, 0, s * 255);
-    text('=', x + 122, 250);
-    text('(100 mL - ' + (100 - g.s1measure * 5).toFixed(1) + ' mL)', x + 140, 240);
-    text(g.s1measure.toFixed(1) + ' s', x + 190, 260);
+    text('=', 622, 250);
+    text('(100 mL - ' + (100 - m * g.mDotH).toFixed(1) + ' mL)', 640, 240);
+    text(m.toFixed(1) + ' s', 690, 260);
 
     push();
     stroke(0, 0, 0, s * 255);
-    line(x + 140, 245, x + 290, 245);
+    line(640, 245, 790, 245);
     pop();
 
     s = t / 500 - 8; s = constrain(s, 0, 1);
+    push();
     fill(0, 0, 0, s * 255); textSize(20);
-    text('Q = 5.0 mL / s', x + 90, 310);
+    text('Q  = ' + g.mDotH.toFixed(1) + ' mL / s', 590, 310);
+    textSize(14);
+    text('h', 605, 315);
+    pop();
+
+    s = t / 500 - 10; s = constrain(s, 0, 1);
+    push();
+    fill(0, 0, 0, s * 255);
+    text('service\nflowrate: ', 500, 345);
+    pop();
+
+    // delta V / delta t
+    s = t / 500 - 12; s = constrain(s, 0, 1);
+    push();
+    fill(0, 0, 0, s * 255);
+    text('ΔV', 590, 350);
+    text('Δt', 590, 370);
+    pop();
+
+    push();
+    stroke(0, 0, 0, s * 255);
+    line(590, 355, 612, 355);
+    pop();
+
+    // eqn
+    s = t / 500 - 14; s = constrain(s, 0, 1);
+    fill(0, 0, 0, s * 255);
+    text('=', 622, 360);
+    text('(100 mL - ' + (100 - m * g.mDotC).toFixed(1) + ' mL)', 640, 350);
+    text(m.toFixed(1) + ' s', 690, 370);
+
+    push();
+    stroke(0, 0, 0, s * 255);
+    line(640, 355, 790, 355);
+    pop();
+
+    s = t / 500 - 16; s = constrain(s, 0, 1);
+    push();
+    fill(0, 0, 0, s * 255); textSize(20);
+    text('Q  = ' + g.mDotC.toFixed(1) + ' mL / s', 590, 420);
+    textSize(14);
+    text('c', 605, 425);
+    pop();
+
     pop();
 }
 
@@ -446,3 +503,162 @@ function stage3Labels() {
     pop();
 }
 
+function quizDeltaT(arrays) {
+    push();
+    textSize(22); fill('black'); noStroke();
+    let dT1, dT2;
+
+    if (!g.dT1selected) {
+        text('Select ΔT', 580, 80);
+        push(); textSize(14);
+        text('1', 670, 85);
+        pop();
+        push();
+        fill('green');
+        text('click', 80, map((g.Th_in + g.Tc_out) / 2, 0, 50, lmtdGraph.by, lmtdGraph.ty));
+        noFill(); stroke('green');
+        drawingContext.setLineDash([10, 10]);
+        rect(62, map(g.Th_in, 0, 50, lmtdGraph.by, lmtdGraph.ty) - 20, 100, map(g.Th_in - g.Tc_out, 0, 50, lmtdGraph.ty, lmtdGraph.by) + 20);
+        pop();
+    }
+    else {
+        dT1 = g.Th_in - g.Tc_out;
+        text('ΔT  = ' + dT1.toFixed(1) + ' °C', 580, 80);
+        push(); textSize(14);
+        text('1', 605, 85);
+
+        let thi = map(g.Th_in, 0, 50, lmtdGraph.by, lmtdGraph.ty);
+        let tco = map(g.Tc_out, 0, 50, lmtdGraph.by, lmtdGraph.ty);
+        stroke('black'); strokeWeight(2);
+        fill(250); rect(lmtdGraph.lx + 15, (thi + tco) / 2 - 15, 50, 30);
+        line(lmtdGraph.lx + 10, thi, lmtdGraph.lx + 10, tco);
+        line(lmtdGraph.lx + 5, thi, lmtdGraph.lx + 10, thi);
+        line(lmtdGraph.lx + 5, tco, lmtdGraph.lx + 10, tco);
+        line(lmtdGraph.lx + 10, (thi + tco) / 2, lmtdGraph.lx + 15, (thi + tco) / 2);
+        noStroke();
+        fill('black');
+        textSize(20);
+        text('ΔT', lmtdGraph.lx + 20, (thi + tco) / 2 + 7);
+        textSize(14);
+        text('1', lmtdGraph.lx + 43, (thi + tco) / 2 + 12);
+        pop();
+
+    }
+    if (!g.dT2selected) {
+        text('Select ΔT', 580, 160);
+        push(); textSize(14);
+        text('2', 670, 165);
+        pop();
+        push();
+        fill('green');
+        text('click', 400, map((g.Th_out + g.Tc_in) / 2, 0, 50, lmtdGraph.by, lmtdGraph.ty));
+        noFill(); stroke('green');
+        drawingContext.setLineDash([10, 10]);
+        rect(370, map(g.Th_out, 0, 50, lmtdGraph.by, lmtdGraph.ty) - 20, 100, map(g.Th_out - g.Tc_in, 0, 50, lmtdGraph.ty, lmtdGraph.by) + 20);
+        pop();
+    }
+    else {
+        dT2 = g.Th_out - g.Tc_in;
+        text('ΔT  = ' + dT2.toFixed(1) + ' °C', 580, 160);
+        push(); textSize(14);
+        text('2', 605, 165);
+
+        let tci = map(g.Tc_in, 0, 50, lmtdGraph.by, lmtdGraph.ty);
+        let tho = map(g.Th_out, 0, 50, lmtdGraph.by, lmtdGraph.ty);
+        stroke('black'); strokeWeight(2);
+        fill(250); rect(lmtdGraph.rx - 65, (tho + tci) / 2 - 15, 50, 30);
+        line(lmtdGraph.rx - 10, tho, lmtdGraph.rx - 10, tci);
+        line(lmtdGraph.rx - 5, tho, lmtdGraph.rx - 10, tho);
+        line(lmtdGraph.rx - 5, tci, lmtdGraph.rx - 10, tci);
+        line(lmtdGraph.rx - 10, (tho + tci) / 2, lmtdGraph.rx - 15, (tho + tci) / 2);
+        noStroke();
+        fill('black');
+        textSize(20);
+        text('ΔT', lmtdGraph.rx - 60, (tho + tci) / 2 + 7);
+        textSize(14);
+        text('2', lmtdGraph.rx - 37, (tho + tci) / 2 + 12);
+        pop();
+    }
+
+    if (mouseX >= 72 && mouseX <= 462 &&
+        mouseY >= 22 && mouseY <= 402
+    ) {
+        // circle(mouseX - 2, mouseY - 2, 8);
+        showDeltaT(map(mouseX - 2, 70, 460, 0, 1), arrays);
+    }
+    pop();
+}
+
+function showDeltaT(x, arrays) {
+    let i, j, yLo, yHi;
+    for (i = 0; i < 200; i++) {
+        if (arrays.x[i] > x) {
+            j = i;
+            break;
+        }
+    }
+    yLo = map(x, arrays.x[j], arrays.x[j + 1], arrays.y1[j], arrays.y1[j + 1]);
+    yHi = map(x, arrays.x[j], arrays.x[j + 1], arrays.y2[j], arrays.y2[j + 1]);
+    pLo = lmtdGraph.mapPoint(x, yLo);
+    pHi = lmtdGraph.mapPoint(x, yHi);
+
+    push();
+    circle(...pLo, 8);
+    circle(...pHi, 8);
+    drawingContext.setLineDash([10, 10]);
+    stroke('black'); strokeWeight(2);
+    line(...pLo, ...pHi);
+    pop();
+}
+
+// This wasn't fun to make
+function lmtdAnimation() {
+    let t = millis() - g.animationStartTime;
+    push();
+    fill('black'); textSize(20);
+    text('ΔT    = ', 550, 320);
+    push(); textSize(14);
+    text('lm', 572, 325);
+    pop();
+
+    text('ΔT   - ΔT', 620, 305);
+    text(`ln(        )`, 620, 345);
+    push(); textSize(14);
+    text('1', 643, 310);
+    text('2', 693, 310);
+    stroke('black'); strokeWeight(2);
+    line(620, 315, 700, 315);
+    strokeWeight(1);
+    line(648, 339, 674, 339);
+    pop();
+    textSize(16);
+    text('ΔT\nΔT', 648, 333);
+    textSize(14);
+    text('2\n1', 667, 338);
+
+    textSize(20);
+    translate(-10, 60);
+
+    text('ΔT    = ', 550, 350);
+    push(); textSize(14);
+    text('lm', 572, 355);
+    pop();
+
+    dT1 = (g.Th_in - g.Tc_out).toFixed(1);
+    dT2 = (g.Th_out - g.Tc_in).toFixed(1);
+    text(dT1 + ' - ' + dT2, 620, 335);
+    text(`ln(        )`, 620, 375);
+    push();
+    stroke('black'); strokeWeight(2);
+    line(620, 345, 710, 345);
+    strokeWeight(1);
+    line(648, 369, 674, 369);
+    pop();
+    textSize(16);
+    text(dT1 + '\n' + dT2, 646, 363);
+
+    textSize(20);
+    text('= ' + g.lmtd.toFixed(1) + ' °C', 720, 350);
+
+    pop();
+}

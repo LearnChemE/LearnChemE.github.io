@@ -1,144 +1,10 @@
 
-
-// function shellTubeGraphic(w, h) {
-//     let lx = 50, rx = 450;
-//     let ty = 50, by = 350;
-//     let wHex = rx - lx, hHex = by - ty;
-
-//     let st = createGraphics(w, h);
-
-//     st.push();
-
-//     shellOrangeGraphic(bw, bh, bt, pad);
-//     shellBlueGraphic(bw, bh, bt, pad);
-//     shellOuterGraphic(bw, bh, bt, pad);
-
-//     st.pop();
-
-// }
-
-// function shellOuterGraphic(bw, bh, bt, pad) {
-//     fill(250, 250, 250, 50);
-//     box(bw, bh, bt);
-
-//     // pipes
-//     push();
-//     translate(-bw / 2 + bt / 2, -bh / 2 - 25, 0); noStroke();
-//     cylinder(12 + pad, 52);
-//     translate(bt, 0, 0);
-//     cylinder(12 + pad, 52);
-//     translate(-bt, bh + 50, 0);
-//     cylinder(12 + pad, 52);
-//     pop();
-//     push();
-//     translate(bw / 2 - 77, bh / 2 + 25, 0); noStroke();
-//     cylinder(12 + pad, 52); // bottom right
-//     pop();
-// }
-
-// function shellOrangeGraphic(bw, bh, bt, pad) {
-//     push();
-//     fill(g.orangeFluidColor); noStroke();
-
-//     push();
-
-//     translate(-bw / 2 + bt / 2, -bh / 4, 0);
-//     box(bt - pad, bh / 2 - pad, bt - pad);
-//     translate(0, bh / 2, 0);
-//     box(bt - pad, bh / 2 - pad, bt - pad);
-
-
-//     translate(0, -bh * 3 / 4 - 25, 0);
-//     cylinder(12, 50);
-//     translate(0, bh + 50, 0);
-//     cylinder(12, 50);
-//     pop();
-
-//     push();
-//     translate(bw / 2 - bt / 2, 0, 0);
-//     box(bt - pad, bh - pad, bt - pad);
-//     pop();
-
-//     push();
-//     translate(0, -100, 0);
-//     rotateZ(radians(90));
-
-//     for (let i = 0; i < 4; i++) {
-//         cylinder(12, 408);
-//         translate(bh / 4 + pad, 0, 0);
-//     }
-//     pop();
-
-//     pop();
-// }
-
-// function shellBlueGraphic(bw, bh, bt, pad) {
-//     push();
-//     fill(g.blueFluidColor); noStroke();
-//     translate(-bw / 2 + 3 * bt / 2, 0, 0);
-
-//     // top left box and pipe
-//     push();
-//     translate(0, -bh / 8, 0);
-//     box(bt - pad, bh * 3 / 4 - pad, bt - pad);
-//     translate(0, -bh / 2 + 6, 0);
-//     cylinder(12, 50);
-//     pop();
-
-//     // middle boxes
-//     push();
-//     // middle connecting boxes
-//     for (let i = 0; i < 5; i++) {
-//         translate(bt + 2 * pad, 0, 0);
-//         box(bt - pad, bh / 2 - pad, bt - pad);
-//     }
-//     // bottom right box
-//     translate(bt + 2 * pad, bh / 8, 0);
-//     box(bt - pad, bh * 3 / 4 - pad, bt - pad);
-//     translate(0, bh / 2 - 6, 0);
-//     cylinder(12, 50);
-//     pop();
-
-//     push();
-//     translate(bt / 2 + pad, 3 * bh / 8 - pad, 0);
-//     for (let i = 0; i < 3; i++) {
-//         box(2 * bt + pad, bh / 4, bt - pad);
-//         translate(2 * bt + pad * 4, 0, 0);
-//     }
-//     pop();
-
-//     push()
-//     translate(bt * 3 / 2 + pad * 3, -3 * bh / 8 + 2, 0);
-//     for (let i = 0; i < 3; i++) {
-//         box(2 * bt + pad, bh / 4, bt - pad);
-//         translate(2 * bt + pad * 4, 0, 0);
-//     }
-//     pop();
-
-//     pop();
-// }
-
-// Dashed line function useful for creating lines in WEBGL mode
-// function dashedLine(p1, p2, dashSettings) {
-//     let dash = dashSettings[0];
-//     let space = dash + dashSettings[1];
-
-//     p1 = this.mapPoint(...p1);
-//     p2 = this.mapPoint(...p2);
-
-//     let dir = this.getDirection(p1, p2);
-//     let dist = this.getMagnitude([p2[0] - p1[0], p2[1] - p1[1]]);
-
-//     push();
-//     let n = Math.floor(dist / space);
-//     let i;
-//     for (i = 0; i < n; i++) {
-//         line(...p1, p1[0] + dir[0] * dash, p1[1] + dir[1] * dash);
-//         p1 = [p1[0] + dir[0] * space, p1[1] + dir[1] * space];
-//     }
-//     line(...p1, ...p2);
-//     pop();
-// }
+function randStartVals() {
+    g.Th_in = random(30, 45);
+    g.mDotH = random(1, 2);
+    g.Tc_in = random(0, 20);
+    g.mDotC = random(2, 4);
+}
 
 function effectiveness(cmin, cmax) {
     let C = cmin / cmax;
@@ -171,43 +37,16 @@ function heatTransferRate() {
 
     g.Th_out = g.Th_in - g.Qdot / g.cpH / g.mDotH;
     g.Tc_out = g.Tc_in + g.Qdot / g.cpC / g.mDotC;
+
+    let dT1 = g.Th_in - g.Tc_out;
+    let dT2 = g.Th_out - g.Tc_in;
+    if (dT1 == dT2)
+        g.lmtd = dT1;
+    else
+        g.lmtd = (dT2 - dT1) / Math.log(dT2 / dT1);
 }
 
-function showSimulationControls() {
-    hideExtraControls();
-    switch (g.state) {
-        case 0:
-            inputName.classList.remove("hidden");
-            break;
-        case 1:
-            nextBtn.classList.remove("hidden");
-            document.getElementById("time-wrapper").classList.remove("hidden");
-            measureBtn.classList.remove("hidden");
-            break;
-        case 2:
-            nextBtn.classList.remove("hidden");
-            break;
-        case 3:
-            nextBtn.classList.remove("hidden");
-            measureBtn.classList.remove("hidden");
-            document.getElementById("t-selection-btn-wrapper").classList.remove("hidden");
-            break;
-        case 4:
-            nextBtn.classList.remove("hidden");
-            document.getElementById("sim-sliders").classList.remove("hidden");
-            break;
-    }
-}
 
-// Hides all controls but the start/reset button
-function hideExtraControls() {
-    inputName.classList.remove("hidden");
-    nextBtn.classList.add("hidden");
-    document.getElementById("time-wrapper").classList.add("hidden");
-    measureBtn.classList.add("hidden");
-    inputName.classList.add("hidden");
-    document.getElementById("t-selection-btn-wrapper").classList.add("hidden");
-}
 
 function outlineSelectionButtons(n) {
     for (let i = 0; i < 4; i++) {
@@ -223,98 +62,63 @@ function outlineSelectionButtons(n) {
 }
 
 // Plot Diff Eq. 
-function plotEulersFuncs(graph, x0, y01, y02, n = 100) {
-    let dx = (graph.xRange[1] - x0) / n;
-    let i, dy1dx, dy2dx;
-    let y1 = y01, y2 = new Array(n), x = new Array(n);
+function calcEulersFuncs(graph, x0, y01, y02, n = 1000) {
+    let dx = .02;
+    let i, dy1dx, dy2dx, xFinal = 1;
+    let y1 = new Array(n), y2 = new Array(n), x = new Array(n);
+    y1[0] = y01;
     y2[0] = y02;
     x[0] = x0;
 
-    push();
-    beginShape(); noFill(); stroke('black'); strokeWeight(2);
-    vertex(...graph.mapPoint(x[0], y01));
-    for (i = 1; i < n; i++) {
-        dy1dx = -g.eU * (y2[i - 1] - y1) / g.cpC / g.mDotC;
-        dy2dx = -g.eU * (y2[i - 1] - y1) / g.cpH / g.mDotH;
+    i = 0;
+    do {
+        i++;
+        dy1dx = -g.eU * (y2[i - 1] - y1[i - 1]) / g.cpC / g.mDotC;
+        dy2dx = -g.eU * (y2[i - 1] - y1[i - 1]) / g.cpH / g.mDotH;
 
         x[i] = x[i - 1] + dx;
-        y1 += dy1dx * dx;
+        y1[i] = y1[i - 1] + dy1dx * dx;
         y2[i] = y2[i - 1] + dy2dx * dx;
-        vertex(...graph.mapPoint(x[i], y1));
+
+    } while (y1[i] > g.Tc_in && i < n)
+
+    xFinal = x[i - 1];
+    n = i;
+
+    // Resize x
+    for (i = 0; i <= n; i++) {
+        x[i] /= xFinal;
     }
-    endShape();
+
+    push();
+    noFill(); strokeWeight(2);
+    push(); stroke(g.orangeFluidColor);
     beginShape();
     for (i = 0; i < n; i++) {
         vertex(...graph.mapPoint(x[i], y2[i]));
     }
     endShape();
+    // arrows
+    let a = Math.floor(n / 3);
+    let b = 2 * a;
     pop();
+    push();
+    lmtdGraph.drawArrow([x[a], y2[a]], [x[a + 1], y2[a + 1]], { color: g.orangeFluidColor, arrowSize: 15 });
+    lmtdGraph.drawArrow([x[b], y2[b]], [x[b + 1], y2[b + 1]], { color: g.orangeFluidColor, arrowSize: 15 });
+    pop();
+
+    stroke(g.blueFluidColor);
+    beginShape();
+    for (i = 0; i < n; i++) {
+        vertex(...graph.mapPoint(x[i], y1[i]));
+    }
+    endShape();
+    pop();
+    push();
+
+    lmtdGraph.drawArrow([x[a + 1], y1[a + 1]], [x[a], y1[a]], { color: g.blueFluidColor, arrowSize: 15 });
+    lmtdGraph.drawArrow([x[b + 1], y1[b + 1]], [x[b], y1[b]], { color: g.blueFluidColor, arrowSize: 15 });
+    pop();
+
+    return { x: x, y1: y1, y2: y2 };
 }
-
-// function shellTubeLabels() {
-//     let bounds;
-
-//     rotateY(g.rotX);
-//     rotateX(-g.rotY);
-
-//     push();
-//     translate(-220, -95, 0);
-//     textSize(20);
-//     stroke('black'); strokeWeight(2); fill(250);
-
-//     bounds = font.textBounds('T    = ' + g.Th_in.toFixed(1) + ' °C', 0, 0, 20);
-//     rect(bounds.x - 4, bounds.y - 2, bounds.w + 8, bounds.h + 68);
-
-//     push();
-//     translate(0, 0, 1);
-//     fill('black'); noStroke();
-//     text('T    = ' + g.Th_in.toFixed(1) + ' °C', 0, 0);
-//     text('m  = ' + g.mDotH.toFixed(1) + ' g/s', 0, 20);
-//     text('.', 6, 8);
-//     text('T    = ' + g.Tc_in.toFixed(1) + ' °C', 0, 40);
-//     text('m  = ' + g.mDotC.toFixed(1) + ' g/s', 0, 60);
-//     text('.', 6, 48);
-//     textSize(12);
-//     text('h,in', 10, 3);
-//     text('h', 17, 23);
-//     text('c,in', 10, 43);
-//     text('c', 17, 63);
-//     pop();
-
-//     translate(0, 195, 0);
-//     bounds = font.textBounds('T      = ' + g.Th_in.toFixed(1) + ' °C', 0, 0, 20);
-//     rect(bounds.x - 4, bounds.y - 2, bounds.w + 8, bounds.h + 10);
-
-//     push();
-//     translate(0, 0, 1);
-//     fill('black'); noStroke();
-//     text('T      = ' + g.Th_out.toFixed(1) + ' °C', 0, 0);
-//     textSize(12);
-//     text('h,out', 10, 3);
-//     pop();
-
-//     translate(300, 0, 0);
-//     bounds = font.textBounds('T      = ' + g.Th_in.toFixed(1) + ' °C', 0, 0, 20);
-//     rect(bounds.x - 4, bounds.y - 2, bounds.w + 8, bounds.h + 10);
-
-//     push();
-//     translate(0, 0, 1);
-//     fill('black'); noStroke();
-//     text('T      = ' + g.Tc_out.toFixed(1) + ' °C', 0, 0);
-//     textSize(12);
-//     text('c,out', 10, 3);
-//     pop();
-
-//     translate(8, -180, 0);
-//     bounds = font.textBounds('Q = ' + g.Qdot.toFixed(1) + ' W', 0, 0, 20);
-//     rect(bounds.x - 4, bounds.y - 6, bounds.w + 8, bounds.h + 10);
-
-//     push();
-//     translate(0, 0, 1);
-//     fill('black'); noStroke();
-//     text('Q = ' + g.Qdot.toFixed(1) + ' W', 0, 0);
-//     text('.', 5, -15);
-//     pop();
-
-//     pop();
-// }

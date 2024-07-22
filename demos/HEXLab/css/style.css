@@ -97,8 +97,8 @@ canvas {
 
 .buttons-container {
     display: grid;
-    grid-template-columns: max-content max-content;
-    gap: 10px;
+    grid-template-columns: max-content max-content 80px;
+    gap: 8px;
 
     .btn {
         display: grid;
@@ -113,11 +113,28 @@ canvas {
     }
 
     #start-reset-btn {
-        width: 90px;
+        /* padding: 6px; */
+        /* width: 38px; */
+        height: 38px;
+
+        .fa-arrow-rotate-left {
+            position: relative;
+            left: 5px;
+        }
+    }
+
+    #prev-btn {
+        height: 38px;
+        width: 45px;
+
+        .fa-backward-step {
+            position: relative;
+            left: 5px;
+        }
     }
 
     #next-button {
-        width: 90px;
+        width: 80px;
     }
 }
 
@@ -135,6 +152,12 @@ canvas {
     top: 180px;
 }
 
+#calc-lmtd-btn {
+    position: absolute;
+    width: max-content;
+    left: 550px;
+    top: 220px;
+}
 
 .hidden,
 .btn.hidden,

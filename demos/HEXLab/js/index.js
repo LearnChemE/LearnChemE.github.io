@@ -5,7 +5,7 @@ window.g = {
     cnv: undefined,
     width: 800,
     height: 480,
-    state: 4,
+    state: 0,
 
     name: '',
 
@@ -13,6 +13,10 @@ window.g = {
     s1time: 0,
     s1measure: -1,
     animationStartTime: 0,
+
+    dT1selected: false,
+    dT2selected: false,
+    showLmtd: false,
 
     s3select: -1,
     s3measure: [-1, -1, -1, -1],
@@ -22,7 +26,7 @@ window.g = {
 
     cpC: 4.186, // J / g / K
     cpH: 4.186, // J / g / K
-    mDotC: 1, // g / s
+    mDotC: 2, // g / s
     mDotH: 1, // g / s
 
     UA: 10, // W / K
@@ -32,6 +36,7 @@ window.g = {
     Tc_in: 10.0,
     Th_out: 40,
     Tc_out: 10,
+    lmtd: 26,
 
     Qdot: 0,
 }
@@ -75,6 +80,7 @@ function setup() {
     if (g.state != 0) { showSimulationControls() } // used for debug
 
     textFont(font);
+    randStartVals();
 }
 
 function draw() {

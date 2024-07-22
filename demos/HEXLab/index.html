@@ -36,11 +36,15 @@
     <div class="nav-bar">
         <div class="nav-bar-column" id="nav-bar-left">
             <div class="buttons-container">
-                <button type="button" id="start-reset-btn" class="btn btn-primary">
+                <button type="button" id="start-reset-btn" class="btn btn-primary" title="Start Lab">
                     <i class="fa-solid fa-play"></i>
                     <div>start</div>
                 </button>
-                <button type="button" id="next-btn" class="btn btn-primary hidden" disabled aria-disabled="true">
+                <button type="button" id="prev-btn" class="btn btn-primary hidden" title="Previous">
+                    <i class="fa-solid fa-backward-step"></i>
+                </button>
+                <button type="button" id="next-btn" class="btn btn-primary hidden" disabled aria-disabled="true"
+                    title="Next">
                     <i class="fa-solid fa-play"></i>
                     <div>next</div>
                 </button>
@@ -67,11 +71,6 @@
                 <button type="button" id="tci-btn" class="btn btn-outline-success">\(T_\text{c,in}\)</button>
                 <button type="button" id="tco-btn" class="btn btn-outline-success">\(T_\text{c,out}\)</button>
             </div>
-        </div>
-        <div class="nav-bar-column" id="nav-bar-right">
-
-            <button type="button" id="measure-btn" class="btn btn-secondary hidden">take measurement</button>
-
             <div class="controls-wrapper hidden" id="sim-sliders">
                 <div class="slider-wrapper" id="hot-slider-wrapper">
                     <div class="slider-label">process fluid flowrate (g/s)</div>
@@ -86,8 +85,8 @@
 
                 <div class="slider-wrapper" id="cold-slider-wrapper">
                     <div class="slider-label">coolant flowrate (g/s)</div>
-                    <input type="range" id="cold-flow-slider" min="0.5" max="5" value="1" step="0.1">
-                    <div class="slider-val-label" id="cold-flow-label">1.0</div>
+                    <input type="range" id="cold-flow-slider" min="0.5" max="5" value="2" step="0.1">
+                    <div class="slider-val-label" id="cold-flow-label">2.0</div>
                 </div>
                 <div class="slider-wrapper" id="coldtemp-slider-wrapper">
                     <div class="slider-label">coolant temperature (°C)</div>
@@ -96,12 +95,20 @@
                 </div>
             </div>
         </div>
+        <div class="nav-bar-column" id="nav-bar-right">
+
+            <button type="button" id="measure-btn" class="btn btn-secondary hidden">take measurement</button>
+
+
+        </div>
     </div>
 
     <div id="graphics-wrapper">
         <div id="inputs-wrapper">
             <input type="text" id="input-name">
         </div>
+        <button type="button" id="calc-lmtd-btn" class="btn btn-primary hidden" disabled aria-disabled="true">calculate
+            \(\Delta T_\text{log mean}\)</button>
     </div>
 
 </body>

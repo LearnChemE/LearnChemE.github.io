@@ -29,6 +29,58 @@ const measureBtn = document.getElementById("measure-btn");
 const nextBtn = document.getElementById("next-btn");
 const timeSlider = document.getElementById("progress-bar");
 const timeLabel = document.getElementById("time-label");
+const lmtdBtn = document.getElementById("calc-lmtd-btn");
+const prevBtn = document.getElementById("prev-btn");
+
+// Hides all controls but the start/reset button
+function hideExtraControls() {
+    startButton.style.width = "45px";
+    inputName.classList.remove("hidden");
+    prevBtn.classList.add("hidden");
+    nextBtn.classList.add("hidden");
+    document.getElementById("time-wrapper").classList.add("hidden");
+    measureBtn.classList.add("hidden");
+    inputName.classList.add("hidden");
+    document.getElementById("t-selection-btn-wrapper").classList.add("hidden");
+    lmtdBtn.classList.add("hidden");
+}
+
+// Determine what html elements are unhidden
+function showSimulationControls() {
+    hideExtraControls();
+    switch (g.state) {
+        case 0:
+            inputName.classList.remove("hidden");
+            startButton.style.width = "max-content";
+            break;
+        case 1:
+            nextBtn.classList.remove("hidden");
+            document.getElementById("time-wrapper").classList.remove("hidden");
+            measureBtn.classList.remove("hidden");
+            break;
+        case 2:
+            nextBtn.classList.remove("hidden");
+            prevBtn.classList.remove("hidden");
+            break;
+        case 3:
+            nextBtn.classList.remove("hidden");
+            prevBtn.classList.remove("hidden");
+            measureBtn.classList.remove("hidden");
+            document.getElementById("t-selection-btn-wrapper").classList.remove("hidden");
+            break;
+        case 4:
+            nextBtn.classList.remove("hidden");
+            prevBtn.classList.remove("hidden");
+            lmtdBtn.classList.remove("hidden");
+            break;
+        case 5:
+            nextBtn.classList.remove("hidden");
+            prevBtn.classList.remove("hidden");
+            document.getElementById("sim-sliders").classList.remove("hidden");
+            lmtdBtn.classList.remove("hidden");
+            break;
+    }
+}
 
 // Input name box
 inputName.addEventListener("input", () => {
@@ -40,11 +92,13 @@ inputName.addEventListener("input", () => {
 startButton.addEventListener("click", () => {
     if (g.state == 0) {
         g.state = 1;
-        startButton.innerHTML = `<i class="fa-solid fa-arrow-rotate-left"></i><div>reset</div>`;
+        startButton.innerHTML = `<i class="fa-solid fa-arrow-rotate-left"></i>`;
+        startButton.title = "Restart";
     }
     else {
         g.state = 0;
         startButton.innerHTML = `<i class="fa-solid fa-play"></i><div>start</div>`;
+        startButton.title = "Start Lab"
     }
 
     showSimulationControls();
@@ -123,6 +177,17 @@ nextBtn.addEventListener("click", () => {
     showSimulationControls();
 });
 
+prevBtn.addEventListener("click", () => {
+    g.state--;
+    showSimulationControls();
+});
+
+lmtdBtn.addEventListener("click", () => {
+    g.showLmtd = true;
+    g.animationStartTime = millis();
+    enableNextBtn();
+});
+
 // Enables the next button
 function enableNextBtn() {
     nextBtn.ariaDisabled = false;
@@ -179,3 +244,20 @@ tempSelectionBtns[3].addEventListener("click", () => {
     outlineSelectionButtons(3);
 });
 
+function mouseClicked(event) {
+    if (g.state == 4 &&
+        mouseX >= 72 && mouseX <= 142 &&
+        mouseY >= 20 && mouseY <= 404) {
+        g.dT1selected = true;
+    }
+    if (g.state == 4 &&
+        mouseX >= 370 && mouseX <= 460 &&
+        mouseY >= 20 && mouseY <= 404) {
+        g.dT2selected = true;
+    }
+
+    if (g.dT1selected && g.dT2selected) {
+        lmtdBtn.disabled = false;
+        lmtdBtn.ariaDisabled = false;
+    }
+}
