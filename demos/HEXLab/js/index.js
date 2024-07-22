@@ -5,44 +5,82 @@ window.g = {
     cnv: undefined,
     width: 800,
     height: 480,
+    state: 0,
+
+    name: '',
+
+    playS1: false,
+    s1time: 0,
+    s1measure: -1,
+    animationStartTime: 0,
+
+    dT1selected: false,
+    dT2selected: false,
+    showLmtd: false,
+
+    s3select: -1,
+    s3measure: [-1, -1, -1, -1],
 
     orangeFluidColor: [255, 50, 0, 200],
     blueFluidColor: [0, 80, 255, 180],
 
     cpC: 4.186, // J / g / K
     cpH: 4.186, // J / g / K
-    mDotC: 1, // g / s
+    mDotC: 2, // g / s
     mDotH: 1, // g / s
 
     UA: 10, // W / K
+    eU: 10,
 
     Th_in: 40.0,
     Tc_in: 10.0,
     Th_out: 40,
     Tc_out: 10,
+    lmtd: 26,
 
     Qdot: 0,
-
-    hexType: DOUBLE_TUBE,
-    rotTargX: 0,
-    rotTargY: 0,
-    rotX: 0,
-    rotY: 0,
 }
 
 function preload() {
     font = loadFont('assets/Ubuntu-R.ttf');
 }
 
+lmtdGraph = new P5_Graph(500, 450, {
+    title: '',
+    titleFontSize: 20,
+    padding:
+        [[70, 20],
+        [40, 50]],
+    parent: document.body,
+    fill: 250, // This is very slightly darker than the white of the page
+
+    xTitle: 'location in heat exchanger',
+    yTitle: 'temperature (°C)',
+    xLabelPrecision: 0,
+    yLabelPrecision: 0,
+
+    xTickEvery: 5,
+    xTickCount: 0,
+    yTickEvery: 5,
+    yTickCount: 25,
+
+    disableXLabels: true,
+    disableYLabels: false,
+}, [0, 1], [0, 50]);
+
 function setup() {
-    g.cnv = createCanvas(g.width, g.height, WEBGL);
+    g.cnv = createCanvas(g.width, g.height);
     g.cnv.parent("graphics-wrapper");
 
     dt = doubleTubeGraphic(500, 400);
+    dtb = doubleTubeBlue(500, 400, 50, 450, 50);
+    dto = doubleTubeOrng(500, 400, 50, 450, 50);
+    b = createBeaker();
 
-    // labels = createGraphics(100, 100, WEBGL);
+    if (g.state != 0) { showSimulationControls() } // used for debug
+
     textFont(font);
-    // labels.background(250);
+    randStartVals();
 }
 
 function draw() {
@@ -50,28 +88,7 @@ function draw() {
     // labels.clear();
 
     heatTransferRate();
-
-    if (g.hexType == DOUBLE_TUBE) {
-        labels = extraLabels();
-        image(dt, -250, -200);
-        image(labels, -250, -200);
-    }
-    else {
-
-        clear();
-        drag();
-
-        push();
-        rotateY(g.rotX);
-        rotateX(-g.rotY);
-
-        translate(0, 0, 90);
-        shellTubeGraphic(500, 400);
-
-        translate(0, 0, 50);
-        shellTubeLabels();
-        pop();
-    }
+    drawAll();
 }
 
 function drag() {
@@ -130,3 +147,4 @@ coldTempSlider.addEventListener("input", function () {
     g.Tc_in = tmp;
     coldTempLabel.innerHTML = `${tmp.toFixed(1)}`;
 })
+

@@ -12,33 +12,57 @@ input {
 }
 
 #graphics-wrapper {
-    /* position: absolute; */
-    width: 100vw;
-    top: 200px;
-    height: max-content;
-    display: grid;
-    justify-content: center;
-    margin-top: 15px;
+    position: relative;
+    width: max-content;
+    margin: auto;
+
+    #inputs-wrapper {
+        width: 100%;
+        position: absolute;
+
+        input {
+            position: absolute;
+
+            &.hidden {
+                display: none;
+            }
+
+            &.answer-box {
+                width: 50px;
+            }
+        }
+    }
 }
 
 canvas {
     border: 1px solid black;
-    box-shadow: 0px 0px 2px 2px grey;
+    box-shadow: 0px 0px 1px 1px grey;
 }
 
 .nav-bar {
     display: grid;
-    grid-template-columns: 400px 400px;
+    margin: auto;
+    grid-template-columns: 200px 400px 200px;
     justify-content: center;
     align-items: center;
     justify-items: center;
-    width: 100vw
+    width: 800px
 }
 
 .nav-bar-column {
     display: grid;
-    width: 400px;
+    margin: auto;
+    width: fit-content;
     justify-items: left;
+}
+
+.modal-buttons-container {
+    display: grid;
+    margin: auto;
+    padding: 5px;
+    gap: 10px;
+    grid-template-columns: 100px 100px 100px;
+    width: max-content;
 }
 
 .buttons-container {
@@ -67,4 +91,92 @@ canvas {
     margin-left: 1.5em;
     margin-bottom: 5px;
     gap: 10px;
+}
+
+#time-wrapper {
+    display: grid;
+    grid-template-columns: 300px 40px 40px;
+    gap: 5px;
+    align-items: center;
+
+    #progress-bar {
+        width: 300px;
+    }
+}
+
+.buttons-container {
+    display: grid;
+    grid-template-columns: max-content max-content 80px;
+    gap: 8px;
+
+    .btn {
+        display: grid;
+        grid-template-columns: repeat(2, max-content);
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+
+        div {
+            transform: translateY(-2px);
+        }
+    }
+
+    #start-reset-btn {
+        /* padding: 6px; */
+        /* width: 38px; */
+        height: 38px;
+
+        .fa-arrow-rotate-left {
+            position: relative;
+            left: 5px;
+        }
+    }
+
+    #prev-btn {
+        height: 38px;
+        width: 45px;
+
+        .fa-backward-step {
+            position: relative;
+            left: 5px;
+        }
+    }
+
+    #next-button {
+        width: 80px;
+    }
+}
+
+.controls-wrapper {
+    display: grid;
+
+    &.hidden {
+        display: none;
+    }
+}
+
+#input-name {
+    width: 250px;
+    left: 300px;
+    top: 180px;
+}
+
+#calc-lmtd-btn {
+    position: absolute;
+    width: max-content;
+    left: 550px;
+    top: 220px;
+}
+
+.hidden,
+.btn.hidden,
+#time-wrapper.hidden,
+.close-btns-wrapper.hidden {
+    display: none;
+}
+
+.close-btns-wrapper {
+    display: grid;
+    grid-template-columns: max-content max-content max-content max-content;
+    gap: 5px;
 }
