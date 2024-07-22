@@ -56,6 +56,15 @@ canvas {
     justify-items: left;
 }
 
+.modal-buttons-container {
+    display: grid;
+    margin: auto;
+    padding: 5px;
+    gap: 10px;
+    grid-template-columns: 100px 100px 100px;
+    width: max-content;
+}
+
 .buttons-container {
     display: grid;
     padding: 5px;
