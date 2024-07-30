@@ -285,3 +285,23 @@ function mouseClicked(event) {
         lmtdBtn.ariaDisabled = false;
     }
 }
+
+const hiTt = document.getElementById("hi-tooltip");
+const hoTt = document.getElementById("ho-tooltip");
+const ciTt = document.getElementById("ci-tooltip");
+const coTt = document.getElementById("co-tooltip");
+function updateTooltips() {
+    var strTemp = (g.vols[0] > 0) ? g.Th_in.toFixed(1) : '-';
+    var str = "temperature: " + strTemp + " °C, volume: " + g.vols[0].toFixed(1) + " mL";
+    hiTt.setAttribute("data-bs-original-title", str);
+
+    str = "temperature: " + g.Th_out_observed.toFixed(1) + " °C, volume: " + g.vols[1].toFixed(1) + " mL";
+    hoTt.setAttribute("data-bs-original-title", str);
+
+    strTemp = (g.vols[2] > 0) ? g.Tc_in.toFixed(1) : '-';
+    str = "temperature: " + strTemp + " °C, volume: " + g.vols[2].toFixed(1) + " mL";
+    ciTt.setAttribute("data-bs-original-title", str);
+
+    str = "temperature: " + g.Tc_out.toFixed(1) + " °C, volume: " + g.vols[3].toFixed(1) + " mL";
+    coTt.setAttribute("data-bs-original-title", str);
+}

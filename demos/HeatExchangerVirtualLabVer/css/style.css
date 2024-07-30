@@ -195,3 +195,27 @@ canvas {
         left: -15px
     }
 }
+
+.tooltip-area {
+    position: absolute;
+    /* background-color: yellow; */
+    top: 450px;
+    width: 126px;
+    height: 150px;
+}
+
+#hi-tooltip {
+    left: 75px;
+}
+
+#ho-tooltip {
+    left: 237px;
+}
+
+#ci-tooltip {
+    left: 400px;
+}
+
+#co-tooltip {
+    left: 574px;
+}

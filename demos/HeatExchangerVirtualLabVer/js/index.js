@@ -5,7 +5,7 @@ window.g = {
     cnv: undefined,
     width: 800,
     height: 640,
-    state: -1,
+    state: 0,
 
     name: '',
 
@@ -17,12 +17,12 @@ window.g = {
     orngTime: -1,
     blueTime: -1,
 
-    dT1selected: false,
-    dT2selected: false,
-    showLmtd: false,
+    // dT1selected: false,
+    // dT2selected: false,
+    // showLmtd: false,
 
-    s3select: -1,
-    s3measure: [-1, -1, -1, -1],
+    // s3select: -1,
+    // s3measure: [-1, -1, -1, -1],
 
     orangeFluidColor: [255, 50, 0, 200],
     blueFluidColor: [0, 80, 255, 180],
@@ -33,14 +33,20 @@ window.g = {
     mDotH: 1, // g / s
 
     UA: 10, // W / K
-    eU: 10,
+    // eU: 10,
+
+    vols: [1000, 0, 1000, 0],
+    hIsFlowing: true,
+    cIsFlowing: true,
 
     Th_in: 40.0,
     Tc_in: 10.0,
     Th_out: 40,
     Tc_out: 10,
-    lmtd: 26,
+    Th_out_observed: 40,
+    Tc_out_observed: 10,
 
+    lmtd: 26,
     Qdot: 0,
 }
 
@@ -48,28 +54,28 @@ function preload() {
     font = loadFont('assets/Ubuntu-R.ttf');
 }
 
-lmtdGraph = new P5_Graph(500, 450, {
-    title: '',
-    titleFontSize: 20,
-    padding:
-        [[70, 20],
-        [40, 50]],
-    parent: document.body,
-    fill: 250, // This is very slightly darker than the white of the page
+// lmtdGraph = new P5_Graph(500, 450, {
+//     title: '',
+//     titleFontSize: 20,
+//     padding:
+//         [[70, 20],
+//         [40, 50]],
+//     parent: document.body,
+//     fill: 250, // This is very slightly darker than the white of the page
 
-    xTitle: 'location in heat exchanger',
-    yTitle: 'temperature (°C)',
-    xLabelPrecision: 0,
-    yLabelPrecision: 0,
+//     xTitle: 'location in heat exchanger',
+//     yTitle: 'temperature (°C)',
+//     xLabelPrecision: 0,
+//     yLabelPrecision: 0,
 
-    xTickEvery: 5,
-    xTickCount: 0,
-    yTickEvery: 5,
-    yTickCount: 25,
+//     xTickEvery: 5,
+//     xTickCount: 0,
+//     yTickEvery: 5,
+//     yTickCount: 25,
 
-    disableXLabels: true,
-    disableYLabels: false,
-}, [0, 1], [0, 50]);
+//     disableXLabels: true,
+//     disableYLabels: false,
+// }, [0, 1], [0, 50]);
 
 function setup() {
     g.cnv = createCanvas(g.width, g.height);
@@ -80,6 +86,17 @@ function setup() {
     dto = doubleTubeOrng(500, 400, 50, 450, 50);
     b = createBeaker();
     bt = beakersAndTubes();
+
+    thiTubes(thi = createGraphics(g.width, g.height));
+    thoTubes(tho = createGraphics(g.width, g.height));
+    tciTubes(tci = createGraphics(g.width, g.height));
+    tcoTubes(tco = createGraphics(g.width, g.height));
+
+    var options = { placement: 'bottom' };
+    $("#hi-tooltip").tooltip(options);
+    $("#ho-tooltip").tooltip(options);
+    $("#ci-tooltip").tooltip(options);
+    $("#co-tooltip").tooltip(options);
 
     if (g.state != 0) { showSimulationControls() } // used for debug
 

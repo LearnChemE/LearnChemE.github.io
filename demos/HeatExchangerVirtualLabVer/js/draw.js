@@ -161,34 +161,6 @@ function getDirection(p1, p2) {
     return [ihat, jhat];
 }
 
-function extraLabels() {
-    l = createGraphics(600, 450);
-    l.push();
-
-    l.textSize(20);
-    l.text('T    = ' + g.Th_in.toFixed(1) + ' K', 456, 120);
-    l.text('ṁ  = ' + g.mDotH.toFixed(1) + ' g / s', 463, 145);
-    l.text('T     = ' + g.Th_out.toFixed(1) + ' K', 452, 320);
-
-    l.text('T      = ' + g.Tc_out.toFixed(1) + ' K', 266, 40);
-    l.text('T    = ' + g.Tc_in.toFixed(1) + ' K', 270, 370);
-    l.text('ṁ  = ' + g.mDotC.toFixed(1) + ' g / s', 277, 395);
-
-    l.text('Q̇ = ' + g.Qdot.toFixed(1) + ' W', 100, 385);
-
-    l.textSize(14);
-    l.text('h,in', 466, 125);
-    l.text('h', 480, 150);
-    l.text('h,out', 461, 325);
-    l.text('c,out', 277, 45);
-    l.text('c,in', 280, 375);
-    l.text('c', 294, 400);
-
-    l.pop();
-
-    return l;
-}
-
 function createBeaker() {
     let b = createGraphics(120, 120);
 
@@ -229,15 +201,6 @@ function beakersAndTubes() {
     bt.stroke('black'); bt.strokeWeight(2);
     bt.pop();
 
-    thiTubes(bt);
-    thoTubes(bt);
-    tciTubes(bt);
-    tcoTubes(bt);
-
-    return bt;
-}
-
-function thiTubes(bt) {
     bt.push();
     bt.stroke('black'); bt.strokeWeight(2);
     // thi tube
@@ -253,8 +216,43 @@ function thiTubes(bt) {
     bt.line(510, 90, 510, 115);
     bt.line(520, 132, 450, 132);
     bt.line(510, 115, 450, 115);
+
+    // tho tube
+    bt.line(258, 580, 258, 410);
+    bt.line(248, 580, 248, 400);
+    bt.line(258, 410, 520, 410);
+    bt.line(248, 400, 510, 400);
+    bt.line(520, 410, 520, 313);
+    bt.line(510, 400, 510, 330);
+    bt.line(520, 313, 450, 313);
+    bt.line(510, 330, 450, 330);
+
+    // tci tube
+    bt.line(420, 580, 420, 430);
+    bt.line(410, 580, 410, 440);
+    bt.line(420, 430, 410, 430);
+    bt.line(410, 440, 390, 440);
+    bt.line(410, 430, 410, 300);
+    bt.line(390, 440, 390, 300);
+
+    // tco tube
+    bt.line(593, 580, 593, 10);
+    bt.line(583, 580, 583, 20);
+    bt.line(593, 10, 390, 10);
+    bt.line(583, 20, 410, 20);
+    bt.line(390, 10, 390, 100);
+    bt.line(410, 20, 410, 100);
     bt.pop();
 
+    // thiTubes(bt);
+    // thoTubes(bt);
+    // tciTubes(bt);
+    // tcoTubes(bt);
+
+    return bt;
+}
+
+function thiTubes(bt) {
     bt.push();
     bt.fill(g.orangeFluidColor); bt.noStroke();
     bt.rect(85, 400, 10, 180);
@@ -268,18 +266,6 @@ function thiTubes(bt) {
 
 function thoTubes(bt) {
     bt.push();
-    bt.stroke('black'); bt.strokeWeight(2);
-    bt.line(258, 580, 258, 410);
-    bt.line(248, 580, 248, 400);
-    bt.line(258, 410, 520, 410);
-    bt.line(248, 400, 510, 400);
-    bt.line(520, 410, 520, 313);
-    bt.line(510, 400, 510, 330);
-    bt.line(520, 313, 450, 313);
-    bt.line(510, 330, 450, 330);
-    bt.pop();
-
-    bt.push();
     bt.fill(g.orangeFluidColor); bt.noStroke();
     bt.rect(248, 400, 10, 180);
     bt.rect(258, 400, 262, 10);
@@ -290,49 +276,32 @@ function thoTubes(bt) {
 
 function tciTubes(bt) {
     bt.push();
-    bt.stroke('black'); bt.strokeWeight(2);
-    bt.line(420, 580, 420, 430);
-    bt.line(410, 580, 410, 440);
-    bt.line(420, 430, 410, 430);
-    bt.line(410, 440, 390, 440);
-    bt.line(410, 430, 410, 300);
-    bt.line(390, 440, 390, 300);
-    bt.pop();
-
-    bt.push();
     bt.fill(g.blueFluidColor); bt.noStroke();
     bt.rect(410, 430, 10, 150);
     bt.rect(390, 430, 20, 10);
     bt.rect(390, 300, 20, 130);
-    bt.rect(390, 20, 20, 80);
     bt.pop();
 }
 
 function tcoTubes(bt) {
     bt.push();
-    bt.stroke('black'); bt.strokeWeight(2);
-    bt.line(593, 580, 593, 10);
-    bt.line(583, 580, 583, 20);
-    bt.line(593, 10, 390, 10);
-    bt.line(583, 20, 410, 20);
-    bt.line(390, 10, 390, 100);
-    bt.line(410, 20, 410, 100);
-    bt.pop();
-
-    bt.push();
     bt.fill(g.blueFluidColor); bt.noStroke();
     bt.rect(583, 10, 10, 570);
     bt.rect(390, 10, 193, 10);
-    bt.rect();
+    bt.rect(390, 20, 20, 80);
     bt.pop();
 }
 
-function fillBeaker(b, vol, color = 'pink') {
-    let newb = createGraphics(120, 120);
-    newb.fill(color); newb.noStroke();
-    newb.rect(10, 120 - vol, 100, vol);
-    newb.image(b, 0, 0);
-    return newb;
+function fillBeaker(x, vol, color = 'pink') {
+    vol = vol / 10;
+    push();
+    fill(color); noStroke();
+    translate(0, 450);
+    scale(1.25);
+
+    translate(x, 0);
+    rect(10, 120 - vol, 100, vol);
+    pop();
 }
 
 /* ********************************************* */
@@ -342,46 +311,56 @@ function fillBeaker(b, vol, color = 'pink') {
 function drawAll() {
     switch (g.state) {
         case -1: // dev mode
+            image(thi, 0, 0);
+            image(tho, 0, 0);
+            image(tci, 0, 0);
+            image(tco, 0, 0);
+
             image(bt, 0, 0);
             image(dt, 0, 25);
             image(dto, 0, 25);
             image(dtb, 0, 25);
+
+
             break;
         case 0: // name and landing page
             landingPage();
             break;
         case 1: // startup animation
             if (g.playS1) playTime();
-            image(dt, 0, 25);
             let to = (g.orngTime == -1) ? 0 : (millis() - g.orngTime) / 1000;
             let tb = (g.blueTime == -1) ? 0 : (millis() - g.blueTime) / 1000;
+
+            image(bt, 0, 0);
+            fillAnimationTubes(to, tb);
+            image(dt, 0, 25);
             fillAnimationOrange(to, 0, 25);
             fillAnimationBlue(tb, 0, 25);
             break;
         case 2: // flows and temps
-            flowAnimation();
-            break;
-        case 3:
-            image(dt, 0, 25);
-            image(dto, 0, 25);
-            image(dtb, 0, 25);
-            stage3Labels();
-            break;
-        case 4:
-        case 5:
-            lmtdGraph.on_draw();
+            changeVols();
+            integrateTemps();
             push();
-            let arrays;
-            arrays = calcEulersFuncs(lmtdGraph, 0, g.Tc_out, g.Th_in);
-            console.log()
-            fill('black'); noStroke();
-            circle(...lmtdGraph.mapPoint(0, g.Th_in), 8);
-            circle(...lmtdGraph.mapPoint(0, g.Tc_out), 8);
-            circle(...lmtdGraph.mapPoint(1, g.Tc_in), 8);
-            circle(...lmtdGraph.mapPoint(1, g.Th_out), 8);
+            fillBeaker(50, g.vols[0], g.orangeFluidColor);
+            fillBeaker(180, g.vols[1], g.orangeFluidColor);
+            fillBeaker(310, g.vols[2], g.blueFluidColor);
+            fillBeaker(450, g.vols[3], g.blueFluidColor);
             pop();
-            quizDeltaT(arrays);
-            if (g.showLmtd) lmtdAnimation();
+
+            image(bt, 0, 0);
+            if (g.hIsFlowing) {
+                image(thi, 0, 0);
+                image(tho, 0, 0);
+            }
+            if (g.cIsFlowing) {
+                image(tci, 0, 0);
+                image(tco, 0, 0);
+            }
+            image(dt, 0, 25);
+            if (g.hIsFlowing) image(dto, 0, 25);
+            if (g.cIsFlowing) image(dtb, 0, 25);
+
+            updateTooltips();
             break;
     }
 }
@@ -427,8 +406,9 @@ function fillAnimationOrange(t, x = 0, y = 0) {
 
     push();
     translate(x, y);
-    if (t <= 5) {
-        s = 88 + t * 160
+    if (t <= 7) {
+        s = 88 + t * 160 - 100
+        s = constrain(s, 1, 600);
         partOrng = dto.get(0, 0, 500, s);
         image(partOrng, 0, 0);
     }
@@ -438,160 +418,21 @@ function fillAnimationOrange(t, x = 0, y = 0) {
     pop();
 }
 
-function placeBeakers() {
-    let volumeH0 = 100 - g.s1time * g.mDotH; // map(g.s1time, 0, 16, 100, 20);
-    let volumeH1 = 20 + g.s1time * g.mDotH; // map(g.s1time, 0, 16, 20, 100);
-    let volumeC0 = 100 - g.s1time * g.mDotC;// map(g.s1time, 0, 16, 100, 20);
-    let volumeC1 = 20 + g.s1time * g.mDotC;// map(g.s1time, 0, 16, 20, 100);
-
-    bh0 = fillBeaker(b, volumeH0, g.orangeFluidColor);
-    bh1 = fillBeaker(b, volumeH1, g.orangeFluidColor);
-    bc0 = fillBeaker(b, volumeC0, g.blueFluidColor);
-    bc1 = fillBeaker(b, volumeC1, g.blueFluidColor);
-
-    image(bh0, 500, 110);
-    image(bh1, 500, 250);
-    image(bc1, 640, 40);
-    image(bc0, 640, 330);
-
+function fillAnimationTubes(tOrange, tBlue) {
     push();
-    fill('black'); noStroke(); textSize(18);
-    text('volume = ' + volumeC1.toFixed(1) + ' mL', 630, 30);
-    text('volume = ' + volumeH0.toFixed(1) + ' mL', 490, 100);
-    text('volume = ' + volumeC0.toFixed(1) + ' mL', 630, 470);
-    text('volume = ' + volumeH1.toFixed(1) + ' mL', 490, 390);
+    s = constrain(tOrange * 1000, 0, 255);
+    tint(255, s);
+    image(thi, 0, 0);
+    s = constrain(tOrange * 1000 - 2000, 0, 255);
+    tint(255, s);
+    image(tho, 0, 0);
 
-    text('initial: 100.0 mL', 640, 190);
-    text('at 0.0 s (both)', 650, 215);
-
-    let m;
-    if ((m = g.s1measure) != -1) {
-        text('measured: ', 640, 245);
-        text((100 - m * g.mDotH).toFixed(1) + ' mL (h),', 665, 270);
-        text((100 - m * g.mDotC).toFixed(1) + ' mL (c)', 665, 295);
-        text('at ' + m.toFixed(1) + ' s', 670, 320);
-    }
-    pop();
-
-    bh0.remove();
-    bh1.remove();
-    bc0.remove();
-    bc1.remove();
-}
-
-// state 2
-function flowAnimation() {
-    push();
-    tint(255, 100);
-    image(dt, 0, 25);
-    image(dto, 0, 25);
-    image(dtb, 0, 25);
-    pop();
-
-    t = millis() - g.animationStartTime;
-    _flowAnimationHelper(t);
-
-    if (t > 5000) {
-        enableNextBtn();
-    }
-}
-
-function _flowAnimationHelper(t) {
-    push();
-    // translate(-frame, 0);
-    textSize(18);
-
-    let x1 = 640, y1 = 200;
-    let x2 = 500 - x1, y2 = 80 - y1;
-    let s = t / 1000; s = constrain(s, 0, 1);
-    let x = lerp(0, x2, s);
-    let y = lerp(0, y2, s);
-    let m = g.s1measure;
-
-    push();
-    translate(x, y);
-    text('initial: 100.0 mL', 640, 190);
-    text('at 0.0 s (both)', 650, 215);
-    text('measured: ', 640, 245);
-    text((100 - m * g.mDotH).toFixed(1) + ' mL (h),', 665, 270);
-    text((100 - m * g.mDotC).toFixed(1) + ' mL (c)', 665, 295);
-    text('at ' + m.toFixed(1) + ' s', 670, 320);
-    pop();
-
-    s = t / 500 - 2; s = constrain(s, 0, 1);
-    fill(0, 0, 0, s * 255);
-    text('process\nflowrate: ', 500, 235);
-
-    // delta V / delta t
-    s = t / 500 - 4; s = constrain(s, 0, 1);
-    fill(0, 0, 0, s * 255);
-    text('ΔV', 590, 240);
-    text('Δt', 590, 260);
-
-    push();
-    stroke(0, 0, 0, s * 255);
-    line(590, 245, 612, 245);
-    pop();
-
-    // eqn
-    s = t / 500 - 6; s = constrain(s, 0, 1);
-    fill(0, 0, 0, s * 255);
-    text('=', 622, 250);
-    text('(100 mL - ' + (100 - m * g.mDotH).toFixed(1) + ' mL)', 640, 240);
-    text(m.toFixed(1) + ' s', 690, 260);
-
-    push();
-    stroke(0, 0, 0, s * 255);
-    line(640, 245, 790, 245);
-    pop();
-
-    s = t / 500 - 8; s = constrain(s, 0, 1);
-    push();
-    fill(0, 0, 0, s * 255); textSize(20);
-    text('Q  = ' + g.mDotH.toFixed(1) + ' mL / s', 590, 310);
-    textSize(14);
-    text('h', 605, 315);
-    pop();
-
-    s = t / 500 - 10; s = constrain(s, 0, 1);
-    push();
-    fill(0, 0, 0, s * 255);
-    text('service\nflowrate: ', 500, 345);
-    pop();
-
-    // delta V / delta t
-    s = t / 500 - 12; s = constrain(s, 0, 1);
-    push();
-    fill(0, 0, 0, s * 255);
-    text('ΔV', 590, 350);
-    text('Δt', 590, 370);
-    pop();
-
-    push();
-    stroke(0, 0, 0, s * 255);
-    line(590, 355, 612, 355);
-    pop();
-
-    // eqn
-    s = t / 500 - 14; s = constrain(s, 0, 1);
-    fill(0, 0, 0, s * 255);
-    text('=', 622, 360);
-    text('(100 mL - ' + (100 - m * g.mDotC).toFixed(1) + ' mL)', 640, 350);
-    text(m.toFixed(1) + ' s', 690, 370);
-
-    push();
-    stroke(0, 0, 0, s * 255);
-    line(640, 355, 790, 355);
-    pop();
-
-    s = t / 500 - 16; s = constrain(s, 0, 1);
-    push();
-    fill(0, 0, 0, s * 255); textSize(20);
-    text('Q  = ' + g.mDotC.toFixed(1) + ' mL / s', 590, 420);
-    textSize(14);
-    text('c', 605, 425);
-    pop();
-
+    s = constrain(tBlue * 1000, 0, 255);
+    tint(255, s);
+    image(tci, 0, 0);
+    s = constrain(tBlue * 1000 - 2000, 0, 255);
+    tint(255, s);
+    image(tco, 0, 0);
     pop();
 }
 

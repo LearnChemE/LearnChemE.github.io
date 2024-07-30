@@ -1,9 +1,9 @@
 
 function randStartVals() {
     g.Th_in = random(30, 45);
-    g.mDotH = random(1, 2);
+    g.mDotH = 5// random(5, 10);
     g.Tc_in = random(0, 20);
-    g.mDotC = random(2, 4);
+    g.mDotC = 10// random(2, 4);
 }
 
 function effectiveness(cmin, cmax) {
@@ -121,4 +121,42 @@ function calcEulersFuncs(graph, x0, y01, y02, n = 1000) {
     pop();
 
     return { x: x, y1: y1, y2: y2 };
+}
+
+function changeVols() {
+    let dV;
+    if (g.vols[0] > 0) {
+        dV = g.mDotH * deltaTime / 1000;
+        g.vols[0] -= dV;
+        g.vols[1] += dV;
+    }
+    else {
+        g.vols[0] = 0.0; g.vols[1] = 1000.0;
+        g.hIsFlowing = false;
+    }
+    if (g.vols[2] > 0) {
+        dV = g.mDotC * deltaTime / 1000;
+        g.vols[2] -= dV;
+        g.vols[3] += dV;
+    }
+    else {
+        g.vols[2] = 0.0; g.vols[3] = 1000.0;
+        g.cIsFlowing = false;
+    }
+}
+
+const UA_ROOM = 1e-3;
+const T_ROOM = 25;
+function integrateTemps() {
+    if (g.vols[1] == 0 || g.vols[3] == 0) return;
+    var dV = g.mDotH * deltaTime / 1000;
+    g.Th_out_observed = (g.Th_out_observed * (g.vols[1] - dV) + g.Th_out * dV) / g.vols[1];
+    dV = g.mDotC * deltaTime / 1000;
+    g.Tc_out_observed = (g.Tc_out_observed * (g.vols[1] - dV) + g.Tc_out * dV) / g.vols[3];
+
+    var h = UA_ROOM / g.cpH * deltaTime / 1000;
+    g.Th_in += h * (T_ROOM - g.Th_in);
+    g.Th_out += h * (T_ROOM - g.Th_out);
+    g.Tc_in += h * (T_ROOM - g.Tc_in);
+    g.Tc_out += h * (T_ROOM - g.Tc_out);
 }
