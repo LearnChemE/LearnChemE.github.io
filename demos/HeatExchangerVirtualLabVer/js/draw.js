@@ -472,10 +472,11 @@ function fillAnimationTubes(tOrange, tBlue) {
         s = constrain(tBlue * 1000 - 2000, 0, 255);
         tint(255, s);
         image(tco, 0, 0);
-        pop();
     }
     else {
         image(tci, 0, 0);
         image(tco, 0, 0);
     }
+
+    pop();
 }

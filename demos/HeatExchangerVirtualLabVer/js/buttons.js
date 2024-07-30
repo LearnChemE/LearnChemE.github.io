@@ -99,7 +99,6 @@ inputName.addEventListener("input", () => {
 
 hPumpBtn.addEventListener("click", () => {
     g.orngTime = millis();
-    if (g.blueTime != -1) enableNextBtn();
     g.hIsFlowing = true;
     hPumpBtn.disabled = true;
     hPumpBtn.ariaDisabled = true;

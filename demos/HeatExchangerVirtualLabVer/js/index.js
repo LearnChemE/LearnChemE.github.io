@@ -86,7 +86,7 @@ function setup() {
 }
 
 function draw() {
-    console.log((1000 / deltaTime).toFixed(1));
+    // console.log((1000 / deltaTime).toFixed(1));
     background(250);
     // labels.clear();
 
