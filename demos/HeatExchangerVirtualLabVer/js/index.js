@@ -5,7 +5,7 @@ window.g = {
     cnv: undefined,
     width: 800,
     height: 640,
-    state: 0,
+    state: -1,
 
     name: '',
 
@@ -43,8 +43,8 @@ window.g = {
     Tc_in: 10.0,
     Th_out: 40,
     Tc_out: 10,
-    Th_out_observed: 40,
-    Tc_out_observed: 10,
+    Th_out_observed: 25,
+    Tc_out_observed: 25,
 
     lmtd: 26,
     Qdot: 0,

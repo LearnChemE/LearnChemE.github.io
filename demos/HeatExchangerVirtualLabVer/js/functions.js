@@ -147,13 +147,26 @@ function changeVols() {
 
 const UA_ROOM = 1e-3;
 const T_ROOM = 25;
+const V_BUFFER = 50; // mL
 function integrateTemps() {
     if (g.vols[1] == 0 || g.vols[3] == 0) return;
-    var dV = g.mDotH * deltaTime / 1000;
-    g.Th_out_observed = (g.Th_out_observed * (g.vols[1] - dV) + g.Th_out * dV) / g.vols[1];
-    dV = g.mDotC * deltaTime / 1000;
-    g.Tc_out_observed = (g.Tc_out_observed * (g.vols[1] - dV) + g.Tc_out * dV) / g.vols[3];
+    var dV, vol, dTdV;
 
+    if (g.hIsFlowing) {
+        dV = g.mDotH * deltaTime / 1000;
+        vol = g.vols[1] + V_BUFFER;
+        dTdV = g.cIsFlowing ? g.Th_out : g.Th_in;
+        g.Th_out_observed = (g.Th_out_observed * (vol - dV) + dTdV * dV) / vol;
+    }
+
+    if (g.cIsFlowing) {
+        dV = g.mDotC * deltaTime / 1000;
+        vol = g.vols[3] + V_BUFFER;
+        dTdV = g.hIsFlowing ? g.Tc_out : g.Tc_in;
+        g.Tc_out_observed = (g.Tc_out_observed * (vol - dV) + dTdV * dV) / vol;
+    }
+
+    // Q lost to room
     var h = UA_ROOM / g.cpH * deltaTime / 1000;
     g.Th_in += h * (T_ROOM - g.Th_in);
     g.Th_out += h * (T_ROOM - g.Th_out);
