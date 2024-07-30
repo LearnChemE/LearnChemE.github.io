@@ -304,42 +304,75 @@ function fillBeaker(x, vol, color = 'pink') {
     pop();
 }
 
+function valve() {
+    let v = createGraphics(50, 50);
+    v.push();
+    v.fill(250); v.stroke('black'); v.strokeWeight(2);
+    v.circle(25, 25, 48);
+    v.rect(18, 0, 14, 50);
+    v.pop();
+    return v;
+}
+
+function displayValve(x, y, flow) {
+    push();
+    angle = map(flow, 1, 10, 3 * PI / 4, PI);
+    imageMode(CENTER);
+    translate(x, y);
+    scale(.8);
+    rotate(angle);
+
+    image(v, 0, 0);
+    pop();
+}
 /* ********************************************* */
 /* **************** DRAW DISPLAYS ************** */
 /* ********************************************* */
 
 function drawAll() {
+    let to, tb;
     switch (g.state) {
-        case -1: // dev mode
-            image(thi, 0, 0);
-            image(tho, 0, 0);
-            image(tci, 0, 0);
-            image(tco, 0, 0);
+        // case -1: // dev mode
+        //     image(thi, 0, 0);
+        //     image(tho, 0, 0);
+        //     image(tci, 0, 0);
+        //     image(tco, 0, 0);
 
-            image(bt, 0, 0);
-            image(dt, 0, 25);
-            image(dto, 0, 25);
-            image(dtb, 0, 25);
+        //     image(bt, 0, 0);
+        //     image(dt, 0, 25);
+        //     image(dto, 0, 25);
+        //     image(dtb, 0, 25);
 
-
-            break;
+        //     drag();
+        //     displayValve(90, 431, g.mDotH);
+        //     displayValve(415, 461, g.mDotC);
+        //     break;
         case 0: // name and landing page
             landingPage();
             break;
-        case 1: // startup animation
-            if (g.playS1) playTime();
-            let to = (g.orngTime == -1) ? 0 : (millis() - g.orngTime) / 1000;
-            let tb = (g.blueTime == -1) ? 0 : (millis() - g.blueTime) / 1000;
+        // case -2: // startup animation
+        //     if (g.playS1) playTime();
+        //     to = (g.orngTime == -1) ? 0 : (millis() - g.orngTime) / 1000;
+        //     tb = (g.blueTime == -1) ? 0 : (millis() - g.blueTime) / 1000;
 
-            image(bt, 0, 0);
-            fillAnimationTubes(to, tb);
-            image(dt, 0, 25);
-            fillAnimationOrange(to, 0, 25);
-            fillAnimationBlue(tb, 0, 25);
-            break;
-        case 2: // flows and temps
+        //     image(bt, 0, 0);
+        //     fillAnimationTubes(to, tb);
+        //     image(dt, 0, 25);
+        //     fillAnimationOrange(to, 0, 25);
+        //     fillAnimationBlue(tb, 0, 25);
+
+        //     drag();
+        //     displayValve(90, 431, g.mDotH);
+        //     displayValve(415, 461, g.mDotC);
+        //     break;
+        case 1: // flows and temps
+            to = (g.orngTime == -1) ? 0 : (millis() - g.orngTime) / 1000;
+            tb = (g.blueTime == -1) ? 0 : (millis() - g.blueTime) / 1000;
+
             changeVols();
             integrateTemps();
+
+
             push();
             fillBeaker(50, g.vols[0], g.orangeFluidColor);
             fillBeaker(180, g.vols[1], g.orangeFluidColor);
@@ -348,18 +381,14 @@ function drawAll() {
             pop();
 
             image(bt, 0, 0);
-            if (g.hIsFlowing) {
-                image(thi, 0, 0);
-                image(tho, 0, 0);
-            }
-            if (g.cIsFlowing) {
-                image(tci, 0, 0);
-                image(tco, 0, 0);
-            }
+            fillAnimationTubes(to, tb);
             image(dt, 0, 25);
-            if (g.hIsFlowing) image(dto, 0, 25);
-            if (g.cIsFlowing) image(dtb, 0, 25);
+            fillAnimationOrange(to, 0, 25);
+            fillAnimationBlue(tb, 0, 25);
 
+            drag();
+            displayValve(90, 431, g.mDotH);
+            displayValve(415, 461, g.mDotC);
             updateTooltips();
             break;
     }
@@ -384,6 +413,7 @@ function landingPage() {
 }
 
 function fillAnimationBlue(t, x = 0, y = 0) {
+    if (!g.cIsFlowing) return;
     let s;
     let partBlue;
 
@@ -401,6 +431,7 @@ function fillAnimationBlue(t, x = 0, y = 0) {
 }
 
 function fillAnimationOrange(t, x = 0, y = 0) {
+    if (!g.hIsFlowing) return;
     let s;
     let partOrng;
 
@@ -418,220 +449,33 @@ function fillAnimationOrange(t, x = 0, y = 0) {
     pop();
 }
 
+// The tint function multiplies every pixel on your cpu, so it is a very costy solution. Better would be use a shader :)
 function fillAnimationTubes(tOrange, tBlue) {
     push();
-    s = constrain(tOrange * 1000, 0, 255);
-    tint(255, s);
-    image(thi, 0, 0);
-    s = constrain(tOrange * 1000 - 2000, 0, 255);
-    tint(255, s);
-    image(tho, 0, 0);
-
-    s = constrain(tBlue * 1000, 0, 255);
-    tint(255, s);
-    image(tci, 0, 0);
-    s = constrain(tBlue * 1000 - 2000, 0, 255);
-    tint(255, s);
-    image(tco, 0, 0);
-    pop();
-}
-
-function stage3Labels() {
-    let tco = (g.s3measure[0] == -1) ? ' -' : g.s3measure[0].toFixed(1) + ' °C';
-    let thi = (g.s3measure[1] == -1) ? ' -' : g.s3measure[1].toFixed(1) + ' °C';
-    let tho = (g.s3measure[2] == -1) ? ' -' : g.s3measure[2].toFixed(1) + ' °C';
-    let tci = (g.s3measure[3] == -1) ? ' -' : g.s3measure[3].toFixed(1) + ' °C';
-
-    push();
-    textSize(22);
-    text('T       :   ' + tco, 550, 50);
-    text('T       :   ' + thi, 550, 130);
-    text('T       :   ' + tho, 550, 330);
-    text('T       :   ' + tci, 550, 440);
-
-    textSize(16);
-    text('c,out', 560, 55);
-    text('h,in', 560, 135);
-    text('h,out', 560, 335);
-    text('c,in', 560, 445);
-
-    push();
-    noFill(); stroke('green'); drawingContext.setLineDash([10, 10]);
-    switch (g.s3select) {
-        case 0:
-            rect(453, 105, 260, 40);
-            break;
-        case 1:
-            rect(453, 305, 260, 40);
-            break;
-        case 2:
-            rect(385, 380, 328, 75);
-            break;
-        case 3:
-            rect(385, 20, 328, 50);
-            break;
+    if (tOrange < 7 && g.hIsFlowing) {
+        s = constrain(tOrange * 1000, 0, 255);
+        tint(255, s);
+        image(thi, 0, 0);
+        s = constrain(tOrange * 1000 - 2000, 0, 255);
+        tint(255, s);
+        image(tho, 0, 0);
     }
-    pop();
+    else {
+        image(thi, 0, 0);
+        image(tho, 0, 0);
+    }
 
-    pop();
-}
-
-function quizDeltaT(arrays) {
-    push();
-    textSize(22); fill('black'); noStroke();
-    let dT1, dT2;
-
-    if (!g.dT1selected) {
-        text('Select ΔT', 580, 80);
-        push(); textSize(14);
-        text('1', 670, 85);
-        pop();
-        push();
-        fill('green');
-        text('click', 80, map((g.Th_in + g.Tc_out) / 2, 0, 50, lmtdGraph.by, lmtdGraph.ty));
-        noFill(); stroke('green');
-        drawingContext.setLineDash([10, 10]);
-        rect(62, map(g.Th_in, 0, 50, lmtdGraph.by, lmtdGraph.ty) - 20, 100, map(g.Th_in - g.Tc_out, 0, 50, lmtdGraph.ty, lmtdGraph.by) + 20);
+    if (tBlue < 7 && g.cIsFlowing) {
+        s = constrain(tBlue * 1000, 0, 255);
+        tint(255, s);
+        image(tci, 0, 0);
+        s = constrain(tBlue * 1000 - 2000, 0, 255);
+        tint(255, s);
+        image(tco, 0, 0);
         pop();
     }
     else {
-        dT1 = g.Th_in - g.Tc_out;
-        text('ΔT  = ' + dT1.toFixed(1) + ' °C', 580, 80);
-        push(); textSize(14);
-        text('1', 605, 85);
-
-        let thi = map(g.Th_in, 0, 50, lmtdGraph.by, lmtdGraph.ty);
-        let tco = map(g.Tc_out, 0, 50, lmtdGraph.by, lmtdGraph.ty);
-        stroke('black'); strokeWeight(2);
-        fill(250); rect(lmtdGraph.lx + 15, (thi + tco) / 2 - 15, 50, 30);
-        line(lmtdGraph.lx + 10, thi, lmtdGraph.lx + 10, tco);
-        line(lmtdGraph.lx + 5, thi, lmtdGraph.lx + 10, thi);
-        line(lmtdGraph.lx + 5, tco, lmtdGraph.lx + 10, tco);
-        line(lmtdGraph.lx + 10, (thi + tco) / 2, lmtdGraph.lx + 15, (thi + tco) / 2);
-        noStroke();
-        fill('black');
-        textSize(20);
-        text('ΔT', lmtdGraph.lx + 20, (thi + tco) / 2 + 7);
-        textSize(14);
-        text('1', lmtdGraph.lx + 43, (thi + tco) / 2 + 12);
-        pop();
-
+        image(tci, 0, 0);
+        image(tco, 0, 0);
     }
-    if (!g.dT2selected) {
-        text('Select ΔT', 580, 160);
-        push(); textSize(14);
-        text('2', 670, 165);
-        pop();
-        push();
-        fill('green');
-        text('click', 400, map((g.Th_out + g.Tc_in) / 2, 0, 50, lmtdGraph.by, lmtdGraph.ty));
-        noFill(); stroke('green');
-        drawingContext.setLineDash([10, 10]);
-        rect(370, map(g.Th_out, 0, 50, lmtdGraph.by, lmtdGraph.ty) - 20, 100, map(g.Th_out - g.Tc_in, 0, 50, lmtdGraph.ty, lmtdGraph.by) + 20);
-        pop();
-    }
-    else {
-        dT2 = g.Th_out - g.Tc_in;
-        text('ΔT  = ' + dT2.toFixed(1) + ' °C', 580, 160);
-        push(); textSize(14);
-        text('2', 605, 165);
-
-        let tci = map(g.Tc_in, 0, 50, lmtdGraph.by, lmtdGraph.ty);
-        let tho = map(g.Th_out, 0, 50, lmtdGraph.by, lmtdGraph.ty);
-        stroke('black'); strokeWeight(2);
-        fill(250); rect(lmtdGraph.rx - 65, (tho + tci) / 2 - 15, 50, 30);
-        line(lmtdGraph.rx - 10, tho, lmtdGraph.rx - 10, tci);
-        line(lmtdGraph.rx - 5, tho, lmtdGraph.rx - 10, tho);
-        line(lmtdGraph.rx - 5, tci, lmtdGraph.rx - 10, tci);
-        line(lmtdGraph.rx - 10, (tho + tci) / 2, lmtdGraph.rx - 15, (tho + tci) / 2);
-        noStroke();
-        fill('black');
-        textSize(20);
-        text('ΔT', lmtdGraph.rx - 60, (tho + tci) / 2 + 7);
-        textSize(14);
-        text('2', lmtdGraph.rx - 37, (tho + tci) / 2 + 12);
-        pop();
-    }
-
-    if (mouseX >= 72 && mouseX <= 462 &&
-        mouseY >= 22 && mouseY <= 402
-    ) {
-        // circle(mouseX - 2, mouseY - 2, 8);
-        showDeltaT(map(mouseX - 2, 70, 460, 0, 1), arrays);
-    }
-    pop();
-}
-
-function showDeltaT(x, arrays) {
-    let i, j, yLo, yHi;
-    for (i = 0; i < 200; i++) {
-        if (arrays.x[i] > x) {
-            j = i;
-            break;
-        }
-    }
-    yLo = map(x, arrays.x[j], arrays.x[j + 1], arrays.y1[j], arrays.y1[j + 1]);
-    yHi = map(x, arrays.x[j], arrays.x[j + 1], arrays.y2[j], arrays.y2[j + 1]);
-    pLo = lmtdGraph.mapPoint(x, yLo);
-    pHi = lmtdGraph.mapPoint(x, yHi);
-
-    push();
-    circle(...pLo, 8);
-    circle(...pHi, 8);
-    drawingContext.setLineDash([10, 10]);
-    stroke('black'); strokeWeight(2);
-    line(...pLo, ...pHi);
-    pop();
-}
-
-// This wasn't fun to make
-function lmtdAnimation() {
-    let t = millis() - g.animationStartTime;
-    push();
-    fill('black'); textSize(20);
-    text('ΔT    = ', 550, 320);
-    push(); textSize(14);
-    text('lm', 572, 325);
-    pop();
-
-    text('ΔT   - ΔT', 620, 305);
-    text(`ln(        )`, 620, 345);
-    push(); textSize(14);
-    text('1', 643, 310);
-    text('2', 693, 310);
-    stroke('black'); strokeWeight(2);
-    line(620, 315, 700, 315);
-    strokeWeight(1);
-    line(648, 339, 674, 339);
-    pop();
-    textSize(16);
-    text('ΔT\nΔT', 648, 333);
-    textSize(14);
-    text('2\n1', 667, 338);
-
-    textSize(20);
-    translate(-10, 60);
-
-    text('ΔT    = ', 550, 350);
-    push(); textSize(14);
-    text('lm', 572, 355);
-    pop();
-
-    dT1 = (g.Th_in - g.Tc_out).toFixed(1);
-    dT2 = (g.Th_out - g.Tc_in).toFixed(1);
-    text(dT1 + ' - ' + dT2, 620, 335);
-    text(`ln(        )`, 620, 375);
-    push();
-    stroke('black'); strokeWeight(2);
-    line(620, 345, 710, 345);
-    strokeWeight(1);
-    line(648, 369, 674, 369);
-    pop();
-    textSize(16);
-    text(dT1 + '\n' + dT2, 646, 363);
-
-    textSize(20);
-    text('= ' + g.lmtd.toFixed(1) + ' °C', 720, 350);
-
-    pop();
 }

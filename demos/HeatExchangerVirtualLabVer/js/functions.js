@@ -61,85 +61,23 @@ function outlineSelectionButtons(n) {
     }
 }
 
-// Plot Diff Eq. 
-function calcEulersFuncs(graph, x0, y01, y02, n = 1000) {
-    let dx = .02;
-    let i, dy1dx, dy2dx, xFinal = 1;
-    let y1 = new Array(n), y2 = new Array(n), x = new Array(n);
-    y1[0] = y01;
-    y2[0] = y02;
-    x[0] = x0;
-
-    i = 0;
-    do {
-        i++;
-        dy1dx = -g.eU * (y2[i - 1] - y1[i - 1]) / g.cpC / g.mDotC;
-        dy2dx = -g.eU * (y2[i - 1] - y1[i - 1]) / g.cpH / g.mDotH;
-
-        x[i] = x[i - 1] + dx;
-        y1[i] = y1[i - 1] + dy1dx * dx;
-        y2[i] = y2[i - 1] + dy2dx * dx;
-
-    } while (y1[i] > g.Tc_in && i < n)
-
-    xFinal = x[i - 1];
-    n = i;
-
-    // Resize x
-    for (i = 0; i <= n; i++) {
-        x[i] /= xFinal;
-    }
-
-    push();
-    noFill(); strokeWeight(2);
-    push(); stroke(g.orangeFluidColor);
-    beginShape();
-    for (i = 0; i < n; i++) {
-        vertex(...graph.mapPoint(x[i], y2[i]));
-    }
-    endShape();
-    // arrows
-    let a = Math.floor(n / 3);
-    let b = 2 * a;
-    pop();
-    push();
-    lmtdGraph.drawArrow([x[a], y2[a]], [x[a + 1], y2[a + 1]], { color: g.orangeFluidColor, arrowSize: 15 });
-    lmtdGraph.drawArrow([x[b], y2[b]], [x[b + 1], y2[b + 1]], { color: g.orangeFluidColor, arrowSize: 15 });
-    pop();
-
-    stroke(g.blueFluidColor);
-    beginShape();
-    for (i = 0; i < n; i++) {
-        vertex(...graph.mapPoint(x[i], y1[i]));
-    }
-    endShape();
-    pop();
-    push();
-
-    lmtdGraph.drawArrow([x[a + 1], y1[a + 1]], [x[a], y1[a]], { color: g.blueFluidColor, arrowSize: 15 });
-    lmtdGraph.drawArrow([x[b + 1], y1[b + 1]], [x[b], y1[b]], { color: g.blueFluidColor, arrowSize: 15 });
-    pop();
-
-    return { x: x, y1: y1, y2: y2 };
-}
-
 function changeVols() {
     let dV;
-    if (g.vols[0] > 0) {
+    if (g.vols[0] > 0 && g.hIsFlowing) {
         dV = g.mDotH * deltaTime / 1000;
         g.vols[0] -= dV;
         g.vols[1] += dV;
     }
-    else {
+    else if (g.vols[0] <= 0) {
         g.vols[0] = 0.0; g.vols[1] = 1000.0;
         g.hIsFlowing = false;
     }
-    if (g.vols[2] > 0) {
+    if (g.vols[2] > 0 && g.cIsFlowing) {
         dV = g.mDotC * deltaTime / 1000;
         g.vols[2] -= dV;
         g.vols[3] += dV;
     }
-    else {
+    else if (g.vols[2] <= 0) {
         g.vols[2] = 0.0; g.vols[3] = 1000.0;
         g.cIsFlowing = false;
     }

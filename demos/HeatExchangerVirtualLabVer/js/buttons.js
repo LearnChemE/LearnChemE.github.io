@@ -100,12 +100,13 @@ inputName.addEventListener("input", () => {
 hPumpBtn.addEventListener("click", () => {
     g.orngTime = millis();
     if (g.blueTime != -1) enableNextBtn();
+    g.hIsFlowing = true;
     hPumpBtn.disabled = true;
     hPumpBtn.ariaDisabled = true;
 });
 cPumpBtn.addEventListener("click", () => {
     g.blueTime = millis();
-    if (g.orngTime != -1) enableNextBtn();
+    g.cIsFlowing = true;
     cPumpBtn.disabled = true;
     cPumpBtn.ariaDisabled = true;
 });
@@ -152,71 +153,71 @@ playBtn.addEventListener("click", () => {
 })
 
 // Take Measurement Button
-measureBtn.addEventListener("click", () => {
-    switch (g.state) {
-        case 1:
-            let time;
-            if ((time = g.s1time) >= 1.5) {
-                g.s1measure = time;
-                enableNextBtn();
-            }
-            break;
-        case 3:
-            switch (g.s3select) {
-                case 0:
-                    g.s3measure[1] = randomGaussian(g.Th_in, .1);
-                    break;
-                case 1:
-                    g.s3measure[2] = randomGaussian(g.Th_out, .1);
-                    break;
-                case 2:
-                    g.s3measure[3] = randomGaussian(g.Tc_in, .1);
-                    break;
-                case 3:
-                    g.s3measure[0] = randomGaussian(g.Tc_out, .1);
-                    break;
-            }
-            let allMeasured = true;
-            for (let i = 0; i < 4; i++) {
-                allMeasured = allMeasured && (g.s3measure[i] != -1);
-            }
-            if (allMeasured) {
-                nextBtn.ariaDisabled = false;
-                nextBtn.disabled = false;
-            }
-            break;
-    }
-});
+// measureBtn.addEventListener("click", () => {
+//     switch (g.state) {
+//         case 1:
+//             let time;
+//             if ((time = g.s1time) >= 1.5) {
+//                 g.s1measure = time;
+//                 enableNextBtn();
+//             }
+//             break;
+//         case 3:
+//             switch (g.s3select) {
+//                 case 0:
+//                     g.s3measure[1] = randomGaussian(g.Th_in, .1);
+//                     break;
+//                 case 1:
+//                     g.s3measure[2] = randomGaussian(g.Th_out, .1);
+//                     break;
+//                 case 2:
+//                     g.s3measure[3] = randomGaussian(g.Tc_in, .1);
+//                     break;
+//                 case 3:
+//                     g.s3measure[0] = randomGaussian(g.Tc_out, .1);
+//                     break;
+//             }
+//             let allMeasured = true;
+//             for (let i = 0; i < 4; i++) {
+//                 allMeasured = allMeasured && (g.s3measure[i] != -1);
+//             }
+//             if (allMeasured) {
+//                 nextBtn.ariaDisabled = false;
+//                 nextBtn.disabled = false;
+//             }
+//             break;
+//     }
+// });
 
 // Next Button
-nextBtn.addEventListener("click", () => {
-    g.state++;
-    g.animationStartTime = millis();
+// nextBtn.addEventListener("click", () => {
+//     g.state++;
+//     g.animationStartTime = millis();
 
 
-    nextBtn.ariaDisabled = true;
-    nextBtn.disabled = true;
-    showSimulationControls();
-});
+//     nextBtn.ariaDisabled = true;
+//     nextBtn.disabled = true;
+//     showSimulationControls();
+// });
 
 
 
-prevBtn.addEventListener("click", () => {
-    g.state--;
-    showSimulationControls();
-});
+// prevBtn.addEventListener("click", () => {
+//     g.state--;
+//     showSimulationControls();
+// });
 
-lmtdBtn.addEventListener("click", () => {
-    g.showLmtd = true;
-    g.animationStartTime = millis();
-    enableNextBtn();
-});
+// lmtdBtn.addEventListener("click", () => {
+//     g.showLmtd = true;
+//     g.animationStartTime = millis();
+//     enableNextBtn();
+// });
 
 // Enables the next button
-function enableNextBtn() {
-    nextBtn.ariaDisabled = false;
-    nextBtn.disabled = false;
-}
+// function enableNextBtn() {
+//     nextBtn.ariaDisabled = false;
+//     nextBtn.disabled = false;
+// }
 
 // Syncs the time slider to the time of the animation
 function playTime() {
@@ -304,4 +305,31 @@ function updateTooltips() {
 
     str = "temperature: " + g.Tc_out.toFixed(1) + " °C, volume: " + g.vols[3].toFixed(1) + " mL";
     coTt.setAttribute("data-bs-original-title", str);
+}
+
+function mouseReleased() {
+    g.dragging1 = false;
+    g.dragging2 = false;
+}
+
+function mousePressed() {
+    if (dist(90, 451, mouseX, mouseY) <= 50) {
+        g.dragging1 = true;
+    }
+    else if (dist(415, 461, mouseX, mouseY) <= 50) {
+        g.dragging2 = true;
+    }
+}
+
+function drag() {
+    if (g.dragging1) {
+        angle = atan2(mouseY - 431, mouseX - 90);
+        angle = constrain(angle, PI / 4, PI / 2);
+        g.mDotH = map(angle, PI / 4, PI / 2, 1, 10);
+    }
+    else if (g.dragging2) {
+        angle = atan2(mouseY - 461, mouseX - 415);
+        angle = constrain(angle, PI / 4, PI / 2);
+        g.mDotC = map(angle, PI / 4, PI / 2, 1, 10);
+    }
 }

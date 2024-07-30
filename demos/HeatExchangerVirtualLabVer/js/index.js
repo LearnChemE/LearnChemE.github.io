@@ -5,7 +5,7 @@ window.g = {
     cnv: undefined,
     width: 800,
     height: 640,
-    state: -1,
+    state: 0,
 
     name: '',
 
@@ -36,8 +36,8 @@ window.g = {
     // eU: 10,
 
     vols: [1000, 0, 1000, 0],
-    hIsFlowing: true,
-    cIsFlowing: true,
+    hIsFlowing: false,
+    cIsFlowing: false,
 
     Th_in: 40.0,
     Tc_in: 10.0,
@@ -48,34 +48,14 @@ window.g = {
 
     lmtd: 26,
     Qdot: 0,
+
+    dragging1: false,
+    dragging2: false,
 }
 
 function preload() {
     font = loadFont('assets/Ubuntu-R.ttf');
 }
-
-// lmtdGraph = new P5_Graph(500, 450, {
-//     title: '',
-//     titleFontSize: 20,
-//     padding:
-//         [[70, 20],
-//         [40, 50]],
-//     parent: document.body,
-//     fill: 250, // This is very slightly darker than the white of the page
-
-//     xTitle: 'location in heat exchanger',
-//     yTitle: 'temperature (°C)',
-//     xLabelPrecision: 0,
-//     yLabelPrecision: 0,
-
-//     xTickEvery: 5,
-//     xTickCount: 0,
-//     yTickEvery: 5,
-//     yTickCount: 25,
-
-//     disableXLabels: true,
-//     disableYLabels: false,
-// }, [0, 1], [0, 50]);
 
 function setup() {
     g.cnv = createCanvas(g.width, g.height);
@@ -86,6 +66,7 @@ function setup() {
     dto = doubleTubeOrng(500, 400, 50, 450, 50);
     b = createBeaker();
     bt = beakersAndTubes();
+    v = valve();
 
     thiTubes(thi = createGraphics(g.width, g.height));
     thoTubes(tho = createGraphics(g.width, g.height));
@@ -105,6 +86,7 @@ function setup() {
 }
 
 function draw() {
+    console.log((1000 / deltaTime).toFixed(1));
     background(250);
     // labels.clear();
 
