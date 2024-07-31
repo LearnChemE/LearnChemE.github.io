@@ -36,18 +36,18 @@
   align-items: end;
   justify-items: center;
   margin-top: 10px;
-  margin-right: 15px;
+  margin-left: 15px;
 
 }
 
 .balance {
   display: grid;
-  grid-template-columns: max-content 320px 35px max-content;
+  grid-template-columns: max-content 310px 35px max-content;
   gap: 10px;
-  align-items: center;
+  align-items: baseline;
   justify-items: center;
   margin-top: 0px;
-  margin-right: 15px;
+  margin-left: 15px;
 }
 
 .simulation-wrapper {
@@ -57,8 +57,16 @@
 
 .simulation-controls {
   float: right;
+  margin-top: 10px;
   margin-right: 15px;
   min-width: 300px;
+}
+
+#modal-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 5px;
+  grid-column: 3;
 }
 
 .inputs {
@@ -68,13 +76,14 @@
 #defaultCanvas0 {
   position: relative;
   top: 20px;
+  left: 80px;
 }
 
 #equation {
   display: inline;
   position: relative;
   top: 20px;
-  left: 230px;
+  left: 300px;
   font-size: 19px;
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -95,7 +104,7 @@
 
 #shuffle-btn {
   position: relative;
-  left: 40px;
+  left: 28px;
 }
 
 .close {
