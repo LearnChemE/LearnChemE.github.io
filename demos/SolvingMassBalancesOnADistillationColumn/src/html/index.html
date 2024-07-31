@@ -1,6 +1,7 @@
 <!doctype html>
 
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta http-equiv="content-language" content="en">
@@ -15,34 +16,41 @@
       }
     };
   </script>
-  <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'UA-204988035-3');
   </script>
-    <script src="https://kit.fontawesome.com/e9f4c78fcc.js" crossorigin="anonymous"></script>
+  <script src="https://kit.fontawesome.com/e9f4c78fcc.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
 
   <div class="simulation-controls">
     <div class="input-area">
-  
+
       <div class="controls-container">
-        <div id="start-reset" class="btn btn-primary"><i class="fa-solid fa-play"></i><div>start</div></div>
-        <div id="show-solution-next" class="btn btn-success" disabled="yes"><i class="fa-solid fa-forward"></i><div>show solution</div></div>
+        <div id="start-reset" class="btn btn-primary"><i class="fa-solid fa-play"></i>
+          <div>start</div>
+        </div>
+        <div id="show-solution-next" class="btn btn-success" disabled="yes"><i class="fa-solid fa-forward"></i>
+          <div>show solution</div>
+        </div>
       </div>
-  
+
     </div>
 
     <div class="modal-buttons-row">
-      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
-      <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
+      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
+        Directions</div>
+      <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details
+      </div>
       <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
     </div>
 
@@ -75,13 +83,27 @@
 
         <div class="modal-body">
           <div class="directions-text">
-            This is a three-question quiz with a total of seven unknowns that must be solved for. After (optionally) entering your name and then beginning the quiz, you will be given a scenario with two unknown values (see below).
+            This is a three-question quiz with a total of seven unknowns that must be solved for. After (optionally)
+            entering your name and then beginning the quiz, you will be given a scenario with two unknown values (see
+            below).
           </div>
           <div class="directions-image-wrapper">
             <img class="directions-image" src="./assets/scenario_1.PNG" />
           </div>
           <div class="directions-text">
-            Enter the correct mole fractions and flow rates in the light yellow input boxes. Answers should have a precision of two digits after the decimal place (e.g., 2.15 kmol/h). A correct answer is considered within ±0.01 of the solution. After you have entered your answers in the input boxes, press <img class="directions-image-small" src="./assets/show_solution.PNG"/> to display the correct answers. Then, press <img class="directions-image-small" src="./assets/next_question.PNG"/> to proceed to the next question. Once all seven unknowns have been solved for, your score will be displayed. If you entered your name at the beginning of the quiz, your name will be displayed alongside your score so you may screenshot the page and send the image to your instructor. You may attempt the quiz as many times as you like by pressing <img class="directions-image-small" src="./assets/reset_quiz.PNG"/>. Each time you re-attempt the quiz, the unknowns to be solved for will be randomized and the flow rates and mole fractions will be randomized (i.e., the quiz will be different each time you attempt it). To see the equations needed to solve each mass balance, press <img class="directions-image-small" style="width:80px;" src="./assets/details.PNG"/>.
+            Enter the correct mole fractions and flow rates in the light yellow input boxes. Answers should have a
+            precision of two digits after the decimal place (e.g., 2.15 kmol/h). A correct answer is considered within
+            ±0.01 of the solution. After you have entered your answers in the input boxes, press <img
+              class="directions-image-small" src="./assets/show_solution.PNG" /> to display the correct answers. Then,
+            press <img class="directions-image-small" src="./assets/next_question.PNG" /> to proceed to the next
+            question. Once all seven unknowns have been solved for, your score will be displayed. If you entered your
+            name at the beginning of the quiz, your name will be displayed alongside your score so you may screenshot
+            the page and send the image to your instructor. You may attempt the quiz as many times as you like by
+            pressing <img class="directions-image-small" src="./assets/reset_quiz.PNG" />. Each time you re-attempt the
+            quiz, the unknowns to be solved for will be randomized and the flow rates and mole fractions will be
+            randomized (i.e., the quiz will be different each time you attempt it). To see the equations needed to solve
+            each mass balance, press <img class="directions-image-small" style="width:80px;"
+              src="./assets/details.PNG" />.
           </div>
           <div style="margin-top: 2rem;"></div>
         </div>
@@ -104,7 +126,10 @@
 
         <div class="modal-body">
           <div class="details-text">
-            For the first scenario, a binary mixture is fed to a distillation column. Two of the six variables are unknown, and their values are obtained from the mass balances below (where \(F\), \(D\) and \(B\) are the feed, distillate and bottoms flow rates (kmol/h), and \(z_{F}\), \(x_{D}\) and \(x_{B}\) are the feed, distillate and bottoms mass fractions of the more volatile component):
+            For the first scenario, a binary mixture is fed to a distillation column. Two of the six variables are
+            unknown, and their values are obtained from the mass balances below (where \(F\), \(D\) and \(B\) are the
+            feed, distillate and bottoms flow rates (kmol/h), and \(z_{F}\), \(x_{D}\) and \(x_{B}\) are the feed,
+            distillate and bottoms mass fractions of the more volatile component):
           </div>
 
           <div class="details-eqn">
@@ -120,7 +145,10 @@
           </div>
 
           <div class="details-text">
-            For the second scenario, a binary mixture is fed to a distillation column in two streams and the two unknowns are obtained from the mass balances below (where \(F_{1}\) and \(F_{2}\) are the flow rates from feed 1 and feed 2, and \(z_{F,1}\) and \(z_{F,2}\) are the mole fractions of the more volatile component in feed 1 and feed 2):
+            For the second scenario, a binary mixture is fed to a distillation column in two streams and the two
+            unknowns are obtained from the mass balances below (where \(F_{1}\) and \(F_{2}\) are the flow rates from
+            feed 1 and feed 2, and \(z_{F,1}\) and \(z_{F,2}\) are the mole fractions of the more volatile component in
+            feed 1 and feed 2):
           </div>
 
           <div class="details-eqn">
@@ -136,7 +164,11 @@
           </div>
 
           <div class="details-text">
-            For the third scenario, a ternary mixture is fed to a distillation column in one feed stream. The mass fractions of components A and B are either given or to be solved for. The three unknowns are obtained from the mass balances below (where subscript \(A\) represents component A, and subscript \(B\) represents component B. Component C is solved for by summing each mole fraction to 1, e.g. \(x_{B,A} + x_{B,B} + x_{B,C} = 1\)):
+            For the third scenario, a ternary mixture is fed to a distillation column in one feed stream. The mass
+            fractions of components A and B are either given or to be solved for. The three unknowns are obtained from
+            the mass balances below (where subscript \(A\) represents component A, and subscript \(B\) represents
+            component B. Component C is solved for by summing each mole fraction to 1, e.g. \(x_{B,A} + x_{B,B} +
+            x_{B,C} = 1\)):
           </div>
 
           <div class="details-eqn">
@@ -156,7 +188,7 @@
             [7] \quad z_{F,B} F = x_{D,B} D + x_{B,B} B
             $$
           </div>
-          
+
           <div style="margin-top: 2rem;"></div>
         </div>
 
@@ -176,7 +208,16 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of
+            Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our
+            simulations are open source, and are available on our <a
+              href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+              repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page
+            (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is
+            not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended
+            browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
           </p>
         </div>
       </div>

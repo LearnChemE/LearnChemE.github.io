@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords"
+        content="LearnChemE, chemical engineering, engineering, simulation, heat transfer, heat exchanger">
+    <meta name="author" content="Drew Smith">
+    <meta name="application-name" content="LearnChemE HEX Lab">
+    <!-- Libs -->
+    <script src="lib/p5.js"></script>
+    <script src="lib/p5-graph-lib.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="lib/bootstrap.min.css">
+    <script>
+        MathJax = {
+            chtml: {
+                scale: 0.95,
+                mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+                displayAlign: 'left', // default for indentalign when set to 'auto'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Style sheets -->
+    <link rel="stylesheet" href="css/sliders.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://kit.fontawesome.com/9d19ad28f4.js" crossorigin="anonymous"></script>
+
+    <title>Heat Exchanger Virtual Lab</title>
+</head>
+
+<body>
+    <div class="modal-buttons-container">
+        <button type="button" id="directions-modal-btn" class="btn btn-primary" title="Directions"
+            data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</button>
+        <button type="button" id="details-modal-btn" class="btn btn-primary" title="Details" data-bs-toggle="modal"
+            data-bs-target="#details-modal">Details</button>
+        <button type="button" id="about-modal-btn" class="btn btn-primary" title="About" data-bs-toggle="modal"
+            data-bs-target="#about-modal">About</button>
+    </div>
+    <div class="nav-bar">
+        <div class="nav-bar-column" id="nav-bar-left">
+            <div class="buttons-container">
+                <button type="button" id="start-reset-btn" class="btn btn-primary" title="Start Lab">
+                    <i class="fa-solid fa-play"></i>
+                    <div>start</div>
+                </button>
+            </div>
+        </div>
+        <div class="nav-bar-column" id="nav-bar-center">
+            <div class="buttons-container hidden" id="pump-btns">
+                <button type="button" id="process-pump-btn" class="btn btn-danger">start process fluid pump</button>
+                <button type="button" id="service-pump-btn" class="btn btn-primary">start service fluid pump</button>
+            </div>
+        </div>
+        <div class="nav-bar-column" id="nav-bar-right">
+
+            <button type="button" id="reset-modal-btn" class="btn btn-outline-danger hidden" data-bs-toggle="modal"
+                data-bs-target="#reset-modal">
+                reset beakers
+            </button>
+
+        </div>
+    </div>
+
+    <div id="graphics-wrapper">
+        <div id="inputs-wrapper">
+            <input type="text" id="input-name">
+        </div>
+        <button type="button" id="calc-lmtd-btn" class="btn btn-primary hidden" disabled aria-disabled="true">calculate
+            \(\Delta T_\text{log mean}\)</button>
+        <div class="tooltip-area" id="hi-tooltip" title="<em>test0</em>" data-bs-toggle="tooltip" data-bs-html="true">
+        </div>
+        <div class="tooltip-area" id="ho-tooltip" title="test1"></div>
+        <div class="tooltip-area" id="ci-tooltip" title="test2"></div>
+        <div class="tooltip-area" id="co-tooltip" title="test3"></div>
+    </div>
+
+    <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-l" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    This lab was intended to be used along side the supplementary worksheet provided <a
+                        href="https://s3.wp.wsu.edu/uploads/sites/2379/2020/11/ME_DoublePipe-Worksheet_2020-2021_Final.docx">here</a>.
+                    Follow along taking the required measurements as you go. Use the buttons at
+                    the top of the simulation to start the service and process fluid pumps after dragging the valves on
+                    each inlet beaker to adjust the flowrate of each fluid. Then watch the temperatures and volumes
+                    change by hovering your mouse over the beakers. You can use a stopwatch to track the time elapsed
+                    and determine the exact flowrate.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-l" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        The heat exchanger shown in the simulation is an example of a counter-current concentric tube
+                        heat
+                        exchanger. Inside, the process fluid (orange) runs anti-parallel to the service fluid (blue). At
+                        steady-state, the rate of heat transfer is proportional to the temperature difference of the two
+                        fluids at a location in the unit. Thus, the heat flux (\(\dot{q}\)) between the fluids can be
+                        expressed as
+                        $$\dot{q}=\epsilon U \Delta T$$
+                        Where \(\epsilon\) is the effectiveness of the heat transfer, U is the inverse of (resistance
+                        times
+                        area) of the heat exchanger, and \(\Delta T\) is the temperature difference
+                        between
+                        the two fluids at the point.
+                    </p>
+                    <p>Thus, the overall rate of heat transfer (\(\dot{Q}\)) can be expressed as
+                        $$ \dot{Q} = \epsilon UA \Delta T_\text{log mean} $$
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-l" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutModalLabel">About</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This virtual lab was created in the <a href="https://www.colorado.edu/chbe"
+                            target="_blank">Department of
+                            Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+                            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Drew Smith under
+                        the direction of
+                        Professor John L. Falconer and Michelle Medlin. This virtual lab was
+                        prepared with financial support from the
+                        National Science Foundation and is based off of the <a
+                            href="https://labs.wsu.edu/educ-ate/heat-transfer-kit/">Heat Exchanger experimental kit</a>
+                        from
+                        Washington State University. Address any questions or comments to learncheme@gmail.com. All of
+                        our
+                        simulations are open source, and are available on our <a
+                            href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+                            repository</a>.</p>
+                    <p style="line-height: 3rem;">
+                        If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                                src="https://learncheme.github.io/media/command.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on
+                        Mac
+                        or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on
+                        Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on
+                        Mac
+                        or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on
+                        Windows.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="reset-modal" tabindex="-1" role="dialog" aria-labelledby="resetModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resetModalLabel">Reset Beakers</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Reset beakers and pumps to gather new measurements. Select whether to re-randomize inlet
+                    temperatures as well:
+                </div>
+                <div class="modal-footer" id="reset-modal-footer">
+                    <button type="button" id="reset-new-btn" class="btn btn-primary btn-sm"
+                        data-bs-dismiss="modal">Reset with new
+                        temperatures</button>
+                    <button type="button" id="reset-keep-btn" class="btn btn-success btn-sm"
+                        data-bs-dismiss="modal">Reset but keep temperatures</button>
+                    <button type="button" id="close-btn" class="btn btn-secondary btn-sm"
+                        data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+<script src="js/index.js"></script>
+<script src="js/functions.js"></script>
+<script src="js/buttons.js"></script>
+<script src="js/draw.js"></script>
