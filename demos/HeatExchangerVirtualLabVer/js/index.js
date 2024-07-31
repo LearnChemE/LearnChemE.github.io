@@ -115,39 +115,3 @@ function drag() {
     g.rotY = lerp(g.rotY, g.rotTargY, .1);
 }
 
-const hotFlowSlider = document.getElementById("hot-flow-slider");
-const hotFlowLabel = document.getElementById("hot-flow-label");
-
-const hotTempSlider = document.getElementById("hot-temp-slider");
-const hotTempLabel = document.getElementById("hot-temp-label");
-
-const coldFlowSlider = document.getElementById("cold-flow-slider");
-const coldFlowLabel = document.getElementById("cold-flow-label");
-
-const coldTempSlider = document.getElementById("cold-temp-slider");
-const coldTempLabel = document.getElementById("cold-temp-label");
-
-hotFlowSlider.addEventListener("input", function () {
-    tmp = Number(hotFlowSlider.value);
-    g.mDotH = tmp;
-    hotFlowLabel.innerHTML = `${tmp.toFixed(1)}`;
-})
-
-hotTempSlider.addEventListener("input", function () {
-    tmp = Number(hotTempSlider.value);
-    g.Th_in = tmp;
-    hotTempLabel.innerHTML = `${tmp.toFixed(1)}`;
-})
-
-coldFlowSlider.addEventListener("input", function () {
-    tmp = Number(coldFlowSlider.value);
-    g.mDotC = tmp;
-    coldFlowLabel.innerHTML = `${tmp.toFixed(1)}`;
-})
-
-coldTempSlider.addEventListener("input", function () {
-    tmp = Number(coldTempSlider.value);
-    g.Tc_in = tmp;
-    coldTempLabel.innerHTML = `${tmp.toFixed(1)}`;
-})
-

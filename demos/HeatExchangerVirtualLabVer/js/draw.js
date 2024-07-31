@@ -177,12 +177,19 @@ function createBeaker() {
     b.strokeWeight(2);
     for (let i = 0; i < 9; i++) {
         if (i % 2 == 0) {
-            b.line(30, i * 10 + 20, 90, i * 10 + 20);
+            b.line(30, i * 10 + 20, 80, i * 10 + 20);
         }
         else {
             b.line(45, i * 10 + 20, 75, i * 10 + 20);
         }
     }
+    b.noStroke(); b.textSize(10);
+    b.text('mL', 90, 11);
+    b.text('1000', 83, 23);
+    b.text('800', 83, 43);
+    b.text('600', 83, 63);
+    b.text('400', 83, 83);
+    b.text('200', 83, 103);
     return b;
 }
 
@@ -460,7 +467,7 @@ function fillAnimationTubes(tOrange, tBlue) {
         tint(255, s);
         image(tho, 0, 0);
     }
-    else {
+    else if (g.hIsFlowing) {
         image(thi, 0, 0);
         image(tho, 0, 0);
     }
@@ -473,7 +480,7 @@ function fillAnimationTubes(tOrange, tBlue) {
         tint(255, s);
         image(tco, 0, 0);
     }
-    else {
+    else if (g.cIsFlowing) {
         image(tci, 0, 0);
         image(tco, 0, 0);
     }

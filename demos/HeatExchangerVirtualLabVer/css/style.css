@@ -219,3 +219,27 @@ canvas {
 #co-tooltip {
     left: 574px;
 }
+
+#reset-modal-footer {
+    display: grid;
+    grid-template-columns: 150px 150px auto;
+    align-items: end;
+    justify-content: space-evenly;
+}
+
+@media (min-width: 768px) {
+    /* .modal-l {
+        width: 80%;
+        max-width: 1000px;
+    } */
+
+    .modal-xl {
+        width: 70%;
+        max-width: 1200px;
+
+        #reset-modal-footer {
+            grid-template-columns: max-content max-content auto;
+        }
+
+    }
+}
