@@ -322,7 +322,7 @@ function valve() {
 
 function displayValve(x, y, flow) {
     push();
-    angle = map(flow, 1, 10, 3 * PI / 4, PI);
+    angle = map(flow, MIN_FLOWRATE, MAX_FLOWRATE, 3 * PI / 4, PI);
     imageMode(CENTER);
     translate(x, y);
     scale(.8);
@@ -331,6 +331,7 @@ function displayValve(x, y, flow) {
     image(v, 0, 0);
     pop();
 }
+
 /* ********************************************* */
 /* **************** DRAW DISPLAYS ************** */
 /* ********************************************* */

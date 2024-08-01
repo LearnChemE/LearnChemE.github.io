@@ -63,12 +63,6 @@ hPumpBtn.addEventListener("click", () => {
         hPumpBtn.innerHTML = `<i class="fa-solid fa-play"></i><div>&nbsp start pumps</div>`
     }
 });
-// cPumpBtn.addEventListener("click", () => {
-//     g.blueTime = millis();
-//     g.cIsFlowing = true;
-//     cPumpBtn.disabled = true;
-//     cPumpBtn.ariaDisabled = true;
-// });
 
 // Start / Reset button
 startButton.addEventListener("click", () => {
@@ -142,12 +136,12 @@ function drag() {
     if (g.dragging1) {
         angle = atan2(mouseY - 431, mouseX - 90);
         angle = constrain(angle, PI / 4, PI / 2);
-        g.mDotH = map(angle, PI / 4, PI / 2, 1, 10);
+        g.mDotH = map(angle, PI / 4, PI / 2, MIN_FLOWRATE, MAX_FLOWRATE);
     }
     else if (g.dragging2) {
         angle = atan2(mouseY - 461, mouseX - 415);
         angle = constrain(angle, PI / 4, PI / 2);
-        g.mDotC = map(angle, PI / 4, PI / 2, 1, 10);
+        g.mDotC = map(angle, PI / 4, PI / 2, MIN_FLOWRATE, MAX_FLOWRATE);
     }
 }
 

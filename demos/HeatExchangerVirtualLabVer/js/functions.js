@@ -1,9 +1,9 @@
 
 function randStartVals() {
-    g.Th_in = random(30, 45);
-    g.mDotH = 5// random(5, 10);
-    g.Tc_in = random(0, 20);
-    g.mDotC = 10// random(2, 4);
+    g.Th_in = random(MIN_HOT_WATER_TEMP, MAX_HOT_WATER_TEMP);
+    g.mDotH = random(MIN_FLOWRATE, MAX_FLOWRATE);
+    g.Tc_in = random(MIN_COLD_WATER_TEMP, MAX_COLD_WATER_TEMP);
+    g.mDotC = random(MIN_FLOWRATE, MAX_FLOWRATE);
 }
 
 function effectiveness(cmin, cmax) {

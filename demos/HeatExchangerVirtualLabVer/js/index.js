@@ -1,5 +1,11 @@
 const DOUBLE_TUBE = 0;
 const SHELL_TUBE = 1;
+const MAX_HOT_WATER_TEMP = 50;
+const MIN_HOT_WATER_TEMP = 30;
+const MAX_COLD_WATER_TEMP = 25;
+const MIN_COLD_WATER_TEMP = 10;
+const MAX_FLOWRATE = 25;
+const MIN_FLOWRATE = 2;
 
 window.g = {
     cnv: undefined,
