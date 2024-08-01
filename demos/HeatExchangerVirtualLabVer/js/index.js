@@ -5,7 +5,7 @@ window.g = {
     cnv: undefined,
     width: 800,
     height: 640,
-    state: 0,
+    state: 1,
 
     name: '',
 

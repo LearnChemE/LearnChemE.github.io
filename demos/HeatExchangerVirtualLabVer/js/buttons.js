@@ -4,7 +4,7 @@ const nextBtn = document.getElementById("next-btn");
 const prevBtn = document.getElementById("prev-btn");
 const pumpBtns = document.getElementById("pump-btns");
 const hPumpBtn = document.getElementById("process-pump-btn");
-const cPumpBtn = document.getElementById("service-pump-btn");
+// const cPumpBtn = document.getElementById("service-pump-btn");
 const resetRandBtn = document.getElementById("reset-new-btn");
 const resetKeepBtn = document.getElementById("reset-keep-btn");
 
@@ -40,18 +40,35 @@ inputName.addEventListener("input", () => {
     g.name = input;
 });
 
+let pumpsAreRunning = false;
 hPumpBtn.addEventListener("click", () => {
-    g.orngTime = millis();
-    g.hIsFlowing = true;
-    hPumpBtn.disabled = true;
-    hPumpBtn.ariaDisabled = true;
+    pumpsAreRunning = !pumpsAreRunning;
+
+    if (pumpsAreRunning) {
+        g.orngTime = millis();
+        g.hIsFlowing = true;
+        g.blueTime = millis();
+        g.cIsFlowing = true;
+        hPumpBtn.classList.remove("btn-primary");
+        hPumpBtn.classList.add("btn-danger");
+        hPumpBtn.innerHTML = `<i class="fa-solid fa-pause"></i><div>&nbsp stop pumps</div>`
+    }
+    else {
+        g.orngTime = -1;
+        g.hIsFlowing = false;
+        g.blueTime = -1;
+        g.cIsFlowing = false;
+        hPumpBtn.classList.remove("btn-danger");
+        hPumpBtn.classList.add("btn-primary");
+        hPumpBtn.innerHTML = `<i class="fa-solid fa-play"></i><div>&nbsp start pumps</div>`
+    }
 });
-cPumpBtn.addEventListener("click", () => {
-    g.blueTime = millis();
-    g.cIsFlowing = true;
-    cPumpBtn.disabled = true;
-    cPumpBtn.ariaDisabled = true;
-});
+// cPumpBtn.addEventListener("click", () => {
+//     g.blueTime = millis();
+//     g.cIsFlowing = true;
+//     cPumpBtn.disabled = true;
+//     cPumpBtn.ariaDisabled = true;
+// });
 
 // Start / Reset button
 startButton.addEventListener("click", () => {

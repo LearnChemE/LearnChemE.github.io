@@ -13,10 +13,10 @@ function doubleTubeGraphic(w, h) {
     dt.stroke('black'); dt.strokeWeight(2);
     dt.rect(lx, ty, wHex, hHex);
 
-    drawArrow(dt, [rx - 50, ty], [rx - 50, ty - 50]);
-    drawArrow(dt, [rx - 50, by + 50], [rx - 50, by]);
-    drawArrow(dt, [w, ty + 48], [rx, ty + 48]);
-    drawArrow(dt, [rx, by - 54], [w, by - 54]);
+    // drawArrow(dt, [rx - 50, ty], [rx - 50, ty - 50]);
+    // drawArrow(dt, [rx - 50, by + 50], [rx - 50, by]);
+    // drawArrow(dt, [w, ty + 48], [rx, ty + 48]);
+    // drawArrow(dt, [rx, by - 54], [w, by - 54]);
     dt.pop();
 
     let hPipe = horizontalPipe(wHex, hHex);
@@ -126,33 +126,33 @@ function curvePipe() {
     return cPipe;
 }
 
-function drawArrow(graphicsObject, tail, head, options = {
-    color: 'black',
-    arrowSize: 12,
-    dashed: false,
-}) {
-    let temp = { color: 'black', arrowSize: 12, dashed: false, };
-    options = { ...temp, ...options };
+// function drawArrow(graphicsObject, tail, head, options = {
+//     color: 'black',
+//     arrowSize: 12,
+//     dashed: false,
+// }) {
+//     let temp = { color: 'black', arrowSize: 12, dashed: false, };
+//     options = { ...temp, ...options };
 
-    let p1 = tail;
-    let p2 = head;
-    let dir = getDirection(p2, p1);
-    let perp = [dir[1], -dir[0]];
-    let size = options.arrowSize;
+//     let p1 = tail;
+//     let p2 = head;
+//     let dir = getDirection(p2, p1);
+//     let perp = [dir[1], -dir[0]];
+//     let size = options.arrowSize;
 
-    dt.push();
-    dt.stroke(options.color); dt.strokeWeight(2);
-    if (options.dashed) drawingContext.setLineDash([8, 5]);
+//     dt.push();
+//     dt.stroke(options.color); dt.strokeWeight(2);
+//     if (options.dashed) drawingContext.setLineDash([8, 5]);
 
-    dt.line(p1[0], p1[1], p2[0], p2[1]);
+//     dt.line(p1[0], p1[1], p2[0], p2[1]);
 
-    dt.noStroke(); dt.fill(options.color);
-    dt.triangle(p2[0], p2[1],
-        p2[0] + size * (dir[0] + perp[0] / 3), p2[1] + size * (dir[1] + perp[1] / 3),
-        p2[0] + size * (dir[0] - perp[0] / 3), p2[1] + size * (dir[1] - perp[1] / 3));
+//     dt.noStroke(); dt.fill(options.color);
+//     dt.triangle(p2[0], p2[1],
+//         p2[0] + size * (dir[0] + perp[0] / 3), p2[1] + size * (dir[1] + perp[1] / 3),
+//         p2[0] + size * (dir[0] - perp[0] / 3), p2[1] + size * (dir[1] - perp[1] / 3));
 
-    dt.pop();
-}
+//     dt.pop();
+// }
 
 function getDirection(p1, p2) {
     let dx = p2[0] - p1[0], dy = p2[1] - p1[1];
@@ -219,36 +219,36 @@ function beakersAndTubes() {
     bt.line(20, 400, 20, 90);
     bt.line(10, 80, 520, 80);
     bt.line(20, 90, 510, 90);
-    bt.line(520, 80, 520, 130);
-    bt.line(510, 90, 510, 115);
-    bt.line(520, 132, 450, 132);
-    bt.line(510, 115, 450, 115);
+    bt.line(520, 80, 520, 128);
+    bt.line(510, 90, 510, 118);
+    bt.line(520, 128, 450, 128);
+    bt.line(510, 118, 450, 118);
 
     // tho tube
     bt.line(258, 580, 258, 410);
     bt.line(248, 580, 248, 400);
     bt.line(258, 410, 520, 410);
     bt.line(248, 400, 510, 400);
-    bt.line(520, 410, 520, 313);
-    bt.line(510, 400, 510, 330);
-    bt.line(520, 313, 450, 313);
-    bt.line(510, 330, 450, 330);
+    bt.line(520, 410, 520, 315);
+    bt.line(510, 400, 510, 325);
+    bt.line(520, 315, 450, 315);
+    bt.line(510, 325, 450, 325);
 
     // tci tube
     bt.line(420, 580, 420, 430);
-    bt.line(410, 580, 410, 440);
-    bt.line(420, 430, 410, 430);
-    bt.line(410, 440, 390, 440);
-    bt.line(410, 430, 410, 300);
-    bt.line(390, 440, 390, 300);
+    bt.line(410, 580, 410, 420);
+    bt.line(420, 430, 430, 430);
+    bt.line(410, 420, 420, 420);
+    bt.line(430, 430, 430, 300);
+    bt.line(420, 420, 420, 300);
 
     // tco tube
     bt.line(593, 580, 593, 10);
     bt.line(583, 580, 583, 20);
-    bt.line(593, 10, 390, 10);
-    bt.line(583, 20, 410, 20);
-    bt.line(390, 10, 390, 100);
-    bt.line(410, 20, 410, 100);
+    bt.line(593, 10, 420, 10);
+    bt.line(583, 20, 430, 20);
+    bt.line(420, 10, 420, 100);
+    bt.line(430, 20, 430, 100);
     bt.pop();
 
     // thiTubes(bt);
@@ -266,8 +266,8 @@ function thiTubes(bt) {
     bt.rect(10, 400, 75, 10);
     bt.rect(10, 80, 10, 320);
     bt.rect(20, 80, 500, 10);
-    bt.rect(510, 90, 10, 42);
-    bt.rect(450, 115, 60, 17);
+    bt.rect(510, 90, 10, 38);
+    bt.rect(450, 118, 60, 10);
     bt.pop();
 }
 
@@ -276,17 +276,16 @@ function thoTubes(bt) {
     bt.fill(g.orangeFluidColor); bt.noStroke();
     bt.rect(248, 400, 10, 180);
     bt.rect(258, 400, 262, 10);
-    bt.rect(510, 313, 10, 87);
-    bt.rect(450, 313, 60, 17);
+    bt.rect(510, 315, 10, 85);
+    bt.rect(450, 315, 60, 10);
     bt.pop();
 }
 
 function tciTubes(bt) {
     bt.push();
     bt.fill(g.blueFluidColor); bt.noStroke();
-    bt.rect(410, 430, 10, 150);
-    bt.rect(390, 430, 20, 10);
-    bt.rect(390, 300, 20, 130);
+    bt.rect(410, 420, 10, 160);
+    bt.rect(420, 300, 10, 130);
     bt.pop();
 }
 
@@ -294,8 +293,8 @@ function tcoTubes(bt) {
     bt.push();
     bt.fill(g.blueFluidColor); bt.noStroke();
     bt.rect(583, 10, 10, 570);
-    bt.rect(390, 10, 193, 10);
-    bt.rect(390, 20, 20, 80);
+    bt.rect(420, 10, 163, 10);
+    bt.rect(420, 20, 10, 80);
     bt.pop();
 }
 
@@ -339,46 +338,15 @@ function displayValve(x, y, flow) {
 function drawAll() {
     let to, tb;
     switch (g.state) {
-        // case -1: // dev mode
-        //     image(thi, 0, 0);
-        //     image(tho, 0, 0);
-        //     image(tci, 0, 0);
-        //     image(tco, 0, 0);
-
-        //     image(bt, 0, 0);
-        //     image(dt, 0, 25);
-        //     image(dto, 0, 25);
-        //     image(dtb, 0, 25);
-
-        //     drag();
-        //     displayValve(90, 431, g.mDotH);
-        //     displayValve(415, 461, g.mDotC);
-        //     break;
         case 0: // name and landing page
             landingPage();
             break;
-        // case -2: // startup animation
-        //     if (g.playS1) playTime();
-        //     to = (g.orngTime == -1) ? 0 : (millis() - g.orngTime) / 1000;
-        //     tb = (g.blueTime == -1) ? 0 : (millis() - g.blueTime) / 1000;
-
-        //     image(bt, 0, 0);
-        //     fillAnimationTubes(to, tb);
-        //     image(dt, 0, 25);
-        //     fillAnimationOrange(to, 0, 25);
-        //     fillAnimationBlue(tb, 0, 25);
-
-        //     drag();
-        //     displayValve(90, 431, g.mDotH);
-        //     displayValve(415, 461, g.mDotC);
-        //     break;
         case 1: // flows and temps
             to = (g.orngTime == -1) ? 0 : (millis() - g.orngTime) / 1000;
             tb = (g.blueTime == -1) ? 0 : (millis() - g.blueTime) / 1000;
 
             changeVols();
             integrateTemps();
-
 
             push();
             fillBeaker(50, g.vols[0], g.orangeFluidColor);
@@ -389,7 +357,7 @@ function drawAll() {
 
             image(bt, 0, 0);
             fillAnimationTubes(to, tb);
-            image(dt, 0, 25);
+            image(dt, 25, 25);
             fillAnimationOrange(to, 0, 25);
             fillAnimationBlue(tb, 0, 25);
 
@@ -429,10 +397,10 @@ function fillAnimationBlue(t, x = 0, y = 0) {
     if (t <= 5) {
         s = 88 + t * 160
         partBlue = dtb.get(0, 450 - s, 500, 50 + s);
-        image(partBlue, 0, 450 - s);
+        image(partBlue, 25, 450 - s);
     }
     else {
-        image(dtb, 0, 0);
+        image(dtb, 25, 0);
     }
     pop();
 }
@@ -448,10 +416,10 @@ function fillAnimationOrange(t, x = 0, y = 0) {
         s = 88 + t * 160 - 100
         s = constrain(s, 1, 600);
         partOrng = dto.get(0, 0, 500, s);
-        image(partOrng, 0, 0);
+        image(partOrng, 25, 0);
     }
     else {
-        image(dto, 0, 0);
+        image(dto, 25, 0);
     }
     pop();
 }
