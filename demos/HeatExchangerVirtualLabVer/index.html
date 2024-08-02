@@ -44,22 +44,20 @@
     </div>
     <div class="nav-bar">
         <div class="nav-bar-column" id="nav-bar-left">
-            <div class="buttons-container">
-                <button type="button" id="start-reset-btn" class="btn btn-primary" title="Start Lab">
-                    <i class="fa-solid fa-play"></i>
-                    <div>start</div>
-                </button>
-            </div>
         </div>
         <div class="nav-bar-column" id="nav-bar-center">
-            <div class="buttons-container hidden" id="pump-btns">
-                <button type="button" id="process-pump-btn" class="btn btn-danger">start process fluid pump</button>
-                <button type="button" id="service-pump-btn" class="btn btn-primary">start service fluid pump</button>
+            <div class="buttons-container" id="pump-btns">
+                <button type="button" id="process-pump-btn" class="btn btn-primary">
+                    <i class="fa-solid fa-play"></i>
+                    <div>&nbsp start pumps</div>
+                </button>
+                <button type="button" id="measure-temps-btn" class="btn btn-success">measure
+                    temperatures</button>
             </div>
         </div>
         <div class="nav-bar-column" id="nav-bar-right">
 
-            <button type="button" id="reset-modal-btn" class="btn btn-outline-danger hidden" data-bs-toggle="modal"
+            <button type="button" id="reset-modal-btn" class="btn btn-outline-danger" data-bs-toggle="modal"
                 data-bs-target="#reset-modal">
                 reset beakers
             </button>
@@ -68,14 +66,9 @@
     </div>
 
     <div id="graphics-wrapper">
-        <div id="inputs-wrapper">
-            <input type="text" id="input-name">
-        </div>
-        <button type="button" id="calc-lmtd-btn" class="btn btn-primary hidden" disabled aria-disabled="true">calculate
-            \(\Delta T_\text{log mean}\)</button>
         <div class="tooltip-area" id="hi-tooltip" title="<em>test0</em>" data-bs-toggle="tooltip" data-bs-html="true">
         </div>
-        <div class="tooltip-area" id="ho-tooltip" title="test1"></div>
+        <div class="tooltip-area" target="#details-modal" id="ho-tooltip" title="test1"></div>
         <div class="tooltip-area" id="ci-tooltip" title="test2"></div>
         <div class="tooltip-area" id="co-tooltip" title="test3"></div>
     </div>
@@ -91,13 +84,15 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    This lab was intended to be used along side the supplementary worksheet provided <a
-                        href="https://s3.wp.wsu.edu/uploads/sites/2379/2020/11/ME_DoublePipe-Worksheet_2020-2021_Final.docx">here</a>.
-                    Follow along taking the required measurements as you go. Use the buttons at
-                    the top of the simulation to start the service and process fluid pumps after dragging the valves on
-                    each inlet beaker to adjust the flowrate of each fluid. Then watch the temperatures and volumes
-                    change by hovering your mouse over the beakers. You can use a stopwatch to track the time elapsed
-                    and determine the exact flowrate.
+                    This digital lab represents a double pipe heat exchanger with countercurrent flow. It is designed to
+                    be used with this downloadable <a
+                        href="https://s3.wp.wsu.edu/uploads/sites/2379/2020/11/ME_DoublePipe-Worksheet_2020-2021_Final.docx">worksheet</a>.
+                    Use the button at the top to start the pumps. Drag the
+                    valves on each inlet beaker to adjust flowrates. To measure temperatures, stop the pumps and press
+                    the "measure temperatures" button, then hover your mouse over each beaker to get the temperature and
+                    volume. Note that changing the flowrate valves while pumps are running will change the outlet
+                    temperatures, and thus reduce the accuracy of the observed temperature in the beakers, so it is
+                    important to adjust the valves before starting the pump.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
@@ -118,21 +113,18 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        The heat exchanger shown in the simulation is an example of a counter-current concentric tube
-                        heat
-                        exchanger. Inside, the process fluid (orange) runs anti-parallel to the service fluid (blue). At
-                        steady-state, the rate of heat transfer is proportional to the temperature difference of the two
-                        fluids at a location in the unit. Thus, the heat flux (\(\dot{q}\)) between the fluids can be
-                        expressed as
-                        $$\dot{q}=\epsilon U \Delta T$$
-                        Where \(\epsilon\) is the effectiveness of the heat transfer, U is the inverse of (resistance
-                        times
-                        area) of the heat exchanger, and \(\Delta T\) is the temperature difference
-                        between
-                        the two fluids at the point.
+                        This simulation uses the NTU-effectiveness approach to calculate the outlet temperatures of each
+                        fluid line. Values were chosen to be realistic and similar to the values used in the actual
+                        experiment, and are randomized on each startup. A room temperature of 25°C was chosen, so water
+                        in the beakers will slowly
+                        equilibriate towards this value;
+                        you may notice this if you leave the simulation running for a very long time.
                     </p>
-                    <p>Thus, the overall rate of heat transfer (\(\dot{Q}\)) can be expressed as
-                        $$ \dot{Q} = \epsilon UA \Delta T_\text{log mean} $$
+                    <p>Additionally, the
+                        temperature measured in the outlet beakers are designed to show the average temperature of the
+                        outlet fluid and the heat capacity of the beaker initially at 25°C. Thus, for accurate results,
+                        it is recommended to let the heat exchanger flow for a long period of time, without changing any
+                        valves during the run.
                     </p>
                 </div>
                 <div class="modal-footer">
@@ -161,16 +153,16 @@
                         the direction of
                         Professor John L. Falconer and Michelle Medlin. This virtual lab was
                         prepared with financial support from the
-                        National Science Foundation and is based off of the <a
+                        National Science Foundation and is based on the <a
                             href="https://labs.wsu.edu/educ-ate/heat-transfer-kit/">Heat Exchanger experimental kit</a>
                         from
-                        Washington State University. Address any questions or comments to learncheme@gmail.com. All of
-                        our
+                        Washington State University. Address any questions or comments to learncheme@gmail.com. Our
                         simulations are open source, and are available on our <a
                             href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
-                            repository</a>.</p>
-                    <p style="line-height: 3rem;">
-                        If this simulation is too big for your screen, zoom out using&nbsp;<span><img
+                            repository</a>.
+                        <!-- </p>
+                    <p style="line-height: 3rem;"> -->
+                        If this simulation is too big or small for your screen, zoom out using&nbsp;<span><img
                                 src="https://learncheme.github.io/media/command.png"
                                 style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
                                 src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on

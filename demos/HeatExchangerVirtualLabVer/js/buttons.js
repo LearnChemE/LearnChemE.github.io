@@ -1,73 +1,42 @@
-const startButton = document.getElementById("start-reset-btn");
-const inputName = document.getElementById("input-name");
-const nextBtn = document.getElementById("next-btn");
-const prevBtn = document.getElementById("prev-btn");
 const pumpBtns = document.getElementById("pump-btns");
 const hPumpBtn = document.getElementById("process-pump-btn");
-const cPumpBtn = document.getElementById("service-pump-btn");
 const resetRandBtn = document.getElementById("reset-new-btn");
 const resetKeepBtn = document.getElementById("reset-keep-btn");
+const measureBtn = document.getElementById("measure-temps-btn");
 
-// Hides all controls but the start/reset button
-function hideExtraControls() {
-    inputName.classList.remove("hidden");
-    inputName.classList.add("hidden");
-    pumpBtns.classList.add("hidden");
-    document.getElementById("reset-modal-btn").classList.add("hidden");
-}
-
-// Determine what html elements are unhidden
-function showSimulationControls() {
-    hideExtraControls();
-    switch (g.state) {
-        case -1:
-            break;
-        case 0:
-            inputName.classList.remove("hidden");
-            startButton.style.width = "max-content";
-            break;
-        case 1:
-            pumpBtns.classList.remove("hidden");
-
-            document.getElementById("reset-modal-btn").classList.remove("hidden");
-            break;
-    }
-}
-
-// Input name box
-inputName.addEventListener("input", () => {
-    const input = inputName.value;
-    g.name = input;
-});
-
+let pumpsAreRunning = false;
 hPumpBtn.addEventListener("click", () => {
-    g.orngTime = millis();
-    g.hIsFlowing = true;
-    hPumpBtn.disabled = true;
-    hPumpBtn.ariaDisabled = true;
-});
-cPumpBtn.addEventListener("click", () => {
-    g.blueTime = millis();
-    g.cIsFlowing = true;
-    cPumpBtn.disabled = true;
-    cPumpBtn.ariaDisabled = true;
-});
-
-// Start / Reset button
-startButton.addEventListener("click", () => {
-    if (g.state == 0) {
-        g.state = 1;
-        startButton.innerHTML = `<i class="fa-solid fa-arrow-rotate-left"></i><div>back</div>`;
-        startButton.title = "Restart";
+    if (pumpsAreRunning) {
+        stopPumps();
+        toggleMeasureTempsButton(false);
     }
     else {
-        g.state = 0;
-        startButton.innerHTML = `<i class="fa-solid fa-play"></i><div>start</div>`;
-        startButton.title = "Start Lab"
+        startPumps();
+        toggleMeasureTempsButton(true);
     }
-
-    showSimulationControls();
 });
+
+function startPumps() {
+    pumpsAreRunning = true;
+    g.orngTime = millis();
+    g.hIsFlowing = true;
+    g.blueTime = millis();
+    g.cIsFlowing = true;
+    hPumpBtn.classList.remove("btn-primary");
+    hPumpBtn.classList.add("btn-danger");
+    hPumpBtn.innerHTML = `<i class="fa-solid fa-pause"></i><div>&nbsp stop pumps</div>`
+}
+
+function stopPumps() {
+    pumpsAreRunning = false;
+    g.orngTime = -1;
+    g.hIsFlowing = false;
+    g.blueTime = -1;
+    g.cIsFlowing = false;
+    hPumpBtn.classList.remove("btn-danger");
+    hPumpBtn.classList.add("btn-primary");
+    hPumpBtn.innerHTML = `<i class="fa-solid fa-play"></i><div>&nbsp start pumps</div>`
+}
 
 function mouseClicked(event) {
     if (g.state == 4 &&
@@ -91,10 +60,22 @@ const hiTt = document.getElementById("hi-tooltip");
 const hoTt = document.getElementById("ho-tooltip");
 const ciTt = document.getElementById("ci-tooltip");
 const coTt = document.getElementById("co-tooltip");
+let tooltipIsShowingOnDiv = -1;
 function updateTooltips() {
-    var strTemp = (g.vols[0] > 0) ? g.Th_in.toFixed(1) : '-';
-    var str = "temperature: " + strTemp + " °C, volume: " + g.vols[0].toFixed(1) + " mL";
-    hiTt.setAttribute("data-bs-original-title", str);
+    if (tooltipIsShowingOnDiv === -1) return;
+    var strTemp; //= (g.vols[0] > 0) ? g.Th_in.toFixed(1) : '-';
+    var strVol;
+
+    strTemp = g.T_measured[tooltipIsShowingOnDiv];
+    strTemp = strTemp === -1 ? '--' : strTemp.toFixed(1);
+    strVol = g.vols[tooltipIsShowingOnDiv].toFixed(0);
+
+    var str = "temperature: " + strTemp + " °C, volume: " + strVol + " mL";
+
+    displayedTooltip = document.getElementsByClassName("tooltip-inner");
+    displayedTooltip.forEach((div) => {
+        div.innerHTML = str;
+    });
 
     str = "temperature: " + g.Th_out_observed.toFixed(1) + " °C, volume: " + g.vols[1].toFixed(1) + " mL";
     hoTt.setAttribute("data-bs-original-title", str);
@@ -106,6 +87,19 @@ function updateTooltips() {
     str = "temperature: " + g.Tc_out.toFixed(1) + " °C, volume: " + g.vols[3].toFixed(1) + " mL";
     coTt.setAttribute("data-bs-original-title", str);
 }
+
+hiTt.addEventListener("mouseover", () => {
+    tooltipIsShowingOnDiv = 0;
+})
+hoTt.addEventListener("mouseover", () => {
+    tooltipIsShowingOnDiv = 1;
+})
+ciTt.addEventListener("mouseover", () => {
+    tooltipIsShowingOnDiv = 2;
+})
+coTt.addEventListener("mouseover", () => {
+    tooltipIsShowingOnDiv = 3;
+})
 
 function mouseReleased() {
     g.dragging1 = false;
@@ -125,12 +119,12 @@ function drag() {
     if (g.dragging1) {
         angle = atan2(mouseY - 431, mouseX - 90);
         angle = constrain(angle, PI / 4, PI / 2);
-        g.mDotH = map(angle, PI / 4, PI / 2, 1, 10);
+        g.mDotH = map(angle, PI / 4, PI / 2, MIN_FLOWRATE, MAX_FLOWRATE);
     }
     else if (g.dragging2) {
         angle = atan2(mouseY - 461, mouseX - 415);
         angle = constrain(angle, PI / 4, PI / 2);
-        g.mDotC = map(angle, PI / 4, PI / 2, 1, 10);
+        g.mDotC = map(angle, PI / 4, PI / 2, MIN_FLOWRATE, MAX_FLOWRATE);
     }
 }
 
@@ -147,8 +141,28 @@ function resetVols() {
     g.cIsFlowing = false;
     g.hIsFlowing = false;
 
-    hPumpBtn.disabled = false;
-    hPumpBtn.ariaDisabled = false;
-    cPumpBtn.disabled = false;
-    cPumpBtn.ariaDisabled = false;
+    pumpsAreRunning = false;
+    stopPumps();
+    toggleMeasureTempsButton(false);
 }
+
+function toggleMeasureTempsButton(disableButton = true) {
+    if (disableButton) {
+        measureBtn.disabled = true;
+        measureBtn.ariaDisabled = true;
+        g.T_measured = [-1, -1, -1, -1];
+    }
+    else {
+        measureBtn.disabled = false;
+        measureBtn.ariaDisabled = false;
+    }
+}
+
+measureBtn.addEventListener("click", () => {
+    g.T_measured = [g.Th_in, g.Th_out_observed, g.Tc_in, g.Tc_out_observed];
+
+    for (let i = 0; i < 4; i++) {
+        if (g.vols[i] <= 0)
+            g.T_measured[i] = -1;
+    }
+});

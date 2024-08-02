@@ -1,11 +1,17 @@
 const DOUBLE_TUBE = 0;
 const SHELL_TUBE = 1;
+const MAX_HOT_WATER_TEMP = 50;
+const MIN_HOT_WATER_TEMP = 30;
+const MAX_COLD_WATER_TEMP = 25;
+const MIN_COLD_WATER_TEMP = 10;
+const MAX_FLOWRATE = 25;
+const MIN_FLOWRATE = 2;
 
 window.g = {
     cnv: undefined,
     width: 800,
     height: 640,
-    state: 0,
+    state: 1,
 
     name: '',
 
@@ -46,6 +52,8 @@ window.g = {
     Th_out_observed: 25,
     Tc_out_observed: 25,
 
+    T_measured: [-1, -1, -1, -1],
+
     lmtd: 26,
     Qdot: 0,
 
@@ -67,6 +75,7 @@ function setup() {
     b = createBeaker();
     bt = beakersAndTubes();
     v = valve();
+    pa = pumpAssembly();
 
     thiTubes(thi = createGraphics(g.width, g.height));
     thoTubes(tho = createGraphics(g.width, g.height));
@@ -78,8 +87,6 @@ function setup() {
     $("#ho-tooltip").tooltip(options);
     $("#ci-tooltip").tooltip(options);
     $("#co-tooltip").tooltip(options);
-
-    if (g.state != 0) { showSimulationControls() } // used for debug
 
     textFont(font);
     randStartVals();
