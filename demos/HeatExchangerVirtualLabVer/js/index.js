@@ -88,8 +88,6 @@ function setup() {
     $("#ci-tooltip").tooltip(options);
     $("#co-tooltip").tooltip(options);
 
-    if (g.state != 0) { showSimulationControls() } // used for debug
-
     textFont(font);
     randStartVals();
 }

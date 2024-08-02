@@ -44,23 +44,20 @@
     </div>
     <div class="nav-bar">
         <div class="nav-bar-column" id="nav-bar-left">
-            <div class="buttons-container">
-                <button type="button" id="start-reset-btn" class="btn btn-primary" title="Start Lab">
-                    <i class="fa-solid fa-play"></i>
-                    <div>start</div>
-                </button>
-            </div>
         </div>
         <div class="nav-bar-column" id="nav-bar-center">
-            <div class="buttons-container hidden" id="pump-btns">
-                <button type="button" id="process-pump-btn" class="btn btn-primary">start pumps</button>
+            <div class="buttons-container" id="pump-btns">
+                <button type="button" id="process-pump-btn" class="btn btn-primary">
+                    <i class="fa-solid fa-play"></i>
+                    <div>&nbsp start pumps</div>
+                </button>
                 <button type="button" id="measure-temps-btn" class="btn btn-success">measure
                     temperatures</button>
             </div>
         </div>
         <div class="nav-bar-column" id="nav-bar-right">
 
-            <button type="button" id="reset-modal-btn" class="btn btn-outline-danger hidden" data-bs-toggle="modal"
+            <button type="button" id="reset-modal-btn" class="btn btn-outline-danger" data-bs-toggle="modal"
                 data-bs-target="#reset-modal">
                 reset beakers
             </button>
@@ -69,9 +66,6 @@
     </div>
 
     <div id="graphics-wrapper">
-        <div id="inputs-wrapper">
-            <input type="text" id="input-name">
-        </div>
         <div class="tooltip-area" id="hi-tooltip" title="<em>test0</em>" data-bs-toggle="tooltip" data-bs-html="true">
         </div>
         <div class="tooltip-area" target="#details-modal" id="ho-tooltip" title="test1"></div>

@@ -1,44 +1,8 @@
-const startButton = document.getElementById("start-reset-btn");
-const inputName = document.getElementById("input-name");
-const nextBtn = document.getElementById("next-btn");
-const prevBtn = document.getElementById("prev-btn");
 const pumpBtns = document.getElementById("pump-btns");
 const hPumpBtn = document.getElementById("process-pump-btn");
 const resetRandBtn = document.getElementById("reset-new-btn");
 const resetKeepBtn = document.getElementById("reset-keep-btn");
 const measureBtn = document.getElementById("measure-temps-btn");
-
-// Hides all controls but the start/reset button
-function hideExtraControls() {
-    inputName.classList.remove("hidden");
-    inputName.classList.add("hidden");
-    pumpBtns.classList.add("hidden");
-    document.getElementById("reset-modal-btn").classList.add("hidden");
-}
-
-// Determine what html elements are unhidden
-function showSimulationControls() {
-    hideExtraControls();
-    switch (g.state) {
-        case -1:
-            break;
-        case 0:
-            inputName.classList.remove("hidden");
-            startButton.style.width = "max-content";
-            break;
-        case 1:
-            pumpBtns.classList.remove("hidden");
-
-            document.getElementById("reset-modal-btn").classList.remove("hidden");
-            break;
-    }
-}
-
-// Input name box
-inputName.addEventListener("input", () => {
-    const input = inputName.value;
-    g.name = input;
-});
 
 let pumpsAreRunning = false;
 hPumpBtn.addEventListener("click", () => {
@@ -73,22 +37,6 @@ function stopPumps() {
     hPumpBtn.classList.add("btn-primary");
     hPumpBtn.innerHTML = `<i class="fa-solid fa-play"></i><div>&nbsp start pumps</div>`
 }
-
-// Start / Reset button
-startButton.addEventListener("click", () => {
-    if (g.state == 0) {
-        g.state = 1;
-        startButton.innerHTML = `<i class="fa-solid fa-arrow-rotate-left"></i><div>back</div>`;
-        startButton.title = "Restart";
-    }
-    else {
-        g.state = 0;
-        startButton.innerHTML = `<i class="fa-solid fa-play"></i><div>start</div>`;
-        startButton.title = "Start Lab"
-    }
-
-    showSimulationControls();
-});
 
 function mouseClicked(event) {
     if (g.state == 4 &&
