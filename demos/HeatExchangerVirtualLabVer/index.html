@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords"
+        content="LearnChemE, chemical engineering, engineering, simulation, heat transfer, heat exchanger">
+    <meta name="author" content="Drew Smith">
+    <meta name="application-name" content="LearnChemE HEX Lab">
+    <!-- Libs -->
+    <script src="lib/p5.js"></script>
+    <script src="lib/p5-graph-lib.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="lib/bootstrap.min.css">
+    <script>
+        MathJax = {
+            chtml: {
+                scale: 0.95,
+                mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+                displayAlign: 'left', // default for indentalign when set to 'auto'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Style sheets -->
+    <link rel="stylesheet" href="css/sliders.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://kit.fontawesome.com/9d19ad28f4.js" crossorigin="anonymous"></script>
+
+    <title>Heat Exchanger Virtual Lab</title>
+</head>
+
+<body>
+    <div class="modal-buttons-container">
+        <button type="button" id="directions-modal-btn" class="btn btn-primary" title="Directions"
+            data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</button>
+        <button type="button" id="details-modal-btn" class="btn btn-primary" title="Details" data-bs-toggle="modal"
+            data-bs-target="#details-modal">Details</button>
+        <button type="button" id="about-modal-btn" class="btn btn-primary" title="About" data-bs-toggle="modal"
+            data-bs-target="#about-modal">About</button>
+    </div>
+    <div class="nav-bar">
+        <div class="nav-bar-column" id="nav-bar-left">
+        </div>
+        <div class="nav-bar-column" id="nav-bar-center">
+            <div class="buttons-container" id="pump-btns">
+                <button type="button" id="process-pump-btn" class="btn btn-primary">
+                    <i class="fa-solid fa-play"></i>
+                    <div>&nbsp start pumps</div>
+                </button>
+                <button type="button" id="measure-temps-btn" class="btn btn-success">measure
+                    temperatures</button>
+            </div>
+        </div>
+        <div class="nav-bar-column" id="nav-bar-right">
+
+            <button type="button" id="reset-modal-btn" class="btn btn-outline-danger" data-bs-toggle="modal"
+                data-bs-target="#reset-modal">
+                reset beakers
+            </button>
+
+        </div>
+    </div>
+
+    <div id="graphics-wrapper">
+        <div class="tooltip-area" id="hi-tooltip" title="<em>test0</em>" data-bs-toggle="tooltip" data-bs-html="true">
+        </div>
+        <div class="tooltip-area" target="#details-modal" id="ho-tooltip" title="test1"></div>
+        <div class="tooltip-area" id="ci-tooltip" title="test2"></div>
+        <div class="tooltip-area" id="co-tooltip" title="test3"></div>
+    </div>
+
+    <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-l" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    This digital lab represents a double pipe heat exchanger with countercurrent flow. It is designed to
+                    be used with this downloadable <a
+                        href="https://s3.wp.wsu.edu/uploads/sites/2379/2020/11/ME_DoublePipe-Worksheet_2020-2021_Final.docx">worksheet</a>.
+                    Use the button at the top to start the pumps. Drag the
+                    valves on each inlet beaker to adjust flowrates. To measure temperatures, stop the pumps and press
+                    the "measure temperatures" button, then hover your mouse over each beaker to get the temperature and
+                    volume. Note that changing the flowrate valves while pumps are running will change the outlet
+                    temperatures, and thus reduce the accuracy of the observed temperature in the beakers, so it is
+                    important to adjust the valves before starting the pump.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-l" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This simulation uses the NTU-effectiveness approach to calculate the outlet temperatures of each
+                        fluid line. Values were chosen to be realistic and similar to the values used in the actual
+                        experiment, and are randomized on each startup. A room temperature of 25°C was chosen, so water
+                        in the beakers will slowly
+                        equilibriate towards this value;
+                        you may notice this if you leave the simulation running for a very long time.
+                    </p>
+                    <p>Additionally, the
+                        temperature measured in the outlet beakers are designed to show the average temperature of the
+                        outlet fluid and the heat capacity of the beaker initially at 25°C. Thus, for accurate results,
+                        it is recommended to let the heat exchanger flow for a long period of time, without changing any
+                        valves during the run.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-l" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutModalLabel">About</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This virtual lab was created in the <a href="https://www.colorado.edu/chbe"
+                            target="_blank">Department of
+                            Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+                            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Drew Smith under
+                        the direction of
+                        Professor John L. Falconer and Michelle Medlin. This virtual lab was
+                        prepared with financial support from the
+                        National Science Foundation and is based on the <a
+                            href="https://labs.wsu.edu/educ-ate/heat-transfer-kit/">Heat Exchanger experimental kit</a>
+                        from
+                        Washington State University. Address any questions or comments to learncheme@gmail.com. Our
+                        simulations are open source, and are available on our <a
+                            href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+                            repository</a>.
+                        <!-- </p>
+                    <p style="line-height: 3rem;"> -->
+                        If this simulation is too big or small for your screen, zoom out using&nbsp;<span><img
+                                src="https://learncheme.github.io/media/command.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on
+                        Mac
+                        or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on
+                        Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on
+                        Mac
+                        or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
+                                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on
+                        Windows.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="reset-modal" tabindex="-1" role="dialog" aria-labelledby="resetModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resetModalLabel">Reset Beakers</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Reset beakers and pumps to gather new measurements. Select whether to re-randomize inlet
+                    temperatures as well:
+                </div>
+                <div class="modal-footer" id="reset-modal-footer">
+                    <button type="button" id="reset-new-btn" class="btn btn-primary btn-sm"
+                        data-bs-dismiss="modal">Reset with new
+                        temperatures</button>
+                    <button type="button" id="reset-keep-btn" class="btn btn-success btn-sm"
+                        data-bs-dismiss="modal">Reset but keep temperatures</button>
+                    <button type="button" id="close-btn" class="btn btn-secondary btn-sm"
+                        data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+<script src="js/index.js"></script>
+<script src="js/functions.js"></script>
+<script src="js/buttons.js"></script>
+<script src="js/draw.js"></script>
