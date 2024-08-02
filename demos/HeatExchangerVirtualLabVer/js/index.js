@@ -52,6 +52,8 @@ window.g = {
     Th_out_observed: 25,
     Tc_out_observed: 25,
 
+    T_measured: [-1, -1, -1, -1],
+
     lmtd: 26,
     Qdot: 0,
 
@@ -73,6 +75,7 @@ function setup() {
     b = createBeaker();
     bt = beakersAndTubes();
     v = valve();
+    pa = pumpAssembly();
 
     thiTubes(thi = createGraphics(g.width, g.height));
     thoTubes(tho = createGraphics(g.width, g.height));

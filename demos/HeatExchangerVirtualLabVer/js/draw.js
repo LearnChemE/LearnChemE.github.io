@@ -211,8 +211,8 @@ function beakersAndTubes() {
     bt.push();
     bt.stroke('black'); bt.strokeWeight(2);
     // thi tube
-    bt.line(95, 580, 95, 400);
-    bt.line(85, 580, 85, 410);
+    bt.line(95, 440, 95, 400);
+    bt.line(85, 440, 85, 410);
     bt.line(85, 410, 10, 410);
     bt.line(95, 400, 20, 400);
     bt.line(10, 410, 10, 80);
@@ -235,8 +235,8 @@ function beakersAndTubes() {
     bt.line(510, 325, 450, 325);
 
     // tci tube
-    bt.line(420, 580, 420, 430);
-    bt.line(410, 580, 410, 420);
+    bt.line(420, 450, 420, 430);
+    bt.line(410, 450, 410, 420);
     bt.line(420, 430, 430, 430);
     bt.line(410, 420, 420, 420);
     bt.line(430, 430, 430, 300);
@@ -262,7 +262,8 @@ function beakersAndTubes() {
 function thiTubes(bt) {
     bt.push();
     bt.fill(g.orangeFluidColor); bt.noStroke();
-    bt.rect(85, 400, 10, 180);
+    bt.rect(83, 450, 13, 100);
+    bt.rect(85, 400, 10, 50);
     bt.rect(10, 400, 75, 10);
     bt.rect(10, 80, 10, 320);
     bt.rect(20, 80, 500, 10);
@@ -284,7 +285,8 @@ function thoTubes(bt) {
 function tciTubes(bt) {
     bt.push();
     bt.fill(g.blueFluidColor); bt.noStroke();
-    bt.rect(410, 420, 10, 160);
+    bt.rect(408, 470, 13, 80);
+    bt.rect(410, 420, 10, 50);
     bt.rect(420, 300, 10, 130);
     bt.pop();
 }
@@ -313,11 +315,33 @@ function fillBeaker(x, vol, color = 'pink') {
 function valve() {
     let v = createGraphics(50, 50);
     v.push();
-    v.fill(250); v.stroke('black'); v.strokeWeight(2);
+    v.fill('blue'); v.stroke('black'); v.strokeWeight(2);
     v.circle(25, 25, 48);
     v.rect(18, 0, 14, 50);
     v.pop();
     return v;
+}
+
+function pumpAssembly() {
+    pa = createGraphics(50, 150);
+    pa.push();
+    // pa.background('yellow');
+
+    pa.push();
+    pa.fill(0);
+    pa.rect(10, 120, 30, 30);
+    pa.rect(20, 110, 10, 10);
+    pa.pop();
+
+    pa.push();
+    pa.stroke('black'); pa.strokeWeight(3);
+    pa.noFill();
+    pa.line(17, 120, 17, 0);
+    pa.line(32, 120, 32, 0);
+    pa.pop();
+
+    pa.pop();
+    return pa;
 }
 
 function displayValve(x, y, flow) {
@@ -349,6 +373,9 @@ function drawAll() {
             changeVols();
             integrateTemps();
 
+            image(pa, 65, 440);
+            image(pa, 390, 440);
+
             push();
             fillBeaker(50, g.vols[0], g.orangeFluidColor);
             fillBeaker(180, g.vols[1], g.orangeFluidColor);
@@ -364,8 +391,9 @@ function drawAll() {
 
             drag();
             displayValve(90, 431, g.mDotH);
-            displayValve(415, 461, g.mDotC);
+            displayValve(415, 451, g.mDotC);
             updateTooltips();
+
             break;
     }
 }
