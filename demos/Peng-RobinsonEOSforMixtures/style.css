@@ -1,0 +1,65 @@
+:root {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+}
+
+body {
+    padding: 0.5em;
+}
+
+input {
+    cursor: pointer;
+}
+
+.nav-bar {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    width: 100vw;
+}
+
+.buttons-container {
+    display: grid;
+    grid-template-columns: 100px 100px 100px;
+    justify-content: center;
+    gap: 0px 20px;
+    width: 100vw;
+    margin-bottom: 0.5em;
+}
+
+
+
+#slider-container {
+    display: grid;
+    flex-direction: row;
+    z-index: 10;
+}
+
+.slider-row {
+    display: grid;
+    grid-template-columns: max-content 210px 25px max-content;
+    gap: 10px;
+    align-items: end;
+    justify-items: center;
+    margin-top: 5px;
+    transform: translateX(-35px);
+}
+
+
+#graphics-wrapper {
+    width: 100vw;
+    top: 200px;
+    height: max-content;
+    display: grid;
+    justify-content: center;
+}
+
+#molar-slider {
+    display: block;
+    width: 15em;
+}
+
+#temperature-slider {
+    display: block;
+    width: 15em;
+}

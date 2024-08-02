@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peng-Robinson EOS for Mixtures</title>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.min.js"></script>
+    <script src="p5.js"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+    <link href="./style.css" rel="stylesheet">
+    <link href="./bootstrap.min.css" rel="stylesheet">
+    <script src="./jquery.js"></script>
+    <script src="./popper.js"></script>
+    <script src="./bootstrap.min.js"></script>
+    <script>
+        MathJax = {
+            chtml: {
+                scale: 0.95,
+                mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+                displayAlign: 'left', // default for indentalign when set to 'auto'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="nav-bar">
+
+        <div class="buttons-container">
+            <button type="button" id="dir" class="btn btn-primary" data-bs-toggle="modal"
+                data-bs-target="#directionsModal">Directions
+            </button>
+            <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+            <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>
+        </div>
+
+        <div class="slider-container">
+            <div class="slider-row" style="margin-left: -70px;">
+                <div>n-butane liquid mole fraction x<sub>1</sub></div>
+                <input id="molar-slider" type="range" min="0" max="0.75" value="0.55" step="0.01">
+                <div id="molar-label">0.55</div>
+            </div>
+
+            <form id="myForm">
+                <div class="slider-row" style="margin-left: 30px;">
+                    <div>temperature (K)</div>
+                    <input id="temperature-slider" type="range" min="350" max="415" value="390" step="1">
+                    <div id="temp-label">390</div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+    <div id="graphics-wrapper"></div>
+
+
+    <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>This Demonstration uses the Peng-Robinson equation of state for mixtures to plot isotherms
+                        for n-butane(1)/n-octane(2) mixtures on a log pressure versus log volume graph. Select the
+                        temperature with a slider.
+                        Selecting the mole fraction x<sub>1</sub> of the liquid yields the isotherm for the liquid in
+                        blue.
+                        The green isotherm is for the vapor phase (mole fraction y<sub>1</sub>) that is in equilibrium
+                        with the liquid; the values of y<sub>1</sub> and pressure are determined from Raoult's law and
+                        are displayed in the upper-right corner. The dashed black line connects the blue isotherm to the
+                        green isotherm at the VLE pressure.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>The Peng-Robinson equation of state for mixtures is used to plot pressure P versus volume V
+                        on a log-log graph:
+                        $$ P = \frac{R \cdot T}{V-b_m}-\frac{a_m}{V^2+2 \cdot V \cdot b_m-b^2_m} $$
+                        where R is the gas constant ([cm<sup>3</sup> MPa]/[molK]), T is temperature (K), P is in MPa and
+                        V is in
+                        (cm<sup>3</sup>/mol).
+                    </p>
+                    <p>a<sub>m</sub> is the attraction parameter and b<sub>m</sub> is the repulsion parameter for the
+                        mixture:
+                    </p>
+                    <p>
+                        $$
+                        a_m = \sum_{i=1}^{2} \sum_{j=1}^{2} z_i z_j
+                        (1 - k_i,j) \sqrt{a_i a_j}
+                        $$
+                    </p>
+                    <p>
+                        $$ b_m = \sum_{i=1}^{2} z_i b_i $$
+                    </p>
+                    <p>
+                        where <i>z</i> is the component mole fraction, k<sub>ij</sub> is the binary interaction
+                        parameter and <i>a</i> and <i>b</i> are the attraction and repulsion parameters for a pure
+                        component.
+                    </p>
+                    <p>
+                        The binary interaction parameter can be calculated [1]:
+                    </p>
+                    <p>
+                        \(
+                        k_{i,j} = 1 = \frac{1}{2} \frac{b_2}{b_1} \sqrt{\frac{a_1}{a_2}} - \frac{1}{2} \frac{b_1}{b_2}
+                        \sqrt{\frac{a_2}{a_1}} + \frac{1}{2} \frac{b_2 R T}{\sqrt{a_1 a_2}}
+                        \frac{\Theta_1}{\left(\frac{T}{T_{c,1}}\right)^{\Theta_2}},
+                        \)
+                        for an alkane/alkane mixture \( \Theta_1=0.22806 \) and \( \Theta_2=0.18772. \)
+                    </p>
+                    <p>The attraction and repulsion parameters for a pure component are:
+                        \[
+                        a = 0.457 \frac{R^2 T_c^2}{P_c} \left( 1 + \kappa \left( 1 - \sqrt{\frac{T}{T_c}} \right)
+                        \right)^2 ,
+                        \]
+                        \[
+                        b = 0.0778 \frac{R T_c}{P_c}
+                        \]
+                        where T<sub>c</sub> is the critical temperature (K) and P<sub>c</sub> is the critical pressure
+                        (MPa).
+                        \[
+                        \kappa = 0.37464 + 1.54226 \, \omega - 0.26992 \, \omega^2
+                        \]
+                        where \( \kappa \) is a simplification term and \( \omega \) is the acentric factor.
+                    </p>
+                    <p>Raoult's law is used to calculate the pressure of the mixture at VLE:
+                        \[
+                        P_{\text{vle}} = x_1 P_1^{\text{sat}} + (1 - x_1) P_2^{\text{sat}}
+                        \]
+                        and P<sub>vle</sub> is used to determine the vapor mole fraction:
+                        \[
+                        y_1 = x_1 \frac{P_1^{\text{sat}}}{P_{\text{vle}}}
+                        \]
+                        Where \( x_1 \) and \( y_1 \) are the liquid and vapor mole fractions of hexane, and \(
+                        P_i^{\text{sat}} \) is the saturation pressure that is calculated using the Antoine equation:
+                        \[
+                        P_i^{\text{sat}} = 10^{\left( A_i - \frac{B_i}{T + C_i} \right)}
+                        \]
+                        where A<sub>i</sub>, B<sub>i</sub> and C<sub>i</sub> are Antoine constants.
+                        The screencast video at [2] explains how to use this Demonstration.
+                    </p>
+                    <p>References:</p>
+                    <p>[1] A. O. Elnabawy, S. K. Fateen and M. M. Khalil, "Semi-empirical Correlation for Binary
+                        Interaction Parameters of the Peng-Robinson Equation of State with the van der Waals Mixing
+                        Rules for the Prediction of High-Pressure Vapor-Liquid Equilibrium," Journal of Advanced
+                        Research, 4(2), 2013 pp. 137-145. doi:10.1016/j.jare.2012.03.004.</p>
+                    <p>[2] Peng-Robinson Equation of State for Mixtures [Video]. (Sep 1 2016) <a
+                            href="https://learncheme.com/simulations/kinetics-reactor-design/reversible-reaction-in-an-adiabatic-pfr/"
+                            target="_blank"
+                            rel="noopener noreferrer">https://learncheme.com/simulations/kinetics-reactor-design/reversible-reaction-in-an-adiabatic-pfr/</a>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutModalLabel">About</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank"
+                            rel="noopener noreferrer">Department of Chemical and Biological Engineering</a> at
+                        University of Colorado
+                        Boulder for <a href="https://learncheme.com/" target="_blank"
+                            rel="noopener noreferrer">LearnChemE.com</a>
+                        by
+                        Drew Smith and Jason Horst under the direction of Professor John L. Falconer. This simulation
+                        was prepared
+                        with financial
+                        support
+                        from the National Science Foundation. It is based on a Mathematica simulation on the Wolfram
+                        Demonstration
+                        Project
+                        website prepared by Rachael L. Baumann (<a
+                            href="https://learncheme.com/simulations/kinetics-reactor-design/reversible-reaction-in-an-adiabatic-pfr/"
+                            target="_blank" rel="noopener noreferrer">Reversible Reaction in an Adiabatic Plug-Flow
+                            Reactor</a>).
+                        Address
+                        any questions or comments to learncheme@gmail.com. All of our simulations are open source, and
+                        are available
+                        on
+                        our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank"
+                            rel="noopener noreferrer">LearnChemE Github repository</a>.</p>
+                    <p>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL + "-" and
+                        CTRL +
+                        "=" on
+                        Windows, or ⌘ + "-" and ⌘ + "=" on Mac), then refreshing the page. This application is not
+                        compatible with
+                        Internet
+                        Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the
+                        latest versions
+                        of:
+                        Chrome, Safari, Firefox, Edge, and Opera.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="plot"></div>
+    <script src="p5-graph-lib.js"></script>
+    <script src="index.js"></script>
+</body>
+
+</html>
