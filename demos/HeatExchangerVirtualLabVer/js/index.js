@@ -23,13 +23,6 @@ window.g = {
     orngTime: -1,
     blueTime: -1,
 
-    // dT1selected: false,
-    // dT2selected: false,
-    // showLmtd: false,
-
-    // s3select: -1,
-    // s3measure: [-1, -1, -1, -1],
-
     orangeFluidColor: [255, 50, 0, 200],
     blueFluidColor: [0, 80, 255, 180],
 
@@ -101,24 +94,4 @@ function draw() {
     drawAll();
 }
 
-function drag() {
-    if (mouseIsPressed) {
-        if (mouseX > 0 && mouseX < width &&
-            mouseY > 0 && mouseY < height) {
-
-            let dx = (mouseX - pmouseX) / width / 2;
-            let dy = (mouseY - pmouseY) / height / 2;
-
-            g.rotTargX += dx; g.rotTargX = constrain(g.rotTargX, -.5, .5);
-            g.rotTargY += dy; g.rotTargY = constrain(g.rotTargY, -.5, .5);
-        }
-    }
-    else {
-        g.rotTargX = 0;
-        g.rotTargY = 0;
-    }
-
-    g.rotX = lerp(g.rotX, g.rotTargX, .1);
-    g.rotY = lerp(g.rotY, g.rotTargY, .1);
-}
 

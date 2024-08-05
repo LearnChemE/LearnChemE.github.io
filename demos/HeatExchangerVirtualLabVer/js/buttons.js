@@ -117,14 +117,22 @@ function mousePressed() {
 
 function drag() {
     if (g.dragging1) {
-        angle = atan2(mouseY - 431, mouseX - 90);
-        angle = constrain(angle, PI / 4, PI / 2);
-        g.mDotH = map(angle, PI / 4, PI / 2, MIN_FLOWRATE, MAX_FLOWRATE);
+        theta = atan2(mouseY - 431, mouseX - 90);
+        prevTheta = atan2(pmouseY - 431, pmouseX - 90);
+        dTheta = Math.sign(theta * prevTheta) === -1 ? 0 : theta - prevTheta;
+        dmDot = map(dTheta, 0, PI / 4, 0, MAX_FLOWRATE);
+
+        g.mDotH += dmDot;
+        g.mDotH = constrain(g.mDotH, MIN_FLOWRATE, MAX_FLOWRATE);
     }
     else if (g.dragging2) {
-        angle = atan2(mouseY - 461, mouseX - 415);
-        angle = constrain(angle, PI / 4, PI / 2);
-        g.mDotC = map(angle, PI / 4, PI / 2, MIN_FLOWRATE, MAX_FLOWRATE);
+        theta = atan2(mouseY - 461, mouseX - 415);
+        prevTheta = atan2(pmouseY - 461, pmouseX - 415);
+        dTheta = Math.sign(theta * prevTheta) === -1 ? 0 : theta - prevTheta;
+        dmDot = map(dTheta, 0, PI / 4, 0, MAX_FLOWRATE);
+
+        g.mDotC += dmDot;
+        g.mDotC = constrain(g.mDotC, MIN_FLOWRATE, MAX_FLOWRATE);
     }
 }
 
