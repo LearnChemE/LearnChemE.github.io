@@ -362,40 +362,32 @@ function displayValve(x, y, flow) {
 
 function drawAll() {
     let to, tb;
-    switch (g.state) {
-        case 0: // name and landing page
-            landingPage();
-            break;
-        case 1: // flows and temps
-            to = (g.orngTime == -1) ? 0 : (millis() - g.orngTime) / 1000;
-            tb = (g.blueTime == -1) ? 0 : (millis() - g.blueTime) / 1000;
+    to = (g.orngTime == -1) ? 0 : (millis() - g.orngTime) / 1000;
+    tb = (g.blueTime == -1) ? 0 : (millis() - g.blueTime) / 1000;
 
-            changeVols();
-            integrateTemps();
+    changeVols();
+    integrateTemps();
 
-            image(pa, 65, 440);
-            image(pa, 390, 440);
+    image(pa, 65, 440);
+    image(pa, 390, 440);
 
-            push();
-            fillBeaker(50, g.vols[0], g.orangeFluidColor);
-            fillBeaker(180, g.vols[1], g.orangeFluidColor);
-            fillBeaker(310, g.vols[2], g.blueFluidColor);
-            fillBeaker(450, g.vols[3], g.blueFluidColor);
-            pop();
+    push();
+    fillBeaker(50, g.vols[0], g.orangeFluidColor);
+    fillBeaker(180, g.vols[1], g.orangeFluidColor);
+    fillBeaker(310, g.vols[2], g.blueFluidColor);
+    fillBeaker(450, g.vols[3], g.blueFluidColor);
+    pop();
 
-            image(bt, 0, 0);
-            fillAnimationTubes(to, tb);
-            image(dt, 25, 25);
-            fillAnimationOrange(to, 0, 25);
-            fillAnimationBlue(tb, 0, 25);
+    image(bt, 0, 0);
+    fillAnimationTubes(to, tb);
+    image(dt, 25, 25);
+    fillAnimationOrange(to, 0, 25);
+    fillAnimationBlue(tb, 0, 25);
 
-            drag();
-            displayValve(90, 431, g.mDotH);
-            displayValve(415, 451, g.mDotC);
-            updateTooltips();
-
-            break;
-    }
+    drag();
+    displayValve(90, 431, g.mDotH);
+    displayValve(415, 451, g.mDotC);
+    updateTooltips();
 }
 
 function landingPage() {

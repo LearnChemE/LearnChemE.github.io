@@ -104,19 +104,6 @@ function calcGrashoffNumber() {
     return 9.81 * beta * deltaT * HYDRAULIC_DIAMETER_ANNULAR ** 3 / DYNAMIC_VISCOSITY_C ** 2
 }
 
-// function outlineSelectionButtons(n) {
-//     for (let i = 0; i < 4; i++) {
-//         if (i == n) {
-//             tempSelectionBtns[i].classList.remove("btn-outline-success");
-//             tempSelectionBtns[i].classList.add("btn-success");
-//         }
-//         else {
-//             tempSelectionBtns[i].classList.add("btn-outline-success");
-//             tempSelectionBtns[i].classList.remove("btn-success");
-//         }
-//     }
-// }
-
 function changeVols() {
     let dV;
     if (g.vols[0] > 0 && g.hIsFlowing) {
@@ -139,11 +126,11 @@ function changeVols() {
     }
 }
 
-const UA_ROOM = 1e-2;
+const UA_ROOM = 1e-3;
 const T_ROOM = 25;
 const V_BUFFER = 50; // mL
 function integrateTemps() {
-    if (g.vols[1] == 0 || g.vols[3] == 0) return;
+    // if (g.vols[1] == 0 || g.vols[3] == 0) return;
     var dV, vol, dTdV;
 
     if (g.hIsFlowing) {
