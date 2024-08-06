@@ -120,19 +120,19 @@ function drag() {
         theta = atan2(mouseY - 431, mouseX - 90);
         prevTheta = atan2(pmouseY - 431, pmouseX - 90);
         dTheta = Math.sign(theta * prevTheta) === -1 ? 0 : theta - prevTheta;
-        dmDot = map(dTheta, 0, PI / 4, 0, MAX_FLOWRATE);
+        dmDot = map(dTheta, 0, PI / 4, 0, MAX_HOT_FLOWRATE);
 
         g.mDotH += dmDot;
-        g.mDotH = constrain(g.mDotH, MIN_FLOWRATE, MAX_FLOWRATE);
+        g.mDotH = constrain(g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE);
     }
     else if (g.dragging2) {
         theta = atan2(mouseY - 461, mouseX - 415);
         prevTheta = atan2(pmouseY - 461, pmouseX - 415);
         dTheta = Math.sign(theta * prevTheta) === -1 ? 0 : theta - prevTheta;
-        dmDot = map(dTheta, 0, PI / 4, 0, MAX_FLOWRATE);
+        dmDot = map(dTheta, 0, PI / 4, 0, MAX_COLD_FLOWRATE);
 
         g.mDotC += dmDot;
-        g.mDotC = constrain(g.mDotC, MIN_FLOWRATE, MAX_FLOWRATE);
+        g.mDotC = constrain(g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE);
     }
 }
 

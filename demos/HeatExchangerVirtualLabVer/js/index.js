@@ -33,9 +33,6 @@ window.g = {
     mDotC: 2, // g / s
     mDotH: 1, // g / s
 
-    UA: 10, // W / K
-    // eU: 10,
-
     vols: [1000, 0, 1000, 0],
     hIsFlowing: false,
     cIsFlowing: false,
@@ -48,9 +45,6 @@ window.g = {
     Tc_out_observed: 25,
 
     T_measured: [-1, -1, -1, -1],
-
-    lmtd: 26,
-    Qdot: 0,
 
     dragging1: false,
     dragging2: false,

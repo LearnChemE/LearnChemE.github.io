@@ -346,7 +346,7 @@ function pumpAssembly() {
 
 function displayValve(x, y, flow) {
     push();
-    angle = map(flow, MIN_FLOWRATE, MAX_FLOWRATE, 3 * PI / 4, PI);
+    angle = map(flow, MIN_HOT_FLOWRATE, MAX_COLD_FLOWRATE, 3 * PI / 4, PI);
     imageMode(CENTER);
     translate(x, y);
     scale(.8);
