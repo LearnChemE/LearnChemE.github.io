@@ -64,13 +64,13 @@ let tooltipIsShowingOnDiv = -1;
 function updateTooltips() {
     if (tooltipIsShowingOnDiv === -1) return;
     var strTemp; //= (g.vols[0] > 0) ? g.Th_in.toFixed(1) : '-';
-    var strVol;
+    // var strVol;
 
     strTemp = g.T_measured[tooltipIsShowingOnDiv];
     strTemp = strTemp === -1 ? '--' : strTemp.toFixed(1);
-    strVol = g.vols[tooltipIsShowingOnDiv].toFixed(0);
+    // strVol = g.vols[tooltipIsShowingOnDiv].toFixed(0);
 
-    var str = "temperature: " + strTemp + " °C, volume: " + strVol + " mL";
+    var str = "temperature: " + strTemp + " °C"; //, volume: " + strVol + " mL";
 
     displayedTooltip = document.getElementsByClassName("tooltip-inner");
     displayedTooltip.forEach((div) => {
