@@ -23,9 +23,14 @@ hPumpBtn.addEventListener("click", () => {
 // Starts pumps when button is pressed
 function startPumps() {
     pumpsAreRunning = true;
-    g.orngTime = millis();
+
+    if (g.orngTime === -1) {
+        g.orngTime = millis();
+        g.blueTime = millis();
+        hPumpBtn.disabled = true;
+        hPumpBtn.ariaDisabled = true;
+    }
     g.hIsFlowing = true;
-    g.blueTime = millis();
     g.cIsFlowing = true;
     hPumpBtn.classList.remove("btn-primary");
     hPumpBtn.classList.add("btn-danger");
@@ -35,9 +40,7 @@ function startPumps() {
 // Stops pumps when button is pressed
 function stopPumps() {
     pumpsAreRunning = false;
-    g.orngTime = -1;
     g.hIsFlowing = false;
-    g.blueTime = -1;
     g.cIsFlowing = false;
     hPumpBtn.classList.remove("btn-danger");
     hPumpBtn.classList.add("btn-primary");

@@ -366,7 +366,6 @@ function drawAll() {
 
 // Cold fill animation
 function fillAnimationBlue(t, x = 0, y = 0) {
-    if (!g.cIsFlowing) return;
     let s;
     let partBlue;
 
@@ -377,7 +376,7 @@ function fillAnimationBlue(t, x = 0, y = 0) {
         partBlue = dtb.get(0, 450 - s, 500, 50 + s);
         image(partBlue, 25, 450 - s);
     }
-    else {
+    else if (g.vols[2] > 0) {
         image(dtb, 25, 0);
     }
     pop();
@@ -385,19 +384,19 @@ function fillAnimationBlue(t, x = 0, y = 0) {
 
 // hot fill animation
 function fillAnimationOrange(t, x = 0, y = 0) {
-    if (!g.hIsFlowing) return;
+    // if (!g.hIsFlowing) return;
     let s;
     let partOrng;
 
     push();
     translate(x, y);
-    if (t <= 7) {
+    if (t <= 3) {
         s = 88 + t * 160 - 100
         s = constrain(s, 1, 600);
         partOrng = dto.get(0, 0, 500, s);
         image(partOrng, 25, 0);
     }
-    else {
+    else if (g.vols[0] > 0) {
         image(dto, 25, 0);
     }
     pop();
@@ -406,7 +405,7 @@ function fillAnimationOrange(t, x = 0, y = 0) {
 // The tint function multiplies every pixel on your cpu, so it is a very costy solution. Better would be to use a framebuffer
 function fillAnimationTubes(tOrange, tBlue) {
     push();
-    if (tOrange < 7 && g.hIsFlowing) {
+    if (tOrange < 3 && g.hIsFlowing) {
         s = constrain(tOrange * 1000, 0, 255);
         tint(255, s);
         image(thi, 0, 0);
@@ -414,12 +413,16 @@ function fillAnimationTubes(tOrange, tBlue) {
         tint(255, s);
         image(tho, 0, 0);
     }
-    else if (g.hIsFlowing) {
+    else if (g.orngTime != -1 && g.vols[0] > 0) {
         image(thi, 0, 0);
         image(tho, 0, 0);
+        if (hPumpBtn.disabled) {
+            hPumpBtn.disabled = false;
+            hPumpBtn.ariaDisabled = false;
+        }
     }
 
-    if (tBlue < 7 && g.cIsFlowing) {
+    if (tBlue < 3 && g.cIsFlowing) {
         s = constrain(tBlue * 1000, 0, 255);
         tint(255, s);
         image(tci, 0, 0);
@@ -427,7 +430,7 @@ function fillAnimationTubes(tOrange, tBlue) {
         tint(255, s);
         image(tco, 0, 0);
     }
-    else if (g.cIsFlowing) {
+    else if (g.blueTime != -1 && g.vols[2] > 0) {
         image(tci, 0, 0);
         image(tco, 0, 0);
     }
