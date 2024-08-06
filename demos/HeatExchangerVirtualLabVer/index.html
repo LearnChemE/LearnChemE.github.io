@@ -44,6 +44,8 @@
     </div>
     <div class="nav-bar">
         <div class="nav-bar-column" id="nav-bar-left">
+            <button type="button" id="wksht-modal-btn" class="btn btn-primary" title="Display lab worksheet"
+                data-bs-toggle="modal" data-bs-target="#wksht-modal">worksheet</button>
         </div>
         <div class="nav-bar-column" id="nav-bar-center">
             <div class="buttons-container" id="pump-btns">
@@ -209,6 +211,27 @@
                         data-bs-dismiss="modal">Reset but keep temperatures</button>
                     <button type="button" id="close-btn" class="btn btn-secondary btn-sm"
                         data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="wksht-modal" tabindex="-1" role="dialog" aria-labelledby="wkshtModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="wkshtModalLabel">Lab worksheet</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <embed src="assets/ME_DoublePipe-Worksheet_2020-2021_Final.pdf" width="100%" height="800px">
+                </div>
+                <div class="modal-footer" id="reset-modal-footer">
+                    <button type="button" id="close-btn" class="btn btn-secondary btn-sm"
+                        data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
