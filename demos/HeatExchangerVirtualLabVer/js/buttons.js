@@ -4,6 +4,10 @@ const resetRandBtn = document.getElementById("reset-new-btn");
 const resetKeepBtn = document.getElementById("reset-keep-btn");
 const measureBtn = document.getElementById("measure-temps-btn");
 
+/* **************************************************************** */
+/* ** This file manages DOM-related info and handles user inputs ** */
+/* **************************************************************** */
+
 let pumpsAreRunning = false;
 hPumpBtn.addEventListener("click", () => {
     if (pumpsAreRunning) {
@@ -16,6 +20,7 @@ hPumpBtn.addEventListener("click", () => {
     }
 });
 
+// Starts pumps when button is pressed
 function startPumps() {
     pumpsAreRunning = true;
     g.orngTime = millis();
@@ -27,6 +32,7 @@ function startPumps() {
     hPumpBtn.innerHTML = `<i class="fa-solid fa-pause"></i><div>&nbsp stop pumps</div>`
 }
 
+// Stops pumps when button is pressed
 function stopPumps() {
     pumpsAreRunning = false;
     g.orngTime = -1;
@@ -38,29 +44,14 @@ function stopPumps() {
     hPumpBtn.innerHTML = `<i class="fa-solid fa-play"></i><div>&nbsp start pumps</div>`
 }
 
-function mouseClicked(event) {
-    if (g.state == 4 &&
-        mouseX >= 72 && mouseX <= 142 &&
-        mouseY >= 20 && mouseY <= 404) {
-        g.dT1selected = true;
-    }
-    if (g.state == 4 &&
-        mouseX >= 370 && mouseX <= 460 &&
-        mouseY >= 20 && mouseY <= 404) {
-        g.dT2selected = true;
-    }
-
-    if (g.dT1selected && g.dT2selected) {
-        lmtdBtn.disabled = false;
-        lmtdBtn.ariaDisabled = false;
-    }
-}
-
 const hiTt = document.getElementById("hi-tooltip");
 const hoTt = document.getElementById("ho-tooltip");
 const ciTt = document.getElementById("ci-tooltip");
 const coTt = document.getElementById("co-tooltip");
 let tooltipIsShowingOnDiv = -1;
+// Updates the tooltips. This is very hard because bootstrap and jQuery tooltips weren't designed to be updated in real-time.
+// What this does is everytime the tooltip should be updated, it searches for the tooltip in the DOM by its '.tooltip-inner' css class
+// Then it updates that tooltip with the correct text. This is only good for displaying one tooltip at a time, because you can't identify which tooltip is which this way.
 function updateTooltips() {
     if (tooltipIsShowingOnDiv === -1) return;
     var strTemp; //= (g.vols[0] > 0) ? g.Th_in.toFixed(1) : '-';
@@ -88,6 +79,7 @@ function updateTooltips() {
     coTt.setAttribute("data-bs-original-title", str);
 }
 
+// Determines which tooltip is being displayed
 hiTt.addEventListener("mouseover", () => {
     tooltipIsShowingOnDiv = 0;
 })
@@ -101,11 +93,13 @@ coTt.addEventListener("mouseover", () => {
     tooltipIsShowingOnDiv = 3;
 })
 
+// Cancel dragging
 function mouseReleased() {
     g.dragging1 = false;
     g.dragging2 = false;
 }
 
+// determine if user is dragging a valve
 function mousePressed() {
     if (dist(90, 451, mouseX, mouseY) <= 50) {
         g.dragging1 = true;
@@ -115,6 +109,7 @@ function mousePressed() {
     }
 }
 
+// handle dragging 
 function drag() {
     if (g.dragging1) {
         theta = atan2(mouseY - 431, mouseX - 90);
@@ -136,6 +131,7 @@ function drag() {
     }
 }
 
+// listeners for the buttons in the reset modal
 resetRandBtn.addEventListener("click", () => {
     resetVols();
     randStartVals();
@@ -144,6 +140,7 @@ resetKeepBtn.addEventListener("click", () => {
     resetVols();
 });
 
+// reset volumes to initial
 function resetVols() {
     g.vols = [1000, 0, 1000, 0];
     g.cIsFlowing = false;
@@ -154,6 +151,7 @@ function resetVols() {
     toggleMeasureTempsButton(false);
 }
 
+// toggles html for whether the 'measure temperatures' button is disabled
 function toggleMeasureTempsButton(disableButton = true) {
     if (disableButton) {
         measureBtn.disabled = true;

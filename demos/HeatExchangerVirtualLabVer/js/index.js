@@ -9,20 +9,17 @@ const MIN_HOT_FLOWRATE = 3.5;
 const MAX_COLD_FLOWRATE = 21.6;
 const MIN_COLD_FLOWRATE = 16.3;
 
+/* ************************************************************************* */
+/* ** This file holds the main P5 draw loop, window globals, and settings ** */
+/* ************************************************************************* */
+
+// Globals defined here
 window.g = {
     cnv: undefined,
     width: 800,
     height: 640,
-    state: 1,
 
-    name: '',
-
-    playS1: false,
-    s1time: 0,
-    s1measure: -1,
-    animationStartTime: 0,
-
-    orngTime: -1,
+    orngTime: -1, // -1 means it's not running, will be replaced by millis() once pumps are started
     blueTime: -1,
 
     orangeFluidColor: [255, 50, 0, 200],
@@ -33,27 +30,24 @@ window.g = {
     mDotC: 2, // g / s
     mDotH: 1, // g / s
 
-    vols: [1000, 0, 1000, 0],
-    hIsFlowing: false,
-    cIsFlowing: false,
+    vols: [1000, 0, 1000, 0], // Beakers always follow order [Th_in, Th_out, Tc_in, Tc_out]
+    hIsFlowing: false, // These are separate because the simulation used to have you start them separately
+    cIsFlowing: false, // I'll leave it in like this in case that ever changes again
 
-    Th_in: 40.0,
+    Th_in: 40.0, // These values are overridden by the randStartVals function
     Tc_in: 10.0,
     Th_out: 40,
     Tc_out: 10,
-    Th_out_observed: 25,
-    Tc_out_observed: 25,
+    Th_out_observed: 25, // These values are the starting observed beaker values...
+    Tc_out_observed: 25, // The beakers are integrated over the pump run time and display the average temperature over time
 
     T_measured: [-1, -1, -1, -1],
 
-    dragging1: false,
+    dragging1: false, // These are for the valves, they become true on click in the buttons.js
     dragging2: false,
 }
 
-function preload() {
-    font = loadFont('assets/Ubuntu-R.ttf');
-}
-
+// Setup is called when the p5 object is initialized
 function setup() {
     g.cnv = createCanvas(g.width, g.height);
     g.cnv.parent("graphics-wrapper");
@@ -77,17 +71,14 @@ function setup() {
     $("#ci-tooltip").tooltip(options);
     $("#co-tooltip").tooltip(options);
 
-    textFont(font);
     randStartVals();
 }
 
+// Called every frame of the p5 animation
 function draw() {
-    // console.log((1000 / deltaTime).toFixed(1));
+    // console.log((1000 / deltaTime).toFixed(1)); // Track frametime
     background(250);
-    // labels.clear();
 
-    heatTransferRate();
-    drawAll();
+    heatTransferRate(); // calculations
+    drawAll(); // graphics
 }
-
-

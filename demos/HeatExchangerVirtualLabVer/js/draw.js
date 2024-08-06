@@ -126,34 +126,6 @@ function curvePipe() {
     return cPipe;
 }
 
-// function drawArrow(graphicsObject, tail, head, options = {
-//     color: 'black',
-//     arrowSize: 12,
-//     dashed: false,
-// }) {
-//     let temp = { color: 'black', arrowSize: 12, dashed: false, };
-//     options = { ...temp, ...options };
-
-//     let p1 = tail;
-//     let p2 = head;
-//     let dir = getDirection(p2, p1);
-//     let perp = [dir[1], -dir[0]];
-//     let size = options.arrowSize;
-
-//     dt.push();
-//     dt.stroke(options.color); dt.strokeWeight(2);
-//     if (options.dashed) drawingContext.setLineDash([8, 5]);
-
-//     dt.line(p1[0], p1[1], p2[0], p2[1]);
-
-//     dt.noStroke(); dt.fill(options.color);
-//     dt.triangle(p2[0], p2[1],
-//         p2[0] + size * (dir[0] + perp[0] / 3), p2[1] + size * (dir[1] + perp[1] / 3),
-//         p2[0] + size * (dir[0] - perp[0] / 3), p2[1] + size * (dir[1] - perp[1] / 3));
-
-//     dt.pop();
-// }
-
 function getDirection(p1, p2) {
     let dx = p2[0] - p1[0], dy = p2[1] - p1[1];
     let magnitude = Math.sqrt(dx ** 2 + dy ** 2);
@@ -344,6 +316,7 @@ function pumpAssembly() {
     return pa;
 }
 
+// Places image of valve on x, y with the correct angle based on flow
 function displayValve(x, y, flow) {
     push();
     angle = map(flow, MIN_HOT_FLOWRATE, MAX_COLD_FLOWRATE, 3 * PI / 4, PI);
@@ -360,6 +333,7 @@ function displayValve(x, y, flow) {
 /* **************** DRAW DISPLAYS ************** */
 /* ********************************************* */
 
+// Main graphics loop called from draw. The logic here plays animations and displays everything inside the P5 canvas
 function drawAll() {
     let to, tb;
     to = (g.orngTime == -1) ? 0 : (millis() - g.orngTime) / 1000;
@@ -390,24 +364,7 @@ function drawAll() {
     updateTooltips();
 }
 
-function landingPage() {
-    push();
-    fill('black'); noStroke();
-    textAlign(CENTER, CENTER); textSize(18);
-    const label1 = 'This is a virtual lab made for LearnChemE'
-    const label2 = 'by Drew Smith'
-    const label3 = 'Please input your name.';
-    text(label1, g.width / 2, 90);
-    text(label2, g.width / 2, 120);
-    text(label3, g.width / 2, 150);
-    text('name:', 260, 193);
-    if (g.name != '') {
-        stroke('green'); strokeWeight(2); noFill();
-        rect(300, 180, 250, 30);
-    }
-    pop();
-}
-
+// Cold fill animation
 function fillAnimationBlue(t, x = 0, y = 0) {
     if (!g.cIsFlowing) return;
     let s;
@@ -426,6 +383,7 @@ function fillAnimationBlue(t, x = 0, y = 0) {
     pop();
 }
 
+// hot fill animation
 function fillAnimationOrange(t, x = 0, y = 0) {
     if (!g.hIsFlowing) return;
     let s;
@@ -445,7 +403,7 @@ function fillAnimationOrange(t, x = 0, y = 0) {
     pop();
 }
 
-// The tint function multiplies every pixel on your cpu, so it is a very costy solution. Better would be use a shader :)
+// The tint function multiplies every pixel on your cpu, so it is a very costy solution. Better would be to use a framebuffer
 function fillAnimationTubes(tOrange, tBlue) {
     push();
     if (tOrange < 7 && g.hIsFlowing) {
