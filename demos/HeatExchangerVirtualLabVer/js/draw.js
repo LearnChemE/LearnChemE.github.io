@@ -126,34 +126,6 @@ function curvePipe() {
     return cPipe;
 }
 
-// function drawArrow(graphicsObject, tail, head, options = {
-//     color: 'black',
-//     arrowSize: 12,
-//     dashed: false,
-// }) {
-//     let temp = { color: 'black', arrowSize: 12, dashed: false, };
-//     options = { ...temp, ...options };
-
-//     let p1 = tail;
-//     let p2 = head;
-//     let dir = getDirection(p2, p1);
-//     let perp = [dir[1], -dir[0]];
-//     let size = options.arrowSize;
-
-//     dt.push();
-//     dt.stroke(options.color); dt.strokeWeight(2);
-//     if (options.dashed) drawingContext.setLineDash([8, 5]);
-
-//     dt.line(p1[0], p1[1], p2[0], p2[1]);
-
-//     dt.noStroke(); dt.fill(options.color);
-//     dt.triangle(p2[0], p2[1],
-//         p2[0] + size * (dir[0] + perp[0] / 3), p2[1] + size * (dir[1] + perp[1] / 3),
-//         p2[0] + size * (dir[0] - perp[0] / 3), p2[1] + size * (dir[1] - perp[1] / 3));
-
-//     dt.pop();
-// }
-
 function getDirection(p1, p2) {
     let dx = p2[0] - p1[0], dy = p2[1] - p1[1];
     let magnitude = Math.sqrt(dx ** 2 + dy ** 2);
@@ -344,9 +316,10 @@ function pumpAssembly() {
     return pa;
 }
 
+// Places image of valve on x, y with the correct angle based on flow
 function displayValve(x, y, flow) {
     push();
-    angle = map(flow, MIN_FLOWRATE, MAX_FLOWRATE, 3 * PI / 4, PI);
+    angle = map(flow, MIN_HOT_FLOWRATE, MAX_COLD_FLOWRATE, 3 * PI / 4, PI);
     imageMode(CENTER);
     translate(x, y);
     scale(.8);
@@ -360,64 +333,39 @@ function displayValve(x, y, flow) {
 /* **************** DRAW DISPLAYS ************** */
 /* ********************************************* */
 
+// Main graphics loop called from draw. The logic here plays animations and displays everything inside the P5 canvas
 function drawAll() {
     let to, tb;
-    switch (g.state) {
-        case 0: // name and landing page
-            landingPage();
-            break;
-        case 1: // flows and temps
-            to = (g.orngTime == -1) ? 0 : (millis() - g.orngTime) / 1000;
-            tb = (g.blueTime == -1) ? 0 : (millis() - g.blueTime) / 1000;
+    to = (g.orngTime == -1) ? 0 : (millis() - g.orngTime) / 1000;
+    tb = (g.blueTime == -1) ? 0 : (millis() - g.blueTime) / 1000;
 
-            changeVols();
-            integrateTemps();
+    changeVols();
+    integrateTemps();
 
-            image(pa, 65, 440);
-            image(pa, 390, 440);
+    image(pa, 65, 440);
+    image(pa, 390, 440);
 
-            push();
-            fillBeaker(50, g.vols[0], g.orangeFluidColor);
-            fillBeaker(180, g.vols[1], g.orangeFluidColor);
-            fillBeaker(310, g.vols[2], g.blueFluidColor);
-            fillBeaker(450, g.vols[3], g.blueFluidColor);
-            pop();
-
-            image(bt, 0, 0);
-            fillAnimationTubes(to, tb);
-            image(dt, 25, 25);
-            fillAnimationOrange(to, 0, 25);
-            fillAnimationBlue(tb, 0, 25);
-
-            drag();
-            displayValve(90, 431, g.mDotH);
-            displayValve(415, 451, g.mDotC);
-            updateTooltips();
-
-            break;
-    }
-}
-
-function landingPage() {
     push();
-    fill('black'); noStroke();
-    textAlign(CENTER, CENTER); textSize(18);
-    const label1 = 'This is a virtual lab made for LearnChemE'
-    const label2 = 'by Drew Smith'
-    const label3 = 'Please input your name.';
-    text(label1, g.width / 2, 90);
-    text(label2, g.width / 2, 120);
-    text(label3, g.width / 2, 150);
-    text('name:', 260, 193);
-    if (g.name != '') {
-        stroke('green'); strokeWeight(2); noFill();
-        rect(300, 180, 250, 30);
-    }
+    fillBeaker(50, g.vols[0], g.orangeFluidColor);
+    fillBeaker(180, g.vols[1], g.orangeFluidColor);
+    fillBeaker(310, g.vols[2], g.blueFluidColor);
+    fillBeaker(450, g.vols[3], g.blueFluidColor);
     pop();
+
+    image(bt, 0, 0);
+    fillAnimationTubes(to, tb);
+    image(dt, 25, 25);
+    fillAnimationOrange(to, 0, 25);
+    fillAnimationBlue(tb, 0, 25);
+
+    drag();
+    displayValve(90, 431, g.mDotH);
+    displayValve(415, 451, g.mDotC);
+    updateTooltips();
 }
 
+// Cold fill animation
 function fillAnimationBlue(t, x = 0, y = 0) {
-    if (!g.cIsFlowing) return;
     let s;
     let partBlue;
 
@@ -428,35 +376,36 @@ function fillAnimationBlue(t, x = 0, y = 0) {
         partBlue = dtb.get(0, 450 - s, 500, 50 + s);
         image(partBlue, 25, 450 - s);
     }
-    else {
+    else if (g.vols[2] > 0) {
         image(dtb, 25, 0);
     }
     pop();
 }
 
+// hot fill animation
 function fillAnimationOrange(t, x = 0, y = 0) {
-    if (!g.hIsFlowing) return;
+    // if (!g.hIsFlowing) return;
     let s;
     let partOrng;
 
     push();
     translate(x, y);
-    if (t <= 7) {
+    if (t <= 3) {
         s = 88 + t * 160 - 100
         s = constrain(s, 1, 600);
         partOrng = dto.get(0, 0, 500, s);
         image(partOrng, 25, 0);
     }
-    else {
+    else if (g.vols[0] > 0) {
         image(dto, 25, 0);
     }
     pop();
 }
 
-// The tint function multiplies every pixel on your cpu, so it is a very costy solution. Better would be use a shader :)
+// The tint function multiplies every pixel on your cpu, so it is a very costy solution. Better would be to use a framebuffer
 function fillAnimationTubes(tOrange, tBlue) {
     push();
-    if (tOrange < 7 && g.hIsFlowing) {
+    if (tOrange < 3 && g.hIsFlowing) {
         s = constrain(tOrange * 1000, 0, 255);
         tint(255, s);
         image(thi, 0, 0);
@@ -464,12 +413,16 @@ function fillAnimationTubes(tOrange, tBlue) {
         tint(255, s);
         image(tho, 0, 0);
     }
-    else if (g.hIsFlowing) {
+    else if (g.orngTime != -1 && g.vols[0] > 0) {
         image(thi, 0, 0);
         image(tho, 0, 0);
+        if (hPumpBtn.disabled) {
+            hPumpBtn.disabled = false;
+            hPumpBtn.ariaDisabled = false;
+        }
     }
 
-    if (tBlue < 7 && g.cIsFlowing) {
+    if (tBlue < 3 && g.cIsFlowing) {
         s = constrain(tBlue * 1000, 0, 255);
         tint(255, s);
         image(tci, 0, 0);
@@ -477,7 +430,7 @@ function fillAnimationTubes(tOrange, tBlue) {
         tint(255, s);
         image(tco, 0, 0);
     }
-    else if (g.cIsFlowing) {
+    else if (g.blueTime != -1 && g.vols[2] > 0) {
         image(tci, 0, 0);
         image(tco, 0, 0);
     }

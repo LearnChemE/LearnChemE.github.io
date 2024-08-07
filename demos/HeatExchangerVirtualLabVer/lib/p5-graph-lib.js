@@ -1,5 +1,8 @@
-// const { sqrt } = require("mathjs");
-
+/* ********************************************************************************* */
+/* ** This is a graphing toolkit library made for P5.js graphs. It is still a WIP ** */
+/* ** For the latest version, email drew.smith@colorado.edu or they will post it *** */
+/* ** on GitHub on a later date when the library is better documented. ************* */
+/* ********************************************************************************* */
 
 class P5_Graph {
     constructor(width, height, options, xRange = [0, 1], yRange = [0, 1]) {

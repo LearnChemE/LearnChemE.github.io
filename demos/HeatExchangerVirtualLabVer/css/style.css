@@ -15,6 +15,7 @@ input {
     position: relative;
     width: max-content;
     margin: auto;
+    padding: .5em;
 
     #inputs-wrapper {
         width: 100%;
@@ -73,7 +74,6 @@ canvas {
     align-items: center;
     gap: 0px 20px;
     width: inherit;
-    margin-bottom: 0.5em;
 }
 
 #hex-btn-container {
