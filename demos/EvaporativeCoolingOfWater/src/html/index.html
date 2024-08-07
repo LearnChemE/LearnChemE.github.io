@@ -27,24 +27,31 @@
       <span id="mass-metric">kg</span>
       <button id="play-pause" class="button play" onclick="play()">
         <div id="pause" style="display: none;">⏸</div>
-        <svg id="play" xmlns="http://www.w3.org/2000/svg" width="22" height="16" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
-          <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z" />
+        <svg id="play" xmlns="http://www.w3.org/2000/svg" width="22" height="16" fill="currentColor"
+          class="bi bi-play-fill" viewBox="0 0 16 16">
+          <path
+            d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z" />
         </svg>
       </button>
       <button class="button reset" onclick="reset()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="16" fill="currentColor" class="bi bi-rewind-fill" viewBox="0 0 16 16">
-          <path d="M8.404 7.304a.802.802 0 0 0 0 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696L8.404 7.304Z" />
-          <path d="M.404 7.304a.802.802 0 0 0 0 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696L.404 7.304Z" />
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="16" fill="currentColor" class="bi bi-rewind-fill"
+          viewBox="0 0 16 16">
+          <path
+            d="M8.404 7.304a.802.802 0 0 0 0 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696L8.404 7.304Z" />
+          <path
+            d="M.404 7.304a.802.802 0 0 0 0 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696L.404 7.304Z" />
         </svg>
       </button>
     </div>
     <div class="info-buttons-box">
-      <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</button>
+      <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+        data-bs-target="#directionsModal">Directions</button>
       <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</button>
       <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#aboutModal">About</button>
     </div>
   </div>
-  <div class="d-flex border align-items-center justify-content-center mx-auto mt-1 w-100" style="min-width: 600px; max-width: 1200px;">
+  <div class="d-flex border align-items-center justify-content-center mx-auto mt-1 w-100"
+    style="min-width: 600px; max-width: 1200px;">
     <div class="chart p-3" id="figure" style="width: 60%; min-width: 300px;">
     </div>
     <div class="chart w-25 p-3" style="width: 35%; min-height: 500px; min-width: 300px;">
@@ -54,7 +61,8 @@
 
 
   <!-- Modals -->
-  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModal" aria-hidden="true">
+  <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModal"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -62,14 +70,21 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          First, choose the amount of mass to be evaporated. Then, when you click the play button, a vacuum pump continuously removes water vapor from a tank initially containing 10 kg of liquid water at a temperature of 40°C. Water in the tank evaporates because
-          the vapor pressure is below the saturation pressure when water vapor is removed by the vacuum pump. Because the tank is well insulated, as water evaporates, the remaining water cools until it reaches 0°C. Additional pumping causes some of the
-          remaining water to freeze at 0°C. The bar graph on the right shows the amounts of each phase present (liquid, solid, or vapor). The amounts for each phase are determined using mass balance and unsteady-state energy balance.
+          First, choose the amount of mass to be evaporated. Then, when you click the play button, a vacuum pump
+          continuously removes water vapor from a tank initially containing 10 kg of liquid water at a temperature of
+          40°C. Water in the tank evaporates because
+          the vapor pressure is below the saturation pressure when water vapor is removed by the vacuum pump. Because
+          the tank is well insulated, as water evaporates, the remaining water cools until it reaches 0°C. Additional
+          pumping causes some of the
+          remaining water to freeze at 0°C. The bar graph on the right shows the amounts of each phase present (liquid,
+          solid, or vapor). The amounts for each phase are determined using mass balance and unsteady-state energy
+          balance.
         </div>
       </div>
     </div>
   </div>
-  <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModal" aria-hidden="true">
+  <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModal"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -77,12 +92,23 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          10 kg of liquid water are cooled from an initial temperature of 40°C. Up until 0°C, an energy balance is used to determine the final temperature \(T_2\): $$ m_L\;Cp\;dT = - \Delta H_{vap,20}\;dm_v $$ where \( Cp \) is the liquid heat capacity (kJ/kg \(^\circ
-          \)C), \( \Delta H_{vap,20} \) is the heat of vaporization at 20°C (average of initial temperature and 0°C) in kJ/kg, and \( T_2 \) is in °C.
-          <div style="height:10px;"></div> The amount of liquid \( m_L \) is 10 kg minus the amount of water vaporized \( m_v \) (both in kg): $$ (10 - m_v) Cp\; dT = - \Delta H_{vap,20}\; dm_v $$ Integrating between the initial conditions (\( m_L = 10, m_v = 0 \)) and the final
-          conditions yields: $$ \int_{40}^{T_2} \frac{Cp dT}{\Delta H_{vap,20}} = -\int_{0}^{m_v} \frac{dm_v}{(10-m_v)} $$ $$ \frac{Cp}{\Delta H_{vap,20}} (T_2 - 40) = \ln (10 - m_v) \Big|_{0}^{m_v} = \ln \left( \frac{10-m_v}{10} \right) $$ Thus the final
-          temperature for a given amount of water vaporized is: $$ T_2 = 40 + \frac{\Delta H_{vap,20}}{Cp} \ln \left( \frac{10-m_v}{10} \right), \text{ where } T_2 \geq 0^\circ C $$ When 0.66 kg of water vaporizes, the liquid temperature is 0°C and additional
-          vaporization freezes some of the remaining liquid. An energy balance at 0°C determines the amount of liquid that forms solid ice: $$ m_s \Delta H_f = (m_v - 0.66) \Delta H_{vap,0} $$ where \( m_s \) is the mass of ice formed (kg), \( \Delta
+          10 kg of liquid water are cooled from an initial temperature of 40°C. Up until 0°C, an energy balance is used
+          to determine the final temperature \(T_2\): $$ m_L\;Cp\;dT = - \Delta H_{vap,20}\;dm_v $$ where \( Cp \) is
+          the liquid heat capacity (kJ/kg \(^\circ
+          \)C), \( \Delta H_{vap,20} \) is the heat of vaporization at 20°C (average of initial temperature and 0°C) in
+          kJ/kg, and \( T_2 \) is in °C.
+          <div style="height:10px;"></div> The amount of liquid \( m_L \) is 10 kg minus the amount of water vaporized
+          \( m_v \) (both in kg): $$ (10 - m_v) Cp\; dT = - \Delta H_{vap,20}\; dm_v $$ Integrating between the initial
+          conditions (\( m_L = 10, m_v = 0 \)) and the final
+          conditions yields: $$ \int_{40}^{T_2} \frac{Cp dT}{\Delta H_{vap,20}} = -\int_{0}^{m_v} \frac{dm_v}{(10-m_v)}
+          $$ $$ \frac{Cp}{\Delta H_{vap,20}} (T_2 - 40) = \ln (10 - m_v) \Big|_{0}^{m_v} = \ln \left( \frac{10-m_v}{10}
+          \right) $$ Thus the final
+          temperature for a given amount of water vaporized is: $$ T_2 = 40 + \frac{\Delta H_{vap,20}}{Cp} \ln \left(
+          \frac{10-m_v}{10} \right), \text{ where } T_2 \geq 0^\circ C $$ When 0.66 kg of water vaporizes, the liquid
+          temperature is 0°C and additional
+          vaporization freezes some of the remaining liquid. An energy balance at 0°C determines the amount of liquid
+          that forms solid ice: $$ m_s \Delta H_f = (m_v - 0.66) \Delta H_{vap,0} $$ where \( m_s \) is the mass of ice
+          formed (kg), \( \Delta
           H_f \) is the heat of fusion (kJ/kg) and \( \Delta H_{vap,0} \) is the heat of vaporization at 0°C (kJ/kg).
         </div>
       </div>
@@ -98,8 +124,12 @@
         <div class="modal-body">
           <p>
             This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
-              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by <a href="https://www.linkedin.com/in/abijith-ramachandran/" target="_blank">Abijith Trichur Ramachandran</a>            and <a href="https://www.linkedin.com/in/neilhendren/" target="_blank">Neil Hendren</a> under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and
-            are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Abijith Trichur Ramachandran and
+            Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to
+            learncheme@gmail.com. All of our simulations are open source, and
+            are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/"
+              target="_blank">LearnChemE Github
               repository</a>.</p>
           <p style="line-height: 3rem;">
             If this simulation is too big for your screen, zoom out using&nbsp;<span><img
@@ -107,9 +137,9 @@
                 src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac or&nbsp;
             <span><img src="https://learncheme.github.io/media/ctrl.png"
                 style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
-                style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png"
-                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
-                style="height: 4ch;"></span>&nbsp;on Mac or&nbsp;
+                style="height: 4ch;"></span>&nbsp;on Windows. To zoom in, use&nbsp;<span><img
+                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/plus.png" style="height: 4ch;"></span>&nbsp;on Mac or&nbsp;
             <span><img src="https://learncheme.github.io/media/ctrl.png"
                 style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
                 style="height: 4ch;"></span>&nbsp;on Windows.
