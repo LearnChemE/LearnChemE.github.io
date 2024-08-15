@@ -1,0 +1,1 @@
+This Lab is one of the initial precursors to the Double-tube virtual lab WIDE, written by Drew Smith. The source code is being kept here for future use as a LearnChemE simulation, which will be hosted on the website itself.
