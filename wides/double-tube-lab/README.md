@@ -1,50 +1,11 @@
 # React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+After cloning the environment, use `npm i` to install the node dependencies. The .gitignore file will prevent these from being pushed to GitHub since they don't need to be.
 
-Currently, two official plugins are available:
+# Message to future Undergraduate Assistants
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This simulation was made using the Vite + React Demo. It uses TypeScript instead of JavaScript, which is helpful to prevent bugs from inaccurate JS typings.
 
-## Expanding the ESLint configuration
+If you haven't worked with React or a similar framework, I would recommend taking a quick tutorial. React helps greatly in managing DOM elements and creating interactive UI's. It also utilizes JSX, so while metadata can still be found in the index.html file, the app itself is compiled from the code within the App.tsx and other element .tsx files.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+Lastly, I tried to mostly keep the P5 simulation segregated from the React App, so they mostly interface with the p5-wrapper dependency. However, as this was originally a vanilla JS simulation, some parts of the original sketch were not easy to handle.

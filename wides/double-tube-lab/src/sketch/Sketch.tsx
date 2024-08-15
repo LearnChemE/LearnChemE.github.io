@@ -56,7 +56,7 @@ export var p5_instance: P5CanvasInstance;
 
 export default function sketch(p: P5CanvasInstance) {
   p5_instance = p;
-  let canvas;
+  // let canvas: P5CanvasInstance;
 
   let dt: P5CanvasInstance;
   let dtb: P5CanvasInstance;
@@ -71,7 +71,7 @@ export default function sketch(p: P5CanvasInstance) {
   let tco: P5CanvasInstance;
 
   p.setup = () => {
-    canvas = p.createCanvas(g.width, g.height);
+    p.createCanvas(g.width, g.height);
 
     dt = Graphics.doubleTubeGraphic(500, 400, p);
     dtb = Graphics.doubleTubeBlue(500, 400, 50, 450, 50, p);
