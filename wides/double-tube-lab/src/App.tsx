@@ -104,7 +104,7 @@ function App() {
 
       <div className="nav-bar">
         <div id="nav-bar-left">
-          <a href="public/ME_DoublePipe-Worksheet_2020-2021_Final.pdf" download>
+          <a href="./ME_DoublePipe-Worksheet_2020-2021_Final.pdf" download>
             <button className="btn btn-primary">
               <div>
                 <i className="fa-solid fa-download"></i>&nbsp;worksheet

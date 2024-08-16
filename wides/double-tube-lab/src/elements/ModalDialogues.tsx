@@ -17,10 +17,7 @@ export const DirectionsModalDialogue = () => {
           <div className="modal-body-content">
             This digital lab, which represents a double pipe heat exchanger with
             countercurrent flow, is designed to be used with this{" "}
-            <a
-              href="public/ME_DoublePipe-Worksheet_2020-2021_Final.pdf"
-              download
-            >
+            <a href="./ME_DoublePipe-Worksheet_2020-2021_Final.pdf" download>
               worksheet
             </a>
             . Drag the valves on each inlet beaker to set flowrates, and then
@@ -34,7 +31,7 @@ export const DirectionsModalDialogue = () => {
       case WORKSHEET:
         innerHtml = (
           <embed
-            src="public/ME_DoublePipe-Worksheet_2020-2021_Final.pdf"
+            src="./ME_DoublePipe-Worksheet_2020-2021_Final.pdf"
             width="100%"
             height="800px"
           />
