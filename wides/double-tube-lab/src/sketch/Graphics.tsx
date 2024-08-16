@@ -387,3 +387,52 @@ export default {
   displayValve,
   pumpAssembly,
 };
+
+export function singleBeakerGraphics(p: P5CanvasInstance) {
+  let b = p.createGraphics(g.width, g.height);
+  let beaker = createBeaker(p);
+  let v = valve(p);
+
+  b.push();
+  b.scale(1.25);
+  b.image(beaker, 290, 360);
+  b.image(beaker, 450, 360);
+  b.pop();
+
+  b.push();
+  b.stroke("black");
+  b.strokeWeight(2);
+
+  // cold tubes
+  b.line(420, 430, 420, 50);
+  b.line(430, 430, 430, 40);
+  b.line(395, 590, 395, 50);
+  b.line(385, 590, 385, 40);
+  b.line(420, 50, 395, 50);
+  b.line(430, 40, 385, 40);
+
+  // hot out
+  b.line(585, 325, 585, 590);
+  b.line(595, 315, 595, 590);
+  b.line(585, 325, 470, 325);
+  b.line(595, 315, 470, 315);
+
+  // hot in
+  b.line(620, 127, 620, 430);
+  b.line(630, 117, 630, 430);
+  b.line(620, 127, 470, 127);
+  b.line(630, 117, 470, 117);
+
+  b.pop();
+
+  // valves
+  b.push();
+  b.translate(406, 425);
+  b.scale(0.75);
+  b.image(v, 0, 0);
+  b.translate(267, 0);
+  b.image(v, 0, 0);
+  b.pop();
+
+  return b;
+}

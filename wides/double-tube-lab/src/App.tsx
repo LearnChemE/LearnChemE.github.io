@@ -14,12 +14,17 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import "./App.css";
 import { randStartVals } from "./sketch/Functions.tsx";
+import { SingleBeakerSketch } from "./sketch/SingleBeaker.tsx";
+
+const DOUBLE_BEAKER = 0;
+const SINGLE_BEAKER = 1;
 
 // Use functional style, not classes. Hooks make the code much better to work with.
 function App() {
   const [pumpsRunning, setPumpsRunning] = useState(false);
   const [measured, setMeasured] = useState([-1, -1, -1, -1]);
   const [isPumpBtnDisabled, setPumpBtnDisabled] = useState(false);
+  const [canvasMode, setCanvasMode] = useState(SINGLE_BEAKER);
 
   // start pumps button
   function handlePumpsClick() {
@@ -32,7 +37,6 @@ function App() {
       // this sets a 3 second timer where the button is disabled
       setTimeout(() => setPumpBtnDisabled(false), 3000);
     }
-    console.log(g.vols[0]);
   }
 
   // measure temps button
@@ -56,6 +60,10 @@ function App() {
     innerHtml = "start pumps";
   }
 
+  function handleCanvasModeClick() {
+    setCanvasMode(canvasMode === SINGLE_BEAKER ? DOUBLE_BEAKER : SINGLE_BEAKER);
+  }
+
   let pumpBtnClass: string, icon: string, innerHtml: string;
   if (pumpsRunning) {
     pumpBtnClass = "btn btn-danger";
@@ -69,6 +77,7 @@ function App() {
 
   return (
     <>
+      <button onClick={() => handleCanvasModeClick()}>mode</button>
       <div className="buttons-container" id="modal-buttons-container">
         <button
           type="button"
@@ -151,7 +160,12 @@ function App() {
       </div>
 
       <div className="graphics-wrapper">
-        <ReactP5Wrapper sketch={sketch} />
+        {canvasMode == DOUBLE_BEAKER ? (
+          <ReactP5Wrapper sketch={sketch} />
+        ) : (
+          <ReactP5Wrapper sketch={SingleBeakerSketch} />
+        )}
+
         <a className="tooltip-anchor" id="hi-anchor" />
         <a className="tooltip-anchor" id="ho-anchor" />
         <a className="tooltip-anchor" id="ci-anchor" />
