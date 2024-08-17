@@ -198,6 +198,13 @@ canvas {
   left: 584px;
 }
 
+#cold-single-anchor {
+  left: 384px;
+}
+#hot-single-anchor {
+  left: 582px;
+}
+
 #reset-modal-footer {
   display: grid;
   grid-template-columns: max-content auto;

@@ -14,7 +14,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import "./App.css";
 import { randStartVals } from "./sketch/Functions.tsx";
-import { SingleBeakerSketch } from "./sketch/SingleBeaker.tsx";
+import {
+  SingleBeakerSketch,
+  setAnimationTimeNextFrame,
+} from "./sketch/SingleBeaker.tsx";
 
 const DOUBLE_BEAKER = 0;
 const SINGLE_BEAKER = 1;
@@ -31,11 +34,15 @@ function App() {
     setPumpsRunning((pumpsRunning) => !pumpsRunning);
     setMeasured([-1, -1, -1, -1]);
 
-    togglePumps(!pumpsRunning);
-    if (g.vols[0] >= 998) {
-      setPumpBtnDisabled(true);
-      // this sets a 3 second timer where the button is disabled
-      setTimeout(() => setPumpBtnDisabled(false), 3000);
+    if (canvasMode === DOUBLE_BEAKER) {
+      togglePumps(!pumpsRunning);
+      if (g.vols[0] >= 998) {
+        setPumpBtnDisabled(true);
+        // this sets a 3 second timer where the button is disabled
+        setTimeout(() => setPumpBtnDisabled(false), 3000);
+      }
+    } else {
+      setAnimationTimeNextFrame();
     }
   }
 
@@ -166,10 +173,19 @@ function App() {
           <ReactP5Wrapper sketch={SingleBeakerSketch} />
         )}
 
-        <a className="tooltip-anchor" id="hi-anchor" />
-        <a className="tooltip-anchor" id="ho-anchor" />
-        <a className="tooltip-anchor" id="ci-anchor" />
-        <a className="tooltip-anchor" id="co-anchor" />
+        {canvasMode === DOUBLE_BEAKER ? (
+          <>
+            <a className="tooltip-anchor" id="hi-anchor" />
+            <a className="tooltip-anchor" id="ho-anchor" />
+            <a className="tooltip-anchor" id="ci-anchor" />
+            <a className="tooltip-anchor" id="co-anchor" />
+          </>
+        ) : (
+          <>
+            <a className="tooltip-anchor" id="cold-single-anchor" />
+            <a className="tooltip-anchor" id="hot-single-anchor" />
+          </>
+        )}
       </div>
 
       <DirectionsModalDialogue />
@@ -177,7 +193,7 @@ function App() {
       {AboutModalDialogue}
       <ResetModalDialogue resetVars={() => handleResetClick()} />
 
-      <Tooltips measured={measured} />
+      <Tooltips measured={measured} canvasMode={canvasMode} />
     </>
   );
 }
