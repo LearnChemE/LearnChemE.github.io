@@ -182,7 +182,7 @@ function App() {
           </>
         ) : (
           <>
-            <a className="tooltip-anchor" id="cold-single-anchor" />
+            <a className="tooltip-anchor" id="cold`-single-anchor" />
             <a className="tooltip-anchor" id="hot-single-anchor" />
           </>
         )}

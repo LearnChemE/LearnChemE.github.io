@@ -2,7 +2,7 @@ import { g } from "./Sketch";
 import Graphics from "./Graphics";
 import { P5CanvasInstance } from "@p5-wrapper/react";
 import { singleBeakerGraphics } from "./Graphics";
-import { event } from "jquery";
+// import { event } from "jquery";
 
 const NOT_STARTED = -1;
 const START_ON_RENDER = -2;
@@ -65,7 +65,7 @@ function singleBeakerFillAnimation(
     // Button just pressed
     let alpha1 = p.map(aniTime, 0, 1000, 0, 200, true);
     let hexCartridgeFillTimer = p.map(aniTime, 0, 3000, 0, 400, true);
-    let alpha2 = p.map(aniTime, 0, 1000, 0, 200, true);
+    let alpha2 = p.map(aniTime - 3000, 0, 1000, 0, 200, true);
 
     fillSingleInletTubes(p, alpha1);
     p.image(graphicsObjs.singleBeakers, 0, 0);
@@ -90,8 +90,9 @@ function singleBeakerFillAnimation(
 
 // Fill the lines going into the HEX
 function fillSingleInletTubes(p: P5CanvasInstance, alpha = 200) {
-  let color = g.orangeFluidColor;
+  let color = g.orangeFluidColor.slice();
   color[3] = alpha;
+
   p.push();
   p.noStroke();
   p.fill(color);
@@ -99,7 +100,7 @@ function fillSingleInletTubes(p: P5CanvasInstance, alpha = 200) {
   p.rect(470, 117, 150, 10);
   p.rect(617, 450, 15, 120);
 
-  color = g.blueFluidColor;
+  color = g.blueFluidColor.slice();
   color[3] = alpha;
   p.fill(color);
   p.rect(420, 370, 10, 60);
@@ -109,18 +110,18 @@ function fillSingleInletTubes(p: P5CanvasInstance, alpha = 200) {
 
 // Fill tubes coming out of HEX
 function fillSingleOutletTubes(p: P5CanvasInstance, alpha = 200) {
-  let color = g.orangeFluidColor;
+  let color = g.orangeFluidColor.slice();
   color[3] = alpha;
   p.push();
   p.noStroke();
   p.fill(color);
-  p.rect(585, 315, 10, 160);
+  p.rect(585, 315, 10, 2751);
   p.rect(475, 315, 110, 10);
 
-  color = g.blueFluidColor;
+  color = g.blueFluidColor.slice();
   color[3] = alpha;
   p.fill(color);
-  p.rect(385, 375, 10, 100);
+  p.rect(385, 375, 10, 215);
   p.rect(385, 40, 10, 35);
   p.rect(395, 40, 25, 10);
   p.rect(420, 40, 10, 35);
