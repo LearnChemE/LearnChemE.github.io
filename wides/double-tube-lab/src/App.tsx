@@ -35,7 +35,7 @@ function App() {
   const [pumpsRunning, setPumpsRunning] = useState(false);
   const [measured, setMeasured] = useState([-1, -1, -1, -1]);
   const [isPumpBtnDisabled, setPumpBtnDisabled] = useState(false);
-  const [canvasMode, setCanvasMode] = useState(SINGLE_BEAKER);
+  const [canvasMode, setCanvasMode] = useState(DOUBLE_BEAKER);
   const [showingSideBar, setShowingSideBar] = useState(false);
 
   // start pumps button
