@@ -137,11 +137,6 @@ canvas {
   gap: 5px;
 }
 
-.btn-danger#process-pump-btn,
-.btn-danger:hover {
-  background-color: orangered;
-}
-
 #pump-btns {
   grid-template-columns: 150px 200px;
   gap: 15px;
@@ -198,11 +193,66 @@ canvas {
   left: 584px;
 }
 
+#cold-single-anchor {
+  left: 384px;
+}
+#hot-single-anchor {
+  left: 582px;
+}
+
+#outlet-tubes-anchor {
+  top: 390px;
+  left: 380px;
+  height: 50px;
+  width: 230px;
+}
+
 #reset-modal-footer {
   display: grid;
   grid-template-columns: max-content auto;
   align-items: end;
   justify-content: space-between;
+}
+
+/* The side navigation menu */
+.sidebar {
+  display: grid;
+  grid-template-rows: repeat(auto-fit, 3em);
+  height: 100%; /* 100% Full-height */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  right: 0;
+  background-color: #eff0f5; /* Black*/
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 60px; /* Place content 60px from the top */
+  transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+}
+
+.sidebar .btn-close {
+  justify-self: right;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidebar-item:hover {
+  background-color: #cecece;
+  cursor: pointer;
+}
+
+.sidebar-item {
+  grid-template-columns: repeat(auto-fit, 3em);
+  padding: 8px 8px 8px 8px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 18px;
+  color: #000000;
+  /* display: block; */
+  transition: 0.3s;
+}
+
+.sidebar-item.vl {
+  border-left: 3px solid rgb(35, 112, 255);
+  height: fit-content;
 }
 
 @media (min-width: 768px) {
@@ -214,5 +264,12 @@ canvas {
   .modal-xl {
     width: 70%;
     max-width: 1200px;
+  }
+
+  .sidebar {
+    padding-top: 15px;
+  }
+  .sidebar a {
+    font-size: 18px;
   }
 }

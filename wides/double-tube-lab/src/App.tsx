@@ -8,31 +8,57 @@ import {
   ResetModalDialogue,
 } from "./elements/ModalDialogues.tsx";
 // import { StartPumpsButton, MeasureTempsButton } from "./Buttons.tsx";
-import sketch, { togglePumps, g, p5_instance } from "./sketch/Sketch.tsx";
+import sketch, {
+  togglePumps,
+  g,
+  p5_instance,
+  toggleSinglePumps,
+} from "./sketch/Sketch.tsx";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import "./App.css";
 import { randStartVals } from "./sketch/Functions.tsx";
+import {
+  SingleBeakerSketch,
+  randSingleStartVals,
+  setAnimationTimeNextFrame,
+  setAnimationTimeToNotStarted,
+} from "./sketch/SingleBeaker.tsx";
+import { SideBar } from "./elements/SideBar.tsx";
+
+const DOUBLE_BEAKER = 0;
+const SINGLE_BEAKER = 1;
 
 // Use functional style, not classes. Hooks make the code much better to work with.
 function App() {
   const [pumpsRunning, setPumpsRunning] = useState(false);
   const [measured, setMeasured] = useState([-1, -1, -1, -1]);
   const [isPumpBtnDisabled, setPumpBtnDisabled] = useState(false);
+  const [canvasMode, setCanvasMode] = useState(DOUBLE_BEAKER);
+  const [showingSideBar, setShowingSideBar] = useState(false);
 
   // start pumps button
   function handlePumpsClick() {
     setPumpsRunning((pumpsRunning) => !pumpsRunning);
     setMeasured([-1, -1, -1, -1]);
 
-    togglePumps(!pumpsRunning);
-    if (g.vols[0] >= 998) {
-      setPumpBtnDisabled(true);
-      // this sets a 3 second timer where the button is disabled
-      setTimeout(() => setPumpBtnDisabled(false), 3000);
+    if (canvasMode === DOUBLE_BEAKER) {
+      togglePumps(!pumpsRunning);
+      if (g.vols[0] >= 998) {
+        setPumpBtnDisabled(true);
+        // this sets a 3 second timer where the button is disabled
+        setTimeout(() => setPumpBtnDisabled(false), 3000);
+      }
+    } else if (canvasMode === SINGLE_BEAKER) {
+      toggleSinglePumps(!pumpsRunning);
+
+      if (setAnimationTimeNextFrame()) {
+        setPumpBtnDisabled(true);
+        // this sets a 3 second timer where the button is disabled
+        setTimeout(() => setPumpBtnDisabled(false), 3000);
+      }
     }
-    console.log(g.vols[0]);
   }
 
   // measure temps button
@@ -43,10 +69,16 @@ function App() {
 
   // reset temps button
   function handleResetClick() {
+    console.log("reset");
     g.vols = [1000, 0, 1000, 0];
     g.orngTime = -1;
     g.blueTime = -1;
-    randStartVals(p5_instance);
+    if (canvasMode === DOUBLE_BEAKER) {
+      randStartVals(p5_instance);
+    } else {
+      randSingleStartVals();
+      setAnimationTimeToNotStarted();
+    }
     setPumpsRunning(false);
     setPumpBtnDisabled(false);
     setMeasured([-1, -1, -1, -1]);
@@ -54,6 +86,13 @@ function App() {
     pumpBtnClass = "btn btn-primary";
     icon = "fa-solid fa-play";
     innerHtml = "start pumps";
+  }
+
+  function handleCanvasModeClick(newMode: number) {
+    if (newMode === canvasMode) return;
+    handleResetClick();
+    setAnimationTimeToNotStarted();
+    setCanvasMode(newMode);
   }
 
   let pumpBtnClass: string, icon: string, innerHtml: string;
@@ -69,6 +108,13 @@ function App() {
 
   return (
     <>
+      <SideBar
+        showing={showingSideBar}
+        onClose={() => setShowingSideBar(false)}
+        selected={canvasMode}
+        toggleSelected={(selected) => handleCanvasModeClick(selected)}
+        onResetClick={() => handleResetClick()}
+      />
       <div className="buttons-container" id="modal-buttons-container">
         <button
           type="button"
@@ -139,6 +185,18 @@ function App() {
         </div>
         <div id="nav-bar-right">
           <button
+            id="menu-btn"
+            className="btn btn-secondary"
+            onClick={() =>
+              setShowingSideBar((showingSideBar) => !showingSideBar)
+            }
+          >
+            <div>
+              <i className="fa-solid fa-bars" />
+              &nbsp;&nbsp;menu
+            </div>
+          </button>
+          {/* <button
             id="beakers-btn"
             className="btn btn-outline-danger"
             data-bs-toggle="modal"
@@ -146,16 +204,31 @@ function App() {
             // onClick={() => handleResetClick()}
           >
             reset beakers
-          </button>
+          </button> */}
         </div>
       </div>
 
       <div className="graphics-wrapper">
-        <ReactP5Wrapper sketch={sketch} />
-        <a className="tooltip-anchor" id="hi-anchor" />
-        <a className="tooltip-anchor" id="ho-anchor" />
-        <a className="tooltip-anchor" id="ci-anchor" />
-        <a className="tooltip-anchor" id="co-anchor" />
+        {canvasMode == DOUBLE_BEAKER ? (
+          <ReactP5Wrapper sketch={sketch} />
+        ) : (
+          <ReactP5Wrapper sketch={SingleBeakerSketch} />
+        )}
+
+        {canvasMode === DOUBLE_BEAKER ? (
+          <>
+            <a className="tooltip-anchor" id="hi-anchor" />
+            <a className="tooltip-anchor" id="ho-anchor" />
+            <a className="tooltip-anchor" id="ci-anchor" />
+            <a className="tooltip-anchor" id="co-anchor" />
+          </>
+        ) : (
+          <>
+            <a className="tooltip-anchor" id="cold-single-anchor" />
+            <a className="tooltip-anchor" id="hot-single-anchor" />
+            <a className="tooltip-anchor" id="outlet-tubes-anchor" />
+          </>
+        )}
       </div>
 
       <DirectionsModalDialogue />
@@ -163,7 +236,11 @@ function App() {
       {AboutModalDialogue}
       <ResetModalDialogue resetVars={() => handleResetClick()} />
 
-      <Tooltips measured={measured} />
+      <Tooltips
+        measured={measured}
+        canvasMode={canvasMode}
+        pumpsAreRunning={pumpsRunning}
+      />
     </>
   );
 }

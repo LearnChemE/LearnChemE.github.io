@@ -201,3 +201,20 @@ export function integrateTemps(p: P5CanvasInstance) {
   g.Tc_in += h * (T_ROOM - g.Tc_in);
   g.Tc_out += h * (T_ROOM - g.Tc_out);
 }
+
+export function singleBeakerCalculations(p: P5CanvasInstance) {
+  if (!g.hIsFlowing) return;
+  calcHeatTransferRate();
+
+  let dV = (g.mDotH * p.deltaTime) / 1000;
+  g.Th_in = p.lerp(g.Th_in, g.Th_out, dV / 1000);
+  dV = (g.mDotC * p.deltaTime) / 1000;
+  g.Tc_in = p.lerp(g.Tc_in, g.Tc_out, dV / 1000);
+}
+
+export function lerp(start: number, end: number, amount: number): number {
+  if (amount < 0 || amount > 1) {
+    throw new Error("Amount must be between 0 and 1");
+  }
+  return start + (end - start) * amount;
+}
