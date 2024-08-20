@@ -114,3 +114,7 @@ export default function sketch(p: P5CanvasInstance) {
     g.dragging2 = false;
   };
 }
+
+export function toggleSinglePumps(running: boolean) {
+  g.hIsFlowing = running;
+}

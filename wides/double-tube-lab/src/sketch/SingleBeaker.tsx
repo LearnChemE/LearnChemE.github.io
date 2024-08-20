@@ -2,13 +2,30 @@ import { g } from "./Sketch";
 import Graphics from "./Graphics";
 import { P5CanvasInstance } from "@p5-wrapper/react";
 import { singleBeakerGraphics } from "./Graphics";
+import {
+  MAX_COLD_FLOWRATE,
+  MAX_COLD_WATER_TEMP,
+  MAX_HOT_FLOWRATE,
+  MAX_HOT_WATER_TEMP,
+  MIN_COLD_WATER_TEMP,
+  MIN_HOT_WATER_TEMP,
+  singleBeakerCalculations,
+} from "./Functions";
 // import { event } from "jquery";
 
 const NOT_STARTED = -1;
 const START_ON_RENDER = -2;
 let startAniTime = NOT_STARTED; // Start time of fill animation (ms)
 export const setAnimationTimeNextFrame = () => {
-  startAniTime = START_ON_RENDER;
+  if (startAniTime === NOT_STARTED) {
+    startAniTime = START_ON_RENDER;
+    return true;
+  }
+  return false;
+};
+
+export const setAnimationTimeToNotStarted = () => {
+  startAniTime = NOT_STARTED;
 };
 
 interface SingleTubeGraphicsObjs {
@@ -27,9 +44,11 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
     singleBeakers: undefined,
     pa: undefined,
   };
+  let pinchingColdTube = false;
 
   p.setup = () => {
     p.createCanvas(g.width, g.height);
+    randSingleStartVals();
 
     graphicsObjs.dt = Graphics.doubleTubeGraphic(500, 400, p);
     graphicsObjs.dtb = Graphics.doubleTubeBlue(500, 400, 50, 450, 50, p);
@@ -40,6 +59,7 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
 
   p.draw = () => {
     p.background(250);
+    singleBeakerCalculations(p);
     if (startAniTime === START_ON_RENDER) startAniTime = p.millis();
 
     p.image(graphicsObjs.pa, 400, 450);
@@ -49,6 +69,30 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
     Graphics.fillBeaker(450, 1000, g.orangeFluidColor, p);
 
     singleBeakerFillAnimation(p, graphicsObjs);
+    if (pinchingColdTube) {
+      pinchColdTubeGraphic(p);
+    }
+  };
+
+  p.mousePressed = () => {
+    if (
+      p.mouseX >= 400 &&
+      p.mouseX <= 450 &&
+      p.mouseY >= 370 &&
+      p.mouseY <= 430
+    ) {
+      pinchingColdTube = true;
+      setTimeout(() => {
+        g.mDotC = MAX_COLD_FLOWRATE / 8;
+      }, 1000);
+    }
+  };
+
+  p.mouseReleased = () => {
+    pinchingColdTube = false;
+    setTimeout(() => {
+      g.mDotC = MAX_COLD_FLOWRATE;
+    }, 1000);
   };
 }
 
@@ -115,7 +159,7 @@ function fillSingleOutletTubes(p: P5CanvasInstance, alpha = 200) {
   p.push();
   p.noStroke();
   p.fill(color);
-  p.rect(585, 315, 10, 2751);
+  p.rect(585, 315, 10, 275);
   p.rect(475, 315, 110, 10);
 
   color = g.blueFluidColor.slice();
@@ -139,4 +183,33 @@ function hexCartridgeFillAnimation(
 
   let partBlue = dtb.get(0, 450 - timer, 500, 50 + timer);
   p.image(partBlue, 25, 475 - timer);
+}
+
+function pinchColdTubeGraphic(p: P5CanvasInstance) {
+  p.push();
+  p.noStroke();
+  // p.rect(419, 385, 12, 30);
+
+  p.fill("white");
+  p.triangle(419, 385, 419, 415, 423, 400);
+  p.triangle(431, 385, 431, 415, 427, 400);
+
+  p.stroke("black");
+  p.strokeWeight(2);
+  p.line(420, 385, 423, 400);
+  p.line(420, 415, 423, 400);
+  p.line(430, 385, 427, 400);
+  p.line(430, 415, 427, 400);
+  p.pop();
+}
+
+export function randSingleStartVals() {
+  g.Th_in =
+    Math.random() * (MAX_HOT_WATER_TEMP - MIN_HOT_WATER_TEMP) +
+    MIN_HOT_WATER_TEMP;
+  g.Th_out =
+    Math.random() * (MAX_COLD_WATER_TEMP - MIN_COLD_WATER_TEMP) +
+    MIN_COLD_WATER_TEMP;
+  g.mDotH = MAX_HOT_FLOWRATE;
+  g.mDotC = MAX_COLD_FLOWRATE;
 }

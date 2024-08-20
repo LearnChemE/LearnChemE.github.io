@@ -205,6 +205,13 @@ canvas {
   left: 582px;
 }
 
+#outlet-tubes-anchor {
+  top: 390px;
+  left: 380px;
+  height: 50px;
+  width: 230px;
+}
+
 #reset-modal-footer {
   display: grid;
   grid-template-columns: max-content auto;

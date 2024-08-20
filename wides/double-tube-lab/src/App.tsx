@@ -8,7 +8,12 @@ import {
   ResetModalDialogue,
 } from "./elements/ModalDialogues.tsx";
 // import { StartPumpsButton, MeasureTempsButton } from "./Buttons.tsx";
-import sketch, { togglePumps, g, p5_instance } from "./sketch/Sketch.tsx";
+import sketch, {
+  togglePumps,
+  g,
+  p5_instance,
+  toggleSinglePumps,
+} from "./sketch/Sketch.tsx";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
@@ -16,7 +21,9 @@ import "./App.css";
 import { randStartVals } from "./sketch/Functions.tsx";
 import {
   SingleBeakerSketch,
+  randSingleStartVals,
   setAnimationTimeNextFrame,
+  setAnimationTimeToNotStarted,
 } from "./sketch/SingleBeaker.tsx";
 
 const DOUBLE_BEAKER = 0;
@@ -41,8 +48,14 @@ function App() {
         // this sets a 3 second timer where the button is disabled
         setTimeout(() => setPumpBtnDisabled(false), 3000);
       }
-    } else {
-      setAnimationTimeNextFrame();
+    } else if (canvasMode === SINGLE_BEAKER) {
+      toggleSinglePumps(!pumpsRunning);
+
+      if (setAnimationTimeNextFrame()) {
+        setPumpBtnDisabled(true);
+        // this sets a 3 second timer where the button is disabled
+        setTimeout(() => setPumpBtnDisabled(false), 3000);
+      }
     }
   }
 
@@ -57,7 +70,11 @@ function App() {
     g.vols = [1000, 0, 1000, 0];
     g.orngTime = -1;
     g.blueTime = -1;
-    randStartVals(p5_instance);
+    if (canvasMode === DOUBLE_BEAKER) {
+      randStartVals(p5_instance);
+    } else {
+      randSingleStartVals();
+    }
     setPumpsRunning(false);
     setPumpBtnDisabled(false);
     setMeasured([-1, -1, -1, -1]);
@@ -68,6 +85,8 @@ function App() {
   }
 
   function handleCanvasModeClick() {
+    handleResetClick();
+    setAnimationTimeToNotStarted();
     setCanvasMode(canvasMode === SINGLE_BEAKER ? DOUBLE_BEAKER : SINGLE_BEAKER);
   }
 
@@ -182,8 +201,9 @@ function App() {
           </>
         ) : (
           <>
-            <a className="tooltip-anchor" id="cold`-single-anchor" />
+            <a className="tooltip-anchor" id="cold-single-anchor" />
             <a className="tooltip-anchor" id="hot-single-anchor" />
+            <a className="tooltip-anchor" id="outlet-tubes-anchor" />
           </>
         )}
       </div>
@@ -193,7 +213,11 @@ function App() {
       {AboutModalDialogue}
       <ResetModalDialogue resetVars={() => handleResetClick()} />
 
-      <Tooltips measured={measured} canvasMode={canvasMode} />
+      <Tooltips
+        measured={measured}
+        canvasMode={canvasMode}
+        pumpsAreRunning={pumpsRunning}
+      />
     </>
   );
 }
