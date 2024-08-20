@@ -532,7 +532,7 @@ function rightDisplay() {
 }
 function draw() {
     // console.log('state 1');
-    background(255);
+    background(250);
     drawVar(g.unknowns);
     rightDisplay();
     // updateView();
