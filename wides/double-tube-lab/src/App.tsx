@@ -25,6 +25,7 @@ import {
   setAnimationTimeNextFrame,
   setAnimationTimeToNotStarted,
 } from "./sketch/SingleBeaker.tsx";
+import { SideBar } from "./elements/SideBar.tsx";
 
 const DOUBLE_BEAKER = 0;
 const SINGLE_BEAKER = 1;
@@ -35,6 +36,7 @@ function App() {
   const [measured, setMeasured] = useState([-1, -1, -1, -1]);
   const [isPumpBtnDisabled, setPumpBtnDisabled] = useState(false);
   const [canvasMode, setCanvasMode] = useState(SINGLE_BEAKER);
+  const [showingSideBar, setShowingSideBar] = useState(false);
 
   // start pumps button
   function handlePumpsClick() {
@@ -67,6 +69,7 @@ function App() {
 
   // reset temps button
   function handleResetClick() {
+    console.log("reset");
     g.vols = [1000, 0, 1000, 0];
     g.orngTime = -1;
     g.blueTime = -1;
@@ -74,6 +77,7 @@ function App() {
       randStartVals(p5_instance);
     } else {
       randSingleStartVals();
+      setAnimationTimeToNotStarted();
     }
     setPumpsRunning(false);
     setPumpBtnDisabled(false);
@@ -84,10 +88,11 @@ function App() {
     innerHtml = "start pumps";
   }
 
-  function handleCanvasModeClick() {
+  function handleCanvasModeClick(newMode: number) {
+    if (newMode === canvasMode) return;
     handleResetClick();
     setAnimationTimeToNotStarted();
-    setCanvasMode(canvasMode === SINGLE_BEAKER ? DOUBLE_BEAKER : SINGLE_BEAKER);
+    setCanvasMode(newMode);
   }
 
   let pumpBtnClass: string, icon: string, innerHtml: string;
@@ -103,7 +108,13 @@ function App() {
 
   return (
     <>
-      <button onClick={() => handleCanvasModeClick()}>mode</button>
+      <SideBar
+        showing={showingSideBar}
+        onClose={() => setShowingSideBar(false)}
+        selected={canvasMode}
+        toggleSelected={(selected) => handleCanvasModeClick(selected)}
+        onResetClick={() => handleResetClick()}
+      />
       <div className="buttons-container" id="modal-buttons-container">
         <button
           type="button"
@@ -174,6 +185,18 @@ function App() {
         </div>
         <div id="nav-bar-right">
           <button
+            id="menu-btn"
+            className="btn btn-secondary"
+            onClick={() =>
+              setShowingSideBar((showingSideBar) => !showingSideBar)
+            }
+          >
+            <div>
+              <i className="fa-solid fa-bars" />
+              &nbsp;&nbsp;menu
+            </div>
+          </button>
+          {/* <button
             id="beakers-btn"
             className="btn btn-outline-danger"
             data-bs-toggle="modal"
@@ -181,7 +204,7 @@ function App() {
             // onClick={() => handleResetClick()}
           >
             reset beakers
-          </button>
+          </button> */}
         </div>
       </div>
 
