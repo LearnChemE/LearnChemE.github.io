@@ -30,16 +30,18 @@
                     <div class="btn-group btn-group-sm" id="condenser-type">
                         <input type="radio" class="btn-check" name="condbtn" id="partial" autocomplete="off"
                             value="partial" checked>
-                        <label class="btn btn-outline-primary" for="partial" style="margin-right: 0px">partial</label>
+                        <label class="btn btn-outline-primary" for="partial" style="margin-right: 0px">partial
+                            condenser</label>
 
                         <input type="radio" class="btn-check" name="condbtn" id="total" autocomplete="off"
                             value="total">
-                        <label class="btn btn-outline-primary" for="total">total</label>
+                        <label class="btn btn-outline-primary" for="total">total condenser</label>
                     </div>
                     <!-- Unknowns slider -->
-                    <div class="balance">
+                    <div class="balance" id="textB">
 
                         <div class="btn-group btn-group-sm" id="speciesBrep">
+                            species B representation:
                             <input type="radio" class="btn-check" name="btnradio" id="equationB" autocomplete="off"
                                 value="equationB" checked>
                             <label class="btn btn-outline-primary" for="equationB"
@@ -51,6 +53,7 @@
                         </div>
 
                         <div class="select-row">
+                            <div class="balance-type">balance on:</div>
                             <select id="isotype">
                                 <option value="condenser">condenser</option>
                                 <option value="reboiler">reboiler</option>
@@ -58,7 +61,7 @@
                                 <option value="overall">overall</option>
                             </select>
 
-                            <button type="button" id="shuffle-btn" class="btn btn-outline-danger">New Problem</button>
+                            <button type="button" id="shuffle-btn" class="btn btn-outline-danger">new problem</button>
                         </div>
 
                     </div>
