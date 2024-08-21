@@ -1,34 +1,26 @@
 const DOUBLE_TUBE = 0;
 const SHELL_TUBE = 1;
-const MAX_HOT_WATER_TEMP = 50;
-const MIN_HOT_WATER_TEMP = 30;
-const MAX_COLD_WATER_TEMP = 25;
-const MIN_COLD_WATER_TEMP = 10;
-const MAX_FLOWRATE = 25;
-const MIN_FLOWRATE = 2;
+const MAX_HOT_WATER_TEMP = 59.2;
+const MIN_HOT_WATER_TEMP = 46.6;
+const MAX_COLD_WATER_TEMP = 26.6;
+const MIN_COLD_WATER_TEMP = 20.2;
+const MAX_HOT_FLOWRATE = 19.5;
+const MIN_HOT_FLOWRATE = 3.5;
+const MAX_COLD_FLOWRATE = 21.6;
+const MIN_COLD_FLOWRATE = 16.3;
 
+/* ************************************************************************* */
+/* ** This file holds the main P5 draw loop, window globals, and settings ** */
+/* ************************************************************************* */
+
+// Globals defined here
 window.g = {
     cnv: undefined,
     width: 800,
     height: 640,
-    state: 1,
 
-    name: '',
-
-    playS1: false,
-    s1time: 0,
-    s1measure: -1,
-    animationStartTime: 0,
-
-    orngTime: -1,
+    orngTime: -1, // -1 means it's not running, will be replaced by millis() once pumps are started
     blueTime: -1,
-
-    // dT1selected: false,
-    // dT2selected: false,
-    // showLmtd: false,
-
-    // s3select: -1,
-    // s3measure: [-1, -1, -1, -1],
 
     orangeFluidColor: [255, 50, 0, 200],
     blueFluidColor: [0, 80, 255, 180],
@@ -38,33 +30,24 @@ window.g = {
     mDotC: 2, // g / s
     mDotH: 1, // g / s
 
-    UA: 10, // W / K
-    // eU: 10,
+    vols: [1000, 0, 1000, 0], // Beakers always follow order [Th_in, Th_out, Tc_in, Tc_out]
+    hIsFlowing: false, // These are separate because the simulation used to have you start them separately
+    cIsFlowing: false, // I'll leave it in like this in case that ever changes again
 
-    vols: [1000, 0, 1000, 0],
-    hIsFlowing: false,
-    cIsFlowing: false,
-
-    Th_in: 40.0,
+    Th_in: 40.0, // These values are overridden by the randStartVals function
     Tc_in: 10.0,
     Th_out: 40,
     Tc_out: 10,
-    Th_out_observed: 25,
-    Tc_out_observed: 25,
+    Th_out_observed: 25, // These values are the starting observed beaker values...
+    Tc_out_observed: 25, // The beakers are integrated over the pump run time and display the average temperature over time
 
     T_measured: [-1, -1, -1, -1],
 
-    lmtd: 26,
-    Qdot: 0,
-
-    dragging1: false,
+    dragging1: false, // These are for the valves, they become true on click in the buttons.js
     dragging2: false,
 }
 
-function preload() {
-    font = loadFont('assets/Ubuntu-R.ttf');
-}
-
+// Setup is called when the p5 object is initialized
 function setup() {
     g.cnv = createCanvas(g.width, g.height);
     g.cnv.parent("graphics-wrapper");
@@ -88,37 +71,14 @@ function setup() {
     $("#ci-tooltip").tooltip(options);
     $("#co-tooltip").tooltip(options);
 
-    textFont(font);
     randStartVals();
 }
 
+// Called every frame of the p5 animation
 function draw() {
-    // console.log((1000 / deltaTime).toFixed(1));
+    // console.log((1000 / deltaTime).toFixed(1)); // Track frametime
     background(250);
-    // labels.clear();
 
-    heatTransferRate();
-    drawAll();
+    heatTransferRate(); // calculations
+    drawAll(); // graphics
 }
-
-function drag() {
-    if (mouseIsPressed) {
-        if (mouseX > 0 && mouseX < width &&
-            mouseY > 0 && mouseY < height) {
-
-            let dx = (mouseX - pmouseX) / width / 2;
-            let dy = (mouseY - pmouseY) / height / 2;
-
-            g.rotTargX += dx; g.rotTargX = constrain(g.rotTargX, -.5, .5);
-            g.rotTargY += dy; g.rotTargY = constrain(g.rotTargY, -.5, .5);
-        }
-    }
-    else {
-        g.rotTargX = 0;
-        g.rotTargY = 0;
-    }
-
-    g.rotX = lerp(g.rotX, g.rotTargX, .1);
-    g.rotY = lerp(g.rotY, g.rotTargY, .1);
-}
-

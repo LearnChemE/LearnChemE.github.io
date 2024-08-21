@@ -1,0 +1,275 @@
+.root {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+}
+
+body {
+  padding: 0.5em;
+}
+
+input {
+  cursor: pointer;
+}
+
+.graphics-wrapper {
+  position: relative;
+  width: max-content;
+  margin: auto;
+  padding: 0.5em;
+}
+
+canvas {
+  border: 1px solid black;
+  box-shadow: 0px 0px 1px 1px grey;
+}
+
+.nav-bar {
+  display: grid;
+  margin: auto;
+  grid-template-columns: 200px 400px 200px;
+  justify-content: center;
+  align-items: center;
+  justify-items: center;
+  width: 800px;
+}
+
+.nav-bar-column {
+  display: grid;
+  margin: auto;
+  width: fit-content;
+  justify-items: left;
+}
+
+.nav-bar-center {
+  display: grid;
+  grid-template-columns: 150px 200px;
+  gap: 10px;
+  padding: 2px;
+}
+
+#modal-buttons-container {
+  display: grid;
+  margin: auto;
+  padding: 5px;
+  gap: 10px;
+  grid-template-columns: 100px 100px 100px;
+  width: max-content;
+}
+
+.close {
+  background-color: white;
+  border: none;
+}
+
+.modal-header {
+  justify-content: space-between;
+}
+
+.buttons-container {
+  display: grid;
+  padding: 5px;
+  grid-template-columns: 100px 100px 100px;
+  justify-content: center;
+  align-items: center;
+  gap: 0px 20px;
+  width: inherit;
+}
+
+#hex-btn-container {
+  grid-template-columns: 100px 100px;
+  justify-self: center;
+  gap: 20px;
+}
+
+.slider-wrapper {
+  display: grid;
+  justify-self: baseline;
+  justify-content: center;
+  align-items: end;
+  grid-template-columns: max-content 150px 20px;
+  margin-left: 1.5em;
+  margin-bottom: 5px;
+  gap: 10px;
+}
+
+#time-wrapper {
+  display: grid;
+  grid-template-columns: 300px 40px 40px;
+  gap: 5px;
+  align-items: center;
+
+  #progress-bar {
+    width: 300px;
+  }
+}
+
+.controls-wrapper {
+  display: grid;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+#input-name {
+  width: 250px;
+  left: 300px;
+  top: 180px;
+}
+
+#calc-lmtd-btn {
+  position: absolute;
+  width: max-content;
+  left: 550px;
+  top: 220px;
+}
+
+.hidden,
+.btn.hidden,
+#time-wrapper.hidden,
+.close-btns-wrapper.hidden {
+  display: none;
+}
+
+.close-btns-wrapper {
+  display: grid;
+  grid-template-columns: max-content max-content max-content max-content;
+  gap: 5px;
+}
+
+#pump-btns {
+  grid-template-columns: 150px 200px;
+  gap: 15px;
+
+  .btn {
+    position: relative;
+    gap: 0px;
+    /* left: -15px */
+  }
+}
+
+.modal-titles-container {
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+  gap: 20px;
+}
+
+.vl {
+  border-left: 1px solid rgb(85, 85, 85);
+  height: 40px;
+}
+
+.hl {
+  border-bottom: 2px solid rgb(21, 76, 255);
+  width: auto;
+}
+
+.btn-light {
+  background-color: white;
+  border-color: white;
+}
+
+.tooltip-anchor {
+  position: absolute;
+  /* background-color: yellow; */
+  top: 450px;
+  width: 126px;
+  height: 155px;
+}
+
+#hi-anchor {
+  left: 85px;
+}
+
+#ho-anchor {
+  left: 247px;
+}
+
+#ci-anchor {
+  left: 410px;
+}
+
+#co-anchor {
+  left: 584px;
+}
+
+#cold-single-anchor {
+  left: 384px;
+}
+#hot-single-anchor {
+  left: 582px;
+}
+
+#outlet-tubes-anchor {
+  top: 390px;
+  left: 380px;
+  height: 50px;
+  width: 230px;
+}
+
+#reset-modal-footer {
+  display: grid;
+  grid-template-columns: max-content auto;
+  align-items: end;
+  justify-content: space-between;
+}
+
+/* The side navigation menu */
+.sidebar {
+  display: grid;
+  grid-template-rows: repeat(auto-fit, 3em);
+  height: 100%; /* 100% Full-height */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  right: 0;
+  background-color: #eff0f5; /* Black*/
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 60px; /* Place content 60px from the top */
+  transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+}
+
+.sidebar .btn-close {
+  justify-self: right;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidebar-item:hover {
+  background-color: #cecece;
+  cursor: pointer;
+}
+
+.sidebar-item {
+  grid-template-columns: repeat(auto-fit, 3em);
+  padding: 8px 8px 8px 8px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 18px;
+  color: #000000;
+  /* display: block; */
+  transition: 0.3s;
+}
+
+.sidebar-item.vl {
+  border-left: 3px solid rgb(35, 112, 255);
+  height: fit-content;
+}
+
+@media (min-width: 768px) {
+  /* .modal-l {
+      width: 80%;
+      max-width: 1000px;
+  } */
+
+  .modal-xl {
+    width: 70%;
+    max-width: 1200px;
+  }
+
+  .sidebar {
+    padding-top: 15px;
+  }
+  .sidebar a {
+    font-size: 18px;
+  }
+}

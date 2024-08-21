@@ -1,0 +1,1 @@
+This is an outdated version of the double-tube WIDE made by Drew Smith. The updated version can now be found in the wides/ directory and is now adapted as a React TypeScript project. This source code will be deleted once the full virtual lab is published.
