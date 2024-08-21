@@ -14,18 +14,36 @@ export const DirectionsModalDialogue = () => {
     switch (selection) {
       case DIRECTIONS:
         innerHtml = (
-          <div className="modal-body-content">
-            This digital lab, which represents a double pipe heat exchanger with
-            countercurrent flow, is designed to be used with this{" "}
-            <a href="./ME_DoublePipe-Worksheet_2020-2021_Final.pdf" download>
-              worksheet
-            </a>
-            . Drag the valves on each inlet beaker to set flowrates, and then
-            use the button at the top to start the pumps. To measure
-            temperatures, stop the pumps and press the "measure temperatures"
-            button, then hover your mouse over each beaker to read the
-            temperature.
-          </div>
+          <>
+            <div className="modal-body-content">
+              <h6>Double-beaker setup</h6>
+              <p>
+                This digital lab, which represents a double pipe heat exchanger
+                with countercurrent flow, is designed to be used with this{" "}
+                <a
+                  href="./ME_DoublePipe-Worksheet_2020-2021_Final.pdf"
+                  download
+                >
+                  worksheet
+                </a>
+                . Drag the valves on each inlet beaker to set flowrates, and
+                then use the button at the top to start the pumps. To measure
+                temperatures, stop the pumps and press the "measure
+                temperatures" button, then hover your mouse over each beaker to
+                read the temperature.
+              </p>
+              <h6>Single-beaker setup</h6>
+              <p>
+                Measure the temperatures of the beakers by clicking the "measure
+                temperatures" button then hovering over each beaker. Start the
+                pumps using the "start pumps" button, then hover your mouse over
+                the outlet tubes to measure the hot fluid's outlet temperature.
+                Click and hold on the cold inlet tube to pinch it, lowering the
+                flowrate of the cold fluid. Measure the effect of this on the
+                hot outlet tube.
+              </p>
+            </div>
+          </>
         );
         break;
       case WORKSHEET:
@@ -277,48 +295,3 @@ export const DirectionsModalDialogue = () => {
       </div>
     );
   };
-//   WorksheetModalDialogue = (
-//     <div
-//       className="modal fade"
-//       id="wksht-modal"
-//       tabIndex={-1}
-//       role="dialog"
-//       aria-labelledby="wkshtModalLabel"
-//       aria-hidden="true"
-//     >
-//       <div className="modal-dialog modal-xl" role="document">
-//         <div className="modal-content">
-//           <div className="modal-header">
-//             <h5 className="modal-title" id="wkshtModalLabel">
-//               Lab worksheet
-//             </h5>
-//             <button
-//               type="button"
-//               className="close"
-//               data-bs-dismiss="modal"
-//               aria-label="Close"
-//             >
-//               <span aria-hidden="true">&times;</span>
-//             </button>
-//           </div>
-//           <div className="modal-body">
-//             <embed
-//               src="assets/ME_DoublePipe-Worksheet_2020-2021_Final.pdf"
-//               width="100%"
-//               height="800px"
-//             />
-//           </div>
-//           <div className="modal-footer" id="reset-modal-footer">
-//             <button
-//               type="button"
-//               id="close-btn"
-//               className="btn btn-secondary btn-sm"
-//               data-bs-dismiss="modal"
-//             >
-//               Close
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
