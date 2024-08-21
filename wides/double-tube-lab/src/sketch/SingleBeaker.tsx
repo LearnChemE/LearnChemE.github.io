@@ -71,6 +71,14 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
     singleBeakerFillAnimation(p, graphicsObjs);
     if (pinchingColdTube) {
       pinchColdTubeGraphic(p);
+    } else {
+      p.push();
+      p.noFill();
+      p.drawingContext.setLineDash([10, 10]);
+      p.stroke("green");
+      p.strokeWeight(2);
+      p.rect(400, 370, 50, 60);
+      p.pop();
     }
   };
 
