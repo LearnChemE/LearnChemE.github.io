@@ -31,3 +31,7 @@ export const g = {
   dragging1: false, // These are for the valves, they become true on click in the buttons.js
   dragging2: false,
 };
+
+const ShellTubeSketch = () => {};
+
+export default ShellTubeSketch;
