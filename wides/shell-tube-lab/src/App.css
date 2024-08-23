@@ -1,0 +1,47 @@
+.root {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+}
+
+.graphics-wrapper {
+  position: relative;
+  width: max-content;
+  margin: auto;
+  padding: 0.5em;
+}
+
+canvas {
+  border: 1px solid black;
+  box-shadow: 0px 0px 1px 1px grey;
+}
+
+.nav-bar {
+  display: grid;
+  margin: auto;
+  grid-template-columns: 200px 400px 200px;
+  justify-content: center;
+  align-items: center;
+  justify-items: center;
+  width: 800px;
+}
+
+.nav-bar-center {
+  display: grid;
+  grid-template-columns: 150px 200px;
+  gap: 10px;
+  padding: 2px;
+}
+
+#modal-buttons-container {
+  display: grid;
+  margin: auto;
+  padding: 5px;
+  gap: 10px;
+  grid-template-columns: 100px 100px 100px;
+  width: max-content;
+}
+
+.close {
+  background-color: white;
+  border: none;
+}
