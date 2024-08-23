@@ -45,3 +45,77 @@ canvas {
   background-color: white;
   border: none;
 }
+
+/* The side navigation menu */
+.sidebar {
+  display: grid;
+  grid-template-rows: 3em 3em 3em max-content 3em;
+  height: 100%; /* 100% Full-height */
+  position: fixed; /* Stay in place */
+  z-index: 2; /* Stay on top */
+  top: 0; /* Stay at the top */
+  right: 0;
+  /* background-color: #444444; Black */
+  color: rgb(0, 0, 0);
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 60px; /* Place content 60px from the top */
+  transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+  background-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.4),
+      rgba(255, 255, 255, 1)
+    ),
+    url("./Flatirons_Winter_Sunrise-scaled.jpg");
+
+  .btn-close {
+    justify-self: right;
+    margin-right: 30px;
+  }
+  #modal-buttons-container {
+    display: grid;
+    grid-row-start: 1;
+    grid-template-rows: auto auto auto;
+    grid-template-columns: none;
+    /* margin: 0px; */
+  }
+
+  .nav-bar {
+    grid-template-rows: auto auto auto;
+    grid-template-columns: none;
+    /* grid-row-start: 2; */
+    width: 150px;
+    /* margin: 0px; */
+    height: max-content;
+    gap: 10px;
+    /* justify-items: end; */
+    padding: 5px;
+    .nav-bar-center {
+      grid-template-columns: none;
+      /* padding: 0px; */
+    }
+    #menu-btn {
+      display: none;
+    }
+  }
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidebar-item:hover {
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.sidebar-item {
+  height: 50px;
+  padding: 8px 8px 8px 8px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 18px;
+  /* display: block; */
+  transition: 0.3s;
+}
+
+.sidebar-item.vl {
+  border-left: 3px solid rgb(35, 112, 255);
+  height: fit-content;
+}
