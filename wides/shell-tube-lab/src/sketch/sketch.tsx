@@ -1,3 +1,6 @@
+import { P5CanvasInstance } from "@p5-wrapper/react";
+import Graphics from "./graphics";
+
 // Globals defined here
 export const g = {
   cnv: undefined,
@@ -32,6 +35,15 @@ export const g = {
   dragging2: false,
 };
 
-const ShellTubeSketch = () => {};
+// Sketch for P5 Wrapper
+const ShellTubeSketch = (p: P5CanvasInstance) => {
+  p.setup = () => {
+    p.createCanvas(g.width, g.height);
+    p.shellTubeGraphic = Graphics.createShellTubeGraphic(p);
+  };
+  p.draw = () => {
+    p.image(p.shellTubeGraphic, 75, 75);
+  };
+};
 
 export default ShellTubeSketch;
