@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import Controls from "./elements/Controls";
 import SideBar from "./elements/SideBar";
 import { ReactP5Wrapper } from "@p5-wrapper/react";
-import ShellTubeSketch from "./sketch/sketch";
+import ShellTubeSketch, { g } from "./sketch/sketch";
 import {
   DirectionsModalDialogue,
   DetailsModalDialogue,
@@ -23,8 +23,12 @@ function App() {
   const [sideBarIsShowing, setSideBarShowing] = useState(false);
 
   // Event handlers
-  const pumpBtnHandler = () => {};
-  const measureBtnHandler = () => {};
+  const pumpBtnHandler = () => {
+    setPumpsAreRunning((pumpsAreRunning) => !pumpsAreRunning);
+  };
+  const measureBtnHandler = () => {
+    setMeasured([g.Th_in, g.Th_out, g.Tc_in, g.Tc_out]);
+  };
   const resetBtnHandler = () => {};
 
   // Wrapper for Controls to keep the hooks the same
