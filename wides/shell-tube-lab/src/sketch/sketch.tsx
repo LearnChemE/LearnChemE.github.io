@@ -1,5 +1,5 @@
 import { P5CanvasInstance } from "@p5-wrapper/react";
-import Graphics from "./graphics";
+import createGraphicsObjects, { graphicsObjects } from "./graphics";
 
 // Globals defined here
 export const g = {
@@ -37,12 +37,21 @@ export const g = {
 
 // Sketch for P5 Wrapper
 const ShellTubeSketch = (p: P5CanvasInstance) => {
+  let graphics: graphicsObjects;
+
   p.setup = () => {
     p.createCanvas(g.width, g.height);
-    p.shellTubeGraphic = Graphics.createShellTubeGraphic(p);
+    graphics = createGraphicsObjects(p); // Load graphics objects
   };
+
   p.draw = () => {
-    p.image(p.shellTubeGraphic, 75, 75);
+    p.background(250);
+    p.image(graphics.shellTube, 75, 75);
+    p.image(graphics.orngShellTube, 75, 75);
+    p.image(graphics.blueShellTube, 75, 75);
+    p.image(graphics.beakersAndTubes, 0, 0);
+
+    for (let i = 0; i < 4; i++) p.image(graphics.tubes[i], 0, 0);
   };
 };
 
