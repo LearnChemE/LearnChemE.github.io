@@ -46,12 +46,13 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
 
   p.draw = () => {
     p.background(250);
+
+    for (let i = 0; i < 4; i++) p.image(graphics.tubes[i], 0, 0);
+
+    p.image(graphics.beakersAndTubes, 0, 0);
     p.image(graphics.shellTube, 75, 75);
     p.image(graphics.orngShellTube, 75, 75);
     p.image(graphics.blueShellTube, 75, 75);
-    p.image(graphics.beakersAndTubes, 0, 0);
-
-    for (let i = 0; i < 4; i++) p.image(graphics.tubes[i], 0, 0);
   };
 };
 

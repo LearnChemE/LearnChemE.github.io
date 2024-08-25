@@ -14,19 +14,19 @@ const shellTubeBlueVertices = [[60, 5],[110, 5],[110, 230],[115, 230],[115, 5],[
 const hiTubeVertices = [[80, 430],[80, 405],[35, 405],[35, 35],[100, 35],[100, 75],[110, 75],[110, 25],[25, 25],[25, 415],[70, 415],[70, 430],];
 // prettier-ignore
 const hoTubeVertices = [[260, 430],[260, 400],[100, 400],[100, 375],[110, 375],[110, 390],[270, 390],[270, 430],];
-// prettier
-const ciTubeVertices = [[0, 0]];
-// prettier
-const coTubeVertices = [[0, 0]];
+// prettier-ignore
+const ciTubeVertices = [[440, 430],[440, 375],[440, 75],[440, 35],[165, 35],[165, 75],[155, 75],[155, 25],[450, 25],[450, 75],[450, 375],[450, 430],];
+// prettier-ignore
+const coTubeVertices = [[620, 430],[620, 400],[485, 400],[485, 375],[495, 375],[495, 390],[630, 390],[630, 430],];
 
 function createShellTubeGraphic(p: P5CanvasInstance) {
   const width = 475,
     height = 300;
   let st = p.createGraphics(width, height);
   st.push();
-  st.noFill();
   st.strokeWeight(3);
   st.rect(0, 0, width, height); // outline
+  st.noFill();
   st.strokeWeight(2);
 
   // orange
@@ -178,12 +178,25 @@ function createTubeFluidGraphic(
   return hi;
 }
 
+function createValveGraphic(p: P5CanvasInstance) {
+  let v = p.createGraphics(50, 50);
+  v.push();
+  v.fill("blue");
+  v.stroke("black");
+  v.strokeWeight(2);
+  v.circle(25, 25, 48);
+  v.rect(18, 0, 14, 50);
+  v.pop();
+  return v;
+}
+
 export interface graphicsObjects {
   shellTube: any;
   orngShellTube: any;
   blueShellTube: any;
   beakersAndTubes: any;
   tubes: any[];
+  valve: any;
 }
 export default function createGraphicsObjects(
   p: P5CanvasInstance
@@ -196,17 +209,11 @@ export default function createGraphicsObjects(
     tubes: [
       createTubeFluidGraphic(p, hiTubeVertices, ORANGE_FLUID_COLOR),
       createTubeFluidGraphic(p, hoTubeVertices, ORANGE_FLUID_COLOR),
-      createTubeFluidGraphic(p, ciTubeVertices, ORANGE_FLUID_COLOR),
-      createTubeFluidGraphic(p, coTubeVertices, ORANGE_FLUID_COLOR),
+      createTubeFluidGraphic(p, ciTubeVertices, BLUE_FLUID_COLOR),
+      createTubeFluidGraphic(p, coTubeVertices, BLUE_FLUID_COLOR),
     ],
+    valve: createValveGraphic(p),
   };
 
   return g;
 }
-
-export {
-  createShellTubeGraphic,
-  createOrngShellTubeGraphic,
-  createBlueShellTubeGraphic,
-  createBeakersAndTubesGraphic,
-};
