@@ -13,11 +13,11 @@ const shellTubeBlueVertices = [[60, 5],[110, 5],[110, 230],[115, 230],[115, 5],[
 // prettier-ignore
 const hiTubeVertices = [[80, 430],[80, 405],[35, 405],[35, 35],[100, 35],[100, 75],[110, 75],[110, 25],[25, 25],[25, 415],[70, 415],[70, 430],];
 // prettier-ignore
-const hoTubeVertices = [[260, 430],[260, 400],[100, 400],[100, 375],[110, 375],[110, 390],[270, 390],[270, 430],];
+const hoTubeVertices = [[260, 620],[260, 400],[100, 400],[100, 375],[110, 375],[110, 390],[270, 390],[270, 620],];
 // prettier-ignore
 const ciTubeVertices = [[440, 430],[440, 375],[440, 75],[440, 35],[165, 35],[165, 75],[155, 75],[155, 25],[450, 25],[450, 75],[450, 375],[450, 430],];
 // prettier-ignore
-const coTubeVertices = [[620, 430],[620, 400],[485, 400],[485, 375],[495, 375],[495, 390],[630, 390],[630, 430],];
+const coTubeVertices = [[620, 620],[620, 400],[485, 400],[485, 375],[495, 375],[495, 390],[630, 390],[630, 620],];
 
 function createShellTubeGraphic(p: P5CanvasInstance) {
   const width = 475,
@@ -190,6 +190,28 @@ function createValveGraphic(p: P5CanvasInstance) {
   return v;
 }
 
+function pumpAssembly(p: P5CanvasInstance) {
+  let pa = p.createGraphics(50, 150);
+  pa.push();
+
+  pa.push();
+  pa.fill(0);
+  pa.rect(10, 120, 30, 30);
+  pa.rect(20, 110, 10, 10);
+  pa.pop();
+
+  pa.push();
+  pa.stroke("black");
+  pa.strokeWeight(3);
+  pa.noFill();
+  pa.line(17, 120, 17, 0);
+  pa.line(32, 120, 32, 0);
+  pa.pop();
+
+  pa.pop();
+  return pa;
+}
+
 export interface graphicsObjects {
   shellTube: any;
   orngShellTube: any;
@@ -197,6 +219,7 @@ export interface graphicsObjects {
   beakersAndTubes: any;
   tubes: any[];
   valve: any;
+  pumpAssembly: any;
 }
 export default function createGraphicsObjects(
   p: P5CanvasInstance
@@ -213,6 +236,7 @@ export default function createGraphicsObjects(
       createTubeFluidGraphic(p, coTubeVertices, BLUE_FLUID_COLOR),
     ],
     valve: createValveGraphic(p),
+    pumpAssembly: pumpAssembly(p),
   };
 
   return g;

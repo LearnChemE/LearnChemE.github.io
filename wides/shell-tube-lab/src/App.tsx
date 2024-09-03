@@ -24,6 +24,12 @@ function App() {
 
   // Event handlers
   const pumpBtnHandler = () => {
+    if (g.startTime === -1) {
+      // startTime === NOT_STARTED
+      g.startTime = -2; // START_NEXT_FRAME
+    }
+    g.hIsFlowing = !pumpsAreRunning;
+    g.cIsFlowing = !pumpsAreRunning;
     setPumpsAreRunning((pumpsAreRunning) => !pumpsAreRunning);
   };
   const measureBtnHandler = () => {

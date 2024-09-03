@@ -17,14 +17,14 @@ const CONDUCTIVITY_HOT_WATER = 0.6435; // W / m / K
 const HEX_AREA = 109; // cm2
 
 // Flowrates
-export const MAX_HOT_WATER_TEMP = 59.2;
-export const MIN_HOT_WATER_TEMP = 46.6;
-export const MAX_COLD_WATER_TEMP = 26.6;
-export const MIN_COLD_WATER_TEMP = 20.2;
-export const MAX_HOT_FLOWRATE = 19.5;
-export const MIN_HOT_FLOWRATE = 3.5;
-export const MAX_COLD_FLOWRATE = 21.6;
-export const MIN_COLD_FLOWRATE = 16.3;
+export const MAX_HOT_WATER_TEMP = 45.0;
+export const MIN_HOT_WATER_TEMP = 45.0;
+export const MAX_COLD_WATER_TEMP = 25.0;
+export const MIN_COLD_WATER_TEMP = 25.0;
+export const MAX_HOT_FLOWRATE = 36.0;
+export const MIN_HOT_FLOWRATE = 33.0;
+export const MAX_COLD_FLOWRATE = 26.0;
+export const MIN_COLD_FLOWRATE = 23.0;
 
 /* ********************************************************************* */
 /* ** This file holds calculations for heat transfer and outlet temps ** */
@@ -86,12 +86,20 @@ function calcHeatTransferRate() {
 
 // Calculate H value for shell side heat transfer
 function calcShellHValue() {
+  let Re: number;
+  let Nu: number;
   return -1;
 }
 
 // Calculate H value for tube side heat transfer
 function calcTubeHValue() {
-  return -1;
+  let Re: number = calcTubeRe();
+  let Nu: number = 0.023 * Re ** 0.8 * PR_HOT ** (1 / 3);
+  return (Nu * CONDUCTIVITY_HOT_WATER) / INNER_TUBE_DIAMETER;
+}
+
+function calcTubeRe() {
+  return (g.mDotH * INNER_TUBE_DIAMETER) / DYNAMIC_VISCOSITY_H;
 }
 
 // Change the volumes each frame based on the deltaTime
