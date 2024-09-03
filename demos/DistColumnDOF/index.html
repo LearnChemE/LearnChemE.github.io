@@ -78,9 +78,9 @@
         </div>
         <div class="input-area">
             <div class="input-row" id="label1">
-                <div class="input-label">Total Number of Unknowns</div>
+                <div class="input-label">total number of unknowns</div>
                 <input type="range" id="unknown" min="1" max="13" value="1" step="1" />
-                <div id="unknown-label" class="value-label">1</div>
+                <div id="unknown-label" details="value-label">1</div>
             </div>
         </div>
 
@@ -105,6 +105,23 @@
                 </div>
                 <div class="modal-body">
                     <p>
+                        In this simulation, a degree-of-freedom analysis is performed on a distillation process to
+                        determine whether the system has sufficient information to solve for the unknown variables. Use
+                        buttons to select the unit on which to do mass balances (distillation column, condenser, or
+                        reboiler) or to do a balance on the overall system. When “condenser” is selected, use buttons to
+                        select “partial condenser” or “total condenser”. Set the “total number of unknowns” with the
+                        slider; unknown variables are colored blue on the diagram and known variables are black. The
+                        known variables are selected randomly, and they change when you click the “new problem” button.
+                        Use buttons to select how species B is represented: as z<sub>B</sub> or as 1 – z<sub>A</sub>;
+                        the degree-of-freedom
+                        analysis is different for each representation. An explanation of the analysis is shown on the
+                        right. For zero degrees of freedom, the balances are solvable. The system is overspecified if it
+                        has more equations than unknowns and it is underspecified if it has more unknowns than
+                        equations. For a reboiler, the equilibrium ratio K<sub>r</sub>, is known, and for a partial
+                        condenser the
+                        equilibrium ratio K<sub>c</sub> is known. Temperatures and pressures are known for this
+                        analysis. Mass
+                        balances and phase equilibrium relations are solved to determine the unknown variables.
                         When solving material balances for this distillation process, use the dropdown menu to start
                         with a unit that has zero degrees of freedom or start with the complete system if it has zero
                         degrees of freedom. Then, do
@@ -129,24 +146,17 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        In this simulation, a degree-of-freedom analysis is performed on a distillation process to
-                        determine whether the system has sufficient information to solve for the unknown variables. Use
-                        buttons to select the unit on which to do mass balances (distillation column, condenser, or
-                        reboiler) or to do a balance on the overall system. When “condenser” is selected, use buttons to
-                        select “partial condenser” or “total condenser”. Set the “total number of unknowns” with the
-                        slider; unknown variables are colored blue on the diagram and known variables are black. The
-                        known variables are selected randomly, and they change when you click the “new problem” button.
-                        Use buttons to select how species B is represented: as z<sub>B</sub> or as 1 – z<sub>A</sub>;
-                        the degree-of-freedom
-                        analysis is different for each representation. An explanation of the analysis is shown on the
-                        right. For zero degrees of freedom, the balances are solvable. The system is overspecified if it
-                        has more equations than unknowns and it is underspecified if it has more unknowns than
-                        equations. For a reboiler, the equilibrium ratio K<sub>r</sub>, is known, and for a partial
-                        condenser the
-                        equilibrium ratio K<sub>c</sub> is known. Temperatures and pressures are known for this
-                        analysis. Mass
-                        balances and phase equilibrium relations are solved to determine the unknown variables.
+                        These screencasts have examples of degree of freedom analysis.:
                     </p>
+                    <p> Degree of Freedom Analysis on a Single Unit [Video]. (Nov 14, 2011) <a
+                            href="https://www.youtube.com/watch?v=6Rx2ry1P6ME"
+                            target="_blank">www.youtube.com/watch?v=6Rx2ry1P6ME.</a>
+                    </p>
+                    <p> Multiple Unit Material Balance: Degree of Freedom Analysis [Video]. (Oct 30, 2013) <a
+                            href="https://www.youtube.com/watch?v=JfD5iyoKD8w"
+                            target="_blank">www.youtube.com/watch?v=JfD5iyoKD8w.</a>
+                    </p>
+
 
 
                 </div>
@@ -167,18 +177,21 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        This simulation was created in the <a href="https://www.colorado.edu/chbe"
-                            target="_blank">Department of
-                            Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
-                            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Rachael Baumann under
-                        the direction of
-                        Professor John L. Falconer and was converted to HTML5 by Vlad Denisenkov. This simulation was
-                        prepared with financial support from the
-                        National Science Foundation. Address any questions or comments to learncheme@gmail.com. All of
-                        our
-                        simulations are open source, and are available on our <a
-                            href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
-                            repository</a>.</p>
+                        This simulation was created in the Department of <a href="https://www.colorado.edu/chbe"
+                            target="_blank">Chemical and Biological Engineering</a>, at
+                        University of Colorado Boulder for <a href="https://learncheme.com/ "
+                            target="_blank">LearnChemE.com </a>by
+                        Vladislav Denisenkov under the direction of
+                        Professor John L. Falconer. It is a JavaScript/HTML5 implementation of a Mathematica simulation
+                        <a href="https://demonstrations.wolfram.com/DegreeOfFreedomAnalysisOnADistillationProcess/"
+                            target="_blank">(https://demonstrations.wolfram.com/DegreeOfFreedomAnalysisOnADistillationProcess/)</a>
+                        by Rachael
+                        L. Baumann. This simulation was prepared with financial support from the National Science
+                        Foundation. Address any questions or comments to LearnChemE@gmail.com. Our simulations are open
+                        source at <a href="https://github.com/LearnChemE/LearnChemE.github.io/"
+                            target="_blank">LearnChemE GitHub</a>
+                        repository.
+                    </p>
                     <p style="line-height: 3rem;">
                         If this simulation is too big for your screen, zoom out using&nbsp;<span><img
                                 src="https://learncheme.github.io/media/command.png"

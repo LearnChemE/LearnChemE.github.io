@@ -52,11 +52,11 @@
         style="max-width: 700px; min-width: 400px;">
         <div class="d-flex flex-row justify-content-evenly align-items-center mb-0 w-100">
           <label class="form-label me-2 my-auto" for="N2_moles">\(\text{N}_2:\)</label>
-          <input type="range" class="form-range me-2 my-auto" id="N2_moles" min="0.1" max="10" step="0.1" value="0.1"
+          <input type="range" class="form-range me-2 my-auto" id="N2_moles" min="0" max="10" step="0.1" value="0.1"
             oninput="updateN2Mole(this.value)" />
           <span id="N2MoleValue"></span>
           <label class="form-label ms-3 me-2 my-auto" for="H2_moles">\(\text{H}_2:\)</label>
-          <input type="range" class="form-range me-2 my-auto" id="H2_moles" min="0.1" max="8" step="0.1" value="0.1"
+          <input type="range" class="form-range me-2 my-auto" id="H2_moles" min="0" max="8" step="0.1" value="0.1"
             oninput="updateH2Mole(this.value)" />
           <span id="H2MoleValue"></span>
           <label class="form-label ms-3 me-2 my-auto" for="NH3_moles">\(\text{NH}_3:\)</label>
@@ -87,18 +87,19 @@
         </div>
         <div class="modal-body">
           <p>This Demonstration calculates the number of moles at equilibrium for the reversible, exothermic
-            reaction
-            that synthesizes ammonia \(NH_3\) from hydrogen \(H_2\) and nitrogen \(N_2\), known as
-            the Haber process. This reaction typically takes place near 200 bar and 675 to 725 K. The system starts
-            with
-            1 mol \(NH_3\) and goes to equilibrium. Use sliders to add additional moles of \(N_2\) ,
-            \(H_2\) and \(NH_3\) at constant pressure and temperature and observe how they change
-            equilibrium. Vary pressure and temperature with sliders. Because 4 mol of reactants form 2 mol of
+            reaction that synthesizes ammonia \(\textnormal{NH}_3\) from hydrogen and nitrogen
+            , known as the Haber process. This reaction typically takes place near 200 bar and 675
+            to 725 K. The system starts
+            with 1 mol \(\textnormal{NH}_3\) and goes to equilibrium. Use sliders to add additional moles of
+            \(\textnormal{N}_2\),
+            \(\textnormal{H}_2\), and \(\textnormal{NH}_3\). Vary pressure and temperature with sliders. Because 4 mol
+            of reactants form 2 mol of
             product,
-            raising the pressure shifts equilibrium toward products. Gases are assumed ideal, but at the high
-            pressures
-            used for this reaction, significant deviation from ideal behavior is likely.
+            raising the pressure shifts equilibrium toward products. Gases are assumed ideal, but at the high pressures
+            used for
+            this reaction, significant deviation from ideal behavior is likely.
           </p>
+
         </div>
       </div>
     </div>
@@ -117,31 +118,41 @@
             component at equilibrium is:
             <br />
             <b>
-              \(\eta_{i,eq} = \eta_{i,add} + \nu_i \xi\)
-              <br />
+              <div style="text-align: left;">
+                \(\eta_{i,eq} = \eta_{i,add} + \nu_i \xi\)
+              </div>
             </b>
-            where \(\eta_{i,add}\), are the moles of component \(i=(N_2, H_2, NH_3\)) added, \(\nu_i\) is
-            the stoichiometric coefficient and \(\xi\) is extent of
-            reaction (mol). Initially only 1 mol NH<sub>3</sub> is present.
+            where \(\eta_{i,add}\) are the moles of component \(i=(N_2, H_2, NH_3)\) added, \(\nu_i\) is
+            the stoichiometric coefficient and \(\xi\) is the extent of
+            reaction (mol). Initially, only 1 mol NH<sub>3</sub> is present.
             <br />
             The mole fraction at equilibrium \(y_i\) is:
-            \[ y_i = {{\eta_{i,eq}} \over {\eta_{total}}}\]
-            \[\eta_{total} = \sum \eta_{i,eq}\]
-
-            <span>where \(\eta_{total}\) is the total number of moles.</span>
+          <div style="text-align: left;">
+            \( y_i = \frac{\eta_{i,eq}}{\eta_{total}} \)
             <br />
-            <span>The extent of reaction is found by setting the equilibrium constant \(K_{eq}\) equal to the
-              equilibrium rate constant K and solving for \(\xi\) : \(K_{eq} = e^{-\Delta G / RT }\) ,
-              \[ K = \Pi(y_i P)^{-V_i}
-              = {{(y_{NH_3} P)^2} \over {(y_{N_2} P) (y_{H_2}P)^3}}
-              = {{(y_{NH_3})^2} \over {y_{N_2} (y_{H_2})^3}} \cdot {1 \over P^2}\]
-            </span>
-            <span>where \(\Delta G = \Delta H_r - T\Delta S_r\) is Gibbs free energy (J/mol),
-              \(\Delta H_r\) is the heat of reaction (J/mol), \(\Delta S_r\) is the entropy change of
-              reaction (J/(mol K)), \(T\) is temperature (\(K\)), \(R\) is the ideal gas constant (J/(mol K)) and
-              \(P\)
-              is pressure (bar).</span>
+            \(\eta_{total} = \sum \eta_{i,eq}\)
+          </div>
+          <span>where \(\eta_{total}\) is the total number of moles.</span>
+          <br />
+          <span>The dimensionless equilibrium constant \(K_{eq}\) is
+            <div style="text-align: left;">
+              \(K_{eq} = e^{-\Delta G / RT }\)
+            </div>
+          </span>
+          <span>where \(\Delta G = \Delta H_r - T\Delta S_r\) is the standard state Gibbs free energy of reaction at
+            temperature T(K)
+            and \(R\) is the ideal gas constant (J/(mol K)).
+            <br />
+            Then the extent of reaction is found by solving the equation below:
+            <div>
+              \( K_{eq} = \prod(y_i P)^{-V_i}
+              = \frac{(y_{NH_3} P)^2}{(y_{N_2} P) (y_{H_2}P)^3}
+              = \frac{(y_{NH_3})^2}{y_{N_2} (y_{H_2})^3} \cdot \frac{1}{P^2}\)</div>
+            where P is the pressure (bar).
+          </span>
           </p>
+
+
         </div>
       </div>
     </div>
@@ -157,27 +168,20 @@
           <p>
             This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
               Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
-              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by <a
-              href="https://www.linkedin.com/in/abijith-ramachandran/" target="_blank">Abijith Trichur Ramachandran</a>
-            under
-            the direction of
-            Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Vladislav Denisenkov and Abijith
+            Trichur Ramachandran under the direction of Professor John L. Falconer. It is a JavaScript/HTML5
+            implementation of a simulation by Benjamin L. Kee and Rachael L. Baumann
+            (<a href="https://demonstrations.wolfram.com/ChemicalEquilibriumInTheHaberProcess/"
+              target="_blank">https://demonstrations.wolfram.com/ChemicalEquilibriumInTheHaberProcess/</a>).This
+            simulation was prepared with financial support from the National Science Foundation. Address any questions
+            or comments to LearnChemE@gmail.com.
+            All of our
             simulations are open source, and are available on our <a
               href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
               repository</a>.</p>
-          <p style="line-height: 3rem;">
-            If this simulation is too big for your screen, zoom out using&nbsp;<span><img
-                src="https://learncheme.github.io/media/command.png" style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img
-                src="https://learncheme.github.io/media/minus.png" style="height: 4ch;"></span>&nbsp;on Mac
-            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
-                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
-                style="height: 4ch;"></span>&nbsp;on Windows. To
-            zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png"
-                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
-                style="height: 4ch;"></span>&nbsp;on Mac
-            or&nbsp;<span><img src="https://learncheme.github.io/media/ctrl.png"
-                style="height: 4ch;"></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
-                style="height: 4ch;"></span>&nbsp;on Windows.
+          <p>
+            If this simulation is too big or too small for your screen, zoom out or in using command - or command  +  on
+            Mac or  ctrl - or ctrl +  on Windows.
           </p>
         </div>
       </div>
