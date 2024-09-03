@@ -205,81 +205,45 @@ export function beakersAndTubes(p: P5CanvasInstance) {
   bt.push();
   bt.stroke("black");
   bt.strokeWeight(2);
-  // old thi tube
-  // bt.line(95, 440, 95, 400);
-  // bt.line(85, 440, 85, 410);
-  // bt.line(85, 410, 10, 410);
-  // bt.line(95, 400, 20, 400);
-  // bt.line(10, 410, 10, 80);
-  // bt.line(20, 400, 20, 90);
-  // bt.line(10, 80, 520, 80);
-  // bt.line(20, 90, 510, 90);
-  // bt.line(520, 80, 520, 128);
-  // bt.line(510, 90, 510, 118);
-  // bt.line(520, 128, 450, 128);
-  // bt.line(510, 118, 450, 118);
-
-  // new Tco tube
+  // thi tube
   bt.line(95, 440, 95, 400);
   bt.line(85, 440, 85, 410);
   bt.line(85, 410, 10, 410);
   bt.line(95, 400, 20, 400);
-  bt.line(10, 410, 10, 40);
-  bt.line(20, 400, 20, 50);
-  bt.line(10, 40, 430, 40);
-  bt.line(20, 50, 420, 50);
-  bt.line(430, 40, 430, 75);
-  bt.line(420, 50, 420, 75);
+  bt.line(10, 410, 10, 80);
+  bt.line(20, 400, 20, 90);
+  bt.line(10, 80, 520, 80);
+  bt.line(20, 90, 510, 90);
+  bt.line(520, 80, 520, 128);
+  bt.line(510, 90, 510, 118);
+  bt.line(520, 128, 450, 128);
+  bt.line(510, 118, 450, 118);
 
-  // old tho tube
-  // bt.line(258, 580, 258, 410);
-  // bt.line(248, 580, 248, 400);
-  // bt.line(258, 410, 520, 410);
-  // bt.line(248, 400, 510, 400);
-  // bt.line(520, 410, 520, 315);
-  // bt.line(510, 400, 510, 325);
-  // bt.line(520, 315, 450, 315);
-  // bt.line(510, 325, 450, 325);
-
-  // new tci tube
+  // tho tube
   bt.line(258, 580, 258, 410);
   bt.line(248, 580, 248, 400);
-  bt.line(258, 410, 430, 410);
-  bt.line(248, 400, 420, 400);
-  bt.line(430, 410, 430, 375);
-  bt.line(420, 400, 420, 375);
+  bt.line(258, 410, 520, 410);
+  bt.line(248, 400, 510, 400);
+  bt.line(520, 410, 520, 315);
+  bt.line(510, 400, 510, 325);
+  bt.line(520, 315, 450, 315);
+  bt.line(510, 325, 450, 325);
 
-  // // old tci tube
-  // bt.line(420, 450, 420, 430);
-  // bt.line(410, 450, 410, 420);
-  // bt.line(420, 430, 430, 430);
-  // bt.line(410, 420, 420, 420);
-  // bt.line(430, 430, 430, 300);
-  // bt.line(420, 420, 420, 300);
-
-  // new tho tube
+  // tci tube
   bt.line(420, 450, 420, 430);
   bt.line(410, 450, 410, 420);
-  bt.line(420, 430, 510, 430);
-  bt.line(410, 420, 500, 420);
-  bt.line(510, 430, 510, 317);
-  bt.line(500, 420, 500, 327);
-  bt.line(510, 317, 477, 317);
-  bt.line(500, 327, 477, 327);
+  bt.line(420, 430, 430, 430);
+  bt.line(410, 420, 420, 420);
+  bt.line(430, 430, 430, 300);
+  bt.line(420, 420, 420, 300);
 
-  // // old tco tube
-  // bt.line(593, 580, 593, 10);
-  // bt.line(583, 580, 583, 20);
-  // bt.line(593, 10, 420, 10);
-  // bt.line(583, 20, 430, 20);
-  // bt.line(420, 10, 420, 100);
-  // bt.line(430, 20, 430, 100);
-
-  // new tci tube
-  bt.line(593, 580, 593, 117);
-  bt.line(583, 580, 583, 127);
-  bt.line(593, 117, 476, 117);
-  bt.line(583, 127, 476, 127);
+  // tco tube
+  bt.line(593, 580, 593, 10);
+  bt.line(583, 580, 583, 20);
+  bt.line(593, 10, 420, 10);
+  bt.line(583, 20, 430, 20);
+  bt.line(420, 10, 420, 100);
+  bt.line(430, 20, 430, 100);
   bt.pop();
 
   // thiTubes(bt);
@@ -290,14 +254,28 @@ export function beakersAndTubes(p: P5CanvasInstance) {
   return bt;
 }
 
-export function tcoTubes(bt: P5CanvasInstance) {
+export function thiTubes(bt: P5CanvasInstance) {
   bt.push();
-  bt.fill(g.blueFluidColor);
+  bt.fill(g.orangeFluidColor);
   bt.noStroke();
-  bt.rect(420, 50, 10, 25);
-  bt.rect(10, 40, 420, 10);
-  bt.rect(10, 50, 10, 360);
-  bt.rect(20, 400, 75, 10);
+  bt.rect(83, 450, 13, 100);
+  bt.rect(85, 400, 10, 50);
+  bt.rect(10, 400, 75, 10);
+  bt.rect(10, 80, 10, 320);
+  bt.rect(20, 80, 500, 10);
+  bt.rect(510, 90, 10, 38);
+  bt.rect(450, 118, 60, 10);
+  bt.pop();
+}
+
+export function thoTubes(bt: P5CanvasInstance) {
+  bt.push();
+  bt.fill(g.orangeFluidColor);
+  bt.noStroke();
+  bt.rect(248, 400, 10, 180);
+  bt.rect(258, 400, 262, 10);
+  bt.rect(510, 315, 10, 85);
+  bt.rect(450, 315, 60, 10);
   bt.pop();
 }
 
@@ -305,28 +283,19 @@ export function tciTubes(bt: P5CanvasInstance) {
   bt.push();
   bt.fill(g.blueFluidColor);
   bt.noStroke();
-  bt.rect(420, 375, 10, 35);
-  bt.rect(248, 400, 172, 10);
-  bt.rect(248, 410, 10, 170);
+  bt.rect(408, 470, 13, 80);
+  bt.rect(410, 420, 10, 50);
+  bt.rect(420, 300, 10, 130);
   bt.pop();
 }
 
-export function thoTubes(bt: P5CanvasInstance) {
+export function tcoTubes(bt: P5CanvasInstance) {
   bt.push();
-  bt.fill(g.orangeFluidColor);
-  bt.noStroke(); // TODO
-  bt.rect(410, 420, 100, 10);
-  bt.rect(500, 317, 10, 103);
-  bt.rect(470, 317, 30, 10);
-  bt.pop();
-}
-
-export function thiTubes(bt: P5CanvasInstance) {
-  bt.push();
-  bt.fill(g.orangeFluidColor);
+  bt.fill(g.blueFluidColor);
   bt.noStroke();
-  bt.rect(583, 117, 10, 464);
-  bt.rect(476, 117, 107, 10);
+  bt.rect(583, 10, 10, 570);
+  bt.rect(420, 10, 163, 10);
+  bt.rect(420, 20, 10, 80);
   bt.pop();
 }
 
