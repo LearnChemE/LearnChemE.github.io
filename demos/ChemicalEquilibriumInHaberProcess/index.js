@@ -273,16 +273,14 @@ function calculateEquilibrium(P, T, nN2, nH2, nNH3) {
   nH2 = Number(nH2);
   nNH3 = Number(nNH3);
 
-  // Constants
-  const R = 8.314; // Gas constant in J/(mol·K)
-  const deltaH = -92200; // Enthalpy change in J/mol
-  const deltaS = -198.75; // Entropy change in J/(mol·K)
+  const R = 8.314;
+  const deltaH = -92200;
+  const deltaS = -198.75;
 
-  // Calculate equilibrium constant K using thermodynamic data
+
   const K_T_value = -((deltaH - T * deltaS) / (R * T));
   const K_T = Math.exp(K_T_value);
 
-  // Define initial bounds for x (extent of reaction)
   let xi_lower = 0;
   let xi_upper = Math.min(nN2, nH2 / 3, (nNH3 + nN2) / 2);
 
@@ -291,13 +289,13 @@ function calculateEquilibrium(P, T, nN2, nH2, nNH3) {
   const maxIterations = 10000;
 
   for (let i = 0; i < maxIterations; i++) {
-    // Calculate equilibrium constant from extent of reaction xi
+
     const total = nN2 + nH2 + nNH3 - xi;
     const z1 = (nN2 - xi) / total;
     const z2 = (nH2 - 3 * xi) / total;
     const z3 = (nNH3 + 2 * xi) / total;
 
-    // Product of partial pressures to compute k from xi
+
     const k = Math.pow(z1 * P, 1) * Math.pow(z2 * P, 3) / Math.pow(z3 * P, 2);
 
     if (Math.abs(k - K_T) < tolerance) {
@@ -317,7 +315,7 @@ function calculateEquilibrium(P, T, nN2, nH2, nNH3) {
     return null;
   }
 
-  // Calculate final mole amounts at equilibrium
+
   let nN2Final = nN2 - xi;
   let nH2Final = nH2 - 3 * xi;
   let nNH3Final = nNH3 + 2 * xi;
