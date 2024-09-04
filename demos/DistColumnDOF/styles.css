@@ -51,6 +51,7 @@
   justify-items: center;
   margin-top: 0;
   margin-left: 1rem;
+  row-gap: 20px;
 }
 
 
@@ -90,10 +91,6 @@
   position: absolute;
   z-index: 3;
   left: 18.75rem;
-
-  row-gap: 0.6rem;
-  min-width: 16.9rem;
-
   margin-top: 0.9rem;
 }
 

@@ -272,7 +272,7 @@ function calculateEquilibrium(P, T, nN2, nH2, nNH3) {
   nH2 = Number(nH2);
   nNH3 = Number(nNH3);
 
-  const K_T_value = -23.84 + (11051 / T);
+  const K_T_value = -((-92200 - T * (-198.75)) / (8.314 * T));
   const K_T = parseFloat(Math.exp(K_T_value).toFixed(3));
   const RHS = Math.pow(P, 2) * K_T;
 
