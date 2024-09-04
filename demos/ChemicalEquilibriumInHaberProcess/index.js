@@ -4,6 +4,7 @@ var nN2 = 0.1;
 var nH2 = 0.1;
 var nNH3 = 1;
 
+
 // ----------------------------------------------------------------
 
 
@@ -272,26 +273,38 @@ function calculateEquilibrium(P, T, nN2, nH2, nNH3) {
   nH2 = Number(nH2);
   nNH3 = Number(nNH3);
 
-  const K_T_value = -((-92200 - T * (-198.75)) / (8.314 * T));
-  const K_T = parseFloat(Math.exp(K_T_value).toFixed(3));
-  const RHS = Math.pow(P, 2) * K_T;
+  // Constants
+  const R = 8.314; // Gas constant in J/(mol·K)
+  const deltaH = -92200; // Enthalpy change in J/mol
+  const deltaS = -198.75; // Entropy change in J/(mol·K)
 
+  // Calculate equilibrium constant K using thermodynamic data
+  const K_T_value = -((deltaH - T * deltaS) / (R * T));
+  const K_T = Math.exp(K_T_value);
+
+  // Define initial bounds for x (extent of reaction)
   let xi_lower = 0;
-  let xi_upper = Math.min(nN2 + (2 * nNH3), (nH2 + (3 * nNH3)) / 3);
-  xi_upper = Math.min(xi_upper, nN2, nH2 / 3);
+  let xi_upper = Math.min(nN2, nH2 / 3, (nNH3 + nN2) / 2);
 
   let xi = (xi_lower + xi_upper) / 2;
   const tolerance = 0.000001;
   const maxIterations = 10000;
 
   for (let i = 0; i < maxIterations; i++) {
-    let value = (Math.pow(T, 2) * Math.pow((2 * xi + nNH3), 2)) / ((nN2 - xi) * Math.pow((nH2 - 3 * xi), 3));
+    // Calculate equilibrium constant from extent of reaction xi
+    const total = nN2 + nH2 + nNH3 - xi;
+    const z1 = (nN2 - xi) / total;
+    const z2 = (nH2 - 3 * xi) / total;
+    const z3 = (nNH3 + 2 * xi) / total;
 
-    if (Math.abs(value - RHS) < tolerance) {
+    // Product of partial pressures to compute k from xi
+    const k = Math.pow(z1 * P, 1) * Math.pow(z2 * P, 3) / Math.pow(z3 * P, 2);
+
+    if (Math.abs(k - K_T) < tolerance) {
       break;
     }
 
-    if (value < RHS) {
+    if (k < K_T) {
       xi_lower = xi;
     } else {
       xi_upper = xi;
@@ -304,9 +317,11 @@ function calculateEquilibrium(P, T, nN2, nH2, nNH3) {
     return null;
   }
 
+  // Calculate final mole amounts at equilibrium
   let nN2Final = nN2 - xi;
-  let nH2Final = nH2 - (3 * xi);
-  let nNH3Final = Number(nNH3) + (2 * xi);
+  let nH2Final = nH2 - 3 * xi;
+  let nNH3Final = nNH3 + 2 * xi;
+
   return [
     parseFloat(nN2Final.toFixed(3)),
     parseFloat(nH2Final.toFixed(3)),
