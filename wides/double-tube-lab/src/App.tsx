@@ -308,7 +308,14 @@ function App() {
       </SideBar>
       <div className="sim-wrapper">
         <Controls />
-        <div className="graphics-wrapper">
+        <div
+          className="graphics-wrapper"
+          style={
+            measured[0] != -1
+              ? { cursor: "url('thermometer.png') 25 95, auto" }
+              : { cursor: "auto" }
+          }
+        >
           {canvasMode == DOUBLE_BEAKER ? (
             <ReactP5Wrapper sketch={sketch} />
           ) : (
