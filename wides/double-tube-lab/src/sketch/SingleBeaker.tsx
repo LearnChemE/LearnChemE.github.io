@@ -171,7 +171,7 @@ function fillSingleOutletTubes(p: P5CanvasInstance, alpha = 200) {
   p.push();
   p.noStroke();
   p.fill(color);
-  p.rect(585, 315, 10, 275);
+  p.rect(585, 315, 10, 160);
   p.rect(475, 315, 110, 10);
 
   color = g.blueFluidColor.slice();
