@@ -412,8 +412,8 @@ export function singleBeakerGraphics(p: P5CanvasInstance) {
   b.line(430, 40, 385, 40);
 
   // hot out
-  b.line(585, 325, 585, 590);
-  b.line(595, 315, 595, 590);
+  b.line(585, 325, 585, 430);
+  b.line(595, 315, 595, 430);
   b.line(585, 325, 470, 325);
   b.line(595, 315, 470, 315);
 

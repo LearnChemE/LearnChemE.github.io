@@ -34,6 +34,7 @@ interface SingleTubeGraphicsObjs {
   dto: any;
   singleBeakers: any;
   pa: any;
+  therm: any;
 }
 
 export function SingleBeakerSketch(p: P5CanvasInstance) {
@@ -43,6 +44,7 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
     dto: undefined,
     singleBeakers: undefined,
     pa: undefined,
+    therm: undefined,
   };
   let pinchingColdTube = false;
 
@@ -55,6 +57,7 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
     graphicsObjs.dto = Graphics.doubleTubeOrng(500, 400, 50, 450, 50, p);
     graphicsObjs.singleBeakers = singleBeakerGraphics(p);
     graphicsObjs.pa = Graphics.pumpAssembly(p);
+    graphicsObjs.therm = p.loadImage("thermometer.png");
   };
 
   p.draw = () => {
@@ -69,6 +72,7 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
     Graphics.fillBeaker(450, 1000, g.orangeFluidColor, p);
 
     singleBeakerFillAnimation(p, graphicsObjs);
+    if (startAniTime != NOT_STARTED) drawThermometer(p, graphicsObjs);
     if (pinchingColdTube) {
       pinchColdTubeGraphic(p);
     } else {
@@ -193,6 +197,7 @@ function hexCartridgeFillAnimation(
   p.image(partBlue, 25, 475 - timer);
 }
 
+// Apply overlay to canvas that makes it look like you are pinching the tube
 function pinchColdTubeGraphic(p: P5CanvasInstance) {
   p.push();
   p.noStroke();
@@ -208,9 +213,11 @@ function pinchColdTubeGraphic(p: P5CanvasInstance) {
   p.line(420, 415, 423, 400);
   p.line(430, 385, 427, 400);
   p.line(430, 415, 427, 400);
+
   p.pop();
 }
 
+// randomize start values for single
 export function randSingleStartVals() {
   g.Th_in =
     Math.random() * (MAX_HOT_WATER_TEMP - MIN_HOT_WATER_TEMP) +
@@ -220,4 +227,17 @@ export function randSingleStartVals() {
     MIN_COLD_WATER_TEMP;
   g.mDotH = MAX_HOT_FLOWRATE;
   g.mDotC = MAX_COLD_FLOWRATE;
+}
+
+function drawThermometer(
+  p: P5CanvasInstance,
+  graphicsObjs: SingleTubeGraphicsObjs
+) {
+  // show measurement of the outlet stream
+  console.log("drawing therm");
+  p.push();
+  p.translate(495, 455);
+  p.rotate(-1.5);
+  p.image(graphicsObjs.therm, 0, 0);
+  p.pop();
 }
