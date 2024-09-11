@@ -10,4 +10,4 @@ LearnChemE Live-Server.bat
 **/node_modules
 Current\ Projects.code-workspace
 learncheme_github_io_workspace.code-workspace
-.vscode
+.vscode/
