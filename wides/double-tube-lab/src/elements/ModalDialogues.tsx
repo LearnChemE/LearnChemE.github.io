@@ -202,13 +202,15 @@ export const DirectionsModalDialogue = () => {
               </a>{" "}
               by Drew Smith under the direction of Professor John L. Falconer
               and Michelle Medlin. This virtual lab was prepared with financial
-              support from the National Science Foundation and is based on the{" "}
+              support from the National Science Foundation (NSF *** (give CUB
+              no.) and 2336988) and is based on a Double Pipe Heat Exchanger{" "}
               <a href="https://labs.wsu.edu/educ-ate/heat-transfer-kit/">
-                Heat Exchanger experimental kit
+                experimental kit
               </a>
-              from Washington State University. Address any questions or
-              comments to learncheme@gmail.com. Our simulations are open source,
-              and are available on our{" "}
+              and accompanying worksheet protocol developed with separate
+              support under NSF 1821578 led by Washington State University.
+              Address any questions or comments to learncheme@gmail.com. Our
+              simulations are open source, and are available on our{" "}
               <a
                 href="https://github.com/LearnChemE/LearnChemE.github.io/"
                 target="_blank"
