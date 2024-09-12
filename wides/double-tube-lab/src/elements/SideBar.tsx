@@ -29,18 +29,20 @@ export const SideBar: React.FC<SideBarProps> = ({
           className={selected === 0 ? "sidebar-item vl" : "sidebar-item"}
           onClick={() => toggleSelected(0)}
         >
-          Double-beaker setup
+          {selected === 0
+            ? `Experiment 1: Confirming Flow Patterns and Measuring Heat Transfer
+          Rate`
+            : `Experiment 1`}
         </div>
         <div
           className={selected === 1 ? "sidebar-item vl" : "sidebar-item"}
           onClick={() => toggleSelected(1)}
         >
-          Single-beaker setup
+          {selected === 1
+            ? `Experiment 2: Effect of Flowrate on Heat Transfer Rate`
+            : `Experiment 2`}
         </div>
-        <div
-          className={dropDownShowing ? "sidebar-item vl" : "sidebar-item"}
-          onClick={() => toggleSelected(1)}
-        >
+        <div className={dropDownShowing ? "sidebar-item vl" : "sidebar-item"}>
           <div
             onClick={() =>
               setDropDownShowing((dropDownShowing) => !dropDownShowing)
