@@ -23,17 +23,27 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="1.2566832"
-     inkscape:cx="383.94719"
-     inkscape:cy="290.4471"
-     inkscape:window-width="1440"
-     inkscape:window-height="823"
-     inkscape:window-x="0"
+     inkscape:zoom="4.2122954"
+     inkscape:cx="137.21735"
+     inkscape:cy="105.64311"
+     inkscape:window-width="752"
+     inkscape:window-height="847"
+     inkscape:window-x="689"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
      inkscape:current-layer="apparatus" />
   <defs
      id="defs" />
+  <filter
+     id="shadow"
+     color-interpolation-filters="sRGB">
+    <feDropShadow
+       flood-opacity="0.5"
+       dx="0"
+       dy="0"
+       stdDeviation="0.3"
+       flood-color="navy" />
+  </filter>
   <g
      id="apparatus"
      inkscape:label="apparatus"
@@ -143,11 +153,13 @@
          id="switch"
          width="1.2109931"
          height="3.8059785"
-         x="-8.6435213"
-         y="110.87569"
-         transform="rotate(-38)"
+         x="-10.611537"
+         y="110.71905"
+         transform="rotate(-38.9859)"
          rx="0.23692913"
-         ry="0.23692913" />
+         ry="0.23692913"
+         inkscape:transform-center-x="0.98675114"
+         inkscape:transform-center-y="-1.3480579" />
       <rect
          style="fill:#646464;fill-opacity:1;stroke:#000000;stroke-width:0.0499999;stroke-dasharray:none;stroke-opacity:1"
          id="switch-bump"
