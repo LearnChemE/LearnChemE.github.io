@@ -86,6 +86,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       g.mDotC = p.constrain(g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE);
     }
   };
+
   const drawValve = (
     x: number,
     y: number,
@@ -114,7 +115,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
 
   const fillAnimation = () => {
     let start: number;
-    p.image(graphics.beakersAndTubes, 0, 0);
+    p.image(graphics.emptyTubes, 0, 0);
     p.image(graphics.shellTube, 75, 75);
 
     if ((start = g.startTime) === PUMPS_NOT_STARTED) return; // Pumps not started
@@ -158,6 +159,21 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     }
   };
 
+  const fillBeaker = (
+    p: P5CanvasInstance,
+    x: number,
+    vol: number,
+    color: Array<number>
+  ) => {
+    let width = 150;
+    vol *= 0.16;
+    p.push();
+    p.fill(...color);
+    p.noStroke();
+    p.rect(x, 630 - vol, width, vol);
+    p.pop();
+  };
+
   p.setup = () => {
     p.createCanvas(g.width, g.height);
     graphics = createGraphicsObjects(p); // Load graphics objects
@@ -190,6 +206,13 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       p,
       graphics.valve
     );
+
+    // prettier-ignore
+    fillBeaker(p,  55, g.vols[0], g.orangeFluidColor);
+    fillBeaker(p, 235, g.vols[1], g.orangeFluidColor);
+    fillBeaker(p, 415, g.vols[3], g.blueFluidColor);
+    fillBeaker(p, 595, g.vols[2], g.blueFluidColor);
+    p.image(graphics.beakers, 0, 0);
   };
 
   // P5 mousePressed handler determines if dragging

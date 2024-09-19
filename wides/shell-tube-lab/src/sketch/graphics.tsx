@@ -127,16 +127,20 @@ function createBeakerGraphic(p: P5CanvasInstance) {
   return b;
 }
 
-function createBeakersAndTubesGraphic(p: P5CanvasInstance) {
+function createBeakersGraphic(p: P5CanvasInstance) {
   let bt = p.createGraphics(p.width, p.height);
   let b = createBeakerGraphic(p);
-
   // beakers
   bt.image(b, 50, 450);
   bt.image(b, 230, 450);
   bt.image(b, 410, 450);
   bt.image(b, 590, 450);
+  b.remove();
+  return bt;
+}
 
+function createEmptyTubesGraphic(p: P5CanvasInstance) {
+  let bt = p.createGraphics(p.width, p.height);
   // tubes
   // hot in
   bt.strokeWeight(2);
@@ -168,7 +172,6 @@ function createBeakersAndTubesGraphic(p: P5CanvasInstance) {
   }
   bt.endShape();
 
-  b.remove();
   return bt;
 }
 
@@ -264,7 +267,8 @@ export interface graphicsObjects {
   shellTube: any;
   orngShellTube: any;
   blueShellTube: any;
-  beakersAndTubes: any;
+  emptyTubes: any;
+  beakers: any;
   tubes: any[];
   valve: any;
   pumpAssembly: any;
@@ -276,7 +280,8 @@ export default function createGraphicsObjects(
     shellTube: createShellTubeGraphic(p),
     orngShellTube: createOrngShellTubeGraphic(p),
     blueShellTube: createBlueShellTubeGraphic(p),
-    beakersAndTubes: createBeakersAndTubesGraphic(p),
+    emptyTubes: createEmptyTubesGraphic(p),
+    beakers: createBeakersGraphic(p),
     tubes: [
       createTubeFluidGraphic(p, hiTubeVertices, ORANGE_FLUID_COLOR),
       createTubeFluidGraphic(p, hoTubeVertices, ORANGE_FLUID_COLOR),
