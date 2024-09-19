@@ -202,8 +202,8 @@ export const DirectionsModalDialogue = () => {
               </a>{" "}
               by Drew Smith under the direction of Professor John L. Falconer
               and Michelle Medlin. This virtual lab was prepared with financial
-              support from the National Science Foundation (NSF *** (give CUB
-              no.) and 2336988) and is based on a Double Pipe Heat Exchanger{" "}
+              support from the National Science Foundation (NSF DUE 2336987 and
+              DUE 2336988) and is based on a Double Pipe Heat Exchanger{" "}
               <a href="https://labs.wsu.edu/educ-ate/heat-transfer-kit/">
                 experimental kit
               </a>
