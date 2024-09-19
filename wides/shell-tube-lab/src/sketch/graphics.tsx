@@ -11,13 +11,26 @@ const BLUE_FLUID_COLOR = [0, 80, 255, 180];
 // prettier-ignore
 const shellTubeBlueVertices = [[60, 5],[110, 5],[110, 230],[115, 230],[115, 5],[220, 5],[220, 230],[225, 230],[225, 5],[330, 5],[330, 230],[335, 230],[335, 5],[440, 5],[440, 295],[390, 295],[390, 70],[385, 70],[385, 295],[280, 295],[280, 70],[275, 70],[275, 295],[170, 295],[170, 70],[165, 70],[165, 295],[60, 295],[60, 5],];
 // prettier-ignore
-const hiTubeVertices = [[80, 430],[80, 405],[35, 405],[35, 35],[100, 35],[100, 75],[110, 75],[110, 25],[25, 25],[25, 415],[70, 415],[70, 430],];
+const hiTubeVertices = [[83, 575],[83, 430],[80, 430],[80, 405],[35, 405],[35, 35],[100, 35],[100, 75],[110, 75],[110, 25],[25, 25],[25, 415],[70, 415],[70, 430],[68, 430],[68, 575],];
 // prettier-ignore
 const hoTubeVertices = [[260, 620],[260, 400],[100, 400],[100, 375],[110, 375],[110, 390],[270, 390],[270, 620],];
 // prettier-ignore
-const ciTubeVertices = [[440, 430],[440, 375],[440, 75],[440, 35],[165, 35],[165, 75],[155, 75],[155, 25],[450, 25],[450, 75],[450, 375],[450, 430],];
-// prettier-ignore
-const coTubeVertices = [[620, 620],[620, 400],[485, 400],[485, 375],[495, 375],[495, 390],[630, 390],[630, 620],];
+const ciTubeVertices = [[440, 620],[440, 430],[440, 430],[440, 375],[440, 75],[440, 35],[165, 35],[165, 75],[155, 75],[155, 25],[450, 25],[450, 75],[450, 375],[450, 430],[450, 430],[450, 620],];
+// prettier-ignor
+const coTubeVertices = [
+  [618, 575],
+  [618, 430],
+  [620, 430],
+  [620, 400],
+  [485, 400],
+  [485, 375],
+  [495, 375],
+  [495, 390],
+  [630, 390],
+  [630, 430],
+  [632, 430],
+  [632, 575],
+];
 
 function createShellTubeGraphic(p: P5CanvasInstance) {
   const width = 475,
@@ -178,6 +191,41 @@ function createTubeFluidGraphic(
   return hi;
 }
 
+// exception to tube graphics because ci tube has two parts
+function blueTubeFluidGraphicException(
+  p: P5CanvasInstance,
+  vertices: number[][],
+  color: any
+) {
+  let hi = p.createGraphics(p.width, p.height);
+  let i: number;
+  hi.push();
+  hi.noStroke();
+  hi.fill(color);
+
+  // Upper part
+  hi.beginShape();
+  for (i = 4; i < 12; i++) {
+    hi.vertex(vertices[i][0], vertices[i][1]);
+  }
+  hi.endShape();
+
+  // Lower part
+  hi.beginShape();
+  hi.vertex(vertices[0][0], vertices[0][1]);
+  hi.vertex(vertices[1][0], vertices[1][1]);
+  hi.vertex(vertices[2][0], vertices[2][1]);
+  hi.vertex(vertices[3][0], vertices[3][1]);
+  hi.vertex(vertices[12][0], vertices[12][1]);
+  hi.vertex(vertices[13][0], vertices[13][1]);
+  hi.vertex(vertices[14][0], vertices[14][1]);
+  hi.vertex(vertices[15][0], vertices[15][1]);
+  hi.endShape();
+  hi.pop();
+
+  return hi;
+}
+
 function createValveGraphic(p: P5CanvasInstance) {
   let v = p.createGraphics(50, 50);
   v.push();
@@ -232,7 +280,7 @@ export default function createGraphicsObjects(
     tubes: [
       createTubeFluidGraphic(p, hiTubeVertices, ORANGE_FLUID_COLOR),
       createTubeFluidGraphic(p, hoTubeVertices, ORANGE_FLUID_COLOR),
-      createTubeFluidGraphic(p, ciTubeVertices, BLUE_FLUID_COLOR),
+      blueTubeFluidGraphicException(p, ciTubeVertices, BLUE_FLUID_COLOR),
       createTubeFluidGraphic(p, coTubeVertices, BLUE_FLUID_COLOR),
     ],
     valve: createValveGraphic(p),

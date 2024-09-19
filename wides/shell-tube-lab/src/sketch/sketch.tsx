@@ -111,6 +111,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     p.image(valve, 0, 0);
     p.pop();
   };
+
   const fillAnimation = () => {
     let start: number;
     p.image(graphics.beakersAndTubes, 0, 0);
@@ -122,19 +123,33 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     if (current < 5000) {
       // Fill animation
       // fill inlet tubes
-      let alpha: number = p.map(current, 0, 1000, 0, 200, true);
-      let color: Array<number> = g.orangeFluidColor;
-      color[3] = alpha;
+      let alpha: number = p.map(current, 0, 1000, 0, 255, true);
+      let color: Array<number> = [255, 255, 255, alpha];
       p.push();
       p.tint(color);
       p.image(graphics.tubes[0], 0, 0);
-
-      color = g.blueFluidColor;
-      color[3] = alpha * 0.9;
-      p.tint(color);
       p.image(graphics.tubes[3], 0, 0);
 
-      alpha = p.map(current, 1000, 4000, 0, 300, true);
+      // HEX fill
+      alpha = p.map(current, 1000, 4000, 0, 475, true);
+      let alpha2 = p.map(current, 1000, 4000, 0, 300, true);
+      let blue = graphics.blueShellTube.get(475 - alpha, 0, alpha, 300);
+      let orng = graphics.orngShellTube.get(0, 0, 475, alpha2);
+      if (alpha2 < 1 || alpha < 1) {
+        p.pop();
+        return;
+      }
+      p.image(orng, 75, 75);
+      p.image(blue, 550 - alpha, 75);
+
+      // Exit tubes
+      alpha = p.map(current, 4000, 5000, 0, 255, true);
+      color = [255, 255, 255, alpha];
+      p.tint(color);
+      p.image(graphics.tubes[1], 0, 0);
+      p.image(graphics.tubes[2], 0, 0);
+
+      p.pop();
     } else {
       // Pumps have been running
       for (let i = 0; i < 4; i++) p.image(graphics.tubes[i], 0, 0); // fill all tubes
@@ -153,7 +168,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     p.background(250);
 
     p.image(graphics.pumpAssembly, 51, 455);
-    p.image(graphics.pumpAssembly, 420, 455);
+    p.image(graphics.pumpAssembly, 600, 455);
 
     fillAnimation();
     drag(isDraggingValves);
@@ -167,7 +182,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       graphics.valve
     );
     drawValve(
-      445,
+      625,
       440,
       g.mDotC,
       MIN_COLD_FLOWRATE,
