@@ -7,7 +7,6 @@ body {
   color: #f8f7f7;
 }
 
-/* Wrapper for the entire simulation */
 #simulation-wrapper {
   max-width: 1200px;
   margin: 20px auto;
@@ -17,7 +16,7 @@ body {
   border-radius: 8px;
 }
 
-/* Controls and inputs wrapper */
+
 .controls-wrapper {
   display: flex;
   justify-content: space-between;
@@ -43,7 +42,6 @@ body {
   margin-right: 5px;
 }
 
-/* Inputs section */
 .inputs {
   margin-bottom: 20px;
 }
@@ -109,11 +107,8 @@ body {
 
 .input-label {
   flex: 0 0 auto;
-  /* Ensures the label takes up only the space it needs */
   margin-right: 10px;
-  /* Reduces the space between the label and the slider */
   font-weight: bold;
-  /* Optional: makes the label stand out */
 }
 
 
@@ -153,7 +148,6 @@ btn-outline-primary {
   color: #6c757d;
 }
 
-/* Modal styles */
 .modal-content {
   padding: 20px;
 }
@@ -173,7 +167,7 @@ btn-outline-primary {
   font-size: 1.5rem;
 }
 
-/* Mobile responsiveness */
+
 @media (max-width: 768px) {
   #simulation-wrapper {
     padding: 10px;
