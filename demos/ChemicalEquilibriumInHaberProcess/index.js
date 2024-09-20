@@ -255,6 +255,7 @@ function initValues() {
 //     return null;
 //   }
 
+
 //   let nN2Final = nN2 - xi;
 //   let nH2Final = nH2 - (3 * xi);
 //   let nNH3Final = Number(nNH3) + (2 * xi);
