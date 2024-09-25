@@ -192,3 +192,42 @@ canvas {
     }
   }
 }
+
+.tooltip-anchor {
+  position: absolute;
+  /* for debugging */
+  /* background-color: yellow;  */
+  top: 455px;
+  width: 151px;
+  height: 181px;
+}
+
+#hi-anchor {
+  left: 63px;
+}
+
+#ho-anchor {
+  left: 243px;
+}
+
+#ci-anchor {
+  left: 602px;
+}
+
+#co-anchor {
+  left: 422px;
+}
+
+#cold-single-anchor {
+  left: 384px;
+}
+#hot-single-anchor {
+  left: 582px;
+}
+
+#outlet-tubes-anchor {
+  top: 390px;
+  left: 380px;
+  height: 50px;
+  width: 230px;
+}
