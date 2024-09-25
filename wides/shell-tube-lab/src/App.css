@@ -231,3 +231,28 @@ canvas {
   height: 50px;
   width: 230px;
 }
+
+.modal-header {
+  justify-content: space-between;
+}
+
+.vl {
+  border-left: 1px solid rgb(85, 85, 85);
+  height: 40px;
+}
+
+.hl {
+  border-bottom: 2px solid rgb(21, 76, 255);
+  width: auto;
+}
+
+.modal-titles-container {
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+  gap: 20px;
+}
+
+.btn-light {
+  background-color: white;
+  border-color: white;
+}

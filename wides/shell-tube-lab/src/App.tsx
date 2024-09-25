@@ -1,6 +1,7 @@
 import React from "react";
 import logo from "./logo.svg";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap";
 import "./App.css";
 import { useState, useEffect } from "react";
 import Controls from "./elements/Controls";
@@ -19,7 +20,7 @@ function App() {
   const [pumpsAreRunning, setPumpsAreRunning] = useState(false);
   const [measured, setMeasured] = useState([-1, -1, -1, -1]);
   const [pumpBtnIsDisabled, setPumpBtnDisabled] = useState(false);
-  // const [canvasMode, setCanvasMode] = useState(DOUBLE_BEAKER);
+  // const [experimentMode, setExperimentMode] = useState(DOUBLE_BEAKER);
   const [sideBarIsShowing, setSideBarShowing] = useState(false);
 
   // Event handlers
@@ -27,10 +28,15 @@ function App() {
     if (g.startTime === -1) {
       // startTime === NOT_STARTED
       g.startTime = -2; // START_NEXT_FRAME
+      setPumpBtnDisabled(true);
+      setTimeout(() => {
+        setPumpBtnDisabled(false);
+      }, 5000);
     }
     g.hIsFlowing = !pumpsAreRunning;
     g.cIsFlowing = !pumpsAreRunning;
     setPumpsAreRunning((pumpsAreRunning) => !pumpsAreRunning);
+    setMeasured([-1, -1, -1, -1]);
   };
   const measureBtnHandler = () => {
     setMeasured([g.Th_in, g.Th_out, g.Tc_in, g.Tc_out]);
@@ -65,6 +71,7 @@ function App() {
           <a className="tooltip-anchor" id="co-anchor" />
         </div>
       </div>
+
       <SideBar
         showing={sideBarIsShowing}
         onCloseBtnClick={() => setSideBarShowing(false)}
