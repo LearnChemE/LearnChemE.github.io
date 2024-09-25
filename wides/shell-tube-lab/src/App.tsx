@@ -15,12 +15,15 @@ import {
 } from "./elements/ModalDialogues";
 import { Tooltips } from "./elements/Tooltips";
 
+const DOUBLE_BEAKER_MODE = 0;
+const SINGLE_BEAKER_MODE = 1;
+
 function App() {
   // State vars
   const [pumpsAreRunning, setPumpsAreRunning] = useState(false);
   const [measured, setMeasured] = useState([-1, -1, -1, -1]);
   const [pumpBtnIsDisabled, setPumpBtnDisabled] = useState(false);
-  // const [experimentMode, setExperimentMode] = useState(DOUBLE_BEAKER);
+  const [experimentMode, setExperimentMode] = useState(DOUBLE_BEAKER_MODE);
   const [sideBarIsShowing, setSideBarShowing] = useState(false);
 
   // Event handlers
@@ -75,8 +78,8 @@ function App() {
       <SideBar
         showing={sideBarIsShowing}
         onCloseBtnClick={() => setSideBarShowing(false)}
-        selected={0}
-        toggleSelected={() => {}}
+        selected={experimentMode}
+        toggleSelected={(newMode) => setExperimentMode(newMode)}
         onResetBtnClick={() => resetBtnHandler()}
       >
         <ControlWrapper />
