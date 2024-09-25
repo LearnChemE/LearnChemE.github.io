@@ -2,18 +2,19 @@ import { P5CanvasInstance } from "@p5-wrapper/react";
 import { g } from "./sketch";
 
 // Constants used in calculations
-const HYDRAULIC_DIAMETER_ANNULAR = 0.00318; // m
-const ANNULAR_CROSS_SECTION_AREA = 3.966e-5; // m^2
+const HYDRAULIC_DIAMETER_SHELL = ((0.0127 * 0.08) / 2) * (0.0127 + 0.08); // m
 const INNER_TUBE_DIAMETER = 0.00457; // m
 const OUTER_TUBE_DIAMETER = 0.00635; // m
-const ANNULAR_DIAMETER = 0.00953; // m
-const DYNAMIC_VISCOSITY_H = 5.5e-7; // m^2 / s
+const TUBE_CROSS_SECTION_AREA = (Math.PI * INNER_TUBE_DIAMETER ** 2) / 4;
+const SHELL_CROSS_SECTION_AREA =
+  0.0127 * 0.08 - (Math.PI * OUTER_TUBE_DIAMETER ** 2) / 4; // m^2
+const DYNAMIC_VISCOSITY_H = 6.06e-7; // m^2 / s
 const DYNAMIC_VISCOSITY_C = 9e-5; // m^2 / s
 const PR_COLD = 6.62; // kJ / kg / K
-const PR_HOT = 3.42; // kJ / kg / K
-const TUBE_LENGTH = 0.137; // m
+const PR_HOT = 4.02; // kJ / kg / K
+// const TUBE_LENGTH = 0.137; // m
 const CONDUCTIVITY_COLD_WATER = 0.5984; // W / m / K
-const CONDUCTIVITY_HOT_WATER = 0.6435; // W / m / K
+const CONDUCTIVITY_HOT_WATER = 0.6186; // W / m / K
 const HEX_AREA = 109; // cm2
 
 // Flowrates
@@ -21,10 +22,10 @@ export const MAX_HOT_WATER_TEMP = 45.0;
 export const MIN_HOT_WATER_TEMP = 45.0;
 export const MAX_COLD_WATER_TEMP = 25.0;
 export const MIN_COLD_WATER_TEMP = 25.0;
-export const MAX_HOT_FLOWRATE = 36.0;
-export const MIN_HOT_FLOWRATE = 33.0;
-export const MAX_COLD_FLOWRATE = 26.0;
-export const MIN_COLD_FLOWRATE = 23.0;
+export const MAX_HOT_FLOWRATE = 28.0;
+export const MIN_HOT_FLOWRATE = 24.0;
+export const MAX_COLD_FLOWRATE = 36.0;
+export const MIN_COLD_FLOWRATE = 30.0;
 
 /* ********************************************************************* */
 /* ** This file holds calculations for heat transfer and outlet temps ** */
@@ -52,7 +53,13 @@ export function randStartVals() {
 }
 
 function effectiveness(cmin: number, cmax: number, UA: number) {
-  return -1;
+  let C = cmin / cmax;
+  let NTU = UA / cmin;
+  let temp =
+    (1 + Math.exp(-NTU * Math.sqrt(1 + C ** 2))) /
+    (1 - C * Math.exp(-NTU * Math.sqrt(1 + C ** 2)));
+  temp = temp * Math.sqrt(1 + C ** 2);
+  return 2 / (1 + C + temp);
 }
 
 // Main calculations, sets g outlet temps
@@ -86,9 +93,16 @@ function calcHeatTransferRate() {
 
 // Calculate H value for shell side heat transfer
 function calcShellHValue() {
-  let Re: number;
-  let Nu: number;
-  return -1;
+  let Re: number = calcShellRe();
+  let Nu: number = 0.2 * Re ** 0.6 * PR_COLD ** (1 / 3);
+  return (Nu * CONDUCTIVITY_COLD_WATER) / HYDRAULIC_DIAMETER_SHELL;
+}
+
+function calcShellRe() {
+  return (
+    ((g.mDotC / SHELL_CROSS_SECTION_AREA) * HYDRAULIC_DIAMETER_SHELL) /
+    DYNAMIC_VISCOSITY_C
+  );
 }
 
 // Calculate H value for tube side heat transfer
@@ -99,7 +113,10 @@ function calcTubeHValue() {
 }
 
 function calcTubeRe() {
-  return (g.mDotH * INNER_TUBE_DIAMETER) / DYNAMIC_VISCOSITY_H;
+  return (
+    ((g.mDotH / TUBE_CROSS_SECTION_AREA) * INNER_TUBE_DIAMETER) /
+    DYNAMIC_VISCOSITY_H
+  );
 }
 
 // Change the volumes each frame based on the deltaTime
