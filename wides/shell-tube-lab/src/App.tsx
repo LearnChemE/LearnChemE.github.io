@@ -8,6 +8,7 @@ import Controls from "./elements/Controls";
 import SideBar from "./elements/SideBar";
 import { ReactP5Wrapper } from "@p5-wrapper/react";
 import ShellTubeSketch, { g } from "./sketch/sketch";
+import SingleBeakerSketch from "./sketch/SingleBeaker";
 import {
   DirectionsModalDialogue,
   DetailsModalDialogue,
@@ -23,7 +24,7 @@ function App() {
   const [pumpsAreRunning, setPumpsAreRunning] = useState(false);
   const [measured, setMeasured] = useState([-1, -1, -1, -1]);
   const [pumpBtnIsDisabled, setPumpBtnDisabled] = useState(false);
-  const [experimentMode, setExperimentMode] = useState(DOUBLE_BEAKER_MODE);
+  const [experimentMode, setExperimentMode] = useState(SINGLE_BEAKER_MODE);
   const [sideBarIsShowing, setSideBarShowing] = useState(false);
 
   // Event handlers
@@ -42,7 +43,7 @@ function App() {
     setMeasured([-1, -1, -1, -1]);
   };
   const measureBtnHandler = () => {
-    setMeasured([g.Th_in, g.Th_out, g.Tc_in, g.Tc_out]);
+    setMeasured([g.Th_in, g.Th_out_observed, g.Tc_in, g.Tc_out_observed]);
   };
   const resetBtnHandler = () => {};
 
@@ -67,7 +68,13 @@ function App() {
       <div className="sim-wrapper">
         <ControlWrapper />
         <div className="graphics-wrapper">
-          <ReactP5Wrapper sketch={ShellTubeSketch} />
+          <ReactP5Wrapper
+            sketch={
+              experimentMode === DOUBLE_BEAKER_MODE
+                ? ShellTubeSketch
+                : SingleBeakerSketch
+            }
+          />
           <a className="tooltip-anchor" id="hi-anchor" />
           <a className="tooltip-anchor" id="ho-anchor" />
           <a className="tooltip-anchor" id="ci-anchor" />

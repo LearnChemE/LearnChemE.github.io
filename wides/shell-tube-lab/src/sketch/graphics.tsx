@@ -16,21 +16,8 @@ const hiTubeVertices = [[83, 575],[83, 430],[80, 430],[80, 405],[35, 405],[35, 3
 const hoTubeVertices = [[260, 620],[260, 400],[100, 400],[100, 375],[110, 375],[110, 390],[270, 390],[270, 620],];
 // prettier-ignore
 const ciTubeVertices = [[440, 620],[440, 430],[440, 430],[440, 375],[440, 75],[440, 35],[165, 35],[165, 75],[155, 75],[155, 25],[450, 25],[450, 75],[450, 375],[450, 430],[450, 430],[450, 620],];
-// prettier-ignor
-const coTubeVertices = [
-  [618, 575],
-  [618, 430],
-  [620, 430],
-  [620, 400],
-  [485, 400],
-  [485, 375],
-  [495, 375],
-  [495, 390],
-  [630, 390],
-  [630, 430],
-  [632, 430],
-  [632, 575],
-];
+// prettier-ignore
+const coTubeVertices = [[618, 575],[618, 430],[620, 430],[620, 400],[485, 400],[485, 375],[495, 375],[495, 390],[630, 390],[630, 430],[632, 430],[632, 575],];
 
 function createShellTubeGraphic(p: P5CanvasInstance) {
   const width = 475,
@@ -273,9 +260,7 @@ export interface graphicsObjects {
   valve: any;
   pumpAssembly: any;
 }
-export default function createGraphicsObjects(
-  p: P5CanvasInstance
-): graphicsObjects {
+export function createGraphicsObjects(p: P5CanvasInstance): graphicsObjects {
   let g = {
     shellTube: createShellTubeGraphic(p),
     orngShellTube: createOrngShellTubeGraphic(p),
@@ -294,3 +279,95 @@ export default function createGraphicsObjects(
 
   return g;
 }
+
+// Single beaker tube vertices
+// prettier-ignore
+const hoSingleVert = [[100, 400],[100, 375],[110, 375],[110, 400],];
+// prettier-ignor
+const coSingleVert = [
+  [590, 440],
+  [440, 440],
+  [440, 430],
+  [440, 375],
+  [440, 75],
+  [440, 35],
+  [165, 35],
+  [165, 75],
+  [155, 75],
+  [155, 25],
+  [450, 25],
+  [450, 75],
+  [450, 375],
+  [450, 430],
+  [450, 430],
+  [590, 430],
+];
+
+function createEmptySingleTubes(p: P5CanvasInstance) {
+  let bt = p.createGraphics(p.width, p.height);
+  // tubes
+  // hot in
+  bt.strokeWeight(2);
+  bt.noFill();
+  bt.beginShape();
+  for (let i = 0; i < hiTubeVertices.length; i++) {
+    bt.vertex(hiTubeVertices[i][0], hiTubeVertices[i][1]);
+  }
+  bt.endShape();
+
+  // hot out
+  bt.beginShape();
+  for (let i = 0; i < hoSingleVert.length; i++) {
+    bt.vertex(hoSingleVert[i][0], hoSingleVert[i][1]);
+  }
+  bt.endShape();
+
+  // cold in
+  bt.beginShape(); // Wrong name, gets fixed later
+  for (let i = 0; i < coTubeVertices.length; i++) {
+    bt.vertex(coTubeVertices[i][0], coTubeVertices[i][1]);
+  }
+  bt.endShape();
+
+  // cold out
+  bt.beginShape(); // Actual cold out
+  for (let i = 0; i < coSingleVert.length; i++) {
+    bt.vertex(coSingleVert[i][0], coSingleVert[i][1]);
+  }
+  bt.endShape();
+
+  return bt;
+}
+
+function createSingleBeakers(p: P5CanvasInstance) {
+  let t = p.createGraphics(p.width, p.height);
+  return t;
+}
+
+function singleBlueFluidException(p: P5CanvasInstance) {
+  let t = p.createGraphics(p.width, p.height);
+  return t;
+}
+
+export interface singleGraphicsObj {
+  emptyTubes: any;
+  beakers: any;
+  tubes: any[];
+}
+export function createSingleGraphicsObjects(
+  p: P5CanvasInstance
+): singleGraphicsObj {
+  let g: singleGraphicsObj = {
+    emptyTubes: createEmptySingleTubes(p),
+    beakers: createSingleBeakers(p),
+    tubes: [
+      createTubeFluidGraphic(p, hiTubeVertices, ORANGE_FLUID_COLOR),
+      createTubeFluidGraphic(p, hoSingleVert, ORANGE_FLUID_COLOR),
+      blueTubeFluidGraphicException(p, coSingleVert, BLUE_FLUID_COLOR),
+      createTubeFluidGraphic(p, coTubeVertices, BLUE_FLUID_COLOR),
+    ],
+  };
+  return g;
+}
+
+export default createGraphicsObjects;
