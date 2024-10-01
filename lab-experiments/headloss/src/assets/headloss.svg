@@ -23,15 +23,15 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="4.2122954"
-     inkscape:cx="137.21735"
-     inkscape:cy="105.64311"
-     inkscape:window-width="752"
+     inkscape:zoom="1.5304941"
+     inkscape:cx="517.80663"
+     inkscape:cy="257.4332"
+     inkscape:window-width="1440"
      inkscape:window-height="847"
-     inkscape:window-x="689"
+     inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="apparatus" />
+     inkscape:current-layer="waste-beaker" />
   <defs
      id="defs" />
   <filter
@@ -378,7 +378,7 @@
      id="waste-beaker"
      transform="translate(-38.545055,-88.095)">
     <rect
-       style="fill:#ff5050;fill-opacity:0.6;stroke:#000000;stroke-width:0.0909606;stroke-opacity:0"
+       style="fill:#ff9696;fill-opacity:1;stroke:#000000;stroke-width:0.0909606;stroke-opacity:0"
        id="waste-liquid"
        width="22.75"
        height="26.25"

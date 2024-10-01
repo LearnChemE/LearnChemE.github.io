@@ -7,6 +7,8 @@ import "./style/style.scss";
 window.state = {
   switchOn: false,
   valveOpen: false,
+  flowRate: 50, // mL/s
+  wasteBeakerFilling: false,
 };
 
 populate(Graphic);

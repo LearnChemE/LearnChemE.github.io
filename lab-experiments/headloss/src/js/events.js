@@ -1,4 +1,5 @@
 import "./animations.js";
+import { switchLogic, valveLogic } from "./animations.js";
 
 function setDefaults(elts) {
   elts.intakeLiquid.style.strokeDasharray = elts.intakeLiquidMaxLength;
@@ -17,118 +18,11 @@ function setDefaults(elts) {
     manometerLiquid.style.strokeDasharray = manometerMaxHeight;
     manometerLiquid.style.strokeDashoffset = manometerMaxHeight;
   });
-}
 
-function switchLogic(elts) {
-  const switchX = elts.switchElt.getAttribute("x");
-  const switchY = elts.switchElt.getAttribute("y");
-  const destinationX = 108.44429;
-  const destinationY = 32.344028;
-  const switchTransform = elts.switchElt.getAttribute("transform");
-  const destinationTransform = "rotate(38)";
-
-  elts.switchG.addEventListener("click", () => {
-    if (state.switchOn === false) {
-      elts.switchElt.setAttribute("x", destinationX);
-      elts.switchElt.setAttribute("y", destinationY);
-      elts.switchElt.setAttribute("transform", destinationTransform);
-      state.switchOn = true;
-      let currentLength = 0;
-      const interval = setInterval(() => {
-        if (currentLength < elts.intakeLiquidMaxLength) {
-          currentLength += 2;
-          elts.intakeLiquid.style.strokeDashoffset =
-            elts.intakeLiquidMaxLength - currentLength;
-        } else {
-          if (state.valveOpen === true) {
-            flowThroughApparatus(elts);
-          }
-          clearInterval(interval);
-        }
-      }, 16.67);
-    } else {
-      elts.switchElt.setAttribute("x", switchX);
-      elts.switchElt.setAttribute("y", switchY);
-      elts.switchElt.setAttribute("transform", switchTransform);
-      state.switchOn = false;
-      let currentLength = elts.intakeLiquidMaxLength;
-      const interval = setInterval(() => {
-        if (currentLength > 0) {
-          currentLength -= 2;
-          elts.intakeLiquid.style.strokeDashoffset =
-            elts.intakeLiquidMaxLength - currentLength;
-        } else {
-          if (state.valveOpen === true) {
-            emptyApparatus(elts);
-          }
-          clearInterval(interval);
-        }
-      }, 16.67);
-    }
-  });
-
-  elts.switchG.addEventListener("mouseover", () => {
-    elts.switchG.style.cursor = "pointer";
-    elts.switchG.style.filter = "url(#shadow)";
-  });
-
-  elts.switchG.addEventListener("mouseout", () => {
-    elts.switchG.style.filter = "none";
-  });
-}
-
-function valveLogic(elts) {
-  const valveRectX = elts.valveRect.getAttribute("x");
-  const valveRectY = elts.valveRect.getAttribute("y");
-  const valveRectDestinationX = 116.46883;
-  const valveRectDestinationY = -64.357788;
-
-  elts.valve.addEventListener("click", () => {
-    if (state.valveOpen === false) {
-      elts.valveRect.setAttribute("x", valveRectDestinationX);
-      elts.valveRect.setAttribute("y", valveRectDestinationY);
-      elts.valveRect.setAttribute("transform", "rotate(90)");
-      state.valveOpen = true;
-      if (state.switchOn === true) {
-        flowThroughApparatus(elts);
-      }
-    } else {
-      elts.valveRect.setAttribute("x", valveRectX);
-      elts.valveRect.setAttribute("y", valveRectY);
-      elts.valveRect.setAttribute("transform", "rotate(0)");
-      state.valveOpen = false;
-      if (state.switchOn === true) {
-        emptyApparatus(elts);
-      }
-    }
-  });
-}
-
-function flowThroughApparatus(elts) {
-  let currentLength = 0;
-  const interval = setInterval(() => {
-    if (currentLength < elts.tubeLiquidMaxLength) {
-      currentLength += 2;
-      elts.tubeLiquid.style.strokeDashoffset =
-        elts.tubeLiquidMaxLength - currentLength;
-    } else {
-      clearInterval(interval);
-    }
-  }, 16.67);
-}
-
-function emptyApparatus(elts) {
-  let currentLength = elts.tubeLiquidMaxLength;
-  const interval = setInterval(() => {
-    if (currentLength < 2 * elts.tubeLiquidMaxLength) {
-      currentLength += 2;
-      elts.tubeLiquid.style.strokeDashoffset =
-        elts.tubeLiquidMaxLength - currentLength;
-    } else {
-      elts.tubeLiquid.style.strokeDashoffset = elts.tubeLiquidMaxLength;
-      clearInterval(interval);
-    }
-  }, 16.67);
+  const wasteY = Number(elts.wasteLiquid.getAttribute("y"));
+  const wasteHeight = Number(elts.wasteLiquid.getAttribute("height"));
+  elts.wasteLiquid.setAttribute("y", `${wasteY + wasteHeight}`);
+  elts.wasteLiquid.setAttribute("height", 0);
 }
 
 export default function addEvents() {
@@ -146,6 +40,8 @@ export default function addEvents() {
     switchG: document.getElementById("power-switch"),
     valve: document.getElementById("valve"),
     valveRect: document.getElementById("valve-rect"),
+    sourceLiquid: document.getElementById("source-liquid"),
+    wasteLiquid: document.getElementById("waste-liquid"),
   };
 
   elts.intakeLiquidMaxLength = elts.intakeLiquid.getTotalLength();
