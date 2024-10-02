@@ -39,6 +39,7 @@ export default function addEvents() {
     switchElt: document.getElementById("switch"),
     switchG: document.getElementById("power-switch"),
     valve: document.getElementById("valve"),
+    valveCircle: document.getElementById("valve-circle"),
     valveRect: document.getElementById("valve-rect"),
     sourceLiquid: document.getElementById("source-liquid"),
     wasteLiquid: document.getElementById("waste-liquid"),

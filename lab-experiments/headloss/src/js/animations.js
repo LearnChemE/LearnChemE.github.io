@@ -61,37 +61,106 @@ export function switchLogic(elts) {
 }
 
 export function valveLogic(elts) {
-  const valveRectX = elts.valveRect.getAttribute("x");
-  const valveRectY = elts.valveRect.getAttribute("y");
-  const valveRectDestinationX = 116.46883;
-  const valveRectDestinationY = -64.357788;
+  let mouseX = 0;
+  let mouseY = 0;
 
-  elts.valve.addEventListener("click", () => {
-    if (state.valveOpen === false) {
-      elts.valveRect.setAttribute("x", valveRectDestinationX);
-      elts.valveRect.setAttribute("y", valveRectDestinationY);
-      elts.valveRect.setAttribute("transform", "rotate(90)");
-      state.valveOpen = true;
-      if (state.switchOn === true) {
-        flowThroughApparatus(elts);
-      }
+  document.body.addEventListener("mousemove", (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  const setValveOpen = () => {
+    calculateState();
+    const rect = elts.valveCircle.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const diffX = Math.max(0, mouseX - cx);
+    const diffY = Math.max(0, cy - mouseY);
+    let open = 0;
+    if (diffX === 0 && diffY === 0) {
+      open = 0;
     } else {
-      elts.valveRect.setAttribute("x", valveRectX);
-      elts.valveRect.setAttribute("y", valveRectY);
-      elts.valveRect.setAttribute("transform", "rotate(0)");
+      open = 1 - (2 * Math.atan(diffY / diffX)) / Math.PI;
+    }
+    if (open > 0) {
+      state.valveOpen = true;
+    } else {
       state.valveOpen = false;
     }
+    const angle = open * 90;
+    const circlePtX = elts.valveCircle.getAttribute("cx");
+    const circlePtY = elts.valveCircle.getAttribute("cy");
+    elts.valveRect.setAttribute(
+      "transform",
+      `rotate(${angle} ${circlePtX} ${circlePtY})`
+    );
+    state.flowRate = state.maxFlowRate * open;
+    if (state.switchOn === true && state.flowing === false) {
+      flowThroughApparatus(elts);
+    }
+  };
+
+  let mouse = false;
+
+  const callEvent = () => {
+    if (mouse) {
+      setTimeout(() => {
+        setValveOpen();
+        callEvent();
+      }, 16.67);
+    } else {
+      return;
+    }
+  };
+
+  elts.valve.addEventListener("mousedown", () => {
+    mouse = true;
+    callEvent();
   });
+
+  document.body.addEventListener("mouseup", () => {
+    mouse = false;
+  });
+}
+
+function calculateState() {
+  const V = state.flowRate; // flow rate (mL/s)
+  const tubeArea = Math.PI * Math.pow(state.r, 2);
+  state.v = V / tubeArea; // cm/s
+  const nu = 0.0089; // kinematic viscosity (cm^2/s)
+  state.Re = (state.r * 2 * state.v) / nu; // Reynolds number
+  state.laminar = state.Re < 3500;
+  if (state.laminar) {
+    state.f = 64 / state.Re; // Darcy friction factor
+  } else {
+    state.f = 0.25 / Math.log10(5.74 / Math.pow(state.Re, 0.9)) ** 2;
+  }
+  const L4 = 10 / 3; // characteristic length (cm)
+  const L3 = L4 + 7.62;
+  const L2 = L3 + 7.62;
+  const L1 = L2 + 7.62;
+
+  const P1 = (state.rho * state.v ** 2 * state.f * L1) / (2 * state.r) || 0; // pressure drop (dyne/cm^2)
+  const P2 = (state.rho * state.v ** 2 * state.f * L2) / (2 * state.r) || 0;
+  const P3 = (state.rho * state.v ** 2 * state.f * L3) / (2 * state.r) || 0;
+  const P4 = (state.rho * state.v ** 2 * state.f * L4) / (2 * state.r) || 0;
+
+  const cmPerDyneCm2 = 0.00102; // conversion factor for dyne/cm^2 to cm of head
+
+  state.P1 = P1 * cmPerDyneCm2; // cm of head
+  state.P2 = P2 * cmPerDyneCm2;
+  state.P3 = P3 * cmPerDyneCm2;
+  state.P4 = P4 * cmPerDyneCm2;
 }
 
 function flowThroughApparatus(elts) {
   let currentLength = 0;
+  state.flowing = true;
 
   const sourceStartHeight = Number(elts.sourceLiquid.getAttribute("height"));
   const sourceStartY = Number(elts.sourceLiquid.getAttribute("y"));
   const wasteStartHeight = 26.25;
   const wasteStartY = Number(elts.wasteLiquid.getAttribute("y"));
-  const r = 0.635 / 2; // tube radius (cm)
   const frameRate = 60; // frames per second
   const ms = 1000 / frameRate; // milliseconds per frame
   const s = ms / 1000; // seconds per frame
@@ -101,16 +170,14 @@ function flowThroughApparatus(elts) {
   const emptySource = sourceHeight === 0;
 
   const tubePtsPerFrame = () => {
-    const V = state.flowRate; // flow rate (mL/s)
-    const tubeArea = Math.PI * Math.pow(r, 2);
-    const tubeVelocity = V / tubeArea; // cm/s
     const tubeLength = 200; // pts
-    const tubeCmPerFrame = tubeVelocity * s; // cm per frame
+    const tubeCmPerFrame = state.v * s; // cm per frame
     const tubePtsPerCm = tubeLength / 40; // pts per cm
     return tubeCmPerFrame * tubePtsPerCm; // pts per frame
   };
 
   const handleBeakers = () => {
+    calculateState();
     const V = state.flowRate; // flow rate (mL/s)
     const beakerFractionPerSecond = V / 500; // s^-1
     const beakerFractionPerMillisecond = beakerFractionPerSecond / 1000; // ms^-1
@@ -125,10 +192,48 @@ function flowThroughApparatus(elts) {
     wasteHeight = Math.min(wasteHeight + beakerPtsPerFrame, wasteStartHeight);
     elts.wasteLiquid.setAttribute("y", wasteY);
     elts.wasteLiquid.setAttribute("height", wasteHeight);
+
+    const m1MaxHeight = state.P1 * 3;
+    const m2MaxHeight = state.P2 * 3;
+    const m3MaxHeight = state.P3 * 3;
+    const m4MaxHeight = state.P4 * 3;
+
+    const sdo = Number(elts.tubeLiquid.style.strokeDashoffset);
+
+    if (sdo < 100) {
+      m1Height = Math.min(m1MaxHeight, m1Height + tubePtsPerFrame());
+    }
+
+    if (sdo < 70) {
+      m2Height = Math.min(m2MaxHeight, m2Height + tubePtsPerFrame());
+    }
+
+    if (sdo < 40) {
+      m3Height = Math.min(m3MaxHeight, m3Height + tubePtsPerFrame());
+    }
+
+    if (sdo < 10) {
+      m4Height = Math.min(m4MaxHeight, m4Height + tubePtsPerFrame());
+    }
+
+    elts.manometerLiquids[0].style.strokeDashoffset = 30.055 - m1Height;
+    elts.manometerLiquids[1].style.strokeDashoffset = 30.055 - m2Height;
+    elts.manometerLiquids[2].style.strokeDashoffset = 30.055 - m3Height;
+    elts.manometerLiquids[3].style.strokeDashoffset = 30.055 - m4Height;
   };
+
+  let m1Height = 0;
+  let m2Height = 0;
+  let m3Height = 0;
+  let m4Height = 0;
 
   const interval = setInterval(() => {
     let beakerFilling = false;
+    if (state.valveOpen === false) {
+      state.flowing = false;
+      clearInterval(interval);
+      return;
+    }
     if (currentLength < elts.tubeLiquidMaxLength && !emptySource) {
       currentLength += tubePtsPerFrame();
       elts.tubeLiquid.style.strokeDashoffset =
@@ -176,10 +281,19 @@ function flowThroughApparatus(elts) {
 }
 
 function emptyApparatus(elts) {
+  state.flowing = false;
+  calculateState();
   let currentTubeLiquidLength = elts.tubeLiquidMaxLength;
   let currentIntakeLiquidLength = elts.intakeLiquidMaxLength;
   let currentWasteStreamLength = elts.wasteBeakerStreamMaxLength;
   const interval = setInterval(() => {
+    elts.manometerLiquids.forEach((man) => {
+      const height = Number(man.style.strokeDashoffset);
+      const maxHeight = 30.055;
+      if (height < maxHeight) {
+        man.style.strokeDashoffset = Math.min(maxHeight, height + 2);
+      }
+    });
     if (
       Number(elts.sourceLiquid.getAttribute("height")) === 0 &&
       currentIntakeLiquidLength < 2 * elts.intakeLiquidMaxLength
