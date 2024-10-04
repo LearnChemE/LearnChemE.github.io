@@ -22,7 +22,10 @@ window.state = {
   showButtons: false,
 };
 
-state.hamburgerHasBeenClicked = window.sessionStorage.getItem("hamburgerHasBeenClicked") === "true" ? true : false;
+state.hamburgerHasBeenClicked =
+  window.sessionStorage.getItem("hamburgerHasBeenClicked") === "true"
+    ? true
+    : false;
 
 populate(Graphic);
 addEvents();

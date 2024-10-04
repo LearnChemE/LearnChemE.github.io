@@ -38,38 +38,48 @@ function enableSvgZoom() {
     e.preventDefault();
     // set the scaling factor (and make sure it's at least 10%)
     let scale = e.deltaY / 3000;
-    scale = Math.abs(scale) < .1 ? .1 * e.deltaY / Math.abs(e.deltaY) : scale;
+    scale =
+      Math.abs(scale) < 0.1 ? (0.1 * e.deltaY) / Math.abs(e.deltaY) : scale;
 
     // get point in SVG space
     let pt = new DOMPoint(e.clientX, e.clientY);
     pt = pt.matrixTransform(svg.getScreenCTM().inverse());
 
     // get viewbox transform
-    let [x, y, width, height] = svg.getAttribute('viewBox').split(' ').map(Number);
-    const amountZoomed = width / (state.maxViewBox[2] - state.maxViewBox[0]) / 2;
+    let [x, y, width, height] = svg
+      .getAttribute("viewBox")
+      .split(" ")
+      .map(Number);
+    const amountZoomed =
+      width / (state.maxViewBox[2] - state.maxViewBox[0]) / 2;
     scale *= Math.max(0.1, amountZoomed);
 
     // get pt.x as a proportion of width and pt.y as proportion of height
     let [xPropW, yPropH] = [(pt.x - x) / width, (pt.y - y) / height];
-    
+
     // calc new width and height, new x2, y2 (using proportions and new width and height)
     let [width2, height2] = [
       Math.min(state.maxViewBox[2], width + width * scale),
-      Math.min(state.maxViewBox[3], height + height * scale)
+      Math.min(state.maxViewBox[3], height + height * scale),
     ];
     let x2 = Math.max(0, pt.x - xPropW * width2);
     let y2 = Math.max(0, pt.y - yPropH * height2);
 
     [width2, height2] = [
       Math.max(10, Math.min(state.maxViewBox[2] - x2, width2)),
-      Math.max(10, Math.min(state.maxViewBox[3] - y2, height2))
-    ]
+      Math.max(10, Math.min(state.maxViewBox[3] - y2, height2)),
+    ];
 
-    if (Number.isNaN(x2) || Number.isNaN(y2) || Number.isNaN(width2) || Number.isNaN(height2)) {
+    if (
+      Number.isNaN(x2) ||
+      Number.isNaN(y2) ||
+      Number.isNaN(width2) ||
+      Number.isNaN(height2)
+    ) {
       return;
     }
 
-    svg.setAttribute('viewBox', `${x2} ${y2} ${width2} ${height2}`);
+    svg.setAttribute("viewBox", `${x2} ${y2} ${width2} ${height2}`);
   });
 }
 
@@ -79,7 +89,13 @@ function enableSvgDrag(elts) {
   let prevX = 0;
   let prevY = 0;
   svg.addEventListener("mousedown", (e) => {
-    if (e.target === elts.switchElt || e.target === elts.switchG || e.target === elts.valve || e.target === elts.valveCircle || e.target === elts.valveRect) {
+    if (
+      e.target === elts.switchElt ||
+      e.target === elts.switchG ||
+      e.target === elts.valve ||
+      e.target === elts.valveCircle ||
+      e.target === elts.valveRect
+    ) {
       return;
     }
     isDragging = true;
@@ -89,9 +105,12 @@ function enableSvgDrag(elts) {
 
   svg.addEventListener("mousemove", (e) => {
     if (isDragging) {
-      const [x, y, width, height] = svg.getAttribute("viewBox").split(" ").map(Number);
-      const dx = (prevX - e.clientX) * width / svg.clientWidth;
-      const dy = (prevY - e.clientY) * height / svg.clientHeight;
+      const [x, y, width, height] = svg
+        .getAttribute("viewBox")
+        .split(" ")
+        .map(Number);
+      const dx = ((prevX - e.clientX) * width) / svg.clientWidth;
+      const dy = ((prevY - e.clientY) * height) / svg.clientHeight;
       let viewX = Math.max(0, x + dx);
       let viewY = Math.max(0, y + dy);
       let viewWidth = Math.min(state.maxViewBox[2], width);
@@ -102,7 +121,10 @@ function enableSvgDrag(elts) {
       if (viewY + viewHeight >= state.maxViewBox[3]) {
         viewY = state.maxViewBox[3] - viewHeight;
       }
-      svg.setAttribute("viewBox", `${viewX} ${viewY} ${viewWidth} ${viewHeight}`);
+      svg.setAttribute(
+        "viewBox",
+        `${viewX} ${viewY} ${viewWidth} ${viewHeight}`
+      );
       prevX = e.clientX;
       prevY = e.clientY;
     }
@@ -170,9 +192,9 @@ function handleHamburger() {
       !e.target.classList.contains("modal-header")
     ) {
       if (e.target.tagName !== "HTML") {
-        if(
-        !e.target.parentElement.classList.contains("modal-body") &&
-        !e.target.parentElement.classList.contains("modal-header")
+        if (
+          !e.target.parentElement.classList.contains("modal-body") &&
+          !e.target.parentElement.classList.contains("modal-header")
         ) {
           buttons.style.display = "none";
           state.showButtons = false;
