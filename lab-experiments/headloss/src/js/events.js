@@ -205,6 +205,19 @@ function handleHamburger() {
   });
 }
 
+function handleReset() {
+  const resetButton = document.getElementById("reset");
+  resetButton.addEventListener("click", () => {
+    resetButton.classList.add("clicked");
+    setTimeout(() => {
+      resetButton.classList.remove("clicked");
+    }, 100);
+    setTimeout(() => {
+      window.location.reload();
+    }, 200);
+  });
+}
+
 export default function addEvents() {
   const elts = {
     intakeLiquid: document.getElementById("intake-liquid"),
@@ -233,4 +246,5 @@ export default function addEvents() {
   switchLogic(elts);
   valveLogic(elts);
   handleHamburger();
+  handleReset();
 }
