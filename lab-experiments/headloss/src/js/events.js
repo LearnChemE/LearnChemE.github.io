@@ -200,6 +200,10 @@ function handleHamburger() {
           state.showButtons = false;
           hamburgerIcon.classList.remove("active");
         }
+      } else {
+        buttons.style.display = "none";
+        state.showButtons = false;
+        hamburgerIcon.classList.remove("active");
       }
     }
   });
