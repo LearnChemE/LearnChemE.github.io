@@ -9,15 +9,19 @@
   </head>
   <body>
     <div id="root">
-      <div id="controls">
-        <div id="buttons">
-          <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
-          <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
-          <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+      <div id="graphics-container">
+        <div id="reset">reset</div>
+        <div id="hamburger">
+          <div id="hamburger-icon"></div>
+          <div id="controls">
+            <div id="buttons">
+              <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
+              <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
+              <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <div id="graphics-container"></div>
     </div>
 
     <div id="directions-modal" class="modal fade" tabindex="-1" aria-labelledby="simulation directions" aria-hidden="true">
