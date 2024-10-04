@@ -95,7 +95,7 @@ export function valveLogic(elts) {
       `rotate(${angle} ${circlePtX} ${circlePtY})`
     );
     state.flowRate = state.maxFlowRate * open;
-    if (state.switchOn === true && state.flowing === false) {
+    if (state.switchOn === true && state.flowing === false && state.valveOpen) {
       flowThroughApparatus(elts);
     }
   };
@@ -177,7 +177,6 @@ function flowThroughApparatus(elts) {
   };
 
   const handleBeakers = () => {
-    calculateState();
     const V = state.flowRate; // flow rate (mL/s)
     const beakerFractionPerSecond = V / 500; // s^-1
     const beakerFractionPerMillisecond = beakerFractionPerSecond / 1000; // ms^-1

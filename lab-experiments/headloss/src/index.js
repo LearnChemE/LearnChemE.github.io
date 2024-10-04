@@ -17,6 +17,8 @@ window.state = {
   Re: 0, // Reynolds number
   laminar: true,
   f: 0, // friction factor
+  maxViewBox: [0, 0, 0, 0],
+  viewBox: [0, 0, 0, 0],
 };
 
 populate(Graphic);
