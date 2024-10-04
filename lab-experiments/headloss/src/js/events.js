@@ -118,6 +118,22 @@ function handleHamburger() {
   const hamburgerIcon = document.getElementById("hamburger-icon");
   const buttons = document.getElementById("buttons");
 
+  hamburgerIcon.style.transitionProperty = "background-color";
+  hamburgerIcon.style.transitionDuration = "0.5s";
+  const glowInterval = setInterval(() => {
+    if (!state.hamburgerHasBeenClicked) {
+      hamburgerIcon.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
+      setTimeout(() => {
+        hamburgerIcon.style.backgroundColor = "";
+      }, 800);
+    } else {
+      hamburgerIcon.style.backgroundColor = "";
+      hamburgerIcon.style.transitionProperty = "";
+      hamburgerIcon.style.transitionDuration = "";
+      clearInterval(glowInterval);
+    }
+  }, 1600);
+
   hamburger.addEventListener("click", (e) => {
     if (
       e.target.id !== "controls" &&
@@ -132,6 +148,8 @@ function handleHamburger() {
         buttons.style.display = "grid";
         state.showButtons = true;
         hamburgerIcon.classList.add("active");
+        state.hamburgerHasBeenClicked = true;
+        window.sessionStorage.setItem("hamburgerHasBeenClicked", "true");
       }
     }
   });
