@@ -19,6 +19,7 @@ window.state = {
   f: 0, // friction factor
   maxViewBox: [0, 0, 0, 0],
   viewBox: [0, 0, 0, 0],
+  showButtons: false,
 };
 
 populate(Graphic);

@@ -82,6 +82,7 @@ export function valveLogic(elts) {
     } else {
       open = 1 - (2 * Math.atan(diffY / diffX)) / Math.PI;
     }
+
     if (open > 0) {
       state.valveOpen = true;
     } else {
@@ -94,6 +95,9 @@ export function valveLogic(elts) {
       "transform",
       `rotate(${angle} ${circlePtX} ${circlePtY})`
     );
+
+    open = Math.sin(open**0.6 * Math.PI / 2);
+
     state.flowRate = state.maxFlowRate * open;
     if (state.switchOn === true && state.flowing === false && state.valveOpen) {
       flowThroughApparatus(elts);
@@ -236,7 +240,10 @@ function flowThroughApparatus(elts) {
     if (currentLength < elts.tubeLiquidMaxLength && !emptySource) {
       currentLength += tubePtsPerFrame();
       elts.tubeLiquid.style.strokeDashoffset =
-        elts.tubeLiquidMaxLength - currentLength;
+        Math.max(
+          0,
+          elts.tubeLiquidMaxLength - currentLength
+        )
       handleBeakers();
     } else {
       clearInterval(interval);

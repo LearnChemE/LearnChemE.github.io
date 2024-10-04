@@ -113,6 +113,58 @@ function enableSvgDrag(elts) {
   });
 }
 
+function handleHamburger() {
+  const hamburger = document.getElementById("hamburger");
+  const hamburgerIcon = document.getElementById("hamburger-icon");
+  const buttons = document.getElementById("buttons");
+
+  hamburger.addEventListener("click", (e) => {
+    if (
+      e.target.id !== "controls" &&
+      e.target.id !== "buttons" &&
+      !e.target.classList.contains("btn")
+    ) {
+      if (state.showButtons) {
+        buttons.style.display = "none";
+        state.showButtons = false;
+        hamburgerIcon.classList.remove("active");
+      } else {
+        buttons.style.display = "grid";
+        state.showButtons = true;
+        hamburgerIcon.classList.add("active");
+      }
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    if (
+      e.target.id !== "controls" &&
+      e.target.id !== "buttons" &&
+      !e.target.classList.contains("btn") &&
+      e.target.id !== "hamburger" &&
+      e.target.id !== "hamburger-icon" &&
+      e.target.id !== "hamburger-svg" &&
+      e.target.tagName !== "path" &&
+      !e.target.classList.contains("modal") &&
+      !e.target.classList.contains("modal-dialog") &&
+      !e.target.classList.contains("modal-content") &&
+      !e.target.classList.contains("modal-body") &&
+      !e.target.classList.contains("modal-header")
+    ) {
+      if (e.target.tagName !== "HTML") {
+        if(
+        !e.target.parentElement.classList.contains("modal-body") &&
+        !e.target.parentElement.classList.contains("modal-header")
+        ) {
+          buttons.style.display = "none";
+          state.showButtons = false;
+          hamburgerIcon.classList.remove("active");
+        }
+      }
+    }
+  });
+}
+
 export default function addEvents() {
   const elts = {
     intakeLiquid: document.getElementById("intake-liquid"),
@@ -140,4 +192,5 @@ export default function addEvents() {
   setDefaults(elts);
   switchLogic(elts);
   valveLogic(elts);
+  handleHamburger();
 }
