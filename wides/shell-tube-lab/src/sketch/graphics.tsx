@@ -326,8 +326,13 @@ function createEmptySingleTubes(p: P5CanvasInstance) {
 }
 
 function createSingleBeakers(p: P5CanvasInstance) {
-  let t = p.createGraphics(p.width, p.height);
-  return t;
+  let bt = p.createGraphics(p.width, p.height);
+  let b = createBeakerGraphic(p);
+  // beakers
+  bt.image(b, 50, 450);
+  bt.image(b, 590, 450);
+  b.remove();
+  return bt;
 }
 
 export interface singleGraphicsObj {

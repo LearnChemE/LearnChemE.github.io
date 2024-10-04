@@ -134,12 +134,23 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
 
     fillAnimation();
 
+    // Pumps and valves
+    p.image(graphics.pumpAssembly, 51, 470);
+    p.image(graphics.pumpAssembly, 601, 470);
+
+    p.push();
+    p.translate(58, 400);
+    p.scale(0.6);
+    p.image(graphics.valve, 0, 0);
+    p.pop();
+
+    // Beakers
     // prettier-ignore
     fillBeaker(p,  55, g.vols[0], g.orangeFluidColor);
     fillBeaker(p, 235, g.vols[1], g.orangeFluidColor);
     fillBeaker(p, 415, g.vols[3], g.blueFluidColor);
     fillBeaker(p, 595, g.vols[2], g.blueFluidColor);
-    p.image(graphics.beakers, 0, 0);
+    p.image(singleGraphics.beakers, 0, 0);
   };
 };
 
