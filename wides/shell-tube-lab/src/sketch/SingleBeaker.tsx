@@ -99,7 +99,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
       p.pop();
     } else {
       // Pumps have been running
-      for (let i = 0; i < 4; i++) p.image(graphics.tubes[i], 0, 0); // fill all tubes
+      for (let i = 0; i < 4; i++) p.image(singleGraphics.tubes[i], 0, 0); // fill all tubes
       p.image(graphics.orngShellTube, 75, 75);
       p.image(graphics.blueShellTube, 75, 75);
     }
@@ -133,6 +133,13 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     showDebugCoordinates(p);
 
     fillAnimation();
+
+    // prettier-ignore
+    fillBeaker(p,  55, g.vols[0], g.orangeFluidColor);
+    fillBeaker(p, 235, g.vols[1], g.orangeFluidColor);
+    fillBeaker(p, 415, g.vols[3], g.blueFluidColor);
+    fillBeaker(p, 595, g.vols[2], g.blueFluidColor);
+    p.image(graphics.beakers, 0, 0);
   };
 };
 

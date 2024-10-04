@@ -185,31 +185,34 @@ function createTubeFluidGraphic(
 function blueTubeFluidGraphicException(
   p: P5CanvasInstance,
   vertices: number[][],
-  color: any
+  color: any,
+  poly2start: number,
+  poly2end: number
 ) {
   let hi = p.createGraphics(p.width, p.height);
-  let i: number;
+  let i: number,
+    n: number = vertices.length;
   hi.push();
   hi.noStroke();
   hi.fill(color);
 
   // Upper part
   hi.beginShape();
-  for (i = 4; i < 12; i++) {
+  for (i = poly2start; i < poly2end; i++) {
     hi.vertex(vertices[i][0], vertices[i][1]);
   }
   hi.endShape();
 
   // Lower part
   hi.beginShape();
-  hi.vertex(vertices[0][0], vertices[0][1]);
-  hi.vertex(vertices[1][0], vertices[1][1]);
-  hi.vertex(vertices[2][0], vertices[2][1]);
-  hi.vertex(vertices[3][0], vertices[3][1]);
-  hi.vertex(vertices[12][0], vertices[12][1]);
-  hi.vertex(vertices[13][0], vertices[13][1]);
-  hi.vertex(vertices[14][0], vertices[14][1]);
-  hi.vertex(vertices[15][0], vertices[15][1]);
+  // Before 2nd polygon
+  for (i = 0; i < poly2start; i++) {
+    hi.vertex(vertices[i][0], vertices[i][1]);
+  }
+
+  for (i = poly2end; i < n; i++) {
+    hi.vertex(vertices[i][0], vertices[i][1]);
+  }
   hi.endShape();
   hi.pop();
 
@@ -270,7 +273,7 @@ export function createGraphicsObjects(p: P5CanvasInstance): graphicsObjects {
     tubes: [
       createTubeFluidGraphic(p, hiTubeVertices, ORANGE_FLUID_COLOR),
       createTubeFluidGraphic(p, hoTubeVertices, ORANGE_FLUID_COLOR),
-      blueTubeFluidGraphicException(p, ciTubeVertices, BLUE_FLUID_COLOR),
+      blueTubeFluidGraphicException(p, ciTubeVertices, BLUE_FLUID_COLOR, 4, 12),
       createTubeFluidGraphic(p, coTubeVertices, BLUE_FLUID_COLOR),
     ],
     valve: createValveGraphic(p),
@@ -283,25 +286,8 @@ export function createGraphicsObjects(p: P5CanvasInstance): graphicsObjects {
 // Single beaker tube vertices
 // prettier-ignore
 const hoSingleVert = [[100, 400],[100, 375],[110, 375],[110, 400],];
-// prettier-ignor
-const coSingleVert = [
-  [590, 440],
-  [440, 440],
-  [440, 430],
-  [440, 375],
-  [440, 75],
-  [440, 35],
-  [165, 35],
-  [165, 75],
-  [155, 75],
-  [155, 25],
-  [450, 25],
-  [450, 75],
-  [450, 375],
-  [450, 430],
-  [450, 430],
-  [590, 430],
-];
+// prettier-ignore
+const coSingleVert = [[600, 470],[600, 440],[440, 440],[440, 430],[440, 375],[440, 75],[440, 35],[165, 35],[165, 75],[155, 75],[155, 25],[450, 25],[450, 75],[450, 375],[450, 430],[450, 430],[610, 430],[610, 470],];
 
 function createEmptySingleTubes(p: P5CanvasInstance) {
   let bt = p.createGraphics(p.width, p.height);
@@ -344,11 +330,6 @@ function createSingleBeakers(p: P5CanvasInstance) {
   return t;
 }
 
-function singleBlueFluidException(p: P5CanvasInstance) {
-  let t = p.createGraphics(p.width, p.height);
-  return t;
-}
-
 export interface singleGraphicsObj {
   emptyTubes: any;
   beakers: any;
@@ -357,16 +338,33 @@ export interface singleGraphicsObj {
 export function createSingleGraphicsObjects(
   p: P5CanvasInstance
 ): singleGraphicsObj {
+  // Create all single beaker graphics objects
   let g: singleGraphicsObj = {
     emptyTubes: createEmptySingleTubes(p),
     beakers: createSingleBeakers(p),
     tubes: [
       createTubeFluidGraphic(p, hiTubeVertices, ORANGE_FLUID_COLOR),
       createTubeFluidGraphic(p, hoSingleVert, ORANGE_FLUID_COLOR),
-      blueTubeFluidGraphicException(p, coSingleVert, BLUE_FLUID_COLOR),
+      blueTubeFluidGraphicException(p, coSingleVert, BLUE_FLUID_COLOR, 5, 13),
       createTubeFluidGraphic(p, coTubeVertices, BLUE_FLUID_COLOR),
     ],
   };
+
+  // Fix output tubes liquid so it falls in beakers
+  // ho
+  g.tubes[1].push();
+  g.tubes[1].noStroke();
+  g.tubes[1].fill(ORANGE_FLUID_COLOR);
+  g.tubes[1].rect(100, 400, 10, 70);
+  g.tubes[1].pop();
+
+  // co
+  // g.tubes[2].push();
+  // g.tubes[2].noStroke();
+  // g.tubes[2].fill(BLUE_FLUID_COLOR);
+  // g.tubes[2].rect(100, 400, 10, 70);
+  // g.tubes[2].pop();
+
   return g;
 }
 
