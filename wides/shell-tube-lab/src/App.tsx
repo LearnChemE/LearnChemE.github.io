@@ -26,6 +26,7 @@ function App() {
   const [pumpBtnIsDisabled, setPumpBtnDisabled] = useState(false);
   const [experimentMode, setExperimentMode] = useState(SINGLE_BEAKER_MODE);
   const [sideBarIsShowing, setSideBarShowing] = useState(false);
+  let pumpBtnTimeout: NodeJS.Timeout;
 
   // Event handlers
   const pumpBtnHandler = () => {
@@ -33,7 +34,7 @@ function App() {
       // startTime === NOT_STARTED
       g.startTime = -2; // START_NEXT_FRAME
       setPumpBtnDisabled(true);
-      setTimeout(() => {
+      pumpBtnTimeout = setTimeout(() => {
         setPumpBtnDisabled(false);
       }, 5000);
     }
@@ -45,7 +46,14 @@ function App() {
   const measureBtnHandler = () => {
     setMeasured([g.Th_in, g.Th_out_observed, g.Tc_in, g.Tc_out_observed]);
   };
-  const resetBtnHandler = () => {};
+  const resetBtnHandler = () => {
+    g.vols = [1000, 0, 1000, 0]; // reset volumes
+    g.startTime = -1; // NOT_STARTED
+    setPumpBtnDisabled(false);
+    setPumpsAreRunning(false);
+    setMeasured([-1, -1, -1, -1]);
+    clearTimeout(pumpBtnTimeout);
+  };
 
   // Wrapper for Controls to keep the hooks the same
   const ControlWrapper = () => {
@@ -79,6 +87,7 @@ function App() {
           <a className="tooltip-anchor" id="ho-anchor" />
           <a className="tooltip-anchor" id="ci-anchor" />
           <a className="tooltip-anchor" id="co-anchor" />
+          <a className="tooltip-anchor" id="outlet-tubes-anchor" />
         </div>
       </div>
 
@@ -86,7 +95,10 @@ function App() {
         showing={sideBarIsShowing}
         onCloseBtnClick={() => setSideBarShowing(false)}
         selected={experimentMode}
-        toggleSelected={(newMode) => setExperimentMode(newMode)}
+        toggleSelected={(newMode) => {
+          resetBtnHandler();
+          setExperimentMode(newMode);
+        }}
         onResetBtnClick={() => resetBtnHandler()}
       >
         <ControlWrapper />
@@ -98,7 +110,7 @@ function App() {
 
       <Tooltips
         measured={measured}
-        canvasMode={0}
+        canvasMode={experimentMode}
         pumpsAreRunning={pumpsAreRunning}
       />
     </>
