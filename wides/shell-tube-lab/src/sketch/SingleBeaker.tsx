@@ -139,7 +139,12 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     p.image(graphics.pumpAssembly, 601, 470);
 
     p.push();
-    p.translate(58, 400);
+    p.translate(60, 420);
+    p.scale(0.6);
+    p.image(graphics.valve, 0, 0);
+    p.pop();
+    p.push();
+    p.translate(610, 420);
     p.scale(0.6);
     p.image(graphics.valve, 0, 0);
     p.pop();
