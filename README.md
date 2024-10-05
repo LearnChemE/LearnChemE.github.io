@@ -1,4 +1,4 @@
-# LearnChemE.github.io
+# [LearnChemE.github.io](https://learncheme.github.io)
 
 This repository includes simulations created for https://www.learncheme.com/ to demonstrate the fundamental concepts of chemical and biological engineering, among other related topics. It also contains embedabble features and scripts used on LearnChemE. Contact us at learncheme@gmail.com to collaborate or inquire.
 
