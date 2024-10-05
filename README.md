@@ -1,4 +1,29 @@
-#In-Browser Demonstrations
-Simulations created for https://www.learncheme.com/ to demonstrate the fundamental concepts of chemical and biological engineering, among other related topics. Contact us at learncheme@gmail.com to collaborate or inquire.
+# LearnChemE.github.io
 
-/demos/ contains the source code for all of the simulations available on our website.
+This repository includes simulations created for https://www.learncheme.com/ to demonstrate the fundamental concepts of chemical and biological engineering, among other related topics. It also contains embedabble features and scripts used on LearnChemE. Contact us at learncheme@gmail.com to collaborate or inquire.
+
+`/accordion_iframes/` contains embeddable "accordion" elements used on LearnChemE.com.
+
+`/demos/` contains the source code for all of the simulations available on our website.
+
+`/home_page/` contains styling for https://learncheme.github.io.
+
+`/iframe/` contains embeddable quizzes covering various engineering topics.
+
+`/lab-experiments/` contains virtual laboratory experiments. See https://learncheme.com/virtual-laboratories/ for more information.
+
+`/learnchemejs/` contains the first prototypes of our in-browser simulations, developed in 2017, which served as a precursor for all of the simulations developed thereafter.
+
+`/libraries/` contains JavaScript libraries that were modified from their original sources.
+
+`/media/` contains common assets used by multiple different applications within this repository.
+
+`/quiz_questions/` is an quiz used within a learning module posted on LearnChemE.
+
+`/resources/` contains miscellaneous files, including large datasets, Excel spreadsheets, and non-JavaScript simulations that can be downloaded via links on LearnChemE.
+
+`/templates/` contains templates for building simulations.
+
+`/website_resources/` contains an application that displays YouTube videos as a pop-up window to be viewed while using simulations.
+
+`/wides/` contains virtual laboratories currently in progress
