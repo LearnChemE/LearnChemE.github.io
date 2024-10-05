@@ -2,15 +2,15 @@
 
 This repository includes simulations created for https://www.learncheme.com/ to demonstrate the fundamental concepts of chemical and biological engineering, among other related topics. It also contains embedabble features and scripts used on LearnChemE. Contact us at learncheme@gmail.com to collaborate or inquire.
 
-`/accordion_iframes/` contains embeddable "accordion" elements used on LearnChemE.com.
+`/demos/` **contains the source code for all of the simulations available on our website.**
 
-`/demos/` contains the source code for all of the simulations available on our website.
+`/lab-experiments/` **contains our virtual laboratory experiments.** See https://learncheme.com/virtual-laboratories/ for more information.
+
+`/accordion_iframes/` contains embeddable "accordion" elements used on LearnChemE.com.
 
 `/home_page/` contains styling for https://learncheme.github.io.
 
 `/iframe/` contains embeddable quizzes covering various engineering topics.
-
-`/lab-experiments/` contains virtual laboratory experiments. See https://learncheme.com/virtual-laboratories/ for more information.
 
 `/learnchemejs/` contains the first prototypes of our in-browser simulations, developed in 2017, which served as a precursor for all of the simulations developed thereafter.
 
