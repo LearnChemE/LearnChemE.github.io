@@ -162,8 +162,11 @@ btn-outline-primary {
 }
 
 .close {
+  position: absolute;
+  right: 1px;
   border: none;
   background: transparent;
+  margin-right: 20px;
   font-size: 1.5rem;
 }
 
