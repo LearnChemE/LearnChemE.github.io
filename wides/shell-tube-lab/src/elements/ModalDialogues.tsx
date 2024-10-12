@@ -49,7 +49,7 @@ export const DirectionsModalDialogue = () => {
       case WORKSHEET:
         innerHtml = (
           <embed
-            src="./ME_DoublePipe-Worksheet_2020-2021_Final.pdf"
+            src="./Shell-and-Tube-Worksheet-2022.pdf"
             width="100%"
             height="800px"
           />
