@@ -75,7 +75,14 @@ function App() {
     <>
       <div className="sim-wrapper">
         <ControlWrapper />
-        <div className="graphics-wrapper">
+        <div
+          className="graphics-wrapper"
+          style={
+            measured[0] != -1
+              ? { cursor: "url('thermometer.png') 25 95, auto" }
+              : { cursor: "auto" }
+          }
+        >
           <ReactP5Wrapper
             sketch={
               experimentMode === DOUBLE_BEAKER_MODE

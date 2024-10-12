@@ -33,6 +33,7 @@ const START_PUMPS_NEXT_FRAME = -2;
 const SingleBeakerSketch = (p: P5CanvasInstance) => {
   let graphics: graphicsObjects;
   let singleGraphics: singleGraphicsObj;
+  let thermometer: any;
 
   const drawValves = (p: P5CanvasInstance) => {
     p.push();
@@ -114,10 +115,13 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     // Load graphics objects
     graphics = createGraphicsObjects(p);
     singleGraphics = createSingleGraphicsObjects(p);
+    thermometer = p.loadImage("thermometer.png");
     // Randomize start Temps
     randStartVals();
     g.mDotH = MAX_HOT_FLOWRATE;
     g.mDotC = MAX_COLD_FLOWRATE;
+    // Im used to OpenGL so I like degrees
+    p.angleMode(p.DEGREES);
   };
 
   p.draw = () => {
@@ -129,6 +133,13 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     handleSingleBeakerCalculations(p.deltaTime);
 
     fillAnimation();
+    if (g.startTime !== PUMPS_NOT_STARTED) {
+      p.push();
+      p.translate(198, 370);
+      p.rotate(80);
+      p.image(thermometer, 0, 0);
+      p.pop();
+    }
 
     // Pumps
     p.image(graphics.pumpAssembly, 51, 470);
@@ -143,9 +154,9 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     fillBeaker(p, 595, g.vols[2], g.blueFluidColor);
     p.image(singleGraphics.beakers, 0, 0);
     // Debug purposes
-    console.log(
-      g.Th_in + " " + g.Th_out + " " + g.Tc_in + " " + g.Tc_out + " "
-    );
+    // console.log(
+    //   g.Th_in + " " + g.Th_out + " " + g.Tc_in + " " + g.Tc_out + " "
+    // );
   };
 };
 
