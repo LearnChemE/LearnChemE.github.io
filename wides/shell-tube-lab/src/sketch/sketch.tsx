@@ -194,7 +194,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
   p.draw = () => {
     if (g.startTime === START_PUMPS_NEXT_FRAME) g.startTime = p.millis();
     p.background(250);
-    showDebugCoordinates(p);
+    // showDebugCoordinates(p);
 
     p.image(graphics.pumpAssembly, 51, 455);
     p.image(graphics.pumpAssembly, 600, 455);

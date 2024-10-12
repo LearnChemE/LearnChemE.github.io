@@ -129,7 +129,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     if (g.startTime === START_PUMPS_NEXT_FRAME) g.startTime = p.millis();
     p.background(250);
     // Coordinates in top left
-    showDebugCoordinates(p);
+    // showDebugCoordinates(p);
     // Calculations
     handleSingleBeakerCalculations(p.deltaTime);
 
