@@ -194,7 +194,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     ) {
       pinchingColdTube = true;
       setTimeout(() => {
-        g.mDotC = MAX_COLD_FLOWRATE / 8;
+        g.mDotC = MAX_COLD_FLOWRATE / 4;
       }, 1000);
     }
   };

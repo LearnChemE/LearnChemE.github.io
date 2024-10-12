@@ -386,13 +386,6 @@ export function createSingleGraphicsObjects(
   g.tubes[1].rect(100, 400, 10, 70);
   g.tubes[1].pop();
 
-  // co
-  // g.tubes[2].push();
-  // g.tubes[2].noStroke();
-  // g.tubes[2].fill(BLUE_FLUID_COLOR);
-  // g.tubes[2].rect(100, 400, 10, 70);
-  // g.tubes[2].pop();
-
   return g;
 }
 
