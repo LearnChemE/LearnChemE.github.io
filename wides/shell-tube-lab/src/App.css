@@ -49,7 +49,7 @@ canvas {
 /* The side navigation menu */
 .sidebar {
   display: grid;
-  grid-template-rows: 3em 3em 3em max-content 3em;
+  grid-template-rows: 3em max-content max-content max-content 3em;
   height: 100%; /* 100% Full-height */
   position: fixed; /* Stay in place */
   z-index: 2; /* Stay on top */
@@ -106,7 +106,7 @@ canvas {
 }
 
 .sidebar-item {
-  height: 50px;
+  height: max-content;
   padding: 8px 8px 8px 8px;
   text-align: center;
   text-decoration: none;

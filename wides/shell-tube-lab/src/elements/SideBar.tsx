@@ -34,7 +34,10 @@ const SideBar: React.FC<SideBarProps> = ({
           }
           onClick={() => toggleSelected(0)}
         >
-          Double-beaker setup
+          {selected === 0
+            ? `Experiment 1-2: Flow Patterns and Heat Transfer
+          Rate`
+            : `Experiment 1-2`}
         </div>
         <div
           className={
@@ -42,7 +45,9 @@ const SideBar: React.FC<SideBarProps> = ({
           }
           onClick={() => toggleSelected(1)}
         >
-          Single-beaker setup
+          {selected === 1
+            ? `Experiment 3: Effect of Flowrate on Heat Transfer Rate`
+            : `Experiment 3`}
         </div>
         <div
           className={dropDownShowing ? "sidebar-item vl" : "sidebar-item"}
