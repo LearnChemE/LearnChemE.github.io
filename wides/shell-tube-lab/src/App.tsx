@@ -24,7 +24,7 @@ function App() {
   const [pumpsAreRunning, setPumpsAreRunning] = useState(false);
   const [measured, setMeasured] = useState([-1, -1, -1, -1]);
   const [pumpBtnIsDisabled, setPumpBtnDisabled] = useState(false);
-  const [experimentMode, setExperimentMode] = useState(SINGLE_BEAKER_MODE);
+  const [experimentMode, setExperimentMode] = useState(DOUBLE_BEAKER_MODE);
   const [sideBarIsShowing, setSideBarShowing] = useState(false);
   let pumpBtnTimeout: NodeJS.Timeout;
 
