@@ -49,7 +49,7 @@ canvas {
 /* The side navigation menu */
 .sidebar {
   display: grid;
-  grid-template-rows: 3em 3em 3em max-content 3em;
+  grid-template-rows: 3em max-content max-content max-content 3em;
   height: 100%; /* 100% Full-height */
   position: fixed; /* Stay in place */
   z-index: 2; /* Stay on top */
@@ -106,7 +106,7 @@ canvas {
 }
 
 .sidebar-item {
-  height: 50px;
+  height: max-content;
   padding: 8px 8px 8px 8px;
   text-align: center;
   text-decoration: none;
@@ -191,4 +191,69 @@ canvas {
       }
     }
   }
+}
+
+.tooltip-anchor {
+  position: absolute;
+  /* for debugging */
+  /* background-color: yellow;  */
+  top: 455px;
+  width: 151px;
+  height: 181px;
+}
+
+#hi-anchor {
+  left: 63px;
+}
+
+#ho-anchor {
+  left: 243px;
+}
+
+#ci-anchor {
+  left: 602px;
+}
+
+#co-anchor {
+  left: 422px;
+}
+
+#outlet-tubes-anchor {
+  /* background-color: yellow; */
+  top: 390px;
+  left: 100px;
+  height: 60px;
+  width: 550px;
+}
+
+.hide-arrow {
+  /* background-color: rgb(21, 76, 255) !important; */
+  position: absolute !important;
+  left: 70px !important;
+  top: -4px !important;
+}
+
+.modal-header {
+  justify-content: space-between;
+}
+
+.vl {
+  border-left: 1px solid rgb(85, 85, 85);
+  height: 40px;
+}
+
+.hl {
+  border-bottom: 2px solid rgb(21, 76, 255);
+  width: auto;
+}
+
+.modal-titles-container {
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+  gap: 20px;
+}
+
+.btn-light {
+  background-color: white;
+  border-color: white;
 }

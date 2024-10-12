@@ -1,12 +1,14 @@
 import React from "react";
 import logo from "./logo.svg";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap";
 import "./App.css";
 import { useState, useEffect } from "react";
 import Controls from "./elements/Controls";
 import SideBar from "./elements/SideBar";
 import { ReactP5Wrapper } from "@p5-wrapper/react";
 import ShellTubeSketch, { g } from "./sketch/sketch";
+import SingleBeakerSketch from "./sketch/SingleBeaker";
 import {
   DirectionsModalDialogue,
   DetailsModalDialogue,
@@ -14,28 +16,44 @@ import {
 } from "./elements/ModalDialogues";
 import { Tooltips } from "./elements/Tooltips";
 
+const DOUBLE_BEAKER_MODE = 0;
+const SINGLE_BEAKER_MODE = 1;
+
 function App() {
   // State vars
   const [pumpsAreRunning, setPumpsAreRunning] = useState(false);
   const [measured, setMeasured] = useState([-1, -1, -1, -1]);
   const [pumpBtnIsDisabled, setPumpBtnDisabled] = useState(false);
-  // const [canvasMode, setCanvasMode] = useState(DOUBLE_BEAKER);
+  const [experimentMode, setExperimentMode] = useState(DOUBLE_BEAKER_MODE);
   const [sideBarIsShowing, setSideBarShowing] = useState(false);
+  let pumpBtnTimeout: NodeJS.Timeout;
 
   // Event handlers
   const pumpBtnHandler = () => {
     if (g.startTime === -1) {
       // startTime === NOT_STARTED
       g.startTime = -2; // START_NEXT_FRAME
+      setPumpBtnDisabled(true);
+      pumpBtnTimeout = setTimeout(() => {
+        setPumpBtnDisabled(false);
+      }, 5000);
     }
     g.hIsFlowing = !pumpsAreRunning;
     g.cIsFlowing = !pumpsAreRunning;
     setPumpsAreRunning((pumpsAreRunning) => !pumpsAreRunning);
+    setMeasured([-1, -1, -1, -1]);
   };
   const measureBtnHandler = () => {
-    setMeasured([g.Th_in, g.Th_out, g.Tc_in, g.Tc_out]);
+    setMeasured([g.Th_in, g.Th_out_observed, g.Tc_in, g.Tc_out_observed]);
   };
-  const resetBtnHandler = () => {};
+  const resetBtnHandler = () => {
+    g.vols = [1000, 0, 1000, 0]; // reset volumes
+    g.startTime = -1; // NOT_STARTED
+    setPumpBtnDisabled(false);
+    setPumpsAreRunning(false);
+    setMeasured([-1, -1, -1, -1]);
+    clearTimeout(pumpBtnTimeout);
+  };
 
   // Wrapper for Controls to keep the hooks the same
   const ControlWrapper = () => {
@@ -57,19 +75,41 @@ function App() {
     <>
       <div className="sim-wrapper">
         <ControlWrapper />
-        <div className="graphics-wrapper">
-          <ReactP5Wrapper sketch={ShellTubeSketch} />
+        <div
+          className="graphics-wrapper"
+          style={
+            measured[0] != -1
+              ? { cursor: "url('thermometer.png') 25 95, auto" }
+              : { cursor: "auto" }
+          }
+        >
+          <ReactP5Wrapper
+            sketch={
+              experimentMode === DOUBLE_BEAKER_MODE
+                ? ShellTubeSketch
+                : SingleBeakerSketch
+            }
+          />
           <a className="tooltip-anchor" id="hi-anchor" />
           <a className="tooltip-anchor" id="ho-anchor" />
           <a className="tooltip-anchor" id="ci-anchor" />
           <a className="tooltip-anchor" id="co-anchor" />
+          <a
+            className="tooltip-anchor"
+            id="outlet-tubes-anchor"
+            data-tooltip-offset={30}
+          />
         </div>
       </div>
+
       <SideBar
         showing={sideBarIsShowing}
         onCloseBtnClick={() => setSideBarShowing(false)}
-        selected={0}
-        toggleSelected={() => {}}
+        selected={experimentMode}
+        toggleSelected={(newMode) => {
+          resetBtnHandler();
+          setExperimentMode(newMode);
+        }}
         onResetBtnClick={() => resetBtnHandler()}
       >
         <ControlWrapper />
@@ -81,7 +121,7 @@ function App() {
 
       <Tooltips
         measured={measured}
-        canvasMode={0}
+        canvasMode={experimentMode}
         pumpsAreRunning={pumpsAreRunning}
       />
     </>

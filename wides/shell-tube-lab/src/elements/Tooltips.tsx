@@ -33,6 +33,7 @@ export const Tooltips: React.FC<MeasuredVals> = ({
   }
 
   if (canvasMode == 0)
+    // Double beakers
     return (
       <>
         <Tooltip anchorSelect="#hi-anchor" place="bottom">
@@ -49,20 +50,25 @@ export const Tooltips: React.FC<MeasuredVals> = ({
         </Tooltip>
       </>
     );
+  // Single beakers
   else
     return (
       <>
-        <Tooltip anchorSelect="#hot-single-anchor" place="bottom">
+        <Tooltip anchorSelect="#hi-anchor" place="bottom">
           Temperature: {measuredStrings[0]} °C
         </Tooltip>
-        <Tooltip anchorSelect="#cold-single-anchor" place="bottom">
+        <Tooltip anchorSelect="#ci-anchor" place="bottom">
           Temperature: {measuredStrings[2]} °C
         </Tooltip>
         {/* <Tooltip anchorSelect="#outlet-tubes-anchor" place="left">
           Temperature: {g.Tc_out.toFixed(1)} °C
         </Tooltip> */}
         {pumpsAreRunning && (
-          <Tooltip anchorSelect="#outlet-tubes-anchor" place="right">
+          <Tooltip
+            anchorSelect="#outlet-tubes-anchor"
+            place="bottom-start"
+            classNameArrow="hide-arrow"
+          >
             Temperature: {tHOut.toFixed(1)} °C
           </Tooltip>
         )}

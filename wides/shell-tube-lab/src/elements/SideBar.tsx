@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+const DOUBLE_BEAKER_MODE = 0;
+const SINGLE_BEAKER_MODE = 1;
+
 interface SideBarProps {
   showing: boolean;
   onCloseBtnClick: () => void;
@@ -12,7 +15,7 @@ interface SideBarProps {
 const SideBar: React.FC<SideBarProps> = ({
   showing,
   onCloseBtnClick,
-  selected = 0,
+  selected = DOUBLE_BEAKER_MODE,
   toggleSelected,
   onResetBtnClick,
   children,
@@ -26,16 +29,25 @@ const SideBar: React.FC<SideBarProps> = ({
         <button className="btn-close" onClick={() => onCloseBtnClick()} />
 
         <div
-          className={selected === 0 ? "sidebar-item vl" : "sidebar-item"}
+          className={
+            selected === DOUBLE_BEAKER_MODE ? "sidebar-item vl" : "sidebar-item"
+          }
           onClick={() => toggleSelected(0)}
         >
-          Double-beaker setup
+          {selected === 0
+            ? `Experiment 1-2: Flow Patterns and Heat Transfer
+          Rate`
+            : `Experiment 1-2`}
         </div>
         <div
-          className={selected === 1 ? "sidebar-item vl" : "sidebar-item"}
+          className={
+            selected === SINGLE_BEAKER_MODE ? "sidebar-item vl" : "sidebar-item"
+          }
           onClick={() => toggleSelected(1)}
         >
-          Single-beaker setup
+          {selected === 1
+            ? `Experiment 3: Effect of Flowrate on Heat Transfer Rate`
+            : `Experiment 3`}
         </div>
         <div
           className={dropDownShowing ? "sidebar-item vl" : "sidebar-item"}

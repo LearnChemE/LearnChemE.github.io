@@ -16,14 +16,11 @@ export const DirectionsModalDialogue = () => {
         innerHtml = (
           <>
             <div className="modal-body-content">
-              <h6>Double-beaker setup</h6>
+              <h6>Experiment 1-2: Flow Patterns and Heat Transfer Rate</h6>
               <p>
                 This digital lab, which represents a double pipe heat exchanger
                 with countercurrent flow, is designed to be used with this{" "}
-                <a
-                  href="./ME_DoublePipe-Worksheet_2020-2021_Final.pdf"
-                  download
-                >
+                <a href="./Shell-and-Tube-Worksheet-2022.pdf" download>
                   worksheet
                 </a>
                 . Drag the valves on each inlet beaker to set flowrates, and
@@ -32,14 +29,14 @@ export const DirectionsModalDialogue = () => {
                 temperatures" button, then hover your mouse over each beaker to
                 read the temperature.
               </p>
-              <h6>Single-beaker setup</h6>
+              <h6>Experiment 3: Effect of Flowrate on Heat Transfer Rate</h6>
               <p>
                 Measure the temperatures of the beakers by clicking the "measure
                 temperatures" button then hovering over each beaker. Start the
                 pumps using the "start pumps" button, then hover your mouse over
                 the outlet tubes to measure the hot fluid's outlet temperature.
                 Click and hold on the cold inlet tube to pinch it, lowering the
-                flowrate of the cold fluid. Measure the effect of this on the
+                flowrate of the cold water. Measure the effect of this on the
                 hot outlet tube.
               </p>
             </div>
@@ -49,7 +46,7 @@ export const DirectionsModalDialogue = () => {
       case WORKSHEET:
         innerHtml = (
           <embed
-            src="./ME_DoublePipe-Worksheet_2020-2021_Final.pdf"
+            src="./Shell-and-Tube-Worksheet-2022.pdf"
             width="100%"
             height="800px"
           />
