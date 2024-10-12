@@ -5,6 +5,8 @@ import {
   MAX_COLD_FLOWRATE,
   MIN_HOT_FLOWRATE,
   MAX_HOT_FLOWRATE,
+  handleDoubleBeakerCalculations,
+  randStartVals,
 } from "./functions";
 
 // Globals defined here
@@ -41,6 +43,15 @@ export const g = {
   dragging2: false,
 };
 
+const showDebugCoordinates = (p: P5CanvasInstance) => {
+  p.push();
+  p.noStroke();
+  p.fill("black");
+  p.textAlign(p.LEFT, p.TOP);
+  p.text("x: " + p.mouseX.toFixed(0) + " y: " + p.mouseY.toFixed(0), 1, 1);
+  p.pop();
+};
+
 const NOT_DRAGGING = 0;
 const DRAGGING_HOT = 1;
 const DRAGGING_COLD = 2;
@@ -71,8 +82,8 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       g.mDotH += dmDot;
       g.mDotH = p.constrain(g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE);
     } else {
-      theta = p.atan2(p.mouseY - 440, p.mouseX - 445);
-      prevTheta = p.atan2(p.pmouseY - 440, p.pmouseX - 445);
+      theta = p.atan2(p.mouseY - 442, p.mouseX - 627);
+      prevTheta = p.atan2(p.pmouseY - 442, p.pmouseX - 627);
       dTheta = Math.sign(theta * prevTheta) === -1 ? 0 : theta - prevTheta;
       dmDot = p.map(
         dTheta,
@@ -86,6 +97,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       g.mDotC = p.constrain(g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE);
     }
   };
+
   const drawValve = (
     x: number,
     y: number,
@@ -111,9 +123,10 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     p.image(valve, 0, 0);
     p.pop();
   };
+
   const fillAnimation = () => {
     let start: number;
-    p.image(graphics.beakersAndTubes, 0, 0);
+    p.image(graphics.emptyTubes, 0, 0);
     p.image(graphics.shellTube, 75, 75);
 
     if ((start = g.startTime) === PUMPS_NOT_STARTED) return; // Pumps not started
@@ -122,19 +135,33 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     if (current < 5000) {
       // Fill animation
       // fill inlet tubes
-      let alpha: number = p.map(current, 0, 1000, 0, 200, true);
-      let color: Array<number> = g.orangeFluidColor;
-      color[3] = alpha;
+      let alpha: number = p.map(current, 0, 1000, 0, 255, true);
+      let color: Array<number> = [255, 255, 255, alpha];
       p.push();
       p.tint(color);
       p.image(graphics.tubes[0], 0, 0);
-
-      color = g.blueFluidColor;
-      color[3] = alpha * 0.9;
-      p.tint(color);
       p.image(graphics.tubes[3], 0, 0);
 
-      alpha = p.map(current, 1000, 4000, 0, 300, true);
+      // HEX fill
+      alpha = p.map(current, 1000, 4000, 0, 475, true);
+      let alpha2 = p.map(current, 1000, 4000, 0, 300, true);
+      let blue = graphics.blueShellTube.get(475 - alpha, 0, alpha, 300);
+      let orng = graphics.orngShellTube.get(0, 0, 475, alpha2);
+      if (alpha2 < 1 || alpha < 1) {
+        p.pop();
+        return;
+      }
+      p.image(orng, 75, 75);
+      p.image(blue, 550 - alpha, 75);
+
+      // Exit tubes
+      alpha = p.map(current, 4000, 5000, 0, 255, true);
+      color = [255, 255, 255, alpha];
+      p.tint(color);
+      p.image(graphics.tubes[1], 0, 0);
+      p.image(graphics.tubes[2], 0, 0);
+
+      p.pop();
     } else {
       // Pumps have been running
       for (let i = 0; i < 4; i++) p.image(graphics.tubes[i], 0, 0); // fill all tubes
@@ -143,17 +170,34 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     }
   };
 
+  const fillBeaker = (
+    p: P5CanvasInstance,
+    x: number,
+    vol: number,
+    color: Array<number>
+  ) => {
+    let width = 150;
+    vol *= 0.16;
+    p.push();
+    p.fill(...color);
+    p.noStroke();
+    p.rect(x, 630 - vol, width, vol);
+    p.pop();
+  };
+
   p.setup = () => {
     p.createCanvas(g.width, g.height);
     graphics = createGraphicsObjects(p); // Load graphics objects
+    randStartVals();
   };
 
   p.draw = () => {
     if (g.startTime === START_PUMPS_NEXT_FRAME) g.startTime = p.millis();
     p.background(250);
+    // showDebugCoordinates(p);
 
     p.image(graphics.pumpAssembly, 51, 455);
-    p.image(graphics.pumpAssembly, 420, 455);
+    p.image(graphics.pumpAssembly, 600, 455);
 
     fillAnimation();
     drag(isDraggingValves);
@@ -167,7 +211,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       graphics.valve
     );
     drawValve(
-      445,
+      625,
       440,
       g.mDotC,
       MIN_COLD_FLOWRATE,
@@ -175,6 +219,16 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       p,
       graphics.valve
     );
+
+    handleDoubleBeakerCalculations(p.deltaTime);
+    // console.log(g.Th_in, g.Th_out, g.Tc_in, g.Tc_out);
+
+    // prettier-ignore
+    fillBeaker(p,  55, g.vols[0], g.orangeFluidColor);
+    fillBeaker(p, 235, g.vols[1], g.orangeFluidColor);
+    fillBeaker(p, 415, g.vols[3], g.blueFluidColor);
+    fillBeaker(p, 595, g.vols[2], g.blueFluidColor);
+    p.image(graphics.beakers, 0, 0);
   };
 
   // P5 mousePressed handler determines if dragging
@@ -185,7 +239,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       if (x >= 35 && x <= 115) {
         isDraggingValves = DRAGGING_HOT;
       }
-      if (x >= 405 && x <= 485) {
+      if (x >= 585 && x <= 665) {
         isDraggingValves = DRAGGING_COLD;
       }
     }
