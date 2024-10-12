@@ -18,10 +18,10 @@ const CONDUCTIVITY_HOT_WATER = 0.6186; // W / m / K
 const HEX_AREA = 109; // cm2
 
 // Flowrates
-export const MAX_HOT_WATER_TEMP = 45.0;
-export const MIN_HOT_WATER_TEMP = 45.0;
+export const MAX_HOT_WATER_TEMP = 40.0;
+export const MIN_HOT_WATER_TEMP = 50.0;
 export const MAX_COLD_WATER_TEMP = 25.0;
-export const MIN_COLD_WATER_TEMP = 25.0;
+export const MIN_COLD_WATER_TEMP = 15.0;
 export const MAX_HOT_FLOWRATE = 28.0;
 export const MIN_HOT_FLOWRATE = 24.0;
 export const MAX_COLD_FLOWRATE = 36.0;

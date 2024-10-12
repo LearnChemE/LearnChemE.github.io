@@ -11,6 +11,7 @@ import {
   MAX_HOT_FLOWRATE,
   handleDoubleBeakerCalculations,
   randStartVals,
+  handleSingleBeakerCalculations,
 } from "./functions";
 import { g } from "./sketch";
 
@@ -33,29 +34,16 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
   let graphics: graphicsObjects;
   let singleGraphics: singleGraphicsObj;
 
-  const drawValve = (
-    x: number,
-    y: number,
-    flow: number,
-    minFlow: number,
-    maxFlow: number,
-    p: P5CanvasInstance,
-    valve: P5CanvasInstance
-  ) => {
+  const drawValves = (p: P5CanvasInstance) => {
     p.push();
-    var angle: number = p.map(
-      flow,
-      minFlow,
-      maxFlow,
-      (3 * Math.PI) / 4,
-      Math.PI
-    );
-    p.imageMode(p.CENTER);
-    p.translate(x, y);
-    p.scale(0.8);
-    p.rotate(angle);
-
-    p.image(valve, 0, 0);
+    p.translate(60, 420);
+    p.scale(0.6);
+    p.image(graphics.valve, 0, 0);
+    p.pop();
+    p.push();
+    p.translate(610, 420);
+    p.scale(0.6);
+    p.image(graphics.valve, 0, 0);
     p.pop();
   };
 
@@ -121,34 +109,32 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
   };
 
   p.setup = () => {
+    // Create canvas
     p.createCanvas(g.width, g.height);
-    graphics = createGraphicsObjects(p); // Load graphics objects
+    // Load graphics objects
+    graphics = createGraphicsObjects(p);
     singleGraphics = createSingleGraphicsObjects(p);
+    // Randomize start Temps
     randStartVals();
+    g.mDotH = MAX_HOT_FLOWRATE;
+    g.mDotC = MAX_COLD_FLOWRATE;
   };
 
   p.draw = () => {
     if (g.startTime === START_PUMPS_NEXT_FRAME) g.startTime = p.millis();
     p.background(250);
+    // Coordinates in top left
     showDebugCoordinates(p);
+    // Calculations
+    handleSingleBeakerCalculations(p.deltaTime);
 
     fillAnimation();
 
-    // Pumps and valves
+    // Pumps
     p.image(graphics.pumpAssembly, 51, 470);
     p.image(graphics.pumpAssembly, 601, 470);
-
-    p.push();
-    p.translate(60, 420);
-    p.scale(0.6);
-    p.image(graphics.valve, 0, 0);
-    p.pop();
-    p.push();
-    p.translate(610, 420);
-    p.scale(0.6);
-    p.image(graphics.valve, 0, 0);
-    p.pop();
-
+    // Valves
+    drawValves(p);
     // Beakers
     // prettier-ignore
     fillBeaker(p,  55, g.vols[0], g.orangeFluidColor);
@@ -156,6 +142,10 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     fillBeaker(p, 415, g.vols[3], g.blueFluidColor);
     fillBeaker(p, 595, g.vols[2], g.blueFluidColor);
     p.image(singleGraphics.beakers, 0, 0);
+    // Debug purposes
+    console.log(
+      g.Th_in + " " + g.Th_out + " " + g.Tc_in + " " + g.Tc_out + " "
+    );
   };
 };
 
