@@ -335,10 +335,32 @@ function createSingleBeakers(p: P5CanvasInstance) {
   return bt;
 }
 
+function createPinchingGraphic(p: P5CanvasInstance) {
+  let pinch = p.createGraphics(15, 30);
+  pinch.push();
+  pinch.noStroke();
+  // pinch.rect(419, 385, 12, 30);
+
+  pinch.fill("white");
+  pinch.triangle(0, 0, 0, 30, 4, 15);
+  pinch.triangle(12, 0, 12, 30, 8, 15);
+
+  pinch.stroke("black");
+  pinch.strokeWeight(2);
+  pinch.line(1, 0, 4, 15);
+  pinch.line(1, 30, 4, 15);
+  pinch.line(11, 0, 8, 15);
+  pinch.line(11, 30, 8, 15);
+
+  pinch.pop();
+  return pinch;
+}
+
 export interface singleGraphicsObj {
   emptyTubes: any;
   beakers: any;
   tubes: any[];
+  pinching: any;
 }
 export function createSingleGraphicsObjects(
   p: P5CanvasInstance
@@ -353,6 +375,7 @@ export function createSingleGraphicsObjects(
       blueTubeFluidGraphicException(p, coSingleVert, BLUE_FLUID_COLOR, 5, 13),
       createTubeFluidGraphic(p, coTubeVertices, BLUE_FLUID_COLOR),
     ],
+    pinching: createPinchingGraphic(p),
   };
 
   // Fix output tubes liquid so it falls in beakers

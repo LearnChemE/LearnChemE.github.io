@@ -34,6 +34,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
   let graphics: graphicsObjects;
   let singleGraphics: singleGraphicsObj;
   let thermometer: any;
+  let pinchingColdTube: boolean = false;
 
   const drawValves = (p: P5CanvasInstance) => {
     p.push();
@@ -153,10 +154,56 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     fillBeaker(p, 415, g.vols[3], g.blueFluidColor);
     fillBeaker(p, 595, g.vols[2], g.blueFluidColor);
     p.image(singleGraphics.beakers, 0, 0);
+
+    if (pinchingColdTube) {
+      p.push();
+      p.translate(575, 389);
+      p.rotate(90);
+      p.image(singleGraphics.pinching, 0, 0);
+      p.pop();
+    } else {
+      p.push();
+      p.noFill();
+      p.drawingContext.setLineDash([10, 10]);
+      p.stroke("green");
+      p.strokeWeight(2);
+      p.rect(
+        PINCH_LEFT,
+        PINCH_TOP,
+        PINCH_RIGHT - PINCH_LEFT,
+        PINCH_BOTTOM - PINCH_TOP
+      );
+      p.pop();
+    }
     // Debug purposes
     // console.log(
     //   g.Th_in + " " + g.Th_out + " " + g.Tc_in + " " + g.Tc_out + " "
     // );
+  };
+
+  const PINCH_LEFT: number = 475;
+  const PINCH_RIGHT: number = 635;
+  const PINCH_TOP: number = 375;
+  const PINCH_BOTTOM: number = 410;
+  p.mousePressed = () => {
+    if (
+      p.mouseX >= PINCH_LEFT &&
+      p.mouseX <= PINCH_RIGHT &&
+      p.mouseY >= PINCH_TOP &&
+      p.mouseY <= PINCH_BOTTOM
+    ) {
+      pinchingColdTube = true;
+      setTimeout(() => {
+        g.mDotC = MAX_COLD_FLOWRATE / 8;
+      }, 1000);
+    }
+  };
+
+  p.mouseReleased = () => {
+    pinchingColdTube = false;
+    setTimeout(() => {
+      g.mDotC = MAX_COLD_FLOWRATE;
+    }, 1000);
   };
 };
 
