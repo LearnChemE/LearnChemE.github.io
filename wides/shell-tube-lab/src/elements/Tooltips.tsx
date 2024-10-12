@@ -64,7 +64,11 @@ export const Tooltips: React.FC<MeasuredVals> = ({
           Temperature: {g.Tc_out.toFixed(1)} °C
         </Tooltip> */}
         {pumpsAreRunning && (
-          <Tooltip anchorSelect="#outlet-tubes-anchor" place="bottom">
+          <Tooltip
+            anchorSelect="#outlet-tubes-anchor"
+            place="bottom-start"
+            classNameArrow="hide-arrow"
+          >
             Temperature: {tHOut.toFixed(1)} °C
           </Tooltip>
         )}

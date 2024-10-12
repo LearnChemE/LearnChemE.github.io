@@ -226,6 +226,13 @@ canvas {
   width: 550px;
 }
 
+.hide-arrow {
+  /* background-color: rgb(21, 76, 255) !important; */
+  position: absolute !important;
+  left: 70px !important;
+  top: -4px !important;
+}
+
 .modal-header {
   justify-content: space-between;
 }

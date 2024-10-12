@@ -94,7 +94,11 @@ function App() {
           <a className="tooltip-anchor" id="ho-anchor" />
           <a className="tooltip-anchor" id="ci-anchor" />
           <a className="tooltip-anchor" id="co-anchor" />
-          <a className="tooltip-anchor" id="outlet-tubes-anchor" />
+          <a
+            className="tooltip-anchor"
+            id="outlet-tubes-anchor"
+            data-tooltip-offset={30}
+          />
         </div>
       </div>
 
