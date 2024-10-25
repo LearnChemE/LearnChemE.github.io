@@ -88,13 +88,19 @@ function enableSvgDrag(elts) {
   let isDragging = false;
   let prevX = 0;
   let prevY = 0;
+
+  const onRuler = (e) => {
+    console.log(e);
+  };
+
   svg.addEventListener("mousedown", (e) => {
     if (
       e.target === elts.switchElt ||
       e.target === elts.switchG ||
       e.target === elts.valve ||
       e.target === elts.valveCircle ||
-      e.target === elts.valveRect
+      e.target === elts.valveRect ||
+      onRuler(e)
     ) {
       return;
     }
