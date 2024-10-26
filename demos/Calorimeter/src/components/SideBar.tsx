@@ -12,7 +12,7 @@ interface SideBarProps {
   children: React.ReactNode;
 }
 
-const SideBar: React.FC<SideBarProps> = ({
+export const SideBar: React.FC<SideBarProps> = ({
   showing,
   onCloseBtnClick,
   selected = DOUBLE_BEAKER_MODE,

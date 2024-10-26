@@ -1,0 +1,16 @@
+.App {
+  text-align: center;
+  position: relative;
+  display: grid;
+  margin: auto;
+  width: 800px;
+}
+
+.sim-container {
+  border: 1px solid black;
+  box-shadow: 0px 0px 2px 2px grey;
+  border-radius: 4px;
+  padding: 5px;
+  display: grid;
+  grid-template-columns: auto max-content;
+}

@@ -1,65 +1,10 @@
 import { useState } from "react";
 
-interface controlProps {
-  pumpsAreRunning: boolean;
-  pumpBtnIsDisabled: boolean;
-  pumpBtnHandler: () => void;
-  measureBtnHandler: () => void;
-  menuBtnHandler: () => void;
-}
+interface ControlProps {}
 
-const Controls: React.FC<controlProps> = ({
-  pumpsAreRunning,
-  pumpBtnIsDisabled,
-  pumpBtnHandler,
-  measureBtnHandler,
-  menuBtnHandler,
-}) => {
-  let pumpBtnClass: string, icon: string, innerHtml: string;
-  if (pumpsAreRunning) {
-    pumpBtnClass = "btn btn-danger";
-    icon = "fa-solid fa-pause";
-    innerHtml = "stop pumps";
-  } else {
-    pumpBtnClass = "btn btn-success";
-    icon = "fa-solid fa-play";
-    innerHtml = "start pumps";
-  }
-
+export const Controls: React.FC<ControlProps> = ({}) => {
   return (
     <>
-      <div className="buttons-container" id="modal-buttons-container">
-        <button
-          type="button"
-          id="directions-button"
-          className="btn btn-primary"
-          title="Directions"
-          data-bs-toggle="modal"
-          data-bs-target="#directions-modal"
-        >
-          Directions
-        </button>
-        <button
-          type="button"
-          id="details-button"
-          className="btn btn-primary"
-          title="Simulation Details"
-          data-bs-toggle="modal"
-          data-bs-target="#details-modal"
-        >
-          Details
-        </button>
-        <button
-          type="button"
-          id="about-button"
-          className="btn btn-primary"
-          title="About this program"
-          data-bs-toggle="modal"
-          data-bs-target="#about-modal"
-        >
-          About
-        </button>
-      </div>
       <div className="nav-bar">
         <div id="nav-bar-left">
           <a href="./Shell-and-Tube-Worksheet-2022.pdf" download>
@@ -74,22 +19,22 @@ const Controls: React.FC<controlProps> = ({
           <button
             type="button"
             id="pumpsBtn"
-            className={pumpBtnClass}
-            disabled={pumpBtnIsDisabled}
-            aria-disabled={pumpBtnIsDisabled}
-            onClick={() => pumpBtnHandler()}
+            // className={}
+            // disabled={}
+            // aria-disabled={}
+            // onClick={}
           >
             <div>
-              <i className={icon}></i>
-              &nbsp; {innerHtml}
+              {/* <i className={icon}></i>
+              &nbsp; {innerHtml} */}
             </div>
           </button>
           <button
             type="button"
             className="btn btn-success"
-            disabled={pumpsAreRunning}
-            aria-disabled={pumpsAreRunning}
-            onClick={() => measureBtnHandler()}
+            // disabled={pumpsAreRunning}
+            // aria-disabled={pumpsAreRunning}
+            // onClick={() => measureBtnHandler()}
           >
             measure temperatures
           </button>
@@ -98,7 +43,7 @@ const Controls: React.FC<controlProps> = ({
           <button
             id="menu-btn"
             className="btn btn-secondary"
-            onClick={() => menuBtnHandler()}
+            // onClick={() => menuBtnHandler()}
           >
             <div>
               <i className="fa-solid fa-bars" />
