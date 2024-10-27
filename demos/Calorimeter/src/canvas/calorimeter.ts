@@ -11,24 +11,22 @@ interface graphics {
 // P5 Script to draw to canvas
 export const CalorimeterSketch = (p: P5CanvasInstance) => {
   let graphics: graphics;
-  let g: any;
 
-  // p.preload = () => {
-  //   graphics = {
-  //     calorimeter: p.loadImage("src/Calorimeter.png"),
-  //     thermometer: p.loadImage("Thermometer.png"),
-  //     thermoTicks: p.loadImage("ThermoTicks.png"),
-  //     stirrer: p.loadImage("Stirrer.png"),
-  //   };
-  // };
+  p.preload = () => {
+    graphics = {
+      calorimeter: p.loadImage("Calorimeter.png"),
+      thermometer: p.loadImage("Thermometer.png"),
+      thermoTicks: p.loadImage("ThermoTicks.png"),
+      stirrer: p.loadImage("Stirrer.png"),
+    };
+  };
 
   p.setup = () => {
     p.createCanvas(300, 480);
-    g = p.loadImage("Calorimeter.png");
   };
   p.draw = () => {
     p.background(255, 255, 255);
-    p.image(g, 0, 0);
+    p.image(graphics.calorimeter, 14, 210);
     // p.image(graphics.calorimeter, 0, 0);
   };
 };

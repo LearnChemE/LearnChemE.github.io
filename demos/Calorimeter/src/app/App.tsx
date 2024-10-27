@@ -15,7 +15,6 @@ function App() {
         <Controls />
         <div className="graphics-wrapper">
           <ReactP5Wrapper sketch={CalorimeterSketch} />
-          <a href="Calorimeter.png" />
         </div>
       </div>
     </div>
