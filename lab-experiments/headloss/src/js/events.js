@@ -88,29 +88,45 @@ function enableSvgDrag(elts) {
   let isDragging = false;
   let prevX = 0;
   let prevY = 0;
+  let rulerTransformX = 0;
+  let rulerTransformY = 0;
 
-  const onRuler = (e) => {
-    console.log(e);
-  };
+  let onRuler = false;
+  const ruler = elts.ruler;
+
+  ruler.addEventListener("mouseover", () => {
+    onRuler = true;
+  });
+
+  ruler.addEventListener("mouseout", () => {
+    onRuler = false;
+  });
+
+  document.addEventListener("mouseup", () => {
+    onRuler = false;
+  });
 
   svg.addEventListener("mousedown", (e) => {
+    console.log(onRuler);
     if (
       e.target === elts.switchElt ||
       e.target === elts.switchG ||
       e.target === elts.valve ||
       e.target === elts.valveCircle ||
-      e.target === elts.valveRect ||
-      onRuler(e)
+      e.target === elts.valveRect
     ) {
       return;
     }
     isDragging = true;
     prevX = e.clientX;
     prevY = e.clientY;
+    const currentTransform = ruler.getAttribute("transform");
+    rulerTransformX = Number(currentTransform.match(/translate\(([^,]+),/)[1]);
+    rulerTransformY = Number(currentTransform.match(/,([^)]+)\)/)[1]);
   });
 
   svg.addEventListener("mousemove", (e) => {
-    if (isDragging) {
+    if (isDragging && !onRuler) {
       const [x, y, width, height] = svg
         .getAttribute("viewBox")
         .split(" ")
@@ -133,6 +149,14 @@ function enableSvgDrag(elts) {
       );
       prevX = e.clientX;
       prevY = e.clientY;
+    } else if (isDragging && onRuler) {
+      const [x, y, width, height] = svg
+        .getAttribute("viewBox")
+        .split(" ")
+        .map(Number);
+      const dx = ((prevX - e.clientX) * width) / svg.clientWidth;
+      const dy = ((prevY - e.clientY) * height) / svg.clientHeight;
+      ruler.setAttribute("transform", `translate(${rulerTransformX - dx}, ${rulerTransformY - dy})`);
     }
   });
 
@@ -246,6 +270,7 @@ export default function addEvents() {
     valveRect: document.getElementById("valve-rect"),
     sourceLiquid: document.getElementById("source-liquid"),
     wasteLiquid: document.getElementById("waste-liquid"),
+    ruler: document.getElementById("ruler"),
   };
 
   elts.intakeLiquidMaxLength = elts.intakeLiquid.getTotalLength();
