@@ -23,9 +23,22 @@ function setDefaults(elts) {
   const wasteHeight = Number(elts.wasteLiquid.getAttribute("height"));
   elts.wasteLiquid.setAttribute("y", `${wasteY + wasteHeight}`);
   elts.wasteLiquid.setAttribute("height", 0);
+  elts.sourceLiquid.setAttribute("height", "26.25");
+  elts.sourceLiquid.setAttribute("y", "166.71507");
 
-  enableSvgZoom();
-  enableSvgDrag(elts);
+  state.switchOn = false;
+  state.flowing = false;
+  state.wasteBeakerFilling = false;
+
+  if (!state.initialized) {
+    enableSvgZoom();
+    enableSvgDrag(elts);
+    state.initialized = true;
+  } else {
+    elts.switchElt.setAttribute("x", "-10.611537");
+    elts.switchElt.setAttribute("y", "110.71905");
+    elts.switchElt.setAttribute("transform", "rotate(-38.9859)")
+  }
 }
 
 function enableSvgZoom() {
@@ -239,16 +252,14 @@ function handleHamburger() {
   });
 }
 
-function handleReset() {
+function handleReset(elts) {
   const resetButton = document.getElementById("reset");
   resetButton.addEventListener("click", () => {
     resetButton.classList.add("clicked");
     setTimeout(() => {
       resetButton.classList.remove("clicked");
     }, 100);
-    setTimeout(() => {
-      window.location.reload();
-    }, 200);
+    setDefaults(elts);
   });
 }
 
@@ -281,5 +292,5 @@ export default function addEvents() {
   switchLogic(elts);
   valveLogic(elts);
   handleHamburger();
-  handleReset();
+  handleReset(elts);
 }
