@@ -182,7 +182,7 @@ function flowThroughApparatus(elts) {
 
   const handleBeakers = () => {
     const V = state.flowRate; // flow rate (mL/s)
-    const beakerFractionPerSecond = V / 500; // s^-1
+    const beakerFractionPerSecond = V / 1000; // s^-1
     const beakerFractionPerMillisecond = beakerFractionPerSecond / 1000; // ms^-1
     const beakerFractionPerFrame = beakerFractionPerMillisecond * ms; // frame^-1
     const beakerPtsPerFrame = beakerFractionPerFrame * sourceStartHeight;

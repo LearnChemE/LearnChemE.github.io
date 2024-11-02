@@ -20,6 +20,7 @@ window.state = {
   maxViewBox: [0, 0, 0, 0],
   viewBox: [0, 0, 0, 0],
   showButtons: false,
+  initialized: false,
 };
 
 state.hamburgerHasBeenClicked =

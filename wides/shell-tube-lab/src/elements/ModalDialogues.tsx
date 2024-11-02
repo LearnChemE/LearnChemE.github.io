@@ -200,8 +200,12 @@ export const DirectionsModalDialogue = () => {
               by Drew Smith under the direction of Professor John L. Falconer
               and Michelle Medlin. This virtual lab was prepared with financial
               support from the National Science Foundation (DUE 2336987 and
-              2336988) and is based on the Shell and Tube Heat Exchanger
-              experimental kit and accompanying worksheet protocol developed
+              2336988) and is based on the &nbsp;
+              <a href="https://labs.wsu.edu/educ-ate/heat-transfer-kit/">
+                Shell and Tube Heat Exchanger
+                experimental kit
+              </a>&nbsp;
+              and accompanying worksheet protocol developed
               with separate support under NSF 1821578 led by Washington State
               University. Address any questions or comments to
               learncheme@gmail.com. Our simulations are open source, and are
