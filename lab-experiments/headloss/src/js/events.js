@@ -23,9 +23,22 @@ function setDefaults(elts) {
   const wasteHeight = Number(elts.wasteLiquid.getAttribute("height"));
   elts.wasteLiquid.setAttribute("y", `${wasteY + wasteHeight}`);
   elts.wasteLiquid.setAttribute("height", 0);
+  elts.sourceLiquid.setAttribute("height", "26.25");
+  elts.sourceLiquid.setAttribute("y", "166.71507");
 
-  enableSvgZoom();
-  enableSvgDrag(elts);
+  state.switchOn = false;
+  state.flowing = false;
+  state.wasteBeakerFilling = false;
+
+  if (!state.initialized) {
+    enableSvgZoom();
+    enableSvgDrag(elts);
+    state.initialized = true;
+  } else {
+    elts.switchElt.setAttribute("x", "-10.611537");
+    elts.switchElt.setAttribute("y", "110.71905");
+    elts.switchElt.setAttribute("transform", "rotate(-38.9859)")
+  }
 }
 
 function enableSvgZoom() {
@@ -88,7 +101,26 @@ function enableSvgDrag(elts) {
   let isDragging = false;
   let prevX = 0;
   let prevY = 0;
+  let rulerTransformX = 0;
+  let rulerTransformY = 0;
+
+  let onRuler = false;
+  const ruler = elts.ruler;
+
+  ruler.addEventListener("mouseover", () => {
+    onRuler = true;
+  });
+
+  ruler.addEventListener("mouseout", () => {
+    onRuler = false;
+  });
+
+  document.addEventListener("mouseup", () => {
+    onRuler = false;
+  });
+
   svg.addEventListener("mousedown", (e) => {
+    console.log(onRuler);
     if (
       e.target === elts.switchElt ||
       e.target === elts.switchG ||
@@ -101,10 +133,13 @@ function enableSvgDrag(elts) {
     isDragging = true;
     prevX = e.clientX;
     prevY = e.clientY;
+    const currentTransform = ruler.getAttribute("transform");
+    rulerTransformX = Number(currentTransform.match(/translate\(([^,]+),/)[1]);
+    rulerTransformY = Number(currentTransform.match(/,([^)]+)\)/)[1]);
   });
 
   svg.addEventListener("mousemove", (e) => {
-    if (isDragging) {
+    if (isDragging && !onRuler) {
       const [x, y, width, height] = svg
         .getAttribute("viewBox")
         .split(" ")
@@ -127,6 +162,14 @@ function enableSvgDrag(elts) {
       );
       prevX = e.clientX;
       prevY = e.clientY;
+    } else if (isDragging && onRuler) {
+      const [x, y, width, height] = svg
+        .getAttribute("viewBox")
+        .split(" ")
+        .map(Number);
+      const dx = ((prevX - e.clientX) * width) / svg.clientWidth;
+      const dy = ((prevY - e.clientY) * height) / svg.clientHeight;
+      ruler.setAttribute("transform", `translate(${rulerTransformX - dx}, ${rulerTransformY - dy})`);
     }
   });
 
@@ -209,16 +252,14 @@ function handleHamburger() {
   });
 }
 
-function handleReset() {
+function handleReset(elts) {
   const resetButton = document.getElementById("reset");
   resetButton.addEventListener("click", () => {
     resetButton.classList.add("clicked");
     setTimeout(() => {
       resetButton.classList.remove("clicked");
     }, 100);
-    setTimeout(() => {
-      window.location.reload();
-    }, 200);
+    setDefaults(elts);
   });
 }
 
@@ -240,6 +281,7 @@ export default function addEvents() {
     valveRect: document.getElementById("valve-rect"),
     sourceLiquid: document.getElementById("source-liquid"),
     wasteLiquid: document.getElementById("waste-liquid"),
+    ruler: document.getElementById("ruler"),
   };
 
   elts.intakeLiquidMaxLength = elts.intakeLiquid.getTotalLength();
@@ -250,5 +292,5 @@ export default function addEvents() {
   switchLogic(elts);
   valveLogic(elts);
   handleHamburger();
-  handleReset();
+  handleReset(elts);
 }
