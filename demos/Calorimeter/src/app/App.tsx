@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 import { ReactP5Wrapper } from "@p5-wrapper/react";
 import "p5";
 import "bootstrap";
@@ -8,13 +9,15 @@ import { ModalButtons, Controls } from "../components";
 import { CalorimeterSketch } from "../canvas";
 
 function App() {
+  const [waterTemp, setWaterTemp] = useState(4);
+
   return (
     <div className="App">
       <ModalButtons />
       <div className="sim-container">
-        <Controls />
+        <Controls waterTemp={waterTemp} setWaterTemp={setWaterTemp} />
         <div className="graphics-wrapper">
-          <ReactP5Wrapper sketch={CalorimeterSketch} />
+          <ReactP5Wrapper sketch={CalorimeterSketch} startTemp={waterTemp} />
         </div>
       </div>
     </div>
