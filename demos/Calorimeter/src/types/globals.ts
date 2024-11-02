@@ -1,3 +1,3 @@
 export interface SimProps {
-    temp: number;
+    waterTemp: number;
 };

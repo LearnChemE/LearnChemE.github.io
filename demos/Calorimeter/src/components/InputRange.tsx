@@ -27,7 +27,7 @@ export const InputRange: React.FC<InputRangeProps> = ({
     <>
         <div className="slider-container" >
             <div className="slider-label">{label}</div>
-            <input type="range" aria-labelledby="#slider-label" id={id} min={min} max={max} step={step} onChange={handleInputChange} />
+            <input type="range" aria-labelledby="#slider-label" id={id} min={min} max={max} value={val} step={step} onChange={handleInputChange} />
             <div className="slider-val-label">{val}</div>
         </div>
     </>

@@ -17,7 +17,7 @@ function App() {
       <div className="sim-container">
         <Controls waterTemp={waterTemp} setWaterTemp={setWaterTemp} />
         <div className="graphics-wrapper">
-          <ReactP5Wrapper sketch={CalorimeterSketch} startTemp={waterTemp} />
+          <ReactP5Wrapper sketch={CalorimeterSketch} waterTemp={waterTemp} />
         </div>
       </div>
     </div>
