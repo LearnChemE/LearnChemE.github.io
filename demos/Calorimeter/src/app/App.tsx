@@ -7,17 +7,21 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import { ModalButtons, Controls } from "../components";
 import { CalorimeterSketch } from "../canvas";
+import { SimProps } from "../types/globals";
 
 function App() {
-  const [waterTemp, setWaterTemp] = useState(4);
+  const [simState, setSimState] = useState<SimProps>({
+    waterTemp: 4,
+    mat: 0,
+  });
 
   return (
     <div className="App">
       <ModalButtons />
       <div className="sim-container">
-        <Controls waterTemp={waterTemp} setWaterTemp={setWaterTemp} />
+        <Controls simState={simState} setSimState={setSimState} />
         <div className="graphics-wrapper">
-          <ReactP5Wrapper sketch={CalorimeterSketch} waterTemp={waterTemp} />
+          <ReactP5Wrapper sketch={CalorimeterSketch} waterTemp={simState.waterTemp} />
         </div>
       </div>
     </div>

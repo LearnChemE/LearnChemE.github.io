@@ -7,7 +7,7 @@ interface InputRangeProps {
     max: number;
     step: number;
     val: number;
-    setVal: React.Dispatch<React.SetStateAction<number>>;
+    setVal: (newVal: number) => void;
 };
 
 export const InputRange: React.FC<InputRangeProps> = ({
