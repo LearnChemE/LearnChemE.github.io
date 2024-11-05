@@ -6,11 +6,10 @@ var nNH3 = 1;
 
 // ----------------------------------------------------------------
 
-
 const barLabels = ['N₂', 'H₂', 'NH₃'];
 const labels = ['', '', ''];
 
-chartDataset = [nN2, nH2, nNH3]
+chartDataset = [nN2, nH2, nNH3];
 
 const data = {
   labels: labels,
@@ -33,7 +32,6 @@ const data = {
       anchor: 'end',
       align: 'top',
       offset: 5,
-
     }
   }]
 };
@@ -48,13 +46,11 @@ const customImagePlugin = {
     const ctx = chart.ctx;
     ctx.save();
 
-
     if (image.complete) {
       const x = 290;
       const y = 24;
       const width = 380;
       const height = 80;
-
       ctx.drawImage(image, x, y, width, height);
     }
 
@@ -153,18 +149,17 @@ const config = {
   },
 };
 
-
 image.onload = function () {
   var canvas = document.getElementById('myChart').getContext('2d');
   var myChart = new Chart(canvas, config);
 };
-// --------------------------------
 
 window.addEventListener('resize', function () {
   myChart.resize();
 });
 
 initValues();
+
 var canvas = document.getElementById('myChart').getContext('2d');
 var myChart = new Chart(canvas, config);
 
@@ -172,99 +167,49 @@ updatePressure = (value) => {
   document.getElementById('pressureValue').innerText = value;
   P = value;
   updateChart();
-}
+};
 
 updateTemperature = (value) => {
   document.getElementById('temperatureValue').innerText = value;
   T = value;
   updateChart();
-}
+};
 
 updateN2Mole = (value) => {
   document.getElementById('N2MoleValue').innerText = value;
   nN2 = value;
   updateChart();
-}
+};
 
 updateH2Mole = (value) => {
   document.getElementById('H2MoleValue').innerText = value;
   nH2 = value;
   updateChart();
-}
+};
 
 updateNH3Mole = (value) => {
   document.getElementById('NH3MoleValue').innerText = value;
   nNH3 = value;
   updateChart();
-}
+};
 
 updateChart = () => {
-  result = calculateEquilibrium(P, T, nN2, nH2, nNH3);
-  chartDataset[0] = result[0];
-  chartDataset[1] = result[1];
-  chartDataset[2] = result[2];
-  myChart.update()
-}
+  const result = calculateEquilibrium(P, T, nN2, nH2, nNH3);
+  if (result) {
+    chartDataset[0] = result[0];
+    chartDataset[1] = result[1];
+    chartDataset[2] = result[2];
+    myChart.update();
+  }
+};
 
 function initValues() {
-  document.getElementById('pressureValue').innerText = 50;
-  document.getElementById('temperatureValue').innerText = 300;
-  document.getElementById('N2MoleValue').innerText = 0.1;
-  document.getElementById('H2MoleValue').innerText = 0.1;
-  document.getElementById('NH3MoleValue').innerText = 1;
+  document.getElementById('pressureValue').innerText = P;
+  document.getElementById('temperatureValue').innerText = T;
+  document.getElementById('N2MoleValue').innerText = nN2;
+  document.getElementById('H2MoleValue').innerText = nH2;
+  document.getElementById('NH3MoleValue').innerText = nNH3;
 }
-
-
-
-//  ----------------------------------------------------------------
-// function calculateEquilibrium(P, T, nN2, nH2, nNH3) {
-//   P = Number(P);
-//   T = Number(T);
-//   nN2 = Number(nN2);
-//   nH2 = Number(nH2);
-//   nNH3 = Number(nNH3);
-
-//   const K_T_value = -23.84 + (11051 / T);
-//   const K_T = parseFloat(Math.exp(K_T_value).toFixed(3));
-//   const RHS = Math.pow(P, 2) * K_T;
-
-//   let xi_lower = 0;
-//   xi_upper = Math.min(xi_upper, nN2, nH2 / 3);
-
-//   let xi = (xi_lower + xi_upper) / 2;
-//   const tolerance = 0.001;
-//   const maxIterations = 10000;
-
-//   for (let i = 0; i < maxIterations; i++) {
-//     let value = (25 * Math.pow((2 * xi + nNH3), 2)) / ((nN2 - xi) * (nH2 - 3 * xi));
-
-//     if (Math.abs(value - RHS) < tolerance) {
-//       break;
-//     }
-
-//     if (value < RHS) {
-//       xi_lower = xi;
-//     } else {
-//       xi_upper = xi;
-//     }
-//     xi = (xi_lower + xi_upper) / 2;        
-//   }
-
-//   if (xi_upper - xi_lower > tolerance) {
-//     console.log("Equilibrium not found within tolerance.");
-//     return null;
-//   }
-
-
-//   let nN2Final = nN2 - xi;
-//   let nH2Final = nH2 - (3 * xi);
-//   let nNH3Final = Number(nNH3) + (2 * xi);
-//   return [
-//     parseFloat(nN2Final.toFixed(3)),
-//     parseFloat(nH2Final.toFixed(3)),
-//     parseFloat(nNH3Final.toFixed(3))
-//   ];
-// }
 
 function calculateEquilibrium(P, T, nN2, nH2, nNH3) {
   P = Number(P);
@@ -278,19 +223,15 @@ function calculateEquilibrium(P, T, nN2, nH2, nNH3) {
   const RHS = Math.pow(P, 2) * K_T;
 
   let xi_lower = 0;
-  let xi_upper = Math.min(nN2 + (2 * nNH3), (nH2 + (3 * nNH3)) / 3);
-  xi_upper = Math.min(xi_upper, nN2, nH2 / 3);
+  let xi_upper = Math.min(nN2, nH2 / 3);
 
   let xi = (xi_lower + xi_upper) / 2;
-  const tolerance = 0.000001;
+  const tolerance = 0.001;
   const maxIterations = 10000;
 
   for (let i = 0; i < maxIterations; i++) {
-    let value = (Math.pow(T, 2) * Math.pow((2 * xi + nNH3), 2)) / ((nN2 - xi) * Math.pow((nH2 - 3 * xi), 3));
-
-    if (Math.abs(value - RHS) < tolerance) {
-      break;
-    }
+    const value = (Math.pow((2 * xi + nNH3), 2)) / ((nN2 - xi) * Math.pow((nH2 - 3 * xi), 3));
+    if (Math.abs(value - RHS) < tolerance) break;
 
     if (value < RHS) {
       xi_lower = xi;
@@ -305,26 +246,9 @@ function calculateEquilibrium(P, T, nN2, nH2, nNH3) {
     return null;
   }
 
-  let nN2Final = nN2 - xi;
-  let nH2Final = nH2 - (3 * xi);
-  let nNH3Final = Number(nNH3) + (2 * xi);
   return [
-    parseFloat(nN2Final.toFixed(3)),
-    parseFloat(nH2Final.toFixed(3)),
-    parseFloat(nNH3Final.toFixed(3))
+    parseFloat((nN2 - xi).toFixed(3)),
+    parseFloat((nH2 - 3 * xi).toFixed(3)),
+    parseFloat((nNH3 + 2 * xi).toFixed(3))
   ];
 }
-
-
-// ----------------------------------------------------------------
-
-
-window.addEventListener('resize', function () {
-  myChart.resize();
-});
-
-initValues();
-var canvas = document.getElementById('myChart').getContext('2d');
-var myChart = new Chart(canvas, config);
-
-
