@@ -12,7 +12,7 @@ import { SimProps } from "../types/globals";
 function App() {
   const [simState, setSimState] = useState<SimProps>({
     waterTemp: 4,
-    mat: 0,
+    mat: "Fe",
   });
 
   return (

@@ -4,7 +4,7 @@ interface InputListProps {
     label: string;
     id: string;
     val: number;
-    setVal: (newVal: number) => void;
+    setVal: (newVal: string) => void;
     listItems: string[];
 };
 
@@ -15,7 +15,11 @@ export const InputList: React.FC<InputListProps> = ({
     setVal,
     listItems,
 }) => {
-    const onChange = (event: any) => setVal(Number(event.target.value));
+    const onChange = (event: any) => {
+        let newVal = listItems[Number(event.target.value)];
+        console.log(newVal)
+        setVal(newVal);
+        };
 
     return (
     <>

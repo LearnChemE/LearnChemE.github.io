@@ -1,6 +1,6 @@
 export interface SimProps {
     waterTemp: number;
-    mat: number;
+    mat: string;
 };
 
 export interface MaterialProperties {
@@ -8,3 +8,5 @@ export interface MaterialProperties {
     color: Array<number>[3] | string;
     density: number;
 };
+
+export const MaterialArray: Array<string> = ["Fe","Au","Cu","Hg","Pb"];

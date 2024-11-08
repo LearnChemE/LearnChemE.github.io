@@ -15,6 +15,8 @@ const THERMOMETER_TICK_SPACING = 3;
 const THERMOMETER_TOTAL_TICK_HEIGHT = 241;
 const THERMOMETER_TOP_TICK_Y = 157;
 const THERMOMETER_MAX_TEMP = 60; // C
+// Canvas geometry
+const CALORIMETER_FLOOR = 103;
 
 // Materials and their properties
 const Materials = new Map <string, MaterialProperties> ([
@@ -52,9 +54,17 @@ interface CalorimeterSketchProps extends SketchProps, SimProps {};
 export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) => {
   let graphics: graphics;
   let startTemp: number = 4;
+  let material: MaterialProperties = {specificHeat: 0.451, color: "#A19D94", density: 7.874};
 
   p.updateWithProps = (props: CalorimeterSketchProps) => {
     startTemp = props.waterTemp;
+    let mp;
+
+    // The first one always comes undefined due to Reacts template render
+    if ((mp = Materials.get(props.mat)) === undefined)
+      return;
+
+    material = mp;
   };
 
   // Debug coordinates display in top left corner
@@ -68,7 +78,10 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
 
   // Fills thermometer to proper temp. 
   // Should be called after drawing thermometer and before ticks.
-  const fillThermometer = (temp: number) => {
+  const drawThermometer = (temp: number) => {
+    // Draw thermometer body
+    p.image(graphics.thermometer, 64,138);
+
     if (temp < 0 || temp > THERMOMETER_MAX_TEMP) {
       throw new Error(`Temp of ${temp} is outside of range 0-60`);
     }
@@ -81,10 +94,18 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
     p.noStroke();
     p.rect(70, ty, 12, h);
     p.pop();
+
+    // Draw tick marks last
+    p.image(graphics.thermoTicks, 70, THERMOMETER_TOP_TICK_Y);
   };
 
-  const drawBlock = (z: number) => {
+  // Draw the block with its bottom at height z
+  const drawBlock = (bottomZ: number) => {
+    let col = material.color
+
     p.push();
+    p.noStroke();
+    p.fill(col)
     p.rect(1,1,1,1);
     p.pop();
   }
@@ -103,14 +124,15 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
   };
   p.draw = () => {
     p.background(255, 255, 255);
-
     // debug
     showDebugCoordinates();
 
+    // Draw Calorimeter
     p.image(graphics.calorimeter, 14, 210);
-    p.image(graphics.thermometer, 64,138);
-    fillThermometer(startTemp);
-    p.image(graphics.thermoTicks, 70, THERMOMETER_TOP_TICK_Y);
+    // Draw thermometer
+    drawThermometer(startTemp);
+    // Draw block
+    drawBlock(150);
   };
 };
 
