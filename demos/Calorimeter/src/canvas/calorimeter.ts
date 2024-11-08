@@ -1,5 +1,5 @@
 import { P5CanvasInstance, SketchProps } from "@p5-wrapper/react";
-import { SimProps } from "../types/globals";
+import { SimProps, MaterialProperties } from "../types/globals";
 
 // It's annoying that there are no separate types for the graphics objects in this library, but thats a problem for another day...
 interface graphics {
@@ -9,11 +9,41 @@ interface graphics {
   stirrer: any;
 }
 
+// Thermometer geometry 
 const THERMOMETER_RED_COLOR = "#F22525";
 const THERMOMETER_TICK_SPACING = 3;
 const THERMOMETER_TOTAL_TICK_HEIGHT = 241;
 const THERMOMETER_TOP_TICK_Y = 157;
 const THERMOMETER_MAX_TEMP = 60; // C
+
+// Materials and their properties
+const Materials = new Map <string, MaterialProperties> ([
+  ["Fe", {
+    specificHeat: 0.451, // J/g/K
+    color: "#A19D94",
+    density: 7.874 // g / mL
+  }],
+  ["Au", {
+    specificHeat: 0.129, // J/g/K
+    color: "#FFD700",
+    density: 19.3 // g / mL
+  }],
+  ["Cu", {
+    specificHeat: 0.385, // J/g/K
+    color: "#b87333",
+    density: 8.96 // g / mL
+  }],
+  ["Hg",{
+    specificHeat: 0.140, // J/g/K
+    color: "#B7B8B9",
+    density: 13.546 // g / mL
+  }],
+  ["Pb",{
+    specificHeat: 0.129, // J/g/K
+    color: "#646462",
+    density: 11.34 // g / mL
+  }]
+]);
 
 // Extend the p5 wrapper interface to get my own props
 interface CalorimeterSketchProps extends SketchProps, SimProps {};
@@ -52,6 +82,12 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
     p.rect(70, ty, 12, h);
     p.pop();
   };
+
+  const drawBlock = (z: number) => {
+    p.push();
+    p.rect(1,1,1,1);
+    p.pop();
+  }
 
   p.preload = () => {
     graphics = {
