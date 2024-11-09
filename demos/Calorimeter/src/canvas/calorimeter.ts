@@ -16,7 +16,16 @@ const THERMOMETER_TOTAL_TICK_HEIGHT = 241;
 const THERMOMETER_TOP_TICK_Y = 157;
 const THERMOMETER_MAX_TEMP = 60; // C
 // Canvas geometry
-const CALORIMETER_FLOOR = 103;
+const CALORIMETER_FLOOR = 442;
+const BLOCK_WIDTH = 72;
+const BLOCK_LEFT_X = 114;
+const BLOCK_BOTTOM_Y = 162;
+// Water geometry
+const WIDTH_WATER = 208;
+const WATER_HEIGHT = 168;
+const WATER_LEFT_X = 46;
+const WATER_TOP_Y = 275;
+const WATER_LEVEL_CHANGE = 40;
 
 // Materials and their properties
 const Materials = new Map <string, MaterialProperties> ([
@@ -55,16 +64,22 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
   let graphics: graphics;
   let startTemp: number = 4;
   let material: MaterialProperties = {specificHeat: 0.451, color: "#A19D94", density: 7.874};
+  let mass: number = 1000;
+  let startTime = 0;
 
   p.updateWithProps = (props: CalorimeterSketchProps) => {
     startTemp = props.waterTemp;
+    mass = props.mass;
+    if (props.startTime === -2) startTime = p.time();
     let mp;
 
     // The first one always comes undefined due to Reacts template render
-    if ((mp = Materials.get(props.mat)) === undefined)
-      return;
+    if ((mp = Materials.get(props.mat)) === undefined) {
+      throw new Error(`Undefined material passed to canvas: ${props.mat}`);
+    }
 
     material = mp;
+    console.log(material);
   };
 
   // Debug coordinates display in top left corner
@@ -101,14 +116,29 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
 
   // Draw the block with its bottom at height z
   const drawBlock = (bottomZ: number) => {
-    let col = material.color
+    let col = material.color;
+    let rho = material.density;
+    let height = 1.2 * mass / rho;
+    let ty = BLOCK_BOTTOM_Y - height;
 
     p.push();
     p.noStroke();
     p.fill(col)
-    p.rect(1,1,1,1);
+    p.rect(BLOCK_LEFT_X,ty,BLOCK_WIDTH,height);
     p.pop();
   }
+
+  // Fill the calorimeter with the appropriate amount of water based on the volume of the block submerged
+  const fillCalorimeter = (extraVol: number) => {
+    let dh = WATER_LEVEL_CHANGE * extraVol / 127;
+    let h = WATER_HEIGHT + dh;
+
+    p.push();
+    p.fill("#226CA880");
+    p.noStroke();
+    p.rect(WATER_LEFT_X,WATER_TOP_Y - dh,WIDTH_WATER,h);
+    p.pop();
+  };
 
   p.preload = () => {
     graphics = {
@@ -129,10 +159,13 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
 
     // Draw Calorimeter
     p.image(graphics.calorimeter, 14, 210);
+    p.image(graphics.stirrer,195,138);
     // Draw thermometer
     drawThermometer(startTemp);
     // Draw block
-    drawBlock(150);
+    drawBlock(BLOCK_BOTTOM_Y);
+    // Draw Water
+    fillCalorimeter(mass / material.density);
   };
 };
 

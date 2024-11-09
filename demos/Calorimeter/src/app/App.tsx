@@ -13,15 +13,18 @@ function App() {
   const [simState, setSimState] = useState<SimProps>({
     waterTemp: 4,
     mat: "Fe",
+    mass: 200,
+    startTime: -1
   });
 
   return (
     <div className="App">
       <ModalButtons />
       <div className="sim-container">
-        <Controls simState={simState} setSimState={setSimState} />
+        <Controls simState={simState} setSimState={setSimState} buttonCallback={() => {setSimState({ ...simState, startTime: -2 })}} />
         <div className="graphics-wrapper">
-          <ReactP5Wrapper sketch={CalorimeterSketch} waterTemp={simState.waterTemp} />
+          <ReactP5Wrapper sketch={CalorimeterSketch} waterTemp={simState.waterTemp} mat={simState.mat} mass={simState.mass}
+            time={simState.startTime} />
         </div>
       </div>
     </div>

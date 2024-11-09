@@ -17,7 +17,6 @@ export const InputList: React.FC<InputListProps> = ({
 }) => {
     const onChange = (event: any) => {
         let newVal = listItems[Number(event.target.value)];
-        console.log(newVal)
         setVal(newVal);
         };
 
