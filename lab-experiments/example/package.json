@@ -1,0 +1,36 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "An example of a webpack-based simulation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx webpack --config ./_dev/webpack.config.js --mode=production --progress",
+    "watch": "npx webpack --watch --config ./_dev/webpack.config.js --mode=development --progress",
+    "start": "npx webpack serve --config ./_dev/webpack.config.js --mode=development --open"
+  },
+  "keywords": [
+    "simulation",
+    "chemical",
+    "engineering"
+  ],
+  "author": "Neil Hendren",
+  "license": "MIT",
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.0",
+    "mini-css-extract-plugin": "^2.9.1",
+    "postcss-loader": "^8.1.1",
+    "raw-loader": "^4.0.2",
+    "sass": "^1.77.6",
+    "sass-loader": "^16.0.1",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.0"
+  }
+}
