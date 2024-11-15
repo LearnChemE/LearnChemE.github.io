@@ -1,5 +1,6 @@
 import { P5CanvasInstance, SketchProps } from "@p5-wrapper/react";
 import { SimProps, MaterialProperties } from "../types/globals";
+import { useEffect } from "react";
 
 // It's annoying that there are no separate types for the graphics objects in this library, but thats a problem for another day...
 interface graphics {
@@ -24,8 +25,11 @@ const BLOCK_BOTTOM_Y = 162;
 const WIDTH_WATER = 208;
 const WATER_HEIGHT = 168;
 const WATER_LEFT_X = 46;
+const WATER_RIGHT_X = WATER_LEFT_X + WIDTH_WATER;
 const WATER_TOP_Y = 275;
 const WATER_LEVEL_CHANGE = 40;
+// Animations
+const FALL_TIME = 800; // ms
 
 // Materials and their properties
 const Materials = new Map <string, MaterialProperties> ([
@@ -61,33 +65,40 @@ interface CalorimeterSketchProps extends SketchProps, SimProps {};
 
 // P5 Script to draw to canvas
 export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) => {
+  // State
   let graphics: graphics;
   let startTemp: number = 4;
   let material: MaterialProperties = {specificHeat: 0.451, color: "#A19D94", density: 7.874};
   let mass: number = 1000;
-  let startTime = 0;
+  let started: boolean = false;
+  // Time
+  let aniTime: number = 0;
 
+  // This gets called whenever props are updated by React.
   p.updateWithProps = (props: CalorimeterSketchProps) => {
     startTemp = props.waterTemp;
     mass = props.mass;
-    if (props.startTime === -2) startTime = p.time();
+    if (started !== props.started) {
+      started = props.started;
+    }
     let mp;
 
-    // The first one always comes undefined due to Reacts template render
+    // Sanity check
     if ((mp = Materials.get(props.mat)) === undefined) {
       throw new Error(`Undefined material passed to canvas: ${props.mat}`);
     }
 
     material = mp;
-    console.log(material);
   };
 
   // Debug coordinates display in top left corner
   const showDebugCoordinates = () => {
     let mx = p.mouseX, my = p.mouseY;
     p.push();
+    p.fill(0);
     p.textAlign(p.LEFT,p.TOP);
     p.text(`x: ${mx}\ny: ${my}`,2,2);
+    p.text(`t = ${aniTime}`,250,2);
     p.pop();
   }
 
@@ -97,6 +108,7 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
     // Draw thermometer body
     p.image(graphics.thermometer, 64,138);
 
+    // Sanity check
     if (temp < 0 || temp > THERMOMETER_MAX_TEMP) {
       throw new Error(`Temp of ${temp} is outside of range 0-60`);
     }
@@ -104,6 +116,7 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
     let h = temp * THERMOMETER_TICK_SPACING + 1;
     let ty = THERMOMETER_TOP_TICK_Y + (THERMOMETER_TOTAL_TICK_HEIGHT - h);
 
+    // Draw rect for thermometer fill
     p.push();
     p.fill(THERMOMETER_RED_COLOR);
     p.noStroke();
@@ -114,12 +127,49 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
     p.image(graphics.thermoTicks, 70, THERMOMETER_TOP_TICK_Y);
   };
 
+  // Update animation time each frame
+  const updateTime = () => {
+    if (started)
+      aniTime += p.deltaTime;
+  };
+
+  // Get the height of the block based on mass and density
+  const getBlockHeight = () => {
+    return 1.2 * mass / material.density;
+  };
+
+  // Find the position of the bottom of the block based on aniTime
+  const getBlockPos = () => {
+    // Avoid the lerp when possible
+    if (aniTime === 0) 
+      return BLOCK_BOTTOM_Y;
+    if (aniTime > FALL_TIME)
+      return CALORIMETER_FLOOR;
+    
+    // Lerp with square smoothing function
+    let s = aniTime / FALL_TIME;
+    return p.lerp(BLOCK_BOTTOM_Y,CALORIMETER_FLOOR, s*s);
+  };
+
+  // Find the volume for the fill height based on the fraction of block submerged
+  const getExtraWaterVol = (blockZ: number, blockHeight: number) => {
+    // Before and after animation we know what these will be
+    if (aniTime === 0)
+      return 0;
+    let maxFill = mass / material.density;
+    if (aniTime > FALL_TIME)
+      return maxFill;
+
+    // Use the fraction of the block that's below original z value. Waves will cover up the inaccuracy
+    let fracSubmerged = (blockZ - WATER_TOP_Y) / blockHeight;
+    fracSubmerged = p.constrain(fracSubmerged, 0, 1);
+    return fracSubmerged * maxFill;
+  };
+
   // Draw the block with its bottom at height z
-  const drawBlock = (bottomZ: number) => {
+  const drawBlock = (bottomZ: number, height: number) => {
     let col = material.color;
-    let rho = material.density;
-    let height = 1.2 * mass / rho;
-    let ty = BLOCK_BOTTOM_Y - height;
+    let ty = bottomZ - height;
 
     p.push();
     p.noStroke();
@@ -129,18 +179,30 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
   }
 
   // Fill the calorimeter with the appropriate amount of water based on the volume of the block submerged
-  const fillCalorimeter = (extraVol: number) => {
+  const fillCalorimeter = (extraVol: number, waves?: boolean) => {
     let dh = WATER_LEVEL_CHANGE * extraVol / 127;
     let h = WATER_HEIGHT + dh;
 
-    p.push();
-    p.fill("#226CA880");
-    p.noStroke();
-    p.rect(WATER_LEFT_X,WATER_TOP_Y - dh,WIDTH_WATER,h);
-    p.pop();
+    if (!waves) {
+      p.push();
+      p.fill("#226CA880");
+      p.noStroke();
+      p.rect(WATER_LEFT_X,WATER_TOP_Y - dh,WIDTH_WATER,h);
+      p.pop();
+    }
+    else {
+      p.push();
+      p.fill("#226CA880");
+      p.noStroke();
+      p.beginShape(p.TESS);
+      p.vertex(WATER_RIGHT_X,CALORIMETER_FLOOR);
+      p.endShape();
+      p.pop();
+    }
   };
 
   p.preload = () => {
+    p.f = p.loadFont("./Inconsolata-VariableFont_wdth,wght.ttf");
     graphics = {
       calorimeter: p.loadImage("Calorimeter.png"),
       thermometer: p.loadImage("Thermometer.png"),
@@ -150,10 +212,15 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
   };
 
   p.setup = () => {
-    p.createCanvas(300, 480);
+    p.createCanvas(300, 480, p.WEBGL);
+    p.textFont(p.f);
+    p.translate(-150,-240);
   };
+
   p.draw = () => {
     p.background(255, 255, 255);
+    p.translate(-150,-240);
+    updateTime();
     // debug
     showDebugCoordinates();
 
@@ -163,9 +230,12 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
     // Draw thermometer
     drawThermometer(startTemp);
     // Draw block
-    drawBlock(BLOCK_BOTTOM_Y);
+    let blockPos = getBlockPos();
+    let blockHeight = getBlockHeight();
+    drawBlock(blockPos, blockHeight);
+
     // Draw Water
-    fillCalorimeter(mass / material.density);
+    fillCalorimeter(getExtraWaterVol(blockPos, blockHeight), true);
   };
 };
 

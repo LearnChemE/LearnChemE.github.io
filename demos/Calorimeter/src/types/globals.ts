@@ -2,7 +2,7 @@ export interface SimProps {
     waterTemp: number;
     mat: string;
     mass: number;
-    startTime: number;
+    started: boolean;
 };
 
 export interface MaterialProperties {
