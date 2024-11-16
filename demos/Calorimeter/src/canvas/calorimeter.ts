@@ -10,7 +10,7 @@ interface graphics {
   stirrer: any;
 }
 
-// Thermometer geometry 
+// Thermometer geometry
 const THERMOMETER_RED_COLOR = "#F22525";
 const THERMOMETER_TICK_SPACING = 3;
 const THERMOMETER_TOTAL_TICK_HEIGHT = 241;
@@ -30,45 +30,67 @@ const WATER_TOP_Y = 275;
 const WATER_LEVEL_CHANGE = 40;
 // Animations
 const FALL_TIME = 800; // ms
+const WATER_HIT_TIME = 600; // ms
 
 // Materials and their properties
-const Materials = new Map <string, MaterialProperties> ([
-  ["Fe", {
-    specificHeat: 0.451, // J/g/K
-    color: "#A19D94",
-    density: 7.874 // g / mL
-  }],
-  ["Au", {
-    specificHeat: 0.129, // J/g/K
-    color: "#FFD700",
-    density: 19.3 // g / mL
-  }],
-  ["Cu", {
-    specificHeat: 0.385, // J/g/K
-    color: "#b87333",
-    density: 8.96 // g / mL
-  }],
-  ["Hg",{
-    specificHeat: 0.140, // J/g/K
-    color: "#B7B8B9",
-    density: 13.546 // g / mL
-  }],
-  ["Pb",{
-    specificHeat: 0.129, // J/g/K
-    color: "#646462",
-    density: 11.34 // g / mL
-  }]
+const Materials = new Map<string, MaterialProperties>([
+  [
+    "Fe",
+    {
+      specificHeat: 0.451, // J/g/K
+      color: "#A19D94",
+      density: 7.874, // g / mL
+    },
+  ],
+  [
+    "Au",
+    {
+      specificHeat: 0.129, // J/g/K
+      color: "#FFD700",
+      density: 19.3, // g / mL
+    },
+  ],
+  [
+    "Cu",
+    {
+      specificHeat: 0.385, // J/g/K
+      color: "#b87333",
+      density: 8.96, // g / mL
+    },
+  ],
+  [
+    "Hg",
+    {
+      specificHeat: 0.14, // J/g/K
+      color: "#B7B8B9",
+      density: 13.546, // g / mL
+    },
+  ],
+  [
+    "Pb",
+    {
+      specificHeat: 0.129, // J/g/K
+      color: "#646462",
+      density: 11.34, // g / mL
+    },
+  ],
 ]);
 
 // Extend the p5 wrapper interface to get my own props
-interface CalorimeterSketchProps extends SketchProps, SimProps {};
+interface CalorimeterSketchProps extends SketchProps, SimProps {}
 
 // P5 Script to draw to canvas
-export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) => {
+export const CalorimeterSketch = (
+  p: P5CanvasInstance<CalorimeterSketchProps>
+) => {
   // State
   let graphics: graphics;
   let startTemp: number = 4;
-  let material: MaterialProperties = {specificHeat: 0.451, color: "#A19D94", density: 7.874};
+  let material: MaterialProperties = {
+    specificHeat: 0.451,
+    color: "#A19D94",
+    density: 7.874,
+  };
   let mass: number = 1000;
   let started: boolean = false;
   // Time
@@ -93,20 +115,21 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
 
   // Debug coordinates display in top left corner
   const showDebugCoordinates = () => {
-    let mx = p.mouseX, my = p.mouseY;
+    let mx = p.mouseX,
+      my = p.mouseY;
     p.push();
     p.fill(0);
-    p.textAlign(p.LEFT,p.TOP);
-    p.text(`x: ${mx}\ny: ${my}`,2,2);
-    p.text(`t = ${aniTime}`,250,2);
+    p.textAlign(p.LEFT, p.TOP);
+    p.text(`x: ${mx}\ny: ${my}`, 2, 2);
+    p.text(`t = ${aniTime}`, 250, 2);
     p.pop();
-  }
+  };
 
-  // Fills thermometer to proper temp. 
+  // Fills thermometer to proper temp.
   // Should be called after drawing thermometer and before ticks.
   const drawThermometer = (temp: number) => {
     // Draw thermometer body
-    p.image(graphics.thermometer, 64,138);
+    p.image(graphics.thermometer, 64, 138);
 
     // Sanity check
     if (temp < 0 || temp > THERMOMETER_MAX_TEMP) {
@@ -127,38 +150,33 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
     p.image(graphics.thermoTicks, 70, THERMOMETER_TOP_TICK_Y);
   };
 
-  // Update animation time each frame
+  // Update animation time each frame, as well as static animation flags
   const updateTime = () => {
-    if (started)
-      aniTime += p.deltaTime;
+    if (started) aniTime += p.deltaTime;
   };
 
   // Get the height of the block based on mass and density
   const getBlockHeight = () => {
-    return 1.2 * mass / material.density;
+    return (1.2 * mass) / material.density;
   };
 
   // Find the position of the bottom of the block based on aniTime
   const getBlockPos = () => {
     // Avoid the lerp when possible
-    if (aniTime === 0) 
-      return BLOCK_BOTTOM_Y;
-    if (aniTime > FALL_TIME)
-      return CALORIMETER_FLOOR;
-    
+    if (aniTime === 0) return BLOCK_BOTTOM_Y;
+    if (aniTime > FALL_TIME) return CALORIMETER_FLOOR;
+
     // Lerp with square smoothing function
     let s = aniTime / FALL_TIME;
-    return p.lerp(BLOCK_BOTTOM_Y,CALORIMETER_FLOOR, s*s);
+    return p.lerp(BLOCK_BOTTOM_Y, CALORIMETER_FLOOR, s * s);
   };
 
   // Find the volume for the fill height based on the fraction of block submerged
   const getExtraWaterVol = (blockZ: number, blockHeight: number) => {
     // Before and after animation we know what these will be
-    if (aniTime === 0)
-      return 0;
+    if (aniTime === 0) return 0;
     let maxFill = mass / material.density;
-    if (aniTime > FALL_TIME)
-      return maxFill;
+    if (aniTime > FALL_TIME) return maxFill;
 
     // Use the fraction of the block that's below original z value. Waves will cover up the inaccuracy
     let fracSubmerged = (blockZ - WATER_TOP_Y) / blockHeight;
@@ -173,29 +191,56 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
 
     p.push();
     p.noStroke();
-    p.fill(col)
-    p.rect(BLOCK_LEFT_X,ty,BLOCK_WIDTH,height);
+    p.fill(col);
+    p.rect(BLOCK_LEFT_X, ty, BLOCK_WIDTH, height);
     p.pop();
-  }
+  };
+
+  // Based on x and animation time, calculates sinusoid y value between 0 and 1
+  const sines = (x: number) => {
+    x = x / WIDTH_WATER;
+    let s1 = Math.sin(2 * Math.PI * x + aniTime / 500);
+    let s2 = Math.sin(3 * Math.PI * x - aniTime / 300);
+    return 0.7 * s1 + 0.3 * s2;
+  };
 
   // Fill the calorimeter with the appropriate amount of water based on the volume of the block submerged
   const fillCalorimeter = (extraVol: number, waves?: boolean) => {
-    let dh = WATER_LEVEL_CHANGE * extraVol / 127;
-    let h = WATER_HEIGHT + dh;
+    // Displacement from block
+    let dh = (WATER_LEVEL_CHANGE * extraVol) / 127;
+    // Fill for steady meniscus
+    let avgFillY = WATER_TOP_Y - dh;
 
     if (!waves) {
+      // Height of water rectangle
+      let h = WATER_HEIGHT + dh;
+
       p.push();
       p.fill("#226CA880");
       p.noStroke();
-      p.rect(WATER_LEFT_X,WATER_TOP_Y - dh,WIDTH_WATER,h);
+      p.rect(WATER_LEFT_X, avgFillY, WIDTH_WATER, h);
       p.pop();
-    }
-    else {
+    } else {
+      let s = (aniTime - WATER_HIT_TIME) / 1000;
+      // Smoothing
+      s = 1 - Math.exp(-10 * s);
+      s = p.constrain(s, 0, 1);
+      let rippleHeight = p.lerp(0, 20, s);
+      console.log(s);
+
       p.push();
       p.fill("#226CA880");
       p.noStroke();
       p.beginShape(p.TESS);
-      p.vertex(WATER_RIGHT_X,CALORIMETER_FLOOR);
+      p.vertex(WATER_RIGHT_X, CALORIMETER_FLOOR);
+      p.vertex(WATER_LEFT_X, CALORIMETER_FLOOR);
+      // Use sines() to generate animated waves
+      let num_pts = 15; // You honestly don't need many to make this trick look good, unless there's 3d vertex lighting
+      let dx = WIDTH_WATER / (num_pts - 1);
+      for (let i = 0; i < num_pts; i++) {
+        let x = WATER_LEFT_X + i * dx;
+        p.vertex(x, avgFillY + rippleHeight * sines(x));
+      }
       p.endShape();
       p.pop();
     }
@@ -214,19 +259,19 @@ export const CalorimeterSketch = (p: P5CanvasInstance<CalorimeterSketchProps>) =
   p.setup = () => {
     p.createCanvas(300, 480, p.WEBGL);
     p.textFont(p.f);
-    p.translate(-150,-240);
+    p.translate(-150, -240);
   };
 
   p.draw = () => {
     p.background(255, 255, 255);
-    p.translate(-150,-240);
+    p.translate(-150, -240);
     updateTime();
     // debug
     showDebugCoordinates();
 
     // Draw Calorimeter
     p.image(graphics.calorimeter, 14, 210);
-    p.image(graphics.stirrer,195,138);
+    p.image(graphics.stirrer, 195, 138);
     // Draw thermometer
     drawThermometer(startTemp);
     // Draw block
