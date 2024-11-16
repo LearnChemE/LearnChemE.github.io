@@ -14,24 +14,28 @@ function App() {
     waterTemp: 4,
     mat: "Fe",
     mass: 200,
-    started: false
+    started: false,
   });
 
   return (
     <div className="App">
       <ModalButtons />
       <div className="sim-container">
-        <Controls simState={simState} 
-                  setSimState={setSimState} 
-                  buttonCallback={() => {
-                    setSimState({ ...simState, started: !simState.started });
-                  }} />
+        <Controls
+          simState={simState}
+          setSimState={setSimState}
+          buttonCallback={() => {
+            setSimState({ ...simState, started: !simState.started });
+          }}
+        />
         <div className="graphics-wrapper">
-          <ReactP5Wrapper sketch={CalorimeterSketch} 
-                          waterTemp={simState.waterTemp} 
-                          mat={simState.mat} 
-                          mass={simState.mass}
-                          started={simState.started} />
+          <ReactP5Wrapper
+            sketch={CalorimeterSketch}
+            waterTemp={simState.waterTemp}
+            mat={simState.mat}
+            mass={simState.mass}
+            started={simState.started}
+          />
         </div>
       </div>
     </div>
