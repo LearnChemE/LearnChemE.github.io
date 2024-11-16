@@ -16,6 +16,21 @@ export const Controls: React.FC<ControlProps> = ({
 }) => {
   let mat = simState.mat;
 
+  let dropBtnText: string;
+  let dropBtnClass: string;
+  if (simState.started) {
+    if (simState.paused) {
+      dropBtnText = "play";
+      dropBtnClass = "btn btn-outline-primary";
+    } else {
+      dropBtnText = "pause";
+      dropBtnClass = "btn btn-outline-danger";
+    }
+  } else {
+    dropBtnText = "drop metal";
+    dropBtnClass = "btn btn-success";
+  }
+
   return (
     <>
       <div className="controls-container">
@@ -86,12 +101,16 @@ export const Controls: React.FC<ControlProps> = ({
         <button
           type="button"
           id="drop-btn"
-          className="btn btn-success"
-          onClick={() =>
-            setSimState({ ...simState, started: !simState.started })
-          }
+          className={dropBtnClass}
+          onClick={() => {
+            setSimState({
+              ...simState,
+              started: true,
+              paused: !simState.paused,
+            });
+          }}
         >
-          drop metal
+          {dropBtnText}
         </button>
         {/* Reset Button */}
         <button

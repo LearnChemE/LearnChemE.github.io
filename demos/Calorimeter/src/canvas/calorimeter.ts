@@ -97,6 +97,7 @@ export const CalorimeterSketch = (
   let mass: number = 1000;
   let stirring: boolean = false;
   let started: boolean = false;
+  let paused: boolean = true;
   // Time
   let aniTime: number = 0;
 
@@ -106,6 +107,7 @@ export const CalorimeterSketch = (
     blockTemp = props.blockTemp;
     mass = props.mass;
     stirring = props.stirring;
+    paused = props.paused;
     if (started !== props.started) {
       started = props.started;
       aniTime = 0;
@@ -159,7 +161,7 @@ export const CalorimeterSketch = (
 
   // Update animation time each frame, as well as static animation flags
   const updateTime = () => {
-    if (started) aniTime += p.deltaTime;
+    if (started && !paused) aniTime += p.deltaTime;
   };
 
   // Get the height of the block based on mass and density

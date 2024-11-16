@@ -5,6 +5,7 @@ export interface SimProps {
   mass: number;
   stirring: boolean;
   started: boolean;
+  paused: boolean;
 }
 
 export interface MaterialProperties {

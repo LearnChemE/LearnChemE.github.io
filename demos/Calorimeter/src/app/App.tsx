@@ -17,6 +17,7 @@ function App() {
     mass: 200,
     stirring: false,
     started: false,
+    paused: true,
   });
   let resetSim = false;
 
@@ -28,6 +29,7 @@ function App() {
       mass: 200,
       stirring: false,
       started: false,
+      paused: true,
     });
     resetSim = true;
     console.log(resetSim);
@@ -51,6 +53,7 @@ function App() {
             mass={simState.mass}
             stirring={simState.stirring}
             started={simState.started}
+            paused={simState.paused}
           />
         </div>
       </div>
