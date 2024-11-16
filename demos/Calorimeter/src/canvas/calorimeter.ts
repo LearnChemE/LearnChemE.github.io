@@ -30,6 +30,9 @@ const WATER_LEVEL_CHANGE = 40;
 // Animations
 const FALL_TIME = 800; // ms
 const WATER_HIT_TIME = 600; // ms
+const STIR_FRAME_W = 54; // px
+const STIR_FRAME_H = 288; // px
+const STIR_FRAMETIME = 50; // ms
 
 // Materials and their properties
 const Materials = new Map<string, MaterialProperties>([
@@ -85,12 +88,14 @@ export const CalorimeterSketch = (
   // State
   let graphics: graphics;
   let startTemp: number = 4;
+  let blockTemp: number = 30;
   let material: MaterialProperties = {
     specificHeat: 0.451,
     color: "#A19D94",
     density: 7.874,
   };
   let mass: number = 1000;
+  let stirring: boolean = false;
   let started: boolean = false;
   // Time
   let aniTime: number = 0;
@@ -98,9 +103,12 @@ export const CalorimeterSketch = (
   // This gets called whenever props are updated by React.
   p.updateWithProps = (props: CalorimeterSketchProps) => {
     startTemp = props.waterTemp;
+    blockTemp = props.blockTemp;
     mass = props.mass;
+    stirring = props.stirring;
     if (started !== props.started) {
       started = props.started;
+      aniTime = 0;
     }
     let mp;
 
@@ -241,6 +249,18 @@ export const CalorimeterSketch = (
     }
   };
 
+  // Draw stirrer with animation
+  const drawStirrer = () => {
+    // Select frame
+    let frame = stirring ? Math.floor((p.millis() / STIR_FRAMETIME) % 4) : 0;
+    // Figure out frame position on texture
+    let x = frame * STIR_FRAME_W;
+    // Get frame from texture
+    let im = graphics.stirrer.get(x, 0, STIR_FRAME_W, STIR_FRAME_H);
+    // Draw image
+    p.image(im, 195, 138);
+  };
+
   // P5 Calls this first while other things are loading
   p.preload = () => {
     p.f = p.loadFont("./Inconsolata-VariableFont_wdth,wght.ttf");
@@ -248,7 +268,7 @@ export const CalorimeterSketch = (
       calorimeter: p.loadImage("Calorimeter.png"),
       thermometer: p.loadImage("Thermometer.png"),
       thermoTicks: p.loadImage("ThermoTicks.png"),
-      stirrer: p.loadImage("Stirrer.png"),
+      stirrer: p.loadImage("StirAniFull.png"),
     };
   };
 
@@ -271,7 +291,7 @@ export const CalorimeterSketch = (
 
     // Draw Calorimeter
     p.image(graphics.calorimeter, 14, 210);
-    p.image(graphics.stirrer, 195, 138);
+    drawStirrer();
     // Draw thermometer
     drawThermometer(startTemp);
     // Draw block

@@ -18,6 +18,20 @@ function App() {
     stirring: false,
     started: false,
   });
+  let resetSim = false;
+
+  const handleReset = () => {
+    setSimState({
+      waterTemp: 4,
+      blockTemp: 30,
+      mat: "Fe",
+      mass: 200,
+      stirring: false,
+      started: false,
+    });
+    resetSim = true;
+    console.log(resetSim);
+  };
 
   return (
     <div className="App">
@@ -26,14 +40,16 @@ function App() {
         <Controls
           simState={simState}
           setSimState={setSimState}
-          resetCallback={() => {}}
+          resetCallback={handleReset}
         />
         <div className="graphics-wrapper">
           <ReactP5Wrapper
             sketch={CalorimeterSketch}
             waterTemp={simState.waterTemp}
+            blockTemp={simState.blockTemp}
             mat={simState.mat}
             mass={simState.mass}
+            stirring={simState.stirring}
             started={simState.started}
           />
         </div>
