@@ -1,7 +1,9 @@
 export interface SimProps {
   waterTemp: number;
+  blockTemp: number;
   mat: string;
   mass: number;
+  stirring: boolean;
   started: boolean;
 }
 

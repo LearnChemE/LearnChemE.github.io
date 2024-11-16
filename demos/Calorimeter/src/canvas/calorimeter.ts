@@ -1,6 +1,5 @@
 import { P5CanvasInstance, SketchProps } from "@p5-wrapper/react";
 import { SimProps, MaterialProperties } from "../types/globals";
-import { useEffect } from "react";
 
 // It's annoying that there are no separate types for the graphics objects in this library, but thats a problem for another day...
 interface graphics {
@@ -221,12 +220,8 @@ export const CalorimeterSketch = (
       p.rect(WATER_LEFT_X, avgFillY, WIDTH_WATER, h);
       p.pop();
     } else {
-      let s = (aniTime - WATER_HIT_TIME) / 1000;
-      // Smoothing
-      s = 1 - Math.exp(-10 * s);
-      s = p.constrain(s, 0, 1);
-      let rippleHeight = p.lerp(0, 20, s);
-      console.log(s);
+      // Based on displacement height times an exponential decay
+      let rippleHeight = 0.5 * dh * Math.exp(-aniTime / 7500);
 
       p.push();
       p.fill("#226CA880");
@@ -246,6 +241,7 @@ export const CalorimeterSketch = (
     }
   };
 
+  // P5 Calls this first while other things are loading
   p.preload = () => {
     p.f = p.loadFont("./Inconsolata-VariableFont_wdth,wght.ttf");
     graphics = {
@@ -256,15 +252,19 @@ export const CalorimeterSketch = (
     };
   };
 
+  // Setup the P5 canvas
   p.setup = () => {
     p.createCanvas(300, 480, p.WEBGL);
     p.textFont(p.f);
     p.translate(-150, -240);
   };
 
+  // P5 calls this each frame
   p.draw = () => {
+    // Clear the framebuffer
     p.background(255, 255, 255);
-    p.translate(-150, -240);
+    // P5 loads identity matrix each frame on its own, which can be annoying sometimes
+    p.translate(-150, -240); // WEBGL coordinates start in middle
     updateTime();
     // debug
     showDebugCoordinates();

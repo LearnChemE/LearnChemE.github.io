@@ -24,13 +24,49 @@
   height: 482px;
 }
 
+#mat-stir-container {
+  display: grid;
+  grid-template-columns: max-content 115px;
+  justify-content: space-around;
+  padding: 0.75em;
+
+  button {
+    /* height: min-content; */
+  }
+}
+
+/* ----- Inputs ----- */
+
 /* Sliders */
 .slider-container {
-  padding: 1em;
+  padding: 0.75em;
   display: grid;
   grid-template-columns: max-content auto 25px;
   gap: 10px;
   align-content: center;
+}
+
+/* Input Lists */
+.labelled-list-container {
+  /* padding: 0.75em; */
+  display: grid;
+  grid-template-columns: max-content 50px;
+  gap: 10px;
+}
+
+.dropdown {
+  background-color: #ffffffb0;
+  border: none;
+  border-radius: 4px;
+  transition: 100ms;
+
+  option {
+    border: none;
+    border-radius: 3px;
+  }
+}
+.dropdown:hover {
+  box-shadow: 0px 0px 2px 2px gray;
 }
 
 /* ----- From slider.css  ----- */

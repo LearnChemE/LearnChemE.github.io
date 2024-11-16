@@ -12,8 +12,10 @@ import { SimProps } from "../types/globals";
 function App() {
   const [simState, setSimState] = useState<SimProps>({
     waterTemp: 4,
+    blockTemp: 30,
     mat: "Fe",
     mass: 200,
+    stirring: false,
     started: false,
   });
 
@@ -24,9 +26,7 @@ function App() {
         <Controls
           simState={simState}
           setSimState={setSimState}
-          buttonCallback={() => {
-            setSimState({ ...simState, started: !simState.started });
-          }}
+          resetCallback={() => {}}
         />
         <div className="graphics-wrapper">
           <ReactP5Wrapper

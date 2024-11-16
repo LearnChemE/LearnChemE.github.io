@@ -22,14 +22,16 @@ export const InputList: React.FC<InputListProps> = ({
 
   return (
     <>
-      <div>{label}</div>
-      <select name={id} id={id} onChange={onChange}>
-        {listItems.map((item, index) => (
-          <option key={index} value={index}>
-            {item}
-          </option>
-        ))}
-      </select>
+      <div className="labelled-list-container" id="mat-list">
+        <div>{label}</div>
+        <select className="dropdown" name={id} id={id} onChange={onChange}>
+          {listItems.map((item, index) => (
+            <option key={index} value={index}>
+              {item}
+            </option>
+          ))}
+        </select>
+      </div>
     </>
   );
 };
