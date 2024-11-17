@@ -1,0 +1,159 @@
+.App {
+  text-align: center;
+  position: relative;
+  display: grid;
+  margin: auto;
+  width: 800px;
+}
+
+.sim-container {
+  margin: 1em;
+  padding: 5px;
+  display: grid;
+  grid-template-columns: auto max-content;
+
+  border: 1px solid black;
+  box-shadow: 0px 0px 2px 2px grey;
+  border-radius: 4px;
+  /* background-image: linear-gradient(0deg, #add8e6b0, white),
+    url("./Flatirons_Winter_Sunrise-scaled.jpg");
+  background-position: top; */
+}
+
+.graphics-wrapper {
+  /* border: 1px solid black;
+  box-shadow: 0px 0px 2px 2px grey; */
+  position: relative;
+  height: 482px;
+}
+
+.tooltip-anchor {
+  position: absolute;
+  top: 135px;
+  left: 60px;
+  width: 30px;
+  height: 300px;
+}
+
+#mat-stir-container {
+  display: grid;
+  grid-template-columns: max-content 115px;
+  justify-content: space-around;
+  padding: 0.75em;
+}
+
+/* ----- Inputs ----- */
+
+.controls-container {
+  display: grid;
+  padding-top: 2em;
+  padding-bottom: 2em;
+  grid-template-rows: repeat(min-content, 6);
+  gap: 1em;
+}
+
+/* Sliders */
+.slider-container {
+  padding: 0.75em;
+  display: grid;
+  grid-template-columns: max-content auto 25px;
+  gap: 10px;
+  align-content: center;
+}
+
+/* Input Lists */
+.labelled-list-container {
+  /* padding: 0.75em; */
+  display: grid;
+  grid-template-columns: max-content 50px;
+  gap: 10px;
+}
+
+.dropdown {
+  background-color: #c2c2c2b0;
+  border: none;
+  border-radius: 4px;
+  transition: 100ms;
+
+  option {
+    border: none;
+    border-radius: 3px;
+  }
+}
+.dropdown:hover {
+  box-shadow: 0px 0px 2px 2px gray;
+}
+
+.dropdown.disabled:hover {
+  box-shadow: none;
+}
+
+.btn-container {
+  display: grid;
+  grid-template-columns: 120px max-content;
+  justify-content: center;
+  gap: 10px;
+}
+
+button.close {
+  justify-self: end;
+  border: none;
+}
+
+.modal-header {
+  display: grid;
+  grid-template-columns: min-content min-content;
+  justify-content: space-between;
+}
+
+.modal-body {
+  text-align: left;
+}
+
+/* ----- From slider.css  ----- */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 3px;
+  background: #919191;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
+  align-self: center;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: hsl(226, 78%, 47%);
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: hsl(226, 78%, 47%);
+  cursor: pointer;
+}
+
+/* Manipulate style while disabled */
+input[type="range"].disabled {
+  background: hsl(0, 0%, 74%);
+}
+
+input[type="range"].disabled::-webkit-slider-thumb {
+  cursor: default;
+  background: hsl(226, 62%, 68%);
+}
+
+input[type="range"].disabled::-moz-range-thumb {
+  cursor: default;
+  background: hsl(226, 62%, 68%);
+}
+/* ----------------------------- */
