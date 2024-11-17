@@ -83,12 +83,15 @@ const Materials = new Map<string, MaterialProperties>([
 ]);
 
 // Extend the p5 wrapper interface to get my own props
-interface CalorimeterSketchProps extends SketchProps, SimProps {}
+interface CalorimeterSketchProps extends SketchProps, SimProps {
+  returnTemperature: (temp: number) => void;
+}
 
 // P5 Script to draw to canvas
 export const CalorimeterSketch = (
   p: P5CanvasInstance<CalorimeterSketchProps>
 ) => {
+  let returnTemp: (temp: number) => void;
   // State
   let graphics: graphics;
   let startTemp: number = 4;
@@ -129,6 +132,7 @@ export const CalorimeterSketch = (
 
     material = mp;
     calcGenSolnCoeffs();
+    returnTemp = props.returnTemperature;
   };
 
   // Set the curve parameters for temperature
@@ -324,7 +328,7 @@ export const CalorimeterSketch = (
     drawStirrer();
     // Calc temperature of water
     let temp = getWaterTemp();
-    console.log(temp);
+    returnTemp(temp);
     // Draw thermometer
     drawThermometer(temp);
     // Draw block

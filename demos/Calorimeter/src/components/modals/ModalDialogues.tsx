@@ -6,7 +6,6 @@ interface ModalDialogueProps {
 const ModalDialogue: React.FC<ModalDialogueProps> = ({ title, innerHTML }) => {
   let key = title.toLowerCase();
   let labelId: string = key + "ModalLabel";
-  console.log(key);
 
   return (
     <>

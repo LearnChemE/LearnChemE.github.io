@@ -21,6 +21,7 @@ function App() {
     started: false,
     paused: false,
   });
+  const [temperature, setTemperature] = useState<number>(4);
   let resetSim = false;
 
   const handleReset = () => {
@@ -34,7 +35,6 @@ function App() {
       paused: false,
     });
     resetSim = true;
-    console.log(resetSim);
   };
 
   return (
@@ -55,10 +55,13 @@ function App() {
             stirring={simState.stirring}
             started={simState.started}
             paused={simState.paused}
+            returnTemperature={(val: number) => {
+              setTemperature(val);
+            }}
           />
           <TooltipLabel
             name="temp-label"
-            content={`water temperature: ${4.0} °C`}
+            content={`water temperature: ${temperature.toFixed(1)} °C`}
           />
         </div>
       </div>
