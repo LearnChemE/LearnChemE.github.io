@@ -1,8 +1,6 @@
 import "./ModalButtons.css";
 
-interface ModalButtonProps {}
-
-export const ModalButtons: React.FC<ModalButtonProps> = ({}) => {
+export const ModalButtons: React.FC = () => {
   return (
     <div className="modal-buttons-container" id="modal-buttons-container">
       <button

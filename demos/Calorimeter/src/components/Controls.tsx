@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { InputRange } from "./InputRange";
 import { InputList } from "./InputList";
 import { MaterialArray, SimProps } from "../types/globals";

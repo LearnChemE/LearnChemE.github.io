@@ -5,7 +5,7 @@ import "p5";
 import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
-import { ModalButtons, Controls } from "../components";
+import { Controls } from "../components";
 import { CalorimeterSketch } from "../canvas";
 import { SimProps } from "../types/globals";
 import { ModalDialogues } from "../components";
@@ -22,7 +22,6 @@ function App() {
     paused: false,
   });
   const [temperature, setTemperature] = useState<number>(4);
-  let resetSim = false;
 
   const handleReset = () => {
     setSimState({
@@ -34,7 +33,6 @@ function App() {
       started: false,
       paused: false,
     });
-    resetSim = true;
   };
 
   return (

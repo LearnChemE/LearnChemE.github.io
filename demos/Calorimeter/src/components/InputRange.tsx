@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 interface InputRangeProps {
   label: string;
   id: string;
