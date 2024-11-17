@@ -82,6 +82,21 @@
   gap: 10px;
 }
 
+button.close {
+  justify-self: end;
+  border: none;
+}
+
+.modal-header {
+  display: grid;
+  grid-template-columns: min-content min-content;
+  justify-content: space-between;
+}
+
+.modal-body {
+  text-align: left;
+}
+
 /* ----- From slider.css  ----- */
 input[type="range"] {
   -webkit-appearance: none;

@@ -8,6 +8,7 @@ import "./App.css";
 import { ModalButtons, Controls } from "../components";
 import { CalorimeterSketch } from "../canvas";
 import { SimProps } from "../types/globals";
+import { ModalDialogues } from "../components";
 
 function App() {
   const [simState, setSimState] = useState<SimProps>({
@@ -56,6 +57,7 @@ function App() {
           />
         </div>
       </div>
+      <ModalDialogues />
     </div>
   );
 }
