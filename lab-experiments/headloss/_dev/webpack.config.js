@@ -21,35 +21,39 @@ module.exports = {
     static: "./dist",
   },
   module: {
-    rules: [{
-      test: /\.(scss)$/i,
-      use: [{
-        loader: miniCssExtractPlugin.loader,
-      },
+    rules: [
       {
-        loader: "css-loader",
-      },
-      {
-        loader: "postcss-loader",
+        test: /\.(docx)$/i,
+        loader: 'file-loader',
         options: {
-          postcssOptions: {
-            plugins: [autoprefixer],
-          },
+          name: 'assets/[name].[ext]',
         },
       },
       {
-        loader: "sass-loader",
+        test: /\.(scss)$/i,
+        use: [{
+          loader: miniCssExtractPlugin.loader,
+        },
+        {
+          loader: "css-loader",
+        },
+        {
+          loader: "postcss-loader",
+          options: {
+            postcssOptions: {
+              plugins: [autoprefixer],
+            },
+          },
+        },
+        {
+          loader: "sass-loader",
+        },
+        ],
       },
-      ],
-    },
-    {
-      test: /\.svg$/i,
-      use: ["raw-loader"],
-    },
-    {
-      test: /\.docx$/i,
-      type: "asset/resource",
-    },
+      {
+        test: /\.svg$/i,
+        use: ["raw-loader"],
+      },
     ],
   },
 };

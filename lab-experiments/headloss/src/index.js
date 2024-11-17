@@ -1,5 +1,6 @@
 import modal from "bootstrap";
 import Graphic from "./assets/headloss.svg";
+import "./assets/headloss_worksheet.docx";
 import addEvents from "./js/events.js";
 import populate from "./js/populate.js";
 import "./style/style.scss";
