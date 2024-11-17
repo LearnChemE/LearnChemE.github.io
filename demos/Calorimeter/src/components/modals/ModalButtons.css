@@ -1,6 +1,6 @@
 .modal-buttons-container {
   display: grid;
-  justify-self: end;
+  justify-self: center;
   grid-template-columns: 100px 100px 100px;
   gap: 10px;
   padding: 5px;

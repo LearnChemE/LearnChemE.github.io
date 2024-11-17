@@ -37,7 +37,6 @@ function App() {
 
   return (
     <div className="App">
-      <ModalButtons />
       <div className="sim-container">
         <Controls
           simState={simState}

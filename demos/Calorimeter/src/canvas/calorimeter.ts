@@ -33,6 +33,10 @@ const WATER_HIT_TIME = 600; // ms
 const STIR_FRAME_W = 54; // px
 const STIR_FRAME_H = 288; // px
 const STIR_FRAMETIME = 50; // ms
+// Calculation Constants
+const CW = 4186; // J / K
+const H_COEFF = 100; // W / cm^2 / K
+const AREA = 1; // cm^2
 
 // Materials and their properties
 const Materials = new Map<string, MaterialProperties>([
@@ -100,6 +104,10 @@ export const CalorimeterSketch = (
   let paused: boolean = true;
   // Time
   let aniTime: number = 0;
+  // Gen Soln
+  let k = 0;
+  let deltaTempW = 0;
+  let finalTemp = 0;
 
   // This gets called whenever props are updated by React.
   p.updateWithProps = (props: CalorimeterSketchProps) => {
@@ -120,6 +128,26 @@ export const CalorimeterSketch = (
     }
 
     material = mp;
+    calcGenSolnCoeffs();
+  };
+
+  // Set the curve parameters for temperature
+  const calcGenSolnCoeffs = () => {
+    let cm = mass * material.specificHeat;
+    let ceq = (cm * CW) / (cm + CW);
+    let h = stirring ? H_COEFF : H_COEFF / 10;
+    k = (h * AREA) / ceq;
+    deltaTempW = ((blockTemp - startTemp) * cm) / CW;
+    finalTemp = (cm * blockTemp + CW * startTemp) / (cm + CW);
+  };
+
+  // Find water temp based on general soln
+  const getWaterTemp = () => {
+    // Rebase time based on when water hits
+    let t = (aniTime - WATER_HIT_TIME) / 1000; // s
+    if (t <= 0) return startTemp;
+    // Use diff eq from water hit time
+    return finalTemp - deltaTempW * Math.exp(-k * t);
   };
 
   // Debug coordinates display in top left corner
@@ -265,7 +293,7 @@ export const CalorimeterSketch = (
 
   // P5 Calls this first while other things are loading
   p.preload = () => {
-    p.f = p.loadFont("./Inconsolata-VariableFont_wdth,wght.ttf");
+    // p.f = p.loadFont("./Inconsolata-VariableFont_wdth,wght.ttf");
     graphics = {
       calorimeter: p.loadImage("Calorimeter.png"),
       thermometer: p.loadImage("Thermometer.png"),
@@ -277,7 +305,7 @@ export const CalorimeterSketch = (
   // Setup the P5 canvas
   p.setup = () => {
     p.createCanvas(300, 480, p.WEBGL);
-    p.textFont(p.f);
+    // p.textFont(p.f);
     p.translate(-150, -240);
   };
 
@@ -289,13 +317,16 @@ export const CalorimeterSketch = (
     p.translate(-150, -240); // WEBGL coordinates start in middle
     updateTime();
     // debug
-    showDebugCoordinates();
+    // showDebugCoordinates();
 
     // Draw Calorimeter
     p.image(graphics.calorimeter, 14, 210);
     drawStirrer();
+    // Calc temperature of water
+    let temp = getWaterTemp();
+    console.log(temp);
     // Draw thermometer
-    drawThermometer(startTemp);
+    drawThermometer(temp);
     // Draw block
     let blockPos = getBlockPos();
     let blockHeight = getBlockHeight();

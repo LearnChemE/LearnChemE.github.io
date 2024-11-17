@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { InputRange } from "./InputRange";
 import { InputList } from "./InputList";
 import { MaterialArray, SimProps } from "../types/globals";
+import { ModalButtons } from "./modals/ModalButtons";
 
 interface ControlProps {
   simState: SimProps;
@@ -34,6 +35,7 @@ export const Controls: React.FC<ControlProps> = ({
   return (
     <>
       <div className="controls-container">
+        <ModalButtons />
         {/* Water Temp Slider */}
         <InputRange
           label="starting water temperature (°C):"
@@ -97,30 +99,32 @@ export const Controls: React.FC<ControlProps> = ({
             {simState.stirring ? "stop" : "start"} stirrer
           </button>
         </div>
-        {/* Start Button */}
-        <button
-          type="button"
-          id="drop-btn"
-          className={dropBtnClass}
-          onClick={() => {
-            setSimState({
-              ...simState,
-              started: true,
-              paused: !simState.paused,
-            });
-          }}
-        >
-          {dropBtnText}
-        </button>
-        {/* Reset Button */}
-        <button
-          type="button"
-          id="reset-btn"
-          className="btn btn-danger"
-          onClick={resetCallback}
-        >
-          reset
-        </button>
+        <div className="btn-container" id="play-sim-btns">
+          {/* Start Button */}
+          <button
+            type="button"
+            id="drop-btn"
+            className={dropBtnClass}
+            onClick={() => {
+              setSimState({
+                ...simState,
+                started: true,
+                paused: !simState.paused,
+              });
+            }}
+          >
+            {dropBtnText}
+          </button>
+          {/* Reset Button */}
+          <button
+            type="button"
+            id="reset-btn"
+            className="btn btn-danger"
+            onClick={resetCallback}
+          >
+            reset
+          </button>
+        </div>
       </div>
     </>
   );
