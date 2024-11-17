@@ -45,6 +45,7 @@ export const Controls: React.FC<ControlProps> = ({
           step={1}
           val={simState.waterTemp}
           setVal={(newVal) => setSimState({ ...simState, waterTemp: newVal })}
+          disabled={simState.started}
         />
         {/* Block Temp Slider */}
         <InputRange
@@ -55,6 +56,7 @@ export const Controls: React.FC<ControlProps> = ({
           step={1}
           val={simState.blockTemp}
           setVal={(newVal) => setSimState({ ...simState, blockTemp: newVal })}
+          disabled={simState.started}
         />
         {/* Block Mass Slider */}
         <InputRange
@@ -67,6 +69,7 @@ export const Controls: React.FC<ControlProps> = ({
           setVal={(newVal) => {
             setSimState({ ...simState, mass: newVal });
           }}
+          disabled={simState.started}
         />
         <div id="mat-stir-container">
           {/* Select Material Dropdown */}
@@ -76,6 +79,7 @@ export const Controls: React.FC<ControlProps> = ({
             val={MaterialArray.indexOf(mat)}
             setVal={(newMat) => setSimState({ ...simState, mat: newMat })}
             listItems={MaterialArray}
+            disabled={simState.started}
           />
           {/* Stirrer button */}
           <button
@@ -89,6 +93,8 @@ export const Controls: React.FC<ControlProps> = ({
             onClick={() =>
               setSimState({ ...simState, stirring: !simState.stirring })
             }
+            disabled={simState.started}
+            aria-disabled={simState.started}
           >
             <i
               className={

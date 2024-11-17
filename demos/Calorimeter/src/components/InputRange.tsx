@@ -8,6 +8,7 @@ interface InputRangeProps {
   step: number;
   val: number;
   setVal: (newVal: number) => void;
+  disabled?: boolean;
 }
 
 export const InputRange: React.FC<InputRangeProps> = ({
@@ -18,6 +19,7 @@ export const InputRange: React.FC<InputRangeProps> = ({
   step,
   val,
   setVal,
+  disabled = false,
 }) => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setVal(Number(event.target.value));
@@ -28,6 +30,7 @@ export const InputRange: React.FC<InputRangeProps> = ({
       <div className="slider-container">
         <div className="slider-label">{label}</div>
         <input
+          className={disabled ? "disabled" : "slider"}
           type="range"
           aria-labelledby="#slider-label"
           id={id}
@@ -36,6 +39,8 @@ export const InputRange: React.FC<InputRangeProps> = ({
           value={val}
           step={step}
           onChange={handleInputChange}
+          disabled={disabled}
+          aria-disabled={disabled}
         />
         <div className="slider-val-label">{val}</div>
       </div>
