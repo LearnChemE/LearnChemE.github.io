@@ -259,7 +259,8 @@ export const CalorimeterSketch = (
       p.pop();
     } else {
       // Based on displacement height times an exponential decay
-      let rippleHeight = 0.5 * dh * Math.exp(-aniTime / 7500);
+      let rippleHeight =
+        0.5 * dh * Math.exp(-aniTime / 7500) + Number(stirring);
 
       p.push();
       p.fill("#226CA880");
@@ -282,7 +283,8 @@ export const CalorimeterSketch = (
   // Draw stirrer with animation
   const drawStirrer = () => {
     // Select frame
-    let frame = stirring ? Math.floor((p.millis() / STIR_FRAMETIME) % 4) : 0;
+    let frame =
+      stirring && !paused ? Math.floor((p.millis() / STIR_FRAMETIME) % 4) : 0;
     // Figure out frame position on texture
     let x = frame * STIR_FRAME_W;
     // Get frame from texture
@@ -313,14 +315,12 @@ export const CalorimeterSketch = (
   p.draw = () => {
     // Clear the framebuffer
     p.background(255, 255, 255);
-    // P5 loads identity matrix each frame on its own, which can be annoying sometimes
+    // P5 loads identity matrix each frame on its own
     p.translate(-150, -240); // WEBGL coordinates start in middle
     updateTime();
     // debug
     // showDebugCoordinates();
 
-    // Draw Calorimeter
-    p.image(graphics.calorimeter, 14, 210);
     drawStirrer();
     // Calc temperature of water
     let temp = getWaterTemp();
@@ -334,6 +334,8 @@ export const CalorimeterSketch = (
 
     // Draw Water
     fillCalorimeter(getExtraWaterVol(blockPos, blockHeight), true);
+    // Draw Calorimeter last
+    p.image(graphics.calorimeter, 14, 210);
   };
 };
 

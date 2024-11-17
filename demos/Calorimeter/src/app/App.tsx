@@ -9,6 +9,7 @@ import { ModalButtons, Controls } from "../components";
 import { CalorimeterSketch } from "../canvas";
 import { SimProps } from "../types/globals";
 import { ModalDialogues } from "../components";
+import { TooltipLabel } from "../components";
 
 function App() {
   const [simState, setSimState] = useState<SimProps>({
@@ -18,7 +19,7 @@ function App() {
     mass: 200,
     stirring: false,
     started: false,
-    paused: true,
+    paused: false,
   });
   let resetSim = false;
 
@@ -30,7 +31,7 @@ function App() {
       mass: 200,
       stirring: false,
       started: false,
-      paused: true,
+      paused: false,
     });
     resetSim = true;
     console.log(resetSim);
@@ -54,6 +55,10 @@ function App() {
             stirring={simState.stirring}
             started={simState.started}
             paused={simState.paused}
+          />
+          <TooltipLabel
+            name="temp-label"
+            content={`water temperature: ${4.0} °C`}
           />
         </div>
       </div>

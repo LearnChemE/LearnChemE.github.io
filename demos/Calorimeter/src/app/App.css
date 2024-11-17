@@ -23,7 +23,16 @@
 .graphics-wrapper {
   /* border: 1px solid black;
   box-shadow: 0px 0px 2px 2px grey; */
+  position: relative;
   height: 482px;
+}
+
+.tooltip-anchor {
+  position: absolute;
+  top: 135px;
+  left: 60px;
+  width: 30px;
+  height: 300px;
 }
 
 #mat-stir-container {

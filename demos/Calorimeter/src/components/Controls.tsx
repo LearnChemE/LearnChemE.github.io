@@ -106,17 +106,20 @@ export const Controls: React.FC<ControlProps> = ({
           </button>
         </div>
         <div className="btn-container" id="play-sim-btns">
-          {/* Start Button */}
+          {/* Drop Button */}
           <button
             type="button"
             id="drop-btn"
             className={dropBtnClass}
             onClick={() => {
-              setSimState({
-                ...simState,
-                started: true,
-                paused: !simState.paused,
-              });
+              if (!simState.started)
+                setSimState({ ...simState, started: true, paused: false });
+              else
+                setSimState({
+                  ...simState,
+                  started: true,
+                  paused: !simState.paused,
+                });
             }}
           >
             {dropBtnText}
