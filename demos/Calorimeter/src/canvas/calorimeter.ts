@@ -29,7 +29,7 @@ const WATER_TOP_Y = 275;
 const WATER_LEVEL_CHANGE = 40;
 // Animations
 const FALL_TIME = 800; // ms
-const WATER_HIT_TIME = 600; // ms
+const WATER_HIT_TIME = 400; // ms
 const STIR_FRAME_W = 54; // px
 const STIR_FRAME_H = 288; // px
 const STIR_FRAMETIME = 50; // ms
@@ -151,7 +151,10 @@ export const CalorimeterSketch = (
     let t = (aniTime - WATER_HIT_TIME) / 1000; // s
     if (t <= 0) return startTemp;
     // Use diff eq from water hit time
-    return finalTemp - deltaTempW * Math.exp(-k * t);
+    let tmp = finalTemp - deltaTempW * Math.exp(-k * t);
+    // Floating point error in deltaTempW can cause tmp to drop in first few milliseconds
+    if (tmp < startTemp) return startTemp;
+    return tmp;
   };
 
   // Debug coordinates display in top left corner
@@ -322,15 +325,16 @@ export const CalorimeterSketch = (
     // P5 loads identity matrix each frame on its own
     p.translate(-150, -240); // WEBGL coordinates start in middle
     updateTime();
-    // debug
-    // showDebugCoordinates();
+    // showDebugCoordinates(); // for debug, need to load and enable font for this
 
     drawStirrer();
+
     // Calc temperature of water
     let temp = getWaterTemp();
     returnTemp(temp);
     // Draw thermometer
     drawThermometer(temp);
+
     // Draw block
     let blockPos = getBlockPos();
     let blockHeight = getBlockHeight();
@@ -338,6 +342,7 @@ export const CalorimeterSketch = (
 
     // Draw Water
     fillCalorimeter(getExtraWaterVol(blockPos, blockHeight), true);
+
     // Draw Calorimeter last
     p.image(graphics.calorimeter, 14, 210);
   };
