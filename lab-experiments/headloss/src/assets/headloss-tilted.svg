@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="158.3045mm"
    height="140.19501mm"
    viewBox="0 -45 228.293 202.17695"
    version="1.1"
    id="canvas"
-   inkscape:version="1.1-dev (b530929, 2020-05-03)"
-   sodipodi:docname="headloss-tilted.svg">
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   sodipodi:docname="headloss-tilted.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
      id="view"
      pagecolor="#ffffff"
@@ -22,8 +22,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="2.747537"
-     inkscape:cx="185.40607"
-     inkscape:cy="220.79893"
+     inkscape:cx="185.62079"
+     inkscape:cy="74.976242"
      inkscape:window-width="1440"
      inkscape:window-height="847"
      inkscape:window-x="0"
@@ -67,6 +67,11 @@
        style="fill:#c8c8c8;fill-opacity:1;stroke:#000000;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
        d="m 170,120 v 41 h -10 v 2 h 22 v -2 h -10 v -41"
        id="apparatus-right-leg" />
+    <path
+       style="fill:#c8c8c8;fill-opacity:1;stroke:#000000;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
+       d="M 109.99791,120.19961 110,161 h -10 l 0,2 22,0 0,-2 -10.09094,0.23029 -0.1283,-41.08354"
+       id="apparatus-left-leg"
+       sodipodi:nodetypes="cccccccc" />
     <path
        style="fill:none;fill-opacity:0.6;stroke:#ff5050;stroke-width:1.8;stroke-dasharray:none;stroke-opacity:0.6"
        d="m 75.785348,168.21794 7.680101,-2.57508 c 0,0 2.080813,-0.87351 2.590078,-3.26557 0.131766,-2.74469 -0.405776,-5.02953 -0.405776,-5.02953 0,0 -5.68887,-24.35805 -6.552604,-27.27036 -1.273946,-3.93555 -1.913551,-5.44643 -1.913551,-5.44643 0,0 -0.675132,-1.65488 -1.099606,-3.21303 -0.07053,-1.0269 -0.119022,-1.27868 0.180099,-1.89341 0.876951,-0.58699 0.624658,-0.44165 1.609559,-0.46926 1.935651,-0.0718 2.641959,-0.0303 2.641959,-0.0303 l 119.415143,0.0155 c 0,0 1.93257,-0.074 5.77228,0.25144 5.4444,0.88192 7.95658,4.9168 9.6572,9.00239 0.86636,2.68283 2.18162,6.54393 2.18162,6.54393"
@@ -1139,10 +1144,4 @@
          x="212.8"
          y="6.5500002">cm</tspan></text>
   </g>
-  <path
-     style="fill:#c8c8c8;fill-opacity:1;stroke:#000000;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
-     d="M 109.99791,120.19961 110,161 h -10 l 0,2 22,0 0,-2 -10.09094,0.23029 -0.1283,-41.08354"
-     id="apparatus-left-leg"
-     transform="rotate(19.052888,455.3639,37.894859)"
-     sodipodi:nodetypes="cccccccc" />
 </svg>
