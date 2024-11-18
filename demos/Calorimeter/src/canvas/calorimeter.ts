@@ -6,7 +6,7 @@ interface graphics {
   calorimeter: any;
   thermometer: any;
   thermoTicks: any;
-  stirrer: any;
+  stirrer: Array<any>[4];
 }
 
 // Thermometer geometry
@@ -292,33 +292,46 @@ export const CalorimeterSketch = (
     // Select frame
     let frame =
       stirring && !paused ? Math.floor((p.millis() / STIR_FRAMETIME) % 4) : 0;
-    // Figure out frame position on texture
-    let x = frame * STIR_FRAME_W;
-    // Get frame from texture
-    let im = graphics.stirrer.get(x, 0, STIR_FRAME_W, STIR_FRAME_H);
     // Draw image
-    p.image(im, 195, 138);
+    p.image(graphics.stirrer[frame], 195, 138);
   };
 
+  const loadStirrerAnimation: Array<any>[4] = (im: P5CanvasInstance) => {
+    var frames: Array<P5CanvasInstance>[4] = [0, 0, 0, 0];
+    for (let i = 0; i < 4; i++) {
+      // Figure out frame position on texture
+      let x = i * STIR_FRAME_W;
+      // Get each frame from texture
+      frames[i] = im.get(x, 0, STIR_FRAME_W, STIR_FRAME_H);
+    }
+    return frames;
+  };
+
+  let im: P5CanvasInstance;
   // P5 Calls this first while other things are loading
   p.preload = () => {
+    // Load texture containing frames
+    im = p.loadImage("StirAniFull.png");
+    if (!im) throw new Error("Error: couldn't load StirAniFull.png");
     // p.f = p.loadFont("./Inconsolata-VariableFont_wdth,wght.ttf");
+    // Set the graphics objects
     graphics = {
       calorimeter: p.loadImage("Calorimeter.png"),
       thermometer: p.loadImage("Thermometer.png"),
       thermoTicks: p.loadImage("ThermoTicks.png"),
-      stirrer: p.loadImage("StirAniFull.png"),
+      stirrer: [0, 0, 0, 0],
     };
   };
 
   // Setup the P5 canvas
   p.setup = () => {
+    graphics.stirrer = loadStirrerAnimation(im);
     p.createCanvas(300, 480, p.WEBGL);
     // p.textFont(p.f);
     p.translate(-150, -240);
   };
 
-  // P5 calls this each frame
+  // P5 calls this each frameframe
   p.draw = () => {
     // Clear the framebuffer
     p.background(255, 255, 255);
