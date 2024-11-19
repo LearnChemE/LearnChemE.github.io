@@ -22,6 +22,9 @@ window.state = {
   viewBox: [0, 0, 0, 0],
   showButtons: false,
   initialized: false,
+  tilted: false,
+  switchTilt: false,
+  pinching: false,
 };
 
 state.hamburgerHasBeenClicked =

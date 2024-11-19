@@ -14,6 +14,10 @@ export function switchLogic(elts) {
       state.switchOn = true;
       let currentLength = 0;
       const interval = setInterval(() => {
+        if (state.switchTilt) {
+          clearInterval(interval);
+          return;
+        }
         if (
           currentLength < elts.intakeLiquidMaxLength &&
           Number(elts.sourceLiquid.getAttribute("height")) > 0
@@ -29,7 +33,7 @@ export function switchLogic(elts) {
           }
           clearInterval(interval);
         }
-      }, 16.67);
+      }, 1000 / 60);
     } else {
       elts.switchElt.setAttribute("x", switchX);
       elts.switchElt.setAttribute("y", switchY);
@@ -38,6 +42,10 @@ export function switchLogic(elts) {
       let currentLength = elts.intakeLiquidMaxLength;
       if (Number(elts.sourceLiquid.getAttribute("height")) > 0) {
         const interval = setInterval(() => {
+          if (state.switchTilt) {
+            clearInterval(interval);
+            return;
+          }
           if (currentLength > 0) {
             currentLength -= 2;
             elts.intakeLiquid.style.strokeDashoffset =
@@ -45,7 +53,7 @@ export function switchLogic(elts) {
           } else {
             clearInterval(interval);
           }
-        }, 16.67);
+        }, 1000 / 60);
       }
     }
   });
@@ -111,7 +119,7 @@ export function valveLogic(elts) {
       setTimeout(() => {
         setValveOpen();
         callEvent();
-      }, 16.67);
+      }, 1000 / 60);
     } else {
       return;
     }
@@ -177,7 +185,7 @@ function flowThroughApparatus(elts) {
     const tubeLength = 200; // pts
     const tubeCmPerFrame = state.v * s; // cm per frame
     const tubePtsPerCm = tubeLength / 40; // pts per cm
-    return tubeCmPerFrame * tubePtsPerCm; // pts per frame
+    return tubeCmPerFrame * tubePtsPerCm / 4; // pts per frame
   };
 
   const handleBeakers = () => {
@@ -203,20 +211,60 @@ function flowThroughApparatus(elts) {
 
     const sdo = Number(elts.tubeLiquid.style.strokeDashoffset);
 
-    if (sdo < 100) {
+    if (sdo < 100 && !state.pinching) {
       m1Height = Math.min(m1MaxHeight, m1Height + tubePtsPerFrame());
+    } else if (state.pinching) {
+      m1Height = Math.max(0, m1Height - tubePtsPerFrame());
     }
 
-    if (sdo < 70) {
+    if (sdo < 70 && !state.pinching) {
       m2Height = Math.min(m2MaxHeight, m2Height + tubePtsPerFrame());
+    } else if (state.pinching) {
+      m2Height = Math.max(0, m2Height - tubePtsPerFrame());
     }
 
-    if (sdo < 40) {
+    if (sdo < 40 && !state.pinching) {
       m3Height = Math.min(m3MaxHeight, m3Height + tubePtsPerFrame());
+    } else if (state.pinching) {
+      m3Height = Math.max(0, m3Height - tubePtsPerFrame());
     }
 
-    if (sdo < 10) {
+    if (sdo < 10 && !state.pinching) {
       m4Height = Math.min(m4MaxHeight, m4Height + tubePtsPerFrame());
+    } else if (state.pinching) {
+      m4Height = Math.max(0, m4Height - tubePtsPerFrame());
+    }
+
+    if (state.tilted) {
+      const bubbleOffset = Number(elts.bubbleStream.style.strokeDashoffset);
+      const bubbleMaxLength = Number(elts.bubbleStream.getTotalLength());
+      if (bubbleOffset < 0) {
+        elts.bubbleStream.style.strokeDashoffset = bubbleMaxLength * 2;
+      }
+      elts.bubbleStream.style.strokeDashoffset = bubbleOffset - tubePtsPerFrame();
+    }
+
+    if (sdo < 102 && state.pinching && state.tilted) {
+      const bubbleCoverOffset = Number(elts.bubbleCover.style.strokeDashoffset);
+      const bubbleCoverMaxLength = Number(elts.bubbleCover.getTotalLength());
+      if (bubbleCoverOffset === 0) {
+        elts.bubbleCover.style.strokeDashoffset = 2 * bubbleCoverMaxLength;
+      }
+      if (bubbleCoverOffset > bubbleCoverMaxLength) {
+        elts.bubbleCover.style.strokeDashoffset = Math.max(
+          bubbleCoverMaxLength,
+          bubbleCoverOffset - tubePtsPerFrame()
+        );
+      }
+    } else if (state.tilted) {
+      const bubbleCoverOffset = Number(elts.bubbleCover.style.strokeDashoffset);
+      const bubbleCoverMaxLength = Number(elts.bubbleCover.getTotalLength());
+      if (bubbleCoverOffset > 0) {
+        elts.bubbleCover.style.strokeDashoffset = Math.max(
+          0,
+          bubbleCoverOffset - tubePtsPerFrame()
+        );
+      }
     }
 
     elts.manometerLiquids[0].style.strokeDashoffset = 30.055 - m1Height;
@@ -231,6 +279,10 @@ function flowThroughApparatus(elts) {
   let m4Height = 0;
 
   const interval = setInterval(() => {
+    if (state.switchTilt) {
+      clearInterval(interval);
+      return;
+    }
     let beakerFilling = false;
     if (state.valveOpen === false) {
       state.flowing = false;
@@ -247,6 +299,11 @@ function flowThroughApparatus(elts) {
     } else {
       clearInterval(interval);
       const beakerInterval = setInterval(() => {
+        if (state.switchTilt) {
+          clearInterval(interval);
+          clearInterval(beakerInterval);
+          return;
+        }
         if (
           sourceHeight > 0 &&
           state.switchOn === true &&
@@ -255,6 +312,12 @@ function flowThroughApparatus(elts) {
           if (!beakerFilling) {
             elts.wasteBeakerStream.style.strokeDashoffset = 26.25;
             const fillingInterval = setInterval(() => {
+              if (state.switchTilt) {
+                clearInterval(interval);
+                clearInterval(beakerInterval);
+                clearInterval(fillingInterval);
+                return;
+              }
               const streamOffset = Number(
                 elts.wasteBeakerStream.style.strokeDashoffset
               );
@@ -291,7 +354,17 @@ function emptyApparatus(elts) {
   let currentTubeLiquidLength = elts.tubeLiquidMaxLength;
   let currentIntakeLiquidLength = elts.intakeLiquidMaxLength;
   let currentWasteStreamLength = elts.wasteBeakerStreamMaxLength;
+  if (state.tilted) {
+    const bubbleCoverMaxLength = Number(elts.bubbleCover.getTotalLength());
+    elts.bubbleCover.style.strokeDashoffset = 2 * bubbleCoverMaxLength;
+    elts.bubbleCover.style.opacity = "0";
+    elts.bubbleStream.style.opacity = "0";
+  }
   const interval = setInterval(() => {
+    if (state.switchTilt) {
+      clearInterval(interval);
+      return;
+    }
     elts.manometerLiquids.forEach((man) => {
       const height = Number(man.style.strokeDashoffset);
       const maxHeight = 30.055;
@@ -312,9 +385,24 @@ function emptyApparatus(elts) {
         elts.tubeLiquid.style.strokeDashoffset =
           elts.tubeLiquidMaxLength - currentTubeLiquidLength;
       } else {
+        if (state.tilted) {
+          const bubbleCoverMaxLength = Number(elts.bubbleCover.getTotalLength());
+          elts.bubbleCover.style.strokeDashoffset = 2 * bubbleCoverMaxLength;
+          elts.bubbleCover.style.opacity = "0";
+          elts.bubbleStream.style.opacity = "0";
+        }
         elts.tubeLiquid.style.strokeDashoffset = elts.tubeLiquidMaxLength;
         clearInterval(interval);
+        if (state.tilted) {
+          const bubbleCoverMaxLength = Number(elts.bubbleCover.getTotalLength());
+          elts.bubbleCover.style.strokeDashoffset = 2 * bubbleCoverMaxLength;
+        }
         const clearWasteStreamInterval = setInterval(() => {
+          if (state.switchTilt) {
+            clearInterval(interval);
+            clearInterval(clearWasteStreamInterval);
+            return;
+          }
           if (currentWasteStreamLength > 0) {
             currentWasteStreamLength -= 2;
             elts.wasteBeakerStream.style.strokeDashoffset = Math.min(
@@ -324,8 +412,28 @@ function emptyApparatus(elts) {
           } else {
             clearInterval(clearWasteStreamInterval);
           }
-        }, 16.67);
+        }, 1000 / 60);
       }
     }
-  }, 16.67);
+  }, 1000 / 60);
+}
+
+export function pinchLogic(elts) {
+  const p = elts.pinchGroup;
+  const bubbleStream = elts.bubbleStream;
+  const bubbleCover = elts.bubbleCover;
+
+  p.addEventListener("mousedown", () => {
+    state.pinching = true;
+    p.style.opacity = "1";
+    if (state.switchOn && state.valveOpen) {
+      bubbleStream.style.opacity = "1";
+      bubbleCover.style.opacity = "1";
+    }
+  });
+
+  document.addEventListener("mouseup", () => {
+    state.pinching = false;
+    p.style.opacity = "0";
+  });
 }
