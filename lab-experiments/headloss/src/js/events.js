@@ -117,14 +117,13 @@ function enableSvgDrag(elts) {
   });
 
   ruler.addEventListener("mouseout", () => {
-    onRuler = false;
-  });
-
-  document.addEventListener("mouseup", () => {
-    onRuler = false;
+    if (!window.mousedown) {
+      onRuler = false;
+    }
   });
 
   svg.addEventListener("mousedown", (e) => {
+    window.mousedown = true;
     if (
       e.target === elts.switchElt ||
       e.target === elts.switchG ||
@@ -180,6 +179,7 @@ function enableSvgDrag(elts) {
 
   document.addEventListener("mouseup", () => {
     isDragging = false;
+    window.mousedown = false;
   });
 }
 
@@ -272,6 +272,8 @@ function handleReset(elts) {
 }
 
 function handleTilt() {
+  state.flowRate = 0;
+  state.valveOpen = false;
   let tiltElt = document.getElementById("tilt");
   tiltElt.addEventListener("click", () => {
     tiltElt.classList.add("clicked");
@@ -323,10 +325,10 @@ function handleTilt() {
     handleTilt();
     handleReset(newElts);
     handleHamburger();
+    enableSvgDrag(newElts);
+    enableSvgZoom();
     if (state.tilted) {
       handlePinch(newElts);
-      enableSvgDrag(newElts);
-      enableSvgZoom();
     }
   });
 }

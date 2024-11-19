@@ -104,7 +104,7 @@ export function valveLogic(elts) {
       `rotate(${angle} ${circlePtX} ${circlePtY})`
     );
 
-    open = Math.sin((open ** 0.6 * Math.PI) / 2);
+    open = Math.sin((open ** 1.2 * Math.PI) / 2);
 
     state.flowRate = state.maxFlowRate * open;
     if (state.switchOn === true && state.flowing === false && state.valveOpen) {
@@ -136,12 +136,12 @@ export function valveLogic(elts) {
 }
 
 function calculateState() {
-  const V = state.flowRate; // flow rate (mL/s)
+  const V = state.pinching ? state.flowRate / 2 : state.flowRate; // flow rate (mL/s)
   const tubeArea = Math.PI * Math.pow(state.r, 2);
   state.v = V / tubeArea; // cm/s
   const nu = 0.0089; // kinematic viscosity (cm^2/s)
   state.Re = (state.r * 2 * state.v) / nu; // Reynolds number
-  state.laminar = state.Re < 3500;
+  state.laminar = state.Re < 2800;
   if (state.laminar) {
     state.f = 64 / state.Re; // Darcy friction factor
   } else {
@@ -182,25 +182,26 @@ function flowThroughApparatus(elts) {
   const emptySource = sourceHeight === 0;
 
   const tubePtsPerFrame = () => {
-    const tubeLength = 200; // pts
     const tubeCmPerFrame = state.v * s; // cm per frame
-    const tubePtsPerCm = tubeLength / 40; // pts per cm
-    return tubeCmPerFrame * tubePtsPerCm / 4; // pts per frame
+    const tubePtsPerCm = 3; // pts per cm
+    return tubeCmPerFrame * tubePtsPerCm; // pts per frame - slowed down a bit
   };
 
   const handleBeakers = () => {
-    const V = state.flowRate; // flow rate (mL/s)
+    const V = state.pinching ? state.flowRate / 2 : state.flowRate; // flow rate (mL/s)
     const beakerFractionPerSecond = V / 1000; // s^-1
     const beakerFractionPerMillisecond = beakerFractionPerSecond / 1000; // ms^-1
     const beakerFractionPerFrame = beakerFractionPerMillisecond * ms; // frame^-1
-    const beakerPtsPerFrame = beakerFractionPerFrame * sourceStartHeight;
-    sourceHeight = Math.max(0, sourceHeight - beakerPtsPerFrame);
+    state.beakerPtsPerFrame = beakerFractionPerFrame * sourceStartHeight;
+    sourceHeight = Math.max(0, sourceHeight - state.beakerPtsPerFrame);
     const sourceHeightDiff = sourceStartHeight - sourceHeight;
     const sourceY = sourceStartY + sourceHeightDiff;
     elts.sourceLiquid.setAttribute("y", sourceY);
     elts.sourceLiquid.setAttribute("height", sourceHeight);
-    wasteY = wasteY - beakerPtsPerFrame;
-    wasteHeight = Math.min(wasteHeight + beakerPtsPerFrame, wasteStartHeight);
+    if (Number(elts.wasteBeakerStream.style.strokeDashoffset) >= 52.5) {
+      wasteY = wasteY - state.beakerPtsPerFrame;
+      wasteHeight = Math.min(wasteHeight + state.beakerPtsPerFrame, wasteStartHeight);
+    }
     elts.wasteLiquid.setAttribute("y", wasteY);
     elts.wasteLiquid.setAttribute("height", wasteHeight);
 
@@ -258,7 +259,6 @@ function flowThroughApparatus(elts) {
       }
     } else if (state.tilted) {
       const bubbleCoverOffset = Number(elts.bubbleCover.style.strokeDashoffset);
-      const bubbleCoverMaxLength = Number(elts.bubbleCover.getTotalLength());
       if (bubbleCoverOffset > 0) {
         elts.bubbleCover.style.strokeDashoffset = Math.max(
           0,
@@ -365,6 +365,12 @@ function emptyApparatus(elts) {
       clearInterval(interval);
       return;
     }
+    const wasteCurrentHeight = Number(elts.wasteLiquid.getAttribute("height"));
+    const wasteCurrentY = Number(elts.wasteLiquid.getAttribute("y"));
+    elts.wasteLiquid.setAttribute("height", Math.min(26.25, wasteCurrentHeight + state.beakerPtsPerFrame));
+    if (wasteCurrentHeight < 26.25) {
+      elts.wasteLiquid.setAttribute("y", wasteCurrentY - state.beakerPtsPerFrame);
+    }
     elts.manometerLiquids.forEach((man) => {
       const height = Number(man.style.strokeDashoffset);
       const maxHeight = 30.055;
@@ -425,8 +431,9 @@ export function pinchLogic(elts) {
 
   p.addEventListener("mousedown", () => {
     state.pinching = true;
+    calculateState();
     p.style.opacity = "1";
-    if (state.switchOn && state.valveOpen) {
+    if (state.switchOn && state.valveOpen && state.flowing) {
       bubbleStream.style.opacity = "1";
       bubbleCover.style.opacity = "1";
     }
@@ -434,6 +441,7 @@ export function pinchLogic(elts) {
 
   document.addEventListener("mouseup", () => {
     state.pinching = false;
+    calculateState();
     p.style.opacity = "0";
   });
 }

@@ -11,6 +11,7 @@ window.state = {
   maxFlowRate: 24, // mL/s
   flowRate: 0, // mL/s
   wasteBeakerFilling: false,
+  beakerPtsPerFrame: 0,
   flowing: false,
   r: 0.635 / 2, // tube radius (cm)
   v: 0, // velocity (cm/s)
@@ -26,6 +27,8 @@ window.state = {
   switchTilt: false,
   pinching: false,
 };
+
+window.mousedown = false;
 
 state.hamburgerHasBeenClicked =
   window.sessionStorage.getItem("hamburgerHasBeenClicked") === "true"
