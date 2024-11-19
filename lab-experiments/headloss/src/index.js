@@ -8,7 +8,7 @@ import "./style/style.scss";
 window.state = {
   switchOn: false,
   valveOpen: false,
-  maxFlowRate: 24, // mL/s
+  maxFlowRate: 35, // mL/s
   flowRate: 0, // mL/s
   wasteBeakerFilling: false,
   beakerPtsPerFrame: 0,

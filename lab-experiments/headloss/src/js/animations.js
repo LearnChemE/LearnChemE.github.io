@@ -147,17 +147,18 @@ function calculateState() {
   } else {
     state.f = 0.25 / Math.log10(5.74 / Math.pow(state.Re, 0.9)) ** 2;
   }
+
   const L4 = 10 / 3; // characteristic length (cm)
   const L3 = L4 + 7.62;
   const L2 = L3 + 7.62;
   const L1 = L2 + 7.62;
 
-  const P1 = (state.rho * state.v ** 2 * state.f * L1) / (2 * state.r) || 0; // pressure drop (dyne/cm^2)
-  const P2 = (state.rho * state.v ** 2 * state.f * L2) / (2 * state.r) || 0;
-  const P3 = (state.rho * state.v ** 2 * state.f * L3) / (2 * state.r) || 0;
-  const P4 = (state.rho * state.v ** 2 * state.f * L4) / (2 * state.r) || 0;
+  const P1 = (state.rho * state.v ** 2 * state.f * L1) / (4 * state.r) || 0; // pressure drop (dyne/cm^2)
+  const P2 = (state.rho * state.v ** 2 * state.f * L2) / (4 * state.r) || 0;
+  const P3 = (state.rho * state.v ** 2 * state.f * L3) / (4 * state.r) || 0;
+  const P4 = (state.rho * state.v ** 2 * state.f * L4) / (4 * state.r) || 0;
 
-  const cmPerDyneCm2 = 0.00102; // conversion factor for dyne/cm^2 to cm of head
+  const cmPerDyneCm2 = 0.00102; // conversion factor for dyne/cm^2 to cm of water
 
   state.P1 = P1 * cmPerDyneCm2; // cm of head
   state.P2 = P2 * cmPerDyneCm2;
