@@ -54,7 +54,7 @@ function enableSvgZoom() {
   svg.addEventListener("wheel", (e) => {
     e.preventDefault();
     // set the scaling factor (and make sure it's at least 10%)
-    let scale = e.deltaY / 3000;
+    let scale = e.deltaY / 1000;
     scale =
       Math.abs(scale) < 0.1 ? (0.1 * e.deltaY) / Math.abs(e.deltaY) : scale;
 
@@ -68,7 +68,7 @@ function enableSvgZoom() {
       .split(" ")
       .map(Number);
     const amountZoomed =
-      width / (state.maxViewBox[2] - state.maxViewBox[0]) / 2;
+      width / (state.maxViewBox[2] - state.maxViewBox[0]);
     scale *= Math.max(0.1, amountZoomed);
 
     // get pt.x as a proportion of width and pt.y as proportion of height

@@ -136,7 +136,7 @@ export function valveLogic(elts) {
 }
 
 function calculateState() {
-  const V = state.pinching ? state.flowRate / 2 : state.flowRate; // flow rate (mL/s)
+  const V = state.pinching ? Math.min(state.flowRate / 2, 4) : state.flowRate; // flow rate (mL/s)
   const tubeArea = Math.PI * Math.pow(state.r, 2);
   state.v = V / tubeArea; // cm/s
   const nu = 0.0089; // kinematic viscosity (cm^2/s)
@@ -190,7 +190,7 @@ function flowThroughApparatus(elts) {
   };
 
   const handleBeakers = () => {
-    const V = state.pinching ? state.flowRate / 2 : state.flowRate; // flow rate (mL/s)
+    const V = state.pinching ? Math.min(state.flowRate / 2, 4) : state.flowRate; // flow rate (mL/s)
     const beakerFractionPerSecond = V / 1000; // s^-1
     const beakerFractionPerMillisecond = beakerFractionPerSecond / 1000; // ms^-1
     const beakerFractionPerFrame = beakerFractionPerMillisecond * ms; // frame^-1
