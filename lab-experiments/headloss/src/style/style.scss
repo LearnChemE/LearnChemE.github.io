@@ -131,7 +131,8 @@
 }
 
 @media screen and (max-width: 768px) {
-  #reset {
+  #reset,
+  #tilt {
     font-size: 0.8rem;
   }
 
@@ -157,9 +158,15 @@
 }
 
 @media screen and (min-width: 1320px) {
-  #reset {
+  #reset,
+  #tilt {
     font-size: 1.2rem;
     padding: 4px 12px;
+    width: 70px;
+  }
+
+  #tilt {
+    transform: translate(-30%, calc(40% + 50px));
   }
 
   #hamburger-icon {

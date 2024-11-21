@@ -24,6 +24,7 @@ function setDefaults(elts) {
   const wasteHeight = Number(elts.wasteLiquid.getAttribute("height"));
   elts.wasteLiquid.setAttribute("y", `${wasteY + wasteHeight}`);
   elts.wasteLiquid.setAttribute("height", 0);
+  setTimeout(() => { elts.wasteLiquid.setAttribute("height", 0) }, 2000);
   elts.sourceLiquid.setAttribute("height", "26.25");
   elts.sourceLiquid.setAttribute("y", "166.71507");
 
@@ -41,9 +42,7 @@ function setDefaults(elts) {
     elts.switchElt.setAttribute("transform", "rotate(-38.9859)")
   }
 
-  if (state.tilted) {
-    elts.bubbleCover.style.strokeDashoffset = 2 * Number(elts.bubbleCover.getTotalLength());
-  }
+  elts.bubbleCover.style.strokeDashoffset = 2 * Number(elts.bubbleCover.getTotalLength());
 }
 
 function enableSvgZoom() {
@@ -313,11 +312,9 @@ function handleTilt() {
     newElts.intakeLiquidMaxLength = newElts.intakeLiquid.getTotalLength();
     newElts.tubeLiquidMaxLength = newElts.tubeLiquid.getTotalLength();
     newElts.wasteBeakerStreamMaxLength = newElts.wasteBeakerStream.getTotalLength();
-    if (state.tilted) {
-      newElts.pinchGroup = document.getElementById("pinch-group");
-      newElts.bubbleStream = document.getElementById("bubble-path");
-      newElts.bubbleCover = document.getElementById("bubble-cover-path");
-    }
+    newElts.pinchGroup = document.getElementById("pinch-group");
+    newElts.bubbleStream = document.getElementById("bubble-path");
+    newElts.bubbleCover = document.getElementById("bubble-cover-path");
 
     setDefaults(newElts);
     switchLogic(newElts);
@@ -327,9 +324,7 @@ function handleTilt() {
     handleHamburger();
     enableSvgDrag(newElts);
     enableSvgZoom();
-    if (state.tilted) {
-      handlePinch(newElts);
-    }
+    handlePinch(newElts);
   });
 }
 
@@ -358,6 +353,9 @@ export default function addEvents() {
     sourceLiquid: document.getElementById("source-liquid"),
     wasteLiquid: document.getElementById("waste-liquid"),
     ruler: document.getElementById("ruler"),
+    bubbleStream: document.getElementById("bubble-path"),
+    bubbleCover: document.getElementById("bubble-cover-path"),
+    pinchGroup: document.getElementById("pinch-group"),
   };
 
   elts.intakeLiquidMaxLength = elts.intakeLiquid.getTotalLength();
@@ -369,5 +367,6 @@ export default function addEvents() {
   valveLogic(elts);
   handleHamburger();
   handleReset(elts);
+  handlePinch(elts);
   handleTilt();
 }

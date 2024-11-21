@@ -104,7 +104,7 @@ export function valveLogic(elts) {
       `rotate(${angle} ${circlePtX} ${circlePtY})`
     );
 
-    open = Math.sin((open ** 1.2 * Math.PI) / 2);
+    open = Math.sin((open ** 1.5 * Math.PI) / 2);
 
     state.flowRate = state.maxFlowRate * open;
     if (state.switchOn === true && state.flowing === false && state.valveOpen) {
@@ -179,6 +179,7 @@ function flowThroughApparatus(elts) {
   const s = ms / 1000; // seconds per frame
   let sourceHeight = sourceStartHeight;
   let wasteHeight = Number(elts.wasteLiquid.getAttribute("height"));
+
   let wasteY = wasteStartY;
   const emptySource = sourceHeight === 0;
 
@@ -199,7 +200,9 @@ function flowThroughApparatus(elts) {
     const sourceY = sourceStartY + sourceHeightDiff;
     elts.sourceLiquid.setAttribute("y", sourceY);
     elts.sourceLiquid.setAttribute("height", sourceHeight);
-    if (Number(elts.wasteBeakerStream.style.strokeDashoffset) >= 52.5) {
+
+    const wasteBeakerStreamOffset = Number(elts.wasteBeakerStream.style.strokeDashoffset.replace(/px/, ""));
+    if (wasteBeakerStreamOffset >= 52.5) {
       wasteY = wasteY - state.beakerPtsPerFrame;
       wasteHeight = Math.min(wasteHeight + state.beakerPtsPerFrame, wasteStartHeight);
     }
@@ -211,7 +214,7 @@ function flowThroughApparatus(elts) {
     const m3MaxHeight = state.P3 * 3;
     const m4MaxHeight = state.P4 * 3;
 
-    const sdo = Number(elts.tubeLiquid.style.strokeDashoffset);
+    const sdo = Number(elts.tubeLiquid.style.strokeDashoffset.replace(/px/, ""));
 
     if (sdo < 100 && !state.pinching) {
       m1Height = Math.min(m1MaxHeight, m1Height + tubePtsPerFrame());
@@ -237,17 +240,16 @@ function flowThroughApparatus(elts) {
       m4Height = Math.max(0, m4Height - tubePtsPerFrame());
     }
 
-    if (state.tilted) {
-      const bubbleOffset = Number(elts.bubbleStream.style.strokeDashoffset);
-      const bubbleMaxLength = Number(elts.bubbleStream.getTotalLength());
-      if (bubbleOffset < 0) {
-        elts.bubbleStream.style.strokeDashoffset = bubbleMaxLength * 2;
-      }
-      elts.bubbleStream.style.strokeDashoffset = bubbleOffset - tubePtsPerFrame();
-    }
+    const bubbleOffset = Number(elts.bubbleStream.style.strokeDashoffset.replace(/px/, ""));
+    const bubbleMaxLength = Number(elts.bubbleStream.getTotalLength());
 
-    if (sdo < 102 && state.pinching && state.tilted) {
-      const bubbleCoverOffset = Number(elts.bubbleCover.style.strokeDashoffset);
+    if (bubbleOffset < 0) {
+      elts.bubbleStream.style.strokeDashoffset = bubbleMaxLength * 2;
+    }
+    elts.bubbleStream.style.strokeDashoffset = bubbleOffset - tubePtsPerFrame();
+
+    if (sdo < 102 && state.pinching) {
+      const bubbleCoverOffset = Number(elts.bubbleCover.style.strokeDashoffset.replace(/px/, ""));
       const bubbleCoverMaxLength = Number(elts.bubbleCover.getTotalLength());
       if (bubbleCoverOffset === 0) {
         elts.bubbleCover.style.strokeDashoffset = 2 * bubbleCoverMaxLength;
@@ -258,8 +260,8 @@ function flowThroughApparatus(elts) {
           bubbleCoverOffset - tubePtsPerFrame()
         );
       }
-    } else if (state.tilted) {
-      const bubbleCoverOffset = Number(elts.bubbleCover.style.strokeDashoffset);
+    } else {
+      const bubbleCoverOffset = Number(elts.bubbleCover.style.strokeDashoffset.replace(/px/, ""));
       if (bubbleCoverOffset > 0) {
         elts.bubbleCover.style.strokeDashoffset = Math.max(
           0,
@@ -320,7 +322,7 @@ function flowThroughApparatus(elts) {
                 return;
               }
               const streamOffset = Number(
-                elts.wasteBeakerStream.style.strokeDashoffset
+                elts.wasteBeakerStream.style.strokeDashoffset.replace(/px/, "")
               );
               if (
                 streamOffset > 0 &&
@@ -355,12 +357,12 @@ function emptyApparatus(elts) {
   let currentTubeLiquidLength = elts.tubeLiquidMaxLength;
   let currentIntakeLiquidLength = elts.intakeLiquidMaxLength;
   let currentWasteStreamLength = elts.wasteBeakerStreamMaxLength;
-  if (state.tilted) {
-    const bubbleCoverMaxLength = Number(elts.bubbleCover.getTotalLength());
-    elts.bubbleCover.style.strokeDashoffset = 2 * bubbleCoverMaxLength;
-    elts.bubbleCover.style.opacity = "0";
-    elts.bubbleStream.style.opacity = "0";
-  }
+
+  const bubbleCoverMaxLength = Number(elts.bubbleCover.getTotalLength());
+  elts.bubbleCover.style.strokeDashoffset = 2 * bubbleCoverMaxLength;
+  elts.bubbleCover.style.opacity = "0";
+  elts.bubbleStream.style.opacity = "0";
+
   const interval = setInterval(() => {
     if (state.switchTilt) {
       clearInterval(interval);
@@ -373,7 +375,7 @@ function emptyApparatus(elts) {
       elts.wasteLiquid.setAttribute("y", wasteCurrentY - state.beakerPtsPerFrame);
     }
     elts.manometerLiquids.forEach((man) => {
-      const height = Number(man.style.strokeDashoffset);
+      const height = Number(man.style.strokeDashoffset.replace(/px/, ""));
       const maxHeight = 30.055;
       if (height < maxHeight) {
         man.style.strokeDashoffset = Math.min(maxHeight, height + 2);
@@ -392,18 +394,17 @@ function emptyApparatus(elts) {
         elts.tubeLiquid.style.strokeDashoffset =
           elts.tubeLiquidMaxLength - currentTubeLiquidLength;
       } else {
-        if (state.tilted) {
-          const bubbleCoverMaxLength = Number(elts.bubbleCover.getTotalLength());
-          elts.bubbleCover.style.strokeDashoffset = 2 * bubbleCoverMaxLength;
-          elts.bubbleCover.style.opacity = "0";
-          elts.bubbleStream.style.opacity = "0";
-        }
+
+        const bubbleCoverMaxLength = Number(elts.bubbleCover.getTotalLength());
+        elts.bubbleCover.style.strokeDashoffset = 2 * bubbleCoverMaxLength;
+        elts.bubbleCover.style.opacity = "0";
+        elts.bubbleStream.style.opacity = "0";
+
         elts.tubeLiquid.style.strokeDashoffset = elts.tubeLiquidMaxLength;
         clearInterval(interval);
-        if (state.tilted) {
-          const bubbleCoverMaxLength = Number(elts.bubbleCover.getTotalLength());
-          elts.bubbleCover.style.strokeDashoffset = 2 * bubbleCoverMaxLength;
-        }
+
+        elts.bubbleCover.style.strokeDashoffset = 2 * bubbleCoverMaxLength;
+
         const clearWasteStreamInterval = setInterval(() => {
           if (state.switchTilt) {
             clearInterval(interval);

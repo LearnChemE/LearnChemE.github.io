@@ -10,7 +10,7 @@ export function tiltApparatus() {
   if (state.tilted) {
     graphicsContainer.innerHTML = html + TiltedApparatus;
     svg = document.getElementById("canvas");
-    svg.style.maxWidth = "calc(100vh * 158 / 140)";
+    svg.style.maxWidth = "calc(100vh * 154 / 121)";
   } else {
     graphicsContainer.innerHTML = html + Apparatus;
     svg = document.getElementById("canvas");
