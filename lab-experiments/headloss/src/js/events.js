@@ -307,6 +307,7 @@ function handleTilt() {
       sourceLiquid: document.getElementById("source-liquid"),
       wasteLiquid: document.getElementById("waste-liquid"),
       ruler: document.getElementById("ruler"),
+      outletHose: document.getElementById("pump-outlet-hose"),
     };
 
     newElts.intakeLiquidMaxLength = newElts.intakeLiquid.getTotalLength();
@@ -356,6 +357,7 @@ export default function addEvents() {
     bubbleStream: document.getElementById("bubble-path"),
     bubbleCover: document.getElementById("bubble-cover-path"),
     pinchGroup: document.getElementById("pinch-group"),
+    outletHose: document.getElementById("pump-outlet-hose"),
   };
 
   elts.intakeLiquidMaxLength = elts.intakeLiquid.getTotalLength();

@@ -29,6 +29,11 @@ $modal-md: 800px;
   }
 }
 
+iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
 #reset,
 #tilt {
   position: absolute;

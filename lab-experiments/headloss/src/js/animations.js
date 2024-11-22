@@ -428,6 +428,7 @@ function emptyApparatus(elts) {
 
 export function pinchLogic(elts) {
   const p = elts.pinchGroup;
+  const outletHose = elts.outletHose;
   const bubbleStream = elts.bubbleStream;
   const bubbleCover = elts.bubbleCover;
 
@@ -435,6 +436,7 @@ export function pinchLogic(elts) {
     state.pinching = true;
     calculateState();
     p.style.opacity = "1";
+    outletHose.style.opacity = "0";
     if (state.switchOn && state.valveOpen && state.flowing) {
       bubbleStream.style.opacity = "1";
       bubbleCover.style.opacity = "1";
@@ -445,5 +447,6 @@ export function pinchLogic(elts) {
     state.pinching = false;
     calculateState();
     p.style.opacity = "0";
+    outletHose.style.opacity = "1";
   });
 }
