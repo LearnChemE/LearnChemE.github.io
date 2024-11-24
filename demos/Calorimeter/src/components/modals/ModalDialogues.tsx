@@ -89,11 +89,9 @@ export const ModalDialogues: React.FC = () => {
             <a href="http://www.learncheme.com">LearnChemE.com</a> by Drew Smith
             under the direction of Professor John L. Falconer and Michelle
             Medlin. It was prepared with financial support from the National
-            Science Foundation (DUE 2336987 and 2336988) and is based on a
-            Static Calorimeter experimental kit and accompanying worksheet
-            protocol developed with separate support under NSF 1821578 led by
-            Washington State University. Address any questions or comments to
-            LearnChemE@gmail.com. Our simulations are open source at{" "}
+            Science Foundation (DUE 2336987 and 2336988). Address any questions
+            or comments to LearnChemE@gmail.com. Our simulations are open source
+            at{" "}
             <a href="https://github.com/LearnChemE/LearnChemE.github.io/">
               LearnChemE GitHub repository
             </a>
