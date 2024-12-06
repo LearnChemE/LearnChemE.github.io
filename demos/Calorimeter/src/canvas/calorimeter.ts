@@ -35,7 +35,8 @@ const STIR_FRAME_W = 54; // px
 const STIR_FRAME_H = 288; // px
 const STIR_FRAMETIME = 50; // ms
 // Calculation Constants
-const CW = 4186; // J / K
+const CC = 500; // J / K
+const CW = 4186 + CC; // J / K
 const H_COEFF = 100; // W / cm^2 / K
 const AREA = 1; // cm^2
 
