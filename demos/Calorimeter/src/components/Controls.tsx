@@ -17,20 +17,22 @@ export const Controls: React.FC<ControlProps> = ({
 }) => {
   let mat = simState.mat;
 
-  let dropBtnText: string;
-  let dropBtnClass: string;
-  if (simState.started) {
-    if (simState.paused) {
-      dropBtnText = "play";
-      dropBtnClass = "btn btn-outline-primary";
-    } else {
-      dropBtnText = "pause";
-      dropBtnClass = "btn btn-outline-danger";
-    }
-  } else {
-    dropBtnText = "drop metal";
-    dropBtnClass = "btn btn-success";
-  }
+  // Originally coded for pause functionality.
+  // If we ever want that back uncomment and give these props to drop button
+  // let dropBtnText: string;
+  // let dropBtnClass: string;
+  // if (simState.started) {
+  //   if (simState.paused) {
+  //     dropBtnText = "play";
+  //     dropBtnClass = "btn btn-outline-primary";
+  //   } else {
+  //     dropBtnText = "pause";
+  //     dropBtnClass = "btn btn-outline-danger";
+  //   }
+  // } else {
+  //   dropBtnText = "drop metal";
+  //   dropBtnClass = "btn btn-success";
+  // }
 
   return (
     <>
@@ -110,7 +112,10 @@ export const Controls: React.FC<ControlProps> = ({
           <button
             type="button"
             id="drop-btn"
-            className={dropBtnClass}
+            className={
+              simState.started ? "btn btn-success disabled" : "btn btn-success"
+            }
+            aria-disabled={simState.started}
             onClick={() => {
               if (!simState.started)
                 setSimState({ ...simState, started: true, paused: false });
@@ -122,7 +127,7 @@ export const Controls: React.FC<ControlProps> = ({
                 });
             }}
           >
-            {dropBtnText}
+            {"drop metal"}
           </button>
           {/* Reset Button */}
           <button
