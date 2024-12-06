@@ -15,8 +15,8 @@ function App() {
   const [simState, setSimState] = useState<SimProps>({
     waterTemp: 4,
     blockTemp: 30,
-    mat: "Fe",
-    mass: 200,
+    mat: "Pt (Sample)",
+    mass: 400,
     stirring: false,
     started: false,
     paused: false,
@@ -27,8 +27,8 @@ function App() {
     setSimState({
       waterTemp: 4,
       blockTemp: 30,
-      mat: "Fe",
-      mass: 200,
+      mat: "Pt (Sample)",
+      mass: 400,
       stirring: false,
       started: false,
       paused: false,

@@ -14,4 +14,11 @@ export interface MaterialProperties {
   density: number;
 }
 
-export const MaterialArray: Array<string> = ["Fe", "Au", "Cu", "Hg", "Pb"];
+export const MaterialArray: Array<string> = [
+  "Pt (Sample)",
+  "Fe",
+  "Au",
+  "Cu",
+  "Ag",
+  "Pb",
+];

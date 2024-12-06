@@ -1,9 +1,14 @@
 interface ModalDialogueProps {
   title: string;
   innerHTML: JSX.Element;
+  size?: string;
 }
 
-const ModalDialogue: React.FC<ModalDialogueProps> = ({ title, innerHTML }) => {
+const ModalDialogue: React.FC<ModalDialogueProps> = ({
+  title,
+  innerHTML,
+  size = "l",
+}) => {
   let key = title.toLowerCase();
   let labelId: string = key + "ModalLabel";
 
@@ -17,7 +22,7 @@ const ModalDialogue: React.FC<ModalDialogueProps> = ({ title, innerHTML }) => {
         aria-labelledby={labelId}
         aria-hidden="true"
       >
-        <div className="modal-dialog modal-l" role="document">
+        <div className={`modal-dialog modal-${size}`} role="document">
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id={labelId}>
@@ -58,10 +63,26 @@ export const ModalDialogues: React.FC = () => {
           <p>
             This digital lab, which represents a static calorimeter with
             adiabatic walls, is designed to be used with{" "}
-            <a href="">this worksheet</a>. Use the sliders to set the initial
-            conditions of the experiment, then press the "drop metal" button and
-            watch the system equilibriate. To record the temperature of the
-            water, hover your mouse over the thermometer.
+            <a href="Calorimeter worksheet.docx">this worksheet</a>. Pick a
+            metal from the drop down menu, use the sliders to set the initial
+            conditions of the experiment, start the stirrer, press the "drop
+            metal" button and watch the system equilibriate. Hover your mouse
+            over the thermometer to observe the water temperature.
+          </p>
+        }
+      />
+      <ModalDialogue
+        title="Worksheet"
+        size="xl"
+        innerHTML={
+          <p>
+            <embed
+              width="100%"
+              height="100%"
+              src="Calorimeter worksheet.pdf"
+              type="application/pdf"
+              title="Calorimeter Worksheet"
+            />
           </p>
         }
       />
@@ -69,10 +90,10 @@ export const ModalDialogues: React.FC = () => {
         title="Details"
         innerHTML={
           <p>
-            This simulation uses an energy balance to calculate the final
-            temperature of the closed system. It then uses a hypothetical UA
-            value to calculate the time constant of the transient temperature
-            function and plays an animation to show the quenching of the block.
+            This digital experiment uses an energy balance to calculate the
+            final temperature of the system. The time constant for the
+            temperature rise is calculated using an approximate value for the
+            heat transfer coefficient.
             {/* TODO: More on equations */}
           </p>
         }
@@ -89,11 +110,9 @@ export const ModalDialogues: React.FC = () => {
             <a href="http://www.learncheme.com">LearnChemE.com</a> by Drew Smith
             under the direction of Professor John L. Falconer and Michelle
             Medlin. It was prepared with financial support from the National
-            Science Foundation (DUE 2336987 and 2336988) and is based on a
-            Static Calorimeter experimental kit and accompanying worksheet
-            protocol developed with separate support under NSF 1821578 led by
-            Washington State University. Address any questions or comments to
-            LearnChemE@gmail.com. Our simulations are open source at{" "}
+            Science Foundation (DUE 2336987 and 2336988). Address any questions
+            or comments to LearnChemE@gmail.com. Our simulations are open source
+            at{" "}
             <a href="https://github.com/LearnChemE/LearnChemE.github.io/">
               LearnChemE GitHub repository
             </a>

@@ -15,6 +15,16 @@ export const ModalButtons: React.FC = () => {
       </button>
       <button
         type="button"
+        id="worksheet-button"
+        className="btn btn-primary"
+        title="View Worksheet"
+        data-bs-toggle="modal"
+        data-bs-target="#worksheet-modal"
+      >
+        Worksheet
+      </button>
+      <button
+        type="button"
         id="details-button"
         className="btn btn-primary"
         title="Simulation Details"

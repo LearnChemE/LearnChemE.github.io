@@ -1,7 +1,15 @@
 .modal-buttons-container {
   display: grid;
   justify-self: center;
-  grid-template-columns: 100px 100px 100px;
+  grid-template-columns: 100px 110px 90px 90px;
   gap: 10px;
-  padding: 5px;
+  padding: 0px;
+}
+
+embed {
+  height: 80vh;
+}
+
+.modal-xl {
+  width: 80% !important;
 }

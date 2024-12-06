@@ -17,20 +17,22 @@ export const Controls: React.FC<ControlProps> = ({
 }) => {
   let mat = simState.mat;
 
-  let dropBtnText: string;
-  let dropBtnClass: string;
-  if (simState.started) {
-    if (simState.paused) {
-      dropBtnText = "play";
-      dropBtnClass = "btn btn-outline-primary";
-    } else {
-      dropBtnText = "pause";
-      dropBtnClass = "btn btn-outline-danger";
-    }
-  } else {
-    dropBtnText = "drop metal";
-    dropBtnClass = "btn btn-success";
-  }
+  // Originally coded for pause functionality.
+  // If we ever want that back uncomment and give these props to drop button
+  // let dropBtnText: string;
+  // let dropBtnClass: string;
+  // if (simState.started) {
+  //   if (simState.paused) {
+  //     dropBtnText = "play";
+  //     dropBtnClass = "btn btn-outline-primary";
+  //   } else {
+  //     dropBtnText = "pause";
+  //     dropBtnClass = "btn btn-outline-danger";
+  //   }
+  // } else {
+  //   dropBtnText = "drop metal";
+  //   dropBtnClass = "btn btn-success";
+  // }
 
   return (
     <>
@@ -74,7 +76,7 @@ export const Controls: React.FC<ControlProps> = ({
         <div id="mat-stir-container">
           {/* Select Material Dropdown */}
           <InputList
-            label="substance:"
+            label="metal:"
             id="substances"
             val={MaterialArray.indexOf(mat)}
             setVal={(newMat) => setSimState({ ...simState, mat: newMat })}
@@ -105,12 +107,20 @@ export const Controls: React.FC<ControlProps> = ({
             {simState.stirring ? "stop" : "start"} stirrer
           </button>
         </div>
+        {/* Pt Label */}
+        <div style={{ height: "27px" }}>
+          {simState.mat === "Pt (Sample)" &&
+            "Specific Heat Capacity: 0.133 J/(g K)"}
+        </div>
         <div className="btn-container" id="play-sim-btns">
           {/* Drop Button */}
           <button
             type="button"
             id="drop-btn"
-            className={dropBtnClass}
+            className={
+              simState.started ? "btn btn-success disabled" : "btn btn-success"
+            }
+            aria-disabled={simState.started}
             onClick={() => {
               if (!simState.started)
                 setSimState({ ...simState, started: true, paused: false });
@@ -122,7 +132,7 @@ export const Controls: React.FC<ControlProps> = ({
                 });
             }}
           >
-            {dropBtnText}
+            {"drop metal"}
           </button>
           {/* Reset Button */}
           <button
