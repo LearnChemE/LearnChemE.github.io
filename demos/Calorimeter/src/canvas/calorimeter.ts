@@ -4,6 +4,7 @@ import { SimProps, MaterialProperties } from "../types/globals";
 // It's annoying that there are no separate types for the graphics objects in this library, but thats a problem for another day...
 interface graphics {
   calorimeter: any;
+  lid: any;
   thermometer: any;
   thermoTicks: any;
   stirrer: Array<any>[4];
@@ -65,11 +66,11 @@ const Materials = new Map<string, MaterialProperties>([
     },
   ],
   [
-    "Hg",
+    "Ag",
     {
-      specificHeat: 0.14, // J/g/K
-      color: "#B7B8B9",
-      density: 13.546, // g / mL
+      specificHeat: 0.233, // J/g/K
+      color: "#C4C4C4",
+      density: 10.49, // g / mL
     },
   ],
   [
@@ -287,6 +288,22 @@ export const CalorimeterSketch = (
     }
   };
 
+  const drawLid = () => {
+    // step function for when block hits
+    var s = aniTime - WATER_HIT_TIME;
+    if (s >= 0 && s < 1000) {
+      // Smooth over small time
+      s = p.lerp(0, 1, Math.exp(s / 1000) - 1);
+      // Constrain s value
+      s = p.constrain(s, 0, 1);
+    }
+
+    p.push();
+    p.tint(255, s * 255);
+    p.image(graphics.lid, 46, 210);
+    p.pop();
+  };
+
   // Draw stirrer with animation
   const drawStirrer = () => {
     // Select frame
@@ -317,6 +334,7 @@ export const CalorimeterSketch = (
     // Set the graphics objects
     graphics = {
       calorimeter: p.loadImage("Calorimeter.png"),
+      lid: p.loadImage("Lid.png"),
       thermometer: p.loadImage("Thermometer.png"),
       thermoTicks: p.loadImage("ThermoTicks.png"),
       stirrer: [0, 0, 0, 0],
@@ -355,6 +373,7 @@ export const CalorimeterSketch = (
 
     // Draw Water
     fillCalorimeter(getExtraWaterVol(blockPos, blockHeight), true);
+    if (started) drawLid();
 
     // Draw Calorimeter last
     p.image(graphics.calorimeter, 14, 210);
