@@ -107,6 +107,11 @@ export const Controls: React.FC<ControlProps> = ({
             {simState.stirring ? "stop" : "start"} stirrer
           </button>
         </div>
+        {/* Pt Label */}
+        <div style={{ height: "27px" }}>
+          {simState.mat === "Pt (Sample)" &&
+            "Specific Heat Capacity: 0.133 J/(g K)"}
+        </div>
         <div className="btn-container" id="play-sim-btns">
           {/* Drop Button */}
           <button

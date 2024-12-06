@@ -42,6 +42,14 @@ const AREA = 1; // cm^2
 // Materials and their properties
 const Materials = new Map<string, MaterialProperties>([
   [
+    "Pt (Sample)",
+    {
+      specificHeat: 0.133, // J/g/K
+      color: "#D5D4D2",
+      density: 21.45, // g / mL
+    },
+  ],
+  [
     "Fe",
     {
       specificHeat: 0.451, // J/g/K
