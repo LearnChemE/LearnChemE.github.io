@@ -12,6 +12,7 @@
     <div id="root">
       <div id="graphics-container">
         <div id="reset">reset</div>
+        <div id="tilt">tilt</div>
         <div id="hamburger">
           <div id="hamburger-icon"></div>
           <div id="controls">
@@ -19,13 +20,10 @@
               <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
                 Directions
               </div>
-              <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">
-                Details
-              </div>
               <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">
                 About
               </div>
-              <div type="button" class="btn btn-primary" id="worksheet">Worksheet</div>
+              <a href="./assets/headloss_worksheet.docx" class="btn btn-primary" id="worksheet" download>Worksheet</a>
             </div>
           </div>
         </div>
@@ -46,21 +44,16 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p>Modal body text goes here.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="details-modal" class="modal fade" tabindex="-1" aria-labelledby="simulation details" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Details</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>Modal body text goes here.</p>
+            <div id="iframe-container">
+              <iframe
+                src="https://www.youtube.com/embed/bHyNzkR-hSo?si=5y1hH2J4HFu8YId7"
+                title="Head Loss Virtual Laboratory Instructions"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+              ></iframe>
+            </div>
           </div>
         </div>
       </div>
@@ -74,7 +67,21 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p>Modal body text goes here.</p>
+            <p>
+              This digital experiment was created in the Department of Chemical and Biological Engineering, at
+              University of Colorado Boulder for
+              <a href="https://learncheme.com" target="_blank">LearnChemE.com</a>
+              by Neil Hendren under the direction of Professor John L. Falconer and Michelle Medlin. It was prepared
+              with financial support from the National Science Foundation (DUE 2336987 and 2336988) and is based on a
+              <a href="https://labs.wsu.edu/educ-ate/desktop-learning-modules/fluid-mechanics-kit/" target="_blank">
+                Fluid Mechanics experimental kit
+              </a>
+              and accompanying worksheet protocol developed with separate support under NSF 1821578 led by Washington
+              State University. Address any questions or comments to
+              <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com.</a>
+              Our simulations are open source and available on our
+              <a href="https://github.com/learncheme/learncheme.github.io" target="_blank">GitHub.</a>
+            </p>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import "./animations.js";
-import { switchLogic, valveLogic } from "./animations.js";
+import { pinchLogic, switchLogic, valveLogic } from "./animations.js";
+import { tiltApparatus } from "./populate.js";
 
 function setDefaults(elts) {
   elts.intakeLiquid.style.strokeDasharray = elts.intakeLiquidMaxLength;
@@ -23,6 +24,7 @@ function setDefaults(elts) {
   const wasteHeight = Number(elts.wasteLiquid.getAttribute("height"));
   elts.wasteLiquid.setAttribute("y", `${wasteY + wasteHeight}`);
   elts.wasteLiquid.setAttribute("height", 0);
+  setTimeout(() => { elts.wasteLiquid.setAttribute("height", 0) }, 2000);
   elts.sourceLiquid.setAttribute("height", "26.25");
   elts.sourceLiquid.setAttribute("y", "166.71507");
 
@@ -39,6 +41,8 @@ function setDefaults(elts) {
     elts.switchElt.setAttribute("y", "110.71905");
     elts.switchElt.setAttribute("transform", "rotate(-38.9859)")
   }
+
+  elts.bubbleCover.style.strokeDashoffset = 2 * Number(elts.bubbleCover.getTotalLength());
 }
 
 function enableSvgZoom() {
@@ -50,7 +54,7 @@ function enableSvgZoom() {
   svg.addEventListener("wheel", (e) => {
     e.preventDefault();
     // set the scaling factor (and make sure it's at least 10%)
-    let scale = e.deltaY / 3000;
+    let scale = e.deltaY / 1000;
     scale =
       Math.abs(scale) < 0.1 ? (0.1 * e.deltaY) / Math.abs(e.deltaY) : scale;
 
@@ -64,7 +68,7 @@ function enableSvgZoom() {
       .split(" ")
       .map(Number);
     const amountZoomed =
-      width / (state.maxViewBox[2] - state.maxViewBox[0]) / 2;
+      width / (state.maxViewBox[2] - state.maxViewBox[0]);
     scale *= Math.max(0.1, amountZoomed);
 
     // get pt.x as a proportion of width and pt.y as proportion of height
@@ -112,15 +116,13 @@ function enableSvgDrag(elts) {
   });
 
   ruler.addEventListener("mouseout", () => {
-    onRuler = false;
-  });
-
-  document.addEventListener("mouseup", () => {
-    onRuler = false;
+    if (!window.mousedown) {
+      onRuler = false;
+    }
   });
 
   svg.addEventListener("mousedown", (e) => {
-    console.log(onRuler);
+    window.mousedown = true;
     if (
       e.target === elts.switchElt ||
       e.target === elts.switchG ||
@@ -138,6 +140,7 @@ function enableSvgDrag(elts) {
     rulerTransformY = Number(currentTransform.match(/,([^)]+)\)/)[1]);
   });
 
+  // Hold mouse to move the camera around
   svg.addEventListener("mousemove", (e) => {
     if (isDragging && !onRuler) {
       const [x, y, width, height] = svg
@@ -175,6 +178,7 @@ function enableSvgDrag(elts) {
 
   document.addEventListener("mouseup", () => {
     isDragging = false;
+    window.mousedown = false;
   });
 }
 
@@ -235,6 +239,9 @@ function handleHamburger() {
       !e.target.classList.contains("modal-header")
     ) {
       if (e.target.tagName !== "HTML") {
+        if (e.target.id === "tilt") {
+          return;
+        }
         if (
           !e.target.parentElement.classList.contains("modal-body") &&
           !e.target.parentElement.classList.contains("modal-header")
@@ -263,6 +270,71 @@ function handleReset(elts) {
   });
 }
 
+function handleTilt() {
+  state.flowRate = 0;
+  state.valveOpen = false;
+  let tiltElt = document.getElementById("tilt");
+  tiltElt.addEventListener("click", () => {
+    tiltElt.classList.add("clicked");
+    setTimeout(() => {
+      tiltElt.classList.remove("clicked");
+    }, 100);
+    state.tilted = !state.tilted;
+    state.switchTilt = true;
+    setTimeout(() => { state.switchTilt = false }, 100);
+    tiltApparatus();
+    tiltElt = document.getElementById("tilt");
+    if (state.tilted) {
+      tiltElt.innerHTML = "untilt";
+    } else {
+      tiltElt.innerHTML = "tilt";
+    }
+    const newElts = {
+      intakeLiquid: document.getElementById("intake-liquid"),
+      tubeLiquid: document.getElementById("tube-liquid"),
+      wasteBeakerStream: document.getElementById("waste-beaker-stream"),
+      manometerLiquids: [
+        document.getElementById("manometer-liquid-1"),
+        document.getElementById("manometer-liquid-2"),
+        document.getElementById("manometer-liquid-3"),
+        document.getElementById("manometer-liquid-4"),
+      ],
+      switchElt: document.getElementById("switch"),
+      switchG: document.getElementById("power-switch"),
+      valve: document.getElementById("valve"),
+      valveCircle: document.getElementById("valve-circle"),
+      valveRect: document.getElementById("valve-rect"),
+      sourceLiquid: document.getElementById("source-liquid"),
+      wasteLiquid: document.getElementById("waste-liquid"),
+      ruler: document.getElementById("ruler"),
+      outletHose: document.getElementById("pump-outlet-hose"),
+    };
+
+    newElts.intakeLiquidMaxLength = newElts.intakeLiquid.getTotalLength();
+    newElts.tubeLiquidMaxLength = newElts.tubeLiquid.getTotalLength();
+    newElts.wasteBeakerStreamMaxLength = newElts.wasteBeakerStream.getTotalLength();
+    newElts.pinchGroup = document.getElementById("pinch-group");
+    newElts.bubbleStream = document.getElementById("bubble-path");
+    newElts.bubbleCover = document.getElementById("bubble-cover-path");
+
+    setDefaults(newElts);
+    switchLogic(newElts);
+    valveLogic(newElts);
+    handleTilt();
+    handleReset(newElts);
+    handleHamburger();
+    enableSvgDrag(newElts);
+    enableSvgZoom();
+    handlePinch(newElts);
+  });
+}
+
+function handlePinch(elts) {
+  const bubbleCoverLength = Number(elts.bubbleCover.getTotalLength());
+  elts.bubbleCover.style.strokeDasharray = bubbleCoverLength;
+  pinchLogic(elts);
+}
+
 export default function addEvents() {
   const elts = {
     intakeLiquid: document.getElementById("intake-liquid"),
@@ -282,6 +354,10 @@ export default function addEvents() {
     sourceLiquid: document.getElementById("source-liquid"),
     wasteLiquid: document.getElementById("waste-liquid"),
     ruler: document.getElementById("ruler"),
+    bubbleStream: document.getElementById("bubble-path"),
+    bubbleCover: document.getElementById("bubble-cover-path"),
+    pinchGroup: document.getElementById("pinch-group"),
+    outletHose: document.getElementById("pump-outlet-hose"),
   };
 
   elts.intakeLiquidMaxLength = elts.intakeLiquid.getTotalLength();
@@ -293,4 +369,6 @@ export default function addEvents() {
   valveLogic(elts);
   handleHamburger();
   handleReset(elts);
+  handlePinch(elts);
+  handleTilt();
 }

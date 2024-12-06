@@ -1,3 +1,5 @@
+$modal-md: 800px;
+
 @import "bootstrap/scss/bootstrap.scss";
 
 #graphics-container {
@@ -27,15 +29,20 @@
   }
 }
 
-#reset {
+iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+#reset,
+#tilt {
   position: absolute;
   top: 0px;
   right: 0px;
   z-index: 1000;
-  width: max-content;
+  width: 55px;
   height: max-content;
-  transform: translate(-30%, 40%);
-  background-color: lightgreen;
+  text-align: center;
   padding: 4px 8px;
   border: 1px solid black;
   border-radius: 5px;
@@ -49,12 +56,30 @@
   user-select: none;
 }
 
+#reset {
+  transform: translate(-30%, 40%);
+  background-color: lightgreen;
+}
+
+#tilt {
+  transform: translate(-30%, calc(40% + 40px));
+  background-color: rgb(32, 178, 154);
+}
+
 #reset:hover {
   background-color: rgb(177, 246, 177);
 }
 
 #reset.clicked {
   background-color: rgb(205, 249, 205);
+}
+
+#tilt:hover {
+  background-color: rgb(72, 218, 194);
+}
+
+#tilt.clicked {
+  background-color: rgb(92, 238, 214);
 }
 
 #hamburger {
@@ -113,7 +138,8 @@
 }
 
 @media screen and (max-width: 768px) {
-  #reset {
+  #reset,
+  #tilt {
     font-size: 0.8rem;
   }
 
@@ -139,9 +165,15 @@
 }
 
 @media screen and (min-width: 1320px) {
-  #reset {
+  #reset,
+  #tilt {
     font-size: 1.2rem;
     padding: 4px 12px;
+    width: 70px;
+  }
+
+  #tilt {
+    transform: translate(-30%, calc(40% + 50px));
   }
 
   #hamburger-icon {
