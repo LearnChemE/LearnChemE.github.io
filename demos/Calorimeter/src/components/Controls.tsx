@@ -74,7 +74,7 @@ export const Controls: React.FC<ControlProps> = ({
         <div id="mat-stir-container">
           {/* Select Material Dropdown */}
           <InputList
-            label="substance:"
+            label="metal:"
             id="substances"
             val={MaterialArray.indexOf(mat)}
             setVal={(newMat) => setSimState({ ...simState, mat: newMat })}

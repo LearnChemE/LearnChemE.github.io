@@ -58,10 +58,11 @@ export const ModalDialogues: React.FC = () => {
           <p>
             This digital lab, which represents a static calorimeter with
             adiabatic walls, is designed to be used with{" "}
-            <a href="">this worksheet</a>. Use the sliders to set the initial
-            conditions of the experiment, then press the "drop metal" button and
-            watch the system equilibriate. To record the temperature of the
-            water, hover your mouse over the thermometer.
+            <a href="">this worksheet</a>. Pick a metal from the drop down menu,
+            use the sliders to set the initial conditions of the experiment,
+            start the stirrer, press the "drop metal" button and watch the
+            system equilibriate. Hover your mouse over the thermometer to
+            observe the water temperature.
           </p>
         }
       />
@@ -69,10 +70,10 @@ export const ModalDialogues: React.FC = () => {
         title="Details"
         innerHTML={
           <p>
-            This simulation uses an energy balance to calculate the final
-            temperature of the closed system. It then uses a hypothetical UA
-            value to calculate the time constant of the transient temperature
-            function and plays an animation to show the quenching of the block.
+            This digital experiment uses an energy balance to calculate the
+            final temperature of the system. The time constant for the
+            temperature rise is calculated using an approximate value for the
+            heat transfer coefficient.
             {/* TODO: More on equations */}
           </p>
         }
