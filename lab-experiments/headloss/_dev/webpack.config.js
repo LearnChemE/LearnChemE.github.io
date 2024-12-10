@@ -23,7 +23,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(docx)$/i,
+        test: /\.(docx|pdf)$/i,
         loader: 'file-loader',
         options: {
           name: 'assets/[name].[ext]',
