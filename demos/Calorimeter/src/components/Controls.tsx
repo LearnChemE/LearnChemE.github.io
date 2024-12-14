@@ -78,7 +78,7 @@ export const Controls: React.FC<ControlProps> = ({
           <InputList
             label="metal:"
             id="substances"
-            val={MaterialArray.indexOf(mat)}
+            val={MaterialArray.indexOf(simState.mat)}
             setVal={(newMat) => setSimState({ ...simState, mat: newMat })}
             listItems={MaterialArray}
             disabled={simState.started}

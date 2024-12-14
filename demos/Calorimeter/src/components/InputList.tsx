@@ -32,6 +32,7 @@ export const InputList: React.FC<InputListProps> = ({
           id={id}
           onChange={onChange}
           disabled={disabled}
+          value={val}
         >
           {listItems.map((item, index) => (
             <option key={index} value={index}>
