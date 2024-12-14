@@ -65,7 +65,7 @@ export const Controls: React.FC<ControlProps> = ({
           label="mass of block (g):"
           id="mass-range"
           min={100}
-          max={1000}
+          max={500}
           step={10}
           val={simState.mass}
           setVal={(newVal) => {

@@ -36,7 +36,7 @@ const STIR_FRAME_H = 288; // px
 const STIR_FRAMETIME = 50; // ms
 // Calculation Constants
 const CC = 500; // J / K
-const CW = 4186 + CC; // J / K
+const CW = 4184 + CC; // J / K
 const H_COEFF = 100; // W / cm^2 / K
 const AREA = 1; // cm^2
 
@@ -51,7 +51,7 @@ const Materials = new Map<string, MaterialProperties>([
     },
   ],
   [
-    "Fe",
+    "A", // Fe
     {
       specificHeat: 0.451, // J/g/K
       color: "#A19D94",
@@ -59,7 +59,7 @@ const Materials = new Map<string, MaterialProperties>([
     },
   ],
   [
-    "Au",
+    "B", // Au
     {
       specificHeat: 0.129, // J/g/K
       color: "#FFD700",
@@ -67,7 +67,7 @@ const Materials = new Map<string, MaterialProperties>([
     },
   ],
   [
-    "Cu",
+    "C", // Cu
     {
       specificHeat: 0.385, // J/g/K
       color: "#b87333",
@@ -75,7 +75,7 @@ const Materials = new Map<string, MaterialProperties>([
     },
   ],
   [
-    "Ag",
+    "D", // Ag
     {
       specificHeat: 0.233, // J/g/K
       color: "#C4C4C4",
@@ -83,7 +83,7 @@ const Materials = new Map<string, MaterialProperties>([
     },
   ],
   [
-    "Pb",
+    "E", // Pb
     {
       specificHeat: 0.129, // J/g/K
       color: "#646462",

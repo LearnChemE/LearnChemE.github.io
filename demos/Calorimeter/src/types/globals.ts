@@ -16,9 +16,9 @@ export interface MaterialProperties {
 
 export const MaterialArray: Array<string> = [
   "Pt (Sample)",
-  "Fe",
-  "Au",
-  "Cu",
-  "Ag",
-  "Pb",
+  "A", // Fe
+  "B", // Au
+  "C", // Cu
+  "D", // Ag
+  "E", // Pb
 ];
