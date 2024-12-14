@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Head Loss Virtual Lab</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Head Loss Virtual Lab" />
+    <meta name="author" content="Neil Hendren" />
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.1/lib/p5.min.js"></script>
+  </head>
+
+  <body>
+    <div id="root">
+      <div id="controls">
+        <div id="buttons">
+          <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
+            Directions
+          </div>
+          <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">
+            Details
+          </div>
+          <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+        </div>
+      </div>
+    </div>
+    <div
+      id="directions-modal"
+      class="modal fade"
+      tabindex="-1"
+      aria-labelledby="simulation directions"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Directions</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>\( \frac{1}{2} \)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="details-modal" class="modal fade" tabindex="-1" aria-labelledby="simulation details" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Modal body text goes here.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="about-modal" class="modal fade" tabindex="-1" aria-labelledby="about the simulation" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">About</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Modal body text goes here.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
