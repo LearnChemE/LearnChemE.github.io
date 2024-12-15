@@ -66,7 +66,7 @@ export const ModalDialogues: React.FC = () => {
             <a href="Calorimeter worksheet.docx">this worksheet</a>. Pick a
             metal from the drop down menu, use the sliders to set the initial
             conditions of the experiment, start the stirrer, press the "drop
-            metal" button and watch the system equilibriate. Hover your mouse
+            metal" button and watch the system equilibrate. Hover your mouse
             over the thermometer to observe the water temperature.
           </p>
         }

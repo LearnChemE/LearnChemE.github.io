@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useState } from "react";
 import { ReactP5Wrapper } from "@p5-wrapper/react";
 import "p5";
@@ -35,6 +35,10 @@ function App() {
     });
   };
 
+  const handleTemp = useCallback((val: number) => {
+    setTemperature((temperature) => val);
+  }, []);
+
   return (
     <div className="App">
       <div className="sim-container">
@@ -53,9 +57,7 @@ function App() {
             stirring={simState.stirring}
             started={simState.started}
             paused={simState.paused}
-            returnTemperature={(val: number) => {
-              setTemperature(val);
-            }}
+            returnTemperature={handleTemp}
           />
           <TooltipLabel
             name="temp-label"
