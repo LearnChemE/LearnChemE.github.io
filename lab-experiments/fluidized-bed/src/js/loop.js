@@ -1,5 +1,10 @@
+window.g = {
+  cnv: undefined,
+}
+
 window.setup = function () {
-  createCanvas(400, 400);
+  g.cnv = createCanvas(400, 400);
+  g.cnv.parent("graphics-wrapper");
   background(220);
   noLoop();
 }

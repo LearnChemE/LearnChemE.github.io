@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Head Loss Virtual Lab</title>
+    <title>Fluidized Bed Virtual Lab</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Head Loss Virtual Lab" />
     <meta name="author" content="Neil Hendren" />
@@ -12,18 +12,32 @@
 
   <body>
     <div id="root">
-      <div id="controls">
-        <div id="buttons">
-          <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
-            Directions
+      <div class="sim-wrapper">
+        <div id="controls" class="ctrl-wrapper">
+          <!-- Modal Buttons -->
+          <div id="modal-buttons">
+            <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
+              Directions
+            </div>
+            <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
+              Worksheet
+            </div>
+            <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">
+              Details
+            </div>
+            <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
           </div>
-          <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">
-            Details
-          </div>
-          <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+
+          <!--  -->
         </div>
+
+        <!-- Wrapper for Canvas -->
+        <div id="graphics-wrapper"></div>
+        </div>
+        
       </div>
-    </div>
+
+    <!-- Modal Dialoogues -->
     <div
       id="directions-modal"
       class="modal fade"

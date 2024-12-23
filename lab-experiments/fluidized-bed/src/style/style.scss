@@ -5,3 +5,16 @@
 canvas {
   margin: 30px;
 }
+
+.sim-wrapper {
+  display: grid;
+  margin: auto;
+  width: max-content;
+}
+
+#modal-buttons {
+  display: grid;
+  grid-template-columns: 100px 100px 100px 100px;
+  justify-content: space-evenly;
+  gap: 10px;
+}
