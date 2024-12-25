@@ -15,6 +15,21 @@ canvas {
 #modal-buttons {
   display: grid;
   grid-template-columns: 100px 100px 100px 100px;
-  justify-content: space-evenly;
+  justify-content: center;
   gap: 10px;
+}
+
+#apparatus-wrapper {
+  display: grid;
+  margin: auto;
+  width: 964px;
+  position: relative;
+}
+
+#Valve {
+  cursor: grab;
+  
+  :active {
+    cursor: grabbing;
+  }
 }

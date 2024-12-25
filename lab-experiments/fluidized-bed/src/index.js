@@ -4,7 +4,9 @@ import "./style/style.scss";
 
 window.globals = {
   progress: 0,
+  apparatusDiv: undefined,
 };
 
+import "./js/interactions.js"
 import "./js/calculations.js";
-import "./js/loop.js";
+// import "./js/loop.js";
