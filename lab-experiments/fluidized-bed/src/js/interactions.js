@@ -22,6 +22,7 @@ parent.appendChild(apparatusDiv);
 
 const container = document.getElementById("Fluidized-bed Graphics");
 const valve1 = document.getElementById("Valve");
+const valve2 = document.getElementById("Valve_2");
 
 // Find the angle between (A -> B) and down
 function findAngleFromDown(A, B) {
@@ -41,6 +42,41 @@ function constrain(x, min, max) {
     if (x > max) x = max;
 
     return x;
+}
+
+// Lerp function
+function lerp(a, b, t) {
+    return a + (b - a) * t;
+}
+
+// Smoothly interpolate from start to end over a given duration (in milliseconds)
+function smoothLerp(start, end, duration, updateCallback) {
+    let startTime = null;
+
+    // Function to update the value at each frame
+    const animate = (time) => {
+      if (!startTime) startTime = time; // Initialize the start time
+
+      // Calculate elapsed time
+      const elapsed = time - startTime;
+
+      // Calculate the interpolation factor t (from 0 to 1)
+      const t = Math.min(elapsed / duration, 1); // Ensure t doesn't go beyond 1
+
+      // Interpolate between start and end
+      const interpolatedValue = lerp(start, end, t);
+
+      // Call the update callback with the interpolated value
+      updateCallback(interpolatedValue);
+
+      // If we're not at the end, continue the animation
+      if (t < 1) {
+        requestAnimationFrame(animate);
+      }
+    }
+
+    // Start the animation
+    requestAnimationFrame(animate);
 }
 
 /*
@@ -81,3 +117,41 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
     document.addEventListener("mouseup", release);
 })
 
+/*
+ *  Interaction for valve 2
+ */
+/*
+ *  Interaction for valve 1
+ */
+v2Angle = 0;
+valve2.addEventListener("mousedown", ({ clientX, clientY }) => {
+    // Find centroid
+    var offset = valve2.getBoundingClientRect();
+    var cx = (offset.left + offset.right) / 2;
+    var cy = (offset.top + offset.bottom) / 2;
+    // Get initial mouse angle
+    let dispAngle = v2Angle;
+
+    const drag = ({ clientX, clientY }) => {
+        // Find angle from centroid to mouse
+        let th = findAngleFromDown([cx, cy],[clientX,clientY]);
+        // Find difference and reset th
+        let target;
+        if (th > -180 && th < -45 || th > 135) target = -90;
+        else target = 0;
+
+        if (v2Angle !== target) {
+            smoothLerp(v2Angle, target, 150, (val) => {
+                valve2.setAttribute("transform", `rotate(${val} 143 29)`);
+            });
+            v2Angle = target;
+        }
+    };
+    const release = () => {
+        document.removeEventListener("mousemove", drag);
+        document.removeEventListener("mouseup", release);
+    };
+
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", release);
+})

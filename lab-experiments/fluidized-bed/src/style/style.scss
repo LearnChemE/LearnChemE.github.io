@@ -33,3 +33,10 @@ canvas {
     cursor: grabbing;
   }
 }
+#Valve_2 {
+  cursor: grab;
+  
+  :active {
+    cursor: grabbing;
+  }
+}
