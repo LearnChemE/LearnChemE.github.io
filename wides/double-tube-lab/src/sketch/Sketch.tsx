@@ -1,7 +1,7 @@
 import Graphics from "./Graphics";
 import { P5CanvasInstance } from "@p5-wrapper/react";
 // import { Tooltip } from "bootstrap";
-import { randStartVals } from "./Functions.tsx";
+import { calcHeatTransferRate, randStartVals } from "./Functions.tsx";
 import drawAll from "./Draw.tsx";
 
 // Globals defined here
@@ -97,7 +97,7 @@ export default function sketch(p: P5CanvasInstance) {
 
   p.draw = () => {
     p.background(250);
-
+    calcHeatTransferRate();
     drawAll(p, dt, bt, pa, v, dto, dtb, thi, tho, tci, tco);
   };
 
