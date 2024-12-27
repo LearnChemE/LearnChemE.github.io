@@ -20,10 +20,10 @@ export const MAX_HOT_WATER_TEMP = 59.2;
 export const MIN_HOT_WATER_TEMP = 46.6;
 export const MAX_COLD_WATER_TEMP = 26.6;
 export const MIN_COLD_WATER_TEMP = 20.2;
-export const MAX_HOT_FLOWRATE = 19.5;
-export const MIN_HOT_FLOWRATE = 3.5;
-export const MAX_COLD_FLOWRATE = 21.6;
-export const MIN_COLD_FLOWRATE = 16.3;
+export const MAX_HOT_FLOWRATE = 20;
+export const MIN_HOT_FLOWRATE = 15;
+export const MAX_COLD_FLOWRATE = 22;
+export const MIN_COLD_FLOWRATE = 16;
 
 /* ********************************************************************* */
 /* ** This file holds calculations for heat transfer and outlet temps ** */
