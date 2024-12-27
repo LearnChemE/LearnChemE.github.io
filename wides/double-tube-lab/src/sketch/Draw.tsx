@@ -54,7 +54,8 @@ export default function drawAll(
   drag(p);
   displayValve(90, 431, g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE, p, v);
   displayValve(415, 451, g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE, p, v);
-  //   updateTooltips();
+
+  console.log(`Flowrates: ${g.mDotH.toFixed(1)} ${g.mDotC.toFixed(1)}\nTemps: ${g.Th_in.toFixed(1)} ${g.Th_out.toFixed(1)} ${g.Tc_in.toFixed(1)} ${g.Tc_out.toFixed(1)}`);
 }
 
 // Cold fill animation
@@ -105,7 +106,7 @@ function fillAnimationOrange(
   p.pop();
 }
 
-// The tint function multiplies every pixel on your cpu, so it is a very costy solution. Better would be to use a framebuffer
+// The tint function is a very costy solution. Better would be to use a framebuffer
 function fillAnimationTubes(
   tOrange: number,
   tBlue: number,

@@ -30,7 +30,7 @@ export const DirectionsModalDialogue = () => {
                 then use the button at the top to start the pumps. To measure
                 temperatures, stop the pumps and press the "measure
                 temperatures" button, then hover your mouse over each beaker to
-                read the temperature.
+                read the temperature. To reset, select the “Reset beakers” button in the menu.
               </p>
               <h6>Single-beaker setup</h6>
               <p>
