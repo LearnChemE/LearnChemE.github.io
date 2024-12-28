@@ -14,7 +14,7 @@
     "chemical",
     "engineering"
   ],
-  "author": "Neil Hendren",
+  "author": "Drew Smith",
   "license": "MIT",
   "devDependencies": {
     "autoprefixer": "^10.4.20",

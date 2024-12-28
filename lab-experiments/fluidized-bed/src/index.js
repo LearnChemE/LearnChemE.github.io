@@ -1,6 +1,6 @@
 import modal from "bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "./style/style.scss";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 window.globals = {
   progress: 0,
