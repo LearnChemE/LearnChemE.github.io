@@ -9,13 +9,12 @@ innerDiameterSlider.addEventListener("input", () => {
   const innerDiameter = Number(innerDiameterSlider.value);
   innerDiameterValue.innerHTML = innerDiameter.toFixed(1);
   gvs.inner_diameter = innerDiameter;
-  gvs.discharge_coefficient = 1 - (0.05 + 0.15 * ((15 - gvs.inner_diameter) / (15 - 9.1)));
   gvs.p.redraw();
 });
 
 fluidFrictionCheckbox.addEventListener("change", () => {
   const checked = fluidFrictionCheckbox.checked;
-  if(checked) {
+  if (checked) {
     gvs.include_friction = true;
   } else {
     gvs.include_friction = false;
@@ -24,14 +23,13 @@ fluidFrictionCheckbox.addEventListener("change", () => {
 });
 
 volumetricFlowRateSlider.addEventListener("input", () => {
-  gvs.volumetric_flow_rate = Number(volumetricFlowRateSlider.value) / 10000;
-  gvs.inlet_velocity = gvs.volumetric_flow_rate / (Math.PI * ((gvs.outer_diameter / 1000) / 2)**2);
-  // volumetricFlowRateValue.innerHTML = `${(gvs.volumetric_flow_rate * 10000).toFixed(2)}`;
+  gvs.volumetric_flow_rate = Number(volumetricFlowRateSlider.value / 1e6);
+  volumetricFlowRateValue.innerHTML = `${(Math.round(100 * gvs.volumetric_flow_rate * 1e6 / 50) / 100).toFixed(2)}`;
   gvs.p.redraw();
 });
 
 showFlowRate.addEventListener("input", () => {
-  if(showFlowRate.checked) {
+  if (showFlowRate.checked) {
     gvs.show_flow_rate = true
   } else {
     gvs.show_flow_rate = false
