@@ -13,15 +13,7 @@ function calcAll() {
   const v = V / A1; // average velocity, m / s
   const Re = v * D1 * rho / mu; // Reynolds number, dimensionless
 
-  let f;
-  // const laminar = Re < 2800;
-  const laminar = false;
-
-  if (laminar) {
-    f = 64 / Re; // Darcy friction factor
-  } else {
-    f = 0.25 / Math.log10(5.74 / Math.pow(Re, 0.9)) ** 2;
-  }
+  const f = 0.25 / Math.log10(5.74 / Math.pow(Re, 0.9)) ** 2; // friction factor, dimensionless - Swamee Jain equation
 
   let P5 = (rho * v ** 2 * f * L) / (2 * D1); // pressure drop across venturi meter, including friction, Pa
   const vThroat = V / A2; // velocity at the throat, m/s

@@ -24,7 +24,7 @@ fluidFrictionCheckbox.addEventListener("change", () => {
 
 volumetricFlowRateSlider.addEventListener("input", () => {
   gvs.volumetric_flow_rate = Number(volumetricFlowRateSlider.value / 1e6);
-  volumetricFlowRateValue.innerHTML = `${(Math.round(100 * gvs.volumetric_flow_rate * 1e6 / 50) / 100).toFixed(2)}`;
+  volumetricFlowRateValue.innerHTML = `${Math.round(100 * gvs.volumetric_flow_rate * 1e6 / 50)}`;
   gvs.p.redraw();
 });
 

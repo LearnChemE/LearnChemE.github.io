@@ -4,91 +4,93 @@ $modal-lg: 800px;
 $modal-xl: 1140px;
 @import "bootstrap";
 @import "./slider.scss";
-
 .simulation-controls {
-    display: grid;
-    grid-template-columns: max-content max-content;
-    justify-content: center;
-    gap: 0px 20px;
-    width: 100vw;
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-content: center;
+  gap: 0px 20px;
+  width: 100vw;
 }
 
 .modal-buttons-row {
-    display: grid;
-    grid-template-columns: repeat(3, max-content);
-    gap: 10px;
-    margin: 0.5rem auto;
-    justify-content: center;
-    align-content: center;
-    .btn {
-        height: max-content;
-        width: 12ch;
-    }
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 10px;
+  margin: 0.5rem auto;
+  justify-content: center;
+  align-content: center;
+  .btn {
+    height: max-content;
+    width: 12ch;
+  }
 }
 
 .input-area {
+  display: grid;
+  grid-template-columns: max-content;
+  margin: 20px auto;
+  gap: 10px 0px;
+  width: max-content;
+  justify-items: center;
+  .input-row {
     display: grid;
-    grid-template-columns: max-content;
-    margin: 20px auto;
-    gap: 10px 0px;
-    width: max-content;
-    justify-items: center;
-    .input-row {
-        display: grid;
-        grid-template-columns: 200px 10rem 27px 50px;
-        gap: 1ch;
-        align-items: end;
-        .data-name {
-            justify-self: end;
-        }
-        .data-value {
-            text-align: end;
-        }
+    grid-template-columns: 200px 10rem 27px 70px;
+    gap: 1ch;
+    align-items: end;
+    .data-name {
+      justify-self: end;
     }
-    .checkbox-container {
-        display: grid;
-        grid-template-columns: repeat(4, max-content);
-        gap: 5px;
+    .data-value {
+      text-align: end;
     }
+    .data-metric {
+      transform: translateX(-8px);
+    }
+  }
+  .checkbox-container {
+    display: grid;
+    grid-template-columns: repeat(4, max-content);
+    gap: 5px;
+  }
 }
 
 #include-friction {
-    margin-right: 30px;
+  margin-right: 30px;
 }
 
 input[type="checkbox"] {
-    transform: translateY(1px);
+  transform: translateY(1px);
 }
 
 #p5-container {
-    width: max-content;
-    margin: auto;
+  width: max-content;
+  margin: auto;
 }
 
 canvas {
-    border-style: solid;
-    border-width: 1px;
-    border-color: black;
-    box-shadow: 0px 0px 2px 2px lightgrey;
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+  box-shadow: 0px 0px 2px 2px lightgrey;
 }
 
 .modal.show {
-    padding-left: 0px !important;
+  padding-left: 0px !important;
 }
 
 .modal-body {
-    text-align: left;
-    font-size: 0.9rem;
-    .details-text {
-        margin-left: 20px;
-    }
+  text-align: left;
+  font-size: 0.9rem;
+  .details-text {
+    margin-left: 20px;
+  }
 }
 
 .details-eqn {
-    margin-left: 40px;
+  margin-left: 40px;
 }
 
 *[disabled="yes"] {
-    opacity: 0.3 !important;
-    pointer-events: none;
+  opacity: 0.3 !important;
+  pointer-events: none;
 }

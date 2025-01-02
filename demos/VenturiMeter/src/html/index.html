@@ -46,7 +46,8 @@
       <div class="input-row">
         <div class="data-name">valve position</div>
         <input type="range" id="v-slider" min="0" max="50" step="0.1" value="25">
-        <div class="data-value" id="v-value">0.50</div>
+        <div class="data-value" id="v-value">50</div>
+        <div class="data-metric">% open</div>
       </div>
 
       <div class="checkbox-container">
@@ -80,8 +81,8 @@
         <div class="modal-body">
           <p>
             A venturi meter allows one to calculate the flow rate of a liquid through a pipe by measuring the pressure drop across a constricted section (the "choke") and using Bernoulli's equation. In this simulation, water flows through a pipe whose inner diameter
-            is 20 mm, and the manometers along the pipe show the pressure in mm H<sub>2</sub>O. A slider is used to adjust volumetric flow rate, which can be achieved by opening or closing a valve in front of the venturi meter. Click on the
-            "show volumetric flow rate" box to display the volumetric flow rate. Click on the "include fluid friction" box to introduce friction in the pipe.
+            is 20 mm, and whose choke is 8 mm. The manometers along the pipe show the pressure in mm H<sub>2</sub>O. A pump and valve is assumed to be located before the inlet. A slider is used to adjust the valve position, controlling flow
+            rate through the venturi meter. Click on the "show volumetric flow rate" box to display or hide the volumetric flow rate. Click on the "include fluid friction" box to introduce or remove friction in the pipe.
           </p>
         </div>
       </div>
@@ -109,8 +110,8 @@
           </div>
 
           <div class="details-text">
-            where \( \rho \) is the density of the liquid, \( v_{1} \) and \( v_{2} \) are the velocities of the liquid at the inlet and choke point, \( z_{1} \) and \( z_{2} \) are the heights of the liquid at the inlet and choke point, and \( p_{1} \) and \( p_{2}
-            \) are the pressures at the inlet and choke point. Since the height of the liquid doesn't change, equation [1] can be simplified:
+            where \( \rho \) is the density of the liquid, \( g \) is the acceleration due to gravity, \( v_{1} \) and \( v_{2} \) are the velocities of the liquid at the inlet and choke point, \( z_{1} \) and \( z_{2} \) are the heights of the liquid at the inlet
+            and choke point, and \( p_{1} \) and \( p_{2} \) are the pressures at the inlet and choke point. Since the height of the liquid doesn't change, equation [1] can be simplified:
           </div>
 
           <div class="details-eqn">
@@ -134,8 +135,19 @@
           </div>
 
           <div class="details-text">
-            When fluid friction is included, there is <a href="https://www.wermac.org/specials/venturiflowmeter.html" target="_blank">typically a head loss of between 10% and 20% across the venturi meter</a>. In this simulation, the head loss is approximately
-            11% of the pressure of the first manometer, which results in 13.7 mm H<sub>2</sub>O lower pressure in the last manometer.
+            When fluid friction is included, head loss across the venturi meter is equal to
+          </div>
+
+          <div class="details-eqn">
+            $$ [5] \quad \Delta h_{f} = K \frac{v_{2}^{2}}{2g} + f \frac{v_{1}^{2} L_{c}}{2 D} $$
+          </div>
+
+          <div class="details-text">
+            where \( K \) is the minor loss coefficient (0.5 in this simulation), \( f \) is the Darcy friction factor and \( L_{c} \) is the length of the choke. The Darcy friction factor can be approximated using the Swamee-Jain equation:
+          </div>
+
+          <div class="details-eqn">
+            $$ [6] \quad f = \frac{0.25}{\left[ \log_{10} \left( \frac{\epsilon}{3.7 D} + \frac{5.74}{Re^{0.9}} \right) \right]^{2}} $$
           </div>
           <div style="margin-top: 2rem;"></div>
         </div>
