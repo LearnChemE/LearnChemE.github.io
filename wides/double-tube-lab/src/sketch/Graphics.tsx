@@ -153,7 +153,8 @@ function curvePipe(p: P5CanvasInstance) {
 }
 
 function createBeaker(p: P5CanvasInstance) {
-  let b = p.createGraphics(120, 120);
+  let b = p.createGraphics(150, 150);
+  b.scale(1.25);
 
   b.strokeWeight(5);
   b.stroke("black");
@@ -185,71 +186,16 @@ function createBeaker(p: P5CanvasInstance) {
   return b;
 }
 
-export function beakersAndTubes(p: P5CanvasInstance) {
+export function beakersAndTubes(p: P5CanvasInstance, tubes: P5CanvasInstance) {
   let bt = p.createGraphics(g.width, g.height);
   let b = createBeaker(p);
-  bt.push();
-  bt.translate(0, 450);
-  bt.scale(1.25);
-  bt.image(b, 50, 0);
-  bt.image(b, 180, 0);
-  bt.image(b, 310, 0);
-  bt.image(b, 450, 0);
-  bt.pop();
 
-  bt.push();
-  bt.stroke("black");
-  bt.strokeWeight(2);
-  bt.pop();
+  bt.image(b,  62, 461);
+  bt.image(b, 247, 461);
+  bt.image(b, 436, 461);
+  bt.image(b, 625, 461);
 
-  bt.push();
-  bt.stroke("black");
-  bt.strokeWeight(2);
-  // thi tube
-  bt.line(95, 440, 95, 400);
-  bt.line(85, 440, 85, 410);
-  bt.line(85, 410, 10, 410);
-  bt.line(95, 400, 20, 400);
-  bt.line(10, 410, 10, 80);
-  bt.line(20, 400, 20, 90);
-  bt.line(10, 80, 520, 80);
-  bt.line(20, 90, 510, 90);
-  bt.line(520, 80, 520, 128);
-  bt.line(510, 90, 510, 118);
-  bt.line(520, 128, 450, 128);
-  bt.line(510, 118, 450, 118);
-
-  // tho tube
-  bt.line(258, 580, 258, 410);
-  bt.line(248, 580, 248, 400);
-  bt.line(258, 410, 520, 410);
-  bt.line(248, 400, 510, 400);
-  bt.line(520, 410, 520, 315);
-  bt.line(510, 400, 510, 325);
-  bt.line(520, 315, 450, 315);
-  bt.line(510, 325, 450, 325);
-
-  // tci tube
-  bt.line(420, 450, 420, 430);
-  bt.line(410, 450, 410, 420);
-  bt.line(420, 430, 430, 430);
-  bt.line(410, 420, 420, 420);
-  bt.line(430, 430, 430, 300);
-  bt.line(420, 420, 420, 300);
-
-  // tco tube
-  bt.line(593, 580, 593, 10);
-  bt.line(583, 580, 583, 20);
-  bt.line(593, 10, 420, 10);
-  bt.line(583, 20, 430, 20);
-  bt.line(420, 10, 420, 100);
-  bt.line(430, 20, 430, 100);
-  bt.pop();
-
-  // thiTubes(bt);
-  // thoTubes(bt);
-  // tciTubes(bt);
-  // tcoTubes(bt);
+  bt.image(tubes,87,40);
 
   return bt;
 }
@@ -322,10 +268,9 @@ export function fillBeaker(
   p.push();
   p.fill(color);
   p.noStroke();
-  p.translate(0, 450);
+  p.translate(x, 460);
   p.scale(1.25);
 
-  p.translate(x, 0);
   p.rect(10, 120 - vol, 100, vol);
   p.pop();
 }
@@ -352,24 +297,7 @@ export function displayValve(
 }
 
 export function pumpAssembly(p: P5CanvasInstance) {
-  let pa = p.createGraphics(50, 150);
-  pa.push();
-
-  pa.push();
-  pa.fill(0);
-  pa.rect(10, 120, 30, 30);
-  pa.rect(20, 110, 10, 10);
-  pa.pop();
-
-  pa.push();
-  pa.stroke("black");
-  pa.strokeWeight(3);
-  pa.noFill();
-  pa.line(17, 120, 17, 0);
-  pa.line(32, 120, 32, 0);
-  pa.pop();
-
-  pa.pop();
+  let pa = p.loadImage("./Pump.png");
   return pa;
 }
 

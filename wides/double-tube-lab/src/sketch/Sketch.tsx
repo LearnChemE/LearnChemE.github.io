@@ -70,27 +70,26 @@ export default function sketch(p: P5CanvasInstance) {
   let tci: P5CanvasInstance;
   let tco: P5CanvasInstance;
 
-  p.setup = () => {
-    p.createCanvas(g.width, g.height);
+  var tubes: P5CanvasInstance;
+  p.preload = () => {
+    tubes = p.loadImage("./Tubes.png");
 
     dt = Graphics.doubleTubeGraphic(500, 400, p);
     dtb = Graphics.doubleTubeBlue(500, 400, 50, 450, 50, p);
     dto = Graphics.doubleTubeOrng(500, 400, 50, 450, 50, p);
-    // b = Graphics.createBeaker(p);
-    bt = Graphics.beakersAndTubes(p);
     v = Graphics.valve(p);
     pa = Graphics.pumpAssembly(p);
+  };
+
+  p.setup = () => {
+    p.createCanvas(g.width, g.height);
+
+    bt = Graphics.beakersAndTubes(p, tubes);
 
     Graphics.thiTubes((thi = p.createGraphics(g.width, g.height)));
     Graphics.thoTubes((tho = p.createGraphics(g.width, g.height)));
     Graphics.tciTubes((tci = p.createGraphics(g.width, g.height)));
     Graphics.tcoTubes((tco = p.createGraphics(g.width, g.height)));
-
-    // var options = { placement: "bottom" };
-    // $("#hi-tooltip").tooltip(options);
-    // $("#ho-tooltip").tooltip(options);
-    // $("#ci-tooltip").tooltip(options);
-    // $("#co-tooltip").tooltip(options);
 
     randStartVals(p);
   };

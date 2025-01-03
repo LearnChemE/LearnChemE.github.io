@@ -32,27 +32,33 @@ export default function drawAll(
   to = g.orngTime == -1 ? 0 : (p.millis() - g.orngTime) / 1000;
   tb = g.blueTime == -1 ? 0 : (p.millis() - g.blueTime) / 1000;
 
+  // Calculations
   changeVols(p);
   integrateTemps(p);
 
-  p.image(pa, 65, 440);
-  p.image(pa, 390, 440);
+  // Pumps
+  p.image(pa,  78, 434);
+  p.image(pa, 644, 434);
 
-  p.push();
-  fillBeaker(50, g.vols[0], g.orangeFluidColor, p);
-  fillBeaker(180, g.vols[1], g.orangeFluidColor, p);
-  fillBeaker(310, g.vols[2], g.blueFluidColor, p);
-  fillBeaker(450, g.vols[3], g.blueFluidColor, p);
-  p.pop();
+  // Fill Beakers
+  fillBeaker( 62, g.vols[0], g.orangeFluidColor, p);
+  fillBeaker(247, g.vols[1], g.orangeFluidColor, p);
+  fillBeaker(436, g.vols[2], g.blueFluidColor, p);
+  fillBeaker(625, g.vols[3], g.blueFluidColor, p);
 
+  // Tube and Beaker Outlines
   p.image(bt, 0, 0);
+  // Tube Fills
   fillAnimationTubes(to, tb, p, thi, tho, tci, tco);
-  p.image(dt, 25, 25);
-  fillAnimationOrange(to, 0, 25, p, dto);
-  fillAnimationBlue(tb, 0, 25, p, dtb);
+  // Apparatus
+  p.image(dt, 149, 25);
+  // Apparatus Fill
+  fillAnimationOrange(to, 124, 25, p, dto);
+  fillAnimationBlue(tb, 124, 25, p, dtb);
 
+  // Valves
   drag(p);
-  displayValve(90, 431, g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE, p, v);
+  displayValve( 90, 431, g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE, p, v);
   displayValve(415, 451, g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE, p, v);
 
   // console.log(`Flowrates: ${g.mDotH.toFixed(1)} ${g.mDotC.toFixed(1)}\nTemps: ${g.Th_in.toFixed(1)} ${g.Th_out.toFixed(1)} ${g.Tc_in.toFixed(1)} ${g.Tc_out.toFixed(1)}`);
