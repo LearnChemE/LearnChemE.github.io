@@ -65,11 +65,8 @@ export default function sketch(p: P5CanvasInstance) {
   let v: P5CanvasInstance;
   let pa: P5CanvasInstance;
 
-  let thi: P5CanvasInstance;
-  let tho: P5CanvasInstance;
-  let tci: P5CanvasInstance;
-  let tco: P5CanvasInstance;
-
+  let inTubes: P5CanvasInstance;
+  let outTubes: P5CanvasInstance;
   var tubes: P5CanvasInstance;
   p.preload = () => {
     tubes = p.loadImage("./Tubes.png");
@@ -79,6 +76,9 @@ export default function sketch(p: P5CanvasInstance) {
     dto = Graphics.doubleTubeOrng(500, 400, 50, 450, 50, p);
     v = Graphics.valve(p);
     pa = Graphics.pumpAssembly(p);
+
+    inTubes  = Graphics. inTubeFill(p);
+    outTubes =Graphics.outTubeFill(p);
   };
 
   p.setup = () => {
@@ -86,18 +86,13 @@ export default function sketch(p: P5CanvasInstance) {
 
     bt = Graphics.beakersAndTubes(p, tubes);
 
-    Graphics.thiTubes((thi = p.createGraphics(g.width, g.height)));
-    Graphics.thoTubes((tho = p.createGraphics(g.width, g.height)));
-    Graphics.tciTubes((tci = p.createGraphics(g.width, g.height)));
-    Graphics.tcoTubes((tco = p.createGraphics(g.width, g.height)));
-
     randStartVals(p);
   };
 
   p.draw = () => {
     p.background(250);
     calcHeatTransferRate();
-    drawAll(p, dt, bt, pa, v, dto, dtb, thi, tho, tci, tco);
+    drawAll(p, dt, bt, pa, v, dto, dtb, inTubes, outTubes);
   };
 
   p.mousePressed = () => {

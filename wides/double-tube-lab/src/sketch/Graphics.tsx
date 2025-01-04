@@ -200,30 +200,16 @@ export function beakersAndTubes(p: P5CanvasInstance, tubes: P5CanvasInstance) {
   return bt;
 }
 
-export function thiTubes(bt: P5CanvasInstance) {
-  bt.push();
-  bt.fill(g.orangeFluidColor);
-  bt.noStroke();
-  bt.rect(83, 450, 13, 100);
-  bt.rect(85, 400, 10, 50);
-  bt.rect(10, 400, 75, 10);
-  bt.rect(10, 80, 10, 320);
-  bt.rect(20, 80, 500, 10);
-  bt.rect(510, 90, 10, 38);
-  bt.rect(450, 118, 60, 10);
-  bt.pop();
+export function inTubeFill(p: P5CanvasInstance) {
+  var t = p.loadImage("./In Tubes.png");
+  return t;
 }
 
-export function thoTubes(bt: P5CanvasInstance) {
-  bt.push();
-  bt.fill(g.orangeFluidColor);
-  bt.noStroke();
-  bt.rect(248, 400, 10, 180);
-  bt.rect(258, 400, 262, 10);
-  bt.rect(510, 315, 10, 85);
-  bt.rect(450, 315, 60, 10);
-  bt.pop();
+export function outTubeFill(p: P5CanvasInstance) {
+  var t = p.loadImage("./Out Tubes.png");
+  return t;
 }
+
 
 export function tciTubes(bt: P5CanvasInstance) {
   bt.push();
@@ -299,10 +285,8 @@ export default {
   doubleTubeBlue,
   doubleTubeOrng,
   beakersAndTubes,
-  thiTubes,
-  thoTubes,
-  tciTubes,
-  tcoTubes,
+  inTubeFill,
+  outTubeFill,
   valve,
   fillBeaker,
   displayValve,

@@ -28,10 +28,8 @@ export default function drawAll(
   v: P5CanvasInstance,
   dto: P5CanvasInstance,
   dtb: P5CanvasInstance,
-  thi: P5CanvasInstance,
-  tho: P5CanvasInstance,
-  tci: P5CanvasInstance,
-  tco: P5CanvasInstance
+  inTubes: P5CanvasInstance,
+  outTubes: P5CanvasInstance
 ) {
   let to, tb;
   to = g.orngTime == -1 ? 0 : (p.millis() - g.orngTime) / 1000;
@@ -54,7 +52,7 @@ export default function drawAll(
   // Tube and Beaker Outlines
   p.image(bt, 0, 0);
   // Tube Fills
-  fillAnimationTubes(to, tb, p, thi, tho, tci, tco);
+  fillAnimationTubes(to, p, inTubes, outTubes);
   // Apparatus
   p.image(dt, 149, 25);
   // Apparatus Fill
@@ -120,41 +118,35 @@ function fillAnimationOrange(
 // The tint function is a very costy solution. Better would be to use a framebuffer
 function fillAnimationTubes(
   tOrange: number,
-  tBlue: number,
   p: P5CanvasInstance,
-  thi: P5CanvasInstance,
-  tho: P5CanvasInstance,
-  tci: P5CanvasInstance,
-  tco: P5CanvasInstance
+  ti: P5CanvasInstance,
+  to: P5CanvasInstance
 ) {
   p.push();
+
   if (tOrange < 3 && g.hIsFlowing) {
     let s = p.constrain(tOrange * 1000, 0, 255);
     p.tint(255, s);
-    p.image(thi, 0, 0);
+    p.image(ti, 266, 120);
     s = p.constrain(tOrange * 1000 - 2000, 0, 255);
     p.tint(255, s);
-    p.image(tho, 0, 0);
+    p.image(to, 88, 41);
   } else if (g.orngTime != -1 && g.vols[0] > 0) {
-    p.image(thi, 0, 0);
-    p.image(tho, 0, 0);
-    // if (p.hPumpBtn.disabled) {
-    //   p.hPumpBtn.disabled = false;
-    //   p.hPumpBtn.ariaDisabled = false;
-    // }
+    p.image(ti, 266, 120);
+    p.image(to, 88, 41);
   }
 
-  if (tBlue < 3 && g.cIsFlowing) {
-    let s = p.constrain(tBlue * 1000, 0, 255);
-    p.tint(255, s);
-    p.image(tci, 0, 0);
-    s = p.constrain(tBlue * 1000 - 2000, 0, 255);
-    p.tint(255, s);
-    p.image(tco, 0, 0);
-  } else if (g.blueTime != -1 && g.vols[2] > 0) {
-    p.image(tci, 0, 0);
-    p.image(tco, 0, 0);
-  }
+  // if (tBlue < 3 && g.cIsFlowing) {
+  //   let s = p.constrain(tBlue * 1000, 0, 255);
+  //   p.tint(255, s);
+  //   p.image(tci, 0, 0);
+  //   s = p.constrain(tBlue * 1000 - 2000, 0, 255);
+  //   p.tint(255, s);
+  //   p.image(tco, 0, 0);
+  // } else if (g.blueTime != -1 && g.vols[2] > 0) {
+  //   p.image(tci, 0, 0);
+  //   p.image(tco, 0, 0);
+  // }
 
   p.pop();
 }
