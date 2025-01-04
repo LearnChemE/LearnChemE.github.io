@@ -178,19 +178,19 @@ canvas {
 }
 
 #hi-anchor {
-  left: 83px;
+  left: 644px;
 }
 
 #ho-anchor {
-  left: 267px;
-}
-
-#ci-anchor {
   left: 456px;
 }
 
+#ci-anchor {
+  left: 267px;
+}
+
 #co-anchor {
-  left: 644px;
+  left: 83px;
 }
 
 #cold-single-anchor {
