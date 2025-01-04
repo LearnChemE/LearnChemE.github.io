@@ -65,14 +65,14 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
     singleBeakerCalculations(p);
     if (startAniTime === START_ON_RENDER) startAniTime = p.millis();
 
-    p.image(graphicsObjs.pa, 400, 450);
-    p.image(graphicsObjs.pa, 600, 450);
+    p.image(graphicsObjs.pa, 400, 440);
+    p.image(graphicsObjs.pa, 600, 440);
 
-    Graphics.fillBeaker(290, 1000, g.blueFluidColor, p);
-    Graphics.fillBeaker(450, 1000, g.orangeFluidColor, p);
+    Graphics.fillBeaker(362, 1000, g.blueFluidColor, p);
+    Graphics.fillBeaker(562, 1000, g.orangeFluidColor, p);
 
     singleBeakerFillAnimation(p, graphicsObjs);
-    if (startAniTime != NOT_STARTED) drawThermometer(p, graphicsObjs);
+    if (startAniTime !== NOT_STARTED) drawThermometer(p, graphicsObjs);
     if (pinchingColdTube) {
       pinchColdTubeGraphic(p);
     } else {

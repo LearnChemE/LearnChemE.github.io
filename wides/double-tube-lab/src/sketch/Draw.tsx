@@ -10,7 +10,7 @@ import {
   MIN_COLD_FLOWRATE,
 } from "./Functions.tsx";
 
-export const V1CX =  93;
+export const V1CX = 284;
 export const V1CY = 432;
 export const V2CX = 658;
 export const V2CY = 432;
@@ -39,15 +39,15 @@ export default function drawAll(
   changeVols(p);
   integrateTemps(p);
 
-  // Pumps
-  p.image(pa,  78, 434);
+  // Pumps 
+  p.image(pa, 269, 434);
   p.image(pa, 644, 434);
 
   // Fill Beakers
-  fillBeaker( 62, g.vols[0], g.orangeFluidColor, p);
-  fillBeaker(247, g.vols[1], g.orangeFluidColor, p);
-  fillBeaker(436, g.vols[2], g.blueFluidColor, p);
-  fillBeaker(625, g.vols[3], g.blueFluidColor, p);
+  fillBeaker( 62, g.vols[3], g.blueFluidColor, p);
+  fillBeaker(247, g.vols[2], g.blueFluidColor, p);
+  fillBeaker(436, g.vols[1], g.orangeFluidColor, p);
+  fillBeaker(625, g.vols[0], g.orangeFluidColor, p);
 
   // Tube and Beaker Outlines
   p.image(bt, 0, 0);
@@ -127,12 +127,12 @@ function fillAnimationTubes(
   if (tOrange < 3 && g.hIsFlowing) {
     let s = p.constrain(tOrange * 1000, 0, 255);
     p.tint(255, s);
-    p.image(ti, 266, 120);
+    p.image(ti, 279, 120);
     s = p.constrain(tOrange * 1000 - 2000, 0, 255);
     p.tint(255, s);
     p.image(to, 88, 41);
   } else if (g.orngTime != -1 && g.vols[0] > 0) {
-    p.image(ti, 266, 120);
+    p.image(ti, 279, 120);
     p.image(to, 88, 41);
   }
 

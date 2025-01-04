@@ -268,10 +268,10 @@ export function displayValve(
   var angle = p.map(flow, minFlow, maxFlow, (3 * Math.PI) / 4, Math.PI);
   p.imageMode(p.CENTER);
   p.translate(x, y);
-  p.scale(1.25);
+  // p.scale(1.25);
   p.rotate(angle - Math.PI);
 
-  p.image(v, 0, 2);
+  p.image(v, 0, 3);
   p.pop();
 }
 
@@ -299,9 +299,9 @@ export function singleBeakerGraphics(p: P5CanvasInstance) {
   let v = valve(p);
 
   b.push();
-  b.scale(1.25);
-  b.image(beaker, 290, 360);
-  b.image(beaker, 450, 360);
+  // b.scale(1.25);
+  b.image(beaker, 362, 461);
+  b.image(beaker, 562, 461);
   b.pop();
 
   b.push();
