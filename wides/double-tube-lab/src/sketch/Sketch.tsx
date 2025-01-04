@@ -2,7 +2,7 @@ import Graphics from "./Graphics";
 import { P5CanvasInstance } from "@p5-wrapper/react";
 // import { Tooltip } from "bootstrap";
 import { calcHeatTransferRate, randStartVals } from "./Functions.tsx";
-import drawAll from "./Draw.tsx";
+import drawAll, { V1CX, V1CY, V2CX, V2CY } from "./Draw.tsx";
 
 // Globals defined here
 export const g = {
@@ -101,9 +101,9 @@ export default function sketch(p: P5CanvasInstance) {
   };
 
   p.mousePressed = () => {
-    if (p.dist(90, 451, p.mouseX, p.mouseY) <= 50) {
+    if (p.dist(V1CX, V1CY, p.mouseX, p.mouseY) <= 50) {
       g.dragging1 = true;
-    } else if (p.dist(415, 461, p.mouseX, p.mouseY) <= 50) {
+    } else if (p.dist(V2CX, V2CY, p.mouseX, p.mouseY) <= 50) {
       g.dragging2 = true;
     }
   };

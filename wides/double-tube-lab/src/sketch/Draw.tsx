@@ -10,6 +10,11 @@ import {
   MIN_COLD_FLOWRATE,
 } from "./Functions.tsx";
 
+export const V1CX =  93;
+export const V1CY = 432;
+export const V2CX = 658;
+export const V2CY = 432;
+
 /* ********************************************* */
 /* **************** DRAW DISPLAYS ************** */
 /* ********************************************* */
@@ -58,8 +63,8 @@ export default function drawAll(
 
   // Valves
   drag(p);
-  displayValve( 90, 431, g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE, p, v);
-  displayValve(415, 451, g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE, p, v);
+  displayValve(V1CX, V1CY+1, g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE, p, v);
+  displayValve(V2CX, V2CY+1, g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE, p, v);
 
   // console.log(`Flowrates: ${g.mDotH.toFixed(1)} ${g.mDotC.toFixed(1)}\nTemps: ${g.Th_in.toFixed(1)} ${g.Th_out.toFixed(1)} ${g.Tc_in.toFixed(1)} ${g.Tc_out.toFixed(1)}`);
 }
@@ -157,16 +162,16 @@ function fillAnimationTubes(
 // handle dragging
 function drag(p: P5CanvasInstance) {
   if (g.dragging1) {
-    var theta = p.atan2(p.mouseY - 431, p.mouseX - 90);
-    var prevTheta = p.atan2(p.pmouseY - 431, p.pmouseX - 90);
+    var theta = p.atan2(p.mouseY - V1CY, p.mouseX - V1CX);
+    var prevTheta = p.atan2(p.pmouseY - V1CY, p.pmouseX - V1CX);
     var dTheta = Math.sign(theta * prevTheta) === -1 ? 0 : theta - prevTheta;
     var dmDot = p.map(dTheta, 0, p.PI / 4, 0, MAX_HOT_FLOWRATE);
 
     g.mDotH += dmDot;
     g.mDotH = p.constrain(g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE);
   } else if (g.dragging2) {
-    theta = p.atan2(p.mouseY - 461, p.mouseX - 415);
-    prevTheta = p.atan2(p.pmouseY - 461, p.pmouseX - 415);
+    theta = p.atan2(p.mouseY - V2CY, p.mouseX - V2CX);
+    prevTheta = p.atan2(p.pmouseY - V2CY, p.pmouseX - V2CX);
     dTheta = Math.sign(theta * prevTheta) === -1 ? 0 : theta - prevTheta;
     dmDot = p.map(dTheta, 0, p.PI / 4, 0, MAX_COLD_FLOWRATE);
 

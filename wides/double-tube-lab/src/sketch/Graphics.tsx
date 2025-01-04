@@ -246,14 +246,7 @@ export function tcoTubes(bt: P5CanvasInstance) {
 }
 
 export function valve(p: P5CanvasInstance) {
-  let v = p.createGraphics(50, 50);
-  v.push();
-  v.fill("blue");
-  v.stroke("black");
-  v.strokeWeight(2);
-  v.circle(25, 25, 48);
-  v.rect(18, 0, 14, 50);
-  v.pop();
+  let v = p.loadImage("./Valve.png");
   return v;
 }
 
@@ -289,10 +282,10 @@ export function displayValve(
   var angle = p.map(flow, minFlow, maxFlow, (3 * Math.PI) / 4, Math.PI);
   p.imageMode(p.CENTER);
   p.translate(x, y);
-  p.scale(0.8);
-  p.rotate(angle);
+  p.scale(1.25);
+  p.rotate(angle - Math.PI);
 
-  p.image(v, 0, 0);
+  p.image(v, 0, 2);
   p.pop();
 }
 
