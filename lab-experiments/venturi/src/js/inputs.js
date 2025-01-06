@@ -9,7 +9,7 @@ innerDiameterSlider.addEventListener("input", () => {
   const innerDiameter = Number(innerDiameterSlider.value);
   innerDiameterValue.innerHTML = innerDiameter.toFixed(1);
   gvs.inner_diameter = innerDiameter;
-  gvs.p.redraw();
+  redraw();
 });
 
 fluidFrictionCheckbox.addEventListener("change", () => {
@@ -19,13 +19,13 @@ fluidFrictionCheckbox.addEventListener("change", () => {
   } else {
     gvs.include_friction = false;
   }
-  gvs.p.redraw();
+  redraw();
 });
 
 volumetricFlowRateSlider.addEventListener("input", () => {
   gvs.volumetric_flow_rate = Number(volumetricFlowRateSlider.value / 1e6);
-  volumetricFlowRateValue.innerHTML = `${Math.round(100 * gvs.volumetric_flow_rate * 1e6 / 50)}`;
-  gvs.p.redraw();
+  volumetricFlowRateValue.innerHTML = `${Math.round(100 * gvs.volumetric_flow_rate * 1e6 / 18)}`;
+  redraw();
 });
 
 showFlowRate.addEventListener("input", () => {
@@ -34,5 +34,5 @@ showFlowRate.addEventListener("input", () => {
   } else {
     gvs.show_flow_rate = false
   }
-  gvs.p.redraw();
+  redraw();
 });

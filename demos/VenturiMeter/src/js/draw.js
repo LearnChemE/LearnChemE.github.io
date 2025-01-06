@@ -58,7 +58,7 @@ function drawAll(p) {
   p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
   // start of venturi meter outline section
-  
+
   const outline_list_mm = [
     [-100, -1 * gvs.outer_diameter / 2],
     [-50, -1 * gvs.outer_diameter / 2],
@@ -212,7 +212,7 @@ function drawAll(p) {
   p.noStroke();
   p.textAlign(p.CENTER, p.CENTER);
   let labelCoord = mmToPix(7, 20);
-  p.text("10 mm", labelCoord[0], labelCoord[1]);
+  p.text(`${gvs.inner_diameter} mm`, labelCoord[0], labelCoord[1]);
 
   // start of axis section
 
@@ -269,7 +269,7 @@ function drawAll(p) {
   p.fill(0);
   p.noStroke();
   coord1 = mmToPix(-85, 0);
-  p.text("20 mm", coord1[0], coord1[1]);
+  p.text(`${gvs.outer_diameter} mm`, coord1[0], coord1[1]);
 
   p.noFill();
   p.stroke(0);
@@ -362,14 +362,12 @@ function drawAll(p) {
   coord3 = mmToPix(68, 0.5 * gvs.outer_diameter / 2 - 1);
   p.triangle(coord1[0], coord1[1], coord2[0], coord2[1], coord3[0], coord3[1]);
 
-  if(gvs.show_flow_rate) {
+  if (gvs.show_flow_rate) {
     p.fill(0);
     p.noStroke();
     p.textSize(16);
     p.textAlign(p.CENTER, p.CENTER);
-    p.text(`volumetric flow rate = ${(Math.round(gvs.volumetric_flow_rate * 10000 * 100) / 100).toFixed(2)} cm  /s`, -200, 60);
-    p.textSize(10);
-    p.text(`3`, -101, 56);
+    p.text(`volumetric flow rate = ${Math.round(gvs.volumetric_flow_rate * 1e6)} mL / s`, -200, 60);
   }
   p.pop();
 
@@ -378,11 +376,11 @@ function drawAll(p) {
   p.noStroke();
   p.textSize(16);
   p.textAlign(p.CENTER);
-  p.text(`${(Math.round(100 * gvs.manometer_1_pressure) / 100).toFixed(1)}`, 197, 50);
-  p.text(`${(Math.round(100 * gvs.manometer_2_pressure) / 100).toFixed(1)}`, 319, 50);
-  p.text(`${(Math.round(100 * gvs.manometer_3_pressure) / 100).toFixed(1)}`, 397, 50);
-  p.text(`${(Math.round(100 * gvs.manometer_4_pressure) / 100).toFixed(1)}`, 479, 50);
-  p.text(`${(Math.round(100 * gvs.manometer_5_pressure) / 100).toFixed(1)}`, 597, 50);
+  p.text(`${Math.round(gvs.manometer_1_pressure)} mm`, 197, 50);
+  p.text(`${Math.round(gvs.manometer_2_pressure)}`, 319, 50);
+  p.text(`${Math.round(gvs.manometer_3_pressure)}`, 397, 50);
+  p.text(`${Math.round(gvs.manometer_4_pressure)}`, 479, 50);
+  p.text(`${Math.round(gvs.manometer_5_pressure)}`, 597, 50);
   p.pop();
 }
 

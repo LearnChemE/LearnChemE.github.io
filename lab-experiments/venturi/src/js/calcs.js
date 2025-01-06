@@ -1,4 +1,4 @@
-function calcAll() {
+export default function calcAll() {
   const K = 0.5; // minor loss coefficient
   const D1 = gvs.outer_diameter / 1000; // m
   const D2 = gvs.inner_diameter / 1000; // m
@@ -6,7 +6,7 @@ function calcAll() {
   const mu = 0.001; // dynamic viscosity of water, Pa * s
   const A1 = Math.PI * (D1 / 2) ** 2; // area of venturi outer tube, m^2
   const A2 = Math.PI * (D2 / 2) ** 2; // area of venturi choke, m^2
-  const L = 40; // length of the tube exiting the venturi meter, m
+  const L = 20; // length of the tube exiting the venturi meter, m
   const g = 9.81; // acceleration due to gravity, m / s^2
   const V = gvs.volumetric_flow_rate;
 
@@ -25,7 +25,7 @@ function calcAll() {
     P5 = P1;
   }
 
-  const dP = 0.5 * rho * (vThroat ** 2 - v ** 2); // pressure drop across venturi meter, not including friction, Pa
+  const dP = rho * ((V * 4 * Math.sqrt(1 - (D2 / D1) ** 4)) / (Math.PI * D2 ** 2)) ** 2 / 2
   const P3 = P1 - dP; // pressure at third manometer, Pa
 
   const P2 = (P1 + P3) / 2; // pressure at second manometer, Pa
@@ -56,5 +56,3 @@ function calcAll() {
   //   gvs.manometer_5_pressure = gvs.manometer_1_pressure;
   // }
 }
-
-module.exports = calcAll;
