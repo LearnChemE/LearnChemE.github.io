@@ -2,7 +2,7 @@ import Graphics from "./Graphics";
 import { P5CanvasInstance } from "@p5-wrapper/react";
 // import { Tooltip } from "bootstrap";
 import { calcHeatTransferRate, randStartVals } from "./Functions.tsx";
-import drawAll from "./Draw.tsx";
+import drawAll, { V1CX, V1CY, V2CX, V2CY } from "./Draw.tsx";
 
 // Globals defined here
 export const g = {
@@ -65,32 +65,26 @@ export default function sketch(p: P5CanvasInstance) {
   let v: P5CanvasInstance;
   let pa: P5CanvasInstance;
 
-  let thi: P5CanvasInstance;
-  let tho: P5CanvasInstance;
-  let tci: P5CanvasInstance;
-  let tco: P5CanvasInstance;
-
-  p.setup = () => {
-    p.createCanvas(g.width, g.height);
+  let inTubes: P5CanvasInstance;
+  let outTubes: P5CanvasInstance;
+  var tubes: P5CanvasInstance;
+  p.preload = () => {
+    tubes = p.loadImage("./Tubes.png");
 
     dt = Graphics.doubleTubeGraphic(500, 400, p);
     dtb = Graphics.doubleTubeBlue(500, 400, 50, 450, 50, p);
     dto = Graphics.doubleTubeOrng(500, 400, 50, 450, 50, p);
-    // b = Graphics.createBeaker(p);
-    bt = Graphics.beakersAndTubes(p);
     v = Graphics.valve(p);
     pa = Graphics.pumpAssembly(p);
 
-    Graphics.thiTubes((thi = p.createGraphics(g.width, g.height)));
-    Graphics.thoTubes((tho = p.createGraphics(g.width, g.height)));
-    Graphics.tciTubes((tci = p.createGraphics(g.width, g.height)));
-    Graphics.tcoTubes((tco = p.createGraphics(g.width, g.height)));
+    inTubes  = Graphics. inTubeFill(p);
+    outTubes =Graphics.outTubeFill(p);
+  };
 
-    // var options = { placement: "bottom" };
-    // $("#hi-tooltip").tooltip(options);
-    // $("#ho-tooltip").tooltip(options);
-    // $("#ci-tooltip").tooltip(options);
-    // $("#co-tooltip").tooltip(options);
+  p.setup = () => {
+    p.createCanvas(g.width, g.height);
+
+    bt = Graphics.beakersAndTubes(p, tubes);
 
     randStartVals(p);
   };
@@ -98,13 +92,13 @@ export default function sketch(p: P5CanvasInstance) {
   p.draw = () => {
     p.background(250);
     calcHeatTransferRate();
-    drawAll(p, dt, bt, pa, v, dto, dtb, thi, tho, tci, tco);
+    drawAll(p, dt, bt, pa, v, dto, dtb, inTubes, outTubes);
   };
 
   p.mousePressed = () => {
-    if (p.dist(90, 451, p.mouseX, p.mouseY) <= 50) {
+    if (p.dist(V1CX, V1CY, p.mouseX, p.mouseY) <= 50) {
       g.dragging1 = true;
-    } else if (p.dist(415, 461, p.mouseX, p.mouseY) <= 50) {
+    } else if (p.dist(V2CX, V2CY, p.mouseX, p.mouseY) <= 50) {
       g.dragging2 = true;
     }
   };

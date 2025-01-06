@@ -172,25 +172,25 @@ canvas {
 .tooltip-anchor {
   position: absolute;
   /* background-color: yellow; */
-  top: 450px;
+  top: 461px;
   width: 126px;
   height: 155px;
 }
 
 #hi-anchor {
-  left: 85px;
+  left: 644px;
 }
 
 #ho-anchor {
-  left: 247px;
+  left: 456px;
 }
 
 #ci-anchor {
-  left: 410px;
+  left: 267px;
 }
 
 #co-anchor {
-  left: 584px;
+  left: 83px;
 }
 
 #cold-single-anchor {
