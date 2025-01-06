@@ -293,10 +293,9 @@ export default {
   pumpAssembly,
 };
 
-export function singleBeakerGraphics(p: P5CanvasInstance) {
+export function singleBeakerGraphics(p: P5CanvasInstance, v: any) {
   let b = p.createGraphics(g.width, g.height);
   let beaker = createBeaker(p);
-  let v = valve(p);
 
   b.push();
   // b.scale(1.25);
@@ -332,10 +331,12 @@ export function singleBeakerGraphics(p: P5CanvasInstance) {
 
   // valves
   b.push();
-  b.translate(406, 425);
+  b.translate(408, 425);
   b.scale(0.75);
+  // b.rect(0,0,100,100);
   b.image(v, 0, 0);
   b.translate(267, 0);
+  // b.rect(0,0,100,100);
   b.image(v, 0, 0);
   b.pop();
 

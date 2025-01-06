@@ -1,5 +1,5 @@
 import { g } from "./Sketch";
-import Graphics from "./Graphics";
+import Graphics, { displayValve, valve } from "./Graphics";
 import { P5CanvasInstance } from "@p5-wrapper/react";
 import { singleBeakerGraphics } from "./Graphics";
 import {
@@ -42,22 +42,28 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
     dt: undefined,
     dtb: undefined,
     dto: undefined,
+    v: undefined,
     singleBeakers: undefined,
     pa: undefined,
     therm: undefined,
   };
   let pinchingColdTube = false;
 
+  // It is important to preload any images you are using; the function is async but was created before the async keywords 
+  p.preload = () => {
+    graphicsObjs.v = valve(p);
+    graphicsObjs.dt = Graphics.doubleTubeGraphic(500, 400, p);
+    graphicsObjs.dtb = Graphics.doubleTubeBlue(500, 400, 50, 450, 50, p);
+    graphicsObjs.dto = Graphics.doubleTubeOrng(500, 400, 50, 450, 50, p);
+    graphicsObjs.pa = Graphics.pumpAssembly(p);
+    graphicsObjs.therm = p.loadImage("thermometer.png");
+  }
+
   p.setup = () => {
     p.createCanvas(g.width, g.height);
     randSingleStartVals();
 
-    graphicsObjs.dt = Graphics.doubleTubeGraphic(500, 400, p);
-    graphicsObjs.dtb = Graphics.doubleTubeBlue(500, 400, 50, 450, 50, p);
-    graphicsObjs.dto = Graphics.doubleTubeOrng(500, 400, 50, 450, 50, p);
-    graphicsObjs.singleBeakers = singleBeakerGraphics(p);
-    graphicsObjs.pa = Graphics.pumpAssembly(p);
-    graphicsObjs.therm = p.loadImage("thermometer.png");
+    graphicsObjs.singleBeakers = singleBeakerGraphics(p,graphicsObjs.v);
   };
 
   p.draw = () => {
@@ -65,13 +71,14 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
     singleBeakerCalculations(p);
     if (startAniTime === START_ON_RENDER) startAniTime = p.millis();
 
-    p.image(graphicsObjs.pa, 400, 440);
-    p.image(graphicsObjs.pa, 600, 440);
+    p.image(graphicsObjs.pa, 410, 435);
+    p.image(graphicsObjs.pa, 610, 435);
 
     Graphics.fillBeaker(362, 1000, g.blueFluidColor, p);
     Graphics.fillBeaker(562, 1000, g.orangeFluidColor, p);
 
     singleBeakerFillAnimation(p, graphicsObjs);
+    // displayValve(100,100,1,0,1,p,v)
     if (startAniTime !== NOT_STARTED) drawThermometer(p, graphicsObjs);
     if (pinchingColdTube) {
       pinchColdTubeGraphic(p);
@@ -154,13 +161,13 @@ function fillSingleInletTubes(p: P5CanvasInstance, alpha = 200) {
   p.fill(color);
   p.rect(620, 117, 10, 330);
   p.rect(470, 117, 150, 10);
-  p.rect(617, 450, 15, 120);
 
+  alpha *= 18/20;
   color = g.blueFluidColor.slice();
   color[3] = alpha;
   p.fill(color);
   p.rect(420, 370, 10, 60);
-  p.rect(418, 430, 13, 140);
+  // p.rect(418, 430, 13, 140);
   p.pop();
 }
 
@@ -171,16 +178,17 @@ function fillSingleOutletTubes(p: P5CanvasInstance, alpha = 200) {
   p.push();
   p.noStroke();
   p.fill(color);
-  p.rect(585, 315, 10, 160);
+  p.rect(585, 315, 10, 170);
   p.rect(475, 315, 110, 10);
 
+  alpha *= 18/20;
   color = g.blueFluidColor.slice();
   color[3] = alpha;
   p.fill(color);
-  p.rect(385, 375, 10, 215);
-  p.rect(385, 40, 10, 35);
-  p.rect(395, 40, 25, 10);
-  p.rect(420, 40, 10, 35);
+  p.rect(385, 375, 10, 110);
+  p.rect(385,  40, 10,  35);
+  p.rect(395,  40, 25,  10);
+  p.rect(420,  40, 10,  35);
   p.pop();
 }
 
