@@ -1,5 +1,5 @@
 import { g } from "./Sketch";
-import Graphics, { displayValve, valve } from "./Graphics";
+import Graphics, { valve } from "./Graphics";
 import { P5CanvasInstance } from "@p5-wrapper/react";
 import { singleBeakerGraphics } from "./Graphics";
 import {
