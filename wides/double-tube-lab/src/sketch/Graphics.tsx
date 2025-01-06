@@ -153,7 +153,8 @@ function curvePipe(p: P5CanvasInstance) {
 }
 
 function createBeaker(p: P5CanvasInstance) {
-  let b = p.createGraphics(120, 120);
+  let b = p.createGraphics(150, 150);
+  b.scale(1.25);
 
   b.strokeWeight(5);
   b.stroke("black");
@@ -185,99 +186,30 @@ function createBeaker(p: P5CanvasInstance) {
   return b;
 }
 
-export function beakersAndTubes(p: P5CanvasInstance) {
+export function beakersAndTubes(p: P5CanvasInstance, tubes: P5CanvasInstance) {
   let bt = p.createGraphics(g.width, g.height);
   let b = createBeaker(p);
-  bt.push();
-  bt.translate(0, 450);
-  bt.scale(1.25);
-  bt.image(b, 50, 0);
-  bt.image(b, 180, 0);
-  bt.image(b, 310, 0);
-  bt.image(b, 450, 0);
-  bt.pop();
 
-  bt.push();
-  bt.stroke("black");
-  bt.strokeWeight(2);
-  bt.pop();
+  bt.image(b,  62, 461);
+  bt.image(b, 247, 461);
+  bt.image(b, 436, 461);
+  bt.image(b, 625, 461);
 
-  bt.push();
-  bt.stroke("black");
-  bt.strokeWeight(2);
-  // thi tube
-  bt.line(95, 440, 95, 400);
-  bt.line(85, 440, 85, 410);
-  bt.line(85, 410, 10, 410);
-  bt.line(95, 400, 20, 400);
-  bt.line(10, 410, 10, 80);
-  bt.line(20, 400, 20, 90);
-  bt.line(10, 80, 520, 80);
-  bt.line(20, 90, 510, 90);
-  bt.line(520, 80, 520, 128);
-  bt.line(510, 90, 510, 118);
-  bt.line(520, 128, 450, 128);
-  bt.line(510, 118, 450, 118);
-
-  // tho tube
-  bt.line(258, 580, 258, 410);
-  bt.line(248, 580, 248, 400);
-  bt.line(258, 410, 520, 410);
-  bt.line(248, 400, 510, 400);
-  bt.line(520, 410, 520, 315);
-  bt.line(510, 400, 510, 325);
-  bt.line(520, 315, 450, 315);
-  bt.line(510, 325, 450, 325);
-
-  // tci tube
-  bt.line(420, 450, 420, 430);
-  bt.line(410, 450, 410, 420);
-  bt.line(420, 430, 430, 430);
-  bt.line(410, 420, 420, 420);
-  bt.line(430, 430, 430, 300);
-  bt.line(420, 420, 420, 300);
-
-  // tco tube
-  bt.line(593, 580, 593, 10);
-  bt.line(583, 580, 583, 20);
-  bt.line(593, 10, 420, 10);
-  bt.line(583, 20, 430, 20);
-  bt.line(420, 10, 420, 100);
-  bt.line(430, 20, 430, 100);
-  bt.pop();
-
-  // thiTubes(bt);
-  // thoTubes(bt);
-  // tciTubes(bt);
-  // tcoTubes(bt);
+  bt.image(tubes,87,40);
 
   return bt;
 }
 
-export function thiTubes(bt: P5CanvasInstance) {
-  bt.push();
-  bt.fill(g.orangeFluidColor);
-  bt.noStroke();
-  bt.rect(83, 450, 13, 100);
-  bt.rect(85, 400, 10, 50);
-  bt.rect(10, 400, 75, 10);
-  bt.rect(10, 80, 10, 320);
-  bt.rect(20, 80, 500, 10);
-  bt.rect(510, 90, 10, 38);
-  bt.rect(450, 118, 60, 10);
-  bt.pop();
+export function inTubeFill(p: P5CanvasInstance) {
+  var t = p.loadImage("./In Tubes.png");
+  return t;
 }
 
-export function thoTubes(bt: P5CanvasInstance) {
-  bt.push();
-  bt.fill(g.orangeFluidColor);
-  bt.noStroke();
-  bt.rect(248, 400, 10, 180);
-  bt.rect(258, 400, 262, 10);
-  bt.rect(510, 315, 10, 85);
-  bt.rect(450, 315, 60, 10);
-  bt.pop();
+export function outTubeFill(p: P5CanvasInstance) {
+  var t = p.loadImage("./Out Tubes.png");
+  return t;
 }
+
 
 export function tciTubes(bt: P5CanvasInstance) {
   bt.push();
@@ -300,14 +232,7 @@ export function tcoTubes(bt: P5CanvasInstance) {
 }
 
 export function valve(p: P5CanvasInstance) {
-  let v = p.createGraphics(50, 50);
-  v.push();
-  v.fill("blue");
-  v.stroke("black");
-  v.strokeWeight(2);
-  v.circle(25, 25, 48);
-  v.rect(18, 0, 14, 50);
-  v.pop();
+  let v = p.loadImage("./Valve.png");
   return v;
 }
 
@@ -322,10 +247,9 @@ export function fillBeaker(
   p.push();
   p.fill(color);
   p.noStroke();
-  p.translate(0, 450);
+  p.translate(x, 460);
   p.scale(1.25);
 
-  p.translate(x, 0);
   p.rect(10, 120 - vol, 100, vol);
   p.pop();
 }
@@ -344,32 +268,15 @@ export function displayValve(
   var angle = p.map(flow, minFlow, maxFlow, (3 * Math.PI) / 4, Math.PI);
   p.imageMode(p.CENTER);
   p.translate(x, y);
-  p.scale(0.8);
-  p.rotate(angle);
+  // p.scale(1.25);
+  p.rotate(angle - Math.PI);
 
-  p.image(v, 0, 0);
+  p.image(v, 0, 3);
   p.pop();
 }
 
 export function pumpAssembly(p: P5CanvasInstance) {
-  let pa = p.createGraphics(50, 150);
-  pa.push();
-
-  pa.push();
-  pa.fill(0);
-  pa.rect(10, 120, 30, 30);
-  pa.rect(20, 110, 10, 10);
-  pa.pop();
-
-  pa.push();
-  pa.stroke("black");
-  pa.strokeWeight(3);
-  pa.noFill();
-  pa.line(17, 120, 17, 0);
-  pa.line(32, 120, 32, 0);
-  pa.pop();
-
-  pa.pop();
+  let pa = p.loadImage("./Pump.png");
   return pa;
 }
 
@@ -378,25 +285,22 @@ export default {
   doubleTubeBlue,
   doubleTubeOrng,
   beakersAndTubes,
-  thiTubes,
-  thoTubes,
-  tciTubes,
-  tcoTubes,
+  inTubeFill,
+  outTubeFill,
   valve,
   fillBeaker,
   displayValve,
   pumpAssembly,
 };
 
-export function singleBeakerGraphics(p: P5CanvasInstance) {
+export function singleBeakerGraphics(p: P5CanvasInstance, v: any) {
   let b = p.createGraphics(g.width, g.height);
   let beaker = createBeaker(p);
-  let v = valve(p);
 
   b.push();
-  b.scale(1.25);
-  b.image(beaker, 290, 360);
-  b.image(beaker, 450, 360);
+  // b.scale(1.25);
+  b.image(beaker, 362, 461);
+  b.image(beaker, 562, 461);
   b.pop();
 
   b.push();
@@ -427,10 +331,12 @@ export function singleBeakerGraphics(p: P5CanvasInstance) {
 
   // valves
   b.push();
-  b.translate(406, 425);
+  b.translate(408, 425);
   b.scale(0.75);
+  // b.rect(0,0,100,100);
   b.image(v, 0, 0);
   b.translate(267, 0);
+  // b.rect(0,0,100,100);
   b.image(v, 0, 0);
   b.pop();
 

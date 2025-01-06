@@ -10,6 +10,11 @@ import {
   MIN_COLD_FLOWRATE,
 } from "./Functions.tsx";
 
+export const V1CX = 284;
+export const V1CY = 432;
+export const V2CX = 658;
+export const V2CY = 432;
+
 /* ********************************************* */
 /* **************** DRAW DISPLAYS ************** */
 /* ********************************************* */
@@ -23,37 +28,41 @@ export default function drawAll(
   v: P5CanvasInstance,
   dto: P5CanvasInstance,
   dtb: P5CanvasInstance,
-  thi: P5CanvasInstance,
-  tho: P5CanvasInstance,
-  tci: P5CanvasInstance,
-  tco: P5CanvasInstance
+  inTubes: P5CanvasInstance,
+  outTubes: P5CanvasInstance
 ) {
   let to, tb;
   to = g.orngTime == -1 ? 0 : (p.millis() - g.orngTime) / 1000;
   tb = g.blueTime == -1 ? 0 : (p.millis() - g.blueTime) / 1000;
 
+  // Calculations
   changeVols(p);
   integrateTemps(p);
 
-  p.image(pa, 65, 440);
-  p.image(pa, 390, 440);
+  // Pumps 
+  p.image(pa, 269, 434);
+  p.image(pa, 644, 434);
 
-  p.push();
-  fillBeaker(50, g.vols[0], g.orangeFluidColor, p);
-  fillBeaker(180, g.vols[1], g.orangeFluidColor, p);
-  fillBeaker(310, g.vols[2], g.blueFluidColor, p);
-  fillBeaker(450, g.vols[3], g.blueFluidColor, p);
-  p.pop();
+  // Fill Beakers
+  fillBeaker( 62, g.vols[3], g.blueFluidColor, p);
+  fillBeaker(247, g.vols[2], g.blueFluidColor, p);
+  fillBeaker(436, g.vols[1], g.orangeFluidColor, p);
+  fillBeaker(625, g.vols[0], g.orangeFluidColor, p);
 
+  // Tube and Beaker Outlines
   p.image(bt, 0, 0);
-  fillAnimationTubes(to, tb, p, thi, tho, tci, tco);
-  p.image(dt, 25, 25);
-  fillAnimationOrange(to, 0, 25, p, dto);
-  fillAnimationBlue(tb, 0, 25, p, dtb);
+  // Tube Fills
+  fillAnimationTubes(to, p, inTubes, outTubes);
+  // Apparatus
+  p.image(dt, 149, 25);
+  // Apparatus Fill
+  fillAnimationOrange(to, 124, 25, p, dto);
+  fillAnimationBlue(tb, 124, 25, p, dtb);
 
+  // Valves
   drag(p);
-  displayValve(90, 431, g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE, p, v);
-  displayValve(415, 451, g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE, p, v);
+  displayValve(V1CX, V1CY+1, g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE, p, v);
+  displayValve(V2CX, V2CY+1, g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE, p, v);
 
   // console.log(`Flowrates: ${g.mDotH.toFixed(1)} ${g.mDotC.toFixed(1)}\nTemps: ${g.Th_in.toFixed(1)} ${g.Th_out.toFixed(1)} ${g.Tc_in.toFixed(1)} ${g.Tc_out.toFixed(1)}`);
 }
@@ -109,41 +118,35 @@ function fillAnimationOrange(
 // The tint function is a very costy solution. Better would be to use a framebuffer
 function fillAnimationTubes(
   tOrange: number,
-  tBlue: number,
   p: P5CanvasInstance,
-  thi: P5CanvasInstance,
-  tho: P5CanvasInstance,
-  tci: P5CanvasInstance,
-  tco: P5CanvasInstance
+  ti: P5CanvasInstance,
+  to: P5CanvasInstance
 ) {
   p.push();
+
   if (tOrange < 3 && g.hIsFlowing) {
     let s = p.constrain(tOrange * 1000, 0, 255);
     p.tint(255, s);
-    p.image(thi, 0, 0);
+    p.image(ti, 279, 120);
     s = p.constrain(tOrange * 1000 - 2000, 0, 255);
     p.tint(255, s);
-    p.image(tho, 0, 0);
+    p.image(to, 88, 41);
   } else if (g.orngTime != -1 && g.vols[0] > 0) {
-    p.image(thi, 0, 0);
-    p.image(tho, 0, 0);
-    // if (p.hPumpBtn.disabled) {
-    //   p.hPumpBtn.disabled = false;
-    //   p.hPumpBtn.ariaDisabled = false;
-    // }
+    p.image(ti, 279, 120);
+    p.image(to, 88, 41);
   }
 
-  if (tBlue < 3 && g.cIsFlowing) {
-    let s = p.constrain(tBlue * 1000, 0, 255);
-    p.tint(255, s);
-    p.image(tci, 0, 0);
-    s = p.constrain(tBlue * 1000 - 2000, 0, 255);
-    p.tint(255, s);
-    p.image(tco, 0, 0);
-  } else if (g.blueTime != -1 && g.vols[2] > 0) {
-    p.image(tci, 0, 0);
-    p.image(tco, 0, 0);
-  }
+  // if (tBlue < 3 && g.cIsFlowing) {
+  //   let s = p.constrain(tBlue * 1000, 0, 255);
+  //   p.tint(255, s);
+  //   p.image(tci, 0, 0);
+  //   s = p.constrain(tBlue * 1000 - 2000, 0, 255);
+  //   p.tint(255, s);
+  //   p.image(tco, 0, 0);
+  // } else if (g.blueTime != -1 && g.vols[2] > 0) {
+  //   p.image(tci, 0, 0);
+  //   p.image(tco, 0, 0);
+  // }
 
   p.pop();
 }
@@ -151,16 +154,16 @@ function fillAnimationTubes(
 // handle dragging
 function drag(p: P5CanvasInstance) {
   if (g.dragging1) {
-    var theta = p.atan2(p.mouseY - 431, p.mouseX - 90);
-    var prevTheta = p.atan2(p.pmouseY - 431, p.pmouseX - 90);
+    var theta = p.atan2(p.mouseY - V1CY, p.mouseX - V1CX);
+    var prevTheta = p.atan2(p.pmouseY - V1CY, p.pmouseX - V1CX);
     var dTheta = Math.sign(theta * prevTheta) === -1 ? 0 : theta - prevTheta;
     var dmDot = p.map(dTheta, 0, p.PI / 4, 0, MAX_HOT_FLOWRATE);
 
     g.mDotH += dmDot;
     g.mDotH = p.constrain(g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE);
   } else if (g.dragging2) {
-    theta = p.atan2(p.mouseY - 461, p.mouseX - 415);
-    prevTheta = p.atan2(p.pmouseY - 461, p.pmouseX - 415);
+    theta = p.atan2(p.mouseY - V2CY, p.mouseX - V2CX);
+    prevTheta = p.atan2(p.pmouseY - V2CY, p.pmouseX - V2CX);
     dTheta = Math.sign(theta * prevTheta) === -1 ? 0 : theta - prevTheta;
     dmDot = p.map(dTheta, 0, p.PI / 4, 0, MAX_COLD_FLOWRATE);
 
