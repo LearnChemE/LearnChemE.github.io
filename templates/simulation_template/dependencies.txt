@@ -1,1 +1,0 @@
-@popperjs/core bootstrap clean-webpack-plugin css-loader html-loader html-webpack-plugin mini-css-extract-plugin popper.js postcss-loader sass sass-loader style-loader terser-webpack-plugin to-string-loader uglify-js webpack webpack-cli webpack-dev-server

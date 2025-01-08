@@ -1,0 +1,192 @@
+$modal-md: 800px;
+
+@import "bootstrap/scss/bootstrap.scss";
+
+#graphics-container {
+  position: relative;
+  margin: auto;
+  margin-top: 20px;
+  background-color: rgb(250, 250, 250);
+  border: 1px solid black;
+  border-radius: 5px;
+  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+  width: min-content;
+
+  & > svg {
+    width: calc(100vw - 40px);
+    max-width: calc(100vh * 158 / 108);
+    height: 100%;
+    max-height: calc(100vh - 30px);
+
+    & > * {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+  }
+}
+
+iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+#reset,
+#tilt {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 1000;
+  width: 55px;
+  height: max-content;
+  text-align: center;
+  padding: 4px 8px;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#reset {
+  transform: translate(-30%, 40%);
+  background-color: lightgreen;
+}
+
+#tilt {
+  transform: translate(-30%, calc(40% + 40px));
+  background-color: rgb(32, 178, 154);
+}
+
+#reset:hover {
+  background-color: rgb(177, 246, 177);
+}
+
+#reset.clicked {
+  background-color: rgb(205, 249, 205);
+}
+
+#tilt:hover {
+  background-color: rgb(72, 218, 194);
+}
+
+#tilt.clicked {
+  background-color: rgb(92, 238, 214);
+}
+
+#hamburger {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  width: max-content;
+  height: max-content;
+}
+
+#hamburger-icon {
+  display: grid;
+  align-content: center;
+  align-items: center;
+  height: max-content;
+  width: max-content;
+  cursor: pointer;
+  background-color: lightblue;
+  padding: 5px;
+  border: 1px solid black;
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+}
+
+#hamburger-icon.active {
+  background-color: rgb(233, 164, 164);
+}
+
+#hamburger-icon:hover,
+#hamburger-icon.active:hover {
+  background-color: rgb(217, 239, 246);
+}
+
+#hamburger-icon > svg {
+  width: 30px;
+  height: 30px;
+}
+
+#buttons {
+  position: absolute;
+  top: 30px;
+  display: none;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 10px;
+  background-color: white;
+  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 12px;
+
+  & > .btn {
+    width: 100px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  #reset,
+  #tilt {
+    font-size: 0.8rem;
+  }
+
+  #hamburger-icon {
+    padding: 3px;
+    height: 28px;
+  }
+
+  #hamburger-icon > svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  #buttons {
+    top: 20px;
+    padding: 10px;
+
+    & > .btn {
+      width: 80px;
+      font-size: 0.7rem;
+    }
+  }
+}
+
+@media screen and (min-width: 1320px) {
+  #reset,
+  #tilt {
+    font-size: 1.2rem;
+    padding: 4px 12px;
+    width: 70px;
+  }
+
+  #tilt {
+    transform: translate(-30%, calc(40% + 50px));
+  }
+
+  #hamburger-icon {
+    padding: 6px;
+  }
+
+  #hamburger-icon > svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  #buttons {
+    top: 35px;
+    padding: 15px;
+  }
+}
