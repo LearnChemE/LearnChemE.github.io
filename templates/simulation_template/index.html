@@ -18,21 +18,24 @@
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <!-- p5.js -->
-   <script type="text/javascript" src="./js/p5.js"></script>
+  <script type="text/javascript" src="./js/p5.js"></script>
 
   <!-- CSS -->
   <link rel="stylesheet" href="./style/style.css">
   <link rel="stylesheet" href="./style/slider.css">
 
   <!-- bootstrap -->
-  <link rel="stylesheet" href="./style/bootstrap.css">
-  <script src="./js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="./style/bootstrap-custom.css">
+  <script src="./js/bootstrap.min.js"></script>
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
     gtag('js', new Date());
 
     gtag('config', 'UA-204988035-3');
@@ -40,84 +43,80 @@
 </head>
 
 <body>
-  <div class="modal-buttons-row">
-    <div id="directions-button" class="btn btn-primary" data-toggle="modal" data-target="#directions-modal">Directions</div>
-    <div id="details-button" class="btn btn-primary" data-toggle="modal" data-target="#details-modal">Details</div>
-    <div id="about-button" class="btn btn-primary" data-toggle="modal" data-target="#about-modal">About</div>
-  </div>
-
-  <!-- 
-  <div class="value-area">
+  <div class="controls-area">
     <div class="inputs">
       <div class="input-area">
-        <div>Object</div>
-        <select id="fluid-selection">
-          <option value="3">Honey</option>
-          <option value="1">Water</option>
-          <option value="2">Milk</option>
-
+        <div id="selection-row">Selection</div>
+        <select id="selection-slider">
+          <option value="a">Option 1</option>
+          <option value="b">Option 2</option>
+          <option value="c">Option 3</option>
         </select>
       </div>
 
       <div class="input-area">
-        <div class="data-name">Fluid Density \(\rho\):</div>
-        <input type="range" id="density" min="0.2" max="7.6" step="0.01" value="6.907755">
-        <div class="data-value" id="densityValue">1400</div>
+        <div class="data-name">Density \(\rho\):</div>
+        <input type="range" id="density-slider" min="0" max="1" step="0.01" value="0.5">
+        <div class="data-value" id="density-value">0.50</div>
         <div class="data-metric">kg/m<sup>3</sup></div>
       </div>
+    </div>
 
-
-      <div class="input-area">
-        <div class="data-name">Fluid velocity \(V\):</div>
-        <div class="group-slider">
-          <input type="range" id="velocity" min="-3.5066" max="-0.8557" step="0.05" value="-3.15825">
-          <div class="data-value" id="velocityValue">4.25</div>
-        </div>
-        <div class="data-metric">cm/s</div>
-      </div>
-
-      <div class="input-area">
-        <div>Reynolds number: </div>
-        <div id="ReNumber"> 50 </div>
-      </div>
+    <div class="modal-buttons-row">
+      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
+      <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
+      <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
     </div>
   </div>
-  -->
 
-  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
-    aria-hidden="true">
-    <!--
+
+
+  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="directions-modal-label">Directions</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            
           </button>
         </div>
         <div class="modal-body">
           <p>
-            This simulation generates a vector field around a sphere with diameter \( d = 1 \; \mathrm{ m } \). One of three fluids can be selected from the dropdown menu. The slider changes the fluid velocity. The vector field automaticaly updates if a parameter is changed. The fluid velocity may change when a new fluid is selected in order to keep the Reynold's number within a valid range.
+            Instructions for the simulation
           </p>
         </div>
       </div>
-    </div> -->
+    </div>
   </div>
 
-  <!--
-  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label"
-    aria-hidden="true">
+
+
+  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
 
         <div class="modal-header">
           <h5 class="modal-title" id="details-modal-label">Details</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
           </button>
         </div>
 
         <div class="modal-body">
+          <p>
+            Details about the simulation
+          </p>
+
+          <p>
+            $$ [1] \quad x + 1 = 5 $$
+          </p>
+
+          <p>
+            More details
+          </p>
+
+          <p>
+            $$ [2] \quad y + 2 = 10 $$
+          </p>
 
           <p>
             References:
@@ -125,11 +124,11 @@
           <p>
             <ol class="references">
               <li>
-                Reference
+                Ke, F., & Hoadley, C. (2009). Evaluating online learning communities. Educational Technology Research & Development, 57(4), 487-510
               </li>
 
               <li>
-                Reference 2
+                Smith, J. (2023, January 15). How to Cite a Website in APA Style. Example.com. <a href="https://www.example.com/how-to-cite-apa" target="_blank">https://www.example.com/how-to-cite-apa</a>
               </li>
             </ol>
           </p>
@@ -138,25 +137,25 @@
     </div>
   </div>
 
-  <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label"
-    aria-hidden="true">
+  <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="about-modal-label">About</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            
           </button>
         </div>
         <div class="modal-body">
           <p>
+            This template was created by Neil Hendren at the University of Colorado Boulder.
           </p>
         </div>
       </div>
     </div>
-  </div> -->
+  </div>
 
-  <script src="../js/main.js"></script>
+  <script type="module" src="../js/main.js"></script>
 </body>
 
 </html>

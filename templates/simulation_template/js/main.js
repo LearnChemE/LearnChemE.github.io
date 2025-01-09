@@ -1,8 +1,9 @@
-function setup() {
-  createCanvas(400, 400);
-  background(255);
+// Global variables
+window.g = {
+  selection: "Option 1",
+  density: 0.5,
+  particles: 50,
 }
 
-function draw() {
-  ellipse(mouseX, mouseY, 20, 20);
-}
+import "./controls.js";
+import "./draw.js";
