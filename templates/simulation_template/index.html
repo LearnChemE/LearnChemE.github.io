@@ -3,9 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulation Template</title>
 
-  <!-- MathJax -->
+  <!-- Update everything below THIS -->
+  <meta name="description" content="A simulation template for LearnChemE.com">
+  <meta name="keywords" content="simulation, engineering, interactive">
+  <meta name="author" content="Neil Hendren">
+
+  <title>Simulation Template</title>
+  <!-- and above THIS -->
+
+  <!-- MathJax Settings -->
   <script>
     MathJax = {
       chtml: {
@@ -43,6 +50,8 @@
 </head>
 
 <body>
+
+  <!-- The controls-area is at the top of the simulation, and contains all buttons, sliders, and dropdowns -->
   <div class="controls-area">
     <div class="inputs">
       <div class="input-area">
@@ -52,6 +61,11 @@
           <option value="b">Option 2</option>
           <option value="c">Option 3</option>
         </select>
+
+        <div class="play-pause-area">
+          <button class="btn-sm btn-success" id="play">&#9654;</button>
+          <button class="btn-sm btn-danger" id="pause"><div>&#8214;</div></button>
+        </div>
       </div>
 
       <div class="input-area">
@@ -69,27 +83,25 @@
     </div>
   </div>
 
-
-
+  <!--
+    Everything below here are modals, which are hidden by default. Any content
+    within the modals should be wrapped in a div with the class "modal-content".
+  -->
   <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="directions-modal-label">Directions</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-            
-          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <p>
-            Instructions for the simulation
+            Press buttons and move sliders to interact with the simulation. Read the HTML, CSS, and JavaScript code to learn how to create your own simulation.
           </p>
         </div>
       </div>
     </div>
   </div>
-
-
 
   <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
@@ -97,25 +109,24 @@
 
         <div class="modal-header">
           <h5 class="modal-title" id="details-modal-label">Details</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
         <div class="modal-body">
           <p>
-            Details about the simulation
+            The number of particles is equal to
           </p>
 
           <p>
-            $$ [1] \quad x + 1 = 5 $$
+            $$ [1] \quad n_{p} = 300 \rho $$
           </p>
 
           <p>
-            More details
+            Where \( \rho \) is the density of particles in kg/m<sup>3</sup>. A second example of an equation written in TeX is:
           </p>
 
           <p>
-            $$ [2] \quad y + 2 = 10 $$
+            $$ [2] \quad \int_{0}^{2} \frac{3x}{2} dx = \left. \frac{3}{4} x^{2} + C \> \right|_{x = 0}^{x = 2}\ = 3 + C $$
           </p>
 
           <p>
@@ -142,9 +153,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="about-modal-label">About</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-            
-          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <p>
