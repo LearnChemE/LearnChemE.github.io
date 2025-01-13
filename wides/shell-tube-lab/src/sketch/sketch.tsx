@@ -196,8 +196,8 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     p.background(250);
     // showDebugCoordinates(p);
 
-    p.image(graphics.pumpAssembly, 51, 455);
-    p.image(graphics.pumpAssembly, 600, 455);
+    p.image(graphics.pumpAssembly,  60, 455);
+    p.image(graphics.pumpAssembly, 430, 455);
 
     fillAnimation();
     drag(isDraggingValves);
@@ -226,8 +226,8 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     // prettier-ignore
     fillBeaker(p,  55, g.vols[0], g.orangeFluidColor);
     fillBeaker(p, 235, g.vols[1], g.orangeFluidColor);
-    fillBeaker(p, 415, g.vols[3], g.blueFluidColor);
-    fillBeaker(p, 595, g.vols[2], g.blueFluidColor);
+    fillBeaker(p, 415, g.vols[2], g.blueFluidColor);
+    fillBeaker(p, 595, g.vols[3], g.blueFluidColor);
     p.image(graphics.beakers, 0, 0);
   };
 
