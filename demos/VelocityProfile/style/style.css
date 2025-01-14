@@ -1,0 +1,118 @@
+.controls-area {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  width: 100%;
+  margin: auto;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.inputs {
+  display: grid;
+  gap: 3px;
+  width: max-content;
+  margin: 12px;
+  gap: 10px;
+  align-content: center;
+}
+
+.input-area {
+  display: grid;
+  grid-template-columns: max-content 15ch max-content max-content;
+  align-items: center;
+  justify-items: end;
+  gap: 0px 10px;
+}
+
+input[type="range"] {
+  transform: translateY(6px);
+}
+
+.play-pause-area {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  gap: 5px;
+  padding-left: 8px;
+}
+
+#pause {
+  width: 32px;
+  padding: 0;
+  margin-left: 5px;
+}
+
+#pause>div {
+  transform: scaleX(2);
+}
+
+select {
+  width: 100%;
+}
+
+mjx-container {
+  transform: translateX(20px);
+}
+
+.modal-buttons-row {
+  display: grid;
+  grid-template-columns: repeat(3, 10ch);
+  gap: 20px;
+  width: max-content;
+  margin: 0.5rem auto 0rem auto;
+}
+
+.modal-buttons-row>* {
+  height: max-content;
+  align-self: center;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+.modal.show {
+  padding-left: 0px !important;
+}
+
+.modal-body {
+  font-size: 0.8rem;
+}
+
+.modal-body>p {
+  font-size: 0.9rem;
+}
+
+.modal-body .modal-text {
+  max-width: 70ch;
+  text-align: justify;
+}
+
+.modal-body .modal-equation {
+  width: max-content;
+  margin-left: 15px;
+  padding: 2px;
+}
+
+.modal-text+.modal-text {
+  margin-top: 10px;
+}
+
+.modal-equation.no-padding {
+  padding: 0px;
+}
+
+main {
+  width: max-content;
+  margin: auto;
+}
+
+canvas {
+  outline: 1px solid black;
+  box-shadow: 0px 0px 2px black;
+}
+
+.references {
+  font-size: 0.8rem;
+}

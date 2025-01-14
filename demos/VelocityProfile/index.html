@@ -1,0 +1,170 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Update everything below THIS -->
+  <meta name="description" content="A simulation template for LearnChemE.com">
+  <meta name="keywords" content="simulation, engineering, interactive">
+  <meta name="author" content="Neil Hendren">
+
+  <title>Simulation Template</title>
+  <!-- and above THIS -->
+
+  <!-- MathJax Settings -->
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.95,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- p5.js -->
+  <script type="text/javascript" src="./js/p5.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="./style/style.css">
+  <link rel="stylesheet" href="./style/slider.css">
+
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="./style/bootstrap-custom.css">
+  <script src="./js/bootstrap.min.js"></script>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-204988035-3');
+  </script>
+</head>
+
+<body>
+
+  <!-- The controls-area is at the top of the simulation, and contains all buttons, sliders, and dropdowns -->
+  <div class="controls-area">
+    <div class="inputs">
+      <div class="input-area">
+        <div id="selection-row">Selection</div>
+        <select id="selection-slider">
+          <option value="a">Option 1</option>
+          <option value="b">Option 2</option>
+          <option value="c">Option 3</option>
+        </select>
+
+        <div class="play-pause-area">
+          <button class="btn-sm btn-success" id="play">&#9654;</button>
+          <button class="btn-sm btn-danger" id="pause"><div>&#8214;</div></button>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <div class="data-name">Density \(\rho\):</div>
+        <input type="range" id="density-slider" min="0" max="1" step="0.01" value="0.5">
+        <div class="data-value" id="density-value">0.50</div>
+        <div class="data-metric">kg/m<sup>3</sup></div>
+      </div>
+    </div>
+
+    <div class="modal-buttons-row">
+      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
+      <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
+      <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+    </div>
+  </div>
+
+  <!--
+    Everything below here are modals, which are hidden by default. Any content
+    within the modals should be wrapped in a div with the class "modal-content".
+  -->
+  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="directions-modal-label">Directions</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Press buttons and move sliders to interact with the simulation. Read the HTML, CSS, and JavaScript code to learn how to create your own simulation.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="details-modal-label">Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <p>
+            The number of particles is equal to
+          </p>
+
+          <p>
+            $$ [1] \quad n_{p} = 300 \rho $$
+          </p>
+
+          <p>
+            Where \( \rho \) is the density of particles in kg/m<sup>3</sup>. A second example of an equation written in TeX is:
+          </p>
+
+          <p>
+            $$ [2] \quad \int_{0}^{2} \frac{3x}{2} dx = \left. \frac{3}{4} x^{2} + C \> \right|_{x = 0}^{x = 2}\ = 3 + C $$
+          </p>
+
+          <p>
+            References:
+          </p>
+          <p>
+            <ol class="references">
+              <li>
+                Ke, F., & Hoadley, C. (2009). Evaluating online learning communities. Educational Technology Research & Development, 57(4), 487-510
+              </li>
+
+              <li>
+                Smith, J. (2023, January 15). How to Cite a Website in APA Style. Example.com. <a href="https://www.example.com/how-to-cite-apa" target="_blank">https://www.example.com/how-to-cite-apa</a>
+              </li>
+            </ol>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="about-modal-label">About</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This template was created by Neil Hendren at the University of Colorado Boulder.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+
+</html>
