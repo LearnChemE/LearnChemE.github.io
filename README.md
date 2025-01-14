@@ -26,4 +26,4 @@ This repository includes simulations created for https://www.learncheme.com/ to 
 
 `/website_resources/` contains an application that displays YouTube videos as a pop-up window to be viewed while using simulations.
 
-`/wides/` contains virtual laboratories currently in progress
+`/wides/` contains virtual laboratories currently in progress.
