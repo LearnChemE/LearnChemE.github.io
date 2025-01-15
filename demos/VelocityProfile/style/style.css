@@ -57,7 +57,7 @@ mjx-container {
 
 .modal-buttons-row {
   display: grid;
-  grid-template-columns: repeat(3, 10ch);
+  grid-template-columns: repeat(3, 12ch);
   gap: 20px;
   width: max-content;
   margin: 0.5rem auto 0rem auto;
