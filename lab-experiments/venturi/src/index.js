@@ -1,4 +1,5 @@
 import "bootstrap";
+import "./assets/venturi_meter_virtual_lab_worksheet.docx";
 import addEvents from "./js/events.js";
 import populate from "./js/populate.js";
 import "./style/style.scss";

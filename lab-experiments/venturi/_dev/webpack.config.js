@@ -5,6 +5,13 @@ const TerserPlugin = require("terser-webpack-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const module_rules = [{
+    test: /\.(docx|pdf)$/i,
+    loader: 'file-loader',
+    options: {
+      name: 'assets/[name].[ext]',
+    },
+  },
+  {
     test: /\.(sa|sc|c)ss$/,
     use: [
       MiniCssExtractPlugin.loader,
@@ -93,9 +100,9 @@ module.exports = (env, argv) => {
       chunkIds: 'total-size',
       removeAvailableModules: true,
     }
-  
+
   } else {
-    
+
     config.optimization = {
       minimize: false,
       moduleIds: 'named',
@@ -103,9 +110,9 @@ module.exports = (env, argv) => {
       removeAvailableModules: false,
       realContentHash: false,
     }
-    
+
     config.devtool = 'source-map';
- 
+
   };
 
   return config;
