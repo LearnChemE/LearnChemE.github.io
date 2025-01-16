@@ -33,41 +33,20 @@
 
 <body>
 
-  <div class="simulation-controls">
-    <div class="input-area">
-
-      <div class="input-row" style="display: none;">
-        <div class="data-name">choke diameter</div>
-        <input type="range" id="inner-diameter-slider" min="9.1" max="15" step="0.1" value="10.0">
-        <div class="data-value" id="inner-diameter-value">12.5</div>
-        <div class="data-metric">mm</div>
+  <div id="root">
+    <div id="graphics-container">
+      <div id="hamburger">
+        <div id="hamburger-icon"></div>
+        <div id="controls">
+          <div id="buttons">
+            <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
+            <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+            <a href="" class="btn btn-primary" id="worksheet" download>Worksheet</a>
+          </div>
+        </div>
       </div>
-
-      <div class="input-row">
-        <div class="data-name">valve position</div>
-        <input type="range" id="v-slider" min="0" max="17.5" step="0.01" value="8.75">
-        <div class="data-value" id="v-value">50</div>
-        <div class="data-metric">% open</div>
-      </div>
-
-      <div class="checkbox-container">
-        <div class="checkbox-label">include fluid friction</div>
-        <input type="checkbox" id="include-friction" checked />
-        <div class="checkbox-label">show volumetric flow rate</div>
-        <input type="checkbox" id="show-flow-rate" />
-      </div>
-
     </div>
-
-    <div class="modal-buttons-row">
-      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
-      <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
-      <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
-    </div>
-
   </div>
-
-  <div id="p5-container"></div>
 
   <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
@@ -85,73 +64,6 @@
             rate through the venturi meter. Click on the "show volumetric flow rate" box to display or hide the volumetric flow rate. Click on the "include fluid friction" box to introduce or remove friction in the pipe.
           </p>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-
-        <div class="modal-header">
-          <h5 class="modal-title" id="details-modal-label">Details</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true"></span>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <div class="details-text">
-            Venturi meters can be used to calculate liquid flow rate using the Bernoulli equation:
-          </div>
-
-          <div class="details-eqn">
-            $$ [1] \quad \frac{1}{2} \rho v_{1}^{2} + \rho g z_{1} + p_{1} = \frac{1}{2} \rho v_{2}^{2} + \rho g z_{2} + p_{2} $$
-          </div>
-
-          <div class="details-text">
-            where \( \rho \) is the density of the liquid, \( g \) is the acceleration due to gravity, \( v_{1} \) and \( v_{2} \) are the velocities of the liquid at the inlet and choke point, \( z_{1} \) and \( z_{2} \) are the heights of the liquid at the inlet
-            and choke point, and \( p_{1} \) and \( p_{2} \) are the pressures at the inlet and choke point. Since the height of the liquid doesn't change, equation [1] can be simplified:
-          </div>
-
-          <div class="details-eqn">
-            $$ [2] \quad \frac{1}{2} \rho v_{1}^{2} + p_{1} = \frac{1}{2} \rho v_{2}^{2} + p_{2} $$
-          </div>
-
-          <div class="details-text">
-            Volumetric flow rate \( \dot{V} \) can be calculated from the velocity and pipe diameter:
-          </div>
-
-          <div class="details-eqn">
-            $$ [3] \quad \dot{V} = \frac{1}{4} \pi D^{2} v_{1} = \frac{1}{4} \pi d^{2} v_{2} $$
-          </div>
-
-          <div class="details-text">
-            where \( D \) is the diameter of the pipe at the inlet, and \( d \) is the diameter of the pipe at the choke point. Combining equations [2] and [3], we can calculate volumetric flow rate using the pressures read from the manometers:
-          </div>
-
-          <div class="details-eqn">
-            $$ [4] \quad \dot{V} = \frac{\pi d^{2}}{4 \sqrt{1 - (d/D)^{4}}} \sqrt{\frac{2(p_{1} - p_{2})}{\rho}} $$
-          </div>
-
-          <div class="details-text">
-            When fluid friction is included, head loss across the venturi meter is equal to
-          </div>
-
-          <div class="details-eqn">
-            $$ [5] \quad \Delta h_{f} = K \frac{v_{2}^{2}}{2g} + f \frac{v_{1}^{2} L_{c}}{2 D} $$
-          </div>
-
-          <div class="details-text">
-            where \( K \) is the minor loss coefficient (0.5 in this simulation), \( f \) is the Darcy friction factor and \( L_{c} \) is the length of the choke. The Darcy friction factor can be approximated using the Swamee-Jain equation:
-          </div>
-
-          <div class="details-eqn">
-            $$ [6] \quad f = \frac{0.25}{\left[ \log_{10} \left( \frac{\epsilon}{3.7 D} + \frac{5.74}{Re^{0.9}} \right) \right]^{2}} $$
-          </div>
-          <div style="margin-top: 2rem;"></div>
-        </div>
-
       </div>
     </div>
   </div>

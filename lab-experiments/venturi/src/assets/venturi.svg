@@ -13,15 +13,15 @@
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
      showgrid="false"
-     inkscape:current-layer="canvas"
+     inkscape:current-layer="apparatus"
      inkscape:window-maximized="0"
      inkscape:window-y="25"
      inkscape:window-x="0"
      inkscape:window-height="847"
      inkscape:window-width="1440"
-     inkscape:cy="231.06941"
-     inkscape:cx="312.58013"
-     inkscape:zoom="2.0426762"
+     inkscape:cy="92.24486"
+     inkscape:cx="267.86488"
+     inkscape:zoom="2.5367267"
      inkscape:document-units="mm"
      inkscape:deskcolor="#d1d1d1"
      inkscape:pagecheckerboard="0"
@@ -45,18 +45,8 @@
   </filter>
   <g
      transform="translate(-17.48816,-91.394298)"
-     inkscape:label="apparatus"
-     id="apparatus">
-    <path
-       sodipodi:nodetypes="cc"
-       id="bubble-path"
-       d="m 121.028,162.77719 78.84793,0.12903"
-       style="opacity:0;fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:1.66398;stroke-miterlimit:4;stroke-dasharray:3.32794, 9.9838, 1.6642, 18.676, 2.86612, 1.94156;stroke-dashoffset:0;stroke-opacity:1" />
-    <path
-       style="opacity:0;fill:none;fill-opacity:1;stroke:#ff9696;stroke-width:1.66398;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 120.1126,162.84151 79.89302,0.0892"
-       id="bubble-cover-path"
-       sodipodi:nodetypes="cc" />
+     inkscape:label="pump-valve"
+     id="pump-valve">
     <path
        id="intake-liquid"
        d="M 56.440232,203.9061 V 169.9198"
@@ -171,13 +161,8 @@
          id="valve-rect"
          style="fill:#c8c8ff;fill-opacity:1;stroke:#000000;stroke-width:0.124865;stroke-dasharray:none;stroke-opacity:0.5" />
     </g>
-    <path
-       id="apparatus-left-leg"
-       d="m 110,176.67268 v 38.88286 h -10 v 2 h 22 v -2 h -10 v -38.93048"
-       style="fill:#c8c8c8;fill-opacity:1;stroke:#000000;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
-       sodipodi:nodetypes="cccccccc" />
     <g
-       id="g102"
+       id="closed-open-label"
        transform="translate(0,42.193984)">
       <path
          style="fill:none;stroke:#000000;stroke-width:0.216317;stroke-dasharray:none;stroke-opacity:1"
@@ -248,26 +233,115 @@
            x="67.582664"
            y="115.38159">open</tspan></text>
     </g>
-    <g
-       transform="matrix(0.92455463,0,0,0.92455463,-10.604933,161.18772)"
-       id="pinch-label" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:1.52624px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.381559"
-       x="45.96286"
-       y="187.68094"
-       id="text1"><tspan
-         sodipodi:role="line"
-         id="tspan1"
-         style="font-size:1.52624px;stroke-width:0.381559"
-         x="45.96286"
-         y="187.68094">(mL)</tspan></text>
+  </g>
+  <g
+     id="apparatus">
+    <path
+       id="apparatus-left-leg"
+       d="m 90.602716,74.511508 v 49.704372 h -10 v 2 h 22.000004 v -2 H 92.602716 V 74.544848"
+       style="fill:#c8c8c8;fill-opacity:1;stroke:#000000;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
+       sodipodi:nodetypes="cccccccc" />
+    <path
+       id="apparatus-right-leg"
+       d="m 146.15139,74.520588 v 49.704372 h -10 v 2 h 22 v -2 h -10 V 74.553928"
+       style="fill:#c8c8c8;fill-opacity:1;stroke:#000000;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:1"
+       sodipodi:nodetypes="cccccccc" />
+    <rect
+       style="fill:#c8c8c8;fill-opacity:0.4;stroke-width:0.193577;stroke-opacity:0.5"
+       id="manometer-shell-1"
+       width="3.0570033"
+       height="50.010391"
+       x="95.969757"
+       y="18.098057" />
+    <rect
+       style="fill:#c8c8c8;fill-opacity:0.4;stroke-width:0.193556;stroke-opacity:0.5"
+       id="manometer-shell-5"
+       width="3.0570033"
+       height="49.999435"
+       x="137.95203"
+       y="18.105032" />
+    <path
+       style="fill:none;fill-opacity:0.4;stroke:#ff9696;stroke-width:4.61476;stroke-dasharray:none;stroke-opacity:1"
+       d="m 53.8,71.280702 h 120 c 13.61907,0 16.40671,6.363644 16.40671,10.209566 0,6.315249 -0.48181,13.223956 -0.48181,13.223956 -1.11424,9.294936 -10.60455,9.121606 -10.60455,9.121606 -24.63712,1.11424 -64.79708,4.62054 -83.432074,-2.12161 C 84.669665,97.381068 75.799208,89.421393 65.997209,86.378838 57.570201,84.008564 53.141476,84.309661 50.744224,84.672082 c 0,0 -5.434059,0.348842 -4.938841,4.434395 -0.03442,6.218065 -0.03836,9.034056 -0.03836,9.034056"
+       id="tube-liquid"
+       sodipodi:nodetypes="cccccccccc" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.144211;stroke-dasharray:none;stroke-opacity:0.5"
+       d="m 105.9519,68.531179 9.97149,2.194495 h 5.05623 l 10.04421,-2.211131 v -0.668976 h -25.08662 z"
+       id="hide-tube-liquid-top" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.144211;stroke-dasharray:none;stroke-opacity:0.5"
+       d="m 105.9519,74.076774 9.97149,-2.194495 h 5.05623 l 10.04421,2.211131 v 0.668976 h -25.08662 z"
+       id="hide-tube-liquid-bottom" />
+    <rect
+       style="fill:#c8c8c8;fill-opacity:0.4;stroke-width:0.19776;stroke-opacity:0.5"
+       id="manometer-shell-3"
+       width="3.0570033"
+       height="52.194546"
+       x="116.96901"
+       y="18.086376" />
+    <path
+       style="fill:#c8c8c8;fill-opacity:0.4;stroke-width:0.144211;stroke-opacity:0.5"
+       d="m 109.47505,18.100484 h 3.01198 l 0.01,51.408616 -3.01199,-0.657678 z"
+       id="manometer-shell-2" />
+    <path
+       style="fill:#c8c8c8;fill-opacity:0.4;stroke-width:0.144211;stroke-opacity:0.5"
+       d="m 124.47451,18.097358 h 3.00344 l 0.0192,50.74169 -3.03222,0.6621 z"
+       id="manometer-shell-4" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.144211;stroke-dasharray:none"
+       d="m 72,68.105702 h 24 v -50 h 3 v 50 h 7 l 3.5,0.756 v -50.756 h 3 v 51.404 l 3.5,0.756 h 1 v -52.16 h 3 v 52.16 h 1 l 3.5,-0.756 v -51.404 h 3 v 50.756 l 3.5,-0.756 h 7 v -50 h 3 v 50 h 24"
+       id="venturi-outline-top" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.144211;stroke-dasharray:none"
+       d="m 72,74.455702 h 34 l 10,-2.16 h 5 l 10,2.16 h 34"
+       id="venturi-outline-bottom" />
+    <path
+       style="fill:#c8c8c8;fill-opacity:0.4;stroke:#000000;stroke-width:0.144211;stroke-dasharray:none"
+       d="m 72,74.455702 h 34 l 10,-2.16 h 5 l 10,2.16 h 34 v -6.35 h -34 l -10,2.16 h -5 l -10,-2.16 H 72"
+       id="venturi-shell" />
+    <path
+       style="fill:#c8c8c8;fill-opacity:0.2;stroke:#000000;stroke-width:0.144211;stroke-dasharray:none;stroke-opacity:0.5"
+       d="m 163.57871,67.047661 h 2.03504 l 0.91563,0.528638 h 7.95135 c 2.66008,0.0475 5.84581,0.448998 7.41336,0.87651 1.52004,0.33251 4.24729,1.401985 5.47524,2.035042 2.42346,1.442538 4.55462,3.924728 4.55462,3.924728 1.18288,1.557941 1.79278,4.021633 1.79278,4.021633 0.31736,2.019553 0.14536,5.57214 0.14536,5.57214 0.0289,1.615642 -0.49489,10.550974 -0.58144,11.5319 -0.20196,1.702186 -0.82371,3.149462 -0.82371,3.149462 -0.66357,1.644486 -1.23536,2.825076 -1.84123,3.488646 -0.75012,0.92322 -2.42267,2.32576 -2.42267,2.32576 -1.38484,1.00978 -2.70153,1.62078 -3.68246,1.93814 -1.55794,0.49046 -3.97318,0.7268 -3.97318,0.7268 -1.26943,0.1154 -10.90281,0.43768 -10.90281,0.43768 0,0 -11.75186,0.62114 -21.70073,0.97788 -7.63445,0.34478 -17.38996,0.24788 -17.38996,0.24788 -6.91549,0.0204 -12.19256,-0.25452 -15.36614,-0.48533 -4.65264,-0.41937 -8.71408,-0.77303 -12.26272,-1.46402 -5.249089,-1.09112 -8.315059,-2.23962 -11.231576,-3.49666 -2.551571,-0.72719 -6.114794,-2.95061 -10.011493,-5.214421 -4.197934,-2.481813 -7.209714,-4.137277 -9.038495,-5.427114 -3.504591,-1.71953 -2.339655,-1.307674 -5.948469,-2.899406 -5.537262,-1.915212 -9.349878,-2.35548 -11.168519,-2.446066 -3.022983,0.01368 -4.71257,0.390116 -5.514391,0.477511 -0.75012,0.08655 -1.064948,0.404967 -1.136191,0.583075 -0.124676,0.249351 -0.09231,0.978608 -0.09231,0.978608 l -0.05888,9.251204 -5.882492,-0.05938 c -0.07236,-3.839518 -0.117028,-10.997563 -0.0045,-11.518778 0.522127,-3.041002 3.442326,-6.301416 11.736489,-6.074094 4.966783,0.009 10.086502,1.604872 10.086502,1.604872 0,0 7.254175,1.794601 11.725589,4.731052 l 8.199586,5.016297 c 4.977882,2.865198 4.511499,2.865008 12.863926,6.542133 1.413687,0.432758 6.287046,1.685807 6.287046,1.685807 5.94728,0.82402 10.4311,1.28584 15.72268,1.53223 l 16.07465,0.15724 c 4.70267,0.14425 16.10482,-0.41082 16.10482,-0.41082 4.84693,-0.0289 11.5502,-0.46864 11.5502,-0.46864 l 11.0108,-0.60608 c 1.70219,-0.0577 3.31737,0.037 4.99071,-0.19381 1.29828,-0.0866 2.15708,-0.31365 2.9072,-0.775258 0.95207,-0.51931 2.13195,-1.453596 2.13195,-1.453596 0.60587,-0.43276 1.21133,-1.453596 1.21133,-1.453596 0.37506,-0.63471 0.6299,-1.889676 0.6299,-1.889676 l 0.29072,-1.598966 c 0.25966,-1.29828 0.54223,-9.966924 0.48453,-11.871074 -0.0866,-0.721269 -0.19492,-1.580467 -0.19492,-1.580467 -0.14425,-0.952075 -1.21023,-1.908178 -1.21023,-1.908178 0,0 -0.98606,-1.117746 -1.93813,-1.550507 -1.44254,-0.721269 -2.85875,-1.065977 -2.85875,-1.065977 -1.44254,-0.432762 -2.1212,-0.6691 -3.24638,-0.726801 -2.10611,-0.115403 -4.84564,-0.04756 -4.84564,-0.04756 l -6.15269,0.02407 -0.90411,0.691162 -1.90678,-0.02286 z"
+       id="outlet-hose"
+       sodipodi:nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" />
+    <path
+       style="fill:none;stroke:#dfadab;stroke-width:2.01896;stroke-dasharray:none;stroke-opacity:1"
+       d="M 97.506569,18.243733 V 71.539004"
+       id="manometer-liquid-1" />
+    <path
+       style="fill:none;stroke:#dfadab;stroke-width:2.01896;stroke-dasharray:none;stroke-opacity:1"
+       d="M 111.00754,18.243733 V 71.539004"
+       id="manometer-liquid-2" />
+    <path
+       style="fill:none;stroke:#dfadab;stroke-width:2.01896;stroke-dasharray:none;stroke-opacity:1"
+       d="M 118.50756,18.243733 V 71.539004"
+       id="manometer-liquid-3" />
+    <path
+       style="fill:none;stroke:#dfadab;stroke-width:2.01896;stroke-dasharray:none;stroke-opacity:1"
+       d="M 125.98151,18.243733 V 71.539004"
+       id="manometer-liquid-4" />
+    <path
+       style="fill:none;stroke:#dfadab;stroke-width:2.01896;stroke-dasharray:none;stroke-opacity:1"
+       d="M 139.48249,18.243733 V 71.539004"
+       id="manometer-liquid-5" />
   </g>
   <g
      transform="translate(-60.814739,-114.73977)"
      id="source-beaker"
      inkscape:groupmode="layer"
      inkscape:label="Source Beaker">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:1.52624px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.381559"
+       x="89.237968"
+       y="211.20329"
+       id="mL-label"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="font-size:1.52624px;stroke-width:0.381559"
+         x="89.237968"
+         y="211.20329">(mL)</tspan></text>
     <rect
        y="212.8763"
        x="88.286087"
@@ -386,11 +460,6 @@
          id="tspan2-7-1-2-1"
          sodipodi:role="line">200</tspan></text>
   </g>
-  <g
-     transform="translate(-60.814739,-114.73977)"
-     id="waste-beaker"
-     inkscape:groupmode="layer"
-     inkscape:label="Waste Beaker" />
   <g
      transform="translate(14.551079,51.248865)"
      id="table">
@@ -988,34 +1057,4 @@
          id="tspan101"
          sodipodi:role="line">cm</tspan></text>
   </g>
-  <path
-     style="fill:none;fill-opacity:0.4;stroke:#ff9696;stroke-width:4.61476;stroke-dasharray:none;stroke-opacity:1"
-     d="m 53.8,71.280702 h 120 c 13.61907,0 16.40671,6.363644 16.40671,10.209566 0,6.315249 -0.48181,13.223956 -0.48181,13.223956 -1.11424,9.294936 -10.60455,9.121606 -10.60455,9.121606 -24.63712,1.11424 -64.79708,4.62054 -83.432074,-2.12161 C 84.669665,97.381068 75.799208,89.421393 65.997209,86.378838 57.570201,84.008564 53.141476,84.309661 50.744224,84.672082 c 0,0 -5.434059,0.348842 -4.938841,4.434395 -0.03442,6.218065 -0.03836,9.034056 -0.03836,9.034056"
-     id="path85"
-     sodipodi:nodetypes="cccccccccc" />
-  <path
-     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.144211;stroke-dasharray:none;stroke-opacity:0.5"
-     d="m 105.9519,68.531179 9.97149,2.194495 h 5.05623 l 10.04421,-2.211131 v -0.668976 h -25.08662 z"
-     id="path87" />
-  <path
-     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.144211;stroke-dasharray:none;stroke-opacity:0.5"
-     d="m 105.9519,74.076774 9.97149,-2.194495 h 5.05623 l 10.04421,2.211131 v 0.668976 h -25.08662 z"
-     id="path88" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.144211;stroke-dasharray:none"
-     d="m 72,68.105702 h 34 l 10,2.16 h 5 l 10,-2.16 h 34"
-     id="path82" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.144211;stroke-dasharray:none"
-     d="m 72,74.455702 h 34 l 10,-2.16 h 5 l 10,2.16 h 34"
-     id="path83" />
-  <path
-     style="fill:#c8c8c8;fill-opacity:0.4;stroke:#000000;stroke-width:0.144211;stroke-dasharray:none"
-     d="m 72,74.455702 h 34 l 10,-2.16 h 5 l 10,2.16 h 34 v -6.35 h -34 l -10,2.16 h -5 l -10,-2.16 H 72"
-     id="path84" />
-  <path
-     style="fill:#c8c8c8;fill-opacity:0.2;stroke:#000000;stroke-width:0.144211;stroke-dasharray:none;stroke-opacity:0.5"
-     d="m 163.57871,67.047661 h 2.03504 l 0.91563,0.528638 h 7.95135 c 2.66008,0.0475 5.84581,0.448998 7.41336,0.87651 1.52004,0.33251 4.24729,1.401985 5.47524,2.035042 2.42346,1.442538 4.55462,3.924728 4.55462,3.924728 1.18288,1.557941 1.79278,4.021633 1.79278,4.021633 0.31736,2.019553 0.14536,5.57214 0.14536,5.57214 0.0289,1.615642 -0.49489,10.550974 -0.58144,11.5319 -0.20196,1.702186 -0.82371,3.149462 -0.82371,3.149462 -0.66357,1.644486 -1.23536,2.825076 -1.84123,3.488646 -0.75012,0.92322 -2.42267,2.32576 -2.42267,2.32576 -1.38484,1.00978 -2.70153,1.62078 -3.68246,1.93814 -1.55794,0.49046 -3.97318,0.7268 -3.97318,0.7268 -1.26943,0.1154 -10.90281,0.43768 -10.90281,0.43768 0,0 -11.75186,0.62114 -21.70073,0.97788 -7.63445,0.34478 -17.38996,0.24788 -17.38996,0.24788 -6.91549,0.0204 -12.19256,-0.25452 -15.36614,-0.48533 -4.65264,-0.41937 -8.71408,-0.77303 -12.26272,-1.46402 -5.249089,-1.09112 -8.315059,-2.23962 -11.231576,-3.49666 -2.551571,-0.72719 -6.114794,-2.95061 -10.011493,-5.214421 -4.197934,-2.481813 -7.209714,-4.137277 -9.038495,-5.427114 -3.504591,-1.71953 -2.339655,-1.307674 -5.948469,-2.899406 -5.537262,-1.915212 -9.349878,-2.35548 -11.168519,-2.446066 -3.022983,0.01368 -4.71257,0.390116 -5.514391,0.477511 -0.75012,0.08655 -1.064948,0.404967 -1.136191,0.583075 -0.124676,0.249351 -0.09231,0.978608 -0.09231,0.978608 l -0.05888,9.251204 -5.882492,-0.05938 c -0.07236,-3.839518 -0.117028,-10.997563 -0.0045,-11.518778 0.522127,-3.041002 3.442326,-6.301416 11.736489,-6.074094 4.966783,0.009 10.086502,1.604872 10.086502,1.604872 0,0 7.254175,1.794601 11.725589,4.731052 l 8.199586,5.016297 c 4.977882,2.865198 4.511499,2.865008 12.863926,6.542133 1.413687,0.432758 6.287046,1.685807 6.287046,1.685807 5.94728,0.82402 10.4311,1.28584 15.72268,1.53223 l 16.07465,0.15724 c 4.70267,0.14425 16.10482,-0.41082 16.10482,-0.41082 4.84693,-0.0289 11.5502,-0.46864 11.5502,-0.46864 l 11.0108,-0.60608 c 1.70219,-0.0577 3.31737,0.037 4.99071,-0.19381 1.29828,-0.0866 2.15708,-0.31365 2.9072,-0.775258 0.95207,-0.51931 2.13195,-1.453596 2.13195,-1.453596 0.60587,-0.43276 1.21133,-1.453596 1.21133,-1.453596 0.37506,-0.63471 0.6299,-1.889676 0.6299,-1.889676 l 0.29072,-1.598966 c 0.25966,-1.29828 0.54223,-9.966924 0.48453,-11.871074 -0.0866,-0.721269 -0.19492,-1.580467 -0.19492,-1.580467 -0.14425,-0.952075 -1.21023,-1.908178 -1.21023,-1.908178 0,0 -0.98606,-1.117746 -1.93813,-1.550507 -1.44254,-0.721269 -2.85875,-1.065977 -2.85875,-1.065977 -1.44254,-0.432762 -2.1212,-0.6691 -3.24638,-0.726801 -2.10611,-0.115403 -4.84564,-0.04756 -4.84564,-0.04756 l -6.15269,0.02407 -0.90411,0.691162 -1.90678,-0.02286 z"
-     id="path86"
-     sodipodi:nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" />
 </svg>
