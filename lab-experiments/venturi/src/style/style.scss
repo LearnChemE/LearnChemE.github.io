@@ -14,7 +14,7 @@ $modal-xl: 1140px;
   width: min-content;
   &>svg {
     width: calc(100vw - 40px);
-    max-width: calc(100vh * 158 / 108);
+    max-width: calc(calc(100vh - 30px) * 228.293 / 199.29282);
     height: 100%;
     max-height: calc(100vh - 30px);
     &>* {
