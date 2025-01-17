@@ -19,17 +19,17 @@ function drawAll(p) {
   let coord2 = mmToPix(-72, -1 * gvs.manometer_1_pressure);
   p.rect(coord1[0], coord1[1], coord2[0], coord2[1]);
 
-  coord1 = mmToPix(-33, 0);
-  coord2 = mmToPix(-27, -1 * gvs.manometer_2_pressure);
-  p.rect(coord1[0], coord1[1], coord2[0], coord2[1]);
+  // coord1 = mmToPix(-33, 0);
+  // coord2 = mmToPix(-27, -1 * gvs.manometer_2_pressure);
+  // p.rect(coord1[0], coord1[1], coord2[0], coord2[1]);
 
   coord1 = mmToPix(-3, 0);
   coord2 = mmToPix(3, -1 * gvs.manometer_3_pressure);
   p.rect(coord1[0], coord1[1], coord2[0], coord2[1]);
 
-  coord1 = mmToPix(27, 0);
-  coord2 = mmToPix(33, -1 * gvs.manometer_4_pressure);
-  p.rect(coord1[0], coord1[1], coord2[0], coord2[1]);
+  // coord1 = mmToPix(27, 0);
+  // coord2 = mmToPix(33, -1 * gvs.manometer_4_pressure);
+  // p.rect(coord1[0], coord1[1], coord2[0], coord2[1]);
 
   coord1 = mmToPix(72, 0);
   coord2 = mmToPix(78, -1 * gvs.manometer_5_pressure);
@@ -41,17 +41,17 @@ function drawAll(p) {
   coord2 = mmToPix(-72, -1 * gvs.manometer_1_pressure);
   p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
-  coord1 = mmToPix(-33, -1 * gvs.manometer_2_pressure);
-  coord2 = mmToPix(-27, -1 * gvs.manometer_2_pressure);
-  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  // coord1 = mmToPix(-33, -1 * gvs.manometer_2_pressure);
+  // coord2 = mmToPix(-27, -1 * gvs.manometer_2_pressure);
+  // p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
   coord1 = mmToPix(-3, -1 * gvs.manometer_3_pressure);
   coord2 = mmToPix(3, -1 * gvs.manometer_3_pressure);
   p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
-  coord1 = mmToPix(27, -1 * gvs.manometer_4_pressure);
-  coord2 = mmToPix(33, -1 * gvs.manometer_4_pressure);
-  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  // coord1 = mmToPix(27, -1 * gvs.manometer_4_pressure);
+  // coord2 = mmToPix(33, -1 * gvs.manometer_4_pressure);
+  // p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
   coord1 = mmToPix(78, -1 * gvs.manometer_5_pressure);
   coord2 = mmToPix(72, -1 * gvs.manometer_5_pressure);
@@ -96,10 +96,6 @@ function drawAll(p) {
   p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
   coord1 = mmToPix(-50, -1 * gvs.outer_diameter / 2);
-  coord2 = mmToPix(-33, (25 / 40) * -1 * gvs.outer_diameter / 2 + (15 / 40) * -1 * gvs.inner_diameter / 2);
-  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
-
-  coord1 = mmToPix(-27, (15 / 40) * -1 * gvs.outer_diameter / 2 + (25 / 40) * -1 * gvs.inner_diameter / 2);
   coord2 = mmToPix(-10, -1 * gvs.inner_diameter / 2);
   p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
@@ -112,10 +108,6 @@ function drawAll(p) {
   p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
   coord1 = mmToPix(10, -1 * gvs.inner_diameter / 2);
-  coord2 = mmToPix(27, (15 / 40) * -1 * gvs.outer_diameter / 2 + (25 / 40) * -1 * gvs.inner_diameter / 2);
-  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
-
-  coord1 = mmToPix(33, (25 / 40) * -1 * gvs.outer_diameter / 2 + (15 / 40) * -1 * gvs.inner_diameter / 2);
   coord2 = mmToPix(50, -1 * gvs.outer_diameter / 2);
   p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
@@ -157,13 +149,13 @@ function drawAll(p) {
   coord2 = mmToPix(-72, -1 * gvs.outer_diameter / 2 - 130);
   p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
-  coord1 = mmToPix(-33, (25 / 40) * -1 * gvs.outer_diameter / 2 + (15 / 40) * -1 * gvs.inner_diameter / 2);
-  coord2 = mmToPix(-33, -1 * gvs.outer_diameter / 2 - 130);
-  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  // coord1 = mmToPix(-33, (25 / 40) * -1 * gvs.outer_diameter / 2 + (15 / 40) * -1 * gvs.inner_diameter / 2);
+  // coord2 = mmToPix(-33, -1 * gvs.outer_diameter / 2 - 130);
+  // p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
-  coord1 = mmToPix(-27, (15 / 40) * -1 * gvs.outer_diameter / 2 + (25 / 40) * -1 * gvs.inner_diameter / 2);
-  coord2 = mmToPix(-27, -1 * gvs.outer_diameter / 2 - 130);
-  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  // coord1 = mmToPix(-27, (15 / 40) * -1 * gvs.outer_diameter / 2 + (25 / 40) * -1 * gvs.inner_diameter / 2);
+  // coord2 = mmToPix(-27, -1 * gvs.outer_diameter / 2 - 130);
+  // p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
   coord1 = mmToPix(-3, -1 * gvs.inner_diameter / 2);
   coord2 = mmToPix(-3, -1 * gvs.outer_diameter / 2 - 130);
@@ -173,13 +165,13 @@ function drawAll(p) {
   coord2 = mmToPix(3, -1 * gvs.outer_diameter / 2 - 130);
   p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
-  coord1 = mmToPix(27, (15 / 40) * -1 * gvs.outer_diameter / 2 + (25 / 40) * -1 * gvs.inner_diameter / 2);
-  coord2 = mmToPix(27, -1 * gvs.outer_diameter / 2 - 130);
-  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  // coord1 = mmToPix(27, (15 / 40) * -1 * gvs.outer_diameter / 2 + (25 / 40) * -1 * gvs.inner_diameter / 2);
+  // coord2 = mmToPix(27, -1 * gvs.outer_diameter / 2 - 130);
+  // p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
-  coord1 = mmToPix(33, (25 / 40) * -1 * gvs.outer_diameter / 2 + (15 / 40) * -1 * gvs.inner_diameter / 2);
-  coord2 = mmToPix(33, -1 * gvs.outer_diameter / 2 - 130);
-  p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
+  // coord1 = mmToPix(33, (25 / 40) * -1 * gvs.outer_diameter / 2 + (15 / 40) * -1 * gvs.inner_diameter / 2);
+  // coord2 = mmToPix(33, -1 * gvs.outer_diameter / 2 - 130);
+  // p.line(coord1[0], coord1[1], coord2[0], coord2[1]);
 
   coord1 = mmToPix(78, -1 * gvs.outer_diameter / 2);
   coord2 = mmToPix(78, -1 * gvs.outer_diameter / 2 - 130);
@@ -377,9 +369,9 @@ function drawAll(p) {
   p.textSize(16);
   p.textAlign(p.CENTER);
   p.text(`${Math.round(gvs.manometer_1_pressure)} mm`, 197, 50);
-  p.text(`${Math.round(gvs.manometer_2_pressure)}`, 319, 50);
+  // p.text(`${Math.round(gvs.manometer_2_pressure)}`, 319, 50);
   p.text(`${Math.round(gvs.manometer_3_pressure)}`, 397, 50);
-  p.text(`${Math.round(gvs.manometer_4_pressure)}`, 479, 50);
+  // p.text(`${Math.round(gvs.manometer_4_pressure)}`, 479, 50);
   p.text(`${Math.round(gvs.manometer_5_pressure)}`, 597, 50);
   p.pop();
 }
