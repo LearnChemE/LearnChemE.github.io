@@ -1,7 +1,5 @@
 $modal-md: 800px;
-
 @import "bootstrap/scss/bootstrap.scss";
-
 #graphics-container {
   position: relative;
   margin: auto;
@@ -11,14 +9,12 @@ $modal-md: 800px;
   border-radius: 5px;
   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
   width: min-content;
-
-  & > svg {
+  &>svg {
     width: calc(100vw - 40px);
-    max-width: calc(100vh * 158 / 108);
+    max-width: calc(calc(100vh - 30px) * 158 / 108);
     height: 100%;
     max-height: calc(100vh - 30px);
-
-    & > * {
+    &>* {
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       -khtml-user-select: none;
@@ -114,7 +110,7 @@ iframe {
   background-color: rgb(217, 239, 246);
 }
 
-#hamburger-icon > svg {
+#hamburger-icon>svg {
   width: 30px;
   height: 30px;
 }
@@ -131,8 +127,7 @@ iframe {
   border: 1px solid black;
   border-radius: 5px;
   padding: 12px;
-
-  & > .btn {
+  &>.btn {
     width: 100px;
   }
 }
@@ -142,22 +137,18 @@ iframe {
   #tilt {
     font-size: 0.8rem;
   }
-
   #hamburger-icon {
     padding: 3px;
     height: 28px;
   }
-
-  #hamburger-icon > svg {
+  #hamburger-icon>svg {
     width: 20px;
     height: 20px;
   }
-
   #buttons {
     top: 20px;
     padding: 10px;
-
-    & > .btn {
+    &>.btn {
       width: 80px;
       font-size: 0.7rem;
     }
@@ -171,20 +162,16 @@ iframe {
     padding: 4px 12px;
     width: 70px;
   }
-
   #tilt {
     transform: translate(-30%, calc(40% + 50px));
   }
-
   #hamburger-icon {
     padding: 6px;
   }
-
-  #hamburger-icon > svg {
+  #hamburger-icon>svg {
     width: 32px;
     height: 32px;
   }
-
   #buttons {
     top: 35px;
     padding: 15px;
