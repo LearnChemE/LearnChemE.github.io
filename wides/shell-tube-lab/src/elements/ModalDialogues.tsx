@@ -20,7 +20,7 @@ export const DirectionsModalDialogue = () => {
               <p>
                 This digital lab, which represents a double pipe heat exchanger
                 with countercurrent flow, is designed to be used with this{" "}
-                <a href="./Shell-and-Tube-Worksheet-2022.pdf" download>
+                <a href="./Shell-and-Tube-Worksheet-2025.pdf" download>
                   worksheet
                 </a>
                 . Drag the valves on each inlet beaker to set flowrates, and
@@ -46,7 +46,7 @@ export const DirectionsModalDialogue = () => {
       case WORKSHEET:
         innerHtml = (
           <embed
-            src="./Shell-and-Tube-Worksheet-2022.pdf"
+            src="./Shell-and-Tube-Worksheet-2025.pdf"
             width="100%"
             height="800px"
           />
