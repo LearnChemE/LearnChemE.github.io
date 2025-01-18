@@ -143,7 +143,7 @@ function App() {
         </div>
         <div className="nav-bar">
           <div id="nav-bar-left">
-            <a href="./ME_DoublePipe-Worksheet_2020-2021_Final.pdf" download>
+            <a href="./DoublePipe-Worksheet_2025.docx" download>
               <button className="btn btn-primary">
                 <div>
                   <i className="fa-solid fa-download"></i>&nbsp;worksheet
@@ -249,7 +249,7 @@ function App() {
         </div>
         <div className="nav-bar side-bar-extra">
           <div id="nav-bar-left">
-            <a href="./ME_DoublePipe-Worksheet_2020-2021_Final.pdf" download>
+            <a href="./DoublePipe-Worksheet.docx" download>
               <button className="btn btn-primary">
                 <div>
                   <i className="fa-solid fa-download"></i>&nbsp;worksheet
