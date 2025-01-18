@@ -38,12 +38,12 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
 
   const drawValves = (p: P5CanvasInstance) => {
     p.push();
-    p.translate(60, 420);
+    p.translate(60, 430);
     p.scale(0.6);
     p.image(graphics.valve, 0, 0);
     p.pop();
     p.push();
-    p.translate(610, 420);
+    p.translate(590, 430);
     p.scale(0.6);
     p.image(graphics.valve, 0, 0);
     p.pop();
@@ -143,8 +143,8 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     }
 
     // Pumps
-    p.image(graphics.pumpAssembly, 51, 470);
-    p.image(graphics.pumpAssembly, 601, 470);
+    p.image(graphics.pumpAssembly,  60, 455);
+    p.image(graphics.pumpAssembly, 590, 455);
     // Valves
     drawValves(p);
     // Beakers
@@ -152,7 +152,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     fillBeaker(p,  55, g.vols[0], g.orangeFluidColor);
     fillBeaker(p, 235, g.vols[1], g.orangeFluidColor);
     fillBeaker(p, 415, g.vols[3], g.blueFluidColor);
-    fillBeaker(p, 595, g.vols[2], g.blueFluidColor);
+    fillBeaker(p, 585, g.vols[2], g.blueFluidColor);
     p.image(singleGraphics.beakers, 0, 0);
 
     if (pinchingColdTube) {
@@ -182,7 +182,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
   };
 
   const PINCH_LEFT: number = 475;
-  const PINCH_RIGHT: number = 635;
+  const PINCH_RIGHT: number = 620;
   const PINCH_TOP: number = 375;
   const PINCH_BOTTOM: number = 410;
   p.mousePressed = () => {

@@ -82,8 +82,8 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       g.mDotH += dmDot;
       g.mDotH = p.constrain(g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE);
     } else {
-      theta = p.atan2(p.mouseY - 442, p.mouseX - 627);
-      prevTheta = p.atan2(p.pmouseY - 442, p.pmouseX - 627);
+      theta = p.atan2(p.mouseY - 442, p.mouseX - 447);
+      prevTheta = p.atan2(p.pmouseY - 442, p.pmouseX - 447);
       dTheta = Math.sign(theta * prevTheta) === -1 ? 0 : theta - prevTheta;
       dmDot = p.map(
         dTheta,
@@ -211,7 +211,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       graphics.valve
     );
     drawValve(
-      625,
+      445,
       440,
       g.mDotC,
       MIN_COLD_FLOWRATE,
@@ -239,7 +239,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       if (x >= 35 && x <= 115) {
         isDraggingValves = DRAGGING_HOT;
       }
-      if (x >= 585 && x <= 665) {
+      if (x >= 405 && x <= 485) {
         isDraggingValves = DRAGGING_COLD;
       }
     }
