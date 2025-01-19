@@ -11,13 +11,13 @@ const BLUE_FLUID_COLOR = [0, 80, 255, 180];
 // prettier-ignore
 const shellTubeBlueVertices = [[60, 5],[110, 5],[110, 230],[115, 230],[115, 5],[220, 5],[220, 230],[225, 230],[225, 5],[330, 5],[330, 230],[335, 230],[335, 5],[440, 5],[440, 295],[390, 295],[390, 70],[385, 70],[385, 295],[280, 295],[280, 70],[275, 70],[275, 295],[170, 295],[170, 70],[165, 70],[165, 295],[60, 295],[60, 5],];
 // prettier-ignore
-const hiTubeVertices = [[83, 585],[83, 430],[80, 430],[80, 405],[35, 405],[35, 35],[100, 35],[100, 75],[110, 75],[110, 25],[25, 25],[25, 415],[70, 415],[70, 430],[68, 430],[68, 585],];
+const hiTubeVertices = [[80, 430],[80, 405],[35, 405],[35, 35],[100, 35],[100, 75],[110, 75],[110, 25],[25, 25],[25, 415],[70, 415],[70, 430]];
 // prettier-ignore
 const hoTubeVertices = [[260, 620],[260, 400],[100, 400],[100, 375],[110, 375],[110, 390],[270, 390],[270, 620],];
 // prettier-ignore
-const ciTubeVertices = [[440, 620],[440, 430],[440, 430],[440, 375],[440, 75],[440, 35],[165, 35],[165, 75],[155, 75],[155, 25],[450, 25],[450, 75],[450, 375],[450, 430],[450, 430],[450, 620],];
-// prettier-ignore
-const coTubeVertices = [[618, 585],[618, 430],[620, 430],[620, 400],[485, 400],[485, 375],[495, 375],[495, 390],[630, 390],[630, 430],[632, 430],[632, 585],];
+const ciTubeVertices = [[620, 620],[620, 35],[165, 35],[165, 75],[155, 75],[155, 25],[450, 25],[630, 25],[630, 620],];
+// prettier-ignor
+const coTubeVertices = [[440, 450],[440, 430],[440, 400],[485, 400],[485, 375],[495, 375],[495, 410],[450, 410],[450, 450]];
 
 function createShellTubeGraphic(p: P5CanvasInstance) {
   const width = 475,
@@ -232,24 +232,24 @@ function createValveGraphic(p: P5CanvasInstance) {
 }
 
 function pumpAssembly(p: P5CanvasInstance) {
-  let pa = p.createGraphics(50, 150);
-  pa.push();
+  let pa = p.loadImage("./Pump.png"); //createGraphics(50, 150);
+  // pa.push();
 
-  pa.push();
-  pa.fill(0);
-  pa.rect(10, 120, 30, 30);
-  pa.rect(20, 110, 10, 10);
-  pa.pop();
+  // pa.push();
+  // pa.fill(0);
+  // pa.rect(10, 120, 30, 30);
+  // pa.rect(20, 110, 10, 10);
+  // pa.pop();
 
-  pa.push();
-  pa.stroke("black");
-  pa.strokeWeight(3);
-  pa.noFill();
-  pa.line(17, 120, 17, 0);
-  pa.line(32, 120, 32, 0);
-  pa.pop();
+  // pa.push();
+  // pa.stroke("black");
+  // pa.strokeWeight(3);
+  // pa.noFill();
+  // pa.line(17, 120, 17, 0);
+  // pa.line(32, 120, 32, 0);
+  // pa.pop();
 
-  pa.pop();
+  // pa.pop();
   return pa;
 }
 
@@ -273,7 +273,7 @@ export function createGraphicsObjects(p: P5CanvasInstance): graphicsObjects {
     tubes: [
       createTubeFluidGraphic(p, hiTubeVertices, ORANGE_FLUID_COLOR),
       createTubeFluidGraphic(p, hoTubeVertices, ORANGE_FLUID_COLOR),
-      blueTubeFluidGraphicException(p, ciTubeVertices, BLUE_FLUID_COLOR, 4, 12),
+      createTubeFluidGraphic(p, ciTubeVertices, BLUE_FLUID_COLOR),
       createTubeFluidGraphic(p, coTubeVertices, BLUE_FLUID_COLOR),
     ],
     valve: createValveGraphic(p),
@@ -287,7 +287,9 @@ export function createGraphicsObjects(p: P5CanvasInstance): graphicsObjects {
 // prettier-ignore
 const hoSingleVert = [[100, 400],[100, 375],[110, 375],[110, 400],];
 // prettier-ignore
-const coSingleVert = [[600, 470],[600, 440],[440, 440],[440, 430],[440, 375],[440, 75],[440, 35],[165, 35],[165, 75],[155, 75],[155, 25],[450, 25],[450, 75],[450, 375],[450, 430],[450, 430],[610, 430],[610, 470],];
+const coSingleVert = [[650, 470],[650, 35],[165, 35],[165, 75],[155, 75],[155, 25],[660, 25],[660, 470],];
+// prettier-ignore
+const ciSingleVert = [[600,450],[600,400],[485,400],[485,370],[495,370],[495,390],[610,390],[610,450]];
 
 function createEmptySingleTubes(p: P5CanvasInstance) {
   let bt = p.createGraphics(p.width, p.height);
@@ -310,8 +312,8 @@ function createEmptySingleTubes(p: P5CanvasInstance) {
 
   // cold in
   bt.beginShape(); // Wrong name, gets fixed later
-  for (let i = 0; i < coTubeVertices.length; i++) {
-    bt.vertex(coTubeVertices[i][0], coTubeVertices[i][1]);
+  for (let i = 0; i < ciSingleVert.length; i++) {
+    bt.vertex(ciSingleVert[i][0], ciSingleVert[i][1]);
   }
   bt.endShape();
 
@@ -330,7 +332,7 @@ function createSingleBeakers(p: P5CanvasInstance) {
   let b = createBeakerGraphic(p);
   // beakers
   bt.image(b, 50, 450);
-  bt.image(b, 590, 450);
+  bt.image(b, 580, 450);
   b.remove();
   return bt;
 }
@@ -372,8 +374,8 @@ export function createSingleGraphicsObjects(
     tubes: [
       createTubeFluidGraphic(p, hiTubeVertices, ORANGE_FLUID_COLOR),
       createTubeFluidGraphic(p, hoSingleVert, ORANGE_FLUID_COLOR),
-      blueTubeFluidGraphicException(p, coSingleVert, BLUE_FLUID_COLOR, 5, 13),
-      createTubeFluidGraphic(p, coTubeVertices, BLUE_FLUID_COLOR),
+      createTubeFluidGraphic(p, coSingleVert, BLUE_FLUID_COLOR),
+      createTubeFluidGraphic(p, ciSingleVert, BLUE_FLUID_COLOR),
     ],
     pinching: createPinchingGraphic(p),
   };
