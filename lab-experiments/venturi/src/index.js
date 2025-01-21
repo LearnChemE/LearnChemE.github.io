@@ -1,5 +1,5 @@
 import "bootstrap";
-import "./assets/venturi_meter_virtual_lab_worksheet.docx";
+import "./assets/venturi_meter_virtual_lab_worksheet.pdf";
 import addEvents from "./js/events.js";
 import populate from "./js/populate.js";
 import "./style/style.scss";
@@ -25,6 +25,7 @@ window.state = {
   viewBox: [0, 0, 0, 0],
   showButtons: false,
   initialized: false,
+  resetting: false,
 };
 
 window.mousedown = false;
