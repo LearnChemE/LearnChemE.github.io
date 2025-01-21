@@ -21,6 +21,9 @@ export function switchLogic(elts) {
       elts.switchElt.setAttribute("transform", destinationTransform);
       state.switchOn = true;
       let currentLength = 0;
+
+      if (beakerEmpty(elts)) { return }
+
       const interval = setInterval(() => {
         if (state.switchTilt) {
           clearInterval(interval);
@@ -47,6 +50,9 @@ export function switchLogic(elts) {
       elts.switchElt.setAttribute("transform", switchTransform);
       state.switchOn = false;
       let currentLength = elts.intakeLiquidMaxLength;
+
+      if (beakerEmpty(elts)) { return }
+
       const interval = setInterval(() => {
         if (state.switchTilt) {
           clearInterval(interval);
@@ -110,7 +116,12 @@ export function valveLogic(elts) {
 
     state.flowRate = state.maxFlowRate * open;
 
-    if (state.switchOn === true && state.flowing === false && state.valveOpen) {
+    if (
+      state.switchOn === true &&
+      state.flowing === false &&
+      state.valveOpen &&
+      !beakerEmpty(elts)
+    ) {
       flowThroughApparatus(elts);
     }
   };
@@ -148,74 +159,78 @@ function tubePtsPerFrame(elts) {
   return ptsPerFrame / 10;
 }
 
+function strokeDashoffset(elt) {
+  return Number(elt.style.strokeDashoffset.replace(/px/, ""));
+}
+
 function handleManometers(elts, pts, up) {
   const tubeLiquid = elts.tubeLiquid;
   const tubeLiquidMaxLength = elts.tubeLiquidMaxLength;
-  const manometerMaxLength = elts.manometerLiquids[0].getTotalLength();
-  const currentLength = Number(tubeLiquid.style.strokeDashoffset);
+  const manometerMaxLength = Number(elts.manometerLiquids[0].getTotalLength());
+  const currentLength = strokeDashoffset(tubeLiquid);
   const H1 = 5 * state.manometer_1_pressure / 10; // pts
   const H2 = 5 * state.manometer_2_pressure / 10;
   const H3 = 5 * state.manometer_3_pressure / 10;
   const H4 = 5 * state.manometer_4_pressure / 10;
   const H5 = 5 * state.manometer_5_pressure / 10;
 
-  const sdo1 = Number(manometerMaxLength) - H1;
-  const sdo2 = Number(manometerMaxLength) - H2;
-  const sdo3 = Number(manometerMaxLength) - H3;
-  const sdo4 = Number(manometerMaxLength) - H4;
-  const sdo5 = Number(manometerMaxLength) - H5;
+  const sdo1 = manometerMaxLength - H1;
+  const sdo2 = manometerMaxLength - H2;
+  const sdo3 = manometerMaxLength - H3;
+  const sdo4 = manometerMaxLength - H4;
+  const sdo5 = manometerMaxLength - H5;
 
   if (up) {
     if (currentLength < tubeLiquidMaxLength - 40) {
       elts.manometerLiquids[0].style.strokeDashoffset = Math.min(
         2 * manometerMaxLength - sdo1,
-        Number(elts.manometerLiquids[0].style.strokeDashoffset) + pts
+        strokeDashoffset(elts.manometerLiquids[0]) + pts
       );
     }
     if (currentLength < tubeLiquidMaxLength - 55) {
       elts.manometerLiquids[1].style.strokeDashoffset = Math.min(
         2 * manometerMaxLength - sdo2,
-        Number(elts.manometerLiquids[1].style.strokeDashoffset) + pts
+        strokeDashoffset(elts.manometerLiquids[1]) + pts
       );
     }
     if (currentLength < tubeLiquidMaxLength - 63) {
       elts.manometerLiquids[2].style.strokeDashoffset = Math.min(
         2 * manometerMaxLength - sdo3,
-        Number(elts.manometerLiquids[2].style.strokeDashoffset) + pts
+        strokeDashoffset(elts.manometerLiquids[2]) + pts
       );
     }
     if (currentLength < tubeLiquidMaxLength - 71) {
       elts.manometerLiquids[3].style.strokeDashoffset = Math.min(
         2 * manometerMaxLength - sdo4,
-        Number(elts.manometerLiquids[3].style.strokeDashoffset) + pts
+        strokeDashoffset(elts.manometerLiquids[3]) + pts
       );
     }
     if (currentLength < tubeLiquidMaxLength - 86) {
       elts.manometerLiquids[4].style.strokeDashoffset = Math.min(
         2 * manometerMaxLength - sdo5,
-        Number(elts.manometerLiquids[4].style.strokeDashoffset) + pts
+        strokeDashoffset(elts.manometerLiquids[4]) + pts
       );
     }
   } else {
     elts.manometerLiquids[0].style.strokeDashoffset = Math.max(
       manometerMaxLength,
-      Number(elts.manometerLiquids[0].style.strokeDashoffset) - pts
+      strokeDashoffset(elts.manometerLiquids[0]) - pts
     );
     elts.manometerLiquids[1].style.strokeDashoffset = Math.max(
       manometerMaxLength,
-      Number(elts.manometerLiquids[1].style.strokeDashoffset) - pts
+      strokeDashoffset(elts.manometerLiquids[1]) - pts
     );
     elts.manometerLiquids[2].style.strokeDashoffset = Math.max(
       manometerMaxLength,
-      Number(elts.manometerLiquids[2].style.strokeDashoffset) - pts
+      strokeDashoffset(elts.manometerLiquids[2]) - pts
     );
     elts.manometerLiquids[3].style.strokeDashoffset = Math.max(
       manometerMaxLength,
-      Number(elts.manometerLiquids[3].style.strokeDashoffset) - pts
+      strokeDashoffset(elts.manometerLiquids[3]) - pts
     );
     elts.manometerLiquids[4].style.strokeDashoffset = Math.max(
       manometerMaxLength,
-      Number(elts.manometerLiquids[4].style.strokeDashoffset) - pts
+      strokeDashoffset(elts.manometerLiquids[4]) - pts
     );
   }
 }
@@ -235,12 +250,10 @@ function flowThroughApparatus(elts) {
 
     handleManometers(elts, pts, true);
 
-    if (Number(tubeLiquid.style.strokeDashoffset) > 0 && !beakerEmpty(elts)) {
+    if (strokeDashoffset(tubeLiquid) > 0 && !beakerEmpty(elts)) {
       tubeLiquid.style.strokeDashoffset = Math.max(
         0,
-        Number(
-          tubeLiquid.style.strokeDashoffset
-        ) - pts
+        strokeDashoffset(tubeLiquid) - pts
       );
       emptySourceBeaker(elts);
     } else if (!state.switchOn || !state.valveOpen || beakerEmpty(elts)) {
@@ -277,32 +290,30 @@ function emptyApparatus(elts) {
     if (beakerEmpty(elts)) {
       intakeLiquid.style.strokeDashoffset = Math.max(
         intakeLiquidMaxLength,
-        Number(intakeLiquid.style.strokeDashoffset) - pts
+        strokeDashoffset(intakeLiquid) - pts
       );
 
-      if (Math.abs(Number(intakeLiquid.style.strokeDashoffset) - intakeLiquidMaxLength) < 0.001) {
+      if (Math.abs(strokeDashoffset(intakeLiquid) - intakeLiquidMaxLength) < 0.001) {
         intakeLiquidGone = true;
       }
     }
 
     if (
-      Number(tubeLiquid.style.strokeDashoffset) > tubeLiquidMaxLength &&
+      strokeDashoffset(tubeLiquid) > tubeLiquidMaxLength &&
       !beakerEmpty(elts) ||
       beakerEmpty(elts) &&
       intakeLiquidGone
     ) {
       tubeLiquid.style.strokeDashoffset = Math.max(
         tubeLiquidMaxLength,
-        Number(
-          tubeLiquid.style.strokeDashoffset
-        ) - pts
+        strokeDashoffset(tubeLiquid) - pts
       );
 
       handleManometers(elts, pts, false);
       fillWasteBeaker(elts);
     }
 
-    if (Number(tubeLiquid.style.strokeDashoffset) === tubeLiquidMaxLength) {
+    if (strokeDashoffset(tubeLiquid) === tubeLiquidMaxLength) {
       clearInterval(interval);
     }
   }, 1000 / frameRate);
