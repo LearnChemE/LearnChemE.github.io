@@ -7,7 +7,7 @@
   <!-- Update everything below THIS -->
   <meta name="description" content="A simulation template for LearnChemE.com">
   <meta name="keywords" content="simulation, engineering, interactive">
-  <meta name="author" content="Neil Hendren">
+  <meta name="author" content="Jackson Dunlap">
 
   <title>Velocity Profile</title>
   <!-- and above THIS -->
@@ -57,9 +57,9 @@
       <div class="input-area">
         <div id="selection-row">Selection</div>
         <select id="selection-slider">
-          <option value="a">Option 1</option>
-          <option value="b">Option 2</option>
-          <option value="c">Option 3</option>
+          <option value="a">Velocity Distribution</option>
+          <option value="b">Velocity Versus Height</option>
+          
         </select>
 
         <div class="play-pause-area">
@@ -96,7 +96,7 @@
         </div>
         <div class="modal-body">
           <p>
-            Press buttons and move sliders to interact with the simulation. Read the HTML, CSS, and JavaScript code to learn how to create your own simulation.
+            This Demonstration shows the behavior of three immiscible, incompressible fluids in laminar flow. The fluids are layered vertically and subjected to steady-state Couette flow; the top plate moves to the right at a constant velocity, and the bottom plate is stationary.  At each height, the black arrow is proportional to the velocity of the fluid at that height. You can change the viscosities and heights of fluids 2 and 3 with sliders. The velocity distribution shows the impact of fluid viscosity on the fluid's velocity gradient. The velocity versus height plot indicates the relative slopes (or velocity gradients) in each fluid. All numbers are dimensionless.
           </p>
         </div>
       </div>
@@ -114,32 +114,61 @@
 
         <div class="modal-body">
           <p>
-            The number of particles is equal to
+            Couette flow is fluid flow through parallel plates where one plate is stationary and the other is moving at a constant velocity. In this Demonstration, the flow is at steady-state and fully developed. The Navier-Stokes equations in the \(x\) and \(y\) directions are used:
           </p>
 
           <p>
-            $$ [1] \quad n_{p} = 300 \rho $$
+            $$ \rho g_x - \frac{\partial P}{\partial x} + \mu \left(\frac{\partial^{2} u_x}{\partial x^{2}} + \frac{\partial^{2} u_x}{\partial y^{2}} + \frac{\partial^{2} u_x}{\partial z^{2}}\right) = \rho \left(\frac{\partial u_x}{\partial t} + u_x \frac{\partial u_x}{\partial x} + u_y \frac{\partial u_x}{\partial y} + u_z \frac{\partial u_x}{\partial z}\right), $$ 
+            $$ \rho g_y - \frac{\partial P}{\partial y} + \mu \left(\frac{\partial^{2} u_y}{\partial x^{2}} + \frac{\partial^{2} u_y}{\partial y^{2}} + \frac{\partial^{2} u_y}{\partial z^{2}}\right) = \rho \left(\frac{\partial u_y}{\partial t} + u_x \frac{\partial u_y}{\partial x} + u_y \frac{\partial u_y}{\partial y} + u_z \frac{\partial u_y}{\partial z}\right). $$
           </p>
 
           <p>
-            Where \( \rho \) is the density of particles in kg/m<sup>3</sup>. A second example of an equation written in TeX is:
+            Since flow is steady-state and there is no flow in the \(z\) direction, these equations simplify to:
           </p>
 
           <p>
-            $$ [2] \quad \int_{0}^{2} \frac{3x}{2} dx = \left. \frac{3}{4} x^{2} + C \> \right|_{x = 0}^{x = 2}\ = 3 + C $$
+            $$ \rho g_x - \frac{\partial P}{\partial x} + \mu \left(\frac{\partial^{2} u_x}{\partial x^{2}} + \frac{\partial^{2} u_x}{\partial y^{2}}\right) = \rho \left(u_x \frac{\partial u_x}{\partial x} + u_y \frac{\partial u_x}{\partial y}\right), $$ 
+            $$ \rho g_y - \frac{\partial P}{\partial y} + \mu \left(\frac{\partial^{2} u_y}{\partial x^{2}} + \frac{\partial^{2} u_y}{\partial y^{2}}\right) = \rho \left(u_x \frac{\partial u_y}{\partial x} + u_y \frac{\partial u_y}{\partial y}\right). $$
           </p>
 
           <p>
-            References:
+            Flow is in the \(x\) direction, so \(u_y\) drops out:
+          </p>
+
+          <p>
+            $$ \rho g_x - \frac{\partial P}{\partial x} + \mu \left(\frac{\partial^{2} u_x}{\partial x^{2}} + \frac{\partial^{2} u_x}{\partial y^{2}}\right) = \rho u_x \frac{\partial u_x}{\partial x}, $$
+            $$ \rho g_y - \frac{\partial P}{\partial y} = 0. $$
+          </p>
+
+          <p>
+            Since the flow is fully developed the velocity in the direction of flow does not change. It is assumed that the pressure is hydrostatic so pressure does not vary in the \(x\) direction:
+          </p>
+
+          <p>
+            $$ \mu \frac{\partial^2 u_x}{\partial y^2} = 0, $$
+            $$  \rho g_y = \frac{\partial P}{\partial y}. $$
+          </p>
+
+          <p>
+            For the boundary conditions \( u_x = 0 \) at \( y = 0 \) and \(u_x = U\) at \( y = H \), the simplified Navier-Stokes eqation is:
+          </p>
+
+          <p>
+            $$ u_x = \frac{U}{H} y, $$
+          </p>
+
+          <p>
+            where \(\rho\) is density, \(g\) is gravity, \(P\) is pressure, \(\mu\) is viscosity, \(u\) is fluid velocity, \(U\) is plate velocity, \(t\) is time, and \(H\) is the distance between plates.
+          </p>
+
+          <p>
+            Reference
           </p>
           <p>
             <ol class="references">
+              <!-- This is the main citation from the origional simulation, the Permanent Citation from that Page has not been included but may need to be.-->
               <li>
-                Ke, F., & Hoadley, C. (2009). Evaluating online learning communities. Educational Technology Research & Development, 57(4), 487-510
-              </li>
-
-              <li>
-                Smith, J. (2023, January 15). How to Cite a Website in APA Style. Example.com. <a href="https://www.example.com/how-to-cite-apa" target="_blank">https://www.example.com/how-to-cite-apa</a>
+                B. R. Munson, T. H. Okiishi, and W. W. Huebsch, Fundamentals of Fluid Mechanics, 6th ed., Hoboken, NJ: John Wiley & Sons, 2010. 
               </li>
             </ol>
           </p>
