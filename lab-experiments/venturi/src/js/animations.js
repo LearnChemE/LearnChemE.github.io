@@ -11,6 +11,10 @@ export function switchLogic(elts) {
   const destinationTransform = "rotate(38)";
 
   elts.switchG.addEventListener("click", () => {
+    if (state.resetting) {
+      return;
+    }
+
     if (state.switchOn === false) {
       elts.switchElt.setAttribute("x", destinationX);
       elts.switchElt.setAttribute("y", destinationY);
@@ -221,37 +225,72 @@ function flowThroughApparatus(elts) {
 
   state.flowing = true;
   const interval = setInterval(() => {
+    if (state.resetting) {
+      clearInterval(interval);
+      return;
+    }
+
     calcAll();
     const pts = tubePtsPerFrame();
 
     handleManometers(elts, pts, true);
 
-    if (Number(tubeLiquid.style.strokeDashoffset) > 0) {
+    if (Number(tubeLiquid.style.strokeDashoffset) > 0 && !beakerEmpty(elts)) {
       tubeLiquid.style.strokeDashoffset = Math.max(
         0,
         Number(
           tubeLiquid.style.strokeDashoffset
         ) - pts
       );
-    } else if (!state.switchOn || !state.valveOpen) {
+      emptySourceBeaker(elts);
+    } else if (!state.switchOn || !state.valveOpen || beakerEmpty(elts)) {
       clearInterval(interval);
       emptyApparatus(elts);
+    } else {
+      fillWasteBeaker(elts);
+      emptySourceBeaker(elts);
     }
   }, 1000 / frameRate);
 }
 
 function emptyApparatus(elts) {
+  if (state.resetting) {
+    return;
+  }
+
   const tubeLiquid = elts.tubeLiquid;
   const tubeLiquidMaxLength = elts.tubeLiquidMaxLength;
+  const intakeLiquid = elts.intakeLiquid;
+  const intakeLiquidMaxLength = elts.intakeLiquidMaxLength;
 
   state.flowing = false;
   tubeLiquid.style.strokeDashoffset = 2 * tubeLiquidMaxLength;
+  intakeLiquid.style.strokeDashoffset = 2 * intakeLiquidMaxLength;
+
+  let intakeLiquidGone = false;
+
+  let pts = 1;
 
   const interval = setInterval(() => {
     calcAll();
-    const pts = 2;
 
-    if (Number(tubeLiquid.style.strokeDashoffset) > tubeLiquidMaxLength) {
+    if (beakerEmpty(elts)) {
+      intakeLiquid.style.strokeDashoffset = Math.max(
+        intakeLiquidMaxLength,
+        Number(intakeLiquid.style.strokeDashoffset) - pts
+      );
+
+      if (Math.abs(Number(intakeLiquid.style.strokeDashoffset) - intakeLiquidMaxLength) < 0.001) {
+        intakeLiquidGone = true;
+      }
+    }
+
+    if (
+      Number(tubeLiquid.style.strokeDashoffset) > tubeLiquidMaxLength &&
+      !beakerEmpty(elts) ||
+      beakerEmpty(elts) &&
+      intakeLiquidGone
+    ) {
       tubeLiquid.style.strokeDashoffset = Math.max(
         tubeLiquidMaxLength,
         Number(
@@ -260,8 +299,47 @@ function emptyApparatus(elts) {
       );
 
       handleManometers(elts, pts, false);
-    } else {
+      fillWasteBeaker(elts);
+    }
+
+    if (Number(tubeLiquid.style.strokeDashoffset) === tubeLiquidMaxLength) {
       clearInterval(interval);
     }
   }, 1000 / frameRate);
+}
+
+function beakerEmpty(elts) {
+  return Number(elts.sourceLiquid.getAttribute("height")) <= 0;
+}
+
+function beakerHeightPerFrame() {
+  const V = state.flowRate;
+  const maxHeight = 26.25;
+  const maxVolume = 1000;
+  const frameTime = 1 / frameRate;
+  const VPerFrame = frameTime * V;
+  const framesToFill = maxVolume / VPerFrame;
+  return maxHeight / framesToFill;
+}
+
+function fillWasteBeaker(elts) {
+  const wasteLiquid = elts.wasteLiquid;
+  const wasteLiquidHeight = Number(wasteLiquid.getAttribute("height"));
+  const wasteLiquidY = Number(wasteLiquid.getAttribute("y"));
+  const dH = beakerHeightPerFrame();
+  if (wasteLiquidHeight < 26.25) {
+    wasteLiquid.setAttribute("height", Math.min(26.25, wasteLiquidHeight + dH));
+    wasteLiquid.setAttribute("y", Math.max(212.91513, wasteLiquidY - dH));
+  }
+}
+
+function emptySourceBeaker(elts) {
+  const sourceLiquid = elts.sourceLiquid;
+  const sourceLiquidHeight = Number(sourceLiquid.getAttribute("height"));
+  const sourceLiquidY = Number(sourceLiquid.getAttribute("y"));
+  const dH = beakerHeightPerFrame();
+  if (sourceLiquidHeight > 0) {
+    sourceLiquid.setAttribute("height", Math.max(0, sourceLiquidHeight - dH));
+    sourceLiquid.setAttribute("y", Math.max(212.8763, sourceLiquidY + dH));
+  }
 }

@@ -26,6 +26,15 @@ function setDefaults(elts) {
     elts.switchElt.setAttribute("y", "110.71905");
     elts.switchElt.setAttribute("transform", "rotate(-38.9859)")
   }
+
+  elts.sourceLiquid.setAttribute("height", "26.25");
+  elts.sourceLiquid.setAttribute("y", "212.8763");
+  elts.wasteLiquid.setAttribute("height", "0");
+  elts.wasteLiquid.setAttribute("y", `${212.91513 + 26.25}`);
+
+  elts.tubeLiquid.style.strokeDashoffset = elts.tubeLiquidMaxLength;
+  elts.intakeLiquid.style.strokeDashoffset = elts.intakeLiquidMaxLength;
+
 }
 
 function enableSvgZoom() {
@@ -238,6 +247,30 @@ function handleHamburger() {
   });
 }
 
+function handleReset(elts) {
+  // const showHide = (elts, opacity) => {
+  //   elts.tubeLiquid.style.opacity = String(opacity);
+  //   elts.intakeLiquid.style.opacity = String(opacity);
+  //   elts.manometerLiquids.forEach((manometerLiquid) => {
+  //     manometerLiquid.style.opacity = String(opacity);
+  //   });
+  //   elts.wasteLiquid.style.opacity = String(opacity);
+  //   state.resetting = opacity === 0;
+  // };
+
+  const resetButton = document.getElementById("reset");
+  resetButton.addEventListener("click", () => {
+    resetButton.classList.add("clicked");
+    state.resetting = true;
+    // showHide(elts, 0);
+    setTimeout(() => {
+      resetButton.classList.remove("clicked");
+      state.resetting = false;
+    }, 100);
+    setDefaults(elts);
+  });
+}
+
 export default function addEvents() {
   const elts = {
     intakeLiquid: document.getElementById("intake-liquid"),
@@ -255,6 +288,9 @@ export default function addEvents() {
     valveCircle: document.getElementById("valve-circle"),
     valveRect: document.getElementById("valve-rect"),
     ruler: document.getElementById("ruler"),
+    sourceLiquid: document.getElementById("source-liquid"),
+    wasteLiquid: document.getElementById("waste-liquid"),
+    resetButton: document.getElementById("reset"),
   };
 
   elts.intakeLiquidMaxLength = elts.intakeLiquid.getTotalLength();
@@ -263,5 +299,6 @@ export default function addEvents() {
   setDefaults(elts);
   switchLogic(elts);
   valveLogic(elts);
+  handleReset(elts);
   handleHamburger();
 }

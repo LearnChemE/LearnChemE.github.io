@@ -70,6 +70,37 @@ iframe {
   height: 30px;
 }
 
+#reset {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 1000;
+  width: 55px;
+  height: max-content;
+  text-align: center;
+  padding: 4px 8px;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transform: translate(-30%, 40%);
+  background-color: lightgreen;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#reset:hover {
+  background-color: rgb(177, 246, 177);
+}
+
+#reset.clicked {
+  background-color: rgb(205, 249, 205);
+}
+
 #buttons {
   position: absolute;
   top: 30px;
@@ -88,8 +119,7 @@ iframe {
 }
 
 @media screen and (max-width: 768px) {
-  #reset,
-  #tilt {
+  #reset {
     font-size: 0.8rem;
   }
   #hamburger-icon {
