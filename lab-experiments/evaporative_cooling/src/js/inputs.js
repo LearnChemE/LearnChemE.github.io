@@ -73,8 +73,19 @@ function handleHamburger() {
   });
 }
 
-export default function initializeHamburger() {
+export function initializeHamburger() {
   const hamburgerContainer = document.getElementById("hamburger-icon");
   hamburgerContainer.innerHTML = Hamburger;
   handleHamburger();
+}
+
+export function initializeButtons() {
+  const fanButton = document.getElementById("fan");
+  const waterButton = document.getElementById("water");
+  fanButton.addEventListener("click", () => {
+    state.fanOn = !state.fanOn;
+  });
+  waterButton.addEventListener("click", () => {
+    state.waterOn = !state.waterOn;
+  });
 }

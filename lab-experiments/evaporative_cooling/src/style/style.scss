@@ -131,3 +131,25 @@ canvas {
     padding: 15px;
   }
 }
+
+#temp-container {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  gap: 10px;
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#fan,
+#water {
+  background-color: lightblue;
+  border: 1px solid black;
+  padding: 5px 10px;
+}
+
+#fan:hover,
+#water:hover {
+  background-color: rgb(217, 239, 246);
+}
