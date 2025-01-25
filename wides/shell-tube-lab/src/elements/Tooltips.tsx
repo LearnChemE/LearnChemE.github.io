@@ -57,7 +57,7 @@ export const Tooltips: React.FC<MeasuredVals> = ({
         <Tooltip anchorSelect="#hi-anchor" place="bottom">
           Temperature: {measuredStrings[0]} °C
         </Tooltip>
-        <Tooltip anchorSelect="#ci-anchor" place="bottom">
+        <Tooltip anchorSelect="#co-anchor" place="bottom">
           Temperature: {measuredStrings[2]} °C
         </Tooltip>
         {/* <Tooltip anchorSelect="#outlet-tubes-anchor" place="left">

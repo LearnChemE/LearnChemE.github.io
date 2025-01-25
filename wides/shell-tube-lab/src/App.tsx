@@ -49,6 +49,8 @@ function App() {
   const resetBtnHandler = () => {
     g.vols = [1000, 0, 1000, 0]; // reset volumes
     g.startTime = -1; // NOT_STARTED
+    g.hIsFlowing = false;
+    g.cIsFlowing = false;
     setPumpBtnDisabled(false);
     setPumpsAreRunning(false);
     setMeasured([-1, -1, -1, -1]);
