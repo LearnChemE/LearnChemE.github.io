@@ -1,0 +1,72 @@
+<div id="directions" class="modal fade bd-example-modal-lg" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Directions</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <p>
+                This simulation calculates the volumetric and mass flow rates of a liquid maintained at a constant height in a tank as a function of the liquid's height <em>h</em> and density <em>&#961;</em>, the drain pipe's diameter <em>d</em>, and the discharge (orifice) coefficient <em>c<sub>0</sub></em>. It plots the volumetric flow rate as a function of the liquid's height for the chosen drain diameter and discharge coefficient values. The discharge (orifice) coefficient <em>c<sub>0</sub></em> characterizes the relationship between actual flow and ideal flow through an orifice. An orifice with discharge coefficient of 1.0 behaves as if pressure drop across the orifice <em>&#916;P</em> is zero. An orifice with a discharge coefficient near zero restricts flow significantly, even at large pipe diameters.
+            </p>              
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="details" class="modal fade bd-example-modal-lg" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Details</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <p>
+                This simulation shows the flow rate from a tank as a function of the height of liquid in the tank. The liquid flow rate is proportional to the square root of its height. The volumetric flow rate is calculated using a slightly modified Bernoulli equation:
+            </p>
+            <p>
+                <em>Q</em> = <span style="font-family: 'Times New Roman', serif;">&#8730;</span>(2g <em>h</em>) <em>c<sub>0</sub></em>&#960;(<em>d</em>/100)<sup>2</sup>/4
+              </p>
+            <p>
+                where <em>g</em> is the gravitational constant (9.81 m/s<sup>2</sup>), <em>h</em> is the liquid height in the tank (m), <em>c<sub>0</sub></em> is the discharge coefficient (dimensionless), and <em>d</em> is the drain diameter (cm). The mass flow rate (kg/s) is calculated by multiplying the volumetric flow rate by the liquid density, <em>&#961;</em> (kg/L). The resistant coefficient <em>k</em> is related to the discharge coefficient by:
+            </p>
+            <p>
+                <em>k</em> = 1 / <em>c<sub>0</sub></em><sup>2</sup>
+            </p>             
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="about" class="modal fade bd-example-modal-lg" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">About</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <p>
+                This digital experiment was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Sanath Kavatooru. It is a JavaScript/HTML5 implementation of a Mathematica simulation that was prepared by Mark D. Normand, Maria G. Corradini, and Micha Peleg (<a href="https://demonstrations.wolfram.com/FlowFromATankAtConstantHeight/" target="_blank">https://demonstrations.wolfram.com/FlowFromATankAtConstantHeight/</a>) and modified by Neil Hendren and John L. Falconer. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>. If this simulation is too big or too small for your screen, zoom out or in using command - or command +  on Mac or ctrl - or ctrl +  on Windows.
+            </p>    
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
