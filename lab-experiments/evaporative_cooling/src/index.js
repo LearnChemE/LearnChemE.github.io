@@ -15,6 +15,11 @@ window.state = {
   fanCount: 0,
   waterOn: false,
   waterFlowCoordinate: 0,
+  valvePosition: 0,
+  valvePositionStart: 0,
+  mousePositionStart: [0, 0],
+  onKnob: false,
+  switchOn: false,
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -28,6 +33,11 @@ window.setup = () => {
 
 window.draw = () => {
   scale(relativeSize());
+  if (state.waterOn) {
+    state.waterFlowCoordinate = constrain(state.waterFlowCoordinate + 1, 0, 1000);
+  } else {
+    state.waterFlowCoordinate = 0;
+  }
   calcAll();
   drawAll();
 }
