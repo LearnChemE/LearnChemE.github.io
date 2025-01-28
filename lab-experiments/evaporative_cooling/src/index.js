@@ -3,7 +3,7 @@ import "p5";
 import "./assets/evaporative_cooling_worksheet.pdf";
 import calcAll from "./js/calcs";
 import drawAll from "./js/draw";
-import { initializeButtons, initializeHamburger } from "./js/inputs";
+import { initializeHamburger } from "./js/inputs";
 import "./style/style.scss";
 
 // TO DO:
@@ -27,7 +27,6 @@ const containerElement = document.getElementById("p5-container");
 window.setup = () => {
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
   initializeHamburger();
-  initializeButtons();
   frameRate(60);
 }
 

@@ -1,6 +1,6 @@
-const coolerLocation = [120, 26];
+const coolerLocation = [90, 26];
 const bladeLength = 15;
-const beakerCoordinate = [120, 81];
+const beakerCoordinate = [90, 81];
 const beakerWidth = 25;
 const beakerHeight = 32;
 const knobDiameter = 12;
@@ -385,6 +385,10 @@ function drawIntakeHose() {
   fill(intakeTubeFill);
   stroke(intakeTubeStroke);
   pop();
+}
+
+function drawOutletHose() {
+
 }
 
 function drawPump() {
