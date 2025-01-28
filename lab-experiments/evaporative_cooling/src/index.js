@@ -14,7 +14,7 @@ window.state = {
   fanOn: false,
   fanCount: 0,
   waterOn: false,
-  waterLevel: 0,
+  waterFlowCoordinate: 0,
 };
 
 const containerElement = document.getElementById("p5-container");
