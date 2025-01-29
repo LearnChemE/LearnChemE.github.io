@@ -1,11 +1,11 @@
-const selectionSlider = document.getElementById('selection-slider');
+const selectionElement = document.getElementById('selection');
 const densitySlider = document.getElementById('density-slider');
 const playButton = document.getElementById("play");
 const pauseButton = document.getElementById("pause");
 
-selectionSlider.addEventListener('input', function () {
+selectionElement.addEventListener('input', function() {
   // This corresponds to the "value" attribute of each option in the select element.
-  const value = selectionSlider.value;
+  const value = selectionElement.value;
   switch (value) {
     case "a":
       g.selection = "Velocity Distribution";
@@ -24,7 +24,7 @@ selectionSlider.addEventListener('input', function () {
   }
 });
 
-densitySlider.addEventListener('input', function () {
+densitySlider.addEventListener('input', function() {
   // The default value of a slider is a string, so we always first convert it to a number.
   g.density = Number(densitySlider.value);
   const densityLabel = document.getElementById("density-value");
@@ -34,12 +34,12 @@ densitySlider.addEventListener('input', function () {
   }
 });
 
-playButton.addEventListener('click', function () {
+playButton.addEventListener('click', function() {
   g.playing = true;
   loop();
 });
 
-pauseButton.addEventListener('click', function () {
+pauseButton.addEventListener('click', function() {
   g.playing = false;
   noLoop();
 });
