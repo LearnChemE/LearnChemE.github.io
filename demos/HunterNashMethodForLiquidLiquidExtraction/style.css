@@ -28,7 +28,8 @@
 
 .input-row {
   display: grid;
-  grid-template-columns: max-content 200px 15px max-content; /* 250 px was formerly 150 px, Dr. F asked me to make it much longer*/
+  grid-template-columns: max-content 200px 15px max-content;
+  /* 250 px was formerly 150 px, Dr. F asked me to make it much longer*/
   gap: 10px;
   align-items: end;
   justify-items: center;
@@ -42,8 +43,6 @@
   align-items: center;
   justify-self: start;
 }
-
-
 
 #point-type {
   height: min-content;
@@ -78,15 +77,14 @@ canvas {
   box-shadow: 0px 0px 2px 2px grey;
 }
 
-
-
 label {
   margin-right: 20px;
 }
 
 #modal-buttons {
   display: grid;
-  grid-template-columns: 100px 100px 100px; /* These were all previously 1fr. I changed them to hopefully get the on the same line as the feed,solvent,raffinate button or the slider once we can make them appear/disappear */
+  grid-template-columns: 100px 100px 100px;
+  /* These were all previously 1fr. I changed them to hopefully get the on the same line as the feed,solvent,raffinate button or the slider once we can make them appear/disappear */
   gap: 5px;
   grid-column: 3;
   justify-self: end;
@@ -126,8 +124,8 @@ label {
   width: 100vw;
 }
 
-.feed-mole-fracs span {
+.feed-mass-fracs span {
   display: block;
-  line-height:1.7em;
+  line-height: 1.7em;
   font-size: 80%;
 }

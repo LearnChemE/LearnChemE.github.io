@@ -9,7 +9,7 @@ function setDefaults(elts) {
   elts.tubeLiquid.style.strokeDashoffset = elts.tubeLiquidMaxLength;
 
   elts.manometerLiquids.forEach((manometerLiquid) => {
-    const manometerMaxHeight = manometerLiquid.getTotalLength();
+    const manometerMaxHeight = Number(manometerLiquid.getTotalLength());
     manometerLiquid.style.strokeDasharray = manometerMaxHeight;
     manometerLiquid.style.strokeDashoffset = manometerMaxHeight;
   });
@@ -248,21 +248,10 @@ function handleHamburger() {
 }
 
 function handleReset(elts) {
-  // const showHide = (elts, opacity) => {
-  //   elts.tubeLiquid.style.opacity = String(opacity);
-  //   elts.intakeLiquid.style.opacity = String(opacity);
-  //   elts.manometerLiquids.forEach((manometerLiquid) => {
-  //     manometerLiquid.style.opacity = String(opacity);
-  //   });
-  //   elts.wasteLiquid.style.opacity = String(opacity);
-  //   state.resetting = opacity === 0;
-  // };
-
   const resetButton = document.getElementById("reset");
   resetButton.addEventListener("click", () => {
     resetButton.classList.add("clicked");
     state.resetting = true;
-    // showHide(elts, 0);
     setTimeout(() => {
       resetButton.classList.remove("clicked");
       state.resetting = false;
@@ -293,8 +282,8 @@ export default function addEvents() {
     resetButton: document.getElementById("reset"),
   };
 
-  elts.intakeLiquidMaxLength = elts.intakeLiquid.getTotalLength();
-  elts.tubeLiquidMaxLength = elts.tubeLiquid.getTotalLength();
+  elts.intakeLiquidMaxLength = Number(elts.intakeLiquid.getTotalLength());
+  elts.tubeLiquidMaxLength = Number(elts.tubeLiquid.getTotalLength());
 
   setDefaults(elts);
   switchLogic(elts);
