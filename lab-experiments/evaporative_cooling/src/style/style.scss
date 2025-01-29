@@ -106,6 +106,10 @@ canvas {
   font-size: 0.8rem;
   border: 1px solid black;
   border-radius: 5px;
+  padding: 5px 12px;
+  background-color: rgb(67, 20, 255);
+  color: white;
+  font-family: sans-serif, Arial;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -115,7 +119,7 @@ canvas {
 }
 
 #temp-units:hover {
-  background-color: rgb(217, 239, 246);
+  background-color: rgb(103, 66, 255);
 }
 
 #temp-units.clicked {
@@ -144,6 +148,12 @@ canvas {
   }
 }
 
+@media screen and (min-width: 1080px) {
+  #temp-units {
+    font-size: 1.1rem;
+  }
+}
+
 @media screen and (min-width: 1320px) {
   #hamburger-icon {
     padding: 6px;
@@ -157,6 +167,6 @@ canvas {
     padding: 15px;
   }
   #temp-units {
-    font-size: 1rem;
+    font-size: 1.2rem;
   }
 }
