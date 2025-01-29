@@ -184,12 +184,12 @@ function drawTemperatureMeter(temp, x, y, str) {
   stroke(0);
   fill(255);
   strokeWeight(0.125 / relativeSize());
-  textSize(1.5 * relativeSize() ** 0.25);
+  textSize(1.5 * relativeSize() ** 0.125);
   text(str, 7.5, 1.75);
   textFont(state.temperatureFont);
   noStroke();
   fill(255, 255, 0);
-  textSize(2.5 * relativeSize() ** 0.25);
+  textSize(2.5 * relativeSize() ** 0.125);
   textAlign(RIGHT, CENTER);
   let temperature;
   if (state.temperatureUnits === "C") {
@@ -197,12 +197,12 @@ function drawTemperatureMeter(temp, x, y, str) {
   } else {
     temperature = (Math.round(10 * (temp * 9 / 5 + 32)) / 10).toFixed(1);
   }
-  text(temperature, 9, 5.5);
+  text(temperature, 9.5, 5.5);
   textAlign(LEFT, CENTER);
   const units = state.temperatureUnits === "C" ? "C" : "F";
   text(units, 11, 5.5);
   textFont("Arial");
-  textSize(1.75 * relativeSize() ** 0.25);
+  textSize(1.75 * relativeSize() ** 0.125);
   text("°", 9.75, 5.5);
   pop();
 }
@@ -467,7 +467,7 @@ function drawBeaker() {
   }
   endShape();
 
-  textSize(1.25 * relativeSize() ** 0.25);
+  textSize(1.25 * relativeSize() ** 0.125);
   textAlign(RIGHT, CENTER);
   for (let i = 1; i < 21; i++) {
     let xOffset;
@@ -680,7 +680,7 @@ function drawPumpPowerSwitch() {
   rect(-20, 28, 20, 8, 2);
   fill(255);
   strokeWeight(0.2 / relativeSize());
-  textSize(1.5 * relativeSize() ** 0.25);
+  textSize(1.5 * relativeSize() ** 0.125);
   textAlign(CENTER, CENTER);
   text("OFF", -24, 28);
   text("ON", -16, 28);
@@ -733,7 +733,7 @@ function drawFanPowerSwitch() {
   rect(w / 2, w / 5, w * 1.3, w * 0.5, 2);
   strokeWeight(0.25 / relativeSize());
   fill(255);
-  textSize(1.5 * relativeSize() ** 0.25);
+  textSize(1.5 * relativeSize() ** 0.125);
   textAlign(CENTER, CENTER);
   text("OFF", w * 0.25, w * 0.2);
   text("ON", w * 0.8, w * 0.2);
