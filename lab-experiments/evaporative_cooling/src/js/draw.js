@@ -13,6 +13,7 @@ export default function drawAll() {
   drawGrid(false, 0);
   drawGrid(true, constrain(state.waterFlowCoordinate, 0, 100));
   drawIntakeHose();
+  drawOutletHose();
   drawPump();
   drawWaterDistributor();
   drawBeaker();
@@ -388,7 +389,58 @@ function drawIntakeHose() {
 }
 
 function drawOutletHose() {
-
+  push();
+  translate(beakerCoordinate[0] - 50, beakerCoordinate[1] - beakerHeight / 2 - 5.25);
+  const outletTubeFill = "rgba(240, 240, 240, 0.5)";
+  const outletTubeStroke = "rgba(150, 150, 150, 0.8)";
+  fill(outletTubeFill);
+  stroke(outletTubeStroke);
+  strokeWeight(0.5 / relativeSize());
+  rect(0, -1.25, -20, 2.5, 0.5);
+  rect(-23, -2, 2.5, -50, 0.5);
+  rect(-20, -55.75, 49, 2.5, 0.5);
+  fill(255);
+  stroke(200);
+  translate(-20, 0);
+  beginShape();
+  vertex(1, -1.5);
+  vertex(1, 1.5);
+  vertex(0, 1.5);
+  vertex(0, 1.25);
+  for (let i = 10; i < 90; i += 10) {
+    vertex(cos(radians(i + 90)) * 3, sin(radians(i + 90)) * 3 - 1.75);
+  }
+  vertex(-3, -1.75);
+  vertex(-3.25, -1.75);
+  vertex(-3.25, -2.75);
+  vertex(-0.25, -2.75);
+  vertex(-0.25, -1.75);
+  vertex(-0.5, -1.75);
+  vertex(-0.5, -1.25);
+  vertex(0, -1.25);
+  vertex(0, -1.5);
+  endShape(CLOSE);
+  translate(-3.5, -51.5);
+  beginShape();
+  vertex(0, 0);
+  vertex(3.5, 0);
+  vertex(3.5, -1);
+  vertex(3.25, -1);
+  vertex(3.25, -1.5);
+  vertex(3.75, -1.5);
+  vertex(3.75, -1.25);
+  vertex(4.75, -1.25);
+  vertex(4.75, -4.75);
+  vertex(3.75, -4.75);
+  vertex(3.75, -4.5);
+  vertex(3.25, -4.5);
+  for (let i = 10; i < 90; i += 10) {
+    vertex(cos(radians(i + 90)) * 3 + 3.25, -sin(radians(i + 90)) * 3 - 1.5);
+  }
+  vertex(0.25, -1);
+  vertex(0, -1);
+  endShape(CLOSE);
+  pop();
 }
 
 function drawPump() {
