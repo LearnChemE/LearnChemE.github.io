@@ -1,9 +1,10 @@
 import "bootstrap";
 import "p5";
+import "./assets/digital-7.ttf";
 import "./assets/evaporative_cooling_worksheet.pdf";
 import calcAll from "./js/calcs";
 import drawAll from "./js/draw";
-import { initializeHamburger } from "./js/inputs";
+import { initializeHamburger, initializeUnitsButton } from "./js/inputs";
 import "./style/style.scss";
 
 // TO DO:
@@ -20,13 +21,24 @@ window.state = {
   mousePositionStart: [0, 0],
   onKnob: false,
   switchOn: false,
+  temperatureUnits: "C",
+  airTemperature: 25,
+  reservoirTemperature: 71,
+  beakerTemperature: 80,
+  apparatusTemperatureTop: 78,
+  apparatusTemperatureBottom: 75,
 };
 
 const containerElement = document.getElementById("p5-container");
 
+window.preload = () => {
+  state.temperatureFont = loadFont("assets/digital-7.ttf");
+}
+
 window.setup = () => {
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
   initializeHamburger();
+  initializeUnitsButton();
   frameRate(60);
 }
 

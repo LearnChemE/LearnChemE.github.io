@@ -78,3 +78,18 @@ export function initializeHamburger() {
   hamburgerContainer.innerHTML = Hamburger;
   handleHamburger();
 }
+
+export function initializeUnitsButton() {
+  const units = document.getElementById("temp-units");
+  units.addEventListener("click", () => {
+    units.classList.add("clicked");
+    setTimeout(() => {
+      units.classList.remove("clicked");
+    }, 100);
+    if (state.temperatureUnits === "C") {
+      state.temperatureUnits = "F";
+    } else {
+      state.temperatureUnits = "C";
+    }
+  });
+}
