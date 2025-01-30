@@ -2,7 +2,7 @@ const coolerLocation = [90, 26];
 const bladeLength = 15;
 const beakerCoordinate = [90, 81];
 const beakerWidth = 25;
-const beakerHeight = 32;
+window.beakerHeight = 32;
 const knobDiameter = 12;
 const pumpSwitchCenter = [beakerCoordinate[0] - 50 - 12, beakerCoordinate[1] - beakerHeight / 2 - 5.25 + 28];
 const fanSwitchCenter = [coolerLocation[0] + bladeLength * 3.15, coolerLocation[1] - bladeLength * 1.25];
@@ -12,12 +12,294 @@ export default function drawAll() {
   background(255);
   drawFan();
   drawGrid(false, 0);
-  drawGrid(true, constrain(state.waterFlowCoordinate, 0, 100));
+  drawGrid(true, state.flowState[10]);
+  drawWater(state.pumpOn);
   drawIntakeHose();
   drawOutletHose();
   drawPump();
   drawBeaker();
   drawWaterDistributor();
+}
+
+function drawWater(pumpOn) {
+  const flowRate = state.valvePosition;
+  const waterFill = "rgba(180, 180, 255, 1)";
+  const bc = beakerCoordinate;
+  const bw = beakerWidth;
+  const bh = beakerHeight;
+  const cl = coolerLocation;
+  const bl = bladeLength;
+  const s = state.flowState;
+  push();
+  fill(waterFill);
+  noStroke();
+
+  let totalWaterInSystem = 0;
+
+  state.flowState.forEach((waterLevel, index) => {
+    if (index === 12) {
+      totalWaterInSystem += waterLevel * 10;
+    } else if (index === 10 && waterLevel > 100) {
+      totalWaterInSystem += 200 - waterLevel
+    } else {
+      totalWaterInSystem += waterLevel;
+    }
+  });
+
+  state.beakerWaterLevel = 1000 - totalWaterInSystem / 3;
+
+  if (pumpOn) {
+    const check1 = s[0] === beakerHeight;
+    const check2 = s[1] === 30 && check1;
+    const check3 = s[2] === 20 && check2;
+    const check4 = s[3] === 50 && check3;
+    const check5 = s[4] === 49 && check4;
+    const check6 = s[10] === 100 && check5;
+    const check7 = s[11] === 12.4 && check6;
+    const check8 = s[12] > 0 && check7;
+    if (s[0] <= beakerHeight) {
+      s[0] = min(s[0] + flowRate, beakerHeight);
+      push();
+      translate(bc[0], bc[1]);
+      rect(-beakerWidth / 2 + 1.65, beakerHeight / 2 - 3, 2.2, -s[0]);
+      pop();
+    }
+    if (check1 && s[1] <= 30) {
+      s[1] = min(s[1] + flowRate, 30);
+      push();
+      translate(bc[0], bc[1]);
+      rect(-beakerWidth / 2 + 1.5, -beakerHeight / 2 - 6.35, -s[1], 2.2);
+      pop();
+    }
+    if (check2 && s[2] <= 20) {
+      s[2] = min(s[2] + flowRate, 20);
+      push();
+      translate(bc[0] - 50, bc[1] - bh / 2 - 5.25);
+      rect(0, -1.1, -s[2], 2.2);
+      pop();
+    }
+    if (check3 && s[3] <= 50) {
+      s[3] = min(s[3] + flowRate, 50);
+      push();
+      translate(bc[0] - 50, bc[1] - bh / 2 - 5.25);
+      rect(-22.85, -2, 2.2, -s[3]);
+      pop();
+    }
+    if (check4 && s[4] <= 49) {
+      s[4] = min(s[4] + flowRate, 49);
+      push();
+      translate(bc[0] - 50, bc[1] - bh / 2 - 5.25);
+      rect(-20, -55.6, s[4], 2.2);
+      pop();
+    }
+
+    push();
+    translate(cl[0], cl[1]);
+
+    if (check5 && s[5] <= 38.5) {
+      s[5] = min(s[5] + flowRate, 38.5);
+      rect(-20, -22.35, s[5], 3.5);
+      const offset = 3;
+      if (s[5] > offset) {
+        rect(-20 + offset, -18.9, s[5] - offset, 0.72);
+      }
+    }
+
+    if (check5 && s[5] > 5.125) {
+      s[6] = min(s[6] + 1, 2);
+      rect((-17 + -9.75) / 2 - 1, -17.85, 1.5, s[6]);
+    }
+
+    if (check5 && s[5] > 13.875) {
+      s[7] = min(s[7] + 1, 2);
+      rect((-8.25 + -0.75) / 2 - 1, -17.85, 1.5, s[7]);
+    }
+
+    if (check5 && s[5] > 22.625) {
+      s[8] = min(s[8] + 1, 2);
+      rect((0.75 + 8.25) / 2 - 1, -17.85, 1.5, s[8]);
+    }
+
+    if (check5 && s[5] > 31.375) {
+      s[9] = min(s[9] + 1, 2);
+      rect((9.75 + 17) / 2 - 1, -17.85, 1.5, s[9]);
+    }
+
+    if (check5 && s[5] > 18.25) {
+      s[10] = min(s[10] + 1, 100);
+    }
+
+    if (check6) {
+      s[11] = min(s[11] + 1, 12.4);
+      rect(-14, 16.5, 1.5, s[11])
+      rect(-11.5, 16.5, 1.5, s[11])
+      rect(-7.75, 16.5, 1.5, s[11])
+      rect(-4, 16.5, 1.5, s[11])
+      rect(1.5, 16.5, 1.5, s[11])
+      rect(4, 16.5, 1.5, s[11])
+      rect(7.8, 16.5, 1.5, s[11])
+      rect(11, 16.5, 1.5, s[11])
+      rect(13, 16.5, 1.5, s[11])
+    }
+
+    if (check7) {
+      const inverseFullness = Math.max((8 - s[12]), 0.0001) / 8;
+      s[12] = min(s[12] + inverseFullness * flowRate / 100, 8);
+      rect(-1.5, 30.5, 3, -s[12]);
+      if (s[12] > 1.5) {
+        rect(-17, 29, 34, -s[12] + 1.5);
+      }
+    }
+
+    if (check8) {
+      s[13] = min(s[13] + 1, 10.6 + (beakerHeight * 10 / 11) * (1000 - state.beakerWaterLevel) / 1000);
+    }
+
+    fill("rgba(100, 100, 255, 0.4)");
+    rect(-1.5, 30.5, 3, s[13]);
+
+    pop();
+
+    if (check5) {
+      state.waterOnMesh = true;
+    }
+
+    if (check6) {
+      state.waterInReservoir = true;
+    }
+  } else {
+    push();
+    translate(cl[0], cl[1]);
+
+    if (s[5] > 0) {
+      s[5] = max(s[5] - 1, 0);
+      rect(-20, -22.35 + 3.5 * (38.5 - s[5]) / 38.5, 38.5, 3.5 - 3.5 * (38.5 - s[5]) / 38.5);
+    } else {
+      s[6] = max(s[6] - 1, 0);
+      s[7] = max(s[7] - 1, 0);
+      s[8] = max(s[8] - 1, 0);
+      s[9] = max(s[9] - 1, 0);
+    }
+
+    if (s[6] > 0) {
+      rect((-17 + -9.75) / 2 - 1, -16.35, 2, -s[6]);
+      rect((-8.25 + -0.75) / 2 - 1, -16.35, 2, -s[7]);
+      rect((0.75 + 8.25) / 2 - 1, -16.35, 2, -s[8]);
+      rect((9.75 + 17) / 2 - 1, -16.35, 2, -s[9]);
+    }
+
+    pop();
+
+    push();
+
+    translate(bc[0], bc[1]);
+
+    if (s[4] > 0) {
+      s[4] = max(s[4] - flowRate, 0);
+      push();
+      translate(-50, -bh / 2 - 5.25);
+      rect(-20, -55.6, s[4], 2.2);
+      pop();
+    }
+
+    if (s[4] === 0) {
+      s[3] = max(s[3] - flowRate, 0);
+    }
+
+    if (s[3] === 0) {
+      s[2] = max(s[2] - flowRate, 0);
+    }
+
+    if (s[2] === 0) {
+      s[1] = max(s[1] - flowRate, 0);
+    }
+
+    if (s[1] === 0) {
+      s[0] = max(s[0] - flowRate, 0);
+    }
+
+    if (s[0] > 0) {
+      rect(-beakerWidth / 2 + 1.65, beakerHeight / 2 - 3, 2.2, -s[0]);
+    }
+
+    if (s[1] > 0) {
+      rect(-beakerWidth / 2 + 1.5, -beakerHeight / 2 - 6.35, -s[1], 2.2);
+    }
+
+    if (s[2] > 0) {
+      push();
+      translate(-50, -bh / 2 - 5.25);
+      rect(0, -1.1, -s[2], 2.2);
+      pop();
+    }
+
+    if (s[3] > 0) {
+      push();
+      translate(-50, -bh / 2 - 5.25);
+      rect(-22.85, -2, 2.2, -s[3]);
+      pop();
+    }
+
+    if (s[6] === 0 && s[10] !== 0) {
+      s[10] = min(s[10] + 1, 200);
+      if (s[10] === 200) {
+        s[10] = 0;
+      }
+    }
+
+    pop();
+
+    push();
+
+    translate(cl[0], cl[1]);
+
+    if (s[10] === 0) {
+      s[11] = max(s[11] - 1, 0);
+    }
+
+    rect(-14, 28.9, 1.5, -s[11])
+    rect(-11.5, 28.9, 1.5, -s[11])
+    rect(-7.75, 28.9, 1.5, -s[11])
+    rect(-4, 28.9, 1.5, -s[11])
+    rect(1.5, 28.9, 1.5, -s[11])
+    rect(4, 28.9, 1.5, -s[11])
+    rect(7.8, 28.9, 1.5, -s[11])
+    rect(11, 28.9, 1.5, -s[11])
+    rect(13, 28.9, 1.5, -s[11])
+
+    const fullness = Math.max(s[12], 5);
+
+    if (s[11] === 0) {
+      s[12] = max(s[12] - fullness / 200, 0);
+    }
+
+    rect(-1.5, 30.5, 3, -s[12]);
+    if (s[12] > 1.5) {
+      rect(-17, 29, 34, -s[12] + 1.5);
+    }
+
+    if (s[12] === 0) {
+      s[13] = max(s[13] - 1, 0);
+    } else {
+      s[13] = 10.6 + (beakerHeight * 10 / 11) * (1000 - state.beakerWaterLevel) / 1000
+    }
+
+    const beakerWaterCoord = 30.5 + 10.6 + (beakerHeight * 10 / 11) * (1000 - state.beakerWaterLevel) / 1000;
+
+    fill("rgba(100, 100, 255, 0.4)");
+    rect(-1.5, beakerWaterCoord, 3, -s[13]);
+
+    pop();
+
+    if (s[10] === 0) {
+      state.waterOnMesh = false;
+    }
+
+    if (s[12] === 0) {
+      state.waterInReservoir = false;
+    }
+  }
+  pop();
 }
 
 function drawGrid(waterPresent, waterFlowCoordinate) {
@@ -33,21 +315,34 @@ function drawGrid(waterPresent, waterFlowCoordinate) {
   }
   beginShape();
 
-  vertex(-16.65, -16.125);
-  vertex(16.65, -16.125);
-  if (waterPresent) {
-    vertex(16.65, -16.125 + waterFlowCoordinate * 32.25 / 100);
-    vertex(-16.65, -16.125 + waterFlowCoordinate * 32.25 / 100);
+  if (waterFlowCoordinate <= 100) {
+    vertex(-16.65, -16.125);
+    vertex(16.65, -16.125);
+    if (waterPresent) {
+      vertex(16.65, -16.125 + waterFlowCoordinate * 32.25 / 100);
+      vertex(-16.65, -16.125 + waterFlowCoordinate * 32.25 / 100);
+    } else {
+      vertex(16.65, 16.125);
+      vertex(-16.65, 16.125);
+    }
   } else {
     vertex(16.65, 16.125);
     vertex(-16.65, 16.125);
+    if (waterPresent) {
+      vertex(-16.65, -16.125 + (waterFlowCoordinate - 100) * 32.25 / 100);
+      vertex(16.65, -16.125 + (waterFlowCoordinate - 100) * 32.25 / 100);
+    } else {
+      vertex(-16.65, -16.125);
+      vertex(16.65, -16.125);
+    }
   }
 
   const s = waterPresent ? 0.5 : 1;
-  const rows = waterPresent ? constrain(waterFlowCoordinate / 100 * 10, 0, 10) : 10;
+  const maxRows = waterPresent ? constrain(waterFlowCoordinate / 100 * 10, 0, 10) : 10;
+  const minRows = waterPresent ? constrain(round((waterFlowCoordinate - 100) / 100 * 10), 0, 10) : 0;
 
   for (let i = 1; i < 15; i++) {
-    for (let j = 1; j < rows; j++) {
+    for (let j = minRows + 1; j < maxRows; j++) {
       beginContour();
       vertex(i * 2.3 - 17.25 - s * 0.825, j * 3.45 - 17.25 - s * 0.0375);
       vertex(i * 2.3 - 17.25 - s * 0.825, j * 3.45 - 17.25 + s * 0.0375);
@@ -62,7 +357,7 @@ function drawGrid(waterPresent, waterFlowCoordinate) {
   }
 
   for (let i = 0; i < 15; i++) {
-    for (let j = 0; j < rows; j++) {
+    for (let j = minRows; j < maxRows; j++) {
       beginContour();
       if (i > 0) {
         vertex(i * 2.3 - 17.25 + 1.150125 - s * 0.825, j * 3.45 - 17.25 + 1.725 - s * 0.0375);
@@ -183,7 +478,7 @@ function drawTemperatureMeter(temp, x, y, str) {
   textAlign(CENTER, CENTER);
   stroke(0);
   fill(255);
-  strokeWeight(0.125 / relativeSize());
+  strokeWeight(0.75 / relativeSize());
   textSize(1.5 * relativeSize() ** 0.125);
   text(str, 7.5, 1.75);
   textFont(state.temperatureFont);
@@ -248,7 +543,7 @@ function drawWaterDistributor() {
   drawApparatusTopTemperatureMeter();
   drawApparatusBottomTemperatureMeter();
   drawReservoirTemperatureMeter();
-  const distributorFill = "rgba(240, 240, 240, 0.7)";
+  const distributorFill = "rgba(240, 240, 240, 0.55)";
   const distrubutorStroke = "rgba(150, 150, 150, 0.8)";
   fill(distributorFill);
   stroke(distrubutorStroke);
@@ -325,7 +620,7 @@ function drawWaterDistributor() {
     [-17, 29]
   ];
 
-  const reservoirColor = "rgba(255, 255, 255, 0.8)";
+  const reservoirColor = "rgba(255, 255, 255, 0.5)";
   const reservoirStroke = "rgba(220, 220, 220, 0.8)";
 
   stroke(reservoirStroke);
@@ -406,7 +701,7 @@ function drawReservoirTemperatureMeter() {
   stroke(color("brown"))
   fill(color("gold"));
   strokeWeight(0.25 / relativeSize());
-  translate(12, 22);
+  translate(11.7, 23.5);
   rect(0, 0, 1, 5);
   pop();
   drawTemperatureMeter(
@@ -419,10 +714,17 @@ function drawReservoirTemperatureMeter() {
 function drawBeaker() {
   const beakerStroke = "rgba(0, 0, 0, 0.5)";
   const beakerFill = "rgba(230, 230, 230, 1)";
+  const waterFill = "rgba(100, 100, 255, 0.4)";
 
   push();
 
   translate(beakerCoordinate[0], beakerCoordinate[1]);
+  fill(waterFill);
+  noStroke();
+
+  const beakerPx = (state.beakerWaterLevel / 1000) * beakerHeight * 10 / 11;
+  rect(-beakerWidth / 2 - 1, beakerHeight / 2 - 0.8, beakerWidth + 2, -beakerPx);
+
   fill(beakerFill);
   stroke(beakerStroke);
   strokeWeight(0.5 / relativeSize());
@@ -618,6 +920,35 @@ function drawPump() {
   stroke(0);
   rect(8, 0, 20, 8, 1);
   drawPumpKnob();
+  drawPumpLabel();
+  pop();
+}
+
+function drawPumpLabel() {
+  push();
+  translate(8, -6);
+  noFill();
+  stroke(0);
+  strokeWeight(0.25 / relativeSize());
+
+  beginShape();
+  for (let i = 0; i < 90; i++) {
+    vertex(-cos(radians(i)) * 6, -sin(radians(i)) * 5);
+  }
+  endShape();
+
+  noStroke();
+  fill(0);
+  triangle(-6, 0, -6.5, -0.8, -5.5, -0.8);
+  triangle(0, -4.9, -0.8, -5.4, -0.8, -4.4);
+
+  textSize(1.5 * relativeSize() ** 0.125);
+  textAlign(RIGHT, CENTER);
+  text("OPEN", -8, 0);
+  textAlign(LEFT, CENTER);
+  text("CLOSE", 2, -6);
+  textAlign(CENTER, TOP);
+  text("PUMP POWER", -20, 40);
   pop();
 }
 
@@ -663,7 +994,7 @@ function drawPumpPowerSwitch() {
   translate(-20, 24);
   rectMode(CORNER);
   fill(40);
-  if (state.switchOn) {
+  if (state.pumpOn) {
     rotate(-PI / 3);
     translate(-1, 0);
     rect(0, 0, 5, 2, 0.5);
@@ -737,6 +1068,10 @@ function drawFanPowerSwitch() {
   textAlign(CENTER, CENTER);
   text("OFF", w * 0.25, w * 0.2);
   text("ON", w * 0.8, w * 0.2);
+  fill(0);
+  noStroke();
+  textAlign(CENTER, TOP);
+  text("FAN POWER", w * 0.525, w * 0.55);
   pop();
 }
 
@@ -750,7 +1085,7 @@ window.mousePressed = () => {
     state.mousePositionStart = [x, y];
   }
   if (x > pumpSwitchCenter[0] - 19 && x < pumpSwitchCenter[0] + 19 && y > pumpSwitchCenter[1] - 8 && y < pumpSwitchCenter[1] + 4) {
-    state.switchOn = !state.switchOn;
+    state.pumpOn = !state.pumpOn;
   }
   if (abs(x - fanSwitchCenter[0]) < bladeLength * 15 / 24 && abs(y - fanSwitchCenter[1]) < bladeLength * 5 / 12) {
     state.fanOn = !state.fanOn;
