@@ -48,7 +48,7 @@ function drawWater(pumpOn) {
 
   state.beakerWaterLevel = 1000 - totalWaterInSystem / 3;
 
-  if (pumpOn) {
+  if (pumpOn && state.valvePosition > 0) {
     const check1 = s[0] === beakerHeight;
     const check2 = s[1] === 30 && check1;
     const check3 = s[2] === 20 && check2;
