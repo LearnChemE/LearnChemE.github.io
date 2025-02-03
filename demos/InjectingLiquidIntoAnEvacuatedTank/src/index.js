@@ -4,7 +4,7 @@ window.p5 = new require("./js/p5.min.js");
 
 // TO DO:
 
-// GLOBAL VARIABLES OBJECTåç
+// GLOBAL VARIABLES OBJECT
 window.gvs = {
     liquid_level: 0, // 0-1 value of how high liquid is in tank
     final_liquid_level: 0, // The final liquid level, between 0 and 0.3 depending on value of V_final
@@ -19,8 +19,7 @@ window.gvs = {
     L_final: 0, // the solution to moles of liquid in the tank
     V_final: 0, // the solution to moles of vapor in the tank
     P_final: 0, // the final pressure in the tank
-    T: 5, // Initial Temperature (deg. C) starts at 5°C
-    max_temperature: 100,
+    T: 35, // Temperature (deg. C)
     n: 1.0, // moles to inject (moles)
     chemical: "propane", // chemical to inject
     syringe_initial: 0.5, // The initial value for how far the syringe is pushed in. Dictated by moles to inject (n)
@@ -43,15 +42,13 @@ const sketch = (p) => {
         require("./js/inputs.js");
         
         p.windowResized = function() {
-            // Optional window resizing behavior
+
         }
     };
 
     p.draw = function() {
         p.background.apply(this, gvs.background_color);
         gvs.drawAll(p);
-
-        // Constant for temperature update duration (seconds)
         const seconds_to_inject = 2.5;
         const frameRate = 60;
         const frames_per_second = frameRate;
@@ -63,22 +60,7 @@ const sketch = (p) => {
         const dP = gvs.P_final / frames;
         const dVap = gvs.final_vapor_density / frames;
         const dLiq = gvs.final_liquid_level / frames;
-
-        // Update temperature continuously from 5°C to 100°C
-        if (gvs.is_running && !gvs.is_finished) {
-            // const maxTemperature = 100; // 100°C
-            // const minTemperature = 5;  // 5°C
-            // const temperatureRange = maxTemperature - minTemperature;
-            // const elapsedTime = (p.frameCount / frameRate); // Total time elapsed in seconds
-            // const newTemperature = minTemperature + (temperatureRange * (elapsedTime / 100)); // Increase temperature over time
-            // if (newTemperature <= maxTemperature) {
-            //     gvs.T = newTemperature; // Update the temperature
-            // } else {
-            //     gvs.T = maxTemperature; // Stop at 100°C
-            // }
-            gvs.updateTemperature();
-
-            // Update other simulation parameters during the "running" state
+        if(gvs.is_running && !gvs.is_finished) {
             gvs.syringe_fraction += dInj;
             gvs.percent_injected += dt;
             gvs.P += dP;
@@ -86,9 +68,7 @@ const sketch = (p) => {
             gvs.V += dV;
             gvs.liquid_level += dLiq;
             gvs.vapor_density += dVap;
-
-            // If injection is complete, finish the experiment
-            if (gvs.percent_injected >= 1) {
+            if(gvs.percent_injected >= 1) {
                 gvs.percent_injected = 1;
                 gvs.is_finished = true;
                 gvs.is_running = false;
@@ -99,7 +79,7 @@ const sketch = (p) => {
                 const reset_button = document.getElementById("reset-button");
                 reset_button.style.transition = "background 2s";
                 gvs.reset_interval = setInterval(() => {
-                    if (gvs.reset_button_bright) {
+                    if(gvs.reset_button_bright) {
                         reset_button.classList.remove("bright");
                     } else {
                         reset_button.classList.add("bright");
@@ -108,11 +88,8 @@ const sketch = (p) => {
                 }, 1000);
             }
         }
-
-        //drawTemperatureProgressBar(p);
     };
 
 };
 
-// Initialize the p5 instance with the sketch
 const P5 = new p5(sketch, containerElement);
