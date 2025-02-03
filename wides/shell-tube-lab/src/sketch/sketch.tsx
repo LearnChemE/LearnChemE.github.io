@@ -8,6 +8,11 @@ import {
   handleDoubleBeakerCalculations,
   randStartVals,
 } from "./functions";
+import { ppid } from "process";
+import { PathTrace } from "../types/pathTrace";
+import { CreateVAOs } from "./createVao";
+import { CreateShaderProgram } from "./createShader";
+import { blueFragShaderSource, fillVertShaderSource } from "./shaders";
 
 // Globals defined here
 export const g = {
@@ -60,8 +65,12 @@ const START_PUMPS_NEXT_FRAME = -2;
 
 // Sketch for P5 Wrapper
 const ShellTubeSketch = (p: P5CanvasInstance) => {
+  var gl: WebGL2RenderingContext;
   let graphics: graphicsObjects;
   let isDraggingValves: number = NOT_DRAGGING;
+  var fillPath: PathTrace;
+  var blueShader: any;
+  var blueVao: WebGLVertexArrayObject;
 
   const drag = (isDraggingValves: number) => {
     if (isDraggingValves === NOT_DRAGGING) return;
@@ -133,35 +142,69 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
 
     let current = p.millis() - start;
     if (current < 5000) {
-      // Fill animation
-      // fill inlet tubes
-      let alpha: number = p.map(current, 0, 1000, 0, 255, true);
-      let color: Array<number> = [255, 255, 255, alpha];
+      // // Fill animation
+      // // fill inlet tubes
+      // let alpha: number = p.map(current, 0, 1000, 0, 255, true);
+      // let color: Array<number> = [255, 255, 255, alpha];
+      // p.push();
+      // p.tint(color);
+      // p.image(graphics.tubes[0], 0, 0);
+      // p.image(graphics.tubes[3], 0, 0);
+
+      // // HEX fill
+      // alpha = p.map(current, 1000, 4000, 0, 475, true);
+      // let alpha2 = p.map(current, 1000, 4000, 0, 300, true);
+      // let blue = graphics.blueShellTube.get(475 - alpha, 0, alpha, 300);
+      // let orng = graphics.orngShellTube.get(0, 0, 475, alpha2);
+      // if (alpha2 < 1 || alpha < 1) {
+      //   p.pop();
+      //   return;
+      // }
+      // p.image(orng, 75, 75);
+      // p.image(blue, 550 - alpha, 75);
+
+      // // Exit tubes
+      // alpha = p.map(current, 4000, 5000, 0, 255, true);
+      // color = [255, 255, 255, alpha];
+      // p.tint(color);
+      // p.image(graphics.tubes[1], 0, 0);
+      // p.image(graphics.tubes[2], 0, 0);
+
+      // p.pop();
+
+      gl.useProgram(blueShader);
+      gl.bindVertexArray(blueVao);
+      gl.drawElements(gl.TRIANGLES,3,gl.UNSIGNED_INT,0);
+      gl.useProgram(null);
+
       p.push();
-      p.tint(color);
-      p.image(graphics.tubes[0], 0, 0);
-      p.image(graphics.tubes[3], 0, 0);
-
-      // HEX fill
-      alpha = p.map(current, 1000, 4000, 0, 475, true);
-      let alpha2 = p.map(current, 1000, 4000, 0, 300, true);
-      let blue = graphics.blueShellTube.get(475 - alpha, 0, alpha, 300);
-      let orng = graphics.orngShellTube.get(0, 0, 475, alpha2);
-      if (alpha2 < 1 || alpha < 1) {
-        p.pop();
-        return;
-      }
-      p.image(orng, 75, 75);
-      p.image(blue, 550 - alpha, 75);
-
-      // Exit tubes
-      alpha = p.map(current, 4000, 5000, 0, 255, true);
-      color = [255, 255, 255, alpha];
-      p.tint(color);
-      p.image(graphics.tubes[1], 0, 0);
-      p.image(graphics.tubes[2], 0, 0);
-
+      p.fill("red");
+      let pos = fillPath.calculatePosition(current);
+      console.log(pos)
+      p.circle(pos[0],pos[1],10);
       p.pop();
+
+      
+
+      var vertices = [[490,370],[490,80],[435,80],[435,370],[380,370],[380,80],[325,80],[325,370],[270,370],[270,80],[215,80],[215,370],[160,370],[160,80]];
+      // var gl = p._renderer.GL;
+      // console.log(p);
+      // gl.clear(gl.COLOR_BUFFER_BIT);
+
+      p.push();
+      p.fill("red"); p.stroke("red");
+      p.translate(0,0,1);
+      p.beginShape(p.LINES);
+      for (let i=0;i<vertices.length-1;i++) {
+        p.vertex(vertices[  i][0],vertices[  i][1]);
+        p.vertex(vertices[i+1][0],vertices[i+1][1]);
+      }
+      p.endShape();
+      p.pop();
+
+      // p.image(graphics.orngShellTube, 75, 75);
+      // p.image(graphics.blueShellTube, 75, 75);
+
     } else {
       // Pumps have been running
       for (let i = 0; i < 4; i++) p.image(graphics.tubes[i], 0, 0); // fill all tubes
@@ -185,50 +228,70 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     p.pop();
   };
 
+  p.preload = () => {
+  }
+
   p.setup = () => {
-    p.createCanvas(g.width, g.height);
+    p.createCanvas(g.width, g.height, p.WEBGL);
+
+    gl = p._renderer.GL;
+    blueShader = CreateShaderProgram(gl,fillVertShaderSource,blueFragShaderSource);
+    blueVao = CreateVAOs(gl,blueShader);
+
     graphics = createGraphicsObjects(p); // Load graphics objects
     randStartVals();
+
+    var vertices = [[490,370],[490,80],[435,80],[435,370],[380,370],[380,80],[325,80],[325,370],[270,370],[270,80],[215,80],[215,370],[160,370],[160,80]];
+    fillPath = new PathTrace(5000,vertices);
   };
 
   p.draw = () => {
+    // console.log(p)
     if (g.startTime === START_PUMPS_NEXT_FRAME) g.startTime = p.millis();
     p.background(250);
+    p.translate(-g.width/2,-g.height/2);
     // showDebugCoordinates(p);
 
-    p.image(graphics.pumpAssembly,  60, 455);
-    p.image(graphics.pumpAssembly, 430, 455);
+    gl.useProgram(blueShader);
+    gl.bindVertexArray(blueVao);
+    gl.drawArrays(gl.TRIANGLES,0,3);
+    gl.bindVertexArray(null);
+    
+    p.resetShader();
 
-    fillAnimation();
-    drag(isDraggingValves);
-    drawValve(
-      75,
-      440,
-      g.mDotH,
-      MIN_HOT_FLOWRATE,
-      MAX_HOT_FLOWRATE,
-      p,
-      graphics.valve
-    );
-    drawValve(
-      445,
-      440,
-      g.mDotC,
-      MIN_COLD_FLOWRATE,
-      MAX_COLD_FLOWRATE,
-      p,
-      graphics.valve
-    );
+    // p.image(graphics.pumpAssembly,  60, 455);
+    // p.image(graphics.pumpAssembly, 430, 455);
 
-    handleDoubleBeakerCalculations(p.deltaTime);
-    // console.log(g.Th_in, g.Th_out, g.Tc_in, g.Tc_out);
+    // fillAnimation();
+    // drag(isDraggingValves);
+    // drawValve(
+    //   75,
+    //   440,
+    //   g.mDotH,
+    //   MIN_HOT_FLOWRATE,
+    //   MAX_HOT_FLOWRATE,
+    //   p,
+    //   graphics.valve
+    // );
+    // drawValve(
+    //   445,
+    //   440,
+    //   g.mDotC,
+    //   MIN_COLD_FLOWRATE,
+    //   MAX_COLD_FLOWRATE,
+    //   p,
+    //   graphics.valve
+    // );
+
+    // handleDoubleBeakerCalculations(p.deltaTime);
+    // // console.log(g.Th_in, g.Th_out, g.Tc_in, g.Tc_out);
 
     // prettier-ignore
     fillBeaker(p,  55, g.vols[0], g.orangeFluidColor);
-    fillBeaker(p, 235, g.vols[1], g.orangeFluidColor);
-    fillBeaker(p, 415, g.vols[2], g.blueFluidColor);
-    fillBeaker(p, 595, g.vols[3], g.blueFluidColor);
-    p.image(graphics.beakers, 0, 0);
+    // fillBeaker(p, 235, g.vols[1], g.orangeFluidColor);
+    // fillBeaker(p, 415, g.vols[2], g.blueFluidColor);
+    // fillBeaker(p, 595, g.vols[3], g.blueFluidColor);
+    // p.image(graphics.beakers, 0, 0);
   };
 
   // P5 mousePressed handler determines if dragging
