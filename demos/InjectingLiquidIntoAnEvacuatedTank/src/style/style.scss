@@ -2,9 +2,8 @@ $modal-sm: calc(100vw - 50px);
 $modal-md: calc(100vw - 50px);
 $modal-lg: 820px;
 $modal-xl: 1140px;
-
 @import "bootstrap";
-@import "./slider.scss";  // Keeping slider styling in place if needed for other inputs
+@import "./slider.scss";
 
 .simulation-controls {
     display: grid;
@@ -186,16 +185,7 @@ canvas {
     background-color: rgb(240, 240, 240);
 }
 
-/* If temperature slider is no longer used, we can hide it or remove its style */
-#T-slider {
-    display: none; /* Hides the temperature slider */
-}
-
-/* Ensure that the rest of the controls and buttons remain intact */
-.simulation-controls {
-    display: grid;
-    grid-template-columns: max-content max-content;
-    justify-content: center;
-    gap: 0px 20px;
-    width: 100vw;
+*[disabled="yes"] {
+    opacity: 0.3 !important;
+    pointer-events: none;
 }
