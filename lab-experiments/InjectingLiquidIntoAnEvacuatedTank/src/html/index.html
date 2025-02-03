@@ -1,0 +1,325 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en">
+  <title>Injecting Liquid Into an Evacuated Tank</title>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.9,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-204988035-3');
+  </script>
+</head>
+
+<body>
+  <!-- <div class="simulation-title">Injecting Liquid Into an Evacuated Tank</div> -->
+
+  <div class="simulation-controls">
+    <div class="input-area">
+
+      <div class="input-row">
+        <div class="data-name">Moles to inject</div>
+        <input type="range" id="n-slider" min="0.2" max="2" step="0.01" value="1">
+        <div class="data-value" id="n-value">1.00</div>
+        <div class="data-metric">mol</div>
+      </div>
+
+    </div>
+
+    <div class="modal-buttons-row">
+      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
+        Directions</div>
+      <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details
+      </div>
+      <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+    </div>
+
+  </div>
+
+  <div class="simulation-controls-below">
+    <div class="select-wrapper">
+      <div class="label">Chemical to inject</div>
+      <select id="select-chemical" value="propane">
+        <option value="propane">propane</option>
+        <option value="toluene">toluene</option>
+      </select>
+    </div>
+
+    <div class="start-wrapper">
+      <div id="go-button">inject</div>
+      <div id="reset-button">reset</div>
+    </div>
+  </div>
+
+  <div id="p5-container"></div>
+
+  <!-- Temperature Meter -->
+  <!-- <div id="temperature-meter-container">
+    <div id="temperature-meter">
+      <div id="temperature-meter-inner"></div>
+      <span id="temperature-value">35°C</span>
+    </div>
+  </div> -->
+
+  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="directions-modal-label">Directions</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            In this simulation, liquid propane or liquid toluene is injected into an evacuated 2-L spherical tank that
+            is held at constant temperature. When propane is injected, it either vaporizes completely or forms two
+            phases in vapor-liquid equilibrium (VLE), depending on the number of moles injected and the temperature
+            (control both with sliders). Because toluene has a much lower saturation pressure, only a small amount of
+            injected toluene liquid vaporizes. When the component is in VLE, the tank pressure equals the saturation
+            pressure; otherwise, the pressure is calculated using the ideal gas law. The pressure is displayed at the
+            top of the tank. Click the "inject" button to inject liquid into the tank. Press "reset" at any time to
+            start from the beginning. The intensity of the blue color of the vapor is proportional to the vapor density.
+            The liquid volume in the tank is exaggerated relative to the vapor volume for better visualization. The bar
+            graph on the right shows the number of moles of liquid and vapor in the tank.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="details-modal-label">Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <p>
+            When propane or toluene is in vapor-liquid equilibrium (VLE), the pressure in the tank is the saturation
+            pressure, which is calculated using the Antoine equation:
+          </p>
+
+          <p class="block-eqn">
+            $$
+            [1] \quad P_{i}^{sat} = 10^{\left( A_{i} - \frac{ B_{ i } }{ T + C_{ i } } \right)}
+            $$
+          </p>
+
+          <p>
+            where \( P_{i}^{sat} \) is the saturation pressure (bar), \( A_i \), \( B_i \), and \( C_i \) are Antoine
+            constants, and \( T \) is temperature (K). When only vapor is present, the ideal gas law is used to
+            calculate the pressure \( P \):
+          </p>
+
+          <p class="block-eqn">
+            $$
+            [2] \quad P = \frac{ n R T }{ V }
+            $$
+          </p>
+
+          <p>
+            where \( n \) is the total moles (moles of vapor in this case), \( R \) is the ideal gas constant [(L bar)
+            / (mol K)], and \( V \) is the total volume (L). When the component is in VLE, the sum of the liquid \( V_L
+            \) and vapor \( V_V \) volumes equal the volume of the tank \( V \):
+          </p>
+
+          <p class="block-eqn">
+            $$
+            [3] \quad V = V_L + V_V
+            $$
+          </p>
+
+          <p>
+            and the liquid volume is determined using the liquid density \( \rho_{ L } \):
+          </p>
+
+          <p class="block-eqn">
+            $$
+            [4] \quad V_L = \frac{ n_L }{ \rho_L }
+            $$
+          </p>
+
+          <p>
+            The vapor volume is determined using the ideal gas law:
+          </p>
+
+          <p class="block-eqn">
+            $$
+            [5] \quad V_V = \frac{ n_V R T }{ P^{sat} }
+            $$
+          </p>
+
+          <p>
+            where the total moles (moles injected) equals the sum of the liquid \( n_L \) and vapor \( n_V \) moles:
+          </p>
+
+          <p class="block-eqn">
+            $$
+            [6] \quad n = n_L + n_V
+            $$
+          </p>
+
+          <p>
+            To solve for \( n_{L} \), substitute equation [4] and [5] into equation [3],
+          </p>
+
+          <p class="block-eqn">
+            $$
+            [7] \quad V = \frac{ n_L }{ \rho_L } + \frac{ ( n - n_L ) R T }{ P^{sat} }
+            $$
+          </p>
+
+          <p>
+            and bring \( n_{L} \) to the left-hand side of the equation:
+          </p>
+
+          <p class="block-eqn">
+            $$
+            [8] \quad n_L = \frac{ \rho_L (P^{sat} V - n R T) }{ P^{sat} - R T \rho_L }
+            $$
+          </p>
+
+          <p>
+            From here we can calculate the volume of vapor by solving equation [6] for \( n_{V} \) and plugging it into
+            equation [5].
+          </p>
+
+          <div style="margin-top: 2rem;"></div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="about-modal-label">About</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren and Rakesh Vijay Kumar under the direction of
+            Professor John L. Falconer. This simulation was prepared with financial support from the National Science Foundation. Address any questions or comments to learncheme@gmail.com. All of our
+            simulations are open source, and are available on our <a
+              href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
+              repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page
+            (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is
+            not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended
+            browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simulation constants
+    const R = 0.08314;  // Ideal gas constant (L·bar)/(mol·K)
+
+    // DOM elements
+    //const temperatureSlider = document.getElementById("T-slider");
+    //const temperatureValue = document.getElementById("T-value");
+    //const temperatureMeterInner = document.getElementById("temperature-meter-inner");
+    const nSlider = document.getElementById("n-slider");
+    const nValue = document.getElementById("n-value");
+    const goButton = document.getElementById("go-button");
+    const resetButton = document.getElementById("reset-button");
+
+    // Initial conditions
+    let temperature = 35;  // Starting temperature in °C
+    let moles = 1.00;      // Starting moles (default is 1 mol)
+    let pressure = 1.0;    // Initial pressure (bar)
+    let vaporDensity = 0.5; // Vapor density (a proxy for simulation purpose)
+
+    // Update temperature, pressure, and other simulation dynamics
+    function updateSimulation() {
+      // temperature = parseFloat(temperatureSlider.value);
+      // temperatureValue.textContent = temperature.toFixed(1);
+
+      // // Update the temperature progress bar
+      // const tempPercentage = (temperature - 5) / (100 - 5);  // Temperature range: 5°C to 100°C
+      // temperatureMeterInner.style.width = `${tempPercentage * 100}%`;
+
+      // Update the pressure based on the ideal gas law: P = nRT / V
+      // Assuming volume (V) is fixed at 2L, adjust as necessary
+      const volume = 2;  // Fixed tank volume in liters
+      pressure = (moles * R * (temperature + 273.15)) / volume;  // Convert °C to Kelvin
+
+      // Update other simulation values like vapor density
+      vaporDensity = Math.min(1, temperature / 100); // Simplified relation for demonstration
+
+      // You can link more parameters here as per your simulation logic
+      // For example, change the color of the vapor, update liquid/vapor ratio, etc.
+    }
+
+    // Update moles and the corresponding value
+    nSlider.addEventListener("input", () => {
+      moles = parseFloat(nSlider.value);
+      nValue.textContent = moles.toFixed(2);
+      updateSimulation();
+    });
+
+    // // Update temperature and the corresponding value
+    // temperatureSlider.addEventListener("input", () => {
+    //   updateSimulation();
+    // });
+
+    // Start the simulation on click
+    goButton.addEventListener("click", () => {
+      // Insert simulation start logic here
+      console.log("Simulation Started with:", { moles, pressure, vaporDensity });
+    });
+
+    // Reset the simulation
+    resetButton.addEventListener("click", () => {
+      //temperatureSlider.value = 35;
+      nSlider.value = 1.00;
+      updateSimulation();
+      console.log("Simulation Reset");
+    });
+
+    // Initial update to display
+    updateSimulation();
+
+  </script>
+  
+</body>
+
+</html>
