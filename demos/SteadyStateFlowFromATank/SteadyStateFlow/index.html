@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steady-State Flow from a Tank</title>
+    <link rel="stylesheet" href="main.css">
+    <script src="https://kit.fontawesome.com/9d19ad28f4.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="button-container">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#directions">Directions</button>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#details">Details</button>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#about">About</button>
+    </div>
+
+
+    <div class="slider-container">
+        <div class="slider-wrapper">
+                <label class="slider-label" for="liquidHeight">Liquid Height (m)</label>
+                <input class="slider" type="range" id="liquidHeight" min="0.18" max="0.90" step="0.02" value="0.18">
+                <span class="slider-value" id="liquidHeightValue">0.18</span>
+        </div>
+        <div class="slider-wrapper">
+                <label class="slider-label" for="drainDiameter">Drain Diameter (cm)</label>
+                <input class="slider" type="range" id="drainDiameter" min="2.0" max="7.0" step="0.1" value="7.0">
+                <span class="slider-value" id="drainDiameterValue">7.0</span>
+        </div>
+        <div class="slider-wrapper">
+                <label class="slider-label" for="liquidDensity">Liquid Density (kg/L)</label>
+                <input class="slider" type="range" id="liquidDensity" min="0.8" max="1.50" step="0.02" value="1.00">
+                <span class="slider-value" id="liquidDensityValue">1.00</span>
+        </div>
+        <div class="slider-wrapper">
+                <label class="slider-label" for="dischargeCoefficient">Discharge Coefficient (c₀)</label>
+                <input class="slider" type="range" id="dischargeCoefficient" min="0.5" max="1.00" step="0.05" value="0.95">
+                <span class="slider-value" id="dischargeCoefficientValue">0.95</span>
+        </div>
+    </div>
+
+    
+
+    <canvas id="centeredCanvas" width="624" height="455"></canvas>
+    <div id="overlayContainer"></div>
+
+    <script>
+        fetch('../Overlay/overlay.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('overlayContainer').innerHTML = data;
+            });
+    </script>
+
+    <script type="module" src="canvas.js"></script>
+
+    <!-- Bootstrap JS, Popper, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

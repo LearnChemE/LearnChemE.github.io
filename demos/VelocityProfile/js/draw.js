@@ -1,63 +1,121 @@
 import { calcAll } from './calcs.js';
+const selectionElement = document.getElementById('selection');
+const p5container = document.getElementById('p5-container');
 
-/* 
-  This file is responsible for drawing the simulation.
-  Pretty much all of the functions in this file are part
-  of the p5.js library. Documentation is available at p5js.org.
-*/
+// This function is used to scale the canvas based on the size of the container
+window.relativeSize = () => p5container.offsetWidth / 1280;
 
-// The setup function is called when the page loads.
+function resize() {
+  // Here I am reassigning the width and height of the canvas to a static value of 1280x720,
+  // even though the actual canvas size is based on the size of the #p5-container element.
+  // So you can effectively treat the canvas like it is 1280x720, even though it will scale to fit the screen.
+  width = 1280;
+  height = 720;
+  scale(relativeSize());
+}
+
+// Moved outside of the selection block - Do not call setup() more than once.
+// So this should never be inside a conditional statement.
 window.setup = function() {
-  createCanvas(800, 600);
-  background(255);
+  createCanvas(p5container.offsetWidth, p5container.offsetHeight).parent(p5container);
   frameRate(30);
-  if (!g.playing) {
-    noLoop();
+}
+
+// Same with draw() - this should never be inside a conditional statement.
+// Put the conditional statements inside the draw function.
+window.draw = function() {
+  // The "window" keyword is used to set global variables. So you can use
+  // "selection" in any file, function, block, etc.
+  window.selection = selectionElement.value;
+  resize();
+
+  background(255);
+  calcAll();
+  drawGraphDist();
+  drawText();
+
+  if (selection === "velocity-distribution") {
+    // do something here
+  } else if (selection === "velocity-vs-height") {
+    // do something else here
   }
 }
 
-/*
-  The draw function will be called at 30 frames per second,
-  unless we call the noLoop() function, in which case it will pause
-  until we call loop().
-*/
-window.draw = function() {
-  background(255);
-  calcAll();
-  drawText();
-  drawParticles();
+// Look this function up in p5.js documentation. The width and height of
+// the #p5-container element are set in the css file.
+window.windowResized = () => {
+  resizeCanvas(p5container.offsetWidth, p5container.offsetHeight);
 }
+
+// I had a while loop set here, I just had true inside of the loop parameters, I think this was the problem
 
 function drawText() {
   push();
 
   textAlign(CENTER);
   noStroke();
-  fill("black");
+  fill("White");
   textSize(32);
 
-  text(`You have selected ${g.selection}`, width / 2, 100);
+  const label = selection === "velocity-distribution" ? "Velocity Distribution" : "Velocity vs Height";
+
+  text(`Moving Plate ${label}`, width / 2, (height / 2 - 240 - 13));
+  text(`Stationary Plate`, width / 2, (height / 2 + 275));
 
   pop();
 }
 
-function drawParticles() {
+function drawGraphDist() {
   push();
 
   rectMode(CENTER);
-  fill(0, 0, 0, 10);
-  stroke(0, 0, 0);
-  strokeWeight(1);
-  rect(width / 2, height / 2, 400, 300);
+  stroke('black');
+  strokeWeight(5);
+  rect(width / 2, height / 2, 854, 480);
 
+  rectMode(CENTER);
+  fill(205, 115, 215);
   noStroke();
-  fill("red");
+  rect(width / 2, (height / 2 - 160), 854, 160 /*will change*/ );
 
-  for (let i = 0; i < g.particles; i++) {
-    const randX = (width / 2) + random(-200, 200);
-    const randY = (height / 2) + random(-150, 150);
-    ellipse(randX, randY, 5, 5);
-  }
+  rectMode(CENTER);
+  fill(30, 255, 55);
+  noStroke();
+  rect(width / 2, (height / 2), 854, 160 /*will change*/ );
+
+  rectMode(CENTER);
+  fill(40, 95, 220);
+  noStroke();
+  rect(width / 2, (height / 2 + 160), 854, 160 /*will change*/ );
+
+  rectMode(CENTER);
+  fill(100, 100, 100);
+  stroke('black');
+  strokeWeight(3.25);
+  rect(width / 2, (height / 2 - 265), 856, 50);
+
+  rectMode(CENTER);
+  fill(100, 100, 100);
+  stroke('black');
+  strokeWeight(3.25);
+  rect(width / 2, (height / 2 + 265), 856, 50);
+
+  line(1, 1, 1, 1);
 
   pop();
+
+
+  /* //incase i need this
+    
+    noStroke();
+    fill("blue");
+   
+    for (let i = 0; i < g.particles; i++) {
+      const randX = (width / 2) + random(-200, 200);
+      const randY = (height / 2) + random(-150, 150);
+      ellipse(randX, randY, 5, 5);
+    }
+   
+    pop();
+    */
 }

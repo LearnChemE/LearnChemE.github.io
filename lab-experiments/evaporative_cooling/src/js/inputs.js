@@ -79,13 +79,17 @@ export function initializeHamburger() {
   handleHamburger();
 }
 
-export function initializeButtons() {
-  const fanButton = document.getElementById("fan");
-  const waterButton = document.getElementById("water");
-  fanButton.addEventListener("click", () => {
-    state.fanOn = !state.fanOn;
-  });
-  waterButton.addEventListener("click", () => {
-    state.waterOn = !state.waterOn;
+export function initializeUnitsButton() {
+  const units = document.getElementById("temp-units");
+  units.addEventListener("click", () => {
+    units.classList.add("clicked");
+    setTimeout(() => {
+      units.classList.remove("clicked");
+    }, 100);
+    if (state.temperatureUnits === "C") {
+      state.temperatureUnits = "F";
+    } else {
+      state.temperatureUnits = "C";
+    }
   });
 }

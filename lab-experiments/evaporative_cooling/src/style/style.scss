@@ -99,6 +99,33 @@ canvas {
   }
 }
 
+#temp-units {
+  position: absolute;
+  right: 2%;
+  bottom: 2%;
+  font-size: 0.8rem;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 5px 12px;
+  background-color: rgb(67, 20, 255);
+  color: white;
+  font-family: sans-serif, Arial;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#temp-units:hover {
+  background-color: rgb(103, 66, 255);
+}
+
+#temp-units.clicked {
+  background-color: rgb(165, 153, 219);
+}
+
 @media screen and (max-width: 768px) {
   #hamburger-icon {
     padding: 3px;
@@ -116,6 +143,15 @@ canvas {
       font-size: 0.7rem;
     }
   }
+  #temp-units {
+    font-size: 0.7rem;
+  }
+}
+
+@media screen and (min-width: 1080px) {
+  #temp-units {
+    font-size: 1.1rem;
+  }
 }
 
 @media screen and (min-width: 1320px) {
@@ -130,26 +166,7 @@ canvas {
     top: 35px;
     padding: 15px;
   }
-}
-
-#temp-container {
-  display: grid;
-  grid-template-columns: max-content max-content;
-  gap: 10px;
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-#fan,
-#water {
-  background-color: lightblue;
-  border: 1px solid black;
-  padding: 5px 10px;
-}
-
-#fan:hover,
-#water:hover {
-  background-color: rgb(217, 239, 246);
+  #temp-units {
+    font-size: 1.2rem;
+  }
 }

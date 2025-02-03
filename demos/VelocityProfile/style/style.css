@@ -20,7 +20,7 @@
 
 .input-area {
   display: grid;
-  grid-template-columns: max-content 15ch max-content max-content;
+  grid-template-columns: repeat(4, max-content);
   align-items: center;
   justify-items: end;
   gap: 0px 10px;
@@ -115,4 +115,19 @@ canvas {
 
 .references {
   font-size: 0.8rem;
+}
+
+#p5-container {
+  width: calc(100vw - 40px);
+  height: calc(calc(100vw - 40px) * 720 / 1280);
+  max-width: calc(calc(100vh - 160px) * 1280 / 720);
+  max-height: calc(100vh - 160px);
+  margin: auto;
+}
+
+canvas {
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+  box-shadow: 0px 0px 2px 2px lightgrey;
 }

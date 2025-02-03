@@ -6,7 +6,7 @@
 
 // Declare global variables which are available to all files
 window.g = {
-  selection: "Option 1",
+  selection: "Velocity Distribution",
   density: 0.5,
   particles: 50,
   playing: false,
