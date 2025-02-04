@@ -46,7 +46,7 @@ function drawWater(pumpOn) {
     }
   });
 
-  state.beakerWaterLevel = 1000 - totalWaterInSystem / 3;
+  state.beakerWaterLevel = 1000 - totalWaterInSystem / 12;
 
   if (pumpOn && state.valvePosition > 0) {
     const check1 = s[0] === beakerHeight;
@@ -144,6 +144,9 @@ function drawWater(pumpOn) {
 
     if (check7) {
       const inverseFullness = Math.max((8 - s[12]), 0.0001) / 8;
+
+      state.reservoirVolume = 100 * (1 - inverseFullness);
+
       s[12] = min(s[12] + inverseFullness * flowRate / 100, 8);
       rect(-1.5, 30.5, 3, -s[12]);
       if (s[12] > 1.5) {
@@ -268,6 +271,8 @@ function drawWater(pumpOn) {
     rect(13, 28.9, 1.5, -s[11])
 
     const fullness = Math.max(s[12], 5);
+
+    state.reservoirVolume = 100 * (1 - (8 - s[12]) / 8);
 
     if (s[11] === 0) {
       s[12] = max(s[12] - fullness / 200, 0);
@@ -488,17 +493,17 @@ function drawTemperatureMeter(temp, x, y, str) {
   textAlign(RIGHT, CENTER);
   let temperature;
   if (state.temperatureUnits === "C") {
-    temperature = (Math.round(10 * temp) / 10).toFixed(1);
+    temperature = Math.round(temp);
   } else {
-    temperature = (Math.round(10 * (temp * 9 / 5 + 32)) / 10).toFixed(1);
+    temperature = Math.round(temp * 9 / 5 + 32);
   }
-  text(temperature, 9.5, 5.5);
+  text(temperature, 8, 5.5);
   textAlign(LEFT, CENTER);
   const units = state.temperatureUnits === "C" ? "C" : "F";
-  text(units, 11, 5.5);
+  text(units, 10, 5.5);
   textFont("Arial");
   textSize(1.75 * relativeSize() ** 0.125);
-  text("°", 9.75, 5.5);
+  text("°", 8.75, 5.5);
   pop();
 }
 
@@ -778,7 +783,7 @@ function drawBeaker() {
       push();
       noStroke();
       fill(100);
-      text(i * 50, beakerWidth / 2 - 2.5, beakerHeight / 2 - 0.7 - i * beakerHeight / 22);
+      text(i * 200, beakerWidth / 2 - 2.5, beakerHeight / 2 - 0.7 - i * beakerHeight / 22);
       pop();
     } else if (i % 2 === 0) {
       xOffset = 0.75;
