@@ -973,33 +973,33 @@ function drawPump() {
   stroke(0);
   rect(8, 0, 20, 8, 1);
   drawPumpKnob();
-  // drawPumpLabel();
+  drawPumpLabel();
   pop();
 }
 
 function drawPumpLabel() {
   push();
   translate(8, -6);
-  noFill();
-  stroke(0);
-  strokeWeight(0.25 / relativeSize());
+  // noFill();
+  // stroke(0);
+  // strokeWeight(0.25 / relativeSize());
 
-  beginShape();
-  for (let i = 0; i < 90; i++) {
-    vertex(-cos(radians(i)) * 6, -sin(radians(i)) * 5);
-  }
-  endShape();
+  // beginShape();
+  // for (let i = 0; i < 90; i++) {
+  //   vertex(-cos(radians(i)) * 6, -sin(radians(i)) * 5);
+  // }
+  // endShape();
 
   noStroke();
   fill(0);
-  triangle(-6, 0, -6.5, -0.8, -5.5, -0.8);
-  triangle(0, -4.9, -0.8, -5.4, -0.8, -4.4);
+  // triangle(-6, 0, -6.5, -0.8, -5.5, -0.8);
+  // triangle(0, -4.9, -0.8, -5.4, -0.8, -4.4);
 
   textSize(1.5 * relativeSize() ** 0.125);
-  textAlign(RIGHT, CENTER);
-  text("OPEN", -8, 0);
-  textAlign(LEFT, CENTER);
-  text("CLOSE", 2, -6);
+  // textAlign(RIGHT, CENTER);
+  // text("OPEN", -8, 0);
+  // textAlign(LEFT, CENTER);
+  // text("CLOSE", 2, -6);
   textAlign(CENTER, TOP);
   text("PUMP POWER", -20, 40);
   pop();
