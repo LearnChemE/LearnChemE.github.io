@@ -1,12 +1,12 @@
 export default function calcAll() {
   const Tb = state.beakerTemperature; // temperature of the beaker - C
-  let Vl = state.valvePosition * 15 * 1e-6; // volumetric flow rate - m^3 / s
+  let Vl = state.valvePosition * 60 * 1e-6; // volumetric flow rate - m^3 / s
 
   const mu = 0.001; // water dynamic viscosity - Pa * s
   const rho = 1000; // water density - kg / m^3
   const w = 0.002; // width of the channel - m
   const g = 9.81; // gravity - m / s^2
-  const vAir = state.fanOn ? 0.25 : 0; // velocity of air - m / s
+  const vAir = state.fanOn ? 1.5 : 0; // velocity of air - m / s
   const Dwa = 0.242 * 1e-4; // diffusivity of water in air - m^2 / s
   const R = 8.314; // ideal gas constant - J / mol * K
   const Dz = 0.014; // height of a single mesh diamond - m
@@ -14,8 +14,8 @@ export default function calcAll() {
   const Hvap = 2260000; // heat of vaporization of water - J / kg
   const Mw = 18 * 1e-3; // molecular weight of water - kg / mol
   const Cp = 4184; // specific heat of water - J / kg * K
-  const Hp = 0.28; // height of the channel - m
-  const Wmesh = 0.28; // width of the mesh - m
+  const Hp = 0.32; // height of the channel - m
+  const Wmesh = 0.32; // width of the mesh - m
   const Nc = Wmesh / Dx; // number of channels - adjustable parameter
   const numRows = Hp / Dz; // number of rows
 
@@ -49,9 +49,9 @@ export default function calcAll() {
     return mmHg * 133.322; // vapor pressure in Pa
   }
 
-  const phi = 0.3; // relative humidity
+  const phi = state.ambientHumidity; // relative humidity
 
-  const Pa = Pvap(state.airTemperature); // partial pressure of water in air - Pa
+  const Pa = Pvap(state.airInletTemperature); // partial pressure of water in air - Pa
 
   const Sc = mu / (rho * Dwa); // Schmidt number
 
@@ -68,7 +68,7 @@ export default function calcAll() {
 
   const Qs = (T) => {
     // (W / m^2 * K) * m * m * K = W
-    return h0(T) * Nc * w * Hp * Dz * (T - state.airTemperature); // heat transfer rate - W
+    return h0(T) * Nc * w * Hp * Dz * (T - state.airInletTemperature); // heat transfer rate - W
   }
 
   // (m * mol / J * s) * (kg / mol) * m * m * (kg * m / (s^2 * m^2)) * J / kg
@@ -95,32 +95,37 @@ export default function calcAll() {
       T -= dT;
 
       if (!state.pumpOn || state.valvePosition === 0) {
-        T = 25;
+        T = state.airInletTemperature;
       }
 
       const topQuarter = round(numRows / 3);
       const bottomQuarter = round(3 * numRows / 4);
 
-      if (i === topQuarter) {
+      if (i === 0) {
         state.apparatusTargetTemperatureTop = T;
-      }
-
-      if (i === bottomQuarter) {
-        state.apparatusTargetTemperatureBottom = T
       }
     }
 
-    const adjustmentRate = 0.1;
+    const adjustmentRate = 0.2;
 
-    if (state.waterOnMesh || state.apparatusTemperatureBottom !== state.airTemperature || state.apparatusTemperatureTop !== state.airTemperature) {
+    if (T === state.airInletTemperature || !state.fanOn) {
+      state.airOutletTargetTemperature = state.airInletTemperature;
+      state.outletTargetHumidity = state.ambientHumidity;
+    } else {
+      state.airOutletTargetTemperature = airTemperature();
+      state.outletTargetHumidity = outletHumidity();
+    }
+
+    if (state.waterOnMesh || state.apparatusTemperatureTop !== state.airInletTemperature) {
       state.apparatusTemperatureTop += (state.apparatusTargetTemperatureTop - state.apparatusTemperatureTop) * adjustmentRate;
-      state.apparatusTemperatureBottom += (state.apparatusTargetTemperatureBottom - state.apparatusTemperatureBottom) * adjustmentRate;
+      state.airOutletTemperature += (state.airOutletTargetTemperature - state.airOutletTemperature) * adjustmentRate;
+      state.outletHumidity += (state.outletTargetHumidity - state.outletHumidity) * adjustmentRate;
     }
 
     if (state.reservoirVolume > 0) {
-      state.reservoirTemperature += (T - state.reservoirTemperature) * adjustmentRate;
+      state.waterOutletTemperature += (T - state.waterOutletTemperature) * adjustmentRate;
     } else {
-      state.reservoirTemperature += (state.airTemperature - state.reservoirTemperature) * adjustmentRate;
+      state.waterOutletTemperature += (state.airInletTemperature - state.waterOutletTemperature) * adjustmentRate;
     }
 
     if (state.waterOnMesh) {
@@ -128,6 +133,53 @@ export default function calcAll() {
       const dT = qTotal / (VBeaker * rho * Cp);
       state.beakerTemperature -= dT;
     }
+  }
+}
+
+function airTemperature() {
+  const initialOffset = -6;
+  const finalOffset = 4;
+  const intercept = state.airInletTemperature;
+  const outletTemperature = state.waterOutletTemperature;
+  const dT = outletTemperature - intercept;
+  const initialMaxdT = 39 - intercept;
+  const finalMaxdT = 10 - intercept;
+
+  if (outletTemperature > intercept) {
+    return (dT / initialMaxdT) * initialOffset + outletTemperature;
+  } else {
+    return (dT / finalMaxdT) * finalOffset + outletTemperature;
+  }
+}
+
+function outletHumidity() {
+  const humidity52 = 0.073;
+  const humidity42 = 0.045;
+  const humidity32 = 0.027;
+  const humidity22 = 0.016;
+  const humidity16 = 0.011;
+  const humidity10 = 0.008;
+  const humidity5 = 0.005;
+  const interpolate = (temp, lowTemp, highTemp, lowHumidity, highHumidity) => {
+    return lowHumidity + (temp - lowTemp) * (highHumidity - lowHumidity) / (highTemp - lowTemp);
+  }
+
+  if (state.airOutletTemperature > 52) {
+    return humidity52;
+  } else if (state.airOutletTemperate > 42) {
+    return interpolate(state.airOutletTemperature, 42, 52, humidity42, humidity52);
+  } else if (state.airOutletTemperature > 32) {
+    return interpolate(state.airOutletTemperature, 32, 42, humidity32, humidity42);
+  } else if (state.airOutletTemperature > 22) {
+    return interpolate(state.airOutletTemperature, 22, 32, humidity22, humidity32);
+  } else if (state.airOutletTemperature > 16) {
+    return interpolate(state.airOutletTemperature, 16, 22, humidity16, humidity22);
+  } else if (state.airOutletTemperature > 10) {
+    return interpolate(state.airOutletTemperature, 10, 16, humidity10, humidity16);
+  } else if (state.airOutletTemperature > 5) {
+    return interpolate(state.airOutletTemperature, 5, 10, humidity5, humidity10);
+  } else {
+    return humidity5;
   }
 }
 
