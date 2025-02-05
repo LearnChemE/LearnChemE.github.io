@@ -4,7 +4,7 @@ import "./assets/digital-7.ttf";
 import "./assets/evaporative_cooling_worksheet.pdf";
 import calcAll from "./js/calcs";
 import drawAll from "./js/draw";
-import { initializeHamburger, initializeUnitsButton } from "./js/inputs";
+import { initializeHamburger, initializeReset, initializeUnitsButton } from "./js/inputs";
 import "./style/style.scss";
 
 // TO DO:
@@ -48,6 +48,7 @@ window.setup = () => {
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
   initializeHamburger();
   initializeUnitsButton();
+  initializeReset();
   frameRate(60);
 }
 

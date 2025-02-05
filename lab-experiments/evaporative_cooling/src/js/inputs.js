@@ -93,3 +93,30 @@ export function initializeUnitsButton() {
     }
   });
 }
+
+export function initializeReset() {
+  const reset = document.getElementById("reset");
+  reset.addEventListener("click", () => {
+    reset.classList.add("clicked");
+    setTimeout(() => {
+      reset.classList.remove("clicked");
+    }, 100);
+    state.flowState = new Array(16).fill(0);
+    state.beakerWaterLevel = 1000;
+    state.pumpOn = false;
+    state.fanOn = false;
+    state.airInletTemperature = 22;
+    state.waterOutletTemperature = 22;
+    state.beakerTemperature = 52;
+    state.apparatusTemperatureTop = 22;
+    state.apparatusTargetTemperatureTop = 22;
+    state.airOutletTemperature = 22;
+    state.airOutletTargetTemperature = 22;
+    state.outletHumidity = 0.005;
+    state.outletTargetHumidity = 0.005;
+    state.ambientHumidity = 0.005;
+    state.waterOnMesh = false;
+    state.waterInReservoir = false;
+    state.reservoirVolume = 0;
+  });
+}

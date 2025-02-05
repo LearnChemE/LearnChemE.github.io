@@ -99,17 +99,16 @@ canvas {
   }
 }
 
-#temp-units {
+#temp-units,
+#reset {
   position: absolute;
-  right: 2%;
-  bottom: 2%;
   font-size: 0.8rem;
   border: 1px solid black;
   border-radius: 5px;
   padding: 5px 12px;
-  background-color: rgb(67, 20, 255);
   color: white;
   font-family: sans-serif, Arial;
+  width: 65px;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -118,12 +117,32 @@ canvas {
   user-select: none;
 }
 
+#temp-units {
+  background-color: rgb(67, 20, 255);
+  right: 2%;
+  bottom: 2%;
+}
+
 #temp-units:hover {
   background-color: rgb(103, 66, 255);
 }
 
 #temp-units.clicked {
   background-color: rgb(165, 153, 219);
+}
+
+#reset {
+  background-color: rgb(255, 0, 0);
+  right: 2%;
+  bottom: calc(2% + 35px);
+}
+
+#reset:hover {
+  background-color: rgb(255, 51, 51);
+}
+
+#reset.clicked {
+  background-color: rgb(255, 102, 102);
 }
 
 @media screen and (max-width: 768px) {
@@ -143,14 +162,20 @@ canvas {
       font-size: 0.7rem;
     }
   }
-  #temp-units {
+  #temp-units,
+  #reset {
     font-size: 0.7rem;
   }
 }
 
 @media screen and (min-width: 1080px) {
-  #temp-units {
+  #temp-units,
+  #reset {
     font-size: 1.1rem;
+    width: 90px;
+  }
+  #reset {
+    bottom: calc(2% + 45px);
   }
 }
 
@@ -166,7 +191,12 @@ canvas {
     top: 35px;
     padding: 15px;
   }
-  #temp-units {
+  #temp-units,
+  #reset {
     font-size: 1.2rem;
+    width: 100px;
+  }
+  #reset {
+    bottom: calc(2% + 50px);
   }
 }
