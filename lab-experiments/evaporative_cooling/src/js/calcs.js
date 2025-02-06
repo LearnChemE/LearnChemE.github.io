@@ -6,7 +6,7 @@ export default function calcAll() {
   const rho = 1000; // water density - kg / m^3
   const w = 0.002; // width of the channel - m
   const g = 9.81; // gravity - m / s^2
-  const vAir = state.fanOn ? 1.5 : 0; // velocity of air - m / s
+  let vAir = state.fanOn ? 1.5 : 0; // velocity of air - m / s
   const Dwa = 0.242 * 1e-4; // diffusivity of water in air - m^2 / s
   const R = 8.314; // ideal gas constant - J / mol * K
   const Dz = 0.014; // height of a single mesh diamond - m
@@ -18,6 +18,18 @@ export default function calcAll() {
   const Wmesh = 0.32; // width of the mesh - m
   const Nc = Wmesh / Dx; // number of channels - adjustable parameter
   const numRows = Hp / Dz; // number of rows
+
+  if (state.waterOutletTemperature <= state.airInletTemperature) {
+    vAir = 1.0;
+  }
+
+  if (state.waterOutletTemperature <= 10) {
+    vAir = 0.5;
+  }
+
+  if (state.waterOutletTemperature <= 5) {
+    vAir = 0.1;
+  }
 
   const del = (3 * mu * Vl / (rho * g * w * Nc)) ** (1 / 3); // characteristic length - m
 

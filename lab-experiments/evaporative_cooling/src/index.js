@@ -1,6 +1,7 @@
 import "bootstrap";
 import "p5";
 import "./assets/digital-7.ttf";
+import "./assets/evaporative_cooling_article.pdf";
 import "./assets/evaporative_cooling_worksheet.pdf";
 import calcAll from "./js/calcs";
 import drawAll from "./js/draw";
