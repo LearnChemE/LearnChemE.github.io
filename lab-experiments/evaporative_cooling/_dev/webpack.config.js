@@ -5,6 +5,13 @@ const TerserPlugin = require("terser-webpack-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const module_rules = [{
+    test: /\.ttf$/i,
+    loader: 'file-loader',
+    options: {
+      name: 'assets/[name].[ext]',
+    },
+  },
+  {
     test: /\.(sa|sc|c)ss$/,
     use: [
       MiniCssExtractPlugin.loader,
@@ -22,7 +29,7 @@ const module_rules = [{
     options: {
       name: 'assets/[name].[ext]',
     },
-  },
+  }
 ];
 
 const html_options = {

@@ -1,0 +1,116 @@
+/* main.css */
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100vh;
+    background-color: white;
+    width: 100%;
+    font-family: sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.button-container {
+    display: flex;
+    /* gap: 10px; */
+    margin-top: 10px;
+    justify-content: flex-start;
+}
+
+.button-container .btn {
+    margin-right: 10px;
+}
+
+.slider-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 2px;
+    width: 800px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.slider-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 150px;
+    height: 5px;
+    background: #d3d3d3;
+    border-radius: 5px;
+    outline: none;
+    margin-top: 10px;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: rgba(134,199,134,255);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #88e788;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.slider-value {
+    display: inline-block;
+    width: 50px;
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.slider-label {
+    display: inline-block;
+    width: 185px;
+    text-align: right;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+canvas {
+    border: 1px solid #000;
+    width: 100%;
+    max-width: 624px;
+    height: auto;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    .button-container {
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+    }
+    .button {
+        width: 80%;
+        margin: 10px 0;
+    }
+    .slider-container {
+        grid-template-columns: 1fr;
+        grid-gap: 15px;
+    }
+    .canvas {
+        width: 100%;
+    }
+}
