@@ -43,3 +43,4 @@ pauseButton.addEventListener('click', function() {
   g.playing = false;
   noLoop();
 });
+

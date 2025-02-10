@@ -23,7 +23,15 @@
   grid-template-columns: repeat(4, max-content);
   align-items: center;
   justify-items: end;
-  gap: 0px 10px;
+  gap: 0px 5px;
+}
+
+.input-area2 {
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  align-items:center;
+  justify-items: end;
+  gap: 0px 5px;
 }
 
 input[type="range"] {

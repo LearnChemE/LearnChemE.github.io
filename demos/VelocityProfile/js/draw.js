@@ -2,6 +2,8 @@ import { calcAll } from './calcs.js';
 const selectionElement = document.getElementById('selection');
 const p5container = document.getElementById('p5-container');
 
+
+
 // This function is used to scale the canvas based on the size of the container
 window.relativeSize = () => p5container.offsetWidth / 1280;
 
@@ -9,8 +11,9 @@ function resize() {
   // Here I am reassigning the width and height of the canvas to a static value of 1280x720,
   // even though the actual canvas size is based on the size of the #p5-container element.
   // So you can effectively treat the canvas like it is 1280x720, even though it will scale to fit the screen.
-  width = 1280;
+  width = 1280; 
   height = 720;
+  
   scale(relativeSize());
 }
 
@@ -31,13 +34,15 @@ window.draw = function() {
 
   background(255);
   calcAll();
-  drawGraphDist();
-  drawText();
+  
+  
 
   if (selection === "velocity-distribution") {
-    // do something here
+    drawGraphDist();
+    drawText();
   } else if (selection === "velocity-vs-height") {
-    // do something else here
+    drawGraphHeight();
+    drawText();
   }
 }
 
@@ -100,7 +105,23 @@ function drawGraphDist() {
   strokeWeight(3.25);
   rect(width / 2, (height / 2 + 265), 856, 50);
 
-  line(1, 1, 1, 1);
+  const graphLX = (width/2)-428;
+  const graphBY = (height / 2) + 240;
+  const graphRX = (width/2)+428;
+  const graphTY = (height/2)-240;
+
+  for(let i=graphBY;i+1>graphTY;i-=(graphBY-graphTY)/10)
+    {
+      stroke('black');
+      strokeWeight(1.5);
+      line(graphLX, i , graphLX+2.5, i);
+    }
+  for(let j=graphBY;j+1>graphTY;j-=(graphBY-graphTY)/20)
+      {
+        stroke('black');
+        strokeWeight(0.75);
+        line(graphLX, j , graphLX+5, j);
+      }
 
   pop();
 
@@ -118,4 +139,46 @@ function drawGraphDist() {
    
     pop();
     */
+}
+
+function drawGraphHeight() {
+
+  push();
+
+  rectMode(CENTER);
+  stroke('black');
+  strokeWeight(5);
+  rect(width / 2, height / 2, 854, 480);
+
+  rectMode(CENTER);
+  fill(205, 115, 215);
+  noStroke();
+  rect(width / 2, (height / 2 - 160), 854, 160 /*will change*/ );
+
+  rectMode(CENTER);
+  fill(30, 255, 55);
+  noStroke();
+  rect(width / 2, (height / 2), 854, 160 /*will change*/ );
+
+  rectMode(CENTER);
+  fill(40, 95, 220);
+  noStroke();
+  rect(width / 2, (height / 2 + 160), 854, 160 /*will change*/ );
+
+  rectMode(CENTER);
+  fill(100, 100, 100);
+  stroke('black');
+  strokeWeight(3.25);
+  rect(width / 2, (height / 2 - 265), 856, 50);
+
+  rectMode(CENTER);
+  fill(100, 100, 100);
+  stroke('black');
+  strokeWeight(3.25);
+  rect(width / 2, (height / 2 + 265), 856, 50);
+
+  line(1, 1, 1, 1);
+
+  pop();
+
 }
