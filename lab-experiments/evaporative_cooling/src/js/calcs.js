@@ -122,7 +122,7 @@ export default function calcAll() {
       }
     }
 
-    const adjustmentRate = 0.2;
+    const adjustmentRate = 0.4;
 
     if (T === state.airInletTemperature || !state.fanOn) {
       state.airOutletTargetTemperature = state.airInletTemperature;
