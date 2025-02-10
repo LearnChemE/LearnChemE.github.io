@@ -23,12 +23,16 @@ export default function calcAll() {
     vAir = 1.0;
   }
 
-  if (state.waterOutletTemperature <= 10) {
+  if (state.waterOutletTemperature <= 15) {
     vAir = 0.5;
   }
 
+  if (state.waterOutletTemperature <= 10) {
+    vAir = 0.2;
+  }
+
   if (state.waterOutletTemperature <= 5) {
-    vAir = 0.1;
+    vAir = 0.05;
   }
 
   const del = (3 * mu * Vl / (rho * g * w * Nc)) ** (1 / 3); // characteristic length - m
