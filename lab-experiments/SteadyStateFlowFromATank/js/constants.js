@@ -1,0 +1,20 @@
+// constants.js
+export const canvasWidth = 800;
+export const canvasHeight = 596;
+export const draw = SVG().addTo('#svg-container').size(canvasWidth, canvasHeight);
+export const tableWidth = 500;
+export const tableHeight = 75;
+export const tableX = (canvasWidth - tableWidth) / 2;
+export const tableY = canvasHeight - tableHeight;
+export const legWidth = 20;
+export const ratio = 475 / 85;
+export const containerWidth = 20 * ratio;
+export const length = 475;
+export const surfaceWidth = 10;
+export const borderHexCode = '#b3b3b3';
+export const valveCenterX = canvasWidth / 2 + containerWidth / 2 + 50;
+export const dropletCount = 300;
+export const gravityPixels = 9.8 * 20; // 9.8 m/s² * pixelsPerMeter
+export const initialVelocityX = 50;
+export const drainDiameterDropdown = document.getElementById('drainDiameter');
+export const liquidHeightDropdown = document.getElementById('liquidHeight');
