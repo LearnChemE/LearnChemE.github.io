@@ -16,8 +16,7 @@
       }
     };
   </script>
-  <script type="text/javascript" id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"></script>
   <script>
@@ -37,6 +36,13 @@
 
   <div class="simulation-controls">
     <div class="input-area">
+
+      <div class="input-row">
+        <div class="data-name">Temperature</div>
+        <input type="range" id="T-slider" min="5" max="100" step="0.01" value="35">
+        <div class="data-value" id="T-value">35</div>
+        <div class="data-metric">°C</div>
+      </div>
 
       <div class="input-row">
         <div class="data-name">Moles to inject</div>
@@ -82,8 +88,7 @@
     </div>
   </div> -->
 
-  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
-    aria-hidden="true">
+  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -94,24 +99,18 @@
         </div>
         <div class="modal-body">
           <p>
-            In this simulation, liquid propane or liquid toluene is injected into an evacuated 2-L spherical tank that
-            is held at constant temperature. When propane is injected, it either vaporizes completely or forms two
-            phases in vapor-liquid equilibrium (VLE), depending on the number of moles injected and the temperature
-            (control both with sliders). Because toluene has a much lower saturation pressure, only a small amount of
-            injected toluene liquid vaporizes. When the component is in VLE, the tank pressure equals the saturation
-            pressure; otherwise, the pressure is calculated using the ideal gas law. The pressure is displayed at the
-            top of the tank. Click the "inject" button to inject liquid into the tank. Press "reset" at any time to
-            start from the beginning. The intensity of the blue color of the vapor is proportional to the vapor density.
-            The liquid volume in the tank is exaggerated relative to the vapor volume for better visualization. The bar
-            graph on the right shows the number of moles of liquid and vapor in the tank.
+            In this simulation, liquid propane or liquid toluene is injected into an evacuated 2-L spherical tank that is held at constant temperature. When propane is injected, it either vaporizes completely or forms two phases in vapor-liquid equilibrium (VLE),
+            depending on the number of moles injected and the temperature (control both with sliders). Because toluene has a much lower saturation pressure, only a small amount of injected toluene liquid vaporizes. When the component is in VLE, the tank
+            pressure equals the saturation pressure; otherwise, the pressure is calculated using the ideal gas law. The pressure is displayed at the top of the tank. Click the "inject" button to inject liquid into the tank. Press "reset" at any time to
+            start from the beginning. The intensity of the blue color of the vapor is proportional to the vapor density. The liquid volume in the tank is exaggerated relative to the vapor volume for better visualization. The bar graph on the right shows
+            the number of moles of liquid and vapor in the tank.
           </p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label"
-    aria-hidden="true">
+  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
 
@@ -124,38 +123,28 @@
 
         <div class="modal-body">
           <p>
-            When propane or toluene is in vapor-liquid equilibrium (VLE), the pressure in the tank is the saturation
-            pressure, which is calculated using the Antoine equation:
+            When propane or toluene is in vapor-liquid equilibrium (VLE), the pressure in the tank is the saturation pressure, which is calculated using the Antoine equation:
           </p>
 
           <p class="block-eqn">
-            $$
-            [1] \quad P_{i}^{sat} = 10^{\left( A_{i} - \frac{ B_{ i } }{ T + C_{ i } } \right)}
-            $$
+            $$ [1] \quad P_{i}^{sat} = 10^{\left( A_{i} - \frac{ B_{ i } }{ T + C_{ i } } \right)} $$
           </p>
 
           <p>
-            where \( P_{i}^{sat} \) is the saturation pressure (bar), \( A_i \), \( B_i \), and \( C_i \) are Antoine
-            constants, and \( T \) is temperature (K). When only vapor is present, the ideal gas law is used to
-            calculate the pressure \( P \):
+            where \( P_{i}^{sat} \) is the saturation pressure (bar), \( A_i \), \( B_i \), and \( C_i \) are Antoine constants, and \( T \) is temperature (K). When only vapor is present, the ideal gas law is used to calculate the pressure \( P \):
           </p>
 
           <p class="block-eqn">
-            $$
-            [2] \quad P = \frac{ n R T }{ V }
-            $$
+            $$ [2] \quad P = \frac{ n R T }{ V } $$
           </p>
 
           <p>
-            where \( n \) is the total moles (moles of vapor in this case), \( R \) is the ideal gas constant [(L bar)
-            / (mol K)], and \( V \) is the total volume (L). When the component is in VLE, the sum of the liquid \( V_L
-            \) and vapor \( V_V \) volumes equal the volume of the tank \( V \):
+            where \( n \) is the total moles (moles of vapor in this case), \( R \) is the ideal gas constant [(L bar) / (mol K)], and \( V \) is the total volume (L). When the component is in VLE, the sum of the liquid \( V_L \) and vapor \( V_V \) volumes equal
+            the volume of the tank \( V \):
           </p>
 
           <p class="block-eqn">
-            $$
-            [3] \quad V = V_L + V_V
-            $$
+            $$ [3] \quad V = V_L + V_V $$
           </p>
 
           <p>
@@ -163,9 +152,7 @@
           </p>
 
           <p class="block-eqn">
-            $$
-            [4] \quad V_L = \frac{ n_L }{ \rho_L }
-            $$
+            $$ [4] \quad V_L = \frac{ n_L }{ \rho_L } $$
           </p>
 
           <p>
@@ -173,9 +160,7 @@
           </p>
 
           <p class="block-eqn">
-            $$
-            [5] \quad V_V = \frac{ n_V R T }{ P^{sat} }
-            $$
+            $$ [5] \quad V_V = \frac{ n_V R T }{ P^{sat} } $$
           </p>
 
           <p>
@@ -183,9 +168,7 @@
           </p>
 
           <p class="block-eqn">
-            $$
-            [6] \quad n = n_L + n_V
-            $$
+            $$ [6] \quad n = n_L + n_V $$
           </p>
 
           <p>
@@ -193,9 +176,7 @@
           </p>
 
           <p class="block-eqn">
-            $$
-            [7] \quad V = \frac{ n_L }{ \rho_L } + \frac{ ( n - n_L ) R T }{ P^{sat} }
-            $$
+            $$ [7] \quad V = \frac{ n_L }{ \rho_L } + \frac{ ( n - n_L ) R T }{ P^{sat} } $$
           </p>
 
           <p>
@@ -203,14 +184,11 @@
           </p>
 
           <p class="block-eqn">
-            $$
-            [8] \quad n_L = \frac{ \rho_L (P^{sat} V - n R T) }{ P^{sat} - R T \rho_L }
-            $$
+            $$ [8] \quad n_L = \frac{ \rho_L (P^{sat} V - n R T) }{ P^{sat} - R T \rho_L } $$
           </p>
 
           <p>
-            From here we can calculate the volume of vapor by solving equation [6] for \( n_{V} \) and plugging it into
-            equation [5].
+            From here we can calculate the volume of vapor by solving equation [6] for \( n_{V} \) and plugging it into equation [5].
           </p>
 
           <div style="margin-top: 2rem;"></div>
@@ -221,8 +199,7 @@
     </div>
   </div>
 
-  <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label"
-    aria-hidden="true">
+  <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -234,15 +211,11 @@
         <div class="modal-body">
           <p>
             This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
-              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
-              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren and Rakesh Vijay Kumar under the direction of
-            Professor John L. Falconer. This simulation was prepared with financial support from the National Science Foundation. Address any questions or comments to learncheme@gmail.com. All of our
-            simulations are open source, and are available on our <a
-              href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
-              repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page
-            (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is
-            not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended
-            browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
+              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren and Rakesh Vijay Kumar under the direction of Professor John L. Falconer.
+            This simulation was prepared with financial support from the National Science Foundation. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/"
+              target="_blank">LearnChemE Github
+              repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet
+            Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
           </p>
         </div>
       </div>
@@ -251,7 +224,7 @@
 
   <script>
     // Simulation constants
-    const R = 0.08314;  // Ideal gas constant (L·bar)/(mol·K)
+    const R = 0.08314; // Ideal gas constant (L·bar)/(mol·K)
 
     // DOM elements
     //const temperatureSlider = document.getElementById("T-slider");
@@ -263,9 +236,9 @@
     const resetButton = document.getElementById("reset-button");
 
     // Initial conditions
-    let temperature = 35;  // Starting temperature in °C
-    let moles = 1.00;      // Starting moles (default is 1 mol)
-    let pressure = 1.0;    // Initial pressure (bar)
+    let temperature = 35; // Starting temperature in °C
+    let moles = 1.00; // Starting moles (default is 1 mol)
+    let pressure = 1.0; // Initial pressure (bar)
     let vaporDensity = 0.5; // Vapor density (a proxy for simulation purpose)
 
     // Update temperature, pressure, and other simulation dynamics
@@ -279,8 +252,8 @@
 
       // Update the pressure based on the ideal gas law: P = nRT / V
       // Assuming volume (V) is fixed at 2L, adjust as necessary
-      const volume = 2;  // Fixed tank volume in liters
-      pressure = (moles * R * (temperature + 273.15)) / volume;  // Convert °C to Kelvin
+      const volume = 2; // Fixed tank volume in liters
+      pressure = (moles * R * (temperature + 273.15)) / volume; // Convert °C to Kelvin
 
       // Update other simulation values like vapor density
       vaporDensity = Math.min(1, temperature / 100); // Simplified relation for demonstration
@@ -304,7 +277,11 @@
     // Start the simulation on click
     goButton.addEventListener("click", () => {
       // Insert simulation start logic here
-      console.log("Simulation Started with:", { moles, pressure, vaporDensity });
+      console.log("Simulation Started with:", {
+        moles,
+        pressure,
+        vaporDensity
+      });
     });
 
     // Reset the simulation
@@ -317,9 +294,8 @@
 
     // Initial update to display
     updateSimulation();
-
   </script>
-  
+
 </body>
 
 </html>

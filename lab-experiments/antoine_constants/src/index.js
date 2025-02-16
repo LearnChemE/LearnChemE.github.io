@@ -19,8 +19,7 @@ window.g = {
   L_final: 0, // the solution to moles of liquid in the tank
   V_final: 0, // the solution to moles of vapor in the tank
   P_final: 0, // the final pressure in the tank
-  T: 5, // Initial Temperature (deg. C) starts at 5°C
-  max_temperature: 100,
+  T: 35, // Temperature (deg. C)
   n: 1.0, // moles to inject (moles)
   chemical: "propane", // chemical to inject
   syringe_initial: 0.5, // The initial value for how far the syringe is pushed in. Dictated by moles to inject (n)
@@ -46,8 +45,6 @@ window.draw = function() {
   scale(relativeSize());
   background.apply(this, g.background_color);
   g.drawAll();
-
-  // Constant for temperature update duration (seconds)
   const seconds_to_inject = 2.5;
   const frameRate = 60;
   const frames_per_second = frameRate;
@@ -59,22 +56,7 @@ window.draw = function() {
   const dP = g.P_final / frames;
   const dVap = g.final_vapor_density / frames;
   const dLiq = g.final_liquid_level / frames;
-
-  // Update temperature continuously from 5°C to 100°C
   if (g.is_running && !g.is_finished) {
-    // const maxTemperature = 100; // 100°C
-    // const minTemperature = 5;  // 5°C
-    // const temperatureRange = maxTemperature - minTemperature;
-    // const elapsedTime = (frameCount / frameRate); // Total time elapsed in seconds
-    // const newTemperature = minTemperature + (temperatureRange * (elapsedTime / 100)); // Increase temperature over time
-    // if (newTemperature <= maxTemperature) {
-    //     g.T = newTemperature; // Update the temperature
-    // } else {
-    //     g.T = maxTemperature; // Stop at 100°C
-    // }
-    g.updateTemperature();
-
-    // Update other simulation parameters during the "running" state
     g.syringe_fraction += dInj;
     g.percent_injected += dt;
     g.P += dP;
@@ -82,8 +64,6 @@ window.draw = function() {
     g.V += dV;
     g.liquid_level += dLiq;
     g.vapor_density += dVap;
-
-    // If injection is complete, finish the experiment
     if (g.percent_injected >= 1) {
       g.percent_injected = 1;
       g.is_finished = true;
@@ -104,8 +84,6 @@ window.draw = function() {
       }, 1000);
     }
   }
-
-  //drawTemperatureProgressBar();
 };
 
 window.windowResized = () => {

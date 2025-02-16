@@ -34,7 +34,7 @@ $modal-xl: 1140px;
   justify-items: center;
   .input-row {
     display: grid;
-    grid-template-columns: max-content 10rem 35px 50px;
+    grid-template-columns: 110px 10rem 35px 50px;
     gap: 0.6ch;
     align-items: end;
     .data-name {
@@ -172,14 +172,6 @@ canvas {
 }
 
 
-/* If temperature slider is no longer used, we can hide it or remove its style */
-
-#T-slider {
-  display: none;
-  /* Hides the temperature slider */
-}
-
-
 /* Ensure that the rest of the controls and buttons remain intact */
 
 .simulation-controls {
@@ -197,7 +189,7 @@ canvas {
   }
   .input-area {
     .input-row {
-      grid-template-columns: max-content 8rem 30px 40px;
+      grid-template-columns: 90px 8rem 30px 40px;
     }
   }
   .btn {
