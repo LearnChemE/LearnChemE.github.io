@@ -2,30 +2,78 @@ const V = 2; // Volume of tank (L)
 const R = 0.08314; // Gas constant ( (L bar) / (mol K) )
 
 g.Psat = function(t) {
-  let exp;
-  if (g.chemical == "propane") {
-    exp = 3.98292 - 819.296 / (t + 248.6)
-  } else {
-    exp = 4.14157 - 1377.578 / (t + 222.493)
+  let A, B, C, exp;
+  switch (g.chemical) {
+    case "a":
+      A = 6.880;
+      B = 1197;
+      C = 219.2;
+      break;
+    case "b":
+      A = 8.1122;
+      B = 1592.864;
+      C = 226.184;
+      break;
+    case "c":
+      A = 6.89677;
+      B = 1264.9;
+      C = 216.544;
+      break;
+    case "d":
+      A = 8.07131;
+      B = 1730.63;
+      C = 233.426;
+      break;
+    case "e":
+      A = 7.264753;
+      B = 1434.148;
+      C = 246.7207;
+      break;
+    default:
+      A = 6.880;
+      B = 1197;
+      C = 219.2;
+      break;
   }
-  return 10 ** exp
+  exp = A - B / (C + t);
+  const mmHg = Math.pow(10, exp);
+  // Convert to bar
+  return mmHg / 750.0616827;
 }
 
 // Density (g/L)
 g.rho = function() {
-  if (g.chemical == "propane") {
-    return 580
-  } else {
-    return 867
+  switch (g.chemical) {
+    case "a":
+      return 876;
+    case "b":
+      return 789;
+    case "c":
+      return 684;
+    case "d":
+      return 1000;
+    case "e":
+      return 779;
+    default:
+      return 876;
   }
 }
 
 // Molecular weight (g/mol)
 g.MW = function() {
-  if (g.chemical == "propane") {
-    return 44.1
-  } else {
-    return 92.14
+  switch (g.chemical) {
+    case "a":
+      return 78.11;
+    case "b":
+      return 46.07;
+    case "c":
+      return 100.21;
+    case "d":
+      return 18.02;
+    case "e":
+      return 84.16;
+    default:
+      return 78.11;
   }
 }
 

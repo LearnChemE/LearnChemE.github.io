@@ -19,11 +19,12 @@ window.g = {
   L_final: 0, // the solution to moles of liquid in the tank
   V_final: 0, // the solution to moles of vapor in the tank
   P_final: 0, // the final pressure in the tank
+  P_range: [0, 1], // The range of pressure on the pressure gauge
   T: 35, // Temperature (deg. C)
-  n: 1.0, // moles to inject (moles)
-  chemical: "propane", // chemical to inject
-  syringe_initial: 0.5, // The initial value for how far the syringe is pushed in. Dictated by moles to inject (n)
-  syringe_fraction: 0.5, // How far pushed in the syringe is, 0-1
+  n: 0.1, // moles to inject (moles)
+  chemical: "a", // chemical to inject
+  syringe_initial: 0.70575, // The initial value for how far the syringe is pushed in. Dictated by moles to inject (n)
+  syringe_fraction: 0.70575, // How far pushed in the syringe is, 0-1
   is_running: false, // Whether the simulation is currently running
   is_finished: false, // Whether the animation has finished running
   percent_injected: 0, // Value between 0 and 1, used during the animation phase
@@ -37,12 +38,14 @@ window.setup = function() {
   noLoop();
   g.drawAll = require("./js/draw.js");
   require("./js/inputs.js");
+  pixelDensity(4);
 };
 
 window.draw = function() {
   window.width = 800;
   window.height = 530;
   scale(relativeSize());
+  scale(1.2);
   background.apply(this, g.background_color);
   g.drawAll();
   const seconds_to_inject = 2.5;
@@ -72,16 +75,6 @@ window.draw = function() {
       g.L = g.L_final;
       g.P = g.P_final;
       g.syringe_fraction = 1;
-      const reset_button = document.getElementById("reset-button");
-      reset_button.style.transition = "background 2s";
-      g.reset_interval = setInterval(() => {
-        if (g.reset_button_bright) {
-          reset_button.classList.remove("bright");
-        } else {
-          reset_button.classList.add("bright");
-        }
-        g.reset_button_bright = !g.reset_button_bright;
-      }, 1000);
     }
   }
 };
