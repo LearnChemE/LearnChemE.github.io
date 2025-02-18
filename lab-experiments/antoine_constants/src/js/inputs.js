@@ -8,6 +8,7 @@ const select_chemical = document.getElementById("select-chemical");
 const add_button = document.getElementById("add-button");
 const start_button = document.getElementById("start-button");
 const reset_button = document.getElementById("reset-button");
+const gauge_hover = document.getElementById("gauge-hover");
 
 t_slider.addEventListener("input", () => {
   const T = Number(t_slider.value);
@@ -155,3 +156,16 @@ function reset_injection() {
   reset_button.classList.remove("bright");
   redraw();
 }
+
+gauge_hover.addEventListener("mouseover", () => {
+  g.is_enlarged = true;
+  loop();
+});
+
+gauge_hover.addEventListener("mouseout", () => {
+  g.is_enlarged = false;
+  if (!g.is_equilibrating) {
+    noLoop();
+  }
+  redraw();
+});

@@ -204,6 +204,22 @@ div[disabled="yes"] {
   animation-duration: 0.5s;
 }
 
+#gauge-hover {
+  position: absolute;
+  background-color: white;
+  border: 1px solid black;
+  width: 10%;
+  height: calc(10% * 800 / 530);
+  left: 25.2%;
+  top: 16%;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+#gauge-hover:hover {
+  transform: scale(2) translateY(25%);
+}
+
 @media screen and (max-width: 800px) {
   .input-row,
   .select-wrapper {

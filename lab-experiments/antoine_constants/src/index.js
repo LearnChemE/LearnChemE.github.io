@@ -35,30 +35,44 @@ window.g = {
   is_equilibrating: false, // Whether the system is currently equilibrating
   percent_injected: 0, // Value between 0 and 1, used during the animation phase
   reset_button_bright: false, // Switches every second false and true to make the reset button "glow" after finishing a run
+  frame_rate: 60, // Frame rate of the animation
+  is_enlarged: false, // Whether the gauge is enlarged
 };
 
 const containerElement = document.getElementById("p5-container");
 
 window.setup = function() {
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
-  noLoop();
   g.drawAll = require("./js/draw.js");
   require("./js/inputs.js");
   pixelDensity(4);
+  frameRate(g.frame_rate);
+  document.getElementById("v-slider").value = g.v_to_inject;
+  document.getElementById("t-slider").value = g.T;
 };
 
 window.draw = function() {
   window.width = 800;
   window.height = 530;
-  window.graphics_left = width / 2;
+  window.graphics_left = width / 1.9;
   window.graphics_top = height / 2.25
   scale(relativeSize());
   scale(1.2);
   background.apply(this, g.background_color);
   g.drawAll();
+  handleInject();
+};
+
+window.windowResized = () => {
+  resizeCanvas(containerElement.offsetWidth, containerElement.offsetHeight);
+}
+
+window.relativeSize = () => containerElement.offsetWidth / 800;
+
+function handleInject() {
   const seconds_to_inject = 2.5;
-  const seconds_to_equilibrate = 20;
-  const frameRate = 60;
+  const seconds_to_equilibrate = 10;
+  const frameRate = g.frame_rate;
   const frames_per_second = frameRate;
   const frames_inject = frames_per_second * seconds_to_inject;
   const frames_equilibrate = frames_per_second * seconds_to_equilibrate;
@@ -67,8 +81,6 @@ window.draw = function() {
   const dL = g.L_final / frames_equilibrate;
   const dV = g.V_final / frames_equilibrate;
   const dP = g.P_final / frames_equilibrate;
-  const one = g.syringe_fraction < 1;
-  const two = !g.is_finished && g.is_running;
   if (!g.is_finished && g.is_running) {
     g.syringe_fraction = min(1, g.syringe_fraction + dInj);
     g.percent_injected = min(1, g.percent_injected + dt_inject);
@@ -91,10 +103,4 @@ window.draw = function() {
       g.syringe_fraction = 1;
     }
   }
-};
-
-window.windowResized = () => {
-  resizeCanvas(containerElement.offsetWidth, containerElement.offsetHeight);
 }
-
-window.relativeSize = () => containerElement.offsetWidth / 800;

@@ -1,4 +1,0 @@
-- Mess around with different syringe volumes
-- Zoom function for pressure gauge
-- Add fire/heating mantle
-- Add thermometer

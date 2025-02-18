@@ -14,15 +14,23 @@ function drawTank() {
   stroke(50);
   rect(-220, -100, 10, 30);
   fill(255);
-  drawPressureGauge();
   pop();
 }
 
 function drawPressureGauge() {
   push();
   translate(-220, -140);
+  if (g.is_enlarged) {
+    scale(2);
+    translate(0, 20);
+    fill(255);
+    stroke(100);
+    strokeWeight(0.25);
+    circle(0, -1, 105);
+  }
   fill(255);
   stroke(0);
+  strokeWeight(1);
   ellipse(0, 0, 60, 60);
   textAlign(CENTER, CENTER);
   textSize(10 / relativeSize() ** 0.25);
@@ -72,33 +80,43 @@ function drawPressureGauge() {
   fill(0);
   text("bar", 0, 20);
   pop();
+  push();
+  translate(-80, -190);
+  textAlign(CENTER, CENTER);
+  noStroke();
+  fill(0);
+  textSize(10 / relativeSize() ** 0.25);
+  text("hover mouse over\ngauge to enlarge", 0, 40);
+  pop();
 }
 
 function drawTankShell() {
   push();
   translate(graphics_left, graphics_top);
+  strokeWeight(2);
   noFill();
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < 200; i += 2) {
     const rgb = 220 - 0.002 * i ** 2;
     stroke(rgb);
     beginShape();
-    for (let j = 0; j < 360; j++) {
+    for (let j = 0; j < 360; j += 10) {
       const x = -220 + tank_diameter / 2 * (i / 200) * sin(radians(j / 2));
       const y = tank_diameter / 2 * cos(radians(j / 2));
       vertex(x, y);
     }
     endShape();
     beginShape();
-    for (let j = 0; j < 360; j++) {
+    for (let j = 0; j < 360; j += 10) {
       const x = -220 - tank_diameter / 2 * (i / 200) * sin(radians(j / 2));
       const y = tank_diameter / 2 * cos(radians(j / 2));
       vertex(x, -y);
     }
     endShape();
   }
-  stroke(100);
-  strokeWeight(1 / relativeSize());
+  stroke(150);
+  strokeWeight(4);
   ellipse(-220, 0, tank_diameter, tank_diameter)
+  drawPressureGauge();
   pop();
 }
 
