@@ -1,6 +1,7 @@
 import "bootstrap";
 import "p5";
 import "./style/style.scss";
+import "./assets/antoine_constants_worksheet.pdf";
 
 // TO DO:
 
