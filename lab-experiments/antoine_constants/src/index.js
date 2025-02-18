@@ -50,12 +50,14 @@ window.setup = function() {
 window.draw = function() {
   window.width = 800;
   window.height = 530;
+  window.graphics_left = width / 2;
+  window.graphics_top = height / 2.25
   scale(relativeSize());
   scale(1.2);
   background.apply(this, g.background_color);
   g.drawAll();
   const seconds_to_inject = 2.5;
-  const seconds_to_equilibrate = 15;
+  const seconds_to_equilibrate = 20;
   const frameRate = 60;
   const frames_per_second = frameRate;
   const frames_inject = frames_per_second * seconds_to_inject;

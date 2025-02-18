@@ -2,7 +2,7 @@ const tank_diameter = 200;
 
 function drawTank() {
   push();
-  translate(width / 2, height / 2.25);
+  translate(graphics_left, graphics_top);
   fill(50);
   stroke(0);
   rectMode(CENTER);
@@ -76,7 +76,7 @@ function drawPressureGauge() {
 
 function drawTankShell() {
   push();
-  translate(width / 2, height / 2.25);
+  translate(graphics_left, graphics_top);
   noFill();
   for (let i = 0; i < 200; i++) {
     const rgb = 220 - 0.002 * i ** 2;
@@ -105,7 +105,7 @@ function drawTankShell() {
 function drawSyringe() {
   push();
   // console.log(g.syringe_fraction);
-  translate(width / 2, height / 2.25);
+  translate(graphics_left, graphics_top);
   rectMode(CORNER);
   noStroke();
   fill(g.liquid_color);
@@ -154,7 +154,7 @@ function setGradient(p, x, y, w, h, c1, c2, axis) {
 
 function drawText() {
   push();
-  translate(width / 2, height / 2.25);
+  translate(graphics_left, graphics_top);
   textSize(14 / relativeSize() ** 0.25);
   noStroke();
   fill(0);
@@ -201,11 +201,76 @@ function drawText() {
   pop();
 }
 
+function drawThermometer() {
+  push();
+  translate(graphics_left, graphics_top);
+  const thermometer_color = color(200);
+  const liquid_color = color(255, 100, 100);
+  translate(-350, 120);
+  strokeWeight(2 / relativeSize());
+  stroke(thermometer_color);
+  fill(thermometer_color);
+  beginShape();
+  vertex(-15 * sqrt(2) / 2, -15 * sqrt(2) / 2);
+  vertex(-15 * sqrt(2) / 2, -200);
+  for (let i = 0; i < 180; i += 10) {
+    const x = -15 * sqrt(2) * cos(radians(i)) / 2;
+    const y = -200 - 15 * sqrt(2) / 2 - 15 * sqrt(2) * sin(radians(i)) / 2;
+    vertex(x, y);
+  }
+  vertex(15 * sqrt(2) / 2, -200);
+  vertex(15 * sqrt(2) / 2, -15 * sqrt(2) / 2);
+  beginContour();
+  vertex(6.35, -15 * sqrt(2) / 2);
+  vertex(6.35, -204);
+  for (let i = 180; i >= 0; i -= 10) {
+    const x = -6.35 * cos(radians(i));
+    const y = -204 - 6.35 - 6.35 * sin(radians(i));
+    vertex(x, y);
+  }
+  vertex(-6.35, -204);
+  vertex(-6.35, -15 * sqrt(2) / 2);
+  endContour();
+  endShape();
+  fill(liquid_color);
+  stroke(thermometer_color);
+  strokeWeight(4 / relativeSize());
+  circle(0, 0, 30);
+  fill(liquid_color);
+  noStroke();
+  rectMode(CORNER);
+  rect(-5, 0, 10, -30 - g.T / 120 * 180);
+  fill(0);
+  strokeWeight(0.6 / relativeSize());
+  textAlign(RIGHT, CENTER);
+  textSize(8 / relativeSize());
+  for (let i = 0; i <= 120; i += 5) {
+    let line_length;
+    if (i % 20 === 0) {
+      line_length = 4;
+      noStroke();
+      text(i, -18, -30 - i * 1.5);
+    } else if (i % 10 === 0) {
+      line_length = 3;
+    } else {
+      line_length = 1.5;
+    }
+    stroke(0);
+    line(-11.5, -30 - i * 1.5, -11.5 + line_length, -30 - i * 1.5);
+  }
+  noStroke();
+  textAlign(CENTER, TOP);
+  textSize(10 / relativeSize());
+  text("°C", 0, 24);
+  pop();
+}
+
 function drawAll() {
   drawTank();
   drawTankShell();
   drawSyringe();
   drawText();
+  drawThermometer();
   if (g.is_running && g.percent_injected == 0) {
     document.getElementById("t-slider").setAttribute("disabled", "yes");
     document.getElementById("v-slider").setAttribute("disabled", "yes");
