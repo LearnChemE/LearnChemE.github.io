@@ -22,12 +22,15 @@ window.g = {
   P_final: 0, // the final pressure in the tank
   P_range: [0, 1], // The range of pressure on the pressure gauge
   T: 35, // Temperature (deg. C)
-  n: 0.1, // moles to inject (moles)
+  n: 0, // moles in the tank
+  n_max: 0, // max moles in the tank
+  v_to_inject: 15, // volume to inject in mL
   chemical: "a", // chemical to inject
-  syringe_initial: 0.70575, // The initial value for how far the syringe is pushed in. Dictated by moles to inject (n)
-  syringe_fraction: 0.70575, // How far pushed in the syringe is, 0-1
+  syringe_initial: 1, // The initial value for how far the syringe is pushed in. Dictated by moles to inject (n)
+  syringe_fraction: 1, // How far pushed in the syringe is, 0-1
   is_running: false, // Whether the simulation is currently running
   is_finished: false, // Whether the animation has finished running
+  is_equilibrating: false, // Whether the system is currently equilibrating
   percent_injected: 0, // Value between 0 and 1, used during the animation phase
   reset_button_bright: false, // Switches every second false and true to make the reset button "glow" after finishing a run
 };
@@ -50,31 +53,37 @@ window.draw = function() {
   background.apply(this, g.background_color);
   g.drawAll();
   const seconds_to_inject = 2.5;
+  const seconds_to_equilibrate = 15;
   const frameRate = 60;
   const frames_per_second = frameRate;
-  const frames = frames_per_second * seconds_to_inject;
-  const dt = 1 / frames;
-  const dInj = (1 - g.syringe_initial) / frames;
-  const dL = g.L_final / frames;
-  const dV = g.V_final / frames;
-  const dP = g.P_final / frames;
-  const dVap = g.final_vapor_density / frames;
-  const dLiq = g.final_liquid_level / frames;
-  if (g.is_running && !g.is_finished) {
-    g.syringe_fraction += dInj;
-    g.percent_injected += dt;
-    g.P += dP;
-    g.L += dL;
-    g.V += dV;
-    g.liquid_level += dLiq;
-    g.vapor_density += dVap;
-    if (g.percent_injected >= 1) {
-      g.percent_injected = 1;
+  const frames_inject = frames_per_second * seconds_to_inject;
+  const frames_equilibrate = frames_per_second * seconds_to_equilibrate;
+  const dt_inject = 1 / frames_inject;
+  const dInj = (1 - g.syringe_initial) / frames_inject;
+  const dL = g.L_final / frames_equilibrate;
+  const dV = g.V_final / frames_equilibrate;
+  const dP = g.P_final / frames_equilibrate;
+  const one = g.syringe_fraction < 1;
+  const two = !g.is_finished && g.is_running;
+  if (!g.is_finished && g.is_running) {
+    g.syringe_fraction = min(1, g.syringe_fraction + dInj);
+    g.percent_injected = min(1, g.percent_injected + dt_inject);
+    g.P = min(g.P_final, g.P + dP);
+    g.L = min(g.L_final, g.L + dL);
+    g.V = min(g.V_final, g.V + dV);
+    if (g.L >= g.L_final && g.syringe_fraction === 1) {
       g.is_finished = true;
       g.is_running = false;
-      g.P = g.P_final;
-      g.L = g.L_final;
-      g.P = g.P_final;
+      g.is_equilibrating = false;
+      const mL_in_tank = round(g.n_max * g.rhoLm());
+      if (mL_in_tank < 1000) {
+        document.getElementById("add-button").removeAttribute("disabled");
+        document.getElementById("reset-button").removeAttribute("disabled");
+        document.getElementById("v-slider").removeAttribute("disabled");
+      }
+    }
+    if (g.percent_injected >= 1) {
+      g.percent_injected = 1;
       g.syringe_fraction = 1;
     }
   }

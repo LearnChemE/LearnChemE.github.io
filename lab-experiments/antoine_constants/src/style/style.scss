@@ -17,17 +17,19 @@ $modal-xl: 1140px;
 }
 
 .simulation-controls {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
   display: grid;
   grid-template-columns: max-content max-content;
   justify-content: center;
-  gap: 0px 20px;
-  width: 100vw;
 }
 
 .modal-buttons-row {
   position: absolute;
   right: 20px;
-  top: 20px;
+  top: 100px;
   display: grid;
   grid-template-columns: repeat(1, max-content);
   gap: 8px;
@@ -42,14 +44,14 @@ $modal-xl: 1140px;
 
 .input-area {
   display: grid;
-  grid-template-columns: max-content;
+  grid-template-columns: max-content max-content;
   margin: 10px auto 5px auto;
   gap: 10px;
   width: max-content;
   justify-items: center;
   .input-row {
     display: grid;
-    grid-template-columns: 110px 10rem 35px 50px;
+    grid-template-columns: 120px 10rem 25px 50px;
     gap: 0.6ch;
     align-items: end;
     .data-name {
@@ -63,8 +65,10 @@ $modal-xl: 1140px;
 
 .select-wrapper {
   display: grid;
-  grid-template-columns: max-content max-content;
-  gap: 20px;
+  grid-template-columns: max-content;
+  gap: 3px;
+  transform: translateX(-10px);
+  margin-bottom: 10px;
   align-items: center;
   select {
     padding: 4px 20px 4px 10px;
@@ -74,17 +78,16 @@ $modal-xl: 1140px;
 .start-wrapper {
   position: absolute;
   right: 20px;
-  top: 250px;
+  bottom: 50px;
   display: grid;
   grid-template-columns: 12ch;
   gap: 10px;
   align-items: center;
-  #go-button {
+  .simulation-button {
     display: grid;
     align-items: center;
     width: 100%;
     height: 35px;
-    background-color: rgb(127, 164, 127);
     color: white;
     border-radius: 5px;
     text-align: center;
@@ -97,26 +100,20 @@ $modal-xl: 1140px;
     user-select: none;
     cursor: pointer;
   }
-  #go-button:hover {
+  #add-button {
+    background-color: rgb(127, 127, 164);
+  }
+  #add-button:hover {
+    background-color: rgb(163, 163, 208);
+  }
+  #start-button {
+    background-color: rgb(127, 164, 127);
+  }
+  #start-button:hover {
     background-color: rgb(163, 208, 163);
   }
   #reset-button {
-    display: grid;
-    align-items: center;
-    width: 100%;
-    height: 35px;
     background-color: red;
-    color: white;
-    border-radius: 5px;
-    text-align: center;
-    box-shadow: 0px 0px 1px 1px grey;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    cursor: pointer;
   }
   #reset-button:hover {
     background: rgb(255, 100, 100);
@@ -130,9 +127,9 @@ $modal-xl: 1140px;
   position: relative;
   margin: auto;
   width: calc(100vw - 40px);
-  max-width: calc(calc(100vh - 90px) * 800 / 530);
+  max-width: calc(calc(100vh - 20px) * 800 / 530);
   height: calc(calc(100vw - 40px) * 530 / 800);
-  max-height: calc(100vh - 90px);
+  max-height: calc(100vh - 20px);
   padding-top: 10px;
 }
 
@@ -214,24 +211,32 @@ div[disabled="yes"] {
   }
   .input-area {
     .input-row {
-      grid-template-columns: 90px 8rem 30px 40px;
+      grid-template-columns: 100px 8rem 20px 30px;
     }
   }
   .btn {
     width: 10ch !important;
   }
   .btn,
-  #go-button,
-  #reset-button {
+  .simulation-button {
     font-size: 0.8rem;
     padding: 0.3rem 0.4rem;
   }
   .start-wrapper {
     justify-items: end;
-    #go-button,
-    #reset-button {
+    bottom: 20px;
+    .simulation-button {
       height: 30px;
       width: 80px;
     }
+  }
+  .select-wrapper {
+    transform: translateX(0px);
+  }
+  .modal-buttons-row {
+    top: 50px;
+  }
+  .simulation-controls {
+    top: 10px;
   }
 }

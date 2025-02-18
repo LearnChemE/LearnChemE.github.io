@@ -85,8 +85,8 @@ g.rhoLm = function() {
 function calcAll() {
   let d = 1e9;
   let liq_estimate = 0;
-  for (let liq = 0; liq < g.n; liq += 0.0001) {
-    const vap = g.n - liq;
+  for (let liq = g.n; liq < g.n_max; liq += 0.0001) {
+    const vap = g.n_max - liq;
     const RHS = (liq / g.rhoLm()) + (vap * R * (g.T + 273.15) / g.Psat(g.T)); // Right-hand side of the equation V == L / rhoLm + (V R T) / Psat
     const dV = Math.abs(V - RHS);
     if (dV < d) {
@@ -96,16 +96,13 @@ function calcAll() {
   }
   const liq = liq_estimate;
   g.L_final = Number(liq.toFixed(4)); // Fix to 3-digit precision
-  g.V_final = Number((g.n - g.L_final).toFixed(4)); // Fix to 3-digit precision
-  g.final_liquid_level = 1.5 * (g.L_final / g.rhoLm()) / V;
-  const max_n = 2; // Max number of moles of vapor possible
-  g.final_vapor_density = 0.05 + 0.95 * (g.V_final / max_n); // Even for tiny amounts of vapor, we want it to be at least 5% density
+  g.V_final = Number((g.n_max - g.L_final).toFixed(4)); // Fix to 3-digit precision
   g.P_final = P_final(); // Next, calculate the final pressure
 }
 
 function P_final() {
   if (g.L_final == 0) {
-    return g.n * R * (g.T + 273.15) / V
+    return g.n_max * R * (g.T + 273.15) / V
   } else {
     return g.Psat(g.T)
   }

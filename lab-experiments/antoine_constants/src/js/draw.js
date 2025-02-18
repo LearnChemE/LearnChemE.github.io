@@ -2,7 +2,7 @@ const tank_diameter = 200;
 
 function drawTank() {
   push();
-  translate(width / 2, height / 2.5);
+  translate(width / 2, height / 2.25);
   fill(50);
   stroke(0);
   rectMode(CENTER);
@@ -76,7 +76,7 @@ function drawPressureGauge() {
 
 function drawTankShell() {
   push();
-  translate(width / 2, height / 2.5);
+  translate(width / 2, height / 2.25);
   noFill();
   for (let i = 0; i < 200; i++) {
     const rgb = 220 - 0.002 * i ** 2;
@@ -104,7 +104,8 @@ function drawTankShell() {
 
 function drawSyringe() {
   push();
-  translate(width / 2, height / 2.5);
+  // console.log(g.syringe_fraction);
+  translate(width / 2, height / 2.25);
   rectMode(CORNER);
   noStroke();
   fill(g.liquid_color);
@@ -153,31 +154,50 @@ function setGradient(p, x, y, w, h, c1, c2, axis) {
 
 function drawText() {
   push();
-  translate(width / 2, height / 2.5);
-  textSize(16);
+  translate(width / 2, height / 2.25);
+  textSize(14 / relativeSize() ** 0.25);
   noStroke();
   fill(0);
   textAlign(CENTER, CENTER);
   textWrap(WORD);
   let text_above_syringe = "";
   let text_below_syringe = "";
-  let liquid_in_syringe = Number(round(10000 * g.n / g.rhoLm()) / 10).toFixed(1);
-  if (liquid_in_syringe === "0.0" || liquid_in_syringe === "0.1") {
-    liquid_in_syringe = Number(round(100000 * g.n / g.rhoLm()) / 100).toFixed(2);
-  }
-  if (!g.is_finished && !g.is_running) {
-    text_above_syringe = "ready to inject liquid into empty vessel";
+  const V_to_add = round((g.n_max - g.n) * g.rhoLm());
+  const mL_in_tank = round(g.n_max * g.rhoLm());
+  let liquid_in_syringe = g.syringe_fraction === 1 ? 0 : V_to_add;
+  if (g.is_equilibrating && g.syringe_fraction === 1) {
+    text_above_syringe = `you have injected a\ntotal of ${mL_in_tank} mL`;
+    text_below_syringe = "system is equilibrating ...";
+  } else if (!g.is_finished && !g.is_running) {
+    if (g.syringe_fraction === 1) {
+      if (g.n === 0) {
+        text_above_syringe = "the tank is empty.\n";
+      }
+      text_above_syringe += "ready to fill the syringe";
+    } else if (g.n === 0) {
+      text_above_syringe = "ready to inject liquid into empty vessel";
+    } else {
+      text_above_syringe = "";
+    }
     text_below_syringe = `syringe contains ${liquid_in_syringe} mL liquid`;
   } else if (g.is_running && !g.is_finished) {
     text_above_syringe = "";
     text_below_syringe = "injecting liquid ...";
   } else {
-    text_below_syringe = `injected ${liquid_in_syringe} L liquid`;
-    text_above_syringe = "";
+    if (mL_in_tank < 1000) {
+      text_below_syringe = `system is at equilibrium.\nyou may refill the syringe`;
+    } else {
+      text_below_syringe = `tank is full`;
+    }
+    text_above_syringe = `you have injected a\ntotal of ${mL_in_tank} mL`;
+    g.n = g.n_max;
   }
   text(text_above_syringe, -120, -45, 200);
   text(text_below_syringe, -10, 40);
   text("tank volume = 2 L", -220, 180);
+  if (!g.is_equilibrating) {
+    noLoop();
+  }
   pop();
 }
 
@@ -187,8 +207,8 @@ function drawAll() {
   drawSyringe();
   drawText();
   if (g.is_running && g.percent_injected == 0) {
-    document.getElementById("T-slider").setAttribute("disabled", "yes");
-    document.getElementById("n-slider").setAttribute("disabled", "yes");
+    document.getElementById("t-slider").setAttribute("disabled", "yes");
+    document.getElementById("v-slider").setAttribute("disabled", "yes");
   }
 }
 
