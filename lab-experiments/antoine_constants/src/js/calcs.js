@@ -1,4 +1,4 @@
-const V = 2; // Volume of tank (L)
+const V = g.tank_volume; // Volume of tank (L)
 const R = 0.08314; // Gas constant ( (L bar) / (mol K) )
 
 g.Psat = function(t) {
@@ -85,7 +85,7 @@ g.rhoLm = function() {
 function calcAll() {
   let d = 1e9;
   let liq_estimate = 0;
-  for (let liq = g.n; liq < g.n_max; liq += 0.0001) {
+  for (let liq = 0; liq < g.n_max; liq += 0.0001) {
     const vap = g.n_max - liq;
     const RHS = (liq / g.rhoLm()) + (vap * R * (g.T + 273.15) / g.Psat(g.T)); // Right-hand side of the equation V == L / rhoLm + (V R T) / Psat
     const dV = Math.abs(V - RHS);

@@ -51,7 +51,7 @@ $modal-xl: 1140px;
   justify-items: center;
   .input-row {
     display: grid;
-    grid-template-columns: 120px 10rem 25px 50px;
+    grid-template-columns: 120px 10rem 30px 50px;
     gap: 0.6ch;
     align-items: end;
     .data-name {
@@ -211,7 +211,7 @@ div[disabled="yes"] {
   }
   .input-area {
     .input-row {
-      grid-template-columns: 100px 8rem 20px 30px;
+      grid-template-columns: 100px 8rem 25px 30px;
     }
   }
   .btn {

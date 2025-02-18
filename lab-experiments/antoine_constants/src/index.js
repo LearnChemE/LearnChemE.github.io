@@ -24,7 +24,9 @@ window.g = {
   T: 35, // Temperature (deg. C)
   n: 0, // moles in the tank
   n_max: 0, // max moles in the tank
-  v_to_inject: 15, // volume to inject in mL
+  v_to_inject: 0.5, // volume to inject in mL
+  tank_volume: 4, // volume of the tank in L
+  max_injectable_volume: 1, // max volume that can be injected in mL
   chemical: "a", // chemical to inject
   syringe_initial: 1, // The initial value for how far the syringe is pushed in. Dictated by moles to inject (n)
   syringe_fraction: 1, // How far pushed in the syringe is, 0-1

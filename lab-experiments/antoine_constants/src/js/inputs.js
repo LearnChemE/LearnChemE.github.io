@@ -25,18 +25,18 @@ t_slider.addEventListener("input", () => {
 v_slider.addEventListener("input", () => {
   const V = Number(v_slider.value);
   g.v_to_inject = V;
-  v_value.innerHTML = `${round(V)}`;
+  v_value.innerHTML = `${(round(100 * V) / 100).toFixed(2)}`;
   redraw();
 });
 
 select_chemical.addEventListener("change", () => {
   const chemical = select_chemical.value;
   g.chemical = chemical;
-  const mL = 15;
-  const max_V = 30;
+  const mL = 0.5;
+  const max_V = g.max_injectable_volume;
   g.n_max = 0;
   v_slider.value = mL;
-  v_value.innerHTML = mL;
+  v_value.innerHTML = mL.toFixed(2);
   g.syringe_initial = 1 - mL / max_V;
   let T_min, T_max, T_default, P_max;
   switch (chemical) {
@@ -108,8 +108,8 @@ add_button.addEventListener("mousedown", () => {
   const v = Number(v_slider.value);
   const n = v / g.rhoLm();
   g.n_max = g.n + n;
-  g.syringe_initial = 1 - v / 30;
-  g.syringe_fraction = 1 - v / 30;
+  g.syringe_initial = 1 - v / g.max_injectable_volume;
+  g.syringe_fraction = 1 - v / g.max_injectable_volume;
   g.is_finished = false;
   g.percent_injected = 0;
   start_button.removeAttribute("disabled");

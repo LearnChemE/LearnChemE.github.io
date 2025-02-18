@@ -26,7 +26,7 @@ function drawPressureGauge() {
   ellipse(0, 0, 60, 60);
   textAlign(CENTER, CENTER);
   textSize(10 / relativeSize() ** 0.25);
-  for (let i = 30; i >= -210; i -= 2.4) {
+  for (let i = 54; i >= -210; i -= 2.4) {
     i = round(i * 10) / 10;
     const x = 30 * cos(radians(i));
     const y = 30 * sin(radians(i));
@@ -109,24 +109,24 @@ function drawSyringe() {
   rectMode(CORNER);
   noStroke();
   fill(g.liquid_color);
-  rect(-80, -12.5, 5 + (1 - g.syringe_fraction) * 92, 25);
+  rect(-80, -6, 1 + (1 - g.syringe_fraction) * 92, 12);
   stroke(0);
   fill(150);
   rect(-120, -1, 40, 2);
   fill(150);
-  rect(15 - 90 * g.syringe_fraction, -3, 105, 6);
+  rect(12 - 90 * g.syringe_fraction, -1, 105, 2);
   rectMode(CENTER);
   fill(120);
-  rect(15 - 90 * g.syringe_fraction, 0, 4, 23);
+  rect(12 - 90 * g.syringe_fraction, 0, 2, 11);
   rectMode(CORNER);
   fill(180);
-  rect(120 - 90 * g.syringe_fraction, -13, 3, 26);
-  rect(-82, -5, 2, 10);
-  setGradient(-80, -12.5, 100, 25, color(240, 240, 240, 127), color(215, 215, 215, 127), 1);
+  rect(117 - 90 * g.syringe_fraction, -6.5, 2, 13);
+  rect(-82, -3, 2, 6);
+  setGradient(-80, -10, 100, 20, color(240, 240, 240, 127), color(215, 215, 215, 127), 1);
   noFill();
   rectMode(CORNER);
   stroke(100);
-  rect(-80, -12.5, 100, 25, 2, 2);
+  rect(-80, -6, 100, 12, 2, 2);
   pop();
 }
 
@@ -162,8 +162,8 @@ function drawText() {
   textWrap(WORD);
   let text_above_syringe = "";
   let text_below_syringe = "";
-  const V_to_add = round((g.n_max - g.n) * g.rhoLm());
-  const mL_in_tank = round(g.n_max * g.rhoLm());
+  const V_to_add = (round(100 * (g.n_max - g.n) * g.rhoLm()) / 100).toFixed(2);
+  const mL_in_tank = (round(100 * g.n_max * g.rhoLm()) / 100).toFixed(2);
   let liquid_in_syringe = g.syringe_fraction === 1 ? 0 : V_to_add;
   if (g.is_equilibrating && g.syringe_fraction === 1) {
     text_above_syringe = `you have injected a\ntotal of ${mL_in_tank} mL`;
@@ -194,7 +194,7 @@ function drawText() {
   }
   text(text_above_syringe, -120, -45, 200);
   text(text_below_syringe, -10, 40);
-  text("tank volume = 2 L", -220, 180);
+  text(`tank volume = ${g.tank_volume} L`, -220, 180);
   if (!g.is_equilibrating) {
     noLoop();
   }
