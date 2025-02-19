@@ -1,0 +1,258 @@
+$modal-sm: calc(100vw - 50px);
+$modal-md: calc(100vw - 50px);
+$modal-lg: 820px;
+$modal-xl: 1140px;
+@import "bootstrap";
+@import "./slider.scss"; // Keeping slider styling in place if needed for other inputs
+@keyframes disable {
+  0% {
+    opacity: 1;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.25;
+  }
+}
+
+.simulation-controls {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-content: center;
+}
+
+.modal-buttons-row {
+  position: absolute;
+  right: 20px;
+  top: 100px;
+  display: grid;
+  grid-template-columns: repeat(1, max-content);
+  gap: 8px;
+  margin: 0.5rem auto;
+  justify-content: center;
+  align-content: center;
+  .btn {
+    height: max-content;
+    width: 12ch;
+  }
+}
+
+.input-area {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  margin: 10px auto 5px auto;
+  gap: 10px;
+  width: max-content;
+  justify-items: center;
+  .input-row {
+    display: grid;
+    grid-template-columns: 120px 10rem 30px 50px;
+    gap: 0.6ch;
+    align-items: end;
+    .data-name {
+      justify-self: end;
+    }
+    .data-value {
+      text-align: end;
+    }
+  }
+}
+
+.select-wrapper {
+  display: grid;
+  grid-template-columns: max-content;
+  gap: 3px;
+  transform: translateX(-10px);
+  margin-bottom: 10px;
+  align-items: center;
+  select {
+    padding: 4px 20px 4px 10px;
+  }
+}
+
+.start-wrapper {
+  position: absolute;
+  right: 20px;
+  bottom: 50px;
+  display: grid;
+  grid-template-columns: 12ch;
+  gap: 10px;
+  align-items: center;
+  .simulation-button {
+    display: grid;
+    align-items: center;
+    width: 100%;
+    height: 35px;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0px 0px 1px 1px grey;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+  }
+  #add-button {
+    background-color: rgb(127, 127, 164);
+  }
+  #add-button:hover {
+    background-color: rgb(163, 163, 208);
+  }
+  #start-button {
+    background-color: rgb(127, 164, 127);
+  }
+  #start-button:hover {
+    background-color: rgb(163, 208, 163);
+  }
+  #reset-button {
+    background-color: red;
+  }
+  #reset-button:hover {
+    background: rgb(255, 100, 100);
+  }
+  #reset-button.bright {
+    background: rgb(255, 150, 150);
+  }
+}
+
+#p5-container {
+  position: relative;
+  margin: auto;
+  width: calc(100vw - 40px);
+  max-width: calc(calc(100vh - 20px) * 800 / 530);
+  height: calc(calc(100vw - 40px) * 530 / 800);
+  max-height: calc(100vh - 20px);
+  padding-top: 10px;
+}
+
+canvas {
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+  box-shadow: 0px 0px 2px 2px lightgrey;
+}
+
+#loading {
+  margin-left: 15px;
+  font-size: 1.5rem;
+  width: 100vw;
+  text-align: center;
+}
+
+.modal.show {
+  padding-left: 0px !important;
+}
+
+.modal-body {
+  text-align: left;
+  font-size: 0.9rem;
+  .references {
+    font-size: 0.8rem;
+  }
+  ol {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    &>li {
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
+    }
+  }
+  .block-eqn {
+    margin-left: 1rem;
+    font-size: 0.95rem;
+  }
+}
+
+.simulation-title {
+  width: 100vw;
+  text-align: center;
+  padding: 8px;
+  padding-bottom: 10px;
+  font-size: 1.25rem;
+  background-color: rgb(240, 240, 240);
+}
+
+
+/* Ensure that the rest of the controls and buttons remain intact */
+
+.simulation-controls {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-content: center;
+  gap: 0px 20px;
+  margin: auto;
+}
+
+input[type="range"][disabled="yes"] {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+div[disabled="yes"] {
+  opacity: 0.25;
+  pointer-events: none;
+  animation-name: disable;
+  animation-duration: 0.5s;
+}
+
+#gauge-hover {
+  position: absolute;
+  background-color: white;
+  border: 1px solid black;
+  width: 10%;
+  height: calc(10% * 800 / 530);
+  left: 25.2%;
+  top: 16%;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+#gauge-hover:hover {
+  transform: scale(2) translateY(25%);
+}
+
+@media screen and (max-width: 800px) {
+  .input-row,
+  .select-wrapper {
+    font-size: 0.8rem;
+  }
+  .input-area {
+    .input-row {
+      grid-template-columns: 100px 8rem 25px 30px;
+    }
+  }
+  .btn {
+    width: 10ch !important;
+  }
+  .btn,
+  .simulation-button {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.4rem;
+  }
+  .start-wrapper {
+    justify-items: end;
+    bottom: 20px;
+    .simulation-button {
+      height: 30px;
+      width: 80px;
+    }
+  }
+  .select-wrapper {
+    transform: translateX(0px);
+  }
+  .modal-buttons-row {
+    top: 50px;
+  }
+  .simulation-controls {
+    top: 10px;
+  }
+}

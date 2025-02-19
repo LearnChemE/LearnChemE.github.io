@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Fast Does a Tank Empty?</title>
+    <link rel="stylesheet" href="main.css">
+    <script src="https://kit.fontawesome.com/9d19ad28f4.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- SVG.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
+</head>
+<body>
+    <div class="canvas-container">
+        <div id="svg-container">
+            <!-- Container for Hamburger Icon and Reset Button -->
+            <div class="icon-container">
+                <!-- Hamburger Icon and Menu Container -->
+                <div class="hamburger-wrapper">
+                    <!-- Hamburger Icon -->
+                    <div id="hamburger-icon" onclick="toggleMenu()">
+                        <img src="./assets/hamburger.svg" alt="Menu" class="hamburger-img">
+                    </div>
+                    
+                    <!-- Container for Hamburger Menu Buttons -->
+                    <div id="hamburger-menu" class="hamburger-menu">
+                        <!-- Buttons will be dynamically added here -->
+                    </div>
+                </div>
+                
+                <div class="dropDown-wrapperBox">
+                    <div class="control-container">
+                        <div class="dropdown-wrapper">
+                            <label class="dropdownLabel">Drain diameter (cm):</label>
+                            <select id="drainDiameter" class="form-control">
+                                <option value="0.5">0.5</option>
+                                <option value="1" selected>1</option>
+                            </select>
+                        </div>
+                        <div class="dropdown-wrapper">
+                            <label class="dropdownLabel">Liquid height (cm):</label>
+                            <select id="liquidHeight" class="form-control">
+                                <option value="40">40</option>
+                                <option value="80" selected>80</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reset Button -->
+                <button id="reset-button" class="btn btn-danger">Reset</button>
+            </div>
+        </div>
+    </div>
+    <div id="overlayContainer"></div>
+    
+    <script type="module" src="./js/main.js"></script>
+    <script type="module" src="./js/constants.js"></script>
+<script type="module" src="./js/drawCanvas.js"></script>
+<script type="module" src="./js/resetCanvas.js"></script>
+<script type="module" src="./js/domElements.js"></script>
+<script type="module" src="./js/drawContainer.js"></script>
+<script type="module" src="./js/drawInstructions.js"></script>
+<script type="module" src="./js/drawRuler.js"></script>
+<script type="module" src="./js/drawTable.js"></script>
+<script type="module" src="./js/drawValve.js"></script>
+<script type="module" src="./js/droplets.js"></script>
+<script type="module" src="./js/fillTank.js"></script>
+<script type="module" src="./js/state.js"></script>
+<script type="module" src="./js/timer.js"></script>
+
+    <!-- Bootstrap JS, Popper, and jQuery -->   
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Function to toggle the hamburger menu
+        function toggleMenu() {
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            hamburgerMenu.classList.toggle('show');
+            
+            if (hamburgerMenu.classList.contains('show')) {
+                // Clear any existing buttons
+                hamburgerMenu.innerHTML = '';
+                
+                // Create and append three buttons
+                const buttonLabels = ['Directions', 'About', 'Worksheet'];
+                buttonLabels.forEach((label) => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'btn btn-primary';
+                    button.textContent = label;
+                    
+                    button.addEventListener('click', () => {
+                        const modalId = label.toLowerCase();
+                        const modalUrl = `./overlay/${modalId}.html`;
+                        
+                        if (modalId === 'worksheet') {
+                            const fileUrl = 'assets/worksheet.pdf'; // Replace with the actual file path
+                            const fileName = 'worksheet.pdf'; // Replace with the desired file name
+                            downloadFile(fileUrl, fileName);
+                            return; // Exit the function to prevent further execution
+                        }
+                        fetch(modalUrl)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network error');
+                            return response.text();
+                        })
+                        .then(html => {
+                            // Inject the modal HTML into the container
+                            const container = document.getElementById('overlayContainer');
+                            container.innerHTML = html;
+                            
+                            // Initialize and show the modal
+                            const modalEl = document.getElementById(modalId);
+                            if (modalEl) {
+                                const modal = new bootstrap.Modal(modalEl);
+                                modal.show();
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    });
+                    
+                    hamburgerMenu.appendChild(button);
+                });
+            }
+        }
+        
+        // Function to download a file
+        function downloadFile(fileUrl, fileName) {
+            const link = document.createElement('a');
+            link.href = fileUrl;
+            link.download = fileName; // Set the file name for download
+            document.body.appendChild(link);
+            link.click(); // Trigger the download
+            document.body.removeChild(link); // Clean up
+        }
+        
+        // Function to reset the canvas
+        function resetCanvas() {
+            console.log('Reset button clicked');
+            
+            // Reset water height and diameter
+            waterHeight = parseFloat(document.getElementById('liquidHeight').value) * 3.5;
+            diameter = parseFloat(document.getElementById('drainDiameter').value) * 3.5;
+            
+            // Stop any ongoing animations
+            stopTimer();
+            stopDropletAnimation();
+            
+            // Reset the valve state
+            isRotated = false;
+            
+            // Redraw the canvas
+            drawCanvas();
+        }
+        
+        // Close the hamburger menu when clicking outside
+        document.addEventListener('click', (event) => {
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const hamburgerIcon = document.getElementById('hamburger-icon');
+            
+            if (!hamburgerMenu.contains(event.target) && !hamburgerIcon.contains(event.target)) {
+                hamburgerMenu.classList.remove('show');
+            }
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

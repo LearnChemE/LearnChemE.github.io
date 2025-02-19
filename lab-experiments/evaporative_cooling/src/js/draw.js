@@ -155,7 +155,7 @@ function drawWater(pumpOn) {
     }
 
     if (check8) {
-      s[13] = min(s[13] + 1, 10.6 + (beakerHeight * 10 / 11) * (1000 - state.beakerWaterLevel) / 1000);
+      s[13] = min(s[13] + 1, 16.43 + (beakerHeight * 10 / 11 * 8 / 10) * (1000 - state.beakerWaterLevel) / 1000);
     }
 
     fill("rgba(100, 100, 255, 0.4)");
@@ -286,10 +286,10 @@ function drawWater(pumpOn) {
     if (s[12] === 0) {
       s[13] = max(s[13] - 1, 0);
     } else {
-      s[13] = 10.6 + (beakerHeight * 10 / 11) * (1000 - state.beakerWaterLevel) / 1000
+      s[13] = 16.43 + (beakerHeight * 10 / 11 * 8 / 10) * (1000 - state.beakerWaterLevel) / 1000
     }
 
-    const beakerWaterCoord = 30.5 + 10.6 + (beakerHeight * 10 / 11) * (1000 - state.beakerWaterLevel) / 1000;
+    const beakerWaterCoord = 30.5 + 16.43 + (beakerHeight * 10 / 11 * 8 / 10) * (1000 - state.beakerWaterLevel) / 1000;
 
     fill("rgba(100, 100, 255, 0.4)");
     rect(-1.5, beakerWaterCoord, 3, -s[13]);
@@ -775,7 +775,7 @@ function drawBeaker() {
   fill(waterFill);
   noStroke();
 
-  const beakerPx = (state.beakerWaterLevel / 1000) * beakerHeight * 10 / 11;
+  const beakerPx = (state.beakerWaterLevel / 1000) * beakerHeight * 10 / 11 * 8 / 10;
   rect(-beakerWidth / 2 - 1, beakerHeight / 2 - 0.8, beakerWidth + 2, -beakerPx);
 
   fill(beakerFill);
