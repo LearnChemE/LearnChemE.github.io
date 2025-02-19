@@ -14,7 +14,7 @@
   gap: 3px;
   width: max-content;
   margin: 12px;
-  gap: 10px;
+  gap: 20px;
   align-content: center;
 }
 
@@ -69,6 +69,7 @@ mjx-container {
   gap: 20px;
   width: max-content;
   margin: 0.5rem auto 0rem auto;
+  height: max-content;
 }
 
 .modal-buttons-row>* {

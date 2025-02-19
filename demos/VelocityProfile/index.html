@@ -56,13 +56,15 @@
     <div class="inputs">
       <div class="input-area">
         <div id="selection-row">Display:</div>
-        <!--<div class="btn-group" role="group" id="plot-type">
+        
+        <!-- <div class="btn-group" role="group" id="plot-type">
           <input type="radio" class="btn-check" name="plot" id="velocity-distribution" value="velocity-distribution" autocomplete="off" checked>
           <label class="btn btn-outline-primary" for="velocity-distribution">Velocity Distribution</label>
        
           <input type="radio" class="btn-check" name="plot" id="velocity-vs-height" value="velocity-vs-height" autocomplete="off">
           <label class="btn btn-outline-primary" for="velocity-vs-height">Velocity vs Height</label>
         </div>-->
+        
 
        
 
@@ -71,17 +73,16 @@
         <button class="btn btn-primary btn-primary" data-bs-toggle="button" aria-pressed="false" autocomplete="off">Velocity vs Height</button>
         </div>-->
           
-
-        
         <select id="selection">
           <option value="velocity-distribution">Velocity Distribution</option>
           <option value="velocity-vs-height">Velocity vs Height</option>
         </select>
+        
 
-        <div class="play-pause-area">
+      <!--<div class="play-pause-area">
           <button class="btn-sm btn-success" id="play">&#9654;</button>
           <button class="btn-sm btn-danger" id="pause"><div>&#8214;</div></button>
-        </div>
+        </div>-->
       </div>
 
       <div class="input-area">
@@ -89,34 +90,32 @@
         <input type="range" id="density-slider" min="0" max="1" step="0.01" value="0.5">
         <div class="data-value" id="density-value">0.50</div>
         <div class="data-metric">kg/m<sup>3</sup></div>
-      </div>
 
-      <div class="input-area">
         <div class="data-name">Density2 \(\rho\):</div>
         <input type="range" id="density-slider" min="0" max="1" step="0.01" value="0.5">
         <div class="data-value" id="density-value">0.50</div>
         <div class="data-metric">kg/m<sup>3</sup></div>
       </div>
+    </div>
+    
+
+    <div class="modal-buttons-row">
+      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
+      <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
+      <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
 
       <div class="input-area2">
         <div class="data-name">Density3 \(\rho\):</div>
         <input type="range" id="density-slider" min="0" max="1" step="0.01" value="0.5">
         <div class="data-value" id="density-value">0.50</div>
         <div class="data-metric">kg/m<sup>3</sup></div>
-      </div>
 
-      <div class="input-area2">
         <div class="data-name">Density4 \(\rho\):</div>
         <input type="range" id="density-slider" min="0" max="1" step="0.01" value="0.5">
         <div class="data-value" id="density-value">0.50</div>
         <div class="data-metric">kg/m<sup>3</sup></div>
-      </div>
-    </div>
 
-    <div class="modal-buttons-row">
-      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
-      <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
-      <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+      </div>
     </div>
   </div>
 

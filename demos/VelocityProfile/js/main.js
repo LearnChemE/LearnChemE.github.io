@@ -6,10 +6,10 @@
 
 // Declare global variables which are available to all files
 window.g = {
-  selection: "Velocity Distribution",
+  //selection: "Velocity Distribution",
   density: 0.5,
   particles: 50,
-  playing: false,
+  //playing: false,
 }
 
 // Load the other scripts (except calcs.js, which is imported in draw.js).
