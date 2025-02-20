@@ -91,7 +91,7 @@ window.simulation_list = [{
   {
     "title": "Venturi Meter Digital Experiment",
     "href": "https://learncheme.github.io/lab-experiments/venturi/dist/",
-    "image": "https://learncheme.com/wp-content/uploads/2025/01/venturiDigitalLab",
+    "image": "https://learncheme.com/wp-content/uploads/2025/01/venturiDigitalLab.png",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demosVenturi"
   },
   {
@@ -127,7 +127,7 @@ window.simulation_list = [{
   {
     "title": "Identify Temperature Profiles for Composite Walls",
     "href": "https://learncheme.github.io/demos/IdentTempProfilesForHeatGenorCondThroughCompWalls/",
-    "image": "https://learncheme.com/wp-content/uploads/2023/03/identify_temperature_profiles_preview.png",
+    "image": "https://learncheme.com/wp-content/uploads/2023/03/Identify-Temperature-Profiles-for-Composite-Walls-QUIZ.png",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/IdentTempProfilesForHeatGenorCondThroughCompWalls/"
   },
   {
@@ -211,7 +211,7 @@ window.simulation_list = [{
   {
     "title": "Construct T-x-y Diagram for VLE",
     "href": "https://learncheme.github.io/learnchemejs/html/Txy.html",
-    "image": "https://learncheme.com/wp-content/uploads/2021/06/construct-t-x-y-diagram-for-vle-thumbnail-original.png",
+    "image": "https://learncheme.com/wp-content/uploads/2023/03/Construct-T-x-y-Diagram-for-VLE-QUIZ.png",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/learnchemejs/"
   },
   {
@@ -223,7 +223,7 @@ window.simulation_list = [{
   {
     "title": "Mass Balances in Evaporative Crystallization",
     "href": "https://learncheme.github.io/demos/MassBalancesInEvaporativeCrystallizationQuiz/dist/",
-    "image": "https://learncheme.com/wp-content/uploads/2023/03/mass_balances_in_evaporative_crystallization_quiz_preview.png",
+    "image": "https://learncheme.com/wp-content/uploads/2023/03/Mass-Balances-in-Evaporative-Crystallization-QUIZ.png",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MassBalancesInEvaporativeCrystallizationQuiz"
   },
   {
@@ -241,7 +241,7 @@ window.simulation_list = [{
   {
     "title": "Solving Mass Balances on a Distillation Column",
     "href": "https://learncheme.github.io/demos/SolvingMassBalancesOnADistillationColumn/dist/index.html",
-    "image": "https://learncheme.com/wp-content/uploads/2022/12/solving_mass_balances_on_distillation_column.png",
+    "image": "https://learncheme.com/wp-content/uploads/2023/03/Solving-Mass-Balances-on-a-Distillation-Column-QUIZ.png",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SolvingMassBalancesOnADistillationColumn"
   },
   {
@@ -313,7 +313,7 @@ window.simulation_list = [{
   {
     "title": "Construct P-x-y Diagram for Immiscible Liquids",
     "href": "https://learncheme.github.io/learnchemejs/html/immiscibleP.html",
-    "image": "https://learncheme.com/wp-content/uploads/2021/06/construct-p-x-y-diagram-for-immiscible-liquids-thumbnail-original.png",
+    "image": "https://learncheme.com/wp-content/uploads/2023/03/Construct-P-x-y-Diagram-for-Immiscible-Liquids-Quiz.png",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/learnchemejs/"
   },
   {
@@ -325,7 +325,7 @@ window.simulation_list = [{
   {
     "title": "Construct T-x-y Diagram for Immiscible Liquids",
     "href": "https://learncheme.github.io/learnchemejs/html/immiscibleT.html",
-    "image": "https://learncheme.com/wp-content/uploads/2021/06/construct-t-x-y-diagram-for-immiscible-liquids-thumbnail-original.png",
+    "image": "https://learncheme.com/wp-content/uploads/2023/03/Construct-T-x-y-Diagram-for-Immiscible-Liquids-QUIZ.png",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/learnchemejs/"
   },
   {
@@ -347,7 +347,7 @@ window.simulation_list = [{
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/LiquidLiquidExtractionOnARightTriangleTernaryPhaseDiagram/"
   },
   {
-    "title": "Multistage Batch Distillation",
+    "title": "Multi-stage Batch Distillation",
     "href": "https://learncheme.github.io/demos/MultiStageBatchDistillation/dist/index.html",
     "image": "https://learncheme.com/wp-content/uploads/2021/06/multistagebatchdistillationnew.png",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MultiStageBatchDistillation"
@@ -511,7 +511,7 @@ window.simulation_list = [{
   {
     "title": "Partial Molar Enthalpy and Entropy Quiz",
     "href": "https://learncheme.github.io/demos/PartialMolarEnthalpyAndEntropyQuiz/dist/",
-    "image": "https://learncheme.com/wp-content/uploads/2023/06/partial_molar_enthalpy_entropy_quiz_preview.png",
+    "image": "https://learncheme.com/wp-content/uploads/2023/03/Partial-Molar-Enthalpy-and-Entropy-QUIZ.png",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/PartialMolarEnthalpyAndEntropyQuiz/"
   },
   {
