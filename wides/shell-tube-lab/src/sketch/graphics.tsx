@@ -289,7 +289,7 @@ const hoSingleVert = [[100, 400],[100, 375],[110, 375],[110, 400],];
 // prettier-ignore
 const coSingleVert = [[650, 470],[650, 35],[165, 35],[165, 75],[155, 75],[155, 25],[660, 25],[660, 470],];
 // prettier-ignore
-const ciSingleVert = [[600,450],[600,400],[485,400],[485,370],[495,370],[495,390],[610,390],[610,450]];
+const ciSingleVert = [[600,450],[600,400],[485,400],[485,375],[495,375],[495,390],[610,390],[610,450]];
 
 function createEmptySingleTubes(p: P5CanvasInstance) {
   let bt = p.createGraphics(p.width, p.height);
