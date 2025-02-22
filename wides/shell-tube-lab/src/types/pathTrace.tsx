@@ -35,6 +35,20 @@ export class PathTrace
         this.normDist = dist;
     };
 
+    findPreviousVertex(time: number) {
+        var lo;
+        var s = time / this.totalTime;
+        if (s>1) 
+            return this.vertices.length-1;
+
+        // Find lower bound
+        for (lo=0;lo<this.normDist.length;lo++) {
+            if (this.normDist[lo+1] >= s) 
+                return lo;
+        }
+        return this.vertices.length-1;
+    }
+
     calculatePosition(time: number) {
         var s = time/this.totalTime;
         if (s >= 1) 

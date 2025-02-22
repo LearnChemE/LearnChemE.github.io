@@ -1,7 +1,7 @@
 import { P5CanvasInstance } from "@p5-wrapper/react";
 
-const ORANGE_FLUID_COLOR = [255, 50, 0, 200];
-const BLUE_FLUID_COLOR = [0, 80, 255, 180];
+export const ORANGE_FLUID_COLOR = [255, 50, 0, 200];
+export const BLUE_FLUID_COLOR = [0, 80, 255, 180];
 
 // bt.image(b, 50, 450);
 // bt.image(b, 230, 450);
