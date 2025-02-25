@@ -14,7 +14,7 @@
   gap: 3px;
   width: max-content;
   margin: 12px;
-  gap: 20px;
+  gap: 30px;
   align-content: center;
 }
 
@@ -24,6 +24,7 @@
   align-items: center;
   justify-items: end;
   gap: 0px 5px;
+  justify-content: space-evenly;
 }
 
 .input-area2 {
