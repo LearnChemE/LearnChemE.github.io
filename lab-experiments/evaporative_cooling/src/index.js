@@ -37,6 +37,10 @@ window.state = {
   waterOnMesh: false,
   waterInReservoir: false,
   reservoirVolume: 0,
+  beakerTemperatureArray: [],
+  waterOutletTemperatureArray: [],
+  airOutletTemperatureArray: [],
+  timeIndex: 0,
 };
 
 const containerElement = document.getElementById("p5-container");

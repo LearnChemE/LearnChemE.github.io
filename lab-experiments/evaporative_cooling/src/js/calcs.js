@@ -6,7 +6,7 @@ export default function calcAll() {
   const rho = 1000; // water density - kg / m^3
   const w = 0.002; // width of the channel - m
   const g = 9.81; // gravity - m / s^2
-  let vAir = state.fanOn ? 1.5 : 0; // velocity of air - m / s
+  let vAir = state.fanOn ? 2.5 : 0; // velocity of air - m / s
   const Dwa = 0.242 * 1e-4; // diffusivity of water in air - m^2 / s
   const R = 8.314; // ideal gas constant - J / mol * K
   const Dz = 0.014; // height of a single mesh diamond - m
@@ -14,26 +14,17 @@ export default function calcAll() {
   const Hvap = 2260000; // heat of vaporization of water - J / kg
   const Mw = 18 * 1e-3; // molecular weight of water - kg / mol
   const Cp = 4184; // specific heat of water - J / kg * K
-  const Hp = 0.32; // height of the channel - m
-  const Wmesh = 0.32; // width of the mesh - m
+  const Hp = 0.34; // height of the channel - m
+  const Wmesh = 0.34; // width of the mesh - m
   const Nc = Wmesh / Dx; // number of channels - adjustable parameter
   const numRows = Hp / Dz; // number of rows
 
-  if (state.waterOutletTemperature <= state.airInletTemperature) {
-    vAir = 1.0;
-  }
+  const maxTemp = 52;
+  const minTemp = 5;
 
-  if (state.waterOutletTemperature <= 15) {
-    vAir = 0.5;
-  }
+  const ratio = ((state.beakerTemperature - minTemp) / (maxTemp - minTemp)) ** 1.0;
 
-  if (state.waterOutletTemperature <= 10) {
-    vAir = 0.2;
-  }
-
-  if (state.waterOutletTemperature <= 5) {
-    vAir = 0.05;
-  }
+  vAir = vAir * ratio;
 
   const del = (3 * mu * Vl / (rho * g * w * Nc)) ** (1 / 3); // characteristic length - m
 
@@ -97,6 +88,9 @@ export default function calcAll() {
   }
 
   if (frameCount % 60 === 0) {
+    if (state.fanOn) {
+      state.timeIndex += 1;
+    }
 
     let T = Tb;
     let qTotal = 0;
@@ -148,6 +142,18 @@ export default function calcAll() {
       const VBeaker = 4000 * 1e-6;
       const dT = qTotal / (VBeaker * rho * Cp);
       state.beakerTemperature -= dT;
+    }
+
+    if (state.fanOn) {
+      state.beakerTemperatureArray.push(state.beakerTemperature);
+      state.waterOutletTemperatureArray.push(state.waterOutletTemperature);
+      state.airOutletTemperatureArray.push(state.airOutletTemperature);
+    }
+
+    if (state.timeIndex === 1000) {
+      console.log(JSON.stringify(state.beakerTemperatureArray));
+      console.log(JSON.stringify(state.waterOutletTemperatureArray));
+      console.log(JSON.stringify(state.airOutletTemperatureArray));
     }
   }
 }

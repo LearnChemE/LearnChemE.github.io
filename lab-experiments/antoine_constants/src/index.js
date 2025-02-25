@@ -10,7 +10,7 @@ window.g = {
   liquid_level: 0, // 0-1 value of how high liquid is in tank
   final_liquid_level: 0, // The final liquid level, between 0 and 0.3 depending on value of V_final
   max_liquid_level: 0.3, // The highest that the liquid can go in the tank (30% full)
-  background_color: [253, 253, 253], // RGB color
+  background_color: [252, 252, 252], // RGB color
   liquid_color: [150, 150, 255], // RGB color
   vapor_density: 0, // 0-1 value of how dark the vapor color is
   final_vapor_density: 0, // final value for how dense the vapor will be after injecting

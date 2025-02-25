@@ -1,71 +1,144 @@
-:root {
-  font-size: 9px;
-}
+/* General styles */
 
-* {
+body {
+  font-family: "Balsamiq Sans", "Open Sans", sans-serif;
+  background-color: #121212;
+  color: #ffffff;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 1.8rem;
+  text-align: center;
 }
 
-#home {
-  margin: 1rem;
-  padding: 0.5rem 1rem 3rem 1rem;
-  width: 100%;
-  max-width: 90ch;
-  background: lightgrey;
-  box-shadow: 0px 0px 10px teal;
+main {
+  background-image: url("./molecular.png");
+  background-size: cover;
+  background-attachment: fixed;
+  /* background-size: 100%; */
+}
+
+
+/* Header */
+
+header {
+  background-color: #232323;
+  padding: 20px;
+  border-bottom: 2px solid #444;
+}
+
+header>p {
+  max-width: 800px;
+  margin: auto;
+  margin-top: 10px;
+}
+
+header a {
+  color: #aaaaff;
+  text-decoration: underline;
+  font-weight: bold;
 }
 
 h1 {
-  font-size: 3.0rem;
-  margin-bottom: 2rem;
-  font-family: 'Balsamiq Sans', cursive;
-  font-weight: 400;
+  margin: 0;
+  font-size: 2rem;
 }
 
-a, #lce {
-  font-size: 1.6rem;
-  font-weight: 700;
-  text-decoration-color: rgba(255, 255, 255, 0);
+
+/* Grid container */
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  padding: 20px;
+  padding-top: 30px;
+  max-width: 1200px;
+  margin: auto;
 }
 
-a:hover, #lce:hover {
-  transition: text-decoration-color 0.5s;
-  text-decoration-color: rgba(255, 255, 255, 1);
+
+/* Simulation cards */
+
+.card {
+  background-color: #2a2a2a;
+  box-shadow: 0px 0px 3px 2px rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.15s ease-in-out;
+  position: relative;
+  z-index: 0;
 }
 
-p {
-  margin-top: 2rem;
+.card:hover {
+  transform: scale(1.05);
 }
 
-ul {
-  margin-top: 2rem;
-  margin-left: 2rem;
-  list-style-type: none;
+
+/* Image styles */
+
+.card .img-container {
+  width: 100%;
+  height: 180px;
+  background-color: white;
 }
 
-li {
-  background-image: url("bullet.svg");
-  background-size: 0.7rem;
-  background-repeat: no-repeat;
-  background-position: 0rem 1.1rem;
-  padding-left: 1.5rem;
+.img-container img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  border-bottom: 2px solid #444;
 }
 
-li + li{
-  margin-top : 0.15rem;
+
+/* Title styles */
+
+.card h2 {
+  font-size: 1.2rem;
+  margin: 10px;
+  color: #fff;
 }
 
-#lce {
-  display: inline;
-  color: rgb(0, 0, 255);
-  text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0);
+
+/* Link styles */
+
+.card a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
 }
 
-#lce:hover {
-  cursor: pointer;
+.source {
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid black;
+  position: absolute;
+  width: 40px;
+  height: 35px;
+  padding-top: 5px;
+  top: 5px;
+  left: 5px;
+}
+
+.source img {
+  width: 30px;
+}
+
+.source:hover {
+  background-color: #ddddff;
+}
+
+#tooltip {
+  position: absolute;
+  top: 0px;
+  background-color: lightgoldenrodyellow;
+  padding: 5px 15px;
+  border-radius: 5px;
+  border: 1px solid black;
+  color: black;
+  z-index: 1;
+  width: 320px;
+  height: max-content;
+  max-width: calc(50vw - 50px);
+  text-align: left;
+  pointer-events: none;
+  box-shadow: 0px 0px 4px 4px black;
 }
