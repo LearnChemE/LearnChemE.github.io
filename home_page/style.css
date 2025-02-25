@@ -9,12 +9,20 @@ body {
   text-align: center;
 }
 
+main {
+  background-image: url("./molecular.png");
+  background-size: cover;
+  background-attachment: fixed;
+  /* background-size: 100%; */
+}
+
 
 /* Header */
 
 header {
   background-color: #232323;
   padding: 20px;
+  border-bottom: 2px solid #444;
 }
 
 header>p {
@@ -56,6 +64,8 @@ h1 {
   border-radius: 10px;
   overflow: hidden;
   transition: transform 0.15s ease-in-out;
+  position: relative;
+  z-index: 0;
 }
 
 .card:hover {
@@ -94,4 +104,41 @@ h1 {
   text-decoration: none;
   color: inherit;
   display: block;
+}
+
+.source {
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid black;
+  position: absolute;
+  width: 40px;
+  height: 35px;
+  padding-top: 5px;
+  top: 5px;
+  left: 5px;
+}
+
+.source img {
+  width: 30px;
+}
+
+.source:hover {
+  background-color: #ddddff;
+}
+
+#tooltip {
+  position: absolute;
+  top: 0px;
+  background-color: lightgoldenrodyellow;
+  padding: 5px 15px;
+  border-radius: 5px;
+  border: 1px solid black;
+  color: black;
+  z-index: 1;
+  width: 320px;
+  height: max-content;
+  max-width: calc(50vw - 50px);
+  text-align: left;
+  pointer-events: none;
+  box-shadow: 0px 0px 4px 4px black;
 }
