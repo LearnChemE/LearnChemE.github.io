@@ -1,7 +1,7 @@
 import { P5CanvasInstance } from "@p5-wrapper/react";
 
-export const ORANGE_FLUID_COLOR = [255, 50, 0, 200];
-export const BLUE_FLUID_COLOR = [0, 80, 255, 180];
+const ORANGE_FLUID_COLOR = [255, 50, 0, 200];
+const BLUE_FLUID_COLOR = [0, 80, 255, 180];
 
 // bt.image(b, 50, 450);
 // bt.image(b, 230, 450);
@@ -289,7 +289,7 @@ const hoSingleVert = [[100, 400],[100, 375],[110, 375],[110, 400],];
 // prettier-ignore
 const coSingleVert = [[650, 470],[650, 35],[165, 35],[165, 75],[155, 75],[155, 25],[660, 25],[660, 470],];
 // prettier-ignore
-const ciSingleVert = [[600,450],[600,400],[485,400],[485,375],[495,375],[495,390],[610,390],[610,450]];
+const ciSingleVert = [[600,450],[600,400],[485,400],[485,370],[495,370],[495,390],[610,390],[610,450]];
 
 function createEmptySingleTubes(p: P5CanvasInstance) {
   let bt = p.createGraphics(p.width, p.height);

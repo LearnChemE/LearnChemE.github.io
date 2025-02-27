@@ -897,5 +897,14 @@ window.simulation_list = [{
     "description": "This is a simulation of phase equilibrium for one mole of a binary system (A, B) that forms two partially-miscible liquids (α, β). The T-x-y diagram shows vapor-liquid equilibrium (VLE), liquid-liquid equilibrium (LLE), and vapor-liquid-liquid equilibrium (VLLE). The number of moles of each phase, which are shown in the bar graph (along with the mole fractions of component B in the phases), are determined from mole balances. The overall mole fraction of component B and the heat added are specified using the sliders. ",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/VLLE/",
     "simulation_type": "in-browser"
+  },
+  {
+    "title": "Viscous flow around a rotating cylindrical rod",
+    "href": "/lab-experiments/viscousFlowAroundRotatingRod/index.html",
+    "image": "N/A",
+    "tooltip": "measures the velocity profile of a liquid around a rotating cylinder in the limit of small Reynold number.",
+    "description": "N/A",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/viscousFlowAroundRotatingRod",
+    "simulation_type": "in-browser"
   }
 ]
