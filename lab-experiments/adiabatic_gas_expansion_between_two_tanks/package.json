@@ -1,0 +1,46 @@
+{
+  "name": "adiabatic-gas-expansion-between-two-tanks-digital-lab",
+  "version": "1.0.0",
+  "description": "An interactive experiment designed to teach engineering students about adiabatic gas expansion.",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --open --config ./_dev/webpack.config.js --mode=development",
+    "build": "webpack --config ./_dev/webpack.config.js --mode=production"
+  },
+  "keywords": [
+    "chemical",
+    "engineering",
+    "chemistry",
+    "thermodynamics",
+    "experiment",
+    "lab",
+    "education",
+    "interactive",
+    "simulation",
+    "adiabatic",
+    "gas",
+    "expansion"
+  ],
+  "author": "Neil Hendren",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "clean-webpack-plugin": "^4.0.0",
+    "css-loader": "^7.1.2",
+    "file-loader": "^6.2.0",
+    "html-loader": "^5.1.0",
+    "html-webpack-plugin": "^5.6.3",
+    "mini-css-extract-plugin": "^2.9.2",
+    "p5": "^1.11.2",
+    "postcss-loader": "^8.1.1",
+    "sass": "^1.83.4",
+    "sass-loader": "^16.0.4",
+    "style-loader": "^4.0.0",
+    "terser-webpack-plugin": "^5.3.11",
+    "to-string-loader": "^1.2.0",
+    "uglify-js": "^3.19.3",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.0"
+  }
+}
