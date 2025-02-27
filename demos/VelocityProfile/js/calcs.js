@@ -21,7 +21,7 @@ export function calcAll() {
   //calculations for velocity line on dist graph
     //point on fluid barrier between fluid 1 and 2
   let x12 = h1/((h3*z.muMid+h2*z.muTop+h1*z.muTop*z.muMid)/(z.muTop*z.muMid))
-  let x23 = (z.muTop*(h2+h1*z.muMid))/(h1*z.muTop*z.muMid + h3*z.muMid + h2*z.muTop)
+  let x23 = ((z.muTop*(h2+h1*z.muMid))/(h1*z.muTop*z.muMid + h3*z.muMid + h2*z.muTop))
 
   
    //point on fluid barrier between fluid 2 and 3
@@ -37,5 +37,11 @@ export function calcAll() {
   z.centerXTop = -((z.distRX-z.distLX)*z.hTop)/2 + z.distRX;
   z.centerXMid = -((z.distRX-z.distLX)*z.hTop) - ((z.distRX-z.distLX)*z.hMid/2) + z.distRX;
   z.centerXBot = -((z.distRX-z.distLX)*z.hTop) - ((z.distRX-z.distLX)*z.hMid) - ((z.distRX-z.distLX)*z.hBot/2) + z.distRX;
+
+
+  //Points on the Graph
+
+  
+  
  
 }

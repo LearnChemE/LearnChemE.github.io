@@ -5,7 +5,8 @@ const p5container = document.getElementById('p5-container');
 
 
 // This function is used to scale the canvas based on the size of the container
-window.relativeSize = () => p5container.offsetWidth / 1280;
+window.relativeSizeX = () => p5container.offsetWidth/1280;
+//window.relativeSizeY = () => p5container.offsetHeight;
 
 function resize() {
   // Here I am reassigning the width and height of the canvas to a static value of 1280x720,
@@ -13,13 +14,15 @@ function resize() {
   // So you can effectively treat the canvas like it is 1280x720, even though it will scale to fit the screen.
   z.width
   z.height
-
-  scale(relativeSize());
+  
+  scale(relativeSizeX());
+  
 }
 
 // Moved outside of the selection block - Do not call setup() more than once.
 // So this should never be inside a conditional statement.
 window.setup = function () {
+  
   createCanvas(p5container.offsetWidth, p5container.offsetHeight).parent(p5container);
   frameRate(30);
 }
@@ -32,7 +35,7 @@ window.draw = function () {
   window.selection = selectionElement.value;
 
 
-
+  
   resize();
 
   background(255);
@@ -43,6 +46,7 @@ window.draw = function () {
   if (selection === "velocity-distribution") {
     drawGraphDist();
     drawAxesLablesDist();
+    drawMousePos1();
   } else if (selection === "velocity-vs-height") {
     drawGraphHeight();
     drawAxesLablesHeight();
@@ -319,4 +323,25 @@ function drawGraphHeight() {
 
   
   
+}
+
+function drawMousePos1() {
+
+  textAlign(CENTER);
+  textSize(16);
+  let MX = mouseX.toFixed(3);
+  let MY = mouseY.toFixed(3);
+  
+
+  z.mouseXPtCalibrated = mouseX;
+  z.mouseYPtCalibrated = mouseY;
+
+  
+    line(z.mouseXPtCalibrated,z.mouseYPtCalibrated,z.mouseXPtCalibrated+50,z.mouseYPtCalibrated);
+   // text(`x: ${z.mouseXPtCalibrated.toFixed(3)} y: ${z.mouseYPtCalibrated.toFixed(3)}`, mouseX+50, mouseY-20);
+
+  
+  
+
+
 }
