@@ -54,9 +54,9 @@
   <!-- The controls-area is at the top of the simulation, and contains all buttons, sliders, and dropdowns -->
   <div class="controls-area">
     <div class="inputs">
-      <div class="input-area">
+      <div class="input-area" id="display-selection">
         <div id="selection-row">Display:</div>
-        
+
         <!-- <div class="btn-group" role="group" id="plot-type">
           <input type="radio" class="btn-check" name="plot" id="velocity-distribution" value="velocity-distribution" autocomplete="off" checked>
           <label class="btn btn-outline-primary" for="velocity-distribution">Velocity Distribution</label>
@@ -64,28 +64,28 @@
           <input type="radio" class="btn-check" name="plot" id="velocity-vs-height" value="velocity-vs-height" autocomplete="off">
           <label class="btn btn-outline-primary" for="velocity-vs-height">Velocity vs Height</label>
         </div>-->
-        
 
-       
+
+
 
         <!--<div class="btn-group">
         <button class="btn btn-primary btn-primary" data-bs-toggle="button" aria-pressed="true" autocomplete="off">Velocity Distribution</button>
         <button class="btn btn-primary btn-primary" data-bs-toggle="button" aria-pressed="false" autocomplete="off">Velocity vs Height</button>
         </div>-->
-          
+
         <select id="selection">
           <option value="velocity-distribution">Velocity Distribution</option>
           <option value="velocity-vs-height">Velocity vs Height</option>
         </select>
-        
 
-      <!--<div class="play-pause-area">
+
+        <!--<div class="play-pause-area">
           <button class="btn-sm btn-success" id="play">&#9654;</button>
           <button class="btn-sm btn-danger" id="pause"><div>&#8214;</div></button>
         </div>-->
       </div>
 
-      <div class="input-area">
+      <div class="input-area" id="sliders-area-1">
         <div class="data-name"><b>Fluid Height:</b> <span style="color:rgb(137, 63, 145);">\(h_3\) (top)</span></div>
         <input type="range" id="height-slider3" min="0.01" max="0.66" step="0.01" value="0.34">
         <div class="data-value" id="height-value3">0.34</div>
@@ -97,14 +97,14 @@
         <div class="data-metric"></div>
       </div>
     </div>
-    
+
 
     <div class="modal-buttons-row">
       <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
       <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
       <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
 
-      <div class="input-area2">
+      <div class="input-area" id="sliders-area-2">
         <div class="data-name"><span style="color:rgb(46, 194, 6);">\(h_2\) (middle)</span></div>
         <input type="range" id="height-slider2" min="0.01" max="0.33" step="0.01" value="0.33">
         <div class="data-value" id="height-value2">0.33</div>
