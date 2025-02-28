@@ -127,7 +127,7 @@ window.simulation_list = [{
   {
     "title": "Venturi Meter",
     "href": "https://learncheme.com/simulations/fluid-mechanics/venturi-meter",
-    "image": "https://learncheme.com/wp-content/uploads/2025/01/VenturiMeter-2.png",
+    "image": "https://learncheme.com/wp-content/uploads/2023/09/VenturiMeter.png",
     "tooltip": "Calculate the flow rate of a liquid through a pipe with a venturi meter",
     "description": "A venturi meter allows one to calculate the flow rate of a liquid through a pipe by measuring the pressure drop across a constricted section (the \"choke\") and using Bernoulli's equation. In this simulation, water flows through a pipe whose inner diameter is 20 mm, and the manometers along the pipe show the pressure in mm H2O. ",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/VenturiMeter",
@@ -901,7 +901,7 @@ window.simulation_list = [{
   {
     "title": "Viscous flow around a rotating cylindrical rod",
     "href": "/lab-experiments/viscousFlowAroundRotatingRod/index.html",
-    "image": "N/A",
+    "image": "https://learncheme.com/wp-content/uploads/2025/02/viscousflowrotatingrod.png",
     "tooltip": "measures the velocity profile of a liquid around a rotating cylinder in the limit of small Reynold number.",
     "description": "N/A",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/viscousFlowAroundRotatingRod",
