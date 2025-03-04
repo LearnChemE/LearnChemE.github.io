@@ -22,6 +22,12 @@ window.mousePressed = function() {
   const vkh = valve.height;
 
   if (mX > lkx && mX < lkx + lkw && mY > lky && mY < lky + lkh) {
+    document.getElementById("left-25").classList.add("disabled");
+    document.getElementById("left-50").classList.add("disabled");
+    document.getElementById("left-100").classList.add("disabled");
+    document.getElementById("right-25").classList.add("disabled");
+    document.getElementById("right-50").classList.add("disabled");
+    document.getElementById("right-100").classList.add("disabled");
     if (leftTank.valveRotation === 0) {
       if (rightTank.valveRotation > 0 && state.valvePosition > 0) {
         solve();
@@ -38,6 +44,12 @@ window.mousePressed = function() {
   }
 
   if (mX > rkx && mX < rkx + rkw && mY > rky && mY < rky + rkh) {
+    document.getElementById("left-25").classList.add("disabled");
+    document.getElementById("left-50").classList.add("disabled");
+    document.getElementById("left-100").classList.add("disabled");
+    document.getElementById("right-25").classList.add("disabled");
+    document.getElementById("right-50").classList.add("disabled");
+    document.getElementById("right-100").classList.add("disabled");
     if (rightTank.valveRotation === 0) {
       if (leftTank.valveRotation > 0 && state.valvePosition > 0) {
         solve();
@@ -53,6 +65,12 @@ window.mousePressed = function() {
   }
 
   if (mX > vkx - vkw / 2 && mX < vkx + vkw / 2 && mY > vky - vkh && mY < vky + vkh) {
+    document.getElementById("left-25").classList.add("disabled");
+    document.getElementById("left-50").classList.add("disabled");
+    document.getElementById("left-100").classList.add("disabled");
+    document.getElementById("right-25").classList.add("disabled");
+    document.getElementById("right-50").classList.add("disabled");
+    document.getElementById("right-100").classList.add("disabled");
     if (state.valvePosition === 0) {
       if (leftTank.valveRotation > 0 && rightTank.valveRotation > 0) {
         solve();

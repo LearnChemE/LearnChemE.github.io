@@ -129,6 +129,45 @@ canvas {
   background-color: rgb(255, 102, 102);
 }
 
+.size-buttons {
+  position: absolute;
+  display: grid;
+  justify-content: center;
+  justify-items: center;
+  width: 120px;
+  gap: 15px;
+}
+
+.size-buttons>button {
+  width: 80px;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: rgb(122, 200, 122)
+}
+
+.size-buttons>button:hover {
+  background-color: rgb(142, 210, 142);
+}
+
+.size-buttons>button.clicked {
+  background-color: rgb(162, 220, 162);
+}
+
+.size-buttons>button.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+#left-tank-buttons {
+  left: 1%;
+  bottom: 30%;
+}
+
+#right-tank-buttons {
+  right: 1%;
+  bottom: 30%;
+}
+
 @media screen and (min-width: 1080px) {
   #reset {
     font-size: 1.1rem;

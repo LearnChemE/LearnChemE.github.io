@@ -32,7 +32,7 @@ export function setDefaults() {
   };
 
   state.valveLocation = {
-    x: width / 2 / relativeSize(),
+    x: 75,
     y: state.leftTank.yCoord - 10,
     width: 5,
     height: 1,
