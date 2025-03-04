@@ -4,6 +4,7 @@ function drawLeftTank() {
   const width = state.leftTank.width;
   const height = state.leftTank.height;
   drawTank(x, y, width, height, state.leftTank);
+  drawThermometer(62, 100, 4, state.leftTank.temperature, "°C");
 }
 
 function drawRightTank() {
@@ -12,6 +13,7 @@ function drawRightTank() {
   const width = state.rightTank.width;
   const height = state.rightTank.height;
   drawTank(x, y, width, height, state.rightTank);
+  drawThermometer(90, 100, 4, state.rightTank.temperature, "°C");
 }
 
 function drawTank(x, y, width, height, tank) {
@@ -91,11 +93,11 @@ function drawRegulator(x, y, size, tank) {
   }
   translate(0, -size);
   if (tank === state.rightTank) {
-    drawGauge(-size * 1.5, -size, size, tank.outletPressure, 1e7, "Pa", x, y - size);
-    drawGauge(size * 1.4, -size, size, tank.pressure, 1e7, "Pa", x, y - size);
+    drawGauge(-size * 1.5, -size, size, tank.outletPressure, 5e6, "Pa", x, y - size);
+    drawGauge(size * 1.4, -size, size, tank.pressure, 5e6, "Pa", x, y - size);
   } else {
-    drawGauge(size * 1.5, -size, size, tank.outletPressure, 1e7, "Pa", x, y - size);
-    drawGauge(-size * 1.4, -size, size, tank.pressure, 1e7, "Pa", x, y - size);
+    drawGauge(size * 1.5, -size, size, tank.outletPressure, 5e6, "Pa", x, y - size);
+    drawGauge(-size * 1.4, -size, size, tank.pressure, 5e6, "Pa", x, y - size);
   }
   pop();
 }
@@ -120,7 +122,7 @@ function drawGauge(x, y, diameter, pressure, maxPressure, units, offsetX, offset
   stroke(gaugeOutline);
   strokeWeight(0.15);
   circle(0, 0, diameter);
-  for (let i = 54; i >= -210; i -= 2.4) {
+  for (let i = 54; i >= -210; i -= 4.8) {
     i = round(i * 10) / 10;
     const x = diameter * cos(radians(i)) / 2;
     const y = diameter * sin(radians(i)) / 2;
@@ -163,6 +165,75 @@ function drawGauge(x, y, diameter, pressure, maxPressure, units, offsetX, offset
   noStroke();
   fill(150);
   circle(0, 0, diameter / 15);
+  pop();
+}
+
+function drawThermometer(x, y, size, temperature, units) {
+  push();
+  translate(x, y);
+  const thermometer_color = color(200);
+  const liquid_color = color(255, 100, 100);
+  strokeWeight(0.5);
+  stroke(thermometer_color);
+  fill(thermometer_color);
+  beginShape();
+  vertex(-size * sqrt(2) / 2, -size * sqrt(2) / 2);
+  vertex(-size * sqrt(2) / 2, -size * 13);
+  for (let i = 0; i < 180; i += 10) {
+    const xCoord = -size * sqrt(2) * cos(radians(i)) / 2;
+    const yCoord = -size * 15.5 - size * sqrt(2) / 2 - size * sqrt(2) * sin(radians(i)) / 2;
+    vertex(xCoord, yCoord);
+  }
+  vertex(size * sqrt(2) / 2, -size * 13);
+  vertex(size * sqrt(2) / 2, -size * sqrt(2) / 2);
+  beginContour();
+  vertex(0.42333 * size, -size * sqrt(2) / 2);
+  // vertex(-0.42333 * size, -size * 13.0205128);
+  for (let i = 180; i >= 0; i -= 10) {
+    const xCoord = -0.4324 * size * cos(radians(i));
+    const yCoord = -size * 15.7 - size * .42333 - size * .42333 * sin(radians(i));
+    vertex(xCoord, yCoord);
+  }
+  // vertex(0.42333 * size, -size * 13.0205128);
+  vertex(-0.42333 * size, -size * sqrt(2) / 2);
+  endContour();
+  endShape();
+  fill(liquid_color);
+  stroke(thermometer_color);
+  strokeWeight(2);
+  circle(0, 0, size * 2);
+  fill(liquid_color);
+  noStroke();
+  rectMode(CORNER);
+  rect(-size / 3, 0, 2 * size / 3, -2 * size - ((temperature + 100) / state.maxTemperature) * size * 12);
+  fill(0);
+  strokeWeight(0.6 / relativeSize());
+  textAlign(RIGHT, CENTER);
+  textSize(1.9);
+  for (let i = 0; i <= 140; i += 1) {
+    let line_length;
+    if (i % 20 === 0) {
+      strokeWeight(0.1);
+      line_length = size * 4 / 15;
+      noStroke();
+      text(-100 + state.maxTemperature * (i / 120), -size * 18 / 15, -2 * size - i * size / 10);
+    } else if (i % 10 === 0) {
+      strokeWeight(0.1);
+      line_length = size / 5;
+    } else if (i % 5 === 0) {
+      strokeWeight(0.075);
+      line_length = size / 7;
+    } else {
+      strokeWeight(0.05);
+      line_length = size / 10;
+    }
+    stroke(0);
+    line(-size * 11.5 / 15, -2 * size - i * size / 10, -size * 11.5 / 15 + line_length, -size * 2 - i * size / 10);
+  }
+  noStroke();
+  textAlign(CENTER, TOP);
+  textSize(3);
+  text(units, 0, size * 24 / 15);
   pop();
 }
 

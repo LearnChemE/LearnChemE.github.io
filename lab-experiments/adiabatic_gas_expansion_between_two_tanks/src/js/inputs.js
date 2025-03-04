@@ -7,6 +7,10 @@ const left100 = document.getElementById("left-100");
 const right25 = document.getElementById("right-25");
 const right50 = document.getElementById("right-50");
 const right100 = document.getElementById("right-100");
+const pressureSlider = document.getElementById("pressure-slider");
+const pressureValue = document.getElementById("pressure-value");
+const temperatureSlider = document.getElementById("temperature-slider");
+const temperatureValue = document.getElementById("temperature-value");
 
 function handleReset() {
   const resetButton = document.getElementById("reset");
@@ -15,16 +19,42 @@ function handleReset() {
     setTimeout(() => {
       resetButton.style.backgroundColor = "";
     }, 50);
-    [left25, left50, left100, right25, right50, right100].forEach((button) => {
+    [left25, left50, left100, right25, right50, right100, pressureSlider, temperatureSlider].forEach((button) => {
       button.classList.remove("disabled");
     });
+    const currentLeftTankSize = state.leftTank.volume;
+    const currentRightTankSize = state.rightTank.volume;
     setDefaults();
+    switch (currentLeftTankSize) {
+      case 25:
+        left25.click();
+        break;
+      case 50:
+        left50.click();
+        break;
+      case 100:
+        left100.click();
+        break;
+    }
+    switch (currentRightTankSize) {
+      case 25:
+        right25.click();
+        break;
+      case 50:
+        right50.click();
+        break;
+      case 100:
+        right100.click();
+        break;
+    }
   });
 }
 
 function handleSize() {
   left25.addEventListener("click", () => {
     left25.classList.add("clicked");
+    removeActiveLeft();
+    left25.classList.add("active");
     setTimeout(() => {
       left25.classList.remove("clicked");
     }, 50);
@@ -36,6 +66,8 @@ function handleSize() {
 
   left50.addEventListener("click", () => {
     left50.classList.add("clicked");
+    removeActiveLeft();
+    left50.classList.add("active");
     setTimeout(() => {
       left50.classList.remove("clicked");
     }, 50);
@@ -47,6 +79,8 @@ function handleSize() {
 
   left100.addEventListener("click", () => {
     left100.classList.add("clicked");
+    removeActiveLeft();
+    left100.classList.add("active");
     setTimeout(() => {
       left100.classList.remove("clicked");
     }, 50);
@@ -58,6 +92,8 @@ function handleSize() {
 
   right25.addEventListener("click", () => {
     right25.classList.add("clicked");
+    removeActiveRight();
+    right25.classList.add("active");
     setTimeout(() => {
       right25.classList.remove("clicked");
     }, 50);
@@ -69,6 +105,8 @@ function handleSize() {
 
   right50.addEventListener("click", () => {
     right50.classList.add("clicked");
+    removeActiveRight();
+    right50.classList.add("active");
     setTimeout(() => {
       right50.classList.remove("clicked");
     }, 50);
@@ -80,6 +118,8 @@ function handleSize() {
 
   right100.addEventListener("click", () => {
     right100.classList.add("clicked");
+    removeActiveRight();
+    right100.classList.add("active");
     setTimeout(() => {
       right100.classList.remove("clicked");
     }, 50);
@@ -90,9 +130,35 @@ function handleSize() {
   });
 }
 
+function removeActiveLeft() {
+  [left25, left50, left100].forEach((button) => {
+    button.classList.remove("active");
+  });
+}
+
+function removeActiveRight() {
+  [right25, right50, right100].forEach((button) => {
+    button.classList.remove("active");
+  });
+}
+
+function handleSliders() {
+  pressureSlider.addEventListener("input", () => {
+    const P = Number(pressureSlider.value);
+    state.leftTank.pressure = P * 1e6;
+    pressureValue.innerHTML = P.toFixed(1);
+  });
+  temperatureSlider.addEventListener("input", () => {
+    const T = Number(temperatureSlider.value);
+    state.leftTank.temperature = T;
+    temperatureValue.innerHTML = T;
+  });
+}
+
 export function handleInputs() {
   handleReset();
   handleSize();
+  handleSliders();
 }
 
 function handleHamburger() {

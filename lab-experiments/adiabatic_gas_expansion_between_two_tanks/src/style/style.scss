@@ -153,8 +153,13 @@ canvas {
   background-color: rgb(162, 220, 162);
 }
 
-.size-buttons>button.disabled {
-  opacity: 0.5;
+.size-buttons>button.active {
+  background-color: rgb(255, 100, 100);
+  color: white;
+}
+
+.disabled {
+  opacity: 0.5 !important;
   pointer-events: none;
 }
 
@@ -168,10 +173,45 @@ canvas {
   bottom: 30%;
 }
 
+#sliders {
+  position: absolute;
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-content: center;
+  justify-items: center;
+  width: max-content;
+  gap: 10px;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+}
+
+.slider-container {
+  display: grid;
+  grid-template-columns: 120px 150px 22px 50px;
+  align-items: end;
+  gap: 7px;
+}
+
+.slider-label {
+  text-align: right;
+}
+
+.value-label {
+  text-align: right;
+}
+
 @media screen and (min-width: 1080px) {
   #reset {
     font-size: 1.1rem;
     width: 90px;
+  }
+  #sliders {
+    font-size: 0.9rem;
+  }
+  .slider-container {
+    grid-template-columns: 130px 200px 25px 50px;
   }
 }
 
@@ -190,5 +230,11 @@ canvas {
   #reset {
     font-size: 1.2rem;
     width: 100px;
+  }
+  #sliders {
+    font-size: 1rem;
+  }
+  .slider-container {
+    grid-template-columns: 150px 250px 30px 60px;
   }
 }
