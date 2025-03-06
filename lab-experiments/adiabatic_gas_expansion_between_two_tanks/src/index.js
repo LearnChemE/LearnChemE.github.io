@@ -10,7 +10,7 @@ import { calcAll, setDefaults } from "./js/calcs";
 // GLOBAL VARIABLES OBJECT
 window.state = {
   frameRate: 60,
-  pixelDensity: 4,
+  pixelDensity: 8,
   showButtons: false,
   hamburgerHasBeenClicked: window.sessionStorage.getItem("hamburgerHasBeenClicked") === "true",
 };
@@ -25,13 +25,13 @@ window.setup = function() {
   calcAll();
   pixelDensity(state.pixelDensity);
   frameRate(state.frameRate);
-  drawAll();
 };
 
 window.draw = function() {
   window.width = 150;
   window.height = 100;
   scale(relativeSize());
+  background(255);
   calcAll();
   drawAll();
 };
@@ -41,3 +41,5 @@ window.windowResized = () => {
 }
 
 window.relativeSize = () => containerElement.offsetWidth / 150;
+
+require("./js/events.js");

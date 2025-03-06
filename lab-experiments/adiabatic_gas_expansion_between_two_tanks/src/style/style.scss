@@ -129,10 +129,89 @@ canvas {
   background-color: rgb(255, 102, 102);
 }
 
+.size-buttons {
+  position: absolute;
+  display: grid;
+  justify-content: center;
+  justify-items: center;
+  width: 120px;
+  gap: 15px;
+}
+
+.size-buttons>button {
+  width: 80px;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: rgb(122, 200, 122)
+}
+
+.size-buttons>button:hover {
+  background-color: rgb(142, 210, 142);
+}
+
+.size-buttons>button.clicked {
+  background-color: rgb(162, 220, 162);
+}
+
+.size-buttons>button.active {
+  background-color: rgb(255, 100, 100);
+  color: white;
+}
+
+.disabled {
+  opacity: 0.5 !important;
+  pointer-events: none;
+}
+
+#left-tank-buttons {
+  left: 1%;
+  bottom: 30%;
+}
+
+#right-tank-buttons {
+  right: 1%;
+  bottom: 30%;
+}
+
+#sliders {
+  position: absolute;
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-content: center;
+  justify-items: center;
+  width: max-content;
+  gap: 10px;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+}
+
+.slider-container {
+  display: grid;
+  grid-template-columns: 120px 150px 22px 50px;
+  align-items: end;
+  gap: 7px;
+}
+
+.slider-label {
+  text-align: right;
+}
+
+.value-label {
+  text-align: right;
+}
+
 @media screen and (min-width: 1080px) {
   #reset {
     font-size: 1.1rem;
     width: 90px;
+  }
+  #sliders {
+    font-size: 0.9rem;
+  }
+  .slider-container {
+    grid-template-columns: 130px 200px 25px 50px;
   }
 }
 
@@ -151,5 +230,11 @@ canvas {
   #reset {
     font-size: 1.2rem;
     width: 100px;
+  }
+  #sliders {
+    font-size: 1rem;
+  }
+  .slider-container {
+    grid-template-columns: 150px 250px 30px 60px;
   }
 }
