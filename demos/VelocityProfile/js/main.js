@@ -40,6 +40,9 @@ window.z = {
   distLineX12: 0,
   mouseXPtCalibrated: 0,
   mouseYPtCalibrated: 0,
+  pressed: 0,
+  circleX: 0,
+  circleY: 0,
 
 
   particles: 50,
