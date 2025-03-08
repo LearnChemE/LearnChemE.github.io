@@ -18,6 +18,7 @@ import {
 import { g } from "./sketch";
 import { blueFragShaderSource, fillVertShaderSource, orngFragShaderSource } from "./shaders";
 import { PathTrace } from "../types/pathTrace";
+import { AnimationFactory, HexFill, TubeFill } from "../types";
 
 const showDebugCoordinates = (p: P5CanvasInstance) => {
   p.push();
@@ -39,10 +40,9 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
   let singleGraphics: singleGraphicsObj;
   let thermometer: any;
   let pinchingColdTube: boolean = false;
-  let blueFillPath: PathTrace;
-  let orngFillPath: PathTrace;
   let blueShader: any;
   let orngShader: any;
+  let fillAnimationFactory: AnimationFactory;
 
   const drawValves = (p: P5CanvasInstance) => {
     p.push();
@@ -67,29 +67,12 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     let current = p.millis() - start;
     if (current < 5000) {
       // Fill animation
-      // fill inlet tubes
-      let alpha: number = p.map(current, 0, 1000, 0, 255, true);
-      let color: Array<number> = [255, 255, 255, alpha];
-      p.push();
-      p.tint(color);
-      p.image(singleGraphics.tubes[0], 0, 0);
-      p.image(singleGraphics.tubes[3], 0, 0);
-      p.pop();
 
       // HEX fill
       p.noStroke();
-      drawOrngFillLong(p, current - 1000);
-      drawBlueFillLong(p, current - 1000);
+      fillAnimationFactory.draw(p, current);
       p.resetShader();
 
-      // Exit tubes
-      p.push();
-      alpha = p.map(current, 4000, 5000, 0, 255, true);
-      color = [255, 255, 255, alpha];
-      p.tint(color);
-      p.image(singleGraphics.tubes[1], 0, 0);
-      p.image(singleGraphics.tubes[2], 0, 0);
-      p.pop();
     } else {
       // Pumps have been running
       // Fill tubes
@@ -134,10 +117,34 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     // Im used to OpenGL so I like degrees
     p.angleMode(p.DEGREES);
 
-    var vertices = [[490,370],[490,110],[435,110],[435,340],[380,340],[380,110],[325,110],[325,340],[270,340],[270,110],[215,110],[215,340],[160,340],[160,80]];
-    blueFillPath = new PathTrace(3000,vertices);
+    // Initialize animation
+    // Create the parameterized filling animation
+    fillAnimationFactory = new AnimationFactory;
+
+    // Inlet tubes
+    // Orange
+    var vertices = [[75, 430],[75, 410],[30, 410],[30, 30],[105, 30],[105, 75]];
+    fillAnimationFactory.createSegment(0, TubeFill, 1000, vertices, ORANGE_FLUID_COLOR);
+    // Blue
+    vertices = [[605,450],[605,395],[490,395],[490,375]];
+    fillAnimationFactory.createSegment(0, TubeFill, 1000, vertices, BLUE_FLUID_COLOR);
+
+    // Vertices for orange path
     vertices = [[105,20],[105,150],[585,150],[585,300],[105,300],[105,460],];
-    orngFillPath = new PathTrace(3000,vertices);
+    // HexFill for orange filling
+    fillAnimationFactory.createSegment(1000, HexFill, 3000, vertices, drawOrngFillLong, (p:P5CanvasInstance)=>{p.image(graphics.orngShellTube,75,75)});
+    // Vertices for blue path
+    vertices = [[490,370],[490,110],[435,110],[435,340],[380,340],[380,110],[325,110],[325,340],[270,340],[270,110],[215,110],[215,340],[160,340],[160,80]];
+    // HexFill for blue filling
+    fillAnimationFactory.createSegment(1000, HexFill, 3000, vertices, drawBlueFillLong, (p:P5CanvasInstance)=>{p.image(graphics.blueShellTube,75,75)});
+
+    // Outlet tubes
+    // Orange
+    var vertices = [[105, 375],[105,470]];
+    fillAnimationFactory.createSegment(4000, TubeFill, 1000, vertices, ORANGE_FLUID_COLOR);
+    // Blue
+    vertices = [[160, 75],[160, 30],[655, 30],[655, 470]];
+    fillAnimationFactory.createSegment(4000, TubeFill, 1000, vertices, BLUE_FLUID_COLOR);
   };
 
   p.draw = () => {
@@ -223,7 +230,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
   };
 
   // Blue long so I can use shader
-  const drawBlueFillLong = (p: P5CanvasInstance, time:number) => {
+  const drawBlueFillLong = (p: P5CanvasInstance, time:number, blueFillPath: PathTrace) => {
     const v = [[390, 295],[390,  70],[385,  70],[385, 295],[280, 295],
                [280,  70],[275,  70],[275, 295],[170, 295],[170,  70],[165,  70],
                [165, 295],[ 60, 295],[ 60,   5],[ 60,   5],[110,   5],[110, 230],
@@ -266,7 +273,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     p.pop();
   };
 
-  const drawOrngFillLong = (p: P5CanvasInstance, time: number) => {
+  const drawOrngFillLong = (p: P5CanvasInstance, time: number, orngFillPath: PathTrace) => {
     const v = [[5,5],[55,5],[55,145],[5,145],
 
               [55, 30],[55, 50],[445, 50],[445, 30],
@@ -302,6 +309,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     p.endShape();
 
     if (vNum > 1) orngShader.setUniform("reverse",true);
+    else orngShader.setUniform("reverse",false);
 
     // Draw animated quads
     p.shader(orngShader);

@@ -54,6 +54,9 @@ export class TubeFill implements AnimationSegment
         let v = path.vertices;
         let prev = path.findPreviousVertex(time);
 
+        // For debugging purposes
+        // path.drawPath(p, time);
+
         // Push state
         p.push();
         p.noFill();
