@@ -90,7 +90,7 @@ canvas {
     /* justify-items: end; */
     padding: 5px;
     .nav-bar-center {
-      grid-template-columns: none;
+      grid-template-columns: none !important;
       /* padding: 0px; */
     }
     #menu-btn {
@@ -113,6 +113,7 @@ canvas {
   font-size: 18px;
   /* display: block; */
   transition: 0.3s;
+  width: 300px;
 }
 
 .sidebar-item.vl {
@@ -155,13 +156,13 @@ canvas {
 
     .nav-bar {
       grid-template-rows: auto auto auto;
-      grid-template-columns: none;
+      grid-template-columns: none !important;
       grid-row-start: 2;
-      width: 150px;
+      width: auto;
       margin: 0px;
       height: max-content;
       gap: 10px;
-      justify-items: end;
+      /* justify-items: end !important; */
       padding: 5px;
       .nav-bar-center {
         grid-template-columns: none;

@@ -1,5 +1,5 @@
 import { P5CanvasInstance, P5WrapperClassName } from "@p5-wrapper/react";
-import createGraphicsObjects, { graphicsObjects } from "./graphics";
+import createGraphicsObjects, { BLUE_FLUID_COLOR, ORANGE_FLUID_COLOR, graphicsObjects } from "./graphics";
 import {
   MIN_COLD_FLOWRATE,
   MAX_COLD_FLOWRATE,
@@ -8,6 +8,8 @@ import {
   handleDoubleBeakerCalculations,
   randStartVals,
 } from "./functions";
+import { AnimationFactory, HexFill, PathTrace, TubeFill } from "../types";
+import { blueFragShaderSource, orngFragShaderSource, fillVertShaderSource } from "./shaders";
 
 // Globals defined here
 export const g = {
@@ -62,6 +64,11 @@ const START_PUMPS_NEXT_FRAME = -2;
 const ShellTubeSketch = (p: P5CanvasInstance) => {
   let graphics: graphicsObjects;
   let isDraggingValves: number = NOT_DRAGGING;
+  var blueFillPath: PathTrace;
+  var blueShader: any;
+  var orngFillPath: PathTrace;
+  var orngShader: any;
+  var fillingAnimation: AnimationFactory;
 
   const drag = (isDraggingValves: number) => {
     if (isDraggingValves === NOT_DRAGGING) return;
@@ -133,35 +140,12 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
 
     let current = p.millis() - start;
     if (current < 5000) {
-      // Fill animation
-      // fill inlet tubes
-      let alpha: number = p.map(current, 0, 1000, 0, 255, true);
-      let color: Array<number> = [255, 255, 255, alpha];
-      p.push();
-      p.tint(color);
-      p.image(graphics.tubes[0], 0, 0);
-      p.image(graphics.tubes[3], 0, 0);
 
       // HEX fill
-      alpha = p.map(current, 1000, 4000, 0, 475, true);
-      let alpha2 = p.map(current, 1000, 4000, 0, 300, true);
-      let blue = graphics.blueShellTube.get(475 - alpha, 0, alpha, 300);
-      let orng = graphics.orngShellTube.get(0, 0, 475, alpha2);
-      if (alpha2 < 1 || alpha < 1) {
-        p.pop();
-        return;
-      }
-      p.image(orng, 75, 75);
-      p.image(blue, 550 - alpha, 75);
+      p.noStroke();
+      fillingAnimation.draw(p, current);
+      p.resetShader();
 
-      // Exit tubes
-      alpha = p.map(current, 4000, 5000, 0, 255, true);
-      color = [255, 255, 255, alpha];
-      p.tint(color);
-      p.image(graphics.tubes[1], 0, 0);
-      p.image(graphics.tubes[2], 0, 0);
-
-      p.pop();
     } else {
       // Pumps have been running
       for (let i = 0; i < 4; i++) p.image(graphics.tubes[i], 0, 0); // fill all tubes
@@ -186,15 +170,50 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
   };
 
   p.setup = () => {
-    p.createCanvas(g.width, g.height);
+    p.createCanvas(g.width, g.height, p.WEBGL);
+    blueShader = p.createShader(fillVertShaderSource,blueFragShaderSource);
+    orngShader = p.createShader(fillVertShaderSource,orngFragShaderSource);
+
     graphics = createGraphicsObjects(p); // Load graphics objects
     randStartVals();
+
+    // Create the parameterized filling animation
+    fillingAnimation = new AnimationFactory;
+
+    // Inlet tubes
+    // Orange
+    var vertices = [[75, 430],[75, 410],[30, 410],[30, 30],[105, 30],[105, 75]];
+    fillingAnimation.createSegment(0, TubeFill, 1000, vertices, ORANGE_FLUID_COLOR);
+    // Blue
+    vertices = [[445, 450],[445, 405],[490, 405],[490, 375]];
+    fillingAnimation.createSegment(0, TubeFill, 1000, vertices, BLUE_FLUID_COLOR);
+
+    // Vertices for orange path
+    vertices = [[105,20],[105,150],[585,150],[585,300],[105,300],[105,460],];
+    // HexFill for orange filling
+    fillingAnimation.createSegment(1000, HexFill, 3000, vertices, drawOrngFillLong, (p:P5CanvasInstance)=>{p.image(graphics.orngShellTube,75,75)});
+    // Vertices for blue path
+    vertices = [[490,370],[490,110],[435,110],[435,340],[380,340],[380,110],[325,110],[325,340],[270,340],[270,110],[215,110],[215,340],[160,340],[160,80]];
+    // HexFill for blue filling
+    fillingAnimation.createSegment(1000, HexFill, 3000, vertices, drawBlueFillLong, (p:P5CanvasInstance)=>{p.image(graphics.blueShellTube,75,75)});
+
+    // Outlet tubes
+    // Orange
+    var vertices = [[105, 375],[105, 395],[265, 395],[265, 620]];
+    fillingAnimation.createSegment(4000, TubeFill, 1000, vertices, ORANGE_FLUID_COLOR);
+    // Blue
+    vertices = [[160, 75],[160, 30],[625, 30],[625, 620]];
+    fillingAnimation.createSegment(4000, TubeFill, 1000, vertices, BLUE_FLUID_COLOR);
   };
 
   p.draw = () => {
+    // console.log(p)
     if (g.startTime === START_PUMPS_NEXT_FRAME) g.startTime = p.millis();
     p.background(250);
+    p.translate(-g.width/2,-g.height/2);
     // showDebugCoordinates(p);
+
+    p.resetShader();
 
     p.image(graphics.pumpAssembly,  60, 455);
     p.image(graphics.pumpAssembly, 430, 455);
@@ -249,6 +268,100 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
   p.mouseReleased = () => {
     isDraggingValves = NOT_DRAGGING;
   };
+
+  // Blue long so I can use shader
+  const drawBlueFillLong = (p: P5CanvasInstance, time:number, blueFillPath: PathTrace) => {
+    const v = [[390, 295],[390,  70],[385,  70],[385, 295],[280, 295],
+               [280,  70],[275,  70],[275, 295],[170, 295],[170,  70],[165,  70],
+               [165, 295],[ 60, 295],[ 60,   5],[ 60,   5],[110,   5],[110, 230],
+               [115, 230],[115,   5],[220,   5],[220, 230],[225, 230],[225,   5],
+               [330,   5],[330, 230],[335, 230],[335,   5],[440,   5],[440, 295],];
+
+    var numVert = blueFillPath.findPreviousVertex(time);
+    p.push();
+    p.translate(75,75);
+
+    var n = v.length;
+    // Fill everthing already covered
+    p.beginShape();
+    p.fill(BLUE_FLUID_COLOR);
+    for (let i=0;i<numVert+1;i++) {
+      p.vertex(v[i][0],v[i][1]);
+    }
+    for (let i=n-numVert-1;i<n;i++) {
+      p.vertex(v[i][0],v[i][1]);
+    }
+    p.endShape();
+
+
+    p.shader(blueShader);
+    // Because JS Modulo sucks
+    let d = ((numVert-1) % 4 + 4) % 4;
+    blueShader.setUniform('waterPos', blueFillPath.calculatePosition(time));
+    blueShader.setUniform('time',time);
+    blueShader.setUniform("falling", (d < 2));
+    p.beginShape();
+    
+    p.vertex(v[numVert][0],v[numVert][1]);
+    p.vertex(v[numVert+1][0],v[numVert+1][1]);
+    p.vertex(v[numVert+2][0],v[numVert+2][1]);
+    p.vertex(v[n-numVert-3][0],v[n-numVert-3][1]);
+    p.vertex(v[n-numVert-2][0],v[n-numVert-2][1]);
+    p.vertex(v[n-numVert-1][0],v[n-numVert-1][1]);
+    
+    p.endShape();
+    p.pop();
+  };
+
+  const drawOrngFillLong = (p: P5CanvasInstance, time: number, orngFillPath: PathTrace) => {
+    const v = [[5,5],[55,5],[55,145],[5,145],
+
+              [55, 30],[55, 50],[445, 50],[445, 30],
+              [55,105],[55,125],[445,125],[445,105],
+              
+              [445,20],[470,20],[470,280],[445,280],
+
+              [55,175],[55,195],[445,195],[445,175],
+              [55,250],[55,270],[445,270],[445,250],
+
+              [5,155],[55,155],[55,295],[5,295]];
+    
+    // Draw Settings
+    p.push();
+    p.translate(75,75);
+    p.stroke('black');
+    p.strokeWeight(.5);
+
+    // Shader uniforms
+    p.fill(ORANGE_FLUID_COLOR);
+    orngShader.setUniform('waterPos', orngFillPath.calculatePosition(time));
+    orngShader.setUniform('time',time);
+
+    // Draw filled quads
+    var vNum = orngFillPath.findPreviousVertex(time);
+    if (vNum > 1) vNum++;
+    if (vNum > 4) vNum++;
+    p.beginShape(p.QUADS);
+    let n = vNum*4;
+    for (let i=0;i<n;i++) {
+      p.vertex(...v[i]);
+    }
+    p.endShape();
+
+    if (vNum > 1) orngShader.setUniform("reverse",true);
+    else orngShader.setUniform("reverse",false);
+
+    // Draw animated quads
+    p.shader(orngShader);
+    p.beginShape(p.QUADS);
+    n = Math.min(vNum*4 + 12, v.length);
+    for (let i=vNum*4;i<n;i++) {
+      p.vertex(...v[i]);
+    }
+    p.endShape();
+    
+    p.pop();
+  }
 };
 
 export default ShellTubeSketch;
