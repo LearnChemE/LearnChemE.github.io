@@ -6,27 +6,30 @@ const p5container = document.getElementById('p5-container');
 
 // This function is used to scale the canvas based on the size of the container
 window.relativeSize = () => p5container.offsetWidth / 1280;
+//window.relativeSizeY = () => p5container.offsetHeight;
 
 function resize() {
   // Here I am reassigning the width and height of the canvas to a static value of 1280x720,
   // even though the actual canvas size is based on the size of the #p5-container element.
   // So you can effectively treat the canvas like it is 1280x720, even though it will scale to fit the screen.
-  z.width
-  z.height
+  z.width;
+  z.height;
 
   scale(relativeSize());
+
 }
 
 // Moved outside of the selection block - Do not call setup() more than once.
 // So this should never be inside a conditional statement.
-window.setup = function () {
+window.setup = function() {
+
   createCanvas(p5container.offsetWidth, p5container.offsetHeight).parent(p5container);
   frameRate(30);
 }
 
 // Same with draw() - this should never be inside a conditional statement.
 // Put the conditional statements inside the draw function.
-window.draw = function () {
+window.draw = function() {
   // The "window" keyword is used to set global variables. So you can use
   // "selection" in any file, function, block, etc.
   window.selection = selectionElement.value;
@@ -43,6 +46,8 @@ window.draw = function () {
   if (selection === "velocity-distribution") {
     drawGraphDist();
     drawAxesLablesDist();
+    drawMousePos1();
+
   } else if (selection === "velocity-vs-height") {
     drawGraphHeight();
     drawAxesLablesHeight();
@@ -72,35 +77,37 @@ function drawGraphDist() {
   rectMode(CENTER);
   fill(205, 115, 215);
   noStroke();
-  rect( z.graphCenterX, z.centerYTop, 854, (z.distBY-z.distTY)*z.hTop); //purple
+  rect(z.graphCenterX, z.centerYTop, 854, (z.distBY - z.distTY) * z.hTop); //purple
 
   rectMode(CENTER);
   fill(30, 255, 55);
   noStroke();
-  rect( z.graphCenterX, z.centerYMid, 854, (z.distBY-z.distTY)*z.hMid); //green
+  rect(z.graphCenterX, z.centerYMid, 854, (z.distBY - z.distTY) * z.hMid); //green
 
   rectMode(CENTER);
   fill(40, 95, 220);
   noStroke();
-  rect( z.graphCenterX, z.centerYBot, 854, (z.distBY-z.distTY)*z.hBot); //blue
+  rect(z.graphCenterX, z.centerYBot, 854, (z.distBY - z.distTY) * z.hBot); //blue
 
   rectMode(CENTER);
   fill(100, 100, 100);
   stroke('black');
   strokeWeight(3.25);
-  rect( z.graphCenterX, (z.graphCenterY - 265), 856, 50);
+  rect(z.graphCenterX, (z.graphCenterY - 265), 856, 50);
 
   rectMode(CENTER);
   fill(100, 100, 100);
   stroke('black');
   strokeWeight(3.25);
-  rect( z.graphCenterX, (z.graphCenterY + 265), 856, 50);
+  rect(z.graphCenterX, (z.graphCenterY + 265), 856, 50);
 
   stroke('black');
   strokeWeight(3);
-  line( z.distLineX12, (-((z.distBY-z.distTY)*z.hBot) + z.distBY), z.distLX, z.distBY);
-  line(z.distLineX12,(-((z.distBY-z.distTY)*z.hBot) + z.distBY),z.distLineX23,-((z.distBY-z.distTY)*z.hBot) - ((z.distBY-z.distTY)*z.hMid) + z.distBY);
-  line( z.distLineX23, -((z.distBY-z.distTY)*z.hBot) - ((z.distBY-z.distTY)*z.hMid) + z.distBY, z.distRX, z.distTY);
+  line(z.distLineX12, (-((z.distBY - z.distTY) * z.hBot) + z.distBY), z.distLX, z.distBY);
+  line(z.distLineX12, (-((z.distBY - z.distTY) * z.hBot) + z.distBY), z.distLineX23, -((z.distBY - z.distTY) * z.hBot) - ((z.distBY - z.distTY) * z.hMid) + z.distBY);
+  line(z.distLineX23, -((z.distBY - z.distTY) * z.hBot) - ((z.distBY - z.distTY) * z.hMid) + z.distBY, z.distRX, z.distTY);
+
+
 
   pop();
 
@@ -123,7 +130,7 @@ function drawGraphDist() {
 function drawAxesLablesDist() {
 
   push();
- 
+
   let intervalV = 0;
   let intervalH = 0;
   //vertical
@@ -155,7 +162,7 @@ function drawAxesLablesDist() {
   strokeWeight(0.2);
   fill("Black");
   textSize(28);
-  translate( z.graphCenterX - z.graphCenterX * 49 / 64, z.graphCenterY);
+  translate(z.graphCenterX - z.graphCenterX * 49 / 64, z.graphCenterY);
   rotate(HALF_PI * 3);
   text('Fraction of Fluid Height', 0, 0);
   pop();
@@ -194,11 +201,11 @@ function drawAxesLablesDist() {
 function drawAxesLablesHeight() {
 
   push();
-  
+
   let intervalV = 0;
   let intervalH = 0;
   //Vertical
-    //big ticks
+  //big ticks
   for (let i = z.heightBY - (z.heightBY - z.heightTY) / 5; i > z.heightTY; i -= (z.heightBY - z.heightTY) / 5) {
     stroke('black');
     strokeWeight(2);
@@ -206,7 +213,7 @@ function drawAxesLablesHeight() {
     line(z.distRX, i, z.distRX - 5, i);
 
   }
-    //values
+  //values
   for (let ii = z.heightBY; ii + 1 > z.heightTY; ii -= (z.heightBY - z.heightTY) / 5) {
     textAlign(CENTER);
     noStroke();
@@ -217,7 +224,7 @@ function drawAxesLablesHeight() {
     text(intervalVRound, z.distLX - 24, ii + 8);
     intervalV += 0.2;
   }
-    //little ticks
+  //little ticks
   for (let j = z.heightBY - (z.heightBY - z.heightTY) / 10; j > z.heightTY; j -= (z.heightBY - z.heightTY) / 10) {
     stroke('black');
     strokeWeight(1);
@@ -228,8 +235,8 @@ function drawAxesLablesHeight() {
 
 
   //Horizontal
-    //Big Ticks
-  for (let k = z.distLX+ (z.distRX - z.distLX)/5; k < z.distRX; k += (z.distRX - z.distLX)/5) {
+  //Big Ticks
+  for (let k = z.distLX + (z.distRX - z.distLX) / 5; k < z.distRX; k += (z.distRX - z.distLX) / 5) {
 
     stroke('black');
     strokeWeight(2);
@@ -237,8 +244,8 @@ function drawAxesLablesHeight() {
     line(k, z.heightTY, k, z.heightTY + 5);
 
   }
-    //Values
-  for (let k = z.distLX; k - 1 < z.distRX; k += (z.distRX - z.distLX)/5) {
+  //Values
+  for (let k = z.distLX; k - 1 < z.distRX; k += (z.distRX - z.distLX) / 5) {
 
     textAlign(CENTER);
     noStroke();
@@ -248,8 +255,8 @@ function drawAxesLablesHeight() {
     text(intervalHRound, k, z.heightBY + 30);
     intervalH += 0.2;
   }
-    //Little ticks
-  for (let k = z.distLX+(z.distRX - z.distLX)/10; k < z.distRX; k += (z.distRX - z.distLX)/10) {
+  //Little ticks
+  for (let k = z.distLX + (z.distRX - z.distLX) / 10; k < z.distRX; k += (z.distRX - z.distLX) / 10) {
 
     stroke('black');
     strokeWeight(1);
@@ -264,7 +271,7 @@ function drawAxesLablesHeight() {
   strokeWeight(0.2);
   fill("Black");
   textSize(28);
-  translate( z.graphCenterX - z.graphCenterX * 49 / 64, z.graphCenterY);
+  translate(z.graphCenterX - z.graphCenterX * 49 / 64, z.graphCenterY);
   rotate(HALF_PI * 3);
   text('Fluid Velocity', 0, 0);
   pop();
@@ -280,7 +287,7 @@ function drawAxesLablesHeight() {
 
   pop();
 
-  
+
 
 }
 
@@ -289,34 +296,81 @@ function drawGraphHeight() {
 
   push();
 
-  
+
   push();
   rectMode(CENTER);
   stroke('black');
   strokeWeight(7);
-  rect( z.graphCenterX, z.graphCenterY, 854, 580);
+  rect(z.graphCenterX, z.graphCenterY, 854, 580);
   pop();
-  
+
 
   rectMode(CENTER);
   fill(205, 115, 215); //purple
   noStroke();
-  rect( z.centerXTop, z.graphCenterY, (z.distRX-z.distLX)*z.hTop, z.heightBY-z.heightTY );
+  rect(z.centerXTop, z.graphCenterY, (z.distRX - z.distLX) * z.hTop, z.heightBY - z.heightTY);
 
   rectMode(CENTER);
   fill(30, 255, 55); //green
   noStroke();
-  rect( z.centerXMid, z.graphCenterY, (z.distRX-z.distLX)*z.hMid, z.heightBY-z.heightTY);
+  rect(z.centerXMid, z.graphCenterY, (z.distRX - z.distLX) * z.hMid, z.heightBY - z.heightTY);
 
   rectMode(CENTER);
   fill(40, 95, 220); //blue 
   noStroke();
-  rect( z.centerXBot,z.graphCenterY , (z.distRX-z.distLX)*z.hBot, z.heightBY-z.heightTY);
+  rect(z.centerXBot, z.graphCenterY, (z.distRX - z.distLX) * z.hBot, z.heightBY - z.heightTY);
 
-  
+
 
   pop();
 
+
+
+}
+
+function drawMousePos1() {
+
+  textAlign(CENTER);
+  textSize(16);
+
+  z.circleX = (mouseX) / relativeSize();
+  z.circleY = (mouseY) / relativeSize();
+
+  z.mouseXPtCalibrated = (mouseX) / relativeSize();
+  z.mouseYPtCalibrated = (mouseY) / relativeSize();
+
+  //line(z.mouseXPtCalibrated - 75, z.mouseYPtCalibrated - 15, z.mouseXPtCalibrated + 75, z.mouseYPtCalibrated - 15);
+  //text(`x: ${Math.abs(((z.mouseXPtCalibrated-z.distLX)/854).toFixed(3))} y: ${Math.abs(((z.mouseYPtCalibrated-z.distBY)/-480).toFixed(3))}`, z.mouseXPtCalibrated, z.mouseYPtCalibrated - 25);
+  
+  line(z.mouseXPtCalibrated - 75, z.mouseYPtCalibrated - 15, z.mouseXPtCalibrated + 75, z.mouseYPtCalibrated - 15);
+  text(`x: ${Math.abs(((z.mouseXPtCalibrated-z.distLX)/854).toFixed(3))} y: ${Math.abs(((z.mouseYPtCalibrated-z.distBY)/-480).toFixed(3))}`, z.mouseXPtCalibrated, z.mouseYPtCalibrated - 25);
+  
+    fill(100, 100, 100);
+    ellipse(z.circleX, z.circleY, 15, 15);
+  
+
+  if( z.mouseYPtCalibrated > z.distTY && z.mouseXPtCalibrated > z.distLX && z.distRX> z.mouseXPtCalibrated && z.mouseYPtCalibrated < z.distBY){
+   
+    cursor(CROSS);
+
+    
+    
+    
+  }
+  if( z.mouseYPtCalibrated < z.distTY || z.mouseXPtCalibrated < z.distLX || z.distRX< z.mouseXPtCalibrated || z.mouseYPtCalibrated > z.distBY){
+
+    cursor(ARROW);
+
+  }
+
   
   
+
+
+}
+
+function mouseTele() {
+
+  
+ 
 }

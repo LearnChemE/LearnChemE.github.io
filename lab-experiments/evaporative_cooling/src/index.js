@@ -13,6 +13,7 @@ import "./style/style.scss";
 // GLOBAL VARIABLES OBJECT
 window.state = {
   showButtons: false,
+  hamburgerHasBeenClicked: window.sessionStorage.getItem("hamburgerHasBeenClicked") === "true",
   fanOn: false,
   fanCount: 0,
   waterOn: false,

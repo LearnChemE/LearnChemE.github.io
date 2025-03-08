@@ -4,7 +4,7 @@
   width: 100%;
   margin: auto;
   justify-content: center;
-  gap: 15px;
+  gap: 5px;
   margin-top: 10px;
   margin-bottom: 10px;
 }
@@ -27,33 +27,18 @@
   justify-content: space-evenly;
 }
 
-.input-area2 {
-  display: grid;
-  grid-template-columns: repeat(4, max-content);
-  align-items:center;
-  justify-items: end;
-  gap: 0px 5px;
-}
-
-input[type="range"] {
-  transform: translateY(6px);
-}
-
-.play-pause-area {
-  display: grid;
+#display-selection {
   grid-template-columns: max-content max-content;
   gap: 5px;
-  padding-left: 8px;
+  justify-content: center;
 }
 
-#pause {
-  width: 32px;
-  padding: 0;
-  margin-left: 5px;
+#sliders-area-1 {
+  transform: translateX(10px);
 }
 
-#pause>div {
-  transform: scaleX(2);
+#sliders-area-2 {
+  transform: translateX(20px);
 }
 
 select {
@@ -66,16 +51,21 @@ mjx-container {
 
 .modal-buttons-row {
   display: grid;
-  grid-template-columns: repeat(3, 12ch);
+  grid-template-columns: repeat(3, 11ch);
   gap: 20px;
   width: max-content;
   margin: 0.5rem auto 0rem auto;
   height: max-content;
+  transform: translateX(-20px);
 }
 
 .modal-buttons-row>* {
   height: max-content;
   align-self: center;
+}
+
+.modal-buttons-row>.input-area {
+  grid-column: 1 / -1;
 }
 
 li {
@@ -140,4 +130,20 @@ canvas {
   border-width: 1px;
   border-color: black;
   box-shadow: 0px 0px 2px 2px lightgrey;
+}
+
+@media screen and (max-width: 800px) {
+  .input-area {
+    font-size: 0.8rem;
+  }
+  .btn {
+    font-size: 0.8rem !important;
+    padding: 0.2rem 0.5rem !important;
+    width: 10ch;
+  }
+  .modal-buttons-row {
+    grid-template-columns: repeat(3, 9ch);
+    column-gap: 5px;
+    row-gap: 25px;
+  }
 }

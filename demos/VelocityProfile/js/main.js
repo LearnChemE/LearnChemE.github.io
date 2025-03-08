@@ -22,16 +22,6 @@ window.z = {
   distBY: ((mainHeight / 2) - 32) + 240,
   distTY: ((mainHeight / 2) - 32) - 240, 
 
-  /*graphCenterX: (width / 2),
-  graphCenterY: (height / 2) - 32,
-  grayThickness: (graphCenterY - 265) - 50,
-  distLX: (graphCenterX) - 428,
-  heightBY: (graphCenterY) + 290,
-  distRX: (graphCenterX) + 428,
-  heightTY: (graphCenterY) - 290,
-  distBY: (graphCenterY) + 240,
-  distTY: (graphCenterY) - 240, */
-
   //slider variables
   hTop: 0.34,
   muTop: 0.5,
@@ -48,6 +38,11 @@ window.z = {
   //line on the distribution graph points
   distLineX23: 0,
   distLineX12: 0,
+  mouseXPtCalibrated: 0,
+  mouseYPtCalibrated: 0,
+  pressed: 0,
+  circleX: 0,
+  circleY: 0,
 
 
   particles: 50,

@@ -8,7 +8,7 @@ This repository includes simulations created for https://www.learncheme.com/ to 
 
 `/accordion_iframes/` contains embeddable "accordion" elements used on LearnChemE.com.
 
-`/home_page/` contains styling for https://learncheme.github.io.
+`/home_page/` contains styling and scripts for the [LearnChemE.github.io](https://learncheme.github.io) home page.
 
 `/iframe/` contains embeddable quizzes covering various engineering topics.
 
@@ -18,7 +18,7 @@ This repository includes simulations created for https://www.learncheme.com/ to 
 
 `/media/` contains common assets used by multiple different applications within this repository.
 
-`/quiz_questions/` is an quiz used within a learning module posted on LearnChemE.
+`/quiz_questions/` is a quiz used within a learning module posted on LearnChemE.
 
 `/resources/` contains miscellaneous files, including large datasets, Excel spreadsheets, and non-JavaScript simulations that can be downloaded via links on LearnChemE.
 

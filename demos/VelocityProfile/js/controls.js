@@ -3,6 +3,7 @@ const heightSlider3 = document.getElementById('height-slider3');
 const viscoSlider3 = document.getElementById('visco-slider3');
 const heightSlider2 = document.getElementById('height-slider2');
 const viscoSlider2 = document.getElementById('visco-slider2');
+
 //const playButton = document.getElementById("play");
 //const pauseButton = document.getElementById("pause");
 

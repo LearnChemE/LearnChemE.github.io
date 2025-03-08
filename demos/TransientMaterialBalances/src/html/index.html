@@ -1,6 +1,7 @@
 <!doctype html>
 
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta http-equiv="content-language" content="en">
@@ -20,7 +21,10 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
     gtag('js', new Date());
 
     gtag('config', 'UA-204988035-3');
@@ -28,11 +32,9 @@
 </head>
 
 <body>
-  <div class="simulation-title">Transient Material Balances</div>
-
   <div class="simulation-controls">
     <div class="input-area">
-  
+
       <div class="input-row" id="volume-controls">
         <div class="data-name">Initial volume of solution</div>
         <input type="range" id="V0-slider" min="250" max="750" step="10" value="500">
@@ -60,14 +62,14 @@
         <div class="data-value" id="k-value">0.050</div>
         <div class="data-metric">s<sup>-1</sup></div>
       </div>
-  
+
     </div>
 
     <div class="modal-buttons-row">
       <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
       <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
       <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
-    
+
       <div class="buttons-row">
         <div class="button btn-success" id="start-button">Start simulation</div>
         <div class="button btn-danger" id="reset-button">Reset</div>
@@ -98,8 +100,7 @@
 
   <div id="plot-container"></div>
 
-  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
-    aria-hidden="true">
+  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -110,15 +111,16 @@
         </div>
         <div class="modal-body">
           <p>
-            A draining tank with a continuous feed is simulated; a chemical reaction takes place in the tank. To observe how concentration in the tank changes without a reaction, set the rate constant slider to zero. Adjust the inlet flow rate and concentration using sliders, then press "Start simulation". The volume, concentration of A in the tank, or outlet flow rate can be plotted, depending on which is selected from the Plot drop-down menu. To speed up the graph plot, increase the simulation speed using the slider. Reset the simulation to initial conditions by pressing "Reset". 
+            A draining tank with a continuous feed is simulated; a chemical reaction takes place in the tank. To observe how concentration in the tank changes without a reaction, set the rate constant slider to zero. Adjust the inlet flow rate and concentration using
+            sliders, then press "Start simulation". The volume, concentration of A in the tank, or outlet flow rate can be plotted, depending on which is selected from the Plot drop-down menu. To speed up the graph plot, increase the simulation speed
+            using the slider. Reset the simulation to initial conditions by pressing "Reset".
           </p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label"
-    aria-hidden="true">
+  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
 
@@ -132,45 +134,31 @@
         <div class="modal-body">
           <p>Because the liquid is constant density, the overall material balance is:</p>
 
-          $$
-            [1] \quad \frac{ dV }{ dt } = \nu_{0} - \nu_{out}
-          $$
+          $$ [1] \quad \frac{ dV }{ dt } = \nu_{0} - \nu_{out} $$
 
-          <p>where \( V \) is volume of liquid in the tank, \( \nu_{0} \) is volumetric flow rate in, and \( \nu_{out} \) is volumetric flow rate out.  The velocity of the outlet \(( u_{out} )\) is:</p>
+          <p>where \( V \) is volume of liquid in the tank, \( \nu_{0} \) is volumetric flow rate in, and \( \nu_{out} \) is volumetric flow rate out. The velocity of the outlet \(( u_{out} )\) is:</p>
 
-          $$
-            [2] \quad u_{out} = \sqrt{ 2 g h }
-          $$
+          $$ [2] \quad u_{out} = \sqrt{ 2 g h } $$
 
           <p>where \( g \) is gravitational acceleration (9.81 m/s<sup>2</sup>) and \( h \) is the height of liquid in the tank:</p>
 
-          $$
-            [3] \quad h = \frac{ V }{ A_{tank} }
-          $$
+          $$ [3] \quad h = \frac{ V }{ A_{tank} } $$
 
           <p>where \( A_{tank} \) is the cross-sectional area of the tank. Thus, the outlet volumetric flow rate is:</p>
 
-          $$
-            [4] \quad \nu_{out} = u_{out} A_{out}
-          $$
+          $$ [4] \quad \nu_{out} = u_{out} A_{out} $$
 
           <p>where \( A_{out} \) is the cross-sectional area of the outlet pipe. Combining equations [1] -[4] yields:</p>
 
-          $$
-            [5] \quad \frac{ dV }{ dt } = \sqrt{ \frac{ 2 g V }{ A_{tank} } } A_{ out } - \nu_{0}
-          $$
+          $$ [5] \quad \frac{ dV }{ dt } = \sqrt{ \frac{ 2 g V }{ A_{tank} } } A_{ out } - \nu_{0} $$
 
           <p>The first-order rate of reaction [\( r_{A} \), mol/(L s)] is</p>
-          
-          $$
-            [6] \quad r_{ A } = - k C_{ A }
-          $$  
+
+          $$ [6] \quad r_{ A } = - k C_{ A } $$
 
           <p>where \( k \) is the reaction rate constant (s<sup>-1</sup>). The equation for number of moles of component \( A \) in the tank is:</p>
 
-          $$
-            [7] \quad \frac{ dN_{A} }{ dt } = C_{A, 0} \, \nu_{ 0 } - C_{A}\nu_{out} - k C_{A} V
-          $$
+          $$ [7] \quad \frac{ dN_{A} }{ dt } = C_{A, 0} \, \nu_{ 0 } - C_{A}\nu_{out} - k C_{A} V $$
 
           <p>where \( N_{A} \) is number of moles of \( A \) in the tank and \( C_{ A, 0 } \) is the concentration \( A \) in the inlet stream (mol/L). In this simulation, equations [5] and [7] were solved numerically using Euler's Method.</p>
 
@@ -180,8 +168,7 @@
     </div>
   </div>
 
-  <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label"
-    aria-hidden="true">
+  <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -192,7 +179,9 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a>            by Neil Hendren under the direction of Professor John L. Falconer. Address any questions or comments to learncheme@gmail.com. All of our simulations are open source, and are available on our <a href="https://github.com/LearnChemE/LearnChemE.github.io/"
+              target="_blank">LearnChemE Github repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application
+            is not compatible with Internet Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions of: Chrome, Safari, Firefox, Edge, and Opera.
           </p>
         </div>
       </div>
