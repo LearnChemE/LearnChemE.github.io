@@ -25,7 +25,7 @@ const SideBar: React.FC<SideBarProps> = ({
   return (
     <>
       <div className="sidebar-background"></div>
-      <div className="sidebar" style={{ width: showing ? "250px" : "0px" }}>
+      <div className="sidebar" style={{ width: showing ? "300px" : "0px" }}>
         <button className="btn-close" onClick={() => onCloseBtnClick()} />
 
         <div
@@ -49,10 +49,7 @@ const SideBar: React.FC<SideBarProps> = ({
             ? `Experiment 3: Effect of Flowrate on Heat Transfer Rate`
             : `Experiment 3`}
         </div>
-        <div
-          className={dropDownShowing ? "sidebar-item vl" : "sidebar-item"}
-          onClick={() => toggleSelected(1)}
-        >
+        <div className={dropDownShowing ? "sidebar-item vl" : "sidebar-item"}>
           <div
             onClick={() =>
               setDropDownShowing((dropDownShowing) => !dropDownShowing)
