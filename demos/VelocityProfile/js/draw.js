@@ -12,8 +12,8 @@ function resize() {
   // Here I am reassigning the width and height of the canvas to a static value of 1280x720,
   // even though the actual canvas size is based on the size of the #p5-container element.
   // So you can effectively treat the canvas like it is 1280x720, even though it will scale to fit the screen.
-  z.width
-  z.height
+  z.width;
+  z.height;
 
   scale(relativeSize());
 
@@ -47,6 +47,7 @@ window.draw = function() {
     drawGraphDist();
     drawAxesLablesDist();
     drawMousePos1();
+
   } else if (selection === "velocity-vs-height") {
     drawGraphHeight();
     drawAxesLablesHeight();
@@ -105,6 +106,8 @@ function drawGraphDist() {
   line(z.distLineX12, (-((z.distBY - z.distTY) * z.hBot) + z.distBY), z.distLX, z.distBY);
   line(z.distLineX12, (-((z.distBY - z.distTY) * z.hBot) + z.distBY), z.distLineX23, -((z.distBY - z.distTY) * z.hBot) - ((z.distBY - z.distTY) * z.hMid) + z.distBY);
   line(z.distLineX23, -((z.distBY - z.distTY) * z.hBot) - ((z.distBY - z.distTY) * z.hMid) + z.distBY, z.distRX, z.distTY);
+
+
 
   pop();
 
@@ -330,15 +333,44 @@ function drawMousePos1() {
   textAlign(CENTER);
   textSize(16);
 
+  z.circleX = (mouseX) / relativeSize();
+  z.circleY = (mouseY) / relativeSize();
 
-  z.mouseXPtCalibrated = mouseX / relativeSize();
-  z.mouseYPtCalibrated = mouseY / relativeSize();
+  z.mouseXPtCalibrated = (mouseX) / relativeSize();
+  z.mouseYPtCalibrated = (mouseY) / relativeSize();
 
+  //line(z.mouseXPtCalibrated - 75, z.mouseYPtCalibrated - 15, z.mouseXPtCalibrated + 75, z.mouseYPtCalibrated - 15);
+  //text(`x: ${Math.abs(((z.mouseXPtCalibrated-z.distLX)/854).toFixed(3))} y: ${Math.abs(((z.mouseYPtCalibrated-z.distBY)/-480).toFixed(3))}`, z.mouseXPtCalibrated, z.mouseYPtCalibrated - 25);
+  
   line(z.mouseXPtCalibrated - 75, z.mouseYPtCalibrated - 15, z.mouseXPtCalibrated + 75, z.mouseYPtCalibrated - 15);
-  text(`x: ${z.mouseXPtCalibrated.toFixed(3)} y: ${z.mouseYPtCalibrated.toFixed(3)}`, z.mouseXPtCalibrated, z.mouseYPtCalibrated - 25);
+  text(`x: ${Math.abs(((z.mouseXPtCalibrated-z.distLX)/854).toFixed(3))} y: ${Math.abs(((z.mouseYPtCalibrated-z.distBY)/-480).toFixed(3))}`, z.mouseXPtCalibrated, z.mouseYPtCalibrated - 25);
+  
+    fill(100, 100, 100);
+    ellipse(z.circleX, z.circleY, 15, 15);
+  
+
+  if( z.mouseYPtCalibrated > z.distTY && z.mouseXPtCalibrated > z.distLX && z.distRX> z.mouseXPtCalibrated && z.mouseYPtCalibrated < z.distBY){
+   
+    cursor(CROSS);
+
+    
+    
+    
+  }
+  if( z.mouseYPtCalibrated < z.distTY || z.mouseXPtCalibrated < z.distLX || z.distRX< z.mouseXPtCalibrated || z.mouseYPtCalibrated > z.distBY){
+
+    cursor(ARROW);
+
+  }
+
+  
+  
 
 
+}
 
+function mouseTele() {
 
-
+  
+ 
 }
