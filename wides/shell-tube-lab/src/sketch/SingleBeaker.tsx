@@ -140,7 +140,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
 
     // Outlet tubes
     // Orange
-    var vertices = [[105, 375],[105,470]];
+    var vertices = [[105, 378],[105,470]];
     fillAnimationFactory.createSegment(4000, TubeFill, 1000, vertices, ORANGE_FLUID_COLOR);
     // Blue
     vertices = [[160, 75],[160, 30],[655, 30],[655, 470]];
@@ -206,7 +206,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
 
   const PINCH_LEFT: number = 475;
   const PINCH_RIGHT: number = 620;
-  const PINCH_TOP: number = 375;
+  const PINCH_TOP: number = 380;
   const PINCH_BOTTOM: number = 410;
   p.mousePressed = () => {
     if (
