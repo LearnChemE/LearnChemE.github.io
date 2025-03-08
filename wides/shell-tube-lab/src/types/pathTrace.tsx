@@ -1,4 +1,7 @@
-export class PathTrace 
+import { P5CanvasInstance } from "@p5-wrapper/react";
+import { Type } from "typescript";
+
+export class PathTrace
 {
     totalTime: number;
     vertices: number[][];
@@ -77,4 +80,24 @@ export class PathTrace
         // Add to lo vert to find position
         return [loVert[0]+dif[0] , loVert[1]+dif[1]];
     }
+
+    drawPath(p: P5CanvasInstance, current?: number) {
+        p.push();
+        p.stroke('red');
+        p.strokeWeight(2);
+        p.noFill();
+        p.beginShape();
+        let n = this.vertices.length;
+        for (let i=0;i<n;i++) {
+            p.vertex(...this.vertices[i]);
+        }
+        p.endShape();
+        if (current) {
+            p.fill('red');
+            p.stroke(0);
+            let currentPos = this.calculatePosition(current);
+            p.circle(...currentPos, 5);
+        }
+        p.pop();
+    } 
 }
