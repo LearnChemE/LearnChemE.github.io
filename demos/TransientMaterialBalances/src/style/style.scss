@@ -1,11 +1,9 @@
-$modal-sm: calc( 100vw - 50px );
-$modal-md: calc( 100vw - 50px );
+$modal-sm: calc( 100vw - 50px);
+$modal-md: calc( 100vw - 50px);
 $modal-lg: 800px;
 $modal-xl: 1140px;
-
 @import "bootstrap";
 @import "./slider.scss";
-
 .simulation-controls {
   display: grid;
   grid-template-columns: max-content max-content;
@@ -26,7 +24,6 @@ $modal-xl: 1140px;
     height: max-content;
     width: 12ch;
   }
-
   .input-row {
     display: grid;
     grid-template-columns: max-content 10rem 27px 50px;
@@ -43,23 +40,19 @@ $modal-xl: 1140px;
   gap: 10px;
   width: max-content;
   justify-items: center;
-
   .input-row {
     display: grid;
     grid-template-columns: 200px 10rem 35px 50px;
     grid-column: 1;
     gap: 1ch;
     align-items: end;
-  
     .data-name {
       justify-self: end;
     }
-
     .data-value {
       text-align: end;
     }
   }
-
   .input-select {
     display: grid;
     grid-template-columns: max-content max-content;
@@ -76,9 +69,8 @@ $modal-xl: 1140px;
   gap: 10px;
   position: absolute;
   left: calc(50vw + 90px);
-  top: 255px;
+  top: 205px;
   // grid-column: 1 / 4;
-
   select {
     padding: 5px;
   }
@@ -92,7 +84,6 @@ $modal-xl: 1140px;
   grid-column: 1 / 4;
   gap: 10px;
   margin: 5px;
-
   .button {
     width: 16ch;
     height: max-content;
@@ -105,7 +96,6 @@ $modal-xl: 1140px;
     opacity: 1;
     cursor: pointer;
   }
-
   .button:hover {
     opacity: 0.6;
   }
@@ -118,7 +108,7 @@ $modal-xl: 1140px;
 
 #plot-container {
   position: absolute;
-  top: 275px;
+  top: 225px;
   left: calc(max(430px, 50vw + 30px));
   width: 360px;
   height: 420px;
@@ -170,31 +160,18 @@ canvas {
 .modal-body {
   text-align: left;
   font-size: 0.9rem;
-
   .references {
     font-size: 0.8rem;
   }
-
   ol {
     list-style-type: none;
     margin: 0;
     padding: 0;
-
     &>li {
       margin-bottom: 0.5rem;
       font-size: 0.8rem;
     }
   }
-
-}
-
-.simulation-title {
-  width: 100vw;
-  text-align: center;
-  padding: 8px;
-  padding-bottom: 10px;
-  font-size: 1.25rem;
-  background-color: rgb(240, 240, 240);
 }
 
 *[disabled="yes"] {
