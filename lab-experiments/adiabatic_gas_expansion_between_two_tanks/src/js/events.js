@@ -21,7 +21,7 @@ window.mousePressed = function() {
   const vkw = valve.width;
   const vkh = valve.height;
 
-  if (mX > lkx && mX < lkx + lkw && mY > lky && mY < lky + lkh) {
+  if (mX > lkx - lkw / 2 && mX < lkx + 3 * lkw / 2 && mY > lky - lkh / 2 && mY < lky + 2 * lkh) {
     disableInputs();
     if (leftTank.valveRotation === 0) {
       if (rightTank.valveRotation > 0 && state.valvePosition > 0) {
@@ -38,7 +38,7 @@ window.mousePressed = function() {
     }
   }
 
-  if (mX > rkx && mX < rkx + rkw && mY > rky && mY < rky + rkh) {
+  if (mX > rkx - rkw / 2 && mX < rkx + 3 * rkw / 2 && mY > rky - rkh / 2 && mY < rky + 2 * rkh) {
     disableInputs();
     if (rightTank.valveRotation === 0) {
       if (leftTank.valveRotation > 0 && state.valvePosition > 0) {
@@ -54,7 +54,7 @@ window.mousePressed = function() {
     }
   }
 
-  if (mX > vkx - vkw / 2 && mX < vkx + vkw / 2 && mY > vky - vkh && mY < vky + vkh) {
+  if (mX > vkx - vkw / 1.5 && mX < vkx + vkw / 1.5 && mY > vky - vkh && mY < vky + vkh * 2) {
     disableInputs();
     if (state.valvePosition === 0) {
       if (leftTank.valveRotation > 0 && rightTank.valveRotation > 0) {
