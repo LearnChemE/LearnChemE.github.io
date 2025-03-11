@@ -41,6 +41,7 @@ window.draw = function() {
   background(255);
   calcAll();
 
+  
 
 
   if (selection === "velocity-distribution") {
@@ -156,6 +157,16 @@ function drawAxesLablesDist() {
     line(z.distLX, j, z.distLX + 5, j);
   }
 
+  /*
+  for (let jj = z.distBY; jj + 1 > z.distTY; jj -= (z.distBY - z.distTY) / 9) {
+    
+    stroke('black');
+    strokeWeight(5);
+    line(z.distLX, jj, z.distRX, jj);
+    triangle(z.distRX - 20, jj+7, z.distRX - 20 , jj-7, z.distRX, jj);
+  }
+  */
+ 
   push();
   textAlign(CENTER);
   stroke('Black');
@@ -339,25 +350,60 @@ function drawMousePos1() {
   z.mouseXPtCalibrated = (mouseX) / relativeSize();
   z.mouseYPtCalibrated = (mouseY) / relativeSize();
 
+  
+
   //line(z.mouseXPtCalibrated - 75, z.mouseYPtCalibrated - 15, z.mouseXPtCalibrated + 75, z.mouseYPtCalibrated - 15);
   //text(`x: ${Math.abs(((z.mouseXPtCalibrated-z.distLX)/854).toFixed(3))} y: ${Math.abs(((z.mouseYPtCalibrated-z.distBY)/-480).toFixed(3))}`, z.mouseXPtCalibrated, z.mouseYPtCalibrated - 25);
   
-  line(z.mouseXPtCalibrated - 75, z.mouseYPtCalibrated - 15, z.mouseXPtCalibrated + 75, z.mouseYPtCalibrated - 15);
-  text(`x: ${Math.abs(((z.mouseXPtCalibrated-z.distLX)/854).toFixed(3))} y: ${Math.abs(((z.mouseYPtCalibrated-z.distBY)/-480).toFixed(3))}`, z.mouseXPtCalibrated, z.mouseYPtCalibrated - 25);
+  //line(z.mouseXPtCalibrated - 75, z.mouseYPtCalibrated - 15, z.mouseXPtCalibrated + 75, z.mouseYPtCalibrated - 15);
   
-    fill(100, 100, 100);
-    ellipse(z.circleX, z.circleY, 15, 15);
   
-
+ 
+  
+//these if statements define what the mouse does and where to place the gray circle on the graph
   if( z.mouseYPtCalibrated > z.distTY && z.mouseXPtCalibrated > z.distLX && z.distRX> z.mouseXPtCalibrated && z.mouseYPtCalibrated < z.distBY){
    
-    cursor(CROSS);
+    //If statements for points on the middle section of the plot
+    if(z.circleX>z.distLineX12 && z.circleX<z.distLineX23){
 
+      
+      fill(100, 100, 100);
+      strokeWeight(2);
+      ellipse(z.circleX, z.plotCircleY2, 15, 15);
+      fill('black');
+      text(`x: ${Math.abs(((z.mouseXPtCalibrated-z.distLX)/854).toFixed(3))} y: ${Math.abs(((z.plotCircleY2-z.distBY)/-480).toFixed(3))}`, z.mouseXPtCalibrated, z.plotCircleY2 - 25);
+
+    }
+    //if for top section
+    if(z.circleX>z.distLineX23 && z.circleX<z.distRX){
+
+      
+      fill(100, 100, 100);
+      strokeWeight(2);
+      ellipse(z.circleX, z.plotCircleY3, 15, 15);
+      fill('black');
+      text(`x: ${Math.abs(((z.mouseXPtCalibrated-z.distLX)/854).toFixed(3))} y: ${Math.abs(((z.plotCircleY3-z.distBY)/-480).toFixed(3))}`, z.mouseXPtCalibrated, z.plotCircleY3 - 25);
+
+    }
+    //if for bottom section
+    if(z.circleX>z.distLX && z.circleX<z.distLineX12){
+
+      
+      fill(100, 100, 100);
+      strokeWeight(2);
+      ellipse(z.circleX, z.plotCircleY1, 15, 15);
+      fill('black');
+      text(`x: ${Math.abs(((z.mouseXPtCalibrated-z.distLX)/854).toFixed(3))} y: ${Math.abs(((z.plotCircleY1-z.distBY)/-480).toFixed(3))}`, z.mouseXPtCalibrated, z.plotCircleY1 - 25);
+
+    }
     
+    
+    
+
     
     
   }
-  if( z.mouseYPtCalibrated < z.distTY || z.mouseXPtCalibrated < z.distLX || z.distRX< z.mouseXPtCalibrated || z.mouseYPtCalibrated > z.distBY){
+  else if( z.mouseYPtCalibrated < z.distTY || z.mouseXPtCalibrated < z.distLX || z.distRX< z.mouseXPtCalibrated || z.mouseYPtCalibrated > z.distBY){
 
     cursor(ARROW);
 

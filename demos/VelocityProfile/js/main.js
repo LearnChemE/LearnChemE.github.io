@@ -43,6 +43,17 @@ window.z = {
   pressed: 0,
   circleX: 0,
   circleY: 0,
+  plotCirlceX: 0,
+  plotCirlceY1: 0,
+  plotCirlceY2: 0,
+  plotCirlceY3: 0,
+  bottomLineA: 0,
+  bottomLineB: 0,
+  midLineA: 0,
+  midLineB: 0,
+  bottomLineA: 0,
+  bottomLineB: 0,
+  mouseVector: 0,
 
 
   particles: 50,
