@@ -5,162 +5,157 @@ $modal-xl: 1140px;
 @import "bootstrap";
 @import "./slider.scss";
 @import "./checkbox.scss";
+body {
+  overflow-y: hidden;
+}
 
 .simulation-controls {
-    display: grid;
-    grid-template-columns: max-content max-content;
-    justify-content: center;
-    gap: 0px 20px;
-    width: 100vw;
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-content: center;
+  gap: 0px 20px;
+  width: 100vw;
 }
 
 .modal-buttons-row {
-    display: grid;
-    grid-template-columns: repeat(3, max-content);
-    gap: 10px;
-    margin: 0.5rem auto;
-    justify-content: center;
-    align-content: center;
-
-    .btn {
-        height: max-content;
-        width: 12ch;
-    }
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 10px;
+  margin: 0.5rem auto;
+  justify-content: center;
+  align-content: center;
+  .btn {
+    height: max-content;
+    width: 12ch;
+  }
 }
 
 .input-area {
+  display: grid;
+  position: absolute;
+  grid-template-columns: max-content;
+  margin: 20px auto;
+  gap: 10px;
+  width: max-content;
+  justify-items: center;
+  justify-self: center;
+  height: 70px;
+  align-content: space-between;
+  .input-row {
     display: grid;
-    position: absolute;
-    grid-template-columns: max-content;
-    margin: 20px auto;
-    gap: 10px;
-    width: max-content;
-    justify-items: center;
-    justify-self: center;
-    height: 70px;
-    align-content: space-between;
-
-    .input-row {
-        display: grid;
-        grid-template-columns: 100px 10rem 27px 50px;
-        gap: 1ch;
-        align-items: end;
-
-        .data-name {
-            justify-self: end;
-        }
-
-        .data-value {
-            text-align: end;
-        }
+    grid-template-columns: 100px 10rem 27px 50px;
+    gap: 1ch;
+    align-items: end;
+    .data-name {
+      justify-self: end;
     }
-
-    transform: translate(200px, 30px);
+    .data-value {
+      text-align: end;
+    }
+  }
+  transform: translate(200px, 30px);
 }
 
 #p5-container {
-    position: absolute;
-    top: 20px;
-    left: 0px;
-    width: 100vw;
-    height: 100vh;
-    margin: auto;
-    display: grid;
-    justify-content: center;
+  position: absolute;
+  top: 20px;
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+  margin: auto;
+  display: grid;
+  justify-content: center;
 }
 
 canvas {
-    border-style: solid;
-    border-width: 1px;
-    border-color: black;
-    box-shadow: 0px 0px 2px 2px lightgrey;
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+  box-shadow: 0px 0px 2px 2px lightgrey;
 }
 
 #loading {
-    margin-left: 15px;
-    font-size: 1.5rem;
-    width: 100vw;
-    text-align: center;
+  margin-left: 15px;
+  font-size: 1.5rem;
+  width: 100vw;
+  text-align: center;
 }
 
 .modal.show {
-    padding-left: 0px !important;
+  padding-left: 0px !important;
 }
 
 .modal-body {
-    text-align: left;
-    font-size: 0.9rem;
-
-    .references {
-        font-size: 0.8rem;
+  text-align: left;
+  font-size: 0.9rem;
+  .references {
+    font-size: 0.8rem;
+  }
+  ol {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    &>li {
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
     }
-
-    ol {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-
-        &>li {
-            margin-bottom: 0.5rem;
-            font-size: 0.8rem;
-        }
-    }
+  }
 }
 
 .simulation-title {
-    width: 100vw;
-    text-align: center;
-    padding: 8px;
-    padding-bottom: 10px;
-    font-size: 1.25rem;
-    background-color: rgb(240, 240, 240);
+  width: 100vw;
+  text-align: center;
+  padding: 8px;
+  padding-bottom: 10px;
+  font-size: 1.25rem;
+  background-color: rgb(240, 240, 240);
 }
 
 *[disabled="yes"] {
-    opacity: 0.3 !important;
-    pointer-events: none;
+  opacity: 0.3 !important;
+  pointer-events: none;
 }
 
 .checkbox-wrapper {
-    justify-self: start;
-    margin-top: 10px;
-    margin-left: 20px;
+  justify-self: start;
+  margin-top: 10px;
+  margin-left: 20px;
 }
 
 .checkbox-label {
-    font-size: 16px !important;
+  font-size: 16px !important;
 }
 
 .img-wrapper {
-    width: 100%;
-    display: grid;
-    justify-content: center;
-    justify-items: center;
+  width: 100%;
+  display: grid;
+  justify-content: center;
+  justify-items: center;
 }
 
 img {
-    width: 300px;
-    outline: 1px solid black;
-    padding: 10px;
+  width: 300px;
+  outline: 1px solid black;
+  padding: 10px;
 }
 
 mjx-container {
-    transform: translateX(20px);
+  transform: translateX(20px);
 }
 
 .figure-label {
-    width: 100%;
-    text-align: center;
-    padding-bottom: 0px;
-    margin-bottom: 10px;
+  width: 100%;
+  text-align: center;
+  padding-bottom: 0px;
+  margin-bottom: 10px;
 }
 
 .refs {
-    font-size: 0.8rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
+  font-size: 0.8rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .see-also {
-    padding-left: 1rem;
+  padding-left: 1rem;
 }
