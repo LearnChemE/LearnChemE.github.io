@@ -24,7 +24,7 @@ function resize() {
 window.setup = function() {
 
   createCanvas(p5container.offsetWidth, p5container.offsetHeight).parent(p5container);
-  frameRate(30);
+  frameRate(500);
 }
 
 // Same with draw() - this should never be inside a conditional statement.
@@ -364,7 +364,7 @@ function drawMousePos1() {
   if( z.mouseYPtCalibrated > z.distTY && z.mouseXPtCalibrated > z.distLX && z.distRX> z.mouseXPtCalibrated && z.mouseYPtCalibrated < z.distBY){
    
     //If statements for points on the middle section of the plot
-    if(z.circleX>z.distLineX12 && z.circleX<z.distLineX23){
+    if(z.circleX>z.distLineX12 && z.circleX<z.distLineX23 && Math.abs(z.circleY-z.plotCircleY2) < 20){
 
       
       fill(100, 100, 100);
@@ -375,7 +375,7 @@ function drawMousePos1() {
 
     }
     //if for top section
-    if(z.circleX>z.distLineX23 && z.circleX<z.distRX){
+    if(z.circleX>z.distLineX23 && z.circleX<z.distRX && Math.abs(z.circleY-z.plotCircleY3) < 20){
 
       
       fill(100, 100, 100);
@@ -386,7 +386,7 @@ function drawMousePos1() {
 
     }
     //if for bottom section
-    if(z.circleX>z.distLX && z.circleX<z.distLineX12){
+    if(z.circleX>z.distLX && z.circleX<z.distLineX12 && Math.abs(z.circleY-z.plotCircleY1) < 20){
 
       
       fill(100, 100, 100);
