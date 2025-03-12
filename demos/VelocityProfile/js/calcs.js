@@ -68,12 +68,12 @@ export function calcAll() {
 
 
   //calculations for velocity line on dist graph
-  let x12 = fluid1LineXOut(h1);
-  let x23 = fluid2LineXOut(h1+h2);
-  //let x12 = h1 / ((h3 * z.muMid + h2 * z.muTop + h1 * z.muMid * z.muTop) / (z.muTop * z.muMid));
-  //let x23 = ((z.muTop * (h2 + h1 * z.muMid)) / (h1 * z.muTop * z.muMid + h3 * z.muMid + h2 * z.muTop));
+  
+ 
 
   //x-values for the function being graphed based on the heights of each fluid. only calculates the x value between fluid 1 and fluid 2, and between fluid 2 and fluid 3
+  let x12 = fluid1LineXOut(h1);
+  let x23 = fluid2LineXOut(h1+h2);
   z.distLineX12 = z.distLX + (z.distRX - z.distLX) * x12;
   z.distLineX23 = z.distLX + (z.distRX - z.distLX) * x23;
 
@@ -91,12 +91,6 @@ export function calcAll() {
   z.plotCircleY2 = fluid2LineYOut((z.circleX-z.distLX)/(z.distRX-z.distLX))*(1-(z.distBY-z.distTY)) + z.distBY;
   z.plotCircleY3 = fluid3LineYOut((z.circleX-z.distLX)/(z.distRX-z.distLX))*(1-(z.distBY-z.distTY)) + z.distBY;
   
-  //let slope1 = ((-((z.distBY - z.distTY) * z.hBot) + z.distBY) - z.distBY) / (z.distLineX12 - z.distLX);
-  //z.plotCircleY1 = slope1 * (z.circleX - z.distLX) + z.distBY;
-  //let slope2 = ((-((z.distBY - z.distTY) * z.hBot) + z.distBY) - (-((z.distBY - z.distTY) * z.hBot) - ((z.distBY - z.distTY) * z.hMid) + z.distBY)) / (z.distLineX12 - z.distLineX23); // <--pick up here, trying to make dot work for second and thurd line
-  //z.plotCircleY2 = slope2 * (z.circleX - z.distLineX23) + (-((z.distBY - z.distTY) * z.hBot) - ((z.distBY - z.distTY) * z.hMid) + z.distBY);
-  //let slope3 = ((-((z.distBY - z.distTY) * z.hBot) - ((z.distBY - z.distTY) * z.hMid) + z.distBY) - z.distTY) / (z.distLineX23 - z.distRX);
-  //z.plotCircleY3 = slope3 * (z.circleX - z.distRX) + z.distTY;
 
   //Height Graph stuff
 
@@ -106,7 +100,19 @@ export function calcAll() {
 
 
   //Points on the Graph
+  
+  z.heightY12 = (1-(z.heightBY-z.heightTY))*x12 + z.heightBY;
+  z.heightY23 = (1-(z.heightBY-z.heightTY))*x23 + z.heightBY;
 
+  let y12 = fluid1LineYOut(h1);
+  let y23 = fluid2LineYOut(h1+h2);
+
+  z.heightX12 = z.distLX + (z.distRX - z.distLX) * y12;
+  z.heightX23 = z.distLX + (z.distRX - z.distLX) * y23;
+
+  z.plotCircleY4 = fluid1LineXOut((z.circleX-z.distLX)/(z.distRX-z.distLX))*(1-(z.heightBY-z.heightTY)) + z.heightBY;
+  z.plotCircleY5 = fluid2LineXOut((z.circleX-z.distLX)/(z.distRX-z.distLX))*(1-(z.heightBY-z.heightTY)) + z.heightBY;
+  z.plotCircleY6 = fluid3LineXOut((z.circleX-z.distLX)/(z.distRX-z.distLX))*(1-(z.heightBY-z.heightTY)) + z.heightBY;
 
 
 

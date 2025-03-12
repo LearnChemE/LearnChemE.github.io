@@ -57,6 +57,14 @@ window.z = {
   bottomLineB: 0,
   mouseVector: 0,
 
+  //Height graph
+  heightY12: 0,
+  heightY23: 0,
+  plotCirlceY4: 0,
+  plotCirlceY5: 0,
+  plotCirlceY6: 0,
+  heightX12: 0,
+  heightX23: 0,
 
   particles: 50,
   //playing: false,
