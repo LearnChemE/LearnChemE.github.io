@@ -77,15 +77,32 @@ function fillAnimationBlue(
 ) {
   let s;
   let partBlue;
+  const rectInfo = [
+    [415,314, 20,34],
+    [101,279,350,35],
+    [115,248, 20,31],
+    [101,213,350,35],
+    [415,182, 20,31],
+    [101,147,350,35],
+    [115,116, 20,31],
+    [101, 81,350,35],
+    [415, 50, 20,31]
+  ];
 
   p.push();
   p.translate(x, y);
-  if (t <= 5) {
-    s = 88 + t * 160;
-    partBlue = dtb.get(0, 450 - s, 500, 50 + s);
-    p.image(partBlue, 25, 450 - s);
-  } else if (g.vols[2] > 0) {
-    p.image(dtb, 25, 0);
+  // if (t <= 5) {
+  //   s = 88 + t * 160;
+  //   partBlue = dtb.get(0, 450 - s, 500, 50 + s);
+  //   p.image(partBlue, 25, 450 - s);
+  // } else if (g.vols[2] > 0) {
+  //   p.image(dtb, 25, 0);
+  // }
+  p.fill(g.blueFluidColor);
+  p.noStroke();
+  let n = rectInfo.length;
+  for (let i=0;i<n;i++) {
+    p.rect(...rectInfo[i]);
   }
   p.pop();
 }
@@ -115,7 +132,7 @@ function fillAnimationOrange(
   p.pop();
 }
 
-// The tint function is a very costy solution. Better would be to use a framebuffer
+
 function fillAnimationTubes(
   tOrange: number,
   p: P5CanvasInstance,
@@ -135,18 +152,6 @@ function fillAnimationTubes(
     p.image(ti, 279, 120);
     p.image(to, 88, 41);
   }
-
-  // if (tBlue < 3 && g.cIsFlowing) {
-  //   let s = p.constrain(tBlue * 1000, 0, 255);
-  //   p.tint(255, s);
-  //   p.image(tci, 0, 0);
-  //   s = p.constrain(tBlue * 1000 - 2000, 0, 255);
-  //   p.tint(255, s);
-  //   p.image(tco, 0, 0);
-  // } else if (g.blueTime != -1 && g.vols[2] > 0) {
-  //   p.image(tci, 0, 0);
-  //   p.image(tco, 0, 0);
-  // }
 
   p.pop();
 }
