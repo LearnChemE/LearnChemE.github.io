@@ -24,7 +24,7 @@ function resize() {
 window.setup = function() {
 
   createCanvas(p5container.offsetWidth, p5container.offsetHeight).parent(p5container);
-  frameRate(500);
+  //frameRate(500);
 }
 
 // Same with draw() - this should never be inside a conditional statement.
@@ -390,7 +390,7 @@ function drawMouseDist() {
   
   //line(z.mouseXPtCalibrated - 75, z.mouseYPtCalibrated - 15, z.mouseXPtCalibrated + 75, z.mouseYPtCalibrated - 15);
   
-  if(Math.abs(z.circleX-z.distLX) < 15 && Math.abs(z.circleY-z.distBY) < 15){
+  if(Math.abs(z.circleX-z.distLX) < 7.5 && Math.abs(z.circleY-z.distBY) < 7.5){
 
     fill(100, 100, 100);
     strokeWeight(2);
@@ -403,7 +403,7 @@ function drawMouseDist() {
     text(`x: ${Math.abs((0).toFixed(3))} y: ${Math.abs((0).toFixed(3))}`, z.distLX, z.distBY + 35);
     
   }
-  if(Math.abs(z.circleX-z.distRX) < 15 && Math.abs(z.circleY-z.distTY) < 15){
+  if(Math.abs(z.circleX-z.distRX) < 7.5 && Math.abs(z.circleY-z.distTY) < 7.5){
 
     fill(100, 100, 100);
     strokeWeight(2);
@@ -416,37 +416,39 @@ function drawMouseDist() {
     text(`x: ${Math.abs((1).toFixed(3))} y: ${Math.abs((1).toFixed(3))}`, z.distRX, z.distTY + 35);
     
   }
-  if(Math.abs(z.circleX-((z.distRX-z.distLX)*z.hBot + z.distLX)) < 15 && Math.abs(z.circleY-z.heightY12) < 15){
+  if(Math.abs(z.circleX-z.distLineX12) <7.5 && Math.abs(z.circleY - (((z.distBY-z.distTY))*(1-z.hBot) + z.distTY) ) < 7.5){
 
     fill(100, 100, 100);
     strokeWeight(2);
     stroke('black');
-    ellipse((z.distRX-z.distLX)*z.hBot + z.distLX,z.heightY12, 15, 15);
+    ellipse(z.distLineX12, (((z.distBY-z.distTY))*(1-z.hBot) + z.distTY), 15, 15);
     fill('white');
     textSize(22);
     stroke('black');
     strokeWeight(3.5);
-    text(`x: ${Math.abs(((z.distRX-z.distLX)*z.hBot + z.distLX).toFixed(3))} y: ${Math.abs((z.heightY12).toFixed(3))}`, z.distRX, z.distTY + 35);
+    text(`x: ${Math.abs(((z.distLineX12-z.distLX)/(z.distRX-z.distLX)).toFixed(3))} y: ${Math.abs((((((z.distBY-z.distTY))*(1-z.hBot) + z.distTY)-z.distBY)/(z.distTY-z.distBY)).toFixed(3))}0`, z.distLineX12, (((z.distBY-z.distTY))*(1-z.hBot) + z.distTY) + 35);
     
   }
-  if(Math.abs(z.circleX-z.distRX) < 15 && Math.abs(z.circleY-z.distTY) < 15){
+  if(Math.abs(z.circleX-z.distLineX23) <7.5 && Math.abs(z.circleY - (((z.distBY-z.distTY))*(1-(z.hBot+z.hMid)) + z.distTY) ) < 7.5){
 
     fill(100, 100, 100);
     strokeWeight(2);
     stroke('black');
-    ellipse(z.distRX, z.distTY, 15, 15);
+    ellipse(z.distLineX23, (((z.distBY-z.distTY))*(1-(z.hBot+z.hMid)) + z.distTY), 15, 15);
     fill('white');
     textSize(22);
     stroke('black');
     strokeWeight(3.5);
-    text(`x: ${Math.abs((1).toFixed(3))} y: ${Math.abs((1).toFixed(3))}`, z.distRX, z.distTY + 35);
+    text(`x: ${Math.abs(((z.distLineX23-z.distLX)/(z.distRX-z.distLX)).toFixed(3))} y: ${Math.abs((((((z.distBY-z.distTY))*(1-(z.hBot+z.hMid)) + z.distTY)-z.distBY)/(z.distTY-z.distBY)).toFixed(3))}0`, z.distLineX23, (((z.distBY-z.distTY))*(1-(z.hBot+z.hMid)) + z.distTY) + 35);
     
   }
  
   
 //these if statements define what the mouse does and where to place the gray circle on the graph
   if( z.mouseYPtCalibrated > z.distTY && z.mouseXPtCalibrated > z.distLX && z.distRX> z.mouseXPtCalibrated && z.mouseYPtCalibrated < z.distBY){
-   
+    
+    //cursor('grab');
+
     //If statements for points on the middle section of the plot
     if(z.circleX>z.distLineX12 && z.circleX<z.distLineX23 && Math.abs(z.circleY-z.plotCircleY2) < 20){
 
@@ -529,7 +531,58 @@ function drawMouseHeight(){
   
   //line(z.mouseXPtCalibrated - 75, z.mouseYPtCalibrated - 15, z.mouseXPtCalibrated + 75, z.mouseYPtCalibrated - 15);
   
-  
+  if(Math.abs(z.circleX-z.distLX) < 7.5 && Math.abs(z.circleY-z.heightBY) < 7.5){
+
+    fill(100, 100, 100);
+    strokeWeight(2);
+    stroke('black');
+    ellipse(z.distLX, z.heightBY, 15, 15);
+    fill('white');
+    textSize(22);
+    stroke('black');
+    strokeWeight(3.5);
+    text(`x: ${Math.abs((0).toFixed(3))} y: ${Math.abs((0).toFixed(3))}`, z.distLX, z.heightBY + 35);
+    
+  }
+  if(Math.abs(z.circleX-z.distRX) < 7.5 && Math.abs(z.circleY-z.heightTY) < 7.5){
+
+    fill(100, 100, 100);
+    strokeWeight(2);
+    stroke('black');
+    ellipse(z.distRX, z.heightTY, 15, 15);
+    fill('white');
+    textSize(22);
+    stroke('black');
+    strokeWeight(3.5);
+    text(`x: ${Math.abs((1).toFixed(3))} y: ${Math.abs((1).toFixed(3))}`, z.distRX, z.heightTY + 35);
+    
+  }
+  if(Math.abs(z.circleX-((z.distRX-z.distLX)*(z.hBot) + z.distLX)) <7.5 && Math.abs(z.circleY - z.heightY12 ) < 7.5){
+
+    fill(100, 100, 100);
+    strokeWeight(2);
+    stroke('black');
+    ellipse(((z.distRX-z.distLX)*(z.hBot) + z.distLX), z.heightY12, 15, 15);
+    fill('white');
+    textSize(22);
+    stroke('black');
+    strokeWeight(3.5);
+    text(`x: ${Math.abs(((((z.distRX-z.distLX)*(z.hBot) + z.distLX)-z.distLX)/(z.distRX-z.distLX)).toFixed(3))}0 y: ${Math.abs(((z.heightY12-z.distBY)/(z.distTY-z.distBY)).toFixed(3))}`, ((z.distRX-z.distLX)*(z.hBot) + z.distLX), z.heightY12 + 35);
+    
+  }
+  if(Math.abs(z.circleX-((z.distRX-z.distLX)*(z.hBot+z.hMid) + z.distLX)) <7.5 && Math.abs(z.circleY - z.heightY23) < 7.5){
+
+    fill(100, 100, 100);
+    strokeWeight(2);
+    stroke('black');
+    ellipse(((z.distRX-z.distLX)*(z.hBot+z.hMid) + z.distLX), z.heightY23, 15, 15);
+    fill('white');
+    textSize(22);
+    stroke('black');
+    strokeWeight(3.5);
+    text(`x: ${Math.abs(((((z.distRX-z.distLX)*(z.hBot+z.hMid) + z.distLX)-z.distLX)/(z.distRX-z.distLX)).toFixed(3))}0 y: ${Math.abs(((z.heightY23-z.distBY)/(z.distTY-z.distBY)).toFixed(3))}`, ((z.distRX-z.distLX)*(z.hBot+z.hMid) + z.distLX), z.heightY23 + 35);
+    
+  }
   
 //these if statements define what the mouse does and where to place the gray circle on the graph
   if( z.mouseYPtCalibrated > z.heightTY && z.mouseXPtCalibrated > z.distLX && z.distRX> z.mouseXPtCalibrated && z.mouseYPtCalibrated < z.heightBY){
@@ -549,7 +602,7 @@ function drawMouseHeight(){
       text(`x: ${Math.abs(((z.mouseXPtCalibrated-z.distLX)/(z.distRX-z.distLX)).toFixed(3))} y: ${Math.abs(((z.plotCircleY5-z.heightBY)/(z.heightTY-z.heightBY)).toFixed(3))}`, z.mouseXPtCalibrated, z.plotCircleY5 - 25);
 
     }
-    //if for top section
+    //if for right section
     if(z.circleX>((z.distRX-z.distLX)*(z.hBot+z.hMid) + z.distLX) && z.circleX<z.distRX && Math.abs(z.circleY-z.plotCircleY6) < 20){
 
       
@@ -564,7 +617,7 @@ function drawMouseHeight(){
       text(`x: ${Math.abs(((z.mouseXPtCalibrated-z.distLX)/(z.distRX-z.distLX)).toFixed(3))} y: ${Math.abs(((z.plotCircleY6-z.heightBY)/(z.heightTY-z.heightBY)).toFixed(3))}`, z.mouseXPtCalibrated, z.plotCircleY6 - 25);
 
     }
-    //if for bottom section
+    //if for left section
     if(z.circleX>z.distLX && z.circleX<((z.distRX-z.distLX)*z.hBot + z.distLX) && Math.abs(z.circleY-z.plotCircleY4) < 20){
 
       

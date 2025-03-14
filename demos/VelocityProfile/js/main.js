@@ -23,6 +23,8 @@ window.z = {
   distTY: ((mainHeight / 2) - 32) - 240, 
 
   //slider variables
+  h3Max: 0.98,
+  h2Max: 0.98,
   hTop: 0.34,
   muTop: 0.5,
   hMid: 0.33,

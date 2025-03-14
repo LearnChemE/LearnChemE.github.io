@@ -11,7 +11,8 @@ export function calcAll() {
   let h3 = z.hTop;
   let h2 = z.hMid;
   let h1 = z.hBot;
-
+  z.h3Max = 0.99-z.hMid;
+  z.h2Max = 0.99-z.hTop;
 
   /*
   The origional base line equations to graph:
@@ -62,6 +63,7 @@ export function calcAll() {
 
   //dist graph fluid height ratios
   z.hBot = 1 - z.hTop - z.hMid;
+
   z.centerYTop = -((z.distBY - z.distTY) * z.hBot) - ((z.distBY - z.distTY) * z.hMid) - ((z.distBY - z.distTY) * z.hTop / 2) + z.distBY;
   z.centerYMid = -((z.distBY - z.distTY) * z.hBot) - ((z.distBY - z.distTY) * z.hMid / 2) + z.distBY;
   z.centerYBot = -((z.distBY - z.distTY) * z.hBot) / 2 + z.distBY;
