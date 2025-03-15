@@ -23,6 +23,8 @@ window.z = {
   distTY: ((mainHeight / 2) - 32) - 240, 
 
   //slider variables
+  h3Max: 0.98,
+  h2Max: 0.98,
   hTop: 0.34,
   muTop: 0.5,
   hMid: 0.33,
@@ -43,7 +45,28 @@ window.z = {
   pressed: 0,
   circleX: 0,
   circleY: 0,
+  plotCirlceX1: 0,
+  plotCirlceX2: 0,
+  plotCirlceX3: 0,
+  plotCirlceY1: 0,
+  plotCirlceY2: 0,
+  plotCirlceY3: 0,
+  bottomLineA: 0,
+  bottomLineB: 0,
+  midLineA: 0,
+  midLineB: 0,
+  bottomLineA: 0,
+  bottomLineB: 0,
+  mouseVector: 0,
 
+  //Height graph
+  heightY12: 0,
+  heightY23: 0,
+  plotCirlceY4: 0,
+  plotCirlceY5: 0,
+  plotCirlceY6: 0,
+  heightX12: 0,
+  heightX23: 0,
 
   particles: 50,
   //playing: false,

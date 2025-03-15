@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "./static/css/main.91c75281.css",
-    "main.js": "./static/js/main.9d2c989b.js",
+    "main.css": "./static/css/main.ad039570.css",
+    "main.js": "./static/js/main.b31c063c.js",
     "static/js/453.6e13c64c.chunk.js": "./static/js/453.6e13c64c.chunk.js",
     "static/media/Flatirons_Winter_Sunrise-scaled.jpg": "./static/media/Flatirons_Winter_Sunrise-scaled.0e145ae0b6bb08a02a88.jpg",
     "index.html": "./index.html",
-    "main.91c75281.css.map": "./static/css/main.91c75281.css.map",
-    "main.9d2c989b.js.map": "./static/js/main.9d2c989b.js.map",
+    "main.ad039570.css.map": "./static/css/main.ad039570.css.map",
+    "main.b31c063c.js.map": "./static/js/main.b31c063c.js.map",
     "453.6e13c64c.chunk.js.map": "./static/js/453.6e13c64c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.91c75281.css",
-    "static/js/main.9d2c989b.js"
+    "static/css/main.ad039570.css",
+    "static/js/main.b31c063c.js"
   ]
 }
