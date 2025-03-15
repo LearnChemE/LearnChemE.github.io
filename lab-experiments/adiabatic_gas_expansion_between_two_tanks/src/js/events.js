@@ -20,19 +20,32 @@ window.mousePressed = function() {
   const vky = valve.y;
   const vkw = valve.width;
   const vkh = valve.height;
+  const equilibrated = abs(state.leftTank.pressure - state.rightTank.pressure) < 4e4;
 
   if (mX > lkx - lkw / 2 && mX < lkx + 3 * lkw / 2 && mY > lky - lkh / 2 && mY < lky + 2 * lkh) {
     disableInputs();
-    if (leftTank.valveRotation === 0) {
+    if (leftTank.valveRotation === 0 && !equilibrated) {
+      state.leftTank.open = true;
       if (rightTank.valveRotation > 0 && state.valvePosition > 0) {
         solve();
+        gasTransferSound.play();
+      } else {
+        gasReleaseSound.play();
       }
       const openInterval = setInterval(() => {
         if (leftTank.valveRotation === 1) {
           clearInterval(openInterval)
         } else {
           leftTank.valveRotation = min(1, leftTank.valveRotation + 0.005);
-          leftTank.outletPressure = 0.05 * (leftTank.pressure - leftTank.outletPressure) + leftTank.outletPressure;
+        }
+      }, 1000 / state.frameRate);
+    } else if (leftTank.valveRotation === 1 && equilibrated) {
+      state.leftTank.open = false;
+      const closeInterval = setInterval(() => {
+        if (leftTank.valveRotation === 0) {
+          clearInterval(closeInterval)
+        } else {
+          leftTank.valveRotation = max(0, leftTank.valveRotation - 0.005);
         }
       }, 1000 / state.frameRate);
     }
@@ -40,9 +53,11 @@ window.mousePressed = function() {
 
   if (mX > rkx - rkw / 2 && mX < rkx + 3 * rkw / 2 && mY > rky - rkh / 2 && mY < rky + 2 * rkh) {
     disableInputs();
-    if (rightTank.valveRotation === 0) {
+    if (rightTank.valveRotation === 0 && !equilibrated) {
+      state.rightTank.open = true;
       if (leftTank.valveRotation > 0 && state.valvePosition > 0) {
         solve();
+        gasTransferSound.play();
       }
       const openInterval = setInterval(() => {
         if (rightTank.valveRotation === 1) {
@@ -51,23 +66,42 @@ window.mousePressed = function() {
           rightTank.valveRotation = min(1, rightTank.valveRotation + 0.005);
         }
       }, 1000 / state.frameRate);
+    } else if (rightTank.valveRotation === 1 && equilibrated) {
+      state.rightTank.open = false;
+      const closeInterval = setInterval(() => {
+        if (rightTank.valveRotation === 0) {
+          clearInterval(closeInterval)
+        } else {
+          rightTank.valveRotation = max(0, rightTank.valveRotation - 0.005);
+        }
+      }, 1000 / state.frameRate);
     }
   }
 
   if (mX > vkx - vkw / 1.5 && mX < vkx + vkw / 1.5 && mY > vky - vkh && mY < vky + vkh * 2) {
     disableInputs();
-    if (state.valvePosition === 0) {
+    if (state.valvePosition === 0 && !equilibrated) {
+      state.valveOpen = true;
       if (leftTank.valveRotation > 0 && rightTank.valveRotation > 0) {
         solve();
+        gasTransferSound.play();
+      } else if (leftTank.valveRotation > 0) {
+        gasReleaseSound.play();
       }
       const openInterval = setInterval(() => {
         if (state.valvePosition === 1) {
           clearInterval(openInterval)
         } else {
           state.valvePosition = min(1, state.valvePosition + 0.005);
-          if (state.leftTank.valveRotation > 0) {
-            state.rightTank.outletPressure = 0.05 * (state.leftTank.outletPressure - state.rightTank.outletPressure) + state.rightTank.outletPressure;
-          }
+        }
+      }, 1000 / state.frameRate);
+    } else if (state.valvePosition === 1 && equilibrated) {
+      state.valveOpen = false;
+      const closeInterval = setInterval(() => {
+        if (state.valvePosition === 0) {
+          clearInterval(closeInterval)
+        } else {
+          state.valvePosition = max(0, state.valvePosition - 0.005);
         }
       }, 1000 / state.frameRate);
     }

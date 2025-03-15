@@ -1,10 +1,14 @@
 import "bootstrap";
-import "p5";
 import "./style/style.scss";
-import "./assets/adiabatic_gas_expansion_worksheet.pdf";
+import "./assets/adiabatic_gas_expansion_between_two_tanks_worksheet.pdf";
+import "./assets/gas_release.wav";
+import "./assets/gas_transfer.wav";
 import { drawAll } from "./js/draw";
 import { handleInputs, initializeHamburger } from "./js/inputs";
 import { calcAll, setDefaults } from "./js/calcs";
+
+window.p5 = require("p5");
+require("p5/lib/addons/p5.sound");
 // TO DO:
 
 // GLOBAL VARIABLES OBJECT
@@ -12,10 +16,16 @@ window.state = {
   frameRate: 60,
   pixelDensity: 8,
   showButtons: false,
-  hamburgerHasBeenClicked: window.sessionStorage.getItem("hamburgerHasBeenClicked") === "true",
+  hamburgerHasBeenClicked: window.localStorage.getItem("hamburgerHasBeenClicked") === "true",
+  sounds: window.localStorage.getItem("sounds") === "true" || window.localStorage.getItem("sounds") === null,
 };
 
 const containerElement = document.getElementById("p5-container");
+
+window.preload = function() {
+  window.gasReleaseSound = loadSound("./assets/gas_release.wav");
+  window.gasTransferSound = loadSound("./assets/gas_transfer.wav");
+}
 
 window.setup = function() {
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);

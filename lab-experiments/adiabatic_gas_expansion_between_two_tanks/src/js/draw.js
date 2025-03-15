@@ -44,7 +44,6 @@ function drawRegulator(x, y, size, tank) {
   if (tank === state.rightTank) {
     rect(-size * 1.1, 0, size * 2, size / 3, size / 10);
     fill(240);
-    rect(-size * 1.5, -size / 3, size / 8, size / 3);
     rect(-size / 3.5, 0, size / 6, size / 2, size / 20);
     rect(size / 1.2, 0, size, size / 8);
     rect(size * 1.4, -size / 4, size / 16, size / 2, size / 40);
@@ -53,7 +52,6 @@ function drawRegulator(x, y, size, tank) {
   } else {
     rect(size * 1.1, 0, size * 2, size / 3, size / 10);
     fill(240);
-    rect(size * 1.5, -size / 3, size / 8, size / 3);
     rect(-size / 1.2, 0, size, size / 8);
     rect(-size * 1.4, -size / 4, size / 16, size / 2, size / 40);
     rect(-size * 1.4, 0, size / 6, size / 6, size / 40);
@@ -93,11 +91,9 @@ function drawRegulator(x, y, size, tank) {
   }
   translate(0, -size);
   if (tank === state.rightTank) {
-    drawGauge(-size * 1.5, -size, size, tank.outletPressure, 5e6, "Pa", x, y - size);
-    drawGauge(size * 1.4, -size, size, tank.pressure, 5e6, "Pa", x, y - size);
+    drawGauge(size * 1.4, -size, size, tank.pressure, 5e6, "MPa", x, y - size);
   } else {
-    drawGauge(size * 1.5, -size, size, tank.outletPressure, 5e6, "Pa", x, y - size);
-    drawGauge(-size * 1.4, -size, size, tank.pressure, 5e6, "Pa", x, y - size);
+    drawGauge(-size * 1.4, -size, size, tank.pressure, 5e6, "MPa", x, y - size);
   }
   pop();
 }
@@ -149,12 +145,19 @@ function drawGauge(x, y, diameter, pressure, maxPressure, units, offsetX, offset
       const textX = diameter / 1.5 * cos(radians(i));
       const textY = diameter / 1.5 * sin(radians(i));
       const ratio = round(10 * (1 + ((i - 30) / 240))) / 10;
-      if (units === "Pa") {
+      if (units === "MPa") {
         const P = round(ratio * maxPressure / 1e6);
         text(P, textX, textY);
       }
     }
   }
+  push();
+  textAlign(CENTER, CENTER);
+  textSize(0.75);
+  fill(0);
+  noStroke();
+  text(units, 0, diameter / 3);
+  pop();
   stroke(needleOutline);
   strokeWeight(0.05);
   fill(needleColor);

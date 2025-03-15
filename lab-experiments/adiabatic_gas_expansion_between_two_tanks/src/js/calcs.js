@@ -4,26 +4,27 @@ export function setDefaults() {
     leftTank: {
       volume: 100,
       pressure: 3e6,
-      outletPressure: 0,
       temperature: 227,
       valveRotation: 0,
       xCoord: 30,
       yCoord: 30,
       width: 20,
       height: 80,
+      open: false,
     },
     rightTank: {
       volume: 100,
       pressure: 0,
-      outletPressure: 0,
       temperature: 22,
       valveRotation: 0,
       xCoord: 100,
       yCoord: 30,
       width: 20,
       height: 80,
+      open: false,
     },
     valvePosition: 0,
+    valveOpen: false,
     solution: {
       Tf1: 0,
       Tf2: 0,
@@ -107,7 +108,5 @@ export function calcAll() {
     state.rightTank.temperature = 0.005 * (Tf2 - state.rightTank.temperature) + state.rightTank.temperature;
     state.leftTank.pressure = 0.005 * (Pf - state.leftTank.pressure) + state.leftTank.pressure;
     state.rightTank.pressure = 0.005 * (Pf - state.rightTank.pressure) + state.rightTank.pressure;
-    state.leftTank.outletPressure = 0.05 * (state.leftTank.pressure - state.leftTank.outletPressure) + state.leftTank.outletPressure;
-    state.rightTank.outletPressure = 0.05 * (state.leftTank.outletPressure - state.rightTank.outletPressure) + state.rightTank.outletPressure;
   }
 }

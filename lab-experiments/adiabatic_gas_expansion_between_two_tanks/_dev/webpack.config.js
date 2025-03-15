@@ -5,7 +5,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const module_rules = [{
-    test: /\.ttf$/i,
+    test: /\.ttf|\.wav$/i,
     loader: 'file-loader',
     options: {
       name: 'assets/[name].[ext]',

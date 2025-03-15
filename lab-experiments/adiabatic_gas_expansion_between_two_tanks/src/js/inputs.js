@@ -11,6 +11,9 @@ const pressureSlider = document.getElementById("pressure-slider");
 const pressureValue = document.getElementById("pressure-value");
 const temperatureSlider = document.getElementById("temperature-slider");
 const temperatureValue = document.getElementById("temperature-value");
+const soundsButton = document.getElementById("sounds");
+const soundOn = document.getElementById("sound-on");
+const soundOff = document.getElementById("sound-off");
 
 function handleReset() {
   const resetButton = document.getElementById("reset");
@@ -155,10 +158,31 @@ function handleSliders() {
   });
 }
 
+function handleSounds() {
+  soundsButton.addEventListener("click", () => {
+    if (state.sounds) {
+      state.sounds = false;
+      gasReleaseSound.setVolume(0);
+      gasTransferSound.setVolume(0);
+      soundOn.style.display = "block";
+      soundOff.style.display = "none";
+      window.localStorage.setItem("sounds", "false");
+    } else {
+      state.sounds = true;
+      gasReleaseSound.setVolume(1);
+      gasTransferSound.setVolume(1);
+      soundOn.style.display = "none";
+      soundOff.style.display = "block";
+      window.localStorage.setItem("sounds", "true");
+    }
+  });
+}
+
 export function handleInputs() {
   handleReset();
   handleSize();
   handleSliders();
+  handleSounds();
 }
 
 function handleHamburger() {
@@ -197,7 +221,7 @@ function handleHamburger() {
         state.showButtons = true;
         hamburgerIcon.classList.add("active");
         state.hamburgerHasBeenClicked = true;
-        window.sessionStorage.setItem("hamburgerHasBeenClicked", "true");
+        window.localStorage.setItem("hamburgerHasBeenClicked", "true");
       }
     }
   });
