@@ -28,6 +28,12 @@ window.preload = function() {
 }
 
 window.setup = function() {
+  if (state.sounds === false) {
+    document.getElementById("sound-off").style.display = "none";
+    document.getElementById("sound-on").style.display = "block";
+    gasReleaseSound.setVolume(0);
+    gasTransferSound.setVolume(0);
+  }
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
   handleInputs();
   initializeHamburger();
