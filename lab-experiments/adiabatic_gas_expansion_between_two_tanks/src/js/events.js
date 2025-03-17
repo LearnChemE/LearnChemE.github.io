@@ -28,8 +28,10 @@ window.mousePressed = function() {
       state.leftTank.open = true;
       if (rightTank.valveRotation > 0 && state.valvePosition > 0) {
         solve();
+        gasTransferSound.currentTime = 0;
         gasTransferSound.play();
       } else {
+        gasReleaseSound.currentTime = 0;
         gasReleaseSound.play();
       }
       const openInterval = setInterval(() => {
@@ -57,6 +59,7 @@ window.mousePressed = function() {
       state.rightTank.open = true;
       if (leftTank.valveRotation > 0 && state.valvePosition > 0) {
         solve();
+        gasTransferSound.currentTime = 0;
         gasTransferSound.play();
       }
       const openInterval = setInterval(() => {
@@ -84,8 +87,10 @@ window.mousePressed = function() {
       state.valveOpen = true;
       if (leftTank.valveRotation > 0 && rightTank.valveRotation > 0) {
         solve();
+        gasTransferSound.curentTime = 0;
         gasTransferSound.play();
       } else if (leftTank.valveRotation > 0) {
+        gasReleaseSound.currentTime = 0;
         gasReleaseSound.play();
       }
       const openInterval = setInterval(() => {

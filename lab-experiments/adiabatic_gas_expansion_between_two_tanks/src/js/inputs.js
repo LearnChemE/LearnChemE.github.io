@@ -50,6 +50,12 @@ function handleReset() {
         right100.click();
         break;
     }
+    if (!gasReleaseSound.paused || !gasTransferSound.paused) {
+      gasReleaseSound.pause();
+      gasTransferSound.pause();
+      gasReleaseSound.currentTime = 0;
+      gasTransferSound.currentTime = 0;
+    }
   });
 }
 
@@ -162,15 +168,15 @@ function handleSounds() {
   soundsButton.addEventListener("click", () => {
     if (state.sounds) {
       state.sounds = false;
-      gasReleaseSound.setVolume(0);
-      gasTransferSound.setVolume(0);
+      gasReleaseSound.volume = 0;
+      gasTransferSound.volume = 0;
       soundOn.style.display = "block";
       soundOff.style.display = "none";
       window.localStorage.setItem("sounds", "false");
     } else {
       state.sounds = true;
-      gasReleaseSound.setVolume(1);
-      gasTransferSound.setVolume(1);
+      gasReleaseSound.volume = 1;
+      gasTransferSound.volume = 1;
       soundOn.style.display = "none";
       soundOff.style.display = "block";
       window.localStorage.setItem("sounds", "true");
