@@ -4,26 +4,27 @@ export function setDefaults() {
     leftTank: {
       volume: 100,
       pressure: 3e6,
-      outletPressure: 0,
       temperature: 227,
       valveRotation: 0,
       xCoord: 30,
       yCoord: 30,
       width: 20,
       height: 80,
+      open: false,
     },
     rightTank: {
       volume: 100,
       pressure: 0,
-      outletPressure: 0,
       temperature: 22,
       valveRotation: 0,
       xCoord: 100,
       yCoord: 30,
       width: 20,
       height: 80,
+      open: false,
     },
     valvePosition: 0,
+    valveOpen: false,
     solution: {
       Tf1: 0,
       Tf2: 0,
@@ -48,6 +49,9 @@ export function setDefaults() {
 }
 
 export function solve() {
+  const leftTankInitialTemperature = state.leftTank.temperature;
+  const rightTankInitialTemperature = state.rightTank.temperature;
+  const initialPressure = state.leftTank.pressure;
   const V1 = state.leftTank.volume;
   const V2 = state.rightTank.volume;
   const Pi = state.leftTank.pressure / 1000;
@@ -91,10 +95,35 @@ export function solve() {
     }
   }
 
+  const TErrorRange = [
+    0.95 - 0.04 * (state.leftTank.pressure - 5e5) / 4.5e6 - 0.03 * (state.leftTank.temperature - 25) / 275,
+    0.98 - 0.02 * (state.leftTank.pressure - 5e5) / 4.5e6 - 0.01 * (state.leftTank.temperature - 25) / 275,
+  ]
+
+  const leftTankError = random(2 - TErrorRange[0], 2 - TErrorRange[1]);
+  const rightTankError = random(TErrorRange[0], TErrorRange[1]);
+
+  const PErrorRange = [
+    min(2 - leftTankError, 2 - rightTankError),
+    max(2 - leftTankError, 2 - rightTankError)
+  ]
+
+  const pressureError = random(PErrorRange[0], PErrorRange[1]);
+
+  Tf1 -= 273.15;
+  Tf2 -= 273.15;
+
+  Tf1 = leftTankInitialTemperature + (Tf1 - leftTankInitialTemperature) * leftTankError;
+  Tf2 = rightTankInitialTemperature + (Tf2 - rightTankInitialTemperature) * rightTankError;
+
+  Pff *= 1000;
+
+  Pff = initialPressure + pressureError * (Pff - initialPressure);
+
   state.solution = {
-    Tf1: Tf1 - 273.15,
-    Tf2: Tf2 - 273.15,
-    P: Pff * 1000,
+    Tf1: Tf1,
+    Tf2: Tf2,
+    P: Pff,
   }
 }
 
@@ -107,7 +136,5 @@ export function calcAll() {
     state.rightTank.temperature = 0.005 * (Tf2 - state.rightTank.temperature) + state.rightTank.temperature;
     state.leftTank.pressure = 0.005 * (Pf - state.leftTank.pressure) + state.leftTank.pressure;
     state.rightTank.pressure = 0.005 * (Pf - state.rightTank.pressure) + state.rightTank.pressure;
-    state.leftTank.outletPressure = 0.05 * (state.leftTank.pressure - state.leftTank.outletPressure) + state.leftTank.outletPressure;
-    state.rightTank.outletPressure = 0.05 * (state.leftTank.outletPressure - state.rightTank.outletPressure) + state.rightTank.outletPressure;
   }
 }

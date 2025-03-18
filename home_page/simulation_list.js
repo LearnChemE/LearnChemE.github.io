@@ -906,5 +906,14 @@ window.simulation_list = [{
     "description": "This is a simulation of phase equilibrium for one mole of a binary system (A, B) that forms two partially-miscible liquids (α, β). The T-x-y diagram shows vapor-liquid equilibrium (VLE), liquid-liquid equilibrium (LLE), and vapor-liquid-liquid equilibrium (VLLE). The number of moles of each phase, which are shown in the bar graph (along with the mole fractions of component B in the phases), are determined from mole balances. The overall mole fraction of component B and the heat added are specified using the sliders. ",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/VLLE/",
     "simulation_type": "in-browser"
+  },
+  {
+    "title": "Material balances in liquid-liquid extraction",
+    "href": "/lab-experiments/LiquidLiquidExtraction/index.html",
+    "image": "N/A",
+    "tooltip": "This digital experiment applies material balances to a liquid-liquid extraction process in which water as a solvent contacts an acetic acid/chloroform mixture in a steady-state counter flow experiment",
+    "description": "This experiment applies material balances to a liquid-liquid extraction process in which water as a solvent contacts an acetic acid/chloroform mixture in a steady-state counter flow experiment. Because acetic acid is much more soluble in water, it is extracted from the chloroform organic phase into the aqueous phase.",
+    "src": "https://learncheme.github.io/lab-experiments/LiquidLiquidExtraction/index.html",
+    "simulation_type": "in-browser"
   }
 ]

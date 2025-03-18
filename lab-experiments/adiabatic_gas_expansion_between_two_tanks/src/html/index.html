@@ -20,6 +20,7 @@
 
     gtag('config', 'UA-204988035-3');
   </script>
+  <script src="https://kit.fontawesome.com/57b4de50ab.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -35,12 +36,16 @@
             <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">
               About
             </div>
-            <a href="./assets/adiabatic_gas_expansion_worksheet.pdf" class="btn btn-primary" id="worksheet" download>Worksheet</a>
+            <a href="./assets/adiabatic_gas_expansion_between_two_tanks_worksheet.pdf" class="btn btn-primary" id="worksheet" download>Worksheet</a>
           </div>
         </div>
       </div>
     </div>
     <button id="reset">Reset</button>
+    <button id="sounds">
+      <i id="sound-off" class="fa-solid fa-volume-high"></i>
+      <i id="sound-on" class="fa-solid fa-volume-xmark"></i>
+    </button>
     <div id="left-tank-buttons" class="size-buttons">
       <div class="size-buttons-label">cylinder volume</div>
       <button id="left-25">25 L</button>
@@ -55,13 +60,13 @@
     </div>
     <div id="sliders">
       <div id="pressure-slider-container" class="slider-container">
-        <div class="slider-label">Initial Pressure</div>
+        <div class="slider-label">Initial pressure</div>
         <input type="range" id="pressure-slider" min="0.5" max="5.0" value="3.0" step="0.1">
         <div id="pressure-value" class="value-label">3.0</div>
         <div id="pressure-units">MPa</div>
       </div>
       <div id="temperature-slider-container" class="slider-container">
-        <div class="slider-label">Initial Temperature</div>
+        <div class="slider-label">Initial temperature</div>
         <input type="range" id="temperature-slider" min="25" max="300" value="227" step="1">
         <div id="temperature-value" class="value-label">227</div>
         <div id="temperature-units">°C</div>
@@ -79,11 +84,9 @@
           </div>
           <div class="modal-body">
             <p>
-              This digital experiment allows you to explore the adiabatic expansion of a gas between two tanks. The left tank is filled with a gas at a specified initial pressure and temperature. The right tank is initially evacuated. The valves on the left tank, right
-              tank, and the valve connecting the two tanks can be clicked to be opened. Once all three valves are opened, gas will transfer from the left tank to the right tank over the course of about ten seconds. The expansion is adiabatic, meaning
-              that no heat is transferred to or from the surroundings. Ideal gas conditions can also be assumed. The pressure and temperature of the gas in each tank are displayed as the gas expands. Hover your mouse over the pressure gauges to expand
-              their size for readability. The volume of each tank can be adjusted, as well as the initial pressure and temperature of the gas in the left tank. The simulation can be reset at any time by clicking the "Reset" button (note that the valves
-              will need to be opened again after resetting for a new trial). Click the "Worksheet" button to download the corresponding worksheet for this laboratory experiment.
+              This digital experiment expands an ideal gas, which is at high pressure in the left tank, adiabatically into the right tank, which is initially evacuated. Select the volume of each tank (25, 50 or 100 L), and set the initial pressure and temperature of
+              the gas in the left tank with the sliders. Then open the values on the top of the two tanks by clicking them. To expand the gas into the right tank, open the value connecting the tanks by clicking on it. Hover your mouse over the pressure
+              gauges to expand their size for readability. Reset the simulation by clicking the "Reset" button. Click the "Worksheet" button to download the worksheet for this experiment.
             </p>
           </div>
         </div>

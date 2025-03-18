@@ -202,10 +202,44 @@ canvas {
   text-align: right;
 }
 
+#sounds {
+  position: absolute;
+  display: grid;
+  justify-content: center;
+  justify-items: center;
+  align-items: center;
+  width: 45px;
+  height: 30px;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: rgb(81, 196, 250);
+  gap: 0px;
+  top: 55px;
+  right: 3%;
+  cursor: pointer;
+}
+
+#sounds:hover {
+  background-color: rgb(91, 206, 255);
+}
+
+#sound-on {
+  display: none;
+}
+
 @media screen and (min-width: 1080px) {
   #reset {
     font-size: 1.1rem;
     width: 90px;
+  }
+  #sounds {
+    width: 50px;
+    height: 35px;
+    top: 70px;
+  }
+  #sound-on,
+  #sound-off {
+    transform: scale(1.1);
   }
   #sliders {
     font-size: 0.9rem;
@@ -230,6 +264,15 @@ canvas {
   #reset {
     font-size: 1.2rem;
     width: 100px;
+  }
+  #sounds {
+    width: 60px;
+    height: 40px;
+    top: 80px;
+  }
+  #sound-on,
+  #sound-off {
+    transform: scale(1.2);
   }
   #sliders {
     font-size: 1rem;
