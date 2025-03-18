@@ -113,12 +113,8 @@ export function solve() {
   Tf1 -= 273.15;
   Tf2 -= 273.15;
 
-  console.log({ Tf1, Tf2 });
-
   Tf1 = leftTankInitialTemperature + (Tf1 - leftTankInitialTemperature) * leftTankError;
   Tf2 = rightTankInitialTemperature + (Tf2 - rightTankInitialTemperature) * rightTankError;
-
-  console.log({ Tf1, Tf2 });
 
   Pff *= 1000;
 

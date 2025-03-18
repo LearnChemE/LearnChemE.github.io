@@ -1,3 +1,14 @@
+function drawZoomText() {
+  push();
+  translate(2, height - 10);
+  noStroke();
+  fill(0);
+  textSize(3);
+  textAlign(LEFT, CENTER);
+  text("Zoom using the scroll wheel, and drag the mouse to move the image", 0, -15, 29, 50);
+  pop();
+}
+
 function drawLeftTank() {
   const x = state.leftTank.xCoord;
   const y = state.leftTank.yCoord;
@@ -101,14 +112,6 @@ function drawRegulator(x, y, size, tank) {
 function drawGauge(x, y, diameter, pressure, maxPressure, units, offsetX, offsetY) {
   push();
   translate(x, y);
-  const mX = mouseX / relativeSize();
-  const mY = mouseY / relativeSize();
-  if (sqrt((mX - x - offsetX) ** 2 + (mY - y - offsetY) ** 2) < diameter / 2) {
-    scale(4);
-    fill(255);
-    noStroke();
-    circle(0, 0, diameter * 1.6);
-  }
   const gaugeColor = "rgb(255, 255, 255)";
   const gaugeOutline = "rgb(110, 110, 110)";
   const needleColor = "rgb(255, 0, 0)";
@@ -301,4 +304,5 @@ export function drawAll() {
   drawConnectingPipe();
   drawLeftTank();
   drawRightTank();
+  drawZoomText();
 }

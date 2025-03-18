@@ -4,8 +4,8 @@ window.mousePressed = function() {
   const leftTank = state.leftTank;
   const rightTank = state.rightTank;
   const valve = state.valveLocation;
-  const mX = mouseX / relativeSize();
-  const mY = mouseY / relativeSize();
+  const mX = (-state.zoomTarget[0] + mouseX / relativeSize()) / state.zoom;
+  const mY = (-state.zoomTarget[1] + mouseY / relativeSize()) / state.zoom;
   const leftTankKnobCoords = leftTank.knobCoords;
   const rightTankKnobCoords = rightTank.knobCoords;
   const lkx = leftTankKnobCoords[0]; // left knob x
@@ -22,7 +22,11 @@ window.mousePressed = function() {
   const vkh = valve.height;
   const equilibrated = abs(state.leftTank.pressure - state.rightTank.pressure) < 4e4;
 
-  if (mX > lkx - lkw / 2 && mX < lkx + 3 * lkw / 2 && mY > lky - lkh / 2 && mY < lky + 2 * lkh) {
+  const leftClickBox = [
+    lkx - lkw / 2, lky - lkh / 2,
+    lkx + 3 * lkw / 2, lky + 3 * lkh
+  ]
+  if (mX > leftClickBox[0] && mX < leftClickBox[2] && mY > leftClickBox[1] && mY < leftClickBox[3]) {
     disableInputs();
     if (leftTank.valveRotation === 0 && !equilibrated) {
       state.leftTank.open = true;
@@ -53,7 +57,11 @@ window.mousePressed = function() {
     }
   }
 
-  if (mX > rkx - rkw / 2 && mX < rkx + 3 * rkw / 2 && mY > rky - rkh / 2 && mY < rky + 2 * rkh) {
+  const rightClickBox = [
+    rkx - rkw / 2, rky - rkh / 2,
+    rkx + 3 * rkw / 2, rky + 2 * rkh
+  ]
+  if (mX > rightClickBox[0] && mX < rightClickBox[2] && mY > rightClickBox[1] && mY < rightClickBox[3]) {
     disableInputs();
     if (rightTank.valveRotation === 0 && !equilibrated) {
       state.rightTank.open = true;
@@ -81,7 +89,11 @@ window.mousePressed = function() {
     }
   }
 
-  if (mX > vkx - vkw / 1.5 && mX < vkx + vkw / 1.5 && mY > vky - vkh && mY < vky + vkh * 2) {
+  const valveClickBox = [
+    vkx - vkw, vky - 2 * vkh,
+    vkx + vkw, vky + vkh * 7
+  ]
+  if (mX > valveClickBox[0] && mX < valveClickBox[2] && mY > valveClickBox[1] && mY < valveClickBox[3]) {
     disableInputs();
     if (state.valvePosition === 0 && !equilibrated) {
       state.valveOpen = true;
@@ -122,4 +134,29 @@ function disableInputs() {
   document.getElementById("right-100").classList.add("disabled");
   document.getElementById("pressure-slider").classList.add("disabled");
   document.getElementById("temperature-slider").classList.add("disabled");
+}
+
+window.mouseWheel = function(e) {
+  e.preventDefault();
+  const mX = mouseX / relativeSize();
+  const mY = mouseY / relativeSize();
+  if (e.deltaY < 0) {
+    state.zoom *= 1.02;
+    state.zoomTarget[0] = mX - (mX - state.zoomTarget[0]) * 1.02;
+    state.zoomTarget[1] = mY - (mY - state.zoomTarget[1]) * 1.02;
+  } else {
+    state.zoom /= 1.02;
+    state.zoom = Math.max(1, state.zoom); // Prevent zooming out too much
+    state.zoomTarget[0] = mX - (mX - state.zoomTarget[0]) / 1.02;
+    state.zoomTarget[1] = mY - (mY - state.zoomTarget[1]) / 1.02;
+    state.zoomTarget[0] = constrain(state.zoomTarget[0], -150 * (state.zoom - 1), 0);
+    state.zoomTarget[1] = constrain(state.zoomTarget[1], -150 * (state.zoom - 1), 0);
+  }
+}
+
+window.mouseDragged = function() {
+  state.zoomTarget[0] += (mouseX - pmouseX) / relativeSize();
+  state.zoomTarget[1] += (mouseY - pmouseY) / relativeSize();
+  state.zoomTarget[0] = constrain(state.zoomTarget[0], -150 * (state.zoom - 1), 0);
+  state.zoomTarget[1] = constrain(state.zoomTarget[1], -150 * (state.zoom - 1), 0);
 }

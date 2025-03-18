@@ -14,6 +14,7 @@ const temperatureValue = document.getElementById("temperature-value");
 const soundsButton = document.getElementById("sounds");
 const soundOn = document.getElementById("sound-on");
 const soundOff = document.getElementById("sound-off");
+const canvas = document.querySelector("canvas");
 
 function handleReset() {
   const resetButton = document.getElementById("reset");

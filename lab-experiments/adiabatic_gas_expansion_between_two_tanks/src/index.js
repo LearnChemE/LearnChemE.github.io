@@ -16,6 +16,9 @@ window.state = {
   showButtons: false,
   hamburgerHasBeenClicked: window.localStorage.getItem("hamburgerHasBeenClicked") === "true",
   sounds: window.localStorage.getItem("sounds") === "true" || window.localStorage.getItem("sounds") === null,
+  isRetina: window.devicePixelRatio === 2,
+  zoom: 1,
+  zoomTarget: [0, 0],
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -47,6 +50,8 @@ window.draw = function() {
   window.width = 150;
   window.height = 100;
   scale(relativeSize());
+  translate(state.zoomTarget[0], state.zoomTarget[1]);
+  scale(state.zoom);
   background(255);
   calcAll();
   drawAll();
