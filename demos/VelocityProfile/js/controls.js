@@ -10,29 +10,29 @@ const viscoSlider2 = document.getElementById('visco-slider2');
 
 
 
+
+
+
+
+
 heightSlider3.addEventListener('input', function() {
   // The default value of a slider is a string, so we always first convert it to a number.
+  heightSlider3.setAttribute("max", String(0.99-z.hMid));
+  heightSlider3.setAttribute("value", String(0.99-z.hMid));
   z.hTop = Number(heightSlider3.value);
   const heightLabel3 = document.getElementById("height-value3");
-  
   heightLabel3.innerHTML = z.hTop.toFixed(2);
-  
+  heightSlider2.setAttribute("max", String(0.99-z.hTop));
 });
-
-heightSlider3.addEventListener('output', function() {
-  
-  document.getElementById("height-value3").max = String(z.h3Max);
-  
-});
-
 
 heightSlider2.addEventListener('input', function() {
   // The default value of a slider is a string, so we always first convert it to a number.
+  heightSlider2.setAttribute("max", String(0.99-z.hTop));
+  heightSlider2.setAttribute("value", String(0.99-z.hTop));
   z.hMid = Number(heightSlider2.value);
+  heightSlider3.setAttribute("max", String(0.99-z.hMid));
   const heightLabel2 = document.getElementById("height-value2");
-  document.getElementById("height-value2").max = String(z.h2Max);
   heightLabel2.innerHTML = z.hMid.toFixed(2);
-  
 });
 
 viscoSlider3.addEventListener('input', function() {
@@ -50,3 +50,4 @@ viscoSlider2.addEventListener('input', function() {
   viscoLabel2.innerHTML = z.muMid.toFixed(2);
   
 });
+

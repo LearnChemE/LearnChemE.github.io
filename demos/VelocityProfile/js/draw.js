@@ -113,20 +113,6 @@ function drawGraphDist() {
 
   pop();
 
-
-  /* //incase i need this
-    
-    noStroke();
-    fill("blue");
-   
-    for (let i = 0; i < g.particles; i++) {
-      const randX = (width / 2) + random(-200, 200);
-      const randY = (height / 2) + random(-150, 150);
-      ellipse(randX, randY, 5, 5);
-    }
-   
-    pop();
-    */
 }
 
 function drawAxesLablesDist() {
@@ -157,16 +143,103 @@ function drawAxesLablesDist() {
     strokeWeight(1);
     line(z.distLX, j, z.distLX + 5, j);
   }
+  
+  
+  let divide = 4;
+   
+  if(  0.34*(3/4) < (1-z.hTop-z.hMid) ){
+     divide = 4;
+  }
+  if(0.34*(2/4) < (1-z.hTop-z.hMid) < 0.34*(3/4)){
+    divide = 3;
+  }
+  if(0.07 < (1-z.hTop-z.hMid) < (0.34*(2/4))){
+    divide = 2;
+  }
+  if ((1-z.hTop-z.hMid) < (0.07)){
+    divide = 1;
+  }
 
-  /*
-  for (let jj = z.distBY; jj + 1 > z.distTY; jj -= (z.distBY - z.distTY) / 9) {
+  let divide2 = 4;
+   
+  if(  0.34*(3/4) < (z.hMid) ){
+     divide2 = 4;
+  }
+  if(0.34*(2/4) < (z.hMid) < 0.34*(3/4)){
+    divide2 = 3;
+  }
+  if(0.05 < (z.hMid) < (0.34*(2/4))){
+    divide2 = 2;
+  }
+  if ((z.hMid) < (0.05)){
+    divide2 = 1;
+  }
+
+  let divide3 = 4;
+   
+  if(  0.34*(3/4) < (z.hTop) ){
+     divide3 = 4;
+  }
+  if(0.34*(2/4) < (z.hTop) < 0.34*(3/4)){
+    divide3 = 3;
+  }
+  if(0.05 < (z.hTop) < (0.34*(2/4))){
+    divide3 = 2;
+  }
+  if ((z.hTop) < (0.05)){
+    divide3 = 1;
+  }
+
+   
+  let h3 = z.hTop;
+  let h2 = z.hMid;
+  let h1 = 1 - z.hTop - z.hMid;
+
+  function fluid1LineXOut(y) {
+
+    
+    return (((z.distBY-y)/(z.distBY-z.distTY)) * ((z.muMid * z.muTop) / (h3 * z.muMid + h2 * z.muTop + h1 * z.muMid * z.muTop)))*(z.distRX-z.distLX) + z.distLX;
+
+  }
+
+  function fluid2LineXOut(y) {
+
+    return ((z.muTop * (((z.distBY-y)/(z.distBY-z.distTY)) - h1 + h1 * z.muMid)) / (h3 * z.muMid + h2 * z.muTop + h1 * z.muMid * z.muTop))*(z.distRX-z.distLX) + z.distLX;
+
+  }
+
+  function fluid3LineXOut(y) {
+
+    return ((z.muMid * (((z.distBY-y)/(z.distBY-z.distTY)) - h1 - h2) + z.muTop * (h2 + h1 * z.muMid)) / (h3 * z.muMid + h2 * z.muTop + h1 * z.muMid * z.muTop))*(z.distRX-z.distLX) + z.distLX;
+
+  }
+
+  for (let j1 = z.distBY - (z.distBY - (z.distTY+((z.distBY-z.distTY)*(z.hTop+z.hMid)))) / divide ; j1 - 1 > (z.distTY+((z.distBY-z.distTY)*(z.hTop+z.hMid))); j1 -= (z.distBY - (z.distTY+((z.distBY-z.distTY)*(z.hTop+z.hMid)))) / divide) {
     
     stroke('black');
-    strokeWeight(5);
-    line(z.distLX, jj, z.distRX, jj);
-    triangle(z.distRX - 20, jj+7, z.distRX - 20 , jj-7, z.distRX, jj);
+    strokeWeight(3);
+    line(z.distLX, j1, fluid1LineXOut(j1), j1);
+    noStroke();
+    triangle(fluid1LineXOut(j1) - 25, j1+10, fluid1LineXOut(j1) - 25 , j1-10, fluid1LineXOut(j1), j1);
   }
-  */
+  
+  for (let j2 = (z.distTY+((z.distBY-z.distTY)*(z.hTop+z.hMid))); j2 - 1 > (z.distTY+((z.distBY-z.distTY)*(z.hTop))); j2 -= ((z.distTY+((z.distBY-z.distTY)*(z.hTop+z.hMid))) - (z.distTY+((z.distBY-z.distTY)*(z.hTop)))) / divide2) {
+    
+    stroke('black');
+    strokeWeight(3);
+    line(z.distLX, j2, fluid2LineXOut(j2), j2);
+    noStroke();
+    triangle(fluid2LineXOut(j2) - 25, j2+10, fluid2LineXOut(j2) - 25 , j2-10, fluid2LineXOut(j2), j2);
+  }
+
+  for (let j3 = (z.distTY+((z.distBY-z.distTY)*(z.hTop))); j3 + 1 > z.distTY; j3 -= ((z.distTY+((z.distBY-z.distTY)*(z.hTop))) - z.distTY) / divide3) {
+    
+    stroke('black');
+    strokeWeight(3);
+    line(z.distLX, j3, fluid3LineXOut(j3), j3);
+    noStroke();
+    triangle(fluid3LineXOut(j3) - 25, j3+10, fluid3LineXOut(j3) - 25 , j3-10, fluid3LineXOut(j3), j3);
+  }
  
   push();
   textAlign(CENTER);

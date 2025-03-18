@@ -36,6 +36,8 @@ window.z = {
   centerYMid: 0,
   centerXBot: 0,
   centerYBot: 0,
+  h3Actual: 0,
+  h2Actual: 0,
 
   //line on the distribution graph points
   distLineX23: 0,
@@ -68,8 +70,9 @@ window.z = {
   heightX12: 0,
   heightX23: 0,
 
-  particles: 50,
-  //playing: false,
+  //arrows
+  
+  
 }
 
 // Load the other scripts (except calcs.js, which is imported in draw.js).

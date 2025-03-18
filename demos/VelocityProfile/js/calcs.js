@@ -7,15 +7,21 @@
 
 export function calcAll() {
 
+  
+  
+  
+
   //for simplier variables
+  z.hBot = 1 - z.hTop - z.hMid;
   let h3 = z.hTop;
   let h2 = z.hMid;
   let h1 = z.hBot;
-  z.h3Max = 0.99-z.hMid;
-  z.h2Max = 0.99-z.hTop;
+  
+  
+  
 
   /*
-  The origional base line equations to graph:
+  The original base line equations to graph:
 
   Line spanning fluid 1 (bottom fluid):
   y = (x*(h3*muMid + h2*muTop + h1*muMid*muTop))/(muMid*muTop)
@@ -62,7 +68,7 @@ export function calcAll() {
   }
 
   //dist graph fluid height ratios
-  z.hBot = 1 - z.hTop - z.hMid;
+  
 
   z.centerYTop = -((z.distBY - z.distTY) * z.hBot) - ((z.distBY - z.distTY) * z.hMid) - ((z.distBY - z.distTY) * z.hTop / 2) + z.distBY;
   z.centerYMid = -((z.distBY - z.distTY) * z.hBot) - ((z.distBY - z.distTY) * z.hMid / 2) + z.distBY;
