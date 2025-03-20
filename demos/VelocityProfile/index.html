@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Update everything below THIS -->
-  <meta name="description" content="A simulation template for LearnChemE.com">
+  <meta name="description" content="A simulation of three immiscible, incompressible fluids in laminar flow. The fluids are layered vertically and subjected to steady-state Couette flow.">
   <meta name="keywords" content="simulation, engineering, interactive">
   <meta name="author" content="Jackson Dunlap">
 
@@ -50,49 +50,25 @@
 </head>
 
 <body>
-
-  <!-- The controls-area is at the top of the simulation, and contains all buttons, sliders, and dropdowns -->
   <div class="controls-area">
     <div class="inputs">
       <div class="input-area" id="display-selection">
         <div id="selection-row">Display:</div>
 
-        <!-- <div class="btn-group" role="group" id="plot-type">
-          <input type="radio" class="btn-check" name="plot" id="velocity-distribution" value="velocity-distribution" autocomplete="off" checked>
-          <label class="btn btn-outline-primary" for="velocity-distribution">Velocity Distribution</label>
-       
-          <input type="radio" class="btn-check" name="plot" id="velocity-vs-height" value="velocity-vs-height" autocomplete="off">
-          <label class="btn btn-outline-primary" for="velocity-vs-height">Velocity vs Height</label>
-        </div>-->
-
-
-
-
-        <!--<div class="btn-group">
-        <button class="btn btn-primary btn-primary" data-bs-toggle="button" aria-pressed="true" autocomplete="off">Velocity Distribution</button>
-        <button class="btn btn-primary btn-primary" data-bs-toggle="button" aria-pressed="false" autocomplete="off">Velocity vs Height</button>
-        </div>-->
-
         <select id="selection">
           <option value="velocity-distribution">Velocity Distribution</option>
           <option value="velocity-vs-height">Velocity vs Height</option>
         </select>
-
-
-        <!--<div class="play-pause-area">
-          <button class="btn-sm btn-success" id="play">&#9654;</button>
-          <button class="btn-sm btn-danger" id="pause"><div>&#8214;</div></button>
-        </div>-->
       </div>
 
       <div class="input-area" id="sliders-area-1">
         <div class="data-name"><b>Fluid Height:</b> <span style="color:rgb(137, 63, 145);">\(h_3\) (top)</span></div>
-        <input type="range" id="height-slider3" min="0.01" max="0.98" step="0.01" value="0.34">
+        <input type="range" id="height-slider-3" min="0.01" max="0.65" step="0.01" value="0.34">
         <div class="data-value" id="height-value3">0.34</div>
         <div class="data-metric"></div>
 
         <div class="data-name"><b>Viscosities:</b> <span style="color:rgb(137, 63, 145);">\(\mu_3\) (top)</span></div>
-        <input type="range" id="visco-slider3" min="0.1" max="10" step="0.01" value="0.5">
+        <input type="range" id="visco-slider-3" min="0.1" max="10" step="0.01" value="0.5">
         <div class="data-value" id="visco-value3">0.50</div>
         <div class="data-metric"></div>
       </div>
@@ -106,12 +82,12 @@
 
       <div class="input-area" id="sliders-area-2">
         <div class="data-name"><span style="color:rgb(46, 194, 6);">\(h_2\) (middle)</span></div>
-        <input type="range" id="height-slider2" min="0.01" max="0.98" step="0.01" value="0.33">
+        <input type="range" id="height-slider2" min="0.01" max="0.64" step="0.01" value="0.33">
         <div class="data-value" id="height-value2">0.33</div>
         <div class="data-metric"></div>
 
         <div class="data-name"><span style="color:rgb(46, 194, 6);">\(\mu_2\) (middle)</span></div>
-        <input type="range" id="visco-slider2" min="0.1" max="10" step="0.01" value="1">
+        <input type="range" id="visco-slider-2" min="0.1" max="10" step="0.01" value="1">
         <div class="data-value" id="visco-value2">1.00</div>
         <div class="data-metric"></div>
 
@@ -121,10 +97,6 @@
 
   <div id="p5-container"></div>
 
-  <!--
-    Everything below here are modals, which are hidden by default. Any content
-    within the modals should be wrapped in a div with the class "modal-content".
-  -->
   <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -134,7 +106,7 @@
         </div>
         <div class="modal-body">
           <p>
-            This Demonstration shows the behavior of three immiscible, incompressible fluids in laminar flow. The fluids are layered vertically and subjected to steady-state Couette flow; the top plate moves to the right at a constant velocity, and the bottom plate
+            This simulation shows the behavior of three immiscible, incompressible fluids in laminar flow. The fluids are layered vertically and subjected to steady-state Couette flow; the top plate moves to the right at a constant velocity, and the bottom plate
             is stationary. At each height, the black arrow is proportional to the velocity of the fluid at that height. You can change the viscosities and heights of fluids 2 and 3 with sliders. The velocity distribution shows the impact of fluid viscosity
             on the fluid's velocity gradient. The velocity versus height plot indicates the relative slopes (or velocity gradients) in each fluid. All numbers are dimensionless.
           </p>
@@ -206,7 +178,6 @@
           </p>
           <p>
             <ol class="references">
-              <!-- This is the main citation from the original simulation, the Permanent Citation from that Page has not been included but may need to be.-->
               <li>
                 B. R. Munson, T. H. Okiishi, and W. W. Huebsch, Fundamentals of Fluid Mechanics, 6th ed., Hoboken, NJ: John Wiley & Sons, 2010.
               </li>
@@ -226,15 +197,11 @@
         </div>
         <div class="modal-body">
           <p>
-            This digital experiment was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
-            Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
-            href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Jackson Dunlap
-            under the direction of Professor John L. Falconer and Michelle Medlin. It is a JavaScript/HTML5 
-            implementation of a Mathematica simulation by Duncan Chadly, Michael Wrobel, Terra Salamida, and Rachael L. Baumann. It can be downloaded 
-            <a href="https://learncheme.com/wp-content/uploads/simulation-files/downloads/velocity-profile-for-immiscible-viscous-fluids.cdf">here</a>.  
-            It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. 
-            Address any questions or comments to LearnChemE@gmail.com.  
-            
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+            Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Jackson Dunlap under the direction of Professor John L. Falconer and Michelle Medlin,
+            with the assistance of Neil Hendren and Drew Smith. It is a JavaScript/HTML5 implementation of a Mathematica simulation by Duncan Chadly, Michael Wrobel, Terra Salamida, and Rachael L. Baumann. It can be downloaded
+            <a href="https://learncheme.com/wp-content/uploads/simulation-files/downloads/velocity-profile-for-immiscible-viscous-fluids.cdf">here</a>. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988).
+            Address any questions or comments to LearnChemE@gmail.com.
           </p>
         </div>
       </div>
