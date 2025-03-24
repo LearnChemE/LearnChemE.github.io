@@ -160,7 +160,7 @@ export default function sketch(p: P5CanvasInstance) {
     ];
 
     p.push();
-    blueFillPath.drawPath(p,time);
+    // blueFillPath.drawPath(p,time); // debug
     p.translate(124,25);
     var numVert = blueFillPath.findPreviousVertex(time);
 
@@ -229,7 +229,7 @@ export default function sketch(p: P5CanvasInstance) {
     ];
 
     p.push();
-    orngFillPath.drawPath(p,time);
+    // orngFillPath.drawPath(p,time); // debug
     var numVert = orngFillPath.findPreviousVertex(time);
 
     var n = Math.floor(numVert / 2) + 1;
@@ -260,7 +260,7 @@ export default function sketch(p: P5CanvasInstance) {
       p.endShape();
     }
 
-    console.log(orngFillPath.normDist);
+    // console.log(orngFillPath.normDist);
 
     const segmentTimes = orngFillPath.normDist;
     const aniTime = 3;
