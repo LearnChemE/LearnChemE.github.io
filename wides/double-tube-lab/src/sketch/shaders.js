@@ -81,18 +81,20 @@ void main() {
     // Get squared distance from water center
     float dist2 = dif.x*dif.x + .5*dif.y*dif.y;
     // Distort distance by a sinusoid based on th
-    dist2 += 400.0 * cos(5.0 * th + 0.01 * time);
-    dist2 += 400.0 * cos(3.0 * th + 0.01 * time);
+    dist2 += 400.0 * cos(5.0 * th + 10.0 * time);
+    dist2 += 400.0 * cos(3.0 * th + 10.0 * time);
     // vec4 col = vec4(0.2941, 0.5137, 1.0, 0.7019);
     vec4 col = vVertexColor;
     // Water based on distance
     bool wet = dist2 < r2;
     if (!flipx) 
-      wet = wet || pos.x > vWaterPos.x + dif.y;
+      wet = wet || (pos.x > vWaterPos.x && pos.y > vWaterPos.y - 30.0);
     else 
-      wet = wet || pos.x < vWaterPos.x - dif.y;
+      wet = wet || (pos.x < vWaterPos.x && pos.y > vWaterPos.y - 30.0);
 
-    // if (!wet) col = vec4(0);
+    wet = wet || pos.y > vWaterPos.y + 50.0;
+
+    if (!wet) col = vec4(0);
     // If p5.js has one hater, I am that hater
     gl_FragColor = col;//pow(col,vec4(1.25,1.25,1.25,1.0));
 }

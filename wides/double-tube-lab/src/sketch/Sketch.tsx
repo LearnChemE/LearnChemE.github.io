@@ -108,7 +108,7 @@ export default function sketch(p: P5CanvasInstance) {
     fillingAnimation.createSegment(0, TubeFill, 1, vertices, g.blueFluidColor);
 
     // Vertices for orange path
-    vertices = [[600,323],[200,323],[200,254],[600,254],[600,190],[200,190],[200,125],[600,125],];
+    vertices = [[600,125],[200,125],[200,190],[600,190],[600,254],[200,254],[200,323],[600,323],];
     // HexFill for orange filling
     fillingAnimation.createSegment(1, HexFill, 3, vertices, drawOrngFillLong, (p:P5CanvasInstance)=>{p.image(dto,149,25)});
     // Vertices for blue path
@@ -225,7 +225,7 @@ export default function sketch(p: P5CanvasInstance) {
     orngFillPath.drawPath(p,time);
     var numVert = orngFillPath.findPreviousVertex(time);
 
-    var n = v.length;
+    var n = Math.floor(numVert / 2) + 1;
 
     // Already full
     p.noStroke();
@@ -235,7 +235,7 @@ export default function sketch(p: P5CanvasInstance) {
 
     let pos = orngFillPath.calculatePosition(time);
     let d = Math.floor(numVert/2) % 2;
-    pos = [pos[0]-50, pos[1]+50];
+    pos = [pos[0]+75, pos[1]+75];
     orngShader.setUniform('waterPos',pos);
     orngShader.setUniform('time',time);
     orngShader.setUniform("flipx", Boolean(d));
@@ -257,9 +257,9 @@ export default function sketch(p: P5CanvasInstance) {
 
     const segmentTimes = orngFillPath.normDist;
     const aniTime = 3;
-    drawArc(p,199,288,false, normAniTime(time,aniTime * segmentTimes[1],aniTime * segmentTimes[2]));
+    drawArc(p,199,156,false, normAniTime(time,aniTime * segmentTimes[1],aniTime * segmentTimes[2]));
     drawArc(p,600,222,true , normAniTime(time,aniTime * segmentTimes[3],aniTime * segmentTimes[4]));
-    drawArc(p,199,156,false, normAniTime(time,aniTime * segmentTimes[5],aniTime * segmentTimes[6]));
+    drawArc(p,199,288,false, normAniTime(time,aniTime * segmentTimes[5],aniTime * segmentTimes[6]));
 
     p.pop();
 
@@ -277,9 +277,6 @@ function normAniTime(time: number, start: number, end: number) {
 }
 
 function drawArc(p:P5CanvasInstance,x:number, y:number,flip=false, ratio: number) {
-  if (ratio < 0) ratio = 0;
-  if (ratio > 1) ratio = 1;
-
   p.push();
   p.noFill();
   p.stroke(g.orangeFluidColor);
@@ -287,9 +284,9 @@ function drawArc(p:P5CanvasInstance,x:number, y:number,flip=false, ratio: number
   p.strokeCap(p.SQUARE);
 
   if (!flip)
-    p.arc(x,y , 67,67 , p.HALF_PI, p.PI + ratio * p.HALF_PI);
+    p.arc(x,y , 67,67 , p.HALF_PI + (1 - ratio) * p.PI, p.HALF_PI + p.PI);
   else
-    p.arc(x,y , 67,67 ,p.HALF_PI - ratio * p.PI,  p.HALF_PI);
+    p.arc(x,y , 67,67 ,-p.HALF_PI, -p.HALF_PI + ratio * p.PI);
 
   p.pop();
 }
