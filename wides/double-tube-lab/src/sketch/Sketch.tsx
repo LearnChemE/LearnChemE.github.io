@@ -101,10 +101,10 @@ export default function sketch(p: P5CanvasInstance) {
 
     // Inlet tubes
     // Orange
-    var vertices = [[659, 430],[659, 125],[602, 125]];
+    var vertices = [[659, 430],[659, 125],[600, 125]];
     fillingAnimation.createSegment(0, TubeFill, 1, vertices, g.orangeFluidColor);
     // Blue
-    vertices = [[284, 450],[284, 399],[550, 399],[550, 379]];
+    vertices = [[284, 450],[284, 399],[550, 399],[550, 375]];
     fillingAnimation.createSegment(0, TubeFill, 1, vertices, g.blueFluidColor);
 
     // Vertices for orange path
@@ -116,6 +116,13 @@ export default function sketch(p: P5CanvasInstance) {
     // HexFill for blue filling
     fillingAnimation.createSegment(1, HexFill, 3, vertices, drawBlueFillLong, (p:P5CanvasInstance)=>{p.image(dtb,150,25)});
 
+    // Outlet Tubes
+    // Orange
+    var vertices = [[602, 322],[622,322],[622,433],[459,433],[459,603]];
+    fillingAnimation.createSegment(4, TubeFill, 1, vertices, g.orangeFluidColor);
+    // Blue
+    vertices = [[550, 72],[550, 46],[93,46],[93,603]];
+    fillingAnimation.createSegment(4, TubeFill, 1, vertices, g.blueFluidColor);
   };
 
   p.draw = () => {
