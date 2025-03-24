@@ -9,6 +9,7 @@ import {
   MAX_COLD_FLOWRATE,
   MIN_COLD_FLOWRATE,
 } from "./Functions.tsx";
+import { AnimationFactory } from "../types/animation.tsx";
 
 export const V1CX = 284;
 export const V1CY = 432;
@@ -29,7 +30,8 @@ export default function drawAll(
   dto: P5CanvasInstance,
   dtb: P5CanvasInstance,
   inTubes: P5CanvasInstance,
-  outTubes: P5CanvasInstance
+  outTubes: P5CanvasInstance,
+  fillingAnimation: AnimationFactory
 ) {
   let to, tb;
   to = g.orngTime == -1 ? 0 : (p.millis() - g.orngTime) / 1000;
@@ -52,12 +54,13 @@ export default function drawAll(
   // Tube and Beaker Outlines
   p.image(bt, 0, 0);
   // Tube Fills
-  fillAnimationTubes(to, p, inTubes, outTubes);
+  // fillAnimationTubes(to, p, inTubes, outTubes);
   // Apparatus
   p.image(dt, 149, 25);
   // Apparatus Fill
-  fillAnimationOrange(to, 124, 25, p, dto);
-  fillAnimationBlue(tb, 124, 25, p, dtb);
+  // fillAnimationOrange(to, 124, 25, p, dto);
+  // fillAnimationBlue(tb, 124, 25, p, dtb);
+  fillingAnimation.draw(p, tb);
 
   // Valves
   drag(p);
