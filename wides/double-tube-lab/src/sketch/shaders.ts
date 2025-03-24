@@ -100,8 +100,7 @@ void main() {
 }
 `;
 
-export const checkShaderError = (shaderObj, shaderText) => {
-    console.log(shaderObj)
+export const checkShaderError = (shaderObj:any, shaderText:string) => {
     var gl = shaderObj._renderer.GL;
     var glFragShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(glFragShader, shaderText);

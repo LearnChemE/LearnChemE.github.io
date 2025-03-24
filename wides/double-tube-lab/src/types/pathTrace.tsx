@@ -1,5 +1,4 @@
 import { P5CanvasInstance } from "@p5-wrapper/react";
-import { Type } from "typescript";
 
 export class PathTrace
 {

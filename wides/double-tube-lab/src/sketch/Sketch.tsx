@@ -4,7 +4,7 @@ import { P5CanvasInstance } from "@p5-wrapper/react";
 import { calcHeatTransferRate, randStartVals } from "./Functions.tsx";
 import drawAll, { V1CX, V1CY, V2CX, V2CY } from "./Draw.tsx";
 import { AnimationFactory, HexFill, PathTrace, TubeFill } from "../types";
-import { fillVertShaderSource, blueFragShaderSource, orngFragShaderSource } from "./shaders.js";
+import { fillVertShaderSource, blueFragShaderSource, orngFragShaderSource } from "./shaders.ts";
 
 // Globals defined here
 export const g = {
@@ -67,8 +67,6 @@ export default function sketch(p: P5CanvasInstance) {
   let v: P5CanvasInstance;
   let pa: P5CanvasInstance;
 
-  let inTubes: P5CanvasInstance;
-  let outTubes: P5CanvasInstance;
   var tubes: P5CanvasInstance;
 
   var fillingAnimation: AnimationFactory;
@@ -83,9 +81,6 @@ export default function sketch(p: P5CanvasInstance) {
     dto = Graphics.doubleTubeOrng(500, 400, 50, 450, 50, p);
     v = Graphics.valve(p);
     pa = Graphics.pumpAssembly(p);
-
-    inTubes  = Graphics. inTubeFill(p);
-    outTubes =Graphics.outTubeFill(p);
   };
 
   p.setup = () => {
@@ -129,7 +124,7 @@ export default function sketch(p: P5CanvasInstance) {
     p.background(250);
     p.translate(-g.width/2, -g.height/2);
     calcHeatTransferRate();
-    drawAll(p, dt, bt, pa, v, dto, dtb, inTubes, outTubes, fillingAnimation);
+    drawAll(p, dt, bt, pa, v, fillingAnimation);
   };
 
   p.mousePressed = () => {

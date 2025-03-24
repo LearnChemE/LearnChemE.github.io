@@ -1,5 +1,5 @@
 import { g } from "./Sketch";
-import Graphics, { displayValve, valve } from "./Graphics";
+import Graphics, { valve } from "./Graphics";
 import { P5CanvasInstance } from "@p5-wrapper/react";
 import { singleBeakerGraphics } from "./Graphics";
 import {
@@ -12,7 +12,7 @@ import {
   singleBeakerCalculations,
 } from "./Functions";
 import { AnimationFactory, HexFill, PathTrace, TubeFill } from "../types";
-import { fillVertShaderSource, blueFragShaderSource, orngFragShaderSource } from "./shaders.js";
+import { fillVertShaderSource, blueFragShaderSource, orngFragShaderSource } from "./shaders.ts";
 
 const NOT_STARTED = -1;
 const START_ON_RENDER = -2;
@@ -376,19 +376,6 @@ function fillSingleOutletTubes(p: P5CanvasInstance, alpha = 200) {
   p.rect(395,  40, 25,  10);
   p.rect(420,  40, 10,  35);
   p.pop();
-}
-
-function hexCartridgeFillAnimation(
-  p: P5CanvasInstance,
-  timer: number,
-  dto: any,
-  dtb: any
-) {
-  let partOrng = dto.get(0, 0, 500, timer + 10);
-  p.image(partOrng, 25, 25);
-
-  let partBlue = dtb.get(0, 450 - timer, 500, 50 + timer);
-  p.image(partBlue, 25, 475 - timer);
 }
 
 // Apply overlay to canvas that makes it look like you are pinching the tube

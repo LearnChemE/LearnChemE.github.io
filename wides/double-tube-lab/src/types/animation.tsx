@@ -31,7 +31,6 @@ export class HexFill implements AnimationSegment
             this.postAnimationCallback?.(p);
         }
         else {
-            let fillPathNum = this.fillPath.findPreviousVertex(time);
             this.animationCallback(p, time, this.fillPath);
         }
     }
