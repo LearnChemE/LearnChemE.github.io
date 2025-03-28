@@ -13,7 +13,13 @@ window.state = {
   pixelDensity: 4,
   showButtons: false,
   hamburgerHasBeenClicked: window.localStorage.getItem("hamburgerHasBeenClicked") === "true",
-  pressureControllers: []
+  pump: {
+    x: 32,
+    y: 70,
+    scaleX: 0.8,
+    scaleY: 0.8,
+    on: false,
+  }
 };
 
 const containerElement = document.getElementById("p5-container");
