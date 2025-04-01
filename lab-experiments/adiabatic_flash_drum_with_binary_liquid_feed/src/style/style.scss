@@ -7,7 +7,7 @@ $modal-xl: 1140px;
 #graphics-container {
   position: relative;
   margin: auto;
-  margin-top: 20px;
+  margin-top: 10px;
   background-color: rgb(250, 250, 250);
   border: 1px solid black;
   border-radius: 5px;
@@ -19,8 +19,8 @@ $modal-xl: 1140px;
   position: relative;
   margin: auto;
   width: calc(100vw - 40px);
-  max-width: calc(calc(100vh - 20px) * 150 / 100);
-  height: calc(calc(100vw - 40px) * 100 / 150);
+  max-width: calc(calc(100vh - 20px) * 150 / 115);
+  height: calc(calc(100vw - 40px) * 115 / 150);
   max-height: calc(100vh - 20px);
 }
 
