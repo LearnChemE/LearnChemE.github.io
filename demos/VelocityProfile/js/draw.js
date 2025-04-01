@@ -249,7 +249,7 @@ function drawAxesLablesDist() {
   textSize(28);
   translate(z.graphCenterX - z.graphCenterX * 49 / 64, z.graphCenterY);
   rotate(HALF_PI * 3);
-  text('Fraction of Fluid Height', 0, 0);
+  text('fraction of fluid height', 0, 0);
   pop();
 
 
@@ -268,8 +268,8 @@ function drawAxesLablesDist() {
   noStroke();
   fill("White");
   textSize(32);
-  text(`Moving Plate Velocity vs Height`, z.graphCenterX, (z.graphCenterY - 240 - 13));
-  text(`Stationary Plate`, z.graphCenterX, (z.graphCenterY + 275));
+  text(`moving plate`, z.graphCenterX, (z.graphCenterY - 240 - 13));
+  text(`stationary plate`, z.graphCenterX, (z.graphCenterY + 275));
 
   push();
   textAlign(CENTER);
@@ -277,7 +277,7 @@ function drawAxesLablesDist() {
   strokeWeight(0.2);
   fill("Black");
   textSize(28);
-  text('Fluid Velocity', z.graphCenterX, z.distBY + 120);
+  text('fluid velocity', z.graphCenterX, z.distBY + 120);
   pop();
 
   pop();
@@ -358,7 +358,7 @@ function drawAxesLablesHeight() {
   textSize(28);
   translate(z.graphCenterX - z.graphCenterX * 49 / 64, z.graphCenterY);
   rotate(HALF_PI * 3);
-  text('Fluid Velocity', 0, 0);
+  text('fluid velocity', 0, 0);
   pop();
 
   push();
@@ -367,7 +367,7 @@ function drawAxesLablesHeight() {
   strokeWeight(0.2);
   fill("Black");
   textSize(28);
-  text('Fraction of Fluid Height', z.graphCenterX, z.heightBY + 70);
+  text('fraction of fluid height', z.graphCenterX, z.heightBY + 70);
   pop();
 
   pop();
