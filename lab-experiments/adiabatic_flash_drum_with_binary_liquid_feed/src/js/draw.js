@@ -634,32 +634,32 @@ function drawVaporOutletPipe() {
   push();
   let vertices;
   translate(20, -30);
-  rect(0, -1, 1, 5);
-  rect(1, 0, 40, 3);
-  strokeWeight(0.05);
-  for (let i = 0; i < 3; i++) {
-    rect(1, -0.6725 + i * 1.8725, 0.5);
-  }
+  // rect(0, -1, 1, 5);
+  // rect(1, 0, 40, 3);
+  // strokeWeight(0.05);
+  // for (let i = 0; i < 3; i++) {
+  //   rect(1, -0.6725 + i * 1.8725, 0.5);
+  // }
   strokeWeight(0.1);
   translate(20, 1.5);
   push();
   fill("rgb(200, 200, 200)");
   stroke("rgb(40, 40, 40)");
-  rect(-1.5, -5, 3, -7);
+  // rect(-1.5, -5, 3, -7);
   translate(-15, -13);
-  rect(-13, -1.5, 27, 3);
+  rect(-13, -1.5, 52, 3);
   push();
   translate(12, 0);
-  beginShape();
-  vertex(0, -1.75);
-  for (let i = 90; i >= 0; i -= 10) {
-    const x = 1.75 + 3 * cos(radians(i));
-    const y = 1.75 - 3.5 * sin(radians(i));
-    vertex(x, y);
-  }
-  vertex(4.75, 3);
-  vertex(1.25, 3);
-  endShape(CLOSE);
+  // beginShape();
+  // vertex(0, -1.75);
+  // for (let i = 90; i >= 0; i -= 10) {
+  //   const x = 1.75 + 3 * cos(radians(i));
+  //   const y = 1.75 - 3.5 * sin(radians(i));
+  //   vertex(x, y);
+  // }
+  // vertex(4.75, 3);
+  // vertex(1.25, 3);
+  // endShape(CLOSE);
   translate(-24, 0);
   beginShape();
   vertex(0, -1.75);
@@ -677,48 +677,48 @@ function drawVaporOutletPipe() {
   rect(0, -2, 1, 4);
   rect(-4.75, 2.5, 4, 1);
   pop();
-  rect(12, -2, 1, 4);
-  rect(13, 2, 4, 1);
+  // rect(12, -2, 1, 4);
+  // rect(13, 2, 4, 1);
   pop();
   push();
-  fill("rgb(150, 150, 40)");
-  stroke("rgb(100, 100, 40)");
-  beginShape();
-  vertices = [
-    [-5, -2.5],
-    [-5, 2.5],
-    [-4, 2.5],
-    [-4, 2],
-    [0, 1.75],
-    [4, 2],
-    [4, 2.5],
-    [5, 2.5],
-    [5, -2.5],
-    [4, -2.5],
-    [4, -2],
-    [2, -2.25],
-    [2, -4],
-    [2.5, -4],
-    [2.5, -5],
-    [-2.5, -5],
-    [-2.5, -4],
-    [-2, -4],
-    [-2, -2.25],
-    [-4, -2],
-    [-4, -2.5],
-  ];
+  // fill("rgb(150, 150, 40)");
+  // stroke("rgb(100, 100, 40)");
+  // beginShape();
+  // vertices = [
+  //   [-5, -2.5],
+  //   [-5, 2.5],
+  //   [-4, 2.5],
+  //   [-4, 2],
+  //   [0, 1.75],
+  //   [4, 2],
+  //   [4, 2.5],
+  //   [5, 2.5],
+  //   [5, -2.5],
+  //   [4, -2.5],
+  //   [4, -2],
+  //   [2, -2.25],
+  //   [2, -4],
+  //   [2.5, -4],
+  //   [2.5, -5],
+  //   [-2.5, -5],
+  //   [-2.5, -4],
+  //   [-2, -4],
+  //   [-2, -2.25],
+  //   [-4, -2],
+  //   [-4, -2.5],
+  // ];
 
-  vertices.forEach(coord => vertex(coord[0], coord[1]));
-  endShape(CLOSE);
+  // vertices.forEach(coord => vertex(coord[0], coord[1]));
+  // endShape(CLOSE);
 
-  fill("rgb(200, 200, 200)");
-  stroke("rgb(150, 150, 150)");
-  strokeWeight(0.05);
-  rect(-0.5, 2, 1, 3);
+  // fill("rgb(200, 200, 200)");
+  // stroke("rgb(150, 150, 150)");
+  // strokeWeight(0.05);
+  // rect(-0.5, 2, 1, 3);
 
-  fill("rgb(40, 40, 40)");
-  stroke("rgb(20, 20, 20)");
-  rect(-3, 5, 6, 1);
+  // fill("rgb(40, 40, 40)");
+  // stroke("rgb(20, 20, 20)");
+  // rect(-3, 5, 6, 1);
 
   translate(-15, -13);
 
