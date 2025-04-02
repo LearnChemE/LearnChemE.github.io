@@ -41,6 +41,8 @@ window.state = {
   mF: 0,
   massFlowRateUnits: "g/s",
   temperatureUnits: "C",
+  pressureUnits: "atm",
+  mousePressedFrameModulus: 0,
 };
 
 const containerElement = document.getElementById("p5-container");

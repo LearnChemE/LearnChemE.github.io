@@ -1,6 +1,7 @@
 function drawPump(x, y, scaleX, scaleY) {
   push();
   translate(x, y);
+  translate(0, 19);
   scale(scaleX, scaleY);
   const pumpColor = "rgb(180, 180, 255)";
   const pumpStroke = "rgb(140, 140, 225)";
@@ -125,15 +126,15 @@ function drawPump(x, y, scaleX, scaleY) {
 
   beginShape();
   vertex(30.5, 0);
-  quadraticVertex(33, 0, 35, 2);
-  quadraticVertex(40, 8, 35, 15);
-  quadraticVertex(31, 20, 20, 18);
+  quadraticVertex(33, 0, 35, -2);
+  quadraticVertex(40, -8, 35, -15);
+  quadraticVertex(31, -20, 20, -18);
   endShape();
 
   strokeWeight(0.1);
   const mX = mouseX / relativeSize();
   const mY = mouseY / relativeSize();
-  if (mX > 16.5 + x - 7.5 && mX < 16.5 + x + 7.5 && mY > 31 + y - 5 && mY < 31 + y + 2.75) {
+  if (mX > 16.5 + x - 7.5 && mX < 16.5 + x + 7.5 && mY > 19.5 + y - 5 && mY < 19.5 + y + 2.75) {
     stroke("rgb(140, 140, 40)");
     strokeWeight(0.2);
   } else {
@@ -141,7 +142,7 @@ function drawPump(x, y, scaleX, scaleY) {
   }
   push();
   fill("rgb(80, 80, 80)");
-  translate(16.5, 18.75);
+  translate(16.5, -18.75);
   if (state.pump.on) {
     rotate(-12 * PI / 32);
   } else {
@@ -151,20 +152,21 @@ function drawPump(x, y, scaleX, scaleY) {
   pop();
   fill("rgb(60, 60, 60)");
   rectMode(CENTER, CENTER);
-  rect(16.5, 16, 8, 1.5, 0.5);
-  rect(16.5, 18.75, 13, 5.5, 1);
+  rect(16.5, -21.5, 8, 1.5, 0.5);
+  rect(16.5, -18.75, 13, 5.5, 1);
   stroke("rgb(150, 150, 150)");
   strokeWeight(0.05);
   fill("white");
   textSize(2.5);
   textAlign(CENTER, CENTER);
-  text("off    on", 16.5, 18.75);
+  text("off    on", 16.5, -18.75);
   pop();
 }
 
 function drawInletPipe() {
   push();
   translate(state.pump.x, state.pump.y);
+  translate(0, 19);
   stroke("rgb(40, 40, 40)");
   strokeWeight(0.1);
   fill("rgb(200, 200, 200)");
@@ -175,13 +177,14 @@ function drawInletPipe() {
     rect(-3.75, -2.75 + i * (27 / 16), 0.5);
   }
   strokeWeight(0.1);
-  rect(-1, -9.375, 4, -8);
+  rect(-1, -9.375, 4, -27);
   rect(-2.8725, -9.375, 7.75, 0.5);
   strokeWeight(0.05);
   for (let i = 0; i < 4; i++) {
     rect(-1.8725 + i * (33 / 16), -9.375, -0.5);
   }
   strokeWeight(0.1);
+  translate(0, -19);
   beginShape();
   for (let i = 0; i <= 90; i += 10) {
     const x = 3 - 4 * cos(radians(i));
@@ -206,7 +209,7 @@ function drawInletPipe() {
   for (let i = 0; i < 4; i++) {
     rect(44, -23.5 + i * (15 / 8), 0.5);
   }
-  translate(-20, 0);
+  translate(-20, 19);
   strokeWeight(0.1);
   beginShape();
   vertex(-1, 2);
@@ -231,6 +234,8 @@ function drawInletPipe() {
   for (let i = 0; i < 4; i++) {
     rect(-6.75 + i * 1.6725, -24, 0.5);
   }
+  strokeWeight(0.1);
+  rect(5.5, -24.75, 3, 33);
   pop();
 }
 
@@ -243,28 +248,57 @@ function drawHeatExchanger() {
   stroke(0);
   strokeWeight(0.05);
   translate(-6, -12);
-  rect(-6, -12, 12, 12, 2);
+  rect(-6.5, -12, 15, 12, 2);
   fill(20);
-  rect(-5, -10, 10, 4);
-  fill("rgb(255, 20, 20)");
+  rect(-5, -10, 12.5, 4);
   const mX = mouseX / relativeSize();
   const mY = mouseY / relativeSize();
-  if (mX > 61 && mX < 67 && mY < 49.75 && mY > 46.75) {
+  if (mX > 61 - 2.5 && mX < 67 - 2.5 && mY < 49.75 && mY > 46.75) {
     fill("rgb(255, 50, 50)");
+  } else {
+    fill("rgb(255, 20, 20)");
   }
-  rect(-3, -4.5, 6, 3, 0.25);
+  rect(-3 - 2.5, -4.5, 6, 3, 0.25);
+
+  if (mX > 61 + 4 && mX < 64 + 4 && mY < 49.75 && mY > 46.75) {
+    fill("rgb(255, 50, 50)");
+    if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
+      state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T - 1, 100, 300) : constrain(state.heatExchanger.T - 5 / 9, 100, 300);
+    }
+  } else {
+    fill("rgb(255, 20, 20)");
+  }
+  rect(-3 + 4, -4.5, 3, 3, 0.25);
+
+  if (mX > 61 + 7.5 && mX < 64 + 7.5 && mY < 49.75 && mY > 46.75) {
+    fill("rgb(255, 50, 50)");
+    if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
+      state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T + 1, 100, 300) : constrain(state.heatExchanger.T + 5 / 9, 100, 300);
+    }
+  } else {
+    fill("rgb(255, 20, 20)");
+  }
+  rect(-3 + 7.5, -4.5, 3, 3, 0.25);
+
   fill("white");
   noStroke();
   textSize(1.75);
   textAlign(RIGHT, CENTER);
-  text("units", 1.875, -3);
+  text("units", 1.875 - 2.5, -3);
+  push();
+  textSize(3.5);
+  text("▴", 7, -3.1);
+  translate(1.55, -2.8);
+  rotate(PI);
+  text("▴", 0, 0);
+  pop();
   textFont(state.meterFont);
   fill("yellow");
   textSize(3);
   const T = state.temperatureUnits === "C" ? state.heatExchanger.T : state.heatExchanger.T * 9 / 5 + 32;
-  text(`${round(T)}  ${state.temperatureUnits}`, 3.125, -8);
+  text(`${round(T)}  ${state.temperatureUnits}`, 4.125, -8);
   textFont("Arial");
-  text("°", 1.75, -8);
+  text("°", 2.75, -8);
   noFill();
   stroke(0);
   strokeWeight(0.2);
@@ -274,6 +308,13 @@ function drawHeatExchanger() {
   quadraticVertex(0, 6, -1.5, 7);
   quadraticVertex(-3, 7.5, -3, 8);
   endShape();
+  fill("rgb(200, 200, 200)");
+  stroke("rgb(150, 150, 150)");
+  strokeWeight(0.05);
+  rect(1, -12, 0.5, -40);
+  fill("rgb(220, 220, 220)");
+  rect(0.75, -12.5, 1, 0.5);
+  rect(8.5, -8, 0.5, 1);
   pop();
   stroke("rgb(40, 40, 40)");
   strokeWeight(0.1);
@@ -332,7 +373,7 @@ function drawHeatExchanger() {
 
   vertices.forEach(coord => vertex(coord[0], coord[1]));
   endShape(CLOSE);
-  fill("rgb(180, 180, 180)");
+  fill("rgb(200, 200, 200)");
   stroke("rgb(100, 100, 100)");
   translate(5, 2.5);
   strokeWeight(0.05);
@@ -403,7 +444,7 @@ function drawHeatExchanger() {
   endShape(CLOSE);
   rect(2.5, -7, 0.75, 14);
   rect(3.25, -7, 0.75, 14);
-  fill("rgb(180, 180, 180)");
+  fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
   strokeWeight(0.05);
   for (let i = 0; i < 7; i++) {
@@ -422,38 +463,75 @@ function drawHeatExchanger() {
 
   beginShape();
   vertices = [
-    [0, -1],
-    [0.5, -1],
-    [0.5, -0.75],
-    [1.75, -0.75],
-    [2, -0.5],
+    [0, 1],
+    [0.5, 1],
+    [0.5, 0.75],
+    [1.75, 0.75],
     [2, 0.5],
-    [2.25, 0.5],
-    [2.25, 1],
-    [1, 1],
-    [1, 0.5],
-    [1.25, 0.5],
+    [2, -0.5],
+    [2.25, -0.5],
+    [2.25, -1],
+    [1, -1],
+    [1, -0.5],
+    [1.25, -0.5],
     [1.25, 0],
     [0.5, 0],
-    [0.5, 0.25],
-    [0, 0.25],
+    [0.5, -0.25],
+    [0, -0.25],
   ];
 
   vertices.forEach(coord => vertex(coord[0], coord[1]));
 
   endShape(CLOSE);
 
-  fill("rgb(180, 180, 180)");
+  fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
-  rect(1.625 - 0.25, 1, 0.5, 10);
+  rect(1.625 - 0.25, -1, 0.5, -60);
   fill("rgb(220, 220, 220)")
-  rect(1.625 - 0.375, 1, 0.75, 0.325);
+  rect(1.625 - 0.375, -1.25, 0.75, 0.325);
+
+  push();
+  translate(1.25, -61);
+  rotate(-PI / 2);
+  fill("rgb(150, 150, 40)");
+  stroke("rgb(100, 100, 40)");
+
+  beginShape();
+  vertices = [
+    [0, 1],
+    [0.5, 1],
+    [0.5, 0.75],
+    [1.75, 0.75],
+    [2, 0.5],
+    [2, -0.5],
+    [2.25, -0.5],
+    [2.25, -1],
+    [1, -1],
+    [1, -0.5],
+    [1.25, -0.5],
+    [1.25, 0],
+    [0.5, 0],
+    [0.5, -0.25],
+    [0, -0.25],
+  ];
+
+  vertices.forEach(coord => vertex(coord[0], coord[1]));
+
+  endShape(CLOSE);
+
+  fill("rgb(200, 200, 200)");
+  stroke("rgb(150, 150, 150)");
+  rect(1.3725, -13 - 31 / 32, 0.5, 14 - 31 / 32);
+  fill("rgb(220, 220, 220)");
+  rect(-0.325, 0, 0.325, 0.75);
+  rect(1.25, -1.325, 0.75, 0.325);
+  pop();
 
   fill(0);
   noStroke();
   textSize(2.5);
-  textAlign(RIGHT, CENTER);
-  text("steam in", -22, 6);
+  textAlign(CENTER, CENTER);
+  text("steam in", -19, 9.5);
   stroke(0);
   strokeWeight(0.2);
   line(-19.25, 5, -19.25, 8);
@@ -473,18 +551,20 @@ function drawHeatExchanger() {
 function drawFeedTank() {
   push();
   translate(state.pump.x, state.pump.y);
-  translate(-14, -24.75);
+  translate(-14, -5.75);
   noStroke();
   fill("rgb(200, 200, 255)");
-  const liquidHeight = state.liquidHeight * 38;
+  const liquidHeight = state.liquidHeight * 48;
   rect(-14, -2, 28, -liquidHeight);
   stroke("rgb(40, 40, 40)");
   strokeWeight(0.1);
   fill("rgba(220, 220, 220, 0.2)");
-  rect(-14, -45, 28, 45);
+  rect(-14, -55, 28, 55);
   fill("rgb(200, 200, 200)");
   rect(-15, 0, 30, -2);
-  rect(-15, -46, 30, 2);
+  rect(-15, -56, 30, 2);
+  quad(-11, 0, -9, 0, -12, 32.75, -14, 32.75);
+  quad(11, 0, 9, 0, 12, 32.75, 14, 32.75);
   pop();
 }
 
@@ -516,6 +596,9 @@ function drawFlashDrum() {
   }
   strokeWeight(0.1);
   drawVaporOutletPipe();
+  quad(1, 31, 3, 31, 1, 48, -1, 48);
+  quad(19, 31, 17, 31, 19, 48, 21, 48);
+  rect(9, 31, 2, 17);
   drawLiquidOutletPipe();
   pop();
 }
@@ -628,6 +711,15 @@ function drawVaporOutletPipe() {
   vertices.forEach(coord => vertex(coord[0], coord[1]));
   endShape(CLOSE);
 
+  fill("rgb(200, 200, 200)");
+  stroke("rgb(150, 150, 150)");
+  strokeWeight(0.05);
+  rect(-0.5, 2, 1, 3);
+
+  fill("rgb(40, 40, 40)");
+  stroke("rgb(20, 20, 20)");
+  rect(-3, 5, 6, 1);
+
   translate(-15, -13);
 
   fill("rgb(150, 150, 40)");
@@ -664,7 +756,7 @@ function drawVaporOutletPipe() {
 
   vertices.forEach(coord => vertex(coord[0], coord[1]));
   endShape(CLOSE);
-  fill("rgb(180, 180, 180)");
+  fill("rgb(200, 200, 200)");
   stroke("rgb(100, 100, 100)");
   translate(5, 2.5);
   strokeWeight(0.05);
@@ -735,7 +827,7 @@ function drawVaporOutletPipe() {
   endShape(CLOSE);
   rect(2.5, -7, 0.75, 14);
   rect(3.25, -7, 0.75, 14);
-  fill("rgb(180, 180, 180)");
+  fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
   strokeWeight(0.05);
   for (let i = 0; i < 7; i++) {
@@ -751,6 +843,39 @@ function drawVaporOutletPipe() {
   fill("rgb(150, 150, 40)");
   stroke("rgb(100, 100, 40)");
   translate(6.5, 0.625);
+
+  beginShape();
+  vertices = [
+    [0, 1],
+    [0.5, 1],
+    [0.5, 0.75],
+    [1.75, 0.75],
+    [2, 0.5],
+    [2, -0.5],
+    [2.25, -0.5],
+    [2.25, -1],
+    [1, -1],
+    [1, -0.5],
+    [1.25, -0.5],
+    [1.25, 0],
+    [0.5, 0],
+    [0.5, -0.25],
+    [0, -0.25],
+  ];
+
+  vertices.forEach(coord => vertex(coord[0], coord[1]));
+
+  endShape(CLOSE);
+
+  fill("rgb(200, 200, 200)");
+  stroke("rgb(150, 150, 150)");
+  rect(1.625 - 0.25, -1, 0.5, -10);
+  fill("rgb(220, 220, 220)")
+  rect(1.625 - 0.375, -1.325, 0.75, 0.325);
+
+  fill("rgb(150, 150, 40)");
+  stroke("rgb(100, 100, 40)");
+  translate(0, -12);
 
   beginShape();
   vertices = [
@@ -775,11 +900,135 @@ function drawVaporOutletPipe() {
 
   endShape(CLOSE);
 
-  fill("rgb(180, 180, 180)");
+  translate(-4, -0.75);
+
+  beginShape();
+  vertices = [
+    [0, 1],
+    [-0.5, 1],
+    [-0.5, 0.75],
+    [-1.75, 0.75],
+    [-2, 0.5],
+    [-2, -0.5],
+    [-2.25, -0.5],
+    [-2.25, -1],
+    [-1, -1],
+    [-1, -0.5],
+    [-1.25, -0.5],
+    [-1.25, 0],
+    [-0.5, 0],
+    [-0.5, -0.25],
+    [0, -0.25],
+  ];
+
+  vertices.forEach(coord => vertex(coord[0], coord[1]));
+
+  endShape(CLOSE);
+
+  translate(0, -21.5);
+
+  beginShape();
+  vertices = [
+    [0, -1],
+    [-0.5, -1],
+    [-0.5, -0.75],
+    [-1.75, -0.75],
+    [-2, -0.5],
+    [-2, 0.5],
+    [-2.25, 0.5],
+    [-2.25, 1],
+    [-1, 1],
+    [-1, 0.5],
+    [-1.25, 0.5],
+    [-1.25, 0],
+    [-0.5, 0],
+    [-0.5, 0.25],
+    [0, 0.25],
+  ];
+
+  vertices.forEach(coord => vertex(coord[0], coord[1]));
+
+  endShape(CLOSE);
+
+  fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
-  rect(1.625 - 0.25, 1, 0.5, 50);
-  fill("rgb(220, 220, 220)")
-  rect(1.625 - 0.375, 1, 0.75, 0.325);
+  rect(-1.8725, 1 + 1 / 32, 0.5, 5);
+  rect(-1.8725, 15.5 - 1 / 32, 0.5, 5);
+  rect(0.125 - 3 / 32, -0.625, 10, 0.5);
+  rect(0.125 - 3 / 32, 22.25 - 0.625, 4 - 1 / 16, 0.5);
+  fill("rgb(220, 220, 220)");
+  rect(-1.8725 - 0.125, 1 + 1 / 32, 0.75, 0.325);
+  rect(-1.8725 - 0.125, 20.175 - 1 / 32, 0.75, 0.325);
+  rect(0.125 - 3 / 32, -0.625 - 0.125, 0.325, 0.75);
+  rect(0.125 - 3 / 32, 22.25 - 0.625 - 0.125, 0.325, 0.75);
+  rect(4.125 - 5 / 32 - 0.325, 22.25 - 0.625 - 0.125, 0.325, 0.75);
+  rect(5.25, 23.25, 0.75, 0.325);
+  pop();
+
+  push();
+  translate(-30, -8);
+  fill("rgb(140, 140, 140)");
+  stroke(0);
+  strokeWeight(0.05);
+  translate(-6, -12);
+  rect(-6.5, -12, 15, 12, 2);
+  fill(20);
+  rect(-5, -10, 12.5, 4);
+  const mX = mouseX / relativeSize();
+  const mY = mouseY / relativeSize();
+  if (mX > 76.25 && mX < 82.25 && mY < 15.25 && mY > 12.25) {
+    fill("rgb(255, 50, 50)");
+  } else {
+    fill("rgb(255, 20, 20)");
+  }
+  rect(-3 - 2.5, -4.5, 6, 3, 0.25);
+
+  if (mX > 76.25 + 6.5 && mX < 79.25 + 6.5 && mY < 15.25 && mY > 12.25) {
+    fill("rgb(255, 50, 50)");
+    if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
+      state.pressureController.P = state.pressureUnits === "atm" ? constrain(state.pressureController.P - 0.01, 1, 3) : constrain(state.pressureController.P - 0.01 * 100000 / 101325, 1, 3);
+    }
+  } else {
+    fill("rgb(255, 20, 20)");
+  }
+  rect(-3 + 4, -4.5, 3, 3, 0.25);
+
+  if (mX > 76.25 + 10 && mX < 79.25 + 10 && mY < 15.25 && mY > 12.25) {
+    fill("rgb(255, 50, 50)");
+    if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
+      state.pressureController.P = state.pressureUnits === "atm" ? constrain(state.pressureController.P + 0.01, 1, 3) : constrain(state.pressureController.P + 0.01 * 100000 / 101325, 1, 3);
+    }
+  } else {
+    fill("rgb(255, 20, 20)");
+  }
+  rect(-3 + 7.5, -4.5, 3, 3, 0.25);
+
+  fill("white");
+  noStroke();
+  textSize(1.75);
+  textAlign(RIGHT, CENTER);
+  text("units", 1.875 - 2.5, -3);
+  push();
+  textSize(3.5);
+  text("▴", 7, -3.1);
+  translate(1.55, -2.8);
+  rotate(PI);
+  text("▴", 0, 0);
+  pop();
+  textFont(state.meterFont);
+  fill("yellow");
+  textSize(3);
+  const P = state.pressureUnits === "atm" ? state.pressureController.P : state.pressureController.P * 101325 / 100000;
+  text(`${(round(P * 100) / 100).toFixed(2)}  ${state.pressureUnits}`, 6.125, -8);
+  noFill();
+  stroke(0);
+  strokeWeight(0.2);
+  beginShape();
+  vertex(0, 0);
+  vertex(0, 2);
+  quadraticVertex(0, 6, 0.75, 7);
+  quadraticVertex(2, 9.5, 1.5, 12.5);
+  endShape();
   pop();
   pop();
 }
