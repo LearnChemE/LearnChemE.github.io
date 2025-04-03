@@ -554,7 +554,7 @@ function drawFeedTank() {
   translate(-14, -5.75);
   noStroke();
   fill("rgb(200, 200, 255)");
-  const liquidHeight = state.liquidHeight * 48;
+  const liquidHeight = state.liquidHeight * 52;
   rect(-14, -2, 28, -liquidHeight);
   stroke("rgb(40, 40, 40)");
   strokeWeight(0.1);
@@ -574,11 +574,11 @@ function drawFlashDrum() {
   translate(45.5, -20.5);
   drawFlashLiquid();
   noStroke();
-  fill(`rgba(${round(255 - 25 * state.vaporDensity)}, ${round(255 - 25 * state.vaporDensity)}, 255, ${0.5 * state.vaporDensity})`);
+  fill(`rgba(${round(255 - 25 * state.vaporDensity)}, ${round(255 - 25 * state.vaporDensity)}, 255, ${0.3 * state.vaporDensity})`);
   rect(0, -35, 20, 65);
   stroke("rgb(40, 40, 40)");
   strokeWeight(0.1);
-  fill("rgba(220, 220, 220, 0.2)");
+  fill("rgba(220, 220, 220, 0.1)");
   rect(0, -35, 20, 65);
   fill("rgb(200, 200, 200)");
   rect(-1, -36, 22, 2);
@@ -607,22 +607,62 @@ function drawFlashLiquid() {
   push();
   if (state.pump.on) {
     state.liquidFlow.timeCoordinate = constrain(state.liquidFlow.timeCoordinate + 0.02, -1, 1);
+    state.liquidHeight -= 0.000025;
+  } else if (state.liquidFlow.timeCoordinate > 0 && !state.pump.on) {
+    state.liquidFlow.timeCoordinate = constrain(state.liquidFlow.timeCoordinate + 0.02, 0, 2);
   }
   let t = state.liquidFlow.timeCoordinate;
   noFill();
   stroke("rgb(200, 200, 255)");
   strokeWeight(4);
-  if (t > 0) {
-    beginShape();
-    vertex(-4, 0);
-    vertex(-1, 0);
-    quadraticVertex(-1 + 10 * t, t, -1 + constrain(t, 0, 0.8) * 15, constrain(t - 0.1, 0, 1) * 32);
-    endShape();
+  if (abs(t) < 0.001) {
+    state.bubbleFrame = frameCount;
+  } else if (abs(t) > 1.01 && abs(t) < 1.03) {
+    state.bubbleEndTime = frameCount;
   }
-  if (t >= 1) {
+  if (t > 0) {
+    if (t < 2) {
+      beginShape();
+      if (t <= 1) {
+        vertex(-4, 0);
+        vertex(-1, 0);
+        quadraticVertex(-1 + 10 * t, t, -1 + constrain(t, 0, 0.8) * 15, constrain(t - 0.1, 0, 1) * 32);
+      } else {
+        vertex(1 + 13 * (t - 1), 29 * (t - 1));
+        quadraticVertex(-2 + 10 * t, 6 + (t - 1) * 25, -1 + constrain(t, 0, 0.8) * 15, constrain(t - 0.1, 0, 1) * 28);
+      }
+      endShape();
+    }
+    push();
+    randomSeed(1578459);
+    for (let i = 0; i < 50; i++) {
+      push();
+      let m = random(0, 1) * (frameCount - state.bubbleFrame) % 240;
+      if (t > 1) {
+        const timeLeft = constrain((240 - (frameCount - state.bubbleEndTime)) / 240, 0, 1);
+        if (timeLeft === 0) {
+          state.liquidFlow.timeCoordinate = -1;
+        }
+        m = constrain(m, (1 - timeLeft) * 240, 240);
+      }
+      fill(`rgba(230, 230, 255, ${1 - m / 240})`);
+      noStroke();
+      const offsetX = random(5, 20);
+      const offsetY = random(-10, 10);
+      const c = m / 240;
+      circle(offsetX * c ** 0.45, (-25 + offsetY) * c, 2.5 + 4.5 * c);
+      pop();
+    }
+    pop();
+  }
+  if (t >= 1 && state.pump.on) {
     const l = state.liquidFlow.liquidHeight;
     state.liquidFlow.liquidHeight = l + (15 - l) * 0.002;
     state.vaporDensity = state.vaporDensity + (1 - state.vaporDensity) * 0.02;
+  } else {
+    const l = state.liquidFlow.liquidHeight;
+    state.liquidFlow.liquidHeight = constrain(l - 0.05, 0, 15);
+    state.vaporDensity = state.vaporDensity - state.vaporDensity * 0.02;
   }
   noStroke();
   fill("rgb(200, 200, 255)");

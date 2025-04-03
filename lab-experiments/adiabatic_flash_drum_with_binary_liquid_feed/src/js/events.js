@@ -3,7 +3,7 @@ window.mousePressed = function() {
   const mY = mouseY / relativeSize();
   const x = state.pump.x;
   const y = state.pump.y;
-  if (mX > 16.5 + x - 7.5 && mX < 16.5 + x + 7.5 && mY > 19.5 + y - 5 && mY < 19.5 + y + 2.75) {
+  if (mX > 16.5 + x - 7.5 && mX < 16.5 + x + 7.5 && mY > 19.5 + y - 5 && mY < 19.5 + y + 2.75 && (state.liquidFlow.timeCoordinate === -1 || state.liquidFlow.timeCoordinate === 1)) {
     state.pump.on = !state.pump.on;
   }
   if (mX > 124.5 && mX < 131 && mY < 90.5 && mY > 86.5) {

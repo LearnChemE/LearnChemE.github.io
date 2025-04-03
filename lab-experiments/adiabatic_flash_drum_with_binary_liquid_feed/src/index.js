@@ -43,6 +43,8 @@ window.state = {
   temperatureUnits: "C",
   pressureUnits: "atm",
   mousePressedFrameModulus: 0,
+  bubbleFrame: 0,
+  bubbleEndTime: 0,
 };
 
 const containerElement = document.getElementById("p5-container");
