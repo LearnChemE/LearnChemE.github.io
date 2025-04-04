@@ -19,32 +19,21 @@ window.state = {
     y: 70,
     scaleX: 0.8,
     scaleY: 0.8,
-    on: false,
   },
   heatExchanger: {
-    valvePosition: 0,
-    T: 100,
+    T: 95,
+    Tmin: 90,
+    Tmax: 130,
   },
   pressureController: {
-    valvePosition: 0,
     P: 1,
+    Pmin: 1,
+    Pmax: 2,
   },
-  liquidHeight: 1,
-  vaporDensity: 0,
   xF: 0.5,
-  liquidFlow: {
-    timeCoordinate: -1,
-    liquidHeight: 0,
-  },
-  mL: 0,
-  mV: 0,
-  mF: 0,
   massFlowRateUnits: "g/s",
   temperatureUnits: "C",
   pressureUnits: "atm",
-  mousePressedFrameModulus: 0,
-  bubbleFrame: 0,
-  bubbleEndTime: 0,
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -57,6 +46,7 @@ window.setup = function() {
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
   handleInputs();
   setDefaults();
+  window.mixture = [state.chemicals.benzene, state.chemicals.toluene];
   calcAll();
   pixelDensity(state.pixelDensity);
   frameRate(state.frameRate);
@@ -68,7 +58,6 @@ window.draw = function() {
   scale(relativeSize());
   translate(0, 15);
   background(255);
-  calcAll();
   drawAll();
 };
 

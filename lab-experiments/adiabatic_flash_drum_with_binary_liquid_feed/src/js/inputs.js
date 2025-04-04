@@ -1,5 +1,5 @@
 import Hamburger from "../assets/hamburger.svg";
-import { setDefaults } from "./calcs";
+import { calcAll, setDefaults } from "./calcs";
 
 export function handleInputs() {
   initializeHamburger();

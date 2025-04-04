@@ -1,3 +1,5 @@
+import { calcAll } from "./calcs";
+
 window.mousePressed = function() {
   const mX = mouseX / relativeSize();
   const mY = mouseY / relativeSize();
@@ -13,21 +15,22 @@ window.mousePressed = function() {
     state.temperatureUnits = state.temperatureUnits === "C" ? "F" : "C";
   }
   if (mX > 61 + 4 && mX < 64 + 4 && mY < 49.75 && mY > 46.75) {
-    state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T - 1, 100, 300) : constrain(state.heatExchanger.T - 5 / 9, 100, 300);
+    state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T - 0.1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T - 5 / 9 / 10, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
   }
   if (mX > 61 + 7.5 && mX < 64 + 7.5 && mY < 49.75 && mY > 46.75) {
-    state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T + 1, 100, 300) : constrain(state.heatExchanger.T + 5 / 9, 100, 300);
+    state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T + 0.1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T + 5 / 9 / 10, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
   }
   if (mX > 76.25 && mX < 82.25 && mY < 15.25 && mY > 12.25) {
     state.pressureUnits = state.pressureUnits === "atm" ? "bar" : "atm";
   }
   if (mX > 76.25 + 6.5 && mX < 79.25 + 6.5 && mY < 15.25 && mY > 12.25) {
-    state.pressureController.P = state.pressureUnits === "atm" ? constrain(state.pressureController.P - 0.01, 1, 3) : constrain(state.pressureController.P - 0.01 * 100000 / 101325, 1, 3);
+    state.pressureController.P = state.pressureUnits === "atm" ? constrain(state.pressureController.P - 0.01, state.pressureController.Pmin, state.pressureController.Pmax) : constrain(state.pressureController.P - 0.01 * 100000 / 101325, state.pressureController.Pmin, state.pressureController.Pmax);
   }
   if (mX > 76.25 + 10 && mX < 79.25 + 10 && mY < 15.25 && mY > 12.25) {
-    state.pressureController.P = state.pressureUnits === "atm" ? constrain(state.pressureController.P + 0.01, 1, 3) : constrain(state.pressureController.P + 0.01 * 100000 / 101325, 1, 3);
+    state.pressureController.P = state.pressureUnits === "atm" ? constrain(state.pressureController.P + 0.01, state.pressureController.Pmin, state.pressureController.Pmax) : constrain(state.pressureController.P + 0.01 * 100000 / 101325, state.pressureController.Pmin, state.pressureController.Pmax);
   }
   state.mousePressedFrameModulus = frameCount % 10;
+  calcAll();
 }
 
 // window.mouseDragged = function() {
