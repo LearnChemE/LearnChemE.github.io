@@ -265,7 +265,7 @@ function drawHeatExchanger() {
   if (mX > 61 + 4 && mX < 64 + 4 && mY < 49.75 && mY > 46.75) {
     fill("rgb(255, 50, 50)");
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
-      state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T - 0.1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T - 5 / 9 / 10, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
+      state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T - 1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T - 5 / 9 / 10, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
       calcAll();
     }
   } else {
@@ -276,7 +276,7 @@ function drawHeatExchanger() {
   if (mX > 61 + 7.5 && mX < 64 + 7.5 && mY < 49.75 && mY > 46.75) {
     fill("rgb(255, 50, 50)");
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
-      state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T + 0.1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T + 5 / 9 / 10, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
+      state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T + 1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T + 5 / 9 / 10, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
       calcAll();
     }
   } else {
@@ -300,9 +300,9 @@ function drawHeatExchanger() {
   fill("yellow");
   textSize(3);
   const T = state.temperatureUnits === "C" ? state.heatExchanger.T : state.heatExchanger.T * 9 / 5 + 32;
-  text(`${(round(T * 10) / 10).toFixed(1)}  ${state.temperatureUnits}`, 5.125, -8);
+  text(`${round(T)}  ${state.temperatureUnits}`, 4.125, -8);
   textFont("Arial");
-  text("°", 3.75, -8);
+  text("°", 2.75, -8);
   noFill();
   stroke(0);
   strokeWeight(0.2);

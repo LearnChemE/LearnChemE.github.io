@@ -15,10 +15,10 @@ window.mousePressed = function() {
     state.temperatureUnits = state.temperatureUnits === "C" ? "F" : "C";
   }
   if (mX > 61 + 4 && mX < 64 + 4 && mY < 49.75 && mY > 46.75) {
-    state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T - 0.1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T - 5 / 9 / 10, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
+    state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T - 1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T - 5 / 9, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
   }
   if (mX > 61 + 7.5 && mX < 64 + 7.5 && mY < 49.75 && mY > 46.75) {
-    state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T + 0.1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T + 5 / 9 / 10, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
+    state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T + 1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T + 5 / 9, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
   }
   if (mX > 76.25 && mX < 82.25 && mY < 15.25 && mY > 12.25) {
     state.pressureUnits = state.pressureUnits === "atm" ? "bar" : "atm";

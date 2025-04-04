@@ -255,30 +255,10 @@ function HV(T, y, component_A, component_B) {
 function HF(args) {
   const z = args.z;
   const T = args.T + 273.15;
-  const P = args.P;
-  const n = args.n;
   const component_A = args.component_A;
   const component_B = args.component_B;
 
-  // We'll do an isothermal flash at (T,P) to see if feed is partial, etc.
-  const sol = flash(T, P, z, component_A, component_B);
-
-  const V = sol.beta;
-  const K1 = sol.K1;
-
-  if (V < 0) {
-    return n * HL(T, z, component_A, component_B);
-  } else if (V > 1) {
-    return n * HV(T, z, component_A, component_B);
-  } else {
-    const L = 1 - V;
-    const denom = 1 + V * (K1 - 1);
-    const x = z / denom;
-    const y = K1 * x;
-    const H_liquid = HL(T, x, component_A, component_B);
-    const H_vapor = HV(T, y, component_A, component_B);
-    return n * (L * H_liquid + V * H_vapor);
-  }
+  return HL(T, z, component_A, component_B);
 }
 
 function solution(args) {
@@ -289,7 +269,7 @@ function solution(args) {
   const component_A = args.component_A;
   const component_B = args.component_B;
 
-  const H_feed = HF(args);
+  const H_feed = n * HF(args);
 
   let T_low = Math.min(T, 0) + 273.15;
   let T_high = Math.max(T, 1000) + 273.15;
@@ -374,6 +354,7 @@ export function calcAll() {
     component_B: mixture[1]
   });
 
+  state.column_T = sol.T;
   state.nL = sol.L;
   state.nV = sol.V;
   state.xL = sol.x;

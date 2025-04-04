@@ -21,15 +21,16 @@ window.state = {
     scaleY: 0.8,
   },
   heatExchanger: {
-    T: 95,
+    T: 150,
     Tmin: 90,
-    Tmax: 130,
+    Tmax: 500,
   },
   pressureController: {
     P: 1,
     Pmin: 1,
     Pmax: 2,
   },
+  column_T: 25,
   xF: 0.5,
   massFlowRateUnits: "g/s",
   temperatureUnits: "C",
