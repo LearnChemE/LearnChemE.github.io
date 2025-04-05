@@ -25,11 +25,12 @@ export function setDefaults() {
     chemicals: {
       benzene: {
         name: "Benzene",
+        A: 6.880,
+        B: 1197,
+        C: 219.2,
         Psat: (T) => {
-          const A = 6.880,
-            B = 1197,
-            C = 219.2;
-          return Math.pow(10, A - B / (T + C)) * 0.00133322; // bar
+          const c = state.chemicals.benzene;
+          return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322; // bar
         },
         Hvap: 30.7, // kJ / mol
         CpL: 136, // J / mol·K
@@ -44,11 +45,12 @@ export function setDefaults() {
       },
       toluene: {
         name: "Toluene",
+        A: 6.951,
+        B: 1342,
+        C: 219.2,
         Psat: (T) => {
-          const A = 6.951,
-            B = 1342,
-            C = 219.2;
-          return Math.pow(10, A - B / (T + C)) * 0.00133322;
+          const c = state.chemicals.toluene;
+          return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322;
         },
         Hvap: 51.0,
         CpL: 157,
@@ -63,11 +65,12 @@ export function setDefaults() {
       },
       nHexane: {
         name: "n-Hexane",
+        A: 6.876,
+        B: 1171,
+        C: 224.4,
         Psat: (T) => {
-          const A = 6.876,
-            B = 1171,
-            C = 224.4;
-          return Math.pow(10, A - B / (T + C)) * 0.00133322;
+          const c = state.chemicals.nHexane;
+          return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322;
         },
         Hvap: 31.0,
         CpL: 195,
@@ -82,11 +85,12 @@ export function setDefaults() {
       },
       nOctane: {
         name: "n-Octane",
+        A: 6.919,
+        B: 1352,
+        C: 209.2,
         Psat: (T) => {
-          const A = 6.919,
-            B = 1352,
-            C = 209.2;
-          return Math.pow(10, A - B / (T + C)) * 0.00133322;
+          const c = state.chemicals.nOctane;
+          return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322;
         },
         Hvap: 41.0,
         CpL: 254,
@@ -101,11 +105,12 @@ export function setDefaults() {
       },
       cycloHexane: {
         name: "Cyclohexane",
+        A: 6.851,
+        B: 1206,
+        C: 223.1,
         Psat: (T) => {
-          const A = 6.851,
-            B = 1206,
-            C = 223.1;
-          return Math.pow(10, A - B / (T + C)) * 0.00133322;
+          const c = state.chemicals.cycloHexane;
+          return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322;
         },
         Hvap: 30.8,
         CpL: 156,
@@ -120,11 +125,12 @@ export function setDefaults() {
       },
       nDecane: {
         name: "n-Decane",
+        A: 6.944,
+        B: 1495,
+        C: 193.9,
         Psat: (T) => {
-          const A = 6.944,
-            B = 1495,
-            C = 193.9;
-          return Math.pow(10, A - B / (T + C)) * 0.00133322;
+          const c = state.chemicals.nDecane;
+          return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322;
         },
         Hvap: 51.3,
         CpL: 313,
@@ -139,11 +145,12 @@ export function setDefaults() {
       },
       methanol: {
         name: "Methanol",
+        A: 8.072,
+        B: 1575,
+        C: 238.9,
         Psat: (T) => {
-          const A = 8.0724,
-            B = 1574.99,
-            C = 238.87;
-          return Math.pow(10, A - B / (T + C)) * 0.00133322;
+          const c = state.chemicals.methanol;
+          return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322;
         },
         Hvap: 35.2,
         CpL: 81.2,
@@ -157,11 +164,12 @@ export function setDefaults() {
       },
       water: {
         name: "Water",
+        A: 8.071,
+        B: 1731,
+        C: 233.4,
         Psat: (T) => {
-          const A = 8.07131,
-            B = 1730.63,
-            C = 233.426;
-          return Math.pow(10, A - B / (T + C)) * 0.00133322;
+          const c = state.chemicals.water;
+          return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322;
         },
         Hvap: 40.7,
         CpL: 75.3,
@@ -184,6 +192,9 @@ export function setDefaults() {
   state.pump.on = false;
   state.heatExchanger.valvePosition = 0;
   state.pressureController.valvePosition = 0;
+  state.heatExchanger.T_current = 500;
+  state.pressureController.P_current = 1;
+  state.column.T_current = 25;
 }
 
 // Solve for vapor fraction

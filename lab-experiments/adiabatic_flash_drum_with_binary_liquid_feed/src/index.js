@@ -38,14 +38,14 @@ window.state = {
     units: "C",
   },
   liquidOutlet: {
-    units: "g/s",
+    units: "kg/min",
   },
   inlet: {
-    units: "g/s",
+    units: "kg/min",
   },
   xF: 0.5,
   temperatureUnits: "C",
-  pressureUnits: "atm",
+  pressureUnits: "bar"
 };
 
 const containerElement = document.getElementById("p5-container");

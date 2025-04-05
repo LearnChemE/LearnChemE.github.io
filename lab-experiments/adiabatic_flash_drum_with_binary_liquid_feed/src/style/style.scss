@@ -31,6 +31,12 @@ canvas {
   box-shadow: 0px 0px 2px 2px lightgrey;
 }
 
+#take-sample {
+  position: absolute;
+  bottom: 3%;
+  right: 3%;
+}
+
 .modal.show {
   padding-left: 0px !important;
 }
@@ -79,19 +85,56 @@ canvas {
 
 #buttons {
   position: absolute;
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  width: max-content;
   top: 30px;
   display: none;
-  justify-content: center;
+  justify-items: center;
   margin-top: 20px;
   gap: 10px;
   background-color: white;
   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
   border: 1px solid black;
   border-radius: 5px;
-  padding: 12px;
+  padding: 25px;
   &>.btn {
     width: 110px;
   }
+}
+
+#buttons>div:nth-child(1) {
+  justify-self: end;
+}
+
+#buttons>div:nth-child(2) {
+  justify-self: center;
+}
+
+#buttons>a:nth-child(3) {
+  justify-self: start;
+}
+
+.slider-container {
+  display: grid;
+  grid-template-columns: max-content 180px 40px;
+  grid-column: 1 / 4;
+  gap: 10px;
+  align-items: end;
+  margin-top: 10px;
+}
+
+.dropdown-container {
+  display: grid;
+  grid-template-columns: max-content 200px;
+  gap: 10px;
+  grid-column: 1 / 4;
+  // justify-self: start;
+  margin-top: 15px;
+}
+
+.dropdown-label {
+  justify-self: end;
 }
 
 .disabled {
@@ -113,4 +156,41 @@ canvas {
     top: 35px;
     padding: 15px;
   }
+}
+
+#antoine-table {
+  grid-column: 1 / 4;
+  margin-bottom: 20px;
+}
+
+#antoine-table table {
+  outline: 1px solid black;
+}
+
+#antoine-table table th {
+  background-color: lightblue;
+  text-align: center;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#antoine-table table td {
+  text-align: center;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+#antoine-table table td:first-child {
+  width: 120px;
+}
+
+.table-label {
+  width: 100%;
+  text-align: center;
+  padding-bottom: 8px;
+  margin-top: 15px;
 }
