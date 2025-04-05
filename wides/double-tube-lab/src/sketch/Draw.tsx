@@ -20,6 +20,18 @@ export const V2CY = 432;
 /* **************** DRAW DISPLAYS ************** */
 /* ********************************************* */
 
+const fillPumps = (p: P5CanvasInstance,s: number = 1) => {
+  p.push();
+  p.noStroke();
+  // Right orange
+  p.fill(255, 50, 0, 120);
+  p.rect(652,437 + 143 * (1-s),14,143 * s);
+  // Left blue
+  p.fill(0, 80, 255, 100);
+  p.rect(277,437 + 143 * (1-s),14,143 * s);
+  p.pop();
+}
+
 // Main graphics loop called from draw. The logic here plays animations and displays everything inside the P5 canvas
 export default function drawAll(
   p: P5CanvasInstance,
@@ -57,8 +69,8 @@ export default function drawAll(
   // Apparatus
   p.image(dt, 149, 25);
   // Apparatus Fill
-  // fillAnimationOrange(to, 124, 25, p, dto);
-  // fillAnimationBlue(tb, 124, 25, p, dtb);
+  let pumptime = tb < .3 ? tb / .3 : 1;
+  fillPumps(p,pumptime);
   fillingAnimation.draw(p, tb);
 
   // Valves
