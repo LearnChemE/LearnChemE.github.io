@@ -15,7 +15,11 @@ export function setDefaults() {
     nV: 0,
     yV: 0,
     xL: 0,
+    mL_current: 0,
+    mF_current: 0,
     mousePressedFrameModulus: 0,
+    mousePressedPressureFrame: -1200,
+    mousePressedTemperatureFrame: -1200,
     bubbleFrame: 0,
     bubbleEndTime: 0,
     chemicals: {
@@ -354,7 +358,7 @@ export function calcAll() {
     component_B: mixture[1]
   });
 
-  state.column_T = sol.T;
+  state.column.T = sol.T;
   state.nL = sol.L;
   state.nV = sol.V;
   state.xL = sol.x;

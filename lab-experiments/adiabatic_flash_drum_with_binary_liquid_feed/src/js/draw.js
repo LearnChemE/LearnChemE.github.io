@@ -129,14 +129,15 @@ function drawPump(x, y, scaleX, scaleY) {
   beginShape();
   vertex(30.5, 0);
   quadraticVertex(33, 0, 35, -2);
-  quadraticVertex(40, -8, 35, -15);
-  quadraticVertex(31, -20, 20, -18);
+  quadraticVertex(40, -8, 35.5, -13);
+  quadraticVertex(31, -18, 18, -13);
   endShape();
 
+  translate(4, 5);
   strokeWeight(0.1);
   const mX = mouseX / relativeSize();
   const mY = mouseY / relativeSize();
-  if (mX > 16.5 + x - 7.5 && mX < 16.5 + x + 7.5 && mY > 19.5 + y - 5 && mY < 19.5 + y + 2.75) {
+  if (mX > 16.5 + x - 3.5 && mX < 16.5 + x + 11.5 && mY > 19.5 + y - 1 && mY < 19.5 + y + 6.75) {
     stroke("rgb(140, 140, 40)");
     strokeWeight(0.2);
   } else {
@@ -238,6 +239,7 @@ function drawInletPipe() {
   }
   strokeWeight(0.1);
   rect(5.5, -24.75, 3, 33);
+  drawInletFlowMeter();
   pop();
 }
 
@@ -266,6 +268,7 @@ function drawHeatExchanger() {
     fill("rgb(255, 50, 50)");
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
       state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T - 1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T - 5 / 9 / 10, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
+      state.mousePressedTemperatureFrame = frameCount;
       calcAll();
     }
   } else {
@@ -277,6 +280,7 @@ function drawHeatExchanger() {
     fill("rgb(255, 50, 50)");
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
       state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T + 1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T + 5 / 9 / 10, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
+      state.mousePressedTemperatureFrame = frameCount;
       calcAll();
     }
   } else {
@@ -296,13 +300,35 @@ function drawHeatExchanger() {
   rotate(PI);
   text("▴", 0, 0);
   pop();
+  push();
   textFont(state.meterFont);
   fill("yellow");
   textSize(3);
-  const T = state.temperatureUnits === "C" ? state.heatExchanger.T : state.heatExchanger.T * 9 / 5 + 32;
-  text(`${round(T)}  ${state.temperatureUnits}`, 4.125, -8);
+  let T = state.temperatureUnits === "C" ? round(state.heatExchanger.T_current) : round(state.heatExchanger.T_current * 9 / 5 + 32);
+  let units = state.temperatureUnits;
+  let showDegrees = true;
+  if (T > 480 && !(frameCount - state.mousePressedTemperatureFrame < 120)) {
+    T = "steam off";
+    units = "";
+    showDegrees = false;
+    translate(3.75, 0);
+  }
+  if (frameCount - state.mousePressedTemperatureFrame < 120) {
+    if (state.temperatureUnits === "C") {
+      T = round(state.heatExchanger.T * 10) / 10;
+    } else {
+      T = round(state.heatExchanger.T * 9 / 5 + 32);
+    }
+    units = state.temperatureUnits;
+    showDegrees = true;
+    fill("red");
+  }
+  text(`${T}  ${units}`, 5.125, -8);
   textFont("Arial");
-  text("°", 2.75, -8);
+  if (showDegrees) {
+    text("°", 3.75, -8);
+  }
+  pop();
   noFill();
   stroke(0);
   strokeWeight(0.2);
@@ -604,6 +630,51 @@ function drawFlashDrum() {
   quad(19, 31, 17, 31, 19, 48, 21, 48);
   rect(9, 31, 2, 17);
   drawLiquidOutletPipe();
+  drawTemperatureMeter();
+  pop();
+}
+
+function drawTemperatureMeter() {
+  push();
+  translate(21, -12.5);
+  noFill();
+  stroke("rgb(20, 20, 20)");
+  strokeWeight(0.2);
+  beginShape();
+  vertex(0, 0);
+  quadraticVertex(3, -1, 5, -3);
+  quadraticVertex(7, -6, 12, -7);
+  endShape();
+
+  fill("rgb(140, 140, 140)");
+  stroke(0);
+  strokeWeight(0.05);
+  translate(16, 0);
+  rect(-6.5, -12, 15, 12, 2);
+  fill(20);
+  rect(-5.25, -10, 12.5, 4);
+  const mX = mouseX / relativeSize();
+  const mY = mouseY / relativeSize();
+  // console.log({ mX, mY });
+  if (mX > 113 && mX < 119 && mY < 51.25 && mY > 48.25) {
+    fill("rgb(255, 50, 50)");
+  } else {
+    fill("rgb(255, 20, 20)");
+  }
+  rect(-2, -4.5, 6, 3, 0.25);
+
+  fill("white");
+  noStroke();
+  textSize(1.75);
+  textAlign(RIGHT, CENTER);
+  text("units", 2.875, -3);
+  textFont(state.meterFont);
+  fill("yellow");
+  textSize(3);
+  const T = state.column.units === "C" ? state.column.T_current : state.column.T_current * 9 / 5 + 32;
+  text(`${(round(T * 10) / 10).toFixed(1)}  ${state.column.units}`, 5.625, -8);
+  textFont("Arial");
+  text("°", 4.25, -8);
   pop();
 }
 
@@ -612,13 +683,35 @@ function drawFlashLiquid() {
   if (state.pump.on) {
     state.liquidFlow.timeCoordinate = constrain(state.liquidFlow.timeCoordinate + 0.02, -1, 1);
     state.liquidHeight -= 0.000025;
+    if (frameCount % 60 === 0) {
+      state.mF_current = state.mF_current + (state.mF - state.mF_current) * 0.7;
+      state.heatExchanger.T_current = state.heatExchanger.T_current + (state.heatExchanger.T - state.heatExchanger.T_current) * 0.4;
+    }
   } else if (state.liquidFlow.timeCoordinate > 0 && !state.pump.on) {
     state.liquidFlow.timeCoordinate = constrain(state.liquidFlow.timeCoordinate + 0.02, 0, 2);
+  }
+  if (!state.pump.on && frameCount % 60 === 0) {
+    state.mF_current = state.mF_current * 0.2;
+    state.heatExchanger.T_current = state.heatExchanger.T_current + (500 - state.heatExchanger.T_current) * 0.4;
+  }
+  if (state.liquidFlow.timeCoordinate > 0 && state.liquidFlow.timeCoordinate <= 1) {
+    if (frameCount % 60 === 0) {
+      state.column.T_current = state.column.T_current + (state.column.T - state.column.T_current) * 0.1;
+      state.pressureController.P_current = state.pressureController.P_current + (state.pressureController.P - state.pressureController.P_current) * 0.1;
+      state.mL_current = state.mL_current + (state.mL - state.mL_current) * 0.6;
+    }
+  } else {
+    if (frameCount % 60 === 0) {
+      state.column.T_current = state.column.T_current - (state.column.T_current - 25) * 0.1;
+      state.pressureController.P_current = state.pressureController.P_current - (state.pressureController.P_current - 1) * 0.1;
+      state.mL_current = state.mL_current - (state.mL_current - 0) * 0.6;
+    }
   }
   let t = state.liquidFlow.timeCoordinate;
   noFill();
   stroke("rgb(200, 200, 255)");
-  strokeWeight(4);
+  const liquidThickness = 4 * (state.mL / state.mF);
+  strokeWeight(liquidThickness);
   if (abs(t) < 0.001) {
     state.bubbleFrame = frameCount;
   } else if (abs(t) > 1.01 && abs(t) < 1.03) {
@@ -639,7 +732,8 @@ function drawFlashLiquid() {
     }
     push();
     randomSeed(1578459);
-    for (let i = 0; i < 50; i++) {
+    const numberOfBubbles = 100 * (state.mV / state.mF);
+    for (let i = 0; i < numberOfBubbles; i++) {
       push();
       let m = random(0, 1) * (frameCount - state.bubbleFrame) % 240;
       if (t > 1) {
@@ -654,14 +748,16 @@ function drawFlashLiquid() {
       const offsetX = random(5, 20);
       const offsetY = random(-10, 10);
       const c = m / 240;
-      circle(offsetX * c ** 0.45, (-25 + offsetY) * c, 2.5 + 4.5 * c);
+      const bubbleSizeOffset = state.mV / state.mF;
+      circle(offsetX * c ** 0.45, (-25 + offsetY) * c, 2.5 + 4.5 * c + bubbleSizeOffset);
       pop();
     }
     pop();
   }
   if (t >= 1 && state.pump.on) {
+    const maxLiquidHeight = 15 * (state.mL / state.mF)
     const l = state.liquidFlow.liquidHeight;
-    state.liquidFlow.liquidHeight = l + (15 - l) * 0.002;
+    state.liquidFlow.liquidHeight = l + (maxLiquidHeight - l) * 0.002;
     state.vaporDensity = state.vaporDensity + (1 - state.vaporDensity) * 0.02;
   } else {
     const l = state.liquidFlow.liquidHeight;
@@ -1031,6 +1127,7 @@ function drawVaporOutletPipe() {
     fill("rgb(255, 50, 50)");
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
       state.pressureController.P = state.pressureUnits === "atm" ? constrain(state.pressureController.P - 0.01, state.pressureController.Pmin, state.pressureController.Pmax) : constrain(state.pressureController.P - 0.01 * 100000 / 101325, state.pressureController.Pmin, state.pressureController.Pmax);
+      state.mousePressedPressureFrame = frameCount;
       calcAll();
     }
   } else {
@@ -1042,6 +1139,7 @@ function drawVaporOutletPipe() {
     fill("rgb(255, 50, 50)");
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
       state.pressureController.P = state.pressureUnits === "atm" ? constrain(state.pressureController.P + 0.01, state.pressureController.Pmin, state.pressureController.Pmax) : constrain(state.pressureController.P + 0.01 * 100000 / 101325, state.pressureController.Pmin, state.pressureController.Pmax);
+      state.mousePressedPressureFrame = frameCount;
       calcAll();
     }
   } else {
@@ -1064,7 +1162,11 @@ function drawVaporOutletPipe() {
   textFont(state.meterFont);
   fill("yellow");
   textSize(3);
-  const P = state.pressureUnits === "atm" ? state.pressureController.P : state.pressureController.P * 101325 / 100000;
+  let P = state.pressureUnits === "atm" ? state.pressureController.P_current : state.pressureController.P_current * 101325 / 100000;
+  if (frameCount - state.mousePressedPressureFrame < 120) {
+    P = state.pressureUnits === "atm" ? state.pressureController.P : state.pressureController.P * 101325 / 100000;
+    fill("red");
+  }
   text(`${(round(P * 100) / 100).toFixed(2)}  ${state.pressureUnits}`, 6.125, -8);
   noFill();
   stroke(0);
@@ -1176,8 +1278,85 @@ function drawMassFlowMeter() {
   textFont(state.meterFont);
   fill("yellow");
   textSize(3);
-  const m = state.massFlowRateUnits === "kg/min" ? (state.mL * 60).toFixed(2) : (state.mL * 1000).toFixed(1);
-  text(`${m} ${state.massFlowRateUnits}`, 0.125, -8);
+  const m = state.liquidOutlet.units === "kg/min" ? (state.mL_current * 60).toFixed(2) : (state.mL_current * 1000).toFixed(1);
+  text(`${m} ${state.liquidOutlet.units}`, 0.125, -8);
+  pop();
+}
+
+function drawInletFlowMeter() {
+  push();
+  translate(21, -20.5);
+  rotate(PI / 2);
+  rectMode(CENTER);
+  fill("rgb(80, 80, 80)");
+  stroke("rgb(40, 40, 40)");
+  strokeWeight(0.05);
+  rect(-5, 0, 2, 5, 0.5);
+  rect(5, 0, 2, 5, 0.5);
+  fill("rgb(240, 240, 240)");
+  beginShape();
+  let vertices = [
+    [-5, -2.5],
+    [-5, 2.5],
+    [-4, 2.5],
+    [-4, 2],
+    [-2, 1.75],
+    [2, 1.75],
+    [4, 2],
+    [4, 2.5],
+    [5, 2.5],
+    [5, -2.5],
+    [4, -2.5],
+    [4, -2],
+    [2, -1.75],
+    [-2, -1.75],
+    [-4, -2],
+    [-4, -2.5],
+  ];
+
+  vertices.forEach(coord => vertex(coord[0], coord[1]));
+  endShape(CLOSE);
+
+  fill("rgb(80, 80, 80)");
+  rect(0, -1, 5, 6, 0.5);
+  rectMode(CORNER);
+  rect(-1, -4.5, 2, 0.5);
+  quad(-0.75, -4.5, -0.5, -6, 0.5, -6, 0.75, -4.5);
+  rotate(-PI / 2);
+  translate(3, 12);
+  noFill();
+  stroke(0);
+  strokeWeight(0.2);
+  beginShape();
+  vertex(3, -12);
+  quadraticVertex(4, -12.5, 5, -14);
+  quadraticVertex(6, -16, 8, -16);
+  endShape();
+  translate(0, 2);
+  fill("rgb(140, 140, 140)");
+  stroke(0);
+  strokeWeight(0.05);
+  translate(16, -12);
+  rect(-8, -12, 16, 12, 2);
+  fill(20);
+  rect(-7, -10, 14, 4);
+  fill("rgb(255, 20, 20)");
+  const mX = mouseX / relativeSize();
+  const mY = mouseY / relativeSize();
+  if (mX > 49.5 && mX < 55.5 && mY < 85 && mY > 82) {
+    fill("rgb(255, 50, 50)");
+  }
+  rect(-3, -4.5, 6, 3, 0.25);
+  fill("white");
+  noStroke();
+  textSize(1.75);
+  textAlign(CENTER, CENTER);
+  text("units", 0, -3);
+  textFont(state.meterFont);
+  fill("yellow");
+  textSize(3);
+  const m = state.inlet.units === "kg/min" ? (state.mF_current * 60).toFixed(2) : (state.mF_current * 1000).toFixed(1);
+  text(`${m} ${state.inlet.units}`, 0.125, -8);
   pop();
 }
 

@@ -22,17 +22,28 @@ window.state = {
   },
   heatExchanger: {
     T: 150,
-    Tmin: 90,
-    Tmax: 500,
+    T_current: 500,
+    Tmin: 50,
+    Tmax: 450,
   },
   pressureController: {
     P: 1,
+    P_current: 1,
     Pmin: 1,
     Pmax: 2,
   },
-  column_T: 25,
+  column: {
+    T: 25,
+    T_current: 25,
+    units: "C",
+  },
+  liquidOutlet: {
+    units: "g/s",
+  },
+  inlet: {
+    units: "g/s",
+  },
   xF: 0.5,
-  massFlowRateUnits: "g/s",
   temperatureUnits: "C",
   pressureUnits: "atm",
 };
