@@ -1,7 +1,5 @@
 - Look into weird issue with feed stream suddenly just appearing outta nowhere
 - Add buttons to empty and fill tank
-- Make pressure controller "bar" by default
-- Make mass flow controllers "kg/min" by default
 - Add a "take sample" feature
 - Turn off pump automatically when tank is fully empty
 - Make the valves adjust according to pressure and temperature

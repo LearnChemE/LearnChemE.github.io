@@ -190,8 +190,8 @@ export function setDefaults() {
   };
 
   state.pump.on = false;
-  state.heatExchanger.valvePosition = 0;
-  state.pressureController.valvePosition = 0;
+  state.heatExchanger.valvePosition = state.heatExchanger.T / state.heatExchanger.Tmax;
+  state.pressureController.valvePosition = state.pressureController.P / state.pressureController.Pmax;
   state.heatExchanger.T_current = 500;
   state.pressureController.P_current = 1;
   state.column.T_current = 25;

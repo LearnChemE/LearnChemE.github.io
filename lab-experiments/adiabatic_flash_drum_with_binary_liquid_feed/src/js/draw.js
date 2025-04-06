@@ -269,6 +269,7 @@ function drawHeatExchanger() {
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
       state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T - 1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T - 5 / 9 / 10, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
       state.mousePressedTemperatureFrame = frameCount;
+      state.heatExchanger.valvePosition = state.heatExchanger.T / state.heatExchanger.Tmax;
       calcAll();
     }
   } else {
@@ -281,6 +282,7 @@ function drawHeatExchanger() {
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
       state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T + 1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T + 5 / 9 / 10, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
       state.mousePressedTemperatureFrame = frameCount;
+      state.heatExchanger.valvePosition = state.heatExchanger.T / state.heatExchanger.Tmax;
       calcAll();
     }
   } else {
@@ -602,10 +604,10 @@ function drawFlashDrum() {
   push();
   translate(state.pump.x, state.pump.y);
   translate(45.5, -20.5);
-  drawFlashLiquid();
   noStroke();
   fill(`rgba(${round(255 - 25 * state.vaporDensity)}, ${round(255 - 25 * state.vaporDensity)}, 255, ${0.3 * state.vaporDensity})`);
   rect(0, -35, 20, 65);
+  drawFlashLiquid();
   stroke("rgb(40, 40, 40)");
   strokeWeight(0.1);
   fill("rgba(220, 220, 220, 0.1)");
@@ -732,7 +734,7 @@ function drawFlashLiquid() {
     }
     push();
     randomSeed(1578459);
-    const numberOfBubbles = 100 * (state.mV / state.mF);
+    const numberOfBubbles = 100 * (state.mV / state.mF) - 1;
     for (let i = 0; i < numberOfBubbles; i++) {
       push();
       let m = random(0, 1) * (frameCount - state.bubbleFrame) % 240;
@@ -1127,6 +1129,7 @@ function drawVaporOutletPipe() {
     fill("rgb(255, 50, 50)");
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
       state.pressureController.P = state.pressureUnits === "atm" ? constrain(state.pressureController.P - 0.01, state.pressureController.Pmin, state.pressureController.Pmax) : constrain(state.pressureController.P - 0.01 * 100000 / 101325, state.pressureController.Pmin, state.pressureController.Pmax);
+      state.pressureController.valvePosition = 0.2 + (state.pressureController.Pmax - state.pressureController.P) * 0.8;
       state.mousePressedPressureFrame = frameCount;
       calcAll();
     }
@@ -1140,6 +1143,7 @@ function drawVaporOutletPipe() {
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
       state.pressureController.P = state.pressureUnits === "atm" ? constrain(state.pressureController.P + 0.01, state.pressureController.Pmin, state.pressureController.Pmax) : constrain(state.pressureController.P + 0.01 * 100000 / 101325, state.pressureController.Pmin, state.pressureController.Pmax);
       state.mousePressedPressureFrame = frameCount;
+      state.pressureController.valvePosition = 0.2 + (state.pressureController.Pmax - state.pressureController.P) * 0.8;
       calcAll();
     }
   } else {
