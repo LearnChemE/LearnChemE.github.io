@@ -27,6 +27,8 @@
   <div id="graphics-container">
     <div id="p5-container">
       <div id="take-sample" class="btn btn-danger">take sample</div>
+      <div id="fill-tank" class="btn btn-success">fill tank</div>
+      <div id="empty-tank" class="btn btn-info">empty tank</div>
       <div id="hamburger">
         <div id="hamburger-icon"></div>
         <div id="controls">
@@ -38,39 +40,40 @@
               About
             </div>
             <a href="./assets/adiabatic_flash_drum_with_binary_liquid_feed_worksheet.pdf" class="btn btn-primary" id="worksheet" download>Worksheet</a>
+            <div id="controls-active-label">Tank is empty. You may now change the composition of the mixture.</div>
             <div class="slider-container">
               <div class="slider-label">Feed Composition (x<sub>F</sub>)</div>
               <input type="range" id="z-slider" min="0" max="1" step="0.01" value="0.5">
               <div id="z-value" class="slider-value">0.50</div>
             </div>
             <div class="dropdown-container">
-              <div class="dropdown-label">Mixture</div>
+              <div class="dropdown-label">Binary Mixture</div>
               <select id="mixture-dropdown">
-                <option value="b-t">benzene / toluene</option>
-                <option value="h-o">n-hexane / n-octane</option>
-                <option value="c-d">cyclohexane / n-decane</option>
-                <option value="w-m">water / methanol</option>
+                <option value="a">Mixture A</option>
+                <option value="b">Mixture B</option>
+                <option value="c">Mixture C</option>
+                <option value="d">Mixture D</option>
               </select>
             </div>
             <div id="antoine-table">
               <div class="table-label">Antoine Coefficients</div>
               <table>
                 <tr>
-                  <th>Compound</th>
+                  <th>compound</th>
                   <th>A</th>
                   <th>B</th>
                   <th>C</th>
                   <th>molecular weight</th>
                 </tr>
                 <tr>
-                  <td id="compound-1">benzene</td>
+                  <td id="chemical-1">chemical 1</td>
                   <td id="a1">6.880</td>
                   <td id="b1">1197</td>
                   <td id="c1">219.2</td>
                   <td id="mw1">78.11</td>
                 </tr>
                 <tr>
-                  <td id="compound-2">toluene</td>
+                  <td id="chemical-2">chemical 2</td>
                   <td id="a2">6.951</td>
                   <td id="b2">1342</td>
                   <td id="c2">219.2</td>

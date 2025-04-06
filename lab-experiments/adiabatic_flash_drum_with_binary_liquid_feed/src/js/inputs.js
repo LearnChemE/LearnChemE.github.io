@@ -5,6 +5,51 @@ export function handleInputs() {
   initializeHamburger();
   initializeSlider();
   initializeDropdown();
+  initializeTankControls();
+}
+
+function initializeTankControls() {
+  const fillTank = document.getElementById("fill-tank");
+  const emptyTank = document.getElementById("empty-tank");
+  const zSlider = document.getElementById("z-slider");
+  const mixtureDropdown = document.getElementById("mixture-dropdown");
+  const controlsActiveLabel = document.getElementById("controls-active-label");
+  const sliderContainer = document.getElementsByClassName("slider-container")[0];
+  const dropdownContainer = document.getElementsByClassName("dropdown-container")[0];
+
+  fillTank.addEventListener("click", (e) => {
+    e.target.classList.add("clicked");
+    setTimeout(() => {
+      e.target.classList.remove("clicked");
+    }, 50);
+    zSlider.setAttribute("disabled", "true");
+    mixtureDropdown.setAttribute("disabled", "true");
+    sliderContainer.classList.add("disabled");
+    dropdownContainer.classList.add("disabled");
+    controlsActiveLabel.style.color = "red";
+    controlsActiveLabel.style.fontWeight = "bold";
+    controlsActiveLabel.innerHTML = "Tank is full. Please empty the tank before changing composition.";
+    setDefaults();
+    state.liquidHeight = 1;
+    calcAll();
+  });
+
+  emptyTank.addEventListener("click", (e) => {
+    e.target.classList.add("clicked");
+    setTimeout(() => {
+      e.target.classList.remove("clicked");
+    }, 50);
+    state.liquidHeight = 0;
+    state.pump.on = false;
+    zSlider.removeAttribute("disabled");
+    mixtureDropdown.removeAttribute("disabled");
+    sliderContainer.classList.remove("disabled");
+    dropdownContainer.classList.remove("disabled");
+    controlsActiveLabel.style.color = "black";
+    controlsActiveLabel.style.fontWeight = "normal";
+    controlsActiveLabel.innerHTML = "Tank is empty. You may now change the composition of the mixture.";
+    calcAll();
+  });
 }
 
 function initializeSlider() {
@@ -21,8 +66,8 @@ function initializeSlider() {
 
 function initializeDropdown() {
   const mixtureDropdown = document.getElementById("mixture-dropdown");
-  const compound1label = document.getElementById("compound-1");
-  const compound2label = document.getElementById("compound-2");
+  const chemical1label = document.getElementById("chemical-1");
+  const chemical2label = document.getElementById("chemical-2");
   const A1 = document.getElementById("a1");
   const B1 = document.getElementById("b1");
   const C1 = document.getElementById("c1");
@@ -34,70 +79,70 @@ function initializeDropdown() {
   mixtureDropdown.addEventListener("change", (e) => {
     const selectedOption = e.target.value;
     switch (selectedOption) {
-      case "b-t":
-        compound1label.innerHTML = "benzene";
-        compound2label.innerHTML = "toluene";
-        A1.innerHTML = state.chemicals.benzene.A.toFixed(3);
-        B1.innerHTML = state.chemicals.benzene.B.toFixed(0);
-        C1.innerHTML = state.chemicals.benzene.C.toFixed(1);
-        MW1.innerHTML = state.chemicals.benzene.MW.toFixed(2);
-        A2.innerHTML = state.chemicals.toluene.A.toFixed(3);
-        B2.innerHTML = state.chemicals.toluene.B.toFixed(0);
-        C2.innerHTML = state.chemicals.toluene.C.toFixed(1);
-        MW2.innerHTML = state.chemicals.toluene.MW.toFixed(2);
-        window.mixture = [state.chemicals.benzene, state.chemicals.toluene];
+      case "a":
+        chemical1label.innerHTML = state.chemicals.chemical1.name;
+        chemical2label.innerHTML = state.chemicals.chemical2.name;
+        A1.innerHTML = state.chemicals.chemical1.A.toFixed(3);
+        B1.innerHTML = state.chemicals.chemical1.B.toFixed(0);
+        C1.innerHTML = state.chemicals.chemical1.C.toFixed(1);
+        MW1.innerHTML = state.chemicals.chemical1.MW.toFixed(2);
+        A2.innerHTML = state.chemicals.chemical2.A.toFixed(3);
+        B2.innerHTML = state.chemicals.chemical2.B.toFixed(0);
+        C2.innerHTML = state.chemicals.chemical2.C.toFixed(1);
+        MW2.innerHTML = state.chemicals.chemical2.MW.toFixed(2);
+        window.mixture = [state.chemicals.chemical1, state.chemicals.chemical2];
         break;
-      case "h-o":
-        compound1label.innerHTML = "n-hexane";
-        compound2label.innerHTML = "n-octane";
-        A1.innerHTML = state.chemicals.nHexane.A.toFixed(3);
-        B1.innerHTML = state.chemicals.nHexane.B.toFixed(0);
-        C1.innerHTML = state.chemicals.nHexane.C.toFixed(1);
-        MW1.innerHTML = state.chemicals.nHexane.MW.toFixed(2);
-        A2.innerHTML = state.chemicals.nOctane.A.toFixed(3);
-        B2.innerHTML = state.chemicals.nOctane.B.toFixed(0);
-        C2.innerHTML = state.chemicals.nOctane.C.toFixed(1);
-        MW2.innerHTML = state.chemicals.nOctane.MW.toFixed(2);
-        window.mixture = [state.chemicals.nHexane, state.chemicals.nOctane];
+      case "b":
+        chemical1label.innerHTML = state.chemicals.chemical3.name;
+        chemical2label.innerHTML = state.chemicals.chemical4.name;
+        A1.innerHTML = state.chemicals.chemical3.A.toFixed(3);
+        B1.innerHTML = state.chemicals.chemical3.B.toFixed(0);
+        C1.innerHTML = state.chemicals.chemical3.C.toFixed(1);
+        MW1.innerHTML = state.chemicals.chemical3.MW.toFixed(2);
+        A2.innerHTML = state.chemicals.chemical4.A.toFixed(3);
+        B2.innerHTML = state.chemicals.chemical4.B.toFixed(0);
+        C2.innerHTML = state.chemicals.chemical4.C.toFixed(1);
+        MW2.innerHTML = state.chemicals.chemical4.MW.toFixed(2);
+        window.mixture = [state.chemicals.chemical3, state.chemicals.chemical4];
         break;
-      case "c-d":
-        compound1label.innerHTML = "cyclohexane";
-        compound2label.innerHTML = "n-Decane";
-        A1.innerHTML = state.chemicals.cycloHexane.A.toFixed(3);
-        B1.innerHTML = state.chemicals.cycloHexane.B.toFixed(0);
-        C1.innerHTML = state.chemicals.cycloHexane.C.toFixed(1);
-        MW1.innerHTML = state.chemicals.cycloHexane.MW.toFixed(2);
-        A2.innerHTML = state.chemicals.nDecane.A.toFixed(3);
-        B2.innerHTML = state.chemicals.nDecane.B.toFixed(0);
-        C2.innerHTML = state.chemicals.nDecane.C.toFixed(1);
-        MW2.innerHTML = state.chemicals.nDecane.MW.toFixed(2);
-        window.mixture = [state.chemicals.cycloHexane, state.chemicals.nDecane];
+      case "c":
+        chemical1label.innerHTML = state.chemicals.chemical5.name;
+        chemical2label.innerHTML = state.chemicals.chemical6.name;
+        A1.innerHTML = state.chemicals.chemical5.A.toFixed(3);
+        B1.innerHTML = state.chemicals.chemical5.B.toFixed(0);
+        C1.innerHTML = state.chemicals.chemical5.C.toFixed(1);
+        MW1.innerHTML = state.chemicals.chemical5.MW.toFixed(2);
+        A2.innerHTML = state.chemicals.chemical6.A.toFixed(3);
+        B2.innerHTML = state.chemicals.chemical6.B.toFixed(0);
+        C2.innerHTML = state.chemicals.chemical6.C.toFixed(1);
+        MW2.innerHTML = state.chemicals.chemical6.MW.toFixed(2);
+        window.mixture = [state.chemicals.chemical5, state.chemicals.chemical6];
         break;
-      case "m-w":
-        compound1label.innerHTML = "methanol";
-        compound2label.innerHTML = "water";
-        A1.innerHTML = state.chemicals.methanol.A.toFixed(3);
-        B1.innerHTML = state.chemicals.methanol.B.toFixed(0);
-        C1.innerHTML = state.chemicals.methanol.C.toFixed(1);
-        MW1.innerHTML = state.chemicals.methanol.MW.toFixed(2);
-        A2.innerHTML = state.chemicals.water.A.toFixed(3);
-        B2.innerHTML = state.chemicals.water.B.toFixed(0);
-        C2.innerHTML = state.chemicals.water.C.toFixed(1);
-        MW2.innerHTML = state.chemicals.water.MW.toFixed(2);
-        window.mixture = [state.chemicals.methanol, state.chemicals.water];
+      case "d":
+        chemical1label.innerHTML = state.chemicals.chemical7.name;
+        chemical2label.innerHTML = state.chemicals.chemical8.name;
+        A1.innerHTML = state.chemicals.chemical7.A.toFixed(3);
+        B1.innerHTML = state.chemicals.chemical7.B.toFixed(0);
+        C1.innerHTML = state.chemicals.chemical7.C.toFixed(1);
+        MW1.innerHTML = state.chemicals.chemical7.MW.toFixed(2);
+        A2.innerHTML = state.chemicals.chemical8.A.toFixed(3);
+        B2.innerHTML = state.chemicals.chemical8.B.toFixed(0);
+        C2.innerHTML = state.chemicals.chemical8.C.toFixed(1);
+        MW2.innerHTML = state.chemicals.chemical8.MW.toFixed(2);
+        window.mixture = [state.chemicals.chemical7, state.chemicals.chemical8];
         break;
       default:
-        compound1label.innerHTML = "benzene";
-        compound2label.innerHTML = "toluene";
-        A1.innerHTML = state.chemicals.benzene.A.toFixed(3);
-        B1.innerHTML = state.chemicals.benzene.B.toFixed(0);
-        C1.innerHTML = state.chemicals.benzene.C;
-        MW1.innerHTML = state.chemicals.benzene.MW;
-        A2.innerHTML = state.chemicals.toluene.A.toFixed(3);
-        B2.innerHTML = state.chemicals.toluene.B.toFixed(0);
-        C2.innerHTML = state.chemicals.toluene.C;
-        MW2.innerHTML = state.chemicals.toluene.MW;
-        window.mixture = [state.chemicals.benzene, state.chemicals.toluene];
+        chemical1label.innerHTML = state.chemicals.chemical1.name;
+        chemical2label.innerHTML = state.chemicals.chemical2.name;
+        A1.innerHTML = state.chemicals.chemical1.A.toFixed(3);
+        B1.innerHTML = state.chemicals.chemical1.B.toFixed(0);
+        C1.innerHTML = state.chemicals.chemical1.C;
+        MW1.innerHTML = state.chemicals.chemical1.MW;
+        A2.innerHTML = state.chemicals.chemical2.A.toFixed(3);
+        B2.innerHTML = state.chemicals.chemical2.B.toFixed(0);
+        C2.innerHTML = state.chemicals.chemical2.C;
+        MW2.innerHTML = state.chemicals.chemical2.MW;
+        window.mixture = [state.chemicals.chemical1, state.chemicals.chemical2];
         break;
     }
     setDefaults();

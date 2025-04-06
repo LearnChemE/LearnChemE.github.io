@@ -1371,4 +1371,7 @@ export function drawAll() {
   drawHeatExchanger();
   const p = state.pump;
   drawPump(p.x, p.y, p.scaleX, p.scaleY, p.on);
+  if (state.liquidHeight <= 0) {
+    state.pump.on = false;
+  }
 }

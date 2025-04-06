@@ -58,7 +58,7 @@ window.setup = function() {
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
   handleInputs();
   setDefaults();
-  window.mixture = [state.chemicals.benzene, state.chemicals.toluene];
+  window.mixture = [state.chemicals.chemical1, state.chemicals.chemical2];
   calcAll();
   pixelDensity(state.pixelDensity);
   frameRate(state.frameRate);

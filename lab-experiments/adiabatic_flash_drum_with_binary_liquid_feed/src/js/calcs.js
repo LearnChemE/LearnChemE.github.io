@@ -1,7 +1,7 @@
 export function setDefaults() {
   state = {
     ...state,
-    liquidHeight: 1,
+    liquidHeight: 0,
     vaporDensity: 0,
     liquidFlow: {
       timeCoordinate: -1,
@@ -23,13 +23,13 @@ export function setDefaults() {
     bubbleFrame: 0,
     bubbleEndTime: 0,
     chemicals: {
-      benzene: {
-        name: "Benzene",
+      chemical1: {
+        name: "chemical 1",
         A: 6.880,
         B: 1197,
         C: 219.2,
         Psat: (T) => {
-          const c = state.chemicals.benzene;
+          const c = state.chemicals.chemical1;
           return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322; // bar
         },
         Hvap: 30.7, // kJ / mol
@@ -43,13 +43,13 @@ export function setDefaults() {
         },
         MW: 78.11 // g/mol
       },
-      toluene: {
-        name: "Toluene",
+      chemical2: {
+        name: "chemical 2",
         A: 6.951,
         B: 1342,
         C: 219.2,
         Psat: (T) => {
-          const c = state.chemicals.toluene;
+          const c = state.chemicals.chemical2;
           return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322;
         },
         Hvap: 51.0,
@@ -63,13 +63,13 @@ export function setDefaults() {
         },
         MW: 92.14
       },
-      nHexane: {
-        name: "n-Hexane",
+      chemical3: {
+        name: "chemical 3",
         A: 6.876,
         B: 1171,
         C: 224.4,
         Psat: (T) => {
-          const c = state.chemicals.nHexane;
+          const c = state.chemicals.chemical3;
           return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322;
         },
         Hvap: 31.0,
@@ -83,13 +83,13 @@ export function setDefaults() {
         },
         MW: 86.18
       },
-      nOctane: {
-        name: "n-Octane",
+      chemical4: {
+        name: "chemical 4",
         A: 6.919,
         B: 1352,
         C: 209.2,
         Psat: (T) => {
-          const c = state.chemicals.nOctane;
+          const c = state.chemicals.chemical4;
           return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322;
         },
         Hvap: 41.0,
@@ -103,13 +103,13 @@ export function setDefaults() {
         },
         MW: 114.23
       },
-      cycloHexane: {
-        name: "Cyclohexane",
+      chemical5: {
+        name: "chemical 5",
         A: 6.851,
         B: 1206,
         C: 223.1,
         Psat: (T) => {
-          const c = state.chemicals.cycloHexane;
+          const c = state.chemicals.chemical5;
           return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322;
         },
         Hvap: 30.8,
@@ -123,13 +123,13 @@ export function setDefaults() {
         },
         MW: 84.16
       },
-      nDecane: {
-        name: "n-Decane",
+      chemical6: {
+        name: "chemical 6",
         A: 6.944,
         B: 1495,
         C: 193.9,
         Psat: (T) => {
-          const c = state.chemicals.nDecane;
+          const c = state.chemicals.chemical6;
           return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322;
         },
         Hvap: 51.3,
@@ -143,13 +143,13 @@ export function setDefaults() {
         },
         MW: 144.26
       },
-      methanol: {
-        name: "Methanol",
+      chemical7: {
+        name: "chemical 7",
         A: 8.072,
         B: 1575,
         C: 238.9,
         Psat: (T) => {
-          const c = state.chemicals.methanol;
+          const c = state.chemicals.chemical7;
           return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322;
         },
         Hvap: 35.2,
@@ -162,13 +162,13 @@ export function setDefaults() {
         },
         MW: 32.04
       },
-      water: {
-        name: "Water",
+      chemical8: {
+        name: "chemical 8",
         A: 8.071,
         B: 1731,
         C: 233.4,
         Psat: (T) => {
-          const c = state.chemicals.water;
+          const c = state.chemicals.chemical8;
           return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322;
         },
         Hvap: 40.7,
