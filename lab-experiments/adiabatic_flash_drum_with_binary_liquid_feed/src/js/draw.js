@@ -1707,6 +1707,17 @@ function drawComputer() {
   pop();
 }
 
+function triggerSampleButton() {
+  const takeSampleButton = document.getElementById("take-sample");
+  if (state.pump.on) {
+    takeSampleButton.classList.remove("disabled");
+    state.sampleButtonOn = true;
+  } else {
+    takeSampleButton.classList.add("disabled");
+    state.sampleButtonOn = false;
+  }
+}
+
 export function drawAll() {
   state.hand = false;
   if (state.gc.takingSample) {
@@ -1723,6 +1734,11 @@ export function drawAll() {
     drawPump(p.x, p.y, p.scaleX, p.scaleY, p.on);
     if (state.liquidHeight <= 0) {
       state.pump.on = false;
+      if (state.sampleButtonOn) {
+        triggerSampleButton();
+      }
+    } else if (!state.sampleButtonOn && state.pump.on) {
+      triggerSampleButton();
     }
   }
   if (state.hand) {

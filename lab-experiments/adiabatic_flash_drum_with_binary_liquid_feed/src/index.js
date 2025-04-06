@@ -54,6 +54,7 @@ window.state = {
   xF: 0.5,
   temperatureUnits: "C",
   pressureUnits: "bar",
+  sampleButtonOn: false,
 };
 
 const containerElement = document.getElementById("p5-container");
