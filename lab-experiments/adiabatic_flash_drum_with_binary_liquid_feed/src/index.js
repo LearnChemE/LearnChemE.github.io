@@ -24,7 +24,7 @@ window.state = {
     x: 51,
     y: 40,
     scale: 0.7,
-    takingSample: true,
+    takingSample: false,
     takingSampleFrame: 0,
     takingSampleTime: 0,
   },

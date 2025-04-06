@@ -138,6 +138,7 @@ function drawPump(x, y, scaleX, scaleY) {
   const mX = mouseX / relativeSize();
   const mY = mouseY / relativeSize();
   if (mX > 16.5 + x - 3.5 && mX < 16.5 + x + 11.5 && mY > 19.5 + y - 1 && mY < 19.5 + y + 6.75) {
+    state.hand = true;
     stroke("rgb(140, 140, 40)");
     strokeWeight(0.2);
   } else {
@@ -258,14 +259,17 @@ function drawHeatExchanger() {
   const mX = mouseX / relativeSize();
   const mY = mouseY / relativeSize();
   if (mX > 61 - 2.5 && mX < 67 - 2.5 && mY < 49.75 && mY > 46.75) {
+    state.hand = true;
     fill("rgb(255, 50, 50)");
   } else {
+
     fill("rgb(255, 20, 20)");
   }
   rect(-3 - 2.5, -4.5, 6, 3, 0.25);
 
   if (mX > 61 + 4 && mX < 64 + 4 && mY < 49.75 && mY > 46.75) {
     fill("rgb(255, 50, 50)");
+    state.hand = true;
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
       state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T - 1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T - 5 / 9 / 10, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
       state.mousePressedTemperatureFrame = frameCount;
@@ -273,12 +277,14 @@ function drawHeatExchanger() {
       calcAll();
     }
   } else {
+
     fill("rgb(255, 20, 20)");
   }
   rect(-3 + 4, -4.5, 3, 3, 0.25);
 
   if (mX > 61 + 7.5 && mX < 64 + 7.5 && mY < 49.75 && mY > 46.75) {
     fill("rgb(255, 50, 50)");
+    state.hand = true;
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
       state.heatExchanger.T = state.temperatureUnits === "C" ? constrain(state.heatExchanger.T + 1, state.heatExchanger.Tmin, state.heatExchanger.Tmax) : constrain(state.heatExchanger.T + 5 / 9 / 10, state.heatExchanger.Tmin, state.heatExchanger.Tmax);
       state.mousePressedTemperatureFrame = frameCount;
@@ -286,6 +292,7 @@ function drawHeatExchanger() {
       calcAll();
     }
   } else {
+
     fill("rgb(255, 20, 20)");
   }
   rect(-3 + 7.5, -4.5, 3, 3, 0.25);
@@ -659,8 +666,10 @@ function drawTemperatureMeter() {
   const mY = mouseY / relativeSize();
   // console.log({ mX, mY });
   if (mX > 113 && mX < 119 && mY < 51.25 && mY > 48.25) {
+    state.hand = true;
     fill("rgb(255, 50, 50)");
   } else {
+
     fill("rgb(255, 20, 20)");
   }
   rect(-2, -4.5, 6, 3, 0.25);
@@ -1119,13 +1128,16 @@ function drawVaporOutletPipe() {
   const mX = mouseX / relativeSize();
   const mY = mouseY / relativeSize();
   if (mX > 76.25 && mX < 82.25 && mY < 15.25 && mY > 12.25) {
+    state.hand = true;
     fill("rgb(255, 50, 50)");
   } else {
+
     fill("rgb(255, 20, 20)");
   }
   rect(-3 - 2.5, -4.5, 6, 3, 0.25);
 
   if (mX > 76.25 + 6.5 && mX < 79.25 + 6.5 && mY < 15.25 && mY > 12.25) {
+    state.hand = true;
     fill("rgb(255, 50, 50)");
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
       state.pressureController.P = state.pressureUnits === "atm" ? constrain(state.pressureController.P - 0.01, state.pressureController.Pmin, state.pressureController.Pmax) : constrain(state.pressureController.P - 0.01 * 100000 / 101325, state.pressureController.Pmin, state.pressureController.Pmax);
@@ -1134,12 +1146,14 @@ function drawVaporOutletPipe() {
       calcAll();
     }
   } else {
+
     fill("rgb(255, 20, 20)");
   }
   rect(-3 + 4, -4.5, 3, 3, 0.25);
 
   if (mX > 76.25 + 10 && mX < 79.25 + 10 && mY < 15.25 && mY > 12.25) {
     fill("rgb(255, 50, 50)");
+    state.hand = true;
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
       state.pressureController.P = state.pressureUnits === "atm" ? constrain(state.pressureController.P + 0.01, state.pressureController.Pmin, state.pressureController.Pmax) : constrain(state.pressureController.P + 0.01 * 100000 / 101325, state.pressureController.Pmin, state.pressureController.Pmax);
       state.mousePressedPressureFrame = frameCount;
@@ -1147,6 +1161,7 @@ function drawVaporOutletPipe() {
       calcAll();
     }
   } else {
+
     fill("rgb(255, 20, 20)");
   }
   rect(-3 + 7.5, -4.5, 3, 3, 0.25);
@@ -1271,6 +1286,7 @@ function drawMassFlowMeter() {
   const mX = mouseX / relativeSize();
   const mY = mouseY / relativeSize();
   if (mX > 124.5 && mX < 131 && mY < 90.5 && mY > 86.5) {
+    state.hand = true;
     fill("rgb(255, 50, 50)");
   }
   rect(-3, -4.5, 6, 3, 0.25);
@@ -1348,6 +1364,7 @@ function drawInletFlowMeter() {
   const mX = mouseX / relativeSize();
   const mY = mouseY / relativeSize();
   if (mX > 49.5 && mX < 55.5 && mY < 85 && mY > 82) {
+    state.hand = true;
     fill("rgb(255, 50, 50)");
   }
   rect(-3, -4.5, 6, 3, 0.25);
@@ -1691,6 +1708,7 @@ function drawComputer() {
 }
 
 export function drawAll() {
+  state.hand = false;
   if (state.gc.takingSample) {
     drawTable();
     drawComputer();
@@ -1706,5 +1724,10 @@ export function drawAll() {
     if (state.liquidHeight <= 0) {
       state.pump.on = false;
     }
+  }
+  if (state.hand) {
+    cursor(HAND);
+  } else {
+    cursor(ARROW);
   }
 }
