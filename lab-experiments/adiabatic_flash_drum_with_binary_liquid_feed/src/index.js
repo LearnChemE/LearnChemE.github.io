@@ -20,6 +20,14 @@ window.state = {
     scaleX: 0.8,
     scaleY: 0.8,
   },
+  gc: {
+    x: 51,
+    y: 40,
+    scale: 0.7,
+    takingSample: true,
+    takingSampleFrame: 0,
+    takingSampleTime: 0,
+  },
   heatExchanger: {
     T: 150,
     T_current: 500,
@@ -45,7 +53,7 @@ window.state = {
   },
   xF: 0.5,
   temperatureUnits: "C",
-  pressureUnits: "bar"
+  pressureUnits: "bar",
 };
 
 const containerElement = document.getElementById("p5-container");

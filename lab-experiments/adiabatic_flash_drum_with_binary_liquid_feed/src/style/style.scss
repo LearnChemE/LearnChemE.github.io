@@ -31,10 +31,19 @@ canvas {
   box-shadow: 0px 0px 2px 2px lightgrey;
 }
 
+#inject-sample {
+  position: absolute;
+  top: 2%;
+  left: 12%;
+  display: none;
+}
+
 #take-sample {
   position: absolute;
   bottom: 3%;
   right: 3%;
+  width: max-content;
+  height: max-content;
 }
 
 #fill-tank {
@@ -51,7 +60,8 @@ canvas {
 
 #fill-tank.clicked,
 #empty-tank.clicked,
-#take-sample.clicked {
+#take-sample.clicked,
+#inject-sample.clicked {
   opacity: 0.7;
 }
 

@@ -6,6 +6,85 @@ export function handleInputs() {
   initializeSlider();
   initializeDropdown();
   initializeTankControls();
+  initializeTakeSample();
+  initializeInjectSample();
+}
+
+function initializeInjectSample() {
+  const injectSample = document.getElementById("inject-sample");
+  injectSample.addEventListener("click", (e) => {
+    e.target.classList.add("clicked");
+    setTimeout(() => {
+      e.target.classList.remove("clicked");
+    }, 50);
+    const interval = setInterval(() => {
+      if (state.gc.takingSample) {
+        state.gc.takingSampleTime += 0.01667 / 4;
+        if (state.gc.takingSampleTime >= 1) {
+          state.gc.takingSampleTime = 1;
+          clearInterval(interval);
+        }
+      }
+    }, 16.67);
+  });
+}
+
+function initializeTakeSample() {
+  const takeSample = document.getElementById("take-sample");
+  const injectSample = document.getElementById("inject-sample");
+  const fillTank = document.getElementById("fill-tank");
+  const emptyTank = document.getElementById("empty-tank");
+  const zSlider = document.getElementById("z-slider");
+  const mixtureDropdown = document.getElementById("mixture-dropdown");
+  const controlsActiveLabel = document.getElementById("controls-active-label");
+  const sliderContainer = document.getElementsByClassName("slider-container")[0];
+  const dropdownContainer = document.getElementsByClassName("dropdown-container")[0];
+
+  takeSample.addEventListener("click", (e) => {
+    state.gc.takingSample = !state.gc.takingSample;
+    state.gc.takingSampleFrame = frameCount;
+    state.gc.takingSampleTime = 0;
+    if (state.gc.takingSample) {
+      fillTank.style.display = "none";
+      emptyTank.style.display = "none";
+      injectSample.style.display = "block";
+      takeSample.style.left = "calc(10% + 150px)";
+      takeSample.style.top = "2%";
+      takeSample.innerHTML = "back to experiment"
+      zSlider.setAttribute("disabled", "true");
+      mixtureDropdown.setAttribute("disabled", "true");
+      sliderContainer.classList.add("disabled");
+      dropdownContainer.classList.add("disabled");
+      controlsActiveLabel.style.color = "red";
+      controlsActiveLabel.style.fontWeight = "bold";
+      controlsActiveLabel.innerHTML = "Currently taking sample. Please wait before changing composition.";
+    } else {
+      e.target.classList.remove("clicked");
+      fillTank.style.display = "block";
+      emptyTank.style.display = "block";
+      injectSample.style.display = "none";
+      takeSample.style.left = "";
+      takeSample.style.top = "";
+      takeSample.innerHTML = "take sample";
+      if (state.liquidHeight === 0) {
+        zSlider.removeAttribute("disabled");
+        mixtureDropdown.removeAttribute("disabled");
+        sliderContainer.classList.remove("disabled");
+        dropdownContainer.classList.remove("disabled");
+        controlsActiveLabel.style.color = "black";
+        controlsActiveLabel.style.fontWeight = "normal";
+        controlsActiveLabel.innerHTML = "Tank is empty. You may now change the composition of the mixture.";
+      } else {
+        zSlider.setAttribute("disabled", "true");
+        mixtureDropdown.setAttribute("disabled", "true");
+        sliderContainer.classList.add("disabled");
+        dropdownContainer.classList.add("disabled");
+        controlsActiveLabel.style.color = "red";
+        controlsActiveLabel.style.fontWeight = "bold";
+        controlsActiveLabel.innerHTML = "Tank is full. Please empty the tank before changing composition.";
+      }
+    }
+  });
 }
 
 function initializeTankControls() {

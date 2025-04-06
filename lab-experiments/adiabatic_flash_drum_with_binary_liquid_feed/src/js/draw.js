@@ -1364,14 +1364,347 @@ function drawInletFlowMeter() {
   pop();
 }
 
+function drawSample() {
+  push();
+  translate(state.gc.x, state.gc.y);
+  scale(state.gc.scale);
+  fill("rgb(200, 200, 200)");
+  stroke("rgb(150, 150, 150)");
+  strokeWeight(0.025);
+  rect(-40, -20, -5, 0.2);
+  fill("rgb(220, 220, 220)");
+  const offsetX = 12 * state.gc.takingSampleTime;
+  rect(-58 + offsetX, -21, 0.5, 2);
+  rect(-58 + offsetX, -20.25, -13, 0.5);
+  rect(-71.5 + offsetX, -21.25, 0.5, 2.5);
+  fill("rgb(200, 200, 255)");
+  noStroke();
+  rect(-57.5 + offsetX, -21, 12 - offsetX, 2);
+  fill("rgba(200, 200, 200, 0.2)");
+  stroke("rgb(150, 150, 150)");
+  rect(-45, -21, -14, 2, 1, 0.5, 0.5, 1);
+  stroke(50);
+  strokeWeight(0.1);
+  for (let i = 0; i <= 12; i++) {
+    const x = -58 + i;
+    const y = -21;
+    const y2 = i % 4 === 0 ? y + 0.75 : i % 2 === 0 ? y + 0.5 : y + 0.25;
+    line(x, y, x, y2);
+  }
+  pop();
+}
+
+function drawGC() {
+  push();
+  translate(state.gc.x, state.gc.y);
+  scale(state.gc.scale);
+  fill("rgb(230, 230, 220)");
+  stroke("rgb(150, 150, 120)");
+  strokeWeight(0.1);
+  rect(-40, 0, 80, 40, 0, 0, 2, 2);
+  fill("rgb(180, 50, 50)");
+  stroke("rgb(200, 0, 0)");
+  rect(-40, -40, 80, 40, 2, 2, 0, 0);
+  fill("rgb(200, 200, 200)");
+  for (let i = 0; i < 18; i++) {
+    if (i < 6) {
+      stroke("rgb(150, 150, 150)");
+      strokeWeight(0.05);
+      circle(-38, 4 - i * 8, 1);
+      strokeWeight(0.1);
+      stroke(50);
+      line(-37.75, 4 - i * 8, -38.25, 4 - i * 8);
+      line(-38, 4 - i * 8 - 0.25, -38, 4 - i * 8 + 0.25);
+    } else if (i < 12) {
+      const j = i - 6;
+      stroke("rgb(150, 150, 150)");
+      strokeWeight(0.05);
+      circle(-30 + j * 12, -38, 1);
+      strokeWeight(0.1);
+      stroke(50);
+      line(-30 + j * 12 - 0.25, -38, -30 + j * 12 + 0.25, -38);
+      line(-30 + j * 12, -38 - 0.25, -30 + j * 12, -38 + 0.25);
+    } else {
+      const j = i - 12;
+      stroke("rgb(150, 150, 150)");
+      strokeWeight(0.05);
+      circle(38, 4 - j * 8, 1);
+      strokeWeight(0.1);
+      stroke(50);
+      line(37.75, 4 - j * 8, 38.25, 4 - j * 8);
+      line(38, 4 - j * 8 - 0.25, 38, 4 - j * 8 + 0.25);
+    }
+  }
+  stroke(0);
+  strokeWeight(0.1);
+  fill(40);
+  beginShape();
+  vertex(-20.5, -3);
+  vertex(-20, -3.5);
+  vertex(-16, -3.5);
+  vertex(-15.5, -3);
+  vertex(-15.5, 3);
+  vertex(-16, 3.5);
+  vertex(-20, 3.5);
+  vertex(-20.5, 3);
+  beginContour();
+  vertex(-19.25, -2.25);
+  vertex(-19.25, 2.25);
+  vertex(-16.75, 2.25);
+  vertex(-16.75, -2.25);
+  endContour();
+  endShape();
+  fill("rgb(200, 200, 200)");
+  stroke("rgb(50, 50, 50)");
+  strokeWeight(0.05);
+  rect(-18.75, -2.25, 1.5, 1);
+  rect(-18.75, 1.25, 1.5, 1);
+
+  stroke(0);
+  strokeWeight(0.1);
+  fill(40);
+  beginShape();
+  vertex(20.5, -3);
+  vertex(20, -3.5);
+  vertex(16, -3.5);
+  vertex(15.5, -3);
+  vertex(15.5, 3);
+  vertex(16, 3.5);
+  vertex(20, 3.5);
+  vertex(20.5, 3);
+  beginContour();
+  vertex(19.25, -2.25);
+  vertex(19.25, 2.25);
+  vertex(16.75, 2.25);
+  vertex(16.75, -2.25);
+  endContour();
+  endShape();
+  fill("rgb(200, 200, 200)");
+  stroke("rgb(50, 50, 50)");
+  strokeWeight(0.05);
+  rect(17.25, -2.25, 1.5, 1);
+  rect(17.25, 1.25, 1.5, 1);
+
+  stroke("rgb(150, 150, 150)");
+  strokeWeight(0.2);
+  noFill();
+  rect(-38, 7, 14, 31, 1);
+  translate(0.5, 0);
+  rect(-23, 7, 19.5, 31, 1);
+  rect(-2, 7, 14, 31, 1);
+  noStroke();
+  fill("black");
+  textSize(1.25);
+  textAlign(CENTER, CENTER);
+  text("EPC CONTROLS", -31, 9.5);
+  text("DETECTOR PARAMETERS", -13, 9.5);
+  text("TEMPERATURES", 5, 9.5);
+  textSize(0.75);
+  text("LOCAL\nSETPOINT", -35, 13);
+  text("TOTAL\nSETPOINT", -35, 16);
+  text("STATUS", -35, 19);
+  text("ACTUAL", -35, 22);
+  textAlign(CENTER, TOP);
+  text("C\nA\nR\nR\nI\nE\nR", -32, 24);
+  text("H\nY\nD\nR\nO\nG\nE\nN", -29.5, 24);
+  text("A\nI\nR", -27, 24);
+  text("B\nE\nA\nD\n\nV\nO\nL\nT\nS", -21, 24);
+  text("F\nL\nA\nM\nE\n\nI\nG\nN\nI\nT\nE", -18.5, 24);
+  text("L\nA\nM\nP\n\nC\nU\nR\nR\nE\nN\nT", -16, 24);
+  text("P\nM\nT\n\nV\nO\nL\nT\nS", -13.5, 24);
+  text("E\nC\nD\n\nC\nU\nR\nR\nE\nN\nT", -11, 24);
+  text("R\nE\nA\nC\nT\nO\nR\n\nT\nE\nM\nP", -8.5, 24);
+  text("T\nC\nD\n\nP\nR\nO\nT\nE\nC\nT", -6, 24);
+  text("D\nE\nT\nE\nC\nT\nO\nR\n\n1", 0, 24);
+  text("D\nE\nT\nE\nC\nT\nO\nR\n\n2", 2.5, 24);
+  text("I\nN\nJ\nE\nC\nT\nO\nR", 5, 24);
+  text("C\nO\nL\nU\nM\nN\n\nO\nV\nE\nN", 7.5, 24);
+  text("O\nV\nE\nN\n\nM\nA\nX", 10, 24);
+  fill("rgb(80, 80, 80)");
+  stroke(0);
+  strokeWeight(0.1);
+  randomSeed(125);
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 4; j++) {
+      if (random() < 0.2) {
+        fill("yellow");
+      } else {
+        fill("rgb(80, 80, 80)");
+      }
+      circle(-32 + i * 2.5, 13 + j * 3, 0.5)
+    }
+  }
+  for (let i = 0; i < 7; i++) {
+    for (let j = 0; j < 4; j++) {
+      if (random() < 0.2) {
+        fill("yellow");
+      } else {
+        fill("rgb(80, 80, 80)");
+      }
+      circle(-21 + i * 2.5, 13 + j * 3, 0.5)
+    }
+  }
+  for (let i = 0; i < 5; i++) {
+    for (let j = 0; j < 4; j++) {
+      if (random() < 0.2) {
+        fill("yellow");
+      } else {
+        fill("rgb(80, 80, 80)");
+      }
+      circle(i * 2.5, 13 + j * 3, 0.5)
+    }
+  }
+  translate(-0.5, 0);
+  noStroke();
+  fill("black");
+  textSize(1.25);
+  textAlign(CENTER, CENTER);
+  text("TEMPERATURE (°C)\nPRESSURE (PSI)", 25, 8);
+  textSize(0.75);
+  text("TEMPERATURE", 23, 18);
+  text("PRESSURE", 23, 23);
+  textSize(1.1);
+  text("START", 30, 30);
+  fill("rgb(220, 220, 220)");
+  stroke("rgb(150, 150, 150)");
+  strokeWeight(0.05);
+  circle(23, 20.5, 2.5);
+  rectMode(CENTER);
+  fill("rgb(230, 230, 230)");
+  rect(23, 19.75, 0.75, 2, 0.5);
+  fill(0);
+  stroke(0);
+  strokeWeight(0.1);
+  rectMode(CORNER);
+  rect(20, 10.5, 10, 6);
+  fill(40);
+  rect(21, 11.5, 8, 4);
+  rect(28.5, 25, 3, 3);
+  fill("rgb(255, 255, 200)");
+  stroke("rgb(200, 200, 200)");
+  strokeWeight(0.2);
+  rect(28.75, 25.25, 2.5, 2.5);
+  noStroke();
+  textFont(state.meterFont);
+  fill("yellow");
+  textSize(4);
+  text("80", 25, 13.5);
+  pop();
+}
+
+function drawTable() {
+  push();
+  fill(100);
+  stroke(0);
+  strokeWeight(0.1);
+  rectMode(CENTER);
+  rect(width / 2, height / 2 + 20.25, 140, 4, 0.5);
+  fill("rgb(200, 180, 160)");
+  stroke("rgb(180, 160, 120)");
+  rectMode(CORNER);
+  rect(width / 2 - 48, height / 2 + 22.3, 5, 35);
+  rect(width / 2 + 48 - 5, height / 2 + 22.3, 5, 35);
+  rect()
+  pop();
+}
+
+function drawComputer() {
+  push();
+  translate(width / 2 + 40, height / 2 - 40);
+  fill(50);
+  stroke(0);
+  strokeWeight(0.05);
+  rect(-25, 0, 50, 40, 1);
+  fill(245);
+  rect(-23.5, 1.5, 47, 37, 0.5);
+  fill(220);
+  quad(-13, 40, -17, 58, -15, 58, -11, 40);
+  quad(13, 40, 17, 58, 15, 58, 11, 40);
+  fill(190);
+  for (let i = 0; i < 16; i++) {
+    const x = -22 + i * (46 - 2) / 16;
+    const y = 54;
+    rect(x, y, 2, 3);
+  }
+  fill(200);
+  rect(-23, 55, 46, 3);
+  noFill();
+  stroke(0);
+  strokeWeight(0.4);
+  beginShape();
+  vertex(-36, 42);
+  quadraticVertex(-32, 40, -30, 35);
+  quadraticVertex(-28, 30, -25, 28);
+  endShape();
+  fill(255);
+  strokeWeight(0.1);
+  rect(-19, 10, 38, 25);
+  for (let i = 0; i < 32; i++) {
+    let x = -19;
+    const y = 10 + i * 25 / 32;
+    let x2 = i % 4 === 0 ? x + 0.5 : i % 2 === 0 ? x + 0.3 : x + 0.2;
+    line(x, y, x2, y);
+    x = 19;
+    x2 = i % 4 === 0 ? x - 0.5 : i % 2 === 0 ? x - 0.3 : x - 0.2;
+    line(x, y, x2, y);
+  }
+  for (let i = 0; i < 48; i++) {
+    const x = -19 + i * 38 / 48;
+    let y = 35;
+    let y2 = i % 4 === 0 ? y - 0.5 : i % 2 === 0 ? y - 0.3 : y - 0.2;
+    line(x, y, x, y2);
+    y = 10;
+    y2 = i % 4 === 0 ? y + 0.5 : i % 2 === 0 ? y + 0.3 : y + 0.2;
+    line(x, y, x, y2);
+  }
+  noFill();
+  strokeWeight(0.15);
+  beginShape();
+  vertex(-19, 35 - 4 * 38 / 48);
+  vertex(-14, 35 - 4 * 38 / 48);
+  if (state.gc.takingSampleTime >= 1) {
+    for (let i = 0; i < 100; i++) {
+      const x = -14 + i * 8 / 50;
+      const y = 35 - 4 * 38 / 48 - state.xL * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2);
+      vertex(x, y);
+    }
+    for (let i = 0; i < 100; i++) {
+      const x = 2 + i * 8 / 50;
+      const y = 35 - 4 * 38 / 48 - (1 - state.xL) * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2);
+      vertex(x, y);
+    }
+  }
+  vertex(19, 35 - 4 * 38 / 48);
+  endShape();
+  fill(0);
+  noStroke();
+  textSize(3);
+  textAlign(LEFT, CENTER);
+  if (state.gc.takingSampleTime >= 1) {
+    text(`x  = ${(round(100 * state.xL) / 100).toFixed(2)}`, -5, 6);
+    textSize(2);
+    text("L", -3.2, 7.1);
+  } else {
+    text("READY FOR SAMPLE", -15, 6);
+  }
+  pop();
+}
+
 export function drawAll() {
-  drawFeedTank();
-  drawFlashDrum();
-  drawInletPipe();
-  drawHeatExchanger();
-  const p = state.pump;
-  drawPump(p.x, p.y, p.scaleX, p.scaleY, p.on);
-  if (state.liquidHeight <= 0) {
-    state.pump.on = false;
+  if (state.gc.takingSample) {
+    drawTable();
+    drawComputer();
+    drawGC();
+    drawSample();
+  } else {
+    drawFeedTank();
+    drawFlashDrum();
+    drawInletPipe();
+    drawHeatExchanger();
+    const p = state.pump;
+    drawPump(p.x, p.y, p.scaleX, p.scaleY, p.on);
+    if (state.liquidHeight <= 0) {
+      state.pump.on = false;
+    }
   }
 }
