@@ -57,6 +57,18 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     p.pop();
   };
 
+  const fillPumps = (s: number = 1) => {
+    p.push();
+    p.noStroke();
+    // Left orange
+    p.fill(255, 50, 0, 120);
+    p.rect(68,458 + 143 * (1-s),14,143 * s);
+    // Right blue
+    p.fill(0, 80, 255, 100);
+    p.rect(598,458 + 143 * (1-s),14,143 * s);
+    p.pop();
+  }
+
   const fillAnimation = () => {
     let start: number;
     p.image(singleGraphics.emptyTubes, 0, 0);
@@ -67,6 +79,8 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     let current = p.millis() - start;
     if (current < 5000) {
       // Fill animation
+      let s = current < 300 ? current / 300 : 1;
+      fillPumps(s);
 
       // HEX fill
       p.noStroke();
@@ -80,6 +94,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
       if (g.cIsFlowing) p.image(singleGraphics.tubes[1], 0, 0);
       p.image(singleGraphics.tubes[2], 0, 0);
       p.image(singleGraphics.tubes[3], 0, 0);
+      fillPumps();
       // Fill HEX
       p.image(graphics.orngShellTube, 75, 75);
       p.image(graphics.blueShellTube, 75, 75);
@@ -124,10 +139,10 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     // Inlet tubes
     // Orange
     var vertices = [[75, 430],[75, 410],[30, 410],[30, 30],[105, 30],[105, 75]];
-    fillAnimationFactory.createSegment(0, TubeFill, 1000, vertices, ORANGE_FLUID_COLOR);
+    fillAnimationFactory.createSegment(300, TubeFill, 700, vertices, ORANGE_FLUID_COLOR);
     // Blue
     vertices = [[605,450],[605,395],[490,395],[490,375]];
-    fillAnimationFactory.createSegment(0, TubeFill, 1000, vertices, BLUE_FLUID_COLOR);
+    fillAnimationFactory.createSegment(300, TubeFill, 700, vertices, BLUE_FLUID_COLOR);
 
     // Vertices for orange path
     vertices = [[105,20],[105,150],[585,150],[585,300],[105,300],[105,460],];
@@ -156,6 +171,11 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     // Calculations
     handleSingleBeakerCalculations(p.deltaTime);
 
+    // Pumps
+    p.image(graphics.pumpAssembly,  60, 455);
+    p.image(graphics.pumpAssembly, 590, 455);
+
+    // Fill ani
     fillAnimation();
     if (g.startTime !== PUMPS_NOT_STARTED) {
       p.push();
@@ -165,9 +185,6 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
       p.pop();
     }
 
-    // Pumps
-    p.image(graphics.pumpAssembly,  60, 455);
-    p.image(graphics.pumpAssembly, 590, 455);
     // Valves
     drawValves(p);
     // Beakers

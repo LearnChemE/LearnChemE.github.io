@@ -3,17 +3,23 @@ import { useState } from "react";
 interface controlProps {
   pumpsAreRunning: boolean;
   pumpBtnIsDisabled: boolean;
+  animationIsFinished: boolean;
+  showSwapBtn: boolean;
   pumpBtnHandler: () => void;
   measureBtnHandler: () => void;
   menuBtnHandler: () => void;
+  swapBtnHandler: () => void;
 }
 
 const Controls: React.FC<controlProps> = ({
   pumpsAreRunning,
   pumpBtnIsDisabled,
+  animationIsFinished,
+  showSwapBtn,
   pumpBtnHandler,
   measureBtnHandler,
   menuBtnHandler,
+  swapBtnHandler
 }) => {
   let pumpBtnClass: string, icon: string, innerHtml: string;
   if (pumpsAreRunning) {
@@ -93,6 +99,15 @@ const Controls: React.FC<controlProps> = ({
           >
             measure temperatures
           </button>
+          {showSwapBtn && <button
+            type="button"
+            className="btn btn-success"
+            disabled={pumpsAreRunning || !animationIsFinished}
+            aria-disabled={pumpsAreRunning}
+            onClick={() => swapBtnHandler()}
+          >
+            swap beakers
+          </button>}
         </div>
         <div id="nav-bar-right">
           <button
