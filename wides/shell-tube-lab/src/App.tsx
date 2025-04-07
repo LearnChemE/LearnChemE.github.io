@@ -26,6 +26,7 @@ function App() {
   const [pumpBtnIsDisabled, setPumpBtnDisabled] = useState(false);
   const [experimentMode, setExperimentMode] = useState(DOUBLE_BEAKER_MODE);
   const [sideBarIsShowing, setSideBarShowing] = useState(false);
+  const [animationIsFinished, setAnimationFinished] = useState(false);
   let pumpBtnTimeout: NodeJS.Timeout;
 
   // Event handlers
@@ -36,6 +37,7 @@ function App() {
       setPumpBtnDisabled(true);
       pumpBtnTimeout = setTimeout(() => {
         setPumpBtnDisabled(false);
+        setAnimationFinished(true);
       }, 5000);
     }
     g.hIsFlowing = !pumpsAreRunning;
@@ -45,6 +47,7 @@ function App() {
   };
   const measureBtnHandler = () => {
     setMeasured([g.Th_in, g.Th_out_observed, g.Tc_in, g.Tc_out_observed]);
+    console.log([g.Th_in,g.Th_out,g.Th_out_observed])
   };
   const resetBtnHandler = () => {
     g.vols = [1000, 0, 1000, 0]; // reset volumes
@@ -55,7 +58,27 @@ function App() {
     setPumpsAreRunning(false);
     setMeasured([-1, -1, -1, -1]);
     clearTimeout(pumpBtnTimeout);
+    setAnimationFinished(false);
   };
+  // Swap the first and third beakers with the second and fourth
+  const swapBtnHandler = () => {
+    let temp = g.vols;
+    // Swap volumes
+    g.vols = [temp[1],temp[0],temp[3],temp[2]];
+    // Temp measurements become outdated
+    setMeasured([-1,-1,-1,-1]);
+    // Swap temps. Use the observed values for the effluent; g.Tx_out will be recalculated on running the pumps.
+    // Orange
+    let tmp = g.Th_in;
+    g.Th_in = g.Th_out_observed;
+    g.Th_out = tmp;
+    g.Th_out_observed = tmp;
+    // Blue
+    tmp = g.Tc_in;
+    g.Tc_in = g.Tc_out_observed;
+    g.Tc_out = tmp;
+    g.Tc_out_observed = tmp;
+  }
 
   // Wrapper for Controls to keep the hooks the same
   const ControlWrapper = () => {
@@ -63,11 +86,14 @@ function App() {
       <Controls
         pumpsAreRunning={pumpsAreRunning}
         pumpBtnIsDisabled={pumpBtnIsDisabled}
+        animationIsFinished={animationIsFinished}
+        showSwapBtn={experimentMode == DOUBLE_BEAKER_MODE}
         pumpBtnHandler={() => pumpBtnHandler()}
         measureBtnHandler={() => measureBtnHandler()}
         menuBtnHandler={() =>
           setSideBarShowing((sideBarIsShowing) => !sideBarIsShowing)
         }
+        swapBtnHandler={() => swapBtnHandler()}
       />
     );
   };

@@ -81,10 +81,10 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
     // Inlet tubes
     // Orange
     var vertices = [[625, 430],[625, 122],[475, 122]];
-    fillingAnimation.createSegment(0, TubeFill, 1000, vertices, g.orangeFluidColor);
+    fillingAnimation.createSegment(300, TubeFill, 700, vertices, g.orangeFluidColor);
     // Blue
     vertices = [[425, 455],[425, 375]];
-    fillingAnimation.createSegment(0, TubeFill, 1000, vertices, g.blueFluidColor);
+    fillingAnimation.createSegment(300, TubeFill, 700, vertices, g.blueFluidColor);
 
     // Vertices for orange path
     vertices = [[600,125],[200,125],[200,190],[600,190],[600,254],[200,254],[200,323],[600,323],];
@@ -135,6 +135,18 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
     }
   };
 
+  const fillPumps = (s: number = 1) => {
+    p.push();
+    p.noStroke();
+    // Left orange
+    p.fill(255, 50, 0, 120);
+    p.rect(618,458 + 143 * (1-s),14,143 * s);
+    // Right blue
+    p.fill(0, 80, 255, 100);
+    p.rect(418,458 + 143 * (1-s),14,143 * s);
+    p.pop();
+  }
+
   function singleBeakerFillAnimation(
     p: P5CanvasInstance,
     graphicsObjs: SingleTubeGraphicsObjs
@@ -145,6 +157,10 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
       p.image(graphicsObjs.singleBeakers, 0, 0);
       p.image(graphicsObjs.dt, 25, 25);
     } else if (aniTime < 7000) {
+
+
+      let pumpTime = aniTime < 300 ? aniTime / 300 : 1;
+      fillPumps(pumpTime);
 
       p.image(graphicsObjs.singleBeakers, 0, 0);
       p.image(graphicsObjs.dt, 25, 25);
@@ -157,6 +173,7 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
 
     } else {
       // already full
+      fillPumps();
       fillSingleInletTubes(p);
       fillSingleOutletTubes(p);
       p.image(graphicsObjs.singleBeakers, 0, 0);

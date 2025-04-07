@@ -174,6 +174,15 @@ function App() {
             >
               measure temperatures
             </button>
+            {/* <button
+              type="button"
+              className="btn btn-success"
+              disabled={pumpsRunning}
+              aria-disabled={pumpsRunning}
+              onClick={() => handleMeasureClick()}
+            >
+              swap beakers
+            </button> */}
           </div>
           <div id="nav-bar-right">
             <button
@@ -188,15 +197,6 @@ function App() {
                 &nbsp;&nbsp;menu
               </div>
             </button>
-            {/* <button
-        id="beakers-btn"
-        className="btn btn-outline-danger"
-        data-bs-toggle="modal"
-        data-bs-target="#reset-modal"
-        // onClick={() => handleResetClick()}
-      >
-        reset beakers
-      </button> */}
           </div>
         </div>
       </>
