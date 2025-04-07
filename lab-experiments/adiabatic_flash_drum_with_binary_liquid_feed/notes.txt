@@ -1,0 +1,4 @@
+- Add "xF" label above the feed tank
+- Write directions
+- "Steam Off" should not show when farenheit is greater than 500
+- Heat exchanger controller red should always be a whole number

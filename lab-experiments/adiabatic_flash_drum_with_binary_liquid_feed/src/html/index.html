@@ -43,12 +43,12 @@
             <a href="./assets/adiabatic_flash_drum_with_binary_liquid_feed_worksheet.pdf" class="btn btn-primary" id="worksheet" download>Worksheet</a>
             <div id="controls-active-label">Tank is empty. You may now change the composition of the mixture.</div>
             <div class="slider-container">
-              <div class="slider-label">Feed Composition (x<sub>F</sub>)</div>
+              <div id="z-slider-label" class="slider-label">x<sub>F</sub> (chemical 1)</div>
               <input type="range" id="z-slider" min="0" max="1" step="0.01" value="0.5">
               <div id="z-value" class="slider-value">0.50</div>
             </div>
             <div class="dropdown-container">
-              <div class="dropdown-label">Binary Mixture</div>
+              <div class="dropdown-label">binary mixture</div>
               <select id="mixture-dropdown">
                 <option value="a">Mixture A</option>
                 <option value="b">Mixture B</option>
@@ -70,15 +70,15 @@
                   <td id="chemical-1">chemical 1</td>
                   <td id="a1">6.880</td>
                   <td id="b1">1197</td>
-                  <td id="c1">219.2</td>
-                  <td id="mw1">78.11</td>
+                  <td id="c1">218.7</td>
+                  <td id="mw1">78</td>
                 </tr>
                 <tr>
                   <td id="chemical-2">chemical 2</td>
                   <td id="a2">6.951</td>
                   <td id="b2">1342</td>
                   <td id="c2">219.2</td>
-                  <td id="mw2">92.14</td>
+                  <td id="mw2">92</td>
                 </tr>
               </table>
             </div>

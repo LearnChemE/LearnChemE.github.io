@@ -27,7 +27,7 @@ export function setDefaults() {
         name: "chemical 1",
         A: 6.880,
         B: 1197,
-        C: 219.2,
+        C: 218.7,
         Psat: (T) => {
           const c = state.chemicals.chemical1;
           return Math.pow(10, c.A - c.B / (T + c.C)) * 0.00133322; // bar
@@ -41,7 +41,7 @@ export function setDefaults() {
             D = 7.13e-08;
           return A + B * T + C * T ** 2 + D * T ** 3; // J/mol·K
         },
-        MW: 78.11 // g/mol
+        MW: 78 // g/mol
       },
       chemical2: {
         name: "chemical 2",
@@ -61,7 +61,7 @@ export function setDefaults() {
             D = 4.91e-08;
           return A + B * T + C * T ** 2 + D * T ** 3;
         },
-        MW: 92.14
+        MW: 92
       },
       chemical3: {
         name: "chemical 3",
@@ -81,7 +81,7 @@ export function setDefaults() {
             D = 6.49e-08;
           return A + B * T + C * T ** 2 + D * T ** 3;
         },
-        MW: 86.18
+        MW: 86
       },
       chemical4: {
         name: "chemical 4",
@@ -101,7 +101,7 @@ export function setDefaults() {
             D = 8.855e-08;
           return A + B * T + C * T ** 2 + D * T ** 3;
         },
-        MW: 114.23
+        MW: 114
       },
       chemical5: {
         name: "chemical 5",
@@ -121,7 +121,7 @@ export function setDefaults() {
             D = 1.32e-08;
           return A + B * T + C * T ** 2 + D * T ** 3;
         },
-        MW: 84.16
+        MW: 84
       },
       chemical6: {
         name: "chemical 6",
@@ -141,7 +141,7 @@ export function setDefaults() {
             D = 1.13e-07;
           return A + B * T + C * T ** 2 + D * T ** 3;
         },
-        MW: 144.26
+        MW: 144
       },
       chemical7: {
         name: "chemical 7",
@@ -160,7 +160,7 @@ export function setDefaults() {
           const C = -2.868e-5;
           return A + B * T + C * T ** 2;
         },
-        MW: 32.04
+        MW: 32
       },
       chemical8: {
         name: "chemical 8",
@@ -184,17 +184,17 @@ export function setDefaults() {
           const G = 4.22234973344988;
           return (A * TC ** 6 + B * TC ** 5 + C * TC ** 4 + D * TC ** 3 + E * TC ** 2 + F * TC + G) * 18.016;
         },
-        MW: 18.01528
+        MW: 18
       }
     }
   };
 
   state.pump.on = false;
-  state.heatExchanger.valvePosition = state.heatExchanger.T / state.heatExchanger.Tmax;
-  state.pressureController.valvePosition = state.pressureController.P / state.pressureController.Pmax;
-  state.heatExchanger.T_current = 500;
+  state.heatExchanger.valvePosition = (state.heatExchanger.T - state.heatExchanger.Tmin) / (state.heatExchanger.Tmax - state.heatExchanger.Tmin);
+  state.pressureController.valvePosition = 1 - (state.pressureController.P - state.pressureController.Pmin) / (state.pressureController.Pmax - state.pressureController.Pmin);
+  state.heatExchanger.T_current = 22;
   state.pressureController.P_current = 1;
-  state.column.T_current = 25;
+  state.column.T_current = 22;
 }
 
 // Solve for vapor fraction

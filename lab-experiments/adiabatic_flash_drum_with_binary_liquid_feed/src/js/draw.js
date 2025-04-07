@@ -253,6 +253,8 @@ function drawHeatExchanger() {
   stroke(0);
   strokeWeight(0.05);
   translate(-6, -12);
+  push();
+  translate(0, 3);
   rect(-6.5, -12, 15, 12, 2);
   fill(20);
   rect(-5, -10, 12.5, 4);
@@ -267,7 +269,7 @@ function drawHeatExchanger() {
   }
   rect(-3 - 2.5, -4.5, 6, 3, 0.25);
 
-  if (mX > 61 + 4 && mX < 64 + 4 && mY < 49.75 && mY > 46.75) {
+  if (mX > 61 + 4 && mX < 64 + 4 && mY < 52.75 && mY > 49.75) {
     fill("rgb(255, 50, 50)");
     state.hand = true;
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
@@ -277,12 +279,11 @@ function drawHeatExchanger() {
       calcAll();
     }
   } else {
-
     fill("rgb(255, 20, 20)");
   }
   rect(-3 + 4, -4.5, 3, 3, 0.25);
 
-  if (mX > 61 + 7.5 && mX < 64 + 7.5 && mY < 49.75 && mY > 46.75) {
+  if (mX > 61 + 7.5 && mX < 64 + 7.5 && mY < 52.75 && mY > 49.75) {
     fill("rgb(255, 50, 50)");
     state.hand = true;
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
@@ -301,7 +302,7 @@ function drawHeatExchanger() {
   noStroke();
   textSize(1.75);
   textAlign(RIGHT, CENTER);
-  text("units", 1.875 - 2.5, -3);
+  text("on/off", 2.25 - 2.5, -3);
   push();
   textSize(3.5);
   text("▴", 7, -3.1);
@@ -332,28 +333,77 @@ function drawHeatExchanger() {
     showDegrees = true;
     fill("red");
   }
-  text(`${T}  ${units}`, 5.125, -8);
-  textFont("Arial");
-  if (showDegrees) {
-    text("°", 3.75, -8);
+  if (state.heatExchanger.on) {
+    text(`${T}  ${units}`, 5.125, -8);
+    textFont("Arial");
+    if (showDegrees) {
+      text("°", 3.75, -8);
+    }
   }
+  pop();
   pop();
   noFill();
   stroke(0);
   strokeWeight(0.2);
   beginShape();
-  vertex(0, 0);
+  vertex(0, 3);
   vertex(0, 4);
   quadraticVertex(0, 6, -1.5, 7);
   quadraticVertex(-3, 7.5, -3, 8);
   endShape();
+  beginShape();
+  vertex(-2, -9);
+  quadraticVertex(-3, -11, -3, -13);
+  quadraticVertex(-3, -20, 0, -21);
+  endShape();
   fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
   strokeWeight(0.05);
-  rect(1, -12, 0.5, -40);
+  rect(1, -15, 0.5, -40);
+  push();
+  translate(-11.25, -27);
+  rotate(PI / 2);
+  fill(60);
+  stroke(20);
+  scale(0.75);
+  rect(2.7, -18.5 + 3.75 / 2 - 0.75, 0.5, 1.5, 0.25);
+  rect(3 + 10 / 2 - 1.5, -18.5 - 3, 3, 4, 0.25);
+  rect(3 + 10 / 2 - 2, -18.5 - 0.5, 4, 1.5, 0.25);
+  rect(12.8, -18.5 + 3.75 / 2 - 0.75, 0.5, 1.5, 0.25);
+  fill(70);
+  rect(3, -18.5, 10, 3.75, 1);
+  pop();
   fill("rgb(220, 220, 220)");
-  rect(0.75, -12.5, 1, 0.5);
-  rect(8.5, -8, 0.5, 1);
+  rect(0.875, -15.5, 0.75, 0.325);
+  rect(2.6725, -13.875, 0.325, 0.75);
+  fill("rgb(150, 150, 40)");
+  stroke("rgb(100, 100, 40)");
+  strokeWeight(0.1);
+  push();
+  translate(1.625, -15.125);
+  rotate(-PI / 2);
+  beginShape();
+  let vertices = [
+    [0, -1],
+    [-0.5, -1],
+    [-0.5, -0.75],
+    [-1.75, -0.75],
+    [-2, -0.5],
+    [-2, 0.5],
+    [-2.25, 0.5],
+    [-2.25, 1],
+    [-1, 1],
+    [-1, 0.5],
+    [-1.25, 0.5],
+    [-1.25, 0],
+    [-0.5, 0],
+    [-0.5, 0.25],
+    [0, 0.25],
+  ];
+
+  vertices.forEach(coord => vertex(coord[0], coord[1]));
+  endShape(CLOSE);
+  pop();
   pop();
   stroke("rgb(40, 40, 40)");
   strokeWeight(0.1);
@@ -383,7 +433,7 @@ function drawHeatExchanger() {
   strokeWeight(0.1);
   translate(-3.5, 40);
   beginShape();
-  let vertices = [
+  vertices = [
     [2.5, -2],
     [2.5, -1],
     [2, -1],
@@ -525,12 +575,12 @@ function drawHeatExchanger() {
 
   fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
-  rect(1.625 - 0.25, -1, 0.5, -60);
+  rect(1.625 - 0.25, -1, 0.5, -66);
   fill("rgb(220, 220, 220)")
   rect(1.625 - 0.375, -1.25, 0.75, 0.325);
 
   push();
-  translate(1.25, -61);
+  translate(1.25, -67);
   rotate(-PI / 2);
   fill("rgb(150, 150, 40)");
   stroke("rgb(100, 100, 40)");
@@ -560,7 +610,7 @@ function drawHeatExchanger() {
 
   fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
-  rect(1.3725, -13 - 31 / 32, 0.5, 14 - 31 / 32);
+  rect(1.3725, -19 - 31 / 32, 0.5, 19.625 - 31 / 32);
   fill("rgb(220, 220, 220)");
   rect(-0.325, 0, 0.325, 0.75);
   rect(1.25, -1.325, 0.75, 0.325);
@@ -678,14 +728,16 @@ function drawTemperatureMeter() {
   noStroke();
   textSize(1.75);
   textAlign(RIGHT, CENTER);
-  text("units", 2.875, -3);
+  text("on/off", 3.25, -3);
   textFont(state.meterFont);
   fill("yellow");
   textSize(3);
   const T = state.column.units === "C" ? state.column.T_current : state.column.T_current * 9 / 5 + 32;
-  text(`${(round(T * 10) / 10).toFixed(1)}  ${state.column.units}`, 5.625, -8);
-  textFont("Arial");
-  text("°", 4.25, -8);
+  if (state.column.readout_on) {
+    text(`${(round(T * 10) / 10).toFixed(1)}  ${state.column.units}`, 5.625, -8);
+    textFont("Arial");
+    text("°", 4.25, -8);
+  }
   pop();
 }
 
@@ -701,7 +753,7 @@ function drawFlashLiquid() {
   } else if (state.liquidFlow.timeCoordinate > 0 && !state.pump.on) {
     state.liquidFlow.timeCoordinate = constrain(state.liquidFlow.timeCoordinate + 0.02, 0, 2);
   }
-  if (!state.pump.on && frameCount % 60 === 0) {
+  if (!state.pump.on && frameCount % 60 === 0 && state.heatExchanger.on) {
     state.mF_current = state.mF_current * 0.2;
     state.heatExchanger.T_current = state.heatExchanger.T_current + (500 - state.heatExchanger.T_current) * 0.4;
   }
@@ -713,7 +765,7 @@ function drawFlashLiquid() {
     }
   } else {
     if (frameCount % 60 === 0) {
-      state.column.T_current = state.column.T_current - (state.column.T_current - 25) * 0.1;
+      state.column.T_current = state.column.T_current - (state.column.T_current - 22) * 0.1;
       state.pressureController.P_current = state.pressureController.P_current - (state.pressureController.P_current - 1) * 0.1;
       state.mL_current = state.mL_current - (state.mL_current - 0) * 0.6;
     }
@@ -1103,7 +1155,7 @@ function drawVaporOutletPipe() {
 
   fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
-  rect(-1.8725, 1 + 1 / 32, 0.5, 5);
+  rect(-1.8725, 1 + 1 / 32, 0.5, 8);
   rect(-1.8725, 15.5 - 1 / 32, 0.5, 5);
   rect(0.125 - 3 / 32, -0.625, 10, 0.5);
   rect(0.125 - 3 / 32, 22.25 - 0.625, 4 - 1 / 16, 0.5);
@@ -1121,13 +1173,13 @@ function drawVaporOutletPipe() {
   fill("rgb(140, 140, 140)");
   stroke(0);
   strokeWeight(0.05);
-  translate(-6, -12);
+  translate(-13, -2);
   rect(-6.5, -12, 15, 12, 2);
   fill(20);
   rect(-5, -10, 12.5, 4);
   const mX = mouseX / relativeSize();
   const mY = mouseY / relativeSize();
-  if (mX > 76.25 && mX < 82.25 && mY < 15.25 && mY > 12.25) {
+  if (mX > 69.25 && mX < 75.25 && mY < 25.25 && mY > 22.25) {
     state.hand = true;
     fill("rgb(255, 50, 50)");
   } else {
@@ -1136,7 +1188,7 @@ function drawVaporOutletPipe() {
   }
   rect(-3 - 2.5, -4.5, 6, 3, 0.25);
 
-  if (mX > 76.25 + 6.5 && mX < 79.25 + 6.5 && mY < 15.25 && mY > 12.25) {
+  if (mX > 69.25 + 6.5 && mX < 72.25 + 6.5 && mY < 25.25 && mY > 22.25) {
     state.hand = true;
     fill("rgb(255, 50, 50)");
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
@@ -1151,7 +1203,7 @@ function drawVaporOutletPipe() {
   }
   rect(-3 + 4, -4.5, 3, 3, 0.25);
 
-  if (mX > 76.25 + 10 && mX < 79.25 + 10 && mY < 15.25 && mY > 12.25) {
+  if (mX > 76.25 + 3 && mX < 79.25 + 3 && mY < 25.25 && mY > 22.25) {
     fill("rgb(255, 50, 50)");
     state.hand = true;
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
@@ -1170,7 +1222,7 @@ function drawVaporOutletPipe() {
   noStroke();
   textSize(1.75);
   textAlign(RIGHT, CENTER);
-  text("units", 1.875 - 2.5, -3);
+  text("on/off", 2.25 - 2.5, -3);
   push();
   textSize(3.5);
   text("▴", 7, -3.1);
@@ -1186,7 +1238,9 @@ function drawVaporOutletPipe() {
     P = state.pressureUnits === "atm" ? state.pressureController.P : state.pressureController.P * 101325 / 100000;
     fill("red");
   }
-  text(`${(round(P * 100) / 100).toFixed(2)}  ${state.pressureUnits}`, 6.125, -8);
+  if (state.pressureController.on) {
+    text(`${(round(P * 100) / 100).toFixed(2)}  ${state.pressureUnits}`, 6.125, -8);
+  }
   noFill();
   stroke(0);
   strokeWeight(0.2);
@@ -1194,8 +1248,26 @@ function drawVaporOutletPipe() {
   vertex(0, 0);
   vertex(0, 2);
   quadraticVertex(0, 6, 0.75, 7);
-  quadraticVertex(2, 9.5, 1.5, 12.5);
+  quadraticVertex(2, 9.5, 3, 8.5);
   endShape();
+  beginShape();
+  vertex(3, -12);
+  quadraticVertex(4.5, -13.5, 6.5, -13.5);
+  quadraticVertex(8.5, -13.5, 8.5, -15);
+  endShape();
+  fill(60);
+  stroke(20);
+  strokeWeight(0.05);
+  push();
+  translate(2.75, -4.125);
+  scale(0.75);
+  rect(2.7, -18.5 + 3.75 / 2 - 0.75, 0.5, 1.5, 0.25);
+  rect(3 + 10 / 2 - 1.5, -18.5 - 3, 3, 4, 0.25);
+  rect(3 + 10 / 2 - 2, -18.5 - 0.5, 4, 1.5, 0.25);
+  rect(12.8, -18.5 + 3.75 / 2 - 0.75, 0.5, 1.5, 0.25);
+  fill(70);
+  rect(3, -18.5, 10, 3.75, 1);
+  pop();
   pop();
   pop();
 }
@@ -1294,12 +1366,14 @@ function drawMassFlowMeter() {
   noStroke();
   textSize(1.75);
   textAlign(CENTER, CENTER);
-  text("units", 0, -3);
+  text("on/off", 0, -3);
   textFont(state.meterFont);
   fill("yellow");
   textSize(3);
   const m = state.liquidOutlet.units === "kg/min" ? (state.mL_current * 60).toFixed(2) : (state.mL_current * 1000).toFixed(1);
-  text(`${m} ${state.liquidOutlet.units}`, 0.125, -8);
+  if (state.liquidOutlet.readout_on) {
+    text(`${m} ${state.liquidOutlet.units}`, 0.125, -8);
+  }
   pop();
 }
 
@@ -1372,12 +1446,14 @@ function drawInletFlowMeter() {
   noStroke();
   textSize(1.75);
   textAlign(CENTER, CENTER);
-  text("units", 0, -3);
+  text("on/off", 0, -3);
   textFont(state.meterFont);
   fill("yellow");
   textSize(3);
   const m = state.inlet.units === "kg/min" ? (state.mF_current * 60).toFixed(2) : (state.mF_current * 1000).toFixed(1);
-  text(`${m} ${state.inlet.units}`, 0.125, -8);
+  if (state.inlet.readout_on) {
+    text(`${m} ${state.inlet.units}`, 0.125, -8);
+  }
   pop();
 }
 
@@ -1385,19 +1461,19 @@ function drawSample() {
   push();
   translate(state.gc.x, state.gc.y);
   scale(state.gc.scale);
-  fill("rgb(200, 200, 200)");
-  stroke("rgb(150, 150, 150)");
+  fill("rgb(180, 180, 180)");
+  stroke("rgb(120, 120, 120)");
   strokeWeight(0.025);
   rect(-40, -20, -5, 0.2);
-  fill("rgb(220, 220, 220)");
+  fill("rgb(200, 200, 200)");
   const offsetX = 12 * state.gc.takingSampleTime;
   rect(-58 + offsetX, -21, 0.5, 2);
   rect(-58 + offsetX, -20.25, -13, 0.5);
   rect(-71.5 + offsetX, -21.25, 0.5, 2.5);
-  fill("rgb(200, 200, 255)");
+  fill("rgb(150, 150, 255)");
   noStroke();
   rect(-57.5 + offsetX, -21, 12 - offsetX, 2);
-  fill("rgba(200, 200, 200, 0.2)");
+  fill("rgba(150, 150, 150, 0.4)");
   stroke("rgb(150, 150, 150)");
   rect(-45, -21, -14, 2, 1, 0.5, 0.5, 1);
   stroke(50);
