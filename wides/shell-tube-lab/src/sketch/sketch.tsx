@@ -131,6 +131,18 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     p.pop();
   };
 
+  const fillPumps = (s: number = 1) => {
+    p.push();
+    p.noStroke();
+    // Left orange
+    p.fill(255, 50, 0, 120);
+    p.rect(68,458 + 143 * (1-s),14,143 * s);
+    // Right blue
+    p.fill(0, 80, 255, 100);
+    p.rect(438,458 + 143 * (1-s),14,143 * s);
+    p.pop();
+  }
+
   const fillAnimation = () => {
     let start: number;
     p.image(graphics.emptyTubes, 0, 0);
@@ -140,6 +152,9 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
 
     let current = p.millis() - start;
     if (current < 5000) {
+
+      let s = current < 300 ? current / 300 : 1;
+      fillPumps(s);
 
       // HEX fill
       p.noStroke();
@@ -151,6 +166,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       for (let i = 0; i < 4; i++) p.image(graphics.tubes[i], 0, 0); // fill all tubes
       p.image(graphics.orngShellTube, 75, 75);
       p.image(graphics.blueShellTube, 75, 75);
+      fillPumps();
     }
   };
 
@@ -183,10 +199,10 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     // Inlet tubes
     // Orange
     var vertices = [[75, 430],[75, 410],[30, 410],[30, 30],[105, 30],[105, 75]];
-    fillingAnimation.createSegment(0, TubeFill, 1000, vertices, ORANGE_FLUID_COLOR);
+    fillingAnimation.createSegment(300, TubeFill, 700, vertices, ORANGE_FLUID_COLOR);
     // Blue
     vertices = [[445, 450],[445, 405],[490, 405],[490, 375]];
-    fillingAnimation.createSegment(0, TubeFill, 1000, vertices, BLUE_FLUID_COLOR);
+    fillingAnimation.createSegment(300, TubeFill, 700, vertices, BLUE_FLUID_COLOR);
 
     // Vertices for orange path
     vertices = [[105,20],[105,150],[585,150],[585,300],[105,300],[105,460],];
