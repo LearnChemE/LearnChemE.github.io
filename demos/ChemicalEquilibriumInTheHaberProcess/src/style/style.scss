@@ -4,6 +4,10 @@ $modal-lg: 820px;
 $modal-xl: 1140px;
 @import "bootstrap";
 @import "./slider.scss"; // Keeping slider styling in place if needed for other inputs
+:root {
+  --slider-width: 120px;
+}
+
 #graphics-container {
   position: relative;
   margin: auto;
@@ -22,6 +26,67 @@ $modal-xl: 1140px;
   max-width: calc(calc(100vh - 10px) * 150 / 120);
   height: calc(calc(100vw - 10px) * 120 / 150);
   max-height: calc(100vh - 10px);
+}
+
+#sliders-wrapper {
+  position: absolute;
+  display: grid;
+  left: 50%;
+  top: 25px;
+  transform: translateX(-50%);
+  width: max-content;
+  height: max-content;
+  font-size: 0.8rem;
+  gap: 10px;
+}
+
+#sliders-top {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 10px;
+  justify-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+#sliders-bottom {
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  gap: 10px;
+  justify-items: center;
+  justify-content: center;
+}
+
+.slider {
+  display: grid;
+  align-items: end;
+}
+
+.slider.with-units {
+  grid-template-columns: max-content var(--slider-width) 32px 25px;
+}
+
+.slider.without-units {
+  grid-template-columns: max-content var(--slider-width) 32px;
+}
+
+.slider-label {
+  text-align: end;
+  margin-right: 10px;
+}
+
+input[type="range"] {
+  transform: translateY(2px);
+}
+
+.slider-value {
+  text-align: start;
+  padding-left: 2px;
+  margin: 0px 5px;
+}
+
+#moles-added-label {
+  font-weight: bold;
 }
 
 canvas {
@@ -106,6 +171,18 @@ canvas {
 *[disabled="true"] {
   opacity: 0.5 !important;
   pointer-events: none;
+}
+
+@media screen and (min-width: 780px) {
+   :root {
+    --slider-width: 150px;
+  }
+}
+
+@media screen and (min-width: 900px) {
+   :root {
+    --slider-width: 180px;
+  }
 }
 
 @media screen and (min-width: 1320px) {

@@ -7,7 +7,56 @@ export function handleInputs() {
 }
 
 function initializeSliders() {
+  const pressureSlider = document.getElementById("pressure-slider");
+  const temperatureSlider = document.getElementById("temperature-slider");
+  const n2Slider = document.getElementById("n2-slider");
+  const h2Slider = document.getElementById("h2-slider");
+  const nh3Slider = document.getElementById("nh3-slider");
+  const pressureValue = document.getElementById("pressure-value");
+  const temperatureValue = document.getElementById("temperature-value");
+  const n2Value = document.getElementById("n2-value");
+  const h2Value = document.getElementById("h2-value");
+  const nh3Value = document.getElementById("nh3-value");
 
+  pressureSlider.addEventListener("input", (e) => {
+    const P = Math.round(Number(e.target.value));
+    pressureValue.innerHTML = String(P);
+    state.P = P;
+    calcAll();
+    redraw();
+  });
+
+  temperatureSlider.addEventListener("input", (e) => {
+    const T = Math.round(Number(e.target.value));
+    temperatureValue.innerHTML = String(T);
+    state.T = T;
+    calcAll();
+    redraw();
+  });
+
+  n2Slider.addEventListener("input", (e) => {
+    const nN2 = Math.round(10 * Number(e.target.value)) / 10;
+    n2Value.innerHTML = nN2.toFixed(1);
+    state.nN2 = nN2;
+    calcAll();
+    redraw();
+  });
+
+  h2Slider.addEventListener("input", (e) => {
+    const nH2 = Math.round(10 * Number(e.target.value)) / 10;
+    h2Value.innerHTML = nH2.toFixed(1);
+    state.nH2 = nH2;
+    calcAll();
+    redraw();
+  });
+
+  nh3Slider.addEventListener("input", (e) => {
+    const nNH3 = Math.round(10 * Number(e.target.value)) / 10;
+    nh3Value.innerHTML = nNH3.toFixed(1);
+    state.nNH3 = nNH3;
+    calcAll();
+    redraw();
+  });
 }
 
 function handleHamburger() {

@@ -12,6 +12,11 @@ window.state = {
   pixelDensity: 4,
   showButtons: false,
   hamburgerHasBeenClicked: window.localStorage.getItem("hamburgerHasBeenClicked") === "true",
+  P: 150,
+  T: 600,
+  nN2: 0,
+  nH2: 0,
+  nNH3: 1,
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -22,6 +27,7 @@ window.setup = function() {
   calcAll();
   pixelDensity(state.pixelDensity);
   frameRate(state.frameRate);
+  noLoop();
 };
 
 window.draw = function() {
