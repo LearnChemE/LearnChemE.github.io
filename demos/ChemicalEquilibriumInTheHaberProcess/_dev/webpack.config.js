@@ -42,8 +42,8 @@ const html_options = {
     "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
     "keywords": "LearnChemE, chemical engineering, engineering, simulation",
     "author": "Neil Hendren",
-    "application-name": "Adiabatic Flash Drum with Binary Liquid Feed Digital Laboratory Experiment",
-    "description": "A digital experiment to explore adiabatic flash vaporization of ideal and non-ideal binary mixtures."
+    "application-name": "Chemical Equilibrium in the Haber Process",
+    "description": "Chemical Equilibrium in the Haber Process",
   },
 }
 
