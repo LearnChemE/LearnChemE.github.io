@@ -390,72 +390,6 @@ function drawHeatExchanger() {
   quadraticVertex(0, 6, -1.5, 7);
   quadraticVertex(-3, 7.5, -3, 8);
   endShape();
-
-  // Temperature controller pressure regulator cable
-  beginShape();
-  vertex(-2, -9);
-  quadraticVertex(-3, -11, -3, -13);
-  quadraticVertex(-3, -20, 0, -21);
-  endShape();
-
-
-  fill("rgb(200, 200, 200)");
-  stroke("rgb(150, 150, 150)");
-  strokeWeight(0.05);
-
-  // Compressed air top vertical pipe
-  rect(1, -15, 0.5, -40);
-
-  // Pressure regulator
-  push();
-  translate(-11.25, -27);
-  rotate(PI / 2);
-  fill(60);
-  stroke(20);
-  scale(0.75);
-  rect(2.7, -18.5 + 3.75 / 2 - 0.75, 0.5, 1.5, 0.25);
-  rect(3 + 10 / 2 - 1.5, -18.5 - 3, 3, 4, 0.25);
-  rect(3 + 10 / 2 - 2, -18.5 - 0.5, 4, 1.5, 0.25);
-  rect(12.8, -18.5 + 3.75 / 2 - 0.75, 0.5, 1.5, 0.25);
-  fill(70);
-  rect(3, -18.5, 10, 3.75, 1);
-  pop();
-
-  fill("rgb(220, 220, 220)");
-
-  // Compressed air top-left elbow joint compression fittings
-  rect(0.875, -15.5, 0.75, 0.325);
-  rect(2.6725, -13.875, 0.325, 0.75);
-
-  // Top-left elbow joint
-  fill("rgb(150, 150, 40)");
-  stroke("rgb(100, 100, 40)");
-  strokeWeight(0.1);
-  push();
-  translate(1.625, -15.125);
-  rotate(-PI / 2);
-  beginShape();
-  let vertices = [
-    [0, -1],
-    [-0.5, -1],
-    [-0.5, -0.75],
-    [-1.75, -0.75],
-    [-2, -0.5],
-    [-2, 0.5],
-    [-2.25, 0.5],
-    [-2.25, 1],
-    [-1, 1],
-    [-1, 0.5],
-    [-1.25, 0.5],
-    [-1.25, 0],
-    [-0.5, 0],
-    [-0.5, 0.25],
-    [0, 0.25],
-  ];
-
-  vertices.forEach(coord => vertex(coord[0], coord[1]));
-  endShape(CLOSE);
-  pop();
   pop();
 
   stroke("rgb(40, 40, 40)");
@@ -501,7 +435,7 @@ function drawHeatExchanger() {
   strokeWeight(0.1);
   translate(-3.5, 40);
   beginShape();
-  vertices = [
+  let vertices = [
     [2.5, -2],
     [2.5, -1],
     [2, -1],
@@ -631,83 +565,6 @@ function drawHeatExchanger() {
   stroke("rgb(100, 100, 40)");
   translate(6.5, 0.625);
 
-  // Steam valve diaphragm elbow joint
-  beginShape();
-  vertices = [
-    [0, 1],
-    [0.5, 1],
-    [0.5, 0.75],
-    [1.75, 0.75],
-    [2, 0.5],
-    [2, -0.5],
-    [2.25, -0.5],
-    [2.25, -1],
-    [1, -1],
-    [1, -0.5],
-    [1.25, -0.5],
-    [1.25, 0],
-    [0.5, 0],
-    [0.5, -0.25],
-    [0, -0.25],
-  ];
-
-  vertices.forEach(coord => vertex(coord[0], coord[1]));
-
-  endShape(CLOSE);
-
-  fill("rgb(200, 200, 200)");
-  stroke("rgb(150, 150, 150)");
-
-  // Steam valve vertical inlet compressed air pipe
-  rect(1.625 - 0.25, -1, 0.5, -66);
-
-  fill("rgb(220, 220, 220)")
-
-  // Steam valve elbow joint pressure fitting
-  rect(1.625 - 0.375, -1.25, 0.75, 0.325);
-
-  push();
-  translate(1.25, -67);
-  rotate(-PI / 2);
-  fill("rgb(150, 150, 40)");
-  stroke("rgb(100, 100, 40)");
-
-  // Mid-right elbow joint
-  beginShape();
-  vertices = [
-    [0, 1],
-    [0.5, 1],
-    [0.5, 0.75],
-    [1.75, 0.75],
-    [2, 0.5],
-    [2, -0.5],
-    [2.25, -0.5],
-    [2.25, -1],
-    [1, -1],
-    [1, -0.5],
-    [1.25, -0.5],
-    [1.25, 0],
-    [0.5, 0],
-    [0.5, -0.25],
-    [0, -0.25],
-  ];
-
-  vertices.forEach(coord => vertex(coord[0], coord[1]));
-
-  endShape(CLOSE);
-
-  fill("rgb(200, 200, 200)");
-  stroke("rgb(150, 150, 150)");
-
-  // Middle horizontal compressed air pipe
-  rect(1.3725, -19 - 31 / 32, 0.5, 19.625 - 31 / 32);
-  fill("rgb(220, 220, 220)");
-
-  // Mid-right elbow joint compression fittings
-  rect(-0.325, 0, 0.325, 0.75);
-  rect(1.25, -1.325, 0.75, 0.325);
-  pop();
-
   // Steam in / steam out text labels and arrows
   fill(0);
   noStroke();
@@ -815,10 +672,16 @@ function drawFlashDrumTemperatureMeter() {
 
   // Thermocouple cable
   beginShape();
-  vertex(0, 0);
-  quadraticVertex(3, -1, 5, -3);
+  vertex(-1, -10);
+  quadraticVertex(2, -5.5, 5, -6);
   quadraticVertex(7, -6, 12, -7);
   endShape();
+
+  // Flash column thermocouple
+  fill("rgb(220, 180, 150)");
+  stroke("rgb(120, 120, 120)");
+  strokeWeight(0.1);
+  rect(-4.5, -11, 3.75, 2);
 
   fill("rgb(150, 150, 150)");
   stroke(0);
@@ -1137,151 +1000,6 @@ function drawVaporOutletPipe() {
 
   // Vapor outlet backpressure valve needle indicator
   rect(-6 + p * 3.5, -1.5, 0.25, 3);
-
-  fill("rgb(150, 150, 40)");
-  stroke("rgb(100, 100, 40)");
-  translate(6.5, 0.625);
-
-  // Vapor outlet backpressure valve diaphragm elbow joint
-  beginShape();
-  vertices = [
-    [0, 1],
-    [0.5, 1],
-    [0.5, 0.75],
-    [1.75, 0.75],
-    [2, 0.5],
-    [2, -0.5],
-    [2.25, -0.5],
-    [2.25, -1],
-    [1, -1],
-    [1, -0.5],
-    [1.25, -0.5],
-    [1.25, 0],
-    [0.5, 0],
-    [0.5, -0.25],
-    [0, -0.25],
-  ];
-
-  vertices.forEach(coord => vertex(coord[0], coord[1]));
-
-  endShape(CLOSE);
-
-  fill("rgb(200, 200, 200)");
-  stroke("rgb(150, 150, 150)");
-
-  // Top-right horizontal compressed air pipe
-  rect(1.625 - 0.25, -1, 0.5, -10);
-  fill("rgb(220, 220, 220)")
-
-  // Top-right elbow joint compression fittings
-  rect(1.625 - 0.375, -1.325, 0.75, 0.325);
-
-  fill("rgb(150, 150, 40)");
-  stroke("rgb(100, 100, 40)");
-  translate(0, -12);
-
-  // Top-right elbow joint
-  beginShape();
-  vertices = [
-    [0, -1],
-    [0.5, -1],
-    [0.5, -0.75],
-    [1.75, -0.75],
-    [2, -0.5],
-    [2, 0.5],
-    [2.25, 0.5],
-    [2.25, 1],
-    [1, 1],
-    [1, 0.5],
-    [1.25, 0.5],
-    [1.25, 0],
-    [0.5, 0],
-    [0.5, 0.25],
-    [0, 0.25],
-  ];
-
-  vertices.forEach(coord => vertex(coord[0], coord[1]));
-
-  endShape(CLOSE);
-
-  translate(-4, -0.75);
-
-  // Mid-bottom elbow joint
-  beginShape();
-  vertices = [
-    [0, 1],
-    [-0.5, 1],
-    [-0.5, 0.75],
-    [-1.75, 0.75],
-    [-2, 0.5],
-    [-2, -0.5],
-    [-2.25, -0.5],
-    [-2.25, -1],
-    [-1, -1],
-    [-1, -0.5],
-    [-1.25, -0.5],
-    [-1.25, 0],
-    [-0.5, 0],
-    [-0.5, -0.25],
-    [0, -0.25],
-  ];
-
-  vertices.forEach(coord => vertex(coord[0], coord[1]));
-
-  endShape(CLOSE);
-
-  translate(0, -21.5);
-
-  // Bottom-left elbow joint
-  beginShape();
-  vertices = [
-    [0, -1],
-    [-0.5, -1],
-    [-0.5, -0.75],
-    [-1.75, -0.75],
-    [-2, -0.5],
-    [-2, 0.5],
-    [-2.25, 0.5],
-    [-2.25, 1],
-    [-1, 1],
-    [-1, 0.5],
-    [-1.25, 0.5],
-    [-1.25, 0],
-    [-0.5, 0],
-    [-0.5, 0.25],
-    [0, 0.25],
-  ];
-
-  vertices.forEach(coord => vertex(coord[0], coord[1]));
-
-  endShape(CLOSE);
-
-  fill("rgb(200, 200, 200)");
-  stroke("rgb(150, 150, 150)");
-  // Bottom-left horizontal compressed air pipe
-  rect(-1.8725, 1 + 1 / 32, 0.5, 8);
-
-  // Bottom-right horizontal compressed air pipe
-  rect(-1.8725, 15.5 - 1 / 32, 0.5, 5);
-
-  // Top-left vertical compressed air pipe
-  rect(0.125 - 3 / 32, -0.625, 10, 0.5);
-
-  // Middle vertical compressed air pipe
-  rect(0.125 - 3 / 32, 22.25 - 0.625, 4 - 1 / 16, 0.5);
-  fill("rgb(220, 220, 220)");
-
-  // Bottom-left elbow joint compression fittings
-  rect(-1.8725 - 0.125, 1 + 1 / 32, 0.75, 0.325);
-  rect(-1.8725 - 0.125, 20.175 - 1 / 32, 0.75, 0.325);
-
-  // Bottom-middle elbow joint compression fittings
-  rect(0.125 - 3 / 32, -0.625 - 0.125, 0.325, 0.75);
-  rect(0.125 - 3 / 32, 22.25 - 0.625 - 0.125, 0.325, 0.75);
-
-  // Top-middle elbow joint compression fittings
-  rect(4.125 - 5 / 32 - 0.325, 22.25 - 0.625 - 0.125, 0.325, 0.75);
-  rect(5.25, 23.25, 0.75, 0.325);
   pop();
 
   // Draw the pressure controller
@@ -1374,26 +1092,16 @@ function drawVaporOutletPipe() {
   quadraticVertex(0, 6, 0.75, 7);
   quadraticVertex(2, 9.5, 3, 8.5);
   endShape();
-  beginShape();
-  vertex(3, -12);
-  quadraticVertex(4.5, -13.5, 6.5, -13.5);
-  quadraticVertex(8.5, -13.5, 8.5, -15);
-  endShape();
 
-  // Pressure regulator
-  fill(60);
-  stroke(20);
+  // Pressure transducer
+  fill("rgb(180, 180, 180)");
+  stroke("rgb(100, 100, 100)");
   strokeWeight(0.05);
-  push();
-  translate(2.75, -4.125);
-  scale(0.75);
-  rect(2.7, -18.5 + 3.75 / 2 - 0.75, 0.5, 1.5, 0.25);
-  rect(3 + 10 / 2 - 1.5, -18.5 - 3, 3, 4, 0.25);
-  rect(3 + 10 / 2 - 2, -18.5 - 0.5, 4, 1.5, 0.25);
-  rect(12.8, -18.5 + 3.75 / 2 - 0.75, 0.5, 1.5, 0.25);
-  fill(70);
-  rect(3, -18.5, 10, 3.75, 1);
-  pop();
+  rect(3.0675, 8, 2.5, 1);
+  fill(150);
+  stroke(80);
+  rect(5.5675, 8.25, 0.25, 0.5);
+
   pop();
   pop();
 }
