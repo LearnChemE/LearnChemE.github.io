@@ -30,36 +30,30 @@ window.state = {
   },
   heatExchanger: {
     T: 22,
-    T_current: 22,
+    T_current: 500,
     Tmin: 22,
-    Tmax: 450,
-    on: false,
+    Tmax: 450
   },
   pressureController: {
     P: 1,
     P_current: 1,
     Pmin: 1,
-    Pmax: 2,
-    on: false,
+    Pmax: 2
   },
   column: {
     T: 22,
     T_current: 22,
-    units: "C",
-    readout_on: false,
+    units: "C"
   },
   liquidOutlet: {
-    units: "kg/min",
-    readout_on: false,
+    units: "kg/min"
   },
   inlet: {
-    units: "kg/min",
-    readout_on: false,
+    units: "kg/min"
   },
   xF: 0.5,
   temperatureUnits: "C",
-  pressureUnits: "bar",
-  sampleButtonOn: false,
+  pressureUnits: "bar"
 };
 
 const containerElement = document.getElementById("p5-container");

@@ -2,3 +2,4 @@
 - Write directions
 - "Steam Off" should not show when farenheit is greater than 500
 - Heat exchanger controller red should always be a whole number
+- Change setdefaults to steam temperature of 500

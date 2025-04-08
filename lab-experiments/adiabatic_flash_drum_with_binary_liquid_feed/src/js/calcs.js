@@ -192,7 +192,7 @@ export function setDefaults() {
   state.pump.on = false;
   state.heatExchanger.valvePosition = (state.heatExchanger.T - state.heatExchanger.Tmin) / (state.heatExchanger.Tmax - state.heatExchanger.Tmin);
   state.pressureController.valvePosition = 1 - (state.pressureController.P - state.pressureController.Pmin) / (state.pressureController.Pmax - state.pressureController.Pmin);
-  state.heatExchanger.T_current = 22;
+  state.heatExchanger.T_current = 500;
   state.pressureController.P_current = 1;
   state.column.T_current = 22;
 }

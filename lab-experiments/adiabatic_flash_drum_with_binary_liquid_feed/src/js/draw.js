@@ -10,6 +10,8 @@ function drawPump(x, y, scaleX, scaleY) {
   fill(pumpColor);
   stroke(pumpStroke);
   strokeWeight(0.15);
+
+  // Pump nose
   let vertices = [
     [-2, -4],
     [-3, -4],
@@ -31,10 +33,14 @@ function drawPump(x, y, scaleX, scaleY) {
   endShape(CLOSE);
   line(-2, -4, -2, 4);
   line(7, -6, 7, 6);
+
+  // Pump nose supports
   strokeWeight(0.4);
   line(4, -2, 7, -3);
   line(-2, 0, 7, 0);
   line(4, 2, 7, 3);
+
+  // Pump legs
   strokeWeight(0.15);
   fill("rgb(160, 160, 245)");
   vertices = [
@@ -59,6 +65,7 @@ function drawPump(x, y, scaleX, scaleY) {
   vertices.forEach(coord => vertex(coord[0], coord[1]));
   endShape(CLOSE);
 
+  // Pump body
   fill(pumpColor);
   vertices = [
     [8, 6],
@@ -82,6 +89,8 @@ function drawPump(x, y, scaleX, scaleY) {
   vertices.forEach(coord => vertex(coord[0], coord[1]));
   endShape(CLOSE);
   line(9, 6, 9, -6);
+
+  // Pump heat sink
   strokeWeight(0.1);
   fill("rgb(200, 200, 255)");
   stroke("rgb(100, 100, 190)");
@@ -89,17 +98,21 @@ function drawPump(x, y, scaleX, scaleY) {
   for (let i = 0; i < 13; i++) {
     rect(22.5, -6 + i, 10, 0.25 + abs(i - 6) * 0.075);
   }
+
+  // Pump body supports
   stroke(pumpStroke);
   strokeWeight(0.4);
   line(9, -3, 11, -3);
   line(9, 0, 11, 0);
   line(9, 3, 11, 3);
 
+  // Pump base
   strokeWeight(0.15);
   fill("rgb(160, 160, 245)");
   rectMode(CORNER);
   rect(-2, 8, 34, 2, 0.25);
 
+  // Pump outlet
   fill("rgb(170, 170, 250)");
   rect(-0.5, -8, 3.5, 13, 0, 0, 2, 2);
   stroke("rgb(170, 170, 250)");
@@ -120,6 +133,7 @@ function drawPump(x, y, scaleX, scaleY) {
 
   rect(-3.5, -11, 9.5, 1);
 
+  // Pump power cable
   const cableColor = "rgb(40, 40, 40)";
 
   noFill();
@@ -133,11 +147,16 @@ function drawPump(x, y, scaleX, scaleY) {
   quadraticVertex(31, -18, 18, -13);
   endShape();
 
-  translate(4, 5);
+  drawPumpSwitch(4, 5, x + 13, y + 18.5);
+  pop();
+}
+
+function drawPumpSwitch(offsetX, offsetY, cursorX, cursorY) {
+  translate(offsetX, offsetY);
   strokeWeight(0.1);
   const mX = mouseX / relativeSize();
   const mY = mouseY / relativeSize();
-  if (mX > 16.5 + x - 3.5 && mX < 16.5 + x + 11.5 && mY > 19.5 + y - 1 && mY < 19.5 + y + 6.75) {
+  if (mX > cursorX && mX < cursorX + 15 && mY > cursorY && mY < cursorY + 7.75) {
     state.hand = true;
     stroke("rgb(140, 140, 40)");
     strokeWeight(0.2);
@@ -164,7 +183,6 @@ function drawPump(x, y, scaleX, scaleY) {
   textSize(2.5);
   textAlign(CENTER, CENTER);
   text("off    on", 16.5, -18.75);
-  pop();
 }
 
 function drawInletPipe() {
@@ -174,19 +192,30 @@ function drawInletPipe() {
   stroke("rgb(40, 40, 40)");
   strokeWeight(0.1);
   fill("rgb(200, 200, 200)");
+
+  // Horizontal pipe going into pump
   rect(-20, -2, 20, 4);
+
+  // Mounting plate for said pipe
   rect(-3.25, -3.25, 0.75, 6.5);
   strokeWeight(0.05);
   for (let i = 0; i < 4; i++) {
     rect(-3.75, -2.75 + i * (27 / 16), 0.5);
   }
+
+
   strokeWeight(0.1);
+  // Vertical pipe going out of pump
   rect(-1, -9.375, 4, -27);
+
+  // Mounting plate for said pipe
   rect(-2.8725, -9.375, 7.75, 0.5);
   strokeWeight(0.05);
   for (let i = 0; i < 4; i++) {
     rect(-1.8725 + i * (33 / 16), -9.375, -0.5);
   }
+
+  // Vertical pipe elbow joint
   strokeWeight(0.1);
   translate(0, -19);
   beginShape();
@@ -205,16 +234,25 @@ function drawInletPipe() {
   }
   vertex(3, -17.5);
   endShape(CLOSE);
+
+  // Outlet horizontal pipe
   rect(5, -22.5, 40, 4);
+
+  // Elbow joint supports
   rect(-1.5, -17.5, 5, 1);
   rect(4.5, -22.5 - 0.5, 1, 5);
+
+  // Outlet pipe mounting plate on flash column
   rect(44.5, -24, 1, 7);
   strokeWeight(0.05);
   for (let i = 0; i < 4; i++) {
     rect(44, -23.5 + i * (15 / 8), 0.5);
   }
+
   translate(-20, 19);
   strokeWeight(0.1);
+
+  // Inlet pipe elbow joint
   beginShape();
   vertex(-1, 2);
   for (let i = 90; i >= 0; i -= 10) {
@@ -230,15 +268,23 @@ function drawInletPipe() {
     vertex(x, y);
   }
   endShape(CLOSE);
+
+  // Inlet pipe elbow joint supports
   rect(-1, -2.5, 1, 5);
   rect(-6.5, -4, 5, 1);
+
+  // Inlet vertical pipe
   rect(-6, -4, 4, -20);
+
+  // Inlet vertical pipe mounting plate
   rect(-7, -24.75, 6, 0.75);
   strokeWeight(0.05);
   for (let i = 0; i < 4; i++) {
     rect(-6.75 + i * 1.6725, -24, 0.5);
   }
   strokeWeight(0.1);
+
+  // Feed tank front leg (here because it needs to be in front of inlet pipe)
   rect(5.5, -24.75, 3, 33);
   drawInletFlowMeter();
   pop();
@@ -249,27 +295,21 @@ function drawHeatExchanger() {
   translate(state.pump.x, state.pump.y);
   translate(38, -22);
   push();
-  fill("rgb(140, 140, 140)");
+  fill("rgb(150, 150, 150)");
   stroke(0);
   strokeWeight(0.05);
   translate(-6, -12);
+
+  // Heat exchanger temperature controller
   push();
   translate(0, 3);
   rect(-6.5, -12, 15, 12, 2);
   fill(20);
-  rect(-5, -10, 12.5, 4);
+  rect(-5, -10, 8, 4);
   const mX = mouseX / relativeSize();
   const mY = mouseY / relativeSize();
-  if (mX > 61 - 2.5 && mX < 67 - 2.5 && mY < 49.75 && mY > 46.75) {
-    state.hand = true;
-    fill("rgb(255, 50, 50)");
-  } else {
 
-    fill("rgb(255, 20, 20)");
-  }
-  rect(-3 - 2.5, -4.5, 6, 3, 0.25);
-
-  if (mX > 61 + 4 && mX < 64 + 4 && mY < 52.75 && mY > 49.75) {
+  if (mX > 62 && mX < 65 && mY < 52.75 && mY > 49.75) {
     fill("rgb(255, 50, 50)");
     state.hand = true;
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
@@ -281,9 +321,11 @@ function drawHeatExchanger() {
   } else {
     fill("rgb(255, 20, 20)");
   }
-  rect(-3 + 4, -4.5, 3, 3, 0.25);
 
-  if (mX > 61 + 7.5 && mX < 64 + 7.5 && mY < 52.75 && mY > 49.75) {
+  // Left button
+  rect(-3 + 1, -4.5, 3, 3, 0.25);
+
+  if (mX > 62 + 3.5 && mX < 65 + 3.5 && mY < 52.75 && mY > 49.75) {
     fill("rgb(255, 50, 50)");
     state.hand = true;
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
@@ -296,70 +338,75 @@ function drawHeatExchanger() {
 
     fill("rgb(255, 20, 20)");
   }
-  rect(-3 + 7.5, -4.5, 3, 3, 0.25);
+
+  // Right button
+  rect(-3 + 4.5, -4.5, 3, 3, 0.25);
 
   fill("white");
   noStroke();
   textSize(1.75);
   textAlign(RIGHT, CENTER);
-  text("on/off", 2.25 - 2.5, -3);
   push();
   textSize(3.5);
-  text("▴", 7, -3.1);
+  text("▴", 4, -3.1);
   translate(1.55, -2.8);
   rotate(PI);
-  text("▴", 0, 0);
+  text("▴", 3, 0);
+  textSize(2.75);
+  rotate(-PI);
+  fill("black");
+  text("°C", 5.5, -5);
   pop();
   push();
   textFont(state.meterFont);
   fill("yellow");
+  textAlign(CENTER, CENTER);
   textSize(3);
   let T = state.temperatureUnits === "C" ? round(state.heatExchanger.T_current) : round(state.heatExchanger.T_current * 9 / 5 + 32);
-  let units = state.temperatureUnits;
-  let showDegrees = true;
+
   if (T > 480 && !(frameCount - state.mousePressedTemperatureFrame < 120)) {
-    T = "steam off";
-    units = "";
-    showDegrees = false;
-    translate(3.75, 0);
+    T = "off";
   }
   if (frameCount - state.mousePressedTemperatureFrame < 120) {
     if (state.temperatureUnits === "C") {
-      T = round(state.heatExchanger.T * 10) / 10;
+      T = round(state.heatExchanger.T).toFixed(0);
     } else {
-      T = round(state.heatExchanger.T * 9 / 5 + 32);
+      T = round(state.heatExchanger.T * 9 / 5 + 32).toFixed(0);
     }
-    units = state.temperatureUnits;
-    showDegrees = true;
     fill("red");
   }
-  if (state.heatExchanger.on) {
-    text(`${T}  ${units}`, 5.125, -8);
-    textFont("Arial");
-    if (showDegrees) {
-      text("°", 3.75, -8);
-    }
-  }
+  text(T, -1, -8);
   pop();
   pop();
+
   noFill();
   stroke(0);
   strokeWeight(0.2);
+
+  // Temperature controller thermocouple cable
   beginShape();
   vertex(0, 3);
   vertex(0, 4);
   quadraticVertex(0, 6, -1.5, 7);
   quadraticVertex(-3, 7.5, -3, 8);
   endShape();
+
+  // Temperature controller pressure regulator cable
   beginShape();
   vertex(-2, -9);
   quadraticVertex(-3, -11, -3, -13);
   quadraticVertex(-3, -20, 0, -21);
   endShape();
+
+
   fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
   strokeWeight(0.05);
+
+  // Compressed air top vertical pipe
   rect(1, -15, 0.5, -40);
+
+  // Pressure regulator
   push();
   translate(-11.25, -27);
   rotate(PI / 2);
@@ -373,9 +420,14 @@ function drawHeatExchanger() {
   fill(70);
   rect(3, -18.5, 10, 3.75, 1);
   pop();
+
   fill("rgb(220, 220, 220)");
+
+  // Compressed air top-left elbow joint compression fittings
   rect(0.875, -15.5, 0.75, 0.325);
   rect(2.6725, -13.875, 0.325, 0.75);
+
+  // Top-left elbow joint
   fill("rgb(150, 150, 40)");
   stroke("rgb(100, 100, 40)");
   strokeWeight(0.1);
@@ -405,9 +457,12 @@ function drawHeatExchanger() {
   endShape(CLOSE);
   pop();
   pop();
+
   stroke("rgb(40, 40, 40)");
   strokeWeight(0.1);
   fill("rgb(200, 200, 200)");
+
+  // Heat exchanger left/right mounting plates
   rect(-25, -2, 1, 7);
   rect(0, -2, 1, 7);
   strokeWeight(0.05);
@@ -415,19 +470,32 @@ function drawHeatExchanger() {
     rect(-25.5, -1.5 + i * (30 / 16), 0.5);
     rect(1, -1.5 + i * (30 / 16), 0.5);
   }
+
   fill("rgb(220, 220, 220)");
   strokeWeight(0.1);
+
+  // Heat exchanger body
   rect(-24, -4, 24, 11, 0.25);
+
   fill("rgb(200, 200, 200)");
+
+  // Heat exchanger top/bottom mounting plates
   rect(-23, -5, 5, 1);
   rect(-6, 7, 5, 1);
+
+  // Heat exchanger steam pipes
   rect(-22, -5, 3, -30);
   rect(-5, 8, 3, 35);
+
   strokeWeight(0.05);
+
+  // Heat exchanger top/bottom mounting plate bolts
   for (let i = 0; i < 3; i++) {
     rect(-22.25 + i * (12 / 8), -5.5, 0.5);
     rect(-5.25 + i * (12 / 8), 8, 0.5);
   }
+
+  // Steam valve golden body
   fill("rgb(150, 150, 40)");
   stroke("rgb(100, 100, 40)");
   strokeWeight(0.1);
@@ -462,12 +530,17 @@ function drawHeatExchanger() {
 
   vertices.forEach(coord => vertex(coord[0], coord[1]));
   endShape(CLOSE);
+
   fill("rgb(200, 200, 200)");
   stroke("rgb(100, 100, 100)");
   translate(5, 2.5);
   strokeWeight(0.05);
+
+  // Steam valve pressure stem
   rect(0, -0.25, 8, 0.5);
   strokeWeight(0.1);
+
+  // Steam valve support bracket
   beginShape();
   vertices = [
     [0, -1.75],
@@ -507,6 +580,7 @@ function drawHeatExchanger() {
   stroke("rgb(200, 60, 60)");
   translate(7.75, 0);
 
+  // Steam valve diaphragm body
   beginShape();
 
   vertices = [
@@ -531,25 +605,33 @@ function drawHeatExchanger() {
   vertices.forEach(coord => vertex(coord[0], coord[1]));
 
   endShape(CLOSE);
+
   rect(2.5, -7, 0.75, 14);
   rect(3.25, -7, 0.75, 14);
+
   fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
   strokeWeight(0.05);
+
+  // Steam valve diaphragm body bolts
   for (let i = 0; i < 7; i++) {
     rect(2, -6.5 + i * 2.0625, 0.5);
     rect(4, -6.5 + i * 2.0625, 0.5);
   }
+
   const p = state.heatExchanger.valvePosition;
   fill("gold");
   stroke("rgb(100, 100, 100)");
   strokeWeight(0.05);
+
+  // Steam valve needle indicator
   rect(-6 + p * 3.5, -1.5, 0.25, 3);
 
   fill("rgb(150, 150, 40)");
   stroke("rgb(100, 100, 40)");
   translate(6.5, 0.625);
 
+  // Steam valve diaphragm elbow joint
   beginShape();
   vertices = [
     [0, 1],
@@ -575,8 +657,13 @@ function drawHeatExchanger() {
 
   fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
+
+  // Steam valve vertical inlet compressed air pipe
   rect(1.625 - 0.25, -1, 0.5, -66);
+
   fill("rgb(220, 220, 220)")
+
+  // Steam valve elbow joint pressure fitting
   rect(1.625 - 0.375, -1.25, 0.75, 0.325);
 
   push();
@@ -585,6 +672,7 @@ function drawHeatExchanger() {
   fill("rgb(150, 150, 40)");
   stroke("rgb(100, 100, 40)");
 
+  // Mid-right elbow joint
   beginShape();
   vertices = [
     [0, 1],
@@ -610,12 +698,17 @@ function drawHeatExchanger() {
 
   fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
+
+  // Middle horizontal compressed air pipe
   rect(1.3725, -19 - 31 / 32, 0.5, 19.625 - 31 / 32);
   fill("rgb(220, 220, 220)");
+
+  // Mid-right elbow joint compression fittings
   rect(-0.325, 0, 0.325, 0.75);
   rect(1.25, -1.325, 0.75, 0.325);
   pop();
 
+  // Steam in / steam out text labels and arrows
   fill(0);
   noStroke();
   textSize(2.5);
@@ -644,14 +737,22 @@ function drawFeedTank() {
   noStroke();
   fill("rgb(200, 200, 255)");
   const liquidHeight = state.liquidHeight * 52;
+
+  // Feed liquid
   rect(-14, -2, 28, -liquidHeight);
   stroke("rgb(40, 40, 40)");
   strokeWeight(0.1);
   fill("rgba(220, 220, 220, 0.2)");
+
+  // Feed tank body
   rect(-14, -55, 28, 55);
   fill("rgb(200, 200, 200)");
+
+  // Feed tank top and bottom support plates
   rect(-15, 0, 30, -2);
   rect(-15, -56, 30, 2);
+
+  // Feed tank legs
   quad(-11, 0, -9, 0, -12, 32.75, -14, 32.75);
   quad(11, 0, 9, 0, 12, 32.75, 14, 32.75);
   pop();
@@ -663,13 +764,20 @@ function drawFlashDrum() {
   translate(45.5, -20.5);
   noStroke();
   fill(`rgba(${round(255 - 25 * state.vaporDensity)}, ${round(255 - 25 * state.vaporDensity)}, 255, ${0.3 * state.vaporDensity})`);
+
+  // Flash drum transparent vapor
   rect(0, -35, 20, 65);
+
   drawFlashLiquid();
   stroke("rgb(40, 40, 40)");
   strokeWeight(0.1);
   fill("rgba(220, 220, 220, 0.1)");
+
+  // Flash drum body
   rect(0, -35, 20, 65);
   fill("rgb(200, 200, 200)");
+
+  // Flash drum support plates and mounting bolts
   rect(-1, -36, 22, 2);
   rect(-1, 29, 22, 2);
   rect(-1, -13.3333, 22, 2);
@@ -684,76 +792,63 @@ function drawFlashDrum() {
     rect(i * 3 - 0.75, 28.5, 0.5, 0.5);
   }
   strokeWeight(0.1);
+
   drawVaporOutletPipe();
+
+  // Flash drum legs
   quad(1, 31, 3, 31, 1, 48, -1, 48);
   quad(19, 31, 17, 31, 19, 48, 21, 48);
   rect(9, 31, 2, 17);
+
   drawLiquidOutletPipe();
-  drawTemperatureMeter();
+  drawFlashDrumTemperatureMeter();
+
   pop();
 }
 
-function drawTemperatureMeter() {
+function drawFlashDrumTemperatureMeter() {
   push();
   translate(21, -12.5);
   noFill();
   stroke("rgb(20, 20, 20)");
   strokeWeight(0.2);
+
+  // Thermocouple cable
   beginShape();
   vertex(0, 0);
   quadraticVertex(3, -1, 5, -3);
   quadraticVertex(7, -6, 12, -7);
   endShape();
 
-  fill("rgb(140, 140, 140)");
+  fill("rgb(150, 150, 150)");
   stroke(0);
   strokeWeight(0.05);
-  translate(16, 0);
-  rect(-6.5, -12, 15, 12, 2);
+  translate(16, 1.5);
+
+  // Body of the temperature meter
+  rect(-6.5, -12, 15, 8.25, 2);
   fill(20);
-  rect(-5.25, -10, 12.5, 4);
-  const mX = mouseX / relativeSize();
-  const mY = mouseY / relativeSize();
-  // console.log({ mX, mY });
-  if (mX > 113 && mX < 119 && mY < 51.25 && mY > 48.25) {
-    state.hand = true;
-    fill("rgb(255, 50, 50)");
-  } else {
 
-    fill("rgb(255, 20, 20)");
-  }
-  rect(-2, -4.5, 6, 3, 0.25);
+  // Temperature meter display
+  rect(-5.25, -10, 8, 4);
 
-  fill("white");
   noStroke();
-  textSize(1.75);
-  textAlign(RIGHT, CENTER);
-  text("on/off", 3.25, -3);
+  textAlign(CENTER, CENTER);
   textFont(state.meterFont);
   fill("yellow");
   textSize(3);
   const T = state.column.units === "C" ? state.column.T_current : state.column.T_current * 9 / 5 + 32;
-  if (state.column.readout_on) {
-    text(`${(round(T * 10) / 10).toFixed(1)}  ${state.column.units}`, 5.625, -8);
-    textFont("Arial");
-    text("°", 4.25, -8);
-  }
+  text(`${(round(T * 10) / 10).toFixed(1)}`, -1.25, -8);
+  textSize(2.75);
+  fill("black");
+  textFont("Arial");
+  text("°C", 5.5, -7.5);
   pop();
 }
 
-function drawFlashLiquid() {
-  push();
-  if (state.pump.on) {
-    state.liquidFlow.timeCoordinate = constrain(state.liquidFlow.timeCoordinate + 0.02, -1, 1);
-    state.liquidHeight -= 0.000025;
-    if (frameCount % 60 === 0) {
-      state.mF_current = state.mF_current + (state.mF - state.mF_current) * 0.7;
-      state.heatExchanger.T_current = state.heatExchanger.T_current + (state.heatExchanger.T - state.heatExchanger.T_current) * 0.4;
-    }
-  } else if (state.liquidFlow.timeCoordinate > 0 && !state.pump.on) {
-    state.liquidFlow.timeCoordinate = constrain(state.liquidFlow.timeCoordinate + 0.02, 0, 2);
-  }
-  if (!state.pump.on && frameCount % 60 === 0 && state.heatExchanger.on) {
+function handleReadouts() {
+  // Logic for showing what to display on the readouts
+  if (!state.pump.on && frameCount % 60 === 0) {
     state.mF_current = state.mF_current * 0.2;
     state.heatExchanger.T_current = state.heatExchanger.T_current + (500 - state.heatExchanger.T_current) * 0.4;
   }
@@ -770,17 +865,43 @@ function drawFlashLiquid() {
       state.mL_current = state.mL_current - (state.mL_current - 0) * 0.6;
     }
   }
+}
+
+function drawFlashLiquid() {
+  push();
+
+  // Logic for the time coordinates of liquid flow and vapor "bubbles"
+  if (state.pump.on) {
+    state.liquidFlow.timeCoordinate = constrain(state.liquidFlow.timeCoordinate + 0.02, -1, 1);
+    state.liquidHeight -= 0.000025;
+    if (frameCount % 60 === 0) {
+      state.mF_current = state.mF_current + (state.mF - state.mF_current) * 0.7;
+      state.heatExchanger.T_current = state.heatExchanger.T_current + (state.heatExchanger.T - state.heatExchanger.T_current) * 0.4;
+    }
+  } else if (state.liquidFlow.timeCoordinate > 0 && !state.pump.on) {
+    state.liquidFlow.timeCoordinate = constrain(state.liquidFlow.timeCoordinate + 0.02, 0, 2);
+  }
+
+  handleReadouts();
+
   let t = state.liquidFlow.timeCoordinate;
   noFill();
   stroke("rgb(200, 200, 255)");
+
+  // Make inlet stream thickness inverse to the amount of liquid flashed to vapor
   const liquidThickness = 4 * (state.mL / state.mF);
   strokeWeight(liquidThickness);
+
+  // Only draw the vapor "bubbles" about a second after the pump is turned on, and stop drawing new bubbles after the pump is turned off
   if (abs(t) < 0.001) {
     state.bubbleFrame = frameCount;
   } else if (abs(t) > 1.01 && abs(t) < 1.03) {
     state.bubbleEndTime = frameCount;
   }
+
   if (t > 0) {
+
+    // Draw the liquid flow and liquid stream being "spit out" when the pump is turned off
     if (t < 2) {
       beginShape();
       if (t <= 1) {
@@ -794,11 +915,20 @@ function drawFlashLiquid() {
       endShape();
     }
     push();
+
+    // This prevents the bubbles from occupying random coordinates every single frame
     randomSeed(1578459);
+
     const numberOfBubbles = 100 * (state.mV / state.mF) - 1;
+
+    // Draw the vapor bubbles
     for (let i = 0; i < numberOfBubbles; i++) {
       push();
+
+      // It takes a total of 4 seconds (240 frames) for the vapor to escape and disappear
       let m = random(0, 1) * (frameCount - state.bubbleFrame) % 240;
+
+      // Logic for the vapor to stop coming out of the pipe when the pump is turned off
       if (t > 1) {
         const timeLeft = constrain((240 - (frameCount - state.bubbleEndTime)) / 240, 0, 1);
         if (timeLeft === 0) {
@@ -812,11 +942,15 @@ function drawFlashLiquid() {
       const offsetY = random(-10, 10);
       const c = m / 240;
       const bubbleSizeOffset = state.mV / state.mF;
+
+      // Draw the vapor bubbles
       circle(offsetX * c ** 0.45, (-25 + offsetY) * c, 2.5 + 4.5 * c + bubbleSizeOffset);
       pop();
     }
     pop();
   }
+
+  // Draw the liquid at the bottom of the flash drum
   if (t >= 1 && state.pump.on) {
     const maxLiquidHeight = 15 * (state.mL / state.mF)
     const l = state.liquidFlow.liquidHeight;
@@ -837,33 +971,20 @@ function drawVaporOutletPipe() {
   push();
   let vertices;
   translate(20, -30);
-  // rect(0, -1, 1, 5);
-  // rect(1, 0, 40, 3);
-  // strokeWeight(0.05);
-  // for (let i = 0; i < 3; i++) {
-  //   rect(1, -0.6725 + i * 1.8725, 0.5);
-  // }
   strokeWeight(0.1);
   translate(20, 1.5);
   push();
   fill("rgb(200, 200, 200)");
   stroke("rgb(40, 40, 40)");
-  // rect(-1.5, -5, 3, -7);
   translate(-15, -13);
+
+  // Horizontal vapor outlet pipe
   rect(-13, -1.5, 52, 3);
   push();
   translate(12, 0);
-  // beginShape();
-  // vertex(0, -1.75);
-  // for (let i = 90; i >= 0; i -= 10) {
-  //   const x = 1.75 + 3 * cos(radians(i));
-  //   const y = 1.75 - 3.5 * sin(radians(i));
-  //   vertex(x, y);
-  // }
-  // vertex(4.75, 3);
-  // vertex(1.25, 3);
-  // endShape(CLOSE);
   translate(-24, 0);
+
+  // Vapor outlet elbow joint
   beginShape();
   vertex(0, -1.75);
   for (let i = 90; i >= 0; i -= 10) {
@@ -876,59 +997,24 @@ function drawVaporOutletPipe() {
   vertex(-1, 1.75);
   vertex(0, 1.75);
   endShape(CLOSE);
+
+  // Vapor outlet vertical pipe
   rect(-4.25, 3, 3, 2.5);
+
+  // Vapor outlet elbow joint supports
   rect(0, -2, 1, 4);
   rect(-4.75, 2.5, 4, 1);
   pop();
-  // rect(12, -2, 1, 4);
-  // rect(13, 2, 4, 1);
   pop();
+
   push();
-  // fill("rgb(150, 150, 40)");
-  // stroke("rgb(100, 100, 40)");
-  // beginShape();
-  // vertices = [
-  //   [-5, -2.5],
-  //   [-5, 2.5],
-  //   [-4, 2.5],
-  //   [-4, 2],
-  //   [0, 1.75],
-  //   [4, 2],
-  //   [4, 2.5],
-  //   [5, 2.5],
-  //   [5, -2.5],
-  //   [4, -2.5],
-  //   [4, -2],
-  //   [2, -2.25],
-  //   [2, -4],
-  //   [2.5, -4],
-  //   [2.5, -5],
-  //   [-2.5, -5],
-  //   [-2.5, -4],
-  //   [-2, -4],
-  //   [-2, -2.25],
-  //   [-4, -2],
-  //   [-4, -2.5],
-  // ];
-
-  // vertices.forEach(coord => vertex(coord[0], coord[1]));
-  // endShape(CLOSE);
-
-  // fill("rgb(200, 200, 200)");
-  // stroke("rgb(150, 150, 150)");
-  // strokeWeight(0.05);
-  // rect(-0.5, 2, 1, 3);
-
-  // fill("rgb(40, 40, 40)");
-  // stroke("rgb(20, 20, 20)");
-  // rect(-3, 5, 6, 1);
-
   translate(-15, -13);
-
   fill("rgb(150, 150, 40)");
   stroke("rgb(100, 100, 40)");
   strokeWeight(0.1);
   rotate(-PI / 2);
+
+  // Vapor outlet backpressure valve golden body
   beginShape();
   vertices = [
     [2.5, -2],
@@ -963,8 +1049,12 @@ function drawVaporOutletPipe() {
   stroke("rgb(100, 100, 100)");
   translate(5, 2.5);
   strokeWeight(0.05);
+
+  // Vapor outlet backpressure valve pressure stem
   rect(0, -0.25, 8, 0.5);
   strokeWeight(0.1);
+
+  // Vapor outlet backpressure valve support bracket
   beginShape();
   vertices = [
     [0, -1.75],
@@ -1004,6 +1094,7 @@ function drawVaporOutletPipe() {
   stroke("rgb(200, 60, 60)");
   translate(7.75, 0);
 
+  // Vapor outlet backpressure valve diaphragm body
   beginShape();
 
   vertices = [
@@ -1033,6 +1124,8 @@ function drawVaporOutletPipe() {
   fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
   strokeWeight(0.05);
+
+  // Vapor outlet backpressure valve diaphragm body bolts
   for (let i = 0; i < 7; i++) {
     rect(2, -6.5 + i * 2.0625, 0.5);
     rect(4, -6.5 + i * 2.0625, 0.5);
@@ -1041,12 +1134,15 @@ function drawVaporOutletPipe() {
   fill("gold");
   stroke("rgb(100, 100, 100)");
   strokeWeight(0.05);
+
+  // Vapor outlet backpressure valve needle indicator
   rect(-6 + p * 3.5, -1.5, 0.25, 3);
 
   fill("rgb(150, 150, 40)");
   stroke("rgb(100, 100, 40)");
   translate(6.5, 0.625);
 
+  // Vapor outlet backpressure valve diaphragm elbow joint
   beginShape();
   vertices = [
     [0, 1],
@@ -1072,14 +1168,19 @@ function drawVaporOutletPipe() {
 
   fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
+
+  // Top-right horizontal compressed air pipe
   rect(1.625 - 0.25, -1, 0.5, -10);
   fill("rgb(220, 220, 220)")
+
+  // Top-right elbow joint compression fittings
   rect(1.625 - 0.375, -1.325, 0.75, 0.325);
 
   fill("rgb(150, 150, 40)");
   stroke("rgb(100, 100, 40)");
   translate(0, -12);
 
+  // Top-right elbow joint
   beginShape();
   vertices = [
     [0, -1],
@@ -1105,6 +1206,7 @@ function drawVaporOutletPipe() {
 
   translate(-4, -0.75);
 
+  // Mid-bottom elbow joint
   beginShape();
   vertices = [
     [0, 1],
@@ -1130,6 +1232,7 @@ function drawVaporOutletPipe() {
 
   translate(0, -21.5);
 
+  // Bottom-left elbow joint
   beginShape();
   vertices = [
     [0, -1],
@@ -1155,40 +1258,50 @@ function drawVaporOutletPipe() {
 
   fill("rgb(200, 200, 200)");
   stroke("rgb(150, 150, 150)");
+  // Bottom-left horizontal compressed air pipe
   rect(-1.8725, 1 + 1 / 32, 0.5, 8);
+
+  // Bottom-right horizontal compressed air pipe
   rect(-1.8725, 15.5 - 1 / 32, 0.5, 5);
+
+  // Top-left vertical compressed air pipe
   rect(0.125 - 3 / 32, -0.625, 10, 0.5);
+
+  // Middle vertical compressed air pipe
   rect(0.125 - 3 / 32, 22.25 - 0.625, 4 - 1 / 16, 0.5);
   fill("rgb(220, 220, 220)");
+
+  // Bottom-left elbow joint compression fittings
   rect(-1.8725 - 0.125, 1 + 1 / 32, 0.75, 0.325);
   rect(-1.8725 - 0.125, 20.175 - 1 / 32, 0.75, 0.325);
+
+  // Bottom-middle elbow joint compression fittings
   rect(0.125 - 3 / 32, -0.625 - 0.125, 0.325, 0.75);
   rect(0.125 - 3 / 32, 22.25 - 0.625 - 0.125, 0.325, 0.75);
+
+  // Top-middle elbow joint compression fittings
   rect(4.125 - 5 / 32 - 0.325, 22.25 - 0.625 - 0.125, 0.325, 0.75);
   rect(5.25, 23.25, 0.75, 0.325);
   pop();
 
+  // Draw the pressure controller
   push();
   translate(-30, -8);
-  fill("rgb(140, 140, 140)");
+  fill("rgb(150, 150, 150)");
   stroke(0);
   strokeWeight(0.05);
   translate(-13, -2);
+
+  // Pressure controller body
   rect(-6.5, -12, 15, 12, 2);
   fill(20);
-  rect(-5, -10, 12.5, 4);
+
+  // Pressure readout
+  rect(-5, -10, 8, 4);
   const mX = mouseX / relativeSize();
   const mY = mouseY / relativeSize();
-  if (mX > 69.25 && mX < 75.25 && mY < 25.25 && mY > 22.25) {
-    state.hand = true;
-    fill("rgb(255, 50, 50)");
-  } else {
 
-    fill("rgb(255, 20, 20)");
-  }
-  rect(-3 - 2.5, -4.5, 6, 3, 0.25);
-
-  if (mX > 69.25 + 6.5 && mX < 72.25 + 6.5 && mY < 25.25 && mY > 22.25) {
+  if (mX > 72.75 && mX < 75.75 && mY < 25.25 && mY > 22.25) {
     state.hand = true;
     fill("rgb(255, 50, 50)");
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
@@ -1201,9 +1314,11 @@ function drawVaporOutletPipe() {
 
     fill("rgb(255, 20, 20)");
   }
-  rect(-3 + 4, -4.5, 3, 3, 0.25);
 
-  if (mX > 76.25 + 3 && mX < 79.25 + 3 && mY < 25.25 && mY > 22.25) {
+  // Left button
+  rect(-3 + 1, -4.5, 3, 3, 0.25);
+
+  if (mX > 72.75 + 3.5 && mX < 75.75 + 3.5 && mY < 25.25 && mY > 22.25) {
     fill("rgb(255, 50, 50)");
     state.hand = true;
     if (mouseIsPressed && frameCount % 10 === state.mousePressedFrameModulus) {
@@ -1216,20 +1331,29 @@ function drawVaporOutletPipe() {
 
     fill("rgb(255, 20, 20)");
   }
-  rect(-3 + 7.5, -4.5, 3, 3, 0.25);
 
+  // Right button
+  rect(-3 + 4.5, -4.5, 3, 3, 0.25);
+
+  // Text on the buttons
   fill("white");
   noStroke();
   textSize(1.75);
   textAlign(RIGHT, CENTER);
-  text("on/off", 2.25 - 2.5, -3);
   push();
   textSize(3.5);
-  text("▴", 7, -3.1);
+  text("▴", 4, -3.1);
   translate(1.55, -2.8);
   rotate(PI);
-  text("▴", 0, 0);
+  text("▴", 3, 0);
+  rotate(-PI);
+  textSize(2.75);
+  fill("black");
+  text("bar", 6.125, -5);
   pop();
+
+  // Text on the readout
+  textAlign(CENTER, CENTER);
   textFont(state.meterFont);
   fill("yellow");
   textSize(3);
@@ -1238,12 +1362,12 @@ function drawVaporOutletPipe() {
     P = state.pressureUnits === "atm" ? state.pressureController.P : state.pressureController.P * 101325 / 100000;
     fill("red");
   }
-  if (state.pressureController.on) {
-    text(`${(round(P * 100) / 100).toFixed(2)}  ${state.pressureUnits}`, 6.125, -8);
-  }
+  text(`${(round(P * 100) / 100).toFixed(2)}`, -1, -8);
   noFill();
   stroke(0);
   strokeWeight(0.2);
+
+  // Pressure controller cable
   beginShape();
   vertex(0, 0);
   vertex(0, 2);
@@ -1255,6 +1379,8 @@ function drawVaporOutletPipe() {
   quadraticVertex(4.5, -13.5, 6.5, -13.5);
   quadraticVertex(8.5, -13.5, 8.5, -15);
   endShape();
+
+  // Pressure regulator
   fill(60);
   stroke(20);
   strokeWeight(0.05);
@@ -1275,15 +1401,24 @@ function drawVaporOutletPipe() {
 function drawLiquidOutletPipe() {
   push();
   translate(20, 37);
+  // Vertical pipe mounting plate
   rect(-7, -6, 5, 1);
+
+  // Horizontal pipe
   rect(-2, 0, 45, 3);
+
+  // Vertical pipe
   rect(-6, -5, 3, 4);
   strokeWeight(0.05);
+
+  // Mounting plate bolts
   for (let i = 0; i < 3; i++) {
     rect(-6.5 + i * 1.75, -5, 0.5);
   }
   strokeWeight(0.1);
   translate(-6, 0);
+
+  // Elbow joint
   beginShape();
   vertex(0, -0.5);
   for (let i = 0; i <= 90; i += 10) {
@@ -1293,8 +1428,11 @@ function drawLiquidOutletPipe() {
   }
   vertex(3.5, -0.5);
   endShape();
+
+  // Elbow joint supports
   rect(-0.5, -1.5, 4, 1);
   rect(3.5, -0.5, 1, 4);
+
   drawMassFlowMeter();
   pop();
 }
@@ -1306,9 +1444,13 @@ function drawMassFlowMeter() {
   fill("rgb(80, 80, 80)");
   stroke("rgb(40, 40, 40)");
   strokeWeight(0.05);
+
+  // Dark grey caps on the ends of the mass flow meter
   rect(-5, 0, 2, 5, 0.5);
   rect(5, 0, 2, 5, 0.5);
   fill("rgb(240, 240, 240)");
+
+  // Body of the mass flow meter
   beginShape();
   let vertices = [
     [-5, -2.5],
@@ -1333,47 +1475,45 @@ function drawMassFlowMeter() {
   endShape(CLOSE);
 
   fill("rgb(80, 80, 80)");
+
+  // Middle dark grey cap
   rect(0, -1, 5, 6, 0.5);
   rectMode(CORNER);
+
+  // Cable support
   rect(-1, -4.5, 2, 0.5);
   quad(-0.75, -4.5, -0.5, -6, 0.5, -6, 0.75, -4.5);
   noFill();
   stroke(0);
   strokeWeight(0.2);
+
+  // Cable
   beginShape();
   vertex(0, -6);
-
   quadraticVertex(2, -10, 6, -8);
   quadraticVertex(10, -5, 15, -7);
   quadraticVertex(18, -9, 16, -12);
   endShape();
-  fill("rgb(140, 140, 140)");
+
+  // Mass flow readout
+  fill("rgb(150, 150, 150)");
   stroke(0);
   strokeWeight(0.05);
   translate(16, -12);
-  rect(-8, -12, 16, 12, 2);
+  rect(-8, -8, 19, 8.125, 2);
   fill(20);
-  rect(-7, -10, 14, 4);
-  fill("rgb(255, 20, 20)");
-  const mX = mouseX / relativeSize();
-  const mY = mouseY / relativeSize();
-  if (mX > 124.5 && mX < 131 && mY < 90.5 && mY > 86.5) {
-    state.hand = true;
-    fill("rgb(255, 50, 50)");
-  }
-  rect(-3, -4.5, 6, 3, 0.25);
-  fill("white");
+  rect(-7, -6, 8, 4);
   noStroke();
-  textSize(1.75);
   textAlign(CENTER, CENTER);
-  text("on/off", 0, -3);
   textFont(state.meterFont);
   fill("yellow");
   textSize(3);
   const m = state.liquidOutlet.units === "kg/min" ? (state.mL_current * 60).toFixed(2) : (state.mL_current * 1000).toFixed(1);
-  if (state.liquidOutlet.readout_on) {
-    text(`${m} ${state.liquidOutlet.units}`, 0.125, -8);
-  }
+  text(m, -2.875, -4);
+  textFont("Arial");
+  textSize(2.75);
+  fill("black");
+  text("kg/min", 5.875, -4);
   pop();
 }
 
@@ -1385,9 +1525,13 @@ function drawInletFlowMeter() {
   fill("rgb(80, 80, 80)");
   stroke("rgb(40, 40, 40)");
   strokeWeight(0.05);
+
+  // Dark grey caps on the ends of the mass flow meter
   rect(-5, 0, 2, 5, 0.5);
   rect(5, 0, 2, 5, 0.5);
   fill("rgb(240, 240, 240)");
+
+  // Body of the mass flow meter
   beginShape();
   let vertices = [
     [-5, -2.5],
@@ -1412,48 +1556,49 @@ function drawInletFlowMeter() {
   endShape(CLOSE);
 
   fill("rgb(80, 80, 80)");
+
+  // Middle dark grey cap
   rect(0, -1, 5, 6, 0.5);
   rectMode(CORNER);
+
+  // Cable support
   rect(-1, -4.5, 2, 0.5);
   quad(-0.75, -4.5, -0.5, -6, 0.5, -6, 0.75, -4.5);
+
   rotate(-PI / 2);
   translate(3, 12);
   noFill();
   stroke(0);
   strokeWeight(0.2);
+
+  // Cable
   beginShape();
   vertex(3, -12);
   quadraticVertex(4, -12.5, 5, -14);
   quadraticVertex(6, -16, 8, -16);
   endShape();
+
   translate(0, 2);
-  fill("rgb(140, 140, 140)");
+  fill("rgb(150, 150, 150)");
   stroke(0);
   strokeWeight(0.05);
   translate(16, -12);
-  rect(-8, -12, 16, 12, 2);
+
+  // Mass flow readout
+  rect(-8, -10, 19, 8.125, 2);
   fill(20);
-  rect(-7, -10, 14, 4);
-  fill("rgb(255, 20, 20)");
-  const mX = mouseX / relativeSize();
-  const mY = mouseY / relativeSize();
-  if (mX > 49.5 && mX < 55.5 && mY < 85 && mY > 82) {
-    state.hand = true;
-    fill("rgb(255, 50, 50)");
-  }
-  rect(-3, -4.5, 6, 3, 0.25);
-  fill("white");
+  rect(-7, -8, 8, 4);
   noStroke();
-  textSize(1.75);
   textAlign(CENTER, CENTER);
-  text("on/off", 0, -3);
   textFont(state.meterFont);
   fill("yellow");
   textSize(3);
   const m = state.inlet.units === "kg/min" ? (state.mF_current * 60).toFixed(2) : (state.mF_current * 1000).toFixed(1);
-  if (state.inlet.readout_on) {
-    text(`${m} ${state.inlet.units}`, 0.125, -8);
-  }
+  text(m, -2.875, -6);
+  textFont("Arial");
+  textSize(2.75);
+  fill("black");
+  text("kg/min", 5.875, -6);
   pop();
 }
 
@@ -1464,20 +1609,32 @@ function drawSample() {
   fill("rgb(180, 180, 180)");
   stroke("rgb(120, 120, 120)");
   strokeWeight(0.025);
+
+  // Syringe needle
   rect(-40, -20, -5, 0.2);
   fill("rgb(200, 200, 200)");
   const offsetX = 12 * state.gc.takingSampleTime;
+
+  // Syringe handle
   rect(-58 + offsetX, -21, 0.5, 2);
   rect(-58 + offsetX, -20.25, -13, 0.5);
   rect(-71.5 + offsetX, -21.25, 0.5, 2.5);
+
   fill("rgb(150, 150, 255)");
   noStroke();
+
+  // Syringe liquid
   rect(-57.5 + offsetX, -21, 12 - offsetX, 2);
   fill("rgba(150, 150, 150, 0.4)");
   stroke("rgb(150, 150, 150)");
+
+  // Syringe body
   rect(-45, -21, -14, 2, 1, 0.5, 0.5, 1);
+
   stroke(50);
   strokeWeight(0.1);
+
+  // Syringe volume markings
   for (let i = 0; i <= 12; i++) {
     const x = -58 + i;
     const y = -21;
@@ -1494,11 +1651,19 @@ function drawGC() {
   fill("rgb(230, 230, 220)");
   stroke("rgb(150, 150, 120)");
   strokeWeight(0.1);
+
+  // GC Base
   rect(-40, 0, 80, 40, 0, 0, 2, 2);
+
   fill("rgb(180, 50, 50)");
   stroke("rgb(200, 0, 0)");
+
+  // Red GC cover
   rect(-40, -40, 80, 40, 2, 2, 0, 0);
+
   fill("rgb(200, 200, 200)");
+
+  // Screws going around the outside of the top cover
   for (let i = 0; i < 18; i++) {
     if (i < 6) {
       stroke("rgb(150, 150, 150)");
@@ -1531,6 +1696,8 @@ function drawGC() {
   stroke(0);
   strokeWeight(0.1);
   fill(40);
+
+  // Left cover clamp
   beginShape();
   vertex(-20.5, -3);
   vertex(-20, -3.5);
@@ -1556,6 +1723,8 @@ function drawGC() {
   stroke(0);
   strokeWeight(0.1);
   fill(40);
+
+  // Right cover clamp
   beginShape();
   vertex(20.5, -3);
   vertex(20, -3.5);
@@ -1581,6 +1750,8 @@ function drawGC() {
   stroke("rgb(150, 150, 150)");
   strokeWeight(0.2);
   noFill();
+
+  // Left, middle, and right rounded rectangles with the text and indicators inside them
   rect(-38, 7, 14, 31, 1);
   translate(0.5, 0);
   rect(-23, 7, 19.5, 31, 1);
@@ -1589,6 +1760,8 @@ function drawGC() {
   fill("black");
   textSize(1.25);
   textAlign(CENTER, CENTER);
+
+  // Text inside the rounded rectangles
   text("EPC CONTROLS", -31, 9.5);
   text("DETECTOR PARAMETERS", -13, 9.5);
   text("TEMPERATURES", 5, 9.5);
@@ -1613,10 +1786,13 @@ function drawGC() {
   text("I\nN\nJ\nE\nC\nT\nO\nR", 5, 24);
   text("C\nO\nL\nU\nM\nN\n\nO\nV\nE\nN", 7.5, 24);
   text("O\nV\nE\nN\n\nM\nA\nX", 10, 24);
+
   fill("rgb(80, 80, 80)");
   stroke(0);
   strokeWeight(0.1);
   randomSeed(125);
+
+  // Indicators inside the rounded rectangles
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 4; j++) {
       if (random() < 0.2) {
@@ -1647,40 +1823,58 @@ function drawGC() {
       circle(i * 2.5, 13 + j * 3, 0.5)
     }
   }
+
   translate(-0.5, 0);
   noStroke();
   fill("black");
   textSize(1.25);
   textAlign(CENTER, CENTER);
+
+  // Text on the right side of the GC
   text("TEMPERATURE (°C)\nPRESSURE (PSI)", 25, 8);
+
   textSize(0.75);
+
   text("TEMPERATURE", 23, 18);
   text("PRESSURE", 23, 23);
+
   textSize(1.1);
+
   text("START", 30, 30);
+
   fill("rgb(220, 220, 220)");
   stroke("rgb(150, 150, 150)");
   strokeWeight(0.05);
+
+  // Temperature/pressure switch
   circle(23, 20.5, 2.5);
   rectMode(CENTER);
   fill("rgb(230, 230, 230)");
   rect(23, 19.75, 0.75, 2, 0.5);
+
   fill(0);
   stroke(0);
   strokeWeight(0.1);
   rectMode(CORNER);
+
+  // Temperature readout
   rect(20, 10.5, 10, 6);
   fill(40);
   rect(21, 11.5, 8, 4);
   rect(28.5, 25, 3, 3);
+
+  // Power button
   fill("rgb(255, 255, 200)");
   stroke("rgb(200, 200, 200)");
   strokeWeight(0.2);
   rect(28.75, 25.25, 2.5, 2.5);
+
   noStroke();
   textFont(state.meterFont);
   fill("yellow");
   textSize(4);
+
+  // Temperature text
   text("80", 25, 13.5);
   pop();
 }
@@ -1707,31 +1901,53 @@ function drawComputer() {
   fill(50);
   stroke(0);
   strokeWeight(0.05);
+
+  // Computer screen body
   rect(-25, 0, 50, 40, 1);
+
   fill(245);
+
+  // Computer screen screen
   rect(-23.5, 1.5, 47, 37, 0.5);
+
   fill(220);
+
+  // Computer screen legs
   quad(-13, 40, -17, 58, -15, 58, -11, 40);
   quad(13, 40, 17, 58, 15, 58, 11, 40);
+
   fill(190);
+
+  // Computer keyboard keys
   for (let i = 0; i < 16; i++) {
     const x = -22 + i * (46 - 2) / 16;
     const y = 54;
     rect(x, y, 2, 3);
   }
+
   fill(200);
+
+  // Computer keyboard body
   rect(-23, 55, 46, 3);
+
   noFill();
   stroke(0);
   strokeWeight(0.4);
+
+  // Computer cable to the GC
   beginShape();
   vertex(-36, 42);
   quadraticVertex(-32, 40, -30, 35);
   quadraticVertex(-28, 30, -25, 28);
   endShape();
+
   fill(255);
   strokeWeight(0.1);
+
+  // Graph background
   rect(-19, 10, 38, 25);
+
+  // Graph axes ticks
   for (let i = 0; i < 32; i++) {
     let x = -19;
     const y = 10 + i * 25 / 32;
@@ -1750,8 +1966,11 @@ function drawComputer() {
     y2 = i % 4 === 0 ? y + 0.5 : i % 2 === 0 ? y + 0.3 : y + 0.2;
     line(x, y, x, y2);
   }
+
   noFill();
   strokeWeight(0.15);
+
+  // Graph spectrograph
   beginShape();
   vertex(-19, 35 - 4 * 38 / 48);
   vertex(-14, 35 - 4 * 38 / 48);
@@ -1769,10 +1988,13 @@ function drawComputer() {
   }
   vertex(19, 35 - 4 * 38 / 48);
   endShape();
+
   fill(0);
   noStroke();
   textSize(3);
   textAlign(LEFT, CENTER);
+
+  // Display the liquid composition after liquid is inject
   if (state.gc.takingSampleTime >= 1) {
     text(`x  = ${(round(100 * state.xL) / 100).toFixed(2)}`, -5, 6);
     textSize(2);
@@ -1783,6 +2005,9 @@ function drawComputer() {
   pop();
 }
 
+// We only want to interact with the DOM for a single frame, but we want to disable when the pump is off,
+// and enable it when the pump is on. This turns the button on and off when the pump on/off switch is pressed,
+// and in drawAll we continually check whether the pump state is on or off, and trigger this accordingly.
 function triggerSampleButton() {
   const takeSampleButton = document.getElementById("take-sample");
   if (state.pump.on) {
