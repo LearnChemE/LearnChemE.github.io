@@ -96,6 +96,20 @@ canvas {
   box-shadow: 0px 0px 2px 2px lightgrey;
 }
 
+#eqn-container {
+  position: absolute;
+  left: 50%;
+  top: 17%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 80px;
+  align-content: center;
+  align-items: center;
+}
+
+#reaction-eqn {}
+
 .modal.show {
   padding-left: 0px !important;
 }
@@ -176,6 +190,10 @@ canvas {
 @media screen and (min-width: 780px) {
    :root {
     --slider-width: 150px;
+  }
+  #eqn-container {
+    font-size: 1.2rem;
+    top: 14%;
   }
 }
 

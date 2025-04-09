@@ -14,9 +14,16 @@ window.state = {
   hamburgerHasBeenClicked: window.localStorage.getItem("hamburgerHasBeenClicked") === "true",
   P: 150,
   T: 600,
-  nN2: 0,
-  nH2: 0,
-  nNH3: 1,
+  inlet: {
+    nN2: 0,
+    nH2: 0,
+    nNH3: 1,
+  },
+  outlet: {
+    nN2: 0,
+    nH2: 0,
+    nNH3: 1,
+  }
 };
 
 const containerElement = document.getElementById("p5-container");

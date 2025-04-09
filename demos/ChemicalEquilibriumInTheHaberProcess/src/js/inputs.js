@@ -37,7 +37,7 @@ function initializeSliders() {
   n2Slider.addEventListener("input", (e) => {
     const nN2 = Math.round(10 * Number(e.target.value)) / 10;
     n2Value.innerHTML = nN2.toFixed(1);
-    state.nN2 = nN2;
+    state.inlet.nN2 = nN2;
     calcAll();
     redraw();
   });
@@ -45,7 +45,7 @@ function initializeSliders() {
   h2Slider.addEventListener("input", (e) => {
     const nH2 = Math.round(10 * Number(e.target.value)) / 10;
     h2Value.innerHTML = nH2.toFixed(1);
-    state.nH2 = nH2;
+    state.inlet.nH2 = nH2;
     calcAll();
     redraw();
   });
@@ -53,7 +53,7 @@ function initializeSliders() {
   nh3Slider.addEventListener("input", (e) => {
     const nNH3 = Math.round(10 * Number(e.target.value)) / 10;
     nh3Value.innerHTML = nNH3.toFixed(1);
-    state.nNH3 = nNH3;
+    state.inlet.nNH3 = nNH3;
     calcAll();
     redraw();
   });
