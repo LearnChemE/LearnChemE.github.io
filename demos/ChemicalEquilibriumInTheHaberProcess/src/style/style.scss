@@ -5,7 +5,9 @@ $modal-xl: 1140px;
 @import "bootstrap";
 @import "./slider.scss"; // Keeping slider styling in place if needed for other inputs
 :root {
-  --slider-width: 120px;
+  --slider-width: 100px;
+  --value-width: 28px;
+  --unit-width: 22px;
 }
 
 #graphics-container {
@@ -36,7 +38,7 @@ $modal-xl: 1140px;
   transform: translateX(-50%);
   width: max-content;
   height: max-content;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   gap: 10px;
 }
 
@@ -63,11 +65,11 @@ $modal-xl: 1140px;
 }
 
 .slider.with-units {
-  grid-template-columns: max-content var(--slider-width) 32px 25px;
+  grid-template-columns: max-content var(--slider-width) var(--value-width) var(--unit-width);
 }
 
 .slider.without-units {
-  grid-template-columns: max-content var(--slider-width) 32px;
+  grid-template-columns: max-content var(--slider-width) var(--value-width);
 }
 
 .slider-label {
@@ -108,8 +110,6 @@ canvas {
   align-items: center;
 }
 
-#reaction-eqn {}
-
 .modal.show {
   padding-left: 0px !important;
 }
@@ -117,6 +117,16 @@ canvas {
 .modal-body {
   text-align: left;
   font-size: 0.9rem;
+}
+
+.details-eqn {
+  width: min-content;
+  margin-left: 20px;
+}
+
+.details-txt {
+  line-height: 1.5rem;
+  margin-top: 15px;
 }
 
 #hamburger {
@@ -187,23 +197,53 @@ canvas {
   pointer-events: none;
 }
 
+@media screen and (min-width: 680px) {
+   :root {
+    --slider-width: 120px;
+    --value-width: 32px;
+    --unit-width: 25px;
+  }
+  #eqn-container {
+    font-size: 1.1rem;
+    top: 16%;
+  }
+  #sliders-wrapper {
+    font-size: 0.8rem;
+  }
+}
+
 @media screen and (min-width: 780px) {
    :root {
     --slider-width: 150px;
+    --value-width: 35px;
+    --unit-width: 28px;
   }
   #eqn-container {
     font-size: 1.2rem;
     top: 14%;
+  }
+  #sliders-wrapper {
+    font-size: 0.9rem;
   }
 }
 
 @media screen and (min-width: 900px) {
    :root {
     --slider-width: 180px;
+    --value-width: 36px;
+    --unit-width: 30px;
+  }
+  #sliders-wrapper {
+    font-size: 1rem;
   }
 }
 
 @media screen and (min-width: 1320px) {
+   :root {
+    --slider-width: 200px;
+    --value-width: 40px;
+    --unit-width: 32px;
+  }
   #hamburger-icon {
     padding: 6px;
   }
@@ -214,5 +254,8 @@ canvas {
   #buttons {
     top: 35px;
     padding: 15px;
+  }
+  #sliders-wrapper {
+    font-size: 1.1rem;
   }
 }

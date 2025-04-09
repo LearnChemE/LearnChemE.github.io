@@ -3,6 +3,7 @@ export function calcAll() {
   // The code is a numerical solution to the equilibrium constant of the Haber process.
   // The solution from ChatGPT was far from perfect, but it was a good starting point.
   // A lot of time and effort went into this solution, so here it is in all of its beauty.
+  // -Neil
 
   const R = 8.314; // Ideal gas constant - J / (mol * K)
   const DH = -92200; // Enthalpy of reaction - J / mol
@@ -15,17 +16,17 @@ export function calcAll() {
   const gamma = [1, 3, -2];
 
   // Initial moles for N2, H2, and NH3 from the inlet state.
-  const nInitial = [state.inlet.nN2, state.inlet.nH2, state.inlet.nNH3];
+  const nAdd = [state.inlet.nN2, state.inlet.nH2, state.inlet.nNH3];
 
   // The number of moles at equilibrium = initial number of moles minus the extent
   // of reaction times the stoichiometric coefficient.
   function nEQ(i, x) {
-    return nInitial[i] - x * gamma[i];
+    return nAdd[i] - x * gamma[i];
   }
 
   // Total moles in the system
   function total(x) {
-    return nInitial.reduce((sum, n, i) => sum + nEQ(i, x), 0);
+    return nAdd.reduce((sum, n, i) => sum + nEQ(i, x), 0);
   }
 
   // The mol fraction of each component in the mixture, as a function of
@@ -82,14 +83,14 @@ export function calcAll() {
 
   // The minimum extent is a fully-reversed reaction, where all of the ammonia converts to N2 and H2.
   // This is a negative value for x.
-  const xMin = gamma[2] * nInitial[2];
+  const xMin = gamma[2] * nAdd[2];
 
   // The maximum extent is limited by the limiting reactant, so for example, if we have
   // 1 mol of N2 and 6 mol of H2, the maximum extent is 1.
   // Likewise, if we have 3 mol of N2 and 3 mol of H2, the maximum extent is also 1 because
   // the stoichiometric coefficient of H2 is 3 and 3 / 3 = 1.
   // This would be a positive value for x.
-  const extents = nInitial.map((n, i) => { return n / gamma[i]; });
+  const extents = nAdd.map((n, i) => { return n / gamma[i]; });
   const xMax = Math.min(extents[0], extents[1]);
 
   // There are multiple roots to the equation k(x) = keq, so we need to find all of them.
