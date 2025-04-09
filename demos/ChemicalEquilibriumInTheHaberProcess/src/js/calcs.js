@@ -1,27 +1,40 @@
 export function calcAll() {
-  const R = 8.314;
-  const DH = -92200;
-  const DS = -198.75;
+  // Much credit to ChatGPT and GitHub Copilot for the code in this file.
+  // The code is a numerical solution to the equilibrium constant of the Haber process.
+  // The solution from ChatGPT was far from perfect, but it was a good starting point.
+  // A lot of time and effort went into this solution, so here it is in all of its beauty.
+
+  const R = 8.314; // Ideal gas constant - J / (mol * K)
+  const DH = -92200; // Enthalpy of reaction - J / mol
+  const DS = -198.75; // Entropy of reaction - J / (mol * K)
+
+  // Equilibrium constant for the reaction at the given temperature.
   const keq = Math.exp(-1 * (DH - (state.T * DS)) / (R * state.T));
 
   // Stoichiometric coefficients for [N2, H2, NH3]
   const gamma = [1, 3, -2];
 
   // Initial moles for N2, H2, and NH3 from the inlet state.
-  const nAdd = [state.inlet.nN2, state.inlet.nH2, state.inlet.nNH3];
+  const nInitial = [state.inlet.nN2, state.inlet.nH2, state.inlet.nNH3];
 
+  // The number of moles at equilibrium = initial number of moles minus the extent
+  // of reaction times the stoichiometric coefficient.
   function nEQ(i, x) {
-    return nAdd[i] - x * gamma[i];
+    return nInitial[i] - x * gamma[i];
   }
 
+  // Total moles in the system
   function total(x) {
-    return nAdd.reduce((sum, n, i) => sum + nEQ(i, x), 0);
+    return nInitial.reduce((sum, n, i) => sum + nEQ(i, x), 0);
   }
 
+  // The mol fraction of each component in the mixture, as a function of
+  // extent of reaction
   function z(i, x) {
     return nEQ(i, x) / total(x);
   }
 
+  // The equilibrium constant as a function of the extent of reaction.
   function k(x) {
     return [0, 1, 2].reduce(
       (prod, i) => prod * Math.pow(z(i, x) * state.P, -1 * gamma[i]),
@@ -29,12 +42,17 @@ export function calcAll() {
     );
   }
 
+  // At equilibrium, k(x) = keq.
+  // This is the function we want to find the root of.
   function f(x) {
     return k(x) - keq;
   }
 
-  // --- Bisection Method ---
-  function bisection(lower, upper, tol = 1e-15, maxIterations = 50000) {
+  // The bisection method is a numerical method for finding roots of a function.
+  // It works by iteratively narrowing down an interval [lower, upper] where the function changes sign.
+  // The function must be continuous in the interval, and the initial interval must contain a root.
+  // The method is simple and robust, and in this case converges very rapidly.
+  function bisection(lower, upper, tol, maxIterations) {
     let fLower = f(lower);
     let fUpper = f(upper);
 
@@ -62,23 +80,42 @@ export function calcAll() {
     return mid;
   }
 
-  // --- Find Roots with a Coarse Pre-scan ---
-  function findRoots(coarseSteps = 50000, tol = 1e-15, maxIterations = 50000) {
+  // The minimum extent is a fully-reversed reaction, where all of the ammonia converts to N2 and H2.
+  // This is a negative value for x.
+  const xMin = gamma[2] * nInitial[2];
+
+  // The maximum extent is limited by the limiting reactant, so for example, if we have
+  // 1 mol of N2 and 6 mol of H2, the maximum extent is 1.
+  // Likewise, if we have 3 mol of N2 and 3 mol of H2, the maximum extent is also 1 because
+  // the stoichiometric coefficient of H2 is 3 and 3 / 3 = 1.
+  // This would be a positive value for x.
+  const extents = nInitial.map((n, i) => { return n / gamma[i]; });
+  const xMax = Math.min(extents[0], extents[1]);
+
+  // There are multiple roots to the equation k(x) = keq, so we need to find all of them.
+  // The bisection method is a rapid way of finding a highly accurate solution.
+  function findRoots(coarseSteps = 10000, tol = 1e-9, maxIterations = 10000) {
     let roots = [];
-    // Change domain if desired; for a forward reaction, you may only scan [0, xMax].
-    const xMin = -14;
-    const xMax = 14;
+
+    // Step size of the extent of reaction is approximately 1e-4
     const step = (xMax - xMin) / coarseSteps;
 
     let xPrev = xMin;
     let fPrev = f(xPrev);
+
+    // We check the function at each step to see if it changes sign.
     for (let i = 1; i <= coarseSteps; i++) {
       let xCurr = xMin + i * step;
       let fCurr = f(xCurr);
 
+      // When the function changes sign, we have found a root.
       if (fPrev * fCurr < 0) {
         try {
+          // Once we have an interval for the root, we use the bisection method
+          // to find the root's exact value.
           let root = bisection(xPrev, xCurr, tol, maxIterations);
+
+          // This is then added to the list of roots.
           roots.push(root);
         } catch (err) {
           console.error("Error in bisection interval [", xPrev, ",", xCurr, "]:", err.message);
@@ -87,30 +124,40 @@ export function calcAll() {
       xPrev = xCurr;
       fPrev = fCurr;
     }
+
+    // At the end of this method, we should have between one and three roots.
     return roots;
   }
 
-  // --- Example Usage ---
   try {
+    // First, we find all of the roots of the equation k(x) = keq.  
     const solutionRoots = findRoots();
-    let solutionFound = false;
+
+    // Then, for each root that we found, we check if it is a valid solution.
     for (let i = 0; i < solutionRoots.length; i++) {
       const x = solutionRoots[i];
-      // Calculate equilibrium moles for each species.
+
+      // Equilibrium moles for each species.
       const EQs = [0, 1, 2].map(i => nEQ(i, x));
 
-      // Relax the validity test to allow nearly zero values.
-      if (EQs.every(eq => eq >= -1e-9)) {
-        // Consider the solution valid even if one component is nearly zero.
+      // We consider a solution valid if all components are positive.
+      // The exception is if one component is negative but very small (greater than -1e-3).
+      // In that case, we can consider it as zero.
+      if (EQs.every(eq => eq >= -1e-3)) {
         state.outlet.nN2 = Math.max(EQs[0], 0);
         state.outlet.nH2 = Math.max(EQs[1], 0);
         state.outlet.nNH3 = Math.max(EQs[2], 0);
-        solutionFound = true;
-        break; // or handle both solutions as needed
+        break;
       }
     }
+
+    // If we didn't find a valid solution, the chances are that it was essentially a complete conversion,
+    // In which case we can use the maximum extent of reaction.
     if (!solutionFound) {
-      console.error("No physically valid solution was found.");
+      const EQs = [0, 1, 2].map(i => nEQ(i, xMax));
+      state.outlet.nN2 = Math.max(EQs[0], 0);
+      state.outlet.nH2 = Math.max(EQs[1], 0);
+      state.outlet.nNH3 = Math.max(EQs[2], 0);
     }
   } catch (error) {
     console.error("Error:", error.message);
