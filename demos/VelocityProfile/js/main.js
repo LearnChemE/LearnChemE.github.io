@@ -20,16 +20,16 @@ window.z = {
   distRX: ((mainWidth / 2)) + 428,
   heightTY: ((mainHeight / 2) - 32) - 290,
   distBY: ((mainHeight / 2) - 32) + 240,
-  distTY: ((mainHeight / 2) - 32) - 240, 
+  distTY: ((mainHeight / 2) - 32) - 240,
 
   //slider variables
   h3Max: 0.98,
   h2Max: 0.98,
-  hTop: 0.34,
+  hTop: 0.27,
   muTop: 0.5,
   hMid: 0.33,
   muMid: 1,
-  hBot: 0.33, 
+  hBot: 0.33,
   centerXTop: 0,
   centerYTop: 0,
   centerXMid: 0,
@@ -71,8 +71,8 @@ window.z = {
   heightX23: 0,
 
   //arrows
-  
-  
+
+
 }
 
 // Load the other scripts (except calcs.js, which is imported in draw.js).
