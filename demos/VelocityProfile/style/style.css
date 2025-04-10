@@ -120,8 +120,8 @@ canvas {
 #p5-container {
   width: calc(100vw - 40px);
   height: calc(calc(100vw - 40px) * 720 / 1280);
-  max-width: calc(calc(70vh - 160px) * 1280 / 720);
-  max-height: calc(70vh - 160px);
+  max-width: calc(calc(100vh - 160px) * 1280 / 720);
+  max-height: calc(100vh - 160px);
   margin: auto;
 }
 
