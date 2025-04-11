@@ -22,42 +22,6 @@ window.z = {
   distBY: ((mainHeight / 2) - 32) + 240,
   distTY: ((mainHeight / 2) - 32) - 240, 
 
-  //slider variables
-  hTop: 0.34,
-  muTop: 0.5,
-  hMid: 0.33,
-  muMid: 1,
-  hBot: 0.33, 
-  centerXTop: 0,
-  centerYTop: 0,
-  centerXMid: 0,
-  centerYMid: 0,
-  centerXBot: 0,
-  centerYBot: 0,
-
-  //line on the distribution graph points
-  distLineX23: 0,
-  distLineX12: 0,
-  mouseXPtCalibrated: 0,
-  mouseYPtCalibrated: 0,
-  pressed: 0,
-  circleX: 0,
-  circleY: 0,
-  plotCirlceX: 0,
-  plotCirlceY1: 0,
-  plotCirlceY2: 0,
-  plotCirlceY3: 0,
-  bottomLineA: 0,
-  bottomLineB: 0,
-  midLineA: 0,
-  midLineB: 0,
-  bottomLineA: 0,
-  bottomLineB: 0,
-  mouseVector: 0,
-
-
-  particles: 50,
-  //playing: false,
 }
 
 // Load the other scripts (except calcs.js, which is imported in draw.js).
