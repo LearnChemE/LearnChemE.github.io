@@ -106,7 +106,7 @@ const Controls: React.FC<controlProps> = ({
             aria-disabled={pumpsAreRunning}
             onClick={() => swapBtnHandler()}
           >
-            swap beakers
+            pour back
           </button>}
         </div>
         <div id="nav-bar-right">
