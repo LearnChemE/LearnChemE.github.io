@@ -21,6 +21,10 @@ window.z = {
   heightTY: ((mainHeight / 2) - 32) - 290,
   distBY: ((mainHeight / 2) - 32) + 240,
   distTY: ((mainHeight / 2) - 32) - 240, 
+  
+  //3D cylinder parameters
+  cylRadius: 100,
+  cylHeight: 300,
 
 }
 

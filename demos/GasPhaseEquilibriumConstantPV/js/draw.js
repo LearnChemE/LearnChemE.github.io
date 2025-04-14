@@ -3,6 +3,7 @@ const selectionElement = document.getElementById('selection');
 const p5container = document.getElementById('p5-container');
 
 
+let cam;
 
 // This function is used to scale the canvas based on the size of the container
 window.relativeSize = () => p5container.offsetWidth / 1280;
@@ -25,6 +26,10 @@ window.setup = function() {
 
   createCanvas(p5container.offsetWidth, p5container.offsetHeight, WEBGL).parent(p5container);
   frameRate(60);
+
+  //cam = createCamera();
+  //cam.camera(0,0,800,-350,0,0);
+  //setCamera(cam);
 }
 
 // Same with draw() - this should never be inside a conditional statement.
@@ -45,8 +50,8 @@ window.draw = function() {
 
 
   if (selection === "constant-pressure") {
-    drawGraphDist();
-
+    draw3D();
+    draw2D();
   } else if (selection === "constant-volume") {
     //draw funcs go here
 
@@ -62,16 +67,85 @@ window.windowResized = () => {
 //const label = selection === "velocity-distribution" ? "Velocity Distribution" : "Velocity vs Height";
 
 
-function drawGraphDist() {
+let angleX = 0;
+let angleY = 0;
+let lastMouseX = 0;
+let lastMouseY = 0;
+let damping = 0.01; 
 
-  let options = {
-    disableTouchActions: true,
-    freeRotation: true
-  };
-
-  orbitControl();
+function draw3D() {
   
-  // Draw the cylinder.
-  cylinder(50,50,5);
+  
+  if (mouseIsPressed) {
+    let deltaX = mouseX - lastMouseX;
+    let deltaY = mouseY - lastMouseY;
+
+    angleY += deltaX * damping;  
+    angleX -= deltaY * damping;  
+  }
+
+  lastMouseX = mouseX;
+  lastMouseY = mouseY;
+
+  push();
+  translate(-350, 0);
+  rotateX(angleX);
+  rotateZ(angleY);
+  
+  push();
+  fill(0, 0, 0, 200);
+  cylinder(z.cylRadius-80, z.cylHeight+100, 64, 1);
+
+  pop();
+
+  fill(0,0,0,50);
+  cylinder(z.cylRadius, z.cylHeight,64);
+  
+
+  
+  
+
+  push();
+  fill(0, 0, 0, 200);
+  cylinder(z.cylRadius-80, z.cylHeight+100, 64, 1);
+
+  pop();
+  
+
+
+  
+  
+
+  push();
+  stroke(0);
+  strokeWeight(1);
+  translate(0, -z.cylHeight / 2, 0);  
+  cylinder(z.cylRadius, 0.5, 64, 1);
+  pop();
+
+  push();
+  stroke(0);
+  strokeWeight(1);
+  translate(0, z.cylHeight / 2, 0); 
+  cylinder(z.cylRadius, 0.5, 64, 1);
+  pop();
+
+  pop();
+}
+ 
+    
+
+    
+  
+  
+  
+
+
+function draw2D(){
+
+circle(1280/2, 720/2, 50);
+
+//line(width/2, 100, width/2, 500);
+//line(width/2, 500, 500, width/2 + 500);
 
 }
