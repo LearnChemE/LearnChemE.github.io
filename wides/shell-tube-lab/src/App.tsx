@@ -60,24 +60,19 @@ function App() {
     clearTimeout(pumpBtnTimeout);
     setAnimationFinished(false);
   };
-  // Swap the first and third beakers with the second and fourth
+  // Swap the first and third beakers with the second and fourth. This is called the swap button, but is actually labelled "pour back"
   const swapBtnHandler = () => {
-    let temp = g.vols;
-    // Swap volumes
-    g.vols = [temp[1],temp[0],temp[3],temp[2]];
     // Temp measurements become outdated
     setMeasured([-1,-1,-1,-1]);
-    // Swap temps. Use the observed values for the effluent; g.Tx_out will be recalculated on running the pumps.
+
+    // Calc average temps. Use the observed values for the effluent; g.Tx_out will be recalculated on running the pumps.
     // Orange
-    let tmp = g.Th_in;
-    g.Th_in = g.Th_out_observed;
-    g.Th_out = tmp;
-    g.Th_out_observed = tmp;
+    g.Th_in = (g.Th_in * g.vols[0] + g.Th_out_observed * g.vols[1]) / 1000;
     // Blue
-    tmp = g.Tc_in;
-    g.Tc_in = g.Tc_out_observed;
-    g.Tc_out = tmp;
-    g.Tc_out_observed = tmp;
+    g.Tc_in = (g.Tc_in * g.vols[2] + g.Tc_out_observed * g.vols[3]) / 1000;
+
+    // Reset volumes
+    g.vols = [1000,0,1000,0];
   }
 
   // Wrapper for Controls to keep the hooks the same
