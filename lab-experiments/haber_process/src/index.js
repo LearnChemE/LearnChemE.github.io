@@ -1,8 +1,8 @@
 import "bootstrap";
 import "p5";
 import "./style/style.scss";
-// import "./assets/font_here.ttf";
-// import "./assets/worksheet_here.pdf";
+import "./assets/digital-7.ttf";
+import "./assets/chemical_equilibrium_in_the_haber_process.pdf";
 import { drawAll } from "./js/draw";
 import { handleInputs } from "./js/inputs";
 import { calcAll, setDefaults } from "./js/calcs";
@@ -14,13 +14,16 @@ window.state = {
   showButtons: false,
   hamburgerHasBeenClicked: window.localStorage.getItem("hamburgerHasBeenClicked") === "true",
   canvasSize: [150, 120],
+  mouseDownFrame: 0,
+  minFlowRate: 0,
+  maxFlowRate: 100,
 };
 
 const containerElement = document.getElementById("p5-container");
 
-// window.preload = () => {
-//   state.customFont = loadFont("assets/font_here.ttf");
-// }
+window.preload = () => {
+  state.meterFont = loadFont("assets/digital-7.ttf");
+}
 
 window.setup = function() {
   sizeContainer();
@@ -35,6 +38,8 @@ window.setup = function() {
 window.draw = function() {
   window.width = state.canvasSize[0];
   window.height = state.canvasSize[1];
+  window.mX = mouseX / relativeSize();
+  window.mY = mouseY / relativeSize();
   scale(relativeSize());
   background(255);
   drawAll();
