@@ -12,11 +12,24 @@ canvas {
   width: max-content;
 }
 
+.ctrl-wrapper {
+  display: grid;
+  grid-template-rows: max-content max-content;
+}
+
 #modal-buttons {
   display: grid;
   grid-template-columns: 100px 100px 100px 100px;
   justify-content: center;
   gap: 10px;
+}
+
+#graphics-wrapper {
+  display: grid;
+  margin: auto;
+  width: max-content;
+  height: max-content;
+  position: relative;
 }
 
 #apparatus-wrapper {
@@ -39,4 +52,9 @@ canvas {
   :active {
     cursor: grabbing;
   }
+}
+
+#pump-btn {
+  width: 150px;
+  margin: auto;
 }

@@ -4,7 +4,7 @@ const autoprefixer = require("autoprefixer");
 const miniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
-  entry: "./src/index.js",
+  entry: "./src/index.ts",
   output: {
     filename: "bundle.js",
     path: path.resolve(__dirname, "../dist"),
@@ -21,35 +21,48 @@ module.exports = {
     static: "./dist",
   },
   module: {
-    rules: [{
-      test: /\.(scss)$/i,
-      use: [{
-        loader: miniCssExtractPlugin.loader,
+    rules: [
+      {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
+        ],
       },
       {
-        loader: "css-loader",
-      },
-      {
-        loader: "postcss-loader",
-        options: {
-          postcssOptions: {
-            plugins: [autoprefixer],
+        test: /\.(scss)$/i,
+        use: [{
+          loader: miniCssExtractPlugin.loader,
+        },
+        {
+          loader: "css-loader",
+        },
+        {
+          loader: "postcss-loader",
+          options: {
+            postcssOptions: {
+              plugins: [autoprefixer],
+            },
           },
         },
+        {
+          loader: "sass-loader",
+        },
+        ],
       },
       {
-        loader: "sass-loader",
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader']
       },
-      ],
-    },
-    {
-      test: /\.css$/i,
-      use: ['style-loader', 'css-loader']
-    },
-    {
-      test: /\.svg$/,
-      loader: 'svg-inline-loader'
-    },
+      {
+        test: /\.svg$/,
+        loader: 'svg-inline-loader'
+      },
     ],
+  },
+  resolve: {
+      extensions: ['.tsx','.ts','.js'],
   },
 };
