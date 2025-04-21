@@ -7,6 +7,7 @@
 
 export function calcAll() {
   
-  
+
+  z.totalmoles = z.initialA + z.molesInerts + z.x*(z.coeffBValue-1);
  
 }

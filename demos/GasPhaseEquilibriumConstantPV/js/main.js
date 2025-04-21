@@ -7,24 +7,33 @@ const mainWidth = 1280;
 const mainHeight = 720;
 // Declare global variables which are available to all files
 window.z = {
-  //selection: "Velocity Distribution",
+  
 
   //graph and window variables
   width: mainWidth,
   height: mainWidth,
-  graphCenterX: (mainWidth / 2),
-  graphCenterY: (mainHeight / 2) - 32,
-  grayThickness: (((mainHeight / 2) - 32) - 265) - 50,
-  distLX: ((mainWidth / 2)) - 428,
-  heightBY: ((mainHeight / 2) - 32) + 290,
-  distRX: ((mainWidth / 2)) + 428,
-  heightTY: ((mainHeight / 2) - 32) - 290,
-  distBY: ((mainHeight / 2) - 32) + 240,
-  distTY: ((mainHeight / 2) - 32) - 240, 
+
+  //slider inputs
+  pressure: 0.5,
+  volume: 0,
+  molesInerts: 0.0000000001,
+  R: 8.314*10^-5,
+  T: 900,
+  totalmoles: 0, 
+  initialA: 5,
+  coeffBValue: 2, 
   
   //3D cylinder parameters
   cylRadius: 100,
   cylHeight: 300,
+
+  molACP: 3.0,
+  molBCP: 4.1,
+  
+
+  molACV: 3.1,
+  molBCV: 3.9,
+  
 
 }
 

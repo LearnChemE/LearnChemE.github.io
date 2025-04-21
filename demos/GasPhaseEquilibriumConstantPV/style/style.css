@@ -14,7 +14,7 @@
   gap: 3px;
   width: max-content;
   margin: 12px;
-  gap: 30px;
+  gap: 12px;
   align-content: center;
 }
 
@@ -38,7 +38,7 @@
 }
 
 #sliders-area-2 {
-  transform: translateX(20px);
+  transform: translateY(-17px) translateX(20px);
 }
 
 select {
