@@ -2,11 +2,13 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
+   width="300mm"
    viewBox="0 0 300 240"
    version="1.1"
    id="graphic-svg"
    inkscape:version="1.3.2 (091e20e, 2023-11-25)"
    sodipodi:docname="graphic.svg"
+   height="240mm"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -31,7 +33,7 @@
      inkscape:window-maximized="0"
      inkscape:current-layer="tank-2" />
   <defs
-     id="defs1" />
+     id="defs" />
   <g
      inkscape:label="Tank 1"
      inkscape:groupmode="layer"

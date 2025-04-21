@@ -9,6 +9,8 @@ export function importGraphic(container) {
   svgContainer.style.top = "0";
   svgContainer.style.left = "0";
   svgContainer.style.zIndex = "1";
-  svgContainer.innerHTML = Graphic;
+  let dimensionlessGraphic = Graphic.replace(/width="\d+mm"/, "");
+  dimensionlessGraphic = dimensionlessGraphic.replace(/height="\d+mm"/, "");
+  svgContainer.innerHTML = dimensionlessGraphic;
   container.appendChild(svgContainer);
 }
