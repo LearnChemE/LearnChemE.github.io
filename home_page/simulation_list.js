@@ -1,4 +1,5 @@
-window.simulation_list = [{
+window.simulation_list = [
+  {
     "title": "Bernoulli Equation for Pipe Flow",
     "href": "https://learncheme.github.io/demos/Bernoulli/dist/index.html",
     "image": "https://learncheme.com/wp-content/uploads/2021/06/bernoulli-equation-for-pipe-flow-thumbnail-original.png",
@@ -55,7 +56,7 @@ window.simulation_list = [{
   {
     "title": "How Fast Does a Tank Empty? Digital Experiment",
     "href": "https://learncheme.github.io/lab-experiments/howFastDoesATankEmpty/index.html",
-    "image": "https://learncheme.com/wp-content/uploads/2025/02/HowFastDoesATankEmpty.png",
+    "image": "https://learncheme.com/wp-content/uploads/2025/03/HowFastDoesATankEmpty_digiex_r1.png",
     "tooltip": "Measures the volumetric flow rate of a liquid leaving a tank as a function of the liquid height and the drain pipe diameter. ",
     "description": "This digital experiment measures the volumetric flow rate of a liquid leaving a tank as a function of the liquid height and the drain pipe diameter. ",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/howFastDoesATankEmpty",
@@ -64,7 +65,7 @@ window.simulation_list = [{
   {
     "title": "Hydraulic Loss in a Smooth Pipe Digital Experiment",
     "href": "https://learncheme.github.io/lab-experiments/headloss/dist/index.html",
-    "image": "https://learncheme.com/wp-content/uploads/2024/12/hydrauliclossWIDE.png",
+    "image": "https://learncheme.com/wp-content/uploads/2025/03/hydrauliclossWIDE_digiex_r1.png",
     "tooltip": "Use the continuity equation and mechanical energy balance to predict velocity and pressure trends in a pipe",
     "description": "Use the continuity equation and mechanical energy balance to predict velocity and pressure trends in a pipe",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/headloss",
@@ -125,6 +126,15 @@ window.simulation_list = [{
     "simulation_type": "in-browser"
   },
   {
+    "title": "Velocity Profile for Immiscible Viscous Fluids",
+    "href": "https://learncheme.github.io/demos/VelocityProfile",
+    "image": "https://learncheme.com/wp-content/uploads/2025/04/velocity_profile.png",
+    "tooltip": "Behavior of three immiscible fluids subject to Couette flow",
+    "description": "<p>This simulation shows the behavior of three immiscible fluids subject to couette flow. The top plate is moving to the right, while the bottom plate is stationary. The velocity of each fluid is given relative to the top plate velocity. The flow is steady, incompressible, and laminar. You can vary each fluid’s relative viscosity and height. The velocity distribution indicates the impact of fluid viscosity on each fluid’s velocity gradient. The velocity versus height plot indicates the relative slopes (or velocity gradients) in each fluid.</p>",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/VelocityProfile/",
+    "simulation_type": "in-browser"
+  },
+  {
     "title": "Venturi Meter",
     "href": "https://learncheme.github.io/demos/VenturiMeter/dist/index.html",
     "image": "https://learncheme.com/wp-content/uploads/2023/09/VenturiMeter.png",
@@ -136,16 +146,16 @@ window.simulation_list = [{
   {
     "title": "Venturi Meter Digital Experiment",
     "href": "https://learncheme.github.io/lab-experiments/venturi/dist/",
-    "image": "https://learncheme.com/wp-content/uploads/2025/01/venturiDigitalLab.png",
+    "image": "https://learncheme.com/wp-content/uploads/2025/03/venturiDigitalLab_digiex_r1.png",
     "tooltip": "A virtual laboratory experiment for exploring venturi meters",
     "description": "A venturi meter allows one to calculate the flow rate of a liquid through a pipe by measuring the pressure drop across a constricted section (the \"choke\") and using Bernoulli's equation. In this simulation, water flows through a pipe whose inner diameter is 20 mm, and the manometers along the pipe show the pressure in mm H2O. ",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demosVenturi",
     "simulation_type": "in-browser"
   },
   {
-    "title": "Viscous Flow around a Rotating Rod",
+    "title": "Viscous Flow around a Rotating Rod Digital Experiment",
     "href": "https://learncheme.github.io/lab-experiments/viscousFlowAroundRotatingRod/index.html",
-    "image": "https://learncheme.com/wp-content/uploads/2025/02/viscousflowrotatingrod.png",
+    "image": "https://learncheme.com/wp-content/uploads/2025/03/viscousflowrotatingrod_digiex72_r1.png",
     "tooltip": "This digital experiment measures the velocity profile of a liquid around a rotating cylinder in the limit of small Reynolds number. ",
     "description": "This digital experiment measures the velocity profile of a liquid around a rotating cylinder in the limit of small Reynolds number. ",
     "src": "https://learncheme.github.io/lab-experiments/viscousFlowAroundRotatingRod/index.html",
@@ -172,16 +182,16 @@ window.simulation_list = [{
   {
     "title": "Double Pipe Heat Exchanger Digital Experiment",
     "href": "https://learncheme.github.io/wides/double-tube-lab/dist/index.html",
-    "image": "https://learncheme.com/wp-content/uploads/2024/10/doubletubelabpic.png",
+    "image": "https://learncheme.com/wp-content/uploads/2025/03/doubletubelab_digiex_r1.png",
     "tooltip": "This simulation uses the NTU-effectiveness approach to calculate the outlet temperatures of each fluid line.",
     "description": "This simulation uses the NTU-effectiveness approach to calculate the outlet temperatures of each fluid line.",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/wides/double-tube-lab",
     "simulation_type": "in-browser"
   },
   {
-    "title": "Evaporative Cooling",
+    "title": "Evaporative Cooling Digital Experiment",
     "href": "https://learncheme.github.io/lab-experiments/evaporative_cooling/dist/",
-    "image": "https://learncheme.com/wp-content/uploads/2025/02/evaporative_cooling_screenshot.png",
+    "image": "https://learncheme.com/wp-content/uploads/2025/03/evaporativecoolinglab_digiex_r1.png",
     "tooltip": "Evaporative cooling of water using direct air flow over a water-filled mesh",
     "description": "<p>This is a digital experiment in which the student explores the topic of evaporative cooling. Hot water is pumped through a pipe and poured over a mesh, and a fan blows dry air through the mesh, causing the water to evaporate. The latent transfer of heat cools the water over time, and the student characterizes the behavior of the system, taking measurements of temperature and humidity at different locations on the apparatus. There is an included worksheet with instructions on how to complete this digital experiment.<p>",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/evaporative_cooling",
@@ -226,7 +236,7 @@ window.simulation_list = [{
   {
     "title": "Shell and Tube Heat Exchanger Digital Experiment",
     "href": "https://learncheme.github.io/wides/shell-tube-lab/dist/index.html",
-    "image": "https://learncheme.com/wp-content/uploads/2024/10/WIDEshelltubepic.png",
+    "image": "https://learncheme.com/wp-content/uploads/2025/03/WIDEshelltubepic_digiex_r1.png",
     "tooltip": "This simulation uses the NTU-effectiveness approach to calculate the outlet temperatures of each fluid line.",
     "description": "This simulation uses the NTU-effectiveness approach to calculate the outlet temperatures of each fluid line.",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/wides/shell-tube-lab",
@@ -305,15 +315,6 @@ window.simulation_list = [{
     "simulation_type": "in-browser"
   },
   {
-    "title": "Calorimeter Digital Experiment",
-    "href": "https://learncheme.github.io/demos/Calorimeter/dist/index.html",
-    "image": "https://learncheme.com/wp-content/uploads/2024/12/calorimeter.png",
-    "tooltip": "A metal cube is dropped into water and the increase in the water temperature is used to determine the heat capacity of the metal.",
-    "description": "In this experiment, a hot metal cube is dropped into an insulated container of water and the increase in the water temperature is used to determine the heat capacity of the metal.",
-    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/Calorimeter",
-    "simulation_type": "in-browser"
-  },
-  {
     "title": "Compressibility Factor Charts",
     "href": "https://learncheme.github.io/demos/CompressibilityFactorCharts/index.html",
     "image": "https://learncheme.com/wp-content/uploads/2023/05/compressibility_factor_preview.png",
@@ -365,6 +366,24 @@ window.simulation_list = [{
     "tooltip": "Perform material balances on an evaporative crystallization process",
     "description": "<p>In this simulation, you can perform mass balances on an evaporative crystallization process. Input the correct values for mole fraction and/or flow rate, then click \"show answers\" to check your work. Click the \"new problem\" button for a new set of conditions.</p>",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/MassBalancesInEvaporativeCrystallizationQuiz",
+    "simulation_type": "in-browser"
+  },
+  {
+    "title": "Material Balances in Liquid-Liquid Extraction Digital Experiment",
+    "href": "https://learncheme.github.io/lab-experiments/LiquidLiquidExtraction/index.html",
+    "image": "https://learncheme.com/wp-content/uploads/2025/03/material-balances-in-lle_digiex_r1.png",
+    "tooltip": "Water is used as a solvent to extract acetic acid from a feed solution of acetic acid/chloroform/water so that the extract is enriched in acetic acid and the raffinate tank is depleted of acetic acid.",
+    "description": "This digital experiment applies mass balances to a liquid-liquid extraction unit. Water is used as a solvent to extract acetic acid from a feed solution of acetic acid/chloroform/water so that the extract is enriched in acetic acid and the raffinate tank is depleted of acetic acid. ",
+    "src": "https://learncheme.github.io/lab-experiments/LiquidLiquidExtraction/index.html",
+    "simulation_type": "in-browser"
+  },
+  {
+    "title": "Measure Heat Capacity with a Calorimeter Digital Experiment",
+    "href": "https://learncheme.github.io/demos/Calorimeter/dist/index.html",
+    "image": "https://learncheme.com/wp-content/uploads/2025/03/calorimeter_wide_r1.png",
+    "tooltip": "A metal cube is dropped into water and the increase in the water temperature is used to determine the heat capacity of the metal.",
+    "description": "In this experiment, a hot metal cube is dropped into an insulated container of water and the increase in the water temperature is used to determine the heat capacity of the metal.",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/Calorimeter",
     "simulation_type": "in-browser"
   },
   {
@@ -530,6 +549,15 @@ window.simulation_list = [{
     "simulation_type": "in-browser"
   },
   {
+    "title": "Adiabatic Flash Drum with Binary Liquid Feed Digital Experiment",
+    "href": "https://learncheme.github.io/lab-experiments/adiabatic_flash_drum_with_binary_liquid_feed/dist/",
+    "image": "https://learncheme.com/wp-content/uploads/2025/04/adiabaticflashdrumwithbinaryliquidfeedWIDEdigiex.png",
+    "tooltip": "This digital experiment feeds a heated binary liquid into a flash drum at lower pressure. Some of the liquid vaporizes and the rest leaves as a liquid at lower temperature than the feed. ",
+    "description": "This digital experiment feeds a heated binary liquid into a flash drum at lower pressure. Some of the liquid vaporizes and the rest leaves as a liquid at lower temperature than the feed. ",
+    "src": "https://learncheme.github.io/lab-experiments/adiabatic_flash_drum_with_binary_liquid_feed/dist/",
+    "simulation_type": "in-browser"
+  },
+  {
     "title": "Apply the Hunter-Nash Method for Liquid-Liquid Extraction",
     "href": "https://learncheme.github.io/demos/ApplyTheHunterNashMethodToLLE/",
     "image": "https://learncheme.com/wp-content/uploads/2025/02/applyhunternashmethodquizr1.png",
@@ -674,6 +702,15 @@ window.simulation_list = [{
     "simulation_type": "in-browser"
   },
   {
+    "title": "Adiabatic Gas Expansion between Two Tanks Digital Experiment",
+    "href": "https://learncheme.github.io/lab-experiments/adiabatic_gas_expansion_between_two_tanks/dist/",
+    "image": "https://learncheme.com/wp-content/uploads/2025/03/AdiabaticGasExpansionbetweenTwoTanks_WIDE_digiex.png",
+    "tooltip": "This digital experiment expands an ideal gas, which is at high pressure in the left tank, adiabatically into the right tank, which is initially evacuated.",
+    "description": "This digital experiment expands an ideal gas, which is at high pressure in the left tank, adiabatically into the right tank, which is initially evacuated.",
+    "src": "https://learncheme.github.io/lab-experiments/adiabatic_gas_expansion_between_two_tanks/dist/",
+    "simulation_type": "in-browser"
+  },
+  {
     "title": "Carnot Cycle on Ideal Gas",
     "href": "https://learncheme.github.io/demos/CarnotCycleIdealGas/index.html",
     "image": "https://learncheme.com/wp-content/uploads/2025/02/carnot-cycle-on-an-ideal-gas.png",
@@ -683,9 +720,9 @@ window.simulation_list = [{
     "simulation_type": "in-browser"
   },
   {
-    "title": "Determine Antoine Constants",
+    "title": "Determine Antoine Constants Digital Experiment",
     "href": "https://learncheme.github.io/lab-experiments/antoine_constants/dist/",
-    "image": "https://learncheme.com/wp-content/uploads/2025/02/antoine_constants.png",
+    "image": "https://learncheme.com/wp-content/uploads/2025/03/antoines_constant_digiex72.png",
     "tooltip": "A digital experiment to determine Antoine constants",
     "description": "The Antoine Equation is used to determine the saturation pressure of a liquid at a given temperature. In this digital experiment, students inject liquids into an evacuated tank and use linear or nonlinear regression to determine the Antoine Constants of the species.",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/lab-experiments/antoine_constants",
@@ -809,6 +846,15 @@ window.simulation_list = [{
     "simulation_type": "in-browser"
   },
   {
+    "title": "Chemical Equilibrium in the Haber Process",
+    "href": "https://learncheme.github.io/demos/ChemicalEquilibriumInTheHaberProcess/dist/index.html",
+    "image": "https://learncheme.com/wp-content/uploads/2025/04/chemical_equilibrium_in_the_haber_process.png",
+    "tooltip": "Number of moles at equilibrium for NH<sub>3</sub> formation from N<sub>2</sub> and H<sub>2</sub>",
+    "description": "<p>The number of moles at equilibrium is calculated for the Haber process, the reversible, exothermic reaction that synthesizes ammonia (NH<sub>3</sub>) from hydrogen (H<sub>2</sub>) and nitrogen (N<sub>2</sub>). The reaction is typically carried out at around 200 bar and 675–725 K. Sliders vary the pressure and temperature. Gases are assumed to behave ideally, although at the high pressures used for this reaction, the gases are nonideal. Four moles of reactants form two moles of product, so raising the pressure shifts equilibrium toward products. Initially, the system is filled with one mole of NH<sub>3</sub> and allowed to reach equilibrium. Additional N<sub>2</sub>, H<sub>2</sub>, and/or NH<sub>3</sub> at can be added at constant pressure, and the effect on the equilibrium is observed. Le Chatelier&#8217;s principle predicts that when N<sub>2</sub> or H<sub>2</sub> are added, the reaction goes to the right, whereas when NH<sub>3</sub> is added, the reaction shifts to the left. However, when the N<sub>2</sub>/H<sub>2</sub> ratio is sufficiently high, adding N<sub>2</sub> shifts reaction to the left (i.e. adding N<sub>2</sub> decreases the amount of NH<sub>3</sub> and increases the amount of H<sub>2</sub>), contrary to what Le Chatelier&#8217;s principle predicts. This happens because adding N<sub>2</sub> decreases the mole fraction of H<sub>2</sub>, and because the H<sub>2</sub> mole fraction is cubed in the equilibrium expression, Nh<sub>3</sub> reacts to increase the number of moles of H<sub>2</sub> and N<sub>2</sub>.</p>",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/ChemicalEquilibriumInTheHaberProcess",
+    "simulation_type": "in-browser"
+  },
+  {
     "title": "Henry's Law for Gases Dissolved in Water",
     "href": "https://learncheme.github.io/demos/HenrysLawForGasesDissolvedInWater/dist/index.html",
     "image": "https://learncheme.com/wp-content/uploads/2024/07/henryslaw.png",
@@ -891,7 +937,7 @@ window.simulation_list = [{
   },
   {
     "title": "Vapor-Liquid Equilibrium Virtual Laboratory",
-    "href": "https://virtual-labs.learncheme.com/vle-virtual-laboratory/",
+    "href": "https://laboratory-experiments.herokuapp.com/vle-virtual-laboratory/",
     "image": "https://learncheme.com/wp-content/uploads/2023/07/vle_virtual_lab_preview.png",
     "tooltip": "N/A",
     "description": "N/A",
@@ -905,15 +951,6 @@ window.simulation_list = [{
     "tooltip": "Phase equilibrium for two partially-miscible liquids on temperature-composition diagram",
     "description": "This is a simulation of phase equilibrium for one mole of a binary system (A, B) that forms two partially-miscible liquids (α, β). The T-x-y diagram shows vapor-liquid equilibrium (VLE), liquid-liquid equilibrium (LLE), and vapor-liquid-liquid equilibrium (VLLE). The number of moles of each phase, which are shown in the bar graph (along with the mole fractions of component B in the phases), are determined from mole balances. The overall mole fraction of component B and the heat added are specified using the sliders. ",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/VLLE/",
-    "simulation_type": "in-browser"
-  },
-  {
-    "title": "Material balances in liquid-liquid extraction",
-    "href": "/lab-experiments/LiquidLiquidExtraction/index.html",
-    "image": "N/A",
-    "tooltip": "This digital experiment applies material balances to a liquid-liquid extraction process in which water as a solvent contacts an acetic acid/chloroform mixture in a steady-state counter flow experiment",
-    "description": "This experiment applies material balances to a liquid-liquid extraction process in which water as a solvent contacts an acetic acid/chloroform mixture in a steady-state counter flow experiment. Because acetic acid is much more soluble in water, it is extracted from the chloroform organic phase into the aqueous phase.",
-    "src": "https://learncheme.github.io/lab-experiments/LiquidLiquidExtraction/index.html",
     "simulation_type": "in-browser"
   }
 ]
