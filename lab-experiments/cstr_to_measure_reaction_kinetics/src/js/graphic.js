@@ -13,4 +13,5 @@ export function importGraphic(container) {
   dimensionlessGraphic = dimensionlessGraphic.replace(/height="\d+mm"/, "");
   svgContainer.innerHTML = dimensionlessGraphic;
   container.appendChild(svgContainer);
+  state.impeller = document.getElementById("impeller");
 }
