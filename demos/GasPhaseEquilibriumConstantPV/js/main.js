@@ -14,8 +14,10 @@ window.z = {
   height: mainWidth,
 
   //slider inputs
-  pressure: 0.5,
-  volume: 0,
+  pressureCP: 0.7,
+  volumeCP: 0.74,
+  pressureCV: 0.7,
+  volumeCV: 0.74,
   molesInerts: 0.0000000001,
   R: 8.314*10^-5,
   T: 900,
