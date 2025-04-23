@@ -38,7 +38,7 @@ function resize() {
   z.height;
 
   scale(relativeSize());
- 
+
 }
 
 // Moved outside of the selection block - Do not call setup() more than once.
@@ -47,7 +47,7 @@ window.setup = function () {
 
   createCanvas(p5container.offsetWidth, p5container.offsetHeight, WEBGL).parent(p5container);
   frameRate(60);
-  
+
 
 }
 
@@ -141,7 +141,7 @@ function draw3DCP() {
 
   */
 
-  
+
 
   push();
 
@@ -268,20 +268,17 @@ function drawTextCP() {
   textSize(28);
   text("pressure = " + z.pressureCP.toFixed(2) + " bar", -265, -320);
   text("final volume = " + z.volumeCP.toFixed(2), -265, -280);
-  if(z.volumeCP < 10){
+  if (z.volumeCP < 10) {
 
+    tint(255, 242);
     image(meter3Image, -13, -316);
 
   }
-  else if(z.volumeCP >= 10){
+  else if (z.volumeCP >= 10) {
 
     image(meter3Image, 0, -316);
 
   }
-  
-
-
-
 
   pop();
 
@@ -437,17 +434,17 @@ function drawTextCV() {
   textSize(28);
   text("final pressure = " + z.pressureCV.toFixed(2) + " bar", -265, -320);
   text("volume = " + z.volumeCV.toFixed(2), -200, -280);
-  if(z.volumeCV < 10){
-
+  if (z.volumeCV < 10) {
+    tint(255, 242);
     image(meter3Image, -13, -316);
 
   }
-  else if(z.volumeCV >= 10){
+  else if (z.volumeCV >= 10) {
 
     image(meter3Image, 0, -316);
 
   }
-  
+
 
 
   pop();
