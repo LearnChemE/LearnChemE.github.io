@@ -76,9 +76,15 @@ function drawMassFlowMeter(x, y, chemical, hover_coords) {
   textFont(state.meterFont);
   textSize(3);
   textAlign(CENTER, CENTER);
-  fill("yellow");
   noStroke();
-  const m = chemical.m.toFixed(0);
+  let m;
+  if (frameCount - chemical.mFrame < 60) {
+    fill("red");
+    m = chemical.mSetPoint.toFixed(0);
+  } else {
+    fill("yellow");
+    m = chemical.m.toFixed(0);
+  }
   text(m, 0, -5.675);
   fill("black");
   textFont("Arial");
@@ -88,8 +94,9 @@ function drawMassFlowMeter(x, y, chemical, hover_coords) {
   fill("red");
   if (hover_coords[0][0] < mX && mX < hover_coords[0][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
     fill(hoverColor);
-    if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 5 === 0 && chemical.valvePosition === 1) {
-      chemical.m = max(state.minFlowRate, chemical.m - 1);
+    if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 5 === 0) {
+      chemical.mSetPoint = max(state.minFlowRate, chemical.mSetPoint - 1);
+      chemical.mFrame = frameCount;
     }
   }
   stroke(0);
@@ -108,8 +115,9 @@ function drawMassFlowMeter(x, y, chemical, hover_coords) {
   fill("red");
   if (hover_coords[1][0] < mX && mX < hover_coords[1][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
     fill(hoverColor);
-    if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 5 === 0 && chemical.valvePosition === 1) {
-      chemical.m = min(state.maxFlowRate, chemical.m + 1);
+    if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 5 === 0) {
+      chemical.mSetPoint = min(state.maxFlowRate, chemical.mSetPoint + 1);
+      chemical.mFrame = frameCount;
     }
   }
   beginShape();
@@ -299,6 +307,86 @@ function drawTank(x, y, w, h, tank) {
   pop();
 }
 
+function drawReactor() {
+  push();
+  fill(220);
+  stroke(0);
+  strokeWeight(0.1);
+  // Reactor sand bath body
+  rect(55, height - 30, 20, 24, 0, 0, 0.5, 0.5);
+  fill(150);
+  // Reactor sand bath lid
+  rect(55, height - 32, 20, 2, 0.5, 0.5, 0, 0);
+  fill(ironColor);
+  // Reactor sand bath legs
+  quad(56, height - 6, 58, height - 6, 57, height - 2, 55, height - 2);
+  quad(74, height - 6, 72, height - 6, 73, height - 2, 75, height - 2);
+  rect(64, height - 6, 2, 4);
+  // Reactor temperature display
+  fill(40);
+  stroke(0);
+  strokeWeight(0.2);
+  // Reactor temperature display screen
+  rect(58, height - 25, 10, 5, 0.5);
+  noStroke();
+  fill(0);
+  textAlign(CENTER, CENTER);
+  textSize(3.5);
+  // Temperature units label
+  text("°C", 71, height - 22.25);
+  textFont(state.meterFont);
+  textSize(4.5);
+  fill("yellow");
+  const T = round(state.T - 273);
+  // Temperature text
+  text(T, 63, height - 22.6);
+
+  // Reactor temperature adjustment buttons
+  push();
+  const hover_coords = [
+    [60, 62.5],
+    [64, 66.5],
+    [102.5, 105]
+  ]
+  const hoverColor = "rgb(255, 150, 150)";
+  fill("red");
+  if (hover_coords[0][0] < mX && mX < hover_coords[0][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
+    fill(hoverColor);
+    if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 5 === 0) {
+      state.T = max(state.minT, state.T - 1);
+    }
+  }
+  stroke(0);
+  translate(61, 103);
+  beginShape();
+  vertex(-0.75, -0.75);
+  vertex(0.75, -0.75);
+  vertex(0.9, -0.6);
+  vertex(0.075, 0.75);
+  vertex(-0.075, 0.75);
+  vertex(-0.9, -0.6);
+  endShape(CLOSE);
+
+  translate(4, 0);
+  fill("red");
+  if (hover_coords[1][0] < mX && mX < hover_coords[1][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
+    fill(hoverColor);
+    if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 5 === 0) {
+      state.T = min(state.maxT, state.T + 1);
+    }
+  }
+  beginShape();
+  vertex(-0.75, 0.75);
+  vertex(0.75, 0.75);
+  vertex(0.9, 0.6);
+  vertex(0.075, -0.75);
+  vertex(-0.075, -0.75);
+  vertex(-0.9, 0.6);
+  endShape(CLOSE);
+  pop();
+  pop();
+}
+
 export function drawAll() {
   [state.tanks.h2, state.tanks.n2, state.tanks.nh3].forEach((tank) => {
     if (tank.isTurningOn) {
@@ -315,6 +403,12 @@ export function drawAll() {
         tank.isTurningOff = false;
       }
     }
+    if (tank.valvePosition >= 1) {
+      tank.m = tank.mSetPoint;
+    } else {
+      tank.m = 0;
+    }
   });
   drawTanks();
+  drawReactor();
 }

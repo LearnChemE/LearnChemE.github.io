@@ -17,6 +17,7 @@ window.state = {
   mouseDownFrame: 0,
   minFlowRate: 0,
   maxFlowRate: 100,
+  popupOpen: false,
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -28,8 +29,8 @@ window.preload = () => {
 window.setup = function() {
   sizeContainer();
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
-  handleInputs();
   setDefaults();
+  handleInputs();
   calcAll();
   pixelDensity(state.pixelDensity);
   frameRate(state.frameRate);

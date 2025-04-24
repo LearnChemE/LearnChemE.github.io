@@ -3,6 +3,7 @@ import { calcAll, setDefaults } from "./calcs";
 
 export function handleInputs() {
   initializeHamburger();
+  handlePressureInput();
 }
 
 function handleHamburger() {
@@ -118,4 +119,45 @@ function initializeHamburger() {
   const hamburgerContainer = document.getElementById("hamburger-icon");
   hamburgerContainer.innerHTML = Hamburger;
   handleHamburger();
+}
+
+function handlePressureInput() {
+  const canvas = document.querySelector("canvas");
+  const h2Pressure = document.getElementById("h2-pressure");
+  const n2Pressure = document.getElementById("n2-pressure");
+  const nh3Pressure = document.getElementById("nh3-pressure");
+
+  [h2Pressure, n2Pressure, nh3Pressure].forEach((elt) => {
+    elt.querySelector("input").setAttribute("max", state.tanks.maxP);
+  });
+
+  h2Pressure.querySelector("input").addEventListener("input", (e) => {
+    const P = round(parseFloat(e.target.value));
+    state.tanks.h2.P = P;
+    h2Pressure.querySelector(".pressure-value").innerText = P;
+    calcAll();
+  });
+
+  n2Pressure.querySelector("input").addEventListener("input", (e) => {
+    const P = round(parseFloat(e.target.value));
+    state.tanks.n2.P = P;
+    n2Pressure.querySelector(".pressure-value").innerText = P;
+    calcAll();
+  });
+
+  nh3Pressure.querySelector("input").addEventListener("input", (e) => {
+    const P = round(parseFloat(e.target.value));
+    state.tanks.nh3.P = P;
+    nh3Pressure.querySelector(".pressure-value").innerText = P;
+    calcAll();
+  });
+
+  canvas.addEventListener("mousedown", (e) => {
+    if (state.popupOpen) {
+      h2Pressure.style.display = "none";
+      n2Pressure.style.display = "none";
+      nh3Pressure.style.display = "none";
+      state.popupOpen = false;
+    }
+  });
 }

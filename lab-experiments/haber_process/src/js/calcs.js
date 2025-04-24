@@ -1,10 +1,15 @@
 export function setDefaults() {
   state = {
     ...state,
+    T: 773,
+    minT: 298,
+    maxT: 1023,
     tanks: {
       maxP: 15,
       h2: {
         m: 0,
+        mSetPoint: 0,
+        mFrame: -600,
         P: 10,
         valvePosition: 0,
         isTurningOn: false,
@@ -15,6 +20,8 @@ export function setDefaults() {
       },
       n2: {
         m: 0,
+        mSetPoint: 0,
+        mFrame: -600,
         P: 10,
         valvePosition: 0,
         isTurningOn: false,
@@ -25,6 +32,8 @@ export function setDefaults() {
       },
       nh3: {
         m: 0,
+        mSetPoint: 0,
+        mFrame: -600,
         P: 10,
         valvePosition: 0,
         isTurningOn: false,

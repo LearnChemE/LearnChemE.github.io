@@ -93,6 +93,42 @@ canvas {
   }
 }
 
+.pressure-slider-container {
+  display: none;
+  position: absolute;
+  background: white;
+  border: 1px solid black;
+  border-radius: 5px;
+  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  z-index: 5;
+  grid-template-columns: max-content 120px 30px 30px;
+  gap: 8px;
+}
+
+.pressure-slider-container>input {
+  align-self: end;
+}
+
+.pressure-value {
+  text-align: end;
+}
+
+#h2-pressure {
+  top: 50%;
+  left: 5%;
+}
+
+#n2-pressure {
+  top: 50%;
+  left: 15%;
+}
+
+#nh3-pressure {
+  top: 50%;
+  left: 25%;
+}
+
 .disabled {
   pointer-events: none;
   opacity: 0.5;
