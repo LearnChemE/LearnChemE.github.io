@@ -75,6 +75,20 @@ window.mousePressed = function() {
   }
 
   handlePressures();
+  handlePurge();
+}
+
+function handlePurge() {
+  const knob_coords = [
+    [89.5, 94.5],
+    [75.5, 80.5]
+  ];
+
+  const clicked_on_valve = mX > knob_coords[0][0] && mX < knob_coords[0][1] && mY > knob_coords[1][0] && mY < knob_coords[1][1];
+
+  if (clicked_on_valve) {
+    state.purging = !state.purging;
+  }
 }
 
 function handlePressures() {

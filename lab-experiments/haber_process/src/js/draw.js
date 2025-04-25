@@ -366,7 +366,7 @@ function drawReactor() {
   fill("red");
   if (hover_coords[0][0] < mX && mX < hover_coords[0][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
     fill(hoverColor);
-    if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 5 === 0) {
+    if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 3 === 0) {
       state.T = max(state.minT, state.T - 1);
     }
   }
@@ -385,7 +385,7 @@ function drawReactor() {
   fill("red");
   if (hover_coords[1][0] < mX && mX < hover_coords[1][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
     fill(hoverColor);
-    if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 5 === 0) {
+    if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 3 === 0) {
       state.T = min(state.maxT, state.T + 1);
     }
   }
@@ -398,6 +398,72 @@ function drawReactor() {
   vertex(-0.9, 0.6);
   endShape(CLOSE);
   pop();
+  pop();
+}
+
+function drawOutletTubes() {
+  push();
+  fill(steelColor);
+  stroke(0);
+  strokeWeight(0.05);
+  translate(72, height - 32);
+  // Vertical reactor outlet tube
+  rect(-0.375, 0, 0.75, -10);
+  // Horizontal reactor outlet tube
+  rect(0.375, -10.75, 40.375, 0.75);
+  // First elbow
+  drawTubeElbow(0, -10, 0);
+  // Purge Valve
+  drawPurgeValve();
+  pop();
+}
+
+function drawPurgeValve() {
+  push();
+  fill(ironColor);
+  translate(20, -10.375);
+  // "T" part
+  beginShape();
+  vertex(-3, 0.75);
+  vertex(3, 0.75);
+  vertex(3, -0.75);
+  vertex(0.75, -0.75);
+  vertex(0.75, -2.5);
+  vertex(-0.75, -2.5);
+  vertex(-0.75, -0.75);
+  vertex(-3, -0.75);
+  endShape(CLOSE);
+  // Left cap
+  rect(-3.5, -1, 0.75, 2);
+  // Right cap
+  rect(2.75, -1, 0.75, 2);
+  // Top cap
+  rect(-1, -3, 2, 0.75);
+
+  const knob_coords = [
+    [89.5, 94.5],
+    [75.5, 80.5]
+  ];
+
+  fill(80);
+  stroke(0);
+  if (knob_coords[0][0] < mX && mX < knob_coords[0][1] && knob_coords[1][0] < mY && mY < knob_coords[1][1]) {
+    stroke(255, 255, 100);
+    strokeWeight(0.1);
+  }
+  circle(0, 0, 3);
+  fill(60);
+  if (!state.purging) {
+    rotate(PI / 2);
+  }
+  beginShape();
+  vertex(0, 0.75);
+  vertex(0.75, 0.25);
+  vertex(0.5, -2);
+  vertex(0, -2.5);
+  vertex(-0.5, -2);
+  vertex(-0.75, 0.25);
+  endShape(CLOSE);
   pop();
 }
 
@@ -424,5 +490,6 @@ export function drawAll() {
     }
   });
   drawTanks();
+  drawOutletTubes();
   drawReactor();
 }
