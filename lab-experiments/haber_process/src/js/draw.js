@@ -180,6 +180,13 @@ function drawTank(x, y, w, h, tank) {
   fill(200);
 
   // Tank valve knob
+  const knobCoords = [
+    [4, 9.5],
+    [-8.5, -6]
+  ];
+  if (mX - x > knobCoords[0][0] && mX - x < knobCoords[0][1] && mY - y > knobCoords[1][0] && mY - y < knobCoords[1][1]) {
+    stroke(255, 255, 100);
+  }
   const time = tank.valvePosition;
   for (let i = 0; i < 3; i++) {
     const offsetTime = (time + 0.16667 * i + 0.5) % 0.5;
@@ -203,6 +210,18 @@ function drawTank(x, y, w, h, tank) {
 
   fill(steelColor);
   stroke(0);
+
+  stroke(100);
+  strokeWeight(0.05);
+  const regulatorCoords = [
+    [10.5, 21],
+    [-11.5, -0.5]
+  ];
+
+  if (mX - x > regulatorCoords[0][0] && mX - x < regulatorCoords[0][1] && mY - y > regulatorCoords[1][0] && mY - y < regulatorCoords[1][1]) {
+    stroke(255, 255, 100);
+    // strokeWeight(0.1);
+  }
 
   push();
   translate(x + w / 2 + 8, y - 4);
@@ -255,21 +274,17 @@ function drawTank(x, y, w, h, tank) {
 
   pop();
   fill(200, 170, 60);
-  stroke(100);
   // Regulator right side
   rect(x + w / 2 + 12.375, y - 4, 1.25, -2)
   rect(x + w / 2 + 10, y - 4.5, 3, 1, 0.25);
   rect(x + w / 2 + 12, y - 4.875, 2, 1.75, 0.25, 0.25, 0.25, 0.25);
   const regulatorBodyColor = "rgb(180, 150, 50)";
-  const regulatorOutlineColor = "rgb(100, 100, 100)";
   fill(regulatorBodyColor);
-  stroke(regulatorOutlineColor);
   // Regulator left side
   rect(x + w / 2 + 4, y - 4.75, 2, 1.5, 0.25);
   // Regulator circle body
   circle(x + w / 2 + 8, y - 4, 5);
   fill(40);
-  stroke(0);
   push();
   translate(x + w / 2 + 8, y - 4);
   // Regulator knob
@@ -293,7 +308,6 @@ function drawTank(x, y, w, h, tank) {
   push();
   fill(tank.color);
   noStroke();
-  strokeWeight(0.05);
   // tank label
   textAlign(RIGHT, CENTER);
   textSize(5);
