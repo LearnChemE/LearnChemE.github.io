@@ -1,11 +1,15 @@
 export function setDefaults() {
   state = {
     ...state,
+    T: 773,
+    purging: false,
     tanks: {
       maxP: 15,
       h2: {
         m: 0,
-        P: 10,
+        mSetPoint: 0,
+        mFrame: -600,
+        P: 5,
         valvePosition: 0,
         isTurningOn: false,
         isTurningOff: false,
@@ -15,7 +19,9 @@ export function setDefaults() {
       },
       n2: {
         m: 0,
-        P: 10,
+        mSetPoint: 0,
+        mFrame: -600,
+        P: 5,
         valvePosition: 0,
         isTurningOn: false,
         isTurningOff: false,
@@ -25,7 +31,9 @@ export function setDefaults() {
       },
       nh3: {
         m: 0,
-        P: 10,
+        mSetPoint: 0,
+        mFrame: -600,
+        P: 5,
         valvePosition: 0,
         isTurningOn: false,
         isTurningOff: false,
@@ -33,6 +41,13 @@ export function setDefaults() {
         label1: "NH",
         label2: "3",
       },
+      he: {
+        valvePosition: 0,
+        isTurningOn: false,
+        isTurningOff: false,
+        color: "#ffffff",
+        label: "He"
+      }
     }
   }
 }

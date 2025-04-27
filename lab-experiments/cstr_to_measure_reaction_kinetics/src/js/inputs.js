@@ -3,6 +3,7 @@ import { calcAll, setDefaults } from "./calcs";
 
 export function handleInputs() {
   initializeHamburger();
+  turnMotorOn();
 }
 
 function handleHamburger() {
@@ -118,4 +119,11 @@ function initializeHamburger() {
   const hamburgerContainer = document.getElementById("hamburger-icon");
   hamburgerContainer.innerHTML = Hamburger;
   handleHamburger();
+}
+
+function turnMotorOn() {
+  const motor = document.getElementById("rect30");
+  motor.addEventListener("click", () => {
+    state.motorOn = !state.motorOn;
+  });
 }

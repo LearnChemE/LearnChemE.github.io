@@ -20,6 +20,10 @@ $modal-xl: 1140px;
   margin: auto;
 }
 
+svg {
+  z-index: 1;
+}
+
 canvas {
   border-style: solid;
   border-width: 1px;
@@ -118,4 +122,13 @@ canvas {
     top: 35px;
     padding: 15px;
   }
+}
+
+#tank-2-concentration-slider {
+  position: absolute;
+  top: 40%;
+  left: 39%;
+  width: 25%;
+  transform: translate(-50%, -50%) rotate(90deg);
+  z-index: 2;
 }
