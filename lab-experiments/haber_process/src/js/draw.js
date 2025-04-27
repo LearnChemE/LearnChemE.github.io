@@ -407,14 +407,25 @@ function drawOutletTubes() {
   stroke(0);
   strokeWeight(0.05);
   translate(72, height - 32);
-  // Vertical reactor outlet tube
+  // First vertical reactor outlet tube
   rect(-0.375, 0, 0.75, -10);
-  // Horizontal reactor outlet tube
-  rect(0.375, -10.75, 40.375, 0.75);
+  // First horizontal reactor outlet tube
+  rect(0.375, -10.75, 35.375, 0.75);
+  // Second vertical reactor outlet tube
+  rect(35.375, -10, 0.75, 20);
+  // Second horizontal reactor outlet tube
+  rect(36.125, 10, 14.5, 0.75);
   // First elbow
   drawTubeElbow(0, -10, 0);
+  // Second elbow
+  drawTubeElbow(35.75, -10, 90);
+  // Third elbow
+  drawTubeElbow(35.75, 10.75, 270);
   // Purge Valve
   drawPurgeValve();
+  // GC inlet cap
+  rect(50.25, 9.75, 0.55, 1.25);
+  rect(50.75, 9.625, 0.25, 1.5);
   pop();
 }
 
@@ -467,8 +478,138 @@ function drawPurgeValve() {
   pop();
 }
 
+function drawHeTank(x, y, w, h, tank) {
+  push();
+  fill(ironColor);
+  stroke(0);
+  strokeWeight(0.1);
+  // Tank body
+  rect(x, y, w, h, w / 2, w / 2, w / 10, w / 10);
+
+  fill(steelColor);
+  strokeWeight(0.05);
+  // Tank valve base
+  rect(x + w / 2 - 2.5, y - 1.5, 5, 2, 0.25);
+  // Tank valve stem
+  rect(x + w / 2 - 1, y - 1.5, 2, -6);
+  // Tank valve outlet
+  rect(x + w / 2 - 1, y - 4.5, -3, 1);
+  // Outlet horizontal tube
+  rect(x + w / 2 - 4, y - 4.325, -8.5, 0.675);
+  // Outlet cap
+  rect(x + w / 2 - 4.5, y - 4.625, 0.75, 1.25);
+  // Outlet vertical tube
+  rect(x + w / 2 - 12.875 + 0.125 / 2, y - 3.625, 0.675, 22);
+  // Outlet elbow
+  drawTubeElbow(x + w / 2 - 12.5 + 0.125 / 2, y - 3.625, 0);
+  push();
+  translate(x + w / 2 - 12.5, y + 6);
+  // Pressure limiter top pressure fitting
+  rect(-0.5, -2.75, 1, 0.25);
+  // Pressure limiter bottom pressure fitting
+  rect(-0.5, 2.5, 1, 0.25);
+  fill(200, 170, 60);
+  // Pressure limiter body
+  rect(-1.25, -2, 2.5, 4, 0.5);
+  fill(ironColor);
+  // Pressure limiter top cap
+  rect(-0.75, -2.5, 1.5, 0.5);
+  // Pressure limiter bottom cap
+  rect(-0.75, 2.0, 1.5, 0.5);
+  // Pressure limiter knob base
+  fill(80);
+  quad(0, -1, 0, 1, -2.25, 0.75, -2.25, -0.75);
+  // Pressure limiter knob
+  rect(-5.5, -1.25, 3.5, 2.5, 0.75);
+  fill(40);
+  rectMode(CENTER);
+  // Pressure limiter knob knurls
+  for (let i = 1; i < 6; i++) {
+    rect(-3.75, -1.375 + i * ((2.375 - 0.125 / 2) / 5), 2.5, 0.075 * (3 - abs(3 - i)), 0.5);
+  }
+  // Pressure limiter gauge body
+  fill(steelColor);
+  circle(0, 0, 3.5);
+  fill("white");
+  strokeWeight(0.05);
+  // Pressure limiter gauge background
+  circle(0, 0, 3.25);
+  // Pressure limiter gauge ticks
+  for (let i = 0; i <= 24; i++) {
+    const angle = radians(60 - i * 10);
+    const xPos = cos(angle) * 1.5;
+    const yPos = sin(angle) * 1.5;
+    const tickLength = i % 4 === 0 ? i % 2 === 0 ? 0.325 : 0.25 : 0.125;
+    const xPos2 = cos(angle) * (1.5 - tickLength);
+    const yPos2 = sin(angle) * (1.5 - tickLength);
+    stroke(0);
+    line(xPos, yPos, xPos2, yPos2);
+  }
+  fill("red");
+  const needleAngle = -HALF_PI + tank.valvePosition * 5 * PI / 6;
+  rotate(needleAngle);
+  // Pressure limiter gauge needle
+  triangle(-0.125, 0, 0.125, 0, 0, -1.25);
+  fill("silver");
+  // Pressure limiter gauge needle circle
+  circle(0, 0, 0.5);
+  pop();
+  fill(200);
+
+  // Tank valve knob
+  const knobCoords = [
+    [4, 9.5],
+    [-8.5, -6]
+  ];
+  if (mX - x > knobCoords[0][0] && mX - x < knobCoords[0][1] && mY - y > knobCoords[1][0] && mY - y < knobCoords[1][1]) {
+    stroke(255, 255, 100);
+  }
+  const time = tank.valvePosition;
+  for (let i = 0; i < 3; i++) {
+    const offsetTime = (time + 0.16667 * i + 0.5) % 0.5;
+    const xPos = 1 * cos(offsetTime * TWO_PI) * 2.25;
+    const wid = (0.55) * abs(sin((0.25 - (offsetTime - 0.25) % 0.25) * TWO_PI)) + 0.225;
+    if (offsetTime < 0.5 && offsetTime > 0) {
+      rect(x + xPos + w / 2 - wid / 2 - 0.125, y - 8.675, 5.5 / 3 * wid, 1.875, 0.25);
+    }
+  }
+  fill(steelColor);
+  rect(x + w / 2 - 2.5, y - 8.5, 5, 1.5, 0.5);
+  fill(200);
+  for (let i = 0; i < 6; i++) {
+    const offsetTime = (time + 0.16667 * i) % 1;
+    const xPos = -1 * cos(offsetTime * TWO_PI) * 2.25;
+    const wid = (0.55) * abs(sin((0.25 - (offsetTime - 0.25) % 0.25) * TWO_PI)) + 0.225;
+    if (offsetTime > 0 && offsetTime < 0.5) {
+      rect(x + xPos + w / 2 - wid / 2 - 0.125, y - 8.675, 5.5 / 3 * wid, 1.875, 0.25);
+    }
+  }
+
+  fill(steelColor);
+  stroke(0);
+
+  pop();
+  push();
+  fill(tank.color);
+  noStroke();
+  // tank label
+  textAlign(CENTER, CENTER);
+  textSize(5);
+  text(tank.label, x + w / 2, y + h / 4);
+  pop();
+}
+
+function drawGC() {
+  push();
+  translate(123, height - 23.5);
+  fill(245);
+  strokeWeight(0.05);
+  rect(0, -1, 20, 21.5, 0, 0, 0.25, 0.25);
+  pop();
+}
+
 export function drawAll() {
-  [state.tanks.h2, state.tanks.n2, state.tanks.nh3].forEach((tank) => {
+  [state.tanks.h2, state.tanks.n2, state.tanks.nh3, state.tanks.he].forEach((tank) => {
     if (tank.isTurningOn) {
       tank.valvePosition = (1, tank.valvePosition + 0.01);
       if (tank.valvePosition >= 1) {
@@ -490,6 +631,8 @@ export function drawAll() {
     }
   });
   drawTanks();
+  drawHeTank(98, height / 2 - 3, tankWidth, tankHeight, state.tanks.he);
   drawOutletTubes();
   drawReactor();
+  drawGC();
 }

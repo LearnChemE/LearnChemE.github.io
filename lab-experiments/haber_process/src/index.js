@@ -18,6 +18,8 @@ window.state = {
   minFlowRate: 0,
   maxFlowRate: 100,
   popupOpen: false,
+  minT: 298,
+  maxT: 1023,
 };
 
 const containerElement = document.getElementById("p5-container");

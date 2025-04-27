@@ -47,6 +47,7 @@ window.mousePressed = function() {
   const h2_tank_knob_x = [8, 13.5];
   const n2_tank_knob_x = [25, 30.5];
   const nh3_tank_knob_x = [42, 47.5];
+  const he_tank_knob_x = [102, 107.5];
   const knob_tank_y = [48, 51];
 
   if (mX < h2_tank_knob_x[1] && mX > h2_tank_knob_x[0] && mY < knob_tank_y[1] && mY > knob_tank_y[0]) {
@@ -71,6 +72,14 @@ window.mousePressed = function() {
     }
     if (state.tanks.nh3.valvePosition === 1) {
       state.tanks.nh3.isTurningOff = true;
+    }
+  }
+  if (mX < he_tank_knob_x[1] && mX > he_tank_knob_x[0] && mY < knob_tank_y[1] && mY > knob_tank_y[0]) {
+    if (state.tanks.he.valvePosition === 0) {
+      state.tanks.he.isTurningOn = true;
+    }
+    if (state.tanks.he.valvePosition === 1) {
+      state.tanks.he.isTurningOff = true;
     }
   }
 

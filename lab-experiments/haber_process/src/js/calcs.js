@@ -2,8 +2,7 @@ export function setDefaults() {
   state = {
     ...state,
     T: 773,
-    minT: 298,
-    maxT: 1023,
+    purging: false,
     tanks: {
       maxP: 15,
       h2: {
@@ -42,6 +41,13 @@ export function setDefaults() {
         label1: "NH",
         label2: "3",
       },
+      he: {
+        valvePosition: 0,
+        isTurningOn: false,
+        isTurningOff: false,
+        color: "#ffffff",
+        label: "He"
+      }
     }
   }
 }
