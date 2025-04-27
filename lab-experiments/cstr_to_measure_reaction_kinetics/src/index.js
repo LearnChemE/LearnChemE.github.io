@@ -15,6 +15,7 @@ window.state = {
   showButtons: false,
   hamburgerHasBeenClicked: window.localStorage.getItem("hamburgerHasBeenClicked") === "true",
   canvasSize: [150, 120],
+  motorOn: false,
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -37,6 +38,8 @@ window.setup = function() {
 window.draw = function() {
   window.width = state.canvasSize[0];
   window.height = state.canvasSize[1];
+  window.mX = mouseX / relativeSize();
+  window.mY = mouseY / relativeSize();
   scale(relativeSize());
   background(255);
   drawAll();
