@@ -1,0 +1,341 @@
+/* main.css */
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100vh;
+  background-color: white;
+  width: 100%;
+  font-family: sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.button-container {
+  display: flex;
+  margin-top: 10px;
+  justify-content: flex-start;
+}
+
+.button-container .btn {
+  margin-right: 10px;
+}
+
+.canvas-container {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.timer-display {
+  font-size: 24px;
+  margin-bottom: 10px;
+  text-align: center;
+  width: 150px;
+}
+
+.pencil-cursor {
+  cursor: crosshair;
+}
+
+#svg-container {
+  position: relative;
+  border: 2px solid #ccc;
+  margin: 20px auto;
+  padding: 10px;
+  width: calc(100vw - 40px);
+  height: calc(100vh - 40px);
+  max-width: calc((100vh - 40px) * 1000 / 600);
+  max-height: calc((100vw - 40px) * 600 / 1000);
+}
+
+#svg-container>svg {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  max-height: calc(100% - 20px);
+  max-width: calc(100% - 20px);
+}
+
+
+/* main.css */
+
+.icon-container {
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  position: relative;
+  z-index: 1001; /* Higher than SVG canvas */
+  pointer-events: auto;
+}
+
+.hamburger-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  z-index: 1001; /* Higher than SVG canvas */
+  pointer-events: auto;
+}
+
+#hamburger-icon {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  /* Center the image vertically */
+  border: 2px solid #000;
+  /* Add a border */
+  border-radius: 8px;
+  /* Add corner radius */
+  background-color: lightblue;
+  /* Fill with light blue color */
+  padding: 8px;
+  position: relative;
+  z-index: 1001; /* Higher than SVG canvas */
+  pointer-events: auto;
+}
+
+#reset-button {
+  position: relative;
+  z-index: 1001; /* Higher than SVG canvas */
+  pointer-events: auto;
+}
+
+
+.hamburger-img {
+  width: 24px;
+  /* Set the desired width */
+  height: 24px;
+  /* Set the desired height */
+  object-fit: contain;
+  /* Ensure the image scales properly */
+}
+
+
+/* main.css */
+
+.canvas-container {
+  position: relative;
+  /* Establish a stacking context */
+  z-index: 1;
+  /* Default z-index for the canvas container */
+}
+
+.hamburger-menu {
+  display: none;
+  /* Hidden by default */
+  flex-direction: column;
+  gap: 10px;
+  /* Space between buttons */
+  margin-top: 40px;
+  /* Space below the hamburger icon */
+  position: absolute;
+  /* Position the menu absolutely */
+  z-index: 1000;
+  /* Ensure the menu appears on top */
+  background-color: white;
+  /* Add a background to make buttons visible */
+  border: 2px solid #ddd;
+  /* Optional: Add a border */
+  padding: 10px;
+  /* Add padding for better appearance */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* Optional: Add a shadow */
+}
+
+.hamburger-menu.show {
+  display: flex;
+  /* Show when the "show" class is added */
+}
+
+.hamburger-menu .btn {
+  width: 100px;
+  /* Set a fixed width for the buttons */
+}
+
+#svg-container.measure-mode {
+  cursor: url("assets/hydrometer.png") 16 16, auto;
+}
+
+
+.gauge-input-container {
+  position: fixed;
+  background: white;
+  border: 2px solid #333;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+  pointer-events: auto;
+}
+
+/* Arrow pointing to the click location */
+.gauge-input-container::before {
+  content: '';
+  position: absolute;
+  left: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent #333 transparent transparent;
+  z-index: 10000;
+}
+
+.gauge-input-container::after {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 7px;
+  border-style: solid;
+  border-color: transparent white transparent transparent;
+  z-index: 10000;
+}
+
+.gauge-input-container .input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gauge-input-container input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.gauge-input-container .unit {
+  color: #666;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.gauge-input-container button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.gauge-input-container button:hover {
+  background: #0056b3;
+}
+
+.gauge-input-container .error {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  text-align: center;
+}
+
+
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+  .button-container {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+  }
+  .button {
+    width: 80%;
+    margin: 10px 0;
+  }
+  .slider-container {
+    grid-template-columns: 1fr;
+    grid-gap: 15px;
+  }
+  .canvas {
+    width: 100%;
+  }
+}
+
+.mfc-zoomed-view {
+  position: fixed;
+  width: 380px;
+  max-width: 90%;
+  max-height: 90%;
+  background: #4a4a4a;
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 25px;
+  color: white;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.4);
+  text-align: center;
+  z-index: 1010;
+  transform: translate(-50%, -50%);
+  clip-path: circle(190px at center);
+  overflow: hidden;
+}
+
+.mfc-display {
+  background: #c69c6d;
+  color: black;
+  padding: 15px;
+  margin: 15px auto;
+  border-radius: 6px;
+  font-size: 32px;
+  font-family: monospace;
+  width: 90%;
+  font-weight: bold;
+  position: relative;
+}
+
+.mfc-unit {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  color: white;
+}
+
+.mfc-controls {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.pressure-unit {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  color: white;
+}
+
+.magnifying-glass {
+  position: fixed;
+  width: 380px;
+  height: 380px;
+  border: 2px solid #000;
+  border-radius: 50%;
+  background: rgba(128, 128, 128, 0.15);
+  pointer-events: none;
+  z-index: 1000;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+}
