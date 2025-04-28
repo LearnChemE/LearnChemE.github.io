@@ -1,25 +1,48 @@
 import * as state from './state.js';
 
-export function updateDigitalPressureGauge() {
+export function updateDigitalPressureGauge(P) {
   const gauge = document.querySelector('.digital-pressure-gauge');
   if (!gauge) return;
 
   // Get current pressure values and calculate sum
-  const gauge1Value = state.getGaugeValue('gauge1', 0.1);
-  const gauge2Value = state.getGaugeValue('gauge2', 0.1);
-  const gauge3Value = state.getGaugeValue('gauge3', 0.1);
+  const gauge1Value = state.getGaugeValue('gauge1', P);
+  const gauge2Value = state.getGaugeValue('gauge2', P);
+  const gauge3Value = state.getGaugeValue('gauge3', P);
 
   const gaugePosition = state.getCurrentMultiValvePosition();
-  let pressure;
+  let pressure, tankNum;
+  switch (gaugePosition) {
+    case 270:
+      tankNum = "outlet";
+      break;
+    case 0:
+      tankNum = "3";
+      break;
+    case 90:
+      tankNum = "2";
+      break;
+    case 180:
+      tankNum = "1";
+      break;
+    default:
+      tankNum = "outlet";
+      break;
+  }
+  const tankValveId = `tankValve${tankNum}`;
+  const pressureValveId = `pressureValve${tankNum}`;
 
-  if (gaugePosition === 270) {
+  const isOpen = tankNum !== "outlet" ? state.getValveState(tankValveId)?.isOpen && state.getValveState(pressureValveId)?.isOpen : false;
+
+  if (tankNum === "outlet") {
     pressure = `0.0`;
-  } else if (gaugePosition === 0) {
-    pressure = gauge3Value.toFixed(1)
-  } else if (gaugePosition = 90) {
+  } else if (tankNum === "1" && isOpen) {
+    pressure = gauge1Value.toFixed(1)
+  } else if (tankNum === "2" && isOpen) {
     pressure = gauge2Value.toFixed(1);
+  } else if (tankNum === "3" && isOpen) {
+    pressure = gauge3Value.toFixed(1);
   } else {
-    pressure = gauge1Value.toFixed(1);
+    pressure = `0.0`;
   }
 
   // Update the text element with the total pressure

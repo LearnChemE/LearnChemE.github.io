@@ -70,14 +70,14 @@ export async function setGaugeValue(gaugeId, value) {
   gaugeValues[gaugeId] = value;
   // Update the digital pressure gauge display whenever a gauge value changes
   const { updateDigitalPressureGauge } = await
-  import ('./calculations.js');
-  updateDigitalPressureGauge();
+    import('./calculations.js');
+  updateDigitalPressureGauge(value);
 }
-export function getGaugeValue(gaugeId, defaultValue = 0.1) {
+export function getGaugeValue(gaugeId, defaultValue = 5.0) {
   return gaugeValues[gaugeId] ?? defaultValue;
 }
 export function resetGaugeValues() {
-  Object.keys(gaugeValues).forEach(id => gaugeValues[id] = 0.1);
+  Object.keys(gaugeValues).forEach(id => gaugeValues[id] = 5.0);
   console.log("Gauge values reset."); // Optional log
 }
 

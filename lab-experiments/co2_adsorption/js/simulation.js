@@ -24,7 +24,7 @@ export function startMoleFractionCalculation(tankNum) {
         yCO2: y,
         yTarget: state.outletMoleFraction,
         m: state.getMfcValue() * 1e-3 / 60, // Convert mg/min to g/s
-        P: state.getGaugeValue('gauge1', 0.1), // Convert bar to MPa
+        P: state.getGaugeValue('gauge1', 5.0), // Convert bar to MPa
         T: config.tempKelvin,
         desorbing: false,
       })
@@ -32,7 +32,7 @@ export function startMoleFractionCalculation(tankNum) {
 
     console.log(`yTarget: ${state.outletMoleFraction}`);
     console.log(`m: ${state.getMfcValue() * 1e-3 / 60}`);
-    console.log(`P: ${state.getGaugeValue('gauge1', 0.1)}`);
+    console.log(`P: ${state.getGaugeValue('gauge1', 5.0)}`);
     console.log(`T: ${config.tempKelvin}`);
     console.log({ initialTimeOffset });
     currentDesorbingState = false;
@@ -58,7 +58,7 @@ export function startMoleFractionCalculation(tankNum) {
         yCO2: y,
         yTarget: state.outletMoleFraction,
         m: state.getMfcValue() * 1e-3 / 60, // Convert mg/min to g/s
-        P: state.getGaugeValue('gauge1', 0.1),
+        P: state.getGaugeValue('gauge1', 5.0),
         T: config.tempKelvin,
         desorbing: false,
       })
@@ -77,7 +77,7 @@ export function startMoleFractionCalculation(tankNum) {
     // Use the mole fraction of the *last* CO2 tank for yCO2 parameter during desorption
     const lastTank = state.getPrevTankNum();
     if (lastTank === '1') y = 0.9;
-    else if (lastTank === '2') y = 0.1;
+    else if (lastTank === '2') y = 5.0;
     else {
       console.warn("Desorption (Tank 3) started without prior Adsorption (Tank 1 or 2). Using y=0.1");
       y = 0.1; // Default if no previous tank
@@ -113,7 +113,7 @@ export function startMoleFractionCalculation(tankNum) {
   // --- Parameters for yCO2_out ---
   // P needs to be dynamic based on selected tank's gauge, or a default
   const pressureGaugeId = `gauge${tankNum}`;
-  const P_bar = state.getGaugeValue(pressureGaugeId, 0.1); // Get pressure in bar, default 1.0 bar
+  const P_bar = state.getGaugeValue(pressureGaugeId, 5.0); // Get pressure in bar, default 1.0 bar
 
   const m_controller_mg_min = state.getMfcValue(); // Get current MFC setting (mg/min)
   const m_g_s = m_controller_mg_min * 1e-3 / 60; // Convert mg/min to g/s
@@ -130,7 +130,7 @@ export function startMoleFractionCalculation(tankNum) {
     const elapsedRealTime_ms = Date.now() - state.getStartTime();
     const t = initialTimeOffset + (elapsedRealTime_ms / 1000) * config.simulationSpeedMultiplier;
 
-    console.log(t);
+    console.log("t = ", Math.round(t));
 
     // Call the external calculation function
     const y_out = yCO2_out({
