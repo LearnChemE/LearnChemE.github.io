@@ -121,6 +121,11 @@ canvas {
   pointer-events: none;
 }
 
+.details-eqn {
+  width: max-content;
+  margin-left: 20px;
+}
+
 @media screen and (min-width: 1080px) {}
 
 @media screen and (min-width: 1320px) {
