@@ -146,6 +146,7 @@ function draw3DCP() {
   push();
 
   ortho();
+  rotateX(PI/64); 
 
   translate(-350, 0);
   rotateX(angleX);
@@ -345,6 +346,7 @@ function draw3DCV() {
   push();
 
   ortho();
+  rotateX(PI/64);
 
   translate(-350, 0);
   rotateX(angleX);
@@ -454,11 +456,11 @@ function drawTextCV() {
   fill('Black');
   textFont(font);
   textSize(28);
-  text("mol A", 90, 305 - z.molACP * (530 / 7));
-  text("mol B", 90 + 450 / 3, 305 - z.molBCP * (530 / 7));
+  text("mol A", 90, 305 - z.molACV * (530 / 7));
+  text("mol B", 90 + 450 / 3, 305 - z.molBCV * (530 / 7));
   text("mol inerts", 62.5 + 450 * (2 / 3), 305 - (z.molesInerts) * (530 / 7));
-  text(z.molACP.toFixed(1), 110, 265 - z.molACP * (530 / 7));
-  text(z.molBCP.toFixed(1), 110 + 450 / 3, 265 - z.molBCP * (530 / 7));
+  text(z.molACV.toFixed(1), 110, 265 - z.molACV * (530 / 7));
+  text(z.molBCV.toFixed(1), 110 + 450 / 3, 265 - z.molBCV * (530 / 7));
   text(z.molesInerts.toFixed(1), 110 + 450 * (2 / 3), 265 - (z.molesInerts) * (530 / 7));
 
   pop();
@@ -478,7 +480,7 @@ function drawBarGraphCV() {
 
   //strokeWeight(1);
   fill(239, 100, 255);
-  rect(60, 310 - z.molACP * (530 / 7), 450 / 3 - 10, z.molACP * (530 / 7));
+  rect(60, 310 - z.molACV * (530 / 7), 450 / 3 - 10, z.molACV * (530 / 7));
 
   pop();
 
@@ -486,7 +488,7 @@ function drawBarGraphCV() {
 
   //strokeWeight(1);
   fill(248, 215, 146);
-  rect(60 + 450 * (1 / 3), 310 - z.molBCP * (530 / 7), 450 / 3 - 10, z.molBCP * (530 / 7));
+  rect(60 + 450 * (1 / 3), 310 - z.molBCV * (530 / 7), 450 / 3 - 10, z.molBCV * (530 / 7));
 
   pop();
 
