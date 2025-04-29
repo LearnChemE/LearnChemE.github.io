@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adsorption Process Simulation</title> <link rel="stylesheet" href="main.css"> <script src="https://kit.fontawesome.com/9d19ad28f4.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  </head>
+
+<body>
+  <div class="canvas-container">
+    <div id="svg-container">
+      <div class="icon-container">
+        <div class="hamburger-wrapper">
+          <div id="hamburger-icon" onclick="toggleMenu()">
+            <img src="./assets/hamburger.svg" alt="Menu" class="hamburger-img">
+          </div>
+          <div id="hamburger-menu" class="hamburger-menu">
+            </div>
+        </div>
+        <button id="reset-button" class="btn btn-sm btn-danger">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="overlayContainer"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.1/dist/svg.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.draggable.js@3.0/dist/svg.draggable.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script type="module" src="./js/main.js"></script>
+
+  <script>
+    // Function to toggle the hamburger menu
+    function toggleMenu() {
+      const hamburgerMenu = document.getElementById('hamburger-menu');
+      const isCurrentlyShown = hamburgerMenu.classList.contains('show');
+      hamburgerMenu.classList.toggle('show');
+
+      // Only populate if opening
+      if (!isCurrentlyShown) {
+        // Clear any existing buttons
+        hamburgerMenu.innerHTML = '';
+
+        // --- Button Configuration ---
+        const buttons = [
+          { label: 'Directions', url: './overlay/directions.html', action: 'modal' },
+          { label: 'About', url: './overlay/about.html', action: 'modal' },
+          { label: 'Worksheet', url: 'assets/worksheet.pdf', action: 'download', filename: 'worksheet.pdf' }
+        ];
+
+        buttons.forEach((btnConfig) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          // Use classes defined in main.css if available, otherwise default Bootstrap
+          button.className = 'btn btn-light btn-sm hamburger-menu-button'; // Added a class for potential specific styling
+          button.textContent = btnConfig.label;
+
+          button.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent click from closing menu immediately
+
+            if (btnConfig.action === 'modal') {
+              // Fetch and display modal content
+              fetch(btnConfig.url)
+                .then(response => {
+                  if (!response.ok) throw new Error(`Network error loading ${btnConfig.url}`);
+                  return response.text();
+                })
+                .then(html => {
+                  const container = document.getElementById('overlayContainer');
+                  container.innerHTML = html; // Replace previous modal HTML
+
+                  // Modal ID assumed to be the same as the label lowercased
+                  const modalId = btnConfig.label.toLowerCase();
+                  const modalEl = document.getElementById(modalId);
+
+                  if (modalEl) {
+                     // Make sure no stray modals are lingering from previous fetches
+                     const existingModalInstance = bootstrap.Modal.getInstance(modalEl);
+                     if(existingModalInstance) {
+                         // If an instance exists but might be hidden or closing, dispose of it
+                         // before creating a new one to avoid conflicts.
+                         existingModalInstance.dispose();
+                     }
+                    const modal = new bootstrap.Modal(modalEl); // Create new instance
+                    modal.show();
+                  } else {
+                     console.error(`Modal element with ID '${modalId}' not found in fetched HTML from ${btnConfig.url}.`);
+                  }
+                })
+                .catch(error => console.error('Error loading/showing modal:', error));
+
+            } else if (btnConfig.action === 'download') {
+              // Trigger download
+              downloadFile(btnConfig.url, btnConfig.filename);
+            }
+
+            // Close menu after action
+            hamburgerMenu.classList.remove('show');
+          });
+
+          hamburgerMenu.appendChild(button);
+        });
+      }
+    } // End of toggleMenu
+
+    // Function to download a file
+    function downloadFile(fileUrl, fileName) {
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = fileName || fileUrl.split('/').pop(); // Use provided name or derive from URL
+      document.body.appendChild(link);
+      link.click(); // Trigger the download
+      document.body.removeChild(link); // Clean up
+    }
+
+    // Close the hamburger menu when clicking outside
+    document.addEventListener('click', (event) => {
+      const hamburgerMenu = document.getElementById('hamburger-menu');
+      const hamburgerIcon = document.getElementById('hamburger-icon');
+
+      // Check if the menu/icon exist and if the click was outside both
+      if (hamburgerMenu && hamburgerIcon && !hamburgerMenu.contains(event.target) && !hamburgerIcon.contains(event.target)) {
+        hamburgerMenu.classList.remove('show');
+      }
+    });
+  </script>
+
+</body>
+</html>
