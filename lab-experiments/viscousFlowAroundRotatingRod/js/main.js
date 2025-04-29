@@ -1,6 +1,5 @@
 const canvasWidth = 1000;
 const canvasHeight = 600;
-const draw = SVG().addTo('#svg-container').size(canvasWidth, canvasHeight);
 const borderHexCode = '#b3b3b3';
 const containerHeight = 410;
 const containerWidth = 8 * containerHeight / 12;
@@ -50,6 +49,21 @@ let panStart = { x: 0, y: 0 };
 
 const resetButton = document.getElementById('reset-button');
 const measureAngleButton = document.getElementById('measure-angle-button');
+
+let windowWidth = window.innerWidth - 60;
+let windowHeight = windowWidth * 600 / 1000;
+
+const draw = SVG().addTo('#svg-container').size(windowWidth, windowHeight);
+
+// Change the viewport to 1000 x 600
+document.getElementsByTagName('svg')[0].setAttribute('viewBox', `0 0 ${canvasWidth} ${canvasHeight}`);
+
+// Resize the canvas width and height when the window is resized
+window.addEventListener('resize', function() {
+  let windowWidth = window.innerWidth - 60;
+  let windowHeight = windowWidth * 600 / 1000;
+  draw.size(windowWidth, windowHeight);
+});
 
 function resetCanvas() {
     resetButton.addEventListener('click', () => {
