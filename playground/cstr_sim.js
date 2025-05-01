@@ -8,8 +8,8 @@ const run_CSTR = require("./cstr_calc");
 const output = run_CSTR({
   t: 10, // time in seconds
   T: 350, // temperature in Kelvin
-  CAf: 0.1, // Concentration of A (CH3COOCH3) in the feed (mol/L)
-  CBf: 0.1 // Concentration of B (NaOH) in the feed (mol/L)
+  CAf: 0.067, // Concentration of A (CH3COOCH3) in the feed (mol/L)
+  CBf: 0.067 // Concentration of B (NaOH) in the feed (mol/L)
 });
 
 console.log(output);
