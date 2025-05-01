@@ -1,7 +1,20 @@
-// Setup the canvas and SVG drawing
+let windowWidth = window.innerWidth - 60;
+let windowHeight = windowWidth * 600 / 1000;
+
+const draw = SVG().addTo('#svg-container').size(windowWidth, windowHeight);
+
 const canvasWidth = 1000;
 const canvasHeight = 600;
-const draw = SVG().addTo('#svg-container').size(canvasWidth, canvasHeight);
+
+// Change the viewport to 1000 x 600
+document.getElementsByTagName('svg')[0].setAttribute('viewBox', `0 0 ${canvasWidth} ${canvasHeight}`);
+
+// Resize the canvas width and height when the window is resized
+window.addEventListener('resize', function() {
+  let windowWidth = window.innerWidth - 60;
+  let windowHeight = windowWidth * 600 / 1000;
+  draw.size(windowWidth, windowHeight);
+});
 
 // Global groups for layering (we declare them as let so we can reinitialize them on redraw)
 let pipeGroup, waterGroup, uiGroup;

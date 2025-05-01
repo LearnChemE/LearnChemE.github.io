@@ -42,11 +42,24 @@ body {
     cursor: crosshair;
 }
 
+
 #svg-container {
+    position: relative;
     border: 2px solid #ccc;
     margin: 20px auto;
-    width: 1000px;
-    height: 659px;
+    padding: 10px;
+    width: calc(100vw - 40px);
+    height: calc(100vh - 40px);
+    max-width: calc((100vh - 40px) * 1000 / 600);
+    max-height: calc((100vw - 40px) * 600 / 1000);
+}
+
+#svg-container>svg {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    max-height: calc(100% - 20px);
+    max-width: calc(100% - 20px);
 }
 
 /* main.css */
@@ -59,12 +72,18 @@ body {
     justify-content: space-between; /* Distribute space between items */
     align-items: flex-start; /* Align items to the top */
     gap: 10px; /* Space between icons (optional) */
+    position: relative;
+    z-index: 1001; /* Higher than SVG canvas */
+    pointer-events: auto;
 }
 
 .hamburger-wrapper {
     display: flex;
     flex-direction: column;
     align-items: flex-start; /* Align items to the left */
+    position: relative;
+    z-index: 1001; /* Higher than SVG canvas */
+    pointer-events: auto;
 }
 
 #hamburger-icon {
@@ -75,6 +94,15 @@ body {
     border-radius: 8px; /* Add corner radius */
     background-color: lightblue; /* Fill with light blue color */
     padding: 8px; /* Add some padding for better spacing */
+    position: relative;
+    z-index: 1001; /* Higher than SVG canvas */
+    pointer-events: auto;
+}
+
+#reset-button {
+    position: relative;
+    z-index: 1001; /* Higher than SVG canvas */
+    pointer-events: auto;
 }
 
 .hamburger-img {
@@ -112,7 +140,7 @@ body {
 
 #svg-container.measure-mode {
     cursor: url("assets/hydrometer.png") 16 16, auto;
-  }
+}
 
 @media (max-width: 600px) {
     body {
