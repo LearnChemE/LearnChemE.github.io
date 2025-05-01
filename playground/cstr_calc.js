@@ -13,19 +13,18 @@
 module.exports = function run_CSTR(args) {
   const t = args.t; // time in seconds
   const T = args.T; // temperature in Kelvin
+  const CAf = args.CAf; // Concentration of A in the feed (mol/L)
+  const CBf = args.CBf; // Concentration of B in the feed (mol/L)
+  const vA = args.vA; // volumetric flow rate of A (L/s)
+  const vB = args.vB; // volumetric flow rate of B (L/s)
 
-  // CSTR concentrations
+  // CSTR initial concentrations
   const CA0 = 0;
   const CB0 = 0;
   const CC0 = 0;
   const CD0 = 0;
 
-  // Feed concentrations
-  const CAf = args.CAf; // Concentration of A in the feed (mol/L)
-  const CBf = args.CBf; // Concentration of B in the feed (mol/L)
-
-  const vA = 0.066; // volumetric flow rate of A (L/s)
-  const vB = 0.066; // volumetric flow rate of B (L/s)
+  // Feed concentration
 
   const V = 2; // volume of tank (L)
 

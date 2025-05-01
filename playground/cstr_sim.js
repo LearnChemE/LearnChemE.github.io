@@ -8,8 +8,10 @@ const run_CSTR = require("./cstr_calc");
 const output = run_CSTR({
   t: 10, // time in seconds
   T: 350, // temperature in Kelvin
-  CAf: 0.067, // Concentration of A (CH3COOCH3) in the feed (mol/L)
-  CBf: 0.067 // Concentration of B (NaOH) in the feed (mol/L)
+  CAf: 0.1, // Concentration of A (CH3COOCH3) in the feed (mol/L)
+  CBf: 0.1, // Concentration of B (NaOH) in the feed (mol/L)
+  vA: 0.03, // volumetric flow rate of A (CH3COOCH3) (L/s)
+  vB: 0.05, // volumetric flow rate of B (NaOH) (L/s)
 });
 
 console.log(output);
@@ -17,10 +19,10 @@ console.log(output);
 /* output => 
   {
     time: 10,
-    CA: 0.016964123206283706, // (Concentration of CH3COOCH3 [mol/L])
-    CB: 0.016964123206283706, // (Concentration of NaOH [mol/L])
-    CC: 0.007198940444495265, // (Concentration of CH3COONa [mol/L])
-    CD: 0.007198940444495265, // (Concentration of CH3OH [mol/L])
-    X: 0.1439788088899053 // (Conversion coordinate X)
+    CA: 0.008763373005670856,
+    CB: 0.01700671279883049,
+    CC: 0.003601636684068561,
+    CD: 0.003601636684068561,
+    X: 0.09604364490849496
   }
 */
