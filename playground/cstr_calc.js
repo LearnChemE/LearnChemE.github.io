@@ -90,7 +90,7 @@ module.exports = function run_CSTR(args) {
   let CD = CD0;
   const time_steps = Math.ceil(t / dt);
 
-  if (t === 0) {
+  if (t < dt) {
     return { time: 0, CA: CA, CB: CB, CC: CC, CD: CD };
   }
 
