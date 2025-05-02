@@ -3,6 +3,9 @@ export function setDefaults() {
     ...state,
     T: 773,
     purging: false,
+    purgingTime: 0,
+    takingSample: false,
+    takingSampleTime: 0,
     tanks: {
       maxP: 15,
       h2: {
@@ -48,10 +51,15 @@ export function setDefaults() {
         color: "#ffffff",
         label: "He"
       }
+    },
+    outlet: {
+      yH2: 0.5,
+      yN2: 0.3,
+      yNH3: 0.2,
     }
   }
 }
 
 export function calcAll() {
-
+  console.log("calcing..")
 }

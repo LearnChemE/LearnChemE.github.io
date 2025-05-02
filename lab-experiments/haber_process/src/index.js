@@ -20,6 +20,7 @@ window.state = {
   popupOpen: false,
   minT: 298,
   maxT: 1023,
+  doCalc: false,
 };
 
 const containerElement = document.getElementById("p5-container");

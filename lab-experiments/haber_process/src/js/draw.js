@@ -1,3 +1,5 @@
+import { calcAll } from "./calcs.js";
+
 const tankHeight = 60;
 const tankWidth = 13;
 const steelColor = "rgb(220, 220, 220)";
@@ -415,6 +417,8 @@ function drawOutletTubes() {
   rect(35.375, -10, 0.75, 20);
   // Second horizontal reactor outlet tube
   rect(36.125, 10, 14.5, 0.75);
+  // Outlet tube to vent
+  rect(19.675, -7.5, 0.75, 30);
   // First elbow
   drawTubeElbow(0, -10, 0);
   // Second elbow
@@ -426,6 +430,17 @@ function drawOutletTubes() {
   // GC inlet cap
   rect(50.25, 9.75, 0.55, 1.25);
   rect(50.75, 9.625, 0.25, 1.5);
+  // Vent label
+  fill(0);
+  stroke(0);
+  strokeWeight(0.2);
+  line(20.05, 23.5, 20.05, 30);
+  noStroke();
+  translate(20.05, 30);
+  triangle(0, 1.15, -0.5, -0.5, 0.5, -0.5);
+  textAlign(RIGHT);
+  textSize(3);
+  text("vent", -1.5, -2);
   pop();
 }
 
@@ -436,6 +451,10 @@ function drawPurgeValve() {
   // "T" part
   beginShape();
   vertex(-3, 0.75);
+  vertex(-0.75, 0.75);
+  vertex(-0.75, 2.5);
+  vertex(0.75, 2.5);
+  vertex(0.75, 0.75);
   vertex(3, 0.75);
   vertex(3, -0.75);
   vertex(0.75, -0.75);
@@ -450,6 +469,8 @@ function drawPurgeValve() {
   rect(2.75, -1, 0.75, 2);
   // Top cap
   rect(-1, -3, 2, 0.75);
+  // Bottom cap
+  rect(-1, 2.25, 2, 0.75);
 
   const knob_coords = [
     [89.5, 94.5],
@@ -464,8 +485,12 @@ function drawPurgeValve() {
   }
   circle(0, 0, 3);
   fill(60);
-  if (!state.purging) {
+  if (state.purge_position === 0) {
     rotate(PI / 2);
+  } else if (state.purge_position === 1) {
+    rotate(0);
+  } else {
+    rotate(-PI);
   }
   beginShape();
   vertex(0, 0.75);
@@ -599,12 +624,383 @@ function drawHeTank(x, y, w, h, tank) {
   pop();
 }
 
+// function drawGC() {
+//   push();
+//   translate(123, height - 23.5);
+//   fill(245);
+//   strokeWeight(0.05);
+//   rect(0, -1, 20, 21.5, 0, 0, 0.25, 0.25);
+//   pop();
+// }
+
 function drawGC() {
   push();
-  translate(123, height - 23.5);
-  fill(245);
+  translate(132.5, height - 15);
+  scale(0.3);
+  fill("rgb(230, 230, 220)");
+  stroke("rgb(150, 150, 120)");
+  strokeWeight(0.1);
+
+  // GC Base
+  rect(-40, 0, 80, 40, 0, 0, 2, 2);
+
+  fill("rgb(180, 50, 50)");
+  stroke("rgb(200, 0, 0)");
+
+  // Red GC cover
+  rect(-40, -40, 80, 40, 2, 2, 0, 0);
+
+  fill("rgb(200, 200, 200)");
+
+  // Screws going around the outside of the top cover
+  for (let i = 0; i < 18; i++) {
+    if (i < 6) {
+      stroke("rgb(150, 150, 150)");
+      strokeWeight(0.05);
+      circle(-38, 4 - i * 8, 1);
+      strokeWeight(0.1);
+      stroke(50);
+      line(-37.75, 4 - i * 8, -38.25, 4 - i * 8);
+      line(-38, 4 - i * 8 - 0.25, -38, 4 - i * 8 + 0.25);
+    } else if (i < 12) {
+      const j = i - 6;
+      stroke("rgb(150, 150, 150)");
+      strokeWeight(0.05);
+      circle(-30 + j * 12, -38, 1);
+      strokeWeight(0.1);
+      stroke(50);
+      line(-30 + j * 12 - 0.25, -38, -30 + j * 12 + 0.25, -38);
+      line(-30 + j * 12, -38 - 0.25, -30 + j * 12, -38 + 0.25);
+    } else {
+      const j = i - 12;
+      stroke("rgb(150, 150, 150)");
+      strokeWeight(0.05);
+      circle(38, 4 - j * 8, 1);
+      strokeWeight(0.1);
+      stroke(50);
+      line(37.75, 4 - j * 8, 38.25, 4 - j * 8);
+      line(38, 4 - j * 8 - 0.25, 38, 4 - j * 8 + 0.25);
+    }
+  }
+  stroke(0);
+  strokeWeight(0.1);
+  fill(40);
+
+  // Left cover clamp
+  beginShape();
+  vertex(-20.5, -3);
+  vertex(-20, -3.5);
+  vertex(-16, -3.5);
+  vertex(-15.5, -3);
+  vertex(-15.5, 3);
+  vertex(-16, 3.5);
+  vertex(-20, 3.5);
+  vertex(-20.5, 3);
+  beginContour();
+  vertex(-19.25, -2.25);
+  vertex(-19.25, 2.25);
+  vertex(-16.75, 2.25);
+  vertex(-16.75, -2.25);
+  endContour();
+  endShape();
+  fill("rgb(200, 200, 200)");
+  stroke("rgb(50, 50, 50)");
   strokeWeight(0.05);
-  rect(0, -1, 20, 21.5, 0, 0, 0.25, 0.25);
+  rect(-18.75, -2.25, 1.5, 1);
+  rect(-18.75, 1.25, 1.5, 1);
+
+  stroke(0);
+  strokeWeight(0.1);
+  fill(40);
+
+  // Right cover clamp
+  beginShape();
+  vertex(20.5, -3);
+  vertex(20, -3.5);
+  vertex(16, -3.5);
+  vertex(15.5, -3);
+  vertex(15.5, 3);
+  vertex(16, 3.5);
+  vertex(20, 3.5);
+  vertex(20.5, 3);
+  beginContour();
+  vertex(19.25, -2.25);
+  vertex(19.25, 2.25);
+  vertex(16.75, 2.25);
+  vertex(16.75, -2.25);
+  endContour();
+  endShape();
+  fill("rgb(200, 200, 200)");
+  stroke("rgb(50, 50, 50)");
+  strokeWeight(0.05);
+  rect(17.25, -2.25, 1.5, 1);
+  rect(17.25, 1.25, 1.5, 1);
+
+  stroke("rgb(150, 150, 150)");
+  strokeWeight(0.2);
+  noFill();
+
+  // Left, middle, and right rounded rectangles with the text and indicators inside them
+  rect(-38, 7, 14, 31, 1);
+  translate(0.5, 0);
+  rect(-23, 7, 19.5, 31, 1);
+  rect(-2, 7, 14, 31, 1);
+  noStroke();
+  fill("black");
+  textSize(1.25);
+  textAlign(CENTER, CENTER);
+
+  // Text inside the rounded rectangles
+  text("EPC CONTROLS", -31, 9.5);
+  text("DETECTOR PARAMETERS", -13, 9.5);
+  text("TEMPERATURES", 5, 9.5);
+  textSize(0.75);
+  text("LOCAL\nSETPOINT", -35, 13);
+  text("TOTAL\nSETPOINT", -35, 16);
+  text("STATUS", -35, 19);
+  text("ACTUAL", -35, 22);
+  textAlign(CENTER, TOP);
+  text("C\nA\nR\nR\nI\nE\nR", -32, 24);
+  text("H\nY\nD\nR\nO\nG\nE\nN", -29.5, 24);
+  text("A\nI\nR", -27, 24);
+  text("B\nE\nA\nD\n\nV\nO\nL\nT\nS", -21, 24);
+  text("F\nL\nA\nM\nE\n\nI\nG\nN\nI\nT\nE", -18.5, 24);
+  text("L\nA\nM\nP\n\nC\nU\nR\nR\nE\nN\nT", -16, 24);
+  text("P\nM\nT\n\nV\nO\nL\nT\nS", -13.5, 24);
+  text("E\nC\nD\n\nC\nU\nR\nR\nE\nN\nT", -11, 24);
+  text("R\nE\nA\nC\nT\nO\nR\n\nT\nE\nM\nP", -8.5, 24);
+  text("T\nC\nD\n\nP\nR\nO\nT\nE\nC\nT", -6, 24);
+  text("D\nE\nT\nE\nC\nT\nO\nR\n\n1", 0, 24);
+  text("D\nE\nT\nE\nC\nT\nO\nR\n\n2", 2.5, 24);
+  text("I\nN\nJ\nE\nC\nT\nO\nR", 5, 24);
+  text("C\nO\nL\nU\nM\nN\n\nO\nV\nE\nN", 7.5, 24);
+  text("O\nV\nE\nN\n\nM\nA\nX", 10, 24);
+
+  fill("rgb(80, 80, 80)");
+  stroke(0);
+  strokeWeight(0.1);
+  randomSeed(125);
+
+  // Indicators inside the rounded rectangles
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 4; j++) {
+      if (random() < 0.2) {
+        fill("yellow");
+      } else {
+        fill("rgb(80, 80, 80)");
+      }
+      circle(-32 + i * 2.5, 13 + j * 3, 0.5)
+    }
+  }
+  for (let i = 0; i < 7; i++) {
+    for (let j = 0; j < 4; j++) {
+      if (random() < 0.2) {
+        fill("yellow");
+      } else {
+        fill("rgb(80, 80, 80)");
+      }
+      circle(-21 + i * 2.5, 13 + j * 3, 0.5)
+    }
+  }
+  for (let i = 0; i < 5; i++) {
+    for (let j = 0; j < 4; j++) {
+      if (random() < 0.2) {
+        fill("yellow");
+      } else {
+        fill("rgb(80, 80, 80)");
+      }
+      circle(i * 2.5, 13 + j * 3, 0.5)
+    }
+  }
+
+  translate(-0.5, 0);
+  noStroke();
+  fill("black");
+  textSize(1.25);
+  textAlign(CENTER, CENTER);
+
+  // Text on the right side of the GC
+  text("TEMPERATURE (°C)\nPRESSURE (PSI)", 25, 8);
+
+  textSize(0.75);
+
+  text("TEMPERATURE", 23, 18);
+  text("PRESSURE", 23, 23);
+
+  textSize(1.1);
+
+  text("START", 30, 30);
+
+  fill("rgb(220, 220, 220)");
+  stroke("rgb(150, 150, 150)");
+  strokeWeight(0.05);
+
+  // Temperature/pressure switch
+  circle(23, 20.5, 2.5);
+  rectMode(CENTER);
+  fill("rgb(230, 230, 230)");
+  rect(23, 19.75, 0.75, 2, 0.5);
+
+  fill(0);
+  stroke(0);
+  strokeWeight(0.1);
+  rectMode(CORNER);
+
+  // Temperature readout
+  rect(20, 10.5, 10, 6);
+  fill(40);
+  rect(21, 11.5, 8, 4);
+  rect(28.5, 25, 3, 3);
+
+  // Power button
+  fill("rgb(255, 255, 200)");
+  stroke("rgb(200, 200, 200)");
+  strokeWeight(0.2);
+  rect(28.75, 25.25, 2.5, 2.5);
+
+  noStroke();
+  textFont(state.meterFont);
+  fill("yellow");
+  textSize(4);
+
+  // Temperature text
+  text("80", 25, 13.5);
+  pop();
+}
+
+function drawComputer() {
+  push();
+  translate(width - 17, height - 70);
+  scale(0.5);
+  fill(50);
+  stroke(0);
+  strokeWeight(0.05);
+
+  // Computer screen body
+  rect(-25, 0, 50, 40, 1);
+
+  fill(245);
+
+  // Computer screen screen
+  rect(-23.5, 1.5, 47, 37, 0.5);
+
+  fill(220);
+
+  // Computer screen legs
+  quad(-13, 40, -17, 58, -15, 58, -11, 40);
+  quad(13, 40, 17, 58, 15, 58, 11, 40);
+
+  fill(190);
+
+  // Computer keyboard keys
+  for (let i = 0; i < 16; i++) {
+    const x = -22 + i * (46 - 2) / 16;
+    const y = 54;
+    rect(x, y, 2, 3);
+  }
+
+  fill(200);
+
+  // Computer keyboard body
+  rect(-23, 55, 46, 3);
+
+  noFill();
+  stroke(0);
+  strokeWeight(0.4);
+
+  // Computer cable to the GC
+  beginShape();
+  vertex(-25, 92);
+  quadraticVertex(-35, 92, -36, 62);
+  quadraticVertex(-35, 27, -25, 28);
+  endShape();
+
+  fill(255);
+  strokeWeight(0.1);
+
+  // Graph background
+  rect(-19, 10, 38, 25);
+
+  // Graph axes ticks
+  for (let i = 0; i < 32; i++) {
+    let x = -19;
+    const y = 10 + i * 25 / 32;
+    let x2 = i % 4 === 0 ? x + 0.5 : i % 2 === 0 ? x + 0.3 : x + 0.2;
+    line(x, y, x2, y);
+    x = 19;
+    x2 = i % 4 === 0 ? x - 0.5 : i % 2 === 0 ? x - 0.3 : x - 0.2;
+    line(x, y, x2, y);
+  }
+  for (let i = 0; i < 48; i++) {
+    const x = -19 + i * 38 / 48;
+    let y = 35;
+    let y2 = i % 4 === 0 ? y - 0.5 : i % 2 === 0 ? y - 0.3 : y - 0.2;
+    line(x, y, x, y2);
+    y = 10;
+    y2 = i % 4 === 0 ? y + 0.5 : i % 2 === 0 ? y + 0.3 : y + 0.2;
+    line(x, y, x, y2);
+  }
+
+  noFill();
+  strokeWeight(0.15);
+
+  // Graph spectrograph
+  beginShape();
+  vertex(-19, 35 - 4 * 38 / 48);
+  vertex(-16, 35 - 4 * 38 / 48);
+  if (state.takingSampleTime >= 1 || (state.purgingTime > 0 && state.purgingTime < 1)) {
+    for (let i = 0; i < 100; i++) {
+      const x = -16 + i * 5 / 50;
+      const y = 35 - 4 * 38 / 48 - state.outlet.yH2 * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2);
+      vertex(x, y);
+    }
+    for (let i = 0; i < 100; i++) {
+      const x = -6 + i * 5 / 50;
+      const y = 35 - 4 * 38 / 48 - state.outlet.yN2 * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2);
+      vertex(x, y);
+    }
+    for (let i = 0; i < 100; i++) {
+      const x = 4 + i * 5 / 50;
+      const y = 35 - 4 * 38 / 48 - state.outlet.yNH3 * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2);
+      vertex(x, y);
+    }
+  }
+  vertex(19, 35 - 4 * 38 / 48);
+  endShape();
+
+  fill(0);
+  noStroke();
+  textSize(4);
+  textAlign(LEFT, CENTER);
+
+  // Display the liquid composition after liquid is inject
+  if (state.takingSampleTime >= 1) {
+    text(`y     = ${(round(100 * state.outlet.yNH3) / 100).toFixed(2)}`, -7.5, 6);
+    textSize(2);
+    text("NH3", -5.4, 7.1);
+  } else if (state.takingSampleTime > 0) {
+    text("TAKING SAMPLE ...", -18, 6);
+  } else if (state.purgingTime > 0 && state.purgingTime < 1) {
+    text("PURGING ...", -11, 6);
+  } else {
+    text("READY FOR SAMPLE", -20, 6);
+  }
+  pop();
+}
+
+function drawTable() {
+  push();
+  fill(100);
+  stroke(0);
+  strokeWeight(0.1);
+  rectMode(CENTER);
+  rect(width - 17.5, height / 2 + 20.25, 34, 2, 0.5);
+  fill("rgb(200, 180, 160)");
+  stroke("rgb(180, 160, 120)");
+  rectMode(CORNER);
+  rect(width - 32, height / 2 + 21.4, 2, 35);
+  rect(width - 5, height / 2 + 21.4, 2, 35);
+  rect()
   pop();
 }
 
@@ -615,6 +1011,7 @@ export function drawAll() {
       if (tank.valvePosition >= 1) {
         tank.valvePosition = 1;
         tank.isTurningOn = false;
+        state.doCalc = true;
       }
     }
     if (tank.isTurningOff) {
@@ -622,17 +1019,51 @@ export function drawAll() {
       if (tank.valvePosition <= 0) {
         tank.valvePosition = 0;
         tank.isTurningOff = false;
+        state.doCalc = true;
       }
     }
     if (tank.valvePosition >= 1) {
       tank.m = tank.mSetPoint;
+      if (state.doCalc) {
+        calcAll();
+        state.doCalc = false;
+      }
     } else {
       tank.m = 0;
+      if (state.doCalc) {
+        calcAll();
+        state.doCalc = false;
+      }
     }
   });
+  if (state.tanks.h2.m > 0 || state.tanks.n2.m > 0 || state.tanks.nh3.m > 0) {
+    if (state.purge_position === 0) {
+      state.purging = false;
+      state.takingSample = true;
+    }
+  } else {
+    state.outlet.yH2 = 0;
+    state.outlet.yN2 = 0;
+    state.outlet.yNH3 = 0;
+  }
+  if (state.tanks.he.valvePosition > 0 && state.purge_position === 1) {
+    state.purging = true;
+    state.takingSample = false;
+  }
+  if (state.takingSample) {
+    state.takingSampleTime = min(1, state.takingSampleTime + 0.005);
+    state.purgingTime = 0;
+  } else {
+    state.takingSampleTime = 0;
+  }
+  if (state.purging) {
+    state.purgingTime = min(1, state.purgingTime + 0.0025);
+  }
   drawTanks();
   drawHeTank(98, height / 2 - 3, tankWidth, tankHeight, state.tanks.he);
   drawOutletTubes();
   drawReactor();
   drawGC();
+  drawComputer();
+  drawTable();
 }
