@@ -97,8 +97,9 @@ window.mousePressed = function() {
     }
   }
 
-  handlePressures();
+  // handlePressures();
   handlePurge();
+  handlePressureController();
 }
 
 function handlePurge() {
@@ -158,6 +159,25 @@ function handlePressures() {
     document.getElementById("h2-pressure").style.display = "none";
     document.getElementById("n2-pressure").style.display = "none";
     document.getElementById("nh3-pressure").style.display = "grid";
+  }
+}
+
+function handlePressureController() {
+  const hover_coords = [
+    [81.5, 83.5],
+    [84.75, 86.75],
+    [49, 50.75]
+  ];
+
+  const clicked_on_decrease_pressure = mX > hover_coords[0][0] && mX < hover_coords[0][1] && mY > hover_coords[2][0] && mY < hover_coords[2][1];
+  const clicked_on_increase_pressure = mX > hover_coords[1][0] && mX < hover_coords[1][1] && mY > hover_coords[2][0] && mY < hover_coords[2][1];
+  if (clicked_on_decrease_pressure && !state.takingSample) {
+    state.PSetPoint = max(0, state.PSetPoint - 0.1);
+    calcAll();
+  }
+  if (clicked_on_increase_pressure && !state.takingSample) {
+    state.PSetPoint = min(state.maxP, state.PSetPoint + 0.1);
+    calcAll();
   }
 }
 
