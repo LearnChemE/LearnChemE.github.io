@@ -48,11 +48,15 @@ window.mousePressed = function() {
 
     if (T_controller_coords[0][0] < mX && mX < T_controller_coords[0][1] && T_controller_coords[2][0] < mY && mY < T_controller_coords[2][1]) {
       state.T = max(state.minT, state.T - 1);
+      state.hasAdjustedTemperature = true;
+      window.localStorage.setItem("hasAdjustedTemperature", "true");
       calcAll();
     }
 
     if (T_controller_coords[1][0] < mX && mX < T_controller_coords[1][1] && T_controller_coords[2][0] < mY && mY < T_controller_coords[2][1]) {
       state.T = min(state.maxT, state.T + 1);
+      state.hasAdjustedTemperature = true;
+      window.localStorage.setItem("hasAdjustedTemperature", "true");
       calcAll();
     }
 
@@ -110,8 +114,9 @@ function handlePurge() {
 
   const clicked_on_valve = mX > knob_coords[0][0] && mX < knob_coords[0][1] && mY > knob_coords[1][0] && mY < knob_coords[1][1];
   const not_mid_purge_or_sample = (state.purgingTime === 0 || state.purgingTime === 1) && (state.takingSampleTime === 0 || state.takingSampleTime === 1);
+  const all_tanks_open = state.tanks.h2.valvePosition === 1 && state.tanks.n2.valvePosition === 1 && state.tanks.nh3.valvePosition === 1 && state.tanks.he.valvePosition === 1;
 
-  if (clicked_on_valve && not_mid_purge_or_sample) {
+  if (clicked_on_valve && not_mid_purge_or_sample && all_tanks_open && state.reaction_time >= 1) {
     state.purge_position === 0 ? state.purge_position = 1 : state.purge_position === 1 ? state.purge_position = 2 : state.purge_position = 0;
     if (state.purge_position === 1) {
       if (state.tanks.he.valvePosition === 1) {
@@ -173,10 +178,14 @@ function handlePressureController() {
   const clicked_on_increase_pressure = mX > hover_coords[1][0] && mX < hover_coords[1][1] && mY > hover_coords[2][0] && mY < hover_coords[2][1];
   if (clicked_on_decrease_pressure && !state.takingSample) {
     state.PSetPoint = max(0, state.PSetPoint - 0.1);
+    state.hasAdjustedPressure = true;
+    window.localStorage.setItem("hasAdjustedPressure", "true");
     calcAll();
   }
   if (clicked_on_increase_pressure && !state.takingSample) {
     state.PSetPoint = min(state.maxP, state.PSetPoint + 0.1);
+    state.hasAdjustedPressure = true;
+    window.localStorage.setItem("hasAdjustedPressure", "true");
     calcAll();
   }
 }

@@ -1168,6 +1168,30 @@ function drawTable() {
   pop();
 }
 
+function drawInstructionText() {
+  push();
+  translate(width - 35, 10);
+  fill(0);
+  textSize(3);
+  textAlign(CENTER, TOP);
+  if (state.tanks.h2.valvePosition === 0 || state.tanks.n2.valvePosition === 0 || state.tanks.nh3.valvePosition === 0 || state.tanks.he.valvePosition === 0) {
+    text("At least one gas tank is closed.\nOpen the tanks to begin taking measurements.", 0, 0);
+  } else if (state.tanks.h2.m === 0 && state.tanks.n2.m === 0 && state.tanks.nh3.m === 0) {
+    text("No gas is flowing through the reactor.\nSet the mass flow rates using the controllers.", 0, 0);
+  } else if (state.purge_position === 2 && (!state.hasAdjustedPressure || !state.hasAdjustedTemperature)) {
+    text("Adjust pressure using the pressure controller\nand temperature on the sand bath.", 0, 0);
+  } else if (state.purge_position == 2 && state.reaction_time < 1) {
+    text("System is reaching equilibrium ... please wait", 0, 0);
+  } else if (state.purge_position === 2) {
+    text("Ready to take sample. Click the three-way valve\nto take a sample, or adjust reaction conditions\nfor a new trial.", 0, 0);
+  } else if (state.purge_position === 0 && state.takingSampleTime >= 1) {
+    text("Sample has been taken. Purge the GC\nby clicking the three-way valve when ready.", 0, 0);
+  } else if (state.purge_position === 1 && state.purgingTime >= 1) {
+    text("GC has been purged. Click the three-way valve\nto set new reaction conditions.", 0, 0);
+  }
+  pop();
+}
+
 export function drawAll() {
   let maxPressure = 0;
   [state.tanks.h2, state.tanks.n2, state.tanks.nh3, state.tanks.he].forEach((tank) => {
@@ -1227,6 +1251,8 @@ export function drawAll() {
   if (state.purging) {
     state.purgingTime = min(1, state.purgingTime + 0.0025);
   }
+  state.reaction_time += state.purging ? 1 : state.takingSample ? 1 : 0.002;
+  state.reaction_time = min(state.reaction_time, 1);
   state.P = min(state.PSetPoint, maxPressure);
   drawTanks();
   drawHeTank(98, height / 2 - 3, tankWidth, tankHeight, state.tanks.he);
@@ -1235,4 +1261,5 @@ export function drawAll() {
   drawGC();
   drawComputer();
   drawTable();
+  drawInstructionText();
 }

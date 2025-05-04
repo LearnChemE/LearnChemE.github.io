@@ -21,6 +21,8 @@ window.state = {
   minT: 298,
   maxT: 1023,
   doCalc: false,
+  hasAdjustedPressure: window.localStorage.getItem("hasAdjustedPressure") === "true",
+  hasAdjustedTemperature: window.localStorage.getItem("hasAdjustedTemperature") === "true",
 };
 
 const containerElement = document.getElementById("p5-container");

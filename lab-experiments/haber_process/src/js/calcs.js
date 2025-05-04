@@ -7,8 +7,10 @@ export function setDefaults() {
     maxP: 15,
     purging: false,
     purgingTime: 0,
+    purge_position: 2,
     takingSample: false,
     takingSampleTime: 0,
+    reaction_time: 0,
     tanks: {
       maxP: 15,
       h2: {
@@ -64,6 +66,8 @@ export function setDefaults() {
 }
 
 export function calcAll() {
+  state.reaction_time = 0;
+
   // Much credit to ChatGPT and GitHub Copilot for the code in this file.
   // The code is a numerical solution to the equilibrium constant of the Haber process.
   // The solution from ChatGPT was far from perfect, but it was a good starting point.
