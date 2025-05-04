@@ -1,8 +1,7 @@
 {
   "dependencies": {
     "eslint": "^9.13.0",
-    "live-server": "^1.2.2",
-    "prettier": "^3.3.3"
+    "live-server": "^1.2.2"
   },
   "name": "learncheme.github.io",
   "version": "1.0.0",
@@ -12,6 +11,17 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "author": "Neil Hendren",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "3.5.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/learncheme/learncheme.github.io.git"
+  },
+  "bugs": {
+    "url": "https://github.com/learncheme/learncheme.github.io/issues"
+  },
+  "homepage": "https://github.com/learncheme/learncheme.github.io#readme"
 }
