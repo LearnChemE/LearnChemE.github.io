@@ -161,10 +161,10 @@ function drawPressureRegulator(x, y) {
   textAlign(CENTER, CENTER);
   textSize(2.25);
   textFont(state.meterFont);
-  const P = (round(state.P * 10) / 10).toFixed(1);
+  const P = round(state.P).toFixed(0);
   text(P, 0.875, -2.375);
   textSize(1.75);
-  const P_sp = (round(state.PSetPoint * 10) / 10).toFixed(1);
+  const P_sp = round(state.PSetPoint).toFixed(0);
   text(P_sp, 1, 0.125);
   const hover_coords = [
     [81.5, 83.5],
@@ -175,7 +175,7 @@ function drawPressureRegulator(x, y) {
   if (hover_coords[0][0] < mX && mX < hover_coords[0][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
     fill(120);
     if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 5 === 0 && state.purge_position !== 0) {
-      state.PSetPoint = max(1, state.PSetPoint - 0.1);
+      state.PSetPoint = max(1, state.PSetPoint - 1);
       calcAll();
     }
   }
@@ -185,7 +185,7 @@ function drawPressureRegulator(x, y) {
   if (hover_coords[1][0] < mX && mX < hover_coords[1][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
     fill(120);
     if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 5 === 0 && state.purge_position !== 0) {
-      state.PSetPoint = min(state.maxP, state.PSetPoint + 0.1);
+      state.PSetPoint = min(state.maxP, state.PSetPoint + 1);
       calcAll();
     }
   }
@@ -1174,8 +1174,8 @@ function drawInstructionText() {
   fill(0);
   textSize(3);
   textAlign(CENTER, TOP);
-  if (state.tanks.h2.valvePosition === 0 || state.tanks.n2.valvePosition === 0 || state.tanks.nh3.valvePosition === 0 || state.tanks.he.valvePosition === 0) {
-    text("At least one gas tank is closed.\nOpen the tanks to begin taking measurements.", 0, 0);
+  if (state.tanks.he.valvePosition === 0 || (state.tanks.n2.valvePosition === 0 && state.tanks.nh3.valvePosition === 0 && state.tanks.h2.valvePosition === 0)) {
+    text("All reactant tanks or the helium tank is closed.\nOpen the helium tank and at least one\nreactant tank to begin taking measurements.", 0, 0);
   } else if (state.tanks.h2.m === 0 && state.tanks.n2.m === 0 && state.tanks.nh3.m === 0) {
     text("No gas is flowing through the reactor.\nSet the mass flow rates using the controllers.", 0, 0);
   } else if (state.purge_position === 2 && (!state.hasAdjustedPressure || !state.hasAdjustedTemperature)) {
