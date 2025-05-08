@@ -7,7 +7,7 @@ const mainWidth = 1280;
 const mainHeight = 720;
 // Declare global variables which are available to all files
 window.z = {
-  
+
 
   //graph and window variables
   width: mainWidth,
@@ -21,9 +21,9 @@ window.z = {
   molesInerts: 0.0000000001,
   gasConst: 0.00008314,
   temp: 900,
-  totalMoles: 0, 
+  totalMoles: 0,
   initialA: 5,
-  coeffBValue: 2, 
+  coeffBValue: 2,
   result1: 0,
   c: 0,
   equilA: 0,
@@ -31,18 +31,18 @@ window.z = {
   extentCP: 0,
   extentCV: 0,
   kEQ: 0.5,
-  
+
   //3D cylinder parameters
   cylRadius: 100,
   cylHeight: 300,
 
   molACP: 3.0,
   molBCP: 4.1,
-  
+
 
   molACV: 3.1,
   molBCV: 3.9,
-  
+
 
 }
 

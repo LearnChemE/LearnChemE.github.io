@@ -21,7 +21,7 @@ let meter3Image;
 let font;
 
 //preload for loading images and fonts
-window.preload = function () {
+window.preload = function() {
   font = loadFont('./assets/NotoSans-Regular.ttf');
   meter3Image = loadImage('/assets/imageMeterCubed.jpg');
 }
@@ -43,7 +43,7 @@ function resize() {
 
 // Moved outside of the selection block - Do not call setup() more than once.
 // So this should never be inside a conditional statement.
-window.setup = function () {
+window.setup = function() {
 
   createCanvas(p5container.offsetWidth, p5container.offsetHeight, WEBGL).parent(p5container);
   frameRate(60);
@@ -53,7 +53,7 @@ window.setup = function () {
 
 // Same with draw() - this should never be inside a conditional statement.
 // Put the conditional statements inside the draw function.
-window.draw = function () {
+window.draw = function() {
   // The "window" keyword is used to set global variables. So you can use
   // "selection" in any file, function, block, etc.
   window.selection = selectionElement.value;
@@ -66,8 +66,7 @@ window.draw = function () {
   const coeffB = document.querySelector('input[name="plot"]:checked');
   if (coeffB && coeffB.value != 1) {
     document.getElementById("equilibrium-text").textContent = `A ⇋ ${coeffB.value}B`;
-  }
-  else if (coeffB && coeffB.value == 1) {
+  } else if (coeffB && coeffB.value == 1) {
 
     document.getElementById("equilibrium-text").textContent = `A ⇋ B`;
 
@@ -146,7 +145,7 @@ function draw3DCP() {
   push();
 
   ortho();
-  rotateX(PI/64); 
+  rotateX(PI / 64);
 
   translate(-350, 0);
   rotateX(angleX);
@@ -274,8 +273,7 @@ function drawTextCP() {
     tint(255, 242);
     image(meter3Image, -13, -316);
 
-  }
-  else if (z.volumeCP >= 10) {
+  } else if (z.volumeCP >= 10) {
 
     image(meter3Image, 0, -316);
 
@@ -346,7 +344,7 @@ function draw3DCV() {
   push();
 
   ortho();
-  rotateX(PI/64);
+  rotateX(PI / 64);
 
   translate(-350, 0);
   rotateX(angleX);
@@ -410,6 +408,7 @@ function draw2DCV() {
   }
 
 }
+
 function drawTextCV() {
 
   for (let i = 310; i > -221; i -= 530 / 7) {
@@ -440,8 +439,7 @@ function drawTextCV() {
     tint(255, 242);
     image(meter3Image, -13, -316);
 
-  }
-  else if (z.volumeCV >= 10) {
+  } else if (z.volumeCV >= 10) {
 
     image(meter3Image, 0, -316);
 
