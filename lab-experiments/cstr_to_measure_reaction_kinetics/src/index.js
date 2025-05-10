@@ -1,61 +1,42 @@
 import "bootstrap";
 import "p5";
 import "./style/style.scss";
-// import "./assets/font_here.ttf";
-import "./assets/cstr_to_measure_reaction_kinetics.pdf";
-import { drawAll } from "./js/draw";
-import { handleInputs } from "./js/inputs";
-import { calcAll, setDefaults } from "./js/calcs";
-import { importGraphic } from "./js/graphic"
+import { setupCanvas, drawSimulation } from "./js/graphics";
 
-// GLOBAL VARIABLES OBJECT
+// Global state object
 window.state = {
   frameRate: 60,
   pixelDensity: 4,
-  showButtons: false,
   hamburgerHasBeenClicked: window.localStorage.getItem("hamburgerHasBeenClicked") === "true",
-  canvasSize: [150, 120],
-  motorOn: false,
+  canvasSize: [1400, 1000],
+  scale: 1
 };
 
 const containerElement = document.getElementById("p5-container");
 
-// window.preload = () => {
-//   state.customFont = loadFont("assets/font_here.ttf");
-// }
-
 window.setup = function() {
-  importGraphic(containerElement);
-  sizeContainer();
-  createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
-  handleInputs();
-  setDefaults();
-  calcAll();
-  pixelDensity(state.pixelDensity);
-  frameRate(state.frameRate);
+  setupCanvas(containerElement);
+  windowResized();
 };
 
 window.draw = function() {
-  window.width = state.canvasSize[0];
-  window.height = state.canvasSize[1];
+  const width = state.canvasSize[0];
+  const height = state.canvasSize[1];
+  window.width = width;
+  window.height = height;
   window.mX = mouseX / relativeSize();
   window.mY = mouseY / relativeSize();
   scale(relativeSize());
-  background(255);
-  drawAll();
+  console.log(relativeSize());
+  drawSimulation(width, height);
 };
 
 window.windowResized = () => {
-  resizeCanvas(containerElement.offsetWidth, containerElement.offsetHeight);
+  const width = containerElement.offsetWidth;
+  const height = containerElement.offsetHeight;
+  resizeCanvas(width, height);
 }
 
-window.relativeSize = () => containerElement.offsetWidth / 150;
-
-function sizeContainer() {
-  containerElement.style.width = `calc(100vw - 10px)`;
-  containerElement.style.maxWidth = `calc(calc(100vh - 10px) * ${state.canvasSize[0]} / ${state.canvasSize[1]})`;
-  containerElement.style.height = `calc(calc(100vw - 10px) * ${state.canvasSize[1]} / ${state.canvasSize[0]})`;
-  containerElement.style.maxHeight = `calc(100vh - 10px)`;
+window.relativeSize = () => {
+  return containerElement.offsetWidth / state.canvasSize[0];
 }
-
-require("./js/events.js");
