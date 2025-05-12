@@ -24,15 +24,15 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="0.43138268"
-     inkscape:cx="541.28274"
-     inkscape:cy="613.14469"
+     inkscape:zoom="1.7492989"
+     inkscape:cx="888.07006"
+     inkscape:cy="375.2932"
      inkscape:window-width="1512"
      inkscape:window-height="916"
      inkscape:window-x="0"
      inkscape:window-y="38"
      inkscape:window-maximized="0"
-     inkscape:current-layer="inlet-temperature-readout" />
+     inkscape:current-layer="rotameter-2-text" />
   <defs
      id="defs1">
     <linearGradient
@@ -1235,7 +1235,7 @@
         </g>
       </g>
       <g
-         id="inlet-temperature-readout-group"
+         id="g16"
          transform="rotate(-90,166.5,200.5)">
         <g
            id="inlet-temperature-readout"
@@ -1280,17 +1280,6 @@
                  x="-13.964409"
                  y="163.28149">°C</tspan></text>
           </g>
-          <text
-             xml:space="preserve"
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.87778px;line-height:1.1;font-family:Digital-7;-inkscape-font-specification:Digital-7;text-align:center;text-anchor:middle;fill:#ffff00;fill-opacity:1;stroke-width:0.349999"
-             x="122.3924"
-             y="28.869024"
-             id="text1"><tspan
-               sodipodi:role="line"
-               id="inlet-temperature-text"
-               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.87778px;font-family:Digital-7;-inkscape-font-specification:Digital-7;fill:#ffff00;fill-opacity:1;stroke-width:0.35"
-               x="122.3924"
-               y="28.869024">22.0</tspan></text>
         </g>
         <rect
            style="fill:#b49632;fill-opacity:1;stroke:#000000;stroke-width:0.0380265;stroke-dasharray:none;stroke-opacity:1"

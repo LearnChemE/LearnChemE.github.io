@@ -13,16 +13,16 @@ function handleSliders() {
     const value = parseFloat(e.target.value);
     const frac = value ** 0.6;
     state.inletPressure = map(frac, 0, 1, 1, state.maxP);
-    compressedAirValvePositionValue.innerHTML = (round(value * 100) / 100).toFixed(2);
+    compressedAirValvePositionValue.innerHTML = `${(round(value * 100)).toFixed(0)}% open`;
     calcAll();
   });
 
   const vortexTubePortPositionSlider = document.getElementById("vortex-port-slider");
-  const vortexTubePortPositionValue = document.getElementById("vortex-port-value");
+  // const vortexTubePortPositionValue = document.getElementById("vortex-port-value");
   vortexTubePortPositionSlider.addEventListener("input", (e) => {
     const value = parseFloat(e.target.value);
     state.vortexPortPosition = 0.1 + 0.9 * value;
-    vortexTubePortPositionValue.innerHTML = `${round(10 + value * 90)}% open`;
+    // vortexTubePortPositionValue.innerHTML = `${round(10 + value * 90)}% open`;
     calcAll();
   });
 }

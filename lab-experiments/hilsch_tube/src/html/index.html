@@ -20,6 +20,13 @@
 
     gtag('config', 'UA-204988035-3');
   </script>
+  <style>
+    @font-face {
+      font-family: "Digital-7";
+      src: url("./assets/digital-7.ttf") format("truetype");
+      font-weight: normal;
+    }
+  </style>
 </head>
 
 <body>
@@ -28,14 +35,18 @@
       <div id="svg-container"></div>
       <div id="sliders-container">
         <div class="slider-container">
-          <div class="slider-label">compressed air valve position</div>
+          <div class="slider-label">inlet air valve</div>
           <input type="range" id="compressed-air-valve-slider" min="0" max="1" step="0.01" value="0">
-          <div class="slider-value" id="compressed-air-valve-value">0.00</div>
+          <div class="slider-value" id="compressed-air-valve-value">0% open</div>
         </div>
         <div class="slider-container">
-          <div class="slider-label">vortex tube port position</div>
-          <input type="range" id="vortex-port-slider" min="0" max="1" step="0.01" value="0.5">
-          <div class="slider-value" id="vortex-port-value">50% open</div>
+          <div class="slider-label">hot/cold flow split</div>
+          <div class="slider-with-labels">
+            <div class="under-slider-label left">cold</div>
+            <input type="range" id="vortex-port-slider" min="0" max="1" step="0.01" value="0.5">
+            <div class="under-slider-label right">hot</div>
+          </div>
+          <!-- <div class="slider-value" id="vortex-port-value">50% open</div> -->
         </div>
       </div>
       <div id="hamburger">

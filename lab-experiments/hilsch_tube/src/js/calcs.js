@@ -20,7 +20,7 @@ function calcOutletPressureAndFlowRate() {
   calculateTemperatures();
   const nIn = molesIn();
   const nOut = nIn * coldStreamFraction;
-  const Pout = state.inletPressure * (nOut / nIn) ** 0.85 || 1;
+  const Pout = 1 + state.inletPressure * (nOut / (6 * nIn)) ** 0.85 || 1;
   state.outletPressure = Pout;
   const R = 8.314;
   const T = state.coldSideTemperature + 273.15;

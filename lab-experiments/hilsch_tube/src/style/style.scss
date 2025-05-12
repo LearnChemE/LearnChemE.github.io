@@ -4,17 +4,11 @@ $modal-lg: 820px;
 $modal-xl: 1140px;
 @import "bootstrap";
 @import "./slider.scss"; // Keeping slider styling in place if needed for other inputs
-@font-face {
-  font-family: "Digital 7";
-  src: url("../assets/digital-7.ttf") format("truetype");
-  font-weight: normal;
-}
-
 body {
-  --slider-label-width: 200px;
-  --slider-width: 150px;
-  --slider-value-width: 80px;
-  --slider-font-size: 1rem;
+  --slider-label-width: 105px;
+  --slider-width: 160px;
+  --slider-value-width: 70px;
+  --slider-font-size: 0.75rem;
 }
 
 #graphics-container {
@@ -26,6 +20,28 @@ body {
   border-radius: 5px;
   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
   width: min-content;
+}
+
+#vortex-port-slider {
+  background: linear-gradient(to right, #2222ff, #ff2222);
+}
+
+.slider-with-labels {
+  position: relative;
+}
+
+.under-slider-label {
+  position: absolute;
+  bottom: -15px;
+  font-size: calc(0.8 * var(--slider-font-size));
+}
+
+.under-slider-label.right {
+  right: 0px;
+}
+
+.under-slider-label.left {
+  left: 0px;
 }
 
 #p5-container {
@@ -150,46 +166,37 @@ canvas {
   pointer-events: none;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (min-width: 600px) and (min-height: 450px) {
   body {
-    --slider-label-width: 170px;
-    --slider-width: 100px;
-    --slider-value-width: 60px;
-    --slider-font-size: 0.75rem;
-  }
-}
-
-@media screen and (min-width: 600px) and (max-width: 800px) {
-  body {
-    --slider-label-width: 200px;
-    --slider-width: 120px;
-    --slider-value-width: 70px;
+    --slider-label-width: 120px;
+    --slider-width: 190px;
+    --slider-value-width: 80px;
     --slider-font-size: 0.9rem;
   }
 }
 
-@media screen and (min-width: 800px) and (max-width: 1080px) {
+@media screen and (min-width: 800px) and (min-height: 600px) {
   body {
-    --slider-label-width: 200px;
-    --slider-width: 150px;
-    --slider-value-width: 70px;
+    --slider-label-width: 130px;
+    --slider-width: 250px;
+    --slider-value-width: 80px;
     --slider-font-size: 0.9rem;
   }
 }
 
-@media screen and (min-width: 1080px) {
+@media screen and (min-width: 1080px) and (min-height: 810px) {
   body {
-    --slider-label-width: 220px;
-    --slider-width: 180px;
-    --slider-value-width: 90px;
+    --slider-label-width: 155px;
+    --slider-width: 300px;
+    --slider-value-width: 100px;
     --slider-font-size: 1rem;
   }
 }
 
-@media screen and (min-width: 1320px) {
+@media screen and (min-width: 1320px) and (min-height: 990px) {
   body {
-    --slider-label-width: 255px;
-    --slider-width: 250px;
+    --slider-label-width: 155px;
+    --slider-width: 400px;
     --slider-value-width: 100px;
     --slider-font-size: 1.2rem;
   }
