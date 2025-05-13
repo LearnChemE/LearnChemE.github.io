@@ -145,7 +145,6 @@ export function createDigitalPressureGauge(draw, x, y, pressure = "--- bar") {
 
   group.text(`${totalPressure}`)
     .font({ family: 'monospace', size: fontSize, anchor: 'middle', weight: 'bold' })
-    .fill('#ff0000')
     .center(x, y);
 
   // Bottom Connector

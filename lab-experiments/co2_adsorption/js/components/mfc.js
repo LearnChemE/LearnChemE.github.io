@@ -89,46 +89,33 @@ export function createMassFlowController(draw, x, y) {
         .fill('#000')
         .center(x + topWidth / 2, y + topHeight + bottomHeight + 15);
 
-    // Add click handler
-    group.on('click', () => {
-        showMFCZoomedView(); // Call UI function
-    });
-
-    writeTextAtPosition(380, 95, "mg/min");
+    
+        group.text("mg/min")
+        .font({ family: 'Arial', size: 12, anchor: 'middle', weight: 'bold' })
+        .fill('#000')
+        .center(x + topWidth / 2, y + topHeight + bottomHeight - 10);
 
     return group;
 }
 
-// --- Related Logic ---
-export function updateMFCFlowSpeed(draw, value) {
-    state.setMfcFlowSpeed(value);
-    
-    // Update the MFC value text in the small MFC component
-    const mfcValue = state.getMfcValue();
-    const mfcElements = document.querySelectorAll('.mfc-value-text');
-    mfcElements.forEach(element => {
-        element.textContent = mfcValue.toFixed(1);
-    });
-    
-    // Re-animate any active MFC-controlled flows with the new speed
-    // This requires iterating through existing flow paths and restarting their animation
-    const activeFlows = state.getAllFlowPaths();
-    Object.keys(activeFlows).forEach(segmentId => {
-        const path = activeFlows[segmentId];
-        if (path && path.isMFCControlled) {
-            // Get original properties
-            const color = path.flowColor;
-            const opacity = path.flowOpacity;
-            // Remove old path
-            state.removeFlowPath(segmentId);
-            // Re-animate with new speed
-            // Need animateGasFlow function here or pass it in
-            // For simplicity, let's assume animateGasFlow is available via import
-             import('../pipes.js').then(pipesModule => {
-                 pipesModule.animateGasFlow(draw, segmentId, color, opacity, null, true);
-             });
-        }
-    });
-     // Optional: Immediately check if flow should restart based on new MFC value/speed
-     checkAndStartMFCFlow(draw);
+export function mfcClicked(draw, x, y) {
+
+    const topWidth = 60;
+    const topHeight = 80;
+    const bottomHeight = 20;
+    const clickArea = draw.rect(
+        topWidth,
+        topHeight + bottomHeight + 30   // 30px extra to cover your label
+    )
+    .fill({ opacity: 0})               // truly invisible
+    .move(x, y)                         // same origin as the rest
+    .attr({
+      'pointer-events': 'all',          // catch clicks even on gaps
+      cursor: 'pointer'                 // show hand cursor
+    })
+    .click(() => {
+      // your one‐and‐only handler:
+      showMFCZoomedView();
+    })
+    .front();
 }
