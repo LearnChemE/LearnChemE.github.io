@@ -19,7 +19,7 @@ let font;
 //preload for loading images and fonts
 window.preload = function () {
   font = loadFont("./assets/NotoSans-Regular.ttf");
-  meter3Image = loadImage("/assets/imageMeterCubed.jpg");
+  meter3Image = loadImage("./assets/imageMeterCubed.jpg");
 };
 
 // This function is used to scale the canvas based on the size of the container
@@ -184,9 +184,11 @@ function draw3DCylinderForConstPressureSelection() {
 
   //green gas volume
   push();
-  translate(0, z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2 + 0.5 * (z.cylHeight / 2 - (z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2)));
+  //translate(0, z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2 + 0.5 * (z.cylHeight / 2 - (z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2)));
   fill(0, 200, 0, 80);
-  cylinder(z.cylRadius - 1, -1 + (z.cylHeight / 2 - (z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2)), 64, 1);
+  //cylinder(z.cylRadius - 1, -1 + (z.cylHeight / 2 - (z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2)), 64, 1);
+  translate(0, z.cylHeight * z.cylinderLiveVolumeFractionConstantPressureCase );
+  cylinder(z.cylRadius - 1, -1 - z.cylHeight * z.cylinderLiveVolumeFractionConstantPressureCase, 64, 1);
 
   pop();
 
