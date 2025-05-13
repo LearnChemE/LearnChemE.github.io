@@ -1,6 +1,5 @@
 // js/uiInteractions.js
 import * as state from './state.js';
-import { updateMFCFlowSpeed } from './components/mfc.js'; // Import MFC logic
 
 // --- Gauge Input Popup ---
 export function showGaugeInput(screenX, screenY, gaugeId) {

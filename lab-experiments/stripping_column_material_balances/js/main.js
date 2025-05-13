@@ -123,7 +123,7 @@ function initTooltips() {
   .stroke({ color: '#000', width: 1 });
   tooltipText = moleFractionTooltip
   .text('')
-  .font({ size: 12, family: 'Arial' })
+  .font({ size: 16, family: 'Arial' })
   .fill('#000');
 }
 
@@ -131,7 +131,7 @@ function showTooltip(label, event) {
   // If this is a column stream label, show the computed comp.
   if (streamComp.hasOwnProperty(label)) {
     const compVal = streamComp[label];
-    tooltipText.clear().text(compVal.toFixed(3));
+    tooltipText.clear().text(compVal.toFixed(2) + " ppm");
     // redraw tooltip background
     setTimeout(() => {
       const bbox = tooltipText.bbox();
@@ -191,7 +191,8 @@ function drawCanvas() {
   drawTanks();
   drawTexts();
   gasImage = addSVGImage('./assets/gasFlowRateDevice.svg', 700, 247.5, 800/3, 200);
-  gasFlowRateText = drawCenteredText(800, 290, "0 mol/s", 20, 'red', 'Arial', 'red', 1);
+  gasFlowRateText = drawCenteredText(805, 295, "0 mol/s", 17, 'black', 'Arial', 'black', 0.4);
+  drawCenteredText(795, 377, "gas flow rate", 12, 'white', 'Arial', 'white', 0.7)
   addOptionToDragAndZoom();
   
   // Set layering: pipes at bottom, water in middle, UI on top.
@@ -207,7 +208,7 @@ function drawTanks() {
   drawBracket(475, canvasHeight, 125, 125, 10, 20, 1000);
   extractLiquidElement = drawLiquidRectangle(475, canvasHeight, 125, 10, 0, '#c1c1ff', 0.7);
   pipeGroup.add(extractLiquidElement);
-  drawGasCylinder(650, canvasHeight - mainCylHeight, "Feed Tank");
+  drawGasCylinder(650, canvasHeight - mainCylHeight, "feed tank");
 }
 
 function drawBracket(startX, startY, width, height, surfaceWidth, holderLength, maxVolume, liquidColor = '#c1c1ff', liquidColorOpacity = 0.7) {
@@ -423,45 +424,92 @@ function drawTap(valveCenterX, valveCenterY, radius, opacity = 1) {
 }
 
 function drawTexts() {
-  
+  const offsetX = 10;
   let startX = 310;
   let startY = 450;
-  
+
   // Number labels
-  drawCenteredText(startX - 55 + 179.5 - 5 + 65, startY - 320, "1", 20);
-  drawCenteredText(startX - 55 + 179.5 - 5 + 65, startY - 210, "2", 20);
-  drawCenteredText(startX - 55 + 179.5 - 5 + 65, startY - 100, "3", 20);
-  
-  // Left column stream labels with tooltip events
-  let textF = drawCenteredText(startX - 55 + 179.5 - 5, startY - 375, "X0", 16);
+  drawCenteredText(startX - 55 + 179.5 - 5 + 65 + offsetX, startY - 320, "1", 20);
+  drawCenteredText(startX - 55 + 179.5 - 5 + 65 + offsetX, startY - 210, "2", 20);
+  drawCenteredText(startX - 55 + 179.5 - 5 + 65 + offsetX, startY - 100, "3", 20);
+
+  // X0
+  let textF = draw.text(function(add) {
+    add.plain("x");
+    add.tspan("0").attr({ dy: 4, 'font-size': 12 });
+  }).move(startX - 55 + 179.5 - 5 + offsetX, startY - 375)
+    .font({ family: 'Arial', size: 16, anchor: 'middle' });
+  uiGroup.add(textF);
   textF.on('mouseover', (event) => showTooltip("X0", event));
   textF.on('mouseout', hideTooltip);
-  
-  let textR1 = drawCenteredText(startX - 55 + 179.5 - 5, startY - 270, "X1", 16);
+
+  // X1
+  let textR1 = draw.text(function(add) {
+    add.plain("x");
+    add.tspan("1").attr({ dy: 4, 'font-size': 12 });
+  }).move(startX - 55 + 179.5 - 5 + offsetX, startY - 270)
+    .font({ family: 'Arial', size: 16, anchor: 'middle' });
+  uiGroup.add(textR1);
   textR1.on('mouseover', (event) => showTooltip("X1", event));
   textR1.on('mouseout', hideTooltip);
-  
-  let textR2 = drawCenteredText(startX - 55 + 179.5 - 5, startY - 160, "X2", 16);
+
+  // X2
+  let textR2 = draw.text(function(add) {
+    add.plain("x");
+    add.tspan("2").attr({ dy: 4, 'font-size': 12 });
+  }).move(startX - 55 + 179.5 - 5 + offsetX, startY - 160)
+    .font({ family: 'Arial', size: 16, anchor: 'middle' });
+  uiGroup.add(textR2);
   textR2.on('mouseover', (event) => showTooltip("X2", event));
   textR2.on('mouseout', hideTooltip);
-  
-  let textR3 = drawCenteredText(startX - 55 + 179.5 - 5, startY - 50, "X3", 16);
+
+  // X3
+  let textR3 = draw.text(function(add) {
+    add.plain("x");
+    add.tspan("3").attr({ dy: 4, 'font-size': 12 });
+  }).move(startX - 55 + 179.5 - 5 + offsetX, startY - 50)
+    .font({ family: 'Arial', size: 16, anchor: 'middle' });
+  uiGroup.add(textR3);
   textR3.on('mouseover', (event) => showTooltip("X3", event));
   textR3.on('mouseout', hideTooltip);
-  
-  let textE1 = drawCenteredText(startX - 55 + 179.5 - 5 + 120, startY - 375, "Y1", 16);
+
+  // Y1
+  let textE1 = draw.text(function(add) {
+    add.plain("y");
+    add.tspan("1").attr({ dy: 4, 'font-size': 12 });
+  }).move(startX - 55 + 179.5 - 5 + 120 + offsetX, startY - 375)
+    .font({ family: 'Arial', size: 16, anchor: 'middle' });
+  uiGroup.add(textE1);
   textE1.on('mouseover', (event) => showTooltip("Y1", event));
   textE1.on('mouseout', hideTooltip);
-  
-  let textE2 = drawCenteredText(startX - 55 + 179.5 - 5 + 120, startY - 270, "Y2", 16);
+
+  // Y2
+  let textE2 = draw.text(function(add) {
+    add.plain("y");
+    add.tspan("2").attr({ dy: 4, 'font-size': 12 });
+  }).move(startX - 55 + 179.5 - 5 + 120 + offsetX, startY - 270)
+    .font({ family: 'Arial', size: 16, anchor: 'middle' });
+  uiGroup.add(textE2);
   textE2.on('mouseover', (event) => showTooltip("Y2", event));
   textE2.on('mouseout', hideTooltip);
-  
-  let textE3 = drawCenteredText(startX - 55 + 179.5 - 5 + 120, startY - 160, "Y3", 16);
+
+  // Y3
+  let textE3 = draw.text(function(add) {
+    add.plain("y");
+    add.tspan("3").attr({ dy: 4, 'font-size': 12 });
+  }).move(startX - 55 + 179.5 - 5 + 120 + offsetX, startY - 160)
+    .font({ family: 'Arial', size: 16, anchor: 'middle' });
+  uiGroup.add(textE3);
   textE3.on('mouseover', (event) => showTooltip("Y3", event));
   textE3.on('mouseout', hideTooltip);
-  
-  let textS = drawCenteredText(startX - 55 + 179.5 - 5 + 120, startY - 50, "Y4", 16);
+
+  // Y4
+  let textS = draw.text(function(add) {
+    add.plain("y");
+    add.tspan("4").attr({ dy: 4, 'font-size': 12 });
+  }).move(startX - 55 + 179.5 - 5 + 120 + offsetX, startY - 50)
+    .font({ family: 'Arial', size: 16, anchor: 'middle' });
+  uiGroup.add(textS);
   textS.on('mouseover', (event) => showTooltip("Y4", event));
   textS.on('mouseout', hideTooltip);
 }

@@ -6,11 +6,12 @@ import { drawPipes, stopAllFlows } from './pipes.js';
 import { createGasCylinder } from './components/gasCylinder.js';
 import { createConnectedGauges, createDigitalPressureGauge } from './components/gauges.js';
 import { createVerticalValve, createInteractiveValve, createTValveFromImage } from './components/valves.js';
-import { createMassFlowController } from './components/mfc.js';
+import { createMassFlowController, mfcClicked } from './components/mfc.js';
 import { createVerticalAdsorptionBedView } from './components/adsorptionBed.js';
 import { createCO2GasAnalyzer } from './components/co2Analyzer.js';
 import { createVentArrow } from './components/ventArrow.js';
 import { stopMoleFractionCalculation, stopHeating } from './simulation.js';
+import { addOptionToDragAndZoom } from './zoom.js';
 
 // Function now accepts draw and pipeGroup (or assumes draw is global and recreates group)
 export function resetEverything(draw, pipeGroup) { // Keep parameters if main.js passes them
@@ -82,7 +83,6 @@ export function resetEverything(draw, pipeGroup) { // Keep parameters if main.js
     const gauge3X = config.tanksMarginX + 2 * (config.mainCylWidth + config.tanksGap) + config.mainCylWidth / 2 - config.connectedGaugeSize / 2 - 2.5;
     createConnectedGauges(draw, gauge3X, gaugeY, 'gauge3');
 
-    // Updated pvX calculations
     const pv1_x = config.tanksMarginX + config.mainCylWidth / 2 - config.verticalValveBlockWidth / 2 - 2.5;
     createVerticalValve(draw, pv1_x, pv_y, 'pressureValve1');
     const pv2_x = config.tanksMarginX + config.mainCylWidth + config.tanksGap + config.mainCylWidth / 2 - config.verticalValveBlockWidth / 2 - 2.5;
@@ -90,22 +90,22 @@ export function resetEverything(draw, pipeGroup) { // Keep parameters if main.js
     const pv3_x = config.tanksMarginX + 2 * (config.mainCylWidth + config.tanksGap) + config.mainCylWidth / 2 - config.verticalValveBlockWidth / 2 - 2.5;
     createVerticalValve(draw, pv3_x, pv_y, 'pressureValve3');
 
-    // Other components using updated constants
-    createInteractiveValve(draw, multiValveX, multiValveY, true); // Controller valve
+    createInteractiveValve(draw, multiValveX, multiValveY, true);
     createMassFlowController(draw, mfcX, mfcY);
+    mfcClicked(draw, mfcX, mfcY);
     createInteractiveValve(draw, outletValveX, outletValveY, false);
     createDigitalPressureGauge(draw, digPressureGaugeX, digPressureGaugeY, "--- bar");
     createVerticalAdsorptionBedView(draw, adsorptionBedX, adsorptionBedY);
     createInteractiveValve(draw, adsorptionOutletValveX, adsorptionOutletValveY, false, true);
-    createTValveFromImage(draw, tValveX, tValveY); // Using updated tValveX
+    createTValveFromImage(draw, tValveX, tValveY);
     createCO2GasAnalyzer(draw, co2AnalyzerX, co2AnalyzerY, "00.00%");
 
-    // Vent Arrows using updated base positions/offsets from main.js
     createVentArrow(draw, vent1BaseX + 5, vent1BaseY - 2, 270, 40);
     createVentArrow(draw, vent2BaseX, vent2BaseY, 0, 40);
 
     // 6. Draw Pipes LAST
     drawPipes(draw, newPipeGroup); // Pass the newly created group
+    addOptionToDragAndZoom(draw);
 
     console.log('System reset complete.');
 }
