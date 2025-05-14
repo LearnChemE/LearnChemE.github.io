@@ -336,4 +336,32 @@ h1 {
   flex: 1;
   max-width: 180px;
   margin: 0 0.5rem;
+  
+  -webkit-appearance: none;  /* Chrome/Safari/Opera */
+  -moz-appearance: none;     /* Firefox */
+  appearance: none;
+
+  height: 6px;
+  background: #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+.panel input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #2a72de;
+  border: 2px solid #888;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.panel input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #2a72de;
+  border: 2px solid #888;
+  border-radius: 50%;
+  cursor: pointer;
 }
