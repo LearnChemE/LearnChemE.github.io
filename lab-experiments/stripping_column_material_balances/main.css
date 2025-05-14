@@ -1,0 +1,162 @@
+/* main.css */
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100vh;
+    background-color: white;
+    width: 100%;
+    font-family: sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    margin-top: 10px;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none; 
+}
+
+.button-container {
+    display: flex;
+    margin-top: 10px;
+    justify-content: flex-start;
+}
+
+.button-container .btn {
+    margin-right: 10px;
+}
+
+.canvas-container {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+
+
+#svg-container {
+    overflow: hidden;
+    position: relative;
+    border: 2px solid #ccc;
+    margin: 20px auto;
+    padding: 10px;
+    width: calc(100vw - 40px);
+    height: calc(100vh - 40px);
+    max-width: calc((100vh - 40px) * 1000 / 600);
+    max-height: calc((100vw - 40px) * 600 / 1000);
+}
+
+#svg-container>svg {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    max-height: calc(100% - 20px);
+    max-width: calc(105%);
+    display: block;        /* remove inline-SVG whitespace */
+    overflow: hidden; 
+}
+
+/* main.css */
+.icon-container {
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; /* Distribute space between items */
+    align-items: flex-start; /* Align items to the top */
+    gap: 10px; /* Space between icons (optional) */
+    position: relative;
+    z-index: 1001; /* Higher than SVG canvas */
+    pointer-events: auto;
+}
+
+.hamburger-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align items to the left */
+    position: relative;
+    z-index: 1001; /* Higher than SVG canvas */
+    pointer-events: auto;
+}
+
+#hamburger-icon {
+    cursor: pointer;
+    display: flex;
+    align-items: center; /* Center the image vertically */
+    border: 2px solid #000; /* Add a border */
+    border-radius: 8px; /* Add corner radius */
+    background-color: lightblue; /* Fill with light blue color */
+    padding: 8px; /* Add some padding for better spacing */
+    position: relative;
+    z-index: 1001; /* Higher than SVG canvas */
+    pointer-events: auto;
+}
+
+#reset-button {
+    position: relative;
+    z-index: 1001; /* Higher than SVG canvas */
+    pointer-events: auto;
+}
+
+.hamburger-img {
+    width: 24px; /* Set the desired width */
+    height: 24px; /* Set the desired height */
+    object-fit: contain; /* Ensure the image scales properly */
+}
+
+/* main.css */
+.canvas-container {
+    position: relative; /* Establish a stacking context */
+    z-index: 1; /* Default z-index for the canvas container */
+}
+
+.hamburger-menu {
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    gap: 10px; /* Space between buttons */
+    margin-top: 40px; /* Space below the hamburger icon */
+    position: absolute; /* Position the menu absolutely */
+    z-index: 1000; /* Ensure the menu appears on top */
+    background-color: white; /* Add a background to make buttons visible */
+    border: 2px solid #ddd; /* Optional: Add a border */
+    padding: 10px; /* Add padding for better appearance */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow */
+}
+
+.hamburger-menu.show {
+    display: flex; /* Show when the "show" class is added */
+}
+
+.hamburger-menu .btn {
+    width: 100px; /* Set a fixed width for the buttons */
+}
+
+#svg-container.measure-mode {
+    cursor: url("assets/hydrometer.png") 16 16, auto;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    .button-container {
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+    }
+    .button {
+        width: 80%;
+        margin: 10px 0;
+    }
+    .slider-container {
+        grid-template-columns: 1fr;
+        grid-gap: 15px;
+    }
+    .canvas {
+        width: 100%;
+    }
+}

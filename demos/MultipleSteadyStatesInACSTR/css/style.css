@@ -1,0 +1,339 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Global resets & base page styles
+   ───────────────────────────────────────────────────────────────────────────── */
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background: #f3f4f6;
+  color: #111827;
+  padding: 0 1rem 1rem;
+  margin: 0;
+}
+
+.container {
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+  color: #8B0000;
+  margin-bottom: 1rem;
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+     Hamburger menu
+     ───────────────────────────────────────────────────────────────────────────── */
+
+.hamburger-container {
+  position: relative;
+  /* was: absolute */
+  top: auto;
+  /* reset position */
+  right: auto;
+  align-self: flex-end;
+  /* aligns it to the right in flex container */
+  margin-top: -1rem;
+  /* spacing from the row above */
+  margin-right: -0.5rem;
+  margin-left: auto;
+  /* Push to far right */
+  align-self: center;
+}
+
+.menu-button {
+  font-size: 1.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  transform: translate(-5px, -30px);
+  background-color: lightblue;
+  height: 35px;
+  width: 35px;
+  margin-top: 0;
+  border-radius: 3px;
+  border: 1px solid black;
+}
+
+.menu-button:hover {
+  background-color: rgb(198, 224, 233);
+}
+
+.menu-button>div {
+  transform: translateY(-5px);
+}
+
+.menu-content {
+  display: none;
+  position: absolute;
+  top: 2rem;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 500;
+  /* keep this lower than modal's z-index */
+}
+
+.menu-content a {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #111827;
+  text-decoration: none;
+  font-size: 1.05rem;
+}
+
+.menu-content a:hover {
+  background: #f0f0f0;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+     Modal dialog
+     ───────────────────────────────────────────────────────────────────────────── */
+
+#modal-body {
+  overflow-y: auto;
+  /* 👈 allows vertical scroll */
+  padding-right: 0.5rem;
+  /* optional for scrollbar gap */
+  max-height: 75vh;
+  /* 👈 scrolls if taller than this */
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 2rem;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  width: 800px;
+  position: relative;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content a {
+  color: #1d4ed8;
+  /* bright blue */
+  text-decoration: underline;
+}
+
+.modal-content a:hover {
+  color: #2563eb;
+  /* darker on hover */
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-content h2 {
+  padding: 0 1rem;
+}
+
+.directions-txt,
+.about-txt {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  padding: 0 1rem;
+}
+
+.details-txt {
+  font-size: 1.1rem;
+  line-height: 1.65;
+  padding: 0 1rem;
+}
+
+.details-eqn {
+  font-size: 1.1rem;
+  max-width: max-content;
+  padding: 0 2rem;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+     Outer container & plot styles
+     ───────────────────────────────────────────────────────────────────────────── */
+
+.outer-box {
+  position: relative;
+  background: #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 0.1rem 0.5rem 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 991px;
+  height: 730px;
+  margin: auto;
+}
+
+#plot {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  width: 965px;
+  height: 600px;
+  margin-top: -10px;
+}
+
+.js-plotly-plot svg {
+  border: none;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+     Slider panel & controls (common)
+     ───────────────────────────────────────────────────────────────────────────── */
+
+.panel {
+  background: #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  /* tighten vertical spacing */
+  margin-bottom: 1rem;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+}
+
+.control label {
+  white-space: nowrap;
+  font-size: 1.05rem;
+  color: #1f2937;
+}
+
+.control .value {
+  font-size: 1.05rem;
+  color: #1f2937;
+}
+
+
+/* extra top‐padding on the very first row */
+
+.panel .control:first-of-type {
+  margin-top: 1rem;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+     FIRST ROW: heat-transfer (U) & reverse-reaction (kr)
+     ───────────────────────────────────────────────────────────────────────────── */
+
+.top-dual {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+  padding: 0 0.5rem;
+  margin: 1.5rem 0 0.5rem;
+  box-sizing: border-box;
+}
+
+.top-dual .sub-control {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.top-dual .sub-control label {
+  flex: 0 0 200px;
+  margin-right: 0.5rem;
+}
+
+.top-dual .sub-control:nth-child(2) label {
+  flex: 0 0 135px;
+  margin-left: 1rem;
+}
+
+.top-dual .sub-control input[type="range"] {
+  flex: 1;
+  max-width: 150px;
+  margin: 0 0.5rem;
+}
+
+.top-dual .sub-control:nth-child(2) input[type="range"] {
+  max-width: 180px;
+}
+
+.top-dual .sub-control:nth-child(2) {
+  /* margin-left: -1rem; */
+  /* adjust as needed, try -0.5rem, -1rem, etc. */
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+     SECOND ROW ONLY: feed temperature (Tf) & residence time (τ)
+     ───────────────────────────────────────────────────────────────────────────── */
+
+.panel>.dual-control:not(.top-dual) {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0.25rem;
+  /* tighter between blocks */
+  padding: 0.5rem 1rem;
+  margin: 0;
+  box-sizing: border-box;
+  justify-content: flex-start;
+}
+
+.panel>.dual-control:not(.top-dual) .sub-control {
+  flex: 0 0 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.50rem;
+  /* snug label↔slider only here */
+}
+
+.panel>.dual-control:not(.top-dual) .sub-control label {
+  flex: 0 0 90px;
+  margin: 0 !important;
+}
+
+.panel>.dual-control:not(.top-dual) .sub-control input[type="range"] {
+  flex: 1;
+  max-width: 150px;
+  margin: 0 !important;
+}
+
+.dual-control .sub-control:nth-child(2) {
+  margin-left: 2rem;
+  /* move residence time block to the right */
+}
+
+.panel input[type="range"] {
+  flex: 1;
+  max-width: 180px;
+  margin: 0 0.5rem;
+}

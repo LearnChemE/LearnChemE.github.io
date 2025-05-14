@@ -1,0 +1,132 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en">
+  <title>Entropy Changes in Mixing Ideal Gasses</title>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-204988035-3');
+  </script>
+</head>
+
+<body>
+  <div id="graphics-container">
+    <div id="p5-container">
+      <div id="controls-container">
+        <div class="slider-row">
+          <div class="slider-label" id="pAi-label">initial partial pressure A</div>
+          <input type="range" id="pAi" class="slider" min="0" max="1" step="0.01" value="0.5">
+          <div class="slider-value" id="pAi-value">0.50</div>
+          <div class="slider-unit">bar</div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-label" id="pBi-label">initial partial pressure B</div>
+          <input type="range" id="pBi" class="slider" min="0" max="1" step="0.01" value="0.5">
+          <div class="slider-value" id="pBi-value">0.50</div>
+          <div class="slider-unit">bar</div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-label" id="v-label">initial volume ratio A/B</div>
+          <input type="range" id="v" class="slider" min="0" max="1" step="0.01" value="0.50">
+          <div class="slider-value" id="v-value">0.50</div>
+          <div class="slider-unit"></div>
+        </div>
+        <div class="slider-row with-play-button">
+          <div class="slider-label" id="t-label">time</div>
+          <input type="range" id="t" class="slider" min="0" max="1" step="0.01" value="0.00">
+          <div class="slider-value" id="t-value">0.00</div>
+          <div class="slider-unit">s</div>
+          <button id="play-button" class="btn btn-primary">Play</button>
+        </div>
+      </div>
+      <div id="hamburger">
+        <div id="hamburger-icon"></div>
+        <div id="controls">
+          <div id="buttons">
+            <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
+              Directions
+            </div>
+            <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">
+              Details
+            </div>
+            <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">
+              About
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="directions-modal-label">Directions</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="details-modal-label">Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            $$ \Delta S = -nR \left( x_A \ln x_A + x_B \ln x_B \right) $$
+          </p>
+          <p>
+            Inline equation \( x = 5 \)
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="about-modal-label">About</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

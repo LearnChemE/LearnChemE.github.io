@@ -1,0 +1,41 @@
+{
+  "name": "entropy-changes-in-mixing-ideal-gasses",
+  "version": "1.0.0",
+  "description": "Examine the change in entropy when two gasses separated by a barrier are mixed.",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --open --config ./_dev/webpack.config.js --mode=development",
+    "build": "webpack --config ./_dev/webpack.config.js --mode=production",
+    "install-dependencies": "npm install --save bootstrap clean-webpack-plugin css-loader file-loader html-loader html-webpack-plugin mini-css-extract-plugin p5 postcss-loader sass sass-loader style-loader terser-webpack-plugin to-string-loader uglify-js webpack webpack-cli webpack-dev-server"
+  },
+  "keywords": [
+    "chemical",
+    "engineering",
+    "interactive",
+    "simultation",
+    "ideal gas",
+    "entropy"
+  ],
+  "author": "Venkatesh Mopidevi",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.3.5",
+    "clean-webpack-plugin": "^4.0.0",
+    "css-loader": "^7.1.2",
+    "file-loader": "^6.2.0",
+    "html-loader": "^5.1.0",
+    "html-webpack-plugin": "^5.6.3",
+    "mini-css-extract-plugin": "^2.9.2",
+    "p5": "^2.0.1",
+    "postcss-loader": "^8.1.1",
+    "sass": "^1.87.0",
+    "sass-loader": "^16.0.5",
+    "style-loader": "^4.0.0",
+    "terser-webpack-plugin": "^5.3.14",
+    "to-string-loader": "^1.2.0",
+    "uglify-js": "^3.19.3",
+    "webpack": "^5.99.7",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.1"
+  }
+}

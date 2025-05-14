@@ -1,0 +1,214 @@
+$modal-sm: calc(100vw - 50px);
+$modal-md: calc(100vw - 50px);
+$modal-lg: 820px;
+$modal-xl: 1140px;
+@import "bootstrap";
+@import "./slider.scss"; // Keeping slider styling in place if needed for other inputs
+body {
+  --slider-label-width: 105px;
+  --slider-width: 160px;
+  --slider-value-width: 70px;
+  --slider-font-size: 0.75rem;
+}
+
+#graphics-container {
+  position: relative;
+  margin: auto;
+  margin-top: 5px;
+  background-color: rgb(250, 250, 250);
+  border: 1px solid black;
+  border-radius: 5px;
+  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+  width: min-content;
+}
+
+#vortex-port-slider {
+  background: linear-gradient(to right, #2222ff, #ff2222);
+}
+
+.slider-with-labels {
+  position: relative;
+}
+
+.under-slider-label {
+  position: absolute;
+  bottom: -15px;
+  font-size: calc(0.8 * var(--slider-font-size));
+}
+
+.under-slider-label.right {
+  right: 0px;
+}
+
+.under-slider-label.left {
+  left: 0px;
+}
+
+#p5-container {
+  position: relative;
+  margin: auto;
+}
+
+#svg-container {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+#svg-container>svg {
+  width: 100%;
+  height: 100%;
+}
+
+#sliders-container {
+  position: absolute;
+  display: grid;
+  top: 4%;
+  left: 12%;
+  gap: 5px;
+}
+
+.slider-container {
+  display: grid;
+  grid-template-columns: var(--slider-label-width) var(--slider-width) var(--slider-value-width);
+  align-items: end;
+  gap: 8px;
+  font-size: var(--slider-font-size);
+}
+
+.slider-label {
+  justify-self: end;
+}
+
+canvas {
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+  box-shadow: 0px 0px 2px 2px lightgrey;
+}
+
+.modal.show {
+  padding-left: 0px !important;
+}
+
+.modal-body {
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+#hamburger {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  width: max-content;
+  height: max-content;
+}
+
+#hamburger-icon {
+  display: grid;
+  align-content: center;
+  align-items: center;
+  height: max-content;
+  width: max-content;
+  cursor: pointer;
+  background-color: lightblue;
+  padding: 5px;
+  border: 1px solid black;
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+}
+
+#hamburger-icon.active {
+  background-color: rgb(233, 164, 164);
+}
+
+#hamburger-icon:hover,
+#hamburger-icon.active:hover {
+  background-color: rgb(217, 239, 246);
+}
+
+#hamburger-icon>svg {
+  width: 20px;
+  height: 20px;
+}
+
+#buttons {
+  position: absolute;
+  display: grid;
+  grid-template-columns: max-content;
+  width: max-content;
+  top: 25px;
+  display: none;
+  justify-items: center;
+  margin-top: 20px;
+  gap: 10px;
+  background-color: white;
+  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 15px;
+  &>.btn {
+    width: 110px;
+  }
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  color: grey;
+}
+
+*[disabled="true"] {
+  opacity: 0.5 !important;
+  pointer-events: none;
+}
+
+@media screen and (min-width: 600px) and (min-height: 450px) {
+  body {
+    --slider-label-width: 120px;
+    --slider-width: 190px;
+    --slider-value-width: 80px;
+    --slider-font-size: 0.9rem;
+  }
+}
+
+@media screen and (min-width: 800px) and (min-height: 600px) {
+  body {
+    --slider-label-width: 130px;
+    --slider-width: 250px;
+    --slider-value-width: 80px;
+    --slider-font-size: 0.9rem;
+  }
+}
+
+@media screen and (min-width: 1080px) and (min-height: 810px) {
+  body {
+    --slider-label-width: 155px;
+    --slider-width: 300px;
+    --slider-value-width: 100px;
+    --slider-font-size: 1rem;
+  }
+}
+
+@media screen and (min-width: 1320px) and (min-height: 990px) {
+  body {
+    --slider-label-width: 155px;
+    --slider-width: 400px;
+    --slider-value-width: 100px;
+    --slider-font-size: 1.2rem;
+  }
+  #hamburger-icon {
+    padding: 6px;
+  }
+  #hamburger-icon>svg {
+    width: 32px;
+    height: 32px;
+  }
+  #buttons {
+    top: 35px;
+    padding: 15px;
+  }
+}

@@ -7,10 +7,11 @@ import { resetEverything } from './reset.js';
 import { createGasCylinder } from './components/gasCylinder.js';
 import { createConnectedGauges, createDigitalPressureGauge } from './components/gauges.js';
 import { createVerticalValve, createInteractiveValve, createTValveFromImage } from './components/valves.js';
-import { createMassFlowController } from './components/mfc.js';
+import { createMassFlowController, mfcClicked } from './components/mfc.js';
 import { createVerticalAdsorptionBedView } from './components/adsorptionBed.js';
 import { createCO2GasAnalyzer } from './components/co2Analyzer.js';
 import { createVentArrow } from './components/ventArrow.js';
+import { addOptionToDragAndZoom } from './zoom.js';
 
 // --- Global Canvas Setup ---
 let windowWidth = window.innerWidth - 60;
@@ -89,6 +90,7 @@ function drawCanvas() {
 
     // Create MFC
     createMassFlowController(draw, mfcX, mfcY);
+    mfcClicked(draw, mfcX, mfcY);
 
     // Create Inlet Valve (Non-controller) - between MFC and Bed
     createInteractiveValve(draw, outletValveX, outletValveY, false);
@@ -117,6 +119,8 @@ function drawCanvas() {
     console.log("Drawing pipes...");
     drawPipes(draw, pipeGroup); // Draw pipes LAST
 
+    addOptionToDragAndZoom(draw);
+
     console.log("Canvas drawing complete.");
 }
 
@@ -133,7 +137,6 @@ window.addEventListener('resize', function() {
 // --- Reset Button ---
 const resetButton = document.getElementById('reset-button');
 if (resetButton) {
-    // Pass draw and pipeGroup to the reset function
     resetButton.addEventListener('click', () => resetEverything(draw, pipeGroup));
 } else {
     console.warn("Reset button element not found.");

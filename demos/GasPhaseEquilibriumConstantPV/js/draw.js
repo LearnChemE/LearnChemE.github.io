@@ -1,30 +1,26 @@
-import { calcAll } from './calcs.js';
-const selectionElement = document.getElementById('selection');
-const p5container = document.getElementById('p5-container');
-const eqText = document.getElementById('equilibrium-text');
-const meter3 = document.getElementById('meter3-text');
-const pressureSlider = document.getElementById('pressure-slider');
-const pressureSldrVal = document.getElementById('pressure-value');
-const pressureSldrName = document.getElementById('pressure-slider-name');
-const volumeSlider = document.getElementById('volume-slider');
-const volumeSldrVal = document.getElementById('volume-value');
-const volumeSldrName = document.getElementById('volume-slider-name');
-
+import { calcAll } from "./calcs.js";
+const selectionElement = document.getElementById("selection");
+const p5container = document.getElementById("p5-container");
+const eqText = document.getElementById("equilibrium-text");
+const meter3 = document.getElementById("meter3-text");
+const pressureSlider = document.getElementById("pressure-slider");
+const pressureSldrVal = document.getElementById("pressure-value");
+const pressureSldrName = document.getElementById("pressure-slider-name");
+const volumeSlider = document.getElementById("volume-slider");
+const volumeSldrVal = document.getElementById("volume-value");
+const volumeSldrName = document.getElementById("volume-slider-name");
 
 //defined local variables only needed in draw
 let angleX = 0;
 let angleY = 0;
-let lastMouseX = 0;
-let lastMouseY = 0;
-let damping = 0.01;
 let meter3Image;
 let font;
 
 //preload for loading images and fonts
 window.preload = function () {
-  font = loadFont('./assets/NotoSans-Regular.ttf');
-  meter3Image = loadImage('/assets/imageMeterCubed.jpg');
-}
+  font = loadFont("./assets/NotoSans-Regular.ttf");
+  meter3Image = loadImage("./assets/imageMeterCubed.jpg");
+};
 
 // This function is used to scale the canvas based on the size of the container
 window.relativeSize = () => p5container.offsetWidth / 1280;
@@ -38,18 +34,14 @@ function resize() {
   z.height;
 
   scale(relativeSize());
-
 }
 
 // Moved outside of the selection block - Do not call setup() more than once.
 // So this should never be inside a conditional statement.
 window.setup = function () {
-
   createCanvas(p5container.offsetWidth, p5container.offsetHeight, WEBGL).parent(p5container);
   frameRate(60);
-
-
-}
+};
 
 // Same with draw() - this should never be inside a conditional statement.
 // Put the conditional statements inside the draw function.
@@ -61,67 +53,55 @@ window.draw = function () {
   background(255);
   calcAll();
 
-
   //A ⇋ rB must be drawn using HTML and is controlled by the radio buttons here
   const coeffB = document.querySelector('input[name="plot"]:checked');
   if (coeffB && coeffB.value != 1) {
     document.getElementById("equilibrium-text").textContent = `A ⇋ ${coeffB.value}B`;
-  }
-  else if (coeffB && coeffB.value == 1) {
-
+  } else if (coeffB && coeffB.value == 1) {
     document.getElementById("equilibrium-text").textContent = `A ⇋ B`;
-
   }
 
   if (selection === "constant-pressure") {
-    draw3DCP();
-    draw2DCP();
-    drawBarGraphCP();
-    drawTextCP();
+    draw3DCylinderForConstPressureSelection();
+    drawPlotForConstPressureSelection();
+    drawBarsForConstPressurePlot();
+    drawTextForConstPressureSelection();
 
     //Controls for switching the volume and pressure sliders
-    pressureSlider.style.display = 'block';
-    pressureSldrVal.style.display = 'block';
-    pressureSldrName.style.display = 'block';
-    volumeSlider.style.display = 'none';
-    volumeSldrVal.style.display = 'none';
-    volumeSldrName.style.display = 'none';
+    pressureSlider.style.display = "block";
+    pressureSldrVal.style.display = "block";
+    pressureSldrName.style.display = "block";
+    volumeSlider.style.display = "none";
+    volumeSldrVal.style.display = "none";
+    volumeSldrName.style.display = "none";
     //eqText.style.display = 'block';
-
   } else if (selection === "constant-volume") {
-
-    draw3DCV();
-    draw2DCV();
-    drawTextCV();
-    drawBarGraphCV();
+    draw3DCylinderForConstVolumeSelection();
+    drawPlotForConstVolumeSelection();
+    drawTextForConstVolumeSelection();
+    drawBarsForConstVolumePlot();
 
     //Controls for switching the volume and pressure sliders
-    pressureSlider.style.display = 'none';
-    pressureSldrVal.style.display = 'none';
-    pressureSldrName.style.display = 'none';
-    volumeSlider.style.display = 'block';
-    volumeSldrVal.style.display = 'block';
-    volumeSldrName.style.display = 'block';
+    pressureSlider.style.display = "none";
+    pressureSldrVal.style.display = "none";
+    pressureSldrName.style.display = "none";
+    volumeSlider.style.display = "block";
+    volumeSldrVal.style.display = "block";
+    volumeSldrName.style.display = "block";
 
     //eqText.style.display = 'block';
-
   }
-}
+};
 
 // Look this function up in p5.js documentation. The width and height of
 // the #p5-container element are set in the css file.
 window.windowResized = () => {
   resizeCanvas(p5container.offsetWidth, p5container.offsetHeight);
-}
+};
 
 //const label = selection === "velocity-distribution" ? "Velocity Distribution" : "Velocity vs Height";
 
-
-
-
-
-function draw3DCP() {
-
+function draw3DCylinderForConstPressureSelection() {
   //blendMode(ADD);
 
   /*
@@ -141,12 +121,10 @@ function draw3DCP() {
 
   */
 
-
-
   push();
 
   ortho();
-  rotateX(PI/64); 
+  rotateX(PI / 64);
 
   translate(-350, 0);
   rotateX(angleX);
@@ -155,34 +133,34 @@ function draw3DCP() {
 
   push();
   translate(0, -1 - z.cylHeight / 2);
-  rotateX(HALF_PI)
+  rotateX(HALF_PI);
   fill(0, 0, 0);
   torus(z.cylRadius - 1, 1, 64);
   pop();
 
   push();
   translate(0, 1 + z.cylHeight / 2);
-  rotateX(HALF_PI)
+  rotateX(HALF_PI);
   fill(0, 0, 0);
   torus(z.cylRadius - 1, 1, 64);
   pop();
 
   //piston head + outlines
   push();
-  translate(0, -80 + 0.5 * z.cylHeight);
+  translate(0, -0.5 * (z.cylHeight - 280) - z.cylHeight * z.cylinderLiveVolumeFractionConstantPressureCase + 0.5 * z.cylHeight);
   fill(100, 100, 100);
   cylinder(z.cylRadius - 1, z.cylHeight - 280, 64, 1);
 
   push();
   translate(0, -0.5 * (z.cylHeight - 280));
-  rotateX(HALF_PI)
+  rotateX(HALF_PI);
   fill(0, 0, 0);
   torus(z.cylRadius - 1.5, 1, 64);
   pop();
 
   push();
   translate(0, 0.5 * (z.cylHeight - 280));
-  rotateX(HALF_PI)
+  rotateX(HALF_PI);
   fill(0, 0, 0);
   torus(z.cylRadius - 1.5, 1, 64);
   pop();
@@ -191,28 +169,28 @@ function draw3DCP() {
 
   //piston rod + outlines
   push();
-  translate(0, -80);
+  translate(0, -0.5 * (z.cylHeight - 280) - z.cylHeight * z.cylinderLiveVolumeFractionConstantPressureCase);
   fill(120, 120, 120);
   cylinder(z.cylRadius - 80, z.cylHeight, 64, 1, false);
 
   push();
   translate(0, -11 + z.cylHeight / 2);
-  rotateX(HALF_PI)
+  rotateX(HALF_PI);
   fill(0, 0, 0);
   torus(z.cylRadius - 79, 1, 64);
   pop();
-
 
   pop();
 
   //green gas volume
   push();
-  translate(0, (z.cylHeight / 2) - 80 + ((z.cylHeight - 280) / 2) + 0.5 * ((z.cylHeight / 2) - ((z.cylHeight / 2) - 80 + ((z.cylHeight - 280) / 2))));
+  //translate(0, z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2 + 0.5 * (z.cylHeight / 2 - (z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2)));
   fill(0, 200, 0, 80);
-  cylinder(z.cylRadius - 1, -1 + ((z.cylHeight / 2) - ((z.cylHeight / 2) - 80 + ((z.cylHeight - 280) / 2))), 64, 1);
+  //cylinder(z.cylRadius - 1, -1 + (z.cylHeight / 2 - (z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2)), 64, 1);
+  translate(0, z.cylHeight * z.cylinderLiveVolumeFractionConstantPressureCase );
+  cylinder(z.cylRadius - 1, -1 - z.cylHeight * z.cylinderLiveVolumeFractionConstantPressureCase, 64, 1);
 
   pop();
-
 
   //Overall chamber + outlines
   fill(0, 0, 0, 9);
@@ -221,42 +199,30 @@ function draw3DCP() {
   pop();
 }
 
-function draw2DCP() {
-
-
-
+function drawPlotForConstPressureSelection() {
   line(50, -220, 50, 310);
   line(50, 310, 510, 310);
 
   for (let i = 310; i > -220; i -= 530 / 35) {
-
     line(50, i, 54, i);
-
   }
 
   for (let i = 310; i > -221; i -= 530 / 7) {
-
     line(50, i, 58, i);
-
-
   }
-
 }
 
-function drawTextCP() {
-
+function drawTextForConstPressureSelection() {
   for (let i = 310; i > -221; i -= 530 / 7) {
-
-    fill('Black');
+    fill("Black");
     textFont(font);
     textSize(20);
     text(Math.floor(-(7 / 530) * (i - 310)), 25, i + 5);
-
   }
 
   push();
   rotate(3 * HALF_PI);
-  fill('Black');
+  fill("Black");
   textFont(font);
   textSize(20);
   text("final number of moles", -125, -30 + (310 - 220) / 2);
@@ -264,48 +230,41 @@ function drawTextCP() {
 
   push();
 
-  fill('Black');
+  fill("Black");
   textFont(font);
   textSize(28);
-  text("pressure = " + z.pressureCP.toFixed(2) + " bar", -265, -320);
-  text("final volume = " + z.volumeCP.toFixed(2), -265, -280);
-  if (z.volumeCP < 10) {
-
+  text("pressure = " + z.pressureConstPressureCase.toFixed(2) + " bar", -265, -320);
+  text("final volume = " + z.volumeConstPressureCase.toFixed(2), -265, -280);
+  if (z.volumeConstPressureCase < 10) {
     tint(255, 242);
     image(meter3Image, -13, -316);
-
-  }
-  else if (z.volumeCP >= 10) {
-
+  } else if (z.volumeConstPressureCase >= 10) {
     image(meter3Image, 0, -316);
-
   }
 
   pop();
 
   push();
 
-  fill('Black');
+  fill("Black");
   textFont(font);
   textSize(28);
-  text("mol A", 90, 305 - z.molACP * (530 / 7));
-  text("mol B", 90 + 450 / 3, 305 - z.molBCP * (530 / 7));
-  text("mol inerts", 62.5 + 450 * (2 / 3), 305 - (z.molesInerts) * (530 / 7));
-  text(z.molACP.toFixed(1), 110, 265 - z.molACP * (530 / 7));
-  text(z.molBCP.toFixed(1), 110 + 450 / 3, 265 - z.molBCP * (530 / 7));
-  text(z.molesInerts.toFixed(1), 110 + 450 * (2 / 3), 265 - (z.molesInerts) * (530 / 7));
+  text("mol A", 90, 305 - z.molAForConstPressureSelection * (530 / 7));
+  text("mol B", 90 + 450 / 3, 305 - z.molBForConstPressureSelection * (530 / 7));
+  text("mol inerts", 62.5 + 450 * (2 / 3), 305 - z.molesInerts * (530 / 7));
+  text(z.molAForConstPressureSelection.toFixed(1), 110, 265 - z.molAForConstPressureSelection * (530 / 7));
+  text(z.molBForConstPressureSelection.toFixed(1), 110 + 450 / 3, 265 - z.molBForConstPressureSelection * (530 / 7));
+  text(z.molesInerts.toFixed(1), 110 + 450 * (2 / 3), 265 - z.molesInerts * (530 / 7));
 
   pop();
-
 }
 
-function drawBarGraphCP() {
-
+function drawBarsForConstPressurePlot() {
   push();
 
   //strokeWeight(1);
   fill(239, 100, 255);
-  rect(60, 310 - z.molACP * (530 / 7), 450 / 3 - 10, z.molACP * (530 / 7));
+  rect(60, 310 - z.molAForConstPressureSelection * (530 / 7), 450 / 3 - 10, z.molAForConstPressureSelection * (530 / 7));
 
   pop();
 
@@ -313,7 +272,7 @@ function drawBarGraphCP() {
 
   //strokeWeight(1);
   fill(248, 215, 146);
-  rect(60 + 450 * (1 / 3), 310 - z.molBCP * (530 / 7), 450 / 3 - 10, z.molBCP * (530 / 7));
+  rect(60 + 450 * (1 / 3), 310 - z.molBForConstPressureSelection * (530 / 7), 450 / 3 - 10, z.molBForConstPressureSelection * (530 / 7));
 
   pop();
 
@@ -326,8 +285,7 @@ function drawBarGraphCP() {
   pop();
 }
 
-function draw3DCV() {
-
+function draw3DCylinderForConstVolumeSelection() {
   /*
   //This adds ability to rotate the cylinder if needed
 
@@ -346,7 +304,7 @@ function draw3DCV() {
   push();
 
   ortho();
-  rotateX(PI/64);
+  rotateX(PI / 64);
 
   translate(-350, 0);
   rotateX(angleX);
@@ -355,7 +313,7 @@ function draw3DCV() {
 
   push();
   translate(0, 1 + z.cylHeight / 2);
-  rotateX(HALF_PI)
+  rotateX(HALF_PI);
   fill(0, 0, 0);
   torus(z.cylRadius - 1, 1, 64);
   pop();
@@ -364,66 +322,50 @@ function draw3DCV() {
   push();
   translate(0, -80 + 0.5 * z.cylHeight);
 
-
-
-
   push();
   translate(0, 0.5 * (z.cylHeight - 280));
-  rotateX(HALF_PI)
+  rotateX(HALF_PI);
   fill(0, 0, 0);
   torus(z.cylRadius - 1.5, 1, 64);
   pop();
 
   pop();
 
-
-
   //green gas volume
   push();
-  translate(0, (z.cylHeight / 2) - 80 + ((z.cylHeight - 280) / 2) + 0.5 * ((z.cylHeight / 2) - ((z.cylHeight / 2) - 80 + ((z.cylHeight - 280) / 2))));
+  translate(0, z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2 + 0.5 * (z.cylHeight / 2 - (z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2)));
   fill(0, 200, 0, 80);
-  cylinder(z.cylRadius - 1, -1 + ((z.cylHeight / 2) - ((z.cylHeight / 2) - 80 + ((z.cylHeight - 280) / 2))), 64, 1);
+  cylinder(z.cylRadius - 1, -1 + (z.cylHeight / 2 - (z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2)), 64, 1);
 
   pop();
 
   pop();
 }
 
-function draw2DCV() {
-
-
-
+function drawPlotForConstVolumeSelection() {
   line(50, -220, 50, 310);
   line(50, 310, 510, 310);
 
   for (let i = 310; i > -220; i -= 530 / 35) {
-
     line(50, i, 54, i);
-
   }
 
   for (let i = 310; i > -221; i -= 530 / 7) {
-
     line(50, i, 58, i);
-
-
   }
-
 }
-function drawTextCV() {
 
+function drawTextForConstVolumeSelection() {
   for (let i = 310; i > -221; i -= 530 / 7) {
-
-    fill('Black');
+    fill("Black");
     textFont(font);
     textSize(20);
     text(Math.floor(-(7 / 530) * (i - 310)), 25, i + 5);
-
   }
 
   push();
   rotate(3 * HALF_PI);
-  fill('Black');
+  fill("Black");
   textFont(font);
   textSize(20);
   text("final number of moles", -125, -30 + (310 - 220) / 2);
@@ -431,37 +373,31 @@ function drawTextCV() {
 
   push();
 
-  fill('Black');
+  fill("Black");
   textFont(font);
   textSize(28);
-  text("final pressure = " + z.pressureCV.toFixed(2) + " bar", -265, -320);
-  text("volume = " + z.volumeCV.toFixed(2), -200, -280);
-  if (z.volumeCV < 10) {
+  text("final pressure = " + z.pressureConstVolumeCase.toFixed(2) + " bar", -265, -320);
+  text("volume = " + z.volumeConstVolumeCase.toFixed(2), -200, -280);
+  if (z.volumeConstVolumeCase < 10) {
     tint(255, 242);
     image(meter3Image, -13, -316);
-
-  }
-  else if (z.volumeCV >= 10) {
-
+  } else if (z.volumeConstVolumeCase >= 10) {
     image(meter3Image, 0, -316);
-
   }
-
-
 
   pop();
 
   push();
 
-  fill('Black');
+  fill("Black");
   textFont(font);
   textSize(28);
-  text("mol A", 90, 305 - z.molACV * (530 / 7));
-  text("mol B", 90 + 450 / 3, 305 - z.molBCV * (530 / 7));
-  text("mol inerts", 62.5 + 450 * (2 / 3), 305 - (z.molesInerts) * (530 / 7));
-  text(z.molACV.toFixed(1), 110, 265 - z.molACV * (530 / 7));
-  text(z.molBCV.toFixed(1), 110 + 450 / 3, 265 - z.molBCV * (530 / 7));
-  text(z.molesInerts.toFixed(1), 110 + 450 * (2 / 3), 265 - (z.molesInerts) * (530 / 7));
+  text("mol A", 90, 305 - z.molAForConstVolumeSelection * (530 / 7));
+  text("mol B", 90 + 450 / 3, 305 - z.molBForConstVolumeSelection * (530 / 7));
+  text("mol inerts", 62.5 + 450 * (2 / 3), 305 - z.molesInerts * (530 / 7));
+  text(z.molAForConstVolumeSelection.toFixed(1), 110, 265 - z.molAForConstVolumeSelection * (530 / 7));
+  text(z.molBForConstVolumeSelection.toFixed(1), 110 + 450 / 3, 265 - z.molBForConstVolumeSelection * (530 / 7));
+  text(z.molesInerts.toFixed(1), 110 + 450 * (2 / 3), 265 - z.molesInerts * (530 / 7));
 
   pop();
 
@@ -471,16 +407,14 @@ function drawTextCV() {
   equation.position(240, -290);
   katex.render('A 2B', equation.elt);
   */
-
 }
 
-function drawBarGraphCV() {
-
+function drawBarsForConstVolumePlot() {
   push();
 
   //strokeWeight(1);
   fill(239, 100, 255);
-  rect(60, 310 - z.molACV * (530 / 7), 450 / 3 - 10, z.molACV * (530 / 7));
+  rect(60, 310 - z.molAForConstVolumeSelection * (530 / 7), 450 / 3 - 10, z.molAForConstVolumeSelection * (530 / 7));
 
   pop();
 
@@ -488,7 +422,7 @@ function drawBarGraphCV() {
 
   //strokeWeight(1);
   fill(248, 215, 146);
-  rect(60 + 450 * (1 / 3), 310 - z.molBCV * (530 / 7), 450 / 3 - 10, z.molBCV * (530 / 7));
+  rect(60 + 450 * (1 / 3), 310 - z.molBForConstVolumeSelection * (530 / 7), 450 / 3 - 10, z.molBForConstVolumeSelection * (530 / 7));
 
   pop();
 
@@ -499,8 +433,4 @@ function drawBarGraphCV() {
   rect(60 + 450 * (2 / 3), 310 - z.molesInerts * (530 / 7), 450 / 3 - 10, z.molesInerts * (530 / 7));
 
   pop();
-
-
-
-
 }

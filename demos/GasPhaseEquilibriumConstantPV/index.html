@@ -90,9 +90,9 @@
       </div>
 
       <div class="btn-group" role="group" id="plot-type">coefficient of B in reaction: &nbsp;
-        <input type="radio" class="btn-check" name="plot" id="r-1/2" value="1/2" autocomplete="off" >
+        <input type="radio" class="btn-check" name="plot" id="r-1/2" value="1/2" autocomplete="off">
         <label class="btn btn-outline-primary btn-sm" for="r-1/2">1/2</label>
-     
+
         <input type="radio" class="btn-check" name="plot" id="r-1" value="1" autocomplete="off">
         <label class="btn btn-outline-primary btn-sm" for="r-1">1</label>
 
@@ -105,7 +105,7 @@
 
     </div>
 
-    
+
 
     <div class="modal-buttons-row">
       <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
@@ -122,10 +122,10 @@
     </div>
   </div>
 
-  <div id="p5-container" style="position: relative; width: 100%; height: 100%;">
-    <p id="equilibrium-text" style="font-size: calc(1.5vw + 1vh); font-family: 'Noto Sans', sans-serif; position: absolute; top: 8%; left: 72.5%; margin: 0; transform: translate(-50%, -50%); color: #000000; display: block; ">A ⇋ 2B</p>
+  <div id="p5-container">
+    <p id="equilibrium-text">A ⇋ 2B</p>
   </div>
-  
+
 
   <!--
     Everything below here are modals, which are hidden by default. Any content
@@ -140,11 +140,9 @@
         </div>
         <div class="modal-body">
           <p>
-            This Demonstration calculates the number of moles at equilibrium for a gas-phase reaction \(A ⇋ rB\) at constant temperature; 
-            the equilibrium constant for the reaction is \(K_{eq} = 0.5\). Components \(A\) and \(B\) are ideal gases, and you can set the value of \(r\) (1/2, 1, 3/2, or 2) with buttons. 
-            Initially the container is filled with 5 mol of reactant \(A\), and equilibrium is obtained at either constant pressure (set pressure with a slider) or constant volume 
-            (set volume with a slider). The bar graph displays the number of moles at equilibrium, including the moles of inert gas (select the moles of inert with a slider). 
-            The height of the piston or container is proportional to the final volume.
+            This Demonstration calculates the number of moles at equilibrium for a gas-phase reaction \(A ⇋ rB\) at constant temperature; the equilibrium constant for the reaction is \(K_{eq} = 0.5\). Components \(A\) and \(B\) are ideal gases, and you can set the
+            value of \(r\) (1/2, 1, 3/2, or 2) with buttons. Initially the container is filled with 5 mol of reactant \(A\), and equilibrium is obtained at either constant pressure (set pressure with a slider) or constant volume (set volume with a slider).
+            The bar graph displays the number of moles at equilibrium, including the moles of inert gas (select the moles of inert with a slider). The height of the piston or container is proportional to the final volume.
           </p>
         </div>
       </div>
@@ -166,8 +164,7 @@
           </p>
 
           <p>
-            $$ n_A = n_{A,0} - \xi, $$
-            $$ n_B = r\xi, $$
+            $$ n_A = n_{A,0} - \xi, $$ $$ n_B = r\xi, $$
           </p>
 
           <p>
@@ -175,8 +172,7 @@
           </p>
 
           <p>
-            The equilibrium constant \(K_{eq}\) is:
-            $$ K_{eq} = {P_B}^r/P_A,$$
+            The equilibrium constant \(K_{eq}\) is: $$ K_{eq} = {P_B}^r/P_A,$$
           </p>
 
           <p>
@@ -184,9 +180,7 @@
           </p>
 
           <p>
-           The mole fraction of each species at equilibrium is:
-            $$y_A = n_A/n_{total},$$
-            $$y_B = n_B/n_{total},$$
+            The mole fraction of each species at equilibrium is: $$y_A = n_A/n_{total},$$ $$y_B = n_B/n_{total},$$
           </p>
 
           <p>
@@ -209,7 +203,7 @@
            <p>
             <ol class="references">
                This is the main citation from the origional simulation, the Permanent Citation from that Page has not been included but may need to be.-->
-               <!--I included the Permanent Citation. as the  second reference.
+          <!--I included the Permanent Citation. as the  second reference.
               <li>
                 Gas-Phase Chemical Equilibrium at Constant Pressure or Constant Volume [Video]. (Dec 16, 2020) https://www.youtube.com/watch?v=QjzJZ_OD3AY&t=1s.
               </li>
@@ -238,9 +232,9 @@
           <p>
             This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
               Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Jackson Dunlap under the direction of Professor John L. Falconer and Michelle Medlin,
-              with the assistance of Neil Hendren and Drew Smith. It is a JavaScript/HTML5 implementation of a Mathematica simulation by Garrison Vigil, Rachael L. Baumann. It can be downloaded
-              <a href="https://learncheme.com/wp-content/uploads/simulation-files/downloads/gas-phase-chemical-equilibrium-at-constant-p-or-constant-v.cdf">here</a>. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988).
-              Address any questions or comments to LearnChemE@gmail.com.
+            with the assistance of Neil Hendren and Drew Smith. It is a JavaScript/HTML5 implementation of a Mathematica simulation by Garrison Vigil, Rachael L. Baumann. It can be downloaded
+            <a href="https://learncheme.com/wp-content/uploads/simulation-files/downloads/gas-phase-chemical-equilibrium-at-constant-p-or-constant-v.cdf">here</a>. It was prepared with financial support from the National Science Foundation (DUE 2336987
+            and 2336988). Address any questions or comments to LearnChemE@gmail.com.
           </p>
         </div>
       </div>

@@ -13,6 +13,10 @@ body {
   font-size: 16px;
   margin-top: 10px;
   overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none; 
 }
 
 .button-container {
@@ -23,23 +27,6 @@ body {
 
 .button-container .btn {
   margin-right: 10px;
-}
-
-.canvas-container {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-}
-
-.timer-display {
-  font-size: 24px;
-  margin-bottom: 10px;
-  text-align: center;
-  width: 150px;
-}
-
-.pencil-cursor {
-  cursor: crosshair;
 }
 
 #svg-container {
@@ -65,17 +52,16 @@ body {
 /* main.css */
 
 .icon-container {
-  margin-top: 10px;
-  margin-left: 10px;
-  margin-right: 10px;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
+  justify-content: space-between; /* ← push first child to left, last to right */
+  align-items: center;            /* optional, to vertically center if your buttons are different heights */
   position: relative;
-  z-index: 1001; /* Higher than SVG canvas */
+  z-index: 990;
   pointer-events: auto;
+  width: 85%;
+  padding: 0 10px;
+  height: 0px;
 }
 
 .hamburger-wrapper {
@@ -85,6 +71,7 @@ body {
   position: relative;
   z-index: 1001; /* Higher than SVG canvas */
   pointer-events: auto;
+  padding-top: 135px;
 }
 
 #hamburger-icon {
@@ -108,6 +95,7 @@ body {
   position: relative;
   z-index: 1001; /* Higher than SVG canvas */
   pointer-events: auto;
+  margin-top: 135px;
 }
 
 
@@ -125,9 +113,12 @@ body {
 
 .canvas-container {
   position: relative;
-  /* Establish a stacking context */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
   z-index: 1;
-  /* Default z-index for the canvas container */
 }
 
 .hamburger-menu {

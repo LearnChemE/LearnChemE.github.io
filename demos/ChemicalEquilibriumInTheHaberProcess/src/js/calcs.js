@@ -130,6 +130,8 @@ export function calcAll() {
     return roots;
   }
 
+  let solutionFound = false;
+
   try {
     // First, we find all of the roots of the equation k(x) = keq.  
     const solutionRoots = findRoots();
@@ -148,6 +150,7 @@ export function calcAll() {
         state.outlet.nN2 = Math.max(EQs[0], 0);
         state.outlet.nH2 = Math.max(EQs[1], 0);
         state.outlet.nNH3 = Math.max(EQs[2], 0);
+        solutionFound = true;
         break;
       }
     }
