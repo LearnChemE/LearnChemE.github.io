@@ -1,4 +1,5 @@
 import Hamburger from "../assets/hamburger.svg";
+import { calcAll } from "./calcs";
 
 export function handleInputs() {
   initializeHamburger();
@@ -10,7 +11,11 @@ function handleFeedPressure() {
   document.getElementById("feed-pressure-slider").addEventListener("input", (e) => {
     const pressureValue = parseFloat(e.target.value);
     state.P = pressureValue;
+    //state.arrowShift = (pressureValue - 2.4) * 4;
+    const normalized = (pressureValue - 2.4) / (7.8 - 2.4);
+    state.arrowShift = normalized;
     document.getElementById("feed-pressure-value").textContent = pressureValue.toFixed(1);
+    calcAll();
   });
 }
 
@@ -19,6 +24,7 @@ function handleFeedFraction() {
     const fractionValue = parseFloat(e.target.value);
     state.z = fractionValue;
     document.getElementById("fraction-feed-value").textContent = fractionValue.toFixed(2);
+    calcAll();
   });
 }
 

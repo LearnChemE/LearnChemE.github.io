@@ -29,3 +29,43 @@ input[type="range"]::-moz-range-thumb {
   background: #4CAF50;
   cursor: pointer;
 }
+
+.slider-row-inline {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: nowrap;
+}
+
+.slider-block {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.slider-block label {
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.slider-block input[type="range"] {
+  width: 140px;
+}
+
+.slider-block input[type="number"] {
+  width: 50px;
+  font-size: 0.9rem;
+  text-align: right;
+  padding: 2px 4px;
+}
+
+
+#outer-container {
+  border: 1px solid #ccc;
+  padding: 25px;
+  border-radius: 6px;
+  background-color: white;
+  display: inline-block;  /* ensures border wraps tightly */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* optional soft shadow */
+}
+
