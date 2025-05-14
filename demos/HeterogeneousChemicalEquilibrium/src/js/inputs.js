@@ -3,24 +3,26 @@ import { calcAll } from "./calcs";
 
 export function handleInputs() {
   initializeHamburger();
-  handleSliders();
+  
 }
 
-function handleSliders() {
-  handleTemperatureSlider();
-}
+// function handleSliders() {
+//   handleTemperatureSlider();
+// }
 
-function handleTemperatureSlider() {
-  const temperatureSlider = document.getElementById("temperature-slider");
-  const temperatureValue = document.getElementById("temperature-value");
+// function handleTemperatureSlider() {
+//   const temperatureSlider = document.getElementById("temperature-slider");
+//   const temperatureValue = document.getElementById("temperature-value");
 
-  temperatureSlider.addEventListener("input", (e) => {
-    const value = Number(e.target.value);
-    temperatureValue.textContent = `${value} K`;
-    state.T = value;
-    calcAll(); // Recalculate all values based on new defaults
-  });
-}
+//   temperatureSlider.addEventListener("input", (e) => {
+//     const value = Number(e.target.value);
+//     temperatureValue.textContent = `${value} K`;
+//     state.T = value;
+//     calcAll(); // Recalculate all values based on new defaults
+//   });
+// }
+
+
 
 function handleHamburger() {
   const hamburger = document.getElementById("hamburger");
