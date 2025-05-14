@@ -1,17 +1,19 @@
-import { vec2 } from "../types";
-import { beginTubeFillAnimation } from "./animation";
+import { GlobalState, ValveSetting, vec2 } from "../types";
+import { beginTubeFillAnimation, initAnimationObjects, swapValveAnimation } from "./animation";
 import { constrain, rescale, smoothLerp } from "./helpers";
-
-export const State = {
-    pumpIsRunning: false,
-    flowrate: 10, // g / s
-}
 
 const MIN_FLOWRATE = 10;
 const MAX_FLOWRATE = 20;
 
+export const State: GlobalState = {
+    apparatusDiv: undefined,
+    valveSetting: ValveSetting.RecycleMode,
+    pumpIsRunning: false,
+    valveLift: 10, // g / s
+}
+
 // Insert an svg image 
-function insertSVG(svg: string) {
+function insertSVG(svg: string): HTMLDivElement {
     const div = document.createElement("div");
   
     // Set basic attributes
@@ -22,11 +24,13 @@ function insertSVG(svg: string) {
 
 // Create div containing svg
 const svg = require("../media/Fluidized-bed Graphics.svg");
-const apparatusDiv = insertSVG(svg);
+State.apparatusDiv = insertSVG(svg) as unknown as SVGAElement;
 
 // Find parent and append svg div
 const parent = document.getElementById("graphics-wrapper");
-parent.appendChild(apparatusDiv);
+parent.appendChild(State.apparatusDiv);
+
+initAnimationObjects();
 
 /* ********************** */
 /* ** Set interactions ** */
@@ -75,9 +79,9 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
 
         // Set angle
         v1Angle += dth;
-        v1Angle = constrain(v1Angle, 0, 90);
+        v1Angle = constrain(v1Angle, -90, 0);
         valve1.setAttribute("transform", `rotate(${v1Angle} 129 83)`);
-        State.flowrate = rescale(v1Angle, 0, 90, MIN_FLOWRATE, MAX_FLOWRATE, true);
+        State.valveLift = rescale(v1Angle, -90, 0, 0, 1, true);
     };
     const release = () => {
         document.removeEventListener("mousemove", drag);
@@ -91,43 +95,28 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
 /*
  *  Interaction for valve 2
  */
-/*
- *  Interaction for valve 1
- */
-var v2Angle = 0;
+var lastAngle = 0;
+var currAngle = 0;
 valve2.addEventListener("mousedown", ({ clientX, clientY }) => {
-    // Find centroid
-    var offset = valve2.getBoundingClientRect();
-    var center = vec2(
-        (offset.left + offset.right) / 2,
-        (offset.top + offset.bottom) / 2
-    );
-    // Get initial mouse angle
-    let dispAngle = v2Angle;
+    currAngle = currAngle === 0 ? -90 : 0;
 
-    const drag = ({ clientX, clientY }: MouseEvent) => {
-        // Find angle from centroid to mouse
-        let th = findAngleFromDown(center,vec2(clientX,clientY));
-        // Find difference and reset th
-        let target;
-        if (th > -180 && th < -45 || th > 135) target = -90;
-        else target = 0;
+    smoothLerp(150, (val) => {
+        valve2.setAttribute("transform", `rotate(${val} 143 29)`);
+    }, lastAngle, currAngle);
+    lastAngle = currAngle;
 
-        if (v2Angle !== target) {
-            // Lerp between the current value and the target smoothly
-            smoothLerp(150, (val) => {
-                valve2.setAttribute("transform", `rotate(${val} 143 29)`);
-            }, v2Angle, target);
-            v2Angle = target;
-        }
-    };
-    const release = () => {
-        document.removeEventListener("mousemove", drag);
-        document.removeEventListener("mouseup", release);
-    };
+    // Update the state
+    if (State.valveSetting === ValveSetting.RecycleMode) {
+        State.valveSetting = ValveSetting.CatchAndWeigh;
+    }
+    else {
+        State.valveSetting = ValveSetting.RecycleMode;
+    }
 
-    document.addEventListener("mousemove", drag);
-    document.addEventListener("mouseup", release);
+    // Play animation
+    if (State.pumpIsRunning) {
+        swapValveAnimation(State.valveSetting);
+    }
 })
 
 /* ************************************** */
@@ -141,4 +130,5 @@ const pumpBtn = document.getElementById("pump-btn");
 pumpBtn.addEventListener("click", () => {
     // Start pump animation
     beginTubeFillAnimation();
+    State.pumpIsRunning = true;
 })

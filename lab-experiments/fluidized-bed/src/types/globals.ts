@@ -1,5 +1,13 @@
+export enum ValveSetting {
+    RecycleMode = 0,
+    CatchAndWeigh = 1
+}
+
 export type GlobalState = {
-    aparatusDiv: SVGAElement;
+    apparatusDiv: SVGAElement;
+    valveSetting: ValveSetting;
+    pumpIsRunning: boolean;
+    valveLift: number
 }
 
 export type vec2 = {

@@ -47,14 +47,11 @@ canvas {
   }
 }
 #Valve_2 {
-  cursor: grab;
-  
-  :active {
-    cursor: grabbing;
-  }
+  cursor: pointer;
 }
 
 #pump-btn {
   width: 150px;
   margin: auto;
+  margin-top: .5em;
 }
