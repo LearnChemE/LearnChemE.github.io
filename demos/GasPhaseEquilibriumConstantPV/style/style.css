@@ -25,25 +25,28 @@
   justify-items: end;
   gap: 0px 5px;
   justify-content: space-evenly;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 
 .btn-group {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 
 #display-selection {
   grid-template-columns: max-content max-content;
   gap: 5px;
   justify-content: center;
+  font-size: 1.2rem;
 }
 
 #sliders-area-1 {
   transform: translateX(10px);
+  font-size: 1.2rem;
 }
 
 #sliders-area-2 {
   transform: translateY(-5px) translateX(20px);
+  font-size: 1.2rem;
 }
 
 select {
@@ -64,12 +67,12 @@ mjx-container {
   transform: translateX(-20px);
 }
 
-.modal-buttons-row>* {
+.modal-buttons-row > * {
   height: max-content;
   align-self: center;
 }
 
-.modal-buttons-row>.input-area {
+.modal-buttons-row > .input-area {
   grid-column: 1 / -1;
 }
 
@@ -85,7 +88,7 @@ li {
   font-size: 0.8rem;
 }
 
-.modal-body>p {
+.modal-body > p {
   font-size: 0.9rem;
 }
 
@@ -100,7 +103,7 @@ li {
   padding: 2px;
 }
 
-.modal-text+.modal-text {
+.modal-text + .modal-text {
   margin-top: 10px;
 }
 
@@ -133,7 +136,7 @@ canvas {
 
 #equilibrium-text {
   font-size: 2rem;
-  font-family: 'Noto Sans', sans-serif;
+  font-family: "Noto Sans", sans-serif;
   position: absolute;
   top: 8%;
   left: 72.5%;
@@ -190,6 +193,6 @@ canvas {
 @media screen and (min-width: 1200px) {
   .input-area,
   .btn-group {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 }

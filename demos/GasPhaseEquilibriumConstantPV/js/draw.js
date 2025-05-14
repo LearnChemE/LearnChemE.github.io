@@ -1,5 +1,5 @@
 import { calcAll } from "./calcs.js";
-const selectionElement = document.getElementById("selection");
+//const selectionElement = document.getElementById("selection");
 const p5container = document.getElementById("p5-container");
 const eqText = document.getElementById("equilibrium-text");
 const meter3 = document.getElementById("meter3-text");
@@ -48,6 +48,8 @@ window.setup = function () {
 window.draw = function () {
   // The "window" keyword is used to set global variables. So you can use
   // "selection" in any file, function, block, etc.
+  const selectionElement = document.querySelector('input[name="selection"]:checked');
+
   window.selection = selectionElement.value;
   resize();
   background(255);
@@ -184,10 +186,8 @@ function draw3DCylinderForConstPressureSelection() {
 
   //green gas volume
   push();
-  //translate(0, z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2 + 0.5 * (z.cylHeight / 2 - (z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2)));
-  fill(0, 200, 0, 80);
-  //cylinder(z.cylRadius - 1, -1 + (z.cylHeight / 2 - (z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2)), 64, 1);
-  translate(0, z.cylHeight * z.cylinderLiveVolumeFractionConstantPressureCase );
+  fill(0, 200, 0, 50 / z.cylinderLiveVolumeFractionConstantPressureCase);
+  translate(0, (z.cylHeight * (1 - z.cylinderLiveVolumeFractionConstantPressureCase)) / 2);
   cylinder(z.cylRadius - 1, -1 - z.cylHeight * z.cylinderLiveVolumeFractionConstantPressureCase, 64, 1);
 
   pop();

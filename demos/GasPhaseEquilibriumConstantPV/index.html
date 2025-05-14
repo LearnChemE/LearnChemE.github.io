@@ -1,13 +1,14 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Update everything below THIS -->
-  <meta name="description" content="A simulation of a gas phase equilibrium reaction at constant pressure or volume.">
-  <meta name="keywords" content="simulation, engineering, interactive, chemical, equilibrium, gas-phase, physical chemistry">
-  <meta name="author" content="Jackson Dunlap">
+  <meta name="description" content="A simulation of a gas phase equilibrium reaction at constant pressure or volume." />
+  <meta name="keywords"
+    content="simulation, engineering, interactive, chemical, equilibrium, gas-phase, physical chemistry" />
+  <meta name="author" content="Jackson Dunlap" />
 
   <title>Gas-Phase Chemical Equilibrium at Constant Pressure or Volume</title>
   <!-- and above THIS -->
@@ -18,8 +19,8 @@
       chtml: {
         scale: 0.95,
         mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
-        displayAlign: 'left', // default for indentalign when set to 'auto'
-      }
+        displayAlign: "left", // default for indentalign when set to 'auto'
+      },
     };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -28,11 +29,11 @@
   <script type="text/javascript" src="./js/p5.js"></script>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="./style/style.css">
-  <link rel="stylesheet" href="./style/slider.css">
+  <link rel="stylesheet" href="./style/style.css" />
+  <link rel="stylesheet" href="./style/slider.css" />
 
   <!-- bootstrap -->
-  <link rel="stylesheet" href="./style/bootstrap-custom.css">
+  <link rel="stylesheet" href="./style/bootstrap-custom.css" />
   <script src="./js/bootstrap.min.js"></script>
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -43,19 +44,18 @@
     function gtag() {
       dataLayer.push(arguments);
     }
-    gtag('js', new Date());
+    gtag("js", new Date());
 
-    gtag('config', 'UA-204988035-3');
+    gtag("config", "UA-204988035-3");
   </script>
 </head>
 
 <body>
-
   <!-- The controls-area is at the top of the simulation, and contains all buttons, sliders, and dropdowns -->
   <div class="controls-area">
     <div class="inputs">
       <div class="input-area" id="display-selection">
-        <div id="selection-row">display:</div>
+        <div id="selection-row"></div>
 
         <!-- <div class="btn-group" role="group" id="plot-type">
           <input type="radio" class="btn-check" name="plot" id="velocity-distribution" value="velocity-distribution" autocomplete="off" checked>
@@ -69,55 +69,71 @@
         <button class="btn btn-primary btn-primary" data-bs-toggle="button" aria-pressed="true" autocomplete="off">Velocity Distribution</button>
         <button class="btn btn-primary btn-primary" data-bs-toggle="button" aria-pressed="false" autocomplete="off">Velocity vs Height</button>
         </div>-->
+        <div class="btn-group" role="group" id="selection-type">
+          <input type="radio" class="btn-check" name="selection" id="r-constant-pressure" value="constant-pressure"
+            autocomplete="off" checked />
+          <label class="btn btn-outline-secondary btn-sm" style="color: black; font-size: 1rem;"
+            for="r-constant-pressure">constant pressure</label>
 
-        <select id="selection">
-          <option value="constant-pressure">constant pressure</option>
-          <option value="constant-volume">constant volume</option>
-        </select>
+          <input type="radio" class="btn-check" name="selection" id="r-constant-volume" value="constant-volume"
+            autocomplete="off" />
+          <label class="btn btn-outline-secondary btn-sm" style="color: black; font-size: 1rem;"
+            for="r-constant-volume">constant volume</label>
+        </div>
+
+        <!-- <select id="selection">
+            <option value="constant-pressure2">constant pressure</option>
+            <option value="constant-volume2">constant volume</option>
+          </select> -->
 
       </div>
 
       <div class="input-area" id="sliders-area-1">
-        <div class="data-name" id="pressure-slider-name">pressure (bar): </div>
-        <input type="range" id="pressure-slider" min="0.5" max="10" step="0.01" value="0.7">
+        <div class="data-name" id="pressure-slider-name">pressure (bar):</div>
+        <input type="range" id="pressure-slider" min="0.5" max="10" step="0.01" value="0.7" />
         <div class="data-value" id="pressure-value">0.70</div>
         <div class="data-metric"></div>
 
-        <div class="data-name" id="volume-slider-name">volume (m<sup>3</sup>): </div>
-        <input type="range" id="volume-slider" min="0.02" max="2.06" step="0.01" value="0.74">
+        <div class="data-name" id="volume-slider-name">
+          volume (m<sup>3</sup>):
+        </div>
+        <input type="range" id="volume-slider" min="0.02" max="2.06" step="0.01" value="0.74" />
         <div class="data-value" id="volume-value">0.74</div>
         <div class="data-metric"></div>
       </div>
 
-      <div class="btn-group" role="group" id="plot-type">coefficient of B in reaction: &nbsp;
-        <input type="radio" class="btn-check" name="plot" id="r-1/2" value="1/2" autocomplete="off">
+      <div class="btn-group" role="group" id="plot-type">
+        coefficient of B in reaction: &nbsp;
+        <input type="radio" class="btn-check" name="plot" id="r-1/2" value="1/2" autocomplete="off" />
         <label class="btn btn-outline-primary btn-sm" for="r-1/2">1/2</label>
 
-        <input type="radio" class="btn-check" name="plot" id="r-1" value="1" autocomplete="off">
+        <input type="radio" class="btn-check" name="plot" id="r-1" value="1" autocomplete="off" />
         <label class="btn btn-outline-primary btn-sm" for="r-1">1</label>
 
-        <input type="radio" class="btn-check" name="plot" id="r-3/2" value="3/2" autocomplete="off">
+        <input type="radio" class="btn-check" name="plot" id="r-3/2" value="3/2" autocomplete="off" />
         <label class="btn btn-outline-primary btn-sm" for="r-3/2">3/2</label>
 
-        <input type="radio" class="btn-check" name="plot" id="r-2" value="2" autocomplete="off" checked>
+        <input type="radio" class="btn-check" name="plot" id="r-2" value="2" autocomplete="off" checked />
         <label class="btn btn-outline-primary btn-sm" for="r-2">2</label>
       </div>
-
     </div>
 
-
-
     <div class="modal-buttons-row">
-      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
-      <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
-      <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+      <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
+        Directions
+      </div>
+      <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">
+        Details
+      </div>
+      <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">
+        About
+      </div>
 
       <div class="input-area" id="sliders-area-2">
         <div class="data-name">add moles of inert:</div>
-        <input type="range" id="moles-inerts-slider" min="0" max="6" step="0.1" value="0.0">
+        <input type="range" id="moles-inerts-slider" min="0" max="6" step="0.1" value="0.0" />
         <div class="data-value" id="moles-inerts-value">0.0</div>
         <div class="data-metric"></div>
-
       </div>
     </div>
   </div>
@@ -126,12 +142,12 @@
     <p id="equilibrium-text">A ⇋ 2B</p>
   </div>
 
-
   <!--
     Everything below here are modals, which are hidden by default. Any content
     within the modals should be wrapped in a div with the class "modal-content".
   -->
-  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label" aria-hidden="true">
+  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -140,19 +156,27 @@
         </div>
         <div class="modal-body">
           <p>
-            This Demonstration calculates the number of moles at equilibrium for a gas-phase reaction \(A ⇋ rB\) at constant temperature; the equilibrium constant for the reaction is \(K_{eq} = 0.5\). Components \(A\) and \(B\) are ideal gases, and you can set the
-            value of \(r\) (1/2, 1, 3/2, or 2) with buttons. Initially the container is filled with 5 mol of reactant \(A\), and equilibrium is obtained at either constant pressure (set pressure with a slider) or constant volume (set volume with a slider).
-            The bar graph displays the number of moles at equilibrium, including the moles of inert gas (select the moles of inert with a slider). The height of the piston or container is proportional to the final volume.
+            This simulation calculates the number of moles at equilibrium for
+            a gas-phase reaction \(A ⇋ rB\) at constant temperature; set the
+            value of \(r\) (1/2, 1, 3/2, or 2) with buttons. The equilibrium
+            constant for the reaction is \(K_{eq} = 0.5\) and components A and
+            B are ideal gases. Initially the container is filled with 5 mol of
+            reactant A, and equilibrium is obtained at either constant
+            pressure (set pressure with a slider) or constant volume (set
+            volume with a slider). The bar graph displays the number of moles
+            at equilibrium, including the moles of inert gas (select the moles
+            of inert with a slider). The height of the piston or container is
+            proportional to the final volume.
           </p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label" aria-hidden="true">
+  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
-
         <div class="modal-header">
           <h5 class="modal-title" id="details-modal-label">Details</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -160,68 +184,42 @@
 
         <div class="modal-body">
           <p>
-            The number of moles of each species in this reaction at equilibrium (values shown on the chart) determines the extent of reaction \(\xi\):
+            The number of moles of each species in this reaction at
+            equilibrium (values shown on the chart) determines the extent of
+            reaction \(\xi\):
+          </p>
+
+          <p>$$ n_A = n_{A,0} - \xi, $$ $$ n_B = r\xi, $$</p>
+
+          <p>
+            where \(n_{A}\) and \(n_B\) are the moles of reactant and product
+            at equilibrium (mol), \(n_{A,0} = 5\) is the moles of reactant
+            present initially, and \(r\) is the ratio of moles of product to
+            moles of reactant. The equilibrium constant \(K_{eq}\) is: $$
+            K_{eq} = {P_B}^r/P_A,$$
           </p>
 
           <p>
-            $$ n_A = n_{A,0} - \xi, $$ $$ n_B = r\xi, $$
+            where \(P_A = y_AP\) is the partial pressure of the reactant,
+            \(P_B = y_BP\) is the partial pressure of the product, and \(P\)
+            is the total pressure (bar). The mole fraction of each species at
+            equilibrium is: $$y_A = n_A/n_{total},$$ $$y_B = n_B/n_{total},$$
           </p>
 
           <p>
-            where \(n_{A}\) and \(n_B\) are the moles of reactant and product at equilibrium (mol), \(n_{A,0} = 5\) is the moles of reactant present initially, and \(r\) is the ratio of moles of product to moles of reactant.
+            where the total number of moles is \(n_{total} = n_{A,0} + n_I +
+            \xi(r-1)\), with \(n_I\) the number of moles of any inert
+            component in the mixture. The extent of reaction is found by
+            setting \(K_{eq} = 0.5\) and solving for \(\xi\).
           </p>
 
-          <p>
-            The equilibrium constant \(K_{eq}\) is: $$ K_{eq} = {P_B}^r/P_A,$$
-          </p>
-
-          <p>
-            where \(P_A = y_AP\) is the partial pressure of the reactant, \(P_B = y_BP\) is the partial pressure of the product, and \(P\) is the total pressure (bar).
-          </p>
-
-          <p>
-            The mole fraction of each species at equilibrium is: $$y_A = n_A/n_{total},$$ $$y_B = n_B/n_{total},$$
-          </p>
-
-          <p>
-            where the total number of moles is \(n_{total} = n_{A,0} + n_I + \xi(r-1)\), with \(n_I\) the number of moles of any inert component in the mixture.
-          </p>
-
-          <p>
-            The extent of reaction is found by setting \(K_{eq} = 0.5\) and solving for \(\xi\).
-          </p>
-
-
-          <!--
-          <p>
-            The screencast video <a href="https://www.youtube.com/watch?v=QjzJZ_OD3AY&t=1s" target="_blank">Gas-Phase Chemical Equilibrium</a> shows how to use this Demonstration.
-          </p>
-
-          <p>
-            Reference
-          </p>
-           <p>
-            <ol class="references">
-               This is the main citation from the origional simulation, the Permanent Citation from that Page has not been included but may need to be.-->
-          <!--I included the Permanent Citation. as the  second reference.
-              <li>
-                Gas-Phase Chemical Equilibrium at Constant Pressure or Constant Volume [Video]. (Dec 16, 2020) https://www.youtube.com/watch?v=QjzJZ_OD3AY&t=1s.
-              </li>
-              <li>
-                Garrison J. Vigil and Rachael L. Baumann <br>
-                "Gas-Phase Chemical Equilibrium at Constant Pressure or Constant Volume" <br>
-                http://demonstrations.wolfram.com/GasPhaseChemicalEquilibriumAtConstantPressureOrConstantVolum/ <br>
-                Wolfram Demonstrations Project <br>
-                Published: July 30, 2015
-              </li>
-            </ol>
-          </p>-->
         </div>
       </div>
     </div>
   </div>
 
-  <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label" aria-hidden="true">
+  <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -230,11 +228,34 @@
         </div>
         <div class="modal-body">
           <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
-              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Jackson Dunlap under the direction of Professor John L. Falconer and Michelle Medlin,
-            with the assistance of Neil Hendren and Drew Smith. It is a JavaScript/HTML5 implementation of a Mathematica simulation by Garrison Vigil, Rachael L. Baumann. It can be downloaded
-            <a href="https://learncheme.com/wp-content/uploads/simulation-files/downloads/gas-phase-chemical-equilibrium-at-constant-p-or-constant-v.cdf">here</a>. It was prepared with financial support from the National Science Foundation (DUE 2336987
-            and 2336988). Address any questions or comments to LearnChemE@gmail.com.
+            This simulation was created in the
+            <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological
+              Engineering</a>, at University of Colorado Boulder for
+            <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a>
+            by Jackson Dunlap under the direction of Professor John L.
+            Falconer and Michelle Medlin, with the assistance of Neil Hendren
+            and Drew Smith. It is a JavaScript/HTML5 implementation of a
+            <a href="https://demonstrations.wolfram.com/GasPhaseChemicalEquilibriumAtConstantPressureOrConstantVolum/"
+              target="_blank">Mathematica simulation</a>
+            by Garrison Vigil and Rachael L. Baumann. It was prepared with
+            financial support from the National Science Foundation (DUE
+            2336987 and 2336988) in collaboration with Washington State
+            University. Address any questions or comments to
+            LearnChemE@gmail.com.
+          </p>
+
+          <p>
+            If this simulation is too big for your
+            screen, zoom out using&nbsp;<span><img src="https://learncheme.github.io/media/command.png"
+                style="height: 4ch" /></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/minus.png"
+                style="height: 4ch" /></span>&nbsp;on Mac or&nbsp;<span><img
+                src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch" /></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/minus.png" style="height: 4ch" /></span>&nbsp;on Windows. To
+            zoom in, use&nbsp;<span><img src="https://learncheme.github.io/media/command.png"
+                style="height: 4ch" /></span>&nbsp;+&nbsp;<span><img src="https://learncheme.github.io/media/plus.png"
+                style="height: 4ch" /></span>&nbsp;on Mac or&nbsp;<span><img
+                src="https://learncheme.github.io/media/ctrl.png" style="height: 4ch" /></span>&nbsp;+&nbsp;<span><img
+                src="https://learncheme.github.io/media/plus.png" style="height: 4ch" /></span>&nbsp;on Windows.
           </p>
         </div>
       </div>
