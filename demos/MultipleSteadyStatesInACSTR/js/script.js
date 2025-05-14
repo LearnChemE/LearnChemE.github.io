@@ -166,8 +166,8 @@ function update() {
     yM = mbal(xM, tau, kr);
 
   Plotly.react('plot', [
-    { x: T, y: E, mode: 'lines', line: { color: 'blue', width: 3 }, hovertemplate: '%{x}, %{y}<extra></extra>' },
-    { x: T, y: M, mode: 'lines', line: { color: 'green', width: 3 }, hovertemplate: '%{x}, %{y}<extra></extra>' }
+    { x: T, y: E, mode: 'lines', line: { color: 'blue', width: 3 }, hovertemplate: '%{x:.2f}, %{y:.2f}<extra></extra>' },
+    { x: T, y: M, mode: 'lines', line: { color: 'green', width: 3 }, hovertemplate: '%{x:.2f}, %{y:.2f}<extra></extra>' }
   ], {
     margin: { t: 20, l: 60, r: 20, b: 60 },
     showlegend: false,
