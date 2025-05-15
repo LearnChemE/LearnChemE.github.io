@@ -1,9 +1,10 @@
-import { calcAll } from './calcs.js';
-const selectionElement = document.getElementById('selection');
-const p5container = document.getElementById('p5-container');
-const eqText = document.getElementById('equilibrium-text');
-const meter3 = document.getElementById('meter3-text');
-
+import { calcAll } from "./calcs.js";
+const selectionElement = document.getElementById("selection");
+const p5container = document.getElementById("p5-container");
+const eqText = document.getElementById("equilibrium-text");
+const meter3 = document.getElementById("meter3-text");
+const volumeSliderWrapper = document.getElementById("volume-slider-wrapper");
+const pressureSliderWrapper = document.getElementById("pressure-slider-wrapper");
 
 //defined local variables only needed in draw
 let angleX = 0;
@@ -12,10 +13,10 @@ let meter3Image;
 let font;
 
 //preload for loading images and fonts
-window.preload = function() {
-  font = loadFont('./assets/NotoSans-Regular.ttf');
-  meter3Image = loadImage('/assets/imageMeterCubed.jpg');
-}
+window.preload = function () {
+  font = loadFont("./assets/NotoSans-Regular.ttf");
+  meter3Image = loadImage("/assets/imageMeterCubed.jpg");
+};
 
 // This function is used to scale the canvas based on the size of the container
 window.relativeSize = () => p5container.offsetWidth / 1280;
@@ -33,18 +34,20 @@ function resize() {
 
 // Moved outside of the selection block - Do not call setup() more than once.
 // So this should never be inside a conditional statement.
-window.setup = function() {
-
+window.setup = function () {
   createCanvas(p5container.offsetWidth, p5container.offsetHeight, WEBGL).parent(p5container);
   frameRate(60);
-
-}
+};
 
 // Same with draw() - this should never be inside a conditional statement.
 // Put the conditional statements inside the draw function.
-window.draw = function() {
+window.draw = function () {
   // The "window" keyword is used to set global variables. So you can use
   // "selection" in any file, function, block, etc.
+
+  const selectionElement = document.querySelector('input[name="selection"]:checked');
+  window.selection = selectionElement.value;
+
   resize();
   background(255);
   calcAll();
@@ -58,18 +61,19 @@ window.draw = function() {
   }
 
   if (selection === "constant-pressure") {
-
     draw3DCylinderForConstPressureSelection();
     drawPlotForConstPressureSelection();
     drawTextForConstPressureSelection();
     drawBarsForConstPressurePlot();
-
+    volumeSliderWrapper.style.display = "none";
+    pressureSliderWrapper.style.display = "grid";
   } else if (selection === "constant-volume") {
     draw3DCylinderForConstVolumeSelection();
     drawPlotForConstVolumeSelection();
     drawTextForConstVolumeSelection();
     drawBarsForConstVolumePlot();
-
+    volumeSliderWrapper.style.display = "grid";
+    pressureSliderWrapper.style.display = "none";
   }
 };
 
@@ -104,9 +108,9 @@ function draw3DCylinderForConstPressureSelection() {
   push();
 
   ortho();
-  rotateX(PI / 64);
+  rotateX(-PI / 24);
 
-  translate(-350, 0);
+  translate(-350, 90);
   rotateX(angleX);
   rotateZ(angleY);
   rotateY(3 * HALF_PI);
@@ -164,9 +168,9 @@ function draw3DCylinderForConstPressureSelection() {
 
   //green gas volume
   push();
-  fill(0, 200, 0, 50 / z.cylinderLiveVolumeFractionConstantPressureCase);
+  fill(0, 200, 0, 32 / z.cylinderLiveVolumeFractionConstantPressureCase);
   translate(0, (z.cylHeight * (1 - z.cylinderLiveVolumeFractionConstantPressureCase)) / 2);
-  cylinder(z.cylRadius - 1, -1 - z.cylHeight * z.cylinderLiveVolumeFractionConstantPressureCase, 64, 1);
+  cylinder(z.cylRadius - 1, -1 - z.cylHeight * z.cylinderLiveVolumeFractionConstantPressureCase, 64, 1, false);
 
   pop();
 
@@ -282,9 +286,9 @@ function draw3DCylinderForConstVolumeSelection() {
   push();
 
   ortho();
-  rotateX(PI / 64);
+  rotateX(-PI / 24);
 
-  translate(-350, 0);
+  translate(-350, 90);
   rotateX(angleX);
   rotateZ(angleY);
   rotateY(3 * HALF_PI);
@@ -298,7 +302,7 @@ function draw3DCylinderForConstVolumeSelection() {
 
   //piston head + outlines
   push();
-  translate(0, -80 + 0.5 * z.cylHeight);
+  translate(0, -0.5 * (z.cylHeight - 280) - z.cylHeight * z.cylinderLiveVolumeFractionConstantVolumeCase + 0.5 * z.cylHeight);
 
   push();
   translate(0, 0.5 * (z.cylHeight - 280));
@@ -311,9 +315,9 @@ function draw3DCylinderForConstVolumeSelection() {
 
   //green gas volume
   push();
-  translate(0, z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2 + 0.5 * (z.cylHeight / 2 - (z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2)));
-  fill(0, 200, 0, 80);
-  cylinder(z.cylRadius - 1, -1 + (z.cylHeight / 2 - (z.cylHeight / 2 - 80 + (z.cylHeight - 280) / 2)), 64, 1);
+  fill(0, 200, 0, 32 / z.cylinderLiveVolumeFractionConstantVolumeCase + 70 / (6 / z.molesInerts));
+  translate(0, (z.cylHeight * (1 - z.cylinderLiveVolumeFractionConstantVolumeCase)) / 2);
+  cylinder(z.cylRadius - 1, -1 - z.cylHeight * z.cylinderLiveVolumeFractionConstantVolumeCase, 64, 1, false);
 
   pop();
 

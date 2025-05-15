@@ -47,12 +47,27 @@ body {
   padding-bottom: 15px;
 }
 
+.selection-row-wrapper {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  grid-column: 1 / 3;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-right: 40px;
+}
+
+.selection-row-wrapper > .btn-group > .btn {
+  width: 17ch;
+  font-size: var(--controls-font-size);
+}
+
 .btn-group-label {
   align-self: center;
   margin-right: 10px;
 }
 
-.btn-group>.btn {
+.btn-group > .btn {
   width: 5ch;
   font-size: var(--controls-font-size);
 }
@@ -72,17 +87,17 @@ mjx-container {
   margin: 5px;
 }
 
-.modal-buttons-row>.btn {
+.modal-buttons-row > .btn {
   font-size: var(--controls-font-size);
   padding: var(--button-padding);
 }
 
-.modal-buttons-row>* {
+.modal-buttons-row > * {
   height: max-content;
   align-self: center;
 }
 
-.modal-buttons-row>.input-area {
+.modal-buttons-row > .input-area {
   grid-column: 1 / -1;
 }
 
@@ -98,7 +113,7 @@ li {
   font-size: 0.8rem;
 }
 
-.modal-body>p {
+.modal-body > p {
   font-size: 0.9rem;
 }
 
@@ -113,7 +128,7 @@ li {
   padding: 2px;
 }
 
-.modal-text+.modal-text {
+.modal-text + .modal-text {
   margin-top: 10px;
 }
 
@@ -146,7 +161,7 @@ canvas {
 
 #equilibrium-text {
   font-size: var(--equation-font-size);
-  font-family: 'Noto Sans', sans-serif;
+  font-family: "Noto Sans", sans-serif;
   position: absolute;
   top: 8%;
   left: 72.5%;
@@ -165,7 +180,7 @@ canvas {
 
 @media screen and (min-width: 680px) {
   body {
-    --controls-font-size: 0.9rem;
+    --controls-font-size: 0.7rem;
     --button-padding: 0.4rem 0.6rem;
     --button-width: 6rem;
     --equation-font-size: 1.1rem;
@@ -174,7 +189,7 @@ canvas {
 
 @media screen and (min-width: 800px) {
   body {
-    --controls-font-size: 1rem;
+    --controls-font-size: 0.7rem;
     --button-padding: 0.5rem 0.8rem;
     --button-width: 7rem;
     --equation-font-size: 1.3rem;
@@ -183,14 +198,21 @@ canvas {
 
 @media screen and (min-width: 1080px) {
   body {
-    --controls-font-size: 1.1rem;
+    --controls-font-size: 0.8rem;
     --equation-font-size: 1.5rem;
   }
 }
 
 @media screen and (min-width: 1200px) {
   body {
-    --controls-font-size: 1.2rem;
+    --controls-font-size: 0.9rem;
     --equation-font-size: 1.8rem;
+  }
+}
+
+@media screen and (min-width: 1500px) {
+  body {
+    --controls-font-size: 1rem;
+    --equation-font-size: 2.2rem;
   }
 }
