@@ -1,0 +1,56 @@
+import "./style.css";
+import "bootstrap/scss/bootstrap.scss";
+import "bootstrap";
+import { FluidType, PlayState, type GlobalState } from "./types";
+import { DualButtonSelector, DualSelected, type DualButtonSelectorDescriptor } from "./types/dualButton";
+import { Slider } from "./types/slider";
+
+export const State: GlobalState = {
+  canvas: undefined,
+  playState: PlayState.NOT_PLAYED,
+  fluidType: FluidType.WATER,
+  linePressure: 10,
+  lineTemperature: 250,
+  tankPressure: 1
+};
+
+const ftypeDescriptor: DualButtonSelectorDescriptor = {
+  btnId1: "water-btn",
+  btnId2: "gas-btn",
+  style1: {
+    clicked: "btn btn-primary btn-sm",
+    unclicked: "btn btn-outline-primary btn-sm"
+  },
+  style2: {
+    clicked: "btn btn-secondary btn-sm",
+    unclicked: "btn btn-outline-secondary btn-sm"
+  },
+  callback: (s: number) => {
+    State.fluidType = (s === DualSelected.FIRST) ? FluidType.WATER : FluidType.IDEAL_GAS;
+  },
+}
+const fluidSelector = new DualButtonSelector(ftypeDescriptor);
+
+const playResetDescriptor: DualButtonSelectorDescriptor = {
+  btnId1: "play-btn",
+  btnId2: "reset-btn",
+  style1: {
+    clicked: "btn btn-success btn-sm disabled",
+    unclicked: "btn btn-success btn-sm"
+  },
+  style2: {
+    clicked: "btn btn-danger btn-sm disabled",
+    unclicked: "btn btn-danger btn-sm"
+  },
+  callback: (s: number) => {
+    State.fluidType = (s === DualSelected.FIRST) ? FluidType.WATER : FluidType.IDEAL_GAS;
+  },
+}
+const playSelector = new DualButtonSelector(playResetDescriptor);
+
+// Sliders
+const linePressureSlider = new Slider("line-p-slider-container", (val: number) => { State.linePressure    = val }, "bar", 0);
+const lineTempSlider     = new Slider("line-t-slider-container", (val: number) => { State.lineTemperature = val }, "°C" , 0);
+const tankPressureSlider = new Slider("tank-p-container",        (val: number) => { State.tankPressure    = val }, "bar", 1);
+
+import "./ts/canvas";

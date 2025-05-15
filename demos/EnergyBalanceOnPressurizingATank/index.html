@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Simulation showing the energy balances involved with pressurizing a tank."
+    />
+    <meta
+      name="keywords"
+      content="LearnChemE, chemical engineering, engineering, simulation, energy balance, material and energy balances, pressurizing tank, pressure vessel"
+    />
+    <meta name="author" content="Drew Smith" />
+    <meta name="application-name" content="Energy Balance on Pressurizing a Tank" />
+    <title>Energy Balance on Pressurizing a Tank</title>
+    <script
+      src="https://kit.fontawesome.com/9d19ad28f4.js"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      window.MathJax = {
+        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+        svg: { fontCache: 'global' }
+      };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <!-- Simulation Layout -->
+    <div class="sim-wrapper">
+        <div id="controls" class="ctrl-wrapper">
+          <!-- Modal Buttons -->
+          <div id="modal-buttons">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
+              Directions
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">
+              Details
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</button>
+          </div>
+          <!-- Sim Controls -->
+          <div class="nav-bar">
+            <!-- Left -->
+            <div class="nav-bar-column" id="nav-bar-left">
+                <div class="two-button-container" id="fluid-type-container">
+                    <button type="button" id="water-btn" class="btn btn-primary btn-sm">water</button>
+                    <button type="button" id="gas-btn" class="btn btn-outline-secondary btn-sm">ideal gas</button>
+                </div>
+
+                <div class="slider-wrapper" id="line-p-slider-container">
+                    <div class="slider-label">line pressure (\( P_2 \)):</div>
+                    <input type="range" id="conc-slider" min="5" max="15" value="10" step="1" />
+                    <div class="slider-val-label" id="conc-slider-label">10 bar</div>
+                </div>
+                <div class="slider-wrapper" id="line-t-slider-container">
+                    <div class="slider-label">line temperature (\( T_2 \)):</div>
+                    <input type="range" id="conc-slider" min="200" max="250" value="225" step="1" />
+                    <div class="slider-val-label" id="conc-slider-label">225 °C</div>
+                </div>
+            </div>
+            <!-- Right -->
+            <div class="nav-bar-column" id="nav-bar-right">
+                <div class="two-button-container" id="play-reset-container">
+                    <button type="button" id="play-btn" class="btn btn-success btn-sm">
+                      <div>
+                        <i class="fa-solid fa-play"></i>
+                        &nbsp;&nbsp;play
+                      </div>
+                    </button>
+                    <button type="button" id="reset-btn" class="btn btn-danger btn-sm disabled">
+                      <div>
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        &nbsp;&nbsp;reset
+                      </div>
+                    </button>
+                </div>
+
+                <div class="slider-wrapper" id="tank-p-container">
+                    <div class="slider-label">tank pressure (\( P_1 \)):</div>
+                    <input type="range" id="conc-slider" min="1" max="5" value="1" step=".1" />
+                    <div class="slider-val-label" id="conc-slider-label">1.0 bar</div>
+                </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wrapper for Canvas -->
+        <div id="graphics-wrapper">
+        </div>
+      </div>
+        
+    </div>
+    <!-- End Simulation Layout -->
+
+    <!-- Modal Dialoogues -->
+    <div
+      id="directions-modal"
+      class="modal fade"
+      tabindex="-1"
+      aria-labelledby="simulation directions"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Directions</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>\( \frac{1}{2} \)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="details-modal" class="modal fade" tabindex="-1" aria-labelledby="simulation details" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Modal body text goes here.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="about-modal" class="modal fade" tabindex="-1" aria-labelledby="about the simulation" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">About</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Modal body text goes here.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal Dialogues -->
+
+    <!-- Scripts -->
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
