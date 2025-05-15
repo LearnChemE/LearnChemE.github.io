@@ -15,7 +15,7 @@ let font;
 //preload for loading images and fonts
 window.preload = function () {
   font = loadFont("./assets/NotoSans-Regular.ttf");
-  meter3Image = loadImage("/assets/imageMeterCubed.jpg");
+  meter3Image = loadImage("./assets/imageMeterCubed.jpg");
 };
 
 // This function is used to scale the canvas based on the size of the container
