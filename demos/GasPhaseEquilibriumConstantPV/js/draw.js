@@ -1,14 +1,9 @@
-import { calcAll } from "./calcs.js";
-//const selectionElement = document.getElementById("selection");
-const p5container = document.getElementById("p5-container");
-const eqText = document.getElementById("equilibrium-text");
-const meter3 = document.getElementById("meter3-text");
-const pressureSlider = document.getElementById("pressure-slider");
-const pressureSldrVal = document.getElementById("pressure-value");
-const pressureSldrName = document.getElementById("pressure-slider-name");
-const volumeSlider = document.getElementById("volume-slider");
-const volumeSldrVal = document.getElementById("volume-value");
-const volumeSldrName = document.getElementById("volume-slider-name");
+import { calcAll } from './calcs.js';
+const selectionElement = document.getElementById('selection');
+const p5container = document.getElementById('p5-container');
+const eqText = document.getElementById('equilibrium-text');
+const meter3 = document.getElementById('meter3-text');
+
 
 //defined local variables only needed in draw
 let angleX = 0;
@@ -17,10 +12,10 @@ let meter3Image;
 let font;
 
 //preload for loading images and fonts
-window.preload = function () {
-  font = loadFont("./assets/NotoSans-Regular.ttf");
-  meter3Image = loadImage("./assets/imageMeterCubed.jpg");
-};
+window.preload = function() {
+  font = loadFont('./assets/NotoSans-Regular.ttf');
+  meter3Image = loadImage('/assets/imageMeterCubed.jpg');
+}
 
 // This function is used to scale the canvas based on the size of the container
 window.relativeSize = () => p5container.offsetWidth / 1280;
@@ -38,19 +33,18 @@ function resize() {
 
 // Moved outside of the selection block - Do not call setup() more than once.
 // So this should never be inside a conditional statement.
-window.setup = function () {
+window.setup = function() {
+
   createCanvas(p5container.offsetWidth, p5container.offsetHeight, WEBGL).parent(p5container);
   frameRate(60);
-};
+
+}
 
 // Same with draw() - this should never be inside a conditional statement.
 // Put the conditional statements inside the draw function.
-window.draw = function () {
+window.draw = function() {
   // The "window" keyword is used to set global variables. So you can use
   // "selection" in any file, function, block, etc.
-  const selectionElement = document.querySelector('input[name="selection"]:checked');
-
-  window.selection = selectionElement.value;
   resize();
   background(255);
   calcAll();
@@ -64,34 +58,18 @@ window.draw = function () {
   }
 
   if (selection === "constant-pressure") {
-    draw3DCylinderForConstPressureSelection();
-    drawPlotForConstPressureSelection();
-    drawBarsForConstPressurePlot();
-    drawTextForConstPressureSelection();
 
-    //Controls for switching the volume and pressure sliders
-    pressureSlider.style.display = "block";
-    pressureSldrVal.style.display = "block";
-    pressureSldrName.style.display = "block";
-    volumeSlider.style.display = "none";
-    volumeSldrVal.style.display = "none";
-    volumeSldrName.style.display = "none";
-    //eqText.style.display = 'block';
+    draw3DCP();
+    draw2DCP();
+    drawBarGraphCP();
+    drawTextCP();
+
   } else if (selection === "constant-volume") {
     draw3DCylinderForConstVolumeSelection();
     drawPlotForConstVolumeSelection();
     drawTextForConstVolumeSelection();
     drawBarsForConstVolumePlot();
 
-    //Controls for switching the volume and pressure sliders
-    pressureSlider.style.display = "none";
-    pressureSldrVal.style.display = "none";
-    pressureSldrName.style.display = "none";
-    volumeSlider.style.display = "block";
-    volumeSldrVal.style.display = "block";
-    volumeSldrName.style.display = "block";
-
-    //eqText.style.display = 'block';
   }
 };
 
