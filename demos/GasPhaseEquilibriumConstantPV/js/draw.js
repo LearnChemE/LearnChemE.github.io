@@ -59,10 +59,10 @@ window.draw = function() {
 
   if (selection === "constant-pressure") {
 
-    draw3DCP();
-    draw2DCP();
-    drawBarGraphCP();
-    drawTextCP();
+    draw3DCylinderForConstPressureSelection();
+    drawPlotForConstPressureSelection();
+    drawTextForConstPressureSelection();
+    drawBarsForConstPressurePlot();
 
   } else if (selection === "constant-volume") {
     draw3DCylinderForConstVolumeSelection();
