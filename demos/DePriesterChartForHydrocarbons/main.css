@@ -1,0 +1,191 @@
+/* main.css */
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100vh;
+    background-color: white;
+    width: 100%;
+    font-family: sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+#svg-container {
+    position: relative;
+    border: 2px solid #ccc;
+    margin: 20px auto;
+    padding: 10px;
+    width: calc(100vw - 40px);
+    height: calc(100vh - 40px);
+    max-width: calc((100vh - 40px) * 1000 / 600);
+    max-height: calc((100vw - 40px) * 600 / 1000);
+    overflow: hidden;
+}
+
+#svg-container>svg {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    max-height: calc(100% - 20px);
+    max-width: calc(105%);
+}
+
+
+
+.hamburger-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1001;
+    pointer-events: auto;
+}
+
+#hamburger-icon {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border: 2px solid #000;
+    border-radius: 8px;
+    background-color: lightblue;
+    padding: 8px;
+    position: relative;
+    z-index: 1001;
+    pointer-events: auto;
+}
+
+.hamburger-img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.canvas-container {
+    position: relative;
+    z-index: 1;
+}
+
+#offcanvasSidebar {
+    width: 300px;
+    max-width: 80%;
+    background-size:cover;
+  }
+
+  .hamburger-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 100px;
+  }
+
+  .hamburger-button-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    gap: 8px;
+    margin-bottom: 16px;
+    seperator: 8px;
+  }
+
+  #directions-button, #about-button, #worksheet-button, #reset-button, #details-button {
+    width: 265px;
+  }
+
+  #offcanvasSidebarControl {
+    width: 350px;
+    max-width: 80%;
+    background-size:cover;
+  }
+
+  .offcanvas-body-top {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding-top: 150px;
+  }
+
+.controls-container.slider-controls {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+  }
+  
+
+  .controls-container.slider-controls .slider-group label {
+    font-size: 0.9rem;
+    margin-bottom: 1px;
+    display: block;
+  }
+  
+  .controls-container.slider-controls .slider-group input[type="range"] {
+    width: 300px;
+    -webkit-appearance: none;
+    background: transparent;
+  }
+  
+  .controls-container.slider-controls input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: #ccc;
+    border-radius: 2px;
+  }
+  .controls-container.slider-controls input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #333;
+    border-radius: 50%;
+    margin-top: -6px;
+  }
+
+.slider-container {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 12px;
+  }
+  
+  /* Compound selector button group */
+  #compound-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  #compound-buttons .btn {
+    flex: 1;
+    user-select: none;
+  }
+  
+  #compound-buttons .btn.active {
+    background-color: #0d6efd;
+    color: #fff;
+  }
+
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    .button-container {
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+    }
+    .button {
+        width: 80%;
+        margin: 10px 0;
+    }
+    .slider-container {
+        grid-template-columns: 1fr;
+        grid-gap: 15px;
+    }
+    .canvas {
+        width: 100%;
+    }
+}
