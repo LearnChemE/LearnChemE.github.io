@@ -1,3 +1,4 @@
+// Gauge pressure update function
 let windowWidth = window.innerWidth;
 let windowHeight = windowWidth * 600 / 1000;
 
@@ -27,6 +28,17 @@ export const verticalValveStemWidth = 5;
 export const verticalValveStemHeight = 10;
 export const verticalValveTrapezoidWidth = 5;
 export const verticalValveTopExtent = 15;
+
+export const connectedGaugeSize = 50;
+export const connectedGaugeSeparation = 0;
+export const connectedGaugeVerticalOffset = 30;
+
+export const gaugeSize = 30;
+export const gaugeStrokeWidth = 4;
+
+export const hexCircleSize = 30;
+export const hexSize = 12;
+export const hexInnerCircleSize = 10;
 
 document.getElementsByTagName('svg')[0].setAttribute('viewBox', `0 0 ${canvasWidth} ${canvasHeight}`);
 
@@ -60,6 +72,7 @@ const maxSolventVolume = 500;
 let feedHeightPx = 1000;
 let extractHeightPx = 0;
 let gasFlowRateText = null;
+let isGasValveOpen = false;
 
 
 let feedTankVolume = maxTankVolume;
@@ -77,7 +90,7 @@ const V = 0.01;           // Vapor  flow (mol/s)
 const x0 = 0.35;          // Bottom liquid comp.
 const y4 = 1.0;           // Top vapor  comp.
 const H = 150;            // Height of column (m)
-const P = 1.0;            // Pressure of column (bar)
+let P = 1.0;            // Pressure of column (bar)
 
 function computeStageCompositions(L, V, x0, y4) {
   const K  = H / P;
@@ -101,18 +114,18 @@ function computeStageCompositions(L, V, x0, y4) {
 }
 
 // Example usage:
-const result = computeStageCompositions(1.0, 0.01, 0.35, 1.0);
+let result = computeStageCompositions(L, V, x0, y4);
 console.log(result);
 
-const streamComp = {
-  Y1: result.y1,
-  Y2: result.y2,
-  Y3: result.y3,
-  Y4: y4,
-  X0: x0,
-  X1: result.x1,
-  X2: result.x2,
-  X3: result.x3,
+let streamComp = {
+  Y1: result.y1.toFixed(1),
+  Y2: result.y2.toFixed(1),
+  Y3: result.y3.toFixed(2),
+  Y4: y4.toFixed(2),
+  X0: x0.toFixed(2),
+  X1: result.x1.toFixed(2),
+  X2: result.x2.toFixed(2),
+  X3: result.x3.toFixed(2)
 };
 
 function initTooltips() {
@@ -128,10 +141,13 @@ function initTooltips() {
 }
 
 function showTooltip(label, event) {
+  if (!((pumpOn && nozzleOn) && isGasValveOpen)) {
+    return;
+  }
   // If this is a column stream label, show the computed comp.
   if (streamComp.hasOwnProperty(label)) {
     const compVal = streamComp[label];
-    tooltipText.clear().text(compVal.toFixed(2) + " ppm");
+    tooltipText.clear().text(compVal + " ppm");
     // redraw tooltip background
     setTimeout(() => {
       const bbox = tooltipText.bbox();
@@ -190,6 +206,7 @@ function drawCanvas() {
   drawGasValves();
   drawTanks();
   drawTexts();
+  // createConnectedGauges(655, 195, "1")
   gasImage = addSVGImage('./assets/gasFlowRateDevice.svg', 700, 247.5, 800/3, 200);
   gasFlowRateText = drawCenteredText(805, 295, "0 mol/s", 17, 'black', 'Arial', 'black', 0.4);
   drawCenteredText(795, 377, "gas flow rate", 12, 'white', 'Arial', 'white', 0.7)
@@ -371,9 +388,9 @@ function drawPipes() {
   startX = 700;
   rightPipe = `
     M ${675 + 5} ${canvasHeight - mainCylHeight - 100} 
-    L ${675 + 5} ${canvasHeight - mainCylHeight - 100 - 50} 
-    L ${675 - 35} ${canvasHeight - mainCylHeight - 100 - 50}
-    L ${675 - 35} ${startY - 130 - 17}
+    L ${675 + 5} ${canvasHeight - mainCylHeight - 100 - 100} 
+    L ${675 - 50} ${canvasHeight - mainCylHeight - 100 - 100}
+    L ${675 - 50} ${startY - 130 - 17}
     L ${startX - 170} ${startY - 130 - 17} 
     L ${startX - 170} ${startY - 182.5}
   `;
@@ -632,9 +649,11 @@ function drawGasValves() {
           }, duration * 8);
         }
       });
+      isGasValveOpen = true;
     } else{
       gasFlowRateText.text("0 mol/s");
       gasGroup.clear();
+      isGasValveOpen = false;
     }
   });
 }
@@ -721,6 +740,23 @@ function updateFlow() {
 
 
 function resetAll() {
+  // Remove any open pressure modals
+  document.querySelectorAll('.pressure-modal').forEach(m => m.remove());
+  // Reset pressure to default
+  P = 1.0;
+  // Recompute and reset tooltip data
+  const initRes = computeStageCompositions(L, V, x0, y4);
+  result = initRes;
+  streamComp = {
+    Y1: initRes.y1.toFixed(1),
+    Y2: initRes.y2.toFixed(1),
+    Y3: initRes.y3,
+    Y4: y4,
+    X0: x0,
+    X1: initRes.x1,
+    X2: initRes.x2,
+    X3: initRes.x3,
+  };
   // Stop any ongoing flow interval
   if (flowInterval) {
     clearInterval(flowInterval);
@@ -813,6 +849,187 @@ function addOptionToDragAndZoom() {
     newY = Math.max(0, Math.min(newY, canvasHeight - newHeight));
     draw.viewbox(newX, newY, newWidth, newHeight);
   });
+}
+
+function createConnectedGauges(x, y, gaugeId) {
+  // Separate group for lines, added first to stay behind
+  const lineGroup = draw.group();
+
+  // Main group for gauges and hexagon
+  const group = draw.group().attr({ id: gaugeId });
+
+  const leftGaugeX = x;
+  const rightGaugeX = x + connectedGaugeSize;
+  const hexagonX = x + connectedGaugeSize / 2;
+  const hexagonY = y + connectedGaugeVerticalOffset;
+
+  // Draw lines in the background group
+  lineGroup.line(hexagonX, hexagonY, leftGaugeX, y)
+    .stroke({ color: '#666', width: 4 });
+
+  lineGroup.line(hexagonX, hexagonY, rightGaugeX, y)
+    .stroke({ color: '#666', width: 4 });
+
+  // Create gauges and hexagon
+  const leftGauge = createPressureGaugeView(draw, leftGaugeX, y);
+  const rightGauge = createPressureGaugeView(draw, rightGaugeX, y);
+  const hexagon = createHexagonalView(draw, hexagonX, hexagonY);
+
+  // Add them to main group
+  group.add(leftGauge);
+  group.add(rightGauge);
+  group.add(hexagon);
+
+  group.click(event => {
+    // Remove any existing pressure modals
+    document.querySelectorAll('.pressure-modal').forEach(m => m.remove());
+    const modal = document.createElement('div');
+    modal.className = 'pressure-modal';
+    // Position modal at click location
+    modal.style.position = 'absolute';
+    modal.style.left = `${event.clientX}px`;
+    modal.style.top = `${event.clientY}px`;
+    // modal.style.position = 'fixed';
+    // modal.style.left = '50%';
+    // modal.style.top = '50%';
+    // modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.background = 'white';
+    modal.style.border = '2px solid black';
+    modal.style.padding = '20px';
+    modal.style.zIndex = 1000;
+    modal.style.borderRadius = '8px';
+
+    const message = document.createElement('p');
+    message.textContent = 'Select pressure (bar):';
+    modal.appendChild(message);
+
+    // Insert current pressure display here
+    const currentDisplay = document.createElement('p');
+    currentDisplay.textContent = `Current pressure: ${P.toFixed(0)} bar`;
+    currentDisplay.style.fontWeight = 'bold';
+    currentDisplay.style.marginBottom = '10px';
+    modal.appendChild(currentDisplay);
+
+    const option1 = document.createElement('button');
+    option1.textContent = '1 bar';
+    option1.className = 'btn btn-primary';
+    option1.onclick = () => {
+      updateGaugePressure(1);
+      document.body.removeChild(modal);
+    };
+
+    const option4 = document.createElement('button');
+    option4.textContent = '4 bar';
+    option4.className = 'btn btn-primary';
+    option4.onclick = () => {
+      updateGaugePressure(4);
+      document.body.removeChild(modal);
+    };
+
+    // Create a button container for spacing and alignment
+    const btnContainer = document.createElement('div');
+    btnContainer.style.display = 'flex';
+    btnContainer.style.justifyContent = 'space-between';
+    btnContainer.style.marginTop = '10px';
+    btnContainer.appendChild(option1);
+    btnContainer.appendChild(option4);
+    modal.appendChild(btnContainer);
+
+    document.body.appendChild(modal);
+    // Close modal on outside click
+    setTimeout(() => {
+      const outsideClickListener = (e) => {
+        const m = document.querySelector('.pressure-modal');
+        if (m && !m.contains(e.target)) {
+          m.remove();
+          document.removeEventListener('mousedown', outsideClickListener);
+        }
+      };
+      document.addEventListener('mousedown', outsideClickListener);
+    }, 0);
+  });
+
+  return group;
+}
+
+function updateGaugePressure(pressureValue) {
+  P = pressureValue;
+  // Recompute stage compositions with updated pressure
+  const newRes = computeStageCompositions(L, V, x0, y4);
+  // Update globals
+  result = newRes;
+  // Update streamComp so tooltips use fresh values
+  streamComp.Y1 = newRes.y1;
+  streamComp.Y2 = newRes.y2;
+  streamComp.Y3 = newRes.y3;
+  streamComp.Y4 = y4;
+  streamComp.X0 = x0;
+  streamComp.X1 = newRes.x1;
+  streamComp.X2 = newRes.x2;
+  streamComp.X3 = newRes.x3;
+}
+
+function createPressureGaugeView(draw, x, y) {
+  const group = draw.group();
+
+  group.circle(gaugeSize)
+    .fill('white')
+    .stroke({ color: '#888', width: gaugeStrokeWidth })
+    .center(x, y);
+
+  const radius = (gaugeSize / 2) - gaugeStrokeWidth - 2;
+  const startAngle = 220;
+  const endAngle = -40;
+  const startRad = startAngle * Math.PI / 180;
+  const endRad = endAngle * Math.PI / 180;
+  const startX = x + radius * Math.cos(startRad);
+  const startY = y + radius * Math.sin(startRad);
+  const endX = x + radius * Math.cos(endRad);
+  const endY = y + radius * Math.sin(endRad);
+  const arcPath = `M ${startX} ${startY} A ${radius} ${radius} 0 1 0 ${endX} ${endY}`;
+
+  group.path(arcPath)
+    .fill('none')
+    .stroke({ color: 'black', width: 2 });
+
+  const needleLength = radius - 2;
+  const needleWidth = 4;
+  group.path(`M ${x} ${y}
+                L ${x - needleWidth/2} ${y}
+                L ${x} ${y - needleLength}
+                L ${x + needleWidth/2} ${y} Z`)
+    .fill('black')
+    .transform({ rotate: 45, cx: x, cy: y }); // Example rotation
+  return group;
+}
+
+function createHexagonalView(draw, x, y) {
+  const group = draw.group();
+
+  group.circle(hexCircleSize)
+    .fill('white')
+    .stroke({ color: '#888', width: 4 })
+    .center(x, y);
+
+  const height = hexSize * Math.sqrt(3);
+  const hexagonPath = `
+        M ${x - hexSize} ${y}
+        L ${x - hexSize/2} ${y - height/2}
+        L ${x + hexSize/2} ${y - height/2}
+        L ${x + hexSize} ${y}
+        L ${x + hexSize/2} ${y + height/2}
+        L ${x - hexSize/2} ${y + height/2}
+        Z
+    `;
+  group.path(hexagonPath)
+    .fill('black')
+    .stroke({ color: 'black', width: 1 });
+
+  group.circle(hexInnerCircleSize)
+    .fill('white')
+    .center(x, y);
+
+  return group;
 }
 
 function createToggleWithTextRect(draw, x, y, width, height, opacity = 1) {

@@ -59,7 +59,8 @@ body {
   position: relative;
   z-index: 990;
   pointer-events: auto;
-  width: 85%;
+  width:calc(100vw - 40px);
+  max-width: calc((100vh - 40px) * 1000 / 600);
   padding: 0 10px;
   height: 0px;
 }
