@@ -69,7 +69,7 @@ body {
 
 .btn-group > .btn {
   width: 5ch;
-  font-size: var(--controls-font-size);
+  font-size: var(--controls-button-font-size);
 }
 
 select {
@@ -88,7 +88,7 @@ mjx-container {
 }
 
 .modal-buttons-row > .btn {
-  font-size: var(--controls-font-size);
+  font-size: var(--modals-font-size);
   padding: var(--button-padding);
 }
 
@@ -180,39 +180,39 @@ canvas {
 
 @media screen and (min-width: 680px) {
   body {
-    --controls-font-size: 0.7rem;
+    --controls-font-size: 0.8rem;
+    --modals-font-size: 0.6rem;
     --button-padding: 0.4rem 0.6rem;
     --button-width: 6rem;
     --equation-font-size: 1.1rem;
   }
 }
 
-@media screen and (min-width: 800px) {
-  body {
-    --controls-font-size: 0.7rem;
-    --button-padding: 0.5rem 0.8rem;
-    --button-width: 7rem;
-    --equation-font-size: 1.3rem;
-  }
-}
-
-@media screen and (min-width: 1080px) {
-  body {
-    --controls-font-size: 0.8rem;
-    --equation-font-size: 1.5rem;
-  }
-}
-
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: 780px) {
   body {
     --controls-font-size: 0.9rem;
-    --equation-font-size: 1.8rem;
+    --controls-button-font-size: 0.7rem;
+    --modals-font-size: 0.7rem;
+    --button-padding: 0.5rem 0.8rem;
+    --button-width: 7rem;
+    --equation-font-size: 1.2rem;
   }
 }
 
-@media screen and (min-width: 1500px) {
+@media screen and (min-width: 900px) {
   body {
     --controls-font-size: 1rem;
-    --equation-font-size: 2.2rem;
+    --controls-button-font-size: 0.8rem;
+    --modals-font-size: 0.8rem;
+    --equation-font-size: 1.4rem;
+  }
+}
+
+@media screen and (min-width: 1320px) {
+  body {
+    --controls-font-size: 1.1rem;
+    --controls-button-font-size: 0.9rem;
+    --modals-font-size: 0.9rem;
+    --equation-font-size: 1.8rem;
   }
 }
