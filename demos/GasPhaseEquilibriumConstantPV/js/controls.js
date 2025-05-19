@@ -11,7 +11,7 @@ pressureSlider.addEventListener("input", function () {
   // The default value of a slider is a string, so we always first convert it to a number.
   z.pressureConstPressureCase = Number(pressureSlider.value);
   const pressureLabel = document.getElementById("pressure-value");
-  pressureLabel.innerHTML = z.pressureConstPressureCase.toFixed(2);
+  pressureLabel.innerHTML = z.pressureConstPressureCase.toFixed(1);
 });
 
 volumeSlider.addEventListener("input", function () {
