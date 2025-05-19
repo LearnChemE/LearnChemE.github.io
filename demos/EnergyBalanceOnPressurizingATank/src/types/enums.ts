@@ -10,3 +10,6 @@ export const FluidType = {
     IDEAL_GAS: 1
 };
 export type FluidType = (typeof FluidType)[keyof typeof FluidType];
+
+
+export const TANK_TEMPERATURE = 100; // C

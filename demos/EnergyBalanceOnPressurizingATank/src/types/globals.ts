@@ -11,3 +11,5 @@ export type GlobalState = {
     lineTemperature:number;
     tankPressure: number;
 };
+
+export type col4 = [r: number, g: number, b: number, a: number];

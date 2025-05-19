@@ -53,4 +53,4 @@ const linePressureSlider = new Slider("line-p-slider-container", (val: number) =
 const lineTempSlider     = new Slider("line-t-slider-container", (val: number) => { State.lineTemperature = val }, "°C" , 0);
 const tankPressureSlider = new Slider("tank-p-container",        (val: number) => { State.tankPressure    = val }, "bar", 1);
 
-import "./ts/canvas";
+import "./ts/sketch";
