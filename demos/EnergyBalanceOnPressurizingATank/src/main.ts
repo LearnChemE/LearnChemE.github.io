@@ -7,12 +7,18 @@ import { Slider } from "./types/slider";
 
 export const State: GlobalState = {
   canvas: undefined,
+  steamTable: null,
   playState: PlayState.NOT_PLAYED,
   fluidType: FluidType.WATER,
   linePressure: 10,
   lineTemperature: 250,
-  tankPressure: 1
+  tankPressure: 1,
 };
+
+// Load steam tables asynchronously
+window.addEventListener("load", async () => {
+  State.steamTable = await SteamTable.create("./steam.csv");
+});
 
 const ftypeDescriptor: DualButtonSelectorDescriptor = {
   btnId1: "water-btn",
@@ -53,4 +59,9 @@ const linePressureSlider = new Slider("line-p-slider-container", (val: number) =
 const lineTempSlider     = new Slider("line-t-slider-container", (val: number) => { State.lineTemperature = val }, "°C" , 0);
 const tankPressureSlider = new Slider("tank-p-container",        (val: number) => { State.tankPressure    = val }, "bar", 1);
 
+// Initialize steamTable
+
+
+
 import "./ts/sketch";
+import { SteamTable } from "./types/steamTable";

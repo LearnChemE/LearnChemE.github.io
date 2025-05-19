@@ -11,3 +11,42 @@
  * Final temp is saturation temp at final pressure (P final === P2)
  * 
  */
+
+import { State } from "../main";
+import { FluidType } from "../types";
+
+/*
+type GlobalState = {
+    canvas: Renderer | undefined;
+
+    playState: PlayState;
+    fluidType: FluidType;
+
+    linePressure: number;
+    lineTemperature:number;
+    tankPressure: number;
+};
+*/
+
+/**
+ * Need: Initial and final vapour fractions,
+ * sat temp for each pressure (range 1 to 15 bar),
+ * spec volumes for "
+ * internal nrg for "
+ * enthalpy vals .. "
+ */
+export function calculations() {
+    var fluidType = State.fluidType;
+    var linePres = State.linePressure;
+    var lineTemp = State.lineTemperature;
+    var tankPres = State.tankPressure;
+
+    if (fluidType == FluidType.WATER) {
+
+
+    }
+    else {
+
+    }
+}
+
