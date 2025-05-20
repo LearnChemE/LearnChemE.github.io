@@ -29,22 +29,16 @@ body {
 
 .slider-wrapper {
   display: grid;
-  grid-template-columns: max-content 120px 50px max-content;
+  grid-template-columns: max-content 150px 50px max-content;
   align-items: center;
   gap: 10px;
   align-self: center;
 }
-
-#volume-slider-wrapper {
-  display: none;
-}
-
 .buttons-row-wrapper {
   display: grid;
   grid-template-columns: max-content max-content;
   grid-column: 1 / 3;
-  padding-top: 10px;
-  padding-bottom: 15px;
+  padding-bottom: 2px;
 }
 
 .selection-row-wrapper {
@@ -58,7 +52,7 @@ body {
 }
 
 .selection-row-wrapper > .btn-group > .btn {
-  width: 25ch;
+  width: 24ch;
   font-size: var(--controls-font-size);
 }
 
@@ -114,7 +108,7 @@ li {
 }
 
 .modal-body > p {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .modal-body .modal-text {
@@ -184,7 +178,6 @@ canvas {
     --modals-font-size: 0.6rem;
     --button-padding: 0.4rem 0.6rem;
     --button-width: 6rem;
-    --equation-font-size: 1.1rem;
   }
 }
 
@@ -195,7 +188,6 @@ canvas {
     --modals-font-size: 0.7rem;
     --button-padding: 0.5rem 0.8rem;
     --button-width: 7rem;
-    --equation-font-size: 1.2rem;
   }
 }
 
@@ -204,7 +196,6 @@ canvas {
     --controls-font-size: 1rem;
     --controls-button-font-size: 0.8rem;
     --modals-font-size: 0.8rem;
-    --equation-font-size: 1.4rem;
   }
 }
 
@@ -213,6 +204,5 @@ canvas {
     --controls-font-size: 1.1rem;
     --controls-button-font-size: 0.9rem;
     --modals-font-size: 0.9rem;
-    --equation-font-size: 1.8rem;
   }
 }

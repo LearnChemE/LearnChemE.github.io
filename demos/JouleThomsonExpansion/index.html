@@ -7,7 +7,7 @@
   <!-- Update everything below THIS -->
   <meta name="description" content="A simulation of Joule-Thomson expansion." />
   <meta name="keywords"
-    content="simulation, engineering, interactive, joule, thomson, joule-thomson, expansion ,thermodynamics" />
+    content="simulation, engineering, interactive, joule, thomson, joule-thomson, expansion , thermodynamics" />
   <meta name="author" content="Jackson Dunlap" />
 
   <title>Joule Thomson Expansion</title>
@@ -78,52 +78,44 @@
       <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
     </div>
 
-    <div class="buttons-row-wrapper">
+    <div class="buttons-row-wrapper" id="gas-buttons-wrapper" style="padding-top: 0px;">
       <div class="btn-group-label">gas:</div>
-      <div class="btn-group" role="group" id="plot-type">
-        <input type="radio" class="btn-check" name="plot" id="r-1/2" value="1/2" autocomplete="off">
-        <label class="btn btn-outline-success btn-sm" for="r-1/2">CO<sub>2</sub></label>
+      <div class="btn-group" role="group" id="gas-type">
+        <input type="radio" class="btn-check" name="gas" id="r-NH3" value="NH3" autocomplete="off" checked />
+        <label class="btn btn-outline-success btn-sm" for="r-NH3">NH<sub>3</sub></label>
 
-        <input type="radio" class="btn-check" name="plot" id="r-1" value="1" autocomplete="off" />
-        <label class="btn btn-outline-success btn-sm" for="r-1">N<sub>2</sub></label>
+        <input type="radio" class="btn-check" name="gas" id="r-CO2" value="CO2" autocomplete="off" />
+        <label class="btn btn-outline-success btn-sm" for="r-CO2">CO<sub>2</sub></label>
 
-        <input type="radio" class="btn-check" name="plot" id="r-3/2" value="3/2" autocomplete="off" />
-        <label class="btn btn-outline-success btn-sm" for="r-3/2">H<sub>2</sub></label>
+        <input type="radio" class="btn-check" name="gas" id="r-N2" value="N2" autocomplete="off" />
+        <label class="btn btn-outline-success btn-sm" for="r-N2">N<sub>2</sub></label>
 
-        <input type="radio" class="btn-check" name="plot" id="r-2" value="2" autocomplete="off" checked />
-        <label class="btn btn-outline-success btn-sm" for="r-2">NH<sub>3</sub></label>
+        <input type="radio" class="btn-check" name="gas" id="r-H2" value="H2" autocomplete="off" />
+        <label class="btn btn-outline-success btn-sm" for="r-H2">H<sub>2</sub></label>
+
       </div>
     </div>
 
-    <div class="slider-wrapper" id="inerts-slider-wrapper">
+    <div class="slider-wrapper" id="inlet-pressure-slider-wrapper" style="gap: 8px;">
       <div class="data-name">inlet pressure (MPa):</div>
-      <input type="range" id="moles-inerts-slider" min="0" max="6" step="0.1" value="0.0">
-      <div class="data-value" id="moles-inerts-value">0.0</div>
+      <input type="range" id="inlet-pressure-slider" min="1" max="5" step="1" value="3">
+      <div class="data-value" id="inlet-pressure-value">3</div>
       <div class="data-metric"></div>
     </div>
-    <div class="slider-wrapper" id="inerts-slider-wrapper">
+
+    <div class="slider-wrapper" id="outlet-pressure-slider-wrapper">
       <div class="data-name">outlet pressure (MPa):</div>
-      <input type="range" id="moles-inerts-slider" min="0" max="6" step="0.1" value="0.0">
-      <div class="data-value" id="moles-inerts-value">0.0</div>
+      <input type="range" id="outlet-pressure-slider" min="0.01" max="0.1" step="0.01" value="0.05">
+      <div class="data-value" id="outlet-pressure-value">0.05</div>
       <div class="data-metric"></div>
     </div>
 
-    <div class="slider-wrapper" id="pressure-slider-wrapper">
-      <div class="data-name" id="pressure-slider-name">inlet temperature (K): </div>
-      <input type="range" id="pressure-slider" min="0.5" max="10" step="0.1" value="0.7">
-      <div class="data-value" id="pressure-value">0.70</div>
+    <div class="slider-wrapper" id="inlet-temperature-slider-wrapper" style="padding-bottom: 10px;">
+      <div class="data-name">inlet temperature (K): </div>
+      <input type="range" id="inlet-temperature-slider" min="50" max="750" step="5" value="500">
+      <div class="data-value" id="inlet-temperature-value">500</div>
       <div class="data-metric"></div>
     </div>
-
-    <div class="slider-wrapper" id="volume-slider-wrapper">
-      <div class="data-name" id="volume-slider-name">volume (m<sup>3</sup>): </div>
-      <input type="range" id="volume-slider" min="0.02" max="2.06" step="0.01" value="0.74">
-      <div class="data-value" id="volume-value">0.74</div>
-      <div class="data-metric"></div>
-    </div>
-
-
-
   </div>
 
   <div id="p5-container"></div>
@@ -163,7 +155,23 @@
         </div>
 
         <div class="modal-body">
-
+          <p>The energy balance for an adiabatic throttle implies that</p>
+          <p>$$H_{out} = H_{in}.$$</p>
+          <p>The throttle does no work, and because the gas moves so quickly through the throttle, it does not have much
+            time to transfer heat to the surroundings. The Joule-Thomson coefficient is derived by starting with
+            the exact differential for enthalpy:</p>
+          <p>$$dH = \left(\frac{\delta H}{\delta P}\right)_T dP + \left(\frac{\delta H}{\delta T}\right)_P dT.$$</p>
+          <p>Since \(dH=0\) for a throttle, and the derivative of enthalpy \(H\) with respect to temperature \(T\) at
+            constant pressure \(P\) is the heat capacity \(C_p,\) then:</p>
+          <p>$$-\left(\frac{\delta H}{\delta P}\right)_T dP = C_pdT.$$</p>
+          <p>Rearranging, and given that the enthalpy \(H\) is constant,</p>
+          <p>$$-\left(\frac{\delta H}{\delta P}\right)_T = C_p \left(\frac{\delta T}{\delta P}\right)_{H}, $$</p>
+          <p>where \(\left(\frac{\delta T}{\delta P}\right)_H = \mu_{JT},\) and \(\mu_{JT}\) is the Joule-Thomson
+            coefficient. Integration then relates the output temperature to the inlet temperature and the pressure drop:
+          </p>
+          <p>$$T_{out} = T_{in} + \mu_{JT}(P_{out}-P_{in}).$$</p>
+          <p>If \(\mu_{JT}\) > \(0,\) the outlet temperature is lower than the inlet temperature. If \(\mu_{JT}\) < \(
+              0,\) then the outlet tmperature is higher.</p>
 
         </div>
       </div>

@@ -1,13 +1,14 @@
 import { calcAll } from "./calcs.js";
 const p5container = document.getElementById("p5-container");
-const volumeSliderWrapper = document.getElementById("volume-slider-wrapper");
-const pressureSliderWrapper = document.getElementById("pressure-slider-wrapper");
+const inletPressureSlider = document.getElementById("inlet-pressure-slider");
+const outletPressureSlider = document.getElementById("outlet-pressure-slider");
+const inletTemperatureSlider = document.getElementById("inlet-temperature-slider");
+const inletPressureSliderWrapper = document.getElementById("inlet-pressure-slider-wrapper");
+const outletPressureSliderWrapper = document.getElementById("outlet-pressure-slider-wrapper");
+const inletTemperatureSliderWrapper = document.getElementById("inlet-temperature-slider-wrapper");
+const gasButtonsWrapper = document.getElementById("gas-buttons-wrapper");
 
-//defined local variables only needed in draw
-let angleX = 0;
-let angleY = 0;
-let meter3Image;
-let font;
+let mu = 5.468;
 
 //preload for loading images and fonts
 window.preload = function () {};
@@ -30,7 +31,7 @@ function resize() {
 // So this should never be inside a conditional statement.
 window.setup = function () {
   createCanvas(p5container.offsetWidth, p5container.offsetHeight).parent(p5container);
-  frameRate(60);
+  frameRate(30);
 };
 
 // Same with draw() - this should never be inside a conditional statement.
@@ -42,16 +43,48 @@ window.draw = function () {
   const selectionElement = document.querySelector('input[name="selection"]:checked');
   window.selection = selectionElement.value;
 
+  const gasSelectionElement = document.querySelector('input[name="gas"]:checked');
+  window.gasSelection = gasSelectionElement.value;
+
   resize();
   background(255);
   calcAll();
 
+  if (gasSelection === "NH3") {
+    inletTemperatureSlider.setAttribute("min", 200);
+    inletTemperatureSlider.setAttribute("max", 725);
+    mu = z.muNH3[z.inletPressure - 1][(z.inletTemperature - 200) / 5];
+  }
+  if (gasSelection === "CO2") {
+    inletTemperatureSlider.setAttribute("min", 290);
+    inletTemperatureSlider.setAttribute("max", 1000);
+    mu = z.muCO2[z.inletPressure - 1][(z.inletTemperature - 290) / 5];
+  }
+  if (gasSelection === "N2") {
+    inletTemperatureSlider.setAttribute("min", 145);
+    inletTemperatureSlider.setAttribute("max", 1000);
+    mu = z.muN2[z.inletPressure - 1][(z.inletTemperature - 145) / 5];
+  }
+  if (gasSelection === "H2") {
+    inletTemperatureSlider.setAttribute("min", 55);
+    inletTemperatureSlider.setAttribute("max", 1000);
+    mu = z.muH2[z.inletPressure - 1][(z.inletTemperature - 55) / 5];
+  }
+
+  z.outletTemperature = z.inletTemperature + mu * (z.outletPressure - z.inletPressure);
+
   if (selection === "constant-pressure") {
-    volumeSliderWrapper.style.display = "none";
-    pressureSliderWrapper.style.display = "grid";
+    gasButtonsWrapper.style.display = "grid";
+    inletPressureSliderWrapper.style.display = "grid";
+    outletPressureSliderWrapper.style.display = "grid";
+    inletTemperatureSliderWrapper.style.display = "grid";
+
+    drawDiagramText();
   } else if (selection === "constant-volume") {
-    volumeSliderWrapper.style.display = "grid";
-    pressureSliderWrapper.style.display = "none";
+    inletTemperatureSliderWrapper.style.display = "none";
+    inletPressureSliderWrapper.style.display = "grid";
+    outletPressureSliderWrapper.style.display = "none";
+    gasButtonsWrapper.style.display = "none";
   }
 };
 
@@ -60,3 +93,14 @@ window.draw = function () {
 window.windowResized = () => {
   resizeCanvas(p5container.offsetWidth, p5container.offsetHeight);
 };
+
+function drawDiagramText() {
+  push();
+  textAlign(CENTER);
+  stroke("Black");
+  strokeWeight(0.2);
+  fill("Black");
+  textSize(28);
+  text("T out = " + z.outletTemperature.toFixed(1), z.width / 4, z.height / 2);
+  pop();
+}
