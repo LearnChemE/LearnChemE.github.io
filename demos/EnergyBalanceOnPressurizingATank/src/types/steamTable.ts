@@ -68,24 +68,20 @@ export class SteamTable {
      */
     interpolate = (pressure: number, targetCol: string): number | null => {
         const xCol = 'P(bar)';
+        const data = this.data;
         let x = pressure;
 
-        // Validation helper function
-        const validData = this.data.filter((row: Row) => {
-            row[xCol] !== undefined && row[targetCol] !== undefined
-        });
-
         // Loop through to search for the correct values
-        for (let i=0;i<validData.length - 1;i++) {
-            const x0 = validData[i][xCol];
-            const x1 = validData[i+1][xCol];
-            const y0 = validData[i][targetCol];
-            const y1 = validData[i+1][targetCol];
+        for (let i=0;i<data.length - 1;i++) {
+            const x0 = data[i][xCol];
+            const x1 = data[i+1][xCol];
+            const y0 = data[i][targetCol];
+            const y1 = data[i+1][targetCol];
 
             if (x >= x0 && x <= x1) {
                 // Lever rule
                 const t = (x - x0) / (x1 - x0);
-                // return interpolated valuet
+                // return interpolated values
                 return y0 + t * (y1 - y0);
             }
         }

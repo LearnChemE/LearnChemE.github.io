@@ -1,7 +1,6 @@
 export const PlayState = {
     NOT_PLAYED: 0,
-    PLAYING: 1,
-    PLAYED: 2
+    PLAYED: 1
 };
 export type PlayState = (typeof PlayState)[keyof typeof PlayState];
 

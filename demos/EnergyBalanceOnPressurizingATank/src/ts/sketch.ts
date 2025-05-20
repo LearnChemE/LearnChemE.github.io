@@ -1,6 +1,7 @@
 import { State } from "../main";
 import p5 from "p5";
 import { FluidType, type col4 } from "../types";
+import { calculations } from "./calcs";
 
 const sketch = async (p: p5) => {
     var piping: p5.Image;
@@ -14,13 +15,14 @@ const sketch = async (p: p5) => {
         // Load images
         piping = await p.loadImage("Piping.png");
         valve = await p.loadImage("Valve.png");
-        console.log(p)
+        // Change some WebGL settings
         renderer = (p as any)._renderer.GL;
         renderer.enable(renderer.CULL_FACE);
         renderer.frontFace(renderer.CW);
     }
 
     p.draw = () => {
+        calculations(1);
         p.background(240);
         // Ortho perspective
         p.ortho();

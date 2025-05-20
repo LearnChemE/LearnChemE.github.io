@@ -14,4 +14,10 @@ export type GlobalState = {
     tankPressure: number;
 };
 
+export type CalculatedValues = {
+    tankPressure: number;
+    tankTemperature: number;
+    tankComposition: number;
+}
+
 export type col4 = [r: number, g: number, b: number, a: number];
