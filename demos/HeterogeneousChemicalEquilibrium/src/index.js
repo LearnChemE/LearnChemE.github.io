@@ -1,24 +1,17 @@
 import "bootstrap";
 import "p5";
 import "./style/style.scss";
-import { drawAll, setupSliders, sliderTemp, tempValue, slidercO2, 
-  slidercaCO3, slidercaO, caCO3Value, caOValue, cO2Value  } from "./js/draw";
-
+import { drawAll } from "./js/draw";
 import { handleInputs } from "./js/inputs";
 import { calcAll } from "./js/calcs";
 
-// GLOBAL VARIABLES OBJECT
 window.state = {
   frameRate: 60,
   pixelDensity: 4,
   showButtons: false,
   hamburgerHasBeenClicked: window.localStorage.getItem("hamburgerHasBeenClicked") === "true",
   canvasSize: [150, 120],
-  // T: Number(document.getElementById("temperature-slider").value),
-  T: 1000,
-  CaCO3: 0.5,
-  CaO: 0.5,
-  CO2: 0.5
+  T: 1364, 
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -26,11 +19,32 @@ const containerElement = document.getElementById("p5-container");
 window.setup = function () {
   sizeContainer();
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
-  setupSliders();  // <- this is required!
   handleInputs();
   calcAll();
   pixelDensity(state.pixelDensity);
   frameRate(state.frameRate);
+
+  // Slider value label updates only 
+  const tempSlider = document.getElementById("tempSlider");
+  const caco3Slider = document.getElementById("caco3Slider");
+  const caoSlider = document.getElementById("caoSlider");
+  const co2Slider = document.getElementById("co2Slider");
+
+  tempSlider.addEventListener("input", () => {
+    document.getElementById("tempValue").textContent = `${tempSlider.value} K`;
+  });
+
+  caco3Slider.addEventListener("input", () => {
+    document.getElementById("caco3Value").textContent = (+caco3Slider.value).toFixed(2);
+  });
+
+  caoSlider.addEventListener("input", () => {
+    document.getElementById("caoValue").textContent = (+caoSlider.value).toFixed(2);
+  });
+
+  co2Slider.addEventListener("input", () => {
+    document.getElementById("co2Value").textContent = (+co2Slider.value).toFixed(2);
+  });
 };
 
 window.draw = function () {
@@ -38,39 +52,12 @@ window.draw = function () {
   window.height = state.canvasSize[1];
   scale(relativeSize());
   background(255);
-
-  if (sliderTemp) {
-    window.state.T = sliderTemp.value();
-    console.log("Slider value:", window.state.T);
-  }
-
-  if (tempValue) {
-    tempValue.html(`${window.state.T} K`);
-    if (slidercaCO3) {
-      window.state.caCO3 = slidercaCO3.value();
-      caCO3Value.html(window.state.caCO3.toFixed(2));
-    }
-    
-    if (slidercaO) {
-      window.state.caO = slidercaO.value();
-      caOValue.html(window.state.caO.toFixed(2));
-    }
-    
-    if (slidercO2) {
-      window.state.cO2 = slidercO2.value();
-      cO2Value.html(window.state.cO2.toFixed(2));
-    }
-    
-  }
-  
-
-  drawAll();
+  drawAll();  
 };
-
 
 window.windowResized = () => {
   resizeCanvas(containerElement.offsetWidth, containerElement.offsetHeight);
-}
+};
 
 window.relativeSize = () => containerElement.offsetWidth / 150;
 

@@ -3,7 +3,7 @@ $modal-md: calc(100vw - 50px);
 $modal-lg: 820px;
 $modal-xl: 1140px;
 @import "bootstrap";
-@import "./slider.scss"; // Keeping slider styling in place if needed for other inputs
+@import "./slider.scss"; 
 #graphics-container {
   position: relative;
   margin: auto;
@@ -29,7 +29,7 @@ canvas {
 
 .slider-container {
   position: absolute;
-  top: 15px;
+  top: 0px;
   left: 50%;
   transform: translateX(-50%);
   display: grid;
@@ -128,5 +128,104 @@ canvas {
   #buttons {
     top: 35px;
     padding: 15px;
+  }
+}
+
+#slider-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.slider-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+  font-weight: bold;
+  font-size: 14px;
+  color: black;
+}
+
+.slider-row input[type="range"] {
+  width: 150px;
+  margin-top: 10px;
+}
+
+#slider-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: absolute;
+  top: 20px;         
+  left: 150px;       
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.slider-row.temp {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.slider-subgroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+input[type="range"] {
+  width: 100px;
+  margin-top: 10px;
+}
+
+.slider-label {
+  font-size: 15px;
+  font-weight: bold;
+  color: #222;
+}
+
+.slider-value {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.equation-text {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 1px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+
+@media screen and (min-width: 1200px) {
+  .equation-text {
+    font-size: 24px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .bar-chart {
+    margin-left: 10px;
   }
 }

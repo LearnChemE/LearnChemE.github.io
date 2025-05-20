@@ -29,3 +29,14 @@ input[type="range"]::-moz-range-thumb {
   background: #4CAF50;
   cursor: pointer;
 }
+
+
+#graphics-container {
+  position: relative;
+}
+
+#p5-container canvas,
+.slider-container div,
+.slider-container input {
+  position: absolute !important;
+}
