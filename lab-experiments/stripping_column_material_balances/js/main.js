@@ -801,14 +801,14 @@ function addOptionToDragAndZoom() {
   .fill({ color: '#fff', opacity: 0 });
   background.back();
   
-  background.on('mousedown', function(event) {
+  draw.on('mousedown', function(event) {
     const vb = draw.viewbox();
     if (vb.width >= defaultViewbox.width) return;
     isPanning = true;
     panStart = { x: event.clientX, y: event.clientY };
   });
   
-  background.on('mousemove', function(event) {
+  draw.on('mousemove', function(event) {
     if (!isPanning) return;
     event.preventDefault();
     const dx = event.clientX - panStart.x;
@@ -820,7 +820,7 @@ function addOptionToDragAndZoom() {
     panStart = { x: event.clientX, y: event.clientY };
   });
   
-  background.on('mouseup', function() {
+  draw.on('mouseup', function() {
     isPanning = false;
   });
   
