@@ -261,6 +261,15 @@ window.simulation_list = [
     "simulation_type": "in-browser"
   },
   {
+    "title": "Multiple Steady States in a CSTR",
+    "href": "https://learncheme.github.io/demos/MultipleSteadyStatesInACSTR/",
+    "image": "https://learncheme.com/wp-content/uploads/2021/06/multiple-steady-states-in-a-cstr-thumbnail-original.png",
+    "tooltip": "Multiple steady states for a reversible exothermic reaction in a CSTR with heat transfer",
+    "description": "A continuously stirred tank reactor (CSTR) with heat transfer is used to carry out the reversible, exothermic reaction: \\( A \\longleftrightarrow B \\). This simulation shows how the steady-state solutions change as you vary the feed temperature, the heat transfer coefficient, and the pre-exponential factor for the reverse reaction. Plots of concentration of product B versus reactor temperature are shown for the mass balance and the energy balance; the intersections of these two balances correspond to the steady-state solutions for the reactor. Either one or three solutions are possible, and when three solutions are obtained, the middle solution (at the intersection of the two plots) is unstable.",
+    "src": "https://learncheme.github.io/demos/MultipleSteadyStatesInACSTR/",
+    "simulation_type": "in-browser"
+  },
+  {
     "title": "Residence Time Distribution of CSTRs in Series",
     "href": "https://learncheme.github.io/demos/RTDofCSTRsInSeries/dist/",
     "image": "https://learncheme.com/wp-content/uploads/2023/06/rtd-cstrs-in-series-preview.png",
