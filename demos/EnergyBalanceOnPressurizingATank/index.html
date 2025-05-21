@@ -84,6 +84,11 @@
                     <input type="range" id="conc-slider" min="1" max="5" value="1" step=".1" />
                     <div class="slider-val-label" id="conc-slider-label">1.0 bar</div>
                 </div>
+                <div class="slider-wrapper hidden" id="tank-t-container">
+                    <div class="slider-label">tank temperature (\( T_1 \)):</div>
+                    <input type="range" id="tank-t-slider" min="155" max="250" value="200" step="1" />
+                    <div class="slider-val-label" id="tank-t-slider-label">200 °C</div>
+                </div>
             </div>
           </div>
         </div>
@@ -104,42 +109,115 @@
       aria-labelledby="simulation directions"
       aria-hidden="true"
     >
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-m">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Directions</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p>\( \frac{1}{2} \)</p>
+            <!-- Directions text here: -->
+            <p>
+              In this simulation, a gas flows through a pipe into an insulated tank. The tank is initially at a lower 
+              pressure than the gas in the pipe and at a different temperature. When the valve to the tank is opened, 
+              the gas flows into the tank until the pressures equalize, and the valve is then closed. The tank can 
+              initially contain nitrogen, treated as an ideal gas, with additional nitrogen added from the line. 
+              Alternatively, the tank can initially contain a water vapor/liquid mixture with superheated steam added 
+              from the line. With water in the tank, both the volume of the tank (0.1 \(m^3\)) and the initial mass of 
+              water (1 kg) are fixed, and thus as the initial tank pressure is changed, the initial water quality 
+              (vapor mass fraction) in the tank changes. When the valve is opened, the mass in the tank increases. The 
+              flowing gas conditions and the initial tank conditions can be changed with sliders. For the water system, 
+              the temperature of the vapor/liquid mixture in the tank cannot be independently changed because the tank 
+              is at the saturation temperature for the selected pressure. Click "play" to let the gas flow into the 
+              tank, and use the "reset" button to go back to the initial conditions.
+            </p>
           </div>
         </div>
       </div>
     </div>
 
     <div id="details-modal" class="modal fade" tabindex="-1" aria-labelledby="simulation details" aria-hidden="true">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Details</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p>Modal body text goes here.</p>
+            <!-- Details text here: -->
+            <p>
+              <h6>Energy Balance</h6>
+              $$ m_1 U_1 + m_2 H_2 = m_\text{final} U_\text{final} = (m_1 + m_2) U_\text{final}, $$
+              where the subscript 1 refers to what is initially inside the tank, 2 refers to what is added (or in the 
+              line), m is mass (kg), U is the internal energy (kJ/kg), and H is enthalpy (kJ/kg).
+            </p>
+            <p>
+              <h6>For a Non-Ideal System, Using Water</h6>
+              $$ m_\text{final} = m_1 + m_2. $$
+              Since two phases are present in the tank at all times, the quality of the steam needs to be calculated:
+              $$ q_1 = \frac{(V_1/m_1)-V_1^L}{V_1^V - V_1^L}, $$
+              $$ U_1 = q_1 U_1^V + (1-q_1) U_1^L, $$
+              $$ m_2 H_2 = m_2 H_2^V, $$
+              where the superscripts L and V refer to the specific liquid and vapor properties (per kg), \(V_1\) is the 
+              volume of the tank (m^3), Subscript[m, 2] is the mass of steam added to the tank from the line, and 
+              \(H_2\) is the enthalpy at the line temperature (\(T_2\)) and pressure (\(P_2\)). The value \(m_2\) is 
+              unknown; it has to be solved for in order to evaluate the conditions of the system.
+              $$ q_\text{final} = \frac{(\frac{V_1}{m_1+m_2})-V_2^L}{V_2^V-V_2^L}, $$
+              $$ U_\text{final} = q_\text{final} U_2^V + (1-q_\text{final}) U_2^L. $$
+              Now these expressions can be substituted into the energy balance (remember \(m_\text{final}=m_1+m_2\)) 
+              and solved for \(m_2\). 
+            </p>
+            <p>
+              Since two phases are present in the tank, the final temperature of the system is the saturation 
+              temperature at the final pressure \(P_2\).
+            </p>
+            <p>
+              <h6>For an Ideal Gas System</h6>
+              The number of moles \(n_1\) initially in the tank can be calculated using the ideal gas law:
+              $$ n_1=\frac{P_1V}{RT_1}. $$
+              The internal energy and enthalpy are found by defining a reference point \(T_\text{ref}\).
+            </p>
+            <p>
+              At \(T_\text{ref}\), \(U_\text{ref}=0\),
+              $$ U_1 = U_\text{ref}+C_v (T_1-T_\text{ref}) = C_v (T_1-T_\text{ref}), $$
+              $$ U_\text{final} = U_\text{ref} + C_v (T_\text{final}-T_2) = C_v (T_\text{final}-T_2), $$
+              $$ H_2 = H_\text{ref} + R T_2. $$
+              The number of moles in the tank at equilibrium (\(n_\text{final}\)) can also be calculated using the 
+              ideal gas law:
+              $$ n_1 U_1 = \frac{P_\text{final}V}{R T_\text{final}} = \frac{P_2 V}{R T_\text{final}}. $$
+              This equation can be substituted into the energy balance to solve for the final temperature 
+              \(T_\text{final}\).
+              $$ n_1 U_1 + (n_\text{final}-n_1)H_2 = n_\text{final}U_\text{final}. $$
+              The subscript 1 refers to the gas in the tank before more gas is added, the subscript 2 refers to the gas 
+              in the line, the subscript <i>ref</i> denotes a reference state, P is pressure (bar), V is volume (L), R is the 
+              ideal gas constant (L bar \(\text{mol}^{-1}\) \(\text{K}^{-1}\)), T is temperature (°C), U is internal 
+              energy (J/mol), \(C_v\) is the 
+              constant-volume heat capacity for an ideal gas (J/mol/K), and H is enthalpy (J/mol).
+            </p>
           </div>
         </div>
       </div>
     </div>
 
     <div id="about-modal" class="modal fade" tabindex="-1" aria-labelledby="about the simulation" aria-hidden="true">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-m">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">About</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p>Modal body text goes here.</p>
+            <!-- About text here: -->
+            <p>
+              This simulation was created in the Department of Chemical and Biological Engineering at University of 
+              Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Drew Smith  
+              under the direction of Professor John L. Falconer and 
+              Michelle Medlin. It is a JavaScript/HTML5 implementation of a Mathematica simulation by Rachael L. 
+              Baumann. It was prepared with financial support from the National Science Foundation. <!--(DUE 2336987 and 
+              2336988) in collaboration with Washington State University.--> Address any questions or comments to 
+              LearnChemE@gmail.com.  If this simulation is too big or too small for your screen, zoom
+              out or in using command - or command + on Mac or ctrl - or ctrl +
+              on Windows.
           </div>
         </div>
       </div>

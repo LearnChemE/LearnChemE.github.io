@@ -76,3 +76,18 @@ h1 {
   line-height: 1.1;
 }
 
+.hidden {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .modal-m {
+      width: 70%;
+      max-width: 900px !important;
+  }
+
+  .modal-xl {
+      width: 90%;
+      max-width: 1600px;
+  }
+}

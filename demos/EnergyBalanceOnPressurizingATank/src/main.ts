@@ -11,8 +11,9 @@ export const State: GlobalState = {
   playState: PlayState.NOT_PLAYED,
   fluidType: FluidType.WATER,
   linePressure: 10,
-  lineTemperature: 250,
+  lineTemperature: 225,
   tankPressure: 1,
+  tankTemperature: 200,
 };
 
 // Load steam tables asynchronously
@@ -33,6 +34,12 @@ const ftypeDescriptor: DualButtonSelectorDescriptor = {
   },
   callback: (s: number) => {
     State.fluidType = (s === DualSelected.FIRST) ? FluidType.WATER : FluidType.IDEAL_GAS;
+    if (s === DualSelected.FIRST) {
+      document.getElementById("tank-t-container")?.setAttribute("class", "slider-wrapper hidden");
+    }
+    else {
+      document.getElementById("tank-t-container")?.setAttribute("class", "slider-wrapper");
+    }
   },
 }
 const fluidSelector = new DualButtonSelector(ftypeDescriptor);
@@ -49,7 +56,7 @@ const playResetDescriptor: DualButtonSelectorDescriptor = {
     unclicked: "btn btn-danger btn-sm"
   },
   callback: (s: number) => {
-    State.fluidType = (s === DualSelected.FIRST) ? FluidType.WATER : FluidType.IDEAL_GAS;
+    State.playState = (s === DualSelected.FIRST) ? PlayState.PLAYED : PlayState.NOT_PLAYED;
   },
 }
 const playSelector = new DualButtonSelector(playResetDescriptor);
@@ -58,6 +65,7 @@ const playSelector = new DualButtonSelector(playResetDescriptor);
 const linePressureSlider = new Slider("line-p-slider-container", (val: number) => { State.linePressure    = val }, "bar", 0);
 const lineTempSlider     = new Slider("line-t-slider-container", (val: number) => { State.lineTemperature = val }, "°C" , 0);
 const tankPressureSlider = new Slider("tank-p-container",        (val: number) => { State.tankPressure    = val }, "bar", 1);
+const tankTempSlider     = new Slider("tank-t-container", (val: number) => { State.tankTemperature = val }, "°C" , 0);
 
 // Initialize steamTable
 

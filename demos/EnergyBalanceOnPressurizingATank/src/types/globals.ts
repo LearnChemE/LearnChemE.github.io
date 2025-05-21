@@ -10,8 +10,9 @@ export type GlobalState = {
     fluidType: FluidType;
 
     linePressure: number;
-    lineTemperature:number;
+    lineTemperature: number;
     tankPressure: number;
+    tankTemperature: number;
 };
 
 export type CalculatedValues = {

@@ -39,16 +39,20 @@ const MASS_1 = 1 // kg
  * internal nrg for "
  * enthalpy vals .. "
  */
-export function calculations(t: number) {
+export function calculations(t: number): CalculatedValues {
 
     var fluidType = State.fluidType;
 
     if (fluidType == FluidType.WATER) {
-        if (State.steamTable === null) return;
-        steamCalcs(t);
+        // Steam tables not initialized: return initial data 
+        if (State.steamTable === null) // (should not be noticed as it will be for a few frames at most)
+            return { tankPressure: 4, tankTemperature: 144, tankComposition: .79 };
+        // Do the steam calcs (requires steam tables)
+        return steamCalcs(t);
     }
     else {
-
+        // Do the ideal gas calculations
+        return idealGasCalcs(t);
     }
 }
 
@@ -58,7 +62,7 @@ export function calculations(t: number) {
  * @param t Interpolant for play animation
  * @returns CalculatedValues object for current time
  */
-const steamCalcs = (t: number) => {
+const steamCalcs = (t: number): CalculatedValues => {
     var linePres = State.linePressure;
     var initTankPres = State.tankPressure;
     var steamTable = State.steamTable!;
@@ -99,9 +103,7 @@ const steamCalcs = (t: number) => {
     }
 
     // Solve using secant method
-    var m2 = secantMethod(massFromLine, 0, 10)!;
-    console.log(m2)
-    console.log(massFromLine(m2!));
+    var m2 = secantMethod(massFromLine, 0, 10, 1e-1)!;
 
     if (m2 === null)
         console.warn(`Warning: secant method not solved at ${tankPres} bar`);
@@ -117,8 +119,52 @@ const steamCalcs = (t: number) => {
         tankComposition: 1 - quality
     }
 
-    console.log(result)
+    // Debug:
+    // console.log(result)
 
     return result;
 }
 
+// Ideal gas constants
+const R = 8.314e-5; // bar m3 / mol / K
+// Let Uref = 0 J when Tref = 0 K
+/**
+ * Calculations for Ideal Gas Mode
+ * @param t Current interpolant between 0 and 1
+ * @returns CalculatedValues Object
+ */
+const idealGasCalcs = (t: number): CalculatedValues => {
+    const linePres = State.linePressure;
+    const lineTemp = State.lineTemperature + 273.15;
+    const initTankPres = State.tankPressure;
+    const initTankTemp = State.tankTemperature + 273.15;
+
+    // Calculate current pressure using interpolant
+    const tankPres = initTankPres + t * (linePres - initTankPres);
+
+    // Calculate initial moles using starting conditions
+    const n1 = initTankPres * VOLUME / R / initTankTemp; // mol
+    const gamma = 1.399; // Cp / Cv for an ideal gas
+    const a = tankPres * VOLUME / R;
+
+    // Define the energy balance to be solved
+    const fn = (tf: number): number => {
+        const nf = a / tf; // mol
+        return a - n1*initTankTemp - (nf - n1) * gamma * lineTemp;
+    }
+
+    // Solve the energy balance using secant method
+    let tf = secantMethod(fn, initTankTemp, 600, 1e-1)! - 273.15;
+
+    // Fill out result object and return
+    var result: CalculatedValues = {
+        tankPressure: tankPres,
+        tankTemperature: tf,
+        tankComposition: 0
+    }
+
+    // Debug:
+    // console.log(result)
+
+    return result;
+}
