@@ -1,3 +1,4 @@
+import "./cssmodule.d";
 import "./style.css";
 import "bootstrap/scss/bootstrap.scss";
 import "bootstrap";
@@ -42,7 +43,7 @@ const ftypeDescriptor: DualButtonSelectorDescriptor = {
     }
   },
 }
-const fluidSelector = new DualButtonSelector(ftypeDescriptor);
+new DualButtonSelector(ftypeDescriptor);
 
 const playResetDescriptor: DualButtonSelectorDescriptor = {
   btnId1: "play-btn",
@@ -59,13 +60,13 @@ const playResetDescriptor: DualButtonSelectorDescriptor = {
     State.playState = (s === DualSelected.FIRST) ? PlayState.PLAYED : PlayState.NOT_PLAYED;
   },
 }
-const playSelector = new DualButtonSelector(playResetDescriptor);
+new DualButtonSelector(playResetDescriptor);
 
 // Sliders
-const linePressureSlider = new Slider("line-p-slider-container", (val: number) => { State.linePressure    = val }, "bar", 0);
-const lineTempSlider     = new Slider("line-t-slider-container", (val: number) => { State.lineTemperature = val }, "°C" , 0);
-const tankPressureSlider = new Slider("tank-p-container",        (val: number) => { State.tankPressure    = val }, "bar", 1);
-const tankTempSlider     = new Slider("tank-t-container", (val: number) => { State.tankTemperature = val }, "°C" , 0);
+new Slider("line-p-slider-container", (val: number) => { State.linePressure    = val }, "bar", 0);
+new Slider("line-t-slider-container", (val: number) => { State.lineTemperature = val }, "°C" , 0);
+new Slider("tank-p-container",        (val: number) => { State.tankPressure    = val }, "bar", 1);
+new Slider("tank-t-container", (val: number) => { State.tankTemperature = val }, "°C" , 0);
 
 // Initialize steamTable
 
