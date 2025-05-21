@@ -181,7 +181,7 @@ canvas {
 @media screen and (min-width: 680px) {
   body {
     --controls-font-size: 0.8rem;
-    --modals-font-size: 0.6rem;
+    --modals-font-size: 0.8rem;
     --button-padding: 0.4rem 0.6rem;
     --button-width: 6rem;
     --equation-font-size: 1.1rem;
@@ -192,7 +192,7 @@ canvas {
   body {
     --controls-font-size: 0.9rem;
     --controls-button-font-size: 0.7rem;
-    --modals-font-size: 0.7rem;
+    --modals-font-size: 0.9rem;
     --button-padding: 0.5rem 0.8rem;
     --button-width: 7rem;
     --equation-font-size: 1.2rem;
@@ -203,7 +203,7 @@ canvas {
   body {
     --controls-font-size: 1rem;
     --controls-button-font-size: 0.8rem;
-    --modals-font-size: 0.8rem;
+    --modals-font-size: 1rem;
     --equation-font-size: 1.4rem;
   }
 }
@@ -212,7 +212,7 @@ canvas {
   body {
     --controls-font-size: 1.1rem;
     --controls-button-font-size: 0.9rem;
-    --modals-font-size: 0.9rem;
+    --modals-font-size: 1.1rem;
     --equation-font-size: 1.8rem;
   }
 }
