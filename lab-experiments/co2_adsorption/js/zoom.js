@@ -44,7 +44,7 @@ export function addOptionToDragAndZoom(draw) {
     
     draw.on('wheel', function(event) {
         event.preventDefault();
-        const zoomStep = 0.02;
+        const zoomStep = 0.2;
         const zoomFactor = event.deltaY < 0 ? (1 - zoomStep) : (1 + zoomStep);
         const vb = draw.viewbox();
         let newWidth = vb.width * zoomFactor;
