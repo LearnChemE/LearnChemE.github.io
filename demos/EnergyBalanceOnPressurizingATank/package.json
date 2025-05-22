@@ -6,7 +6,7 @@
   "scripts": {
     "start": "vite",
     "dev": "vite",
-    "build": "tsc && vite build"
+    "build": "tsc && vite build --base=./"
   },
   "devDependencies": {
     "typescript": "~5.8.3",
