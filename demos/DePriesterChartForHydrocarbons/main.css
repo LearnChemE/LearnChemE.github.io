@@ -22,9 +22,12 @@ body {
     padding: 10px;
     width: calc(100vw - 40px);
     height: calc(100vh - 40px);
-    max-width: calc((100vh - 40px) * 1000 / 600);
-    max-height: calc((100vw - 40px) * 600 / 1000);
+    max-width: calc((100vh - 40px) * 800 / 600);
+    max-height: calc((100vw - 40px) * 800 / 900);
     overflow: hidden;
+    z-index: 100000;
+    align-items: flex-start;
+    
 }
 
 #svg-container>svg {
@@ -35,7 +38,20 @@ body {
     max-width: calc(105%);
 }
 
+.nav-bar {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
 
+.icon-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 50px;
+}
 
 .hamburger-wrapper {
     display: flex;
@@ -90,7 +106,6 @@ body {
     position: absolute;
     gap: 8px;
     margin-bottom: 16px;
-    seperator: 8px;
   }
 
   #directions-button, #about-button, #worksheet-button, #reset-button, #details-button {
@@ -112,20 +127,28 @@ body {
   }
 
 .controls-container.slider-controls {
-    position: absolute;
     display: flex;
-    flex-direction: column;
-  }
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    height: 50px;
+    z-index: 1000001;
+}
+
+.controls-container.slider-controls > .slider-group {
+    flex: 1;
+}
   
 
   .controls-container.slider-controls .slider-group label {
     font-size: 0.9rem;
-    margin-bottom: 1px;
     display: block;
+    margin-bottom: -20px;
   }
   
   .controls-container.slider-controls .slider-group input[type="range"] {
-    width: 300px;
+    width: 100%;
     -webkit-appearance: none;
     background: transparent;
   }
@@ -147,15 +170,18 @@ body {
 .slider-container {
     border: 1px solid #ccc;
     border-radius: 4px;
-    padding: 8px;
-    margin-bottom: 12px;
+    padding: 2px;
+    margin-bottom: 4px;
   }
   
   /* Compound selector button group */
   #compound-buttons {
     display: flex;
+    flex-direction: column;
     gap: 8px;
     margin-bottom: 16px;
+    width: 150px;
+    z-index: 1000001;
   }
   
   #compound-buttons .btn {
@@ -166,6 +192,23 @@ body {
   #compound-buttons .btn.active {
     background-color: #0d6efd;
     color: #fff;
+  }
+
+  .slider-label-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #333;
+      background-color: #f0f0f0;
+      padding: 4px 8px;
+      margin: 0 8px;
+      font-family: 'Arial', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #222;
+      border-radius: 4px;
+      white-space: nowrap;
+      width: 220px;
   }
 
 @media (max-width: 600px) {
