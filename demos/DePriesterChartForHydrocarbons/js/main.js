@@ -146,7 +146,7 @@ function drawCanvas() {
 // Insert and transform the DePriester chart image
 function insertImage() {
   const g = draw.group();
-  g.image('./assets/depriester.svG')
+  g.image('./assets/depriester.svg')
     .size(canvasWidth, canvasHeight)
     .attr({ 'pointer-events': 'none' })
     .move(-10, 20);
