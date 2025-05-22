@@ -9,12 +9,18 @@ let menuBounds = {
     height: 36
 };
 let buttonBounds = [];
+let isHovering = false;
 
 export function drawHamburgerMenu() {
+    // Check if mouse is hovering over the hamburger menu
+    isHovering = mouseX >= menuBounds.x && mouseX <= menuBounds.x + menuBounds.width &&
+                 mouseY >= menuBounds.y && mouseY <= menuBounds.y + menuBounds.height;
+    
     // Draw hamburger icon with border
     stroke(0);
     strokeWeight(2);
-    fill(255);
+    // Use a lighter blue when hovering
+    fill(isHovering ? color(100, 150, 255) : color(0, 123, 255));
     rect(menuBounds.x, menuBounds.y, menuBounds.width, menuBounds.height, 5);
     
     // Draw the three lines
@@ -22,6 +28,8 @@ export function drawHamburgerMenu() {
     const startY = menuBounds.y + 10;
     
     for (let i = 0; i < 3; i++) {
+        stroke(255); // White lines
+        strokeWeight(2);
         line(
             menuBounds.x + 10,
             startY + (i * lineSpacing),
@@ -63,8 +71,12 @@ function drawButton(x, y, w, h, label, index) {
     // Store button bounds for interaction
     buttonBounds[index] = { x, y, w, h, label };
     
+    // Check if mouse is hovering over this button
+    const isButtonHovering = mouseX >= x && mouseX <= x + w &&
+                            mouseY >= y && mouseY <= y + h;
+    
     // Draw button with border
-    fill(0, 123, 255); // Bootstrap primary blue
+    fill(isButtonHovering ? color(100, 150, 255) : color(0, 123, 255)); // Lighter blue when hovering
     stroke(0);
     strokeWeight(2);
     rect(x, y, w, h, 5);
