@@ -99,7 +99,7 @@ export function createVentArrow(draw, x, y, angle, length) {
     // --- End Debugging ---
 
     group.text("vent")
-        .font({ family: 'Arial', size: 14, anchor: 'middle' })
+        .font({ family: 'Arial', size: 18, anchor: 'middle' })
         .move(textXRelative, textYRelative);
 
 

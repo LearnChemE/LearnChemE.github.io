@@ -125,7 +125,7 @@ export function createInteractiveValve(draw, x, y, controller = true, isThreeVal
 
     // Define initial entry positions (in degrees)
     // Tank positions: 1 at 180°, 2 at 90°, 3 at 0°, Outlet at 270°
-    const entryAngles = [270, 0, 90, 180];
+    let entryAngles = [270, 0, 90, 180];
     const rotationSequence = isThreeValve ? [270, 0, 180] : [270, 0, 90, 180]; // Angles pointer stops at
 
     // Draw markers for each entry.
@@ -164,10 +164,11 @@ export function createInteractiveValve(draw, x, y, controller = true, isThreeVal
             .stroke({ color: '#444', width: 1 });
         pointerGroup.center(x, y); // Position pivot point at valve center
 
-        let currentAngleIndex = 0;
-          pointerGroup.rotate(270, x, y); // Initialize to 270 degrees
-          
-          const entryAngles1 = [90, 90, 90, 90]; // Initialize to current state or default
+        let currentAngleIndex = 2;
+          pointerGroup.rotate(180, x, y); // Initialize to 270 degrees
+
+            entryAngles = [0, 90, 180];
+          const entryAngles1 = [180, 90, 90]; // Initialize to current state or default
 
         group.on('click', function() {
             currentAngleIndex = (currentAngleIndex + 1) % entryAngles.length;
@@ -189,7 +190,7 @@ export function createInteractiveValve(draw, x, y, controller = true, isThreeVal
 }
 
 
-export function createTValveFromImage(draw, x, y) {
+export function createTValve(draw, x, y) {
     const scale = 0.6;
     const group = draw.group(); // Work in group-local coordinates
 
@@ -279,11 +280,11 @@ export function createTValveFromImage(draw, x, y) {
 
 
     // --- Label for Back Pressure Regulator ---
-    group.text("Back Pressure\nRegulator") // Use \n for line break
-         .font({ family: 'Arial', size: 10, anchor: 'middle' }) // Smaller font
+    group.text("back pressure\nregulator") // Use \n for line break
+         .font({ family: 'Arial', size: 16, anchor: 'middle' }) // Smaller font
          .fill('#000')
          .leading(1.2) // Adjust line spacing
-         .center(bodyX + bodyWidth / 2, bodyY + bodyHeight + 12); // Position below body
+         .center(bodyX + bodyWidth / 2, bodyY + bodyHeight + 16); // Position below body
 
     // --- Finally, position the entire group at the desired absolute (x, y) ---
     group.move(x, y);

@@ -6,7 +6,7 @@ export let flowPaths = {}; // Store flow animation paths for cleanup { segmentId
 export let pipeSegments = {}; // Store base pipe segments for animation reference { segmentId: SVGPathElement }
 export let gaugeValues = {}; // Store current pressure gauge values { gaugeId: number (bar) }
 
-export let currentMultiValvePosition = 270; // Angle in degrees
+export let currentMultiValvePosition = 180; // Angle in degrees
 export let mfcFlowSpeed = 50; // ms per animation step
 export let mfcValue = 15.0; // mg/min
 
@@ -25,6 +25,7 @@ export let heatingInterval = null; // Interval ID
 // --- References to SVG Elements (Set by creation functions) ---
 export let co2AnalyzerElement = null; // Reference to the SVG group for CO2 Analyzer
 export let interactiveValveKnobElement = null; // Reference to the main interactive valve SVG group
+export let isPanning = false; // Flag for panning state
 
 // --- State Management Functions ---
 export function setValveState(valveId, isOpen, position, knob = null) {
@@ -181,6 +182,9 @@ export function clearHeatingInterval() {
   heatingInterval = null;
 }
 
+export function setIsPanning(value) { isPanning = value; }
+export function getIsPanning() { return isPanning; }
+
 // --- Master Reset for Simulation State ---
 export function resetSimulationState() {
   clearMoleFractionTimer();
@@ -193,7 +197,7 @@ export function resetSimulationState() {
   isHeating = false;
   mfcValue = 15.0; // Reset MFC value
   mfcFlowSpeed = 50; // Reset flow speed
-  currentMultiValvePosition = 270; // Reset valve position
+  currentMultiValvePosition = 180; // Reset valve position
   console.log("Simulation state reset."); // Optional log
 }
 
