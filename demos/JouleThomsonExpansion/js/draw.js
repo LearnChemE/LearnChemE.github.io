@@ -51,9 +51,9 @@ window.draw = function () {
   calcAll();
 
   if (gasSelection === "NH3") {
-    inletTemperatureSlider.setAttribute("min", 200);
+    inletTemperatureSlider.setAttribute("min", 365);
     inletTemperatureSlider.setAttribute("max", 725);
-    mu = z.muNH3[z.inletPressure - 1][(z.inletTemperature - 200) / 5];
+    mu = z.muNH3[z.inletPressure - 1][(z.inletTemperature - 365) / 5];
   }
   if (gasSelection === "CO2") {
     inletTemperatureSlider.setAttribute("min", 290);
@@ -73,18 +73,21 @@ window.draw = function () {
 
   z.outletTemperature = z.inletTemperature + mu * (z.outletPressure - z.inletPressure);
 
-  if (selection === "constant-pressure") {
+  if (selection === "throttle") {
     gasButtonsWrapper.style.display = "grid";
     inletPressureSliderWrapper.style.display = "grid";
     outletPressureSliderWrapper.style.display = "grid";
     inletTemperatureSliderWrapper.style.display = "grid";
 
-    drawDiagramText();
-  } else if (selection === "constant-volume") {
+    drawFigureText();
+  } else if (selection === "JTcoeff-vs-temperature") {
     inletTemperatureSliderWrapper.style.display = "none";
     inletPressureSliderWrapper.style.display = "grid";
     outletPressureSliderWrapper.style.display = "none";
     gasButtonsWrapper.style.display = "none";
+    jouleThomsonCoeffPlot();
+    jouleThomsonPlotLines();
+    coverUpRectangle();
   }
 };
 
@@ -94,7 +97,7 @@ window.windowResized = () => {
   resizeCanvas(p5container.offsetWidth, p5container.offsetHeight);
 };
 
-function drawDiagramText() {
+function drawFigureText() {
   push();
   textAlign(CENTER);
   stroke("Black");
@@ -103,4 +106,693 @@ function drawDiagramText() {
   textSize(28);
   text("T out = " + z.outletTemperature.toFixed(1), z.width / 4, z.height / 2);
   pop();
+}
+
+function coverUpRectangle() {
+  push();
+  noStroke();
+  rectMode(CORNERS);
+  rect(z.graphLeftSideX, z.graphTopY - 1, z.graphRightSideX, -5);
+  pop();
+}
+
+function jouleThomsonCoeffPlot() {
+  push();
+
+  stroke("black");
+  strokeWeight(1.5);
+  line(z.graphLeftSideX, z.graphTopY, z.graphRightSideX, z.graphTopY);
+  line(z.graphLeftSideX, z.graphTopY, z.graphLeftSideX, z.graphBottomY);
+  line(z.graphLeftSideX, z.graphBottomY, z.graphRightSideX, z.graphBottomY);
+  line(z.graphRightSideX, z.graphTopY, z.graphRightSideX, z.graphBottomY);
+  line(z.graphLeftSideX, z.graphBottomY - (z.graphBottomY - z.graphTopY) / 4, z.graphRightSideX, z.graphBottomY - (z.graphBottomY - z.graphTopY) / 4);
+  pop();
+
+  push();
+  // Vertical dashes and number labels
+  stroke("black");
+  strokeWeight(1);
+  for (let i = z.graphBottomY - (z.graphBottomY - z.graphTopY) / 20; i > z.graphTopY; i -= (z.graphBottomY - z.graphTopY) / 20) {
+    line(z.graphLeftSideX, i, z.graphLeftSideX + 5, i);
+    line(z.graphRightSideX, i, z.graphRightSideX - 5, i);
+  }
+  pop();
+
+  push();
+  textAlign(CENTER);
+  stroke("Black");
+  strokeWeight(0.2);
+  fill("Black");
+  textSize(22);
+  for (let i = z.graphBottomY; i >= z.graphTopY; i -= (z.graphBottomY - z.graphTopY) / 4) {
+    text(-1 - (i - z.graphBottomY) / ((z.graphBottomY - z.graphTopY) / 4), z.graphLeftSideX - 20, i + 5);
+  }
+
+  for (let i = z.graphLeftSideX; i <= z.graphRightSideX; i += (z.graphRightSideX - z.graphLeftSideX) / 5) {
+    text((200 * (i - z.graphLeftSideX)) / ((z.graphRightSideX - z.graphLeftSideX) / 5), i, z.graphBottomY + 25);
+  }
+
+  pop();
+
+  // Horizontal dashes and number labels
+  push();
+  stroke("black");
+  strokeWeight(1);
+  for (
+    let i = z.graphLeftSideX + (z.graphRightSideX - z.graphLeftSideX) / 20;
+    i < z.graphRightSideX;
+    i += (z.graphRightSideX - z.graphLeftSideX) / 20
+  ) {
+    line(i, z.graphBottomY, i, z.graphBottomY - 5);
+    line(i, z.graphTopY, i, z.graphTopY + 5);
+  }
+
+  pop();
+
+  push();
+  rotate(-PI / 2);
+  textAlign(CENTER);
+  stroke("Black");
+  strokeWeight(0.2);
+  fill("Black");
+  textSize(22);
+  text("Joule-Thomson coefficient (K/MPa)", -330, 60);
+
+  pop();
+
+  push();
+  textAlign(CENTER);
+  stroke("Black");
+  strokeWeight(0.2);
+  fill("Black");
+  textSize(22);
+  text("temperature (K)", z.width / 2, 680);
+
+  let xH2 = z.graphLeftSideX + (z.graphRightSideX - z.graphLeftSideX) / 5 + 5;
+  let yH2 = z.graphTopY + (3 * (z.graphBottomY - z.graphTopY)) / 4 - 15;
+  let xN2 = z.graphLeftSideX + (z.graphRightSideX - z.graphLeftSideX) / 2 - 90;
+  let yN2 = z.graphTopY + (z.graphBottomY - z.graphTopY) / 2;
+  let xCO2 = z.graphLeftSideX + (6.5 * (z.graphRightSideX - z.graphLeftSideX)) / 10 - 10;
+  let yCO2 = z.graphTopY + (2.25 * (z.graphBottomY - z.graphTopY)) / 8;
+  let xNH3 = z.graphLeftSideX + (7 * (z.graphRightSideX - z.graphLeftSideX)) / 10;
+  let yNH3 = z.graphTopY + (0.2 * z.graphBottomY - z.graphTopY);
+
+  text("H", xH2, yH2);
+  text("N", xN2, yN2);
+  text("CO", xCO2, yCO2);
+  text("NH", xNH3, yNH3);
+
+  textSize(12);
+  strokeWeight(0.4);
+  text("2", xH2 + 11, yH2 + 5);
+  text("2", xN2 + 11, yN2 + 5);
+  text("2", xCO2 + 20, yCO2 + 5);
+  text("3", xNH3 + 20, yNH3 + 5);
+  pop();
+}
+
+function jouleThomsonPlotLines() {
+  //This variable p is for the first index of each array depending on each pressure case.
+  let p = z.inletPressure - 1;
+
+  //for pressure of 1Mpa
+  if (z.inletPressure == 1) {
+    push();
+    noFill();
+
+    //CO2 line
+    push();
+    stroke("blue");
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muCO2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muCO2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muCO2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muCO2[p].length * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muCO2[p][z.muCO2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //N2 line
+    push();
+    stroke("green");
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muN2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muN2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muN2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muN2[p].length * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muN2[p][z.muN2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //H2 line
+    push();
+    stroke(242, 90, 2);
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muH2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muH2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muH2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muH2[p].length * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muH2[p][z.muH2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //NH3 lines
+    push();
+    stroke("purple");
+    strokeWeight(3);
+    /* 
+    //liquid region incase needed
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < 20; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muNH3[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((19 * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][19] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+
+    endShape(); */
+
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+
+    for (let i = 0; i < z.muNH3[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muNH3[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muNH3[p].length * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][z.muNH3[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+    pop();
+  }
+
+  //for pressure of 2Mpa
+  if (z.inletPressure == 2) {
+    push();
+    noFill();
+
+    //CO2 line
+    push();
+    stroke("blue");
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muCO2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muCO2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muCO2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muCO2[p].length * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muCO2[p][z.muCO2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //N2 line
+    push();
+    stroke("green");
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muN2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muN2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muN2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muN2[p].length * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muN2[p][z.muN2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //H2 line
+    push();
+    stroke(242, 90, 2);
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muH2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muH2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muH2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muH2[p].length * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muH2[p][z.muH2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //NH3 lines
+    push();
+    stroke("purple");
+    strokeWeight(3);
+    /* 
+    //liquid region incase needed
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < 25; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muNH3[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((24 * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][24] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+
+    endShape(); */
+
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+
+    for (let i = 0; i < z.muNH3[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muNH3[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muNH3[p].length * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][z.muNH3[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+    pop();
+  }
+
+  //for pressure of 3Mpa
+  if (z.inletPressure == 3) {
+    push();
+    noFill();
+
+    //CO2 line
+    push();
+    stroke("blue");
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muCO2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muCO2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muCO2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muCO2[p].length * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muCO2[p][z.muCO2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //N2 line
+    push();
+    stroke("green");
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muN2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muN2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muN2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muN2[p].length * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muN2[p][z.muN2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //H2 line
+    push();
+    stroke(242, 90, 2);
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muH2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muH2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muH2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muH2[p].length * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muH2[p][z.muH2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //NH3 lines
+    push();
+    stroke("purple");
+    strokeWeight(3);
+    /* 
+    //liquid region incase needed
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < 28; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muNH3[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((27 * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][27] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+
+    endShape(); */
+
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+
+    for (let i = 0; i < z.muNH3[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muNH3[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muNH3[p].length * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][z.muNH3[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+    pop();
+  }
+
+  //for pressure of 4Mpa
+
+  if (z.inletPressure == 4) {
+    push();
+    noFill();
+
+    //CO2 line
+    push();
+    stroke("blue");
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muCO2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muCO2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muCO2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muCO2[p].length * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muCO2[p][z.muCO2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //N2 line
+    push();
+    stroke("green");
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muN2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muN2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muN2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muN2[p].length * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muN2[p][z.muN2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //H2 line
+    push();
+    stroke(242, 90, 2);
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muH2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muH2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muH2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muH2[p].length * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muH2[p][z.muH2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //NH3 lines
+    push();
+    stroke("purple");
+    strokeWeight(3);
+    /*
+    //liquid region incase needed 
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < 31; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muNH3[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((30 * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][30] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+
+    endShape(); */
+
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+
+    for (let i = 0; i < z.muNH3[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muNH3[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muNH3[p].length * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][z.muNH3[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+    pop();
+  }
+
+  //For pressure 5Mpa
+  if (z.inletPressure == 5) {
+    push();
+    noFill();
+
+    //CO2 line
+    push();
+    stroke("blue");
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muCO2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muCO2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muCO2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muCO2[p].length * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muCO2[p][z.muCO2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //N2 line
+    push();
+    stroke("green");
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muN2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muN2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muN2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muN2[p].length * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muN2[p][z.muN2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //H2 line
+    push();
+    stroke(242, 90, 2);
+    strokeWeight(3);
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muH2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < z.muH2[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muH2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muH2[p].length * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muH2[p][z.muH2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+
+    //NH3 line
+    push();
+    stroke("purple");
+    strokeWeight(3);
+    /* 
+    //liquid region incase needed
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    for (let i = 0; i < 33; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muNH3[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((32 * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][32] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+
+    endShape(); */
+
+    beginShape();
+    curveVertex(
+      z.graphLeftSideX + ((0 * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+
+    for (let i = 0; i < z.muNH3[p].length; i++) {
+      curveVertex(
+        z.graphLeftSideX + ((i * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+        z.graphBottomY + ((z.muNH3[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      );
+    }
+    curveVertex(
+      z.graphLeftSideX + ((z.muNH3[p].length * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
+      z.graphBottomY + ((z.muNH3[p][z.muNH3[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    );
+    endShape();
+    pop();
+    pop();
+  }
 }
