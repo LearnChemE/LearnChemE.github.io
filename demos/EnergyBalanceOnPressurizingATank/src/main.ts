@@ -1,5 +1,6 @@
 import "./cssmodule.d";
 import "./style.css";
+import "./sliders.css";
 import "bootstrap/scss/bootstrap.scss";
 import "bootstrap";
 import { FluidType, PlayState, type GlobalState } from "./types";
@@ -30,8 +31,8 @@ const ftypeDescriptor: DualButtonSelectorDescriptor = {
     unclicked: "btn btn-outline-primary btn-sm"
   },
   style2: {
-    clicked: "btn btn-secondary btn-sm",
-    unclicked: "btn btn-outline-secondary btn-sm"
+    clicked: "btn btn-success btn-sm",
+    unclicked: "btn btn-outline-success btn-sm"
   },
   callback: (s: number) => {
     State.fluidType = (s === DualSelected.FIRST) ? FluidType.WATER : FluidType.IDEAL_GAS;
