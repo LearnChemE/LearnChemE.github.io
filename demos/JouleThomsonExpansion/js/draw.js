@@ -88,6 +88,7 @@ window.draw = function () {
     jouleThomsonCoeffPlot();
     jouleThomsonPlotLines();
     coverUpRectangle();
+    drawMouseGraphInteraction();
   }
 };
 
@@ -332,13 +333,177 @@ function jouleThomsonPlotLines() {
 function drawMouseGraphInteraction() {
   let p = z.inletPressure - 1;
 
+  let mouseXCalibrated = mouseX / relativeSize();
+  let mouseYCalibrated = mouseY / relativeSize();
+
+  let textOffSetX = 0;
+  let textOffSetY = 25;
+
   //Mouse interaction for CO2 line
   for (let i = 0; i < z.muCO2[p].length; i++) {
+    let calibratedXPointOnCO2Line = z.graphLeftSideX + ((i * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX);
+    let calibratedYPointOnCO2Line = z.graphBottomY + ((z.muCO2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY);
+
     if (
-      Math.abs(mouseX - (z.graphLeftSideX + ((i * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX))) < 20 &&
-      Math.abs(mouseY - (z.graphBottomY + ((z.muCO2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY))) < 20
+      Math.abs(mouseXCalibrated - calibratedXPointOnCO2Line) < 4 &&
+      Math.abs(mouseYCalibrated - calibratedYPointOnCO2Line) < 40 &&
+      z.muCO2[p][i] < 3.0049
     ) {
-      circle(mouseX, mouseY, 25);
+      if (z.muCO2[p][i] > 2.7) {
+        textOffSetY = -textOffSetY;
+      }
+      if (i * 5 + 290 > 960) {
+        textOffSetX = -50;
+      }
+      push();
+      fill("blue");
+      stroke("blue");
+      circle(calibratedXPointOnCO2Line, calibratedYPointOnCO2Line, 12);
+      pop();
+
+      push();
+      rectMode(CENTER);
+      fill(210, 210, 255);
+      stroke("Blue");
+      rect(calibratedXPointOnCO2Line + textOffSetX, calibratedYPointOnCO2Line - textOffSetY, 80, 25);
+      pop();
+
+      push();
+      textAlign(CENTER, CENTER);
+      stroke("Black");
+      strokeWeight(0.2);
+      fill("Black");
+      textSize(16);
+      text(i * 5 + 290 + ", " + z.muCO2[p][i].toFixed(2), calibratedXPointOnCO2Line + textOffSetX, calibratedYPointOnCO2Line - textOffSetY);
+      pop();
+
+      break;
+    }
+  }
+
+  //Mouse interaction for N2 line
+  for (let i = 0; i < z.muN2[p].length; i++) {
+    let calibratedXPointOnN2Line = z.graphLeftSideX + ((i * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX);
+    let calibratedYPointOnN2Line = z.graphBottomY + ((z.muN2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY);
+
+    if (
+      Math.abs(mouseXCalibrated - calibratedXPointOnN2Line) < 4 &&
+      Math.abs(mouseYCalibrated - calibratedYPointOnN2Line) < 40 &&
+      z.muN2[p][i] < 3.0049
+    ) {
+      if (z.muN2[p][i] > 2.7) {
+        textOffSetY = -textOffSetY;
+      }
+      if (i * 5 + 145 > 960) {
+        textOffSetX = -50;
+      }
+      push();
+      fill("green");
+      stroke("green");
+      circle(calibratedXPointOnN2Line, calibratedYPointOnN2Line, 12);
+      pop();
+
+      push();
+      rectMode(CENTER);
+      fill(210, 255, 210);
+      stroke("green");
+      rect(calibratedXPointOnN2Line + textOffSetX, calibratedYPointOnN2Line - textOffSetY, 80, 25);
+      pop();
+
+      push();
+      textAlign(CENTER, CENTER);
+      stroke("Black");
+      strokeWeight(0.2);
+      fill("Black");
+      textSize(16);
+      text(i * 5 + 145 + ", " + z.muN2[p][i].toFixed(2), calibratedXPointOnN2Line + textOffSetX, calibratedYPointOnN2Line - textOffSetY);
+      pop();
+
+      break;
+    }
+  }
+
+  //Mouse interaction for H2 line
+  for (let i = 0; i < z.muH2[p].length; i++) {
+    let calibratedXPointOnH2Line = z.graphLeftSideX + ((i * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX);
+    let calibratedYPointOnH2Line = z.graphBottomY + ((z.muH2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY);
+
+    if (
+      Math.abs(mouseXCalibrated - calibratedXPointOnH2Line) < 4 &&
+      Math.abs(mouseYCalibrated - calibratedYPointOnH2Line) < 40 &&
+      z.muH2[p][i] < 3.0049
+    ) {
+      if (z.muH2[p][i] > 2.7) {
+        textOffSetY = -textOffSetY;
+      }
+      if (i * 5 + 55 > 960) {
+        textOffSetX = -50;
+      }
+      push();
+      fill(242, 90, 2);
+      stroke(242, 90, 2);
+      circle(calibratedXPointOnH2Line, calibratedYPointOnH2Line, 12);
+      pop();
+
+      push();
+      rectMode(CENTER);
+      fill(252, 220, 187);
+      stroke(242, 90, 2);
+      rect(calibratedXPointOnH2Line + textOffSetX, calibratedYPointOnH2Line - textOffSetY, 80, 25);
+      pop();
+
+      push();
+      textAlign(CENTER, CENTER);
+      stroke("Black");
+      strokeWeight(0.2);
+      fill("Black");
+      textSize(16);
+      text(i * 5 + 55 + ", " + z.muH2[p][i].toFixed(2), calibratedXPointOnH2Line + textOffSetX, calibratedYPointOnH2Line - textOffSetY);
+      pop();
+
+      break;
+    }
+  }
+
+  //Mouse interaction for NH3 line
+  for (let i = 0; i < z.muNH3[p].length; i++) {
+    let calibratedXPointOnNH3Line = z.graphLeftSideX + ((i * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX);
+    let calibratedYPointOnNH3Line = z.graphBottomY + ((z.muNH3[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY);
+
+    if (
+      Math.abs(mouseXCalibrated - calibratedXPointOnNH3Line) < 4 &&
+      Math.abs(mouseYCalibrated - calibratedYPointOnNH3Line) < 40 &&
+      z.muNH3[p][i] < 3.0049
+    ) {
+      if (z.muNH3[p][i] > 2.7) {
+        textOffSetY = -textOffSetY;
+      }
+      if (i * 5 + 365 > 960) {
+        textOffSetX = -50;
+      }
+      push();
+      fill("purple");
+      stroke("purple");
+      circle(calibratedXPointOnNH3Line, calibratedYPointOnNH3Line, 12);
+      pop();
+
+      push();
+      rectMode(CENTER);
+      fill(227, 201, 255);
+      stroke("purple");
+      rect(calibratedXPointOnNH3Line + textOffSetX, calibratedYPointOnNH3Line - textOffSetY, 80, 25);
+      pop();
+
+      push();
+      textAlign(CENTER, CENTER);
+      stroke("Black");
+      strokeWeight(0.2);
+      fill("Black");
+      textSize(16);
+      text(i * 5 + 365 + ", " + z.muNH3[p][i].toFixed(2), calibratedXPointOnNH3Line + textOffSetX, calibratedYPointOnNH3Line - textOffSetY);
+      pop();
+
+      break;
     }
   }
 }
