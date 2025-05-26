@@ -5,8 +5,8 @@ let isMenuOpen = false;
 let menuBounds = {
     x: 20,
     y: 20,
-    width: 40,
-    height: 36
+    width: 50,
+    height: 45
 };
 let buttonBounds = [];
 let isHovering = false;
@@ -24,16 +24,16 @@ export function drawHamburgerMenu() {
     rect(menuBounds.x, menuBounds.y, menuBounds.width, menuBounds.height, 5);
     
     // Draw the three lines
-    const lineSpacing = 8;
-    const startY = menuBounds.y + 10;
+    const lineSpacing = 10;
+    const startY = menuBounds.y + 12;
     
     for (let i = 0; i < 3; i++) {
         stroke(255); // White lines
         strokeWeight(2);
         line(
-            menuBounds.x + 10,
+            menuBounds.x + 12,
             startY + (i * lineSpacing),
-            menuBounds.x + menuBounds.width - 10,
+            menuBounds.x + menuBounds.width - 12,
             startY + (i * lineSpacing)
         );
     }
@@ -44,14 +44,16 @@ export function drawHamburgerMenu() {
         fill(255);
         stroke(0);
         strokeWeight(2);
-        rect(menuBounds.x, menuBounds.y + menuBounds.height + 5, 200, 160, 5);
+        const popupWidth = 400; // Define popup width
+        const popupHeight = 350; // Define popup height
+        rect(menuBounds.x, menuBounds.y + menuBounds.height + 5, popupWidth, popupHeight, 5);
         
         // Draw buttons
-        const buttonWidth = 180;
-        const buttonHeight = 36;
-        const buttonSpacing = 15;
-        const startX = menuBounds.x + 10;
-        const startY = menuBounds.y + menuBounds.height + 15;
+        const buttonWidth = 280;
+        const buttonHeight = 55;
+        const buttonSpacing = 30;
+        const startX = menuBounds.x + (popupWidth - buttonWidth) / 2; // Calculate startX to center buttons
+        const startY = menuBounds.y + menuBounds.height + 60; // Increased top margin from 40 to 60
         
         // Clear previous button bounds
         buttonBounds = [];
@@ -79,13 +81,13 @@ function drawButton(x, y, w, h, label, index) {
     fill(isButtonHovering ? color(100, 150, 255) : color(0, 123, 255)); // Lighter blue when hovering
     stroke(0);
     strokeWeight(2);
-    rect(x, y, w, h, 5);
+    rect(x, y, w, h, 8);
     
     // Draw text
     fill(255);
     noStroke();
     textAlign(CENTER, CENTER);
-    textSize(14);
+    textSize(20); // Decreased from 24 to 20
     text(label, x + w/2, y + h/2);
 }
 

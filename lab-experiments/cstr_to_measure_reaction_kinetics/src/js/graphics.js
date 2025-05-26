@@ -15,8 +15,8 @@ let sliderYCommon = 0; // Will be updated in drawSimulation
 let sliderTrackY = 0; // Will be updated in drawSimulation
 
 // Tank levels (0 to 1)
-let tankALiquidLevel = 0.85; // NaOH tank
-let tankBLiquidLevel = 0.85; // CH₃COOCH₃ tank
+let tankALiquidLevel = 1.0; // NaOH tank - Changed from 0.85 to 1.0 to represent 20L
+let tankBLiquidLevel = 1.0; // CH₃COOCH₃ tank - Changed from 0.85 to 1.0 to represent 20L
 let simpleTankLiquidLevel = 0.65; // CSTR tank
 let collectionTankLiquidLevel = 0; // Collection tank
 
@@ -99,7 +99,7 @@ function drawValveMonitor(x, y, value) {
   fill(0);
   noStroke();
   textAlign(CENTER, CENTER);
-  textSize(16);
+  textSize(18); // Increased text size for flow rate
   // Map from 0 to π/2 to 0 to MAX_FLOW_RATE, scaling the input range
   const flowRate = map(Math.abs(value), 0, Math.PI / 2, 0, MAX_FLOW_RATE) * (Math.PI / 2);
   text(flowRate.toFixed(1) + " mL/s", x + monitorWidth / 2, y + monitorHeight / 2);
@@ -453,7 +453,7 @@ function drawPump(x, y, size, pipeWidth, label) {
   let switchY, bounds;
   if (label === 'Tank A') {
     // Switch below pump
-    switchY = y + size * 0.9;
+    switchY = y + size * 1.4; // Moved switch down
     bounds = drawRotorSwitch(x, y, switchY, pumpASwitchOn, true);
     pumpASwitchBounds = bounds;
     // Draw wire
@@ -470,7 +470,7 @@ function drawPump(x, y, size, pipeWidth, label) {
     endShape();
   } else if (label === 'Tank B') {
     // Switch above pump (more space)
-    switchY = y - size * 2.2;
+    switchY = y - size * 2.8; // Moved switch up
     bounds = drawRotorSwitch(x, y, switchY, pumpBSwitchOn, true);
     pumpBSwitchBounds = bounds;
     // Draw wire
@@ -610,7 +610,7 @@ function drawOutletPipe(x, y, pipeWidth, valvePosition, label) {
     fill(0);
     noStroke();
     textAlign(LEFT, CENTER);
-    textSize(16);
+    textSize(18); // Increased text size for label
     text("NaOH flow rate", monitorX - 20, monitorY - 15);
   } else if (label === "Tank B") {
     // Move monitor up for Tank B
@@ -642,7 +642,7 @@ function drawOutletPipe(x, y, pipeWidth, valvePosition, label) {
     fill(0);
     noStroke();
     textAlign(LEFT, CENTER);
-    textSize(16);
+    textSize(18); // Increased text size for label
     text("CH₃COOCH₃ flow rate", monitorX-30, monitorY - 15);
   }
 
@@ -750,6 +750,7 @@ function drawStand(x, y, w, h) {
   line(rightLegX - clampExtension, y - h / 4, rightLegX - clampExtension, y + h / 4);
   
   // Cross support between legs (for stability)
+  stroke(100); // Changed to lighter grey
   strokeWeight(3); // Keep original stroke weight for cross supports
   line(leftLegX, y, rightLegX, y);
   line(leftLegX, y + h / 4, rightLegX, y - h / 4);
@@ -758,29 +759,22 @@ function drawStand(x, y, w, h) {
 
 function drawSlider(x, y, w, value, label, displayValue, min = 0.1, max = 0.5, disabled = false) {
   const sliderY = y - 30;
-  // Draw slider track with rounded ends
-  stroke(40);
-  strokeWeight(4);
-  fill(230);
-  const trackRadius = 8;
+  // Draw slider track (simple grey bar)
+  stroke(180); // Grey stroke
+  strokeWeight(6); // Thicker stroke like in the image
+  noFill(); // No fill for a simple bar
   const trackY = sliderY;
-  const trackLeft = x - w / 2;
-  const trackRight = x + w / 2;
-  line(trackLeft + trackRadius, trackY, trackRight - trackRadius, trackY);
-  ellipse(trackLeft + trackRadius, trackY, trackRadius * 2, trackRadius * 2);
-  ellipse(trackRight - trackRadius, trackY, trackRadius * 2, trackRadius * 2);
 
-  // Draw tick marks
-  stroke(100);
-  strokeWeight(1);
-  for (let i = 0; i <= 5; i++) {
-    const tx = map(i, 0, 5, trackLeft + trackRadius, trackRight - trackRadius);
-    line(tx, trackY - 4, tx, trackY + 4); // Reduced from -7,7 to -4,4
-  }
+  // Draw simple grey bar
+  const barHeight = 6; // Match stroke weight for a solid bar appearance
+  const barWidth = w;
+  rectMode(CENTER);
+  rect(x, trackY, barWidth, barHeight, barHeight / 2); // Rounded ends
+  rectMode(CORNER); // Reset rectMode to default
 
   // Draw slider handle (3D look)
-  const handleX = map(value, min, max, trackLeft + trackRadius, trackRight - trackRadius);
-  const handleR = 13;
+  const handleX = map(value, min, max, x - w / 2, x + w / 2); // Map value across the full bar width
+  const handleR = 20; // Increased handle size
   // Shadow
   noStroke();
   if (!disabled) {
@@ -790,7 +784,7 @@ function drawSlider(x, y, w, value, label, displayValue, min = 0.1, max = 0.5, d
   // Handle
   stroke(40);
   strokeWeight(2);
-  fill(disabled ? 180 : color(102, 155, 188)); // Changed from gold to navy blue color
+  fill(disabled ? 180 : color(102, 155, 188)); // Navy blue color
   ellipse(handleX, trackY, handleR, handleR);
 
   // Draw value display box
@@ -801,7 +795,7 @@ function drawSlider(x, y, w, value, label, displayValue, min = 0.1, max = 0.5, d
   noStroke();
   fill(0);
   textAlign(CENTER, CENTER);
-  textSize(16);
+  textSize(18); // Increased text size for value
   if (displayValue !== undefined) {
     text(Math.round(displayValue), handleX, trackY - 24);
   } else {
@@ -812,20 +806,15 @@ function drawSlider(x, y, w, value, label, displayValue, min = 0.1, max = 0.5, d
   noStroke();
   fill(0);
   textAlign(CENTER, TOP);
-  textSize(16); // Increased from 11 to 14
+  textSize(18); // Increased text size for label
   text(label, x, trackY + 15);
 }
 
-function drawLiquid(x, y, w, h, level, color) {
-  const cylinderHeight = h * 0.7;
-  const coneHeight = h * 0.3;
-  const coneTopWidth = w;
-  const coneBottomWidth = w * 0.1;
-  
-  // Calculate total liquid height including cone
-  const totalHeight = cylinderHeight + coneHeight;
+function drawLiquid(x, y, w, h, level, color, applyWave = true) {
+  // Calculate total liquid height
+  const totalHeight = h;
   const liquidHeight = totalHeight * level;
-  const waveHeight = 0.8; // Reduced from 1.5 to 0.8 for flatter waves
+  const waveHeight = applyWave ? 0.8 : 0; // Reduced from 1.5 to 0.8 for flatter waves
   const segments = 20;
   
   fill(color);
@@ -833,60 +822,23 @@ function drawLiquid(x, y, w, h, level, color) {
   
   beginShape();
   
-  // Left side of cone
-  if (liquidHeight > coneHeight) {
-    // If liquid is in the cylinder part
-    vertex(x - coneTopWidth / 2, y - h / 2 + cylinderHeight);
-    vertex(x - w / 2, y - h / 2 + cylinderHeight - (liquidHeight - coneHeight));
-  } else if (liquidHeight > 0) {
-    // If liquid is only in the cone part
-    const ratio = liquidHeight / coneHeight;
-    const currentWidth = lerp(coneBottomWidth, coneTopWidth, ratio);
-    vertex(x - currentWidth / 2, y - h / 2 + cylinderHeight + coneHeight - liquidHeight);
-  }
+  // Left side
+  vertex(x - w / 2, y - h / 2 + h - liquidHeight);
   
   // Draw wavy top surface
   for (let i = 0; i <= segments; i++) {
-    let xPos;
-    let baseY;
-    
-    if (liquidHeight > coneHeight) {
-      // Liquid in cylinder part
-      xPos = x - w / 2 + (w * i / segments);
-      baseY = y - h / 2 + cylinderHeight - (liquidHeight - coneHeight);
-    } else {
-      // Liquid only in cone part
-      const ratio = liquidHeight / coneHeight;
-      const currentWidth = lerp(coneBottomWidth, coneTopWidth, ratio);
-      xPos = x - currentWidth / 2 + (currentWidth * i / segments);
-      baseY = y - h / 2 + cylinderHeight + coneHeight - liquidHeight;
-    }
-    
+    const xPos = x - w / 2 + (w * i / segments);
+    const baseY = y - h / 2 + h - liquidHeight;
     const yOffset = Math.sin(waveOffset + i * 0.5) * waveHeight;
     vertex(xPos, baseY + yOffset);
   }
   
   // Right side
-  if (liquidHeight > coneHeight) {
-    // If liquid is in the cylinder part
-    vertex(x + w / 2, y - h / 2 + cylinderHeight - (liquidHeight - coneHeight));
-    vertex(x + coneTopWidth / 2, y - h / 2 + cylinderHeight);
-  } else if (liquidHeight > 0) {
-    // If liquid is only in the cone part
-    const ratio = liquidHeight / coneHeight;
-    const currentWidth = lerp(coneBottomWidth, coneTopWidth, ratio);
-    vertex(x + currentWidth / 2, y - h / 2 + cylinderHeight + coneHeight - liquidHeight);
-  }
-
-  // Add bottom vertices to create the V-shape
-  if (liquidHeight > 0) {
-    // Right bottom point of the V
-    vertex(x + coneBottomWidth / 2, y - h / 2 + cylinderHeight + coneHeight);
-    // Center bottom point of the V
-    vertex(x, y - h / 2 + cylinderHeight + coneHeight);
-    // Left bottom point of the V
-    vertex(x - coneBottomWidth / 2, y - h / 2 + cylinderHeight + coneHeight);
-  }
+  vertex(x + w / 2, y - h / 2 + h - liquidHeight);
+  
+  // Bottom vertices
+  vertex(x + w / 2, y + h / 2);
+  vertex(x - w / 2, y + h / 2);
   
   endShape(CLOSE);
 }
@@ -897,105 +849,89 @@ export function drawTank(x, y, w, h, label, liquidColor, isFirstTank, liquidLeve
   
   // Tank outline
   stroke(0);
-  strokeWeight(2);
+  strokeWeight(3); // Thick walls
   noFill();
   
-  // Main cylindrical body
-  const cylinderHeight = h * 0.7;
+  // Main cylindrical body - now extends full height
+  const cylinderHeight = h;
   
-  // Draw curved top instead of flat top
-  const topCurveHeight = h * 0.02; // Subtle curve height
-  beginShape();
-  vertex(x - w / 2, y - h / 2);
-  bezierVertex(
-    x - w / 4, y - h / 2 - topCurveHeight,
-    x + w / 4, y - h / 2 - topCurveHeight,
-    x + w / 2, y - h / 2
-  );
-  endShape();
+  // Draw main cylinder sides with thicker walls
+  line(x - w / 2, y - h / 2, x - w / 2, y + h / 2);
+  line(x + w / 2, y - h / 2, x + w / 2, y + h / 2);
   
-  // Draw main cylinder sides
-  line(x - w / 2, y - h / 2, x - w / 2, y - h / 2 + cylinderHeight);
-  line(x + w / 2, y - h / 2, x + w / 2, y - h / 2 + cylinderHeight);
+  // Draw top rim
+  const rimWidth = w * 0.1; // Width of the rim
+  strokeWeight(3);
+  // Left rim
+  line(x - w / 2, y - h / 2, x - w / 2 - rimWidth, y - h / 2);
+  // Right rim
+  line(x + w / 2, y - h / 2, x + w / 2 + rimWidth, y - h / 2);
+  // Front rim
+  line(x - w / 2 - rimWidth, y - h / 2, x + w / 2 + rimWidth, y - h / 2);
   
-  // Conical bottom
-  const coneTopWidth = w;
-  const coneBottomWidth = w * 0.1;
-  const coneHeight = h * 0.3;
+  // Bottom line
+  strokeWeight(4); // Even thicker bottom line
+  line(x - w / 2, y + h / 2, x + w / 2, y + h / 2);
+  strokeWeight(3); // Reset stroke weight for rest of the drawing
   
-  // Draw cone
-  line(x - coneTopWidth / 2, y - h / 2 + cylinderHeight, x - coneBottomWidth / 2, y - h / 2 + cylinderHeight + coneHeight);
-  line(x + coneTopWidth / 2, y - h / 2 + cylinderHeight, x + coneBottomWidth / 2, y - h / 2 + cylinderHeight + coneHeight);
+  // Draw liquid with current level, accounting for wall thickness
+  const wallThickness = 3; // Match the stroke weight
+  const adjustedWidth = w - (2 * wallThickness);
+  const adjustedHeight = h - (2 * wallThickness);
+  const adjustedX = x;
+  const adjustedY = y;
+  drawLiquid(adjustedX, adjustedY, adjustedWidth, adjustedHeight, liquidLevel, liquidColor, false); // Disable wave for Tank A and B
   
-  // Bottom line of cone
-  strokeWeight(3); // Increased from 2 to 3 for thicker bottom line
-  line(x - coneBottomWidth / 2, y - h / 2 + cylinderHeight + coneHeight, x + coneBottomWidth / 2, y - h / 2 + cylinderHeight + coneHeight);
-  strokeWeight(2); // Reset stroke weight for rest of the drawing
-  
-  // Draw liquid with current level
-  drawLiquid(x, y, w, h, liquidLevel, liquidColor);
-  
-  // Draw beaker-style markings (centered, 20L scale, aligned to liquid level)
-  if (label === "NaOH" || label === "CH₃COOCH₃") {
-    const totalVolume = 20000; // 20L in mL
-    const majorStep = 1000; // 1L
-    const minorStep = 500;  // 0.5L
-    const markingCount = totalVolume / majorStep; // 20
-    const markingMinorCount = totalVolume / minorStep; // 40
-    // Align 20000 mL to initial liquid level (0.85 of tank height)
-    const tankTopY = y - h / 2;
-    const tankBottomY = y + h / 2;
-    const tankHeight = tankBottomY - tankTopY;
-    const initialLiquidFrac = 0.85; // initial fill level
-    const markingStartY = tankBottomY - tankHeight * initialLiquidFrac; // 20000 mL (full)
-    const markingEndY = tankBottomY; // 0 mL (bottom)
-    const markingX = x; // Center of tank
-    const markingLengthMajor = w * 0.1; // even shorter
-    const markingLengthMinor = w * 0.06; // even shorter
-    const labelOffset = w * 0.07; // closer
-    const labelSize = w * 0.07; // smaller font
-    const markingSpan = markingEndY - markingStartY;
-    // Draw minor lines (every 0.5L, except at major positions)
-    for (let i = 0; i <= markingMinorCount; i++) {
-      if (i % 2 === 0) continue; // skip major positions
-      const frac = i / markingMinorCount;
-      const yMark = markingEndY - frac * markingSpan;
-      stroke(0);
-      strokeWeight(1);
-      line(markingX - markingLengthMinor / 2, yMark, markingX + markingLengthMinor / 2, yMark);
-    }
-    // Draw major lines and labels (every 1L)
-    for (let i = 0; i <= markingCount; i++) {
-      const frac = i / markingCount;
-      const yMark = markingEndY - frac * markingSpan;
-      stroke(0);
-      strokeWeight(2);
-      line(markingX - markingLengthMajor / 2, yMark, markingX + markingLengthMajor / 2, yMark);
-      noStroke();
-      fill(0);
-      textAlign(LEFT, CENTER);
-      textSize(labelSize);
-      const labelValue = (i * majorStep).toFixed(0);
-      text(labelValue, markingX + markingLengthMajor / 2 + labelOffset, yMark);
-      if (i === markingCount) {
-        textAlign(LEFT, BOTTOM);
-        textSize(labelSize);
-        // Move 'mL' a little higher above the top line
-        text('mL', markingX + markingLengthMajor / 2 + labelOffset + w * 0.10, yMark - labelSize * 0.6);
-      }
+  // Draw volume markings
+  stroke(0);
+  strokeWeight(1); // Default stroke weight for text outline
+  textAlign(LEFT, CENTER); // Align text to the left of the mark
+  textSize(12); // Reduced size for numbers
+  fill(0); // Text color
+
+  const innerWidth = w - (2 * wallThickness);
+  const innerHeight = h - (2 * wallThickness);
+  const innerTopY = y - h / 2 + wallThickness;
+  const innerBottomY = y + h / 2 - wallThickness;
+
+  // Markings every 1000 ml (1L)
+  const volumesToMark = [];
+  for (let v = 0; v <= TANK_VOLUME; v += 1000) {
+     volumesToMark.push(v);
+  }
+
+  for (let i = 0; i < volumesToMark.length; i++) {
+    const volume = volumesToMark[i];
+    // Map volume (0-20000) to a level (0-0.85)
+    const level = 0.85 * (volume / TANK_VOLUME);
+    // Map level (0-0.85) to a visual Y position (bottom to 85% full height)
+    // Level 0 corresponds to innerBottomY, Level 0.85 corresponds to innerTopY + innerHeight * (1 - 0.85)
+    const markY = innerBottomY - (innerHeight * level);
+
+    // Draw tick mark
+    const volumeInL = volume / 1000;
+    const tickLength = (volumeInL % 2 === 0) ? 50 : 25; // Longer for even liters, shorter for odd - Increased size even more
+    
+    strokeWeight(2); // Reduced thickness for lines
+    line(x - tickLength / 2, markY, x + tickLength / 2, markY); // Centered tick marks
+
+    // Only draw text label for even liter markings
+    if (volumeInL % 2 === 0) {
+        strokeWeight(1); // Reset stroke weight for text outline
+        text(volumeInL + " L", x + tickLength / 2 + 5, markY - 4); // Position text to the right of the mark, moved up
     }
   }
   
   // Draw outlet pipe with bottom valve
   const valvePos = isFirstTank ? valveAPosition : valveBPosition;
   const valveLabel = isFirstTank ? "Tank A" : "Tank B";
-  drawOutletPipe(x, y - h / 2 + cylinderHeight + coneHeight + 10, coneBottomWidth, valvePos, valveLabel);
+  drawOutletPipe(x, y + h / 2 + 10, w * 0.1, valvePos, valveLabel);
   
   // Tank label
   fill(0);
   noStroke();
   textAlign(CENTER, CENTER);
-  textSize(h * 0.05);
+  textSize(h * 0.06); // Increased text size for labels
   text(label, x, y - h / 2 + 20);
 }
 
@@ -1037,7 +973,7 @@ function handleInteractions() {
   const sliderATrackRight = extendedSliderX + extendedSliderWidth / 2 - sliderTrackRadius;
   const sliderBTrackLeft = extendedSliderX - extendedSliderWidth / 2 + sliderTrackRadius;
   const sliderBTrackRight = extendedSliderX + extendedSliderWidth / 2 - sliderTrackRadius;
-  const sliderHandleRadius = 13; // matches drawSlider
+  const sliderHandleRadius = 20; // matches drawSlider handleR
 
   // Only block slider logic if rotor is on
   if (!rotorOn) {
@@ -1168,8 +1104,9 @@ export function drawSimulation(width, height) {
   }
 
   // Update liquid levels based on delta V
-  tankALiquidLevel = Math.max(0, 0.85 - (tankADeltaV / TANK_VOLUME));
-  tankBLiquidLevel = Math.max(0, 0.85 - (tankBDeltaV / TANK_VOLUME));
+  // Ensure level does not go below 0
+  tankALiquidLevel = Math.max(0, 0.85 * (1 - (tankADeltaV / TANK_VOLUME))); // Level goes from 0.85 down to 0 when 20L is drained
+  tankBLiquidLevel = Math.max(0, 0.85 * (1 - (tankBDeltaV / TANK_VOLUME))); // Level goes from 0.85 down to 0 when 20L is drained
 
   // Draw reset button
   drawResetButton();
@@ -1187,14 +1124,6 @@ export function drawSimulation(width, height) {
   // Update wave animation
   waveOffset += 0.05;
   
-  // Update liquid levels based on flow rates
-  if (currentFlowRateA > 0) {
-    tankALiquidLevel = max(0, tankALiquidLevel - currentFlowRateA * FLOW_RATE_FACTOR);
-  }
-  if (currentFlowRateB > 0) {
-    tankBLiquidLevel = max(0, tankBLiquidLevel - currentFlowRateB * FLOW_RATE_FACTOR);
-  }
-  
   // Draw Tank A (left tank) with blue liquid
   const tankAColor = color(255 - sliderAValue * 100, 120, 120, 200); // reddish
   drawTank(tankAX, tankY, tankW, tankH, "NaOH", tankAColor, true, tankALiquidLevel);
@@ -1211,7 +1140,7 @@ export function drawSimulation(width, height) {
   drawSlider(extendedSliderX, sliderYCommon - 80, extendedSliderWidth, sliderAValue, "NaOH (M)", undefined, 0.1, 0.5, rotorOn || concentrationSet);
 
   // Draw temperature slider next to NaOH slider
-  const tempSliderX = extendedSliderX + extendedSliderWidth + 20; // Position to the right of NaOH slider
+  const tempSliderX = extendedSliderX + extendedSliderWidth + 60; // Position to the right of NaOH slider - Increased offset further
   drawSlider(tempSliderX, sliderYCommon - 80, extendedSliderWidth, temperatureValue, 'temperature (°C)', temperatureValue, 25, 85, rotorOn || temperatureSet);
 
   // Draw CH₃COOCH₃ slider (bottom)
@@ -1220,7 +1149,7 @@ export function drawSimulation(width, height) {
   // Update temperature Set button position to match new slider position
   const tempSetButtonW = 60;
   const tempSetButtonH = 32;
-  const tempSetButtonX = tempSliderX + extendedSliderWidth / 2 + 18;
+  const tempSetButtonX = tempSliderX + extendedSliderWidth / 2 + 18; // Use updated tempSliderX
   const tempSetButtonY = sliderTrackY - tempSetButtonH / 2;
   tempSetButtonBounds = { x: tempSetButtonX, y: tempSetButtonY, w: tempSetButtonW, h: tempSetButtonH };
 
@@ -1399,8 +1328,6 @@ export function drawSimulation(width, height) {
   stroke(0);
   strokeWeight(1);
   noFill();
-  // Horizontal line from left monitor
-  line(baseX, baseY + indicatorH / 2, baseX - 40, baseY + indicatorH / 2);
   // Vertical line going up from left monitor
   line(baseX - 40, baseY + indicatorH / 2, baseX - 40, baseY - 160);
   // Add dot at the end of vertical line
@@ -1420,43 +1347,36 @@ export function drawSimulation(width, height) {
   fill(0);
   noStroke();
   textAlign(CENTER, BOTTOM);
-  textSize(16);
-  text('CH₃COONa (M)', baseX + indicatorW / 2, baseY - 5);
+  textSize(18); // Increased text size for label
+  text('CH₃COONa (M)', baseX + indicatorW / 2 - 65, baseY + indicatorH + 45); // Moved label further down below monitor, and left by 15
   stroke(0);
   strokeWeight(1);
   fill(220);
-  rect(baseX, baseY, indicatorW, indicatorH, 5);
+  rect(baseX - 40 - indicatorW / 2, baseY + indicatorH / 2, indicatorW, indicatorH, 5); // Move monitor to end of vertical line
   fill(0);
   noStroke();
   textAlign(CENTER, CENTER);
-  textSize(18);
-  text(displayCA1.toFixed(3), baseX + indicatorW / 2, baseY + indicatorH / 2);
+  textSize(20); // Increased text size for final concentration value
+  text(displayCA1.toFixed(3), baseX - 40, baseY + indicatorH); // Position value at the center of the monitor
 
   // CB1 monitor (right)
   fill(0);
   noStroke();
   textAlign(CENTER, BOTTOM);
-  textSize(16);
-  text('CH₃OH (M)', baseX + indicatorW * 2.2, baseY - 5);
+  textSize(18); // Increased text size for label
+  text('CH₃OH (M)', baseX + indicatorW * 2.2 + 55, baseY + indicatorH + 45); // Moved label further down below monitor, and right by 15
   stroke(0);
   strokeWeight(1);
   fill(220);
-  rect(baseX + indicatorW * 1.7, baseY, indicatorW, indicatorH, 5);
+  rect(baseX + indicatorW * 1.7 + indicatorW + 25 - indicatorW / 2, baseY + indicatorH / 2, indicatorW, indicatorH, 5); // Move monitor to end of vertical line
   fill(0);
   noStroke();
   textAlign(CENTER, CENTER);
-  textSize(18);
-  text(displayCB1.toFixed(3), baseX + indicatorW * 1.7 + indicatorW / 2, baseY + indicatorH / 2);
+  textSize(20); // Increased text size for final concentration value
+  text(displayCB1.toFixed(3), baseX + indicatorW * 1.7 + indicatorW + 25, baseY + indicatorH); // Position value at the center of the monitor
 
   // Draw hamburger menu last to ensure it's on top
   drawHamburgerMenu();
-
-  // Draw instructional text at the bottom
-  fill(40);
-  noStroke();
-  textAlign(CENTER, BOTTOM);
-  textSize(18);
-  text('Note: Set concentration and temperature, then turn on the stirrer. Next, set the flow rates and turn on the pumps', width / 2, height - 18);
 }
 
 // Export slider values for external use
@@ -1549,10 +1469,10 @@ function drawRotorSwitch(cx, topY, switchY, isOn, returnBounds = false) {
   strokeWeight(2);
   rect(cx - swWidth / 2, switchY, swWidth, swHeight, 8);
   // Draw mounting bolts
-  fill(120);
-  for (let i = 0; i < 2; i++) {
-    circle(cx - swWidth / 2 + 10 + i * (swWidth - 20), switchY + swHeight - 7, 7);
-  }
+  // fill(120);
+  // for (let i = 0; i < 2; i++) {
+  //   circle(cx - swWidth / 2 + 10 + i * (swWidth - 20), switchY + swHeight - 7, 7);
+  // }
   // Draw indicator lights
   fill(isOn ? 'yellow' : 'red');
   stroke(60);
@@ -1563,11 +1483,11 @@ function drawRotorSwitch(cx, topY, switchY, isOn, returnBounds = false) {
   // Draw ON/OFF labels inside the switch, near the left/right walls
   noStroke();
   fill(0);
-  textSize(10);
+  textSize(14); // Increased text size for ON/OFF labels
   textAlign(LEFT, CENTER);
-  text('OFF', cx - swWidth / 2 + 8, switchY + swHeight / 2 + 3); // Moved down by adding 3
+  text('OFF', cx - swWidth / 2 + 4, switchY + swHeight / 2 + 10); // Moved down by adding 3
   textAlign(RIGHT, CENTER);
-  text('ON', cx + swWidth / 2 - 8, switchY + swHeight / 2 + 3); // Moved down by adding 3
+  text('ON', cx + swWidth / 2 - 4, switchY + swHeight / 2 + 10); // Moved down by adding 3
   // Draw lever
   const leverAngle = isOn ? -PI / 4 : -3 * PI / 4;
   stroke(60);
@@ -1853,10 +1773,10 @@ function drawSimpleTank(x, y, w, h, liquidLevel, liquidColor, canvasWidth) {
   const shaftTopY = y - h / 2 + Math.max(4, w * 0.035) + 2;
   // Draw a wavy wire for realism
   beginShape();
-  for (let i = 0; i <= 20; i++) {
+  for (let i = 0; i <= 17; i++) {
     const t = i / 20;
     const wx = x;
-    const wy = switchY + 32 + (shaftTopY - (switchY + 32)) * t + Math.sin(t * 4 * Math.PI) * 6 * (1 - t);
+    const wy = switchY + 48 + (shaftTopY - (switchY + 32)) * t + Math.sin(t * 4 * Math.PI) * 6 * (1 - t);
     vertex(wx, wy);
   }
   endShape();
@@ -1949,9 +1869,9 @@ function resetSimulation() {
   valveBPosition = 0;
 
   // Reset tank liquid levels
-  tankALiquidLevel = 0.85;
-  tankBLiquidLevel = 0.85;
-  simpleTankLiquidLevel = 0.65; // Changed from 0.3 to 0.65 to match SIMPLE_TANK_MAX_LEVEL
+  tankALiquidLevel = 1.0; // NaOH tank - Changed from 0.85 to 1.0 to represent 20L
+  tankBLiquidLevel = 1.0; // CH₃COOCH₃ tank - Changed from 0.85 to 1.0 to represent 20L
+  simpleTankLiquidLevel = 0.65; // CSTR tank
   collectionTankLiquidLevel = 0;
 
   // Reset waterfall animations
@@ -2040,48 +1960,43 @@ function drawCollectionTank(x, y, w, h, liquidLevel, liquidColor) {
   
   // Tank outline
   stroke(0);
-  strokeWeight(2);
+  strokeWeight(3); // Thick walls
   noFill();
   
   // Main cylindrical body
-  const cylinderHeight = h * 0.7;
+  const cylinderHeight = h;
   
-  // Draw curved top instead of flat top
-  const topCurveHeight = h * 0.02; // Subtle curve height
-  beginShape();
-  vertex(x - w / 2, y - h / 2);
-  bezierVertex(
-    x - w / 4, y - h / 2 - topCurveHeight,
-    x + w / 4, y - h / 2 - topCurveHeight,
-    x + w / 2, y - h / 2
-  );
-  endShape();
+  // Draw main cylinder sides with thicker walls
+  line(x - w / 2, y - h / 2, x - w / 2, y + h / 2);
+  line(x + w / 2, y - h / 2, x + w / 2, y + h / 2);
   
-  // Draw main cylinder sides
-  line(x - w / 2, y - h / 2, x - w / 2, y - h / 2 + cylinderHeight);
-  line(x + w / 2, y - h / 2, x + w / 2, y - h / 2 + cylinderHeight);
+  // Draw top rim
+  const rimWidth = w * 0.1; // Width of the rim
+  strokeWeight(3);
+  // Left rim
+  line(x - w / 2, y - h / 2, x - w / 2 - rimWidth, y - h / 2);
+  // Right rim
+  line(x + w / 2, y - h / 2, x + w / 2 + rimWidth, y - h / 2);
+  // Front rim
+  line(x - w / 2 - rimWidth, y - h / 2, x + w / 2 + rimWidth, y - h / 2);
   
-  // Conical bottom
-  const coneTopWidth = w;
-  const coneBottomWidth = w * 0.1;
-  const coneHeight = h * 0.3;
+  // Bottom line
+  strokeWeight(4); // Even thicker bottom line
+  line(x - w / 2, y + h / 2, x + w / 2, y + h / 2);
+  strokeWeight(3); // Reset stroke weight for rest of the drawing
   
-  // Draw cone
-  line(x - coneTopWidth / 2, y - h / 2 + cylinderHeight, x - coneBottomWidth / 2, y - h / 2 + cylinderHeight + coneHeight);
-  line(x + coneTopWidth / 2, y - h / 2 + cylinderHeight, x + coneBottomWidth / 2, y - h / 2 + cylinderHeight + coneHeight);
-  
-  // Bottom line of cone
-  strokeWeight(3); // Increased from 2 to 3 for thicker bottom line
-  line(x - coneBottomWidth / 2, y - h / 2 + cylinderHeight + coneHeight, x + coneBottomWidth / 2, y - h / 2 + cylinderHeight + coneHeight);
-  strokeWeight(2); // Reset stroke weight for rest of the drawing
-  
-  // Draw liquid with current level
-  drawLiquid(x, y, w, h, liquidLevel, liquidColor);
+  // Draw liquid with current level, accounting for wall thickness
+  const wallThickness = 3; // Match the stroke weight
+  const adjustedWidth = w - (2 * wallThickness);
+  const adjustedHeight = h - (2 * wallThickness);
+  const adjustedX = x;
+  const adjustedY = y;
+  drawLiquid(adjustedX, adjustedY, adjustedWidth, adjustedHeight, liquidLevel, liquidColor);
   
   // Draw outlet pipe with bottom valve
   const pipeWidth = w * 0.1; // Same width as cone bottom
   const pipeHeight = h * 0.4; // Height of the vertical pipe
-  const valveY = y - h / 2 + cylinderHeight + coneHeight + pipeHeight + 10;
+  const valveY = y + h / 2 + pipeHeight + 10;
   
   // Draw vertical pipe
   stroke(40);
@@ -2089,15 +2004,15 @@ function drawCollectionTank(x, y, w, h, liquidLevel, liquidColor) {
   fill(240); // Light grey for pipe
   beginShape();
   // Top end (at tank)
-  arc(x, y - h / 2 + cylinderHeight + coneHeight, pipeWidth, pipeWidth, 0, Math.PI);
+  arc(x, y + h / 2, pipeWidth, pipeWidth, 0, Math.PI);
   // Left line
-  vertex(x - pipeWidth / 2, y - h / 2 + cylinderHeight + coneHeight);
+  vertex(x - pipeWidth / 2, y + h / 2);
   vertex(x - pipeWidth / 2, valveY);
   // Bottom end
   arc(x, valveY, pipeWidth, pipeWidth, 0, Math.PI);
   // Right line
   vertex(x + pipeWidth / 2, valveY);
-  vertex(x + pipeWidth / 2, y - h / 2 + cylinderHeight + coneHeight);
+  vertex(x + pipeWidth / 2, y + h / 2);
   endShape(CLOSE);
 
   // Draw horizontal pipe from valve (behind the valve)
@@ -2162,7 +2077,7 @@ function drawCollectionTank(x, y, w, h, liquidLevel, liquidColor) {
   
   // Draw handle knob
   translate(handleLength, 0);
-  fill(255, 0, 0); // Red knob
+  fill(255, 215, 0); // Gold knob to match other valves
   circle(0, 0, handleWidth * 1.5);
   
   // Add center dot to handle
