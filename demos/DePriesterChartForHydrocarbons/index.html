@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Material balances in liquid-liquid extraction</title>
+    <title>DePriester Chart for Hydrocarbons</title>
     <link rel="stylesheet" href="main.css">
     <script src="https://kit.fontawesome.com/9d19ad28f4.js"></script>
     <!-- Bootstrap 5 CSS -->
@@ -20,17 +20,40 @@
 <body>
     <div class="canvas-container">
         <div id="svg-container">
-            <div class="icon-container">
-                <div class="hamburger-wrapper">
-                    <button id="hamburger-icon" class="btn btn-light" type="button"
-                    data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar"
-                    aria-controls="offcanvasSidebar">
-                    <img src="./assets/hamburger.svg" alt="Menu" class="hamburger-img">
-                </button>
+            <div class="nav-bar">
+                <div class="icon-container">
+                    <div class="hamburger-wrapper">
+                        <button id="hamburger-icon" class="btn btn-light" type="button"
+                        data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar"
+                        aria-controls="offcanvasSidebar">
+                        <img src="./assets/hamburger.svg" alt="Menu" class="hamburger-img">
+                        </button>
+                    </div>
+                    <div id="compound-buttons" class="btn-group" role="group">
+                        <button id= "methane" type="button" class="btn btn-outline-primary active" data-value="methane">methane</button>
+                        <button id= "propane" type="button" class="btn btn-outline-primary" data-value="propane">propane</button>
+                        <button id= "n-decane" type="button" class="btn btn-outline-primary" data-value="n-decane">n-decane</button>
+                        <!-- <div  id="coords-display">
+                            Your Text Here
+                        </div> -->
+                    </div>
+                </div>
+                <div class="controls-container slider-controls">
+                    <div class="slider-group slider-container">
+                        <label for="pressureSlider">pressure (psia): <span id="pressureValue">15</span></label><br>
+                        <input type="range" id="pressureSlider" min="0" max="9" step="1" value="0">
+                    </div>
+                    <div class="slider-label-box" id="k-value">
+                        Your Text Here
+                    </div>
+                    <div class="slider-group slider-container">
+                        <label for="temperatureSlider">temperature (°F): <span id="temperatureValue">20</span></label><br>
+                        <input type="range" id="temperatureSlider" min="0" max="9" step="1" value="0">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 <div id="overlayContainer"></div>
 
 <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
@@ -44,39 +67,14 @@
             <div class="hamburger-button-group" role="group">
                 <button id="directions-button" class="btn btn-dark">Directions</button>
                 <button id="about-button" class="btn btn-dark">About</button>
-                <button id="details-button" class="btn btn-dark">Details</button>
+                <!-- <button id="details-button" class="btn btn-dark">Details</button> -->
                 <!-- <button id="worksheet-button" class="btn btn-dark">Worksheet</button> -->
-                <button id="reset-button" class="btn btn-success" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebarControl" aria-controls="offcanvasTop">Controls</button>
-                <button id="reset-button" class="btn btn-outline-danger">Reset</button>
+                <!-- <button id="reset-button" class="btn btn-success" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebarControl" aria-controls="offcanvasTop">Controls</button> -->
+                <!-- <button id="reset-button" class="btn btn-outline-danger">Reset</button> -->
             </div>
         </div>
     </div>
 </div>
-
-<div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasSidebarControl" aria-labelledby="offcanvasSidebarLabel">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasSidebarLabel">Controls</h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </button>
-    </div>
-    <div class="offcanvas-body-top">
-        <div class="controls-container slider-controls">
-            <div id="compound-buttons" class="btn-group" role="group">
-                <button id= "methane" button" class="btn btn-outline-primary active" data-value="methane">methane</button>
-                <button id= "propane" type="button" class="btn btn-outline-primary" data-value="propane">propane</button>
-                <button id= "n-decane" type="button" class="btn btn-outline-primary" data-value="n-decane">n-decane</button>
-            </div>
-            <div class="slider-group slider-container">
-                <label for="pressureSlider">pressure (psia): <span id="pressureValue">15</span></label><br>
-                <input type="range" id="pressureSlider" min="0" max="9" step="1" value="0">
-            </div>
-            <div class="slider-group slider-container">
-                <label for="temperatureSlider">temperature (°F): <span id="temperatureValue">20</span></label><br>
-                <input type="range" id="temperatureSlider" min="0" max="9" step="1" value="0">
-            </div>
-        </div>
-    </div>
-  </div>
 
 <script type="module" src="./js/main.js"></script>
 <script type="module" src="./js/hamburger.js"></script>

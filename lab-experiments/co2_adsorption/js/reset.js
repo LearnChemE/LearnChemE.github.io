@@ -5,7 +5,7 @@ import * as config from './config.js';
 import { drawPipes, stopAllFlows } from './pipes.js';
 import { createGasCylinder } from './components/gasCylinder.js';
 import { createConnectedGauges, createDigitalPressureGauge } from './components/gauges.js';
-import { createVerticalValve, createInteractiveValve, createTValveFromImage } from './components/valves.js';
+import { createVerticalValve, createInteractiveValve, createTValve } from './components/valves.js';
 import { createMassFlowController, mfcClicked } from './components/mfc.js';
 import { createVerticalAdsorptionBedView } from './components/adsorptionBed.js';
 import { createCO2GasAnalyzer } from './components/co2Analyzer.js';
@@ -57,7 +57,7 @@ export function resetEverything(draw, pipeGroup) { // Keep parameters if main.js
     const digPressureGaugeX = 550; const digPressureGaugeY = 55;
     const adsorptionBedX = 550; const adsorptionBedY = 150;
     const adsorptionOutletValveX = 600; const adsorptionOutletValveY = 400;
-    const tValveX = 643; const tValveY = 370; // Updated tValveX
+    const tValveX = 634.5; const tValveY = 370;
     const co2AnalyzerX = 700; const co2AnalyzerY = 450;
     const vent1BaseX = 465; const vent1BaseY = 5;
     const vent2BaseX = 870; const vent2BaseY = 485;
@@ -97,7 +97,7 @@ export function resetEverything(draw, pipeGroup) { // Keep parameters if main.js
     createDigitalPressureGauge(draw, digPressureGaugeX, digPressureGaugeY, "--- bar");
     createVerticalAdsorptionBedView(draw, adsorptionBedX, adsorptionBedY);
     createInteractiveValve(draw, adsorptionOutletValveX, adsorptionOutletValveY, false, true);
-    createTValveFromImage(draw, tValveX, tValveY);
+    createTValve(draw, tValveX, tValveY);
     createCO2GasAnalyzer(draw, co2AnalyzerX, co2AnalyzerY, "00.00%");
 
     createVentArrow(draw, vent1BaseX + 5, vent1BaseY - 2, 270, 40);

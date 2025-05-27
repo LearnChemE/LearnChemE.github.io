@@ -1,15 +1,13 @@
-// Calculate display dimensions
-let windowWidth  = window.innerWidth;
-let windowHeight = windowWidth * 600 / 1000;
 
-const margin = 50;
 
-// Initialize SVG.js draw area
-const draw = SVG().addTo('#svg-container').size(windowWidth, windowHeight);
+const margin = 160;
 
-// Define logical canvas size and viewBox
-const canvasWidth  = 1000;
+const canvasWidth  = 800;
 const canvasHeight = 600;
+let windowWidth  = window.innerWidth;
+let windowHeight = windowWidth * canvasHeight / canvasWidth;
+
+const draw = SVG().addTo('#svg-container').size(windowWidth, windowHeight);
 document.getElementsByTagName('svg')[0]
 .setAttribute('viewBox', `0 0 ${canvasWidth} ${canvasHeight}`);
 
@@ -64,8 +62,17 @@ const nDecaneKValues = [
     [1.6, 1.2, 0.825, 0.5, 0.4, 0.3, 0.24, 0.16, 0.12, 0.08]
 ]
 
+const methaneKCoordinates = [
+  [{x: 562.12, y: 162.9}, {x: 513.43, y: 173.84}, {x: 463.76, y: 177.23}, {x: 406.01, y: 175.89}, {x: 372.57, y: 173.37}, {x: 336, y: 170.33}, {x: 293, y: 167.56}, {x: 240.06, y: 166.7}, {x: 193.16, y: 168.65}, {x: -100, y: -100}]
+]
+
+const propaneKCoordinates = []
+
+const nDecaneKCoordinates = []
+
 // Currently selected K-value set
 let KValues = methaneKValues;
+let KValuesPositions = methaneKCoordinates;
 
 function updateCustomLineFromSliders() {
   const pIndex = parseInt(pressureSlider.value, 10);
@@ -78,13 +85,17 @@ function updateCustomLineFromSliders() {
   const y2 = 558;
 
   currentK = KValues[tIndex][pIndex];
+
+  const kXCoordinate = KValuesPositions[tIndex][pIndex].x
+  const kYCoordinate = KValuesPositions[tIndex][pIndex].y
+
   
   // Clear and redraw base content
   drawCanvas();
   drawKValue();
   
   // Draw the dynamic line
-  drawCustomLine(x1, y1, x2, y2);
+  drawCustomLine(x1, y1, x2, y2, kXCoordinate, kYCoordinate);
 }
 
 // Attach input listeners
@@ -103,16 +114,19 @@ setActiveButton(methaneButton);
 // Button click handlers
 methaneButton.addEventListener('click', () => {
   KValues = methaneKValues;
+  KValuesPositions = methaneKCoordinates
   setActiveButton(methaneButton);
   updateCustomLineFromSliders();
 });
 propaneButton.addEventListener('click', () => {
   KValues = propaneKValues;
+  KValuesPositions = propaneKCoordinates
   setActiveButton(propaneButton);
   updateCustomLineFromSliders();
 });
 nDecaneButton.addEventListener('click', () => {
   KValues = nDecaneKValues;
+  KValuesPositions = nDecaneKCoordinates
   setActiveButton(nDecaneButton);
   updateCustomLineFromSliders();
 });
@@ -135,7 +149,7 @@ function insertImage() {
   g.image('./assets/depriester.svg')
     .size(canvasWidth, canvasHeight)
     .attr({ 'pointer-events': 'none' })
-    .move(0, 20);
+    .move(-10, 20);
   g.rotate(90).scale(zoom);
 }
 
@@ -176,28 +190,35 @@ function drawScale() {
 }
 
 
-function drawCustomLine(x1, y1, x2, y2, strokeOptions = { width: 2, color: '#0ddb0d' }) {
-  draw.line(x1, y1, x2, y2).stroke(strokeOptions);
+function drawCustomLine(x1, y1, x2, y2, kXCoordinate, kYCoordinate, strokeOptions = { width: 2, color: '#0ddb0d' }) {
+  const customLine = draw.line(x1, y1, x2, y2).stroke(strokeOptions);
+  draw.circle(8).center(x1, y1).fill('none').stroke({ width: 1.5, color: '#0ddb0d' });
+  draw.circle(8).center(x2, y2).fill('none').stroke({ width: 1.5, color: '#0ddb0d' });
+  draw.circle(14).center(kXCoordinate, kYCoordinate).fill('none').stroke({ width: 2, color: '#0ddb0d' });
+
+    // On hover, compute SVG coordinates of the pointer
+    customLine.on('mousemove', function(event) {
+        // Create an SVGPoint and transform to get SVG coords
+        const svg = this.node.ownerSVGElement;
+        const pt = svg.createSVGPoint();
+        pt.x = event.clientX;
+        pt.y = event.clientY;
+        const location = pt.matrixTransform(svg.getScreenCTM().inverse());
+        const coordsEl = document.getElementById('coords-display');
+        if (coordsEl) {
+            coordsEl.textContent = `Coordinates: ${location.x.toFixed(2)}, ${location.y.toFixed(2)}`;
+        }
+    });
 }
 
 function drawKValue() {
   if (currentK !== null) {
-    // Group the text and box together
-    const kGroup = draw.group();
-    // Draw the text
+    // Update the K-value in the overlay div
     const text = (currentK === -1) ? 'K = out of chart range' : `K = ${currentK}`;
-    const kText = kGroup.text(text)
-    .font({ size: 24, anchor: 'start' })
-    .move(475, 10);
-    // Measure text dimensions
-    const bbox = kText.bbox();
-    // Draw a box behind the text with padding
-    kGroup.rect(bbox.width + 8, bbox.height + 4)
-    .move(bbox.x - 4, bbox.y - 2)
-    .fill('white')
-    .stroke({ color: 'black', width: 1 });
-    // Ensure text is on top
-    kText.front();
+    const kText = document.getElementById("k-value");
+    if (kText) {
+        kText.textContent = text;
+    }
   }
 }
 
@@ -263,4 +284,4 @@ function addOptionToDragAndZoom() {
 
 drawCanvas();
 drawKValue();
-drawCustomLine(pressurePositions[0] - margin, 85, temperaturePositions[0] - margin, 558);
+drawCustomLine(pressurePositions[0] - margin, 85, temperaturePositions[0] - margin, 558, KValuesPositions[0][0].x, KValuesPositions[0][0].y);

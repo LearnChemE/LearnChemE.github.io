@@ -56,15 +56,15 @@ export function createVerticalAdsorptionBedView(draw, x, y) {
     group.add(patternGroup); // Add pattern after heaters so it's visually behind
 
     // Add centered labels for the adsorption bed
-    group.text("Adsorption")
+    group.text("adsorption \n bed")
         .font({ family: 'Arial', size: 18, anchor: 'middle', weight: 'bold' })
         .fill('#000')
         .center(x + bedWidth / 2, y + bedHeight / 2 - 10); // Adjust vertical position
 
-    group.text("Bed")
-        .font({ family: 'Arial', size: 18, anchor: 'middle', weight: 'bold' })
-        .fill('#000')
-        .center(x + bedWidth / 2, y + bedHeight / 2 + 10); // Adjust vertical position
+    // group.text("bed")
+    //     .font({ family: 'Arial', size: 18, anchor: 'middle', weight: 'bold' })
+    //     .fill('#000')
+    //     .center(x + bedWidth / 2, y + bedHeight / 2 + 10); // Adjust vertical position
 
     return group;
 }

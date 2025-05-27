@@ -56,14 +56,13 @@
     <div id="selection-row">
       <div class="selection-row-wrapper" id="selection-wrapper">
         <div class="btn-group" role="group" id="selection-type">
-          <input type="radio" class="btn-check" name="selection" id="r-constant-pressure" value="constant-pressure"
-            autocomplete="off" checked />
-          <label class="btn btn-outline-secondary btn-sm" style="color: black;"
-            for="r-constant-pressure">throtte</label>
+          <input type="radio" class="btn-check" name="selection" id="r-throttle" value="throttle" autocomplete="off"
+            checked />
+          <label class="btn btn-outline-primary btn-sm" for="r-throttle">throttle</label>
 
-          <input type="radio" class="btn-check" name="selection" id="r-constant-volume" value="constant-volume"
-            autocomplete="off" />
-          <label class="btn btn-outline-secondary btn-sm" style="color: black;" for="r-constant-volume">J-T coeff. vs.
+          <input type="radio" class="btn-check" name="selection" id="r-JTcoeff-vs-temperature"
+            value="JTcoeff-vs-temperature" autocomplete="off" />
+          <label class="btn btn-outline-primary btn-sm" for="r-JTcoeff-vs-temperature">J-T coeff. vs.
             temperature</label>
         </div>
       </div>
@@ -110,7 +109,7 @@
       <div class="data-metric"></div>
     </div>
 
-    <div class="slider-wrapper" id="inlet-temperature-slider-wrapper" style="padding-bottom: 10px;">
+    <div class="slider-wrapper" id="inlet-temperature-slider-wrapper">
       <div class="data-name">inlet temperature (K): </div>
       <input type="range" id="inlet-temperature-slider" min="50" max="750" step="5" value="500">
       <div class="data-value" id="inlet-temperature-value">500</div>
@@ -160,13 +159,15 @@
           <p>The throttle does no work, and because the gas moves so quickly through the throttle, it does not have much
             time to transfer heat to the surroundings. The Joule-Thomson coefficient is derived by starting with
             the exact differential for enthalpy:</p>
-          <p>$$dH = \left(\frac{\delta H}{\delta P}\right)_T dP + \left(\frac{\delta H}{\delta T}\right)_P dT.$$</p>
+          <p>$$dH = \left(\frac{\partial H}{\partial P}\right)_T dP + \left(\frac{\partial H}{\partial T}\right)_P dT.$$
+          </p>
           <p>Since \(dH=0\) for a throttle, and the derivative of enthalpy \(H\) with respect to temperature \(T\) at
             constant pressure \(P\) is the heat capacity \(C_p,\) then:</p>
-          <p>$$-\left(\frac{\delta H}{\delta P}\right)_T dP = C_pdT.$$</p>
+          <p>$$-\left(\frac{\partial H}{\partial P}\right)_T dP = C_pdT.$$</p>
           <p>Rearranging, and given that the enthalpy \(H\) is constant,</p>
-          <p>$$-\left(\frac{\delta H}{\delta P}\right)_T = C_p \left(\frac{\delta T}{\delta P}\right)_{H}, $$</p>
-          <p>where \(\left(\frac{\delta T}{\delta P}\right)_H = \mu_{JT},\) and \(\mu_{JT}\) is the Joule-Thomson
+          <p>$$-\left(\frac{\partial H}{\partial P}\right)_T = C_p \left(\frac{\partial T}{\partial P}\right)_{H}, $$
+          </p>
+          <p>where \(\left(\frac{\partial T}{\partial P}\right)_H = \mu_{JT},\) and \(\mu_{JT}\) is the Joule-Thomson
             coefficient. Integration then relates the output temperature to the inlet temperature and the pressure drop:
           </p>
           <p>$$T_{out} = T_{in} + \mu_{JT}(P_{out}-P_{in}).$$</p>

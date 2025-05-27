@@ -233,7 +233,7 @@ function drawTextForConstPressureSelection() {
   textSize(28);
   text("mol A", 90, 305 - z.molAForConstPressureSelection * (530 / 7));
   text("mol B", 90 + 450 / 3, 305 - z.molBForConstPressureSelection * (530 / 7));
-  text("mol inerts", 62.5 + 450 * (2 / 3), 305 - z.molesInerts * (530 / 7));
+  text("mol inert", 67.5 + 450 * (2 / 3), 305 - z.molesInerts * (530 / 7));
   text(z.molAForConstPressureSelection.toFixed(1), 110, 265 - z.molAForConstPressureSelection * (530 / 7));
   text(z.molBForConstPressureSelection.toFixed(1), 110 + 450 / 3, 265 - z.molBForConstPressureSelection * (530 / 7));
   text(z.molesInerts.toFixed(1), 110 + 450 * (2 / 3), 265 - z.molesInerts * (530 / 7));
@@ -376,7 +376,7 @@ function drawTextForConstVolumeSelection() {
   textSize(28);
   text("mol A", 90, 305 - z.molAForConstVolumeSelection * (530 / 7));
   text("mol B", 90 + 450 / 3, 305 - z.molBForConstVolumeSelection * (530 / 7));
-  text("mol inerts", 62.5 + 450 * (2 / 3), 305 - z.molesInerts * (530 / 7));
+  text("mol inert", 67.5 + 450 * (2 / 3), 305 - z.molesInerts * (530 / 7));
   text(z.molAForConstVolumeSelection.toFixed(1), 110, 265 - z.molAForConstVolumeSelection * (530 / 7));
   text(z.molBForConstVolumeSelection.toFixed(1), 110 + 450 / 3, 265 - z.molBForConstVolumeSelection * (530 / 7));
   text(z.molesInerts.toFixed(1), 110 + 450 * (2 / 3), 265 - z.molesInerts * (530 / 7));

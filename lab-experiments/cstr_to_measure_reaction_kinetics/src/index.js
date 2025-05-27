@@ -27,7 +27,6 @@ window.draw = function() {
   window.mX = mouseX / relativeSize();
   window.mY = mouseY / relativeSize();
   scale(relativeSize());
-  console.log(relativeSize());
   drawSimulation(width, height);
 };
 

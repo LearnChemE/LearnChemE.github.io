@@ -1,11 +1,11 @@
 import * as config from './config.js';
 import * as state from './state.js';
 export function addOptionToDragAndZoom(draw) {
-    draw.text("zoom with the scroll wheel")
+    draw.text("Zoom with the scroll wheel.")
     .move(config.canvasWidth - 250, 100)
     .font({ size: 16, anchor: 'left' })
 
-    draw.text("After zooming, drag mouse to move image")
+    draw.text("After zooming, drag mouse to move image.")
     .move(config.canvasWidth - 300, 120)
     .font({ size: 16, anchor: 'left' })
     const defaultViewbox = { x: 0, y: 0, width: config.canvasWidth, height: config.canvasHeight };

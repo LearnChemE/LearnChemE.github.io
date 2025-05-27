@@ -38,8 +38,8 @@ export function createCO2GasAnalyzer(draw, x, y, concentration = "00.00%") {
         .center(displayX + displayWidth / 2, displayY + displayHeight / 2);
 
     // Label for the Analyzer
-    group.text("CO₂ Analyzer")
-        .font({ family: 'Arial', size: 12, anchor: 'middle', weight: 'bold' })
+    group.text("CO₂ analyzer")
+        .font({ family: 'Arial', size: 16, anchor: 'middle', weight: 'bold' })
         .fill('#000')
         .center(x + analyzerWidth / 2, y + analyzerHeight - 15); // Position below display
 
