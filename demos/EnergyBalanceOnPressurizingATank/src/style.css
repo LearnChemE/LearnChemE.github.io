@@ -57,10 +57,11 @@ canvas {
 
 .slider-wrapper {
   display: grid;
-  grid-template-columns: auto 200px 50px;
+  grid-template-columns: 160px 180px 50px;
   justify-self: right;
   gap: .25em;
   text-align: end;
+  align-items: end;
 }
 
 #modal-buttons {
@@ -80,14 +81,23 @@ h1 {
   display: none;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 400px) {
   .modal-m {
-      width: 70%;
-      max-width: 900px !important;
+      width: 70% !important;
+      max-width: 900px;
   }
 
   .modal-xl {
-      width: 90%;
+      width: 90% !important;
       max-width: 1600px;
   }
+}
+
+.modal-body {
+  text-align: left;
+}
+
+.MathJax_Display,
+mjx-container {
+  text-align: left !important;
 }

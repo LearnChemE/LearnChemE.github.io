@@ -56,6 +56,7 @@ const sketch = async (p: p5) => {
 
         // Draw labels
         labels(type, results, t);
+        arrows();
     }
 
     /**
@@ -203,6 +204,7 @@ const sketch = async (p: p5) => {
     const labels = (type: FluidType, results: CalculatedValues, t: number): void => {
         p.push();
         p.textSize(24);
+        p.fill(0);
         // Top left pipe
         p.text(`P : ${State.linePressure.toFixed(1)} bar`, -465, -160);
         p.text(`T : ${State.lineTemperature} °C`, -460, -130);
@@ -213,41 +215,56 @@ const sketch = async (p: p5) => {
         p.text(`2`, -451, -160);
         p.text(`2`, -447, -130);
 
+        let sigfigs = results.tankTemperature >= 100 ? 0 : 1;
         if (type === FluidType.WATER) {
             p.textSize(24);
             // Left of tank
-            p.text(`P : ${results.tankPressure.toFixed(1)} bar`, -260, 140);
-            p.text(`T : ${results.tankTemperature.toFixed(1)} °C`, -260, 170);
-
+            p.text(`P   : ${results.tankPressure.toFixed(1)} bar`, -260, 140);
+            p.text(`T   : ${results.tankTemperature.toFixed(sigfigs)} °C`, -260, 170);
+ 
             // Tank label
             const comp = results.tankComposition * 100;
             renderer.disable(renderer.DEPTH_TEST);
             let waterHeight = comp * 1.4;
-            p.text(`${comp.toFixed(1)}% Liquid`, -60, 240 - waterHeight / 2);
+            p.fill(255);
+            p.text(`${comp.toFixed(1)}% liquid`, -60, 240 - waterHeight / 2);
+            p.fill(0);
 
             // Only show vapour % if there is enough
             if (comp <= 80) {
                 let steamHeight = (100 - comp) * 1.4;
-                p.text(`${(100 - comp).toFixed(1)}% Vapor`, -60, 110 + steamHeight / 2);
+                p.text(`${(100 - comp).toFixed(1)}% vapor`, -60, 110 + steamHeight / 2);
             }
             renderer.enable(renderer.DEPTH_TEST);
 
             // Subscripts
             p.textSize(12);
             // Top left pipe
-            p.text('1', -246, 140);
-            p.text('1', -247, 170);
+            let subscript = '';
+            if (t === 0) subscript = '1';
+            else if (t === 1) {
+                subscript = 'final';
+            }
+            p.text(subscript, -246, 140);
+            p.text(subscript, -247, 170);
         }
         else {
             p.textSize(24);
             // Tank labels
             renderer.disable(renderer.DEPTH_TEST);
-            p.text(`P : ${results.tankPressure.toFixed(1)} bar`, -57, 150);
-            p.text(`T : ${results.tankTemperature.toFixed(1)} °C`, -60, 190);
+            p.text(`P   : ${results.tankPressure.toFixed(1)} bar`, -57, 150);
+            p.text(`T   : ${results.tankTemperature.toFixed(sigfigs)} °C`, -60, 190);
             //Subscripts
             p.textSize(12);
-            p.text('1', -43, 150);
-            p.text('1', -47, 190);
+
+            let subscript = '';
+            if (t === 0) subscript = '1';
+            else if (t === 1) {
+                subscript = 'final';
+            }
+
+            p.text(subscript, -43, 150);
+            p.text(subscript, -47, 190);
             renderer.enable(renderer.DEPTH_TEST);
         }
 
@@ -256,6 +273,27 @@ const sketch = async (p: p5) => {
             p.textSize(24);
             p.text("pressure equalized", -110, -143);
         }
+        p.pop();
+    }
+
+    const arrows = () => {
+        p.push();
+        p.stroke(0);
+        p.strokeWeight(3);
+        p.fill(0);
+
+        // Inlet arrow body
+        p.line(-340, -155, -250, -155);
+        // Outlet arrow body
+        p.line(180, -155, 270, -155);
+
+        // Arrow heads
+        p.strokeWeight(1);
+        // Inlet arrow head
+        p.triangle(-250,-150 , -250,-160 , -230,-155);
+        // Outlet arrow head
+        p.triangle(270,-150 , 270,-160 , 290,-155);
+
         p.pop();
     }
 }
