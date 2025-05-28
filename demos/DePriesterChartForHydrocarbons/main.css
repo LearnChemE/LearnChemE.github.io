@@ -155,15 +155,16 @@ body {
   
   .controls-container.slider-controls input[type="range"]::-webkit-slider-runnable-track {
     height: 4px;
-    background: #ccc;
+    background: darkgray;
     border-radius: 2px;
   }
   .controls-container.slider-controls input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 16px;
     height: 16px;
-    background: #333;
+    background: lightgreen;
     border-radius: 50%;
+    border: 0.5px solid #333;
     margin-top: -6px;
   }
 
