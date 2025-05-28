@@ -1,4 +1,4 @@
-import { BentTube, StraightTube, Tube, TubeDirection, TubeGroup, ValveSetting, vec2 } from "../types";
+import { BentTube, Manometer, StraightTube, Tube, TubeDirection, TubeGroup, ValveSetting, vec2 } from "../types";
 import { BendDirection } from "../types/bend-direction";
 import { smoothLerp } from "./helpers";
 import { State } from "./interactions";
@@ -10,6 +10,9 @@ var VenturiRight: TubeGroup;
 var UpperBase:    TubeGroup;
 var Recycle:      TubeGroup;
 var ExitTube:     TubeGroup;
+
+// Venturi Meter
+var manometer: Manometer;
 
 /**
  * Initialize all of the animation objects. This must happen after the SVG is loaded
@@ -56,6 +59,9 @@ export function initAnimationObjects() {
     UpperBase    = new TubeGroup(UpperBaseData);
     Recycle      = new TubeGroup(RecycleData);
     ExitTube     = new TubeGroup(ExitTubeData);
+
+    // Manometer
+    manometer = new Manometer();
 }
 
 

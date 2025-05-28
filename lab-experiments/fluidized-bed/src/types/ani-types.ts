@@ -141,6 +141,10 @@ export class StraightTube implements Tube {
     public async empty(duration: number) {
         return smoothLerp(duration, (t) => {this.update(t)}, -1, 0);
     }
+
+    public async fillTo(start: number, target: number, duration: number) {
+        return smoothLerp(duration, (t) => {this.update(t)}, start, target);
+    }
 }
 
 /**
@@ -257,4 +261,29 @@ const checkForDefs = (parent: HTMLElement): SVGDefsElement => {
     }
     // Return the defs element
     return defs;
+}
+
+export class Manometer {
+    private inTube: StraightTube;
+    private inFill: number;
+    private outTube: StraightTube;
+    private outFill: number;
+
+    constructor() {
+        this.inTube  = new StraightTube( "Tube_6", TubeDirection.Left); // 6 for left
+        this.outTube = new StraightTube("Tube_15", TubeDirection.Left); // 14 for right
+
+        this.inFill  = 0;
+        this.outFill = 0;
+    }
+
+    /**
+     * Make these private later
+     */
+
+    public fillLeftTo = async (target: number) => {
+        this.inTube.fillTo(this.inFill, target, 500);
+        this.inFill = target;
+        return;
+    }
 }
