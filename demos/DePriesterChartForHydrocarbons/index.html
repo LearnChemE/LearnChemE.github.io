@@ -18,63 +18,45 @@
     <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.draggable.js@3.0"></script>
 </head>
 <body>
+    <!-- Container for dynamically loaded modal content -->
+    <div id="overlayContainer"></div>
     <div class="canvas-container">
         <div id="svg-container">
             <div class="nav-bar">
                 <div class="icon-container">
                     <div class="hamburger-wrapper">
-                        <button id="hamburger-icon" class="btn btn-light" type="button"
-                        data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar"
-                        aria-controls="offcanvasSidebar">
-                        <img src="./assets/hamburger.svg" alt="Menu" class="hamburger-img">
-                        </button>
+                        <div id="hamburger-menu" class="hamburger-menu"></div>
+                        <div id="hamburger-icon" onclick="toggleMenu()">
+                            <img src="./assets/hamburger.svg" alt="Menu" class="hamburger-img">
+                        </div>
                     </div>
                     <div id="compound-buttons" class="btn-group" role="group">
                         <button id= "methane" type="button" class="btn btn-outline-primary active" data-value="methane">methane</button>
                         <button id= "propane" type="button" class="btn btn-outline-primary" data-value="propane">propane</button>
                         <button id= "n-decane" type="button" class="btn btn-outline-primary" data-value="n-decane">n-decane</button>
-                        <div  id="coords-display">
+                        <!-- <div  id="coords-display">
                             Your Text Here
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <div class="controls-container slider-controls">
                     <div class="slider-group slider-container">
-                        <label for="pressureSlider">pressure (psia): <span id="pressureValue">15</span></label><br>
+                        <label for="pressureSlider">pressure (psia)</label><br>
                         <input type="range" id="pressureSlider" min="0" max="9" step="1" value="0">
+                        <span id="pressureValue">15</span>
                     </div>
                     <div class="slider-label-box" id="k-value">
                         Your Text Here
                     </div>
                     <div class="slider-group slider-container">
-                        <label for="temperatureSlider">temperature (°F): <span id="temperatureValue">20</span></label><br>
+                        <label for="temperatureSlider">temperature (°F)</label><br>
                         <input type="range" id="temperatureSlider" min="0" max="9" step="1" value="0">
+                        <span id="temperatureValue">20</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-<div id="overlayContainer"></div>
-
-<div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasSidebarLabel">Menu</h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </button>
-    </div>
-    <div class="offcanvas-body">
-        <div class="hamburger-sections">
-            <div class="hamburger-button-group" role="group">
-                <button id="directions-button" class="btn btn-dark">Directions</button>
-                <button id="about-button" class="btn btn-dark">About</button>
-                <button id="details-button" class="btn btn-dark">Details</button>
-                <!-- <button id="worksheet-button" class="btn btn-dark">Worksheet</button> -->
-                <!-- <button id="reset-button" class="btn btn-success" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebarControl" aria-controls="offcanvasTop">Controls</button> -->
-                <!-- <button id="reset-button" class="btn btn-outline-danger">Reset</button> -->
-            </div>
-        </div>
-    </div>
-</div>
 
 <script type="module" src="./js/main.js"></script>
 <script type="module" src="./js/hamburger.js"></script>
@@ -99,5 +81,101 @@ crossorigin="anonymous"></script>
         temperatureValueLabel.textContent = temperatureValues[temperatureSlider.value];
     });
 </script>
+
+ <script>
+    // Function to toggle the hamburger menu
+    function toggleMenu() {
+      const hamburgerMenu = document.getElementById('hamburger-menu');
+      const isCurrentlyShown = hamburgerMenu.classList.contains('show');
+      hamburgerMenu.classList.toggle('show');
+
+      // Only populate if opening
+      if (!isCurrentlyShown) {
+        // Clear any existing buttons
+        hamburgerMenu.innerHTML = '';
+
+        // --- Button Configuration ---
+        const buttons = [
+          { label: 'Directions', url: './overlay/directions.html', action: 'modal' },
+          { label: 'About', url: './overlay/about.html', action: 'modal' },
+        //   { label: 'Worksheet', url: 'assets/worksheet.pdf', action: 'download', filename: 'worksheet.pdf' }
+        ];
+
+        buttons.forEach((btnConfig) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          // Use classes defined in main.css if available, otherwise default Bootstrap
+          button.className = 'btn btn-primary btn-sm hamburger-menu-button'; // Added a class for potential specific styling
+          button.textContent = btnConfig.label;
+
+          button.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent click from closing menu immediately
+
+            if (btnConfig.action === 'modal') {
+              // Fetch and display modal content
+              fetch(btnConfig.url)
+                .then(response => {
+                  if (!response.ok) throw new Error(`Network error loading ${btnConfig.url}`);
+                  return response.text();
+                })
+                .then(html => {
+                  const container = document.getElementById('overlayContainer');
+                  container.innerHTML = html; // Replace previous modal HTML
+
+                  // Modal ID assumed to be the same as the label lowercased
+                  const modalId = btnConfig.label.toLowerCase();
+                  const modalEl = document.getElementById(modalId);
+
+                  if (modalEl) {
+                     // Make sure no stray modals are lingering from previous fetches
+                     const existingModalInstance = bootstrap.Modal.getInstance(modalEl);
+                     if(existingModalInstance) {
+                         // If an instance exists but might be hidden or closing, dispose of it
+                         // before creating a new one to avoid conflicts.
+                         existingModalInstance.dispose();
+                     }
+                    const modal = new bootstrap.Modal(modalEl); // Create new instance
+                    modal.show();
+                  } else {
+                     console.error(`Modal element with ID '${modalId}' not found in fetched HTML from ${btnConfig.url}.`);
+                  }
+                })
+                .catch(error => console.error('Error loading/showing modal:', error));
+
+            } else if (btnConfig.action === 'download') {
+              // Trigger download
+              downloadFile(btnConfig.url, btnConfig.filename);
+            }
+
+            // Close menu after action
+            hamburgerMenu.classList.remove('show');
+          });
+
+          hamburgerMenu.appendChild(button);
+        });
+      }
+    } // End of toggleMenu
+
+    // Function to download a file
+    function downloadFile(fileUrl, fileName) {
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = fileName || fileUrl.split('/').pop(); // Use provided name or derive from URL
+      document.body.appendChild(link);
+      link.click(); // Trigger the download
+      document.body.removeChild(link); // Clean up
+    }
+
+    // Close the hamburger menu when clicking outside
+    document.addEventListener('click', (event) => {
+      const hamburgerMenu = document.getElementById('hamburger-menu');
+      const hamburgerIcon = document.getElementById('hamburger-icon');
+
+      // Check if the menu/icon exist and if the click was outside both
+      if (hamburgerMenu && hamburgerIcon && !hamburgerMenu.contains(event.target) && !hamburgerIcon.contains(event.target)) {
+        hamburgerMenu.classList.remove('show');
+      }
+    });
+  </script>
 </body>
 </html>

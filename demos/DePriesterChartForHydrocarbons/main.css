@@ -1,4 +1,4 @@
-/* main.css */
+/ main.css */
 
 body {
     display: flex;
@@ -25,7 +25,7 @@ body {
     max-width: calc((100vh - 40px) * 800 / 600);
     max-height: calc((100vw - 40px) * 800 / 900);
     overflow: hidden;
-    z-index: 100000;
+    z-index: 1000;
     align-items: flex-start;
     
 }
@@ -43,6 +43,7 @@ body {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
+  z-index: 10000000001;
 }
 
 .icon-container {
@@ -50,7 +51,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 50px;
+  gap: 150px;
 }
 
 .hamburger-wrapper {
@@ -79,6 +80,39 @@ body {
     width: 24px;
     height: 24px;
     object-fit: contain;
+}
+
+.hamburger-menu {
+  display: none;
+  /* Hidden by default */
+  flex-direction: column;
+  gap: 10px;
+  /* Space between buttons */
+  margin-top: 40px;
+  /* Space below the hamburger icon */
+  position: absolute;
+  /* Position the menu absolutely */
+  z-index: 10000000000;
+  /* Ensure the menu appears on top */
+  background-color: white;
+  /* Add a background to make buttons visible */
+  border: 2px solid #ddd;
+  /* Optional: Add a border */
+  padding: 10px;
+  /* Add padding for better appearance */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* Optional: Add a shadow */
+}
+
+.hamburger-menu.show {
+  display: flex;
+  z-index: 100000000000;
+  /* Show when the "show" class is added */
+}
+
+.hamburger-menu .btn {
+  width: 100px;
+  /* Set a fixed width for the buttons */
 }
 
 .canvas-container {
@@ -113,8 +147,8 @@ body {
   }
 
   #offcanvasSidebarControl {
-    width: 350px;
-    max-width: 80%;
+    width: 400px;
+    height: 100px;
     background-size:cover;
   }
 
@@ -138,13 +172,15 @@ body {
 
 .controls-container.slider-controls > .slider-group {
     flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2px;
 }
   
 
   .controls-container.slider-controls .slider-group label {
     font-size: 0.9rem;
-    display: block;
-    margin-bottom: -20px;
   }
   
   .controls-container.slider-controls .slider-group input[type="range"] {
@@ -167,12 +203,27 @@ body {
     border: 0.5px solid #333;
     margin-top: -6px;
   }
+  /* Firefox track */
+  .controls-container.slider-controls input[type="range"]::-moz-range-track {
+    height: 4px;
+    background: darkgray;
+    border-radius: 2px;
+  }
+  /* Firefox thumb */
+  .controls-container.slider-controls input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: lightgreen;
+    border-radius: 50%;
+    border: 0.5px solid #333;
+  }
 
 .slider-container {
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
     border-radius: 4px;
     padding: 2px;
     margin-bottom: 4px;
+    height: 65px;
   }
   
   /* Compound selector button group */
@@ -181,8 +232,9 @@ body {
     flex-direction: column;
     gap: 8px;
     margin-bottom: 16px;
-    width: 150px;
-    z-index: 1000001;
+    width: 100px;
+    height: 50px;
+    z-index: 1001;
   }
   
   #compound-buttons .btn {
@@ -210,6 +262,7 @@ body {
       border-radius: 4px;
       white-space: nowrap;
       width: 220px;
+      height: 30px;
   }
 
 @media (max-width: 600px) {
