@@ -63,13 +63,13 @@
 
   .slider-label {
     font-size: 13px;
-    font-weight: bold;
+    /* font-weight: bold; */
     color: #222;
   }
 
   .slider-value {
     font-size: 13px;
-    font-weight: bold;
+    /* font-weight: bold; */
   }
   </style>
 </head>
@@ -80,26 +80,23 @@
     <div id="p5-container">
    
 <div id="slider-wrapper">
-       <!-- Chemical Equation -->
-    <div id="equation" class="equation-text">
-      CaCO<sub>3</sub> (s) ⇌ CaO (s) + CO<sub>2</sub> (g)
-    </div>  
+  
   <!-- Temperature row -->
   <div class="slider-row temp">
     
-    <label for="tempSlider">Temperature (K):</label>
+    <label for="tempSlider">temperature (K):</label>
     
     <input type="range" id="tempSlider" min="980" max="1400" value="1364" step="1">
 
     <span id="tempValue">1364 K</span>
   </div>
-    <div class="slider-description" style="margin-bottom: 5px; font-size: 14px;">
-      Add moles to the system:
-    </div>
+  
 
   <!-- Grouped row: CaCO₃, CaO, CO₂ -->
   <div class="slider-group">
+    
     <div class="slider-subgroup">
+      <label class="slider-label">add moles to system:</label>
       <label class="slider-label" for="caco3Slider">CaCO₃:</label>
       <input type="range" id="caco3Slider" min="0" max="2" value="1" step="0.01">
       <span class="slider-value" id="caco3Value">1.00</span>
@@ -114,7 +111,10 @@
       <input type="range" id="co2Slider" min="0" max="2" value="1" step="0.01">
       <span class="slider-value" id="co2Value">1.00</span>
       </div> 
-
+     <!-- Chemical Equation -->
+    <div id="equation" class="equation-text">
+      CaCO<sub>3</sub>(s) ⇌ CaO(s) + CO<sub>2</sub>(g)
+    </div>  
 
     </div>
   </div>
@@ -151,19 +151,18 @@
         </div>
         <div class="modal-body">
           <p>
-            Solid calcium carbonate (CaCO3) decomposes into solid calcium oxide (CaO) and gaseous 
-            carbon dioxide (CO2) in a constant-volume container at high temperatures. CO2 is assumed 
-            to be an ideal gas, and the two solids are assumed to be in separate phases. You can 
-            vary the initial number of moles of 
-            CaCO3, CaO, and CO2 in the constant-volume container using sliders; the container 
-            displays the equilibrium pressure as the color intensity of the gas phase increases as 
-            the number of moles of CO2 increases. The bar graph on the right shows the number of 
-            moles present at equilibrium. The equilibrium constant Keq changes as the temperature 
-            changes using the slider. The equilibrium constant is equal to the CO2 pressure (in bar) 
-            divided by the standard-state pressure of 1 bar. Note that adding more CaO when CaO is 
-            already in the container (or adding more CaCO3 when CaCO3 is already in the container)
-             at equilibrium does not change equilibrium because increasing the number of moles of a 
-             pure solid does not change its fugacity.
+            Solid calcium carbonate (CaCO<sub>3</sub>) decomposes into solid calcium oxide (CaO) and gaseous 
+            carbon dioxide (CO<sub>2</sub>) in a constant-volume (100 cm³) container at high temperatures. Carbon dioxide is assumed 
+            to be an ideal gas, and the two solids are assumed to be in separate phases. 
+            You can vary the initial number of moles of CaCO<sub>3</sub>, CaO, and CO<sub>2</sub> in the 
+            constant-volume container using sliders; the container displays the equilibrium
+             pressure. The bar graph on the right shows the number of moles present at 
+             equilibrium. The equilibrium constant K<sub>eq</sub> changes as the temperature changes 
+             using the slider. The equilibrium constant is equal to the CO<sub>2</sub> pressure (in bar)
+              divided by the standard-state pressure of 1 bar. Note that adding more CaO when 
+              CaO is already in the container (or adding more CaCO<sub>3</sub> when CaCO<sub>3</sub> is already in 
+              the container) at equilibrium does not change equilibrium because increasing 
+              the number of moles of a pure solid does not change its fugacity.
           </p>
 
   
@@ -188,51 +187,53 @@
     The equilibrium constant is calculated as a function of temperature using the Van’t Hoff equation:
   </p>
 
-  <p>
-    \[
-    \ln\left(\frac{K_{eq}}{K_{ref}}\right) = -\frac{\Delta H^\circ}{R} \left(\frac{1}{T} - \frac{1}{T_{ref}}\right)
-    \]
-  </p>
+    <p>
+      \[
+      \ln\left(\frac{K_{eq}}{K_{ref}}\right) = -\frac{\Delta H^\circ}{R} \left( \frac{1}{T} - \frac{1}{T_{ref}} \right),
+      \]
+    </p>
+
+    <p>
+      \[
+      \ln K_{ref} = -\frac{\Delta G^\circ}{R \cdot T_{ref}},
+      \]
+    </p>
+
 
   <p>
-    \[
-    \ln K_{ref} = -\frac{\Delta G^\circ}{R \cdot T_{ref}}
-    \]
-  </p>
-
-  <p>
-    where the subscript ref refers to a reference state, \( K_{eq} \) is the equilibrium constant, \( T \) is temperature (K),
+    where the subscript ref refers to a reference state, ( K<sub>eq</sub> ) is the equilibrium constant, \( T \) is temperature (K),
     \( R \) is the ideal gas constant, \( \Delta H^\circ \) is the standard enthalpy of reaction (kJ/mol),
     and \( \Delta G^\circ \) is the standard Gibbs free energy of reaction (kJ/mol).
   </p>
 
   <p>
     \[
-    P = \frac{n_{CO_2} \cdot R \cdot T}{V}
+    P = \frac{n_{CO_2} \cdot R \cdot T}{V} ,
     \]
   </p>
 
   <p>
     \[
-    \zeta = \frac{K_{eq} \cdot V}{R \cdot T} - n_{CO_2}
+    \zeta = \frac{K_{eq} \cdot V}{R \cdot T} - n_{CO_2} ,
     \]
   </p>
 
   <p>
-    \[
-    n_{CaCO_3}^{(f)} = n_{CaCO_3} - \zeta
-    \]
-    \[
-    n_{CaO}^{(f)} = n_{CaO} + \zeta
-    \]
-    \[
-    n_{CO_2}^{(f)} = n_{CO_2} + \zeta
-    \]
-  </p>
+  \[
+  n_{{CaCO_3}(f)} = n_{CaCO_3} - \zeta,
+  \]
+  \[
+  n_{{CaO}(f)} = n_{CaO} + \zeta,
+  \]
+  \[
+  n_{{CO_2}(f)} = n_{CO_2} + \zeta,
+  \]
+</p>
+
 
   <p>
     where \( P \) is the pressure (bar), \( n_i \) is the number of moles of component \( i \) initially in the system,
-    \( n_i^{(f)} \) is the final number of moles in the system, \( V \) is the fixed volume of the container (cm³),
+    \( n_{{i}{(f)}} \) is the final number of moles in the system, \( V \) is the fixed volume of the container (cm³),
     and \( \zeta \) is the extent of reaction.
   </p>
 </div>
@@ -252,16 +253,20 @@
           </button>
         </div>
         <div class="modal-body">
-          <p>
-            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">
-              Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder 
-              for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by 
-              Pramod Kumar Ajmera under the direction of Professor John L. Falconer and Michelle Medlin, 
-              with the assistance of Neil Hendren. It is a JavaScript/HTML5 implementation of a 
-              Mathematica simulation by _________. It can be downloaded <a href="_______">here</a>. 
-              It was prepared with financial support from the National Science Foundation 
-              (DUE 2336987 and 2336988). Address any questions or comments to LearnChemE@gmail.com.
-          </p>
+        <p>
+          This simulation was created in the 
+          <a href="https://www.colorado.edu/chbe" target="_blank">
+            Department of Chemical and Biological Engineering</a>, 
+          at University of Colorado Boulder for 
+          <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> 
+          by Pramod Kumar Ajmera under the direction of Professor John L. Falconer and Michelle Medlin, 
+          with the assistance of Neil Hendren. It is a JavaScript/HTML5 implementation of a 
+          <a href="_______" target="_blank">Mathematica simulation</a> by Rachael L. Baumann and Garrison Vigil. 
+          It was prepared with financial support from the National Science Foundation 
+          (DUE 2336987 and 2336988) in collaboration with Washington State University. 
+          Address any questions or comments to LearnChemE@gmail.com.
+        </p>
+
         </div>
       </div>
     </div>
