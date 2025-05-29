@@ -175,7 +175,7 @@ function throttleFigure() {
     line(60 * cos(i), -60 * sin(i), 68 * cos(i), -68 * sin(i));
   }
   strokeWeight(1);
-  for (let i = -45; i <= 225; i += (225 + 45) / 20) {
+  for (let i = -45; i <= 225; i += (225 + 45) / 25) {
     line(60 * cos(i), -60 * sin(i), 65 * cos(i), -65 * sin(i));
   }
   pop();
