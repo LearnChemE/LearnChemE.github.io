@@ -11,7 +11,7 @@ const gasButtonsWrapper = document.getElementById("gas-buttons-wrapper");
 let mu = 5.468;
 
 //preload for loading images and fonts
-window.preload = function () {};
+window.preload = function() {};
 
 // This function is used to scale the canvas based on the size of the container
 window.relativeSize = () => p5container.offsetWidth / 1280;
@@ -29,14 +29,14 @@ function resize() {
 
 // Moved outside of the selection block - Do not call setup() more than once.
 // So this should never be inside a conditional statement.
-window.setup = function () {
+window.setup = function() {
   createCanvas(p5container.offsetWidth, p5container.offsetHeight).parent(p5container);
   frameRate(30);
 };
 
 // Same with draw() - this should never be inside a conditional statement.
 // Put the conditional statements inside the draw function.
-window.draw = function () {
+window.draw = function() {
   // The "window" keyword is used to set global variables. So you can use
   // "selection" in any file, function, block, etc.
 
@@ -160,9 +160,7 @@ function jouleThomsonCoeffPlot() {
   stroke("black");
   strokeWeight(1);
   for (
-    let i = z.graphLeftSideX + (z.graphRightSideX - z.graphLeftSideX) / 20;
-    i < z.graphRightSideX;
-    i += (z.graphRightSideX - z.graphLeftSideX) / 20
+    let i = z.graphLeftSideX + (z.graphRightSideX - z.graphLeftSideX) / 20; i < z.graphRightSideX; i += (z.graphRightSideX - z.graphLeftSideX) / 20
   ) {
     line(i, z.graphBottomY, i, z.graphBottomY - 5);
     line(i, z.graphTopY, i, z.graphTopY + 5);
@@ -428,12 +426,13 @@ function drawMouseGraphInteraction() {
     let calibratedXPointOnH2Line = z.graphLeftSideX + ((i * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX);
     let calibratedYPointOnH2Line = z.graphBottomY + ((z.muH2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY);
 
+    console.log(z.muH2[p][i]);
     if (
       Math.abs(mouseXCalibrated - calibratedXPointOnH2Line) < 4 &&
       Math.abs(mouseYCalibrated - calibratedYPointOnH2Line) < 40 &&
       z.muH2[p][i] < 3.0049
     ) {
-      if (z.muH2[p][i] > 2.7) {
+      if (z.muH2[p][i] > 2.7 || z.muH2[p][i] < 0) {
         textOffSetY = -textOffSetY;
       }
       if (i * 5 + 55 > 960) {

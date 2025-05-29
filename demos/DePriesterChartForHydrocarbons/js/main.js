@@ -1,7 +1,6 @@
-
+import { pressurePositions, temperaturePositions,  propaneKValues, methaneKValues, nDecaneKValues, methaneKCoordinates, propaneKCoordinates, nDecaneKCoordinates} from "../js/kvalues.js";
 
 const margin = 160;
-
 const canvasWidth  = 800;
 const canvasHeight = 600;
 let windowWidth  = window.innerWidth;
@@ -21,54 +20,7 @@ const methaneButton = document.getElementById('methane');
 const propaneButton = document.getElementById('propane');
 const nDecaneButton = document.getElementById('n-decane');
 
-const pressurePositions = [820.5, 778, 720.5, 647, 603.5, 556, 501.5, 437, 381, 306]; 
-const temperaturePositions = [223.5, 281, 349, 432, 512, 575, 632, 680, 741, 799];
 
-const propaneKValues = [[3.5, 2.7, 1.8, 1.1, 0.5, 0.58, 0.4, 0.252, -1, -1.0],
-                [4.6, 3.5, 2.45, 1.5, 1.1, 0.8, 0.57, 0.36, 0.252, -1.0],
-                [7.2, 5.2, 3.6, 2.3, 1.7, 1.25, 0.88, 0.58, 0.42, 0.252],
-                [10.625, 7.6,   5.2,   3.25,  2.4,  1.8,  1.28, 0.84, 0.6,  0.38],
-                [17.0,   12.2,  7.9,   4.8,   3.75, 2.7,  1.9,  1.3,  0.9,  0.58],
-                [24.0,   16.5,  10.9,  6.6,   4.9,  3.7,  2.6,  1.75, 1.25, 0.78],
-                [32.0,   22.0,  14.4,  8.7,   6.6,  4.8,  3.5,  2.3,  1.6,  1.1 ],
-                [39, 28, 18.3,  11.1,  8.2,   6.2,  4.4,  2.9,  2.5,  1.3],
-                [50.0,   36, 24, 14.4,  11.1,  8.2,  6.0,  3.8,  2.8,  1.75],
-                [64.0,   44.0,  30.0,  19.0,  13.85,10.55,7.8,  5.2,  3.7,  2.3 ]
-]
-
-const methaneKValues = [
-    [120.0, 82.0, 52.0, 32.0, 25.0, 18.5, 13.0, 7.6, 4.85, -1.0],
-    [132.5, 90.0, 59.0, 36.0, 27.0, 20.0, 14.0, 8.4, 5.4, 3.2],
-    [155.0, 105.0, 68.0, 40.0, 30.0, 22.5, 15.5, 9.7, 6.1, 3.6],
-    [180.0, 120.0, 78.0, 45.0, 34.0, 25.0, 17.5, 11.0, 6.8, 3.9],
-    [200.0, 135.0, 88.0, 51.0, 38.0, 28.0, 19.5, 12.5, 7.8, 4.4],
-    [215.0, 145.0, 96.0, 58.0, 44.0, 30.0, 22.0, 13.5, 8.8, 4.8],
-    [225.0, 160.0, 105.0, 64.0, 48.0, 34.0, 23.5, 15.0, 9.8, 5.4],
-    [233.0, 170.0, 115.0, 70.0, 50.0, 37.0, 25.5, 16.0, 10.5, 5.8],
-    [245.0, 135.0, 122.5, 76.0, 56.0, 41.0, 28.0, 18.0, 12, 6.4],
-    [255.0, 195.0, 130.0, 82.0, 62.0, 44.0, 30.0, 20.0, 13.0, 7.0]
-]
-
-const nDecaneKValues = [
-    [-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0],
-    [-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0],
-    [0.001, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0],
-    [0.0028, 0.0024, 0.0019, 0.0015, 0.0013, 0.0011, -1.0, -1.0, -1.0, -1.0],
-    [0.011, 0.009, 0.007, 0.0048, 0.004, 0.0034, 0.0027, 0.0022, 0.0017, 0.0014],
-    [0.0325, 0.026, 0.02, 0.014, 0.011, 0.009, 0.007, 0.005, 0.0042, 0.0031],
-    [0.080, 0.070, 0.050, 0.034, 0.028, 0.022, 0.017, 0.013, 0.010, 0.007],
-    [0.200, 0.160, 0.110, 0.07, 0.06, 0.045, 0.035, 0.026, 0.02, 0.014],
-    [0.6, 0.44, 0.32, 0.2, 0.16, 0.14, 0.09, 0.0625, 0.05, 0.035],
-    [1.6, 1.2, 0.825, 0.5, 0.4, 0.3, 0.24, 0.16, 0.12, 0.08]
-]
-
-const methaneKCoordinates = [
-  [{x: 562.12, y: 162.9}, {x: 513.43, y: 173.84}, {x: 463.76, y: 177.23}, {x: 406.01, y: 175.89}, {x: 372.57, y: 173.37}, {x: 336, y: 170.33}, {x: 293, y: 167.56}, {x: 240.06, y: 166.7}, {x: 193.16, y: 168.65}, {x: -100, y: -100}]
-]
-
-const propaneKCoordinates = []
-
-const nDecaneKCoordinates = []
 
 // Currently selected K-value set
 let KValues = methaneKValues;
@@ -139,7 +91,6 @@ const trimPx = 80;
 function drawCanvas() {
   draw.clear();
   insertImage();
-  // drawScale();
   addOptionToDragAndZoom();
 }
 
@@ -153,42 +104,6 @@ function insertImage() {
   g.rotate(90).scale(zoom);
 }
 
-// Draw a realistic ruler-style scale on axes
-function drawScale() {
-  console.log('Drawing scale ticks'); // debug to confirm execution
-  const minorInterval = 5;   // smallest division in px
-  const mediumInterval = 2;  // intermediate division
-  const majorInterval = 25;  // major division with labels
-  
-  // X-axis (bottom)
-  for (let x = 0; x <= canvasWidth; x += minorInterval) {
-    let tickHeight = (x % majorInterval === 0) ? 15 
-    : (x % mediumInterval === 0) ? 10 
-    : 5;
-    draw.line(x, canvasHeight, x, canvasHeight - tickHeight)
-    .stroke({ width: 1, color: '#000' });
-    if (x % majorInterval === 0) {
-      draw.text(String(x))
-      .font({ size: 10, anchor: 'start' })
-      .move(x, canvasHeight - tickHeight - 12);
-    }
-  }
-  
-  // Y-axis (left)
-  for (let y = 0; y <= canvasHeight; y += minorInterval) {
-    let tickWidth = (y % majorInterval === 0) ? 15 
-    : (y % mediumInterval === 0) ? 10 
-    : 5;
-    draw.line(0, y, tickWidth, y)
-    .stroke({ width: 1, color: '#000' });
-    if (y % majorInterval === 0) {
-      draw.text(String(y))
-      .font({ size: 10, anchor: 'start' })
-      .move(tickWidth + 2, y - 5);
-    }
-  }
-}
-
 
 function drawCustomLine(x1, y1, x2, y2, kXCoordinate, kYCoordinate, strokeOptions = { width: 2, color: '#0ddb0d' }) {
   const customLine = draw.line(x1, y1, x2, y2).stroke(strokeOptions);
@@ -196,19 +111,29 @@ function drawCustomLine(x1, y1, x2, y2, kXCoordinate, kYCoordinate, strokeOption
   draw.circle(8).center(x2, y2).fill('none').stroke({ width: 1.5, color: '#0ddb0d' });
   draw.circle(14).center(kXCoordinate, kYCoordinate).fill('none').stroke({ width: 2, color: '#0ddb0d' });
 
-    // On hover, compute SVG coordinates of the pointer
-    customLine.on('mousemove', function(event) {
-        // Create an SVGPoint and transform to get SVG coords
-        const svg = this.node.ownerSVGElement;
-        const pt = svg.createSVGPoint();
-        pt.x = event.clientX;
-        pt.y = event.clientY;
-        const location = pt.matrixTransform(svg.getScreenCTM().inverse());
-        const coordsEl = document.getElementById('coords-display');
-        if (coordsEl) {
-            coordsEl.textContent = `Coordinates: ${location.x.toFixed(2)}, ${location.y.toFixed(2)}`;
-        }
-    });
+  //   // On hover, compute SVG coordinates of the pointer
+  //   customLine.on('mousemove', function(event) {
+  //       // Create an SVGPoint and transform to get SVG coords
+  //       const svg = this.node.ownerSVGElement;
+  //       const pt = svg.createSVGPoint();
+  //       pt.x = event.clientX;
+  //       pt.y = event.clientY;
+  //       const location = pt.matrixTransform(svg.getScreenCTM().inverse());
+  //       const coordsEl = document.getElementById('coords-display');
+  //       if (coordsEl) {
+  //           coordsEl.textContent = `Coordinates: ${location.x.toFixed(2)}, ${location.y.toFixed(2)}`;
+  //       }
+  //   });
+
+  // // Log coordinates to console on click
+  // customLine.on('click', function(event) {
+  //     const svg = this.node.ownerSVGElement;
+  //     const pt = svg.createSVGPoint();
+  //     pt.x = event.clientX;
+  //     pt.y = event.clientY;
+  //     const location = pt.matrixTransform(svg.getScreenCTM().inverse());
+  //     console.log(`{ x: ${location.x.toFixed(2)}, y: ${location.y.toFixed(2)} }`);
+  // });
 }
 
 function drawKValue() {

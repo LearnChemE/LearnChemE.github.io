@@ -49,7 +49,7 @@ canvas {
 
 #hamburger {
   position: absolute;
-  top: 10px;
+  top: 30px;
   left: 10px;
   z-index: 1000;
   width: max-content;
@@ -149,7 +149,7 @@ canvas {
   align-items: center;
   gap: 10px;
   margin-top: 5px;
-  font-weight: bold;
+  // font-weight: bold;
   font-size: 14px;
   color: black;
 }
@@ -162,18 +162,19 @@ canvas {
 #slider-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   position: absolute;
-  top: 20px;         
-  left: 150px;       
+  top: 15px;         
+  left: 80px;       
   z-index: 10;
-  background-color: rgba(255, 255, 255, 0.8);
+  background: none !important;
   padding: 10px;
   border-radius: 8px;
 }
 
 .slider-row.temp {
   display: flex;
+  font-weight: normal;
   align-items: center;
   gap: 10px;
 }
@@ -199,20 +200,18 @@ input[type="range"] {
 
 .slider-label {
   font-size: 15px;
-  font-weight: bold;
+  // font-weight: bold;
   color: #222;
 }
 
 .slider-value {
   font-size: 15px;
-  font-weight: bold;
+  // font-weight: bold;
 }
 
 .equation-text {
-  font-size: 20px;
-  font-weight: bold;
   text-align: center;
-  margin-top: 1px;
+  margin-top: 20px;
   margin-bottom: 10px;
   width: 100%;
 }
@@ -220,7 +219,7 @@ input[type="range"] {
 
 @media screen and (min-width: 1200px) {
   .equation-text {
-    font-size: 24px;
+    font-size: 30px;
   }
 }
 
@@ -228,4 +227,17 @@ input[type="range"] {
   .bar-chart {
     margin-left: 10px;
   }
+}
+
+
+/* Force ALL MathJax equations to be left-aligned */
+.MathJax_Display {
+  text-align: left !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Ensure modal content stays left-aligned */
+.modal-body {
+  text-align: left;
 }
