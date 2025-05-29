@@ -65,8 +65,8 @@ export function generateCaCO3Molecules(count, radius, centerX, centerY) {
   while (moleculesPlaced < count) {
     let px, py, tries = 0;
     do {
-      const angle = random(PI/5, PI*4/5); // Narrower angle range for tighter packing
-      const r = random(0.7, 0.88) * radius; // Keep in lower half
+      const angle = random(PI/5, PI*4/5); 
+      const r = random(0.7, 0.88) * radius; 
       px = centerX + r * cos(angle);
       py = centerY + r * sin(angle);
       tries++;
@@ -142,35 +142,12 @@ export function generateCO2Molecules(count) {
   }));
 }
 
-// export function drawTubeFurnace(centerX, centerY, radius, temp) {
-//   const furnaceWidth = radius * 1;
-//   const furnaceHeight = radius * 0.25;
 
-//   const lowOrange = color('#FF6600');  
-//   const hotFlame = color('#FF3300');   
-
-  
-//   const clampedTemp = constrain(temp, 980, 1400);
-
-  
-//   const heatColor = lerpColor(lowOrange, hotFlame, map(clampedTemp, 980, 1400, 0, 1));
-//   heatColor.setAlpha(220 + random(-10, 10));  
-
-//   push();
-//   fill(120);
-//   noStroke();
-//   rectMode(CENTER);
-//   rect(centerX, centerY + radius + 2.5, furnaceWidth, furnaceHeight, 10);
-
-//   fill(heatColor);
-//   rect(centerX, centerY + radius + 2.5, furnaceWidth * 0.95, furnaceHeight * 0.55, 1);
-//   pop();
-// }
 
 
 export function drawDigitalPressureMeter(x, y, pressure) {
   push();
-  fill(0); // black background
+  fill(0); 
   stroke(130);
   strokeWeight(1.5);
   rectMode(CENTER);
@@ -180,9 +157,7 @@ export function drawDigitalPressureMeter(x, y, pressure) {
   noStroke();
   textSize(5.5);
   textAlign(CENTER, CENTER);
-
-  // Round to nearest integer and append unit
-  const pressureText = Math.round(pressure) + " bars";
+  const pressureText = Math.round(pressure) + " bar";
   text(pressureText, x, y);
 
   pop();
@@ -194,16 +169,16 @@ export function drawYAxis(x, y, height, maxValue = 4) {
   const tickCount = 4;
   const tickLength = 1;
   const labelOffset = 4;
-  const barWidth = 16; // Keep wider bars
-  const axisExtension = 4; // Added to extend X-axis
+  const barWidth = 16; 
+  const axisExtension = 4; 
 
   push();
-  translate(x - 6, y); // Move 15 pixels left (adjust this value as needed)
+  translate(x - 6, y); 
 
   // Extended X-axis line
   stroke(40);
   strokeWeight(0.4);
-  line(-30, 0, 25 + axisExtension, 0); // Added axisExtension
+  line(-30, 0, 25 + axisExtension, 0); 
 
   // X-axis labels (CaCO₃, CaO, CO₂)
   const labels = ["CaCO₃", "CaO", "CO₂"];
@@ -234,7 +209,7 @@ export function drawYAxis(x, y, height, maxValue = 4) {
     stroke(0);
     line(-30, ty, -30 - tickLength, ty);
     noStroke();
-    text(floor(val), -32, ty); // Whole numbers only
+    text(floor(val), -32, ty); 
   }
 
   // Axis label
@@ -290,18 +265,18 @@ export function drawLegend(x, y) {
   fill(100, 149, 255, 255);  
   ellipse(x, y, size);
   fill(0);
-  text("CaCO₃ (solid)", x + 3 , y);
+  text("CaCO₃(solid)", x + 3 , y);
 
   // CaO
   fill(102, 204, 51, 204);
   ellipse(x + spacing, y, size -1);
   fill(0);
-  text("CaO (solid)", x + spacing + 3, y);
+  text("CaO(solid)", x + spacing + 3, y);
 
   // CO₂
   fill(255, 255, 0);  
-  ellipse(x + spacing * 2, y, size -2);
+  ellipse(x + spacing*2, y, size -2);
   fill(0);
-  text("CO₂ (gas)", x + spacing * 2+  3, y);
+  text("CO₂(gas)", x + spacing * 2+  3, y);
 }
 

@@ -165,5 +165,5 @@ function draw() {
     ellipse(x, y, 10, 10);
   }
 
-  // You can now also call drawLegend(), drawTubeFurnace(), etc. here
+  
 }

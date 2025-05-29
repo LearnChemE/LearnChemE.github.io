@@ -17,6 +17,19 @@
     gtag('js', new Date());
     gtag('config', 'UA-204988035-3');
   </script>
+  <script>
+  window.MathJax = {
+    tex: {
+      displayMath: [['$$','$$'], ['\\[','\\]']]
+    },
+    options: {
+      renderActions: {
+        addMenu: []
+      }
+    }
+  };
+</script>
+
   <style>
     #slider-wrapper {
       display: flex;
@@ -182,61 +195,48 @@
           </button>
         </div>
         <div class="modal-body">
-  <p>
-    For this reaction, the equilibrium constant is equal to the equilibrium pressure (in bar) divided by 1 bar pressure.
-    The equilibrium constant is calculated as a function of temperature using the Van’t Hoff equation:
-  </p>
 
-    <p>
-      \[
-      \ln\left(\frac{K_{eq}}{K_{ref}}\right) = -\frac{\Delta H^\circ}{R} \left( \frac{1}{T} - \frac{1}{T_{ref}} \right),
-      \]
-    </p>
+<p style="text-align: left;">
+  For this reaction, the equilibrium constant is equal to the equilibrium pressure (in bar) divided by 1 bar pressure.
+  The equilibrium constant is calculated as a function of temperature using the Van’t Hoff equation:
+</p>
 
-    <p>
-      \[
-      \ln K_{ref} = -\frac{\Delta G^\circ}{R \cdot T_{ref}},
-      \]
-    </p>
+<div style="text-align: left;">
+  \(
+  \begin{array}{l}
+  \ln\left(\frac{K_{eq}}{K_{ref}}\right) = -\frac{\Delta H^\circ}{R} \left( \frac{1}{T} - \frac{1}{T_{ref}} \right) \\
+  \ln K_{ref} = -\frac{\Delta G^\circ}{R T_{ref}} \\
+  \end{array}
+  \)
+</div>
 
+<p style="text-align: left;">
+  where the subscript ref refers to a reference state, \( K_{eq} \) is the equilibrium constant,
+  \( T \) is temperature (K), \( R \) is the ideal gas constant, \( \Delta H^\circ \) is the standard enthalpy of reaction (kJ/mol),
+  and \( \Delta G^\circ \) is the standard Gibbs free energy of reaction (kJ/mol).
+</p>
 
-  <p>
-    where the subscript ref refers to a reference state, ( K<sub>eq</sub> ) is the equilibrium constant, \( T \) is temperature (K),
-    \( R \) is the ideal gas constant, \( \Delta H^\circ \) is the standard enthalpy of reaction (kJ/mol),
-    and \( \Delta G^\circ \) is the standard Gibbs free energy of reaction (kJ/mol).
-  </p>
+<div style="text-align: left;">
+\(
+  \begin{array}{l}
+  P = \frac{n_{CO_2} R T}{V} \\
+  \zeta = \frac{K_{eq} V}{R T} - n_{CO_2} \\
+  n_{{CaCO_3}(f)} = n_{CaCO_3} - \zeta \\
+  n_{{CaO}(f)} = n_{CaO} + \zeta \\
+  n_{{CO_2}(f)} = n_{CO_2} + \zeta
+  \end{array}
+  \)
+</div>
 
-  <p>
-    \[
-    P = \frac{n_{CO_2} \cdot R \cdot T}{V} ,
-    \]
-  </p>
-
-  <p>
-    \[
-    \zeta = \frac{K_{eq} \cdot V}{R \cdot T} - n_{CO_2} ,
-    \]
-  </p>
-
-  <p>
-  \[
-  n_{{CaCO_3}(f)} = n_{CaCO_3} - \zeta,
-  \]
-  \[
-  n_{{CaO}(f)} = n_{CaO} + \zeta,
-  \]
-  \[
-  n_{{CO_2}(f)} = n_{CO_2} + \zeta,
-  \]
+<p style="text-align: left;">
+  where \( P \) is the pressure (bar), \( n_i \) is the number of moles of component \( i \) initially in the system,
+  \( n_{i(f)} \) is the final number of moles in the system, \( V \) is the fixed volume of the container (cm³),
+  and \( \zeta \) is the extent of reaction.
 </p>
 
 
-  <p>
-    where \( P \) is the pressure (bar), \( n_i \) is the number of moles of component \( i \) initially in the system,
-    \( n_{{i}{(f)}} \) is the final number of moles in the system, \( V \) is the fixed volume of the container (cm³),
-    and \( \zeta \) is the extent of reaction.
-  </p>
 </div>
+     
 
       </div>
     </div>

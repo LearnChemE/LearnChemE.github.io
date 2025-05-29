@@ -164,10 +164,10 @@ canvas {
   flex-direction: column;
   gap: 6px;
   position: absolute;
-  top: 20px;         
-  left: 150px;       
+  top: 15px;         
+  left: 80px;       
   z-index: 10;
-  background-color: rgba(255, 255, 255, 0.8);
+  background: none !important;
   padding: 10px;
   border-radius: 8px;
 }
@@ -227,4 +227,17 @@ input[type="range"] {
   .bar-chart {
     margin-left: 10px;
   }
+}
+
+
+/* Force ALL MathJax equations to be left-aligned */
+.MathJax_Display {
+  text-align: left !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Ensure modal content stays left-aligned */
+.modal-body {
+  text-align: left;
 }
