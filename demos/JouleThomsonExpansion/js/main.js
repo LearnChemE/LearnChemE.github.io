@@ -10,6 +10,8 @@ window.z = {
   //graph and window variables
   width: mainWidth,
   height: mainHeight,
+  xMid: mainWidth / 2,
+  yMid: mainHeight / 2,
   graphLeftSideX: 120,
   graphRightSideX: 1210,
   graphTopY: 40,
