@@ -8,9 +8,12 @@ const outletPressureSliderWrapper = document.getElementById("outlet-pressure-sli
 const inletTemperatureSliderWrapper = document.getElementById("inlet-temperature-slider-wrapper");
 const gasButtonsWrapper = document.getElementById("gas-buttons-wrapper");
 let mu = 5.468;
+let digitalReadoutFont;
 
 //preload for loading images and fonts
-window.preload = function () {};
+window.preload = function () {
+  digitalReadoutFont = loadFont("./assets/digital-7.ttf");
+};
 
 // This function is used to scale the canvas based on the size of the container
 window.relativeSize = () => p5container.offsetWidth / 1280;
@@ -20,8 +23,8 @@ function resize() {
   // Here I am reassigning the width and height of the canvas to a static value of 1280x720,
   // even though the actual canvas size is based on the size of the #p5-container element.
   // So you can effectively treat the canvas like it is 1280x720, even though it will scale to fit the screen.
-  z.width;
-  z.height;
+  state.width;
+  state.height;
 
   scale(relativeSize());
 }
@@ -52,32 +55,33 @@ window.draw = function () {
   if (gasSelection === "NH3") {
     inletTemperatureSlider.setAttribute("min", 365);
     inletTemperatureSlider.setAttribute("max", 725);
-    mu = z.muNH3[z.inletPressure - 1][(z.inletTemperature - 365) / 5];
+    mu = state.muNH3[state.inletPressure - 1][(state.inletTemperature - 365) / 5];
   }
   if (gasSelection === "CO2") {
     inletTemperatureSlider.setAttribute("min", 290);
     inletTemperatureSlider.setAttribute("max", 1000);
-    mu = z.muCO2[z.inletPressure - 1][(z.inletTemperature - 290) / 5];
+    mu = state.muCO2[state.inletPressure - 1][(state.inletTemperature - 290) / 5];
   }
   if (gasSelection === "N2") {
     inletTemperatureSlider.setAttribute("min", 145);
     inletTemperatureSlider.setAttribute("max", 1000);
-    mu = z.muN2[z.inletPressure - 1][(z.inletTemperature - 145) / 5];
+    mu = state.muN2[state.inletPressure - 1][(state.inletTemperature - 145) / 5];
   }
   if (gasSelection === "H2") {
     inletTemperatureSlider.setAttribute("min", 55);
     inletTemperatureSlider.setAttribute("max", 1000);
-    mu = z.muH2[z.inletPressure - 1][(z.inletTemperature - 55) / 5];
+    mu = state.muH2[state.inletPressure - 1][(state.inletTemperature - 55) / 5];
   }
 
-  z.outletTemperature = z.inletTemperature + mu * (z.outletPressure - z.inletPressure);
+  state.outletTemperature = state.inletTemperature + mu * (state.outletPressure - state.inletPressure);
 
   if (selection === "throttle") {
     gasButtonsWrapper.style.display = "grid";
     inletPressureSliderWrapper.style.display = "grid";
     outletPressureSliderWrapper.style.display = "grid";
     inletTemperatureSliderWrapper.style.display = "grid";
-    throttleFigure();
+    throttleFigureAndPressureGauges();
+    temperatureGauges();
 
     drawFigureText();
   } else if (selection === "JTcoeff-vs-temperature") {
@@ -98,88 +102,132 @@ window.windowResized = () => {
   resizeCanvas(p5container.offsetWidth, p5container.offsetHeight);
 };
 
-function throttleFigure() {
-  //the rectangles portion of the figure
+//--------------------Temperature Gauge Variables--------------------
+const tempGaugeEdgeCurve = 5;
+const tempGaugeWidth = 200;
+const tempGaugeHeight = 90;
+const tempGaugeInnerScreenWidth = 115;
+const tempGaugeInnerScreenHeight = 75;
+const tempScreenOffsetX = -30;
+const tempScreenOffsetY = -3;
+const kelvinLabelOffsetX = 60;
+const kelvinLabelOffsetY = 4;
+
+function temperatureGauges() {
+  push();
+  translate(state.width / 3, state.height / 4);
+  push();
+  fill("gray");
+  rectMode(CENTER);
+  rect(0, 0, tempGaugeWidth, tempGaugeHeight, tempGaugeEdgeCurve, tempGaugeEdgeCurve, tempGaugeEdgeCurve, tempGaugeEdgeCurve);
+  fill("black");
+  rect(tempScreenOffsetX, 0, tempGaugeInnerScreenWidth, tempGaugeInnerScreenHeight);
+  pop();
+  //--------------------Digital Temperature readout numbers--------------------
+  push();
+
+  textAlign(CENTER, CENTER);
+  textSize(50);
+  textFont(digitalReadoutFont);
+  fill("yellow");
+  text(state.inletTemperature.toFixed(1), tempScreenOffsetX, tempScreenOffsetY);
+
+  pop();
+
+  push();
+  textAlign(CENTER, CENTER);
+  stroke("Black");
+  strokeWeight(0.2);
+  fill("Black");
+  textSize(42);
+  text("K", kelvinLabelOffsetX, kelvinLabelOffsetY);
+  pop();
+
+  pop();
+}
+
+function throttleFigureAndPressureGauges() {
+  //--------------------Rectangles portion of the figure--------------------
   push();
 
   rectMode(CENTER);
   noStroke();
 
-  //pipe
+  //--------------------Pipe--------------------
   push();
   fill("grey");
   line();
-  rect(z.xMid, z.yMid + 100, z.width - 100, z.height * 0.5 - 30);
+  rect(state.xMid, state.yMid + 100, state.width - 100, state.height * 0.5 - 30);
   pop();
 
-  //gas inside the pipe
+  //--------------------gas inside the pipe--------------------
   push();
   fill(255, 115, 115);
-  rect(z.xMid, z.yMid + 100, z.width - 100, z.height * 0.3);
+  rect(state.xMid, state.yMid + 100, state.width - 100, state.height * 0.3);
   pop();
 
-  //pipe borders
+  //--------------------pipe borders--------------------
   push();
   fill("black");
-  rect(z.xMid, z.yMid + 100 - 103, z.width - 100, 10);
-  rect(z.xMid, z.yMid + 100 + 103, z.width - 100, 10);
+  rect(state.xMid, state.yMid + 100 - 103, state.width - 100, 10);
+  rect(state.xMid, state.yMid + 100 + 103, state.width - 100, 10);
   pop();
 
   pop();
 
-  //The lines on the outer metal
+  //--------------------The lines on the outer metal--------------------
 
-  for (let i = 50; i < z.width - 50; i += (z.width - 100) / 38) {
-    line(i, z.yMid + 100 - 165, i + 30, z.yMid + 100 - 108);
-    line(i, z.yMid + 100 + 108, i + 30, z.yMid + 100 + 165);
+  for (let i = 50; i < state.width - 50; i += (state.width - 100) / 38) {
+    line(i, state.yMid + 100 - 165, i + 30, state.yMid + 100 - 108);
+    line(i, state.yMid + 100 + 108, i + 30, state.yMid + 100 + 165);
   }
 
-  //gauges
+  //--------------------gauges--------------------
   push();
   rectMode(CORNERS);
   noStroke();
-  //in pressure
+  //--------------------in pressure--------------------
   fill("gray");
-  rect(z.width / 8 + 15, z.yMid - 100, z.width / 8 - 35, z.yMid - 64);
+  rect(state.width / 8 + 15, state.yMid - 100, state.width / 8 - 35, state.yMid - 64);
   fill("black");
-  rect(z.width / 8 + 4, z.yMid - 100, z.width / 8 - 24, z.yMid + 1);
+  rect(state.width / 8 + 4, state.yMid - 100, state.width / 8 - 24, state.yMid + 1);
   fill(255, 115, 115);
-  rect(z.width / 8, z.yMid - 100, z.width / 8 - 20, z.yMid + 4);
+  rect(state.width / 8, state.yMid - 100, state.width / 8 - 20, state.yMid + 4);
   rectMode(CENTER);
   fill("gray");
   stroke("black");
   strokeWeight(1);
-  //bolts on the gauge
-  rect(150 + 39, z.yMid - 94, 17, 12);
-  rect(150 - 39, z.yMid - 94, 17, 12);
-  rect(150 + 39, z.yMid - 139, 17, 12);
-  rect(150 - 39, z.yMid - 139, 17, 12);
-  //seal of the gauge
-  rect(150, z.yMid - 116, 110, 34);
-  line(95, z.yMid - 116, 205, z.yMid - 116);
-  //top pressure reader
-  rect(150, z.yMid - 153, 25, 40);
-  circle(150, z.yMid - 250, 200);
+  //--------------------bolts on the gauge--------------------
+  rect(150 + 39, state.yMid - 94, 17, 12);
+  rect(150 - 39, state.yMid - 94, 17, 12);
+  rect(150 + 39, state.yMid - 139, 17, 12);
+  rect(150 - 39, state.yMid - 139, 17, 12);
+  //--------------------seal of the gauge--------------------
+  rect(150, state.yMid - 116, 110, 34);
+  line(95, state.yMid - 116, 205, state.yMid - 116);
+  //--------------------top pressure reader--------------------
+  rect(150, state.yMid - 153, 25, 40);
+  circle(150, state.yMid - 250, 200);
   noStroke();
   fill("white");
-  circle(150, z.yMid - 250, 190);
+  circle(150, state.yMid - 250, 190);
   stroke("black");
   angleMode(DEGREES);
-  arc(150, z.yMid - 250, 120, 120, 135, 45);
+  arc(150, state.yMid - 250, 120, 120, 135, 45);
   push();
-  translate(150, z.yMid - 250);
+  translate(150, state.yMid - 250);
   push();
-  //ticks on gauge
+  //--------------------ticks on gauge--------------------
   strokeWeight(2);
   for (let i = -45; i <= 225; i += (225 + 45) / 5) {
     line(60 * cos(i), -60 * sin(i), 68 * cos(i), -68 * sin(i));
   }
   strokeWeight(1);
-  for (let i = -45; i <= 225; i += (225 + 45) / 25) {
+  for (let i = -45; i <= 225; i += (225 + 45) / 20) {
     line(60 * cos(i), -60 * sin(i), 65 * cos(i), -65 * sin(i));
   }
   pop();
-  //text on the gauge
+  //--------------------text on the gauge--------------------
   push();
   textAlign(CENTER, CENTER);
   stroke("Black");
@@ -190,17 +238,99 @@ function throttleFigure() {
     text(-(i + 45) / (270 / 5) + 5, 80 * cos(i), -80 * sin(i));
   }
   pop();
-  //Gauge Needle
+  //--------------------Gauge Needle--------------------
   push();
-  fill("red");
+  fill("black");
   noStroke();
   triangle(
-    75 * cos(225 - (270 * z.inletPressure) / 5),
-    -75 * sin(225 - (270 * z.inletPressure) / 5),
-    25 * cos(225 - (270 * z.inletPressure) / 5 + 180 - 17),
-    -25 * sin(225 - (270 * z.inletPressure) / 5 + 180 - 17),
-    25 * cos(225 - (270 * z.inletPressure) / 5 + 180 + 17),
-    -25 * sin(225 - (270 * z.inletPressure) / 5 + 180 + 17)
+    75 * cos(225 - (270 * state.inletPressure) / 5),
+    -75 * sin(225 - (270 * state.inletPressure) / 5),
+    25 * cos(225 - (270 * state.inletPressure) / 5 + 180 - 17),
+    -25 * sin(225 - (270 * state.inletPressure) / 5 + 180 - 17),
+    25 * cos(225 - (270 * state.inletPressure) / 5 + 180 + 17),
+    -25 * sin(225 - (270 * state.inletPressure) / 5 + 180 + 17)
+  );
+  fill("gray");
+  strokeWeight(5);
+  circle(0, 0, 15);
+  pop();
+
+  textAlign(CENTER, CENTER);
+  stroke("Black");
+  strokeWeight(0.2);
+  fill("Black");
+  textSize(12);
+  text("MPa", 0, 50);
+
+  pop();
+  //--------------------out pressure--------------------
+  push();
+  rectMode(CORNERS);
+  noStroke();
+  translate((6.135 * state.width) / 8, 0);
+  //--------------------in pressure--------------------
+  fill("gray");
+  rect(state.width / 8 + 15, state.yMid - 100, state.width / 8 - 35, state.yMid - 64);
+  fill("black");
+  rect(state.width / 8 + 4, state.yMid - 100, state.width / 8 - 24, state.yMid + 1);
+  fill(255, 115, 115);
+  rect(state.width / 8, state.yMid - 100, state.width / 8 - 20, state.yMid + 4);
+  rectMode(CENTER);
+  fill("gray");
+  stroke("black");
+  strokeWeight(1);
+  //--------------------bolts on the gauge--------------------
+  rect(150 + 39, state.yMid - 94, 17, 12);
+  rect(150 - 39, state.yMid - 94, 17, 12);
+  rect(150 + 39, state.yMid - 139, 17, 12);
+  rect(150 - 39, state.yMid - 139, 17, 12);
+  //--------------------seal of the gauge--------------------
+  rect(150, state.yMid - 116, 110, 34);
+  line(95, state.yMid - 116, 205, state.yMid - 116);
+  //--------------------top pressure reader--------------------
+  rect(150, state.yMid - 153, 25, 40);
+  circle(150, state.yMid - 250, 200);
+  noStroke();
+  fill("white");
+  circle(150, state.yMid - 250, 190);
+  stroke("black");
+  angleMode(DEGREES);
+  arc(150, state.yMid - 250, 120, 120, 135, 45);
+  push();
+  translate(150, state.yMid - 250);
+  push();
+  //--------------------ticks on gauge--------------------
+  strokeWeight(2);
+  for (let i = -45; i <= 225; i += (225 + 45) / 5) {
+    line(60 * cos(i), -60 * sin(i), 68 * cos(i), -68 * sin(i));
+  }
+  strokeWeight(1);
+  for (let i = -45; i <= 225; i += (225 + 45) / 20) {
+    line(60 * cos(i), -60 * sin(i), 65 * cos(i), -65 * sin(i));
+  }
+  pop();
+  //--------------------text on the gauge--------------------
+  push();
+  textAlign(CENTER, CENTER);
+  stroke("Black");
+  strokeWeight(0.2);
+  fill("Black");
+  textSize(12);
+  for (let i = -45; i <= 225; i += (225 + 45) / 5) {
+    text("0." + (-(i + 45) / (270 / 5) + 5), 80 * cos(i), -80 * sin(i));
+  }
+  pop();
+  //--------------------Gauge Needle--------------------
+  push();
+  fill("black");
+  noStroke();
+  triangle(
+    75 * cos(225 - (270 * state.outletPressure) / 0.5),
+    -75 * sin(225 - (270 * state.outletPressure) / 0.5),
+    25 * cos(225 - (270 * state.outletPressure) / 0.5 + 180 - 17),
+    -25 * sin(225 - (270 * state.outletPressure) / 0.5 + 180 - 17),
+    25 * cos(225 - (270 * state.outletPressure) / 0.5 + 180 + 17),
+    -25 * sin(225 - (270 * state.outletPressure) / 0.5 + 180 + 17)
   );
   fill("gray");
   strokeWeight(5);
@@ -216,10 +346,7 @@ function throttleFigure() {
 
   pop();
 
-  push();
-
   pop();
-  //out pressure
 
   pop();
 }
@@ -231,9 +358,7 @@ function drawFigureText() {
   strokeWeight(0.2);
   fill("Black");
   textSize(28);
-  text("T out = " + z.outletTemperature.toFixed(1), (3 * z.width) / 4, z.yMid + 100);
-  text("inlet", z.width / 10, z.yMid + 100);
-  text("outlet", (9 * z.width) / 10, z.yMid + 100);
+  text("T out = " + state.outletTemperature.toFixed(1), (3 * state.width) / 4, state.yMid + 100);
   pop();
 }
 
@@ -241,7 +366,7 @@ function coverUpRectangle() {
   push();
   noStroke();
   rectMode(CORNERS);
-  rect(z.graphLeftSideX, z.graphTopY - 1, z.graphRightSideX, -5);
+  rect(state.graphLeftSideX, state.graphTopY - 1, state.graphRightSideX, -5);
   pop();
 }
 
@@ -250,20 +375,29 @@ function jouleThomsonCoeffPlot() {
 
   stroke("black");
   strokeWeight(1.5);
-  line(z.graphLeftSideX, z.graphTopY, z.graphRightSideX, z.graphTopY);
-  line(z.graphLeftSideX, z.graphTopY, z.graphLeftSideX, z.graphBottomY);
-  line(z.graphLeftSideX, z.graphBottomY, z.graphRightSideX, z.graphBottomY);
-  line(z.graphRightSideX, z.graphTopY, z.graphRightSideX, z.graphBottomY);
-  line(z.graphLeftSideX, z.graphBottomY - (z.graphBottomY - z.graphTopY) / 4, z.graphRightSideX, z.graphBottomY - (z.graphBottomY - z.graphTopY) / 4);
+  line(state.graphLeftSideX, state.graphTopY, state.graphRightSideX, state.graphTopY);
+  line(state.graphLeftSideX, state.graphTopY, state.graphLeftSideX, state.graphBottomY);
+  line(state.graphLeftSideX, state.graphBottomY, state.graphRightSideX, state.graphBottomY);
+  line(state.graphRightSideX, state.graphTopY, state.graphRightSideX, state.graphBottomY);
+  line(
+    state.graphLeftSideX,
+    state.graphBottomY - (state.graphBottomY - state.graphTopY) / 4,
+    state.graphRightSideX,
+    state.graphBottomY - (state.graphBottomY - state.graphTopY) / 4
+  );
   pop();
 
   push();
-  // Vertical dashes and number labels
+  //--------------------Vertical dashes and number labels--------------------
   stroke("black");
   strokeWeight(1);
-  for (let i = z.graphBottomY - (z.graphBottomY - z.graphTopY) / 20; i > z.graphTopY; i -= (z.graphBottomY - z.graphTopY) / 20) {
-    line(z.graphLeftSideX, i, z.graphLeftSideX + 5, i);
-    line(z.graphRightSideX, i, z.graphRightSideX - 5, i);
+  for (
+    let i = state.graphBottomY - (state.graphBottomY - state.graphTopY) / 20;
+    i > state.graphTopY;
+    i -= (state.graphBottomY - state.graphTopY) / 20
+  ) {
+    line(state.graphLeftSideX, i, state.graphLeftSideX + 5, i);
+    line(state.graphRightSideX, i, state.graphRightSideX - 5, i);
   }
   pop();
 
@@ -273,27 +407,27 @@ function jouleThomsonCoeffPlot() {
   strokeWeight(0.2);
   fill("Black");
   textSize(22);
-  for (let i = z.graphBottomY; i >= z.graphTopY; i -= (z.graphBottomY - z.graphTopY) / 4) {
-    text(-1 - (i - z.graphBottomY) / ((z.graphBottomY - z.graphTopY) / 4), z.graphLeftSideX - 20, i + 5);
+  for (let i = state.graphBottomY; i >= state.graphTopY; i -= (state.graphBottomY - state.graphTopY) / 4) {
+    text(-1 - (i - state.graphBottomY) / ((state.graphBottomY - state.graphTopY) / 4), state.graphLeftSideX - 20, i + 5);
   }
 
-  for (let i = z.graphLeftSideX; i <= z.graphRightSideX; i += (z.graphRightSideX - z.graphLeftSideX) / 5) {
-    text((200 * (i - z.graphLeftSideX)) / ((z.graphRightSideX - z.graphLeftSideX) / 5), i, z.graphBottomY + 25);
+  for (let i = state.graphLeftSideX; i <= state.graphRightSideX; i += (state.graphRightSideX - state.graphLeftSideX) / 5) {
+    text((200 * (i - state.graphLeftSideX)) / ((state.graphRightSideX - state.graphLeftSideX) / 5), i, state.graphBottomY + 25);
   }
 
   pop();
 
-  // Horizontal dashes and number labels
+  //--------------------Horizontal dashes and number labels--------------------
   push();
   stroke("black");
   strokeWeight(1);
   for (
-    let i = z.graphLeftSideX + (z.graphRightSideX - z.graphLeftSideX) / 20;
-    i < z.graphRightSideX;
-    i += (z.graphRightSideX - z.graphLeftSideX) / 20
+    let i = state.graphLeftSideX + (state.graphRightSideX - state.graphLeftSideX) / 20;
+    i < state.graphRightSideX;
+    i += (state.graphRightSideX - state.graphLeftSideX) / 20
   ) {
-    line(i, z.graphBottomY, i, z.graphBottomY - 5);
-    line(i, z.graphTopY, i, z.graphTopY + 5);
+    line(i, state.graphBottomY, i, state.graphBottomY - 5);
+    line(i, state.graphTopY, i, state.graphTopY + 5);
   }
 
   pop();
@@ -315,16 +449,16 @@ function jouleThomsonCoeffPlot() {
   strokeWeight(0.2);
   fill("Black");
   textSize(22);
-  text("temperature (K)", z.width / 2, 680);
+  text("temperature (K)", state.width / 2, 680);
 
-  let xH2 = z.graphLeftSideX + (z.graphRightSideX - z.graphLeftSideX) / 5 + 5;
-  let yH2 = z.graphTopY + (3 * (z.graphBottomY - z.graphTopY)) / 4 - 15;
-  let xN2 = z.graphLeftSideX + (z.graphRightSideX - z.graphLeftSideX) / 2 - 90;
-  let yN2 = z.graphTopY + (z.graphBottomY - z.graphTopY) / 2;
-  let xCO2 = z.graphLeftSideX + (6.5 * (z.graphRightSideX - z.graphLeftSideX)) / 10 - 10;
-  let yCO2 = z.graphTopY + (2.25 * (z.graphBottomY - z.graphTopY)) / 8;
-  let xNH3 = z.graphLeftSideX + (7 * (z.graphRightSideX - z.graphLeftSideX)) / 10;
-  let yNH3 = z.graphTopY + (0.2 * z.graphBottomY - z.graphTopY);
+  let xH2 = state.graphLeftSideX + (state.graphRightSideX - state.graphLeftSideX) / 5 + 5;
+  let yH2 = state.graphTopY + (3 * (state.graphBottomY - state.graphTopY)) / 4 - 15;
+  let xN2 = state.graphLeftSideX + (state.graphRightSideX - state.graphLeftSideX) / 2 - 90;
+  let yN2 = state.graphTopY + (state.graphBottomY - state.graphTopY) / 2;
+  let xCO2 = state.graphLeftSideX + (6.5 * (state.graphRightSideX - state.graphLeftSideX)) / 10 - 10;
+  let yCO2 = state.graphTopY + (2.25 * (state.graphBottomY - state.graphTopY)) / 8;
+  let xNH3 = state.graphLeftSideX + (7 * (state.graphRightSideX - state.graphLeftSideX)) / 10;
+  let yNH3 = state.graphTopY + (0.2 * state.graphBottomY - state.graphTopY);
 
   text("H", xH2, yH2);
   text("N", xN2, yN2);
@@ -342,116 +476,97 @@ function jouleThomsonCoeffPlot() {
 
 function jouleThomsonPlotLines() {
   //This variable p is for the first index of each array depending on each pressure case.
-  let p = z.inletPressure - 1;
+  let p = state.inletPressure - 1;
 
   push();
   noFill();
 
-  //CO2 line
+  //--------------------CO2 line--------------------
   push();
   stroke("blue");
   strokeWeight(3);
   beginShape();
   curveVertex(
-    z.graphLeftSideX + ((0 * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-    z.graphBottomY + ((z.muCO2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    state.graphLeftSideX + ((0 * 5 + 290) / 1000) * (state.graphRightSideX - state.graphLeftSideX),
+    state.graphBottomY + ((state.muCO2[p][0] + 1) / 4) * (state.graphTopY - state.graphBottomY)
   );
-  for (let i = 0; i < z.muCO2[p].length; i++) {
+  for (let i = 0; i < state.muCO2[p].length; i++) {
     curveVertex(
-      z.graphLeftSideX + ((i * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-      z.graphBottomY + ((z.muCO2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      state.graphLeftSideX + ((i * 5 + 290) / 1000) * (state.graphRightSideX - state.graphLeftSideX),
+      state.graphBottomY + ((state.muCO2[p][i] + 1) / 4) * (state.graphTopY - state.graphBottomY)
     );
   }
   curveVertex(
-    z.graphLeftSideX + ((z.muCO2[p].length * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-    z.graphBottomY + ((z.muCO2[p][z.muCO2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    state.graphLeftSideX + ((state.muCO2[p].length * 5 + 290) / 1000) * (state.graphRightSideX - state.graphLeftSideX),
+    state.graphBottomY + ((state.muCO2[p][state.muCO2[p].length - 1] + 1) / 4) * (state.graphTopY - state.graphBottomY)
   );
   endShape();
   pop();
 
-  //N2 line
+  //--------------------N2 line--------------------
   push();
   stroke("green");
   strokeWeight(3);
   beginShape();
   curveVertex(
-    z.graphLeftSideX + ((0 * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-    z.graphBottomY + ((z.muN2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    state.graphLeftSideX + ((0 * 5 + 145) / 1000) * (state.graphRightSideX - state.graphLeftSideX),
+    state.graphBottomY + ((state.muN2[p][0] + 1) / 4) * (state.graphTopY - state.graphBottomY)
   );
-  for (let i = 0; i < z.muN2[p].length; i++) {
+  for (let i = 0; i < state.muN2[p].length; i++) {
     curveVertex(
-      z.graphLeftSideX + ((i * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-      z.graphBottomY + ((z.muN2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      state.graphLeftSideX + ((i * 5 + 145) / 1000) * (state.graphRightSideX - state.graphLeftSideX),
+      state.graphBottomY + ((state.muN2[p][i] + 1) / 4) * (state.graphTopY - state.graphBottomY)
     );
   }
   curveVertex(
-    z.graphLeftSideX + ((z.muN2[p].length * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-    z.graphBottomY + ((z.muN2[p][z.muN2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    state.graphLeftSideX + ((state.muN2[p].length * 5 + 145) / 1000) * (state.graphRightSideX - state.graphLeftSideX),
+    state.graphBottomY + ((state.muN2[p][state.muN2[p].length - 1] + 1) / 4) * (state.graphTopY - state.graphBottomY)
   );
   endShape();
   pop();
 
-  //H2 line
+  //--------------------H2 line--------------------
   push();
   stroke(242, 90, 2);
   strokeWeight(3);
   beginShape();
   curveVertex(
-    z.graphLeftSideX + ((0 * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-    z.graphBottomY + ((z.muH2[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    state.graphLeftSideX + ((0 * 5 + 55) / 1000) * (state.graphRightSideX - state.graphLeftSideX),
+    state.graphBottomY + ((state.muH2[p][0] + 1) / 4) * (state.graphTopY - state.graphBottomY)
   );
-  for (let i = 0; i < z.muH2[p].length; i++) {
+  for (let i = 0; i < state.muH2[p].length; i++) {
     curveVertex(
-      z.graphLeftSideX + ((i * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-      z.graphBottomY + ((z.muH2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      state.graphLeftSideX + ((i * 5 + 55) / 1000) * (state.graphRightSideX - state.graphLeftSideX),
+      state.graphBottomY + ((state.muH2[p][i] + 1) / 4) * (state.graphTopY - state.graphBottomY)
     );
   }
   curveVertex(
-    z.graphLeftSideX + ((z.muH2[p].length * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-    z.graphBottomY + ((z.muH2[p][z.muH2[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    state.graphLeftSideX + ((state.muH2[p].length * 5 + 55) / 1000) * (state.graphRightSideX - state.graphLeftSideX),
+    state.graphBottomY + ((state.muH2[p][state.muH2[p].length - 1] + 1) / 4) * (state.graphTopY - state.graphBottomY)
   );
   endShape();
   pop();
 
-  //NH3 lines
+  //--------------------NH3 lines--------------------
   push();
   stroke("purple");
   strokeWeight(3);
-  /* 
-    //liquid region incase needed
-    beginShape();
-    curveVertex(
-      z.graphLeftSideX + ((0 * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-      z.graphBottomY + ((z.muNH3[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
-    );
-    for (let i = 0; i < 20; i++) {
-      curveVertex(
-        z.graphLeftSideX + ((i * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-        z.graphBottomY + ((z.muNH3[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
-      );
-    }
-    curveVertex(
-      z.graphLeftSideX + ((19 * 5 + 200) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-      z.graphBottomY + ((z.muNH3[p][19] + 1) / 4) * (z.graphTopY - z.graphBottomY)
-    );
-
-    endShape(); */
 
   beginShape();
   curveVertex(
-    z.graphLeftSideX + ((0 * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-    z.graphBottomY + ((z.muNH3[p][0] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    state.graphLeftSideX + ((0 * 5 + 365) / 1000) * (state.graphRightSideX - state.graphLeftSideX),
+    state.graphBottomY + ((state.muNH3[p][0] + 1) / 4) * (state.graphTopY - state.graphBottomY)
   );
 
-  for (let i = 0; i < z.muNH3[p].length; i++) {
+  for (let i = 0; i < state.muNH3[p].length; i++) {
     curveVertex(
-      z.graphLeftSideX + ((i * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-      z.graphBottomY + ((z.muNH3[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+      state.graphLeftSideX + ((i * 5 + 365) / 1000) * (state.graphRightSideX - state.graphLeftSideX),
+      state.graphBottomY + ((state.muNH3[p][i] + 1) / 4) * (state.graphTopY - state.graphBottomY)
     );
   }
   curveVertex(
-    z.graphLeftSideX + ((z.muNH3[p].length * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX),
-    z.graphBottomY + ((z.muNH3[p][z.muNH3[p].length - 1] + 1) / 4) * (z.graphTopY - z.graphBottomY)
+    state.graphLeftSideX + ((state.muNH3[p].length * 5 + 365) / 1000) * (state.graphRightSideX - state.graphLeftSideX),
+    state.graphBottomY + ((state.muNH3[p][state.muNH3[p].length - 1] + 1) / 4) * (state.graphTopY - state.graphBottomY)
   );
   endShape();
   pop();
@@ -459,7 +574,7 @@ function jouleThomsonPlotLines() {
 }
 
 function drawMouseGraphInteraction() {
-  let p = z.inletPressure - 1;
+  let p = state.inletPressure - 1;
 
   let mouseXCalibrated = mouseX / relativeSize();
   let mouseYCalibrated = mouseY / relativeSize();
@@ -467,17 +582,17 @@ function drawMouseGraphInteraction() {
   let textOffSetX = 0;
   let textOffSetY = 25;
 
-  //Mouse interaction for CO2 line
-  for (let i = 0; i < z.muCO2[p].length; i++) {
-    let calibratedXPointOnCO2Line = z.graphLeftSideX + ((i * 5 + 290) / 1000) * (z.graphRightSideX - z.graphLeftSideX);
-    let calibratedYPointOnCO2Line = z.graphBottomY + ((z.muCO2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY);
+  //--------------------Mouse interaction for CO2 line--------------------
+  for (let i = 0; i < state.muCO2[p].length; i++) {
+    let calibratedXPointOnCO2Line = state.graphLeftSideX + ((i * 5 + 290) / 1000) * (state.graphRightSideX - state.graphLeftSideX);
+    let calibratedYPointOnCO2Line = state.graphBottomY + ((state.muCO2[p][i] + 1) / 4) * (state.graphTopY - state.graphBottomY);
 
     if (
       Math.abs(mouseXCalibrated - calibratedXPointOnCO2Line) < 4 &&
       Math.abs(mouseYCalibrated - calibratedYPointOnCO2Line) < 40 &&
-      z.muCO2[p][i] < 3.0049
+      state.muCO2[p][i] < 3.0049
     ) {
-      if (z.muCO2[p][i] > 2.7) {
+      if (state.muCO2[p][i] > 2.7) {
         textOffSetY = -textOffSetY;
       }
       if (i * 5 + 290 > 960) {
@@ -502,24 +617,24 @@ function drawMouseGraphInteraction() {
       strokeWeight(0.2);
       fill("Black");
       textSize(16);
-      text(i * 5 + 290 + ", " + z.muCO2[p][i].toFixed(2), calibratedXPointOnCO2Line + textOffSetX, calibratedYPointOnCO2Line - textOffSetY);
+      text(i * 5 + 290 + ", " + state.muCO2[p][i].toFixed(2), calibratedXPointOnCO2Line + textOffSetX, calibratedYPointOnCO2Line - textOffSetY);
       pop();
 
       break;
     }
   }
 
-  //Mouse interaction for N2 line
-  for (let i = 0; i < z.muN2[p].length; i++) {
-    let calibratedXPointOnN2Line = z.graphLeftSideX + ((i * 5 + 145) / 1000) * (z.graphRightSideX - z.graphLeftSideX);
-    let calibratedYPointOnN2Line = z.graphBottomY + ((z.muN2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY);
+  //--------------------Mouse interaction for N2 line--------------------
+  for (let i = 0; i < state.muN2[p].length; i++) {
+    let calibratedXPointOnN2Line = state.graphLeftSideX + ((i * 5 + 145) / 1000) * (state.graphRightSideX - state.graphLeftSideX);
+    let calibratedYPointOnN2Line = state.graphBottomY + ((state.muN2[p][i] + 1) / 4) * (state.graphTopY - state.graphBottomY);
 
     if (
       Math.abs(mouseXCalibrated - calibratedXPointOnN2Line) < 4 &&
       Math.abs(mouseYCalibrated - calibratedYPointOnN2Line) < 40 &&
-      z.muN2[p][i] < 3.0049
+      state.muN2[p][i] < 3.0049
     ) {
-      if (z.muN2[p][i] > 2.7) {
+      if (state.muN2[p][i] > 2.7) {
         textOffSetY = -textOffSetY;
       }
       if (i * 5 + 145 > 960) {
@@ -544,25 +659,25 @@ function drawMouseGraphInteraction() {
       strokeWeight(0.2);
       fill("Black");
       textSize(16);
-      text(i * 5 + 145 + ", " + z.muN2[p][i].toFixed(2), calibratedXPointOnN2Line + textOffSetX, calibratedYPointOnN2Line - textOffSetY);
+      text(i * 5 + 145 + ", " + state.muN2[p][i].toFixed(2), calibratedXPointOnN2Line + textOffSetX, calibratedYPointOnN2Line - textOffSetY);
       pop();
 
       break;
     }
   }
 
-  //Mouse interaction for H2 line
-  for (let i = 0; i < z.muH2[p].length; i++) {
-    let calibratedXPointOnH2Line = z.graphLeftSideX + ((i * 5 + 55) / 1000) * (z.graphRightSideX - z.graphLeftSideX);
-    let calibratedYPointOnH2Line = z.graphBottomY + ((z.muH2[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY);
+  //--------------------Mouse interaction for H2 line--------------------
+  for (let i = 0; i < state.muH2[p].length; i++) {
+    let calibratedXPointOnH2Line = state.graphLeftSideX + ((i * 5 + 55) / 1000) * (state.graphRightSideX - state.graphLeftSideX);
+    let calibratedYPointOnH2Line = state.graphBottomY + ((state.muH2[p][i] + 1) / 4) * (state.graphTopY - state.graphBottomY);
 
-    console.log(z.muH2[p][i]);
+    console.log(state.muH2[p][i]);
     if (
       Math.abs(mouseXCalibrated - calibratedXPointOnH2Line) < 4 &&
       Math.abs(mouseYCalibrated - calibratedYPointOnH2Line) < 40 &&
-      z.muH2[p][i] < 3.0049
+      state.muH2[p][i] < 3.0049
     ) {
-      if (z.muH2[p][i] > 2.7 || z.muH2[p][i] < 0) {
+      if (state.muH2[p][i] > 2.7 || state.muH2[p][i] < 0) {
         textOffSetY = -textOffSetY;
       }
       if (i * 5 + 55 > 960) {
@@ -587,24 +702,24 @@ function drawMouseGraphInteraction() {
       strokeWeight(0.2);
       fill("Black");
       textSize(16);
-      text(i * 5 + 55 + ", " + z.muH2[p][i].toFixed(2), calibratedXPointOnH2Line + textOffSetX, calibratedYPointOnH2Line - textOffSetY);
+      text(i * 5 + 55 + ", " + state.muH2[p][i].toFixed(2), calibratedXPointOnH2Line + textOffSetX, calibratedYPointOnH2Line - textOffSetY);
       pop();
 
       break;
     }
   }
 
-  //Mouse interaction for NH3 line
-  for (let i = 0; i < z.muNH3[p].length; i++) {
-    let calibratedXPointOnNH3Line = z.graphLeftSideX + ((i * 5 + 365) / 1000) * (z.graphRightSideX - z.graphLeftSideX);
-    let calibratedYPointOnNH3Line = z.graphBottomY + ((z.muNH3[p][i] + 1) / 4) * (z.graphTopY - z.graphBottomY);
+  //--------------------Mouse interaction for NH3 line--------------------
+  for (let i = 0; i < state.muNH3[p].length; i++) {
+    let calibratedXPointOnNH3Line = state.graphLeftSideX + ((i * 5 + 365) / 1000) * (state.graphRightSideX - state.graphLeftSideX);
+    let calibratedYPointOnNH3Line = state.graphBottomY + ((state.muNH3[p][i] + 1) / 4) * (state.graphTopY - state.graphBottomY);
 
     if (
       Math.abs(mouseXCalibrated - calibratedXPointOnNH3Line) < 4 &&
       Math.abs(mouseYCalibrated - calibratedYPointOnNH3Line) < 40 &&
-      z.muNH3[p][i] < 3.0049
+      state.muNH3[p][i] < 3.0049
     ) {
-      if (z.muNH3[p][i] > 2.7) {
+      if (state.muNH3[p][i] > 2.7) {
         textOffSetY = -textOffSetY;
       }
       if (i * 5 + 365 > 960) {
@@ -629,7 +744,7 @@ function drawMouseGraphInteraction() {
       strokeWeight(0.2);
       fill("Black");
       textSize(16);
-      text(i * 5 + 365 + ", " + z.muNH3[p][i].toFixed(2), calibratedXPointOnNH3Line + textOffSetX, calibratedYPointOnNH3Line - textOffSetY);
+      text(i * 5 + 365 + ", " + state.muNH3[p][i].toFixed(2), calibratedXPointOnNH3Line + textOffSetX, calibratedYPointOnNH3Line - textOffSetY);
       pop();
 
       break;
