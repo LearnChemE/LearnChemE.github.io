@@ -1,4 +1,4 @@
-import { GlobalState, ValveSetting, vec2 } from "../types";
+import { GlobalState, Manometer, ValveSetting, vec2 } from "../types";
 import { beginTubeFillAnimation, initAnimationObjects, swapValveAnimation } from "./animation";
 import { constrain, rescale, smoothLerp } from "./helpers";
 
@@ -31,6 +31,7 @@ const parent = document.getElementById("graphics-wrapper");
 parent.appendChild(State.apparatusDiv);
 
 initAnimationObjects();
+const manometer = new Manometer();
 
 /* ********************** */
 /* ** Set interactions ** */
@@ -82,6 +83,8 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
         v1Angle = constrain(v1Angle, -90, 0);
         valve1.setAttribute("transform", `rotate(${v1Angle} 129 83)`);
         State.valveLift = rescale(v1Angle, -90, 0, 0, 1, true);
+
+        manometer.fillTubes(State.valveLift);
     };
     const release = () => {
         document.removeEventListener("mousemove", drag);

@@ -53,6 +53,7 @@ export class StraightTube implements Tube {
     private dir: TubeDirection;
     private coord: vec2;
     private dim: vec2;
+    private current: number;
 
     constructor(id: string, dir: TubeDirection) {
         // Get the element
@@ -69,6 +70,7 @@ export class StraightTube implements Tube {
         this.dir = dir;
         this.coord = vec2(x, y);
         this.dim = vec2(w, h);
+        this.current = 0;
 
         // Hide by default
         this.update(0);
@@ -102,6 +104,7 @@ export class StraightTube implements Tube {
                     break;
             }
         }
+        this.current = t;
 
         // Conditionally set variables based on direction
         switch(dir) {
@@ -142,8 +145,8 @@ export class StraightTube implements Tube {
         return smoothLerp(duration, (t) => {this.update(t)}, -1, 0);
     }
 
-    public async fillTo(start: number, target: number, duration: number) {
-        return smoothLerp(duration, (t) => {this.update(t)}, start, target);
+    public async fillTo(target: number, duration: number) {
+        return smoothLerp(duration, (t) => {this.update(t)}, this.current, target);
     }
 }
 
@@ -261,29 +264,4 @@ const checkForDefs = (parent: HTMLElement): SVGDefsElement => {
     }
     // Return the defs element
     return defs;
-}
-
-export class Manometer {
-    private inTube: StraightTube;
-    private inFill: number;
-    private outTube: StraightTube;
-    private outFill: number;
-
-    constructor() {
-        this.inTube  = new StraightTube( "Tube_6", TubeDirection.Left); // 6 for left
-        this.outTube = new StraightTube("Tube_15", TubeDirection.Left); // 14 for right
-
-        this.inFill  = 0;
-        this.outFill = 0;
-    }
-
-    /**
-     * Make these private later
-     */
-
-    public fillLeftTo = async (target: number) => {
-        this.inTube.fillTo(this.inFill, target, 500);
-        this.inFill = target;
-        return;
-    }
 }

@@ -1,6 +1,4 @@
-import { BentTube, Manometer, StraightTube, Tube, TubeDirection, TubeGroup, ValveSetting, vec2 } from "../types";
-import { BendDirection } from "../types/bend-direction";
-import { smoothLerp } from "./helpers";
+import { BendDirection, BentTube, Manometer, StraightTube, Tube, TubeDirection, TubeGroup, ValveSetting, vec2 } from "../types";
 import { State } from "./interactions";
 
 // Tube Groups
@@ -71,17 +69,19 @@ export function initAnimationObjects() {
  */
 var tubesAreFull = false;
 async function tubesFillAnimation() {
-    await LowerTubes.fill();
-    await VenturiLeft.fill();
-    await VenturiRight.fill();
-    await UpperBase.fill();
-    if (State.valveSetting === ValveSetting.RecycleMode) {
-        await Recycle.fill();
+    if (!tubesAreFull) {
+        tubesAreFull = true;
+        await LowerTubes.fill();
+        await VenturiLeft.fill();
+        await VenturiRight.fill();
+        await UpperBase.fill();
+        if (State.valveSetting === ValveSetting.RecycleMode) {
+            await Recycle.fill();
+        }
+        else {
+            await ExitTube.fill();
+        }
     }
-    else {
-        await ExitTube.fill();
-    }
-    tubesAreFull = true;
 }
 
 /**
