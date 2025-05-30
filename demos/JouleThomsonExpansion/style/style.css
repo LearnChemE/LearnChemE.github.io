@@ -16,7 +16,7 @@ body {
   justify-content: center;
   margin: auto;
   padding: 0px 20px;
-  gap: 10px;
+  gap: 5px;
   font-size: var(--controls-font-size);
 }
 
