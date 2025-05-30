@@ -6,7 +6,7 @@
 const mainWidth = 1280;
 const mainHeight = 720;
 // Declare global variables which are available to all files
-window.z = {
+window.state = {
   //graph and window variables
   width: mainWidth,
   height: mainHeight,
@@ -19,7 +19,7 @@ window.z = {
 
   //Temperature and Pressure Variables
   inletPressure: 3,
-  outletPressure: 0.05,
+  outletPressure: 0.3,
   inletTemperature: 500,
   outletTemperature: 0,
 
