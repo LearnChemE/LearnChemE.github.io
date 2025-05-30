@@ -7,11 +7,10 @@ const inletPressureSliderWrapper = document.getElementById("inlet-pressure-slide
 const outletPressureSliderWrapper = document.getElementById("outlet-pressure-slider-wrapper");
 const inletTemperatureSliderWrapper = document.getElementById("inlet-temperature-slider-wrapper");
 const gasButtonsWrapper = document.getElementById("gas-buttons-wrapper");
-
 let mu = 5.468;
 
 //preload for loading images and fonts
-window.preload = function() {};
+window.preload = function () {};
 
 // This function is used to scale the canvas based on the size of the container
 window.relativeSize = () => p5container.offsetWidth / 1280;
@@ -29,14 +28,14 @@ function resize() {
 
 // Moved outside of the selection block - Do not call setup() more than once.
 // So this should never be inside a conditional statement.
-window.setup = function() {
+window.setup = function () {
   createCanvas(p5container.offsetWidth, p5container.offsetHeight).parent(p5container);
   frameRate(30);
 };
 
 // Same with draw() - this should never be inside a conditional statement.
 // Put the conditional statements inside the draw function.
-window.draw = function() {
+window.draw = function () {
   // The "window" keyword is used to set global variables. So you can use
   // "selection" in any file, function, block, etc.
 
@@ -78,6 +77,7 @@ window.draw = function() {
     inletPressureSliderWrapper.style.display = "grid";
     outletPressureSliderWrapper.style.display = "grid";
     inletTemperatureSliderWrapper.style.display = "grid";
+    throttleFigure();
 
     drawFigureText();
   } else if (selection === "JTcoeff-vs-temperature") {
@@ -98,14 +98,142 @@ window.windowResized = () => {
   resizeCanvas(p5container.offsetWidth, p5container.offsetHeight);
 };
 
+function throttleFigure() {
+  //the rectangles portion of the figure
+  push();
+
+  rectMode(CENTER);
+  noStroke();
+
+  //pipe
+  push();
+  fill("grey");
+  line();
+  rect(z.xMid, z.yMid + 100, z.width - 100, z.height * 0.5 - 30);
+  pop();
+
+  //gas inside the pipe
+  push();
+  fill(255, 115, 115);
+  rect(z.xMid, z.yMid + 100, z.width - 100, z.height * 0.3);
+  pop();
+
+  //pipe borders
+  push();
+  fill("black");
+  rect(z.xMid, z.yMid + 100 - 103, z.width - 100, 10);
+  rect(z.xMid, z.yMid + 100 + 103, z.width - 100, 10);
+  pop();
+
+  pop();
+
+  //The lines on the outer metal
+
+  for (let i = 50; i < z.width - 50; i += (z.width - 100) / 38) {
+    line(i, z.yMid + 100 - 165, i + 30, z.yMid + 100 - 108);
+    line(i, z.yMid + 100 + 108, i + 30, z.yMid + 100 + 165);
+  }
+
+  //gauges
+  push();
+  rectMode(CORNERS);
+  noStroke();
+  //in pressure
+  fill("gray");
+  rect(z.width / 8 + 15, z.yMid - 100, z.width / 8 - 35, z.yMid - 64);
+  fill("black");
+  rect(z.width / 8 + 4, z.yMid - 100, z.width / 8 - 24, z.yMid + 1);
+  fill(255, 115, 115);
+  rect(z.width / 8, z.yMid - 100, z.width / 8 - 20, z.yMid + 4);
+  rectMode(CENTER);
+  fill("gray");
+  stroke("black");
+  strokeWeight(1);
+  //bolts on the gauge
+  rect(150 + 39, z.yMid - 94, 17, 12);
+  rect(150 - 39, z.yMid - 94, 17, 12);
+  rect(150 + 39, z.yMid - 139, 17, 12);
+  rect(150 - 39, z.yMid - 139, 17, 12);
+  //seal of the gauge
+  rect(150, z.yMid - 116, 110, 34);
+  line(95, z.yMid - 116, 205, z.yMid - 116);
+  //top pressure reader
+  rect(150, z.yMid - 153, 25, 40);
+  circle(150, z.yMid - 250, 200);
+  noStroke();
+  fill("white");
+  circle(150, z.yMid - 250, 190);
+  stroke("black");
+  angleMode(DEGREES);
+  arc(150, z.yMid - 250, 120, 120, 135, 45);
+  push();
+  translate(150, z.yMid - 250);
+  push();
+  //ticks on gauge
+  strokeWeight(2);
+  for (let i = -45; i <= 225; i += (225 + 45) / 5) {
+    line(60 * cos(i), -60 * sin(i), 68 * cos(i), -68 * sin(i));
+  }
+  strokeWeight(1);
+  for (let i = -45; i <= 225; i += (225 + 45) / 25) {
+    line(60 * cos(i), -60 * sin(i), 65 * cos(i), -65 * sin(i));
+  }
+  pop();
+  //text on the gauge
+  push();
+  textAlign(CENTER, CENTER);
+  stroke("Black");
+  strokeWeight(0.2);
+  fill("Black");
+  textSize(12);
+  for (let i = -45; i <= 225; i += (225 + 45) / 5) {
+    text(-(i + 45) / (270 / 5) + 5, 80 * cos(i), -80 * sin(i));
+  }
+  pop();
+  //Gauge Needle
+  push();
+  fill("red");
+  noStroke();
+  triangle(
+    75 * cos(225 - (270 * z.inletPressure) / 5),
+    -75 * sin(225 - (270 * z.inletPressure) / 5),
+    25 * cos(225 - (270 * z.inletPressure) / 5 + 180 - 17),
+    -25 * sin(225 - (270 * z.inletPressure) / 5 + 180 - 17),
+    25 * cos(225 - (270 * z.inletPressure) / 5 + 180 + 17),
+    -25 * sin(225 - (270 * z.inletPressure) / 5 + 180 + 17)
+  );
+  fill("gray");
+  strokeWeight(5);
+  circle(0, 0, 15);
+  pop();
+
+  textAlign(CENTER, CENTER);
+  stroke("Black");
+  strokeWeight(0.2);
+  fill("Black");
+  textSize(12);
+  text("MPa", 0, 50);
+
+  pop();
+
+  push();
+
+  pop();
+  //out pressure
+
+  pop();
+}
+
 function drawFigureText() {
   push();
-  textAlign(CENTER);
+  textAlign(CENTER, CENTER);
   stroke("Black");
   strokeWeight(0.2);
   fill("Black");
   textSize(28);
-  text("T out = " + z.outletTemperature.toFixed(1), z.width / 4, z.height / 2);
+  text("T out = " + z.outletTemperature.toFixed(1), (3 * z.width) / 4, z.yMid + 100);
+  text("inlet", z.width / 10, z.yMid + 100);
+  text("outlet", (9 * z.width) / 10, z.yMid + 100);
   pop();
 }
 
@@ -160,7 +288,9 @@ function jouleThomsonCoeffPlot() {
   stroke("black");
   strokeWeight(1);
   for (
-    let i = z.graphLeftSideX + (z.graphRightSideX - z.graphLeftSideX) / 20; i < z.graphRightSideX; i += (z.graphRightSideX - z.graphLeftSideX) / 20
+    let i = z.graphLeftSideX + (z.graphRightSideX - z.graphLeftSideX) / 20;
+    i < z.graphRightSideX;
+    i += (z.graphRightSideX - z.graphLeftSideX) / 20
   ) {
     line(i, z.graphBottomY, i, z.graphBottomY - 5);
     line(i, z.graphTopY, i, z.graphTopY + 5);
