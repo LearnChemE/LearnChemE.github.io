@@ -1,37 +1,7 @@
-import { GlobalState, Manometer, ValveSetting, vec2 } from "../types";
-import { beginTubeFillAnimation, initAnimationObjects, swapValveAnimation } from "./animation";
+import { ValveSetting, vec2 } from "../types";
+import { beginTubeFillAnimation, swapValveAnimation } from "./animation";
 import { constrain, rescale, smoothLerp } from "./helpers";
-
-const MIN_FLOWRATE = 10;
-const MAX_FLOWRATE = 20;
-
-export const State: GlobalState = {
-    apparatusDiv: undefined,
-    valveSetting: ValveSetting.RecycleMode,
-    pumpIsRunning: false,
-    valveLift: 10, // g / s
-}
-
-// Insert an svg image 
-function insertSVG(svg: string): HTMLDivElement {
-    const div = document.createElement("div");
-  
-    // Set basic attributes
-    div.id = "apparatus-wrapper";
-    div.innerHTML = svg;
-    return div;
-}
-
-// Create div containing svg
-const svg = require("../media/Fluidized-bed Graphics.svg");
-State.apparatusDiv = insertSVG(svg) as unknown as SVGAElement;
-
-// Find parent and append svg div
-const parent = document.getElementById("graphics-wrapper");
-parent.appendChild(State.apparatusDiv);
-
-initAnimationObjects();
-const manometer = new Manometer();
+import State from "./state";
 
 /* ********************** */
 /* ** Set interactions ** */
@@ -82,9 +52,8 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
         v1Angle += dth;
         v1Angle = constrain(v1Angle, -90, 0);
         valve1.setAttribute("transform", `rotate(${v1Angle} 129 83)`);
+        console.log(v1Angle)
         State.valveLift = rescale(v1Angle, -90, 0, 0, 1, true);
-
-        manometer.fillTubes(State.valveLift);
     };
     const release = () => {
         document.removeEventListener("mousemove", drag);
@@ -132,6 +101,5 @@ valve2.addEventListener("mousedown", ({ clientX, clientY }) => {
 const pumpBtn = document.getElementById("pump-btn");
 pumpBtn.addEventListener("click", () => {
     // Start pump animation
-    beginTubeFillAnimation();
     State.pumpIsRunning = true;
 })

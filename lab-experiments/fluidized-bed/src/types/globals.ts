@@ -1,3 +1,5 @@
+import { Manometer } from "./manometer";
+
 export enum ValveSetting {
     RecycleMode = 0,
     CatchAndWeigh = 1
@@ -7,7 +9,7 @@ export type GlobalState = {
     apparatusDiv: SVGAElement;
     valveSetting: ValveSetting;
     pumpIsRunning: boolean;
-    valveLift: number
+    valveLift: number;
 }
 
 export type vec2 = {

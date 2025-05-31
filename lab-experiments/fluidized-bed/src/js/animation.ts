@@ -1,5 +1,5 @@
-import { BendDirection, BentTube, Manometer, StraightTube, Tube, TubeDirection, TubeGroup, ValveSetting, vec2 } from "../types";
-import { State } from "./interactions";
+import { Beaker, BendDirection, BentTube, Manometer, StraightTube, Tube, TubeDirection, TubeGroup, ValveSetting, vec2 } from "../types";
+import State from "./state";
 
 // Tube Groups
 var LowerTubes:   TubeGroup;
@@ -9,8 +9,12 @@ var UpperBase:    TubeGroup;
 var Recycle:      TubeGroup;
 var ExitTube:     TubeGroup;
 
-// Venturi Meter
+// Manometer
 var manometer: Manometer;
+
+// Beakers
+var beakerL: Beaker;
+var beakerR: Beaker;
 
 /**
  * Initialize all of the animation objects. This must happen after the SVG is loaded
@@ -60,6 +64,10 @@ export function initAnimationObjects() {
 
     // Manometer
     manometer = new Manometer();
+
+    // Beakers
+    beakerL = new Beaker("Beaker Fill", 1000);
+    beakerR = new Beaker("Beaker Fill_2", 0);
 }
 
 
@@ -73,7 +81,9 @@ async function tubesFillAnimation() {
         tubesAreFull = true;
         await LowerTubes.fill();
         await VenturiLeft.fill();
+        manometer.fillLeftOnly();
         await VenturiRight.fill();
+        manometer.fillTubes();
         await UpperBase.fill();
         if (State.valveSetting === ValveSetting.RecycleMode) {
             await Recycle.fill();
@@ -84,11 +94,21 @@ async function tubesFillAnimation() {
     }
 }
 
+
 /**
  * External call to begin the animation for the tubes filling.
  */
 export async function beginTubeFillAnimation() {
     tubesFillAnimation();
+}
+
+/**
+ * Call animations that happen on lift change
+ * @returns void promise
+ */
+export async function onLiftChange() {
+    manometer.fillTubes();
+    return;
 }
 
 /**

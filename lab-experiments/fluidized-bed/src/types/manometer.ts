@@ -1,3 +1,4 @@
+import { pumpPressure } from "../js/calculations";
 import { TubeDirection } from "./ani-types";
 import { vec2 } from "./globals";
 
@@ -96,6 +97,7 @@ class VaryingTube {
      * @returns Promise<void> - Resolves with animation end
      */
     public setTarget = async (target: number) => {
+        console.log(`Setting target to: ${target}`);
         this.target = target;
         this.animate();
     }
@@ -115,31 +117,27 @@ class VaryingTube {
 
         // Loop for each frame
         const frame = (time: number) => {
+            if (!prevTime) prevTime = time; // Initialize the first time
     
-            // Function to update the value at each frame
-            const animate = (time: number) => {
-                if (!prevTime) prevTime = time; // Initialize the first time
-        
-                // Calculate elapsed time
-                const deltaTime = time - prevTime;
-        
-                // Calculate the interpolation factor t (from 0 to 1)
-                var t = this.current; // Ensure t doesn't go beyond 1
-        
-                // Interpolate between start and end
-                t = (t - this.target) * this.r ** deltaTime + this.target;
-                this.current = t;
-        
-                // Call the update callback with the interpolated value
-                this.update(t);
-        
-                // If not at the end, continue the animation
-                if (t !== this.target) {
-                    requestAnimationFrame(animate);
-                }
-                // If at the end, give the return callback
-                else this.running = false;
+            // Calculate elapsed time
+            const deltaTime = time - prevTime;
+    
+            // Calculate the interpolation factor t (from 0 to 1)
+            var t = this.current; // Ensure t doesn't go beyond 1
+    
+            // Interpolate between start and end
+            t = (t - this.target) * this.r ** deltaTime + this.target;
+            this.current = t;
+    
+            // Call the update callback with the interpolated value
+            this.update(t);
+    
+            // If not at the end, continue the animation
+            if (t !== this.target) {
+                requestAnimationFrame(frame);
             }
+            // If at the end, give the return callback
+            else this.running = false;
         }
     
         // Start the animation
@@ -151,15 +149,22 @@ export class Manometer {
     private inTube: VaryingTube;
     private outTube: VaryingTube;
     // Keeping track of water heights
-    private baseElement: HTMLElement;
-    private base: number;
+    private baseElement: SVGAElement;
+    // For converting to interpolant
+    private bottom: number;
+    private height: number;
 
     constructor() {
-        this.inTube  = new VaryingTube( "Tube_6", TubeDirection.Left, 3); // 6 for left
-        this.outTube = new VaryingTube("Tube_15", TubeDirection.Left, 3); // 14 for right
+        this.inTube  = new VaryingTube( "Tube_6", TubeDirection.Left, 5000); // 6 for left
+        this.outTube = new VaryingTube("Tube_15", TubeDirection.Left, 5000); // 14 for right
 
-        this.baseElement = document.getElementById("");
-        this.base = 0;
+        // Get the bounding box and use to find bottom and height of manometer tube section
+        const rect = document.getElementById("Tube_16") as unknown as SVGAElement;
+        const bounds = rect.getBBox();
+        this.bottom = bounds.y + bounds.width;
+        this.height = bounds.width;
+
+        this.baseElement = document.getElementById("Beaker Fill") as unknown as SVGAElement;
     }
 
     /**
@@ -169,14 +174,36 @@ export class Manometer {
      * @param dif 
      * @returns void promise
      */
-    public fillTubes = async (pump: number = 0, dif: number = 0) => {
-        // Set privates
-        // this.baseLevel = base;
-        // this.pump = pump;
-        // this.pressureDif = dif;
+    public fillTubes = async () => {
+        // Calculate height in pixels
+        const base = this.baseElement.getBBox().y;
+        // Add pump pressure. Sign should be negative because y pixels are 
+        const pump = pumpPressure();
+        var left = base - pump * 5;
+        console.log(base - left)
+        var right = left; // TODO: minus bed drop
 
-        this.inTube.setTarget(this.base + pump);
-        // this.inFill = target;
+        // Convert to 0-1 range for tube
+        left = (this.bottom - left) / this.height;
+        right = (this.bottom - right) / this.height;
+
+        // Set the left tube only
+        this.inTube.setTarget(left);
+        this.outTube.setTarget(right);
+        return;
+    }
+
+    public fillLeftOnly = async () => {
+        // Calculate height in pixels
+        const base = this.baseElement.getBBox().y;
+        // TODO: Add pump pressure
+        var level = base - pumpPressure();
+
+        // Convert to 0-1 range for tube
+        level = (this.bottom - level) / this.height;
+
+        // Set the left tube only
+        this.inTube.setTarget(level);
         return;
     }
 }

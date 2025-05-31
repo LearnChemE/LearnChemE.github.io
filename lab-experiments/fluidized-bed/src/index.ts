@@ -1,7 +1,8 @@
+// Packages
 import "bootstrap";
 import "./style/style.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-
-import "./js/interactions.ts"
+// Scripts
 import "./js/calculations.ts";
+import "./js/interactions.ts";
