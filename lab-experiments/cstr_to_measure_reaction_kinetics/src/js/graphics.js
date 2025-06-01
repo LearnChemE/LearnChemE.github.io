@@ -71,8 +71,9 @@ const TANK_VOLUME = 20000; // 20L in ml (was 200L)
 const FLOW_RATE_FACTOR = 0.0000003; // Flow scaling
 const MAX_FLOW_RATE = 60; // Max flow (ml/s)
 const SIMPLE_TANK_MAX_LEVEL = 0.65; // Max CSTR level
-const COLLECTION_TANK_MAX_LEVEL = 0.80; // Max collection tank level (decreased from 0.85)
+const COLLECTION_TANK_MAX_LEVEL = 0.85; // Max collection tank level (increased from 0.80)
 const SIMPLE_TANK_FILL_RATE = 0.0005; // CSTR fill rate
+const COLLECTION_TANK_VOLUME = TANK_VOLUME * 2; // 40L in ml (combined capacity of tanks A and B)
 
 // Add these global variables at the top with other state variables
 let isDraggingValveA = false;
@@ -118,13 +119,13 @@ function drawPump(x, y, size, pipeWidth, label) {
   for (const [dx, dy] of boltOffsets) {
     ellipse(inletX + dx * (flangeW / 2 - boltSize / 2), y + dy * (flangeH / 2 - boltSize / 2), boltSize, boltSize);
   }
-
+  
   // Motor housing (rectangle on top)
   const motorWidth = size * 0.8;
   const motorHeight = size * 0.6;
   fill(160, 160, 170); // Darker metallic
   rect(x - motorWidth / 2, y - size / 2 - motorHeight, motorWidth, motorHeight, 5);
-
+  
   // Cooling fins on motor
   const finCount = 5;
   const finSpacing = motorHeight / (finCount + 1);
@@ -135,14 +136,14 @@ function drawPump(x, y, size, pipeWidth, label) {
     const finY = y - size / 2 - motorHeight + i * finSpacing;
     line(x - motorWidth / 2 - finLength, finY, x + motorWidth / 2 + finLength, finY);
   }
-
+  
   // Central shaft detail
   stroke(100);
   strokeWeight(2);
   const shaftSize = size * 0.15;
   fill(140, 140, 150);
   circle(x, y, shaftSize);
-
+  
   // Bolt details around the pump housing
   stroke(80);
   strokeWeight(1);
@@ -155,17 +156,17 @@ function drawPump(x, y, size, pipeWidth, label) {
     fill(160, 160, 170);
     circle(bx, by, boltSize);
   }
-
+  
   // Draw horizontal outlet pipe with different lengths for each tank
   const baseOutletLength = size * 1.5;
   const outletLength = label === "Tank A" ? baseOutletLength * 1.83 : baseOutletLength * 0.5; // Increased for Tank A
   const pipeEndX = x + size / 2 + outletLength;
-
+  
   // Set uniform pipe style
   stroke(0);
   strokeWeight(1);
   fill(240); // Light grey for pipes
-
+  
   // Draw horizontal outlet pipe from pump with rounded ends
   stroke(40);
   strokeWeight(2);
@@ -181,17 +182,17 @@ function drawPump(x, y, size, pipeWidth, label) {
   vertex(pipeEndX, y + pipeWidth / 2);
   vertex(x + size / 2, y + pipeWidth / 2);
   endShape(CLOSE);
-
+  
   // Draw intersection circle with mechanical details
   const circleRadius = pipeWidth * 0.6;
   const jointBoltCount = 6;
   const jointBoltRadius = circleRadius * 0.7;
   const jointBoltSize = circleRadius * 0.15;
-
+  
   // Draw the main circle
   fill(240);
   circle(pipeEndX, y, circleRadius * 2);
-
+  
   // Draw bolt holes around the circle
   stroke(40);
   strokeWeight(2);
@@ -202,22 +203,22 @@ function drawPump(x, y, size, pipeWidth, label) {
     fill(200); // Consistent grey fill for bolts
     circle(bx, by, jointBoltSize);
   }
-
+  
   // Draw center cross detail
   stroke(0); // Black stroke for cross
   strokeWeight(1);
   line(pipeEndX - circleRadius * 0.3, y, pipeEndX + circleRadius * 0.3, y);
   line(pipeEndX, y - circleRadius * 0.3, pipeEndX, y + circleRadius * 0.3);
-
+  
   // Draw vertical pipe for both tanks with different heights
   const verticalPipeHeight = label === "Tank B" ? 400 : 100; // Longer for Tank B
   const verticalPipeY = y;
-
+  
   // Reset pipe style for vertical pipe
   stroke(0);
   strokeWeight(1);
   fill(240);
-
+  
   // Draw vertical pipe going up from intersection (appears behind the circle)
   stroke(40);
   strokeWeight(2);
@@ -233,11 +234,11 @@ function drawPump(x, y, size, pipeWidth, label) {
   vertex(pipeEndX + pipeWidth / 2, verticalPipeY - verticalPipeHeight);
   vertex(pipeEndX + pipeWidth / 2, verticalPipeY);
   endShape(CLOSE);
-
+  
   // Redraw the circle and details to ensure they're on top
   fill(240);
   circle(pipeEndX, y, circleRadius * 2);
-
+  
   // Redraw bolt holes with consistent colors
   for (let i = 0; i < jointBoltCount; i++) {
     const angle = (i * 2 * Math.PI) / jointBoltCount;
@@ -246,7 +247,7 @@ function drawPump(x, y, size, pipeWidth, label) {
     fill(200); // Consistent grey fill for bolts
     circle(bx, by, jointBoltSize);
   }
-
+  
   // Redraw center cross with consistent color
   stroke(0); // Black stroke for cross
   strokeWeight(1);
@@ -257,12 +258,12 @@ function drawPump(x, y, size, pipeWidth, label) {
   if (label === "Tank B") {
     const horizontalPipeLength = 100; // Length of the horizontal pipe at top
     const horizontalPipeY = verticalPipeY - verticalPipeHeight;
-
+    
     // Set uniform pipe style
     stroke(0);
     strokeWeight(1);
     fill(240); // Light grey for pipes
-
+    
     // Draw horizontal pipe at top of vertical pipe with rounded ends
     stroke(40);
     strokeWeight(2);
@@ -278,11 +279,11 @@ function drawPump(x, y, size, pipeWidth, label) {
     vertex(pipeEndX + horizontalPipeLength, horizontalPipeY + pipeWidth / 2);
     vertex(pipeEndX, horizontalPipeY + pipeWidth / 2);
     endShape(CLOSE);
-
+    
     // Draw intersection circle with mechanical details at top
     fill(240);
     circle(pipeEndX, horizontalPipeY, circleRadius * 2);
-
+    
     // Draw bolt holes around the circle
     stroke(40);
     strokeWeight(2);
@@ -293,7 +294,7 @@ function drawPump(x, y, size, pipeWidth, label) {
       fill(200);
       circle(bx, by, jointBoltSize);
     }
-
+    
     // Draw center cross detail
     stroke(0);
     strokeWeight(1);
@@ -490,15 +491,15 @@ function drawOutletPipe(x, y, pipeWidth, valvePosition, label) {
   // Set black outline for all pipe elements
   stroke(40);
   strokeWeight(2);
-
+  
   // Main vertical pipe - longer for both tanks, extra length for Tank A
   const basePipeHeight = 150;
   const pipeHeight = label === "Tank A" ? basePipeHeight + 100 : basePipeHeight;
-
+  
   // Connect pipe to tank outlet
   const pipeTop = y - pipeWidth / 2;
   fill(240); // Light grey for pipes
-
+  
   // Draw pipe with rounded top to connect smoothly
   stroke(40);
   strokeWeight(2);
@@ -509,17 +510,17 @@ function drawOutletPipe(x, y, pipeWidth, valvePosition, label) {
   vertex(x + pipeWidth / 2, y + pipeHeight);
   vertex(x + pipeWidth / 2, pipeTop);
   endShape(CLOSE);
-
+  
   // Bottom valve (adjustable switch style)
   const valveY = y + pipeHeight;
   const valveSize = pipeWidth * 3;
-
-  // Valve body (circle) with matching red tint
-  fill(100, 150, 255); // Changed from red to blue
+  
+  // Valve body (circle) with matching color
+  fill(209, 177, 203); // Changed from blue to specified color
   stroke(40);
   strokeWeight(2);
   circle(x, valveY, valveSize);
-
+  
   // Add bolt holes around the valve body
   const boltCount = 8;
   const boltRadius = valveSize * 0.4;
@@ -533,12 +534,12 @@ function drawOutletPipe(x, y, pipeWidth, valvePosition, label) {
     strokeWeight(2);
     circle(bx, by, boltSize);
   }
-
+  
   // Draw horizontal pipe from valve with different lengths for each tank
   const basePipeLength = basePipeHeight * 2;
   const horizontalPipeLength = label === "Tank A" ? basePipeLength : basePipeLength * 0.7; // Reduced for Tank B
   fill(240); // Light grey for pipes
-
+  
   // Ensure black outline for horizontal pipe
   stroke(0);
   strokeWeight(1);
@@ -552,13 +553,13 @@ function drawOutletPipe(x, y, pipeWidth, valvePosition, label) {
   vertex(x + valveSize / 2 + horizontalPipeLength, valveY + pipeWidth / 2);
   vertex(x + valveSize / 2, valveY + pipeWidth / 2);
   endShape(CLOSE);
-
+  
   // Draw pump at the end of horizontal pipe
   const pumpX = x + valveSize / 2 + horizontalPipeLength + pipeWidth / 2;
   const pumpY = valveY;
   const pumpSize = valveSize * 1.2;
   drawPump(pumpX, pumpY, pumpSize, pipeWidth, label);
-
+  
   // Calculate flow rate based on valve position (0 to 1)
   const flowRate = map(valvePosition, 0, -Math.PI / 2, 0, 1);
 
@@ -566,31 +567,31 @@ function drawOutletPipe(x, y, pipeWidth, valvePosition, label) {
   strokeWeight(1);
   line(x - valveSize / 2, valveY, x + valveSize / 2, valveY);
   line(x, valveY - valveSize / 2, x, valveY + valveSize / 2);
-
+  
   // Add center cross detail
   const crossSize = valveSize * 0.15;
   line(x - crossSize, valveY, x + crossSize, valveY);
   line(x, valveY - crossSize, x, valveY + crossSize);
-
+  
   // Valve handle (rotatable) - drawn last to appear on top
   stroke(40);
   strokeWeight(2);
   const handleLength = valveSize;
   const handleWidth = 20;
-
+  
   // Calculate handle end position for hit detection
   // Map valvePosition from 0 to -π/2 to -π to 0 (left to right, rotating up)
   const mappedAngle = map(valvePosition, 0, -Math.PI / 2, -Math.PI, 0);
   const handleEndX = x + handleLength * Math.cos(mappedAngle);
   const handleEndY = valveY + handleLength * Math.sin(mappedAngle);
 
-  // Draw handle as a rectangle with blue tint (same as valve body)
+  // Draw handle as a rectangle with matching color
   push();
   translate(x, valveY);
   rotate(mappedAngle); // Use mapped angle for rotation
-  fill(100, 150, 255); // Blue, same as valve body
+  fill(209, 177, 203); // Changed from blue to specified color
   rect(0, -handleWidth / 2, handleLength, handleWidth, 5);
-
+  
   // Add handle details
   stroke(0);
   strokeWeight(1);
@@ -600,19 +601,30 @@ function drawOutletPipe(x, y, pipeWidth, valvePosition, label) {
   for (let i = 1; i <= gripCount; i++) {
     line(i * gripSpacing, -handleWidth / 2 + 2, i * gripSpacing, handleWidth / 2 - 2);
   }
-
+  
   // Draw blue draggable handle at the end
   translate(handleLength, 0);
-  // Use darker gold when pump is on
+  // Use navy blue when pump is off, gray when pump is on
   const isPumpOn = label === "Tank A" ? pumpASwitchOn : pumpBSwitchOn;
-  fill(isPumpOn ? color(218, 165, 32) : color(255, 215, 0)); // Changed from red to gold colors
+  fill(isPumpOn ? color(180, 180, 180) : color(102, 155, 188)); // Gray when pump is on, navy blue when off
   circle(0, 0, handleWidth * 1.5);
-
+  
   // Add center dot to handle
   fill(0);
   circle(0, 0, handleWidth * 0.4);
   pop();
 
+  // Add percentage indicator
+  const percentage = Math.round(map(Math.abs(valvePosition), 0, Math.PI / 2, 0, 100));
+  fill(0);
+  noStroke();
+  textAlign(CENTER, CENTER);
+  textSize(14);
+  // Position the text below the valve handle
+  const textX = x;
+  const textY = valveY + handleLength * 0.8;
+  text(percentage + "%", textX, textY);
+  
   // Store handle end position for interaction
   if (label === "Tank A") {
     window.tankAHandle = { x: handleEndX, y: handleEndY, centerX: x, centerY: valveY };
@@ -624,7 +636,7 @@ function drawOutletPipe(x, y, pipeWidth, valvePosition, label) {
 function drawStand(x, y, w, h) {
   stroke(0);
   strokeWeight(3); // Keep default stroke weight for other components
-
+  
   // Left leg
   const legSpacing = w * 1.2;
   const leftLegX = x - legSpacing / 2;
@@ -635,21 +647,21 @@ function drawStand(x, y, w, h) {
   strokeWeight(5); // Increased stroke weight specifically for vertical legs
   line(leftLegX, y - h / 4, leftLegX, legBottom);
   line(rightLegX, y - h / 4, rightLegX, legBottom);
-
+  
   // Base feet
   const footLength = w * 0.25;
-
+  
   // Left leg foot
   strokeWeight(5); // Match vertical leg thickness
   line(leftLegX - footLength / 2, legBottom, leftLegX + footLength / 2, legBottom);
-
+  
   // Right leg foot
   line(rightLegX - footLength / 2, legBottom, rightLegX + footLength / 2, legBottom);
-
+  
   // Side clamps
   const clampWidth = w * 0.1;
   const clampExtension = w * 0.15;
-
+  
   // Left clamp
   strokeWeight(2); // Keep original stroke weight for clamps
   // Horizontal part
@@ -657,14 +669,14 @@ function drawStand(x, y, w, h) {
   line(leftLegX, y + h / 4, leftLegX + clampExtension, y + h / 4);
   // Vertical part
   line(leftLegX + clampExtension, y - h / 4, leftLegX + clampExtension, y + h / 4);
-
+  
   // Right clamp
   // Horizontal part
   line(rightLegX, y - h / 4, rightLegX - clampExtension, y - h / 4);
   line(rightLegX, y + h / 4, rightLegX - clampExtension, y + h / 4);
   // Vertical part
   line(rightLegX - clampExtension, y - h / 4, rightLegX - clampExtension, y + h / 4);
-
+  
   // Cross support between legs (for stability)
   stroke(100); // Changed to lighter grey
   strokeWeight(3); // Keep original stroke weight for cross supports
@@ -732,15 +744,15 @@ function drawLiquid(x, y, w, h, level, color, applyWave = true) {
   const liquidHeight = totalHeight * level;
   const waveHeight = applyWave ? 0.8 : 0; // Reduced from 1.5 to 0.8 for flatter waves
   const segments = 20;
-
+  
   fill(color);
   noStroke();
-
+  
   beginShape();
 
   // Left side
   vertex(x - w / 2, y - h / 2 + h - liquidHeight);
-
+  
   // Draw wavy top surface
   for (let i = 0; i <= segments; i++) {
     const xPos = x - w / 2 + (w * i / segments);
@@ -748,26 +760,26 @@ function drawLiquid(x, y, w, h, level, color, applyWave = true) {
     const yOffset = Math.sin(waveOffset + i * 0.5) * waveHeight;
     vertex(xPos, baseY + yOffset);
   }
-
+  
   // Right side
   vertex(x + w / 2, y - h / 2 + h - liquidHeight);
 
   // Bottom vertices
   vertex(x + w / 2, y + h / 2);
   vertex(x - w / 2, y + h / 2);
-
+  
   endShape(CLOSE);
 }
 
 export function drawTank(x, y, w, h, label, liquidColor, isFirstTank, liquidLevel) {
   // Draw stand first
   drawStand(x, y, w, h);
-
+  
   // Tank outline
   stroke(0);
   strokeWeight(3); // Thick walls
   noFill();
-
+  
   // Main cylindrical body - now extends full height
   const cylinderHeight = h;
 
@@ -840,12 +852,12 @@ export function drawTank(x, y, w, h, label, liquidColor, isFirstTank, liquidLeve
       text(volumeInL + " L", x + tickLength / 2 + 5, markY); // Position text to the right of the mark, moved up
     }
   }
-
+  
   // Draw outlet pipe with bottom valve
   const valvePos = isFirstTank ? valveAPosition : valveBPosition;
   const valveLabel = isFirstTank ? "Tank A" : "Tank B";
   drawOutletPipe(x, y + h / 2 + 10, w * 0.1, valvePos, valveLabel);
-
+  
   // Tank label
   fill(0);
   noStroke();
@@ -943,7 +955,7 @@ function handleInteractions() {
       const deltaX = mX - centerX;
       const deltaY = mY - centerY;
       let angle = Math.atan2(deltaY, deltaX);
-
+      
       // Normalize angle to be between -π and π
       angle = (angle + Math.PI) % (2 * Math.PI) - Math.PI;
 
@@ -957,7 +969,7 @@ function handleInteractions() {
       // Ensure the angle can reach both extremes with a small threshold
       if (angle > -0.01) angle = 0; // Fully closed
       if (angle < -Math.PI / 2 + 0.01) angle = -Math.PI / 2; // Fully open
-
+      
       setPosition(angle);
       return true; // Return true to indicate we're dragging
     }
@@ -1039,7 +1051,7 @@ export function drawSimulation(width, height) {
 
   // Draw reset button
   drawResetButton();
-
+  
   const tankAX = width * 0.15;
   const tankBX = width * 0.30;
   const tankY = height * 0.42 + VERTICAL_OFFSET; // Add offset here
@@ -1049,10 +1061,10 @@ export function drawSimulation(width, height) {
   // Update global slider position variables
   sliderYCommon = tankY - tankH / 2 - 40;
   sliderTrackY = sliderYCommon - 30; // This matches the trackY in drawSlider
-
+  
   // Update wave animation
   waveOffset += 0.05;
-
+  
   // Draw Tank A (left tank) with blue liquid
   const tankAColor = color(255 - sliderAValue * 100, 120, 120, 200); // reddish
   drawTank(tankAX, tankY, tankW, tankH, "NaOH", tankAColor, true, tankALiquidLevel);
@@ -1208,8 +1220,11 @@ export function drawSimulation(width, height) {
     );
     // Only increase liquid level when waterfall has visually reached the liquid surface
     if (collectionTankWaterfallProgress >= 1) {
-      collectionTankLiquidLevel += SIMPLE_TANK_FILL_RATE;
-      collectionTankLiquidLevel = Math.min(collectionTankLiquidLevel, COLLECTION_TANK_MAX_LEVEL); // Use new constant
+      // Calculate the total volume drained from both tanks
+      const totalDrainedVolume = tankADeltaV + tankBDeltaV;
+      // Map the drained volume to the collection tank level (0 to 0.85)
+      collectionTankLiquidLevel = 0.85 * (totalDrainedVolume / COLLECTION_TANK_VOLUME);
+      collectionTankLiquidLevel = Math.min(collectionTankLiquidLevel, COLLECTION_TANK_MAX_LEVEL);
     }
   } else {
     collectionTankWaterfallProgress = 0;
@@ -1220,17 +1235,23 @@ export function drawSimulation(width, height) {
 
   // Calculate CSTR values
   const calcTime = millis();
-  const timeSinceLastCalc = (calcTime - lastCalculationTime) / 1000; // Convert to seconds
+  const timeSinceLastCalc = (calcTime - lastCalculationTime) / 1000;
 
   if (timeSinceLastCalc >= 0.1) { // Update every 100ms
     // Only calculate when both pumps are on
-    if (pumpASwitchOn || pumpBSwitchOn) {
-      accumulatedTime += timeSinceLastCalc;
+    if (pumpASwitchOn && pumpBSwitchOn) {
+      // Reset accumulated time when both pumps are on
+      if (accumulatedTime === 0) {
+        accumulatedTime = timeSinceLastCalc;
+      } else {
+        accumulatedTime += timeSinceLastCalc;
+      }
+      
       const cstrResult = run_CSTR({
         t: accumulatedTime,
         T: temperatureValue + 273.15, // Convert °C to K
-        CAf: pumpASwitchOn ? sliderAValue : 0, // Only use NaOH concentration if its pump is on
-        CBf: pumpBSwitchOn ? sliderBValue : 0, // Only use CH₃COOCH₃ concentration if its pump is on
+        CAf: sliderAValue, // Use NaOH concentration
+        CBf: sliderBValue, // Use CH₃COOCH₃ concentration
         vA: currentFlowRateA / 1000,
         vB: currentFlowRateB / 1000
       });
@@ -1239,7 +1260,7 @@ export function drawSimulation(width, height) {
       currentCA1 = cstrResult.CC;
       currentCB1 = cstrResult.CD;
     } else {
-      // Reset concentrations when pumps are off
+      // Reset concentrations and time when not both pumps are on
       currentCA1 = 0;
       currentCB1 = 0;
       accumulatedTime = 0;
@@ -1514,7 +1535,7 @@ function drawSimpleTank(x, y, w, h, liquidLevel, liquidColor, canvasWidth) {
   arc(x, topY, wInner, eInner, 0, Math.PI);
   line(x - wOuter / 2, topY, x - wOuter / 2 + wall, topY);
   line(x + wOuter / 2, topY, x + wOuter / 2 - wall, topY);
-
+  
   // Then draw the grey outline on top
   stroke(180);
   strokeWeight(2);
@@ -1938,7 +1959,7 @@ function drawCollectionTank(x, y, w, h, liquidLevel, liquidColor) {
 
   // Draw valve body
   const valveSize = pipeWidth * 3;
-  fill(100, 150, 255); // Blue tint
+  fill(209, 177, 203); // Changed from blue to match other valves
   stroke(40);
   strokeWeight(2);
   circle(x, valveY, valveSize);
@@ -1965,7 +1986,7 @@ function drawCollectionTank(x, y, w, h, liquidLevel, liquidColor) {
   push();
   translate(x, valveY);
   rotate(handleAngle);
-  fill(100, 150, 255); // Blue, same as valve body
+  fill(209, 177, 203); // Changed from blue to match other valves
   rect(0, -handleWidth / 2, handleLength, handleWidth, 5);
 
   // Add handle details
@@ -1980,7 +2001,7 @@ function drawCollectionTank(x, y, w, h, liquidLevel, liquidColor) {
 
   // Draw handle knob
   translate(handleLength, 0);
-  fill(255, 215, 0); // Gold knob to match other valves
+  fill(color(180, 180, 180)); // Gray since collection tank valve is always disabled
   circle(0, 0, handleWidth * 1.5);
 
   // Add center dot to handle
@@ -2027,4 +2048,4 @@ function drawErrorMessages() {
   }
 
   pop();
-}
+} 
