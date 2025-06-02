@@ -25,7 +25,7 @@ export function runSimulation(initialVLfrac, sprayTime, stopAtMinus5 = false) {
     const Hvap = 21.8;         // kJ/mol
     const Cp = 0.0707;       // kJ/(mol·K)
     const Patm = 1.0;          // bar (outside)
-    const alpha = 1e-4;         // mol/(bar·s)
+    const alpha = 6e-4;         // mol/(bar·s)
     const T0_C = 25;           // °C
     const T0 = T0_C + 273.15;// K
 
@@ -57,7 +57,7 @@ export function runSimulation(initialVLfrac, sprayTime, stopAtMinus5 = false) {
         //    dn/dt = -α (P_sat - Patm)
         const dn_dt = -alpha * (P_sat - Patm);
         //    dT/dt = -(dHvap * dn/dt) / (n * Cp)
-        const dT_dt = -(Hvap * dn_dt) / (n * Cp);
+        const dT_dt = (Hvap * dn_dt) / (n * Cp);
 
         // 3) integrate
         n += dn_dt * dt;
@@ -96,6 +96,7 @@ export function runSimulation(initialVLfrac, sprayTime, stopAtMinus5 = false) {
 
 
 function Psat(T) {
+    const T_C = T - 273.15;
     const A = 4.23406, B = 896.171, C = 238.3;
-    return Math.pow(10, A - B / (T + C));
+    return Math.pow(10, A - B / (T_C + C));
 }
