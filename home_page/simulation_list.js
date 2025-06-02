@@ -111,7 +111,7 @@ window.simulation_list = [
     "title": "Surface Roughness Effect on Sphere Trajectory",
     "href": "https://learncheme.github.io/demos/SurfaceRoughness/dist/index.html",
     "image": "https://learncheme.com/wp-content/uploads/2021/06/surface-roughness-thumbnail-original.png",
-    "tooltip": "Trajectory of a non-rotating sphere, launched from a cannon, for different surface roughness",
+    "tooltip": "Trajectory of a non-rotating sphere, launched from a cannon, for surfaces with different roughness",
     "description": "This simulation plots the trajectory of a non-rotating sphere when launched; the surface roughness determines the sphere’s drag profile. Compare spheres side-by-side while launching them from a cannon.",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SurfaceRoughness/",
     "simulation_type": "in-browser"
