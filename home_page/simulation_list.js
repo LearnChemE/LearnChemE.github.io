@@ -738,6 +738,15 @@ window.simulation_list = [
     "simulation_type": "in-browser"
   },
   {
+    "title": "Energy Balance on Pressurizing a Tank",
+    "href": "https://learncheme.github.io/demos/EnergyBalanceOnPressurizingATank/dist/index.html",
+    "image": "https://learncheme.com/wp-content/uploads/2025/05/EnergyBalanceOnPressurizingATank.png",
+    "tooltip": "Gas flows into an insulated that that is initially at a lower pressure and different temperature ",
+    "description": "A gas flows through a pipe into an insulated tank (0.1 m<sup>3</sup>) that is initially at a lower pressure and at a different temperature. Click the &#8220;valve (open)&#8221; play button to start gas flow into the tank; the valve closes when the pressures equalize. The tank initially contains either an ideal gas (N<sub>2</sub>), and more N<sub>2</sub> is added, or it contains a vapor-liquid mixture of water and superheated steam is added. Sliders change the pipe pressure and temperature and the initial tank pressure. The initial mass of water in the tank is 1 kg and that does not change when the initial tank pressure is changed with the slider. Initially the tank is at the saturation temperature of water at the initial pressure. Use the &#8220;valve (reset)&#8221; button to go back to the initial conditions before the valve was opened.",
+    "src": "https://demonstrations.wolfram.com/EnergyBalanceOnPressurizingATank/",
+    "simulation_type": "in-browser"
+  },
+  {
     "title": "Evaporative Cooling of Water",
     "href": "https://learncheme.github.io/demos/EvaporativeCoolingOfWater/dist/index.html",
     "image": "https://learncheme.com/wp-content/uploads/2024/06/evaporative-cooling-of-water.png",
@@ -864,12 +873,39 @@ window.simulation_list = [
     "simulation_type": "in-browser"
   },
   {
+    "title": "DePriester Chart for Hydrocarbons",
+    "href": "https://learncheme.github.io/demos/DePriesterChartForHydrocarbons",
+    "image": "https://learncheme.com/wp-content/uploads/2025/06/depriesterchartforhydrocarbons1.png",
+    "tooltip": "Nomogram to find VLE ratios for hydrocarbons",
+    "description": "<p>This simulation applies a DePriester chart, a set of nomograms, to find the vapor-liquid equilibrium ratio (the gas phase mole fraction divided by the liquid phase mole fraction,<br />known as the K-value) for a series of hydrocarbons. Select one of three hydrocarbons:<br />methane, propane, or n-decane. Use sliders to change the pressure and temperature; a<br />green line connects these two points. The green circle indicates where to read the K-value<br />on the chart, which is also displayed above the chart. The K-values for other hydrocarbons<br />can also be read from the chart.</p>",
+    "src": "https://learncheme.github.io/demos/DePriesterChartForHydrocarbons/index.html",
+    "simulation_type": "in-browser"
+  },
+  {
+    "title": "Gas-Phase Chemical Equilibrium at Constant P or V",
+    "href": "https://learncheme.github.io/demos/GasPhaseEquilibriumConstantPV/",
+    "image": "https://learncheme.com/wp-content/uploads/2025/05/GasPhaseChemicalEquilibriumatConstantPorV.png",
+    "tooltip": "Equilibrium for gas-phase reaction at constant pressure or constant volume",
+    "description": "<p>This simulation calculates the number of moles at equilibrium for a gas-phase reaction, A &#8211;&gt; rB, where A and B are ideal gases; the value of r (0.5, 1, 1.5, or 2) is selected with buttons. Initially the container is filled with 5 mol of reactant A, and equilibrium is obtained at either constant pressure (the pressure is set with a slider) or constant volume (the starting pressure is set with a slider). The bar graph displays the number of moles at equilibrium, including the moles of inert gas (the moles of inert are selected with a slider). The height of the piston is proportional to the final volume.</p>",
+    "src": "https://learncheme.github.io/demos/GasPhaseEquilibriumConstantPV/",
+    "simulation_type": "in-browser"
+  },
+  {
     "title": "Henry's Law for Gases Dissolved in Water",
     "href": "https://learncheme.github.io/demos/HenrysLawForGasesDissolvedInWater/dist/index.html",
     "image": "https://learncheme.com/wp-content/uploads/2024/07/henryslaw.png",
     "tooltip": "Mole fractions of gas dissolved in water as a function of temperature and pressure",
     "description": "<p>This simulation calculates the mole fractions of gases dissolved in water. Check &#8220;set temperature&#8221; to display mole fractions in a bar graph and set the temperature with a slider. Uncheck &#8220;set temperature&#8221; to plot mole fractions as a function of temperature and hover the cursor over a curve to see which gas it corresponds to. Only the gases whose boxes are checked are displayed. The mole fractions are calculated independently for each gas at the gas pressure (set with a slider).</p>",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/HenrysLawForGasesDissolvedInWater/",
+    "simulation_type": "in-browser"
+  },
+  {
+    "title": "Heterogeneous Chemical Equilibrium",
+    "href": "https://learncheme.github.io/demos/HeterogeneousChemicalEquilibrium/dist/",
+    "image": "https://learncheme.com/wp-content/uploads/2025/06/heterogeneouschemicalequilibrium1.png",
+    "tooltip": "Number of moles of solids and gas in equilibrium in a constant-volume container",
+    "description": "<p>Solid calcium carbonate (CaCO<sub>3</sub>) decomposes into solid calcium oxide (CaO) and gaseous carbon dioxide (CO<sub>2</sub>) in a constant-volume container at high temperatures. CO<sub>2</sub> is assumed to be an ideal gas, and the two solids are assumed to be in separate phases. You can vary the initial number of moles of CaCO<sub>3</sub>, CaO, and CO<sub>2</sub> in the constant-volume container using sliders; the container displays the equilibrium pressure as the color intensity of the gas phase increases as the number of moles of CO<sub>2</sub> increases. The bar graph on the right shows the number of moles present at equilibrium. The equilibrium constant K<sub>eq</sub> changes as the temperature changes using the slider. The equilibrium constant is equal to the CO<sub>2</sub> pressure (in bar) divided by the standard-state pressure of 1 bar. Note that adding more CaO when CaO is already in the container (or adding more CaCO<sub>3</sub> when CaCO<sub>3</sub> is already in the container) at equilibrium does not change equilibrium because increasing the number of moles of a pure solid does not change its fugacity.</p>",
+    "src": "https://learncheme.github.io/demos/HeterogeneousChemicalEquilibrium/dist/",
     "simulation_type": "in-browser"
   },
   {
