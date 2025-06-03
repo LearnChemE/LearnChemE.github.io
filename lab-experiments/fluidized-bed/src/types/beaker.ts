@@ -1,6 +1,8 @@
-import { vec2 } from "./globals";
+import { PUMP_FLOWRATE_GAIN, vec2 } from "./globals";
+import State from "../js/state";
+import { constrain } from "../js/helpers";
 
-export class Beaker {
+class Beaker {
     private element: HTMLElement;
     private coord: vec2;
     private dim: vec2;
@@ -23,23 +25,129 @@ export class Beaker {
         this.dim = vec2(w, h);
 
         // Set initial fill
-        this.update(initialVolume);
+        this.setVolume(initialVolume);
     }
 
     /**
      * Update rendering
-     * @param t Linear interpolant
+     * @param vol New volume of tank
      */
-    private update = (vol: number) => {
+    public setVolume = (vol: number) => {
         let coord = this.coord;
         let dim = this.dim;
         let e = this.element;
 
         this.volume = vol
-        vol /= 1000;
+        vol = constrain(vol / 1000, 0, 1);
 
         // Change the attributes
         e.setAttribute("y", `${coord.y + dim.y * (1 - vol)}`);
         e.setAttribute("height", `${dim.y * vol}`);
     }
+
+    /**
+     * Change the volume by a specific amount, accounting for bounds
+     * @param volToAdd amount of volume to add to beaker
+     */
+    public addVolume = (volToAdd: number) => {
+        let newVol = this.volume + volToAdd;
+        // TODO: set bounds on new volume
+
+        // Set the new volume
+        this.setVolume(newVol);
+    }
+
+    /**
+     * Get the current beaker volume
+     * @returns beaker volume
+     */
+    public getVolume = () => {
+        return this.volume;
+    }
+}
+
+// Some state enums
+const NOT_STARTED = 0;
+const FILLING_ANI = 1;
+const RECYCLE     = 2;
+const CATCH_WEIGH = 3;
+
+export class BeakerHolder {
+    private beakerL: Beaker;
+    private beakerR: Beaker;
+    private state: number = NOT_STARTED;
+    private callback: () => any | null;
+
+    constructor(catchAndWeighCallback?: () => any) {
+        this.beakerL = new Beaker("Beaker Fill", 1000);
+        this.beakerR = new Beaker("Beaker Fill_2", 0);
+        this.callback = catchAndWeighCallback;
+    }
+
+    private catchAndWeigh = async () => {
+        if (this.state !== CATCH_WEIGH) return;
+
+        let prevTime: number | null = null;
+
+        const frame = (time: number) => {
+            if (prevTime === null) prevTime = time;
+
+            // Calculate deltaTime
+            const deltaTime = time - prevTime;
+            prevTime = time;
+
+            // Set flowrate
+            let flowrate = State.valveLift * PUMP_FLOWRATE_GAIN * deltaTime / 1000;
+            this.beakerL.addVolume(-flowrate);
+            this.beakerR.addVolume( flowrate);
+            this.callback?.();
+
+            // Only request another frame if you are still in catch and weigh
+            if (this.state === CATCH_WEIGH) {
+                requestAnimationFrame(frame);
+            }
+        };
+
+        requestAnimationFrame(frame);
+    }
+
+    public setCatchWeighCallback = (callback: () => any | null) => {
+        this.callback = callback;
+    }
+
+    /**
+     * Set the current state of the beakers
+     * @param mode new mode
+     */
+    public setMode = (mode: number) => {
+        // Set the state
+        this.state = mode;
+
+        switch (mode) {
+            // Reset
+            case NOT_STARTED:
+                this.beakerL.setVolume(1000);
+                this.beakerR.setVolume(0);
+                break;
+
+            // Start animation
+            case FILLING_ANI:
+                // fillAnimation();
+                break;
+
+            // Recycle (do nothing)
+            case RECYCLE:
+                break;
+
+            // Catch and weigh mode
+            case CATCH_WEIGH:
+                this.catchAndWeigh();
+                break;
+
+            // Shouldn't ever reach here
+            default:
+                console.warn(`Unknown state enumerant passed to beakers: ${mode}`);
+                break;
+        }
+    };
 }

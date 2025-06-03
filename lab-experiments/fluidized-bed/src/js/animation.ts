@@ -1,4 +1,4 @@
-import { Beaker, BendDirection, BentTube, Manometer, StraightTube, Tube, TubeDirection, TubeGroup, ValveSetting, vec2 } from "../types";
+import { BeakerHolder, BendDirection, BentTube, Manometer, StraightTube, Tube, TubeDirection, TubeGroup, ValveSetting } from "../types";
 import State from "./state";
 
 // Tube Groups
@@ -13,8 +13,7 @@ var ExitTube:     TubeGroup;
 var manometer: Manometer;
 
 // Beakers
-var beakerL: Beaker;
-var beakerR: Beaker;
+export var beakers: BeakerHolder | null = null;
 
 /**
  * Initialize all of the animation objects. This must happen after the SVG is loaded
@@ -66,8 +65,8 @@ export function initAnimationObjects() {
     manometer = new Manometer();
 
     // Beakers
-    beakerL = new Beaker("Beaker Fill", 1000);
-    beakerR = new Beaker("Beaker Fill_2", 0);
+    beakers = new BeakerHolder();
+    beakers.setCatchWeighCallback(() => manometer.fillTubes());
 }
 
 
@@ -83,7 +82,7 @@ async function tubesFillAnimation() {
         await VenturiLeft.fill();
         manometer.fillLeftOnly();
         await VenturiRight.fill();
-        manometer.fillTubes();
+        manometer.initialFill();
         await UpperBase.fill();
         if (State.valveSetting === ValveSetting.RecycleMode) {
             await Recycle.fill();
@@ -119,12 +118,15 @@ export async function onLiftChange() {
 export async function swapValveAnimation(newSetting: ValveSetting) {
     if (!tubesAreFull) return;
 
+    // Swap the animation
     if (newSetting === ValveSetting.RecycleMode) {
         ExitTube.empty();
         Recycle.fill();
+        beakers.setMode(2); // RECYCLE
     }
     else {
         Recycle.empty();
         ExitTube.fill();
+        beakers.setMode(3); // CATCH_WEIGH
     }
 }

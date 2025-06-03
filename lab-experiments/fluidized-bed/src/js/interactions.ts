@@ -52,7 +52,6 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
         v1Angle += dth;
         v1Angle = constrain(v1Angle, -90, 0);
         valve1.setAttribute("transform", `rotate(${v1Angle} 129 83)`);
-        console.log(v1Angle)
         State.valveLift = rescale(v1Angle, -90, 0, 0, 1, true);
     };
     const release = () => {
@@ -85,10 +84,6 @@ valve2.addEventListener("mousedown", ({ clientX, clientY }) => {
         State.valveSetting = ValveSetting.RecycleMode;
     }
 
-    // Play animation
-    if (State.pumpIsRunning) {
-        swapValveAnimation(State.valveSetting);
-    }
 })
 
 /* ************************************** */

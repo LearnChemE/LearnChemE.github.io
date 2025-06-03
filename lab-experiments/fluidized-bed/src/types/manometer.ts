@@ -97,9 +97,23 @@ class VaryingTube {
      * @returns Promise<void> - Resolves with animation end
      */
     public setTarget = async (target: number) => {
-        console.log(`Setting target to: ${target}`);
         this.target = target;
         this.animate();
+        return;
+    }
+
+    /**
+     * Same as setTarget, but with a specified time delay
+     * @param target New target pressure
+     * @param timeDelay time before target is set
+     * @returns Promise<void>
+     */
+    public setTargetTimeDelay = async (target: number, timeDelay: number) => {
+        setTimeout(() => {
+            this.target = target;
+            this.animate();
+        }, timeDelay);
+        return;
     }
 
     /**
@@ -153,10 +167,12 @@ export class Manometer {
     // For converting to interpolant
     private bottom: number;
     private height: number;
+    // Track whether it's been filled initially
+    private init: boolean = false;
 
     constructor() {
-        this.inTube  = new VaryingTube( "Tube_6", TubeDirection.Left, 5000); // 6 for left
-        this.outTube = new VaryingTube("Tube_15", TubeDirection.Left, 5000); // 14 for right
+        this.inTube  = new VaryingTube( "Tube_6", TubeDirection.Left, 200000); // 6 for left
+        this.outTube = new VaryingTube("Tube_15", TubeDirection.Left, 200000); // 14 for right
 
         // Get the bounding box and use to find bottom and height of manometer tube section
         const rect = document.getElementById("Tube_16") as unknown as SVGAElement;
@@ -168,19 +184,22 @@ export class Manometer {
     }
 
     /**
-     * Fill the manometer according to the current parameters
+     * Fill the manometer according to the current parameters. If initialFill has not been called,
+     * returns immediately.
      * @param base 
      * @param pump 
      * @param dif 
      * @returns void promise
      */
     public fillTubes = async () => {
+        // If init hasn't been called, return
+        if (this.init === false) return;
+
         // Calculate height in pixels
-        const base = this.baseElement.getBBox().y;
-        // Add pump pressure. Sign should be negative because y pixels are 
-        const pump = pumpPressure();
-        var left = base - pump * 5;
-        console.log(base - left)
+        const base = this.baseElement.getBBox().y; // fill line of beaker
+        // Add pump pressure. Sign should be negative because y pixels go down, and multiply by 5 pixels per cm water
+        const pump = 5 * pumpPressure(); // pixels water
+        var left = base - pump;
         var right = left; // TODO: minus bed drop
 
         // Convert to 0-1 range for tube
@@ -188,8 +207,8 @@ export class Manometer {
         right = (this.bottom - right) / this.height;
 
         // Set the left tube only
-        this.inTube.setTarget(left);
-        this.outTube.setTarget(right);
+        this.inTube.setTargetTimeDelay(left, 1000);
+        this.outTube.setTargetTimeDelay(right, 1000);
         return;
     }
 
@@ -204,6 +223,16 @@ export class Manometer {
 
         // Set the left tube only
         this.inTube.setTarget(level);
+        return;
+    }
+
+    /**
+     * Call this function on the initial fill. Any calls to fillTubes will work after this.
+     * @returns void promise
+     */
+    public initialFill = async () => {
+        this.init = true;
+        this.fillTubes();
         return;
     }
 }

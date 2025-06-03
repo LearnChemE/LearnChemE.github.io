@@ -1,5 +1,5 @@
-import { GlobalState, Manometer, ValveSetting } from "../types";
-import { beginTubeFillAnimation, initAnimationObjects, onLiftChange } from "./animation";
+import { GlobalState, ValveSetting } from "../types";
+import { beginTubeFillAnimation, initAnimationObjects, onLiftChange, swapValveAnimation } from "./animation";
 
 /* ************************* */
 /* ** Create State Object ** */
@@ -10,7 +10,7 @@ const state: GlobalState = {
     apparatusDiv: undefined,
     valveSetting: ValveSetting.RecycleMode,
     pumpIsRunning: false,
-    valveLift: 10, // g / s
+    valveLift: 1,
 }
 
 // Insert an svg image 
@@ -58,7 +58,7 @@ const stateProxy = new Proxy(state, {
         }
         else if (prop === 'valveSetting') {
             // Valve 2 pressed
-            // toggle beaker volume changing
+            swapValveAnimation(value as ValveSetting);
         }
         else if (prop === 'pumpIsRunning') {
             // Pump button toggled
