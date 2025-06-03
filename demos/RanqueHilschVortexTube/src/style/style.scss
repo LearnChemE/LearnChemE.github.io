@@ -4,6 +4,7 @@ $modal-lg: 820px;
 $modal-xl: 1140px;
 @import "bootstrap";
 @import "./slider.scss"; // Keeping slider styling in place if needed for other inputs
+
 #graphics-container {
   position: relative;
   margin: auto;
@@ -15,10 +16,52 @@ $modal-xl: 1140px;
   width: min-content;
 }
 
-#p5-container {
+#graphics-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   position: relative;
-  margin: auto;
 }
+
+mjx-container {
+  font-size: 2.2vw !important;
+  font-family: 'Times New Roman', serif !important;
+  line-height: 1.2 !important;
+}
+
+@media (max-width: 768px) {
+  mjx-container {
+    font-size: 3.5vw !important;
+  }
+}
+
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#p5-outer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#p5-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 10px;
+}
+
 
 canvas {
   border-style: solid;
@@ -35,6 +78,128 @@ canvas {
   text-align: left;
   font-size: 0.9rem;
 }
+
+#formula-container {
+  position: absolute;
+  top: 8vh;
+  right: 6vw;
+  font-size: 2.2vw;
+  max-width: 90vw;
+  color: black;
+  text-align: right;
+}
+
+#formula1-container {
+  position: absolute;
+  top: 24vh;
+  right: 17vw;
+  font-size: 2.2vw;
+  max-width: 90vw;
+  color: black;
+  text-align: right;
+}
+
+#coldTemperature-container {
+  position: absolute;
+  bottom: 22vh;
+  left: 10vw;
+  font-size: 2.2vw;
+  max-width: 90vw;
+  color: black;
+  text-align: right;
+}
+
+#hotTemperature-container {
+  position: absolute;
+  bottom: 22vh;
+  right: 10vw;
+  font-size: 2.2vw;
+  max-width: 90vw;
+  color: black;
+  text-align: right;
+}
+
+#mf-container {
+  position: absolute;
+  top: 8vh;
+  left: 10vw;
+  font-size: 2.2vw;
+  max-width: 90vw;
+  color: black;
+  text-align: right;
+}
+
+#mc-container {
+  position: absolute;
+  bottom: 12vh;
+  left: 10vw;
+  font-size: 2.2vw;
+  max-width: 90vw;
+  color: black;
+  text-align: right;
+}
+
+#mh-container {
+  position: absolute;
+  bottom: 12vh;
+  right: 10vw;
+  font-size: 2.2vw;
+  max-width: 90vw;
+  color: black;
+  text-align: right;
+}
+
+#pressure-container {
+  position: absolute;
+  top: 2vh;
+  left: 10vw;
+  font-size: 2.2vw;
+  max-width: 90vw;
+  color: black;
+  text-align: right;
+}
+
+#cop-container {
+  position: absolute;
+  top: 2vh;
+  right: 6vw;
+  font-size: 2.2vw;
+  max-width: 90vw;
+  color: black;
+  text-align: right;
+}
+
+
+@media (max-width: 768px) {
+
+  #formula-container,
+  #formula1-container {
+    font-size: 3.5vw;
+    right: 2vw;
+  }
+}
+
+#controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding-top: 10px;
+}
+
+.slider-row-inline {
+  display: flex;
+  flex-direction: row;
+  gap: 6rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.slider-block {
+  display: flex;
+  align-items: center;
+}
+
 
 #hamburger {
   position: absolute;
@@ -88,6 +253,7 @@ canvas {
   border: 1px solid black;
   border-radius: 5px;
   padding: 15px;
+
   &>.btn {
     width: 110px;
   }
@@ -132,12 +298,30 @@ canvas {
   #hamburger-icon {
     padding: 6px;
   }
+
   #hamburger-icon>svg {
     width: 32px;
     height: 32px;
   }
+
   #buttons {
     top: 35px;
     padding: 15px;
   }
+}
+
+input[type="range"] {
+  max-width: 200px;
+  width: 100%;
+}
+
+.details-text,
+.details-eqn {
+  font-size: 1rem;
+  font-family: "Arial", sans-serif;
+  line-height: 1.4;
+}
+
+.details-eqn mjx-container {
+  font-size: 100% !important;
 }
