@@ -1,4 +1,4 @@
-// _dev/webpack.config.js
+// _dev/webpack.config.js (Modified)
 
 const path = require('path');
 const HtmlWebpackPlugin    = require('html-webpack-plugin');
@@ -25,10 +25,10 @@ module.exports = (env, argv) => {
     // 2) OUTPUT
     // ───────────────────────────────────────────────────────────────────────
     output: {
-      // Emit JS bundles into dist/js/
-      filename: 'js/[name].[contenthash].js',
+      // Emit JS bundles directly into dist/ (NO 'js/' prefix)
+      filename: '[name].[contenthash].js',
       path: path.resolve(__dirname, '../dist'),
-      publicPath: '/',    // Serve from the root of dist/
+      // publicPath: '/', // REMOVED - Will default to 'auto' in Webpack 5+
       clean: false,       // We’ll use CleanWebpackPlugin instead
     },
 
@@ -60,12 +60,11 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         // ───────────────────────────────────────────────────────────────────
-        // 5.1) SCSS → CSS (extract into dist/css/ in production)
+        // 5.1) SCSS → CSS (extract into dist/ in production)
         // ───────────────────────────────────────────────────────────────────
         {
           test: /\.(sa|sc|c)ss$/i,
           use: [
-            // In production, extract CSS to its own file. In development, use style-loader.
             isProd ? MiniCssExtractPlugin.loader : 'style-loader',
             'css-loader',
             'sass-loader',
@@ -84,10 +83,16 @@ module.exports = (env, argv) => {
         },
 
         // ───────────────────────────────────────────────────────────────────
-        // 5.3) IMAGES (SVG, PNG, JPG, GIF) → dist/assets/
+        // 5.3) IMAGES
         // ───────────────────────────────────────────────────────────────────
+        // SVGs handled to be loaded as strings (like in the "working" config example)
         {
-          test: /\.(svg|png|jpe?g|gif)$/i,
+          test: /\.svg$/i,
+          use: ['to-string-loader', 'html-loader'],
+        },
+        // Other images (PNG, JPG, GIF) → dist/assets/
+        {
+          test: /\.(png|jpe?g|gif)$/i,
           type: 'asset/resource',
           generator: {
             filename: 'assets/[name][ext]',
@@ -113,18 +118,14 @@ module.exports = (env, argv) => {
     // ───────────────────────────────────────────────────────────────────────
     plugins: [
       // ─────────────────────────────────────────────────────────────────────
-      // 6.1) HtmlWebpackPlugin will:
-      //   • Take src/html/index.html
-      //   • Inject <link rel="stylesheet" href="css/index.<hash>.css">
-      //     and <script src="js/index.<hash>.js"></script>
-      //   • Output it as dist/index.html
+      // 6.1) HtmlWebpackPlugin
       // ─────────────────────────────────────────────────────────────────────
       new HtmlWebpackPlugin({
         title: "Heterogeneous Chemical Equilibrium",
         filename: "index.html",
         template: path.resolve(__dirname, '../src/html/index.html'),
         scriptLoading: "blocking",
-        hash: true,
+        hash: true, // Consider removing if using [contenthash] in filenames, but keep if it was in your original working setup
         meta: {
           viewport:          "width=device-width, initial-scale=1, shrink-to-fit=no",
           keywords:          "LearnChemE, chemical engineering, engineering, simulation",
@@ -135,26 +136,24 @@ module.exports = (env, argv) => {
       }),
 
       // ─────────────────────────────────────────────────────────────────────
-      // 6.2) Extract CSS into its own file under dist/css/[name].[contenthash].css
+      // 6.2) Extract CSS into its own file under dist/ (NO 'css/' prefix for prod)
       // ─────────────────────────────────────────────────────────────────────
       new MiniCssExtractPlugin({
-        filename: isProd ? 'css/[name].[contenthash].css' : '[name].css',
+        filename: isProd ? '[name].[contenthash].css' : '[name].css',
       }),
 
       // ─────────────────────────────────────────────────────────────────────
-      // 6.3) Clean dist/ before each build, except keep dist/assets/ if needed
+      // 6.3) Clean dist/ before each build
       // ─────────────────────────────────────────────────────────────────────
       new CleanWebpackPlugin({
         cleanOnceBeforeBuildPatterns: [
           '**/*',
-          '!assets/**',
+          '!assets/**', // Keep assets if needed, this was in your original
         ],
       }),
 
       // ─────────────────────────────────────────────────────────────────────
-      // 6.4) CopyWebpackPlugin copies:
-      //   • src/html/overlay/ → dist/html/overlay/
-      //   • src/assets/        → dist/assets/
+      // 6.4) CopyWebpackPlugin (kept from your original config)
       // ─────────────────────────────────────────────────────────────────────
       new CopyWebpackPlugin({
         patterns: [
@@ -175,11 +174,10 @@ module.exports = (env, argv) => {
     // ───────────────────────────────────────────────────────────────────────
     optimization: isProd
       ? {
-          // Minify JS with Terser
           minimizer: [
             new TerserPlugin({
               parallel: true,
-              terserOptions: { compress: true },
+              terserOptions: { compress: true }, // Ensure this matches your TerserPlugin version's API if issues arise
             }),
           ],
           moduleIds: 'size',
@@ -191,7 +189,7 @@ module.exports = (env, argv) => {
           moduleIds: 'named',
           chunkIds: 'named',
           removeAvailableModules: false,
-          realContentHash: false,
+          realContentHash: false, // This was 'false' in your original, so kept it.
         },
   };
 };
