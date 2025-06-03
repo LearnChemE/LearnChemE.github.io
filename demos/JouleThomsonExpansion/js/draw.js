@@ -113,7 +113,7 @@ const tempScreenOffsetY = -3;
 const kelvinLabelOffsetX = 60;
 const kelvinLabelOffsetY = 4;
 const plugWidth = 5;
-const verticalPlugRectangles = 12;
+const verticalPlugRectangles = 5;
 const plugLineSpacing = 5;
 //let saturationIn = (state.inletTemperature - 55) / (1000 - 55);
 //let saturationOut = state.inlet / 70;
@@ -124,22 +124,22 @@ function porousPlug() {
 
   rect(state.xMid, state.yMid + 100, plugWidth, state.height * 0.3 - 20);
 
-  for (let i = 0; i < verticalPlugRectangles - (state.outletPressure - 0.0999999999) / 0.05; i++) {
+  for (let i = 0; i < verticalPlugRectangles - (state.outletPressure - 0.0999999999) / 0.05 + state.inletPressure * 5; i++) {
     rect(state.xMid - i * plugWidth, state.yMid + 100, plugWidth, state.height * 0.3 - 20);
     rect(state.xMid + i * plugWidth, state.yMid + 100, plugWidth, state.height * 0.3 - 20);
   }
 
   for (let i = 0; i * plugLineSpacing < state.height * 0.15; i++) {
     line(
-      state.xMid + plugWidth / 2 - (verticalPlugRectangles - (state.outletPressure - 0.1) / 0.05) * plugWidth,
+      state.xMid + plugWidth / 2 - (verticalPlugRectangles - (state.outletPressure - 0.0999999999) / 0.05 + state.inletPressure * 5) * plugWidth,
       state.yMid + 100 + i * plugLineSpacing,
-      state.xMid - plugWidth / 2 + (verticalPlugRectangles - (state.outletPressure - 0.1) / 0.05) * plugWidth,
+      state.xMid - plugWidth / 2 + (verticalPlugRectangles - (state.outletPressure - 0.0999999999) / 0.05 + state.inletPressure * 5) * plugWidth,
       state.yMid + 100 + i * plugLineSpacing
     );
     line(
-      state.xMid + plugWidth / 2 - (verticalPlugRectangles - (state.outletPressure - 0.1) / 0.05) * plugWidth,
+      state.xMid + plugWidth / 2 - (verticalPlugRectangles - (state.outletPressure - 0.0999999999) / 0.05 + state.inletPressure * 5) * plugWidth,
       state.yMid + 100 - i * plugLineSpacing,
-      state.xMid - plugWidth / 2 + (verticalPlugRectangles - (state.outletPressure - 0.1) / 0.05) * plugWidth,
+      state.xMid - plugWidth / 2 + (verticalPlugRectangles - (state.outletPressure - 0.0999999999) / 0.05 + state.inletPressure * 5) * plugWidth,
       state.yMid + 100 - i * plugLineSpacing
     );
   }
