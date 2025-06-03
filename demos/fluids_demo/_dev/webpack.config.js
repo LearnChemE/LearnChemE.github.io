@@ -11,6 +11,7 @@ module.exports = (env, argv) => {
   const isProd = argv.mode === 'production';
 
   return {
+    // Only show errors in console
     stats: 'errors-only',
 
     // ───────────────────────────────────────────────────────────────────────
@@ -24,14 +25,15 @@ module.exports = (env, argv) => {
     // 2) OUTPUT
     // ───────────────────────────────────────────────────────────────────────
     output: {
-      filename: '[name].[contenthash].js',
+      // Emit JS bundles into dist/js/
+      filename: 'js/[name].[contenthash].js',
       path: path.resolve(__dirname, '../dist'),
-      publicPath: '/',   // Serve everything under dist/ as “/…”
-      clean: false,      // We rely on CleanWebpackPlugin instead
+      publicPath: '/',    // Serve from the root of dist/
+      clean: false,       // We’ll use CleanWebpackPlugin instead
     },
 
     // ───────────────────────────────────────────────────────────────────────
-    // 3) SOURCE MAPS (only in dev)
+    // 3) SOURCE MAPS (dev only)
     // ───────────────────────────────────────────────────────────────────────
     devtool: isProd ? false : 'source-map',
 
@@ -57,17 +59,22 @@ module.exports = (env, argv) => {
     // ───────────────────────────────────────────────────────────────────────
     module: {
       rules: [
-        // ── 5.1) SCSS → CSS (extract in production; style-loader in dev)
+        // ───────────────────────────────────────────────────────────────────
+        // 5.1) SCSS → CSS (extract into dist/css/ in production)
+        // ───────────────────────────────────────────────────────────────────
         {
           test: /\.(sa|sc|c)ss$/i,
           use: [
+            // In production, extract CSS to its own file. In development, use style-loader.
             isProd ? MiniCssExtractPlugin.loader : 'style-loader',
             'css-loader',
             'sass-loader',
           ],
         },
 
-        // ── 5.2) FONTS & AUDIO & DOCUMENTS (TTF, WAV, DOCX, PDF)
+        // ───────────────────────────────────────────────────────────────────
+        // 5.2) FONTS & AUDIO & DOCS (TTF, WAV, DOCX, PDF) → dist/assets/
+        // ───────────────────────────────────────────────────────────────────
         {
           test: /\.(ttf|wav|docx|pdf)$/i,
           type: 'asset/resource',
@@ -76,7 +83,9 @@ module.exports = (env, argv) => {
           },
         },
 
-        // ── 5.3) IMAGES (SVG, PNG, JPG, GIF)
+        // ───────────────────────────────────────────────────────────────────
+        // 5.3) IMAGES (SVG, PNG, JPG, GIF) → dist/assets/
+        // ───────────────────────────────────────────────────────────────────
         {
           test: /\.(svg|png|jpe?g|gif)$/i,
           type: 'asset/resource',
@@ -85,7 +94,9 @@ module.exports = (env, argv) => {
           },
         },
 
-        // ── 5.4) HTML PARTIALS (only if you import them in JS; otherwise CopyPlugin handles)
+        // ───────────────────────────────────────────────────────────────────
+        // 5.4) HTML PARTIALS (overlay) if you import them → dist/html/overlay/
+        // ───────────────────────────────────────────────────────────────────
         {
           test: /\.html$/i,
           include: path.resolve(__dirname, '../src/html/overlay'),
@@ -101,7 +112,13 @@ module.exports = (env, argv) => {
     // 6) PLUGINS
     // ───────────────────────────────────────────────────────────────────────
     plugins: [
-      // ── 6.1) HtmlWebpackPlugin for main index.html
+      // ─────────────────────────────────────────────────────────────────────
+      // 6.1) HtmlWebpackPlugin will:
+      //   • Take src/html/index.html
+      //   • Inject <link rel="stylesheet" href="css/index.<hash>.css">
+      //     and <script src="js/index.<hash>.js"></script>
+      //   • Output it as dist/index.html
+      // ─────────────────────────────────────────────────────────────────────
       new HtmlWebpackPlugin({
         title: "Heterogeneous Chemical Equilibrium",
         filename: "index.html",
@@ -117,12 +134,16 @@ module.exports = (env, argv) => {
         },
       }),
 
-      // ── 6.2) Extract CSS into a separate file in production
+      // ─────────────────────────────────────────────────────────────────────
+      // 6.2) Extract CSS into its own file under dist/css/[name].[contenthash].css
+      // ─────────────────────────────────────────────────────────────────────
       new MiniCssExtractPlugin({
-        filename: isProd ? '[name].[contenthash].css' : '[name].css',
+        filename: isProd ? 'css/[name].[contenthash].css' : '[name].css',
       }),
 
-      // ── 6.3) Clean dist/ before each build (except keep dist/assets/ if you need)
+      // ─────────────────────────────────────────────────────────────────────
+      // 6.3) Clean dist/ before each build, except keep dist/assets/ if needed
+      // ─────────────────────────────────────────────────────────────────────
       new CleanWebpackPlugin({
         cleanOnceBeforeBuildPatterns: [
           '**/*',
@@ -130,17 +151,17 @@ module.exports = (env, argv) => {
         ],
       }),
 
-      // ── 6.4) Copy static folders:
-      //      • src/html/overlay → dist/html/overlay
-      //      • src/assets (images + pdfs + etc) → dist/assets
+      // ─────────────────────────────────────────────────────────────────────
+      // 6.4) CopyWebpackPlugin copies:
+      //   • src/html/overlay/ → dist/html/overlay/
+      //   • src/assets/        → dist/assets/
+      // ─────────────────────────────────────────────────────────────────────
       new CopyWebpackPlugin({
         patterns: [
-          // Copy overlay HTML partials
           {
             from: path.resolve(__dirname, '../src/html/overlay'),
             to:   path.resolve(__dirname, '../dist/html/overlay'),
           },
-          // Copy everything under src/assets → dist/assets
           {
             from: path.resolve(__dirname, '../src/assets'),
             to:   path.resolve(__dirname, '../dist/assets'),
@@ -154,12 +175,11 @@ module.exports = (env, argv) => {
     // ───────────────────────────────────────────────────────────────────────
     optimization: isProd
       ? {
+          // Minify JS with Terser
           minimizer: [
             new TerserPlugin({
               parallel: true,
-              terserOptions: {
-                compress: true,
-              },
+              terserOptions: { compress: true },
             }),
           ],
           moduleIds: 'size',
