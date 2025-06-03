@@ -5,6 +5,7 @@ export function handleInputs() {
   initializeHamburger();
   handleFeedPressure();
   handleFeedFraction();
+
 }
 
 function handleFeedPressure() {
