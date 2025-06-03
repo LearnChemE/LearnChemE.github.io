@@ -37,6 +37,7 @@
     "webpack-dev-server": "^5.2.1"
   },
   "devDependencies": {
+    "copy-webpack-plugin": "^13.0.0",
     "html-loader": "^5.1.0"
   }
 }
