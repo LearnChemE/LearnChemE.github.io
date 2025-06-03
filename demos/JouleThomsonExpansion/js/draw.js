@@ -115,6 +115,8 @@ const kelvinLabelOffsetY = 4;
 const plugWidth = 5;
 const verticalPlugRectangles = 12;
 const plugLineSpacing = 5;
+//let saturationIn = (state.inletTemperature - 55) / (1000 - 55);
+//let saturationOut = state.inlet / 70;
 
 function porousPlug() {
   push();
@@ -355,9 +357,10 @@ function throttleFigureAndPressureGauges() {
 
   //--------------------gas inside the pipe--------------------
   push();
-  fill(255, 255 - (255 * state.inletTemperature) / 1200, 255 - (255 * state.inletTemperature) / 1200); //gas color in
+  //fill(255, 255*1-);
+  fill(255, 50 + (0.75 - state.inletPressure / 8) * 205, 50 + (0.75 - state.inletPressure / 8) * 205); //gas color in
   rect(state.xMid / 2 + 25, state.yMid + 100, (state.width - 100) / 2, state.height * 0.3);
-  fill(255, 255 - (255 * state.outletTemperature) / 1200, 255 - (255 * state.outletTemperature) / 1200); //gas color out
+  fill(255, 50 + (0.75 - state.outletPressure / 8) * 205, 50 + (0.75 - state.outletPressure / 8) * 205); //gas color out */
   rect((3 * state.xMid) / 2 - 25, state.yMid + 100, (state.width - 100) / 2, state.height * 0.3);
   pop();
 
@@ -386,7 +389,7 @@ function throttleFigureAndPressureGauges() {
   rect(state.width / 8 + 15, state.yMid - 100, state.width / 8 - 35, state.yMid - 64);
   fill("black");
   rect(state.width / 8 + 4, state.yMid - 100, state.width / 8 - 24, state.yMid + 1);
-  fill(255, 255 - (255 * state.inletTemperature) / 1200, 255 - (255 * state.inletTemperature) / 1200); //gas color in
+  fill(255, 50 + (0.75 - state.inletPressure / 8) * 205, 50 + (0.75 - state.inletPressure / 8) * 205); //gas color in
   rect(state.width / 8, state.yMid - 100, state.width / 8 - 20, state.yMid + 4);
   rectMode(CENTER);
   fill("gray");
@@ -468,7 +471,7 @@ function throttleFigureAndPressureGauges() {
   rect(state.width / 8 + 15, state.yMid - 100, state.width / 8 - 35, state.yMid - 64);
   fill("black");
   rect(state.width / 8 + 4, state.yMid - 100, state.width / 8 - 24, state.yMid + 1);
-  fill(255, 255 - (255 * state.outletTemperature) / 1200, 255 - (255 * state.outletTemperature) / 1200); //gas color out
+  fill(255, 50 + (0.75 - state.outletPressure / 8) * 205, 50 + (0.75 - state.outletPressure / 8) * 205); //gas color out
   rect(state.width / 8, state.yMid - 100, state.width / 8 - 20, state.yMid + 4);
   rectMode(CENTER);
   fill("gray");
