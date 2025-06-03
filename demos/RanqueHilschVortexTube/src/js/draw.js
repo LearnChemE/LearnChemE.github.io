@@ -1,5 +1,5 @@
 export function drawAll() {
-  
+
   // -----------longer waves---------------
   push();
   noFill();
@@ -16,13 +16,13 @@ export function drawAll() {
     const x = 53 + i / 15;
     const y = height / 2 + 10.5 * sin(radians(i * 3));
     stroke(lerpColorStops(t, colorStops1));
-    point(x, y,x+1,y+1);
+    point(x, y, x + 1, y + 1);
   }
   pop();
 
   //--------------elongated line-----------------
   push();
-  stroke(90, 173, 233); 
+  stroke(90, 173, 233);
   strokeWeight(1);
   line(51.5, 27, 53, 50);
   pop();
@@ -41,10 +41,10 @@ export function drawAll() {
   ];
   for (let i = 0; i < 1000; i++) {
     const t0 = i / 1000;
-    const x =  39 + i / 13;
+    const x = 39 + i / 13;
     const y = height / 2 + 3.5 * sin(radians(i * 4.5));
     stroke(lerpColorStops(t0, colorStops));
-    point(x, y,x+1,y+1);
+    point(x, y, x + 1, y + 1);
   }
   pop();
 
@@ -65,64 +65,64 @@ export function drawAll() {
 
 
   //lines for upper vortex borders
-  stroke(0); 
+  stroke(0);
   strokeWeight(1);
-  line(20,38,42,38);
-  line(42,38,42,34);
-  line(42,34,44,34);
-  line(44,34,44,25);
-  line(44,25,49,25);
-  line(54,25,59,25);
-  line(59,25,59,34);
-  line(59,34,61,34);
-  line(61,34,61,36);
-  line(61,36,122,36);
-  line(122,36,122,39);
+  line(20, 38, 42, 38);
+  line(42, 38, 42, 34);
+  line(42, 34, 44, 34);
+  line(44, 34, 44, 25);
+  line(44, 25, 49, 25);
+  line(54, 25, 59, 25);
+  line(59, 25, 59, 34);
+  line(59, 34, 61, 34);
+  line(61, 34, 61, 36);
+  line(61, 36, 122, 36);
+  line(122, 36, 122, 39);
 
   //--------------lines for lower vortex borders------------------
-  line(122,61,122,64);
-  line(61,64,122,64);
-  line(61,64,61,66);
-  line(44,66,61,66);
-  line(43,66,61,66);
-  line(43,62,43,66);
-  line(20,62,43,62);
+  line(122, 61, 122, 64);
+  line(61, 64, 122, 64);
+  line(61, 64, 61, 66);
+  line(44, 66, 61, 66);
+  line(43, 66, 61, 66);
+  line(43, 62, 43, 66);
+  line(20, 62, 43, 62);
 
   //--------------vertical lines----------------------
-  line(38,62,38,53);
-  line(38,38,38,47);
+  line(38, 62, 38, 53);
+  line(38, 38, 38, 47);
 
   //------------------TOP ARROW-----------------------
-  line(29,18,51,18);
+  line(29, 18, 51, 18);
   drawDownArrow(51, 17.5);
   function drawDownArrow(x, y, shaftLen = 6, headHeight = 3, headWidth = 3) {
     push();
     fill(0);
     strokeJoin(ROUND);
     strokeWeight(1);
-  
-    rect(x+0.2, y+0.6, 0.1, shaftLen);
-  
+
+    rect(x + 0.2, y + 0.6, 0.1, shaftLen);
+
     beginShape();
-    vertex(x+0.5, y + shaftLen-1 + headHeight); // tip
-    vertex(x+0.5 - headWidth / 2, y + shaftLen); // left base
-    vertex(x+0.5 + headWidth / 2, y + shaftLen); // right base
+    vertex(x + 0.5, y + shaftLen - 1 + headHeight); // tip
+    vertex(x + 0.5 - headWidth / 2, y + shaftLen); // left base
+    vertex(x + 0.5 + headWidth / 2, y + shaftLen); // right base
     endShape(CLOSE);
-  
+
     pop();
   }
-  
+
 
   //----------------------left arrows------------------------
   push();
   stroke(0, 0, 255);
-  strokeWeight(1); 
-  fill(0, 0, 255);  
+  strokeWeight(1);
+  fill(0, 0, 255);
 
   const baseX = 37;
   const baseY = height / 2;
   const arrowLen = 18 + (state.P * 0.08) * 2 + state.z * 0.4;
-  const offsetY = 1.5; 
+  const offsetY = 1.5;
 
   for (let i = -1; i <= 1; i++) {
     const y = baseY + i * offsetY;
@@ -171,7 +171,7 @@ export function drawAll() {
 
   const horizontalOffset = 120;
   const verticalSpread = 8;
-  const spreadAngle = radians(26); 
+  const spreadAngle = radians(26);
 
   for (let dir of [-1, 1]) {
     const angle = dir * spreadAngle;
@@ -210,5 +210,5 @@ export function drawAll() {
 }
 
 if (window.MathJax) {
-     MathJax.typesetPromise();
-  }
+  MathJax.typesetPromise();
+}
