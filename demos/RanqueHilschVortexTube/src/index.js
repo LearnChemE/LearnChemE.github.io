@@ -18,34 +18,38 @@ window.state = {
 
 const containerElement = document.getElementById("p5-container");
 
-window.setup = function() {
+window.setup = function () {
   sizeContainer();
-  createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
+  createCanvas(containerElement.offsetWidth, containerElement.offsetHeight - 10).parent(containerElement);
   handleInputs();
+  if (window.MathJax) MathJax.typesetPromise();
   calcAll();
   pixelDensity(state.pixelDensity);
   frameRate(state.frameRate);
 };
 
-window.draw = function() {
+window.draw = function () {
   window.width = state.canvasSize[0];
   window.height = state.canvasSize[1];
   scale(relativeSize());
   background(255);
-  calcAll();
+  //calcAll();
   drawAll();
 };
 
 window.windowResized = () => {
+  sizeContainer(); // recalculate container size
   resizeCanvas(containerElement.offsetWidth, containerElement.offsetHeight);
 }
+
 
 window.relativeSize = () => containerElement.offsetWidth / state.canvasSize[0];
 
 function sizeContainer() {
   containerElement.style.width = `calc(100vw - 10px)`;
   containerElement.style.maxWidth = `calc(calc(100vh - 10px) * ${state.canvasSize[0]} / ${state.canvasSize[1]})`;
-  containerElement.style.height = `calc(calc(100vw - 10px) * ${state.canvasSize[1]} / ${state.canvasSize[0]})`;
+  //containerElement.style.height = `calc(calc(100vw - 10px) * ${state.canvasSize[1]} / ${state.canvasSize[0]})`;
+  containerElement.style.height = `calc(calc(100vw - 100px) * ${state.canvasSize[1]} / ${state.canvasSize[0]} - 100px)`;
   containerElement.style.maxHeight = `calc(100vh - 10px)`;
 }
 
