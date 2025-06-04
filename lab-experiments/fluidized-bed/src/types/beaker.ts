@@ -84,6 +84,33 @@ export class BeakerHolder {
         this.callback = catchAndWeighCallback;
     }
 
+    private fillAnimation = async () => {
+        if (this.state !== FILLING_ANI) return;
+
+        let prevTime: number | null = null;
+
+        const frame = (time: number) => {
+            if (prevTime === null) prevTime = time;
+
+            // Calculate deltaTime
+            const deltaTime = time - prevTime;
+            prevTime = time;
+
+            // Set flowrate
+            let flowrate = State.valveLift * PUMP_FLOWRATE_GAIN * deltaTime / 1000;
+            console.log(flowrate)
+            this.beakerL.addVolume(-flowrate);
+            this.callback?.();
+
+            // Only request another frame if you are still in catch and weigh
+            if (this.state === FILLING_ANI) {
+                requestAnimationFrame(frame);
+            }
+        };
+        
+        requestAnimationFrame(frame);
+    }
+
     private catchAndWeigh = async () => {
         if (this.state !== CATCH_WEIGH) return;
 
@@ -132,7 +159,7 @@ export class BeakerHolder {
 
             // Start animation
             case FILLING_ANI:
-                // fillAnimation();
+                this.fillAnimation();
                 break;
 
             // Recycle (do nothing)

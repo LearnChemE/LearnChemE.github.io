@@ -1,5 +1,4 @@
 import { ValveSetting, vec2 } from "../types";
-import { beginTubeFillAnimation, swapValveAnimation } from "./animation";
 import { constrain, rescale, smoothLerp } from "./helpers";
 import State from "./state";
 
@@ -52,7 +51,7 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
         v1Angle += dth;
         v1Angle = constrain(v1Angle, -90, 0);
         valve1.setAttribute("transform", `rotate(${v1Angle} 129 83)`);
-        State.valveLift = rescale(v1Angle, -90, 0, 0, 1, true);
+        State.valveLift = rescale(v1Angle, -90, 0, 0.05, 1, true);
     };
     const release = () => {
         document.removeEventListener("mousemove", drag);

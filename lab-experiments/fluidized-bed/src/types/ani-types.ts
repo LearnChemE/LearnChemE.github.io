@@ -13,11 +13,18 @@ export enum TubeDirection {
 }
 
 /**
+ * Modifiable speed object type
+ */
+export type SpeedModifier = {
+    value: number;
+}
+
+/**
  * Base class for animated tubes.
  */
 export interface Tube {
-    fill : (t: number) => Promise<void>;
-    empty: (t: number) => Promise<void>;
+    fill : (t: number | SpeedModifier) => Promise<void>;
+    empty: (t: number | SpeedModifier) => Promise<void>;
 }
 
 /**
@@ -31,13 +38,13 @@ export class TubeGroup implements Tube {
         this.tubeMap = new Map(tubeData);
     }
 
-    public async fill() {
+    public async fill(speed: SpeedModifier) {
         for (const [tube, duration] of this.tubeMap) {
-            await tube.fill(duration);
+            await tube.fill(duration / speed.value);
         }
     }
 
-    public async empty() {
+    public async empty(speed: SpeedModifier) {
         for (const [tube, duration] of this.tubeMap) {
             await tube.empty(duration);
         }

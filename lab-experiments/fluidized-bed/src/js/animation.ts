@@ -77,18 +77,33 @@ export function initAnimationObjects() {
 var tubesAreFull = false;
 async function tubesFillAnimation() {
     if (!tubesAreFull) {
-        tubesAreFull = true;
-        await LowerTubes.fill();
-        await VenturiLeft.fill();
+        // Start beaker drain
+        beakers.setMode(1);
+        const spd = {value: State.valveLift};
+
+        // Play each animation
+        await LowerTubes.fill(spd);
+        await VenturiLeft.fill(spd);
         manometer.fillLeftOnly();
-        await VenturiRight.fill();
+        await VenturiRight.fill(spd);
         manometer.initialFill();
-        await UpperBase.fill();
+        await UpperBase.fill(spd);
         if (State.valveSetting === ValveSetting.RecycleMode) {
-            await Recycle.fill();
+            await Recycle.fill(spd);
         }
         else {
-            await ExitTube.fill();
+            await ExitTube.fill(spd);
+        }
+
+        // now let the user do stuff
+        tubesAreFull = true;
+
+        // Set beaker state
+        if (State.valveSetting == ValveSetting.RecycleMode) {
+            beakers.setMode(2);
+        }
+        else {
+            beakers.setMode(3);
         }
     }
 }
@@ -117,16 +132,17 @@ export async function onLiftChange() {
  */
 export async function swapValveAnimation(newSetting: ValveSetting) {
     if (!tubesAreFull) return;
+    const spd = {value: State.valveLift};
 
     // Swap the animation
     if (newSetting === ValveSetting.RecycleMode) {
-        ExitTube.empty();
-        Recycle.fill();
+        ExitTube.empty(spd);
+        Recycle.fill(spd);
         beakers.setMode(2); // RECYCLE
     }
     else {
-        Recycle.empty();
-        ExitTube.fill();
+        Recycle.empty(spd);
+        ExitTube.fill(spd);
         beakers.setMode(3); // CATCH_WEIGH
     }
 }
