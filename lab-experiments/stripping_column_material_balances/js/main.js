@@ -208,7 +208,7 @@ function drawCanvas() {
   drawTexts();
   // createConnectedGauges(655, 195, "1")
   gasImage = addSVGImage('./assets/gasFlowRateDevice.svg', 700, 247.5, 800/3, 200);
-  gasFlowRateText = drawCenteredText(805, 295, "0 mol/s", 17, 'black', 'Arial', 'black', 0.4);
+  gasFlowRateText = drawCenteredText(809, 295, "0 mol/s", 14, 'black', 'Arial', 'black', 0.4);
   drawCenteredText(795, 377, "gas flow rate", 12, 'white', 'Arial', 'white', 0.7)
   addOptionToDragAndZoom();
   
@@ -644,7 +644,7 @@ function drawGasValves() {
         delay += duration + pipeDelay;
         if (pipe === rightPipe4) {
           setTimeout(() => {
-            gasFlowRateText.text("1 mol/s");
+            gasFlowRateText.text("0.01 mol/s");
             gasFlowRateText.front();    // bring it to the top
           }, duration * 8);
         }
