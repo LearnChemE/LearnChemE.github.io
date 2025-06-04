@@ -22,6 +22,7 @@
 
     gtag('config', 'UA-204988035-3');
   </script>
+
 </head>
 
 <body>
@@ -29,34 +30,34 @@
   <div id="graphics-container">
     <div id="outer-container">
       <div id="controls">
-        <div class="slider-row-inline">
-          <div class="slider-block">
-            <label for="feed-pressure-slider">feed pressure (bar, absolute)</label>
-            <input type="range" id="feed-pressure-slider" min="2.4" max="7.8" step="0.1" value="5">
-            <span id="feed-pressure-value">5</span>
-          </div>
+        <!-- NOTE: class="slider-group" uses a plain ASCII hyphen (U+002D), NOT a "fancy" hyphen -->
+        <div class="slider-group">
+          <label for="feed-pressure-slider">feed pressure (bar, absolute)</label>
+          <input type="range" id="feed-pressure-slider" min="2.4" max="7.8" step="0.1" value="5" />
+          <span id="feed-pressure-value">5</span>
+        </div>
 
-          <div class="slider-block">
-            <label for="fraction-feed-slider">fraction of feed in cold stream</label>
-            <input type="range" id="fraction-feed-slider" min="0.2" max="0.8" step="0.01" value="0.5">
-            <span id="fraction-feed-value">0.4</span>
-          </div>
+        <div class="slider-group">
+          <label for="fraction-feed-slider">fraction of feed in cold stream</label>
+          <input type="range" id="fraction-feed-slider" min="0.2" max="0.8" step="0.01" value="0.4" />
+          <span id="fraction-feed-value">0.4</span>
         </div>
       </div>
+
       <div id="p5-outer">
 
         <div id="p5-container">
-
-          <div id="formula-container"></div>
-          <div id="formula1-container"></div>
-          <div id="coldTemperature-container"></div>
-          <div id="hotTemperature-container"></div>
-          <div id="mf-container"></div>
-          <div id="mh-container"></div>
-          <div id="mc-container"></div>
-          <div id="pressure-container"></div>
-          <div id="cop-container"></div>
-
+          <div id="mathsection">
+            <div id="formula-container"></div>
+            <div id="formula1-container"></div>
+            <div id="coldTemperature-container"></div>
+            <div id="hotTemperature-container"></div>
+            <div id="mf-container"></div>
+            <div id="mh-container"></div>
+            <div id="mc-container"></div>
+            <div id="pressure-container"></div>
+            <div id="cop-container"></div>
+          </div>
           <span id="hot-temp"></span>
           <span id="cold-temp"></span>
           <span id="cop-value"></span>
@@ -182,7 +183,7 @@
             </p>
 
             <p class="details-text">
-              where subscript i may be replaced by either c or h
+              where subscript i may be replaced by either c or h.
             </p>
           </div>
         </div>

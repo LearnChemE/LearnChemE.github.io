@@ -3,7 +3,7 @@ $modal-md: calc(100vw - 50px);
 $modal-lg: 820px;
 $modal-xl: 1140px;
 @import "bootstrap";
-@import "./slider.scss"; // Keeping slider styling in place if needed for other inputs
+@import "./slider.scss";
 
 #graphics-container {
   position: relative;
@@ -23,9 +23,14 @@ $modal-xl: 1140px;
   position: relative;
 }
 
+mjx-container,
+mjx-container * {
+  font-family: Arial, sans-serif !important;
+}
+
 mjx-container {
   font-size: 2.2vw !important;
-  font-family: 'Times New Roman', serif !important;
+  font-family: 'Arial', sans-serif !important;
   line-height: 1.2 !important;
 }
 
@@ -41,8 +46,8 @@ body {
   margin: 0;
   padding: 0;
   width: 100vw;
-  height: 100vh;
   overflow: hidden;
+  font-family: Arial, sans-serif !important;
 }
 
 #p5-outer {
@@ -50,8 +55,11 @@ body {
   justify-content: center;
   align-items: center;
   width: 100vw;
-  height: 100vh;
+  //height: 100vh;
+  height: auto;
   overflow: hidden;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 #p5-container {
@@ -59,7 +67,17 @@ body {
   align-items: center;
   justify-content: center;
   position: relative;
-  margin-bottom: 10px;
+  margin-bottom: 0;
+  margin-top: 0;
+  padding-top: 0;
+  font-family: Arial, sans-serif;
+  width: 95vw;
+  height: 60vh;
+  overflow: visible;
+}
+
+#mathsection mjx-container {
+  font-family: Arial, sans-serif !important;
 }
 
 
@@ -81,18 +99,19 @@ canvas {
 
 #formula-container {
   position: absolute;
-  top: 8vh;
-  right: 6vw;
+  top: 6vh;
+  right: 5vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
   text-align: right;
+  font-family: Arial, sans-serif;
 }
 
 #formula1-container {
   position: absolute;
-  top: 24vh;
-  right: 17vw;
+  top: -1vh;
+  left: 7vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -101,8 +120,8 @@ canvas {
 
 #coldTemperature-container {
   position: absolute;
-  bottom: 22vh;
-  left: 10vw;
+  bottom: 10vh;
+  left: 7vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -111,7 +130,7 @@ canvas {
 
 #hotTemperature-container {
   position: absolute;
-  bottom: 22vh;
+  bottom: 10vh;
   right: 10vw;
   font-size: 2.2vw;
   max-width: 90vw;
@@ -121,8 +140,8 @@ canvas {
 
 #mf-container {
   position: absolute;
-  top: 8vh;
-  left: 10vw;
+  top: 11vh;
+  left: 7vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -131,8 +150,8 @@ canvas {
 
 #mc-container {
   position: absolute;
-  bottom: 12vh;
-  left: 10vw;
+  bottom: 4vh;
+  left: 6.5vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -141,8 +160,8 @@ canvas {
 
 #mh-container {
   position: absolute;
-  bottom: 12vh;
-  right: 10vw;
+  bottom: 4vh;
+  right: 6.5vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -151,8 +170,8 @@ canvas {
 
 #pressure-container {
   position: absolute;
-  top: 2vh;
-  left: 10vw;
+  top: 6vh;
+  left: 7vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -161,8 +180,8 @@ canvas {
 
 #cop-container {
   position: absolute;
-  top: 2vh;
-  right: 6vw;
+  top: 3vh;
+  right: 2vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -181,30 +200,55 @@ canvas {
 
 #controls {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  width: 100%;
-  padding-top: 10px;
+  width: 90%;
+  max-width: 800px;
+  margin: 1rem auto;
+  padding: 0;
 }
 
-.slider-row-inline {
+#controls>.slider-group {
+  flex: 0 0 auto !important;
+  margin: 0 1rem;
+}
+
+.slider-group input[type="range"] {
+  flex: 1 1 auto;
+  margin: 0 0.5rem;
+  max-width: 300px;
+}
+
+
+.slider-group span {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 2.0vh;
+  margin-left: 0.5rem;
+}
+
+.slider-group {
   display: flex;
-  flex-direction: row;
-  gap: 6rem;
-  justify-content: center;
+  flex-wrap: nowrap;
   align-items: center;
+  justify-content: flex-start;
+  flex: 1 1 40vw;
+  min-width: 250px;
+  margin: 1vh 1vw;
+  gap: 1rem;
 }
 
-.slider-block {
-  display: flex;
-  align-items: center;
+.slider-group label {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 2.0vh;
+  margin-right: 0.5rem;
 }
-
 
 #hamburger {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 15px;
+  left: 15px;
   z-index: 1000;
   width: max-content;
   height: max-content;
@@ -243,7 +287,8 @@ canvas {
   display: grid;
   grid-template-columns: max-content;
   width: max-content;
-  top: 25px;
+  top: 40px;
+  left: 0px;
   display: none;
   justify-items: center;
   margin-top: 20px;
@@ -267,13 +312,17 @@ canvas {
   left: 50%;
   transform: translateX(-50%);
   gap: 20px;
+  padding-top: 0;
+  padding-bottom: 0%;
 }
 
 .slider-container {
   display: grid;
   grid-template-columns: max-content 150px 30px;
-  align-items: end;
+  align-items: center;
   gap: 5px;
+  padding-top: 0;
+  padding-bottom: 0%;
 }
 
 .disabled {
