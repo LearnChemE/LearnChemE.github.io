@@ -121,7 +121,7 @@ let streamComp = {
   Y1: result.y1.toFixed(1),
   Y2: result.y2.toFixed(1),
   Y3: result.y3.toFixed(2),
-  Y4: y4.toFixed(2),
+  Y4: y4.toFixed(1),
   X0: x0.toFixed(2),
   X1: result.x1.toFixed(2),
   X2: result.x2.toFixed(2),
