@@ -1,0 +1,169 @@
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+}
+
+#simulation-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100vw;
+  height: min-content;
+  gap: 10px;
+  padding: 10px;
+}
+
+.inputs-wrapper {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 40px;
+  align-items: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  width: 700px;
+}
+
+.buttons-wrapper {
+  display: grid;
+  gap: 5px;
+}
+
+.buttons-wrapper>.btn {
+  width: 83px;
+  padding: 3px 5px;
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: 180px max-content;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5px;
+  width: 100%;
+}
+
+.slider-container {
+  display: grid;
+  grid-template-columns: 240px 30px 30px;
+  align-items: center;
+  gap: 5px;
+}
+
+.current-value {
+  text-align: end;
+}
+
+.input-label {
+  font-weight: bold;
+  font-size: 14px;
+  justify-self: end;
+}
+
+.value-label {
+  font-size: 14px;
+  text-align: right;
+  width: 40px;
+}
+
+#graphics-wrapper {
+  position: relative;
+  margin: auto;
+  box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.min-max-labels {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #666;
+}
+
+input[type="range"] {
+  width: 100%;
+  margin: 0;
+  /* Remove default margins */
+}
+
+.mixture-data table {
+  width: 700px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+.mixture-data th,
+.mixture-data td {
+  border: 1px solid #ccc;
+  padding: 5px;
+  text-align: center;
+}
+
+.mixture-data th:first-child,
+.mixture-data td:first-child {
+  width: 70%;
+  /* Keep the Output column wider */
+  text-align: center;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.mixture-data th:last-child,
+.mixture-data td:last-child {
+  width: 30%;
+  /* Keep the Value column narrower */
+}
+
+.mixture-data th {
+  font-size: 14px;
+  background-color: #f5f5f5;
+}
+
+.mixture-data input {
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  padding: 2px;
+  border: 1px solid #eee;
+  background-color: #f9f9f9;
+  border-radius: 3px;
+}
+
+
+/* Make disabled inputs look cleaner */
+
+.mixture-data input:disabled {
+  color: #333;
+  border: none;
+  background-color: #f9f9f9;
+}
+
+
+/* Add this to your CSS */
+
+.disclaimer {
+  color: #d9534f;
+  /* Red color */
+  font-size: 14px;
+  font-style: italic;
+  text-align: center;
+  margin-top: 10px;
+  width: 700px;
+  /* Match width of other elements */
+  padding: 5px;
+  border-top: 1px dashed #d9534f;
+  /* Light red dashed border on top */
+  border-bottom: 1px dashed #d9534f;
+  /* Light red dashed border on bottom */
+}
+
+.box-eqn {
+  margin-left: 15px;
+}
