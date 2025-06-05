@@ -46,7 +46,7 @@ initAnimationObjects();
 // Only expose a proxy for protection
 const stateProxy = new Proxy(state, {
     set(target: GlobalState, prop: keyof GlobalState, value: GlobalState[keyof GlobalState]) {
-        console.log(`Setting ${prop} to value ${value}`);
+        // console.log(`Setting ${prop} to value ${value}`); // Useful for debug
 
         // For some reason using the actual types always returns 'never' for GlobalState[keyof GlobalState]?
         // So I just cast to any because it should work this way by definition

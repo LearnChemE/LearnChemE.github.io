@@ -98,7 +98,6 @@ export class BeakerHolder {
 
             // Set flowrate
             let flowrate = State.valveLift * PUMP_FLOWRATE_GAIN * deltaTime / 1000;
-            console.log(flowrate)
             this.beakerL.addVolume(-flowrate);
             this.callback?.();
 

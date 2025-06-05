@@ -51,7 +51,11 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
         v1Angle += dth;
         v1Angle = constrain(v1Angle, -90, 0);
         valve1.setAttribute("transform", `rotate(${v1Angle} 129 83)`);
-        State.valveLift = rescale(v1Angle, -90, 0, 0.05, 1, true);
+
+        // Set state after a time delay
+        setTimeout(() => {
+            State.valveLift = rescale(v1Angle, -90, 0, 0.05, 1, true);
+        }, 500);
     };
     const release = () => {
         document.removeEventListener("mousemove", drag);

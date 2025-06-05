@@ -13,18 +13,11 @@ export enum TubeDirection {
 }
 
 /**
- * Modifiable speed object type
- */
-export type SpeedModifier = {
-    value: number;
-}
-
-/**
  * Base class for animated tubes.
  */
 export interface Tube {
-    fill : (t: number | SpeedModifier) => Promise<void>;
-    empty: (t: number | SpeedModifier) => Promise<void>;
+    fill : (t: number) => Promise<void>;
+    empty: (t: number) => Promise<void>;
 }
 
 /**
@@ -38,13 +31,14 @@ export class TubeGroup implements Tube {
         this.tubeMap = new Map(tubeData);
     }
 
-    public async fill(speed: SpeedModifier) {
+    public async fill() {
+
         for (const [tube, duration] of this.tubeMap) {
-            await tube.fill(duration / speed.value);
+            await tube.fill(duration);
         }
     }
 
-    public async empty(speed: SpeedModifier) {
+    public async empty() {
         for (const [tube, duration] of this.tubeMap) {
             await tube.empty(duration);
         }
@@ -61,8 +55,9 @@ export class StraightTube implements Tube {
     private coord: vec2;
     private dim: vec2;
     private current: number;
+    private duration: number;
 
-    constructor(id: string, dir: TubeDirection) {
+    constructor(id: string, dir: TubeDirection, duration: number = 1) {
         // Get the element
         let e: HTMLElement = document.getElementById(id);
         // Get coordinates
@@ -78,6 +73,7 @@ export class StraightTube implements Tube {
         this.coord = vec2(x, y);
         this.dim = vec2(w, h);
         this.current = 0;
+        this.duration = duration;
 
         // Hide by default
         this.update(0);
@@ -140,7 +136,7 @@ export class StraightTube implements Tube {
      * @returns Promise<void> - Resolves with animation end
      */
     public async fill(duration: number) {
-        return smoothLerp(duration, (t) => {this.update(t)});
+        return smoothLerp(duration, (t) => this.update(t), 0, 1, true);
     }
 
     /**
@@ -149,7 +145,7 @@ export class StraightTube implements Tube {
      * @returns Promise<void> - Resolves with animation end
      */
     public async empty(duration: number) {
-        return smoothLerp(duration, (t) => {this.update(t)}, -1, 0);
+        return smoothLerp(duration, (t) => {this.update(t)}, -1, 0, true);
     }
 
     public async fillTo(target: number, duration: number) {
@@ -236,7 +232,7 @@ export class BentTube implements Tube {
      * @returns Promise<void> - Resolves with animation end
      */
     public async fill(duration: number) {
-        return smoothLerp(duration, (t) => {this.update(t)});
+        return smoothLerp(duration, (t) => {this.update(t)}, 0, 1, true);
     }
 
     /**
@@ -245,7 +241,7 @@ export class BentTube implements Tube {
      * @returns Promise<void> - Resolves with animation end
      */
     public async empty(duration: number) {
-        return smoothLerp(duration, (t) => {this.update(t)}, -1, 0);
+        return smoothLerp(duration, (t) => {this.update(t)}, -1, 0, true);
     }
 }
 

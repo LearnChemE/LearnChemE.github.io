@@ -1,3 +1,4 @@
+import State from "./state";
 
 // Constain x to the bounds [min, max]
 export function constrain(x: number, min: number, max: number) {
@@ -37,34 +38,42 @@ export function rescale(x: number, a: number, b: number, c: number, d: number, c
  * @param duration Duration of animation
  * @param updateCallback Callback accepting interpolant to render animation
  * @param start Lowest t value accepted by callback (default 0)
- * @param end Highest t value accepted by callback (deault 1)
+ * @param end Highest t value accepted by callback (default 1)
+ * @param clamp Clamp values to be between start and end (default 1)
  */
-export function smoothLerp(duration: number, updateCallback: (t: number) => void, start: number = 0, end: number = 1): Promise<void> {
+export function smoothLerp(duration: number, updateCallback: (t: number) => void, start: number = 0, end: number = 1, useValveLift: boolean = false): Promise<void> {
     return new Promise((resolve) => {
-        let startTime: number | null = null;
+        let fill: number = 0;
+        let prevTime: number | null = null;
 
         // Function to update the value at each frame
         const animate = (time: number) => {
-        if (!startTime) startTime = time; // Initialize the start time
+            if (!prevTime) prevTime = time; // Initialize the start time
 
-        // Calculate elapsed time
-        const elapsed = time - startTime;
+            // Calculate elapsed time
+            const deltaTime = (time - prevTime);
+            prevTime = time;
 
-        // Calculate the interpolation factor t (from 0 to 1)
-        const t = Math.min(elapsed / duration, 1); // Ensure t doesn't go beyond 1
+            // Calculate the interpolation factor t (from 0 to 1)
+            let increment = deltaTime / duration;
+            if (useValveLift) {
+                console.log(`Valve lift of ${State.valveLift} modifying animation!`);
+                increment *= State.valveLift;
+            }
+            fill = Math.min(fill + increment, 1); // Ensure fill doesn't go beyond 1
 
-        // Interpolate between start and end
-        const interpolatedValue = lerp(start, end, t);
+            // Interpolate between start and end
+            const interpolatedValue = lerp(start, end, fill);
 
-        // Call the update callback with the interpolated value
-        updateCallback(interpolatedValue);
+            // Call the update callback with the interpolated value
+            updateCallback(interpolatedValue);
 
-        // If not at the end, continue the animation
-        if (t < 1) {
-            requestAnimationFrame(animate);
-        }
-        // If at the end, give the return callback
-        else resolve();
+            // If not at the end, continue the animation
+            if (fill < 1) {
+                requestAnimationFrame(animate);
+            }
+            // If at the end, give the return callback
+            else resolve();
         }
 
         // Start the animation

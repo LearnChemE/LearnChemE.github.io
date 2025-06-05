@@ -171,8 +171,8 @@ export class Manometer {
     private init: boolean = false;
 
     constructor() {
-        this.inTube  = new VaryingTube( "Tube_6", TubeDirection.Left, 200000); // 6 for left
-        this.outTube = new VaryingTube("Tube_15", TubeDirection.Left, 200000); // 14 for right
+        this.inTube  = new VaryingTube( "Tube_6", TubeDirection.Left, 2000); // 6 for left
+        this.outTube = new VaryingTube("Tube_15", TubeDirection.Left, 2000); // 14 for right
 
         // Get the bounding box and use to find bottom and height of manometer tube section
         const rect = document.getElementById("Tube_16") as unknown as SVGAElement;
@@ -207,8 +207,8 @@ export class Manometer {
         right = (this.bottom - right) / this.height;
 
         // Set the left tube only
-        this.inTube.setTargetTimeDelay(left, 1000);
-        this.outTube.setTargetTimeDelay(right, 1000);
+        this.inTube.setTargetTimeDelay(left, 500);
+        this.outTube.setTargetTimeDelay(right, 500);
         return;
     }
 

@@ -7,3 +7,4 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./js/state";
 import "./js/calculations.ts";
 import "./js/interactions.ts";
+import "./js/canvas";

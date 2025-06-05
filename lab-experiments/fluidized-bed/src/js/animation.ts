@@ -45,7 +45,7 @@ export function initAnimationObjects() {
         [ new StraightTube ( "Rectangle 14"   , TubeDirection.Right        ),  800 ],
     ];
     const RecycleData: Array<[ Tube, number ]> = [
-        [ new StraightTube ( "Rectangle 15"   , TubeDirection.Right        ),  500 ],
+        [ new StraightTube ( "Rectangle 15"   , TubeDirection.Right        ),  800 ],
     ];
     const ExitTubeData: Array<[ Tube, number ]> = [
         [ new StraightTube ( "Rectangle 16"   , TubeDirection.Right        ),  200 ],
@@ -79,20 +79,19 @@ async function tubesFillAnimation() {
     if (!tubesAreFull) {
         // Start beaker drain
         beakers.setMode(1);
-        const spd = {value: State.valveLift};
 
         // Play each animation
-        await LowerTubes.fill(spd);
-        await VenturiLeft.fill(spd);
+        await LowerTubes.fill();
+        await VenturiLeft.fill();
         manometer.fillLeftOnly();
-        await VenturiRight.fill(spd);
+        await VenturiRight.fill();
         manometer.initialFill();
-        await UpperBase.fill(spd);
+        await UpperBase.fill();
         if (State.valveSetting === ValveSetting.RecycleMode) {
-            await Recycle.fill(spd);
+            await Recycle.fill();
         }
         else {
-            await ExitTube.fill(spd);
+            await ExitTube.fill();
         }
 
         // now let the user do stuff
@@ -132,17 +131,18 @@ export async function onLiftChange() {
  */
 export async function swapValveAnimation(newSetting: ValveSetting) {
     if (!tubesAreFull) return;
-    const spd = {value: State.valveLift};
 
     // Swap the animation
     if (newSetting === ValveSetting.RecycleMode) {
-        ExitTube.empty(spd);
-        Recycle.fill(spd);
-        beakers.setMode(2); // RECYCLE
+        ExitTube.empty();
+        Recycle.fill().then(() => {
+            beakers.setMode(2); // RECYCLE
+        });
     }
     else {
-        Recycle.empty(spd);
-        ExitTube.fill(spd);
-        beakers.setMode(3); // CATCH_WEIGH
+        Recycle.empty();
+        ExitTube.fill().then(() => {
+            beakers.setMode(3); // CATCH_WEIGH
+        });
     }
 }

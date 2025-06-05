@@ -6,7 +6,6 @@ import State from './state';
  * @returns pressure from pump in cm water
  */
 export function pumpPressure() {
-    console.log(State.valveLift)
     return PUMP_PRESSURE_GAIN * State.valveLift;
 }
 
