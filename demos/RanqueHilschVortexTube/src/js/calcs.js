@@ -112,11 +112,11 @@ export function calcAll() {
   results.eta= eta.toFixed(2);
   results.deltaStotal= deltaStotal.toFixed(0);
 
-  updateSimulation();
   loop();
+  updateSimulation();
 }
 
-export function updateSimulation() {
+export function updateResults() {
   push();
   fill(0);
   textSize(4);
@@ -129,8 +129,6 @@ export function updateSimulation() {
   const mh = Number(results?.mh ?? 0);
   const mc = Number(results?.mc ?? 0);
   const COP = Number(results?.COP ?? 0);
-  const eta = Number(results?.eta ?? 0);
-  const deltaS = Number(results?.deltaStotal ?? 0);
   
   text(`${coldTemp.toFixed(1)} K`, width / 6, height - 25);
   text(`${hotTemp.toFixed(1)} K`, width - 25, height - 25);
@@ -139,15 +137,33 @@ export function updateSimulation() {
   text(`${mc.toFixed(2)} kg/min`, width / 6, height - 15);
   text(`298 K   ${state.P.toFixed(1)} bar`, width / 5.5, height - 90);
   text(`coefficient of performance = ${COP.toFixed(2)}`, width - 40, 8);
-  const formula1 = `$$\\Delta S_{\\text{tot}} = ${deltaS.toFixed(0)}\\ \\mathrm{J/(kg\\ K)}$$`;
-  document.getElementById("formula1-container").innerHTML = formula1;
-  
-  const formula = `$$\\frac{T_{\\text{feed}} - T_{\\text{cold}}}{(T_{\\text{feed}} - T_{\\text{cold}})_{\\text{rev}}} = ${eta.toFixed(2)} $$`;
-  document.getElementById("formula-container").innerHTML = formula;
-  
-  if (window.MathJax) {
-    MathJax.typesetPromise();
-  }
   pop();
+}
+
+export function updateSimulation() {
+  const eta = Number(results?.eta ?? 0);
+  const deltaS = Number(results?.deltaStotal ?? 0);
+
+  if (window.MathJax) {
+    // Create formula string
+    const formula1 = `$$\\Delta S_{\\text{tot}} = ${deltaS.toFixed(0)}\\ \\mathrm{J/(kg\\ K)}$$`;
+    const formula1Container = document.getElementById("formula1-container");
+    // Reset the formula container
+    MathJax.typesetClear([formula1Container]);
+    // Set the new HTML
+    formula1Container.innerHTML = formula1;
+    // Render with MathJax
+    MathJax.typesetPromise([formula1Container]);
+
+    
+    const formula = `$$\\frac{T_{\\text{feed}} - T_{\\text{cold}}}{(T_{\\text{feed}} - T_{\\text{cold}})_{\\text{rev}}} = ${eta.toFixed(2)} $$`;
+    const formulaContainer = document.getElementById("formula-container");
+    // Reset the formula container
+    MathJax.typesetClear([formulaContainer]);
+    // Set the new HTML
+    formulaContainer.innerHTML = formula;
+    // Render with MathJax
+    MathJax.typesetPromise([formulaContainer]);
+  }
   
 }

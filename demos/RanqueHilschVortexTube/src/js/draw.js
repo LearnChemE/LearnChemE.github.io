@@ -1,3 +1,4 @@
+import { updateResults } from "./calcs";
 
 // ---------------- Color gradience function----------------------
 function lerpColorStops(t, stops) {
@@ -215,6 +216,8 @@ export function drawAll() {
     vertex((xA + xB) / 2, (yA + yB) / 2 + 0.5);
     vertex(xB, yB);
     endShape(CLOSE);
+
+    updateResults();
   }
   pop();
 
