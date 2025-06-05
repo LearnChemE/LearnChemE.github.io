@@ -1,3 +1,5 @@
+import results from "./results.js";
+
 export const TDropData = [
   [[20, 20], 63.1], [[20, 30], 61.3], [[20, 40], 56.1], [[20, 50], 51.3],
   [[20, 60], 44.5], [[20, 70], 37], [[20, 80], 28.8],
@@ -23,20 +25,6 @@ export const TRiseData = [
   [[100, 20], 27.8], [[100, 30], 46.1], [[100, 40], 67.3], [[100, 50], 100.3],
   [[100, 60], 119.9], [[100, 70], 151.1], [[100, 80], 192.1]
 ];
-
-// results.js
-const results = {
-  th: 0,
-  tc: 0,
-  mf: 0,
-  mc: 0,
-  mh: 0,
-  COP: 0,
-  eta: 0,
-  deltaStotal: 0,
-};
-
-export default results;
 
 function interpolate2D(data, x, y) {
   // Find 4 closest points (simplified for clarity)
@@ -103,14 +91,16 @@ export function calcAll() {
 
   const deltaStotal = deltaS(mc, tc, Pc) + deltaS(mh, th, Ph);
 
-  results.th = th.toFixed(0);
-  results.tc = tc.toFixed(0);
-  results.mf = mf.toFixed(2);
-  results.mc = mc.toFixed(2);
-  results.mh = mh.toFixed(2);
+  results.th = Math.round(th);
+  results.tc = Math.round(tc);
+  results.mf = mf.toFixed(3);
+  results.mc = mc.toFixed(3);
+  results.mh = mh.toFixed(3);
   results.COP = COP.toFixed(2);
   results.eta = eta.toFixed(2);
   results.deltaStotal = deltaStotal.toFixed(0);
+
+
 
   updateSimulation();
 }
@@ -132,20 +122,20 @@ export function updateSimulation() {
   const deltaS = Number(results?.deltaStotal ?? 0);
 
   //text(`${coldTemp.toFixed(1)} K`, width / 6, height - 25);
-  const coldTemperature = `$$ ${coldTemp.toFixed(1)}\\ \\text{K} $$`;
+  const coldTemperature = `$$ ${Math.round(coldTemp)}\\ \\text{K} $$`;
   document.getElementById("coldTemperature-container").innerHTML = coldTemperature;
   //text(`${hotTemp.toFixed(1)} K`, width - 25, height - 25);
-  const hotTemperature = `$$ ${hotTemp.toFixed(1)}\\ \\text{K} $$`
+  const hotTemperature = `$$ ${Math.round(hotTemp)}\\ \\text{K} $$`
   document.getElementById("hotTemperature-container").innerHTML = hotTemperature;
   //text(`${mf.toFixed(2)} kg/min`, width / 6, height - 85);
-  const mfValue = `$$ ${mf.toFixed(2)}\\ \\mathrm{kg/min} $$`
+  const mfValue = `$$ ${mf.toFixed(3)}\\ \\mathrm{kg\\ /min} $$`
   document.getElementById("mf-container").innerHTML = mfValue;
 
   //text(`${mh.toFixed(2)} kg/min`, width - 25, height - 15);
-  const mhValue = `$$ ${mh.toFixed(2)}\\ \\mathrm{kg/min} $$`
+  const mhValue = `$$ ${mh.toFixed(3)}\\ \\mathrm{kg\\ /min} $$`
   document.getElementById("mh-container").innerHTML = mhValue;
   //text(`${mc.toFixed(2)} kg/min`, width / 6, height - 15);
-  const mcValue = `$$ ${mc.toFixed(2)}\\ \\mathrm{kg/min} $$`
+  const mcValue = `$$ ${mc.toFixed(3)}\\ \\mathrm{kg\\ /min} $$`
   document.getElementById("mc-container").innerHTML = mcValue;
 
   //text(`298 K   ${state.P.toFixed(1)} bar`, width / 5.5, height - 90);
@@ -153,8 +143,9 @@ export function updateSimulation() {
   document.getElementById("pressure-container").innerHTML = pressure;
 
   //text(`coefficient of performance = ${COP.toFixed(2)}`, width - 40, 8);
-  const coeffOfPerformance =
-    `$$ \\text{coefficient of performance} = ${COP.toFixed(2)} $$`;
+  const coeffOfPerformance = `<span style="font-family: Arial, sans-serif;">
+      coefficient of performance = ${COP.toFixed(2)}
+   </span>`;
 
   document.getElementById("cop-container").innerHTML = coeffOfPerformance;
 
