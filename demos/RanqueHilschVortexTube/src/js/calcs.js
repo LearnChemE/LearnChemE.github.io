@@ -91,9 +91,9 @@ export function calcAll() {
 
   const deltaStotal = deltaS(mc, tc, Pc) + deltaS(mh, th, Ph);
 
-  results.th = th.toFixed(0);
-  results.tc = tc.toFixed(0);
-  results.mf = mf.toFixed(2);
+  results.th = Math.round(th);
+  results.tc = Math.round(tc);
+  results.mf = mf.toFixed(3);
   results.mc = mc.toFixed(3);
   results.mh = mh.toFixed(3);
   results.COP = COP.toFixed(2);
@@ -122,13 +122,13 @@ export function updateSimulation() {
   const deltaS = Number(results?.deltaStotal ?? 0);
 
   //text(`${coldTemp.toFixed(1)} K`, width / 6, height - 25);
-  const coldTemperature = `$$ ${coldTemp.toFixed(1)}\\ \\text{K} $$`;
+  const coldTemperature = `$$ ${Math.round(coldTemp)}\\ \\text{K} $$`;
   document.getElementById("coldTemperature-container").innerHTML = coldTemperature;
   //text(`${hotTemp.toFixed(1)} K`, width - 25, height - 25);
-  const hotTemperature = `$$ ${hotTemp.toFixed(1)}\\ \\text{K} $$`
+  const hotTemperature = `$$ ${Math.round(hotTemp)}\\ \\text{K} $$`
   document.getElementById("hotTemperature-container").innerHTML = hotTemperature;
   //text(`${mf.toFixed(2)} kg/min`, width / 6, height - 85);
-  const mfValue = `$$ ${mf.toFixed(2)}\\ \\mathrm{kg\\ /min} $$`
+  const mfValue = `$$ ${mf.toFixed(3)}\\ \\mathrm{kg\\ /min} $$`
   document.getElementById("mf-container").innerHTML = mfValue;
 
   //text(`${mh.toFixed(2)} kg/min`, width - 25, height - 15);
