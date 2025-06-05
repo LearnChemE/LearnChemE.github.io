@@ -29,14 +29,14 @@ mjx-container * {
 }
 
 mjx-container {
-  font-size: 2.2vw !important;
+  font-size: 2vw !important;
   font-family: 'Arial', sans-serif !important;
   line-height: 1.2 !important;
 }
 
 @media (max-width: 768px) {
   mjx-container {
-    font-size: 3.5vw !important;
+    font-size: 1.6vw !important;
   }
 }
 
@@ -99,9 +99,9 @@ canvas {
 
 #formula-container {
   position: absolute;
-  top: 6vh;
+  top: 5vh;
   right: 5vw;
-  font-size: 2.2vw;
+  font-size: 2vw;
   max-width: 90vw;
   color: black;
   text-align: right;
@@ -110,9 +110,9 @@ canvas {
 
 #formula1-container {
   position: absolute;
-  top: -1vh;
-  left: 7vw;
-  font-size: 2.2vw;
+  top: 17vh;
+  left: 37vw;
+  font-size: 2vw;
   max-width: 90vw;
   color: black;
   text-align: right;
@@ -120,8 +120,8 @@ canvas {
 
 #coldTemperature-container {
   position: absolute;
-  bottom: 10vh;
-  left: 7vw;
+  bottom: 29vh;
+  left: 3vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -130,8 +130,8 @@ canvas {
 
 #hotTemperature-container {
   position: absolute;
-  bottom: 10vh;
-  right: 10vw;
+  bottom: 22vh;
+  right: 3vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -140,8 +140,8 @@ canvas {
 
 #mf-container {
   position: absolute;
-  top: 11vh;
-  left: 7vw;
+  top: 13vh;
+  left: 12vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -150,8 +150,8 @@ canvas {
 
 #mc-container {
   position: absolute;
-  bottom: 4vh;
-  left: 6.5vw;
+  bottom: 23vh;
+  left: 1vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -160,8 +160,8 @@ canvas {
 
 #mh-container {
   position: absolute;
-  bottom: 4vh;
-  right: 6.5vw;
+  bottom: 17vh;
+  right: 0.5vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -170,8 +170,8 @@ canvas {
 
 #pressure-container {
   position: absolute;
-  top: 6vh;
-  left: 7vw;
+  top: 9vh;
+  left: 12vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -182,7 +182,7 @@ canvas {
   position: absolute;
   top: 3vh;
   right: 2vw;
-  font-size: 2.2vw;
+  font-size: 2vw;
   max-width: 90vw;
   color: black;
   text-align: right;
@@ -200,12 +200,15 @@ canvas {
 
 #controls {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  //transform: translateX(-50%);
   align-items: center;
-  width: 90%;
-  max-width: 800px;
+  width: 60%;
+  left: 20%;
+  max-width: 500px;
   margin: 1rem auto;
   padding: 0;
+  flex-wrap: wrap;
 }
 
 #controls>.slider-group {
@@ -214,28 +217,35 @@ canvas {
 }
 
 .slider-group input[type="range"] {
-  flex: 1 1 auto;
-  margin: 0 0.5rem;
-  max-width: 300px;
+  width: 100%;
+  max-width: 200px;
+  min-width: 0;
 }
 
 
 .slider-group span {
   display: inline-block;
-  white-space: nowrap;
+  white-space: wrap;
   font-size: 2.0vh;
   margin-left: 0.5rem;
 }
 
 .slider-group {
-  display: flex;
-  flex-wrap: nowrap;
+  display: grid;
+  grid-template-columns: max-content 1fr max-content;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
   flex: 1 1 40vw;
-  min-width: 250px;
+  min-width: 0 !important;
   margin: 1vh 1vw;
-  gap: 1rem;
+  gap: 0.5rem;
+}
+
+.slider-group label,
+.slider-group span {
+  white-space: wrap;
+  font-size: 0.9rem;
 }
 
 .slider-group label {
@@ -304,27 +314,6 @@ canvas {
   }
 }
 
-#slider-wrapper {
-  display: grid;
-  grid-template-columns: max-content;
-  position: absolute;
-  top: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  gap: 20px;
-  padding-top: 0;
-  padding-bottom: 0%;
-}
-
-.slider-container {
-  display: grid;
-  grid-template-columns: max-content 150px 30px;
-  align-items: center;
-  gap: 5px;
-  padding-top: 0;
-  padding-bottom: 0%;
-}
-
 .disabled {
   pointer-events: none;
   opacity: 0.5;
@@ -360,8 +349,9 @@ canvas {
 }
 
 input[type="range"] {
-  max-width: 200px;
+  //max-width: 200px;
   width: 100%;
+  min-width: 0;
 }
 
 .details-text,
@@ -372,5 +362,5 @@ input[type="range"] {
 }
 
 .details-eqn mjx-container {
-  font-size: 100% !important;
+  font-size: 2w !important;
 }
