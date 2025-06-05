@@ -24,7 +24,7 @@ window.setup = function() {
   handleInputs();
   calcAll();
   pixelDensity(state.pixelDensity);
-  frameRate(state.frameRate);
+  // frameRate(state.frameRate);
 };
 
 window.draw = function() {
@@ -32,8 +32,8 @@ window.draw = function() {
   window.height = state.canvasSize[1];
   scale(relativeSize());
   background(255);
-  calcAll();
   drawAll();
+  noLoop();
 };
 
 window.windowResized = () => {

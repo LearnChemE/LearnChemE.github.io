@@ -113,6 +113,7 @@ export function calcAll() {
   results.deltaStotal= deltaStotal.toFixed(0);
 
   updateSimulation();
+  loop();
 }
 
 export function updateSimulation() {
