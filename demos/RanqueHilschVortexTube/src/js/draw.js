@@ -1,3 +1,31 @@
+
+// ---------------- Color gradience function----------------------
+function lerpColorStops(t, stops) {
+  const n = stops.length - 1;
+  const scaledT = t * n;
+  const i = Math.floor(scaledT);
+  const localT = scaledT - i;
+  const c1 = stops[i];
+  const c2 = stops[i + 1];
+  return lerpColor(c1, c2, localT);
+}
+
+function sinusoid(x0, y0, len, amp, om, colorStops, n) {
+  var last = [x0, y0];
+  var dx = len / n;
+  om = om / n;
+
+  for (let i = 0; i < n; i++) {
+    const t = i / n;
+    const x = x0 + i * dx;
+    const y = y0 + amp * sin(radians(i * om));
+    stroke(lerpColorStops(t, colorStops));
+    line(...last, x, y);
+    last[0] = x;
+    last[1] = y;
+  }
+}
+
 export function drawAll() {
   
   // -----------longer waves---------------
@@ -11,13 +39,10 @@ export function drawAll() {
     color(255, 165, 0),    // orange
     color(255, 0, 0),      // red
   ];
-  for (let i = 0; i < 1000; i++) {
-    const t = i / 1000;
-    const x = 53 + i / 15;
-    const y = height / 2 + 10.5 * sin(radians(i * 3));
-    stroke(lerpColorStops(t, colorStops1));
-    point(x, y,x+1,y+1);
-  }
+
+  // Draw a sinusoid
+  sinusoid(53, height/2, 1000 / 15, 10.5, 3000, colorStops1, 100);
+
   pop();
 
   //--------------elongated line-----------------
@@ -39,13 +64,9 @@ export function drawAll() {
     color(255, 165, 0),   // orange
     color(255, 0, 0),     // red
   ];
-  for (let i = 0; i < 1000; i++) {
-    const t0 = i / 1000;
-    const x =  39 + i / 13;
-    const y = height / 2 + 3.5 * sin(radians(i * 4.5));
-    stroke(lerpColorStops(t0, colorStops));
-    point(x, y,x+1,y+1);
-  }
+
+  // Draw another sinusoid
+  sinusoid(39, height/2, 1000 / 13, 3.5, 4500, colorStops, 100);
   pop();
 
 
@@ -197,16 +218,6 @@ export function drawAll() {
   }
   pop();
 
-  // ---------------- Color gradience function----------------------
-  function lerpColorStops(t, stops) {
-    const n = stops.length - 1;
-    const scaledT = t * n;
-    const i = Math.floor(scaledT);
-    const localT = scaledT - i;
-    const c1 = stops[i];
-    const c2 = stops[i + 1];
-    return lerpColor(c1, c2, localT);
-  }
 }
 
 if (window.MathJax) {
