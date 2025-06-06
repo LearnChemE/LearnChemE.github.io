@@ -119,42 +119,34 @@ export function updateSimulation() {
   const eta = Number(results?.eta ?? 0);
   const deltaS = Number(results?.deltaStotal ?? 0);
 
-  //text(`${coldTemp.toFixed(1)} K`, width / 6, height - 25);
-  const coldTemperature = `$$ ${Math.round(coldTemp)}\\ \\text{K} $$`;
-  document.getElementById("coldTemperature-container").innerHTML = coldTemperature;
-  //text(`${hotTemp.toFixed(1)} K`, width - 25, height - 25);
-  const hotTemperature = `$$ ${Math.round(hotTemp)}\\ \\text{K} $$`
-  document.getElementById("hotTemperature-container").innerHTML = hotTemperature;
-  //text(`${mf.toFixed(2)} kg/min`, width / 6, height - 85);
-  const mfValue = `$$ ${mf.toFixed(3)}\\ \\mathrm{kg/min} $$`
-  document.getElementById("mf-container").innerHTML = mfValue;
+  // Find all necessary containers
+  const coldTempContainer = document.getElementById("coldTemperature-container");
+  const hotTempContainer  = document.getElementById("hotTemperature-container");
+  const mfContainer       = document.getElementById("mf-container");
+  const mhContainer       = document.getElementById("mh-container");
+  const mcContainer       = document.getElementById("mc-container");
+  const pressureContainer = document.getElementById("pressure-container");
+  const copContainer      = document.getElementById("cop-container");
+  const formula1Container = document.getElementById("formula1-container");
+  const formulaContainer  = document.getElementById("formula-container");
 
-  //text(`${mh.toFixed(2)} kg/min`, width - 25, height - 15);
-  const mhValue = `$$ ${mh.toFixed(3)}\\ \\mathrm{kg/min} $$`
-  document.getElementById("mh-container").innerHTML = mhValue;
-  //text(`${mc.toFixed(2)} kg/min`, width / 6, height - 15);
-  const mcValue = `$$ ${mc.toFixed(3)}\\ \\mathrm{kg/min} $$`
-  document.getElementById("mc-container").innerHTML = mcValue;
+  // Get the list of containers for mathjax
+  const eqnContainers = [ coldTempContainer, hotTempContainer, mfContainer, mhContainer, mcContainer, pressureContainer, copContainer, formula1Container, formulaContainer ];
+  MathJax.typesetClear(eqnContainers);
 
-  //text(`298 K   ${state.P.toFixed(1)} bar`, width / 5.5, height - 90);
-  const pressure = `$$ 298 \\ \\text{K} \\ \\  ${state.P.toFixed(1)}\\ \\text{bar} $$`
-  document.getElementById("pressure-container").innerHTML = pressure;
-
-  //text(`coefficient of performance = ${COP.toFixed(2)}`, width - 40, 8);
-  const coeffOfPerformance = `<span style="font-family: Arial, sans-serif;">
-      coefficient of performance = ${COP.toFixed(2)}
-   </span>`;
-
-  document.getElementById("cop-container").innerHTML = coeffOfPerformance;
-
-  const formula1 = `$$\\Delta S_{\\text{tot}} = ${deltaS.toFixed(0)}\\ \\mathrm{J/(kg\\ K)}$$`;
-  document.getElementById("formula1-container").innerHTML = formula1;
-
-  const formula = `$$\\frac{T_{\\text{feed}} - T_{\\text{cold}}}{(T_{\\text{feed}} - T_{\\text{cold}})_{\\text{rev}}} = ${eta.toFixed(2)} $$`;
-  document.getElementById("formula-container").innerHTML = formula;
+  // Set html
+  coldTempContainer.innerHTML = `$$ ${Math.round(coldTemp)}\\ \\text{K} $$`;
+  hotTempContainer.innerHTML  = `$$ ${Math.round(hotTemp)}\\ \\text{K} $$`;
+  mfContainer.innerHTML       = `$$ ${mf.toFixed(3)}\\ \\mathrm{kg/min} $$`;
+  mhContainer.innerHTML       = `$$ ${mh.toFixed(3)}\\ \\mathrm{kg/min} $$`;
+  mcContainer.innerHTML       = `$$ ${mc.toFixed(3)}\\ \\mathrm{kg/min} $$`;
+  pressureContainer.innerHTML = `$$ 298 \\ \\text{K} \\ \\  ${state.P.toFixed(1)}\\ \\text{bar} $$`;
+  copContainer.innerHTML      = `<span style="font-family: Arial, sans-serif;">coefficient of performance = ${COP.toFixed(2)}</span>`;
+  formula1Container.innerHTML = `$$\\Delta S_{\\text{tot}} = ${deltaS.toFixed(0)}\\ \\mathrm{J/(kg\\ K)}$$`;
+  formulaContainer.innerHTML  = `$$\\frac{T_{\\text{feed}} - T_{\\text{cold}}}{(T_{\\text{feed}} - T_{\\text{cold}})_{\\text{rev}}} = ${eta.toFixed(2)} $$`;
 
   if (window.MathJax) {
-    MathJax.typesetPromise();
+    MathJax.typesetPromise(eqnContainers);
   }
   pop();
 

@@ -36,6 +36,7 @@ window.draw = function () {
   push();
   drawAll();
   pop();
+  console.log('to ' + millis())
 };
 
 window.windowResized = () => {

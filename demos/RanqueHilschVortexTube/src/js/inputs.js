@@ -15,6 +15,7 @@ function handleFeedPressure() {
     const normalized = (pressureValue - 2.4) / (7.8 - 2.4);
     state.arrowShift = normalized;
     document.getElementById("feed-pressure-value").textContent = pressureValue.toFixed(1);
+    console.log('from ' + millis())
     calcAll();
   });
 }
