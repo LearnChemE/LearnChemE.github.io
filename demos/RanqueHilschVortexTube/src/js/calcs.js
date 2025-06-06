@@ -104,12 +104,6 @@ export function calcAll() {
 }
 
 export function updateSimulation() {
-  push();
-  fill(0);
-  textSize(4);
-  textAlign(CENTER);
-  noStroke();
-
   const coldTemp = Number(results?.tc ?? 0);
   const hotTemp = Number(results?.th ?? 0);
   const mf = Number(results?.mf ?? 0);
@@ -132,7 +126,10 @@ export function updateSimulation() {
 
   // Get the list of containers for mathjax
   const eqnContainers = [ coldTempContainer, hotTempContainer, mfContainer, mhContainer, mcContainer, pressureContainer, copContainer, formula1Container, formulaContainer ];
-  MathJax.typesetClear(eqnContainers);
+  // Clear the equations
+  if (window.MathJax) {
+    MathJax.typesetClear(eqnContainers);
+  }
 
   // Set html
   coldTempContainer.innerHTML = `$$ ${Math.round(coldTemp)}\\ \\text{K} $$`;
@@ -145,9 +142,8 @@ export function updateSimulation() {
   formula1Container.innerHTML = `$$\\Delta S_{\\text{tot}} = ${deltaS.toFixed(0)}\\ \\mathrm{J/(kg\\ K)}$$`;
   formulaContainer.innerHTML  = `$$\\frac{T_{\\text{feed}} - T_{\\text{cold}}}{(T_{\\text{feed}} - T_{\\text{cold}})_{\\text{rev}}} = ${eta.toFixed(2)} $$`;
 
+  // Rerender the equations
   if (window.MathJax) {
     MathJax.typesetPromise(eqnContainers);
   }
-  pop();
-
 }
