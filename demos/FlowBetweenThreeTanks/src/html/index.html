@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0"
     />
-    <title>Adsorption Process Simulation</title>
+    <title>Flow Between Three Tanks</title>
     <script
       src="https://kit.fontawesome.com/9d19ad28f4.js"
       crossorigin="anonymous"
@@ -31,6 +31,13 @@
           </div>
           <div id="hamburger-menu" class="hamburger-menu"></div>
         </div>
+
+        <div class="slider-group slider-container">
+          <label for="elevationSlider">tankB elevation (ft)</label><br>
+          <input type="range" id="elevationSlider" min="0" max="100" step="1" value="20">
+          <span id="elevationValue">20</span>
+        </div>
+
         <button id="reset-button" class="btn btn-sm btn-danger">
           Reset
         </button>

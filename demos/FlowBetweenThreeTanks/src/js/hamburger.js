@@ -19,7 +19,7 @@
             const button = document.createElement('button');
             button.type = 'button';
             // Use classes defined in main.css if available, otherwise default Bootstrap
-            button.className = 'btn btn-light btn-sm hamburger-menu-button'; // Added a class for potential specific styling
+            button.className = 'btn btn-primary btn-sm hamburger-menu-button'; // Added a class for potential specific styling
             button.textContent = btnConfig.label;
             
             button.addEventListener('click', (e) => {

@@ -129,9 +129,9 @@ module.exports = (env, argv) => {
         meta: {
           viewport:          "width=device-width, initial-scale=1, shrink-to-fit=no",
           keywords:          "LearnChemE, chemical engineering, engineering, simulation",
-          author:            "Neil Hendren",
-          "application-name": "Heterogeneous Chemical Equilibrium",
-          description:       "Simulates the number of moles of solids and gas in equilibrium in a constant-volume container."
+          author:            "Sanath Kavatooru",
+          "application-name": "Flow Between Three Tanks",
+          description:       ""
         },
       }),
 

@@ -2,6 +2,8 @@ import './css/style.scss';
 import { addOptionToDragAndZoom } from './js/zoom.js';
 import * as config from './js/config.js';
 import { toggleMenu } from './js/hamburger.js';
+import { SVG } from '@svgdotjs/svg.js';
+import {drawFigure} from './js/main.js';
 
 let windowWidth = window.innerWidth - 60;
 let windowHeight = windowWidth * config.canvasHeight / config.canvasWidth;
@@ -17,8 +19,6 @@ window.addEventListener('resize', function() {
     // Ensure height calculation respects potential container limits if needed
     windowHeight = windowWidth * config.canvasHeight / config.canvasWidth;
     draw.size(windowWidth, windowHeight);
-    // You might not need to explicitly set viewbox again if preserveAspectRatio is working
-    // draw.viewbox(0, 0, config.canvasWidth, config.canvasHeight);
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -27,5 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
     hambIcon.addEventListener('click', toggleMenu);
   }
 });
+
+function drawCanvas() {
+  draw.clear(); // Clear previous drawings if any
+  drawFigure(draw);
+}
+
+drawCanvas();
 
 addOptionToDragAndZoom(draw);
