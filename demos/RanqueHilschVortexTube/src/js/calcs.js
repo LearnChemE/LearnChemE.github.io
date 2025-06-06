@@ -100,8 +100,6 @@ export function calcAll() {
   results.eta = eta.toFixed(2);
   results.deltaStotal = deltaStotal.toFixed(0);
 
-
-
   updateSimulation();
 }
 
@@ -128,14 +126,14 @@ export function updateSimulation() {
   const hotTemperature = `$$ ${Math.round(hotTemp)}\\ \\text{K} $$`
   document.getElementById("hotTemperature-container").innerHTML = hotTemperature;
   //text(`${mf.toFixed(2)} kg/min`, width / 6, height - 85);
-  const mfValue = `$$ ${mf.toFixed(3)}\\ \\mathrm{kg\\ /min} $$`
+  const mfValue = `$$ ${mf.toFixed(3)}\\ \\mathrm{kg/min} $$`
   document.getElementById("mf-container").innerHTML = mfValue;
 
   //text(`${mh.toFixed(2)} kg/min`, width - 25, height - 15);
-  const mhValue = `$$ ${mh.toFixed(3)}\\ \\mathrm{kg\\ /min} $$`
+  const mhValue = `$$ ${mh.toFixed(3)}\\ \\mathrm{kg/min} $$`
   document.getElementById("mh-container").innerHTML = mhValue;
   //text(`${mc.toFixed(2)} kg/min`, width / 6, height - 15);
-  const mcValue = `$$ ${mc.toFixed(3)}\\ \\mathrm{kg\\ /min} $$`
+  const mcValue = `$$ ${mc.toFixed(3)}\\ \\mathrm{kg/min} $$`
   document.getElementById("mc-container").innerHTML = mcValue;
 
   //text(`298 K   ${state.P.toFixed(1)} bar`, width / 5.5, height - 90);
