@@ -4,7 +4,7 @@ function updateSliderValue(sliderId) {
   const slider = document.getElementById(sliderId);
 
   // Get the current value element
-  const currentValue = slider.parentElement.querySelector('.current-value');
+  const currentValue = slider.parentElement.querySelector(".current-value");
 
   // Get the slider's current value
   const value = parseFloat(slider.value);
@@ -18,19 +18,19 @@ function updateSliderValue(sliderId) {
 }
 
 // Add event listeners to the sliders
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   // Set up Feed Pressure slider
-  const pressureSlider = document.getElementById('feed-pressure');
-  pressureSlider.addEventListener('input', () => updateSliderValue('feed-pressure'));
-  updateSliderValue('feed-pressure');
+  const pressureSlider = document.getElementById("feed-pressure");
+  pressureSlider.addEventListener("input", () => updateSliderValue("feed-pressure"));
+  updateSliderValue("feed-pressure");
 
   // Set up Feed Temperature slider
-  const tempSlider = document.getElementById('feed-temp');
-  tempSlider.addEventListener('input', () => updateSliderValue('feed-temp'));
-  updateSliderValue('feed-temp');
+  const tempSlider = document.getElementById("feed-temp");
+  tempSlider.addEventListener("input", () => updateSliderValue("feed-temp"));
+  updateSliderValue("feed-temp");
 
   // Set up NaCl Concentration slider
-  const saltSlider = document.getElementById('salt-conc');
-  saltSlider.addEventListener('input', () => updateSliderValue('salt-conc'));
-  updateSliderValue('salt-conc');
+  const saltSlider = document.getElementById("salt-conc");
+  saltSlider.addEventListener("input", () => updateSliderValue("salt-conc"));
+  updateSliderValue("salt-conc");
 });

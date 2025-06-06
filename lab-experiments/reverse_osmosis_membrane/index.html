@@ -6,12 +6,32 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
 
+  <!-- Update everything below THIS -->
+  <meta name="description" content="A digital laboratory experiment demonstrating reverse osmosis principles.">
+  <meta name="keywords" content="simulation, engineering, interactive">
+  <meta name="author" content="Jackson Dunlap, Neil Hendren, Manuel Arredondo">
+
   <title>Reverse Osmosis Simulation</title>
+  <!-- and above THIS -->
+
+  <!-- MathJax Configuration (optional) -->
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.95,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
 
   <!-- Libraries -->
   <script src="./js/p5.js"></script>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
 
   <!-- jQuery / Popper / Bootstrap -->
   <script src="./js/bootstrap.min.js"></script>
@@ -21,18 +41,20 @@
   <link href="./style/sliders.css" rel="stylesheet" />
   <link href="./style/style.css" rel="stylesheet" />
 
-  <!-- MathJax Configuration (optional) -->
-  <script>
-    MathJax = {
-      chtml: {
-        scale: 0.95,
-        mathmlSpacing: true,
-        displayAlign: "left",
-      },
-    };
-  </script>
-
   <script src="./js/slider.js"></script>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-204988035-3');
+  </script>
 </head>
 
 <body>
@@ -149,7 +171,7 @@
     </div>
   </div>
 
-  <script src="./js/functions.js"></script>
+  <script type="module" src="./js/main.js"></script>
 
 </body>
 
