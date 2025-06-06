@@ -11,7 +11,7 @@ window.state = {
   pixelDensity: 4,
   showButtons: false,
   hamburgerHasBeenClicked: window.localStorage.getItem("hamburgerHasBeenClicked") === "true",
-  canvasSize: [150, 100],
+  canvasSize: [300, 200],
   P: Number(document.getElementById("feed-pressure-slider").value), // bar
   z: Number(document.getElementById("fraction-feed-slider").value), // fraction of feed in cold stream
 };

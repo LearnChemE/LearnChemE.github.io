@@ -5,7 +5,7 @@ import results from "./results.js";  // ← adjust this path if your results.js 
 export function drawAll() {
 
   push();
-  translate(0, 55);
+  translate(-25, 55);
 
   // Compute scale factors from “design units” → actual pixels:
   const ux = width / 150;
