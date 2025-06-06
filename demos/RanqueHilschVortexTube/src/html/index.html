@@ -30,16 +30,17 @@
   <div id="graphics-container">
     <div id="outer-container">
       <div id="controls">
-        <!-- NOTE: class="slider-group" uses a plain ASCII hyphen (U+002D), NOT a "fancy" hyphen -->
         <div class="slider-group">
           <label for="feed-pressure-slider">feed pressure (bar, absolute)</label>
-          <input type="range" id="feed-pressure-slider" min="2.4" max="7.8" step="0.1" value="5" />
+          <input type="range" class="responsive‐slider" id="feed-pressure-slider" min="2.4" max="7.8" step="0.1"
+            value="5" />
           <span id="feed-pressure-value">5</span>
         </div>
 
         <div class="slider-group">
           <label for="fraction-feed-slider">fraction of feed in cold stream</label>
-          <input type="range" id="fraction-feed-slider" min="0.2" max="0.8" step="0.01" value="0.4" />
+          <input type="range" class="responsive‐slider" id="fraction-feed-slider" min="0.2" max="0.8" step="0.01"
+            value="0.4" />
           <span id="fraction-feed-value">0.4</span>
         </div>
       </div>

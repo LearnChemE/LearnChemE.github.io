@@ -120,7 +120,7 @@ canvas {
 
 #coldTemperature-container {
   position: absolute;
-  bottom: 29vh;
+  bottom: 32vh;
   left: 3vw;
   font-size: 2.2vw;
   max-width: 90vw;
@@ -130,8 +130,8 @@ canvas {
 
 #hotTemperature-container {
   position: absolute;
-  bottom: 22vh;
-  right: 3vw;
+  bottom: 30vh;
+  right: 4vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -140,8 +140,8 @@ canvas {
 
 #mf-container {
   position: absolute;
-  top: 13vh;
-  left: 12vw;
+  top: 17vh;
+  left: 1vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -151,7 +151,7 @@ canvas {
 #mc-container {
   position: absolute;
   bottom: 23vh;
-  left: 1vw;
+  left: 0.5vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -160,9 +160,9 @@ canvas {
 
 #mh-container {
   position: absolute;
-  bottom: 17vh;
-  right: 0.5vw;
-  font-size: 2.2vw;
+  bottom: 25vh;
+  right: 0.25vw;
+  font-size: 1.8vw;
   max-width: 90vw;
   color: black;
   text-align: right;
@@ -170,8 +170,8 @@ canvas {
 
 #pressure-container {
   position: absolute;
-  top: 9vh;
-  left: 12vw;
+  top: 13vh;
+  left: 15.5vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -208,7 +208,7 @@ canvas {
   max-width: 500px;
   margin: 1rem auto;
   padding: 0;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 #controls>.slider-group {
