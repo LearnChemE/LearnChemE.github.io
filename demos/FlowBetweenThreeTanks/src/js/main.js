@@ -26,13 +26,13 @@ export function drawFigure(draw) {
 
 
 function drawTank(draw) {
-  tankA = addSVGImage(draw, '/assets/tankA.svg', 0, 50, 175, 160);
+  tankA = addSVGImage(draw, 'assets/tankA.svg', 0, 50, 175, 160);
   drawDashedHorizontalLine(draw, 175, 80, 100, 'black', 1, '5,5');
   drawText(draw, 'elevation = 100 ft', 175, 60, 14);
   drawText(draw, 'A', 85, 50, 20);
-  tankB = addSVGImage(draw, '/assets/tankA.svg', tankBX, tankBY , 175, 160);
+  tankB = addSVGImage(draw, 'assets/tankA.svg', tankBX, tankBY , 175, 160);
   textB = drawText(draw, 'B', tankBX + 85, tankBY, 20);
-  tankC = addSVGImage(draw, '/assets/tankA.svg', 0, config.canvasHeight - 160, 175, 160);
+  tankC = addSVGImage(draw, 'assets/tankA.svg', 0, config.canvasHeight - 160, 175, 160);
   drawDashedHorizontalLine(draw, 175, config.canvasHeight - 130, 100, 'black', 1, '5,5');
   drawText(draw, 'elevation = 0 ft', 175, config.canvasHeight - 150, 14);
   drawText(draw, 'C', 85, config.canvasHeight - 160, 20);
