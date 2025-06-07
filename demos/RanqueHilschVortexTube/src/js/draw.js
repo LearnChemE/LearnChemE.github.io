@@ -2,6 +2,34 @@
 
 import results from "./results.js";  // ← adjust this path if your results.js lives elsewhere
 
+// ------------------ 9) “Color interpolation” helper ------------------
+  function lerpColorStops(t, stops) {
+    const n = stops.length - 1;
+    const scaledT = t * n;
+    const i = floor(scaledT);
+    const localT = scaledT - i;
+    const idx = constrain(i, 0, n - 1);
+    const c1 = stops[idx];
+    const c2 = stops[idx + 1];
+    return lerpColor(c1, c2, localT);
+  }
+
+function sinusoid(x0, y0, len, amp, om, colorStops, n) {
+  var last = [x0, y0];
+  var dx = len / n;
+  om = om / n;
+
+  for (let i = 0; i < n; i++) {
+    const t = i / n;
+    const x = x0 + i * dx;
+    const y = y0 + amp * sin(radians(i * om));
+    stroke(lerpColorStops(t, colorStops));
+    line(...last, x, y);
+    last[0] = x;
+    last[1] = y;
+  }
+}
+
 export function drawAll() {
 
   push();
@@ -45,16 +73,8 @@ export function drawAll() {
     color(255, 0, 0)      // red
   ];
 
-  for (let i = 0; i < 1000; i++) {
-    const t = i / 1000;
-    const xDesign = 53 + i / 15;
-    const x = xDesign * ux;
-    const yDesign = 50 + 10.5 * sin(radians(i * 3));
-    const y = yDesign * uy;
-
-    stroke(lerpColorStops(t, colorStops1));
-    point(x, y);
-  }
+  // Draw a sinusoid
+  sinusoid(53 * ux, height/2, 200 / 3 * ux, 10.5 * uy, 3000, colorStops1, 150);
   pop();
 
   // ------------------ 2) “Elongated line” (small slanted connector, thicker) ------------------
@@ -82,16 +102,8 @@ export function drawAll() {
     color(255, 0, 0)  // red
   ];
 
-  for (let i = 0; i < 1000; i++) {
-    const t0 = i / 1000;
-    const xDesign = 39 + i / 13;
-    const x = xDesign * ux;
-    const yDesign = 50 + 3.5 * sin(radians(i * 4.5));
-    const y = yDesign * uy;
-
-    stroke(lerpColorStops(t0, colorStops2));
-    point(x, y);
-  }
+  // Draw another sinusoid
+  sinusoid(39 * ux, height/2, 1000 / 13 * ux, 3.5 * uy, 4500, colorStops2, 180);
   pop();
 
   // ------------------ 4) “Triangle” (throttle valve indicator, much thicker outline) ------------------
@@ -269,17 +281,8 @@ export function drawAll() {
   }
   pop();
 
-  // ------------------ 9) “Color interpolation” helper ------------------
-  function lerpColorStops(t, stops) {
-    const n = stops.length - 1;
-    const scaledT = t * n;
-    const i = floor(scaledT);
-    const localT = scaledT - i;
-    const idx = constrain(i, 0, n - 1);
-    const c1 = stops[idx];
-    const c2 = stops[idx + 1];
-    return lerpColor(c1, c2, localT);
-  }
+
+  
   pop();
 }
 
