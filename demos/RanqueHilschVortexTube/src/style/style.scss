@@ -141,7 +141,7 @@ canvas {
 #mf-container {
   position: absolute;
   top: 17vh;
-  left: 1vw;
+  left: 0.5vw;
   font-size: 2.2vw;
   max-width: 90vw;
   color: black;
@@ -188,6 +188,11 @@ canvas {
   text-align: right;
 }
 
+@media (max-width: 750px) {
+  #controls {
+    flex-wrap: wrap;
+  }
+}
 
 @media (max-width: 768px) {
 
