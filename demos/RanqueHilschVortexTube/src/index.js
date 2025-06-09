@@ -17,6 +17,7 @@ window.state = {
 };
 
 const containerElement = document.getElementById("p5-container");
+const wrapperElement = document.getElementById("p5-outer");
 
 window.setup = function () {
   sizeContainer();
@@ -36,7 +37,7 @@ window.draw = function () {
   push();
   drawAll();
   pop();
-  console.log('to ' + millis())
+  // console.log('to ' + millis())
 };
 
 window.windowResized = () => {
@@ -51,11 +52,17 @@ window.windowResized = () => {
 window.relativeSize = () => containerElement.offsetWidth / state.canvasSize[0];
 
 function sizeContainer() {
-  containerElement.style.width = `90vw`;
-  containerElement.style.maxWidth = `calc(calc(100vh - 10px) * ${state.canvasSize[0]} / ${state.canvasSize[1]})`;
-  //containerElement.style.height = `calc(calc(100vw - 10px) * ${state.canvasSize[1]} / ${state.canvasSize[0]})`;
-  containerElement.style.height = `80vh`;
-  containerElement.style.maxHeight = `calc(100vh - 10px)`;
+  const w = window.innerWidth * .9;
+  const h = window.innerHeight * .8;
+  const asp = 3/2;
+  const dim = Math.min(w / asp, h);
+
+  containerElement.style.width = `${dim * asp}px`;
+  containerElement.style.height = `${dim}px`;
+  wrapperElement.style.width = `${dim * asp}px`;
+  wrapperElement.style.height = `${dim}px`;
+  
+  wrapperElement.style.fontSize = `${dim / 500}rem`;
 }
 
 require("./js/events.js");
