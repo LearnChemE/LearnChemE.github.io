@@ -33,11 +33,11 @@ function sinusoid(x0, y0, len, amp, om, colorStops, n) {
 export function drawAll() {
 
   push();
-  translate(-25, 55);
 
   // Compute scale factors from “design units” → actual pixels:
   const ux = width / 150;
   const uy = height / 100;
+  translate( 0*ux, 10*uy);
 
   const mcNum = parseFloat(results.mc);  // cold‐side mass flow (kg/min)
   const mhNum = parseFloat(results.mh);  // hot‐side mass flow  (kg/min)
@@ -53,8 +53,8 @@ export function drawAll() {
 
   // ── 3) Now remap “raw px” into [minPx, maxPx] so small flows aren’t too tiny
   //      and large flows aren’t too huge.
-  const minPx = 80;
-  const maxPx = 180;
+  const minPx = 10 * ux;
+  const maxPx = 20 * ux;
 
   // Option A: CLAMP the raw pixel values directly
   const arrowLenCold_px = constrain(rawCold_px, minPx, maxPx);
