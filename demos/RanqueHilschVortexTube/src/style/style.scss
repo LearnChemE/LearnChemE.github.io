@@ -6,6 +6,7 @@ $modal-xl: 1140px;
 @import "./slider.scss";
 
 #graphics-container {
+  display: grid;
   position: relative;
   margin: auto;
   margin-top: 5px;
@@ -14,13 +15,7 @@ $modal-xl: 1140px;
   border-radius: 5px;
   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
   width: min-content;
-}
-
-#graphics-container {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  position: relative;
+  padding: .5em;
 }
 
 mjx-container,
@@ -29,7 +24,7 @@ mjx-container * {
 }
 
 mjx-container {
-  font-size: 2vw !important;
+  // font-size: 2vw !important;
   font-family: 'Arial', sans-serif !important;
   line-height: 1.2 !important;
 }
@@ -43,37 +38,25 @@ mjx-container {
 
 html,
 body {
-  margin: 0;
-  padding: 0;
-  width: 100vw;
-  overflow: hidden;
-  font-family: Arial, sans-serif !important;
+  font-family: Arial, sans-serif;
 }
 
 #p5-outer {
-  display: flex;
+  display: grid;
+  margin: auto;
   justify-content: center;
   align-items: center;
-  width: 100vw;
-  //height: 100vh;
-  height: auto;
-  overflow: hidden;
-  margin-top: 0;
-  padding-top: 0;
+  max-width: 100%;
+  aspect-ratio: 3/2;
+  font-size: 1rem;
 }
 
 #p5-container {
-  display: flex;
+  display: grid;
   align-items: center;
   justify-content: center;
-  position: relative;
-  margin-bottom: 0;
-  margin-top: 0;
-  padding-top: 0;
   font-family: Arial, sans-serif;
-  width: 95vw;
-  height: 60vh;
-  overflow: visible;
+  position: relative;
 }
 
 #mathsection mjx-container {
@@ -86,6 +69,7 @@ canvas {
   border-width: 1px;
   border-color: black;
   box-shadow: 0px 0px 2px 2px lightgrey;
+  border-radius: 4px;
 }
 
 .modal.show {
@@ -99,9 +83,9 @@ canvas {
 
 #formula-container {
   position: absolute;
-  top: 5vh;
-  right: 5vw;
-  font-size: 2vw;
+  top: 5%;
+  right: 5%;
+  font-size: 1.1em;
   max-width: 90vw;
   color: black;
   text-align: right;
@@ -110,9 +94,9 @@ canvas {
 
 #formula1-container {
   position: absolute;
-  top: 17vh;
-  left: 37vw;
-  font-size: 2vw;
+  top: 25%;
+  left: 43%;
+  font-size: 1em;
   max-width: 90vw;
   color: black;
   text-align: right;
@@ -120,9 +104,9 @@ canvas {
 
 #coldTemperature-container {
   position: absolute;
-  bottom: 32vh;
-  left: 3vw;
-  font-size: 2.2vw;
+  bottom: 40%;
+  left: 3%;
+  font-size: 1em;
   max-width: 90vw;
   color: black;
   text-align: right;
@@ -130,9 +114,9 @@ canvas {
 
 #hotTemperature-container {
   position: absolute;
-  bottom: 30vh;
-  right: 4vw;
-  font-size: 2.2vw;
+  bottom: 40%;
+  right: 7%;
+  font-size: 1em;
   max-width: 90vw;
   color: black;
   text-align: right;
@@ -140,9 +124,9 @@ canvas {
 
 #mf-container {
   position: absolute;
-  top: 17vh;
-  left: 0.5vw;
-  font-size: 2.2vw;
+  top: 20%;
+  left: 1%;
+  font-size: 1em;
   max-width: 90vw;
   color: black;
   text-align: right;
@@ -150,9 +134,9 @@ canvas {
 
 #mc-container {
   position: absolute;
-  bottom: 23vh;
-  left: 0.5vw;
-  font-size: 2.2vw;
+  bottom: 23%;
+  left: 0.5%;
+  font-size: 1em;
   max-width: 90vw;
   color: black;
   text-align: right;
@@ -160,9 +144,9 @@ canvas {
 
 #mh-container {
   position: absolute;
-  bottom: 25vh;
-  right: 0.25vw;
-  font-size: 1.8vw;
+  bottom: 25%;
+  right: 0.25%;
+  font-size: .9em;
   max-width: 90vw;
   color: black;
   text-align: right;
@@ -170,9 +154,9 @@ canvas {
 
 #pressure-container {
   position: absolute;
-  top: 13vh;
-  left: 15.5vw;
-  font-size: 2.2vw;
+  top: 13%;
+  left: 15.5%;
+  font-size: 1em;
   max-width: 90vw;
   color: black;
   text-align: right;
@@ -180,10 +164,10 @@ canvas {
 
 #cop-container {
   position: absolute;
-  top: 3vh;
-  right: 2vw;
-  font-size: 2vw;
-  max-width: 90vw;
+  top: 3%;
+  right: 5%;
+  font-size: 1.2em;
+  // max-width: 90vmin;
   color: black;
   text-align: right;
 }
@@ -204,47 +188,42 @@ canvas {
 }
 
 #controls {
-  display: flex;
+  display: grid;
+  margin: auto;
   justify-content: center;
-  //transform: translateX(-50%);
   align-items: center;
-  width: 60%;
-  left: 20%;
-  max-width: 500px;
-  margin: 1rem auto;
-  padding: 0;
-  flex-wrap: nowrap;
+  width: 100%;
+  padding: 1em;
+  grid-template-columns: auto auto;
+  gap: 1em;
 }
 
 #controls>.slider-group {
-  flex: 0 0 auto !important;
-  margin: 0 1rem;
+  display: grid;
+  // grid-template-columns: auto auto auto;
+  // margin: 0 1rem;
+  gap: .25em;
 }
 
 .slider-group input[type="range"] {
-  width: 100%;
-  max-width: 200px;
-  min-width: 0;
+  // width: 100%;
+  // max-width: 30%;
+  min-width: 50px;
+  align-self: end;
 }
 
 
 .slider-group span {
-  display: inline-block;
-  white-space: wrap;
-  font-size: 2.0vh;
-  margin-left: 0.5rem;
+  display: span;
+  // white-space: wrap;
+  font-size: 1em;
 }
 
 .slider-group {
   display: grid;
-  grid-template-columns: max-content 1fr max-content;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-start;
-  flex: 1 1 40vw;
-  min-width: 0 !important;
-  margin: 1vh 1vw;
-  gap: 0.5rem;
+  grid-template-columns: min-content auto min-content;
+  width: 100%;
+  gap: 0.5em;
 }
 
 .slider-group label,
@@ -256,7 +235,7 @@ canvas {
 .slider-group label {
   display: inline-block;
   white-space: nowrap;
-  font-size: 2.0vh;
+  font-size: 1.0em;
   margin-right: 0.5rem;
 }
 
