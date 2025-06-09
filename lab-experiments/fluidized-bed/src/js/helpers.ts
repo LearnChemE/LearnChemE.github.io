@@ -164,7 +164,7 @@ export function CreateShader(gl: WebGL2RenderingContext, vert: string, frag: str
  * @param attribs Array of attribute descriptors to be assigned
  * @returns 
  */
-export function CreateVao(gl: WebGL2RenderingContext, vrts: Float32Array, idxs: Float32Array, shdr: WebGLProgram, attribs: Array<VertexAttribute>) {
+export function CreateVao(gl: WebGL2RenderingContext, vrts: Float32Array, idxs: Uint32Array, shdr: WebGLProgram, attribs: Array<VertexAttribute>) {
     // Create VAO
     const vao = gl.createVertexArray();
     gl.bindVertexArray(vao);
