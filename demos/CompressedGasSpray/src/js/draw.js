@@ -170,10 +170,11 @@ function drawGraph(ctx, centerX, canvasHeight, data, mode, sprayTime) {
   // 5) Build scales
   const maxY = Math.max(...curves.flat()) * 1.1;
   const maxX = Math.max(...times);
+  const minY = Math.min(0, ...curves.flat()) * 1.1; 
   const scaleX = width / maxX;
-  const scaleY = height / maxY;
+  const scaleY = height / (maxY - minY);
   const x = t => xBase + margin.left + t * scaleX;
-  const y = v => yBase + margin.top + height - v * scaleY;
+  const y = v => yBase + margin.top + height - (v - minY) * scaleY;
 
   // 6) Draw axes rectangle
   ctx.strokeStyle = 'black';
@@ -219,7 +220,7 @@ function drawGraph(ctx, centerX, canvasHeight, data, mode, sprayTime) {
   // 10) Draw Y-ticks and labels
   ctx.font = '12px sans-serif';
   ctx.textAlign = 'right';
-  for (let v = 0; v <= maxY; v += maxY / 5) {
+  for (let v = minY; v <= maxY; v += (maxY - minY) / 5) {
     const yy = y(v);
     ctx.beginPath();
     ctx.moveTo(xBase + margin.left - 5, yy);
