@@ -1,4 +1,6 @@
 import { BeakerHolder, BendDirection, BentTube, Manometer, StraightTube, Tube, TubeDirection, TubeGroup, ValveSetting } from "../types";
+import { fillCanvas } from "./canvas";
+import { delay } from "./helpers";
 import State from "./state";
 
 // Tube Groups
@@ -82,10 +84,18 @@ async function tubesFillAnimation() {
 
         // Play each animation
         await LowerTubes.fill();
+        // Save a promise for the canvas
+        const cnvIsFull = fillCanvas();
+        // Fill left manometer tube
+        await delay(300);
         await VenturiLeft.fill();
         manometer.fillLeftOnly();
+        // Await the canvas before continuing
+        await cnvIsFull;
+        // Now fill the right venturi
         await VenturiRight.fill();
         manometer.initialFill();
+        // Fill the upper base
         await UpperBase.fill();
         if (State.valveSetting === ValveSetting.RecycleMode) {
             await Recycle.fill();

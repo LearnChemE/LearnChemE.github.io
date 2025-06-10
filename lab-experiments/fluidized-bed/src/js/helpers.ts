@@ -106,6 +106,15 @@ export function smoothLerp(duration: number, updateCallback: (t: number) => void
 }
 
 /**
+ * Create a delay for ms milliseconds
+ * @param ms Number of milliseconds to delay
+ * @returns Promise<void>. Await to create a time delay in animations
+ */
+export function delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
  * Create a WebGL shader module using vertex and fragment sources
  * @param gl WebGL context
  * @param vert Vertex shader source code
@@ -201,11 +210,11 @@ export function CreateVao(gl: WebGL2RenderingContext, vrts: Float32Array, idxs: 
 /**
  * Create a UBO object
  * @param gl WebGL rendering context
- * @param size Size of the buffer
+ * @param size Size of the buffer, in bytes
  * @param shaders Array of webGL shader modules that refer to this UBO
  * @param name Name of the UBO
  * @param binding UBO block binding
- * @returns 
+ * @returns WebGLBuffer for ubo
  */
 export function CreateUBO(gl: WebGL2RenderingContext, size: number, shaders: Array<WebGLProgram>, name: string, binding: number) {
     // Create buffer
