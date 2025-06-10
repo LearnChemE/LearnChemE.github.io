@@ -94,8 +94,8 @@ canvas {
 
 #formula1-container {
   position: absolute;
-  top: 25%;
-  left: 43%;
+  top: 30%;
+  left: 45%;
   font-size: 1em;
   max-width: 90vw;
   color: black;
@@ -104,8 +104,8 @@ canvas {
 
 #coldTemperature-container {
   position: absolute;
-  bottom: 40%;
-  left: 3%;
+  bottom: 38%;
+  left: 4%;
   font-size: 1em;
   max-width: 90vw;
   color: black;
@@ -114,8 +114,8 @@ canvas {
 
 #hotTemperature-container {
   position: absolute;
-  bottom: 40%;
-  right: 7%;
+  bottom: 38%;
+  right: 4%;
   font-size: 1em;
   max-width: 90vw;
   color: black;
@@ -124,8 +124,8 @@ canvas {
 
 #mf-container {
   position: absolute;
-  top: 20%;
-  left: 1%;
+  top: 22%;
+  left: 4%;
   font-size: 1em;
   max-width: 90vw;
   color: black;
@@ -134,7 +134,7 @@ canvas {
 
 #mc-container {
   position: absolute;
-  bottom: 23%;
+  bottom: 30%;
   left: 0.5%;
   font-size: 1em;
   max-width: 90vw;
@@ -144,8 +144,8 @@ canvas {
 
 #mh-container {
   position: absolute;
-  bottom: 25%;
-  right: 0.25%;
+  bottom: 30%;
+  right: .5%;
   font-size: .9em;
   max-width: 90vw;
   color: black;
@@ -154,8 +154,8 @@ canvas {
 
 #pressure-container {
   position: absolute;
-  top: 13%;
-  left: 15.5%;
+  top: 18%;
+  left: 22%;
   font-size: 1em;
   max-width: 90vw;
   color: black;
@@ -242,7 +242,7 @@ canvas {
 #hamburger {
   position: absolute;
   top: 15px;
-  left: 15px;
+  left: 10px;
   z-index: 1000;
   width: max-content;
   height: max-content;
