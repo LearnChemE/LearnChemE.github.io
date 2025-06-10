@@ -60,12 +60,15 @@ input[type="range"]::-moz-range-thumb {
 }
 
 
+// #outer-container {
+//   border: 1px solid #ccc;
+//   padding: 25px;
+//   border-radius: 6px;
+//   background-color: white;
+//   // display: inline-block;  /* ensures border wraps tightly */
+//   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* optional soft shadow */
+//}
 #outer-container {
-  border: 1px solid #ccc;
-  padding: 25px;
-  border-radius: 6px;
-  background-color: white;
-  display: inline-block;  /* ensures border wraps tightly */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* optional soft shadow */
+  display: inline-grid;
+  width: min-content;
 }
-
