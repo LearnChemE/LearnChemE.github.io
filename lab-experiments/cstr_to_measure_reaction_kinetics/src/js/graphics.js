@@ -933,7 +933,7 @@ function handleInteractions() {
   const trackOffset = 15; // Track offset from slider Y position for concentration sliders
   const tempTrackOffset = 30; // Track offset from slider Y position for temperature slider
 
-  const sliderHandleRadius = 8; // Reduced from 20 to match the actual handle size (16/2)
+  const sliderHandleRadius = 12; // Increased from 8 to 16 for larger interaction area
   const operationalError = "Cannot set concentrations while tank\nis operational";
 
   // Only block slider logic if rotor is on
