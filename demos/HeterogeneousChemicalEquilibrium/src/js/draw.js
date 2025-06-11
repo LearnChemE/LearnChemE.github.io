@@ -1,6 +1,6 @@
 import { drawContainer, generateCaCO3Molecules,
   generateCaOMolecules,
-  generateCO2Molecules, drawTubeFurnace, 
+  generateCO2Molecules, 
   drawDigitalPressureMeter,  drawYAxis, drawLegend   } from './drawContainer.js';
 
 import { calculateEquilibrium } from "./calcs.js";
@@ -18,12 +18,12 @@ const containerElement = document.getElementById("p5-container");
 export function drawAll() {
   background(255);
   let centerX = width / 2 - 40;
-  let centerY = height / 2 + 20;
+  let centerY = height / 2 + 15;
   let radius = 25;
 
   drawContainer(centerX, centerY, radius);
   drawLegend(centerX - 30 , centerY + radius + 10);
-  drawTubeFurnace(centerX, centerY, radius, window.state.T);
+  // drawTubeFurnace(centerX, centerY, radius, window.state.T);
 
   //  Equilibrium Calculations 
 const T     = +document.getElementById("tempSlider").value;
@@ -58,15 +58,12 @@ window.state.T = T;
   const targetCaO   = Math.round(eq.nCaO_final * molToCount);
   const targetCO2   = Math.round(eq.nCO2_final * molToCount);
 
-if (caCO3Positions.length < targetCaCO3) {
-  const extra = targetCaCO3 - caCO3Positions.length;
-  const newPositions = generateCaCO3Molecules(extra, radius, centerX, centerY);
-  caCO3Positions = caCO3Positions.concat(newPositions);
-} else if (caCO3Positions.length > targetCaCO3) {
-  caCO3Positions = caCO3Positions.slice(0, targetCaCO3);
-}
+// Only regenerate if count changed by more than 10% or if we don't have positions yet
+  if (!caCO3Positions.length || Math.abs(caCO3Positions.length - targetCaCO3) > targetCaCO3 * 0.1) {
+    caCO3Positions = generateCaCO3Molecules(targetCaCO3, radius, centerX, centerY);
+  }
 
-  if (caOPositions.length !== targetCaO) {
+  if (!caOPositions.length || Math.abs(caOPositions.length - targetCaO) > targetCaO * 0.1) {
     caOPositions = generateCaOMolecules(targetCaO, radius, centerX, centerY);
   }
   if (co2Molecules.length !== targetCO2) {
@@ -75,7 +72,7 @@ if (caCO3Positions.length < targetCaCO3) {
 
 
 
-  drawCaCO3Molecules(caCO3Positions, [100, 149, 255, 300], 5);  
+  drawCaCO3Molecules(caCO3Positions, [100, 149, 255, 300], 4);  
   drawCaOMolecules(caOPositions, [102, 204, 51, 204], 3); 
 
   drawCO2Molecules(co2Molecules, radius, centerX, centerY, 2);
@@ -147,3 +144,26 @@ function drawCO2Molecules(molecules, radius, centerX, centerY, size = 4, pressur
   pop();
 }
 
+function draw() {
+  background(255);
+
+  // 1. Define shared container dimensions
+  const centerX = width / 3;
+  const centerY = height / 1.8;
+  const radius = 90;
+
+  // 2. Draw the container using consistent center and radius
+  drawContainer(centerX, centerY, radius);
+
+  // 3. Generate molecules positioned along curved layers at the bottom
+  const caCO3Molecules = generateCaCO3Molecules(radius, centerX, centerY);
+
+  // 4. Draw CaCO₃ molecules inside the container
+  for (const [x, y] of caCO3Molecules) {
+    fill(100, 149, 255); // Blue for CaCO₃
+    noStroke();
+    ellipse(x, y, 10, 10);
+  }
+
+  
+}

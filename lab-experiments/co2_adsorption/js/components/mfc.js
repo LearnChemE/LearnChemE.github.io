@@ -83,15 +83,14 @@ export function createMassFlowController(draw, x, y) {
         .stroke({ color: '#444', width: 1 })
         .move(x, y + topHeight);
 
-    // --- Label for Mass Flow Controller ---
-    group.text("Mass Flow Controller")
+    group.text("mass flow controller")
         .font({ family: 'Arial', size: 14, anchor: 'middle', weight: 'bold' })
         .fill('#000')
         .center(x + topWidth / 2, y + topHeight + bottomHeight + 15);
 
     
         group.text("mg/min")
-        .font({ family: 'Arial', size: 12, anchor: 'middle', weight: 'bold' })
+        .font({ family: 'Arial', size: 16, anchor: 'middle', weight: 'bold' })
         .fill('#000')
         .center(x + topWidth / 2, y + topHeight + bottomHeight - 10);
 

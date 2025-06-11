@@ -1,4 +1,4 @@
-/* main.css */
+/ main.css */
 
 body {
     display: flex;
@@ -22,9 +22,12 @@ body {
     padding: 10px;
     width: calc(100vw - 40px);
     height: calc(100vh - 40px);
-    max-width: calc((100vh - 40px) * 1000 / 600);
-    max-height: calc((100vw - 40px) * 600 / 1000);
+    max-width: calc((100vh - 40px) * 800 / 600);
+    max-height: calc((100vw - 40px) * 800 / 900);
     overflow: hidden;
+    z-index: 1000;
+    align-items: flex-start;
+    
 }
 
 #svg-container>svg {
@@ -35,7 +38,21 @@ body {
     max-width: calc(105%);
 }
 
+.nav-bar {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  z-index: 10000000001;
+}
 
+.icon-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 150px;
+}
 
 .hamburger-wrapper {
     display: flex;
@@ -65,6 +82,39 @@ body {
     object-fit: contain;
 }
 
+.hamburger-menu {
+  display: none;
+  /* Hidden by default */
+  flex-direction: column;
+  gap: 10px;
+  /* Space between buttons */
+  margin-top: 40px;
+  /* Space below the hamburger icon */
+  position: absolute;
+  /* Position the menu absolutely */
+  z-index: 10000000000;
+  /* Ensure the menu appears on top */
+  background-color: white;
+  /* Add a background to make buttons visible */
+  border: 2px solid #ddd;
+  /* Optional: Add a border */
+  padding: 10px;
+  /* Add padding for better appearance */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* Optional: Add a shadow */
+}
+
+.hamburger-menu.show {
+  display: flex;
+  z-index: 100000000000;
+  /* Show when the "show" class is added */
+}
+
+.hamburger-menu .btn {
+  width: 100px;
+  /* Set a fixed width for the buttons */
+}
+
 .canvas-container {
     position: relative;
     z-index: 1;
@@ -90,7 +140,6 @@ body {
     position: absolute;
     gap: 8px;
     margin-bottom: 16px;
-    seperator: 8px;
   }
 
   #directions-button, #about-button, #worksheet-button, #reset-button, #details-button {
@@ -98,8 +147,8 @@ body {
   }
 
   #offcanvasSidebarControl {
-    width: 350px;
-    max-width: 80%;
+    width: 400px;
+    height: 100px;
     background-size:cover;
   }
 
@@ -112,50 +161,80 @@ body {
   }
 
 .controls-container.slider-controls {
-    position: absolute;
     display: flex;
-    flex-direction: column;
-  }
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    height: 50px;
+    z-index: 1000001;
+}
+
+.controls-container.slider-controls > .slider-group {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2px;
+}
   
 
   .controls-container.slider-controls .slider-group label {
     font-size: 0.9rem;
-    margin-bottom: 1px;
-    display: block;
   }
   
   .controls-container.slider-controls .slider-group input[type="range"] {
-    width: 300px;
+    width: 100%;
     -webkit-appearance: none;
     background: transparent;
   }
   
   .controls-container.slider-controls input[type="range"]::-webkit-slider-runnable-track {
     height: 4px;
-    background: #ccc;
+    background: darkgray;
     border-radius: 2px;
   }
   .controls-container.slider-controls input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 16px;
     height: 16px;
-    background: #333;
+    background: lightgreen;
     border-radius: 50%;
+    border: 0.5px solid #333;
     margin-top: -6px;
+  }
+  /* Firefox track */
+  .controls-container.slider-controls input[type="range"]::-moz-range-track {
+    height: 4px;
+    background: darkgray;
+    border-radius: 2px;
+  }
+  /* Firefox thumb */
+  .controls-container.slider-controls input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: lightgreen;
+    border-radius: 50%;
+    border: 0.5px solid #333;
   }
 
 .slider-container {
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
     border-radius: 4px;
-    padding: 8px;
-    margin-bottom: 12px;
+    padding: 2px;
+    margin-bottom: 4px;
+    height: 65px;
   }
   
   /* Compound selector button group */
   #compound-buttons {
     display: flex;
+    flex-direction: column;
     gap: 8px;
     margin-bottom: 16px;
+    width: 100px;
+    height: 50px;
+    z-index: 1001;
   }
   
   #compound-buttons .btn {
@@ -166,6 +245,24 @@ body {
   #compound-buttons .btn.active {
     background-color: #0d6efd;
     color: #fff;
+  }
+
+  .slider-label-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #333;
+      background-color: #f0f0f0;
+      padding: 4px 8px;
+      margin: 0 8px;
+      font-family: 'Arial', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #222;
+      border-radius: 4px;
+      white-space: nowrap;
+      width: 220px;
+      height: 30px;
   }
 
 @media (max-width: 600px) {

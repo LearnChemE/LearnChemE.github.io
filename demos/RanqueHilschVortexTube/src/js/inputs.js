@@ -5,17 +5,18 @@ export function handleInputs() {
   initializeHamburger();
   handleFeedPressure();
   handleFeedFraction();
+
 }
 
 function handleFeedPressure() {
   document.getElementById("feed-pressure-slider").addEventListener("input", (e) => {
     const pressureValue = parseFloat(e.target.value);
     state.P = pressureValue;
-    //state.arrowShift = (pressureValue - 2.4) * 4;
     const normalized = (pressureValue - 2.4) / (7.8 - 2.4);
     state.arrowShift = normalized;
     document.getElementById("feed-pressure-value").textContent = pressureValue.toFixed(1);
     calcAll();
+    console.log('to ' + millis())
   });
 }
 

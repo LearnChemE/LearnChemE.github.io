@@ -141,7 +141,7 @@ export function createDigitalPressureGauge(draw, x, y, pressure = "--- bar") {
   const totalPressure = `0.0`;
 
   // Create text element for total pressure
-  const fontSize = Math.min(displayWidth * 0.3, displayHeight * 0.6); // Larger font size for single value
+  const fontSize = Math.min(displayWidth * 0.8, displayHeight * 0.8);
 
   group.text(`${totalPressure}`)
     .font({ family: 'monospace', size: fontSize, anchor: 'middle', weight: 'bold' })

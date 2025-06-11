@@ -100,7 +100,7 @@ function drawPressureRegulator(x, y) {
     line(xPos, yPos, xPos2, yPos2);
   }
   fill("red");
-  const needleAngle = -HALF_PI + state.P * PI / 11;
+  const needleAngle = -HALF_PI + state.P * PI / 110;
   push();
   translate(-2.5, 0);
   rotate(needleAngle);

@@ -1,0 +1,263 @@
+$modal-sm: calc(100vw - 50px);
+$modal-md: calc(100vw - 50px);
+$modal-lg: 820px;
+$modal-xl: 1140px;
+
+@import "bootstrap";
+@import "./slider.scss"; // if you need legacy slider styles
+
+/*─────────────────────────────────────────────────────────────────────────────*/
+/* RESET & OVERFLOW                                                           */
+/*─────────────────────────────────────────────────────────────────────────────*/
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  /* center horizontally */
+  align-items: center;
+  /* center vertically */
+  background: #f0f0f0;
+  /* optional page background */
+}
+
+/*─────────────────────────────────────────────────────────────────────────────*/
+/* MAIN CONTAINERS                                                            */
+/*─────────────────────────────────────────────────────────────────────────────*/
+#graphics-container {
+  background-color: #fafafa;
+  border: 1px solid #000;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  width: min-content;
+  margin: 2rem auto;
+  /* center horizontally */
+  gap: 1rem;
+  /* space between controls and canvas */
+  padding: 1rem;
+}
+
+#outer-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  /* space between controls and canvas */
+  margin: 0vmax;
+  /* pull it up closer to the top & center */
+  padding: 1rem;
+  /* card padding */
+  padding-top: 4rem;
+  max-width: 1200px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/*─────────────────────────────────────────────────────────────────────────────*/
+/* CONTROLS                                                                   */
+/*─────────────────────────────────────────────────────────────────────────────*/
+.controls {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0 1rem;
+  margin-bottom: 0.75rem;
+}
+
+/* TOP ROW: mode buttons + play controls */
+.top-row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  gap: 4rem;
+  padding-bottom: 0.5rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.button-group button {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f8f9fa;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.button-group button.active {
+  background: #007bff;
+  border-color: #0056b3;
+  color: #fff;
+}
+
+
+.play-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.play-controls label {
+  margin-right: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.play-controls button {
+  padding: 0.4rem 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  background: #f8f9fa;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.play-controls button:hover {
+  background: #e0e0ff;
+}
+
+
+.middle-row {
+  display: flex;
+  gap: 4rem;
+  align-items: flex-start;
+  padding: 0 1rem;
+  justify-content: flex-start;
+}
+
+/*─────────────────────────────────────────────────────────────────────────────*/
+/* CANVAS SECTION                                                             */
+/*─────────────────────────────────────────────────────────────────────────────*/
+#graphics-wrapper {
+  overflow: hidden;
+  width: 100%;
+  background: #fafafa;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+/*─────────────────────────────────────────────────────────────────────────────*/
+/* P5 CONTAINER                                                               */
+/*─────────────────────────────────────────────────────────────────────────────*/
+#p5-container {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-top: -3rem;
+}
+
+/*─────────────────────────────────────────────────────────────────────────────*/
+/* HAMBURGER                                                                  */
+/*─────────────────────────────────────────────────────────────────────────────*/
+#hamburger {
+  position: relative;
+  top: 8px;
+  left: 8px;
+  z-index: 1000;
+  width: max-content;
+  height: max-content;
+}
+
+#hamburger-icon {
+  display: grid;
+  align-content: center;
+  align-items: center;
+  height: max-content;
+  width: max-content;
+  cursor: pointer;
+  background-color: lightblue;
+  padding: 5px;
+  border: 1px solid black;
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+}
+
+#hamburger-icon.active {
+  background-color: rgb(233, 164, 164);
+}
+
+#hamburger-icon:hover,
+#hamburger-icon.active:hover {
+  background-color: rgb(217, 239, 246);
+}
+
+#hamburger-icon>svg {
+  width: 20px;
+  height: 20px;
+}
+
+@media screen and (min-width: 1080px) {}
+
+@media screen and (min-width: 1320px) {
+  #hamburger-icon {
+    padding: 6px;
+  }
+
+  #hamburger-icon>svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  #buttons {
+    top: 35px;
+    padding: 15px;
+  }
+}
+
+
+#buttons {
+  position: absolute;
+  top: 35px;
+  left: 0;
+  display: none;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: #fff;
+  padding: 0.75rem;
+  border: 1px solid #333;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+#buttons .btn {
+  width: 110px;
+}
+
+#drawing-area {
+  min-width: 0;
+  flex: 1;
+}
+
+/*─────────────────────────────────────────────────────────────────────────────*/
+/* MODALS & MISC                                                              */
+/*─────────────────────────────────────────────────────────────────────────────*/
+.modal.show {
+  padding-left: 0 !important;
+}
+
+.modal-body {
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+
+.disabled,
+*[disabled="true"] {
+  pointer-events: none;
+  opacity: 0.5 !important;
+}

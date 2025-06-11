@@ -312,7 +312,7 @@ export function checkAndStartMFCFlow(draw) {
           startMoleFractionCalculation(tankNum);
         }, true);
 
-        animateGasFlow(draw, 'mfc_valve_outlet', color, opacity, () => {
+        // animateGasFlow(draw, 'mfc_valve_outlet', color, opacity, () => {
           // After MFC valve outlet completes, start adsorption bed outlet
           animateGasFlow(draw, 'adsorption_bed_outlet', color, opacity, () => {
             // After adsorption bed outlet completes, start remaining paths
@@ -321,7 +321,7 @@ export function checkAndStartMFCFlow(draw) {
             animateGasFlow(draw, 'analyser_outlet', color, opacity, null, true);
           }, true);
         }, true);
-      }, true); // isMFCControlled = true
+      // }, true); // isMFCControlled = true
 
     } else {
       state.setGaugeValue(0.0, 0.0);

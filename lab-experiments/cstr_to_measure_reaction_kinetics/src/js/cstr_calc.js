@@ -14,6 +14,7 @@ function run_CSTR(args) {
   const CBf = args.CBf; // Concentration of B in the feed (mol/L)
   const vA = args.vA; // volumetric flow rate of A (L/s)
   const vB = args.vB; // volumetric flow rate of B (L/s)
+  console.log(args);
 
   // CSTR initial concentrations
   const CA0 = 0;
