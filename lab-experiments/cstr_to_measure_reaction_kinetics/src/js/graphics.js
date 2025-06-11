@@ -933,7 +933,7 @@ function handleInteractions() {
   const trackOffset = 15; // Track offset from slider Y position for concentration sliders
   const tempTrackOffset = 30; // Track offset from slider Y position for temperature slider
 
-  const sliderHandleRadius = 12; // Increased from 8 to 16 for larger interaction area
+  const sliderHandleRadius = 16; // Adjusted to match the visual handle size (handleR) in drawSlider
   const operationalError = "Cannot set concentrations while tank\nis operational";
 
   // Only block slider logic if rotor is on
@@ -1307,11 +1307,11 @@ export function drawSimulation(width, height) {
       
       const cstrResult = run_CSTR({
         t: accumulatedTime,
-        T: temperatureValue + 273.15, // Convert °C to K
-        CAf: sliderAValue, // Use NaOH concentration
-        CBf: sliderBValue, // Use CH₃COOCH₃ concentration
-        vA: currentFlowRateA / 1000,
-        vB: currentFlowRateB / 1000
+        T: Math.round(temperatureValue) + 273.15, // Convert °C to K and round temperature
+        CAf: parseFloat(sliderAValue.toFixed(3)), // Round concentration A to 3 decimal places
+        CBf: parseFloat(sliderBValue.toFixed(3)), // Round concentration B to 3 decimal places
+        vA: parseFloat((currentFlowRateA / 1000).toFixed(4)), // Round flow rate A to 4 decimal places (L/s)
+        vB: parseFloat((currentFlowRateB / 1000).toFixed(4)) // Round flow rate B to 4 decimal places (L/s)
       });
 
       // Update the values
