@@ -727,9 +727,11 @@ function drawSlider(x, y, w, value, label, displayValue, min = 0.1, max = 0.5, d
   const valueX = x + w / 2 + 10; // Position value text to the right of the slider bar
   const valueY = trackY; // Align vertically with the slider bar
   let displayValueText;
-  if (displayValue !== undefined) {
-    displayValueText = Math.round(displayValue);
+  if (label.includes("(°C)")) {
+    // For temperature slider, display as a whole number
+    displayValueText = Math.round(value);
   } else {
+    // For concentration sliders, display with two decimal places
     displayValueText = value.toFixed(2);
   }
   // Add units based on the original label
@@ -944,7 +946,7 @@ function handleInteractions() {
         // Use the new sliderStartX and sliderEndX for mapping mouseX to value
         if (mX >= sliderStartX && mX <= sliderEndX) {
           sliderAValue = map(mX, sliderStartX, sliderEndX, 0.1, 0.5);
-          sliderAValue = constrain(sliderAValue, 0.1, 0.5);
+          sliderAValue = parseFloat(constrain(sliderAValue, 0.1, 0.5).toFixed(2));
           return; // Only allow one slider at a time
         }
       }
@@ -955,7 +957,7 @@ function handleInteractions() {
         // Use the new sliderStartX and sliderEndX for mapping mouseX to value
         if (mX >= sliderStartX && mX <= sliderEndX) {
           sliderBValue = map(mX, sliderStartX, sliderEndX, 0.1, 0.5);
-          sliderBValue = constrain(sliderBValue, 0.1, 0.5);
+          sliderBValue = parseFloat(constrain(sliderBValue, 0.1, 0.5).toFixed(2));
           return;
         }
       }
@@ -1032,7 +1034,7 @@ function handleInteractions() {
       if (mX >= tempSliderStartX && mX <= tempSliderEndX) {
         // Map mX to temperature value (25 to 85 °C)
         temperatureValue = map(mX, tempSliderStartX, tempSliderEndX, 25, 85);
-        temperatureValue = constrain(temperatureValue, 25, 85);
+        temperatureValue = parseFloat(constrain(temperatureValue, 25, 85).toFixed(2));
         return;
       }
     }
