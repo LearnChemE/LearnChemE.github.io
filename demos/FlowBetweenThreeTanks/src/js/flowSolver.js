@@ -87,7 +87,7 @@ function solveFlowOutB(l2, hB) {
   //   Positive U2  ⇒ “B → J”   (if U2 < 0, then “J → B”)
   //   Positive U3  ⇒ “J → Common” (if U3 < 0, then “Common → J”)
 
-  const dir1 = U1 >= 0 ? 'down' : "up";
+  const dir1 = U1 >= 0 ? 'up' : "up";
   const dir2 = U2 >= 0 ? 'up' : "down";
   const dir3 = U3 >= 0 ? 'down' : "up";
 
@@ -179,7 +179,7 @@ function solveFlowInB(l2, hB) {
 
   const dir1 = U1 >= 0 ? 'up' : "down";
   const dir2 = U2 >= 0 ? 'down' : "up";
-  const dir3 = U3 >= 0 ? 'up' : "down";
+  const dir3 = U3 >= 0 ? 'down' : "down";
 
   return {
     U1: U1,
@@ -193,12 +193,17 @@ function solveFlowInB(l2, hB) {
 
 export function solveThreeTanks(l2, hB) {
   const hA = 100.0; // same fixed Tank A head
-  if (hB < hA) {
-    console.log(solveFlowInB(l2, hB));
-    return solveFlowInB(l2, hB);
+  const solverIn = solveFlowInB(l2, hB)
+  const solverOut = solveFlowOutB(l2, hB);
+
+  if (solverIn.U1 >= 0 && solverIn.U2 >= 0 && solverIn.U3 >= 0) {
+    // If both U1 and U2 are positive, we can use flow_in_B
+    console.log(l2, hB, solverIn);
+    return solverIn;
   } else {
-    console.log(solveFlowOutB(l2, hB));
-    return solveFlowOutB(l2, hB);
+    // If both U1 and U2 are positive, we can use flow_out_B
+    console.log(l2, hB, solverOut);
+    return solverOut;
   }
 }
 

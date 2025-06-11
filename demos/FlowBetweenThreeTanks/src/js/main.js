@@ -11,31 +11,39 @@ let textB = null;
 let pipeBElement = null;
 let pipeGroup = null;
 const elevationSlider = document.getElementById('elevationSlider');
+const lengthSlider = document.getElementById('lengthSlider');
 let currenrtTankBHeight = elevationSlider.value;
 let markerGroup = null;
+let tankBDashedLine = null;
+let tankBElevation = null;
+let pipeBLength = lengthSlider.value;
 
-let tankBX = config.canvasWidth - 175;
+let tankBX = config.canvasWidth - 225;
 let tankBY = config.canvasHeight - 160 - (maxHeight * currenrtTankBHeight / 100);
 
 export function drawFigure(draw) {
   drawTank(draw);
   drawPipes(draw);
   adjustFigureWithEleveationSlider(draw);
-  // drawDashedConnection(draw, 400, 100, 400, 400, 'YourLabel');
 }
 
 
 function drawTank(draw) {
   tankA = addSVGImage(draw, 'assets/tankA.svg', 0, 50, 175, 160);
-  drawDashedHorizontalLine(draw, 175, 80, 100, 'black', 1, '5,5');
-  drawText(draw, 'elevation = 100 ft', 175, 60, 14);
+  // drawDashedHorizontalLine(draw, 175, 80, 100, 'black', 1, '5,5');
+  // drawText(draw, 'elevation = 100 ft', 175, 60, 14);
   drawText(draw, 'A', 85, 50, 20);
   tankB = addSVGImage(draw, 'assets/tankA.svg', tankBX, tankBY , 175, 160);
   textB = drawText(draw, 'B', tankBX + 85, tankBY, 20);
+  tankBDashedLine = drawDashedHorizontalLine(draw, config.canvasWidth - 50, tankBY + 30, 50, 'black', 1, '5,5');
+  tankBElevation = drawDashedLineWithArrows(draw, config.canvasWidth - 40, config.canvasHeight - 130 - 5, config.canvasWidth - 40, tankBY + 35, currenrtTankBHeight + ' ft', { color: 'black', width: 1, dashArray: '5,5' });
   tankC = addSVGImage(draw, 'assets/tankA.svg', 0, config.canvasHeight - 160, 175, 160);
   drawDashedHorizontalLine(draw, 175, config.canvasHeight - 130, 100, 'black', 1, '5,5');
-  drawText(draw, 'elevation = 0 ft', 175, config.canvasHeight - 150, 14);
+  drawText(draw, 'elevation = 0 ft', 175, config.canvasHeight - 150 + 20, 14);
   drawText(draw, 'C', 85, config.canvasHeight - 160, 20);
+  drawDashedLineWithArrows(draw, 10, 80 + 5  , 10, config.canvasHeight - 130 - 5, '100 ft');
+
+  drawDashedHorizontalLine(draw, config.canvasWidth - 50, config.canvasHeight - 130, 50, 'black', 1, '5,5');
 }
 
 function drawPipeConnectors(draw) {
@@ -53,7 +61,7 @@ function drawPipeConnectors(draw) {
 
 function drawPipes(draw) {
   pipeGroup = draw.group();
-  const result = solveThreeTanks(500, currenrtTankBHeight);
+  const result = solveThreeTanks(pipeBLength, currenrtTankBHeight);
   const pipeA = `
       M ${startX} ${startY} 
       L ${165} ${200} 
@@ -61,23 +69,23 @@ function drawPipes(draw) {
   
   
   const directionA = result.dir1
-  drawPipeWithCurves(pipeGroup, pipeA, 15, directionA, '#B4B4FF', 'black', 'length_a = 1000 ft');
+  drawPipeWithCurves(pipeGroup, pipeA, 15, directionA, '#B4B4FF', 'black', 'length_a = 1000 ft', 1000);
   
   const pipeC = `
       M ${startX} ${startY} 
       L ${170} ${config.canvasHeight - 20} 
     `;
   const directionC = result.dir3
-  drawPipeWithCurves(pipeGroup, pipeC, 15, directionC, '#B4B4FF', 'black', 'length_c = 400 ft');
+  drawPipeWithCurves(pipeGroup, pipeC, 15, directionC, '#B4B4FF', 'black', 'length_c = 400 ft', 400);
   
   const pipeB = `
       M ${startX} ${startY} 
-      L ${config.canvasWidth - 170} ${config.canvasHeight - 20 - (maxHeight * currenrtTankBHeight / 100)} 
+      L ${config.canvasWidth - 220} ${config.canvasHeight - 20 - (maxHeight * currenrtTankBHeight / 100)} 
     `;
   const directionB = result.dir2
-  pipeBElement = drawPipeWithCurves(pipeGroup, pipeB, 15, directionB, '#B4B4FF', 'black', 'length_b = 500 ft');
+  pipeBElement = drawPipeWithCurves(pipeGroup, pipeB, 15, directionB, '#B4B4FF', 'black', 'length_b = ' + pipeBLength + 'ft', pipeBLength);
 
-  drawPipeConnectors(draw);
+  // drawPipeConnectors(draw);
 }
 
 function adjustFigureWithEleveationSlider(draw) {
@@ -86,20 +94,36 @@ function adjustFigureWithEleveationSlider(draw) {
     elevationDisplay.textContent = this.value;
     adjustTankHeight(draw, this.value);
   });
+
+  const lengthDisplay = document.getElementById('lengthValue');
+  lengthSlider.addEventListener('input', function () {
+    const newLength = parseFloat(this.value);
+    lengthDisplay.textContent = newLength;
+    const newPath = `
+      M ${startX} ${startY} 
+      L ${config.canvasWidth - 220} ${config.canvasHeight - 20 - (maxHeight * currenrtTankBHeight / 100)} 
+    `;
+    pipeBLength = newLength;
+    pipeBElement.clear();
+    pipeBElement = drawPipeWithCurves(pipeGroup, newPath, 15, 'down', '#B4B4FF', 'black', `length_b = ${newLength} ft`, newLength);
+    pipeGroup.clear();
+    drawPipes(draw);
+
+  });
 }
 
 function adjustTankHeight(draw, value) {
   currenrtTankBHeight = value
     const newY = config.canvasHeight - 20 - (maxHeight * currenrtTankBHeight / 100);
     
-    const newPath = `
-      M ${startX} ${startY}
-      L ${config.canvasWidth - 170} ${newY}
-    `;
     pipeGroup.clear();
     drawPipes(draw);
-    tankB.move(config.canvasWidth - 175, config.canvasHeight - 160 - (maxHeight * currenrtTankBHeight / 100));
+    tankB.move(config.canvasWidth - 225, config.canvasHeight - 160 - (maxHeight * currenrtTankBHeight / 100));
     textB.move(tankBX + 85, config.canvasHeight - 160 - (maxHeight * currenrtTankBHeight / 100));
+    tankBDashedLine.clear();
+    tankBDashedLine = drawDashedHorizontalLine(draw, config.canvasWidth - 50, config.canvasHeight - 160 - (maxHeight * currenrtTankBHeight / 100) + 30, 50, 'black', 1, '5,5');
+    tankBElevation.clear();
+    tankBElevation = drawDashedLineWithArrows(draw, config.canvasWidth - 40, config.canvasHeight - 130 - 5, config.canvasWidth - 40, config.canvasHeight - 160 - (maxHeight * currenrtTankBHeight / 100) + 35, currenrtTankBHeight + ' ft', { color: 'black', width: 1, dashArray: '5,5' });
 }
 
 
@@ -111,7 +135,7 @@ function addSVGImage(draw, url, x = 0, y = 0, width, height) {
   return img;
 }
 
-function drawPipeWithCurves(draw, pathString, pipeWidth = 15, flowDirection = 'down', strokeColor = '#B4B4FF', outlineColor = 'black', pipeLabel = '') {
+function drawPipeWithCurves(draw, pathString, pipeWidth = 15, flowDirection = 'down', strokeColor = '#B4B4FF', outlineColor = 'black', pipeLabel = '', pipeLength = 1000) {
   let outline = draw.path(pathString)
   .fill('none')
   .stroke({
@@ -129,7 +153,7 @@ function drawPipeWithCurves(draw, pathString, pipeWidth = 15, flowDirection = 'd
   });
   
   const arrowSize = 10;
-  const arrowSpacing = 40;
+  const arrowSpacing = 20;
   const path = draw.path(pathString).hide();
   const length = path.length();
   
@@ -159,7 +183,20 @@ function drawPipeWithCurves(draw, pathString, pipeWidth = 15, flowDirection = 'd
   // Draw a rectangular cap: length = 1.5×pipeWidth, height = pipeWidth
   const rectLength = pipeWidth * 1.5;
   const rectHeight = pipeWidth;
-  
+
+  // Draw a rectangular cap at the start of the pipe (inside)
+  const firstPoint = path.pointAt(0);
+  let nextPoint = path.pointAt(1);
+  const dxStart = nextPoint.x - firstPoint.x;
+  const dyStart = nextPoint.y - firstPoint.y;
+  const startAngle = Math.atan2(dyStart, dxStart) * 180 / Math.PI;
+  const lenStart = Math.sqrt(dxStart * dxStart + dyStart * dyStart);
+  const ux = dxStart / lenStart;
+  const uy = dyStart / lenStart;
+  // Center the cap half its length into the pipe
+  const startCenterX = firstPoint.x + ux * (rectLength / 2);
+  const startCenterY = firstPoint.y + uy * (rectLength / 2);
+
   draw.rect(rectLength, rectHeight)
   .fill(strokeColor)
   .center(endPoint.x, endPoint.y)
@@ -167,7 +204,7 @@ function drawPipeWithCurves(draw, pathString, pipeWidth = 15, flowDirection = 'd
 
   const midIndex = length / 2;
   const midPoint = path.pointAt(midIndex);
-  const nextPoint = path.pointAt(midIndex + 1);
+  nextPoint = path.pointAt(midIndex + 1);
   const dxMid = nextPoint.x - midPoint.x;
   const dyMid = nextPoint.y - midPoint.y;
   const midAngle = Math.atan2(dyMid, dxMid) * (180 / Math.PI);
@@ -192,6 +229,71 @@ function drawPipeWithCurves(draw, pathString, pipeWidth = 15, flowDirection = 'd
                 .rotate(textAngle, labelX, labelY);
   }
   
+  // --- Draw dashed length indicator with arrows and label ---
+  // Compute normal at midpoint for offsetting the dashed indicator outside the pipe
+  const lenMidIndicator = Math.sqrt(dxMid * dxMid + dyMid * dyMid);
+  const nxIndicator = -dyMid / lenMidIndicator;
+  const nyIndicator = dxMid / lenMidIndicator;
+  const offsetDist = pipeWidth / 2 + 5;
+
+  // Create a dashed overlay of the same path
+  const dashedIndicator = draw.path(pathString)
+    .fill('none')
+    .stroke({ color: 'black', width: 1, dasharray: '5,5', linecap: 'round' });
+  // Offset the dashed path outward
+  dashedIndicator.translate(nxIndicator * offsetDist, nyIndicator * offsetDist);
+
+  // Compute start and end points and angle
+  const startPoint = path.pointAt(0);
+  // endPoint and endAngle already defined above
+  // Helper to draw an arrowhead
+  const drawArrow = (px, py, rotation) => {
+    draw.polygon(`0,0 -7,4 -7,-4`)
+      .fill('black')
+      .center(px, py)
+      .rotate(rotation, px, py);
+  };
+  // Offset arrow positions
+  const endXOff = endPoint.x + nxIndicator * offsetDist;
+  const endYOff = endPoint.y + nyIndicator * offsetDist;
+  drawArrow(endXOff, endYOff, endAngle);
+
+  const startXOff = startPoint.x + nxIndicator * offsetDist;
+  const startYOff = startPoint.y + nyIndicator * offsetDist;
+  drawArrow(startXOff, startYOff, endAngle + 180);
+
+  // Draw cut markers (ticks) along the pipe based on real-world length
+  const tickIntervalFt = 100;    // interval in real-world units (ft)
+  // Use pipe diameter as tick length
+  const halfTickPx = (pipeWidth + 10) / 2;
+  const realLenFt = pipeLength;  // real pipe length passed in
+  for (let ft = tickIntervalFt; ft < realLenFt; ft += tickIntervalFt) {
+    const ratio = ft / realLenFt;
+    const pixelDist = ratio * length;  // map to pixel distance along path
+    const midPt = path.pointAt(pixelDist);
+    const nextPt = path.pointAt(Math.min(pixelDist + 1, length));
+    const dxB = nextPt.x - midPt.x;
+    const dyB = nextPt.y - midPt.y;
+    const segLen = Math.sqrt(dxB * dxB + dyB * dyB);
+    const nxB = -dyB / segLen;
+    const nyB = dxB / segLen;
+    // Draw a small perpendicular tick centered at midPt
+    draw.line(
+      midPt.x + nxB * halfTickPx,
+      midPt.y + nyB * halfTickPx,
+      midPt.x - nxB * halfTickPx,
+      midPt.y - nyB * halfTickPx
+    ).stroke({ color: 'white', width: 5 });
+  }
+
+  draw.circle(18)
+    .fill(strokeColor)
+    .center(startX, startY)
+
+    draw.circle(5)
+    .fill('black')
+    .center(startX, startY)
+
   return pipe;
 }
 
@@ -201,23 +303,6 @@ function drawText(draw, textString, x, y, fontSize = 16, fillColor = 'black') {
     .fill(fillColor)
     .move(x, y);
   return txt;
-}
-
-// 1) Define a helper that emits two tspans: one normal letter, one “shifted down” subscript
-function drawTextWithSubscript(draw, mainStr, subStr, x, y, fontSize = 16, fillColor = 'black') {
-  return draw.text(add => {
-    // Primary character (ℓ)
-    add.tspan(mainStr)
-       .attr({ 'font-size': fontSize, fill: fillColor });
-    // Subscript character (A), scaled + baseline-shift
-    add.tspan(subStr)
-       .attr({
-         'font-size': Math.round(fontSize * 0.75),  // slightly smaller
-         fill: fillColor,
-         'baseline-shift': 'sub'
-       });
-  })
-  .move(x, y);
 }
 
 function drawLabelWithSubscript(draw, label, x, y, fontSize = 16, fillColor = 'black') {
@@ -248,76 +333,54 @@ function drawLabelWithSubscript(draw, label, x, y, fontSize = 16, fillColor = 'b
   }
 }
 
-// Draw a dashed connection with crosses at endpoints, a dashed arrow, and an optional label
-function drawDashedConnection(draw, x1, y1, x2, y2, label = '') {
-  const crossSize = 10;
-  // Cross at point 1
-  draw.line(x1 - crossSize, y1, x1 + crossSize, y1)
-    .stroke({ color: 'black', width: 1, dasharray: '5,5' });
-  draw.line(x1, y1 - crossSize, x1, y1 + crossSize)
-    .stroke({ color: 'black', width: 1, dasharray: '5,5' });
-  // Cross at point 2
-  draw.line(x2 - crossSize, y2, x2 + crossSize, y2)
-    .stroke({ color: 'black', width: 1, dasharray: '5,5' });
-  draw.line(x2, y2 - crossSize, x2, y2 + crossSize)
-    .stroke({ color: 'black', width: 1, dasharray: '5,5' });
-
-  // Compute unit direction vector
-  const dxTotal = x2 - x1;
-  const dyTotal = y2 - y1;
-  const totalLen = Math.sqrt(dxTotal * dxTotal + dyTotal * dyTotal);
-  const ux = dxTotal / totalLen;
-  const uy = dyTotal / totalLen;
-
-  const offset = crossSize;
-  const startLineX = x1 + ux * offset;
-  const startLineY = y1 + uy * offset;
-  const endLineX = x2 - ux * offset;
-  const endLineY = y2 - uy * offset;
-
-  // Main dashed line shortened to end at crosses
-  draw.line(startLineX, startLineY, endLineX, endLineY)
-    .stroke({ color: 'black', width: 1, dasharray: '5,5' });
-  // Arrowhead
-  const angle = Math.atan2(dyTotal, dxTotal) * (180 / Math.PI);
-  const arrowTipX2 = x2 - ux * offset;
-  const arrowTipY2 = y2 - uy * offset;
-  const arrowPoly = draw.polygon('0,-5 10,0 0,5')
-    .fill('black')
-    .center(arrowTipX2, arrowTipY2)
-    .rotate(angle, arrowTipX2, arrowTipY2);
-  arrowPoly.front();
-
-  // Draw arrowhead at the starting point, reversed direction
-  const reverseAngle = angle + 180;
-  const arrowTipX1 = x1 + ux * offset;
-  const arrowTipY1 = y1 + uy * offset;
-  const arrowPolyStart = draw.polygon('0,-5 10,0 0,5')
-    .fill('black')
-    .center(arrowTipX1, arrowTipY1)
-    .rotate(reverseAngle, arrowTipX1, arrowTipY1);
-  arrowPolyStart.front();
-
-  // Label at midpoint, offset perpendicular to line
-  if (label) {
-    const midX = (x1 + x2) / 2;
-    const midY = (y1 + y2) / 2;
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const len = Math.sqrt(dx * dx + dy * dy);
-    const nx = -dy / len;
-    const ny = dx / len;
-    const offset = 15; // distance to offset text from line
-    const labelX = midX + nx * offset;
-    const labelY = midY + ny * offset;
-    const txt = drawText(draw, label, labelX, labelY, 14, 'black')
-      .font({ anchor: 'middle' });
-    txt.front();
-  }
+/**
+ * Draws a horizontal dashed line and returns a group that can be cleared.
+ */
+function drawDashedHorizontalLine(draw, startX, startY, length, color = 'black', width = 1, dashArray = '5,5') {
+  const group = draw.group();
+  group.line(startX, startY, startX + length, startY)
+    .stroke({ color: color, width: width, dasharray: dashArray });
+  return group;
 }
 
-// Draw a horizontal dashed line starting at (startX, startY) with the specified length
-function drawDashedHorizontalLine(draw, startX, startY, length, color = 'black', width = 1, dashArray = '5,5') {
-  draw.line(startX, startY, startX + length, startY)
-    .stroke({ color: color, width: width, dasharray: dashArray });
+function drawDashedLineWithArrows(draw, x1, y1, x2, y2, textString, options = {}) {
+  const group = draw.group();
+  const {
+    color = 'black',
+    width = 1,
+    dashArray = '5,5',
+    arrowSize = 10,
+    fontSize = 14,
+    fontColor = 'black'
+  } = options;
+
+  // Draw the dashed line
+  group.line(x1, y1, x2, y2).stroke({ color, width, dasharray: dashArray });
+
+  // Compute angle for arrowheads
+  const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+
+  // Helper to draw an arrowhead
+  const drawArrow = (px, py, rotation) => {
+    group.polygon(`0,0 -${arrowSize},${arrowSize/2} -${arrowSize},-${arrowSize/2}`)
+      .fill(color)
+      .center(px, py)
+      .rotate(rotation, px, py);
+  };
+
+  // Arrow at end
+  drawArrow(x2, y2, angle);
+
+  // Arrow at start (flip 180°)
+  drawArrow(x1, y1, angle + 180);
+
+  // Text at midpoint
+  const midX = (x1 + x2) / 2;
+  const midY = (y1 + y2) / 2;
+  group.text(textString)
+    .font({ size: fontSize, family: 'Arial', anchor: 'middle' })
+    .fill(fontColor)
+    .move(midX, midY - fontSize / 2);
+
+  return group;
 }
