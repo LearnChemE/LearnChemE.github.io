@@ -88,20 +88,16 @@
                 V_0^\ell = f\,V_{\mathrm{can}},
                 \]
               </p>
-              <p>where \(f\) is the initial volume fraction of liquid.</p>
-
-              <p>Initially all contents are at room temperature (300 K), and the pressure inside the can is the
+              <p>where \(f\) is the initial volume fraction of liquid. Initially all contents are at room temperature (300 K), and the pressure inside the can is the
                 saturation pressure \(p^{\mathrm{sat}}\) at 300 K. The Antoine equation is used to calculate
                 \(p^{\mathrm{sat}}\):</p>
               <p style="text-align:center;">
                 \[
-                p^{\mathrm{sat}} = 10^{A - \frac{B}{T + C}},
+                p^{\mathrm{sat}} = 10^{A - \frac{B}{\mathrm{T_c} + C}},
                 \]
               </p>
-              <p>where \(p^{\mathrm{sat}}\) is in bar, \(T\) is temperature (K), and \(A, B, C\) are Antoine constants.
-              </p>
-
-              <p>The total moles \(n\) are equal to the liquid moles \(n^\ell\) plus the vapor moles \(n^v\):</p>
+              <p>where \(p^{\mathrm{sat}}\) is in bar, \(T_{\mathrm{c}}\) is temperature (&deg;C), and \(A, B, C\) are Antoine constants.
+                The total moles \(n\) are equal to the liquid moles \(n^\ell\) plus the vapor moles \(n^v\):</p>
               <p style="text-align:center;">
                 \[
                 n = n^\ell + n^v,\quad
@@ -110,7 +106,7 @@
                 \]
               </p>
               <p>where \(\rho^\ell\) is the liquid molar density (mol/L), \(R\) is the ideal‐gas constant
-                (L·bar/(mol·K)), and \(V^\ell\) and \(V^v\) are the liquid and vapor volumes at any time. The liquid
+                (L·bar/(mol·K)), \(T\) is the absolute temperature (K), and \(V^\ell\) and \(V^v\) are the liquid and vapor volumes at any time. The liquid
                 volume is found by rearranging the total‐moles equation:</p>
               <p style="text-align:center;">
                 \[
@@ -138,9 +134,6 @@
               </p>
               <p>at \(t=0\), \(T = 300\) K, where \(\Delta H_{\mathrm{vap}}\) is the heat of vaporization (kJ/mol), and
                 \(C_p\) is the liquid heat capacity (kJ/(mol·K)).</p>
-
-              <p>The screencast video <a href="https://demonstrations.wolfram.com/CompressedGasSpray/"
-                  target="_blank">shows how to use this Demonstration</a>.</p>
             </div>
           </div>
         </div>
@@ -160,23 +153,15 @@
             <div class="modal-body">
               <p class="details-text">
                 Compressed-gas dusters spray a gas such as difluoroethane (DFE) to remove dust from electronics. When
-                gas
-                exits the valve, liquid DFE in the container vaporizes to maintain vapor-liquid equilibrium. The energy
-                to
-                vaporize the liquid is obtained by cooling the remaining liquid; the container is modeled as adiabatic.
+                gas exits the valve, liquid DFE in the container vaporizes to maintain vapor-liquid equilibrium. The energy
+                to vaporize the liquid is obtained by cooling the remaining liquid; the container is modeled as adiabatic.
                 Decreasing the liquid temperature decreases its saturation pressure, which lowers the driving force, and
                 thus the gas flow rate decreases. For smaller initial volume fractions of liquid (change with a slider),
                 the liquid cools faster.
-              </p>
-              <p class="details-text">
                 Select a plot (volume, moles, temperature, or pressure) with buttons to display how that property
-                changes
-                with time. Animate the duster by clicking the play button next to "spray gas". Select "stop at -5 °C"
-                and
-                the spray will stop once -5 °C is reached, Otherwise, set the time the spray stops with a slider. In
-                either case, the black dot(s) show the conditions of the duster on the plot. The liquid and vapor DFE
-                are
-                assumed to be in equilibrium at all times. As the spray time increases, the adiabatic approximation
+                changes with time. Animate the duster by clicking the play button next to "spray gas". Set the time the spray stops with a slider. 
+                The black dot(s) show the conditions of the duster on the plot. The liquid and vapor DFE
+                are assumed to be in equilibrium at all times. As the spray time increases, the adiabatic approximation
                 becomes less accurate.
               </p>
             </div>
@@ -198,13 +183,11 @@
               <p class="details-text">
                 This simulation was created in the Department of Chemical and Biological Engineering at University of
                 Colorado Boulder for LearnChemE.com by Sneha Nagaraju under the direction of Professor John L. Falconer
-                and Michelle Medlin. It is a JavaScript/HTML5 implementation of a Mathematica simulation (<a
-                  href="https://demonstrations.wolfram.com/CompressedGasSpray/" target="_blank">link</a>) by Rachael
+                and Michelle Medlin. It is a JavaScript/HTML5 implementation of a <a
+                  href="https://demonstrations.wolfram.com/CompressedGasSpray/" target="_blank">Mathematica simulation</a> by Rachael
                 Bauman. It was prepared with financial support from the National Science Foundation (DUE 2336987 and
                 2336988) in collaboration with Washington State University. Address any questions or comments to <a
-                  href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>. If this simulation is too big or too
-                small
-                for your screen, zoom out or in using command - or command +  on Mac or ctrl - or ctrl +  on Windows.
+                  href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.
               </p>
             </div>
           </div>
