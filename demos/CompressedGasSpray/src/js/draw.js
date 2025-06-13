@@ -297,9 +297,9 @@ function drawGraph(ctx, x0, y0, w, h, data, mode, tMax) {
   ctx.fillText('time (s)', x0 + M.left + plotW / 2, y0 + M.top + plotH + 40);
 
   // Initial Pᵢ, Tᵢ annotation
-  const Pi = data.P0.toFixed(2);
-  const Ti = (data.T0 - 273.15).toFixed(1);
+  // const Pi = data.P0.toFixed(2);
+  // const Ti = (data.T0 - 273.15).toFixed(1);
 
-  ctx.font = 'italic 14px serif';
-  ctx.fillText(`Pᵢ = ${Pi} bar   Tᵢ = ${Ti} °C`, x0 + M.left + plotW / 2, y0 + M.top - 10);
+  // ctx.font = 'italic 14px serif';
+  // ctx.fillText(`Pᵢ = ${Pi} bar   Tᵢ = ${Ti} °C`, x0 + M.left + plotW / 2, y0 + M.top - 10);
 }
