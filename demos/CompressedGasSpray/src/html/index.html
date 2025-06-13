@@ -1,266 +1,294 @@
 <!doctype html>
+
 <html lang="en">
 
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="content-language" content="en">
   <title>Compressed-Gas Spray</title>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <link rel="stylesheet" href="style.css">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-204988035-3');
+  </script>
+
 </head>
 
 <body>
+
   <div id="graphics-container">
-    <div class="controls">
-      <div class="top-row">
-        <div class="button-group">
-          <button id="volumeBtn" class="active">volume</button>
-          <button id="molesBtn">moles</button>
-          <button id="temperatureBtn">temperature</button>
-          <button id="pressureBtn">pressure</button>
-        </div>
-        <div class="play-controls">
-          <label>spray gas</label>
-          <button id="playBtn" title="Play and Reset">▶</button>
-          <button id="pauseBtn" title="Pause">⏸</button>
-          <button id="resetBtn" title="Reset">⏮</button>
-        </div>
-      </div>
-
-      <div class="middle-row">
-        <div class="slider-row-inline">
-          <div class="slider-block">
-            <label for="volumeFraction">initial volume fraction of liquid</label>
-            <input type="range" id="volumeFraction" min="0.10" max="1.00" step="0.01" value="0.75">
-            <span id="volumeVal">0.75</span>
-          </div>
-
-          <!-- Time slider -->
-          <div class="slider-block">
-            <label for="timeSprayed">time sprayed (s)</label>
-            <input type="range" id="timeSprayed" min="20" max="300" step="1" value="204">
-            <span id="timeVal">204</span>
-            <!-- </div> -->
+    <div id="outer-container">
+      <div id="hamburger">
+        <div id="hamburger-icon"></div>
+        <div id="controlshamburger">
+          <div id="buttons">
+            <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
+              Directions
+            </div>
+            <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">
+              Details
+            </div>
+            <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">
+              About
+            </div>
           </div>
         </div>
       </div>
+      <div id="controls">
+        <div class="top-row">
+          <div class="button-group">
+            <button id="volumeBtn" class="active">volume</button>
+            <button id="molesBtn">moles</button>
+            <button id="temperatureBtn">temperature</button>
+            <button id="pressureBtn">pressure</button>
+          </div>
+          <div class="play-controls">
+            <label>spray gas</label>
+            <button id="playBtn" title="Play and Reset">▶</button>
+            <button id="pauseBtn" title="Pause">⏸</button>
+            <button id="resetBtn" title="Reset">⏮</button>
+          </div>
+        </div>
 
+        <div class="middle-row">
+          <div class="slider-row-inline">
+            <div class="slider-block">
+              <label for="volumeFraction">initial volume fraction of liquid</label>
+              <input type="range" id="volumeFraction" min="0.10" max="1.00" step="0.01" value="0.75">
+              <span id="volumeVal">0.75</span>
+            </div>
 
-      <div id="outer-container">
+            <!-- Time slider -->
+            <div class="slider-block">
+              <label for="timeSprayed">time sprayed (s)</label>
+              <input type="range" id="timeSprayed" min="20" max="300" step="1" value="204">
+              <span id="timeVal">204</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <div id="p5-outer">
 
         <div id="p5-container">
-          <div id="hamburger">
-            <div id="hamburger-icon"></div>
-            <div id="controls">
-              <div id="buttons">
-                <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
-                  Directions
-                </div>
-                <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">
-                  Details
-                </div>
-                <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">
-                  About
-                </div>
-              </div>
-            </div>
-          </div>
-          <div id="drawing-area"></div>
-        </div>
-      </div>
+          <canvas id="main-canvas"></canvas>
 
-      <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="details-modal-label">Details</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"></span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p>The total volume of the can \(V_{\mathrm{can}}\) is 0.375 L, and the initial volume of liquid in the
-                can \(V_0^\ell\) is:</p>
-              <p style="text-align:center;">
-                \[
-                V_0^\ell = f\,V_{\mathrm{can}},
-                \]
-              </p>
-              <p>where \(f\) is the initial volume fraction of liquid. Initially all contents are at room temperature (300 K), and the pressure inside the can is the
-                saturation pressure \(p^{\mathrm{sat}}\) at 300 K. The Antoine equation is used to calculate
-                \(p^{\mathrm{sat}}\):</p>
-              <p style="text-align:center;">
-                \[
-                p^{\mathrm{sat}} = 10^{A - \frac{B}{\mathrm{T_c} + C}},
-                \]
-              </p>
-              <p>where \(p^{\mathrm{sat}}\) is in bar, \(T_{\mathrm{c}}\) is temperature (&deg;C), and \(A, B, C\) are Antoine constants.
-                The total moles \(n\) are equal to the liquid moles \(n^\ell\) plus the vapor moles \(n^v\):</p>
-              <p style="text-align:center;">
-                \[
-                n = n^\ell + n^v,\quad
-                n^\ell = \rho^\ell\,V^\ell,\quad
-                n^v = \frac{p^{\mathrm{sat}}\,V^v}{R\,T},
-                \]
-              </p>
-              <p>where \(\rho^\ell\) is the liquid molar density (mol/L), \(R\) is the ideal‐gas constant
-                (L·bar/(mol·K)), \(T\) is the absolute temperature (K), and \(V^\ell\) and \(V^v\) are the liquid and vapor volumes at any time. The liquid
-                volume is found by rearranging the total‐moles equation:</p>
-              <p style="text-align:center;">
-                \[
-                V^\ell = \frac{n - \dfrac{p\,V_{\mathrm{can}}}{R\,T}}{\rho^\ell - \dfrac{p}{R\,T}},
-                \quad
-                V^v = V_{\mathrm{can}} - V^\ell.
-                \]
-              </p>
 
-              <p>From an unsteady‐state mole balance:</p>
-              <p style="text-align:center;">
-                \[
-                \frac{dn}{dt} = -\alpha\,(p^{\mathrm{sat}} - 1),
-                \]
-              </p>
-              <p>at \(t=0\), \(n = n_0\); where \(\alpha\) is a constant (mol/(bar·s)) and the outside air pressure is 1
-                bar.</p>
-
-              <p>From the energy balance:</p>
-              <p style="text-align:center;">
-                \[
-                \frac{dT}{dt}
-                = -\frac{\Delta H_{\mathrm{vap}}}{n\,C_p}\,\frac{dn}{dt},
-                \]
-              </p>
-              <p>at \(t=0\), \(T = 300\) K, where \(\Delta H_{\mathrm{vap}}\) is the heat of vaporization (kJ/mol), and
-                \(C_p\) is the liquid heat capacity (kJ/(mol·K)).</p>
-            </div>
+          <div id="mathsection">
+            <div id="formula-container"></div>
           </div>
         </div>
       </div>
+    </div>
 
-
-      <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="directions-modal-label">Directions</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"></span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p class="details-text">
-                Compressed-gas dusters spray a gas such as difluoroethane (DFE) to remove dust from electronics. When
-                gas exits the valve, liquid DFE in the container vaporizes to maintain vapor-liquid equilibrium. The energy
-                to vaporize the liquid is obtained by cooling the remaining liquid; the container is modeled as adiabatic.
-                Decreasing the liquid temperature decreases its saturation pressure, which lowers the driving force, and
-                thus the gas flow rate decreases. For smaller initial volume fractions of liquid (change with a slider),
-                the liquid cools faster.
-                Select a plot (volume, moles, temperature, or pressure) with buttons to display how that property
-                changes with time. Animate the duster by clicking the play button next to "spray gas". Set the time the spray stops with a slider. 
-                The black dot(s) show the conditions of the duster on the plot. The liquid and vapor DFE
-                are assumed to be in equilibrium at all times. As the spray time increases, the adiabatic approximation
-                becomes less accurate.
-              </p>
-            </div>
+    <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label"
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="details-modal-label">Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"></span>
+            </button>
           </div>
-        </div>
-      </div>
+          <div class="modal-body">
+            <p>The total volume of the can \(V_{\mathrm{can}}\) is 0.375 L, and the initial volume of liquid in the
+              can \(V_0^\ell\) is:</p>
+            <p style="text-align:center;">
+              \[
+              V_0^\ell = f\,V_{\mathrm{can}},
+              \]
+            </p>
+            <p>where \(f\) is the initial volume fraction of liquid. Initially all contents are at room temperature (300
+              K), and the pressure inside the can is the
+              saturation pressure \(p^{\mathrm{sat}}\) at 300 K. The Antoine equation is used to calculate
+              \(p^{\mathrm{sat}}\):</p>
+            <p style="text-align:center;">
+              \[
+              p^{\mathrm{sat}} = 10^{A - \frac{B}{\mathrm{T_c} + C}},
+              \]
+            </p>
+            <p>where \(p^{\mathrm{sat}}\) is in bar, \(T_{\mathrm{c}}\) is temperature (&deg;C), and \(A, B, C\) are
+              Antoine constants.
+              The total moles \(n\) are equal to the liquid moles \(n^\ell\) plus the vapor moles \(n^v\):</p>
+            <p style="text-align:center;">
+              \[
+              n = n^\ell + n^v,\quad
+              n^\ell = \rho^\ell\,V^\ell,\quad
+              n^v = \frac{p^{\mathrm{sat}}\,V^v}{R\,T},
+              \]
+            </p>
+            <p>where \(\rho^\ell\) is the liquid molar density (mol/L), \(R\) is the ideal‐gas constant
+              (L·bar/(mol·K)), \(T\) is the absolute temperature (K), and \(V^\ell\) and \(V^v\) are the liquid and
+              vapor volumes at any time. The liquid
+              volume is found by rearranging the total‐moles equation:</p>
+            <p style="text-align:center;">
+              \[
+              V^\ell = \frac{n - \dfrac{p\,V_{\mathrm{can}}}{R\,T}}{\rho^\ell - \dfrac{p}{R\,T}},
+              \quad
+              V^v = V_{\mathrm{can}} - V^\ell.
+              \]
+            </p>
 
-      <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="about-modal-label">About</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"></span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p class="details-text">
-                This simulation was created in the Department of Chemical and Biological Engineering at University of
-                Colorado Boulder for LearnChemE.com by Sneha Nagaraju under the direction of Professor John L. Falconer
-                and Michelle Medlin. It is a JavaScript/HTML5 implementation of a <a
-                  href="https://demonstrations.wolfram.com/CompressedGasSpray/" target="_blank">Mathematica simulation</a> by Rachael
-                Bauman. It was prepared with financial support from the National Science Foundation (DUE 2336987 and
-                2336988) in collaboration with Washington State University. Address any questions or comments to <a
-                  href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.
-              </p>
-            </div>
+            <p>From an unsteady‐state mole balance:</p>
+            <p style="text-align:center;">
+              \[
+              \frac{dn}{dt} = -\alpha\,(p^{\mathrm{sat}} - 1),
+              \]
+            </p>
+            <p>at \(t=0\), \(n = n_0\); where \(\alpha\) is a constant (mol/(bar·s)) and the outside air pressure is 1
+              bar.</p>
+
+            <p>From the energy balance:</p>
+            <p style="text-align:center;">
+              \[
+              \frac{dT}{dt}
+              = -\frac{\Delta H_{\mathrm{vap}}}{n\,C_p}\,\frac{dn}{dt},
+              \]
+            </p>
+            <p>at \(t=0\), \(T = 300\) K, where \(\Delta H_{\mathrm{vap}}\) is the heat of vaporization (kJ/mol), and
+              \(C_p\) is the liquid heat capacity (kJ/(mol·K)).</p>
           </div>
         </div>
       </div>
     </div>
 
 
-    <script>
-      const volumeSlider = document.getElementById("volumeFraction");
-      const volumeVal = document.getElementById("volumeVal");
-      volumeSlider.addEventListener("input", () => {
-        volumeVal.textContent = volumeSlider.value;
+    <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="directions-modal-label">Directions</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="details-text">
+              Compressed-gas dusters spray a gas such as difluoroethane (DFE) to remove dust from electronics. When
+              gas exits the valve, liquid DFE in the container vaporizes to maintain vapor-liquid equilibrium. The
+              energy
+              to vaporize the liquid is obtained by cooling the remaining liquid; the container is modeled as adiabatic.
+              Decreasing the liquid temperature decreases its saturation pressure, which lowers the driving force, and
+              thus the gas flow rate decreases. For smaller initial volume fractions of liquid (change with a slider),
+              the liquid cools faster.
+              Select a plot (volume, moles, temperature, or pressure) with buttons to display how that property
+              changes with time. Animate the duster by clicking the play button next to "spray gas". Set the time the
+              spray stops with a slider.
+              The black dot(s) show the conditions of the duster on the plot. The liquid and vapor DFE
+              are assumed to be in equilibrium at all times. As the spray time increases, the adiabatic approximation
+              becomes less accurate.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label"
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="about-modal-label">About</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="details-text">
+              This simulation was created in the Department of Chemical and Biological Engineering at University of
+              Colorado Boulder for LearnChemE.com by Sneha Nagaraju under the direction of Professor John L. Falconer
+              and Michelle Medlin. It is a JavaScript/HTML5 implementation of a <a
+                href="https://demonstrations.wolfram.com/CompressedGasSpray/" target="_blank">Mathematica simulation</a>
+              by Rachael
+              Bauman. It was prepared with financial support from the National Science Foundation (DUE 2336987 and
+              2336988) in collaboration with Washington State University. Address any questions or comments to <a
+                href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    const volumeSlider = document.getElementById("volumeFraction");
+    const volumeVal = document.getElementById("volumeVal");
+    volumeSlider.addEventListener("input", () => {
+      volumeVal.textContent = volumeSlider.value;
+    });
+
+    const timeSlider = document.getElementById("timeSprayed");
+    const timeVal = document.getElementById("timeVal");
+    timeSlider.addEventListener("input", () => {
+      timeVal.textContent = timeSlider.value;
+    });
+
+    const buttons = document.querySelectorAll(".button-group button");
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        buttons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
       });
+    });
+  </script>
 
-      const timeSlider = document.getElementById("timeSprayed");
-      const timeVal = document.getElementById("timeVal");
-      timeSlider.addEventListener("input", () => {
-        timeVal.textContent = timeSlider.value;
-      });
+  <script type="module">
+    import { drawAll } from './draw.js';
 
-      const buttons = document.querySelectorAll(".button-group button");
-      buttons.forEach(btn => {
-        btn.addEventListener("click", () => {
-          buttons.forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-        });
-      });
-    </script>
+    window.addEventListener('DOMContentLoaded', () => {
+      // 1. Set default mode
+      window.graphMode = 'volume';
+      console.log('Default graphMode:', window.graphMode);
+      drawAll();
 
-    <script type="module">
-      import { drawAll } from './draw.js';
+      // 2. Wire up buttons
+      const modeButtons = {
+        volume: document.getElementById('volumeBtn'),
+        moles: document.getElementById('molesBtn'),
+        temperature: document.getElementById('temperatureBtn'),
+        pressure: document.getElementById('pressureBtn'),
+      };
 
-      window.addEventListener('DOMContentLoaded', () => {
-        // 1. Set default mode
-        window.graphMode = 'volume';
-        console.log('Default graphMode:', window.graphMode);
-        drawAll();
-
-        // 2. Wire up buttons
-        const modeButtons = {
-          volume: document.getElementById('volumeBtn'),
-          moles: document.getElementById('molesBtn'),
-          temperature: document.getElementById('temperatureBtn'),
-          pressure: document.getElementById('pressureBtn'),
-        };
-
-        for (const [mode, btn] of Object.entries(modeButtons)) {
-          if (!btn) {
-            console.error(`Button for mode "${mode}" not found`);
-            continue;
-          }
-          btn.addEventListener('click', () => {
-            // toggle UI
-            Object.values(modeButtons).forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            // set & log
-            window.graphMode = mode;
-            console.log('Switched graphMode to', mode);
-            drawAll();
-          });
+      for (const [mode, btn] of Object.entries(modeButtons)) {
+        if (!btn) {
+          console.error(`Button for mode "${mode}" not found`);
+          continue;
         }
+        btn.addEventListener('click', () => {
+          // toggle UI
+          Object.values(modeButtons).forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
 
-        // 3. Redraw on slider change
-        document.getElementById('volumeFraction')
-          .addEventListener('input', () => { console.log('volumeFraction changed'); drawAll(); });
-        document.getElementById('timeSprayed')
-          .addEventListener('input', () => { console.log('timeSprayed changed'); drawAll(); });
+          // set & log
+          window.graphMode = mode;
+          console.log('Switched graphMode to', mode);
+          drawAll();
+        });
+      }
 
-        // (If you use radios for stop-at–5°, wire them here too)
-      });
-    </script>
+      // 3. Redraw on slider change
+      document.getElementById('volumeFraction')
+        .addEventListener('input', () => { console.log('volumeFraction changed'); drawAll(); });
+      document.getElementById('timeSprayed')
+        .addEventListener('input', () => { console.log('timeSprayed changed'); drawAll(); });
+
+      // (If you use radios for stop-at–5°, wire them here too)
+    });
+  </script>
 
 </body>
 
