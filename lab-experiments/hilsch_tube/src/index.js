@@ -3,7 +3,7 @@ import "p5";
 import "./style/style.scss";
 import "./assets/digital-7.ttf";
 import "./assets/ranque_hilsch_vortex_tube_worksheet.pdf";
-import { importSVG } from "./js/svg";
+import { importSVG, enableSvgZoom, enableSvgDrag } from "./js/svg";
 import { handleInputs } from "./js/inputs";
 import { calcAll } from "./js/calcs";
 
@@ -25,6 +25,9 @@ window.state = {
   vortexPortPosition: 0.5,
   maxP: 6.89,
   fractionInColdStream: 0.2,
+  mousedown: false,
+  maxViewBox: [-130, 10, 320, 240],
+  viewBox: [-130, 10, 320, 240],
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -32,6 +35,8 @@ const containerElement = document.getElementById("p5-container");
 window.setup = function() {
   sizeContainer();
   importSVG();
+  enableSvgZoom();
+  enableSvgDrag();
   window.drawAll = require("./js/draw");
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
   handleInputs();
