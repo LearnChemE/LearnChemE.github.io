@@ -14,11 +14,14 @@ let graphicsWrapper = document.getElementById("graphics-wrapper");
 
 // This is the size of the canvas. I set it to 800x600, but it could
 // be any arbitrary height and width.
-let containerDims = [800, 600];
+let containerDims = [1280, 720];
 
 window.setup = function () {
   // Create the p5.js canvas inside #graphics-wrapper
-  createCanvas(graphicsWrapper.offsetWidth, graphicsWrapper.offsetHeight).parent(graphicsWrapper);
+  createCanvas(
+    graphicsWrapper.offsetWidth,
+    graphicsWrapper.offsetHeight
+  ).parent(graphicsWrapper);
   handleCanvasSize();
   handleMouseScaling();
 };
@@ -37,32 +40,206 @@ window.draw = function () {
   text(`Feed Temp: ${g.feedTemp} °C`, 20, 110);
 
   // Draw pipe first so it appears behind everything
-  drawPipeAndPump(50, 250);
+  //drawPipeAndPump(150, 250);
 
   // Draw tank last so it appears on top
-  drawSaltTank(50, 250);
+  drawSaltTank(175, 400);
+  drawPump(175, 400);
 };
+
+let saltTankWidth = 200;
+let saltTankHeight = 300;
 
 function drawSaltTank(x, y) {
   // Tank outline
-  stroke(0);
-  strokeWeight(2);
-  noFill();
-  rect(x, y, 100, 150, 15);
+  push();
+  fill("gray");
+  stroke("black");
+  strokeWeight(1);
+  line(
+    x - saltTankWidth / 2 - 5,
+    y - saltTankHeight / 2,
+    x - saltTankWidth / 2 - 5,
+    y + saltTankHeight / 2
+  );
+  beginShape();
+  vertex(x - saltTankWidth / 2 - 5, y - saltTankHeight / 2);
+  vertex(x + saltTankWidth / 2 + 5, y - saltTankHeight / 2);
+  vertex(x + saltTankWidth / 2 + 5, y + saltTankHeight / 2);
+  vertex(x, y + saltTankHeight / 2 + 30);
+  vertex(x - saltTankWidth / 2 - 5, y + saltTankHeight / 2);
 
-  // Fill with solid light blue solution (removed transparency)
-  fill(220, 230, 255); // Removed the alpha value to make it solid
+  endShape();
+
   noStroke();
-  rect(x, y, 100, 150, 15);
+  fill("LightCyan");
+  beginShape();
+  vertex(x - saltTankWidth / 2, y - saltTankHeight / 2 - 1);
+  vertex(x + saltTankWidth / 2, y - saltTankHeight / 2 - 1);
+  vertex(x + saltTankWidth / 2, y + saltTankHeight / 2 - 5);
+  vertex(x, y + saltTankHeight / 2 + 24);
+  vertex(x - saltTankWidth / 2, y + saltTankHeight / 2 - 5);
+
+  endShape();
+
+  pop();
+
+  //---------------------bottom of the tank spout---------------------
+  push();
+  stroke("black");
+  strokeWeight(1);
+  rectMode(CENTER);
+  fill("gray");
+  rect(x, y + saltTankHeight / 2 + 40, 30, 30);
+
+  pop();
+
+  //---------------------bottom of the tank pipe turn right---------------------
+  push();
+  stroke("black");
+  strokeWeight(1);
+  rectMode(CORNER);
+  fill("gray");
+  rect(x - 15, y + saltTankHeight / 2 + 54, 160, 30, 0, 0, 0, 15);
+  noStroke();
+  rectMode(CENTER);
+  fill("gray");
+  rect(x, y + saltTankHeight / 2 + 40, 29, 34);
+  noStroke();
+  fill("LightCyan");
+  rect(x, y + saltTankHeight / 2 + 38, 20, 36);
+  rectMode(CORNER);
+  fill("LightCyan");
+  rect(x - 10, y + saltTankHeight / 2 + 53, 20, 26, 0, 0, 0, 10);
+  rect(x - 10, y + saltTankHeight / 2 + 59, 156, 20, 0, 0, 0, 10);
+  stroke("black");
+  strokeWeight(1);
+  fill("gray");
+  rect(x - 16 + 160 - 4, y + saltTankHeight / 2 + 55 + 2, 7, 7);
+  rect(x - 16 + 160 - 4, y + saltTankHeight / 2 + 72 + 2, 7, 7);
+  rect(x - 16 + 160 - 4, y + saltTankHeight / 2 + 42 + 2, 7, 7);
+  rect(x - 16 + 160 - 4, y + saltTankHeight / 2 + 85 + 2, 7, 7);
+  rect(x - 16 + 160, y + saltTankHeight / 2 + 41, 7, 56);
+
+  pop();
 
   // Add text
+  textAlign(CENTER, CENTER);
   fill(0);
   textSize(20);
-  textAlign(CENTER);
-  text("Salt", x + 50, y + 60);
-  text("Solution", x + 50, y + 85);
-
+  text("Salt", x, y);
+  text("Solution", x, y + 25);
   textAlign(LEFT);
+}
+
+function drawPump(x, y) {
+  push();
+  translate(-16 + 160, saltTankHeight / 2 + 41 + 28);
+
+  push();
+  fill("gray");
+  beginShape();
+
+  vertex(x + 14, y - 15); //top left corner
+  vertex(x + 14, y + 15);
+  vertex(x + 14 + 60, y + 15);
+  vertex(x + 14 + 60 + 25, y + 15 + 10);
+  vertex(x + 14 + 60 + 25, y - 15 - 10);
+  vertex(x + 14 + 60, y - 15);
+  endShape();
+  line(x + 14 + 60, y - 15, x + 14, y - 15);
+  rectMode(CORNER);
+  rect(x + 30, y - 75, 30, 90);
+  arc(x + 45, y + 15, 30, 30, 2 * PI, PI);
+  noStroke();
+  arc(x + 45, y + 10, 28, 30, 2 * PI, PI);
+
+  pop();
+  //---------------------stand for the pump---------------------
+
+  push();
+
+  fill("gray");
+  quad(x + 140, y + 30, x + 150, y + 30, x + 120, y + 60, x + 110, y + 60);
+  push();
+  translate(40, 0);
+  quad(x + 180, y + 30, x + 190, y + 30, x + 220, y + 60, x + 210, y + 60);
+  pop();
+
+  pop();
+
+  //---------------------right side of the pump---------------------
+  push();
+  fill("gray");
+  beginShape();
+
+  vertex(x + 14 + 60 + 25, y - 15 - 10); //top left corner
+  vertex(x + 14 + 60 + 25, y + 15 + 10);
+  vertex(x + 99 + 15, y + 25);
+  vertex(x + 114 + 30, y + 25 + 10);
+  vertex(x + 144 + 100, y + 35);
+  vertex(x + 244 + 5, y + 35 - 5);
+  vertex(x + 249, y + 30);
+  vertex(x + 249, y - 30);
+  vertex(x + 249 - 5, y - 30 - 5);
+  vertex(x + 249 - 5, y - 30 - 5);
+  vertex(x + 144, y - 35);
+  vertex(x + 144 - 25, y - 25);
+
+  endShape();
+  line(x + 144 - 25, y - 25, x + 14 + 60 + 25, y - 15 - 10);
+  pop();
+
+  push();
+  rectMode(CORNER);
+  fill("gray");
+  rect(x + 11.5, y - 25, 7, 7);
+  rect(x + 11.5, y + 18, 7, 7);
+  rect(x + 11.5, y - 12, 7, 7);
+  rect(x + 11.5, y + 5, 7, 7);
+  rect(x + 7, y - 28, 7, 56);
+
+  pop();
+
+  push();
+  fill("gray");
+  rectMode(CENTER);
+  rect(x + 100, y, 14, 65);
+  line(x + 100, y + 65 / 2, x + 100, y - 65 / 2);
+  pop();
+
+  push();
+  rectMode(CENTER);
+  fill("gray");
+  rect(x + 200, y, 75, 3);
+  rect(x + 200, y + 13, 75, 3);
+  rect(x + 200, y - 13, 75, 3);
+  rect(x + 200, y + 23, 75, 2.5);
+  rect(x + 200, y - 23, 75, 2.5);
+  rect(x + 200, y + 31, 75, 2);
+  rect(x + 200, y - 31, 75, 2);
+
+  pop();
+
+  push();
+
+  rectMode(CENTER);
+  fill("gray");
+  rect(x + 54, y - 77, 7, 7);
+  rect(x + 54, y - 63, 7, 7);
+  rect(x + 37, y - 77, 7, 7);
+  rect(x + 37, y - 63, 7, 7);
+
+  rect(x + 67, y - 77, 7, 7);
+  rect(x + 67, y - 63, 7, 7);
+  rect(x + 24, y - 77, 7, 7);
+  rect(x + 24, y - 63, 7, 7);
+  rect(x + 45, y - 70, 56, 14);
+  line(x + 17, y - 70, x + 73, y - 70);
+
+  pop();
+
+  pop();
 }
 
 function drawPipeAndPump(tankX, tankY) {
