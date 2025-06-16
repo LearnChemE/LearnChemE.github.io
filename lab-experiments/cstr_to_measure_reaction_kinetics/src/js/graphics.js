@@ -1220,7 +1220,7 @@ export function drawSimulation(width, height) {
   sliderTrackY = sliderYCommon - 30; // This matches the trackY in drawSlider
   
   // Update wave animation
-  waveOffset += 0.05;
+  waveOffset += 0.08;
   
   // Draw Tank A (left tank) with blue liquid
   const tankAColor = color(255 - sliderAValue * 100, 120, 120, 200); // reddish
@@ -1705,7 +1705,7 @@ function drawSimpleTank(x, y, w, h, liquidLevel, liquidColor, canvasWidth) {
     const tankInnerBottom = bottomY - wall;
     const liquidHeight = (h - 2 * wall) * liquidLevel;
     const liquidTopY = tankInnerBottom - liquidHeight;
-    const waveHeight = 0.8; // Reduced from 1.5 to 0.8 for flatter waves
+    const waveHeight = 1; // Reduced from 1.5 to 0.8 for flatter waves
     const segments = 20;
 
     fill(liquidColor);
