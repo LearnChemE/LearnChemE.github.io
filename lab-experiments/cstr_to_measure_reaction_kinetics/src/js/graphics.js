@@ -1342,7 +1342,6 @@ export function drawSimulation(width, height) {
 
   // Draw hamburger menu last to ensure it's on top
   drawHamburgerMenu();
-  drawErrorMessages();
 
   // Draw operation instructions under the outlet pipe
   drawOperationInstructions(width, height);
@@ -1383,13 +1382,13 @@ export function drawSimulation(width, height) {
   // Draw text
   text('Scaled 10x', rectX + rectWidth - 20, rectY + 20); // Position with padding
 
-  // No need to draw text twice if stroke weight is 0 and fill is applied directly
-  // The `noStroke()` and `fill(0)` block after the text call can be removed if strokeWeight is consistently 0
-  
   // Reset line dash to solid
   drawingContext.setLineDash([]);
 
   pop();
+
+  // Draw error messages after the dotted rectangle to ensure they appear on top
+  drawErrorMessages();
 }
 
 // Export slider values for external use
