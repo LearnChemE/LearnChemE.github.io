@@ -121,47 +121,52 @@ export function delay(ms: number): Promise<void> {
  * @param frag Fragment shader source code
  * @returns WebGLProgram if successfully compiled; null if errors occurred
  */
-export function CreateShader(gl: WebGL2RenderingContext, vert: string, frag: string): WebGLProgram | null {
-  // Create the shader objects
-  let vertShader: WebGLShader = gl.createShader(gl.VERTEX_SHADER);
-  let fragShader: WebGLShader = gl.createShader(gl.FRAGMENT_SHADER);
-  // Specify the sources
-  gl.shaderSource(vertShader, vert);
-  gl.shaderSource(fragShader, frag);
-  // Compile the shaders
-  gl.compileShader(vertShader);
-  gl.compileShader(fragShader);
+export function CreateShader(gl: WebGL2RenderingContext, vert: string, frag: string, varying?: Array<string>): WebGLProgram | null {
+    if (!vert && !frag) return null;
+    // Create the shader objects
+    let vertShader: WebGLShader = gl.createShader(gl.VERTEX_SHADER);
+    let fragShader: WebGLShader = gl.createShader(gl.FRAGMENT_SHADER);
+    // Specify the sources
+    gl.shaderSource(vertShader, vert);
+    gl.shaderSource(fragShader, frag);
+    // Compile the shaders
+    gl.compileShader(vertShader);
+    gl.compileShader(fragShader);
 
-  // Check compile status
-  if (!gl.getShaderParameter(vertShader, gl.COMPILE_STATUS)) {
-    console.warn(
-      "Vertex Shader Compilation Error: " + gl.getShaderInfoLog(vertShader)
-    );
-    return;
-  }
-  if (!gl.getShaderParameter(fragShader, gl.COMPILE_STATUS)) {
-    console.warn(
-      "Fragment Shader Compilation Error: " + gl.getShaderInfoLog(fragShader)
-    );
-    return;
-  }
+    // Check compile status
+    if (!gl.getShaderParameter(vertShader, gl.COMPILE_STATUS)) {
+        console.warn(
+            "Vertex Shader Compilation Error: " + gl.getShaderInfoLog(vertShader)
+        );
+        return;
+    }
+    if (!gl.getShaderParameter(fragShader, gl.COMPILE_STATUS)) {
+        console.warn(
+            "Fragment Shader Compilation Error: " + gl.getShaderInfoLog(fragShader)
+        );
+        return;
+    }
 
-  // Create shader program
-  let shdrProg = gl.createProgram();
-  // Attach shaders
-  gl.attachShader(shdrProg, vertShader);
-  gl.attachShader(shdrProg, fragShader);
-  // Link
-  gl.linkProgram(shdrProg);
+    // Create shader program
+    let shdrProg = gl.createProgram();
+    // Attach shaders
+    gl.attachShader(shdrProg, vertShader);
+    gl.attachShader(shdrProg, fragShader);
+    // Optionally attach transform feedback
+    if (varying) {
+        gl.transformFeedbackVaryings(shdrProg, varying, gl.INTERLEAVED_ATTRIBS);
+    }
+    // Link
+    gl.linkProgram(shdrProg);
 
-  // Check link status
-  if (!gl.getProgramParameter(shdrProg, gl.LINK_STATUS)) {
-    console.warn("Program Linking Error: " + gl.getProgramInfoLog(shdrProg));
-    return;
-  }
+    // Check link status
+    if (!gl.getProgramParameter(shdrProg, gl.LINK_STATUS)) {
+        console.warn("Program Linking Error: " + gl.getProgramInfoLog(shdrProg));
+        return;
+    }
 
-  // Return
-  return shdrProg;
+    // Return
+    return shdrProg;
 }
 
 /**
@@ -173,7 +178,7 @@ export function CreateShader(gl: WebGL2RenderingContext, vert: string, frag: str
  * @param attribs Array of attribute descriptors to be assigned
  * @returns 
  */
-export function CreateVao(gl: WebGL2RenderingContext, vrts: Float32Array, idxs: Uint32Array, shdr: WebGLProgram, attribs: Array<VertexAttribute>) {
+export function CreateVao(gl: WebGL2RenderingContext, vrts: Float32Array, idxs: Uint32Array | null, shdr: WebGLProgram | Array<WebGLProgram>, attribs: Array<VertexAttribute>) {
     // Create VAO
     const vao = gl.createVertexArray();
     gl.bindVertexArray(vao);
@@ -181,24 +186,38 @@ export function CreateVao(gl: WebGL2RenderingContext, vrts: Float32Array, idxs: 
     // Vertex data
     gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
     gl.bufferData(gl.ARRAY_BUFFER, vrts, gl.STATIC_DRAW);
-    // Index data
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idxs, gl.STATIC_DRAW);
+    if (idxs) {
+        // Index data
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idxs, gl.STATIC_DRAW);
+    }
+
+    // Wrap the shader programs if not already an array
+    if (Array.isArray(shdr)) {
+        var shdrs: Array<WebGLProgram> = shdr;
+    }
+    else {
+        var shdrs: Array<WebGLProgram> = [shdr];
+    }
+
 
     // Vertex attributes
     for (let attr of attribs) {
-        // Find the location of the attribute
-        const loc = gl.getAttribLocation(shdr, attr.name);
-        // Check for errors
-        if (loc !== -1) {
-            // Tell GL what the attribute is
-            gl.vertexAttribPointer(loc, attr.size, attr.type, attr.normalized, attr.stride, attr.offset);
-            // Enable the attribute
-            gl.enableVertexAttribArray(loc);
-        } 
-        else {
-            // Couldn't find attribute location
-            console.warn(`Attribute "${attr.name}" not found in shader "${shdr}".`);
+        for (let shdr of shdrs) {
+            gl.useProgram(shdr);
+            // Find the location of the attribute
+            const loc = gl.getAttribLocation(shdr, attr.name);
+            // Check for errors
+            if (loc !== -1) {
+                // Tell GL what the attribute is
+                gl.vertexAttribPointer(loc, attr.size, attr.type, attr.normalized, attr.stride, attr.offset);
+                // Enable the attribute
+                gl.enableVertexAttribArray(loc);
+            } 
+            else {
+                // Couldn't find attribute location
+                console.warn(`Attribute "${attr.name}" not found in shader "${shdr}".`);
+            }
         }
     }
 

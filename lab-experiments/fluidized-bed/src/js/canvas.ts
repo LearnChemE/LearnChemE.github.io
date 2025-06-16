@@ -1,5 +1,6 @@
 import { VertexAttribute } from "../types";
 import { constrain, CreateShader, CreateUBO, CreateVao, SetUBO } from "./helpers";
+import { bgFragSrc, bgVertSrc, dummyFragSrc, particleRenderFragSrc, particleRenderVertSrc, particleUpdateVertSrc } from "./shaders";
 import State from "./state";
 
 /**
@@ -38,6 +39,8 @@ class UniformBuffer {
   }
 }
 
+const NUM_PARTICLES = 256;
+
 // Initialize canvas
 // Grab canvas element
 const cnv = document.getElementById("cnv") as HTMLCanvasElement;
@@ -49,11 +52,18 @@ var prevTime = 0;
 var deltaTime = 0;
 var asp = window.innerHeight / window.innerWidth;
 
-// 
-var shader: WebGLProgram;
-var vao: WebGLVertexArrayObject;
+// Resource management
+var bgShader: WebGLProgram;
+var pRenderShader: WebGLProgram;
+var pUpdateShader: WebGLProgram;
+var bgVao: WebGLVertexArrayObject;
+// var pVaos: WebGLVertexArrayObject[];
+var pvaos: WebGLVertexArrayObject[];
 var ubo: WebGLBuffer;
 var uniformData: UniformBuffer = new UniformBuffer;
+var transformFeedback: WebGLTransformFeedback;
+var positionBuffer: WebGLBuffer[];
+var previousBuffer: WebGLBuffer[];
 
 // Internal state
 var fill = false;
@@ -73,38 +83,6 @@ const attribs: Array<VertexAttribute> = [{
   offset: 0
 }];
 
-
-const bgVertSrc = `#version 300 es
-precision highp float;
-layout (location=0) in vec2 aPos;
-out vec2 vPos;
-
-void main() {
-  gl_Position = vec4(aPos, 0, 1);
-  vPos = aPos;
-}
-`;
-
-const bgFragSrc = `#version 300 es
-precision mediump float;
-
-layout (std140) uniform ubo {
-  float time;
-  float deltaTime;
-  float height;
-};
-in vec2 vPos;
-layout (location=0) out vec4 FragColor;
-
-void main() {
-  float h = height;
-  float y = vPos.y + 0.05 * cos(vPos.x - 0.005 * time);
-  y += 0.03 * cos(2.0 * vPos.x + 0.001 * time);
-  if (y > h) discard;  
-  FragColor = vec4(.388,.561,.996,.85);
-}
-`;
-
 /**
  * Add an on-load event listener to make sure the canvas is fully loaded.
  */
@@ -119,15 +97,37 @@ window.addEventListener("load", () => {
   const pixRatio = Math.max(window.devicePixelRatio, 2);
 
   // Create shaders and objects
-  shader = CreateShader(gl, bgVertSrc, bgFragSrc);
-  vao = CreateVao(gl, vertices, indices, shader, attribs);
-  ubo = CreateUBO(gl, 16, [shader], "ubo", 0);
+  bgShader = CreateShader(gl, bgVertSrc, bgFragSrc);
+  pRenderShader = CreateShader(gl, particleRenderVertSrc, particleRenderFragSrc);
+  pUpdateShader = CreateShader(gl, particleUpdateVertSrc, dummyFragSrc, ["vPos", "vPrev"]);
+  bgVao = CreateVao(gl, vertices, indices, bgShader, attribs);
+  ubo = CreateUBO(gl, 16, [bgShader], "ubo", 0);
   SetUBO(gl, ubo, uniformData.raw);
+  positionBuffer = [gl.createBuffer(), gl.createBuffer()];
+  // previousBuffer = [gl.createBuffer(), gl.createBuffer()];
 
-  gl.enable(gl.DEPTH_TEST);
+  // Create double buffers for ping pong
+  const initialData = new Float32Array(NUM_PARTICLES * 4);
+
+  // Initialize the particle array buffers
+  const posLoc = gl.getAttribLocation(pUpdateShader, "aPos");
+  const prvLoc = gl.getAttribLocation(pUpdateShader, "aPrev");
+  positionBuffer.forEach(buffer => {
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 16, 0);
+    gl.vertexAttribPointer(prvLoc, 2, gl.FLOAT, false, 16, 8);
+    gl.bufferData(gl.ARRAY_BUFFER, initialData, gl.DYNAMIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  });
+
+  // Create and bind the transform feedback object
+  transformFeedback = gl.createTransformFeedback();
+  gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback);
+
   // Set viewport and clear colors
-  cnv.width = cnv.width * pixRatio;
-  cnv.height = cnv.height * pixRatio;
+  cnv.width = 40 * pixRatio;
+  cnv.height = 255 * pixRatio;
+  console.log(cnv.width, cnv.height)
   gl.viewport(0, 0, cnv.width, cnv.height);
   asp = innerWidth / innerHeight;
   // Set the clear color
@@ -146,9 +146,64 @@ function drawBg() {
   // Set data
   SetUBO(gl, ubo, uniformData.raw);
   // Draw
-  gl.useProgram(shader);
-  gl.bindVertexArray(vao);
+  gl.useProgram(bgShader);
+  gl.bindVertexArray(bgVao);
   gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, 0);
+  gl.bindVertexArray(null);
+}
+
+// Read index for determining which framebuffer to use
+var readIndex = 0;
+function drawParticles() {
+  // Determine the write index
+  const writeIndex = (readIndex + 1) % 2;
+
+  // Run the update shader first with transform feedback
+  gl.useProgram(pUpdateShader);
+  // Bind the readonly buffer
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer[readIndex]);
+  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 16, 0);
+  gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 16, 8);
+  gl.enableVertexAttribArray(0);
+  gl.enableVertexAttribArray(1);
+  // Bind the writeonly buffer
+  gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback);
+  gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, positionBuffer[writeIndex]);
+  // gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, previousBuffer[writeIndex]);
+
+  // Setup and run the update pass
+  gl.enable(gl.RASTERIZER_DISCARD);
+  gl.beginTransformFeedback(gl.POINTS);
+  gl.drawArrays(gl.POINTS, 0, NUM_PARTICLES);
+  gl.endTransformFeedback();
+  gl.disable(gl.RASTERIZER_DISCARD);
+  printDebugBuffer(positionBuffer[readIndex]);
+  console.log('hi')
+
+
+  // Now the render pass
+  gl.useProgram(pRenderShader);
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer[readIndex]);
+  gl.drawArrays(gl.POINTS, 0, NUM_PARTICLES);
+
+  // Unbind the buffers
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, null);
+
+  // Swap the indices for the next frame
+  readIndex = writeIndex;
+}
+
+function printDebugBuffer(buffer: WebGLBuffer) {
+  const target = gl.ARRAY_BUFFER; // or TRANSFORM_FEEDBACK_BUFFER, etc.
+  const byteOffset = 0; 
+  const size = NUM_PARTICLES * 4; // for 2 vec2s (4 floats per particle)
+  const out = new Float32Array(size);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.getBufferSubData(target, byteOffset, out);
+
+  console.log('Read buffer contents:', out);
 }
 
 /**
@@ -160,6 +215,8 @@ function display() {
 
   // Draw bg
   drawBg();
+  // Update and draw particles
+  drawParticles();
 
   // Flush the framebuffer contents to the canvas
   gl.flush();
@@ -201,6 +258,9 @@ function updateState() {
   }
 }
 
+/**
+ * Begin the fill animation for inside the aparatus
+ */
 export async function fillCanvas() {
   fill = true;
   await hasFilled;
