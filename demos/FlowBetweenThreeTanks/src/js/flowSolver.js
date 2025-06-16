@@ -187,28 +187,28 @@ export function solveThreeTanks(hB) {
     const solverIn = solveFlowInB(hB)
     const solverOut = solveFlowOutB(hB);
     
-    console.log("hB:", hB);
-    console.log("Solver In:", solverIn);
-    console.log("Solver Out:", solverOut);
+    // console.log("hB:", hB);
+    // console.log("Solver In:", solverIn);
+    // console.log("Solver Out:", solverOut);
     if (hB >= 50) {
         if (solverOut.U1 >= 0 && solverOut.U2 >= 0 && solverOut.U3 >= 0) {
             // If both U1 and U2 are positive, we can use flow_in_B
-            console.log(hB, solverOut);
+            // console.log(hB, solverOut);
             return solverOut;
         } else {
             // If both U1 and U2 are positive, we can use flow_out_B
-            console.log(hB, solverIn);
+            // console.log(hB, solverIn);
             return solverIn;
         }
     } else {
         if (solverIn.U1 >= 0 && solverIn.U2 >= 0 && solverIn.U3 >= 0) {
             // If both U1 and U2 are positive, we can use flow_in_B
-            console.log(hB, solverIn);
+            // console.log(hB, solverIn);
             return solverIn;
         } else {
             // If both U1 and U2 are positive, we can use flow_out_B
             
-            console.log(hB, solverOut);
+            // console.log(hB, solverOut);
             return solverOut;
         }
     }

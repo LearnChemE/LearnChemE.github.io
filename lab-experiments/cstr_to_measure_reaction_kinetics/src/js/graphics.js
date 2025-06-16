@@ -70,6 +70,9 @@ const MAX_FLOW_RATE = 60; // Max flow (ml/s)
 const SIMPLE_TANK_MAX_LEVEL = 0.65; // Max CSTR level
 const SIMPLE_TANK_FILL_RATE = 0.0005; // CSTR fill rate
 
+// New constant to control simulation speed
+const TIME_LAPSE_FACTOR = 10; // e.g., 10 means 10 simulation seconds pass for every 1 real second
+
 // Add these global variables at the top with other state variables
 let isDraggingValveA = false;
 let isDraggingValveB = false;
@@ -1217,7 +1220,7 @@ export function drawSimulation(width, height) {
   sliderTrackY = sliderYCommon - 30; // This matches the trackY in drawSlider
   
   // Update wave animation
-  waveOffset += 0.05;
+  waveOffset += 0.08;
   
   // Draw Tank A (left tank) with blue liquid
   const tankAColor = color(255 - sliderAValue * 100, 120, 120, 200); // reddish
@@ -1295,6 +1298,7 @@ export function drawSimulation(width, height) {
 
   // Calculate CSTR values
   const calcTime = millis();
+
   const timeSinceLastCalc = (calcTime - lastCalculationTime) / 1000;
 
   if (timeSinceLastCalc >= 0.1) { // Update every 100ms
@@ -1302,9 +1306,9 @@ export function drawSimulation(width, height) {
     if (pumpASwitchOn && pumpBSwitchOn) {
       // Reset accumulated time when both pumps are on
       if (accumulatedTime === 0) {
-        accumulatedTime = timeSinceLastCalc;
+        accumulatedTime = timeSinceLastCalc * TIME_LAPSE_FACTOR;
       } else {
-        accumulatedTime += timeSinceLastCalc;
+        accumulatedTime += timeSinceLastCalc * TIME_LAPSE_FACTOR;
       }
       
       const cstrResult = run_CSTR({
@@ -1338,10 +1342,53 @@ export function drawSimulation(width, height) {
 
   // Draw hamburger menu last to ensure it's on top
   drawHamburgerMenu();
-  drawErrorMessages();
 
   // Draw operation instructions under the outlet pipe
   drawOperationInstructions(width, height);
+
+  // Add irregular boundary around CSTR tank and concentration monitors
+  push();
+  noFill();
+
+  // Approximate bounding box for CSTR tank and monitors
+  const rectX = width * 0.57; // Left edge
+  const rectY = height * 0.185; // Top edge
+  const rectWidth = width * 0.41; // Width
+  const rectHeight = height * 0.48; // Height
+
+  // Check for hover state
+  const isHoveringRect = mX >= rectX && mX <= rectX + rectWidth &&
+                         mY >= rectY && mY <= rectY + rectHeight;
+
+  // Set stroke color based on hover state
+  stroke(isHoveringRect ? color("#254D70") : 0); // Lighter grey on hover, black otherwise
+  strokeWeight(2.5); // Thicker line, manually set by user
+
+  // Set dash pattern: 10 pixels dash, 5 pixels gap
+  drawingContext.setLineDash([10, 5]);
+
+  rect(rectX, rectY, rectWidth, rectHeight, 10); // Added corner radius of 10
+
+  // Add text inside the box at the top right
+  stroke(0); // Black stroke
+  strokeWeight(0); // Current stroke weight for the text
+  textFont('Open Sans'); // Set font to Open Sans
+  textSize(22); // Current font size
+  textAlign(RIGHT, TOP); // Align text to the top-right
+  
+  // Set text fill color based on hover state
+  fill(isHoveringRect ? color("#254D70") : 0); // Lighter red on hover, black otherwise
+
+  // Draw text
+  text('Scaled 10x', rectX + rectWidth - 20, rectY + 20); // Position with padding
+
+  // Reset line dash to solid
+  drawingContext.setLineDash([]);
+
+  pop();
+
+  // Draw error messages after the dotted rectangle to ensure they appear on top
+  drawErrorMessages();
 }
 
 // Export slider values for external use
@@ -1657,7 +1704,7 @@ function drawSimpleTank(x, y, w, h, liquidLevel, liquidColor, canvasWidth) {
     const tankInnerBottom = bottomY - wall;
     const liquidHeight = (h - 2 * wall) * liquidLevel;
     const liquidTopY = tankInnerBottom - liquidHeight;
-    const waveHeight = 0.8; // Reduced from 1.5 to 0.8 for flatter waves
+    const waveHeight = 1; // Reduced from 1.5 to 0.8 for flatter waves
     const segments = 20;
 
     fill(liquidColor);
