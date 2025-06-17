@@ -31,11 +31,12 @@ export function drawFigure(draw) {
   drawTank(draw);
   drawPipes(draw);
   adjustFigureWithEleveationSlider(draw);
-  drawText(draw, '(40, 50)', margin + startX - 25, startY - 60, 14);
+  drawText(draw, '(40, 50)', margin + startX - 75, startY - 60 + 57.5, 14);
+  drawDashedHorizontalLine(draw, startX + 102, startY, 30, 'black', 1, '5,5');
   draw.circle(5)
     .fill('black')
     .center(margin + 175, startY);
-  drawText(draw, '(0, 0)', margin + 157.5, startY + 5, 14);
+  drawText(draw, '(0, 50)', margin + 157.5, startY + 5, 14);
 }
 
 
@@ -432,7 +433,7 @@ function drawDashedLineWithArrows(draw, x1, y1, x2, y2, textString, options = {}
   group.text(textString)
     .font({ size: fontSize, family: 'Arial', anchor: 'middle' })
     .fill(fontColor)
-    .move(midX, midY - fontSize / 2);
+    .move(midX + 15, midY - fontSize / 2);
 
   return group;
 }
