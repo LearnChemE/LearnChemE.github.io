@@ -1,4 +1,4 @@
-import { pumpPressure } from "../js/calculations";
+import { pressureDrop, pumpPressure } from "../js/calculations";
 import { TubeDirection } from "./ani-types";
 import { vec2 } from "./globals";
 
@@ -198,9 +198,10 @@ export class Manometer {
         // Calculate height in pixels
         const base = this.baseElement.getBBox().y; // fill line of beaker
         // Add pump pressure. Sign should be negative because y pixels go down, and multiply by 5 pixels per cm water
-        const pump = 5 * pumpPressure(); // pixels water
+        const pump = 2.45 * pumpPressure(); // pixels water
+        const drop = 2.45 * pressureDrop(); // pixels water
         var left = base - pump;
-        var right = left; // TODO: minus bed drop
+        var right = left + drop;
 
         // Convert to 0-1 range for tube
         left = (this.bottom - left) / this.height;

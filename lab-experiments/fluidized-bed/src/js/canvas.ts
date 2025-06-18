@@ -55,8 +55,6 @@ const cnv = document.getElementById("cnv") as HTMLCanvasElement;
 const gl = cnv.getContext("webgl2");
 
 // Initialize variables
-var prevTime = 0;
-var deltaTime = 0;
 var asp = window.innerHeight / window.innerWidth;
 
 // Resource management
@@ -272,7 +270,7 @@ function mainLoop(time: number) {
   requestAnimationFrame(mainLoop);
 }
 
-const r = Math.E**(-1/5000);
+const r = Math.E**(-1/1000);
 /**
  * Handle state-related changes to canvas
  */
@@ -291,7 +289,9 @@ function updateState() {
   }
 
   // Smooth lerp towards target bed height
-  uniformData.bedHeight = (uniformData.bedHeight - targetHeight) * r ** deltaTime + targetHeight;
+  uniformData.bedHeight = (uniformData.bedHeight - targetHeight) * r ** uniformData.deltaTime + targetHeight;
+  if (uniformData.bedHeight < -.999) uniformData.bedHeight = -1;
+  if (uniformData.bedHeight > 0.999) uniformData.bedHeight =  1;
 }
 
 /**

@@ -164,7 +164,7 @@ void pack(int direction) {
   float abs_height = rel_height * 0.6;
   // Now use the direction to put in the real location
   float abs_y = abs_height * float(direction) - float(direction);
-  float abs_x = hash(.7, gl_VertexID) * 2.0 - 1.0;
+  float abs_x = hash(.77, gl_VertexID) * 2.0 - 1.0;
 
   // Output result
   vPos  = vec2(abs_x, abs_y);
