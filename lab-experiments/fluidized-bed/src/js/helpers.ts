@@ -264,3 +264,26 @@ export function SetUBO(gl: WebGL2RenderingContext, ubo: WebGLBuffer, data: Float
     gl.bindBuffer(gl.UNIFORM_BUFFER, ubo);
     gl.bufferSubData(gl.UNIFORM_BUFFER, 0, data);
 }
+
+export function CreateTexture(gl: WebGL2RenderingContext, image: HTMLImageElement) {
+    // Create a texture
+    const texture = gl.createTexture();
+    // Bind the texture
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    // Flip image's Y for GL
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    // Upload data
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+    // Bilinear filtering and repeat wrapping
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+
+    // unbind the texture
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    // return
+    return texture;
+}

@@ -60,6 +60,10 @@ module.exports = {
         test: /\.svg$/,
         loader: 'svg-inline-loader'
       },
+      {
+        test: /\.png$/,
+        type: 'asset/resource',
+      }
     ],
   },
   resolve: {

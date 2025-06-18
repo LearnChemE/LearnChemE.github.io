@@ -1,7 +1,8 @@
 import { VertexAttribute } from "../types";
-import { constrain, CreateShader, CreateUBO, CreateVao, SetUBO } from "./helpers";
+import { constrain, CreateShader, CreateTexture, CreateUBO, CreateVao, SetUBO } from "./helpers";
 import { bgFragSrc, bgVertSrc, dummyFragSrc, particleRenderFragSrc, particleRenderVertSrc, particleUpdateVertSrc } from "./shaders";
 import State from "./state";
+import noise from "../media/noiseTexture.png";
 
 /**
  * Wrapper class around Float32Array to mimic buffer payload
@@ -9,8 +10,8 @@ import State from "./state";
 class UniformBuffer {
   private data: Float32Array;
 
-  constructor(time=0, deltaTime=0, height=-1.2) {
-    this.data = new Float32Array([time, deltaTime, height]);
+  constructor(time=0, deltaTime=0, fill=-1.2, bedHeight=1) {
+    this.data = new Float32Array([time, deltaTime, fill, bedHeight]);
   }
 
   // Getters
@@ -20,8 +21,11 @@ class UniformBuffer {
   get deltaTime(): number {
     return this.data[1];
   }
-  get height(): number {
+  get fill(): number {
     return this.data[2];
+  }
+  get bedHeight(): number {
+    return this.data[3];
   }
   get raw(): Float32Array {
     return this.data;
@@ -34,12 +38,15 @@ class UniformBuffer {
   set deltaTime(val: number) {
     this.data[1] = val;
   }
-  set height(val: number) {
+  set fill(val: number) {
     this.data[2] = val;
+  }
+  set bedHeight(val: number) {
+    this.data[3] = val;
   }
 }
 
-const NUM_PARTICLES = 256;
+const NUM_PARTICLES = 1024;
 
 // Initialize canvas
 // Grab canvas element
@@ -63,10 +70,12 @@ var ubo: WebGLBuffer;
 var uniformData: UniformBuffer = new UniformBuffer;
 var transformFeedback: WebGLTransformFeedback;
 var positionBuffer: WebGLBuffer[];
-var previousBuffer: WebGLBuffer[];
+var noiseTexture: WebGLTexture;
 
 // Internal state
 var fill = false;
+var bedHeight = 1;
+var targetHeight = 1;
 // Promise for when the tube is filled
 let resolveFill: () => void;
 const hasFilled = new Promise<void>((resolve) => resolveFill = resolve);
@@ -86,12 +95,26 @@ const attribs: Array<VertexAttribute> = [{
 /**
  * Add an on-load event listener to make sure the canvas is fully loaded.
  */
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
   // Make sure gl context is present
   if (!gl) {
     console.warn("gl context not found");
     return;
   }
+
+  const img = new Image();
+  img.src = noise;
+  const texPromise = new Promise<WebGLTexture>((resolve, reject) => img.onload = () => {
+    const tex = CreateTexture(gl, img);
+    if (tex) {
+      noiseTexture = tex;
+      resolve(tex);
+    }
+    else {
+      console.warn("Failed to load texture");
+      reject();
+    }
+  });
 
   // Get the device pixel ratio
   const pixRatio = Math.max(window.devicePixelRatio, 2);
@@ -104,7 +127,6 @@ window.addEventListener("load", () => {
   ubo = CreateUBO(gl, 16, [bgShader], "ubo", 0);
   SetUBO(gl, ubo, uniformData.raw);
   positionBuffer = [gl.createBuffer(), gl.createBuffer()];
-  // previousBuffer = [gl.createBuffer(), gl.createBuffer()];
 
   // Create double buffers for ping pong
   const initialData = new Float32Array(NUM_PARTICLES * 4);
@@ -120,6 +142,7 @@ window.addEventListener("load", () => {
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
   });
 
+  
   // Create and bind the transform feedback object
   transformFeedback = gl.createTransformFeedback();
   gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback);
@@ -127,13 +150,23 @@ window.addEventListener("load", () => {
   // Set viewport and clear colors
   cnv.width = 40 * pixRatio;
   cnv.height = 255 * pixRatio;
-  console.log(cnv.width, cnv.height)
   gl.viewport(0, 0, cnv.width, cnv.height);
   asp = innerWidth / innerHeight;
   // Set the clear color
   gl.clearColor(0, 0, 0, 0);
 
-  // reshape();
+  // Await texture loading
+  await texPromise;
+  // Activate and bind texture to location 0
+  gl.useProgram(pUpdateShader);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
+  gl.uniform1i(gl.getUniformLocation(pUpdateShader, "noiseTex"), 0);
+  gl.useProgram(null);
+
+  gl.useProgram(bgShader);
+  gl.uniform1i(gl.getUniformLocation(bgShader, "noiseTex"), 0);
+  gl.useProgram(null);
 
   // Begin the main loop
   requestAnimationFrame(mainLoop);
@@ -169,7 +202,6 @@ function drawParticles() {
   // Bind the writeonly buffer
   gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback);
   gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, positionBuffer[writeIndex]);
-  // gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, previousBuffer[writeIndex]);
 
   // Setup and run the update pass
   gl.enable(gl.RASTERIZER_DISCARD);
@@ -177,8 +209,7 @@ function drawParticles() {
   gl.drawArrays(gl.POINTS, 0, NUM_PARTICLES);
   gl.endTransformFeedback();
   gl.disable(gl.RASTERIZER_DISCARD);
-  printDebugBuffer(positionBuffer[readIndex]);
-  console.log('hi')
+  // printDebugBuffer(positionBuffer[readIndex]);
 
 
   // Now the render pass
@@ -241,21 +272,26 @@ function mainLoop(time: number) {
   requestAnimationFrame(mainLoop);
 }
 
+const r = Math.E**(-1/5000);
 /**
  * Handle state-related changes to canvas
  */
 function updateState() {
+  // Set fill for animation
   if (fill) {
     // lerp towards full state
-    let h = uniformData.height;
+    let h = uniformData.fill;
     h += uniformData.deltaTime / 1000 * State.valveLift;
     if (h >= 1.2) {
       h = 1.2;
       resolveFill();
       fill = false;
     }
-    uniformData.height = h;
+    uniformData.fill = h;
   }
+
+  // Smooth lerp towards target bed height
+  uniformData.bedHeight = (uniformData.bedHeight - targetHeight) * r ** deltaTime + targetHeight;
 }
 
 /**
@@ -264,4 +300,12 @@ function updateState() {
 export async function fillCanvas() {
   fill = true;
   await hasFilled;
+}
+
+/**
+ * Set the target bed height
+ * @param val New target bed height
+ */
+export function setTargetBedHeight(val: number) {
+  targetHeight = val;
 }

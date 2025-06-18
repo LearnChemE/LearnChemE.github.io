@@ -17,21 +17,28 @@ void main() {
  */
 export const bgFragSrc = `#version 300 es
 precision mediump float;
+uniform sampler2D noiseTex;
 
 layout (std140) uniform ubo {
   float time;
   float deltaTime;
+  float fill;
   float height;
 };
 in vec2 vPos;
 layout (location=0) out vec4 FragColor;
 
 void main() {
-  float h = height;
+  float h = fill;
   float y = vPos.y + 0.05 * cos(vPos.x - 0.005 * time);
   y += 0.03 * cos(2.0 * vPos.x + 0.001 * time);
   if (y > h) discard;  
   FragColor = vec4(.388,.561,.996,.85);
+
+  // For debugging the texture
+  // vec2 texcoord = vec2(vPos.x * .05 + 1e-5 * time, vPos.y * .2 - 3e-5 * time);
+  // float perlin = texture(noiseTex, texcoord).r;
+  // FragColor = vec4(vec3(perlin), 1.0);
 }
 `;
 
@@ -42,7 +49,7 @@ export const particleRenderVertSrc = `#version 300 es
 layout (location=0) in vec2 aPos;
 layout (location=1) in vec2 aPrev;
 void main() {
-  gl_PointSize = 10.0;
+  gl_PointSize = 5.0;
   gl_Position = vec4(aPos,0.0, 1.0);
 }
 `;
@@ -54,7 +61,7 @@ export const particleRenderFragSrc = `#version 300 es
 precision mediump float;
 out vec4 FragColor;
 void main() {
-  FragColor = vec4(1.0, 0.8, 0.2, 1.0);
+  FragColor = vec4(0.9, 0.9, 0.9, 1.0);
 }
 `;
 
@@ -69,23 +76,110 @@ out vec2 vPrev;
 layout (std140) uniform ubo {
   float time;
   float deltaTime;
+  float fill;
   float height;
 };
 
-void main() {
+uniform sampler2D noiseTex;
+
+const int TOT_PARTICLES = 1024;
+
+float hash(float x, int seed) {
+  // Convert integer seed to float and combine with input
+  float s = float(seed);
+  return fract(sin(x * 12.9898 + s * 78.233) * 43758.5453);
+}
+
+float pi = 22.0/7.0;
+
+vec2 cap_speed(vec2 v, float speed) {
+  float mag = sqrt(v.x*v.x + v.y*v.y);
+  if (mag > speed) {
+    return v * speed / mag;
+  }
+  return v;
+}
+
+/**
+ * Calculate whether the particle is packed, fluidized, or repacked.
+ * returns 1 for packed, 0 for fluidized, and -1 for repacked.
+ */
+int CalcState() {
+  int num_fluidized = int(float(TOT_PARTICLES) * abs(height));
+  int sign = (height < 0.0) ? -1 : 1;
+  if (gl_VertexID < num_fluidized) return sign;
+  else return 0;
+}
+
+void fluidized() {
   float dt = deltaTime / 1000.0;
+  float a = hash(dt, gl_VertexID);
+
+  vec2 texcoord = vec2(aPos.x * .05 + 1e-5 * time, aPos.y * .2 - 3e-5 * time);
+  float perlin = texture(noiseTex, texcoord).r;
   
-  vec2 accel = vec2(0.0,-0.1);
+  // Brownian motion
+  vec2 accel = -5.0 * vec2(cos(4.0*pi*a),sin(4.0*pi*a));
+  // Add Perlin noise for fluidlike flow
+  accel += 5.0 * vec2(sin(-4.0*pi*perlin), -cos(-8.0*pi*perlin));
+  // With verlet integration, velocity already accounts for timestep
   vec2 vel = aPos - aPrev;
+  vel = cap_speed(vel, 0.03); // Cap the max speed
+  // Verlet integration to evolve
   vec2 pos = aPos + vel + accel * dt*dt;
 
   // Bounce off walls
-  if (abs(pos.x) > 1.0) vel.x *= -1.0;
-  if (abs(pos.y) > 1.0) vel.y *= -1.0;
-  pos = clamp(pos, -1.0, 1.0);
+  // pos = clamp(pos, -1.0, 1.0);
+  vec2 prev = aPos;
+
+  if (pos.x > 1.0) {
+    // Reverse the direction
+    pos.x -= 2.0;
+    prev.x -= 2.0;
+  }
+  if (pos.x < -1.0) {
+    // Reverse the direction
+    pos.x  += 2.0;
+    prev.x += 2.0;
+  }
+  if (pos.y > 1.0) {
+    // Reverse the direction
+    pos.y -= 2.0;
+    prev.y -= 2.0;
+  }
+  if (pos.y < -1.0) {
+    // Reverse the direction
+    pos.y  += 2.0;
+    prev.y += 2.0;
+  }
 
   vPos = pos;
-  vPrev = aPos;
+  vPrev = prev;
+}
+
+void pack(int direction) {
+  // Use vertex ID to get relative height
+  float rel_height = float(gl_VertexID) / float(TOT_PARTICLES);
+  // Multiply by the total height to get the height of the particle
+  float abs_height = rel_height * 0.6;
+  // Now use the direction to put in the real location
+  float abs_y = abs_height * float(direction) - float(direction);
+  float abs_x = hash(.7, gl_VertexID) * 2.0 - 1.0;
+
+  // Output result
+  vPos  = vec2(abs_x, abs_y);
+  vPrev = vec2(abs_x, abs_y);
+}
+
+void main() {
+  // Find the state
+  int state = CalcState();
+
+  // Determine what needs to happen
+  if (state == 0)
+    fluidized();
+  else 
+    pack(state);
 }
   `;
 
