@@ -82,8 +82,8 @@ window.draw = function () {
     inletTemperatureSliderWrapper.style.display = "grid";
     throttleFigureAndPressureGauges();
     temperatureGauges();
-
-    drawFigureText();
+    arrowsForDirectionOfFlow();
+    porousPlug();
   } else if (selection === "JTcoeff-vs-temperature") {
     inletTemperatureSliderWrapper.style.display = "none";
     inletPressureSliderWrapper.style.display = "grid";
@@ -112,10 +112,110 @@ const tempScreenOffsetX = -30;
 const tempScreenOffsetY = -3;
 const kelvinLabelOffsetX = 60;
 const kelvinLabelOffsetY = 4;
+const plugWidth = 5;
+const verticalPlugRectangles = 5;
+const plugLineSpacing = 5;
+//let saturationIn = (state.inletTemperature - 55) / (1000 - 55);
+//let saturationOut = state.inlet / 70;
+
+function porousPlug() {
+  push();
+  rectMode(CENTER);
+
+  rect(state.xMid, state.yMid + 100, plugWidth, state.height * 0.3 - 20);
+
+  for (let i = 0; i < verticalPlugRectangles - (state.outletPressure - 0.0999999999) / 0.05 + state.inletPressure * 5; i++) {
+    rect(state.xMid - i * plugWidth, state.yMid + 100, plugWidth, state.height * 0.3 - 20);
+    rect(state.xMid + i * plugWidth, state.yMid + 100, plugWidth, state.height * 0.3 - 20);
+  }
+
+  for (let i = 0; i * plugLineSpacing < state.height * 0.15; i++) {
+    line(
+      state.xMid + plugWidth / 2 - (verticalPlugRectangles - (state.outletPressure - 0.0999999999) / 0.05 + state.inletPressure * 5) * plugWidth,
+      state.yMid + 100 + i * plugLineSpacing,
+      state.xMid - plugWidth / 2 + (verticalPlugRectangles - (state.outletPressure - 0.0999999999) / 0.05 + state.inletPressure * 5) * plugWidth,
+      state.yMid + 100 + i * plugLineSpacing
+    );
+    line(
+      state.xMid + plugWidth / 2 - (verticalPlugRectangles - (state.outletPressure - 0.0999999999) / 0.05 + state.inletPressure * 5) * plugWidth,
+      state.yMid + 100 - i * plugLineSpacing,
+      state.xMid - plugWidth / 2 + (verticalPlugRectangles - (state.outletPressure - 0.0999999999) / 0.05 + state.inletPressure * 5) * plugWidth,
+      state.yMid + 100 - i * plugLineSpacing
+    );
+  }
+  pop();
+}
+
+function arrowsForDirectionOfFlow() {
+  push();
+  translate(0, state.yMid + 100);
+  push();
+  strokeWeight(2);
+  line(50, 0, 125, 0);
+  noStroke();
+  fill("black");
+  triangle(120, -10, 125, 1, 150, 0);
+  triangle(120, 10, 125, -1, 150, 0);
+  pop();
+
+  push();
+  translate(0, state.height * 0.085);
+  strokeWeight(2);
+  line(50, 0, 125, 0);
+  noStroke();
+  fill("black");
+  triangle(120, -10, 125, 1, 150, 0);
+  triangle(120, 10, 125, -1, 150, 0);
+  pop();
+
+  push();
+  translate(0, -state.height * 0.085);
+  strokeWeight(2);
+  line(50, 0, 125, 0);
+  noStroke();
+  fill("black");
+  triangle(120, -10, 125, 1, 150, 0);
+  triangle(120, 10, 125, -1, 150, 0);
+  pop();
+  pop();
+
+  push();
+  translate(state.width - 200, state.yMid + 100);
+  push();
+  strokeWeight(2);
+  line(50, 0, 125, 0);
+  noStroke();
+  fill("black");
+  triangle(120, -10, 125, 1, 150, 0);
+  triangle(120, 10, 125, -1, 150, 0);
+  pop();
+
+  push();
+  translate(0, state.height * 0.085);
+  strokeWeight(2);
+  line(50, 0, 125, 0);
+  noStroke();
+  fill("black");
+  triangle(120, -10, 125, 1, 150, 0);
+  triangle(120, 10, 125, -1, 150, 0);
+  pop();
+
+  push();
+  translate(0, -state.height * 0.085);
+  strokeWeight(2);
+  line(50, 0, 125, 0);
+  noStroke();
+  fill("black");
+  triangle(120, -10, 125, 1, 150, 0);
+  triangle(120, 10, 125, -1, 150, 0);
+  pop();
+  pop();
+}
 
 function temperatureGauges() {
+  //--------------------Left/inlet thermocouple--------------------
   push();
-  translate(state.width / 3, state.height / 4);
+  translate(state.width / 3.25, state.height / 3.8);
   push();
   fill("gray");
   rectMode(CENTER);
@@ -143,6 +243,101 @@ function temperatureGauges() {
   text("K", kelvinLabelOffsetX, kelvinLabelOffsetY);
   pop();
 
+  //--------------------Thermocouple Wire--------------------
+  push();
+  translate(-120, 30);
+  strokeWeight(2);
+  stroke("black");
+  noFill();
+  arc(0, 0, 50, 50, 180, 270); //wire bend
+  line(0, -25, 20, -25); //wire from display to arc
+  line(-25, 0, -25, 55); //wire from arc to pipe
+  line(-25, 140, -25, 200); //wire from inside pipe to probe
+  pop();
+
+  //--------------------Thermocouple entry pipe--------------------
+  push();
+  translate(-145, -10);
+  stroke("black");
+  strokeWeight(1);
+  fill("gray");
+  rectMode(CENTER);
+  rect(0, 100, 40, 15);
+  noStroke();
+  rect(0, 112, 20, 8);
+  pop();
+
+  //--------------------Thermocouple Probe--------------------
+  push();
+  translate(-145, 275);
+  rectMode(CENTER);
+  fill(187, 165, 61); //gold
+  rect(0, -60, 5, 40, 5, 5, 5, 5);
+  pop();
+
+  pop();
+  //--------------------Right/outlet thermocouple--------------------
+  push();
+  translate(state.width / 1.444, state.height / 3.8);
+  push();
+  fill("gray");
+  rectMode(CENTER);
+  rect(0, 0, tempGaugeWidth, tempGaugeHeight, tempGaugeEdgeCurve, tempGaugeEdgeCurve, tempGaugeEdgeCurve, tempGaugeEdgeCurve);
+  fill("black");
+  rect(tempScreenOffsetX, 0, tempGaugeInnerScreenWidth, tempGaugeInnerScreenHeight);
+  pop();
+  //--------------------Digital Temperature readout numbers--------------------
+  push();
+
+  textAlign(CENTER, CENTER);
+  textSize(50);
+  textFont(digitalReadoutFont);
+  fill("yellow");
+  text(state.outletTemperature.toFixed(1), tempScreenOffsetX, tempScreenOffsetY);
+
+  pop();
+
+  push();
+  textAlign(CENTER, CENTER);
+  stroke("Black");
+  strokeWeight(0.2);
+  fill("Black");
+  textSize(42);
+  text("K", kelvinLabelOffsetX, kelvinLabelOffsetY);
+  pop();
+
+  //--------------------Thermocouple Wire--------------------
+  push();
+  translate(120, 30);
+  strokeWeight(2);
+  stroke("black");
+  noFill();
+  arc(0, 0, 50, 50, 270, 0); //wire bend
+  line(0, -25, -20, -25); //wire from display to arc
+  line(25, 0, 25, 55); //wire from arc to pipe
+  line(25, 140, 25, 200); //wire from inside pipe to probe
+  pop();
+
+  //--------------------Thermocouple entry pipe--------------------
+  push();
+  translate(145, -10);
+  stroke("black");
+  strokeWeight(1);
+  fill("gray");
+  rectMode(CENTER);
+  rect(0, 100, 40, 15);
+  noStroke();
+  rect(0, 112, 20, 8);
+  pop();
+
+  //--------------------Thermocouple Probe--------------------
+  push();
+  translate(145, 275);
+  rectMode(CENTER);
+  fill(187, 165, 61); //gold
+  rect(0, -60, 5, 40, 5, 5, 5, 5);
+  pop();
+
   pop();
 }
 
@@ -162,8 +357,11 @@ function throttleFigureAndPressureGauges() {
 
   //--------------------gas inside the pipe--------------------
   push();
-  fill(255, 115, 115);
-  rect(state.xMid, state.yMid + 100, state.width - 100, state.height * 0.3);
+  //fill(255, 255*1-);
+  fill(255, 50 + (0.75 - state.inletPressure / 8) * 205, 50 + (0.75 - state.inletPressure / 8) * 205); //gas color in
+  rect(state.xMid / 2 + 25, state.yMid + 100, (state.width - 100) / 2, state.height * 0.3);
+  fill(255, 50 + (0.75 - state.outletPressure / 8) * 205, 50 + (0.75 - state.outletPressure / 8) * 205); //gas color out */
+  rect((3 * state.xMid) / 2 - 25, state.yMid + 100, (state.width - 100) / 2, state.height * 0.3);
   pop();
 
   //--------------------pipe borders--------------------
@@ -191,7 +389,7 @@ function throttleFigureAndPressureGauges() {
   rect(state.width / 8 + 15, state.yMid - 100, state.width / 8 - 35, state.yMid - 64);
   fill("black");
   rect(state.width / 8 + 4, state.yMid - 100, state.width / 8 - 24, state.yMid + 1);
-  fill(255, 115, 115);
+  fill(255, 50 + (0.75 - state.inletPressure / 8) * 205, 50 + (0.75 - state.inletPressure / 8) * 205); //gas color in
   rect(state.width / 8, state.yMid - 100, state.width / 8 - 20, state.yMid + 4);
   rectMode(CENTER);
   fill("gray");
@@ -273,7 +471,7 @@ function throttleFigureAndPressureGauges() {
   rect(state.width / 8 + 15, state.yMid - 100, state.width / 8 - 35, state.yMid - 64);
   fill("black");
   rect(state.width / 8 + 4, state.yMid - 100, state.width / 8 - 24, state.yMid + 1);
-  fill(255, 115, 115);
+  fill(255, 50 + (0.75 - state.outletPressure / 8) * 205, 50 + (0.75 - state.outletPressure / 8) * 205); //gas color out
   rect(state.width / 8, state.yMid - 100, state.width / 8 - 20, state.yMid + 4);
   rectMode(CENTER);
   fill("gray");
@@ -358,7 +556,7 @@ function drawFigureText() {
   strokeWeight(0.2);
   fill("Black");
   textSize(28);
-  text("T out = " + state.outletTemperature.toFixed(1), (3 * state.width) / 4, state.yMid + 100);
+  //text("T out = " + state.outletTemperature.toFixed(1), (3 * state.width) / 4, state.yMid + 100);
   pop();
 }
 

@@ -1,214 +1,289 @@
+// draw.js
+
+import results from "./results.js";  // ← adjust this path if your results.js lives elsewhere
+
 export function drawAll() {
-  
-  // -----------longer waves---------------
+
+  push();
+  translate(-25, 55);
+
+  // Compute scale factors from “design units” → actual pixels:
+  const ux = width / 150;
+  const uy = height / 100;
+
+  const mcNum = parseFloat(results.mc);  // cold‐side mass flow (kg/min)
+  const mhNum = parseFloat(results.mh);  // hot‐side mass flow  (kg/min)
+
+  const scaleFactor = 80;  // (design units per kg/min)
+
+  //  Compute “design‐unit length” for each arrow:
+  const arrowLenCold_Design = mcNum * scaleFactor;
+  const arrowLenHot_Design = mhNum * scaleFactor;
+
+  const rawCold_px = arrowLenCold_Design * ux;
+  const rawHot_px = arrowLenHot_Design * ux;
+
+  // ── 3) Now remap “raw px” into [minPx, maxPx] so small flows aren’t too tiny
+  //      and large flows aren’t too huge.
+  const minPx = 80;
+  const maxPx = 180;
+
+  // Option A: CLAMP the raw pixel values directly
+  const arrowLenCold_px = constrain(rawCold_px, minPx, maxPx);
+  const arrowLenHot_px = constrain(rawHot_px, minPx, maxPx);
+
+  // ------------------ 1) “Longer waves” inside the pipe (even thicker) ------------------
   push();
   noFill();
-  strokeWeight(1);
+  strokeWeight(height * 0.011);
+
   const colorStops1 = [
     color(90, 173, 233),  // light blue
-    color(255, 255, 0),    // yellow (pure yellow)
-    color(255, 219, 88),   // mustard yellow
-    color(255, 165, 0),    // orange
-    color(255, 0, 0),      // red
+    color(255, 255, 0),   // yellow
+    color(255, 219, 88),  // mustard yellow
+    color(255, 165, 0),   // orange
+    color(255, 0, 0)      // red
   ];
+
   for (let i = 0; i < 1000; i++) {
     const t = i / 1000;
-    const x = 53 + i / 15;
-    const y = height / 2 + 10.5 * sin(radians(i * 3));
+    const xDesign = 53 + i / 15;
+    const x = xDesign * ux;
+    const yDesign = 50 + 10.5 * sin(radians(i * 3));
+    const y = yDesign * uy;
+
     stroke(lerpColorStops(t, colorStops1));
-    point(x, y,x+1,y+1);
+    point(x, y);
   }
   pop();
 
-  //--------------elongated line-----------------
+  // ------------------ 2) “Elongated line” (small slanted connector, thicker) ------------------
   push();
-  stroke(90, 173, 233); 
-  strokeWeight(1);
-  line(51.5, 27, 53, 50);
+  stroke(90, 173, 233);
+  strokeWeight(height * 0.011);
+
+  line(
+    51.5 * ux, 27 * uy,
+    53 * ux, 50 * uy
+  );
   pop();
 
-  //--------------smaller waves--------------------
+  // ------------------ 3) “Smaller waves” under the pipe (even thicker) ------------------
   push();
-  fill("rgba(90, 173, 233, 0.34)");
-  strokeWeight(1);
-  const colorStops = [
-    color(0, 0, 255),     // blue
+  fill('rgba(90, 173, 233, 0.34)');
+  strokeWeight(height * 0.010);
+
+  const colorStops2 = [
+    color(0, 0, 255), // blue
     color(100, 200, 255), // light blue
     color(255, 255, 255), // white
     color(255, 255, 100), // yellow
-    color(255, 165, 0),   // orange
-    color(255, 0, 0),     // red
+    color(255, 165, 0), // orange
+    color(255, 0, 0)  // red
   ];
+
   for (let i = 0; i < 1000; i++) {
     const t0 = i / 1000;
-    const x =  39 + i / 13;
-    const y = height / 2 + 3.5 * sin(radians(i * 4.5));
-    stroke(lerpColorStops(t0, colorStops));
-    point(x, y,x+1,y+1);
+    const xDesign = 39 + i / 13;
+    const x = xDesign * ux;
+    const yDesign = 50 + 3.5 * sin(radians(i * 4.5));
+    const y = yDesign * uy;
+
+    stroke(lerpColorStops(t0, colorStops2));
+    point(x, y);
   }
   pop();
 
-
-  //------------------------ triangle --------------------------
+  // ------------------ 4) “Triangle” (throttle valve indicator, much thicker outline) ------------------
   push();
-  const xOffset = state.z * -5;
-  const topX = width - 20 + xOffset;
-  const topY = height / 2 - 8;
-  const botY = height / 2 + 8;
-  const tipX = width - 34 + xOffset;
-  const tipY = height / 2;
-  fill(250, 220, 240); // lavender
-  strokeJoin(ROUND);    //curved edges
-  strokeWeight(1);
+  const xOffsetDesign = state.z * -5;
+
+  const topX = (150 - 20 + xOffsetDesign) * ux;
+  const topY = (50 - 8) * uy;
+  const botY = (50 + 8) * uy;
+  const tipX = (150 - 34 + xOffsetDesign) * ux;
+  const tipY = 50 * uy;
+
+  fill(250, 220, 240); // lavender fill
+  strokeJoin(ROUND);
+  strokeWeight(height * 0.010);
+
   triangle(topX, topY, topX, botY, tipX, tipY);
   pop();
 
 
-  //lines for upper vortex borders
-  stroke(0); 
-  strokeWeight(1);
-  line(20,38,42,38);
-  line(42,38,42,34);
-  line(42,34,44,34);
-  line(44,34,44,25);
-  line(44,25,49,25);
-  line(54,25,59,25);
-  line(59,25,59,34);
-  line(59,34,61,34);
-  line(61,34,61,36);
-  line(61,36,122,36);
-  line(122,36,122,39);
+  // ------------------ 6) “Top arrow” (small downward arrow, same thickness) ------------------
+  drawDownArrow(
+    51.5 * ux,
+    20 * uy,
+    4 * uy,   // shaft length in pixels
+    2 * uy,   // head height
+    3 * ux    // head width
+  );
 
-  //--------------lines for lower vortex borders------------------
-  line(122,61,122,64);
-  line(61,64,122,64);
-  line(61,64,61,66);
-  line(44,66,61,66);
-  line(43,66,61,66);
-  line(43,62,43,66);
-  line(20,62,43,62);
-
-  //--------------vertical lines----------------------
-  line(38,62,38,53);
-  line(38,38,38,47);
-
-  //------------------TOP ARROW-----------------------
-  line(29,18,51,18);
-  drawDownArrow(51, 17.5);
-  function drawDownArrow(x, y, shaftLen = 6, headHeight = 3, headWidth = 3) {
+  function drawDownArrow(px, py, shaftLenPx, headHeightPx, headWidthPx) {
     push();
-    fill(0);
     strokeJoin(ROUND);
-    strokeWeight(1);
-  
-    rect(x+0.2, y+0.6, 0.1, shaftLen);
-  
+    strokeWeight(height * 0.008);  // same thickness you chose for other arrows
+    fill(0);
+
+    // Draw a straight vertical shaft from (px, py) down to (px, py + shaftLenPx)
+    line(px, py, px, py + shaftLenPx);
+
+    // Draw a centered triangular arrowhead below the shaft
+
+    const baseY = py + shaftLenPx;
+    const tipY = baseY + headHeightPx;
+
     beginShape();
-    vertex(x+0.5, y + shaftLen-1 + headHeight); // tip
-    vertex(x+0.5 - headWidth / 2, y + shaftLen); // left base
-    vertex(x+0.5 + headWidth / 2, y + shaftLen); // right base
+    vertex(px - headWidthPx / 2, baseY);  // left corner of triangle base
+    vertex(px + headWidthPx / 2, baseY);  // right corner of triangle base
+    vertex(px, tipY);                     // bottom “tip” of the arrowhead
     endShape(CLOSE);
-  
+
     pop();
   }
-  
 
-  //----------------------left arrows------------------------
   push();
-  stroke(0, 0, 255);
-  strokeWeight(1); 
-  fill(0, 0, 255);  
-
-  const baseX = 37;
-  const baseY = height / 2;
-  const arrowLen = 18 + (state.P * 0.08) * 2 + state.z * 0.4;
-  const offsetY = 1.5; 
-
-  for (let i = -1; i <= 1; i++) {
-    const y = baseY + i * offsetY;
-    const angle = radians(-25 * i);
-
-    const x1 = baseX;
-    const y1 = y;
-    const x2 = baseX - arrowLen * cos(angle);
-    const y2 = y - arrowLen * sin(angle);
-
-    // arrow shaft
-    line(x1, y1, x2, y2);
-
-    // arrowhead points
-    const headSize = 3;
-    const angleOffset = radians(15);
-    const xA = x2 + headSize * cos(angle + angleOffset);
-    const yA = y2 + headSize * sin(angle + angleOffset);
-    const xB = x2 + headSize * cos(angle - angleOffset);
-    const yB = y2 + headSize * sin(angle - angleOffset);
-
-    beginShape();
-    vertex(x2, y2);  // tip of arrow
-    vertex(xA, yA);  // left side
-    vertex((xA + xB) / 2, (yA + yB) / 2 + 0.5);
-    vertex(xB, yB);  // right side
-    endShape(CLOSE);
-  }
+  stroke(0);
+  strokeWeight(height * 0.008);
+  line(28 * ux, 20 * uy, 51.5 * ux, 20 * uy);
   pop();
 
+  // ------------------ 5) “Pipe borders” (upper and lower lines, unchanged or tweak as desired) ------------------
+  stroke(0);
+  strokeWeight(height * 0.010);
 
-  // -------------------Right arrows-----------------------------
+  // Upper borders (in design units):
+  line(25 * ux, 38 * uy, 42 * ux, 38 * uy);
+  line(42 * ux, 38 * uy, 42 * ux, 34 * uy);
+  line(42 * ux, 34 * uy, 44 * ux, 34 * uy);
+  line(44 * ux, 34 * uy, 44 * ux, 25 * uy);
+  line(44 * ux, 25 * uy, 49 * ux, 25 * uy);
+
+  line(54 * ux, 25 * uy, 59 * ux, 25 * uy);
+  line(59 * ux, 25 * uy, 59 * ux, 34 * uy);
+  line(59 * ux, 34 * uy, 61 * ux, 34 * uy);
+  line(61 * ux, 34 * uy, 61 * ux, 36 * uy);
+  line(61 * ux, 36 * uy, 122 * ux, 36 * uy);
+  line(122 * ux, 36 * uy, 122 * ux, 39 * uy);
+
+  // Lower borders:
+  line(122 * ux, 61 * uy, 122 * ux, 64 * uy);
+  line(61 * ux, 64 * uy, 122 * ux, 64 * uy);
+  line(61 * ux, 64 * uy, 61 * ux, 66 * uy);
+  line(44 * ux, 66 * uy, 61 * ux, 66 * uy);
+  line(43 * ux, 66 * uy, 61 * ux, 66 * uy);
+  line(43 * ux, 62 * uy, 43 * ux, 66 * uy);
+  line(25 * ux, 62 * uy, 43 * ux, 62 * uy);
+
+  // Vertical lines separating the two vortices:
+  line(38 * ux, 62 * uy, 38 * ux, 53 * uy);
+  line(38 * ux, 38 * uy, 38 * ux, 47 * uy);
+
+  // ------------------ 7) “Left arrows” (cold side, now three arrows 
+  // ------------------ 7) “Left arrows” (cold side; proportional to results.mc) ------------------
   push();
-  stroke(165, 20, 20);
-  fill(165, 20, 20);
-  strokeWeight(1);
+  stroke(0, 0, 255);
+  fill(0, 0, 255);
+  strokeWeight(height * 0.01);
 
-  const headSize = 3;
-  const minLen = 10;
-  const maxLen = 20;
-  const baseLen = 12;
-  const pressureBoost = ((state.P - 2.4) / (7.8 - 2.4)) * 6;   // up to +6
-  const fractionReduction = ((state.z - 0.2) / (0.8 - 0.2)) * 4; // up to -4
+  const baseX_Design = 37;
+  const baseY_Design = 50;
+  const offsetY_Design = 1.5;
 
-  const shaftLen = baseLen + pressureBoost - fractionReduction;
+  for (let dir of [-1, 0, 1]) {
+    const angle = radians(-25 * dir);
 
-  const horizontalOffset = 120;
-  const verticalSpread = 8;
-  const spreadAngle = radians(26); 
+    // 1) Starting point:
+    const x1 = baseX_Design * ux;
+    const y1 = (baseY_Design + dir * offsetY_Design) * uy;
 
-  for (let dir of [-1, 1]) {
-    const angle = dir * spreadAngle;
-    const startX = horizontalOffset;
-    const startY = height / 2 + dir * verticalSpread;
-    const endX = startX + shaftLen * cos(angle);
-    const endY = startY + shaftLen * sin(angle);
+    // 2) Compute dx/dy from the single pixel length:
+    const dx = arrowLenCold_px * cos(angle);
+    const dy = arrowLenCold_px * sin(angle);
 
-    line(startX, startY, endX, endY);
+    // 3) Ending point:
+    const x2 = x1 - dx;
+    const y2 = y1 - dy;
 
-    // Arrowhead
-    const xA = endX - headSize * cos(angle + QUARTER_PI / 1.5);
-    const yA = endY - headSize * sin(angle + QUARTER_PI / 1.5);
-    const xB = endX - headSize * cos(angle - QUARTER_PI / 1.5);
-    const yB = endY - headSize * sin(angle - QUARTER_PI / 1.5);
+    line(x1, y1, x2, y2);
+
+    // 4) Arrowhead (kept identical to your existing logic)
+    const headSizePx = 3 * ux;            // arrowhead base half-width
+    const angleOffset = radians(15);
+    const xA = x2 + headSizePx * cos(angle + angleOffset);
+    const yA = y2 + headSizePx * sin(angle + angleOffset);
+    const xB = x2 + headSizePx * cos(angle - angleOffset);
+    const yB = y2 + headSizePx * sin(angle - angleOffset);
 
     beginShape();
-    vertex(endX, endY);
+    vertex(x2, y2);
     vertex(xA, yA);
-    vertex((xA + xB) / 2, (yA + yB) / 2 + 0.5);
+    vertex((xA + xB) / 2, (yA + yB) / 2 + 0.5 * uy);
     vertex(xB, yB);
     endShape(CLOSE);
   }
   pop();
 
-  // ---------------- Color gradience function----------------------
+
+  // ------------------ 8) “Right arrows” (hot side, pointing outward) ------------------
+  // ------------------ 8) “Right arrows” (hot side; proportional to results.mh) ------------------
+  push();
+  stroke(165, 20, 20);
+  fill(165, 20, 20);
+  strokeWeight(height * 0.01);
+
+  const baseX2_Design = 120;
+  const baseY2_Design = 50;
+  const spreadAngle = radians(26);
+
+  for (let dir of [-1, 1]) {
+    const angle = dir * spreadAngle;
+    const startX = baseX2_Design * ux;
+    const startY = (baseY2_Design + dir * 8) * uy;
+
+    // 1) Use arrowLenHot_px for both X and Y
+    const dx = arrowLenHot_px * cos(angle);
+    const dy = arrowLenHot_px * sin(angle);
+
+    const endX = startX + dx;
+    const endY = startY + dy;
+
+    line(startX, startY, endX, endY);
+
+    // 2) Draw arrowhead
+    const headSizePx = 3 * ux;
+    const headAngleOffset = QUARTER_PI / 1.5;
+    const xA = endX - headSizePx * cos(angle + headAngleOffset);
+    const yA = endY - headSizePx * sin(angle + headAngleOffset);
+    const xB = endX - headSizePx * cos(angle - headAngleOffset);
+    const yB = endY - headSizePx * sin(angle - headAngleOffset);
+
+    beginShape();
+    vertex(endX, endY);
+    vertex(xA, yA);
+    vertex((xA + xB) / 2, (yA + yB) / 2 + 0.5 * uy);
+    vertex(xB, yB);
+    endShape(CLOSE);
+  }
+  pop();
+
+  // ------------------ 9) “Color interpolation” helper ------------------
   function lerpColorStops(t, stops) {
     const n = stops.length - 1;
     const scaledT = t * n;
-    const i = Math.floor(scaledT);
+    const i = floor(scaledT);
     const localT = scaledT - i;
-    const c1 = stops[i];
-    const c2 = stops[i + 1];
+    const idx = constrain(i, 0, n - 1);
+    const c1 = stops[idx];
+    const c2 = stops[idx + 1];
     return lerpColor(c1, c2, localT);
   }
+  pop();
 }
 
+
 if (window.MathJax) {
-     MathJax.typesetPromise();
-  }
+  MathJax.typesetPromise();
+}

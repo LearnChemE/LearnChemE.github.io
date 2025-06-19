@@ -1,0 +1,27 @@
+<svg width="175" height="160" xmlns="http://www.w3.org/2000/svg">
+
+ <g>
+  <title>Layer 1</title>
+  <g id="svg_38">
+   <g id="svg_34">
+    <line stroke-dasharray="5,5" id="svg_17" y2="40.12265" x2="170.80827" y1="40.56808" x1="116.688" stroke="#000" fill="none"/>
+    <g id="svg_32">
+     <line id="svg_25" y2="0.852" x2="1.34111" y1="29.04923" x1="1.34111" stroke="#000" fill="none"/>
+     <line id="svg_26" y2="1.29501" x2="173.26937" y1="29.32727" x1="173.62779" stroke="#000" fill="none"/>
+     <path transform="rotate(180 41.1772 21.5023)" fill-opacity="0" id="svg_29" d="m32.78892,28.57436l8.38816,-14.14473l8.38816,14.14473l-16.77632,0z" stroke="#000" fill="#000000"/>
+     <g id="svg_31">
+      <path stroke="#000" id="svg_10" d="m1.27808,30.05949l172.34848,0l0,128.0303l-172.34848,0l0,-128.0303z" opacity="undefined" fill="#b4b4ff"/>
+      <line stroke="#000" stroke-dasharray="5,5" id="svg_14" y2="31.61934" x2="173.91425" y1="31.91332" x1="1.08575" fill="none"/>
+      <line stroke-dasharray="5,5" id="svg_15" y2="35.61934" x2="173.46882" y1="35.4768" x1="1.30846" stroke="#000" fill="none"/>
+      <line id="svg_16" y2="39.61934" x2="53.42428" y1="39.93114" x1="9.32628" stroke-dasharray="5,5" stroke="#000" fill="none"/>
+      <line id="svg_18" y2="43.2719" x2="82.82294" y1="43.2719" x1="51.41982" stroke-dasharray="5,5" stroke="#000" fill="none"/>
+      <line id="svg_19" y2="45.27635" x2="36.05234" y1="45.27635" x1="18.45768" stroke-dasharray="5,5" stroke="#000" fill="none"/>
+      <path stroke="#000" id="svg_30" d="m90.25538,32.26592c-1.72478,0 -3.12185,-1.30457 -3.12185,-2.91515c0,-1.61058 1.39707,-2.91515 3.12185,-2.91515c1.72478,0 3.12185,1.30457 3.12185,2.91515c0,1.61058 -1.39707,2.91515 -3.12185,2.91515z" opacity="undefined" fill="#000000"/>
+     </g>
+    </g>
+   </g>
+   <line id="svg_35" y2="39.92856" x2="171.92686" y1="39.6246" x1="119.64723" stroke-dasharray="5,5" stroke="#000" fill="none"/>
+   <line id="svg_36" y2="43.57597" x2="150.04236" y1="43.57597" x1="120.55908" stroke-dasharray="5,5" stroke="#000" fill="none"/>
+  </g>
+ </g>
+</svg>

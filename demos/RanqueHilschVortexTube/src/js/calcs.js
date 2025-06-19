@@ -1,3 +1,5 @@
+import results from "./results.js";
+
 export const TDropData = [
   [[20, 20], 63.1], [[20, 30], 61.3], [[20, 40], 56.1], [[20, 50], 51.3],
   [[20, 60], 44.5], [[20, 70], 37], [[20, 80], 28.8],
@@ -23,20 +25,6 @@ export const TRiseData = [
   [[100, 20], 27.8], [[100, 30], 46.1], [[100, 40], 67.3], [[100, 50], 100.3],
   [[100, 60], 119.9], [[100, 70], 151.1], [[100, 80], 192.1]
 ];
-
-// results.js
-const results = {
-  th: 0,
-  tc: 0,
-  mf: 0,
-  mc: 0,
-  mh: 0,
-  COP: 0,
-  eta: 0,
-  deltaStotal: 0,
-};
-
-export default results;
 
 function interpolate2D(data, x, y) {
   // Find 4 closest points (simplified for clarity)
@@ -87,11 +75,11 @@ export function calcAll() {
   const tc = tf - 5 * interpolate2D(TDropData, barToPSI(Pf - 1.01325), z * 100) / 9;
 
   // Mass flow rates
-  const mf = 0.532 * (A *10.7639) * (Pf * 2088.543) * 60 / (536.4 * 2.205);
+  const mf = 0.532 * (A * 10.7639) * (Pf * 2088.543) * 60 / (536.4 * 2.205);
   const mc = mf * z;
   const mh = mf * (1 - z);
 
-  const eta = (tf-tc)/(tf * (Math.pow((Pf/1.01325),((gamma-1)/gamma))-1));
+  const eta = (tf - tc) / (tf * (Math.pow((Pf / 1.01325), ((gamma - 1) / gamma)) - 1));
 
   // COP formula
   const COP = (z * Cp * (tf - tc)) / ((gamma / (gamma - 1)) * R * tf * (Math.pow((Pf / 1.01325), ((gamma - 1) / gamma)) - 1));
@@ -103,14 +91,14 @@ export function calcAll() {
 
   const deltaStotal = deltaS(mc, tc, Pc) + deltaS(mh, th, Ph);
 
-  results.th= th.toFixed(0);
-  results.tc= tc.toFixed(0);
-  results.mf= mf.toFixed(2);
-  results.mc= mc.toFixed(2);
-  results.mh= mh.toFixed(2);
-  results.COP= COP.toFixed(2);
-  results.eta= eta.toFixed(2);
-  results.deltaStotal= deltaStotal.toFixed(0);
+  results.th = Math.round(th);
+  results.tc = Math.round(tc);
+  results.mf = mf.toFixed(3);
+  results.mc = mc.toFixed(3);
+  results.mh = mh.toFixed(3);
+  results.COP = COP.toFixed(2);
+  results.eta = eta.toFixed(2);
+  results.deltaStotal = deltaStotal.toFixed(0);
 
   updateSimulation();
 }
@@ -121,7 +109,7 @@ export function updateSimulation() {
   textSize(4);
   textAlign(CENTER);
   noStroke();
-  
+
   const coldTemp = Number(results?.tc ?? 0);
   const hotTemp = Number(results?.th ?? 0);
   const mf = Number(results?.mf ?? 0);
@@ -130,23 +118,44 @@ export function updateSimulation() {
   const COP = Number(results?.COP ?? 0);
   const eta = Number(results?.eta ?? 0);
   const deltaS = Number(results?.deltaStotal ?? 0);
-  
-  text(`${coldTemp.toFixed(1)} K`, width / 6, height - 25);
-  text(`${hotTemp.toFixed(1)} K`, width - 25, height - 25);
-  text(`${mf.toFixed(2)} kg/min`, width / 6, height - 85);
-  text(`${mh.toFixed(2)} kg/min`, width - 25, height - 15);
-  text(`${mc.toFixed(2)} kg/min`, width / 6, height - 15);
-  text(`298 K   ${state.P.toFixed(1)} bar`, width / 5.5, height - 90);
-  text(`coefficient of performance = ${COP.toFixed(2)}`, width - 40, 8);
+
+  //text(`${coldTemp.toFixed(1)} K`, width / 6, height - 25);
+  const coldTemperature = `$$ ${Math.round(coldTemp)}\\ \\text{K} $$`;
+  document.getElementById("coldTemperature-container").innerHTML = coldTemperature;
+  //text(`${hotTemp.toFixed(1)} K`, width - 25, height - 25);
+  const hotTemperature = `$$ ${Math.round(hotTemp)}\\ \\text{K} $$`
+  document.getElementById("hotTemperature-container").innerHTML = hotTemperature;
+  //text(`${mf.toFixed(2)} kg/min`, width / 6, height - 85);
+  const mfValue = `$$ ${mf.toFixed(3)}\\ \\mathrm{kg/min} $$`
+  document.getElementById("mf-container").innerHTML = mfValue;
+
+  //text(`${mh.toFixed(2)} kg/min`, width - 25, height - 15);
+  const mhValue = `$$ ${mh.toFixed(3)}\\ \\mathrm{kg/min} $$`
+  document.getElementById("mh-container").innerHTML = mhValue;
+  //text(`${mc.toFixed(2)} kg/min`, width / 6, height - 15);
+  const mcValue = `$$ ${mc.toFixed(3)}\\ \\mathrm{kg/min} $$`
+  document.getElementById("mc-container").innerHTML = mcValue;
+
+  //text(`298 K   ${state.P.toFixed(1)} bar`, width / 5.5, height - 90);
+  const pressure = `$$ 298 \\ \\text{K} \\ \\  ${state.P.toFixed(1)}\\ \\text{bar} $$`
+  document.getElementById("pressure-container").innerHTML = pressure;
+
+  //text(`coefficient of performance = ${COP.toFixed(2)}`, width - 40, 8);
+  const coeffOfPerformance = `<span style="font-family: Arial, sans-serif;">
+      coefficient of performance = ${COP.toFixed(2)}
+   </span>`;
+
+  document.getElementById("cop-container").innerHTML = coeffOfPerformance;
+
   const formula1 = `$$\\Delta S_{\\text{tot}} = ${deltaS.toFixed(0)}\\ \\mathrm{J/(kg\\ K)}$$`;
   document.getElementById("formula1-container").innerHTML = formula1;
-  
+
   const formula = `$$\\frac{T_{\\text{feed}} - T_{\\text{cold}}}{(T_{\\text{feed}} - T_{\\text{cold}})_{\\text{rev}}} = ${eta.toFixed(2)} $$`;
   document.getElementById("formula-container").innerHTML = formula;
-  
+
   if (window.MathJax) {
     MathJax.typesetPromise();
   }
   pop();
-  
+
 }
