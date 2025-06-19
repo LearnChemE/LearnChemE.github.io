@@ -34,6 +34,14 @@ body {
   position: absolute;
   bottom: -15px;
   font-size: calc(0.8 * var(--slider-font-size));
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-user-drag: none;
 }
 
 .under-slider-label.right {
@@ -80,6 +88,14 @@ body {
 
 .slider-label {
   justify-self: end;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-user-drag: none;
 }
 
 canvas {
@@ -164,6 +180,18 @@ canvas {
 *[disabled="true"] {
   opacity: 0.5 !important;
   pointer-events: none;
+}
+
+svg>* {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-user-drag: none;
 }
 
 @media screen and (min-width: 600px) and (min-height: 450px) {

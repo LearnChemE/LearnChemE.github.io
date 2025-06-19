@@ -23,6 +23,9 @@ window.state = {
   doCalc: false,
   hasAdjustedPressure: window.localStorage.getItem("hasAdjustedPressure") === "true",
   hasAdjustedTemperature: window.localStorage.getItem("hasAdjustedTemperature") === "true",
+  zoom: 1, // Current zoom level
+  zoomMin: 1, // Minimum zoom level
+  zoomMax: 4, // Maximum zoom level
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -46,9 +49,17 @@ window.draw = function() {
   window.height = state.canvasSize[1];
   window.mX = mouseX / relativeSize();
   window.mY = mouseY / relativeSize();
+
+  // Apply zoom transformation
+  push();
+  translate(mouseX, mouseY);
+  scale(state.zoom);
+  translate(-mouseX, -mouseY);
+
   scale(relativeSize());
   background(255);
   drawAll();
+  pop();
 };
 
 window.windowResized = () => {
@@ -63,5 +74,22 @@ function sizeContainer() {
   containerElement.style.height = `calc(calc(100vw - 10px) * ${state.canvasSize[1]} / ${state.canvasSize[0]})`;
   containerElement.style.maxHeight = `calc(100vh - 10px)`;
 }
+
+// Add mouseWheel handler
+window.mouseWheel = function(event) {
+  // Prevent default scrolling
+  event.preventDefault();
+
+  // Calculate zoom factor based on scroll direction
+  const zoomFactor = event.deltaY > 0 ? 0.95 : 1.05;
+
+  // Calculate new zoom level
+  const newZoom = state.zoom * zoomFactor;
+
+  // Clamp zoom level between min and max
+  state.zoom = constrain(newZoom, state.zoomMin, state.zoomMax);
+
+  return false;
+};
 
 require("./js/events.js");

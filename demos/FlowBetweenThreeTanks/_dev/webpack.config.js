@@ -65,7 +65,7 @@ module.exports = (env, argv) => {
         {
           test: /\.(sa|sc|c)ss$/i,
           use: [
-            isProd ? MiniCssExtractPlugin.loader : 'style-loader',
+            MiniCssExtractPlugin.loader,
             'css-loader',
             'sass-loader',
           ],
