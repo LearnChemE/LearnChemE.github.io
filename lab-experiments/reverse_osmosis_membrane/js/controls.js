@@ -1,3 +1,4 @@
+const pressureSlider = document.getElementById("feed-pressure");
 // Function to update slider value display
 function updateSliderValue(sliderId) {
   // Get the slider element
@@ -33,4 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const saltSlider = document.getElementById("salt-conc");
   saltSlider.addEventListener("input", () => updateSliderValue("salt-conc"));
   updateSliderValue("salt-conc");
+});
+
+pressureSlider.addEventListener("input", function () {
+  // The default value of a slider is a string, so we always first convert it to a number.
+  state.feedPressure = Number(pressureSlider.value);
 });

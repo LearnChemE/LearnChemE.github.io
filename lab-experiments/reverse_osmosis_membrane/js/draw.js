@@ -44,6 +44,9 @@ window.draw = function () {
   drawPressureGauge(175, 400);
   drawWater(175, 400);
   drawPump(175, 400);
+  drawBeakers(175, 400);
+  drawFilter(175, 400);
+
   //draw text last so it appears over the water
   drawTextOnTopOfDiagram(175, 400);
 };
@@ -235,7 +238,7 @@ function drawPump(x, y) {
 
   push();
   //connector out of the pump
-  fill(53, 57, 53);
+  fill(53, 57, 53); //Dark gray pipe color
   rectMode(CENTER);
   rect(x + 40, y - 75, 20, 20);
   rect(x + 40, y - 60, 30, 20, 5, 5, 0, 0);
@@ -271,6 +274,176 @@ function drawPressureGauge(x, y) {
   rect(x + 25, y - 65, 20, 30, 5, 0, 0, 5);
   pop();
 
+  push();
+
+  rectMode(CORNERS);
+  stroke(0);
+  fill("lightgray");
+  rect(x + 35, y - 75, x + 70, y - 55);
+
+  translate(-50, 0);
+
+  fill("Goldenrod");
+  stroke(0);
+  rect(x + 120, y - 75, x + 180, y - 55);
+  rect(x + 120, y - 80, x + 140, y - 50, 0, 5, 5, 0);
+  rect(x + 180, y - 80, x + 200, y - 50, 5, 0, 0, 5);
+  rectMode(CENTER);
+  rect(x + 160, y - 80, 15, 30);
+  noStroke();
+  rect(x + 160, y - 65, 13, 10);
+  stroke(0);
+  rect(x + 160, y - 85, 25, 10);
+
+  circle(x + 160, y - 145, 100);
+  fill("white");
+  noStroke();
+  circle(x + 160, y - 145, 94);
+  noFill();
+  stroke(0);
+  arc(x + 160, y - 145, 55, 55, -225, 45);
+
+  //--------------------tick marks on pressure gauge--------------------
+  translate(x + 160, y - 145);
+  angleMode(DEGREES);
+  strokeWeight(1.5);
+  for (let i = -45; i <= 225; i += (225 + 45) / 4) {
+    line(28 * cos(i), -28 * sin(i), 32 * cos(i), -32 * sin(i));
+  }
+  strokeWeight(1);
+  for (let i = -45; i <= 225; i += (225 + 45) / 20) {
+    line(28 * cos(i), -28 * sin(i), 30 * cos(i), -30 * sin(i));
+  }
+  //--------------------numbers on pressure gauge--------------------
+  push();
+  textAlign(CENTER, CENTER);
+  noStroke();
+  fill("Black");
+  textSize(11);
+  for (let i = -45; i <= 225; i += (225 + 45) / 4) {
+    text(-(i + 45) / (270 / 20) + 30, 40 * cos(i), -40 * sin(i));
+  }
+  pop();
+
+  //--------------------Gauge Needle--------------------
+
+  fill("black");
+  noStroke();
+  triangle(
+    35 * cos(-(270 * state.feedPressure) / 20),
+    -35 * sin(-(270 * state.feedPressure) / 20),
+    15 * cos(-(270 * state.feedPressure) / 20 + 180 - 17),
+    -15 * sin(-(270 * state.feedPressure) / 20 + 180 - 17),
+    15 * cos(-(270 * state.feedPressure) / 20 + 180 + 17),
+    -15 * sin(-(270 * state.feedPressure) / 20 + 180 + 17)
+  );
+  fill("gray");
+  strokeWeight(5);
+  circle(0, 0, 10);
+
+  textAlign(CENTER, CENTER);
+  noStroke();
+  fill("Black");
+  textSize(14);
+  text("bar", 0, 35);
+
+  pop();
+
+  pop();
+}
+
+function drawFilter(x, y) {
+  push();
+  translate(184, saltTankHeight / 2 - 100);
+
+  push();
+  rectMode(CORNERS);
+  fill("lightgray");
+  stroke(0);
+  rect(x + 150, y - 75, x + 220, y - 55);
+
+  pop();
+
+  push();
+  rectMode(CORNERS);
+  fill("WhiteSmoke");
+  rect(x + 250, y - 75, x + 280, y - 55);
+  rect(x + 280, y - 100, x + 530, y - 30, 20, 20, 20, 20);
+  rect(x + 285, y - 110, x + 320, y - 20, 10, 0, 0, 10);
+
+  fill(53, 57, 53);
+  rect(x + 220, y - 75, x + 250, y - 55);
+  rect(x + 200, y - 80, x + 220, y - 50, 0, 5, 5, 0);
+  rect(x + 250, y - 80, x + 270, y - 50, 5, 0, 0, 5);
+  fill("WhiteSmoke");
+
+  //rectangles on the RO inlet cap
+  rectMode(CENTER);
+  rect(x + 302.5, y - 104, 25, 5, 5, 5, 5, 5);
+  rect(x + 302.5, y - 90, 25, 5, 5, 5, 5, 5);
+  rect(x + 302.5, y - 77, 25, 5, 5, 5, 5, 5);
+  rect(x + 302.5, y - 65, 25, 5, 5, 5, 5, 5);
+  rect(x + 302.5, y - 53, 25, 5, 5, 5, 5, 5);
+  rect(x + 302.5, y - 40, 25, 5, 5, 5, 5, 5);
+  rect(x + 302.5, y - 26, 25, 5, 5, 5, 5, 5);
+
+  //outlet streams
+  rectMode(CORNERS);
+  fill("lightgray");
+  rect(x + 544, y - 25, x + 544 + 12, y + 180);
+  rect(x + 567, y - 71, x + 650, y - 71 + 12);
+  rect(x + 717, y - 71, x + 760, y - 71 + 12);
+  rect(x + 770, y - 45, x + 770 + 12, y + 180);
+
+  fill("whiteSmoke");
+  rectMode(CENTER);
+  rect(x + 530, y - 42, 30, 14);
+  rect(x + 550, y - 34, 14, 30, 0, 10, 0, 0);
+  rect(x + 550, y - 34, 14, 30, 0, 10, 0, 0);
+
+  rect(x + 548, y - 65, 35, 14);
+
+  noStroke();
+  rect(x + 520, y - 42, 20, 13);
+  rect(x + 538, y - 42, 20, 13);
+
+  stroke(0);
+  rect(x + 550, y - 20, 20, 15, 5, 5, 0, 0);
+  rect(x + 560, y - 65, 15, 20, 5, 0, 0, 5);
+
+  //back pressure regulator
+
+  push();
+  rectMode(CENTER);
+
+  fill(53, 57, 53); //dark gray
+  rect(x + 680, y - 65, 45, 12);
+  rect(x + 680 + 14, y - 70, 15, 5);
+  rect(x + 680 - 14, y - 70, 15, 5);
+  rect(x + 680 + 14, y - 60, 15, 5);
+  rect(x + 680 - 14, y - 60, 15, 5);
+  rect(x + 680, y - 65, 15, 25, 5, 5, 5, 5);
+  rect(x + 680 - 10, y - 65, 5, 25, 5, 5, 5, 5);
+  rect(x + 680 + 10, y - 65, 5, 25, 5, 5, 5, 5);
+
+  fill("Goldenrod");
+  rect(x + 650, y - 65, 15, 20, 0, 5, 5, 0);
+  rect(x + 710, y - 65, 15, 20, 5, 0, 0, 5);
+  pop();
+
+  //corner turn piece
+  fill(53, 57, 53); //dark gray
+  rectMode(CENTER);
+  rect(x + 770, y - 65, 20, 12, 0, 7, 0, 0);
+  rect(x + 776, y - 61, 12, 20, 0, 7, 0, 0);
+  rect(x + 756, y - 65, 15, 20, 0, 5, 5, 0);
+  rect(x + 776, y - 44, 20, 15, 5, 5, 0, 0);
+
+  noStroke();
+  rect(x + 770, y - 65, 5, 10, 0, 7, 0, 0);
+
+  pop();
+
   pop();
 }
 
@@ -289,7 +462,7 @@ function drawWater(x, y) {
 
   endShape();
 
-  fill("LightCyan");
+  fill("PaleTurquoise");
   beginShape();
   vertex(x - saltTankWidth / 2, y - saltTankHeight / 2 - 1);
   vertex(x + saltTankWidth / 2, y - saltTankHeight / 2 - 1);
@@ -315,10 +488,10 @@ function drawWater(x, y) {
   rect(x - 10, y + saltTankHeight / 2 + 59, 156, 20, 0, 0, 0, 10);
 
   rectMode(CENTER);
-  fill("LightCyan");
+  fill("PaleTurquoise");
   rect(x, y + saltTankHeight / 2 + 38, 20, 36);
   rectMode(CORNER);
-  fill("LightCyan");
+  fill("PaleTurquoise");
   rect(x - 10, y + saltTankHeight / 2 + 53, 20, 26, 0, 0, 0, 10);
   rect(x - 10, y + saltTankHeight / 2 + 59, 156, 20, 0, 0, 0, 10);
 
@@ -334,11 +507,20 @@ function drawWater(x, y) {
   noStroke();
   rect(x + 90, y + 220, 19, 55);
   pop();
+
+  //---------------------Water between pump and pressure gauge---------------------
+
+  push();
+
+  rectMode(CORNERS);
+  noStroke();
+  fill("PaleTurquoise");
+  rect(x + 178, y + 21, x + 190, y + 119);
+
+  pop();
 }
 
-/* function drawPipeCornerConnector(x, y) {}
-
-function drawPipeCornerConnector(x, y) {} */
+function drawBeakers(x, y) {}
 
 function drawPipeAndPump(tankX, tankY) {
   // Calculate pipe start position
