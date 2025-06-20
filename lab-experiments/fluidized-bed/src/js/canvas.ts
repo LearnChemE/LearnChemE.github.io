@@ -290,8 +290,8 @@ function updateState() {
 
   // Smooth lerp towards target bed height
   uniformData.bedHeight = (uniformData.bedHeight - targetHeight) * r ** uniformData.deltaTime + targetHeight;
-  if (uniformData.bedHeight < -.999) uniformData.bedHeight = -1;
-  if (uniformData.bedHeight > 0.999) uniformData.bedHeight =  1;
+  // if (uniformData.bedHeight < -.999) uniformData.bedHeight = -1;
+  // if (uniformData.bedHeight > 0.999) uniformData.bedHeight =  1;
 }
 
 /**

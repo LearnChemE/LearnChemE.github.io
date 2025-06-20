@@ -30,7 +30,7 @@ export function pressureDrop() {
     // Packed regime
     if (sup_vel <= 1) {
         // Bed height is fixed
-        setTargetBedHeight(1);
+        setTargetBedHeight(InitialBedHeight);
         
         // Use eq 1 to solve pressure
         const p = 150 * mu * InitialBedHeight / ParticleDiameter**2 * (1 - Init_VoidFrac)**2 / Init_VoidFrac**3 * sup_vel / 1000 +
@@ -52,9 +52,9 @@ export function pressureDrop() {
                 (rho_p - rho) * grav * ep**3 * ParticleDiameter**2;
         };
 
-        const h = secantMethod(ergun, 0.01, 1);
+        const h = secantMethod(ergun, 1, 10);
         console.log(`Fluidized Regime; Bed height = ${h}`);
-        setTargetBedHeight( 1 / h );
+        setTargetBedHeight(h);
 
         return 4.3;
     }
@@ -62,7 +62,7 @@ export function pressureDrop() {
     // Repacked regime
     else {
         console.log('Repacked regime');
-        setTargetBedHeight(-1);
+        setTargetBedHeight(30);
         return 5;
     }
 }
