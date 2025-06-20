@@ -60,7 +60,10 @@ canvas {
 }
 
 #pump-btn {
-  width: 150px;
-  margin: auto;
-  margin-top: .5em;
+  position: absolute;
+  z-index: 2;
+  bottom: -1em;
+  right: 24em;
+  width: 8em;
+  
 }

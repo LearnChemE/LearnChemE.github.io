@@ -168,7 +168,8 @@ export class Manometer {
     private bottom: number;
     private height: number;
     // Track whether it's been filled initially
-    private init: boolean = false;
+    private initLeft: boolean = false;
+    private initRight: boolean = false;
 
     constructor() {
         this.inTube  = new VaryingTube( "Tube_6", TubeDirection.Left, 2000); // 6 for left
@@ -193,7 +194,7 @@ export class Manometer {
      */
     public fillTubes = async () => {
         // If init hasn't been called, return
-        if (this.init === false) return;
+        if (this.initLeft === false) return;
 
         // Calculate height in pixels
         const base = this.baseElement.getBBox().y; // fill line of beaker
@@ -208,31 +209,34 @@ export class Manometer {
         right = (this.bottom - right) / this.height;
 
         // Set the left tube only
-        this.inTube.setTargetTimeDelay(left, 500);
-        this.outTube.setTargetTimeDelay(right, 500);
+        if (this.initLeft)  this.inTube.setTargetTimeDelay(left, 500);
+        if (this.initRight) this.outTube.setTargetTimeDelay(right, 500);
         return;
     }
 
     public fillLeftOnly = async () => {
-        // Calculate height in pixels
-        const base = this.baseElement.getBBox().y;
-        // TODO: Add pump pressure
-        var level = base - pumpPressure();
+        // // Calculate height in pixels
+        // const base = this.baseElement.getBBox().y;
+        // // TODO: Add pump pressure
+        // var level = base - 2.45 * pumpPressure();
 
-        // Convert to 0-1 range for tube
-        level = (this.bottom - level) / this.height;
+        // // Convert to 0-1 range for tube
+        // level = (this.bottom - level) / this.height;
 
-        // Set the left tube only
-        this.inTube.setTarget(level);
+        // // Set the left tube only
+        // this.inTube.setTarget(level);
+        this.initLeft = true;
+        this.initRight = false;
+        this.fillTubes();
         return;
     }
-
     /**
      * Call this function on the initial fill. Any calls to fillTubes will work after this.
      * @returns void promise
      */
     public initialFill = async () => {
-        this.init = true;
+        this.initLeft = true;
+        this.initRight = true;
         this.fillTubes();
         return;
     }

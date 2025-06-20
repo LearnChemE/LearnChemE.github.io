@@ -122,7 +122,8 @@ async function tubesFillAnimation() {
  * External call to begin the animation for the tubes filling.
  */
 export async function beginTubeFillAnimation() {
-    tubesFillAnimation();
+    State.valve2isDisabled = true;
+    tubesFillAnimation().then(() => State.valve2isDisabled = false);
 }
 
 /**
@@ -147,12 +148,14 @@ export async function swapValveAnimation(newSetting: ValveSetting) {
         ExitTube.empty();
         Recycle.fill().then(() => {
             beakers.setMode(2); // RECYCLE
+            State.valve2isDisabled = false;
         });
     }
     else {
         Recycle.empty();
         ExitTube.fill().then(() => {
             beakers.setMode(3); // CATCH_WEIGH
+            State.valve2isDisabled = false;
         });
     }
 }

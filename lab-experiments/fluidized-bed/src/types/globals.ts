@@ -10,6 +10,7 @@ export type GlobalState = {
     valveSetting: ValveSetting;
     pumpIsRunning: boolean;
     valveLift: number;
+    valve2isDisabled: boolean;
 }
 
 export type vec2 = {

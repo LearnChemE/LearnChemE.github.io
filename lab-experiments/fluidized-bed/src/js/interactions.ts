@@ -55,7 +55,7 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
         // Set state after a time delay
         setTimeout(() => {
             State.valveLift = rescale(v1Angle, -90, 0, 0.05, 1, true);
-        }, 500);
+        }, 350);
     };
     const release = () => {
         document.removeEventListener("mousemove", drag);
@@ -72,6 +72,8 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
 var lastAngle = 0;
 var currAngle = 0;
 valve2.addEventListener("mousedown", ({ clientX, clientY }) => {
+    if (State.valve2isDisabled) return;
+    if (State.pumpIsRunning) State.valve2isDisabled = true;
     currAngle = currAngle === 0 ? -90 : 0;
 
     smoothLerp(150, (val) => {
@@ -87,6 +89,7 @@ valve2.addEventListener("mousedown", ({ clientX, clientY }) => {
         State.valveSetting = ValveSetting.RecycleMode;
     }
 
+
 })
 
 /* ************************************** */
@@ -96,8 +99,15 @@ valve2.addEventListener("mousedown", ({ clientX, clientY }) => {
 /**
  * Pump button
  */
+function disableBtnTimeout(b: HTMLElement) {
+    const classname = b.className;
+    b.className += ' disabled aria-disabled';
+
+}
+
 const pumpBtn = document.getElementById("pump-btn");
 pumpBtn.addEventListener("click", () => {
     // Start pump animation
     State.pumpIsRunning = true;
+    disableBtnTimeout(pumpBtn);
 })

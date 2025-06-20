@@ -11,6 +11,7 @@ const state: GlobalState = {
     valveSetting: ValveSetting.RecycleMode,
     pumpIsRunning: false,
     valveLift: 1,
+    valve2isDisabled: false,
 }
 
 // Insert an svg image 
@@ -67,6 +68,9 @@ const stateProxy = new Proxy(state, {
         else if (prop === 'valveLift') {
             // Valve 1 turned
             onLiftChange();
+        }
+        else if (prop === 'valve2isDisabled') {
+            // Valve 2 reenabled
         }
         else {
             // Error type
