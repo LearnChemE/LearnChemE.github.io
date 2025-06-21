@@ -1,0 +1,32 @@
+Drew Smith
+
+CSS/HTML : SVG Clip Paths
+
+Defining a clip path:
+<clipPath id="my-clip">
+  <circle cx="150" cy="150" r="50" />
+  <rect x="150" y="150" width="100" height="100" />
+</clipPath>
+
+Next, for the svg element, define that it has a clip path:
+.my-elem {
+    -webkit-clip-path : url(#my-clip);
+    clip-path : url(#my-clip);
+}
+
+Ex: We want to clip this bent tube element:
+<g id="Tube Bend_7">
+    <path id="Tube Bend_8" fill-rule="evenodd" clip-rule="evenodd" d="M102 81C98.6863 81 96 83.6863 96 87H99C99 85.3431 100.343 84 102 84V81Z" fill="#5EB9F1">
+    </path>
+</g>
+
+For a triangle clipping a square from the lower-right pivot:
+<clipPath id="bend7-clip">
+    <triangle points="rgt,bot rgt,top lft,bot">
+</clipPath>
+
+And update the style of the original component:
+g.style = {
+    "-webkit-clip-path" : "url(#bend7-clip)",
+    "clip-path" : "url(#bend7-clip)"
+}
