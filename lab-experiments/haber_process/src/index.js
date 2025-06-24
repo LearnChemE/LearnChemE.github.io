@@ -26,6 +26,8 @@ window.state = {
   zoom: 1, // Current zoom level
   zoomMin: 1, // Minimum zoom level
   zoomMax: 4, // Maximum zoom level
+  zoomX: 300,
+  zoomY: 270,
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -52,9 +54,9 @@ window.draw = function() {
 
   // Apply zoom transformation
   push();
-  translate(mouseX, mouseY);
+  translate(state.zoomX, state.zoomY);
   scale(state.zoom);
-  translate(-mouseX, -mouseY);
+  translate(-state.zoomX, -state.zoomY);
 
   scale(relativeSize());
   background(255);
@@ -84,10 +86,29 @@ window.mouseWheel = function(event) {
   const zoomFactor = event.deltaY > 0 ? 0.95 : 1.05;
 
   // Calculate new zoom level
-  const newZoom = state.zoom * zoomFactor;
+  var newZoom = state.zoom * zoomFactor;
 
   // Clamp zoom level between min and max
-  state.zoom = constrain(newZoom, state.zoomMin, state.zoomMax);
+  newZoom = constrain(newZoom, state.zoomMin, state.zoomMax);
+
+  if (newZoom !== state.zoomMin) {
+    const dz = newZoom - state.zoom;
+    const zdif = newZoom - state.zoomMin;
+    const oldZoom = state.zoom - state.zoomMin;
+    const zoomX = (oldZoom * state.zoomX + mouseX * dz) / zdif;
+    const zoomY = (oldZoom * state.zoomY + mouseY * dz) / zdif;
+
+    state.zoomX = constrain(zoomX, 0, containerElement.offsetWidth);
+    state.zoomY = constrain(zoomY, 0, containerElement.offsetHeight);
+  }
+  else {
+    state.zoomX = 300;
+    state.zoomY = 270;
+  }
+
+  console.log(state.zoomX)
+
+  state.zoom = newZoom;
 
   return false;
 };
