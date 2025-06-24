@@ -1,22 +1,48 @@
 // reactor.js
 
 
+import { addParticleToCondenser } from './condenser.js';
+
+
+
+
 export let reactorX = 50;
 export let reactorY = 12;
 export let reactorHeight = 40;
 export let reactorWidth = 15;
 
 
-// let heaterOn = true;  // Start with ON to test coil glow
-// let currentTemp = 150;  // Simulate mid temperature for glow
+export let valveX = reactorX + reactorHeight + 14;
+export let valveY = reactorY + reactorWidth / 2;
+
 
 window.reactorHeaterOn = false;
 
 let coilGlowValue = 120;  // Starting steel grey
 
-let reactorVaporParticles = [];
+export let reactorVaporParticles = [];
 const maxReactorVapors = 25; // instead of 20
 
+let exhaustParticles = [];
+const maxExhaustParticles = 20;
+
+
+
+
+
+let condenserParticles = [];
+let condenserPathParticles = [];
+
+
+
+// ✅ NEW: Timing variables for exhaust particle control
+let heaterTurnOnTime = null;
+let firstExhaustBurstActive = false;
+let secondExhaustBurstActive = false;
+let secondExhaustStartTime = null;
+
+let tempAbove290Time = null;
+const CONDENSER_DELAY_MS = 1000;
 
 
 
@@ -24,9 +50,6 @@ export function updateCoilGlow() {
   let target = reactorHeaterOn ? 255 : 120;  // glow vs steel
   coilGlowValue = lerp(coilGlowValue, target, 0.05);  // smooth transition
 }
-
-
-
 
 export function drawReactorBody(temp) {
   push();
@@ -46,7 +69,6 @@ export function drawReactorBody(temp) {
 
   // ✅ Fix color logic - Orange at 300°C, Reddish Orange at 330°C+
   let coilColor;
-  // let pulse = sin(frameCount * 0.2) * 15;
   
   if (temp >= 329) {
     coilColor = color(255, 69 , 0); // Reddish Orange
@@ -68,35 +90,29 @@ export function drawReactorBody(temp) {
     arc(x, y, coilWidth, reactorWidth + 2, HALF_PI, -HALF_PI, OPEN);
   }
 
+  // === Entry wire from bottom of first coil
+  let entryX = startX - 4;
+  let entryY = reactorWidth / 2 - (reactorWidth + 2) / 2;
 
-// === Entry wire from bottom of first coil
-let entryX = startX - 4;
-let entryY = reactorWidth / 2 - (reactorWidth + 2) / 2;
+  let jointX = reactorHeight / 3 ; // Center-ish below reactor
+  let jointY = reactorWidth + 8;
 
-let jointX = reactorHeight / 3 ; // Center-ish below reactor
-let jointY = reactorWidth + 8;
+  bezier(entryX, entryY,
+         entryX - 2 , entryY + 4,
+         jointX - 8, jointY - 3,
+         jointX + 3, jointY  -2.5);
 
-bezier(entryX, entryY,
-       entryX - 2 , entryY + 4,
-       jointX - 8, jointY - 3,
-       jointX + 3, jointY  -2.5);
+  // === Exit wire from bottom of last coil
+  let exitX = startX + (turns - 1) * spacing + 3 ;
+  let exitY = reactorWidth / 2 + (reactorWidth + 2) / 2 ;
 
-// === Exit wire from bottom of last coil
-let exitX = startX + (turns - 1) * spacing + 3 ;
-let exitY = reactorWidth / 2 + (reactorWidth + 2) / 2 ;
-
-bezier(exitX, exitY,
-       exitX , exitY + 3,
-       jointX + 3, jointY - 5,
-       jointX, jointY  +1 );
-
+  bezier(exitX, exitY,
+         exitX , exitY + 3,
+         jointX + 3, jointY - 5,
+         jointX, jointY  +1 );
 
   pop();
-
 }
-
-
-
 
 // === Draw Heater Switch for Reactor ===
 export function drawReactorHeaterSwitch(x = 120, y = 60) {
@@ -130,12 +146,6 @@ export function drawReactorHeaterSwitch(x = 120, y = 60) {
   text("OFF", -w / 4, h / 2);
   text("ON", w / 4, h / 2);
 
-  // // --- Label below switch ---
-  // fill(0);
-  // textSize(4);
-  // textAlign(CENTER);
-  // text("Heater Switch", 0, h + 10);
-
   pop();
 }
 
@@ -154,6 +164,22 @@ export function toggleReactorHeater(mx, my, switchX = 63, switchY = 36.5) {
     
     console.log("Switch clicked! Heater state:", window.reactorHeaterOn); // ✅ Debug
     
+    // ✅ NEW: Record heater turn-on time and reset exhaust timing
+    if (window.reactorHeaterOn) {
+      heaterTurnOnTime = millis();
+      firstExhaustBurstActive = false;
+      secondExhaustBurstActive = false;
+      secondExhaustStartTime = null;
+      console.log("Heater turned ON - Starting exhaust timing sequence");
+    } else {
+      // Reset all timing when heater turns off
+      heaterTurnOnTime = null;
+      firstExhaustBurstActive = false;
+      secondExhaustBurstActive = false;
+      secondExhaustStartTime = null;
+      console.log("Heater turned OFF - Resetting exhaust timing");
+    }
+    
     // ✅ Reset slider when heater turns OFF
     if (!window.reactorHeaterOn && window.tempSlider && window.tempValueSpan) {
       window.tempSlider.value = 200;
@@ -167,8 +193,6 @@ export function toggleReactorHeater(mx, my, switchX = 63, switchY = 36.5) {
   return false;
 }
 
-
-
 export function updateReactorVaporParticles(temp) {
   const vaporDelayReached =
     window.liquidMovementStartTime &&
@@ -179,7 +203,25 @@ export function updateReactorVaporParticles(temp) {
   const top = reactorY + 2;
   const bottom = reactorY + reactorWidth - 2;
 
-  // Generate new particles
+  // //  Only spawn condenser particles if reactor hot, valve is open, and cooling is ON
+
+  if (
+    vaporDelayReached &&
+    window.reactorHeaterOn &&
+    temp >= 290 &&
+    tempAbove290Time !== null &&
+    millis() - tempAbove290Time >= CONDENSER_DELAY_MS &&
+    window.valveState === "tocondenser" &&
+    window.condenserCoolingOn && // ✅ extra condition
+    condenserPathParticles.length < 20 &&
+    frameCount % 10 === 0
+  ) {
+    spawnCondenserParticle();
+  }
+
+
+
+  // 🔵 SPAWN reactor vapor particles (bouncing inside reactor)
   if (
     vaporDelayReached &&
     window.reactorHeaterOn &&
@@ -193,63 +235,204 @@ export function updateReactorVaporParticles(temp) {
       vy: random(-0.5, 0.5),
       r: random(1.0, 1.6),
       alpha: 255,
-      wallTouchTime: null // Will be set when it hits a wall
+      wallTouchTime: null
     });
   }
 
-  // Update particles
+  // 🔵 UPDATE reactor vapor particles
   for (let i = reactorVaporParticles.length - 1; i >= 0; i--) {
     let p = reactorVaporParticles[i];
 
-    // Add temp-based motion randomness
+    // Movement and fading logic
     if (temp < 300) {
       p.vx += random(-0.005, 0.005);
       p.vy += random(-0.005, 0.005);
-      fill(100, 180, 255, p.alpha);
     } else if (temp < 330) {
       p.vx += random(-0.1, 0.1);
       p.vy += random(-0.1, 0.1);
-      fill(100, 180, 255, p.alpha);
     } else {
       p.vx += random(-0.25, 0.25);
       p.vy += random(-0.25, 0.25);
-      fill(100, 180, 255, p.alpha);
     }
 
     p.x += p.vx;
     p.y += p.vy;
 
-    // Bounce + track first wall touch
-    if (p.x <= left) {
-      p.x = left;
+    if (p.x <= left || p.x >= right) {
       p.vx *= -1;
+      p.x = constrain(p.x, left, right);
       if (!p.wallTouchTime) p.wallTouchTime = millis();
-    } else if (p.x >= right) {
-      p.x = right;
-      p.vx *= -1;
+    }
+    if (p.y <= top || p.y >= bottom) {
+      p.vy *= -1;
+      p.y = constrain(p.y, top, bottom);
       if (!p.wallTouchTime) p.wallTouchTime = millis();
     }
 
-    if (p.y <= top) {
-      p.y = top;
-      p.vy *= -1;
-      if (!p.wallTouchTime) p.wallTouchTime = millis();
-    } else if (p.y >= bottom) {
-      p.y = bottom;
-      p.vy *= -1;
-      if (!p.wallTouchTime) p.wallTouchTime = millis();
-    }
-
-    // Fading: only after 2s from wall touch
     if (p.wallTouchTime && millis() - p.wallTouchTime > 2000) {
       p.alpha -= 1.5;
     }
 
     noStroke();
+    fill(100, 180, 255, p.alpha);
     ellipse(p.x, p.y, p.r);
 
     if (p.alpha <= 0) {
       reactorVaporParticles.splice(i, 1);
     }
+
+    // Track when temp exceeds 290 for the first time
+    if (temp >= 290 && tempAbove290Time === null) {
+      tempAbove290Time = millis();
+    }
+
+    // Reset if temp drops
+    if (temp < 290) {
+      tempAbove290Time = null;
+    }
+
   }
+}
+
+
+export function updateCondenserParticlesBezier() {
+  const p0 = { x: 90, y: 20  };   // reactor outlet (right side)
+  const p1 = { x: 108, y: 17  };  // valve center (horizontal elbow)
+  const p2 = { x: 104, y: 30 -5};    // drop to condenser inlet
+  const p3 = { x: 104, y: 28 + 20 };    // same as p2 for sharp corner
+
+  for (let i = condenserPathParticles.length - 1; i >= 0; i--) {
+    const p = condenserPathParticles[i];
+    p.t += 0.015; // speed of particle
+
+    if (p.t > 1) {
+      // ✅ FIXED: When particle reaches end of path, add it to condenser
+      condenserPathParticles.splice(i, 1);
+      addParticleToCondenser(); // This will add particle to condenser's internal system
+      continue;
+    }
+
+    const x = bezierPoint(p0.x, p1.x, p2.x, p3.x, p.t);
+    const y = bezierPoint(p0.y, p1.y, p2.y, p3.y, p.t);
+
+    fill(100, 180, 255, p.alpha);
+    noStroke();
+    ellipse(x, y, p.r);
+    
+    // ✅ Optional: Fade particles as they travel (makes transition smoother)
+    // if (p.t > 0.8) { // Start fading when 80% of the way there
+    //   p.alpha -= 3;
+    // }
+  }
+}
+
+
+
+export function updateExhaustParticles() {
+  if (!window.reactorHeaterOn || !heaterTurnOnTime) {
+    return; // No exhaust if heater is off
+  }
+
+  const currentTime = millis();
+  const timeSinceHeaterOn = currentTime - heaterTurnOnTime;
+  
+  // ✅ Check if liquid movement has started (this syncs with your existing system)
+  const liquidMovementStarted = window.liquidMovementStartTime !== null;
+  const timeSinceLiquidMovement = liquidMovementStarted ? 
+    currentTime - window.liquidMovementStartTime : 0;
+
+  // ✅ FIRST BURST: 1 second right when liquid movement starts
+  if (liquidMovementStarted && timeSinceLiquidMovement <= 1000) {
+    if (!firstExhaustBurstActive) {
+      firstExhaustBurstActive = true;
+      console.log("Starting FIRST exhaust burst (1 second)");
+    }
+  } else if (firstExhaustBurstActive && timeSinceLiquidMovement > 1000) {
+    firstExhaustBurstActive = false;
+    console.log("Ending FIRST exhaust burst");
+  }
+
+  // ✅ SECOND BURST: 3 seconds starting after vapor particles appear and settle
+  // This starts after vapor delay (1s) + some settle time (2s) = 3s total
+  const secondBurstStartDelay = 3000; // 3 seconds after liquid movement
+  const secondBurstDuration = 3000;   // 3 seconds duration
+  
+  if (liquidMovementStarted && 
+      timeSinceLiquidMovement >= secondBurstStartDelay && 
+      timeSinceLiquidMovement <= secondBurstStartDelay + secondBurstDuration) {
+    
+    if (!secondExhaustBurstActive) {
+      secondExhaustBurstActive = true;
+      secondExhaustStartTime = currentTime;
+      console.log("Starting SECOND exhaust burst (3 seconds)");
+    }
+  } else if (secondExhaustBurstActive && 
+             timeSinceLiquidMovement > secondBurstStartDelay + secondBurstDuration) {
+    secondExhaustBurstActive = false;
+    console.log("Ending SECOND exhaust burst");
+  }
+
+  // ✅ Generate particles only during active burst periods and when valve is "to exhaust"
+  const shouldGenerateParticles = window.valveState === "toexhaust" && 
+                                  (firstExhaustBurstActive || secondExhaustBurstActive);
+
+  if (shouldGenerateParticles) {
+    if (exhaustParticles.length < maxExhaustParticles && frameCount % 4 === 0) {
+      exhaustParticles.push({
+        x: 90,
+        y: 19.5,
+        r: random(2, 3),
+        dx: random(0.5, 0.9),
+        alpha: 220
+      });
+    }
+  }
+
+  // ✅ Update existing particles (they continue to move regardless of burst state)
+  for (let i = exhaustParticles.length - 1; i >= 0; i--) {
+    const p = exhaustParticles[i];
+    p.x += p.dx;
+    p.alpha -= 2;
+    if (p.alpha <= 0 || p.x > 200) {
+      exhaustParticles.splice(i, 1);
+    }
+  }
+}
+
+export function drawExhaustParticles() {
+  noStroke();
+  for (const p of exhaustParticles) {
+    fill(255, 255, 0, p.alpha);
+    ellipse(p.x, p.y, p.r);
+  }
+}
+
+
+export function updateCondenserParticles() {
+  for (let i = condenserParticles.length - 1; i >= 0; i--) {
+    let p = condenserParticles[i];
+
+    // Move toward condenser (mostly right, slight down)
+    p.x += p.vx;
+    p.y += p.vy;
+
+    fill(100, 180, 255, p.alpha);
+    noStroke();
+    ellipse(p.x, p.y, p.r);
+
+    // Remove when particle reaches condenser
+    if (p.x > 185 && p.y > 45) {
+      condenserParticles.splice(i, 1);
+      // Optionally: increase condenser fluid or add to condenser internal array
+    }
+  }
+}
+
+
+function spawnCondenserParticle() {
+  condenserPathParticles.push({
+    t: 0,       // travel progress from 0 → 1
+    r: random(1.5, 2.2),
+    alpha: 255
+  });
 }

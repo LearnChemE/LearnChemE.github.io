@@ -4,7 +4,10 @@ import "./style/style.scss";
 import { drawAll } from "./js/draw";
 import { handleInputs } from "./js/inputs";
 import { calcAll, setDefaults } from "./js/calcs";
-import { toggleReactorHeater } from "./js/reactor"; // ✅ Add this import
+import { toggleReactorHeater, drawReactorBody  } from "./js/reactor"; // ✅ Add this import
+import { drawCondenserBody } from './js/condenser';
+import { updateExhaustParticles, drawExhaustParticles } from './js/reactor';
+
 
 // ✅ Declare global variables properly
 window.tempSlider = null;
@@ -61,12 +64,19 @@ window.draw = function () {
 
   // ✅ FIXED: Update the actual temperature and store it back
   window.reactorTemp = lerp(window.reactorTemp, window.targetTemp, 0.05);
-  
-  
- 
 
+  updateExhaustParticles();   // <- from reactor.js
+  drawExhaustParticles();     // <- from reactor.js
   drawAll(window.reactorTemp);
 };
+
+window.keyPressed = function () {
+  if (key === 'V') {
+    valveToCondenserOpen = !valveToCondenserOpen;
+    console.log("Valve to condenser is now", valveToCondenserOpen ? "OPEN" : "CLOSED");
+  }
+};
+
 
 // ✅ Add mouse click handler
 window.mousePressed = function() {
