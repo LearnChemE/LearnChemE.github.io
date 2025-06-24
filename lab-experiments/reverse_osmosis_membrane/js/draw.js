@@ -51,7 +51,7 @@ window.draw = function () {
   drawPump(figureX, figureY);
 
   //draw text last so it appears over the water
-  drawTextOnTopOfDiagram(175, 400);
+  drawTextOnTopOfDiagram(figureX, figureY);
 };
 
 function drawTextOnTopOfDiagram(x, y) {
@@ -163,9 +163,8 @@ function drawPump(x, y) {
   push();
   fill("gray");
   push(); //important
-  //translate(40, 0);
-  rect(335, 400, 15, 50);
-  rect(307, 450, 70, 13, 10, 10, 0, 0);
+  rect(x + 160, y, 15, 50);
+  rect(x + 132, y + 50, 70, 13, 10, 10, 0, 0);
   pop();
 
   pop();
