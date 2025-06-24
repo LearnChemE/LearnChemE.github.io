@@ -311,7 +311,7 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
   push();
   translate(x, y);
 
-  const bodyHeight = 35;
+  const bodyHeight = 30;
   const bodyWidth = 20;
   const borderRadius = 10;
   const wallThickness = 1.5;
@@ -338,8 +338,8 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
   fill(200, 200, 200, 200); // light gray, with alpha (100/255 ~ 40% opacity)
   noStroke();
 
-  rect(outletCenterX -1, outletTopY - 7.5, 2.5, 8.8);  // vertical segment
-  rect(outletCenterX -1, outletTopY - 10, elbowLength, 2.5);
+  rect(outletCenterX -1, outletTopY - 11.5, 2.5, 12.8);  // vertical segment
+  rect(outletCenterX -1, outletTopY - 14, elbowLength, 2.5);
 
 
   // // Optional label
@@ -427,7 +427,7 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
       if (bubbles.length < maxBubbles && frameCount % 6 === 0) { // Slower bubble generation
         bubbles.push({
           x: random(8,12),
-          y: -5 + 35 - Math.pow(Math.random(), 2) * (35 * evaporatorFluidLevel),
+          y: -8 + 35 - Math.pow(Math.random(), 2) * (35 * evaporatorFluidLevel),
           r: random(1, 2.5),
           speed: random(0.15, 0.15),
           floating: false,
@@ -518,13 +518,13 @@ for (let i = vaporParticles.length - 1; i >= 0; i--) {
   if (p.stage === 'vertical') {
     p.y -= p.speed;
     p.x = outletCenterX;  // Keep centered in pipe
-    if (p.y <= outletTopY - 9) {
-      p.y = outletTopY - 9;
+    if (p.y <= outletTopY - 12.2) {
+      p.y = outletTopY - 12.2;
       p.stage = 'horizontal';
     }
   } else if (p.stage === 'horizontal') {
     p.x += p.speed;
-    p.y = outletTopY - 9.2;  // Lock into horizontal pipe band
+    p.y = outletTopY - 12.5;  // Lock into horizontal pipe band
   }
 
   // Remove after exiting pipe
@@ -563,7 +563,7 @@ for (let i = vaporParticles.length - 1; i >= 0; i--) {
 
   // === FULL HEATER COIL AROUND EVAPORATOR WITH ENDS ===
   push();
-  translate(0, 20); // Center the coil around evaporator
+  translate(0, 15); // Center the coil around evaporator
 
   stroke(heaterColor);
   strokeWeight(0.8);
