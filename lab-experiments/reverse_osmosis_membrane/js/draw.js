@@ -4,6 +4,9 @@
   Expand or replace these with actual RO logic.
 */
 
+let figureX = 175;
+let figureY = 380;
+
 let g = {
   feedPressure: 10,
   saltConc: 0.5,
@@ -40,12 +43,12 @@ window.draw = function () {
   //drawPipeAndPump(150, 250);
 
   // Draw pipes first, then water, then pipe connectors and equiptment meant to cover the water
-  drawSaltTank(175, 400);
-  drawPressureGauge(175, 400);
-  drawWater(175, 400);
-  drawPump(175, 400);
-  drawBeakers(175, 400);
-  drawFilter(175, 400);
+  drawSaltTank(figureX, figureY);
+  drawPressureGauge(figureX, figureY);
+  drawBeakers(figureX, figureY);
+  drawFilter(figureX, figureY);
+  drawWater(figureX, figureY);
+  drawPump(figureX, figureY);
 
   //draw text last so it appears over the water
   drawTextOnTopOfDiagram(175, 400);
@@ -514,8 +517,49 @@ function drawWater(x, y) {
 
   rectMode(CORNERS);
   noStroke();
+  fill("white");
+  rect(x + 178, y + 21, x + 190, y + 119);
+  rect(x + 220, y - 21, x + 253, y - 21 + 12);
   fill("PaleTurquoise");
   rect(x + 178, y + 21, x + 190, y + 119);
+  rect(x + 220, y - 21, x + 253, y - 21 + 12);
+
+  pop();
+
+  //---------------------Water between pressure gauge and filter---------------------
+
+  push();
+
+  rectMode(CORNERS);
+  noStroke();
+  fill("white");
+  rect(x + 335, y - 21, x + 383, y - 21 + 12);
+  fill("PaleTurquoise");
+  rect(x + 335, y - 21, x + 383, y - 21 + 12);
+
+  pop();
+
+  //---------------------Water filter and beaker---------------------
+
+  push();
+
+  //retentate
+  rectMode(CORNERS);
+  noStroke();
+  fill("white");
+  rect(x + 752, y - 18, x + 825, y - 18 + 6);
+  rect(x + 902, y - 18, x + 932, y - 18 + 6);
+  rect(x + 957, y + 14, x + 957 + 6, y + 230);
+  fill(170, 255, 230); //retentate green
+  rect(x + 752, y - 18, x + 825, y - 18 + 6);
+  rect(x + 902, y - 18, x + 932, y - 18 + 6);
+  rect(x + 957, y + 14, x + 957 + 6, y + 230);
+
+  //permeate
+  fill("white");
+  rect(x + 731, y + 38, x + 731 + 6, y + 230);
+  fill("LightCyan");
+  rect(x + 731, y + 38, x + 731 + 6, y + 230);
 
   pop();
 }
