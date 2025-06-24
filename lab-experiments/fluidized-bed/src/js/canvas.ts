@@ -290,8 +290,6 @@ function updateState() {
 
   // Smooth lerp towards target bed height
   uniformData.bedHeight = (uniformData.bedHeight - targetHeight) * r ** uniformData.deltaTime + targetHeight;
-  // if (uniformData.bedHeight < -.999) uniformData.bedHeight = -1;
-  // if (uniformData.bedHeight > 0.999) uniformData.bedHeight =  1;
 }
 
 /**
@@ -309,3 +307,26 @@ export async function fillCanvas() {
 export function setTargetBedHeight(val: number) {
   targetHeight = val;
 }
+
+/**
+ * Update the canvas size and position to match with the SVG
+ */
+export function updateCanvasPosition() {
+  const tube = document.getElementById("Rectangle 5") as unknown as SVGAElement;
+  const wrapper = document.getElementById("graphics-wrapper").getClientRects()[0];
+  const bbox = tube.getBoundingClientRect();
+  
+  // Set new coordinates of webgl canvas
+  cnv.setAttribute("style", `
+position: absolute;
+z-index : 1;
+left    : ${bbox.left - wrapper.left}px;
+top     : ${bbox.top - wrapper.top}px;
+width   : ${bbox.width}px;
+height  : ${bbox.height}px;
+  `);
+}
+
+window.addEventListener('resize', () => {
+  updateCanvasPosition();
+})
