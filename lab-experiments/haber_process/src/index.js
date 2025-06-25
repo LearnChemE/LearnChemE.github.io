@@ -49,18 +49,25 @@ window.setup = function() {
 window.draw = function() {
   window.width = state.canvasSize[0];
   window.height = state.canvasSize[1];
-  window.mX = mouseX / relativeSize();
-  window.mY = mouseY / relativeSize();
+  [window.mX, window.mY] = mouseCoordinate();
 
-  // Apply zoom transformation
   push();
-  translate(state.zoomX, state.zoomY);
-  scale(state.zoom);
-  translate(-state.zoomX, -state.zoomY);
+  // Apply matrix
+  const s  = state.zoom;
+  const zx = -state.zoomX * (s - 1);
+  const zy = -state.zoomY * (s - 1);
+  applyMatrix(s,0 , 0,s , zx,zy);
 
   scale(relativeSize());
   background(255);
   drawAll();
+  pop();
+
+  push();
+  fill('black');
+  noStroke();
+  textSize(10);
+  text(`x: ${window.mX.toFixed(1)}\ny: ${window.mY.toFixed(1)}`, 50, 20);
   pop();
 };
 
@@ -69,6 +76,19 @@ window.windowResized = () => {
 }
 
 window.relativeSize = () => containerElement.offsetWidth / 150;
+
+function mouseCoordinate() {
+  // Declare variables
+  var x = mouseX;
+  var y = mouseY;
+  const s  = state.zoom; // Will never be 0
+  const tx = state.zoomX;
+  const ty = state.zoomY;
+  // Calculate inverse transform of zoom matrix
+  x = x/s + tx/s * (s - 1);
+  y = y/s + ty/s * (s - 1);
+  return [x / relativeSize(), y / relativeSize()]
+}
 
 function sizeContainer() {
   containerElement.style.width = `calc(100vw - 10px)`;
@@ -105,8 +125,6 @@ window.mouseWheel = function(event) {
     state.zoomX = 300;
     state.zoomY = 270;
   }
-
-  console.log(state.zoomX)
 
   state.zoom = newZoom;
 
