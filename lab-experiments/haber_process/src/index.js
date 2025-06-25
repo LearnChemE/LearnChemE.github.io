@@ -3,7 +3,7 @@ import "p5";
 import "./style/style.scss";
 import "./assets/digital-7.ttf";
 import "./assets/chemical_equilibrium_in_the_haber_process.pdf";
-import { drawAll } from "./js/draw";
+import { drawAll, Zoom } from "./js/draw";
 import { handleInputs } from "./js/inputs";
 import { calcAll, setDefaults } from "./js/calcs";
 
@@ -28,6 +28,7 @@ window.state = {
   zoomMax: 4, // Maximum zoom level
   zoomX: 300,
   zoomY: 270,
+  dragging: false,
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -50,13 +51,10 @@ window.draw = function() {
   window.width = state.canvasSize[0];
   window.height = state.canvasSize[1];
   [window.mX, window.mY] = mouseCoordinate();
+  // drag();
 
   push();
-  // Apply matrix
-  const s  = state.zoom;
-  const zx = -state.zoomX * (s - 1);
-  const zy = -state.zoomY * (s - 1);
-  applyMatrix(s,0 , 0,s , zx,zy);
+  Zoom();
 
   scale(relativeSize());
   background(255);
@@ -77,7 +75,7 @@ window.windowResized = () => {
 
 window.relativeSize = () => containerElement.offsetWidth / 150;
 
-function mouseCoordinate() {
+export function mouseCoordinate() {
   // Declare variables
   var x = mouseX;
   var y = mouseY;

@@ -1263,3 +1263,11 @@ export function drawAll() {
   drawTable();
   drawInstructionText();
 }
+
+export function Zoom() {
+  // Calculate and apply matrix
+  const s  = state.zoom;
+  const zx = -state.zoomX * (s - 1);
+  const zy = -state.zoomY * (s - 1);
+  applyMatrix(s,0 , 0,s , zx,zy);
+}
