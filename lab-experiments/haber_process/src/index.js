@@ -25,7 +25,7 @@ window.state = {
   hasAdjustedTemperature: window.localStorage.getItem("hasAdjustedTemperature") === "true",
   zoom: 1, // Current zoom level
   zoomMin: 1, // Minimum zoom level
-  zoomMax: 4, // Maximum zoom level
+  zoomMax: 6, // Maximum zoom level
   zoomX: 300,
   zoomY: 270,
   dragging: false,

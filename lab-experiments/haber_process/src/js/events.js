@@ -102,6 +102,10 @@ window.mousePressed = function() {
     }
   }
 
+  state.dragging = true;
+  offsetX = mX;
+  offsetY = mY;
+
   // handlePressures();
   handlePurge();
   handlePressureController();
@@ -194,11 +198,6 @@ function handlePressureController() {
 // Add drag event
 var offsetX = 0;
 var offsetY = 0;
-window.mousePressed = () => {
-  state.dragging = true;
-  offsetX = mX;
-  offsetY = mY;
-}
 window.mouseReleased = () => {
   state.dragging = false;
 }
