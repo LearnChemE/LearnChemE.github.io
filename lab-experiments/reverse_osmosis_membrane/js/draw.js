@@ -520,23 +520,23 @@ function drawWater(x, y) {
   //---------------------bottom of the tank pipe turn right---------------------
   push();
 
-  rectMode(CENTER);
+  rectMode(CORNERS);
   noStroke();
 
   fill("white");
-  rect(x, y + saltTankHeight / 2 + 38, 20, 36);
-  rectMode(CORNER);
+  rect(x - 10, y + saltTankHeight / 2 + 38 - 18, x - 10 + 20, y + saltTankHeight / 2 + 38 - 18 + 36);
+  rectMode(CORNERS);
   fill("white");
-  rect(x - 10, y + saltTankHeight / 2 + 53, 20, 26, 0, 0, 0, 10);
-  rect(x - 10, y + saltTankHeight / 2 + 59, 156, 20, 0, 0, 0, 10);
+  rect(x - 10, y + saltTankHeight / 2 + 53, x - 10 + 20, y + saltTankHeight / 2 + 53 + 26, 0, 0, 0, 10);
+  rect(x - 10, y + saltTankHeight / 2 + 59, x - 10 + 156, y + saltTankHeight / 2 + 59 + 20, 0, 0, 0, 10);
 
-  rectMode(CENTER);
+  rectMode(CORNERS);
   fill("PaleTurquoise");
-  rect(x, y + saltTankHeight / 2 + 38, 20, 36);
-  rectMode(CORNER);
+  rect(x - 10, y + saltTankHeight / 2 + 38 - 18, x - 10 + 20, y + saltTankHeight / 2 + 38 - 18 + 36);
+  rectMode(CORNERS);
   fill("PaleTurquoise");
-  rect(x - 10, y + saltTankHeight / 2 + 53, 20, 26, 0, 0, 0, 10);
-  rect(x - 10, y + saltTankHeight / 2 + 59, 156, 20, 0, 0, 0, 10);
+  rect(x - 10, y + saltTankHeight / 2 + 53, x - 10 + 20, y + saltTankHeight / 2 + 53 + 26, 0, 0, 0, 10);
+  rect(x - 10, y + saltTankHeight / 2 + 59, x - 10 + 156, y + saltTankHeight / 2 + 59 + 20, 0, 0, 0, 10);
 
   pop();
 
