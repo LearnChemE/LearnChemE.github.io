@@ -4,9 +4,6 @@
   Expand or replace these with actual RO logic.
 */
 
-let figureX = 175;
-let figureY = 380;
-
 let g = {
   feedPressure: 10,
   saltConc: 0.5,
@@ -26,6 +23,20 @@ window.setup = function () {
   handleMouseScaling();
 };
 
+window.mouseClicked = function () {
+  //pressure switch interaction
+  if (502 < window.mX && window.mX < 540 && 580 < window.mY && window.mY < 620) {
+    state.pumpOn = !state.pumpOn;
+  }
+  //mouse click rectangle for switch
+  /* push();
+  stroke("red");
+  noFill();
+  rectMode(CORNERS);
+  rect(503, 620, 540, 580);
+  pop(); */
+};
+
 window.draw = function () {
   handleScaling();
   background(255);
@@ -42,16 +53,45 @@ window.draw = function () {
   // Draw pipe first so it appears behind everything
   //drawPipeAndPump(150, 250);
 
-  // Draw pipes first, then water, then pipe connectors and equiptment meant to cover the water
-  drawSaltTank(figureX, figureY);
-  drawPressureGauge(figureX, figureY);
-  drawBeakers(figureX, figureY);
-  drawFilter(figureX, figureY);
-  drawWater(figureX, figureY);
-  drawPump(figureX, figureY);
+  //drain settings
+
+  if (state.pumpOn === true && -saltTankHeight - 1 + state.waterDrainTimer + 5 < 0) {
+    state.waterDrainTimer = state.waterDrainTimer + 1;
+  }
+
+  /*  if (
+    502 < window.mX &&
+    window.mX < 540 &&
+    580 < window.mY &&
+    window.mY < 620 &&
+    tank &&
+    state.hasTankDrainedYet === false &&
+    state.tankIsDraining === false
+  ) {
+    state.tankDrainTimer = 0;
+    state.hasTankDrainedYet = true;
+    state.tankIsDraining = true;
+  }
+  if (502 < window.mX && window.mX < 540 && 580 < window.mY && window.mY < 620 && tank && state.hasTankDrainedYet === true) {
+    state.tankDrainTimer = 0;
+    state.hasTankDrainedYet = true;
+  } */
+
+  // Draw pipes first, then water, then pipe connectors and equipment meant to cover the water
+  drawSaltTank(state.figureX, state.figureY);
+  drawPressureGauge(state.figureX, state.figureY);
+
+  drawBeaker(830, 500, 160, 180); //drawBeaker(x, y, beakerThickness, beakerWidth, beakerHeight)
+  drawBeaker(1095, 580, 80, 90);
+  drawFilter(state.figureX, state.figureY);
+  drawWater(state.figureX, state.figureY);
+  drawPumpSwitch(state.figureX, state.figureY, state.pumpOn);
+  drawPump(state.figureX, state.figureY);
 
   //draw text last so it appears over the water
-  drawTextOnTopOfDiagram(figureX, figureY);
+  drawTextOnTopOfDiagram(state.figureX, state.figureY);
+
+  state.frameCount = state.frameCount + 1;
 };
 
 function drawTextOnTopOfDiagram(x, y) {
@@ -466,8 +506,9 @@ function drawWater(x, y) {
 
   fill("PaleTurquoise");
   beginShape();
-  vertex(x - saltTankWidth / 2, y - saltTankHeight / 2 - 1);
-  vertex(x + saltTankWidth / 2, y - saltTankHeight / 2 - 1);
+
+  vertex(x - saltTankWidth / 2, y - saltTankHeight / 2 - 1 + state.waterDrainTimer);
+  vertex(x + saltTankWidth / 2, y - saltTankHeight / 2 - 1 + state.waterDrainTimer);
   vertex(x + saltTankWidth / 2, y + saltTankHeight / 2 - 5);
   vertex(x, y + saltTankHeight / 2 + 24);
   vertex(x - saltTankWidth / 2, y + saltTankHeight / 2 - 5);
@@ -563,142 +604,50 @@ function drawWater(x, y) {
   pop();
 }
 
-function drawBeakers(x, y) {}
+let beakerFlairX = 7;
+let beakerThickness = 8;
 
-function drawPipeAndPump(tankX, tankY) {
-  // Calculate pipe start position
-  let pipeStartX = tankX + 100;
-  let pipeY = tankY + 75;
+function drawBeaker(x, y, beakerWidth, beakerHeight) {
+  push();
 
-  // Draw pressure gauge base (behind pipe)
-  let gaugeX = tankX + 260; // Positioned right after pump
-  fill(150); // Same gray as pump
-  noStroke();
-  rect(gaugeX + 7, pipeY - 25, 10, 20); // Small rectangle poking up behind pipe
-
-  // Add thin centered rectangle behind gauge
-  rect(gaugeX - 2, pipeY - 10, 29, 10); // Slightly wider and thinner rectangle
-
-  // Draw circle above the T structure
-  circle(gaugeX + 12, pipeY - 28, 30); // Centered above the T structure
-
-  fill(255); // White color
-  circle(gaugeX + 12, pipeY - 28, 22); // Same center, slightly smaller diameter
-
-  // Add red dot at bottom of gauge and needle
-  fill(255, 0, 0); // Red color
-  circle(gaugeX + 12, pipeY - 22, 4); // Small red circle near bottom
-
-  // Add gauge needle from red dot at 45 degrees left
-  stroke(255, 0, 0); // Red color
-  strokeWeight(1); // Thin line
-  let needleLength = 9; // Shorter needle
-  let endX = gaugeX + 12 - needleLength * Math.cos(Math.PI / 4); // 45 degrees left
-  let endY = pipeY - 22 - needleLength * Math.sin(Math.PI / 4);
-  line(gaugeX + 12, pipeY - 22, endX, endY); // Line at 45 degrees
-
-  // Reset stroke for pipe
-  noStroke();
-
-  // Draw horizontal pipe
-  stroke(100);
-  strokeWeight(8);
-  line(pipeStartX, pipeY, pipeStartX + 520, pipeY);
-
-  // Add 90-degree elbow bend at the end
-  line(pipeStartX + 520, pipeY, pipeStartX + 520, pipeY + 30); // Vertical part of the elbow
-
-  // Add faucet end (wider rectangle)
-  noStroke();
-  fill(100); // Same gray as pipe
-  rect(pipeStartX + 515, pipeY + 28, 11, 7, 2); // Slightly wider than pipe, rounded corners
-
-  // Add beaker under first faucet
-  stroke(0);
-  strokeWeight(2);
-  fill(0);
-  let beakerX1 = pipeStartX + 509; // Align with first faucet
-  let beakerY1 = pipeY + 40; // Position below first faucet
-  rect(beakerX1, beakerY1, 4, 70, 4); // Left vertical rectangle
-  rect(beakerX1 - 7, beakerY1, 10, 4, 4); // Top horizontal rectangle protruding left
-  rect(beakerX1, beakerY1 + 66, 56, 4, 4); // Bottom horizontal rectangle
-  rect(beakerX1 + 52, beakerY1, 4, 70, 4); // Right vertical rectangle
-  rect(beakerX1 + 52, beakerY1, 8, 4, 4); // Top horizontal rectangle protruding right
-
-  // Draw pump
-  let pumpX = tankX + 150;
-
-  // T-valve (drawn first so it appears behind)
-  stroke(0);
-  strokeWeight(2);
-  fill(0);
-  rect(pumpX + 25, pipeY - 35, 10, 25);
-  rect(pumpX + 15, pipeY - 35, 30, 8);
-
-  // Pump body as wider rounded rectangle
-  fill(150);
-  stroke(0);
-  strokeWeight(2);
-  rect(pumpX - 5, pipeY - 20, 70, 40, 5);
-
-  // Add "Pump" label
-  noStroke();
-  fill(0);
-  textSize(16);
-  textAlign(CENTER);
-  text("Pump", pumpX + 30, pipeY - 45);
-
-  textAlign(LEFT);
-
-  // Add white rounded rectangle to right of gauge
-  stroke(0); // Black outline
-  strokeWeight(1);
-  fill(255); // White fill
-  rect(gaugeX + 75, pipeY - 35, 200, 70, 8); // Centered vertically on pipe
-
-  // Add back pressure regulator
-  noStroke();
-  fill(0); // Black fill
-  rect(gaugeX + 300, pipeY - 12.5, 40, 25, 5); // Centered on pipe (-12.5 to center 25px height on pipe)
-
-  // Add vertical part centered on horizontal part
-  rect(gaugeX + 310, pipeY - 29, 20, 46, 5); // Made wider (20px instead of 10px)
-
-  // Add pentagon on top
+  stroke("blue");
+  fill("lightblue");
   beginShape();
-  let pentX = gaugeX + 320; // Center of pentagon
-  let pentY = pipeY - 33; // Top position
-  let pentSize = 14; // Size of pentagon
+  vertex(x, y);
+  vertex(x, y + beakerHeight);
+  vertex(x + beakerWidth, y + beakerHeight);
+  vertex(x + beakerWidth, y);
+  vertex(x + beakerWidth + beakerFlairX, y - 10);
+  vertex(x + beakerWidth, y - 16);
+  vertex(x + beakerWidth - beakerThickness, y - 0.75 * beakerThickness);
+  vertex(x + beakerWidth - beakerThickness, y + beakerHeight - beakerThickness);
+  vertex(x + beakerThickness, y + beakerHeight - beakerThickness);
+  vertex(x + beakerThickness, y - 0.75 * beakerThickness);
+  vertex(x, y - 16);
+  vertex(x - beakerFlairX, y - 10);
+  vertex(x, y);
+  endShape();
 
-  // Calculate pentagon points
-  vertex(pentX, pentY - pentSize); // Top point
-  vertex(pentX + pentSize, pentY - pentSize / 3); // Upper right
-  vertex(pentX + pentSize / 1.5, pentY + pentSize); // Lower right
-  vertex(pentX - pentSize / 1.5, pentY + pentSize); // Lower left
-  vertex(pentX - pentSize, pentY - pentSize / 3); // Upper left
-  endShape(CLOSE);
+  pop();
+}
 
-  // Add gray rounded rectangle at bottom of membrane
-  noStroke();
-  fill(100); // Same gray as pipes
-  rect(gaugeX + 246, pipeY + 35, 10, 25); // Vertical pipe section
+function drawTable() {}
 
-  // Add faucet end at bottom (reusing existing faucet design)
-  noStroke();
-  fill(100); // Same gray as pipe
-  rect(gaugeX + 244, pipeY + 58, 14, 8, 2); // Slightly wider than pipe, rounded corners
+function drawPumpSwitch(x, y, switchValue) {
+  push();
+  translate(333, 220);
+  fill("lightgray");
+  if (switchValue == true) {
+    quad(x + 5, y, x + 20, y - 15, x + 15, y - 20, x, y - 5);
+  } else {
+    quad(x, y + 5, x + 15, y + 20, x + 20, y + 15, x + 5, y);
+  }
 
-  // Add beaker prototype
-  stroke(0);
-  strokeWeight(2);
-  fill(0);
-  let beakerX = gaugeX + 238; // Align with faucet (moved 6px left from 244)
-  let beakerY = pipeY + 70; // Position below faucet
-  rect(beakerX, beakerY, 4, 70, 4); // Left vertical rectangle
-  rect(beakerX - 7, beakerY, 10, 4, 4); // Top horizontal rectangle protruding left
-  rect(beakerX, beakerY + 66, 56, 4, 4); // Bottom horizontal rectangle
-  rect(beakerX + 52, beakerY, 4, 70, 4); // Right vertical rectangle
-  rect(beakerX + 52, beakerY, 8, 4, 4); // Top horizontal rectangle protruding right
+  fill("gray");
+  rectMode(CENTER);
+  rect(x, y, 10, 40);
+
+  pop();
 }
 
 /* Optionally add more complex math or animations here */

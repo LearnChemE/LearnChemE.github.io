@@ -8,8 +8,13 @@ window.state = {
   //graph and window variables
   width: mainWidth,
   height: mainHeight,
+  figureX: 175,
+  figureY: 380,
+  pumpOn: false,
 
   feedPressure: 10,
+  frameCount: 0,
+  waterDrainTimer: 0,
 };
 
 // Load the other scripts (except calcs.js, which is imported in draw.js).
