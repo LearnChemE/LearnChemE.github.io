@@ -583,10 +583,12 @@ function drawOutletTubes() {
   // First vertical reactor outlet tube
   rect(-0.375, 0, 0.75, -10);
   // First horizontal reactor outlet tube
-  rect(0.375, -10.75, 35.375, 0.75);
+  rect(0.375, -10.75, 11, 0.75);
+  // Second horizontal reactor outlet tube
+  rect(29, -10.75, 6, 0.75);
   // Second vertical reactor outlet tube
   rect(35.375, -10, 0.75, 20);
-  // Second horizontal reactor outlet tube
+  // Third horizontal reactor outlet tube
   rect(36.125, 10, 14.5, 0.75);
   // Outlet tube to vent
   rect(19.675, -7.5, 0.75, 30);
@@ -685,17 +687,17 @@ function drawPurgeValve() {
   push();
   rotate( PI / 6 );
   rect(-3, -.375, 6, .75);
+  rect( 3.2, -4.17, 2, .75);
+  rect(-5.4,  3.45, 2, .75);
   rotate(-PI / 3 );
   rect(-3, -.375, 6, .75);
-  rect(-5.2, -4.17, 2, .75);
-  rect( 3.4,  3.45, 2, .75);
   pop();
 
   // Draw elbows
-  draw120degElbow(-3.8, -2.2, PI/6);
-  draw120degElbow( 3.8,  2.2, 7*PI/6)
-  draw150degElbow(-7.6, 0, PI);
-  draw150degElbow( 7.6, 0, 0);
+  draw120degElbow(-3.8,  2.2, 7*PI/6);
+  draw120degElbow( 3.8, -2.2, PI/6)
+  draw150degElbow(-7.6, 0, PI/6);
+  draw150degElbow( 7.6, 0, 7*PI/6);
 
   // "*" part
   fill(ironColor);
