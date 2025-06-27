@@ -5,6 +5,13 @@ const tankWidth = 13;
 const steelColor = "rgb(220, 220, 220)";
 const ironColor = "rgb(180, 180, 180)";
 
+function Sin(x) {
+  return sin(x * Math.PI / 180);
+}
+function Cos(x) {
+  return cos(x * Math.PI / 180);
+}
+
 function drawTanks() {
   push();
   drawTankTubes();
@@ -576,13 +583,15 @@ function drawOutletTubes() {
   // First vertical reactor outlet tube
   rect(-0.375, 0, 0.75, -10);
   // First horizontal reactor outlet tube
-  rect(0.375, -10.75, 35.375, 0.75);
+  rect(0.375, -10.75, 11, 0.75);
+  // Second horizontal reactor outlet tube
+  rect(29, -10.75, 6, 0.75);
   // Second vertical reactor outlet tube
   rect(35.375, -10, 0.75, 20);
-  // Second horizontal reactor outlet tube
+  // Third horizontal reactor outlet tube
   rect(36.125, 10, 14.5, 0.75);
   // Outlet tube to vent
-  rect(19.675, -7.5, 0.75, 30);
+  rect(19.675, -8.5, 0.75, 31);
   // First elbow
   drawTubeElbow(0, -10, 0);
   // Second elbow
@@ -608,62 +617,214 @@ function drawOutletTubes() {
   pop();
 }
 
+function draw120degElbow(x, y, th) {
+  push();
+  translate(x, y);
+  rotate(th);
+  fill(steelColor);
+  stroke(0);
+  strokeWeight(0.05);
+
+  const radius = .8;
+  const cx = 1, cy = sqrt(3);
+
+  // Tube
+  push();
+  beginClip({ invert: true });
+  circle(cx,cy , 2.6);
+  endClip();
+  arc(cx,cy , 4.3,4.3 , 7/6*PI,1.5*PI);
+  pop();
+  noFill();
+  arc(cx,cy , 2.6,2.6 , 7/6*PI,1.5*PI);
+
+  // Right cap
+  fill(steelColor);
+  rect(1, -.5, .5, 1);
+  // Left cap
+  rotate(2 * PI / 3);
+  rect(1, -.5, .5, 1);
+
+  pop();
+}
+
+function draw150degElbow(x, y, th) {
+  push();
+  translate(x, y);
+  rotate(th);
+  fill(steelColor);
+  stroke(0);
+  strokeWeight(0.05);
+
+  const radius = .8;
+  const cx = 1, cy = 2 + sqrt(3);
+
+  // Tube
+  push();
+  const mask = () => arc(cx,cy , 6.6,6.6 , 4/3*PI,1.6*PI);
+  clip(mask, {invert:true});
+  arc(cx,cy , 8.3,8.3 , 4/3*PI,1.5*PI);
+  pop();
+  noFill();
+  arc(cx,cy , 6.6,6.6 , 4/3*PI,1.5*PI);
+
+  // Right cap
+  fill(steelColor);
+  rect(1, -.5, .5, 1);
+  // Left cap
+  rotate(5 * PI / 6);
+  rect(1, -.5, .5, 1);
+
+  pop();
+}
+
+function draw60degElbow(x, y, th) {
+  push();
+  translate(x, y);
+  rotate(th);
+  fill(steelColor);
+  stroke(0);
+  strokeWeight(0.05);
+
+  const radius = .8;
+  const cx = 1, cy = sqrt(3) / 3;
+
+  // Tube
+  push();
+  beginClip({ invert: true });
+  circle(cx,cy , 0.3);
+  endClip();
+  arc(cx,cy , 1.9,1.9 , 5/6*PI,1.5*PI);
+  pop();
+  noFill();
+  arc(cx,cy , 0.3,0.3 , 5/6*PI,1.5*PI);
+
+  // Right cap
+  fill(steelColor);
+  rect(1.0, -.5, .5, 1);
+  // Left cap
+  rotate(PI / 3);
+  rect(1.0, -.5, .5, 1);
+
+  pop();
+}
+
+function drawCoil(x, y) {
+  push();
+  translate(x, y);
+
+  const dx = .2;
+  const dy = 1.5;
+  for (var cx=-2; cx<=2; cx += dx) {
+    rect(cx - dx/2, -dy/2, dx, dy, dx);
+  }
+  pop();
+}
+
+function drawSampleTube() {
+  push();
+  fill(steelColor);
+
+  rect(-4.2, -4.7, .8, 1);
+  rect(-2.8, -6.05, 6, .75);
+  rect(3.4, -4.7, .8, 5.5);
+  draw120degElbow(-3.8, -2.2, -PI/2);
+  drawTubeElbow(-3.8, -5.3, 0);
+  drawTubeElbow(3.8, -5.3, 90);
+  drawCoil(0, -5.6);
+
+  draw60degElbow(3.8, 2.2, 7/6*PI);
+
+  pop();
+}
+
 function drawPurgeValve() {
   push();
-  fill(ironColor);
   translate(20, -10.375);
-  // "T" part
-  beginShape();
-  vertex(-3, 0.75);
-  vertex(-0.75, 0.75);
-  vertex(-0.75, 2.5);
-  vertex(0.75, 2.5);
-  vertex(0.75, 0.75);
-  vertex(3, 0.75);
-  vertex(3, -0.75);
-  vertex(0.75, -0.75);
-  vertex(0.75, -2.5);
-  vertex(-0.75, -2.5);
-  vertex(-0.75, -0.75);
-  vertex(-3, -0.75);
-  endShape(CLOSE);
-  // Left cap
-  rect(-3.5, -1, 0.75, 2);
-  // Right cap
-  rect(2.75, -1, 0.75, 2);
-  // Top cap
-  rect(-1, -3, 2, 0.75);
-  // Bottom cap
-  rect(-1, 2.25, 2, 0.75);
 
+  // Tubes
+  fill(steelColor);
+  push();
+  rotate( PI / 6 );
+  rect(-3, -.375, 6, .75);
+  rect( 3.2, -4.17, 2, .75);
+  rect(-5.4,  3.45, 2, .75);
+  rotate(-PI / 3 );
+  rect(-3, -.375, 6, .75);
+  pop();
+
+  // Draw elbows
+  draw120degElbow(-3.8,  2.2, 7*PI/6);
+  draw120degElbow( 3.8, -2.2, PI/6)
+  draw150degElbow(-7.6, 0, PI/6);
+  draw150degElbow( 7.6, 0, 7*PI/6);
+
+  // Sample Coil
+  drawSampleTube();
+
+  // "*" part
+  fill(ironColor);
+  const pipeRadius   = 0.75; // Half the width of each pipe
+  const innerRadius = sqrt(3) * pipeRadius;
+  const outerRadius = 2.5;
+  for (let i=0;i<6;i++) {
+    // Rotate for next iteration
+    rotate(PI / 3);
+    beginShape();
+    // Bottom right
+    vertex( pipeRadius, innerRadius );
+
+    // Top right
+    vertex( pipeRadius, outerRadius );
+    // Top Left
+    vertex(-pipeRadius, outerRadius );
+
+    // Bottom left
+    vertex(-pipeRadius, innerRadius );
+    endShape(CLOSE);
+  }
+
+  
+  // Hexagon Part
+  const midRadius = .8 * outerRadius + .2 * innerRadius;
+  fill("rgb(200, 180, 160)");
+  stroke("rgb(180, 160, 120)");
+  beginShape();
+  for (let th=0;th<360;th+=60) {
+    vertex( midRadius * Cos(th), midRadius * Sin(th) );
+  }
+  endShape(CLOSE);
+
+  // Bolts
+  fill(steelColor);
+  stroke('black');
+  for (let th=0;th<360;th+=60) {
+    circle( .65 * midRadius * Cos(th), .65 * midRadius * Sin(th), .3 );
+  }
+
+  // Determine if hovered
   const knob_coords = [
     [89.5, 94.5],
     [75.5, 80.5]
   ];
-
-  fill(80);
-  stroke(0);
   if (knob_coords[0][0] < mX && mX < knob_coords[0][1] && knob_coords[1][0] < mY && mY < knob_coords[1][1]) {
     stroke(255, 255, 100);
     strokeWeight(0.1);
   }
-  circle(0, 0, 3);
-  fill(60);
-  if (state.purge_position === 0) {
-    rotate(PI / 2);
-  } else if (state.purge_position === 1) {
+
+  // Determine valve rotation
+  if (state.purge_position === 1) {
     rotate(0);
-  } else {
-    rotate(-PI);
-  }
-  beginShape();
-  vertex(0, 0.75);
-  vertex(0.75, 0.25);
-  vertex(0.5, -2);
-  vertex(0, -2.5);
-  vertex(-0.5, -2);
-  vertex(-0.75, 0.25);
-  endShape(CLOSE);
+  } else if (state.purge_position === 0) {
+    rotate(PI / 3);
+  } 
+
+  // Handle
+  fill(steelColor);
+  rect( -0.3, -0.32, 0.8, 0.64, .1 );
+  fill(60);
+  rect( 0.45, -0.40, 3.0, 0.8, .05, .2, .2, .05 );
+
   pop();
 }
 
@@ -787,15 +948,6 @@ function drawHeTank(x, y, w, h, tank) {
   text(tank.label, x + w / 2, y + h / 4);
   pop();
 }
-
-// function drawGC() {
-//   push();
-//   translate(123, height - 23.5);
-//   fill(245);
-//   strokeWeight(0.05);
-//   rect(0, -1, 20, 21.5, 0, 0, 0.25, 0.25);
-//   pop();
-// }
 
 function drawGC() {
   push();
@@ -1183,11 +1335,12 @@ function drawInstructionText() {
   } else if (state.purge_position == 2 && state.reaction_time < 1) {
     text("System is reaching equilibrium ... please wait", 0, 0);
   } else if (state.purge_position === 2) {
-    text("Ready to take sample. Click the three-way valve\nto take a sample, or adjust reaction conditions\nfor a new trial.", 0, 0);
+    text("Sample ready. Click the sampling valve\nto insert to GC, or adjust reaction conditions\nfor a new trial.", 0, 0);
   } else if (state.purge_position === 0 && state.takingSampleTime >= 1) {
-    text("Sample has been taken. Purge the GC\nby clicking the three-way valve when ready.", 0, 0);
+    text("Sample has been taken. Reset GC data\nby clicking the sampling valve when ready.", 0, 0);
   } else if (state.purge_position === 1 && state.purgingTime >= 1) {
-    text("GC has been purged. Click the three-way valve\nto set new reaction conditions.", 0, 0);
+    // text("GC has been purged. Click the three-way valve\nto set new reaction conditions.", 0, 0);
+    state.purge_position = 2;
   }
   pop();
 }
@@ -1239,7 +1392,7 @@ export function drawAll() {
     state.outlet.yNH3 = 0;
   }
   if (state.tanks.he.valvePosition > 0 && state.purge_position === 1) {
-    state.purging = true;
+    // state.purging = true;
     state.takingSample = false;
   }
   if (state.takingSample) {
@@ -1262,4 +1415,12 @@ export function drawAll() {
   drawComputer();
   drawTable();
   drawInstructionText();
+}
+
+export function Zoom() {
+  // Calculate and apply matrix
+  const s  = state.zoom;
+  const zx = -state.zoomX * (s - 1);
+  const zy = -state.zoomY * (s - 1);
+  applyMatrix(s,0 , 0,s , zx,zy);
 }
