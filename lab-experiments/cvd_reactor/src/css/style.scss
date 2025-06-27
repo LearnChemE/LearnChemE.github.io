@@ -1,0 +1,239 @@
+// main.scss
+
+#svg-container {
+  position: relative;
+  border: 2px solid #ccc;
+  margin: 20px auto;
+  padding: 10px;
+  width: calc(100vw - 40px);
+  height: calc(100vh - 40px);
+  max-width: calc((100vh - 40px) * 1000 / 600);
+  max-height: calc((100vw - 40px) * 600 / 1000);
+  
+  > svg {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    max-height: calc(100% - 20px);
+    max-width: calc(100% - 20px);
+  }
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100vh;
+  background-color: white;
+  width: 100%;
+  font-family: sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.button-container {
+  display: flex;
+  margin-top: 10px;
+  justify-content: flex-start;
+  
+  .btn {
+    margin-right: 10px;
+  }
+}
+
+.canvas-container {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  position: relative; // merged the later positioning rules
+  z-index: 1;
+}
+
+.timer-display {
+  font-size: 24px;
+  margin-bottom: 10px;
+  text-align: center;
+  width: 150px;
+}
+
+.icon-container {
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  position: relative;
+  z-index: 1001;
+  
+  #valueSlider {
+    pointer-events: auto;
+    z-index: 10000000;
+    position: relative;
+    flex: none;
+  }
+  
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  // main.scss
+  
+  .slider-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    
+    label {
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+    
+    input[type="range"] {
+      // MODIFICATION: Remove flex-grow and set a fixed width
+      width: 150px; // Or any fixed width you prefer
+      -webkit-appearance: none;
+      background: transparent;
+      margin: 0;
+      
+      // WebKit track
+      &::-webkit-slider-runnable-track {
+        height: 4px;
+        // You can remove the width from here as it's now on the main element
+        background: darkgray;
+        border-radius: 2px;
+      }
+      
+      // WebKit thumb
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 16px;
+        height: 16px;
+        background: lightgreen;
+        border-radius: 50%;
+        border: 0.5px solid #333;
+        margin-top: -6px;
+        cursor: pointer;
+      }
+      
+      // Firefox track
+      &::-moz-range-track {
+        height: 4px;
+        background: darkgray;
+        border-radius: 2px;
+      }
+      
+      // Firefox thumb
+      &::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        background: lightgreen;
+        border-radius: 50%;
+        border: 0.5px solid #333;
+        cursor: pointer;
+      }
+      
+      &:focus {
+        outline: none;
+        
+        &::-webkit-slider-runnable-track {
+          background: gray;
+        }
+      }
+    }
+    
+    // If you want the numeric value (span) to appear nicely:
+    span {
+      display: inline-block;
+      min-width: 32px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.hamburger-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  z-index: 1001;
+  pointer-events: auto;
+}
+
+#hamburger-icon {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border: 2px solid #000;
+  border-radius: 8px;
+  background-color: lightblue;
+  padding: 8px;
+  position: relative;
+  z-index: 1001;
+  pointer-events: auto;
+  
+  .hamburger-img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  }
+}
+
+#reset-button {
+  position: relative;
+  z-index: 1001;
+  pointer-events: auto;
+}
+
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 40px;
+  position: absolute;
+  z-index: 1000;
+  background-color: white;
+  border: 2px solid #ddd;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
+  &.show {
+    display: flex;
+  }
+  
+  .btn {
+    width: 100px;
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+  
+  .button-container {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .button {
+    width: 80%;
+    margin: 10px 0;
+  }
+  
+  .slider-container {
+    grid-template-columns: 1fr;
+    grid-gap: 15px;
+  }
+  
+  .canvas {
+    width: 100%;
+  }
+}
