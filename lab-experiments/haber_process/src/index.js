@@ -61,12 +61,12 @@ window.draw = function() {
   drawAll();
   pop();
 
-  push();
-  fill('black');
-  noStroke();
-  textSize(10);
-  text(`x: ${window.mX.toFixed(1)}\ny: ${window.mY.toFixed(1)}`, 50, 20);
-  pop();
+  // push();
+  // fill('black');
+  // noStroke();
+  // textSize(10);
+  // text(`x: ${window.mX.toFixed(1)}\ny: ${window.mY.toFixed(1)}`, 50, 20);
+  // pop();
 };
 
 window.windowResized = () => {
