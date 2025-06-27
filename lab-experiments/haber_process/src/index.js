@@ -3,7 +3,7 @@ import "p5";
 import "./style/style.scss";
 import "./assets/digital-7.ttf";
 import "./assets/chemical_equilibrium_in_the_haber_process.pdf";
-import { drawAll } from "./js/draw";
+import { drawAll, Zoom } from "./js/draw";
 import { handleInputs } from "./js/inputs";
 import { calcAll, setDefaults } from "./js/calcs";
 
@@ -25,7 +25,10 @@ window.state = {
   hasAdjustedTemperature: window.localStorage.getItem("hasAdjustedTemperature") === "true",
   zoom: 1, // Current zoom level
   zoomMin: 1, // Minimum zoom level
-  zoomMax: 4, // Maximum zoom level
+  zoomMax: 6, // Maximum zoom level
+  zoomX: 300,
+  zoomY: 270,
+  dragging: false,
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -47,18 +50,22 @@ window.setup = function() {
 window.draw = function() {
   window.width = state.canvasSize[0];
   window.height = state.canvasSize[1];
-  window.mX = mouseX / relativeSize();
-  window.mY = mouseY / relativeSize();
+  [window.mX, window.mY] = mouseCoordinate();
+  // drag();
 
-  // Apply zoom transformation
   push();
-  translate(mouseX, mouseY);
-  scale(state.zoom);
-  translate(-mouseX, -mouseY);
+  Zoom();
 
   scale(relativeSize());
   background(255);
   drawAll();
+  pop();
+
+  push();
+  fill('black');
+  noStroke();
+  textSize(10);
+  text(`x: ${window.mX.toFixed(1)}\ny: ${window.mY.toFixed(1)}`, 50, 20);
   pop();
 };
 
@@ -67,6 +74,19 @@ window.windowResized = () => {
 }
 
 window.relativeSize = () => containerElement.offsetWidth / 150;
+
+export function mouseCoordinate() {
+  // Declare variables
+  var x = mouseX;
+  var y = mouseY;
+  const s  = state.zoom; // Will never be 0
+  const tx = state.zoomX;
+  const ty = state.zoomY;
+  // Calculate inverse transform of zoom matrix
+  x = x/s + tx/s * (s - 1);
+  y = y/s + ty/s * (s - 1);
+  return [x / relativeSize(), y / relativeSize()]
+}
 
 function sizeContainer() {
   containerElement.style.width = `calc(100vw - 10px)`;
@@ -84,10 +104,27 @@ window.mouseWheel = function(event) {
   const zoomFactor = event.deltaY > 0 ? 0.95 : 1.05;
 
   // Calculate new zoom level
-  const newZoom = state.zoom * zoomFactor;
+  var newZoom = state.zoom * zoomFactor;
 
   // Clamp zoom level between min and max
-  state.zoom = constrain(newZoom, state.zoomMin, state.zoomMax);
+  newZoom = constrain(newZoom, state.zoomMin, state.zoomMax);
+
+  if (newZoom !== state.zoomMin) {
+    const dz = newZoom - state.zoom;
+    const zdif = newZoom - state.zoomMin;
+    const oldZoom = state.zoom - state.zoomMin;
+    const zoomX = (oldZoom * state.zoomX + mouseX * dz) / zdif;
+    const zoomY = (oldZoom * state.zoomY + mouseY * dz) / zdif;
+
+    state.zoomX = constrain(zoomX, 0, containerElement.offsetWidth);
+    state.zoomY = constrain(zoomY, 0, containerElement.offsetHeight);
+  }
+  else {
+    state.zoomX = 300;
+    state.zoomY = 270;
+  }
+
+  state.zoom = newZoom;
 
   return false;
 };

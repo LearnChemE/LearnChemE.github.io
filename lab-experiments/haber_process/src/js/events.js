@@ -1,3 +1,4 @@
+import { mouseCoordinate } from '../index.js';
 import { calcAll } from './calcs.js';
 
 window.mousePressed = function() {
@@ -101,6 +102,10 @@ window.mousePressed = function() {
     }
   }
 
+  state.dragging = true;
+  offsetX = mX;
+  offsetY = mY;
+
   // handlePressures();
   handlePurge();
   handlePressureController();
@@ -117,15 +122,14 @@ function handlePurge() {
   const tanks_open = !(state.tanks.he.valvePosition === 0 || (state.tanks.n2.valvePosition === 0 && state.tanks.nh3.valvePosition === 0 && state.tanks.h2.valvePosition === 0));
 
   if (clicked_on_valve && not_mid_purge_or_sample && tanks_open && state.reaction_time >= 1) {
-    state.purge_position === 0 ? state.purge_position = 1 : state.purge_position === 1 ? state.purge_position = 2 : state.purge_position = 0;
+    state.purge_position === 0 ? state.purge_position = 2 : state.purge_position === 2 ? state.purge_position = 0 : state.purge_position = 0;
     if (state.purge_position === 1) {
       if (state.tanks.he.valvePosition === 1) {
-        state.purging = true;
         state.takingSample = false;
       }
     } else if (state.purge_position === 0) {
       if (state.tanks.h2.m > 0 || state.tanks.n2.m > 0 || state.tanks.nh3.m > 0) {
-        state.purging = false;
+        // state.purging = true;
         state.takingSample = true;
       }
     } else {
@@ -190,7 +194,23 @@ function handlePressureController() {
   }
 }
 
-// window.mouseDragged = function() {
-//   const mX = mouseX / relativeSize();
-//   const mY = mouseY / relativeSize();
-// }
+// Add drag event
+var offsetX = 0;
+var offsetY = 0;
+window.mouseReleased = () => {
+  state.dragging = false;
+}
+
+window.mouseDragged = function() {
+  // For bounds
+  const containerElement = document.getElementById("p5-container");
+  // Subtract the difference from the offset vector times the zoom for tracking
+  state.zoomX -= (mX - offsetX) * state.zoom;
+  state.zoomY -= (mY - offsetY) * state.zoom;
+  // Constrain so the apparatus doesn't go offscreen
+  state.zoomX = constrain(state.zoomX, 0, containerElement.offsetWidth);
+  state.zoomY = constrain(state.zoomY, 0, containerElement.offsetHeight);
+
+  // Update mX and mY, because changing the zoom coordinates will change these
+  [mX, mY] = mouseCoordinate();
+}
