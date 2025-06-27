@@ -24,6 +24,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const pressureSlider = document.getElementById("feed-pressure");
   pressureSlider.addEventListener("input", () => updateSliderValue("feed-pressure"));
   updateSliderValue("feed-pressure");
+  pressureSlider.addEventListener("input", () => (state.feedPressure = Number(pressureSlider.value)));
+  // The default value of a slider is a string, so we always first convert it to a number.
+  state.feedPressure = Number(pressureSlider.value);
 
   // Set up Feed Temperature slider
   const tempSlider = document.getElementById("feed-temp");
@@ -34,9 +37,4 @@ document.addEventListener("DOMContentLoaded", () => {
   const saltSlider = document.getElementById("salt-conc");
   saltSlider.addEventListener("input", () => updateSliderValue("salt-conc"));
   updateSliderValue("salt-conc");
-});
-
-pressureSlider.addEventListener("input", function () {
-  // The default value of a slider is a string, so we always first convert it to a number.
-  state.feedPressure = Number(pressureSlider.value);
 });

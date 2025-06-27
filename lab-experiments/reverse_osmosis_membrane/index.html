@@ -1,178 +1,254 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,shrink-to-fit=no"
+    />
 
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+    <!-- Update everything below THIS -->
+    <meta
+      name="description"
+      content="A digital laboratory experiment demonstrating reverse osmosis principles."
+    />
+    <meta name="keywords" content="simulation, engineering, interactive" />
+    <meta
+      name="author"
+      content="Jackson Dunlap, Neil Hendren, Manuel Arredondo"
+    />
 
-  <!-- Update everything below THIS -->
-  <meta name="description" content="A digital laboratory experiment demonstrating reverse osmosis principles.">
-  <meta name="keywords" content="simulation, engineering, interactive">
-  <meta name="author" content="Jackson Dunlap, Neil Hendren, Manuel Arredondo">
+    <title>Reverse Osmosis Simulation</title>
+    <!-- and above THIS -->
 
-  <title>Reverse Osmosis Simulation</title>
-  <!-- and above THIS -->
+    <!-- MathJax Configuration (optional) -->
+    <script>
+      MathJax = {
+        chtml: {
+          scale: 0.95,
+          mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+          displayAlign: "left", // default for indentalign when set to 'auto'
+        },
+      };
+    </script>
+    <script
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
 
-  <!-- MathJax Configuration (optional) -->
-  <script>
-    MathJax = {
-      chtml: {
-        scale: 0.95,
-        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
-        displayAlign: 'left', // default for indentalign when set to 'auto'
+    <!-- Libraries -->
+    <script src="./js/p5.js"></script>
+
+    <!-- 
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> 
+    Not sure what this library does ^^^, seams to be giving errors
+    -->
+
+    <!-- jQuery / Popper / Bootstrap -->
+    <script src="./js/bootstrap.min.js"></script>
+    <link href="./style/bootstrap.css" rel="stylesheet" />
+
+    <!-- Custom styles -->
+    <link href="./style/sliders.css" rel="stylesheet" />
+    <link href="./style/style.css" rel="stylesheet" />
+
+    <script src="./js/controls.js"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {
+        dataLayer.push(arguments);
       }
-    };
-  </script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      gtag("js", new Date());
 
+      gtag("config", "UA-204988035-3");
+    </script>
+  </head>
 
-
-  <!-- Libraries -->
-  <script src="./js/p5.js"></script>
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-
-
-  <!-- jQuery / Popper / Bootstrap -->
-  <script src="./js/bootstrap.min.js"></script>
-  <link href="./style/bootstrap.css" rel="stylesheet" />
-
-  <!-- Custom styles -->
-  <link href="./style/sliders.css" rel="stylesheet" />
-  <link href="./style/style.css" rel="stylesheet" />
-
-  <script src="./js/slider.js"></script>
-
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-
-    gtag('config', 'UA-204988035-3');
-  </script>
-</head>
-
-<body>
-  <div id="simulation-wrapper">
-    <!-- Sliders / Inputs Section -->
-    <div class="inputs-wrapper">
-      <div class="sliders-wrapper">
-        <div class="input-row">
-          <div class="input-label">Feed Pressure</div>
-          <div class="slider-container">
-            <input type="range" id="feed-pressure" min="10" max="30" step="1" value="10" />
-            <div class="current-value">X</div>
-            <div class="slider-units">bar</div>
+  <body>
+    <div id="simulation-wrapper">
+      <!-- Sliders / Inputs Section -->
+      <div class="inputs-wrapper">
+        <div class="sliders-wrapper">
+          <div class="input-row">
+            <div class="input-label">Feed Pressure</div>
+            <div class="slider-container">
+              <input
+                type="range"
+                id="feed-pressure"
+                min="10"
+                max="30"
+                step="1"
+                value="10"
+              />
+              <div class="current-value">X</div>
+              <div class="slider-units">bar</div>
+            </div>
           </div>
 
-        </div>
+          <div class="input-row">
+            <div class="input-label">Feed Temperature</div>
+            <div class="slider-container">
+              <input
+                type="range"
+                id="feed-temp"
+                min="15"
+                max="60"
+                step="1"
+                value="15"
+              />
+              <div class="current-value">X</div>
+              <div class="slider-units">°C</div>
+            </div>
+          </div>
 
-        <div class="input-row">
-          <div class="input-label">Feed Temperature</div>
-          <div class="slider-container">
-            <input type="range" id="feed-temp" min="15" max="60" step="1" value="15" />
-            <div class="current-value">X</div>
-            <div class="slider-units">°C</div>
+          <div class="input-row">
+            <div class="input-label">NaCl Concentration</div>
+            <div class="slider-container">
+              <input
+                type="range"
+                id="salt-conc"
+                min="0.5"
+                max="3.5"
+                step="0.5"
+                value="0.5"
+              />
+              <div class="current-value">X</div>
+              <div class="slider-units">%</div>
+            </div>
           </div>
         </div>
 
-        <div class="input-row">
-          <div class="input-label">NaCl Concentration</div>
-          <div class="slider-container">
-            <input type="range" id="salt-conc" min="0.5" max="3.5" step="0.5" value="0.5" />
-            <div class="current-value">X</div>
-            <div class="slider-units">%</div>
+        <div class="buttons-wrapper">
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#directions-modal"
+          >
+            directions
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#details-modal"
+          >
+            details
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#about-modal"
+          >
+            about
+          </button>
+        </div>
+      </div>
+
+      <!-- Container for graphics drawn by p5.js -->
+      <div id="graphics-wrapper"></div>
+
+      <!-- Add this after the graphics-wrapper div -->
+      <div class="disclaimer">
+        Currently work in progress, with placeholder values. Not fully
+        functional yet.
+      </div>
+
+      <div id="directions-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Directions</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <p>Directions go here.</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="buttons-wrapper">
-        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#directions-modal">
-          directions
-        </button>
-        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#details-modal">
-          details
-        </button>
-        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#about-modal">
-          about
-        </button>
-      </div>
-    </div>
-
-    <!-- Container for graphics drawn by p5.js -->
-    <div id="graphics-wrapper"></div>
-
-    <!-- Add this after the graphics-wrapper div -->
-    <div class="disclaimer">
-      Currently work in progress, with placeholder values. Not fully functional yet.
-    </div>
-
-    <div id="directions-modal" class="modal fade" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Directions</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div id="details-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Details</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <p>Details go here. Use TeX scripts to write equations.</p>
+              <p class="box-eqn">
+                $$ [1] \quad \frac{P_{feed} - P_{permeate}}{R} =
+                \frac{C_{salt}}{C_{water}} $$
+              </p>
+            </div>
           </div>
-          <div class="modal-body">
-            <p>Directions go here.</p>
+        </div>
+      </div>
+
+      <div id="about-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">About</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <p>
+                This simulation was created in the
+                <a href="https://www.colorado.edu/chbe" target="_blank"
+                  >Department of Chemical and Biological Engineering</a
+                >, at University of Colorado Boulder for
+                <a href="http://www.learncheme.com" target="_blank"
+                  >LearnChemE.com</a
+                >
+                by Manuel Arredondo and Neil Hendren under the direction of
+                Professor John L. Falconer. Address any questions or comments to
+                learncheme@gmail.com. All of our simulations are open source,
+                and are available on our
+                <a
+                  href="https://github.com/LearnChemE/LearnChemE.github.io/"
+                  target="_blank"
+                  >LearnChemE Github repository</a
+                >.<br /><br />Is your screen too small to fit this application?
+                Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on
+                Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page.
+                This application is not compatible with Internet Explorer or web
+                browsers that do not support WebGL and HTML5. Recommended
+                browsers are the latest versions of: Chrome, Safari, Firefox,
+                Edge, and Opera.
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="details-modal" class="modal fade" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Details</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>Details go here. Use TeX scripts to write equations.</p>
-            <p class="box-eqn">
-              $$ [1] \quad \frac{P_{feed} - P_{permeate}}{R} = \frac{C_{salt}}{C_{water}} $$
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="about-modal" class="modal fade" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">About</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>
-              This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
-                Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
-                href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Manuel Arredondo and Neil Hendren
-              under the direction of Professor John L. Falconer. Address any questions or comments to
-              learncheme@gmail.com. All of our simulations are open source, and are available on our
-              <a href="https://github.com/LearnChemE/LearnChemE.github.io/" target="_blank">LearnChemE Github
-                repository</a>.<br><br>Is your screen too small to fit this application? Try zooming-out on the web page
-              (CTRL+"-" and CTRL+"=" on Windows, or
-              ⌘+"-" and ⌘+"=" on Mac), then refreshing the page. This application is not compatible with Internet
-              Explorer or web browsers that do not support WebGL and HTML5. Recommended browsers are the latest versions
-              of: Chrome, Safari, Firefox, Edge,
-              and Opera.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script type="module" src="./js/main.js"></script>
-
-</body>
-
+    <script type="module" src="./js/main.js"></script>
+  </body>
 </html>

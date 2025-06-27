@@ -14,7 +14,12 @@ window.state = {
 
   feedPressure: 10,
   frameCount: 0,
-  waterDrainTimer: 0,
+  flowRate: 1,
+
+  topOfTankDrainTimer: 0,
+  bottomOfTankDrainTimer: 0,
+  doneDrainingTank: false,
+  tankToPumpDrainTimer: 0,
 };
 
 // Load the other scripts (except calcs.js, which is imported in draw.js).
