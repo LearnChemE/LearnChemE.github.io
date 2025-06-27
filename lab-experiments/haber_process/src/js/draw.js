@@ -591,7 +591,7 @@ function drawOutletTubes() {
   // Third horizontal reactor outlet tube
   rect(36.125, 10, 14.5, 0.75);
   // Outlet tube to vent
-  rect(19.675, -7.5, 0.75, 30);
+  rect(19.675, -8.5, 0.75, 31);
   // First elbow
   drawTubeElbow(0, -10, 0);
   // Second elbow
@@ -678,6 +678,66 @@ function draw150degElbow(x, y, th) {
   pop();
 }
 
+function draw60degElbow(x, y, th) {
+  push();
+  translate(x, y);
+  rotate(th);
+  fill(steelColor);
+  stroke(0);
+  strokeWeight(0.05);
+
+  const radius = .8;
+  const cx = 1, cy = sqrt(3) / 3;
+
+  // Tube
+  push();
+  beginClip({ invert: true });
+  circle(cx,cy , 0.3);
+  endClip();
+  arc(cx,cy , 1.9,1.9 , 5/6*PI,1.5*PI);
+  pop();
+  noFill();
+  arc(cx,cy , 0.3,0.3 , 5/6*PI,1.5*PI);
+
+  // Right cap
+  fill(steelColor);
+  rect(1.0, -.5, .5, 1);
+  // Left cap
+  rotate(PI / 3);
+  rect(1.0, -.5, .5, 1);
+
+  pop();
+}
+
+function drawCoil(x, y) {
+  push();
+  translate(x, y);
+
+  const dx = .2;
+  const dy = 1.5;
+  for (var cx=-2; cx<=2; cx += dx) {
+    rect(cx - dx/2, -dy/2, dx, dy, dx);
+  }
+  pop();
+}
+
+function drawSampleTube() {
+  push();
+  fill(steelColor);
+
+  rect(-4.2, -4.7, .8, 1);
+  rect(-2.8, -6.05, 6, .75);
+  rect(3.4, -4.7, .8, 5.5);
+  draw120degElbow(-3.8, -2.2, -PI/2);
+  drawTubeElbow(-3.8, -5.3, 0);
+  drawTubeElbow(3.8, -5.3, 90);
+  drawCoil(0, -5.6);
+
+  draw60degElbow(3.8, 2.2, 7/6*PI);
+
+  pop();
+}
+
 function drawPurgeValve() {
   push();
   translate(20, -10.375);
@@ -692,6 +752,9 @@ function drawPurgeValve() {
   rotate(-PI / 3 );
   rect(-3, -.375, 6, .75);
   pop();
+
+  // Sample Coil
+  drawSampleTube();
 
   // Draw elbows
   draw120degElbow(-3.8,  2.2, 7*PI/6);
@@ -720,6 +783,7 @@ function drawPurgeValve() {
     vertex(-pipeRadius, innerRadius );
     endShape(CLOSE);
   }
+
   
   // Hexagon Part
   const midRadius = .8 * outerRadius + .2 * innerRadius;
