@@ -753,14 +753,14 @@ function drawPurgeValve() {
   rect(-3, -.375, 6, .75);
   pop();
 
-  // Sample Coil
-  drawSampleTube();
-
   // Draw elbows
   draw120degElbow(-3.8,  2.2, 7*PI/6);
   draw120degElbow( 3.8, -2.2, PI/6)
   draw150degElbow(-7.6, 0, PI/6);
   draw150degElbow( 7.6, 0, 7*PI/6);
+
+  // Sample Coil
+  drawSampleTube();
 
   // "*" part
   fill(ironColor);
@@ -813,9 +813,9 @@ function drawPurgeValve() {
   }
 
   // Determine valve rotation
-  if (state.purge_position === 0) {
+  if (state.purge_position === 1) {
     rotate(0);
-  } else if (state.purge_position === 1) {
+  } else if (state.purge_position === 0) {
     rotate(PI / 3);
   } 
 
@@ -1335,11 +1335,12 @@ function drawInstructionText() {
   } else if (state.purge_position == 2 && state.reaction_time < 1) {
     text("System is reaching equilibrium ... please wait", 0, 0);
   } else if (state.purge_position === 2) {
-    text("Ready to take sample. Click the three-way valve\nto take a sample, or adjust reaction conditions\nfor a new trial.", 0, 0);
+    text("Sample ready. Click the sampling valve\nto insert to GC, or adjust reaction conditions\nfor a new trial.", 0, 0);
   } else if (state.purge_position === 0 && state.takingSampleTime >= 1) {
-    text("Sample has been taken. Purge the GC\nby clicking the three-way valve when ready.", 0, 0);
+    text("Sample has been taken. Reset GC data\nby clicking the sampling valve when ready.", 0, 0);
   } else if (state.purge_position === 1 && state.purgingTime >= 1) {
-    text("GC has been purged. Click the three-way valve\nto set new reaction conditions.", 0, 0);
+    // text("GC has been purged. Click the three-way valve\nto set new reaction conditions.", 0, 0);
+    state.purge_position = 2;
   }
   pop();
 }
@@ -1391,7 +1392,7 @@ export function drawAll() {
     state.outlet.yNH3 = 0;
   }
   if (state.tanks.he.valvePosition > 0 && state.purge_position === 1) {
-    state.purging = true;
+    // state.purging = true;
     state.takingSample = false;
   }
   if (state.takingSample) {

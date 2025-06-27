@@ -122,15 +122,14 @@ function handlePurge() {
   const tanks_open = !(state.tanks.he.valvePosition === 0 || (state.tanks.n2.valvePosition === 0 && state.tanks.nh3.valvePosition === 0 && state.tanks.h2.valvePosition === 0));
 
   if (clicked_on_valve && not_mid_purge_or_sample && tanks_open && state.reaction_time >= 1) {
-    state.purge_position === 0 ? state.purge_position = 1 : state.purge_position === 1 ? state.purge_position = 2 : state.purge_position = 0;
+    state.purge_position === 0 ? state.purge_position = 2 : state.purge_position === 2 ? state.purge_position = 0 : state.purge_position = 0;
     if (state.purge_position === 1) {
       if (state.tanks.he.valvePosition === 1) {
-        state.purging = true;
         state.takingSample = false;
       }
     } else if (state.purge_position === 0) {
       if (state.tanks.h2.m > 0 || state.tanks.n2.m > 0 || state.tanks.nh3.m > 0) {
-        state.purging = false;
+        // state.purging = true;
         state.takingSample = true;
       }
     } else {
