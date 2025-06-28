@@ -1,0 +1,43 @@
+/* Temperature Reader Component CSS */
+
+@font-face {
+  font-family: "Digital-7";
+  src: url("../assets/digital-7.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.temperature-reader-container {
+  position: relative;
+  display: inline-block;
+}
+
+.temperature-reader-container svg {
+  overflow: visible;
+}
+
+/* Digital display styling */
+#temp-display {
+  font-family: "Digital-7", "Courier New", monospace !important;
+  font-weight: normal !important;
+}
+
+/* Ensure text is not selectable */
+.temperature-reader-container text {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+/* Responsive scaling */
+@media (max-width: 768px) {
+  .temperature-reader-container svg {
+    transform: scale(0.8);
+  }
+}
+
+@media (max-width: 480px) {
+  .temperature-reader-container svg {
+    transform: scale(0.6);
+  }
+} 
