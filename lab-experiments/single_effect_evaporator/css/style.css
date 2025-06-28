@@ -1,0 +1,259 @@
+/* ─── GLOBAL & CARD LAYOUT ───────────────────────────────────────── */
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.card {
+  position: relative;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 6px;
+  box-shadow: 0 0 3px rgba(0,0,0,0.3);
+  width: 95%;
+  max-width: 1000px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  /* allow card to size to content and prevent inner overflow */
+  height: auto;
+  min-height: 600px;
+}
+
+.menu-btn {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  background: lightblue;
+  border: 1px solid #000;
+  border-radius: 6px;
+  padding: 6px;
+  height: 40px;
+  cursor: pointer;
+  z-index: 150;
+}
+
+.menu-btn img {
+  height: 100%;
+}
+
+/* ─── SIMULATION LAYOUT ──────────────────────────────────────────── */
+
+.simulation-container {
+  display: flex;
+  flex: 1;
+  margin-top: 3rem;
+}
+
+#evaporator-canvas {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: #fff;
+  min-height: 600px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#evaporator-canvas svg {
+  display: block;
+}
+
+/* ─── DROPDOWN MENU ──────────────────────────────────────────────── */
+
+.hidden {
+  display: none !important;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 3.5rem;        /* just below the hamburger button */
+  left: 0.5rem;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  list-style: none;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 100;
+}
+
+/* make each dropdown item look like a blue button */
+.dropdown-menu li {
+  background: #007bff;
+  color: #fff;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  /* ensure it fills the dropdown's width */
+  display: block;
+  white-space: nowrap;
+}
+
+/* darker on hover */
+.dropdown-menu li:hover {
+  background: #0056b3;
+}
+
+/* ─── MODAL STYLES ──────────────────────────────────────────────── */
+
+.modal {
+  position: fixed;
+  top: 0; 
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: flex-start;    /* <-- was center */
+  justify-content: center;
+  padding-top: 1.5rem;        /* add some breathing room from the top */
+  z-index: 200;
+}
+
+.modal-content {
+  position: relative;
+  background: #fff;
+  border-radius: 6px;
+  width: 800px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  max-height: 80vh;           /* allow vertical scroll if very long */
+  overflow-y: auto;
+  padding: 2rem;              /* more breathing room */
+  font-size: 1rem;            /* slightly larger base font */
+  line-height: 1.6;           /* generous line spacing */
+}
+
+.modal-body p {
+  margin: 0.25em 0; /* slight spacing between lines */
+}
+
+.mjx-chtml {
+  text-align: left !important;
+}
+
+/* Tighten up the title spacing */
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+/* Paragraphs and lists */
+.modal-content p,
+.modal-content ul {
+  margin-bottom: 1rem;
+}
+
+.modal-content p {
+  line-height: 1.6;
+}
+
+.modal-content ul {
+  padding-left: 1.5rem;      /* indent bullets */
+}
+
+/* Bullet spacing */
+.modal-content li {
+  margin-bottom: 0.5rem;
+}
+
+/* Centered formula block */
+.formula {
+  font-family: monospace;
+  font-size: 1.2rem;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* center the "or" separator */
+.modal-content .modal-or {
+  text-align: center;
+  margin: 1rem 0;
+  font-style: italic;      /* optional: make it stand out */
+  font-weight: 500;
+}
+
+.modal-content a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.modal-content a:hover {
+  text-decoration: underline;
+}
+
+/* Force left alignment on MathJax block equations */
+mjx-container[jax="CHTML"][display="true"] {
+  display: block;
+  text-align: left !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+}
+
+/* ─── INSTRUMENT LAYOUT ──────────────────────────────── */
+
+.pressure-left {
+  overflow: visible;
+}
+
+/* Flowmeter positioned at top of evaporator */
+.flowmeter-top {
+  position: absolute;
+  top: 10px;
+  left: calc(50% + 40px);
+  transform: translateX(-50%);
+  z-index: 10;
+  overflow: visible;
+}
+
+/* Temperature reader removed */
+
+/* Pressure gauge positioned next to flowmeter */
+.pressure-left {
+  position: absolute;
+  top: -180px;
+  left: calc(50% + 150px);
+  transform: translateX(-50%);
+  z-index: 10;
+  overflow: visible;
+}
+
+
+
+.temperature-reader-container {
+  position: absolute;
+  top: 250px;
+  left: calc(50% + 250px);
+  z-index: 10;
+}
+
+.simulation-container {
+  position: relative;
+  overflow: visible;
+  padding: 50px;
+}
+
+.pressure-left svg, .flowmeter-top svg {
+  display: block;
+  overflow: visible;
+}
