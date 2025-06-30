@@ -100,8 +100,8 @@ export function calcAll() {
   const MW_NH3 = 17.03; // Molecular weight of NH3 - g/mol
 
   // Initial moles for N2, H2, and NH3 from the inlet state.
-  const nN2 = (state.tanks.n2.m * 60 / 1000) / MW_N2;
-  const nH2 = (state.tanks.h2.m * 60 / 1000) / MW_H2;
+  const nN2  = (state.tanks.n2.m  * 60 / 1000) / MW_N2;
+  const nH2  = (state.tanks.h2.m  * 60 / 1000) / MW_H2;
   const nNH3 = (state.tanks.nh3.m * 60 / 1000) / MW_NH3;
 
   const nAdd = [nN2, nH2, nNH3];
@@ -130,6 +130,7 @@ export function calcAll() {
       1
     );
   }
+  console.log(`P: ${state.P}`)
 
   // At equilibrium, k(x) = keq.
   // This is the function we want to find the root of.
@@ -235,6 +236,7 @@ export function calcAll() {
       // The exception is if one component is negative but very small (greater than -1e-3).
       // In that case, we can consider it as zero.
       if (EQs.every(eq => eq >= -1e-3)) {
+        console.log(EQs); 
         const nN2  = Math.max(EQs[0] + addGaussNoise(0, 0.025 * EQs[0]),  0);
         const nH2  = Math.max(EQs[1] + addGaussNoise(0, 0.025 * EQs[1]),  0);
         const nNH3 = Math.max(EQs[2] + addGaussNoise(0, 0.025 * EQs[2]), 0);
@@ -256,6 +258,7 @@ export function calcAll() {
     // If we didn't find a valid solution, the chances are that it was essentially a complete conversion,
     // In which case we can use the maximum extent of reaction.
     if (!solutionFound) {
+      console.log('no soln')
       const EQs = [0, 1, 2].map(i => nEQ(i, xMax));
       const nN2  = Math.max(EQs[0] + addGaussNoise(0, 0.02 * EQs[0]), 0);
       const nH2  = Math.max(EQs[1] + addGaussNoise(0, 0.02 * EQs[1]), 0);

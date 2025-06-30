@@ -1369,21 +1369,25 @@ export function drawAll() {
     }
     if (tank.valvePosition >= 1) {
       tank.m = tank.mSetPoint;
-      if (state.doCalc) {
-        calcAll();
-        state.doCalc = false;
-      }
+      if (tank === state.tanks.nh3) console.log(tank.m)
+      // if (state.doCalc) {
+      //   console.log("recalculating for tank")
+      //   calcAll();
+      //   state.doCalc = false;
+      // }
     } else {
       tank.m = 0;
-      if (state.doCalc) {
-        calcAll();
-        state.doCalc = false;
-      }
+      // if (state.doCalc) {
+      //   calcAll();
+      //   state.doCalc = false;
+      // }
     }
+    // This only is affected 
     if (tank.m > 0) {
       maxPressure = tank.valvePosition > 0 ? Math.max(maxPressure || 0, tank.P) : maxPressure;
     }
   });
+
   if (state.tanks.h2.m > 0 || state.tanks.n2.m > 0 || state.tanks.nh3.m > 0) {
     if (state.purge_position === 0) {
       state.purging = false;
@@ -1410,6 +1414,14 @@ export function drawAll() {
   state.reaction_time += state.purging ? 1 : state.takingSample ? 1 : 0.002;
   state.reaction_time = min(state.reaction_time, 1);
   state.P = min(state.PSetPoint, maxPressure);
+
+  // Recalculate if flagged
+  if (state.doCalc) {
+    console.log("recalculating for tank")
+    calcAll();
+    state.doCalc = false;
+  }
+
   drawTanks();
   drawHeTank(98, height / 2 - 3, tankWidth, tankHeight, state.tanks.he);
   drawOutletTubes();
