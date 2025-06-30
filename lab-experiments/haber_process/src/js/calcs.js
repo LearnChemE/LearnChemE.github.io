@@ -130,7 +130,6 @@ export function calcAll() {
       1
     );
   }
-  console.log(`P: ${state.P}`)
 
   // At equilibrium, k(x) = keq.
   // This is the function we want to find the root of.
@@ -236,7 +235,6 @@ export function calcAll() {
       // The exception is if one component is negative but very small (greater than -1e-3).
       // In that case, we can consider it as zero.
       if (EQs.every(eq => eq >= -1e-3)) {
-        console.log(EQs); 
         const nN2  = Math.max(EQs[0] + addGaussNoise(0, 0.025 * EQs[0]),  0);
         const nH2  = Math.max(EQs[1] + addGaussNoise(0, 0.025 * EQs[1]),  0);
         const nNH3 = Math.max(EQs[2] + addGaussNoise(0, 0.025 * EQs[2]), 0);
@@ -258,7 +256,6 @@ export function calcAll() {
     // If we didn't find a valid solution, the chances are that it was essentially a complete conversion,
     // In which case we can use the maximum extent of reaction.
     if (!solutionFound) {
-      console.log('no soln')
       const EQs = [0, 1, 2].map(i => nEQ(i, xMax));
       const nN2  = Math.max(EQs[0] + addGaussNoise(0, 0.02 * EQs[0]), 0);
       const nH2  = Math.max(EQs[1] + addGaussNoise(0, 0.02 * EQs[1]), 0);

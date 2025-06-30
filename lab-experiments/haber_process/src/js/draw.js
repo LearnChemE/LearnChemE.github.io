@@ -1369,18 +1369,8 @@ export function drawAll() {
     }
     if (tank.valvePosition >= 1) {
       tank.m = tank.mSetPoint;
-      if (tank === state.tanks.nh3) console.log(tank.m)
-      // if (state.doCalc) {
-      //   console.log("recalculating for tank")
-      //   calcAll();
-      //   state.doCalc = false;
-      // }
     } else {
       tank.m = 0;
-      // if (state.doCalc) {
-      //   calcAll();
-      //   state.doCalc = false;
-      // }
     }
     // This only is affected 
     if (tank.m > 0) {
@@ -1417,7 +1407,6 @@ export function drawAll() {
 
   // Recalculate if flagged
   if (state.doCalc) {
-    console.log("recalculating for tank")
     calcAll();
     state.doCalc = false;
   }
