@@ -20,6 +20,7 @@ window.mousePressed = function() {
   state.mouseDownFrame = frameCount;
 
   if (state.purge_position !== 0) {
+    // Mass Flow Setpoint - lower
     if (mX < mass_flow_rate_left_button_x[1] && mX > mass_flow_rate_left_button_x[0]) {
       if (mY < h2_mass_flow_rate_button_y[1] && mY > h2_mass_flow_rate_button_y[0]) {
         state.tanks.h2.mSetPoint = max(state.minFlowRate, state.tanks.h2.mSetPoint - 1);
@@ -31,8 +32,9 @@ window.mousePressed = function() {
         state.tanks.nh3.mSetPoint = max(state.minFlowRate, state.tanks.nh3.mSetPoint - 1);
         state.tanks.nh3.mFrame = frameCount;
       }
-      calcAll();
+      state.doCalc = true;
     }
+    // Mass Flow Setpoint - raise
     if (mX < mass_flow_rate_right_button_x[1] && mX > mass_flow_rate_right_button_x[0]) {
       if (mY < h2_mass_flow_rate_button_y[1] && mY > h2_mass_flow_rate_button_y[0]) {
         state.tanks.h2.mSetPoint = min(state.maxFlowRate, state.tanks.h2.mSetPoint + 1);
@@ -44,9 +46,10 @@ window.mousePressed = function() {
         state.tanks.nh3.mSetPoint = min(state.maxFlowRate, state.tanks.nh3.mSetPoint + 1);
         state.tanks.nh3.mFrame = frameCount;
       }
-      calcAll();
+      state.doCalc = true;
     }
 
+    // Temp Controller - Lower temp
     if (T_controller_coords[0][0] < mX && mX < T_controller_coords[0][1] && T_controller_coords[2][0] < mY && mY < T_controller_coords[2][1]) {
       state.T = max(state.minT, state.T - 1);
       state.hasAdjustedTemperature = true;
@@ -54,6 +57,7 @@ window.mousePressed = function() {
       calcAll();
     }
 
+    // Temp Controller - Raise temp
     if (T_controller_coords[1][0] < mX && mX < T_controller_coords[1][1] && T_controller_coords[2][0] < mY && mY < T_controller_coords[2][1]) {
       state.T = min(state.maxT, state.T + 1);
       state.hasAdjustedTemperature = true;
@@ -61,6 +65,7 @@ window.mousePressed = function() {
       calcAll();
     }
 
+    // H2 Tank
     if (mX < h2_tank_knob_x[1] && mX > h2_tank_knob_x[0] && mY < knob_tank_y[1] && mY > knob_tank_y[0]) {
       if (state.tanks.h2.valvePosition === 0) {
         state.tanks.h2.isTurningOn = true;
@@ -71,6 +76,7 @@ window.mousePressed = function() {
         state.doCalc = true;
       }
     }
+    // N2 Tank
     if (mX < n2_tank_knob_x[1] && mX > n2_tank_knob_x[0] && mY < knob_tank_y[1] && mY > knob_tank_y[0]) {
       if (state.tanks.n2.valvePosition === 0) {
         state.tanks.n2.isTurningOn = true;
@@ -81,6 +87,7 @@ window.mousePressed = function() {
         state.doCalc = true;
       }
     }
+    // NH3 Tank
     if (mX < nh3_tank_knob_x[1] && mX > nh3_tank_knob_x[0] && mY < knob_tank_y[1] && mY > knob_tank_y[0]) {
       if (state.tanks.nh3.valvePosition === 0) {
         state.tanks.nh3.isTurningOn = true;
@@ -93,6 +100,7 @@ window.mousePressed = function() {
     }
   }
 
+  // He Tank
   if (mX < he_tank_knob_x[1] && mX > he_tank_knob_x[0] && mY < knob_tank_y[1] && mY > knob_tank_y[0]) {
     if (state.tanks.he.valvePosition === 0) {
       state.tanks.he.isTurningOn = true;
@@ -135,6 +143,7 @@ function handlePurge() {
     } else {
       state.purging = false;
       state.takingSample = false;
+      calcAll();
     }
   }
 }
@@ -184,13 +193,13 @@ function handlePressureController() {
     state.PSetPoint = max(0, state.PSetPoint - 1);
     state.hasAdjustedPressure = true;
     window.localStorage.setItem("hasAdjustedPressure", "true");
-    calcAll();
+    state.doCalc = true;
   }
   if (clicked_on_increase_pressure && !state.takingSample) {
     state.PSetPoint = min(state.maxP, state.PSetPoint + 1);
     state.hasAdjustedPressure = true;
     window.localStorage.setItem("hasAdjustedPressure", "true");
-    calcAll();
+    state.doCalc = true;
   }
 }
 

@@ -65,6 +65,17 @@ export function setDefaults() {
   }
 }
 
+export function addGaussNoise(mean, stdDev) {
+  // Use the Box-Muller transform
+  const u0 = Math.random();
+  const u1 = Math.random();
+  // Convert to Z space
+  const z0 = Math.sqrt(-2*Math.log(u0)) * Math.cos(2*Math.PI * u1);
+
+  // Give mean and stdev and return
+  return mean + stdDev * z0;
+}
+
 export function calcAll() {
   state.reaction_time = 0;
 
@@ -89,8 +100,8 @@ export function calcAll() {
   const MW_NH3 = 17.03; // Molecular weight of NH3 - g/mol
 
   // Initial moles for N2, H2, and NH3 from the inlet state.
-  const nN2 = (state.tanks.n2.m * 60 / 1000) / MW_N2;
-  const nH2 = (state.tanks.h2.m * 60 / 1000) / MW_H2;
+  const nN2  = (state.tanks.n2.m  * 60 / 1000) / MW_N2;
+  const nH2  = (state.tanks.h2.m  * 60 / 1000) / MW_H2;
   const nNH3 = (state.tanks.nh3.m * 60 / 1000) / MW_NH3;
 
   const nAdd = [nN2, nH2, nNH3];
@@ -224,13 +235,14 @@ export function calcAll() {
       // The exception is if one component is negative but very small (greater than -1e-3).
       // In that case, we can consider it as zero.
       if (EQs.every(eq => eq >= -1e-3)) {
-        const nN2 = Math.max(EQs[0], 0);
-        const nH2 = Math.max(EQs[1], 0);
-        const nNH3 = Math.max(EQs[2], 0);
+        const nN2  = Math.max(EQs[0] + addGaussNoise(0, 0.025 * EQs[0]),  0);
+        const nH2  = Math.max(EQs[1] + addGaussNoise(0, 0.025 * EQs[1]),  0);
+        const nNH3 = Math.max(EQs[2] + addGaussNoise(0, 0.025 * EQs[2]), 0);
 
-        const yN2 = nN2 / (nN2 + nH2 + nNH3);
-        const yH2 = nH2 / (nN2 + nH2 + nNH3);
-        const yNH3 = nNH3 / (nN2 + nH2 + nNH3);
+        const nTot = nN2 + nH2 + nNH3;
+        const yN2  =  nN2 / nTot;
+        const yH2  =  nH2 / nTot;
+        const yNH3 = nNH3 / nTot;
 
         state.outlet.yN2 = yN2;
         state.outlet.yH2 = yH2;
@@ -245,18 +257,32 @@ export function calcAll() {
     // In which case we can use the maximum extent of reaction.
     if (!solutionFound) {
       const EQs = [0, 1, 2].map(i => nEQ(i, xMax));
-      const nN2 = Math.max(EQs[0], 0);
-      const nH2 = Math.max(EQs[1], 0);
-      const nNH3 = Math.max(EQs[2], 0);
+      const nN2  = Math.max(EQs[0] + addGaussNoise(0, 0.02 * EQs[0]), 0);
+      const nH2  = Math.max(EQs[1] + addGaussNoise(0, 0.02 * EQs[1]), 0);
+      const nNH3 = Math.max(EQs[2] + addGaussNoise(0, 0.02 * EQs[2]), 0);
 
-      const yN2 = nN2 / (nN2 + nH2 + nNH3);
-      const yH2 = nH2 / (nN2 + nH2 + nNH3);
-      const yNH3 = nNH3 / (nN2 + nH2 + nNH3);
+      const nTot = nN2 + nH2 + nNH3;
+      const yN2  =  nN2 / nTot;
+      const yH2  =  nH2 / nTot;
+      const yNH3 = nNH3 / nTot;
 
-      state.outlet.yN2 = yN2;
-      state.outlet.yH2 = yH2;
+      state.outlet.yN2  = yN2;
+      state.outlet.yH2  = yH2;
       state.outlet.yNH3 = yNH3;
     }
+
+    // Create graph data
+    for (let i = 0; i < 100; i++) {
+      // Calcilate heights
+      const yN2  = 35 - 4 * 38 / 48 - state.outlet.yH2  * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2);
+      const yH2  = 35 - 4 * 38 / 48 - state.outlet.yN2  * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2);
+      const yNH3 = 35 - 4 * 38 / 48 - state.outlet.yNH3 * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2);
+
+      state.graphYVals[0][i] = yN2  + addGaussNoise(0, .3 * (1 - Math.exp(yN2  - 31.8)));
+      state.graphYVals[1][i] = yH2  + addGaussNoise(0, .3 * (1 - Math.exp(yH2  - 31.8)));
+      state.graphYVals[2][i] = yNH3 + addGaussNoise(0, .3 * (1 - Math.exp(yNH3 - 31.8)));
+    }
+
   } catch (error) {
     console.error("Error:", error.message);
   }

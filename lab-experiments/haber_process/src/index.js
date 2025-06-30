@@ -29,6 +29,7 @@ window.state = {
   zoomX: 300,
   zoomY: 270,
   dragging: false,
+  graphYVals: [[],[],[]],
 };
 
 const containerElement = document.getElementById("p5-container");
@@ -61,6 +62,7 @@ window.draw = function() {
   drawAll();
   pop();
 
+  // // Debug coordinates:
   // push();
   // fill('black');
   // noStroke();
