@@ -1,4 +1,4 @@
-import { calcAll } from "./calcs.js";
+import { addGaussNoise, calcAll } from "./calcs.js";
 
 const tankHeight = 60;
 const tankWidth = 13;
@@ -1267,17 +1267,20 @@ function drawComputer() {
   if (state.takingSampleTime >= 1 || (state.purgingTime > 0 && state.purgingTime < 1)) {
     for (let i = 0; i < 100; i++) {
       const x = -16 + i * 5 / 50;
-      const y = 35 - 4 * 38 / 48 - state.outlet.yH2 * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2);
+      // const y = 35 - 4 * 38 / 48 - state.outlet.yH2 * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2) + addGaussNoise(0, .2);
+      const y = state.graphYVals[0][i];
       vertex(x, y);
     }
     for (let i = 0; i < 100; i++) {
       const x = -6 + i * 5 / 50;
-      const y = 35 - 4 * 38 / 48 - state.outlet.yN2 * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2);
+      // const y = 35 - 4 * 38 / 48 - state.outlet.yN2 * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2) + addGaussNoise(0, .2);
+      const y = state.graphYVals[1][i];
       vertex(x, y);
     }
     for (let i = 0; i < 100; i++) {
       const x = 4 + i * 5 / 50;
-      const y = 35 - 4 * 38 / 48 - state.outlet.yNH3 * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2);
+      // const y = 35 - 4 * 38 / 48 - state.outlet.yNH3 * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2) + addGaussNoise(0, .2);
+      const y = state.graphYVals[2][i];
       vertex(x, y);
     }
   }

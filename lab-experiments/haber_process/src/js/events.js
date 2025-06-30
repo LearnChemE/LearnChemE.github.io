@@ -135,6 +135,7 @@ function handlePurge() {
     } else {
       state.purging = false;
       state.takingSample = false;
+      calcAll();
     }
   }
 }
