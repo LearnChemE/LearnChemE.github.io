@@ -61,6 +61,7 @@ window.draw = function() {
   drawAll();
   pop();
 
+  // // Debug coordinates:
   // push();
   // fill('black');
   // noStroke();
