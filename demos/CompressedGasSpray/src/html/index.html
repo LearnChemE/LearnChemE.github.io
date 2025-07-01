@@ -55,9 +55,9 @@
           </div>
           <div class="play-controls">
             <label>spray gas</label>
-            <button id="playBtn" title="Play and Reset">▶</button>
-            <button id="pauseBtn" title="Pause">⏸</button>
-            <button id="resetBtn" title="Reset">⏮</button>
+            <button id="play-button" title="Play and Reset">▶</button>
+            <button id="pause-button" title="Pause">⏸</button>
+            <button id="reset-button" title="Reset">⏮</button>
           </div>
         </div>
 
@@ -82,11 +82,24 @@
       <div id="p5-outer">
 
         <div id="p5-container">
-          <canvas id="main-canvas"></canvas>
+          <canvas id="main-canvas" style="position: relative; z-index: 1; width: 100%; height: 100%;"></canvas>
+          <div id="mathsection" style="
+         position: absolute;
+         top: 25px;
+         left: calc(50% + 85px);
+         transform: translateX(-50%);
+         z-index: 2;
+         background: rgba(255,255,255,0.9);
+         padding: 0.5rem;
+       ">
+              <span id="pfDisplay"></span>&nbsp;&nbsp;
+              <span id="tfDisplay"></span>
+            </div>
+          </div>
 
 
-          <div id="mathsection">
-            <div id="formula-container"></div>
+          
+            
           </div>
         </div>
       </div>
@@ -289,6 +302,9 @@
       // (If you use radios for stop-at–5°, wire them here too)
     });
   </script>
+  
+  <script type="module" src="js/events.js"></script>
+
 
 </body>
 

@@ -4,6 +4,9 @@ import "./style/style.scss";
 import { drawAll } from "./js/draw";
 import { handleInputs } from "./js/inputs";
 import { calcAll } from "./js/calcs";
+//import { drawSystem, drawSpray, drawMolecule } from './js/draw';
+import { triggerSpray, playMolecule, pauseMolecule, resetMolecule } from './js/draw';
+import "./js/events";
 
 // GLOBAL VARIABLES OBJECT
 window.state = {
@@ -37,6 +40,9 @@ window.draw = function () {
   push();
   drawAll();
   pop();
+  // drawSpray();
+  // drawMolecule();
+  //drawSystem(p);
   // console.log('to ' + millis())
 };
 
@@ -64,31 +70,6 @@ function sizeContainer() {
   wrapperElement.style.fontSize = `${dim / 500}rem`;
 }
 
-// // spray control (events.js will call these)
-// window.startSpray = () => state.showSpray = true;
-// window.stopSpray  = () => state.showSpray = false;
-
-// // the actual aqua-spray drawing
-// function drawSpray() {
-//   push();
-//   stroke(0, 200, 200);
-//   strokeWeight(2);
-
-//   // nozzle coordinates in your 650×220 logical space:
-//   const nozzleX = 100,
-//         nozzleY = 20;
-
-//   for (let i = 0; i < 8; i++) {
-//     const angle = random(-PI / 4, PI / 4);
-//     const len   = random(20, 50);
-//     line(
-//       nozzleX, nozzleY,
-//       nozzleX + len * cos(angle),
-//       nozzleY + len * sin(angle)
-//     );
-//   }
-//   pop();
-// }
 
 window.addEventListener("DOMContentLoaded", () => {
   const modeButtons = document.querySelectorAll(".button-group button");
@@ -111,6 +92,44 @@ window.addEventListener("DOMContentLoaded", () => {
   timeSlider.addEventListener("input", () => {
     document.getElementById("timeVal").textContent = timeSlider.value;
     drawAll();
+  });
+
+  const playBtn = document.getElementById("play-button");
+  const pauseBtn = document.getElementById("pause-button");
+  const resetBtn = document.getElementById("reset-button");
+
+
+  if (playBtn) {
+    playBtn.addEventListener('click', () => {
+      console.log('▶️ Play clicked');
+      triggerSpray(500);
+      playMolecule();
+    });
+  } else {
+    console.error('play-button not found');
+  }
+
+  if (pauseBtn) {
+    pauseBtn.addEventListener('click', () => {
+      console.log('⏸ Pause clicked');
+      pauseMolecule();
+    });
+  } else {
+    console.error('pause-button not found');
+  }
+
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      console.log('⏮ Reset clicked');
+      resetMolecule();
+    });
+  } else {
+    console.error('reset-button not found');
+  }
+
+  ['volumeFraction', 'timeSprayed'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', resetMolecule);
   });
 
   // initial draw
