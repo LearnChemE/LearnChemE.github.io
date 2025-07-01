@@ -18,6 +18,7 @@ export function drawAll() {
   const mode = window.graphMode || "volume";
   const data = runSimulation(f, tMax);
 
+
   // 2) Canvas setup
   const wrapper = document.getElementById("p5-container");
   const canvas = document.getElementById("main-canvas");
@@ -58,12 +59,25 @@ export function drawAll() {
   const xScale = t => gX + M.left + (t / tMax) * plotW;
   const yScale = v => gY + M.top + plotH - ((v - minY) / (maxY - minY)) * plotH;
 
+
+  // true cylinder capacity (in L) = initial liquid volume ÷ initial fraction
+  const capacity = data.vL[0] / f;
+
   // store for animation routines
   window.graphData = {
-    times, curves, xScale, yScale, mode, canvas,
-    Praw: Array.isArray(data.P) ? data.P.slice() : [],
-    Traw: Array.isArray(data.T) ? data.T.slice() : []
+    rawData: data,       // for drawGraph
+    curves,
+    times: data.time,
+    capacity,
+    tMax,
+    mode: window.graphMode || "volume",
+    xScale,
+    yScale,
+    canvas: document.getElementById("main-canvas"),
+    Praw: [...data.P],
+    Traw: [...data.T]
   };
+  drawFrame();
 
   // 6) Optionally overlay spray & moving dot (for non-RAF initial draw)
   if (showSpray) drawSpray();
@@ -383,7 +397,7 @@ export function pauseMolecule() {
     cancelAnimationFrame(rafId);
     rafId = null;
   }
-  drawAll();
+  drawFrame();
 }
 
 export function resetMolecule() {
@@ -404,35 +418,49 @@ export function resetMolecule() {
 // Core animation loop: redraws scene and overlays
 
 function animationLoop(timestamp) {
-  // update molecule index if playing
+  const gd = window.graphData;
+  if (!gd || !Array.isArray(gd.times)) {
+    // no data yet → stop
+    rafId = null;
+    return;
+  }
+
+  // update index if playing
   if (playMoleculeFlag) {
     const elapsed = timestamp - moleculeStartTs;
     const frac = Math.min(elapsed / moleculeDuration, 1);
-    const N = window.graphData.times.length;
+    const N = gd.times.length;
     currentIndex = Math.floor(frac * (N - 1));
   }
 
+  // redraw base frame + overlays
+  drawFrame();
   if (showSpray) drawSpray();
+  if (playMoleculeFlag || pausedMolecule) drawMovingDot(currentIndex);
+
   // continue or finish
+  const keepMoving = playMoleculeFlag && currentIndex < gd.times.length - 1;
   const keepSpraying = showSpray;
-  const keepMoving = playMoleculeFlag && (currentIndex < window.graphData.times.length - 1);
-  if (keepSpraying || keepMoving) {
+  if (keepMoving || keepSpraying) {
     rafId = requestAnimationFrame(animationLoop);
   } else {
-    const pf = window.graphData.Praw[currentIndex];
-    const tf = window.graphData.Traw[currentIndex];
-    showPfTf(pf, tf);
+    showPfTf(gd.Praw[currentIndex], gd.Traw[currentIndex]);
     rafId = null;
   }
 }
 
+
 // Draw the moving black dot on plots
 export function drawMovingDot(idx) {
-  const { times, curves, xScale, yScale, mode, canvas } = window.graphData;
+  const gd = window.graphData;
+  if (!gd || !Array.isArray(gd.times) || !gd.curves) return;
+
+  const { times, curves, xScale, yScale, mode, canvas } = gd;
+  if (idx < 0 || idx >= times.length) return;
+
   const t = times[idx];
   const x = xScale(t);
-  const ctx = canvas.getContext('2d');
-
+  const ctx = canvas.getContext("2d");
   ctx.fillStyle = 'black';
 
   if (mode === 'volume') {
@@ -477,4 +505,30 @@ function showPfTf(pf, tf) {
   updatePfTf(pf, tf);
   const sec = document.getElementById("mathsection");
   if (sec) sec.style.display = "block";
+}
+
+// Draws one full frame (cylinder + graph) at currentIndex
+function drawFrame() {
+  const gd = window.graphData;
+  if (!gd) return;
+
+  const { canvas, rawData, capacity, curves, times, xScale, yScale, mode, tMax } = gd;
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // figure out which index to use (0 if never played yet)
+  const idx = Math.min(currentIndex, times.length - 1) || 0;
+
+  // fraction = current liquid volume ÷ real capacity
+  let frac = curves.volume[idx] / capacity;
+  frac = Math.max(0, Math.min(1, frac));
+
+  // 1) cylinder at that fraction
+  drawCylinder(ctx, W * 0.10, H, frac);
+
+  // 2) graph background + curves
+  const gX = W * 0.30, gY = H * 0.05, gW = W * 0.65, gH = H * 0.90;
+  drawGraph(ctx, gX, gY, gW, gH, rawData, mode, tMax);
 }

@@ -4,7 +4,6 @@ import "./style/style.scss";
 import { drawAll } from "./js/draw";
 import { handleInputs } from "./js/inputs";
 import { calcAll } from "./js/calcs";
-//import { drawSystem, drawSpray, drawMolecule } from './js/draw';
 import { triggerSpray, playMolecule, pauseMolecule, resetMolecule } from './js/draw';
 import "./js/events";
 
@@ -16,12 +15,12 @@ window.state = {
   hamburgerHasBeenClicked:
     localStorage.getItem("hamburgerHasBeenClicked") === "true",
   canvasSize: [200, 80],
-  showSpray: false,  // ← toggled by startSpray/stopSpray
+  showSpray: false,
 };
 
 const containerElement = document.getElementById("p5-container");
 const wrapperElement = document.getElementById("p5-outer");
-//const containerElement = document.getElementById("drawing-area");
+
 window.setup = function () {
   sizeContainer();
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight - 10).parent(containerElement);
@@ -40,14 +39,11 @@ window.draw = function () {
   push();
   drawAll();
   pop();
-  // drawSpray();
-  // drawMolecule();
-  //drawSystem(p);
-  // console.log('to ' + millis())
+
 };
 
 window.windowResized = () => {
-  sizeContainer(); // recalculate container size
+  sizeContainer();
   resizeCanvas(
     containerElement.offsetWidth,
     containerElement.offsetHeight - 10
@@ -127,11 +123,10 @@ window.addEventListener("DOMContentLoaded", () => {
     console.error('reset-button not found');
   }
 
-  ['volumeFraction', 'timeSprayed'].forEach(id => {
+  ['timeSprayed'].forEach(id => {
     const el = document.getElementById(id);
     el.addEventListener('input', resetMolecule);
   });
 
-  // initial draw
   drawAll();
 });
