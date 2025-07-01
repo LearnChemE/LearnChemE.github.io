@@ -1,70 +1,75 @@
-// src/js/draw.js
 import { runSimulation } from "./calcs.js";
 
+// Global animation state
+let showSpray = false;
+let sprayTimer = null;
+let playMoleculeFlag = false;
+let pausedMolecule = false;
+let currentIndex = 0;
+let moleculeStartTs = 0;
+let moleculeDuration = 0;
+let rafId = null;
+
+// Main draw function: runs simulation, draws cylinder + graph, and caches graph data
 export function drawAll() {
-  // 1) Read inputs & run sim
+  // 1) Read inputs & run simulation
   const f = parseFloat(document.getElementById("volumeFraction").value);
   const tMax = parseInt(document.getElementById("timeSprayed").value, 10);
   const mode = window.graphMode || "volume";
   const data = runSimulation(f, tMax);
 
-  // 2) grab the single canvas inside your #p5-container
+  // 2) Canvas setup
   const wrapper = document.getElementById("p5-container");
   const canvas = document.getElementById("main-canvas");
-
-  // 3) resize it to exactly fill #p5-container
   const W = wrapper.clientWidth;
   const H = wrapper.clientHeight;
   canvas.width = W;
   canvas.height = H;
-
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, W, H);
 
-  // 4) Draw cylinder on left 20% using original flow
-  const centerX = W * 0.10;            // 10% in from left
-  drawCylinder(ctx, centerX, H, f);
+  // 3) Draw cylinder on left
+  drawCylinder(ctx, W * 0.10, H, f);
 
-  // 5) Draw graph on right 65%
-  const gphX = W * 0.30;
-  const gphY = (H * 0.05);
-  const gphW = W * 0.65;
-  const gphH = H * 0.90;
-  drawGraph(ctx, gphX, gphY, gphW, gphH, data, mode, tMax);
+  // 4) Draw graph on right
+  const gX = W * 0.30, gY = H * 0.05;
+  const gW = W * 0.65, gH = H * 0.90;
+  drawGraph(ctx, gX, gY, gW, gH, data, mode, tMax);
 
-  // 6) Populate window.graphData for animation
+  // 5) Cache graph data for animation
   const times = data.time;
-  const allY = mode === "volume" ? [...data.vL, ...data.vV]
-    : mode === "moles" ? [...data.nL, ...data.nV]
-      : mode === "temperature" ? data.T.map(t => t - 273.15)
-        : data.P;
-  const minY = Math.min(0, ...allY) * 1.1;
-  const maxY = Math.max(...allY) * 1.1;
-
-  const M = { left: gphW * 0.10, right: gphW * 0.10, top: gphH * 0.10, bottom: gphH * 0.10 };
-  const plotW = gphW - M.left - M.right;
-  const plotH = gphH - M.top - M.bottom;
-
-  const xScale = t => gphX + M.left + (t / tMax) * plotW;
-  const yScale = v => gphY + M.top + plotH
-    - ((mode === "temperature" ? v - 273.15 : v) - minY) / (maxY - minY) * plotH;
-
-  window.graphData = {
-    times,
-    curves: {
-      volume: data.vL,
-      vapor: data.vV,
-      moles: data.nL,
-      temperature: data.T,
-      pressure: data.P
-    },
-    xScale,
-    yScale,
-    mode,
-    canvas,
-    start: (window.graphData && window.graphData.start) || null
+  const curves = {
+    volume: data.vL,
+    vapor: data.vV,
+    moles: data.nL,
+    molesVapor: data.nV,
+    temperature: data.T.map(T => T - 273.15),
+    pressure: data.P
   };
+
+  // margin for full curve
+  const allVals = curves[mode];
+  const minY = Math.min(0, ...allVals) * 1.1;
+  const maxY = Math.max(...allVals) * 1.1;
+
+  const M = { left: gW * 0.10, right: gW * 0.10, top: gH * 0.10, bottom: gH * 0.10 };
+  const plotW = gW - M.left - M.right;
+  const plotH = gH - M.top - M.bottom;
+  const xScale = t => gX + M.left + (t / tMax) * plotW;
+  const yScale = v => gY + M.top + plotH - ((v - minY) / (maxY - minY)) * plotH;
+
+  // store for animation routines
+  window.graphData = {
+    times, curves, xScale, yScale, mode, canvas,
+    Praw: Array.isArray(data.P) ? data.P.slice() : [],
+    Traw: Array.isArray(data.T) ? data.T.slice() : []
+  };
+
+  // 6) Optionally overlay spray & moving dot (for non-RAF initial draw)
+  if (showSpray) drawSpray();
+  if (playMoleculeFlag || pausedMolecule) drawMovingDot(currentIndex);
 }
+
 
 // helper: drawCylinder(ctx, centerX, canvasHeight, volumeFraction)
 function drawCylinder(ctx, centerX, canvasHeight, volumeFraction) {
@@ -100,6 +105,22 @@ function drawCylinder(ctx, centerX, canvasHeight, volumeFraction) {
     bodyWidth,
     liquidHeight
   );
+
+  if (volumeFraction >= 1.0) {
+    ctx.beginPath();
+    ctx.ellipse(
+      centerX,
+      bodyTop,
+      bodyWidth / 2,
+      ellipseRadiusY,
+      0,
+      Math.PI,
+      0
+    );
+    ctx.fillStyle = 'cyan';
+    ctx.fill();
+    ctx.stroke();  // redraw its border
+  }
   // redraw fill border
   ctx.beginPath();
   ctx.moveTo(centerX - bodyWidth / 2, liquidTopY);
@@ -120,9 +141,8 @@ function drawCylinder(ctx, centerX, canvasHeight, volumeFraction) {
   // 5) Valve body (upper rectangle) & gauge
   const valveWidth = bodyWidth * 0.33;
   const valveHeight = bodyHeight * 0.18;
-  // place it directly above the pipe:
   const valveX = centerX - valveWidth / 2;
-  const valveBottomY = domePeakY - 8;    // small gap
+  const valveBottomY = domePeakY - 8;
   const valveTopY = valveBottomY - valveHeight;
 
   // rectangle
@@ -167,10 +187,10 @@ function drawGraph(ctx, x0, y0, w, h, data, mode, tMax) {
   ctx.lineWidth = 1.5;
   ctx.strokeStyle = 'black';
   ctx.strokeRect(
-    x0 + M.left,      // left
-    y0 + M.top,       // top
-    plotW,            // width
-    plotH             // height
+    x0 + M.left,
+    y0 + M.top,
+    plotW,
+    plotH
   );
 
   // data curves
@@ -180,9 +200,9 @@ function drawGraph(ctx, x0, y0, w, h, data, mode, tMax) {
   } else if (mode === 'moles') {
     curves = [data.nL, data.nV]; colors = ['purple', 'purple']; dashes = [[], [5, 3]]; labels = ['liquid', 'vapor'];
   } else if (mode === 'temperature') {
-    curves = [data.T.map(T => T - 273.15)]; colors = ['black']; dashes = [[]]; labels = ['temperature (°C)'];
+    curves = [data.T.map(T => T - 273.15)]; colors = ['black']; dashes = [[]]; labels = [""];
   } else {
-    curves = [data.P]; colors = ['blue']; dashes = [[]]; labels = ['pressure (bar)'];
+    curves = [data.P]; colors = ['blue']; dashes = [[]]; labels = [""];
   }
 
   const flat = curves.flat();
@@ -196,7 +216,6 @@ function drawGraph(ctx, x0, y0, w, h, data, mode, tMax) {
   ctx.font = '12px sans-serif'; ctx.textAlign = 'right'; ctx.fillStyle = 'black';
   let yTickValues;
   if (mode === 'volume') {
-    // from 0.0 up to maxY, in steps of 0.1
     yTickValues = [];
     for (let v = 0.0; v <= maxY; v += 0.1) {
       yTickValues.push(v);
@@ -265,19 +284,12 @@ function drawGraph(ctx, x0, y0, w, h, data, mode, tMax) {
     arr.forEach((v, j) => ctx.lineTo(xS(data.time[j]), yS(v)));
     ctx.stroke();
 
-
-
-    // start dot
-    ctx.fillStyle = 'black'; ctx.beginPath();
-    ctx.arc(xS(data.time[0]), yS(arr[0]), 4, 0, 2 * Math.PI); ctx.fill();
-
     // mid label
     const mid = Math.floor(arr.length / 2);
     ctx.textAlign = 'left'; ctx.fillText(labels[i], xS(data.time[mid]) + 5, yS(arr[mid]) - 5);
     ctx.restore();
   });
 
-  // axis labels
   // Y-axis label
   const yLabel = mode === 'volume' ? 'volume (L)'
     : mode === 'moles' ? 'moles'
@@ -295,11 +307,174 @@ function drawGraph(ctx, x0, y0, w, h, data, mode, tMax) {
   ctx.fillStyle = 'black'; ctx.font = '14px sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('time (s)', x0 + M.left + plotW / 2, y0 + M.top + plotH + 40);
+}
 
-  // Initial Pᵢ, Tᵢ annotation
-  const Pi = data.P0.toFixed(2);
-  const Ti = (data.T0 - 273.15).toFixed(1);
+// Spray trigger and draw
+export function triggerSpray(duration = 500) {
+  showSpray = true;
+  clearTimeout(sprayTimer);
+  sprayTimer = setTimeout(() => { showSpray = false; }, duration);
+  if (!rafId) {
+    rafId = requestAnimationFrame(animationLoop);
+  }
+}
 
-  ctx.font = 'italic 14px serif';
-  ctx.fillText(`Pᵢ = ${Pi} bar   Tᵢ = ${Ti} °C`, x0 + M.left + plotW / 2, y0 + M.top - 10);
+export function drawSpray() {
+  const { canvas } = window.graphData;
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width;
+  const H = canvas.height;
+
+  const centerX = W * 0.10;
+  const bodyHeight = H * 0.45;
+  const verticalOffset = H * 0.10;
+  const bodyTop = (H - bodyHeight) / 2 + verticalOffset;
+  const domeRadiusY = (bodyHeight * 0.4) / 2;
+  const domePeakY = bodyTop - domeRadiusY;
+  const pipeTopY = domePeakY - 8;
+
+  let nozzleX = centerX;
+  let nozzleY = pipeTopY;
+
+  const offsetX = 25;
+  const offsetY = -20;
+  nozzleX += offsetX;
+  nozzleY += offsetY;
+
+  // draw the fan of rays from (nozzleX, nozzleY) —
+  ctx.save();
+  ctx.strokeStyle = "cyan";
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6, 4]);
+
+  const rays = 7;
+  const spread = Math.PI / 3;
+  const length = bodyHeight * 0.4;
+
+  for (let i = 0; i < rays; i++) {
+    const angle = -spread / 2 + (spread / (rays - 1)) * i;
+    const x2 = nozzleX + Math.cos(angle) * length;
+    const y2 = nozzleY + Math.sin(angle) * length;
+    ctx.beginPath();
+    ctx.moveTo(nozzleX, nozzleY);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// Molecule animation controls
+export function playMolecule() {
+  hidePfTf();
+  playMoleculeFlag = true;
+  pausedMolecule = false;
+  currentIndex = 0;
+  moleculeStartTs = performance.now();
+  moleculeDuration = ((parseInt(document.getElementById('timeSprayed').value, 10)) / 20) * 1000;
+  if (!rafId) {
+    rafId = requestAnimationFrame(animationLoop);
+  }
+}
+
+export function pauseMolecule() {
+  playMoleculeFlag = false;
+  pausedMolecule = true;
+  if (rafId) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+  drawAll();
+}
+
+export function resetMolecule() {
+  playMoleculeFlag = false;
+  pausedMolecule = false;
+  showSpray = false;
+  currentIndex = 0;
+  if (rafId) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+  drawAll();
+  const defaultPf = 6.8;
+  const defaultTfRaw = 25.0 + 273.15;
+  showPfTf(defaultPf, defaultTfRaw);
+}
+
+// Core animation loop: redraws scene and overlays
+
+function animationLoop(timestamp) {
+  // update molecule index if playing
+  if (playMoleculeFlag) {
+    const elapsed = timestamp - moleculeStartTs;
+    const frac = Math.min(elapsed / moleculeDuration, 1);
+    const N = window.graphData.times.length;
+    currentIndex = Math.floor(frac * (N - 1));
+  }
+
+  if (showSpray) drawSpray();
+  // continue or finish
+  const keepSpraying = showSpray;
+  const keepMoving = playMoleculeFlag && (currentIndex < window.graphData.times.length - 1);
+  if (keepSpraying || keepMoving) {
+    rafId = requestAnimationFrame(animationLoop);
+  } else {
+    const pf = window.graphData.Praw[currentIndex];
+    const tf = window.graphData.Traw[currentIndex];
+    showPfTf(pf, tf);
+    rafId = null;
+  }
+}
+
+// Draw the moving black dot on plots
+export function drawMovingDot(idx) {
+  const { times, curves, xScale, yScale, mode, canvas } = window.graphData;
+  const t = times[idx];
+  const x = xScale(t);
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = 'black';
+
+  if (mode === 'volume') {
+    // liquid dot
+    const yL = yScale(curves.volume[idx]);
+    ctx.beginPath(); ctx.arc(x, yL, 4, 0, 2 * Math.PI); ctx.fill();
+
+    // vapor dot
+    const yV = yScale(curves.vapor[idx]);
+    ctx.beginPath(); ctx.arc(x, yV, 4, 0, 2 * Math.PI); ctx.fill();
+
+  } else if (mode === 'moles') {
+    // liquid‐moles dot
+    const yL = yScale(curves.moles[idx]);
+    ctx.beginPath(); ctx.arc(x, yL, 4, 0, 2 * Math.PI); ctx.fill();
+
+    // vapor‐moles dot
+    const yV = yScale(curves.molesVapor[idx]);
+    ctx.beginPath(); ctx.arc(x, yV, 4, 0, 2 * Math.PI); ctx.fill();
+
+  } else {
+    // single dot for temp or pressure
+    const arr = curves[mode];
+    const y = yScale(arr[idx]);
+    ctx.beginPath(); ctx.arc(x, y, 4, 0, 2 * Math.PI); ctx.fill();
+  }
+}
+
+function updatePfTf(pf, tf) {
+  const pfEl = document.getElementById("pfDisplay");
+  const tfEl = document.getElementById("tfDisplay");
+  if (pfEl) pfEl.innerHTML = `P<sub>f</sub> = ${pf.toFixed(1)} bar`;
+  if (tfEl) tfEl.innerHTML = `T<sub>f</sub> = ${(tf - 273.15).toFixed(1)} K`;
+}
+
+function hidePfTf() {
+  const sec = document.getElementById("mathsection");
+  if (sec) sec.style.display = "none";
+}
+
+function showPfTf(pf, tf) {
+  updatePfTf(pf, tf);
+  const sec = document.getElementById("mathsection");
+  if (sec) sec.style.display = "block";
 }
