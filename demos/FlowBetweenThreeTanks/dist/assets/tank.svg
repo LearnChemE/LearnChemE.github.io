@@ -1,7 +1,6 @@
 <svg width="175" height="160" xmlns="http://www.w3.org/2000/svg">
  <g>
   <title>Layer 1</title>
-  <rect stroke="#ffffff" id="svg_1" height="28.68679" width="170.70661" y="0.60584" x="2.19672" fill="#ffffff"/>
   <g id="svg_38">
    <g id="svg_34">
     <g id="svg_32">
@@ -14,6 +13,7 @@
     </g>
    </g>
   </g>
+  <rect stroke="#ffffff" id="svg_1" height="28.68679" width="170.70661" y="0.60584" x="2.19672" fill="#ff0000"/>
  </g>
 
 </svg>
