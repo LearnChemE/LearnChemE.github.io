@@ -12,12 +12,12 @@ body {
 
 #mathsection mjx-container {
   position: absolute;
-              top: 10px;
-              left: 50%;
-              transform: translateX(-50%);
-              z-index: 10;
-              background: rgba(255,255,255,0.9);
-              padding: 0.5rem;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.5rem;
 }
 
 #pfDisplay,
@@ -25,7 +25,8 @@ body {
   display: inline-block;
   font-family: sans-serif;
   font-size: 14px;
-  color: #000;              /* ensure it’s not white on white */
+  color: #000;
+  /* ensure it’s not white on white */
 }
 
 #graphics-container {
