@@ -25,15 +25,16 @@ window.setup = function () {
 
 window.mouseClicked = function () {
   //pressure switch interaction
-  if (502 < window.mX && window.mX < 540 && 580 < window.mY && window.mY < 620) {
+  if (502 < window.mX && window.mX < 540 && 555 < window.mY && window.mY < 595) {
     state.pumpOn = !state.pumpOn;
   }
+
   //mouse click rectangle for switch
   /* push();
   stroke("red");
   noFill();
   rectMode(CORNERS);
-  rect(503, 620, 540, 580);
+  rect(503, 595, 540, 555);
   pop(); */
 };
 
@@ -54,24 +55,40 @@ window.draw = function () {
   // Draw pipe first so it appears behind everything
   //drawPipeAndPump(150, 250);
 
-  //drain settings
-  if (state.pumpOn === true && -saltTankHeight - 1 + state.topOfTankDrainTimer + 5 < 0) {
-    state.topOfTankDrainTimer = state.topOfTankDrainTimer + 1;
+  //drain anf beaker fill settings
+  if (state.pumpOn === true && -saltTankHeight - 1 + state.topOfTankDrainTimer + 15 < 0) {
+    state.topOfTankDrainTimer++;
   }
 
   if (
     state.pumpOn === true &&
-    -saltTankHeight - 1 + state.topOfTankDrainTimer + 5 == 0 &&
-    state.bottomOfTankDrainTimer * state.flowRate - saltTankHeight / 12 < 0
+    -saltTankHeight - 1 + state.topOfTankDrainTimer + 15 == 0 &&
+    state.bottomOfTankDrainTimer * state.flowRate - saltTankHeight / 10 < 0
   ) {
-    state.bottomOfTankDrainTimer = state.bottomOfTankDrainTimer + 1;
+    state.bottomOfTankDrainTimer += 1;
   }
 
-  if (state.bottomOfTankDrainTimer * state.flowRate - saltTankHeight / 12 > 0) {
+  if (state.bottomOfTankDrainTimer * state.flowRate - saltTankHeight / 10 > 0) {
     state.doneDrainingTank = true;
   }
   if (state.doneDrainingTank === true && state.pumpOn === true) {
-    state.tankToPumpDrainTimer = state.tankToPumpDrainTimer + 1;
+    state.tankToPumpDrainTimer += 1;
+  }
+
+  //fill beakers
+  if (state.pumpOn === true) {
+    state.permeateBeakerFillUp = true;
+    state.retentateBeakerFillUp = true;
+  } else if (state.pumpOn === false) {
+    state.permeateBeakerFillUp = false;
+    state.retentateBeakerFillUp = false;
+  }
+
+  if (state.permeateBeakerFillUp === true) {
+    state.permeateBeakerTimer += 2 / 3;
+  }
+  if (state.retentateBeakerFillUp === true) {
+    state.rententateBeakerTimer += 1 / 3;
   }
 
   /*  if (
@@ -96,8 +113,8 @@ window.draw = function () {
   drawSaltTank(state.figureX, state.figureY);
   drawPressureGauge(state.figureX, state.figureY);
 
-  drawBeaker(830, 500, 160, 180); //drawBeaker(x, y, beakerThickness, beakerWidth, beakerHeight)
-  drawBeaker(1095, 580, 80, 90);
+  drawBeaker(770, 435, 200, 200); //drawBeaker(x, y, beakerWidth, beakerHeight)
+  drawBeaker(1045, 535, 100, 100);
   drawFilter(state.figureX, state.figureY);
   drawWater(state.figureX, state.figureY);
   drawPumpSwitch(state.figureX, state.figureY, state.pumpOn);
@@ -106,7 +123,7 @@ window.draw = function () {
   //draw text last so it appears over the water
   drawTextOnTopOfDiagram(state.figureX, state.figureY);
 
-  state.frameCount = state.frameCount + 1;
+  state.frameCount++;
 };
 
 function drawTextOnTopOfDiagram(x, y) {
@@ -121,14 +138,14 @@ function drawTextOnTopOfDiagram(x, y) {
 }
 
 let saltTankWidth = 200;
-let saltTankHeight = 300;
+let saltTankHeight = 250;
 
 function drawSaltTank(x, y) {
   //--------------------Tank Stand Back Leg--------------------
   push();
   fill("gray");
   rectMode(CENTER);
-  rect(x, y + 240, 20, 40);
+  rect(x, y + saltTankHeight - 35, 20, 40);
   pop();
 
   //---------------------bottom of the tank pipe turn right---------------------
@@ -162,13 +179,13 @@ function drawSaltTank(x, y) {
   push();
   rectMode(CORNERS);
   fill("gray");
-  rect(x - 100, y + 140, x - 80, y + 280);
-  rect(x + 100, y + 140, x + 80, y + 280);
+  rect(x - 100, y + saltTankHeight - 135, x - 80, y + saltTankHeight + 5);
+  rect(x + 100, y + saltTankHeight - 135, x + 80, y + saltTankHeight + 5);
   //feet
   rectMode(CENTER);
-  rect(x, y + 253, 30, 15, 10, 10, 0, 0);
-  rect(x + 90, y + 273, 30, 15, 10, 10, 0, 0);
-  rect(x - 90, y + 273, 30, 15, 10, 10, 0, 0);
+  rect(x, y + saltTankHeight - 22, 30, 15, 10, 10, 0, 0);
+  rect(x + 90, y + saltTankHeight - 2, 30, 15, 10, 10, 0, 0);
+  rect(x - 90, y + saltTankHeight - 2, 30, 15, 10, 10, 0, 0);
 
   pop();
 
@@ -190,7 +207,7 @@ function drawSaltTank(x, y) {
 function drawPump(x, y) {
   push();
   //adjustment so that the same coordinates can be used for pump as are used for the tank
-  translate(-16 + 160, saltTankHeight / 2 + 41 + 28);
+  translate(-16 + 160, saltTankHeight / 2 + 69);
 
   //---------------------left side of pump connecting to the water pipe---------------------
   push();
@@ -308,14 +325,14 @@ function drawPump(x, y) {
 
 function drawPressureGauge(x, y) {
   push();
-  translate(184, saltTankHeight / 2 - 100);
+  translate(184, saltTankHeight / 2 - 100 - 25);
 
   //pipe with the bend in it
   push();
 
   rectMode(CENTER);
   fill("lightgray");
-  rect(x, y + 20, 20, 100);
+  rect(x, y + 70, 20, 200);
 
   fill(53, 57, 53);
   push();
@@ -411,13 +428,13 @@ function drawPressureGauge(x, y) {
 
 function drawFilter(x, y) {
   push();
-  translate(184, saltTankHeight / 2 - 100);
+  translate(184 - 40, saltTankHeight / 2 - 100 - 25);
 
   push();
   rectMode(CORNERS);
   fill("lightgray");
   stroke(0);
-  rect(x + 150, y - 75, x + 220, y - 55);
+  rect(x + 190, y - 75, x + 220, y - 55);
 
   pop();
 
@@ -503,14 +520,8 @@ function drawFilter(x, y) {
 
   pop();
 }
-/* let m = (figureY + saltTankHeight / 2 - 5 - (figureY + saltTankHeight / 2 + 24)) / (figureX + saltTankWidth / 2 - figureX);
 
-let newX =
-  (figureY + saltTankHeight / 2 - 5 + state.bottomOfTankDrainTimer * state.flowRate - (figureY + saltTankHeight / 2 - 5)) / m +
-  figureX +
-  saltTankWidth / 2 -
-  0.5; */
-
+//inside this water function there is some of the right leg drawn so it draws over the pipe
 function drawWater(x, y) {
   // Tank water
   push();
@@ -518,8 +529,8 @@ function drawWater(x, y) {
   noStroke();
   fill("white");
   beginShape();
-  vertex(x - saltTankWidth / 2, y - saltTankHeight / 2 - 1);
-  vertex(x + saltTankWidth / 2, y - saltTankHeight / 2 - 1);
+  vertex(x - saltTankWidth / 2, y - saltTankHeight / 2 - 2);
+  vertex(x + saltTankWidth / 2, y - saltTankHeight / 2 - 2);
   vertex(x + saltTankWidth / 2, y + saltTankHeight / 2 - 5);
   vertex(x, y + saltTankHeight / 2 + 24);
   vertex(x - saltTankWidth / 2, y + saltTankHeight / 2 - 5);
@@ -529,9 +540,9 @@ function drawWater(x, y) {
   fill("PaleTurquoise");
   beginShape();
 
-  if (-saltTankHeight - 1 + state.topOfTankDrainTimer + 5 != 0) {
-    vertex(x - saltTankWidth / 2, y - saltTankHeight / 2 - 1 + state.topOfTankDrainTimer * state.flowRate);
-    vertex(x + saltTankWidth / 2, y - saltTankHeight / 2 - 1 + state.topOfTankDrainTimer * state.flowRate);
+  if (-saltTankHeight - 1 + state.topOfTankDrainTimer + 15 != 0) {
+    vertex(x - saltTankWidth / 2, y - saltTankHeight / 2 + 10 + state.topOfTankDrainTimer * state.flowRate);
+    vertex(x + saltTankWidth / 2, y - saltTankHeight / 2 + 10 + state.topOfTankDrainTimer * state.flowRate);
   }
 
   if (state.doneDrainingTank === true) {
@@ -578,22 +589,24 @@ function drawWater(x, y) {
   push();
   fill("gray");
   rectMode(CENTER);
-  rect(x + 90, y + 220, 20, 50);
+  rect(x + 90, y + saltTankHeight - 55, 20, 50);
   noStroke();
-  rect(x + 90, y + 220, 19, 55);
+  rect(x + 90, y + saltTankHeight - 55, 19, 55);
   pop();
 
   //---------------------Water between pump and pressure gauge---------------------
 
   push();
+  translate(saltTankWidth / 2 - 100, saltTankHeight / 2 - 150 - 25);
+  push();
 
   rectMode(CORNERS);
   noStroke();
   fill("white");
-  rect(x + 178, y + 21, x + 190, y + 119);
+  rect(x + 178, y + 21, x + 190, y + 219);
   rect(x + 220, y - 21, x + 253, y - 21 + 12);
   fill("PaleTurquoise");
-  rect(x + 178, y + 21, x + 190, y + 119);
+  rect(x + 178, y + 21, x + 190, y + 219);
   rect(x + 220, y - 21, x + 253, y - 21 + 12);
 
   pop();
@@ -605,19 +618,21 @@ function drawWater(x, y) {
   rectMode(CORNERS);
   noStroke();
   fill("white");
-  rect(x + 335, y - 21, x + 400, y - 21 + 12);
+  rect(x + 335, y - 21, x + 360, y - 21 + 12);
   fill("PaleTurquoise");
-  rect(x + 335, y - 21, x + 400, y - 21 + 12);
+  rect(x + 335, y - 21, x + 360, y - 21 + 12);
 
   pop();
 
   //---------------------Water filter and beaker---------------------
 
   push();
+  translate(-40, 0);
 
-  //retentate
   rectMode(CORNERS);
   noStroke();
+
+  //retentate
   fill("white");
   rect(x + 752, y - 18, x + 825, y - 18 + 6);
   rect(x + 902, y - 18, x + 936, y - 18 + 6);
@@ -633,6 +648,34 @@ function drawWater(x, y) {
   fill("LightCyan");
   rect(x + 731, y + 38, x + 731 + 6, y + 230);
 
+  pop();
+
+  //---------------------Beakers---------------------
+
+  push();
+  translate(0, -75);
+
+  rectMode(CORNERS);
+  noStroke();
+
+  //retentate
+  fill(170, 255, 230, 180); //retentate green
+  if (state.rententateBeakerTimer <= 100) {
+    rect(x + 878, y + 372 - state.rententateBeakerTimer, x + 962, y + 372);
+  } else {
+    rect(x + 878, y + 272, x + 962, y + 372);
+  }
+
+  //permeate
+  fill(224, 255, 255, 180);
+
+  if (state.permeateBeakerTimer <= 200) {
+    rect(x + 603, y + 372 - state.permeateBeakerTimer, x + 787, y + 372);
+  } else {
+    rect(x + 603, y + 172, x + 787, y + 372);
+  }
+
+  pop();
   pop();
 }
 
@@ -667,7 +710,7 @@ function drawTable() {}
 
 function drawPumpSwitch(x, y, switchValue) {
   push();
-  translate(333, 220);
+  translate(333, 220 - 25);
   fill("lightgray");
   if (switchValue == true) {
     quad(x + 5, y, x + 20, y - 15, x + 15, y - 20, x, y - 5);

@@ -20,6 +20,11 @@ window.state = {
   bottomOfTankDrainTimer: 0,
   doneDrainingTank: false,
   tankToPumpDrainTimer: 0,
+
+  permeateBeakerFillUp: false,
+  retentateBeakerFillUp: false,
+  permeateBeakerTimer: 0,
+  rententateBeakerTimer: 0,
 };
 
 // Load the other scripts (except calcs.js, which is imported in draw.js).
