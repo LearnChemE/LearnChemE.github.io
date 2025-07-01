@@ -4,7 +4,7 @@ import "./style/style.scss";
 import { drawAll } from "./js/draw";
 import { handleInputs } from "./js/inputs";
 import { calcAll } from "./js/calcs";
-import { triggerSpray, playMolecule, pauseMolecule, resetMolecule } from './js/draw';
+import { triggerSpray, playMolecule, pauseMolecule, resetMolecule, resetMoleculeForSliderChange } from './js/draw';
 import "./js/events";
 
 // GLOBAL VARIABLES OBJECT
@@ -125,7 +125,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   ['timeSprayed'].forEach(id => {
     const el = document.getElementById(id);
-    el.addEventListener('input', resetMolecule);
+    el.addEventListener('input', resetMoleculeForSliderChange);
   });
 
   drawAll();

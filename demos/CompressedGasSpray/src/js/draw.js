@@ -221,7 +221,7 @@ function drawGraph(ctx, x0, y0, w, h, data, mode, tMax) {
   } else if (mode === 'moles') {
     curves = [data.nL, data.nV]; colors = ['purple', 'purple']; dashes = [[], [5, 3]]; labels = ['liquid', 'vapor'];
   } else if (mode === 'temperature') {
-    curves = [data.T.map(T => T - 273.15)]; colors = ['black']; dashes = [[]]; labels = [""];
+    curves = [data.T.map(T => T - 273.15)]; colors = ['blue']; dashes = [[]]; labels = [""];
   } else {
     curves = [data.P]; colors = ['blue']; dashes = [[]]; labels = [""];
   }
@@ -234,7 +234,7 @@ function drawGraph(ctx, x0, y0, w, h, data, mode, tMax) {
   const yS = v => y0 + M.top + plotH - ((v - minY) / (maxY - minY)) * plotH;
 
   // Y-ticks
-  ctx.font = '12px sans-serif'; ctx.textAlign = 'right'; ctx.fillStyle = 'black';
+  ctx.font = '16px sans-serif'; ctx.textAlign = 'right'; ctx.fillStyle = 'black';
   let yTickValues;
   if (mode === 'volume') {
     yTickValues = [];
@@ -307,6 +307,7 @@ function drawGraph(ctx, x0, y0, w, h, data, mode, tMax) {
 
     // mid label
     const mid = Math.floor(arr.length / 2);
+    ctx.font = '16px sans-serif';
     ctx.textAlign = 'left'; ctx.fillText(labels[i], xS(data.time[mid]) + 5, yS(arr[mid]) - 5);
     ctx.restore();
   });
@@ -319,13 +320,13 @@ function drawGraph(ctx, x0, y0, w, h, data, mode, tMax) {
   ctx.save();
   ctx.translate(x0 + 15, y0 + M.top + plotH / 2);
   ctx.rotate(-Math.PI / 2);
-  ctx.textAlign = 'center'; ctx.font = '14px sans-serif';
+  ctx.textAlign = 'center'; ctx.font = '18px sans-serif';
   ctx.fillStyle = 'black';
   ctx.fillText(yLabel, 0, 0);
   ctx.restore();
 
   // X-axis label
-  ctx.fillStyle = 'black'; ctx.font = '14px sans-serif';
+  ctx.fillStyle = 'black'; ctx.font = '18px sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('time (s)', x0 + M.left + plotW / 2, y0 + M.top + plotH + 40);
 }
@@ -420,6 +421,18 @@ export function resetMolecule() {
   const defaultPf = 6.8;
   const defaultTfRaw = 25.0 + 273.15;
   showPfTf(defaultPf, defaultTfRaw);
+}
+
+export function resetMoleculeForSliderChange() {
+  playMoleculeFlag = false;
+  pausedMolecule = false;
+  showSpray = false;
+  currentIndex = 0;
+  if (rafId) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+  drawAll();
 }
 
 // Core animation loop: redraws scene and overlays
