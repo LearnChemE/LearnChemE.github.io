@@ -49,7 +49,14 @@ export function drawAll() {
   };
 
   // margin for full curve
-  const allVals = curves[mode];
+  let allVals;
+  if (mode === 'volume') {
+    allVals = [...curves.volume, ...curves.vapor];
+  } else if (mode === 'moles') {
+    allVals = [...curves.moles, ...curves.molesVapor];
+  } else {
+    allVals = curves[mode];
+  }
   const minY = Math.min(0, ...allVals) * 1.1;
   const maxY = Math.max(...allVals) * 1.1;
 
