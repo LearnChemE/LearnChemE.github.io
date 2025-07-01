@@ -104,6 +104,22 @@ function drawCylinder(ctx, centerX, canvasHeight, volumeFraction) {
     bodyWidth,
     liquidHeight
   );
+
+  if (volumeFraction >= 1.0) {
+    ctx.beginPath();
+    ctx.ellipse(
+      centerX,
+      bodyTop,
+      bodyWidth / 2,
+      ellipseRadiusY,
+      0,
+      Math.PI,
+      0
+    );
+    ctx.fillStyle = 'cyan';
+    ctx.fill();    // fill the dome
+    ctx.stroke();  // redraw its border
+  }
   // redraw fill border
   ctx.beginPath();
   ctx.moveTo(centerX - bodyWidth / 2, liquidTopY);
