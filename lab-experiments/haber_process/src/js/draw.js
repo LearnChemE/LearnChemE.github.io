@@ -155,24 +155,24 @@ function drawPressureRegulator(x, y) {
   fill(20);
   rectMode(CORNER);
   // Pressure value background
-  rect(-2.05, -3.375, 5.3, 2.25, 0.125);
+  rect(-2.55, -3.375, 5.3, 2.25, 0.125);
   // Pressure setpoint background
-  rect(-1.25, -0.875, 4.5, 2, 0.125);
+  // rect(-1.25, -0.875, 4.5, 2, 0.125);
   noStroke();
-  fill("white");
-  textAlign(RIGHT, CENTER);
-  textSize(0.75);
-  text("PV", -2.375, -2.25);
-  text("SP", -1.5, 0);
+  // fill("white");
+  // textAlign(RIGHT, CENTER);
+  // textSize(0.75);
+  // text("PV", -2.375, -2.25);
+  // text("SP", -1.5, 0);
   fill("yellow");
   textAlign(CENTER, CENTER);
   textSize(2.25);
   textFont(state.meterFont);
   const P = round(state.P).toFixed(0);
-  text(P, 0.875, -2.375);
+  text(P, 0.275, -2.375);
   textSize(1.75);
   const P_sp = round(state.PSetPoint).toFixed(0);
-  text(P_sp, 1, 0.125);
+  // text(P_sp, 1, 0.125);
   const hover_coords = [
     [81.5, 83.5],
     [84.75, 86.75],
@@ -1336,7 +1336,8 @@ function drawInstructionText() {
   } else if (state.purge_position === 2 && (!state.hasAdjustedPressure || !state.hasAdjustedTemperature)) {
     text("Adjust pressure using the pressure controller\nand temperature on the sand bath.", 0, 0);
   } else if (state.purge_position == 2 && state.reaction_time < 1) {
-    text("System is reaching equilibrium ... please wait", 0, 0);
+    if (state.valve_time < 1) text("Sampling tube is refilling ... please wait", 0, 0);
+    else text("System is reaching equilibrium ... please wait", 0, 0);
   } else if (state.purge_position === 2) {
     text("Sample ready. Click the sampling valve\nto insert to GC, or adjust reaction conditions\nfor a new trial.", 0, 0);
   } else if (state.purge_position === 0 && state.takingSampleTime >= 1) {
@@ -1401,8 +1402,10 @@ export function drawAll() {
   if (state.purging) {
     state.purgingTime = min(1, state.purgingTime + 0.0025);
   }
-  state.reaction_time += state.purging ? 1 : state.takingSample ? 1 : 0.002;
+  state.reaction_time += state.purging ? 1 : state.takingSample ? 1 : deltaTime/4000;
   state.reaction_time = min(state.reaction_time, 1);
+  state.valve_time += deltaTime/4000;
+  state.valve_time = min(state.valve_time, 1);
   state.P = min(state.PSetPoint, maxPressure);
 
   // Recalculate if flagged

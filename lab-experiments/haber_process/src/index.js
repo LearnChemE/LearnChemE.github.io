@@ -30,6 +30,7 @@ window.state = {
   zoomY: 270,
   dragging: false,
   graphYVals: [[],[],[]],
+  valve_time: 1,
 };
 
 const containerElement = document.getElementById("p5-container");
