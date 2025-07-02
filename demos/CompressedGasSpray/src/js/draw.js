@@ -332,7 +332,7 @@ function drawGraph(ctx, x0, y0, w, h, data, mode, tMax) {
 }
 
 // Spray trigger and draw
-export function triggerSpray(duration = 500) {
+export function triggerSpray(duration) {
   showSpray = true;
   clearTimeout(sprayTimer);
   sprayTimer = setTimeout(() => { showSpray = false; }, duration);
@@ -393,6 +393,8 @@ export function playMolecule() {
   currentIndex = 0;
   moleculeStartTs = performance.now();
   moleculeDuration = ((parseInt(document.getElementById('timeSprayed').value, 10)) / 20) * 1000;
+  // spray the entire time the dot is moving
+  triggerSpray(moleculeDuration);
   if (!rafId) {
     rafId = requestAnimationFrame(animationLoop);
   }
