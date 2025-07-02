@@ -88,6 +88,7 @@ body {
     display: flex;
     align-items: center;
     gap: 4px;
+    width:500px;
     
     label {
       font-size: 0.9rem;
@@ -95,16 +96,16 @@ body {
     }
     
     input[type="range"] {
-      // MODIFICATION: Remove flex-grow and set a fixed width
-      width: 150px; // Or any fixed width you prefer
+      flex-grow: 1;
+      box-sizing: border-box;
       -webkit-appearance: none;
       background: transparent;
       margin: 0;
       
       // WebKit track
       &::-webkit-slider-runnable-track {
+        width: 100%;
         height: 4px;
-        // You can remove the width from here as it's now on the main element
         background: darkgray;
         border-radius: 2px;
       }
@@ -123,6 +124,7 @@ body {
       
       // Firefox track
       &::-moz-range-track {
+        width: 100%;
         height: 4px;
         background: darkgray;
         border-radius: 2px;
@@ -155,6 +157,10 @@ body {
       font-size: 0.9rem;
     }
   }
+}
+
+#lengthValue, #elevationValue {
+  width: 30px;
 }
 
 .hamburger-wrapper {
