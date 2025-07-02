@@ -155,24 +155,24 @@ function drawPressureRegulator(x, y) {
   fill(20);
   rectMode(CORNER);
   // Pressure value background
-  rect(-2.05, -3.375, 5.3, 2.25, 0.125);
+  rect(-2.55, -3.375, 5.3, 2.25, 0.125);
   // Pressure setpoint background
-  rect(-1.25, -0.875, 4.5, 2, 0.125);
+  // rect(-1.25, -0.875, 4.5, 2, 0.125);
   noStroke();
-  fill("white");
-  textAlign(RIGHT, CENTER);
-  textSize(0.75);
-  text("PV", -2.375, -2.25);
-  text("SP", -1.5, 0);
+  // fill("white");
+  // textAlign(RIGHT, CENTER);
+  // textSize(0.75);
+  // text("PV", -2.375, -2.25);
+  // text("SP", -1.5, 0);
   fill("yellow");
   textAlign(CENTER, CENTER);
   textSize(2.25);
   textFont(state.meterFont);
   const P = round(state.P).toFixed(0);
-  text(P, 0.875, -2.375);
+  text(P, 0.275, -2.375);
   textSize(1.75);
   const P_sp = round(state.PSetPoint).toFixed(0);
-  text(P_sp, 1, 0.125);
+  // text(P_sp, 1, 0.125);
   const hover_coords = [
     [81.5, 83.5],
     [84.75, 86.75],
