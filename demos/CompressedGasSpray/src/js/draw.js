@@ -88,7 +88,8 @@ export function drawAll() {
 
   // 6) Optionally overlay spray & moving dot (for non-RAF initial draw)
   if (showSpray) drawSpray();
-  if (playMoleculeFlag || pausedMolecule) drawMovingDot(currentIndex);
+  //if (playMoleculeFlag || pausedMolecule) 
+  drawMovingDot(currentIndex);
 }
 
 
