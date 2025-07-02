@@ -387,7 +387,7 @@ export function drawSpray() {
 
 // Molecule animation controls
 export function playMolecule() {
-  hidePfTf();
+  //hidePfTf();
   playMoleculeFlag = true;
   pausedMolecule = false;
   currentIndex = 0;
@@ -420,7 +420,7 @@ export function resetMolecule() {
   drawAll();
   const defaultPf = 6.8;
   const defaultTfRaw = 25.0 + 273.15;
-  showPfTf(defaultPf, defaultTfRaw);
+  //showPfTf(defaultPf, defaultTfRaw);
 }
 
 export function resetMoleculeForSliderChange() {
@@ -464,7 +464,7 @@ function animationLoop(timestamp) {
   if (keepMoving || keepSpraying) {
     rafId = requestAnimationFrame(animationLoop);
   } else {
-    showPfTf(gd.Praw[currentIndex], gd.Traw[currentIndex]);
+    //showPfTf(gd.Praw[currentIndex], gd.Traw[currentIndex]);
     rafId = null;
   }
 }
@@ -509,23 +509,23 @@ export function drawMovingDot(idx) {
   }
 }
 
-function updatePfTf(pf, tf) {
-  const pfEl = document.getElementById("pfDisplay");
-  const tfEl = document.getElementById("tfDisplay");
-  if (pfEl) pfEl.innerHTML = `P<sub>f</sub> = ${pf.toFixed(1)} bar`;
-  if (tfEl) tfEl.innerHTML = `T<sub>f</sub> = ${(tf - 273.15).toFixed(1)} K`;
-}
+// function updatePfTf(pf, tf) {
+//   const pfEl = document.getElementById("pfDisplay");
+//   const tfEl = document.getElementById("tfDisplay");
+//   if (pfEl) pfEl.innerHTML = `P<sub>f</sub> = ${pf.toFixed(1)} bar`;
+//   if (tfEl) tfEl.innerHTML = `T<sub>f</sub> = ${(tf - 273.15).toFixed(1)} K`;
+// }
 
-function hidePfTf() {
-  const sec = document.getElementById("mathsection");
-  if (sec) sec.style.display = "none";
-}
+// function hidePfTf() {
+//   const sec = document.getElementById("mathsection");
+//   if (sec) sec.style.display = "none";
+// }
 
-function showPfTf(pf, tf) {
-  updatePfTf(pf, tf);
-  const sec = document.getElementById("mathsection");
-  if (sec) sec.style.display = "block";
-}
+// function showPfTf(pf, tf) {
+//   updatePfTf(pf, tf);
+//   const sec = document.getElementById("mathsection");
+//   if (sec) sec.style.display = "block";
+// }
 
 // Draws one full frame (cylinder + graph) at currentIndex
 function drawFrame() {
