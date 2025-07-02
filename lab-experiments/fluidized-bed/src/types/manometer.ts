@@ -109,10 +109,14 @@ class VaryingTube {
      * @returns Promise<void>
      */
     public setTargetTimeDelay = async (target: number, timeDelay: number) => {
-        setTimeout(() => {
+        if (timeDelay > 0) setTimeout(() => {
             this.target = target;
             this.animate();
         }, timeDelay);
+        else {
+            this.target = target;
+            this.animate();
+        }
         return;
     }
 
@@ -135,13 +139,19 @@ class VaryingTube {
     
             // Calculate elapsed time
             const deltaTime = time - prevTime;
+            const MaxSpeed = 1e-5;
     
             // Calculate the interpolation factor t (from 0 to 1)
             var t = this.current; // Ensure t doesn't go beyond 1
     
             // Interpolate between start and end
-            t = (t - this.target) * this.r ** deltaTime + this.target;
-            this.current = t;
+            const exponential = (t - this.target) * this.r ** deltaTime + this.target;
+            if (Math.abs(exponential - t) < MaxSpeed * deltaTime) t = exponential;
+            else {
+                t = t + MaxSpeed * deltaTime * Math.sign(this.target - t);
+            }
+            
+            this.current = 1;
     
             // Call the update callback with the interpolated value
             this.update(t);
@@ -172,8 +182,8 @@ export class Manometer {
     private initRight: boolean = false;
 
     constructor() {
-        this.inTube  = new VaryingTube( "Tube_6", TubeDirection.Left, 2000); // 6 for left
-        this.outTube = new VaryingTube("Tube_15", TubeDirection.Left, 2000); // 14 for right
+        this.inTube  = new VaryingTube("Tube_6" , TubeDirection.Left, 5000); // 6 for left
+        this.outTube = new VaryingTube("Tube_15", TubeDirection.Left, 5000); // 14 for right
 
         // Get the bounding box and use to find bottom and height of manometer tube section
         const rect = document.getElementById("Tube_16") as unknown as SVGAElement;
@@ -192,7 +202,7 @@ export class Manometer {
      * @param dif 
      * @returns void promise
      */
-    public fillTubes = async () => {
+    public fillTubes = async (timeDelay: number) => {
         // If init hasn't been called, return
         if (this.initLeft === false) return;
 
@@ -209,8 +219,8 @@ export class Manometer {
         right = (this.bottom - right) / this.height;
 
         // Set the left tube only
-        if (this.initLeft)  this.inTube.setTargetTimeDelay(left, 500);
-        if (this.initRight) this.outTube.setTargetTimeDelay(right, 500);
+        if (this.initLeft)  this.inTube.setTargetTimeDelay(left, timeDelay);
+        if (this.initRight) this.outTube.setTargetTimeDelay(right, timeDelay);
         return;
     }
 
@@ -227,7 +237,7 @@ export class Manometer {
         // this.inTube.setTarget(level);
         this.initLeft = true;
         this.initRight = false;
-        this.fillTubes();
+        this.fillTubes(0);
         return;
     }
     /**
@@ -237,7 +247,7 @@ export class Manometer {
     public initialFill = async () => {
         this.initLeft = true;
         this.initRight = true;
-        this.fillTubes();
+        this.fillTubes(0);
         return;
     }
 }

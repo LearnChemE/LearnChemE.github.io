@@ -8,3 +8,4 @@ import "./js/state";
 import "./js/calculations.ts";
 import "./js/interactions.ts";
 import "./js/canvas";
+// import "./debug.ts"; // For debug server

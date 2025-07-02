@@ -68,7 +68,7 @@ export function initAnimationObjects() {
 
     // Beakers
     beakers = new BeakerHolder();
-    beakers.setCatchWeighCallback(() => manometer.fillTubes());
+    beakers.setCatchWeighCallback(() => manometer.fillTubes(0));
 }
 
 
@@ -131,7 +131,7 @@ export async function beginTubeFillAnimation() {
  * @returns void promise
  */
 export async function onLiftChange() {
-    manometer.fillTubes();
+    manometer.fillTubes(500);
     return;
 }
 

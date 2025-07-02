@@ -220,7 +220,6 @@ export function enableSvgDrag() {
     let prevY = 0;
 
     svg.addEventListener("mousedown", (e) => {
-        console.log(e.target)
         if (containsParentWithID(e.target as HTMLElement, ['Valve','Valve_2'])) return;
         mousedown = true;
         isDragging = true;
