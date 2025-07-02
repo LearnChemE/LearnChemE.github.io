@@ -1336,7 +1336,8 @@ function drawInstructionText() {
   } else if (state.purge_position === 2 && (!state.hasAdjustedPressure || !state.hasAdjustedTemperature)) {
     text("Adjust pressure using the pressure controller\nand temperature on the sand bath.", 0, 0);
   } else if (state.purge_position == 2 && state.reaction_time < 1) {
-    text("System is reaching equilibrium ... please wait", 0, 0);
+    if (state.valve_time < 1) text("Sampling tube is refilling ... please wait", 0, 0);
+    else text("System is reaching equilibrium ... please wait", 0, 0);
   } else if (state.purge_position === 2) {
     text("Sample ready. Click the sampling valve\nto insert to GC, or adjust reaction conditions\nfor a new trial.", 0, 0);
   } else if (state.purge_position === 0 && state.takingSampleTime >= 1) {
@@ -1401,8 +1402,10 @@ export function drawAll() {
   if (state.purging) {
     state.purgingTime = min(1, state.purgingTime + 0.0025);
   }
-  state.reaction_time += state.purging ? 1 : state.takingSample ? 1 : deltaTime/5000;
+  state.reaction_time += state.purging ? 1 : state.takingSample ? 1 : deltaTime/4000;
   state.reaction_time = min(state.reaction_time, 1);
+  state.valve_time += deltaTime/4000;
+  state.valve_time = min(state.valve_time, 1);
   state.P = min(state.PSetPoint, maxPressure);
 
   // Recalculate if flagged

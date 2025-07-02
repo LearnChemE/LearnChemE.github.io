@@ -143,6 +143,7 @@ function handlePurge() {
     } else {
       state.purging = false;
       state.takingSample = false;
+      state.valve_time = 0;
       calcAll();
     }
   }
