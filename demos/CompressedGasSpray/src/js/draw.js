@@ -88,7 +88,8 @@ export function drawAll() {
 
   // 6) Optionally overlay spray & moving dot (for non-RAF initial draw)
   if (showSpray) drawSpray();
-  if (playMoleculeFlag || pausedMolecule) drawMovingDot(currentIndex);
+  //if (playMoleculeFlag || pausedMolecule) 
+  drawMovingDot(currentIndex);
 }
 
 
@@ -332,7 +333,7 @@ function drawGraph(ctx, x0, y0, w, h, data, mode, tMax) {
 }
 
 // Spray trigger and draw
-export function triggerSpray(duration = 500) {
+export function triggerSpray(duration) {
   showSpray = true;
   clearTimeout(sprayTimer);
   sprayTimer = setTimeout(() => { showSpray = false; }, duration);
@@ -387,12 +388,14 @@ export function drawSpray() {
 
 // Molecule animation controls
 export function playMolecule() {
-  hidePfTf();
+  //hidePfTf();
   playMoleculeFlag = true;
   pausedMolecule = false;
   currentIndex = 0;
   moleculeStartTs = performance.now();
   moleculeDuration = ((parseInt(document.getElementById('timeSprayed').value, 10)) / 20) * 1000;
+  // spray the entire time the dot is moving
+  triggerSpray(moleculeDuration);
   if (!rafId) {
     rafId = requestAnimationFrame(animationLoop);
   }
@@ -420,7 +423,7 @@ export function resetMolecule() {
   drawAll();
   const defaultPf = 6.8;
   const defaultTfRaw = 25.0 + 273.15;
-  showPfTf(defaultPf, defaultTfRaw);
+  //showPfTf(defaultPf, defaultTfRaw);
 }
 
 export function resetMoleculeForSliderChange() {
@@ -464,7 +467,7 @@ function animationLoop(timestamp) {
   if (keepMoving || keepSpraying) {
     rafId = requestAnimationFrame(animationLoop);
   } else {
-    showPfTf(gd.Praw[currentIndex], gd.Traw[currentIndex]);
+    //showPfTf(gd.Praw[currentIndex], gd.Traw[currentIndex]);
     rafId = null;
   }
 }
@@ -509,23 +512,23 @@ export function drawMovingDot(idx) {
   }
 }
 
-function updatePfTf(pf, tf) {
-  const pfEl = document.getElementById("pfDisplay");
-  const tfEl = document.getElementById("tfDisplay");
-  if (pfEl) pfEl.innerHTML = `P<sub>f</sub> = ${pf.toFixed(1)} bar`;
-  if (tfEl) tfEl.innerHTML = `T<sub>f</sub> = ${(tf - 273.15).toFixed(1)} K`;
-}
+// function updatePfTf(pf, tf) {
+//   const pfEl = document.getElementById("pfDisplay");
+//   const tfEl = document.getElementById("tfDisplay");
+//   if (pfEl) pfEl.innerHTML = `P<sub>f</sub> = ${pf.toFixed(1)} bar`;
+//   if (tfEl) tfEl.innerHTML = `T<sub>f</sub> = ${(tf - 273.15).toFixed(1)} K`;
+// }
 
-function hidePfTf() {
-  const sec = document.getElementById("mathsection");
-  if (sec) sec.style.display = "none";
-}
+// function hidePfTf() {
+//   const sec = document.getElementById("mathsection");
+//   if (sec) sec.style.display = "none";
+// }
 
-function showPfTf(pf, tf) {
-  updatePfTf(pf, tf);
-  const sec = document.getElementById("mathsection");
-  if (sec) sec.style.display = "block";
-}
+// function showPfTf(pf, tf) {
+//   updatePfTf(pf, tf);
+//   const sec = document.getElementById("mathsection");
+//   if (sec) sec.style.display = "block";
+// }
 
 // Draws one full frame (cylinder + graph) at currentIndex
 function drawFrame() {
