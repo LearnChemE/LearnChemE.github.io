@@ -1401,7 +1401,7 @@ export function drawAll() {
   if (state.purging) {
     state.purgingTime = min(1, state.purgingTime + 0.0025);
   }
-  state.reaction_time += state.purging ? 1 : state.takingSample ? 1 : 0.002;
+  state.reaction_time += state.purging ? 1 : state.takingSample ? 1 : deltaTime/5000;
   state.reaction_time = min(state.reaction_time, 1);
   state.P = min(state.PSetPoint, maxPressure);
 
