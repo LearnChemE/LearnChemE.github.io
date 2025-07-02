@@ -78,8 +78,8 @@
       <!-- Sliders / Inputs Section -->
       <div class="inputs-wrapper">
         <div class="sliders-wrapper">
-          <div class="input-row">
-            <div class="input-label">Feed Pressure</div>
+          <div class="input-row top">
+            <div class="input-label">feed pressure</div>
             <div class="slider-container">
               <input
                 type="range"
@@ -95,7 +95,7 @@
           </div>
 
           <div class="input-row">
-            <div class="input-label">Feed Temperature</div>
+            <div class="input-label">feed temperature</div>
             <div class="slider-container">
               <input
                 type="range"
@@ -109,9 +109,38 @@
               <div class="slider-units">°C</div>
             </div>
           </div>
+        </div>
+
+        <div class="sliders-wrapper left">
+          <div class="buttons-wrapper">
+            <button
+              type="button"
+              class="btn btn-primary btn-sm"
+              data-bs-toggle="modal"
+              data-bs-target="#directions-modal"
+            >
+              directions
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary btn-sm"
+              data-bs-toggle="modal"
+              data-bs-target="#details-modal"
+            >
+              details
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary btn-sm"
+              data-bs-toggle="modal"
+              data-bs-target="#about-modal"
+            >
+              about
+            </button>
+          </div>
 
           <div class="input-row">
-            <div class="input-label">NaCl Concentration</div>
+            <div class="input-label">NaCl concentration</div>
             <div class="slider-container">
               <input
                 type="range"
@@ -125,33 +154,6 @@
               <div class="slider-units">%</div>
             </div>
           </div>
-        </div>
-
-        <div class="buttons-wrapper">
-          <button
-            type="button"
-            class="btn btn-primary btn-sm"
-            data-bs-toggle="modal"
-            data-bs-target="#directions-modal"
-          >
-            directions
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary btn-sm"
-            data-bs-toggle="modal"
-            data-bs-target="#details-modal"
-          >
-            details
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary btn-sm"
-            data-bs-toggle="modal"
-            data-bs-target="#about-modal"
-          >
-            about
-          </button>
         </div>
       </div>
 

@@ -44,13 +44,13 @@ window.draw = function () {
   frameRate(30);
 
   // Title and parameters display first
-  textSize(18);
+  /* textSize(18);
   fill(0);
   text("Reverse Osmosis Visualization", 20, 30);
   textSize(16);
   text(`Feed Pressure: ${g.feedPressure.toFixed(1)} bar`, 20, 60);
   text(`Salt Concentration: ${g.saltConc.toFixed(2)}%`, 20, 85);
-  text(`Feed Temp: ${g.feedTemp} °C`, 20, 110);
+  text(`Feed Temp: ${g.feedTemp} °C`, 20, 110); */
 
   // Draw pipe first so it appears behind everything
   //drawPipeAndPump(150, 250);

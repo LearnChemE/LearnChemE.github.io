@@ -14,40 +14,75 @@
 }
 
 .inputs-wrapper {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 40px;
-  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
   margin-top: 5px;
   margin-bottom: 5px;
   width: 700px;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.sliders-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sliders-wrapper.left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-left: 10px;
 }
 
 .buttons-wrapper {
-  display: grid;
-  gap: 5px;
+  justify-content: center;
+  display: flex;
+  gap: 8px;
+  padding-top: 2px;
+  padding-right: 5px;
 }
 
-.buttons-wrapper>.btn {
-  width: 83px;
+.buttons-wrapper > .btn {
+  width: 90px;
+  height: 32px;
   padding: 3px 5px;
 }
 
 .input-row {
-  display: grid;
-  grid-template-columns: 180px max-content;
+  display: inline-flex;
+  white-space: nowrap;
   gap: 10px;
   align-items: center;
-  justify-content: center;
-  margin-top: 5px;
-  width: 100%;
+  justify-content: flex-start;
+  width: fit-content;
+  max-width: 100%;
+  padding-left: 0;
+  box-sizing: border-box;
+}
+
+.input-row.top {
+  display: inline-flex;
+  white-space: nowrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  width: fit-content;
+  max-width: 100%;
+  padding-left: 0;
+  box-sizing: border-box;
+  margin-top: 10px;
 }
 
 .slider-container {
-  display: grid;
-  grid-template-columns: 240px 30px 30px;
+  display: inline-flex;
   align-items: center;
   gap: 5px;
+  white-space: nowrap;
+  width: fit-content;
 }
 
 .current-value {
@@ -55,9 +90,10 @@
 }
 
 .input-label {
-  font-weight: bold;
-  font-size: 14px;
-  justify-self: end;
+  display: grid;
+  font-size: 16px;
+  justify-content: end;
+  width: 135px;
 }
 
 .value-label {
@@ -136,7 +172,6 @@ input[type="range"] {
   border-radius: 3px;
 }
 
-
 /* Make disabled inputs look cleaner */
 
 .mixture-data input:disabled {
@@ -144,7 +179,6 @@ input[type="range"] {
   border: none;
   background-color: #f9f9f9;
 }
-
 
 /* Add this to your CSS */
 
