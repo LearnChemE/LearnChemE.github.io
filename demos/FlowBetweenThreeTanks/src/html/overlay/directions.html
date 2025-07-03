@@ -9,11 +9,29 @@
         </div>
         
         <div class="modal-body">
-            <p>
-              This simulation seeks to illustrate how Bernoulli’s principle should be applied while also accounting for pipe losses. There are three tanks in this simulation, which are connected via pipes and a common hinge. The goal of this simulation is to allow the height of tank B to be a variable and determine the direction in which the water should flow. The user is encouraged to change the height of tank B using slider and observe the changes in the direction of water flow.  The arrows indicate the answer.
-            </p>
-            
-            <p>A user is encouraged to perform calculations assuming friction factor f = 0.02 for all pipes.</p>
+          <p>
+            The simulation enables the change of two parameters: height of tank B (\( h_B \)) and the horizontal distance between tanks B and C (\( d_{BC} \)). The changing of these parameters also changes the length connecting tanks A and B, and tanks B and C, denoted as \( \ell_{AB} \) and \( \ell_{BC} \), respectively. The horizontal distance between tanks A and B (\( d_{AB} \)) and the heights of tanks A and C, i.e., \( h_A \) and \( h_C \), are fixed. Note that:
+          </p>
+          <p>
+            \[
+            \ell_{BC} = \sqrt{ (h_B - h_C)^2 + d_{BC}^2 }, \quad
+            \ell_{AB} = \sqrt{ (h_A - h_B)^2 + d_{AB}^2 }
+            \]
+          </p>
+          <p>
+            Change the parameters such that you can balance the flowrate into tank B from A (\( Q_{\text{in}} \)) and flowrate out from tank B to C (\( Q_{\text{out}} \)).
+          </p>
+
+          <p><strong>Qualitative understanding:</strong></p>
+          <p>
+            Try to reason why changing \( h_B \) and \( d_{BC} \) modify \( Q_{\text{in}} \) and \( Q_{\text{out}} \). Keep \( d_{BC} \) fixed and change \( h_B \). How do \( Q_{\text{in}} \) and \( Q_{\text{out}} \) get impacted and why? Similarly, keep \( h_B \) fixed and change \( d_{BC} \). How do \( Q_{\text{in}} \) and \( Q_{\text{out}} \) get impacted and why?
+          </p>
+
+          <p><strong>Quantitative understanding:</strong></p>
+          <ol>
+            <li>By using Bernoulli's equation with friction losses as a balance, derive a condition between \( h_A \), \( h_B \), \( h_C \), \( d_{AB} \), and \( d_{BC} \) to satisfy \( Q_{\text{in}} = Q_{\text{out}} \). Assume a friction factor \( f = 0.02 \) for all pipes and that the level of the water in the tank does not change. Assume that the diameter of all the pipes is 1 ft.</li>
+            <li>Based on the condition in 1, calculate the value of \( d_{BC} \) if a) \( h_B = 30 \) ft and b) \( h_B = 50 \) ft at which \( Q_{\text{in}} = Q_{\text{out}} = Q \). Find the value of \( Q \). Verify the results from the simulation. The results are provided in the Details tab.</li>
+          </ol>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

@@ -10,8 +10,9 @@
         
         // --- Button Configuration ---
         const buttons = [
+            { label: 'About', url: 'html/overlay/about.html', action: 'modal' },
             { label: 'Directions', url: 'html/overlay/directions.html', action: 'modal' },
-            { label: 'About', url: 'html/overlay/about.html', action: 'modal' }//,
+            { label: 'Details', url: 'html/overlay/details.html', action: 'modal' }
             // { label: 'Worksheet', url: 'assets/worksheet.pdf', action: 'download', filename: 'worksheet.pdf' }
         ];
         
@@ -50,6 +51,10 @@
                             }
                             const modal = new bootstrap.Modal(modalEl); // Create new instance
                             modal.show();
+
+                            if (window.MathJax && window.MathJax.typesetPromise) {
+                                window.MathJax.typesetPromise([container]);
+                            }
                         } else {
                             console.error(`Modal element with ID '${modalId}' not found in fetched HTML from ${btnConfig.url}.`);
                         }
