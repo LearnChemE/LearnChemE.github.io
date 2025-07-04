@@ -165,7 +165,7 @@ export function handleInputs() {
       return; // Cooling switch was clicked
     }
 
-    if (handleBulbClick(mx, my,  130, 50)){
+    if (handleBulbClick(mx, my,  129.5, 33)){
       return; // Bulb was clicked
     }
     // Add more click handlers here if needed

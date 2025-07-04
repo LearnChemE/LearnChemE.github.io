@@ -1,5 +1,7 @@
-// js/condenser.js - Fixed liquid flow and timing
+// js/condenser.js - Enhanced with state-coordinated flow control
 // export { condenserCoolingOn };
+
+import { getExperimentState } from "./draw.js";
 
 window.condenserCoolingOn = false;
 let coolingCoilColor = 120; // steel gray by default
@@ -13,6 +15,13 @@ let drainStartTime = 0;
 let condensateBands = [];
 
 export let condenserParticles = [];
+
+// ✅ ENHANCED: Material balance state tracking with experiment coordination
+let experimentStartTime = null;
+let totalPropanolFed = 0; // mol
+let propanolConsumed = 0; // mol
+let liquidProductMass = 0; // g
+let lastExperimentState = "IDLE";
 
 export function drawCondenserBody(x = 200, y = 50) {
   push();
@@ -35,7 +44,7 @@ export function drawCondenserBody(x = 200, y = 50) {
     const innerH = bodyHeight - wallThickness * 0.6;
     const innerRadius = borderRadius - wallThickness * 0.8;
 
-    // === Rounded rectangle clipping path (copied from evaporator) ===
+    // === Rounded rectangle clipping path ===
     drawingContext.moveTo(innerX + innerRadius, innerY);
     drawingContext.lineTo(innerX + innerW - innerRadius, innerY);
     drawingContext.quadraticCurveTo(innerX + innerW, innerY, innerX + innerW, innerY + innerRadius);
@@ -194,22 +203,38 @@ export function drawCollectingBeaker(x = 20, y = 50, fluidLevel = 0.5) {
   rect(innerX - 1.5, fluidY, innerW + 3, fluidH);
 
   // === Graduation Marks ===
-  const steps = 5;
-  const maxValue = 1000;
-  const markSpacing = (height - 2 * wall) / steps;
+  const maxValue = 250;
+  const minorSteps = 25; // Every 10mL from 0 to 250
+  const markSpacing = (height - 2 * wall) / minorSteps;
   const startY = height - wall + 2.5;
 
   stroke(20);
-  strokeWeight(0.1);
   fill(0);
-  textSize(2);
   textAlign(LEFT, CENTER);
 
-  for (let i = 1; i <= steps; i++) {
+  for (let i = 1; i <= minorSteps; i++) {
     const yMark = startY - i * markSpacing;
-    const value = i * (maxValue / steps);
-    line(wall + 3, yMark, wall + 10, yMark);
-    text(value, wall + 10, yMark);
+    const value = i * (maxValue / minorSteps); // Every 10mL
+    
+    // Determine if this is a major (50mL) or minor (10mL) mark
+    const isMajorMark = (value % 50 === 0);
+    
+    if (isMajorMark) {
+      // === Major marks with labels (50, 100, 150, 200, 250 mL) ===
+      strokeWeight(0.2);
+      line(wall + 3, yMark, wall + 10, yMark); // Long line
+      
+      // Add number label
+      noStroke();
+      textSize(2);
+      text(value, wall + 10, yMark);
+      stroke(20);
+      
+    } else {
+      // === Minor marks - lines only (10, 20, 30, 40, 60, 70, etc.) ===
+      strokeWeight(0.1);
+      line(wall + 5, yMark, wall + 8, yMark); // Short line, no label
+    }
   }
 
   // mL label
@@ -246,9 +271,10 @@ export function drawCondensateTube() {
   pop();
 }
 
-// ✅ FIXED: Smooth animated liquid flow through the tube with proper positioning
+// ✅ ENHANCED: State-coordinated liquid flow animation
 export function drawCondensateTubeStream() {
-  if (!drainingToBeaker) return;
+  // ✅ Only show liquid stream if experiment flows are active
+  if (!drainingToBeaker || !window.experimentFlowsActive) return;
 
   const tubeX = 104; // Center X of the tube
   const topY = 62;   // Start of tube (bottom of condenser)
@@ -294,6 +320,9 @@ export function drawCondensateTubeStream() {
 
 // ✅ SIMPLIFIED: This function now just adds particles to the condenser's internal system
 export function addParticleToCondenser() {
+  // ✅ Only add particles if experiment flows are active
+  if (!window.experimentFlowsActive) return;
+  
   condenserParticles.push({
     x: 200, // Start at left edge of condenser
     y: 67.5, // Center Y of condenser
@@ -304,7 +333,7 @@ export function addParticleToCondenser() {
   });
 }
 
-// ✅ MAIN FUNCTION: This handles the condensation process inside the condenser
+// ✅ ENHANCED: State-coordinated condensation process
 export function drawCondenserParticles() {
   const condenserCenterX = 210;
   const condenserCenterY = 67.5;
@@ -356,28 +385,220 @@ export function drawCondenserParticles() {
     }
   }
 
-  // ✅ FIXED: Wait until condenser is 1/4th full before starting flow
-  if (condenserLiquidLevel > 0.25 && condensedFluidLevel < 0.6) { // 1/4 = 0.25
-    if (!drainingToBeaker) {
-      drainingToBeaker = true;
-      drainStartTime = millis();
-    }
-    
-    // ✅ SLOWER: Reduced transfer rate for delayed beaker filling
-    const transferRate = 0.0005; // Much slower transfer rate
-    condenserLiquidLevel = max(condenserLiquidLevel - transferRate, 0);
-    condensedFluidLevel = min(condensedFluidLevel + transferRate, 0.6);
-    
-    // Only stop when truly empty or full, with small buffer
-    if (condensedFluidLevel >= 0.58 || condenserLiquidLevel <= 0.02) {
-      drainingToBeaker = false;
-      // Gradually clear remaining droplets instead of instant clear
-      if (condenserLiquidLevel <= 0.02) {
-        // Let existing droplets finish their animation naturally
-      }
-    }
-  } else if (condenserLiquidLevel <= 0.05) {
-    // Only stop draining when liquid is very low
-    drainingToBeaker = false;
+  // ✅ ENHANCED: State-coordinated material balance with early completion
+  const currentTemp = window.reactorTemp || 300;
+  const currentState = getExperimentState();
+  const materialBalance = coordinateFlowRates(currentTemp);
+  
+  // ✅ NEW: Make beaker progress available globally for evaporator coordination
+  window.condensedFluidLevel = condensedFluidLevel;
+  window.targetCollection = materialBalance.targetCollection;
+  
+  // ✅ Handle state transitions
+  if (currentState !== lastExperimentState) {
+    handleStateChange(currentState, lastExperimentState);
+    lastExperimentState = currentState;
   }
+  
+  // ✅ Only process liquid flow during FILLING state
+  if (currentState === "FILLING" && window.experimentFlowsActive) {
+    // ✅ Wait until condenser is 1/4th full before starting flow
+    if (condenserLiquidLevel > 0.25 && condensedFluidLevel < materialBalance.targetCollection) {
+      if (!drainingToBeaker) {
+        drainingToBeaker = true;
+        drainStartTime = millis();
+        console.log(`Starting liquid collection at ${currentTemp}°C`);
+      }
+      
+      // ✅ Use realistic transfer rate based on temperature
+      condensedFluidLevel += materialBalance.liquidFillRate;
+      condenserLiquidLevel = max(0, condenserLiquidLevel - materialBalance.liquidFillRate * 0.8);
+      
+      // ✅ ENHANCED: Progressive condenser draining - normal until target-20mL, then fast drain
+      const targetLevel = materialBalance.targetCollection;
+      const target_mL = targetLevel * 250; // Convert to mL (155mL or 185mL)
+      const current_mL = condensedFluidLevel * 250; // Current beaker level in mL
+      const threshold_mL = target_mL - 5; // Start fast drain 20mL before target
+      
+      // Normal draining until 20mL before target
+      if (current_mL < threshold_mL) {
+        // Standard draining rate - let it behave normally
+        // (condenserLiquidLevel already being reduced by standard rate above)
+      } else {
+        // Fast draining in final 20mL approach to target
+        const fastDrainRate = 0.008; // 4x faster than normal
+        if (condenserLiquidLevel > 0) {
+          condenserLiquidLevel = max(0, condenserLiquidLevel - fastDrainRate);
+          console.log(`Fast drain active: ${current_mL.toFixed(0)}mL/${target_mL.toFixed(0)}mL (${(target_mL - current_mL).toFixed(0)}mL to target)`);
+        }
+      }
+      
+      // ✅ NEW: Check if target collection is reached - stop flow but keep equipment on
+      if (condensedFluidLevel >= materialBalance.targetCollection) {
+        condensedFluidLevel = materialBalance.targetCollection; // Cap at target
+        drainingToBeaker = false;
+        condensateBands = []; // Clear flowing liquid
+        
+        // ✅ FINAL DRAIN: Empty condenser completely when target reached
+        condenserLiquidLevel = 0;
+        console.log("🫗 Final drain: Condenser emptied completely");
+        
+        // ✅ SIMPLIFIED: Just transition to COMPLETE state, no equipment shutdown
+        if (typeof window.setExperimentComplete === 'function') {
+          window.setExperimentComplete();
+          console.log(`🎯 Target reached! Experiment ready for measurement at ${currentTemp}°C`);
+          console.log(`Collected: ${(materialBalance.targetCollection * 250).toFixed(0)}mL - condenser fully drained`);
+        }
+      }
+      
+    } else if (condenserLiquidLevel <= 0.05) {
+      // Only stop draining when liquid is very low
+      drainingToBeaker = false;
+    }
+  } else if (currentState === "COMPLETE" || currentState === "MEASURING") {
+    // ✅ SIMPLIFIED: Just stop liquid flows, keep everything else running
+    drainingToBeaker = false;
+    condensateBands = []; // Clear flowing liquid
+    
+    // ✅ Keep beaker level stable at target, condenser stays empty
+    const materialBalance = coordinateFlowRates(currentTemp);
+    condensedFluidLevel = materialBalance.targetCollection; // Maintain target level
+    condenserLiquidLevel = 0; // Keep condenser empty after completion
+  }
+}
+
+// ✅ NEW: Handle experiment state changes
+function handleStateChange(newState, oldState) {
+  console.log(`🔄 Condenser: State change ${oldState} → ${newState}`);
+  
+  switch (newState) {
+    case "IDLE":
+      // Reset all condenser state
+      experimentStartTime = null;
+      totalPropanolFed = 0;
+      propanolConsumed = 0;
+      liquidProductMass = 0;
+      drainingToBeaker = false;
+      condensateBands = [];
+      condenserLiquidLevel = 0;
+      condensedFluidLevel = 0; // ✅ Reset beaker to empty for new experiment
+      console.log("🔄 Condenser reset to initial state - beaker emptied");
+      break;
+      
+    case "FILLING":
+      if (oldState === "IDLE") {
+        experimentStartTime = millis();
+        console.log("🚀 Condenser: Starting material balance tracking");
+      }
+      break;
+      
+    case "COMPLETE":
+      // Stop all flows immediately
+      drainingToBeaker = false;
+      condensateBands = [];
+      console.log("⏹️ Condenser: All flows stopped - experiment complete");
+      console.log("🫗 Condenser will drain, beaker level maintained");
+      break;
+      
+    case "MEASURING":
+      // Maintain stopped state during measurement
+      break;
+      
+    case "RESET":
+      // Will transition to IDLE on next frame
+      break;
+  }
+}
+
+// ✅ ENHANCED: Realistic material balance calculations with state coordination
+export function coordinateFlowRates(temp) {
+  const currentState = getExperimentState();
+  
+  // ✅ No flow rates outside of FILLING state
+  if (currentState !== "FILLING" || !window.experimentFlowsActive) {
+    return { 
+      gasFlowRate: 0, 
+      liquidFillRate: 0, 
+      targetCollection: condensedFluidLevel, // Maintain current level
+      conversion: 0 
+    };
+  }
+
+  // Initialize experiment if not started
+  if (!experimentStartTime && window.reactorHeaterOn && temp >= 290) {
+    experimentStartTime = millis();
+    totalPropanolFed = 0;
+    propanolConsumed = 0;
+    liquidProductMass = 0;
+    console.log("Material balance experiment started");
+  }
+
+  // Reset if heater turned off
+  if (!window.reactorHeaterOn) {
+    experimentStartTime = null;
+    return { gasFlowRate: 0, liquidFillRate: 0, targetCollection: 0, conversion: 0 };
+  }
+
+  // Calculate based on worksheet stoichiometry
+  const propanolFed = 3.33; // mol (250 mL * 0.8 g/mL / 60 g/mol)
+  let conversion, gasProduced_mol, liquidProduced_mL, vaporFlowRate_mL_s;
+  
+  if (temp >= 300 && temp < 330) {
+    conversion = 0.40; // 40% conversion at 300°C
+    gasProduced_mol = propanolFed * conversion; // 1.33 mol gas total
+    liquidProduced_mL = 155; // Target: ~155 mL liquid collection
+    vaporFlowRate_mL_s = 2.5; // 2.5 mL/s gas flow rate
+  } else if (temp >= 330) {
+    conversion = 0.60; // 60% conversion at 330°C
+    gasProduced_mol = propanolFed * conversion; // 2.0 mol gas total
+    liquidProduced_mL = 185; // Target: ~185 mL liquid collection
+    vaporFlowRate_mL_s = 6.0; // 6.0 mL/s gas flow rate
+  } else {
+    // Below reaction temperature
+    conversion = 0;
+    gasProduced_mol = 0;
+    liquidProduced_mL = 0;
+    vaporFlowRate_mL_s = 0;
+  }
+
+  // Convert to simulation scale (250 mL beaker = 1.0 scale)
+  const targetCollection = liquidProduced_mL / 250; // Scale to 0-1
+  
+  // ✅ ENHANCED: More realistic fill rate coordination with experiment timing
+  const experimentDuration_s = 120; // 2 minutes
+  const liquidFillRate = targetCollection / (experimentDuration_s * 60) * 2.0; // per frame at 60fps
+
+  console.log(`Temp: ${temp}°C, Conversion: ${(conversion*100).toFixed(0)}%, Target: ${liquidProduced_mL}mL, Gas: ${vaporFlowRate_mL_s}mL/s`);
+
+  return {
+    gasFlowRate: vaporFlowRate_mL_s,
+    liquidFillRate: liquidFillRate,
+    targetCollection: targetCollection,
+    conversion: conversion,
+    propanolReacted: propanolFed * conversion,
+    propanolUnreacted: propanolFed * (1 - conversion)
+  };
+}
+
+// ✅ NEW: Get current material balance data for display
+export function getMaterialBalanceData() {
+  const currentTemp = window.reactorTemp || 300;
+  return coordinateFlowRates(currentTemp);
+}
+
+// ✅ NEW: Check if condenser is ready for operation
+export function isCondenserReady() {
+  return condenserCoolingOn && window.reactorHeaterOn;
+}
+
+// ✅ NEW: Get condenser state for debugging
+export function getCondenserState() {
+  return {
+    coolingOn: condenserCoolingOn,
+    liquidLevel: condenserLiquidLevel,
+    fluidLevel: condensedFluidLevel,
+    draining: drainingToBeaker,
+    particleCount: condenserParticles.length,
+    bandCount: condensateBands.length
+  };
 }
