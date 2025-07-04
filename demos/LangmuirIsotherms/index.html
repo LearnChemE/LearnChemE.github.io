@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Langmuir Isotherms</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.plot.ly/plotly-2.25.2.min.js"></script>
+  <script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
+    options: {
+      renderActions: {
+        find_script: [10, function () {}], // Disable auto-render
+      }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="card">
+    <button class="menu-btn">
+      <img src="assets/hamburger.svg" alt="Menu" />
+    </button>
+
+    <!-- ==== DROPDOWN MENU ==== -->
+    <ul id="dropdownMenu" class="dropdown-menu hidden">
+      <li data-option="directions">Directions</li>
+      <li data-option="details">Details</li>
+      <li data-option="about">About</li>
+    </ul>
+    <!-- ======================= -->
+
+    <!-- ==== LANGMUIR CONTROLS AND PLOT ==== -->
+    <div class="langmuir-container">
+      <div class="controls">
+        <!-- temperature (50% slider + value) -->
+        <div class="control-group temp-group inline">
+          <label for="temp">temperature (K)</label>
+          <div class="slider-row">
+            <input type="range" id="temp" min="250" max="500" step="19" value="300">
+            <span id="temp-value">300</span>
+          </div>
+        </div>
+
+        <!-- heats of adsorption -->
+        <div class="control-group heat-group inline">
+          <label>heat of adsorption (kJ/mol):</label>
+          <div class="slider-row">
+            <label for="heatA">A</label>
+            <input type="range" id="heatA" min="30" max="80" step="1" value="50">
+            <span id="heatA-value">50</span>
+            <label for="heatB">B</label>
+            <input type="range" id="heatB" min="30" max="80" step="1" value="45">
+            <span id="heatB-value">45</span>
+          </div>
+        </div>
+
+        <!-- ratio & number of sites -->
+        <div class="control-group combined-group inline">
+          <label for="ratio">ratio of: partial pressures P<sub>B</sub>/P<sub>A</sub></label>
+          <div class="slider-row">
+            <input type="range" id="ratio" min="0" max="10" step="0.1" value="2">
+            <span id="ratio-value">2</span>
+            <label for="sites">number of sites N<sub>B</sub>/N<sub>A</sub></label>
+            <input type="range" id="sites" min="0.7" max="3" step="0.1" value="1">
+            <span id="sites-value">1</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="plot"></div>
+    </div>
+    <!-- ================================== -->
+  </div>
+
+  <!-- MODAL DIALOG -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+  
+  <script src="js/script.js"></script>
+</body>
+</html>
