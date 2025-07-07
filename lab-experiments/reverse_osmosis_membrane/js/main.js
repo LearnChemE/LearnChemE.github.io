@@ -1,5 +1,5 @@
 const mainWidth = 1280;
-const mainHeight = 720;
+const mainHeight = 600;
 const pressureSlider = document.getElementById("feed-pressure");
 // Declare global variables which are available to all files
 window.state = {
@@ -9,7 +9,7 @@ window.state = {
   width: mainWidth,
   height: mainHeight,
   figureX: 175,
-  figureY: 380,
+  figureY: 280,
   pumpOn: false,
 
   feedPressure: 10,

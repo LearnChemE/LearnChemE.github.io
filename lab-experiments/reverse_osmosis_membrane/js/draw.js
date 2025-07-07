@@ -14,7 +14,7 @@ let graphicsWrapper = document.getElementById("graphics-wrapper");
 
 // This is the size of the canvas. I set it to 800x600, but it could
 // be any arbitrary height and width.
-let containerDims = [1280, 720];
+let containerDims = [1280, 600];
 
 window.setup = function () {
   // Create the p5.js canvas inside #graphics-wrapper
@@ -25,7 +25,7 @@ window.setup = function () {
 
 window.mouseClicked = function () {
   //pressure switch interaction
-  if (502 < window.mX && window.mX < 540 && 555 < window.mY && window.mY < 595) {
+  if (502 < window.mX && window.mX < 540 && 455 < window.mY && window.mY < 495) {
     state.pumpOn = !state.pumpOn;
   }
 
@@ -34,7 +34,7 @@ window.mouseClicked = function () {
   stroke("red");
   noFill();
   rectMode(CORNERS);
-  rect(503, 595, 540, 555);
+  rect(503, 495, 540, 455);
   pop(); */
 };
 
@@ -55,7 +55,7 @@ window.draw = function () {
   // Draw pipe first so it appears behind everything
   //drawPipeAndPump(150, 250);
 
-  //drain anf beaker fill settings
+  //drain and beaker fill settings
   if (state.pumpOn === true && -saltTankHeight - 1 + state.topOfTankDrainTimer + 15 < 0) {
     state.topOfTankDrainTimer++;
   }
@@ -113,8 +113,8 @@ window.draw = function () {
   drawSaltTank(state.figureX, state.figureY);
   drawPressureGauge(state.figureX, state.figureY);
 
-  drawBeaker(770, 435, 200, 200); //drawBeaker(x, y, beakerWidth, beakerHeight)
-  drawBeaker(1045, 535, 100, 100);
+  drawBeaker(785, 365, 170, 170); //drawBeaker(x, y, beakerWidth, beakerHeight)
+  drawBeaker(1010, 365, 170, 170);
   drawFilter(state.figureX, state.figureY);
   drawWater(state.figureX, state.figureY);
   drawPumpSwitch(state.figureX, state.figureY, state.pumpOn);
