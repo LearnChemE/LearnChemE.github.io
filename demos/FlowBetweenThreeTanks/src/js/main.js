@@ -100,8 +100,8 @@ function calculateFlowRate(draw, l_ab, l_bc) {
 
   draw.rect(135, 25).fill('white').stroke({ color: 'black', width: 1 }).center(tankBX + 90, tankBY + 50);
   draw.rect(135, 25).fill('white').stroke({ color: 'black', width: 1 }).center(tankBX + 90, tankBY + 125);
-  drawText(draw, `Qin = ${u_ab.toFixed(2)} ft³/s`, tankBX + 30, tankBY + 40, 16, 'black');
-  drawText(draw, `Qout = ${u_bc.toFixed(2)} ft³/s`, tankBX + 30, tankBY + 115, 16, 'black');
+  drawLabelWithSubscript(draw, `Q_in = ${u_ab.toFixed(1)} ft³/s`, tankBX + 30, tankBY + 40, 16, 'black');
+  drawLabelWithSubscript(draw, `Q_out = ${u_bc.toFixed(1)} ft³/s`, tankBX + 30, tankBY + 115, 16, 'black');
   drawDashedLineWithArrows(pipeGroup, 308, 50, tankBX - 2, 50, '100 ft', { color: 'black', width: 1, dashArray: '5,5' });
 }
 
@@ -320,7 +320,7 @@ function drawText(draw, textString, x, y, fontSize = 16, fillColor = 'black') {
 
 function drawLabelWithSubscript(draw, label, x, y, fontSize = 16, fillColor = 'black') {
 
-  const match = label.match(/^(.+?)_([A-Za-z])(.*)$/);
+  const match = label.match(/^(.+?)_([A-Za-z]+)(.*)$/);
   if (match) {
     const mainStr = match[1];
     const subStr = match[2];
