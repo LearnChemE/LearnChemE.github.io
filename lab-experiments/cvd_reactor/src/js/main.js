@@ -1,5 +1,6 @@
 import { off } from '@svgdotjs/svg.js';
 import * as config from '../js/config.js';
+import { massSiO2WithoutRecycle, massSiO2WithRecycle } from '../js/calc.js';
 
 // Helper to pause execution in async functions
 function sleep(ms) {
@@ -46,8 +47,60 @@ let recycleRatio = 0;
 let recycleValve = null;
 let isPumpOn = false;
 
+let accumulatedMass = 0;
+let timerId = null;
+let reactorIsOpen = false;
+let gasFlowingToReactor = false;
+
+export function startDepositionTimer(interval = 1000) {
+  // If a timer is already running, clear it first
+  if (timerId) {
+    clearInterval(timerId);
+    timerId = null;
+  }
+  let elapsedSeconds = 0;
+  let rate  = 0
+  timerId = setInterval(() => {
+    // Calculate mass rate [g/s] and update elapsed time
+    if (gasFlowingToReactor && reactorIsOpen) {
+      if (recycleRatio > 0) {
+        rate = massSiO2WithRecycle(recycleRatio, 0.0005, 0.65, 1.0);
+      } else {
+        rate = massSiO2WithoutRecycle(1, 0.0005, 0.65);
+      }
+      
+      elapsedSeconds += interval / 1000;
+      
+      // Increment accumulated mass
+      accumulatedMass += rate * (interval / 1000);
+      
+      window.massTextEl.text(`Mass gain: ${accumulatedMass.toFixed(5)} g`);
+      console.log(
+        `Time: ${elapsedSeconds.toFixed(1)} s — Rate: ${rate.toFixed(5)} g/s — Accumulated: ${accumulatedMass.toFixed(5)} g`
+      );
+    }
+    
+    // Log formatted output
+    
+  }, interval);
+  
+  return timerId;
+}
+
 
 export function drawFigure(draw) {
+  // Text box to display accumulated mass gain
+  const massBoxGroup = draw.group();
+  massBoxGroup.rect(160, 30)
+  .fill('#ffffff')
+  .stroke({ color: '#000000', width: 1 })
+  .move(400, 200);
+  const massText = massBoxGroup.text('Mass gain: 0 g')
+  .font({ family: 'Arial', size: 14, anchor: 'start' })
+  .move(405, 205);
+  // Store reference for future updates
+  window.massTextEl = massText;
+  // startDepositionTimer(1000)
   draw.line(225, 265, 320, 280)
   .stroke({ color: '#444', width: 2, linecap: 'round' });
   addSVGImage(draw, 'assets/bubbler.svg', 20, 250, 250, 250);
@@ -63,8 +116,8 @@ export function drawFigure(draw) {
   recycleValve = drawCutoffValve(draw, 900, 300, 40);
   drawHoodString(draw);
   drawPump(draw, 300, 275, 60, 30);
-  drawSwitch(draw, 650, 20, 80, 40);
-  draw.line(600, 20, 650, 30)
+  drawSwitch(draw, 650, 120, 80, 40);
+  draw.line(600, 120, 650, 130)
   .stroke({ color: '#444', width: 2, linecap: 'round' });
 }
 
@@ -142,91 +195,91 @@ function drawGasCylinder(draw, x, y, label) {
     return img;
   }
   
-export function drawHorizontalCVDReactor(parent, x, y, length = 200, diameter = 60) {
-  const group = parent.group().move(x, y);
-  
-  // Create a linear heating gradient from red to yellow
-  const heatGradient = parent.gradient('linear', add => {
-    add.stop(0, '#0000ff');
-    add.stop(0.5, '#00ffff');
-    add.stop(1, '#0000ff');
-  }).from(0, 0).to(1, 0);
-  heatGradient.id('reactorGradient');             // Assign an ID
-  window.reactorGradient = heatGradient;          // Expose globally
-  
-  // Main tube
-  group.rect(length, diameter)
-  .fill('#dddddd')
-  .stroke({ color: '#444', width: 2 })
-  .move(x, y);
-  
-  
-  // Draw internal heating coil as a series of elliptical loops
-  const coilCount = Math.floor(length / 15);
-  const coilSpacing = length / coilCount;
-  const coilHeight = diameter - 20;
-  for (let i = 0; i < coilCount; i++) {
-    group.ellipse(coilSpacing, coilHeight)
-    .fill('#3399ff')
-    .stroke({ color: '#333', width: 1 })
-    .move(x + i * (coilSpacing - 4) + 25, y + (diameter - coilHeight) / 2)
-  }
-  
-  const upperTube = group.rect(length, diameter / 2)
+  export function drawHorizontalCVDReactor(parent, x, y, length = 200, diameter = 60) {
+    const group = parent.group().move(x, y);
+    
+    // Create a linear heating gradient from red to yellow
+    const heatGradient = parent.gradient('linear', add => {
+      add.stop(0, '#0000ff');
+      add.stop(0.5, '#00ffff');
+      add.stop(1, '#0000ff');
+    }).from(0, 0).to(1, 0);
+    heatGradient.id('reactorGradient');             // Assign an ID
+    window.reactorGradient = heatGradient;          // Expose globally
+    
+    // Main tube
+    group.rect(length, diameter)
+    .fill('#dddddd')
+    .stroke({ color: '#444', width: 2 })
+    .move(x, y);
+    
+    
+    // Draw internal heating coil as a series of elliptical loops
+    const coilCount = Math.floor(length / 15);
+    const coilSpacing = length / coilCount;
+    const coilHeight = diameter - 20;
+    for (let i = 0; i < coilCount; i++) {
+      group.ellipse(coilSpacing, coilHeight)
+      .fill('#3399ff')
+      .stroke({ color: '#333', width: 1 })
+      .move(x + i * (coilSpacing - 4) + 25, y + (diameter - coilHeight) / 2)
+    }
+    
+    const upperTube = group.rect(length, diameter / 2)
     .fill(heatGradient)
     .stroke({ color: '#444', width: 2 })
     .move(x, y - diameter / 1.7);
-  window.reactorUpper = upperTube;
-  
-  const lowerTube = group.rect(length, diameter / 2)
+    window.reactorUpper = upperTube;
+    
+    const lowerTube = group.rect(length, diameter / 2)
     .fill(heatGradient)
     .stroke({ color: '#444', width: 2 })
     .move(x, y + diameter / 0.92);
-  window.reactorLower = lowerTube;
-  
-  group.rect(length - 20, 4)
-  .fill("yellow")
-  .stroke({ color: '#444', width: 0.5 })
-  .move(x + 10, y + diameter / 1.08);
-  
-  // Draw AC symbols at both ends of the yellow bar
-  const barY = y + diameter / 1.08 + 70;
-  const symR = 8;
-  const leftX = x + 10;
-  const rightX = x + length - 10;
-  const centerX = (leftX + rightX) / 2;
-  const symbolY = barY - symR - 2;
-  // Draw AC symbols at both ends of the yellow bar
-  // Wires from yellow bar endpoints to symbol
-  
-  drawConnectionCurve(group, 375, 150, centerX - symR, symbolY);
-  group.line(410, 106, 375, 106)
-  .stroke({ color: '#000', width: 1 });
-  group.line(375, 106, 375, 150)
-  .stroke({ color: '#000', width: 1 });
-  drawConnectionCurve(group, 625, 150, centerX + symR, symbolY);
-  group.line(590, 106, 625, 106)
-  .stroke({ color: '#000', width: 1 });
-  group.line(625, 106, 625, 150)
-  .stroke({ color: '#000', width: 1 });
-  
-  // Draw the AC symbol circle
-  group.circle(symR * 2)
-  .fill('#fff')
-  .stroke({ color: '#000', width: 1 })
-  .center(centerX, symbolY);
-  
-  // Sine wave inside the circle
-  group.path(
-    `M${centerX - symR + 2},${symbolY} ` +
-    `C${centerX - symR/2},${symbolY - 6} ` +
-    `${centerX + symR/2},${symbolY + 4} ` +
-    `${centerX + symR - 2},${symbolY}`
-  )
-  .fill('none')
-  .stroke({ color: '#000', width: 1 });
-  return group;
-}
+    window.reactorLower = lowerTube;
+    
+    group.rect(length - 20, 4)
+    .fill("yellow")
+    .stroke({ color: '#444', width: 0.5 })
+    .move(x + 10, y + diameter / 1.08);
+    
+    // Draw AC symbols at both ends of the yellow bar
+    const barY = y + diameter / 1.08 + 70;
+    const symR = 8;
+    const leftX = x + 10;
+    const rightX = x + length - 10;
+    const centerX = (leftX + rightX) / 2;
+    const symbolY = barY - symR - 2;
+    // Draw AC symbols at both ends of the yellow bar
+    // Wires from yellow bar endpoints to symbol
+    
+    drawConnectionCurve(group, 375, 150, centerX - symR, symbolY);
+    group.line(410, 106, 375, 106)
+    .stroke({ color: '#000', width: 1 });
+    group.line(375, 106, 375, 150)
+    .stroke({ color: '#000', width: 1 });
+    drawConnectionCurve(group, 625, 150, centerX + symR, symbolY);
+    group.line(590, 106, 625, 106)
+    .stroke({ color: '#000', width: 1 });
+    group.line(625, 106, 625, 150)
+    .stroke({ color: '#000', width: 1 });
+    
+    // Draw the AC symbol circle
+    group.circle(symR * 2)
+    .fill('#fff')
+    .stroke({ color: '#000', width: 1 })
+    .center(centerX, symbolY);
+    
+    // Sine wave inside the circle
+    group.path(
+      `M${centerX - symR + 2},${symbolY} ` +
+      `C${centerX - symR/2},${symbolY - 6} ` +
+      `${centerX + symR/2},${symbolY + 4} ` +
+      `${centerX + symR - 2},${symbolY}`
+    )
+    .fill('none')
+    .stroke({ color: '#000', width: 1 });
+    return group;
+  }
   
   
   export function drawConnectionCurve(parent, x1, y1, x2, y2, opts = {}) {
@@ -309,18 +362,25 @@ export function drawHorizontalCVDReactor(parent, x, y, length = 200, diameter = 
     return group;
   }
   
-  async function animateFLowToReactor(draw) {
-    if (isPumpOn && multiValvePosition === 0 && gasValveOpen) {
-      animateWaterFlow(draw, window.leftPipe4El, 0, 100, undefined, undefined, undefined, 'reactor');
-      await sleep(100);
-      animateWaterFlow(draw, window.leftPipe5El, 0, 100, undefined, undefined, undefined, 'reactor');
-    } else {
-      draw.find('path')
-      .filter(el => el.attr('data-pipe-side') === 'reactor')
-      .forEach(el => el.remove());
-      console.log("Stopping flow in pipes 4 and 5");
-    }
+async function animateFLowToReactor(draw) {
+  if (isPumpOn && multiValvePosition === 0 && gasValveOpen) {
+    gasFlowingToReactor = true;
+    animateWaterFlow(draw, window.leftPipe4El, 0, 100, undefined, undefined, undefined, 'reactor');
+    startDepositionTimer(1000);
+    await sleep(100);
+    animateWaterFlow(draw, window.leftPipe5El, 0, 100, undefined, undefined, undefined, 'reactor');
+  } else {
+    gasFlowingToReactor = false;
+    clearInterval(timerId);
+    timerId = null;
+    draw.find('path')
+    .filter(el => el.attr('data-pipe-side') === 'reactor')
+    .forEach(el => el.remove());
+    console.log("Stopping flow in pipes 4 and 5");
   }
+
+  console.log("Gas flowing to reactor:", gasFlowingToReactor);
+}
   
   function createVerticalValve(draw, x, y) {
     
@@ -374,11 +434,11 @@ export function drawHorizontalCVDReactor(parent, x, y, length = 200, diameter = 
               animateWaterFlow(draw, pipeEl, 0, 100, undefined, undefined, undefined, 'right');
             }
           });
-          
-          animateFLowToReactor(draw);
-          animateRecycleFlow(draw);
           // console.log(multiValvePosition, gasValveOpen);
         }
+        animatePumpFlow(draw);
+        animateRecycleFlow(draw);
+        animateFLowToReactor(draw);
         if (knob && typeof knob.animate === 'function') { // Check if knob exists and is animatable
           const color = group.isOpen ? '#ffa500' : '#000000';
           knob.animate(300).fill(color);
@@ -599,29 +659,29 @@ export function drawHorizontalCVDReactor(parent, x, y, length = 200, diameter = 
       return group;
     }
     
-function animateRecycleFlow(draw) {
-  if (recycleRatio != 0 && gasValveOpen && multiValvePosition === 0 && isPumpOn) {
-    animateWaterFlow(draw, window.leftPipe6El, 0, 100, undefined, undefined, undefined, 'recycle');
-  } else {
-    // Stop flow if rate is zero
-    draw.find('path')
-    .filter(el => el.attr('data-pipe-side') === 'recycle')
-    .forEach(el => el.remove());
-  }
-  recycleValve.front();
-}
-
-function animatePumpFlow(draw) {
-  if (isPumpOn && gasValveOpen) {
-    // Animate flow in pipes 4 and 5
-    animateWaterFlow(draw, window.leftPipe3El, 0, 100, undefined, undefined, undefined, 'pump');
-  } else {
-    // Stop flow in pipes 4 and 5
-    draw.find('path')
-    .filter(el => el.attr('data-pipe-side') === 'pump')
-    .forEach(el => el.remove());
-  }
-}
+    function animateRecycleFlow(draw) {
+      if (recycleRatio != 0 && gasValveOpen && multiValvePosition === 0 && isPumpOn) {
+        animateWaterFlow(draw, window.leftPipe6El, 0, 100, undefined, undefined, undefined, 'recycle');
+      } else {
+        // Stop flow if rate is zero
+        draw.find('path')
+        .filter(el => el.attr('data-pipe-side') === 'recycle')
+        .forEach(el => el.remove());
+      }
+      recycleValve.front();
+    }
+    
+    function animatePumpFlow(draw) {
+      if (isPumpOn && gasValveOpen) {
+        // Animate flow in pipes 4 and 5
+        animateWaterFlow(draw, window.leftPipe3El, 0, 100, undefined, undefined, undefined, 'pump');
+      } else {
+        // Stop flow in pipes 4 and 5
+        draw.find('path')
+        .filter(el => el.attr('data-pipe-side') === 'pump')
+        .forEach(el => el.remove());
+      }
+    }
     
     function drawHoodString(draw) {
       draw.text("Hood")
@@ -666,62 +726,67 @@ function animatePumpFlow(draw) {
         animateRecycleFlow(draw);
         if (isOn) {
           handle.animate(200).rotate(40, x + width / 2, y + height / 2);
+          startDepositionTimer(1000);
         } else {
           handle.animate(200).rotate(-40, x + width / 2, y + height / 2);
+          clearInterval(timerId);
+          timerId = null;
         }
       });
       return switchGroup;
     }
-
-function drawSwitch(draw, x, y, width, height, opacity = 1) {
-  const switchGroup = draw.group();
-  switchGroup.isOn = false;
-  const handleWidth = 5;
-  const handleHeight = height * 0.8;
-  const handle = switchGroup.rect(handleWidth, handleHeight)
-  .fill({ color: '#aaa', opacity: opacity })
-  .move(x + (width - handleWidth) / 2, y - height / 2);
-  switchGroup.handle = handle;
-  
-  switchGroup.rect(width, height)
-  .fill({ color: '#555', opacity: opacity })
-  .radius(height / 5)
-  .move(x, y);
-  switchGroup.text('OFF')
-  .font({ size: 12, anchor: 'middle', fill: '#fff' })
-  .center(x + width * 0.25, y + height / 2);
-  switchGroup.text('ON')
-  .font({ size: 12, anchor: 'middle', fill: '#fff' })
-  .center(x + width * 0.75, y + height / 2);
-  let isOn = false;
-  handle.rotate(-20, x + width / 2, y + height / 2);
-  switchGroup.click(() => {
-    isOn = !isOn;
-    switchGroup.isOn = isOn;
-    if (isOn) {
-      handle.animate(200).rotate(40, x + width / 2, y + height / 2);
-    } else {
-      handle.animate(200).rotate(-40, x + width / 2, y + height / 2);
+    
+    function drawSwitch(draw, x, y, width, height, opacity = 1) {
+      const switchGroup = draw.group();
+      switchGroup.isOn = false;
+      const handleWidth = 5;
+      const handleHeight = height * 0.8;
+      const handle = switchGroup.rect(handleWidth, handleHeight)
+      .fill({ color: '#aaa', opacity: opacity })
+      .move(x + (width - handleWidth) / 2, y - height / 2);
+      switchGroup.handle = handle;
+      
+      switchGroup.rect(width, height)
+      .fill({ color: '#555', opacity: opacity })
+      .radius(height / 5)
+      .move(x, y);
+      switchGroup.text('OFF')
+      .font({ size: 12, anchor: 'middle', fill: '#fff' })
+      .center(x + width * 0.25, y + height / 2);
+      switchGroup.text('ON')
+      .font({ size: 12, anchor: 'middle', fill: '#fff' })
+      .center(x + width * 0.75, y + height / 2);
+      let isOn = false;
+      handle.rotate(-20, x + width / 2, y + height / 2);
+      switchGroup.click(() => {
+        isOn = !isOn;
+        switchGroup.isOn = isOn;
+        if (isOn) {
+          reactorIsOpen = true;
+          handle.animate(200).rotate(40, x + width / 2, y + height / 2);
+        } else {
+          reactorIsOpen = false;
+          handle.animate(200).rotate(-40, x + width / 2, y + height / 2);
+        }
+        // Update reactor gradient on switch toggle
+        if (window.reactorGradient) {
+          // Clear existing gradient stops
+          window.reactorGradient.children().forEach(stop => stop.remove());
+          if (isOn) {
+            // Hot gradient: red → yellow → red
+            window.reactorGradient.stop(0, '#ff0000');
+            window.reactorGradient.stop(0.5, '#ffff00');
+            window.reactorGradient.stop(1, '#ff0000');
+          } else {
+            // Cool gradient: blue → cyan → blue
+            window.reactorGradient.stop(0, '#0000ff');
+            window.reactorGradient.stop(0.5, '#00ffff');
+            window.reactorGradient.stop(1, '#0000ff');
+          }
+        }
+      });
+      return switchGroup;
     }
-    // Update reactor gradient on switch toggle
-    if (window.reactorGradient) {
-      // Clear existing gradient stops
-      window.reactorGradient.children().forEach(stop => stop.remove());
-      if (isOn) {
-        // Hot gradient: red → yellow → red
-        window.reactorGradient.stop(0, '#ff0000');
-        window.reactorGradient.stop(0.5, '#ffff00');
-        window.reactorGradient.stop(1, '#ff0000');
-      } else {
-        // Cool gradient: blue → cyan → blue
-        window.reactorGradient.stop(0, '#0000ff');
-        window.reactorGradient.stop(0.5, '#00ffff');
-        window.reactorGradient.stop(1, '#0000ff');
-      }
-    }
-  });
-  return switchGroup;
-}
     
     function animateWaterFlow(draw, pipeEl, delay = 0, duration = 100, waterColor = 'red', waterWidth = 4, opacity = 1, side) {
       const d = pipeEl.attr('d');
