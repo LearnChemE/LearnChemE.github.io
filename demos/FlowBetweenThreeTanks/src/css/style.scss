@@ -1,7 +1,7 @@
 // main.scss
 
 #svg-container {
-  position: relative;
+  position: fixed;
   border: 2px solid #ccc;
   margin: 20px auto;
   padding: 10px;
@@ -42,14 +42,6 @@ body {
   .btn {
     margin-right: 10px;
   }
-}
-
-.canvas-container {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-  position: relative; // merged the later positioning rules
-  z-index: 1;
 }
 
 .timer-display {
