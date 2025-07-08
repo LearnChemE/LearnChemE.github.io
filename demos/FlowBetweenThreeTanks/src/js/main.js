@@ -241,13 +241,14 @@ function drawPipeWithCurves(draw, pathString, pipeWidth = 15, flowDirection = 'd
   drawPipeArrows(draw, path, arrowSize, arrowSpacing, flowDirection);
   
   const endPoint = path.pointAt(length);
+  const startPoint = path.pointAt(0);
   const prevPoint = path.pointAt(length - 1);
   const dx_end = endPoint.x - prevPoint.x;
   const dy_end = endPoint.y - prevPoint.y;
   const endAngle = Math.atan2(dy_end, dx_end) * (180 / Math.PI);
   
   // Draw a rectangular cap: length = 1.5×pipeWidth, height = pipeWidth
-  const rectLength = pipeWidth * 1.5;
+  const rectLength = pipeWidth * 0.5;
   const rectHeight = pipeWidth;
 
   // Draw a rectangular cap at the start of the pipe (inside)
@@ -267,6 +268,11 @@ function drawPipeWithCurves(draw, pathString, pipeWidth = 15, flowDirection = 'd
   .fill(strokeColor)
   .center(endPoint.x, endPoint.y)
   .rotate(endAngle, endPoint.x, endPoint.y);
+
+  draw.rect(rectLength, rectHeight)
+  .fill(strokeColor)
+  .center(startPoint.x, startPoint.y)
+  .rotate(endAngle, startPoint.x, startPoint.y);
 
   const midIndex = length / 2;
   const midPoint = path.pointAt(midIndex);
