@@ -1,3 +1,5 @@
+// index.js - Updated with reset functionality
+
 import "bootstrap";
 import "p5";
 import "./style/style.scss";
@@ -7,7 +9,7 @@ import { calcAll, setDefaults } from "./js/calcs";
 import { toggleReactorHeater, drawReactorBody  } from "./js/reactor"; // ✅ Add this import
 import { drawCondenserBody } from './js/condenser';
 import { updateExhaustParticles, drawExhaustParticles } from './js/reactor';
-
+import { initializeResetButton } from "./js/reset.js"; // ✅ NEW: Import reset functionality
 
 // ✅ Declare global variables properly
 window.tempSlider = null;
@@ -45,6 +47,11 @@ window.setup = function () {
       window.tempValueSpan.textContent = `${window.tempSlider.value}°C`;
     });
   }
+
+  // ✅ NEW: Initialize reset button after DOM is ready
+  setTimeout(() => {
+    initializeResetButton();
+  }, 100);
 };
 
 window.draw = function () {
@@ -76,7 +83,6 @@ window.keyPressed = function () {
     console.log("Valve to condenser is now", valveToCondenserOpen ? "OPEN" : "CLOSED");
   }
 };
-
 
 // ✅ Add mouse click handler
 window.mousePressed = function() {

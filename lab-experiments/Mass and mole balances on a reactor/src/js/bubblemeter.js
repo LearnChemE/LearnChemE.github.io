@@ -8,7 +8,7 @@ let bubbleSpawnRate = 0;
 let bubbleSpawnIntervalFrames = Infinity; // Start with no bubbles
 export let reactorTemp = 300; // default initial value
 
-// ✅ SIMPLIFIED: Measurement state variables
+// Measurement state variables
 let measurementActive = false;
 let measurementStartTime = null;
 let measurementPhase = "idle"; // idle, rising, holding, falling
@@ -16,7 +16,7 @@ let targetReading = 31.8; // Will be set based on temperature
 let currentReading = 0; // Start from 0mL (empty tube)
 let measurementTemp = 300; // Temperature when measurement was taken
 
-// ✅ SIMPLIFIED: Animation variables
+// Animation variables
 let liquidDisturbance = [];
 let bubbleTrails = [];
 let surfaceTension = 0;
@@ -27,7 +27,7 @@ let bubbleY = null;
 let bubbleActive = false;
 let bubbleSpeed = 0.4;
 
-// ✅ SIMPLIFIED: Remove complex liquid tracking - just show during measurement
+// Remove complex liquid tracking - just show during measurement
 let soapBaseline = 2;  // Fixed baseline for calculations only
 let accumulatedLiquid = 0;  // For gas accumulation tracking
 let soapRiseSpeed = 0.05;
@@ -88,7 +88,7 @@ export function drawBubbleMeter(x = 200, y = 40) {
   vertex(meterWidth, meterHeight - 8);
   endShape(CLOSE);
 
-  // ✅ FIXED: Show liquid during measurement only
+  // Show liquid during measurement only
   if (measurementActive) {
     const displayLevel = currentReading;
     const liquidHeight = map(displayLevel, 0, 50, 0, meterHeight - 8) * 1.2;
@@ -157,16 +157,15 @@ function drawSqueezeBulb(cx, cy) {
   push();
   translate(cx, cy);
 
-  // ✅ SIMPLIFIED: Red when gas bubbles are flowing (much simpler condition)
+  // Consistent logic - removed redundant inline check
   let canPress = false;
-  
-  // Check if bubbles are actively flowing AND measurement is not already active
-  if (hydrogenBubbles.length > 3 && !measurementActive) {
+
+  // Only two conditions - consistent with handleBulbClick()
+  if (hydrogenBubbles.length > 30 && !measurementActive && canMeasureRealistic()) {
     canPress = true;
   }
-  
-  // ✅ FALLBACK: Also allow measurement if experiment is in COMPLETE state
-  if (getExperimentState() === "COMPLETE" && !measurementActive) {
+
+  if (isNearTargetLevel() && !measurementActive && canMeasureRealistic()) {
     canPress = true;
   }
 
@@ -187,24 +186,41 @@ export function handleBulbClick(mx, my, meterX = 129.8, meterY = 33) {
   const r = 6;
   if (localX * localX + localY * localY <= r * r * 4) {
     
-    // ✅ SIMPLIFIED: Allow measurement if bubbles are flowing OR experiment is complete
+    // Same logic as drawSqueezeBulb()
     let canStartMeasurement = false;
     
-    if ((hydrogenBubbles.length > 3 || getExperimentState() === "COMPLETE") && !measurementActive) {
+    if ((hydrogenBubbles.length > 30 || isNearTargetLevel()) && !measurementActive && canMeasureRealistic()) {
       canStartMeasurement = true;
     }
 
     if (canStartMeasurement) {
       startMeasurement();
-      console.log("🔬 Starting bubble meter measurement!");
+      console.log("Starting bubble meter measurement!");
       return true;
     } else if (measurementActive) {
       console.log("Measurement already in progress...");
       return true;
     } else {
-      // console.log("Cannot measure yet - not enough gas accumulated");
       return false;
     }
+  }
+  return false;
+}
+
+function canMeasureRealistic() {
+  // Require ALL systems to be active for realistic measurement
+  return window.reactorHeaterOn && 
+         window.condenserCoolingOn && 
+         (window.valveState === "tocondenser");
+}
+
+function isNearTargetLevel() {
+  if (typeof window.condensedFluidLevel !== 'undefined' && typeof window.targetCollection !== 'undefined') {
+    const current_mL = window.condensedFluidLevel * 250;
+    const target_mL = window.targetCollection * 250;
+    // More realistic: only activate when 90% full or within 10mL of target
+    const activationThreshold = Math.min(target_mL * 0.9, target_mL - 10);
+    return current_mL >= activationThreshold;
   }
   return false;
 }
@@ -215,18 +231,18 @@ function startMeasurement() {
   measurementPhase = "rising";
   measurementTemp = window.reactorTemp || 300;
   
-  // ✅ RANDOMIZED: Calculate target based on temperature with realistic variability
+  // Calculate target based on temperature with realistic variability
   const propanolFed = 3.33; // mol (250 mL propanol)
   let conversion, gasProduced_mol;
   
   if (measurementTemp >= 330) {
-    // ✅ RANDOMIZED: For 330°C+ range, use random value between 43-47mL
+    // For 330°C+ range, use random value between 43-47mL
     targetReading = random(43, 47); // Random between 43-47mL each measurement
-    console.log(`🎲 Random measurement at ${measurementTemp}°C: ${targetReading.toFixed(1)}mL`);
+    console.log(`Random measurement at ${measurementTemp}°C: ${targetReading.toFixed(1)}mL`);
   } else if (measurementTemp >= 300) {
-    // ✅ RANDOMIZED: For 300°C-329°C range, use random value between 31-35mL
+    // For 300°C-329°C range, use random value between 31-35mL
     targetReading = random(31, 35); // Random between 31-35mL each measurement
-    console.log(`🎲 Random measurement at ${measurementTemp}°C: ${targetReading.toFixed(1)}mL`);
+    console.log(`Random measurement at ${measurementTemp}°C: ${targetReading.toFixed(1)}mL`);
   } else {
     // Lower temperature - less gas
     conversion = 0.20;
@@ -237,7 +253,7 @@ function startMeasurement() {
   currentReading = 0;
   setMeasuringState(); // Update global state
   
-  console.log(`🔬 Measurement started at ${measurementTemp}°C`);
+  console.log(`Measurement started at ${measurementTemp}°C`);
   console.log(`Animation: 0mL → ${targetReading.toFixed(1)}mL`);
 }
 
@@ -264,7 +280,7 @@ function updateMeasurement() {
       
       if (riseProgress >= 1.0) {
         measurementPhase = "holding";
-        console.log(`📊 Measurement reading: ${currentReading.toFixed(1)}mL`);
+        console.log(`Measurement reading: ${currentReading.toFixed(1)}mL`);
       }
       break;
       
@@ -291,7 +307,7 @@ function updateMeasurement() {
         measurementPhase = "idle";
         currentReading = 0;
         completeMeasurement(); // Update global state
-        console.log("🔄 Measurement complete - tube returned to empty");
+        console.log("Measurement complete - tube returned to empty");
       }
       break;
   }
@@ -366,14 +382,14 @@ export function drawTubeAtAngleToBubbleMeter() {
   pop();
 }
 
-// ✅ SYNCHRONIZED: Bubble spawning coordinated with liquid flow to beaker
+// Bubble spawning coordinated with liquid flow to beaker
 export function maybeSpawnHydrogenBubble(temp) {
-  // ✅ PRIMARY CONDITION: Only spawn bubbles when liquid is actively draining to beaker
+  // Only spawn bubbles when liquid is actively draining to beaker
   if (!drainingToBeaker) {
     return; // No gas bubbles when no liquid flow
   }
   
-  // ✅ STOP VAPOR PARTICLES: When beaker reaches target-10mL (coordinated stopping)
+  // Stop vapor particles when beaker reaches target-10mL (coordinated stopping)
   if (typeof window.condensedFluidLevel !== 'undefined' && typeof window.targetCollection !== 'undefined') {
     const current_mL = window.condensedFluidLevel * 250; // Current beaker level in mL
     const target_mL = window.targetCollection * 250; // Target level in mL
@@ -381,36 +397,36 @@ export function maybeSpawnHydrogenBubble(temp) {
     
     if (current_mL >= stopThreshold_mL) {
       if (frameCount % 120 === 0) { // Log every 2 seconds
-        console.log(`🫧 Vapor particles stopped: ${current_mL.toFixed(0)}mL reached threshold (${stopThreshold_mL.toFixed(0)}mL)`);
+        console.log(`Vapor particles stopped: ${current_mL.toFixed(0)}mL reached threshold (${stopThreshold_mL.toFixed(0)}mL)`);
       }
       return; // No more vapor particles in final 10mL approach
     }
   }
   
-  // ✅ BASIC CONDITIONS: Check system requirements
+  // Check system requirements
   if (!window.reactorHeaterOn || temp < 290) {
     return; // No bubbles if heater off or temp too low
   }
   
-  // ✅ CHECK VALVE: Must be directed to condenser
+  // Must be directed to condenser
   if (window.valveState !== "tocondenser") {
     return; // No bubbles to meter if valve goes to exhaust
   }
   
-  // ✅ CHECK COOLING: Condenser must be active
+  // Condenser must be active
   if (!window.condenserCoolingOn) {
     return; // No condensation process without cooling
   }
   
-  // ✅ TIMING: Check spawn interval
+  // Check spawn interval
   if (frameCount - lastBubbleFrame < bubbleSpawnIntervalFrames) {
     return; // Too soon for next bubble
   }
   
-  // ✅ GET MATERIAL BALANCE: Check if reaction is producing gas
+  // Check if reaction is producing gas
   const materialBalance = coordinateFlowRates(temp);
   
-  // ✅ SYNCHRONIZED SPAWNING: Only when conversion is active and liquid flowing
+  // Only when conversion is active and liquid flowing
   if (materialBalance.conversion > 0) {
     let bubbleColor;
 
@@ -433,7 +449,7 @@ export function maybeSpawnHydrogenBubble(temp) {
     });
     
     lastBubbleFrame = frameCount;
-    console.log(`🫧 Gas bubble spawned (synced with liquid flow) at ${temp}°C`);
+    console.log(`Gas bubble spawned (synced with liquid flow) at ${temp}°C`);
   }
 }
 
@@ -470,7 +486,7 @@ export function drawHydrogenBubbles() {
         b.vx = 0;
         b.vy = -0.04;
         
-        // ✅ SIMPLIFIED: Just accumulate some liquid when bubbles enter
+        // Just accumulate some liquid when bubbles enter
         if (accumulatedLiquid < 8) {
           accumulatedLiquid += soapRiseSpeed;
         }
@@ -495,14 +511,14 @@ export function drawHydrogenBubbles() {
     }
   }
 
-  // ✅ SIMPLIFIED: Gentle fallback when no bubbles
+  // Gentle fallback when no bubbles
   if (!anyBubbleRising && accumulatedLiquid > 0 && !measurementActive) {
     accumulatedLiquid -= soapFallRate;
     if (accumulatedLiquid < 0) accumulatedLiquid = 0;
   }
 }
 
-// ✅ SIMPLIFIED: Update vapor flow rate
+// Update vapor flow rate
 export function updateVaporFlowRateBasedOnTemp(temp) {
   reactorTemp = temp;
 
@@ -510,7 +526,7 @@ export function updateVaporFlowRateBasedOnTemp(temp) {
   const materialBalance = coordinateFlowRates(temp);
   vaporFlowRate = materialBalance.gasFlowRate;
 
-  // ✅ SIMPLIFIED: Update bubble frequency
+  // Update bubble frequency
   if (vaporFlowRate > 0) {
     bubbleSpawnRate = getBubbleSpawnRate(vaporFlowRate);
     bubbleSpawnIntervalFrames = Math.max(5, 60 / bubbleSpawnRate);
@@ -522,7 +538,7 @@ export function updateVaporFlowRateBasedOnTemp(temp) {
   console.log(`Temperature: ${temp}°C, Gas Flow: ${vaporFlowRate.toFixed(1)}mL/s, Bubble Rate: ${bubbleSpawnRate.toFixed(2)}/s`);
 }
 
-// ✅ Export functions for debugging and display
+// Export functions for debugging and display
 export function getCurrentGasFlowRate() {
   return vaporFlowRate;
 }
@@ -548,4 +564,39 @@ export function getMeasurementData() {
     targetReading: targetReading,
     temperature: measurementTemp
   };
+}
+
+// Reset function for bubble meter component
+export function resetBubbleMeter() {
+  // Reset measurement state
+  measurementActive = false;
+  measurementStartTime = null;
+  measurementPhase = "idle";
+  currentReading = 0;
+  targetReading = 31.8;
+  measurementTemp = 300;
+  
+  // Reset particle arrays
+  hydrogenBubbles = [];
+  liquidDisturbance = [];
+  bubbleTrails = [];
+  
+  // Reset visual effects
+  surfaceTension = 0;
+  foamLevel = 0;
+  bulbPressed = false;
+  bubbleY = null;
+  bubbleActive = false;
+  
+  // Reset liquid tracking
+  accumulatedLiquid = 0;
+  
+  // Reset flow tracking
+  lastBubbleFrame = 0;
+  vaporFlowRate = 0;
+  bubbleSpawnRate = 0;
+  bubbleSpawnIntervalFrames = Infinity;
+  reactorTemp = 300;
+  
+  console.log("Bubble meter reset complete");
 }

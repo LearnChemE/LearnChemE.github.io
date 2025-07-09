@@ -21,7 +21,7 @@ export function endBubbleTimer(currentY) {
   };
 }
 
-// ✅ ENHANCED: Each bubble represents realistic volume based on flow rate
+// Each bubble represents realistic volume based on flow rate
 export function getBubbleSpawnRate(vaporFlowRate_mL_per_s) {
   if (vaporFlowRate_mL_per_s <= 0) return 0;
   
@@ -33,7 +33,7 @@ export function getBubbleSpawnRate(vaporFlowRate_mL_per_s) {
   return Math.min(bubblesPerSecond, 5.0); // Max 5 bubbles/second
 }
 
-// ✅ NEW: Calculate conversion based on temperature (from worksheet data)
+// Calculate conversion based on temperature (from worksheet data)
 export function getConversionAtTemp(temp) {
   if (temp < 290) return 0; // No reaction below 290°C
   if (temp >= 290 && temp < 315) {
@@ -52,7 +52,7 @@ export function getConversionAtTemp(temp) {
   return 0.60;
 }
 
-// ✅ NEW: Calculate product yields based on temperature and conversion
+// Calculate product yields based on temperature and conversion
 export function calculateProductYields(temp, conversion) {
   const propanolFed = 3.33; // mol (250 mL * 0.8 g/mL / 60 g/mol)
   const propanolReacted = propanolFed * conversion;
@@ -103,7 +103,7 @@ export function calculateProductYields(temp, conversion) {
   };
 }
 
-// ✅ NEW: Calculate expected gas flow rate based on stoichiometry
+// Calculate expected gas flow rate based on stoichiometry
 export function calculateGasFlowRate(temp, conversion) {
   const yields = calculateProductYields(temp, conversion);
   const gasProduced_mol = yields.gasProduced_mol;
@@ -119,7 +119,7 @@ export function calculateGasFlowRate(temp, conversion) {
   return gasFlowRate_mL_s;
 }
 
-// ✅ NEW: Comprehensive material balance calculation
+// Comprehensive material balance calculation
 export function calculateMaterialBalance(temp) {
   const conversion = getConversionAtTemp(temp);
   const yields = calculateProductYields(temp, conversion);
@@ -134,7 +134,7 @@ export function calculateMaterialBalance(temp) {
   };
 }
 
-// ✅ NEW: Validate material balance (inlet = outlet)
+// Validate material balance (inlet = outlet)
 export function validateMaterialBalance(materialBalance) {
   const { propanolFed, propanolReacted, propanolUnreacted } = materialBalance;
   
