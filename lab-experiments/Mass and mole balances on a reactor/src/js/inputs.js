@@ -1,12 +1,7 @@
-
-
-
-
-
-
-
-   import Hamburger from "../assets/hamburger.svg";
+import Hamburger from "../assets/hamburger.svg";
 import { calcAll, setDefaults } from "./calcs";
+import { initializeResetButton } from "./reset.js"; // Import reset functionality
+import worksheetPDF from '/src/assets/Mass_and_mole_balances_on_a_reactor_worksheet.pdf';
 
 // Initialize hamburger icon SVG and its toggle behavior
 function initializeHamburger() {
@@ -53,7 +48,8 @@ function handleHamburger() {
       e.target.tagName !== "TR" &&
       e.target.tagName !== "TD" &&
       e.target.tagName !== "TH" &&
-      !e.target.classList.contains("table-label")
+      !e.target.classList.contains("table-label") &&
+      e.target.id !== "reset-button" // Allow reset button clicks
     ) {
       if (state.showButtons) {
         buttons.style.display = "none";
@@ -94,7 +90,8 @@ function handleHamburger() {
       !e.target.classList.contains("slider-label") &&
       !e.target.classList.contains("slider-value") &&
       !e.target.classList.contains("table-label") &&
-      !e.target.classList.contains("slider-container")
+      !e.target.classList.contains("slider-container") &&
+      e.target.id !== "reset-button" // Allow reset button clicks
     ) {
       if (e.target.tagName !== "HTML") {
         if (!e.target.parentElement.classList.contains("modal-body") &&
@@ -110,7 +107,8 @@ function handleHamburger() {
           e.target.tagName !== "TR" &&
           e.target.tagName !== "TD" &&
           e.target.tagName !== "TH" &&
-          !e.target.classList.contains("table-label")
+          !e.target.classList.contains("table-label") &&
+          e.target.id !== "reset-button" // Allow reset button clicks
         ) {
           buttons.style.display = "none";
           state.showButtons = false;
@@ -126,13 +124,34 @@ function handleHamburger() {
 }
 
 import { togglePumpPower, toggleValve, toggleHeater } from "./evaporator";
-import {  toggleReactorHeater } from './reactor.js'
+import { toggleReactorHeater } from './reactor.js'
 import { handleValveClick } from './threeWayValve.js';
 import { toggleCooling } from "./condenser";
 import { handleBulbClick } from "./bubblemeter.js";
 
+// Add this function
+function downloadFile(fileUrl, fileName) {
+  const link = document.createElement('a');
+  link.href = fileUrl;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+export function handleWorksheetDownload() {
+  const worksheetButton = document.getElementById("worksheet");
+  if (worksheetButton) {
+    worksheetButton.addEventListener("click", () => {
+      downloadFile(worksheetPDF, 'Mass_and_mole_balances_worksheet.pdf');
+    });
+  }
+}
+
 export function handleInputs() {
   initializeHamburger();
+  initializeResetButton(); 
+  handleWorksheetDownload();
 
   window.mousePressed = () => {
     const mx = mouseX / relativeSize();
@@ -153,7 +172,6 @@ export function handleInputs() {
     }
     
     if (toggleReactorHeater(mx, my, 63, 36.5)) {
-      
       return; // Reactor heater was clicked
     }
 

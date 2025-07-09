@@ -1,6 +1,3 @@
-// js/condenser.js - Enhanced with state-coordinated flow control
-// export { condenserCoolingOn };
-
 import { getExperimentState } from "./draw.js";
 
 window.condenserCoolingOn = false;
@@ -9,14 +6,14 @@ let coolingTimer = null;
 export let condensedFluidLevel = 0.0;
 export let condenserLiquidLevel = 0.0; // New: liquid level inside condenser
 
-// ✅ LIQUID FLOW ANIMATION VARIABLES
+// Liquid flow animation variables
 export let drainingToBeaker = false;
 let drainStartTime = 0;
 let condensateBands = [];
 
 export let condenserParticles = [];
 
-// ✅ ENHANCED: Material balance state tracking with experiment coordination
+// Material balance state tracking with experiment coordination
 let experimentStartTime = null;
 let totalPropanolFed = 0; // mol
 let propanolConsumed = 0; // mol
@@ -32,9 +29,9 @@ export function drawCondenserBody(x = 200, y = 50) {
   const borderRadius = 10;
   const wallThickness = 1.5;
 
-  // === Draw Internal Liquid (Clipped Inside Rounded Rect) ===
+  // Draw Internal Liquid (Clipped Inside Rounded Rect)
   if (condenserLiquidLevel > 0) {
-    // === Clipping to match evaporator-style tight inner bounds ===
+    // Clipping to match evaporator-style tight inner bounds
     drawingContext.save();
     drawingContext.beginPath();
 
@@ -44,7 +41,7 @@ export function drawCondenserBody(x = 200, y = 50) {
     const innerH = bodyHeight - wallThickness * 0.6;
     const innerRadius = borderRadius - wallThickness * 0.8;
 
-    // === Rounded rectangle clipping path ===
+    // Rounded rectangle clipping path
     drawingContext.moveTo(innerX + innerRadius, innerY);
     drawingContext.lineTo(innerX + innerW - innerRadius, innerY);
     drawingContext.quadraticCurveTo(innerX + innerW, innerY, innerX + innerW, innerY + innerRadius);
@@ -58,7 +55,7 @@ export function drawCondenserBody(x = 200, y = 50) {
 
     drawingContext.clip();
 
-    // === Draw liquid inside condenser (fills only 1/3 height) ===
+    // Draw liquid inside condenser (fills only 1/3 height)
     const liquidMaxH = innerH / 3;  // Only allow bottom 1/3
     const liquidHeight = condenserLiquidLevel * (liquidMaxH - 1);
     const liquidY = innerY + innerH - liquidHeight-0.3;  // From bottom up
@@ -70,13 +67,13 @@ export function drawCondenserBody(x = 200, y = 50) {
     drawingContext.restore();
   }
 
-  // === Outer Container ===
+  // Outer Container
   stroke(180);
   strokeWeight(wallThickness);
   fill(255, 255, 255, 50);
   rect(0, 0, bodyWidth, bodyHeight, borderRadius);
 
-  // === Cooling Coil ===
+  // Cooling Coil
   const coilOffset = 10;
   const spacing = 2;
   const turns = 6;
@@ -95,7 +92,7 @@ export function drawCondenserBody(x = 200, y = 50) {
   }
   pop();
 
-  // === Cooling Wires ===
+  // Cooling Wires
   const switchX = -12;
   const switchY = 37;
   stroke(coolingCoilColor);
@@ -113,19 +110,14 @@ export function drawCondenserBody(x = 200, y = 50) {
   pop();
 }
 
-// === Cooling Switch UI ===
+// Cooling Switch UI
 export function drawCoolingSwitch(x = 120, y = 100) {
   const w = 15, h = 8;
 
   push();
   translate(x, y);
 
-  // Switch Box
-  fill(60);
-  stroke(0);
-  rect(-w / 2, 0, w, h, 4);
-
-  // Lever
+    // Lever
   push();
   translate(0, 0);
   rotate(radians(condenserCoolingOn ? 30 : -30));
@@ -133,6 +125,13 @@ export function drawCoolingSwitch(x = 120, y = 100) {
   strokeWeight(1);
   line(0, 0, 0, -4);
   pop();
+  
+  // Switch Box
+  fill(60);
+  noStroke();
+  rect(-w / 2, 0, w, h,  4);
+
+
 
   // Labels
   fill(255);
@@ -144,12 +143,12 @@ export function drawCoolingSwitch(x = 120, y = 100) {
 
   // Label
   fill(0);
-  text("Cooling Switch", 0, 11);
+  text("cooling switch", 0, 11);
 
   pop();
 }
 
-// === Handle mouse click ===
+// Handle mouse click
 export function toggleCooling(mx, my) {
   const x = 82, y = 65;
   const w = 15, h = 8;
@@ -181,13 +180,13 @@ export function drawCollectingBeaker(x = 20, y = 50, fluidLevel = 0.5) {
 
   const innerX = wall;
   const innerW = width - 2 * wall;
-  const fluidH = height * fluidLevel;
-  const fluidY = height - fluidH;
+  const fluidH = height * fluidLevel ;
+  const fluidY = height - fluidH-0.5;
 
   push();
   translate(x, y);
 
-  // === Beaker outline (open top) ===
+  // Beaker outline (open top)
   stroke(180);
   strokeWeight(1);
   noFill();
@@ -197,16 +196,16 @@ export function drawCollectingBeaker(x = 20, y = 50, fluidLevel = 0.5) {
   line(-2, 0, 0, 0);               // Left lip
   line(width + 2, 0, width, 0);    // Right lip
 
-  // === Fluid ===
+  // Fluid
   fill(30, 100, 255, 200); // Light blue
   noStroke();
   rect(innerX - 1.5, fluidY, innerW + 3, fluidH);
 
-  // === Graduation Marks ===
+  // Graduation Marks
   const maxValue = 250;
   const minorSteps = 25; // Every 10mL from 0 to 250
   const markSpacing = (height - 2 * wall) / minorSteps;
-  const startY = height - wall + 2.5;
+  const startY = height - wall +1.8;
 
   stroke(20);
   fill(0);
@@ -220,18 +219,18 @@ export function drawCollectingBeaker(x = 20, y = 50, fluidLevel = 0.5) {
     const isMajorMark = (value % 50 === 0);
     
     if (isMajorMark) {
-      // === Major marks with labels (50, 100, 150, 200, 250 mL) ===
+      // Major marks with labels (50, 100, 150, 200, 250 mL)
       strokeWeight(0.2);
       line(wall + 3, yMark, wall + 10, yMark); // Long line
       
       // Add number label
-      noStroke();
+        strokeWeight(0.1);
       textSize(2);
       text(value, wall + 10, yMark);
       stroke(20);
       
     } else {
-      // === Minor marks - lines only (10, 20, 30, 40, 60, 70, etc.) ===
+      // Minor marks - lines only (10, 20, 30, 40, 60, 70, etc.)
       strokeWeight(0.1);
       line(wall + 5, yMark, wall + 8, yMark); // Short line, no label
     }
@@ -239,7 +238,15 @@ export function drawCollectingBeaker(x = 20, y = 50, fluidLevel = 0.5) {
 
   // mL label
   textAlign(LEFT, BOTTOM);
-  text("mL", width - 6, wall + 1);
+    strokeWeight(0.1);
+
+  text("mL", width - 6, wall );
+
+  fill(0); // Black text for the label
+  noStroke();
+  textAlign(CENTER, CENTER);
+  textSize(2.5);
+  text("drawing beaker", width / 2, height + 3); // Label below the beaker
 
   pop();
 }
@@ -250,20 +257,20 @@ export function drawCondensateTube() {
   strokeWeight(2);
   noFill();
 
-  // === Points based on your setup ===
+  // Points based on your setup
   const startX = 94 + 10;  // center of condenser body
   const startY = 28 + 34;  // bottom of condenser (y + height)
 
   const bendX = startX;    // vertical pipe first
   const bendY = startY + 48;   // just above the beaker
 
-  // ✅ FIXED: Position tube to enter beaker properly (inside the beaker walls)
+  // Position tube to enter beaker properly (inside the beaker walls)
   const endX = 30 + 8;     // beaker center (x=30, width=20, so center = 30+10, but offset slightly)
   const endY = 75;         // beaker top (y=50 + 25 = 75, but enter from top)
 
   const tubeWidth = 2.5; // thickness of pipe
 
-  // === Vertical pipe
+  // Vertical pipe
   fill(200, 200, 200, 200); 
   noStroke();
   rect(startX - tubeWidth / 2, startY, tubeWidth, bendY - startY);
@@ -271,19 +278,19 @@ export function drawCondensateTube() {
   pop();
 }
 
-// ✅ ENHANCED: State-coordinated liquid flow animation
+// State-coordinated liquid flow animation
 export function drawCondensateTubeStream() {
-  // ✅ Only show liquid stream if experiment flows are active
+  // Only show liquid stream if experiment flows are active
   if (!drainingToBeaker || !window.experimentFlowsActive) return;
 
   const tubeX = 104; // Center X of the tube
   const topY = 62;   // Start of tube (bottom of condenser)
-  const bottomY = 100; // ✅ FIXED: End at beaker top (y=50 + 25 = 75)
+  const bottomY = 100; // End at beaker top (y=50 + 25 = 75)
   const tubeWidth = 2.5; // Match the tube width
-  const speed = 0.3; // ✅ REDUCED: Slower speed for more realistic flow
+  const speed = 0.3; // Slower speed for more realistic flow
 
   // Create rectangular liquid segments less frequently for slower flow
-  if (frameCount % 30 === 0 && condenserLiquidLevel > 0.25) { // ✅ FIXED: Only when above 1/4th
+  if (frameCount % 30 === 0 && condenserLiquidLevel > 0.25) { // Only when above 1/4th
     condensateBands.push({ 
       y: topY,
       opacity: 200,
@@ -318,9 +325,9 @@ export function drawCondensateTubeStream() {
   pop();
 }
 
-// ✅ SIMPLIFIED: This function now just adds particles to the condenser's internal system
+// This function now just adds particles to the condenser's internal system
 export function addParticleToCondenser() {
-  // ✅ Only add particles if experiment flows are active
+  // Only add particles if experiment flows are active
   if (!window.experimentFlowsActive) return;
   
   condenserParticles.push({
@@ -333,7 +340,7 @@ export function addParticleToCondenser() {
   });
 }
 
-// ✅ ENHANCED: State-coordinated condensation process
+// State-coordinated condensation process
 export function drawCondenserParticles() {
   const condenserCenterX = 210;
   const condenserCenterY = 67.5;
@@ -385,24 +392,24 @@ export function drawCondenserParticles() {
     }
   }
 
-  // ✅ ENHANCED: State-coordinated material balance with early completion
+  // State-coordinated material balance with early completion
   const currentTemp = window.reactorTemp || 300;
   const currentState = getExperimentState();
   const materialBalance = coordinateFlowRates(currentTemp);
   
-  // ✅ NEW: Make beaker progress available globally for evaporator coordination
+  // Make beaker progress available globally for evaporator coordination
   window.condensedFluidLevel = condensedFluidLevel;
   window.targetCollection = materialBalance.targetCollection;
   
-  // ✅ Handle state transitions
+  // Handle state transitions
   if (currentState !== lastExperimentState) {
     handleStateChange(currentState, lastExperimentState);
     lastExperimentState = currentState;
   }
   
-  // ✅ Only process liquid flow during FILLING state
+  // Only process liquid flow during FILLING state
   if (currentState === "FILLING" && window.experimentFlowsActive) {
-    // ✅ Wait until condenser is 1/4th full before starting flow
+    // Wait until condenser is 1/4th full before starting flow
     if (condenserLiquidLevel > 0.25 && condensedFluidLevel < materialBalance.targetCollection) {
       if (!drainingToBeaker) {
         drainingToBeaker = true;
@@ -410,11 +417,11 @@ export function drawCondenserParticles() {
         console.log(`Starting liquid collection at ${currentTemp}°C`);
       }
       
-      // ✅ Use realistic transfer rate based on temperature
+      // Use realistic transfer rate based on temperature
       condensedFluidLevel += materialBalance.liquidFillRate;
       condenserLiquidLevel = max(0, condenserLiquidLevel - materialBalance.liquidFillRate * 0.8);
       
-      // ✅ ENHANCED: Progressive condenser draining - normal until target-20mL, then fast drain
+      // Progressive condenser draining - normal until target-20mL, then fast drain
       const targetLevel = materialBalance.targetCollection;
       const target_mL = targetLevel * 250; // Convert to mL (155mL or 185mL)
       const current_mL = condensedFluidLevel * 250; // Current beaker level in mL
@@ -433,20 +440,20 @@ export function drawCondenserParticles() {
         }
       }
       
-      // ✅ NEW: Check if target collection is reached - stop flow but keep equipment on
+      // Check if target collection is reached - stop flow but keep equipment on
       if (condensedFluidLevel >= materialBalance.targetCollection) {
         condensedFluidLevel = materialBalance.targetCollection; // Cap at target
         drainingToBeaker = false;
         condensateBands = []; // Clear flowing liquid
         
-        // ✅ FINAL DRAIN: Empty condenser completely when target reached
+        // Empty condenser completely when target reached
         condenserLiquidLevel = 0;
-        console.log("🫗 Final drain: Condenser emptied completely");
+        console.log("Final drain: Condenser emptied completely");
         
-        // ✅ SIMPLIFIED: Just transition to COMPLETE state, no equipment shutdown
+        // Just transition to COMPLETE state, no equipment shutdown
         if (typeof window.setExperimentComplete === 'function') {
           window.setExperimentComplete();
-          console.log(`🎯 Target reached! Experiment ready for measurement at ${currentTemp}°C`);
+          console.log(`Target reached! Experiment ready for measurement at ${currentTemp}°C`);
           console.log(`Collected: ${(materialBalance.targetCollection * 250).toFixed(0)}mL - condenser fully drained`);
         }
       }
@@ -456,20 +463,20 @@ export function drawCondenserParticles() {
       drainingToBeaker = false;
     }
   } else if (currentState === "COMPLETE" || currentState === "MEASURING") {
-    // ✅ SIMPLIFIED: Just stop liquid flows, keep everything else running
+    // Just stop liquid flows, keep everything else running
     drainingToBeaker = false;
     condensateBands = []; // Clear flowing liquid
     
-    // ✅ Keep beaker level stable at target, condenser stays empty
+    // Keep beaker level stable at target, condenser stays empty
     const materialBalance = coordinateFlowRates(currentTemp);
     condensedFluidLevel = materialBalance.targetCollection; // Maintain target level
     condenserLiquidLevel = 0; // Keep condenser empty after completion
   }
 }
 
-// ✅ NEW: Handle experiment state changes
+// Handle experiment state changes
 function handleStateChange(newState, oldState) {
-  console.log(`🔄 Condenser: State change ${oldState} → ${newState}`);
+  console.log(`Condenser: State change ${oldState} → ${newState}`);
   
   switch (newState) {
     case "IDLE":
@@ -481,14 +488,14 @@ function handleStateChange(newState, oldState) {
       drainingToBeaker = false;
       condensateBands = [];
       condenserLiquidLevel = 0;
-      condensedFluidLevel = 0; // ✅ Reset beaker to empty for new experiment
-      console.log("🔄 Condenser reset to initial state - beaker emptied");
+      condensedFluidLevel = 0; // Reset beaker to empty for new experiment
+      console.log("Condenser reset to initial state - beaker emptied");
       break;
       
     case "FILLING":
       if (oldState === "IDLE") {
         experimentStartTime = millis();
-        console.log("🚀 Condenser: Starting material balance tracking");
+        console.log("Condenser: Starting material balance tracking");
       }
       break;
       
@@ -496,8 +503,8 @@ function handleStateChange(newState, oldState) {
       // Stop all flows immediately
       drainingToBeaker = false;
       condensateBands = [];
-      console.log("⏹️ Condenser: All flows stopped - experiment complete");
-      console.log("🫗 Condenser will drain, beaker level maintained");
+      console.log("Condenser: All flows stopped - experiment complete");
+      console.log("Condenser will drain, beaker level maintained");
       break;
       
     case "MEASURING":
@@ -510,11 +517,11 @@ function handleStateChange(newState, oldState) {
   }
 }
 
-// ✅ ENHANCED: Realistic material balance calculations with state coordination
+// Realistic material balance calculations with state coordination
 export function coordinateFlowRates(temp) {
   const currentState = getExperimentState();
   
-  // ✅ No flow rates outside of FILLING state
+  // No flow rates outside of FILLING state
   if (currentState !== "FILLING" || !window.experimentFlowsActive) {
     return { 
       gasFlowRate: 0, 
@@ -564,7 +571,7 @@ export function coordinateFlowRates(temp) {
   // Convert to simulation scale (250 mL beaker = 1.0 scale)
   const targetCollection = liquidProduced_mL / 250; // Scale to 0-1
   
-  // ✅ ENHANCED: More realistic fill rate coordination with experiment timing
+  // More realistic fill rate coordination with experiment timing
   const experimentDuration_s = 120; // 2 minutes
   const liquidFillRate = targetCollection / (experimentDuration_s * 60) * 2.0; // per frame at 60fps
 
@@ -580,18 +587,18 @@ export function coordinateFlowRates(temp) {
   };
 }
 
-// ✅ NEW: Get current material balance data for display
+// Get current material balance data for display
 export function getMaterialBalanceData() {
   const currentTemp = window.reactorTemp || 300;
   return coordinateFlowRates(currentTemp);
 }
 
-// ✅ NEW: Check if condenser is ready for operation
+// Check if condenser is ready for operation
 export function isCondenserReady() {
   return condenserCoolingOn && window.reactorHeaterOn;
 }
 
-// ✅ NEW: Get condenser state for debugging
+// Get condenser state for debugging
 export function getCondenserState() {
   return {
     coolingOn: condenserCoolingOn,
@@ -601,4 +608,42 @@ export function getCondenserState() {
     particleCount: condenserParticles.length,
     bandCount: condensateBands.length
   };
+}
+
+// Reset function for condenser component  
+export function resetCondenser() {
+  // Reset equipment state
+  window.condenserCoolingOn = false;
+  
+  // Reset cooling visuals
+  coolingCoilColor = 120; // Steel gray
+  if (coolingTimer) {
+    clearTimeout(coolingTimer);
+    coolingTimer = null;
+  }
+  
+  // Reset fluid levels
+  condensedFluidLevel = 0.0;
+  condenserLiquidLevel = 0.0;
+  
+  // Reset flow state
+  drainingToBeaker = false;
+  drainStartTime = 0;
+  
+  // Reset particle arrays
+  condenserParticles = [];
+  condensateBands = [];
+  
+  // Reset material balance tracking
+  experimentStartTime = null;
+  totalPropanolFed = 0;
+  propanolConsumed = 0;
+  liquidProductMass = 0;
+  lastExperimentState = "IDLE";
+  
+  // Reset global variables
+  window.condensedFluidLevel = 0.0;
+  window.targetCollection = 0.0;
+  
+  console.log("Condenser reset complete");
 }

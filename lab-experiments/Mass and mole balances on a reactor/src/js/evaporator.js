@@ -1,7 +1,3 @@
-// js/evaporator.js
-// import { random, pow } from "p5";
-
-
 let steamParticles = [];
 let pumpPower = false;
 let valveOpen = false; // Track valve state
@@ -9,7 +5,7 @@ let evaporatorFluidLevel = 0.0; // 0.0 to 0.5 max
 let tubeFlowLevel = 0;  // range: 0 to 1.0 (100% of the tube)
 let beakerFluidLevel = 0.8; // Add this new variable
 
-// ✅ UPDATED: Use global heater state for auto-shutdown compatibility
+// Use global heater state for auto-shutdown compatibility
 window.evaporatorHeaterOn = false; // Global state instead of local
 let heaterColor = 120; // initial gray
 let heaterColorTarget = 120; // target value
@@ -75,7 +71,7 @@ export function drawBeaker(x = 20, y = 50, fluidHeight = beakerFluidLevel) {
     rect(100, 150, 80, 150); // Replace with your tank
     fill(0);
   
-    text("Ethanol Tank", 10, 28); // Label centered below the tank
+    text("proponal tank", 10, 28); // Label centered below the tank
   // Graduation lines + labels
   const steps = 5; // for 200, 400, ..., 1000
   const maxValue = 500;
@@ -116,7 +112,7 @@ export function drawBeaker(x = 20, y = 50, fluidHeight = beakerFluidLevel) {
 
     // FLOW LOGIC
   if (shouldLiquidFlow() && tubeFlowLevel < 1.0) {
-    tubeFlowLevel += 0.1; // adjust speed if needed
+    tubeFlowLevel += 0.005; // adjust speed if needed
   }
 
   // LIQUID FLOW VISUAL
@@ -165,22 +161,22 @@ export function drawPumpAndSwitch(pumpX = 60, pumpY = 50, switchX = 60, switchY 
   
   ellipse(300, 200, 70, 70); // Replace with your pump
   fill(0);
-  text("Pump Switch", 12, 101); // Label below the pump
+  text("pump switch", 12, 101); // Label below the pump
 }
 
-// NEW: Draw the valve (the black circular thing connected to pump)
+// Draw the valve (the black circular thing connected to pump)
 function drawValve(x, y) {
   push();
   translate(x, y);
 
   const flowing = pumpPower && valveOpen;
 
-  // === Valve base (always visible)
+  // Valve base (always visible)
   fill(100, 180, 255);  // blue base
   noStroke();
   ellipse(0, 0, 8, 8);  // Slightly smaller than 3-way valve
 
-  // === Rotating handle
+  // Rotating handle
   push();
   rotate(valveOpen ? radians(180) : radians(90));  // Upright if open, flat if closed
   fill(135, 206, 250);  // lighter handle
@@ -190,7 +186,7 @@ function drawValve(x, y) {
 
   pop();
 
-  // === Dynamic label above valve
+  // Dynamic label above valve
   fill(0);
   noStroke();
   textSize(2.5);
@@ -213,19 +209,21 @@ function drawPumpPowerSwitch(x, y) {
   strokeWeight(1);
   bezier(18, 18, 4, 32, 10, 20, 3, 30);
 
-  // Switch box
-  fill(60);
-  stroke(0);
-  rect(-boxW / 2, 30, boxW, boxH, 5);
-
-  // === Lever
+    // Lever
   push();
   translate(0, 30); // origin is center of the switch box
   rotate(radians(pumpPower ? 30 : -30)); // flip depending on state
   stroke(0);
   strokeWeight(1);
-  line(0, 0, 0, -5); // draw lever upwards
+  line(0, 0, 0, -4); // draw lever upwards
   pop();
+
+  // Switch box
+  fill(60);
+  noStroke();
+  rect(-boxW / 2, 30, boxW, boxH, 4);
+
+
 
   // Labels
   fill(255);
@@ -252,7 +250,7 @@ export function togglePumpPower(mx, my) {
       my >= switchBoxY && my <= switchBoxY + boxH) {
     pumpPower = !pumpPower;
     
-    // ADD THIS: Auto-close valve when pump is turned off
+    // Auto-close valve when pump is turned off
     if (!pumpPower) {
       valveOpen = false;
       console.log("Pump turned OFF - Valve automatically CLOSED");
@@ -265,7 +263,7 @@ export function togglePumpPower(mx, my) {
   return false;
 }
 
-/// NEW FUNCTION: Toggle valve state when clicked (now uses the black circular valve)
+// Toggle valve state when clicked (now uses the black circular valve)
 export function toggleValve(mx, my) {
   const vx = valveCoords.x;
   const vy = valveCoords.y;
@@ -308,44 +306,26 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
   const outletCenterX = bodyWidth / 2;
   const outletTopY = 0; // top of evaporator
 
-  // fill(200);           // same color as pipe
-  // noStroke();          // remove border
-  // rect(outletCenterX - 1, outletTopY - 6, 2, 6);  // width 2, height 6 // Adjust -25 as needed
-  
-  // Vertical pipe from evaporator
-  // fill(200);
-  // noStroke();
-  
-
   // Horizontal elbow extension (goes right)
   
   let elbowLength = reactorX - (x + outletCenterX);
-  // rect(outletCenterX - 1, outletTopY - 8, 2, 6);  // vertical segment
-  // rect(outletCenterX - 1, outletTopY - 9, elbowLength, 2);
   fill(200, 200, 200, 200); // light gray, with alpha (100/255 ~ 40% opacity)
   noStroke();
 
   rect(outletCenterX -1, outletTopY - 11.5, 2.5, 12.8);  // vertical segment
   rect(outletCenterX -1, outletTopY - 14, elbowLength, 2.5);
 
-  // // Optional label
-  // noStroke();
-  // fill(0);
-  // textSize(3);
-  // textAlign(CENTER, BOTTOM);
-  // text("Ethanol Vapor Out", outletCenterX, outletTopY - 28);
+  if (shouldLiquidFlow() && tubeFlowLevel >= 1.0 && evaporatorFluidLevel < 0.4) { // Much lower max level
+      evaporatorFluidLevel += 0.001;   // Slower fill rate
 
-  if (shouldLiquidFlow() && tubeFlowLevel >= 1.0 && evaporatorFluidLevel < 0.4) { // ← Much lower max level
-      evaporatorFluidLevel += 0.001;   // ← Slower fill rate
-
-        // ADD THIS: Reduce beaker fluid as evaporator fills
+        // Reduce beaker fluid as evaporator fills
     if (beakerFluidLevel > 0) {
       beakerFluidLevel -= 0.001; // Adjust this rate as needed
       beakerFluidLevel = Math.max(0, beakerFluidLevel); // Don't go below 0
     }
   }
 
-  // ✅ NEW: Coordinated evaporator draining with beaker filling
+  // Coordinated evaporator draining with beaker filling
   // Get current experiment state and beaker progress
   if (typeof window.experimentState !== 'undefined' && window.experimentState === "FILLING") {
     // Get beaker filling progress from condenser
@@ -366,13 +346,6 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
       }
     }
   }
-
-  // check later
-  // ✅ UPDATED: Use global heater state
-  // if (window.evaporatorHeaterOn && evaporatorFluidLevel > 0.05) {
-  //   evaporatorFluidLevel -= 0.004; // ← FAST evaporation rate
-  //   evaporatorFluidLevel = Math.max(0, evaporatorFluidLevel);
-  // }
 
   // Draw liquid using clipping
   if (evaporatorFluidLevel > 0) {
@@ -410,7 +383,7 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
     const baseY = bodyHeight - fillHeight;
 
     if (boilingStartTime && millis() - boilingStartTime > 3000) {
-      // === Draw waving liquid surface ===
+      // Draw waving liquid surface
       beginShape();
       for (let i = 0; i <= innerW; i++) {
         const x = innerX + i;
@@ -421,13 +394,13 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
       vertex(innerX, bodyHeight);
       endShape(CLOSE);
     } else {
-      // === Normal liquid rectangle ===
+      // Normal liquid rectangle
       rect(innerX, baseY, innerW, fillHeight);
     }
 
     drawingContext.restore();
 
-  // ✅ UPDATED: Use global heater state for bubbling logic
+  // Use global heater state for bubbling logic
   if (evaporatorFluidLevel > 0.1 && window.evaporatorHeaterOn) {
     // Start boiling timer if not already started
     if (!boilingStartTime) boilingStartTime = millis();
@@ -436,12 +409,12 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
     
     // Only start bubbles after heater has been red for 2 seconds (total 5 seconds)
     if (heatingTime > 5000) {
-      // ✅ NEW: Auto-turn off pump when bubbles start (enough liquid in system)
+      // Auto-turn off pump when bubbles start (enough liquid in system)
       if (pumpPower && bubbles.length === 0) {
         pumpPower = false;
         valveOpen = false; // Also close valve
-        console.log("🔴 Auto-shutdown: Pump OFF - bubbles started, enough liquid in system");
-        console.log("🔴 Auto-shutdown: Valve CLOSED");
+        console.log("Auto-shutdown: Pump OFF - bubbles started, enough liquid in system");
+        console.log("Auto-shutdown: Valve CLOSED");
       }
       
       // Add bubbles more frequently but gradually
@@ -468,7 +441,7 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
         fill(100, 180, 255, 150);  // pale blue
         noStroke();
 
-        const fluidTopY = -10 + 35 * (1 - evaporatorFluidLevel); // <== move this here
+        const fluidTopY = -10 + 35 * (1 - evaporatorFluidLevel); // move this here
 
       for (let i = bubbles.length - 1; i >= 0; i--) {
         let b = bubbles[i];
@@ -501,13 +474,13 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
 
     }
   } else {
-    // ✅ UPDATED: Clear everything when global heater is off
+    // Clear everything when global heater is off
     boilingStartTime = null;
     liquidMovementStartTime = null;
     bubbles = [];
   }
 
-// ✅ UPDATED: Use global heater state for vapor particle animation with coordinated stopping
+// Use global heater state for vapor particle animation with coordinated stopping
 if (
   window.evaporatorHeaterOn &&
   evaporatorFluidLevel > 0.02 &&
@@ -516,7 +489,7 @@ if (
   frameCount % 2 === 0 &&
   vaporParticles.length < maxVaporParticles
 ) {
-  // ✅ NEW: Stop vapor particles during final 5mL approach (match bubble meter timing)
+  // Stop vapor particles during final 5mL approach (match bubble meter timing)
   let shouldStopVapor = false;
   if (typeof window.condensedFluidLevel !== 'undefined' && typeof window.targetCollection !== 'undefined') {
     const current_mL = window.condensedFluidLevel * 250; // Current beaker level in mL
@@ -578,7 +551,7 @@ for (let i = vaporParticles.length - 1; i >= 0; i--) {
   fill(255, 255, 255, 50);
   rect(0, 0, bodyWidth, bodyHeight, borderRadius);
 
-  // ADD THIS: Draw tube connection inside evaporator
+  // Draw tube connection inside evaporator
   const tubeWidth = 2.5;
   const tubeInsideHeight = 8; // How much tube shows inside
   const tubeX = -tubeWidth / 2; // Center it horizontally
@@ -594,7 +567,7 @@ for (let i = vaporParticles.length - 1; i >= 0; i--) {
     rect(tubeX +10, tubeY + 7, tubeWidth, tubeInsideHeight -6.1);
   }
 
-  // ✅ UPDATED: Use global heater state for coil color
+  // Use global heater state for coil color
   push();
   translate(0, 15); // Center the coil around evaporator
 
@@ -627,13 +600,11 @@ export function drawHeaterSwitch(x = 100, y = 100) {
   push();
   translate(x, y);
 
-  // Switch Box
-  fill(60);
-  stroke(0);
-  rect(-w / 2, 0, w, h, 4);
+
+
 
     // Curved wire
-  stroke(120);
+  stroke(heaterColor);
   noFill();
   strokeWeight(0.8);
     // Upper wire: from top center to top of evaporator
@@ -642,7 +613,7 @@ export function drawHeaterSwitch(x = 100, y = 100) {
   // Lower wire: from bottom center to bottom of evaporator
   bezier(0, 0, -3, -4, 5, -2, 9, -7);
 
-  // ✅ UPDATED: Use global heater state for lever position
+    // Use global heater state for lever position
   push();
   translate(0, 0);
   rotate(radians(window.evaporatorHeaterOn ? 30 : -30));
@@ -650,8 +621,13 @@ export function drawHeaterSwitch(x = 100, y = 100) {
   strokeWeight(1);
   line(0, 0, 0, -4);
   pop();
+  
+  // Switch Box
+  fill(60);
+  noStroke();
+  rect(-w / 2, 0, w, h, 4);
 
-  // === Labels ===
+  // Labels
   fill(255);
   noStroke();
   textSize(2.5); // Make it more readable
@@ -667,7 +643,7 @@ export function drawHeaterSwitch(x = 100, y = 100) {
   fill(255, 99, 71);
   rect(500, 300, 60, 100); // Replace with your heater
   fill(0);
-  text("Heater Switch", 0, 11); // Label below the heater
+  text("heater switch", 0, 11); // Label below the heater
 
   pop();
 }
@@ -683,7 +659,7 @@ export function toggleHeater(mx, my) {
   if (mx >= boxX && mx <= boxX + boxW &&
       my >= boxY && my <= boxY + boxH) {
 
-    // ✅ UPDATED: Toggle global heater state
+    // Toggle global heater state
     window.evaporatorHeaterOn = !window.evaporatorHeaterOn;
 
     if (window.evaporatorHeaterOn) {
@@ -700,4 +676,37 @@ export function toggleHeater(mx, my) {
   }
 
   return false;
+}
+
+// Reset function for evaporator component
+export function resetEvaporator() {
+  // Reset equipment states
+  window.evaporatorHeaterOn = false;
+  pumpPower = false;
+  valveOpen = false;
+  
+  // Reset fluid levels
+  evaporatorFluidLevel = 0.0;
+  tubeFlowLevel = 0;
+  beakerFluidLevel = 0.8; // Initial beaker level
+  
+  // Reset particle arrays
+  steamParticles = [];
+  bubbles = [];
+  vaporParticles = [];
+  
+  // Reset heater visuals
+  heaterColor = 120; // Gray
+  heaterColorTarget = 120;
+  if (heaterTimer) {
+    clearTimeout(heaterTimer);
+    heaterTimer = null;
+  }
+  
+  // Reset timing variables
+  boilingStartTime = null;
+  liquidMovementStartTime = null;
+  window.liquidMovementStartTime = null;
+  
+  console.log("Evaporator reset complete");
 }

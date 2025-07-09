@@ -35,18 +35,19 @@
             <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">
               About
             </div>
-            <a href="../assets/Mass_and_mole_balances_worksheet.docx" class="btn btn-primary" id="worksheet" download>Worksheet</a>
-
-
+              <div type="button" class="btn btn-primary" id="worksheet">Worksheet</div>       
+               <div type="button" class="btn btn-danger" id="reset-button">
+              Reset
+            </div>
           </div>
         </div>
       </div>
     </div>
-        <div id="temp-slider-container" style="position: absolute; top: 15px; left: 50%; transform: translateX(-50%); font-family: sans-serif;">
-        <label for="tempSlider">temperature(°C):</label>
-        <input type="range" id="tempSlider" min="200" max="400" value="200">
-        <span id="tempValue">200°C</span>
-      </div>
+    <div id="temp-slider-container" style="position: absolute; top: 15px; left: 50%; transform: translateX(-50%); font-family: sans-serif;">
+      <label for="tempSlider">temperature(°C):</label>
+      <input type="range" id="tempSlider" min="200" max="400" value="200">
+      <span id="tempValue">200°C</span>
+    </div>
   </div>
 
   <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label" aria-hidden="true">
@@ -84,7 +85,6 @@
             It was prepared with financial support from the National Science Foundation 
             (DUE 2336987 and 2336988) in collaboration with Washington State University. 
             Address any questions or comments to LearnChemE@gmail.com.  
-
           </p>
         </div>
       </div>
