@@ -85,10 +85,10 @@ window.draw = function () {
   }
 
   if (state.permeateBeakerFillUp === true) {
-    state.permeateBeakerTimer += 2 / 3;
+    state.permeateBeakerTimer += 0.5;
   }
   if (state.retentateBeakerFillUp === true) {
-    state.rententateBeakerTimer += 1 / 3;
+    state.rententateBeakerTimer += 0.5;
   }
 
   /*  if (
@@ -113,8 +113,8 @@ window.draw = function () {
   drawSaltTank(state.figureX, state.figureY);
   drawPressureGauge(state.figureX, state.figureY);
 
-  drawBeaker(785, 365, 170, 170); //drawBeaker(x, y, beakerWidth, beakerHeight)
-  drawBeaker(1010, 365, 170, 170);
+  drawBeaker(780, 357, 180, 180); //drawBeaker(x, y, beakerWidth, beakerHeight)
+  drawBeaker(1005, 357, 180, 180);
   drawFilter(state.figureX, state.figureY);
   drawWater(state.figureX, state.figureY);
   drawPumpSwitch(state.figureX, state.figureY, state.pumpOn);
@@ -381,11 +381,11 @@ function drawPressureGauge(x, y) {
   translate(x + 160, y - 145);
   angleMode(DEGREES);
   strokeWeight(1.5);
-  for (let i = -45; i <= 225; i += (225 + 45) / 4) {
+  for (let i = -45; i <= 225; i += (225 + 45) / 6) {
     line(28 * cos(i), -28 * sin(i), 32 * cos(i), -32 * sin(i));
   }
   strokeWeight(1);
-  for (let i = -45; i <= 225; i += (225 + 45) / 20) {
+  for (let i = -45; i <= 225; i += (225 + 45) / 30) {
     line(28 * cos(i), -28 * sin(i), 30 * cos(i), -30 * sin(i));
   }
   //--------------------numbers on pressure gauge--------------------
@@ -394,8 +394,10 @@ function drawPressureGauge(x, y) {
   noStroke();
   fill("Black");
   textSize(11);
-  for (let i = -45; i <= 225; i += (225 + 45) / 4) {
-    text(-(i + 45) / (270 / 20) + 30, 40 * cos(i), -40 * sin(i));
+  for (let i = -45; i <= 225; i += (225 + 45) / 6) {
+    let pressureGaugeText = -(i + 45) / (270 / 30) + 30;
+
+    text(pressureGaugeText.toFixed(0), 40 * cos(i), -40 * sin(i));
   }
   pop();
 
@@ -404,12 +406,12 @@ function drawPressureGauge(x, y) {
   fill("black");
   noStroke();
   triangle(
-    35 * cos(-(270 * state.feedPressure) / 20),
-    -35 * sin(-(270 * state.feedPressure) / 20),
-    15 * cos(-(270 * state.feedPressure) / 20 + 180 - 17),
-    -15 * sin(-(270 * state.feedPressure) / 20 + 180 - 17),
-    15 * cos(-(270 * state.feedPressure) / 20 + 180 + 17),
-    -15 * sin(-(270 * state.feedPressure) / 20 + 180 + 17)
+    35 * cos(-(180 * state.feedPressure) / 20 - 135),
+    -35 * sin(-(180 * state.feedPressure) / 20 - 135),
+    15 * cos(-(180 * state.feedPressure) / 20 - 135 + 180 - 17),
+    -15 * sin(-(180 * state.feedPressure) / 20 - 135 + 180 - 17),
+    15 * cos(-(180 * state.feedPressure) / 20 - 135 + 180 + 17),
+    -15 * sin(-(180 * state.feedPressure) / 20 - 135 + 180 + 17)
   );
   fill("gray");
   strokeWeight(5);
@@ -660,19 +662,19 @@ function drawWater(x, y) {
 
   //retentate
   fill(170, 255, 230, 180); //retentate green
-  if (state.rententateBeakerTimer <= 100) {
-    rect(x + 878, y + 372 - state.rententateBeakerTimer, x + 962, y + 372);
+  if (state.rententateBeakerTimer <= 177) {
+    rect(x + 838, y + 373 - state.rententateBeakerTimer, x + 1002, y + 373);
   } else {
-    rect(x + 878, y + 272, x + 962, y + 372);
+    rect(x + 838, y + 373 - 177, x + 1002, y + 373);
   }
 
   //permeate
-  fill(224, 255, 255, 180);
+  fill(224, 255, 255, 180); //permeate blue
 
-  if (state.permeateBeakerTimer <= 200) {
-    rect(x + 603, y + 372 - state.permeateBeakerTimer, x + 787, y + 372);
+  if (state.permeateBeakerTimer <= 177) {
+    rect(x + 613, y + 373 - state.permeateBeakerTimer, x + 777, y + 373);
   } else {
-    rect(x + 603, y + 172, x + 787, y + 372);
+    rect(x + 613, y + 373 - 177, x + 777, y + 373);
   }
 
   pop();
