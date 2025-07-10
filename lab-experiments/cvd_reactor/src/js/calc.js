@@ -34,7 +34,7 @@ export function massSiO2WithRecycle(gasFlowRate, TEOSFraction, conversion, recyc
   const freshTEOS = gasFlowRate * TEOSFraction;
 
   // 2. Total TEOS molar flow into reactor [mol/s]
-  const TEOSIn = freshTEOS / (1 - recycleRatio * (1 - conversion));
+  const TEOSIn = freshTEOS / (recycleRatio * conversion + 1);
 
   // 3. Moles reacted per second [mol/s]
   const reactedTEOS = TEOSIn * conversion;
