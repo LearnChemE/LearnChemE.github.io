@@ -24,49 +24,50 @@ module.exports = {
     rules: [
       {
         rules: [
-            {
-                test: /\.tsx?$/,
-                use: 'ts-loader',
-                exclude: /node_modules/,
-            },
+          {
+            test: /\.tsx?$/,
+            use: "ts-loader",
+            exclude: /node_modules/,
+          },
         ],
       },
       {
         test: /\.(scss)$/i,
-        use: [{
-          loader: miniCssExtractPlugin.loader,
-        },
-        {
-          loader: "css-loader",
-        },
-        {
-          loader: "postcss-loader",
-          options: {
-            postcssOptions: {
-              plugins: [autoprefixer],
+        use: [
+          {
+            loader: miniCssExtractPlugin.loader,
+          },
+          {
+            loader: "css-loader",
+          },
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [autoprefixer],
+              },
             },
           },
-        },
-        {
-          loader: "sass-loader",
-        },
+          {
+            loader: "sass-loader",
+          },
         ],
       },
       {
         test: /\.css$/i,
-        use: ['style-loader', 'css-loader']
+        use: ["style-loader", "css-loader"],
       },
       {
         test: /\.svg$/,
-        loader: 'svg-inline-loader'
+        loader: "svg-inline-loader",
       },
       {
-        test: /\.png$/,
-        type: 'asset/resource',
-      }
+        test: /\.(png|docx)$/,
+        type: "asset/resource",
+      },
     ],
   },
   resolve: {
-      extensions: ['.tsx','.ts','.js'],
+    extensions: [".tsx", ".ts", ".js"],
   },
 };
