@@ -10,6 +10,7 @@ window.state = {
   frameRate: 60,
   pixelDensity: 4,
   showButtons: false,
+  mode: "compressor",
   hamburgerHasBeenClicked: window.localStorage.getItem("hamburgerHasBeenClicked") === "true",
   canvasSize: [150, 120],
 };
@@ -47,5 +48,97 @@ function sizeContainer() {
   containerElement.style.height = `calc(calc(100vw - 10px) * ${state.canvasSize[1]} / ${state.canvasSize[0]})`;
   containerElement.style.maxHeight = `calc(100vh - 10px)`;
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btnPressure = document.getElementById("btn-pressure");
+  const btnTemperature = document.getElementById("btn-temperature");
+  const btnCompressor = document.getElementById("btn-compressor");
+  const btnTurbine = document.getElementById("btn-turbine");
+
+  const outletSlider = document.getElementById("outlet-slider");
+  const outletLabel = document.getElementById("outlet-label");
+  const outletValue = document.getElementById("outlet-value");
+
+  const eta1 = document.getElementById("eta1");
+  const eta2 = document.getElementById("eta2");
+  const eta1Val = document.getElementById("eta1-value");
+  const eta2Val = document.getElementById("eta2-value");
+
+  function setActiveButton(group, selectedId) {
+    document.querySelectorAll(`#${group} button`).forEach(btn => {
+      btn.classList.remove("active");
+    });
+    document.getElementById(selectedId).classList.add("active");
+  }
+
+  function getSelected(group) {
+    return document.querySelector(`#${group} button.active`).textContent;
+  }
+
+  function updateOutletSlider() {
+    const outletType = getSelected("outlet-buttons");
+    const machineType = getSelected("machine-buttons");
+
+    outletLabel.textContent = outletType === "pressure"
+      ? "Outlet Pressure (bar):"
+      : "Outlet Temperature (K)";
+
+    if (outletType === "pressure" && machineType === "compressor") {
+      outletSlider.min = 10;
+      outletSlider.max = 20;
+    } else if (outletType === "pressure") {
+      outletSlider.min = 0.8;
+      outletSlider.max = 2;
+    } else if (machineType === "compressor") {
+      outletSlider.min = 500;
+      outletSlider.max = 650;
+    } else {
+      outletSlider.min = 350;
+      outletSlider.max = 450;
+    }
+
+    outletSlider.step = 0.1;
+    outletSlider.value = (parseFloat(outletSlider.min) + parseFloat(outletSlider.max)) / 2;
+    outletValue.textContent = outletSlider.value;
+  }
+
+  // Event listeners for buttons
+  btnPressure.onclick = () => {
+    setActiveButton("outlet-buttons", "btn-pressure");
+    updateOutletSlider();
+  };
+
+  btnTemperature.onclick = () => {
+    setActiveButton("outlet-buttons", "btn-temperature");
+    updateOutletSlider();
+  };
+
+  btnCompressor.onclick = () => {
+    setActiveButton("machine-buttons", "btn-compressor");
+  window.state.mode = "compressor";   // set global state
+  updateOutletSlider();
+  };
+
+  btnTurbine.onclick = () => {
+    setActiveButton("machine-buttons", "btn-turbine");
+  window.state.mode = "turbine";      // set global state
+  updateOutletSlider();
+  };
+
+  outletSlider.addEventListener("input", () => {
+    outletValue.textContent = outletSlider.value;
+  });
+
+  eta1.addEventListener("input", () => {
+    eta1Val.textContent = eta1.value;
+  });
+
+  eta2.addEventListener("input", () => {
+    eta2Val.textContent = eta2.value;
+  });
+
+  updateOutletSlider(); // Initial setup
+});
+
 
 require("./js/events.js");
