@@ -38,7 +38,7 @@ dropdown.querySelectorAll('li').forEach(item => {
     if (opt === 'directions') {
       title = 'Directions';
       body  = `
-        <p>This simulation uses Langmuir isotherms to model adsorption of a binary gas mixture on a surface. The number of molecules per site are plotted versus the total pressure (P<sub>A</sub> + P<sub>B</sub>). Use the sliders above to vary the heats of adsorption of each component, the temperature, and the ratio of partial pressures; adjust the relative number of sites per molecule to account for larger molecules occupying more surface area than smaller molecules. The two components compete for adsorption sites but do not interact with each other. Zoom on the graph with your scroll wheel.</p>
+        <p>This simulation uses Langmuir isotherms to model adsorption of a binary gas mixture on a surface. The number of molecules per site are plotted versus the total pressure (P<sub>A</sub> + P<sub>B</sub>). Use the sliders to vary the heats of adsorption of each component, the temperature, and the ratio of partial pressures. </p> <p>Adjust the relative number of sites per molecule to account for larger molecules occupying more surface area than smaller molecules. The two components compete for adsorption sites but do not interact with each other. Zoom on the graph with your scroll wheel.</p>
         `;
     }
     else if (opt === 'details') {
@@ -47,7 +47,7 @@ dropdown.querySelectorAll('li').forEach(item => {
         <p>The number of molecules per site for components A and B are:</p>
         $$\\theta_A = \\frac{K_A P_A}{1 + K_A P_A + K_B P_B}$$
         $$\\theta_B = \\frac{K_B P_B}{\\alpha (1 + K_A P_A + K_B P_B)}$$
-        <p>where \\(K_i\\) is the adsorption equilibrium constant for component \\(i = A, B\\) (1/bar), \\(P_i\\) is the partial pressure (bar), and \\(\\alpha\\) is the saturation coverage of B to A.</p>
+        <p>where \\(K_i\\) is the adsorption equilibrium constant for component \\(i = A, B\\) (1/bar), \\(P_i\\) is the partial pressure (bar), and \\(\\alpha\\) is the ratio of the saturation coverages of B to A.</p>
         $$K_i = k \\, e^{\\lambda_i / (R T)}$$
         <p>where \\(k\\) is a pre-exponential factor (1/bar), \\(\\lambda_i\\) is the heat of adsorption (kJ/mol), \\(R\\) is the ideal gas constant (kJ/[mol K]), and \\(T\\) is temperature (K).</p>
         $$P_A = \\frac{P}{1+r}$$
@@ -61,7 +61,7 @@ dropdown.querySelectorAll('li').forEach(item => {
         <p>
         This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank" rel="noopener">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder 
         for <a href="https://learncheme.com/" target="_blank" rel="noopener">LearnChemE.com</a> by Venkateswarlu Mopidevi under the direction of Professor John L. Falconer and Michelle Medlin. 
-        It is a JavaScript/HTML5 implementation of a Mathematica simulation by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.
+        It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/LangmuirIsothermsForABinaryMixture/" target="_blank" rel="noopener">Mathematica simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>.
       `;
     }
 
@@ -153,7 +153,7 @@ function updatePlot() {
         title:{ 
           text:'total pressure (bar) = P<sub>A</sub> + P<sub>B</sub>',
           standoff:15,
-          font:{size:20,family:'Helvetica, sans-serif',color:'#000'}
+          font:{size:20,family:'Arial, sans-serif',color:'#000'}
         },
         range:[0,10],
         dtick:2,
@@ -174,7 +174,7 @@ function updatePlot() {
         title:{
           text:'number of molecules/site',
           standoff:25,
-          font:{size:20,family:'Helvetica, sans-serif',color:'#000'}
+          font:{size:20,family:'Arial, sans-serif',color:'#000'}
         },
         range:[0,1],
         dtick:0.2,
