@@ -38,7 +38,7 @@ dropdown.querySelectorAll('li').forEach(item => {
     if (opt === 'directions') {
       title = 'Directions';
       body  = `
-        <p>This simulation uses Langmuir isotherms to model adsorption of a binary gas mixture on a surface. The number of molecules per site are plotted versus the total pressure (P<sub>A</sub> + P<sub>B</sub>). Use the sliders to vary the heats of adsorption of each component, the temperature, and the ratio of partial pressures. </p> <p>Adjust the relative number of sites per molecule to account for larger molecules occupying more surface area than smaller molecules. The two components compete for adsorption sites but do not interact with each other. Zoom on the graph with your scroll wheel.</p>
+        <p>This simulation uses Langmuir isotherms to model adsorption of a binary gas mixture on a surface. The number of molecules per site are plotted versus the total pressure (P<sub>A</sub> + P<sub>B</sub>). Use the sliders to vary the heats of adsorption of each component, the temperature, and the ratio of partial pressures. Adjust the relative number of sites per molecule to account for larger molecules occupying more surface area than smaller molecules. The two components compete for adsorption sites but do not interact with each other. Zoom on the graph with your scroll wheel.</p>
         `;
     }
     else if (opt === 'details') {
@@ -128,7 +128,7 @@ function updatePlot() {
   const idxA = Math.round(3/(10/200));
   const idxB = Math.round(7/(10/200));
 
-  Plotly.react('plot',
+  Plotly.newPlot('plot',
     [
       {
         x: Ptot,
@@ -149,11 +149,16 @@ function updatePlot() {
       margin:{t:22,l:60,r:40,b:80},
       showlegend:false,
       autosize: true,
-      xaxis:{
+      font: {
+        family: 'Arial',
+        size: 14,
+        color: '#000'
+      },
+              xaxis:{
         title:{ 
           text:'total pressure (bar) = P<sub>A</sub> + P<sub>B</sub>',
           standoff:15,
-          font:{size:20,family:'Arial, sans-serif',color:'#000'}
+          font:{size:20,family:'Arial',color:'#000'}
         },
         range:[0,10],
         dtick:2,
@@ -168,13 +173,13 @@ function updatePlot() {
         linewidth:1,
         minor:{dtick:0.5,ticks:'inside',ticklen:3},
         showgrid:false,
-        tickfont:{size:18,family:'Arial, sans-serif',color:'#000'}
+        tickfont:{size:18,family:'Arial',color:'#000'}
       },
-      yaxis:{
+              yaxis:{
         title:{
           text:'number of molecules/site',
           standoff:25,
-          font:{size:20,family:'Arial, sans-serif',color:'#000'}
+          font:{size:20,family:'Arial',color:'#000'}
         },
         range:[0,1],
         dtick:0.2,
@@ -189,18 +194,18 @@ function updatePlot() {
         linewidth:1,
         minor:{dtick:0.05,ticks:'inside',ticklen:3},
         showgrid:false,
-        tickfont:{size:18,family:'Arial, sans-serif',color:'#000'}
+        tickfont:{size:18,family:'Arial',color:'#000'}
       },
       annotations:[
         {
           x:Ptot[idxA], y:thetaA[idxA], text:'A',
-          showarrow:false, font:{color:'blue',size:16},
+          showarrow:false, font:{color:'blue',size:16,family:'Arial'},
           bgcolor:'white', borderpad:4,
           xanchor:'left', yanchor:'middle', cliponaxis:false
         },
         {
           x:Ptot[idxB], y:thetaB[idxB], text:'B',
-          showarrow:false, font:{color:'green',size:16},
+          showarrow:false, font:{color:'green',size:16,family:'Arial'},
           bgcolor:'white', borderpad:4,
           xanchor:'left', yanchor:'middle', cliponaxis:false
         }
@@ -230,5 +235,20 @@ function updateValue(id) {
 // Initialize plot when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM ready, calling updatePlot...');
+  // Set global Plotly font defaults
+  if (window.Plotly) {
+    Plotly.setPlotConfig({
+      plotGlPixelRatio: 2,
+      globalTransforms: [],
+      locale: 'en',
+      locales: {},
+      displayModeBar: false,
+      font: {
+        family: 'Arial',
+        size: 14,
+        color: '#000'
+      }
+    });
+  }
   setTimeout(updatePlot, 500); // Give Plotly time to load
 });

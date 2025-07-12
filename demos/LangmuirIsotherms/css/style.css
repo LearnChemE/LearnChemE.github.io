@@ -7,7 +7,7 @@
 
 body {
   margin: 0;
-  font-family: sans-serif;
+  font-family: "Arial", sans-serif;
   background: #fff;
   display: flex;
   justify-content: center;
@@ -191,8 +191,24 @@ body {
 /* Plotly axis/tick overrides to match CSTR */
 #plot path.xaxis,#plot path.yaxis{stroke:#000!important;stroke-width:1px!important;}
 #plot .xtick>path,#plot .ytick>path{stroke-width:1px!important;}
-#plot .xtick text,#plot .ytick text{font-family:'Arial, sans-serif'!important;font-weight:400!important;}
-#plot text.ytitle,#plot text.xtitle{font-family:'Arial, sans-serif'!important;font-weight:500!important;}
+#plot .xtick text,#plot .ytick text{font-family:'Arial'!important;font-weight:400!important;}
+#plot text.ytitle,#plot text.xtitle{font-family:'Arial'!important;font-weight:500!important;}
+
+/* Force Arial on ALL plotly text elements */
+#plot text, #plot .plotly text, #plot svg text {
+  font-family: 'Arial' !important;
+}
+
+/* Additional specific targeting for axis labels and titles */
+#plot .xaxislayer-above text, #plot .yaxislayer-above text,
+#plot .xaxislayer-below text, #plot .yaxislayer-below text {
+  font-family: 'Arial' !important;
+}
+
+/* Target annotation text */
+#plot .annotation text {
+  font-family: 'Arial' !important;
+}
 
 /* ─── DROPDOWN MENU ──────────────────────────────────────────────── */
 
