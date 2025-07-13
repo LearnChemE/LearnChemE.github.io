@@ -23,18 +23,19 @@ window.setup = function () {
   handleMouseScaling();
 };
 
+//the mouse clicked controls any mouse clicking actions
 window.mouseClicked = function () {
-  //pressure switch interaction
-  if (502 < window.mX && window.mX < 540 && 455 < window.mY && window.mY < 495) {
+  //pump switch interaction, this turns the pump on and off
+  if (430 < window.mX && window.mX < 492 && 390 < window.mY && window.mY < 440) {
     state.pumpOn = !state.pumpOn;
   }
 
   //mouse click rectangle for switch
-  /* push();
+  /*  push();
   stroke("red");
   noFill();
   rectMode(CORNERS);
-  rect(503, 495, 540, 455);
+  rect(430, 390, 492, 440);
   pop(); */
 };
 
@@ -715,14 +716,38 @@ function drawPumpSwitch(x, y, switchValue) {
   translate(333, 220 - 25);
   fill("lightgray");
   if (switchValue == true) {
-    quad(x + 5, y, x + 20, y - 15, x + 15, y - 20, x, y - 5);
+    quad(x - 47, y - 50, x - 47 + 5, y - 45, x - 47 + 25, y - 45 - 20, x - 47 + 25 - 5, y - 45 - 20 - 5);
   } else {
-    quad(x, y + 5, x + 15, y + 20, x + 20, y + 15, x + 5, y);
+    quad(x - 47, y - 50, x - 47 - 5, y - 45, x - 47 - 25, y - 45 - 20, x - 47 - 25 + 5, y - 45 - 20 - 5);
   }
 
+  push();
   fill("gray");
   rectMode(CENTER);
-  rect(x, y, 10, 40);
+  rect(x - 47, y - 43, 60, 15);
+  pop();
+
+  if (switchValue == true) {
+    push();
+    fill("RED");
+    stroke(0);
+    strokeWeight(2);
+    textStyle(BOLD);
+    textAlign(CENTER, CENTER);
+    text("ON", x - 47, y - 43);
+
+    pop();
+  } else {
+    push();
+    fill("Black");
+    stroke(0);
+    strokeWeight(1);
+    textStyle(BOLD);
+    textAlign(CENTER, CENTER);
+    text("OFF", x - 47, y - 43);
+
+    pop();
+  }
 
   pop();
 }
