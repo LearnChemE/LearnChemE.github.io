@@ -18,7 +18,7 @@ window.state = {
 const containerElement = document.getElementById("p5-container");
 
 
-window.setup = function() {
+window.setup = function () {
   sizeContainer();
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
   handleInputs();
@@ -28,7 +28,7 @@ window.setup = function() {
   frameRate(state.frameRate);
 };
 
-window.draw = function() {
+window.draw = function () {
   window.width = state.canvasSize[0];
   window.height = state.canvasSize[1];
   scale(relativeSize());
@@ -86,58 +86,91 @@ document.addEventListener("DOMContentLoaded", () => {
     if (outletType === "pressure" && machineType === "compressor") {
       outletSlider.min = 10;
       outletSlider.max = 20;
+      outletSlider.step = 1;
     } else if (outletType === "pressure") {
       outletSlider.min = 0.8;
       outletSlider.max = 2;
+      outletSlider.step = 0.1;
     } else if (machineType === "compressor") {
       outletSlider.min = 500;
       outletSlider.max = 650;
+      outletSlider.step = 1;
     } else {
       outletSlider.min = 350;
       outletSlider.max = 450;
+      outletSlider.step = 1;
     }
 
-    outletSlider.step = 0.1;
     outletSlider.value = (parseFloat(outletSlider.min) + parseFloat(outletSlider.max)) / 2;
     outletValue.textContent = outletSlider.value;
+    calcAll();
   }
 
   // Event listeners for buttons
   btnPressure.onclick = () => {
     setActiveButton("outlet-buttons", "btn-pressure");
+    window.state.outletType = "pressure";
     updateOutletSlider();
+    window.state.outletTarget = parseFloat(outletSlider.value);
+    calcAll();
   };
 
   btnTemperature.onclick = () => {
     setActiveButton("outlet-buttons", "btn-temperature");
+    window.state.outletType = "temperature";
     updateOutletSlider();
+    window.state.outletTarget = parseFloat(outletSlider.value);
+    calcAll();
   };
 
   btnCompressor.onclick = () => {
     setActiveButton("machine-buttons", "btn-compressor");
-  window.state.mode = "compressor";   // set global state
-  updateOutletSlider();
+    window.state.mode = "compressor";   // set global state
+    // Preserve slider values
+    window.state.eta1 = parseFloat(eta1.value);
+    window.state.eta2 = parseFloat(eta2.value);
+    eta1Val.textContent = eta1.value;
+    eta2Val.textContent = eta2.value;
+    setDefaults();
+    updateOutletSlider();
+    window.state.outletTarget = parseFloat(outletSlider.value);
+    calcAll();
   };
 
   btnTurbine.onclick = () => {
     setActiveButton("machine-buttons", "btn-turbine");
-  window.state.mode = "turbine";      // set global state
-  updateOutletSlider();
+    window.state.mode = "turbine";      // set global state
+    // Preserve slider values
+    window.state.eta1 = parseFloat(eta1.value);
+    window.state.eta2 = parseFloat(eta2.value);
+    eta1Val.textContent = eta1.value;
+    eta2Val.textContent = eta2.value;
+    setDefaults();
+    updateOutletSlider();
+    window.state.outletTarget = parseFloat(outletSlider.value);
+    calcAll();
   };
 
   outletSlider.addEventListener("input", () => {
-    outletValue.textContent = outletSlider.value;
+    const val = parseFloat(outletSlider.value);
+    outletValue.textContent = val;
+    window.state.outletTarget = val;
+    calcAll();
   });
 
   eta1.addEventListener("input", () => {
     eta1Val.textContent = eta1.value;
+    window.state.eta1 = eta1.value;
+    calcAll();
   });
 
   eta2.addEventListener("input", () => {
     eta2Val.textContent = eta2.value;
+    window.state.eta2 = eta2.value;
+    calcAll();
   });
 
-  updateOutletSlider(); // Initial setup
+  updateOutletSlider();
 });
 
 

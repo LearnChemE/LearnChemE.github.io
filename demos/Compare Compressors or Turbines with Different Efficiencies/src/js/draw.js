@@ -1,4 +1,5 @@
 export function drawAll() {
+
     const marginX = 4;
     const boxWidth = width - 2 * marginX;
     const boxHeight = height / 2.7;
@@ -10,7 +11,6 @@ export function drawAll() {
     const inletArrowLength = 20;
     const outletArrowLength = 20;
     const arrowOffsetFromTrapezium = 13.5;
-
 
     const type = window.state.mode || "compressor"; // fallback
 
@@ -24,7 +24,7 @@ export function drawAll() {
     drawTurbineTrapezium(
         (boxWidth / 2) - marginX - 5,               // center X
         3 + boxHeight / 2, // centered Y within box
-        "η₁ = 1.",
+        `η₁ = ${window.state.eta1}`,
         "#99f0e0",
         type
     );
@@ -36,13 +36,13 @@ export function drawAll() {
     // Inlet labels
     textSize(4);
     textAlign(RIGHT);
-    text("Pₙ = 10 bar", centerX - 25, centerY1 - 6);
-    text("Tₙ = 550 K", centerX - 25, centerY1 + 8);
+    text(`Pₙ = ${window.state.P_in} bar`, centerX - 25, centerY1 - 6);
+    text(`Tₙ = ${window.state.T_in} K`, centerX - 25, centerY1 + 8);
 
     // Outlet labels
     textAlign(LEFT);
-    text("Pₒᵤₜ = 2.06 bar", centerX + 35, centerY1 - 6);
-    text("Tₒᵤₜ = 350 K", centerX + 35, centerY1 + 8);
+    text(`Pₒᵤₜ = ${window.state.P_out_1} bar`, centerX + 35, centerY1 - 6);
+    text(`Tₒᵤₜ = ${window.state.T_out_1} K`, centerX + 35, centerY1 + 8);
 
     // Box 2 - Bottom
     stroke(0);
@@ -55,11 +55,11 @@ export function drawAll() {
     drawTurbineTrapezium(
         (boxWidth / 2) - marginX - 5,                       // center X
         2 + boxHeight + 3 + boxHeight / 2, // centered Y in bottom box
-        "η₂ = 1.",
+        `η₂ = ${window.state.eta2}`,
         "#66f080",
         type
     );
-    text("W = -5.8 kJ", centerX - 7, centerY1 - h / 2 + 2);
+    text(`W = ${(window.state.W_1).toFixed(1)} kJ`, centerX - 6, centerY1 - h / 2 + 2);
 
     // Arrows
     drawArrow(centerX - inletArrowLength - arrowOffsetFromTrapezium, centerY2, inletArrowLength, arrowHeadSize);
@@ -68,17 +68,17 @@ export function drawAll() {
     // Inlet labels
     textSize(4);
     textAlign(RIGHT);
-    text("Pₙ = 10 bar", centerX - 25, centerY2 - 6);
-    text("Tₙ = 550 K", centerX - 25, centerY2 + 8);
+    text(`Pₙ = ${window.state.P_in} bar`, centerX - 25, centerY2 - 6);
+    text(`Tₙ = ${window.state.T_in} K`, centerX - 25, centerY2 + 8);
 
     // Outlet labels
     textAlign(LEFT);
-    text("Pₒᵤₜ = 2.06 bar", centerX + 35, centerY2 - 6);
-    text("Tₒᵤₜ = 350 K", centerX + 35, centerY2 + 8);
+    text(`Pₒᵤₜ = ${window.state.P_out_2} bar`, centerX + 35, centerY2 - 6);
+    text(`Tₒᵤₜ = ${window.state.T_out_2} K`, centerX + 35, centerY2 + 8);
 
     // Work output label (only on bottom box)
     textAlign(CENTER);
-    text("W = -5.8 kJ", centerX + 2, centerY2 - h / 2 + 3);
+    text(`W = ${(window.state.W_2).toFixed(1)} kJ`, centerX + 5, centerY2 - h / 2 + 3);
 }
 
 function drawTurbineTrapezium(x, y, etaLabel, fillColor, type) {
@@ -100,7 +100,7 @@ function drawTurbineTrapezium(x, y, etaLabel, fillColor, type) {
         vertex(topW / 2, 0);
         vertex(bottomW / 2, h);
         vertex(-bottomW / 2, h);
-        //text(type, topW + h/2 , -h / 2 + 18);
+
     } else if (type === "compressor") {
         vertex(-bottomW / 2, 0);
         vertex(bottomW / 2, 0);
