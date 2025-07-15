@@ -22,6 +22,13 @@ $modal-xl: 1140px;
   overflow: hidden;
 }
 
+label,
+span {
+  line-height: 1.4em;
+  font-size: 1em;
+}
+
+
 #selection-container {
   margin: 1em;
   margin-left: 70px;
@@ -83,6 +90,9 @@ $modal-xl: 1140px;
     }
 
     input[type="range"] {
+      vertical-align: middle;
+      position: relative;
+      top: 2px;
       width: 250px;
     }
 
@@ -109,6 +119,9 @@ $modal-xl: 1140px;
       }
 
       input[type="range"] {
+        vertical-align: middle;
+        position: relative;
+        top: 2px;
         width: 180px;
       }
 
@@ -119,6 +132,46 @@ $modal-xl: 1140px;
     }
   }
 }
+
+
+#outlet-slider-container,
+#efficiency-sliders {
+  display: grid;
+  grid-template-columns: max-content 1fr max-content; // label, slider, value
+  align-items: center;
+  column-gap: 0.6em;
+  margin-bottom: 0.6em;
+
+  label {
+    font-weight: 500;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    margin: 0;
+  }
+
+  span {
+    min-width: 2em;
+    text-align: left;
+    line-height: 1.5;
+  }
+}
+
+
+#efficiency-sliders {
+  display: grid;
+  grid-template-columns: max-content 1fr max-content max-content 1fr max-content;
+  column-gap: 0.6em;
+  align-items: center;
+
+  .eff-group {
+    display: contents; // allow children to flow into the main grid
+  }
+}
+
 
 
 canvas {

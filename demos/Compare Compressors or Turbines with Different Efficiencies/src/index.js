@@ -80,8 +80,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const machineType = getSelected("machine-buttons");
 
     outletLabel.textContent = outletType === "pressure"
-      ? "Outlet Pressure (bar):"
-      : "Outlet Temperature (K)";
+      ? "outlet pressure (bar):"
+      : "outlet temperature (K)";
 
     if (outletType === "pressure" && machineType === "compressor") {
       outletSlider.min = 10;
