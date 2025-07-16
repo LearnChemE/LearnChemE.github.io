@@ -15,7 +15,6 @@
 
 .inputs-wrapper {
   display: flex;
-  flex-wrap: wrap;
   gap: 20px;
   align-items: flex-start;
   margin-top: 5px;
@@ -121,7 +120,7 @@
 }
 
 input[type="range"] {
-  width: 100%;
+  width: 1000%;
   margin: 0;
   /* Remove default margins */
 }
