@@ -1061,3 +1061,28 @@ function drawGasCylinder(draw, x, y, label) {
       g.move(x, y)
       return g;
     }
+
+     export function reset(draw) {
+      pipeGroup = null; // Global reference to pipe group for drawing pipes
+      valve = null
+      valve1 = null
+      multiValvePosition = 270
+      gasValveOpen = false;
+      leftPipe = null;
+      leftPipe1 = null;
+      leftPipe2 = null;
+      leftPipe3 = null;
+       leftPipe4 = null;
+      leftPipe5 = null;
+      leftPipe6 = null;
+      recycleRatio = 0;
+      recycleValve = null;
+      isPumpOn = false;
+      accumulatedMass = 0;
+      reactorIsOpen = false;
+      gasFlowingToReactor = false;
+      flowRate = null;
+      let gasFlowRateDevice = null;
+      clearInterval(timerId);
+      timerId = null;
+    }

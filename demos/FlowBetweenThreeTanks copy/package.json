@@ -1,8 +1,8 @@
 {
-  "name": "compressed-gas-spray",
+  "name": "fluids-experimental-demo",
   "version": "1.0.0",
-  "description": "A simulation of a vortex tube used to separate pressurized air into a hot and cold stream.",
-  "main": "index.js",
+  "description": "Simulates the number of moles of solids and gas in equilibrium in a constant-volume container.",
+  "main": "index.html",
   "scripts": {
     "start": "webpack serve --open --config ./_dev/webpack.config.js --mode=development",
     "build": "webpack --config ./_dev/webpack.config.js --mode=production",
@@ -12,31 +12,32 @@
     "chemical",
     "engineering",
     "interactive",
-    "simultation",
-    "compressed-gas",
-    "gas spray",
-    "electronic dust"
+    "simultation"
   ],
-  "author": "Author Name",
+  "author": "Sanath",
   "license": "ISC",
   "dependencies": {
-    "bootstrap": "^5.3.7",
+    "@svgdotjs/svg.js": "^3.2.4",
+    "bootstrap": "^5.3.6",
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^7.1.2",
+    "dependencies": "^0.0.1",
     "file-loader": "^6.2.0",
-    "html-loader": "^5.1.0",
     "html-webpack-plugin": "^5.6.3",
     "mini-css-extract-plugin": "^2.9.2",
-    "p5": "^2.0.3",
     "postcss-loader": "^8.1.1",
-    "sass": "^1.89.2",
+    "sass": "^1.88.0",
     "sass-loader": "^16.0.5",
     "style-loader": "^4.0.0",
     "terser-webpack-plugin": "^5.3.14",
     "to-string-loader": "^1.2.0",
     "uglify-js": "^3.19.3",
-    "webpack": "^5.100.1",
+    "webpack": "^5.99.8",
     "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^5.2.2"
+    "webpack-dev-server": "^5.2.1"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^13.0.0",
+    "html-loader": "^5.1.0"
   }
 }
