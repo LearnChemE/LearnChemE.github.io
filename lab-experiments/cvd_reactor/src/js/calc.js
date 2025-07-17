@@ -48,37 +48,3 @@ console.log(
   massSiO2WithRecycle(1, TEOSFraction, conversion, gasFlowRate).toFixed(5),
   'g/s'
 );
-
-/**
- * Start a timer to accumulate and print SiO₂ mass deposition over time.
- *
- * @param {Function} rateFn   Function that returns current mass rate [g/s] (e.g., massSiO2WithoutRecycle or massSiO2WithRecycle).
- * @param {Array} rateArgs    Array of arguments to pass to rateFn on each tick.
- * @param {number} interval   Timer interval in milliseconds (default: 1000 ms).
- * @returns {number}          ID of the interval timer (can be passed to clearInterval to stop).
- */
-export function startDepositionTimer(interval = 1000) {
-  let accumulatedMass = 0;
-  let elapsedSeconds = 0;
-
-  let rate  = 0
-  const timerId = setInterval(() => {
-    // Calculate mass rate [g/s] and update elapsed time
-    if (elapsedSeconds >= 5) {
-        rate = massSiO2WithRecycle(1, 0.0005, 0.65, 1.0);
-    } else {
-    rate = massSiO2WithoutRecycle(1, 0.0005, 0.65);
-    }
-    elapsedSeconds += interval / 1000;
-
-    // Increment accumulated mass
-    accumulatedMass += rate * (interval / 1000);
-
-    // Log formatted output
-    console.log(
-      `Time: ${elapsedSeconds.toFixed(1)} s — Rate: ${rate.toFixed(5)} g/s — Accumulated: ${accumulatedMass.toFixed(5)} g`
-    );
-  }, interval);
-
-  return timerId;
-}

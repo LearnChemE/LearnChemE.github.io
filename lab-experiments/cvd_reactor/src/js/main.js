@@ -66,9 +66,9 @@ export function startDepositionTimer(interval = 1000) {
     // Calculate mass rate [g/s] and update elapsed time
     if (gasFlowingToReactor && reactorIsOpen) {
       if (recycleRatio > 0) {
-        rate = massSiO2WithRecycle(1, 0.0005, 0.65, recycleRatio);
+        rate = massSiO2WithRecycle(1, 0.002, 0.65, recycleRatio);
       } else {
-        rate = massSiO2WithoutRecycle(1, 0.0005, 0.65);
+        rate = massSiO2WithoutRecycle(1, 0.002, 0.65);
       }
       
       elapsedSeconds += interval / 1000;
