@@ -113,11 +113,10 @@ window.draw = function () {
   // Draw pipes first, then water, then pipe connectors and equipment meant to cover the water
   drawSaltTank(state.figureX, state.figureY);
   drawPressureGauge(state.figureX, state.figureY);
-
-  drawBeaker(780, 357, 180, 180); //drawBeaker(x, y, beakerWidth, beakerHeight)
-  drawBeaker(1005, 357, 180, 180);
   drawFilter(state.figureX, state.figureY);
   drawWater(state.figureX, state.figureY);
+  drawBeaker(780, 357, 180, 180); //drawBeaker(x, y, beakerWidth, beakerHeight)
+  drawBeaker(1005, 357, 180, 180);
   drawPumpSwitch(state.figureX, state.figureY, state.pumpOn);
   drawPump(state.figureX, state.figureY);
 
@@ -133,8 +132,8 @@ function drawTextOnTopOfDiagram(x, y) {
   textAlign(CENTER, CENTER);
   fill(0);
   textSize(20);
-  text("Salt", x, y);
-  text("Solution", x, y + 25);
+  text("salt", x, y);
+  text("solution", x, y + 25);
   pop();
 }
 
@@ -705,6 +704,40 @@ function drawBeaker(x, y, beakerWidth, beakerHeight) {
   vertex(x - beakerFlairX, y - 10);
   vertex(x, y);
   endShape();
+
+  //Beaker mL lables
+
+  push();
+  for (let i = 1; i < 11; i++) {
+    fill("black");
+    strokeWeight(0.2);
+    textAlign(CENTER, CENTER);
+    if (i % 2 == 0 && i < 10) {
+      text(i * 100, x + beakerWidth / 2 + 30, y + beakerHeight - (i * beakerHeight) / 11 - 8);
+    } else if (i >= 10) {
+      text(i * 100 + " (mL)", x + beakerWidth / 2 + 45, y + beakerHeight - (i * beakerHeight) / 11 - 8);
+    }
+
+    stroke(0);
+    strokeWeight(2);
+    line(
+      x + beakerWidth / 2 - 10 - 10,
+      y + beakerHeight - (i * beakerHeight) / 11 - 8,
+      x + beakerWidth / 2 + 10,
+      y + beakerHeight - (i * beakerHeight) / 11 - 8
+    );
+  }
+  /* strokeWeight(0.5);
+  text("1000mL", x + beakerWidth / 2 - 40, y + beakerHeight / 2); */
+  stroke(0);
+  strokeWeight(2);
+  line(
+    x + beakerWidth / 2 - 10 - 10,
+    y + beakerHeight - beakerHeight / 11 - 8,
+    x + beakerWidth / 2 - 10 - 10,
+    y + beakerHeight - (10 * beakerHeight) / 11 - 8
+  );
+  pop();
 
   pop();
 }
