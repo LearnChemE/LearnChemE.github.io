@@ -117,8 +117,8 @@ window.draw = function () {
   drawPressureGauge(state.figureX, state.figureY);
   drawFilter(state.figureX, state.figureY);
   drawWater(state.figureX, state.figureY);
-  drawBeaker(769, 337, state.permeateBeakerWidth, state.permeateBeakerHeight); //drawBeaker(x, y, beakerWidth, beakerHeight)
-  drawBeaker(995, 337, state.retentateBeakerWidth, state.retentateBeakerHeight);
+  drawBeaker(769, 337, state.permeateBeakerWidth, state.permeateBeakerHeight, "permeate"); //drawBeaker(x, y, beakerWidth, beakerHeight, beakerType)
+  drawBeaker(995, 337, state.retentateBeakerWidth, state.retentateBeakerHeight, "retentate");
   drawPumpSwitch(state.figureX, state.figureY, state.pumpOn);
   drawPump(state.figureX, state.figureY);
 
@@ -680,7 +680,7 @@ function drawWater(x, y) {
   pop();
 }
 
-function drawBeaker(x, y, beakerWidth, beakerHeight) {
+function drawBeaker(x, y, beakerWidth, beakerHeight, beakerType) {
   push();
 
   stroke("gray");
@@ -711,7 +711,7 @@ function drawBeaker(x, y, beakerWidth, beakerHeight) {
     if (i % 2 == 0 && i < 10) {
       text(i * 100, x + beakerWidth / 2 + 30, y + beakerHeight - (i * (beakerHeight - state.beakerThickness)) / 11 - state.beakerThickness);
     } else if (i >= 10) {
-      text(i * 100 + " (mL)", x + beakerWidth / 2 + 45, y + beakerHeight - (i * (beakerHeight - state.beakerThickness)) / 11 - state.beakerThickness);
+      text(i * 100 + " mL", x + beakerWidth / 2 + 45, y + beakerHeight - (i * (beakerHeight - state.beakerThickness)) / 11 - state.beakerThickness);
     }
 
     stroke(0);
@@ -733,6 +733,12 @@ function drawBeaker(x, y, beakerWidth, beakerHeight) {
     x + beakerWidth / 2 - 10 - 10,
     y + beakerHeight - (10 * (beakerHeight - state.beakerThickness)) / 11 - state.beakerThickness
   );
+
+  fill("black");
+  strokeWeight(0.2);
+  textAlign(CENTER, CENTER);
+  textSize(16);
+  text(beakerType, x + beakerWidth / 2 - 48, y);
   pop();
 
   pop();
