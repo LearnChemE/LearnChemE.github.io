@@ -6,7 +6,7 @@
   name="viewport"
   content="width=device-width, initial-scale=1.0"
   />
-  <title>Flow Between Three Tanks</title>
+  <title>Flow In Inclined Tube</title>
   <script
   src="https://kit.fontawesome.com/9d19ad28f4.js"
   crossorigin="anonymous"
@@ -37,29 +37,12 @@
       
       <div class="slider-group slider-container">
         <label for="angleSlider"> angle (degrees)</label><br>
-        <input type="range" id="angleSlider" min="0" max="90" step="5" value="30">
-        <span id="angleValue">30</span>
+        <input type="range" id="angleSlider" min="0" max="90" step="5" value="0">
+        <span id="angleValue">0</span>
       </div>
-      
-      <!-- ─── Flow‑rate Selector ─────────────────────────────────────────────── -->
-      <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Flow rate selector">
-        <input type="radio" class="btn-check" name="flowRateOptions" id="flowHigh"  autocomplete="off" checked>
-        <label class="btn btn-outline-primary" for="flowHigh">High</label>
-
-        <input type="radio" class="btn-check" name="flowRateOptions" id="flowMedium" autocomplete="off">
-        <label class="btn btn-outline-primary" for="flowMedium">Medium</label>
-
-        <input type="radio" class="btn-check" name="flowRateOptions" id="flowLow" autocomplete="off">
-        <label class="btn btn-outline-primary" for="flowLow">Low</label>
-      </div>
-      <!-- ─────────────────────────────────────────────────────────────────────── -->
-      
-      <div>
-        <p></p>
-      </div>
-      <div>
-        <p></p>
-      </div>
+      <button id="reset-button" class="btn btn-sm btn-danger">
+        Reset
+      </button>
     </div>
   </div>
   

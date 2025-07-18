@@ -121,7 +121,7 @@ module.exports = (env, argv) => {
       // 6.1) HtmlWebpackPlugin
       // ─────────────────────────────────────────────────────────────────────
       new HtmlWebpackPlugin({
-        title: "Heterogeneous Chemical Equilibrium",
+        title: "Flow In Inclined Tube",
         filename: "index.html",
         template: path.resolve(__dirname, '../src/html/index.html'),
         scriptLoading: "blocking",
@@ -130,7 +130,7 @@ module.exports = (env, argv) => {
           viewport:          "width=device-width, initial-scale=1, shrink-to-fit=no",
           keywords:          "LearnChemE, chemical engineering, engineering, simulation",
           author:            "Sanath Kavatooru",
-          "application-name": "Flow Between Three Tanks",
+          "application-name": "Flow In Inclined Tube",
           description:       ""
         },
       }),
