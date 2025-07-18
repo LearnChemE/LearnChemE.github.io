@@ -21,6 +21,6 @@
 ## For regular simulations:
 
 - Remove the "worksheet" button from the `src/html/index.html` file.
-- Add a "details" button to the `src/html/index.html` file. 
+- Add a "details" button to the `src/html/index.html` file.
 - Add a corresponding modal to the `src/html/index.html` file and update the data-bs-target tags.
 - Uncomment the MathJax script import in the head of the `src/html/index.html` file.
