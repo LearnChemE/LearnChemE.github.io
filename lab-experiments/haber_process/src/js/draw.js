@@ -1295,21 +1295,21 @@ function drawComputer() {
   // Display the liquid composition after liquid is inject
   if (state.takingSampleTime >= 1) {
     // Composition labels
-    text("SHOWING RESULTS", -19, 6);
+    // text("SHOWING RESULTS", -19, 6);
     push();
-    textSize(2);
+    textSize(3);
     textAlign(CENTER, CENTER);
-    const h2textCoord  = [ -11.5, state.graphYVals[0][50] - 2.0 ];
-    const n2textCoord  = [  -1.0, state.graphYVals[1][50] - 2.0 ];
-    const nh3textCoord = [   9.5, state.graphYVals[2][50] - 2.0 ];
+    const h2textCoord  = [ -15.0, 6 ] // state.graphYVals[0][50] - 2.0 ];
+    const n2textCoord  = [   0.0, 6 ] // state.graphYVals[1][50] - 2.0 ];
+    const nh3textCoord = [  14.5, 6 ] // state.graphYVals[2][50] - 2.0 ];
 
-    text(`y    = ${(round(100 * state.outlet.yH2)  / 100).toFixed(2)}`, ...h2textCoord);
-    text(`y    = ${(round(100 * state.outlet.yN2)  / 100).toFixed(2)}`, ...n2textCoord);
+    text(`y   = ${(round(100 * state.outlet.yH2)  / 100).toFixed(2)},`, ...h2textCoord);
+    text(`y   = ${(round(100 * state.outlet.yN2)  / 100).toFixed(2)},`, ...n2textCoord);
     text(`y    = ${(round(100 * state.outlet.yNH3) / 100).toFixed(2)}`, ...nh3textCoord);
-    textSize(1);
-    text("H2" ,  h2textCoord[0] - 2.5,  h2textCoord[1] + .5);
-    text("N2" ,  n2textCoord[0] - 2.5,  n2textCoord[1] + .5);
-    text("NH3", nh3textCoord[0] - 2.5, nh3textCoord[1] + .5);
+    textSize(1.75);
+    text("H2" ,  h2textCoord[0] - 4.0,  h2textCoord[1] + .5);
+    text("N2" ,  n2textCoord[0] - 4.0,  n2textCoord[1] + .5);
+    text("NH3", nh3textCoord[0] - 3.5, nh3textCoord[1] + .5);
     pop();
   } else if (state.takingSampleTime > 0) {
     text("TAKING SAMPLE ...", -18, 6);
