@@ -22,7 +22,7 @@ function findAngleFromDown(A: vec2, B: vec2) {
 /*
  *  Interaction for valve 1
  */
-var v1Angle = 0;
+var v1Angle = -90;
 valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
     // Find centroid
     var offset = valve1.getBoundingClientRect();
@@ -55,7 +55,7 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
 
         // Set state after a time delay
         setTimeout(() => {
-            State.valveLift = rescale(v1Angle, -90, 0, 0.05, 1, true);
+            State.valveLift = rescale(v1Angle, -90, 0, 0.0, 1, true);
         }, 350);
     };
     const release = () => {
@@ -65,7 +65,11 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
 
     document.addEventListener("mousemove", drag);
     document.addEventListener("mouseup", release);
-})
+});
+
+// Set initial
+valve1.setAttribute("transform", `rotate(${v1Angle} 129 83)`);
+State.valveLift = rescale(v1Angle, -90, 0, 0.0, 1, true);
 
 /*
  *  Interaction for valve 2
