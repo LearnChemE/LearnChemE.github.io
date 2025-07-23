@@ -1,0 +1,31 @@
+# Flask debug server description and rundown
+
+This is a flask server setup as a debugging tool for this virtual lab. It is set up so that the latest output mole fraction is appended onto the plot every time
+that the desorption is run, helpful for visualizing and showing results. 
+
+This is a server with a RESTful API (meaning it takes standard HTTP requests like GET, POST, PUT, and DELETE) that takes JSON and updates a live graph. I figured 
+that a WebSocket connection would be a bit overkill, although that would work even better.
+
+## Notes
+
+You can change the matplotlib labels and options if you want to format a plot to show someone. Otherwise, this should hopefully be a good starting point.
+
+Since the timepoints (x axis) are reported from the JS loop, if any animations reset, they will no longer be accurate and will overlap with existing data. I included a
+/reset endpoint if this becomes a problem, so you can just send a POST request to `localhost:5000/reset`. Feel free to ask me how to do this drew.smith@colorado.edu but
+look at how I am sending the data in simulation.js lines 148 - 167.
+
+IT IS IMPORTANT that you comment out any of the API requests on the client side (the JS simulation) before production or it can cause some security issues. This includes
+lines 148 - 167 in simulation.js as well as any other requests you add. Don't ever add a request without logging it in the console and make sure the console is clean
+before production! (These are just good software practices)
+
+## Running the debug server
+
+Run the debug server using any python 3 install. You will need the following packages installed:
+- matplotlib        (This is a python plotting interface)
+- flask             (This is the server that runs)
+- flask_cors        (This allows flask to handle cross-domain requests)
+- threading         (This is a standard package for writing multi-threaded code. It should already be installed with python)
+
+To install these packages, use `pip install [package name]`.
+
+Let me know again if you have troubles with this.

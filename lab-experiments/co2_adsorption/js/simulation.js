@@ -145,6 +145,27 @@ export function startMoleFractionCalculation(tankNum) {
       // m_controller: m_controller_mg_min // Pass m_controller if needed by yCO2_out, otherwise 'm' is sufficient
     });
 
+    // ----------- FOR DEBUGGING PURPOSES ONLY --------------
+    // Remove this from the code for production builds!!
+    // It is probably unsafe, and students could potentially use it to cheat the homework pretty easily.
+    // Normally, you could check if process.env.NODE_ENV === 'development' or something but this sim does not have a development environment set up.
+    async function sendDataToPython(data) {
+      // You are making a POST request with the attached JSON to localhost port 5000's /plot endpoint (exposed by the Flask server)
+      const response = await fetch('http://localhost:5000/plot', { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      // Await the response from the server and print the results
+      const result = await response.json();
+      console.log('Python responded with: ', result);
+    }
+    sendDataToPython({x: [t], y: [y_out]});
+    // ----------------- END DEBUG SECTION -------------------
+
     state.setOutletMoleFraction(y_out);
 
     // Update the analyzer display

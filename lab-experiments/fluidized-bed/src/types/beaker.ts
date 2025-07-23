@@ -176,4 +176,12 @@ export class BeakerHolder {
                 break;
         }
     };
+
+    /**
+     * Get the current beaker mode
+     * @returns value of beaker.state
+     */
+    public getMode = () => {
+        return this.state;
+    }
 }
