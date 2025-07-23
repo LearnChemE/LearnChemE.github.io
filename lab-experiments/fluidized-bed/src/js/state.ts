@@ -9,6 +9,7 @@ import { beginTubeFillAnimation, initAnimationObjects, onLiftChange, swapValveAn
 const state: GlobalState = {
     apparatusDiv: undefined,
     valveSetting: ValveSetting.RecycleMode,
+    initialFill: false,
     pumpIsRunning: false,
     valveLift: 1,
     valve2isDisabled: false,
@@ -60,6 +61,9 @@ const stateProxy = new Proxy(state, {
         else if (prop === 'valveSetting') {
             // Valve 2 pressed
             swapValveAnimation(value as ValveSetting);
+        }
+        else if (prop === 'initialFill') {
+            // First pump button press
         }
         else if (prop === 'pumpIsRunning') {
             // Pump button toggled
