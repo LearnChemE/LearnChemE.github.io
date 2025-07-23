@@ -47,6 +47,10 @@
     -->
 
     <!-- jQuery / Popper / Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+    />
     <script src="./js/bootstrap.min.js"></script>
     <link href="./style/bootstrap.css" rel="stylesheet" />
 
@@ -127,16 +131,15 @@
               data-bs-toggle="modal"
               data-bs-target="#details-modal"
             >
-              details
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary btn-sm"
-              data-bs-toggle="modal"
-              data-bs-target="#about-modal"
-            >
               about
             </button>
+            <a
+              href="./assets/ReverseOsmosisWorksheet.pdf"
+              download
+              class="btn btn-primary btn-sm"
+            >
+              worksheet
+            </a>
           </div>
 
           <div class="input-row">
@@ -179,36 +182,23 @@
               ></button>
             </div>
             <div class="modal-body">
-              <p>Directions go here.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="details-modal" class="modal fade" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Details</h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <p>Details go here. Use TeX scripts to write equations.</p>
-              <p class="box-eqn">
-                $$ [1] \quad \frac{P_{feed} - P_{permeate}}{R} =
-                \frac{C_{salt}}{C_{water}} $$
+              <p>
+                This digital experiment models a reverse osmosis (RO) membrane
+                that separates a saltwater solution into a permeate stream
+                (purified water) and a retentate stream (higher salt
+                concentration solution). Reverse osmosis uses a high pressure on
+                the feed side (salt water) of a semi-permeable membrane to
+                overcome the osmotic pressure. The experiment examines the
+                effects of feed pressure and salt concentration on permeate flow
+                rate and salt rejection. Reverse osmosis is used on a large
+                scale to convert sea water to fresh water.
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div id="about-modal" class="modal fade" tabindex="-1">
+      <div id="details-modal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
@@ -222,28 +212,19 @@
             </div>
             <div class="modal-body">
               <p>
-                This simulation was created in the
+                This digital experiment was created in the
                 <a href="https://www.colorado.edu/chbe" target="_blank"
                   >Department of Chemical and Biological Engineering</a
-                >, at University of Colorado Boulder for
+                >
+                at University of Colorado Boulder for
                 <a href="http://www.learncheme.com" target="_blank"
                   >LearnChemE.com</a
                 >
-                by Manuel Arredondo and Neil Hendren under the direction of
-                Professor John L. Falconer. Address any questions or comments to
-                learncheme@gmail.com. All of our simulations are open source,
-                and are available on our
-                <a
-                  href="https://github.com/LearnChemE/LearnChemE.github.io/"
-                  target="_blank"
-                  >LearnChemE Github repository</a
-                >.<br /><br />Is your screen too small to fit this application?
-                Try zooming-out on the web page (CTRL+"-" and CTRL+"=" on
-                Windows, or ⌘+"-" and ⌘+"=" on Mac), then refreshing the page.
-                This application is not compatible with Internet Explorer or web
-                browsers that do not support WebGL and HTML5. Recommended
-                browsers are the latest versions of: Chrome, Safari, Firefox,
-                Edge, and Opera.
+                by Jackson Dunlap under the direction of Professor John L.
+                Falconer. It was prepared with financial support from the
+                National Science Foundation (DUE 2336987 and 2336988) in
+                collaboration with Washington State University. Address any
+                questions or comments to LearnChemE@gmail.com.
               </p>
             </div>
           </div>

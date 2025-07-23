@@ -25,16 +25,19 @@ document.addEventListener("DOMContentLoaded", () => {
   pressureSlider.addEventListener("input", () => updateSliderValue("feed-pressure"));
   updateSliderValue("feed-pressure");
   pressureSlider.addEventListener("input", () => (state.feedPressure = Number(pressureSlider.value)));
-  // The default value of a slider is a string, so we always first convert it to a number.
   state.feedPressure = Number(pressureSlider.value);
 
   // Set up Feed Temperature slider
   const tempSlider = document.getElementById("feed-temp");
   tempSlider.addEventListener("input", () => updateSliderValue("feed-temp"));
   updateSliderValue("feed-temp");
+  tempSlider.addEventListener("input", () => (state.feedTemperature = Number(tempSlider.value)));
+  state.feedTemperature = Number(tempSlider.value);
 
   // Set up NaCl Concentration slider
   const saltSlider = document.getElementById("salt-conc");
   saltSlider.addEventListener("input", () => updateSliderValue("salt-conc"));
   updateSliderValue("salt-conc");
+  saltSlider.addEventListener("input", () => (state.saltConcentrationPercent = Number(saltSlider.value)));
+  state.saltConcentrationPercent = Number(saltSlider.value);
 });

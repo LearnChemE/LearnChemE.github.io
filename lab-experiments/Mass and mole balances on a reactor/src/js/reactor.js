@@ -1,41 +1,27 @@
-// reactor.js
-
-
 import { addParticleToCondenser } from './condenser.js';
-
-
-
 
 export let reactorX = 50;
 export let reactorY = 12;
 export let reactorHeight = 40;
 export let reactorWidth = 15;
 
-
 export let valveX = reactorX + reactorHeight + 14;
 export let valveY = reactorY + reactorWidth / 2;
-
 
 window.reactorHeaterOn = false;
 
 let coilGlowValue = 120;  // Starting steel grey
 
 export let reactorVaporParticles = [];
-const maxReactorVapors = 25; // instead of 20
+const maxReactorVapors = 20; 
 
 let exhaustParticles = [];
 const maxExhaustParticles = 20;
 
-
-
-
-
 let condenserParticles = [];
 let condenserPathParticles = [];
 
-
-
-// ✅ NEW: Timing variables for exhaust particle control
+// Timing variables for exhaust particle control
 let heaterTurnOnTime = null;
 let firstExhaustBurstActive = false;
 let secondExhaustBurstActive = false;
@@ -45,6 +31,11 @@ let tempAbove290Time = null;
 const CONDENSER_DELAY_MS = 1000;
 
 
+// Add these new variables for valve switching detection
+let previousValveState = "toexhaust";
+let valveSwitchTime = null;
+let switchTriggeredBurst = false;
+const SWITCH_BURST_DURATION = 2000; // 2 seconds of particles after switching
 
 export function updateCoilGlow() {
   let target = reactorHeaterOn ? 255 : 120;  // glow vs steel
@@ -55,19 +46,19 @@ export function drawReactorBody(temp) {
   push();
   translate(reactorX, reactorY);
 
-  // === Reactor Body ===
+  // Reactor Body
   stroke(100);
   strokeWeight(1.2);
   fill(220);
   rect(0, 0, reactorHeight, reactorWidth, 10); // horizontal reactor
 
-  // === Vertical Spiral Coil (rotated evaporator-style arcs) ===
+  // Vertical Spiral Coil (rotated evaporator-style arcs)
   let turns = 4;
   let spacing = 4;
   let coilWidth = 6;
   let startX = 14;
 
-  // ✅ Fix color logic - Orange at 300°C, Reddish Orange at 330°C+
+  // Fix color logic - Orange at 300°C, Reddish Orange at 330°C+
   let coilColor;
   
   if (temp >= 329) {
@@ -90,7 +81,7 @@ export function drawReactorBody(temp) {
     arc(x, y, coilWidth, reactorWidth + 2, HALF_PI, -HALF_PI, OPEN);
   }
 
-  // === Entry wire from bottom of first coil
+  // Entry wire from bottom of first coil
   let entryX = startX - 4;
   let entryY = reactorWidth / 2 - (reactorWidth + 2) / 2;
 
@@ -102,7 +93,7 @@ export function drawReactorBody(temp) {
          jointX - 8, jointY - 3,
          jointX + 3, jointY  -2.5);
 
-  // === Exit wire from bottom of last coil
+  // Exit wire from bottom of last coil
   let exitX = startX + (turns - 1) * spacing + 3 ;
   let exitY = reactorWidth / 2 + (reactorWidth + 2) / 2 ;
 
@@ -114,31 +105,33 @@ export function drawReactorBody(temp) {
   pop();
 }
 
-// === Draw Heater Switch for Reactor ===
+// Draw Heater Switch for Reactor
 export function drawReactorHeaterSwitch(x = 120, y = 60) {
   const w = 15; // width of switch
   const h = 8; // height of switch
-  const isOn = window.reactorHeaterOn;  // ✅ FIXED: use global state instead of local
+  const isOn = window.reactorHeaterOn;  // use global state instead of local
 
   push();
   translate(x, y);
 
-  // --- Switch Body ---
-  stroke(0);
-  strokeWeight(0);
-  fill(60);
-  rect(-w / 2, 0, w, h, 6); // rounded box
-
-  // --- Lever ---
+    // Lever
   push();
-  translate(0, 0); // ✅ FIXED: move to center of switch for better pivot point
+  translate(0, 0); // move to center of switch for better pivot point
   rotate(radians(isOn ? 30 : -30));
   stroke(0);
-  strokeWeight(1); // ✅ Made slightly thicker for better visibility
+  strokeWeight(1); // Made slightly thicker for better visibility
   line(0, 0, 0, -4);  // vertical lever line
   pop();
 
-  // --- Text Labels ---
+  // Switch Body
+  stroke(0);
+  strokeWeight(0);
+  fill(60);
+  rect(-w / 2, 0, w, h, 4); // rounded box
+
+
+
+  // Text Labels
   noStroke();
   fill(255);
   textSize(2.5);
@@ -146,6 +139,8 @@ export function drawReactorHeaterSwitch(x = 120, y = 60) {
   text("OFF", -w / 4, h / 2);
   text("ON", w / 4, h / 2);
 
+  fill(0); // Black text for the label
+  text("reactor switch", 0, h + 3); // Label below the switch
   pop();
 }
 
@@ -162,9 +157,9 @@ export function toggleReactorHeater(mx, my, switchX = 63, switchY = 36.5) {
   if (mx >= left && mx <= right && my >= top && my <= bottom) {
     window.reactorHeaterOn = !window.reactorHeaterOn;
     
-    console.log("Switch clicked! Heater state:", window.reactorHeaterOn); // ✅ Debug
+    console.log("Switch clicked! Heater state:", window.reactorHeaterOn); // Debug
     
-    // ✅ NEW: Record heater turn-on time and reset exhaust timing
+    // Record heater turn-on time and reset exhaust timing
     if (window.reactorHeaterOn) {
       heaterTurnOnTime = millis();
       firstExhaustBurstActive = false;
@@ -180,11 +175,11 @@ export function toggleReactorHeater(mx, my, switchX = 63, switchY = 36.5) {
       console.log("Heater turned OFF - Resetting exhaust timing");
     }
     
-    // ✅ Reset slider when heater turns OFF
+    // Reset slider when heater turns OFF
     if (!window.reactorHeaterOn && window.tempSlider && window.tempValueSpan) {
       window.tempSlider.value = 200;
       window.tempValueSpan.textContent = `200°C`;
-      window.targetTemp = 200; // ✅ Also reset target immediately
+      window.targetTemp = 200; // Also reset target immediately
       console.log("Heater turned OFF - Slider reset to 200"); // Debug
     }
     
@@ -203,8 +198,7 @@ export function updateReactorVaporParticles(temp) {
   const top = reactorY + 2;
   const bottom = reactorY + reactorWidth - 2;
 
-  // //  Only spawn condenser particles if reactor hot, valve is open, and cooling is ON
-
+  // Only spawn condenser particles if reactor hot, valve is open, and cooling is ON
   if (
     vaporDelayReached &&
     window.reactorHeaterOn &&
@@ -212,16 +206,14 @@ export function updateReactorVaporParticles(temp) {
     tempAbove290Time !== null &&
     millis() - tempAbove290Time >= CONDENSER_DELAY_MS &&
     window.valveState === "tocondenser" &&
-    window.condenserCoolingOn && // ✅ extra condition
+    window.condenserCoolingOn && // extra condition
     condenserPathParticles.length < 20 &&
     frameCount % 10 === 0
   ) {
     spawnCondenserParticle();
   }
 
-
-
-  // 🔵 SPAWN reactor vapor particles (bouncing inside reactor)
+  // Spawn reactor vapor particles (bouncing inside reactor)
   if (
     vaporDelayReached &&
     window.reactorHeaterOn &&
@@ -239,7 +231,7 @@ export function updateReactorVaporParticles(temp) {
     });
   }
 
-  // 🔵 UPDATE reactor vapor particles
+  // Update reactor vapor particles
   for (let i = reactorVaporParticles.length - 1; i >= 0; i--) {
     let p = reactorVaporParticles[i];
 
@@ -290,10 +282,8 @@ export function updateReactorVaporParticles(temp) {
     if (temp < 290) {
       tempAbove290Time = null;
     }
-
   }
 }
-
 
 export function updateCondenserParticlesBezier() {
   const p0 = { x: 90, y: 20  };   // reactor outlet (right side)
@@ -306,7 +296,7 @@ export function updateCondenserParticlesBezier() {
     p.t += 0.015; // speed of particle
 
     if (p.t > 1) {
-      // ✅ FIXED: When particle reaches end of path, add it to condenser
+      // When particle reaches end of path, add it to condenser
       condenserPathParticles.splice(i, 1);
       addParticleToCondenser(); // This will add particle to condenser's internal system
       continue;
@@ -319,14 +309,12 @@ export function updateCondenserParticlesBezier() {
     noStroke();
     ellipse(x, y, p.r);
     
-    // ✅ Optional: Fade particles as they travel (makes transition smoother)
+    // Optional: Fade particles as they travel (makes transition smoother)
     // if (p.t > 0.8) { // Start fading when 80% of the way there
     //   p.alpha -= 3;
     // }
   }
 }
-
-
 
 export function updateExhaustParticles() {
   if (!window.reactorHeaterOn || !heaterTurnOnTime) {
@@ -334,14 +322,37 @@ export function updateExhaustParticles() {
   }
 
   const currentTime = millis();
-  const timeSinceHeaterOn = currentTime - heaterTurnOnTime;
   
-  // ✅ Check if liquid movement has started (this syncs with your existing system)
+  // NEW: Detect valve switching to exhaust
+  if (window.valveState !== previousValveState) {
+    if (window.valveState === "toexhaust" && window.reactorHeaterOn) {
+      // Valve just switched to exhaust while heater is on
+      valveSwitchTime = currentTime;
+      switchTriggeredBurst = true;
+      console.log("Valve switched to exhaust - Starting exhaust burst!");
+    }
+    previousValveState = window.valveState;
+  }
+
+  // NEW: Handle switch-triggered burst
+  let switchBurstActive = false;
+  if (switchTriggeredBurst && valveSwitchTime) {
+    const timeSinceSwitch = currentTime - valveSwitchTime;
+    if (timeSinceSwitch <= SWITCH_BURST_DURATION) {
+      switchBurstActive = true;
+    } else {
+      switchTriggeredBurst = false; // End the burst
+      console.log("Switch-triggered exhaust burst ended");
+    }
+  }
+
+  // EXISTING: Original timed bursts logic
+  const timeSinceHeaterOn = currentTime - heaterTurnOnTime;
   const liquidMovementStarted = window.liquidMovementStartTime !== null;
   const timeSinceLiquidMovement = liquidMovementStarted ? 
     currentTime - window.liquidMovementStartTime : 0;
 
-  // ✅ FIRST BURST: 1 second right when liquid movement starts
+  // First burst: 1 second right when liquid movement starts
   if (liquidMovementStarted && timeSinceLiquidMovement <= 1000) {
     if (!firstExhaustBurstActive) {
       firstExhaustBurstActive = true;
@@ -352,10 +363,9 @@ export function updateExhaustParticles() {
     console.log("Ending FIRST exhaust burst");
   }
 
-  // ✅ SECOND BURST: 3 seconds starting after vapor particles appear and settle
-  // This starts after vapor delay (1s) + some settle time (2s) = 3s total
-  const secondBurstStartDelay = 3000; // 3 seconds after liquid movement
-  const secondBurstDuration = 3000;   // 3 seconds duration
+  // Second burst: 3 seconds starting after vapor particles appear and settle
+  const secondBurstStartDelay = 3000;
+  const secondBurstDuration = 3000;
   
   if (liquidMovementStarted && 
       timeSinceLiquidMovement >= secondBurstStartDelay && 
@@ -372,9 +382,11 @@ export function updateExhaustParticles() {
     console.log("Ending SECOND exhaust burst");
   }
 
-  // ✅ Generate particles only during active burst periods and when valve is "to exhaust"
+  // UPDATED: Generate particles during any active burst period
   const shouldGenerateParticles = window.valveState === "toexhaust" && 
-                                  (firstExhaustBurstActive || secondExhaustBurstActive);
+                                  (firstExhaustBurstActive || 
+                                   secondExhaustBurstActive || 
+                                   switchBurstActive); // NEW: Add switch burst
 
   if (shouldGenerateParticles) {
     if (exhaustParticles.length < maxExhaustParticles && frameCount % 4 === 0) {
@@ -388,7 +400,7 @@ export function updateExhaustParticles() {
     }
   }
 
-  // ✅ Update existing particles (they continue to move regardless of burst state)
+  // Update existing particles
   for (let i = exhaustParticles.length - 1; i >= 0; i--) {
     const p = exhaustParticles[i];
     p.x += p.dx;
@@ -406,7 +418,6 @@ export function drawExhaustParticles() {
     ellipse(p.x, p.y, p.r);
   }
 }
-
 
 export function updateCondenserParticles() {
   for (let i = condenserParticles.length - 1; i >= 0; i--) {
@@ -428,11 +439,34 @@ export function updateCondenserParticles() {
   }
 }
 
-
 function spawnCondenserParticle() {
   condenserPathParticles.push({
     t: 0,       // travel progress from 0 → 1
     r: random(1.5, 2.2),
     alpha: 255
   });
+}
+
+// Reset function for reactor component
+export function resetReactor() {
+  // Reset heater state
+  window.reactorHeaterOn = false;
+  
+  // Reset visual effects
+  coilGlowValue = 120; // Steel gray
+  
+  // Reset particle arrays
+  reactorVaporParticles = [];
+  exhaustParticles = [];
+  condenserParticles = [];
+  condenserPathParticles = [];
+  
+  // Reset timing variables
+  heaterTurnOnTime = null;
+  firstExhaustBurstActive = false;
+  secondExhaustBurstActive = false;
+  secondExhaustStartTime = null;
+  tempAbove290Time = null;
+  
+  console.log("Reactor reset complete");
 }

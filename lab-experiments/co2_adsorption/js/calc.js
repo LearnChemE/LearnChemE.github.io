@@ -3,7 +3,7 @@ const timeMultiplicationFactor = 25;
 /**
  * Calculate the amount of CO2 adsorbed on a surface
  * as a function of time using a first-order rate equation.
- * 
+ *
  * @param {Object} args - The arguments object.
  * @param {number} args.t - The time in seconds.
  * @param {number} args.ka - The adsorption rate constant in m^3/(mol*s).
@@ -12,11 +12,11 @@ const timeMultiplicationFactor = 25;
  * @returns {number} - The amount of CO2 adsorbed on the surface.
  */
 function theta(args) {
-  const t = args.t
+  const t = args.t;
 
   // These constants were chosen to achieve adsorption specified in OneNote. They are specifically hard-coded in
   // to be the default unless overridden.
-  const ka = args.ka || 9.120e-6;
+  const ka = args.ka || 9.12e-6;
   const kd = args.kd || 4.365e-4;
   const cCO2 = args.cCO2;
 
@@ -38,7 +38,7 @@ function theta(args) {
 /**
  * Calculate the concentration of CO2 in a gas mixture
  * using the ideal gas law.
- * 
+ *
  * @param {Object} args - The arguments object.
  * @param {number} args.P - The total pressure of the gas mixture in bar.
  * @param {number} args.T - The temperature of the gas mixture in K.
@@ -55,13 +55,13 @@ function cCO2(args) {
   const R = 0.08314; // L * bar / (K * mol)
 
   // Ideal gas law: PV = nRT => n/V = P/RT
-  return 1000 * PCO2 / (R * T); // (converted to mol / m^3)
+  return (1000 * PCO2) / (R * T); // (converted to mol / m^3)
 }
 
 /**
  * Calculate the outlet mole fraction of CO2 in a gas mixture
  * after passing through a zeolite membrane.
- * 
+ *
  * @param {Object} args - The arguments object.
  * @param {number} args.t - The time in seconds.
  * @param {number} args.tStep - The time step in seconds.
@@ -108,15 +108,39 @@ export function yCO2_out(args) {
 
   const amount_passed_through = Math.max(0, nCO2 * tStep - amount_adsorbed); // the amount of CO2 that did not adsorb in time tStep
 
-  let yOut = (amount_passed_through / tStep) / (amount_passed_through / tStep + nN2) || 0;
+  let yOut = amount_passed_through / tStep / (amount_passed_through / tStep + nN2) || 0;
+
+  function thetaDesorption(tInput, { Ea = 35000, k0 = 1e3, T0 = 298, beta = 0.1, dt = 0.1, theta0 = th1 } = {}) {
+    const R = 8.314;
+    let theta = theta0;
+    let t = 0;
+
+    // Integrate using Euler steps until t >= tInput
+    while (t < tInput && theta > 0) {
+      let T = T0 + beta * t;
+      let k = k0 * Math.exp(-Ea / (R * T));
+      let dtheta_dt = -k * theta;
+
+      theta += dtheta_dt * dt;
+      if (theta < 0) theta = 0;
+
+      t += dt;
+    }
+
+    console.log("theta0", theta0);
+
+    return theta;
+  }
 
   if (!desorbing) {
+    console.log("th1", th1.toFixed(4));
     return yOut;
   } else {
     const t = args.t * timeMultiplicationFactor;
     const delta_t = t - timeOfDesorption;
-    const thetaDesorbed = Math.exp(-delta_t * kd); // amount of CO2 desorbed in time delta_t
+    const thetaDesorbed = thetaDesorption(delta_t); // amount of CO2 desorbed in time delta_t
     yOut = yOut * thetaDesorbed;
+    console.log("thetaDesorbed", thetaDesorbed.toFixed(4));
     return yOut;
   }
 }
@@ -124,7 +148,7 @@ export function yCO2_out(args) {
 /**
  * Find the time required to adsorb a certain amount of CO2
  * to the zeolite membrane.
- * 
+ *
  * @param {Object} args - The arguments object.
  * @param {number} args.tStep - The time step in seconds.
  * @param {number} args.m - The mass flow rate of the gas mixture in g / s.
@@ -158,7 +182,7 @@ export function findAdsorbTime(args) {
       T: T,
       yCO2: yCO2,
       desorbing: false,
-      timeOfDesorption: 0
+      timeOfDesorption: 0,
     });
 
     const diff = Math.abs(outlet - yTarget);
@@ -168,7 +192,7 @@ export function findAdsorbTime(args) {
     }
   }
 
-  return tResult
+  return tResult;
 }
 
 /**

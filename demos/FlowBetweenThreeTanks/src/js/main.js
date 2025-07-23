@@ -25,7 +25,7 @@ let pipeBLength = Math.abs(currenrtTankBHeight - 50) / Math.sin(Math.PI / 3);
 // console.log('pipeBLength', Math.asin(60));
 
 let tankBX = margin + startX + (Math.abs(100 - 50) / Math.tan(Math.PI / 3)) * (startX - 165) / 50;//startX + (startX - 165) * currenrtTankBHeight / 100 - 15;
-let tankBY = startY + (maxHeight * (- currenrtTankBHeight + 50) / 100) - 40;
+let tankBY = startY + (maxHeight * 50 / 100) - 40  - (currenrtTankBHeight - 10) / 90 * 2*(maxHeight * 50 / 100);
 
 let tankCX = margin + (100 - lengthSlider.value) / 100 * (startX - 175 + (Math.abs(100 - 50) / Math.tan(Math.PI / 3)) * (startX - 165) / 50)
 
@@ -44,9 +44,6 @@ function drawTank(draw) {
   textA = drawText(draw, 'A', margin + 85, 50, 20);
   tankB = addSVGImage(draw, 'assets/tankA.svg', tankBX, tankBY , 175, 160);
   textB = drawText(draw, 'B',  tankBX + 85, tankBY, 20);
-  tankBDashedLine = drawDashedHorizontalLine(draw, margin + tankBX + 45, tankBY + 30, 25, 'black', 1, '5,5');
-  tankBBase = drawDashedHorizontalLine(draw, margin + tankBX + 55, config.canvasHeight - 2, 25, 'black', 1, '5,5');
-  tankBElevation = drawDashedLineWithArrows(draw, margin + tankBX + 60, config.canvasHeight - 7, margin + tankBX + 60, tankBY + 35, currenrtTankBHeight + ' ft', { color: 'black', width: 1, dashArray: '5,5' });
   
   tankC = addSVGImage(draw, 'assets/tankA.svg', tankCX, config.canvasHeight - 160, 175, 160);
   textC = drawText(draw, 'C', tankCX + 85, config.canvasHeight - 160, 20);
@@ -77,15 +74,20 @@ function drawPipes(draw) {
   drawPipeLengthIndicator(pipeGroup, pipeAElement, 15, lengthA + ' ft', lengthA, 'above');
   drawPipeLengthIndicator(pipeGroup, pipeCElement, 15, lengthC + ' ft', lengthC, 'below');
   drawDashedHorizontalLine(pipeGroup, margin, config.canvasHeight - 2, (tankBX - 300) * (100 - lengthSlider.value) / 100, 'black', 1, '5,5');
-  drawDashedLineWithArrows(pipeGroup, tankCX + 175 + 2, config.canvasHeight - 50, tankBX - 5, config.canvasHeight - 50, lengthSlider.value + ' ft', { color: 'black', width: 1, dashArray: '5,5' });
-  drawDashedVerticalLine(pipeGroup, tankBX, tankBY + 160, config.canvasHeight - 50 - (tankBY - 80), 'black', 1, '5,5');
-  // tankA.front();
-  // tankB.front();
-  // tankC.front();
+  drawDashedLineWithArrows(pipeGroup, tankCX + 175 + 2, config.canvasHeight - 50, tankBX - 4, config.canvasHeight - 50, lengthSlider.value + ' ft', { color: 'black', width: 1, dashArray: '5,5' });
+  drawDashedVerticalLine(pipeGroup, tankBX + 1.5, tankBY + 160, config.canvasHeight - 50 - (tankBY - 80), 'black', 1, '5,5');
   textA.front();
   textB.front();
   textC.front();
   calculateFlowRate(pipeGroup, lengthA, lengthC);
+
+  const y = startY + (maxHeight * 50 / 100) - 40  - (elevationSlider.value - 10) / 90 * 2*(maxHeight * 50 / 100)
+  drawDashedHorizontalLine(pipeGroup, tankBX + 160 + 12.5, y + 30, 25, 'black', 1, '5,5');
+  drawDashedLineWithArrows(pipeGroup, tankBX + 25 + 160, config.canvasHeight - 7, tankBX + 25 + 160, y + 35, currenrtTankBHeight + ' ft', { color: 'black', width: 1, dashArray: '5,5' });
+  drawDashedHorizontalLine(pipeGroup, tankBX + 160 + 12.5, config.canvasHeight - 2, 25, 'black', 1, '5,5');
+
+  drawDashedLineWithArrows(pipeGroup, tankCX + 20, config.canvasHeight - 6, tankCX + 20, config.canvasHeight - 125, '10' + ' ft', { color: 'black', width: 1, dashArray: '5,5' });
+  drawDashedVerticalLine(pipeGroup, tankBX + 1.5, 40, tankBY - 40, 'black', 1, '5,5');
 }
 
 function calculateFlowRate(draw, l_ab, l_bc) {
@@ -93,11 +95,14 @@ function calculateFlowRate(draw, l_ab, l_bc) {
   const g  = 32.17;
   const f  = 0.02;
 
-  const u_bc = Math.sqrt((2 * g * (elevationSlider.value - 10) * D) / (f * l_bc));
-  const u_ab = Math.sqrt((2 * g * (100 - elevationSlider.value) * D) / (f * l_ab));
+  const u_bc = Math.sqrt((2 * g * (elevationSlider.value - 10) * D) / (f * l_bc)) * Math.PI * 0.25 * Math.pow(D, 2);
+  const u_ab = Math.sqrt((2 * g * (100 - elevationSlider.value) * D) / (f * l_ab)) * Math.PI * 0.25 * Math.pow(D, 2);
 
-  drawText(draw, `U_AB = ${u_ab.toFixed(2)} ft/s`, 10, 200, 12, 'black');
-  drawText(draw, `U_BC = ${u_bc.toFixed(2)} ft/s`, 10, 215, 12, 'black');
+  draw.rect(135, 25).fill('white').stroke({ color: 'black', width: 1 }).center(tankBX + 90, tankBY + 50);
+  draw.rect(135, 25).fill('white').stroke({ color: 'black', width: 1 }).center(tankBX + 90, tankBY + 125);
+  drawLabelWithSubscript(draw, `Q_in = ${u_ab.toFixed(1)} ft³/s`, tankBX + 30, tankBY + 40, 16, 'black');
+  drawLabelWithSubscript(draw, `Q_out = ${u_bc.toFixed(1)} ft³/s`, tankBX + 30, tankBY + 115, 16, 'black');
+  drawDashedLineWithArrows(pipeGroup, 308, 50, tankBX - 2, 50, '100 ft', { color: 'black', width: 1, dashArray: '5,5' });
 }
 
 function adjustFigureWithEleveationSlider(draw) {
@@ -117,12 +122,6 @@ function adjustTankHeight(draw, value) {
     const y = startY + (maxHeight * 50 / 100) - 40  - (value - 10) / 90 * 2*(maxHeight * 50 / 100)//-        (maxHeight * (- currenrtTankBHeight + 50) / 100);
     tankB.move(tankBX, y);
     textB.move(tankBX + 85, y);
-    tankBDashedLine.clear();
-    tankBDashedLine = drawDashedHorizontalLine(draw, tankBX + 160 + 12.5, y + 30, 25, 'black', 1, '5,5');
-    tankBElevation.clear();
-    tankBElevation = drawDashedLineWithArrows(draw, tankBX + 25 + 160, config.canvasHeight - 7, tankBX + 25 + 160, y + 35, currenrtTankBHeight + ' ft', { color: 'black', width: 1, dashArray: '5,5' });
-    tankBBase.clear();
-    tankBBase = drawDashedHorizontalLine(draw, tankBX + 160 + 12.5, config.canvasHeight - 2, 25, 'black', 1, '5,5');
 }
 
 function adjustFigureWithDistanceSlider(draw) {
@@ -242,13 +241,14 @@ function drawPipeWithCurves(draw, pathString, pipeWidth = 15, flowDirection = 'd
   drawPipeArrows(draw, path, arrowSize, arrowSpacing, flowDirection);
   
   const endPoint = path.pointAt(length);
+  const startPoint = path.pointAt(0);
   const prevPoint = path.pointAt(length - 1);
   const dx_end = endPoint.x - prevPoint.x;
   const dy_end = endPoint.y - prevPoint.y;
   const endAngle = Math.atan2(dy_end, dx_end) * (180 / Math.PI);
   
   // Draw a rectangular cap: length = 1.5×pipeWidth, height = pipeWidth
-  const rectLength = pipeWidth * 1.5;
+  const rectLength = pipeWidth * 0.5;
   const rectHeight = pipeWidth;
 
   // Draw a rectangular cap at the start of the pipe (inside)
@@ -268,6 +268,11 @@ function drawPipeWithCurves(draw, pathString, pipeWidth = 15, flowDirection = 'd
   .fill(strokeColor)
   .center(endPoint.x, endPoint.y)
   .rotate(endAngle, endPoint.x, endPoint.y);
+
+  draw.rect(rectLength, rectHeight)
+  .fill(strokeColor)
+  .center(startPoint.x, startPoint.y)
+  .rotate(endAngle, startPoint.x, startPoint.y);
 
   const midIndex = length / 2;
   const midPoint = path.pointAt(midIndex);
@@ -321,7 +326,7 @@ function drawText(draw, textString, x, y, fontSize = 16, fillColor = 'black') {
 
 function drawLabelWithSubscript(draw, label, x, y, fontSize = 16, fillColor = 'black') {
 
-  const match = label.match(/^(.+?)_([A-Za-z])(.*)$/);
+  const match = label.match(/^(.+?)_([A-Za-z]+)(.*)$/);
   if (match) {
     const mainStr = match[1];
     const subStr = match[2];

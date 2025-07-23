@@ -387,6 +387,15 @@ window.simulation_list = [
     "simulation_type": "in-browser"
   },
   {
+    "title": "Material Balances on a CSTR Digital Experiment",
+    "href": "https://learncheme.github.io/lab-experiments/cstr_to_measure_reaction_kinetics/dist/",
+    "image": "https://learncheme.com/wp-content/uploads/2025/06/material-balances-cstr-WIDEr1.png",
+    "tooltip": "In this experiment, two liquid reactants in aqueous solutions flow into a steady-state, continuous stirred tank reactor (CSTR). The objective is to determine the rate constant and the reaction order with respect to one of the reactants.",
+    "description": "In this experiment, two liquid reactants in aqueous solutions flow into a steady-state, continuous stirred tank reactor (CSTR). The objective is to determine the rate constant and the reaction order with respect to one of the reactants.",
+    "src": "https://learncheme.github.io/lab-experiments/cstr_to_measure_reaction_kinetics/dist/",
+    "simulation_type": "in-browser"
+  },
+  {
     "title": "Measure Heat Capacity with a Calorimeter Digital Experiment",
     "href": "https://learncheme.github.io/demos/Calorimeter/dist/index.html",
     "image": "https://learncheme.com/wp-content/uploads/2025/03/calorimeter_wide_r1.png",
@@ -420,6 +429,15 @@ window.simulation_list = [
     "tooltip": "Mass balances around a distillation column",
     "description": "<p>This simulation allows you to test yourself on your ability to perform mass balances. Three scenarios are given; each scenario has a mass flow rate and at least one mole fraction that needs to be solved for.  The equations needed to solve each mass balance are given by pressing \"Details\".  Each question displays the correct answer after you press \"Show solution\", so you get instant feedback on your performance. This simulation displays your score at the end, so you may submit a screenshot of your score as an assignment for a materials & energy balances class.</p>",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/SolvingMassBalancesOnADistillationColumn",
+    "simulation_type": "in-browser"
+  },
+  {
+    "title": "Stripping Column Material Balances Digital Experiment",
+    "href": "https://learncheme.github.io/lab-experiments/stripping_column_material_balances/index.html",
+    "image": "https://learncheme.com/wp-content/uploads/2025/06/strippingcolumnWIDE_digiex.png",
+    "tooltip": "determines the Henry's constant from measurements on a stripping column",
+    "description": "This digital experiment determines the Henry's constant from measurements on a stripping column that removes a solute impurity from an aqueous solution and transfers it to a gas phase.",
+    "src": "https://learncheme.github.io/lab-experiments/stripping_column_material_balances/index.html",
     "simulation_type": "in-browser"
   },
   {
@@ -743,7 +761,16 @@ window.simulation_list = [
     "image": "https://learncheme.com/wp-content/uploads/2025/05/EnergyBalanceOnPressurizingATank.png",
     "tooltip": "Gas flows into an insulated that that is initially at a lower pressure and different temperature ",
     "description": "A gas flows through a pipe into an insulated tank (0.1 m<sup>3</sup>) that is initially at a lower pressure and at a different temperature. Click the &#8220;valve (open)&#8221; play button to start gas flow into the tank; the valve closes when the pressures equalize. The tank initially contains either an ideal gas (N<sub>2</sub>), and more N<sub>2</sub> is added, or it contains a vapor-liquid mixture of water and superheated steam is added. Sliders change the pipe pressure and temperature and the initial tank pressure. The initial mass of water in the tank is 1 kg and that does not change when the initial tank pressure is changed with the slider. Initially the tank is at the saturation temperature of water at the initial pressure. Use the &#8220;valve (reset)&#8221; button to go back to the initial conditions before the valve was opened.",
-    "src": "https://demonstrations.wolfram.com/EnergyBalanceOnPressurizingATank/",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/EnergyBalanceOnPressurizingATank",
+    "simulation_type": "in-browser"
+  },
+  {
+    "title": "Entropy Changes in Mixing Ideal Gases",
+    "href": "https://learncheme.github.io/demos/EntropyChangesInMixingIdealGases",
+    "image": "https://learncheme.com/wp-content/uploads/2025/06/entropychangesinmixingidealgasesr1.png",
+    "tooltip": "Isothermal mixing of ideal gases or adding a second gas to an initial gas",
+    "description": "In this simulation, ideal gases A and B are mixed isothermally by keeping the total volume constant (&#8220;remove barrier&#8221; option) or by adding gas A to gas B so the final volume is the same as the initial volume of B (&#8220;compress right&#8221; option). Select the &#8220;mix gases&#8221; play button to initiate mixing. For the &#8220;remove barrier&#8221; option, the entropy change of each gas is the same as that of a gas expanding into a vacuum. When the partial pressure decreases, entropy increases. For the &#8220;compress right&#8221; option, if the partial pressure of a gas does not change, its entropy does not change, even when mixed with another gas. The total entropy change is the sum of the entropy changes of each gas. Gas A is colored red and gas B is colored blue, and when the gases mix, different shades of purple result, depending on the ratio of moles of each species. As the number of moles increases, the color becomes more intense. When the initial pressures of A and B are equal and the &#8220;remove barrier&#8221; option is selected, which corresponds to mixing at constant pressure, the entropy of mixing is: \\[ \\Delta S_{mix} = -n_{A} \\mathrm{ R } \\; \\mathrm{ln}(x_{A}) &#8211; n_{B} \\mathrm{ R } \\; \\mathrm{ln}(x_{B}) \\] where \\( x_{A} \\) and \\( x_{B} \\) are the mole fractions of A and B in the final mixture.",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/EntropyChangesInMixingIdealGases",
     "simulation_type": "in-browser"
   },
   {
@@ -780,6 +807,15 @@ window.simulation_list = [
     "tooltip": "Liquid propane or toluene is injected into an evacuated tank at constant temperature ",
     "description": "<p>In this simulation, liquid propane is injected into an evacuated 2-L spherical tank that is held at constant temperature. Depending on the number of moles injected and the temperature (control both with sliders), the propane either vaporizes completely or forms two phases in vapor-liquid equilibrium (VLE). When propane is in VLE, the tank pressure equals the saturation vapor pressure of propane; otherwise, the pressure is calculated using the ideal gas law. The pressure is displayed at the top of the tank. Click the inject button to inject liquid into the tank. The intensity of the blue color of the vapor is proportional to the vapor density. The volume of the liquid in the tank exaggerated relative to the vapor volume for better visualization. The bar graph to the right shows the number of moles of liquid and vapor in the tank.</p>",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/InjectingLiquidIntoAnEvacuatedTank/dist/",
+    "simulation_type": "in-browser"
+  },
+  {
+    "title": "Joule-Thomson Expansion",
+    "href": "https://learncheme.github.io/demos/JouleThomsonExpansion/",
+    "image": "https://learncheme.com/wp-content/uploads/2025/06/JTcoefficient.png",
+    "tooltip": "Gas expansion through an adiabatic throttle",
+    "description": "When a gas expands through an adiabatic throttle (often a porous plug), the temperature can change as a result of the Joule–Thomson effect. You can select one of four gases, and use sliders to adjust the inlet temperature, inlet pressure and outlet pressure. The intensity of the green color is proportional to the gas density, and the throttle is thicker for a larger pressure drop. Select “J-T coeff. vs. temperature” to see the Joule–Thomson coefficient plotted as a function of temperature.",
+    "src": "https://learncheme.github.io/demos/JouleThomsonExpansion/",
     "simulation_type": "in-browser"
   },
   {
@@ -834,6 +870,24 @@ window.simulation_list = [
     "tooltip": "The Rankine cycle is a thermodynamic cycle showing how heat engines, such as steam turbines, generate work. This simulation plots the enthalpy and pressure at each stage of the Rankine cycle.",
     "description": "A diagram of a Rankine cycle is shown in this simulation. The Rankine cycle is an idealized thermodynamic cycle describing the process by which certain heat engines, such as steam turbines, allow mechanical work to be extracted from a fluid as it moves between a heat source and heat sink. The enthalpy and pressure of the fluid leaving the boiler, turbine, condenser, and pump are shown as circled numbers in the plot. You can also change the graphic to display the conditions entering and leaving the turbine, or to display a graphic showing what phases are present in each stream.",
     "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/RankineCycle/",
+    "simulation_type": "in-browser"
+  },
+  {
+    "title": "Ranque-Hilsch Vortex Tube",
+    "href": "https://learncheme.github.io/demos/RanqueHilschVortexTube/dist/",
+    "image": "https://learncheme.com/wp-content/uploads/2025/06/ranquehilshvortextube_r1.png",
+    "tooltip": "Hilsch tube separates compressed air into a hold and cold stream",
+    "description": "A vortex tube is a mechanical device used to separate a compressed gas into hot and cold streams. High-pressure air is fed into a Ranque-Hilsch vortex tube and air exits at 1-bar pressure; cold air exits the left side and hot air exits the right side. Use the “fraction of feed in cold stream” slider to adjust the fraction of feed in the cold stream (left side); this adjusts the throttle valve on the right side (triangle). Use the “feed pressure (bar, absolute)” slider to modify the inlet pressure. The color of the flowing gas indicates its temperature; blue is cold and red is hot. The coefficient of performance and isentropic efficiency are shown in the top-right corner. The coefficient of performance equals the isentropic efficiency multiplied by the fraction of feed gas in the cold stream.",
+    "src": "https://github.com/LearnChemE/LearnChemE.github.io/tree/master/demos/RanqueHilschVortexTube",
+    "simulation_type": "in-browser"
+  },
+  {
+    "title": "Ranque-Hilsch Vortex Tube Digital Experiment",
+    "href": "https://learncheme.github.io/lab-experiments/hilsch_tube/dist/",
+    "image": "https://learncheme.com/wp-content/uploads/2025/06/RanqueHilshTubedigiexWIDE.png",
+    "tooltip": "Higher-pressure, room-temperature air is fed to a Ranque-Hilsch vortex tube, which splits the air into hot and cold streams at lower pressure.",
+    "description": "Higher-pressure, room-temperature air is fed to a Ranque-Hilsch vortex tube, which splits the air into hot and cold streams at lower pressure. The fraction of the air that goes to the cold side affects how cold the low temperature side is.",
+    "src": "https://learncheme.github.io/lab-experiments/hilsch_tube/dist/",
     "simulation_type": "in-browser"
   },
   {

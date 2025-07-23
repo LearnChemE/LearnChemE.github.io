@@ -2,7 +2,7 @@ import "bootstrap";
 import "p5";
 import "./style/style.scss";
 import "./assets/digital-7.ttf";
-import "./assets/chemical_equilibrium_in_the_haber_process.pdf";
+import "./assets/chemical_equilibrium_worksheet.pdf";
 import { drawAll, Zoom } from "./js/draw";
 import { handleInputs } from "./js/inputs";
 import { calcAll, setDefaults } from "./js/calcs";
@@ -30,6 +30,7 @@ window.state = {
   zoomY: 270,
   dragging: false,
   graphYVals: [[],[],[]],
+  valve_time: 1,
 };
 
 const containerElement = document.getElementById("p5-container");
