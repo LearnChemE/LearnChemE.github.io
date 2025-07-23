@@ -155,24 +155,24 @@ function drawPressureRegulator(x, y) {
   fill(20);
   rectMode(CORNER);
   // Pressure value background
-  rect(-2.05, -3.375, 5.3, 2.25, 0.125);
+  rect(-2.55, -3.375, 5.3, 2.25, 0.125);
   // Pressure setpoint background
-  rect(-1.25, -0.875, 4.5, 2, 0.125);
+  // rect(-1.25, -0.875, 4.5, 2, 0.125);
   noStroke();
-  fill("white");
-  textAlign(RIGHT, CENTER);
-  textSize(0.75);
-  text("PV", -2.375, -2.25);
-  text("SP", -1.5, 0);
+  // fill("white");
+  // textAlign(RIGHT, CENTER);
+  // textSize(0.75);
+  // text("PV", -2.375, -2.25);
+  // text("SP", -1.5, 0);
   fill("yellow");
   textAlign(CENTER, CENTER);
   textSize(2.25);
   textFont(state.meterFont);
   const P = round(state.P).toFixed(0);
-  text(P, 0.875, -2.375);
+  text(P, 0.275, -2.375);
   textSize(1.75);
   const P_sp = round(state.PSetPoint).toFixed(0);
-  text(P_sp, 1, 0.125);
+  // text(P_sp, 1, 0.125);
   const hover_coords = [
     [81.5, 83.5],
     [84.75, 86.75],
@@ -1265,7 +1265,7 @@ function drawComputer() {
   vertex(-19, 35 - 4 * 38 / 48);
   vertex(-16, 35 - 4 * 38 / 48);
   if (state.takingSampleTime >= 1 || (state.purgingTime > 0 && state.purgingTime < 1)) {
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 100; i++) { // H2
       const x = -16 + i * 5 / 50;
       // const y = 35 - 4 * 38 / 48 - state.outlet.yH2 * 15 * Math.exp(-0.5 * (PI * (i - 50) / 25) ** 2) + addGaussNoise(0, .2);
       const y = state.graphYVals[0][i];
@@ -1294,9 +1294,23 @@ function drawComputer() {
 
   // Display the liquid composition after liquid is inject
   if (state.takingSampleTime >= 1) {
-    text(`y     = ${(round(100 * state.outlet.yNH3) / 100).toFixed(2)}`, -7.5, 6);
-    textSize(2);
-    text("NH3", -5.4, 7.1);
+    // Composition labels
+    // text("SHOWING RESULTS", -19, 6);
+    push();
+    textSize(3);
+    textAlign(CENTER, CENTER);
+    const h2textCoord  = [ -15.0, 6 ] // state.graphYVals[0][50] - 2.0 ];
+    const n2textCoord  = [   0.0, 6 ] // state.graphYVals[1][50] - 2.0 ];
+    const nh3textCoord = [  14.5, 6 ] // state.graphYVals[2][50] - 2.0 ];
+
+    text(`y   = ${(round(100 * state.outlet.yH2)  / 100).toFixed(2)},`, ...h2textCoord);
+    text(`y   = ${(round(100 * state.outlet.yN2)  / 100).toFixed(2)},`, ...n2textCoord);
+    text(`y    = ${(round(100 * state.outlet.yNH3) / 100).toFixed(2)}`, ...nh3textCoord);
+    textSize(1.75);
+    text("H2" ,  h2textCoord[0] - 4.0,  h2textCoord[1] + .5);
+    text("N2" ,  n2textCoord[0] - 4.0,  n2textCoord[1] + .5);
+    text("NH3", nh3textCoord[0] - 3.5, nh3textCoord[1] + .5);
+    pop();
   } else if (state.takingSampleTime > 0) {
     text("TAKING SAMPLE ...", -18, 6);
   } else if (state.purgingTime > 0 && state.purgingTime < 1) {
@@ -1336,7 +1350,8 @@ function drawInstructionText() {
   } else if (state.purge_position === 2 && (!state.hasAdjustedPressure || !state.hasAdjustedTemperature)) {
     text("Adjust pressure using the pressure controller\nand temperature on the sand bath.", 0, 0);
   } else if (state.purge_position == 2 && state.reaction_time < 1) {
-    text("System is reaching equilibrium ... please wait", 0, 0);
+    if (state.valve_time < 1) text("Sampling tube is refilling ... please wait", 0, 0);
+    else text("System is reaching equilibrium ... please wait", 0, 0);
   } else if (state.purge_position === 2) {
     text("Sample ready. Click the sampling valve\nto insert to GC, or adjust reaction conditions\nfor a new trial.", 0, 0);
   } else if (state.purge_position === 0 && state.takingSampleTime >= 1) {
@@ -1401,8 +1416,10 @@ export function drawAll() {
   if (state.purging) {
     state.purgingTime = min(1, state.purgingTime + 0.0025);
   }
-  state.reaction_time += state.purging ? 1 : state.takingSample ? 1 : 0.002;
+  state.reaction_time += state.purging ? 1 : state.takingSample ? 1 : deltaTime/4000;
   state.reaction_time = min(state.reaction_time, 1);
+  state.valve_time += deltaTime/4000;
+  state.valve_time = min(state.valve_time, 1);
   state.P = min(state.PSetPoint, maxPressure);
 
   // Recalculate if flagged

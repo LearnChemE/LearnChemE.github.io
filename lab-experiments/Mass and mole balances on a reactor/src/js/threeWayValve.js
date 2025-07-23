@@ -1,11 +1,10 @@
 import { reactorX, reactorY, reactorHeight, reactorWidth } from './reactor.js';
 
-export let valveState = "toexhaust";  // ✅ Match the naming used in reactor.js
-// ✅ Also set as global variable to avoid circular import
+export let valveState = "toexhaust";  // Match the naming used in reactor.js
+// Also set as global variable to avoid circular import
 window.valveState = "toexhaust";
 
 import { valveX, valveY } from './reactor.js';
-
 
 export function drawThreeWayValve() {
   const baseColor = color(100, 180, 255);
@@ -31,7 +30,7 @@ export function drawThreeWayValve() {
   // Valve handle (rotated rectangle) - points in flow direction
   push();
   translate(valveX, valveY);
-  // ✅ Handle points toward actual flow direction (consistent with other valves)
+  // Handle points toward actual flow direction (consistent with other valves)
   // When "toexhaust": 0° (horizontal right), When "tocondenser": 90° (vertical down)
   rotate(valveState === "toexhaust" ? radians(90) : radians(0));
   fill(handleColor);
@@ -39,13 +38,13 @@ export function drawThreeWayValve() {
   rect(0, 0, 2, 9, 2);  // narrow and long handle
   pop();
 
-  // === FIXED: Corrected Dynamic Flow Label Above Valve ===
+  // Corrected Dynamic Flow Label Above Valve
   fill(0); // Black text
   noStroke();
   textSize(3);
   textAlign(CENTER, CENTER);
 
-  // ✅ FIXED: Use consistent naming without spaces
+  // Use consistent naming without spaces
   let label = valveState === "tocondenser" ? "to condenser" : "to exhaust";
   text(label, valveX, valveY - 8);
 }
@@ -54,7 +53,7 @@ export function handleValveClick(mx, my) {
   const d = dist(mx, my, valveX, valveY);
   if (d < 7) {
     valveState = valveState === "tocondenser" ? "toexhaust" : "tocondenser";
-    // ✅ Update global variable too
+    // Update global variable too
     window.valveState = valveState;
     console.log("Valve switched to:", valveState);
     return true;
@@ -71,4 +70,13 @@ export function drawExhaustCap(x, y) {
   line(x + 1, y - 3, x + 4, y - 3);
   line(x + 1, y, x + 4, y);
   line(x + 1, y + 3, x + 4, y + 3);
+}
+
+// Reset function for three-way valve
+export function resetThreeWayValve() {
+  // Reset valve position
+  valveState = "toexhaust";
+  window.valveState = "toexhaust";
+  
+  console.log("Three-way valve reset complete");
 }

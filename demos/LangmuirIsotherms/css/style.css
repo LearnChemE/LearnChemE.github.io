@@ -1,0 +1,355 @@
+/* ─── GLOBAL & CARD LAYOUT ───────────────────────────────────────── */
+
+/* Browser compatibility and consistent box sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Arial", sans-serif;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.card {
+  position: relative;
+  background: #e5e7eb; /* light grey similar to CSTR */
+  border: none; /* remove black border */
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  width: 95%;
+  max-width: 1000px;
+  height: 680px; /* increased to give plot more vertical space */
+  padding: 0.5rem 0.75rem 0.75rem 0.75rem; /* reduced side padding */
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-btn {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  background: lightblue;
+  border: 1px solid #000;
+  border-radius: 6px;
+  padding: 6px;
+  height: 40px;
+  cursor: pointer;
+  z-index: 50;
+}
+
+.menu-btn img {
+  height: 100%;
+}
+
+/* ─── LANGMUIR SIMULATION CONTAINER ─────────────────────────────── */
+
+.langmuir-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0rem;
+  margin-left: 4rem; /* smaller gap from hamburger */
+  margin-right: 2rem;
+  overflow: hidden;
+}
+
+.langmuir-container h1 {
+  margin: 0 0 1rem 0;
+  text-align: center;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.controls {
+  margin-top: 0.5rem;
+  margin-bottom: 0px;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.control-group.inline {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+/* Row 1: Temperature - reference point */
+.temp-group > label {
+  flex: 0 0 100px; /* Enough width for "temperature (K)" */
+  text-align: right;
+  font-size: 0.85rem;
+  margin-right: 10px;
+}
+
+/* Row 2: Heat of adsorption - align to match row 1 starting point */
+.heat-group > label {
+  flex: 0 0 170px; /* Wider to accommodate longer text and align sliders */
+  text-align: right;
+  font-size: 0.85rem;
+  margin-right: 10px;
+}
+
+/* Row 3: Ratio - align to match row 1 starting point */
+.combined-group > label {
+  flex: 0 0 195px; /* Widest to accommodate longest text and align sliders */
+  text-align: right;
+  font-size: 0.85rem;
+  margin-right: 10px;
+}
+
+/* Slider rows */
+.slider-row {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  flex: 1;
+}
+
+/* All sliders - now they start from same position */
+.slider-row input[type=range] {
+  margin: 0;
+  flex: 1;
+  max-width: 200px;
+  
+  /* Browser compatibility for consistent slider appearance */
+  -webkit-appearance: none;  /* Chrome/Safari/Opera */
+  -moz-appearance: none;     /* Firefox */
+  appearance: none;
+
+  height: 6px;
+  background: #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+/* Secondary sliders in heat and ratio rows */
+.heat-group .slider-row input[type=range],
+.combined-group .slider-row input[type=range] {
+  max-width: 120px;
+}
+
+/* Browser-specific slider thumb styling for consistency */
+.slider-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; /* reduced from 18px for smaller circle */
+  height: 14px; /* reduced from 18px for smaller circle */
+  background: #2a72de;
+  border: 1.5px solid #888; /* slightly thinner border to match new size */
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.slider-row input[type="range"]::-moz-range-thumb {
+  width: 14px; /* reduced from 18px for smaller circle */
+  height: 14px; /* reduced from 18px for smaller circle */
+  background: #2a72de;
+  border: 1.5px solid #888; /* thinner border to maintain proportion */
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Values next to sliders */
+.slider-row span {
+  width: 30px;
+  text-align: left;
+  font-weight: normal;
+  margin-left: 8px;
+  margin-right: 8px;
+  font-size: 0.85rem;
+}
+
+/* Labels within slider rows (A, B, etc.) */
+.slider-row label {
+  margin-right: 5px !important;
+  margin-left: 10px;
+  min-width: auto !important;
+  font-size: 0.85rem;
+  width: auto !important;
+  flex: none !important; /* Don't let these affect alignment */
+}
+
+#plot {
+  flex:1;
+  width:100%;
+  max-width:none;
+  align-self:stretch;
+  background:#fff;
+  border-radius:0.5rem;
+  padding:0.75rem;
+  box-shadow:0 1px 3px rgba(0,0,0,0.05);
+  min-height:0;
+  margin-top:0px;
+  overflow:visible;
+}
+
+/* Plotly axis/tick overrides to match CSTR */
+#plot path.xaxis,#plot path.yaxis{stroke:#000!important;stroke-width:1px!important;}
+#plot .xtick>path,#plot .ytick>path{stroke-width:1px!important;}
+#plot .xtick text,#plot .ytick text{font-family:'Arial'!important;font-weight:400!important;}
+#plot text.ytitle,#plot text.xtitle{font-family:'Arial'!important;font-weight:500!important;}
+
+/* Force Arial on ALL plotly text elements */
+#plot text, #plot .plotly text, #plot svg text {
+  font-family: 'Arial' !important;
+}
+
+/* Additional specific targeting for axis labels and titles */
+#plot .xaxislayer-above text, #plot .yaxislayer-above text,
+#plot .xaxislayer-below text, #plot .yaxislayer-below text {
+  font-family: 'Arial' !important;
+}
+
+/* Target annotation text */
+#plot .annotation text {
+  font-family: 'Arial' !important;
+}
+
+/* ─── DROPDOWN MENU ──────────────────────────────────────────────── */
+
+.hidden {
+  display: none !important;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 3.5rem;        /* just below the hamburger button */
+  left: 0.5rem;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  list-style: none;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 100;
+}
+
+/* make each dropdown item look like a blue button */
+.dropdown-menu li {
+  background: #007bff;
+  color: #fff;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  /* ensure it fills the dropdown's width */
+  display: block;
+  white-space: nowrap;
+}
+
+/* darker on hover */
+.dropdown-menu li:hover {
+  background: #0056b3;
+}
+
+/* ─── MODAL STYLES ──────────────────────────────────────────────── */
+
+.modal {
+  position: fixed;
+  top: 0; 
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: flex-start;    /* <-- was center */
+  justify-content: center;
+  padding-top: 1.5rem;        /* add some breathing room from the top */
+  z-index: 200;
+}
+
+.modal-content {
+  position: relative;
+  background: #fff;
+  border-radius: 6px;
+  width: 800px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  max-height: 80vh;           /* allow vertical scroll if very long */
+  overflow-y: auto;
+  padding: 2rem;              /* more breathing room */
+  font-size: 1rem;            /* slightly larger base font */
+  line-height: 1.6;           /* generous line spacing */
+}
+
+.modal-body p {
+  margin: 0.25em 0; /* slight spacing between lines */
+}
+
+.mjx-chtml {
+  text-align: left !important;
+}
+
+/* Tighten up the title spacing */
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+/* Paragraphs and lists */
+.modal-content p,
+.modal-content ul {
+  margin-bottom: 1rem;
+}
+
+.modal-content p {
+  line-height: 1.6;
+}
+
+.modal-content ul {
+  padding-left: 1.5rem;      /* indent bullets */
+}
+
+/* Bullet spacing */
+.modal-content li {
+  margin-bottom: 0.5rem;
+}
+
+/* Centered formula block */
+.formula {
+  font-family: monospace;
+  font-size: 1.2rem;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* center the "or" separator */
+.modal-content .modal-or {
+  text-align: center;
+  margin: 1rem 0;
+  font-style: italic;      /* optional: make it stand out */
+  font-weight: 500;
+}
+
+.modal-content a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.modal-content a:hover {
+  text-decoration: underline;
+}
+
+/* Force left alignment on MathJax block equations */
+mjx-container[jax="CHTML"][display="true"] {
+  display: block;
+  text-align: left !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+}

@@ -235,17 +235,24 @@ export function calcAll() {
       // The exception is if one component is negative but very small (greater than -1e-3).
       // In that case, we can consider it as zero.
       if (EQs.every(eq => eq >= -1e-3)) {
+
+        // // Debug
+        // let yn  = EQs[0] / (EQs[0]+EQs[1]+EQs[2]);
+        // let yh  = EQs[1] / (EQs[0]+EQs[1]+EQs[2]);
+        // let yam = EQs[2] / (EQs[0]+EQs[1]+EQs[2]);
+        // console.log(`Solution found: \nN2: ${yn.toFixed(4)}\nH2: ${yh.toFixed(4)}\nNH3:${yam.toFixed(4)}`)
+
         const nN2  = Math.max(EQs[0] + addGaussNoise(0, 0.025 * EQs[0]),  0);
         const nH2  = Math.max(EQs[1] + addGaussNoise(0, 0.025 * EQs[1]),  0);
         const nNH3 = Math.max(EQs[2] + addGaussNoise(0, 0.025 * EQs[2]), 0);
 
         const nTot = nN2 + nH2 + nNH3;
-        const yN2  =  nN2 / nTot;
-        const yH2  =  nH2 / nTot;
+        const yN2  = nN2  / nTot;
+        const yH2  = nH2  / nTot;
         const yNH3 = nNH3 / nTot;
 
-        state.outlet.yN2 = yN2;
-        state.outlet.yH2 = yH2;
+        state.outlet.yN2  = yN2;
+        state.outlet.yH2  = yH2;
         state.outlet.yNH3 = yNH3;
 
         solutionFound = true;
