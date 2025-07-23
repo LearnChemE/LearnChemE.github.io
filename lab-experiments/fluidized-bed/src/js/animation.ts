@@ -168,4 +168,5 @@ export function resetBeakers() {
     const mode = beakers.getMode();
     beakers.setMode(0);
     beakers.setMode(mode);
+    manometer.fillTubes(0);
 }
