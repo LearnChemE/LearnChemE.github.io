@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ThermoMix</title>
+  <script>
+    window.MathJax = {
+      tex: {inlineMath: [['\\(','\\)'], ['$', '$']]},
+      svg: {fontCache: 'global'}
+    };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>    
+  <script src="https://cdn.plot.ly/plotly-2.25.2.min.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="card">
+    <button class="menu-btn">
+      <img src="assets/hamburger.svg" alt="Menu" />
+    </button>
+    <ul id="dropdownMenu" class="dropdown-menu hidden">
+      <li data-option="directions">Directions</li>
+      <li data-option="details">Details</li>
+      <li data-option="about">About</li>
+    </ul>
+    <div id="controls">
+      <label>
+        Temperature (K)
+        <input
+          type="range"
+          id="tempSlider"
+          min="275" max="525" step="1"
+          value="275"
+        />
+        <span id="tempValue">275</span>
+      </label>
+      <label>
+        Overall mole fraction x
+        <input
+          type="range"
+          id="zSlider"
+          min="0.01" max="0.99" step="0.01"
+          value="0.01"
+        />
+        <span id="zValue">0.01</span>
+      </label>
+    </div>
+    <div class="thermomix-container">
+      <div class="panel">
+        <div id="plot"></div>
+        <div id="cylinder">
+          <svg width="180" height="300" viewBox="0 0 180 300">
+            <ellipse cx="90" cy="30" rx="88" ry="24" fill="url(#grad)" />
+            <rect x="2" y="30" width="176" height="240" fill="url(#grad)" />
+            <ellipse cx="90" cy="270" rx="88" ry="24" fill="url(#grad)" />
+            <text
+              id="cylText"
+              x="90" y="150"
+              fill="white"
+              font-size="24"
+              text-anchor="middle"
+              alignment-baseline="middle"
+            >x = 0.01</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+  <script src="js/script.js"></script>
+</body>
+</html>
