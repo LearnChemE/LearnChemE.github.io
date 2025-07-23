@@ -1187,7 +1187,7 @@ function drawGC() {
 function drawComputer() {
   push();
   translate(width - 17, height - 70);
-  scale(0.5);
+  scale(0.65);
   fill(50);
   stroke(0);
   strokeWeight(0.05);
@@ -1203,8 +1203,8 @@ function drawComputer() {
   fill(220);
 
   // Computer screen legs
-  quad(-13, 40, -17, 58, -15, 58, -11, 40);
-  quad(13, 40, 17, 58, 15, 58, 11, 40);
+  quad(-13, 40, -17, 48, -15, 48, -11, 40);
+  quad(13, 40, 17, 48, 15, 48, 11, 40);
 
   fill(190);
 
@@ -1297,7 +1297,7 @@ function drawComputer() {
     // Composition labels
     // text("SHOWING RESULTS", -19, 6);
     push();
-    textSize(3);
+    textSize(3.2);
     textAlign(CENTER, CENTER);
     const h2textCoord  = [ -15.0, 6 ] // state.graphYVals[0][50] - 2.0 ];
     const n2textCoord  = [   0.0, 6 ] // state.graphYVals[1][50] - 2.0 ];
@@ -1306,10 +1306,10 @@ function drawComputer() {
     text(`y   = ${(round(100 * state.outlet.yH2)  / 100).toFixed(2)},`, ...h2textCoord);
     text(`y   = ${(round(100 * state.outlet.yN2)  / 100).toFixed(2)},`, ...n2textCoord);
     text(`y    = ${(round(100 * state.outlet.yNH3) / 100).toFixed(2)}`, ...nh3textCoord);
-    textSize(1.75);
-    text("H2" ,  h2textCoord[0] - 4.0,  h2textCoord[1] + .5);
-    text("N2" ,  n2textCoord[0] - 4.0,  n2textCoord[1] + .5);
-    text("NH3", nh3textCoord[0] - 3.5, nh3textCoord[1] + .5);
+    textSize(2.2);
+    text("H2" ,  h2textCoord[0] - 4.2,  h2textCoord[1] + 1.3);
+    text("N2" ,  n2textCoord[0] - 4.2,  n2textCoord[1] + 1.3);
+    text("NH3", nh3textCoord[0] - 3.8, nh3textCoord[1] + 1.3);
     pop();
   } else if (state.takingSampleTime > 0) {
     text("TAKING SAMPLE ...", -18, 6);
