@@ -81,7 +81,7 @@ export function smoothLerp(duration: number, updateCallback: (t: number) => void
             // Calculate the interpolation factor t (from 0 to 1)
             let increment = deltaTime / duration;
             if (useValveLift) {
-                console.log(`Valve lift of ${State.valveLift} modifying animation!`);
+                // console.log(`Valve lift of ${State.valveLift} modifying animation!`);
                 increment *= State.valveLift;
             }
             fill = Math.min(fill + increment, 1); // Ensure fill doesn't go beyond 1

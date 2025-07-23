@@ -109,6 +109,7 @@ class VaryingTube {
      * @returns Promise<void>
      */
     public setTargetTimeDelay = async (target: number, timeDelay: number) => {
+        target = Math.max(target, 0.001);
         if (timeDelay > 0) setTimeout(() => {
             this.target = target;
             this.animate();
