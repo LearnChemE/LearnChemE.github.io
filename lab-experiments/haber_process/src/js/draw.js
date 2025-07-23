@@ -1339,10 +1339,10 @@ function drawTable() {
 
 function drawInstructionText() {
   push();
-  translate(width - 35, 10);
+  translate(width - 67, 20);
   fill(0);
   textSize(3);
-  textAlign(CENTER, TOP);
+  textAlign(LEFT, TOP);
   if (state.tanks.he.valvePosition === 0 || (state.tanks.n2.valvePosition === 0 && state.tanks.nh3.valvePosition === 0 && state.tanks.h2.valvePosition === 0)) {
     text("All reactant tanks or the helium tank is closed.\nOpen the helium tank and at least one\nreactant tank to begin taking measurements.", 0, 0);
   } else if (state.tanks.h2.m === 0 && state.tanks.n2.m === 0 && state.tanks.nh3.m === 0) {
