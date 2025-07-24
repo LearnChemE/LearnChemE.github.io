@@ -64,6 +64,7 @@ window.mousePressed = function() {
           window.mY >= option.y && 
           window.mY <= option.y + option.height) {
         window.state.dropdownSelection = option.index;
+        window.state.sliderValue = 0.5; // Reset slider on dropdown change
         window.state.showDropdown = false;
         return;
       }
@@ -146,6 +147,7 @@ window.mousePressed = function() {
       window.mY >= window.checkboxBounds.y &&
       window.mY <= window.checkboxBounds.y + window.checkboxBounds.h) {
     window.state.realGasChecked = !window.state.realGasChecked;
+    window.state.sliderValue = 0.5; // Reset slider on real gas toggle
     return;
   }
 };

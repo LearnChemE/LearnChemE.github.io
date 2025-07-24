@@ -129,15 +129,15 @@ export function drawFigure(draw) {
   const connector = drawThreeWayValve(draw, 860, 62.5);
   connector.rotate(180, 891.5, 81);
   
-  const connector2 = drawThreeWayValve(draw, 200, 300);
-  connector2.rotate(180, 237, 298.5);
+  const connector2 = drawThreeWayValve(draw, 220, 300);
+  connector2.rotate(180, 257, 298.5);
   
   draw.text('furnace')
   .font({ family: 'Arial', size: 14, anchor: 'start', strokeColor: '#000' })
   .fill('black')
   .move(667.5, 160);
   
-  gasFlowRateDevice = addSVGImage(draw, 'assets/gasFlowRateDevice.svg', 230, 116, 135, 100);
+  gasFlowRateDevice = addSVGImage(draw, 'assets/gasFlowRateDevice.svg', 160, 208, 135, 100);
   gasFlowRate(draw, false); // Initially off
 }
 
@@ -191,7 +191,7 @@ function drawGasCylinder(draw, x, y, label) {
     flowRate = draw.text(on ? '1 mol/s' : '0 mol/s')
     .font({ family: 'Arial', size: 10, anchor: 'start', strokeColor: '#000' })
     .fill('black')
-    .move(280.5, 140);
+    .move(211, 232.5);
   }
   
   function createNozzle(draw, group, x, y) {
@@ -458,10 +458,16 @@ function drawGasCylinder(draw, x, y, label) {
           draw.find('path')
           .filter(el => !!el.attr('data-pipe-side'))
           .forEach(el => el.remove());
+          flowRate.clear();
+          gasFlowRate(draw, false);
         } else {
           [window.leftPipe1El, window.leftPipe2El, window.leftPipe2_1El].forEach(pipeEl => {
             if (pipeEl) {
               animateWaterFlow(draw, pipeEl, 0, 100, undefined, undefined, undefined, 'right');
+              flowRate.clear();
+              gasFlowRate(draw, true);
+              gasFlowRateDevice.front();
+              flowRate.front();
             }
           });
           // console.log(multiValvePosition, gasValveOpen);
@@ -503,12 +509,12 @@ function drawGasCylinder(draw, x, y, label) {
       
       const leftPipe2Path = `
     M ${startX + 163} ${startY - 27.5}
-    L ${startX + 163 + 42} ${startY - 27.5}
+    L ${startX + 163 + 62} ${startY - 27.5}
   `;
       window.leftPipe2El = drawPipeWithCurves(draw, leftPipe2Path, 4);
       
       const leftPipe2_1Path = `
-    M ${startX + 237} ${startY - 27.5}
+    M ${startX + 255} ${startY - 27.5}
     L ${startX + 250 + 26} ${startY - 27.5}
   `;
       window.leftPipe2_1El = drawPipeWithCurves(draw, leftPipe2_1Path, 4);
@@ -536,17 +542,14 @@ function drawGasCylinder(draw, x, y, label) {
       leftPipe6 = `
     M ${startX + 870} ${startY - 209}
     L ${startX + 870} ${startY + 10}
-      
-    // L ${startX + 220} ${startY + 225}
-    // L ${startX + 220} ${startY + 7}
   `;
       window.leftPipe6El = drawPipeWithCurves(draw, leftPipe6, 4);
       
       const leftPipe7 = `
     M ${startX + 870} ${startY + 10}
     L ${startX + 870} ${startY + 225}
-    L ${startX + 220} ${startY + 225}
-    L ${startX + 220} ${startY - 11.5}
+    L ${startX + 240} ${startY + 225}
+    L ${startX + 240} ${startY - 11.5}
   `;
       window.leftPipe7El = drawPipeWithCurves(draw, leftPipe7, 4);
     }
@@ -722,17 +725,17 @@ function drawGasCylinder(draw, x, y, label) {
       if (isPumpOn && gasValveOpen) {
         // Animate flow in pipes 4 and 5
         animateWaterFlow(draw, window.leftPipe3El, 0, 100, undefined, undefined, undefined, 'pump');
-        flowRate.clear();
-        gasFlowRate(draw, true);
-        gasFlowRateDevice.front();
-        flowRate.front();
+        // flowRate.clear();
+        // gasFlowRate(draw, true);
+        // gasFlowRateDevice.front();
+        // flowRate.front();
       } else {
         // Stop flow in pipes 4 and 5
         draw.find('path')
         .filter(el => el.attr('data-pipe-side') === 'pump')
         .forEach(el => el.remove());
-        flowRate.clear();
-        gasFlowRate(draw, false);
+        // flowRate.clear();
+        // gasFlowRate(draw, false);
       }
     }
     
@@ -1061,8 +1064,8 @@ function drawGasCylinder(draw, x, y, label) {
       g.move(x, y)
       return g;
     }
-
-     export function reset(draw) {
+    
+    export function reset(draw) {
       pipeGroup = null; // Global reference to pipe group for drawing pipes
       valve = null
       valve1 = null
@@ -1072,7 +1075,7 @@ function drawGasCylinder(draw, x, y, label) {
       leftPipe1 = null;
       leftPipe2 = null;
       leftPipe3 = null;
-       leftPipe4 = null;
+      leftPipe4 = null;
       leftPipe5 = null;
       leftPipe6 = null;
       recycleRatio = 0;

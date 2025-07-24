@@ -100,8 +100,17 @@ export class BeakerHolder {
             let flowrate = State.valveLift * PUMP_FLOWRATE_GAIN * deltaTime / 1000;
             this.beakerL.addVolume(-flowrate);
             this.callback?.();
+            // console.log(this.beakerL.getVolume())
 
             // Only request another frame if you are still in catch and weigh
+            if (this.beakerL.getVolume() <= 80) {
+                // Stop the pumps if the water level is lower than the pump
+                const pumpBtn = document.getElementById("pump-btn");
+                State.pumpIsRunning = false;
+                pumpBtn.className = "btn btn-secondary";
+                pumpBtn.innerHTML = "start pump";
+                State.valveLift = 0;
+            }
             if (this.state === FILLING_ANI) {
                 requestAnimationFrame(frame);
             }
@@ -127,6 +136,18 @@ export class BeakerHolder {
             this.beakerL.addVolume(-flowrate);
             this.beakerR.addVolume( flowrate);
             this.callback?.();
+
+            // console.log(this.beakerL.getVolume())
+
+            // Only request another frame if you are still in catch and weigh
+            if (this.beakerL.getVolume() <= 80) {
+                // Stop the pumps if the water level is lower than the pump
+                const pumpBtn = document.getElementById("pump-btn");
+                // State.pumpIsRunning = false;
+                pumpBtn.className = "btn btn-secondary";
+                pumpBtn.innerHTML = "start pump";
+                State.valveLift = 0;
+            }
 
             // Only request another frame if you are still in catch and weigh
             if (this.state === CATCH_WEIGH) {
@@ -176,4 +197,12 @@ export class BeakerHolder {
                 break;
         }
     };
+
+    /**
+     * Get the current beaker mode
+     * @returns value of beaker.state
+     */
+    public getMode = () => {
+        return this.state;
+    }
 }

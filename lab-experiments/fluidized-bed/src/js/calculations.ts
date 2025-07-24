@@ -69,7 +69,7 @@ export function pressureDrop(lift?: number) {
         const dx = sup_vel - 6;
         const dy = dx * 4.0;
         // console.log('Repacked regime');
-        if (!dbMode) setTargetBedHeight(30);
+        if (!dbMode) setTargetBedHeight(45);
         return 4.3 + dy; 
     }
 }
