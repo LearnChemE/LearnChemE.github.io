@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 document
   .getElementById("worksheet-download")
-  .setAttribute("href", require("./media/fluidizedBedWorksheet.docx"));
+  .setAttribute("href", require("./media/fluidizedBedWorksheet.pdf"));
 
 // Scripts
 import "./js/state";

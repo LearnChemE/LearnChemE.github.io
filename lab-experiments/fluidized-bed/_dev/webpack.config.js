@@ -62,7 +62,7 @@ module.exports = {
         loader: "svg-inline-loader",
       },
       {
-        test: /\.(png|docx)$/,
+        test: /\.(png|docx|pdf)$/,
         type: "asset/resource",
       },
     ],
