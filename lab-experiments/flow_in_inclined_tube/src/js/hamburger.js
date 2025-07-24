@@ -11,9 +11,9 @@
         // --- Button Configuration ---
         const buttons = [
             { label: 'Directions', url: 'html/overlay/directions.html', action: 'modal' },
-            { label: 'Details', url: 'html/overlay/details.html', action: 'modal' },
-            { label: 'About', url: 'html/overlay/about.html', action: 'modal' }
-            // { label: 'Worksheet', url: 'assets/worksheet.pdf', action: 'download', filename: 'worksheet.pdf' }
+            // { label: 'Details', url: 'html/overlay/details.html', action: 'modal' },
+            { label: 'About', url: 'html/overlay/about.html', action: 'modal' },
+            { label: 'Worksheet', url: 'assets/worksheet.pdf', action: 'download', filename: 'worksheet.pdf' }
         ];
         
         buttons.forEach((btnConfig) => {

@@ -8,7 +8,7 @@ let startX = canvasWidth / 2;
 let startY = canvasHeight - 190;
 let pipe = null;
 let angle = 0;
-const pipeLength = (3 / 8) * canvasWidth;
+const pipeLength = (3 / 12) * canvasWidth;
 let pipeGroup;
 let draw = null;
 let switchControl = null;
@@ -19,9 +19,6 @@ let tank = null;
 let waterGroup = null;
 let currentLiquidHeight = 0;    // in mL
 let fillInterval = null;
-// References for syringe animation
-let syringeHolder, syringeSupport, liquidRect;
-// Animation handles for stopping
 
 const SYRINGE_TOTAL_VOLUME = 1000;  // mL
 const SYRINGE_STROKE_PX = 72;
@@ -49,9 +46,9 @@ let flowRate = RATE_MAP["high"];
 // });
 
 // Tank drawing and scaling constants
-const TANK_X = 900;
+const TANK_X = 850;
 const TANK_Y = canvasHeight;
-const TANK_WIDTH = 200;
+const TANK_WIDTH = 100;
 const TANK_HEIGHT_PX = 125;
 const TANK_SURFACE = 10;
 const TANK_HOLDER = 20;
@@ -138,8 +135,18 @@ function drawPipe(draw) {
         });
         syringe.front();
         flowController.front();
-        
-        const newP = isRotated ? computePressure(flowRate, angle) : 0;
+
+        const newP = (isRotated && currentLiquidHeight < 1000) ? computePressure(flowRate, angle) : 0;
+
+        const lineXX = startX - (pipeLength + 160) * Math.cos(angleRad);
+        const lineYY = startY - (pipeLength + 160) * Math.sin(angleRad);
+
+       // Compute control point halfway and offset for curvature
+       const ctrlX = lineXX / 2;
+       const ctrlY = (140 + lineYY) / 2 - 50; // adjust -50 to tweak curve height
+       pipeGroup.path(`M0,140 Q${ctrlX},${ctrlY} ${lineXX},${lineYY}`)
+         .stroke({ color: 'gray', width: 2 })
+         .fill('none');
         // Always update and show pressure, even if zero
         pressure.show();
         pressure.text(`${Math.round(newP)} Pa`).center(975, 140);
@@ -238,7 +245,7 @@ function drawPipe(draw) {
           let tick = draw.line(leftX, tickY, leftX + tickLength, tickY)
           .stroke({ color: '#000', width: 1 });
           
-          if (tickVolume % index === 0 && tickVolume !== 0) {
+          if (tickVolume % 200 === 0 && tickVolume !== 0) {
             const textLabel = draw.text(tickVolume.toString() + " mL")
             .font({ family: 'Arial', size: 10 })
             .move(leftX + tickLength + 2, tickY - 5);
@@ -309,7 +316,7 @@ function drawPipe(draw) {
             
             // Draw text and background
             const textElem = draw.text(textContent)
-            .font({ family: 'Arial', size: 12 })
+            .font({ family: 'Arial', size: 15 })
             .center(midX, midY)
             .rotate(angle * 180 / Math.PI)
             .fill('#000');
@@ -341,7 +348,7 @@ function drawPipe(draw) {
               const midY = (p1.y + p2.y) / 2;
               const lineAngle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
               draw.text('0°')
-              .font({ family: 'Arial', size: 12 })
+              .font({ family: 'Arial', size: 15 })
               .center(midX - 10, midY)
               return;
             }
@@ -378,7 +385,7 @@ function drawPipe(draw) {
             const textX = cx + textRadius * Math.cos(midAngle);
             const textY = cy + textRadius * Math.sin(midAngle);
             draw.text(`${Math.round(angleDeg)}°`)
-            .font({ family: 'Arial', size: 12 })
+            .font({ family: 'Arial', size: 15 })
             .center(textX, textY);
           }
           
@@ -404,16 +411,21 @@ function drawPipe(draw) {
             .fill('#fff')
             .stroke({ color: '#d5d5d5', width: 4 })
             .move(x, y);
+
+            bodyGroup.rect(5, width)
+            .fill('#d5d5d5')
+            .stroke({ color: '#d5d5d5', width: 4 })
+            .move(x + 100, y);
             
             // Plunger group (MOVING parts - holder, support, and liquid)
             plungerGroup = syringeGroup.group();
             handleGroup = syringeGroup.group();
             
             // MOVING holder (should move with plunger)
-            handleGroup.rect(100, 2)
+            handleGroup.rect(80, 2)
             .fill('grey')
             .stroke({ color: 'grey', width: 2 })
-            .move(x - (100 - 45 + 26), y + width / 2);
+            .move(x - (80 - 45 + 26), y + width / 2);
             
             // MOVING support (should move with plunger)
             handleGroup.rect(5, width)
@@ -481,6 +493,34 @@ function drawPipe(draw) {
           // Control syringe animation based on switch state
           if (switchGroup.isOn) {
             // Start manual interval animation
+            // Start filling the tank
+            const intervalMs = 100; // update every 100ms
+            const maxVolume = TANK_MAX_ML; // mL, as used in drawBracket
+            const bracketHeightPx = TANK_HEIGHT_PX; // px, height passed to drawBracket
+            const mlToPx = bracketHeightPx / maxVolume;
+
+            // Clear any existing fill interval
+            clearInterval(fillInterval);
+            fillInterval = setInterval(() => {
+              // Increment current volume
+              currentLiquidHeight = Math.min(maxVolume, currentLiquidHeight + flowRate * (intervalMs / 1000));
+              // Convert to px
+              const liquidPx = currentLiquidHeight * mlToPx;
+              // Clear previous liquid and draw new level
+              waterGroup.clear();
+              drawLiquidRectangle(TANK_X, TANK_Y, TANK_WIDTH, TANK_SURFACE, liquidPx);
+              if (currentLiquidHeight >= maxVolume) {
+                // Stop filling and drops
+                clearInterval(fillInterval);
+                clearInterval(dropInterval);
+                // Auto-turn off switch
+                handle.animate(200).rotate(-40, x + width / 2, y + height / 2);
+                isOn = false;
+                switchGroup.isOn = false;
+                // Stop syringe movement
+                clearInterval(syringeInterval);
+              }
+            }, intervalMs);
             clearInterval(syringeInterval);
             syringeInterval = setInterval(() => {
               const deltaML = flowRate * (SYRINGE_ANIM_INTERVAL / 1000);
@@ -502,7 +542,7 @@ function drawPipe(draw) {
             clearInterval(dropInterval);
             dropInterval = setInterval(() => {
               // Only emit flow when valve is open
-              if (!isRotated) return;
+              if (!isRotated || currentLiquidHeight >= maxVolume) return;
               for (let i = 0; i < streams; i++) {
                 const yOffset = i * (pipeDiameter / (streams - 1)) - (pipeDiameter / 2);
                 const droplet = draw.circle(dropletSize)
@@ -533,35 +573,6 @@ function drawPipe(draw) {
                 }
               }
             }, 10); // emit every 10ms
-
-            // Start filling the tank
-            const intervalMs = 100; // update every 100ms
-            const maxVolume = TANK_MAX_ML; // mL, as used in drawBracket
-            const bracketHeightPx = TANK_HEIGHT_PX; // px, height passed to drawBracket
-            const mlToPx = bracketHeightPx / maxVolume;
-
-            // Clear any existing fill interval
-            clearInterval(fillInterval);
-            fillInterval = setInterval(() => {
-              // Increment current volume
-              currentLiquidHeight = Math.min(maxVolume, currentLiquidHeight + flowRate * (intervalMs / 1000));
-              // Convert to px
-              const liquidPx = currentLiquidHeight * mlToPx;
-              // Clear previous liquid and draw new level
-              waterGroup.clear();
-              drawLiquidRectangle(TANK_X, TANK_Y, TANK_WIDTH, TANK_SURFACE, liquidPx);
-              if (currentLiquidHeight >= maxVolume) {
-                // Stop filling and drops
-                clearInterval(fillInterval);
-                clearInterval(dropInterval);
-                // Auto-turn off switch
-                handle.animate(200).rotate(-40, x + width / 2, y + height / 2);
-                isOn = false;
-                switchGroup.isOn = false;
-                // Stop syringe movement
-                clearInterval(syringeInterval);
-              }
-            }, intervalMs);
           } else {
             // Stop manual animation
             clearInterval(syringeInterval);
@@ -574,7 +585,7 @@ function drawPipe(draw) {
           isRotated = !isRotated;
 
           // Update pressure display
-          const newP = isRotated ? computePressure(flowRate, angle) : 0;
+          const newP = (isRotated && currentLiquidHeight < 1000) ? computePressure(flowRate, angle) : 0;
           pressure.text(`${Math.round(newP)} Pa`).center(975, 140);
 
           // Update pressure display (kept in for compatibility)
