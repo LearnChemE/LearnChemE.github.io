@@ -108,6 +108,15 @@
   border-radius: 2px;
 }
 
+.resetButton {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: auto;
+  height: auto;
+  z-index: 10;
+}
+
 .min-max-labels {
   position: absolute;
   bottom: 0;

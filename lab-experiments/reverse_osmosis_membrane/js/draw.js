@@ -1,10 +1,13 @@
 import { calcAll } from "./calc.js";
+import { deltaHWaterInCone } from "./calc.js";
+import { deltaRWaterInCone } from "./calc.js";
+
 /* 
   Basic placeholders for a p5.js canvas and simple 
   calculation stubs for demonstration.
   Expand or replace these with actual RO logic.
 */
-
+let timeMultiplier = 25;
 let g = {
   feedPressure: 10,
   saltConc: 0.5,
@@ -43,7 +46,7 @@ window.mouseClicked = function () {
 window.draw = function () {
   handleScaling();
   background(255);
-  frameRate(30);
+  frameRate(state.frameRate);
   calcAll();
 
   // Title and parameters display first
@@ -59,24 +62,26 @@ window.draw = function () {
   //drawPipeAndPump(150, 250);
 
   //drain and beaker fill settings
-  if (state.pumpOn === true && -state.saltTankHeight - 1 + state.topOfTankDrainTimer + 15 < 0) {
+  if (state.pumpOn === true && (state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate < state.saltTankHeight - 15) {
     state.topOfTankDrainTimer++;
   }
 
-  if (
-    state.pumpOn === true &&
-    -state.saltTankHeight - 1 + state.topOfTankDrainTimer + 15 == 0 &&
-    state.bottomOfTankDrainTimer * state.flowRate - state.saltTankHeight / 10 < 0
-  ) {
+  if (state.pumpOn === true && (state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate >= state.saltTankHeight - 15) {
     state.bottomOfTankDrainTimer += 1;
+
+    const deltaR = deltaRWaterInCone(state.hConePx) / state.frameRate;
+    state.rConePx -= deltaR;
+
+    const deltaH = deltaHWaterInCone(state.hConePx) / state.frameRate;
+    state.hConePx -= deltaH;
   }
 
-  if (state.bottomOfTankDrainTimer * state.flowRate - state.saltTankHeight / 10 > 0) {
+  if (state.hConePx < 0) {
     state.doneDrainingTank = true;
   }
-  if (state.doneDrainingTank === true && state.pumpOn === true) {
+  /* if (state.doneDrainingTank === true && state.pumpOn === true) {
     state.tankToPumpDrainTimer += 1;
-  }
+  } */
 
   //fill beakers
   if (state.pumpOn === true) {
@@ -136,6 +141,12 @@ function drawTextOnTopOfDiagram(x, y) {
   textSize(20);
   text("salt", x, y);
   text("solution", x, y + 25);
+  pop();
+}
+
+function resetButton() {
+  push();
+  rect;
   pop();
 }
 
@@ -541,22 +552,28 @@ function drawWater(x, y) {
   fill("PaleTurquoise");
   beginShape();
 
-  if (-state.saltTankHeight - 1 + state.topOfTankDrainTimer + 15 != 0) {
-    vertex(x - state.saltTankWidth / 2, y - state.saltTankHeight / 2 + 10 + state.topOfTankDrainTimer * state.flowRate);
-    vertex(x + state.saltTankWidth / 2, y - state.saltTankHeight / 2 + 10 + state.topOfTankDrainTimer * state.flowRate);
+  if ((state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate < state.saltTankHeight - 15) {
+    vertex(
+      x - state.saltTankWidth / 2,
+      y - state.saltTankHeight / 2 + 10 + (state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate
+    );
+    vertex(
+      x + state.saltTankWidth / 2,
+      y - state.saltTankHeight / 2 + 10 + (state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate
+    );
   }
-
+  let correctionfactorCyl = 0.875;
   if (state.doneDrainingTank === true) {
     endShape();
   } else {
     vertex(
-      x + state.saltTankWidth / 2 - 3.5 * (state.bottomOfTankDrainTimer * state.flowRate),
-      y + state.saltTankHeight / 2 - 5 + state.bottomOfTankDrainTimer * state.flowRate
+      x + state.saltTankWidth / 2 - correctionfactorCyl * (state.saltTankWidth / 2 - state.rConePx),
+      y + state.saltTankHeight / 2 - 5 + (state.saltTankConeWaterDepth - state.hConePx)
     );
     vertex(x, y + state.saltTankHeight / 2 + 24);
     vertex(
-      x - state.saltTankWidth / 2 + 3.5 * (state.bottomOfTankDrainTimer * state.flowRate),
-      y + state.saltTankHeight / 2 - 5 + state.bottomOfTankDrainTimer * state.flowRate
+      x - state.saltTankWidth / 2 + correctionfactorCyl * (state.saltTankWidth / 2 - state.rConePx),
+      y + state.saltTankHeight / 2 - 5 + (state.saltTankConeWaterDepth - state.hConePx)
     );
     endShape();
   }
@@ -570,14 +587,14 @@ function drawWater(x, y) {
   noStroke();
 
   fill("white");
-  rect(x - 10, y + state.saltTankHeight / 2 + 38 - 19, x - 10 + 20, y + state.saltTankHeight / 2 + 38 + 22);
+  rect(x - 10, y + state.saltTankHeight / 2 + 40 - 19, x - 10 + 20, y + state.saltTankHeight / 2 + 38 + 22);
   rectMode(CORNERS);
   fill("white");
   rect(x - 10, y + state.saltTankHeight / 2 + 59, x - 10 + 156, y + state.saltTankHeight / 2 + 59 + 20, 0, 0, 0, 10);
 
   rectMode(CORNERS);
   fill("PaleTurquoise");
-  rect(x - 10, y + state.saltTankHeight / 2 + 38 - 19 + state.tankToPumpDrainTimer, x - 10 + 20, y + state.saltTankHeight / 2 + 38 + 22);
+  rect(x - 10, y + state.saltTankHeight / 2 + 40 - 19 + state.tankToPumpDrainTimer, x - 10 + 20, y + state.saltTankHeight / 2 + 38 + 22);
   rectMode(CORNERS);
   fill("PaleTurquoise");
   rect(x - 10, y + state.saltTankHeight / 2 + 59, x - 10 + 156, y + state.saltTankHeight / 2 + 59 + 20, 0, 0, 0, 10);
