@@ -66,8 +66,12 @@ window.draw = function () {
     state.topOfTankDrainTimer++;
   }
 
-  if (state.pumpOn === true && (state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate >= state.saltTankHeight - 15) {
-    state.bottomOfTankDrainTimer += 1;
+  if (
+    state.pumpOn === true &&
+    (state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate >= state.saltTankHeight - 15 &&
+    state.doneDrainingTank == false
+  ) {
+    state.bottomOfTankDrainTimer++;
 
     const deltaR = deltaRWaterInCone(state.hConePx) / state.frameRate;
     state.rConePx -= deltaR;
@@ -97,6 +101,17 @@ window.draw = function () {
   }
   if (state.retentateBeakerFillUp === true) {
     state.rententateBeakerTimer += 0.5;
+  }
+
+  //Error for backwards pressure flow
+  if (state.backwardsFlow == true) {
+    state.pumpOn = false;
+
+    push();
+    fill("red");
+    textSize(14);
+    text("error! osmotic pressure is greater than pressure drop, flux is negative, RO cannot occur.", 200, 70);
+    pop();
   }
 
   /*  if (
@@ -129,9 +144,37 @@ window.draw = function () {
 
   //draw text last so it appears over the water
   drawTextOnTopOfDiagram(state.figureX, state.figureY);
+  sliderControls();
 
   state.frameCount++;
 };
+
+function sliderControls() {
+  const pressureSlider = document.getElementById("feed-pressure");
+
+  if (state.pumpOn) {
+    pressureSlider.disabled = true;
+  }
+  /* else {
+    pressureSlider.disabled = false;
+  } */
+
+  const tempSlider = document.getElementById("feed-temp");
+
+  if (state.pumpOn) {
+    tempSlider.disabled = true;
+  } /* else {
+    tempSlider.disabled = false;
+  } */
+
+  const saltSlider = document.getElementById("salt-conc");
+
+  if (state.pumpOn) {
+    saltSlider.disabled = true;
+  } /* else {
+    saltSlider.disabled = false;
+  } */
+}
 
 function drawTextOnTopOfDiagram(x, y) {
   push();
@@ -144,11 +187,7 @@ function drawTextOnTopOfDiagram(x, y) {
   pop();
 }
 
-function resetButton() {
-  push();
-  rect;
-  pop();
-}
+function resetButton() {}
 
 function drawSaltTank(x, y) {
   //--------------------Tank Stand Back Leg--------------------
@@ -678,20 +717,27 @@ function drawWater(x, y) {
 
   //retentate
   fill(170, 255, 230, 180); //retentate green
-  if (state.rententateBeakerTimer <= (state.retentateBeakerHeight - state.beakerThickness) * (10 / 11) * state.fractionFillRetentateBeaker) {
-    rect(x + 828, y + 373 - state.rententateBeakerTimer, x + 1012, y + 373);
-  } else {
-    rect(x + 828, y + 373 - (state.retentateBeakerHeight - state.beakerThickness) * (10 / 11) * state.fractionFillRetentateBeaker, x + 1012, y + 373);
-  }
+  rect(
+    x + 828,
+    y +
+      373 -
+      (state.deltaHeightRetentateBeaker * state.topOfTankDrainTimer) / state.frameRate -
+      (state.deltaHeightRetentateBeaker * state.bottomOfTankDrainTimer) / state.frameRate,
+    x + 1012,
+    y + 373
+  );
 
   //permeate
   fill(224, 255, 255, 180); //permeate blue
-
-  if (state.permeateBeakerTimer <= (state.permeateBeakerHeight - state.beakerThickness) * (10 / 11) * state.fractionFillPermeateBeaker) {
-    rect(x + 603, y + 373 - state.permeateBeakerTimer, x + 787, y + 373);
-  } else {
-    rect(x + 603, y + 373 - (state.permeateBeakerHeight - state.beakerThickness) * (10 / 11) * state.fractionFillPermeateBeaker, x + 787, y + 373);
-  }
+  rect(
+    x + 603,
+    y +
+      373 -
+      (state.deltaHeightPermeateBeaker * state.topOfTankDrainTimer) / state.frameRate -
+      (state.deltaHeightPermeateBeaker * state.bottomOfTankDrainTimer) / state.frameRate,
+    x + 787,
+    y + 373
+  );
 
   pop();
   pop();

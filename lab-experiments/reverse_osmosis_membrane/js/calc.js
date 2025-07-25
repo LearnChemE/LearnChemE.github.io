@@ -10,7 +10,7 @@ export function calcAll() {
     return newPermFactor;
   }
 
-  //state.permeabilityFactor = calculatePermeabilityFactor(state.feedTemperature);// this is optional if we want to have A, the permeability factor, be adjusted based on temperature
+  //state.permeabilityFactor = calculatePermeabilityFactor(state.feedTemperature); // this is optional if we want to have A, the permeability factor, be adjusted based on temperature
 
   //-----------calculate volume of beakers and tank for proper mass balance-----------
   //these calculations are to account for the thickness of the walls of the beakers and tank
@@ -54,10 +54,20 @@ export function calcAll() {
 
   let permeateFlux = state.permeabilityFactor * (deltaP - PI); // units of L/(hr*m^2)
 
+  if (permeateFlux < 0) {
+    state.backwardsFlow = true;
+  } else {
+    state.backwardsFlow = false;
+  }
+
   //Flow Rates but need to be in terms of pixels of height/frame
   state.permeateFlowRate = permeateFlux * state.membraneArea * (1000 / 3600); // units of mL/s
   state.feedFlowRate = state.permeateFlowRate / state.recoveryRate; // units of mL/s
   state.retentateFlowRate = state.feedFlowRate - state.permeateFlowRate; // units of mL/s
+
+  //console.log(state.permeateFlowRate);
+  console.log(PI);
+  //console.log(state.retentateFlowRate);
 
   let ratioCylinderSaltTankHeightToRadius = saltTankWaterHeight / saltTankInnerRadius;
   state.ratioConeSaltTankHeightToRadius = state.saltTankConeWaterDepth / saltTankInnerRadius;
@@ -82,6 +92,8 @@ export function calcAll() {
   let cmToPixelConversonRetentateBeaker = retentateBeakerWaterHeight / realRetentateBeakerWaterHeight;
 
   state.deltaHeightSaltTankCylinder = (state.feedFlowRate / (Math.PI * realSaltTankInnerRadius ** 2)) * cmToPixelConversonSaltTankCylinder; //px/s
+  state.deltaHeightPermeateBeaker = (state.permeateFlowRate / (Math.PI * realPermeateBeakerRadius ** 2)) * cmToPixelConversonPermeateBeaker; //px/s
+  state.deltaHeightRetentateBeaker = (state.retentateFlowRate / (Math.PI * realRetentateBeakerRadius ** 2)) * cmToPixelConversonRetentateBeaker; //px/s
 }
 
 //cone changing function outputs px/s

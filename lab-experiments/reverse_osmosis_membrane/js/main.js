@@ -11,6 +11,7 @@ window.state = {
   figureX: 175,
   figureY: 280,
   pumpOn: false,
+  backwardsFlow: null,
 
   frameCount: 0,
   frameRate: 30,
@@ -55,6 +56,8 @@ window.state = {
   permeateFlowRate: null,
   retentateFlowRate: null,
   feedFlowRate: null,
+  deltaHeightPermeateBeaker: null,
+  deltaHeightRetentateBeaker: null,
 
   molarMassNaCl: 58.44, // g/mol
   saltWaterDensity: 1.025, // g/ml
@@ -64,7 +67,7 @@ window.state = {
   gasConstant: 0.08314, // L*bar/K*mol
   permeatePressure: 1.01325, // bar <-- this is just atmospheric pressure
   permeabilityFactor: 3, //L/(m^2*hr*bar)
-  membraneArea: 5, // m^2
+  membraneArea: 0.5, // m^2
   recoveryRate: 0.45,
 };
 
