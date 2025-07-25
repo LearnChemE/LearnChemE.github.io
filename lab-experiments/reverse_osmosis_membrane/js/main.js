@@ -3,8 +3,6 @@ const mainHeight = 600;
 const pressureSlider = document.getElementById("feed-pressure");
 // Declare global variables which are available to all files
 window.state = {
-  //selection: "Velocity Distribution",
-
   //graph and window variables
   width: mainWidth,
   height: mainHeight,

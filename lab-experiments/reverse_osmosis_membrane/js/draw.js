@@ -1,4 +1,5 @@
 import { calcAll } from "./calc.js";
+import { reset } from "./reset.js";
 import { deltaHWaterInCone } from "./calc.js";
 import { deltaRWaterInCone } from "./calc.js";
 
@@ -25,6 +26,19 @@ window.setup = function () {
   createCanvas(graphicsWrapper.offsetWidth, graphicsWrapper.offsetHeight).parent(graphicsWrapper);
   handleCanvasSize();
   handleMouseScaling();
+
+  console.log("Script running");
+
+  const resetBtn = document.getElementById("resetButton");
+  if (resetBtn) {
+    console.log(" Reset button found");
+    resetBtn.addEventListener("click", () => {
+      console.log("Reset Button clicked");
+      reset();
+    });
+  } else {
+    console.error("Reset button not found!");
+  }
 };
 
 //the mouse clicked controls any mouse clicking actions
@@ -49,18 +63,6 @@ window.draw = function () {
   frameRate(state.frameRate);
   calcAll();
 
-  // Title and parameters display first
-  /* textSize(18);
-  fill(0);
-  text("Reverse Osmosis Visualization", 20, 30);
-  textSize(16);
-  text(`Feed Pressure: ${g.feedPressure.toFixed(1)} bar`, 20, 60);
-  text(`Salt Concentration: ${g.saltConc.toFixed(2)}%`, 20, 85);
-  text(`Feed Temp: ${g.feedTemp} °C`, 20, 110); */
-
-  // Draw pipe first so it appears behind everything
-  //drawPipeAndPump(150, 250);
-
   //drain and beaker fill settings
   if (state.pumpOn === true && (state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate < state.saltTankHeight - 15) {
     state.topOfTankDrainTimer++;
@@ -82,6 +84,10 @@ window.draw = function () {
 
   if (state.hConePx < 0) {
     state.doneDrainingTank = true;
+  }
+
+  if (state.doneDrainingTank == true) {
+    state.pumpOn = false;
   }
   /* if (state.doneDrainingTank === true && state.pumpOn === true) {
     state.tankToPumpDrainTimer += 1;
@@ -155,25 +161,18 @@ function sliderControls() {
   if (state.pumpOn) {
     pressureSlider.disabled = true;
   }
-  /* else {
-    pressureSlider.disabled = false;
-  } */
 
   const tempSlider = document.getElementById("feed-temp");
 
   if (state.pumpOn) {
     tempSlider.disabled = true;
-  } /* else {
-    tempSlider.disabled = false;
-  } */
+  }
 
   const saltSlider = document.getElementById("salt-conc");
 
   if (state.pumpOn) {
     saltSlider.disabled = true;
-  } /* else {
-    saltSlider.disabled = false;
-  } */
+  }
 }
 
 function drawTextOnTopOfDiagram(x, y) {
@@ -186,8 +185,6 @@ function drawTextOnTopOfDiagram(x, y) {
   text("solution", x, y + 25);
   pop();
 }
-
-function resetButton() {}
 
 function drawSaltTank(x, y) {
   //--------------------Tank Stand Back Leg--------------------
