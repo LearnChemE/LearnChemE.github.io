@@ -28,5 +28,8 @@ export function computePressure(flowRate_ml_s, angle_deg) {
   const den = Math.PI * Math.pow(d, 4);
   const P   = num/den - rho * g * l1 * Math.sin(θ);
 
-  return P;  // in Pascals
+  // Convert pressure to kilopascals and round to two decimal places
+  // return P
+  // console.log(`Computed pressure: ${parseFloat((P / 1000)).toFixed(2)} Pa`);
+  return parseFloat((P / 1000));  // in kPa, two decimals
 }
