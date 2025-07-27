@@ -155,6 +155,12 @@ window.draw = function () {
   state.frameCount++;
 };
 
+function drawSaltConductivityMeters(x, y) {
+  push();
+  rect;
+  pop();
+}
+
 function sliderControls() {
   const pressureSlider = document.getElementById("feed-pressure");
 

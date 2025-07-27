@@ -46,6 +46,8 @@ window.state = {
   beakerThickness: 8,
   fractionFillRetentateBeaker: null,
   fractionFillPermeateBeaker: null,
+  retentateConcentration: null,
+  permeateConcentration: null,
 
   //RO Variables
   feedPressure: 10, // bar
@@ -56,6 +58,7 @@ window.state = {
   feedFlowRate: null,
   deltaHeightPermeateBeaker: null,
   deltaHeightRetentateBeaker: null,
+  saltRejectionRate: 0.992,
 
   molarMassNaCl: 58.44, // g/mol
   saltWaterDensity: 1.025, // g/ml

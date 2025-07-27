@@ -65,8 +65,12 @@ export function calcAll() {
   state.feedFlowRate = state.permeateFlowRate / state.recoveryRate; // units of mL/s
   state.retentateFlowRate = state.feedFlowRate - state.permeateFlowRate; // units of mL/s
 
+  //Concentrations
+  state.permateConcentration = (1 - state.saltRejectionRate) * state.feedWaterConcentration;
+  state.retentateConcentration = state.feedWaterConcentration / (1 - state.recoveryRate);
+
   //console.log(state.permeateFlowRate);
-  console.log(PI);
+  //console.log(PI);
   //console.log(state.retentateFlowRate);
 
   let ratioCylinderSaltTankHeightToRadius = saltTankWaterHeight / saltTankInnerRadius;

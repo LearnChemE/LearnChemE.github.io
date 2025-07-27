@@ -40,16 +40,16 @@ export function reset() {
   state.beakerThickness = 8;
   state.fractionFillRetentateBeaker = null;
   state.fractionFillPermeateBeaker = null;
+  state.retentateConcentration = 0;
+  state.permeateConcentration = 0;
 
   //RO Variables
-  //state.feedPressure = 10; // bar
-  //state.saltConcentrationPercent = 0.5; // wt%
-  // state.feedTemperature = 15; // C
   state.permeateFlowRate = null;
   state.retentateFlowRate = null;
   state.feedFlowRate = null;
   state.deltaHeightPermeateBeaker = null;
   state.deltaHeightRetentateBeaker = null;
+  state.saltRejectionRate = 0.992;
 
   state.molarMassNaCl = 58.44; // g/mol
   state.saltWaterDensity = 1.025; // g/ml
