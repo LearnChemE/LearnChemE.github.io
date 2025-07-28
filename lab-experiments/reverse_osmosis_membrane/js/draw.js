@@ -2,24 +2,21 @@ import { calcAll } from "./calc.js";
 import { reset } from "./reset.js";
 import { deltaHWaterInCone } from "./calc.js";
 import { deltaRWaterInCone } from "./calc.js";
-
-/* 
-  Basic placeholders for a p5.js canvas and simple 
-  calculation stubs for demonstration.
-  Expand or replace these with actual RO logic.
-*/
-let timeMultiplier = 25;
-let g = {
-  feedPressure: 10,
-  saltConc: 0.5,
-  feedTemp: 15,
-};
-
 let graphicsWrapper = document.getElementById("graphics-wrapper");
+let digitalReadoutFont;
+let permeateBeakerX = 769;
+let permeateBeakerY = 337;
+let retentateBeakerX = 995;
+let retentateBeakerY = 337;
 
 // This is the size of the canvas. I set it to 800x600, but it could
 // be any arbitrary height and width.
 let containerDims = [1280, 600];
+
+//preload for loading images and fonts
+window.preload = function () {
+  digitalReadoutFont = loadFont("./assets/digital-7.ttf");
+};
 
 window.setup = function () {
   // Create the p5.js canvas inside #graphics-wrapper
@@ -139,14 +136,18 @@ window.draw = function () {
   } */
 
   // Draw pipes first, then water, then pipe connectors and equipment meant to cover the water
+
   drawSaltTank(state.figureX, state.figureY);
   drawPressureGauge(state.figureX, state.figureY);
   drawFilter(state.figureX, state.figureY);
   drawWater(state.figureX, state.figureY);
-  drawBeaker(769, 337, state.permeateBeakerWidth, state.permeateBeakerHeight, "permeate"); //drawBeaker(x, y, beakerWidth, beakerHeight, beakerType)
-  drawBeaker(995, 337, state.retentateBeakerWidth, state.retentateBeakerHeight, "retentate");
+  drawBeaker(permeateBeakerX, permeateBeakerY, state.permeateBeakerWidth, state.permeateBeakerHeight, "permeate"); //drawBeaker(x, y, beakerWidth, beakerHeight, beakerType)
+  drawBeaker(retentateBeakerX, retentateBeakerY, state.retentateBeakerWidth, state.retentateBeakerHeight, "retentate");
   drawPumpSwitch(state.figureX, state.figureY, state.pumpOn);
   drawPump(state.figureX, state.figureY);
+  //call this after so vaiables update correctly, the variables are in the drawWater().
+  drawSaltConductivityMeters(950, 275, "permeate");
+  drawSaltConductivityMeters(1175, 275, "retentate");
 
   //draw text last so it appears over the water
   drawTextOnTopOfDiagram(state.figureX, state.figureY);
@@ -155,9 +156,57 @@ window.draw = function () {
   state.frameCount++;
 };
 
-function drawSaltConductivityMeters(x, y) {
+function drawSaltConductivityMeters(x, y, waterType) {
+  let beakersAreFilling = false;
+
+  let retentateWaterTY =
+    state.figureY +
+    373 -
+    (state.deltaHeightRetentateBeaker * state.topOfTankDrainTimer) / state.frameRate -
+    (state.deltaHeightRetentateBeaker * state.bottomOfTankDrainTimer) / state.frameRate;
+  let retentateWaterBY = state.figureY + 373;
+  let retentateWaterLX = state.figureX + 828;
+  let retentateWaterRX = state.figureX + 1012;
+
+  let permeateWaterTY =
+    state.figureY +
+    373 -
+    (state.deltaHeightPermeateBeaker * state.topOfTankDrainTimer) / state.frameRate -
+    (state.deltaHeightPermeateBeaker * state.bottomOfTankDrainTimer) / state.frameRate;
+  let permeateWaterBY = state.figureY + 373;
+  let permeateWaterLX = state.figureX + 603;
+  let permeateWaterRX = state.figureX + 787;
+
+  if (retentateWaterTY - retentateWaterBY == 0 || permeateWaterTY - permeateWaterBY == 0) {
+    beakersAreFilling = false;
+  } else {
+    beakersAreFilling = true;
+  }
+
   push();
-  rect;
+
+  rectMode(CENTER);
+  fill("gray");
+  rect(x, y, 120, 80);
+  fill("white");
+  rect(x, y - 10, 110, 40);
+
+  textAlign(LEFT, CENTER);
+  textFont(digitalReadoutFont);
+  fill("black");
+  textSize(24);
+  if (waterType == "permeate" && beakersAreFilling == true) {
+    text(state.permateConcentration.toFixed(4), x - 50, y - 10);
+    text("wt%", x + 15, y - 10);
+  }
+  if (waterType == "retentate" && beakersAreFilling == true) {
+    text(state.retentateConcentration.toFixed(4), x - 50, y - 10);
+    text("wt%", x + 15, y - 10);
+  }
+  if (beakersAreFilling == false) {
+    text("0.0000 wt%", x - 50, y - 10);
+  }
+
   pop();
 }
 
@@ -712,6 +761,24 @@ function drawWater(x, y) {
 
   //---------------------Beakers---------------------
 
+  let retentateWaterTY =
+    state.figureY +
+    373 -
+    (state.deltaHeightRetentateBeaker * state.topOfTankDrainTimer) / state.frameRate -
+    (state.deltaHeightRetentateBeaker * state.bottomOfTankDrainTimer) / state.frameRate;
+  let retentateWaterBY = state.figureY + 373;
+  let retentateWaterLX = state.figureX + 828;
+  let retentateWaterRX = state.figureX + 1012;
+
+  let permeateWaterTY =
+    state.figureY +
+    373 -
+    (state.deltaHeightPermeateBeaker * state.topOfTankDrainTimer) / state.frameRate -
+    (state.deltaHeightPermeateBeaker * state.bottomOfTankDrainTimer) / state.frameRate;
+  let permeateWaterBY = state.figureY + 373;
+  let permeateWaterLX = state.figureX + 603;
+  let permeateWaterRX = state.figureX + 787;
+
   push();
   translate(0, -75);
 
@@ -720,27 +787,11 @@ function drawWater(x, y) {
 
   //retentate
   fill(170, 255, 230, 180); //retentate green
-  rect(
-    x + 828,
-    y +
-      373 -
-      (state.deltaHeightRetentateBeaker * state.topOfTankDrainTimer) / state.frameRate -
-      (state.deltaHeightRetentateBeaker * state.bottomOfTankDrainTimer) / state.frameRate,
-    x + 1012,
-    y + 373
-  );
+  rect(retentateWaterLX, retentateWaterTY, retentateWaterRX, retentateWaterBY);
 
   //permeate
   fill(224, 255, 255, 180); //permeate blue
-  rect(
-    x + 603,
-    y +
-      373 -
-      (state.deltaHeightPermeateBeaker * state.topOfTankDrainTimer) / state.frameRate -
-      (state.deltaHeightPermeateBeaker * state.bottomOfTankDrainTimer) / state.frameRate,
-    x + 787,
-    y + 373
-  );
+  rect(permeateWaterLX, permeateWaterTY, permeateWaterRX, permeateWaterBY);
 
   pop();
   pop();

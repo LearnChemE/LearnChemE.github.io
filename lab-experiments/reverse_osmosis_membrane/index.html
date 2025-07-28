@@ -1,176 +1,242 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,shrink-to-fit=no"
+    />
+    <link rel="shortcut icon" href="#" />
 
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
-  <link rel="shortcut icon" href="#" />
+    <!-- Update everything below THIS -->
+    <meta
+      name="description"
+      content="A digital laboratory experiment demonstrating reverse osmosis principles."
+    />
+    <meta name="keywords" content="simulation, engineering, interactive" />
+    <meta
+      name="author"
+      content="Jackson Dunlap, Neil Hendren, Manuel Arredondo"
+    />
 
-  <!-- Update everything below THIS -->
-  <meta name="description" content="A digital laboratory experiment demonstrating reverse osmosis principles." />
-  <meta name="keywords" content="simulation, engineering, interactive" />
-  <meta name="author" content="Jackson Dunlap, Neil Hendren, Manuel Arredondo" />
+    <title>Reverse Osmosis Simulation</title>
+    <!-- and above THIS -->
 
-  <title>Reverse Osmosis Simulation</title>
-  <!-- and above THIS -->
+    <!-- MathJax Configuration (optional) -->
+    <script>
+      MathJax = {
+        chtml: {
+          scale: 0.95,
+          mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+          displayAlign: "left", // default for indentalign when set to 'auto'
+        },
+      };
+    </script>
+    <script
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
 
-  <!-- MathJax Configuration (optional) -->
-  <script>
-    MathJax = {
-      chtml: {
-        scale: 0.95,
-        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
-        displayAlign: "left", // default for indentalign when set to 'auto'
-      },
-    };
-  </script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Libraries -->
+    <script src="./js/p5.js"></script>
 
-  <!-- Libraries -->
-  <script src="./js/p5.js"></script>
-
-  <!-- 
+    <!-- 
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> 
     Not sure what this library does ^^^, seams to be giving errors
     -->
 
-  <!-- jQuery / Popper / Bootstrap -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
-  <script src="./js/bootstrap.min.js"></script>
-  <link href="./style/bootstrap.css" rel="stylesheet" />
+    <!-- jQuery / Popper / Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+    />
+    <script src="./js/bootstrap.min.js"></script>
+    <link href="./style/bootstrap.css" rel="stylesheet" />
 
-  <!-- Custom styles -->
-  <link href="./style/sliders.css" rel="stylesheet" />
-  <link href="./style/style.css" rel="stylesheet" />
+    <!-- Custom styles -->
+    <link href="./style/sliders.css" rel="stylesheet" />
+    <link href="./style/style.css" rel="stylesheet" />
 
-  <script src="./js/controls.js"></script>
+    <script src="./js/controls.js"></script>
 
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
 
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag("js", new Date());
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-    gtag("config", "UA-204988035-3");
-  </script>
-</head>
+      gtag("config", "UA-204988035-3");
+    </script>
+  </head>
 
-<body>
-  <div id="simulation-wrapper">
-    <!-- Sliders / Inputs Section -->
-    <div class="inputs-wrapper">
-      <div class="sliders-wrapper">
-        <div class="input-row top">
-          <div class="input-label">feed pressure</div>
-          <div class="slider-container">
-            <input type="range" id="feed-pressure" min="10" max="30" step="1" value="10" />
-            <div class="current-value">X</div>
-            <div class="slider-units">bar</div>
+  <body>
+    <div id="simulation-wrapper">
+      <!-- Sliders / Inputs Section -->
+      <div class="inputs-wrapper">
+        <div class="sliders-wrapper">
+          <div class="input-row top">
+            <div class="input-label">feed pressure</div>
+            <div class="slider-container">
+              <input
+                type="range"
+                id="feed-pressure"
+                min="10"
+                max="30"
+                step="1"
+                value="10"
+              />
+              <div class="current-value">X</div>
+              <div class="slider-units">bar</div>
+            </div>
+          </div>
+
+          <div class="input-row">
+            <div class="input-label">feed temperature</div>
+            <div class="slider-container">
+              <input
+                type="range"
+                id="feed-temp"
+                min="15"
+                max="60"
+                step="1"
+                value="15"
+              />
+              <div class="current-value">X</div>
+              <div class="slider-units">°C</div>
+            </div>
           </div>
         </div>
 
-        <div class="input-row">
-          <div class="input-label">feed temperature</div>
-          <div class="slider-container">
-            <input type="range" id="feed-temp" min="15" max="60" step="1" value="15" />
-            <div class="current-value">X</div>
-            <div class="slider-units">°C</div>
+        <div class="sliders-wrapper left">
+          <div class="buttons-wrapper">
+            <button
+              type="button"
+              class="btn btn-primary btn-sm"
+              data-bs-toggle="modal"
+              data-bs-target="#directions-modal"
+            >
+              directions
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary btn-sm"
+              data-bs-toggle="modal"
+              data-bs-target="#details-modal"
+            >
+              about
+            </button>
+            <a
+              href="./assets/ReverseOsmosisWorksheet.pdf"
+              download
+              class="btn btn-primary btn-sm"
+            >
+              worksheet
+            </a>
+          </div>
+
+          <div class="input-row">
+            <div class="input-label">NaCl concentration</div>
+            <div class="slider-container">
+              <input
+                type="range"
+                id="salt-conc"
+                min="0.5"
+                max="3.5"
+                step="0.5"
+                value="0.5"
+              />
+              <div class="current-value">X</div>
+              <div class="slider-units">%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Container for graphics drawn by p5.js -->
+      <div id="graphics-wrapper">
+        <button id="resetButton" class="btn btn-danger resetButton">
+          reset
+        </button>
+      </div>
+
+      <!-- Add this after the graphics-wrapper div -->
+      <div class="disclaimer">
+        Currently work in progress, with placeholder values. Not fully
+        functional yet.
+      </div>
+
+      <div id="directions-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Directions</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <p>
+                This digital experiment models a reverse osmosis (RO) membrane
+                that separates a saltwater solution into a permeate stream
+                (purified water) and a retentate stream (higher salt
+                concentration solution). Reverse osmosis uses a high pressure on
+                the feed side (salt water) of a semi-permeable membrane to
+                overcome the osmotic pressure. The experiment examines the
+                effects of feed pressure and salt concentration on permeate flow
+                rate and salt rejection. Reverse osmosis is used on a large
+                scale to convert sea water to fresh water.
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="sliders-wrapper left">
-        <div class="buttons-wrapper">
-          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-            data-bs-target="#directions-modal">
-            directions
-          </button>
-          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#details-modal">
-            about
-          </button>
-          <a href="./assets/ReverseOsmosisWorksheet.pdf" download class="btn btn-primary btn-sm">
-            worksheet
-          </a>
-        </div>
-
-        <div class="input-row">
-          <div class="input-label">NaCl concentration</div>
-          <div class="slider-container">
-            <input type="range" id="salt-conc" min="0.5" max="3.5" step="0.5" value="0.5" />
-            <div class="current-value">X</div>
-            <div class="slider-units">%</div>
+      <div id="details-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">About</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <p>
+                This digital experiment was created in the
+                <a href="https://www.colorado.edu/chbe" target="_blank"
+                  >Department of Chemical and Biological Engineering</a
+                >
+                at University of Colorado Boulder for
+                <a href="http://www.learncheme.com" target="_blank"
+                  >LearnChemE.com</a
+                >
+                by Jackson Dunlap under the direction of Professor John L.
+                Falconer. It was prepared with financial support from the
+                National Science Foundation (DUE 2336987 and 2336988) in
+                collaboration with Washington State University. Address any
+                questions or comments to LearnChemE@gmail.com.
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Container for graphics drawn by p5.js -->
-    <div id="graphics-wrapper">
-      <button id=resetButton class="btn btn-danger resetButton">reset</button>
-    </div>
-
-    <!-- Add this after the graphics-wrapper div -->
-    <div class="disclaimer">
-      Currently work in progress, with placeholder values. Not fully
-      functional yet.
-    </div>
-
-    <div id="directions-modal" class="modal fade" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Directions</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>
-              This digital experiment models a reverse osmosis (RO) membrane
-              that separates a saltwater solution into a permeate stream
-              (purified water) and a retentate stream (higher salt
-              concentration solution). Reverse osmosis uses a high pressure on
-              the feed side (salt water) of a semi-permeable membrane to
-              overcome the osmotic pressure. The experiment examines the
-              effects of feed pressure and salt concentration on permeate flow
-              rate and salt rejection. Reverse osmosis is used on a large
-              scale to convert sea water to fresh water.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="details-modal" class="modal fade" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">About</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>
-              This digital experiment was created in the
-              <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological
-                Engineering</a>
-              at University of Colorado Boulder for
-              <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a>
-              by Jackson Dunlap under the direction of Professor John L.
-              Falconer. It was prepared with financial support from the
-              National Science Foundation (DUE 2336987 and 2336988) in
-              collaboration with Washington State University. Address any
-              questions or comments to LearnChemE@gmail.com.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script type="module" src="./js/main.js"></script>
-</body>
-
+    <script type="module" src="./js/main.js"></script>
+  </body>
 </html>
