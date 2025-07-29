@@ -6,6 +6,21 @@ function gibbs(x,T){
        + R*T*(x*Math.log(x)+(1-x)*Math.log(1-x));
 }
 
+// Derivative of Gibbs free energy with respect to x
+function gibbsDerivative(x, T) {
+  x = Math.min(Math.max(x, 1e-6), 1-1e-6);
+  
+  // Derivative of the excess term: d/dx[x(1-x)(a+b(1-2x))]
+  // = (1-2x)(a+b(1-2x)) - 2bx(1-x)
+  const excessDerivative = (1-2*x)*(a+b*(1-2*x)) - 2*b*x*(1-x);
+  
+  // Derivative of the ideal mixing term: d/dx[RT(x*ln(x) + (1-x)*ln(1-x))]
+  // = RT[ln(x) - ln(1-x)]
+  const idealDerivative = R*T*(Math.log(x) - Math.log(1-x));
+  
+  return excessDerivative + idealDerivative;
+}
+
 function computeCurve(T){
   const xs = [], gs = [];
   for(let i=0;i<=2000;i++){
@@ -14,6 +29,102 @@ function computeCurve(T){
     gs.push(gibbs(x,T));
   }
   return { xs, gs };
+}
+
+// Find the common tangent points using numerical optimization
+function findCommonTangent(T) {
+  // At high temperatures (450K and above), no phase separation occurs
+  if (T >= 450) {
+    return null; // No tangent line should be drawn
+  }
+  
+  let bestTangent = null;
+  let minError = Infinity;
+  
+  // Coarse search with wider range and finer steps for lower temperatures
+  const stepSize = T < 350 ? 5 : 10; // Finer search at low temperatures
+  
+  for (let i = 50; i < 950; i += stepSize) { // Search in left portion
+    const x1 = i / 2000;
+    const g1 = gibbs(x1, T);
+    const dg1 = gibbsDerivative(x1, T);
+    
+    // For each x1, find x2 where the tangent condition is satisfied
+    for (let j = 1050; j < 1950; j += stepSize) { // Search in right portion
+      const x2 = j / 2000;
+      const g2 = gibbs(x2, T);
+      const dg2 = gibbsDerivative(x2, T);
+      
+      // Calculate the slope between the two points
+      const lineSlope = (g2 - g1) / (x2 - x1);
+      
+      // Check if this line is tangent at both points
+      const error1 = Math.abs(lineSlope - dg1);
+      const error2 = Math.abs(lineSlope - dg2);
+      const totalError = error1 + error2;
+      
+      if (totalError < minError) {
+        minError = totalError;
+        bestTangent = {
+          x1: x1,
+          g1: g1,
+          x2: x2,
+          g2: g2,
+          slope: lineSlope,
+          error: totalError
+        };
+      }
+    }
+  }
+  
+  // Fine search around the best coarse result
+  if (bestTangent) {
+    const centerX1 = bestTangent.x1;
+    const centerX2 = bestTangent.x2;
+    const searchRange = 0.08; // Larger search range for better coverage
+    
+    for (let i = -25; i <= 25; i++) {
+      const x1 = centerX1 + (i / 500) * searchRange;
+      if (x1 <= 0.02 || x1 >= 0.6) continue;
+      
+      const g1 = gibbs(x1, T);
+      const dg1 = gibbsDerivative(x1, T);
+      
+      for (let j = -25; j <= 25; j++) {
+        const x2 = centerX2 + (j / 500) * searchRange;
+        if (x2 <= 0.4 || x2 >= 0.98) continue;
+        
+        const g2 = gibbs(x2, T);
+        const dg2 = gibbsDerivative(x2, T);
+        
+        const lineSlope = (g2 - g1) / (x2 - x1);
+        const error1 = Math.abs(lineSlope - dg1);
+        const error2 = Math.abs(lineSlope - dg2);
+        const totalError = error1 + error2;
+        
+        if (totalError < bestTangent.error) {
+          bestTangent = {
+            x1: x1,
+            g1: g1,
+            x2: x2,
+            g2: g2,
+            slope: lineSlope,
+            error: totalError
+          };
+        }
+      }
+    }
+  }
+  
+  // More lenient validation criteria, especially for low temperatures
+  const maxError = T < 350 ? 50 : 10; // Much more lenient for low temperatures
+  const minSeparation = T < 350 ? 0.05 : 0.1; // Smaller minimum separation allowed
+  
+  if (!bestTangent || bestTangent.error > maxError || Math.abs(bestTangent.x2 - bestTangent.x1) < minSeparation) {
+    return null; // No valid tangent line
+  }
+  
+  return [{x: bestTangent.x1, g: bestTangent.g1}, {x: bestTangent.x2, g: bestTangent.g2}];
 }
 
 function findMinima(T){
@@ -36,72 +147,98 @@ function update(){
   zValue.textContent    = z.toFixed(2);
 
   const { xs, gs } = computeCurve(T);
-  const [p1,p2]   = findMinima(T);
-  const slope     = (p2.g-p1.g)/(p2.x-p1.x);
-  const tangent   = xs.map(x => p1.g + slope*(x-p1.x));
+  const tangentResult = findCommonTangent(T);
   const gZ        = gibbs(z,T);
   const hoverTpl  = '%{x:.3f}, %{y:.1f}<extra></extra>';
 
-  // find the two binodal compositions
-const x1 = Math.min(p1.x,p2.x),
-      x2 = Math.max(p1.x,p2.x);
+  let data, x1, x2, slope, tangent;
+  
+  if (tangentResult === null) {
+    // No phase separation - single phase
+    data = [
+      { x: xs, y: gs, mode:'lines', line:{color:'black',width:2}, hovertemplate:hoverTpl },
+      { x: [z], y: [gZ], mode:'markers', marker:{size:8, color:'black'}, hovertemplate:hoverTpl }
+    ];
+    
+    // Single phase rectangle
+    document.querySelector('#cylinder svg').innerHTML = `
+      <rect x="15" y="30" width="120" height="240" fill="#4169E1" stroke="#000" stroke-width="2"/>
+      <text x="75" y="150" fill="#fff"
+            font-size="16" text-anchor="middle"
+            alignment-baseline="middle">
+        x₁ = ${z.toFixed(2)}
+      </text>`;
+  } else {
+    // Phase separation occurs
+    const [p1, p2] = tangentResult;
+    slope = (p2.g-p1.g)/(p2.x-p1.x);
+    tangent = xs.map(x => p1.g + slope*(x-p1.x));
+    
+    // find the two binodal compositions
+    x1 = Math.min(p1.x,p2.x);
+    x2 = Math.max(p1.x,p2.x);
 
-// overall z = slider
-if (z <= x1) {
-  // pure blue phase
-  document.querySelector('#cylinder svg').innerHTML = `
-    <ellipse cx="75" cy="30"  rx="60" ry="20" fill="#004a99"/>
-    <rect   x="15" y="30"  width="120" height="240" fill="#004a99"/>
-    <ellipse cx="75" cy="270" rx="60" ry="20" fill="#004a99"/>
-    <text x="75" y="150" fill="#fff"
-          font-size="16" text-anchor="middle"
-          alignment-baseline="middle">
-      x = ${z.toFixed(2)}
-    </text>`;
-}
-else if (z >= x2) {
-  // pure blue phase (same as x=0.01)
-  document.querySelector('#cylinder svg').innerHTML = `
-    <ellipse cx="75" cy="30"  rx="60" ry="20" fill="#004a99"/>
-    <rect   x="15" y="30"  width="120" height="240" fill="#004a99"/>
-    <ellipse cx="75" cy="270" rx="60" ry="20" fill="#004a99"/>
-    <text x="75" y="150" fill="#fff"
-          font-size="16" text-anchor="middle"
-          alignment-baseline="middle">
-      x = ${z.toFixed(2)}
-    </text>`;
-}
-else {
-  // two‐phase split (unchanged)
-  const fBlue  = (x2 - z)/(x2 - x1);
-  const fGreen = 1 - fBlue;
+    // overall z = slider
+    if (z <= x1) {
+      // pure blue phase
+      document.querySelector('#cylinder svg').innerHTML = `
+        <rect x="15" y="30" width="120" height="240" fill="#4169E1" stroke="#000" stroke-width="2"/>
+        <text x="75" y="150" fill="#fff"
+              font-size="16" text-anchor="middle"
+              alignment-baseline="middle">
+          x₁ = ${z.toFixed(2)}
+        </text>`;
+    }
+    else if (z >= x2) {
+      // pure blue phase (same as x=0.01)
+      document.querySelector('#cylinder svg').innerHTML = `
+        <rect x="15" y="30" width="120" height="240" fill="#4169E1" stroke="#000" stroke-width="2"/>
+        <text x="75" y="150" fill="#fff"
+              font-size="16" text-anchor="middle"
+              alignment-baseline="middle">
+          x₁ = ${z.toFixed(2)}
+        </text>`;
+    }
+    else {
+      // two‐phase split (unchanged)
+      const fBlue  = (x2 - z)/(x2 - x1);
+      const fGreen = 1 - fBlue;
 
-  const topEllipseY    = 30,
-        totalH         = 240,
-        bottomEllipseY = topEllipseY + totalH;
-  const blueH  = Math.round(fBlue  * totalH),
-        greenH = Math.round(fGreen * totalH);
-  const blueY  = topEllipseY + (totalH - blueH),
-        greenY = topEllipseY;
+      const topEllipseY    = 30,
+            totalH         = 240,
+            bottomEllipseY = topEllipseY + totalH;
+      const blueH  = Math.round(fBlue  * totalH),
+            greenH = Math.round(fGreen * totalH);
+      const blueY  = topEllipseY + (totalH - blueH),
+            greenY = topEllipseY;
 
-  document.querySelector('#cylinder svg').innerHTML = `
-    <!-- green top -->
-    <ellipse cx="75" cy="${topEllipseY}"  rx="60" ry="20" fill="#009900"/>
-    <rect   x="15" y="${greenY}" width="120" height="${greenH}" fill="#009900"/>
-    <!-- blue bottom -->
-    <rect   x="15" y="${blueY}"  width="120" height="${blueH}"  fill="#004a99"/>
-    <ellipse cx="75" cy="${bottomEllipseY}" rx="60" ry="20" fill="#004a99"/>
-    <text x="75" y="${greenY + greenH/2}" fill="#fff"
-          font-size="16" text-anchor="middle"
-          alignment-baseline="middle">
-      x = ${(Math.floor(x2 * 100) / 100).toFixed(2)}
-    </text>
-    <text x="75" y="${blueY + blueH/2}" fill="#fff"
-          font-size="16" text-anchor="middle"
-          alignment-baseline="middle">
-      x = ${(Math.floor(x1 * 100) / 100).toFixed(2)}
-    </text>`;
-}
+      document.querySelector('#cylinder svg').innerHTML = `
+        <!-- green top -->
+        <rect x="15" y="${greenY}" width="120" height="${greenH}" fill="#228B22"/>
+        <!-- blue bottom -->
+        <rect x="15" y="${blueY}" width="120" height="${blueH}" fill="#4169E1"/>
+        <!-- container border -->
+        <rect x="15" y="30" width="120" height="240" fill="none" stroke="#000" stroke-width="2"/>
+        <text x="75" y="${greenY + greenH/2}" fill="#fff"
+              font-size="16" text-anchor="middle"
+              alignment-baseline="middle">
+          x₁ = ${(Math.round(x2 * 100) / 100).toFixed(2)}
+        </text>
+        <text x="75" y="${blueY + blueH/2}" fill="#fff"
+              font-size="16" text-anchor="middle"
+              alignment-baseline="middle">
+          x₁ = ${(Math.round(x1 * 100) / 100).toFixed(2)}
+        </text>`;
+    }
+    
+    // Create data array with tangent line and phase points
+    data = [
+      { x: xs, y: gs, mode:'lines', line:{color:'black',width:2}, hovertemplate:hoverTpl },
+      { x: xs, y: tangent, mode:'lines', line:{color:'gray', width:2}, hovertemplate:hoverTpl },
+      { x: [p1.x,p2.x], y: [p1.g,p2.g], mode:'markers', marker:{size:10,color:['#4169E1','#228B22']}, hovertemplate:hoverTpl },
+      { x: [z], y: [gZ], mode:'markers', marker:{size:8, color:'black'}, hovertemplate:hoverTpl }
+    ];
+  }
 
 
   // Dynamically compute y-axis ticks for a clean UI
@@ -116,12 +253,7 @@ else {
   const tickvals = Array.from({length: nTicks}, (_, i) => Math.round(minTick + i * step));
   const ticktext = tickvals.map(v => v.toString());
 
-  const data = [
-    { x: xs,      y: gs,     mode:'lines',   line:{color:'black',width:2}, hovertemplate:hoverTpl },
-    { x: xs,      y: tangent,mode:'lines',   line:{color:'gray', width:2}, hovertemplate:hoverTpl },
-    { x: [p1.x,p2.x], y: [p1.g,p2.g], mode:'markers', marker:{size:10,color:['blue','green']}, hovertemplate:hoverTpl },
-    { x: [z],     y: [gZ],    mode:'markers', marker:{size:8, color:'black'}, hovertemplate:hoverTpl }
-  ];
+
 
   const layout = {
     margin: { l: 80, r: 30, t: 30, b: 70 },
@@ -129,7 +261,7 @@ else {
     paper_bgcolor: '#fff',
     hovermode: 'closest',
     xaxis: {
-      title: { text: 'mole fraction', font: { size: 22, family: 'Arial', color: '#000', weight: 'bold' } },
+      title: { text: 'mole fraction of component 1', font: { size: 22, family: 'Arial', color: '#000', weight: 'bold' } },
       showgrid: false,
       zeroline: false,
       showline: true,
@@ -195,7 +327,10 @@ else {
     ]
   };
 
-  Plotly.react('plot', data, layout, { displayModeBar:false });
+  Plotly.react('plot', data, layout, { 
+    displayModeBar: false, 
+    scrollZoom: true 
+  });
 }
 
 tempSlider.addEventListener('input', update);
