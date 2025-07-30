@@ -12,6 +12,8 @@ export function calcAll() {
 
   //state.permeabilityFactor = calculatePermeabilityFactor(state.feedTemperature); // this is optional if we want to have A, the permeability factor, be adjusted based on temperature
 
+  console.log("permeability factor A = " + state.permeabilityFactor);
+
   //-----------calculate volume of beakers and tank for proper mass balance-----------
   //these calculations are to account for the thickness of the walls of the beakers and tank
 

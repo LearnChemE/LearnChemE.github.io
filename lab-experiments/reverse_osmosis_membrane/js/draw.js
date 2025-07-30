@@ -146,8 +146,8 @@ window.draw = function () {
   drawPumpSwitch(state.figureX, state.figureY, state.pumpOn);
   drawPump(state.figureX, state.figureY);
   //call this after so vaiables update correctly, the variables are in the drawWater().
-  drawSaltConductivityMeters(950, 275, "permeate");
-  drawSaltConductivityMeters(1175, 275, "retentate");
+  drawSaltConductivityMeters(1006, 275, "permeate");
+  drawSaltConductivityMeters(1215, 275, "retentate");
 
   //draw text last so it appears over the water
   drawTextOnTopOfDiagram(state.figureX, state.figureY);
@@ -187,9 +187,9 @@ function drawSaltConductivityMeters(x, y, waterType) {
 
   rectMode(CENTER);
   fill("gray");
-  rect(x, y, 120, 80);
+  rect(x, y, 120, 80, 5, 5, 5, 5);
   fill("white");
-  rect(x, y - 10, 110, 40);
+  rect(x, y - 10, 110, 40, 2, 2, 2, 2);
 
   textAlign(LEFT, CENTER);
   textFont(digitalReadoutFont);
@@ -205,6 +205,57 @@ function drawSaltConductivityMeters(x, y, waterType) {
   }
   if (beakersAreFilling == false) {
     text("0.0000 wt%", x - 50, y - 10);
+  }
+
+  if (waterType == "permeate") {
+    push();
+    noFill();
+    stroke(0);
+    strokeWeight(2);
+    line(x - 60, y, x - 62, y);
+    bezier(x - 62, y, x - 72, y, x - 87, y + 15, x - 87, y + 30);
+    line(x - 87, y + 30, x - 87, y + 200);
+
+    push();
+    translate(-87, 200);
+    strokeWeight(1);
+    fill("LightSlateGrey");
+    beginShape();
+    vertex(x - 2, y);
+    vertex(x - 2, y + 47);
+    vertex(x, y + 52);
+    vertex(x + 2, y + 47);
+    vertex(x + 2, y);
+    vertex(x - 2, y);
+    endShape();
+    pop();
+
+    pop();
+  }
+  if (waterType == "retentate") {
+    push();
+    noFill();
+    stroke(0);
+    strokeWeight(2);
+    line(x - 65, y, x - 61, y);
+    bezier(x - 65, y, x - 64, y - 2, x - 70, y + 7, x - 70, y + 15);
+    line(x - 70, y + 15, x - 70, y + 200);
+
+    push();
+    translate(-70, 200);
+    strokeWeight(1);
+    fill("LightSlateGrey");
+    beginShape();
+    vertex(x - 2, y);
+    vertex(x - 2, y + 47);
+    vertex(x, y + 52);
+    vertex(x + 2, y + 47);
+    vertex(x + 2, y);
+    vertex(x - 2, y);
+    endShape();
+    pop();
+
+    pop();
   }
 
   pop();
@@ -855,7 +906,14 @@ function drawBeaker(x, y, beakerWidth, beakerHeight, beakerType) {
   strokeWeight(0.2);
   textAlign(CENTER, CENTER);
   textSize(16);
-  text(beakerType, x + beakerWidth / 2 - 48, y);
+  if (beakerType == "permeate") {
+    //text(beakerType, x + beakerWidth - 50, y);
+    text(beakerType, x + beakerWidth / 2 - 48, y);
+  }
+  if (beakerType == "retentate") {
+    text(beakerType, x + beakerWidth / 2 - 48, y);
+  }
+
   pop();
 
   pop();
