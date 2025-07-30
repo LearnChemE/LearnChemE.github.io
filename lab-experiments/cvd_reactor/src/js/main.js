@@ -53,6 +53,10 @@ let reactorIsOpen = false;
 let gasFlowingToReactor = false;
 let flowRate = null;
 let gasFlowRateDevice = null;
+let reactorInletHoodArrow = null;
+let reactorInletHood = null;
+let reactorOutletHoodArrow = null;
+let reactorOutletHood = null;
 
 export function startDepositionTimer(interval = 1000) {
   // If a timer is already running, clear it first
@@ -66,9 +70,9 @@ export function startDepositionTimer(interval = 1000) {
     // Calculate mass rate [g/s] and update elapsed time
     if (gasFlowingToReactor && reactorIsOpen) {
       if (recycleRatio > 0) {
-        rate = massSiO2WithRecycle(1, 0.002, 0.65, recycleRatio);
+        rate = massSiO2WithRecycle(1, 0.0034, 0.65, recycleRatio);
       } else {
-        rate = massSiO2WithoutRecycle(1, 0.002, 0.65);
+        rate = massSiO2WithoutRecycle(1, 0.0034, 0.65);
       }
       
       elapsedSeconds += interval / 1000;
@@ -399,7 +403,13 @@ function drawGasCylinder(draw, x, y, label) {
       await sleep(100);
       animateWaterFlow(draw, window.leftPipe6El, 0, 100, undefined, undefined, undefined, 'reactor');
       recycleValve.front();
+      reactorInletHood.hide();
+      reactorInletHoodArrow.hide();
     } else {
+      if (isPumpOn && gasValveOpen) {
+        reactorInletHood.show();
+        reactorInletHoodArrow.show();
+      }
       gasFlowingToReactor = false;
       clearInterval(timerId);
       timerId = null;
@@ -690,6 +700,13 @@ function drawGasCylinder(draw, x, y, label) {
             draw.find('path')
             .filter(el => el.attr('data-pipe-side') === 'recycle')
             .forEach(el => el.remove());
+            
+            console.log(isPumpOn, gasValveOpen, recycleRatio, multiValvePosition);
+            if (isPumpOn && gasValveOpen && recycleRatio === '0' && multiValvePosition === 0) {
+              console.log("Stopping flow in recycle pipe");
+              reactorOutletHood.show();
+              reactorOutletHoodArrow.show();
+            }
           }
         });
         
@@ -712,11 +729,18 @@ function drawGasCylinder(draw, x, y, label) {
     function animateRecycleFlow(draw) {
       if (recycleRatio != 0 && gasValveOpen && multiValvePosition === 0 && isPumpOn) {
         animateWaterFlow(draw, window.leftPipe7El, 0, 100, undefined, undefined, undefined, 'recycle');
+        reactorOutletHood.hide();
+        reactorOutletHoodArrow.hide();
       } else {
         // Stop flow if rate is zero
         draw.find('path')
         .filter(el => el.attr('data-pipe-side') === 'recycle')
         .forEach(el => el.remove());
+        if (isPumpOn && gasValveOpen && recycleRatio === 0 && multiValvePosition === 0) {
+          console.log("Stopping flow in recycle pipe");
+          reactorOutletHood.show();
+          reactorOutletHoodArrow.show();
+        }
       }
       recycleValve.front();
     }
@@ -729,6 +753,8 @@ function drawGasCylinder(draw, x, y, label) {
         // gasFlowRate(draw, true);
         // gasFlowRateDevice.front();
         // flowRate.front();
+        // reactorInletHood.show();
+        // reactorInletHoodArrow.show();
       } else {
         // Stop flow in pipes 4 and 5
         draw.find('path')
@@ -736,33 +762,37 @@ function drawGasCylinder(draw, x, y, label) {
         .forEach(el => el.remove());
         // flowRate.clear();
         // gasFlowRate(draw, false);
+        // reactorInletHood.hide();
+        // reactorInletHoodArrow.hide();
       }
     }
     
     function drawHoodString(draw) {
-      draw.text("hood")
+      reactorInletHood = draw.text("hood")
       .font({ family: 'Arial', size: 14, anchor: 'start' })
       .fill('#000')
-      .move(235,0);
+      .move(235,0)
+      .hide();
       
-      drawArrowLine(draw, 250, 45, 250, 20, {
+      reactorInletHoodArrow = drawArrowLine(draw, 250, 45, 250, 20, {
         color: '#ff0000',
         width: 3,
         len: 12,
         base: 8
-      });
+      }).hide();
       
-      draw.text("hood")
+      reactorOutletHood = draw.text("hood")
       .font({ family: 'Arial', size: 14, anchor: 'start' })
       .fill('#000')
-      .move(970,72.5);
+      .move(970,72.5)
+      .hide();
       
-      drawArrowLine(draw, 934, 80, 960, 80, {
+      reactorOutletHoodArrow = drawArrowLine(draw, 934 - 18, 80, 960, 80, {
         color: '#ff0000',
         width: 3,
         len: 12,
         base: 8
-      });
+      }).hide();
     }
     
     function drawPump(draw, x, y, width, height, opacity = 1) {
