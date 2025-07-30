@@ -1,5 +1,5 @@
 // js/simulation.js
-import { yCO2_out, findAdsorbTime } from './calc.js'; // Assuming calc.js is in the same directory or adjust path
+import { yCO2_out, findAdsorbTime, rampTemperature } from './calc.js'; // Assuming calc.js is in the same directory or adjust path
 import * as state from './state.js';
 import * as config from './config.js';
 import { updateCO2AnalyzerDisplay } from './components/co2Analyzer.js';
@@ -74,6 +74,7 @@ export function startMoleFractionCalculation(tankNum) {
     state.setTimeOfDesorption(0);
 
   } else if (tankNum === '3') { // N2 Desorption
+    // This is all wrong. It's almost hard to describe how wrong it is.
     // Use the mole fraction of the *last* CO2 tank for yCO2 parameter during desorption
     const lastTank = state.getPrevTankNum();
     if (lastTank === '1') y = 0.9;
@@ -118,15 +119,18 @@ export function startMoleFractionCalculation(tankNum) {
   const m_controller_mg_min = state.getMfcValue(); // Get current MFC setting (mg/min)
   const m_g_s = m_controller_mg_min * 1e-3 / 60; // Convert mg/min to g/s
 
-  const T = config.tempKelvin; // Temperature from config
-
-  console.log('Calculation Params:', { tankNum, y, P_bar, m_controller_mg_min, m_g_s, T, desorbing: state.getDesorbing(), timeOfDesorption: state.getTimeOfDesorption(), initialTimeOffset });
+  console.log('Calculation Params:', { tankNum, y, P_bar, m_controller_mg_min, m_g_s, desorbing: state.getDesorbing(), timeOfDesorption: state.getTimeOfDesorption(), initialTimeOffset });
 
 
   // --- Interval Timer ---
   const timerId = setInterval(() => {
     // Calculate elapsed simulation time (t) since the *start* of the relevant phase (adsorption or desorption)
     // Add the initial offset to continue from where we left off
+
+    // Heat/cool the bed
+    const T = rampTemperature(1/60, state.getIsHeating(), state.getTemperature()); // Temperature from config
+    state.setTemperature(T);
+
     const elapsedRealTime_ms = Date.now() - state.getStartTime();
     const t = initialTimeOffset + (elapsedRealTime_ms / 1000) * config.simulationSpeedMultiplier;
 
@@ -135,7 +139,7 @@ export function startMoleFractionCalculation(tankNum) {
     // Call the external calculation function
     const y_out = yCO2_out({
       t: t,
-      tStep: config.timeStep, // Use config timestep
+      tStep: 1/60, // Use config timestep
       m: m_g_s,
       P: P_bar,
       T: T,
@@ -145,26 +149,26 @@ export function startMoleFractionCalculation(tankNum) {
       // m_controller: m_controller_mg_min // Pass m_controller if needed by yCO2_out, otherwise 'm' is sufficient
     });
 
-    // ----------- FOR DEBUGGING PURPOSES ONLY --------------
-    // Remove this from the code for production builds!!
-    // It is probably unsafe, and students could potentially use it to cheat the homework pretty easily.
-    // Normally, you could check if process.env.NODE_ENV === 'development' or something but this sim does not have a development environment set up.
-    async function sendDataToPython(data) {
-      // You are making a POST request with the attached JSON to localhost port 5000's /plot endpoint (exposed by the Flask server)
-      const response = await fetch('http://localhost:5000/plot', { 
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      });
+    // // ----------- FOR DEBUGGING PURPOSES ONLY --------------
+    // // Remove this from the code for production builds!!
+    // // It is probably unsafe, and students could potentially use it to cheat the homework pretty easily.
+    // // Normally, you could check if process.env.NODE_ENV === 'development' or something but this sim does not have a development environment set up.
+    // async function sendDataToPython(data) {
+    //   // You are making a POST request with the attached JSON to localhost port 5000's /plot endpoint (exposed by the Flask server)
+    //   const response = await fetch('http://localhost:5000/plot', { 
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify(data)
+    //   });
 
-      // Await the response from the server and print the results
-      const result = await response.json();
-      console.log('Python responded with: ', result);
-    }
-    sendDataToPython({x: [t], y: [y_out]});
-    // ----------------- END DEBUG SECTION -------------------
+    //   // Await the response from the server and print the results
+    //   const result = await response.json();
+    //   console.log('Python responded with: ', result);
+    // }
+    // sendDataToPython({x: [t], y: [y_out]});
+    // // ----------------- END DEBUG SECTION -------------------
 
     state.setOutletMoleFraction(y_out);
 
@@ -176,7 +180,7 @@ export function startMoleFractionCalculation(tankNum) {
       console.log(`Sim Time: ${t.toFixed(2)}s, Outlet CO2: ${state.outletMoleFraction.toFixed(4)}, Desorbing: ${state.getDesorbing()}, T_desorp: ${state.getTimeOfDesorption().toFixed(2)}s`);
     }
 
-  }, 1000 / config.simulationSpeedMultiplier); // Update display roughly once per real second (adjust interval based on multiplier)
+  }, 1000/60 / config.simulationSpeedMultiplier); // Update display roughly once per real second (adjust interval based on multiplier)
 
   state.setMoleFractionTimer(timerId);
 }
