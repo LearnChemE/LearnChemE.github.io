@@ -10,7 +10,7 @@ export function calcAll() {
     return newPermFactor;
   }
 
-  //state.permeabilityFactor = calculatePermeabilityFactor(state.feedTemperature); // this is optional if we want to have A, the permeability factor, be adjusted based on temperature
+  state.permeabilityFactor = calculatePermeabilityFactor(state.feedTemperature); // this is optional if we want to have A, the permeability factor, be adjusted based on temperature
 
   console.log("permeability factor A = " + state.permeabilityFactor);
 
@@ -68,10 +68,10 @@ export function calcAll() {
   state.retentateFlowRate = state.feedFlowRate - state.permeateFlowRate; // units of mL/s
 
   //Concentrations
-  state.permateConcentration = (1 - state.saltRejectionRate) * state.feedWaterConcentration;
-  state.retentateConcentration = state.feedWaterConcentration / (1 - state.recoveryRate);
+  state.permateConcentration = (1 - state.saltRejectionRate) * state.saltConcentrationPercent;
+  state.retentateConcentration = state.saltConcentrationPercent / (1 - state.recoveryRate);
 
-  //console.log(state.permeateFlowRate);
+  console.log(state.feedWaterConcentration);
   //console.log(PI);
   //console.log(state.retentateFlowRate);
 
