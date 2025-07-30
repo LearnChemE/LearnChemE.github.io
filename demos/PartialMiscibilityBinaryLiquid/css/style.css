@@ -20,7 +20,7 @@ body {
 #controls label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px; /* reduced gap for tighter spacing */
   font-size: 14px;
 }
 #controls input[type="range"] {
@@ -55,7 +55,7 @@ body {
   cursor: pointer;
 }
 #controls span {
-  min-width: 40px;
+  min-width: 28px; /* narrowed width so value hugs the slider */
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
@@ -110,6 +110,9 @@ body {
   padding: 1rem;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   z-index: 100;
+  display: flex;               /* center list items vertically */
+  flex-direction: column;
+  align-items: center;         /* center horizontally inside menu */
 }
 .dropdown-menu li {
   background: #007bff;
@@ -121,6 +124,8 @@ body {
   transition: background 0.2s;
   display: block;
   white-space: nowrap;
+  text-align: center;          /* center the text */          /* bolder text similar to other sims */
+  width: 120px;                /* consistent button width */
 }
 .dropdown-menu li:hover {
   background: #0056b3;
