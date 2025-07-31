@@ -18,85 +18,86 @@ export function startMoleFractionCalculation(tankNum) {
 
   if (tankNum === '1') { // 90% CO2 Adsorption
     y = 0.9;
-    if (state.getPrevTankNum() === '2') {
-      initialTimeOffset = findAdsorbTime({
-        tStep: 0.01,
-        yCO2: y,
-        yTarget: state.outletMoleFraction,
-        m: state.getMfcValue() * 1e-3 / 60, // Convert mg/min to g/s
-        P: state.getGaugeValue('gauge1', 5.0), // Convert bar to MPa
-        T: config.tempKelvin,
-        desorbing: false,
-      })
-    }
+    // if (state.getPrevTankNum() === '2') {
+    //   initialTimeOffset = findAdsorbTime({
+    //     tStep: 0.01,
+    //     yCO2: y,
+    //     yTarget: state.outletMoleFraction,
+    //     m: state.getMfcValue() * 1e-3 / 60, // Convert mg/min to g/s
+    //     P: state.getGaugeValue('gauge1', 5.0), // Convert bar to MPa
+    //     T: config.tempKelvin,
+    //     desorbing: false,
+    //   })
+    // }
 
-    console.log(`yTarget: ${state.outletMoleFraction}`);
-    console.log(`m: ${state.getMfcValue() * 1e-3 / 60}`);
-    console.log(`P: ${state.getGaugeValue('gauge1', 5.0)}`);
-    console.log(`T: ${config.tempKelvin}`);
-    console.log({ initialTimeOffset });
-    currentDesorbingState = false;
+    // console.log(`yTarget: ${state.outletMoleFraction}`);
+    // console.log(`m: ${state.getMfcValue() * 1e-3 / 60}`);
+    // console.log(`P: ${state.getGaugeValue('gauge1', 5.0)}`);
+    // console.log(`T: ${config.tempKelvin}`);
+    // console.log({ initialTimeOffset });
+    // currentDesorbingState = false;
     stopHeating(); // Ensure heater is off
-    // If resuming adsorption for the same tank, continue time
-    if (state.getPrevTankNum() === '1' && state.getTimeWhenAdsorptionStopped() !== null) {
-      initialTimeOffset = state.getTimeWhenAdsorptionStopped();
-      console.log(`Resuming Adsorption Tank 1 from ${initialTimeOffset.toFixed(2)}s`);
-    } else {
-      console.log("Starting New Adsorption Tank 1");
-      state.setTimeWhenAdsorptionStopped(null); // Clear previous stop time
-    }
-    state.setPrevTankNum('1'); // Mark this as the last active CO2 tank
-    state.setTimeOfDesorption(0); // Reset desorption time marker
+    // // If resuming adsorption for the same tank, continue time
+    // if (state.getPrevTankNum() === '1' && state.getTimeWhenAdsorptionStopped() !== null) {
+    //   initialTimeOffset = state.getTimeWhenAdsorptionStopped();
+    //   console.log(`Resuming Adsorption Tank 1 from ${initialTimeOffset.toFixed(2)}s`);
+    // } else {
+    //   console.log("Starting New Adsorption Tank 1");
+    //   state.setTimeWhenAdsorptionStopped(null); // Clear previous stop time
+    // }
+    // state.setPrevTankNum('1'); // Mark this as the last active CO2 tank
+    // state.setTimeOfDesorption(0); // Reset desorption time marker
 
   } else if (tankNum === '2') { // 10% CO2 Adsorption
     y = 0.1;
-    currentDesorbingState = false;
+    // currentDesorbingState = false;
     stopHeating();
-    if (state.getPrevTankNum() === '1') {
-      initialTimeOffset = findAdsorbTime({
-        tStep: 0.01,
-        yCO2: y,
-        yTarget: state.outletMoleFraction,
-        m: state.getMfcValue() * 1e-3 / 60, // Convert mg/min to g/s
-        P: state.getGaugeValue('gauge1', 5.0),
-        T: config.tempKelvin,
-        desorbing: false,
-      })
-    }
-    if (state.getPrevTankNum() === '2' && state.getTimeWhenAdsorptionStopped() !== null) {
-      initialTimeOffset = state.getTimeWhenAdsorptionStopped();
-      console.log(`Resuming Adsorption Tank 2 from ${initialTimeOffset.toFixed(2)}s`);
-    } else {
-      console.log("Starting New Adsorption Tank 2");
-      state.setTimeWhenAdsorptionStopped(null);
-    }
-    state.setPrevTankNum('2');
-    state.setTimeOfDesorption(0);
+    // if (state.getPrevTankNum() === '1') {
+    //   initialTimeOffset = findAdsorbTime({
+    //     tStep: 0.01,
+    //     yCO2: y,
+    //     yTarget: state.outletMoleFraction,
+    //     m: state.getMfcValue() * 1e-3 / 60, // Convert mg/min to g/s
+    //     P: state.getGaugeValue('gauge1', 5.0),
+    //     T: config.tempKelvin,
+    //     desorbing: false,
+    //   })
+    // }
+    // if (state.getPrevTankNum() === '2' && state.getTimeWhenAdsorptionStopped() !== null) {
+    //   initialTimeOffset = state.getTimeWhenAdsorptionStopped();
+    //   console.log(`Resuming Adsorption Tank 2 from ${initialTimeOffset.toFixed(2)}s`);
+    // } else {
+    //   console.log("Starting New Adsorption Tank 2");
+    //   state.setTimeWhenAdsorptionStopped(null);
+    // }
+    // state.setPrevTankNum('2');
+    // state.setTimeOfDesorption(0);
 
   } else if (tankNum === '3') { // N2 Desorption
-    // This is all wrong. It's almost hard to describe how wrong it is.
-    // Use the mole fraction of the *last* CO2 tank for yCO2 parameter during desorption
-    const lastTank = state.getPrevTankNum();
-    if (lastTank === '1') y = 0.9;
-    else if (lastTank === '2') y = 5.0;
-    else {
-      console.warn("Desorption (Tank 3) started without prior Adsorption (Tank 1 or 2). Using y=0.1");
-      y = 0.1; // Default if no previous tank
-    }
+    // // This is all wrong. It's almost hard to describe how wrong it is.
+    // // Use the mole fraction of the *last* CO2 tank for yCO2 parameter during desorption
+    // const lastTank = state.getPrevTankNum();
+    // if (lastTank === '1') y = 0.9;
+    // else if (lastTank === '2') y = 5.0;
+    // else {
+    //   console.warn("Desorption (Tank 3) started without prior Adsorption (Tank 1 or 2). Using y=0.1");
+    //   y = 0.1; // Default if no previous tank
+    // }
+    y = 0;
 
-    currentDesorbingState = true;
+    // currentDesorbingState = true;
     startHeating(); // Turn heater on
 
-    if (state.getTimeWhenAdsorptionStopped() !== null) {
-      // Desorption time starts from when adsorption stopped
-      initialTimeOffset = state.getTimeWhenAdsorptionStopped();
-      state.setTimeOfDesorption(initialTimeOffset); // Set the timeOfDesorption parameter
-      console.log(`Starting Desorption (Tank 3) from ${initialTimeOffset.toFixed(2)}s (based on last stop time). Using y=${y}`);
-    } else {
-      console.warn("Desorption (Tank 3) started, but no previous adsorption stop time recorded. Starting time from 0.");
-      initialTimeOffset = 0;
-      state.setTimeOfDesorption(0);
-    }
+    // if (state.getTimeWhenAdsorptionStopped() !== null) {
+    //   // Desorption time starts from when adsorption stopped
+    //   initialTimeOffset = state.getTimeWhenAdsorptionStopped();
+    //   state.setTimeOfDesorption(initialTimeOffset); // Set the timeOfDesorption parameter
+    //   console.log(`Starting Desorption (Tank 3) from ${initialTimeOffset.toFixed(2)}s (based on last stop time). Using y=${y}`);
+    // } else {
+    //   console.warn("Desorption (Tank 3) started, but no previous adsorption stop time recorded. Starting time from 0.");
+    //   initialTimeOffset = 0;
+    //   state.setTimeOfDesorption(0);
+    // }
     // PrevTankNum remains unchanged during desorption
 
   } else {
@@ -148,27 +149,6 @@ export function startMoleFractionCalculation(tankNum) {
       timeOfDesorption: state.getTimeOfDesorption(), // The simulation time 't' when desorption *started*
       // m_controller: m_controller_mg_min // Pass m_controller if needed by yCO2_out, otherwise 'm' is sufficient
     });
-
-    // // ----------- FOR DEBUGGING PURPOSES ONLY --------------
-    // // Remove this from the code for production builds!!
-    // // It is probably unsafe, and students could potentially use it to cheat the homework pretty easily.
-    // // Normally, you could check if process.env.NODE_ENV === 'development' or something but this sim does not have a development environment set up.
-    // async function sendDataToPython(data) {
-    //   // You are making a POST request with the attached JSON to localhost port 5000's /plot endpoint (exposed by the Flask server)
-    //   const response = await fetch('http://localhost:5000/plot', { 
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify(data)
-    //   });
-
-    //   // Await the response from the server and print the results
-    //   const result = await response.json();
-    //   console.log('Python responded with: ', result);
-    // }
-    // sendDataToPython({x: [t], y: [y_out]});
-    // // ----------------- END DEBUG SECTION -------------------
 
     state.setOutletMoleFraction(y_out);
 

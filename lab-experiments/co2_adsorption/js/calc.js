@@ -3,14 +3,14 @@
 
 const timeMultiplicationFactor = 1;
 
-const RATE_MULTIPLIER = 1;
-const KA0 = 20.764 * RATE_MULTIPLIER;
-const EA = 34.814 * 10;
+const RATE_MULTIPLIER = 100;
+const KA0 = 20.764 * RATE_MULTIPLIER * 10;
+const EA = 34.814 * RATE_MULTIPLIER;
 const Ka = (T) => { return KA0 * Math.exp(-EA/T); }
 const KD0 = 4.104 * RATE_MULTIPLIER;
-const ED = 58.102 * 10;
+const ED = 58.102 * RATE_MULTIPLIER;
 const Kd = (T) => { return KD0 * Math.exp(-ED/T); }
-const BED_MAX_CAPACITY = 60; // mol CO2 total
+const BED_MAX_CAPACITY = 1; // mol CO2 total
 
 /**
  * Calculate the amount of CO2 adsorbed on a surface
@@ -58,7 +58,7 @@ function catalyst_bed(cCO2_in, temperature, dt) {
   const roc = rate_des - rate_ads;
 
   // Rate of change of theta_co2
-  const dthdt = (rate_ads - rate_des) // BED_MAX_CAPACITY;
+  const dthdt = (rate_ads - rate_des) / BED_MAX_CAPACITY;
   const dcdt = roc;
 
   // Calculate new theta
@@ -66,6 +66,7 @@ function catalyst_bed(cCO2_in, temperature, dt) {
   // Constrain to range [0,1]
   th_co2 = Math.max(Math.min(th_co2, 1), 0);
   console.log(`theta CO2 = ${th_co2}`)
+
   // Return the out concentration
   return cCO2_in + dcdt * dt;
 }
@@ -179,6 +180,29 @@ export function yCO2_out(args) {
   console.log(`C_CO2 in : ${c_co2_in}`)
   console.log(`C_CO2 out : ${c_co2_out}`)
   const y_out = c_co2_out / (c_co2_out + c_n2);
+
+
+  // ----------- FOR DEBUGGING PURPOSES ONLY --------------
+  // Remove this from the code for production builds!!
+  // It is probably unsafe, and students could potentially use it to cheat the homework pretty easily.
+  // Normally, you could check if process.env.NODE_ENV === 'development' or something but this sim does not have a development environment set up.
+  async function sendDataToPython(data) {
+    // You are making a POST request with the attached JSON to localhost port 5000's /plot endpoint (exposed by the Flask server)
+    const response = await fetch('http://localhost:5000/plot', { 
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    // Await the response from the server and print the results
+    const result = await response.json();
+    console.log('Python responded with: ', result);
+  }
+  sendDataToPython({x: [args.t], y: [y_out], label: "y_out"});
+  sendDataToPython({x: [args.t], y: [th_co2], label: "theta"});
+  // ----------------- END DEBUG SECTION -------------------
 
   return y_out;
 
