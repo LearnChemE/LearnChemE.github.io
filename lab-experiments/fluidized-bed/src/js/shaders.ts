@@ -108,14 +108,16 @@ vec2 cap_speed(vec2 v, float speed) {
  */
 int CalcState() {
   float t = (height - MIN_HEIGHT) / 14.3;
-  if (gl_VertexID <= int((1.0-t) * float(TOT_PARTICLES))) return 1;
+  // if (gl_VertexID <= int((1.0-t) * float(TOT_PARTICLES))) return 1;
   if (height >= MAX_HEIGHT) {
     // As t lerps from MAX_HEIGHT to MAX_HEIGHT + 10.0, a linearly proportional amount of particles pack on the top
     t = (height - MAX_HEIGHT) / 10.0;
     if (gl_VertexID <= int(t * float(TOT_PARTICLES))) return -1;
   }
   
-  return 0;
+  // return 0;
+  if (height <= 10.5) return 1;
+  else return 0;
 }
 
 /**
@@ -130,6 +132,12 @@ float maxHeight() {
 void fluidized() {
   float dt = deltaTime / 1000.0;
   float a = hash(dt, gl_VertexID);
+  
+  // Calculate the particle's "resting" position
+  float rel_height = float(gl_VertexID) / float(TOT_PARTICLES);
+  float bed_height = maxHeight();
+  vec2 rest = vec2(hash(.77, gl_VertexID) * 2.0 - 1.0,
+                    rel_height * bed_height + rel_height - 1.0);
 
   vec2 texcoord = vec2(aPos.x * .05 + 1e-5 * time, aPos.y * .2 - 3e-5 * time);
   float perlin = texture(noiseTex, texcoord).r;
@@ -141,7 +149,10 @@ void fluidized() {
   accel += 5.0 * vec2(sin(-4.0*pi*perlin), cos(-8.0*pi*perlin));
   // Add some gravity
   accel.y -= .0001;
+  // Restoring force to keep particles near their homes
   accel *= speedMod*speedMod;
+  accel += 1000.0 * (rest - aPos);
+
   // With verlet integration, velocity already accounts for timestep
   vec2 vel = aPos - aPrev;
   vel = cap_speed(vel, 0.01 * speedMod); // Cap the max speed
