@@ -729,17 +729,20 @@ function drawGasCylinder(draw, x, y, label) {
     function animateRecycleFlow(draw) {
       if (recycleRatio != 0 && gasValveOpen && multiValvePosition === 0 && isPumpOn) {
         animateWaterFlow(draw, window.leftPipe7El, 0, 100, undefined, undefined, undefined, 'recycle');
-        reactorOutletHood.hide();
-        reactorOutletHoodArrow.hide();
+        reactorOutletHood.show();
+          reactorOutletHoodArrow.show();
       } else {
         // Stop flow if rate is zero
         draw.find('path')
         .filter(el => el.attr('data-pipe-side') === 'recycle')
         .forEach(el => el.remove());
-        if (isPumpOn && gasValveOpen && recycleRatio === 0 && multiValvePosition === 0) {
+        if (isPumpOn && gasValveOpen && multiValvePosition === 0) {
           console.log("Stopping flow in recycle pipe");
           reactorOutletHood.show();
           reactorOutletHoodArrow.show();
+        } else {
+          reactorOutletHood.hide();
+          reactorOutletHoodArrow.hide();
         }
       }
       recycleValve.front();
