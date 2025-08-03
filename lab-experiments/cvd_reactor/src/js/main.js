@@ -75,7 +75,7 @@ export function startDepositionTimer(interval = 1000) {
         rate = massSiO2WithoutRecycle(1, 0.0034, 0.65);
       }
       
-      elapsedSeconds += interval / 1000;
+      elapsedSeconds += interval / 1000 ;
       
       // Increment accumulated mass
       accumulatedMass += rate * (interval / 1000);

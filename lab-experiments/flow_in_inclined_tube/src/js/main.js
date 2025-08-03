@@ -18,6 +18,7 @@
     let switchControl = null;
     let pressure = null;
     let pressure1 = null;
+    let pressure2 = null;
     let isRotated = false;
     let dropInterval = null;
     let tank = null;
@@ -93,13 +94,13 @@
         drawDashedHorizontalLine(draw, canvasWidth / 2 - 150 - 30, canvasHeight - 100, 200);
         switchControl = drawSwitch(draw, -80, 120, 80, 40);
 
-        draw.text('Pressure is in kPa')
-            .font({
-                family: 'Arial',
-                size: 15
-            })
-            .center(1030, 60)
-            .fill('#000');
+        // draw.text('Pressure is in kPa')
+        //     .font({
+        //         family: 'Arial',
+        //         size: 15
+        //     })
+        //     .center(1030, 60)
+        //     .fill('#000');
     }
 
     function drawPipe(draw) {
@@ -201,6 +202,15 @@
             })
             .center(imgX + 30, imgY + 35)
             .fill('#000')
+            .rotate(angle, imgX, imgY);
+        
+        pressure2 = pipeGroup.text( 'kPa')
+            .font({
+                family: 'Arial',
+                size: 12
+            })
+            .center(imgX + 30, imgY + 53.5)
+            .fill('gray')
             .rotate(angle, imgX, imgY);
 
         // pipeGroup.text( 'KPa')
@@ -589,16 +599,16 @@ handleGroup2.rect(125 + 50, 2)
         color: 'grey',
         width: 2
     })
-    .move(x + 21 + 87 - 45 - 50, y + 2 * width / 2);
+    .move(x + 21 + 87 - 45 - 50, y + 2.5 * width / 2);
 handleGroup2.back();
 
-        const liquidRect = plungerGroup.rect(100 - 25, 2 * width)
+        const liquidRect = plungerGroup.rect(100 - 25, 2.5 * width)
             .fill('#B4B4FF')
             .move(x + 27 + 87, y);
 
             liquidRect.front();
 
-        bodyGroup.rect(100, 2 * width)
+        bodyGroup.rect(100, 2.5 * width)
             .fill('none')
             .stroke({
                 color: '#d5d5d5',
@@ -608,7 +618,7 @@ handleGroup2.back();
 
             bodyGroup.back();
 
-        bodyGroup.rect(5, 2 * width)
+        bodyGroup.rect(5, 2.5 * width)
             .fill('#d5d5d5')
             .stroke({
                 color: '#d5d5d5',
@@ -629,7 +639,7 @@ handleGroup2.back();
         //     .move(x + (80 - 45 + 26), y + width / 2);
 
         // MOVING support (should move with plunger)
-        handleGroup1.rect(5, 2 * width)
+        handleGroup1.rect(5, 2.5 * width)
             .fill('grey')
             .stroke({
                 color: 'grey',
@@ -800,7 +810,7 @@ handleGroup2.back();
 
             // Update pressure display
             const newP = (isRotated && currentLiquidHeight < maxVolume) ? computePressure(flowRate, angle) : 0;
-            pressure.text(`${newP.toFixed(2)} KPa`).center(975, 140);
+            pressure.text(`${newP.toFixed(2)}`).center(975, 140);
             const angleRad = (angle * Math.PI) / 180;
             const imageOffset = 85;
             const imgX = startX - (pipeLength) * Math.cos(angleRad) + imageOffset * Math.sin(angleRad);
