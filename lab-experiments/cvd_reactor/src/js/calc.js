@@ -1,6 +1,6 @@
 // Molar mass of SiO₂ [g/mol]
 const M_SIO2 = 60.08;
-const TEOSFraction = 0.0005; // Molar mass of TEOS [g/mol]
+const TEOSFraction = 0.0034; // Molar mass of TEOS [g/mol]
 const gasFlowRate = 1; // Total gas flow [mol/s]
 const conversion = 0.65; // Fraction of TEOS converted per pass
 
@@ -20,12 +20,15 @@ export function massSiO2WithoutRecycle(gasFlowRate, TEOSFraction, conversion) {
   const reactedTEOS = TEOSFlow * conversion;
 
   // 3. Mass of SiO₂ formed per second [g/s]
+  console.log(
+    `TEOS flow: ${TEOSFlow.toFixed(5)} mol/s, Reacted TEOS: ${reactedTEOS.toFixed(5)} mol/s`
+  );
   return reactedTEOS * M_SIO2;
 }
 
 // Example:
 console.log(
-  massSiO2WithoutRecycle(1, 0.0005, 0.65).toFixed(5),
+  massSiO2WithoutRecycle(1, 0.00, 0.65).toFixed(5),
   'g/s'  // ≈ 0.01953 g/s
 );
 
@@ -40,22 +43,20 @@ export function massSiO2WithRecycle(gasFlowRate, TEOSFraction, conversion, recyc
   const reactedTEOS = TEOSIn * conversion;
 
   // 4. Mass SiO₂ formed [g/s]
+  console.log(
+    `Fresh TEOS: ${freshTEOS.toFixed(5)} mol/s, Total TEOS into reactor: ${TEOSIn.toFixed(5)} mol/s, Reacted TEOS: ${reactedTEOS.toFixed(5)} mol/s`
+  );
   return reactedTEOS * M_SIO2;
 }
 
-export function flowRateWithRecycle(gasFlowRate, TEOSFraction, conversion, recycleRatio) {
-  // 1. Fresh TEOS molar flow [mol/s]
-  const freshTEOS = gasFlowRate * TEOSFraction;
-
-  // 2. Total TEOS molar flow into reactor [mol/s]
-  const TEOSIn = freshTEOS / (recycleRatio * conversion + 1);
-
-  // 3. Moles reacted per second [mol/s]
-  const reactedTEOS = TEOSIn * conversion;
-
-  // 4. Mass SiO₂ formed [g/s]
-  console.log(TEOSIn * (1-conversion) + ' mol/s');
-  return (TEOSIn - reactedTEOS);
+export function splitFlows(totalInletFlow, R) {
+  const fresh = totalInletFlow / (1 + R);
+  const recycle = (R * totalInletFlow) / (1 + R);
+  console.log(
+    `Fresh flow: ${fresh.toFixed(5)} mol/s, Recycle flow: ${recycle.toFixed(5)} mol/s , Ratio: ${R}, totalInletFlow: ${totalInletFlow}`
+  );
+  console.log(1 / (1 + R));
+  return { recycle, fresh };
 }
 
 // Example for R = 1.0:

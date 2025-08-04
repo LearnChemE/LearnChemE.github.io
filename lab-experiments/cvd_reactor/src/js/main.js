@@ -1,6 +1,6 @@
 import { off } from '@svgdotjs/svg.js';
 import * as config from '../js/config.js';
-import { massSiO2WithoutRecycle, massSiO2WithRecycle, flowRateWithRecycle } from '../js/calc.js';
+import { massSiO2WithoutRecycle, massSiO2WithRecycle, splitFlows } from '../js/calc.js';
 
 // Helper to pause execution in async functions
 function sleep(ms) {
@@ -67,33 +67,28 @@ export function startDepositionTimer(draw, interval = 1000) {
     timerId = null;
   }
   let elapsedSeconds = 0;
-  let rate  = 0
+  let rate = 0;
   timerId = setInterval(() => {
     // Calculate mass rate [g/s] and update elapsed time
     if (gasFlowingToReactor && reactorIsOpen) {
-      if (recycleRatio > 0) {
-        rate = massSiO2WithRecycle(1, 0.0034, 0.65, recycleRatio);
-        const value = flowRateWithRecycle(1, 0.0034, 0.65, recycleRatio);
-        gasFlowRate1(draw, value);
+      const R = Number(recycleRatio);
+      if (R > 0) {
+        rate = massSiO2WithRecycle(1, 0.0034, 0.65, R);
+        const { fresh, recycle } = splitFlows(1, R);
+        gasFlowRate1(draw, recycle);
       } else {
         rate = massSiO2WithoutRecycle(1, 0.0034, 0.65);
       }
-      
-      elapsedSeconds += interval / 1000 ;
-      
+      elapsedSeconds += interval / 1000;
       // Increment accumulated mass
       accumulatedMass += rate * (interval / 1000);
-      
       window.massTextEl.text(`mass gain: ${accumulatedMass.toFixed(3)} g`);
       // console.log(
       //   `Time: ${elapsedSeconds.toFixed(1)} s — Rate: ${rate.toFixed(5)} g/s — Accumulated: ${accumulatedMass.toFixed(5)} g`
       // );
     }
-    
     // Log formatted output
-    
   }, interval);
-  
   return timerId;
 }
 
@@ -144,7 +139,7 @@ export function drawFigure(draw) {
   gasFlowRateDevice = addSVGImage(draw, 'assets/gasFlowRateDevice.svg', 220, 115, 135, 135 * 6 / 8);
   gasFlowRate(draw, false); // Initially off
 
-  gasFlowRateDevice1 = addSVGImage(draw, 'assets/gasFlowRateDevice.svg', 420, 86, 180, 170 * 6 / 8).rotate(90, 200 + 150 / 2, 115 + 150 * 6 / 8 / 2);
+  gasFlowRateDevice1 = addSVGImage(draw, 'assets/gasFlowRateDevice.svg', 420, 105, 135, 135 * 6 / 8).rotate(90, 200 + 150 / 2, 115 + 150 * 6 / 8 / 2);
   gasFlowRate1(draw, 0); // Initially off
 }
 
@@ -198,10 +193,12 @@ function drawGasCylinder(draw, x, y, label) {
     if (flowRate) {
       flowRate.clear();
     }
-    flowRate = draw.text(on ? '1 mol/s' : '0 mol/s')
-    .font({ family: 'Arial', size: 12, anchor: 'start', strokeColor: '#000' })
+    flowRate = draw.text(on ? `1.00 
+      mol/s` : `0.00
+       mol/s`)
+    .font({ family: 'Arial', size: 12, anchor: 'middle', strokeColor: '#000' })
     .fill('black')
-    .move(268, 140);
+    .center(287.5, 145);
     flowRate.front();
   }
 
@@ -211,19 +208,20 @@ function gasFlowRate1(draw, value = 0) {
   }
   // Format value in multiples of 10^-4, e.g., 0.0034 -> 34.00×10⁻⁴
   // Use helper if exists, else inline formatting
-  let formatted;
-  if (typeof formatAs10PowMinus4 === 'function') {
-    formatted = formatAs10PowMinus4(value);
-  } else {
-    formatted = (value === 0 || value === null || typeof value === 'undefined')
-      ? '0'
-      : `${(value / 1e-4).toFixed(2)}×10⁻⁴`;
-  }
-  flowRate1 = draw.text(`${formatted} 
-    mol/s`)
+  // let formatted;
+  // if (typeof formatAs10PowMinus4 === 'function') {
+  //   formatted = formatAs10PowMinus4(value);
+  // } else {
+  //   formatted = (value === 0 || value === null || typeof value === 'undefined')
+  //     ? '0'
+  //     : `${(value / 1e-4).toFixed(2)}×10⁻⁴`;
+  // }
+  // console.log(value);
+  flowRate1 = draw.text(`${(value).toFixed(2)} 
+  mol/s`)
     .font({ family: 'Arial', size: 12, anchor: 'middle', strokeColor: '#000' })
     .fill('black')
-    .center(511, 125)
+    .center(487.5, 135)
     .rotate(90, 200 + 150 / 2, 115 + 150 * 6 / 8 / 2);
 
   if (flowRate1 && typeof flowRate1.front === 'function') flowRate1.front();
@@ -718,13 +716,13 @@ function gasFlowRate1(draw, value = 0) {
         
         // Handle Set button
         button.addEventListener('click', () => {
-          const rate = select.value;
+          const rate = Number(select.value);
           group.flowRate = rate;
           rateText.text("recycle ratio: " + String(group.flowRate));
           console.log('Valve flow-rate set to', rate);
           container.remove();
           recycleRatio = rate;
-          if (rate != 0) {
+          if (rate !== 0) {
             animateRecycleFlow(draw);
             group.front();
           } else {
@@ -732,9 +730,8 @@ function gasFlowRate1(draw, value = 0) {
             draw.find('path')
             .filter(el => el.attr('data-pipe-side') === 'recycle')
             .forEach(el => el.remove());
-            
             console.log(isPumpOn, gasValveOpen, recycleRatio, multiValvePosition);
-            if (isPumpOn && gasValveOpen && recycleRatio === '0' && multiValvePosition === 0) {
+            if (isPumpOn && gasValveOpen && recycleRatio === 0 && multiValvePosition === 0) {
               console.log("Stopping flow in recycle pipe");
               reactorOutletHood.show();
               reactorOutletHoodArrow.show();
