@@ -18,6 +18,7 @@
     let switchControl = null;
     let pressure = null;
     let pressure1 = null;
+    let pressure2 = null;
     let isRotated = false;
     let dropInterval = null;
     let tank = null;
@@ -25,7 +26,7 @@
     let currentLiquidHeight = 0; // in mL
     let fillInterval = null;
 
-    const SYRINGE_TOTAL_VOLUME = 5000; // mL
+    const SYRINGE_TOTAL_VOLUME = 200; // mL
     const SYRINGE_STROKE_PX = 72;
     // Manual syringe animation state
     let syringeInterval = null;
@@ -33,12 +34,12 @@
     const SYRINGE_INITIAL_WIDTH = 100 - 25;
     const SYRINGE_ANIM_INTERVAL = 16; // ms per tick
     const RATE_MAP = {
-        high: 100, // ml/s
-        medium: 60, // ml/s
-        low: 30 // ml/s
+        high: 1, // ml/s
+        medium: 0.6, // ml/s
+        low: 0.3 // ml/s
     };
 
-    const maxVolume = 5000; // mL, as used in drawBracket
+    const maxVolume = 200; // mL, as used in drawBracket
 
     // const radios = document.querySelectorAll('input[name="flowRateOptions"]');
 
@@ -59,7 +60,7 @@
     const TANK_HEIGHT_PX = 125;
     const TANK_SURFACE = 10;
     const TANK_HOLDER = 20;
-    const TANK_MAX_ML = 5000;
+    const TANK_MAX_ML = 200;
     let syringe = null;
     let prevAngle = 0;
     let syringeCenter = null;
@@ -75,7 +76,8 @@
             'assets/GFRDeviceDisplay1.svg',
             900, 60,
             150, 150
-        )
+        ).hide();
+        tank = drawBracket(svg, TANK_X, TANK_Y, TANK_WIDTH, TANK_HEIGHT_PX, TANK_SURFACE, TANK_HOLDER, TANK_MAX_ML);
         flowController = drawCutoffValve(draw, 700, 410, 40);
         const angleRad = (angle * Math.PI) / 180;
         syringe = drawSyringe(draw, 0, 0);
@@ -87,11 +89,18 @@
             })
             .center(975, 140)
             .fill('#000');
-        // pressure.hide();
+        pressure.hide();
         drawPipe(draw);
-        tank = drawBracket(TANK_X, TANK_Y, TANK_WIDTH, TANK_HEIGHT_PX, TANK_SURFACE, TANK_HOLDER, TANK_MAX_ML);
         drawDashedHorizontalLine(draw, canvasWidth / 2 - 150 - 30, canvasHeight - 100, 200);
         switchControl = drawSwitch(draw, -80, 120, 80, 40);
+
+        // draw.text('Pressure is in kPa')
+        //     .font({
+        //         family: 'Arial',
+        //         size: 15
+        //     })
+        //     .center(1030, 60)
+        //     .fill('#000');
     }
 
     function drawPipe(draw) {
@@ -142,8 +151,8 @@
         addSVGImage(
             pipeGroup,
             'assets/gasFlowRateDevice1.svg',
-            imgX - 45, imgY + 15,
-            120, 90
+            imgX - 45, imgY,
+            120 * 1.25, 90 * 1.25
         ).rotate(
             angle,
             imgX,
@@ -182,17 +191,26 @@
             })
             .fill('none');
         // Always update and show pressure, even if zero
-        pressure.show();
+        // pressure.show();
         pressure.text(`${newP.toFixed(2)} kPa`).center(975, 140);
 
         const p = (isRotated && currentLiquidHeight < maxVolume) ? computePressure(flowRate, angle) : 0;
         pressure1 = pipeGroup.text( ' Pa')
             .font({
                 family: 'Arial',
-                size: 11
+                size: 16
             })
-            .center(imgX + 15, imgY + 42.5)
+            .center(imgX + 30, imgY + 35)
             .fill('#000')
+            .rotate(angle, imgX, imgY);
+        
+        pressure2 = pipeGroup.text( 'kPa')
+            .font({
+                family: 'Arial',
+                size: 12
+            })
+            .center(imgX + 30, imgY + 53.5)
+            .fill('gray')
             .rotate(angle, imgX, imgY);
 
         // pipeGroup.text( 'KPa')
@@ -204,8 +222,8 @@
         //     .fill('#000')
         //     .rotate(angle, imgX, imgY);
 
-        pressure1.show();
-        pressure1.text(`${p.toFixed(2)}`).center(imgX + 15, imgY + 42.5);
+        // pressure1.show();
+        pressure1.text(`${p.toFixed(2)}`).center(imgX + 30, imgY + 35);
     }
 
     function drawPipeWithCurves(draw, pathString, pipeWidth = 15, strokeColor = '#f7f7f7', outlineColor = '#d5d5d5') {
@@ -252,7 +270,8 @@ angleSlider.addEventListener('input', e => {
     }
 });
 
-    function drawBracket(startX, startY, width, height, surfaceWidth, holderLength, maxVolume, liquidColor = '#c1c1ff', liquidColorOpacity = 0.7) {
+    function drawBracket(draw, startX, startY, width, height, surfaceWidth, holderLength, maxVolume, liquidColor = '#c1c1ff', liquidColorOpacity = 0.7) {
+        const group = draw.group();
         const d = holderLength / Math.sqrt(2);
 
         const P0 = {
@@ -320,7 +339,7 @@ angleSlider.addEventListener('input', e => {
         const points = [P0, P1, P2, P3, P4, P5, P6, P7, Q6, Q5, Q4, Q3, Q2, Q1, P0];
         const pointString = points.map(pt => `${pt.x},${pt.y}`).join(" ");
 
-        let bracket = draw.polyline(pointString)
+        let bracket = group.polyline(pointString)
             .fill('#e6e6e6')
             .stroke({
                 color: '#898989',
@@ -344,6 +363,9 @@ angleSlider.addEventListener('input', e => {
         } else if (maxVolume === 5000) {
             index = 100;
             tickInterval = 100;
+        } else if (maxVolume === 200) {
+            index = 5;
+            tickInterval = 5;
         }
         const numTicks = maxVolume / tickInterval;
         const liquidMaxHeight = height;
@@ -352,16 +374,16 @@ angleSlider.addEventListener('input', e => {
 
         for (let i = 0; i <= numTicks; i++) {
             const tickVolume = i * tickInterval;
-            const tickLength = (tickVolume % 500 === 0) ? 20 : 10;
+            const tickLength = (tickVolume % 12.5 === 0) ? 20 : 10;
             const tickY = bottomY - (tickVolume / maxVolume) * liquidMaxHeight;
-            let tick = draw.line(leftX, tickY, leftX + tickLength, tickY)
+            let tick = group.line(leftX, tickY, leftX + tickLength, tickY)
                 .stroke({
                     color: '#000',
                     width: 1
                 });
 
-            if (tickVolume % 500 === 0 && tickVolume !== 0) {
-                const textLabel = draw.text(tickVolume.toString() + " mL")
+            if (tickVolume % 25 === 0 && tickVolume !== 0) {
+                const textLabel = group.text(tickVolume.toString() + " mL")
                     .font({
                         family: 'Arial',
                         size: 10
@@ -372,6 +394,8 @@ angleSlider.addEventListener('input', e => {
                 });
             }
         }
+
+        return group;
     }
 
     function drawLiquidRectangle(startX, startY, width, surfaceWidth, liquidHeight, fillColor = '#c1c1ff', fillOpacity = 0.7) {
@@ -575,16 +599,16 @@ handleGroup2.rect(125 + 50, 2)
         color: 'grey',
         width: 2
     })
-    .move(x + 21 + 87 - 45 - 50, y + width / 2);
+    .move(x + 21 + 87 - 45 - 50, y + 2.5 * width / 2);
 handleGroup2.back();
 
-        const liquidRect = plungerGroup.rect(100 - 25, width)
+        const liquidRect = plungerGroup.rect(100 - 25, 2.5 * width)
             .fill('#B4B4FF')
             .move(x + 27 + 87, y);
 
             liquidRect.front();
 
-        bodyGroup.rect(100, width)
+        bodyGroup.rect(100, 2.5 * width)
             .fill('none')
             .stroke({
                 color: '#d5d5d5',
@@ -594,7 +618,7 @@ handleGroup2.back();
 
             bodyGroup.back();
 
-        bodyGroup.rect(5, width)
+        bodyGroup.rect(5, 2.5 * width)
             .fill('#d5d5d5')
             .stroke({
                 color: '#d5d5d5',
@@ -615,7 +639,7 @@ handleGroup2.back();
         //     .move(x + (80 - 45 + 26), y + width / 2);
 
         // MOVING support (should move with plunger)
-        handleGroup1.rect(5, width)
+        handleGroup1.rect(5, 2.5 * width)
             .fill('grey')
             .stroke({
                 color: 'grey',
@@ -694,7 +718,7 @@ handleGroup2.back();
             isOn = !isOn;
             switchGroup.isOn = isOn;
             if (isOn) {
-                pressure.show();
+                // pressure.show();
                 handle.animate(200).rotate(40, x + width / 2, y + height / 2);
             } else {
                 // pressure.hide();
@@ -727,16 +751,18 @@ handleGroup2.back();
                         clearInterval(fillInterval);
                         clearInterval(dropInterval);
                         // Auto-turn off switch
-                        handle.animate(200).rotate(-40, x + width / 2, y + height / 2);
+                        // handle.animate(200).rotate(-40, x + width / 2, y + height / 2);
                         isOn = false;
                         switchGroup.isOn = false;
+                        reset();
                     }
                 }, intervalMs);
 
                 const pipeDiameter = (2.5 / 30) * pipeLength - 10;
                 const flowY = startY - 5;
                 // Small droplet parameters
-                const dropletSize = Math.max(8, pipeDiameter * 0.2);
+                const dropletSizes = { high: 4, medium: 3, low: 2 };
+                const dropletSize = Math.max(dropletSizes[flowController.flowRate], pipeDiameter * 0.2);
                 // Determine number of streams to fill the pipe diameter
                 const streams = Math.max(5, Math.floor(pipeDiameter / (dropletSize * 2)));
                 // Start droplet emission, clearing any previous interval
@@ -745,7 +771,7 @@ handleGroup2.back();
                     // Only emit flow when valve is open
                     if (!isRotated || currentLiquidHeight >= maxVolume) return;
                     for (let i = 0; i < streams; i++) {
-                        const yOffset = i * (pipeDiameter / (streams - 1)) - (pipeDiameter / 2);
+                        const yOffset = i * (pipeDiameter / (streams - 2)) - (pipeDiameter / 2);
                         const droplet = draw.circle(dropletSize)
                             .fill('#B4B4FF')
                             .move(startX + pipeLength - dropletSize / 2, flowY + yOffset)
@@ -762,7 +788,7 @@ handleGroup2.back();
                             const startTime = Date.now();
                             const intervalId = setInterval(() => {
                                 const t = (Date.now() - startTime) / 1000;
-                                const xPos = startX0 + vX * t;
+                                const xPos = startX0 + vX * flowRate * t;
                                 const yPos = startY0 + 0.5 * g * t * t;
                                 droplet.move(xPos, yPos);
                                 if (yPos > canvasHeight - 15) {
@@ -784,12 +810,12 @@ handleGroup2.back();
 
             // Update pressure display
             const newP = (isRotated && currentLiquidHeight < maxVolume) ? computePressure(flowRate, angle) : 0;
-            pressure.text(`${newP.toFixed(2)} KPa`).center(975, 140);
+            pressure.text(`${newP.toFixed(2)}`).center(975, 140);
             const angleRad = (angle * Math.PI) / 180;
             const imageOffset = 85;
             const imgX = startX - (pipeLength) * Math.cos(angleRad) + imageOffset * Math.sin(angleRad);
         const imgY = startY - pipeLength * Math.sin(angleRad) - imageOffset * Math.cos(angleRad);
-            pressure1.text(`${newP.toFixed(2)}`).center(imgX + 15, imgY + 42.5);
+            pressure1.text(`${newP.toFixed(2)}`).center(imgX + 30, imgY + 35);
         });
         // Remember pivot for reset
         switchGroup.pivot = {
@@ -935,6 +961,15 @@ handleGroup2.back();
                 group.flowRate = select.value;
                 rateText.text("flow rate: " + String(group.flowRate))
                 container.remove();
+
+                if (tank) {
+                    const offsets = { high: 0, medium: -25, low: -50 };
+                    // Reset any previous translation and apply new offset
+                    tank.transform({ translateX: offsets[select.value], translateY: 0 });
+                    waterGroup.transform({ translateX: offsets[select.value], translateY: 0 });
+                } else {
+                    console.warn('Tank element not initialized yet.');
+                }
             });
 
             // Close dropdown when clicking outside
@@ -985,5 +1020,5 @@ handleGroup2.back();
         const imageOffset = 85;
         const imgX = startX - (pipeLength) * Math.cos(angleRad) + imageOffset * Math.sin(angleRad);
         const imgY = startY - pipeLength * Math.sin(angleRad) - imageOffset * Math.cos(angleRad);
-        pressure1.text(`0`).center(imgX + 15, imgY + 42.5);
+        pressure1.text(`0.00`).center(imgX + 30, imgY + 35);
     }

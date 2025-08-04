@@ -89,7 +89,41 @@ window.mousePressed = function() {
     ) {
       window.state.isDraggingSlider = true;
       const newValue = Math.max(0, Math.min(1, (window.mX - x) / width));
-      window.state.sliderValue = newValue;
+      // Convert to stepped value (0.05 to 0.95, 91 steps with 0.01 increments)
+      const steppedValue = getSteppedValue(newValue, 0.05, 0.95, 91);
+      window.state.sliderValue = getContinuousValue(steppedValue, 0.05, 0.95);
+      return;
+    }
+  }
+  
+  // Check second slider interaction
+  if (window.slider2Bounds) {
+    const { x, y, width, height } = window.slider2Bounds;
+    if (
+      window.mX >= x && window.mX <= x + width &&
+      window.mY >= y && window.mY <= y + height
+    ) {
+      window.state.isDraggingSlider2 = true;
+      const newValue = Math.max(0, Math.min(1, (window.mX - x) / width));
+      // Convert to stepped value (0.1 to 0.5, 41 steps with 0.01 increments)
+      const steppedValue = getSteppedValue(newValue, 0.1, 0.5, 41);
+      window.state.slider2Value = getContinuousValue(steppedValue, 0.1, 0.5);
+      return;
+    }
+  }
+  
+  // Check third slider interaction
+  if (window.slider3Bounds) {
+    const { x, y, width, height } = window.slider3Bounds;
+    if (
+      window.mX >= x && window.mX <= x + width &&
+      window.mY >= y && window.mY <= y + height
+    ) {
+      window.state.isDraggingSlider3 = true;
+      const newValue = Math.max(0, Math.min(1, (window.mX - x) / width));
+      // Convert to stepped value (40 to 59, 20 steps)
+      const steppedValue = getSteppedValue(newValue, 40, 59, 20);
+      window.state.slider3Value = getContinuousValue(steppedValue, 40, 59);
       return;
     }
   }
@@ -104,6 +138,27 @@ window.mousePressed = function() {
       return;
     }
   }
+  
+  // Check button bar interaction
+  if (window.buttonBarBounds) {
+    const { x, y, width, height, segments } = window.buttonBarBounds;
+    if (
+      window.mX >= x && window.mX <= x + width &&
+      window.mY >= y && window.mY <= y + height
+    ) {
+      // Determine which button was clicked
+      for (let i = 0; i < segments.length; i++) {
+        const segment = segments[i];
+        if (
+          window.mX >= segment.x && window.mX <= segment.x + segment.width &&
+          window.mY >= y && window.mY <= y + height
+        ) {
+          window.state.selectedButtonIndex = i;
+          return;
+        }
+      }
+    }
+  }
 };
 
 // Add mouse dragging for slider
@@ -111,13 +166,31 @@ window.mouseDragged = function() {
   if (window.state.isDraggingSlider && window.sliderBounds) {
     const { x, width } = window.sliderBounds;
     const newValue = Math.max(0, Math.min(1, (window.mX - x) / width));
-    window.state.sliderValue = newValue;
+    // Convert to stepped value (0.05 to 0.95, 91 steps with 0.01 increments)
+    const steppedValue = getSteppedValue(newValue, 0.05, 0.95, 91);
+    window.state.sliderValue = getContinuousValue(steppedValue, 0.05, 0.95);
+  }
+  if (window.state.isDraggingSlider2 && window.slider2Bounds) {
+    const { x, width } = window.slider2Bounds;
+    const newValue = Math.max(0, Math.min(1, (window.mX - x) / width));
+    // Convert to stepped value (0.1 to 0.5, 41 steps with 0.01 increments)
+    const steppedValue = getSteppedValue(newValue, 0.1, 0.5, 41);
+    window.state.slider2Value = getContinuousValue(steppedValue, 0.1, 0.5);
+  }
+  if (window.state.isDraggingSlider3 && window.slider3Bounds) {
+    const { x, width } = window.slider3Bounds;
+    const newValue = Math.max(0, Math.min(1, (window.mX - x) / width));
+    // Convert to stepped value (40 to 59, 20 steps)
+    const steppedValue = getSteppedValue(newValue, 40, 59, 20);
+    window.state.slider3Value = getContinuousValue(steppedValue, 40, 59);
   }
 };
 
 // Add mouse release to stop dragging
 window.mouseReleased = function() {
   window.state.isDraggingSlider = false;
+  window.state.isDraggingSlider2 = false;
+  window.state.isDraggingSlider3 = false;
 };
 
 window.windowResized = () => {
@@ -131,4 +204,22 @@ function sizeContainer() {
   containerElement.style.maxWidth = `calc(calc(100vh - 10px) * ${state.canvasSize[0]} / ${state.canvasSize[1]})`;
   containerElement.style.height = `calc(calc(100vw - 10px) * ${state.canvasSize[1]} / ${state.canvasSize[0]})`;
   containerElement.style.maxHeight = `calc(100vh - 10px)`;
+}
+
+// Function to snap slider value to discrete steps
+function snapToSteps(value, min, max, steps) {
+  const stepSize = (max - min) / (steps - 1);
+  const step = Math.round((value - min) / stepSize);
+  return min + (step * stepSize);
+}
+
+// Function to convert continuous slider value to stepped value
+function getSteppedValue(continuousValue, min, max, steps) {
+  const actualValue = min + (continuousValue * (max - min));
+  return snapToSteps(actualValue, min, max, steps);
+}
+
+// Function to convert stepped value back to continuous slider value
+function getContinuousValue(steppedValue, min, max) {
+  return (steppedValue - min) / (max - min);
 }

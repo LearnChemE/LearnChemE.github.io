@@ -149,7 +149,7 @@ function update(){
   const { xs, gs } = computeCurve(T);
   const tangentResult = findCommonTangent(T);
   const gZ        = gibbs(z,T);
-  const hoverTpl  = '%{x:.3f}, %{y:.1f}<extra></extra>';
+  const hoverTpl  = '%{x:.3f}, %{y:.0f}<extra></extra>';
 
   let data, x1, x2, slope, tangent;
   
@@ -162,9 +162,9 @@ function update(){
     
     // Single phase rectangle
     document.querySelector('#cylinder svg').innerHTML = `
-      <rect x="15" y="30" width="120" height="240" fill="#4169E1" stroke="#000" stroke-width="2"/>
+      <rect x="15" y="30" width="120" height="240" fill="#6CA0FF" stroke="#000" stroke-width="2"/>
       <text x="75" y="150" fill="#fff"
-            font-size="16" text-anchor="middle"
+            font-size="24" text-anchor="middle"
             alignment-baseline="middle">
         x₁ = ${z.toFixed(2)}
       </text>`;
@@ -182,9 +182,9 @@ function update(){
     if (z <= x1) {
       // pure blue phase
       document.querySelector('#cylinder svg').innerHTML = `
-        <rect x="15" y="30" width="120" height="240" fill="#4169E1" stroke="#000" stroke-width="2"/>
+        <rect x="15" y="30" width="120" height="240" fill="#6CA0FF" stroke="#000" stroke-width="2"/>
         <text x="75" y="150" fill="#fff"
-              font-size="16" text-anchor="middle"
+              font-size="24" text-anchor="middle"
               alignment-baseline="middle">
           x₁ = ${z.toFixed(2)}
         </text>`;
@@ -192,9 +192,9 @@ function update(){
     else if (z >= x2) {
       // pure blue phase (same as x=0.01)
       document.querySelector('#cylinder svg').innerHTML = `
-        <rect x="15" y="30" width="120" height="240" fill="#4169E1" stroke="#000" stroke-width="2"/>
+        <rect x="15" y="30" width="120" height="240" fill="#6CA0FF" stroke="#000" stroke-width="2"/>
         <text x="75" y="150" fill="#fff"
-              font-size="16" text-anchor="middle"
+              font-size="24" text-anchor="middle"
               alignment-baseline="middle">
           x₁ = ${z.toFixed(2)}
         </text>`;
@@ -214,18 +214,18 @@ function update(){
 
       document.querySelector('#cylinder svg').innerHTML = `
         <!-- green top -->
-        <rect x="15" y="${greenY}" width="120" height="${greenH}" fill="#228B22"/>
+        <rect x="15" y="${greenY}" width="120" height="${greenH}" fill="#66CC66"/>
         <!-- blue bottom -->
-        <rect x="15" y="${blueY}" width="120" height="${blueH}" fill="#4169E1"/>
+        <rect x="15" y="${blueY}" width="120" height="${blueH}" fill="#6CA0FF"/>
         <!-- container border -->
         <rect x="15" y="30" width="120" height="240" fill="none" stroke="#000" stroke-width="2"/>
         <text x="75" y="${greenY + greenH/2}" fill="#fff"
-              font-size="16" text-anchor="middle"
+              font-size="24" text-anchor="middle"
               alignment-baseline="middle">
           x₁ = ${(Math.round(x2 * 100) / 100).toFixed(2)}
         </text>
         <text x="75" y="${blueY + blueH/2}" fill="#fff"
-              font-size="16" text-anchor="middle"
+              font-size="24" text-anchor="middle"
               alignment-baseline="middle">
           x₁ = ${(Math.round(x1 * 100) / 100).toFixed(2)}
         </text>`;
@@ -235,7 +235,7 @@ function update(){
     data = [
       { x: xs, y: gs, mode:'lines', line:{color:'black',width:2}, hovertemplate:hoverTpl },
       { x: xs, y: tangent, mode:'lines', line:{color:'gray', width:2}, hovertemplate:hoverTpl },
-      { x: [p1.x,p2.x], y: [p1.g,p2.g], mode:'markers', marker:{size:10,color:['#4169E1','#228B22']}, hovertemplate:hoverTpl },
+      { x: [p1.x,p2.x], y: [p1.g,p2.g], mode:'markers', marker:{size:10,color:['#6CA0FF','#66CC66']}, hovertemplate:hoverTpl },
       { x: [z], y: [gZ], mode:'markers', marker:{size:8, color:'black'}, hovertemplate:hoverTpl }
     ];
   }
@@ -272,6 +272,7 @@ function update(){
       tickwidth: 1,
       tickcolor: '#000',
       mirror: 'all',
+      fixedrange: true,
       tickfont: { size: 18, family: 'Arial', color: '#000', weight: 'normal' },
       range: [0, 1],
       dtick: 0.2,
@@ -296,6 +297,7 @@ function update(){
       tickwidth: 1,
       tickcolor: '#000',
       mirror: 'all',
+      fixedrange: true,
       tickfont: { size: 18, family: 'Arial', color: '#000', weight: 'normal' },
       tickvals: tickvals,
       ticktext: ticktext,
@@ -329,7 +331,7 @@ function update(){
 
   Plotly.react('plot', data, layout, { 
     displayModeBar: false, 
-    scrollZoom: true 
+    scrollZoom: false 
   });
 }
 
@@ -364,7 +366,7 @@ dropdown.querySelectorAll('li').forEach(item => {
     let title = '', body = '';
     if (opt === 'directions') {
       title = 'Directions';
-      body  = `<p>This simulation plots the change in Gibbs free energy versus mole fraction of one component in a non-ideal binary mixture. Two liquid phases form when the Gibbs free energy is lower for the two phases than for one phase. A line that is tangent to the Gibbs free energy curve at two points (blue and green points) represents the Gibbs free energy change over the mole fraction range between the two points. The mole fractions at the blue and green points are the mole fractions of the two phases, and these mole fractions are shown on the container on the right. The size of each phase on the right is proportional to the amount of that phase, and these amounts are obtained from a mass balance (lever rule). Increasing the temperature with the slider decreases the range of partial miscibility. The black circle represents the overall mole fraction, which is changed with the slider. The phase in blue is more dense and thus is below the less-dense green phase. Zoom with the scroll wheel.</p>`;
+      body  = `<p>This simulation plots the change in Gibbs free energy versus mole fraction of one component in a non-ideal binary mixture. Two liquid phases form when the Gibbs free energy is lower for the two phases than for one phase. A line that is tangent to the Gibbs free energy curve at two points (blue and green points) represents the Gibbs free energy change over the mole fraction range between the two points. The mole fractions at the blue and green points are the mole fractions of the two phases, and these mole fractions are shown on the container on the right. The size of each phase on the right is proportional to the amount of that phase, and these amounts are obtained from a mass balance (lever rule). Increasing the temperature with the slider decreases the range of partial miscibility. The black circle represents the overall mole fraction, which is changed with the slider. The phase in blue is more dense and thus is below the less-dense green phase.</p>`;
     } else if (opt === 'details') {
       title = 'Details';
       body  = `<p>For the non‑ideal mixture modeled in this simulation, the change in Gibbs free energy when two components are mixed (\\(\\Delta G\\) in units of J/mol) is:</p>
