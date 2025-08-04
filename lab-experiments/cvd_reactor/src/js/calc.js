@@ -43,6 +43,21 @@ export function massSiO2WithRecycle(gasFlowRate, TEOSFraction, conversion, recyc
   return reactedTEOS * M_SIO2;
 }
 
+export function flowRateWithRecycle(gasFlowRate, TEOSFraction, conversion, recycleRatio) {
+  // 1. Fresh TEOS molar flow [mol/s]
+  const freshTEOS = gasFlowRate * TEOSFraction;
+
+  // 2. Total TEOS molar flow into reactor [mol/s]
+  const TEOSIn = freshTEOS / (recycleRatio * conversion + 1);
+
+  // 3. Moles reacted per second [mol/s]
+  const reactedTEOS = TEOSIn * conversion;
+
+  // 4. Mass SiO₂ formed [g/s]
+  console.log(TEOSIn * (1-conversion) + ' mol/s');
+  return (TEOSIn - reactedTEOS);
+}
+
 // Example for R = 1.0:
 console.log(
   massSiO2WithRecycle(1, TEOSFraction, conversion, gasFlowRate).toFixed(5),
