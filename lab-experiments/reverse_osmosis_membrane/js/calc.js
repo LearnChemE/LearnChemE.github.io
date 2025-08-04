@@ -12,7 +12,7 @@ export function calcAll() {
 
   state.permeabilityFactor = calculatePermeabilityFactor(state.feedTemperature); // this is optional if we want to have A, the permeability factor, be adjusted based on temperature
 
-  console.log("permeability factor A = " + state.permeabilityFactor);
+  //console.log("permeability factor A = " + state.permeabilityFactor);
 
   //-----------calculate volume of beakers and tank for proper mass balance-----------
   //these calculations are to account for the thickness of the walls of the beakers and tank
@@ -71,7 +71,7 @@ export function calcAll() {
   state.permateConcentration = (1 - state.saltRejectionRate) * state.saltConcentrationPercent;
   state.retentateConcentration = state.saltConcentrationPercent / (1 - state.recoveryRate);
 
-  console.log(state.feedWaterConcentration);
+  //console.log(state.feedWaterConcentration);
   //console.log(PI);
   //console.log(state.retentateFlowRate);
 

@@ -8,9 +8,15 @@ let permeateBeakerX = 769;
 let permeateBeakerY = 337;
 let retentateBeakerX = 995;
 let retentateBeakerY = 337;
-
-// This is the size of the canvas. I set it to 800x600, but it could
-// be any arbitrary height and width.
+let zoom = 1;
+let offsetX = 0;
+let offsetY = 0;
+let startX, startY;
+let dragging = false;
+let zoomX = 320;
+let zoomY = 270;
+let zoomMin = 1;
+let zoomMax = 6;
 let containerDims = [1280, 600];
 
 //preload for loading images and fonts
@@ -32,29 +38,142 @@ window.setup = function () {
     resetBtn.addEventListener("click", () => {
       console.log("Reset Button clicked");
       reset();
+      resetZoom();
     });
   } else {
     console.error("Reset button not found!");
   }
 };
 
+function mouseCoordinate() {
+  const s = zoom;
+  const tx = -zoomX * (s - 1);
+  const ty = -zoomY * (s - 1);
+
+  const wx = (mouseX - tx) / s;
+  const wy = (mouseY - ty) / s;
+
+  return [wx, wy];
+}
+
 //the mouse clicked controls any mouse clicking actions
 window.mouseClicked = function () {
+  const [mx, my] = mouseCoordinate();
+
+  handleMouseScaling();
+
   //pump switch interaction, this turns the pump on and off
-  if (430 < window.mX && window.mX < 492 && 390 < window.mY && window.mY < 440) {
+  let mouseCorrectionX = mouseX;
+  let mouseCorrectionY = mouseY;
+
+  if (380 < mX && mX < 442 && 390 < mY && mY < 440) {
     state.pumpOn = !state.pumpOn;
   }
 
+  console.log("mouse X: " + mX);
+  console.log("mouse Y: " + mY);
+  console.log(zoom);
+
   //mouse click rectangle for switch
-  /*  push();
+  push();
+  translate(50, 0);
   stroke("red");
   noFill();
   rectMode(CORNERS);
-  rect(430, 390, 492, 440);
-  pop(); */
+  rect(380, 390, mX, mY);
+  pop();
 };
 
+window.mouseWheel = function (event) {
+  // Prevent default scrolling
+  event.preventDefault();
+
+  // Calculate zoom factor based on scroll direction
+  const zoomFactor = event.deltaY > 0 ? 0.95 : 1.05;
+
+  // Calculate new zoom level
+  let newZoom = zoom * zoomFactor;
+
+  // Clamp zoom level between min and max
+  newZoom = constrain(newZoom, zoomMin, zoomMax);
+
+  if (newZoom !== zoomMin) {
+    const dz = newZoom - zoom;
+    const zdif = newZoom - zoomMin;
+    const oldZoom = zoom - zoomMin;
+    const zoomXConst = (oldZoom * zoomX + mouseX * dz) / zdif;
+    const zoomYConst = (oldZoom * zoomY + mouseY * dz) / zdif;
+
+    zoomX = constrain(zoomXConst, 0, graphicsWrapper.offsetWidth);
+    zoomY = constrain(zoomYConst, 0, graphicsWrapper.offsetHeight);
+  } else {
+    zoomX = 300;
+    zoomY = 270;
+  }
+
+  zoom = newZoom;
+
+  return false;
+};
+
+window.mousePressed = function () {
+  state.dragging = true;
+  offsetX = mouseX;
+  offsetY = mouseY;
+};
+
+window.mouseReleased = () => {
+  state.dragging = false;
+};
+
+window.mouseDragged = function () {
+  // For bounds
+  const graphicsWrapper = document.getElementById("graphics-wrapper");
+  // Subtract the difference from the offset vector times the zoom for tracking
+  zoomX -= (mouseX - offsetX) * 0.8;
+  zoomY -= (mouseY - offsetY) * 0.8;
+
+  offsetX = mouseX;
+  offsetY = mouseY;
+  // Constrain so the apparatus doesn't go offscreen
+  zoomX = constrain(zoomX, 0, graphicsWrapper.offsetWidth);
+  zoomY = constrain(zoomY, 0, graphicsWrapper.offsetHeight);
+
+  // Update mX and mY, because changing the zoom coordinates will change these
+  [mouseX, mouseY] = mouseCoordinate();
+};
+
+function Zoom() {
+  // Calculate and apply matrix
+  const s = zoom;
+  const zx = -zoomX * (s - 1);
+  const zy = -zoomY * (s - 1);
+  applyMatrix(s, 0, 0, s, zx, zy);
+}
+
+function resetZoom() {
+  zoom = 1;
+  offsetX = 0;
+  offsetY = 0;
+  startX, startY;
+  dragging = false;
+}
+
 window.draw = function () {
+  /* translate(offsetX, offsetY);
+  scale(zoom); */
+
+  state.width = containerDims[0];
+  state.height = containerDims[1];
+  [mouseX, mouseY] = mouseCoordinate();
+  // drag();
+
+  push();
+  // translate(150, -240);
+  Zoom();
+
+  translate(-50, 0);
+
   handleScaling();
   background(255);
   frameRate(state.frameRate);
