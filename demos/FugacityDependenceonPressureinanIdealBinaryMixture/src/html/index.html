@@ -38,7 +38,7 @@
         </div>
         <div class="modal-body">
           <p>
-            Directions here
+            This simulation shows how the fugacities of benzene (B) and toluene (T) change with pressure and composition at constant temperature. The liquid mixture is modeled as an ideal solution and the gas phase is ideal, so Raoult's law is used for vapor-liquid equilibrium. Use sliders to vary the temperature and overall mole fraction of benzene. Use buttons to view the pressure-composition diagram (P-x-y), the fugacity-pressure plot or both plots at once. Black dots on the diagrams represent the phase behavior for the selected pressure and composition.
           </p>
         </div>
       </div>
@@ -56,7 +56,40 @@
         </div>
         <div class="modal-body">
           <p>
-            Details here
+            The saturation pressures P<sub>i</sub><sup>sat</sup> were calculated using the Antoine equation:
+          </p>
+          <p>
+            P<sub>i</sub><sup>sat</sup> = 10<sup>(A<sub>i</sub> - B<sub>i</sub> / (T + C<sub>i</sub>))</sup>
+          </p>
+          <p>
+            where i represents either benzene or toluene (B or T), T is temperature (°C), and A<sub>i</sub>, B<sub>i</sub> and C<sub>i</sub> are Antoine constants.
+          </p>
+          <p>
+            The fugacity f<sub>i</sub> of a component depends on temperature and molar composition.
+          </p>
+          <p>
+            In the liquid region:
+          </p>
+          <p>
+            f<sub>i</sub> = x<sub>i</sub> P<sub>i</sub><sup>sat</sup>,
+          </p>
+          <p>
+            where x<sub>i</sub> is the liquid mole fraction and both P<sub>i</sub><sup>sat</sup> and f<sub>i</sub> have units of bar.
+          </p>
+          <p>
+            In the vapor region:
+          </p>
+          <p>
+            f<sub>i</sub> = y<sub>i</sub> P,
+          </p>
+          <p>
+            where y<sub>i</sub> is the vapor molar composition and P is the total pressure (bar).
+          </p>
+          <p>
+            When vapor and liquid are in equilibrium (VLE):
+          </p>
+          <p>
+            f<sub>i</sub> = y<sub>i</sub> P = x<sub>i</sub> P<sub>i</sub><sup>sat</sup>.
           </p>
         </div>
       </div>
@@ -74,7 +107,7 @@
         </div>
         <div class="modal-body">
           <p>
-            About here
+            This simulation was created in the <a href="https://www.colorado.edu/chemical-biological-engineering/" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a href="https://learncheme.com/" target="_blank">LearnChemE.com</a> by Sanjay Baskaran under the direction of Professor John L. Falconer and Michelle Medlin. It is a JavaScript/HTML5 implementation of a <a href="https://www.wolfram.com/mathematica/" target="_blank">Mathematica simulation</a> by Neil Hendren. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.
           </p>
         </div>
       </div>
