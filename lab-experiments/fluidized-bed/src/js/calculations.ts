@@ -3,15 +3,15 @@ import { setTargetBedHeight } from './canvas';
 import { secantMethod } from './helpers';
 import State from './state';
 
-const InitialBedHeight = 10.5; // cm
+const InitialBedHeight = 5.0; // cm
 const mu = 1.002; // mPa s
 const rho = .998; // g / cc
 const rho_p = 2.4; // g / cc
 const grav = 981; // cm / s2
-const ParticleDiameter = .1; // cm
-const Init_VoidFrac = 0.35;
+const ParticleDiameter = 0.107; // cm
+const Init_VoidFrac = 0.45;
 
-var minFluidizeVelocity;
+var minFluidizeVelocity=0;
 function initializeCalculations() {
     const a = 1.75 * rho * ParticleDiameter;
     const b = 150 * mu * (1 - Init_VoidFrac) / 100;
@@ -19,7 +19,7 @@ function initializeCalculations() {
     // minFluidizeVelocity = roots([a,b,c])
     const x1 = (-b + Math.sqrt(b*b - 4*a*c)) / 2 / a;
     const x2 = (-b - Math.sqrt(b*b - 4*a*c)) / 2 / a;
-    console.log(`Quadratic solution found: ${x1} and ${x2}`);
+    minFluidizeVelocity = (x1 > 0) ? x1 : x2;
 }
 initializeCalculations();
 
@@ -41,20 +41,20 @@ export function pressureDrop(lift?: number) {
         lift = State.valveLift;
         dbMode = false;
     }
-    const sup_vel = lift * 6.5; // Superficial velocity, cm/s
-    // console.log(`Superficial Velocity: ${sup_vel}`);
+    const sup_vel = lift * 7; // Superficial velocity, cm/s
 
     // Packed regime
-    if (sup_vel <= 1) {
+    if (sup_vel < minFluidizeVelocity) {
         // Bed height is fixed
         if (!dbMode) setTargetBedHeight(InitialBedHeight);
         
         // Use eq 1 to solve pressure
-        const p = 150 * mu * InitialBedHeight / ParticleDiameter**2 * (1 - Init_VoidFrac)**2 / Init_VoidFrac**3 * sup_vel / 1000 +
+        const p = 150 * mu * InitialBedHeight / ParticleDiameter**2 * (1 - Init_VoidFrac)**2 / Init_VoidFrac**3 * sup_vel / 100 +
             1.75 * InitialBedHeight * rho / ParticleDiameter  *  (1 - Init_VoidFrac) / Init_VoidFrac**3 * sup_vel**2; // mPa
         const p_cmw = p / rho / grav;
 
         // console.log(`Packed bed regime; Pressure drop = ${p} mPa = ${p_cmw} cm water`);
+        if (dbMode) return InitialBedHeight;
         return p_cmw;
     }
 
@@ -70,23 +70,22 @@ export function pressureDrop(lift?: number) {
         };
 
         const h = secantMethod(ergun, 1, 10);
-        // console.log(`Fluidized Regime; Bed height = ${h}`);
+        // console.log(`Fluidized bed height: ${h}`);
+        const ep = 1 - InitialBedHeight / h * (1 - Init_VoidFrac);
+        const p = (rho_p - rho) * grav * h * (1 - ep);
+        
         if (!dbMode) setTargetBedHeight(h);
-
-        return 4.3;
+        if (dbMode) return h;
+        return p / rho / grav;
     }
 
     // Repacked regime
     else {
         const dx = sup_vel - 6;
-        const dy = dx * 4.0;
+        const dy = dx * 15.0;
         // console.log('Repacked regime');
-        if (!dbMode) setTargetBedHeight(45);
+        if (!dbMode) setTargetBedHeight(14.5 + 10*dx);
+        if (dbMode) return 14.5 + 5*dx;
         return 4.3 + dy; 
     }
-}
-
-/** */
-export function catchAndWeigh() {
-
 }
