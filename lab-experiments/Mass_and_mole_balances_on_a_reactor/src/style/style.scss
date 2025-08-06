@@ -4,6 +4,7 @@ $modal-lg: 820px;
 $modal-xl: 1140px;
 @import "bootstrap";
 @import "./slider.scss"; // Keeping slider styling in place if needed for other inputs
+
 #graphics-container {
   position: relative;
   margin: auto;
@@ -36,6 +37,7 @@ canvas {
   font-size: 0.9rem;
 }
 
+/* STANDARD HAMBURGER MENU - MATCHING OTHER SIMULATIONS */
 #hamburger {
   position: absolute;
   top: 10px;
@@ -53,10 +55,10 @@ canvas {
   width: max-content;
   cursor: pointer;
   background-color: lightblue;
-  padding: 5px;
+  padding: 5px; /* Standard padding */
   border: 1px solid black;
   box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.5);
-  border-radius: 5px;
+  border-radius: 5px; /* Standard radius */
 }
 
 #hamburger-icon.active {
@@ -69,7 +71,7 @@ canvas {
 }
 
 #hamburger-icon>svg {
-  width: 20px;
+  width: 20px; /* Standard icon size */
   height: 20px;
 }
 
@@ -78,19 +80,39 @@ canvas {
   display: grid;
   grid-template-columns: max-content;
   width: max-content;
-  top: 25px;
+  top: 25px; /* Standard positioning */
   display: none;
   justify-items: center;
-  margin-top: 20px;
-  gap: 10px;
+  margin-top: 20px; /* Standard margin */
+  gap: 10px; /* Standard gap */
   background-color: white;
   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
   border: 1px solid black;
-  border-radius: 5px;
-  padding: 15px;
+  border-radius: 5px; /* Standard radius */
+  padding: 15px; /* Standard padding */
+  
   &>.btn {
-    width: 110px;
+    width: 110px; /* Standard button width */
   }
+}
+
+/* STANDARD BUTTON STYLING - Using Bootstrap defaults with standard width */
+#buttons .btn {
+  width: 110px; /* Standard width from other simulation */
+  border-radius: 5px; /* Standard radius */
+  /* Let Bootstrap handle font-size, padding, height - using defaults */
+}
+
+/* Primary buttons (Directions, About, Worksheet) */
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
 }
 
 .disabled {
@@ -104,46 +126,21 @@ canvas {
   pointer-events: none;
 }
 
-
-
-
-
-
-
-@media screen and (min-width: 1080px) {}
-
-@media screen and (min-width: 1320px) {
-  #hamburger-icon {
-    padding: 6px;
-  }
-  #hamburger-icon>svg {
-    width: 32px;
-    height: 32px;
-  }
-  #buttons {
-    top: 35px;
-    padding: 15px;
-  }
-}
-
+/* TEMPERATURE SLIDER STYLING */
 #temp-slider-container {
-  position: relative;
-  top: 100px;
+  position: absolute;
+  top: 15px;
   left: 50%;
   transform: translateX(-50%);
-
   padding: 8px 12px;
   border-radius: 8px;
-  
-  z-index: 1001; // higher than hamburger or canvas
+  z-index: 1001;
   font-family: sans-serif;
-  
   display: flex;
   flex-wrap: wrap;           
   align-items: center;
   gap: 8px;
-
-  max-width: 90vw;           // 👈 prevents it from overflowing
+  max-width: 90vw;
   box-sizing: border-box;
 }
 
@@ -156,95 +153,63 @@ canvas {
 }
 
 #tempValue {
-  
   font-size: 0.95rem;
   min-width: 50px;
 }
 
-@media (max-width: 600px) {
-  #temp-slider-container {
-    top: 1200px;  // 👈 lower on phones
-  }
-}
-
-
-
-/* Add this to your style.scss or CSS file */
-
-/* Add this to your style.scss or CSS file */
-
-/* Reset Button Styling - Add to your existing CSS */
+/* RESET BUTTON STYLING - Standard Bootstrap with custom color */
 #reset-button {
-  background-color: #dc3545; /* Bootstrap danger red */
+  background-color: #dc3545;
   border-color: #dc3545;
   color: white;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
+  /* Use Bootstrap defaults for font-weight, padding, etc. */
 }
 
 #reset-button:hover {
-  background-color: #c82333; /* Darker red on hover */
+  background-color: #c82333;
   border-color: #bd2130;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
 
 #reset-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
-}
-
-/* Icon removed per user request */
-
-/* Animation on click */
-#reset-button.resetting {
-  animation: resetPulse 0.6s ease-in-out;
-  pointer-events: none;
-}
-
-@keyframes resetPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.95); background-color: #a02330; }
-  100% { transform: scale(1); }
-}
-
-/* Make sure the button fits well in the hamburger menu */
-#buttons {
-  gap: 8px;
-}
-
-#buttons .btn {
-  margin-bottom: 5px;
-  border-radius: 6px;
-  padding: 8px 16px;
-  font-size: 14px;
-  min-width: 140px;
-  text-align: center;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  #reset-button {
-    font-size: 13px;
-    padding: 6px 12px;
-    min-width: 120px;
-  }
+  background-color: #bd2130;
+  border-color: #b21e2d;
 }
 
 /* Ensure proper spacing in hamburger menu */
 #hamburger #controls #buttons {
   display: none;
   grid-template-columns: 1fr;
-  gap: 10px;
-  padding: 15px;
+  gap: 10px; /* Standard gap */
+  padding: 15px; /* Standard padding */
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
+  border-radius: 5px; /* Standard radius */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  margin-top: 10px;
+  margin-top: 20px; /* Standard margin */
 }
 
 #hamburger #controls #buttons.show {
   display: grid;
+}
+
+/* RESPONSIVE DESIGN - MATCHING OTHER SIMULATIONS */
+@media screen and (min-width: 1080px) {}
+
+@media screen and (min-width: 1320px) {
+  #hamburger-icon {
+    padding: 6px; /* Standard large screen padding */
+  }
+  #hamburger-icon>svg {
+    width: 32px; /* Standard large screen icon */
+    height: 32px;
+  }
+  #buttons {
+    top: 35px; /* Standard large screen positioning */
+    padding: 15px; /* Standard padding maintained */
+  }
+}
+
+@media (max-width: 600px) {
+  #temp-slider-container {
+    top: 1200px;
+  }
 }

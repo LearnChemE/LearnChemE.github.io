@@ -7,6 +7,7 @@ export function startBubbleTimer() {
   bubbleStartTime = millis();
 }
 
+
 export function endBubbleTimer(currentY) {
   bubbleEndTime = millis();
 
