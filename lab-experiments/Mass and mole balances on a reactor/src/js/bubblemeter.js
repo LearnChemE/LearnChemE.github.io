@@ -48,56 +48,59 @@ export function drawBubbleMeter(x = 200, y = 40) {
   fill(255, 255, 255, 40);
   rect(0, 0, meterWidth, meterHeight, 4);
 
-  // === Volume Markings (every 2.5 mL from 0 to 50)
+  // === Volume Markings (every 5 mL from 0 to 50)
   fill(0);
   noStroke();
   textSize(2);
   textAlign(LEFT, CENTER);
-  for (let i = 0; i <= 20; i++) {
-    const scaleStart = 8; // Start scale above soap area
+  for (let i = 0; i <= 10; i++) {
+    const scaleStart = 8;
     const scaleHeight = meterHeight - scaleStart - 1;
-    let yMark = meterHeight - scaleStart - i * (scaleHeight / 20);
-    
+    let yMark = meterHeight - scaleStart - i * (scaleHeight / 10);
+
     stroke(50);
     strokeWeight(0.4);
-   
-    // Right tick marks
     line(meterWidth - 2, yMark, meterWidth + 1, yMark);
 
     noStroke();
-    text(`${i * 2.5} ml`, meterWidth + 2, yMark);
+    text(`${i * 5}`, meterWidth + 2, yMark);
   }
 
-  // === Highlight region (0–10 mL zone for flow timing)
-  fill(100, 255, 100, 130); // green transparent
+  // ✅ === Add "mL" label here ===
+  fill(0);
   noStroke();
-  
+  textSize(2);
+  textAlign(LEFT, BOTTOM);
+  text("mL", meterWidth + 4.5, 2); // Slightly above top mark
+
+  // === Highlight region (0–10 mL zone for flow timing)
+  fill(100, 255, 100, 130);
+  noStroke();
+
   beginShape();
   vertex(0, meterHeight - 8);
   vertex(0, meterHeight - 8 + 8);
-  
-  // Curved bottom edge
+
   for (let i = 0; i <= meterWidth; i++) {
     const x = i;
     const curveDepth = 1.5;
     const y = meterHeight - 8 + 8 - curveDepth * sin(PI * i / meterWidth);
     vertex(x, y);
   }
-  
+
   vertex(meterWidth, meterHeight - 8 + 8);
   vertex(meterWidth, meterHeight - 8);
   endShape(CLOSE);
 
-  // Show liquid during measurement only
+  // === Soap liquid during measurement ===
   if (measurementActive) {
     const displayLevel = currentReading;
     const liquidHeight = map(displayLevel, 0, 50, 0, meterHeight - 8) * 1.2;
-    
+
     fill(100, 255, 100, 120);
     noStroke();
     rect(0, meterHeight - liquidHeight, meterWidth, liquidHeight);
-    
-    // Add measurement effects
+
     drawMeasurementEffects();
   }
 
@@ -106,6 +109,7 @@ export function drawBubbleMeter(x = 200, y = 40) {
 
   pop();
 }
+
 
 function drawMeasurementEffects() {
   // Surface ripples

@@ -163,7 +163,7 @@ export function drawAll(temp) {
   drawBeaker(30, 88, 1);
   drawHeaterSwitch(12, 65);
   drawPumpAndSwitch(33, 60, 12, 60);
-  drawEvaporatorBody(23, 33, 55);
+  drawEvaporatorBody(26.5, 40, 55);
   updateCoilGlow();
   drawReactorBody(temp); 
   
@@ -183,8 +183,8 @@ export function drawAll(temp) {
 
   drawThreeWayValve();
   drawExhaustCap(118,19.2);
-  drawCondenserBody(94, 28, 100); 
-  drawCoolingSwitch(81, 63);
+  drawCondenserBody(98, 37.5, 100); 
+  drawCoolingSwitch(85, 63);
   drawCollectingBeaker(100, 88, condensedFluidLevel + 0);
   drawCondenserParticles();
 
