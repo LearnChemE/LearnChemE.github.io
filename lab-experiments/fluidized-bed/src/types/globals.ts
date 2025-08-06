@@ -8,6 +8,7 @@ export enum ValveSetting {
 export type GlobalState = {
     apparatusDiv: SVGAElement;
     valveSetting: ValveSetting;
+    initialFill: boolean;
     pumpIsRunning: boolean;
     valveLift: number;
     valve2isDisabled: boolean;

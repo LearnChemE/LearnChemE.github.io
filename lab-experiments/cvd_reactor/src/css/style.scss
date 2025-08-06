@@ -1,5 +1,13 @@
 // main.scss
 
+/* Disable text selection and copying globally */
+* {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+
 #svg-container {
   position: fixed;
   border: 2px solid #ccc;

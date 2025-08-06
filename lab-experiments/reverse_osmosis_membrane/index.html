@@ -7,6 +7,7 @@
       name="viewport"
       content="width=device-width,initial-scale=1,shrink-to-fit=no"
     />
+    <link rel="shortcut icon" href="#" />
 
     <!-- Update everything below THIS -->
     <meta
@@ -89,7 +90,7 @@
                 type="range"
                 id="feed-pressure"
                 min="10"
-                max="30"
+                max="40"
                 step="1"
                 value="10"
               />
@@ -123,7 +124,7 @@
               data-bs-toggle="modal"
               data-bs-target="#directions-modal"
             >
-              directions
+              Directions
             </button>
             <button
               type="button"
@@ -131,14 +132,15 @@
               data-bs-toggle="modal"
               data-bs-target="#details-modal"
             >
-              about
+              About
             </button>
+
             <a
               href="./assets/ReverseOsmosisWorksheet.pdf"
               download
-              class="btn btn-primary btn-sm"
+              class="btn btn-primary btn-sm worksheet-button"
             >
-              worksheet
+              Worksheet
             </a>
           </div>
 
@@ -161,7 +163,11 @@
       </div>
 
       <!-- Container for graphics drawn by p5.js -->
-      <div id="graphics-wrapper"></div>
+      <div id="graphics-wrapper">
+        <button id="resetButton" class="btn btn-danger resetButton">
+          reset
+        </button>
+      </div>
 
       <!-- Add this after the graphics-wrapper div -->
       <div class="disclaimer">

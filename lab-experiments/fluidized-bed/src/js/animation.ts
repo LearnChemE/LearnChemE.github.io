@@ -122,8 +122,12 @@ async function tubesFillAnimation() {
  * External call to begin the animation for the tubes filling.
  */
 export async function beginTubeFillAnimation() {
-    State.valve2isDisabled = true;
-    tubesFillAnimation().then(() => State.valve2isDisabled = false);
+    if (!State.initialFill) State.valve2isDisabled = true;
+    tubesFillAnimation().then(() => {
+        if (!State.initialFill) State.valve2isDisabled = false;
+        State.initialFill = true;
+        if (State.pumpIsRunning) document.getElementById("pump-btn").className = "btn btn-danger";
+    });
 }
 
 /**
@@ -158,4 +162,11 @@ export async function swapValveAnimation(newSetting: ValveSetting) {
             State.valve2isDisabled = false;
         });
     }
+}
+
+export function resetBeakers() {
+    const mode = beakers.getMode();
+    beakers.setMode(0);
+    beakers.setMode(mode);
+    manometer.fillTubes(0);
 }

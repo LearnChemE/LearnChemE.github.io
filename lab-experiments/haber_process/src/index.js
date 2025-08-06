@@ -10,7 +10,7 @@ import { calcAll, setDefaults } from "./js/calcs";
 // GLOBAL VARIABLES OBJECT
 window.state = {
   frameRate: 60,
-  pixelDensity: 4,
+  pixelDensity: window.devicePixelRatio,
   showButtons: false,
   hamburgerHasBeenClicked: window.localStorage.getItem("hamburgerHasBeenClicked") === "true",
   canvasSize: [150, 120],
@@ -56,7 +56,9 @@ window.draw = function() {
   // drag();
 
   push();
+  // translate(150, -240);
   Zoom();
+  
 
   scale(relativeSize());
   background(255);

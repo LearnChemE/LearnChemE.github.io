@@ -83,6 +83,8 @@ layout (std140) uniform ubo {
 uniform sampler2D noiseTex;
 
 const int TOT_PARTICLES = 1024;
+const float MIN_HEIGHT = 10.5;
+const float MAX_HEIGHT = 35.0;
 
 float hash(float x, int seed) {
   // Convert integer seed to float and combine with input
@@ -105,11 +107,11 @@ vec2 cap_speed(vec2 v, float speed) {
  * returns 1 for packed, 0 for fluidized, and -1 for repacked.
  */
 int CalcState() {
-  float t = (height - 5.7) / 14.3;
+  float t = (height - MIN_HEIGHT) / 14.3;
   if (gl_VertexID <= int((1.0-t) * float(TOT_PARTICLES))) return 1;
-  if (height >= 20.0) {
-    // As t lerps from 20 to 30, a linearly proportional amount of particles pack on the top
-    t = (height - 20.0) / 10.0;
+  if (height >= MAX_HEIGHT) {
+    // As t lerps from MAX_HEIGHT to MAX_HEIGHT + 10.0, a linearly proportional amount of particles pack on the top
+    t = (height - MAX_HEIGHT) / 10.0;
     if (gl_VertexID <= int(t * float(TOT_PARTICLES))) return -1;
   }
   
@@ -120,8 +122,8 @@ int CalcState() {
  * Calculate the clip space max height of the fluidized regime
  */
 float maxHeight() {
-  // Remap from (5.7, 20) to (-0.6, 1.0)
-  float t = (height - 5.7) / 14.3;
+  // Remap from (MIN_HEIGHT, MAX_HEIGHT) to (-0.6,+1.0)
+  float t = (height - MIN_HEIGHT) / (MAX_HEIGHT-MIN_HEIGHT);
   return 1.6 * t - 0.6;
 }
 
@@ -142,7 +144,7 @@ void fluidized() {
   accel *= speedMod*speedMod;
   // With verlet integration, velocity already accounts for timestep
   vec2 vel = aPos - aPrev;
-  vel = cap_speed(vel, 0.03 * speedMod); // Cap the max speed
+  vel = cap_speed(vel, 0.01 * speedMod); // Cap the max speed
   // Verlet integration to evolve
   vec2 pos = aPos + vel + accel * dt*dt;
 

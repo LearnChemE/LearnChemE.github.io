@@ -1,4 +1,5 @@
 import { ValveSetting, vec2 } from "../types";
+import { resetBeakers } from "./animation";
 import { updateCanvasPosition } from "./canvas";
 import { constrain, rescale, smoothLerp } from "./helpers";
 import State from "./state";
@@ -22,7 +23,7 @@ function findAngleFromDown(A: vec2, B: vec2) {
 /*
  *  Interaction for valve 1
  */
-var v1Angle = 0;
+var v1Angle = 90;
 valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
     // Find centroid
     var offset = valve1.getBoundingClientRect();
@@ -50,12 +51,12 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
 
         // Set angle
         v1Angle += dth;
-        v1Angle = constrain(v1Angle, -90, 0);
+        v1Angle = constrain(v1Angle, 0, 90);
         valve1.setAttribute("transform", `rotate(${v1Angle} 129 83)`);
 
         // Set state after a time delay
         setTimeout(() => {
-            State.valveLift = rescale(v1Angle, -90, 0, 0.05, 1, true);
+            if (State.pumpIsRunning) State.valveLift = rescale(v1Angle, 90, 0, 0.0, 1, true);
         }, 350);
     };
     const release = () => {
@@ -65,7 +66,11 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
 
     document.addEventListener("mousemove", drag);
     document.addEventListener("mouseup", release);
-})
+});
+
+// Set initial
+valve1.setAttribute("transform", `rotate(${v1Angle} 129 83)`);
+State.valveLift = rescale(v1Angle, 90, 0, 0.0, 1, true);
 
 /*
  *  Interaction for valve 2
@@ -74,6 +79,7 @@ var lastAngle = 0;
 var currAngle = 0;
 valve2.addEventListener("mousedown", ({ clientX, clientY }) => {
     if (State.valve2isDisabled) return;
+    if (!State.pumpIsRunning && State.initialFill) return;
     if (State.pumpIsRunning) State.valve2isDisabled = true;
     currAngle = currAngle === 0 ? -90 : 0;
 
@@ -103,15 +109,31 @@ valve2.addEventListener("mousedown", ({ clientX, clientY }) => {
 function disableBtnTimeout(b: HTMLElement) {
     const classname = b.className;
     b.className += ' disabled aria-disabled';
-
 }
 
 const pumpBtn = document.getElementById("pump-btn");
 pumpBtn.addEventListener("click", () => {
     // Start pump animation
-    State.pumpIsRunning = true;
-    disableBtnTimeout(pumpBtn);
-})
+    const running = !State.pumpIsRunning;
+    State.pumpIsRunning = running;
+
+    if (running) {
+        pumpBtn.className = "btn btn-danger";
+        pumpBtn.innerHTML = "stop pump";
+        State.valveLift = rescale(v1Angle, 90, 0, 0.0, 1, true);
+        if (!State.initialFill) disableBtnTimeout(pumpBtn);
+    } else {
+        pumpBtn.className = "btn btn-secondary";
+        pumpBtn.innerHTML = "start pump";
+        State.valveLift = 0;
+    }
+});
+
+/**
+ * Reset button
+ */
+const resetBtn = document.getElementById("reset-btn");
+resetBtn.addEventListener("click", () => resetBeakers());
 
 /* ******************************************** */
 /* *************** Drag and Zoom ************** */

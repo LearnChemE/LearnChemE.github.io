@@ -70,4 +70,3 @@ export const defaultMfcValue = 15.0;
 export const defaultMfcFlowSpeed = 50; // ms
 export const timeStep = 1; // seconds
 export const simulationSpeedMultiplier = 1; // Adjust for faster/slower simulation time progression (8 in original example)
-export const tempKelvin = 298; // Temperature in K

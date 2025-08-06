@@ -1,5 +1,5 @@
 // js/simulation.js
-import { yCO2_out, findAdsorbTime } from './calc.js'; // Assuming calc.js is in the same directory or adjust path
+import { yCO2_out, findAdsorbTime, rampTemperature } from './calc.js'; // Assuming calc.js is in the same directory or adjust path
 import * as state from './state.js';
 import * as config from './config.js';
 import { updateCO2AnalyzerDisplay } from './components/co2Analyzer.js';
@@ -18,84 +18,86 @@ export function startMoleFractionCalculation(tankNum) {
 
   if (tankNum === '1') { // 90% CO2 Adsorption
     y = 0.9;
-    if (state.getPrevTankNum() === '2') {
-      initialTimeOffset = findAdsorbTime({
-        tStep: 0.01,
-        yCO2: y,
-        yTarget: state.outletMoleFraction,
-        m: state.getMfcValue() * 1e-3 / 60, // Convert mg/min to g/s
-        P: state.getGaugeValue('gauge1', 5.0), // Convert bar to MPa
-        T: config.tempKelvin,
-        desorbing: false,
-      })
-    }
+    // if (state.getPrevTankNum() === '2') {
+    //   initialTimeOffset = findAdsorbTime({
+    //     tStep: 0.01,
+    //     yCO2: y,
+    //     yTarget: state.outletMoleFraction,
+    //     m: state.getMfcValue() * 1e-3 / 60, // Convert mg/min to g/s
+    //     P: state.getGaugeValue('gauge1', 5.0), // Convert bar to MPa
+    //     T: config.tempKelvin,
+    //     desorbing: false,
+    //   })
+    // }
 
-    console.log(`yTarget: ${state.outletMoleFraction}`);
-    console.log(`m: ${state.getMfcValue() * 1e-3 / 60}`);
-    console.log(`P: ${state.getGaugeValue('gauge1', 5.0)}`);
-    console.log(`T: ${config.tempKelvin}`);
-    console.log({ initialTimeOffset });
-    currentDesorbingState = false;
+    // console.log(`yTarget: ${state.outletMoleFraction}`);
+    // console.log(`m: ${state.getMfcValue() * 1e-3 / 60}`);
+    // console.log(`P: ${state.getGaugeValue('gauge1', 5.0)}`);
+    // console.log(`T: ${config.tempKelvin}`);
+    // console.log({ initialTimeOffset });
+    // currentDesorbingState = false;
     stopHeating(); // Ensure heater is off
-    // If resuming adsorption for the same tank, continue time
-    if (state.getPrevTankNum() === '1' && state.getTimeWhenAdsorptionStopped() !== null) {
-      initialTimeOffset = state.getTimeWhenAdsorptionStopped();
-      console.log(`Resuming Adsorption Tank 1 from ${initialTimeOffset.toFixed(2)}s`);
-    } else {
-      console.log("Starting New Adsorption Tank 1");
-      state.setTimeWhenAdsorptionStopped(null); // Clear previous stop time
-    }
-    state.setPrevTankNum('1'); // Mark this as the last active CO2 tank
-    state.setTimeOfDesorption(0); // Reset desorption time marker
+    // // If resuming adsorption for the same tank, continue time
+    // if (state.getPrevTankNum() === '1' && state.getTimeWhenAdsorptionStopped() !== null) {
+    //   initialTimeOffset = state.getTimeWhenAdsorptionStopped();
+    //   console.log(`Resuming Adsorption Tank 1 from ${initialTimeOffset.toFixed(2)}s`);
+    // } else {
+    //   console.log("Starting New Adsorption Tank 1");
+    //   state.setTimeWhenAdsorptionStopped(null); // Clear previous stop time
+    // }
+    // state.setPrevTankNum('1'); // Mark this as the last active CO2 tank
+    // state.setTimeOfDesorption(0); // Reset desorption time marker
 
   } else if (tankNum === '2') { // 10% CO2 Adsorption
     y = 0.1;
-    currentDesorbingState = false;
+    // currentDesorbingState = false;
     stopHeating();
-    if (state.getPrevTankNum() === '1') {
-      initialTimeOffset = findAdsorbTime({
-        tStep: 0.01,
-        yCO2: y,
-        yTarget: state.outletMoleFraction,
-        m: state.getMfcValue() * 1e-3 / 60, // Convert mg/min to g/s
-        P: state.getGaugeValue('gauge1', 5.0),
-        T: config.tempKelvin,
-        desorbing: false,
-      })
-    }
-    if (state.getPrevTankNum() === '2' && state.getTimeWhenAdsorptionStopped() !== null) {
-      initialTimeOffset = state.getTimeWhenAdsorptionStopped();
-      console.log(`Resuming Adsorption Tank 2 from ${initialTimeOffset.toFixed(2)}s`);
-    } else {
-      console.log("Starting New Adsorption Tank 2");
-      state.setTimeWhenAdsorptionStopped(null);
-    }
-    state.setPrevTankNum('2');
-    state.setTimeOfDesorption(0);
+    // if (state.getPrevTankNum() === '1') {
+    //   initialTimeOffset = findAdsorbTime({
+    //     tStep: 0.01,
+    //     yCO2: y,
+    //     yTarget: state.outletMoleFraction,
+    //     m: state.getMfcValue() * 1e-3 / 60, // Convert mg/min to g/s
+    //     P: state.getGaugeValue('gauge1', 5.0),
+    //     T: config.tempKelvin,
+    //     desorbing: false,
+    //   })
+    // }
+    // if (state.getPrevTankNum() === '2' && state.getTimeWhenAdsorptionStopped() !== null) {
+    //   initialTimeOffset = state.getTimeWhenAdsorptionStopped();
+    //   console.log(`Resuming Adsorption Tank 2 from ${initialTimeOffset.toFixed(2)}s`);
+    // } else {
+    //   console.log("Starting New Adsorption Tank 2");
+    //   state.setTimeWhenAdsorptionStopped(null);
+    // }
+    // state.setPrevTankNum('2');
+    // state.setTimeOfDesorption(0);
 
   } else if (tankNum === '3') { // N2 Desorption
-    // Use the mole fraction of the *last* CO2 tank for yCO2 parameter during desorption
-    const lastTank = state.getPrevTankNum();
-    if (lastTank === '1') y = 0.9;
-    else if (lastTank === '2') y = 5.0;
-    else {
-      console.warn("Desorption (Tank 3) started without prior Adsorption (Tank 1 or 2). Using y=0.1");
-      y = 0.1; // Default if no previous tank
-    }
+    // // This is all wrong. It's almost hard to describe how wrong it is.
+    // // Use the mole fraction of the *last* CO2 tank for yCO2 parameter during desorption
+    // const lastTank = state.getPrevTankNum();
+    // if (lastTank === '1') y = 0.9;
+    // else if (lastTank === '2') y = 5.0;
+    // else {
+    //   console.warn("Desorption (Tank 3) started without prior Adsorption (Tank 1 or 2). Using y=0.1");
+    //   y = 0.1; // Default if no previous tank
+    // }
+    y = 0;
 
-    currentDesorbingState = true;
+    // currentDesorbingState = true;
     startHeating(); // Turn heater on
 
-    if (state.getTimeWhenAdsorptionStopped() !== null) {
-      // Desorption time starts from when adsorption stopped
-      initialTimeOffset = state.getTimeWhenAdsorptionStopped();
-      state.setTimeOfDesorption(initialTimeOffset); // Set the timeOfDesorption parameter
-      console.log(`Starting Desorption (Tank 3) from ${initialTimeOffset.toFixed(2)}s (based on last stop time). Using y=${y}`);
-    } else {
-      console.warn("Desorption (Tank 3) started, but no previous adsorption stop time recorded. Starting time from 0.");
-      initialTimeOffset = 0;
-      state.setTimeOfDesorption(0);
-    }
+    // if (state.getTimeWhenAdsorptionStopped() !== null) {
+    //   // Desorption time starts from when adsorption stopped
+    //   initialTimeOffset = state.getTimeWhenAdsorptionStopped();
+    //   state.setTimeOfDesorption(initialTimeOffset); // Set the timeOfDesorption parameter
+    //   console.log(`Starting Desorption (Tank 3) from ${initialTimeOffset.toFixed(2)}s (based on last stop time). Using y=${y}`);
+    // } else {
+    //   console.warn("Desorption (Tank 3) started, but no previous adsorption stop time recorded. Starting time from 0.");
+    //   initialTimeOffset = 0;
+    //   state.setTimeOfDesorption(0);
+    // }
     // PrevTankNum remains unchanged during desorption
 
   } else {
@@ -118,15 +120,18 @@ export function startMoleFractionCalculation(tankNum) {
   const m_controller_mg_min = state.getMfcValue(); // Get current MFC setting (mg/min)
   const m_g_s = m_controller_mg_min * 1e-3 / 60; // Convert mg/min to g/s
 
-  const T = config.tempKelvin; // Temperature from config
-
-  console.log('Calculation Params:', { tankNum, y, P_bar, m_controller_mg_min, m_g_s, T, desorbing: state.getDesorbing(), timeOfDesorption: state.getTimeOfDesorption(), initialTimeOffset });
+  console.log('Calculation Params:', { tankNum, y, P_bar, m_controller_mg_min, m_g_s, desorbing: state.getDesorbing(), timeOfDesorption: state.getTimeOfDesorption(), initialTimeOffset });
 
 
   // --- Interval Timer ---
   const timerId = setInterval(() => {
     // Calculate elapsed simulation time (t) since the *start* of the relevant phase (adsorption or desorption)
     // Add the initial offset to continue from where we left off
+
+    // Heat/cool the bed
+    const T = rampTemperature(1/60, state.getIsHeating(), state.getTemperature()); // Temperature from config
+    state.setTemperature(T);
+
     const elapsedRealTime_ms = Date.now() - state.getStartTime();
     const t = initialTimeOffset + (elapsedRealTime_ms / 1000) * config.simulationSpeedMultiplier;
 
@@ -135,7 +140,7 @@ export function startMoleFractionCalculation(tankNum) {
     // Call the external calculation function
     const y_out = yCO2_out({
       t: t,
-      tStep: config.timeStep, // Use config timestep
+      tStep: 1/60, // Use config timestep
       m: m_g_s,
       P: P_bar,
       T: T,
@@ -155,7 +160,7 @@ export function startMoleFractionCalculation(tankNum) {
       console.log(`Sim Time: ${t.toFixed(2)}s, Outlet CO2: ${state.outletMoleFraction.toFixed(4)}, Desorbing: ${state.getDesorbing()}, T_desorp: ${state.getTimeOfDesorption().toFixed(2)}s`);
     }
 
-  }, 1000 / config.simulationSpeedMultiplier); // Update display roughly once per real second (adjust interval based on multiplier)
+  }, 1000/60 / config.simulationSpeedMultiplier); // Update display roughly once per real second (adjust interval based on multiplier)
 
   state.setMoleFractionTimer(timerId);
 }

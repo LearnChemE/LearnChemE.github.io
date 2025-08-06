@@ -1,0 +1,183 @@
+/* Browser compatibility and consistent box sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#controls {
+  width: 620px;               /* same as plot width */
+  margin: 0 0 10px 60px;      /* move controls to the right */
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;                  /* space between sliders, reduced for closer alignment */
+  white-space: nowrap;        /* prevent wrapping */
+}
+#controls label {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* reduced gap for tighter spacing */
+  font-size: 14px;
+}
+#controls input[type="range"] {
+  width: 120px;
+  margin: 0;
+  /* Browser compatibility for consistent slider appearance */
+  -webkit-appearance: none;  /* Chrome/Safari/Opera */
+  -moz-appearance: none;     /* Firefox */
+  appearance: none;
+  height: 6px;
+  background: #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+/* Browser-specific slider thumb styling for consistency */
+#controls input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #2a72de;
+  border: 1.5px solid #888;
+  border-radius: 50%;
+  cursor: pointer;
+}
+#controls input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #2a72de;
+  border: 1.5px solid #888;
+  border-radius: 50%;
+  cursor: pointer;
+}
+#controls span {
+  min-width: 28px; /* narrowed width so value hugs the slider */
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.panel {
+  display: flex;
+  width: 700px;               /* plot (520) + gap (30) + cylinder (150) */
+  gap: 30px;
+}
+#plot {
+  width: 520px;
+  height: 440px;
+}
+#cylinder {
+  width: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.card {
+  position: relative;
+  background: #e5e7eb;
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  width: 95%;
+  max-width: 850px;
+  padding: 1.5rem;
+  margin-left: 0;
+}
+.menu-btn {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  background: lightblue;
+  border: 1px solid #000;
+  border-radius: 6px;
+  padding: 6px;
+  height: 40px;
+  cursor: pointer;
+}
+.menu-btn img {
+  height: 100%;
+}
+.dropdown-menu {
+  position: absolute;
+  top: 3.5rem;
+  left: 0.5rem;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  list-style: none;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 100;
+  display: flex;               /* center list items vertically */
+  flex-direction: column;
+  align-items: center;         /* center horizontally inside menu */
+}
+.dropdown-menu li {
+  background: #007bff;
+  color: #fff;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: block;
+  white-space: nowrap;
+  text-align: center;          /* center the text */          /* bolder text similar to other sims */
+  width: 120px;                /* consistent button width */
+}
+.dropdown-menu li:hover {
+  background: #0056b3;
+}
+.hidden {
+  display: none !important;
+}
+.modal {
+  position: fixed;
+  top: 0; 
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 1.5rem;
+  z-index: 200;
+}
+.modal-content {
+  position: relative;
+  background: #fff;
+  border-radius: 6px;
+  width: 800px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 2rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.thermomix-container {
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.10);
+  margin: 1.5rem 2rem 1.5rem 3rem;
+  padding: 1.2rem 1.5rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+}
+#plot {
+  min-height: 0;
+  margin-top: 0px;
+  overflow: visible;
+}

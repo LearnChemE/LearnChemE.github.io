@@ -118,21 +118,21 @@
           </p>
           <p>where \(f\) is the initial volume fraction of liquid. Initially all contents are at room temperature (300
             K), and the pressure inside the can is the
-            saturation pressure \(p^{\mathrm{sat}}\) at 300 K. The Antoine equation is used to calculate
-            \(p^{\mathrm{sat}}\):</p>
+            saturation pressure \(P^{\mathrm{sat}}\) at 300 K. The Antoine equation is used to calculate
+            \(P^{\mathrm{sat}}\):</p>
           <p style="text-align:center;">
             \[
-            p^{\mathrm{sat}} = 10^{A - \frac{B}{\mathrm{T_c} + C}},
+            P^{\mathrm{sat}} = 10^{A - \frac{B}{\mathrm{T_c} + C}},
             \]
           </p>
-          <p>where \(p^{\mathrm{sat}}\) is in bar, \(T_{\mathrm{c}}\) is temperature (&deg;C), and \(A, B, C\) are
+          <p>where \(P^{\mathrm{sat}}\) is in bar, \(T_{\mathrm{c}}\) is temperature (&deg;C), and \(A, B, C\) are
             Antoine constants.
             The total moles \(n\) are equal to the liquid moles \(n^\ell\) plus the vapor moles \(n^v\):</p>
           <p style="text-align:center;">
             \[
             n = n^\ell + n^v,\quad
             n^\ell = \rho^\ell\,V^\ell,\quad
-            n^v = \frac{p^{\mathrm{sat}}\,V^v}{R\,T},
+            n^v = \frac{P^{\mathrm{sat}}\,V^v}{R\,T},
             \]
           </p>
           <p>where \(\rho^\ell\) is the liquid molar density (mol/L), \(R\) is the ideal‐gas constant
@@ -141,7 +141,7 @@
             volume is found by rearranging the total‐moles equation:</p>
           <p style="text-align:center;">
             \[
-            V^\ell = \frac{n - \dfrac{p\,V_{\mathrm{can}}}{R\,T}}{\rho^\ell - \dfrac{p}{R\,T}},
+            V^\ell = \frac{n - \dfrac{P\,V_{\mathrm{can}}}{R\,T}}{\rho^\ell - \dfrac{P}{R\,T}},
             \quad
             V^v = V_{\mathrm{can}} - V^\ell.
             \]
@@ -150,7 +150,7 @@
           <p>From an unsteady‐state mole balance:</p>
           <p style="text-align:center;">
             \[
-            \frac{dn}{dt} = -\alpha\,(p^{\mathrm{sat}} - 1),
+            \frac{dn}{dt} = -\alpha\,(P^{\mathrm{sat}} - 1),
             \]
           </p>
           <p>at \(t=0\), \(n = n_0\); where \(\alpha\) is a constant (mol/(bar·s)) and the outside air pressure is 1

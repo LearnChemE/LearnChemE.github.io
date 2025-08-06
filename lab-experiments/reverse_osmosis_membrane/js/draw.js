@@ -1,82 +1,213 @@
 import { calcAll } from "./calc.js";
-/* 
-  Basic placeholders for a p5.js canvas and simple 
-  calculation stubs for demonstration.
-  Expand or replace these with actual RO logic.
-*/
-
-let g = {
-  feedPressure: 10,
-  saltConc: 0.5,
-  feedTemp: 15,
-};
-
+import { reset } from "./reset.js";
+import { deltaHWaterInCone } from "./calc.js";
+import { deltaRWaterInCone } from "./calc.js";
 let graphicsWrapper = document.getElementById("graphics-wrapper");
-
-// This is the size of the canvas. I set it to 800x600, but it could
-// be any arbitrary height and width.
+let digitalReadoutFont;
+let permeateBeakerX = 769;
+let permeateBeakerY = 337;
+let retentateBeakerX = 995;
+let retentateBeakerY = 337;
+let zoom = 1;
+let offsetX = 0;
+let offsetY = 0;
+let startX, startY;
+let dragging = false;
+let zoomX = 320;
+let zoomY = 270;
+let zoomMin = 1;
+let zoomMax = 6;
 let containerDims = [1280, 600];
+
+//preload for loading images and fonts
+window.preload = function () {
+  digitalReadoutFont = loadFont("./assets/digital-7.ttf");
+};
 
 window.setup = function () {
   // Create the p5.js canvas inside #graphics-wrapper
   createCanvas(graphicsWrapper.offsetWidth, graphicsWrapper.offsetHeight).parent(graphicsWrapper);
   handleCanvasSize();
   handleMouseScaling();
+
+  console.log("Script running");
+
+  const resetBtn = document.getElementById("resetButton");
+  if (resetBtn) {
+    console.log(" Reset button found");
+    resetBtn.addEventListener("click", () => {
+      console.log("Reset Button clicked");
+      reset();
+      resetZoom();
+    });
+  } else {
+    console.error("Reset button not found!");
+  }
 };
+
+function mouseCoordinate() {
+  const s = zoom;
+  const tx = -zoomX * (s - 1);
+  const ty = -zoomY * (s - 1);
+
+  const wx = (mouseX - tx) / s;
+  const wy = (mouseY - ty) / s;
+
+  return [wx, wy];
+}
 
 //the mouse clicked controls any mouse clicking actions
 window.mouseClicked = function () {
+  const [mx, my] = mouseCoordinate();
+
+  handleMouseScaling();
+
   //pump switch interaction, this turns the pump on and off
-  if (430 < window.mX && window.mX < 492 && 390 < window.mY && window.mY < 440) {
+  let mouseCorrectionX = mouseX;
+  let mouseCorrectionY = mouseY;
+
+  if (380 < mX && mX < 442 && 390 < mY && mY < 440) {
     state.pumpOn = !state.pumpOn;
   }
 
+  console.log("mouse X: " + mX);
+  console.log("mouse Y: " + mY);
+  console.log(zoom);
+
   //mouse click rectangle for switch
-  /*  push();
+  push();
+  translate(50, 0);
   stroke("red");
   noFill();
   rectMode(CORNERS);
-  rect(430, 390, 492, 440);
-  pop(); */
+  rect(380, 390, mX, mY);
+  pop();
 };
 
+window.mouseWheel = function (event) {
+  // Prevent default scrolling
+  event.preventDefault();
+
+  // Calculate zoom factor based on scroll direction
+  const zoomFactor = event.deltaY > 0 ? 0.95 : 1.05;
+
+  // Calculate new zoom level
+  let newZoom = zoom * zoomFactor;
+
+  // Clamp zoom level between min and max
+  newZoom = constrain(newZoom, zoomMin, zoomMax);
+
+  if (newZoom !== zoomMin) {
+    const dz = newZoom - zoom;
+    const zdif = newZoom - zoomMin;
+    const oldZoom = zoom - zoomMin;
+    const zoomXConst = (oldZoom * zoomX + mouseX * dz) / zdif;
+    const zoomYConst = (oldZoom * zoomY + mouseY * dz) / zdif;
+
+    zoomX = constrain(zoomXConst, 0, graphicsWrapper.offsetWidth);
+    zoomY = constrain(zoomYConst, 0, graphicsWrapper.offsetHeight);
+  } else {
+    zoomX = 300;
+    zoomY = 270;
+  }
+
+  zoom = newZoom;
+
+  return false;
+};
+
+window.mousePressed = function () {
+  state.dragging = true;
+  offsetX = mouseX;
+  offsetY = mouseY;
+};
+
+window.mouseReleased = () => {
+  state.dragging = false;
+};
+
+window.mouseDragged = function () {
+  // For bounds
+  const graphicsWrapper = document.getElementById("graphics-wrapper");
+  // Subtract the difference from the offset vector times the zoom for tracking
+  zoomX -= (mouseX - offsetX) * 0.8;
+  zoomY -= (mouseY - offsetY) * 0.8;
+
+  offsetX = mouseX;
+  offsetY = mouseY;
+  // Constrain so the apparatus doesn't go offscreen
+  zoomX = constrain(zoomX, 0, graphicsWrapper.offsetWidth);
+  zoomY = constrain(zoomY, 0, graphicsWrapper.offsetHeight);
+
+  // Update mX and mY, because changing the zoom coordinates will change these
+  [mouseX, mouseY] = mouseCoordinate();
+};
+
+function Zoom() {
+  // Calculate and apply matrix
+  const s = zoom;
+  const zx = -zoomX * (s - 1);
+  const zy = -zoomY * (s - 1);
+  applyMatrix(s, 0, 0, s, zx, zy);
+}
+
+function resetZoom() {
+  zoom = 1;
+  offsetX = 0;
+  offsetY = 0;
+  startX, startY;
+  dragging = false;
+}
+
 window.draw = function () {
+  /* translate(offsetX, offsetY);
+  scale(zoom); */
+
+  state.width = containerDims[0];
+  state.height = containerDims[1];
+  [mouseX, mouseY] = mouseCoordinate();
+  // drag();
+
+  push();
+  // translate(150, -240);
+  Zoom();
+
+  translate(-50, 0);
+
   handleScaling();
   background(255);
-  frameRate(30);
+  frameRate(state.frameRate);
   calcAll();
 
-  // Title and parameters display first
-  /* textSize(18);
-  fill(0);
-  text("Reverse Osmosis Visualization", 20, 30);
-  textSize(16);
-  text(`Feed Pressure: ${g.feedPressure.toFixed(1)} bar`, 20, 60);
-  text(`Salt Concentration: ${g.saltConc.toFixed(2)}%`, 20, 85);
-  text(`Feed Temp: ${g.feedTemp} °C`, 20, 110); */
-
-  // Draw pipe first so it appears behind everything
-  //drawPipeAndPump(150, 250);
-
   //drain and beaker fill settings
-  if (state.pumpOn === true && -state.saltTankHeight - 1 + state.topOfTankDrainTimer + 15 < 0) {
+  if (state.pumpOn === true && (state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate < state.saltTankHeight - 15) {
     state.topOfTankDrainTimer++;
   }
 
   if (
     state.pumpOn === true &&
-    -state.saltTankHeight - 1 + state.topOfTankDrainTimer + 15 == 0 &&
-    state.bottomOfTankDrainTimer * state.flowRate - state.saltTankHeight / 10 < 0
+    (state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate >= state.saltTankHeight - 15 &&
+    state.doneDrainingTank == false
   ) {
-    state.bottomOfTankDrainTimer += 1;
+    state.bottomOfTankDrainTimer++;
+
+    const deltaR = deltaRWaterInCone(state.hConePx) / state.frameRate;
+    state.rConePx -= deltaR;
+
+    const deltaH = deltaHWaterInCone(state.hConePx) / state.frameRate;
+    state.hConePx -= deltaH;
   }
 
-  if (state.bottomOfTankDrainTimer * state.flowRate - state.saltTankHeight / 10 > 0) {
+  if (state.hConePx < 0) {
     state.doneDrainingTank = true;
   }
-  if (state.doneDrainingTank === true && state.pumpOn === true) {
-    state.tankToPumpDrainTimer += 1;
+
+  if (state.doneDrainingTank == true) {
+    state.pumpOn = false;
   }
+  /* if (state.doneDrainingTank === true && state.pumpOn === true) {
+    state.tankToPumpDrainTimer += 1;
+  } */
 
   //fill beakers
   if (state.pumpOn === true) {
@@ -92,6 +223,17 @@ window.draw = function () {
   }
   if (state.retentateBeakerFillUp === true) {
     state.rententateBeakerTimer += 0.5;
+  }
+
+  //Error for backwards pressure flow
+  if (state.backwardsFlow == true) {
+    state.pumpOn = false;
+
+    push();
+    fill("red");
+    textSize(14);
+    text("error! osmotic pressure is greater than pressure drop, flux is negative, RO cannot occur.", 200, 70);
+    pop();
   }
 
   /*  if (
@@ -113,20 +255,150 @@ window.draw = function () {
   } */
 
   // Draw pipes first, then water, then pipe connectors and equipment meant to cover the water
+
   drawSaltTank(state.figureX, state.figureY);
   drawPressureGauge(state.figureX, state.figureY);
   drawFilter(state.figureX, state.figureY);
   drawWater(state.figureX, state.figureY);
-  drawBeaker(769, 337, state.permeateBeakerWidth, state.permeateBeakerHeight, "permeate"); //drawBeaker(x, y, beakerWidth, beakerHeight, beakerType)
-  drawBeaker(995, 337, state.retentateBeakerWidth, state.retentateBeakerHeight, "retentate");
+  drawBeaker(permeateBeakerX, permeateBeakerY, state.permeateBeakerWidth, state.permeateBeakerHeight, "permeate"); //drawBeaker(x, y, beakerWidth, beakerHeight, beakerType)
+  drawBeaker(retentateBeakerX, retentateBeakerY, state.retentateBeakerWidth, state.retentateBeakerHeight, "retentate");
   drawPumpSwitch(state.figureX, state.figureY, state.pumpOn);
   drawPump(state.figureX, state.figureY);
+  //call this after so vaiables update correctly, the variables are in the drawWater().
+  drawSaltConductivityMeters(1006, 275, "permeate");
+  drawSaltConductivityMeters(1215, 275, "retentate");
 
   //draw text last so it appears over the water
   drawTextOnTopOfDiagram(state.figureX, state.figureY);
+  sliderControls();
 
   state.frameCount++;
 };
+
+function drawSaltConductivityMeters(x, y, waterType) {
+  let beakersAreFilling = false;
+
+  let retentateWaterTY =
+    state.figureY +
+    373 -
+    (state.deltaHeightRetentateBeaker * state.topOfTankDrainTimer) / state.frameRate -
+    (state.deltaHeightRetentateBeaker * state.bottomOfTankDrainTimer) / state.frameRate;
+  let retentateWaterBY = state.figureY + 373;
+  let retentateWaterLX = state.figureX + 828;
+  let retentateWaterRX = state.figureX + 1012;
+
+  let permeateWaterTY =
+    state.figureY +
+    373 -
+    (state.deltaHeightPermeateBeaker * state.topOfTankDrainTimer) / state.frameRate -
+    (state.deltaHeightPermeateBeaker * state.bottomOfTankDrainTimer) / state.frameRate;
+  let permeateWaterBY = state.figureY + 373;
+  let permeateWaterLX = state.figureX + 603;
+  let permeateWaterRX = state.figureX + 787;
+
+  if (retentateWaterTY - retentateWaterBY == 0 || permeateWaterTY - permeateWaterBY == 0) {
+    beakersAreFilling = false;
+  } else {
+    beakersAreFilling = true;
+  }
+
+  push();
+
+  rectMode(CENTER);
+  fill("gray");
+  rect(x, y, 120, 80, 5, 5, 5, 5);
+  fill("white");
+  rect(x, y - 10, 110, 40, 2, 2, 2, 2);
+
+  textAlign(LEFT, CENTER);
+  textFont(digitalReadoutFont);
+  fill("black");
+  textSize(24);
+  if (waterType == "permeate" && beakersAreFilling == true) {
+    text(state.permateConcentration.toFixed(4), x - 50, y - 10);
+    text("wt%", x + 15, y - 10);
+  }
+  if (waterType == "retentate" && beakersAreFilling == true) {
+    text(state.retentateConcentration.toFixed(4), x - 50, y - 10);
+    text("wt%", x + 15, y - 10);
+  }
+  if (beakersAreFilling == false) {
+    text("0.0000 wt%", x - 50, y - 10);
+  }
+
+  if (waterType == "permeate") {
+    push();
+    noFill();
+    stroke(0);
+    strokeWeight(2);
+    line(x - 60, y, x - 62, y);
+    bezier(x - 62, y, x - 72, y, x - 87, y + 15, x - 87, y + 30);
+    line(x - 87, y + 30, x - 87, y + 200);
+
+    push();
+    translate(-87, 200);
+    strokeWeight(1);
+    fill("LightSlateGrey");
+    beginShape();
+    vertex(x - 2, y);
+    vertex(x - 2, y + 47);
+    vertex(x, y + 52);
+    vertex(x + 2, y + 47);
+    vertex(x + 2, y);
+    vertex(x - 2, y);
+    endShape();
+    pop();
+
+    pop();
+  }
+  if (waterType == "retentate") {
+    push();
+    noFill();
+    stroke(0);
+    strokeWeight(2);
+    line(x - 65, y, x - 61, y);
+    bezier(x - 65, y, x - 64, y - 2, x - 70, y + 7, x - 70, y + 15);
+    line(x - 70, y + 15, x - 70, y + 200);
+
+    push();
+    translate(-70, 200);
+    strokeWeight(1);
+    fill("LightSlateGrey");
+    beginShape();
+    vertex(x - 2, y);
+    vertex(x - 2, y + 47);
+    vertex(x, y + 52);
+    vertex(x + 2, y + 47);
+    vertex(x + 2, y);
+    vertex(x - 2, y);
+    endShape();
+    pop();
+
+    pop();
+  }
+
+  pop();
+}
+
+function sliderControls() {
+  const pressureSlider = document.getElementById("feed-pressure");
+
+  if (state.pumpOn) {
+    pressureSlider.disabled = true;
+  }
+
+  const tempSlider = document.getElementById("feed-temp");
+
+  if (state.pumpOn) {
+    tempSlider.disabled = true;
+  }
+
+  const saltSlider = document.getElementById("salt-conc");
+
+  if (state.pumpOn) {
+    saltSlider.disabled = true;
+  }
+}
 
 function drawTextOnTopOfDiagram(x, y) {
   push();
@@ -541,22 +813,28 @@ function drawWater(x, y) {
   fill("PaleTurquoise");
   beginShape();
 
-  if (-state.saltTankHeight - 1 + state.topOfTankDrainTimer + 15 != 0) {
-    vertex(x - state.saltTankWidth / 2, y - state.saltTankHeight / 2 + 10 + state.topOfTankDrainTimer * state.flowRate);
-    vertex(x + state.saltTankWidth / 2, y - state.saltTankHeight / 2 + 10 + state.topOfTankDrainTimer * state.flowRate);
+  if ((state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate < state.saltTankHeight - 15) {
+    vertex(
+      x - state.saltTankWidth / 2,
+      y - state.saltTankHeight / 2 + 10 + (state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate
+    );
+    vertex(
+      x + state.saltTankWidth / 2,
+      y - state.saltTankHeight / 2 + 10 + (state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate
+    );
   }
-
+  let correctionfactorCyl = 0.875;
   if (state.doneDrainingTank === true) {
     endShape();
   } else {
     vertex(
-      x + state.saltTankWidth / 2 - 3.5 * (state.bottomOfTankDrainTimer * state.flowRate),
-      y + state.saltTankHeight / 2 - 5 + state.bottomOfTankDrainTimer * state.flowRate
+      x + state.saltTankWidth / 2 - correctionfactorCyl * (state.saltTankWidth / 2 - state.rConePx),
+      y + state.saltTankHeight / 2 - 5 + (state.saltTankConeWaterDepth - state.hConePx)
     );
     vertex(x, y + state.saltTankHeight / 2 + 24);
     vertex(
-      x - state.saltTankWidth / 2 + 3.5 * (state.bottomOfTankDrainTimer * state.flowRate),
-      y + state.saltTankHeight / 2 - 5 + state.bottomOfTankDrainTimer * state.flowRate
+      x - state.saltTankWidth / 2 + correctionfactorCyl * (state.saltTankWidth / 2 - state.rConePx),
+      y + state.saltTankHeight / 2 - 5 + (state.saltTankConeWaterDepth - state.hConePx)
     );
     endShape();
   }
@@ -570,14 +848,14 @@ function drawWater(x, y) {
   noStroke();
 
   fill("white");
-  rect(x - 10, y + state.saltTankHeight / 2 + 38 - 19, x - 10 + 20, y + state.saltTankHeight / 2 + 38 + 22);
+  rect(x - 10, y + state.saltTankHeight / 2 + 40 - 19, x - 10 + 20, y + state.saltTankHeight / 2 + 38 + 22);
   rectMode(CORNERS);
   fill("white");
   rect(x - 10, y + state.saltTankHeight / 2 + 59, x - 10 + 156, y + state.saltTankHeight / 2 + 59 + 20, 0, 0, 0, 10);
 
   rectMode(CORNERS);
   fill("PaleTurquoise");
-  rect(x - 10, y + state.saltTankHeight / 2 + 38 - 19 + state.tankToPumpDrainTimer, x - 10 + 20, y + state.saltTankHeight / 2 + 38 + 22);
+  rect(x - 10, y + state.saltTankHeight / 2 + 40 - 19 + state.tankToPumpDrainTimer, x - 10 + 20, y + state.saltTankHeight / 2 + 38 + 22);
   rectMode(CORNERS);
   fill("PaleTurquoise");
   rect(x - 10, y + state.saltTankHeight / 2 + 59, x - 10 + 156, y + state.saltTankHeight / 2 + 59 + 20, 0, 0, 0, 10);
@@ -653,6 +931,24 @@ function drawWater(x, y) {
 
   //---------------------Beakers---------------------
 
+  let retentateWaterTY =
+    state.figureY +
+    373 -
+    (state.deltaHeightRetentateBeaker * state.topOfTankDrainTimer) / state.frameRate -
+    (state.deltaHeightRetentateBeaker * state.bottomOfTankDrainTimer) / state.frameRate;
+  let retentateWaterBY = state.figureY + 373;
+  let retentateWaterLX = state.figureX + 828;
+  let retentateWaterRX = state.figureX + 1012;
+
+  let permeateWaterTY =
+    state.figureY +
+    373 -
+    (state.deltaHeightPermeateBeaker * state.topOfTankDrainTimer) / state.frameRate -
+    (state.deltaHeightPermeateBeaker * state.bottomOfTankDrainTimer) / state.frameRate;
+  let permeateWaterBY = state.figureY + 373;
+  let permeateWaterLX = state.figureX + 603;
+  let permeateWaterRX = state.figureX + 787;
+
   push();
   translate(0, -75);
 
@@ -661,20 +957,11 @@ function drawWater(x, y) {
 
   //retentate
   fill(170, 255, 230, 180); //retentate green
-  if (state.rententateBeakerTimer <= (state.retentateBeakerHeight - state.beakerThickness) * (10 / 11) * state.fractionFillRetentateBeaker) {
-    rect(x + 828, y + 373 - state.rententateBeakerTimer, x + 1012, y + 373);
-  } else {
-    rect(x + 828, y + 373 - (state.retentateBeakerHeight - state.beakerThickness) * (10 / 11) * state.fractionFillRetentateBeaker, x + 1012, y + 373);
-  }
+  rect(retentateWaterLX, retentateWaterTY, retentateWaterRX, retentateWaterBY);
 
   //permeate
   fill(224, 255, 255, 180); //permeate blue
-
-  if (state.permeateBeakerTimer <= (state.permeateBeakerHeight - state.beakerThickness) * (10 / 11) * state.fractionFillPermeateBeaker) {
-    rect(x + 603, y + 373 - state.permeateBeakerTimer, x + 787, y + 373);
-  } else {
-    rect(x + 603, y + 373 - (state.permeateBeakerHeight - state.beakerThickness) * (10 / 11) * state.fractionFillPermeateBeaker, x + 787, y + 373);
-  }
+  rect(permeateWaterLX, permeateWaterTY, permeateWaterRX, permeateWaterBY);
 
   pop();
   pop();
@@ -738,7 +1025,14 @@ function drawBeaker(x, y, beakerWidth, beakerHeight, beakerType) {
   strokeWeight(0.2);
   textAlign(CENTER, CENTER);
   textSize(16);
-  text(beakerType, x + beakerWidth / 2 - 48, y);
+  if (beakerType == "permeate") {
+    //text(beakerType, x + beakerWidth - 50, y);
+    text(beakerType, x + beakerWidth / 2 - 48, y);
+  }
+  if (beakerType == "retentate") {
+    text(beakerType, x + beakerWidth / 2 - 48, y);
+  }
+
   pop();
 
   pop();

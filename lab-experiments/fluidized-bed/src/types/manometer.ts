@@ -109,6 +109,7 @@ class VaryingTube {
      * @returns Promise<void>
      */
     public setTargetTimeDelay = async (target: number, timeDelay: number) => {
+        target = Math.max(target, 0.001);
         if (timeDelay > 0) setTimeout(() => {
             this.target = target;
             this.animate();
@@ -182,14 +183,17 @@ export class Manometer {
     private initRight: boolean = false;
 
     constructor() {
+        const rect = document.getElementById("Tube_6") as unknown as SVGAElement;
+        const bounds = rect.getBBox();
+        // Get the bounding box and use to find bottom and height of manometer tube section
+        this.bottom = bounds.y + bounds.width;
+        this.height = bounds.width;
+
+        // Initialize tubes
         this.inTube  = new VaryingTube("Tube_6" , TubeDirection.Left, 5000); // 6 for left
         this.outTube = new VaryingTube("Tube_15", TubeDirection.Left, 5000); // 14 for right
 
-        // Get the bounding box and use to find bottom and height of manometer tube section
-        const rect = document.getElementById("Tube_16") as unknown as SVGAElement;
-        const bounds = rect.getBBox();
-        this.bottom = bounds.y + bounds.width;
-        this.height = bounds.width;
+        console.log(`height: ${this.height}\nbottom: ${this.bottom}`)
 
         this.baseElement = document.getElementById("Beaker Fill") as unknown as SVGAElement;
     }
@@ -209,13 +213,13 @@ export class Manometer {
         // Calculate height in pixels
         const base = this.baseElement.getBBox().y; // fill line of beaker
         // Add pump pressure. Sign should be negative because y pixels go down, and multiply by 5 pixels per cm water
-        const pump = 2.45 * pumpPressure(); // pixels water
-        const drop = 2.45 * pressureDrop(); // pixels water
+        const pump = 1.95 * pumpPressure(); // pixels water
+        const drop = 1.95 * pressureDrop(); // pixels water
         var left = base - pump;
         var right = left + drop;
 
         // Convert to 0-1 range for tube
-        left = (this.bottom - left) / this.height;
+        left  = (this.bottom -  left) / this.height;
         right = (this.bottom - right) / this.height;
 
         // Set the left tube only

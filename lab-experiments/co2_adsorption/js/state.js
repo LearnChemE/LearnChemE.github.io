@@ -215,3 +215,10 @@ export function resetDrawingState() {
 }
 
 export function setOutletMoleFraction(value) { outletMoleFraction = value; }
+
+// I'm going to follow the getter-setter global pattern here, but I don't like it. If your state is this messy, organize it into some objects or something. -Drew
+
+// Temperature of the reactor in Kelvin (previously a const in config.js)
+export var tempKelvin = 298; // Temperature in K
+export function setTemperature(newtemp) { tempKelvin = newtemp };
+export function getTemperature() { return tempKelvin };

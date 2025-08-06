@@ -25,13 +25,23 @@
   grid-template-columns: 100px 100px 100px;
   justify-content: center;
   gap: 10px;
-}
 
-#pump-btn {
-  grid-column: span 3;
-  grid-row: 2;
-  width: 150px;
-  justify-self: center;
+  .btn {
+    width: 100px;
+  }
+
+  #pump-btn {
+    grid-column: 1;
+    grid-row: 2;
+    width: 150px;
+    justify-self: left;
+  }
+
+  #reset-btn {
+    grid-column: 3;
+    width: 150px;
+    justify-self: right;
+  }
 }
 
 #graphics-wrapper {

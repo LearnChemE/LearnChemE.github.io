@@ -9,9 +9,9 @@ import State from "./state";
  * @returns constrained value for x
  */
 export function constrain(x: number, min: number, max: number) {
-    if (min > max) {
-        throw new Error("Bad range for constrain: min must be less than max");
-    }
+    // if (min > max) {
+    //     throw new Error("Bad range for constrain: min must be less than max");
+    // }
 
     if (x < min) x = min;
     if (x > max) x = max;
@@ -44,7 +44,7 @@ export function lerp(a: number, b: number, t: number) {
  * @returns Number with new scale
  */
 export function rescale(x: number, a: number, b: number, c: number, d: number, constrain: boolean=false) {
-    if (a > b || c > d) throw new Error("Rescale bounds inverted");
+    // if (a > b || c > d) throw new Error("Rescale bounds inverted");
 
     x = (x - a) / (b - a);
     x = x * (d - c) + c;
@@ -81,7 +81,7 @@ export function smoothLerp(duration: number, updateCallback: (t: number) => void
             // Calculate the interpolation factor t (from 0 to 1)
             let increment = deltaTime / duration;
             if (useValveLift) {
-                console.log(`Valve lift of ${State.valveLift} modifying animation!`);
+                // console.log(`Valve lift of ${State.valveLift} modifying animation!`);
                 increment *= State.valveLift;
             }
             fill = Math.min(fill + increment, 1); // Ensure fill doesn't go beyond 1

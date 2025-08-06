@@ -1,6 +1,6 @@
 import { off } from '@svgdotjs/svg.js';
 import * as config from '../js/config.js';
-import { massSiO2WithoutRecycle, massSiO2WithRecycle } from '../js/calc.js';
+import { massSiO2WithoutRecycle, massSiO2WithRecycle, splitFlows } from '../js/calc.js';
 
 // Helper to pause execution in async functions
 function sleep(ms) {
@@ -52,40 +52,43 @@ let timerId = null;
 let reactorIsOpen = false;
 let gasFlowingToReactor = false;
 let flowRate = null;
+let flowRate1 = null;
 let gasFlowRateDevice = null;
+let gasFlowRateDevice1 = null;
+let reactorInletHoodArrow = null;
+let reactorInletHood = null;
+let reactorOutletHoodArrow = null;
+let reactorOutletHood = null;
 
-export function startDepositionTimer(interval = 1000) {
+export function startDepositionTimer(draw, interval = 1000) {
   // If a timer is already running, clear it first
   if (timerId) {
     clearInterval(timerId);
     timerId = null;
   }
   let elapsedSeconds = 0;
-  let rate  = 0
+  let rate = 0;
   timerId = setInterval(() => {
     // Calculate mass rate [g/s] and update elapsed time
     if (gasFlowingToReactor && reactorIsOpen) {
-      if (recycleRatio > 0) {
-        rate = massSiO2WithRecycle(1, 0.002, 0.65, recycleRatio);
+      const R = Number(recycleRatio);
+      if (R > 0) {
+        rate = massSiO2WithRecycle(1, 0.0034, 0.65, R);
+        const { fresh, recycle } = splitFlows(1, R);
+        gasFlowRate1(draw, recycle);
       } else {
-        rate = massSiO2WithoutRecycle(1, 0.002, 0.65);
+        rate = massSiO2WithoutRecycle(1, 0.0034, 0.65);
       }
-      
       elapsedSeconds += interval / 1000;
-      
       // Increment accumulated mass
       accumulatedMass += rate * (interval / 1000);
-      
       window.massTextEl.text(`mass gain: ${accumulatedMass.toFixed(3)} g`);
-      console.log(
-        `Time: ${elapsedSeconds.toFixed(1)} s — Rate: ${rate.toFixed(5)} g/s — Accumulated: ${accumulatedMass.toFixed(5)} g`
-      );
+      // console.log(
+      //   `Time: ${elapsedSeconds.toFixed(1)} s — Rate: ${rate.toFixed(5)} g/s — Accumulated: ${accumulatedMass.toFixed(5)} g`
+      // );
     }
-    
     // Log formatted output
-    
   }, interval);
-  
   return timerId;
 }
 
@@ -110,10 +113,6 @@ export function drawFigure(draw) {
   drawHorizontalCVDReactor(draw, 400, 50, 200, 60);
   createInteractiveValve(draw, 250, 80, true);
   createVerticalValve(draw, 22.5, 250);
-  // valve = createInteractiveValve(draw, 900, 80, false);
-  // valve.rotate(90, 900, 80);
-  // valve1 = createInteractiveValve(draw, 250, 280, false);
-  // valve1.rotate(90, 250, 280);
   drawPipes(draw);
   recycleValve = drawCutoffValve(draw, 900, 300, 40);
   drawHoodString(draw);
@@ -129,16 +128,19 @@ export function drawFigure(draw) {
   const connector = drawThreeWayValve(draw, 860, 62.5);
   connector.rotate(180, 891.5, 81);
   
-  const connector2 = drawThreeWayValve(draw, 200, 300);
-  connector2.rotate(180, 237, 298.5);
+  const connector2 = drawThreeWayValve(draw, 220, 300);
+  connector2.rotate(180, 257, 298.5);
   
   draw.text('furnace')
   .font({ family: 'Arial', size: 14, anchor: 'start', strokeColor: '#000' })
   .fill('black')
   .move(667.5, 160);
   
-  gasFlowRateDevice = addSVGImage(draw, 'assets/gasFlowRateDevice.svg', 230, 116, 135, 100);
+  gasFlowRateDevice = addSVGImage(draw, 'assets/gasFlowRateDevice.svg', 220, 115, 135, 135 * 6 / 8);
   gasFlowRate(draw, false); // Initially off
+
+  gasFlowRateDevice1 = addSVGImage(draw, 'assets/gasFlowRateDevice.svg', 420, 105, 135, 135 * 6 / 8).rotate(90, 200 + 150 / 2, 115 + 150 * 6 / 8 / 2);
+  gasFlowRate1(draw, 0); // Initially off
 }
 
 function drawGasCylinder(draw, x, y, label) {
@@ -188,11 +190,42 @@ function drawGasCylinder(draw, x, y, label) {
   }
   
   function gasFlowRate(draw, on = True) {
-    flowRate = draw.text(on ? '1 mol/s' : '0 mol/s')
-    .font({ family: 'Arial', size: 10, anchor: 'start', strokeColor: '#000' })
+    if (flowRate) {
+      flowRate.clear();
+    }
+    flowRate = draw.text(on ? `1.00 
+      mol/s` : `0.00
+       mol/s`)
+    .font({ family: 'Arial', size: 12, anchor: 'middle', strokeColor: '#000' })
     .fill('black')
-    .move(280.5, 140);
+    .center(287.5, 145);
+    flowRate.front();
   }
+
+function gasFlowRate1(draw, value = 0) {
+  if (flowRate1) {
+    flowRate1.clear();
+  }
+  // Format value in multiples of 10^-4, e.g., 0.0034 -> 34.00×10⁻⁴
+  // Use helper if exists, else inline formatting
+  // let formatted;
+  // if (typeof formatAs10PowMinus4 === 'function') {
+  //   formatted = formatAs10PowMinus4(value);
+  // } else {
+  //   formatted = (value === 0 || value === null || typeof value === 'undefined')
+  //     ? '0'
+  //     : `${(value / 1e-4).toFixed(2)}×10⁻⁴`;
+  // }
+  // console.log(value);
+  flowRate1 = draw.text(`${(value).toFixed(2)} 
+  mol/s`)
+    .font({ family: 'Arial', size: 12, anchor: 'middle', strokeColor: '#000' })
+    .fill('black')
+    .center(487.5, 135)
+    .rotate(90, 200 + 150 / 2, 115 + 150 * 6 / 8 / 2);
+
+  if (flowRate1 && typeof flowRate1.front === 'function') flowRate1.front();
+}
   
   function createNozzle(draw, group, x, y) {
     // First rectangle
@@ -390,16 +423,29 @@ function drawGasCylinder(draw, x, y, label) {
   }
   
   async function animateFLowToReactor(draw) {
+    gasFlowRateDevice.front();
+    flowRate.front();
+    gasFlowRateDevice1.front();
+    flowRate1.front();
     if (isPumpOn && multiValvePosition === 0 && gasValveOpen) {
       gasFlowingToReactor = true;
       animateWaterFlow(draw, window.leftPipe4El, 0, 100, undefined, undefined, undefined, 'reactor');
-      startDepositionTimer(1000);
+      startDepositionTimer(draw, 1000);
       await sleep(100);
       animateWaterFlow(draw, window.leftPipe5El, 0, 100, undefined, undefined, undefined, 'reactor');
       await sleep(100);
       animateWaterFlow(draw, window.leftPipe6El, 0, 100, undefined, undefined, undefined, 'reactor');
       recycleValve.front();
+      reactorInletHood.hide();
+      reactorInletHoodArrow.hide();
     } else {
+      if (isPumpOn && gasValveOpen) {
+        reactorInletHood.show();
+        reactorInletHoodArrow.show();
+      } else {
+        reactorInletHood.hide();
+      reactorInletHoodArrow.hide();
+      }
       gasFlowingToReactor = false;
       clearInterval(timerId);
       timerId = null;
@@ -453,6 +499,7 @@ function drawGasCylinder(draw, x, y, label) {
       group.click(() => {
         group.isOpen = !(group.isOpen);
         gasValveOpen = group.isOpen;
+        updateFlowMeterDisplay(draw, flowRate);
         if (!group.isOpen) {
           // Stop all flows when vertical valve closes
           draw.find('path')
@@ -503,12 +550,12 @@ function drawGasCylinder(draw, x, y, label) {
       
       const leftPipe2Path = `
     M ${startX + 163} ${startY - 27.5}
-    L ${startX + 163 + 42} ${startY - 27.5}
+    L ${startX + 163 + 62} ${startY - 27.5}
   `;
       window.leftPipe2El = drawPipeWithCurves(draw, leftPipe2Path, 4);
       
       const leftPipe2_1Path = `
-    M ${startX + 237} ${startY - 27.5}
+    M ${startX + 255} ${startY - 27.5}
     L ${startX + 250 + 26} ${startY - 27.5}
   `;
       window.leftPipe2_1El = drawPipeWithCurves(draw, leftPipe2_1Path, 4);
@@ -536,17 +583,14 @@ function drawGasCylinder(draw, x, y, label) {
       leftPipe6 = `
     M ${startX + 870} ${startY - 209}
     L ${startX + 870} ${startY + 10}
-      
-    // L ${startX + 220} ${startY + 225}
-    // L ${startX + 220} ${startY + 7}
   `;
       window.leftPipe6El = drawPipeWithCurves(draw, leftPipe6, 4);
       
       const leftPipe7 = `
     M ${startX + 870} ${startY + 10}
     L ${startX + 870} ${startY + 225}
-    L ${startX + 220} ${startY + 225}
-    L ${startX + 220} ${startY - 11.5}
+    L ${startX + 240} ${startY + 225}
+    L ${startX + 240} ${startY - 11.5}
   `;
       window.leftPipe7El = drawPipeWithCurves(draw, leftPipe7, 4);
     }
@@ -672,14 +716,13 @@ function drawGasCylinder(draw, x, y, label) {
         
         // Handle Set button
         button.addEventListener('click', () => {
-          const rate = select.value;
+          const rate = Number(select.value);
           group.flowRate = rate;
           rateText.text("recycle ratio: " + String(group.flowRate));
           console.log('Valve flow-rate set to', rate);
           container.remove();
           recycleRatio = rate;
-          
-          if (rate != 0) {
+          if (rate !== 0) {
             animateRecycleFlow(draw);
             group.front();
           } else {
@@ -687,7 +730,15 @@ function drawGasCylinder(draw, x, y, label) {
             draw.find('path')
             .filter(el => el.attr('data-pipe-side') === 'recycle')
             .forEach(el => el.remove());
+            console.log(isPumpOn, gasValveOpen, recycleRatio, multiValvePosition);
+            if (isPumpOn && gasValveOpen && recycleRatio === 0 && multiValvePosition === 0) {
+              console.log("Stopping flow in recycle pipe");
+              reactorOutletHood.show();
+              reactorOutletHoodArrow.show();
+            }
           }
+          gasFlowRateDevice1.front();
+          flowRate1.front();
         });
         
         // Close dropdown when clicking outside
@@ -709,11 +760,21 @@ function drawGasCylinder(draw, x, y, label) {
     function animateRecycleFlow(draw) {
       if (recycleRatio != 0 && gasValveOpen && multiValvePosition === 0 && isPumpOn) {
         animateWaterFlow(draw, window.leftPipe7El, 0, 100, undefined, undefined, undefined, 'recycle');
+        reactorOutletHood.show();
+        reactorOutletHoodArrow.show();
       } else {
         // Stop flow if rate is zero
         draw.find('path')
         .filter(el => el.attr('data-pipe-side') === 'recycle')
         .forEach(el => el.remove());
+        if (isPumpOn && gasValveOpen && multiValvePosition === 0) {
+          console.log("Stopping flow in recycle pipe");
+          reactorOutletHood.show();
+          reactorOutletHoodArrow.show();
+        } else {
+          reactorOutletHood.hide();
+          reactorOutletHoodArrow.hide();
+        }
       }
       recycleValve.front();
     }
@@ -722,44 +783,40 @@ function drawGasCylinder(draw, x, y, label) {
       if (isPumpOn && gasValveOpen) {
         // Animate flow in pipes 4 and 5
         animateWaterFlow(draw, window.leftPipe3El, 0, 100, undefined, undefined, undefined, 'pump');
-        flowRate.clear();
-        gasFlowRate(draw, true);
-        gasFlowRateDevice.front();
-        flowRate.front();
       } else {
         // Stop flow in pipes 4 and 5
         draw.find('path')
         .filter(el => el.attr('data-pipe-side') === 'pump')
         .forEach(el => el.remove());
-        flowRate.clear();
-        gasFlowRate(draw, false);
       }
     }
     
     function drawHoodString(draw) {
-      draw.text("hood")
+      reactorInletHood = draw.text("hood")
       .font({ family: 'Arial', size: 14, anchor: 'start' })
       .fill('#000')
-      .move(235,0);
+      .move(235,0)
+      .hide();
       
-      drawArrowLine(draw, 250, 45, 250, 20, {
+      reactorInletHoodArrow = drawArrowLine(draw, 250, 45, 250, 20, {
         color: '#ff0000',
         width: 3,
         len: 12,
         base: 8
-      });
+      }).hide();
       
-      draw.text("hood")
+      reactorOutletHood = draw.text("hood")
       .font({ family: 'Arial', size: 14, anchor: 'start' })
       .fill('#000')
-      .move(970,72.5);
+      .move(970,72.5)
+      .hide();
       
-      drawArrowLine(draw, 934, 80, 960, 80, {
+      reactorOutletHoodArrow = drawArrowLine(draw, 934 - 18, 80, 960, 80, {
         color: '#ff0000',
         width: 3,
         len: 12,
         base: 8
-      });
+      }).hide();
     }
     
     function drawPump(draw, x, y, width, height, opacity = 1) {
@@ -791,9 +848,10 @@ function drawGasCylinder(draw, x, y, label) {
         animatePumpFlow(draw);
         animateFLowToReactor(draw);
         animateRecycleFlow(draw);
+        updateFlowMeterDisplay(draw, flowRate);
         if (isOn) {
           handle.animate(200).rotate(40, x + width / 2, y + height / 2);
-          startDepositionTimer(1000);
+          startDepositionTimer(draw, 1000);
         } else {
           handle.animate(200).rotate(-40, x + width / 2, y + height / 2);
           clearInterval(timerId);
@@ -801,6 +859,20 @@ function drawGasCylinder(draw, x, y, label) {
         }
       });
       return switchGroup;
+    }
+    
+    function updateFlowMeterDisplay(draw, flowRate) {
+      // flowRate.clear();
+      if (gasValveOpen && isPumpOn) {
+        if (gasFlowRateDevice && typeof gasFlowRateDevice.front === 'function') {
+          gasFlowRateDevice.front();
+        }
+        gasFlowRate(draw, true);
+      } else {
+        gasFlowRate(draw, false);
+      }
+
+      flowRate.front();
     }
     
     function drawSwitch(draw, x, y, width, height, opacity = 1) {
@@ -879,20 +951,6 @@ function drawGasCylinder(draw, x, y, label) {
       return water;
     }
     
-    /**
-    * Draws a straight line with an arrowhead at the end using an SVG marker.
-    * @param {SVG.Container} draw - The svg.js draw context.
-    * @param {number} x1 - The x-coordinate of the start point.
-    * @param {number} y1 - The y-coordinate of the start point.
-    * @param {number} x2 - The x-coordinate of the end point.
-    * @param {number} y2 - The y-coordinate of the end point.
-    * @param {object} [options] - Optional styling parameters.
-    * @param {string} [options.color='#000'] - Stroke and fill color.
-    * @param {number} [options.width=2] - Stroke width.
-    * @param {number} [options.arrowLength=10] - Length of the arrowhead.
-    * @param {number} [options.arrowWidth=7] - Width of the arrowhead base.
-    * @returns {SVG.Line} The line element with an arrow marker at the end.
-    */
     function drawArrowLine(draw, x1, y1, x2, y2, options = {}) {
       const {
         color = '#000',
@@ -1005,18 +1063,6 @@ function drawGasCylinder(draw, x, y, label) {
     }
     
     
-    /**
-    * Draws a realistic 3-way pipe joint matching the provided SVG shape.
-    * @param {SVG.Container} draw - The svg.js draw context.
-    * @param {number} x - X-coordinate of the junction's top-left corner.
-    * @param {number} y - Y-coordinate of the junction's top-left corner.
-    * @param {number} width - Desired width of the joint.
-    * @param {number} height - Desired height of the joint.
-    * @param {object} [options] - Styling options.
-    * @param {string} [options.color='#888'] - Stroke/fill color.
-    * @param {number} [options.strokeWidth=2] - Stroke width for the main path.
-    * @returns {SVG.G} The group containing the joint graphic.
-    */
     export function drawThreeWayValve(draw, x, y, width = 64, height = 80, options = {}) {
       const {
         color = '#888',
@@ -1061,8 +1107,8 @@ function drawGasCylinder(draw, x, y, label) {
       g.move(x, y)
       return g;
     }
-
-     export function reset(draw) {
+    
+    export function reset(draw) {
       pipeGroup = null; // Global reference to pipe group for drawing pipes
       valve = null
       valve1 = null
@@ -1072,7 +1118,7 @@ function drawGasCylinder(draw, x, y, label) {
       leftPipe1 = null;
       leftPipe2 = null;
       leftPipe3 = null;
-       leftPipe4 = null;
+      leftPipe4 = null;
       leftPipe5 = null;
       leftPipe6 = null;
       recycleRatio = 0;

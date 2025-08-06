@@ -1187,7 +1187,7 @@ function drawGC() {
 function drawComputer() {
   push();
   translate(width - 17, height - 70);
-  scale(0.5);
+  scale(0.65);
   fill(50);
   stroke(0);
   strokeWeight(0.05);
@@ -1203,8 +1203,8 @@ function drawComputer() {
   fill(220);
 
   // Computer screen legs
-  quad(-13, 40, -17, 58, -15, 58, -11, 40);
-  quad(13, 40, 17, 58, 15, 58, 11, 40);
+  quad(-13, 40, -17, 48, -15, 48, -11, 40);
+  quad(13, 40, 17, 48, 15, 48, 11, 40);
 
   fill(190);
 
@@ -1295,21 +1295,21 @@ function drawComputer() {
   // Display the liquid composition after liquid is inject
   if (state.takingSampleTime >= 1) {
     // Composition labels
-    text("SHOWING RESULTS", -19, 6);
+    // text("SHOWING RESULTS", -19, 6);
     push();
-    textSize(2);
+    textSize(3.2);
     textAlign(CENTER, CENTER);
-    const h2textCoord  = [ -11.5, state.graphYVals[0][50] - 2.0 ];
-    const n2textCoord  = [  -1.0, state.graphYVals[1][50] - 2.0 ];
-    const nh3textCoord = [   9.5, state.graphYVals[2][50] - 2.0 ];
+    const h2textCoord  = [ -15.0, 6 ] // state.graphYVals[0][50] - 2.0 ];
+    const n2textCoord  = [   0.0, 6 ] // state.graphYVals[1][50] - 2.0 ];
+    const nh3textCoord = [  14.5, 6 ] // state.graphYVals[2][50] - 2.0 ];
 
-    text(`y    = ${(round(100 * state.outlet.yH2)  / 100).toFixed(2)}`, ...h2textCoord);
-    text(`y    = ${(round(100 * state.outlet.yN2)  / 100).toFixed(2)}`, ...n2textCoord);
+    text(`y   = ${(round(100 * state.outlet.yH2)  / 100).toFixed(2)},`, ...h2textCoord);
+    text(`y   = ${(round(100 * state.outlet.yN2)  / 100).toFixed(2)},`, ...n2textCoord);
     text(`y    = ${(round(100 * state.outlet.yNH3) / 100).toFixed(2)}`, ...nh3textCoord);
-    textSize(1);
-    text("H2" ,  h2textCoord[0] - 2.5,  h2textCoord[1] + .5);
-    text("N2" ,  n2textCoord[0] - 2.5,  n2textCoord[1] + .5);
-    text("NH3", nh3textCoord[0] - 2.5, nh3textCoord[1] + .5);
+    textSize(2.2);
+    text("H2" ,  h2textCoord[0] - 4.2,  h2textCoord[1] + 1.3);
+    text("N2" ,  n2textCoord[0] - 4.2,  n2textCoord[1] + 1.3);
+    text("NH3", nh3textCoord[0] - 3.8, nh3textCoord[1] + 1.3);
     pop();
   } else if (state.takingSampleTime > 0) {
     text("TAKING SAMPLE ...", -18, 6);
@@ -1339,10 +1339,10 @@ function drawTable() {
 
 function drawInstructionText() {
   push();
-  translate(width - 35, 10);
+  translate(width - 67, 20);
   fill(0);
   textSize(3);
-  textAlign(CENTER, TOP);
+  textAlign(LEFT, TOP);
   if (state.tanks.he.valvePosition === 0 || (state.tanks.n2.valvePosition === 0 && state.tanks.nh3.valvePosition === 0 && state.tanks.h2.valvePosition === 0)) {
     text("All reactant tanks or the helium tank is closed.\nOpen the helium tank and at least one\nreactant tank to begin taking measurements.", 0, 0);
   } else if (state.tanks.h2.m === 0 && state.tanks.n2.m === 0 && state.tanks.nh3.m === 0) {
