@@ -28,6 +28,8 @@ export function updateCoilGlow() {
   coilGlowValue = lerp(coilGlowValue, target, 0.05);  // smooth transition
 }
 
+// In your drawReactorBody function, find this section and update:
+
 export function drawReactorBody(temp) {
   push();
   translate(reactorX, reactorY);
@@ -38,11 +40,11 @@ export function drawReactorBody(temp) {
   fill(220);
   rect(0, 0, reactorHeight, reactorWidth, 10); // horizontal reactor
 
-  // Heating coil - coordinated with updated evaporator design
-  let turns = 3; // CHANGED: Fewer turns to match evaporator
-  let spacing = 4;
-  let coilWidth = 6;
-  let startX = 14;
+  // Heating coil - UPDATED: More turns for better visual impact
+  let turns = 10; // CHANGED: Increased from 3 to 6 turns (or try 5, 7, 8)
+  let spacing = 2.5; // CHANGED: Reduced spacing to fit more coils (was 4)
+  let coilWidth = 3;
+  let startX = 8; // CHANGED: Start slightly earlier to fit more coils (was 14)
 
   // Enhanced color logic - chemistry and heater state aware
   let coilColor;
@@ -67,8 +69,8 @@ export function drawReactorBody(temp) {
     arc(x, y, coilWidth, reactorWidth + 2, HALF_PI, -HALF_PI, OPEN);
   }
 
-  // Wiring - adjusted for compact design
-  let entryX = startX - 4;
+  // Wiring - adjusted for more compact coil design
+  let entryX = startX ;
   let entryY = reactorWidth / 2 - (reactorWidth + 2) / 2;
 
   let jointX = reactorHeight / 3;
@@ -76,7 +78,7 @@ export function drawReactorBody(temp) {
 
   bezier(entryX, entryY,
          entryX - 2, entryY + 4,
-         jointX - 8, jointY - 3,
+         jointX - 10, jointY - 3,
          jointX + 3, jointY - 2.5);
 
   let exitX = startX + (turns - 1) * spacing + 3;
@@ -548,7 +550,7 @@ export function getReactorConditions() {
       toCondenser: condenserPathParticles.length,
       toExhaust: exhaustParticles.length
     },
-    valvePosition: window.valveState || "neutral",
+    valvePosition: window.valveState || "toexhaust",
     coordinatedWithEvaporator: {
       liquidMovementActive: window.liquidMovementStartTime !== null,
       evaporatorHeaterOn: window.evaporatorHeaterOn

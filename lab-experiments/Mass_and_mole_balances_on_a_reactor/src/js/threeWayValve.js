@@ -1,17 +1,17 @@
-// threeWayValve.js (Updated to 3-State Animated Version)
+// threeWayValve.js (Updated to 2-State Version: Exhaust ↔ Condenser)
 
 import { reactorX, reactorY, reactorHeight, reactorWidth } from './reactor.js';
 
-export let valveState = "neutral";
-window.valveState = "neutral";
+export let valveState = "toexhaust"; // CHANGED: Start with exhaust instead of neutral
+window.valveState = "toexhaust";
 
 import { valveX, valveY } from './reactor.js';
 
 // === Rotation Animation State ===
-let valveCycleIndex = 0; // 0 = neutral, 1 = to exhaust, 2 = to condenser
-let currentAngle = 180;
-let targetAngle = 180;
-let rotationStartAngle = 180;
+let valveCycleIndex = 0; // CHANGED: 0 = to exhaust, 1 = to condenser (no neutral)
+let currentAngle = 270;  // CHANGED: Start at exhaust position (270°)
+let targetAngle = 270;   // CHANGED: Start at exhaust position
+let rotationStartAngle = 270; // CHANGED: Start at exhaust position
 let rotationStartTime = 0;
 let isRotating = false;
 let rotationDuration = 800;
@@ -34,14 +34,14 @@ export function drawThreeWayValve() {
 
   drawFlowIndicator();
 
-  // Label for direction
+  // UPDATED: Always show label since there's no neutral state
   fill(0);
   noStroke();
   textSize(3);
   textAlign(CENTER, CENTER);
-  if (valveCycleIndex === 1) {
+  if (valveCycleIndex === 0) {
     text("to exhaust", valveX, valveY - 8);
-  } else if (valveCycleIndex === 2) {
+  } else {
     text("to condenser", valveX, valveY - 8);
   }
 }
@@ -77,20 +77,19 @@ function easeInOutQuad(t) {
 export function handleValveClick(mx, my) {
   const d = dist(mx, my, valveX, valveY);
   if (d < 7 && !isRotating) {
-    valveCycleIndex = (valveCycleIndex + 1) % 3;
+    // CHANGED: Toggle between only 2 states (0 ↔ 1)
+    valveCycleIndex = (valveCycleIndex + 1) % 2;
 
     rotationStartTime = millis();
     rotationStartAngle = currentAngle;
     isRotating = true;
 
+    // UPDATED: Only 2 positions now
     if (valveCycleIndex === 0) {
-      targetAngle = 180 + 360 * Math.ceil((currentAngle + 180) / 360);
-      valveState = "neutral";
-    } else if (valveCycleIndex === 1) {
-      targetAngle = 270 + 360 * Math.ceil((currentAngle + 90) / 360);
+      targetAngle = 270;  // To exhaust
       valveState = "toexhaust";
     } else {
-      targetAngle = 360 + 360 * Math.ceil((currentAngle + 0) / 360);
+      targetAngle = 360;  // To condenser (same as 0° but avoids reverse rotation)
       valveState = "tocondenser";
     }
 
@@ -112,12 +111,13 @@ export function drawExhaustCap(x, y) {
 }
 
 export function resetThreeWayValve() {
+  // CHANGED: Reset to exhaust position instead of neutral
   valveCycleIndex = 0;
-  currentAngle = 180;
-  targetAngle = 180;
-  rotationStartAngle = 180;
+  currentAngle = 270;
+  targetAngle = 270;
+  rotationStartAngle = 270;
   isRotating = false;
-  valveState = "neutral";
-  window.valveState = "neutral";
-  console.log("Three-way valve reset complete");
+  valveState = "toexhaust";
+  window.valveState = "toexhaust";
+  console.log("Two-way valve reset to exhaust position");
 }
