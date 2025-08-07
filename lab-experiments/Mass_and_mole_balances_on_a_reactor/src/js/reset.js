@@ -46,17 +46,28 @@ function resetGlobalState() {
   window.condenserCoolingOn = false;
   window.valveState = "toexhaust";
   
+  // NEW: Reset pump and valve states
+  if (typeof window.setPumpPower === 'function') {
+    window.setPumpPower(false);
+  }
+  if (typeof window.setValveOpen === 'function') {
+    window.setValveOpen(false);
+  }
+  
   // Experiment flow control
   window.experimentFlowsActive = false;
   window.experimentState = "IDLE";
   window.experimentElapsedTime = 0;
+  
+  // NEW: Reset drainage state
+  window.experimentDraining = false;
+  window.drainStartTime = null;
   
   // Clear any global timing variables
   window.liquidMovementStartTime = null;
   
   console.log("Global state variables reset");
 }
-
 /**
  * Reset UI controls to initial values
  */

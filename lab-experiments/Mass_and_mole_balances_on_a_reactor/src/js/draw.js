@@ -162,7 +162,7 @@ export function drawAll(temp) {
   // Draw all components (unchanged visual style)
   drawBeaker(30, 88, 1);
   drawHeaterSwitch(12, 65);
-  drawPumpAndSwitch(33, 60, 12, 60);
+  drawPumpAndSwitch(33, 60, 12, 78);
   drawEvaporatorBody(26.5, 40, 55);
   updateCoilGlow();
   drawReactorBody(temp); 
@@ -256,15 +256,32 @@ export function setExperimentComplete() {
     experimentState = "COMPLETE";
     systemMessage = "Target collection reached! Press bulb to measure gas volume";
     
-    // Auto-shutdown: Only evaporator heater
+    //  COMPLETE AUTO-SHUTDOWN SEQUENCE
     if (typeof window.evaporatorHeaterOn !== 'undefined') {
       window.evaporatorHeaterOn = false;
       console.log("Auto-shutdown: Evaporator heater OFF");
     }
     
+    //  NEW: Auto-shutdown pump and valve
+    if (typeof window.pumpPower !== 'undefined') {
+      window.pumpPower = false;
+      console.log("Auto-shutdown: Pump OFF");
+    }
+    
+    if (typeof window.valveOpen !== 'undefined') {
+      window.valveOpen = false;
+      console.log("Auto-shutdown: Valve CLOSED");
+    }
+    
+    // 💧 NEW: Start draining sequence
+    window.experimentDraining = true;
+    window.drainStartTime = millis();
+    console.log("Auto-shutdown: Starting liquid drain-back to beaker");
+    
     console.log("Experiment ready for measurement");
   }
 }
+
 
 // Make available globally
 window.setExperimentComplete = setExperimentComplete;

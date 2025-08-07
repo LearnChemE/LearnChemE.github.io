@@ -205,11 +205,11 @@ function drawPumpPowerSwitch(x, y) {
   push();
   translate(x, y);
 
-  // Curved wire
-  stroke(90);
-  noFill();
-  strokeWeight(1);
-  bezier(18, 18, 4, 32, 10, 20, 3, 30);
+  // // Curved wire
+  // stroke(90);
+  // noFill();
+  // strokeWeight(1);
+  // bezier(18, 18, 4, 32, 10, 20, 3, 30);
 
   // Lever
   push();
@@ -325,18 +325,18 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
     }
     
     // STEP 2: After tube is full, start filling evaporator
-    if (tubeFlowLevel >= 1.0 && evaporatorFluidLevel < 0.4) {
+    if (tubeFlowLevel >= 1.0 && evaporatorFluidLevel < 0.25) {
       evaporatorFluidLevel += 0.0008;
       
       // Initial beaker draining while evaporator fills up
       if (beakerFluidLevel > 0.05) {
-        beakerFluidLevel -= 0.00000012;
+        beakerFluidLevel -= 0.00012;
         beakerFluidLevel = Math.max(0.05, beakerFluidLevel);
       }
     }
     
     // STEP 3: Once evaporator is full, only drain beaker when BUBBLES are actively forming
-    if (tubeFlowLevel >= 1.0 && evaporatorFluidLevel >= 0.4) {
+    if (tubeFlowLevel >= 1.0 && evaporatorFluidLevel >= 0.25) {
       // Check if bubbles are actively being generated (liquid is actually evaporating)
       const heatingTime = boilingStartTime ? millis() - boilingStartTime : 0;
       const bubblesActive = window.evaporatorHeaterOn && 
@@ -346,12 +346,12 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
       
       // Only continue draining beaker if bubbles are actively forming (liquid evaporating)
       if (bubblesActive && beakerFluidLevel > 0.05) {
-        beakerFluidLevel -= 0.0002; // Slower rate when bubble-controlled
+        beakerFluidLevel -= 0.00012; // Slower rate when bubble-controlled
         beakerFluidLevel = Math.max(0.05, beakerFluidLevel);
         
         // Maintain evaporator level (liquid is being vaporized by bubbling)
-        if (evaporatorFluidLevel > 0.35) {
-          evaporatorFluidLevel = 0.4; // Keep topped up as bubbles create space
+        if (evaporatorFluidLevel > 0.20) {
+          evaporatorFluidLevel = 0.25; // Keep topped up as bubbles create space
         }
       }
       // If no bubbles, beaker draining pauses (no evaporation happening)
@@ -368,7 +368,7 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
   if (frameCount % 60 === 0 && shouldLiquidFlow()) { // Every second
     if (tubeFlowLevel < 1.0) {
       console.log(`Phase 1 - Tube filling: ${(tubeFlowLevel * 100).toFixed(1)}%`);
-    } else if (evaporatorFluidLevel < 0.4) {
+    } else if (evaporatorFluidLevel < 0.25) {
       console.log(`Phase 2 - Evaporator filling: ${(evaporatorFluidLevel * 100 / 0.4).toFixed(1)}%, Beaker: ${(beakerFluidLevel * 100).toFixed(1)}%`);
     } else {
       // Show bubble status instead of just heater status
@@ -441,129 +441,143 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
 
     drawingContext.restore();
 
-  // Use global heater state for bubbling logic
-  if (evaporatorFluidLevel > 0.1 && window.evaporatorHeaterOn) {
-    // Start boiling timer if not already started
-    if (!boilingStartTime) boilingStartTime = millis();
-    
-    const heatingTime = millis() - boilingStartTime;
-    
-    // Only start bubbles after heater has been red for 2 seconds (total 5 seconds)
-    if (heatingTime > 5000) {
-      // REMOVED: Auto-turn off pump when bubbles start
-      // No auto-shutdown - pump and valve stay on until manually turned off
+    // CORRECTED: Evaporator bubbling logic - bubbles continue as long as heater is on and liquid exists
+    if (evaporatorFluidLevel > 0.01 && window.evaporatorHeaterOn) {
+      // Start boiling timer if not already started
+      if (!boilingStartTime) boilingStartTime = millis();
       
-      // Add bubbles more frequently but gradually
-      if (bubbles.length < maxBubbles && frameCount % 6 === 0) {
-        bubbles.push({
-          x: -4+random(9, 12), // CHANGED: Adjusted spawn area
-          y: random(bodyHeight-6, bodyHeight-2), // Bottom area where tube enters
-          r: random(1, 2.5),
-          speed: random(0.15, 0.15),
-          floating: false,
-          evaporated: false,
-          alpha: 150
-        });
+      const heatingTime = millis() - boilingStartTime;
+      
+      // Only start bubbles after heater has been red for 2 seconds (total 5 seconds)
+      if (heatingTime > 5000) {
+        // Add bubbles more frequently but gradually
+        if (bubbles.length < maxBubbles && frameCount % 6 === 0) {
+          bubbles.push({
+            x: -4+random(9, 12), // CHANGED: Adjusted spawn area
+            y: random(bodyHeight-6, bodyHeight-2), // Bottom area where tube enters
+            r: random(1, 2.5),
+            speed: random(0.15, 0.15),
+            floating: false,
+            evaporated: false,
+            alpha: 150
+          });
+        }
+        
+        // CORRECTED: Bubbles consume liquid as they evaporate it
+        // If no new liquid is flowing in, bubbles gradually consume existing liquid
+        if (!shouldLiquidFlow() && evaporatorFluidLevel > 0.01) {
+          evaporatorFluidLevel -= 0.0003; // Bubbles consume liquid through evaporation
+          evaporatorFluidLevel = Math.max(0, evaporatorFluidLevel);
+          
+          // Debug logging for consumption
+          if (frameCount % 120 === 0) { // Every 2 seconds
+            console.log(`🔥 Bubbles evaporating liquid: ${(evaporatorFluidLevel * 100 / 0.25).toFixed(1)}% remaining`);
+          }
+        }
       }
-    }
 
-    // Only start liquid movement after bubbles have been going for 3 seconds (total 8 seconds)
-    if (heatingTime > 6500) {
-      if (!liquidMovementStartTime) {
-        liquidMovementStartTime = millis();
-        window.liquidMovementStartTime = liquidMovementStartTime; // ADDED: Set global variable
-        console.log("🔥 LIQUID MOVEMENT STARTED - Bubbles reached top!");
+      // Only start liquid movement after bubbles have been going for 3 seconds (total 8 seconds)
+      if (heatingTime > 6500) {
+        if (!liquidMovementStartTime) {
+          liquidMovementStartTime = millis();
+          window.liquidMovementStartTime = liquidMovementStartTime;
+          console.log("🔥 LIQUID MOVEMENT STARTED - Bubbles reached top!");
+        }
       }
-    }
 
-    // Draw bubbles only if they should exist
-    if (heatingTime > 5000) {
+      // Draw bubbles only if they should exist
+      if (heatingTime > 5000) {
         fill(100, 180, 255, 150);  // pale blue
         noStroke();
 
         const fluidTopY = -10 + 35 * (1 - evaporatorFluidLevel); // move this here
 
-      for (let i = bubbles.length - 1; i >= 0; i--) {
-        let b = bubbles[i];
+        for (let i = bubbles.length - 1; i >= 0; i--) {
+          let b = bubbles[i];
 
-        // Move up until it floats
-        if (!b.floating) {
-          b.y -= b.speed;
-          const evaporatorTop = 2;
-          if (b.y <= evaporatorTop) {
-            b.y = evaporatorTop; 
-            b.floating = true;
-            b.speed = 0;
+          // Move up until it floats
+          if (!b.floating) {
+            b.y -= b.speed;
+            const evaporatorTop = 2;
+            if (b.y <= evaporatorTop) {
+              b.y = evaporatorTop; 
+              b.floating = true;
+              b.speed = 0;
+            }
           }
-        }
 
-        // Fade out after floating
-        if (b.floating) {
-          b.alpha -= 5;
-          if (b.alpha <= 0) {
-            bubbles.splice(i, 1); // Remove when faded
-            continue;
+          // Fade out after floating
+          if (b.floating) {
+            b.alpha -= 5;
+            if (b.alpha <= 0) {
+              bubbles.splice(i, 1); // Remove when faded
+              continue;
+            }
           }
-        }
 
-        // Draw with fading transparency
-        fill(100, 180, 255, b.alpha);
-        noStroke();
-        ellipse(b.x, b.y, b.r * 2);
+          // Draw with fading transparency
+          fill(100, 180, 255, b.alpha);
+          noStroke();
+          ellipse(b.x, b.y, b.r * 2);
+        }
+      }
+    } else {
+      // Clear everything when heater is off OR no liquid left
+      if (!window.evaporatorHeaterOn || evaporatorFluidLevel <= 0.01) {
+        boilingStartTime = null;
+        liquidMovementStartTime = null;
+        window.liquidMovementStartTime = null;
+        bubbles = []; // Clear all bubbles
+        
+        if (evaporatorFluidLevel <= 0.01 && window.evaporatorHeaterOn) {
+          console.log("💧 EVAPORATOR DRIED OUT - No more liquid to evaporate");
+        }
+      }
+    }
+
+    // Create vapor particles when bubbles reach top
+    if (
+      window.evaporatorHeaterOn &&
+      evaporatorFluidLevel > 0.02 &&
+      boilingStartTime &&
+      millis() - boilingStartTime > 7000 &&   // 3s delay after bubbling
+      frameCount % 2 === 0 &&
+      vaporParticles.length < maxVaporParticles
+    ) {
+      vaporParticles.push({
+        x: outletCenterX,
+        y: outletTopY - 2,
+        stage: 'vertical',
+        alpha: 180,
+        speed: random(0.5,1),
+        r: random(1.2, 2.0)
+      });
+    }
+
+    // Draw vapor particles
+    for (let i = vaporParticles.length - 1; i >= 0; i--) {
+      let p = vaporParticles[i];
+      fill(100, 180, 255, p.alpha);
+      noStroke();
+      ellipse(p.x, p.y, p.r);
+
+      if (p.stage === 'vertical') {
+        p.y -= p.speed;
+        p.x = outletCenterX;  // Keep centered in pipe
+        if (p.y <= outletTopY - 20) { // ADJUSTED: positioning
+          p.y = outletTopY - 20;
+          p.stage = 'horizontal';
+        }
+      } else if (p.stage === 'horizontal') {
+        p.x += p.speed;
+        p.y = outletTopY - 20.75;  // ADJUSTED: Lock into horizontal pipe band
       }
 
-    }
-  } else {
-    // Clear everything when global heater is off
-    boilingStartTime = null;
-    liquidMovementStartTime = null;
-    window.liquidMovementStartTime = null; // ADDED: Clear global variable too
-    bubbles = [];
-  }
-
-  // Create vapor particles when bubbles reach top
-  if (
-    window.evaporatorHeaterOn &&
-    evaporatorFluidLevel > 0.02 &&
-    boilingStartTime &&
-    millis() - boilingStartTime > 7000 &&   // 3s delay after bubbling
-    frameCount % 2 === 0 &&
-    vaporParticles.length < maxVaporParticles
-  ) {
-    vaporParticles.push({
-      x: outletCenterX,
-      y: outletTopY - 2,
-      stage: 'vertical',
-      alpha: 180,
-      speed: random(0.5,1),
-      r: random(1.2, 2.0)
-    });
-  }
-
-  // Draw vapor particles
-  for (let i = vaporParticles.length - 1; i >= 0; i--) {
-    let p = vaporParticles[i];
-    fill(100, 180, 255, p.alpha);
-    noStroke();
-    ellipse(p.x, p.y, p.r);
-
-    if (p.stage === 'vertical') {
-      p.y -= p.speed;
-      p.x = outletCenterX;  // Keep centered in pipe
-      if (p.y <= outletTopY - 20) { // ADJUSTED: positioning
-        p.y = outletTopY - 20;
-        p.stage = 'horizontal';
+      // Remove after exiting pipe
+      if (p.x > outletCenterX + elbowLength + 2) {
+        vaporParticles.splice(i, 1);
       }
-    } else if (p.stage === 'horizontal') {
-      p.x += p.speed;
-      p.y = outletTopY - 20.75;  // ADJUSTED: Lock into horizontal pipe band
     }
-
-    // Remove after exiting pipe
-    if (p.x > outletCenterX + elbowLength + 2) {
-      vaporParticles.splice(i, 1);
-    }
-  }
 
     pop();
   }
@@ -593,7 +607,16 @@ export function drawEvaporatorBody(x = 100, y = 50, reactorX = 150) {
   // Use global heater state for coil color
   push();
   translate(0, 10); // ADJUSTED: Center the coil around evaporator
-
+    // Update coil color to match current heater state (handles auto-shutdown)
+  if (!window.evaporatorHeaterOn && heaterColor !== 120) {
+    // If heater is OFF but color is still red, change to gray immediately
+    heaterColor = 120; // Gray when off
+    if (heaterTimer) {
+      clearTimeout(heaterTimer);
+      heaterTimer = null;
+    }
+    console.log("🔧 Visual sync: Heater coil color → Gray (auto-shutdown)");
+  }
   stroke(heaterColor);
   strokeWeight(0.8);
   noFill();
@@ -626,7 +649,7 @@ export function drawHeaterSwitch(x = 100, y = 100) {
   noFill();
   strokeWeight(0.8);
     // Upper wire: from top center to top of evaporator
-  bezier(0, 0, -3, -4, 5, -18, 13, -11); // ADJUSTED: positioning
+  bezier(0, 0, -3, -4, 5, -8, 13, -11); // ADJUSTED: positioning
 
   // Lower wire: from bottom center to bottom of evaporator
   bezier(0, 0, -3, -4, 0, -2, 13, -7); // ADJUSTED: positioning
@@ -721,6 +744,8 @@ export function resetEvaporator() {
     heaterTimer = null;
   }
   
+    window.experimentDraining = false;
+  window.drainStartTime = null;
   // Reset timing variables
   boilingStartTime = null;
   liquidMovementStartTime = null;
