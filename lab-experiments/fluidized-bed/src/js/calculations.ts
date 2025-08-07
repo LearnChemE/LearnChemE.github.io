@@ -35,7 +35,7 @@ export function pumpPressure() {
  * Calculates the pressure drop and sets the bed height
  * @returns pressure drop across bed in UNITS (positive)
  */
-export function pressureDrop(lift?: number) {
+export function pressureDrop(lift?: number, returnHeight=false) {
     var dbMode = true;
     if (lift == undefined) {
         lift = State.valveLift;
@@ -54,7 +54,7 @@ export function pressureDrop(lift?: number) {
         const p_cmw = p / rho / grav;
 
         // console.log(`Packed bed regime; Pressure drop = ${p} mPa = ${p_cmw} cm water`);
-        if (dbMode) return InitialBedHeight;
+        if (returnHeight) return InitialBedHeight;
         return p_cmw;
     }
 
@@ -75,7 +75,7 @@ export function pressureDrop(lift?: number) {
         const p = (rho_p - rho) * grav * h * (1 - ep);
         
         if (!dbMode) setTargetBedHeight(h);
-        if (dbMode) return h;
+        if (returnHeight) return h;
         return p / rho / grav;
     }
 
@@ -85,7 +85,7 @@ export function pressureDrop(lift?: number) {
         const dy = dx * 15.0;
         // console.log('Repacked regime');
         if (!dbMode) setTargetBedHeight(14.5 + 10*dx);
-        if (dbMode) return 14.5 + 5*dx;
+        if (returnHeight) return 14.5 + 5*dx;
         return 4.3 + dy; 
     }
 }
