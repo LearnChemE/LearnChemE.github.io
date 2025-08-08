@@ -17,10 +17,12 @@ class VaryingTube {
     private target: number = 0;
     private r: number;
     private running: boolean = false;
+    private spoutElem: SVGAElement;
 
-    constructor(id: string, dir: TubeDirection, tau: number) {
+    constructor(id: string, dir: TubeDirection, tau: number, spoutId: string) {
         // Get the element
         let e: HTMLElement = document.getElementById(id);
+        this.spoutElem = document.getElementById(spoutId) as unknown as SVGAElement;
         // Get coordinates
         let x: number = Number(e.getAttribute("x"));
         let y: number = Number(e.getAttribute("y"));
@@ -69,6 +71,15 @@ class VaryingTube {
             }
         }
         this.current = t;
+
+        // Hide/show spout
+        if (t < 1.0) {
+            this.spoutElem.style = "display: none;";
+        } else {
+            this.spoutElem.style = "";
+        }
+
+        t = Math.min(t, 1.0);
 
         // Conditionally set variables based on direction
         switch(dir) {
@@ -190,10 +201,8 @@ export class Manometer {
         this.height = bounds.width;
 
         // Initialize tubes
-        this.inTube  = new VaryingTube("Tube_6" , TubeDirection.Left, 5000); // 6 for left
-        this.outTube = new VaryingTube("Tube_15", TubeDirection.Left, 5000); // 14 for right
-
-        console.log(`height: ${this.height}\nbottom: ${this.bottom}`)
+        this.inTube  = new VaryingTube("Tube_6" , TubeDirection.Left, 5000, "Spout 1"); // 6 for left
+        this.outTube = new VaryingTube("Tube_15", TubeDirection.Left, 5000, "Spout 2"); // 14 for right
 
         this.baseElement = document.getElementById("Beaker Fill") as unknown as SVGAElement;
     }
@@ -215,6 +224,7 @@ export class Manometer {
         // Add pump pressure. Sign should be negative because y pixels go down, and multiply by 5 pixels per cm water
         const pump = 1.95 * pumpPressure(); // pixels water
         const drop = 1.95 * pressureDrop(); // pixels water
+        
         var left = base - pump;
         var right = left + drop;
 
@@ -229,16 +239,7 @@ export class Manometer {
     }
 
     public fillLeftOnly = async () => {
-        // // Calculate height in pixels
-        // const base = this.baseElement.getBBox().y;
-        // // TODO: Add pump pressure
-        // var level = base - 2.45 * pumpPressure();
-
-        // // Convert to 0-1 range for tube
-        // level = (this.bottom - level) / this.height;
-
         // // Set the left tube only
-        // this.inTube.setTarget(level);
         this.initLeft = true;
         this.initRight = false;
         this.fillTubes(0);

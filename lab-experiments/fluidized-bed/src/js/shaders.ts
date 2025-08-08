@@ -48,9 +48,18 @@ void main() {
 export const particleRenderVertSrc = `#version 300 es
 layout (location=0) in vec2 aPos;
 layout (location=1) in vec2 aPrev;
+out float vCol;
+
+float hash(float x, int seed) {
+  // Convert integer seed to float and combine with input
+  float s = float(seed);
+  return fract(sin(x * 12.9898 + s * 78.233) * 43758.5453);
+}
+
 void main() {
-  gl_PointSize = 5.0;
+  gl_PointSize = 3.0;
   gl_Position = vec4(aPos,0.0, 1.0);
+  vCol = hash(0.3, gl_VertexID) * .3 + .7;
 }
 `;
 
@@ -59,9 +68,10 @@ void main() {
  */
 export const particleRenderFragSrc = `#version 300 es
 precision mediump float;
+in float vCol;
 out vec4 FragColor;
 void main() {
-  FragColor = vec4(0.9, 0.9, 0.9, 1.0);
+  FragColor = vec4(vec3(vCol), 1.0);
 }
 `;
 
@@ -83,16 +93,16 @@ layout (std140) uniform ubo {
 uniform sampler2D noiseTex;
 
 const int TOT_PARTICLES = 1024;
-const float MIN_HEIGHT = 10.5;
-const float MAX_HEIGHT = 35.0;
+const float MIN_HEIGHT = 5.0;
+const float MAX_HEIGHT = 14.5;
+const float HEIGHT_DIF = MAX_HEIGHT - MIN_HEIGHT;
+float pi = 22.0/7.0;
 
 float hash(float x, int seed) {
   // Convert integer seed to float and combine with input
   float s = float(seed);
   return fract(sin(x * 12.9898 + s * 78.233) * 43758.5453);
 }
-
-float pi = 22.0/7.0;
 
 vec2 cap_speed(vec2 v, float speed) {
   float mag = sqrt(v.x*v.x + v.y*v.y);
@@ -107,15 +117,14 @@ vec2 cap_speed(vec2 v, float speed) {
  * returns 1 for packed, 0 for fluidized, and -1 for repacked.
  */
 int CalcState() {
-  float t = (height - MIN_HEIGHT) / 14.3;
-  if (gl_VertexID <= int((1.0-t) * float(TOT_PARTICLES))) return 1;
-  if (height >= MAX_HEIGHT) {
-    // As t lerps from MAX_HEIGHT to MAX_HEIGHT + 10.0, a linearly proportional amount of particles pack on the top
-    t = (height - MAX_HEIGHT) / 10.0;
-    if (gl_VertexID <= int(t * float(TOT_PARTICLES))) return -1;
-  }
-  
-  return 0;
+  if (fill <= -1.00) return 1;
+  // if (height >= MAX_HEIGHT) {
+  //   // As t lerps from MAX_HEIGHT to MAX_HEIGHT + 10.0, a linearly proportional amount of particles pack on the top
+  //   float t = (height - MAX_HEIGHT) / 10.0;
+  //   // if (gl_VertexID <= int(0.2 * t * float(TOT_PARTICLES))) return -1;
+  //   // if (gl_VertexID == -1) return -1;
+  // }
+  else return 0;
 }
 
 /**
@@ -123,25 +132,37 @@ int CalcState() {
  */
 float maxHeight() {
   // Remap from (MIN_HEIGHT, MAX_HEIGHT) to (-0.6,+1.0)
-  float t = (height - MIN_HEIGHT) / (MAX_HEIGHT-MIN_HEIGHT);
-  return 1.6 * t - 0.6;
+  float t = (height - MIN_HEIGHT) / HEIGHT_DIF;
+  float clipHeight = 1.6 * t - 0.6;
+
+  return max(min(clipHeight, fill), -0.6);
 }
 
 void fluidized() {
   float dt = deltaTime / 1000.0;
   float a = hash(dt, gl_VertexID);
+  
+  // Calculate the particle's "resting" position
+  float rel_height = float(gl_VertexID) / float(TOT_PARTICLES);
+  float bed_height = min(maxHeight(), 1.0);
+  vec2 rest = vec2(hash(.77, gl_VertexID) * 2.0 - 1.0,
+                    rel_height * bed_height + rel_height - 1.0);
 
   vec2 texcoord = vec2(aPos.x * .05 + 1e-5 * time, aPos.y * .2 - 3e-5 * time);
   float perlin = texture(noiseTex, texcoord).r;
   
   // Brownian motion
-  float speedMod = (height - 5.7) / 14.3;
-  vec2 accel = -5.0 * vec2(cos(4.0*pi*a),sin(4.0*pi*a));
+  float speedMod = (height - MIN_HEIGHT) / HEIGHT_DIF;
+  speedMod *= min(max(fill,0.0),1.0);
+  vec2 accel = -2.5 * vec2(cos(4.0*pi*a),sin(4.0*pi*a));
   // Add Perlin noise for fluidlike flow
   accel += 5.0 * vec2(sin(-4.0*pi*perlin), cos(-8.0*pi*perlin));
   // Add some gravity
   accel.y -= .0001;
+  // Restoring force to keep particles near their homes
   accel *= speedMod*speedMod;
+  accel += 100.0 * (rest - aPos);
+
   // With verlet integration, velocity already accounts for timestep
   vec2 vel = aPos - aPrev;
   vel = cap_speed(vel, 0.01 * speedMod); // Cap the max speed

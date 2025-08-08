@@ -2,8 +2,9 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const autoprefixer = require("autoprefixer");
 const miniCssExtractPlugin = require("mini-css-extract-plugin");
+const webpack = require('webpack')
 
-module.exports = {
+module.exports = (env, argv) => {return {
   entry: "./src/index.ts",
   output: {
     filename: "bundle.js",
@@ -16,6 +17,9 @@ module.exports = {
       template: "./src/index.html",
     }),
     new miniCssExtractPlugin(),
+    new webpack.DefinePlugin({
+      __DEV__: JSON.stringify(argv.mode !== 'production')
+    })
   ],
   devServer: {
     static: "./dist",
@@ -70,4 +74,4 @@ module.exports = {
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
   },
-};
+}};
