@@ -225,8 +225,8 @@ export class Manometer {
         const pump = 1.95 * pumpPressure(); // pixels water
         const drop = 1.95 * pressureDrop(); // pixels water
         
-        var left = base - pump;
-        var right = left + drop;
+        var left = base - pump - drop;
+        var right = base - pump;
 
         // Convert to 0-1 range for tube
         left  = (this.bottom -  left) / this.height;
