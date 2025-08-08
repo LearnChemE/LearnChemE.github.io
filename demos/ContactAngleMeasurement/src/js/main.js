@@ -310,12 +310,19 @@ function drawThetaPlot(volume, angle) {
   if (!profile) return;
   const theta = profile.theta;
   const r = profile.r;
-  const xUpper = theta.map((t, i) => r[i] * Math.cos(t));
-  const xLower = theta.map((t, i) => r[i] * Math.cos(Math.PI - t)).reverse();
-  const yUpper = theta.map((t, i) => r[i] * Math.sin(t));
-  const yLower = theta.map((t, i) => r[i] * Math.sin(Math.PI - t)).reverse();
+  // Convert r from mm to μm for range calculations
+  const r_um = r.map(val => val * 1000);
+  const xUpper = theta.map((t, i) => r[i] * Math.cos(t) * 1000);
+  const xLower = theta.map((t, i) => r[i] * Math.cos(Math.PI - t) * 1000).reverse();
+  const yUpper = theta.map((t, i) => r[i] * Math.sin(t) * 1000);
+  const yLower = theta.map((t, i) => r[i] * Math.sin(Math.PI - t) * 1000).reverse();
   const x = xUpper.concat(xLower);
   const y = yUpper.concat(yLower);
+  // Get container size
+  const plotDivEl = document.getElementById('plotDiv');
+  const w = plotDivEl ? plotDivEl.clientWidth : 750;
+  const h = plotDivEl ? plotDivEl.clientHeight : 750;
+  const size = Math.min(w, h);
   const trace = {
     x, y,
     mode: 'lines',
@@ -325,11 +332,28 @@ function drawThetaPlot(volume, angle) {
     fillOpacity: 0.5
   };
   const layout = {
-    xaxis: { range: [-1.01 * Math.max(...r), 1.01 * Math.max(...r)] },
-    yaxis: { range: [-0.1 * r[r.length - 1], 1.01 * r[r.length - 1]] },
+    xaxis: {
+      title: { text: 'X (μm)' },
+      range: [-1.01 * Math.max(...r_um), 1.01 * Math.max(...r_um)]
+    },
+    yaxis: {
+      title: { text: 'Y (μm)' },
+      range: [-0.1 * r_um[r_um.length - 1], 1.01 * r_um[r_um.length - 1]],
+      scaleanchor: 'x'
+    },
+    width: size,
+    height: size,
   };
-  Plotly.newPlot('plotDiv', [trace], layout);
+  const config = { responsive: true, displayModeBar: false, scrollZoom: false, staticPlot: true };
+  Plotly.newPlot('plotDiv', [trace], layout, config);
 }
+
+// Add window resize handler to redraw plot responsively
+window.addEventListener('resize', () => {
+  if (isAnimationComplete) {
+    drawThetaPlot(volume, angle);
+  }
+});
 
 export function reset(draw) {
   // Stop syringe animation
