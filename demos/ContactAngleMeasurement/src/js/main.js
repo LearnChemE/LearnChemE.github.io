@@ -12,6 +12,7 @@ const gamma = 0.072;    // surface tension [N/m]
 let volume = 10; // volume in mL
 let syringe = null;
 let angle = 10;
+let isAnimationComplete = false;
 
 export function drawFigure(draw) {
     draw.line(-80, 230, 120, 230)
@@ -20,6 +21,10 @@ export function drawFigure(draw) {
     drawSwitch(draw, -80, 200, 80, 40);
     selectVolume(draw);
     selectAngle(draw);
+    draw.rect(300, 2)
+    .fill('none')
+    .stroke({ color: '#000', width: 2 })
+    .move(0, 600);
 }
 
 let syringeProgress = 0; // in mL
@@ -62,6 +67,9 @@ export function drawSyringe(draw, x, y, scale, flowRate = 10, totalVolume = 10) 
         width: 4
     })
     .move(x + 87, y);
+
+    // Add mL tick marks along syringe barrel: small ticks every 1 mL, big ticks every 5 mL with labels
+    
     
     bodyGroup.back();
     
@@ -80,6 +88,11 @@ export function drawSyringe(draw, x, y, scale, flowRate = 10, totalVolume = 10) 
         width: 0.1
     })
     .move(x + 21 + 87 - 45 - 50 + 181, y + 2.5 * width / 2 - 1);
+
+    const bubbleCircle = bodyGroup.circle(0)
+    .fill('#B4B4FF')
+    .stroke({ color: '#000', width: 0 })
+    .center(x + 21 + 87 - 45 - 50 + 181 + 50, y + 2.5 * width / 2 - 1);
     
     handleGroup1.rect(5, 2.5 * width)
     .fill('grey')
@@ -87,12 +100,39 @@ export function drawSyringe(draw, x, y, scale, flowRate = 10, totalVolume = 10) 
         color: 'grey',
         width: 0
     })
-    .move(x + 21 + 89 + ((10 - flowRate) / 10) * (100 - 25), y);
+    .move(x + 21 + 88 + ((10 - flowRate) / 10) * (100 - 25), y);
     
     syringeGroup.liquid = liquidRect;
     syringeGroup.initialWidth = 100 - 25 - ((10 - flowRate) / 10) * (100 - 25);
+    syringeGroup.bubble = bubbleCircle;
     
     syringeGroup.rotate(90, x + 87 + 2.5 * width / 2, y + 2.5 * width / 2).scale(scale, scale);
+
+    const maxVolume = totalVolume;
+    const barrelStartX = x + 88 + 25;
+    const barrelLengthPx = 75;
+    const barrelHeightPx = 2.5 * width;
+    for (let v = 0; v <= maxVolume; v+= 0.5) {
+      const tx = barrelStartX + (v / maxVolume) * barrelLengthPx;
+      if (v % 2.5 === 0) {
+        // Big tick
+        syringeGroup.line(tx, y + barrelHeightPx, tx, y + barrelHeightPx - 10)
+          .stroke({ color: '#000', width: 1 });
+        // Label every 5 mL
+        //   .rotate(-90, tx, y + barrelHeightPx + 15);
+      } else {
+        // Small tick
+        syringeGroup.line(tx, y + barrelHeightPx, tx, y + barrelHeightPx - 5)
+          .stroke({ color: '#000', width: 1 });
+      }
+
+      if (v % 5 === 0) {
+        syringeGroup.text(String(10 - v))
+          .font({ size: 8, anchor: 'middle', fill: '#000' })
+          .center(tx, y + barrelHeightPx - 15)
+          .rotate(-90, tx, y + barrelHeightPx - 15);
+      }
+    }
     
     return syringeGroup;
 }
@@ -101,6 +141,7 @@ export function drawSyringe(draw, x, y, scale, flowRate = 10, totalVolume = 10) 
 function drawSwitch(draw, x, y, width, height, opacity = 1) {
     const switchGroup = draw.group();
     switchGroup.isOn = false;
+    switchGroup.animating = false;
     const handleWidth = 5;
     const handleHeight = height * 0.8;
     const handle = switchGroup.rect(handleWidth, handleHeight)
@@ -135,19 +176,12 @@ function drawSwitch(draw, x, y, width, height, opacity = 1) {
     let isOn = false;
     handle.rotate(-20, x + width / 2, y + height / 2);
     switchGroup.click(() => {
-        isOn = !isOn;
-        switchGroup.isOn = isOn;
-        if (isOn) {
-            // pressure.show();
-            handle.animate(200).rotate(40, x + width / 2, y + height / 2);
-        } else {
-            // pressure.hide();
-            handle.animate(200).rotate(-40, x + width / 2, y + height / 2);
-        }
-        
-        // Control syringe animation based on switch state
-        if (switchGroup.isOn) {
-            animateSyringe();
+        if (switchGroup.animating) return;
+        if (!switchGroup.isOn) {
+            switchGroup.animating = true;
+            switchGroup.isOn = true;
+            handle.animate(200).rotate(40, switchGroup.pivot.x + width / 2, switchGroup.pivot.y + height / 2);
+            animateSyringe(draw);
         }
     });
     // Remember pivot for reset
@@ -157,6 +191,7 @@ function drawSwitch(draw, x, y, width, height, opacity = 1) {
         width,
         height
     };
+    window.currentSwitch = switchGroup;
     return switchGroup;
 }
 
@@ -166,6 +201,7 @@ function selectVolume(draw) {
         const volumeSelect = document.getElementById('volume-select');
         volumeSelect.addEventListener('change', (event) => {
             volume = Number(event.target.value);
+            reset(draw);
             draw.clear();
             drawFigure(draw);
             // TODO: call your update logic here, e.g.:
@@ -187,36 +223,27 @@ function selectAngle(draw) {
   });
 }
 
-
-function updatePlungerPosition() {
-    if (!syringe || !plungerGroup || !handleGroup1 || !handleGroup2) return;
-    
-    const progressPx = (syringeProgress * SYRINGE_STROKE_PX) / SYRINGE_TOTAL_VOLUME;
-    plungerGroup.transform({
-        translateX: progressPx
-    });
-    handleGroup1.transform({ translateX: progressPx });
-    // handleGroup2.transform({ translateX: progressPx });
-    // rectangle.transform({
-    //     translateX: progressPx
-    // });
-    
-    const remainingWidth = Math.max(0, syringe.initialWidth - progressPx);
-    syringe.liquid.attr({
-        width: remainingWidth
-    });
-}
-
-function animateSyringe() {
+function animateSyringe(draw) {
+  // Cancel any previous syringe animation frame
+  if (window.syringeAnimFrame) {
+    cancelAnimationFrame(window.syringeAnimFrame);
+    window.syringeAnimFrame = null;
+  }
   syringeProgress = 0;
   const totalVol = volume; // in mL
   const strokePx = syringe.initialWidth;
   const durationMs = totalVol * 1000; // duration based on volume
   const startTime = performance.now();
+  // initialize bubble at syringe tip with zero radius
+  let bubbleCircle = syringe.bubble;
   function step(now) {
     let elapsed = now - startTime;
     if (elapsed > durationMs) elapsed = durationMs;
     syringeProgress = (elapsed / durationMs) * totalVol;
+    // animate bubble radius from 0 → 20 * volume / 10
+    const maxRadius = 11 * volume / 10;
+    const currentRadius = (syringeProgress / totalVol) * maxRadius;
+    bubbleCircle.radius(currentRadius);
     const progressPx = (syringeProgress / totalVol) * strokePx;
     plungerGroup.transform({ translateX: progressPx });
     handleGroup1.transform({ translateX: progressPx });
@@ -225,10 +252,37 @@ function animateSyringe() {
     const remainingWidth = Math.max(0, strokePx - progressPx);
     syringe.liquid.attr({ width: remainingWidth });
     if (elapsed < durationMs) {
-      requestAnimationFrame(step);
+      // Queue next frame
+      window.syringeAnimFrame = requestAnimationFrame(step);
+    }
+    else {
+      // After bubble reaches full size, animate drop falling by updating its center
+      const drop = syringe.bubble;
+       let groundY = 375;
+      const centerX = drop.cy();
+       if (volume === 1) {
+        groundY = 385;
+      } else if (volume === 5) {
+        groundY = 380;
+      } else if (volume === 10) {
+        groundY = 375;
+      }
+      drop.animate(1000, '<>').center(groundY, centerX)
+        .after(() => {
+          const switchRef = window.currentSwitch;
+          if (!switchRef) return;
+          switchRef.animating = false;
+          switchRef.isOn = false;
+          // rotate handle back to OFF
+          const p = switchRef.pivot;
+          switchRef.handle.animate(200).rotate(-40, p.x + p.width / 2, p.y + p.height / 2);
+          isAnimationComplete = true;
+          drawThetaPlot(volume, angle);
+        });
     }
   }
-  requestAnimationFrame(step);
+  // Queue next frame
+  window.syringeAnimFrame = requestAnimationFrame(step);
 }
 
 
@@ -251,6 +305,7 @@ function getProfile(volume, angle) {
  * @param {number|string} angle  - Contact angle in degrees (e.g., '45').
  */
 function drawThetaPlot(volume, angle) {
+    if (!isAnimationComplete) { return };
   const profile = getProfile(volume, angle);
   if (!profile) return;
   const theta = profile.theta;
@@ -266,11 +321,64 @@ function drawThetaPlot(volume, angle) {
     mode: 'lines',
     line: { color: 'black' },
     fill: 'tozeroy',
-    fillcolor: 'lightblue',
+    fillcolor: '#B4B4FF',
+    fillOpacity: 0.5
   };
   const layout = {
     xaxis: { range: [-1.01 * Math.max(...r), 1.01 * Math.max(...r)] },
     yaxis: { range: [-0.1 * r[r.length - 1], 1.01 * r[r.length - 1]] },
   };
   Plotly.newPlot('plotDiv', [trace], layout);
+}
+
+export function reset(draw) {
+  // Stop syringe animation
+  if (window.syringeAnimFrame) {
+    cancelAnimationFrame(window.syringeAnimFrame);
+    window.syringeAnimFrame = null;
+  }
+  // Stop SVG.js bubble animation if in progress
+  if (syringe && syringe.bubble && typeof syringe.bubble.stop === 'function') {
+    syringe.bubble.stop();
+  }
+
+  // Reset animation completion flag
+  isAnimationComplete = false;
+
+  // Reset volume and update selector
+//   volume = 10;
+//   const volSelect = document.getElementById('volume-select');
+//   if (volSelect) volSelect.value = String(volume);
+
+  // Reset angle and update slider/value display
+  angle = 10;
+  const angleSlider = document.getElementById('angleSlider');
+  const angleValue = document.getElementById('angleValue');
+  if (angleSlider) angleSlider.value = String(angle);
+  if (angleValue) angleValue.textContent = String(angle);
+
+  // Reset the switch to OFF and clear any animation lock
+  const sw = window.currentSwitch;
+  if (sw) {
+    sw.animating = false;
+    sw.isOn = false;
+    const p = sw.pivot;
+    // Rotate handle back to OFF position
+    sw.handle.animate(200).rotate(-20, p.x + p.width / 2, p.y + p.height / 2);
+  }
+
+  // Clear the Plotly graph
+  const plotDiv = document.getElementById('plotDiv');
+  if (plotDiv && window.Plotly && Plotly.purge) {
+    Plotly.purge(plotDiv);
+  }
+
+  // Clear and redraw the SVG canvas
+  if (draw && typeof draw.clear === 'function') {
+    draw.clear();
+    drawFigure(draw);
+  }
+
+  // Ensure animation flag remains false
+  isAnimationComplete = false;
 }

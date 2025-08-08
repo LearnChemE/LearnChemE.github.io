@@ -13,17 +13,18 @@ export function addOptionToDragAndZoom(draw) {
     draw.viewbox(defaultViewbox.x, defaultViewbox.y, defaultViewbox.width, defaultViewbox.height);
     
     const background = draw.rect(config.canvasWidth, config.canvasHeight)
-    .fill({ color: '#fff', opacity: 0 });
+    .fill({ color: '#fff', opacity: 0 })
+    .attr({ 'pointer-events': 'all' });
     background.back();
     
-    background.on('mousedown', function(event) {
+    draw.on('mousedown', function(event) {
         const vb = draw.viewbox();
         if (vb.width >= defaultViewbox.width) return;
         state.setIsPanning(true);
         state.setPanStart({ x: event.clientX, y: event.clientY });
     });
     
-    background.on('mousemove', function(event) {
+    draw.on('mousemove', function(event) {
         if (!state.isPanning) return;
         event.preventDefault();
         const dx = event.clientX - state.panStart.x;
@@ -35,7 +36,7 @@ export function addOptionToDragAndZoom(draw) {
         state.setPanStart({ x: event.clientX, y: event.clientY });
     });
     
-    background.on('mouseup', function() {
+    draw.on('mouseup', function() {
         state.setIsPanning(false);
     });
     
