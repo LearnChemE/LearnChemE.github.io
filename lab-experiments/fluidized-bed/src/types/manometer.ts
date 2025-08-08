@@ -17,10 +17,12 @@ class VaryingTube {
     private target: number = 0;
     private r: number;
     private running: boolean = false;
+    private spoutElem: SVGAElement;
 
-    constructor(id: string, dir: TubeDirection, tau: number) {
+    constructor(id: string, dir: TubeDirection, tau: number, spoutId: string) {
         // Get the element
         let e: HTMLElement = document.getElementById(id);
+        this.spoutElem = document.getElementById(spoutId) as unknown as SVGAElement;
         // Get coordinates
         let x: number = Number(e.getAttribute("x"));
         let y: number = Number(e.getAttribute("y"));
@@ -69,6 +71,15 @@ class VaryingTube {
             }
         }
         this.current = t;
+
+        // Hide/show spout
+        if (t < 1.0) {
+            this.spoutElem.style = "display: none;";
+        } else {
+            this.spoutElem.style = "";
+        }
+
+        t = Math.min(t, 1.0);
 
         // Conditionally set variables based on direction
         switch(dir) {
@@ -190,8 +201,8 @@ export class Manometer {
         this.height = bounds.width;
 
         // Initialize tubes
-        this.inTube  = new VaryingTube("Tube_6" , TubeDirection.Left, 5000); // 6 for left
-        this.outTube = new VaryingTube("Tube_15", TubeDirection.Left, 5000); // 14 for right
+        this.inTube  = new VaryingTube("Tube_6" , TubeDirection.Left, 5000, "Spout 1"); // 6 for left
+        this.outTube = new VaryingTube("Tube_15", TubeDirection.Left, 5000, "Spout 2"); // 14 for right
 
         this.baseElement = document.getElementById("Beaker Fill") as unknown as SVGAElement;
     }
