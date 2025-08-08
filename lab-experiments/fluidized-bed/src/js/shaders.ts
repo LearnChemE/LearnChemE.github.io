@@ -117,13 +117,13 @@ vec2 cap_speed(vec2 v, float speed) {
  * returns 1 for packed, 0 for fluidized, and -1 for repacked.
  */
 int CalcState() {
-  if (fill < 1.0) return 1;
-  if (height >= MAX_HEIGHT) {
-    // As t lerps from MAX_HEIGHT to MAX_HEIGHT + 10.0, a linearly proportional amount of particles pack on the top
-    float t = (height - MAX_HEIGHT) / 10.0;
-    // if (gl_VertexID <= int(0.2 * t * float(TOT_PARTICLES))) return -1;
-    // if (gl_VertexID == -1) return -1;
-  }
+  if (fill <= -1.00) return 1;
+  // if (height >= MAX_HEIGHT) {
+  //   // As t lerps from MAX_HEIGHT to MAX_HEIGHT + 10.0, a linearly proportional amount of particles pack on the top
+  //   float t = (height - MAX_HEIGHT) / 10.0;
+  //   // if (gl_VertexID <= int(0.2 * t * float(TOT_PARTICLES))) return -1;
+  //   // if (gl_VertexID == -1) return -1;
+  // }
   else return 0;
 }
 
@@ -133,7 +133,9 @@ int CalcState() {
 float maxHeight() {
   // Remap from (MIN_HEIGHT, MAX_HEIGHT) to (-0.6,+1.0)
   float t = (height - MIN_HEIGHT) / HEIGHT_DIF;
-  return 1.6 * t - 0.6;
+  float clipHeight = 1.6 * t - 0.6;
+
+  return max(min(clipHeight, fill), -0.6);
 }
 
 void fluidized() {
@@ -151,6 +153,7 @@ void fluidized() {
   
   // Brownian motion
   float speedMod = (height - MIN_HEIGHT) / HEIGHT_DIF;
+  speedMod *= min(max(fill,0.0),1.0);
   vec2 accel = -2.5 * vec2(cos(4.0*pi*a),sin(4.0*pi*a));
   // Add Perlin noise for fluidlike flow
   accel += 5.0 * vec2(sin(-4.0*pi*perlin), cos(-8.0*pi*perlin));

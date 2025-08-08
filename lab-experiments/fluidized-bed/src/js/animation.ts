@@ -1,4 +1,5 @@
 import { BeakerHolder, BendDirection, BentTube, Manometer, StraightTube, Tube, TubeDirection, TubeGroup, ValveSetting } from "../types";
+import { pressureDrop } from "./calculations";
 import { fillCanvas } from "./canvas";
 import { delay } from "./helpers";
 import State from "./state";
@@ -84,7 +85,8 @@ async function tubesFillAnimation() {
 
         // Play each animation
         await LowerTubes.fill();
-        // Save a promise for the canvas
+        // Save a promise for the canvas and precalculate the height
+        pressureDrop();
         const cnvIsFull = fillCanvas();
         // Fill left manometer tube
         await delay(300);

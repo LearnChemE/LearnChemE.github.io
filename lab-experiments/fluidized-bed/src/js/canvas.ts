@@ -10,7 +10,7 @@ import noise from "../media/noiseTexture.png";
 class UniformBuffer {
   private data: Float32Array;
 
-  constructor(time=0, deltaTime=0, fill=-1.2, bedHeight=1) {
+  constructor(time=0, deltaTime=0, fill=-1.2, bedHeight=5) {
     this.data = new Float32Array([time, deltaTime, fill, bedHeight]);
   }
 
@@ -72,8 +72,7 @@ var noiseTexture: WebGLTexture;
 
 // Internal state
 var fill = false;
-var bedHeight = 1;
-var targetHeight = 1;
+var targetHeight = 5;
 // Promise for when the tube is filled
 let resolveFill: () => void;
 const hasFilled = new Promise<void>((resolve) => resolveFill = resolve);
@@ -290,6 +289,7 @@ function updateState() {
 
   // Smooth lerp towards target bed height
   uniformData.bedHeight = (uniformData.bedHeight - targetHeight) * r ** uniformData.deltaTime + targetHeight;
+  // console.log(`Bed height is ${uniformData.bedHeight}`);
 }
 
 /**
@@ -297,6 +297,8 @@ function updateState() {
  */
 export async function fillCanvas() {
   fill = true;
+  // console.log(`Setting bed height to ${targetHeight}`)
+  uniformData.bedHeight = targetHeight;
   await hasFilled;
 }
 
@@ -305,7 +307,7 @@ export async function fillCanvas() {
  * @param val New target bed height
  */
 export function setTargetBedHeight(val: number) {
-  // console.log(`Bed height set to ${targetHeight}`);
+  // console.log(`Target height set to ${val}`)
   targetHeight = val;
 }
 
