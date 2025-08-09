@@ -240,6 +240,23 @@ mjx-container[jax="CHTML"][display="true"] {
 
 
 
+.valve-top {
+  position: absolute;
+  top: 260px; /* Adjusted vertical alignment with inlet pipe */
+  left: calc(50% - 180px); /* Adjusted horizontal alignment onto the inlet stub */
+  transform: translateX(-50%);
+  z-index: 15;
+  overflow: visible;
+}
+
+.condenser-right {
+  position: absolute;
+  top: 145px; /* fine-tuned to align with evaporator outlet */
+  left: calc(50% + 250px);
+  z-index: 10;
+  overflow: visible;
+}
+
 .temperature-reader-container {
   position: absolute;
   top: 250px;
