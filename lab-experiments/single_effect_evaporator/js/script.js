@@ -109,7 +109,9 @@ document.addEventListener('keydown', (e) => {
 let componentRefs = {
   flowmeter: null,
   pressureGauge: null,
-  temperatureReader: null
+  temperatureReader: null,
+  valve: null,
+  condenser: null
 };
 
 function initializeExtractedComponents() {
@@ -126,6 +128,16 @@ function initializeExtractedComponents() {
   // Initialize temperature reader with exact styling
   if (typeof createTemperatureReader === 'function') {
     componentRefs.temperatureReader = createTemperatureReader('#temperature-reader', 0, 0, 22.0);
+  }
+
+  // Initialize valve (simple visual, initial state open)
+  if (typeof createValve === 'function') {
+    componentRefs.valve = createValve('#valve', 0, 0, true);
+  }
+
+  // Initialize condenser (static graphic)
+  if (typeof createCondenser === 'function') {
+    componentRefs.condenser = createCondenser('#condenser', 0, 0);
   }
   
   // Update components with evaporator data
