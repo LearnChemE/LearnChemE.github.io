@@ -56,34 +56,6 @@ function mouseCoordinate() {
   return [wx, wy];
 }
 
-//the mouse clicked controls any mouse clicking actions
-window.mouseClicked = function () {
-  const [mx, my] = mouseCoordinate();
-
-  handleMouseScaling();
-
-  //pump switch interaction, this turns the pump on and off
-  let mouseCorrectionX = mouseX;
-  let mouseCorrectionY = mouseY;
-
-  if (380 < mX && mX < 442 && 390 < mY && mY < 440) {
-    state.pumpOn = !state.pumpOn;
-  }
-
-  console.log("mouse X: " + mX);
-  console.log("mouse Y: " + mY);
-  console.log(zoom);
-
-  //mouse click rectangle for switch
-  push();
-  translate(50, 0);
-  stroke("red");
-  noFill();
-  rectMode(CORNERS);
-  rect(380, 390, mX, mY);
-  pop();
-};
-
 window.mouseWheel = function (event) {
   // Prevent default scrolling
   event.preventDefault();
@@ -129,18 +101,28 @@ window.mouseReleased = () => {
 window.mouseDragged = function () {
   // For bounds
   const graphicsWrapper = document.getElementById("graphics-wrapper");
-  // Subtract the difference from the offset vector times the zoom for tracking
-  zoomX -= (mouseX - offsetX) * 0.8;
-  zoomY -= (mouseY - offsetY) * 0.8;
 
-  offsetX = mouseX;
-  offsetY = mouseY;
-  // Constrain so the apparatus doesn't go offscreen
-  zoomX = constrain(zoomX, 0, graphicsWrapper.offsetWidth);
-  zoomY = constrain(zoomY, 0, graphicsWrapper.offsetHeight);
+  if (
+    380 < (window.mX + zoomX * (zoom - 1)) / zoom &&
+    (window.mX + zoomX * (zoom - 1)) / zoom < 442 &&
+    390 < (window.mY + zoomY * (zoom - 1)) / zoom &&
+    (window.mY + zoomY * (zoom - 1)) / zoom < 440
+  ) {
+    state.dragging = false;
+  } else {
+    // Subtract the difference from the offset vector times the zoom for tracking
+    zoomX -= (mouseX - offsetX) * 0.8;
+    zoomY -= (mouseY - offsetY) * 0.8;
 
-  // Update mX and mY, because changing the zoom coordinates will change these
-  [mouseX, mouseY] = mouseCoordinate();
+    offsetX = mouseX;
+    offsetY = mouseY;
+    // Constrain so the apparatus doesn't go offscreen
+    zoomX = constrain(zoomX, 0, graphicsWrapper.offsetWidth);
+    zoomY = constrain(zoomY, 0, graphicsWrapper.offsetHeight);
+
+    // Update mX and mY, because changing the zoom coordinates will change these
+    [window.mX, window.mY] = mouseCoordinate();
+  }
 };
 
 function Zoom() {
@@ -151,6 +133,22 @@ function Zoom() {
   applyMatrix(s, 0, 0, s, zx, zy);
 }
 
+//the mouse clicked controls any mouse clicking actions
+window.mouseClicked = function () {
+  if (
+    380 < (window.mX + zoomX * (zoom - 1)) / zoom &&
+    (window.mX + zoomX * (zoom - 1)) / zoom < 442 &&
+    390 < (window.mY + zoomY * (zoom - 1)) / zoom &&
+    (window.mY + zoomY * (zoom - 1)) / zoom < 440
+  ) {
+    state.pumpOn = !state.pumpOn;
+  }
+
+  console.log("mouse X: " + window.mX);
+  console.log("mouse Y: " + window.mY);
+  console.log(zoom);
+};
+
 function resetZoom() {
   zoom = 1;
   offsetX = 0;
@@ -160,21 +158,15 @@ function resetZoom() {
 }
 
 window.draw = function () {
-  /* translate(offsetX, offsetY);
-  scale(zoom); */
+  push();
 
+  handleScaling();
   state.width = containerDims[0];
   state.height = containerDims[1];
-  [mouseX, mouseY] = mouseCoordinate();
-  // drag();
 
-  push();
-  // translate(150, -240);
   Zoom();
 
   translate(-50, 0);
-
-  handleScaling();
   background(255);
   frameRate(state.frameRate);
   calcAll();
@@ -271,6 +263,15 @@ window.draw = function () {
   //draw text last so it appears over the water
   drawTextOnTopOfDiagram(state.figureX, state.figureY);
   sliderControls();
+
+  //mouse click rectangle for switch
+  push();
+  stroke("red");
+  noFill();
+  rectMode(CORNERS);
+  rect(430, 390, 492, 440);
+  pop();
+  pop();
 
   state.frameCount++;
 };
@@ -874,7 +875,6 @@ function drawWater(x, y) {
   pop();
 
   //---------------------Water between pump and pressure gauge---------------------
-
   push();
   translate(state.saltTankWidth / 2 - 100, state.saltTankHeight / 2 - 150 - 25);
   push();
@@ -891,7 +891,6 @@ function drawWater(x, y) {
   pop();
 
   //---------------------Water between pressure gauge and filter---------------------
-
   push();
 
   rectMode(CORNERS);
@@ -904,7 +903,6 @@ function drawWater(x, y) {
   pop();
 
   //---------------------Water filter and beaker---------------------
-
   push();
   translate(-40, 0);
 
@@ -989,7 +987,6 @@ function drawBeaker(x, y, beakerWidth, beakerHeight, beakerType) {
   endShape();
 
   //Beaker mL lables
-
   push();
   for (let i = 1; i < 11; i++) {
     fill("black");
@@ -1037,8 +1034,6 @@ function drawBeaker(x, y, beakerWidth, beakerHeight, beakerType) {
 
   pop();
 }
-
-function drawTable() {}
 
 function drawPumpSwitch(x, y, switchValue) {
   push();
