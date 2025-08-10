@@ -265,13 +265,13 @@ window.draw = function () {
   sliderControls();
 
   //mouse click rectangle for switch
-  push();
+  /* push();
   stroke("red");
   noFill();
   rectMode(CORNERS);
   rect(430, 390, 492, 440);
   pop();
-  pop();
+  pop(); */
 
   state.frameCount++;
 };
