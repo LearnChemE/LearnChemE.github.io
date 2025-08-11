@@ -57,6 +57,7 @@ function mouseCoordinate() {
 }
 
 window.mouseWheel = function (event) {
+  const graphicsWrapper = document.getElementById("graphics-wrapper");
   // Prevent default scrolling
   event.preventDefault();
 
@@ -76,8 +77,8 @@ window.mouseWheel = function (event) {
     const zoomXConst = (oldZoom * zoomX + mouseX * dz) / zdif;
     const zoomYConst = (oldZoom * zoomY + mouseY * dz) / zdif;
 
-    zoomX = constrain(zoomXConst, 0, graphicsWrapper.offsetWidth);
-    zoomY = constrain(zoomYConst, 0, graphicsWrapper.offsetHeight);
+    zoomX = constrain(zoomXConst, 0, graphicsWrapper.offsetWidth * 0.8);
+    zoomY = constrain(zoomYConst, 0, graphicsWrapper.offsetHeight * 0.8);
   } else {
     zoomX = 300;
     zoomY = 270;
@@ -117,8 +118,8 @@ window.mouseDragged = function () {
     offsetX = mouseX;
     offsetY = mouseY;
     // Constrain so the apparatus doesn't go offscreen
-    zoomX = constrain(zoomX, 0, graphicsWrapper.offsetWidth);
-    zoomY = constrain(zoomY, 0, graphicsWrapper.offsetHeight);
+    zoomX = constrain(zoomX, 0, graphicsWrapper.offsetWidth * 0.8);
+    zoomY = constrain(zoomY, 0, graphicsWrapper.offsetHeight * 0.8);
 
     // Update mX and mY, because changing the zoom coordinates will change these
     [window.mX, window.mY] = mouseCoordinate();
