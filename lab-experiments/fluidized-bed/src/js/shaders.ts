@@ -76,6 +76,39 @@ void main() {
 `;
 
 /**
+ * Alternate vertex shader for rendering particles that are repacked
+ */
+export const repackedVertSrc = `#version 300 es
+layout (location=0) in vec2 aPos;
+layout (location=1) in vec2 aPrev;
+layout (std140) uniform ubo {
+  float time;
+  float deltaTime;
+  float fill;
+  float height;
+};
+
+out float vCol;
+
+float hash(float x, int seed) {
+  // Convert integer seed to float and combine with input
+  float s = float(seed);
+  return fract(sin(x * 12.9898 + s * 78.233) * 43758.5453);
+}
+
+void main() {
+  // Calculate the particle's "resting" position
+  float rel_height = float(gl_VertexID) / 1024.0;
+  vec2 rest = vec2(hash(.77, gl_VertexID) * 2.0 - 1.0,
+                    1.0 - rel_height * 0.4);
+
+  gl_PointSize = 3.0;
+  gl_Position = vec4(rest, 0.0, 1.0);
+  vCol = hash(0.3, gl_VertexID) * .3 + .7;
+}
+`;
+
+/**
  * Attach transform feedback to vPos and vPrev for updating the buffer. Must also disable the raster.
  */
 export const particleUpdateVertSrc = `#version 300 es
@@ -134,8 +167,14 @@ float maxHeight() {
   // Remap from (MIN_HEIGHT, MAX_HEIGHT) to (-0.6,+1.0)
   float t = (height - MIN_HEIGHT) / HEIGHT_DIF;
   float clipHeight = 1.6 * t - 0.6;
+  // Height cannot be higher than fill
+  clipHeight = min(clipHeight, fill);
+  // If repacking is happening, height cannot be higher than that
+  clipHeight = min(clipHeight, 1.0 - (height - 14.5) / 10.0 * .4);
+  // Height cannot be lower than minimum
+  clipHeight = max(clipHeight, -0.6);
 
-  return max(min(clipHeight, fill), -0.6);
+  return clipHeight;
 }
 
 void fluidized() {
