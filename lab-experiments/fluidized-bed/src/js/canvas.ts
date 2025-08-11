@@ -255,7 +255,7 @@ function display() {
  * @param time Current time, passed from animation frame
  */
 function setTime(time: number) {
-  uniformData.deltaTime = time - uniformData.time;
+  uniformData.deltaTime = Math.min(50, time - uniformData.time);
   uniformData.time = time;
 }
 
