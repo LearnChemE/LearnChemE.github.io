@@ -1,6 +1,6 @@
 import { VertexAttribute } from "../types";
 import { constrain, CreateShader, CreateTexture, CreateUBO, CreateVao, SetUBO } from "./helpers";
-import { bgFragSrc, bgVertSrc, dummyFragSrc, particleRenderFragSrc, particleRenderVertSrc, particleUpdateVertSrc } from "./shaders";
+import { bgFragSrc, bgVertSrc, dummyFragSrc, particleRenderFragSrc, particleRenderVertSrc, particleUpdateVertSrc, repackedVertSrc } from "./shaders";
 import State from "./state";
 import noise from "../media/noiseTexture.png";
 
@@ -61,6 +61,7 @@ var asp = window.innerHeight / window.innerWidth;
 var bgShader: WebGLProgram;
 var pRenderShader: WebGLProgram;
 var pUpdateShader: WebGLProgram;
+var pRepackShader: WebGLProgram;
 var bgVao: WebGLVertexArrayObject;
 // var pVaos: WebGLVertexArrayObject[];
 var pvaos: WebGLVertexArrayObject[];
@@ -119,6 +120,7 @@ window.addEventListener("load", async () => {
   // Create shaders and objects
   bgShader = CreateShader(gl, bgVertSrc, bgFragSrc);
   pRenderShader = CreateShader(gl, particleRenderVertSrc, particleRenderFragSrc);
+  pRepackShader = CreateShader(gl, repackedVertSrc, particleRenderFragSrc);
   pUpdateShader = CreateShader(gl, particleUpdateVertSrc, dummyFragSrc, ["vPos", "vPrev"]);
   bgVao = CreateVao(gl, vertices, indices, bgShader, attribs);
   ubo = CreateUBO(gl, 16, [bgShader], "ubo", 0);
@@ -206,13 +208,24 @@ function drawParticles() {
   gl.drawArrays(gl.POINTS, 0, NUM_PARTICLES);
   gl.endTransformFeedback();
   gl.disable(gl.RASTERIZER_DISCARD);
-  // printDebugBuffer(positionBuffer[readIndex]);
 
+  if (uniformData.bedHeight <= 14.5 || uniformData.fill < 1.0) {
+    // Now the render pass
+    gl.useProgram(pRenderShader);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer[readIndex]);
+    gl.drawArrays(gl.POINTS, 0, NUM_PARTICLES);
+  }
+  else {
+    const num_repacked = Math.floor(NUM_PARTICLES * (uniformData.bedHeight - 14.5) / 10.0);
+    // Obscure the bottom particles by changing what shader to draw with
+    gl.useProgram(pRepackShader);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer[readIndex]);
+    gl.drawArrays(gl.POINTS, 0, num_repacked);
 
-  // Now the render pass
-  gl.useProgram(pRenderShader);
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer[readIndex]);
-  gl.drawArrays(gl.POINTS, 0, NUM_PARTICLES);
+    gl.useProgram(pRenderShader);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer[readIndex]);
+    gl.drawArrays(gl.POINTS, num_repacked, NUM_PARTICLES - num_repacked);
+  }
 
   // Unbind the buffers
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
@@ -289,6 +302,7 @@ function updateState() {
 
   // Smooth lerp towards target bed height
   uniformData.bedHeight = (uniformData.bedHeight - targetHeight) * r ** uniformData.deltaTime + targetHeight;
+  if (uniformData.fill < 1.2) uniformData.bedHeight = Math.min(uniformData.bedHeight, 14.5);
   // console.log(`Bed height is ${uniformData.bedHeight}`);
 }
 
