@@ -143,10 +143,6 @@ window.mouseClicked = function () {
   ) {
     state.pumpOn = !state.pumpOn;
   }
-
-  console.log("mouse X: " + window.mX);
-  console.log("mouse Y: " + window.mY);
-  console.log(zoom);
 };
 
 function resetZoom() {
@@ -409,6 +405,7 @@ function drawTextOnTopOfDiagram(x, y) {
   textSize(20);
   text("salt", x, y);
   text("solution", x, y + 25);
+  text("membrane module", x + 560, y - 65);
   pop();
 }
 
@@ -1053,22 +1050,22 @@ function drawPumpSwitch(x, y, switchValue) {
 
   if (switchValue == true) {
     push();
-    fill("RED");
-    stroke(0);
-    strokeWeight(2);
-    textStyle(BOLD);
+    fill("white");
+    stroke("white");
+    strokeWeight(0);
     textAlign(CENTER, CENTER);
-    text("ON", x - 47, y - 43);
+    textSize(16);
+    text("on", x - 47, y - 42);
 
     pop();
   } else {
     push();
-    fill("Black");
-    stroke(0);
-    strokeWeight(1);
-    textStyle(BOLD);
+    fill("white");
+    stroke("white");
+    strokeWeight(0);
     textAlign(CENTER, CENTER);
-    text("OFF", x - 47, y - 43);
+    textSize(16);
+    text("off", x - 47, y - 42);
 
     pop();
   }
