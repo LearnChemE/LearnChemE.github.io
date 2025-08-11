@@ -54,7 +54,7 @@ window.state = {
   feedTemperature: 15, // C
   permeateFlowRate: null,
   retentateFlowRate: null,
-  feedFlowRate: null,
+  feedFlowRate: 8, // mL/s
   deltaHeightPermeateBeaker: null,
   deltaHeightRetentateBeaker: null,
   saltRejectionRate: 0.992,
@@ -68,5 +68,7 @@ window.state = {
   permeatePressure: 1.01325, // bar <-- this is just atmospheric pressure
   permeabilityFactor: 3, //L/(m^2*hr*bar)
   membraneArea: 0.5, // m^2
-  recoveryRate: 0.45,
+  recoveryRate: null,
+
+  recoveryLimitBasedOnConcentration: [0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45],
 };

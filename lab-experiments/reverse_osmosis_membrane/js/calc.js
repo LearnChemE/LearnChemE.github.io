@@ -10,7 +10,7 @@ export function calcAll() {
     return newPermFactor;
   }
 
-  state.permeabilityFactor = calculatePermeabilityFactor(state.feedTemperature); // this is optional if we want to have A, the permeability factor, be adjusted based on temperature
+  state.permeabilityFactor = calculatePermeabilityFactor(state.feedTemperature); //we want to have A, the permeability factor, be adjusted based on temperature
 
   //console.log("permeability factor A = " + state.permeabilityFactor);
 
@@ -37,7 +37,8 @@ export function calcAll() {
   state.fractionFillRetentateBeaker = volumeSaltSolnTank / 2 / volumeRetentateBeaker; //temporary -- fills each beaker with 50% of tank vol
 
   let realTankVolume = volumeSaltSolnTank / 2 / volumeRetentateBeaker + volumeSaltSolnTank / 2 / volumePermeateBeaker; // about 1.52L
-  //console.log("tank vol: " + realTankVolume);
+  console.log("tank vol: " + realTankVolume);
+  console.log("real permeate vol: " + volumePermeateBeaker);
 
   //pixels/cm
 
@@ -64,8 +65,15 @@ export function calcAll() {
 
   //Flow Rates but need to be in terms of pixels of height/frame
   state.permeateFlowRate = permeateFlux * state.membraneArea * (1000 / 3600); // units of mL/s
-  state.feedFlowRate = state.permeateFlowRate / state.recoveryRate; // units of mL/s
+  if (state.permeateFlowRate > state.recoveryLimitBasedOnConcentration[state.saltConcentrationPercent / 0.5 - 1] * state.feedFlowRate) {
+    state.permeateFlowRate = state.recoveryLimitBasedOnConcentration[state.saltConcentrationPercent / 0.5 - 1] * state.feedFlowRate;
+  }
+  state.recoveryRate = state.permeateFlowRate / state.feedFlowRate;
   state.retentateFlowRate = state.feedFlowRate - state.permeateFlowRate; // units of mL/s
+
+  console.log("permeate flow: " + state.permeateFlowRate);
+
+  console.log("feed flow rate: " + state.feedFlowRate + "mL/s");
 
   //Concentrations
   state.permateConcentration = (1 - state.saltRejectionRate) * state.saltConcentrationPercent;

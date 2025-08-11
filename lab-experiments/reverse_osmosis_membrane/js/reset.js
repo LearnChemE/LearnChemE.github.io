@@ -46,7 +46,7 @@ export function reset() {
   //RO Variables
   state.permeateFlowRate = null;
   state.retentateFlowRate = null;
-  state.feedFlowRate = null;
+  state.feedFlowRate = 8;
   state.deltaHeightPermeateBeaker = null;
   state.deltaHeightRetentateBeaker = null;
   state.saltRejectionRate = 0.992;
@@ -60,7 +60,7 @@ export function reset() {
   state.permeatePressure = 1.01325; // bar <-- this is just atmospheric pressure
   state.permeabilityFactor = 3; //L/(m^2*hr*bar)
   state.membraneArea = 0.5; // m^2
-  state.recoveryRate = 0.45;
+  state.recoveryRate = null;
 
   //Slider reset
 
