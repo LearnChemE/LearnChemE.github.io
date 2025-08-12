@@ -3,12 +3,15 @@
 
 const timeMultiplicationFactor = 1;
 
-const RATE_MULTIPLIER = 100;
+export const HEATING_RATE = 4 // K / s
+export const COOLING_RATE = Math.exp(-1/3);
+
+const RATE_MULTIPLIER = 1;
 const KA0 = 20.764 * RATE_MULTIPLIER * 10;
 const EA = 34.814 * RATE_MULTIPLIER;
 const Ka = (T) => { return KA0 * Math.exp(-EA/T); }
-const KD0 = 4.104 * RATE_MULTIPLIER;
-const ED = 58.102 * RATE_MULTIPLIER;
+const KD0 = 10**4 * RATE_MULTIPLIER;
+const ED = 4209 * RATE_MULTIPLIER;
 const Kd = (T) => { return KD0 * Math.exp(-ED/T); }
 const BED_MAX_CAPACITY = 1; // mol CO2 total
 
@@ -205,54 +208,8 @@ export function yCO2_out(args) {
   // // ----------------- END DEBUG SECTION -------------------
 
   return y_out;
-
-  // const th0 = theta({ t: t, cCO2: C }); // initial amount adsorbed
-  // const th1 = theta({ t: t + tStep, cCO2: C }); // amount adsorbed after time tStep
-
-  // const amount_adsorbed = nMax * (th1 - th0); // moles of CO2 adsorbed in time tStep
-
-  // const amount_passed_through = Math.max(0, nCO2 * tStep - amount_adsorbed); // the amount of CO2 that did not adsorb in time tStep
-
-  // let yOut = amount_passed_through / tStep / (amount_passed_through / tStep + nN2) || 0;
-
-  // function thetaDesorption(tInput, { Ea = 35000, k0 = 1e3, T0 = 298, beta = 0.1, dt = 0.1, theta0 = th1 } = {}) {
-  //   const R = 8.314;
-  //   let theta = theta0;
-  //   let t = 0;
-
-  //   // Integrate using Euler steps until t >= tInput
-  //   while (t < tInput && theta > 0) {
-  //     let T = T0 + beta * t;
-  //     let k = k0 * Math.exp(-Ea / (R * T));
-  //     let dtheta_dt = -k * theta;
-
-  //     theta += dtheta_dt * dt;
-  //     if (theta < 0) theta = 0;
-
-  //     t += dt;
-  //   }
-
-  //   console.log("theta0", theta0);
-
-  //   return theta;
-  // }
-
-  // if (!desorbing) {
-  //   console.log("th1", th1.toFixed(4));
-  //   return yOut;
-  // } else {
-  //   const t = args.t * timeMultiplicationFactor;
-  //   const delta_t = t - timeOfDesorption;
-  //   const thetaDesorbed = thetaDesorption(delta_t); // amount of CO2 desorbed in time delta_t
-  //   yOut = yOut * thetaDesorbed;
-  //   console.log("thetaDesorbed", thetaDesorbed.toFixed(4));
-  //   return yOut;
-  // }
-
 }
 
-export const HEATING_RATE = 5 // K / s
-export const COOLING_RATE = Math.exp(-1/3);
 /**
  * Ramp the temperature of the simulation
  * @param {number} deltaTime Time difference since last call
@@ -323,205 +280,3 @@ export function findAdsorbTime(args) {
 
   return tResult;
 }
-
-/**
- * A function to test the adsorbtion of CO2
- * at various pressures, temperatures, and inlet mole fractions.
- */
-// (function testTheta() {
-//   const P = 5.0;
-//   const T = 273;
-//   const timePassed = 1e9;
-//   const C = cCO2({
-//     P: P,
-//     T: T,
-//     yCO2: 1
-//   });
-
-//   const thetaTheoretical = theta({
-//     t: timePassed,
-//     cCO2: C,
-//     ka: 9.120e-6,
-//     kd: 4.365e-4
-//   }) * 12;
-
-//   console.log({ P, T, thetaTheoretical });
-// })()
-
-/**
- * A function to find the best ka and kd values
- * to fit the experimental data.
- */
-// (function findKa_Kd() {
-//   const experimentalData = [
-//     [0.1, 273, 1.50],
-//     [0.1, 298, 1.20],
-//     [0.1, 323, 0.95],
-//     [0.1, 348, 0.75],
-//     [0.5, 273, 3.75],
-//     [0.5, 298, 3.00],
-//     [0.5, 323, 2.45],
-//     [0.5, 348, 2.00],
-//     [1.0, 273, 5.90],
-//     [1.0, 298, 4.80],
-//     [1.0, 323, 3.90],
-//     [1.0, 348, 3.10],
-//     [2.0, 273, 7.80],
-//     [2.0, 298, 6.50],
-//     [2.0, 323, 5.40],
-//     [2.0, 348, 4.50],
-//     [5.0, 273, 10.20],
-//     [5.0, 298, 8.50],
-//     [5.0, 323, 7.00],
-//     [5.0, 348, 5.90],
-//     [10.0, 273, 12.00],
-//     [10.0, 298, 10.10],
-//     [10.0, 323, 8.50],
-//     [10.0, 348, 7.20]
-//   ];
-//   const timePassed = 1e5; // This should be enough time to reach equilibrium
-//
-//   let largestError = 1e9; // set initial error to an unrealistically high value
-//   let kaBest, kdBest;
-//   const kaStart = 1e-6;
-//   const kdStart = 1e-4;
-//   const kaEnd = 1e-3;
-//   const kdEnd = 1;
-//   const kaStep = Math.pow(kaEnd / kaStart, 1 / 1e2); // test 100 different values for ka in geometric progression
-//   const kdStep = Math.pow(kdEnd / kdStart, 1 / 1e2);
-//   for (let ka = kaStart; ka < kaEnd; ka *= kaStep) {
-//     for (let kd = kdStart; kd < kdEnd; kd *= kdStep) {
-//       let totalDifference = 0;
-//       for (let i = 0; i < experimentalData.length; i++) {
-//         const P = experimentalData[i][0];
-//         const T = experimentalData[i][1];
-//         const thetaExperimental = experimentalData[i][2] / 12;
-//
-//         const C = cCO2({
-//           P: P,
-//           T: T,
-//           yCO2: 1
-//         });
-//
-//         const thetaTheoretical = theta({
-//           t: timePassed,
-//           ka: ka,
-//           kd: kd,
-//           cCO2: C
-//         });
-//         const thetaDifference = Math.abs(thetaExperimental - thetaTheoretical);
-//         totalDifference += thetaDifference;
-//       }
-//       if (totalDifference < largestError) {
-//         largestError = totalDifference;
-//         kaBest = ka;
-//         kdBest = kd;
-//       }
-//     }
-//   }
-//   console.log(`Best ka: ${kaBest.toExponential(3)}, Best kd: ${kdBest.toExponential(3)}, Error: ${err}`);
-// })()
-
-/**
- * A function to generate a CSV file with the outlet mole fraction of CO2
- * as a function of time for different inlet mole fractions.
- */
-// (function generateGraphData() {
-//   const moleFractions = [0.15, 0.5, 1.0];
-//   const P = 5.0; // pressure = 5 bar
-//   const T = 273; // temperature = 298 K
-//   const tStep = 0.1; // time step in seconds. This can be any arbitrary value and d
-//   const V = 0.05; // volumetric flow rate of gas in L / s
-
-//   moleFractions.forEach(y => {
-//     const outputData = []
-//     for (let t = 0; t < 600; t += 1) {
-//       const outlet = yCO2_out({ t, tStep, V, P, T, yCO2: y });
-//       outputData.push([t, Math.round(outlet * 1e4) / 1e4]);
-//     }
-//     const dataString = outputData.map(d => d.join(",")).join("\n");
-//     const blob = new Blob([dataString], { type: "text/csv" });
-//     const url = URL.createObjectURL(blob);
-//     const link = document.createElement("a");
-//     link.href = url;
-//     link.download = `yCO2_out_${y}.csv`;
-//     link.style.display = "none";
-//     // link.click();
-//   });
-// })()
-
-/**
- * A function to generate a CSV file with the theoretical theta values
- * for the same pressures and temperatures as in the experimental measurement.
- */
-// (function generateTheoreticalTheta() {
-//   const experimental_P_T = [
-//     [0.1, 273],
-//     [0.1, 298],
-//     [0.1, 323],
-//     [0.1, 348],
-//     [0.5, 273],
-//     [0.5, 298],
-//     [0.5, 323],
-//     [0.5, 348],
-//     [1.0, 273],
-//     [1.0, 298],
-//     [1.0, 323],
-//     [1.0, 348],
-//     [2.0, 273],
-//     [2.0, 298],
-//     [2.0, 323],
-//     [2.0, 348],
-//     [5.0, 273],
-//     [5.0, 298],
-//     [5.0, 323],
-//     [5.0, 348],
-//     [10.0, 273],
-//     [10.0, 298],
-//     [10.0, 323],
-//     [10.0, 348]
-//   ];
-
-//   const outputData = [...experimental_P_T];
-//   experimental_P_T.forEach(([P, T], i) => {
-//     const C = cCO2({ P, T, yCO2: 1 });
-//     let thetaTheoretical = theta({ t: 1e9, cCO2: C }) * 12;
-//     thetaTheoretical = Math.round(thetaTheoretical * 1e3) / 1e3; // round to 4 decimal places
-//     outputData[i].push(thetaTheoretical);
-//   });
-//   const dataString = outputData.map(d => d.join(",")).join("\n");
-//   const blob = new Blob([dataString], { type: "text/csv" });
-//   const url = URL.createObjectURL(blob);
-//   const link = document.createElement("a");
-//   link.href = url;
-//   link.download = `theoretical_theta.csv`;
-//   link.style.display = "none";
-//   // link.click();
-// })()
-
-// (function CO2Landing() {
-//   let temperatures = [25, 50, 75, 100, 125, 150];
-//   temperatures = temperatures.map(t => t + 273); // convert to K
-//   const pressures = [];
-//   for (let p = 0.01; p <= 5; p += 0.01) {
-//     pressures.push(p);
-//   }
-//   const CO2_data = [];
-//   temperatures.forEach((T, i) => {
-//     CO2_data.push([]);
-//     pressures.forEach(P => {
-//       const C = cCO2({ P: P, T: T, yCO2: 1 });
-//       const thetaTheoretical = theta({ t: 1e9, cCO2: C }) * 12;
-//       CO2_data[i].push(thetaTheoretical);
-//     });
-//   });
-
-//   const dataString = CO2_data.map(d => d.join(",")).join("\n");
-//   const blob = new Blob([dataString], { type: "text/csv" });
-//   const url = URL.createObjectURL(blob);
-//   const link = document.createElement("a");
-//   link.href = url;
-//   link.download = `CO2_landing.csv`;
-//   link.style.display = "none";
-//   // link.click();
-// })()

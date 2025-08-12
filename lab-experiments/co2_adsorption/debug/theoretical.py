@@ -1,19 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-N = 2001
-TIME_RANGE = 500 # s
+N = 40001
+TIME_RANGE = 200 # s
 T0 = 298 # K
-BETA = 10 # K / s
-Y0 = 0
+BETA = 4 # K / s
+Y0 = 0.1
 TH0 = 1
 P = 5 # bar
 MAX_CAPAC = 100
 
 KA0 = 25
-EA = 10
-KD0 = 200
-ED = 2500
+EA = 1000
+KD0 = 10**4
+ED = 4209
 
 def ka(T):
     return KA0 * np.exp(-EA/T)
