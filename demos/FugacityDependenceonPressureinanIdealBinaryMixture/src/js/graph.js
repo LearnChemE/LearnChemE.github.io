@@ -258,7 +258,7 @@ export function drawPlot1(options = {}) {
         const boundedTieLineY = Math.max(plotY, Math.min(plotY + plotH, tieLineY));
         
         // Draw dashed tie-lines
-        stroke(255, 165, 0); // Orange for liquid
+        stroke(255, 0, 0); // Red for liquid
         strokeWeight(0.4);
         strokeCap(SQUARE);
         // Draw dashed line from current point to liquid curve
@@ -266,7 +266,7 @@ export function drawPlot1(options = {}) {
         // Draw dashed line from liquid curve to x-axis
         drawDashedLine(liquidX, boundedTieLineY, liquidX, plotY + plotH);
         
-        stroke(255, 0, 0); // Red for vapor
+        stroke(255, 165, 0); // Orange for vapor
         // Draw dashed line from current point to vapor curve
         drawDashedLine(currentX, boundedCurrentY, vaporX, boundedTieLineY);
         // Draw dashed line from vapor curve to x-axis
