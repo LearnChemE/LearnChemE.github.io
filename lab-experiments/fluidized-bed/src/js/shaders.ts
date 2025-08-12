@@ -1,3 +1,12 @@
+const UniformLayout = `layout (std140) uniform ubo {
+  float time;
+  float deltaTime;
+  float fill;
+  float height;
+  float repacked;
+};
+`;
+
 /**
  * Simple vertex shader for the background
  */
@@ -19,12 +28,7 @@ export const bgFragSrc = `#version 300 es
 precision mediump float;
 uniform sampler2D noiseTex;
 
-layout (std140) uniform ubo {
-  float time;
-  float deltaTime;
-  float fill;
-  float height;
-};
+${UniformLayout}
 in vec2 vPos;
 layout (location=0) out vec4 FragColor;
 
@@ -81,12 +85,7 @@ void main() {
 export const repackedVertSrc = `#version 300 es
 layout (location=0) in vec2 aPos;
 layout (location=1) in vec2 aPrev;
-layout (std140) uniform ubo {
-  float time;
-  float deltaTime;
-  float fill;
-  float height;
-};
+${UniformLayout}
 
 out float vCol;
 
@@ -116,12 +115,7 @@ layout (location=0) in vec2 aPos;
 layout (location=1) in vec2 aPrev;
 out vec2 vPos;
 out vec2 vPrev;
-layout (std140) uniform ubo {
-  float time;
-  float deltaTime;
-  float fill;
-  float height;
-};
+${UniformLayout}
 
 uniform sampler2D noiseTex;
 
@@ -151,12 +145,7 @@ vec2 cap_speed(vec2 v, float speed) {
  */
 int CalcState() {
   if (fill <= -1.00) return 1;
-  // if (height >= MAX_HEIGHT) {
-  //   // As t lerps from MAX_HEIGHT to MAX_HEIGHT + 10.0, a linearly proportional amount of particles pack on the top
-  //   float t = (height - MAX_HEIGHT) / 10.0;
-  //   // if (gl_VertexID <= int(0.2 * t * float(TOT_PARTICLES))) return -1;
-  //   // if (gl_VertexID == -1) return -1;
-  // }
+  if (TOT_PARTICLES - int((1.0 - repacked) * float(TOT_PARTICLES)) >= gl_VertexID) return -1;
   else return 0;
 }
 
@@ -170,11 +159,19 @@ float maxHeight() {
   // Height cannot be higher than fill
   clipHeight = min(clipHeight, fill);
   // If repacking is happening, height cannot be higher than that
-  clipHeight = min(clipHeight, 1.0 - (height - 14.5) / 10.0 * .4);
+  clipHeight = min(clipHeight, 1.0 - repacked * .4);
   // Height cannot be lower than minimum
   clipHeight = max(clipHeight, -0.6);
 
   return clipHeight;
+}
+
+float minHeight() {
+  if (height < 14.5 || repacked == 0.0) return -1.0;
+  
+  // Determine the height minus space filled at the top
+  float h = 2.0 - repacked * .4;
+  return repacked * h - 1.0;
 }
 
 void fluidized() {
@@ -183,9 +180,11 @@ void fluidized() {
   
   // Calculate the particle's "resting" position
   float rel_height = float(gl_VertexID) / float(TOT_PARTICLES);
-  float bed_height = min(maxHeight(), 1.0);
+  if (height >= 14.5) rel_height -= repacked;
+  float minh = minHeight();
+  float bed_height = maxHeight() - minh;
   vec2 rest = vec2(hash(.77, gl_VertexID) * 2.0 - 1.0,
-                    rel_height * bed_height + rel_height - 1.0);
+                    (1.0 - rel_height) * bed_height + minh);
 
   vec2 texcoord = vec2(aPos.x * .05 + 1e-5 * time, aPos.y * .2 - 3e-5 * time);
   float perlin = texture(noiseTex, texcoord).r;
@@ -244,8 +243,15 @@ void pack(int direction) {
   // Multiply by the total height to get the height of the particle
   float abs_height = rel_height * 0.4;
   // Now use the direction to put in the real location
-  float abs_y = abs_height * float(direction) - float(direction);
+  float abs_y;
+  if (direction == -1) {
+    // abs_y = 1.4 - abs_height - 0.4 * repacked;
+    abs_y = 1.0 - abs_height;
+  } else {
+    abs_y = -abs_height - 0.6;
+  }
   float abs_x = hash(.77, gl_VertexID) * 2.0 - 1.0;
+
 
   // Output result
   vPos  = vec2(abs_x, abs_y);
