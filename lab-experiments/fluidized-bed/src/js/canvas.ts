@@ -10,8 +10,8 @@ import noise from "../media/noiseTexture.png";
 class UniformBuffer {
   private data: Float32Array;
 
-  constructor(time=0, deltaTime=0, fill=-1.2, bedHeight=5) {
-    this.data = new Float32Array([time, deltaTime, fill, bedHeight]);
+  constructor(time=0, deltaTime=0, fill=-1.2, bedHeight=5, repacked=0) {
+    this.data = new Float32Array([time, deltaTime, fill, bedHeight, repacked]);
   }
 
   // Getters
@@ -26,6 +26,9 @@ class UniformBuffer {
   }
   get bedHeight(): number {
     return this.data[3];
+  }
+  get repacked() {
+    return this.data[4];
   }
   get raw(): Float32Array {
     return this.data;
@@ -44,6 +47,10 @@ class UniformBuffer {
   set bedHeight(val: number) {
     this.data[3] = val;
   }
+  set repacked(val: number) {
+    this.data[4] = val;
+  }
+
 }
 
 const NUM_PARTICLES = 1024;
@@ -123,7 +130,7 @@ window.addEventListener("load", async () => {
   pRepackShader = CreateShader(gl, repackedVertSrc, particleRenderFragSrc);
   pUpdateShader = CreateShader(gl, particleUpdateVertSrc, dummyFragSrc, ["vPos", "vPrev"]);
   bgVao = CreateVao(gl, vertices, indices, bgShader, attribs);
-  ubo = CreateUBO(gl, 16, [bgShader], "ubo", 0);
+  ubo = CreateUBO(gl, 32, [bgShader], "ubo", 0);
   SetUBO(gl, ubo, uniformData.raw);
   positionBuffer = [gl.createBuffer(), gl.createBuffer()];
 
@@ -209,23 +216,23 @@ function drawParticles() {
   gl.endTransformFeedback();
   gl.disable(gl.RASTERIZER_DISCARD);
 
-  if (uniformData.bedHeight <= 14.5 || uniformData.fill < 1.0) {
+  // if (uniformData.bedHeight <= 14.5 || uniformData.fill < 1.0) {
     // Now the render pass
     gl.useProgram(pRenderShader);
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer[readIndex]);
     gl.drawArrays(gl.POINTS, 0, NUM_PARTICLES);
-  }
-  else {
-    const num_repacked = Math.floor(NUM_PARTICLES * (uniformData.bedHeight - 14.5) / 10.0);
-    // Obscure the bottom particles by changing what shader to draw with
-    gl.useProgram(pRepackShader);
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer[readIndex]);
-    gl.drawArrays(gl.POINTS, 0, num_repacked);
+  // }
+  // else {
+  // const num_repacked = Math.floor(NUM_PARTICLES * uniformData.repacked);
+  // // Obscure the bottom particles by changing what shader to draw with
+  // gl.useProgram(pRepackShader);
+  // gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer[readIndex]);
+  // gl.drawArrays(gl.POINTS, 0, num_repacked);
 
-    gl.useProgram(pRenderShader);
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer[readIndex]);
-    gl.drawArrays(gl.POINTS, num_repacked, NUM_PARTICLES - num_repacked);
-  }
+  // gl.useProgram(pRenderShader);
+  // gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer[readIndex]);
+  // gl.drawArrays(gl.POINTS, num_repacked, NUM_PARTICLES - num_repacked);
+  // }
 
   // Unbind the buffers
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
@@ -283,6 +290,7 @@ function mainLoop(time: number) {
 }
 
 const r = Math.E**(-1/1000);
+var kick = true;
 /**
  * Handle state-related changes to canvas
  */
@@ -301,9 +309,35 @@ function updateState() {
   }
 
   // Smooth lerp towards target bed height
-  uniformData.bedHeight = (uniformData.bedHeight - targetHeight) * r ** uniformData.deltaTime + targetHeight;
-  if (uniformData.fill < 1.2) uniformData.bedHeight = Math.min(uniformData.bedHeight, 14.5);
-  // console.log(`Bed height is ${uniformData.bedHeight}`);
+  var bedHeight = uniformData.bedHeight;
+  bedHeight = (bedHeight - targetHeight) * r ** uniformData.deltaTime + targetHeight;
+  uniformData.bedHeight = bedHeight;
+  
+  // Repacking logic
+  // if (uniformData.fill < 1.2) uniformData.bedHeight = Math.min(uniformData.bedHeight, 14.5);
+  if (bedHeight > 14.5 && uniformData.fill >= 1.2) {
+    const rel_rate = (bedHeight - 14.5) * 0.2; // [0,1]
+    const rate = Math.exp(-rel_rate/3000); // 
+    uniformData.repacked = (uniformData.repacked - 1.0) * rate ** uniformData.deltaTime + 1.0;
+
+    if (uniformData.repacked >= 1023) {
+      kick = false;
+    }
+  }
+  else {
+    const kick_chance = (1 - bedHeight / 14.5) ** 10;
+    // Roll on the kick chance to see if we'll kick
+    if (Math.random() < kick_chance) {
+      // kick; particles fall
+      kick = true;
+    }
+
+    // Fall
+    if (kick) {
+      const rate = Math.exp(-1/1000);
+      uniformData.repacked = uniformData.repacked * rate ** uniformData.deltaTime;
+    }
+  }
 }
 
 /**
