@@ -19,33 +19,33 @@
   <script id="MathJax-script" async
   src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
 </script>
-  <style>
-    /* Full-screen loader overlay */
-    #loader {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #ffffff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-    /* Spinner animation */
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid #ccc;
-      border-top-color: #333;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  </style>
+<style>
+  /* Full-screen loader overlay */
+  #loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  /* Spinner animation */
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #ccc;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
 </head>
 
 <body>
@@ -69,24 +69,24 @@
         <label for="volume-select" class="form-label">select volume (mm³):</label>
         <select id="volume-select" class="form-select">
           <option value="1">1</option>
-          <option value="5">5</option>
           <option value="10" selected>10</option>
+          <option value="100" selected>100</option>
+          <option value="1000" selected>1000</option>
         </select>
       </div>
-
+      
       <div class="slider-group slider-container">
         <label for="angleSlider"> contact angle (degrees)</label><br>
         <input type="range" id="angleSlider" min="10" max="170" step="1" value="10">
         <span id="angleValue">10</span>
       </div>
-      <button id="reset-button" class="btn btn-sm btn-danger">
+      <!-- <button id="reset-button" class="btn btn-sm btn-danger">
         Reset
-      </button>
+      </button> -->
     </div>
-    <!-- <div id="graph"></div> -->
-<div id="plotDiv" style="width: 50%; height: 500px;"></div>
+    <div id="plotDiv"></div>
   </div>
-
+  
   
   <div id="overlayContainer"></div>
   
@@ -105,13 +105,13 @@
     You DO NOT manually reference “./index.js” or “./js/hamburger.js” here. -->
     <!-- <script type="module" src="./index.js"></script> -->
     <!-- <script type="module" src="./js/hamburger.js"></script> -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(function() {
-        var loader = document.getElementById('loader');
-        if (loader) loader.style.display = 'none';
-      }, 1);
-    });
-  </script>
-</body>
-</html>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+          var loader = document.getElementById('loader');
+          if (loader) loader.style.display = 'none';
+        }, 1);
+      });
+    </script>
+  </body>
+  </html>

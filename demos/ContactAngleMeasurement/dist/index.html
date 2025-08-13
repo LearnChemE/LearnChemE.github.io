@@ -1,30 +1,30 @@
 <!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Contact Angle Measurement</title><script src="https://kit.fontawesome.com/9d19ad28f4.js" crossorigin="anonymous"></script><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"/><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><style>/* Full-screen loader overlay */
-    #loader {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #ffffff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-    /* Spinner animation */
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid #ccc;
-      border-top-color: #333;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }</style><meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation"><meta name="author" content="Sanath Kavatooru"><meta name="application-name" content="Unsteady state material balances on a CVD reactor"><meta name="description" content=""><link href="index.c5114f3ef3ff56968471.css?3b647e100e7be3bfda58" rel="stylesheet"></head><body><div id="loader"><div class="spinner"></div></div><div id="svg-container"><div class="icon-container"><div class="hamburger-wrapper"><div id="hamburger-icon"><img src="assets/hamburger.svg" alt="Menu" class="hamburger-img"/></div><div id="hamburger-menu" class="hamburger-menu"></div></div><div class="form-group me-3"><label for="volume-select" class="form-label">select volume (mm³):</label> <select id="volume-select" class="form-select"><option value="1">1</option><option value="5">5</option><option value="10" selected="selected">10</option></select></div><div class="slider-group slider-container"><label for="angleSlider">contact angle (degrees)</label><br><input type="range" id="angleSlider" min="10" max="170" step="1" value="10"> <span id="angleValue">10</span></div><button id="reset-button" class="btn btn-sm btn-danger">Reset</button></div><div id="plotDiv" style="width: 50%; height: 500px;"></div></div><div id="overlayContainer"></div><script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.1/dist/svg.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.draggable.js@3.0/dist/svg.draggable.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script><script>document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(function() {
-        var loader = document.getElementById('loader');
-        if (loader) loader.style.display = 'none';
-      }, 1);
-    });</script><script src="index.59aa9b3804d22302ce1b.js?3b647e100e7be3bfda58"></script></body></html>
+  #loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  /* Spinner animation */
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #ccc;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }</style><meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation"><meta name="author" content="Sanath Kavatooru"><meta name="application-name" content="Unsteady state material balances on a CVD reactor"><meta name="description" content=""><link href="index.2c4c39da4defd180ddc1.css?f4fcda947a46cf3d3835" rel="stylesheet"></head><body><div id="loader"><div class="spinner"></div></div><div id="svg-container"><div class="icon-container"><div class="hamburger-wrapper"><div id="hamburger-icon"><img src="assets/hamburger.svg" alt="Menu" class="hamburger-img"/></div><div id="hamburger-menu" class="hamburger-menu"></div></div><div class="form-group me-3"><label for="volume-select" class="form-label">select volume (mm³):</label> <select id="volume-select" class="form-select"><option value="1">1</option><option value="10" selected="selected">10</option><option value="100" selected="selected">100</option><option value="1000" selected="selected">1000</option></select></div><div class="slider-group slider-container"><label for="angleSlider">contact angle (degrees)</label><br><input type="range" id="angleSlider" min="10" max="170" step="1" value="10"> <span id="angleValue">10</span></div></div><div id="plotDiv"></div></div><div id="overlayContainer"></div><script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.1/dist/svg.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.draggable.js@3.0/dist/svg.draggable.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script><script>document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+          var loader = document.getElementById('loader');
+          if (loader) loader.style.display = 'none';
+        }, 1);
+      });</script><script src="index.65140aecece33695502c.js?f4fcda947a46cf3d3835"></script></body></html>

@@ -1,7 +1,9 @@
 // main.scss
 
 #svg-container {
-  position: fixed;
+  position: relative;
+  overflow: hidden;
+  transform-origin: top left;
   border: 2px solid #ccc;
   margin: 20px auto;
   padding: 10px;
@@ -85,7 +87,7 @@ body {
     display: flex;
     align-items: center;
     gap: 4px;
-    width:500px;
+    width:1200px;
     background-color: white;
     padding: 8px;
     border-radius: 4px;
@@ -253,9 +255,10 @@ svg text {
 
 #plotDiv {
   position: absolute;
-  top: 0px;
-  right: 200px;
-  width: 850px !important;
-  height: 850px !important;
-  pointer-events: none; // disable mouse interactions if needed
+  top: 0;
+  right: 0;
+  width: 60%;
+  height: 100%;
+  // border: 1px solid #ccc;
+  pointer-events: none; // allow SVG zoom/pan gestures to pass through
 }
