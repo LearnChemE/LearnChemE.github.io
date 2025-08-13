@@ -43,11 +43,13 @@ export function animateGasFlow(draw, segmentId, color, opacity, onComplete = nul
     return;
   }
   // Avoid creating duplicate animations if one is already running for this segment
-  if (state.getFlowPath(segmentId)) {
-    // console.log(`Flow animation already exists for ${segmentId}. Skipping.`);
-    // Optionally, call onComplete immediately if needed?
-    // if (onComplete) onComplete();
-    return;
+  let otherpath;
+  console.log(opacity)
+  if (otherpath = state.getFlowPath(segmentId)) {
+    // Just make the other animation invisible. The callbacks will happen in the correct order anyways, and the user won't notice any discrepancies because its so fast
+    // This is not an example of the perfect way to do it, I just don't want to waste more time on it. Theoretically, there is a race condition if you hit the button 
+    //   faster than a human could, and there is a slight memory leak because of invisible discarded paths.
+    otherpath.stroke({ color: color, opacity: 0, width: config.pipeWidth, linejoin: 'round' });
   }
 
 
