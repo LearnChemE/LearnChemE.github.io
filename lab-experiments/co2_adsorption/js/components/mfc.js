@@ -89,7 +89,7 @@ export function createMassFlowController(draw, x, y) {
         .center(x + topWidth / 2, y + topHeight + bottomHeight + 15);
 
     
-        group.text("mg/min")
+        group.text("g/min")
         .font({ family: 'Arial', size: 16, anchor: 'middle', weight: 'bold' })
         .fill('#000')
         .center(x + topWidth / 2, y + topHeight + bottomHeight - 10);
