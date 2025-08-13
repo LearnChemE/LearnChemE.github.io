@@ -14,9 +14,6 @@ export function createThermister(draw, x, y, temperature = 298) {
     const analyzerHeight = 80;
     const cornerRadius = 5;
 
-    // Wire
-    console.log(group)
-
     // Main Analyzer Body
     group.rect(analyzerWidth, analyzerHeight)
         .fill('#f0f0f0')

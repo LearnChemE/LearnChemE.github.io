@@ -14,6 +14,7 @@ const KD0 = 10**4 * RATE_MULTIPLIER;
 const ED = 4209 * RATE_MULTIPLIER;
 const Kd = (T) => { return KD0 * Math.exp(-ED/T); }
 const BED_MAX_CAPACITY = 10; // mol CO2 total
+const MAX_TEMP = 800; // K
 
 /**
  * Calculate the amount of CO2 adsorbed on a surface
@@ -68,7 +69,6 @@ function catalyst_bed(cCO2_in, temperature, dt) {
   th_co2 = th_co2 + dthdt * dt;
   // Constrain to range [0,1]
   th_co2 = Math.max(Math.min(th_co2, 1), 0);
-  console.log(`theta CO2 = ${th_co2}`)
 
   // Return the out concentration
   return cCO2_in + dcdt * dt;
@@ -153,7 +153,6 @@ export function yCO2_out(args) {
   const m = args.m;
   const P = args.P;
   const T = args.T;
-  console.log(`T: ${T}`);
   const y = Math.min(args.yCO2, 0.99); // limit yCO2 to 0.99 to avoid division by zero
   const MW_CO2 = 44.01; // g/mol
   const MW_N2 = 28.02; // g/mol
@@ -179,9 +178,6 @@ export function yCO2_out(args) {
   const c_co2_in = cCO2({ P: P, T: T, yCO2: y }); // concentration of CO2 in mol / m^3
   const c_n2 = cN2(P, T, 1-y);
   const c_co2_out = catalyst_bed(c_co2_in, T, tStep * timeMultiplicationFactor);
-
-  console.log(`C_CO2 in : ${c_co2_in}`)
-  console.log(`C_CO2 out : ${c_co2_out}`)
   const y_out = c_co2_out / (c_co2_out + c_n2);
 
 
@@ -222,11 +218,11 @@ export function rampTemperature(deltaTime, isHeating, temperature) {
   if (isHeating) {
     // Slowly ramp the temperature
     // Constant heating rate = linear temperature rise
-    newTemp = oldTemp + HEATING_RATE * deltaTime;
+    newTemp = Math.min(oldTemp + HEATING_RATE * deltaTime, MAX_TEMP);
   }
   else {
     // Temperature falls to ambient temp through exponential decay
-    newTemp = 298 + (oldTemp - 298) * Math.pow(COOLING_RATE, deltaTime);
+    newTemp = 298.15 + (oldTemp - 298.15) * Math.pow(COOLING_RATE, deltaTime);
   }
   return newTemp;
 }

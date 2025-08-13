@@ -60,7 +60,7 @@ export function startMoleFractionCalculation(tankNum) {
   const m_controller_mg_min = state.getMfcValue(); // Get current MFC setting (mg/min)
   const m_g_s = m_controller_mg_min * 1e-3 / 60; // Convert mg/min to g/s
 
-  console.log('Calculation Params:', { tankNum, y, P_bar, m_controller_mg_min, m_g_s, desorbing: state.getDesorbing(), timeOfDesorption: state.getTimeOfDesorption(), initialTimeOffset });
+  // console.log('Calculation Params:', { tankNum, y, P_bar, m_controller_mg_min, m_g_s, desorbing: state.getDesorbing(), timeOfDesorption: state.getTimeOfDesorption(), initialTimeOffset });
 
 
   // --- Interval Timer ---
@@ -77,11 +77,8 @@ export function startMoleFractionCalculation(tankNum) {
     const elapsedRealTime_ms = Date.now() - state.getStartTime();
     const t = initialTimeOffset + (elapsedRealTime_ms / 1000) * config.simulationSpeedMultiplier;
 
-    console.log("t = ", Math.round(t));
-
     // Call the external calculation function
     if (gasIsFlowing) {
-      console.log(`NaN Causer: ${tankNum}`)
       const y_out = yCO2_out({
         t: t,
         tStep: 1/60, // Use config timestep

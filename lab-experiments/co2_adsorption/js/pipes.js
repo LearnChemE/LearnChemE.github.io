@@ -44,7 +44,7 @@ export function animateGasFlow(draw, segmentId, color, opacity, onComplete = nul
   }
   // Avoid creating duplicate animations if one is already running for this segment
   if (state.getFlowPath(segmentId)) {
-    console.log(`Flow animation already exists for ${segmentId}. Skipping.`);
+    // console.log(`Flow animation already exists for ${segmentId}. Skipping.`);
     // Optionally, call onComplete immediately if needed?
     // if (onComplete) onComplete();
     return;
@@ -87,7 +87,6 @@ export function animateGasFlow(draw, segmentId, color, opacity, onComplete = nul
   flowPath.animate({ duration: totalLength * speed / 50 }).attr({ 'stroke-dashoffset': 0 }) // Adjust duration based on length and speed factor
     .after(() => {
       // Animation finished for this segment
-      console.log(`Animation complete for ${segmentId}`);
       if (onComplete) {
         onComplete();
       }
@@ -293,8 +292,6 @@ export function checkAndStartMFCFlow(draw) {
           opacity = 1.0; // Should not happen
       }
 
-      console.log(`Starting flow from Tank ${tankNum}`);
-
       state.setGaugeValue(`gauge${tankNum}`, state.getGaugeValue(`gauge${tankNum}`, 5.0));
 
       // Start chained animations
@@ -323,13 +320,11 @@ export function checkAndStartMFCFlow(draw) {
     } else {
       state.setGaugeValue(0.0, 0.0);
       startMoleFractionCalculation('-1');
-      // console.log(`Flow check: Tank ${tankNum} selected, but one or both valves are closed.`);
       // No flow started, simulation already stopped.
     }
   } else {
     state.setGaugeValue(0.0, 0.0);
     startMoleFractionCalculation('-1');
-    // console.log(`Flow check: No valid tank selected (Position: ${state.getCurrentMultiValvePosition()}).`);
     // No flow started, simulation already stopped.
   }
 }
