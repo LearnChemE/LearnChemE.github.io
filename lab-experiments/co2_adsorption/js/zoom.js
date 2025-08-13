@@ -1,5 +1,10 @@
 import * as config from './config.js';
 import * as state from './state.js';
+
+/**
+ * Enable dragging on the SVG Canvas via the viewbox element.
+ * @param {*} draw SVG Draw Object
+ */
 export function addOptionToDragAndZoom(draw) {
     draw.text("Zoom with the scroll wheel.")
     .move(config.canvasWidth - 250, 100)
