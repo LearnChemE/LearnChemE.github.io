@@ -2,7 +2,7 @@
 import * as config from './config.js';
 import * as state from './state.js';
 import { getTankFromMultiValvePosition } from './utils.js';
-import { startMoleFractionCalculation, stopMoleFractionCalculation } from './simulation.js';
+import { startMoleFractionCalculation } from './simulation.js';
 
 // Helper to draw the pipe layers (outline and fill)
 function drawPipeLayer(draw, pipeGroup, pathString, width, color, linejoin = 'round', isOutline = false) {
@@ -263,9 +263,6 @@ export function checkAndStartMFCFlow(draw) {
   ];
   mfcSegments.forEach(segmentId => state.removeFlowPath(segmentId));
 
-  // Stop simulation calculation
-  stopMoleFractionCalculation(); // Assumes this clears timer and resets related state
-
   // Determine selected tank and check valve states
   const tankNum = getTankFromMultiValvePosition(state.getCurrentMultiValvePosition());
 
@@ -325,12 +322,14 @@ export function checkAndStartMFCFlow(draw) {
 
     } else {
       state.setGaugeValue(0.0, 0.0);
-      console.log(`Flow check: Tank ${tankNum} selected, but one or both valves are closed.`);
+      startMoleFractionCalculation('-1');
+      // console.log(`Flow check: Tank ${tankNum} selected, but one or both valves are closed.`);
       // No flow started, simulation already stopped.
     }
   } else {
     state.setGaugeValue(0.0, 0.0);
-    console.log(`Flow check: No valid tank selected (Position: ${state.getCurrentMultiValvePosition()}).`);
+    startMoleFractionCalculation('-1');
+    // console.log(`Flow check: No valid tank selected (Position: ${state.getCurrentMultiValvePosition()}).`);
     // No flow started, simulation already stopped.
   }
 }

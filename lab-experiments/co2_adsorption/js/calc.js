@@ -13,7 +13,7 @@ const Ka = (T) => { return KA0 * Math.exp(-EA/T); }
 const KD0 = 10**4 * RATE_MULTIPLIER;
 const ED = 4209 * RATE_MULTIPLIER;
 const Kd = (T) => { return KD0 * Math.exp(-ED/T); }
-const BED_MAX_CAPACITY = 1; // mol CO2 total
+const BED_MAX_CAPACITY = 10; // mol CO2 total
 
 /**
  * Calculate the amount of CO2 adsorbed on a surface
