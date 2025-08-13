@@ -10,7 +10,7 @@ import { createMassFlowController, mfcClicked } from './components/mfc.js';
 import { createVerticalAdsorptionBedView } from './components/adsorptionBed.js';
 import { createCO2GasAnalyzer } from './components/co2Analyzer.js';
 import { createVentArrow } from './components/ventArrow.js';
-import { stopMoleFractionCalculation, stopHeating } from './simulation.js';
+import { stopHeating, startMoleFractionCalculation } from './simulation.js';
 import { addOptionToDragAndZoom } from './zoom.js';
 
 // Function now accepts draw and pipeGroup (or assumes draw is global and recreates group)
@@ -18,8 +18,10 @@ export function resetEverything(draw, pipeGroup) { // Keep parameters if main.js
     console.log('Resetting simulation...');
 
     // 1. Stop Timers and Calculations
-    stopMoleFractionCalculation();
+    // stopMoleFractionCalculation();
+    startMoleFractionCalculation(-1);
     stopHeating();
+    state.setTemperature(298.15);
 
     // 2. Reset State Variables (using functions from state.js)
     state.resetSimulationState();

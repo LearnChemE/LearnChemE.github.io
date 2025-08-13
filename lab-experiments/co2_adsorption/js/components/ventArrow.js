@@ -1,24 +1,6 @@
 // js/components/ventArrow.js
 
 export function createVentArrow(draw, x, y, angle, length) {
-    // --- Debugging: Log Inputs ---
-    console.log('--- createVentArrow Called ---');
-    console.log('Inputs:', { x, y, angle, length });
-    console.log('Input Types:', { x: typeof x, y: typeof y, angle: typeof angle, length: typeof length });
-
-    // --- Debugging: Check for NaN or invalid inputs ---
-    if (typeof x !== 'number' || isNaN(x) ||
-        typeof y !== 'number' || isNaN(y) ||
-        typeof angle !== 'number' || isNaN(angle) ||
-        typeof length !== 'number' || isNaN(length)) {
-        console.error('***** Invalid input detected in createVentArrow! *****', { x, y, angle, length });
-        // Return an empty group to prevent further errors down the line
-        // You might see fewer errors, but the arrow won't be drawn.
-        // This helps confirm if the inputs are the problem.
-        return draw.group();
-    }
-    // --- End Debugging Checks ---
-
     const rad = angle * Math.PI / 180;
 
     // Arrow head parameters
@@ -62,8 +44,6 @@ export function createVentArrow(draw, x, y, angle, length) {
     // Arrowhead
     // --- Debugging: Log calculated points and the final string ---
     const pointsString = `${tipX},${tipY} ${leftX},${leftY} ${rightX},${rightY}`;
-    console.log('Calculated Arrowhead Coords:', { tipX, tipY, leftX, leftY, rightX, rightY });
-    console.log('Polygon Points String:', pointsString);
 
     // Check for NaN or non-numbers in calculated arrowhead values
     if (isNaN(tipX) || isNaN(tipY) || isNaN(leftX) || isNaN(leftY) || isNaN(rightX) || isNaN(rightY)) {

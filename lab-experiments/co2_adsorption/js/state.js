@@ -24,8 +24,10 @@ export let heatingInterval = null; // Interval ID
 
 // --- References to SVG Elements (Set by creation functions) ---
 export let co2AnalyzerElement = null; // Reference to the SVG group for CO2 Analyzer
+export let thermElement = null; // Reference to the SVG group for therm
 export let interactiveValveKnobElement = null; // Reference to the main interactive valve SVG group
 export let isPanning = false; // Flag for panning state
+export let panStart = { x: 0, y: 0 };
 
 // --- State Management Functions ---
 export function setValveState(valveId, isOpen, position, knob = null) {
@@ -147,6 +149,8 @@ export function getCurrentMultiValvePosition() { return currentMultiValvePositio
 // --- SVG Element References ---
 export function setCo2AnalyzerElement(element) { co2AnalyzerElement = element; }
 export function getCo2AnalyzerElement() { return co2AnalyzerElement; }
+export function setThermElement(element) { thermElement = element; }
+export function getThermElement() { return thermElement; }
 export function setInteractiveValveKnobElement(element) { interactiveValveKnobElement = element; }
 export function getInteractiveValveKnobElement() { return interactiveValveKnobElement; }
 
@@ -182,8 +186,10 @@ export function clearHeatingInterval() {
   heatingInterval = null;
 }
 
+// --- Panning ---
 export function setIsPanning(value) { isPanning = value; }
 export function getIsPanning() { return isPanning; }
+export function setPanStart(coord) { panStart = coord }
 
 // --- Master Reset for Simulation State ---
 export function resetSimulationState() {
@@ -219,6 +225,6 @@ export function setOutletMoleFraction(value) { outletMoleFraction = value; }
 // I'm going to follow the getter-setter global pattern here, but I don't like it. If your state is this messy, organize it into some objects or something. -Drew
 
 // Temperature of the reactor in Kelvin (previously a const in config.js)
-export var tempKelvin = 298; // Temperature in K
+export var tempKelvin = 298.15; // Temperature in K
 export function setTemperature(newtemp) { tempKelvin = newtemp };
 export function getTemperature() { return tempKelvin };

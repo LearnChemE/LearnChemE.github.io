@@ -2,7 +2,7 @@
 import * as config from './config.js';
 import * as state from './state.js';
 import { getTankFromMultiValvePosition } from './utils.js';
-import { startMoleFractionCalculation, stopMoleFractionCalculation } from './simulation.js';
+import { startMoleFractionCalculation } from './simulation.js';
 
 // Helper to draw the pipe layers (outline and fill)
 function drawPipeLayer(draw, pipeGroup, pathString, width, color, linejoin = 'round', isOutline = false) {
@@ -44,7 +44,7 @@ export function animateGasFlow(draw, segmentId, color, opacity, onComplete = nul
   }
   // Avoid creating duplicate animations if one is already running for this segment
   if (state.getFlowPath(segmentId)) {
-    console.log(`Flow animation already exists for ${segmentId}. Skipping.`);
+    // console.log(`Flow animation already exists for ${segmentId}. Skipping.`);
     // Optionally, call onComplete immediately if needed?
     // if (onComplete) onComplete();
     return;
@@ -87,7 +87,6 @@ export function animateGasFlow(draw, segmentId, color, opacity, onComplete = nul
   flowPath.animate({ duration: totalLength * speed / 50 }).attr({ 'stroke-dashoffset': 0 }) // Adjust duration based on length and speed factor
     .after(() => {
       // Animation finished for this segment
-      console.log(`Animation complete for ${segmentId}`);
       if (onComplete) {
         onComplete();
       }
@@ -263,9 +262,6 @@ export function checkAndStartMFCFlow(draw) {
   ];
   mfcSegments.forEach(segmentId => state.removeFlowPath(segmentId));
 
-  // Stop simulation calculation
-  stopMoleFractionCalculation(); // Assumes this clears timer and resets related state
-
   // Determine selected tank and check valve states
   const tankNum = getTankFromMultiValvePosition(state.getCurrentMultiValvePosition());
 
@@ -296,8 +292,6 @@ export function checkAndStartMFCFlow(draw) {
           opacity = 1.0; // Should not happen
       }
 
-      console.log(`Starting flow from Tank ${tankNum}`);
-
       state.setGaugeValue(`gauge${tankNum}`, state.getGaugeValue(`gauge${tankNum}`, 5.0));
 
       // Start chained animations
@@ -325,12 +319,12 @@ export function checkAndStartMFCFlow(draw) {
 
     } else {
       state.setGaugeValue(0.0, 0.0);
-      console.log(`Flow check: Tank ${tankNum} selected, but one or both valves are closed.`);
+      startMoleFractionCalculation('-1');
       // No flow started, simulation already stopped.
     }
   } else {
     state.setGaugeValue(0.0, 0.0);
-    console.log(`Flow check: No valid tank selected (Position: ${state.getCurrentMultiValvePosition()}).`);
+    startMoleFractionCalculation('-1');
     // No flow started, simulation already stopped.
   }
 }

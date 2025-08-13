@@ -12,6 +12,7 @@ import { createVerticalAdsorptionBedView } from './components/adsorptionBed.js';
 import { createCO2GasAnalyzer } from './components/co2Analyzer.js';
 import { createVentArrow } from './components/ventArrow.js';
 import { addOptionToDragAndZoom } from './zoom.js';
+import { createThermister } from './components/therm.js';
 
 // --- Global Canvas Setup ---
 let windowWidth = window.innerWidth - 60;
@@ -51,6 +52,7 @@ function drawCanvas() {
     const adsorptionOutletValveX = 600; const adsorptionOutletValveY = 400;
     const tValveX = 634.5; const tValveY = 370;
     const co2AnalyzerX = 700; const co2AnalyzerY = 450;
+    const thermX = 700; const thermY = 200;
     const vent1BaseX = 465; const vent1BaseY = 5; // Base position for arrow placement
     const vent2BaseX = 870; const vent2BaseY = 485; // Base position for arrow placement
 
@@ -109,6 +111,9 @@ function drawCanvas() {
 
     // Create CO2 Analyzer
     createCO2GasAnalyzer(draw, co2AnalyzerX, co2AnalyzerY, "00.00%"); // Initial text
+
+    // Create Thermister display
+    createThermister(draw, thermX, thermY);
 
     // Create Vent Arrows
     createVentArrow(draw, vent1BaseX + 5, vent1BaseY - 2, 270, 40); // Vent 1 (Top)
