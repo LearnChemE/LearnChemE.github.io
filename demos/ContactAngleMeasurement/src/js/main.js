@@ -17,14 +17,15 @@ let isAnimationComplete = false;
 export function drawFigure(draw) {
     // draw.line(-80, 230, 120, 230)
     // .stroke({ color: '#000', width: 2 });
-    syringe = drawSyringe(draw, 40, 350, 1.5, volume);
+    // syringe = drawSyringe(draw, 40, 350, 1.5, volume);
     selectVolume(draw);
     selectAngle(draw);
-    draw.rect(300, 2)
-    .fill('none')
-    .stroke({ color: '#000', width: 2 })
-    .move(0, 600);
-    animateSyringe(draw);
+    // draw.rect(300, 2)
+    // .fill('none')
+    // .stroke({ color: '#000', width: 2 })
+    // .move(0, 600);
+    drawThetaPlot(volume, angle);
+    // animateSyringe(draw);
 }
 
 let syringeProgress = 0; // in mL
@@ -153,7 +154,8 @@ function selectVolume(draw) {
     draw.clear();
     drawFigure(draw);
     // Start the syringe animation automatically on volume change
-    animateSyringe(draw);
+    // animateSyringe(draw);
+    drawThetaPlot(volume, angle);
     // Intentionally not drawing theta here so it appears after animation completes
     // drawThetaPlot(volume, angle);
   };
@@ -236,7 +238,7 @@ function animateSyringe(draw) {
             draw.prevDropCircle.remove();
           }
           draw.prevDropCircle = draw.circle(4 * maxRadius).center(140, 600).fill('#B4B4FF');
-          drawThetaPlot(volume, angle);
+          
         });
     }
 

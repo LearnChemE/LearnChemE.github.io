@@ -87,7 +87,7 @@ body {
     display: flex;
     align-items: center;
     gap: 4px;
-    width:1200px;
+    width:1000px;
     background-color: white;
     padding: 8px;
     border-radius: 4px;
@@ -256,9 +256,9 @@ svg text {
 #plotDiv {
   position: absolute;
   top: 0;
-  right: 0;
   width: 60%;
   height: 100%;
+  left: calc(55vw - 30%);
   // border: 1px solid #ccc;
   pointer-events: none; // allow SVG zoom/pan gestures to pass through
 }
