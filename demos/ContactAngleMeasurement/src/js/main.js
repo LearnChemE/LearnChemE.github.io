@@ -11,7 +11,7 @@ const d     = 1000;     // fluid mass density [kg/m³]
 const gamma = 0.072;    // surface tension [N/m]
 let volume = 1000; // volume in mL
 let syringe = null;
-let angle = 10;
+let angle = 90;
 let isAnimationComplete = false;
 
 export function drawFigure(draw) {
@@ -283,25 +283,66 @@ function drawThetaPlot(volume, angle) {
   const yMax = 1.01 * r_um[r_um.length - 1];
   // Get container size
   const plotDivEl = document.getElementById('plotDiv');
+  if (plotDivEl) {
+    // Make sure the plot can receive mouse/touch events even if other layers overlap
+    plotDivEl.style.pointerEvents = 'auto';
+    plotDivEl.style.zIndex = '1000';
+    plotDivEl.style.touchAction = 'auto';
+  }
   const w = plotDivEl ? plotDivEl.clientWidth : 750;
   const h = plotDivEl ? plotDivEl.clientHeight : 750;
   const size = Math.min(w, h);
+
+  // Format to exactly N significant figures with padding; switches to scientific when needed
+  function formatSig(x, n = 3) {
+    if (!isFinite(x)) return String(x);
+    if (x === 0) return (0).toFixed(n - 1); // e.g., n=3 => "0.00"
+    const ax = Math.abs(x);
+    const exp = Math.floor(Math.log10(ax));
+    // Use fixed-point when the number of integer digits <= n; otherwise scientific
+    if (exp >= n || exp <= -4) {
+      const mant = x / Math.pow(10, exp);
+      return mant.toFixed(n - 1) + 'e' + (exp >= 0 ? '+' : '') + exp;
+    }
+    const decimals = Math.max(0, n - 1 - exp);
+    return x.toFixed(decimals);
+  }
+
+  const customdata = x.map((xi, i) => [formatSig(xi, 3), formatSig(y[i], 3)]);
+
   const trace = {
     x, y,
     mode: 'lines',
     line: { color: 'black' },
     fill: 'tozeroy',
     fillcolor: '#B4B4FF',
-    fillOpacity: 0.5
+    fillOpacity: 0.5,
+    hoveron: 'fills+points',
+    customdata: customdata,
+    hovertemplate: 'x: %{customdata[0]} μm<br>y: %{customdata[1]} μm<extra></extra>'
   };
   const layout = {
+    hovermode: 'closest',
+    hoverdistance: 50,
+    spikedistance: -1,
+    dragmode: 'zoom',
     xaxis: {
       title: { text: 'x (μm)' },
-      range: [-1.01 * Math.max(...r_um), 1.01 * Math.max(...r_um)]
+      range: [-1.01 * Math.max(...r_um), 1.01 * Math.max(...r_um)],
+      showspikes: true,
+      spikemode: 'across',
+      spikesnap: 'cursor',
+      spikecolor: '#444',
+      spikethickness: 1,
     },
     yaxis: {
       title: { text: 'y (μm)' },
       range: [0, yMax],
+      showspikes: true,
+      spikemode: 'across',
+      spikesnap: 'cursor',
+      spikecolor: '#444',
+      spikethickness: 1,
       scaleanchor: 'x',
       scaleratio: 1,
       constrain: 'range',
@@ -310,7 +351,7 @@ function drawThetaPlot(volume, angle) {
     width: size,
     height: size,
   };
-  const config = { responsive: true, displayModeBar: false, scrollZoom: false, staticPlot: true };
+  const config = { responsive: true, displayModeBar: false, scrollZoom: true, staticPlot: false };
   Plotly.newPlot('plotDiv', [trace], layout, config);
 }
 
@@ -341,7 +382,7 @@ export function reset(draw) {
 //   if (volSelect) volSelect.value = String(volume);
 
   // Reset angle and update slider/value display
-  angle = 10;
+  // angle = 10;
   const angleSlider = document.getElementById('angleSlider');
   const angleValue = document.getElementById('angleValue');
   if (angleSlider) angleSlider.value = String(angle);
