@@ -1,5 +1,6 @@
 import 'bootstrap/scss/bootstrap.scss';
 import './css/style.css'
+import 'bootstrap'
 import svg from "./media/crossExchanger.svg?raw"
 import { initHamburgerMenu } from './ts/hamburger';
 

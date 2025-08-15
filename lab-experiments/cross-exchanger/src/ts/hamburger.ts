@@ -12,7 +12,7 @@ export function initHamburgerMenu() {
     menu.className = "menu-content";
     menu.innerHTML = `
             <button id="dir-btn" type="button" class="btn btn-primary btn-wide" data-bs-toggle="modal" data-bs-target="#directions-modal"> Directions </div>
-            <button id="det-btn" type="button" class="btn btn-primary btn-wide" data-bs-toggle="modal" data-bs-target="#details-modal"> Details </div>
+            <button id="wks-btn" type="button" class="btn btn-primary btn-wide"> Worksheet </div>
             <button id="abt-btn" type="button" class="btn btn-primary btn-wide" data-bs-toggle="modal" data-bs-target="#about-modal"> About </div>
             `;
 
