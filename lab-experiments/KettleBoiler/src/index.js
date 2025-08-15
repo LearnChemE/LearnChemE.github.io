@@ -1,35 +1,35 @@
-// index.js - Updated with reset functionality
-
 import "bootstrap";
 import "p5";
 import "./style/style.scss";
-import { drawAll } from "./js/draw";
+import { drawAll} from "./js/draw";
 import { handleInputs } from "./js/inputs";
 import { calcAll, setDefaults } from "./js/calcs";
-import { toggleReactorHeater, drawReactorBody  } from "./js/reactor"; // ✅ Add this import
-import { drawCondenserBody } from './js/condenser';
-import { updateExhaustParticles, drawExhaustParticles } from './js/reactor';
-import { initializeResetButton } from "./js/reset.js"; // ✅ NEW: Import reset functionality
-
-// ✅ Declare global variables properly
-window.tempSlider = null;
-window.tempValueSpan = null;
-window.reactorTemp = 200;
-window.targetTemp = 200;
-window.reactorHeaterOn = false;
 
 // GLOBAL VARIABLES OBJECT
 window.state = {
   frameRate: 60,
   pixelDensity: 4,
   showButtons: false,
+  mode: "compressor",
   hamburgerHasBeenClicked: window.localStorage.getItem("hamburgerHasBeenClicked") === "true",
   canvasSize: [150, 120],
 };
 
 const containerElement = document.getElementById("p5-container");
 
+// Load kettle HTML layout and inject into container
+fetch("kettleBoiler.html")
+  .then(res => res.text())
+  .then(html => {
+    document.getElementById('kettleBoiler').innerHTML = html;
+    }
+  )
+  .catch(err => console.error("❌ Failed to load kettleBoiler.html", err));
+
+
+
 window.setup = function () {
+  //preload();
   sizeContainer();
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
   handleInputs();
@@ -37,21 +37,6 @@ window.setup = function () {
   calcAll();
   pixelDensity(state.pixelDensity);
   frameRate(state.frameRate);
-
-  // ✅ Initialize slider references
-  window.tempSlider = document.getElementById("tempSlider");
-  window.tempValueSpan = document.getElementById("tempValue");
-
-  if (window.tempSlider && window.tempValueSpan) {
-    window.tempSlider.addEventListener("input", () => {
-      window.tempValueSpan.textContent = `${window.tempSlider.value}°C`;
-    });
-  }
-
-  // ✅ NEW: Initialize reset button after DOM is ready
-  setTimeout(() => {
-    initializeResetButton();
-  }, 100);
 };
 
 window.draw = function () {
@@ -59,37 +44,7 @@ window.draw = function () {
   window.height = state.canvasSize[1];
   scale(relativeSize());
   background(255);
-
-  // ✅ FIXED: Properly update target temperature
-  if (window.reactorHeaterOn && window.tempSlider) {
-    window.targetTemp = parseInt(window.tempSlider.value);
-    console.log("Heater ON - Slider value:", window.tempSlider.value, "Target:", window.targetTemp); // Debug
-  } else {
-    window.targetTemp = 200;
-    console.log("Heater OFF - Target reset to 200"); // Debug
-  }
-
-  // ✅ FIXED: Update the actual temperature and store it back
-  window.reactorTemp = lerp(window.reactorTemp, window.targetTemp, 0.05);
-
-  updateExhaustParticles();   // <- from reactor.js
-  drawExhaustParticles();     // <- from reactor.js
-  drawAll(window.reactorTemp);
-};
-
-window.keyPressed = function () {
-  if (key === 'V') {
-    valveToCondenserOpen = !valveToCondenserOpen;
-    console.log("Valve to condenser is now", valveToCondenserOpen ? "OPEN" : "CLOSED");
-  }
-};
-
-// ✅ Add mouse click handler
-window.mousePressed = function() {
-  let mx = mouseX / relativeSize();
-  let my = mouseY / relativeSize();
-  
-  toggleReactorHeater(mx, my);
+  drawAll();
 };
 
 window.windowResized = () => {
@@ -104,5 +59,7 @@ function sizeContainer() {
   containerElement.style.height = `calc(calc(100vw - 10px) * ${state.canvasSize[1]} / ${state.canvasSize[0]})`;
   containerElement.style.maxHeight = `calc(100vh - 10px)`;
 }
+
+
 
 require("./js/events.js");
