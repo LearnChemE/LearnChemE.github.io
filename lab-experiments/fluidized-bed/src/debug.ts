@@ -1,4 +1,5 @@
-import { pressureDrop } from "./js/calculations";
+import { flowrate, pressureDrop } from "./js/calculations";
+import { PUMP_FLOWRATE_GAIN, PUMP_VELOCITY_GAIN } from "./types";
 
 async function sendDataToPython(data: any) {
     const response = await fetch('http://localhost:5000/data', {
@@ -39,6 +40,25 @@ async function saveFig(filename: string) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({filename: `${filename}_${date_str}.png`})
+    });
+
+    const result = await response.json();
+    console.log('Python responded with:', result);
+}
+
+async function saveCSV(filename: string, x: number[], y: number[]) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2,'0');
+    const day = String(now.getDate()).padStart(2, '0')
+    const date_str = `${year}-${month}-${day}`;
+    console.log(filename)
+    const response = await fetch('http://localhost:5000/csv', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ filename: `${filename}_${date_str}.csv`, 'x': x, 'y': y })
     });
 
     const result = await response.json();
@@ -100,4 +120,25 @@ async function debugPlots() {
         await saveFig(names[i]);         await delay(1000);
     }
 } 
-debugPlots();
+// debugPlots();
+
+async function debugSaveCSV() {
+    // Generate data
+    const q = linspace(0, 700, 15);
+    const y: number[] = [];
+    q.forEach((flowrate: number) => {
+        const lift = flowrate / 60 / PUMP_FLOWRATE_GAIN;
+        console.log(lift)
+        y.push(pressureDrop(lift));
+    })
+
+    sendDataToPython({
+        xlabel: "Flowrate (mL / min)",
+        ylabel: "Pressure drop (cm water)",
+        title: "Pressure drop versus flowrate",
+        lift: q,
+        deltaP: y
+    });
+    saveCSV('sim_pdrop', q, y);
+}
+debugSaveCSV();

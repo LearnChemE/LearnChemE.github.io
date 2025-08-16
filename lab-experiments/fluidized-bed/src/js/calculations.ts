@@ -1,4 +1,4 @@
-import { PUMP_PRESSURE_GAIN } from '../types';
+import { PUMP_FLOWRATE_GAIN, PUMP_PRESSURE_GAIN, PUMP_VELOCITY_GAIN } from '../types';
 import { setTargetBedHeight } from './canvas';
 import { secantMethod } from './helpers';
 import State from './state';
@@ -32,6 +32,15 @@ export function pumpPressure() {
 }
 
 /**
+ * Return the flowrate of the tank given a fluidization velocity
+ * @param lift 
+ * @returns 
+ */
+export function flowrate(lift: number) {
+    return lift * PUMP_FLOWRATE_GAIN;
+}
+
+/**
  * Calculates the pressure drop and sets the bed height
  * @returns pressure drop across bed in UNITS (positive)
  */
@@ -41,7 +50,7 @@ export function pressureDrop(lift?: number, returnHeight=false) {
         lift = State.valveLift;
         dbMode = false;
     }
-    const sup_vel = lift * 7; // Superficial velocity, cm/s
+    const sup_vel = lift * PUMP_VELOCITY_GAIN; // Superficial velocity, cm/s
 
     // Packed regime
     if (sup_vel < minFluidizeVelocity) {
