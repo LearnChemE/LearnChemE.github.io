@@ -1,15 +1,15 @@
-import { PUMP_PRESSURE_GAIN } from '../types';
+import { PUMP_FLOWRATE_GAIN, PUMP_PRESSURE_GAIN, PUMP_VELOCITY_GAIN, ValveSetting } from '../types';
 import { setTargetBedHeight } from './canvas';
 import { secantMethod } from './helpers';
 import State from './state';
 
 const InitialBedHeight = 5.0; // cm
 const mu = 1.002; // mPa s
-const rho = .998; // g / cc
+const rho = .997; // g / cc
 const rho_p = 2.4; // g / cc
 const grav = 981; // cm / s2
 const ParticleDiameter = 0.107; // cm
-const Init_VoidFrac = 0.45;
+const Init_VoidFrac = 0.39;
 
 var minFluidizeVelocity=0;
 function initializeCalculations() {
@@ -28,7 +28,30 @@ initializeCalculations();
  * @returns pressure from pump in cm water
  */
 export function pumpPressure() {
-    return PUMP_PRESSURE_GAIN * State.valveLift;
+    const lift = State.valveLift;
+    const flow = PUMP_FLOWRATE_GAIN * lift * 60;
+    if (flow <= 143) {
+        return (State.valveSetting === ValveSetting.RecycleMode) ? 
+            (2.78 / 142 * flow) : 0.0;
+    }
+    else {
+        // Choose which fit to use
+        const poly = (State.valveSetting === ValveSetting.RecycleMode) ? 
+            [2.41e-5, 3.99e-3, 2.86] : 
+            [1.45e-5, 6.93e-3,-1.60];
+        
+        // Evaluate the polynomial
+        return flow*flow * poly[0] + flow * poly[1] + poly[2];
+    }
+}
+
+/**
+ * Return the flowrate of the tank given a fluidization velocity
+ * @param lift 
+ * @returns 
+ */
+export function flowrate(lift: number) {
+    return lift * PUMP_FLOWRATE_GAIN;
 }
 
 /**
@@ -41,7 +64,7 @@ export function pressureDrop(lift?: number, returnHeight=false) {
         lift = State.valveLift;
         dbMode = false;
     }
-    const sup_vel = lift * 7; // Superficial velocity, cm/s
+    const sup_vel = lift * PUMP_VELOCITY_GAIN; // Superficial velocity, cm/s
 
     // Packed regime
     if (sup_vel < minFluidizeVelocity) {
@@ -59,7 +82,7 @@ export function pressureDrop(lift?: number, returnHeight=false) {
     }
 
     // Fluidized regime
-    else if (sup_vel <= 6) {
+    else if (sup_vel <= 6.5) {
         const ergun = (lf: number) => {
             // Calculate porosity
             const ep = 1 - InitialBedHeight / lf * (1 - Init_VoidFrac);
@@ -70,7 +93,7 @@ export function pressureDrop(lift?: number, returnHeight=false) {
         };
 
         const h = secantMethod(ergun, 1, 10);
-        // console.log(`Fluidized bed height: ${h}`);
+        
         const ep = 1 - InitialBedHeight / h * (1 - Init_VoidFrac);
         const p = (rho_p - rho) * grav * h * (1 - ep);
         
@@ -81,10 +104,10 @@ export function pressureDrop(lift?: number, returnHeight=false) {
 
     // Repacked regime
     else {
-        const dx = sup_vel - 6;
+        const dx = sup_vel - 6.5;
         const dy = dx * 15.0;
         // console.log('Repacked regime');
-        if (!dbMode) setTargetBedHeight(14.5 + 10*dx);
+        if (!dbMode) setTargetBedHeight(14.5 + 4*dx);
         if (returnHeight) return 14.5 + 5*dx;
         return 4.3 + dy; 
     }

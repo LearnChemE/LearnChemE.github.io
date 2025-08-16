@@ -3,6 +3,7 @@ from flask_cors import CORS
 import matplotlib.pyplot as plt
 import threading
 import queue
+import csv
 
 # Initialize flask
 app = Flask(__name__)
@@ -107,6 +108,25 @@ def request_save():
 
     main_queue.put(save_plot)
     return jsonify({"message": "Data save queued"})
+
+@app.route('/csv', methods=['POST'])
+def save_csv():
+    content = request.get_json()
+    print(f"CSV request: {content}")
+
+    # Get request content
+    x = content.get('x', [])
+    y = content.get('y', [])
+    filename = content.get('filename', [])
+
+    # Write csv
+    data = [x, y]
+    with open(filename, 'w') as file:
+        writer = csv.writer(file)
+        writer.writerows(data)
+    
+    return jsonify({"message": "csv written successfully"})
+
 
 def live_plot():
     # Plot setup
