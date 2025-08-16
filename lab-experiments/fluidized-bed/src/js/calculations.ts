@@ -5,11 +5,11 @@ import State from './state';
 
 const InitialBedHeight = 5.0; // cm
 const mu = 1.002; // mPa s
-const rho = .998; // g / cc
+const rho = .997; // g / cc
 const rho_p = 2.4; // g / cc
 const grav = 981; // cm / s2
 const ParticleDiameter = 0.107; // cm
-const Init_VoidFrac = 0.45;
+const Init_VoidFrac = 0.39;
 
 var minFluidizeVelocity=0;
 function initializeCalculations() {
@@ -79,7 +79,7 @@ export function pressureDrop(lift?: number, returnHeight=false) {
         };
 
         const h = secantMethod(ergun, 1, 10);
-        // console.log(`Fluidized bed height: ${h}`);
+        
         const ep = 1 - InitialBedHeight / h * (1 - Init_VoidFrac);
         const p = (rho_p - rho) * grav * h * (1 - ep);
         

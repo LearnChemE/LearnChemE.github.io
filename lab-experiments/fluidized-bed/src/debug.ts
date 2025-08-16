@@ -132,6 +132,7 @@ async function debugSaveCSV() {
         y.push(pressureDrop(lift));
     })
 
+    await resetPython();
     sendDataToPython({
         xlabel: "Flowrate (mL / min)",
         ylabel: "Pressure drop (cm water)",
