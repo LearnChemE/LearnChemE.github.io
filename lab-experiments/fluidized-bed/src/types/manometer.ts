@@ -224,6 +224,7 @@ export class Manometer {
         // Add pump pressure. Sign should be negative because y pixels go down, and multiply by 5 pixels per cm water
         const pump = 1.95 * pumpPressure(); // pixels water
         const drop = 1.95 * pressureDrop(); // pixels water
+        console.log(pumpPressure())
         
         var left = base - pump - drop;
         var right = base - pump;
@@ -239,7 +240,7 @@ export class Manometer {
     }
 
     public fillLeftOnly = async () => {
-        // // Set the left tube only
+        // Set the left tube only
         this.initLeft = true;
         this.initRight = false;
         this.fillTubes(0);

@@ -29,7 +29,7 @@ initializeCalculations();
  */
 export function pumpPressure() {
     const lift = State.valveLift;
-    const flow = PUMP_FLOWRATE_GAIN * lift;
+    const flow = PUMP_FLOWRATE_GAIN * lift * 60;
     if (flow <= 143) {
         return (State.valveSetting === ValveSetting.RecycleMode) ? 
             (2.78 / 142 * flow) : 0.0;
@@ -82,7 +82,7 @@ export function pressureDrop(lift?: number, returnHeight=false) {
     }
 
     // Fluidized regime
-    else if (sup_vel <= 6) {
+    else if (sup_vel <= 6.5) {
         const ergun = (lf: number) => {
             // Calculate porosity
             const ep = 1 - InitialBedHeight / lf * (1 - Init_VoidFrac);
@@ -104,10 +104,10 @@ export function pressureDrop(lift?: number, returnHeight=false) {
 
     // Repacked regime
     else {
-        const dx = sup_vel - 6;
+        const dx = sup_vel - 6.5;
         const dy = dx * 15.0;
         // console.log('Repacked regime');
-        if (!dbMode) setTargetBedHeight(14.5 + 10*dx);
+        if (!dbMode) setTargetBedHeight(14.5 + 4*dx);
         if (returnHeight) return 14.5 + 5*dx;
         return 4.3 + dy; 
     }
