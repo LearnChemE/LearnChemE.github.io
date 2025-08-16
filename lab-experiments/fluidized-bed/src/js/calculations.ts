@@ -1,4 +1,4 @@
-import { PUMP_FLOWRATE_GAIN, PUMP_PRESSURE_GAIN, PUMP_VELOCITY_GAIN } from '../types';
+import { PUMP_FLOWRATE_GAIN, PUMP_PRESSURE_GAIN, PUMP_VELOCITY_GAIN, ValveSetting } from '../types';
 import { setTargetBedHeight } from './canvas';
 import { secantMethod } from './helpers';
 import State from './state';
@@ -28,7 +28,21 @@ initializeCalculations();
  * @returns pressure from pump in cm water
  */
 export function pumpPressure() {
-    return PUMP_PRESSURE_GAIN * State.valveLift;
+    const lift = State.valveLift;
+    const flow = PUMP_FLOWRATE_GAIN * lift;
+    if (flow <= 143) {
+        return (State.valveSetting === ValveSetting.RecycleMode) ? 
+            (2.78 / 142 * flow) : 0.0;
+    }
+    else {
+        // Choose which fit to use
+        const poly = (State.valveSetting === ValveSetting.RecycleMode) ? 
+            [2.41e-5, 3.99e-3, 2.86] : 
+            [1.45e-5, 6.93e-3,-1.60];
+        
+        // Evaluate the polynomial
+        return flow*flow * poly[0] + flow * poly[1] + poly[2];
+    }
 }
 
 /**

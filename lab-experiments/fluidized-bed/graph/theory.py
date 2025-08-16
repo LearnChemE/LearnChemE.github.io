@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import csv
 
 hl_r = np.array([2.84e-5,-5.94e-3, 7.58, 7.31])
 hr_r = np.array([2.41e-5,-3.99e-3, 2.86, 2.78])
@@ -36,19 +35,31 @@ def plotAll(ax, data):
     ax.set_ylabel("Pressure Drop (cm water)")
 
     for set in data:
-        ax.plot(set["x"], set["y"], label=set["label"])
+        ax.plot(set["x"], set["y"], label=set["label"], marker='.')
     
     ax.legend()
 
 def plotRes(ax, base, reg):
-    x = reg["x"]
+    x = base["x"]
+    y = reg["y"] - base["y"]
     title = "Residuals for " + reg["label"] + " vs " + base["label"]
     ax.set_xlabel("Flowrate (mL/min)")
     ax.set_ylabel("Pressure Drop (cm water)")
     ax.set_title(title)
 
     ax.axhline(0, color='r')
-    ax.plot(x, reg["y"] - base["y"], 'k.')
+
+    # Calculate r squared
+    sst = np.sum(np.square(base["y"]))
+    ssr = np.sum(np.square(y))
+    r2 = 1 - ssr / sst
+
+    text = f"r squared = {r2:.5f}"
+    ax.plot(x, y, 'ko')
+    ax.annotate(text, xy=(450, 100), xycoords='axes points',
+            size=14, ha='right', va='top',
+            bbox=dict(boxstyle='round', fc='w'))
+
 
 
 if __name__ == '__main__':
