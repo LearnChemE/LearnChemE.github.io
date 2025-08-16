@@ -273,14 +273,14 @@ function drawThetaPlot(volume, angle) {
   const theta = profile.theta;
   const r = profile.r;
   // Convert r from mm to μm for range calculations
-  const r_um = r.map(val => val * 1000);
-  const xUpper = theta.map((t, i) => r[i] * Math.cos(t) * 1000);
-  const xLower = theta.map((t, i) => r[i] * Math.cos(Math.PI - t) * 1000).reverse();
-  const yUpper = theta.map((t, i) => r[i] * Math.sin(t) * 1000);
-  const yLower = theta.map((t, i) => r[i] * Math.sin(Math.PI - t) * 1000).reverse();
+  const r_mm = r;  // r is already in millimeters
+  const xUpper = theta.map((t, i) => r[i] * Math.cos(t));
+  const xLower = theta.map((t, i) => r[i] * Math.cos(Math.PI - t)).reverse();
+  const yUpper = theta.map((t, i) => r[i] * Math.sin(t));
+  const yLower = theta.map((t, i) => r[i] * Math.sin(Math.PI - t)).reverse();
   const x = xUpper.concat(xLower);
   const y = yUpper.concat(yLower);
-  const yMax = 1.01 * r_um[r_um.length - 1];
+  const yMax = 1.01 * r[r.length - 1];
   // Get container size
   const plotDivEl = document.getElementById('plotDiv');
   if (plotDivEl) {
@@ -293,22 +293,13 @@ function drawThetaPlot(volume, angle) {
   const h = plotDivEl ? plotDivEl.clientHeight : 750;
   const size = Math.min(w, h);
 
-  // Format to exactly N significant figures with padding; switches to scientific when needed
-  function formatSig(x, n = 3) {
+  // Replace formatSig with formatFixed for consistent fixed decimal places
+  function formatFixed(x, decimals = 4) {
     if (!isFinite(x)) return String(x);
-    if (x === 0) return (0).toFixed(n - 1); // e.g., n=3 => "0.00"
-    const ax = Math.abs(x);
-    const exp = Math.floor(Math.log10(ax));
-    // Use fixed-point when the number of integer digits <= n; otherwise scientific
-    if (exp >= n || exp <= -4) {
-      const mant = x / Math.pow(10, exp);
-      return mant.toFixed(n - 1) + 'e' + (exp >= 0 ? '+' : '') + exp;
-    }
-    const decimals = Math.max(0, n - 1 - exp);
     return x.toFixed(decimals);
   }
 
-  const customdata = x.map((xi, i) => [formatSig(xi, 3), formatSig(y[i], 3)]);
+  const customdata = x.map((xi, i) => [formatFixed(xi), formatFixed(y[i])]);
 
   const trace = {
     x, y,
@@ -319,7 +310,8 @@ function drawThetaPlot(volume, angle) {
     fillOpacity: 0.5,
     hoveron: 'fills+points',
     customdata: customdata,
-    hovertemplate: 'x: %{customdata[0]} μm<br>y: %{customdata[1]} μm<extra></extra>'
+    hovertemplate: 'x: %{customdata[0]} mm<br>y: %{customdata[1]} mm<extra></extra>',
+    name: '',
   };
   const layout = {
     hovermode: 'closest',
@@ -327,16 +319,18 @@ function drawThetaPlot(volume, angle) {
     spikedistance: -1,
     dragmode: 'zoom',
     xaxis: {
-      title: { text: 'x (μm)' },
-      range: [-1.01 * Math.max(...r_um), 1.01 * Math.max(...r_um)],
+      title: { text: 'x (mm)' },
+      range: [-1.01 * Math.max(...r), 1.01 * Math.max(...r)],
       showspikes: true,
       spikemode: 'across',
       spikesnap: 'cursor',
       spikecolor: '#444',
       spikethickness: 1,
+      tickformat: '.4f',
+      nticks: 7,
     },
     yaxis: {
-      title: { text: 'y (μm)' },
+      title: { text: 'y (mm)' },
       range: [0, yMax],
       showspikes: true,
       spikemode: 'across',
@@ -346,10 +340,14 @@ function drawThetaPlot(volume, angle) {
       scaleanchor: 'x',
       scaleratio: 1,
       constrain: 'range',
-      constraintoward: 'bottom'
+      constraintoward: 'bottom',
+      tickformat: '.4f',
+      nticks: 7,
     },
     width: size,
     height: size,
+    showlegend: false,
+    hoverlabel: { namelength: 0 },
   };
   const config = { responsive: true, displayModeBar: false, scrollZoom: true, staticPlot: false };
   Plotly.newPlot('plotDiv', [trace], layout, config);
