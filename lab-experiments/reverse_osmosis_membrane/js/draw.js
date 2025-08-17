@@ -58,6 +58,7 @@ function mouseCoordinate() {
 
 window.mouseWheel = function (event) {
   const graphicsWrapper = document.getElementById("graphics-wrapper");
+
   // Prevent default scrolling
   event.preventDefault();
 
@@ -77,8 +78,8 @@ window.mouseWheel = function (event) {
     const zoomXConst = (oldZoom * zoomX + mouseX * dz) / zdif;
     const zoomYConst = (oldZoom * zoomY + mouseY * dz) / zdif;
 
-    zoomX = constrain(zoomXConst, 0, graphicsWrapper.offsetWidth * 0.8);
-    zoomY = constrain(zoomYConst, 0, graphicsWrapper.offsetHeight * 0.8);
+    zoomX = constrain(zoomXConst, 0, state.width);
+    zoomY = constrain(zoomYConst, 0, state.height);
   } else {
     zoomX = 300;
     zoomY = 270;
@@ -112,14 +113,14 @@ window.mouseDragged = function () {
     state.dragging = false;
   } else {
     // Subtract the difference from the offset vector times the zoom for tracking
-    zoomX -= (mouseX - offsetX) * 0.8;
-    zoomY -= (mouseY - offsetY) * 0.8;
+    zoomX -= mouseX - offsetX;
+    zoomY -= mouseY - offsetY;
 
     offsetX = mouseX;
     offsetY = mouseY;
     // Constrain so the apparatus doesn't go offscreen
-    zoomX = constrain(zoomX, 0, graphicsWrapper.offsetWidth * 0.8);
-    zoomY = constrain(zoomY, 0, graphicsWrapper.offsetHeight * 0.8);
+    zoomX = constrain(zoomX, 0, state.width);
+    zoomY = constrain(zoomY, 0, state.height);
 
     // Update mX and mY, because changing the zoom coordinates will change these
     [window.mX, window.mY] = mouseCoordinate();
@@ -651,11 +652,11 @@ function drawPressureGauge(x, y) {
   translate(x + 160, y - 145);
   angleMode(DEGREES);
   strokeWeight(1.5);
-  for (let i = -45; i <= 225; i += (225 + 45) / 6) {
+  for (let i = -45; i <= 225; i += (225 + 45) / 8) {
     line(28 * cos(i), -28 * sin(i), 32 * cos(i), -32 * sin(i));
   }
   strokeWeight(1);
-  for (let i = -45; i <= 225; i += (225 + 45) / 30) {
+  for (let i = -45; i <= 225; i += (225 + 45) / 40) {
     line(28 * cos(i), -28 * sin(i), 30 * cos(i), -30 * sin(i));
   }
   //--------------------numbers on pressure gauge--------------------
@@ -664,8 +665,8 @@ function drawPressureGauge(x, y) {
   noStroke();
   fill("Black");
   textSize(11);
-  for (let i = -45; i <= 225; i += (225 + 45) / 6) {
-    let pressureGaugeText = -(i + 45) / (270 / 30) + 30;
+  for (let i = -45; i <= 225; i += (225 + 45) / 8) {
+    let pressureGaugeText = -(i + 45) / (270 / 40) + 40;
 
     text(pressureGaugeText.toFixed(0), 40 * cos(i), -40 * sin(i));
   }
@@ -676,12 +677,12 @@ function drawPressureGauge(x, y) {
   fill("black");
   noStroke();
   triangle(
-    35 * cos(-(180 * state.feedPressure) / 20 - 135),
-    -35 * sin(-(180 * state.feedPressure) / 20 - 135),
-    15 * cos(-(180 * state.feedPressure) / 20 - 135 + 180 - 17),
-    -15 * sin(-(180 * state.feedPressure) / 20 - 135 + 180 - 17),
-    15 * cos(-(180 * state.feedPressure) / 20 - 135 + 180 + 17),
-    -15 * sin(-(180 * state.feedPressure) / 20 - 135 + 180 + 17)
+    35 * cos(-((270 * state.feedPressure) / 40) - 135),
+    -35 * sin(-((270 * state.feedPressure) / 40) - 135),
+    15 * cos(-((270 * state.feedPressure) / 40) - 135 + 180 - 17),
+    -15 * sin(-((270 * state.feedPressure) / 40) - 135 + 180 - 17),
+    15 * cos(-((270 * state.feedPressure) / 40) - 135 + 180 + 17),
+    -15 * sin(-((270 * state.feedPressure) / 40) - 135 + 180 + 17)
   );
   fill("gray");
   strokeWeight(5);
@@ -932,7 +933,7 @@ function drawWater(x, y) {
     373 -
     (state.deltaHeightRetentateBeaker * state.topOfTankDrainTimer) / state.frameRate -
     (state.deltaHeightRetentateBeaker * state.bottomOfTankDrainTimer) / state.frameRate;
-  let retentateWaterBY = state.figureY + 373;
+  let retentateWaterBY = state.figureY + 374;
   let retentateWaterLX = state.figureX + 828;
   let retentateWaterRX = state.figureX + 1012;
 
@@ -941,8 +942,8 @@ function drawWater(x, y) {
     373 -
     (state.deltaHeightPermeateBeaker * state.topOfTankDrainTimer) / state.frameRate -
     (state.deltaHeightPermeateBeaker * state.bottomOfTankDrainTimer) / state.frameRate;
-  let permeateWaterBY = state.figureY + 373;
-  let permeateWaterLX = state.figureX + 603;
+  let permeateWaterBY = state.figureY + 374;
+  let permeateWaterLX = state.figureX + 602;
   let permeateWaterRX = state.figureX + 787;
 
   push();
@@ -956,7 +957,7 @@ function drawWater(x, y) {
   rect(retentateWaterLX, retentateWaterTY, retentateWaterRX, retentateWaterBY);
 
   //permeate
-  fill(224, 255, 255, 180); //permeate blue
+  fill(14, 135, 204, 180); //permeate blue
   rect(permeateWaterLX, permeateWaterTY, permeateWaterRX, permeateWaterBY);
 
   pop();
@@ -1087,9 +1088,9 @@ window.windowResized = function () {
 // on the screen and canvasDims[0] is 800, then this will return 2. It is
 // used to scale the canvas and mouse coordinates correctly.
 window.relativeSize = () => graphicsWrapper.offsetWidth / containerDims[0];
-/* function relativeSize() {
+function relativeSize() {
   return graphicsWrapper.offsetWidth / containerDims[0];
-} */
+}
 
 // This function scales the image to fit the graphics wrapper element.
 // Don't touch this.

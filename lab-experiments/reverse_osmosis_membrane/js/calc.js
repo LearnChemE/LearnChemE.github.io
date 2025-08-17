@@ -37,8 +37,8 @@ export function calcAll() {
   state.fractionFillRetentateBeaker = volumeSaltSolnTank / 2 / volumeRetentateBeaker; //temporary -- fills each beaker with 50% of tank vol
 
   let realTankVolume = volumeSaltSolnTank / 2 / volumeRetentateBeaker + volumeSaltSolnTank / 2 / volumePermeateBeaker; // about 1.52L
-  console.log("tank vol: " + realTankVolume);
-  console.log("real permeate vol: " + volumePermeateBeaker);
+  /* console.log("tank vol: " + realTankVolume);
+  console.log("real permeate vol: " + volumePermeateBeaker); */
 
   //pixels/cm
 
@@ -71,10 +71,10 @@ export function calcAll() {
   state.recoveryRate = state.permeateFlowRate / state.feedFlowRate;
   state.retentateFlowRate = state.feedFlowRate - state.permeateFlowRate; // units of mL/s
 
-  console.log("permeate flow: " + state.permeateFlowRate);
+  /*  console.log("permeate flow: " + state.permeateFlowRate);
 
   console.log("feed flow rate: " + state.feedFlowRate + "mL/s");
-
+ */
   //Concentrations
   state.permateConcentration = (1 - state.saltRejectionRate) * state.saltConcentrationPercent;
   state.retentateConcentration = state.saltConcentrationPercent / (1 - state.recoveryRate);
