@@ -18,6 +18,7 @@ let zoomY = 270;
 let zoomMin = 1;
 let zoomMax = 6;
 let containerDims = [1280, 600];
+let isMouseInside;
 
 //preload for loading images and fonts
 window.preload = function () {
@@ -45,6 +46,16 @@ window.setup = function () {
   }
 };
 
+graphicsWrapper.addEventListener("mouseover", () => {
+  isMouseInside = true;
+  console.log("Mouse entered the element!");
+});
+
+graphicsWrapper.addEventListener("mouseout", () => {
+  isMouseInside = false;
+  console.log("Mouse left the element!");
+});
+
 function mouseCoordinate() {
   const s = zoom;
   const tx = -zoomX * (s - 1);
@@ -57,73 +68,77 @@ function mouseCoordinate() {
 }
 
 window.mouseWheel = function (event) {
-  const graphicsWrapper = document.getElementById("graphics-wrapper");
+  if (isMouseInside == true) {
+    // Prevent default scrolling
+    event.preventDefault();
 
-  // Prevent default scrolling
-  event.preventDefault();
+    // Calculate zoom factor based on scroll direction
+    const zoomFactor = event.deltaY > 0 ? 0.95 : 1.05;
 
-  // Calculate zoom factor based on scroll direction
-  const zoomFactor = event.deltaY > 0 ? 0.95 : 1.05;
+    // Calculate new zoom level
+    let newZoom = zoom * zoomFactor;
 
-  // Calculate new zoom level
-  let newZoom = zoom * zoomFactor;
+    // Clamp zoom level between min and max
+    newZoom = constrain(newZoom, zoomMin, zoomMax);
 
-  // Clamp zoom level between min and max
-  newZoom = constrain(newZoom, zoomMin, zoomMax);
+    if (newZoom !== zoomMin) {
+      const dz = newZoom - zoom;
+      const zdif = newZoom - zoomMin;
+      const oldZoom = zoom - zoomMin;
+      const zoomXConst = (oldZoom * zoomX + mouseX * dz) / zdif;
+      const zoomYConst = (oldZoom * zoomY + mouseY * dz) / zdif;
 
-  if (newZoom !== zoomMin) {
-    const dz = newZoom - zoom;
-    const zdif = newZoom - zoomMin;
-    const oldZoom = zoom - zoomMin;
-    const zoomXConst = (oldZoom * zoomX + mouseX * dz) / zdif;
-    const zoomYConst = (oldZoom * zoomY + mouseY * dz) / zdif;
+      zoomX = constrain(zoomXConst, 0, state.width);
+      zoomY = constrain(zoomYConst, 0, state.height);
+    } else {
+      zoomX = 300;
+      zoomY = 270;
+    }
 
-    zoomX = constrain(zoomXConst, 0, state.width);
-    zoomY = constrain(zoomYConst, 0, state.height);
-  } else {
-    zoomX = 300;
-    zoomY = 270;
+    zoom = newZoom;
+
+    return false;
   }
-
-  zoom = newZoom;
-
-  return false;
 };
 
 window.mousePressed = function () {
-  state.dragging = true;
-  offsetX = mouseX;
-  offsetY = mouseY;
+  if (isMouseInside == true) {
+    state.dragging = true;
+    offsetX = mouseX;
+    offsetY = mouseY;
+  }
 };
 
 window.mouseReleased = () => {
-  state.dragging = false;
+  if (isMouseInside == true) {
+    state.dragging = false;
+  }
 };
 
 window.mouseDragged = function () {
-  // For bounds
-  const graphicsWrapper = document.getElementById("graphics-wrapper");
+  if (isMouseInside == true) {
+    // For bounds
+    if (
+      380 < (window.mX + zoomX * (zoom - 1)) / zoom &&
+      (window.mX + zoomX * (zoom - 1)) / zoom < 442 &&
+      390 < (window.mY + zoomY * (zoom - 1)) / zoom &&
+      (window.mY + zoomY * (zoom - 1)) / zoom < 440
+    ) {
+      state.dragging = false;
+    } else {
+      // Subtract the difference from the offset vector times the zoom for tracking
+      zoomX -= mouseX - offsetX;
+      zoomY -= mouseY - offsetY;
 
-  if (
-    380 < (window.mX + zoomX * (zoom - 1)) / zoom &&
-    (window.mX + zoomX * (zoom - 1)) / zoom < 442 &&
-    390 < (window.mY + zoomY * (zoom - 1)) / zoom &&
-    (window.mY + zoomY * (zoom - 1)) / zoom < 440
-  ) {
-    state.dragging = false;
-  } else {
-    // Subtract the difference from the offset vector times the zoom for tracking
-    zoomX -= mouseX - offsetX;
-    zoomY -= mouseY - offsetY;
+      offsetX = mouseX;
+      offsetY = mouseY;
+      // Constrain so the apparatus doesn't go offscreen
+      zoomX = constrain(zoomX, 0, state.width);
+      zoomY = constrain(zoomY, 0, state.height);
 
-    offsetX = mouseX;
-    offsetY = mouseY;
-    // Constrain so the apparatus doesn't go offscreen
-    zoomX = constrain(zoomX, 0, state.width);
-    zoomY = constrain(zoomY, 0, state.height);
-
-    // Update mX and mY, because changing the zoom coordinates will change these
-    [window.mX, window.mY] = mouseCoordinate();
+      // Update mX and mY, because changing the zoom coordinates will change these
+      [window.mX, window.mY] = mouseCoordinate();
+    }
   }
 };
 
@@ -137,13 +152,15 @@ function Zoom() {
 
 //the mouse clicked controls any mouse clicking actions
 window.mouseClicked = function () {
-  if (
-    380 < (window.mX + zoomX * (zoom - 1)) / zoom &&
-    (window.mX + zoomX * (zoom - 1)) / zoom < 442 &&
-    390 < (window.mY + zoomY * (zoom - 1)) / zoom &&
-    (window.mY + zoomY * (zoom - 1)) / zoom < 440
-  ) {
-    state.pumpOn = !state.pumpOn;
+  if (isMouseInside == true) {
+    if (
+      380 < (window.mX + zoomX * (zoom - 1)) / zoom &&
+      (window.mX + zoomX * (zoom - 1)) / zoom < 442 &&
+      390 < (window.mY + zoomY * (zoom - 1)) / zoom &&
+      (window.mY + zoomY * (zoom - 1)) / zoom < 440
+    ) {
+      state.pumpOn = !state.pumpOn;
+    }
   }
 };
 
@@ -304,25 +321,44 @@ function drawSaltConductivityMeters(x, y, waterType) {
   push();
 
   rectMode(CENTER);
-  fill("gray");
+  fill(160, 160, 160);
   rect(x, y, 120, 80, 5, 5, 5, 5);
   fill("white");
-  rect(x, y - 10, 110, 40, 2, 2, 2, 2);
+  rect(x - 20, y - 10, 110 - 40, 40, 2, 2, 2, 2);
 
   textAlign(LEFT, CENTER);
-  textFont(digitalReadoutFont);
+
   fill("black");
   textSize(24);
   if (waterType == "permeate" && beakersAreFilling == true) {
+    push();
+    textFont(digitalReadoutFont);
     text(state.permateConcentration.toFixed(4), x - 50, y - 10);
-    text("wt%", x + 15, y - 10);
+    pop();
+    push();
+    textSize(22);
+    text("wt%", x + 17, y - 8);
+    pop();
   }
   if (waterType == "retentate" && beakersAreFilling == true) {
+    push();
+    textFont(digitalReadoutFont);
     text(state.retentateConcentration.toFixed(4), x - 50, y - 10);
-    text("wt%", x + 15, y - 10);
+    pop();
+    push();
+    textSize(22);
+    text("wt%", x + 17, y - 8);
+    pop();
   }
   if (beakersAreFilling == false) {
-    text("0.0000 wt%", x - 50, y - 10);
+    push();
+    textFont(digitalReadoutFont);
+    text("0.0000", x - 50, y - 10);
+    pop();
+    push();
+    textSize(22);
+    text("wt%", x + 17, y - 8);
+    pop();
   }
 
   if (waterType == "permeate") {
