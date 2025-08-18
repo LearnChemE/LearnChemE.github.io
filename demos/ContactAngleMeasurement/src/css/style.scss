@@ -195,8 +195,9 @@ body {
 
 #reset-button {
   position: relative;
-  z-index: 1001;
+  z-index: 1000;
   pointer-events: auto;
+  // margin-left: 10px;
 }
 
 .hamburger-menu {
