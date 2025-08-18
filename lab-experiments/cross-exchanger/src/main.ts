@@ -5,7 +5,7 @@ import 'bootstrap';
 
 import svg from "./media/crossExchanger.svg?raw";
 import { initHamburgerMenu, insertSVG } from './ts/helpers';
-import { initInteractables } from './ts/interactions';
+import { enableWindowResize, initInteractables } from './ts/interactions';
 import { GlobalState } from './types';
 import { initSvgDrag, initSvgZoom } from './ts/zoom';
 
@@ -24,3 +24,4 @@ const State = new GlobalState();
 initInteractables(State);
 initSvgZoom();
 initSvgDrag();
+enableWindowResize();

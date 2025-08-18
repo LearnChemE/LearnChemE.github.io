@@ -105,3 +105,22 @@ export function initInteractables(state: GlobalState) {
     initSwitch("fanSwitch", "fanSwitchOn", "fanSwitchOff", (isOn: boolean) => state.setFanStatus(isOn));
     initDial("flowDial", (lift: number) => state.setLift(lift));
 }
+
+// --- Resize Handling ---
+export function enableWindowResize() {
+    const e = document.getElementById("apparatus-wrapper")!.childNodes[0] as unknown as SVGAElement;
+    const asp = e.clientWidth / e.clientHeight;
+    // Attach event handler
+    const resize = () => {
+        let windowWidth = Math.max(Math.min(window.innerWidth * .8, 1000), 400);
+        let windowHeight = window.innerHeight * .8;
+        // Enforce asp
+        windowWidth = Math.min(windowWidth, windowHeight * asp);
+        windowHeight = windowWidth / asp;
+        // Resize canvas
+        e.setAttribute("width", `${windowWidth}`);
+        e.setAttribute("height", `${windowHeight}`);
+    };
+    window.addEventListener('resize', resize);
+    resize();
+}
