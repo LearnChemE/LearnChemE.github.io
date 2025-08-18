@@ -1,4 +1,4 @@
-import { vec2 } from "../types";
+import { GlobalState, vec2 } from "../types";
 import { constrain, findAngleFromDown } from "./helpers";
 
 /**
@@ -43,25 +43,31 @@ function initSwitch(id: string, onId: string, offId: string, callback?: (isOn: b
  */
 function initDial(id: string, callback?: (lift: number) => void) {
     // Get the element
-    const e = document.getElementById(id)!;
+    const e = document.getElementById(id)! as unknown as SVGAElement;
     // Find the proper offset
-    const bbox = e.getBoundingClientRect();
+    const bbox = e.getBBox();
     const center = vec2(
-        (bbox.left + bbox.right) / 2,
-        (bbox.top + bbox.bottom) / 2
+        bbox.x + bbox.width / 2,
+        bbox.y + bbox.height / 2
     );
 
-    const moz: vec2 = { x: 0, y: 0 };
     var angle = 0;
 
     e.addEventListener("mousedown", ({ clientX, clientY }) => {
+        // Center for mouse-related things are relative to the window, and can change with resizing
+        const bbox = e.getBoundingClientRect();
+        const mozCenter = vec2(
+            bbox.x + bbox.width / 2,
+            bbox.y + bbox.height / 2
+        );
+
         // Get initial angle
-        let th0 = findAngleFromDown(center, vec2(clientX, clientY));
+        let th0 = findAngleFromDown(mozCenter, vec2(clientX, clientY));
 
         // Drag function
         const drag = ({ clientX, clientY }: MouseEvent) => {
             // Find angle from centroid to mouse
-            let th = findAngleFromDown(center,vec2(clientX,clientY));
+            let th = findAngleFromDown(mozCenter,vec2(clientX,clientY));
             // Find difference and reset th
             let dth = th - th0;
             if (th * th0 < 0) { // Signs aren't the same
@@ -74,7 +80,8 @@ function initDial(id: string, callback?: (lift: number) => void) {
             // Set angle
             angle += dth;
             angle = constrain(angle, 0, 270);
-            e.setAttribute("transform", `rotate(${angle} 699 ${center.y})`);
+            console.log(center)
+            e.setAttribute("transform", `rotate(${angle} ${center.x} ${center.y})`);
 
             // Set callback
             callback?.(angle / 270);
@@ -93,8 +100,8 @@ function initDial(id: string, callback?: (lift: number) => void) {
 
 }
 
-export function initInteractables() {
-    initSwitch("Switch", "switchOn", "switchOff", (isOn: boolean) => {});
-    initSwitch("fanSwitch", "fanSwitchOn", "fanSwitchOff", (isOn: boolean) => {});
-    initDial("flowDial", (lift: number) => {});
+export function initInteractables(state: GlobalState) {
+    initSwitch("Switch", "switchOn", "switchOff", (isOn: boolean) => state.setPumpStatus(isOn));
+    initSwitch("fanSwitch", "fanSwitchOn", "fanSwitchOff", (isOn: boolean) => state.setFanStatus(isOn));
+    initDial("flowDial", (lift: number) => state.setLift(lift));
 }

@@ -24,6 +24,6 @@ export class GlobalState {
      */
     public setPumpStatus = (isOn: boolean) => { this.pumpIsOn = isOn }
     public setFanStatus = (isOn: boolean) => { this.fanIsOn = isOn }
-    public setLiftStatus = (lift: number) => { this.lift = lift }
+    public setLift = (lift: number) => { this.lift = lift }
 }
 
