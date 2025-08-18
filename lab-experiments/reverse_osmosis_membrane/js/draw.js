@@ -343,17 +343,27 @@ function drawSaltConductivityMeters(x, y, waterType) {
   if (waterType == "retentate" && beakersAreFilling == true) {
     push();
     textFont(digitalReadoutFont);
-    text(state.retentateConcentration.toFixed(4), x - 50, y - 10);
+    text(state.retentateConcentration.toFixed(2), x - 50, y - 10);
     pop();
     push();
     textSize(22);
     text("wt%", x + 17, y - 8);
     pop();
   }
-  if (beakersAreFilling == false) {
+  if (waterType == "permeate" && beakersAreFilling == false) {
     push();
     textFont(digitalReadoutFont);
     text("0.0000", x - 50, y - 10);
+    pop();
+    push();
+    textSize(22);
+    text("wt%", x + 17, y - 8);
+    pop();
+  }
+  if (waterType == "retentate" && beakersAreFilling == false) {
+    push();
+    textFont(digitalReadoutFont);
+    text("0.00", x - 50, y - 10);
     pop();
     push();
     textSize(22);
@@ -949,7 +959,7 @@ function drawWater(x, y) {
   rect(x + 752, y - 18, x + 825, y - 18 + 6);
   rect(x + 902, y - 18, x + 936, y - 18 + 6);
   rect(x + 957, y + 10, x + 957 + 6, y + 230);
-  fill(170, 255, 230); //retentate green
+  fill(14, 135, 204, 180); //retentate green
   rect(x + 752, y - 18, x + 825, y - 18 + 6);
   rect(x + 902, y - 18, x + 936, y - 18 + 6);
   rect(x + 957, y + 10, x + 957 + 6, y + 230);
@@ -957,7 +967,7 @@ function drawWater(x, y) {
   //permeate
   fill("white");
   rect(x + 731, y + 38, x + 731 + 6, y + 230);
-  fill("LightCyan");
+  fill(170, 255, 255, 255); //permeate blue
   rect(x + 731, y + 38, x + 731 + 6, y + 230);
 
   pop();
@@ -989,11 +999,11 @@ function drawWater(x, y) {
   noStroke();
 
   //retentate
-  fill(170, 255, 230, 180); //retentate green
+  fill(14, 135, 204, 180); //retentate green
   rect(retentateWaterLX, retentateWaterTY, retentateWaterRX, retentateWaterBY);
 
   //permeate
-  fill(14, 135, 204, 180); //permeate blue
+  fill(170, 255, 255, 255); //permeate blue
   rect(permeateWaterLX, permeateWaterTY, permeateWaterRX, permeateWaterBY);
 
   pop();
