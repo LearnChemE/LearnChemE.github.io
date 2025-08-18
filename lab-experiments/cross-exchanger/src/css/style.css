@@ -72,3 +72,20 @@
 .menu-content a:hover {
   background: #f0f0f0;
 }
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Apparatus things
+   ───────────────────────────────────────────────────────────────────────────── */
+
+  #Switch, #fanSwitch {
+    cursor: pointer;
+  }
+
+  #flowDial {
+    cursor: grab;
+  }
+
+  #flowDial:active {
+    cursor: grabbing;
+  }

@@ -3,6 +3,8 @@
 /* ********* Do not put any imports here! These should ideally all be pure and self-contained. ******************* */
 /* *************************************************************************************************************** */
 
+import type { vec2 } from "../types";
+
 /**
  * Initialize the hamburger menu and button
  * @returns Div containing button and menu with attached callbacks
@@ -60,6 +62,33 @@ export function insertSVG(svg: string): HTMLDivElement {
     div.innerHTML = svg;
     return div;
 }
+
+/**
+ * Constrain a number x to be at least min and at most max.
+ * @param x Number to constrain
+ * @param min minimum constraining value
+ * @param max maximum constraining value
+ * @returns Constrained value
+ */
+export function constrain(x: number, min: number, max: number) {
+    if (x < min) x = min;
+    if (x > max) x = max;
+    return x;
+}
+
+/**
+ * Find the angle between A->B and down (0,1).
+ * @param A 
+ * @param B 
+ * @returns 
+ */
+export function findAngleFromDown(A: vec2, B: vec2) {
+    var dx = B.x - A.x;
+    var dy = B.y - A.y;
+    var mag = Math.sqrt(dx*dx + dy*dy);
+    return -Math.sign(dx) * Math.acos(dy / mag) * 180 / Math.PI;
+}
+
 
 /* ******************************************** */
 /* *************** Drag and Zoom ************** */
