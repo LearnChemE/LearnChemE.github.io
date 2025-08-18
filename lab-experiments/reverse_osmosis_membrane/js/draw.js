@@ -959,7 +959,7 @@ function drawWater(x, y) {
   rect(x + 752, y - 18, x + 825, y - 18 + 6);
   rect(x + 902, y - 18, x + 936, y - 18 + 6);
   rect(x + 957, y + 10, x + 957 + 6, y + 230);
-  fill(14, 135, 204, 180); //retentate green
+  fill(14, 220, 204, 155); //retentate green
   rect(x + 752, y - 18, x + 825, y - 18 + 6);
   rect(x + 902, y - 18, x + 936, y - 18 + 6);
   rect(x + 957, y + 10, x + 957 + 6, y + 230);
@@ -967,7 +967,7 @@ function drawWater(x, y) {
   //permeate
   fill("white");
   rect(x + 731, y + 38, x + 731 + 6, y + 230);
-  fill(170, 255, 255, 255); //permeate blue
+  fill(160, 255, 255); //permeate blue
   rect(x + 731, y + 38, x + 731 + 6, y + 230);
 
   pop();
@@ -999,11 +999,11 @@ function drawWater(x, y) {
   noStroke();
 
   //retentate
-  fill(14, 135, 204, 180); //retentate green
+  fill(14, 220, 204, 155); //retentate green
   rect(retentateWaterLX, retentateWaterTY, retentateWaterRX, retentateWaterBY);
 
   //permeate
-  fill(170, 255, 255, 255); //permeate blue
+  fill(160, 255, 255); //permeate blue
   rect(permeateWaterLX, permeateWaterTY, permeateWaterRX, permeateWaterBY);
 
   pop();
