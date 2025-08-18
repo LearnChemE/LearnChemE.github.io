@@ -6,6 +6,7 @@ import 'bootstrap';
 import svg from "./media/crossExchanger.svg?raw";
 import { initHamburgerMenu, insertSVG } from './ts/helpers';
 import { initInteractables } from './ts/interactions';
+import { GlobalState } from './types';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
@@ -14,6 +15,9 @@ const app = document.querySelector<HTMLDivElement>('#app')!;
 app.appendChild(initHamburgerMenu());
 // Create hamburger menu
 app.appendChild(insertSVG(svg));
+
+// Initialize State object
+const state = new GlobalState();
 
 // Initialize interactions
 initInteractables();
