@@ -1,4 +1,4 @@
-import { GlobalState, vec2 } from "../types";
+import { Simulation, vec2 } from "../types";
 import { constrain, findAngleFromDown } from "./helpers";
 
 /**
@@ -100,7 +100,7 @@ function initDial(id: string, callback?: (lift: number) => void) {
 
 }
 
-export function initInteractables(state: GlobalState) {
+export function initInteractables(state: Simulation) {
     initSwitch("Switch", "switchOn", "switchOff", (isOn: boolean) => state.setPumpStatus(isOn));
     initSwitch("fanSwitch", "fanSwitchOn", "fanSwitchOff", (isOn: boolean) => state.setFanStatus(isOn));
     initDial("flowDial", (lift: number) => state.setLift(lift));
