@@ -10,8 +10,8 @@ export function initLabels() {
     flowLabel.classList.add("bitcount-prop-single-display");
     flowLabel.innerHTML = `0.00 mL/s`;
     flowLabel.setAttribute("text-anchor", "end");
-    flowLabel.setAttribute("x", "625");
-    flowLabel.setAttribute("y", "286");
+    flowLabel.setAttribute("x", "627");
+    flowLabel.setAttribute("y", "288");
     flowLabel.setAttribute("position", "absolute");
     flowLabel.setAttribute("fontSize", "16");
     flowLabel.setAttribute("fill", "#A8C64E");
