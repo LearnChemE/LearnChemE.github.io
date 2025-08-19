@@ -20,5 +20,5 @@ export function initLabels() {
 
 export function updateFlowLabel(flowrate: number) {
     const label = document.getElementById("flow-label")!;
-    label.innerHTML = `${flowrate.toFixed(2)} mL/s`;
+    label.innerHTML = `${flowrate.toFixed(1)} mL/s`;
 }
