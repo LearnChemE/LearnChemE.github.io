@@ -375,7 +375,7 @@ function drawThetaPlot(volume, angle) {
     hovermode: 'closest',
     hoverdistance: 50,
     spikedistance: -1,
-    dragmode: 'zoom',
+    dragmode: false,
     margin: {l: 0, r: 0, t: 0, b: 0},
     xaxis: {
       title: { text: 'x (mm)' },
@@ -415,7 +415,7 @@ function drawThetaPlot(volume, angle) {
     paper_bgcolor: 'white',
     plot_bgcolor: 'white',
   };
-  const config = { responsive: true, displayModeBar: false, scrollZoom: true, staticPlot: false };
+  const config = { responsive: true, displayModeBar: false, scrollZoom: true, doubleClick: false };
   Plotly.newPlot('plotDiv', [trace], layout, config);
 }
 
