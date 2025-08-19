@@ -122,3 +122,57 @@ export function containsParentWithID(elem: HTMLElement, ids: string | Array<stri
     
     return false;
 }
+
+/**
+ * Check an element for a child defs element. If none are found, append a new defs element.
+ * @param parent Node to be searched for defs children. Note if none are found, a new defs element will be inserted to this node.
+ * @returns Reference to new defs element.
+ */
+const checkForDefs = (parent: HTMLElement): SVGDefsElement => {
+    // Start with null defs
+    let defs: SVGDefsElement | null = null;
+
+    // Search each child node for a defs element
+    parent.childNodes.forEach((value) => {
+        if (value.nodeName === "defs")
+            defs = value as unknown as SVGDefsElement;
+    });
+
+    // If defs were not found, append a new defs element to parent
+    if (defs === null) {
+        defs = document.createElementNS("http://www.w3.org/2000/svg","defs");
+        parent.appendChild(defs);
+    }
+    // Return the defs element
+    return defs;
+}
+
+
+/**
+ * Insert a new clip path to the child of the corresponding element.
+ * @param id Id to name the new elements from
+ * @returns Clippath inserted by function
+ */
+export function insertClipPath(e: HTMLElement | SVGAElement | SVGPathElement, clippathID: string, bbox: DOMRect) {
+    // Get the parent element
+    const parent = e.parentElement!;
+    const defs = checkForDefs(parent);
+    // Create a clip path div
+    const clippath = document.createElementNS("http://www.w3.org/2000/svg","clipPath");
+    clippath.setAttribute("id", clippathID + "-clip");
+
+    // Create rect for clip path
+    clippath.innerHTML = `<rect x="${bbox.x}" y="${bbox.y}" width="${bbox.width}" height="${0}">`;
+
+    // Insert the new clip path
+    parent.appendChild(defs);
+    defs.appendChild(clippath);
+    // Apply the clip path styling
+    var child = e.childNodes[0] as unknown as SVGAElement;
+    if (child === undefined)
+        child = e as unknown as SVGAElement;
+    child.setAttribute("clip-path",`url(#${clippathID + "-clip"})`);
+
+    // Return the polygon element
+    return clippath;
+}
