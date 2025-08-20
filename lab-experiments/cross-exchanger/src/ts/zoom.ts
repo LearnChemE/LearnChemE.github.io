@@ -93,6 +93,7 @@ export function initSvgDrag() {
             .getAttribute("viewBox")!
             .split(" ")
             .map(Number);
+        // const dx = ((prevX - e.clientX) * width) / svg.clientWidth;
         const dx = ((prevX - e.clientX) * width) / svg.clientWidth;
         const dy = ((prevY - e.clientY) * height) / svg.clientHeight;
         let viewX = Math.max(0, x + dx);

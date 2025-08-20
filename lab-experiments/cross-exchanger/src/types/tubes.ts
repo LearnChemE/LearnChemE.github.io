@@ -16,6 +16,9 @@ export class Balance {
 
     private d_tubeVol: number = 0;
 
+    public getTankTemp() { return this.tankTemp }
+    public getTubeTemp() { return this.tubeTemp }
+
     public getTubeFill() { return this.tubeFill }
     public setTubeFill(amt: number) {
         // Scale from [0,1] to [0, TOTAL_TUBE_AMOUNT]
@@ -55,6 +58,6 @@ export class Balance {
         // Evolve
         this.tankTemp += dT_tank;
         this.tubeTemp += dT_tube;
-        console.log(`Tank: ${this.tankTemp.toFixed(8)}\nTube: ${this.tubeTemp.toFixed(8)}`);
+        // console.log(`Tank: ${this.tankTemp.toFixed(8)}\nTube: ${this.tubeTemp.toFixed(8)}`);
     }
 }

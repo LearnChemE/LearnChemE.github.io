@@ -39,5 +39,5 @@ export function updateFlowLabel(flowrate: number) {
 
 export function updateThermLabel(temperature: number) {
     const label = document.getElementById("therm-label")!;
-    label.innerHTML = `${temperature.toFixed(1)} mL/s`;
+    label.innerHTML = `${temperature.toFixed(1)} °C`;
 }

@@ -162,7 +162,12 @@ export function insertClipPath(e: HTMLElement | SVGAElement | SVGPathElement, cl
     clippath.setAttribute("id", clippathID + "-clip");
 
     // Create rect for clip path
-    clippath.innerHTML = `<rect x="${bbox.x}" y="${bbox.y}" width="${bbox.width}" height="${0}">`;
+    const rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    rect.setAttribute("x",`${bbox.x}`);
+    rect.setAttribute("y",`${bbox.y}`);
+    rect.setAttribute("width",`${bbox.width}`);
+    rect.setAttribute("height",`${0}`);
+    clippath.appendChild(rect);
 
     // Insert the new clip path
     parent.appendChild(defs);
@@ -175,4 +180,24 @@ export function insertClipPath(e: HTMLElement | SVGAElement | SVGPathElement, cl
 
     // Return the polygon element
     return clippath;
+}
+
+/**
+ * Check if two SVG Elements are overlapping
+ * @param el1 Element 1
+ * @param el2 Element 2
+ * @returns True if bboxes are overlapping; false if not.
+ */
+export function isOverlapping(el1: SVGGElement, el2: SVGRectElement) {
+    console.log(el1, el2)
+  const r1 = el1.getBoundingClientRect();
+  const r2 = el2.getBoundingClientRect();
+  console.log(r1, r2)
+
+  return !(
+    r1.x + r1.width  < r2.x ||
+    r1.x > r2.x + r2.width ||
+    r1.y + r1.height < r2.y ||
+    r1.y > r2.y + r2.height
+  );
 }

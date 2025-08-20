@@ -1,6 +1,6 @@
-import { FLOWRATE_GAIN, type AnimationFn, type GlobalState } from "../types";
-import { constrain, insertClipPath } from "./helpers";
-import { updateFlowLabel } from "./labels";
+import { FLOWRATE_GAIN, THERMOMETER_NONE, THERMOMETER_TANK, THERMOMETER_TUBE, type AnimationFn, type GlobalState } from "../types";
+import { constrain, insertClipPath, isOverlapping } from "./helpers";
+import { updateFlowLabel, updateThermLabel } from "./labels";
 
 const FAN_OMEGA = 1.5 * 360;
 const TUBE_FILL_DURATION = 5000; // ms
@@ -90,13 +90,72 @@ export const makeFlowAnimation = (state: GlobalState): AnimationFn => {
         cumulativeFill = Math.max(cumulativeFill - outTubeLength, 0);
         if (state.pumpIsOn && state.lift > 0) {
             streamActivated = true;
+            state.outIsFlowing = true;
             clipPath.innerHTML = `<rect x="${bbox.x}" y="${bbox.y}" width="${bbox.width}" height="${cumulativeFill}">`;
         }
         else if (streamActivated) {
+            state.outIsFlowing = false;
             clipPath.innerHTML = `<rect x="${bbox.x}" y="${bbox.y + bbox.height - cumulativeFill}" width="${bbox.width}" height="${bbox.height}">`;
         }
 
         // Integrate
         state.systemBalance.integrate(state.lift * FLOWRATE_GAIN, dt, state.fanIsOn);
+    };
+}
+
+export const makeThermometerAnimation = (state: GlobalState): AnimationFn => {
+    const clip = document.getElementById("strm-clip")! as unknown as SVGRectElement;
+    const r_wet = Math.exp(-1/300);
+    const r_dry = Math.exp(-1/1000);
+
+    var counter = 0;
+    var thermTemp = 60;
+
+    return (dt: number) => {
+        // Only update every so often
+        counter += dt;
+        if (counter < 500) return;
+
+        // Get the thermometer target
+        var measuring = state.thermTarget;
+        // If the stream is not active, default to none
+        const outlet = clip.childNodes[0]! as unknown as SVGRectElement;
+        if (measuring === THERMOMETER_TUBE) {
+            if (Number(outlet.getAttribute("height")) < 10 || Number(outlet.getAttribute("y")) > 140) {
+                measuring = THERMOMETER_NONE;
+            }
+        }
+
+        var temp, r;
+        switch (measuring) {
+            case THERMOMETER_NONE:
+                // Measuring air
+                temp = 25; // Room Temperature
+                r = r_dry;
+                break;
+
+            case THERMOMETER_TANK:
+                // Measuring tank
+                temp = state.systemBalance.getTankTemp();
+                r = r_wet;
+                break;
+
+            case THERMOMETER_TUBE:
+                // Measuring outlet flow
+                temp = state.systemBalance.getTubeTemp();
+                r = r_wet;
+                break;
+
+            default:
+                console.warn(`Bad thermometer measure value: ${state.thermTarget}`);
+                return;
+        }
+
+        // Lerp towards the new value
+        thermTemp = (thermTemp - temp) * r ** counter + temp;
+
+        // Update the thermometer
+        updateThermLabel(thermTemp);
+        counter -= 500;
     };
 }
