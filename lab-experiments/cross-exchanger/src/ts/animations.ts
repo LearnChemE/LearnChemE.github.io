@@ -80,6 +80,8 @@ export const makeFlowAnimation = (state: GlobalState): AnimationFn => {
         // Lerp the tube fill
         fill = constrain(fill, 0, 1);
 
+        state.systemBalance.setTubeFill(fill);
+
         // Fill tubes accordingly
         var cumulativeFill = fill * totalLength;
         inTube.setAttribute("stroke-dashoffset", `${Math.max(inTubeLength - cumulativeFill, 0)}`);
@@ -94,6 +96,7 @@ export const makeFlowAnimation = (state: GlobalState): AnimationFn => {
             clipPath.innerHTML = `<rect x="${bbox.x}" y="${bbox.y + bbox.height - cumulativeFill}" width="${bbox.width}" height="${bbox.height}">`;
         }
 
-
+        // Integrate
+        state.systemBalance.integrate(state.lift * FLOWRATE_GAIN, dt, state.fanIsOn);
     };
 }

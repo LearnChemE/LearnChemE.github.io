@@ -1,5 +1,6 @@
 import { AnimationLoop, type AnimationFn } from ".";
 import { fanAnimation, makeFlowAnimation } from "../ts/animations";
+import { Balance } from "./tubes";
 
 export const FLOWRATE_GAIN = 16; // mL / min
 
@@ -14,13 +15,14 @@ export const vec2 = (x: number, y: number): vec2 => {
 
 export interface GlobalState {
     animationLoop: AnimationLoop,
+    systemBalance: Balance,
     pumpIsOn: boolean,
     fanIsOn: boolean,
     lift: number
 }
 
 export class Simulation {
-    private state = { animationLoop: new AnimationLoop(), pumpIsOn: false, fanIsOn: false, lift: 0 };
+    private state = { animationLoop: new AnimationLoop(), systemBalance: new Balance(), pumpIsOn: false, fanIsOn: false, lift: 0 };
 
     constructor() {
         // Initialize the flow animation
