@@ -1,6 +1,6 @@
 import { AnimationLoop, type AnimationFn } from ".";
 import { fanAnimation, makeFlowAnimation, makeThermometerAnimation } from "../ts/animations";
-import { Balance } from "./tubes";
+import { Balance } from "./calcs";
 
 export const FLOWRATE_GAIN = 16; // mL / min
 
