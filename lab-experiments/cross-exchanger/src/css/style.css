@@ -27,7 +27,7 @@ svg {
 
 .menu-button {
   position:absolute;
-  right: 1.5em;
+  right: -1.5em;
   top: 1.5em;
 
   font-size: 1.75rem;
@@ -42,6 +42,8 @@ svg {
   border-radius: 3px;
   border: 1px solid black;
 
+  aspect-ratio: 1;
+
   align-items: center;
   text-align: start;
 }
@@ -52,8 +54,8 @@ svg {
 
 .menu-button>div {
   transform: translateY(-5px);
-  margin-top: .3rem;
-  margin-bottom: -.3rem;
+  margin-top: .25rem;
+  margin-bottom: -.45rem;
 }
 
 .menu-content {
@@ -61,8 +63,8 @@ svg {
   margin: auto;
 
   position: absolute;
-  top: 6.5rem;
-  right: .5rem;
+  top: 2.5rem;
+  right: -2.5rem;
   background: white;
   border: 1px solid #ccc;
   border-radius: 0.5rem;

@@ -1,5 +1,5 @@
 import { FLOWRATE_GAIN, THERMOMETER_NONE, THERMOMETER_TANK, THERMOMETER_TUBE, type AnimationFn, type GlobalState } from "../types";
-import { constrain, insertClipPath, isOverlapping } from "./helpers";
+import { constrain, insertClipPath } from "./helpers";
 import { updateFlowLabel, updateThermLabel } from "./labels";
 
 const FAN_OMEGA = 1.5 * 360;
