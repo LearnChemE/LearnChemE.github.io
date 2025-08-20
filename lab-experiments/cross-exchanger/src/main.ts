@@ -4,6 +4,7 @@ import './css/style.css';
 import 'bootstrap';
 
 import svg from "./media/crossExchanger.svg?raw";
+import worksheet from "./media/crossFlowHeatExchangerWorksheet.pdf";
 import { initHamburgerMenu, insertSVG } from './ts/helpers';
 import { enableWindowResize, initInteractables } from './ts/interactions';
 import { Simulation } from './types';
@@ -13,7 +14,7 @@ import { initLabels } from './ts/labels';
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
 // Create div containing svg
-app.appendChild(initHamburgerMenu());
+app.appendChild(initHamburgerMenu(worksheet));
 // Create hamburger menu
 app.appendChild(insertSVG(svg));
 // Create Labels

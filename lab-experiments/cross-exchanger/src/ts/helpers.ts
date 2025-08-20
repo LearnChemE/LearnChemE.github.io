@@ -9,21 +9,30 @@ import type { vec2 } from "../types";
  * Initialize the hamburger menu and button
  * @returns Div containing button and menu with attached callbacks
  */
-export function initHamburgerMenu() {
+export function initHamburgerMenu(worksheet: string) {
     // Create the button element
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'menu-button';
     btn.innerHTML = `<div>☰</div>`;
 
+    // Create download element
+    const download = document.createElement("a");
+    download.id="worksheet-download";
+    download.download="crossFlowHeatExchangerWorksheet.pdf";
+    download.innerHTML=`<button id="wks-btn" type="button" class="btn btn-primary btn-wide"> Worksheet </button>`;
+    download.setAttribute("href", worksheet);
+
     // Create the menu element
     const menu = document.createElement("menu");
     menu.className = "menu-content";
     menu.innerHTML = `
-            <button id="dir-btn" type="button" class="btn btn-primary btn-wide" data-bs-toggle="modal" data-bs-target="#directions-modal"> Directions </div>
-            <button id="wks-btn" type="button" class="btn btn-primary btn-wide"> Worksheet </div>
-            <button id="abt-btn" type="button" class="btn btn-primary btn-wide" data-bs-toggle="modal" data-bs-target="#about-modal"> About </div>
+            <button id="dir-btn" type="button" class="btn btn-primary btn-wide" data-bs-toggle="modal" data-bs-target="#directions-modal"> Directions </button>
             `;
+    menu.appendChild(download);
+    menu.insertAdjacentHTML("beforeend", `
+            <button id="abt-btn" type="button" class="btn btn-primary btn-wide" data-bs-toggle="modal" data-bs-target="#about-modal"> About </button>
+        `);
 
     // Give the button a callback to toggle the menu
     function toggleMenu(): void {
