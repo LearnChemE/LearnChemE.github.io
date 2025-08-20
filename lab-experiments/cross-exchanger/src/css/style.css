@@ -104,6 +104,13 @@ svg {
     cursor: grabbing;
   }
 
+  #thermStick {
+    cursor: grab;
+  }
+  #thermStick:active {
+    cursor: grabbing;
+  }
+
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Font
@@ -119,4 +126,5 @@ svg {
     "CRSV" 0.5,
     "ELSH" 0,
     "ELXP" 0;
+  z-index: 2;
 }

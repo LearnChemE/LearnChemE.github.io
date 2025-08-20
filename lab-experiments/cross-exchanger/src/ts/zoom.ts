@@ -79,7 +79,7 @@ export function initSvgDrag() {
     let prevY = 0;
 
     svg.addEventListener("mousedown", (e) => {
-        if (containsParentWithID(e.target as HTMLElement, ['flowDial','Switch','fanSwitch'])) return;
+        if (containsParentWithID(e.target as HTMLElement, ['flowDial','Switch','fanSwitch','thermStick'])) return;
         mousedown = true;
         isDragging = true;
         prevX = e.clientX;
