@@ -7,7 +7,7 @@ export class AnimationLoop {
 
     private tick = (time: number) => {
         if (!this.running) return;
-        const dt = time - this.lastTime;
+        const dt = Math.min(time - this.lastTime, 300);
         this.lastTime = time;
 
         for (const fn of this.animations) {
