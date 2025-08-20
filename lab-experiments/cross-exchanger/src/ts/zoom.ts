@@ -68,7 +68,6 @@ export function initSvgZoom() {
   });
 }
 
-var mousedown = false;
 export function initSvgDrag() {
     // Get the svg context
     const wrapper = document.getElementById("apparatus-wrapper")!;
@@ -80,7 +79,6 @@ export function initSvgDrag() {
 
     svg.addEventListener("mousedown", (e) => {
         if (containsParentWithID(e.target as HTMLElement, ['flowDial','Switch','fanSwitch','thermStick'])) return;
-        mousedown = true;
         isDragging = true;
         prevX = e.clientX;
         prevY = e.clientY;
@@ -117,6 +115,5 @@ export function initSvgDrag() {
 
     document.addEventListener("mouseup", () => {
         isDragging = false;
-        mousedown = false;
     });
 }
