@@ -71,7 +71,7 @@ body {
   
   #valueSlider {
     pointer-events: auto;
-    z-index: 10000000;
+    z-index: 1000;
     position: relative;
     flex: none;
     margin-top: -10px;
@@ -170,7 +170,7 @@ body {
   flex-direction: column;
   align-items: flex-start;
   position: relative;
-  z-index: 1001;
+  z-index: 1004;
   pointer-events: auto;
 }
 
@@ -183,7 +183,7 @@ body {
   background-color: lightblue;
   padding: 8px;
   position: relative;
-  z-index: 1001;
+  z-index: 1005;
   pointer-events: auto;
   
   .hamburger-img {
@@ -195,9 +195,9 @@ body {
 
 #reset-button {
   position: relative;
-  z-index: 1000;
+  z-index: 1002;
   pointer-events: auto;
-  // margin-left: 10px;
+  margin-top: 10px;
 }
 
 .hamburger-menu {
@@ -206,7 +206,7 @@ body {
   gap: 10px;
   margin-top: 40px;
   position: absolute;
-  z-index: 1000;
+  z-index: 1006;
   background-color: white;
   border: 2px solid #ddd;
   padding: 10px;
@@ -214,10 +214,12 @@ body {
   
   &.show {
     display: flex;
+    z-index: 1006;
   }
   
   .btn {
     width: 100px;
+    z-index: 1007;
   }
 }
 

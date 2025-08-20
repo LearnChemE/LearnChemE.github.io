@@ -312,14 +312,14 @@ function drawThetaPlot(volume, angle) {
   // Y span is fixed by requirement: [0, 1.25 * max(y)]
   let yHighTarget = 1.25 * yMax;
   if (volume == 1000) {
-    if (yHighTarget < 0.002) {
-      yHighTarget = 0.002;
+    if (yHighTarget < 0.8) {
+      yHighTarget = 1.5;
     }
   }
 
   if (volume == 1) {
-    if (yHighTarget < 0.0004) {
-      yHighTarget = 0.0004;
+    if (yHighTarget < 0.2) {
+      yHighTarget = 0.25;
     }
   }
 
@@ -368,7 +368,7 @@ function drawThetaPlot(volume, angle) {
     fillOpacity: 0.5,
     hoveron: 'fills+points',
     // customdata: customdata,
-    hovertemplate: 'x: %{x:.6f} mm<br>y: %{y:.6f} mm<extra></extra>',
+    hovertemplate: 'x: %{x:.2f} mm<br>y: %{y:.2f} mm<extra></extra>',
     name: '',
   };
   const layout = {
@@ -376,7 +376,7 @@ function drawThetaPlot(volume, angle) {
     hoverdistance: 50,
     spikedistance: -1,
     dragmode: false,
-    margin: {l: 0, r: 0, t: 0, b: 0},
+    margin: { l: 50, r: 10, t: 10, b: 20 },
     xaxis: {
       title: { text: 'x (mm)' },
       range: xRange,
@@ -385,7 +385,7 @@ function drawThetaPlot(volume, angle) {
       spikesnap: 'cursor',
       spikecolor: '#444',
       spikethickness: 1,
-      tickformat: '.4f',
+      tickformat: '.1f',
       nticks: 7,
       anchor: 'y',
       automargin: true,
@@ -393,7 +393,7 @@ function drawThetaPlot(volume, angle) {
       scaleanchor: 'y',
     },
     yaxis: {
-      title: { text: 'y (mm)' },
+      title: { text: 'y (mm)', standoff: 16 },
       range: yRange,
       showspikes: true,
       spikemode: 'across',
@@ -406,7 +406,7 @@ function drawThetaPlot(volume, angle) {
       scaleanchor: 'x',
       scaleratio: 1,
       constrain: 'domain',
-      tickformat: '.4f',
+      tickformat: '.1f',
     },
     width: containerW,
     height: containerH,
