@@ -5,6 +5,8 @@ let verticalValveOpen = false;
 let gasValveOpen = false;
 let isHeaterOn = false;
 let container = null;
+let gasFlowRateDevice = null;
+let gasFlowRateText = null;
 
 // Save the SVG.js context so other functions can reuse it
 export function drawFigure(svg) {
@@ -17,6 +19,9 @@ export function drawFigure(svg) {
   const switchGroup = drawSwitch(svg, 750, 200, 80, 40);
   container = drawLiquidColumnWithVent(svg, 500, 80, switchGroup); // pass switch to control heaters & bubbles
   valve = drawValve(svg, 580, 450).rotate(90);
+  gasFlowRateDevice = addSVGImage(svg, 'assets/gasFlowRateDevice.svg', 90, 145, 160, 120);
+  gasFlowRateText = svg.text('0').center(174, 180).font({ size: 12, anchor: 'middle' });
+  svg.text('cm³/min').stroke({ color: '#000', width: 0.5 }).center(175, 202.5).font({ size: 12 });
 }
 
 function drawGasCylinder(draw, x, y, label) {
@@ -352,11 +357,11 @@ function createVerticalValve(draw, x, y) {
         add.stop(1, '#ff0000', 0.25);
       }).from(0, 0).to(0, 1);
       
-      // Helper: update heater gradient opacity based on temperature (50–650)
+      // Helper: update heater gradient opacity based on temperature (15–25 °C)
       function updateHeaterHeat(temp) {
-        const t = Math.max(50, Math.min(650, temp));
-        const frac = (t - 50) / (650 - 50);
-        const base = 0.7  ;
+        const t = Math.max(15, Math.min(25, temp));
+        const frac = (t - 15) / (25 - 15);
+        const base = 1  ;
         const addTop = 0.55;
         const addBot = 0.65;
         
@@ -395,6 +400,19 @@ function createVerticalValve(draw, x, y) {
       const heaterH = innerBottom - innerTop + 15;
       const leftHeaterX  = x + WALL - 21;
       const rightHeaterX = x + TANK_W - WALL - 2 - heaterW + 23;
+      const ALLOWED_TEMPS = [15, 20, 25];
+      function snapTemp(t) {
+        let best = ALLOWED_TEMPS[0];
+        let bestDiff = Math.abs(t - best);
+        for (let i = 1; i < ALLOWED_TEMPS.length; i++) {
+          const diff = Math.abs(t - ALLOWED_TEMPS[i]);
+          if (diff < bestDiff) {
+            best = ALLOWED_TEMPS[i];
+            bestDiff = diff;
+          }
+        }
+        return best;
+      }
       // Left heater bar
       const leftHeater = g.rect(heaterW, heaterH)
       .move(leftHeaterX, innerTop - 7.5)
@@ -406,13 +424,15 @@ function createVerticalValve(draw, x, y) {
       .fill(rightHeaterGrad) // replaced fill color with gradient
       .stroke({ color: '#b5865c', width: 0.8 });
       
-      // Helpers to convert between y-position and temperature (50–650)
+      // Helpers to convert between y-position and temperature (strictly discrete: 15, 20, 25 °C)
       function tempFromY(yy) {
         const frac = (innerBottom - yy) / (innerBottom - innerTop);
-        return Math.round(50 + frac * (650 - 50));
+        const raw = 15 + frac * (25 - 15);
+        return snapTemp(raw);
       }
       function yFromTemp(temp) {
-        const frac = (temp - 50) / (650 - 50);
+        const t = snapTemp(temp);
+        const frac = (t - 15) / (25 - 15);
         return innerBottom - frac * (innerBottom - innerTop);
       }
       
@@ -420,7 +440,7 @@ function createVerticalValve(draw, x, y) {
       const pointerH = 14;                 // total height of the arrow
       const pointerTip = 8;                // length of the triangular tip protruding into the liquid
       const tailW = Math.max(6, heaterW - 3); // width of tail that sits over the heater
-      let targetTemp = 200;                // initial target
+      let targetTemp = 20;                 // initial target (°C)
       let py = yFromTemp(targetTemp);
       
       updateHeaterHeat(targetTemp);
@@ -438,13 +458,13 @@ function createVerticalValve(draw, x, y) {
       }
       
       const arrow = g.polygon(arrowPoints(py))
-      .fill('#ff7f50')
+      .fill('black')
       .stroke({ color: '#703c22', width: 1 });
       // Make the arrow show a vertical resize cursor for consistency
       arrow.style('cursor', 'ns-resize');
       
       // Optional: show the current set temperature near the pointer
-      const tempLabel = g.text(String(targetTemp) + 'K')
+      const tempLabel = g.text(String(targetTemp) + '°C')
       .font({ family: 'Arial', size: 11, anchor: 'start', weight: 600 })
       .move(rightHeaterX + heaterW - 13, py - 6)
       .fill(
@@ -455,38 +475,70 @@ function createVerticalValve(draw, x, y) {
       tempLabel.on('mousedown', (ev) => { draggingPointer = true; ev.stopPropagation(); });
       tempLabel.on('touchstart', (ev) => { draggingPointer = true; ev.preventDefault(); });
       
-      // Drag logic (mouse/touch) for the pointer
+      // Drag logic (pointer events) for the pointer — smooth while dragging, snap on release
       let draggingPointer = false;
-      function clamp(v, vmin, vmax) { return Math.max(vmin, Math.min(v, vmax)); }
+      let rafId = null;
+      let pendingY = null;
+
       function updatePointer(toY) {
-        py = clamp(toY, innerTop, innerBottom);
-        targetTemp = Math.round(tempFromY(py) / 50) * 50;
-        py = yFromTemp(targetTemp);
+        py = Math.max(innerTop, Math.min(innerBottom, toY));
+        const t = tempFromY(py); // already snapped to 15/20/25
+        py = yFromTemp(t);      // move pointer to exact discrete position
+        targetTemp = t;
         arrow.plot(arrowPoints(py));
-        tempLabel.text(String(targetTemp) + 'K').move(rightHeaterX + heaterW - 13, py - 6);
+        tempLabel.text(String(targetTemp) + '°C').move(rightHeaterX + heaterW - 13, py - 6);
         g.targetTemperature = targetTemp;
         if (switchGroup && switchGroup.isOn) {
           updateHeaterHeat(targetTemp);
         }
       }
-      // Mouse handlers
-      arrow.on('mousedown', (ev) => { draggingPointer = true; ev.stopPropagation(); });
-      draw.on('mousemove', (ev) => {
-        if (!draggingPointer) return;
+
+      function scheduleUpdate(y) {
+        pendingY = y;
+        if (rafId !== null) return;
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          if (pendingY != null) updatePointer(pendingY);
+          pendingY = null;
+        });
+      }
+
+      function pointYFromEvent(ev) {
         const p = draw.point(ev.clientX, ev.clientY);
-        updatePointer(p.y);
-      });
-      draw.on('mouseup', () => { draggingPointer = false; });
-      // Touch handlers
-      arrow.on('touchstart', (ev) => { draggingPointer = true; ev.preventDefault(); });
-      draw.on('touchmove', (ev) => {
+        return p.y;
+      }
+
+      function onPointerMove(ev) {
         if (!draggingPointer) return;
-        const t = ev.touches[0];
-        if (!t) return;
-        const p = draw.point(t.clientX, t.clientY);
-        updatePointer(p.y);
-      });
-      draw.on('touchend', () => { draggingPointer = false; });
+        ev.preventDefault();
+        scheduleUpdate(pointYFromEvent(ev));
+      }
+
+      function onPointerUp(ev) {
+        if (!draggingPointer) return;
+        draggingPointer = false;
+        ev.preventDefault();
+        updatePointer(pointYFromEvent(ev));
+        try { arrow.releasePointerCapture(ev.pointerId); } catch (_) {}
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+      }
+
+      function startDrag(ev) {
+        draggingPointer = true;
+        ev.preventDefault();
+        try { arrow.setPointerCapture(ev.pointerId); } catch (_) {}
+        document.addEventListener('pointermove', onPointerMove, { passive: false });
+        document.addEventListener('pointerup', onPointerUp, { passive: false });
+      }
+
+      // Attach pointer handlers to both the arrow and its label
+      arrow.on('pointerdown', startDrag);
+      tempLabel.on('pointerdown', startDrag);
+
+      // Improve touch behavior & cursor feedback
+      arrow.style('cursor', 'ns-resize; touch-action: none;');
+      tempLabel.style('cursor', 'ns-resize; touch-action: none;');
       // Initialize heaters & bubbles based on switch state
       if (switchGroup && switchGroup.isOn) {
         isHeaterOn = true;
@@ -586,10 +638,14 @@ function animateGasFlow(draw) {
         draw.find('path')
         .filter(el =>  el.attr('data-pipe-side') === 'gas' || el.attr('data-pipe-side') === 'valve')
         .forEach(el => el.remove());
+        gasFlowRateText.text('0');
       } else {
         [window.leftPipe1].forEach(pipeEl => {
           if (pipeEl) {
             animateWaterFlow(draw, pipeEl, 0, 100, undefined, undefined, undefined, 'gas');
+            gasFlowRateText.text('35');
+            gasFlowRateDevice.front();
+            gasFlowRateText.front();
             valve.front();
           }
         });
@@ -641,3 +697,11 @@ function animateGasFlow(draw) {
       
       return water;
     }
+
+    function addSVGImage(draw, url, x = 0, y = 0, width, height) {
+    const img = draw.image(url)
+    .size(width, height)                      // force the element to the given dimensions
+    .move(x, y)
+    .attr({ preserveAspectRatio: 'none' });   // stretch to fill exactly
+    return img;
+  }
