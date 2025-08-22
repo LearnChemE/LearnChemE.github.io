@@ -315,6 +315,8 @@ function createVerticalValve(draw, x, y) {
       
       // Centered volume scale (0 to 65 cm³)
       const volScale = g.group();
+      // Ensure the scale does not block pointer interactions
+      volScale.attr({ 'pointer-events': 'none' });
       const volMin = 0, volMax = 65, volStep = 5;
       const volTotal = volMax - volMin + 5;
       const volTicks = (volTotal) / volStep + 1;
@@ -423,6 +425,9 @@ function createVerticalValve(draw, x, y) {
       .move(rightHeaterX, innerTop - 7.5)
       .fill(rightHeaterGrad) // replaced fill color with gradient
       .stroke({ color: '#b5865c', width: 0.8 });
+      // Heaters are visual only; don't let them block dragging
+      leftHeater.attr({ 'pointer-events': 'none' });
+      rightHeater.attr({ 'pointer-events': 'none' });
       
       // Helpers to convert between y-position and temperature (strictly discrete: 15, 20, 25 °C)
       function tempFromY(yy) {
@@ -449,7 +454,7 @@ function createVerticalValve(draw, x, y) {
         const top = atY - pointerH / 2;
         const bottom = atY + pointerH / 2;
         const left = rightHeaterX + 1 + 5;          // align at the heater face
-        const right = left + tailW + 15;             // tail extends to the right within heater
+        const right = left + tailW + 25;             // tail extends to the right within heater
         const tipX = rightHeaterX - pointerTip + 5; // tip points left into the liquid
         const midY = atY;
         // Points ordered to create a rectangle with a left-pointing tip
@@ -465,40 +470,80 @@ function createVerticalValve(draw, x, y) {
       
       // Optional: show the current set temperature near the pointer
       const tempLabel = g.text(String(targetTemp) + '°C')
-      .font({ family: 'Arial', size: 11, anchor: 'start', weight: 600 })
-      .move(rightHeaterX + heaterW - 13, py - 6)
-      .fill(
-        '#fff'
-      );
-      // Make the temp label draggable trigger as well
-      tempLabel.style('cursor', 'ns-resize');
-      tempLabel.on('mousedown', (ev) => { draggingPointer = true; ev.stopPropagation(); });
-      tempLabel.on('touchstart', (ev) => { draggingPointer = true; ev.preventDefault(); });
+        .font({ family: 'Arial', size: 11, anchor: 'start', weight: 600 })
+        .move(rightHeaterX + heaterW - 13, py - 6)
+        .fill('#fff')
+        // Make label visually present but non-interactive so it never blocks dragging
+        .attr({ 'pointer-events': 'none' })
+        .attr({ style: 'user-select: none; -webkit-user-select: none;' });
+
+      // Add a transparent drag rail over the right heater to make grabbing easy at extremes
+      const dragRailPadX = 10;   // extend beyond heater so it's easy to grab
+      const dragRailPadY = 18;   // larger vertical pad so edges are easy to re-grab
+      const dragRail = g.rect(heaterW + dragRailPadX * 2, heaterH + dragRailPadY * 2)
+        .move(rightHeaterX - dragRailPadX, innerTop - 7.5 - dragRailPadY)
+        .fill({ color: 'none', opacity: 0 })
+        .stroke({ width: 0 })
+        .attr({ 'pointer-events': 'all' });
+
+      dragRail.style('cursor', 'ns-resize');
+      dragRail.on('pointerdown', startDrag);
+
+      // Ensure arrow and label are above dragRail so they remain visible
+      arrow.front();
+      tempLabel.front();
+
+      const arrow1 = g.polygon(arrowPoints(py))
+      .fill('none')
+      .stroke({ color: 'none', width: 1 });
+
+      arrow1.style('cursor', 'ns-resize');
+      arrow1.on('pointerdown', startDrag);
       
-      // Drag logic (pointer events) for the pointer — smooth while dragging, snap on release
+      // Drag logic (pointer events) — smooth while dragging, SNAP to nearest on release
       let draggingPointer = false;
       let rafId = null;
       let pendingY = null;
 
-      function updatePointer(toY) {
-        py = Math.max(innerTop, Math.min(innerBottom, toY));
-        const t = tempFromY(py); // already snapped to 15/20/25
-        py = yFromTemp(t);      // move pointer to exact discrete position
-        targetTemp = t;
+      function clampY(yVal) {
+        return Math.max(innerTop, Math.min(innerBottom, yVal));
+      }
+
+      // Smooth visual update only (no snapping) while dragging
+      function renderPointer(toY) {
+        py = clampY(toY);
+        // Update arrow shape at raw `py` for smoothness
         arrow.plot(arrowPoints(py));
-        tempLabel.text(String(targetTemp) + '°C').move(rightHeaterX + heaterW - 13, py - 6);
+        // Show provisional nearest label while dragging
+        const provisionalT = tempFromY(py);
+        tempLabel.text(String(provisionalT) + '°C').move(rightHeaterX + heaterW - 13, py - 6);
+      }
+
+      // Snap to the nearest discrete temperature and (optionally) animate into place
+      function snapPointer(toY, animate = true) {
+        const snappedT = tempFromY(clampY(toY));
+        const finalY = yFromTemp(snappedT);
+        targetTemp = snappedT;
+        py = finalY;
+        if (animate) {
+          arrow.animate(180).plot(arrowPoints(finalY));
+          tempLabel.text(String(targetTemp) + '°C').animate(180).move(rightHeaterX + heaterW - 13, finalY - 6);
+        } else {
+          arrow.plot(arrowPoints(finalY));
+          tempLabel.text(String(targetTemp) + '°C').move(rightHeaterX + heaterW - 13, finalY - 6);
+        }
         g.targetTemperature = targetTemp;
         if (switchGroup && switchGroup.isOn) {
           updateHeaterHeat(targetTemp);
         }
       }
 
-      function scheduleUpdate(y) {
+      function scheduleRender(y) {
         pendingY = y;
         if (rafId !== null) return;
         rafId = requestAnimationFrame(() => {
           rafId = null;
-          if (pendingY != null) updatePointer(pendingY);
+          if (pendingY != null) renderPointer(pendingY);
           pendingY = null;
         });
       }
@@ -511,14 +556,16 @@ function createVerticalValve(draw, x, y) {
       function onPointerMove(ev) {
         if (!draggingPointer) return;
         ev.preventDefault();
-        scheduleUpdate(pointYFromEvent(ev));
+        scheduleRender(pointYFromEvent(ev));
       }
 
       function onPointerUp(ev) {
         if (!draggingPointer) return;
         draggingPointer = false;
         ev.preventDefault();
-        updatePointer(pointYFromEvent(ev));
+        const yNow = pointYFromEvent(ev);
+        // Finalize with a SNAP to the nearest allowed temperature
+        snapPointer(yNow, true);
         try { arrow.releasePointerCapture(ev.pointerId); } catch (_) {}
         document.removeEventListener('pointermove', onPointerMove);
         document.removeEventListener('pointerup', onPointerUp);
@@ -530,15 +577,18 @@ function createVerticalValve(draw, x, y) {
         try { arrow.setPointerCapture(ev.pointerId); } catch (_) {}
         document.addEventListener('pointermove', onPointerMove, { passive: false });
         document.addEventListener('pointerup', onPointerUp, { passive: false });
+        // On press, render current position without snapping so the first movement is smooth
+        renderPointer(pointYFromEvent(ev));
       }
 
-      // Attach pointer handlers to both the arrow and its label
+      // Attach pointer handler to the arrow only (not tempLabel)
       arrow.on('pointerdown', startDrag);
       tempLabel.on('pointerdown', startDrag);
 
       // Improve touch behavior & cursor feedback
-      arrow.style('cursor', 'ns-resize; touch-action: none;');
-      tempLabel.style('cursor', 'ns-resize; touch-action: none;');
+      arrow.style('cursor', 'ns-resize');
+      // Prevent touch scrolling from hijacking drags on mobile
+      arrow.attr({ style: (arrow.attr('style') || '') + ' touch-action: none;' });
       // Initialize heaters & bubbles based on switch state
       if (switchGroup && switchGroup.isOn) {
         isHeaterOn = true;
