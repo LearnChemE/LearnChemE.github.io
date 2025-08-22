@@ -1,105 +1,5 @@
 import { computeEquilibriumCompositions, Psat, ANTOINE_BENZENE, ANTOINE_TOLUENE } from './calcs.js';
 
-/* ––––– Helper Functions ––––– */
-
-/** Draw a dashed line between two points */
-function drawDashedLine(x1, y1, x2, y2, dashLength = 3, gapLength = 3) {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  const distance = Math.sqrt(dx * dx + dy * dy);
-  const unitX = dx / distance;
-  const unitY = dy / distance;
-  
-  let currentX = x1;
-  let currentY = y1;
-  let remainingDistance = distance;
-  let drawDash = true;
-  
-  while (remainingDistance > 0) {
-    const segmentLength = Math.min(drawDash ? dashLength : gapLength, remainingDistance);
-    const nextX = currentX + unitX * segmentLength;
-    const nextY = currentY + unitY * segmentLength;
-    
-    if (drawDash) {
-      line(currentX, currentY, nextX, nextY);
-    }
-    
-    currentX = nextX;
-    currentY = nextY;
-    remainingDistance -= segmentLength;
-    drawDash = !drawDash;
-  }
-}
-
-/** Draw a dashed curve using multiple line segments */
-function drawDashedCurve(points, dashLength = 3, gapLength = 3) {
-  for (let i = 0; i < points.length - 1; i++) {
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    drawDashedLine(p1.x, p1.y, p2.x, p2.y, dashLength, gapLength);
-  }
-}
-
-/** Draw a dashed curve with consistent spacing regardless of slope */
-function drawConsistentDashedCurve(points, dashLength = 0.75, gapLength = 1.5) {
-  if (points.length < 2) return;
-  
-  // Calculate total curve length
-  let totalLength = 0;
-  for (let i = 0; i < points.length - 1; i++) {
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    totalLength += Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
-  }
-  
-  // Calculate number of dash-gap cycles needed
-  const cycleLength = dashLength + gapLength;
-  const numCycles = Math.floor(totalLength / cycleLength);
-  
-  // Draw dashes along the curve
-  let currentLength = 0;
-  let cycleProgress = 0;
-  let drawDash = true;
-  
-  for (let i = 0; i < points.length - 1; i++) {
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const segmentLength = Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
-    
-    if (segmentLength === 0) continue;
-    
-    const unitX = (p2.x - p1.x) / segmentLength;
-    const unitY = (p2.y - p1.y) / segmentLength;
-    
-    let segmentProgress = 0;
-    
-    while (segmentProgress < segmentLength) {
-      const remainingInSegment = segmentLength - segmentProgress;
-      const remainingInCycle = drawDash ? dashLength - cycleProgress : gapLength - cycleProgress;
-      const stepLength = Math.min(remainingInSegment, remainingInCycle);
-      
-      if (stepLength <= 0) break;
-      
-      const startX = p1.x + segmentProgress * unitX;
-      const startY = p1.y + segmentProgress * unitY;
-      const endX = p1.x + (segmentProgress + stepLength) * unitX;
-      const endY = p1.y + (segmentProgress + stepLength) * unitY;
-      
-      if (drawDash) {
-        line(startX, startY, endX, endY);
-      }
-      
-      segmentProgress += stepLength;
-      cycleProgress += stepLength;
-      
-      // Check if we need to switch from dash to gap or vice versa
-      if (cycleProgress >= (drawDash ? dashLength : gapLength)) {
-        cycleProgress = 0;
-        drawDash = !drawDash;
-      }
-    }
-  }
-}
 
 // Helper function to draw vertical lines with horizontal dashes
 function drawVerticalDashedLine(x, y1, y2, plotX, plotW) {
@@ -232,85 +132,6 @@ function drawXBLabel(liquidX, plotY, plotH, plotX, plotW) {
   textSize(2.5);
   fill(0, 0, 255);
   text("B", labelX + xBTextWidth/2 + 0.2, labelY + boxPadding + 1.5);
-}
-
-export function drawBasicPlot(options = {}) {
-  // Configurable parameters with defaults
-  const leftMargin = options.leftMargin ?? 18;
-  const topMargin = options.topMargin ?? 8;
-  const rightMargin = options.rightMargin ?? 8;
-  const bottomMargin = options.bottomMargin ?? 14;
-  const tickLen = options.tickLen ?? 2;
-  const tickCount = options.tickCount ?? 5;
-  const yLabel = options.yLabel ?? "Y Axis";
-  const xLabel = options.xLabel ?? "X Axis";
-  const yTickLabel = options.yTickLabel ?? (i => (i * 20).toString());
-  const xTickLabel = options.xTickLabel ?? (i => (i * 10).toString());
-  const axisLabelSize = options.axisLabelSize ?? 3.5;
-  const tickLabelSize = options.tickLabelSize ?? 3.0;
-  const yLabelOffset = options.yLabelOffset ?? -4;
-  const xLabelOffset = options.xLabelOffset ?? 10;
-
-  const plotX = window.contentArea.x + leftMargin;
-  const plotY = window.contentArea.y + topMargin;
-  const plotW = window.contentArea.width - leftMargin - rightMargin;
-  const plotH = window.contentArea.height - topMargin - bottomMargin;
-
-  // Axes
-  stroke(0);
-  strokeWeight(0.4);
-  line(plotX, plotY, plotX, plotY + plotH); // y-axis
-  line(plotX, plotY + plotH, plotX + plotW, plotY + plotH); // x-axis
-  line(plotX, plotY, plotX + plotW, plotY); // top
-  line(plotX + plotW, plotY, plotX + plotW, plotY + plotH); // right
-
-  // Ticks and number labels (left/right, bottom/top)
-  textSize(tickLabelSize);
-  fill(0);
-  noStroke();
-  // Y axis ticks (left and right)
-  textAlign(RIGHT, CENTER);
-  for (let i = 0; i <= tickCount; i++) {
-    const y = plotY + plotH - (i * plotH / tickCount);
-    // Left ticks and labels (ticks inside)
-    stroke(0);
-    strokeWeight(0.25);
-    line(plotX, y, plotX + tickLen, y);
-    noStroke();
-    text(yTickLabel(i), plotX - 2, y); // closer to axis
-    // Right ticks only (ticks inside)
-    stroke(0);
-    strokeWeight(0.25);
-    line(plotX + plotW, y, plotX + plotW - tickLen, y);
-    noStroke();
-  }
-  // X axis ticks (bottom and top)
-  textAlign(CENTER, TOP);
-  for (let i = 0; i <= tickCount; i++) {
-    const x = plotX + (i * plotW / tickCount);
-    // Bottom ticks and labels (ticks inside)
-    stroke(0);
-    strokeWeight(0.25);
-    line(x, plotY + plotH, x, plotY + plotH - tickLen);
-    noStroke();
-    text(xTickLabel(i), x, plotY + plotH + 2); // closer to axis
-    // Top ticks only (ticks inside)
-    stroke(0);
-    strokeWeight(0.25);
-    line(x, plotY, x, plotY + tickLen);
-    noStroke();
-  }
-  // Axis labels
-  textStyle(NORMAL);
-  textSize(axisLabelSize);
-  textAlign(CENTER, BOTTOM);
-  text(xLabel, plotX + plotW / 2, plotY + plotH + xLabelOffset);
-  textAlign(RIGHT, CENTER);
-  push();
-  translate(plotX - 10, plotY + plotH / 2 + yLabelOffset); // move Y axis label up
-  rotate(-HALF_PI);
-  text(yLabel, 0, 0);
-  pop();
 }
 
 export function drawPlot1(options = {}) {
@@ -724,7 +545,7 @@ export function drawPlot2(options = {}) {
     endShape();
     
     // Draw toluene fugacity curve (Purple, dashed) - dashed line
-    stroke(128, 0, 128); // Purple
+    stroke(0, 128, 0); // Purple
     strokeWeight(0.6);
     noFill();
     
@@ -738,8 +559,13 @@ export function drawPlot2(options = {}) {
       toluenePoints.push({ x, y: boundedY });
     }
     
-    // Draw dashed curve using simple line segments
-    drawConsistentDashedCurve(toluenePoints, 0.75, 1.5);
+   // Draw solid curve using simple line segments (like Mathematica's linear interpolation)
+   beginShape();
+   for (let i = 0; i < toluenePoints.length; i++) {
+     const point = toluenePoints[i];
+     vertex(point.x, point.y);
+   }
+   endShape();
   }
 
   // Axes
@@ -1019,7 +845,7 @@ export function drawBothPlots(options = {}) {
     endShape();
     
     // Draw toluene fugacity curve (Purple, dashed) - dashed line
-    stroke(128, 0, 128); // Purple
+    stroke(0, 128, 0); // Purple
     strokeWeight(0.6);
     noFill();
     
@@ -1032,7 +858,13 @@ export function drawBothPlots(options = {}) {
       toluenePoints.push({ x, y: boundedY });
     }
     
-    drawConsistentDashedCurve(toluenePoints, 0.75, 1.5);
+       // Draw solid curve using simple line segments (like Mathematica's linear interpolation)
+   beginShape();
+   for (let i = 0; i < toluenePoints.length; i++) {
+     const point = toluenePoints[i];
+     vertex(point.x, point.y);
+   }
+   endShape();
   }
 
   // === BOTTOM PLOT: Temperature vs Mole Fraction ===
