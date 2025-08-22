@@ -103,13 +103,12 @@ function generateTxyData(n = 100) {
 
 /** Generate fugacity curves data for Plot 2 - exactly like Mathematica */
 function generateFugacityCurvesData() {
-  const z = window.state.sliderValue; // Current overall composition
+  const z = window.state.sliderValue;
+  const data = [];
   
-  // Step 1: Create interpolation data points exactly like Mathematica
-  // Range[75, 115] creates integer points: 75, 76, 77, ..., 115
-  const interpolationPoints = [];
-  for (let T = 75; T <= 115; T++) {
-    // Calculate fB and fT at each integer temperature
+  // Use dense sampling like the pressure simulation (100+ points)
+  for (let i = 0; i <= 100; i++) {
+    const T = 75 + (40 * i) / 100;  // 75 → 115 °C, 100 points
     const xB_val = xB(T, z);
     const yB_val = yB(T, z);
     const PsatB = Psat(T, ANTOINE_BENZENE);
@@ -127,33 +126,10 @@ function generateFugacityCurvesData() {
       fT = (1 - z) * 1.0;
     }
     
-    interpolationPoints.push({ T, fB, fT });
+    data.push({ T, fB, fT });
   }
   
-  // Step 2: Create smooth curve using linear interpolation between integer points
-  // This mimics Mathematica's InterpolationOrder -> 1
-  const smoothCurve = [];
-  for (let i = 0; i < interpolationPoints.length - 1; i++) {
-    const p1 = interpolationPoints[i];
-    const p2 = interpolationPoints[i + 1];
-    
-    // Add the first point
-    smoothCurve.push(p1);
-    
-    // Add intermediate points for smooth curve (10 points between each integer)
-    for (let j = 1; j < 10; j++) {
-      const t = j / 10;
-      const T = p1.T + t * (p2.T - p1.T);
-      const fB = p1.fB + t * (p2.fB - p1.fB);
-      const fT = p1.fT + t * (p2.fT - p1.fT);
-      smoothCurve.push({ T, fB, fT });
-    }
-  }
-  
-  // Add the last point
-  smoothCurve.push(interpolationPoints[interpolationPoints.length - 1]);
-  
-  return smoothCurve;
+  return data;
 }
 
 export function calcAll() {
