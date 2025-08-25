@@ -1,6 +1,6 @@
 import type { ControlType, DigitalLabelDescriptor, SetpointControlDescriptor } from "../types";
 import { DigitalLabel } from "./classes/Label";
-import { FirstOrder, SetpointControl } from "./classes/Setpoint";
+import { SetpointControl } from "./classes/Setpoint";
 import { initButton } from "./helpers";
 
 const spLabels: Array<DigitalLabelDescriptor> = [
@@ -62,9 +62,9 @@ const spLabels: Array<DigitalLabelDescriptor> = [
     }
 ];
 
-export function initInteractions() {
+export function initInteractions<T extends ControlType>(flowCtrl: T, tempCtrl: T) {
     const flowSpDescriptor: SetpointControlDescriptor<ControlType> = {
-        ctrl: new FirstOrder(0, 1000),
+        ctrl: flowCtrl,
         upBtnId: "flowUpBtn",
         downBtnId: "flowDownBtn",
         spLabel: new DigitalLabel(spLabels[0]),
@@ -74,7 +74,7 @@ export function initInteractions() {
         step: 0.5
     };
     const tempSpDescriptor: SetpointControlDescriptor<ControlType> = {
-        ctrl: new FirstOrder(25, 1000),
+        ctrl: tempCtrl,
         upBtnId: "tempUpBtn",
         downBtnId: "tempDownBtn",
         spLabel: new DigitalLabel(spLabels[1]),

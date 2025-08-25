@@ -4,34 +4,6 @@ import { DigitalLabel } from "./classes/Label";
 
 const labelDescriptors: Array<DigitalLabelDescriptor> = [
     {
-        id: "evapTempLabel",
-        gid: "evapTempGauge",
-        centerId: "evapTempScreen",
-        fill: "#F9F155",
-        units: "",
-        decimals: 1,
-        initialValue: 25,
-        range: {
-            range: [0, 1000],
-            overflowString: "OVER",
-            underflowString: "UNDER"
-        }
-    },
-    {
-        id: "steamFlowLabel",
-        gid: "steamFlowGauge",
-        centerId: "steamFlowScreen",
-        fill: "#F9F155",
-        units: "",
-        decimals: 2,
-        initialValue: 0,
-        range: {
-            range: [0, 1000],
-            overflowString: "OVER",
-            underflowString: "UNDER"
-        }
-    },
-    {
         id: "concentrateScaleLabel",
         gid: "concentrateScale",
         centerId: "concentrateScreen",
