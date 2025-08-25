@@ -10,10 +10,14 @@ svg {
   width: fit-content;
   height: fit-content;
   user-select: none;
+  position: relative;
 }
 
 .digital-label {
   position: absolute;
+  font-size: 8px;
+  text-anchor: middle;
+  text-justify: center;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -85,3 +89,14 @@ svg {
   background: #f0f0f0;
 }
 
+.bitcount-grid-single-display {
+  font-family: "Bitcount Grid Single", system-ui;
+  font-optical-sizing: auto;
+  font-weight: 100;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0,
+    "CRSV" 0.5,
+    "ELSH" 0,
+    "ELXP" 0;
+}

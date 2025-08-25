@@ -208,3 +208,19 @@ export function isOverlapping(el1: SVGGElement, el2: SVGRectElement) {
     r1.y > r2.y + r2.height
   );
 }
+
+/**
+ * Make a property of an object observable via a proxy
+ * @param obj 
+ * @param onChange 
+ * @returns 
+ */
+export function makeObservable<T extends object>(obj: T, onChange: (prop: string | symbol, val: any) => void) {
+    return new Proxy(obj, {
+        set(target, prop, value) {
+            target[prop as keyof T] = value;
+            onChange(prop, value);
+            return true;
+        }
+    });
+}
