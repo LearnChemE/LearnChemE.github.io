@@ -16,3 +16,22 @@ export type DigitalLabelDescriptor = {
     initialValue: number,
     range?: LabelRange
 };
+
+export type AnimationFn = (dt: number) => void;
+
+export interface ControlType {
+    setpoint: number;
+    value: number;
+    iterate: (dt: number) => void;
+}
+
+export type SetpointControlDescriptor<T extends ControlType> = {
+    ctrl: T,
+    upBtnId: string,
+    downBtnId: string,
+    spLabel: DigitalLabel,
+    outLabel: DigitalLabel,
+    min: number,
+    max: number,
+    step: number
+}

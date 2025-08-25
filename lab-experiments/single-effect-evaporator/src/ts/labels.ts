@@ -4,34 +4,6 @@ import { DigitalLabel } from "./classes/Label";
 
 const labelDescriptors: Array<DigitalLabelDescriptor> = [
     {
-        id: "feedTempLabel",
-        gid: "feedTempGauge",
-        centerId: "feedTempScreen",
-        fill: "#F9F155",
-        units: "",
-        decimals: 1,
-        initialValue: 25,
-        range: {
-            range: [0, 1000],
-            overflowString: "OVER",
-            underflowString: "UNDER"
-        }
-    },
-    {
-        id: "feedFlowLabel",
-        gid: "feedFlowGauge",
-        centerId: "feedFlowScreen",
-        fill: "#F9F155",
-        units: "",
-        decimals: 2,
-        initialValue: 0,
-        range: {
-            range: [0, 1000],
-            overflowString: "OVER",
-            underflowString: "UNDER"
-        }
-    },
-    {
         id: "evapTempLabel",
         gid: "evapTempGauge",
         centerId: "evapTempScreen",

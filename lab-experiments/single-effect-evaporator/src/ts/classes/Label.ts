@@ -6,6 +6,8 @@ export class DigitalLabel {
     private decimals: number;
     private range: LabelRange | undefined;
 
+    public id;
+
     constructor(descriptor: DigitalLabelDescriptor) {
         const g = document.getElementById(descriptor.gid)!;
 
@@ -34,6 +36,7 @@ export class DigitalLabel {
         this.units = descriptor.units;
         this.decimals = descriptor.decimals;
         this.range = descriptor.range;
+        this.id = descriptor.id;
     }
 
     /**

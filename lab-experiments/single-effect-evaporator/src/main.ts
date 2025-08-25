@@ -17,13 +17,13 @@ app.appendChild(initHamburgerMenu(worksheet, "singleEffectEvaporatorWorksheet.do
 app.appendChild(insertSVG(svg));
 
 // Initialize labels
-createLabels();
+const labels = createLabels();
 
 // Initialize State
 // const State = new Simulation();
 
 // Initialize interactions
-initInteractions();
+initInteractions(/* state, */ labels);
 
 // Visibility and accessibility
 initSvgZoom();

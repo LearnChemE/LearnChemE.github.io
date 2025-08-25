@@ -210,6 +210,54 @@ export function isOverlapping(el1: SVGGElement, el2: SVGRectElement) {
 }
 
 /**
+ * Initialize a button with the proper class and callback
+ * @param id ID of the button's group element
+ * @param onClick Callback for click event
+ */
+export function initButton(id: string, onClick: () => void) {
+    const btn = document.getElementById(id)!;
+    btn.classList.add("svg-btn");
+
+    let isHolding = false;
+    let timeoutId: number | null = null;
+    const speedUpFactor = 0.5;
+
+    const start = () => {
+        if (isHolding) return;
+        isHolding = true;
+
+        // Perform action once
+        onClick();
+        
+        scheduleNext(500);
+    }
+
+    const stop = () => {
+        isHolding = false;
+        if (timeoutId !== null) {
+            clearTimeout(timeoutId);
+            timeoutId = null;
+        }
+    }
+
+    const scheduleNext = (delay: number) => {
+        timeoutId = window.setTimeout(() => {
+            if (!isHolding) return;
+            onClick();
+            const nextSpeed = Math.max(100, delay * speedUpFactor);
+            scheduleNext(nextSpeed);
+        }, delay);
+    }
+
+    btn.addEventListener("mousedown", start);
+    btn.addEventListener("touchstart", start);
+
+    btn.addEventListener("mouseup", stop);
+    btn.addEventListener("mouseleave", stop);
+    btn.addEventListener("touchend", stop);
+}
+
+/**
  * Make a property of an object observable via a proxy
  * @param obj 
  * @param onChange 
