@@ -11,6 +11,9 @@ export class SetpointControl<T extends ControlType> {
     private step: number;
 
     constructor(descriptor: SetpointControlDescriptor<T>) {
+        if (descriptor.ctrl === null) {
+            throw new Error("Error: null control object on Setpoint Descriptor");
+        }
         this.control = descriptor.ctrl;
         this.spLabel = descriptor.spLabel;
         this.outLabel = descriptor.outLabel;

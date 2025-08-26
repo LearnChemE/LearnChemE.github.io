@@ -6,6 +6,7 @@ export type EvaporatorState = {
 
     steamFlow: number,
     steamTemp: number,
+    steamPres: number,
 
     evapFlow: number,
 
@@ -40,7 +41,7 @@ export interface ControlType {
 }
 
 export type SetpointControlDescriptor<T extends ControlType> = {
-    ctrl: T,
+    ctrl: T | null,
     upBtnId: string,
     downBtnId: string,
     spLabel: DigitalLabel,
