@@ -38,6 +38,7 @@ export interface ControlType {
     setpoint: number;
     value: number;
     iterate: (dt: number) => void;
+    setTimeDelay: (val: number, th?: number) => void;
 }
 
 export type SetpointControlDescriptor<T extends ControlType> = {

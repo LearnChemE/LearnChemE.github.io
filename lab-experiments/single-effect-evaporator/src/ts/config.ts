@@ -1,5 +1,8 @@
 import type { ControlType, DigitalLabelDescriptor, SetpointControlDescriptor } from "../types";
 
+/**
+ * Label for steam flowrate
+ */
 export const steamFlowLabelDescriptor: DigitalLabelDescriptor = {
   id: "steamFlowLabel",
   gid: "steamFlowGauge",
@@ -15,6 +18,9 @@ export const steamFlowLabelDescriptor: DigitalLabelDescriptor = {
   }
 };
 
+/**
+ * Label for steam temperature
+ */
 export const steamTempLabelDescriptor: DigitalLabelDescriptor = {
   id: "evapTempLabel",
   gid: "evapTempGauge",
@@ -30,6 +36,9 @@ export const steamTempLabelDescriptor: DigitalLabelDescriptor = {
   }
 };
 
+/**
+ * Label for concentrate scale
+ */
 export const concScaleLabelDescriptor: DigitalLabelDescriptor = {
     id: "concentrateScaleLabel",
     gid: "concentrateScale",
@@ -45,6 +54,9 @@ export const concScaleLabelDescriptor: DigitalLabelDescriptor = {
     }
 };
 
+/**
+ * Label for condensate scale
+ */
 export const condScaleLabelDescriptor: DigitalLabelDescriptor = {
     id: "condensateScaleLabel",
     gid: "condensateScale",
@@ -60,7 +72,9 @@ export const condScaleLabelDescriptor: DigitalLabelDescriptor = {
     }
 };
 
-
+/**
+ * Labels for setpoint controllers
+ */
 export const spLabels: Array<DigitalLabelDescriptor> = [
     {
         id: "flowCtrlLabel",
@@ -120,6 +134,9 @@ export const spLabels: Array<DigitalLabelDescriptor> = [
     }
 ];
 
+/**
+ * Flowrate Setpoint Device
+ */
 export const flowSpDescriptor: SetpointControlDescriptor<ControlType> = {
     ctrl: null,
     upBtnId: "flowUpBtn",
@@ -131,6 +148,9 @@ export const flowSpDescriptor: SetpointControlDescriptor<ControlType> = {
     step: 0.5
 };
 
+/**
+ * Temperature Setpoint Device
+ */
 export const tempSpDescriptor: SetpointControlDescriptor<ControlType> = {
     ctrl: null,
     upBtnId: "tempUpBtn",

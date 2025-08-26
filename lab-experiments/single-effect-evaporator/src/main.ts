@@ -29,8 +29,8 @@ const steamTempLabel = new DigitalLabel(steamTempLabelDescriptor);
 // Create label for steam flowrate
 const steamFlowLabel = new DigitalLabel(steamFlowLabelDescriptor);
 
-const flowCtrl = new FirstOrder(0,  1000);
-const tempCtrl = new FirstOrder(25, 3000);
+const flowCtrl = new FirstOrder(0,   500, 200);
+const tempCtrl = new FirstOrder(25, 3000,1000);
 
 // Initialize State
 const stateDescriptor: SimulationDescriptor = {

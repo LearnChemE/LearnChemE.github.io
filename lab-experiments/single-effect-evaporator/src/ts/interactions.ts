@@ -20,7 +20,3 @@ export function initInteractions<T extends ControlType>(flowCtrl: T, tempCtrl: T
     initButton("concentrateTareBtn", () => {});
     initButton("condensateTareBtn", () => {});
 }
-
-// function initBallValve(leverId: string, set?: (mode: boolean) => void) {
-
-// }

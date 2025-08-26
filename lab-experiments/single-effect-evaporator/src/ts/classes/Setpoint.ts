@@ -28,15 +28,15 @@ export class SetpointControl<T extends ControlType> {
     }
 
     public increment = () => {
-        this.control.setpoint += this.step; 
-        this.control.setpoint = Math.min(this.control.setpoint, this.max);
-        this.spLabel.setLabel(this.control.setpoint);
+        const sp = Math.min(this.control.setpoint + this.step, this.max);
+        this.control.setTimeDelay(sp);
+        this.spLabel.setLabel(sp);
     }
     
     public decrement = () => {
-        this.control.setpoint -= this.step; 
-        this.control.setpoint = Math.max(this.control.setpoint, this.min);
-        this.spLabel.setLabel(this.control.setpoint);
+        const sp = Math.max(this.control.setpoint - this.step, this.min);
+        this.control.setTimeDelay(sp);
+        this.spLabel.setLabel(sp);
     }
 
     private animate = (delay: number) => {
@@ -53,11 +53,20 @@ export class FirstOrder implements ControlType {
     value: number;
 
     private r: number;
+    private th: number;
 
-    constructor(init: number, tau: number) {
+    constructor(init: number, tau: number, th=0) {
         this.setpoint = init;
         this.value = init;
         this.r = Math.exp(-1/tau);
+        this.th = th;
+    }
+
+    public setTimeDelay(val: number, th?: number) {
+        if (th === undefined) th = this.th;
+        setTimeout(() => {
+            this.setpoint = val;
+        }, th);
     }
 
     iterate = (dt: number) => {

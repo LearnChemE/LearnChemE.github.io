@@ -45,7 +45,6 @@ export class Simulation {
 
             // Calculate
             this.state = calculateEvaporator(this.state);
-            console.log(this.state.steamFlow)
 
             // Update labels
             this.setSteamFlowLabel(this.state.steamFlow)
