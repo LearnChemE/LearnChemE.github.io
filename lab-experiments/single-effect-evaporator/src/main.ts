@@ -47,10 +47,10 @@ const steamFlowLabelDescriptor: DigitalLabelDescriptor = {
   centerId: "steamFlowScreen",
   fill: "#F9F155",
   units: "",
-  decimals: 2,
+  decimals: 1,
   initialValue: 0,
   range: {
-    range: [0, 1000],
+    range: [0, 10000],
     overflowString: "OVER",
     underflowString: "UNDER"
   }
@@ -67,7 +67,7 @@ const stateDescriptor: SimulationDescriptor = {
   steamFlowLabel: steamFlowLabel,
   steamTempLabel: steamTempLabel,
 }
-const State = new Simulation(stateDescriptor);
+new Simulation(stateDescriptor);
 
 // Initialize interactions
 initInteractions<FirstOrder>(flowCtrl, tempCtrl);

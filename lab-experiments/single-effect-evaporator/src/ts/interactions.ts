@@ -70,7 +70,7 @@ export function initInteractions<T extends ControlType>(flowCtrl: T, tempCtrl: T
         spLabel: new DigitalLabel(spLabels[0]),
         outLabel: new DigitalLabel(spLabels[3]),
         min: 0,
-        max: 12,
+        max: 15,
         step: 0.5
     };
     const tempSpDescriptor: SetpointControlDescriptor<ControlType> = {

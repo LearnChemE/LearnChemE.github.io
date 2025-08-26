@@ -3,11 +3,15 @@ export const svgNS = "http://www.w3.org/2000/svg";
 export type EvaporatorState = {
     feedFlow: ControlType,
     feedTemp: ControlType,
+
     steamFlow: number,
+    steamTemp: number,
+
     evapFlow: number,
+
     concFlow: number,
-    concComp: number,
-    concTemp: number
+    concTemp: number,
+    concComp: number
 }
 
 export type LabelRange = {
