@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attenuation Simulation</title>
+
+<!-- Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="./libraries/math.min.js"></script>
+<script src="./libraries/p5/p5.min.js"></script>
+<script src="./libraries/p5/p5.dom.min.js"></script>
+<script src="./libraries/p5/grafica.js"></script>
+<script src="./libraries/p5/dat.gui.min.js"></script>
+<script src="./libraries/quicksettings3/quicksettings.js"></script>
+<script src="./libraries/p5/p5.gui.js"></script>
+<script src="./libraries/plotFun.js"></script>
+
+<!-- MathJax -->
+<script>
+MathJax = {
+  chtml: { scale: 0.95, mathmlSpacing: true, displayAlign: 'left' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+<!-- Custom CSS -->
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="sliders.css">
+
+<!-- Main JS -->
+<script src="main.js"></script>
+</head>
+
+<body>
+
+<!-- Canvas wrapper -->
+<div id="plot-wrapper">
+</div>
+  <!-- Hamburger menu inside the plot wrapper -->
+  <div class="hamburger-container">
+    <button class="menu-button" onclick="toggleMenu()">☰</button>
+    <div id="menu" class="menu-content">
+      <div id="dir-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
+      <div id="det-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
+      <div id="abt-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+      <div id="calc-btn" class="btn btn-light btn-wide">Reference calculations</div>
+      <div id="half-btn" class="btn btn-light btn-wide">Initiator half-life</div>
+      <div id="inert-btn" class="btn btn-light btn-wide">Inert absorber</div>
+
+    </div>
+  </div>
+
+
+
+
+<!-- Modals -->
+<div id="directions-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Directions</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+		<p>
+		For a photo-induced process to proceed, light must be absorbed. Consequently, the light intensity
+		in photosensitive media decreases with depth. This interactive graph demonstrates the relationship between 
+		key variables.<br>
+		<b>Critical note: Assumes monochromatic light source.</b>
+		</p>
+		<p>
+		Vertical lines denote key attenuation marks.<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;For homogeneous sample cure, attenuation less than 10% is advised (90% mark); though 20% is preferred by some users.<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;For vat polymerization, depth of cure \(D_p\) is a typical characterization metric.
+		</p>
+		<p>
+		Default values are for diphenyl(2,4,6-trimethylbenzoyl)phosphine oxide (TPO), a common radical photoinitator, at 405 nm.
+		</p>
+		<p>
+		<b>Additional features are available including:</b><br>
+		1) Calculating Napierian absorptivity from UV-Vis data<br>
+			&nbsp;&nbsp;&nbsp;&nbsp;Napierian absorptivity is in base <i>e</i>, rather than base 10<br>
+			&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/marketing/global/documents/233/907/photoinitiators.pdf?srsltid=AfmBOopReVzCuZIFeb8s1t3-qecxE2sYJyzBLP0WUBbFslOgSUIdexkx" target="_blank" rel="noopener noreferrer">Sigma catalog</a><br>
+			&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://www.researchgate.net/profile/San-Ty/post/Formulating_UV_curable_resin_with_suspended_particles/attachment/5a782b744cde266d5888cb18/AS%3A590614525665281%401517824884894/download/Photoinitiators+for+UV+curing.pdf" target="_blank" rel="noopener noreferrer">Ciba catalog</a><br>
+		2) Converting wt% to mM <br>
+		3) Calculating initiator half-life <br>
+    4) Incorperation of an additional (inert) absorber
+		</p>
+    <p>
+		Interested in the impact of 
+		<a href="https://learncheme.github.io/demos/LightAttenutation_MultipleWavelengths/" target="_blank" rel="noopener noreferrer">multiple wavelengths</a>?<br>	
+		</p>
+	</div>
+  </div></div>
+</div>
+
+<div id="details-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Details</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <b><u>Plot details</u></b><br>
+$$
+\frac{dI}{dz} = -I \, \varepsilon \, [C]
+$$
+$$
+\frac{I}{I_0} = \exp(-\varepsilon \, [C] \, z)
+$$
+\( I \) – intensity of light at sample depth \( z \) \((\text{mW/cm}^2)\) <br>
+\( I_0 \) – initial intensity of light \((\text{mW/cm}^2)\) <br>
+\( \varepsilon \) – Napierian molar extinction coefficient (base \(e\)) \((\text{L/mol·cm})\) <br>
+\( [C] \) – concentration of chromophore (i.e., photoinitiator) \((\text{mol/L})\) <br>
+\( z \) – sample thickness \((\mu\text{m})\) <br>
+<br>
+
+<b><u>Napierian absorptivity details</u></b><br>
+$$
+A = \frac{\varepsilon \, [C] \, l}{\ln(10)}
+$$
+\( A \) – Absorbance (base 10) <br>
+\( \varepsilon \) – Napierian absorptivity \((\text{L/mol·cm})\) <br>
+\( l \) – path length \((\text{cm})\) <br>
+\( [C] \) – concentration of absorber \((\text{mM})\) <br>
+<br>
+
+<b><u>Initiator half-life</u></b><br>
+The energy of a photon is inversely proportional to the wavelength \(\lambda\). 
+This relationship is useful for converting light intensity from 
+\((\text{mW/cm}^2)\) to \((\text{Einstein/s·cm}^2)\), where \(1 \ \text{Einstein} = 1 \ \text{mol photons}\).
+
+$$
+E = \frac{h \, c \, N_A}{\lambda} 
+$$
+\( E \) – photon energy \((\text{J/mol})\) <br>
+\( h \) – Planck's constant \((6.6261 \times 10^{-34} \ \text{J·s})\) <br>
+\( c \) – speed of light \((2.9979 \times 10^{8} \ \text{m/s})\) <br>
+\( N_A \) – Avogadro's number \((6.022 \times 10^{23} \ \text{mol}^{-1})\) <br>
+\( \lambda \) – wavelength of light \((\text{nm})\) <br>
+<br>
+
+Half-life (assuming no diffusion, photobleaching, or photodarkening) is then:
+$$
+t_{1/2} = \frac{\ln(2) \, E}{\phi \, \varepsilon \, I}
+$$
+\( \phi \) – quantum yield \((\text{mol/Einstein})\) <br>
+\( \varepsilon \) – Napierian molar extinction coefficient (base \(e\)) \((\text{L/mol·cm})\) <br>
+\( I \) – light intensity \((\text{mW/cm}^2)\) <br>
+<br>
+
+<b><u>Inert absorber contribution</u></b><br>
+The total attenuation now accounts for both the active chromophore and the inert absorber. 
+Note that this impacts intensity for half-life, but only the active species progresses.
+$$
+\frac{dI}{dz} = -I \, (\varepsilon [C] + \varepsilon_\text{inert} [C]_\text{inert})
+$$
+$$
+\frac{I}{I_0} = \exp\big(-(\varepsilon [C] + \varepsilon_\text{inert} [C]_\text{inert}) \, z\big)
+$$
+\( \varepsilon_\text{inert} \) – Napierian molar extinction coefficient of inert absorber \((\text{L/mol·cm})\) <br>
+\( [C]_\text{inert} \) – concentration of inert absorber \((\text{mol/L})\) <br>
+
+						</p>
+    </div>
+  </div></div>
+</div>
+
+<div id="about-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">About</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <p>
+		This simulation was created in the Department of Chemical and Biological 
+		Engineering at University of Colorado Boulder for LearnChemE.com by 
+		Alexander Osterbaan under the direction of Professor John L. Falconer and 
+		Professor Christopher N. Bowman and with the assistance of Drew Smith and Meagan Arguien. Address any questions or comments to LearnChemE@gmail.com.  
+		</p>
+	</div>
+  </div></div>
+</div>
+
+</body>
+</html>
