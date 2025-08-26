@@ -1,0 +1,230 @@
+@charset "UTF-8";
+
+/* ─────────────────────────────────────────────
+   Base Body / Layout
+───────────────────────────────────────────── */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #fdfdfd;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ─────────────────────────────────────────────
+   Plot / Canvas Wrapper
+───────────────────────────────────────────── */
+#plot-wrapper {
+  position: absolute;
+  top: 20px;
+  left: 260px;   /* leaves space for left GUI */
+  right: 340px;  /* leaves space for right GUI */
+  bottom: 20px;
+  background-color: #fff;
+  border: none;                /* removed grey box */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05); /* subtle shadow instead */
+}
+
+/* Canvas: JS sets exact pixel size, avoid CSS stretching */
+#plot-wrapper canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ─────────────────────────────────────────────
+   Hamburger Menu
+───────────────────────────────────────────── */
+.hamburger-container {
+  position: absolute;
+  top: 5px;
+  right: 230px;
+  z-index: 1000;
+}
+
+.menu-button {
+  font-size: 1.75rem;
+  background: lightblue;
+  border: 1px solid black;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: background 0.2s ease;
+}
+
+.menu-button:hover {
+  background-color: rgb(198, 224, 233);
+}
+
+.menu-content {
+  display: none;
+  position: absolute;
+  top: 2.5rem;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  z-index: 500;
+
+  min-width: 260px;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+.menu-content a,
+.menu-content .btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  color: #111827;
+  text-decoration: none;
+}
+
+.menu-content a:hover,
+.menu-content .btn:hover {
+  background: #f0f0f0;
+}
+
+/* ─────────────────────────────────────────────
+   GUI Panels
+───────────────────────────────────────────── */
+.qs_main, .qs_container {
+  background-color: #f0f8ff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 14px;
+  color: #111;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+  z-index: 900;
+}
+
+/* Left GUI (product, left sliders) */
+.gui-left {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 240px;
+}
+
+/* Right GUI (plot controls, half-life) */
+.gui-right {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 320px;
+}
+
+/* Optional: bottom right GUI */
+.gui-bottom-right {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+}
+
+/* Buttons inside GUIs */
+.btn-sm {
+  border-radius: 3px;
+  border: 0.5px solid black;
+  padding: 0px 0.5em;
+}
+
+.btn-wide {
+  width: 100%;
+}
+
+/* ─────────────────────────────────────────────
+   Responsive Adjustments
+───────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  #plot-wrapper {
+    left: 220px;
+    right: 280px;
+  }
+  .qs_main, .qs_container {
+    font-size: 13px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 800px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  #plot-wrapper {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 95%;
+    height: auto;
+    aspect-ratio: 16 / 9; /* keeps proportion on mobile */
+    margin: 10px auto;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+
+  .qs_main, .qs_container {
+    position: relative !important;
+    width: 95%;
+    max-width: 500px;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    margin: 8px auto;
+    font-size: 0.9rem;
+  }
+
+  .hamburger-container {
+    position: relative;
+    top: 0;
+    right: 0;
+    margin: 0 auto 10px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .menu-button {
+    font-size: 1.5rem;
+    padding: 5px 8px;
+  }
+
+  .menu-content {
+    position: relative;
+    top: 0;
+    right: 0;
+    max-height: 50vh;
+    overflow-y: auto;
+    width: 100%;
+    margin-top: 5px;
+  }
+}
+
+
+/* ─────────────────────────────────────────────
+   Inert Absorber GUI
+───────────────────────────────────────────── */
+.gui-inert {
+  background-color: #f0f8ff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 14px;
+  color: #111;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+  z-index: 900;
+  position: fixed;
+  right: 20px;
+  bottom: 20px; /* always bottom-right */
+  width: 320px;
+}
