@@ -36,19 +36,19 @@ export class Simulation {
     }
 
     private animate = () => {
-        // let prevtime = 0;
+        let prevtime = 0;
 
-        const frame = () => {
-            // // Calculate dt
-            // const deltaTime = Math.min(time - prevtime, 200);
-            // prevtime = time;
+        const frame = (time: number) => {
+            // Calculate dt
+            const deltaTime = Math.min(time - prevtime, 200);
+            prevtime = time;
 
             // Calculate
-            this.state = calculateEvaporator(this.state);
+            this.state = calculateEvaporator(this.state, deltaTime);
 
             // Update labels
-            this.setSteamFlowLabel(this.state.steamFlow)
-            this.setSteamTempLabel(this.state.steamTemp)
+            this.setSteamFlowLabel(this.state.steamFlow);
+            this.setSteamTempLabel(this.state.concTemp);
 
             // Request next frame
             requestAnimationFrame(frame);

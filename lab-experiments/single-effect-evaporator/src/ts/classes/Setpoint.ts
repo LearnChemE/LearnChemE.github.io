@@ -4,6 +4,7 @@ import { DigitalLabel } from "./Label";
 
 export class SetpointControl<T extends ControlType> {
     private control: T;
+    private displayPoint: number;
     private spLabel: DigitalLabel;
     private outLabel: DigitalLabel;
     private min: number;
@@ -15,6 +16,7 @@ export class SetpointControl<T extends ControlType> {
             throw new Error("Error: null control object on Setpoint Descriptor");
         }
         this.control = descriptor.ctrl;
+        this.displayPoint = this.control.setpoint;
         this.spLabel = descriptor.spLabel;
         this.outLabel = descriptor.outLabel;
         this.min  = descriptor.min;
@@ -28,15 +30,17 @@ export class SetpointControl<T extends ControlType> {
     }
 
     public increment = () => {
-        const sp = Math.min(this.control.setpoint + this.step, this.max);
-        this.control.setTimeDelay(sp);
+        const sp = Math.min(this.displayPoint + this.step, this.max);
+        this.displayPoint = sp;
         this.spLabel.setLabel(sp);
+        this.control.setTimeDelay(sp);
     }
     
     public decrement = () => {
-        const sp = Math.max(this.control.setpoint - this.step, this.min);
-        this.control.setTimeDelay(sp);
+        const sp = Math.max(this.displayPoint - this.step, this.min);
+        this.displayPoint = sp;
         this.spLabel.setLabel(sp);
+        this.control.setTimeDelay(sp);
     }
 
     private animate = (delay: number) => {
@@ -62,7 +66,7 @@ export class FirstOrder implements ControlType {
         this.th = th;
     }
 
-    public setTimeDelay(val: number, th?: number) {
+    public setTimeDelay = async (val: number, th?: number) => {
         if (th === undefined) th = this.th;
         setTimeout(() => {
             this.setpoint = val;
