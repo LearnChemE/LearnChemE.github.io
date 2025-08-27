@@ -1,19 +1,19 @@
 import type { EvaporatorState } from "../types";
 
-const UA = 1e2; // W / K
+const UA = 1e4; // W / K
 const STEAM_TEMP = 273.15 + 212; // deg C
 const EVAPORATOR_PRESSURE = 1; // bar
 const X_IN = 0.1;
 
 const MASS_IN_EVAPORATOR = 10; // kg
-const EVAPORATOR_HEAT_CAPACITTY = 10000; // J
-const DIFFUSE = 1e-5;
+const EVAPORATOR_HEAT_CAPACITTY = 5000; // J
+const DIFFUSE = 10;
 
 /**
  * Calculate saturated pressure from temperature
  */
 function antoines(T: number) {
-    if(T < 379) {
+    if(T < 399.94) {
         const A = 4.6543;
         const B = 1435.264;
         const C = -64.848;
@@ -52,7 +52,7 @@ function dHvap(T: number) {
     const Tc = T - 273; // temperature in celsius
     let H_vap = 193.1 - 10950 * Math.log( ( 374 - Tc ) / 647) * ( 374 - Tc )**0.785 / ( 273 + Tc ); // heat of vaporization (kJ/kg)
     H_vap *= 1000; // heat of vaporization converted to J/kg
-    return H_vap;  
+    return H_vap;
 }
 
 /**
@@ -90,9 +90,9 @@ function concentrate_flow(T: number, mdot_feed: number) {
         const min = X_IN * mdot_feed;
 
         // Return the one that falls in the correct range
-        if (lo >= min && lo <= mdot_feed) return lo
-        else if (hi >= 0 && hi <= mdot_feed) return hi
-        else return X_IN * mdot_feed // Everything goes to the concentrate
+        if (lo >= min && lo <= mdot_feed) {console.log("lo"); return lo}
+        else if (hi >= min && hi <= mdot_feed) {console.log("hi"); return hi}
+        else return mdot_feed // Everything goes to the concentrate
     }
 }
 
@@ -113,22 +113,26 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     // console.log(`evaporate flow: ${mdot_evap}\nconcentrate flow: ${mdot_conc}\nmole frac: ${x_c}`);
     // Energy in minus energy out
     const in_minus_out = mdot_feed * (Cp(temp_feed, X_IN) * temp_feed - Cp(temp_conc, x_c) * temp_conc);
+    console.log(`Cp: ${Cp(temp_conc, x_c)}`)
     // Energy lost to evaporation
-    const cons = dHvap(temp_conc) * mdot_evap;
+    const cons = dHvap(temp_conc) * mdot_evap / 60;
+    console.log(`in - out = ${in_minus_out}\ngen = ${heat_rate}\ncons = ${cons}`)
+    console.log(`dHvap: ${dHvap(temp_conc)}`)
     // const cons = 0;
     if (mdot_evap > 0) console.warn(`Rate of consumption: ${cons/1000} kW`)
 
     // Use energy bal to evolve (no generation)
     const acc = in_minus_out + heat_rate - cons;
-    if (mdot_evap > 0) console.warn(acc)
 
 
     // Evolve the temperature
     const dTdt = acc / (MASS_IN_EVAPORATOR * Cp(temp_conc, x_c) + EVAPORATOR_HEAT_CAPACITTY);
+    if (mdot_evap > 0) console.warn(`dTdt: ${dTdt}`)
     temp_conc += dTdt * dt;
 
     // Calculate current state
     const mdot_stm = (mdot_feed !== 0) ? heat_rate / dHvap(temp_stm) : 0;
+    console.log(`Evap: ${mdot_evap}\nConc: ${mdot_conc}\nxc: ${x_c}`)
 
     // Set state
     state.evapFlow = mdot_evap;
