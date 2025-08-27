@@ -1,4 +1,5 @@
 import type { ControlType } from "../types";
+import { BallValve } from "./classes/BallValve";
 import { DigitalLabel } from "./classes/Label";
 import { SetpointControl } from "./classes/Setpoint";
 import { flowSpDescriptor, spLabels, tempSpDescriptor } from "./config";
@@ -19,4 +20,7 @@ export function initInteractions<T extends ControlType>(flowCtrl: T, tempCtrl: T
 
     initButton("concentrateTareBtn", () => {});
     initButton("condensateTareBtn", () => {});
+
+    new BallValve("bottomsValve", true);
+    new BallValve("condensateValve", false);
 }
