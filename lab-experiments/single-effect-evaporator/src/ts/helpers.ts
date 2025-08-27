@@ -157,7 +157,9 @@ const checkForDefs = (parent: HTMLElement): SVGDefsElement => {
 
 /**
  * Insert a new clip path to the child of the corresponding element.
- * @param id Id to name the new elements from
+ * @param e Element to attach clip path to
+ * @param clippathID ID to name clippath from
+ * @param bbox bounding box of element to create rect
  * @returns Clippath inserted by function
  */
 export function insertClipPath(e: HTMLElement | SVGAElement | SVGPathElement, clippathID: string, bbox: DOMRect) {
