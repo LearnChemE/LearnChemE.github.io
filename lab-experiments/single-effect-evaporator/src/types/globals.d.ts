@@ -1,0 +1,93 @@
+import type { DigitalLabel } from "../ts/classes/Label";
+
+export const svgNS = "http://www.w3.org/2000/svg";
+
+export type EvaporatorState = {
+    feedFlow: ControlType,
+    feedTemp: ControlType,
+
+    steamFlow: number,
+    steamTemp: number,
+    steamPres: number,
+
+    evapFlow: number,
+
+    concFlow: number,
+    concTemp: number,
+    concComp: number
+}
+
+export interface Label {
+    setLabel: (val: number) => void;
+}
+
+export type LabelRange = {
+    range: [min: number, max: number],
+    overflowString: string,
+    underflowString: string
+}
+
+export type DigitalLabelDescriptor = {
+    id: string,
+    gid: string,
+    centerId: string,
+    fill: string,
+    units: string,
+    decimals: number,
+    initialValue: number,
+    range?: LabelRange
+};
+
+export type AnalogLabelDescriptor = {
+    id: string,
+    centerId: string,
+    units: string,
+    decimals: number,
+    initialValue: number,
+    flipToBottom: boolean
+};
+
+export type AnimationFn = (dt: number) => void;
+
+export interface ControlType {
+    setpoint: number;
+    value: number;
+    iterate: (dt: number) => void;
+    setTimeDelay: (val: number, th?: number) => Promise<void>;
+}
+
+export type SetpointControlDescriptor<T extends ControlType> = {
+    ctrl: T | null,
+    upBtnId: string,
+    downBtnId: string,
+    spLabel: DigitalLabel | null,
+    outLabel: DigitalLabel | null,
+    min: number,
+    max: number,
+    step: number
+}
+
+export type ValveDescriptor = {
+    id: string;
+    reverse: boolean;
+};
+
+export type OutletDescriptor = {
+    flowrate: number;
+    composition: number;
+    drainWaterfallId: string;
+    bucketWaterfallId: string;
+    valveDescriptor: ValveDescriptor;
+    label: DigitalLabel | null;
+};
+
+export type SimulationDescriptor = {
+    flowCtrl: ControlType,
+    tempCtrl: ControlType,
+    steamFlowLabel: Label,
+    steamTempLabel: Label,
+    pressureLabel: Label,
+    evapLabel: Label,
+    condensate: Outlet,
+    concentrate: Outlet,
+}

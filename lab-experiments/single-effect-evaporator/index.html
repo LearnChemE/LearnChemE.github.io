@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Single Effect Evaporator</title>
+
+    <script>
+			MathJax = {
+				chtml: {
+					scale: 0.95,
+					mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+					displayAlign: 'left', // default for indentalign when set to 'auto'
+				}
+			};
+		</script>
+		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitcount+Grid+Single:wght@300&display=swap" rel="stylesheet">
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+
+    <!-- Modal content goes here. It will be hid by Bootstrap until activated -->
+		<div
+		id="directions-modal"
+		class="modal fade"
+		tabindex="-1"
+		aria-labelledby="simulation directions"
+		aria-hidden="true"
+		>
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Directions</h5>
+						<button
+						type="button"
+						class="btn-close"
+						data-bs-dismiss="modal"
+						aria-label="Close"
+						></button>
+					</div>
+					<div class="modal-body">
+						<p>
+							This simulation models a single effect evaporator with a steam jacketed feed heater and manual catch-and-weigh outlet measurement.
+              Use the setpoint displays to control the feed temperature and flowrate, and hover over the evaporator and analog gauges to monitor.
+              Click the three-way ball valves to control flow to scales or the drain. Click the button on either scale to empty the bucket and tare.
+							Scroll to zoom and drag the screen to pan.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div
+		id="about-modal"
+		class="modal fade"
+		tabindex="-1"
+		aria-labelledby="about the simulation"
+		aria-hidden="true"
+		>
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">About</h5>
+						<button
+						type="button"
+						class="btn-close"
+						data-bs-dismiss="modal"
+						aria-label="Close"
+						></button>
+					</div>
+					<div class="modal-body">
+						<p>
+						This digital experiment was created in the Department of Chemical and Biological Engineering at University of Colorado Boulder 
+            for LearnChemE.com by Drew Smith under the direction of Professor John L. Falconer and Michelle Medlin. It is based on a 
+            <a href="http://learncheme.github.io/demos/SingleEffectEvaporator/dist/">browser-based simulation</a> by Neil Hendren at the University of Colorado Boulder.
+            It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State 
+            University.  Address any questions or comments to LearnChemE@gmail.com.   
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+  </body>
+
+</html>
