@@ -184,3 +184,22 @@ export const condensateDescriptor: OutletDescriptor = {
   },
   label: null
 };
+
+
+export const pressureLabelDescriptor = {
+    id: "pressureLabel",
+    centerId: "pressureGuage",
+    units: "bar",
+    decimals: 2,
+    initialValue: 1,
+    flipToBottom: false
+}
+
+export const evapLabelDescriptor = {
+    id: "evapLabel",
+    centerId: "Group 1",
+    units: "kg/min",
+    decimals: 1,
+    initialValue: 0,
+    flipToBottom: true
+}

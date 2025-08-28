@@ -17,6 +17,10 @@ export type EvaporatorState = {
     concComp: number
 }
 
+export interface Label {
+    setLabel: (val: number) => void;
+}
+
 export type LabelRange = {
     range: [min: number, max: number],
     overflowString: string,
@@ -32,6 +36,15 @@ export type DigitalLabelDescriptor = {
     decimals: number,
     initialValue: number,
     range?: LabelRange
+};
+
+export type AnalogLabelDescriptor = {
+    id: string,
+    centerId: string,
+    units: string,
+    decimals: number,
+    initialValue: number,
+    flipToBottom: boolean
 };
 
 export type AnimationFn = (dt: number) => void;
@@ -67,3 +80,14 @@ export type OutletDescriptor = {
     valveDescriptor: ValveDescriptor;
     label: DigitalLabel | null;
 };
+
+export type SimulationDescriptor = {
+    flowCtrl: ControlType,
+    tempCtrl: ControlType,
+    steamFlowLabel: Label,
+    steamTempLabel: Label,
+    pressureLabel: Label,
+    evapLabel: Label,
+    condensate: Outlet,
+    concentrate: Outlet,
+}

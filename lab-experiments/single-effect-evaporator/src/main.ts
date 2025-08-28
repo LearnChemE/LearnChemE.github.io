@@ -7,11 +7,12 @@ import svg from './media/Evaporator.svg?raw';
 import worksheet from './media/Single-effect evaporator worksheet.docx?raw';
 import { enableWindowResize, initSvgDrag, initSvgZoom } from './ts/zoom';
 import { initInteractions } from './ts/interactions';
-import { Simulation, type SimulationDescriptor } from './ts/classes/Simulation';
-import { DigitalLabel } from './ts/classes/Label';
+import { Simulation } from './ts/classes/Simulation';
+import { AnalogLabel, DigitalLabel } from './ts/classes/Label';
 import { FirstOrder } from './ts/classes/Setpoint';
-import { concentrateDescriptor, concScaleLabelDescriptor, condensateDescriptor, condScaleLabelDescriptor, steamFlowLabelDescriptor, steamTempLabelDescriptor } from './ts/config';
+import { concentrateDescriptor, concScaleLabelDescriptor, condensateDescriptor, condScaleLabelDescriptor, evapLabelDescriptor, pressureLabelDescriptor, steamFlowLabelDescriptor, steamTempLabelDescriptor } from './ts/config';
 import { Outlet } from './ts/classes/Outlet';
+import type { SimulationDescriptor } from './types';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
@@ -40,12 +41,18 @@ const condOutlet = new Outlet(condensateDescriptor);
 initButton("concentrateTareBtn", () => {concOutlet.tare()});
 initButton("condensateTareBtn", () => {condOutlet.tare()});
 
+//  Analog labels
+const presLabel = new AnalogLabel(pressureLabelDescriptor);
+const evapLabel = new AnalogLabel(evapLabelDescriptor);
+
 // Initialize State
 const stateDescriptor: SimulationDescriptor = {
   flowCtrl: flowCtrl,
   tempCtrl: tempCtrl,
   steamFlowLabel: steamFlowLabel,
   steamTempLabel: steamTempLabel,
+  pressureLabel: presLabel,
+  evapLabel: evapLabel,
   condensate: condOutlet,
   concentrate: concOutlet
 }
