@@ -48,7 +48,7 @@ export const concScaleLabelDescriptor: DigitalLabelDescriptor = {
     decimals: 2,
     initialValue: 0,
     range: {
-        range: [0, 1000],
+        range: [0, 20],
         overflowString: "FULL",
         underflowString: "NEG"
     }
@@ -66,7 +66,7 @@ export const condScaleLabelDescriptor: DigitalLabelDescriptor = {
     decimals: 2,
     initialValue: 0,
     range: {
-        range: [0, 1000],
+        range: [0, 20],
         overflowString: "FULL",
         underflowString: "NEG"
     }
@@ -170,7 +170,8 @@ export const concentrateDescriptor: OutletDescriptor = {
   valveDescriptor: {
     id: "bottomsValve",
     reverse: true
-  }
+  },
+  label: null
 };
 export const condensateDescriptor: OutletDescriptor = {
   flowrate: 0,
@@ -180,5 +181,6 @@ export const condensateDescriptor: OutletDescriptor = {
   valveDescriptor: {
     id: "condensateValve",
     reverse: false
-  }
+  },
+  label: null
 };

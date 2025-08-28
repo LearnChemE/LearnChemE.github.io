@@ -90,8 +90,8 @@ function concentrate_flow(T: number, mdot_feed: number) {
         const min = X_IN * mdot_feed;
 
         // Return the one that falls in the correct range
-        if (lo >= min && lo <= mdot_feed) {console.log("lo"); return lo}
-        else if (hi >= min && hi <= mdot_feed) {console.log("hi"); return hi}
+        if (lo >= min && lo <= mdot_feed) return lo;
+        else if (hi >= min && hi <= mdot_feed) return hi;
         else return mdot_feed // Everything goes to the concentrate
     }
 }

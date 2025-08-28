@@ -1,3 +1,5 @@
+import type { DigitalLabel } from "../ts/classes/Label";
+
 export const svgNS = "http://www.w3.org/2000/svg";
 
 export type EvaporatorState = {
@@ -45,8 +47,8 @@ export type SetpointControlDescriptor<T extends ControlType> = {
     ctrl: T | null,
     upBtnId: string,
     downBtnId: string,
-    spLabel: DigitalLabel,
-    outLabel: DigitalLabel,
+    spLabel: DigitalLabel | null,
+    outLabel: DigitalLabel | null,
     min: number,
     max: number,
     step: number
@@ -63,4 +65,5 @@ export type OutletDescriptor = {
     drainWaterfallId: string;
     bucketWaterfallId: string;
     valveDescriptor: ValveDescriptor;
+    label: DigitalLabel | null;
 };

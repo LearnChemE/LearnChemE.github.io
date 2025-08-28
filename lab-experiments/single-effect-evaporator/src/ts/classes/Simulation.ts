@@ -1,18 +1,23 @@
 import type { ControlType, EvaporatorState } from "../../types";
 import { calculateEvaporator } from "../calcs";
 import type { DigitalLabel } from "./Label";
+import type { Outlet } from "./Outlet";
 
 export type SimulationDescriptor = {
     flowCtrl: ControlType,
     tempCtrl: ControlType,
     steamFlowLabel: DigitalLabel,
-    steamTempLabel: DigitalLabel
+    steamTempLabel: DigitalLabel,
+    condensate: Outlet,
+    concentrate: Outlet
 }
 
 export class Simulation {
     private state: EvaporatorState; 
     private setSteamTempLabel: (val: number) => void;
     private setSteamFlowLabel: (val: number) => void;
+    private condensate: Outlet;
+    private concentrate: Outlet;
     
     constructor(descriptor: SimulationDescriptor) {
         // Create state object
@@ -27,6 +32,9 @@ export class Simulation {
             concComp: 0,
             concTemp: 25
         }
+
+        this.condensate = descriptor.condensate;
+        this.concentrate = descriptor.concentrate;
 
         // Save label callbacks
         this.setSteamFlowLabel = (val: number) => descriptor.steamFlowLabel.setLabel(val);
@@ -49,6 +57,10 @@ export class Simulation {
             // Update labels
             this.setSteamFlowLabel(this.state.steamFlow);
             this.setSteamTempLabel(this.state.concTemp);
+            
+            // Update outlets
+            this.condensate.setStreamConditions(this.state.steamFlow, 0);
+            this.concentrate.setStreamConditions(this.state.concFlow, this.state.concComp);
 
             // Request next frame
             requestAnimationFrame(frame);

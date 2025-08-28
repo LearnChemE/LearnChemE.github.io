@@ -2,7 +2,6 @@ import type { ControlType } from "../types";
 import { DigitalLabel } from "./classes/Label";
 import { SetpointControl } from "./classes/Setpoint";
 import { flowSpDescriptor, spLabels, tempSpDescriptor } from "./config";
-import { initButton } from "./helpers";
 
 export function initInteractions<T extends ControlType>(flowCtrl: T, tempCtrl: T) {
 
@@ -16,7 +15,4 @@ export function initInteractions<T extends ControlType>(flowCtrl: T, tempCtrl: T
 
     new SetpointControl(flowSpDescriptor);
     new SetpointControl(tempSpDescriptor);
-
-    initButton("concentrateTareBtn", () => {});
-    initButton("condensateTareBtn", () => {});
 }

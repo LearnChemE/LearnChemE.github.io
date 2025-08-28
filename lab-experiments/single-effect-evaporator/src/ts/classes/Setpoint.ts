@@ -15,6 +15,9 @@ export class SetpointControl<T extends ControlType> {
         if (descriptor.ctrl === null) {
             throw new Error("Error: null control object on Setpoint Descriptor");
         }
+        if (descriptor.spLabel === null || descriptor.outLabel === null) {
+            throw new Error("Error: null control object on Setpoint Descriptor");
+        }
         this.control = descriptor.ctrl;
         this.displayPoint = this.control.setpoint;
         this.spLabel = descriptor.spLabel;
@@ -75,5 +78,6 @@ export class FirstOrder implements ControlType {
 
     iterate = (dt: number) => {
         this.value = (this.value - this.setpoint) * this.r ** dt + this.setpoint;
+        if (Math.abs(this.setpoint - this.value) < 0.01) this.value = this.setpoint;
     };
 }

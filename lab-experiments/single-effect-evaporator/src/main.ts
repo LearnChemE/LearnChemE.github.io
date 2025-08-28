@@ -2,16 +2,15 @@ import 'bootstrap';
 
 import 'bootstrap/scss/bootstrap.scss';
 import './style.css'
-import { initHamburgerMenu, insertSVG } from './ts/helpers';
+import { initButton, initHamburgerMenu, insertSVG } from './ts/helpers';
 import svg from './media/Evaporator.svg?raw';
 import worksheet from './media/Single-effect evaporator worksheet.docx?raw';
 import { enableWindowResize, initSvgDrag, initSvgZoom } from './ts/zoom';
 import { initInteractions } from './ts/interactions';
-import { createLabels } from './ts/labels';
 import { Simulation, type SimulationDescriptor } from './ts/classes/Simulation';
 import { DigitalLabel } from './ts/classes/Label';
 import { FirstOrder } from './ts/classes/Setpoint';
-import { concentrateDescriptor, condensateDescriptor, steamFlowLabelDescriptor, steamTempLabelDescriptor } from './ts/config';
+import { concentrateDescriptor, concScaleLabelDescriptor, condensateDescriptor, condScaleLabelDescriptor, steamFlowLabelDescriptor, steamTempLabelDescriptor } from './ts/config';
 import { Outlet } from './ts/classes/Outlet';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
@@ -21,20 +20,25 @@ app.appendChild(initHamburgerMenu(worksheet, "singleEffectEvaporatorWorksheet.do
 // Create hamburger menu
 app.appendChild(insertSVG(svg));
 
-// Initialize labels
-createLabels();
-
 // Create label for steam temperature
 const steamTempLabel = new DigitalLabel(steamTempLabelDescriptor);
-
 // Create label for steam flowrate
 const steamFlowLabel = new DigitalLabel(steamFlowLabelDescriptor);
+// Scale labels
+const condLabel = new DigitalLabel(condScaleLabelDescriptor);
+const concLabel = new DigitalLabel(concScaleLabelDescriptor);
 
+// Control variables for state
 const flowCtrl = new FirstOrder(0,   500, 200);
 const tempCtrl = new FirstOrder(25, 3000,1000);
 
-new Outlet(concentrateDescriptor);
-new Outlet(condensateDescriptor);
+// Outlets
+concentrateDescriptor.label = concLabel;
+condensateDescriptor.label = condLabel;
+const concOutlet = new Outlet(concentrateDescriptor);
+const condOutlet = new Outlet(condensateDescriptor);
+initButton("concentrateTareBtn", () => {concOutlet.tare()});
+initButton("condensateTareBtn", () => {condOutlet.tare()});
 
 // Initialize State
 const stateDescriptor: SimulationDescriptor = {
@@ -42,6 +46,8 @@ const stateDescriptor: SimulationDescriptor = {
   tempCtrl: tempCtrl,
   steamFlowLabel: steamFlowLabel,
   steamTempLabel: steamTempLabel,
+  condensate: condOutlet,
+  concentrate: concOutlet
 }
 new Simulation(stateDescriptor);
 
