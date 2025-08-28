@@ -96,6 +96,12 @@ function concentrate_flow(T: number, mdot_feed: number) {
     }
 }
 
+/**
+ * Handle the per-frame integration of the evaporator mass + energy balances
+ * @param state simulation state object
+ * @param deltaTime time since last frame
+ * @returns state object with updated data
+ */
 export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     const dt = deltaTime / 1000;
     // Read the current state
@@ -111,9 +117,10 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     const mdot_evap = mdot_feed - mdot_conc;
     const x_c = (mdot_conc !== 0) ? X_IN * mdot_feed / mdot_conc : X_IN;
     // Energy in minus energy out
-    const in_minus_out = mdot_feed * (Cp(temp_feed, X_IN) * temp_feed - Cp(temp_conc, x_c) * temp_conc);
+    const in_minus_out = mdot_feed * (Cp(temp_feed, X_IN) * temp_feed - Cp(temp_feed, X_IN) * temp_conc);
     // Energy lost to evaporation
     const cons = dHvap(temp_conc) * mdot_evap / 60;
+    console.log(cons)
 
     // Use energy bal to evolve (no generation)
     const acc = in_minus_out + heat_rate - cons;
@@ -124,7 +131,7 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     temp_conc += dTdt * dt;
 
     // Calculate current state
-    const mdot_stm = (mdot_feed !== 0) ? heat_rate / dHvap(temp_stm) : 0;
+    const mdot_stm = (mdot_feed !== 0) ? heat_rate / dHvap(temp_stm) * 60 : 0;
 
     // debug
     // console.log(`in - out = ${in_minus_out}\ngen = ${heat_rate}\ncons = ${cons}`)

@@ -89,10 +89,13 @@ export class Outlet {
     public setStreamConditions = (flowrate: number, x: number) => {
         this.flowrate = flowrate;
         this.composition = x;
-        this.flow(this.measuring);
-        if (flowrate === 0) {
-            this.outFall.stop();
-            this.measureFall.stop();
-        }
+
+        window.setTimeout(() => {
+            this.flow(this.measuring);
+            if (flowrate === 0) {
+                this.outFall.stop();
+                this.measureFall.stop();
+            }
+        }, 5000);
     }
 }
