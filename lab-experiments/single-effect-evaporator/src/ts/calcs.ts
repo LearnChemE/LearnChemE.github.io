@@ -120,7 +120,6 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     const in_minus_out = mdot_feed * (Cp(temp_feed, X_IN) * temp_feed - Cp(temp_feed, X_IN) * temp_conc);
     // Energy lost to evaporation
     const cons = dHvap(temp_conc) * mdot_evap / 60;
-    console.log(cons)
 
     // Use energy bal to evolve (no generation)
     const acc = in_minus_out + heat_rate - cons;
