@@ -38,7 +38,6 @@ export class Waterfall {
         rect.setAttribute("height", `${0}`);
         this.clip.appendChild(rect);
         this.current = rect;
-        console.log(`stream added: ${rect}`)
     }
 
     /**
@@ -81,7 +80,6 @@ export class Waterfall {
 
             // Increase the height of the current
             const current = this.current;
-            console.log(current)
             if (current !== null) {
                 const height = Number(current.getAttribute("height")!);
                 current.setAttribute("height", `${Math.min(height + dy, this.height)}`);

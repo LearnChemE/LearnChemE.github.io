@@ -11,7 +11,8 @@ import { createLabels } from './ts/labels';
 import { Simulation, type SimulationDescriptor } from './ts/classes/Simulation';
 import { DigitalLabel } from './ts/classes/Label';
 import { FirstOrder } from './ts/classes/Setpoint';
-import { steamFlowLabelDescriptor, steamTempLabelDescriptor } from './ts/config';
+import { concentrateDescriptor, condensateDescriptor, steamFlowLabelDescriptor, steamTempLabelDescriptor } from './ts/config';
+import { Outlet } from './ts/classes/Outlet';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
@@ -31,6 +32,9 @@ const steamFlowLabel = new DigitalLabel(steamFlowLabelDescriptor);
 
 const flowCtrl = new FirstOrder(0,   500, 200);
 const tempCtrl = new FirstOrder(25, 3000,1000);
+
+new Outlet(concentrateDescriptor);
+new Outlet(condensateDescriptor);
 
 // Initialize State
 const stateDescriptor: SimulationDescriptor = {

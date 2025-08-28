@@ -51,3 +51,16 @@ export type SetpointControlDescriptor<T extends ControlType> = {
     max: number,
     step: number
 }
+
+export type ValveDescriptor = {
+    id: string;
+    reverse: boolean;
+};
+
+export type OutletDescriptor = {
+    flowrate: number;
+    composition: number;
+    drainWaterfallId: string;
+    bucketWaterfallId: string;
+    valveDescriptor: ValveDescriptor;
+};

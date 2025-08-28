@@ -1,4 +1,4 @@
-import type { ControlType, DigitalLabelDescriptor, SetpointControlDescriptor } from "../types";
+import type { ControlType, DigitalLabelDescriptor, OutletDescriptor, SetpointControlDescriptor } from "../types";
 
 /**
  * Label for steam flowrate
@@ -160,4 +160,25 @@ export const tempSpDescriptor: SetpointControlDescriptor<ControlType> = {
     min: 25,
     max: 150,
     step: 5
+};
+
+export const concentrateDescriptor: OutletDescriptor = {
+  flowrate: 0,
+  composition: 0.1,
+  drainWaterfallId: "concFallDrain",
+  bucketWaterfallId: "concFall",
+  valveDescriptor: {
+    id: "bottomsValve",
+    reverse: true
+  }
+};
+export const condensateDescriptor: OutletDescriptor = {
+  flowrate: 0,
+  composition: 0,
+  drainWaterfallId: "condFallDrain",
+  bucketWaterfallId: "condFall",
+  valveDescriptor: {
+    id: "condensateValve",
+    reverse: false
+  }
 };
