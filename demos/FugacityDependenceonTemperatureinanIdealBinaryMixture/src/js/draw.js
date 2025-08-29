@@ -34,7 +34,7 @@ export function drawAll() {
       textStyle(ITALIC);
       text("P", textX - 50, textY);
       textStyle(NORMAL);
-      text(" = 1 bar", textX - 42.5, textY);
+      text(" = 1 bar", textX - 42, textY);
       
       // Determine formula and values based on phase region
       let fBFormula, fTFormula, fBValue, fTValue;
@@ -74,25 +74,26 @@ export function drawAll() {
         text("y", textX - 12, textY);
         textStyle(NORMAL);
         textSize(2.5);
-        text("B", textX - 9.5, textY + 1);
+        text("B", textX - 10.0, textY + 1);
         textSize(3.5);
         textStyle(ITALIC);
-        text(" P", textX - 7, textY);
+        text(" P", textX - 8, textY);
+        textStyle(NORMAL);
+        text(" = " + fBValue + " bar", textX + 2, textY);
       } else if (fBFormula === "x_B P^sat") {
         text("x", textX - 12, textY);
         textStyle(NORMAL);
         textSize(2.5);
-        text("B", textX - 9.5, textY + 1);
+        text("B", textX - 10.0, textY + 1);
         textSize(3.5);
         textStyle(ITALIC);
-        text(" P", textX - 7, textY);
+        text(" P", textX - 8, textY);
         textSize(2.5);
-        text("sat", textX - 3, textY - 2.5);
+        text("sat", textX - 4, textY - 2.5);
         textSize(3.5);
+        textStyle(NORMAL);
+        text(" = " + fBValue + " bar", textX + 5, textY);
       }
-      
-      textStyle(NORMAL);
-      text(" = " + fBValue + " bar", textX + 6, textY);
       
       // "f_T = formula = value bar"
       textStyle(ITALIC);
@@ -109,25 +110,27 @@ export function drawAll() {
         text("y", textX + 31, textY);
         textStyle(NORMAL);
         textSize(2.5);
-        text("T", textX + 33.5, textY + 1);
+        text("T", textX + 33.0, textY + 1);
         textSize(3.5);
         textStyle(ITALIC);
-        text(" P", textX + 36, textY);
+        text(" P", textX + 35, textY);
+        textStyle(NORMAL);
+        text(" = " + fTValue + " bar", textX + 45, textY);
       } else if (fTFormula === "x_T P^sat") {
         text("x", textX + 31, textY);
         textStyle(NORMAL);
         textSize(2.5);
-        text("T", textX + 33.5, textY + 1);
+        text("T", textX + 33.0, textY + 1);
         textSize(3.5);
         textStyle(ITALIC);
-        text(" P", textX + 36, textY);
+        text(" P", textX + 35, textY);
         textSize(2.5);
-        text("sat", textX + 40, textY - 2.5);
+        text("sat", textX + 39, textY - 2.5);
         textSize(3.5);
+        textStyle(NORMAL);
+        text(" = " + fTValue + " bar", textX + 48, textY);
       }
       
-      textStyle(NORMAL);
-      text(" = " + fTValue + " bar", textX + 49, textY);
     }
   } else if (selectedIndex === 1) {
     // fugacity versus T button selected - show Plot 2 only
@@ -153,7 +156,7 @@ export function drawAll() {
       textStyle(ITALIC);
       text("P", textX - 50, textY);
       textStyle(NORMAL);
-      text(" = 1 bar", textX - 42.5, textY);
+      text(" = 1 bar", textX - 42, textY);
       
       // Determine formula and values based on phase region
       let fBFormula, fTFormula, fBValue, fTValue;
@@ -193,25 +196,26 @@ export function drawAll() {
         text("y", textX - 12, textY);
         textStyle(NORMAL);
         textSize(2.5);
-        text("B", textX - 9.5, textY + 1);
+        text("B", textX - 10.0, textY + 1);
         textSize(3.5);
         textStyle(ITALIC);
-        text(" P", textX - 7, textY);
+        text(" P", textX - 8, textY);
+        textStyle(NORMAL);
+        text(" = " + fBValue + " bar", textX + 2, textY);
       } else if (fBFormula === "x_B P^sat") {
         text("x", textX - 12, textY);
         textStyle(NORMAL);
         textSize(2.5);
-        text("B", textX - 9.5, textY + 1);
+        text("B", textX - 10.0, textY + 1);
         textSize(3.5);
         textStyle(ITALIC);
-        text(" P", textX - 7, textY);
+        text(" P", textX - 8, textY);
         textSize(2.5);
-        text("sat", textX - 3, textY - 2.5);
+        text("sat", textX - 4, textY - 2.5);
         textSize(3.5);
+        textStyle(NORMAL);
+        text(" = " + fBValue + " bar", textX + 5, textY);
       }
-      
-      textStyle(NORMAL);
-      text(" = " + fBValue + " bar", textX + 6, textY);
       
       // "f_T = formula = value bar"
       textStyle(ITALIC);
@@ -228,25 +232,27 @@ export function drawAll() {
         text("y", textX + 31, textY);
         textStyle(NORMAL);
         textSize(2.5);
-        text("T", textX + 33.5, textY + 1);
+        text("T", textX + 33.0, textY + 1);
         textSize(3.5);
         textStyle(ITALIC);
-        text(" P", textX + 36, textY);
+        text(" P", textX + 35, textY);
+        textStyle(NORMAL);
+        text(" = " + fTValue + " bar", textX + 45, textY);
       } else if (fTFormula === "x_T P^sat") {
         text("x", textX + 31, textY);
         textStyle(NORMAL);
         textSize(2.5);
-        text("T", textX + 33.5, textY + 1);
+        text("T", textX + 33.0, textY + 1);
         textSize(3.5);
         textStyle(ITALIC);
-        text(" P", textX + 36, textY);
+        text(" P", textX + 35, textY);
         textSize(2.5);
-        text("sat", textX + 40, textY - 2.5);
+        text("sat", textX + 39, textY - 2.5);
         textSize(3.5);
+        textStyle(NORMAL);
+        text(" = " + fTValue + " bar", textX + 48, textY);
       }
       
-      textStyle(NORMAL);
-      text(" = " + fTValue + " bar", textX + 49, textY);
     }
   } else if (selectedIndex === 2) {
     // both button selected - show both plots side by side

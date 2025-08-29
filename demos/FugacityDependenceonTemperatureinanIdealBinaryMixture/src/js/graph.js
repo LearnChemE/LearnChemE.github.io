@@ -74,7 +74,6 @@ function drawYBLabel(vaporX, plotY, plotH, plotX, plotW) {
   textAlign(CENTER, TOP);
   
   const yBText = "y";
-  const yBTextWidth = textWidth(yBText);
   const boxHeight = 5;
   const boxWidth = boxHeight;
   const boxPadding = 0.5;
@@ -95,10 +94,10 @@ function drawYBLabel(vaporX, plotY, plotH, plotX, plotW) {
   noStroke();
   text(yBText, labelX - 0.75, labelY + boxPadding - 0.5);
   
-  // y subscript B
+  // y subscript B - use fixed positioning instead of textWidth()
   textSize(2.5);
   fill(0, 128, 0);
-  text("B", labelX + yBTextWidth/2 + 0.2, labelY + boxPadding + 1.5);
+  text("B", labelX + 1.2, labelY + boxPadding + 1.8);
 }
 
 // Helper function to draw xB label consistently
@@ -107,7 +106,6 @@ function drawXBLabel(liquidX, plotY, plotH, plotX, plotW) {
   textAlign(CENTER, TOP);
   
   const xBText = "x";
-  const xBTextWidth = textWidth(xBText);
   const boxHeight = 5;
   const boxWidth = boxHeight;
   const boxPadding = 0.5;
@@ -128,10 +126,10 @@ function drawXBLabel(liquidX, plotY, plotH, plotX, plotW) {
   noStroke();
   text(xBText, labelX - 0.75, labelY + boxPadding - 0.5);
   
-  // x subscript B
+  // x subscript B - use fixed positioning instead of textWidth()
   textSize(2.5);
   fill(0, 0, 255);
-  text("B", labelX + xBTextWidth/2 + 0.2, labelY + boxPadding + 1.5);
+  text("B", labelX + 1.2, labelY + boxPadding + 1.8);
 }
 
 export function drawPlot1(options = {}) {
@@ -451,38 +449,38 @@ export function drawPlot1(options = {}) {
       
       // Draw "x"
       text("x", textX, textY);
-      textX += textWidth("x");
+      textX += 3.5; // Fixed width instead of textWidth("x")
       
       // Draw subscript "B"
       textSize(2.5);
-      text("B", textX + 0.2, textY + 1.5);
-      textX += textWidth("B") + 0.5;
+      text("B", textX - 1.5, textY + 2.0);
+      textX += 2.0; // Fixed width instead of textWidth("B") + 0.5
       textSize(3.5);
       
       // Draw " = "
-      text(" = ", textX, textY);
-      textX += textWidth(" = ");
+      text(" = ", textX - 2, textY);
+      textX += 0; // Fixed width instead of textWidth(" = ")
       
       // Draw x_B value
       text(xBValue, textX + 2, textY);
-      textX += textWidth(xBValue);
+      textX += 8; // Fixed width instead of textWidth(xBValue)
       
       // Add spacing
-      textX += 15;
+      textX += 8; // Reduced from 15 to 8
       
       // Draw "y"
       text("y", textX, textY);
-      textX += textWidth("y");
+      textX += 3.5; // Fixed width instead of textWidth("y")
       
       // Draw subscript "B"
       textSize(2.5);
-      text("B", textX + 0.2, textY + 1.5);
-      textX += textWidth("B") + 0.5;
+      text("B", textX - 1.5, textY + 2.0);
+      textX += 2.0; // Fixed width instead of textWidth("B") + 0.5
       textSize(3.5);
       
       // Draw " = "
-      text(" = ", textX, textY);
-      textX += textWidth(" = ");
+      text(" = ", textX - 2, textY);
+      textX += 0; // Fixed width instead of textWidth(" = ")
       
       // Draw y_B value
       text(yBValue, textX + 2, textY);
@@ -709,8 +707,8 @@ export function drawPlot2(options = {}) {
     
     // Calculate text dimensions for boundary checking
     const fBText = "f_B";
-    const fTText = "f_T";
     const fBTextW = textWidth(fBText);
+    const fTText = "f_T";
     const fTTextW = textWidth(fTText);
     const textHeight = 4;
     const padding = 0.5;
