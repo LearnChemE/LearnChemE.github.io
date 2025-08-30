@@ -724,14 +724,17 @@ function drawPressureGauge(x, y) {
   fill("black");
   noStroke();
   if (state.pumpOn == false) {
-    pressurizeGaugeCountTimer = 0;
+    pressurizeGaugeCountTimer -= (state.feedPressure ^ 2) / 80;
+    if (pressurizeGaugeCountTimer < 0) {
+      pressurizeGaugeCountTimer = 0;
+    }
     triangle(
-      35 * cos(-135),
-      -35 * sin(-135),
-      15 * cos(-135 + 180 - 17),
-      -15 * sin(-135 + 180 - 17),
-      15 * cos(-135 + 180 + 17),
-      -15 * sin(-135 + 180 + 17)
+      35 * cos(-((270 * pressurizeGaugeCountTimer) / 40) - 135),
+      -35 * sin(-((270 * pressurizeGaugeCountTimer) / 40) - 135),
+      15 * cos(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 - 17),
+      -15 * sin(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 - 17),
+      15 * cos(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 + 17),
+      -15 * sin(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 + 17)
     );
   } else if (state.pumpOn == true && pressurizeGaugeCountTimer < state.feedPressure) {
     triangle(
@@ -743,7 +746,7 @@ function drawPressureGauge(x, y) {
       -15 * sin(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 + 17)
     );
 
-    pressurizeGaugeCountTimer += 1 / 2;
+    pressurizeGaugeCountTimer += (state.feedPressure ^ 2) / 80;
   } else {
     triangle(
       35 * cos(-((270 * state.feedPressure) / 40) - 135),
