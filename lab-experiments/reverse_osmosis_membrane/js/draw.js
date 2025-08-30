@@ -19,6 +19,7 @@ let zoomMin = 1;
 let zoomMax = 6;
 let containerDims = [1280, 600];
 let isMouseInside;
+let pressurizeGaugeCountTimer = 0;
 
 //preload for loading images and fonts
 window.preload = function () {
@@ -722,14 +723,37 @@ function drawPressureGauge(x, y) {
 
   fill("black");
   noStroke();
-  triangle(
-    35 * cos(-((270 * state.feedPressure) / 40) - 135),
-    -35 * sin(-((270 * state.feedPressure) / 40) - 135),
-    15 * cos(-((270 * state.feedPressure) / 40) - 135 + 180 - 17),
-    -15 * sin(-((270 * state.feedPressure) / 40) - 135 + 180 - 17),
-    15 * cos(-((270 * state.feedPressure) / 40) - 135 + 180 + 17),
-    -15 * sin(-((270 * state.feedPressure) / 40) - 135 + 180 + 17)
-  );
+  if (state.pumpOn == false) {
+    pressurizeGaugeCountTimer = 0;
+    triangle(
+      35 * cos(-135),
+      -35 * sin(-135),
+      15 * cos(-135 + 180 - 17),
+      -15 * sin(-135 + 180 - 17),
+      15 * cos(-135 + 180 + 17),
+      -15 * sin(-135 + 180 + 17)
+    );
+  } else if (state.pumpOn == true && pressurizeGaugeCountTimer < state.feedPressure) {
+    triangle(
+      35 * cos(-((270 * pressurizeGaugeCountTimer) / 40) - 135),
+      -35 * sin(-((270 * pressurizeGaugeCountTimer) / 40) - 135),
+      15 * cos(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 - 17),
+      -15 * sin(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 - 17),
+      15 * cos(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 + 17),
+      -15 * sin(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 + 17)
+    );
+
+    pressurizeGaugeCountTimer += 1 / 2;
+  } else {
+    triangle(
+      35 * cos(-((270 * state.feedPressure) / 40) - 135),
+      -35 * sin(-((270 * state.feedPressure) / 40) - 135),
+      15 * cos(-((270 * state.feedPressure) / 40) - 135 + 180 - 17),
+      -15 * sin(-((270 * state.feedPressure) / 40) - 135 + 180 - 17),
+      15 * cos(-((270 * state.feedPressure) / 40) - 135 + 180 + 17),
+      -15 * sin(-((270 * state.feedPressure) / 40) - 135 + 180 + 17)
+    );
+  }
   fill("gray");
   strokeWeight(5);
   circle(0, 0, 10);
