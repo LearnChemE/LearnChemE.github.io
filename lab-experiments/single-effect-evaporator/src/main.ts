@@ -4,7 +4,7 @@ import 'bootstrap/scss/bootstrap.scss';
 import './style.css'
 import { initButton, initHamburgerMenu, insertSVG } from './ts/helpers';
 import svg from './media/Evaporator.svg?raw';
-import worksheet from './media/Single-effect evaporator worksheet.docx?raw';
+import worksheet from './media/Single-effect evaporator worksheet.pdf';
 import { enableWindowResize, initSvgDrag, initSvgZoom } from './ts/zoom';
 import { initInteractions } from './ts/interactions';
 import { Simulation } from './ts/classes/Simulation';
@@ -17,7 +17,7 @@ import type { SimulationDescriptor } from './types';
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
 // Create div containing svg
-app.appendChild(initHamburgerMenu(worksheet, "singleEffectEvaporatorWorksheet.docx"));
+app.appendChild(initHamburgerMenu(worksheet, "singleEffectEvaporatorWorksheet.pdf"));
 // Create hamburger menu
 app.appendChild(insertSVG(svg));
 
