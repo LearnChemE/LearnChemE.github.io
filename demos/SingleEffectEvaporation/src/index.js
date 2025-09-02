@@ -44,6 +44,7 @@ const sketch = (p) => {
 
   p.setup = function () {
     p.createCanvas(800, 530);
+    p.textFont("Inter");
     p.noLoop();
     gvs.p = p;
     p.textSize(17);
