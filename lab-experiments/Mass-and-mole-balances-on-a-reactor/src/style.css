@@ -1,0 +1,119 @@
+#app {
+  display: grid;
+  margin: auto;
+  width: min-content;
+  height: min-content;
+  position: relative;
+}
+
+svg {
+  width: fit-content;
+  height: fit-content;
+  user-select: none;
+  position: relative;
+}
+
+.digital-label {
+  font-family: "digital" !important;
+  font-weight: 100;
+  font-size: 11;
+
+  position: absolute;
+  text-anchor: middle;
+  text-justify: middle;
+  dominant-baseline: middle;
+}
+
+.svg-btn {
+  cursor: pointer;
+}
+
+.svg-btn:hover {
+  filter: drop-shadow(0px 0px 2px rgba(235, 255, 59, 200));
+}
+
+.svg-btn:active {
+  filter: brightness(0.8);
+}
+
+.svg-valve {
+  cursor: pointer;
+}
+.svg-valve:hover {
+  filter: drop-shadow(0px 0px 2px rgba(235, 255, 59, 200));
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Hamburger menu
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.menu-button {
+  position:absolute;
+  right: -1.5em;
+  top: 1.5em;
+
+  font-size: 1.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transform: translate(-5px, -30px);
+  background-color: lightblue;
+  height: max-content;
+  width: max-content;
+  margin-top: 0;
+  border-radius: 3px;
+  border: 1px solid black;
+
+  aspect-ratio: 1;
+
+  align-items: center;
+  text-align: start;
+}
+
+.menu-button:hover {
+  background-color: rgb(198, 224, 233);
+}
+
+.menu-button>div {
+  transform: translateY(-5px);
+  margin-top: .25rem;
+  margin-bottom: -.45rem;
+}
+
+.menu-content {
+  display: none;
+  margin: auto;
+
+  position: absolute;
+  top: 2.5rem;
+  right: -2.5rem;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 500;
+
+  width: min-content;
+  grid-template-rows: max-content max-content max-content;
+  gap: 1em;
+  padding: .5rem;
+  /* keep this lower than modal's z-index */
+}
+
+.menu-content a {
+  display: block;
+  padding: none;
+  color: #111827;
+  text-decoration: none;
+  font-size: 1.05rem;
+}
+
+.menu-content a:hover {
+  background: #f0f0f0;
+}
+
+@font-face {
+  font-family: "digital";
+  src: url("./media/digital-7.ttf") format("truetype");
+}
