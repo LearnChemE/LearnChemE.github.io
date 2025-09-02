@@ -71,12 +71,11 @@ canvas {
 
 .slider-wrapper {
     display: grid;
+    margin: auto;
     justify-self: baseline;
     justify-content: center;
     align-items: end;
     grid-template-columns: max-content 150px 20px;
-    margin-left: 1.5em;
-    margin-bottom: 5px;
     gap: 10px;
 }
 

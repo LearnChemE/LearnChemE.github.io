@@ -137,8 +137,7 @@ function drawPiston() {
     push();
     noStroke();
     translate(250, 0, 0);
-    ambientLight(25);
-    directionalLight(255, 255, 255, 0, 0, -1);
+    scale (1.25);
 
     const PIST_BASE = 100;
     let s = 1 - g.pistonHeight / g.pistonHeightMax;
@@ -156,44 +155,38 @@ function drawPiston() {
     let benzHeight = liqHeight - waterHeight;
     let vapHeight = PIST_BASE - pistCiel - liqHeight;
 
-    console.log(x)
-    // Piston arm
-
     push();
-    translate(0, s * 90 - 100, 0);
     fill(100, 100, 100);
-    cylinder(10, s * 180 + 48, 24, 1);
-    pop();
-
-    push();
-    translate(0, pistCiel - 10, 0);
-    cylinder(28, 20, 24, 1);
+    // Piston arm
+    rect(-10, -120, 20, s * 180 + 25);
+    // Piston Cieling
+    rect(-28, pistCiel -20, 56, 20);
     pop();
 
     push();
     translate(0, 100, 0);
-    ambientLight(100);
-
 
     if (waterHeight > 0) {
         push();
-        translate(0, -waterHeight / 2, 0);
         fill(g.blue);
-        cylinder(28, waterHeight);
+        // Water
+        rect(-28, -waterHeight, 56, waterHeight);
         pop();
     }
     if (benzHeight > 0) {
         push();
         fill(g.orange);
-        translate(0, -waterHeight - benzHeight / 2, 0);
-        cylinder(28, benzHeight);
+        translate(0, -waterHeight, 0);
+        // Benzene
+        rect(-28, -benzHeight, 56, benzHeight);
         pop();
     }
     if (vapHeight > 0) {
         push();
         fill(0, 200, 0, 150);
-        translate(0, -waterHeight - benzHeight - vapHeight / 2, 0);
-        cylinder(28, vapHeight);
+        translate(0, -waterHeight - benzHeight, 0);
+        // Vapour
+        rect(-28, -vapHeight, 56, vapHeight);
         pop();
     }
 
@@ -201,18 +194,18 @@ function drawPiston() {
 
     // outline 
     push();
-    fill(255, 255, 255, 100);
-    cylinder(30, 200, 24, 1, false, true);
+    fill(255, 255, 255, 70);
+    rect(-30, -100, 60, 200);
     pop();
 
     // rims
     push();
     translate(0, -100);
     noFill(); stroke(100, 100, 100); strokeWeight(2);
-    cylinder(31, 0, 24, 1);
+    line(-30, 0, 30, 0);
     translate(0, 200);
     fill(100, 100, 100);
-    cylinder(31, 0);
+    line(-30, 0, 30, 0);
     pop();
 
 }
