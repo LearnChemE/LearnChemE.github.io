@@ -21,6 +21,8 @@ function drawFeedLabel(p) {
   // draw text
   p.noStroke();
   p.fill(gvs.solution_label_color);
+  // p.textSize(16);
+  // p.textAlign(p.LEFT, p.BOTTOM);
   p.text("feed", center_width / 2 - 160, center_height - 135);
   p.text(`${Number(gvs.f_inlet).toFixed(1)} kg/s`, center_width / 2 - 160, center_height - 105);
   p.text(`${Number(gvs.p_inlet).toFixed(1)} MPa`, center_width / 2 - 160, center_height - 75);
