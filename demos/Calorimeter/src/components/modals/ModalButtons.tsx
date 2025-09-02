@@ -13,26 +13,16 @@ export const ModalButtons: React.FC = () => {
       >
         Directions
       </button>
-      <button
-        type="button"
-        id="worksheet-button"
-        className="btn btn-primary"
-        title="View Worksheet"
-        data-bs-toggle="modal"
-        data-bs-target="#worksheet-modal"
-      >
-        Worksheet
-      </button>
-      <button
-        type="button"
-        id="details-button"
-        className="btn btn-primary"
-        title="Simulation Details"
-        data-bs-toggle="modal"
-        data-bs-target="#details-modal"
-      >
-        Details
-      </button>
+      <a href="Calorimeter worksheet.pdf" download>
+        <button
+          type="button"
+          id="worksheet-button"
+          className="btn btn-primary"
+          title="Download Worksheet"
+        >
+          Worksheet
+        </button>
+      </a>
       <button
         type="button"
         id="about-button"
