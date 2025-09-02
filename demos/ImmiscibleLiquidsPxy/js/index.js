@@ -35,11 +35,11 @@ window.g = {
 }
 
 function preload() {
-    font = loadFont('assets/Ubuntu-R.ttf');
+    // font = loadFont('assets/Ubuntu-R.ttf');
 }
 
 function setup() {
-    g.cnv = createCanvas(g.width, g.height, WEBGL);
+    g.cnv = createCanvas(g.width, g.height);
     g.cnv.parent("graphics-wrapper");
 }
 
@@ -73,8 +73,8 @@ function draw() {
 
     background(250);
     push();
-    translate(-400, -240);
-    textFont(font);
+    // translate(-400, -240);
+    // textFont(font);
     graph.on_draw();
     drawExtraGraphLabels();
     drawEqm();
@@ -91,11 +91,11 @@ function draw() {
     pop();
 
     if (g.display == PISTON) {
+        translate(400, 240);
         drawPiston();
 
         // text label
         push();
-        textFont(font);
         translate(0, 0, 1);
         fill('black');
         noStroke();
@@ -106,8 +106,7 @@ function draw() {
     }
     else {
         push();
-        textFont(font);
-        translate(-400, -240);
+        // translate(-400, -240);
         drawBarGraph();
         pop();
     }
