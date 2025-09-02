@@ -68,7 +68,7 @@ const Controls: React.FC<controlProps> = ({
       </div>
       <div className="nav-bar">
         <div id="nav-bar-left">
-          <a href="./Shell-and-Tube-Worksheet-2025.docx" download>
+          <a href="./Shell-and-Tube-Worksheet-2025.pdf" download>
             <button className="btn btn-primary">
               <div>
                 <i className="fa-solid fa-download"></i>&nbsp;worksheet

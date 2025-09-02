@@ -63,38 +63,11 @@ export const ModalDialogues: React.FC = () => {
           <p>
             This digital lab, which represents a static calorimeter with
             adiabatic walls, is designed to be used with{" "}
-            <a href="Calorimeter worksheet.docx">this worksheet</a>. Pick a
+            <a href="Calorimeter worksheet.pdf" download>this worksheet</a>. Pick a
             metal from the drop down menu, use the sliders to set the initial
             conditions of the experiment, start the stirrer, press the "drop
             metal" button and watch the system equilibrate. Hover your mouse
             over the thermometer to observe the water temperature.
-          </p>
-        }
-      />
-      <ModalDialogue
-        title="Worksheet"
-        size="xl"
-        innerHTML={
-          <p>
-            <embed
-              width="100%"
-              height="100%"
-              src="Calorimeter worksheet.pdf"
-              type="application/pdf"
-              title="Calorimeter Worksheet"
-            />
-          </p>
-        }
-      />
-      <ModalDialogue
-        title="Details"
-        innerHTML={
-          <p>
-            This digital experiment uses an energy balance to calculate the
-            final temperature of the system. The time constant for the
-            temperature rise is calculated using an approximate value for the
-            heat transfer coefficient.
-            {/* TODO: More on equations */}
           </p>
         }
       />

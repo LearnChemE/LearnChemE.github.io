@@ -7,7 +7,6 @@ import {
   DirectionsModalDialogue,
   ResetModalDialogue,
 } from "./elements/ModalDialogues.tsx";
-// import { StartPumpsButton, MeasureTempsButton } from "./Buttons.tsx";
 import sketch, {
   togglePumps,
   g,
@@ -143,7 +142,7 @@ function App() {
         </div>
         <div className="nav-bar">
           <div id="nav-bar-left">
-            <a href="./DoublePipe-Worksheet_2025.docx" download>
+            <a href="./DoublePipe-Worksheet_2025.pdf" download>
               <button className="btn btn-primary">
                 <div>
                   <i className="fa-solid fa-download"></i>&nbsp;worksheet
