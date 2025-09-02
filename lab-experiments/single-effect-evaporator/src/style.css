@@ -14,10 +14,14 @@ svg {
 }
 
 .digital-label {
+  font-family: "digital" !important;
+  font-weight: 100;
+  font-size: 11;
+
   position: absolute;
-  font-size: 8px;
   text-anchor: middle;
-  text-justify: center;
+  text-justify: middle;
+  dominant-baseline: middle;
 }
 
 .svg-btn {
@@ -125,14 +129,7 @@ svg {
   background: #f0f0f0;
 }
 
-.bitcount-grid-single-display {
-  font-family: "Bitcount Grid Single", system-ui;
-  font-optical-sizing: auto;
-  font-weight: 100;
-  font-style: normal;
-  font-variation-settings:
-    "slnt" 0,
-    "CRSV" 0.5,
-    "ELSH" 0,
-    "ELXP" 0;
+@font-face {
+  font-family: "digital";
+  src: url("./media/digital-7.ttf") format("truetype");
 }

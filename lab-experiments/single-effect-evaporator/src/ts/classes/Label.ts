@@ -19,13 +19,13 @@ export class DigitalLabel implements Label {
         const label = document.createElementNS(svgNS, "text")!;
         label.id = descriptor.id;
         label.classList.add("digital-label");
-        label.classList.add("bitcount-grid-single-display");
         label.innerHTML = `${descriptor.initialValue.toFixed(descriptor.decimals)} ${descriptor.units}`;
         label.setAttribute("text-anchor", "middle");
         label.setAttribute("x", `${cx}`);
-        label.setAttribute("y", `${cy + 2}`);
+        label.setAttribute("y", `${cy}`);
         label.setAttribute("position", "absolute");
-        label.setAttribute("fontSize", "12");
+        label.setAttribute("font-size", "11");
+        label.setAttribute("dominant-baseline", "middle");
         label.setAttribute("fill", descriptor.fill);
 
         // Append to group
