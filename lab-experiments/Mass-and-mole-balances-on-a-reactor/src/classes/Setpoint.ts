@@ -17,9 +17,6 @@ export class SetpointControl<T extends ControlType> {
         if (descriptor.ctrl === null) {
             throw new Error("Error: null control object on Setpoint Descriptor");
         }
-        if (descriptor.spLabel === null) {
-            throw new Error("Error: null control object on Setpoint Descriptor");
-        }
         this.control = descriptor.ctrl;
         this.displayPoint = this.control.setpoint;
         this.spLabel = descriptor.spLabel;
@@ -38,7 +35,7 @@ export class SetpointControl<T extends ControlType> {
         if (this.savedVal !== null) return;
         const sp = Math.min(this.displayPoint + this.step, this.max);
         this.displayPoint = sp;
-        this.spLabel.setLabel(sp);
+        this.spLabel?.setLabel(sp);
         this.control.setTimeDelay(sp);
     }
     
@@ -46,7 +43,7 @@ export class SetpointControl<T extends ControlType> {
         if (this.savedVal !== null) return;
         const sp = Math.max(this.displayPoint - this.step, this.min);
         this.displayPoint = sp;
-        this.spLabel.setLabel(sp);
+        this.spLabel?.setLabel(sp);
         this.control.setTimeDelay(sp);
     }
 
@@ -67,12 +64,12 @@ export class SetpointControl<T extends ControlType> {
             }
             this.savedVal = this.displayPoint;
             this.displayPoint = saveVal;
-            this.spLabel.setLabel(saveVal);
+            this.spLabel?.setLabel(saveVal);
             this.control.setTimeDelay(saveVal);
         }
         else {
             this.displayPoint = this.savedVal;
-            this.spLabel.setLabel(this.savedVal);
+            this.spLabel?.setLabel(this.savedVal);
             this.control.setTimeDelay(this.savedVal);
             this.savedVal = null;
         }

@@ -43,6 +43,27 @@ svg {
   filter: drop-shadow(0px 0px 2px rgba(235, 255, 59, 200));
 }
 
+.svg-dial {
+  cursor: grab;
+}
+.svg-dial:hover {
+  filter: drop-shadow(0px 0px 2px rgba(235, 255, 59, 200));
+}
+.svg-dial:active {
+  cursor: grabbing;
+}
+
+.svg-bulb {
+  cursor: grab;
+}
+.svg-bulb:hover {
+  filter: drop-shadow(0px 0px 8px rgba(235, 255, 59, 255));
+}
+.svg-bulb:active {
+  cursor: grabbing;
+  opacity: 0;
+}
+
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Hamburger menu

@@ -9,6 +9,37 @@
 export const svgNS = "http://www.w3.org/2000/svg";
 
 /**
+ * Helper type for 2-component vectors
+ */
+export type vec2 = {
+    x: number,
+    y: number
+};
+
+/**
+ * Alias to help initialize a vec2
+ * @param x default 0
+ * @param y default 0
+ * @returns vec2 object
+ */
+export const vec2 = (x: number = 0, y: number = 0): vec2 => {
+    return {x: x, y: y};
+}
+
+/**
+ * Gets an element through document.getElementById and safely returns it after checking.
+ * @param id Unique identifier
+ * @returns Element
+ */
+export function GetElement<T = HTMLElement>(id: string): T {
+    const e = document.getElementById(id);
+    // Check
+    if (e === null) throw new Error(`getElementById: Could not get element ${id}`);
+    // Cast and return
+    return e as unknown as T;
+}
+
+/**
  * Initialize the hamburger menu and button
  * @returns Div containing button and menu with attached callbacks
  */
@@ -405,7 +436,7 @@ export function enableWindowResize() {
     // Attach event handler
     const resize = () => {
         let windowWidth = Math.max(Math.min(window.innerWidth * .8, 1800), 400);
-        let windowHeight = window.innerHeight * .8;
+        let windowHeight = window.innerHeight * .95;
         // Enforce asp
         windowWidth = Math.min(windowWidth, windowHeight * asp);
         windowHeight = windowWidth / asp;
