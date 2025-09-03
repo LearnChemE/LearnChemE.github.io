@@ -32,7 +32,7 @@ export type AnalogLabelDescriptor = {
 export interface ControlType {
     setpoint: number;
     value: number;
-    iterate: (dt: number) => void;
+    iterate: (dt: number) => number;
     setTimeDelay: (val: number, th?: number) => Promise<void>;
 }
 
