@@ -11,6 +11,7 @@ import { Signal } from './classes/Signal';
 import { Tube, type TubeDescriptor } from './classes/Tube';
 import { PoweredController, type PoweredControllerDescriptor } from './classes/Control';
 import { Waterfall } from './classes/Waterfall';
+import { Evaporator, type EvaporatorDescriptor } from './classes/Evaporator';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
@@ -70,3 +71,10 @@ const tubeDescriptor: TubeDescriptor = {
 };
 const inTube = new Tube(tubeDescriptor);
 new Waterfall("evapWaterfall", inTube.outFlow);
+
+const evaporatorDescriptor: EvaporatorDescriptor = {
+  id: "evapFill",
+  flowInSignal: inTube.outFlow,
+  mantleSignal: mantleIsOn
+};
+new Evaporator(evaporatorDescriptor);
