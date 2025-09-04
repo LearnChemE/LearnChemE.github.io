@@ -36,7 +36,7 @@ export class SetpointControl<T extends ControlType> {
         const sp = Math.min(this.displayPoint + this.step, this.max);
         this.displayPoint = sp;
         this.spLabel?.setLabel(sp);
-        this.control.setTimeDelay(sp);
+        this.control.set(sp);
     }
     
     public decrement = () => {
@@ -44,7 +44,7 @@ export class SetpointControl<T extends ControlType> {
         const sp = Math.max(this.displayPoint - this.step, this.min);
         this.displayPoint = sp;
         this.spLabel?.setLabel(sp);
-        this.control.setTimeDelay(sp);
+        this.control.set(sp);
     }
 
     private animate = (delay: number) => {
@@ -65,12 +65,12 @@ export class SetpointControl<T extends ControlType> {
             this.savedVal = this.displayPoint;
             this.displayPoint = saveVal;
             this.spLabel?.setLabel(saveVal);
-            this.control.setTimeDelay(saveVal);
+            this.control.set(saveVal);
         }
         else {
             this.displayPoint = this.savedVal;
             this.spLabel?.setLabel(this.savedVal);
-            this.control.setTimeDelay(this.savedVal);
+            this.control.set(this.savedVal);
             this.savedVal = null;
         }
         console.log(`Saved: ${this.savedVal}`)
@@ -83,12 +83,14 @@ export class FirstOrder implements ControlType {
 
     private r: number;
     private th: number;
+    private gain: number;
 
-    constructor(init: number, tau: number, th=0) {
+    constructor(init: number, tau: number, th=0, gain=1) {
         this.setpoint = init;
         this.value = init;
         this.r = Math.exp(-1/tau);
         this.th = th;
+        this.gain = gain;
     }
 
     /**
@@ -96,11 +98,15 @@ export class FirstOrder implements ControlType {
      * @param val New setpoint value
      * @param th delay time (ms)
      */
-    public setTimeDelay = async (val: number, th?: number) => {
+    public set = async (val: number, th?: number) => {
         if (th === undefined) th = this.th;
         setTimeout(() => {
             this.setpoint = val;
         }, th);
+    }
+
+    public get = () => {
+        return this.value * this.gain;
     }
 
     /**
@@ -110,6 +116,6 @@ export class FirstOrder implements ControlType {
     iterate = (dt: number) => {
         this.value = (this.value - this.setpoint) * this.r ** dt + this.setpoint;
         if (Math.abs(this.setpoint - this.value) < 0.01) this.value = this.setpoint;
-        return this.value
+        return this.value;
     };
 }

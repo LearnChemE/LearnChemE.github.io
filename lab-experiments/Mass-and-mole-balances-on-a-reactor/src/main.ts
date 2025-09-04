@@ -9,6 +9,7 @@ import { BallValve, initDial } from './classes/Valve';
 import { initBubbleMeter } from './classes/BubbleMeter';
 import { Signal } from './classes/Signal';
 import { Tube, type TubeDescriptor } from './classes/Tube';
+import { PoweredController, type PoweredControllerDescriptor } from './classes/Control';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
@@ -50,13 +51,20 @@ initSwitch("furnaceSwitch","furnaceSwitchOn","furnaceSwitchOff", () => {furnaceS
 initDial("flowDial", (lift: number) => {pumpLift.set(lift)});
 initBubbleMeter("bulbDefault", "bulbSqueeze");
 
-// const 
+// Create the pump
+const pumpDescriptor: PoweredControllerDescriptor<FirstOrder> = {
+  restingSetpoint: -0.5,
+  powerSignal: pumpIsOn,
+  setpointSignal: pumpLift,
+  control: new FirstOrder(0, 200, 0, 12)
+};
+const pump = new PoweredController<FirstOrder>(pumpDescriptor);
 
 // Inlet tubes
 const tubeDescriptor: TubeDescriptor = {
   pathId: "inTubeFill",
-  inFlowSignal: new Signal(10),
-  crossArea: 1e-3,
+  inFlowSignal: pump.output,
+  crossArea: 5e-4,
   initialFill: 0
 };
 new Tube(tubeDescriptor);
