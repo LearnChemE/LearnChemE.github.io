@@ -52,7 +52,10 @@ export class Tube {
 
             const dv = this.inFlow * deltaTime / 60000;
             const dl = dv / this.thickness;
+
             const current = constrain(this.current + dl, this.minDistance, this.maxDistance);
+            const out = (current >= this.maxDistance) ? Math.max(this.inFlow, 0) : 0;
+            if (this.outFlow.get() !== out) this.outFlow.set(out);
 
             // Add attributes, hide by default
             const offset = this.reverse ? current : this.maxDistance - current;

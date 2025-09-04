@@ -10,6 +10,7 @@ import { initBubbleMeter } from './classes/BubbleMeter';
 import { Signal } from './classes/Signal';
 import { Tube, type TubeDescriptor } from './classes/Tube';
 import { PoweredController, type PoweredControllerDescriptor } from './classes/Control';
+import { Waterfall } from './classes/Waterfall';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
@@ -67,4 +68,5 @@ const tubeDescriptor: TubeDescriptor = {
   crossArea: 5e-4,
   initialFill: 0
 };
-new Tube(tubeDescriptor);
+const inTube = new Tube(tubeDescriptor);
+new Waterfall("evapWaterfall", inTube.outFlow);

@@ -25,7 +25,7 @@ export class DigitalLabel implements Label {
         label.setAttribute("x", `${cx}`);
         label.setAttribute("y", `${cy}`);
         label.setAttribute("position", "absolute");
-        label.setAttribute("font-size", "11");
+        label.setAttribute("font-size", "14");
         label.setAttribute("dominant-baseline", "middle");
         label.setAttribute("fill", descriptor.fill);
 
