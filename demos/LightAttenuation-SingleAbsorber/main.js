@@ -485,9 +485,11 @@ function draw() {
   endShape();
 
   // Recalculate vertical reference lines dynamically
-  const A10 = -1e7 / (Absorb * Conc) * Math.log(0.9);
-  const A20 = -1e7 / (Absorb * Conc) * Math.log(0.8);
-  const Ae  = -1e7 / (Absorb * Conc) * Math.log(0.367879);
+  const totalAbsConc2 = Absorb * Conc + inertAbsorb * inertConc;
+
+  const A10 = -1e7 / totalAbsConc2 * Math.log(0.9);
+  const A20 = -1e7 / totalAbsConc2 * Math.log(0.8);
+  const Ae  = -1e7 / totalAbsConc2 * Math.log(0.367879);
 
   const depths = [
     { depth: A10, color: [255, 100, 100], label: "90%" },
