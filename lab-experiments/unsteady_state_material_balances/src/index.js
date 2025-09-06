@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
       reset(draw); 
-      // drawCanvas();          // clear any existing elements
+      drawCanvas();          // clear any existing elements
       addOptionToDragAndZoom(draw); // re‑enable pan/zoom on the fresh canvas
     });
   }

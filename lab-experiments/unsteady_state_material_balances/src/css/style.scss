@@ -66,6 +66,7 @@ body {
   gap: 10px;
   position: relative;
   z-index: 1001;
+  background-color: none;
   
   #valueSlider {
     pointer-events: auto;
@@ -86,7 +87,6 @@ body {
     align-items: center;
     gap: 4px;
     width:500px;
-    background-color: white;
     padding: 8px;
     border-radius: 4px;
     

@@ -1,4 +1,5 @@
 import * as config from './config.js';
+import { computeVolumeVsTime, volumeAtTime } from './calc.js';
 
 let valve = null;
 let verticalValveOpen = false;
@@ -7,10 +8,18 @@ let isHeaterOn = false;
 let container = null;
 let gasFlowRateDevice = null;
 let gasFlowRateText = null;
+let currentTemp = 20;
+let timerId = null;
+let elapsedSeconds = 0; // track elapsed time for gas flow
+let outletBubbleTimer = null;   // interval handle for outlet bubbles
+let outletBubbleLayer = null;   // SVG group to hold outlet bubbles
 
 // Save the SVG.js context so other functions can reuse it
 export function drawFigure(svg) {
   svg.line(675, 175, 760, 210)
+  .stroke({ color: '#000', width: 2 });
+  
+  svg.line(675, 350, 760, 320)
   .stroke({ color: '#000', width: 2 });
   drawGasCylinder(svg, 100, 350, 'N₂ gas cylinder');
   createVerticalValve(svg, 122.5, 250);
@@ -21,7 +30,9 @@ export function drawFigure(svg) {
   valve = drawValve(svg, 580, 450).rotate(90);
   gasFlowRateDevice = addSVGImage(svg, 'assets/gasFlowRateDevice.svg', 90, 145, 160, 120);
   gasFlowRateText = svg.text('0').center(174, 180).font({ size: 12, anchor: 'middle' });
-  svg.text('cm³/min').stroke({ color: '#000', width: 0.5 }).center(175, 202.5).font({ size: 12 });
+  svg.text('cm³/min').stroke({ color: '#000', width: 0.05 }).center(172, 202.5).font({ size: 14 });
+  const tempController = drawTemperatureController(svg, 745, 300, 20, 15, 25, 5);
+  // if (tempController && typeof tempController.front === 'function') tempController.front();
 }
 
 function drawGasCylinder(draw, x, y, label) {
@@ -90,12 +101,12 @@ function drawGasCylinder(draw, x, y, label) {
     .move(x, y - config.nozzleRect2Height - config.nozzleRect3Height);
   }
   
-function createVerticalValve(draw, x, y) {
-  
-  const group = draw.group();
-  // expose gas valve for cross-component checks
-  window.gasValve = group;
-  group.isOpen = false;
+  function createVerticalValve(draw, x, y) {
+    
+    const group = draw.group();
+    // expose gas valve for cross-component checks
+    window.gasValve = group;
+    group.isOpen = false;
     // Create valve body parts
     group.rect( config.verticalValveBlockWidth,  config.verticalValveBlockHeight)
     .fill('#ccc')
@@ -130,20 +141,21 @@ function createVerticalValve(draw, x, y) {
       .fill('#000') // Start closed (black)
       .stroke({ color: '#444', width: 1 });
       
-  group.click(() => {
-    group.isOpen = !(group.isOpen);
-    verticalValveOpen = group.isOpen;
-
-    if (knob && typeof knob.animate === 'function') { // Check if knob exists and is animatable
-      const color = group.isOpen ? '#ffa500' : '#000000';
-      knob.animate(300).fill(color);
-    } else if (knob) {
-      const color = group.isOpen ? '#ffa500' : '#000000';
-      knob.fill(color);
-    }
-
-    animateGasFlow(draw);
-  });
+      group.click(() => {
+        group.isOpen = !(group.isOpen);
+        verticalValveOpen = group.isOpen;
+        
+        if (knob && typeof knob.animate === 'function') { // Check if knob exists and is animatable
+          const color = group.isOpen ? '#ffa500' : '#000000';
+          knob.animate(300).fill(color);
+        } else if (knob) {
+          const color = group.isOpen ? '#ffa500' : '#000000';
+          knob.fill(color);
+        }
+        
+        animateGasFlow(draw);
+        animateBubbleFlow(draw);
+      });
       
       return group;
     }
@@ -171,19 +183,19 @@ function createVerticalValve(draw, x, y) {
       
       `
       window.leftPipe1 = drawPipeWithCurves(draw, leftPipe1, 4);
-
+      
       const leftPipe2 = `
       M ${startX + 450} ${startY + 140}
       L ${startX + 450} ${startY + 70}
       `
       window.leftPipe2 = drawPipeWithCurves(draw, leftPipe2, 4);
-
+      
       const leftPipe3 = `
       M ${startX + 450} ${startY - 226}
       L ${startX + 450} ${startY - 250}
       L ${startX + 600} ${startY - 250}
       `
-      window.leftPipe3 = drawPipeWithCurves(draw, leftPipe3, 4);
+      window.leftPipe3 = drawPipeWithCurves(draw, leftPipe3, 8);
     }
     
     function drawPipeWithCurves(draw, pathString, pipeWidth = 15, strokeColor = '#f7f7f7', outlineColor = '#d5d5d5') {
@@ -209,12 +221,11 @@ function createVerticalValve(draw, x, y) {
     // ---------------------- Liquid column vessel ----------------------
     // Draws a rectangular vessel with rounded corners, a vent pipe, level scale,
     // a temperature controller, a light-blue liquid and clear bubbles
-    function drawLiquidColumnWithVent(draw, x, y, switchGroup) {
+    function drawLiquidColumnWithVent(draw, x, y, switchGroup, FILL_FRAC = 61.5 / 70) {
       const TANK_W = 160;
       const TANK_H = 300;
       const R = 12;         // corner radius
       const WALL = 6;       // wall thickness
-      const FILL_FRAC = 61.5 / 70; // 65% full
       const PADDING = 8;    // inner padding for bubbles/scale
       
       const g = draw.group();
@@ -241,6 +252,7 @@ function createVerticalValve(draw, x, y) {
       .move(x + WALL, liquidY - 5)
       .fill('#9dd2ff')
       .stroke({ color: '#8cbfe9', width: 0.6 });
+      g.liquid = liquid; // expose for updates
       
       const baseRectWidth = TANK_W - 2 * WALL;
       const baseRectHeight = 5;
@@ -462,142 +474,16 @@ function createVerticalValve(draw, x, y) {
         return `${left},${top} ${right},${top} ${right},${bottom} ${left},${bottom} ${tipX},${midY}`;
       }
       
-      const arrow = g.polygon(arrowPoints(py))
-      .fill('black')
-      .stroke({ color: '#703c22', width: 1 });
-      // Make the arrow show a vertical resize cursor for consistency
-      arrow.style('cursor', 'ns-resize');
-      
-      // Optional: show the current set temperature near the pointer
-      const tempLabel = g.text(String(targetTemp) + '°C')
-        .font({ family: 'Arial', size: 11, anchor: 'start', weight: 600 })
-        .move(rightHeaterX + heaterW - 13, py - 6)
-        .fill('#fff')
-        // Make label visually present but non-interactive so it never blocks dragging
-        .attr({ 'pointer-events': 'none' })
-        .attr({ style: 'user-select: none; -webkit-user-select: none;' });
-
-      // Add a transparent drag rail over the right heater to make grabbing easy at extremes
-      const dragRailPadX = 10;   // extend beyond heater so it's easy to grab
-      const dragRailPadY = 18;   // larger vertical pad so edges are easy to re-grab
-      const dragRail = g.rect(heaterW + dragRailPadX * 2, heaterH + dragRailPadY * 2)
-        .move(rightHeaterX - dragRailPadX, innerTop - 7.5 - dragRailPadY)
-        .fill({ color: 'none', opacity: 0 })
-        .stroke({ width: 0 })
-        .attr({ 'pointer-events': 'all' });
-
-      dragRail.style('cursor', 'ns-resize');
-      dragRail.on('pointerdown', startDrag);
-
-      // Ensure arrow and label are above dragRail so they remain visible
-      arrow.front();
-      tempLabel.front();
-
-      const arrow1 = g.polygon(arrowPoints(py))
-      .fill('none')
-      .stroke({ color: 'none', width: 1 });
-
-      arrow1.style('cursor', 'ns-resize');
-      arrow1.on('pointerdown', startDrag);
-      
-      // Drag logic (pointer events) — smooth while dragging, SNAP to nearest on release
-      let draggingPointer = false;
-      let rafId = null;
-      let pendingY = null;
-
-      function clampY(yVal) {
-        return Math.max(innerTop, Math.min(innerBottom, yVal));
-      }
-
-      // Smooth visual update only (no snapping) while dragging
-      function renderPointer(toY) {
-        py = clampY(toY);
-        // Update arrow shape at raw `py` for smoothness
-        arrow.plot(arrowPoints(py));
-        // Show provisional nearest label while dragging
-        const provisionalT = tempFromY(py);
-        tempLabel.text(String(provisionalT) + '°C').move(rightHeaterX + heaterW - 13, py - 6);
-      }
-
-      // Snap to the nearest discrete temperature and (optionally) animate into place
-      function snapPointer(toY, animate = true) {
-        const snappedT = tempFromY(clampY(toY));
-        const finalY = yFromTemp(snappedT);
-        targetTemp = snappedT;
-        py = finalY;
-        if (animate) {
-          arrow.animate(180).plot(arrowPoints(finalY));
-          tempLabel.text(String(targetTemp) + '°C').animate(180).move(rightHeaterX + heaterW - 13, finalY - 6);
-        } else {
-          arrow.plot(arrowPoints(finalY));
-          tempLabel.text(String(targetTemp) + '°C').move(rightHeaterX + heaterW - 13, finalY - 6);
-        }
-        g.targetTemperature = targetTemp;
-        if (switchGroup && switchGroup.isOn) {
-          updateHeaterHeat(targetTemp);
-        }
-      }
-
-      function scheduleRender(y) {
-        pendingY = y;
-        if (rafId !== null) return;
-        rafId = requestAnimationFrame(() => {
-          rafId = null;
-          if (pendingY != null) renderPointer(pendingY);
-          pendingY = null;
-        });
-      }
-
-      function pointYFromEvent(ev) {
-        const p = draw.point(ev.clientX, ev.clientY);
-        return p.y;
-      }
-
-      function onPointerMove(ev) {
-        if (!draggingPointer) return;
-        ev.preventDefault();
-        scheduleRender(pointYFromEvent(ev));
-      }
-
-      function onPointerUp(ev) {
-        if (!draggingPointer) return;
-        draggingPointer = false;
-        ev.preventDefault();
-        const yNow = pointYFromEvent(ev);
-        // Finalize with a SNAP to the nearest allowed temperature
-        snapPointer(yNow, true);
-        try { arrow.releasePointerCapture(ev.pointerId); } catch (_) {}
-        document.removeEventListener('pointermove', onPointerMove);
-        document.removeEventListener('pointerup', onPointerUp);
-      }
-
-      function startDrag(ev) {
-        draggingPointer = true;
-        ev.preventDefault();
-        try { arrow.setPointerCapture(ev.pointerId); } catch (_) {}
-        document.addEventListener('pointermove', onPointerMove, { passive: false });
-        document.addEventListener('pointerup', onPointerUp, { passive: false });
-        // On press, render current position without snapping so the first movement is smooth
-        renderPointer(pointYFromEvent(ev));
-      }
-
-      // Attach pointer handler to the arrow only (not tempLabel)
-      arrow.on('pointerdown', startDrag);
-      tempLabel.on('pointerdown', startDrag);
-
-      // Improve touch behavior & cursor feedback
-      arrow.style('cursor', 'ns-resize');
-      // Prevent touch scrolling from hijacking drags on mobile
-      arrow.attr({ style: (arrow.attr('style') || '') + ' touch-action: none;' });
-      // Initialize heaters & bubbles based on switch state
       if (switchGroup && switchGroup.isOn) {
         isHeaterOn = true;
         updateHeaterHeat(targetTemp);
         startBubbles();
+        animateBubbleFlow(draw);
       } else {
         isHeaterOn = false;
         applyOffGradient();
         stopBubbles();
+        animateBubbleFlow(draw);
       }
       
       // React to switch toggles to swap gradients and bubbles
@@ -608,10 +494,14 @@ function createVerticalValve(draw, x, y) {
             // Turned ON: heat based on current target temperature, start bubbles
             updateHeaterHeat(g.targetTemperature || targetTemp);
             startBubbles();
+            timerId = startTimer(draw, currentTemp);
+            animateBubbleFlow(draw);
           } else {
             // Turned OFF: cool gradient, stop bubbles
             applyOffGradient();
             stopBubbles();
+            clearInterval(timerId);
+            animateBubbleFlow(draw);
           }
         });
       }
@@ -655,35 +545,138 @@ function createVerticalValve(draw, x, y) {
       return switchGroup;
     }
     
-    
-function drawValve(draw, valveCenterX, valveCenterY, radius, opacity = 1) {
-  const valveGroup = draw.group();
-  valveGroup.circle(40)
-  .fill({ color: '#8cbfe9', opacity: opacity })
-  .stroke({ color: 'black', opacity: opacity, width: 2 })
-  .center(valveCenterX, valveCenterY)
-  .front();
-  valveGroup.rect(10, 44)
-  .fill({ color: '#8cbfe9', opacity: opacity })
-  .stroke({ color: 'black', opacity: opacity, width: 2, linecap: 'round' })
-  .center(valveCenterX, valveCenterY)
-  .front();
-
-  valveGroup.on('click', () => {
-    valveGroup.isRotated = !valveGroup.isRotated;
-    if (valveGroup.isRotated) {
-      valveGroup.animate(300).rotate(90, valveCenterX, valveCenterY);
-    } else {
-      valveGroup.animate(300).rotate(-90, valveCenterX, valveCenterY);
+    function drawTemperatureController(draw, x, y, initialTemp = 20, minTemp = 15, maxTemp = 25, step = 5, onChange) {
+      const g = draw.group();
+      g.attr({ 'pointer-events': 'all' });
+      
+      // Container
+      const W = 100, H = 50, R = 6;
+      g.rect(W, H).move(x, y).radius(R).fill('#f0f0f0').stroke({ color: '#444', width: 1 });
+      
+      // Display background
+      const dispW = 60, dispH = 28;
+      const dispX = x + (W - dispW) / 2;
+      const dispY = y + 5;
+      g.rect(dispW, dispH).move(dispX, dispY).radius(4).fill('#222').stroke({ color: '#111', width: 0.6 });
+      
+      // Display text
+      const readout = g.text(currentTemp + '°C')
+      .font({ family: 'Arial', size: 16, anchor: 'middle', weight: 700 })
+      .fill('#fff')
+      .center(dispX + dispW / 2, dispY + dispH / 2);
+      
+      function updateDisplay() {
+        // clamp
+        currentTemp = Math.max(minTemp, Math.min(maxTemp, currentTemp));
+        // Robustly refresh the text node (plain() avoids tspan quirks)
+        if (readout && readout.clear && readout.plain) {
+          readout.clear().plain(currentTemp + '°C');
+        } else {
+          // fallback for older svg.js
+          readout.text(currentTemp + '°C');
+        }
+        // re-center and bring to front
+        if (readout.center) readout.center(dispX + dispW / 2, dispY + dispH / 2);
+        if (readout.front) readout.front();
+        // notify listener
+        if (typeof onChange === 'function') onChange(currentTemp);
+      }
+      
+      // Buttons
+      const btnSize = 20;
+      const btnY = y + H - btnSize - 4;
+      
+      const minus = g.rect(btnSize, btnSize).move(x + 10, btnY).radius(4).fill('#e8e8e8').stroke({ color: '#666', width: 1 });
+      const minusText = g.text('−')
+      .font({ family: 'Arial', size: 16, anchor: 'middle', weight: 700 })
+      .fill('#333')
+      .center(x + 10 + btnSize / 2, btnY + btnSize / 2)
+      .attr({ 'pointer-events': 'auto' });
+      
+      const plus = g.rect(btnSize, btnSize).move(x + W - btnSize - 10, btnY).radius(4).fill('#e8e8e8').stroke({ color: '#666', width: 1 });
+      const plusText = g.text('+')
+      .font({ family: 'Arial', size: 16, anchor: 'middle', weight: 700 })
+      .fill('#333')
+      .center(x + W - btnSize / 2 - 10, btnY + btnSize / 2)
+      .attr({ 'pointer-events': 'auto' });
+      
+      function inc() {
+        const next = currentTemp + step;
+        if (next <= maxTemp) {
+          currentTemp = next;
+          updateDisplay();
+        } else {
+          // still force a refresh in case UI got desynced
+          // updateDisplay();
+        }
+      }
+      function dec() {
+        const next = currentTemp - step;
+        if (next >= minTemp) {
+          currentTemp = next;
+          updateDisplay();
+        } else {
+          // still force a refresh in case UI got desynced
+          // updateDisplay();
+        }
+      }
+      
+      // Enable clicks on both the rect and the text and also listen to pointerdown (more reliable)
+      [minus, minusText].forEach(el => {
+        el.on('click', dec);
+        // el.on('pointerdown', (e) => { e.preventDefault(); dec(); });
+        el.style('cursor', 'pointer');
+        if (typeof el.front === 'function') el.front();
+      });
+      [plus, plusText].forEach(el => {
+        el.on('click', inc);
+        // el.on('pointerdown', (e) => { e.preventDefault(); inc(); });
+        el.style('cursor', 'pointer');
+        if (typeof el.front === 'function') el.front();
+      });
+      
+      // Ensure the readout is above the button layers
+      if (typeof readout.front === 'function') readout.front();
+      
+      // API
+      g.getTemp = () => currentTemp;
+      g.setTemp = (t) => { currentTemp = Math.max(minTemp, Math.min(maxTemp, t)); updateDisplay(); };
+      
+      if (typeof g.front === 'function') g.front();
+      // updateDisplay();
+      return g;
     }
-    gasValveOpen = valveGroup.isRotated;
-    animateGasFlow(draw);
-  });
-  return valveGroup;
-}
-
-function animateGasFlow(draw) {
-  if (!verticalValveOpen) {
+    
+    
+    function drawValve(draw, valveCenterX, valveCenterY, radius, opacity = 1) {
+      const valveGroup = draw.group();
+      valveGroup.circle(40)
+      .fill({ color: '#8cbfe9', opacity: opacity })
+      .stroke({ color: 'black', opacity: opacity, width: 2 })
+      .center(valveCenterX, valveCenterY)
+      .front();
+      valveGroup.rect(10, 44)
+      .fill({ color: '#8cbfe9', opacity: opacity })
+      .stroke({ color: 'black', opacity: opacity, width: 2, linecap: 'round' })
+      .center(valveCenterX, valveCenterY)
+      .front();
+      
+      valveGroup.on('click', () => {
+        valveGroup.isRotated = !valveGroup.isRotated;
+        if (valveGroup.isRotated) {
+          valveGroup.animate(300).rotate(90, valveCenterX, valveCenterY);
+        } else {
+          valveGroup.animate(300).rotate(-90, valveCenterX, valveCenterY);
+        }
+        gasValveOpen = valveGroup.isRotated;
+        animateGasFlow(draw);
+        animateBubbleFlow(draw);
+      });
+      return valveGroup;
+    }
+    
+    function animateGasFlow(draw) {
+      if (!verticalValveOpen) {
         // Stop all flows when vertical valve closes
         draw.find('path')
         .filter(el =>  el.attr('data-pipe-side') === 'gas' || el.attr('data-pipe-side') === 'valve')
@@ -701,7 +694,7 @@ function animateGasFlow(draw) {
         });
         // console.log(multiValvePosition, gasValveOpen);
       }
-
+      
       if (gasValveOpen && verticalValveOpen) {
         [window.leftPipe2].forEach(pipeEl => {
           if (pipeEl) {
@@ -715,15 +708,93 @@ function animateGasFlow(draw) {
         });
       } else {
         draw.find('path')
-          .filter(el => el.attr('data-pipe-side') === 'valve')
-          .forEach(el => el.remove());
+        .filter(el => el.attr('data-pipe-side') === 'valve')
+        .forEach(el => el.remove());
         if (container && typeof container.stopBubbles === 'function') {
           container.stopBubbles();
         }
       }
-}
-
-
+    }
+    
+    function animateBubbleFlow(draw) {
+      const emit = (pipeEl) => {
+        if (!pipeEl || !pipeEl.node || typeof pipeEl.node.getTotalLength !== 'function') return;
+        
+        // Create (or reuse) a layer for outlet bubbles so we can clear them cleanly.
+        if (!outletBubbleLayer) {
+          outletBubbleLayer = draw.group();
+          // Make sure these bubbles don't block pointer events.
+          outletBubbleLayer.attr({ 'pointer-events': 'none' });
+        }
+        
+        // Find the pipe outlet coordinates (end of the path)
+        const totalLen = pipeEl.node.getTotalLength();
+        const pt = pipeEl.node.getPointAtLength(totalLen);
+        
+        // Helper to spawn a single bubble at the outlet and let it rise
+        const spawn = () => {
+          // Guard against resets that null the layer while an interval is still ticking
+          if (!outletBubbleLayer) return;
+          // match container bubble size (even size)
+          const r = 6; // match container bubble size (even size)
+          const jitterX = (Math.random() - 0.5) * 6; // ±3 px
+          const startX = pt.x + jitterX;
+          const startY = pt.y;
+          
+          const bub = outletBubbleLayer.circle(r * 2)
+          .center(startX, startY)
+          .fill('none')
+          .stroke({ color: '#9e9e9e', width: 1, opacity: 0.9 })
+          .attr({ 'data-pipe-side': 'bubble' });
+          
+          // Rise upwards with a little horizontal drift
+          const dy = - (40 + Math.random() * 60); // 40–100 px upward
+          const dx = (Math.random() - 0.5) * 20;  // slight sideways drift
+          const dur = 2500 + Math.random() * 2000; // closer to container bubble duration
+          
+          bub.animate(dur)
+          .opacity(0.0)
+          .dx(dx)
+          .dy(dy)
+          .after(() => bub.remove());
+        };
+        
+        // Start interval if not already active
+        if (!outletBubbleTimer) {
+          outletBubbleTimer = setInterval(spawn, 450); // slower emission to match container rate
+          // Kick off one bubble immediately for responsiveness
+          spawn();
+        }
+      };
+      
+      const stopEmit = () => {
+        if (outletBubbleTimer) {
+          clearInterval(outletBubbleTimer);
+          outletBubbleTimer = null;
+        }
+        if (outletBubbleLayer) {
+          outletBubbleLayer.clear();
+        }
+      };
+      
+      if (gasValveOpen && verticalValveOpen && isHeaterOn) {
+        // Keep the existing flow highlight along the pipe to the outlet
+        [window.leftPipe3].forEach(pipeEl => {
+          if (pipeEl) {
+            animateWaterFlow(draw, pipeEl, 0, 100, '#9dd2ff', 8, 0.3, 'bubble');
+            emit(pipeEl);
+          }
+        });
+      } else {
+        // remove any animated flow strokes tagged for bubbles
+        draw.find('path')
+        .filter(el => el.attr('data-pipe-side') === 'bubble')
+        .forEach(el => el.remove());
+        stopEmit();
+      }
+    }
+    
+    
     function animateWaterFlow(draw, pipeEl, delay = 0, duration = 100, waterColor = 'red', waterWidth = 4, opacity = 1, side) {
       const d = pipeEl.attr('d');
       const water = draw.path(d)
@@ -740,6 +811,7 @@ function animateGasFlow(draw) {
         'stroke-dasharray': totalLength,
         'stroke-dashoffset': totalLength
       });
+      
       water.delay(delay).animate(duration).attr({ 'stroke-dashoffset': 0 });
       if (side) {
         water.attr('data-pipe-side', side);
@@ -747,11 +819,88 @@ function animateGasFlow(draw) {
       
       return water;
     }
-
+    
     function addSVGImage(draw, url, x = 0, y = 0, width, height) {
-    const img = draw.image(url)
-    .size(width, height)                      // force the element to the given dimensions
-    .move(x, y)
-    .attr({ preserveAspectRatio: 'none' });   // stretch to fill exactly
-    return img;
+      const img = draw.image(url)
+      .size(width, height)                      // force the element to the given dimensions
+      .move(x, y)
+      .attr({ preserveAspectRatio: 'none' });   // stretch to fill exactly
+      return img;
+    }
+    
+    
+    function startTimer(draw, temp, interval = 1000) {
+      console.log('Starting timer with temp:', temp);
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+      // let elapsedSeconds = 0;
+      let rate = 0;
+      timerId = setInterval(() => {
+        // Calculate mass rate [g/s] and update elapsed time
+        if (gasValveOpen && verticalValveOpen && isHeaterOn) {
+          elapsedSeconds += interval / 1000;
+          // Increment accumulated mass
+          const volume = volumeAtTime(temp, elapsedSeconds * 10 / 60)
+          console.log(volume, elapsedSeconds);
+          const TANK_H = 300;
+          const WALL = 6;
+          const liquidH = (TANK_H - 5 - 2 * WALL) * (volume / 70);
+          const liquidY = 80 + WALL + (TANK_H - 2 * WALL - liquidH);
+          if (container && container.liquid) {
+            // Update existing liquid rectangle without redrawing
+            container.liquid.height(liquidH);
+            container.liquid.y(liquidY - 5);
+          }
+          // console.log(
+          //   `Time: ${elapsedSeconds.toFixed(1)} s — Rate: ${rate.toFixed(5)} g/s — Accumulated: ${accumulatedMass.toFixed(5)} g`
+          // );
+        }
+        // Log formatted output
+      }, interval);
+      return timerId;
+    }
+    
+export function reset(draw) {
+  // 1) Stop emission timers first
+  if (outletBubbleTimer) {
+    clearInterval(outletBubbleTimer);
+    outletBubbleTimer = null;
   }
+  if (timerId) {
+    clearInterval(timerId);
+    timerId = null;
+  }
+
+  // 2) Clear outlet bubble layer and force fresh layer on next start
+  if (outletBubbleLayer) {
+    outletBubbleLayer.clear();
+    outletBubbleLayer = null; // allow animateBubbleFlow() to recreate cleanly
+  }
+
+  // 3) Clear any animated overlay strokes
+  if (draw && typeof draw.find === 'function') {
+    draw.find('path')
+      .filter(el => {
+        const side = el.attr('data-pipe-side');
+        return side === 'gas' || side === 'valve' || side === 'bubble';
+      })
+      .forEach(el => el.remove());
+  }
+
+  // 4) Reset core state flags (do not null DOM refs so handlers keep working)
+  verticalValveOpen = false;
+  gasValveOpen = false;
+  isHeaterOn = false;
+  elapsedSeconds = 0;
+
+  // 5) Stop in-vessel bubbling if available and reset readouts
+  if (container && typeof container.stopBubbles === 'function') {
+    container.stopBubbles();
+  }
+  if (gasFlowRateText && typeof gasFlowRateText.text === 'function') {
+    gasFlowRateText.text('0');
+    if (typeof gasFlowRateText.front === 'function') gasFlowRateText.front();
+  }
+}
