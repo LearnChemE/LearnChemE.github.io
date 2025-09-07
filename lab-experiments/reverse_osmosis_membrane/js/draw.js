@@ -189,7 +189,7 @@ window.draw = function () {
 
   //drain and beaker fill settings
   if (state.pumpOn === true && (state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate < state.saltTankHeight - 15) {
-    state.topOfTankDrainTimer++;
+    state.topOfTankDrainTimer += 100;
   }
 
   if (
@@ -213,9 +213,15 @@ window.draw = function () {
   if (state.doneDrainingTank == true) {
     state.pumpOn = false;
   }
-  /* if (state.doneDrainingTank === true && state.pumpOn === true) {
+  if (state.doneDrainingTank === true && state.tankToPumpDrainTimer < 50) {
     state.tankToPumpDrainTimer += 1;
-  } */
+  }
+  if (state.doneDrainingTank === true && state.tankToPumpDrainTimer >= 50) {
+    state.tankToPumpDrainTimer += 0.25;
+  }
+  if (state.doneDrainingTank === true && state.tankToPumpDrainTimer >= 70) {
+    state.tankToPumpDrainTimer = 70;
+  }
 
   //fill beakers
   if (state.pumpOn === true) {
@@ -706,6 +712,7 @@ function drawPressureGauge(x, y) {
   for (let i = -45; i <= 225; i += (225 + 45) / 40) {
     line(28 * cos(i), -28 * sin(i), 30 * cos(i), -30 * sin(i));
   }
+
   //--------------------numbers on pressure gauge--------------------
   push();
   textAlign(CENTER, CENTER);
@@ -738,15 +745,14 @@ function drawPressureGauge(x, y) {
     );
   } else if (state.pumpOn == true && pressurizeGaugeCountTimer < state.feedPressure) {
     triangle(
-      35 * cos(-((270 * pressurizeGaugeCountTimer) / 40) - 135),
-      -35 * sin(-((270 * pressurizeGaugeCountTimer) / 40) - 135),
-      15 * cos(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 - 17),
-      -15 * sin(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 - 17),
-      15 * cos(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 + 17),
-      -15 * sin(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 + 17)
+      35 * cos(-((270 * (state.feedPressure - state.feedPressure / Math.exp(pressurizeGaugeCountTimer))) / 40) - 135),
+      -35 * sin(-((270 * (state.feedPressure - state.feedPressure / Math.exp(pressurizeGaugeCountTimer))) / 40) - 135),
+      15 * cos(-((270 * (state.feedPressure - state.feedPressure / Math.exp(pressurizeGaugeCountTimer))) / 40) - 135 + 180 - 17),
+      -15 * sin(-((270 * (state.feedPressure - state.feedPressure / Math.exp(pressurizeGaugeCountTimer))) / 40) - 135 + 180 - 17),
+      15 * cos(-((270 * (state.feedPressure - state.feedPressure / Math.exp(pressurizeGaugeCountTimer))) / 40) - 135 + 180 + 17),
+      -15 * sin(-((270 * (state.feedPressure - state.feedPressure / Math.exp(pressurizeGaugeCountTimer))) / 40) - 135 + 180 + 17)
     );
-
-    pressurizeGaugeCountTimer += (state.feedPressure ^ 2) / 80;
+    pressurizeGaugeCountTimer += 0.02;
   } else {
     triangle(
       35 * cos(-((270 * state.feedPressure) / 40) - 135),
@@ -928,10 +934,34 @@ function drawWater(x, y) {
 
   rectMode(CORNERS);
   fill("PaleTurquoise");
-  rect(x - 10, y + state.saltTankHeight / 2 + 40 - 19 + state.tankToPumpDrainTimer, x - 10 + 20, y + state.saltTankHeight / 2 + 38 + 22);
-  rectMode(CORNERS);
-  fill("PaleTurquoise");
-  rect(x - 10, y + state.saltTankHeight / 2 + 59, x - 10 + 156, y + state.saltTankHeight / 2 + 59 + 20, 0, 0, 0, 10);
+  if (state.tankToPumpDrainTimer < 50) {
+    rect(x - 10, y + state.saltTankHeight / 2 + 40 - 19 + state.tankToPumpDrainTimer, x - 10 + 20, y + state.saltTankHeight / 2 + 38 + 22);
+    rect(x - 10, y + state.saltTankHeight / 2 + 59, x - 10 + 156, y + state.saltTankHeight / 2 + 59 + 20, 0, 0, 0, 10);
+  }
+  if (50 <= state.tankToPumpDrainTimer && state.tankToPumpDrainTimer < 67) {
+    rect(
+      x - 10 - (50 - state.tankToPumpDrainTimer) / 10,
+      y + state.saltTankHeight / 2 + 59 - 50 + state.tankToPumpDrainTimer,
+      x - 10 + 156,
+      y + state.saltTankHeight / 2 + 59 + 20,
+      0,
+      0,
+      0,
+      10 + (-50 + state.tankToPumpDrainTimer) / 10
+    );
+  }
+  if (state.tankToPumpDrainTimer >= 67) {
+    rect(
+      x - 10 - (50 - state.tankToPumpDrainTimer) / 5,
+      y + state.saltTankHeight / 2 + 59 - 50 + state.tankToPumpDrainTimer,
+      x - 10 + 156,
+      y + state.saltTankHeight / 2 + 59 + 20,
+      0,
+      0,
+      0,
+      10 + (-50 + state.tankToPumpDrainTimer)
+    );
+  }
 
   pop();
 
