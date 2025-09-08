@@ -13,6 +13,7 @@ let timerId = null;
 let elapsedSeconds = 0; // track elapsed time for gas flow
 let outletBubbleTimer = null;   // interval handle for outlet bubbles
 let outletBubbleLayer = null;   // SVG group to hold outlet bubbles
+let readout = null; // temperature display text element
 
 // Save the SVG.js context so other functions can reuse it
 export function drawFigure(svg) {
@@ -20,6 +21,8 @@ export function drawFigure(svg) {
   .stroke({ color: '#000', width: 2 });
   
   svg.line(675, 350, 760, 320)
+  .stroke({ color: '#000', width: 2 });
+  svg.line(500, 100, 400, 120)
   .stroke({ color: '#000', width: 2 });
   drawGasCylinder(svg, 100, 350, 'N₂ gas cylinder');
   createVerticalValve(svg, 122.5, 250);
@@ -32,6 +35,7 @@ export function drawFigure(svg) {
   gasFlowRateText = svg.text('0').center(174, 180).font({ size: 12, anchor: 'middle' });
   svg.text('cm³/min').stroke({ color: '#000', width: 0.05 }).center(172, 202.5).font({ size: 14 });
   const tempController = drawTemperatureController(svg, 745, 300, 20, 15, 25, 5);
+  const tempReadOut = drawTemperatureReadOut(svg, 300, 100);
   // if (tempController && typeof tempController.front === 'function') tempController.front();
 }
 
@@ -292,10 +296,10 @@ function drawGasCylinder(draw, x, y, label) {
         clearAllBubbles();
       }
       function startBubbles() {
-        if (bubbling || !gasValveOpen ||!verticalValveOpen || !isHeaterOn) return;
+        if (bubbling || !gasValveOpen ||!verticalValveOpen) return;
         bubbling = true;
-        for (let i = 0; i < 10; i++) {
-          bubbleTimers.push(setTimeout(spawnBubble, i * 180));
+        for (let i = 0; i < 100; i++) {
+          bubbleTimers.push(setTimeout(spawnBubble, i * 100));
         }
       }
       // Expose bubble controls to outside via returned group
@@ -306,7 +310,7 @@ function drawGasCylinder(draw, x, y, label) {
         if (!bubbling) return;
         const bx = Math.random() * (innerRight - innerLeft) + innerLeft;
         const r = 2 + 4; // 2–6 px
-        const startY = innerBottom - Math.random() * (liquidH * 0.6); // start inside liquid
+        const startY = innerBottom; // start inside liquid
         const c = bubbleLayer.circle(r * 2)
         .center(bx, startY)
         .fill('none')
@@ -477,12 +481,12 @@ function drawGasCylinder(draw, x, y, label) {
       if (switchGroup && switchGroup.isOn) {
         isHeaterOn = true;
         updateHeaterHeat(targetTemp);
-        startBubbles();
+        // startBubbles();
         animateBubbleFlow(draw);
       } else {
         isHeaterOn = false;
         applyOffGradient();
-        stopBubbles();
+        // stopBubbles();
         animateBubbleFlow(draw);
       }
       
@@ -493,13 +497,13 @@ function drawGasCylinder(draw, x, y, label) {
           if (switchGroup.isOn) {
             // Turned ON: heat based on current target temperature, start bubbles
             updateHeaterHeat(g.targetTemperature || targetTemp);
-            startBubbles();
+            // startBubbles();
             timerId = startTimer(draw, currentTemp);
             animateBubbleFlow(draw);
           } else {
             // Turned OFF: cool gradient, stop bubbles
             applyOffGradient();
-            stopBubbles();
+            // stopBubbles();
             clearInterval(timerId);
             animateBubbleFlow(draw);
           }
@@ -537,9 +541,13 @@ function drawGasCylinder(draw, x, y, label) {
         if (isOn) {
           // reactorIsOpen = true;
           handle.animate(200).rotate(40, x + width / 2, y + height / 2);
+          readout.text(currentTemp + '°C');
+          readout.show();
+          
         } else {
           // reactorIsOpen = false;
           handle.animate(200).rotate(-40, x + width / 2, y + height / 2);
+          readout.hide();
         }
       });
       return switchGroup;
@@ -561,7 +569,7 @@ function drawGasCylinder(draw, x, y, label) {
       
       // Display text
       const readout = g.text(currentTemp + '°C')
-      .font({ family: 'Arial', size: 16, anchor: 'middle', weight: 700 })
+      .font({ family: 'Arial', size: 16, anchor: 'middle'})
       .fill('#fff')
       .center(dispX + dispW / 2, dispY + dispH / 2);
       
@@ -647,6 +655,29 @@ function drawGasCylinder(draw, x, y, label) {
       return g;
     }
     
+    function drawTemperatureReadOut(draw, x, y, initialTemp = 20) {
+      const g = draw.group();
+      g.attr({ 'pointer-events': 'all' });
+      
+      // Container
+      const W = 100, H = 50, R = 6;
+      g.rect(W, H).move(x, y).radius(R).fill('black').stroke({ color: '#444', width: 1 });
+      
+      // Display background
+      const dispW = 60, dispH = 28;
+      const dispX = x + (W - dispW) / 2;
+      const dispY = y + 10;
+      g.rect(dispW, dispH).move(dispX, dispY).radius(4).fill('white').stroke({ color: '#111', width: 0.6 });
+      
+      // Display text
+      readout = g.text(currentTemp + '°C')
+      .font({ family: 'Arial', size: 16, anchor: 'middle'})
+      .fill('black')
+      .center(dispX + dispW / 2, dispY + dispH / 2)
+      .hide();
+      // updateDisplay();
+      return g;
+    }
     
     function drawValve(draw, valveCenterX, valveCenterY, radius, opacity = 1) {
       const valveGroup = draw.group();
@@ -717,72 +748,72 @@ function drawGasCylinder(draw, x, y, label) {
     }
     
     function animateBubbleFlow(draw) {
-      const emit = (pipeEl) => {
-        if (!pipeEl || !pipeEl.node || typeof pipeEl.node.getTotalLength !== 'function') return;
+      // const emit = (pipeEl) => {
+      //   if (!pipeEl || !pipeEl.node || typeof pipeEl.node.getTotalLength !== 'function') return;
         
-        // Create (or reuse) a layer for outlet bubbles so we can clear them cleanly.
-        if (!outletBubbleLayer) {
-          outletBubbleLayer = draw.group();
-          // Make sure these bubbles don't block pointer events.
-          outletBubbleLayer.attr({ 'pointer-events': 'none' });
-        }
+      //   // Create (or reuse) a layer for outlet bubbles so we can clear them cleanly.
+      //   if (!outletBubbleLayer) {
+      //     outletBubbleLayer = draw.group();
+      //     // Make sure these bubbles don't block pointer events.
+      //     outletBubbleLayer.attr({ 'pointer-events': 'none' });
+      //   }
         
-        // Find the pipe outlet coordinates (end of the path)
-        const totalLen = pipeEl.node.getTotalLength();
-        const pt = pipeEl.node.getPointAtLength(totalLen);
+      //   // Find the pipe outlet coordinates (end of the path)
+      //   const totalLen = pipeEl.node.getTotalLength();
+      //   const pt = pipeEl.node.getPointAtLength(totalLen);
         
-        // Helper to spawn a single bubble at the outlet and let it rise
-        const spawn = () => {
-          // Guard against resets that null the layer while an interval is still ticking
-          if (!outletBubbleLayer) return;
-          // match container bubble size (even size)
-          const r = 6; // match container bubble size (even size)
-          const jitterX = (Math.random() - 0.5) * 6; // ±3 px
-          const startX = pt.x + jitterX;
-          const startY = pt.y;
+      //   // Helper to spawn a single bubble at the outlet and let it rise
+      //   const spawn = () => {
+      //     // Guard against resets that null the layer while an interval is still ticking
+      //     if (!outletBubbleLayer) return;
+      //     // match container bubble size (even size)
+      //     const r = 6; // match container bubble size (even size)
+      //     const jitterX = (Math.random() - 0.5) * 6; // ±3 px
+      //     const startX = pt.x + jitterX;
+      //     const startY = pt.y;
           
-          const bub = outletBubbleLayer.circle(r * 2)
-          .center(startX, startY)
-          .fill('none')
-          .stroke({ color: '#9e9e9e', width: 1, opacity: 0.9 })
-          .attr({ 'data-pipe-side': 'bubble' });
+      //     const bub = outletBubbleLayer.circle(r * 2)
+      //     .center(startX, startY)
+      //     .fill('none')
+      //     .stroke({ color: '#9e9e9e', width: 1, opacity: 0.9 })
+      //     .attr({ 'data-pipe-side': 'bubble' });
           
-          // Rise upwards with a little horizontal drift
-          const dy = - (40 + Math.random() * 60); // 40–100 px upward
-          const dx = (Math.random() - 0.5) * 20;  // slight sideways drift
-          const dur = 2500 + Math.random() * 2000; // closer to container bubble duration
+      //     // Rise upwards with a little horizontal drift
+      //     const dy = - (40 + Math.random() * 60); // 40–100 px upward
+      //     const dx = (Math.random() - 0.5) * 20;  // slight sideways drift
+      //     const dur = 2500 + Math.random() * 2000; // closer to container bubble duration
           
-          bub.animate(dur)
-          .opacity(0.0)
-          .dx(dx)
-          .dy(dy)
-          .after(() => bub.remove());
-        };
+      //     bub.animate(dur)
+      //     .opacity(0.0)
+      //     .dx(dx)
+      //     .dy(dy)
+      //     .after(() => bub.remove());
+      //   };
         
-        // Start interval if not already active
-        if (!outletBubbleTimer) {
-          outletBubbleTimer = setInterval(spawn, 450); // slower emission to match container rate
-          // Kick off one bubble immediately for responsiveness
-          spawn();
-        }
-      };
+      //   // Start interval if not already active
+      //   if (!outletBubbleTimer) {
+      //     outletBubbleTimer = setInterval(spawn, 450); // slower emission to match container rate
+      //     // Kick off one bubble immediately for responsiveness
+      //     spawn();
+      //   }
+      // };
       
-      const stopEmit = () => {
-        if (outletBubbleTimer) {
-          clearInterval(outletBubbleTimer);
-          outletBubbleTimer = null;
-        }
-        if (outletBubbleLayer) {
-          outletBubbleLayer.clear();
-        }
-      };
+      // const stopEmit = () => {
+      //   if (outletBubbleTimer) {
+      //     clearInterval(outletBubbleTimer);
+      //     outletBubbleTimer = null;
+      //   }
+      //   if (outletBubbleLayer) {
+      //     outletBubbleLayer.clear();
+      //   }
+      // };
       
       if (gasValveOpen && verticalValveOpen && isHeaterOn) {
         // Keep the existing flow highlight along the pipe to the outlet
         [window.leftPipe3].forEach(pipeEl => {
           if (pipeEl) {
             animateWaterFlow(draw, pipeEl, 0, 100, '#9dd2ff', 8, 0.3, 'bubble');
-            emit(pipeEl);
+            // emit(pipeEl);
           }
         });
       } else {
@@ -790,7 +821,7 @@ function drawGasCylinder(draw, x, y, label) {
         draw.find('path')
         .filter(el => el.attr('data-pipe-side') === 'bubble')
         .forEach(el => el.remove());
-        stopEmit();
+        // stopEmit();
       }
     }
     
@@ -864,20 +895,20 @@ function drawGasCylinder(draw, x, y, label) {
     
 export function reset(draw) {
   // 1) Stop emission timers first
-  if (outletBubbleTimer) {
-    clearInterval(outletBubbleTimer);
-    outletBubbleTimer = null;
-  }
+  // if (outletBubbleTimer) {
+  //   clearInterval(outletBubbleTimer);
+  //   outletBubbleTimer = null;
+  // }
   if (timerId) {
     clearInterval(timerId);
     timerId = null;
   }
 
   // 2) Clear outlet bubble layer and force fresh layer on next start
-  if (outletBubbleLayer) {
-    outletBubbleLayer.clear();
-    outletBubbleLayer = null; // allow animateBubbleFlow() to recreate cleanly
-  }
+  // if (outletBubbleLayer) {
+  //   outletBubbleLayer.clear();
+  //   outletBubbleLayer = null; // allow animateBubbleFlow() to recreate cleanly
+  // }
 
   // 3) Clear any animated overlay strokes
   if (draw && typeof draw.find === 'function') {
