@@ -1,3 +1,6 @@
+import 'bootstrap'
+import 'bootstrap/scss/bootstrap.scss'
+
 import './style.css'
 import { enableWindowResize, initHamburgerMenu, initSvgDrag, initSvgZoom, insertSVG } from './ts/helpers';
 import worksheet from './media/massMoleBalancesWorksheet.pdf';
@@ -42,7 +45,6 @@ const pumpPower = initSwitch("pumpSwitch","pumpSwitchOn","pumpSwitchOff");
 const furnacePower = initSwitch("furnaceSwitch","furnaceSwitchOn","furnaceSwitchOff");
 const furnaceSP = initUpDownButtons("furnaceUpBtn","furnaceDownBtn",200,500,10,300);
 const pumpLift = initDial("flowDial");
-initBubbleMeter("bulbDefault", "bulbSqueeze");
 
 // Create the furnace controller
 const furnaceCtrl = new FirstOrder(25, 3000, 0);
@@ -119,3 +121,6 @@ const outBeakerDescriptor: BeakerDescriptor = {
   flowOutInstead: false
 };
 new Beaker(outBeakerDescriptor);
+
+// Bubble Meter
+initBubbleMeter("bulbDefault", "bulbSqueeze", vapSignal);

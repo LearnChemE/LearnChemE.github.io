@@ -2,7 +2,7 @@ import { GetElement, insertClipPath } from "../ts/helpers";
 import { FirstOrder } from "./Setpoint";
 import { Signal } from "./Signal";
 
-export const initBubbleMeter = (normalId: string, squeezeId: string): BubbleMeter => {
+export const initBubbleMeter = (normalId: string, squeezeId: string, flowSignal: Signal<number>): BubbleMeter => {
     const bulb = new Signal<boolean>(false);
 
     // Get the elements
@@ -26,7 +26,7 @@ export const initBubbleMeter = (normalId: string, squeezeId: string): BubbleMete
     // Use the bulb to initialize the bubble meter
     const bubbleMeterDescriptor: BubbleMeterDescriptor = {
         bulb: bulb,
-        flowrate: new Signal(10),
+        flowrate: flowSignal,
         soapId: "soap",
         bubbleId: "bubble",
         bubbleGid: "bubbleGroup",

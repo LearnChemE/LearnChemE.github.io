@@ -1,5 +1,5 @@
-import { GetElement } from "../ts/helpers";
-import type { Signal } from "./Signal";
+import { constrain, GetElement } from "../ts/helpers";
+import { Signal } from "./Signal";
 
 export type BeakerDescriptor = {
     fillId: string;
@@ -18,6 +18,8 @@ export class Beaker {
     private volume: number;
     private maxVol: number;
 
+    public overflow: Signal<void>;
+
     constructor(descriptor: BeakerDescriptor) {
         this.fill = GetElement<SVGRectElement>(descriptor.fillId);
         this.height = Number(this.fill.getAttribute("height")!);
@@ -32,11 +34,19 @@ export class Beaker {
         else
             descriptor.flowSignal.subscribe((flow: number) => { this.flowrate =  flow });
 
+        // Output if overflow
+        this.overflow = new Signal<void>(undefined);
+
         this.animate();
     }
 
     private render = () => {
-        const h = Math.max(this.volume / this.maxVol * this.height, 0);
+        var h = this.volume / this.maxVol * this.height;
+        if (h < 0 || h > this.maxVol) {
+            this.volume = constrain(this.volume, 0, this.maxVol);
+            h = constrain(h, 0, this.maxVol);
+            this.overflow.set(undefined);
+        } 
         const dy = this.height - h;
         this.fill.setAttribute("y",`${this.y + dy}`);
         this.fill.setAttribute("height",`${h}`);

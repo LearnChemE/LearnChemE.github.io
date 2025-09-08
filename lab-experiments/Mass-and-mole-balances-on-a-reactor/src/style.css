@@ -71,7 +71,7 @@ svg {
 
 .menu-button {
   position:absolute;
-  right: -1.5em;
+  right: -2em;
   top: 1.5em;
 
   font-size: 1.75rem;
@@ -108,7 +108,7 @@ svg {
 
   position: absolute;
   top: 2.5rem;
-  right: -2.5rem;
+  right: -3rem;
   background: white;
   border: 1px solid #ccc;
   border-radius: 0.5rem;
