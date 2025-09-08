@@ -1,5 +1,5 @@
 import { svgNS, insertClipPath, GetElement } from "../ts/helpers";
-import type { Signal } from "./Signal";
+import { Signal } from "./Signal";
 
 export class Waterfall {
     private clip: SVGClipPathElement;
@@ -24,7 +24,6 @@ export class Waterfall {
         this.height = bbox.height;
 
         if (pourSignal) pourSignal.subscribe((flow: number) => {
-            console.log(flow)
             if (flow > 0) this.pour();
             else this.stop();
         });

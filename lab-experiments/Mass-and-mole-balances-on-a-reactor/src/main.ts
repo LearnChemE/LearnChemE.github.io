@@ -39,7 +39,6 @@ initSvgDrag();
 enableWindowResize();
 
 // Begin interactables
-new BallValve("valveHandle", false, () => {}, { x: -1.5, y: 0 });
 const evaporatorPower = initSwitch("mantleSwitch","mantleSwitchOn","mantleSwitchOff");
 const pumpPower = initSwitch("pumpSwitch","pumpSwitchOn","pumpSwitchOff");
 const furnacePower = initSwitch("furnaceSwitch","furnaceSwitchOn","furnaceSwitchOff");
@@ -55,7 +54,6 @@ const furnaceDescriptor: PoweredControllerDescriptor<FirstOrder> = {
   control: furnaceCtrl
 };
 const furnace = new PoweredController<FirstOrder>(furnaceDescriptor);
-furnace.output.subscribe((val:number) => console.log(val));
 
 // Label for setpoint
 furnaceSPLabelDescriptor.signal = furnaceSP;
@@ -94,12 +92,34 @@ const evaporator = new Evaporator(evaporatorDescriptor);
 // Reactor
 const outSignal = Reactor(evaporator.flowOut, furnace.output);
 
-// Split the outlet signal
+// Valve to switch the output of the reactor
+const valve = new BallValve("valveHandle", false, () => {}, { x: -1.5, y: 0 });
+
+// Create a function to set the output
+var outStream: ProductStream = outSignal.get();
+var valveSetting: boolean = false;
+// Split into two
 const liqSignal = new Signal<number>(0);
 const vapSignal = new Signal<number>(0);
+// Define the logic for the outlets
+const setOutlet = () => {
+  if (valveSetting) {
+    liqSignal.set(outStream.liquidFlowrate);
+    vapSignal.set(outStream.gasFlowrate);
+  }
+  else {
+    liqSignal.set(0);
+    vapSignal.set(0);
+  }
+}
+// Now subscribe to both
 outSignal.subscribe((stream: ProductStream) => {
-  liqSignal.set(stream.liquidFlowrate);
-  vapSignal.set(stream.gasFlowrate);
+  outStream = stream;
+  setOutlet();
+});
+valve.turned.subscribe((set: boolean) => {
+  valveSetting = set;
+  setOutlet();
 });
 
 // In beaker
@@ -111,6 +131,9 @@ const inBeakerDescriptor: BeakerDescriptor = {
   flowOutInstead: true
 };
 new Beaker(inBeakerDescriptor);
+
+// Out liquid
+new Waterfall("outLiquid", liqSignal);
 
 // Out Beaker
 const outBeakerDescriptor: BeakerDescriptor = {

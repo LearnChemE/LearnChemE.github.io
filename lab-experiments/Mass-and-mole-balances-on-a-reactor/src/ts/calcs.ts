@@ -52,12 +52,12 @@ type ArrhenniusConstants = {
 }
 
 const rxn1: ArrhenniusConstants = {
-    k0: 20,
+    k0: 50,
     ea: 2000
 }
 const rxn2: ArrhenniusConstants = {
-    k0: 3000,
-    ea: 4000
+    k0: 5000,
+    ea: 3800
 }
 
 function arrhennius(cs: ArrhenniusConstants, T: number) {

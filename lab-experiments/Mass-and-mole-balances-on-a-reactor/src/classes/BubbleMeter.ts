@@ -100,7 +100,7 @@ export class BubbleMeter {
     private renderBubbles = (deltaTime: number) => {
         let bubbleHtml: string = '';
         let numOver = 0;
-        const dy = -this.flowrate * deltaTime / 60000 * 226 / 50;
+        const dy = -this.flowrate * deltaTime / 1000 * 226 / 50;
         // Iterate through the bubble array and render them all
         for (let i=0;i<this.bubbles.length;i++) {
             const y = this.bubbles[i] + dy;

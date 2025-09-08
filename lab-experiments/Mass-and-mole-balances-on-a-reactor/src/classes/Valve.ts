@@ -1,4 +1,5 @@
 import { vec2 } from "../ts/helpers";
+import { Signal } from "./Signal";
 
 export class BallValve {
     private handle: SVGGElement;
@@ -7,6 +8,9 @@ export class BallValve {
     private angle = 0;
     private turnAngle = 90;
     private coords: { x: number, y: number };
+
+    // Output
+    public turned: Signal<boolean>;
 
     constructor(id: string, reverse=false, onTurn?: (state: boolean) => void, offset?: vec2) {
         const handle = document.getElementById(id)! as unknown as SVGGElement;
@@ -17,10 +21,12 @@ export class BallValve {
 
         const bbox = handle.getBBox();
         const dx = (offset !== undefined) ? offset.x : 0;
-        console.log(offset)
         const dy = (offset !== undefined) ? offset.y : 0;
         this.coords = { x: bbox.x + bbox.width * .5 + dx , y: bbox.y + bbox.height / 2 + dy };
         if (reverse) this.turnAngle = -90;
+
+        // Create output signal
+        this.turned = new Signal<boolean>(false);
 
         // Set initial transform
         this.handle.setAttribute("transform", `rotate(${0} ${this.coords.x} ${this.coords.y})`);
@@ -29,6 +35,7 @@ export class BallValve {
     public getState = () => {return this.state}
     private toggleState = () => {
         this.state = !this.state;
+        this.turned.set(this.state);
         this.onTurn?.(this.state);
         this.animate();
     }
