@@ -9,11 +9,12 @@ import { Tube, type TubeDescriptor } from './classes/Tube';
 import { PoweredController, type PoweredControllerDescriptor } from './classes/Control';
 import { Waterfall } from './classes/Waterfall';
 import { Evaporator, type EvaporatorDescriptor } from './classes/Evaporator';
-import { Reactor } from './ts/calcs';
+import { Reactor, type ProductStream } from './ts/calcs';
 import { initDial, initSwitch, initUpDownButtons } from './classes/Inputs';
 import { DigitalLabel } from './classes/Label';
 import { furnaceSPLabelDescriptor } from './ts/config';
 import { Beaker, type BeakerDescriptor } from './classes/Beaker';
+import { Signal } from './classes/Signal';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
@@ -33,11 +34,6 @@ app.appendChild(insertSVG(svg));
 initSvgZoom();
 initSvgDrag();
 enableWindowResize();
-
-// furnaceSPDescriptor.ctrl = furnaceCtrl;
-// furnaceSPDescriptor.spLabel = furnaceSPLabel;
-
-// const furnaceSP = new SetpointControl(furnaceSPDescriptor);
 
 // Begin interactables
 new BallValve("valveHandle", false, () => {}, { x: -1.5, y: 0 });
@@ -94,14 +90,32 @@ const evaporatorDescriptor: EvaporatorDescriptor = {
 const evaporator = new Evaporator(evaporatorDescriptor);
 
 // Reactor
-Reactor(evaporator.flowOut, furnace.output);
+const outSignal = Reactor(evaporator.flowOut, furnace.output);
+
+// Split the outlet signal
+const liqSignal = new Signal<number>(0);
+const vapSignal = new Signal<number>(0);
+outSignal.subscribe((stream: ProductStream) => {
+  liqSignal.set(stream.liquidFlowrate);
+  vapSignal.set(stream.gasFlowrate);
+});
 
 // In beaker
 const inBeakerDescriptor: BeakerDescriptor = {
   fillId: "inBeakerFill",
   flowSignal: evaporator.flowOut,
-  initialVolume: 500,
-  maxVolume: 500,
+  initialVolume: 600,
+  maxVolume: 600,
   flowOutInstead: true
 };
 new Beaker(inBeakerDescriptor);
+
+// Out Beaker
+const outBeakerDescriptor: BeakerDescriptor = {
+  fillId: "outBeakerFill",
+  flowSignal: liqSignal,
+  initialVolume: 0,
+  maxVolume: 600,
+  flowOutInstead: false
+};
+new Beaker(outBeakerDescriptor);
