@@ -6,6 +6,7 @@ export class DigitalLabel implements Label {
     private units: string;
     private decimals: number;
     private range: LabelRange | undefined;
+    private hidden: boolean
 
     public id;
 
@@ -38,13 +39,21 @@ export class DigitalLabel implements Label {
         this.decimals = descriptor.decimals;
         this.range = descriptor.range;
         this.id = descriptor.id;
+        this.hidden = false;
+
+        // Subscribe to signal if applicable
+        if (descriptor.signal !== undefined) {
+            this.setLabel(descriptor.signal.get());
+            descriptor.signal.subscribe((val: number) => this.setLabel(val));
+        } 
     }
 
     /**
      * Set the digital label to a certain value
      * @param val value to set to
      */
-    public setLabel(val: number) {
+    public setLabel = (val: number) => {
+        if (this.hidden) return;
         this.label.innerHTML = `${val.toFixed(this.decimals)} ${this.units}`;
         if (this.range !== undefined) {
             this.checkOverflow(val);
@@ -55,7 +64,7 @@ export class DigitalLabel implements Label {
      * Ensure that a value lies inside the range, and display the proper string if not
      * @param val value to set to
      */
-    private checkOverflow(val: number) {
+    private checkOverflow = (val: number) => {
         const r = this.range!;
         if (val < r.range[0]) {
             this.label.innerHTML = r.underflowString;
@@ -63,6 +72,16 @@ export class DigitalLabel implements Label {
         else if (val > r.range[1]) {
             this.label.innerHTML = r.overflowString;
         }
+    }
+
+    public hide = () => {
+        this.hidden = true;
+        this.label.innerHTML = '';
+    }
+
+    public show = (val: number) => {
+        this.hidden = false;
+        this.setLabel(val);
     }
 }
 

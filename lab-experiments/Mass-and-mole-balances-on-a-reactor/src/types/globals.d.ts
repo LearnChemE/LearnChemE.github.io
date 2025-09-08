@@ -17,6 +17,7 @@ export type DigitalLabelDescriptor = {
     units: string,
     decimals: number,
     initialValue: number,
+    signal?: Signal<number>
     range?: LabelRange
 };
 

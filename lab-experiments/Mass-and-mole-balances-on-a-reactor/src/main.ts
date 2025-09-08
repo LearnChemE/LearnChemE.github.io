@@ -1,17 +1,19 @@
 import './style.css'
-import { enableWindowResize, initHamburgerMenu, initSvgDrag, initSvgZoom, initSwitch, insertSVG } from './ts/helpers';
+import { enableWindowResize, initHamburgerMenu, initSvgDrag, initSvgZoom, insertSVG } from './ts/helpers';
 import worksheet from './media/massMoleBalancesWorksheet.pdf';
 import svg from './media/canvas.svg?raw';
-import { FirstOrder, SetpointControl } from './classes/Setpoint';
-import { DigitalLabel } from './classes/Label';
-import { furnaceSPDescriptor, furnaceSPLabelDescriptor } from './ts/config';
-import { BallValve, initDial } from './classes/Valve';
+import { FirstOrder } from './classes/Setpoint';
+import { BallValve } from './classes/Valve';
 import { initBubbleMeter } from './classes/BubbleMeter';
-import { Signal } from './classes/Signal';
 import { Tube, type TubeDescriptor } from './classes/Tube';
 import { PoweredController, type PoweredControllerDescriptor } from './classes/Control';
 import { Waterfall } from './classes/Waterfall';
 import { Evaporator, type EvaporatorDescriptor } from './classes/Evaporator';
+import { Reactor } from './ts/calcs';
+import { initDial, initSwitch, initUpDownButtons } from './classes/Inputs';
+import { DigitalLabel } from './classes/Label';
+import { furnaceSPLabelDescriptor } from './ts/config';
+import { Beaker, type BeakerDescriptor } from './classes/Beaker';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
@@ -32,31 +34,42 @@ initSvgZoom();
 initSvgDrag();
 enableWindowResize();
 
+// furnaceSPDescriptor.ctrl = furnaceCtrl;
+// furnaceSPDescriptor.spLabel = furnaceSPLabel;
 
-const furnaceCtrl = new FirstOrder(100, 3000, 0);
-
-const furnaceSPLabel = new DigitalLabel(furnaceSPLabelDescriptor);
-
-furnaceSPDescriptor.ctrl = furnaceCtrl;
-furnaceSPDescriptor.spLabel = furnaceSPLabel;
-
-const furnaceSP = new SetpointControl(furnaceSPDescriptor);
+// const furnaceSP = new SetpointControl(furnaceSPDescriptor);
 
 // Begin interactables
 new BallValve("valveHandle", false, () => {}, { x: -1.5, y: 0 });
-const mantleIsOn = new Signal<boolean>(false);
-const pumpIsOn = new Signal<boolean>(false);
-const pumpLift = new Signal<number>(0);
-initSwitch("mantleSwitch","mantleSwitchOn","mantleSwitchOff",    (isOn: boolean) => {mantleIsOn.set(isOn)});
-initSwitch("pumpSwitch","pumpSwitchOn","pumpSwitchOff",          (isOn: boolean) => {pumpIsOn.set(isOn)});
-initSwitch("furnaceSwitch","furnaceSwitchOn","furnaceSwitchOff", () => {furnaceSP.togglePower(25)});
-initDial("flowDial", (lift: number) => {pumpLift.set(lift)});
+const evaporatorPower = initSwitch("mantleSwitch","mantleSwitchOn","mantleSwitchOff");
+const pumpPower = initSwitch("pumpSwitch","pumpSwitchOn","pumpSwitchOff");
+const furnacePower = initSwitch("furnaceSwitch","furnaceSwitchOn","furnaceSwitchOff");
+const furnaceSP = initUpDownButtons("furnaceUpBtn","furnaceDownBtn",200,500,10,300);
+const pumpLift = initDial("flowDial");
 initBubbleMeter("bulbDefault", "bulbSqueeze");
+
+// Create the furnace controller
+const furnaceCtrl = new FirstOrder(25, 3000, 0);
+const furnaceDescriptor: PoweredControllerDescriptor<FirstOrder> = {
+  restingSetpoint: 25,
+  powerSignal: furnacePower,
+  setpointSignal: furnaceSP,
+  control: furnaceCtrl
+};
+const furnace = new PoweredController<FirstOrder>(furnaceDescriptor);
+furnace.output.subscribe((val:number) => console.log(val));
+
+// Label for setpoint
+furnaceSPLabelDescriptor.signal = furnaceSP;
+const furnaceSPLabel = new DigitalLabel(furnaceSPLabelDescriptor);
+furnacePower.subscribe((isOn: boolean) => { isOn ? furnaceSPLabel.show(furnaceSP.get()) : furnaceSPLabel.hide() });
+furnaceSPLabel.hide();
+
 
 // Create the pump
 const pumpDescriptor: PoweredControllerDescriptor<FirstOrder> = {
   restingSetpoint: -0.5,
-  powerSignal: pumpIsOn,
+  powerSignal: pumpPower,
   setpointSignal: pumpLift,
   control: new FirstOrder(0, 200, 0, 12)
 };
@@ -72,9 +85,23 @@ const tubeDescriptor: TubeDescriptor = {
 const inTube = new Tube(tubeDescriptor);
 new Waterfall("evapWaterfall", inTube.outFlow);
 
+// Evaporator
 const evaporatorDescriptor: EvaporatorDescriptor = {
   id: "evapFill",
   flowInSignal: inTube.outFlow,
-  mantleSignal: mantleIsOn
+  mantleSignal: evaporatorPower
 };
-new Evaporator(evaporatorDescriptor);
+const evaporator = new Evaporator(evaporatorDescriptor);
+
+// Reactor
+Reactor(evaporator.flowOut, furnace.output);
+
+// In beaker
+const inBeakerDescriptor: BeakerDescriptor = {
+  fillId: "inBeakerFill",
+  flowSignal: evaporator.flowOut,
+  initialVolume: 500,
+  maxVolume: 500,
+  flowOutInstead: true
+};
+new Beaker(inBeakerDescriptor);

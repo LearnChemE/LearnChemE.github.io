@@ -2,7 +2,7 @@ import { initButton } from "../ts/helpers";
 import type { ControlType, SetpointControlDescriptor } from "../types";
 import { DigitalLabel } from "./Label";
 
-export class SetpointControl<T extends ControlType> {
+export class SetpointControl<T extends ControlType> { // TODO: Deprecate
     private control: T;
     private displayPoint: number;
     private spLabel: DigitalLabel;
