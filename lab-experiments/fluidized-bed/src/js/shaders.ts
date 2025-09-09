@@ -38,11 +38,6 @@ void main() {
   y += 0.03 * cos(2.0 * vPos.x + 0.001 * time);
   if (y > h) discard;  
   FragColor = vec4(.388,.561,.996,.85);
-
-  // For debugging the texture
-  // vec2 texcoord = vec2(vPos.x * .05 + 1e-5 * time, vPos.y * .2 - 3e-5 * time);
-  // float perlin = texture(noiseTex, texcoord).r;
-  // FragColor = vec4(vec3(perlin), 1.0);
 }
 `;
 
@@ -185,24 +180,19 @@ void fluidized() {
   float bed_height = maxHeight() - minh;
   vec2 rest = vec2(hash(.77, gl_VertexID) * 2.0 - 1.0,
                     (1.0 - rel_height) * bed_height + minh);
-
-  vec2 texcoord = vec2(aPos.x * .05 + 1e-5 * time, aPos.y * .2 - 3e-5 * time);
-  float perlin = texture(noiseTex, texcoord).r;
   
   // Brownian motion
   float speedMod = (height - MIN_HEIGHT) / HEIGHT_DIF;
   speedMod *= min(max(fill,0.0),1.0);
   vec2 accel = -2.5 * vec2(cos(4.0*pi*a),sin(4.0*pi*a));
-  // Add Perlin noise for fluidlike flow
-  accel += 5.0 * vec2(sin(-4.0*pi*perlin), cos(-8.0*pi*perlin));
-  // Add some gravity
+  // Add some gravity for forcing
   accel.y -= .0001;
   accel *= speedMod*speedMod;
   
   // Restoring force to keep particles near their homes
   vec2 dif = rest - aPos;
-  float dist2 = dif.x*dif.x + dif.y*dif.y;
-  dif = (dist2 > 1.0) ? dif * 10000.0 : dif * dist2 * 10000.0;
+  float dist = sqrt(dif.x*dif.x + dif.y*dif.y);
+  dif = (dist > 1.0) ? dif * 500.0 : dif * dist * 500.0;
   accel += dif;
 
   // With verlet integration, velocity already accounts for timestep
@@ -217,24 +207,21 @@ void fluidized() {
 
   if (pos.x > 1.0) {
     // Reverse the direction
-    pos.x -= 2.0;
-    prev.x -= 2.0;
+    prev.x += (pos.x - prev.x) * 2.0;
   }
   if (pos.x < -1.0) {
     // Reverse the direction
-    pos.x  += 2.0;
-    prev.x += 2.0;
+    prev.x += (pos.x - prev.x) * 2.0;
   }
+
   float mh = maxHeight();
   if (pos.y > mh) {
     // Reverse the direction
-    // pos.y = mh;
-    prev.y += 0.02;
+    prev.y += 0.01;
   }
   if (pos.y < -1.0) {
     // Reverse the direction
-    // pos.y  += 1.0 + mh;
-    prev.y -= 0.05 * mh;
+    prev.y -= 0.01 * mh;
   }
 
   vPos = pos;
