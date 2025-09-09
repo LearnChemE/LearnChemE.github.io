@@ -11,8 +11,8 @@ let gasFlowRateText = null;
 let currentTemp = 20;
 let timerId = null;
 let elapsedSeconds = 0; // track elapsed time for gas flow
-let outletBubbleTimer = null;   // interval handle for outlet bubbles
-let outletBubbleLayer = null;   // SVG group to hold outlet bubbles
+// let outletBubbleTimer = null;   // interval handle for outlet bubbles
+// let outletBubbleLayer = null;   // SVG group to hold outlet bubbles
 let readout = null; // temperature display text element
 
 // Save the SVG.js context so other functions can reuse it
@@ -610,7 +610,7 @@ function drawGasCylinder(draw, x, y, label) {
       
       function inc() {
         const next = currentTemp + step;
-        if (next <= maxTemp) {
+        if (next <= maxTemp && !isHeaterOn) {
           currentTemp = next;
           updateDisplay();
         } else {
@@ -620,7 +620,7 @@ function drawGasCylinder(draw, x, y, label) {
       }
       function dec() {
         const next = currentTemp - step;
-        if (next >= minTemp) {
+        if (next >= minTemp && !isHeaterOn) {
           currentTemp = next;
           updateDisplay();
         } else {
@@ -712,12 +712,12 @@ function drawGasCylinder(draw, x, y, label) {
         draw.find('path')
         .filter(el =>  el.attr('data-pipe-side') === 'gas' || el.attr('data-pipe-side') === 'valve')
         .forEach(el => el.remove());
-        gasFlowRateText.text('0');
+        // gasFlowRateText.text('0');
       } else {
         [window.leftPipe1].forEach(pipeEl => {
           if (pipeEl) {
             animateWaterFlow(draw, pipeEl, 0, 100, undefined, undefined, undefined, 'gas');
-            gasFlowRateText.text('35');
+            // gasFlowRateText.text('35');
             gasFlowRateDevice.front();
             gasFlowRateText.front();
             valve.front();
@@ -733,6 +733,7 @@ function drawGasCylinder(draw, x, y, label) {
             if (container && typeof container.startBubbles === 'function') {
               container.startBubbles();
             }
+            gasFlowRateText.text('35');
             valve.front();
             container.front();
           }
@@ -744,6 +745,7 @@ function drawGasCylinder(draw, x, y, label) {
         if (container && typeof container.stopBubbles === 'function') {
           container.stopBubbles();
         }
+        gasFlowRateText.text('0');
       }
     }
     
@@ -871,9 +873,9 @@ function drawGasCylinder(draw, x, y, label) {
       timerId = setInterval(() => {
         // Calculate mass rate [g/s] and update elapsed time
         if (gasValveOpen && verticalValveOpen && isHeaterOn) {
-          elapsedSeconds += interval / 1000;
+          elapsedSeconds += (interval / 1000);
           // Increment accumulated mass
-          const volume = volumeAtTime(temp, elapsedSeconds * 10 / 60)
+          const volume = volumeAtTime(temp, elapsedSeconds * 1000 / 60)
           console.log(volume, elapsedSeconds);
           const TANK_H = 300;
           const WALL = 6;

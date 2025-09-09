@@ -97,6 +97,7 @@ function volumeFromMoles({ Npent, Nhex }) {
  * @param {number} [opts.V0_cm3=61.5] Initial total liquid volume (cm^3)
  * @param {number} [opts.FN2_sccm=35]  N2 flow (standard cm^3/min)
  * @param {boolean}[opts.useWorksheetFN2=false] Use 0.0156 mol/min as in worksheet
+ * @param {boolean}[opts.stopAt20pct=true]  If true, stop integration once V falls to 20% of initial
  * @param {number} [opts.dt_s=0.5]     Integrator time step (seconds)
  * @param {number} [opts.tMax_min=240] Hard cap on runtime (minutes)
  * @returns {{t_min:number[], V_cm3:number[], states: {Npent:number, Nhex:number}[]}}
@@ -107,6 +108,7 @@ export function computeVolumeVsTime(opts) {
     V0_cm3 = 61.5,
     FN2_sccm = 35,
     useWorksheetFN2 = false,
+    stopAt20pct = true,
     dt_s = 0.5,
     tMax_min = 240,
   } = opts || {};
@@ -121,7 +123,7 @@ export function computeVolumeVsTime(opts) {
   // Initial moles from total volume and equimolar assumption
   let state = initialMolesFromVolumeEquimolar(V0_cm3);
   const V0 = volumeFromMoles(state); // recomputed initial volume (≈ input)
-  const Vstop = 0.2 * V0;
+  const Vstop = stopAt20pct ? 0.2 * V0 : 0;
 
   const dt_min = dt_s / 60;
   const t_min = [0];
@@ -143,7 +145,7 @@ export function computeVolumeVsTime(opts) {
 
     state = next;
 
-    if (V <= Vstop || (next.Npent + next.Nhex) <= 1e-10) break;
+    if ((stopAt20pct && V <= Vstop) || (next.Npent + next.Nhex) <= 1e-10) break;
   }
 
   return { t_min, V_cm3, states };
@@ -174,5 +176,8 @@ export function volumeAtTime(T_C, t_query_min, opts = {}) {
  * Example usage in your UI code:
  *
  * const { t_min, V_cm3 } = computeVolumeVsTime({ T_C: 25, V0_cm3: 61.5, FN2_sccm: 35 });
- * // then animate the liquid height using V_cm3 as a function of t_min.
+ * // To reproduce worksheet timing use the worksheet N2 molar flow and a shorter tMax:
+ * // const { t_min, V_cm3 } = computeVolumeVsTime({ T_C: 25, V0_cm3: 61.5, useWorksheetFN2: true, tMax_min: 120 });
+ * // To simulate down to near depletion (ignoring the 20% VLE validity limit), disable the 20% stop and extend tMax:
+ * // const { t_min, V_cm3 } = computeVolumeVsTime({ T_C: 25, V0_cm3: 61.5, FN2_sccm: 35, stopAt20pct: false, tMax_min: 800 });
  */
