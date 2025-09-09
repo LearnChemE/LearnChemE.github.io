@@ -1,4 +1,4 @@
-import { GetElement, insertClipPath, svgNS, vec2 } from "../ts/helpers";
+import { GetElement, insertClipPath, svgNS } from "../ts/helpers";
 import { FirstOrder } from "./Setpoint";
 import { Signal } from "./Signal";
 
