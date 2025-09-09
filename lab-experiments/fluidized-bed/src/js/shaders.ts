@@ -202,7 +202,7 @@ void fluidized() {
   // Restoring force to keep particles near their homes
   vec2 dif = rest - aPos;
   float dist2 = dif.x*dif.x + dif.y*dif.y;
-  dif *= dist2 * 10000.0;
+  dif = (dist2 > 1.0) ? dif * 10000.0 : dif * dist2 * 10000.0;
   accel += dif;
 
   // With verlet integration, velocity already accounts for timestep

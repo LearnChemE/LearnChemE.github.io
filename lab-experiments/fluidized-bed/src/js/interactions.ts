@@ -1,7 +1,7 @@
 import { ValveSetting, vec2 } from "../types";
 import { resetBeakers } from "./animation";
 import { updateCanvasPosition } from "./canvas";
-import { constrain, rescale, smoothLerp } from "./helpers";
+import { constrain, logscale, rescale, smoothLerp } from "./helpers";
 import State from "./state";
 
 /* ********************** */
@@ -55,9 +55,12 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
         valve1.setAttribute("transform", `rotate(${v1Angle} 129 83)`);
 
         // Set state after a time delay
-        setTimeout(() => {
-            if (State.pumpIsRunning) State.valveLift = rescale(v1Angle, 90, 0, 0.0, 1, true);
-        }, 350);
+        // setTimeout(() => {
+            if (State.pumpIsRunning) {
+                State.valveLift = logscale(1-v1Angle/90, 100);
+                console.log(State.valveLift)
+            }
+        // }, 350);
     };
     const release = () => {
         document.removeEventListener("mousemove", drag);
@@ -70,7 +73,7 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
 
 // Set initial
 valve1.setAttribute("transform", `rotate(${v1Angle} 129 83)`);
-State.valveLift = rescale(v1Angle, 90, 0, 0.0, 1, true);
+State.valveLift = 0;
 
 /*
  *  Interaction for valve 2
