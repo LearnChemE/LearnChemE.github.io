@@ -1,4 +1,4 @@
-import { GetElement, insertClipPath, svgNS } from "../ts/helpers";
+import { GetElement, insertClipPath, svgNS, vec2 } from "../ts/helpers";
 import { FirstOrder } from "./Setpoint";
 import { Signal } from "./Signal";
 
@@ -53,6 +53,8 @@ export class Evaporator {
     private height: FirstOrder;
     private dims: [x: number, y: number, w: number, h: number];
 
+    private bubbleGroup: SVGGElement;
+
     private flowIn: number;
     private mantleIsOn: boolean;
 
@@ -88,13 +90,17 @@ export class Evaporator {
             }
         });
 
-        this.dims = [bbox.x, bbox.y, bbox.width/1440, bbox.height/400/3];
+        // Bubbles init
+        this.bubbleGroup = GetElement<SVGGElement>("evapBubbles");
+
+        this.dims = [bbox.x, bbox.y, bbox.width, bbox.height];
         this.wave = generateWaveSVG(clip);
         this.animate();
     }
 
     private animate = () => {
         let prevtime: number | null = null;
+        let bubbleTimer = 0;
 
         const frame = (time: number) => {
             if (prevtime === null) prevtime = time;
@@ -105,10 +111,51 @@ export class Evaporator {
             this.height.set(target);
             const dy = (this.flowIn !== 0 || this.mantleIsOn) ? this.height.iterate(deltaTime) : this.height.get();
             const [x, y, w, h] = this.dims;
-            setWaveTransform(this.wave, x, y + dy, w, h);
+            setWaveTransform(this.wave, x, y + dy, w/1440, h/1200);
+
+            if (this.mantleIsOn) {
+                bubbleTimer -= deltaTime;
+                if (bubbleTimer <= 0) {
+                    bubbleTimer += 200;
+                    const c = document.createElementNS(svgNS, "circle");
+                    c.setAttribute("stroke", "#FFFFFF");
+                    c.setAttribute("r","2.5");
+                    c.setAttribute("cx",`${4 + this.dims[0] + Math.random() * (this.dims[2]-8)}`);
+                    c.setAttribute("cy",`${this.dims[1] + this.dims[3] - 30}`);
+                    this.bubbleGroup.appendChild(c);
+                }
+            }
+            this.animateBubbles(deltaTime);
 
             requestAnimationFrame(frame);
         }
+
         requestAnimationFrame(frame);
+    }
+
+    private animateBubbles = (deltaTime: number) => {
+        const vel = -25;
+        const top = this.height.get() + this.dims[1] + 10;
+        const dt = Math.min(deltaTime / 1000, 300);
+        const nodes = this.bubbleGroup.childNodes;
+        for (const child of nodes) {
+            if (child.nodeName !== "circle") continue;
+            const bubble = child as SVGCircleElement; 
+
+            const y = Number(bubble.getAttribute("cy")!);
+            const x = Number(bubble.getAttribute("cx")!);
+            const dy = vel * dt;
+            var s;
+            if (y+dy < top) {
+                bubble.remove();
+                continue;
+            }
+            else if ((s = y+dy - top) <= 5) {
+                bubble.setAttribute("opacity",`${s / 5}`);
+            }
+
+            bubble.setAttribute("cy",`${y+dy}`);
+            bubble.setAttribute("cx",`${x + 12 * Math.cos((y+dy)/2) * dt}`);
+        }
     }
 }

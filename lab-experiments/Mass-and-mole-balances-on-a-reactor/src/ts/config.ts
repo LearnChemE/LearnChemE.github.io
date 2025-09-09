@@ -1,6 +1,4 @@
-import type { FirstOrder } from "../classes/Setpoint";
-import type { TubeDescriptor } from "../classes/Tube";
-import type { DigitalLabelDescriptor, SetpointControlDescriptor } from "../types";
+import type { DigitalLabelDescriptor } from "../types";
 
 
 const DigitalLabelFill = "#F9F155";

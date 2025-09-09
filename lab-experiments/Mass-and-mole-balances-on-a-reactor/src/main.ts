@@ -67,7 +67,7 @@ const pumpDescriptor: PoweredControllerDescriptor<FirstOrder> = {
   restingSetpoint: -0.5,
   powerSignal: pumpPower,
   setpointSignal: pumpLift,
-  control: new FirstOrder(0, 200, 0, 120)
+  control: new FirstOrder(0, 200, 0, 12)
 };
 const pump = new PoweredController<FirstOrder>(pumpDescriptor);
 
