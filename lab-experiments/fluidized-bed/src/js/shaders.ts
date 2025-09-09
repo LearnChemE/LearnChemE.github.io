@@ -197,9 +197,13 @@ void fluidized() {
   accel += 5.0 * vec2(sin(-4.0*pi*perlin), cos(-8.0*pi*perlin));
   // Add some gravity
   accel.y -= .0001;
-  // Restoring force to keep particles near their homes
   accel *= speedMod*speedMod;
-  accel += 100.0 * (rest - aPos);
+  
+  // Restoring force to keep particles near their homes
+  vec2 dif = rest - aPos;
+  float dist2 = dif.x*dif.x + dif.y*dif.y;
+  dif *= dist2 * 10000.0;
+  accel += dif;
 
   // With verlet integration, velocity already accounts for timestep
   vec2 vel = aPos - aPrev;
