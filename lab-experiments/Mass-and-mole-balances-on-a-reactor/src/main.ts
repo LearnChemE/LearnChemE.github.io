@@ -2,7 +2,7 @@ import 'bootstrap'
 import 'bootstrap/scss/bootstrap.scss'
 
 import './style.css'
-import { enableWindowResize, initHamburgerMenu, initSvgDrag, initSvgZoom, insertSVG } from './ts/helpers';
+import { enableWindowResize, GetElement, initHamburgerMenu, initSvgDrag, initSvgZoom, insertSVG } from './ts/helpers';
 import worksheet from './media/massMoleBalancesWorksheet.pdf';
 import svg from './media/canvas.svg?raw';
 import { FirstOrder } from './classes/Setpoint';
@@ -67,12 +67,12 @@ const pumpDescriptor: PoweredControllerDescriptor<FirstOrder> = {
   restingSetpoint: -0.5,
   powerSignal: pumpPower,
   setpointSignal: pumpLift,
-  control: new FirstOrder(0, 200, 0, 12)
+  control: new FirstOrder(0, 200, 0, 120)
 };
 const pump = new PoweredController<FirstOrder>(pumpDescriptor);
 
 // Inlet tubes
-const tubeDescriptor: TubeDescriptor = {
+export const tubeDescriptor: TubeDescriptor = {
   pathId: "inTubeFill",
   inFlowSignal: pump.output,
   crossArea: 5e-4,
@@ -130,7 +130,20 @@ const inBeakerDescriptor: BeakerDescriptor = {
   maxVolume: 600,
   flowOutInstead: true
 };
-new Beaker(inBeakerDescriptor);
+const inBeaker = new Beaker(inBeakerDescriptor);
+
+// In Beaker is under
+inBeaker.overflow.subscribe(() => {
+  if (pumpPower.get() === true) {
+    const e = GetElement("pumpSwitch");
+    e.dispatchEvent(new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+      view: window
+    }));
+    e.style.pointerEvents = "none";
+  }
+});
 
 // Out liquid
 new Waterfall("outLiquid", liqSignal);
@@ -143,7 +156,15 @@ const outBeakerDescriptor: BeakerDescriptor = {
   maxVolume: 600,
   flowOutInstead: false
 };
-new Beaker(outBeakerDescriptor);
+const outBeaker = new Beaker(outBeakerDescriptor);
+
+// Reset beakers
+GetElement("reset-btn").addEventListener("click", () => {
+  inBeaker.reset(600);
+  outBeaker.reset(0);
+  const e = GetElement("pumpSwitch");
+  e.style.pointerEvents = "auto";
+});
 
 // Bubble Meter
 initBubbleMeter("bulbDefault", "bulbSqueeze", vapSignal);

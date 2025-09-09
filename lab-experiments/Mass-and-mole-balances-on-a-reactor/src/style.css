@@ -24,6 +24,12 @@ svg {
   dominant-baseline: middle;
 }
 
+#reset-btn {
+  display: grid;
+  margin: auto;
+  margin-top: .25em;
+}
+
 .svg-btn {
   cursor: pointer;
 }

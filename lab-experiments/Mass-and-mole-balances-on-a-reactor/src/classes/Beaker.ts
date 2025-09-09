@@ -69,4 +69,9 @@ export class Beaker {
         }
         requestAnimationFrame(frame);
     }
+
+    public reset = (val: number) => {
+        this.volume = val;
+        this.render();
+    }
 }

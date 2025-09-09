@@ -23,22 +23,11 @@ export class PoweredController<T extends ControlType> {
         this.ctrl = descriptor.control;
         
         // Subscribe to signals
-        descriptor.powerSignal.subscribe((isOn: boolean) => {
-            this.power = isOn;
-            if (isOn) {
-                this.ctrl.setpoint = this.setpoint;
-            }
-            else {
-                this.ctrl.setpoint = this.resting;
-            }
-        });
+        descriptor.powerSignal.subscribe((on: boolean) => this.togglePower(on));
         descriptor.setpointSignal.subscribe((sp: number) => {
             this.setpoint = sp;
             if (this.power) {
                 this.ctrl.setpoint = this.setpoint;
-            }
-            else {
-                this.ctrl.setpoint = this.resting;
             }
         });
 
@@ -51,6 +40,16 @@ export class PoweredController<T extends ControlType> {
         // Start the animation loop
         this.animate();
     } 
+
+    public togglePower = (on: boolean) => {
+            this.power = on;
+            if (on) {
+                this.ctrl.setpoint = this.setpoint;
+            }
+            else {
+                this.ctrl.setpoint = this.resting;
+            }
+    }
 
     private animate = () => {
         let prevtime: number | null = null;

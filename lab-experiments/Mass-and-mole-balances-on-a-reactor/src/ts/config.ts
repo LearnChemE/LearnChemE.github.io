@@ -1,4 +1,5 @@
 import type { FirstOrder } from "../classes/Setpoint";
+import type { TubeDescriptor } from "../classes/Tube";
 import type { DigitalLabelDescriptor, SetpointControlDescriptor } from "../types";
 
 
@@ -17,15 +18,4 @@ export const furnaceSPLabelDescriptor: DigitalLabelDescriptor = {
     overflowString: "HOT",
     underflowString: ""
   }
-};
-
-export const furnaceSPDescriptor: SetpointControlDescriptor<FirstOrder> = {
-  ctrl: null,
-  upBtnId: "furnaceUpBtn",
-  downBtnId: "furnaceDownBtn",
-  spLabel: null,
-  outLabel: null,
-  min: 100,
-  max: 500,
-  step: 5
 };

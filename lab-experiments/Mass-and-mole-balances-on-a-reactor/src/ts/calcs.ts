@@ -52,12 +52,12 @@ type ArrhenniusConstants = {
 }
 
 const rxn1: ArrhenniusConstants = {
-    k0: 50,
-    ea: 2000
+    k0: 100,
+    ea: 4000
 }
 const rxn2: ArrhenniusConstants = {
-    k0: 5000,
-    ea: 3800
+    k0: 7000,
+    ea: 7000
 }
 
 function arrhennius(cs: ArrhenniusConstants, T: number) {
@@ -90,7 +90,7 @@ function calcAll(flow: number, temp: number): ProductStream {
     const conc_propene  = -rxn * k1 / (k1 + k2);
     const conc_propanal = -rxn - conc_propene;
     const c_tot = conc_propanol + 2 * conc_propene + 2 * conc_propanal; // M
-    console.log(`Concentrations:\n  ${conc_propanol} M propanol\n  ${conc_propene} M propene\n  ${conc_propanal} M propanal`)
+    // console.log(`Concentrations:\n  ${conc_propanol} M propanol\n  ${conc_propene} M propene\n  ${conc_propanal} M propanal`)
 
     // Put in terms of moles
     const n_out = c_tot * Qvap; // mol / s
@@ -100,8 +100,8 @@ function calcAll(flow: number, temp: number): ProductStream {
     // Finally, convert to volumetric flowrates
     const liq = m_liq / RHO;
     const vap = n_vap * R * 298 / P;
-    console.log(`Inlet flow: ${flow} mL/s @ ${temp} C\n  Liq: ${liq} mL/s\n  Vap: ${vap} mL/s`);
-    console.log(`In: ${ndot_feed}\nOut: ${n_out}`)
+    // console.log(`Inlet flow: ${flow} mL/s @ ${temp} C\n  Liq: ${liq} mL/s\n  Vap: ${vap} mL/s`);
+    // console.log(`In: ${ndot_feed}\nOut: ${n_out}`)
 
     return { liquidFlowrate: liq, gasFlowrate: vap };
 }
