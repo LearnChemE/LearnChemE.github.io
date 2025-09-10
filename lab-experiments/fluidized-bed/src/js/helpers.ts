@@ -58,6 +58,22 @@ export function rescale(x: number, a: number, b: number, c: number, d: number, c
 }
 
 /**
+ * Rescale x from scale of a to b to scale of c to d
+ * 6th argument optionally sets whether to constrain to bounds
+ * @param x number to be rescaled
+ * @param a min of original scale
+ * @param b max of original scale
+ * @param c min of new scale
+ * @param d max of new scale
+ * @param constrain sets whether to constrain new number to bounds of c and d (default false)
+ * @returns Number with new scale
+ */
+export function logscale(x: number, r: number) {
+    if (x === 0) return 0;
+    return r ** (x - 1);
+}
+
+/**
  * Smoothly interpolate from start to end over a given duration (in milliseconds)
  * @param duration Duration of animation
  * @param updateCallback Callback accepting interpolant to render animation

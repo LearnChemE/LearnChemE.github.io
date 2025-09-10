@@ -355,7 +355,7 @@ export async function fillCanvas() {
  * @param val New target bed height
  */
 export function setTargetBedHeight(val: number) {
-  // console.log(`Target height set to ${val}`)
+  console.trace(`Target height set to ${val}`)
   targetHeight = val;
 }
 

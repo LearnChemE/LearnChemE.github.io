@@ -1,7 +1,7 @@
 import { ValveSetting, vec2 } from "../types";
 import { resetBeakers } from "./animation";
 import { updateCanvasPosition } from "./canvas";
-import { constrain, rescale, smoothLerp } from "./helpers";
+import { constrain, logscale, rescale, smoothLerp } from "./helpers";
 import State from "./state";
 
 /* ********************** */
@@ -55,9 +55,12 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
         valve1.setAttribute("transform", `rotate(${v1Angle} 129 83)`);
 
         // Set state after a time delay
-        setTimeout(() => {
-            if (State.pumpIsRunning) State.valveLift = rescale(v1Angle, 90, 0, 0.0, 1, true);
-        }, 350);
+        // setTimeout(() => {
+            if (State.pumpIsRunning) {
+                State.valveLift = logscale(1-v1Angle/90, 100);
+                console.log(State.valveLift)
+            }
+        // }, 350);
     };
     const release = () => {
         document.removeEventListener("mousemove", drag);
@@ -70,7 +73,7 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
 
 // Set initial
 valve1.setAttribute("transform", `rotate(${v1Angle} 129 83)`);
-State.valveLift = rescale(v1Angle, 90, 0, 0.0, 1, true);
+State.valveLift = 0;
 
 /*
  *  Interaction for valve 2
@@ -232,6 +235,8 @@ export function enableSvgZoom() {
 }
 
 var mousedown = false;
+var viewX = 0;
+var viewY = 0;
 export function enableSvgDrag() {
     // Get the svg context
     const wrapper = document.getElementById("apparatus-wrapper");
@@ -258,8 +263,8 @@ export function enableSvgDrag() {
             .map(Number);
         const dx = ((prevX - e.clientX) * width) / svg.clientWidth;
         const dy = ((prevY - e.clientY) * height) / svg.clientHeight;
-        let viewX = Math.max(0, x + dx);
-        let viewY = Math.max(0, y + dy);
+        viewX = Math.max(0, x + dx);
+        viewY = Math.max(0, y + dy);
         let viewWidth = Math.min(viewState.maxViewBox[2], width);
         let viewHeight = Math.min(viewState.maxViewBox[3], height);
         if (viewX + viewWidth >= viewState.maxViewBox[2]) {
@@ -284,6 +289,104 @@ export function enableSvgDrag() {
     });
 }
 
+//
+// ------------- Add Magnifier ----------------
+//
+const SVGNS = "https://www.w3.org/2000/svg";
+
+function addMagnifierLens(svg: SVGSVGElement) {
+    const defs = document.createElementNS(SVGNS,"defs");
+
+    // Create the lens
+    const lens = document.createElementNS(SVGNS, "circle");
+    lens.setAttribute("id","magnifier-lens");
+    lens.setAttribute("r","100");
+    lens.setAttribute("cx","200");
+    lens.setAttribute("cy","200");
+    lens.setAttribute("stroke","#000000");
+    lens.setAttribute("strokeWidth","2");
+
+    // Put the lens in a clippath
+    const clip = document.createElementNS(SVGNS, "clipPath");
+    clip.setAttribute("id","magnifier-clip");
+    clip.appendChild(lens);
+
+    // Nest the clippath
+    defs.appendChild(clip);
+    svg.appendChild(defs);
+
+    return lens;
+}
+
+function addMagnifierUse(svg: SVGSVGElement) {
+    const g = document.createElementNS(SVGNS, "g");
+    g.setAttribute("id", "magnifier");
+    // g.setAttribute("clip-path","url(#magnifier-clip)");
+
+    const use = document.createElementNS(SVGNS, "use") as unknown as SVGUseElement;
+    use.setAttribute("id","magnifier-use");
+    use.setAttribute("href","#content");
+    use.setAttribute("x","10");
+    use.setAttribute("y","10");
+    use.setAttribute("fill","red");
+    
+    // g.appendChild(use);
+    // svg.setAttribute("xmlns:xlink","http://www.w3.org/1999/xlink");
+    svg.appendChild(use);
+    return use;
+}
+
+export function addMagnifier() {
+    const svg = document.querySelector("svg");
+    const lens = document.getElementById("magnifier-circle");
+    const outline = document.getElementById("lens-outline");
+    const use = document.getElementById("magnifier-use");
+    const bounds = document.getElementById("magnify-bounds");
+
+    const textbounds = document.getElementById("text") as unknown as SVGGElement;
+    console.log(textbounds.getBBox());
+    // textbounds.addEventListener("mouseenter", ()=>console.log("entering"));
+    // textbounds.addEventListener("mouseleave", ()=>console.log("exiting"));
+
+    const moveMagnify = (evt: MouseEvent) => {
+        const pt = svg.createSVGPoint();
+        pt.x = evt.clientX;
+        pt.y = evt.clientY;
+        const cursor = pt.matrixTransform(svg.getScreenCTM()?.inverse());
+
+        // Move circle with cursor
+        lens.setAttribute("cx", String(cursor.x));
+        lens.setAttribute("cy", String(cursor.y));
+        outline.setAttribute("cx", String(cursor.x));
+        outline.setAttribute("cy", String(cursor.y));
+
+        // Combined transform: pan+zoom from main viewport,
+        // plus magnifier zoom around cursor.
+        const zoom = 2.5;
+        const tx = cursor.x //* (1 - magZoom);
+        const ty = cursor.y //* (1 - magZoom);
+        use.setAttribute(
+        "transform",
+        `translate(${tx}, ${ty}) scale(${zoom /* magZoom*/}) translate(${-tx}, ${-ty})`
+        );
+    };
+
+    lens.setAttribute("r","0");
+    outline.setAttribute("r","0");
+
+    bounds.addEventListener("mouseenter", () => {
+        lens.setAttribute("r","40");
+        outline.setAttribute("r","40");
+        svg.addEventListener("mousemove", moveMagnify);
+    });
+    bounds.addEventListener("mouseleave", () => {
+        lens.setAttribute("r","0");
+        outline.setAttribute("r","0");
+        svg.removeEventListener("mousemove", moveMagnify);
+    });
+}
+
 enableSvgZoom();
 enableSvgDrag();
 updateCanvasPosition();
+addMagnifier();

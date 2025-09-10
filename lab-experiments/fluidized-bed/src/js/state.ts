@@ -26,7 +26,7 @@ function insertSVG(svg: string): HTMLDivElement {
 }
 
 // Create div containing svg
-const svg = require("../media/Fluidized-bed Graphics.svg");
+const svg = require("../media/Fluidized-bed-graphics.svg");
 state.apparatusDiv = insertSVG(svg) as unknown as SVGAElement;
 
 // Find parent and append svg div
@@ -56,7 +56,7 @@ const stateProxy = new Proxy(state, {
 
         if (prop === 'apparatusDiv') {
             // This shouldn't ever happen
-            console.warn(`Apparatus Div Changed Externally: ${value}`);
+            console.trace(`Apparatus Div Changed Externally: ${value}`);
         }
         else if (prop === 'valveSetting') {
             // Valve 2 pressed

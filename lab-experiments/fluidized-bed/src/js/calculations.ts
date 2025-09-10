@@ -107,7 +107,7 @@ export function pressureDrop(lift?: number, returnHeight=false) {
         const dx = sup_vel - 6.5;
         const dy = dx * 15.0;
         // console.log('Repacked regime');
-        if (!dbMode) setTargetBedHeight(14.5 + 4*dx);
+        if (!dbMode && State.pumpIsRunning) setTargetBedHeight(14.5 + 4*dx);
         if (returnHeight) return 14.5 + 5*dx;
         return 4.3 + dy; 
     }

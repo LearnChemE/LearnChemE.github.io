@@ -222,9 +222,8 @@ export class Manometer {
         // Calculate height in pixels
         const base = this.baseElement.getBBox().y; // fill line of beaker
         // Add pump pressure. Sign should be negative because y pixels go down, and multiply by 5 pixels per cm water
-        const pump = 1.95 * pumpPressure(); // pixels water
-        const drop = 1.95 * pressureDrop(); // pixels water
-        console.log(pumpPressure())
+        const pump = 5 * pumpPressure(); // pixels water
+        const drop = 5 * pressureDrop(); // pixels water
         
         var left = base - pump - drop;
         var right = base - pump;
