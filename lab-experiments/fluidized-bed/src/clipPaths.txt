@@ -30,3 +30,15 @@ g.style = {
     "-webkit-clip-path" : "url(#bend7-clip)",
     "clip-path" : "url(#bend7-clip)"
 }
+
+Magnifier:
+<defs>
+<clipPath id="magnifier-clip">
+<circle id="magnifier-circle" r="40" cx="0" cy="0"></circle>
+</clipPath>
+</defs>
+<g id="magnifier" clip-path="url(#magnifier-clip)">
+<use id="magnifier-use" href="#content" z-index="4"/>
+</g>
+<circle id="lens-outline" r="40" cx="0" cy="0" stroke="black"/>
+<rect id="magnify-bounds" x="19" y="24" width="28" height="92" fill="red" opacity="0"/>
