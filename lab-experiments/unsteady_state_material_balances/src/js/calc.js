@@ -1,22 +1,3 @@
-/**
- * Unsteady-state liquid volume vs time for a bubbler with an equimolar
- * n-pentane / n-hexane liquid and N2 carrier gas.
- *
- * Model assumptions (from worksheet):
- * - Vapor–liquid equilibrium; ideal solution; Raoult's law.
- * - Total pressure ~ 1.0 bar; three operating temperatures: 15, 20, 25 °C.
- * - N2 enters at a fixed standard volumetric flow (sccm) and does not accumulate.
- * - Initial liquid is 50/50 molar (n-pentane / n-hexane).
- * - Stop when liquid volume falls to 20% of the initial value (VLE breaks down below this).
- *
- * Notes:
- * - The worksheet states 35 sccm N2; it also shows a conversion to 0.0156 mol/min.
- *   If you want to reproduce the worksheet numerically, set `useWorksheetFN2` to true to use 0.0156 mol/min.
- *   Otherwise we convert sccm → mol/min using 24,465 cm^3/mol (approx at 25 °C): mol/min = sccm / 24465.
- *
- * Returns arrays of time (minutes) and total liquid volume (cm^3).
- */
-
 // === Physical constants (at ~20–25 °C) ===
 const MW = { // g/mol
   pentane: 72.151,
@@ -24,26 +5,74 @@ const MW = { // g/mol
 };
 
 const rho = { // g/cm^3 (liquid)
-  // Representative values near room temperature
   pentane: 0.626, // ~20 °C
   hexane: 0.659,  // ~25 °C
 };
 
 const P_TOTAL_BAR = 1.0;
 
-// Saturation pressures (bar) for the three allowed temperatures.
-// Representative values consistent with engineering handbooks.
-// If needed, you can swap this table for an Antoine calculator later.
+// (Kept) Representative saturation pressures for quick checks or if useAntoine=false
 const PSAT_BAR = {
   15: { pentane: 0.33, hexane: 0.12 },
   20: { pentane: 0.42, hexane: 0.16 },
   25: { pentane: 0.57, hexane: 0.20 },
 };
 
+// === NEW: Antoine coefficients from NIST (log10(P[bar]) = A - B/(T[K] + C)) ===
+const ANTOINE = {
+  pentane: [
+    // Valid 268.8–341.37 K  (≈ -4.35 to 68.2 °C)
+    { A: 3.9892,  B: 1070.617, C: -40.454, TminK: 268.8,  TmaxK: 341.37 },
+  ],
+  hexane: [
+    // Choose the range that covers room temperature
+    { A: 4.00266, B: 1171.53,  C: -48.784, TminK: 286.18, TmaxK: 342.69 },
+    // Low-T range (not used for 15–25 °C but kept for robustness)
+    { A: 3.45604, B: 1044.038, C: -53.893, TminK: 177.70, TmaxK: 264.93 },
+  ],
+};
+
 /** Convert N2 flow from sccm to mol/min (approx, 25 °C). */
 function sccmToMolPerMin(sccm) {
   const CM3_PER_MOL = 24465; // cm^3/mol at ~25 °C, 1 bar
   return sccm / CM3_PER_MOL;
+}
+
+/**
+ * NEW: P_sat (bar) via Antoine (NIST). T_C in °C.
+ * Falls back to nearest valid set if T is slightly outside all ranges.
+ */
+function psatBarFromAntoine(species, T_C) {
+  const sets = ANTOINE[species];
+  if (!sets) throw new Error(`Unknown species for Antoine: ${species}`);
+  const T_K = T_C + 273.15;
+
+  // Prefer a set whose range contains T_K
+  let chosen = sets.find(s => T_K >= s.TminK && T_K <= s.TmaxK);
+  if (!chosen) {
+    // Fallback: pick the set with the smallest distance to its valid range
+    chosen = sets.reduce((best, s) => {
+      const dist = T_K < s.TminK ? (s.TminK - T_K) : (T_K > s.TmaxK ? (T_K - s.TmaxK) : 0);
+      return (!best || dist < best.dist) ? { set: s, dist } : best;
+    }, null).set;
+  }
+  const { A, B, C } = chosen;
+  const log10P = A - (B / (T_K + C));
+  return Math.pow(10, log10P);
+}
+
+/** NEW: get {pentane, hexane} psat (bar) from either Antoine or the fixed table */
+function getPsatBar(T_C, useAntoine) {
+  if (useAntoine) {
+    return {
+      pentane: psatBarFromAntoine('pentane', T_C),
+      hexane:  psatBarFromAntoine('hexane',  T_C),
+    };
+  }
+  if (!(T_C in PSAT_BAR)) {
+    throw new Error(`T_C must be one of ${Object.keys(PSAT_BAR).join(', ')} °C when useAntoine=false. Received: ${T_C}`);
+  }
+  return PSAT_BAR[T_C];
 }
 
 /**
@@ -59,11 +88,11 @@ function initialMolesFromVolumeEquimolar(V0_cm3) {
 }
 
 /**
- * Single Euler step for the mole balances.
+ * (Updated signature) Single Euler step for the mole balances.
+ * Pass in psat (bar) object {pentane, hexane} to avoid recomputing every step.
  * dN_i/dt = -F_i,out, where F_i = FN2 * (x_i * P_i^sat) / P_N2
  */
-function stepMoles({ Npent, Nhex }, dt_min, T_C, FN2_mol_min) {
-  const ps = PSAT_BAR[T_C];
+function stepMoles({ Npent, Nhex }, dt_min, ps, FN2_mol_min) {
   const Ntot = Math.max(Npent + Nhex, 1e-12);
   const xPent = Npent / Ntot;
   const xHex  = 1 - xPent;
@@ -93,13 +122,14 @@ function volumeFromMoles({ Npent, Nhex }) {
  * Compute volume–time curve until volume reaches 20% of initial (or tMax).
  *
  * @param {Object} opts
- * @param {number} opts.T_C          Temperature in °C (allowed: 15, 20, 25)
- * @param {number} [opts.V0_cm3=61.5] Initial total liquid volume (cm^3)
- * @param {number} [opts.FN2_sccm=35]  N2 flow (standard cm^3/min)
+ * @param {number} opts.T_C                  Temperature in °C (e.g., 15, 20, 25). With useAntoine=true you may use other T within Antoine ranges.
+ * @param {number} [opts.V0_cm3=61.5]        Initial total liquid volume (cm^3)
+ * @param {number} [opts.FN2_sccm=35]        N2 flow (standard cm^3/min)
  * @param {boolean}[opts.useWorksheetFN2=false] Use 0.0156 mol/min as in worksheet
- * @param {boolean}[opts.stopAt20pct=true]  If true, stop integration once V falls to 20% of initial
- * @param {number} [opts.dt_s=0.5]     Integrator time step (seconds)
- * @param {number} [opts.tMax_min=240] Hard cap on runtime (minutes)
+ * @param {boolean}[opts.useAntoine=true]    If true, compute P_sat(T) from Antoine; else use PSAT_BAR table
+ * @param {boolean}[opts.stopAt20pct=true]   Stop once V ≤ 20% of initial
+ * @param {number} [opts.dt_s=0.5]           Integrator time step (seconds)
+ * @param {number} [opts.tMax_min=240]       Hard cap on runtime (minutes)
  * @returns {{t_min:number[], V_cm3:number[], states: {Npent:number, Nhex:number}[]}}
  */
 export function computeVolumeVsTime(opts) {
@@ -108,14 +138,14 @@ export function computeVolumeVsTime(opts) {
     V0_cm3 = 61.5,
     FN2_sccm = 35,
     useWorksheetFN2 = false,
+    useAntoine = true,
     stopAt20pct = true,
     dt_s = 0.5,
     tMax_min = 240,
   } = opts || {};
 
-  if (!(T_C in PSAT_BAR)) {
-    throw new Error(`T_C must be one of 15, 20, 25 °C. Received: ${T_C}`);
-  }
+  // Precompute P_sat at this temperature (bar)
+  const ps = getPsatBar(T_C, useAntoine);
 
   // Convert flow to mol/min
   const FN2_mol_min = useWorksheetFN2 ? 0.0156 : sccmToMolPerMin(FN2_sccm);
@@ -133,7 +163,7 @@ export function computeVolumeVsTime(opts) {
   let t = 0;
   while (t < tMax_min) {
     // advance one step
-    const next = stepMoles(state, dt_min, T_C, FN2_mol_min);
+    const next = stepMoles(state, dt_min, ps, FN2_mol_min);
     t += dt_min;
 
     // compute new volume
@@ -165,19 +195,3 @@ export function volumeAtTime(T_C, t_query_min, opts = {}) {
   }
   return V_cm3[idx];
 }
-
-// Optional: attach to window for quick manual testing in the browser console
-// if (typeof window !== 'undefined') {
-//   window.computeVolumeVsTime = computeVolumeVsTime;
-//   window.volumeAtTime = volumeAtTime;
-// }
-
-/**
- * Example usage in your UI code:
- *
- * const { t_min, V_cm3 } = computeVolumeVsTime({ T_C: 25, V0_cm3: 61.5, FN2_sccm: 35 });
- * // To reproduce worksheet timing use the worksheet N2 molar flow and a shorter tMax:
- * // const { t_min, V_cm3 } = computeVolumeVsTime({ T_C: 25, V0_cm3: 61.5, useWorksheetFN2: true, tMax_min: 120 });
- * // To simulate down to near depletion (ignoring the 20% VLE validity limit), disable the 20% stop and extend tMax:
- * // const { t_min, V_cm3 } = computeVolumeVsTime({ T_C: 25, V0_cm3: 61.5, FN2_sccm: 35, stopAt20pct: false, tMax_min: 800 });
- */

@@ -1,6 +1,9 @@
 import * as config from './config.js';
 import { computeVolumeVsTime, volumeAtTime } from './calc.js';
 
+// Simulation time scale: 1 second real time = 10 seconds simulated
+const TIME_SCALE = 10;
+
 let valve = null;
 let verticalValveOpen = false;
 let gasValveOpen = false;
@@ -14,6 +17,69 @@ let elapsedSeconds = 0; // track elapsed time for gas flow
 // let outletBubbleTimer = null;   // interval handle for outlet bubbles
 // let outletBubbleLayer = null;   // SVG group to hold outlet bubbles
 let readout = null; // temperature display text element
+let switchGroup = null; // heater ON/OFF switch group
+let ventIndicator = null; // red arrow + 'vent' label at leftPipe3 outlet
+let ventMarker = null; // marker for arrowhead (red)
+let ventLabel = null; // text label for vent indicator
+// Create or hide a red east-pointing arrow with 'vent' text at end of leftPipe3
+function updateVentIndicator(draw, show) {
+  // Create or hide a red east-pointing arrow with 'vent' text at end of leftPipe3
+  if (!window.leftPipe3 || !window.leftPipe3.node || typeof window.leftPipe3.node.getTotalLength !== 'function') {
+    // If the pipe isn't ready, remove any indicator and return
+    if (ventIndicator) { ventIndicator.remove(); ventIndicator = null; }
+    return;
+  }
+
+  const totalLen = window.leftPipe3.node.getTotalLength();
+  const pt = window.leftPipe3.node.getPointAtLength(totalLen);
+
+  if (!show) {
+    if (ventIndicator) { ventIndicator.hide(); }
+    if (ventLabel) { ventLabel.hide(); }
+    return;
+  }
+
+  // Ensure the indicator exists
+  if (!ventIndicator) {
+    ventIndicator = draw.group();
+
+    // Create (or reuse) a marker for the arrowhead
+    if (!ventMarker) {
+      ventMarker = draw.marker(6, 6, function(add) {
+        add.path('M0,0 L0,6 L6,3 Z').fill('#ff0000');
+      });
+      // Tip reference at the marker bounds and auto‑orientation
+      ventMarker.ref(6, 3).orient('auto');
+    }
+
+    // A single red line pointing east with an arrowhead at the end
+    ventIndicator.line(0, 0, 25, 0)
+      .stroke({ color: '#ff0000', width: 1.6 })
+      .marker('end', ventMarker);
+
+    // Text label exactly aligned with the arrow line baseline, starting just after the arrow tip
+    ventLabel = draw.text('vent')
+      .font({ family: 'Arial', size: 12})
+      .fill('#ff0000');
+    // Align the text vertically to the line and anchor from the left
+    ventLabel.attr({ 'text-anchor': 'start', 'dominant-baseline': 'middle', 'alignment-baseline': 'middle' });
+    // Place the label so its vertical middle sits on y=0 and its left edge starts after the arrow tip
+    ventLabel.move(770, 47.5);
+
+    // Ensure it doesn't block clicks on other UI elements
+    ventIndicator.attr({ 'pointer-events': 'none' });
+  }
+
+  // Position the group at the outlet point with a small offset so it sits just outside the pipe
+  // The path ends at the outlet heading east, so offset a few pixels to the right.
+  ventIndicator.show();
+  ventLabel.show();
+  ventIndicator.move(pt.x + 8, pt.y - 0);
+
+  // Keep it above animated strokes
+  if (typeof ventIndicator.front === 'function') ventIndicator.front();
+}
+
 
 // Save the SVG.js context so other functions can reuse it
 export function drawFigure(svg) {
@@ -28,7 +94,7 @@ export function drawFigure(svg) {
   createVerticalValve(svg, 122.5, 250);
   drawPipes(svg);
   // Liquid column with vent, scale, temp controller, colored liquid and clear bubbles
-  const switchGroup = drawSwitch(svg, 750, 200, 80, 40);
+  switchGroup = drawSwitch(svg, 750, 200, 80, 40);
   container = drawLiquidColumnWithVent(svg, 500, 80, switchGroup); // pass switch to control heaters & bubbles
   valve = drawValve(svg, 580, 450).rotate(90);
   gasFlowRateDevice = addSVGImage(svg, 'assets/gasFlowRateDevice.svg', 90, 145, 160, 120);
@@ -412,6 +478,10 @@ function drawGasCylinder(draw, x, y, label) {
           add.stop(1, '#0000ff');
         });
       }
+
+      // Expose heater helpers on the container group
+      g.updateHeaterHeat = updateHeaterHeat;
+      g.applyOffGradient = applyOffGradient;
       
       // --- Side heaters (left & right) and draggable temperature pointer on right ---
       const heaterW = 20;
@@ -538,7 +608,7 @@ function drawGasCylinder(draw, x, y, label) {
       switchGroup.click(() => {
         isOn = !isOn;
         switchGroup.isOn = isOn;
-        if (isOn) {
+        if (switchGroup.isOn) {
           // reactorIsOpen = true;
           handle.animate(200).rotate(40, x + width / 2, y + height / 2);
           readout.text(currentTemp + '°C');
@@ -749,7 +819,7 @@ function drawGasCylinder(draw, x, y, label) {
       }
     }
     
-    function animateBubbleFlow(draw) {
+function animateBubbleFlow(draw) {
       // const emit = (pipeEl) => {
       //   if (!pipeEl || !pipeEl.node || typeof pipeEl.node.getTotalLength !== 'function') return;
         
@@ -810,21 +880,23 @@ function drawGasCylinder(draw, x, y, label) {
       //   }
       // };
       
-      if (gasValveOpen && verticalValveOpen && isHeaterOn) {
-        // Keep the existing flow highlight along the pipe to the outlet
-        [window.leftPipe3].forEach(pipeEl => {
-          if (pipeEl) {
-            animateWaterFlow(draw, pipeEl, 0, 100, '#9dd2ff', 8, 0.3, 'bubble');
-            // emit(pipeEl);
-          }
-        });
-      } else {
-        // remove any animated flow strokes tagged for bubbles
-        draw.find('path')
-        .filter(el => el.attr('data-pipe-side') === 'bubble')
-        .forEach(el => el.remove());
-        // stopEmit();
+  if (gasValveOpen && verticalValveOpen && isHeaterOn) {
+    // Keep the existing flow highlight along the pipe to the outlet
+    [window.leftPipe3].forEach(pipeEl => {
+      if (pipeEl) {
+        animateWaterFlow(draw, pipeEl, 0, 100, '#9dd2ff', 8, 0.3, 'bubble');
+        // emit(pipeEl);
       }
+    });
+    updateVentIndicator(draw, true);
+  } else {
+    // remove any animated flow strokes tagged for bubbles
+    draw.find('path')
+    .filter(el => el.attr('data-pipe-side') === 'bubble')
+    .forEach(el => el.remove());
+    // stopEmit();
+    updateVentIndicator(draw, false);
+  }
     }
     
     
@@ -873,9 +945,13 @@ function drawGasCylinder(draw, x, y, label) {
       timerId = setInterval(() => {
         // Calculate mass rate [g/s] and update elapsed time
         if (gasValveOpen && verticalValveOpen && isHeaterOn) {
-          elapsedSeconds += (interval / 1000);
+          // Advance simulated time at TIME_SCALE × real time
+          const realDeltaSec = interval / 1000;
+          const simDeltaSec = realDeltaSec * TIME_SCALE;
+          elapsedSeconds += simDeltaSec;
           // Increment accumulated mass
-          const volume = volumeAtTime(temp, elapsedSeconds * 1000 / 60)
+          const simulatedMinutes = elapsedSeconds / 60; // seconds → minutes
+          const volume = volumeAtTime(temp, simulatedMinutes, { useWorksheetFN2: true, useAntoine: true });
           console.log(volume, elapsedSeconds);
           const TANK_H = 300;
           const WALL = 6;
@@ -886,9 +962,28 @@ function drawGasCylinder(draw, x, y, label) {
             container.liquid.height(liquidH);
             container.liquid.y(liquidY - 5);
           }
-          // console.log(
-          //   `Time: ${elapsedSeconds.toFixed(1)} s — Rate: ${rate.toFixed(5)} g/s — Accumulated: ${accumulatedMass.toFixed(5)} g`
-          // );
+
+          if (volume <= 0.2 * 61.5) {
+            if (isHeaterOn) {
+              isHeaterOn = false;
+              switchGroup.clear();
+              switchGroup = drawSwitch(draw, 750, 200, 80, 40);
+              readout.hide();
+              if (container && typeof container.applyOffGradient === 'function') {
+                container.applyOffGradient();
+              }
+              // stopBubbles();
+              clearInterval(timerId);
+              animateBubbleFlow(draw);
+            }
+            if (gasValveOpen) {
+              gasValveOpen = false;
+              if (valve) { valve.isRotated = false; }
+              valve.animate(300).rotate(-90, 580, 450);
+              animateGasFlow(draw);
+              animateBubbleFlow(draw);
+            }
+          }
         }
         // Log formatted output
       }, interval);
@@ -921,6 +1016,10 @@ export function reset(draw) {
       })
       .forEach(el => el.remove());
   }
+  // Remove vent indicator so a fresh run recreates it
+  if (ventIndicator) { ventIndicator.remove(); ventIndicator = null; }
+  ventMarker = null;
+  ventLabel = null;
 
   // 4) Reset core state flags (do not null DOM refs so handlers keep working)
   verticalValveOpen = false;
