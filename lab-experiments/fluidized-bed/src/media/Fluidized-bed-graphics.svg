@@ -1,5 +1,5 @@
 <svg width="241" height="178" viewBox="0 0 241 178" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="Fluidized-bed Graphics">
+<g id="content">
 <rect width="241" height="178" fill="white"/>
 <g id="Tube Fill">
 <g id="tubes-upper">
@@ -853,4 +853,14 @@
 <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_15_243" result="shape"/>
 </filter>
 </defs>
+<defs>
+<clipPath id="magnifier-clip">
+<circle id="magnifier-circle" r="40" cx="0" cy="0"></circle>
+</clipPath>
+</defs>
+<g id="magnifier" clip-path="url(#magnifier-clip)">
+<use id="magnifier-use" href="#content"/>
+</g>
+<circle id="lens-outline" r="40" cx="0" cy="0" stroke="black"/>
+<rect id="magnify-bounds" x="19" y="24" width="36" height="92" fill="red" opacity="0"/>
 </svg>

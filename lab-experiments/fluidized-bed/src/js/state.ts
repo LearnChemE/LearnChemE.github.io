@@ -26,7 +26,7 @@ function insertSVG(svg: string): HTMLDivElement {
 }
 
 // Create div containing svg
-const svg = require("../media/Fluidized-bed Graphics.svg");
+const svg = require("../media/Fluidized-bed-graphics.svg");
 state.apparatusDiv = insertSVG(svg) as unknown as SVGAElement;
 
 // Find parent and append svg div
