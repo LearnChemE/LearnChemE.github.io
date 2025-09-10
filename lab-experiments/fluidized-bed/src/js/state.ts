@@ -56,7 +56,7 @@ const stateProxy = new Proxy(state, {
 
         if (prop === 'apparatusDiv') {
             // This shouldn't ever happen
-            console.warn(`Apparatus Div Changed Externally: ${value}`);
+            console.trace(`Apparatus Div Changed Externally: ${value}`);
         }
         else if (prop === 'valveSetting') {
             // Valve 2 pressed

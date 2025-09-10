@@ -131,23 +131,26 @@ export class BeakerHolder {
             const deltaTime = time - prevTime;
             prevTime = time;
 
+            // Only request another frame if you are still in catch and weigh
+            if (this.beakerL.getVolume() <= 80) {
+                // Stop the pumps if the water level is lower than the pump
+                const pumpBtn = document.getElementById("pump-btn");
+                State.pumpIsRunning = false;
+                pumpBtn.className = "btn btn-secondary disabled";
+                pumpBtn.innerHTML = "start pump";
+                State.valveLift = 0;
+                const removeDisable = () => pumpBtn.classList.remove("disabled");
+                document.getElementById("reset-btn").addEventListener("click", removeDisable);
+            }
+
             // Set flowrate
-            let flowrate = State.valveLift * PUMP_FLOWRATE_GAIN * deltaTime / 1000;
+            let flowrate = State.pumpIsRunning ? State.valveLift * PUMP_FLOWRATE_GAIN * deltaTime / 1000 : 0;
             this.beakerL.addVolume(-flowrate);
             this.beakerR.addVolume( flowrate);
             this.callback?.();
 
             // console.log(this.beakerL.getVolume())
 
-            // Only request another frame if you are still in catch and weigh
-            if (this.beakerL.getVolume() <= 80) {
-                // Stop the pumps if the water level is lower than the pump
-                const pumpBtn = document.getElementById("pump-btn");
-                // State.pumpIsRunning = false;
-                pumpBtn.className = "btn btn-secondary";
-                pumpBtn.innerHTML = "start pump";
-                State.valveLift = 0;
-            }
 
             // Only request another frame if you are still in catch and weigh
             if (this.state === CATCH_WEIGH) {

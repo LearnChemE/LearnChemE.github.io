@@ -862,5 +862,5 @@
 <use id="magnifier-use" href="#content"/>
 </g>
 <circle id="lens-outline" r="40" cx="0" cy="0" stroke="black"/>
-<rect id="magnify-bounds" x="19" y="24" width="36" height="92" fill="red" opacity="0"/>
+<rect id="magnify-bounds" x="19" y="24" width="28" height="92" fill="red" opacity="0"/>
 </svg>

@@ -390,25 +390,3 @@ enableSvgZoom();
 enableSvgDrag();
 updateCanvasPosition();
 addMagnifier();
-
-// <svg id="mysvg" width="600" height="400" style="border:1px solid black">
-//   <defs>
-//     <clipPath id="magnifier-clip">
-//       <circle id="magnifier-circle" r="60" cx="0" cy="0"></circle>
-//     </clipPath>
-//   </defs>
-
-//   <!-- Main content wrapper, subject to pan+zoom -->
-//   <g id="viewport">
-//     <g id="content">
-//       <!-- your actual drawings -->
-//       <circle cx="100" cy="100" r="40" fill="tomato" />
-//       <rect x="200" y="80" width="100" height="60" fill="skyblue" />
-//     </g>
-//   </g>
-
-//   <!-- Magnifier group (not affected by #viewport transforms) -->
-//   <g id="magnifier" clip-path="url(#magnifier-clip)">
-//     <use id="magnifier-use" href="#content" />
-//   </g>
-// </svg>
