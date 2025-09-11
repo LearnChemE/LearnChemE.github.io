@@ -58,7 +58,6 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
         // setTimeout(() => {
             if (State.pumpIsRunning) {
                 State.valveLift = logscale(1-v1Angle/90, 100);
-                console.log(State.valveLift)
             }
         // }, 350);
     };

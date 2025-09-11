@@ -20,4 +20,3 @@ const apparatus = insertSVG(svg) as unknown as SVGAElement;
 // Find wrapper and append svg div
 const wrapper = document.getElementById("graphics-wrapper");
 wrapper.appendChild(apparatus);
-console.log("svg created");

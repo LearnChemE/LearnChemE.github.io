@@ -58,7 +58,6 @@ const NUM_PARTICLES = 1024;
 // Initialize canvas
 // Grab canvas element
 const cnv = document.getElementById("cnv") as HTMLCanvasElement;
-console.log(cnv)
 // Request a WebGL2 context
 const gl = cnv.getContext("webgl2");
 // Get the magnifyer copy
@@ -370,7 +369,6 @@ export async function fillCanvas() {
  * @param val New target bed height
  */
 export function setTargetBedHeight(val: number) {
-  console.trace(`Target height set to ${val}`)
   targetHeight = val;
 }
 
