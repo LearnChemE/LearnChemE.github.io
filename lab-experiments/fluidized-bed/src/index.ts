@@ -10,8 +10,8 @@ document
 // Scripts
 import "./js/init";
 import "./js/state";
-import "./js/calculations.ts";
-import "./js/interactions.ts";
+import "./js/calculations";
+import "./js/interactions";
 import "./js/canvas";
 
 declare const __DEV__: boolean;
