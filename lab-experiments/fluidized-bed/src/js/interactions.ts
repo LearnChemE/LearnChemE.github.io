@@ -294,59 +294,13 @@ export function enableSvgDrag() {
 //
 const SVGNS = "https://www.w3.org/2000/svg";
 
-function addMagnifierLens(svg: SVGSVGElement) {
-    const defs = document.createElementNS(SVGNS,"defs");
-
-    // Create the lens
-    const lens = document.createElementNS(SVGNS, "circle");
-    lens.setAttribute("id","magnifier-lens");
-    lens.setAttribute("r","100");
-    lens.setAttribute("cx","200");
-    lens.setAttribute("cy","200");
-    lens.setAttribute("stroke","#000000");
-    lens.setAttribute("strokeWidth","2");
-
-    // Put the lens in a clippath
-    const clip = document.createElementNS(SVGNS, "clipPath");
-    clip.setAttribute("id","magnifier-clip");
-    clip.appendChild(lens);
-
-    // Nest the clippath
-    defs.appendChild(clip);
-    svg.appendChild(defs);
-
-    return lens;
-}
-
-function addMagnifierUse(svg: SVGSVGElement) {
-    const g = document.createElementNS(SVGNS, "g");
-    g.setAttribute("id", "magnifier");
-    // g.setAttribute("clip-path","url(#magnifier-clip)");
-
-    const use = document.createElementNS(SVGNS, "use") as unknown as SVGUseElement;
-    use.setAttribute("id","magnifier-use");
-    use.setAttribute("href","#content");
-    use.setAttribute("x","10");
-    use.setAttribute("y","10");
-    use.setAttribute("fill","red");
-    
-    // g.appendChild(use);
-    // svg.setAttribute("xmlns:xlink","http://www.w3.org/1999/xlink");
-    svg.appendChild(use);
-    return use;
-}
-
 export function addMagnifier() {
     const svg = document.querySelector("svg");
     const lens = document.getElementById("magnifier-circle");
     const outline = document.getElementById("lens-outline");
     const use = document.getElementById("magnifier-use");
     const bounds = document.getElementById("magnify-bounds");
-
-    const textbounds = document.getElementById("text") as unknown as SVGGElement;
-    console.log(textbounds.getBBox());
-    // textbounds.addEventListener("mouseenter", ()=>console.log("entering"));
-    // textbounds.addEventListener("mouseleave", ()=>console.log("exiting"));
+    const bounds2 = document.getElementById("magnify-bounds2");
 
     const moveMagnify = (evt: MouseEvent) => {
         const pt = svg.createSVGPoint();
@@ -363,26 +317,37 @@ export function addMagnifier() {
         // Combined transform: pan+zoom from main viewport,
         // plus magnifier zoom around cursor.
         const zoom = 2.5;
-        const tx = cursor.x //* (1 - magZoom);
-        const ty = cursor.y //* (1 - magZoom);
-        use.setAttribute(
+        const tx = cursor.x;
+        const ty = cursor.y;
+        use.parentElement.setAttribute(
         "transform",
-        `translate(${tx}, ${ty}) scale(${zoom /* magZoom*/}) translate(${-tx}, ${-ty})`
+        `translate(${tx}, ${ty}) scale(${zoom}) translate(${-tx}, ${-ty})`
         );
     };
+    svg.addEventListener("mousemove", moveMagnify);
 
     lens.setAttribute("r","0");
     outline.setAttribute("r","0");
 
+    // Show lens
     bounds.addEventListener("mouseenter", () => {
-        lens.setAttribute("r","40");
+        lens.setAttribute("r",`${40/2.5}`);
         outline.setAttribute("r","40");
-        svg.addEventListener("mousemove", moveMagnify);
     });
+    // Hide lens
     bounds.addEventListener("mouseleave", () => {
         lens.setAttribute("r","0");
         outline.setAttribute("r","0");
-        svg.removeEventListener("mousemove", moveMagnify);
+    });
+    // Show lens
+    bounds2.addEventListener("mouseenter", () => {
+        lens.setAttribute("r",`${40/2.5}`);
+        outline.setAttribute("r","40");
+    });
+    // Hide lens
+    bounds2.addEventListener("mouseleave", () => {
+        lens.setAttribute("r","0");
+        outline.setAttribute("r","0");
     });
 }
 
