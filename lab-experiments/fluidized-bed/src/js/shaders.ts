@@ -118,7 +118,8 @@ const int TOT_PARTICLES = 1024;
 const float MIN_HEIGHT = 5.0;
 const float MAX_HEIGHT = 14.5;
 const float HEIGHT_DIF = MAX_HEIGHT - MIN_HEIGHT;
-float pi = 22.0/7.0;
+const float MIN_HEIGHT_ABS = 0.59;
+const float pi = 22.0/7.0;
 
 float hash(float x, int seed) {
   // Convert integer seed to float and combine with input
@@ -150,13 +151,13 @@ int CalcState() {
 float maxHeight() {
   // Remap from (MIN_HEIGHT, MAX_HEIGHT) to (-0.6,+1.0)
   float t = (height - MIN_HEIGHT) / HEIGHT_DIF;
-  float clipHeight = 1.6 * t - 0.6;
+  float clipHeight = (2.0 - MIN_HEIGHT_ABS) * t - (1.0 - MIN_HEIGHT_ABS);
   // Height cannot be higher than fill
   clipHeight = min(clipHeight, fill);
   // If repacking is happening, height cannot be higher than that
-  clipHeight = min(clipHeight, 1.0 - repacked * .4);
+  clipHeight = min(clipHeight, 1.0 - repacked * MIN_HEIGHT_ABS);
   // Height cannot be lower than minimum
-  clipHeight = max(clipHeight, -0.6);
+  clipHeight = max(clipHeight, MIN_HEIGHT_ABS - 1.0);
 
   return clipHeight;
 }
@@ -165,7 +166,7 @@ float minHeight() {
   if (height < 14.5 || repacked == 0.0) return -1.0;
   
   // Determine the height minus space filled at the top
-  float h = 2.0 - repacked * .4;
+  float h = 2.0 - repacked * MIN_HEIGHT_ABS;
   return repacked * h - 1.0;
 }
 
@@ -232,14 +233,13 @@ void pack(int direction) {
   // Use vertex ID to get relative height
   float rel_height = float(gl_VertexID) / float(TOT_PARTICLES);
   // Multiply by the total height to get the height of the particle
-  float abs_height = rel_height * 0.4;
+  float abs_height = rel_height * MIN_HEIGHT_ABS;
   // Now use the direction to put in the real location
   float abs_y;
   if (direction == -1) {
-    // abs_y = 1.4 - abs_height - 0.4 * repacked;
     abs_y = 1.0 - abs_height;
   } else {
-    abs_y = -abs_height - 0.6;
+    abs_y = -abs_height - (1.0 - MIN_HEIGHT_ABS);
   }
   float abs_x = hash(.77, gl_VertexID) * 2.0 - 1.0;
 
