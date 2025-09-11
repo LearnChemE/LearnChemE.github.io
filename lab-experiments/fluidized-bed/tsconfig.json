@@ -1,10 +1,10 @@
 {
     "compilerOptions": {
         "target": "ESNext",
-        "module": "esnext",
+        "module": "node16",
         "outDir": "./dist",
         "allowJs": true,
         "noImplicitAny": true,
-        "moduleResolution": "node"
+        "moduleResolution": "node16"
     }
 }

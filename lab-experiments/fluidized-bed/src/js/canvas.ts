@@ -61,6 +61,14 @@ const cnv = document.getElementById("cnv") as HTMLCanvasElement;
 console.log(cnv)
 // Request a WebGL2 context
 const gl = cnv.getContext("webgl2");
+// Get the magnifyer copy
+const cpy = document.getElementById("cnv-cpy") as HTMLCanvasElement;
+const cpyctx = cpy.getContext("2d");
+
+// Scale up the copy's resolution to scale
+const MAG_RES_MULTIPLIER = 8;
+cpy.width *= MAG_RES_MULTIPLIER;
+cpy.height *= MAG_RES_MULTIPLIER;
 
 // Initialize variables
 var asp = window.innerHeight / window.innerWidth;
@@ -271,6 +279,11 @@ function display() {
   gl.flush();
 }
 
+function displayMagCopy() {
+  cpyctx.clearRect(0,0,cpy.width,cpy.height);
+  cpyctx.drawImage(cnv, 0, 0, cnv.width, cnv.height, 0, 0, 9 * MAG_RES_MULTIPLIER, 64 * MAG_RES_MULTIPLIER);
+}
+
 /**
  * Sets the uniform buffers time to be tracked
  * @param time Current time, passed from animation frame
@@ -287,6 +300,7 @@ function mainLoop(time: number) {
   setTime(time);
   updateState();
   display();
+  displayMagCopy();
   requestAnimationFrame(mainLoop);
 }
 
@@ -370,6 +384,10 @@ export function updateCanvasPosition() {
   
   // Set new coordinates of webgl canvas
   cnv.setAttribute("style", `
+width   : ${bbox.width}px;
+height  : ${bbox.height}px;
+  `);
+  cpy.setAttribute("style", `
 width   : ${bbox.width}px;
 height  : ${bbox.height}px;
   `);

@@ -886,6 +886,9 @@
 
 <g id="magnifier" clip-path="url(#magnifier-clip)">
 <use id="magnifier-use" href="#content" z-index="4"/>
+<foreignObject x="74" y="58" width="9" height="64">
+<canvas id="cnv-cpy" xmlns="http://www.w3.org/1999/xhtml" width="9" height="64"></canvas>
+</foreignObject>
 </g>
 
 <circle id="lens-outline" r="40" cx="0" cy="0" stroke="black"/>
