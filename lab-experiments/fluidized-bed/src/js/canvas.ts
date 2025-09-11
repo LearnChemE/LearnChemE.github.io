@@ -1,5 +1,5 @@
 import { VertexAttribute } from "../types";
-import { constrain, CreateShader, CreateTexture, CreateUBO, CreateVao, SetUBO } from "./helpers";
+import { CreateShader, CreateTexture, CreateUBO, CreateVao, SetUBO } from "./helpers";
 import { bgFragSrc, bgVertSrc, dummyFragSrc, particleRenderFragSrc, particleRenderVertSrc, particleUpdateVertSrc, repackedVertSrc } from "./shaders";
 import State from "./state";
 import noise from "../media/noiseTexture.png";
@@ -58,6 +58,7 @@ const NUM_PARTICLES = 1024;
 // Initialize canvas
 // Grab canvas element
 const cnv = document.getElementById("cnv") as HTMLCanvasElement;
+console.log(cnv)
 // Request a WebGL2 context
 const gl = cnv.getContext("webgl2");
 
@@ -365,14 +366,10 @@ export function setTargetBedHeight(val: number) {
 export function updateCanvasPosition() {
   const tube = document.getElementById("Rectangle 5") as unknown as SVGAElement;
   const wrapper = document.getElementById("graphics-wrapper").getClientRects()[0];
-  const bbox = tube.getBoundingClientRect();
+  const bbox = tube.getBBox();
   
   // Set new coordinates of webgl canvas
   cnv.setAttribute("style", `
-position: absolute;
-z-index : 1;
-left    : ${bbox.left - wrapper.left}px;
-top     : ${bbox.top - wrapper.top}px;
 width   : ${bbox.width}px;
 height  : ${bbox.height}px;
   `);

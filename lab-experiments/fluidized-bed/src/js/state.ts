@@ -1,38 +1,20 @@
-import { GlobalState, ValveSetting } from "../types";
+import { GlobalState, ValveSetting } from "../types/globals";
 import { beginTubeFillAnimation, initAnimationObjects, onLiftChange, swapValveAnimation } from "./animation";
 
 /* ************************* */
 /* ** Create State Object ** */
 /* ************************* */
 
+
 // Create the variable
 const state: GlobalState = {
-    apparatusDiv: undefined,
+    apparatusDiv: document.getElementById("apparatus-wrapper") as unknown as SVGAElement,
     valveSetting: ValveSetting.RecycleMode,
     initialFill: false,
     pumpIsRunning: false,
     valveLift: 1,
     valve2isDisabled: false,
 }
-
-// Insert an svg image 
-function insertSVG(svg: string): HTMLDivElement {
-    const div = document.createElement("div");
-  
-    // Set basic attributes
-    div.id = "apparatus-wrapper";
-    div.innerHTML = svg;
-    return div;
-}
-
-// Create div containing svg
-const svg = require("../media/Fluidized-bed-graphics.svg");
-state.apparatusDiv = insertSVG(svg) as unknown as SVGAElement;
-
-// Find parent and append svg div
-const parent = document.getElementById("graphics-wrapper");
-parent.appendChild(state.apparatusDiv);
-
 
 /* ************************************** */
 /* ** Create classes utilized by proxy ** */

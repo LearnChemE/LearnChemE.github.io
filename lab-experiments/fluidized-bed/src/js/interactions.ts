@@ -342,6 +342,7 @@ export function addMagnifier() {
     const outline = document.getElementById("lens-outline");
     const use = document.getElementById("magnifier-use");
     const bounds = document.getElementById("magnify-bounds");
+    const bounds2 = document.getElementById("magnify-bounds2");
 
     const textbounds = document.getElementById("text") as unknown as SVGGElement;
     console.log(textbounds.getBBox());
@@ -370,19 +371,32 @@ export function addMagnifier() {
         `translate(${tx}, ${ty}) scale(${zoom /* magZoom*/}) translate(${-tx}, ${-ty})`
         );
     };
+    svg.addEventListener("mousemove", moveMagnify);
 
     lens.setAttribute("r","0");
     outline.setAttribute("r","0");
 
+    // Show lens
     bounds.addEventListener("mouseenter", () => {
         lens.setAttribute("r","40");
         outline.setAttribute("r","40");
-        svg.addEventListener("mousemove", moveMagnify);
     });
+    // Hide lens
     bounds.addEventListener("mouseleave", () => {
         lens.setAttribute("r","0");
         outline.setAttribute("r","0");
-        svg.removeEventListener("mousemove", moveMagnify);
+        // svg.removeEventListener("mousemove", moveMagnify);
+    });
+    // Show lens
+    bounds2.addEventListener("mouseenter", () => {
+        lens.setAttribute("r","40");
+        outline.setAttribute("r","40");
+    });
+    // Hide lens
+    bounds2.addEventListener("mouseleave", () => {
+        lens.setAttribute("r","0");
+        outline.setAttribute("r","0");
+        // svg.removeEventListener("mousemove", moveMagnify);
     });
 }
 

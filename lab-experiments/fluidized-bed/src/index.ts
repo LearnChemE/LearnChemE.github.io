@@ -8,6 +8,7 @@ document
   .setAttribute("href", require("./media/fluidizedBedWorksheet.pdf"));
 
 // Scripts
+import "./js/init";
 import "./js/state";
 import "./js/calculations.ts";
 import "./js/interactions.ts";
@@ -16,5 +17,5 @@ import "./js/canvas";
 declare const __DEV__: boolean;
 // Debug
 if (__DEV__) {
-  require("./debug.ts");
+  // require("./debug.ts");
 }
