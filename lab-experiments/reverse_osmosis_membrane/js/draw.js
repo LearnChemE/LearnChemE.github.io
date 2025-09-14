@@ -20,6 +20,7 @@ let zoomMax = 6;
 let containerDims = [1280, 600];
 let isMouseInside;
 let pressurizeGaugeCountTimer = 0;
+let pressureHeight = 0;
 
 //preload for loading images and fonts
 window.preload = function () {
@@ -210,7 +211,7 @@ window.draw = function () {
     state.doneDrainingTank = true;
   }
 
-  if (state.doneDrainingTank == true) {
+  if (state.doneDrainingTank == true && state.tankToPumpDrainTimer == 70) {
     state.pumpOn = false;
   }
   if (state.doneDrainingTank === true && state.tankToPumpDrainTimer < 50) {
@@ -727,30 +728,33 @@ function drawPressureGauge(x, y) {
   pop();
 
   //--------------------Gauge Needle--------------------
-
+  console.log("pressure gauge timer: " + pressurizeGaugeCountTimer);
   fill("black");
   noStroke();
+
   if (state.pumpOn == false) {
-    pressurizeGaugeCountTimer -= (state.feedPressure ^ 2) / 80;
-    if (pressurizeGaugeCountTimer < 0) {
-      pressurizeGaugeCountTimer = 0;
+    pressureHeight -= 0.2;
+    pressurizeGaugeCountTimer = 0;
+    if (pressureHeight <= 0.0) {
+      pressureHeight = 0;
     }
     triangle(
-      35 * cos(-((270 * pressurizeGaugeCountTimer) / 40) - 135),
-      -35 * sin(-((270 * pressurizeGaugeCountTimer) / 40) - 135),
-      15 * cos(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 - 17),
-      -15 * sin(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 - 17),
-      15 * cos(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 + 17),
-      -15 * sin(-((270 * pressurizeGaugeCountTimer) / 40) - 135 + 180 + 17)
+      35 * cos(-((270 * pressureHeight) / 40) - 135),
+      -35 * sin(-((270 * pressureHeight) / 40) - 135),
+      15 * cos(-((270 * pressureHeight) / 40) - 135 + 180 - 17),
+      -15 * sin(-((270 * pressureHeight) / 40) - 135 + 180 - 17),
+      15 * cos(-((270 * pressureHeight) / 40) - 135 + 180 + 17),
+      -15 * sin(-((270 * pressureHeight) / 40) - 135 + 180 + 17)
     );
   } else if (state.pumpOn == true && pressurizeGaugeCountTimer < state.feedPressure) {
+    pressureHeight = state.feedPressure - state.feedPressure / Math.exp(pressurizeGaugeCountTimer);
     triangle(
-      35 * cos(-((270 * (state.feedPressure - state.feedPressure / Math.exp(pressurizeGaugeCountTimer))) / 40) - 135),
-      -35 * sin(-((270 * (state.feedPressure - state.feedPressure / Math.exp(pressurizeGaugeCountTimer))) / 40) - 135),
-      15 * cos(-((270 * (state.feedPressure - state.feedPressure / Math.exp(pressurizeGaugeCountTimer))) / 40) - 135 + 180 - 17),
-      -15 * sin(-((270 * (state.feedPressure - state.feedPressure / Math.exp(pressurizeGaugeCountTimer))) / 40) - 135 + 180 - 17),
-      15 * cos(-((270 * (state.feedPressure - state.feedPressure / Math.exp(pressurizeGaugeCountTimer))) / 40) - 135 + 180 + 17),
-      -15 * sin(-((270 * (state.feedPressure - state.feedPressure / Math.exp(pressurizeGaugeCountTimer))) / 40) - 135 + 180 + 17)
+      35 * cos(-((270 * pressureHeight) / 40) - 135),
+      -35 * sin(-((270 * pressureHeight) / 40) - 135),
+      15 * cos(-((270 * pressureHeight) / 40) - 135 + 180 - 17),
+      -15 * sin(-((270 * pressureHeight) / 40) - 135 + 180 - 17),
+      15 * cos(-((270 * pressureHeight) / 40) - 135 + 180 + 17),
+      -15 * sin(-((270 * pressureHeight) / 40) - 135 + 180 + 17)
     );
     pressurizeGaugeCountTimer += 0.02;
   } else {
