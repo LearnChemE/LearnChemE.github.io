@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heating Water and Air in a Sealed Container</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Heating Water and Air in a Sealed Container</h1>
+            <p class="description">This simulation shows how water and air behave in a sealed container as temperature increases. Observe how water expands, pressure builds up, and gases dissolve differently at various temperatures.</p>
+        </header>
+        
+        <!-- Hamburger menu button -->
+        <button class="menu-btn" id="menuBtn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <!-- Menu items -->
+        <div class="menu-items" id="menuItems">
+            <button onclick="showModal('theoryModal')">Theory</button>
+            <button onclick="showModal('instructionsModal')">Instructions</button>
+            <button onclick="showModal('aboutModal')">About</button>
+        </div>
+        
+        <!-- Sliders section -->
+        <div class="sliders">
+            <div class="control-group">
+                <label for="volumeSlider">Initial Water Volume (L) at 25°C:</label>
+                <input type="range" id="volumeSlider" min="0.8" max="0.95" step="0.01" value="0.8">
+                <div class="value-display" id="volumeValue">0.80 L</div>
+            </div>
+            
+            <div class="control-group">
+                <label for="tempSlider">Temperature (°C):</label>
+                <input type="range" id="tempSlider" min="25" max="250" step="1" value="25">
+                <div class="value-display" id="tempValue">25°C</div>
+            </div>
+            
+            <div class="control-group">
+                <label>Pressure:</label>
+                <div class="value-display" id="pressureValue">1.0 bar</div>
+            </div>
+        </div>
+        
+        <!-- Visualization section -->
+        <div class="visualization-container">
+            <!-- Container visualization -->
+            <div class="container-vis-section">
+                <h2 class="chart-title">Sealed Container</h2>
+                <div class="container-wrapper">
+                    <div class="pressure-gauge" id="pressureGauge">1.0</div>
+                    <div class="container-vis" id="containerVis">
+                        <div class="water" id="water"></div>
+                        <div class="air" id="air"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gas chart -->
+            <div class="chart-section">
+                <h2 class="chart-title">Gas Composition</h2>
+                <div class="gas-chart" id="gasChart">
+                    <div class="bar-container">
+                        <div class="bar-label">Oxygen (O₂)</div>
+                        <div class="bar-set">
+                            <div class="bar bar-gas" id="o2GasBar" style="height: 40%;"></div>
+                            <div class="bar bar-dissolved" id="o2DissolvedBar" style="height: 20%;"></div>
+                        </div>
+                        <div class="bar-value" id="o2Value">Gas: 2.1 mmol<br>Dissolved: 0.5 mmol</div>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-label">Nitrogen (N₂)</div>
+                        <div class="bar-set">
+                            <div class="bar bar-gas" id="n2GasBar" style="height: 60%;"></div>
+                            <div class="bar bar-dissolved" id="n2DissolvedBar" style="height: 15%;"></div>
+                        </div>
+                        <div class="bar-value" id="n2Value">Gas: 7.9 mmol<br>Dissolved: 1.2 mmol</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #3498db;"></div>
+                <span>Liquid Water</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #9b59b6;"></div>
+                <span>Dissolved Gases</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #2ecc71;"></div>
+                <span>Gas Phase</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(to right, #3498db, #e74c3c);"></div>
+                <span>Temperature Indicator</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Theory Modal -->
+    <div class="modal" id="theoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Theory Behind the Simulation</h2>
+                <button class="close-btn" onclick="closeModal('theoryModal')">&times;</button>
+            </div>
+            <p>This simulation models the behavior of a sealed 1-L autoclave containing water and air. Key principles include:</p>
+            <ul>
+                <li><strong>Water expansion</strong> - Water expands as temperature increases, reducing the gas volume</li>
+                <li><strong>Ideal gas law</strong> - PV = nRT, gas pressure increases as volume decreases or temperature increases</li>
+                <li><strong>Henry's law</strong> - Gas solubility decreases with increasing temperature</li>
+                <li><strong>Antoine equation</strong> - Describes the relation between vapor pressure and temperature</li>
+                <li><strong>Raoult's law</strong> - The partial pressure of each gas contributes to the total pressure</li>
+            </ul>
+            <p>As temperature rises, water vapor pressure increases significantly, contributing to the total pressure in the container. At the same time, gases become less soluble in water, changing the distribution between dissolved and gas phases.</p>
+        </div>
+    </div>
+    
+    <!-- Instructions Modal -->
+    <div class="modal" id="instructionsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>How to Use This Simulation</h2>
+                <button class="close-btn" onclick="closeModal('instructionsModal')">&times;</button>
+            </div>
+            <ol>
+                <li>Adjust the <strong>initial water volume</strong> slider to set the starting water level at 25°C</li>
+                <li>Use the <strong>temperature slider</strong> to heat the container from 25°C to 250°C</li>
+                <li>Observe how the water expands and reduces the gas volume</li>
+                <li>Note the pressure increase shown on the gauge and in the display</li>
+                <li>Watch how gas dissolution changes with temperature in the bar chart</li>
+                <li>Try different initial water volumes to see how it affects the system</li>
+            </ol>
+            <p>At high temperatures, the pressure can become very high, demonstrating why safety measures are important in pressurized systems like autoclaves and pressure cookers.</p>
+        </div>
+    </div>
+    
+    <!-- About Modal -->
+    <div class="modal" id="aboutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>About This Simulation</h2>
+                <button class="close-btn" onclick="closeModal('aboutModal')">&times;</button>
+            </div>
+            <p>This interactive simulation demonstrates the thermodynamic principles governing the behavior of water and air in a sealed container as temperature changes.</p>
+            <p>The simulation is based on a Wolfram CDF demonstration originally created by Derek M. Machalek and Rachael L. Baumann.</p>
+            <p>Applications of this principle include:</p>
+            <ul>
+                <li>Autoclaves and sterilization equipment</li>
+                <li>Pressure cookers</li>
+                <li>Industrial reactors and closed systems</li>
+                <li>Understanding gas laws and thermodynamic principles</li>
+            </ul>
+            <p>The simulation simplifies the complex mathematical relationships to provide an intuitive understanding of the system behavior.</p>
+        </div>
+    </div>
+
+    <script src="./index.js"></script>
+</body>
+</html>
