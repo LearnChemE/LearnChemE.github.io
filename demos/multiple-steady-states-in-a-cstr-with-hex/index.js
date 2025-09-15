@@ -252,7 +252,7 @@ function solveODE(Ca0, T0, tau, tMax = 2000, step = 0.1) {
 
     const rhs = (t, y) => { return derivatives( y[0], y[1], tau); };
     
-    const sol = integrateRK45(rhs, [Ca0, T0], 0, tMax, {h: step, tol: 1e-2, hMin: step * 1e-5, hMax: step * 10});
+    const sol = integrateRK45(rhs, [Ca0, T0], 0, tMax, {h: step, tol: 1e-2, hMin: step * 1e-8, hMax: step * 10});
     
     const times = sol.ts;
     const Cas = [];
