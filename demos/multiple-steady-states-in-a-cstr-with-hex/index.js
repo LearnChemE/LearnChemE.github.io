@@ -389,7 +389,7 @@ function updatePlot(result) {
             layout = {
                 title: { text: 'phase plane: conversion vs temperature'},
                 xaxis: { title: {text:'temperature (K)'} },
-                yaxis: { title: {text:'conversion'} },
+                yaxis: { title: {text:'conversion'}, range: [0,1] },
                 showlegend: false
             };
 
@@ -490,7 +490,7 @@ function updatePlot(result) {
                 title: {text:'conversion vs time'},
                 dragMode: false,
                 xaxis: { title: {text:'time (min)'} },
-                yaxis: { title: {text:'conversion'} },
+                yaxis: { title: {text:'conversion'}, range: [0,1] },
                 showlegend: false
             };
             displayConcSlider(true);
