@@ -1,13 +1,4 @@
 
-// Constants
-const Cp = 4000;       // J/(kg·K)
-const UA = 3400;       // W/K
-const V = 10;          // m³
-const ΔH = -220000;    // J/mol (exothermic reaction)
-const R = 8.314;       // J/(mol·K)
-const Ea = 15000;      // Activation energy (J/mol)
-const k0 = 0.004;      // Pre-exponential factor (1/s)
-
 // Current state
 let currentView = 'phase1';
 let tau = 38;
@@ -30,6 +21,14 @@ const modals = document.querySelectorAll('.modal');
 const closeBtns = document.querySelectorAll('.close-btn');
 const Ca0ctrl = Ca0Slider.parentElement;
 
+// Constants
+const Ea = 15000;      // Activation energy (J/mol)
+const k0 = 0.004;      // Pre-exponential factor (1/s)
+const ΔH = -220000;    // J/mol (exothermic reaction)
+const Cp = 4000;       // J/(kg·K)
+const UA = 3400;       // W/K
+const V = 10;          // m³
+
 function displayConcSlider(show=true) {
     if (show) {
         Ca0ctrl.classList.remove("hidden");
@@ -38,23 +37,68 @@ function displayConcSlider(show=true) {
     }
 }
 
+// Track the webworker's jobs
+var currentJob = null;
+var pendingJob = null;
+
+// Send a job to the worker
+function sendJob(job) {
+    currentJob = job;
+    worker.postMessage(job);
+}
+
+// Enqueue a job
+function enqueueJob(job) {
+    if (!currentJob) {
+        sendJob(job);
+    }
+    else {
+        pendingJob = job;
+    }
+}
+
+// Request an update by sending a job to the webworker. Jobs are throttled such that pending jobs older than the last requested job are dropped.
+function requestUpdate() {
+    if (currentView === 'energy') {
+        updatePlot();
+    }
+    else {
+        enqueueJob({ Ca0, T0, tau, mode:currentView });
+    }
+}
+
+// Worker init
+const worker = new Worker("worker.js");
+worker.onmessage = (event) => {
+    const result = event.data // { times, Cas, Ts }[]
+    updatePlot(result);
+    
+    // Clear the current job; if there is a pending job, request it
+    currentJob = null;
+    if (pendingJob) {
+        const job = pendingJob;
+        pendingJob = null;
+        sendJob(job);
+    }
+}
+
 // Event listeners
 tauSlider.addEventListener('input', () => {
     tau = parseFloat(tauSlider.value);
     tauValue.textContent = tau;
-    updatePlot();
+    requestUpdate();
 });
 
 T0Slider.addEventListener('input', () => {
     T0 = parseFloat(T0Slider.value);
     T0Value.textContent = T0;
-    updatePlot();
+    requestUpdate();
 });
 
 Ca0Slider.addEventListener('input', () => {
     Ca0 = parseFloat(Ca0Slider.value);
     Ca0Value.textContent = Ca0.toFixed(1);
-    updatePlot();
+    requestUpdate();
 });
 
 viewButtons.forEach(button => {
@@ -62,7 +106,7 @@ viewButtons.forEach(button => {
         viewButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
         currentView = button.getAttribute('data-view');
-        updatePlot();
+        requestUpdate();
     });
 });
 
@@ -102,187 +146,6 @@ window.addEventListener('click', (e) => {
         }
     });
 });
-
-// Rate constant calculation
-function k(T) {
-    return k0 * Math.exp(-Ea * (1/T - 1/298));
-}
-
-// ODE system for the CSTR
-function derivatives(Ca, T, tau) {
-    const rate = (Ca > 0.01) ? k(T) * Ca : 0;
-    const dCadt = (2 - Ca) / tau - rate;
-    const dTdt = (UA/(V * Cp)) * (300 - T) + (298 - T)/tau - (ΔH/Cp) * rate;
-    return [ dCadt, dTdt ];
-}
-/**
- * Single adaptive Runge–Kutta–Fehlberg (RK45) step.
- *
- * @param {function(number, number|Array): number|Array} f - derivative f(t, y)
- * @param {number|Array} y   - current state
- * @param {number} t         - current time
- * @param {number} h         - current timestep
- * @returns {{
- *   yNext: number|Array,  // 5th order solution
- *   tNext: number,        // new time (t + h)
- *   error: number|Array   // estimate of local truncation error
- * }}
- */
-function rk45Step(f, y, t, h) {
-  const isArray = Array.isArray(y);
-
-  const add = (a, b) => isArray ? a.map((v, i) => v + b[i]) : a + b;
-  const addScaled = (a, b, s) => isArray ? a.map((v, i) => v + s * b[i]) : a + s * b;
-  const scale = (a, s) => isArray ? a.map(v => v * s) : a * s;
-
-  // Coefficients for Dormand–Prince RK45 (Butcher tableau)
-  const k1 = f(t, y);
-  const k2 = f(t + h * 1/4, addScaled(y, k1, h * 1/4));
-  const k3 = f(t + h * 3/8, addScaled(y, k1, h * 3/32, k2, h * 9/32));
-  const k4 = f(t + h * 12/13, addScaled(y, k1, h * 1932/2197, k2, h * -7200/2197, k3, h * 7296/2197));
-  const k5 = f(t + h, addScaled(y, k1, h * 439/216, k2, h * -8, k3, h * 3680/513, k4, h * -845/4104));
-  const k6 = f(t + h * 1/2, addScaled(y, k1, h * -8/27, k2, h * 2, k3, h * -3544/2565, k4, h * 1859/4104, k5, h * -11/40));
-
-  // 5th-order estimate
-  const y5 = addScaled(y, k1, h * 16/135,
-                          k3, h * 6656/12825,
-                          k4, h * 28561/56430,
-                          k5, h * -9/50,
-                          k6, h * 2/55);
-
-  // 4th-order estimate
-  const y4 = addScaled(y, k1, h * 25/216,
-                          k3, h * 1408/2565,
-                          k4, h * 2197/4104,
-                          k5, h * -1/5);
-
-  // Error estimate (difference between 4th and 5th order)
-  const error = isArray ? y5.map((v, i) => v - y4[i]) : y5 - y4;
-
-  return { yNext: y5, tNext: t + h, error };
-}
-
-/**
- * Utility: addScaled with multiple terms
- */
-function addScaled(base, ...pairs) {
-  const isArray = Array.isArray(base);
-  if (isArray) {
-    const result = base.slice();
-    for (let i = 0; i < pairs.length; i += 2) {
-      const vec = pairs[i];
-      const s = pairs[i + 1];
-      for (let j = 0; j < result.length; j++) {
-        result[j] += vec[j] * s;
-      }
-    }
-    return result;
-  } else {
-    let result = base;
-    for (let i = 0; i < pairs.length; i += 2) {
-      result += pairs[i] * pairs[i + 1];
-    }
-    return result;
-  }
-}
-
-/**
- * Adaptive RK45 integrator
- *
- * @param {function(number, number|Array): number|Array} f - derivative function f(t, y)
- * @param {number|Array} y0   - initial state
- * @param {number} t0         - start time
- * @param {number} tEnd       - end time
- * @param {object} opts       - options { h: initial step, tol: tolerance, hMin, hMax }
- * @returns {{ ts: Array<number>, ys: Array<number|Array>}} solution points
- */
-function integrateRK45(f, y0, t0, tEnd, opts = {}) {
-  let { h = 0.1, tol = 1e-6, hMin = 1e-6, hMax = 1.0 } = opts;
-
-  let t = t0;
-  let y = Array.isArray(y0) ? y0.slice() : y0;
-  const solution = { ts: [t], ys: [y] };
-
-  while (t < tEnd) {
-    if (t + h > tEnd) h = tEnd - t; // don’t overshoot
-
-    const { yNext, error } = rk45Step(f, y, t, h);
-
-    // compute error norm
-    const errNorm = Array.isArray(error)
-      ? Math.sqrt(error.reduce((s, e) => s + e * e, 0) / error.length)
-      : Math.abs(error);
-
-    // check if within tolerance
-    if (errNorm <= tol) {
-      // accept step
-      t += h;
-      y = yNext;
-      solution.ts.push(t);
-      solution.ys.push(y);
-
-      // adaptive step size update (safety factor 0.9)
-      const safety = 0.9;
-      const factor = safety * Math.pow(tol / (errNorm || 1e-16), 0.25);
-      h = Math.min(hMax, Math.max(hMin, h * factor));
-    } else {
-      // reject step → shrink h and retry
-      const safety = 0.9;
-      const factor = safety * Math.pow(tol / (errNorm || 1e-16), 0.25);
-      h = Math.max(hMin, h * Math.max(0.1, factor));
-      if (h <= hMin) {
-        // throw new Error("Step size underflow: cannot maintain tolerance.");
-        console.warn(`Step size underflow: cannot maintain tolerance.\nCa:${y[0]}\nT:${y[1]}\nt:${t}`);
-        // accept step anyways
-        t += h;
-        y = yNext;
-        solution.ts.push(t);
-        solution.ys.push(y);
-      }
-    }
-  }
-
-  return solution;
-}
-
-
-// Solve ODE using Euler's method
-function solveODE(Ca0, T0, tau, tMax = 2000, step = 0.1) {
-    let T = T0; // Number
-
-    const rhs = (t, y) => { return derivatives( y[0], y[1], tau); };
-    
-    const sol = integrateRK45(rhs, [Ca0, T0], 0, tMax, {h: step, tol: 1e-2, hMin: step * 1e-5, hMax: step * 10});
-    
-    const times = sol.ts;
-    const Cas = [];
-    const Ts  = [];
-    sol.ys.forEach(([Ca, T]) => { Cas.push(Ca); Ts.push(T); });
-    const Xas = Cas.map((ca) => 1 - ca / 2);
-    
-    return { times, Cas, Ts, Xas };
-}
-
-// Calculate Qg and Qr for energy plot
-function calculateEnergyData(tau) {
-    const Tmin = 300;
-    const Tmax = 500;
-    const TValues = [];
-    const QgValues = [];
-    const QrValues = [];
-    
-    for (let T = Tmin; T <= Tmax; T += 1) {
-        const k_val = k(T);
-        const Qg = (-k_val/(1 + k_val * tau)) * ΔH * 2 / 1000; // kJ/(m³·min)
-        const Qr = (Cp/tau * (T - 298) + (UA/V) * (T - 300)) / 1000; // kJ/(m³·min)
-        
-        TValues.push(T);
-        QgValues.push(Qg);
-        QrValues.push(Qr);
-    }
-    
-    return { TValues, QgValues, QrValues };
-}
 
 // Add arrow annotations to phase plane plots
 /**
@@ -338,6 +201,7 @@ function createArrowMarkers(trajectories, spacing = 100, firstArrowTime=spacing)
     
     return markers;
 }
+
 /**
  * Smooths a trajectory by treating x,y coordinates as complex numbers
  * and convolving with a moving average filter
@@ -414,19 +278,48 @@ function smoothComplexTrajectory(xArray, yArray, windowSize = 5) {
     };
 }
 
+// Rate constant calculation
+function k(T) {
+    return k0 * Math.exp(-Ea * (1/T - 1/298));
+}
+
+// Calculate Qg and Qr for energy plot
+function calculateEnergyData(tau) {
+    const Tmin = 300;
+    const Tmax = 500;
+    const TValues = [];
+    const QgValues = [];
+    const QrValues = [];
+    
+    for (let T = Tmin; T <= Tmax; T += 2) {
+        const k_val = k(T);
+        const Qg = (-k_val/(1 + k_val * tau)) * ΔH * 2 / 1000; // kJ/(m³·min)
+        const Qr = (Cp/tau * (T - 298) + (UA/V) * (T - 300)) / 1000; // kJ/(m³·min)
+        
+        TValues.push(T);
+        QgValues.push(Qg);
+        QrValues.push(Qr);
+    }
+    
+    return { TValues, QgValues, QrValues };
+}
+
 // Update the plot based on current view and parameters
-function updatePlot() {
-    let layout, data, annotations = [];
+/**
+ * 
+ * @param {Array<{ times: number[], Cas: number[], Ts: number[]}>} result 
+ */
+function updatePlot(result) {
+    let layout, data = [];
     
     switch(currentView) {
         case 'phase1':
             // Phase plane 1: Multiple initial concentrations
-            const initialConcentrations = [0.0, 0.5, 1.0, 1.5, 2.0];
             data = [];
             const trajectories = [];
             
-            initialConcentrations.forEach(Ca_init => {
-                const solution = solveODE(Ca_init, T0, tau);
+            result.forEach(solution => {
+                const Ca_init = solution.Cas[0];
                 const smoothed = smoothComplexTrajectory(solution.Ts, solution.Cas, 21);
                 const trace = {
                     x: smoothed.x,
@@ -479,8 +372,11 @@ function updatePlot() {
             
         case 'phase2':
             // Phase plane 2: Conversion vs Temperature for current initial conditions
-            const solution = solveODE(Ca0, T0, tau);
-            const smoothed = smoothComplexTrajectory(solution.Ts, solution.Xas, 21);
+            const solution = result[0];
+            const Xas = solution.Cas.map(ca => 1 - ca/2);
+            console.log(Xas)
+            const smoothed = smoothComplexTrajectory(solution.Ts, Xas, 21);
+            console.log(smoothed)
             data = [{
                 x: smoothed.x,
                 y: smoothed.y,
@@ -493,12 +389,14 @@ function updatePlot() {
             layout = {
                 title: { text: 'phase plane: conversion vs temperature'},
                 xaxis: { title: {text:'temperature (K)'} },
-                yaxis: { title: {text:'conversion'} },
+                yaxis: { title: {text:'conversion'}, range: [0,1] },
                 showlegend: false
             };
 
+            // Create a new plot just to have the correct axis ranges
+            Plotly.newPlot(plotDiv, data, layout);
 
-            trajectory = [{xs: smoothed.x, ys: smoothed.y, ts: solution.times, line: { color: 'blue' }}];
+            const trajectory = [{xs: smoothed.x, ys: smoothed.y, ts: solution.times, line: { color: 'blue' }}];
             // Create the arrow markers
             markers = createArrowMarkers(trajectory, 800, 10);
             markers.forEach(markerSet => {
@@ -557,10 +455,9 @@ function updatePlot() {
             
         case 'temperature':
             // Temperature vs Time
-            const tempSolution = solveODE(Ca0, T0, tau);
             data = [{
-                x: tempSolution.times,
-                y: tempSolution.Ts,
+                x: result[0].times,
+                y: result[0].Ts,
                 type: 'scatter',
                 mode: 'lines',
                 name: 'temperature',
@@ -578,8 +475,8 @@ function updatePlot() {
             
         case 'conversion':
             // Conversion vs Time
-            const convSolution = solveODE(Ca0, T0, tau);
-            const smooth = smoothComplexTrajectory(convSolution.times, convSolution.Xas, 11);
+            const xas = result[0].Cas.map(ca => 1-ca/2);
+            const smooth = smoothComplexTrajectory(result[0].times, xas, 11);
             data = [{
                 x: smooth.x,
                 y: smooth.y,
@@ -593,7 +490,7 @@ function updatePlot() {
                 title: {text:'conversion vs time'},
                 dragMode: false,
                 xaxis: { title: {text:'time (min)'} },
-                yaxis: { title: {text:'conversion'} },
+                yaxis: { title: {text:'conversion'}, range: [0,1] },
                 showlegend: false
             };
             displayConcSlider(true);
@@ -603,5 +500,5 @@ function updatePlot() {
     Plotly.newPlot(plotDiv, data, layout, { displayModeBar: false, staticPlot: true });
 }
 
-// Initialize the plot
-updatePlot();
+// Initial figure
+requestUpdate();
