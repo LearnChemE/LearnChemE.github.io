@@ -160,12 +160,12 @@ function updateSimulation() {
     air.style.height = (100 - waterHeight) + '%';
     air.style.bottom = waterHeight + '%';
     
-    // Calculate pressure based on temperature and volume
-    pressure = calculatePressure(temperature, liqVol);
-    pressureGauge.textContent = pressure.toFixed(1) + ' bar';
+    // // Calculate pressure based on temperature and volume
+    // pressure = calculatePressure(temperature, liqVol);
+    // pressureGauge.textContent = pressure.toFixed(1) + ' bar';
     
     // Update gas amounts
-    updateGasAmounts(temperature, pressure, liqVol);
+    updateGasAmounts(temperature, liqVol);
     
     // Warning if pressure is too high
     if (pressure > 20) {
@@ -181,17 +181,6 @@ function updateSimulation() {
         pressureGauge.style.fontSize = '1.4rem';
         pressureGauge.style.fontWeight = 'normal';
     }
-}
-
-// TODO: Fix me
-// Calculate pressure based on temperature and volume
-function calculatePressure(temp, waterVol) {
-    // Simplified model - in reality this would use Antoine equation and ideal gas law
-    const psat = Psat(temp);
-    const vapVol = V - waterVol;
-    
-    const gasPressure = (0.8 / vapVol) * (temp + 273) / 298;
-    return vaporPressure + gasPressure;
 }
 
 /**
@@ -226,28 +215,122 @@ function HN2(T) {
 }
 
 /**
+ * Secant method solver for finding roots of equations
+ * @param {Function} f - The function to find the root of
+ * @param {number} x0 - First initial guess
+ * @param {number} x1 - Second initial guess
+ * @param {number} tolerance - Convergence tolerance (default: 1e-10)
+ * @param {number} maxIterations - Maximum number of iterations (default: 100)
+ * @returns {Object} - Result object with root, iterations, and convergence info
+ */
+function secantMethod(f, x0, x1, tolerance = 1e-10, maxIterations = 100) {
+    let iterations = 0;
+    let f0 = f(x0);
+    let f1 = f(x1);
+    
+    // Store iteration history for analysis
+    const history = [
+        { iteration: 0, x: x0, fx: f0 },
+        { iteration: 1, x: x1, fx: f1 }
+    ];
+    
+    // Check if we already have a root
+    if (Math.abs(f0) < tolerance) {
+        return {
+            root: x0,
+            iterations: 0,
+            converged: true,
+            finalError: Math.abs(f0),
+            history: history.slice(0, 1)
+        };
+    }
+    
+    if (Math.abs(f1) < tolerance) {
+        return {
+            root: x1,
+            iterations: 1,
+            converged: true,
+            finalError: Math.abs(f1),
+            history: history
+        };
+    }
+    
+    let x2;
+    
+    for (iterations = 2; iterations <= maxIterations; iterations++) {
+        // Check for division by zero
+        if (Math.abs(f1 - f0) < Number.EPSILON) {
+            throw new Error(`Division by zero at iteration ${iterations}. Function values are too close.`);
+        }
+        
+        // Secant method formula: x2 = x1 - f1 * (x1 - x0) / (f1 - f0)
+        x2 = x1 - f1 * (x1 - x0) / (f1 - f0);
+        
+        const f2 = f(x2);
+        
+        // Add to history
+        history.push({
+            iteration: iterations,
+            x: x2,
+            fx: f2
+        });
+        
+        // Check for convergence
+        if (Math.abs(f2) < tolerance || Math.abs(x2 - x1) < tolerance) {
+            return {
+                root: x2,
+                iterations: iterations,
+                converged: true,
+                finalError: Math.abs(f2),
+                history: history
+            };
+        }
+        
+        // Update values for next iteration
+        x0 = x1;
+        f0 = f1;
+        x1 = x2;
+        f1 = f2;
+    }
+    
+    // If we reach here, method didn't converge
+    return {
+        root: x2,
+        iterations: maxIterations,
+        converged: false,
+        finalError: Math.abs(f1),
+        history: history
+    };
+}
+
+/**
  * Update gas amounts display
  * @param {number} temp Temperature (C)
  * @param {number} pressure Pressure (bar)
  * @param {number} waterVol Water volume (L)
  */
-function updateGasAmounts(temp, pressure, waterVol) {
+function updateGasAmounts(temp, waterVol) {
     // Calculate dissolved gases based on temperature and pressure (Henry's law)
     // Initial moles
     const vol_vap = V - waterVol;
     const psat0 = Psat(T0);
-    const no2_tot = .21 * (P0 - psat0) * vol_vap / R / (T0 + 273) + HO2(T0) * 0.21 * (P0 - psat0) * waterVol;
-    const nn2_tot = .79 * (P0 - psat0) * vol_vap / R / (T0 + 273) + HN2(T0) * 0.79 * (P0 - psat0) * waterVol;
-    // Moles dissolved
-    const psat = Psat(temp);
-    const no2_aq = HO2(temp) * 0.21 * (pressure - psat) * waterVol;
-    const nn2_aq = HN2(temp) * 0.79 * (pressure - psat) * waterVol;
-    // Moles gas
-    const no2_vap = no2_tot - no2_aq;
-    const nn2_vap = nn2_tot - nn2_aq;
+    const no2_tot = .21 * (P0 - psat0) * (V - initialVolume) / R / (T0 + 273) + HO2(T0) * 0.21 * (P0 - psat0) * initialVolume;
+    const nn2_tot = .79 * (P0 - psat0) * (V - initialVolume) / R / (T0 + 273) + HN2(T0) * 0.79 * (P0 - psat0) * initialVolume;
+
+    const moles_gas = (p) => { return p * vol_vap / R / (temp+273) };
+    const moles_aq = (p, h) => { return h(temp) * p * waterVol };
+    // Solve
+    const sol1 = secantMethod((p) => {return moles_gas(p) + moles_aq(p, HO2) - no2_tot}, 1, 60);
+    const sol2 = secantMethod((p) => {return moles_gas(p) + moles_aq(p, HN2) - nn2_tot}, 1, 60);
+    const po2 = sol1.root;
+    const pn2 = sol2.root;
+
+    // Set the pressure
+    const pressure = po2 + pn2 + Psat(temp);
+    pressureGauge.textContent = pressure.toFixed(1) + ' bar';
     
     // Update Plotly chart
-    updatePlotlyChart(no2_vap * 1000, no2_aq * 1000, nn2_vap * 1000, nn2_aq * 1000);
+    updatePlotlyChart(moles_gas(po2) * 1000, moles_aq(po2, HO2) * 1000, moles_gas(pn2) * 1000, moles_aq(pn2, HN2) * 1000);
 }
 
 /**
