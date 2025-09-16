@@ -7,8 +7,48 @@ const tempValue = document.getElementById('tempValue');
 const water = document.getElementById('water');
 const air = document.getElementById('air');
 const pressureGauge = document.getElementById('pressureGauge');
-const menuBtn = document.getElementById('menuBtn');
-const menuItems = document.getElementById('menuItems');
+const menuBtn = document.querySelector('.menu-btn');
+const menuContent = document.querySelector('.menu-content');
+const menuItems = document.querySelectorAll('.menu-item');
+const modals = document.querySelectorAll('.modal');
+const closeBtns = document.querySelectorAll('.close-btn');
+
+// Hamburger menu functionality
+menuBtn.addEventListener('click', () => {
+    menuContent.classList.toggle('show');
+});
+
+// Close menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (!menuBtn.contains(e.target) && !menuContent.contains(e.target)) {
+        menuContent.classList.remove('show');
+    }
+});
+
+// Menu items click handlers
+menuItems.forEach(item => {
+    item.addEventListener('click', () => {
+        const modalId = item.getAttribute('data-modal') + '-modal';
+        document.getElementById(modalId).style.display = 'block';
+        menuContent.classList.remove('show');
+    });
+});
+
+// Close modal buttons
+closeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        btn.closest('.modal').style.display = 'none';
+    });
+});
+
+// Close modal when clicking outside
+window.addEventListener('click', (e) => {
+    modals.forEach(modal => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
 
 // Initial values
 let initialVolume = 0.8;
@@ -73,14 +113,6 @@ Plotly.newPlot('plotly-chart', data, layout, config);
 // Event listeners
 volumeSlider.addEventListener('input', updateVolume);
 tempSlider.addEventListener('input', updateTemperature);
-menuBtn.addEventListener('click', toggleMenu);
-
-// Close menu when clicking outside
-document.addEventListener('click', (e) => {
-    if (!menuBtn.contains(e.target) && !menuItems.contains(e.target)) {
-        menuItems.classList.remove('show');
-    }
-});
 
 // Update volume
 function updateVolume() {
@@ -194,20 +226,6 @@ function updatePlotlyChart(o2Gas, o2Dissolved, n2Gas, n2Dissolved) {
     }];
     
     Plotly.react('plotly-chart', updatedData, layout, config);
-}
-
-// Menu functions
-function toggleMenu() {
-    menuItems.classList.toggle('show');
-}
-
-function showModal(modalId) {
-    document.getElementById(modalId).style.display = 'flex';
-    menuItems.classList.remove('show');
-}
-
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
 }
 
 // Close modal when clicking outside content
