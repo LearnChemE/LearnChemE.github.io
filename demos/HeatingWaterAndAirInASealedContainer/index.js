@@ -58,6 +58,26 @@ window.addEventListener('click', (e) => {
 
 /* *********** End Hamburger Menu *********** */
 
+// Insert an svg image 
+function insertSVG(svg) {
+    const div = document.createElement("div");
+  
+    // Set basic attributes
+    div.id = "crack-wrapper";
+    div.innerHTML = svg;
+    return div;
+}
+
+// Create div containing svg
+const svg = `<svg width="200" height="300" viewBox="0 0 181 215" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path transform="scale(1.1, 1.1) translate(-10, 0)" d="M0.5 17.5L36.5 30.5L62.5 15M62.5 15L75.5 16.5M62.5 15L68 1.5M1 213L58 198M58 198L42 161.5L58 144L53.75 138.5L38 118.5M58 198L88 190.5V180M179.5 108L138.5 85.5M138.5 85.5L113 95M138.5 85.5L145 69.5L137 60L140.5 51M113 95L94.5 87L95 77M113 95L118.5 105L102 121L106.5 127.5M57.5 144.5L68 137.5M42.5 161.5L30.5 153.5M88 180H104.5M88 180L91 165.5" stroke="black" stroke-width="3"/>
+        </svg>`;
+const crack = insertSVG(svg);
+
+// Find wrapper and append svg div
+document.getElementById('containerVis').appendChild(crack);
+crack.classList.add("hidden");
+
 // Initial values
 let initialVolume = 0.8;
 let temperature = 25;
@@ -153,19 +173,23 @@ function calculateLiqVolume() {
 function updateSimulation() {
     // Calculate water expansion based on temperature
     const liqVol = calculateLiqVolume();
-    
-    // Calculate water and air heights
     const waterHeight = Math.min(liqVol * 100, 100);
-    water.style.height = waterHeight + '%';
-    air.style.height = (100 - waterHeight) + '%';
-    air.style.bottom = waterHeight + '%';
     
-    // // Calculate pressure based on temperature and volume
-    // pressure = calculatePressure(temperature, liqVol);
-    // pressureGauge.textContent = pressure.toFixed(1) + ' bar';
-    
-    // Update gas amounts
-    updateGasAmounts(temperature, liqVol);
+    if (waterHeight < 100) {
+        // Calculate water and air heights
+        water.style.height = waterHeight + '%';
+        air.style.height = (100 - waterHeight) + '%';
+        air.style.bottom = waterHeight + '%';
+        // Update gas amounts
+        updateGasAmounts(temperature, liqVol);
+    }
+    else {
+        water.style.height = '0%';
+        air.style.height = '100%';
+        air.style.bottom = '100%';
+        // Overflow
+        boom();
+    }
     
     // Warning if pressure is too high
     if (pressure > 20) {
@@ -310,6 +334,7 @@ function secantMethod(f, x0, x1, tolerance = 1e-10, maxIterations = 100) {
  * @param {number} waterVol Water volume (L)
  */
 function updateGasAmounts(temp, waterVol) {
+    crack.classList.add('hidden');
     // Calculate dissolved gases based on temperature and pressure (Henry's law)
     // Initial moles
     const vol_vap = V - waterVol;
@@ -331,6 +356,25 @@ function updateGasAmounts(temp, waterVol) {
     
     // Update Plotly chart
     updatePlotlyChart(moles_gas(po2) * 1000, moles_aq(po2, HO2) * 1000, moles_gas(pn2) * 1000, moles_aq(pn2, HN2) * 1000);
+}
+
+function boom() {
+    pressureGauge.textContent = 'boom!';
+    crack.classList.remove('hidden');
+    const updatedData = [{
+        x: ['Oxygen (O₂)', 'Nitrogen (N₂)'],
+        y: [0, 0],
+        name: 'Dissolved',
+        type: 'bar',
+        marker: {color: '#9b59b6'},
+    }, {
+        x: ['Oxygen (O₂)', 'Nitrogen (N₂)'],
+        y: [0, 0],
+        name: 'Gas Phase',
+        type: 'bar',
+        marker: {color: '#2ecc71'}
+    }];
+    Plotly.react('plotly-chart', updatedData, layout, config);
 }
 
 /**
