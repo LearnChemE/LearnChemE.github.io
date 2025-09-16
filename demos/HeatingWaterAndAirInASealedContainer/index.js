@@ -1,3 +1,8 @@
+// Constants
+const P0 = 1; // bar
+const R = 0.08314; // L bar / mol / K
+const V = 1; // L
+const T0 = 25;
 
 // DOM elements
 const volumeSlider = document.getElementById('volumeSlider');
@@ -13,6 +18,7 @@ const menuItems = document.querySelectorAll('.menu-item');
 const modals = document.querySelectorAll('.modal');
 const closeBtns = document.querySelectorAll('.close-btn');
 
+/* ******** Hamburger Menu ********** */
 // Hamburger menu functionality
 menuBtn.addEventListener('click', () => {
     menuContent.classList.toggle('show');
@@ -50,6 +56,8 @@ window.addEventListener('click', (e) => {
     });
 });
 
+/* *********** End Hamburger Menu *********** */
+
 // Initial values
 let initialVolume = 0.8;
 let temperature = 25;
@@ -73,7 +81,7 @@ let layout = {
     },
     yaxis: {
         title: 'Amount (mmol)',
-        rangemode: 'tozero'
+        range: [0, 6.5]
     },
     paper_bgcolor: '#f8f9fa',
     plot_bgcolor: '#f8f9fa',
@@ -136,27 +144,28 @@ function resetTemperature() {
     tempValue.textContent = '25°C';
 }
 
+function calculateLiqVolume() {
+    const T = temperature;
+    return (-1e-8*T ** 3 + 6e-6*T ** 2 - 2e-5*T + 0.99695) * initialVolume;
+}
+
 // Update the entire simulation
 function updateSimulation() {
     // Calculate water expansion based on temperature
-    const expansionFactor = 1 + (temperature - 25) * 0.00035;
-    const currentWaterVolume = Math.min(initialVolume * expansionFactor, 0.99);
+    const liqVol = calculateLiqVolume();
     
     // Calculate water and air heights
-    const waterHeight = Math.min(currentWaterVolume * 100, 98);
+    const waterHeight = Math.min(liqVol * 100, 100);
     water.style.height = waterHeight + '%';
     air.style.height = (100 - waterHeight) + '%';
     air.style.bottom = waterHeight + '%';
     
     // Calculate pressure based on temperature and volume
-    pressure = calculatePressure(temperature, currentWaterVolume);
+    pressure = calculatePressure(temperature, liqVol);
     pressureGauge.textContent = pressure.toFixed(1) + ' bar';
     
-    // Change air color based on pressure
-    const intensity = Math.min(100 + pressure * 15, 255);
-    
     // Update gas amounts
-    updateGasAmounts(temperature, pressure, currentWaterVolume);
+    updateGasAmounts(temperature, pressure, liqVol);
     
     // Warning if pressure is too high
     if (pressure > 20) {
@@ -174,69 +183,97 @@ function updateSimulation() {
     }
 }
 
+// TODO: Fix me
 // Calculate pressure based on temperature and volume
 function calculatePressure(temp, waterVol) {
     // Simplified model - in reality this would use Antoine equation and ideal gas law
-    const vaporPressure = 0.01 * Math.exp(0.12 * (temp - 25));
-    const gasVolume = 1 - waterVol;
+    const psat = Psat(temp);
+    const vapVol = V - waterVol;
     
-    if (gasVolume < 0.01) {
-        // When gas volume is very small, pressure increases dramatically
-        return vaporPressure + 50 * (temp / 100);
-    }
-    
-    const gasPressure = (0.8 / gasVolume) * (temp + 273) / 298;
+    const gasPressure = (0.8 / vapVol) * (temp + 273) / 298;
     return vaporPressure + gasPressure;
 }
 
-// Update gas amounts display
-function updateGasAmounts(temp, pressure, waterVol) {
-    // Calculate dissolved gases based on temperature and pressure (Henry's law)
-    const o2Dissolved = 2.1 * (1 - 0.012 * (temp - 25)) * pressure * waterVol;
-    const n2Dissolved = 7.9 * (1 - 0.01 * (temp - 25)) * pressure * waterVol;
-    
-    const o2Gas = 2.1 - o2Dissolved;
-    const n2Gas = 7.9 - n2Dissolved;
-    
-    // Update Plotly chart
-    updatePlotlyChart(o2Gas, o2Dissolved, n2Gas, n2Dissolved);
+/**
+ * Calculate the saturation pressure of water using Antoine's equation
+ * @param {number} T Temperature (C)
+ */
+function Psat(T) {
+    if (T <= 100) {
+        return (1/750.06)*10 ** (8.07131 - 1730.63/(T + 233.426));
+    }
+    else {
+        return (1/750.06)*10 ** (8.14019 - 1810.94/(T + 244.485));
+    }
 }
 
-// Update Plotly chart with new data
+/**
+ * Calculate Henry's law constant for Oxygen
+ * @param {number} T Temperature (C)
+ * @returns Henry's law constant
+ */
+function HO2(T) {
+    return 4.342e-6 * Math.exp(1700 / (T + 273));
+}
+
+/**
+ * Calculate Henry's law constant for Nitrogen
+ * @param {number} T Temperature (C)
+ * @returns Henry's law constant
+ */
+function HN2(T) {
+    return 7.863e-6 * Math.exp(1300 / (T + 273));
+}
+
+/**
+ * Update gas amounts display
+ * @param {number} temp Temperature (C)
+ * @param {number} pressure Pressure (bar)
+ * @param {number} waterVol Water volume (L)
+ */
+function updateGasAmounts(temp, pressure, waterVol) {
+    // Calculate dissolved gases based on temperature and pressure (Henry's law)
+    // Initial moles
+    const vol_vap = V - waterVol;
+    const psat0 = Psat(T0);
+    const no2_tot = .21 * (P0 - psat0) * vol_vap / R / (T0 + 273) + HO2(T0) * 0.21 * (P0 - psat0) * waterVol;
+    const nn2_tot = .79 * (P0 - psat0) * vol_vap / R / (T0 + 273) + HN2(T0) * 0.79 * (P0 - psat0) * waterVol;
+    // Moles dissolved
+    const psat = Psat(temp);
+    const no2_aq = HO2(temp) * 0.21 * (pressure - psat) * waterVol;
+    const nn2_aq = HN2(temp) * 0.79 * (pressure - psat) * waterVol;
+    // Moles gas
+    const no2_vap = no2_tot - no2_aq;
+    const nn2_vap = nn2_tot - nn2_aq;
+    
+    // Update Plotly chart
+    updatePlotlyChart(no2_vap * 1000, no2_aq * 1000, nn2_vap * 1000, nn2_aq * 1000);
+}
+
+/**
+ * Update Plotly chart with new data
+ * @param {number} o2Gas mmol O2 in the gas phase
+ * @param {number} o2Dissolved mmol O2 in the aq phase
+ * @param {number} n2Gas mmol N2 in the gas phase
+ * @param {number} n2Dissolved mmol N2 in the aq phase
+ */
 function updatePlotlyChart(o2Gas, o2Dissolved, n2Gas, n2Dissolved) {
     const updatedData = [{
-        x: ['Oxygen (O₂)', 'Oxygen (O₂)'],
-        y: [o2Gas, o2Dissolved],
-        name: 'Gas Phase',
-        type: 'bar',
-        marker: {color: '#2ecc71'}
-    }, {
         x: ['Oxygen (O₂)', 'Nitrogen (N₂)'],
         y: [o2Dissolved, n2Dissolved],
         name: 'Dissolved',
         type: 'bar',
-        marker: {color: '#9b59b6'}
+        marker: {color: '#9b59b6'},
     }, {
-        x: ['Nitrogen (N₂)'],
-        y: [n2Gas],
+        x: ['Oxygen (O₂)', 'Nitrogen (N₂)'],
+        y: [o2Gas, n2Gas],
         name: 'Gas Phase',
         type: 'bar',
-        marker: {color: '#2ecc71'},
-        showlegend: false
+        marker: {color: '#2ecc71'}
     }];
     
     Plotly.react('plotly-chart', updatedData, layout, config);
 }
-
-// Close modal when clicking outside content
-window.addEventListener('click', (e) => {
-    const modals = document.querySelectorAll('.modal');
-    modals.forEach(modal => {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
-});
 
 // Initialize simulation
 updateSimulation();
