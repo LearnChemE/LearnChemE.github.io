@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peng-Robinson Equation of State for Mixtures</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.8.0/lib/browser/math.min.js"></script>
+    <script>
+        MathJax = {
+            chtml: {
+                scale: 0.95,
+                mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+                displayAlign: 'left', // default for indentalign when set to 'auto'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Hamburger Menu -->
+        <div class="hamburger-menu">
+            <div class="menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div class="menu-content">
+                <div class="menu-item" data-modal="directions">
+                    <i class="fas fa-book"></i>
+                    <span>Directions</span>
+                </div>
+                <div class="menu-item" data-modal="details">
+                    <i class="fa-solid fa-paperclip"></i>
+                    <span>Details</span>
+                </div>
+                <div class="menu-item" data-modal="about">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="temperature">Temperature (K): <span id="tempValue" class="slider-value">390</span></label>
+                <div class="slider-container">
+                    <input type="range" id="temperature" min="350" max="415" step="1" value="390">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label for="moleFraction">n-butane liquid mole fraction <i>x</i><sub>1</sub>: <span id="moleValue" class="slider-value">0.55</span></label>
+                <div class="slider-container">
+                    <input type="range" id="moleFraction" min="0" max="0.75" step="0.01" value="0.55">
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="chart"></canvas>
+            <div class="info-box">
+                <div class="info-title">Equilibrium Properties</div>
+                <div id="pressureValue">Pvle: 0.00 MPa</div>
+                <div id="x1Value" style="color: blue;"><i>x</i><sub>1</sub> = 0.00</div>
+                <div id="y1Value" style="color: green;"><i>y</i><sub>1</sub> = 0.00</div>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: blue;"></div>
+                <span>Liquid Phase (x₁)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: green;"></div>
+                <span>Vapor Phase (y₁)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: black;"></div>
+                <span>VLE Connection</span>
+            </div>
+        </div>
+    </div>
+
+
+        <!-- Modal Dialogs -->
+        <div id="directions-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <div class="modal-header">
+                    <h2>Directions</h2>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        A continuous stirred-tank reactor (CSTR) with heat exchange is used for an exothermic reaction. Multiple steady-state solutions are observed; they can be stable, unstable, 
+                        or exhibit sustained oscillations (limit cycles). The steady-state operating conditions depend on initial conditions (CSTR start up) and on the residence time, 
+                        and limit-cycle behavior is observed for residence times greater than about 30 minutes. Select "phase plane 1" to plot reactant concentration versus reactor temperature for 
+                        five initial concentrations; change the initial reactor temperature with a slider. Select "phase plane 2" to plot conversion versus temperature for one initial condition; set 
+                        the initial reactor temperature and initial reactant concentration with sliders. The reactant feed concentration is 2 kmol/m3 and the feed temperature is 298 K. In both plots, 
+                        the arrows indicate the direction of time. Set the initial conditions with sliders for "phase plane 2", "temperature vs. time" and "conversion vs. time" plots; these show how 
+                        a steady state (or a limit cycle) is approached. Select "energy vs. temperature" to plot heat generated and heat removed versus temperature; the intersections of the straight 
+                        blue line and green curve correspond to steady-state solutions to the mass and energy balances for the CSTR. The heat transfer fluid is at a constant temperature of 300 K. 
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="details-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <div class="modal-header">
+                    <h2>Details</h2>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Mole balance:
+                        $$\frac{dC_A}{dt} = \frac{1}{\tau}(C_{A,f}-C_A) - k C_A$$
+                        $$k = k_m e^{[-\frac{E_a}{R}(\frac{1}{T} - \frac{1}{T_m})]}$$
+                        where C_A is the concentration of reactant A (kmol / \(m^3\)), C_{A,f} is the feed concentration of A (kmol / \(m^3\)),
+                        t is time (min), \(\tau\) is residence time (min), k is the rate constant (1/min), \(k_m\) is the rate constant at mean temperature \(T_m\) (1/min),
+                        T is reactor temperature (K), and Ea is activation energy (kJ/kmol).
+                    </p>
+                    <p>
+                        Energy balance:
+                        $$ \frac{dT}{dt} = \frac{UA}{V C_{ps}} (T_a - T) + \frac{1}{\tau} (T_f - T) - \frac{\Delta H}{C_{ps}} k C_A $$
+                        where \(T_a\) and \(T_f\) are the heat transfer fluid and feed temperatures (K), UA is the overall heat transfer coefficient times heat transfer area 
+                        (kJ/[min K]), V is reactor volume (\(m^3\)), \(C_{ps}\)=\(\rho \widehat{C_p} \) is specific heat capacity (kJ/[m^3 K]), \(\rho\) is density of reactants (kg/\(m^3\)), \(\widehat{C_p}\) is average heat capacity of reactants (kJ/[kg K]), and ΔH is heat of reaction (kJ/kmol).
+                    </p>
+                    <p>
+                        The heats generated \(Q_G\) and removed \(Q_R\) are:
+                        $$ Q_G = -\frac{k}{1 + k \tau} \Delta H C_{A,f} $$
+                        $$ Q_R = \frac{C_{ps}}{\tau} (T - T_f) + \frac{UA}{V}(T - T_a) $$
+                        where \(Q_G\) and \(Q_R\) are in units of (kJ / [\(m^3\) min]).
+                    </p>
+                    <p>
+                        Conversion of reactant A is:
+                        $$ x = 1 - \frac{C_A}{C_{A,f}} $$
+                    </p>
+                    <p>
+                        References
+                    </p>
+                    <p>
+                        [1] J. G. Ekerdt and J. B. Rawlings, Chemical Reactor Analysis and Design Fundamentals, Madison, WI: Nob Hill Publishing, 2002 pp. 296-316.
+                    </p>
+                    <p>
+                        [2] Multiple Steady States in a Continuous Stirred-Tank Reactor with Heat Exchange. www.colorado.edu/learncheme/kinetics/MultipleSteadyStatesCSTR.html.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="about-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <div class="modal-header">
+                    <h2>About</h2>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This simulation was created in the Department of Chemical and Biological Engineering at University of Colorado Boulder for LearnChemE.com by Drew Smith 
+                        under the direction of Professor John L. Falconer and Michelle Medlin. It is a JavaScript/HTML5 implementation of a Mathematica simulation by Rachael 
+                        Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State 
+                        University. Address any questions or comments to LearnChemE@gmail.com.   
+                    </p>
+                </div>
+            </div>
+        </div>
+    <script src="./index.js"></script>
+</body>
+</html>
