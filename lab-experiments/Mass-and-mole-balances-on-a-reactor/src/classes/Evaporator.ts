@@ -116,7 +116,7 @@ export class Evaporator {
             if (this.mantleIsOn) {
                 bubbleTimer -= deltaTime;
                 if (bubbleTimer <= 0) {
-                    bubbleTimer += 200;
+                    bubbleTimer = Math.max(bubbleTimer + 200, 0);
                     const c = document.createElementNS(svgNS, "circle");
                     c.setAttribute("stroke", "#FFFFFF");
                     c.setAttribute("r","2.5");
