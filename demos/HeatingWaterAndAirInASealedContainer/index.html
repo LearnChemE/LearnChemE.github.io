@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Heating Water and Air in a Sealed Container</title>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -40,18 +41,12 @@
                 <input type="range" id="tempSlider" min="25" max="250" step="1" value="25">
                 <div class="value-display" id="tempValue">25°C</div>
             </div>
-            
-            <div class="control-group">
-                <label>Pressure:</label>
-                <div class="value-display" id="pressureValue">1.0 bar</div>
-            </div>
         </div>
         
         <!-- Visualization section -->
         <div class="visualization-container">
             <!-- Container visualization -->
             <div class="container-vis-section">
-                <h2 class="chart-title">Sealed Container</h2>
                 <div class="container-wrapper">
                     <div class="pressure-gauge" id="pressureGauge">1.0</div>
                     <div class="container-vis" id="containerVis">
@@ -61,47 +56,9 @@
                 </div>
             </div>
             
-            <!-- Gas chart -->
+            <!-- Plotly chart -->
             <div class="chart-section">
-                <h2 class="chart-title">Gas Composition</h2>
-                <div class="gas-chart" id="gasChart">
-                    <div class="bar-container">
-                        <div class="bar-label">Oxygen (O₂)</div>
-                        <div class="bar-set">
-                            <div class="bar bar-gas" id="o2GasBar" style="height: 40%;"></div>
-                            <div class="bar bar-dissolved" id="o2DissolvedBar" style="height: 20%;"></div>
-                        </div>
-                        <div class="bar-value" id="o2Value">Gas: 2.1 mmol<br>Dissolved: 0.5 mmol</div>
-                    </div>
-                    <div class="bar-container">
-                        <div class="bar-label">Nitrogen (N₂)</div>
-                        <div class="bar-set">
-                            <div class="bar bar-gas" id="n2GasBar" style="height: 60%;"></div>
-                            <div class="bar bar-dissolved" id="n2DissolvedBar" style="height: 15%;"></div>
-                        </div>
-                        <div class="bar-value" id="n2Value">Gas: 7.9 mmol<br>Dissolved: 1.2 mmol</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Legend -->
-        <div class="legend">
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #3498db;"></div>
-                <span>Liquid Water</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #9b59b6;"></div>
-                <span>Dissolved Gases</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #2ecc71;"></div>
-                <span>Gas Phase</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(to right, #3498db, #e74c3c);"></div>
-                <span>Temperature Indicator</span>
+                <div id="plotly-chart"></div>
             </div>
         </div>
     </div>

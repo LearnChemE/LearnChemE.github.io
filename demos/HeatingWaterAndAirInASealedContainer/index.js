@@ -4,16 +4,9 @@ const volumeSlider = document.getElementById('volumeSlider');
 const tempSlider = document.getElementById('tempSlider');
 const volumeValue = document.getElementById('volumeValue');
 const tempValue = document.getElementById('tempValue');
-const pressureValue = document.getElementById('pressureValue');
 const water = document.getElementById('water');
 const air = document.getElementById('air');
 const pressureGauge = document.getElementById('pressureGauge');
-const o2GasBar = document.getElementById('o2GasBar');
-const o2DissolvedBar = document.getElementById('o2DissolvedBar');
-const n2GasBar = document.getElementById('n2GasBar');
-const n2DissolvedBar = document.getElementById('n2DissolvedBar');
-const o2Value = document.getElementById('o2Value');
-const n2Value = document.getElementById('n2Value');
 const menuBtn = document.getElementById('menuBtn');
 const menuItems = document.getElementById('menuItems');
 
@@ -21,6 +14,61 @@ const menuItems = document.getElementById('menuItems');
 let initialVolume = 0.8;
 let temperature = 25;
 let pressure = 1.0;
+
+// Initialize Plotly chart
+let layout = {
+    title: 'Gas Composition',
+    barmode: 'stack',
+    showlegend: true,
+    legend: {
+        x: 0.5,
+        y: -0.2,
+        xanchor: 'center',
+        orientation: 'h'
+    },
+    xaxis: {
+        title: 'Gas Type',
+        tickvals: [0, 1],
+        ticktext: ['Oxygen (O₂)', 'Nitrogen (N₂)']
+    },
+    yaxis: {
+        title: 'Amount (mmol)',
+        rangemode: 'tozero'
+    },
+    paper_bgcolor: '#f8f9fa',
+    plot_bgcolor: '#f8f9fa',
+    margin: {t: 50, b: 80, l: 60, r: 40}
+};
+
+let config = {
+    staticPlot: true,
+    displayModeBar: false
+};
+
+// Initial data for Plotly
+let data = [{
+    x: ['Oxygen (O₂)', 'Oxygen (O₂)'],
+    y: [2.1, 0.5],
+    name: 'Gas Phase',
+    type: 'bar',
+    marker: {color: '#2ecc71'}
+}, {
+    x: ['Oxygen (O₂)', 'Nitrogen (N₂)'],
+    y: [0.5, 1.2],
+    name: 'Dissolved',
+    type: 'bar',
+    marker: {color: '#9b59b6'}
+}, {
+    x: ['Nitrogen (N₂)'],
+    y: [7.9],
+    name: 'Gas Phase',
+    type: 'bar',
+    marker: {color: '#2ecc71'},
+    showlegend: false
+}];
+
+// Create the initial chart
+Plotly.newPlot('plotly-chart', data, layout, config);
 
 // Event listeners
 volumeSlider.addEventListener('input', updateVolume);
@@ -70,12 +118,10 @@ function updateSimulation() {
     
     // Calculate pressure based on temperature and volume
     pressure = calculatePressure(temperature, currentWaterVolume);
-    pressureValue.textContent = pressure.toFixed(1) + ' bar';
-    pressureGauge.textContent = pressure.toFixed(1);
+    pressureGauge.textContent = pressure.toFixed(1) + ' bar';
     
     // Change air color based on pressure
     const intensity = Math.min(100 + pressure * 15, 255);
-    air.style.background = `linear-gradient(to bottom, rgb(${intensity}, ${intensity}, ${intensity}), rgb(${intensity-20}, ${intensity-20}, ${intensity-20}))`;
     
     // Update gas amounts
     updateGasAmounts(temperature, pressure, currentWaterVolume);
@@ -120,16 +166,34 @@ function updateGasAmounts(temp, pressure, waterVol) {
     const o2Gas = 2.1 - o2Dissolved;
     const n2Gas = 7.9 - n2Dissolved;
     
-    // Update bars
-    o2GasBar.style.height = (o2Gas / 2.1 * 80) + '%';
-    o2DissolvedBar.style.height = (o2Dissolved / 2.1 * 80) + '%';
+    // Update Plotly chart
+    updatePlotlyChart(o2Gas, o2Dissolved, n2Gas, n2Dissolved);
+}
+
+// Update Plotly chart with new data
+function updatePlotlyChart(o2Gas, o2Dissolved, n2Gas, n2Dissolved) {
+    const updatedData = [{
+        x: ['Oxygen (O₂)', 'Oxygen (O₂)'],
+        y: [o2Gas, o2Dissolved],
+        name: 'Gas Phase',
+        type: 'bar',
+        marker: {color: '#2ecc71'}
+    }, {
+        x: ['Oxygen (O₂)', 'Nitrogen (N₂)'],
+        y: [o2Dissolved, n2Dissolved],
+        name: 'Dissolved',
+        type: 'bar',
+        marker: {color: '#9b59b6'}
+    }, {
+        x: ['Nitrogen (N₂)'],
+        y: [n2Gas],
+        name: 'Gas Phase',
+        type: 'bar',
+        marker: {color: '#2ecc71'},
+        showlegend: false
+    }];
     
-    n2GasBar.style.height = (n2Gas / 7.9 * 80) + '%';
-    n2DissolvedBar.style.height = (n2Dissolved / 7.9 * 80) + '%';
-    
-    // Update values
-    o2Value.innerHTML = `Gas: ${o2Gas.toFixed(1)} mmol<br>Dissolved: ${o2Dissolved.toFixed(1)} mmol`;
-    n2Value.innerHTML = `Gas: ${n2Gas.toFixed(1)} mmol<br>Dissolved: ${n2Dissolved.toFixed(1)} mmol`;
+    Plotly.react('plotly-chart', updatedData, layout, config);
 }
 
 // Menu functions

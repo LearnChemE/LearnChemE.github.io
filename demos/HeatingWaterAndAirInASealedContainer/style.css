@@ -78,7 +78,7 @@ input[type="range"] {
     height: 10px;
     -webkit-appearance: none;
     appearance: none;
-    background: linear-gradient(to right, #3498db, #e74c3c);
+    background: #93beda;
     outline: none;
     border-radius: 5px;
     margin-bottom: 10px;
@@ -90,7 +90,7 @@ input[type="range"]::-webkit-slider-thumb {
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background: #2c3e50;
+    background: #2e6ead;
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
@@ -129,11 +129,11 @@ input[type="range"]::-webkit-slider-thumb {
 
 .pressure-gauge {
     position: absolute;
-    top: -40px;
+    top: -15px;
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     background: white;
     border: 3px solid #34495e;
     border-radius: 50%;
@@ -148,14 +148,15 @@ input[type="range"]::-webkit-slider-thumb {
 
 .container-vis {
     position: relative;
-    height: 280px;
+    height: 300px;
     width: 200px;
     border: 3px solid #34495e;
     border-radius: 8px;
     background: #ecf0f1;
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    margin: 0 auto;
+    margin: auto;
+    margin-top: 70px;
 }
 
 .water {
@@ -169,7 +170,6 @@ input[type="range"]::-webkit-slider-thumb {
 .air {
     position: absolute;
     width: 100%;
-    background: linear-gradient(to bottom, #ecf0f1, #dce4e8);
     transition: height 0.5s ease, background-color 0.5s ease;
 }
 
@@ -188,61 +188,12 @@ input[type="range"]::-webkit-slider-thumb {
     font-weight: bold;
 }
 
-.gas-chart {
+#plotly-chart {
     flex: 1;
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-end;
-    padding: 20px;
     background: #f8f9fa;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    min-height: 300px;
-}
-
-.bar-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 45%;
-    height: 100%;
-}
-
-.bar-set {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-    position: relative;
-}
-
-.bar {
-    width: 60px;
-    border-radius: 5px 5px 0 0;
-    transition: height 0.5s ease;
-}
-
-.bar-dissolved {
-    background: #9b59b6;
-}
-
-.bar-gas {
-    background: #2ecc71;
-}
-
-.bar-label {
-    margin-top: 10px;
-    font-weight: bold;
-    text-align: center;
-    color: #2c3e50;
-}
-
-.bar-value {
-    font-size: 0.9rem;
-    margin-top: 5px;
-    text-align: center;
+    min-height: 350px;
 }
 
 .legend {
