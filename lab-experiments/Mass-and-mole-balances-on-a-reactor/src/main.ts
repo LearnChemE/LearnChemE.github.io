@@ -15,9 +15,9 @@ import { Evaporator, type EvaporatorDescriptor } from './classes/Evaporator';
 import { Reactor, type ProductStream } from './ts/calcs';
 import { initDial, initSwitch, initUpDownButtons } from './classes/Inputs';
 import { DigitalLabel } from './classes/Label';
-import { furnaceSPLabelDescriptor } from './ts/config';
 import { Beaker, type BeakerDescriptor } from './classes/Beaker';
 import { Signal } from './classes/Signal';
+import type { DigitalLabelDescriptor } from './types';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
@@ -39,11 +39,11 @@ initSvgDrag();
 enableWindowResize();
 
 // Begin interactables
-const evaporatorPower = initSwitch("mantleSwitch","mantleSwitchOn","mantleSwitchOff");
+// const evaporatorPower = initSwitch("mantleSwitch","mantleSwitchOn","mantleSwitchOff");
 const pumpPower = initSwitch("pumpSwitch","pumpSwitchOn","pumpSwitchOff");
 const furnacePower = initSwitch("furnaceSwitch","furnaceSwitchOn","furnaceSwitchOff");
 const furnaceSP = initUpDownButtons("furnaceUpBtn","furnaceDownBtn",200,500,10,300);
-const pumpLift = initDial("flowDial");
+const pumpLift = initDial("flowDial", 270);
 
 // Create the furnace controller
 const furnaceCtrl = new FirstOrder(25, 3000, 0);
@@ -56,7 +56,21 @@ const furnaceDescriptor: PoweredControllerDescriptor<FirstOrder> = {
 const furnace = new PoweredController<FirstOrder>(furnaceDescriptor);
 
 // Label for setpoint
-furnaceSPLabelDescriptor.signal = furnaceSP;
+const furnaceSPLabelDescriptor: DigitalLabelDescriptor = {
+  id: "furnaceLabel",
+  gid: "switch",
+  centerId: "furnaceScreen",
+  fill: "#F9F155",
+  units: "°C",
+  decimals: 0,
+  initialValue: 100,
+  range: {
+    range: [100, 500],
+    overflowString: "HOT",
+    underflowString: ""
+  },
+  signal: furnaceSP
+};
 const furnaceSPLabel = new DigitalLabel(furnaceSPLabelDescriptor);
 furnacePower.subscribe((isOn: boolean) => { isOn ? furnaceSPLabel.show(furnaceSP.get()) : furnaceSPLabel.hide() });
 furnaceSPLabel.hide();
@@ -85,7 +99,7 @@ new Waterfall("evapWaterfall", inTube.outFlow);
 const evaporatorDescriptor: EvaporatorDescriptor = {
   id: "evapFill",
   flowInSignal: inTube.outFlow,
-  mantleSignal: evaporatorPower
+  mantleSignal: new Signal(true)
 };
 const evaporator = new Evaporator(evaporatorDescriptor);
 

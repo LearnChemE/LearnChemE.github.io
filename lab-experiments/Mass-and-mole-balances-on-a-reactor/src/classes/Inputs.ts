@@ -45,7 +45,7 @@ export function initSwitch(id: string, onId: string, offId: string): Signal<bool
  * @param id ID of the parent dial element
  * @param callback Callback to set state lift variable
  */
-export function initDial(id: string): Signal<number> {
+export function initDial(id: string, init: number = 0): Signal<number> {
     // Get the element
     const e = document.getElementById(id)! as unknown as SVGAElement;
     e.classList.add("svg-dial");
@@ -56,9 +56,11 @@ export function initDial(id: string): Signal<number> {
         bbox.y + bbox.height / 2
     );
 
-    var angle = 0;
+    var angle = init;
 
-    const lift = new Signal<number>(0);
+    const lift = new Signal<number>(init/270);
+    e.setAttribute("transform", `rotate(${init} ${center.x} ${center.y})`);
+
     e.addEventListener("mousedown", ({ clientX, clientY }) => {
         // Center for mouse-related things are relative to the window, and can change with resizing
         const bbox = e.getBoundingClientRect();

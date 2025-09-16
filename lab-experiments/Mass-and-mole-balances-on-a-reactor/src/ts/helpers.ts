@@ -48,7 +48,7 @@ export function initHamburgerMenu(worksheet: string, worksheetDownload: string) 
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'menu-button';
-    btn.innerHTML = `<div>☰</div>`;
+    btn.innerHTML = `<i class="fas fa-bars"></i>`;
 
     // Create download element
     const download = document.createElement("a");
