@@ -373,7 +373,7 @@ function draw() {
     push();
     translate(left - 50, top + h / 2);
     rotate(-HALF_PI);
-    text("Photons Absorbed (normalized)", 0, 0);
+    text("Photons Absorbed (relative to incident surface)", 0, 0);
     pop();
     textAlign(LEFT, BASELINE);
 
