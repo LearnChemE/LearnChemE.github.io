@@ -12,6 +12,10 @@
                 scale: 0.95,
                 mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
                 displayAlign: 'left', // default for indentalign when set to 'auto'
+            },
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
             }
         };
     </script>
@@ -44,7 +48,7 @@
         
         <div class="controls">
             <div class="control-group">
-                <label for="temperature">Temperature (K): <span id="tempValue" class="slider-value">390</span></label>
+                <label for="temperature">temperature (K): <span id="tempValue" class="slider-value">390</span></label>
                 <div class="slider-container">
                     <input type="range" id="temperature" min="350" max="415" step="1" value="390">
                 </div>
@@ -79,14 +83,9 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        A continuous stirred-tank reactor (CSTR) with heat exchange is used for an exothermic reaction. Multiple steady-state solutions are observed; they can be stable, unstable, 
-                        or exhibit sustained oscillations (limit cycles). The steady-state operating conditions depend on initial conditions (CSTR start up) and on the residence time, 
-                        and limit-cycle behavior is observed for residence times greater than about 30 minutes. Select "phase plane 1" to plot reactant concentration versus reactor temperature for 
-                        five initial concentrations; change the initial reactor temperature with a slider. Select "phase plane 2" to plot conversion versus temperature for one initial condition; set 
-                        the initial reactor temperature and initial reactant concentration with sliders. The reactant feed concentration is 2 kmol/m3 and the feed temperature is 298 K. In both plots, 
-                        the arrows indicate the direction of time. Set the initial conditions with sliders for "phase plane 2", "temperature vs. time" and "conversion vs. time" plots; these show how 
-                        a steady state (or a limit cycle) is approached. Select "energy vs. temperature" to plot heat generated and heat removed versus temperature; the intersections of the straight 
-                        blue line and green curve correspond to steady-state solutions to the mass and energy balances for the CSTR. The heat transfer fluid is at a constant temperature of 300 K. 
+                        This simulation uses the Peng-Robinson equation of state for mixtures to plot isotherms for n-butane(1)/n-octane(2) mixtures on a log pressure 
+                        versus log volume graph. Use the sliders to select the temperature and the mole fraction \(x_1\) of the liquid phase (blue  isotherm). The green 
+                        isotherm is for the vapor phase (mole fraction \(y_1\)) that is in equilibrium with the liquid, The values of \(y_1\) and the equilibrium pressure in the upper-right corner are determined from Raoult's law. The dashed black line connects the two compositions that are in equilibrium at the equilibrium pressure. 
                     </p>
                 </div>
             </div>
@@ -100,37 +99,41 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        Mole balance:
-                        $$\frac{dC_A}{dt} = \frac{1}{\tau}(C_{A,f}-C_A) - k C_A$$
-                        $$k = k_m e^{[-\frac{E_a}{R}(\frac{1}{T} - \frac{1}{T_m})]}$$
-                        where C_A is the concentration of reactant A (kmol / \(m^3\)), C_{A,f} is the feed concentration of A (kmol / \(m^3\)),
-                        t is time (min), \(\tau\) is residence time (min), k is the rate constant (1/min), \(k_m\) is the rate constant at mean temperature \(T_m\) (1/min),
-                        T is reactor temperature (K), and Ea is activation energy (kJ/kmol).
+                        The Peng-Robinson equation of state for mixtures is used to plot pressure P versus volume V on a log-log graph:
+                        $$ P = \frac{RT}{V-b_m} - \frac{a_m}{V^2 - 2Vb_m - b_m^2} $$
+                        where R is the gas constant ([\(cm^3\) MPa] / [mol K]), T is temperature (K), P is in MPa, and V is in \(cm^3\) / mol.
                     </p>
                     <p>
-                        Energy balance:
-                        $$ \frac{dT}{dt} = \frac{UA}{V C_{ps}} (T_a - T) + \frac{1}{\tau} (T_f - T) - \frac{\Delta H}{C_{ps}} k C_A $$
-                        where \(T_a\) and \(T_f\) are the heat transfer fluid and feed temperatures (K), UA is the overall heat transfer coefficient times heat transfer area 
-                        (kJ/[min K]), V is reactor volume (\(m^3\)), \(C_{ps}\)=\(\rho \widehat{C_p} \) is specific heat capacity (kJ/[m^3 K]), \(\rho\) is density of reactants (kg/\(m^3\)), \(\widehat{C_p}\) is average heat capacity of reactants (kJ/[kg K]), and ΔH is heat of reaction (kJ/kmol).
+                        \(a_m\) is the attraction parameter and \(b_m\) is the repulsion parameter for the mixture:
+                        $$ a_m = \Sigma_{i=1}^2 \Sigma_{j=1}^2 z_i z_j (1-k_{ij} \sqrt{a_i a_j}) $$
+                        $$ b_m = \Sigma_{i=1}^2 z_i b_i $$
+                        where z is the component mole fraction, \(k_{ij}\) is the binary interaction parameter, adn a and b are the attraction and
+                        repulsion parameters for a pure component.
                     </p>
                     <p>
-                        The heats generated \(Q_G\) and removed \(Q_R\) are:
-                        $$ Q_G = -\frac{k}{1 + k \tau} \Delta H C_{A,f} $$
-                        $$ Q_R = \frac{C_{ps}}{\tau} (T - T_f) + \frac{UA}{V}(T - T_a) $$
-                        where \(Q_G\) and \(Q_R\) are in units of (kJ / [\(m^3\) min]).
+                        The binary interaction parameter can be calculated [1]:
+                        $$ k_{ij} = 1 = \frac{1}{2} \frac{b_2}{b_1} \sqrt{\frac{a_1}{a_2}} - \frac{1}{2} \frac{b_1}{b_2} \sqrt{\frac{a_2}{a_1}}
+                            + \frac{1}{2} \frac{b_2 RT}{\sqrt{a_1 a_2}} \frac{\theta_1}{T/T_{c,1}} $$
+                        for an alkane/alkane mixture \(\theta_1 = 0.22806\) and \(\theta_2 = 0.18772\).
                     </p>
                     <p>
-                        Conversion of reactant A is:
-                        $$ x = 1 - \frac{C_A}{C_{A,f}} $$
+                        The attraction and repulsion parameters for a pure component are:
+                        $$ a = 0.457 \frac{R^2 T_c^2}{P_c}(1 + \kappa (1 - \sqrt{T/T_c}))^2 $$
+                        $$ b = 0.00778 \frac{RT_c}{P_c} $$
+                        where \(T_c\) is the critical temperature (K) and \(P_c\) is the critical pressure (MPa).
                     </p>
                     <p>
-                        References
+                        $$\kappa = 0.37464 + 1.54226 \omega - 0.26992 \omega^2$$
+                        where $\kappa$ is a simplification term and $\omega$ is the acentric factor.
                     </p>
                     <p>
-                        [1] J. G. Ekerdt and J. B. Rawlings, Chemical Reactor Analysis and Design Fundamentals, Madison, WI: Nob Hill Publishing, 2002 pp. 296-316.
-                    </p>
-                    <p>
-                        [2] Multiple Steady States in a Continuous Stirred-Tank Reactor with Heat Exchange. www.colorado.edu/learncheme/kinetics/MultipleSteadyStatesCSTR.html.
+                        Raoult's law is used to calculate the pressure of the mixture at VLE:
+                        $$P_{vle} = x_1 P_1^{sat} + (1 - x_1) P_2^{sat}$$
+                        and $P_{vle}$ is used to determine the vapor mole fraction:
+                        $$y_1 = x_1 P_1^{sat} / P_{vle}$$
+                        where $x_1$ and $y_1$ are the liquid and vapor mole fractions of hexane, and $P_i^{sat}$ is the saturation pressure that is calculated using the Antoine equation:
+                        $$P_i^{sat} = 10^{A_i - \frac{B_i}{T + C_i}}$$
+                        where $A_i$, $B_i$ and $C_i$ are Antoine constants.
                     </p>
                 </div>
             </div>

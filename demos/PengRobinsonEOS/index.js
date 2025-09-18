@@ -68,13 +68,38 @@ const chart = new Chart(ctx, {
     data: {
         datasets: [
             {
-                label: 'Liquid Phase (x₁)',
+                label: '',
+                pointBackgroundColor: 'blue',
                 borderColor: 'blue',
-                backgroundColor: 'rgba(0, 0, 255, 0.1)',
                 borderWidth: 2,
+                fillColor: 'blue',
+                // borderDash: [5, 5],
+                data: [],
+                pointRadius: 4,
+                fill: true,
+                showLine: false
+            },
+            {
+                // label: 'VLE Connection',
+                pointBackgroundColor: 'green',
+                borderColor: 'green',
+                borderWidth: 2,
+                fillColor: 'green',
+                // borderDash: [5, 5],
+                data: [],
+                pointRadius: 4,
+                fill: true,
+                showLine: false
+            },
+            {
+                label: 'VLE Connection',
+                borderColor: 'black',
+                borderWidth: 2,
+                borderDash: [5, 5],
                 data: [],
                 pointRadius: 0,
-                fill: false
+                fill: false,
+                showLine: true
             },
             {
                 label: 'Vapor Phase (y₁)',
@@ -86,15 +111,14 @@ const chart = new Chart(ctx, {
                 fill: false
             },
             {
-                label: 'VLE Connection',
-                borderColor: 'black',
+                label: 'Liquid Phase (x₁)',
+                borderColor: 'blue',
+                backgroundColor: 'rgba(0, 0, 255, 0.1)',
                 borderWidth: 2,
-                borderDash: [5, 5],
                 data: [],
                 pointRadius: 0,
-                fill: false,
-                showLine: true
-            }
+                fill: false
+            },
         ]
     },
     options: {
@@ -124,7 +148,7 @@ const chart = new Chart(ctx, {
         plugins: {
             title: {
                 display: true,
-                text: 'n-butane(1) / n-octane(2) Mixture',
+                text: 'n-butane(1) / n-octane(2)',
                 font: {
                     size: 16
                 }
@@ -135,6 +159,13 @@ const chart = new Chart(ctx, {
                         const label = context.dataset.label || '';
                         const value = context.parsed;
                         return `${label}: P=${value.y.toExponential(2)} MPa, V=${value.x.toExponential(2)} cm³/mol`;
+                    }
+                }
+            },
+            legend: {
+                labels: {
+                    filter: (legendItem, chartData) => {
+                        return legendItem.text !== '' && legendItem.text !== undefined;
                     }
                 }
             }
@@ -340,22 +371,26 @@ function calculateAndUpdate() {
         pv = V;
     }
 
-    
-    
-    // Add VLE connection line if we found roots
-    if (liquidRoots.length >= 2 && vaporRoots.length >= 2) {
-        // Use the smallest liquid volume and largest vapor volume (typical VLE points)
-        const liquidV = Math.min(...liquidRoots);
-        const vaporV = Math.max(...vaporRoots);
-        
-        vleData.push({ x: liquidV, y: Pvle });
-        vleData.push({ x: vaporV, y: Pvle });
+    // Try and find the liquid root with new data
+    for (let i=0;i<liquidData.length-1;i++) {
+        if ((liquidData[i].y - Pvle) * (liquidData[i+1].y - Pvle) <= 0) {
+            // The root is in between the two
+            vleData.push({ x: (liquidData[i].x + liquidData[i+1].x) / 2, y: Pvle });
+            break;
+        }
     }
+
+    const liquidV = Math.min(...liquidRoots);
+    const vaporV = Math.max(...vaporRoots);
+        
+    vleData.push({ x: vaporV, y: Pvle });
     
     // Update chart
-    chart.data.datasets[0].data = liquidData;
-    chart.data.datasets[1].data = vaporData;
+    chart.data.datasets[0].data = [vleData[0]];
+    chart.data.datasets[1].data = [vleData[1]];
     chart.data.datasets[2].data = vleData;
+    chart.data.datasets[3].data = vaporData;
+    chart.data.datasets[4].data = liquidData;
     chart.update();
 }
 
