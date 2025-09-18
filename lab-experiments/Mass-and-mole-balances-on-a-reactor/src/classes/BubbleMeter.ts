@@ -14,14 +14,17 @@ export const initBubbleMeter = (normalId: string, squeezeId: string, flowSignal:
     sqz.setAttribute("opacity","0");
 
     // Add event listeners to set the bulb
-    nrm.addEventListener("mousedown", () => {
+    const startPress = () => {
         bulb.set(true);
-        sqz.setAttribute("opacity","100");
-    });
-    nrm.addEventListener("mouseup", () => {
+        sqz.setAttribute("opacity","1");
+    }
+    const endPress = () => {
         bulb.set(false);
-        sqz.setAttribute("opacity","0");
-    });
+        sqz.setAttribute("opacity","1");
+    }
+
+    nrm.addEventListener("pointerdown", startPress);
+    nrm.addEventListener("pointerup", endPress);
 
     // Use the bulb to initialize the bubble meter
     const bubbleMeterDescriptor: BubbleMeterDescriptor = {
@@ -108,7 +111,7 @@ export class BubbleMeter {
                 ++numOver;
             }
             else {
-                bubbleHtml += `<rect id="bubble" x="856" y="${y}" width="16" height="1" fill="#0E3126"></rect>`;
+                bubbleHtml += `<rect id="bubble" x="856" y="${y}" width="16" height="2" fill="#0E3126"></rect>`;
                 this.bubbles[i] = y;
             }
         }

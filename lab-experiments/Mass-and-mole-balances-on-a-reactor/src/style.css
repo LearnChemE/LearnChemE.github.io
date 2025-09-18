@@ -11,6 +11,10 @@ svg {
   height: fit-content;
   user-select: none;
   position: relative;
+  -webkit-user-select: none; /* iOS Safari */
+  -webkit-touch-callout: none; /* Disable long-press menu */
+  user-select: none;
+  touch-action: none;
 }
 
 .digital-label {
@@ -50,6 +54,10 @@ svg {
 }
 
 .svg-dial {
+  -webkit-user-select: none; /* iOS Safari */
+  -webkit-touch-callout: none; /* Disable long-press menu */
+  user-select: none;
+  touch-action: none; /* Prevent scroll while pressing */
   cursor: grab;
 }
 .svg-dial:hover {
@@ -74,33 +82,6 @@ svg {
 /* ─────────────────────────────────────────────────────────────────────────────
    Hamburger menu
    ───────────────────────────────────────────────────────────────────────────── */
-
-/* .menu-button {
-  position:absolute;
-  right: -2em;
-  top: 1.5em;
-
-  font-size: 1.75rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  transform: translate(-5px, -30px);
-  background-color: lightblue;
-  height: max-content;
-  width: max-content;
-  margin-top: 0;
-  border-radius: 3px;
-  border: 1px solid black;
-
-  aspect-ratio: 1;
-
-  align-items: center;
-  text-align: start;
-}
-
-.menu-button:hover {
-  background-color: rgb(198, 224, 233);
-} */
 
 .menu-button {
     position:absolute;
