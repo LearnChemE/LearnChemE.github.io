@@ -145,6 +145,7 @@ const inBeakerDescriptor: BeakerDescriptor = {
   flowOutInstead: true
 };
 const inBeaker = new Beaker(inBeakerDescriptor);
+evaporator.flowOut.subscribe((val) => console.log(val))
 
 // In Beaker is under
 inBeaker.overflow.subscribe(() => {

@@ -61,13 +61,14 @@ export function initDial(id: string, init: number = 0): Signal<number> {
     const lift = new Signal<number>(init/270);
     e.setAttribute("transform", `rotate(${init} ${center.x} ${center.y})`);
 
-    e.addEventListener("mousedown", ({ clientX, clientY }) => {
+    e.addEventListener("pointerdown", ({ clientX, clientY }) => {
         // Center for mouse-related things are relative to the window, and can change with resizing
         const bbox = e.getBoundingClientRect();
         const mozCenter = vec2(
             bbox.x + bbox.width / 2,
             bbox.y + bbox.height / 2
         );
+        document.querySelector("svg")?.setAttribute("touch-action","none");
 
         // Get initial angle
         let th0 = findAngleFromDown(mozCenter, vec2(clientX, clientY));
@@ -96,13 +97,13 @@ export function initDial(id: string, init: number = 0): Signal<number> {
 
         // Release function
         const release = () => {
-            document.removeEventListener("mousemove", drag);
-            document.removeEventListener("mouseup", release);
+            document.removeEventListener("pointermove", drag);
+            document.removeEventListener("pointerup", release);
         };
 
         // Add the event listeners for drag + release
-        document.addEventListener("mousemove", drag);
-        document.addEventListener("mouseup", release);
+        document.addEventListener("pointermove", drag);
+        document.addEventListener("pointerup", release);
     });
 
     return lift;
