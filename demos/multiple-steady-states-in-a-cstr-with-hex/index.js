@@ -20,6 +20,7 @@ const menuItems = document.querySelectorAll('.menu-item');
 const modals = document.querySelectorAll('.modal');
 const closeBtns = document.querySelectorAll('.close-btn');
 const Ca0ctrl = Ca0Slider.parentElement;
+const T0ctrl = T0Slider.parentElement;
 
 // Constants
 const Ea = 15000;      // Activation energy (J/mol)
@@ -34,6 +35,14 @@ function displayConcSlider(show=true) {
         Ca0ctrl.classList.remove("hidden");
     } else {
         Ca0ctrl.classList.add("hidden");
+    }
+}
+
+function displayTempSlider(show=true) {
+    if (show) {
+        T0ctrl.classList.remove("hidden");
+    } else {
+        T0ctrl.classList.add("hidden");
     }
 }
 
@@ -286,7 +295,7 @@ function k(T) {
 // Calculate Qg and Qr for energy plot
 function calculateEnergyData(tau) {
     const Tmin = 300;
-    const Tmax = 500;
+    const Tmax = 420;
     const TValues = [];
     const QgValues = [];
     const QrValues = [];
@@ -368,6 +377,7 @@ function updatePlot(result) {
                 });
             });
             displayConcSlider(false);
+            displayTempSlider(true);
             break;
             
         case 'phase2':
@@ -417,6 +427,7 @@ function updatePlot(result) {
                 });
             });
             displayConcSlider(true);
+            displayTempSlider(true);
             break;
             
         case 'energy':
@@ -443,14 +454,41 @@ function updatePlot(result) {
 
             // Create a new plot just to have the correct ranges
             Plotly.newPlot(plotDiv, data, layout);
+            console.log(energyData.TValues.length)
             
             layout = {
                 title: { text: 'energy vs temperature'},
-                xaxis: { title: {text:'temperature (K)'} },
-                yaxis: { title: {text:'energy eate (MJ/m³ min)'} },
-                showlegend: true
+                xaxis: { title: { text:'temperature (K)' }, range: [300, 420] },
+                yaxis: { title: { text:'energy eate (MJ/m³ min)'}, range: [0, null] },
+                showlegend: true,
+                annotations: [{
+                    x: energyData.TValues[30],
+                    y: energyData.QgValues[30],
+                    text: "heat generated",
+                    showarrow: false,
+                    font: {
+                        color: "green",
+                        size: 16
+                    },
+                    xanchor: "center",
+                    yanchor: "center",
+                    bgcolor: "white"
+                }, {
+                    x: energyData.TValues[45],
+                    y: energyData.QrValues[45],
+                    text: "heat removed",
+                    showarrow: false,
+                    font: {
+                        color: "blue",
+                        size: 16
+                    },
+                    xanchor: "center",
+                    yanchor: "center",
+                    bgcolor: "white"
+                }]
             };
             displayConcSlider(false);
+            displayTempSlider(false);
             break;
             
         case 'temperature':
@@ -471,6 +509,7 @@ function updatePlot(result) {
                 showlegend: false
             };
             displayConcSlider(true);
+            displayTempSlider(true);
             break;
             
         case 'conversion':
@@ -494,6 +533,7 @@ function updatePlot(result) {
                 showlegend: false
             };
             displayConcSlider(true);
+            displayTempSlider(true);
             break;
     }
     
