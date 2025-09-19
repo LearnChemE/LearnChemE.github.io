@@ -328,7 +328,6 @@ function updatePlot(result) {
             // Phase plane 1: Multiple initial concentrations
             data = [];
             const trajectories = [];
-            const annotations = [];
             
             result.forEach(solution => {
                 const Ca_init = solution.Cas[0];
@@ -348,19 +347,6 @@ function updatePlot(result) {
                     ts: solution.times,
                     line: { color: trace.line.color }
                 });
-                // annotations.push({
-                //     x: smoothed.x[0],
-                //     y: smoothed.y[0],
-                //     text: `Cₐ₀ = ${Ca_init} kmol/m³`,
-                //     showarrow: false,
-                //     font: {
-                //         color: trace.line.color,
-                //         size: 16
-                //     },
-                //     xanchor: "center",
-                //     yanchor: "center",
-                //     bgcolor: "white"
-                // });
             });
             
             layout = {
@@ -369,17 +355,24 @@ function updatePlot(result) {
                         text:'temperature (K)', 
                         font: { size: FontSize } 
                     }, 
-                    tickfont: { size: FontSize }
-                    },
+                    tickfont: { size: FontSize },
+                    showline: true
+                },
                 yaxis: { 
                     title: {text:'concentration (kmol/m³)', font: { size: FontSize } }, 
                     tickformat: ".1f", 
-                    tickfont: { size: FontSize }
+                    tickfont: { size: FontSize },
+                    ticksuffix: ' ',
+                    showline: true,
+                    rangemode: 'tozero',
+                    range: [0, 2]
                 },
                 showlegend: false,
-                annotations: annotations,
                 margin: {
-                    pad: 10
+                    l: 60,
+                    r: 50,
+                    b: 50,
+                    t: 50
                 }
             };
 
@@ -427,17 +420,23 @@ function updatePlot(result) {
             layout = {
                 xaxis: { 
                     title: {text:'temperature (K)', font: { size: FontSize } }, 
-                    tickfont: { size: FontSize }
+                    tickfont: { size: FontSize },
+                    showline: true
                 },
                 yaxis: { 
                     title: {text:'conversion', font: { size: FontSize } }, 
                     range: [0,1], 
                     tickformat: ".1f", 
-                    tickfont: { size: FontSize }
+                    tickfont: { size: FontSize },
+                    ticksuffix: ' ',
+                    showline: true
                 },
                 showlegend: false,
                 margin: {
-                    pad: 10
+                    l: 60,
+                    r: 50,
+                    b: 50,
+                    t: 50
                 }
             };
 
@@ -496,16 +495,22 @@ function updatePlot(result) {
                 xaxis: { 
                     title: { text:'temperature (K)', font: { size: FontSize } }, 
                     range: [300, 420], 
-                    tickfont: { size: FontSize }
+                    tickfont: { size: FontSize },
+                    showline: true
                 },
                 yaxis: { 
                     title: { text:'energy eate (MJ/m³ min)', font: { size: FontSize } }, 
                     range: [0, null], 
-                    tickfont: { size: FontSize }
+                    tickfont: { size: FontSize },
+                    showline: true,
+                    ticksuffix: ' ',
                 },
-                showlegend: true,
+                showlegend: false,
                 margin: {
-                    pad: 10
+                    l: 50,
+                    r: 50,
+                    b: 50,
+                    t: 50
                 },
                 annotations: [{
                     x: energyData.TValues[30],
@@ -551,12 +556,22 @@ function updatePlot(result) {
             layout = {
                 xaxis: { 
                     title: {text:'time (min)', font: { size: FontSize }}, 
-                    tickfont: { size: FontSize }
+                    tickfont: { size: FontSize },
+                    showline: true
                 },
-                yaxis: { title: {text:'temperature (K)', font: { size: FontSize }}, 
-                    tickfont: { size: FontSize } },
+                yaxis: { 
+                    title: {text:'temperature (K)', font: { size: FontSize }}, 
+                    tickfont: { size: FontSize },
+                    showline: true,
+                    ticksuffix: ' '
+                },
                 showlegend: false,
-                margin: { pad: 10 }
+                margin: {
+                    l: 70,
+                    r: 50,
+                    b: 50,
+                    t: 50
+                }
             };
             displayConcSlider(true);
             displayTempSlider(true);
@@ -578,15 +593,23 @@ function updatePlot(result) {
             layout = {
                 xaxis: { 
                     title: {text:'time (min)', font: { size: FontSize }}, 
-                    tickfont: { size: FontSize }
+                    tickfont: { size: FontSize },
+                    showline: true
                 },
                 yaxis: { 
                     title: {text:'conversion', font: { size: FontSize }}, 
                     range: [0,1], tickformat: ".1f", 
-                    tickfont: { size: FontSize }
+                    tickfont: { size: FontSize },
+                    showline: true,
+                    ticksuffix: ' '
                 },
                 showlegend: false,
-                margin: { pad: 10 }
+                margin: {
+                    l: 60,
+                    r: 50,
+                    b: 50,
+                    t: 50
+                }
             };
             displayConcSlider(true);
             displayTempSlider(true);
