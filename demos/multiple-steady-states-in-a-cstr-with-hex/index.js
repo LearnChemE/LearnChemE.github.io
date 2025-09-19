@@ -5,6 +5,8 @@ let tau = 38;
 let T0 = 315;
 let Ca0 = 1.0;
 
+const FontSize = 16;
+
 // DOM elements
 const tauSlider = document.getElementById('tau');
 const tauValue = document.getElementById('tau-value');
@@ -326,6 +328,7 @@ function updatePlot(result) {
             // Phase plane 1: Multiple initial concentrations
             data = [];
             const trajectories = [];
+            const annotations = [];
             
             result.forEach(solution => {
                 const Ca_init = solution.Cas[0];
@@ -345,13 +348,39 @@ function updatePlot(result) {
                     ts: solution.times,
                     line: { color: trace.line.color }
                 });
+                // annotations.push({
+                //     x: smoothed.x[0],
+                //     y: smoothed.y[0],
+                //     text: `Cₐ₀ = ${Ca_init} kmol/m³`,
+                //     showarrow: false,
+                //     font: {
+                //         color: trace.line.color,
+                //         size: 16
+                //     },
+                //     xanchor: "center",
+                //     yanchor: "center",
+                //     bgcolor: "white"
+                // });
             });
             
             layout = {
-                title: { text: 'phase plane: concentration vs temperature'},
-                xaxis: { title:{text:'temperature (K)'} },
-                yaxis: { title: {text:'concentration (kmol/m³)'} },
-                showlegend: true
+                xaxis: { 
+                    title: {
+                        text:'temperature (K)', 
+                        font: { size: FontSize } 
+                    }, 
+                    tickfont: { size: FontSize }
+                    },
+                yaxis: { 
+                    title: {text:'concentration (kmol/m³)', font: { size: FontSize } }, 
+                    tickformat: ".1f", 
+                    tickfont: { size: FontSize }
+                },
+                showlegend: false,
+                annotations: annotations,
+                margin: {
+                    pad: 10
+                }
             };
 
             // Create a new plot just to have the correct ranges
@@ -367,9 +396,8 @@ function updatePlot(result) {
                     mode: 'markers',
                     marker: {
                         symbol: 'arrow',
-                        size: 12,
+                        size: 16,
                         color: markerSet.color,
-                        line: {color: 'white', width: 1},
                         angle: markerSet.angle
                     },
                     showlegend: false,
@@ -397,10 +425,20 @@ function updatePlot(result) {
             }];
             
             layout = {
-                title: { text: 'phase plane: conversion vs temperature'},
-                xaxis: { title: {text:'temperature (K)'} },
-                yaxis: { title: {text:'conversion'}, range: [0,1] },
-                showlegend: false
+                xaxis: { 
+                    title: {text:'temperature (K)', font: { size: FontSize } }, 
+                    tickfont: { size: FontSize }
+                },
+                yaxis: { 
+                    title: {text:'conversion', font: { size: FontSize } }, 
+                    range: [0,1], 
+                    tickformat: ".1f", 
+                    tickfont: { size: FontSize }
+                },
+                showlegend: false,
+                margin: {
+                    pad: 10
+                }
             };
 
             // Create a new plot just to have the correct axis ranges
@@ -417,9 +455,8 @@ function updatePlot(result) {
                     mode: 'markers',
                     marker: {
                         symbol: 'arrow',
-                        size: 12,
+                        size: 16,
                         color: markerSet.color,
-                        line: {color: 'white', width: 1},
                         angle: markerSet.angle
                     },
                     showlegend: false,
@@ -454,13 +491,22 @@ function updatePlot(result) {
 
             // Create a new plot just to have the correct ranges
             Plotly.newPlot(plotDiv, data, layout);
-            console.log(energyData.TValues.length)
             
             layout = {
-                title: { text: 'energy vs temperature'},
-                xaxis: { title: { text:'temperature (K)' }, range: [300, 420] },
-                yaxis: { title: { text:'energy eate (MJ/m³ min)'}, range: [0, null] },
+                xaxis: { 
+                    title: { text:'temperature (K)', font: { size: FontSize } }, 
+                    range: [300, 420], 
+                    tickfont: { size: FontSize }
+                },
+                yaxis: { 
+                    title: { text:'energy eate (MJ/m³ min)', font: { size: FontSize } }, 
+                    range: [0, null], 
+                    tickfont: { size: FontSize }
+                },
                 showlegend: true,
+                margin: {
+                    pad: 10
+                },
                 annotations: [{
                     x: energyData.TValues[30],
                     y: energyData.QgValues[30],
@@ -468,7 +514,7 @@ function updatePlot(result) {
                     showarrow: false,
                     font: {
                         color: "green",
-                        size: 16
+                        size: FontSize
                     },
                     xanchor: "center",
                     yanchor: "center",
@@ -480,7 +526,7 @@ function updatePlot(result) {
                     showarrow: false,
                     font: {
                         color: "blue",
-                        size: 16
+                        size: FontSize
                     },
                     xanchor: "center",
                     yanchor: "center",
@@ -503,10 +549,14 @@ function updatePlot(result) {
             }];
             
             layout = {
-                title: { text: 'temperature vs time'},
-                xaxis: { title: {text:'time (min)'} },
-                yaxis: { title: {text:'temperature (K)'} },
-                showlegend: false
+                xaxis: { 
+                    title: {text:'time (min)', font: { size: FontSize }}, 
+                    tickfont: { size: FontSize }
+                },
+                yaxis: { title: {text:'temperature (K)', font: { size: FontSize }}, 
+                    tickfont: { size: FontSize } },
+                showlegend: false,
+                margin: { pad: 10 }
             };
             displayConcSlider(true);
             displayTempSlider(true);
@@ -526,11 +576,17 @@ function updatePlot(result) {
             }];
             
             layout = {
-                title: {text:'conversion vs time'},
-                dragMode: false,
-                xaxis: { title: {text:'time (min)'} },
-                yaxis: { title: {text:'conversion'}, range: [0,1] },
-                showlegend: false
+                xaxis: { 
+                    title: {text:'time (min)', font: { size: FontSize }}, 
+                    tickfont: { size: FontSize }
+                },
+                yaxis: { 
+                    title: {text:'conversion', font: { size: FontSize }}, 
+                    range: [0,1], tickformat: ".1f", 
+                    tickfont: { size: FontSize }
+                },
+                showlegend: false,
+                margin: { pad: 10 }
             };
             displayConcSlider(true);
             displayTempSlider(true);
