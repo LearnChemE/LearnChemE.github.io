@@ -11,7 +11,8 @@ let isHeaterOn = false;
 let container = null;
 let gasFlowRateDevice = null;
 let gasFlowRateText = null;
-let currentTemp = 20;
+let currentTemp = 15;
+let changedTemp = 15; // track last changed temperature for heating/cooling
 let timerId = null;
 let elapsedSeconds = 0; // track elapsed time for gas flow
 // let outletBubbleTimer = null;   // interval handle for outlet bubbles
@@ -29,20 +30,20 @@ function updateVentIndicator(draw, show) {
     if (ventIndicator) { ventIndicator.remove(); ventIndicator = null; }
     return;
   }
-
+  
   const totalLen = window.leftPipe3.node.getTotalLength();
   const pt = window.leftPipe3.node.getPointAtLength(totalLen);
-
+  
   if (!show) {
     if (ventIndicator) { ventIndicator.hide(); }
     if (ventLabel) { ventLabel.hide(); }
     return;
   }
-
+  
   // Ensure the indicator exists
   if (!ventIndicator) {
     ventIndicator = draw.group();
-
+    
     // Create (or reuse) a marker for the arrowhead
     if (!ventMarker) {
       ventMarker = draw.marker(6, 6, function(add) {
@@ -51,31 +52,31 @@ function updateVentIndicator(draw, show) {
       // Tip reference at the marker bounds and auto‑orientation
       ventMarker.ref(6, 3).orient('auto');
     }
-
+    
     // A single red line pointing east with an arrowhead at the end
     ventIndicator.line(0, 0, 25, 0)
-      .stroke({ color: '#ff0000', width: 1.6 })
-      .marker('end', ventMarker);
-
+    .stroke({ color: '#ff0000', width: 1.6 })
+    .marker('end', ventMarker);
+    
     // Text label exactly aligned with the arrow line baseline, starting just after the arrow tip
     ventLabel = draw.text('vent')
-      .font({ family: 'Arial', size: 12})
-      .fill('#ff0000');
+    .font({ family: 'Arial', size: 12})
+    .fill('#ff0000');
     // Align the text vertically to the line and anchor from the left
     ventLabel.attr({ 'text-anchor': 'start', 'dominant-baseline': 'middle', 'alignment-baseline': 'middle' });
     // Place the label so its vertical middle sits on y=0 and its left edge starts after the arrow tip
     ventLabel.move(770, 47.5);
-
+    
     // Ensure it doesn't block clicks on other UI elements
     ventIndicator.attr({ 'pointer-events': 'none' });
   }
-
+  
   // Position the group at the outlet point with a small offset so it sits just outside the pipe
   // The path ends at the outlet heading east, so offset a few pixels to the right.
   ventIndicator.show();
   ventLabel.show();
   ventIndicator.move(pt.x + 8, pt.y - 0);
-
+  
   // Keep it above animated strokes
   if (typeof ventIndicator.front === 'function') ventIndicator.front();
 }
@@ -224,7 +225,15 @@ function drawGasCylinder(draw, x, y, label) {
         }
         
         animateGasFlow(draw);
+        if (verticalValveOpen) {
+          timerId = startTimer(draw, currentTemp);
+        } else {
+          clearInterval(timerId);
+        }
+
         animateBubbleFlow(draw);
+
+
       });
       
       return group;
@@ -478,7 +487,7 @@ function drawGasCylinder(draw, x, y, label) {
           add.stop(1, '#0000ff');
         });
       }
-
+      
       // Expose heater helpers on the container group
       g.updateHeaterHeat = updateHeaterHeat;
       g.applyOffGradient = applyOffGradient;
@@ -552,12 +561,12 @@ function drawGasCylinder(draw, x, y, label) {
         isHeaterOn = true;
         updateHeaterHeat(targetTemp);
         // startBubbles();
-        animateBubbleFlow(draw);
+        // animateBubbleFlow(draw);
       } else {
         isHeaterOn = false;
         applyOffGradient();
         // stopBubbles();
-        animateBubbleFlow(draw);
+        // animateBubbleFlow(draw);
       }
       
       // React to switch toggles to swap gradients and bubbles
@@ -568,14 +577,14 @@ function drawGasCylinder(draw, x, y, label) {
             // Turned ON: heat based on current target temperature, start bubbles
             updateHeaterHeat(g.targetTemperature || targetTemp);
             // startBubbles();
-            timerId = startTimer(draw, currentTemp);
-            animateBubbleFlow(draw);
+            // timerId = startTimer(draw, currentTemp);
+            // animateBubbleFlow(draw);
           } else {
             // Turned OFF: cool gradient, stop bubbles
             applyOffGradient();
             // stopBubbles();
-            clearInterval(timerId);
-            animateBubbleFlow(draw);
+            // clearInterval(timerId);
+            // animateBubbleFlow(draw);
           }
         });
       }
@@ -605,21 +614,29 @@ function drawGasCylinder(draw, x, y, label) {
       .center(x + width * 0.75, y + height / 2);
       let isOn = false;
       handle.rotate(-20, x + width / 2, y + height / 2);
-      switchGroup.click(() => {
-        isOn = !isOn;
-        switchGroup.isOn = isOn;
-        if (switchGroup.isOn) {
-          // reactorIsOpen = true;
-          handle.animate(200).rotate(40, x + width / 2, y + height / 2);
+  switchGroup.click(() => {
+    if (!(gasValveOpen && verticalValveOpen)) {
+      isOn = !isOn;
+      switchGroup.isOn = isOn;
+      if (switchGroup.isOn) {
+        // reactorIsOpen = true;
+        handle.animate(200).rotate(40, x + width / 2, y + height / 2);
+        currentTemp = changedTemp;
+        if (readout && typeof readout.text === 'function') {
           readout.text(currentTemp + '°C');
-          readout.show();
-          
-        } else {
-          // reactorIsOpen = false;
-          handle.animate(200).rotate(-40, x + width / 2, y + height / 2);
-          readout.hide();
+          if (typeof readout.show === 'function') readout.show();
         }
-      });
+      } else {
+        // reactorIsOpen = false;
+        handle.animate(200).rotate(-40, x + width / 2, y + height / 2);
+        currentTemp = 15;
+        if (readout && typeof readout.text === 'function') {
+          readout.text(currentTemp + '°C');
+          // if (typeof readout.hide === 'function') readout.hide();
+        }
+      }
+    }
+  });
       return switchGroup;
     }
     
@@ -638,26 +655,26 @@ function drawGasCylinder(draw, x, y, label) {
       g.rect(dispW, dispH).move(dispX, dispY).radius(4).fill('#222').stroke({ color: '#111', width: 0.6 });
       
       // Display text
-      const readout = g.text(currentTemp + '°C')
+      const readout1 = g.text(changedTemp + '°C')
       .font({ family: 'Arial', size: 16, anchor: 'middle'})
       .fill('#fff')
       .center(dispX + dispW / 2, dispY + dispH / 2);
       
       function updateDisplay() {
         // clamp
-        currentTemp = Math.max(minTemp, Math.min(maxTemp, currentTemp));
+        // currentTemp = changedTemp;
         // Robustly refresh the text node (plain() avoids tspan quirks)
-        if (readout && readout.clear && readout.plain) {
-          readout.clear().plain(currentTemp + '°C');
+        if (readout1 && readout1.clear && readout1.plain) {
+          readout1.clear().plain(changedTemp + '°C');
         } else {
           // fallback for older svg.js
-          readout.text(currentTemp + '°C');
+          readout1.text(changedTemp + '°C');
         }
         // re-center and bring to front
-        if (readout.center) readout.center(dispX + dispW / 2, dispY + dispH / 2);
-        if (readout.front) readout.front();
+        if (readout1.center) readout1.center(dispX + dispW / 2, dispY + dispH / 2);
+        if (readout1.front) readout1.front();
         // notify listener
-        if (typeof onChange === 'function') onChange(currentTemp);
+        if (typeof onChange === 'function') onChange(changedTemp);
       }
       
       // Buttons
@@ -679,9 +696,9 @@ function drawGasCylinder(draw, x, y, label) {
       .attr({ 'pointer-events': 'auto' });
       
       function inc() {
-        const next = currentTemp + step;
+        const next = changedTemp + step;
         if (next <= maxTemp && !isHeaterOn) {
-          currentTemp = next;
+          changedTemp = next;
           updateDisplay();
         } else {
           // still force a refresh in case UI got desynced
@@ -689,9 +706,9 @@ function drawGasCylinder(draw, x, y, label) {
         }
       }
       function dec() {
-        const next = currentTemp - step;
+        const next = changedTemp - step;
         if (next >= minTemp && !isHeaterOn) {
-          currentTemp = next;
+          changedTemp = next;
           updateDisplay();
         } else {
           // still force a refresh in case UI got desynced
@@ -713,12 +730,12 @@ function drawGasCylinder(draw, x, y, label) {
         if (typeof el.front === 'function') el.front();
       });
       
-      // Ensure the readout is above the button layers
-      if (typeof readout.front === 'function') readout.front();
+  // Ensure the readout is above the button layers
+  if (readout && typeof readout.front === 'function') readout.front();
       
       // API
       g.getTemp = () => currentTemp;
-      g.setTemp = (t) => { currentTemp = Math.max(minTemp, Math.min(maxTemp, t)); updateDisplay(); };
+      g.setTemp = (t) => { updateDisplay(); };
       
       if (typeof g.front === 'function') g.front();
       // updateDisplay();
@@ -743,8 +760,7 @@ function drawGasCylinder(draw, x, y, label) {
       readout = g.text(currentTemp + '°C')
       .font({ family: 'Arial', size: 16, anchor: 'middle'})
       .fill('black')
-      .center(dispX + dispW / 2, dispY + dispH / 2)
-      .hide();
+      .center(dispX + dispW / 2, dispY + dispH / 2);
       // updateDisplay();
       return g;
     }
@@ -766,8 +782,12 @@ function drawGasCylinder(draw, x, y, label) {
         valveGroup.isRotated = !valveGroup.isRotated;
         if (valveGroup.isRotated) {
           valveGroup.animate(300).rotate(90, valveCenterX, valveCenterY);
+          timerId = startTimer(draw, currentTemp);
+          animateBubbleFlow(draw);
         } else {
           valveGroup.animate(300).rotate(-90, valveCenterX, valveCenterY);
+          clearInterval(timerId);
+          animateBubbleFlow(draw);
         }
         gasValveOpen = valveGroup.isRotated;
         animateGasFlow(draw);
@@ -819,84 +839,24 @@ function drawGasCylinder(draw, x, y, label) {
       }
     }
     
-function animateBubbleFlow(draw) {
-      // const emit = (pipeEl) => {
-      //   if (!pipeEl || !pipeEl.node || typeof pipeEl.node.getTotalLength !== 'function') return;
-        
-      //   // Create (or reuse) a layer for outlet bubbles so we can clear them cleanly.
-      //   if (!outletBubbleLayer) {
-      //     outletBubbleLayer = draw.group();
-      //     // Make sure these bubbles don't block pointer events.
-      //     outletBubbleLayer.attr({ 'pointer-events': 'none' });
-      //   }
-        
-      //   // Find the pipe outlet coordinates (end of the path)
-      //   const totalLen = pipeEl.node.getTotalLength();
-      //   const pt = pipeEl.node.getPointAtLength(totalLen);
-        
-      //   // Helper to spawn a single bubble at the outlet and let it rise
-      //   const spawn = () => {
-      //     // Guard against resets that null the layer while an interval is still ticking
-      //     if (!outletBubbleLayer) return;
-      //     // match container bubble size (even size)
-      //     const r = 6; // match container bubble size (even size)
-      //     const jitterX = (Math.random() - 0.5) * 6; // ±3 px
-      //     const startX = pt.x + jitterX;
-      //     const startY = pt.y;
-          
-      //     const bub = outletBubbleLayer.circle(r * 2)
-      //     .center(startX, startY)
-      //     .fill('none')
-      //     .stroke({ color: '#9e9e9e', width: 1, opacity: 0.9 })
-      //     .attr({ 'data-pipe-side': 'bubble' });
-          
-      //     // Rise upwards with a little horizontal drift
-      //     const dy = - (40 + Math.random() * 60); // 40–100 px upward
-      //     const dx = (Math.random() - 0.5) * 20;  // slight sideways drift
-      //     const dur = 2500 + Math.random() * 2000; // closer to container bubble duration
-          
-      //     bub.animate(dur)
-      //     .opacity(0.0)
-      //     .dx(dx)
-      //     .dy(dy)
-      //     .after(() => bub.remove());
-      //   };
-        
-      //   // Start interval if not already active
-      //   if (!outletBubbleTimer) {
-      //     outletBubbleTimer = setInterval(spawn, 450); // slower emission to match container rate
-      //     // Kick off one bubble immediately for responsiveness
-      //     spawn();
-      //   }
-      // };
-      
-      // const stopEmit = () => {
-      //   if (outletBubbleTimer) {
-      //     clearInterval(outletBubbleTimer);
-      //     outletBubbleTimer = null;
-      //   }
-      //   if (outletBubbleLayer) {
-      //     outletBubbleLayer.clear();
-      //   }
-      // };
-      
-  if (gasValveOpen && verticalValveOpen && isHeaterOn) {
-    // Keep the existing flow highlight along the pipe to the outlet
-    [window.leftPipe3].forEach(pipeEl => {
-      if (pipeEl) {
-        animateWaterFlow(draw, pipeEl, 0, 100, '#9dd2ff', 8, 0.3, 'bubble');
-        // emit(pipeEl);
+    function animateBubbleFlow(draw) {    
+      if (gasValveOpen && verticalValveOpen) {
+        // Keep the existing flow highlight along the pipe to the outlet
+        [window.leftPipe3].forEach(pipeEl => {
+          if (pipeEl) {
+            animateWaterFlow(draw, pipeEl, 0, 100, '#9dd2ff', 8, 0.3, 'bubble');
+            // emit(pipeEl);
+          }
+        });
+        updateVentIndicator(draw, true);
+      } else {
+        // remove any animated flow strokes tagged for bubbles
+        draw.find('path')
+        .filter(el => el.attr('data-pipe-side') === 'bubble')
+        .forEach(el => el.remove());
+        // stopEmit();
+        updateVentIndicator(draw, false);
       }
-    });
-    updateVentIndicator(draw, true);
-  } else {
-    // remove any animated flow strokes tagged for bubbles
-    draw.find('path')
-    .filter(el => el.attr('data-pipe-side') === 'bubble')
-    .forEach(el => el.remove());
-    // stopEmit();
-    updateVentIndicator(draw, false);
-  }
     }
     
     
@@ -944,7 +904,7 @@ function animateBubbleFlow(draw) {
       let rate = 0;
       timerId = setInterval(() => {
         // Calculate mass rate [g/s] and update elapsed time
-        if (gasValveOpen && verticalValveOpen && isHeaterOn) {
+        if (gasValveOpen && verticalValveOpen) {
           // Advance simulated time at TIME_SCALE × real time
           const realDeltaSec = interval / 1000;
           const simDeltaSec = realDeltaSec * TIME_SCALE;
@@ -962,13 +922,13 @@ function animateBubbleFlow(draw) {
             container.liquid.height(liquidH);
             container.liquid.y(liquidY - 5);
           }
-
+          
           if (volume <= 0.2 * 61.5) {
             if (isHeaterOn) {
               isHeaterOn = false;
               switchGroup.clear();
               switchGroup = drawSwitch(draw, 750, 200, 80, 40);
-              readout.hide();
+              // readout.hide();
               if (container && typeof container.applyOffGradient === 'function') {
                 container.applyOffGradient();
               }
@@ -990,49 +950,53 @@ function animateBubbleFlow(draw) {
       return timerId;
     }
     
-export function reset(draw) {
-  // 1) Stop emission timers first
-  // if (outletBubbleTimer) {
-  //   clearInterval(outletBubbleTimer);
-  //   outletBubbleTimer = null;
-  // }
-  if (timerId) {
-    clearInterval(timerId);
-    timerId = null;
-  }
+    export function reset(draw) {
+      // 1) Stop emission timers first
+      // if (outletBubbleTimer) {
+      //   clearInterval(outletBubbleTimer);
+      //   outletBubbleTimer = null;
+      // }
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+      
+      // 2) Clear outlet bubble layer and force fresh layer on next start
+      // if (outletBubbleLayer) {
+      //   outletBubbleLayer.clear();
+      //   outletBubbleLayer = null; // allow animateBubbleFlow() to recreate cleanly
+      // }
+      
+      // 3) Clear any animated overlay strokes
+      if (draw && typeof draw.find === 'function') {
+        draw.find('path')
+        .filter(el => {
+          const side = el.attr('data-pipe-side');
+          return side === 'gas' || side === 'valve' || side === 'bubble';
+        })
+        .forEach(el => el.remove());
+      }
+      // Remove vent indicator so a fresh run recreates it
+      if (ventIndicator) { ventIndicator.remove(); ventIndicator = null; }
+      ventMarker = null;
+      ventLabel = null;
+      
+      // 4) Reset core state flags (do not null DOM refs so handlers keep working)
+      verticalValveOpen = false;
+      gasValveOpen = false;
+      isHeaterOn = false;
+      elapsedSeconds = 0;
+      
+      // 5) Stop in-vessel bubbling if available and reset readouts
+      if (container && typeof container.stopBubbles === 'function') {
+        container.stopBubbles();
+      }
+      if (gasFlowRateText && typeof gasFlowRateText.text === 'function') {
+        gasFlowRateText.text('0');
+        if (typeof gasFlowRateText.front === 'function') gasFlowRateText.front();
+      }
 
-  // 2) Clear outlet bubble layer and force fresh layer on next start
-  // if (outletBubbleLayer) {
-  //   outletBubbleLayer.clear();
-  //   outletBubbleLayer = null; // allow animateBubbleFlow() to recreate cleanly
-  // }
-
-  // 3) Clear any animated overlay strokes
-  if (draw && typeof draw.find === 'function') {
-    draw.find('path')
-      .filter(el => {
-        const side = el.attr('data-pipe-side');
-        return side === 'gas' || side === 'valve' || side === 'bubble';
-      })
-      .forEach(el => el.remove());
-  }
-  // Remove vent indicator so a fresh run recreates it
-  if (ventIndicator) { ventIndicator.remove(); ventIndicator = null; }
-  ventMarker = null;
-  ventLabel = null;
-
-  // 4) Reset core state flags (do not null DOM refs so handlers keep working)
-  verticalValveOpen = false;
-  gasValveOpen = false;
-  isHeaterOn = false;
-  elapsedSeconds = 0;
-
-  // 5) Stop in-vessel bubbling if available and reset readouts
-  if (container && typeof container.stopBubbles === 'function') {
-    container.stopBubbles();
-  }
-  if (gasFlowRateText && typeof gasFlowRateText.text === 'function') {
-    gasFlowRateText.text('0');
-    if (typeof gasFlowRateText.front === 'function') gasFlowRateText.front();
-  }
-}
+  // Intentionally do NOT change currentTemp or the controller/readout display on reset.
+  // This preserves the last set temperature on the controller UI.
+  currentTemp = 15;
+    }
