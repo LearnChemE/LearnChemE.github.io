@@ -132,11 +132,11 @@ input[type="range"]::-webkit-slider-thumb {
 
 .pressure-gauge {
     position: absolute;
-    top: -15px;
+    top: -25px;
     left: 50%;
     transform: translateX(-50%);
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     background: white;
     border: 3px solid #34495e;
     border-radius: 50%;
@@ -146,7 +146,19 @@ input[type="range"]::-webkit-slider-thumb {
     font-weight: bold;
     font-size: 1.4rem;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    z-index: 5;
+    /* z-index: 5; */
+}
+
+.pressure-stem {
+    top: 40px;
+    width: 40px;
+    height: 40px;
+    background: white;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border: 3px solid #34495e;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .container-vis {
@@ -256,7 +268,7 @@ input[type="range"]::-webkit-slider-thumb {
     top: 60px;
     right: 0;
     background-color: white;
-    min-width: 200px;
+    min-width: 160px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     border-radius: 5px;
     overflow: hidden;
@@ -267,18 +279,23 @@ input[type="range"]::-webkit-slider-thumb {
     animation: fadeIn 0.3s;
 }
 .menu-item {
-    padding: 15px 20px;
+    margin: 1em;
+    background-color: #3498db;
+    border-radius: .5em;
+    color: white;
+    padding: 10px;
     cursor: pointer;
     transition: background-color 0.3s;
     display: flex;
     align-items: center;
 }
 .menu-item:hover {
-    background-color: #f1f1f1;
+    background-color: #67aedd;
 }
 .menu-item i {
+    margin-left: 5px;
     margin-right: 10px;
-    color: #3498db;
+    color: #ffffff;
 }
 
 
