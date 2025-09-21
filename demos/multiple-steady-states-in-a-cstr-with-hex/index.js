@@ -499,7 +499,7 @@ function updatePlot(result) {
                     showline: true
                 },
                 yaxis: { 
-                    title: { text:'energy eate (MJ/m³ min)', font: { size: FontSize } }, 
+                    title: { text:'energy rate (MJ/m³ min)', font: { size: FontSize } }, 
                     range: [0, null], 
                     tickfont: { size: FontSize },
                     showline: true,
