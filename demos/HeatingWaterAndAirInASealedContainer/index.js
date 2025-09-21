@@ -3,6 +3,7 @@ const P0 = 1; // bar
 const R = 0.08314; // L bar / mol / K
 const V = 1; // L
 const T0 = 25;
+const FontSize = 16;
 
 // DOM elements
 const volumeSlider = document.getElementById('volumeSlider');
@@ -85,27 +86,32 @@ let pressure = 1.0;
 
 // Initialize Plotly chart
 let layout = {
-    title: 'Gas Composition',
     barmode: 'stack',
     showlegend: true,
     legend: {
         x: 0.5,
-        y: -0.2,
+        y: 1.2,
         xanchor: 'center',
-        orientation: 'h'
+        yanchor: 'top',
+        orientation: 'h',
+        font: { size: FontSize },
+        itemsizing: 'constant',
     },
     xaxis: {
-        title: 'Gas Type',
         tickvals: [0, 1],
-        ticktext: ['Oxygen (O₂)', 'Nitrogen (N₂)']
+        ticktext: ['oxygen', 'nitrogen'],
+        tickfont: { size: FontSize }
     },
     yaxis: {
-        title: 'Amount (mmol)',
-        range: [0, 6.5]
+        title: 'amount of O₂ and N₂ (mmol)',
+        range: [0, 6.5],
+        tickfont: { size: FontSize },
+        ticksuffix: ' ',
+        showline: true,
     },
     paper_bgcolor: '#f8f9fa',
     plot_bgcolor: '#f8f9fa',
-    margin: {t: 50, b: 80, l: 60, r: 40}
+    margin: {t: 50, b: 30, l: 60, r: 40}
 };
 
 let config = {
@@ -115,19 +121,19 @@ let config = {
 
 // Initial data for Plotly
 let data = [{
-    x: ['Oxygen (O₂)', 'Oxygen (O₂)'],
+    x: ['oxygen', 'oxygen'],
     y: [2.1, 0.5],
-    name: 'Gas Phase',
+    name: 'gas phase',
     type: 'bar',
     marker: {color: '#2ecc71'}
 }, {
-    x: ['Oxygen (O₂)', 'Nitrogen (N₂)'],
+    x: ['oxygen', 'nitrogen'],
     y: [0.5, 1.2],
-    name: 'Dissolved',
+    name: 'dissolved',
     type: 'bar',
     marker: {color: '#9b59b6'}
 }, {
-    x: ['Nitrogen (N₂)'],
+    x: ['nitrogen'],
     y: [7.9],
     name: 'Gas Phase',
     type: 'bar',
@@ -362,13 +368,13 @@ function boom() {
     pressureGauge.textContent = 'boom!';
     crack.classList.remove('hidden');
     const updatedData = [{
-        x: ['Oxygen (O₂)', 'Nitrogen (N₂)'],
+        x: ['oxygen', 'nitrogen'],
         y: [0, 0],
         name: 'Dissolved',
         type: 'bar',
         marker: {color: '#9b59b6'},
     }, {
-        x: ['Oxygen (O₂)', 'Nitrogen (N₂)'],
+        x: ['oxygen', 'nitrogen'],
         y: [0, 0],
         name: 'Gas Phase',
         type: 'bar',
@@ -386,15 +392,15 @@ function boom() {
  */
 function updatePlotlyChart(o2Gas, o2Dissolved, n2Gas, n2Dissolved) {
     const updatedData = [{
-        x: ['Oxygen (O₂)', 'Nitrogen (N₂)'],
+        x: ['oxygen', 'nitrogen'],
         y: [o2Dissolved, n2Dissolved],
-        name: 'Dissolved',
+        name: 'dissolved',
         type: 'bar',
         marker: {color: '#9b59b6'},
     }, {
-        x: ['Oxygen (O₂)', 'Nitrogen (N₂)'],
+        x: ['oxygen', 'nitrogen'],
         y: [o2Gas, n2Gas],
-        name: 'Gas Phase',
+        name: 'gas phase',
         type: 'bar',
         marker: {color: '#2ecc71'}
     }];

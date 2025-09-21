@@ -65,6 +65,7 @@
             <!-- Container visualization -->
             <div class="container-vis-section">
                 <div class="container-wrapper">
+                    <div class="pressure-stem" id="stem"></div>
                     <div class="pressure-gauge" id="pressureGauge">1.0</div>
                     <div class="container-vis" id="containerVis">
                         <div class="water" id="water"></div>
@@ -90,12 +91,11 @@
                 <div class="modal-body">
                     <p>
                         This simulation models the behavior of a sealed, 1-L autoclave that initially contains mostly water plus a small volume of air, 
-                        all at 25 °C. Change the initial volume of water with a slider and the temperature resets to 25 °C. As the temperature increases 
+                        all at 25 °C and 1.0 bar pressure. Change the initial volume of water with a slider and the temperature resets to 25 °C. As the temperature increases 
                         by moving the slider, liquid water expands and its saturation pressure increases. At the same time, the gas-phase volume decreases, 
                         so gas-phase \(O_2\) and \(N_2\) partial pressures increase (ideal gas law). The amounts of \(O_2\) and \(N_2\) dissolved in the 
-                        water increase with pressure, but decrease with temperature. The amounts dissolved are shown in the bar chart (blue= gas phase, 
+                        water increase with pressure, but decrease with temperature. The amounts dissolved are shown in the bar chart (green = gas phase, 
                         purple = dissolved). Even at moderate temperatures, the pressure inside the sealed container can be quite high. 
-                        Zoom with the scroll wheel.
                     </p>
                 </div>
             </div>
