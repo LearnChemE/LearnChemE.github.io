@@ -65,8 +65,8 @@
         <div class="chart-container">
             <canvas id="chart"></canvas>
             <div class="info-box">
-                <div class="info-title">Equilibrium Properties</div>
-                <div id="pressureValue">Pvle: 0.00 MPa</div>
+                <div class="info-title">vapor-liquid equilibrium</div>
+                <div id="pressureValue">P = 0.00 MPa</div>
                 <div id="x1Value" style="color: blue;"><i>x</i><sub>1</sub> = 0.00</div>
                 <div id="y1Value" style="color: green;"><i>y</i><sub>1</sub> = 0.00</div>
             </div>
@@ -85,7 +85,8 @@
                     <p>
                         This simulation uses the Peng-Robinson equation of state for mixtures to plot isotherms for n-butane(1)/n-octane(2) mixtures on a log pressure 
                         versus log volume graph. Use the sliders to select the temperature and the mole fraction \(x_1\) of the liquid phase (blue  isotherm). The green 
-                        isotherm is for the vapor phase (mole fraction \(y_1\)) that is in equilibrium with the liquid, The values of \(y_1\) and the equilibrium pressure in the upper-right corner are determined from Raoult's law. The dashed black line connects the two compositions that are in equilibrium at the equilibrium pressure. 
+                        isotherm is for the vapor phase (mole fraction \(y_1\)) that is in equilibrium with the liquid, The values of \(y_1\) and the equilibrium pressure 
+                        in the upper-right corner are determined from Raoult's law. The dashed black line connects the liquid and vapor compositions that are in equilibrium.
                     </p>
                 </div>
             </div>
@@ -101,19 +102,19 @@
                     <p>
                         The Peng-Robinson equation of state for mixtures is used to plot pressure P versus volume V on a log-log graph:
                         $$ P = \frac{RT}{V-b_m} - \frac{a_m}{V^2 - 2Vb_m - b_m^2} $$
-                        where R is the gas constant ([\(cm^3\) MPa] / [mol K]), T is temperature (K), P is in MPa, and V is in \(cm^3\) / mol.
+                        where R is the gas constant ([cm\(^3\) MPa] / [mol K]), T is temperature (K), P is in MPa, and V is in cm\(^3\) / mol.
                     </p>
                     <p>
                         \(a_m\) is the attraction parameter and \(b_m\) is the repulsion parameter for the mixture:
                         $$ a_m = \Sigma_{i=1}^2 \Sigma_{j=1}^2 z_i z_j (1-k_{ij} \sqrt{a_i a_j}) $$
                         $$ b_m = \Sigma_{i=1}^2 z_i b_i $$
-                        where z is the component mole fraction, \(k_{ij}\) is the binary interaction parameter, adn a and b are the attraction and
+                        where z\(_i\) is the component mole fraction, \(k_{ij}\) is the binary interaction parameter, and a and b are the attraction and
                         repulsion parameters for a pure component.
                     </p>
                     <p>
                         The binary interaction parameter can be calculated [1]:
                         $$ k_{ij} = 1 = \frac{1}{2} \frac{b_2}{b_1} \sqrt{\frac{a_1}{a_2}} - \frac{1}{2} \frac{b_1}{b_2} \sqrt{\frac{a_2}{a_1}}
-                            + \frac{1}{2} \frac{b_2 RT}{\sqrt{a_1 a_2}} \frac{\theta_1}{T/T_{c,1}} $$
+                            + \frac{1}{2} \frac{b_2 RT}{\sqrt{a_1 a_2}} \frac{\theta_1}{(T/T_{c,1})^{\theta_2}} $$
                         for an alkane/alkane mixture \(\theta_1 = 0.22806\) and \(\theta_2 = 0.18772\).
                     </p>
                     <p>
@@ -135,6 +136,14 @@
                         $$P_i^{sat} = 10^{A_i - \frac{B_i}{T + C_i}}$$
                         where $A_i$, $B_i$ and $C_i$ are Antoine constants.
                     </p>
+                    <p>
+                        Reference
+                    </p>
+                    <p>
+                        [1] A. O. Elnabawy, S. K. Fateen and M. M. Khalil, "Semi-empirical Correlation for Binary Interaction Parameters of the Peng-Robinson Equation of State with the van 
+                        der Waals Mixing Rules for the Prediction of High-Pressure Vapor-Liquid Equilibrium," <i>Journal of Advanced Research,</i> <b>4</b>(2), 2013 pp. 137\[Dash]145. 
+                        <a href="https://dx.doi.org/10.1016/j.jare.2012.03.004">doi:10.1016/j.jare.2012.03.004.</a>
+                    </p>
                 </div>
             </div>
         </div>
@@ -148,7 +157,8 @@
                 <div class="modal-body">
                     <p>
                         This simulation was created in the Department of Chemical and Biological Engineering at University of Colorado Boulder for LearnChemE.com by Drew Smith 
-                        under the direction of Professor John L. Falconer and Michelle Medlin. It is a JavaScript/HTML5 implementation of a Mathematica simulation by Rachael 
+                        under the direction of Professor John L. Falconer and Michelle Medlin. It is a JavaScript/HTML5 implementation of a 
+                        <a href="https://demonstrations.wolfram.com/PengRobinsonEquationOfStateForMixtures/">Mathematica simulation</a> by Rachael 
                         Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State 
                         University. Address any questions or comments to LearnChemE@gmail.com.   
                     </p>
