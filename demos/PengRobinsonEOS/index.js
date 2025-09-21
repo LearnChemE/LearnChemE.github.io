@@ -7,6 +7,8 @@ const omega = [0.193, 0.396]; //
 const theta1 = 0.22806;
 const theta2 = 0.18772;
 
+const FontSize = 16;
+
 // DOM elements
 const tempSlider = document.getElementById('temperature');
 const moleSlider = document.getElementById('moleFraction');
@@ -60,6 +62,19 @@ window.addEventListener('click', (e) => {
     });
 });
 
+function toScientific10(val) {
+    const exp = Math.log10(val);
+    if (!Number.isInteger(exp)) return '';
+    return "10" + "⁰¹²³⁴⁵⁶⁷⁸⁹"[exp];
+}
+
+function tens(val) {
+    const exp = Math.log10(val);
+    if (!Number.isInteger(exp)) return '';
+
+    if (exp < 1)return val.toFixed(Math.abs(exp));
+    else return val.toFixed(0)
+}
 
 // Chart setup
 const ctx = document.getElementById('chart').getContext('2d');
@@ -92,7 +107,7 @@ const chart = new Chart(ctx, {
                 showLine: false
             },
             {
-                label: 'VLE Connection',
+                label: 'VLE connection',
                 borderColor: 'black',
                 borderWidth: 2,
                 borderDash: [5, 5],
@@ -102,7 +117,7 @@ const chart = new Chart(ctx, {
                 showLine: true
             },
             {
-                label: 'Vapor Phase (y₁)',
+                label: 'vapor phase (y₁)',
                 borderColor: 'green',
                 backgroundColor: 'rgba(0, 128, 0, 0.1)',
                 borderWidth: 2,
@@ -111,7 +126,7 @@ const chart = new Chart(ctx, {
                 fill: false
             },
             {
-                label: 'Liquid Phase (x₁)',
+                label: 'liquid phase (x₁)',
                 borderColor: 'blue',
                 backgroundColor: 'rgba(0, 0, 255, 0.1)',
                 borderWidth: 2,
@@ -130,19 +145,63 @@ const chart = new Chart(ctx, {
                 type: 'logarithmic',
                 title: {
                     display: true,
-                    text: 'Volume (cm³/mol)'
+                    text: 'volume (cm³/mol)',
+                    font: {
+                        size: FontSize
+                    },
+                    color: "black"
                 },
                 min: 50,
-                max: 250000
+                max: 250000,
+                grid: {
+                    drawBorder: true,
+                    drawOnChartArea: false,
+                    color: "black"
+                },
+                border: {
+                    display: true,
+                    color: "black",
+                    width: 1
+                },
+                ticks: {
+                    color: "black",
+                    font: {
+                        size: FontSize
+                    },
+                    callback: (value) => toScientific10(value),
+                    minRotation: 0,
+                    maxRotation: 0,
+                }
             },
             y: {
                 type: 'logarithmic',
                 title: {
                     display: true,
-                    text: 'Pressure (MPa)'
+                    text: 'pressure (MPa)',
+                    font: {
+                        size: FontSize
+                    },
+                    color: "black"
                 },
                 min: 0.01,
-                max: 50
+                max: 50,
+                grid: {
+                    drawBorder: true,
+                    drawOnChartArea: false,
+                    color: "black"
+                },
+                border: {
+                    display: true,
+                    color: "black",
+                    width: 1
+                },
+                ticks: {
+                    color: "black",
+                    font: {
+                        size: FontSize
+                    },
+                    callback: (value) => tens(value)
+                }
             }
         },
         plugins: {
@@ -150,8 +209,10 @@ const chart = new Chart(ctx, {
                 display: true,
                 text: 'n-butane(1) / n-octane(2)',
                 font: {
-                    size: 16
-                }
+                    size: FontSize,
+                    weight: "normal"
+                },
+                color: "black"
             },
             tooltip: {
                 callbacks: {
@@ -166,6 +227,12 @@ const chart = new Chart(ctx, {
                 labels: {
                     filter: (legendItem, chartData) => {
                         return legendItem.text !== '' && legendItem.text !== undefined;
+                    },
+                    usePointStyle: true,
+                    pointStyle: "line",
+                    color: "black",
+                    font: {
+                        size: FontSize
                     }
                 }
             }
@@ -291,7 +358,7 @@ function calculateAndUpdate() {
     const { Pvle, x, y } = calculateVLE(T, x1);
     
     // Update info box
-    pressureValue.textContent = `Pvle: ${Pvle.toFixed(2)} MPa`;
+    pressureValue.textContent = `P = ${Pvle.toFixed(2)} MPa`;
     x1Value.innerHTML = `<i>x</i><sub>1</sub> = ${x[0].toFixed(2)}`;
     y1Value.innerHTML = `<i>y</i><sub>1</sub> = ${y[0].toFixed(2)}`;
     
@@ -380,7 +447,7 @@ function calculateAndUpdate() {
         }
     }
 
-    const liquidV = Math.min(...liquidRoots);
+    // Take the higher root
     const vaporV = Math.max(...vaporRoots);
         
     vleData.push({ x: vaporV, y: Pvle });
