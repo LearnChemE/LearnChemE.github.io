@@ -107,7 +107,7 @@ const chart = new Chart(ctx, {
                 showLine: false
             },
             {
-                label: 'VLE connection',
+                label: 'VLE',
                 borderColor: 'black',
                 borderWidth: 2,
                 borderDash: [5, 5],
@@ -233,6 +233,16 @@ const chart = new Chart(ctx, {
                     color: "black",
                     font: {
                         size: FontSize
+                    },
+                    generateLabels: (chart) => {
+                        const original = Chart.defaults.plugins.legend.labels.generateLabels
+                        return original(chart).map(label => {
+                            const ds = chart.data.datasets[label.datasetIndex] || {};
+                            // force thicker stroke for legend line
+                            label.lineWidth = 6
+                            label.lineDash = ds.borderDash ? [4] : [];
+                            return label;
+                        });
                     }
                 }
             }
