@@ -29,7 +29,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
 // Create div containing svg
-app.appendChild(initHamburgerMenu(worksheet, "singleEffectEvaporatorWorksheet.pdf"));
+app.appendChild(initHamburgerMenu(worksheet, "massMoleBalancesWorksheet.pdf"));
 // Create hamburger menu
 app.appendChild(insertSVG(svg));
 
