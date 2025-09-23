@@ -1,4 +1,4 @@
-import { constrain, findAngleFromDown, initButton, svgNS, vec2 } from "../ts/helpers";
+import { constrain, findAngleFromDown, GetElement, initButton, svgNS, vec2 } from "../ts/helpers";
 import { Signal } from "./Signal";
 
 /**
@@ -16,15 +16,18 @@ export function initSwitch(name: string, id: string, onId: string, offId: string
     const title = document.createElementNS(svgNS, "title");
     title.innerHTML = `toggle ${name} on`;
     e.appendChild(title);
+    for (const child of e.children) {
+        if (child.id.includes("switchSymbol")) {
+            child.classList.add("switch-symbol");
+        }
+    }
 
-    e.classList.add("svg-btn");
+    on.classList.add("svg-btn");
+    off.classList.add("svg-btn");
     off.classList.add("hidden");
     
     const signal = new Signal<boolean>(false);
-    // Attach handler
-    e.addEventListener("click", () => {
-        // Update internal state
-        const isOn = !signal.get();
+    const turnOn = (isOn: boolean) => {
         // Recolor components
         if (isOn) {
             on.classList.add("hidden");
@@ -38,7 +41,10 @@ export function initSwitch(name: string, id: string, onId: string, offId: string
         }
         // Set signal
         signal.set(isOn);
-    });
+    }
+    // Attach handler
+    on.addEventListener("click", () => turnOn(true));
+    off.addEventListener("click", () => turnOn(false));
 
     return signal
 }
@@ -52,6 +58,12 @@ export function initDial(id: string, init: number = 0): Signal<number> {
     // Get the element
     const e = document.getElementById(id)! as unknown as SVGAElement;
     e.classList.add("svg-dial");
+    for (const child of e.children) {
+        if (child.id === "dialBody") {
+            child.classList.add("svg-dial-body");
+            break;
+        }
+    }
     // Find the proper offset
     const bbox = e.getBBox();
     const center = vec2(
@@ -142,4 +154,29 @@ export function initUpDownButtons(upId: string, downId: string, min: number, max
     initButton(downId, decrease);
 
     return signal;
+}
+
+export function flashInteractables() {
+    const idleTime = 5000;
+    const ids = ["dialBody","pumpSwitchDown","furnaceSwitchDown","furnaceUpBtn","furnaceDownBtn","valveHandle","bulbDefault"];
+    const elements = ids.map((id: string) => GetElement(id));
+
+    const flash = () => {
+        elements.forEach(e => e.classList.add("hover-outline"));
+    }
+    const noFlash = () => {
+        elements.forEach(e => e.classList.remove("hover-outline"));
+    }
+
+    var timeoutId: NodeJS.Timeout | null = null;
+    const setFlashTimeout = () => {
+        noFlash();
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(flash, idleTime);
+    }
+
+    window.addEventListener("mousemove", setFlashTimeout);
+    window.addEventListener("mousedown", setFlashTimeout);
+    window.addEventListener("mouseup", setFlashTimeout);
+    setFlashTimeout();
 }
