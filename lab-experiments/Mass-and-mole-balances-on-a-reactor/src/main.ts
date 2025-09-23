@@ -40,8 +40,8 @@ enableWindowResize();
 
 // Begin interactables
 // const evaporatorPower = initSwitch("mantleSwitch","mantleSwitchOn","mantleSwitchOff");
-const pumpPower = initSwitch("pumpSwitch","pumpSwitchOn","pumpSwitchOff");
-const furnacePower = initSwitch("furnaceSwitch","furnaceSwitchOn","furnaceSwitchOff");
+const pumpPower = initSwitch("pump", "pumpSwitch","pumpSwitchOn","pumpSwitchOff");
+const furnacePower = initSwitch("furnace", "furnaceSwitch","furnaceSwitchOn","furnaceSwitchOff");
 const furnaceSP = initUpDownButtons("furnaceUpBtn","furnaceDownBtn",200,500,10,300);
 const pumpLift = initDial("flowDial", 270);
 
