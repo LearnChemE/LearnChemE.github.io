@@ -16,6 +16,10 @@ svg {
   position: absolute;
 }
 
+.hidden {
+  display: none !important;
+}
+
 #flow-label {
   left: 100px;
   top: 400px;
@@ -31,32 +35,33 @@ svg {
    Hamburger menu
    ───────────────────────────────────────────────────────────────────────────── */
 
+
 .menu-button {
-  position:absolute;
-  right: -1.5em;
-  top: 1.5em;
+    position:absolute;
+    right: 0em;
+    top: 2.0em;
 
-  font-size: 1.75rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  transform: translate(-5px, -30px);
-  background-color: lightblue;
-  height: max-content;
-  width: max-content;
-  margin-top: 0;
-  border-radius: 3px;
-  border: 1px solid black;
-
-  aspect-ratio: 1;
-
-  align-items: center;
-  text-align: start;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    background-color: #3498db;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: all 0.3s;
 }
-
 .menu-button:hover {
-  background-color: rgb(198, 224, 233);
+    background-color: #2980b9;
+    transform: scale(1.05);
 }
+.menu-button i {
+    color: white;
+    font-size: 24px;
+}
+
 
 .menu-button>div {
   transform: translateY(-5px);
@@ -69,7 +74,7 @@ svg {
   margin: auto;
 
   position: absolute;
-  top: 2.5rem;
+  top: 5rem;
   right: -2.5rem;
   background: white;
   border: 1px solid #ccc;
@@ -101,14 +106,14 @@ svg {
    Apparatus things
    ───────────────────────────────────────────────────────────────────────────── */
 
-  #Switch, #fanSwitch {
-    cursor: pointer;
-  }
-
   #flowDial {
     cursor: grab;
   }
-
+  #flowDial:hover {
+  filter: 
+    drop-shadow(-1px -1px 1px rgba(255, 205, 39, 255))
+    drop-shadow(1px 1px 1px rgba(23, 206, 255, 255));
+  }
   #flowDial:active {
     cursor: grabbing;
   }
@@ -120,6 +125,23 @@ svg {
     cursor: grabbing;
   }
 
+.svg-btn {
+  cursor: pointer;
+}
+
+.svg-btn:hover {
+  filter: 
+    drop-shadow(-1px -1px 1px rgba(255, 205, 39, 255))
+    drop-shadow(1px 1px 1px rgba(23, 206, 255, 255));
+}
+
+.svg-btn:active {
+  filter: brightness(0.8);
+}
+
+.switch-symbol {
+  pointer-events: none;
+}
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Font
