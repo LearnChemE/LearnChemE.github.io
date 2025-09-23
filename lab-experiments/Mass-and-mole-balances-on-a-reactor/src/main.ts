@@ -13,7 +13,7 @@ import { PoweredController, type PoweredControllerDescriptor } from './classes/C
 import { Waterfall } from './classes/Waterfall';
 import { Evaporator, type EvaporatorDescriptor } from './classes/Evaporator';
 import { Reactor, type ProductStream } from './ts/calcs';
-import { initDial, initSwitch, initUpDownButtons } from './classes/Inputs';
+import { flashInteractables, initDial, initSwitch, initUpDownButtons } from './classes/Inputs';
 import { DigitalLabel } from './classes/Label';
 import { Beaker, type BeakerDescriptor } from './classes/Beaker';
 import { Signal } from './classes/Signal';
@@ -183,3 +183,4 @@ GetElement("reset-btn").addEventListener("click", () => {
 
 // Bubble Meter
 initBubbleMeter("bulbDefault", "bulbSqueeze", vapSignal);
+flashInteractables();
