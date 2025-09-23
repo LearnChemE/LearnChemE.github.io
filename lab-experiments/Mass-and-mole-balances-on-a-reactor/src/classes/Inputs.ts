@@ -1,4 +1,4 @@
-import { constrain, findAngleFromDown, initButton, vec2 } from "../ts/helpers";
+import { constrain, findAngleFromDown, initButton, svgNS, vec2 } from "../ts/helpers";
 import { Signal } from "./Signal";
 
 /**
@@ -8,16 +8,17 @@ import { Signal } from "./Signal";
  * @param offId ID of the "off" side of the switch
  * @param callback Callback to set state variable
  */
-export function initSwitch(id: string, onId: string, offId: string): Signal<boolean> {
+export function initSwitch(name: string, id: string, onId: string, offId: string): Signal<boolean> {
     const e  = document.getElementById(id)!;
     const on = document.getElementById(onId)!;
     const off= document.getElementById(offId)!;
 
-    // Get the original on/off colors
-    const upCol = on.getAttribute("fill")!;
-    const downCol = off.getAttribute("fill")!;
+    const title = document.createElementNS(svgNS, "title");
+    title.innerHTML = `toggle ${name} on`;
+    e.appendChild(title);
 
     e.classList.add("svg-btn");
+    off.classList.add("hidden");
     
     const signal = new Signal<boolean>(false);
     // Attach handler
@@ -26,12 +27,14 @@ export function initSwitch(id: string, onId: string, offId: string): Signal<bool
         const isOn = !signal.get();
         // Recolor components
         if (isOn) {
-            on.setAttribute("fill", downCol);
-            off.setAttribute("fill", upCol);
+            on.classList.add("hidden");
+            off.classList.remove("hidden");
+            title.innerHTML = `toggle ${name} off`;
         }
         else {
-            on.setAttribute("fill", upCol);
-            off.setAttribute("fill", downCol);
+            on.classList.remove("hidden");
+            off.classList.add("hidden");
+            title.innerHTML = `toggle ${name} on`;
         }
         // Set signal
         signal.set(isOn);

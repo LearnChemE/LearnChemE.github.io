@@ -17,6 +17,10 @@ svg {
   touch-action: none;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .digital-label {
   font-family: "digital" !important;
   font-weight: 100;

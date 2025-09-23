@@ -64,7 +64,7 @@ export class Evaporator {
         const fill = GetElement<SVGPathElement>(descriptor.id);
         const bbox = fill.getBBox();
         const clip = insertClipPath(fill, "evapFillClip", bbox);
-        this.height = new FirstOrder(EvapEmptyHeight, 10000);
+        this.height = new FirstOrder(EvapEmptyHeight, 3000);
 
         // Inputs and Outputs
         this.flowIn = descriptor.flowInSignal.get();
