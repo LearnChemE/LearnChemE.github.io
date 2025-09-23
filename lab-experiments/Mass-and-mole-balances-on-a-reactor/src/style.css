@@ -43,7 +43,9 @@ svg {
 }
 
 .svg-btn:hover {
-  filter: drop-shadow(0px 0px 4px rgba(235, 255, 59, 255));
+  filter: 
+    drop-shadow(-2px -2px 4px rgba(255, 205, 39, 255))
+    drop-shadow(2px 2px 4px rgba(23, 206, 255, 255));
 }
 
 .svg-btn:active {
@@ -54,7 +56,9 @@ svg {
   cursor: pointer;
 }
 .svg-valve:hover {
-  filter: drop-shadow(0px 0px 4px rgba(235, 255, 59, 255));
+  filter: 
+    drop-shadow(-2px -2px 4px rgba(255, 205, 39, 255))
+    drop-shadow(2px 2px 4px rgba(23, 206, 255, 255));
 }
 
 .svg-dial {
@@ -73,14 +77,18 @@ svg {
 }
 
 .svg-dial-body:hover {
-  filter: drop-shadow(0px 0px 8px rgba(235, 255, 59, 255));
+  filter: 
+    drop-shadow(-2px -2px 4px rgba(255, 205, 39, 255))
+    drop-shadow(2px 2px 4px rgba(23, 206, 255, 255));
 }
 
 .svg-bulb {
   cursor: grab;
 }
 .svg-bulb:hover {
-  filter: drop-shadow(0px 0px 16px rgba(235, 255, 59, 255));
+  filter: 
+    drop-shadow(-2px -2px 4px rgba(255, 205, 39, 255))
+    drop-shadow(2px 2px 4px rgba(23, 206, 255, 255));
 }
 .svg-bulb:active {
   cursor: grabbing;
@@ -88,7 +96,9 @@ svg {
 }
 
 .hover-outline {
-  filter: drop-shadow(0px 0px 4px rgba(235, 255, 59, 255));
+  filter: 
+    drop-shadow(-2px -2px 4px rgba(255, 205, 39, 255))
+    drop-shadow(2px 2px 4px rgba(23, 206, 255, 255));
   transition: all 600ms;
 }
 
