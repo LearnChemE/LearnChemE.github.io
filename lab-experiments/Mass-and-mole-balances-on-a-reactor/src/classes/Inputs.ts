@@ -14,7 +14,7 @@ export function initSwitch(name: string, id: string, onId: string, offId: string
     const off= document.getElementById(offId)!;
 
     const title = document.createElementNS(svgNS, "title");
-    title.innerHTML = `toggle ${name} on`;
+    title.innerHTML = `turn ${name} on`;
     e.appendChild(title);
     for (const child of e.children) {
         if (child.id.includes("switchSymbol")) {
