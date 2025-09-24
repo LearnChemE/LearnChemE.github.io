@@ -600,7 +600,7 @@ function initMainGUI() {
     new ProductSlider('Conc', 0, 1000, Conc, 0.1, 'Absorber concentration', 'mM'),
     new ProductSlider('Absorb', 0, 5000, Absorb, 0.1, 'Napierian absorptivity', 'L/mol-cm'),
     new ProductSlider('Intensity', 0, 100, Intensity, 0.01, 'Incident intensity', 'mW/cm\u00B2'),
-    new ProductSlider('Depth', 15, 2000, Depth, 1, 'Depth', '\u03BCm')
+    new ProductSlider('Depth', 15, 2000, Depth, 1, 'Sample thickness', '\u03BCm')
   ];
 
   const callbacks = [
