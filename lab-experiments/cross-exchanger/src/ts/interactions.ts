@@ -13,27 +13,38 @@ function initSwitch(id: string, onId: string, offId: string, callback?: (isOn: b
     const on = document.getElementById(onId)!;
     const off= document.getElementById(offId)!;
 
-    // Get the original on/off colors
-    const upCol = on.getAttribute("fill")!;
-    const downCol = off.getAttribute("fill")!;
+    const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+    title.innerHTML = `turn switch on`;
+    e.appendChild(title);
+    for (const child of e.children) {
+        if (child.id.includes("switchSymbol")) {
+            child.classList.add("switch-symbol");
+        }
+    }
+
+    on.classList.add("svg-btn");
+    off.classList.add("svg-btn");
+    off.classList.add("hidden");
     
-    var isOn = false;
-    // Attach handler
-    e.addEventListener("click", () => {
-        // Update internal state
-        isOn = !isOn;
-        // Recolor
+    const turnOn = (isOn: boolean) => {
+        // Recolor components
         if (isOn) {
-            on.setAttribute("fill", downCol);
-            off.setAttribute("fill", upCol);
+            on.classList.add("hidden");
+            off.classList.remove("hidden");
+            title.innerHTML = `turn switch off`;
         }
         else {
-            on.setAttribute("fill", upCol);
-            off.setAttribute("fill", downCol);
+            on.classList.remove("hidden");
+            off.classList.add("hidden");
+            title.innerHTML = `turn switch on`;
         }
         // Call callback
         callback?.(isOn);
-    });
+    }
+
+    // Attach handler
+    on.addEventListener("click", () => turnOn(true));
+    off.addEventListener("click", () => turnOn(false));
 }
 
 /**
@@ -161,15 +172,35 @@ function initThermometer(id: string, callback?: (target: number) => void) {
     });
 }
 
+function initResetBtn(state: Simulation) {
+    const e = document.createElement("button");
+    document.getElementById("app")!.append(e);
+    e.innerHTML = "reset";
+    e.id = "reset-btn";
+    e.classList.add("btn");
+    e.classList.add("btn-danger");
+
+    const reset = () => {
+        document.getElementById("pumpSwitchOn")!.classList.remove("hidden");
+        document.getElementById("pumpSwitchOff")!.classList.add("hidden");
+        document.getElementById("fanSwitchOn")!.classList.remove("hidden");
+        document.getElementById("fanSwitchOff")!.classList.add("hidden");
+        state.reset();
+    }
+
+    e.addEventListener("click", () => reset());
+}
+
 /**
  * Initialize all the interactables within the svg. Main export of interactions.ts
  * @param state Simulation state object
  */
 export function initInteractables(state: Simulation) {
-    initSwitch("Switch", "switchOn", "switchOff", (isOn: boolean) => state.setPumpStatus(isOn));
+    initSwitch("pumpSwitch", "pumpSwitchOn", "pumpSwitchOff", (isOn: boolean) => state.setPumpStatus(isOn));
     initSwitch("fanSwitch", "fanSwitchOn", "fanSwitchOff", (isOn: boolean) => state.setFanStatus(isOn));
     initDial("flowDial", (lift: number) => state.setLift(lift));
     initThermometer("thermStick", (target) => state.setTTarg(target));
+    initResetBtn(state);
 }
 
 // --- Resize Handling ---
@@ -189,4 +220,6 @@ export function enableWindowResize() {
     };
     window.addEventListener('resize', resize);
     resize();
+
+
 }

@@ -57,5 +57,20 @@ export class Simulation {
     }
     public setLift = (lift: number) => { this.state.lift = lift }
     public setTTarg = (target: number) => { this.state.thermTarget = target }
+
+    public reset = () => {
+        // Reset some interactions
+        this.state.fanIsOn = false;
+        this.state.pumpIsOn = false;
+        this.state.outIsFlowing = false;
+        // Reset balance
+        const bal = this.state.systemBalance;
+        bal.reset();
+        // Recreate animations
+        this.state.animationLoop.reset();
+        // Re-initialize constant animations
+        this.addAnimation(makeFlowAnimation(this.state));
+        this.addAnimation(makeThermometerAnimation(this.state));
+    }
 }
 

@@ -46,8 +46,6 @@ export class Balance {
         const tube_UA = fanIsOn ? UA_TUBE * 10 : UA_TUBE;
 
         // Calculate heat rates
-        // flowrate += this.d_tubeVol / deltaTime;
-        // this.d_tubeVol = 0;
         const dQdt_tank = UA_TANK * (ROOM_TEMP - tankTemp) + flowrate * CP * (tubeTemp - tankTemp);
         const dQdt_tube = tube_UA * (ROOM_TEMP - tubeTemp) + flowrate * CP * (tankTemp - tubeTemp);
 
@@ -59,5 +57,12 @@ export class Balance {
         this.tankTemp += dT_tank;
         this.tubeTemp += dT_tube;
         // console.log(`Tank: ${this.tankTemp.toFixed(8)}\nTube: ${this.tubeTemp.toFixed(8)}`);
+    }
+
+    public reset = () => {
+        this.tankFill = TOTAL_VOLUME;
+        this.tubeFill = 0;
+        this.tankTemp = INIT_TANK_TEMP;
+        this.tubeTemp = ROOM_TEMP;
     }
 }
