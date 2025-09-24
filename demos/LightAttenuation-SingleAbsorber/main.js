@@ -370,7 +370,7 @@ function initPlot() {
   attPlot = new PlotCanvas(this);
   attPlot.plotSetup();
 
-  attPlot.GPLOT.getXAxis().getAxisLabel().setText("Depth (\u03BCm)");
+  attPlot.GPLOT.getXAxis().getAxisLabel().setText("Sample thickness (\u03BCm)");
   attPlot.GPLOT.getYAxis().getAxisLabel().setText("Intensity (mW/cm²)");
   attPlot.GPLOT.getTitle().setText("Attenuation due to one absorber (monochromatic source)");
 
