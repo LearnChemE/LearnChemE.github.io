@@ -24,7 +24,7 @@ const mainGuiLeft = 0;
 const mainGuiWidth = clientWidth;  // dynamic width of main GUI panel
 
 const secondaryGuiTopOffset = 323 + gui_adjust;  // vertical offset for secondary GUI (gui2)
-const InertGuiOffset = 228 + 5;
+const InertGuiOffset = 228 + gui_adjust;
 const secondaryGuiLeft = 0;
 const secondaryGuiWidth = clientWidth; // same width as main GUI by default
 
@@ -36,7 +36,7 @@ const resultsPanelTopOffset = canvasHeight + 10 + gui_adjust; // just below canv
 const productPanelLeftMargin = 10;      
 const productPanelTopOffset = resultsPanelTopOffset + 105 + gui_adjust;  // below results panel with spacing
 const productPanelWidth = 200;          
-const productPanelHeight = 251;         
+const productPanelHeight = 251 + gui_adjust;         
 
 // Margins and spacing
 const panelHorizontalSpacing = 10;      
@@ -319,13 +319,13 @@ function initPanelPositions() {
     return;
   }
 
-  const PAD_SIDE = 20;
+  const PAD_SIDE = 15;
   const topY = PAD_SIDE;
 
-  if (gui) setPanelPosition(gui, "right", topY, PAD_SIDE);
-  if (gui2) setPanelPosition(gui2, "right", topY + secondaryGuiTopOffset, PAD_SIDE);
-  if (inertGui) setPanelPosition(inertGui, "right", topY + secondaryGuiTopOffset + InertGuiOffset, PAD_SIDE);
-  if (productGui) setPanelPosition(productGui, "left", topY, PAD_SIDE);
+  if (gui) setPanelPosition(gui, "right", mainGuiTop, PAD_SIDE);
+  if (gui2) setPanelPosition(gui2, "right", topY + secondaryGuiTopOffset + PAD_SIDE, PAD_SIDE);
+  if (inertGui) setPanelPosition(inertGui, "right", topY + secondaryGuiTopOffset + InertGuiOffset + PAD_SIDE, PAD_SIDE);
+  if (productGui) setPanelPosition(productGui, "left", mainGuiTop, PAD_SIDE);
   if (wtGui) setPanelPosition(wtGui, "left", topY + productPanelHeight + PAD_SIDE, PAD_SIDE);
   if (textGui && textGui.updateHalfLifeText) {
     const wrapper = document.getElementById('plot-wrapper');
