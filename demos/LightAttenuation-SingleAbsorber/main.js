@@ -5,7 +5,7 @@
  *           GLOBAL VARIABLES
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
-const gui_adjust = 5;
+const gui_adjust = 15;
 const PAD = 20;
 var panelsAreHidden = true;
 var panelsAreHidden2 = true;
@@ -36,7 +36,7 @@ const resultsPanelTopOffset = canvasHeight + 10 + gui_adjust; // just below canv
 const productPanelLeftMargin = 10;      
 const productPanelTopOffset = resultsPanelTopOffset + 105 + gui_adjust;  // below results panel with spacing
 const productPanelWidth = 200;          
-const productPanelHeight = 251 + gui_adjust;         
+const productPanelHeight = 241 + gui_adjust;         
 
 // Margins and spacing
 const panelHorizontalSpacing = 10;      
