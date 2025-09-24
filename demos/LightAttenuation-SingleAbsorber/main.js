@@ -23,7 +23,7 @@ const mainGuiTop = -10;
 const mainGuiLeft = 0;
 const mainGuiWidth = clientWidth;  // dynamic width of main GUI panel
 
-const secondaryGuiTopOffset = 323+5;  // vertical offset for secondary GUI (gui2)
+const secondaryGuiTopOffset = 323;  // vertical offset for secondary GUI (gui2)
 const InertGuiOffset = 228+10;
 const secondaryGuiLeft = 0;
 const secondaryGuiWidth = clientWidth; // same width as main GUI by default
@@ -34,13 +34,13 @@ const resultsPanelTopOffset = canvasHeight + 10; // just below canvas
 
 // PRODUCT PANEL layout variables
 const productPanelLeftMargin = 10;      
-const productPanelTopOffset = resultsPanelTopOffset + 105 + 5;  // below results panel with spacing
+const productPanelTopOffset = resultsPanelTopOffset + 105;  // below results panel with spacing
 const productPanelWidth = 200;          
 const productPanelHeight = 251;         
 
 // Margins and spacing
 const panelHorizontalSpacing = 10;      
-const panelVerticalSpacing = 10;        
+const panelVerticalSpacing = 15;        
 
 // GUI setup
 let gui;
@@ -60,8 +60,8 @@ let QY = 0.55;
 
 // Inert Absorber
 // Starting values for inert absorber (not applied until GUI shown)
-const inertAbsorbStart = 50;  // Napierian absorptivity
-const inertConcStart = 490;   // Concentration (mM)
+const inertAbsorbStart = 51200;  // Napierian absorptivity
+const inertConcStart = 5;   // Concentration (mM)
 let inertAbsorb = inertAbsorbStart;   // default Napierian absorptivity
 let inertConc = inertConcStart; // default concentration (mM)
 // Temporary storage for inert values when hidden
