@@ -5,7 +5,7 @@
  *           GLOBAL VARIABLES
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
-const gui_adjust = 15;
+const gui_adjust = 10;
 const PAD = 20;
 var panelsAreHidden = true;
 var panelsAreHidden2 = true;
@@ -120,8 +120,8 @@ function initHalfLifeText(parent) {
 function updateHalfLifeText() {
   hlLabel.innerHTML = `
 <p>
-  @ exposed surface: ${ESh}<br>
-  @ maximum depth: ${MDh} 
+  Exposed surface: ${ESh}<br>
+  Max depth: ${MDh} 
 </p>
   `;
 }
