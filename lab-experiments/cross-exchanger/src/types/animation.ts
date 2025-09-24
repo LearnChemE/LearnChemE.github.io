@@ -37,4 +37,9 @@ export class AnimationLoop {
         this.animations.delete(fn);
         if (this.animations.size === 0) this.stop();
     }
+
+    public reset = () => {
+        this.stop();
+        this.animations.clear();
+    }
 }

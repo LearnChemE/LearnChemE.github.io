@@ -172,6 +172,25 @@ function initThermometer(id: string, callback?: (target: number) => void) {
     });
 }
 
+function initResetBtn(state: Simulation) {
+    const e = document.createElement("button");
+    document.getElementById("app")!.append(e);
+    e.innerHTML = "reset";
+    e.id = "reset-btn";
+    e.classList.add("btn");
+    e.classList.add("btn-danger");
+
+    const reset = () => {
+        document.getElementById("pumpSwitchOn")!.classList.remove("hidden");
+        document.getElementById("pumpSwitchOff")!.classList.add("hidden");
+        document.getElementById("fanSwitchOn")!.classList.remove("hidden");
+        document.getElementById("fanSwitchOff")!.classList.add("hidden");
+        state.reset();
+    }
+
+    e.addEventListener("click", () => reset());
+}
+
 /**
  * Initialize all the interactables within the svg. Main export of interactions.ts
  * @param state Simulation state object
@@ -181,6 +200,7 @@ export function initInteractables(state: Simulation) {
     initSwitch("fanSwitch", "fanSwitchOn", "fanSwitchOff", (isOn: boolean) => state.setFanStatus(isOn));
     initDial("flowDial", (lift: number) => state.setLift(lift));
     initThermometer("thermStick", (target) => state.setTTarg(target));
+    initResetBtn(state);
 }
 
 // --- Resize Handling ---
@@ -200,4 +220,6 @@ export function enableWindowResize() {
     };
     window.addEventListener('resize', resize);
     resize();
+
+
 }
