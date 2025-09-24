@@ -5,7 +5,7 @@
  *           GLOBAL VARIABLES
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
-
+const gui_adjust = -5;
 const PAD = 20;
 var panelsAreHidden = true;
 var panelsAreHidden2 = true;
@@ -23,18 +23,18 @@ const mainGuiTop = -10;
 const mainGuiLeft = 0;
 const mainGuiWidth = clientWidth;  // dynamic width of main GUI panel
 
-const secondaryGuiTopOffset = 323 + 5;  // vertical offset for secondary GUI (gui2)
+const secondaryGuiTopOffset = 323 + gui_adjust;  // vertical offset for secondary GUI (gui2)
 const InertGuiOffset = 228 + 5;
 const secondaryGuiLeft = 0;
 const secondaryGuiWidth = clientWidth; // same width as main GUI by default
 
 const resultsPanelWidth = 320;          // approx width of Results panel
 const resultsPanelLeft = 10;            // margin from left edge
-const resultsPanelTopOffset = canvasHeight + 10 + 5; // just below canvas
+const resultsPanelTopOffset = canvasHeight + 10 + gui_adjust; // just below canvas
 
 // PRODUCT PANEL layout variables
 const productPanelLeftMargin = 10;      
-const productPanelTopOffset = resultsPanelTopOffset + 105 + 5;  // below results panel with spacing
+const productPanelTopOffset = resultsPanelTopOffset + 105 + gui_adjust;  // below results panel with spacing
 const productPanelWidth = 200;          
 const productPanelHeight = 251;         
 
