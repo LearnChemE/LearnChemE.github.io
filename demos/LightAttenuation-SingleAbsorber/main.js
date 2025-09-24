@@ -5,7 +5,7 @@
  *           GLOBAL VARIABLES
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
-const gui_adjust = 5;
+const gui_adjust = 10;
 const PAD = 20;
 var panelsAreHidden = true;
 var panelsAreHidden2 = true;
