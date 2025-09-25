@@ -25,11 +25,13 @@ export interface GlobalState {
     fanIsOn: boolean,
     outIsFlowing: boolean,
     lift: number,
-    thermTarget: number
+    therm1Target: boolean, // "false" for front, "true" for back
+    therm2Target: number,
+    liqInHex: boolean
 }
 
 export class Simulation {
-    private state = { animationLoop: new AnimationLoop(), systemBalance: new Balance(), pumpIsOn: false, fanIsOn: false, outIsFlowing: false, lift: 0, thermTarget: THERMOMETER_TANK };
+    private state = { animationLoop: new AnimationLoop(), systemBalance: new Balance(), pumpIsOn: false, fanIsOn: false, outIsFlowing: false, lift: 0, therm1Target: false, therm2Target: THERMOMETER_TANK, liqInHex: false };
 
     constructor() {
         // Initialize the constant animation
@@ -43,7 +45,9 @@ export class Simulation {
     public getPumpStatus = () => { return this.state.pumpIsOn }
     public getFanStatus = () => { return this.state.fanIsOn }
     public getLift = () => { return this.state.lift }
-    public getTTarg = () => { return this.state.thermTarget }
+    public getT1Targ = () => { return this.state.therm1Target }
+    public getT2Targ = () => { return this.state.therm2Target }
+    public getLiqInHex = () => { return this.state.liqInHex }
     public addAnimation = (fn: AnimationFn) => { this.state.animationLoop.add(fn) }
 
     /**
@@ -56,7 +60,9 @@ export class Simulation {
         else this.state.animationLoop.remove(fanAnimation);
     }
     public setLift = (lift: number) => { this.state.lift = lift }
-    public setTTarg = (target: number) => { this.state.thermTarget = target }
+    public setT1Targ = (target: boolean) => { this.state.therm1Target = target }
+    public setT2Targ = (target: number) => { this.state.therm2Target = target }
+    public setLiqInHex = (isThere: boolean) => { this.state.liqInHex = isThere }
 
     public reset = () => {
         // Reset some interactions
