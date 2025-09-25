@@ -1,12 +1,15 @@
 // import { createSignal } from 'solid-js'
 import './App.css'
+import { Apparatus } from './components/Apparatus/Apparatus';
 import { HamburgerMenu } from './components/Hamburger/Hamburger';
+import worksheet from './media/testMe.txt'
 
 function App() {
 
   return (
     <>
-      <HamburgerMenu path='./media/testMe.txt' downloadName='test.txt' />
+      <HamburgerMenu path={worksheet} downloadName='test.txt' />
+      <Apparatus/>
     </>
   )
 }
