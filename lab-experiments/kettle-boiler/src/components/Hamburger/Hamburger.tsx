@@ -1,6 +1,7 @@
 import type { Component } from "solid-js";
 import { createSignal, onMount } from "solid-js";
 import "./Hamburger.css";
+import { Modal } from "../Modal/Modal";
 
 interface WorksheetProps {
     path: string;
@@ -9,6 +10,8 @@ interface WorksheetProps {
 
 export const HamburgerMenu: Component<WorksheetProps> = ({ path, downloadName }) => {
     const [showMenu, setShowMenu] = createSignal(false);
+    const [showDirections, setShowDirections] = createSignal(false);
+    const [showAbout, setShowAbout] = createSignal(false);
 
     // Click outside to close
     let ref!: HTMLDivElement;
@@ -22,13 +25,13 @@ export const HamburgerMenu: Component<WorksheetProps> = ({ path, downloadName })
         });
     });
 
-    return (
+    return (<>
         <div class="hamburger-menu" ref={ref}>
             <div class="menu-btn" onclick={() => setShowMenu(!showMenu())}>
                 <i class="fas fa-bars"></i>
             </div>
             <div class={`menu-content ${showMenu() ? "show" : ""}`}>
-                <div class={"menu-item"} data-modal="directions">
+                <div class={"menu-item"} data-modal="directions" onClick={() => {setShowDirections(true); setShowMenu(false)}}>
                     <i class="fas fa-book"></i>
                     <span>Directions</span>
                 </div>
@@ -38,10 +41,13 @@ export const HamburgerMenu: Component<WorksheetProps> = ({ path, downloadName })
                         <span>Worksheet</span>
                     </div>
                 </a>
-                <div class="menu-item" data-modal="about">
+                <div class="menu-item" data-modal="about" onClick={() => {setShowAbout(true); setShowMenu(false)}}>
                     <i class="fas fa-info-circle"></i>
                     <span>About</span>
                 </div>
             </div>
-        </div>);
+        </div>
+        <Modal key="directions" title="Directions" bodyHTML="" show={[showDirections, setShowDirections]} />
+        <Modal key="about" title="About" bodyHTML="" show={[showAbout, setShowAbout]} />
+        </>);
 }
