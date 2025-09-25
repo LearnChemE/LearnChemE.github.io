@@ -8,11 +8,15 @@ const UA_TUBE = 1e-0; // W / K
 const CP = 4.184; // J / g / K
 const RHO = 0.998 // g / mL
 
+const CP_AIR = 1.006; // J / g / K
+const MDOT_AIR = 9.153; // g / s
+
 export class Balance {
     private tankFill: number = TOTAL_VOLUME; // mL
     private tankTemp: number = INIT_TANK_TEMP; // C
     private tubeFill: number = 0; // mL
     private tubeTemp: number = 25; // C
+    private airTemp : number = 25; // C
 
     private d_tubeVol: number = 0;
 
@@ -39,15 +43,21 @@ export class Balance {
         this.tubeFill = amt;
     }
 
-    public integrate(flowrate: number, deltaTime: number, fanIsOn: boolean) {
+    public integrate(flowrate: number, deltaTime: number, fanIsOn: boolean, liqInHex: boolean) {
         const dt = deltaTime / 1000;
         const tankTemp = this.tankTemp;
         const tubeTemp = this.tubeTemp;
-        const tube_UA = fanIsOn ? UA_TUBE * 10 : UA_TUBE;
+        const tube_UA = (fanIsOn && liqInHex) ? UA_TUBE * 10 : UA_TUBE;
 
         // Calculate heat rates
         const dQdt_tank = UA_TANK * (ROOM_TEMP - tankTemp) + flowrate * CP * (tubeTemp - tankTemp);
         const dQdt_tube = tube_UA * (ROOM_TEMP - tubeTemp) + flowrate * CP * (tankTemp - tubeTemp);
+
+        // Use the energy balance to calculate the theoretical air temp
+        const airTempTheoretical = (fanIsOn && liqInHex) ? 25 - dQdt_tube / CP_AIR / MDOT_AIR : 25;
+        // Use a moving average filter over the last 2 seconds to make the actual less awful
+        const avgHi = this.airTemp + (airTempTheoretical - this.airTemp) * deltaTime / 5000;
+        this.airTemp = Math.min(airTempTheoretical, avgHi);
 
         // Translate to rhs
         const dT_tank = this.tankFill !== 0 ? dQdt_tank / RHO / this.tankFill / CP * dt : 0; // K / s
@@ -56,7 +66,10 @@ export class Balance {
         // Evolve
         this.tankTemp += dT_tank;
         this.tubeTemp += dT_tube;
-        // console.log(`Tank: ${this.tankTemp.toFixed(8)}\nTube: ${this.tubeTemp.toFixed(8)}`);
+    }
+
+    public getAirTemp = () => {
+        return this.airTemp;
     }
 
     public reset = () => {

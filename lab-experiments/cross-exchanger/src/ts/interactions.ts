@@ -111,6 +111,7 @@ function initDial(id: string, callback?: (lift: number) => void) {
 
 function initThermometer(id: string, callback?: (target: number) => void) {
     const therm = document.getElementById(id)! as unknown as SVGGElement;
+    therm.classList.add("thermStick");
     const svg = document.querySelector<SVGSVGElement>("svg")!;
 
     const [,, width, height] = svg
@@ -172,6 +173,61 @@ function initThermometer(id: string, callback?: (target: number) => void) {
     });
 }
 
+function initFanTherm(callback?: (target: boolean) => void) {
+    const front = document.getElementById("fanThermOut")!; // in front of the fan
+    const back  = document.getElementById("fanThermIn")!; // behind the fan
+    back.classList.add("hidden");
+    back.setAttribute("transform","rotate(-25)");
+    
+    var playing = false;
+    const toggle = (switchingToBack: boolean) => {
+        if (playing) return;
+        playing = true;
+
+        // Determine what's in position and what will be put into position
+        const current = switchingToBack ? front : back;
+        const next    = switchingToBack ? back : front;
+
+        const r = Math.exp(-1/200);
+        var s = 0;
+
+        var prevtime: number | null = null;
+        const frame = (time: number) => {
+            if (prevtime === null) prevtime = time;
+            const deltaTime = time - prevtime;
+            prevtime = time;
+
+            // Rotate the current up first
+            if (s < 25) {
+                s = (s - 31) * r ** deltaTime + 31;
+            } else {
+                s = (s - 51) * r ** deltaTime + 51;
+            }
+            const r1 = Math.max(-s, -25);
+            current.setAttribute("transform", `rotate(${r1})`);
+            if (s >= 25) current.classList.add("hidden");
+
+            const r2 = constrain(s - 50, -25, 0);
+            next.setAttribute("transform", `rotate(${r2})`);
+            if (s >= 25) next.classList.remove("hidden");
+
+            if (s < 50) requestAnimationFrame(frame);
+            else {
+                callback?.(switchingToBack);
+                playing = false;
+            }
+        }
+
+        requestAnimationFrame(frame);
+    }
+
+    front.classList.add("svg-btn");
+    back.classList.add("svg-btn");
+
+    front.addEventListener("click", () => toggle(true));
+    back.addEventListener("click", () => toggle(false));
+}
+
 function initResetBtn(state: Simulation) {
     const e = document.createElement("button");
     document.getElementById("app")!.append(e);
@@ -199,7 +255,8 @@ export function initInteractables(state: Simulation) {
     initSwitch("pumpSwitch", "pumpSwitchOn", "pumpSwitchOff", (isOn: boolean) => state.setPumpStatus(isOn));
     initSwitch("fanSwitch", "fanSwitchOn", "fanSwitchOff", (isOn: boolean) => state.setFanStatus(isOn));
     initDial("flowDial", (lift: number) => state.setLift(lift));
-    initThermometer("thermStick", (target) => state.setTTarg(target));
+    initThermometer("thermStick", (target) => state.setT2Targ(target));
+    initFanTherm((back) => state.setT1Targ(back));
     initResetBtn(state);
 }
 

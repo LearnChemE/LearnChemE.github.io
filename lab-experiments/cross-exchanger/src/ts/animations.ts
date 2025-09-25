@@ -1,6 +1,6 @@
 import { FLOWRATE_GAIN, THERMOMETER_NONE, THERMOMETER_TANK, THERMOMETER_TUBE, type AnimationFn, type GlobalState } from "../types";
 import { constrain, insertClipPath } from "./helpers";
-import { updateFlowLabel, updateThermLabel } from "./labels";
+import { updateFlowLabel, updateThermLabel, updateThermLabelLeft } from "./labels";
 
 const FAN_OMEGA = 1.5 * 360;
 const TUBE_FILL_DURATION = 5000; // ms
@@ -84,6 +84,7 @@ export const makeFlowAnimation = (state: GlobalState): AnimationFn => {
 
         // Fill tubes accordingly
         var cumulativeFill = fill * totalLength;
+        state.liqInHex = (cumulativeFill > 700) ? true : false;
         inTube.setAttribute("stroke-dashoffset", `${Math.max(inTubeLength - cumulativeFill, 0)}`);
         cumulativeFill = Math.max(cumulativeFill - inTubeLength - EXCHANGER_LENGTH, 0);
         outTube.setAttribute("stroke-dashoffset", `${Math.max(outTubeLength - cumulativeFill, 0)}`);
@@ -100,7 +101,7 @@ export const makeFlowAnimation = (state: GlobalState): AnimationFn => {
 
         // Integrate
         const flow = state.outIsFlowing ? state.lift * FLOWRATE_GAIN : 0;
-        state.systemBalance.integrate(flow, dt, state.fanIsOn);
+        state.systemBalance.integrate(flow, dt, state.fanIsOn, state.liqInHex);
     };
 }
 
@@ -111,6 +112,7 @@ export const makeThermometerAnimation = (state: GlobalState): AnimationFn => {
 
     var counter = 0;
     var thermTemp = 60;
+    var thermTempL = 25;
 
     return (dt: number) => {
         // Only update every so often
@@ -118,7 +120,7 @@ export const makeThermometerAnimation = (state: GlobalState): AnimationFn => {
         if (counter < 500) return;
 
         // Get the thermometer target
-        var measuring = state.thermTarget;
+        var measuring = state.therm2Target;
         // If the stream is not active, default to none
         const outlet = clip.childNodes[0]! as unknown as SVGRectElement;
         if (measuring === THERMOMETER_TUBE) {
@@ -148,15 +150,24 @@ export const makeThermometerAnimation = (state: GlobalState): AnimationFn => {
                 break;
 
             default:
-                console.warn(`Bad thermometer measure value: ${state.thermTarget}`);
+                console.warn(`Bad thermometer measure value: ${state.therm2Target}`);
                 return;
         }
 
         // Lerp towards the new value
         thermTemp = (thermTemp - temp) * r ** counter + temp;
 
-        // Update the thermometer
+        // Left thermometer
+        if (state.therm1Target === false) {
+            temp = (state.liqInHex) ? state.systemBalance.getAirTemp() : 25;
+        } else {
+            temp = 25;
+        }
+        thermTempL = (thermTempL - temp) * r_dry ** counter + temp;
+
+        // Update the thermometers
         updateThermLabel(thermTemp);
+        updateThermLabelLeft(thermTempL);
         counter -= 500;
     };
 }
