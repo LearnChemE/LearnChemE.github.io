@@ -332,7 +332,7 @@ export function initSvgDrag(exemptIDs?: string[]) {
 
 // --- Resize Handling ---
 export function enableWindowResize() {
-    const e = document.getElementById("apparatus-wrapper")!.childNodes[0] as unknown as SVGAElement;
+    const e = document.querySelector("svg")!;
     const asp = e.clientWidth / e.clientHeight;
     // Attach event handler
     const resize = () => {

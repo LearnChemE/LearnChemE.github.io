@@ -3,7 +3,7 @@ import './App.css'
 import { Apparatus } from './components/Apparatus';
 import { HamburgerMenu } from './components/Hamburger/Hamburger';
 import worksheet from './media/testMe.txt'
-import { initSvgDrag, initSvgZoom } from './ts/helpers';
+import { enableWindowResize, initSvgDrag, initSvgZoom } from './ts/helpers';
 
 function App() {
 
@@ -12,6 +12,8 @@ function App() {
     initSvgZoom();
     // Initialize SVG dragging with exempt element IDs
     initSvgDrag();
+    // Add the resizing handler
+    enableWindowResize();
   });
 
   return (
