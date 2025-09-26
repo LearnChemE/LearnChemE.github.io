@@ -26,3 +26,8 @@
 .read-the-docs {
   color: #888;
 }
+
+@font-face {
+  font-family: "digital";
+  src: url("./media/digital-7.ttf") format("truetype");
+}

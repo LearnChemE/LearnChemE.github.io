@@ -1,15 +1,16 @@
-import { createSignal, type Component } from "solid-js";
+import { createMemo, createSignal, type Component } from "solid-js";
 import StaticElements from "./Static/StaticElements";
 import StaticDefs from "./Static/StaticDefs";
 import Rotameter from "./Interactables/Rotameter";
 import Kettle from "./Kettle/Kettle";
-import Display from "./Interactables/Display";
+import Display from "./Display/Display";
 import Waterfall from "./Interactables/Waterfall";
 import Gauge from "./Gauge/Gauge";
 import BallValve from "./BallValve/BallValve";
 import GlobeValve from "./GlobeValve/GlobeValve";
 import BeakerSystem from "./BeakerSystem/BeakerSystem";
 import { PRegulator } from "./PRegulator/PRegulator";
+import { calculateSteamTemperature } from "../ts/calcs";
 
 // Note: The Apparatus component is the main SVG container for the kettle boiler experiment. 
 // It includes static elements, interactable components like the rotameter and kettle, displays for temperature readings, waterfalls to represent fluid flow, 
@@ -21,8 +22,14 @@ const waterfallPaths = [
 ];
 
 export const Apparatus: Component = () => {
+  // Signals
   const [ballValveOpen, setBallValveOpen] = createSignal(false); // State for BallValve
   const [regulatorPressure, setRegulatorPressure] = createSignal(0); // Pressure state for the PRegulator
+
+  // Memos
+  const steamPressure = createMemo(() => ballValveOpen() ? Math.min(regulatorPressure(), 15) : 0); // Steam pressure depends on ball valve state
+  const steamTemperature = createMemo(() => calculateSteamTemperature(steamPressure())); // Steam temperature based on pressure
+  console.log(`Steam Pressure: ${steamPressure()} psi, Steam Temperature: ${steamTemperature().toFixed(2)} °C`);
 
 return (<svg
   width="1133"
@@ -42,19 +49,19 @@ return (<svg
 
     {/* Displays */}
     {/* Condensate Temperature Display */}
-    <Display x={350.5} y={565.5}/>
+    <Display x={350.5} y={565.5} val={calculateSteamTemperature(0)}/>
     {/* Feed Temperature Display */}
-    <Display x={576.5} y={428.5}/>
+    <Display x={576.5} y={428.5} val={25}/>
     {/* Steam Temperature Display */}
-    <Display x={220.5} y={351.5}/>
+    <Display x={220.5} y={351.5} val={steamTemperature}/>
     {/* Outlet Temperature Display */}
-    <Display x={820.5} y={479.5}/>
+    <Display x={820.5} y={479.5} val={steamTemperature}/>
 
     {/* Waterfalls */}
     <Waterfall d={waterfallPaths[0]}/>
     <Waterfall d={waterfallPaths[1]}/>
 
-    <Gauge pressure={regulatorPressure}/>
+    <Gauge pressure={steamPressure}/>
     <BallValve onToggle={(open) => setBallValveOpen(open)} />
     <GlobeValve/>
     <BeakerSystem/>

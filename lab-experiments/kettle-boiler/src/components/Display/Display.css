@@ -1,0 +1,11 @@
+
+.digital-label {
+  font-family: "digital" !important;
+  font-weight: 100;
+  font-size: 11;
+
+  position: absolute;
+  text-anchor: middle;
+  text-justify: middle;
+  dominant-baseline: middle;
+}
