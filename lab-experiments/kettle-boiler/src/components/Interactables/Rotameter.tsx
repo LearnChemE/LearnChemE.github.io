@@ -1,6 +1,15 @@
-import type { Component } from "solid-js";
+import { type Component } from "solid-js";
 
-const Rotameter: Component = () => {
+interface RotameterProps {
+  flowrate: () => number; // Optional prop to set the flowrate
+}
+
+const Rotameter: Component<RotameterProps> = ({ flowrate }) => {
+  const pixels = 80; // Total pixels the ball can move
+  const maxFlowrate = 20; // Max flowrate corresponding to max pixels
+  const pixelsPerFlowrate = pixels / maxFlowrate;
+  
+
   return (
     <g id="rotameter">
       <path
@@ -9,6 +18,7 @@ const Rotameter: Component = () => {
         fill="url(#paint41_radial_6_626)"
         stroke="black"
         stroke-width="0.5"
+        transform={`translate(0, ${-flowrate() * pixelsPerFlowrate})`} // Move ball up based on flowrate
       />
       <g id="Group 3">
         <rect
@@ -158,7 +168,7 @@ const Rotameter: Component = () => {
         fill-opacity="0.5"
         stroke="black"
       />
-      <g id="Repeat group 1">
+      <g>
         <line
           id="Line 16"
           x1="503"
@@ -304,7 +314,7 @@ const Rotameter: Component = () => {
           stroke-width="0.5"
         />
       </g>
-      <g id="Repeat group 2">
+      <g>
         <line
           id="Line 17"
           x1="503"

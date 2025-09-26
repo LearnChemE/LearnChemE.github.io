@@ -1,3 +1,6 @@
+
+export const FEED_RATE_GAIN = 20; // Gain factor to convert lift to flow rate
+
 /**
  * Calculate saturation temperature (C) from pressure (psi) using Antoine equation
  * @param pressure Pressure in psi

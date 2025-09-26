@@ -10,7 +10,7 @@ import BallValve from "./BallValve/BallValve";
 import GlobeValve from "./GlobeValve/GlobeValve";
 import BeakerSystem from "./BeakerSystem/BeakerSystem";
 import { PRegulator } from "./PRegulator/PRegulator";
-import { calculateSteamTemperature } from "../ts/calcs";
+import { calculateSteamTemperature, FEED_RATE_GAIN } from "../ts/calcs";
 
 // Note: The Apparatus component is the main SVG container for the kettle boiler experiment. 
 // It includes static elements, interactable components like the rotameter and kettle, displays for temperature readings, waterfalls to represent fluid flow, 
@@ -25,6 +25,7 @@ export const Apparatus: Component = () => {
   // Signals
   const [ballValveOpen, setBallValveOpen] = createSignal(false); // State for BallValve
   const [regulatorPressure, setRegulatorPressure] = createSignal(0); // Pressure state for the PRegulator
+  const [feedRate, setFeedRate] = createSignal(0); // Feed flow rate
 
   // Memos
   const steamPressure = createMemo(() => ballValveOpen() ? Math.min(regulatorPressure(), 15) : 0); // Steam pressure depends on ball valve state
@@ -43,7 +44,7 @@ return (<svg
     <StaticElements/>
 
     {/* Interactables */}
-    <Rotameter/>
+    <Rotameter flowrate={feedRate}/>
     <Kettle/>
     <PRegulator setPressure={setRegulatorPressure}/>
 
@@ -63,7 +64,7 @@ return (<svg
 
     <Gauge pressure={steamPressure}/>
     <BallValve onToggle={(open) => setBallValveOpen(open)} />
-    <GlobeValve/>
+    <GlobeValve onLiftChange={(lift) => setFeedRate(lift * FEED_RATE_GAIN)}/>
     <BeakerSystem/>
     
     
