@@ -2,7 +2,7 @@ import type { Component } from "solid-js";
 import StaticElements from "./Static/StaticElements";
 import StaticDefs from "./Static/StaticDefs";
 import Rotameter from "./Interactables/Rotameter";
-import Kettle from "./Interactables/Kettle";
+import Kettle from "./Kettle/Kettle";
 import Display from "./Interactables/Display";
 import Waterfall from "./Interactables/Waterfall";
 import Gauge from "./Interactables/Gauge";

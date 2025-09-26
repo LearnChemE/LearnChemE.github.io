@@ -1,8 +1,27 @@
-import type { Component } from "solid-js";
+import { onMount, type Component } from "solid-js";
+import "./Kettle.css";
 
-export const Kettle: Component = () => {
+interface KettleProps {
+  feedRate?: number; // in L/min
+  steamRate?: number; // in kg/min
+};
+
+export const Kettle: Component<KettleProps> = ({}) => {
+
+  let ref!: SVGPathElement;
+  let pathFill = 0; // 0 to 1
+
+  onMount(() => {
+    // Initially hide the exterior
+    setTimeout(() => {
+      document.querySelectorAll('.kettle-exterior').forEach(el => el.classList.add('kettle-exterior-hidden'));
+    }, 1000); // Slight delay to ensure CSS transition
+
+    console.log(ref, ref.getBBox());
+  });
+
   return (
-    
+  <>
     <g id="kettle">
       <g id="interior">
         <path
@@ -173,17 +192,22 @@ export const Kettle: Component = () => {
           d="M914 398H529.214C519.75 398 510.298 397.329 500.93 395.991L494.07 395.011C484.702 393.673 475.25 393 465.786 393H438V272.817C440.34 272.533 442.62 271.92 444.775 271H914V398Z"
           fill="#3B8CCF"
           fill-opacity="0.6"
+          clip-path="url(#chamberClip)"
         />
         <path
           id="overflowFill"
+          ref={ref}
           d="M1056.33 386C1040.3 398.756 1023.51 397.937 1023.48 397.936H1018V398H914V386H1056.33Z"
           fill="#78AEDD"
+          clip-path="url(#overflowClip)"
         />
         <path
           id="overflowPath"
           d="M914 272.5C917 272.5 917.5 274 917.5 277V397"
           stroke="#78AEDD"
           stroke-width="3"
+          stroke-dasharray="126.7020263671875"
+          stroke-dashoffset={126.7020263671875 * (1 - pathFill)}
         />
         <rect
           id="weir"
@@ -201,7 +225,7 @@ export const Kettle: Component = () => {
           stroke="black"
         />
       </g>
-      <g id="exterior">
+      <g id="exterior" class="kettle-exterior">
         <path
           id="Rectangle 58"
           d="M536.5 397.5H529.214C519.774 397.5 510.345 396.831 501 395.496L494.142 394.515C484.75 393.173 475.274 392.5 465.786 392.5H435.5V273.495C441.255 273.381 446.807 271.318 451.241 267.633L498.399 228.446C509.116 219.541 522.577 214.621 536.5 214.505V397.5Z"
@@ -658,6 +682,29 @@ export const Kettle: Component = () => {
         />
       </g>
     </g>
+    <defs>
+      <clipPath id="chamberClip">
+        <rect
+          x={435}
+          y={272}
+          width="479"
+          height="126"
+          fill="white"
+          transform="translate(435 272)"
+        />
+      </clipPath>
+      <clipPath id="overflowClip">
+        <rect
+          x={914}
+          y={386}
+          width="142"
+          height="12"
+          fill="white"
+          transform="translate(914 386)"
+        />
+      </clipPath>
+    </defs>
+  </>
 )};
 
 export default Kettle;
