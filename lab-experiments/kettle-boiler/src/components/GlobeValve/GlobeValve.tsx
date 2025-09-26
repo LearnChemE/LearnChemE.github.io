@@ -1,6 +1,70 @@
-import type { Component } from "solid-js";
+import { getAngleFromDown, getSVGCoords } from "../../ts/helpers";
+import "./GlobeValve.css";
+import { createSignal, type Component } from "solid-js";
 
-export const GlobeValve: Component = () => {
+interface GlobeValveProps {
+  onLiftChange?: (lift: number) => void;
+}
+
+export const GlobeValve: Component<GlobeValveProps> = ({ onLiftChange }) => {
+  const maxAngle = 270; // Degrees for fully open
+
+  // State
+  let [currentAngle, setCurrentAngle] = createSignal(0); // in pixels, range from 0 (closed) to 20 (fully open)
+  let isDragging = false;
+  let prevTh = 0;
+
+  // Begin drag
+  const beginDrag = (e: MouseEvent) => {
+    e.preventDefault();
+    isDragging = true;
+    prevTh = getAngleFromDown({x:498, y:629}, {x:e.clientX, y:e.clientY});
+    document.addEventListener("mousemove", onDrag);
+    document.addEventListener("mouseup", endDrag);
+  };
+
+  // On drag
+  const onDrag = (e: MouseEvent) => {
+    if (!isDragging) return;
+
+    // Calculate angle change
+    const angle = currentAngle();
+    const svgMozCoords = getSVGCoords(e);
+    const th = getAngleFromDown({x:498, y:629}, {x:svgMozCoords.x, y:svgMozCoords.y});
+    let deltaTh = th - prevTh; // Positive if moving up
+    if (Math.abs(deltaTh) > 180) {
+      // Handle wrap-around
+      if (deltaTh > 0) {
+        // Moving from 359 to 0
+        deltaTh -= 360;
+      } else {
+        // Moving from 0 to 359
+        deltaTh += 360;
+      }
+    }
+
+    // Update angle with clamping
+    let newAngle = angle + deltaTh;
+    newAngle = Math.max(0, Math.min(maxAngle, newAngle)); // Clamp between 0 and 20
+
+    // Update state and callback if changed
+    if (newAngle !== angle) {
+      setCurrentAngle(newAngle);
+      onLiftChange?.(newAngle / maxAngle); // Normalize to [0, 1]
+    }
+    
+    // Update previous angle
+    prevTh = th;
+  };
+
+  // End drag
+  const endDrag = () => {
+    isDragging = false;
+    document.removeEventListener("mousemove", onDrag);
+    document.removeEventListener("mouseup", endDrag);
+  };
+
+  // Render
   return (
     <g id="globeValve">
       <g id="body_8">
@@ -37,7 +101,8 @@ export const GlobeValve: Component = () => {
           stroke="black"
         />
       </g>
-      <g id="feedValve">
+      <g id="feedValve" class="drag-exempt" onmousedown={beginDrag} transform={`rotate(${currentAngle()} 498 629)`}>
+        <circle cx="498" cy="629" r="20" fill="red" opacity={0} />
         <path
           id="valve"
           fill-rule="evenodd"
@@ -46,6 +111,7 @@ export const GlobeValve: Component = () => {
           fill="#FF3B3B"
           stroke="black"
           stroke-linejoin="round"
+          class="valveHandle"
         />
         <path
           id="feedValveCenter"

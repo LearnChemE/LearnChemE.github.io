@@ -7,7 +7,7 @@ import Display from "./Interactables/Display";
 import Waterfall from "./Interactables/Waterfall";
 import Gauge from "./Interactables/Gauge";
 import BallValve from "./BallValve/BallValve";
-import GlobeValve from "./Interactables/GlobeValve";
+import GlobeValve from "./GlobeValve/GlobeValve";
 import BeakerSystem from "./BeakerSystem/BeakerSystem";
 
 const waterfallPaths = [

@@ -72,7 +72,7 @@ export function constrain(x: number, min: number, max: number) {
  * @param B 
  * @returns 
  */
-export function findAngleFromDown(A: { x: number, y: number }, B: { x: number, y: number }) {
+export function getAngleFromDown(A: { x: number, y: number }, B: { x: number, y: number }) {
     var dx = B.x - A.x;
     var dy = B.y - A.y;
     var mag = Math.sqrt(dx*dx + dy*dy);
@@ -178,7 +178,6 @@ function getDistance(touches: TouchList) {
 export function initSvgZoom() {
     // Get the svg context
     const svg = document.querySelector("svg")!;
-    console.log(svg)
     const viewBox = svg.getAttribute("viewBox")!.split(" ").map(Number);
     viewState = {
         maxViewBox: viewBox,
@@ -347,4 +346,17 @@ export function enableWindowResize() {
     };
     window.addEventListener('resize', resize);
     resize();
+}
+
+/**
+ * Get SVG coordinates from a mouse or touch event
+ * @param evt Mouse or touch event
+ * @returns SVG coordinates as a point
+ */
+export function getSVGCoords(evt: MouseEvent | Touch) {
+    const svg = document.querySelector("svg")!;
+    var pt = svg.createSVGPoint();
+    pt.x = evt.clientX;
+    pt.y = evt.clientY;
+    return pt.matrixTransform(svg.getScreenCTM()!.inverse());
 }

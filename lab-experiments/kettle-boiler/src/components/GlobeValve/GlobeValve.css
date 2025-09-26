@@ -1,0 +1,14 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Globe Valve
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.valveHandle {
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.valveHandle:hover {
+    filter: brightness(1.1)
+        drop-shadow(-.5px -.5px .5px rgba(255, 205, 39, 255))
+        drop-shadow(.5px .5px .5px rgba(23, 206, 255, 255));
+}

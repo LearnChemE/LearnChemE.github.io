@@ -53,7 +53,7 @@ export const BallValve: Component<BallValveProps> = ({ onToggle }) => {
           stroke="black"
         />
       </g>
-      <g class="valveHandle" onclick={toggleValve} transform={rotation()}>
+      <g class="valveHandle drag-exempt" onclick={toggleValve} transform={rotation()}>
         <rect
           id="Rectangle 51_8"
           x="69.5"
