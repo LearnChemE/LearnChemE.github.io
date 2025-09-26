@@ -1,9 +1,27 @@
-import type { Component } from "solid-js";
+import "./BallValve.css";
+import { createSignal, type Component } from "solid-js";
 
-export const BallValve: Component = () => {
+interface BallValveProps {
+  onToggle?: (open: boolean) => void;
+}
+
+export const BallValve: Component<BallValveProps> = ({ onToggle }) => {
+  // State
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  // Rotation transform
+  const rotation = () => `rotate(${isOpen() ? -90 : 0} 75 278)`;
+
+  // Toggle function
+  const toggleValve = () => {
+    const open = !isOpen();
+    setIsOpen(open);
+    onToggle?.(open);
+  };
+
+  // Render
   return (
-    
-    <g id="ballValve">
+    <g id="ballValve" transform="translate(15, 0)">
       <g id="body_7">
         <rect
           id="Rectangle 48_8"
@@ -35,7 +53,7 @@ export const BallValve: Component = () => {
           stroke="black"
         />
       </g>
-      <g id="steamValve">
+      <g class="valveHandle" onclick={toggleValve} transform={rotation()}>
         <rect
           id="Rectangle 51_8"
           x="69.5"
