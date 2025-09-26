@@ -1,6 +1,21 @@
 import type { Component } from "solid-js";
+import "./Gauge.css";
 
-export const Gauge: Component = () => {
+interface GaugeProps {
+  pressure: number; // in psig
+}
+
+export const Gauge: Component<GaugeProps> = ({ pressure }) => {
+  // Range of pressure: 0 to 30 psig
+  const maxPressure = 30; // psig
+  // Range of needle angle: -135 to 135 degrees
+  const minAngle = -135; // degrees
+  const maxAngle = 135; // degrees
+
+  // Angle of the needle
+  const needleAngle = pressure / maxPressure * (maxAngle - minAngle) + minAngle;
+
+  // Render
   return (
     <g id="gauge">
       <rect
@@ -265,15 +280,19 @@ export const Gauge: Component = () => {
       />
       <path
         id="needle"
+        class="gauge-needle"
+        transform={`rotate(${needleAngle} 381 66.8829)`}
         d="M381 72.9014C381.107 72.3497 381.196 71.798 381.269 71.2463C381.423 70.0723 381.5 68.8983 381.5 67.7244C381.5 63.5573 381.5 59.3902 381.5 55.2231C381.5 50.6336 381.367 46.0442 381.102 41.4548C381.07 40.9031 381.036 40.3514 381 39.7997C380.964 40.3514 380.93 40.9031 380.898 41.4548C380.633 46.0442 380.5 50.6336 380.5 55.2231C380.5 59.3902 380.5 63.5573 380.5 67.7244C380.5 68.8983 380.577 70.0723 380.731 71.2463C380.804 71.798 380.893 72.3497 381 72.9014Z"
         fill="#E00000"
       />
-      <path
-        id="pGaugeCenter"
-        d="M381 66.1298C381.418 66.1298 381.756 66.4677 381.756 66.8828C381.756 67.2979 381.418 67.6357 381 67.6357C380.581 67.6355 380.244 67.2978 380.244 66.8828C380.244 66.4678 380.581 66.13 381 66.1298Z"
+      <circle
+        id="gauge"
+        cx="381"
+        cy="66.8829"
+        r=".5"
         fill="#D9D9D9"
         stroke="black"
-        stroke-width="0.5"
+        stroke-width="0.4"
       />
     </g>
 )};

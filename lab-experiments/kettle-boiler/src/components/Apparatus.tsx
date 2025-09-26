@@ -5,7 +5,7 @@ import Rotameter from "./Interactables/Rotameter";
 import Kettle from "./Kettle/Kettle";
 import Display from "./Interactables/Display";
 import Waterfall from "./Interactables/Waterfall";
-import Gauge from "./Interactables/Gauge";
+import Gauge from "./Gauge/Gauge";
 import BallValve from "./BallValve/BallValve";
 import GlobeValve from "./GlobeValve/GlobeValve";
 import BeakerSystem from "./BeakerSystem/BeakerSystem";
@@ -46,7 +46,7 @@ return (<svg
     <Waterfall d={waterfallPaths[0]}/>
     <Waterfall d={waterfallPaths[1]}/>
 
-    <Gauge/>
+    <Gauge pressure={0}/>
     <BallValve onToggle={() => {}} />
     <GlobeValve/>
     <BeakerSystem/>
