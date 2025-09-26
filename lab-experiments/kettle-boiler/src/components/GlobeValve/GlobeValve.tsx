@@ -7,7 +7,7 @@ interface GlobeValveProps {
 }
 
 export const GlobeValve: Component<GlobeValveProps> = ({ onLiftChange }) => {
-  const maxAngle = 270; // Degrees for fully open
+  const maxAngle = -720; // Degrees for fully open
 
   // State
   let [currentAngle, setCurrentAngle] = createSignal(0); // in pixels, range from 0 (closed) to 20 (fully open)
@@ -18,7 +18,8 @@ export const GlobeValve: Component<GlobeValveProps> = ({ onLiftChange }) => {
   const beginDrag = (e: MouseEvent) => {
     e.preventDefault();
     isDragging = true;
-    prevTh = getAngleFromDown({x:498, y:629}, {x:e.clientX, y:e.clientY});
+    const svgMozCoords = getSVGCoords(e);
+    prevTh = getAngleFromDown({x:498, y:629}, {x:svgMozCoords.x, y:svgMozCoords.y});
     document.addEventListener("mousemove", onDrag);
     document.addEventListener("mouseup", endDrag);
   };
@@ -45,7 +46,7 @@ export const GlobeValve: Component<GlobeValveProps> = ({ onLiftChange }) => {
 
     // Update angle with clamping
     let newAngle = angle + deltaTh;
-    newAngle = Math.max(0, Math.min(maxAngle, newAngle)); // Clamp between 0 and 20
+    newAngle = Math.min(0, Math.max(maxAngle, newAngle)); // Clamp between 0 and 20
 
     // Update state and callback if changed
     if (newAngle !== angle) {
@@ -101,7 +102,7 @@ export const GlobeValve: Component<GlobeValveProps> = ({ onLiftChange }) => {
           stroke="black"
         />
       </g>
-      <g id="feedValve" class="drag-exempt" onmousedown={beginDrag} transform={`rotate(${currentAngle()} 498 629)`}>
+      <g id="feedValve" class="drag-exempt globeValveHandle" onmousedown={beginDrag} transform={`rotate(${currentAngle()} 498 629)`}>
         <circle cx="498" cy="629" r="20" fill="red" opacity={0} />
         <path
           id="valve"
@@ -111,7 +112,6 @@ export const GlobeValve: Component<GlobeValveProps> = ({ onLiftChange }) => {
           fill="#FF3B3B"
           stroke="black"
           stroke-linejoin="round"
-          class="valveHandle"
         />
         <path
           id="feedValveCenter"

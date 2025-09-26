@@ -268,13 +268,21 @@ export function initSvgZoom() {
 }
 
 export function initSvgDrag(exemptIDs?: string[]) {
-    // Get exempt elements if any
+    // Get exempt elements provided
     const exemptElements: HTMLElement[] = [];
-    const checkExemptions: boolean = exemptIDs !== undefined && exemptIDs.length > 0;
-    if (checkExemptions) {
+    if (exemptIDs !== undefined && exemptIDs.length > 0) {
         exemptIDs!.forEach(id => exemptElements.push(GetElement(id)));
     }
     
+    // Find exempt elements from class
+    const classExempt = document.querySelectorAll(".drag-exempt");
+    classExempt.forEach(el => {
+        exemptElements.push(el as unknown as HTMLElement);
+    });
+
+    // Conditional to check if there are any exemptions later
+    const checkExemptions = exemptElements.length > 0;
+
     // Get the svg context
     const svg = document.querySelector("svg")!;
     // Set defaults
@@ -284,12 +292,18 @@ export function initSvgDrag(exemptIDs?: string[]) {
 
     // Begin dragging on pointer down
     svg.addEventListener("pointerdown", (e) => {
+        // Check exemptions
+        let exempt = false;
         if (checkExemptions) exemptElements.forEach(el => {
             if (el.contains(e.target as Node)) {
-                isDragging = false;
+                exempt = true;
                 return;
             }
         });
+        if (exempt) return;
+        
+        // Start dragging
+        e.preventDefault();
         isDragging = true;
         prevX = e.clientX;
         prevY = e.clientY;
