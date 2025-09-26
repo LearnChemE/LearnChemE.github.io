@@ -1,4 +1,4 @@
-import type { Component } from "solid-js";
+import { createSignal, type Component } from "solid-js";
 import StaticElements from "./Static/StaticElements";
 import StaticDefs from "./Static/StaticDefs";
 import Rotameter from "./Interactables/Rotameter";
@@ -9,6 +9,11 @@ import Gauge from "./Gauge/Gauge";
 import BallValve from "./BallValve/BallValve";
 import GlobeValve from "./GlobeValve/GlobeValve";
 import BeakerSystem from "./BeakerSystem/BeakerSystem";
+import { PRegulator } from "./PRegulator/PRegulator";
+
+// Note: The Apparatus component is the main SVG container for the kettle boiler experiment. 
+// It includes static elements, interactable components like the rotameter and kettle, displays for temperature readings, waterfalls to represent fluid flow, 
+// a pressure gauge, valves, and a beaker system. Each component is modular and can be developed and maintained independently.
 
 const waterfallPaths = [
   "M167 522C160.333 522 153.667 522 147 522C147.667 524.57 148.741 527.141 149 529.711C149.013 529.841 149.026 529.97 149.039 530.1C149.657 536.197 150.376 542.294 150.5 548.391C151.364 590.894 152.077 633.397 152.852 675.9C152.901 678.6 152.95 681.3 153 684C155.667 684 158.333 684 161 684C161.05 681.3 161.099 678.6 161.148 675.9C161.923 633.397 162.636 590.894 163.5 548.391C163.624 542.294 164.343 536.197 164.961 530.1C164.974 529.97 164.987 529.841 165 529.711C165.259 527.141 166.333 524.57 167 522Z",
@@ -16,6 +21,8 @@ const waterfallPaths = [
 ];
 
 export const Apparatus: Component = () => {
+  const [ballValveOpen, setBallValveOpen] = createSignal(false); // State for BallValve
+  const [regulatorPressure, setRegulatorPressure] = createSignal(0); // Pressure state for the PRegulator
 
 return (<svg
   width="1133"
@@ -31,6 +38,7 @@ return (<svg
     {/* Interactables */}
     <Rotameter/>
     <Kettle/>
+    <PRegulator setPressure={setRegulatorPressure}/>
 
     {/* Displays */}
     {/* Condensate Temperature Display */}
@@ -46,8 +54,8 @@ return (<svg
     <Waterfall d={waterfallPaths[0]}/>
     <Waterfall d={waterfallPaths[1]}/>
 
-    <Gauge pressure={0}/>
-    <BallValve onToggle={() => {}} />
+    <Gauge pressure={regulatorPressure}/>
+    <BallValve onToggle={(open) => setBallValveOpen(open)} />
     <GlobeValve/>
     <BeakerSystem/>
     
