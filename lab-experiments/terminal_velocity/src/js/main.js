@@ -3,7 +3,7 @@ import { computeVolumeVsTime, volumeAtTime } from './calc.js';
 
 
 let coin = null;
-let terminalVelocity = 1.9;
+let terminalVelocity = 0.19;
 let currentOrientation = 'face-down';
 // Animation state variables
 let animId = null;
@@ -206,7 +206,7 @@ function initOrientationControl(targetCoin, svg) {
     if (requested === 'face-down') {
       rot.rotate(-90, cx, cy);
       rot.move(bbox.x, bbox.y - 2.426 * 7);
-      terminalVelocity = 1.9;
+      terminalVelocity = 0.19;
       lineData.remove();
       lineData = svg.line(457.5, 587, 457.5, 510).stroke({ width: 1, color: '#000' });
     } else if (requested === 'edge-on') {
@@ -214,7 +214,7 @@ function initOrientationControl(targetCoin, svg) {
       rot.move(bbox.x + 2.426 * 7, bbox.y);
       lineData.remove();
       lineData = svg.line(457.5, 587, 457.5, 543).stroke({ width: 1, color: '#000' });
-      terminalVelocity = 2.8;
+      terminalVelocity = 0.28;
     }
 
     currentOrientation = requested; // persist selection
