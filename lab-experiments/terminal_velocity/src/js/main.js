@@ -227,15 +227,15 @@ export function initReleaseButton(svg, coin) {
 
   btn.onclick = () => {
     const sel = document.getElementById('volume-select');
-    if (btn.textContent === "release") {
-      btn.textContent = "stop";
+    if (btn.textContent === "Release") {
+      btn.textContent = "Stop";
       btn.classList.remove("btn-success");
       btn.classList.add("btn-danger");
       orientationLocked = true; // lock until reset
       if (sel) sel.disabled = true;
       startAnimation(svg, coin);
     } else {
-      btn.textContent = "release";
+      btn.textContent = "Release";
       btn.classList.remove("btn-danger");
       btn.classList.add("btn-success");
       // keep selector disabled if locked; only reset() will unlock
