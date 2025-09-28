@@ -1,4 +1,5 @@
 import { type Component } from "solid-js";
+import "./Rotameter.css";
 
 interface RotameterProps {
   flowrate: () => number; // Optional prop to set the flowrate
@@ -14,6 +15,7 @@ const Rotameter: Component<RotameterProps> = ({ flowrate }) => {
     <g id="rotameter">
       <path
         id="ball"
+        class="rotameter-ball"
         d="M498 569.25C500.103 569.25 501.75 570.735 501.75 572.5C501.75 574.265 500.103 575.75 498 575.75C495.897 575.75 494.25 574.265 494.25 572.5C494.25 570.735 495.897 569.25 498 569.25Z"
         fill="url(#paint41_radial_6_626)"
         stroke="black"

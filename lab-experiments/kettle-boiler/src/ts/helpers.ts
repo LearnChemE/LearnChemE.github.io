@@ -374,3 +374,26 @@ export function getSVGCoords(evt: MouseEvent | Touch) {
     pt.y = evt.clientY;
     return pt.matrixTransform(svg.getScreenCTM()!.inverse());
 }
+
+/**
+ * Animate function to be called every frame.
+ * @param fn Function to call every frame. dt is time since last call in seconds, t is total time in ms. Return true to continue, false to stop.
+ * @param then Optional function to call when animation ends.
+ */
+export function animate(fn: (dt: number, t: number) => boolean, then?: () => void) {
+    let prevtime: number | null = null;
+
+    const frame = (time: number) => {
+        if (prevtime === null) prevtime = time;
+        const dt = (time - prevtime) / 1000; // in ms
+        prevtime = time;
+
+        // Call the function
+        const playing = fn(dt, time);
+
+        // Request next frame
+        if (playing) requestAnimationFrame(frame);
+        else then?.();
+    }
+    requestAnimationFrame(frame);
+}

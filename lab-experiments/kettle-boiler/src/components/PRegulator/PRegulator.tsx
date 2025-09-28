@@ -39,7 +39,6 @@ export const PRegulator: Component<PRegulatorProps> = ({ setPressure }) => {
         var startX = e.clientX;
         
         const onDrag = (e: MouseEvent) => {
-            console.log(l());
             const deltaX = e.clientX - startX;
             startX = e.clientX;
 

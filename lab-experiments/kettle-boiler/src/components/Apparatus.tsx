@@ -1,7 +1,7 @@
 import { createMemo, createSignal, type Component } from "solid-js";
 import StaticElements from "./Static/StaticElements";
 import StaticDefs from "./Static/StaticDefs";
-import Rotameter from "./Interactables/Rotameter";
+import Rotameter from "./Rotameter/Rotameter";
 import Kettle from "./Kettle/Kettle";
 import Display from "./Display/Display";
 import Waterfall from "./Interactables/Waterfall";
@@ -41,11 +41,11 @@ return (<svg
 >
   <g id="canvas" clip-path="url(#clip0_6_626)">
     <rect width="1133" height="777" fill="white" />
+    <Rotameter flowrate={feedRate}/>
     <StaticElements/>
 
     {/* Interactables */}
-    <Rotameter flowrate={feedRate}/>
-    <Kettle/>
+    <Kettle feedRate={feedRate} steamTemp={steamTemperature} />
     <PRegulator setPressure={setRegulatorPressure}/>
 
     {/* Displays */}

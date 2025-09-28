@@ -1,25 +1,38 @@
-import { onMount, type Component } from "solid-js";
+import { createSignal, onMount, type Component } from "solid-js";
 import "./Kettle.css";
+import { animateChamberMassBalance } from "./KettleLogic";
 
-interface KettleProps {
-  feedRate?: number; // in L/min
-  steamRate?: number; // in kg/min
+export interface KettleProps {
+  // Inputs
+  feedRate: () => number; // in gal/min
+  steamTemp: () => number; // in C
+
+  // Outputs
+  onOutletChange?: (outletTemp: number) => void; // Callback for outlet temperature change, in Celsi
+  onEvaporateChange?: (evapCh: number) => void; // Callback for evaporation change, in gal/m
+  onConcentrateChange?: (concCh: number) => void; // Callback for concentration change, in gal/m
 };
 
-export const Kettle: Component<KettleProps> = ({}) => {
-
-  let ref!: SVGPathElement;
-  let pathFill = 0; // 0 to 1
+export const Kettle: Component<KettleProps> = (props) => {
+  const feedRate = props.feedRate;
+  // Constants
+  const overflowR = Math.exp(-1/30);
+  // Start empty
+  const [chamberFill, setChamberFill] = createSignal(0); // 0 to 1
+  const [pathFill, setPathFill] = createSignal(0); // 0 to 1
+  const [overflowFill, setOverflowFill] = createSignal(0); // 0 to 1
 
   onMount(() => {
     // Initially hide the exterior
     setTimeout(() => {
       document.querySelectorAll('.kettle-exterior').forEach(el => el.classList.add('kettle-exterior-hidden'));
     }, 1000); // Slight delay to ensure CSS transition
-
-    console.log(ref, ref.getBBox());
   });
 
+  // Animations for the three fills
+  animateChamberMassBalance(props, { chamberFill, pathFill, overflowFill, setChamberFill, setPathFill, setOverflowFill });
+
+  // Render
   return (
   <>
     <g id="kettle">
@@ -196,18 +209,17 @@ export const Kettle: Component<KettleProps> = ({}) => {
         />
         <path
           id="overflowFill"
-          ref={ref}
           d="M1056.33 386C1040.3 398.756 1023.51 397.937 1023.48 397.936H1018V398H914V386H1056.33Z"
           fill="#78AEDD"
           clip-path="url(#overflowClip)"
         />
         <path
           id="overflowPath"
-          d="M914 272.5C917 272.5 917.5 274 917.5 277V397"
+          d="M916 397V275C916 274.5 915.5 274 915 274H914"
           stroke="#78AEDD"
-          stroke-width="3"
+          stroke-width={ Math.max(0, 254 * chamberFill() - 248) }
           stroke-dasharray="126.7020263671875"
-          stroke-dashoffset={126.7020263671875 * (1 - pathFill)}
+          stroke-dashoffset={126.7020263671875 * (1 + pathFill())}
         />
         <rect
           id="weir"
@@ -681,29 +693,27 @@ export const Kettle: Component<KettleProps> = ({}) => {
           stroke="black"
         />
       </g>
-    </g>
     <defs>
       <clipPath id="chamberClip">
         <rect
-          x={435}
-          y={272}
+          x="435"
+          y={398 - 127 * chamberFill()}
           width="479"
-          height="126"
+          height={127 * chamberFill()}
           fill="white"
-          transform="translate(435 272)"
         />
       </clipPath>
       <clipPath id="overflowClip">
         <rect
-          x={914}
-          y={386}
+          x="914"
+          y={398 - 12 * overflowFill()}
           width="142"
-          height="12"
+          height={12 * overflowFill()}
           fill="white"
-          transform="translate(914 386)"
         />
       </clipPath>
     </defs>
+    </g>
   </>
 )};
 
