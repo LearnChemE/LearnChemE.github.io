@@ -3,8 +3,8 @@ import { computeVolumeVsTime, volumeAtTime } from './calc.js';
 
 
 let coin = null;
-let terminalVelocity = 0.39;
-let currentOrientation = 'horizontal';
+let terminalVelocity = 1.9;
+let currentOrientation = 'face-down';
 // Animation state variables
 let animId = null;
 let lastTs = null;
@@ -20,14 +20,14 @@ export function drawFigure(svg) {
   // Clear previous drawing (if any)
   svg.clear();
   drawVessel(svg, vesselX, vesselY, W, H);
-  drawScale(svg, 366, 190 + 25);
-  lineData = svg.line(457.5, 40, 457.5, vesselY + 30 + 52).stroke({ width: 1, color: '#000' });
+  drawScale(svg, 366, 160);
+  lineData = svg.line(457.5, 587, 457.5, 510).stroke({ width: 1, color: '#000' });
 
   // Place a coin roughly at the center of the vessel body
   // must match drawVessel()
   const topY = 30;         // m + 10 from drawVessel()
   const coinCX = vesselX + W / 2 - 2.426 * 7;
-  const coinTopY = vesselY + (190 + 25 - 125 - 2 * 0.175 * 14); // adjust vertical placement as needed
+  const coinTopY = vesselY + (350 + 30 + 2 * 0.175 * 14); // adjust vertical placement as needed
   coin = drawCoin(svg, coinCX, coinTopY, 2.426 * 14, { thickness: 0.175 * 14 });
   initOrientationControl(coin, svg);
   initReleaseButton(svg, coin);
@@ -203,18 +203,18 @@ function initOrientationControl(targetCoin, svg) {
     const cx = bbox.cx;
     const cy = bbox.cy;
 
-    if (requested === 'horizontal') {
+    if (requested === 'face-down') {
       rot.rotate(-90, cx, cy);
-      rot.move(bbox.x, bbox.y + 14);
-      terminalVelocity = 0.39;
+      rot.move(bbox.x, bbox.y - 2.426 * 7);
+      terminalVelocity = 1.9;
       lineData.remove();
-      lineData = svg.line(457.5, 40, 457.5, vesselY + 30 + 52).stroke({ width: 1, color: '#000' });
-    } else if (requested === 'vertical') {
+      lineData = svg.line(457.5, 587, 457.5, 510).stroke({ width: 1, color: '#000' });
+    } else if (requested === 'edge-on') {
       rot.rotate(90, cx, cy);
-      rot.move(bbox.x - 14, bbox.y);
+      rot.move(bbox.x + 2.426 * 7, bbox.y);
       lineData.remove();
-      lineData = svg.line(457.5, 40, 457.5, vesselY + 30 + 27).stroke({ width: 1, color: '#000' });
-      terminalVelocity = 0.59;
+      lineData = svg.line(457.5, 587, 457.5, 543).stroke({ width: 1, color: '#000' });
+      terminalVelocity = 2.8;
     }
 
     currentOrientation = requested; // persist selection
@@ -264,10 +264,10 @@ function startAnimation(svg, coin) {
     // Convert terminalVelocity (in cm/s) to px/s (assumed); move down by dy
     const speedPxPerSec = terminalVelocity * pxPerCm;
     const dy = speedPxPerSec * dt;
-    coin.dmove(0, dy);
+    coin.dmove(0, -dy);
 
     // Check distance traveled in pixels
-    const distPx = coin.bbox().cy - startY;
+    const distPx = - coin.bbox().cy + startY;
     if (distPx >= 25 * pxPerCm) {
       stopAnimation();
       const btn = document.getElementById('release-button');
@@ -326,7 +326,7 @@ export function reset(draw) {
     if (typeof homeX === 'number' && typeof homeY === 'number') {
       coin.move(homeX, homeY);
     }
-    // Reset rotation/orientation to horizontal
+    // Reset rotation/orientation to face-down
     const rot = coin.remember('rot');
     if (rot) {
       const bbox = rot.bbox();
@@ -334,7 +334,7 @@ export function reset(draw) {
       rot.move(bbox.x, bbox.y + 14);
     }
   }
-  currentOrientation = 'horizontal';
+  currentOrientation = 'face-down';
   terminalVelocity = 0.39;
   orientationLocked = false;
   if (sel) {

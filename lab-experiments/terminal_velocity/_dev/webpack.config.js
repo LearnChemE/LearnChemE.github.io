@@ -130,7 +130,7 @@ module.exports = (env, argv) => {
           viewport:          "width=device-width, initial-scale=1, shrink-to-fit=no",
           keywords:          "LearnChemE, chemical engineering, engineering, simulation",
           author:            "Sanath Kavatooru",
-          "application-name": "Unsteady state material balances for a two-phase, multicomponent system ",
+          "application-name": "Terminal Velocity",
           description:       ""
         },
       }),
