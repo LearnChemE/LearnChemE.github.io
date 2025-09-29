@@ -5,17 +5,17 @@
   border: 2px solid #ccc;
   margin: 20px auto;
   padding: 10px;
-  width: calc(100vw - 40px);
+  width: calc(100vw - 600px);
   height: calc(100vh - 40px);
-  max-width: calc((100vh) * 1200 / 600);
-  max-height: calc((100vw) * 600 / 1200);
+  // max-width: calc((100vh) * 1200 / 600);
+  // max-height: calc((100vw) * 600 / 1200);
   
   > svg {
     position: absolute;
     left: 10px;
     top: 10px;
     max-height: calc(100% - 20px);
-    max-width: calc(100% - 20px);
+    max-width: 140%;
   }
 }
 
@@ -164,17 +164,10 @@ body {
 }
 
 
-#reset-button {
-  position: absolute; /* or fixed */
-  top: 0px;
-  right: 0px;
-  z-index: 1000;
-}
-
-// #release-button {
+// #reset-button {
 //   position: absolute; /* or fixed */
 //   top: 0px;
-//   right: 300px;
+//   right: 0px;
 //   z-index: 1000;
 // }
 

@@ -15,20 +15,21 @@ const vesselX = 375;
   const vesselY = 125;
   const W = 200;
   const H = 475;
+const margin = 75;
 // Save the SVG.js context so other functions can reuse it
 export function drawFigure(svg) {
   // Clear previous drawing (if any)
   svg.clear();
-  drawVessel(svg, vesselX, vesselY, W, H);
-  drawScale(svg, 366, 160);
-  lineData = svg.line(457.5, 587, 457.5, 510).stroke({ width: 1, color: '#000' });
+  drawVessel(svg, vesselX- margin, vesselY, W, H);
+  drawScale(svg, 366 - margin, 160);
+  lineData = svg.line(457.5 - margin, 587, 457.5 - margin, 510).stroke({ width: 1, color: '#000' });
 
   // Place a coin roughly at the center of the vessel body
   // must match drawVessel()
   const topY = 30;         // m + 10 from drawVessel()
   const coinCX = vesselX + W / 2 - 2.426 * 7;
   const coinTopY = vesselY + (350 + 30 + 2 * 0.175 * 14); // adjust vertical placement as needed
-  coin = drawCoin(svg, coinCX, coinTopY, 2.426 * 14, { thickness: 0.175 * 14 });
+  coin = drawCoin(svg, coinCX - margin, coinTopY, 2.426 * 14, { thickness: 0.175 * 14 });
   initOrientationControl(coin, svg);
   initReleaseButton(svg, coin);
 }
@@ -49,7 +50,7 @@ function drawVessel(svg, x, y, W, H) {
   // Style helpers
   const wallStroke = { color: '#082a33', width: 2, linejoin: 'round' };
   const faceFill = 'white'; // inside fill
-  const topFill = 'white';
+  const topFill = '#f9e1d8';
 
   // Vessel side-wall shape (back arc at top, full side walls, back arc at top again)
   const sidePath = [
@@ -208,12 +209,12 @@ function initOrientationControl(targetCoin, svg) {
       rot.move(bbox.x, bbox.y - 2.426 * 7);
       terminalVelocity = 0.19;
       lineData.remove();
-      lineData = svg.line(457.5, 587, 457.5, 510).stroke({ width: 1, color: '#000' });
+      lineData = svg.line(457.5 - margin, 587, 457.5 - margin, 510).stroke({ width: 1, color: '#000' });
     } else if (requested === 'edge-on') {
       rot.rotate(90, cx, cy);
       rot.move(bbox.x + 2.426 * 7, bbox.y);
       lineData.remove();
-      lineData = svg.line(457.5, 587, 457.5, 543).stroke({ width: 1, color: '#000' });
+      lineData = svg.line(457.5 - margin, 587, 457.5 - margin, 543).stroke({ width: 1, color: '#000' });
       terminalVelocity = 0.28;
     }
 
@@ -272,7 +273,7 @@ function startAnimation(svg, coin) {
       stopAnimation();
       const btn = document.getElementById('release-button');
       if (btn) {
-        btn.textContent = "release";
+        btn.textContent = "Release";
         btn.classList.remove("btn-danger");
         btn.classList.add("btn-success");
       }
@@ -315,7 +316,7 @@ export function reset(draw) {
   const btn = document.getElementById('release-button');
   const sel = document.getElementById('volume-select');
   if (btn) {
-    btn.textContent = "release";
+    btn.textContent = "Release";
     btn.classList.remove("btn-danger");
     btn.classList.add("btn-success");
   }
