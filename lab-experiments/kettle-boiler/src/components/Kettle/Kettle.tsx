@@ -14,9 +14,6 @@ export interface KettleProps {
 };
 
 export const Kettle: Component<KettleProps> = (props) => {
-  const feedRate = props.feedRate;
-  // Constants
-  const overflowR = Math.exp(-1/30);
   // Start empty
   const [chamberFill, setChamberFill] = createSignal(0); // 0 to 1
   const [pathFill, setPathFill] = createSignal(0); // 0 to 1
