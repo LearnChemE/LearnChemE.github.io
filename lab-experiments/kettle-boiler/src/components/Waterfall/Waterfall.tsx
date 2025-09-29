@@ -13,6 +13,7 @@ export const Waterfall: Component<WaterfallProps> = ({ key, cx, rate, rateRange 
   const [min, max] = (rateRange?.length === 2) ? rateRange : [0, 20];
   const range = max - min;
   const sx = createMemo(() => constrain(rate() - min, 0, range) / range);
+  createEffect(() => console.log("sx:",sx()))
 
   // ClipHeight
   const [clipHeight, setClipHeight] = createSignal(0);
@@ -25,11 +26,16 @@ export const Waterfall: Component<WaterfallProps> = ({ key, cx, rate, rateRange 
     // Stop the animation when max height is passed
     return (h < 1 && rate() !== min);
   }
+  let flowing = true;
   animate(waterfallAni);
 
   // Restart the clip height animation any time the flowrate hits zero
   createEffect(() => {
-    if (rate() === min) {
+    if (sx() === 0) {
+      flowing = false;
+    }
+    else if (flowing === false) {
+      flowing = true;
       setClipHeight(0);
       animate(waterfallAni);
     }

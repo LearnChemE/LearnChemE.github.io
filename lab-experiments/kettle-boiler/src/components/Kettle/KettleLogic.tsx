@@ -70,7 +70,7 @@ export function animateChamberMassBalance(props: KettleProps, fills: ChamberFill
         // Calculate new fill level
         let newFill = fill + (flowIn - flowOut) * dt/60 / .5;
         newFill = Math.min(1, newFill); // Clamp under 1
-        console.log(`Overflow fill: ${newFill.toFixed(3)}`);
+        // console.log(`Overflow fill: ${newFill.toFixed(3)}`);
 
         // Update and continue animation if not full
         fills.setOverflowFill(newFill);

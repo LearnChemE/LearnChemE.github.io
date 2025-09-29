@@ -54,8 +54,8 @@ return (<svg
     <Display x={820.5} y={479.5} val={steamTemperature}/>
 
     {/* Waterfalls */}
-    <Waterfall key="cond" cx={157} rate={() => 20} />
-    <Waterfall key="conc" cx={965} rate={() => 20} />
+    <Waterfall key="cond" cx={157} rate={feedRate} />
+    <Waterfall key="conc" cx={965} rate={feedRate} />
 
     <Gauge pressure={steamPressure}/>
     <BallValve onToggle={(open) => setBallValveOpen(open)} />
