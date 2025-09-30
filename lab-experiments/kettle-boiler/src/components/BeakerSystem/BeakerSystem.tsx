@@ -1,7 +1,6 @@
 import { createSignal, type Component, For, type Accessor, type Setter, createEffect } from "solid-js";
 import { Beaker, type RectState } from "./Beaker";
 import { Scale } from "./Scale";
-import { Filler } from "./Filler";
 import { animate } from "../../ts/helpers";
 
 type SignalT = [get: Accessor<number>, set: Setter<number>];
@@ -117,13 +116,6 @@ export const BeakerSystem: Component<BeakerSystemProps> = ({ leftFlow, rightFlow
               valueSignal={sig} />
           )
         }}</For>
-
-      <defs>
-        {/* Two fill stations for the beakers */}
-        <Filler id="filler-left"   />
-        <Filler id="filler-right"  />
-      </defs>
-
     </>
   );
 };
