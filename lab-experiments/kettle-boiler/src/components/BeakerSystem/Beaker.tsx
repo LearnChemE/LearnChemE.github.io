@@ -1,10 +1,12 @@
-import { createSignal, createEffect, type Component } from "solid-js";
+import { createSignal, type Accessor, type Component, type Setter } from "solid-js";
 import "./Beaker.css"
 import { constrain, getSVGCoords } from "../../ts/helpers";
 
+type SignalT = [get: Accessor<number>, set: Setter<number>];
+
 // Struct to keep the state for the beaker
 export type RectState = {
-  id: string;
+  idx: number;
   x: number;
   y: number;
   value: number;
@@ -12,11 +14,13 @@ export type RectState = {
 };
 
 interface BeakerProps {
-  id: string;
+  idx: number;
   initialX: number;
   initialY: number;
   value: number;
-  update: (id: string, patch: Partial<RectState>) => void;
+  update: (idx: number, patch: Partial<RectState>) => void;
+  block: (which: number, value: SignalT | null) => void;
+  isBlocked: () => Array<SignalT | null>;
 };
 
 const minY = 540;
@@ -27,11 +31,9 @@ export const Beaker: Component<BeakerProps> = (props) => {
   // local position signals to make dragging snappy
   const [x, setX] = createSignal(props.initialX);
   const [y, setY] = createSignal(props.initialY);
+  const [val, setVal] = createSignal(props.value);
 
-  // Keep parent updated whenever local x/y changes
-  createEffect(() => {
-    props.update(props.id, { x: x(), y: y(), value: props.value });
-  });
+  let blocked: number | null = null;
 
   // Coordinate logic wrapper so we can place on scale, etc
   const setCoords = (x: number, y: number) => {
@@ -43,16 +45,26 @@ export const Beaker: Component<BeakerProps> = (props) => {
     if (x > 30 && x < 200 && y < 610) {
         x = 112;
         y = 576;
+        blocked = 0;
+        props.block(blocked, [val, setVal]);
     }
     // Scale
     else if (x > 443 && x < 713) {
         x = 578;
         y = 545;
+        blocked = 1;
+        props.block(blocked, [val, setVal]);
     }
     // Right drain
     else if (x > 840 && x < 1010 && y < 610) {
         x = 922;
         y = 576;
+        blocked = 2;
+        props.block(blocked, [val, setVal]);
+    }
+    // None
+    else if (blocked !== null) {
+      props.block(blocked, null);
     }
 
     // Update the x and y coordinates
@@ -75,7 +87,7 @@ export const Beaker: Component<BeakerProps> = (props) => {
       const newX = x() + dx + mozX;
       const newY = y() + dy + mozY;
       setCoords(newX, newY);
-      console.log("set from drag")
+      props.update(props.idx, { x: x(), y: y() });
     };
 
     const end = () => {
@@ -89,7 +101,7 @@ export const Beaker: Component<BeakerProps> = (props) => {
   };
 
   return (
-    <g class="beaker" transform={`translate(${x()}, ${y()})`} onPointerDown={start}>
+    <g class="beaker drag-exempt" transform={`translate(${x()}, ${y()})`} onPointerDown={start}>
       <rect x={0} y={0} width={w} height={h} fill="#F6D365" stroke="#333" rx="4" />
       <text x={w / 2} y={h / 2 + 5} font-size="14" text-anchor="middle" fill="#111">{props.value}</text>
     </g>

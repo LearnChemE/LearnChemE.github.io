@@ -1,46 +1,56 @@
-import { createSignal, createEffect, createMemo, type Component, For, onMount } from "solid-js";
+import { createSignal, type Component, For, type Accessor, type Setter } from "solid-js";
 import { Beaker, type RectState } from "./Beaker";
 import { Scale } from "./Scale";
 
+type SignalT = [get: Accessor<number>, set: Setter<number>];
+
 export const BeakerSystem: Component = () => {
   // central registry of rects
-  const [beakers, setBeakers] = createSignal<RectState[]>([{
-    "id": "b1",
-    "x": 40,
-    "y": 610,
-    "value": 42,
-    "z": 1
+  const [beakers, setBeakers] = createSignal<RectState[]> ([{
+    idx: 0,
+    x: 40,
+    y: 610,
+    value: 42,
+    z: 1
   },
   {
-    "id": "b2",
-    "x": 300,
-    "y": 660,
-    "value": 10,
-    "z": 2
+    idx: 1,
+    x: 300,
+    y: 660,
+    value: 10,
+    z: 2
   }]);
 
   // Update the beaker list
-  const update = (id: string, patch: Partial<RectState>) => {
-    setBeakers(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
+  const update = (idx: number, patch: Partial<RectState>) => {
+    setBeakers(prev => {
+      const updated = prev.map(r => r.idx === idx ? { ...r, ...patch } : r);
+      // return a new, sorted array so Solid sees a new reference
+      return [...updated].sort((a, b) => a.y - b.y);
+    });
   };
 
-  // small debug: log beakers when they change
-  createEffect(() => console.log(beakers()));
+  // Block a source
+  const [isBlocked, setIsBlocked] = createSignal<Array<SignalT | null>> ([null, null, null, null]);
+  const block = (which: number, value: SignalT | null) => {
+    // update immutably so Solid's signal setter sees a new reference
+    setIsBlocked(prev => {
+      const arr = [...prev];
+      arr[which] = value;
+      return arr;
+    });
+  }
 
   // Create an effect where the beakers are swapped 
-
-  onMount(() => {
-    console.log(beakers())
-  })
 
   return (<>
 
       {/* Scale component - a fixed sensor box */}
-      <Scale rectsSignal={beakers} />
+      <Scale blockSignal={isBlocked} blockIds={[1,2]} />
 
       {/* Draggable items */}
       <For each={beakers()}>
-        {item => <Beaker id={`b${item}`} initialX={item.x}  initialY={item.y} value={42} update={update} />}
+        {(item) => <Beaker idx={item.idx} initialX={item.x}  initialY={item.y} value={item.value} update={update} block={block} isBlocked={isBlocked} />}
       </For>
 
     </>

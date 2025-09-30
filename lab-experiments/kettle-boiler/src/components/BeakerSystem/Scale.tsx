@@ -1,40 +1,38 @@
-import { createEffect, createMemo, createSignal, type Component } from "solid-js";
-import type { RectState } from "./Beaker";
+import { createEffect, createMemo, type Accessor, type Component, type Setter } from "solid-js";
 
+type SignalT = [get: Accessor<number>, set: Setter<number>];
 
-const rectHit = (a: RectState, bx: number, by: number, bw: number, bh: number) => {
-  // AABB overlap
-  return !(a.x + 90 < bx || a.x > bx + bw || a.y + 122 < by || a.y > by + bh);
-};
+export interface ScaleProps {
+  blockSignal: Accessor<Array<SignalT | null>>;
+  blockIds: number[];
+}
 
-export const Scale: Component<{ rectsSignal: () => RectState[] }> = (props) => {
+export const Scale: Component<ScaleProps> = ({ blockSignal, blockIds }) => {
   const x = 533;
   const y = 647;
   const w = 180;
   const h = 100;
-  const [weight, setHoverVal] = createSignal<number | null>(null);
 
   // compute the sum of each overlapping rect's value
-  const sum = createMemo(() => {
-    const rects = props.rectsSignal();
-    // find overlapping rects
-    const hits = rects.filter(r => rectHit(r, x, y, w, h));
-    if (hits.length === 0) return null;
-    // pick highest z, then last registered (end of array) as tiebreaker
-    hits.sort((a,b) => (a.z - b.z) || 0);
-    return hits.map((hit) => hit.value).reduce((acc, val) => acc + val, 0);
+  const weight = createMemo(() => {
+    const all = blockSignal();
+    // select entries whose index is in blockIds
+  const blocks = all.filter((_, idx) => blockIds.includes(idx));
+    // type guard to filter out nulls
+    const signals: SignalT[] = blocks.filter((block): block is SignalT => block !== null);
+
+    const sum = signals.reduce((acc, s) => acc + s[0](), 0);
+    console.log(`weight calc:`, sum);
+    return sum;
   });
 
-  // reflect into weight for easy reactive display
-  createEffect(() => {
-    setHoverVal(sum());
-  });
+  createEffect(() => console.log(blockSignal()))
 
   return (
     <g transform={`translate(${x}, ${y})`}>
       <rect width={w} height={h} fill="rgba(0,0,0,0.04)" stroke="#555" stroke-dasharray="4 3" />
       <text x={w/2} y={h/2 + 5} font-size="14" text-anchor="middle" fill="#222">
-        {weight() === null ? "(empty)" : `value: ${weight()}`}
+        {`value: ${weight()}`}
       </text>
     </g>
   );
