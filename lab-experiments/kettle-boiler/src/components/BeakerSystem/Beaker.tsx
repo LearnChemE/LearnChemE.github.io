@@ -1,6 +1,7 @@
 import { createSignal, onMount, type Accessor, type Component, type Setter } from "solid-js";
 import "./Beaker.css"
 import { constrain, getSVGCoords } from "../../ts/helpers";
+import { Portal } from "solid-js/web";
 
 type SignalT = [get: Accessor<number>, set: Setter<number>];
 
@@ -35,13 +36,14 @@ export const Beaker: Component<BeakerProps> = (props) => {
   const local = props.valueSignal ?? createSignal(props.value);
   const [val, setVal] = local;
 
-  let blocked: number | null = props.blocking;
+  let [blocked, setBlocked] = createSignal<number | null> (props.blocking);
 
   // Coordinate logic wrapper so we can place on scale, etc
   const setCoords = (x: number, y: number) => {
     // Ensure the beaker is always on the table
     x = constrain(x, 0, 1043);
     y = constrain(y, minY, 655);
+    const b = blocked();
 
     // Left drain
     if (x > 30 && x < 200 && y < 610) {
@@ -52,19 +54,19 @@ export const Beaker: Component<BeakerProps> = (props) => {
         x = 112;
         y = 576;
         // Set blocking
-        blocked = 0;
-        props.block(blocked, [val, setVal]);
+        setBlocked(0);
+        props.block(0, [val, setVal]);
     }
     // Scale
     else if (x > 443 && x < 713) {
       // See if something is on the first beaker slot
-      if (props.isBlocked()[1] === null || blocked === 1) {
+      if (props.isBlocked()[1] === null || b === 1) {
         // Set position
         x = 568;
         y = 540;
         // Set blocking
-        blocked = 1;
-        props.block(blocked, [val, setVal]);
+        if (b !== 1) setBlocked(1);
+        props.block(1, [val, setVal]);
       }
       // First slot is blocked; second must be full
       else {
@@ -72,8 +74,8 @@ export const Beaker: Component<BeakerProps> = (props) => {
         x = 598;
         y = 555;
         // Set blocking
-        blocked = 2;
-        props.block(blocked, [val, setVal]);
+        setBlocked(2);
+        props.block(2, [val, setVal]);
       }
     }
     // Right drain
@@ -85,14 +87,14 @@ export const Beaker: Component<BeakerProps> = (props) => {
         x = 922;
         y = 576;
         // Set blocking
-        blocked = 3;
-        props.block(blocked, [val, setVal]);
+        setBlocked(3);
+        props.block(3, [val, setVal]);
     }
     // None
-    else if (blocked !== null) {
+    else if (b !== null) {
       console.log(`Unblocking trigger`)
-      props.block(blocked, null);
-      blocked = null;
+      props.block(b, null);
+      setBlocked(null);
     }
 
     // Update the x and y coordinates
@@ -115,7 +117,7 @@ export const Beaker: Component<BeakerProps> = (props) => {
       const newX = x() + dx + mozX;
       const newY = y() + dy + mozY;
       setCoords(newX, newY);
-      props.update(props.idx, { x: x(), y: y(), blocking: blocked });
+      props.update(props.idx, { x: x(), y: y(), blocking: blocked() });
     };
 
     const end = () => {
@@ -132,7 +134,7 @@ export const Beaker: Component<BeakerProps> = (props) => {
     setCoords(props.initialX, props.initialY);
   });
 
-  return (
+  return (<>
     <g class="beaker drag-exempt" transform={`translate(${x()}, ${y()})`} onPointerDown={start}>
       <BeakerFill vol={val} />
       <g id="beakerBody">
@@ -167,11 +169,17 @@ export const Beaker: Component<BeakerProps> = (props) => {
       <path d="M32 20.25H22M32 22.25H22M32 24.25H22M32 26.25H22M32 30.25H22M32 32.25H22M32 34.25H22M32 36.25H22M32 40.25H22M32 42.25H22M32 44.25H22M32 46.25H22M32 50.25H22M32 52.25H22M32 54.25H22M32 56.25H22M32 60.25H22M32 62.25H22M32 64.25H22M32 66.25H22M32 70.25H22M32 72.25H22M32 74.25H22M32 76.25H22M32 80.25H22M32 82.25H22M32 84.25H22M32 86.25H22M32 90.25H22M32 92.25H22M32 94.25H22M32 96.25H22M42 18.25H22M37 28.25H22M42 38.25H22M37 48.25H22M42 58.25H22M37 68.25H22M42 78.25H22M37 88.25H22M42 98.25H22M22.25 18V98" stroke="black" stroke-width="0.5"/>
       </g>
     </g>
-  );
+    <Portal mount={document.getElementById("cond-mask")!} isSVG={true}>
+      <rect x={0} y={172 - val() / 10} width="20" height={(blocked() === 0) ? val() / 10 : 0} fill="black" />
+    </Portal>
+    <Portal mount={document.getElementById("conc-mask")!} isSVG={true}>
+      <rect x={0} y={172 - val() / 10} width="20" height={(blocked() === 3) ? val() / 10 : 0} fill="black" />
+    </Portal>
+  </>);
 };
 
 const BeakerFill: Component<{ vol: Accessor<number> }> = ({ vol }) => {
-  return (
-    <rect id="inBeakerFill" x="5" y={18 + 100 - vol() / 10} width="79" height={vol() / 10} fill="#597AFF" fill-opacity="0.8"/>
-  );
+  return (<>
+    <rect id="inBeakerFill" x="5" y={18 + 100 - vol() / 10} width="79" height={vol() / 10} fill="#3B8CCF" fill-opacity="0.6"/>
+  </>);
 }

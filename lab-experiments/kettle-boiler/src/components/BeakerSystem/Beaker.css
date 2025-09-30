@@ -2,9 +2,7 @@
     cursor: grab;
 }
 .beaker:hover {
-    filter:
-        drop-shadow(-1px -1px 1px rgba(255, 205, 39, 255))
-        drop-shadow(1px 1px 1px rgba(23, 206, 255, 255));
+    filter: brightness(1.1);
 }
 .beaker:active {
     cursor: grabbing;
