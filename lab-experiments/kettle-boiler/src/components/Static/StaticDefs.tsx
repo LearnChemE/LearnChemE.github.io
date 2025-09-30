@@ -3,6 +3,12 @@ import type { Component } from "solid-js";
 const StaticDefs: Component = () => {
 return (
 <defs>
+
+  <linearGradient id="paint0_linear_4_7" x1="1" y1="62" x2="88" y2="62" gradientUnits="userSpaceOnUse">
+  <stop stop-color="#0045B4"/>
+  <stop offset="0.716346" stop-color="white"/>
+  <stop offset="1" stop-color="#0045B4"/>
+  </linearGradient>
     <linearGradient
       id="paint0_linear_6_626"
       x1="542"

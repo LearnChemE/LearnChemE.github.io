@@ -60,7 +60,7 @@ return (<svg
     <Gauge pressure={steamPressure}/>
     <BallValve onToggle={(open) => setBallValveOpen(open)} />
     <GlobeValve onLiftChange={(lift) => setFeedRate(lift * FEED_RATE_GAIN)}/>
-    <BeakerSystem/>
+    <BeakerSystem leftFlow={feedRate} rightFlow={feedRate} />
     
     
   </g>

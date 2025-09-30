@@ -1,6 +1,8 @@
-import { createEffect, createMemo, type Accessor, type Component, type Setter } from "solid-js";
+import { createMemo, type Accessor, type Component, type Setter } from "solid-js";
 
 type SignalT = [get: Accessor<number>, set: Setter<number>];
+
+const EMPTY_BEAKER_WEIGHT = 538.1; // g
 
 export interface ScaleProps {
   blockSignal: Accessor<Array<SignalT | null>>;
@@ -21,12 +23,9 @@ export const Scale: Component<ScaleProps> = ({ blockSignal, blockIds }) => {
     // type guard to filter out nulls
     const signals: SignalT[] = blocks.filter((block): block is SignalT => block !== null);
 
-    const sum = signals.reduce((acc, s) => acc + s[0](), 0);
-    console.log(`weight calc:`, sum);
+    const sum = signals.reduce((acc, s) => acc + s[0]() + EMPTY_BEAKER_WEIGHT, 0);
     return sum;
   });
-
-  createEffect(() => console.log(blockSignal()))
 
   return (
     <g transform={`translate(${x}, ${y})`}>
