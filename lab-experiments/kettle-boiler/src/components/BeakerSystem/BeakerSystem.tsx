@@ -11,14 +11,14 @@ export const BeakerSystem: Component = () => {
     x: 40,
     y: 610,
     value: 42,
-    z: 1
+    blocking: null
   },
   {
     idx: 1,
     x: 300,
     y: 660,
     value: 10,
-    z: 2
+    blocking: null
   }]);
 
   // Update the beaker list
@@ -33,6 +33,8 @@ export const BeakerSystem: Component = () => {
   // Block a source
   const [isBlocked, setIsBlocked] = createSignal<Array<SignalT | null>> ([null, null, null, null]);
   const block = (which: number, value: SignalT | null) => {
+    if (value === null) console.log(`Unblocking`, which)
+    else console.log(`Blocking`, which, value)
     // update immutably so Solid's signal setter sees a new reference
     setIsBlocked(prev => {
       const arr = [...prev];
@@ -50,7 +52,9 @@ export const BeakerSystem: Component = () => {
 
       {/* Draggable items */}
       <For each={beakers()}>
-        {(item) => <Beaker idx={item.idx} initialX={item.x}  initialY={item.y} value={item.value} update={update} block={block} isBlocked={isBlocked} />}
+        {(item) => <Beaker idx={item.idx} initialX={item.x}  initialY={item.y} value={item.value} 
+        blocking={item.blocking}
+        update={update} block={block} isBlocked={isBlocked} />}
       </For>
 
     </>

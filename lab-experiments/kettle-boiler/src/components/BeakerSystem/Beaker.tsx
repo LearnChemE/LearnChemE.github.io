@@ -10,7 +10,7 @@ export type RectState = {
   x: number;
   y: number;
   value: number;
-  z: number; // stacking order
+  blocking: number | null; // stacking order
 };
 
 interface BeakerProps {
@@ -18,12 +18,13 @@ interface BeakerProps {
   initialX: number;
   initialY: number;
   value: number;
+  blocking: number | null;
   update: (idx: number, patch: Partial<RectState>) => void;
   block: (which: number, value: SignalT | null) => void;
   isBlocked: () => Array<SignalT | null>;
 };
 
-const minY = 540;
+const minY = 550;
 
 export const Beaker: Component<BeakerProps> = (props) => {
   const w = 90;
@@ -33,7 +34,7 @@ export const Beaker: Component<BeakerProps> = (props) => {
   const [y, setY] = createSignal(props.initialY);
   const [val, setVal] = createSignal(props.value);
 
-  let blocked: number | null = null;
+  let blocked: number | null = props.blocking;
 
   // Coordinate logic wrapper so we can place on scale, etc
   const setCoords = (x: number, y: number) => {
@@ -43,28 +44,54 @@ export const Beaker: Component<BeakerProps> = (props) => {
 
     // Left drain
     if (x > 30 && x < 200 && y < 610) {
+        // If left drain is blocked, do nothing
+        if (props.isBlocked()[0] !== null) return;
+
+        // Set position
         x = 112;
         y = 576;
+        // Set blocking
         blocked = 0;
         props.block(blocked, [val, setVal]);
     }
     // Scale
     else if (x > 443 && x < 713) {
-        x = 578;
-        y = 545;
+      // See if something is on the first beaker slot
+      if (props.isBlocked()[1] === null || blocked === 1) {
+        // Set position
+        x = 568;
+        y = 540;
+        // Set blocking
         blocked = 1;
         props.block(blocked, [val, setVal]);
+      }
+      // First slot is blocked; second must be full
+      else {
+        // Set position
+        x = 598;
+        y = 555;
+        // Set blocking
+        blocked = 2;
+        props.block(blocked, [val, setVal]);
+      }
     }
     // Right drain
     else if (x > 840 && x < 1010 && y < 610) {
+        // If right drain is blocked, do 
+        if (props.isBlocked()[3] !== null) return;
+
+        // Set position
         x = 922;
         y = 576;
-        blocked = 2;
+        // Set blocking
+        blocked = 3;
         props.block(blocked, [val, setVal]);
     }
     // None
     else if (blocked !== null) {
+      console.log(`Unblocking trigger`)
       props.block(blocked, null);
+      blocked = null;
     }
 
     // Update the x and y coordinates
@@ -87,7 +114,7 @@ export const Beaker: Component<BeakerProps> = (props) => {
       const newX = x() + dx + mozX;
       const newY = y() + dy + mozY;
       setCoords(newX, newY);
-      props.update(props.idx, { x: x(), y: y() });
+      props.update(props.idx, { x: x(), y: y(), blocking: blocked });
     };
 
     const end = () => {
@@ -103,7 +130,7 @@ export const Beaker: Component<BeakerProps> = (props) => {
   return (
     <g class="beaker drag-exempt" transform={`translate(${x()}, ${y()})`} onPointerDown={start}>
       <rect x={0} y={0} width={w} height={h} fill="#F6D365" stroke="#333" rx="4" />
-      <text x={w / 2} y={h / 2 + 5} font-size="14" text-anchor="middle" fill="#111">{props.value}</text>
+      <text x={w / 2} y={h / 2 + 5} font-size="14" text-anchor="middle" fill="#111">{val()}</text>
     </g>
   );
 };
