@@ -1,56 +1,98 @@
+import { createEffect, createMemo, createSignal, type Component } from "solid-js";
+import type { RectState } from "./Beaker";
 
-    <g id="scale">
-      <path
-        id="Rectangle 27"
-        d="M548.687 647.5H697.313C697.52 647.5 697.706 647.627 697.78 647.82L712.271 685.5H533.729L548.22 647.82C548.294 647.627 548.48 647.5 548.687 647.5Z"
-        fill="#CECECE"
-        stroke="black"
-      />
-      <rect
-        id="Rectangle 28"
-        x="533.5"
-        y="693.5"
-        width="179"
-        height="53"
-        rx="3.5"
-        fill="#888888"
-        stroke="black"
-      />
-      <rect
-        id="scaleScreen"
-        x="538.5"
-        y="699.5"
-        width="125"
-        height="41"
-        rx="1.5"
-        fill="#141414"
-        stroke="black"
-      />
-      <g id="tareBtn">
-        <rect
-          id="upBtnbase"
-          x="670.5"
-          y="702.5"
-          width="35"
-          height="35"
-          rx="5.5"
-          fill="#D51F1F"
-          stroke="black"
-        />
-        <path
-          id="0_3"
-          d="M688 733.44C685.52 733.44 683.613 732.333 682.28 730.12C680.947 727.907 680.28 724.76 680.28 720.68C680.28 716.733 680.947 713.627 682.28 711.36C683.613 709.067 685.52 707.92 688 707.92C690.48 707.92 692.387 709.067 693.72 711.36C695.053 713.627 695.72 716.733 695.72 720.68C695.72 724.76 695.053 727.907 693.72 730.12C692.387 732.333 690.48 733.44 688 733.44ZM683.16 720.68C683.16 722.387 683.28 723.907 683.52 725.24L692 714.32C691.6 713.067 691.053 712.093 690.36 711.4C689.693 710.707 688.907 710.36 688 710.36C686.48 710.36 685.293 711.293 684.44 713.16C683.587 715.027 683.16 717.533 683.16 720.68ZM688 731C689.52 731 690.707 730.107 691.56 728.32C692.413 726.533 692.84 723.987 692.84 720.68C692.84 719.213 692.747 717.88 692.56 716.68L684.08 727.44C684.907 729.813 686.213 731 688 731Z"
-          fill="#320101"
-        />
-      </g>
-      <rect
-        id="Rectangle 29"
-        x="533.5"
-        y="684.5"
-        width="179"
-        height="10"
-        rx="1.5"
-        fill="#CECECE"
-        stroke="black"
-      />
+
+const rectHit = (a: RectState, bx: number, by: number, bw: number, bh: number) => {
+  // AABB overlap
+  return !(a.x + 90 < bx || a.x > bx + bw || a.y + 122 < by || a.y > by + bh);
+};
+
+export const Scale: Component<{ rectsSignal: () => RectState[] }> = (props) => {
+  const x = 533;
+  const y = 647;
+  const w = 180;
+  const h = 100;
+  const [weight, setHoverVal] = createSignal<number | null>(null);
+
+  // compute the sum of each overlapping rect's value
+  const sum = createMemo(() => {
+    const rects = props.rectsSignal();
+    // find overlapping rects
+    const hits = rects.filter(r => rectHit(r, x, y, w, h));
+    if (hits.length === 0) return null;
+    // pick highest z, then last registered (end of array) as tiebreaker
+    hits.sort((a,b) => (a.z - b.z) || 0);
+    return hits.map((hit) => hit.value).reduce((acc, val) => acc + val, 0);
+  });
+
+  // reflect into weight for easy reactive display
+  createEffect(() => {
+    setHoverVal(sum());
+  });
+
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      <rect width={w} height={h} fill="rgba(0,0,0,0.04)" stroke="#555" stroke-dasharray="4 3" />
+      <text x={w/2} y={h/2 + 5} font-size="14" text-anchor="middle" fill="#222">
+        {weight() === null ? "(empty)" : `value: ${weight()}`}
+      </text>
     </g>
+  );
+};
+
+
+    // <g id="scale">
+    //   <path
+    //     id="Rectangle 27"
+    //     d="M548.687 647.5H697.313C697.52 647.5 697.706 647.627 697.78 647.82L712.271 685.5H533.729L548.22 647.82C548.294 647.627 548.48 647.5 548.687 647.5Z"
+    //     fill="#CECECE"
+    //     stroke="black"
+    //   />
+    //   <rect
+    //     id="Rectangle 28"
+    //     x="533.5"
+    //     y="693.5"
+    //     width="179"
+    //     height="53"
+    //     rx="3.5"
+    //     fill="#888888"
+    //     stroke="black"
+    //   />
+    //   <rect
+    //     id="scaleScreen"
+    //     x="538.5"
+    //     y="699.5"
+    //     width="125"
+    //     height="41"
+    //     rx="1.5"
+    //     fill="#141414"
+    //     stroke="black"
+    //   />
+    //   <g id="tareBtn">
+    //     <rect
+    //       id="upBtnbase"
+    //       x="670.5"
+    //       y="702.5"
+    //       width="35"
+    //       height="35"
+    //       rx="5.5"
+    //       fill="#D51F1F"
+    //       stroke="black"
+    //     />
+    //     <path
+    //       id="0_3"
+    //       d="M688 733.44C685.52 733.44 683.613 732.333 682.28 730.12C680.947 727.907 680.28 724.76 680.28 720.68C680.28 716.733 680.947 713.627 682.28 711.36C683.613 709.067 685.52 707.92 688 707.92C690.48 707.92 692.387 709.067 693.72 711.36C695.053 713.627 695.72 716.733 695.72 720.68C695.72 724.76 695.053 727.907 693.72 730.12C692.387 732.333 690.48 733.44 688 733.44ZM683.16 720.68C683.16 722.387 683.28 723.907 683.52 725.24L692 714.32C691.6 713.067 691.053 712.093 690.36 711.4C689.693 710.707 688.907 710.36 688 710.36C686.48 710.36 685.293 711.293 684.44 713.16C683.587 715.027 683.16 717.533 683.16 720.68ZM688 731C689.52 731 690.707 730.107 691.56 728.32C692.413 726.533 692.84 723.987 692.84 720.68C692.84 719.213 692.747 717.88 692.56 716.68L684.08 727.44C684.907 729.813 686.213 731 688 731Z"
+    //       fill="#320101"
+    //     />
+    //   </g>
+    //   <rect
+    //     id="Rectangle 29"
+    //     x="533.5"
+    //     y="684.5"
+    //     width="179"
+    //     height="10"
+    //     rx="1.5"
+    //     fill="#CECECE"
+    //     stroke="black"
+    //   />
+    // </g>

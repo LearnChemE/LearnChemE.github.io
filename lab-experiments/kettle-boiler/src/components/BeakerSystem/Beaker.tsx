@@ -1,6 +1,6 @@
 import { createSignal, createEffect, type Component } from "solid-js";
 import "./Beaker.css"
-import { getSVGCoords } from "../../ts/helpers";
+import { constrain, getSVGCoords } from "../../ts/helpers";
 
 // Struct to keep the state for the beaker
 export type RectState = {
@@ -16,8 +16,6 @@ interface BeakerProps {
   initialX: number;
   initialY: number;
   value: number;
-  z?: number;
-  register: (r: RectState) => void;
   update: (id: string, patch: Partial<RectState>) => void;
 };
 
@@ -30,41 +28,58 @@ export const Beaker: Component<BeakerProps> = (props) => {
   const [x, setX] = createSignal(props.initialX);
   const [y, setY] = createSignal(props.initialY);
 
-  // Register on mount
-  const state: RectState = {
-    id: props.id,
-    x: x(),
-    y: y(),
-    value: props.value,
-    z: props.z ?? 0,
-  };
-
-  props.register(state);
-
   // Keep parent updated whenever local x/y changes
   createEffect(() => {
     props.update(props.id, { x: x(), y: y(), value: props.value });
   });
 
+  // Coordinate logic wrapper so we can place on scale, etc
+  const setCoords = (x: number, y: number) => {
+    // Ensure the beaker is always on the table
+    x = constrain(x, 0, 1043);
+    y = constrain(y, minY, 655);
+
+    // Left drain
+    if (x > 30 && x < 200 && y < 610) {
+        x = 112;
+        y = 576;
+    }
+    // Scale
+    else if (x > 443 && x < 713) {
+        x = 578;
+        y = 545;
+    }
+    // Right drain
+    else if (x > 840 && x < 1010 && y < 610) {
+        x = 922;
+        y = 576;
+    }
+
+    // Update the x and y coordinates
+    setX(x);
+    setY(y);
+  }
+
   // Drag events
   const start = (e: MouseEvent) => {
     e.preventDefault();
     const coords = getSVGCoords(e);
-    let startX = coords.x;
-    let startY = coords.y;
+    let mozX = x() - coords.x;
+    let mozY = y() - coords.y;
     
     const onMove = (ev: MouseEvent) => {
       const coords = getSVGCoords(ev);
-      const dx = coords.x - startX;
-      const dy = coords.y - startY;
-      startX = coords.x;
-      startY = coords.y;
-      setX(x() + dx);
-      setY(Math.max(y() + dy, minY));
+      const dx = coords.x - x();
+      const dy = coords.y - y();
+
+      const newX = x() + dx + mozX;
+      const newY = y() + dy + mozY;
+      setCoords(newX, newY);
       console.log("set from drag")
     };
 
     const end = () => {
+      // Remove event listeners
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", end);
     };
