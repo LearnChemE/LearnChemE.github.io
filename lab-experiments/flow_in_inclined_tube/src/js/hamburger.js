@@ -13,7 +13,7 @@
             { label: 'Directions', url: 'html/overlay/directions.html', action: 'modal' },
             // { label: 'Details', url: 'html/overlay/details.html', action: 'modal' },
             { label: 'About', url: 'html/overlay/about.html', action: 'modal' },
-            { label: 'Worksheet', url: 'assets/worksheet.pdf', action: 'download', filename: 'worksheet.pdf' }
+            { label: 'Worksheet', url: 'assets/worksheet.pdf', action: 'download', filename: 'Viscous Flow in Two Connected Pipes worksheet.pdf' }
         ];
         
         buttons.forEach((btnConfig) => {
