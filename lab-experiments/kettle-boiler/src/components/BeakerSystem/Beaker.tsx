@@ -135,7 +135,7 @@ export const Beaker: Component<BeakerProps> = (props) => {
   });
 
   return (<>
-    <g class="beaker drag-exempt" transform={`translate(${x()}, ${y()})`} onPointerDown={start}>
+    <g class="beaker drag-exempt-slippery" transform={`translate(${x()}, ${y()})`} onPointerDown={start}>
       <BeakerFill vol={val} />
       <g id="beakerBody">
       <g id="Rectangle 3">

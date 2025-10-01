@@ -280,9 +280,6 @@ export function initSvgDrag(exemptIDs?: string[]) {
         exemptElements.push(el as unknown as HTMLElement);
     });
 
-    // Conditional to check if there are any exemptions later
-    const checkExemptions = exemptElements.length > 0;
-
     // Get the svg context
     const svg = document.querySelector("svg")!;
     // Set defaults
@@ -294,7 +291,8 @@ export function initSvgDrag(exemptIDs?: string[]) {
     svg.addEventListener("pointerdown", (e) => {
         // Check exemptions
         let exempt = false;
-        if (checkExemptions) exemptElements.forEach(el => {
+        let allExemptions = [...exemptElements, ...document.querySelectorAll(".drag-exempt-slippery")];
+        allExemptions.forEach(el => {
             if (el.contains(e.target as Node)) {
                 exempt = true;
                 return;
