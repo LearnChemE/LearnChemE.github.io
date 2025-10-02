@@ -21,6 +21,8 @@ export const Apparatus: Component = () => {
   const [ballValveOpen, setBallValveOpen] = createSignal(false); // State for BallValve
   const [regulatorPressure, setRegulatorPressure] = createSignal(0); // Pressure state for the PRegulator
   const [feedRate, setFeedRate] = createSignal(0); // Feed flow rate
+  const [outRate, setOutRate] = createSignal(0); // Kettle outlet
+  const [condRate, setCondRate] = createSignal(0);
 
   // Memos
   const steamPressure = createMemo(() => ballValveOpen() ? Math.min(regulatorPressure(), 15) : 0); // Steam pressure depends on ball valve state
@@ -40,7 +42,15 @@ return (<svg
     <StaticElements/>
 
     {/* Interactables */}
-    <Kettle feedRate={feedRate} steamTemp={steamTemperature} />
+    <Kettle 
+      // Kettle Inputs
+      feedRate={feedRate} 
+      steamTemp={steamTemperature} 
+      // Kettle Outputs
+      onOutletChange={setOutRate}
+      onEvaporateChange={() => {}}
+      onSteamOutChange={setCondRate}
+    />
     <PRegulator setPressure={setRegulatorPressure}/>
 
     {/* Displays */}
@@ -54,8 +64,8 @@ return (<svg
     <Display x={820.5} y={479.5} val={steamTemperature}/>
 
     {/* Waterfalls */}
-    <Waterfall key="cond" cx={157} rate={feedRate} />
-    <Waterfall key="conc" cx={965} rate={feedRate} />
+    <Waterfall key="cond" cx={157} rate={condRate} />
+    <Waterfall key="conc" cx={965} rate={outRate} />
 
     <Gauge pressure={steamPressure}/>
     <BallValve onToggle={(open) => setBallValveOpen(open)} />

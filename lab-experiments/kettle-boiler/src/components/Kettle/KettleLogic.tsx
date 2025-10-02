@@ -1,17 +1,45 @@
 import { type Accessor, type Setter } from "solid-js";
 import { animate } from "../../ts/helpers";
 import type { KettleProps } from "./Kettle";
+import { dHvap } from "../../ts/calcs";
 
 const chamberVolume = 3; // gal
+const UA0 = 100; // W / K
+const MIN_UA = 5; // W / K
 
-interface ChamberFills { 
+// interface KettleProps {
+//   // Inputs
+//   feedRate: () => number; // in gal/min
+//   steamTemp: () => number; // in C
+//
+//   // Outputs
+//   onOutletChange?: (outletTemp: number) => void; // Callback for outlet temperature change, in Celsi
+//   onEvaporateChange?: (evapCh: number) => void; // Callback for evaporation change, in gal/m
+//   onConcentrateChange?: (concCh: number) => void; // Callback for concentration change, in gal/m
+// };
+
+export interface ChamberFills { 
+    // Fill Accessors
     chamberFill     : Accessor<number>,
     pathFill        : Accessor<number>,
     overflowFill    : Accessor<number>,
+    // Fill Setters
     setChamberFill  : Setter<number>,
     setPathFill     : Setter<number>,
     setOverflowFill : Setter<number>,
+    // Evaporate
+    internalEvaporateRate   : Accessor<number>,
+    setInternalEvaporateRate: Setter<number>,
 };
+
+export interface Temperatures {
+    // Left chamber
+    chamberTemperature: Accessor<number>;
+    setChamberTemperature: Setter<number>;
+    // Right overflow
+    overflowTemperature: Accessor<number>;
+    setOverflowTemperature: Setter<number>;
+}
 
 export function animateChamberMassBalance(props: KettleProps, fills: ChamberFills) {
     // Variables only seen by this
@@ -74,8 +102,34 @@ export function animateChamberMassBalance(props: KettleProps, fills: ChamberFill
 
         // Update and continue animation if not full
         fills.setOverflowFill(newFill);
+        // Update the outlet
+        props.onOutletChange?.(flowOut * 3785 / 60);
         return true;
     }));
+}
 
-    // Animate the overflow
+/**
+ * Energy balance to calculate the steam flowrate
+ * @param chamberFill Fill ratio of the chamber (fraction)
+ * @param steamTemp Temperature of steam (C)
+ * @param chamberTemp Temperature of the chamber (K)
+ * @returns Steam Flowrate (g/s)
+ */
+export function calculateSteamOut(chamberFill: number, steamTemp: number, chamberTemp: number) {
+    const UA = Math.max(chamberFill * UA0, MIN_UA);
+
+    // Heat rate
+    const Qs = UA * (steamTemp - chamberTemp); // W
+    const mdot_s = -Qs / dHvap(steamTemp + 273.15); // kg / s
+    return 1000 * mdot_s; // g / s
+}
+
+export function animateChamberEnergyBalance(props: KettleProps, fills: ChamberFills, temps: Temperatures) {
+
+    // Animate the energy balance
+    animate((dt: number) => {
+        return true;
+    });
+    
+
 }

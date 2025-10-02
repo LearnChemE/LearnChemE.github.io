@@ -7,3 +7,7 @@
 .beaker:active {
     cursor: grabbing;
 }
+
+.hidden {
+    display: none !important;
+}

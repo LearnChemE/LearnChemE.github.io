@@ -1,6 +1,6 @@
-import { createSignal, onMount, type Component } from "solid-js";
+import { createEffect, createMemo, createSignal, onMount, type Component } from "solid-js";
 import "./Kettle.css";
-import { animateChamberMassBalance } from "./KettleLogic";
+import { animateChamberEnergyBalance, animateChamberMassBalance, calculateSteamOut, type ChamberFills, type Temperatures } from "./KettleLogic";
 
 export interface KettleProps {
   // Inputs
@@ -8,9 +8,9 @@ export interface KettleProps {
   steamTemp: () => number; // in C
 
   // Outputs
-  onOutletChange?: (outletTemp: number) => void; // Callback for outlet temperature change, in Celsi
+  onOutletChange?: (outletTemp: number) => void; // Callback for outlet flowrate change
   onEvaporateChange?: (evapCh: number) => void; // Callback for evaporation change, in gal/m
-  onConcentrateChange?: (concCh: number) => void; // Callback for concentration change, in gal/m
+  onSteamOutChange?: (concCh: number) => void; // Callback for steam flowrate change
 };
 
 export const Kettle: Component<KettleProps> = (props) => {
@@ -18,6 +18,10 @@ export const Kettle: Component<KettleProps> = (props) => {
   const [chamberFill, setChamberFill] = createSignal(0); // 0 to 1
   const [pathFill, setPathFill] = createSignal(0); // 0 to 1
   const [overflowFill, setOverflowFill] = createSignal(0); // 0 to 1
+  const [internalEvaporateRate, setInternalEvaporateRate] = createSignal(0);
+  // Temps
+  const [chamberTemperature, setChamberTemperature] = createSignal(298);
+  const [overflowTemperature, setOverflowTemperature] = createSignal(298);
 
   onMount(() => {
     // Initially hide the exterior
@@ -26,8 +30,15 @@ export const Kettle: Component<KettleProps> = (props) => {
     }, 1000); // Slight delay to ensure CSS transition
   });
 
+  // Memo to update the steam outlet
+  const steamOut = createMemo(() => calculateSteamOut(chamberFill(), props.steamTemp(), chamberTemperature()));
+  if (props.onSteamOutChange) createEffect(() => props.onSteamOutChange!(steamOut()));
+
   // Animations for the three fills
-  animateChamberMassBalance(props, { chamberFill, pathFill, overflowFill, setChamberFill, setPathFill, setOverflowFill });
+  const fills: ChamberFills = { chamberFill, pathFill, overflowFill, setChamberFill, setPathFill, setOverflowFill, internalEvaporateRate, setInternalEvaporateRate };
+  const temps: Temperatures = { chamberTemperature, setChamberTemperature, overflowTemperature, setOverflowTemperature };
+  animateChamberMassBalance(props, fills);
+  animateChamberEnergyBalance(props, fills, temps);
 
   // Render
   return (
