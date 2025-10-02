@@ -116,7 +116,7 @@ function drawScale(svg, x, y, color = '#1e88e5') {
 
     // Labels every 10 cm
     if (cm % 2.5 === 0) {
-      const t = g.text(String(cm));
+      const t = g.text(String(25 - cm));
       t.font({ family: textFamily, size: fontSize });
       t.attr({ 'text-anchor': 'end', 'dominant-baseline': 'end' });
       t.move(x - len - 15 - labelPad, yy - 7);
