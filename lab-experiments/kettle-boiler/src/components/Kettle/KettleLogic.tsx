@@ -4,8 +4,10 @@ import type { KettleProps } from "./Kettle";
 import { dHvap } from "../../ts/calcs";
 
 const chamberVolume = 3; // gal
-const UA0 = 100; // W / K
-const MIN_UA = 5; // W / K
+const UA0 = 5; // kW / K
+const MIN_UA = 5; // kW / K
+const Cp = 4.1868; // kJ / kg / K
+const rho_kg_gal = 3.78; // kg / gal
 
 // interface KettleProps {
 //   // Inputs
@@ -31,15 +33,6 @@ export interface ChamberFills {
     internalEvaporateRate   : Accessor<number>,
     setInternalEvaporateRate: Setter<number>,
 };
-
-export interface Temperatures {
-    // Left chamber
-    chamberTemperature: Accessor<number>;
-    setChamberTemperature: Setter<number>;
-    // Right overflow
-    overflowTemperature: Accessor<number>;
-    setOverflowTemperature: Setter<number>;
-}
 
 export function animateChamberMassBalance(props: KettleProps, fills: ChamberFills) {
     // Variables only seen by this
@@ -124,10 +117,33 @@ export function calculateSteamOut(chamberFill: number, steamTemp: number, chambe
     return 1000 * mdot_s; // g / s
 }
 
-export function animateChamberEnergyBalance(props: KettleProps, fills: ChamberFills, temps: Temperatures) {
+export function animateChamberEnergyBalance(props: KettleProps, fills: ChamberFills) {
 
     // Animate the energy balance
     animate((dt: number) => {
+        const fillFrac = fills.chamberFill();
+        const Tc = props.outTemp();
+        const Tk = Tc + 273.15;
+
+        // If unfilled, avoid dividing by zero
+        if (fillFrac === 0) {
+            return true;
+        }
+        // Feed rate
+        const mdot_in = props.feedRate() * 3.785 / 60; // GPM to kg/s
+        // HEX UA value
+        const UA = Math.max(fillFrac * UA0, MIN_UA);
+
+        // Balance
+        const nrg_in_minus_out = mdot_in * Cp * (298.15 - Tk);
+        const nrg_gen = UA * (props.steamTemp() - Tc);
+        const nrg_cons = 0; // TODO: how do
+
+        // Evolve
+        const acc = nrg_in_minus_out + nrg_gen - nrg_cons; // kW
+        const dTdt = acc / (rho_kg_gal * Cp * chamberVolume); // K / s
+        props.onOutTempChange(Tc + dTdt * dt);
+
         return true;
     });
     

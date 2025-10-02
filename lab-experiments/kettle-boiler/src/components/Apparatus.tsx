@@ -22,7 +22,8 @@ export const Apparatus: Component = () => {
   const [regulatorPressure, setRegulatorPressure] = createSignal(0); // Pressure state for the PRegulator
   const [feedRate, setFeedRate] = createSignal(0); // Feed flow rate
   const [outRate, setOutRate] = createSignal(0); // Kettle outlet
-  const [condRate, setCondRate] = createSignal(0);
+  const [condRate, setCondRate] = createSignal(0); // Condensate flowrate
+  const [outTemp, setOutTemp] = createSignal(25);
 
   // Memos
   const steamPressure = createMemo(() => ballValveOpen() ? Math.min(regulatorPressure(), 15) : 0); // Steam pressure depends on ball valve state
@@ -46,10 +47,12 @@ return (<svg
       // Kettle Inputs
       feedRate={feedRate} 
       steamTemp={steamTemperature} 
+      outTemp={outTemp}
       // Kettle Outputs
       onOutletChange={setOutRate}
       onEvaporateChange={() => {}}
       onSteamOutChange={setCondRate}
+      onOutTempChange={setOutTemp}
     />
     <PRegulator setPressure={setRegulatorPressure}/>
 
@@ -61,7 +64,7 @@ return (<svg
     {/* Steam Temperature Display */}
     <Display x={220.5} y={351.5} val={steamTemperature}/>
     {/* Outlet Temperature Display */}
-    <Display x={820.5} y={479.5} val={steamTemperature}/>
+    <Display x={820.5} y={479.5} val={outTemp}/>
 
     {/* Waterfalls */}
     <Waterfall key="cond" cx={157} rate={condRate} />
