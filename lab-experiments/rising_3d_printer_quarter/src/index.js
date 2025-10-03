@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (worksheetBtn) {
     worksheetBtn.addEventListener('click', () => {
       // Show worksheet overlay
-      buttonAction({ action: 'download', url: 'assets/worksheet.pdf', label: 'Worksheet', filename: '3D Printed Quarter: Face-Down vs. Edge-On Rising Worksheet.pdf' });
+      buttonAction({ action: 'download', url: 'assets/worksheet.pdf', label: 'Worksheet', filename: 'Rising 3D-Printed Quarter Worksheet.pdf' });
     });
   } 
 });
