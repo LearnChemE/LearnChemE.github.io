@@ -31,7 +31,7 @@ export const Kettle: Component<KettleProps> = (props) => {
 
   // Memo to update the steam outlet
   const steamOut = createMemo(() => calculateSteamOut(chamberFill(), props.steamTemp(), props.outTemp()));
-  if (props.onSteamOutChange) createEffect(() => props.onSteamOutChange!(steamOut()));
+  if (props.onSteamOutChange) createEffect(() => props.onSteamOutChange!(Math.max(steamOut(), 0)));
 
   // Animations for the three fills
   const fills: ChamberFills = { chamberFill, pathFill, overflowFill, setChamberFill, setPathFill, setOverflowFill, internalEvaporateRate, setInternalEvaporateRate };

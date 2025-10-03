@@ -23,12 +23,13 @@ export const Apparatus: Component = () => {
   const [feedRate, setFeedRate] = createSignal(0); // Feed flow rate
   const [outRate, setOutRate] = createSignal(0); // Kettle outlet
   const [condRate, setCondRate] = createSignal(0); // Condensate flowrate
-  const [outTemp, setOutTemp] = createSignal(25);
+  const [outTemp, setOutTemp] = createSignal(100.1);
 
   // Memos
   const steamPressure = createMemo(() => ballValveOpen() ? Math.min(regulatorPressure(), 15) : 0); // Steam pressure depends on ball valve state
   const steamTemperature = createMemo(() => calculateSteamTemperature(steamPressure())); // Steam temperature based on pressure
-  console.log(`Steam Pressure: ${steamPressure()} psi, Steam Temperature: ${steamTemperature().toFixed(2)} °C`);
+
+  const outTempDisplay = createMemo(() => outRate() > 0 ? outTemp().toFixed(1) : "--");
 
 return (<svg
   width="1133"
@@ -58,22 +59,22 @@ return (<svg
 
     {/* Displays */}
     {/* Condensate Temperature Display */}
-    <Display x={350.5} y={565.5} val={calculateSteamTemperature(0)}/>
+    <Display x={350.5} y={565.5} val={calculateSteamTemperature(0).toFixed(1)}/>
     {/* Feed Temperature Display */}
-    <Display x={576.5} y={428.5} val={25}/>
+    <Display x={576.5} y={428.5} val={"25.0"} />
     {/* Steam Temperature Display */}
     <Display x={220.5} y={351.5} val={steamTemperature}/>
     {/* Outlet Temperature Display */}
-    <Display x={820.5} y={479.5} val={outTemp}/>
+    <Display x={820.5} y={479.5} val={outTempDisplay}/>
 
     {/* Waterfalls */}
-    <Waterfall key="cond" cx={157} rate={condRate} />
+    <Waterfall key="cond" cx={157} rate={condRate} rateRange={[0, 300]} />
     <Waterfall key="conc" cx={965} rate={outRate} />
 
     <Gauge pressure={steamPressure}/>
     <BallValve onToggle={(open) => setBallValveOpen(open)} />
     <GlobeValve onLiftChange={(lift) => setFeedRate(lift * FEED_RATE_GAIN)}/>
-    <BeakerSystem leftFlow={feedRate} rightFlow={feedRate} />
+    <BeakerSystem leftFlow={condRate} rightFlow={outRate} />
     
     
   </g>

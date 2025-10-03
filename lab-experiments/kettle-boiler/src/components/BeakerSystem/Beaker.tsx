@@ -76,7 +76,7 @@ export const Beaker: Component<BeakerProps> = (props) => {
     // Scale
     else if (x > 443 && x < 713) {
       // See if something is on the first beaker slot
-      if (props.isBlocked()[1] === null || b === 1) {
+      if ((props.isBlocked()[1] === null && b !== 2) || b === 1) {
         // Set position
         x = 568;
         y = 540;

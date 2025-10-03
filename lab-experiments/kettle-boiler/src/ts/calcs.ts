@@ -20,13 +20,12 @@ export function calculateSteamTemperature(psig: number): number {
 
 /**
  * Calculate enthalpy of vaporization for water at a given temperature
- * @param T temperature (K)
+ * @param T temperature (C)
  * @returns deltaHvap (kJ/kg)
  */
-export function dHvap(T: number) {
+export function dHvap(Tc: number) {
     // Equation for heat of vaporization of saturated water
     // Source: https://mychemengmusings.wordpress.com/2019/01/08/handy-equations-to-calculate-heat-of-evaporation-and-condensation-of-water-steam/
-    const Tc = T - 273; // temperature in celsius
     let H_vap = 193.1 - 10950 * Math.log( ( 374 - Tc ) / 647) * ( 374 - Tc )**0.785 / ( 273 + Tc ); // heat of vaporization (kJ/kg)
     return H_vap;
 }

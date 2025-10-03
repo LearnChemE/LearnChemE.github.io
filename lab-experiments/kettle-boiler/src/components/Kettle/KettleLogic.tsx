@@ -3,7 +3,7 @@ import { animate } from "../../ts/helpers";
 import type { KettleProps } from "./Kettle";
 import { dHvap } from "../../ts/calcs";
 
-const chamberVolume = 3; // gal
+const chamberVolume = 5; // gal
 const UA0 = 5; // kW / K
 const MIN_UA = 5; // kW / K
 const Cp = 4.1868; // kJ / kg / K
@@ -113,7 +113,7 @@ export function calculateSteamOut(chamberFill: number, steamTemp: number, chambe
 
     // Heat rate
     const Qs = UA * (steamTemp - chamberTemp); // W
-    const mdot_s = -Qs / dHvap(steamTemp + 273.15); // kg / s
+    const mdot_s = Qs / dHvap(steamTemp); // kg / s
     return 1000 * mdot_s; // g / s
 }
 
@@ -146,6 +146,5 @@ export function animateChamberEnergyBalance(props: KettleProps, fills: ChamberFi
 
         return true;
     });
-    
 
 }

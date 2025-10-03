@@ -4,12 +4,15 @@ import "./Display.css";
 interface DisplayProps {
   x: number;
   y: number;
-  val: (() => number) | number;
+  val: (() => string | number) | string | number;
+  tofixed?: number;
   // Future feature: add units (e.g., °C, °F)
 };
 
-export const Display: Component<DisplayProps> = ({ x, y, val }) => {
-  const getVal = typeof val === "function" ? val : () => val;
+export const Display: Component<DisplayProps> = ({ x, y, val, tofixed }) => {
+  const fn = typeof val === "function" ? val : () => val;
+  const dec = (tofixed !== undefined) ? tofixed : 1;
+  const strFn = (typeof fn() === "number") ? () => (fn() as number).toFixed(dec) : fn;
 
   return (
     <g id="display">
@@ -42,7 +45,7 @@ export const Display: Component<DisplayProps> = ({ x, y, val }) => {
         font-family="'Digital-7 Mono', monospace"
         font-size="20"
       >
-        { getVal().toFixed(1) } °C
+        { strFn() } °C
       </text>
     </g>
 )};
