@@ -2,6 +2,7 @@ import { createEffect, createSignal, onMount, type Accessor, type Component, typ
 import "./Beaker.css"
 import { constrain, getSVGCoords } from "../../ts/helpers";
 import { Portal } from "solid-js/web";
+import { createMemo } from "solid-js";
 
 type SignalT = [get: Accessor<number>, set: Setter<number>];
 
@@ -32,6 +33,7 @@ export const Beaker: Component<BeakerProps> = (props) => {
   // local position signals to make dragging snappy
   const [x, setX] = createSignal(props.initialX);
   const [y, setY] = createSignal(props.initialY);
+  const [modalDisplay, setModalDisplay] = createSignal(false);
   const [overflow, setOverflow] = createSignal(false);
   // If a stable valueSignal was provided by the parent, use it. Otherwise create a local one.
   const local = props.valueSignal ?? createSignal(props.value);
@@ -140,6 +142,7 @@ export const Beaker: Component<BeakerProps> = (props) => {
       // Remove event listeners
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", end);
+      if (blocked() === null) setModalDisplay(true);
     };
 
     window.addEventListener("pointermove", onMove);
@@ -150,10 +153,12 @@ export const Beaker: Component<BeakerProps> = (props) => {
     setCoords(props.initialX, props.initialY);
   });
 
+  let ref!: SVGGElement;
+
   return (<>
     <g class="beaker drag-exempt-slippery" transform={`translate(${x()}, ${y()})`} onPointerDown={start}>
       <BeakerFill vol={val} />
-      <g id="beakerBody">
+      <g id="beakerBody" ref={ref}>
       <g id="Rectangle 3">
       <mask id="path-2-inside-1_4_7" fill="white">
       <path d="M1 2H88V116C88 119.314 85.3137 122 82 122H7C3.68629 122 1 119.314 1 116V2Z"/>
@@ -199,11 +204,72 @@ export const Beaker: Component<BeakerProps> = (props) => {
     <Portal mount={document.getElementById("conc-mask")!} isSVG={true}>
       <rect x={0} y={172 - val() / 10} width="20" height={(blocked() === 3) ? val() / 10 : 0} fill="black" />
     </Portal>
+    <BeakerEmptyModal beakerRef={ref} display={modalDisplay} onDisplayChange={setModalDisplay} onEmptyClick={() => setVal(0)} />
   </>);
 };
 
 const BeakerFill: Component<{ vol: Accessor<number> }> = ({ vol }) => {
   return (<>
     <rect id="inBeakerFill" x="5" y={18 + 100 - vol() / 10} width="79" height={vol() / 10} fill="#3B8CCF" fill-opacity="0.6"/>
+  </>);
+}
+
+const BeakerEmptyModal: Component<{ beakerRef: SVGGElement, display: Accessor<boolean>, onDisplayChange: (x: boolean) => void, onEmptyClick: () => void }> = ({ beakerRef, display, onDisplayChange, onEmptyClick }) => {
+
+  const window_coords = createMemo(() => {
+    if (!display() || !beakerRef) return {x:0,y:0};
+    const bds = beakerRef.getBoundingClientRect();
+    return { x: bds.x + bds.width/2 - 85, y: bds.y + bds.height + 2 };
+  })
+
+  // Turn own show off
+  let ref!: HTMLDivElement;
+  const clickOut = (e: MouseEvent) => {
+    if (ref.contains(e.target as Node) ) return;
+    document.removeEventListener("click", clickOut);
+    onDisplayChange(false);
+  }
+
+  createEffect(() => {
+    if (display()) {
+      document.addEventListener("pointerdown", clickOut);
+    }
+  });
+
+  return (<>
+  <Portal mount={document.querySelector("body")!}>
+    {display() && (
+      <div ref={ref}
+        style={{
+          "position": "absolute",
+          "left": `${window_coords().x}px`,
+          "top": `${window_coords().y}px`,
+          "width": "max-content",
+          "background": "white",
+          "border": "1px solid #ccc",
+          "border-radius": "6px",
+          "box-shadow": "0 2px 8px rgba(0,0,0,0.15)",
+          "padding": "10px",
+          "text-align": "center",
+          "z-index": 1000,
+        }}
+      >
+        <button
+          style={{
+            "padding": "4px 12px",
+            "border-radius": "4px",
+            "border": "1px solid #da3737ff",
+            "background": "#da3737ff",
+            "color": "white",
+            "cursor": "pointer",
+          }}
+          onClick={onEmptyClick}
+        >
+          <i class="fa-solid fa-arrows-rotate" />&nbsp;
+          empty beaker
+        </button>
+      </div>
+    )}
+  </Portal>
   </>);
 }
