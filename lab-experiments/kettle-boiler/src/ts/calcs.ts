@@ -7,6 +7,9 @@ export const FEED_RATE_GAIN = 20; // Gain factor to convert lift to flow rate
  * @returns Temperature in Celsius
  */
 export function calculateSteamTemperature(psig: number): number {
+    // If less than 0, fake it cooling to room temp
+    if (psig < 0) return (100.1 - 25.0) * psig + 100.1;
+
     // Convert psig to bara (1 bar = 14.5038 psi)
     const P = 1 + .068 * psig;
 

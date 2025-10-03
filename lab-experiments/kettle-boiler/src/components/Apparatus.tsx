@@ -11,6 +11,7 @@ import GlobeValve from "./GlobeValve/GlobeValve";
 import BeakerSystem from "./BeakerSystem/BeakerSystem";
 import { PRegulator } from "./PRegulator/PRegulator";
 import { calculateSteamTemperature, FEED_RATE_GAIN } from "../ts/calcs";
+import { animate } from "../ts/helpers";
 
 // Note: The Apparatus component is the main SVG container for the kettle boiler experiment. 
 // It includes static elements, interactable components like the rotameter and kettle, displays for temperature readings, waterfalls to represent fluid flow, 
@@ -20,13 +21,22 @@ export const Apparatus: Component = () => {
   // Signals
   const [ballValveOpen, setBallValveOpen] = createSignal(false); // State for BallValve
   const [regulatorPressure, setRegulatorPressure] = createSignal(0); // Pressure state for the PRegulator
+  const [steamPressure, setSteamPressure] = createSignal(-1);
   const [feedRate, setFeedRate] = createSignal(0); // Feed flow rate
   const [outRate, setOutRate] = createSignal(0); // Kettle outlet
   const [condRate, setCondRate] = createSignal(0); // Condensate flowrate
-  const [outTemp, setOutTemp] = createSignal(100.1);
+  const [outTemp, setOutTemp] = createSignal(25);
 
   // Memos
-  const steamPressure = createMemo(() => ballValveOpen() ? Math.min(regulatorPressure(), 15) : 0); // Steam pressure depends on ball valve state
+  // const steamPressure = createMemo(() => ballValveOpen() ? Math.min(regulatorPressure(), 15) : 0); // Steam pressure depends on ball valve state
+  const r = Math.exp(-1/1);
+  animate((dt: number) => {
+    const target = ballValveOpen() ? regulatorPressure() : -1;
+    const current = steamPressure();
+    let next = (current - target) * r ** dt + target;
+    setSteamPressure(next);
+    return true;
+  });
   const steamTemperature = createMemo(() => calculateSteamTemperature(steamPressure())); // Steam temperature based on pressure
 
   const outTempDisplay = createMemo(() => outRate() > 0 ? outTemp().toFixed(1) : "--");
@@ -59,7 +69,7 @@ return (<svg
 
     {/* Displays */}
     {/* Condensate Temperature Display */}
-    <Display x={350.5} y={565.5} val={calculateSteamTemperature(0).toFixed(1)}/>
+    <Display x={350.5} y={565.5} val={steamTemperature}/>
     {/* Feed Temperature Display */}
     <Display x={576.5} y={428.5} val={"25.0"} />
     {/* Steam Temperature Display */}
@@ -68,7 +78,7 @@ return (<svg
     <Display x={820.5} y={479.5} val={outTempDisplay}/>
 
     {/* Waterfalls */}
-    <Waterfall key="cond" cx={157} rate={condRate} rateRange={[0, 300]} />
+    <Waterfall key="cond" cx={157} rate={condRate} rateRange={[0, 400]} />
     <Waterfall key="conc" cx={965} rate={outRate} />
 
     <Gauge pressure={steamPressure}/>

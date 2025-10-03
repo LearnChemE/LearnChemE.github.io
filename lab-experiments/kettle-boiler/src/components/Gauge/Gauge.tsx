@@ -1,5 +1,5 @@
 import { createMemo, type Accessor, type Component } from "solid-js";
-import "./Gauge.css";
+import { constrain } from "../../ts/helpers";
 
 interface GaugeProps {
   pressure: Accessor<number>; // in psig
@@ -281,7 +281,7 @@ export const Gauge: Component<GaugeProps> = ({ pressure }) => {
       <path
         id="needle"
         class="gauge-needle"
-        transform={`rotate(${needleAngle()} 381 66.8829)`}
+        transform={`rotate(${constrain(needleAngle(), -135, 0)} 381 66.8829)`}
         d="M381 72.9014C381.107 72.3497 381.196 71.798 381.269 71.2463C381.423 70.0723 381.5 68.8983 381.5 67.7244C381.5 63.5573 381.5 59.3902 381.5 55.2231C381.5 50.6336 381.367 46.0442 381.102 41.4548C381.07 40.9031 381.036 40.3514 381 39.7997C380.964 40.3514 380.93 40.9031 380.898 41.4548C380.633 46.0442 380.5 50.6336 380.5 55.2231C380.5 59.3902 380.5 63.5573 380.5 67.7244C380.5 68.8983 380.577 70.0723 380.731 71.2463C380.804 71.798 380.893 72.3497 381 72.9014Z"
         fill="#E00000"
       />
