@@ -1,6 +1,7 @@
 import { createEffect, createMemo, createSignal, onMount, type Component } from "solid-js";
 import "./Kettle.css";
 import { animateChamberEnergyBalance, animateChamberMassBalance, calculateSteamOut, type ChamberFills } from "./KettleLogic";
+import { Boils } from "../Boils/Boils";
 
 export interface KettleProps {
   // Inputs
@@ -720,6 +721,7 @@ export const Kettle: Component<KettleProps> = (props) => {
       </clipPath>
     </defs>
     </g>
+    <Boils showing={() => chamberFill() > .8 && props.outTemp() > 100}x={475} y={360} w={400} h={60} nbubbles={20} />
   </>
 )};
 
