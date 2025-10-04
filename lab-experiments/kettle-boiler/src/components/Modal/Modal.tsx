@@ -11,7 +11,7 @@ interface ModalProps {
 export const Modal: Component<ModalProps> = ({ key, title, BodyHTML, show }) => {
     const [getShow, setShow] = show;
 
-    const hideIfClickedOut = (e: PointerEvent) => {
+    const hideIfClickedOut = (e: MouseEvent) => {
         if (!ref.contains(e.target as Node)) {
             console.log("setting off")
             setShow(false);
