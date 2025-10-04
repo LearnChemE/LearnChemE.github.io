@@ -4,11 +4,11 @@ import "./Modal.css"
 interface ModalProps {
     key: string;
     title: string;
-    bodyHTML: string;
+    BodyHTML: Component;
     show: Signal<boolean>;
 };
 
-export const Modal: Component<ModalProps> = ({ key, title, bodyHTML, show }) => {
+export const Modal: Component<ModalProps> = ({ key, title, BodyHTML, show }) => {
     const [getShow, setShow] = show;
 
     const hideIfClickedOut = (e: PointerEvent) => {
@@ -43,7 +43,7 @@ export const Modal: Component<ModalProps> = ({ key, title, bodyHTML, show }) => 
                 <h2> { title } </h2>
             </div>
             <div class="modal-body">
-                { bodyHTML }
+                <BodyHTML />
             </div>
         </div>
     </div>

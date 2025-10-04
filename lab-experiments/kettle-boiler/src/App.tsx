@@ -4,6 +4,7 @@ import { Apparatus } from './components/Apparatus';
 import { HamburgerMenu } from './components/Hamburger/Hamburger';
 import worksheet from './media/Kettle-Boiler-Worksheet.pdf'
 import { enableWindowResize, initSvgDrag, initSvgZoom } from './ts/helpers';
+import { AboutText, DirectionsText } from './components/Modal/modals';
 
 function App() {
 
@@ -18,7 +19,7 @@ function App() {
 
   return (
     <>
-      <HamburgerMenu path={worksheet} downloadName='Kettle-Boiler-Worksheet.pdf' />
+      <HamburgerMenu path={worksheet} downloadName='Kettle-Boiler-Worksheet.pdf' Directions={DirectionsText} About={AboutText} />
       <Apparatus/>
     </>
   )

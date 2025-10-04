@@ -21,6 +21,7 @@
     max-width: 800px;
     position: relative;
     animation: slideIn 0.3s;
+    text-align: left;
 }
 .close-btn {
     position: absolute;
@@ -36,15 +37,14 @@
     color: #333;
 }
 .modal-header {
-    padding: 10px 0;
+    padding: 10px;
     border-bottom: 1px solid #eee;
-    margin-bottom: 15px;
 }
 .modal-header h2 {
     margin: 0;
     color: #2c3e50;
 }
 .modal-body {
-    padding: 10px 0;
+    padding: 10px;
     line-height: 1.6;
 }
