@@ -12,6 +12,7 @@ import BeakerSystem from "./BeakerSystem/BeakerSystem";
 import { PRegulator } from "./PRegulator/PRegulator";
 import { calculateSteamTemperature, FEED_RATE_GAIN } from "../ts/calcs";
 import { animate } from "../ts/helpers";
+import { Steam } from "./Steam/Steam";
 
 // Note: The Apparatus component is the main SVG container for the kettle boiler experiment. 
 // It includes static elements, interactable components like the rotameter and kettle, displays for temperature readings, waterfalls to represent fluid flow, 
@@ -85,8 +86,8 @@ return (<svg
     <BallValve onToggle={(open) => setBallValveOpen(open)} />
     <GlobeValve onLiftChange={(lift) => setFeedRate(lift * FEED_RATE_GAIN)}/>
     <BeakerSystem leftFlow={condRate} rightFlow={outRate} />
-    
-    
+
+    <Steam showing={() => (regulatorPressure() > 15 && ballValveOpen())} x={230} y={90} w={5} h={7} />
   </g>
   <StaticDefs/>
 </svg>);
