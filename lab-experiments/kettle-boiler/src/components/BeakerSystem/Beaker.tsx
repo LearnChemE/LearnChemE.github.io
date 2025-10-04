@@ -44,15 +44,15 @@ export const Beaker: Component<BeakerProps> = (props) => {
   // Anytime the volume is set, check if it was overflowed
   let overflowTimer: number | null = null;
   createEffect(() => {
-    if (val() > 1150 && blocked() !== null) {
+    if (val() > 1151 && blocked() !== null) {
       // Overflowing
       setOverflow(true);
-      setVal(1150);
+      setVal(1149);
     }
-    else if (overflow()) {
+    if (overflow()) {
       // Set/reset a timer to cancel the overflowing
       if (overflowTimer !== null) clearTimeout(overflowTimer);
-      overflowTimer = setTimeout(() => { setOverflow(false); overflowTimer = null; }, 1000);
+      overflowTimer = setTimeout(() => { setOverflow(false); overflowTimer = null; }, 100);
     }
   });
 
