@@ -1,0 +1,15 @@
+.preg-valve {
+    cursor: grab;
+}
+
+.preg-valve:active {
+    cursor: grabbing;
+}
+
+.preg-valve:hover {
+    rect {
+        filter: brightness(1.1)
+            drop-shadow(-.5px -.5px .5px rgba(255, 205, 39, 255))
+            drop-shadow(.5px .5px .5px rgba(23, 206, 255, 255));
+    }
+}

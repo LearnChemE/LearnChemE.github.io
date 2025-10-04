@@ -1,0 +1,17 @@
+.scale-label {
+  font-family: "digital" !important;
+  font-weight: 100;
+  font-size: 11;
+
+  position: absolute;
+  text-anchor: end;
+  text-justify: end;
+  dominant-baseline: middle;
+}
+
+.button {
+    cursor: pointer;
+}
+.button:hover {
+    filter: brightness(1.1);
+}

@@ -1,0 +1,15 @@
+
+.source {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+}
+.steam {
+    fill: url(#steamGrad);
+    filter: url(#softBlur);
+    transform-box: fill-box;
+    transform-origin: center;
+}
+.soft {
+    opacity: 0.6;
+    animation-timing-function: ease-out;
+}
