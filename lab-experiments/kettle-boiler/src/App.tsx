@@ -2,7 +2,7 @@ import { onMount } from 'solid-js';
 import './App.css'
 import { Apparatus } from './components/Apparatus';
 import { HamburgerMenu } from './components/Hamburger/Hamburger';
-import worksheet from './media/testMe.txt'
+import worksheet from './media/Kettle-Boiler-Worksheet.pdf'
 import { enableWindowResize, initSvgDrag, initSvgZoom } from './ts/helpers';
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
 
   return (
     <>
-      <HamburgerMenu path={worksheet} downloadName='test.txt' />
+      <HamburgerMenu path={worksheet} downloadName='Kettle-Boiler-Worksheet.pdf' />
       <Apparatus/>
     </>
   )

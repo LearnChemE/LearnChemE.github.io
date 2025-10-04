@@ -22,6 +22,19 @@ export function calculateSteamTemperature(psig: number): number {
 }
 
 /**
+ * Calculate saturated pressure (bar) from temperature (K). Valid for T < 399.94 K.
+ * @param T Temperature (K)
+ * @returns Saturated Pressure (bar absolute)
+ */
+export function antoines(T: number) {
+    const A = 4.6543;
+    const B = 1435.264;
+    const C = -64.848;
+    return 10 ** (A - B / (T + C));
+}
+
+
+/**
  * Calculate enthalpy of vaporization for water at a given temperature
  * @param T temperature (C)
  * @returns deltaHvap (kJ/kg)

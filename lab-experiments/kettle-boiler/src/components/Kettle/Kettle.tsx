@@ -2,6 +2,7 @@ import { createEffect, createMemo, createSignal, onMount, type Component } from 
 import "./Kettle.css";
 import { animateChamberEnergyBalance, animateChamberMassBalance, calculateSteamOut, type ChamberFills } from "./KettleLogic";
 import { Boils } from "../Boils/Boils";
+import { Steam } from "../Steam/Steam";
 
 export interface KettleProps {
   // Inputs
@@ -38,6 +39,8 @@ export const Kettle: Component<KettleProps> = (props) => {
   const fills: ChamberFills = { chamberFill, pathFill, overflowFill, setChamberFill, setPathFill, setOverflowFill, internalEvaporateRate, setInternalEvaporateRate };
   animateChamberMassBalance(props, fills);
   animateChamberEnergyBalance(props, fills);
+  const bubbleHeight = createMemo(() => 60 * chamberFill());;
+
 
   // Render
   return (
@@ -244,6 +247,7 @@ export const Kettle: Component<KettleProps> = (props) => {
           stroke="black"
         />
       </g>
+      <Boils showing={() => chamberFill() > .3 && props.outTemp() > 100}x={475} y={360} w={400} h={bubbleHeight} nbubbles={20} />
       <g id="exterior" class="kettle-exterior">
         <path
           id="Rectangle 58"
@@ -700,6 +704,7 @@ export const Kettle: Component<KettleProps> = (props) => {
           stroke="black"
         />
       </g>
+      <Steam showing={() => false} x={840} y={130} w={6} h={6} />
     <defs>
       <clipPath id="chamberClip">
         <rect
@@ -721,7 +726,6 @@ export const Kettle: Component<KettleProps> = (props) => {
       </clipPath>
     </defs>
     </g>
-    <Boils showing={() => chamberFill() > .8 && props.outTemp() > 100}x={475} y={360} w={400} h={60} nbubbles={20} />
   </>
 )};
 

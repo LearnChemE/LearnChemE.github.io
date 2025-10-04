@@ -27,7 +27,7 @@ type Bubble = {
     render: { get: Accessor<boolean>, set: Setter<boolean> };
 };
 
-export const Boils: Component<{ showing: () => boolean, x: number, y: number, w: number, h: number, nbubbles: number }> = ({ showing, x, y, w, h, nbubbles }) => {
+export const Boils: Component<{ showing: () => boolean, x: number, y: number, w: number, h: () => number, nbubbles: number }> = ({ showing, x, y, w, h, nbubbles }) => {
     // Initialize the bubbles
     const bubbles: Array<Bubble> = [];
     for (let i=0; i<nbubbles; i++) {
@@ -81,7 +81,7 @@ export const Boils: Component<{ showing: () => boolean, x: number, y: number, w:
                   stroke="white"
                   stroke-width="2px"
                   cx={b.cx + .05 * w * Math.cos(4 * b.interpolant.get() + 100 * b.cx)}
-                  cy={b.cy - b.interpolant.get() * h}
+                  cy={b.cy - b.interpolant.get() * h()}
                   r={b.r}
                   transform={`translate(${b.cx}, ${b.cy}) scale(${1 + (b.aniScale - 1) * b.interpolant.get()}) translate(${-b.cx}, ${-b.cy})`}
                   opacity={b.render.get() ? 1 - (2 * b.interpolant.get() - 1) ** 6 : 0}

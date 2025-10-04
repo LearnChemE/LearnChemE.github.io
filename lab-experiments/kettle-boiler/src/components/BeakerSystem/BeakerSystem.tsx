@@ -47,8 +47,6 @@ export const BeakerSystem: Component<BeakerSystemProps> = ({ leftFlow, rightFlow
   // Block a source
   const [isBlocked, setIsBlocked] = createSignal<Array<SignalT | null>> ([null, null, null, null]);
   const block = (which: number, value: SignalT | null) => {
-    if (value === null) console.log(`Unblocking`, which)
-    else console.log(`Blocking`, which, value)
     // update immutably so Solid's signal setter sees a new reference
     setIsBlocked(prev => {
       const arr = [...prev];

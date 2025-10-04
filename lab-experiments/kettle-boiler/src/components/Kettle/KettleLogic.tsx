@@ -1,13 +1,15 @@
 import { type Accessor, type Setter } from "solid-js";
 import { animate } from "../../ts/helpers";
 import type { KettleProps } from "./Kettle";
-import { dHvap } from "../../ts/calcs";
+import { antoines, dHvap } from "../../ts/calcs";
 
 const chamberVolume = 5; // gal
+const chamberCapac_kg = chamberVolume * 3.785 * 0.998; // kg
 const UA0 = 5; // kW / K
 const MIN_UA = 5; // kW / K
 const Cp = 4.1868; // kJ / kg / K
 const rho_kg_gal = 3.78; // kg / gal
+const HA = 1; // kg / s / bar
 
 // interface KettleProps {
 //   // Inputs
@@ -47,11 +49,12 @@ export function animateChamberMassBalance(props: KettleProps, fills: ChamberFill
         const height = 127 * fill;
 
         // Calculate new fill level
-        const fillIn = flow / chamberVolume * dt / 60; // Convert to per minute, then normalize to chamber volume
+        const fillIn = flow / chamberVolume * dt / 60; // Convert to per minute, then normalize to chamber volume (unitless)
         overflowRate = (height > 124) ? (height - 124) * 20 / 3 : 0;
-        const fillOut = overflowRate * dt / 60 / chamberVolume;
+        const fillOut = overflowRate * dt / 60 / chamberVolume; // unitless
+        const evapOut = fills.internalEvaporateRate() * dt / chamberCapac_kg; // unitless
 
-        let newFill = fill + fillIn - fillOut;
+        let newFill = fill + fillIn - fillOut - evapOut;
         newFill = Math.min(1, newFill); // Clamp under 1
 
         // Update and continue animation if not full
@@ -134,10 +137,16 @@ export function animateChamberEnergyBalance(props: KettleProps, fills: ChamberFi
         // HEX UA value
         const UA = Math.max(fillFrac * UA0, MIN_UA);
 
+        // Use an HA value for rate of evaporation
+        const pvap = antoines(Tk);
+        const mdot_evap = (pvap > 1) ? HA * (pvap - 1) : 0;
+        fills.setInternalEvaporateRate(mdot_evap);
+
         // Balance
         const nrg_in_minus_out = mdot_in * Cp * (298.15 - Tk);
         const nrg_gen = UA * (props.steamTemp() - Tc);
-        const nrg_cons = 0; // TODO: how do
+        const nrg_cons = mdot_evap * dHvap(Tc);
+        // console.log(`in-out:${nrg_in_minus_out}\ngen:${nrg_gen}\ncons:${nrg_cons}`);
 
         // Evolve
         const acc = nrg_in_minus_out + nrg_gen - nrg_cons; // kW
