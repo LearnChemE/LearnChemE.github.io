@@ -1,0 +1,7 @@
+.kettle-exterior {
+    transition: opacity 1s;
+}
+
+.kettle-exterior-hidden {
+    opacity: 0;
+}

@@ -1,0 +1,33 @@
+
+.source {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+}
+.steam {
+    fill: url(#steamGrad);
+    filter: url(#softBlur);
+    transform-box: fill-box;
+    transform-origin: center;
+    animation-name: rise;
+    animation-iteration-count: infinite;
+    animation-timing-function: cubic-bezier(.22,.9,.36,1);
+    will-change: transform, opacity;
+}
+@keyframes rise {
+    0% {
+    transform: translate(var(--dx, 0px), 0) scale(1);
+    opacity: 0;
+    }
+    8% {
+    opacity: 0.6;
+    }
+    100% {
+    transform: translate(calc(var(--dx, 0px) * 0.6), var(--rise, -160px))
+                scale(var(--end-scale, 0.25));
+    opacity: 0;
+    }
+}
+.soft {
+    opacity: 0.6;
+    animation-timing-function: ease-out;
+}

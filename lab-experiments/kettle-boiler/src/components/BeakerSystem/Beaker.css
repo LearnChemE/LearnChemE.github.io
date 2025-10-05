@@ -1,0 +1,13 @@
+.beaker {
+    cursor: grab;
+}
+.beaker:hover {
+    filter: brightness(1.1);
+}
+.beaker:active {
+    cursor: grabbing;
+}
+
+.hidden {
+    display: none !important;
+}
