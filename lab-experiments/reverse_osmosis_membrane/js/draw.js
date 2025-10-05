@@ -190,7 +190,12 @@ window.draw = function () {
 
   //drain and beaker fill settings
   if (state.pumpOn === true && (state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate < state.saltTankHeight - 15) {
-    state.topOfTankDrainTimer += 100;
+    state.topOfTankDrainTimer++;
+    state.pumpToBeakersTimer += (state.feedPressure / 40) * 4;
+  }
+
+  if (state.pumpToBeakersTimer > 596 && pressurizeGaugeCountTimer < 4) {
+    state.pumpToBeakersTimer -= (state.feedPressure / 40) * 4;
   }
 
   if (
@@ -211,21 +216,21 @@ window.draw = function () {
     state.doneDrainingTank = true;
   }
 
-  if (state.doneDrainingTank == true && state.tankToPumpDrainTimer == 70) {
+  if (state.doneDrainingTank == true && state.tankToPumpDrainTimer == 70 && state.pumpOn == true) {
     state.pumpOn = false;
   }
-  if (state.doneDrainingTank === true && state.tankToPumpDrainTimer < 50) {
+  if (state.doneDrainingTank === true && state.tankToPumpDrainTimer < 50 && state.pumpOn == true) {
     state.tankToPumpDrainTimer += 1;
   }
-  if (state.doneDrainingTank === true && state.tankToPumpDrainTimer >= 50) {
+  if (state.doneDrainingTank === true && state.tankToPumpDrainTimer >= 50 && state.pumpOn == true) {
     state.tankToPumpDrainTimer += 0.25;
   }
-  if (state.doneDrainingTank === true && state.tankToPumpDrainTimer >= 70) {
+  if (state.doneDrainingTank === true && state.tankToPumpDrainTimer >= 70 && state.pumpOn == true) {
     state.tankToPumpDrainTimer = 70;
   }
 
   //fill beakers
-  if (state.pumpOn === true) {
+  if (state.pumpOn === true && state.pumpToBeakersTimer >= 790) {
     state.permeateBeakerFillUp = true;
     state.retentateBeakerFillUp = true;
   } else if (state.pumpOn === false) {
@@ -233,11 +238,25 @@ window.draw = function () {
     state.retentateBeakerFillUp = false;
   }
 
-  if (state.permeateBeakerFillUp === true) {
-    state.permeateBeakerTimer += 0.5;
-  }
   if (state.retentateBeakerFillUp === true) {
-    state.rententateBeakerTimer += 0.5;
+    state.rententateBeakerTimer++;
+  }
+  if (state.permeateBeakerFillUp === true) {
+    state.permeateBeakerTimer++;
+  } else if (
+    state.pumpOn === true &&
+    (state.deltaHeightSaltTankCylinder * state.topOfTankDrainTimer) / state.frameRate >= state.saltTankHeight - 15 &&
+    state.doneDrainingTank == false &&
+    state.permeateBeakerFillUp == true &&
+    state.retentateBeakerFillUp == true
+  ) {
+    state.permeateBeakerTimerBottomOfTank++;
+    state.retentateBeakerTimerBottomOfTank++;
+  } else if (state.tankToPumpDrainTimer == 70) {
+    state.permeateBeakerTimerBottomOfTank = state.permeateBeakerTimerBottomOfTank;
+    state.retentateBeakerTimerBottomOfTank = state.retentateBeakerTimerBottomOfTank;
+    state.permeateBeakerTimer = state.permeateBeakerTimer;
+    state.rententateBeakerTimer = state.rententateBeakerTimer;
   }
 
   //Error for backwards pressure flow
@@ -305,8 +324,8 @@ function drawSaltConductivityMeters(x, y, waterType) {
   let retentateWaterTY =
     state.figureY +
     373 -
-    (state.deltaHeightRetentateBeaker * state.topOfTankDrainTimer) / state.frameRate -
-    (state.deltaHeightRetentateBeaker * state.bottomOfTankDrainTimer) / state.frameRate;
+    (state.deltaHeightRetentateBeaker * state.rententateBeakerTimer) / state.frameRate -
+    (state.deltaHeightRetentateBeaker * state.retentateBeakerTimerBottomOfTank) / state.frameRate;
   let retentateWaterBY = state.figureY + 373;
   let retentateWaterLX = state.figureX + 828;
   let retentateWaterRX = state.figureX + 1012;
@@ -314,8 +333,8 @@ function drawSaltConductivityMeters(x, y, waterType) {
   let permeateWaterTY =
     state.figureY +
     373 -
-    (state.deltaHeightPermeateBeaker * state.topOfTankDrainTimer) / state.frameRate -
-    (state.deltaHeightPermeateBeaker * state.bottomOfTankDrainTimer) / state.frameRate;
+    (state.deltaHeightPermeateBeaker * state.permeateBeakerTimer) / state.frameRate -
+    (state.deltaHeightPermeateBeaker * state.permeateBeakerTimerBottomOfTank) / state.frameRate;
   let permeateWaterBY = state.figureY + 373;
   let permeateWaterLX = state.figureX + 603;
   let permeateWaterRX = state.figureX + 787;
@@ -746,7 +765,7 @@ function drawPressureGauge(x, y) {
       15 * cos(-((270 * pressureHeight) / 40) - 135 + 180 + 17),
       -15 * sin(-((270 * pressureHeight) / 40) - 135 + 180 + 17)
     );
-  } else if (state.pumpOn == true && pressurizeGaugeCountTimer < state.feedPressure) {
+  } else if (state.pumpOn == true && pressurizeGaugeCountTimer < state.feedPressure && 593 < state.pumpToBeakersTimer) {
     pressureHeight = state.feedPressure - state.feedPressure / Math.exp(pressurizeGaugeCountTimer);
     triangle(
       35 * cos(-((270 * pressureHeight) / 40) - 135),
@@ -757,7 +776,7 @@ function drawPressureGauge(x, y) {
       -15 * sin(-((270 * pressureHeight) / 40) - 135 + 180 + 17)
     );
     pressurizeGaugeCountTimer += 0.02;
-  } else {
+  } else if (593 < state.pumpToBeakersTimer) {
     triangle(
       35 * cos(-((270 * state.feedPressure) / 40) - 135),
       -35 * sin(-((270 * state.feedPressure) / 40) - 135),
@@ -765,6 +784,15 @@ function drawPressureGauge(x, y) {
       -15 * sin(-((270 * state.feedPressure) / 40) - 135 + 180 - 17),
       15 * cos(-((270 * state.feedPressure) / 40) - 135 + 180 + 17),
       -15 * sin(-((270 * state.feedPressure) / 40) - 135 + 180 + 17)
+    );
+  } else if (593 >= state.pumpToBeakersTimer) {
+    triangle(
+      35 * cos(-0 - 135),
+      -35 * sin(-0 - 135),
+      15 * cos(-0 - 135 + 180 - 17),
+      -15 * sin(-0 - 135 + 180 - 17),
+      15 * cos(-0 - 135 + 180 + 17),
+      -15 * sin(-0 - 135 + 180 + 17)
     );
   }
   fill("gray");
@@ -991,8 +1019,22 @@ function drawWater(x, y) {
   rect(x + 178, y + 21, x + 190, y + 219);
   rect(x + 220, y - 21, x + 253, y - 21 + 12);
   fill("PaleTurquoise");
-  rect(x + 178, y + 21, x + 190, y + 219);
-  rect(x + 220, y - 21, x + 253, y - 21 + 12);
+
+  //pump to elbow
+  if (219 - state.pumpToBeakersTimer >= 21) {
+    rect(x + 178, y + 219 - state.pumpToBeakersTimer, x + 190, y + 219);
+  } else {
+    rect(x + 178, y + 21, x + 190, y + 219);
+  }
+  console.log("pump to beakers timer:" + state.pumpToBeakersTimer);
+  //elbow to gauge
+  if (219 < state.pumpToBeakersTimer && 252 >= state.pumpToBeakersTimer) {
+    rect(x + 220, y - 21, x + 220 + state.pumpToBeakersTimer - 219, y - 21 + 12);
+  } else if (252 < state.pumpToBeakersTimer) {
+    rect(x + 220, y - 21, x + 252, y - 21 + 12);
+  } else {
+    rect(x + 220, y - 21, x + 220, y - 21 + 12);
+  }
 
   pop();
 
@@ -1004,7 +1046,13 @@ function drawWater(x, y) {
   fill("white");
   rect(x + 335, y - 21, x + 360, y - 21 + 12);
   fill("PaleTurquoise");
-  rect(x + 335, y - 21, x + 360, y - 21 + 12);
+  if (277 < state.pumpToBeakersTimer && 278 + 25 >= state.pumpToBeakersTimer) {
+    rect(x + 334, y - 21, x + 334 + state.pumpToBeakersTimer - 277, y - 21 + 12);
+  } else if (278 + 25 < state.pumpToBeakersTimer) {
+    rect(x + 334, y - 21, x + 334 + 25, y - 21 + 12);
+  } else {
+    rect(x + 334, y - 21, x + 334, y - 21 + 12);
+  }
 
   pop();
 
@@ -1021,36 +1069,67 @@ function drawWater(x, y) {
   rect(x + 902, y - 18, x + 936, y - 18 + 6);
   rect(x + 957, y + 10, x + 957 + 6, y + 230);
   fill(14, 220, 204, 155); //retentate green
-  rect(x + 752, y - 18, x + 825, y - 18 + 6);
-  rect(x + 902, y - 18, x + 936, y - 18 + 6);
-  rect(x + 957, y + 10, x + 957 + 6, y + 230);
+
+  if (state.pumpToBeakersTimer > 520 && state.pumpToBeakersTimer < 520 + 73) {
+    rect(x + 752, y - 18, x + state.pumpToBeakersTimer - 520 + 752, y - 18 + 6);
+  } else if (state.pumpToBeakersTimer >= 520 + 73) {
+    rect(x + 752, y - 18, x + 825, y - 18 + 6);
+  } else {
+    rect(x + 752, y - 18, x + 752, y - 18 + 6);
+  }
+
+  let retentateSpeedUp = 1.423;
+
+  if (state.pumpToBeakersTimer > 597 && state.pumpToBeakersTimer < 597 + 34 / retentateSpeedUp) {
+    rect(x + 902, y - 18, x + retentateSpeedUp * (state.pumpToBeakersTimer - 597) + 902, y - 18 + 6);
+  } else if (state.pumpToBeakersTimer >= 597 + 34 / retentateSpeedUp) {
+    rect(x + 902, y - 18, x + 936, y - 18 + 6);
+  } else {
+    rect(x + 902, y - 18, x + 902, y - 18 + 6);
+  }
+
+  if (state.pumpToBeakersTimer > 597 + 50 / retentateSpeedUp && state.pumpToBeakersTimer < 597 + 50 / retentateSpeedUp + 220 / retentateSpeedUp) {
+    rect(x + 957, y + 10, x + 957 + 6, y + 10 + retentateSpeedUp * (state.pumpToBeakersTimer - (597 + 50 / retentateSpeedUp)));
+  } else if (state.pumpToBeakersTimer >= 597 + 50 / retentateSpeedUp + 220 / retentateSpeedUp) {
+    rect(x + 957, y + 10, x + 957 + 6, y + 230);
+  } else {
+    rect(x + 957, y + 10, x + 957 + 6, y + 10);
+  }
 
   //permeate
   fill("white");
   rect(x + 731, y + 38, x + 731 + 6, y + 230);
-  fill(160, 255, 255); //permeate blue
-  rect(x + 731, y + 38, x + 731 + 6, y + 230);
+  fill(160, 255, 255, 155); //permeate blue
+
+  if (state.pumpToBeakersTimer > 597 && state.pumpToBeakersTimer < 597 + 192) {
+    rect(x + 731, y + 38, x + 731 + 6, y + 38 + (state.pumpToBeakersTimer - 597));
+  } else if (state.pumpToBeakersTimer >= 597 + 192) {
+    rect(x + 731, y + 38, x + 731 + 6, y + 230);
+  } else {
+    rect(x + 731, y + 38, x + 731 + 6, y + 38);
+  }
 
   pop();
 
   //---------------------Beakers---------------------
 
+  console.log("delta: " + state.rententateBeakerTimer);
   let retentateWaterTY =
     state.figureY +
     373 -
-    (state.deltaHeightRetentateBeaker * state.topOfTankDrainTimer) / state.frameRate -
-    (state.deltaHeightRetentateBeaker * state.bottomOfTankDrainTimer) / state.frameRate;
-  let retentateWaterBY = state.figureY + 374;
+    (state.deltaHeightRetentateBeaker * state.rententateBeakerTimer) / state.frameRate -
+    (state.deltaHeightRetentateBeaker * state.retentateBeakerTimerBottomOfTank) / state.frameRate;
+  let retentateWaterBY = state.figureY + 373;
   let retentateWaterLX = state.figureX + 828;
   let retentateWaterRX = state.figureX + 1012;
 
   let permeateWaterTY =
     state.figureY +
     373 -
-    (state.deltaHeightPermeateBeaker * state.topOfTankDrainTimer) / state.frameRate -
-    (state.deltaHeightPermeateBeaker * state.bottomOfTankDrainTimer) / state.frameRate;
-  let permeateWaterBY = state.figureY + 374;
-  let permeateWaterLX = state.figureX + 602;
+    (state.deltaHeightPermeateBeaker * state.permeateBeakerTimer) / state.frameRate -
+    (state.deltaHeightPermeateBeaker * state.permeateBeakerTimerBottomOfTank) / state.frameRate;
+  let permeateWaterBY = state.figureY + 373;
+  let permeateWaterLX = state.figureX + 603;
   let permeateWaterRX = state.figureX + 787;
 
   push();
@@ -1064,7 +1143,7 @@ function drawWater(x, y) {
   rect(retentateWaterLX, retentateWaterTY, retentateWaterRX, retentateWaterBY);
 
   //permeate
-  fill(160, 255, 255); //permeate blue
+  fill(160, 255, 255, 155); //permeate blue
   rect(permeateWaterLX, permeateWaterTY, permeateWaterRX, permeateWaterBY);
 
   pop();

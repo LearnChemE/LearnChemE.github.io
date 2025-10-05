@@ -14,15 +14,19 @@ window.state = {
   frameRate: 30,
   flowRate: 1,
 
+  //Timers
   topOfTankDrainTimer: 0,
   bottomOfTankDrainTimer: 0,
   doneDrainingTank: false,
   tankToPumpDrainTimer: 0,
+  pumpToBeakersTimer: 0,
 
   permeateBeakerFillUp: false,
   retentateBeakerFillUp: false,
   permeateBeakerTimer: 0,
   rententateBeakerTimer: 0,
+  permeateBeakerTimerBottomOfTank: 0,
+  retentateBeakerTimerBottomOfTank: 0,
 
   //Salt Soln Tank variables
   saltTankWidth: 200,

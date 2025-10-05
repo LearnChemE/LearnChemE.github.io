@@ -9,15 +9,19 @@ export function reset() {
   state.frameRate = 30;
   state.flowRate = 1;
 
+  //timers
   state.topOfTankDrainTimer = 0;
   state.bottomOfTankDrainTimer = 0;
   state.doneDrainingTank = false;
   state.tankToPumpDrainTimer = 0;
+  state.pumpToBeakersTimer = 0;
 
   state.permeateBeakerFillUp = false;
   state.retentateBeakerFillUp = false;
   state.permeateBeakerTimer = 0;
   state.rententateBeakerTimer = 0;
+  state.permeateBeakerTimerBottomOfTank = 0;
+  state.retentateBeakerTimerBottomOfTank = 0;
 
   //Salt Soln Tank variables
   state.saltTankWidth = 200;
