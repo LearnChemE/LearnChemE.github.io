@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx webpack --config ./_dev/webpack.config.js --mode=production --progress",
     "watch": "npx webpack --watch --config ./_dev/webpack.config.js --mode=development --progress",
-    "start": "npx webpack serve --config ./_dev/webpack.config.js --mode=development --open"
+    "start": "npx webpack serve --host 0.0.0.0 --config ./_dev/webpack.config.js --mode=development --open"
   },
   "keywords": [
     "simulation",
