@@ -52,16 +52,16 @@ export const PRegulator: Component<PRegulatorProps> = ({ setPressure }) => {
         };
 
         const endDrag = () => {
-            document.removeEventListener("mousemove", onDrag);
-            document.removeEventListener("mouseup", endDrag);
+            document.removeEventListener("pointermove", onDrag);
+            document.removeEventListener("pointerup", endDrag);
         };
 
-        document.addEventListener("mousemove", onDrag);
-        document.addEventListener("mouseup", endDrag);
+        document.addEventListener("pointermove", onDrag);
+        document.addEventListener("pointerup", endDrag);
     };
 
     return (
-    <g id="pRegHandle" class="preg-valve drag-exempt" onmousedown={startDrag}>
+    <g id="pRegHandle" class="preg-valve drag-exempt" onpointerdown={startDrag}>
         <rect id="pRegHandle_2" x="134" y="189.5" width="64" height="12" rx="6" fill="#5C8DF6" stroke="black"/>
         <PRegLines l={l}/>
     </g>
