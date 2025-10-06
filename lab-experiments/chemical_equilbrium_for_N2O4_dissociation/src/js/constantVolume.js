@@ -1,0 +1,609 @@
+import * as config from './config.js';
+import { computePressureWithConstantVolume } from './calc.js';
+
+let pressureGuage = null;
+let pressureReliefValve = null;
+let sleeve = null;
+let syringeObj = null;
+let syringeControls = null;
+let reactorBounds = null;
+let tempSwitch = null;
+let thermoCouple = null;
+
+let tempController = null;   // UI elements group for temperature control
+let currentTempC = 25;       // °C
+let heaterOn = false;        // switch state
+let pressure = null;        // current pressure in bar
+let liquidWeight = 1.8;      // g of N2O4 in syringe (1.6 to 2.0 g)
+let liquidPushed = false;   // has the syringe been pushed?
+let temperatureText = null; // text element showing current temperature
+
+// --- non-blocking temperature→pressure ramp (0.5 °C steps) ---
+let tempRampTimerIds = [];
+function clearTempRampTimers() {
+  for (const id of tempRampTimerIds) clearTimeout(id);
+  tempRampTimerIds = [];
+}
+function startTempPressureRamp(prevT, currT) {
+  clearTempRampTimers();
+  // No ramp needed
+  if (prevT === currT) {
+    temperatureText && temperatureText.text(`${currT.toFixed(1)} °C`);
+    pressure && pressure.text(computePressureWithConstantVolume(liquidWeight, currT).toFixed(2));
+    return;
+  }
+  const dir = currT > prevT ? 1 : -1;
+  const step = 0.5 * dir;
+  const round1 = (x) => Math.round(x * 10) / 10;
+  const temps = [];
+  // Build the sequence of intermediate temps from prevT to currT (inclusive) at 0.5 °C steps.
+  let t = prevT;
+  while ((dir > 0 && t < currT) || (dir < 0 && t > currT)) {
+    t = round1(t + step);
+    if ((dir > 0 && t > currT) || (dir < 0 && t < currT)) t = currT;
+    temps.push(t);
+    if (t === currT) break;
+  }
+  const delayPerStepMs = 500; // adjust ramp speed here
+  temps.forEach((temp, i) => {
+    const id = setTimeout(() => {
+      // Update temperature readout on the side panel
+      temperatureText && temperatureText.text(`${temp.toFixed(1)} °C`);
+      // Update pressure text
+      if (pressure) {
+        const p = computePressureWithConstantVolume(liquidWeight, temp);
+        pressure.text(p.toFixed(2));
+      }
+    }, i * delayPerStepMs);
+    tempRampTimerIds.push(id);
+  });
+}
+
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const step5 = (v) => 5 * Math.round(v / 5);
+
+function setTemperature(newT) {
+  // currentTempC = clamp(step5(newT), 25, 45);
+  const prev = currentTempC;
+  if (newT < 25) { currentTempC = 25; }
+  else if (newT > 45) {currentTempC = 45;}
+  else {currentTempC = newT;}
+  if (!heaterOn) currentTempC = 25; // lock to 25 if heater is off
+  refreshTempController();
+  if (liquidPushed) {
+    startTempPressureRamp(prev, currentTempC);
+  }
+}
+
+function setHeater(on) {
+  heaterOn = !!on;
+  clearTempRampTimers();
+  if (!heaterOn) currentTempC = 25;
+  refreshTempController();
+}
+
+
+function addSVGImage(draw, url, x = 0, y = 0, width, height) {
+  const img = draw.image(url)
+  .size(width, height)                      // force the element to the given dimensions
+  .move(x, y)
+  .attr({ preserveAspectRatio: 'none' });   // stretch to fill exactly
+  return img;
+}
+
+// Save the SVG.js context so other functions can reuse it
+
+export function drawConstantVolumeSetup(draw) {
+  // Geometry for the reactor container
+  const width = 350
+  const height = 450
+  const x = config.canvasWidth / 2 - width / 2
+  const y = config.canvasHeight / 2 - height / 2 + 65
+  reactorBounds = { x, y, width, height };
+  
+  const g = draw.group();
+  
+  pressureGuage = addSVGImage(g, 'assets/gasFlowRateDevice1.svg', x + 100, y - 67, 120 * 1.25, 90 * 1.25);
+  pressureReliefValve = addSVGImage(g, 'assets/pressure_relief_valve.svg', x + width - 50, y - 20, 100 * 0.15, 200 * 0.15);
+  syringeObj = drawSyringeVertical(g, x + 65, y - 105, 240, 50, { fillPct: 0.6, scale: 0.4 });
+  thermoCouple = addSVGImage(g, 'assets/thermoCouple.svg', x + width - 100, y - 150, 250, 200);
+  updateSyringeFillFromWeight(syringeObj, false);
+  
+  // Reactor rectangle (container)
+  g.rect(width, height)
+  .move(x, y)
+  .stroke({ width: 5, color: 'grey' })
+  .fill({color: 'lightgreen', opacity: 0.5});
+  
+  drawScaleOnVolumeContainer(g, x, y, width, height);
+  drawSyringeControls(g);
+
+  draw.line(x + width, y + height - 375, x + width + 60, y + height - 380)
+  .stroke({ width: 2, color: 'black', linecap: 'round', linejoin: 'round', opacity: 0.75 });
+  // Temperature controller and readout (left side panel)
+  drawTemperatureController(g, x + 410, y + 40);
+
+  g.line(x - 50, y + height - 345, x, y + height - 325)
+    .stroke({ width: 2, color: 'black', linecap: 'round', linejoin: 'round', opacity: 0.75 });
+  tempSwitch = drawSwitch(g, x - 130, y + height - 370, 60 * 1.5, 30 * 1.5, 1);
+  tempSwitch.toggle = (isOn) => {
+    // Update sleeve color/gradient
+    const leftHeaterGrad = draw.gradient('linear', add => {
+      add.stop(0, '#ff0000');
+      add.stop(0.5, '#ffff00');
+      add.stop(1, '#ff0000');
+    }).from(0, 0).to(0, 1);
+    drawSleeve(g, x, y, width, height, isOn ? leftHeaterGrad : 'blue');
+
+    // Update heater state and UI
+    setHeater(isOn);
+  };
+
+  pressure = g.text('0.00').center(x + width / 2, y - 35).font({ size: 16, weight: 'bold' });
+  temperatureText = g.text(`${currentTempC} °C`).center(x + width + 90, y - 65).font({ size: 16, weight: 'bold' });
+  g.text('bar').center(x + width / 2, y - 15).font({ size: 13, weight: 'bold' });
+}
+
+function drawScaleOnVolumeContainer(g, x, y, width, height) {
+  
+  // Scale parameters (0 to 500 mL)
+  const minML = 0;
+  const maxML = 500;
+  const majorStep = 50; // labeled ticks
+  const minorStep = 10;  // shorter ticks
+  
+  // Map mL value to Y coordinate (0 mL at bottom, 500 mL at top)
+  const mlToY = (v) => y + height - ((v - minML) / (maxML - minML)) * height;
+  
+  // Position for the scale to the left of the reactor
+  const scaleX = x;
+  
+  // Scale backbone line
+  g.line(scaleX, y, scaleX, y + height)
+  .stroke({ width: 1 });
+  
+  // Draw ticks and labels
+  for (let v = minML; v <= maxML; v += minorStep) {
+    const y = mlToY(v);
+    const isMajor = (v % majorStep === 0);
+    const tickLen = isMajor ? 25 : 15;
+    
+    // Tick mark
+    g.line(scaleX, y, scaleX + tickLen, y)
+    .stroke({ width: 1, color: 'black' });
+    
+    // Label for major ticks
+    let volumeText = `${v}`;
+    
+    if (v == 500) {
+      volumeText += " mL";
+    }
+    if (isMajor) {
+      if (v != 0) {
+        g.text(volumeText)
+        .font({ size: 12 })
+        .attr({ 'text-anchor': 'end', 'dominant-baseline': 'middle' })
+        .move(scaleX + 30, y - 5);
+      }
+    }
+  }
+  
+  drawSleeve(g, x, y, width, height,'blue');
+}
+
+function drawSleeve(g, x, y, width, height, color) {
+  // Remove any previous sleeve (path or group)
+  if (sleeve && typeof sleeve.remove === 'function') {
+    sleeve.remove();
+  }
+
+  // Create a fresh group to hold the sleeve runs
+  sleeve = g.group();
+
+  // Draw all arcs into the sleeve group
+  drawGravityArc(sleeve, x, y + 25,  x + width, y + 75,        { sag: 20, tube: 4, color });
+  drawGravityArc(sleeve, x, y + 125, x + width, y + 125 + 50,  { sag: 20, tube: 4, color });
+  drawGravityArc(sleeve, x, y + 225, x + width, y + 225 + 50,  { sag: 20, tube: 4, color });
+  drawGravityArc(sleeve, x, y + 325, x + width, y + 325 + 50,  { sag: 20, tube: 4, color });
+}
+
+function drawGravityArc(g, x1, y1, x2, y2, opts = {}) {
+  const tube = opts.tube ?? 4;          
+  const color = opts.color ?? '#d86f1f';      
+  const dashed = !!opts.dashed;                
+  const sagInput = opts.sag;                   
+  
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const dist = Math.hypot(dx, dy);
+  const sag = (sagInput != null) ? sagInput : Math.max(12, dist * 0.2);
+  
+  
+  const c1x = x1 + dx / 3;
+  const c1y = y1 + dy / 3 + sag;
+  const c2x = x1 + 2 * dx / 3;
+  const c2y = y1 + 2 * dy / 3 + sag;
+  
+  const d = `M ${x1} ${y1} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x2} ${y2}`;
+  const path = g.path(d)
+  .fill('none')
+  .stroke({ width: 15, color, linecap: 'round', linejoin: 'round', opacity: 0.75 });
+  
+  if (dashed) path.stroke({ dasharray: '6,6' });
+  return path;
+}
+
+function drawSyringeVertical(g, vx, vy, L = 220, W = 50, opts = {}) {
+  const s = Math.max(0.4, opts.scale ?? 1);
+  const fillPct = Math.min(1, Math.max(0, opts.fillPct ?? 0.6));
+  const syr = g.group();
+  
+  // Scaled geometry
+  const pad = 6 * s;
+  const barrelW = W * s;
+  const barrelL = L * s;
+  const innerW = barrelW - 2 * pad;
+  const innerL = barrelL - 2 * pad;
+  
+  // Barrel (vertical)
+  const barrel = syr.rect(barrelW, barrelL)
+  .move(vx, vy)
+  .fill('#ffffff')
+  .stroke({ width: 2, color: '#444' })
+  .radius(6 * s);
+  
+  // Liquid (at bottom, near needle)
+  const liquidH0 = innerL * fillPct;
+  const liquidBottomY = vy + barrelL - pad;
+  const liquidY0 = liquidBottomY - liquidH0;
+  const liquid = syr.rect(innerW, liquidH0)
+  .move(vx + pad, liquidY0)
+  .fill('#5d1916')
+  .opacity(0.7)
+  .stroke({ width: 0 });
+  
+  // Plunger head and rod (push from top downward)
+  const headH = Math.max(10 * s, innerW * 0.18);
+  const plungerY0 = liquidY0 - headH;
+  const plunger = syr.rect(innerW, headH)
+  .move(vx + pad, plungerY0)
+  .fill('#888')
+  .stroke({ width: 1, color: '#666' });
+  
+  const rodW = Math.max(6 * s, innerW * 0.18);
+  const rodH = 30 * s;
+  const rod = syr.rect(rodW, rodH)
+  .move(vx + (barrelW - rodW) / 2, (vy - rodH))
+  .fill('#bbb')
+  .stroke({ width: 1, color: '#777' });
+  
+  // Nozzle and needle (pointing down)
+  const nozzleH = Math.max(10 * s, barrelW * 0.22);
+  const nozzleL = 18 * s;
+  const nozzle = syr.rect(nozzleH, nozzleL)
+  .move(vx + (barrelW - nozzleH) / 2, vy + barrelL)
+  .fill('#ccc')
+  .stroke({ width: 2, color: '#444' })
+  .radius(2 * s);
+  
+  const needleLen = 40 * s;
+  const needleX = vx + barrelW / 2;
+  const needleTop = vy + barrelL + nozzleL;
+  const needle = syr.line(needleX, needleTop, needleX, needleTop + needleLen)
+  .stroke({ width: 2, color: '#444', linecap: 'round' });
+  
+  const obj = {
+    vertical: true,
+    group: syr,
+    barrel, liquid, plunger, rod, nozzle, needle,
+    // anchors & sizes (unscaled inputs retained for redraw)
+    anchorX: vx, anchorY: vy, L0: L, W0: W,
+    scale: s,
+    pad, innerW, innerL,
+    headH,
+    liquidBottomY, liquidY0, liquidH0,
+    plungerY0,
+    needleTip: { x: needleX, y: needleTop + needleLen },
+    filled: fillPct > 0,
+    animating: false,
+    initFillPct: fillPct
+  };
+  
+  obj.liquidWeight = Math.min(2.0, Math.max(1.6, opts.liquidWeight ?? 1.8));
+  obj.minWeight = 1.6;
+  obj.maxWeight = 2.0;
+  obj.weightStep = 0.1;
+  
+  // Click disabled; use the external Push/Refill button instead
+  return obj;
+}
+
+function animateSyringeVertical(obj) {
+  if (obj.animating || !obj.filled) return;
+  obj.animating = true;
+  const dur = 1200;
+  
+  // Jet parameters derived from selected weight (1.6–2.0 g)
+  const w = obj.liquidWeight ?? 1.8;
+  const factor = Math.max(0, Math.min(1, (w - 1.6) / 0.4)); // 0..1 across 1.6g..2.0g
+  const jetLen = 90 * obj.scale + 90 * factor * obj.scale;  // ~90..180 px
+  const jetWidth = 3 * obj.scale + 2 * factor * obj.scale;  // thicker for heavier liquid
+  
+  // Push: plunger down to bottom, liquid height to 0, jet downward
+  const plungerFinalY = obj.liquidBottomY - obj.headH;
+  const liquidFinalY = obj.liquidBottomY;
+  
+  obj.plunger.animate(dur, '<>').y(plungerFinalY);
+  obj.liquid.animate(dur, '<>').y(liquidFinalY).height(0);
+  
+  const jet = obj.group.line(obj.needleTip.x, obj.needleTip.y, obj.needleTip.x, obj.needleTip.y)
+  .stroke({ width: jetWidth, color: '#1e90ff', linecap: 'round', opacity: 0.95 });
+  
+  jet.animate(dur * 0.55, '<>').plot(
+    obj.needleTip.x, obj.needleTip.y,
+    obj.needleTip.x, obj.needleTip.y + jetLen
+  ).after(() => {
+    jet.animate(280).opacity(0).after(() => {
+      jet.remove();
+      obj.animating = false;
+      obj.filled = false;          // stay empty; no auto-refill
+      refreshSyringeControls();    // update button state/label
+      pressure.text(computePressureWithConstantVolume(w, currentTempC).toFixed(2));
+      liquidWeight = w;
+      liquidPushed = true;
+    });
+  });
+}
+
+function drawSyringeControls(g) {
+  // Remove prior controls if present
+  if (syringeControls && syringeControls.group) syringeControls.group.remove();
+  const ui = g.group();
+  
+  // Base position: left side of the reactor (fallback to syringe anchor if bounds missing)
+  const btnW = 84, btnH = 26;
+  const margin = 325;
+  let px = reactorBounds ? (reactorBounds.x - margin - btnW) : (syringeObj.anchorX - margin - btnW);
+  const py = reactorBounds ? (reactorBounds.y) : (syringeObj.anchorY);
+  const pushBtn = ui.rect(btnW, btnH).move(px + 40, py + 100).fill('green').stroke({ width: 1, color: '#777' }).radius(4).css('cursor', 'pointer');
+  const pushText = ui.text('Push').fill('white').font({ size: 12 }).move(px + 12 + 40, py + 5 + 100).css('pointer-events', 'none');
+  pushBtn.on('click', () => {
+    if (!syringeObj.animating && syringeObj.filled) animateSyringeVertical(syringeObj);
+  });
+  
+  // Weight selector (1.6 g to 2.0 g)
+  const wy = py + btnH + 35;
+  ui.text('cooled liquid N₂O₄ weight').font({ size: 16 }).move(px, wy - 30);
+  
+  px = -110
+  const minus = ui.rect(22, 22).move(px + 60, wy - 2).fill('#f9f9f9').stroke({ width: 1, color: '#888' }).radius(4).css('cursor', 'pointer');
+  ui.text('−').font({ size: 16, weight: 'bold' }).move(px + 66, wy - 2).css('pointer-events', 'none');
+  
+  const weightText = ui.text('1.8 g').font({ size: 12, weight: 'bold' }).move(px + 88, wy);
+  
+  const plus = ui.rect(22, 22).move(px + 132, wy - 2).fill('#f9f9f9').stroke({ width: 1, color: '#888' }).radius(4).css('cursor', 'pointer');
+  ui.text('+').font({ size: 16, weight: 'bold' }).move(px + 138, wy - 2).css('pointer-events', 'none');
+  
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const step = () => +(Math.round(syringeObj.weightStep * 10) / 10).toFixed(1);
+  
+  minus.on('click', () => {
+    if (syringeObj.animating) return;
+    syringeObj.liquidWeight = clamp(+(syringeObj.liquidWeight - 0.1).toFixed(1), syringeObj.minWeight, syringeObj.maxWeight);
+    updateSyringeFillFromWeight(syringeObj, true);
+    refreshSyringeControls();
+  });
+  
+  plus.on('click', () => {
+    if (syringeObj.animating) return;
+    syringeObj.liquidWeight = clamp(+(syringeObj.liquidWeight + 0.1).toFixed(1), syringeObj.minWeight, syringeObj.maxWeight);
+    updateSyringeFillFromWeight(syringeObj, true);
+    refreshSyringeControls();
+  });
+  
+  syringeControls = { group: ui, pushBtn, pushText, weightText };
+  refreshSyringeControls();
+}
+
+function refreshSyringeControls() {
+  if (!syringeControls) return;
+  // Update button label and styling based on fill state
+  const isFilled = !!(syringeObj && syringeObj.filled);
+  syringeControls.pushText.text(isFilled ? 'push N₂O₄' : 'empty');
+  // subtle disabled look when empty
+  syringeControls.pushBtn.fill(isFilled ? 'green' : '#e9e9e9');
+  syringeControls.pushBtn.stroke({ width: 1, color: isFilled ? '#777' : '#bbb' });
+  syringeControls.pushBtn.css('cursor', isFilled ? 'pointer' : 'not-allowed');
+  
+  // Update weight text (1.6..2.0 g)
+  const w = syringeObj && syringeObj.liquidWeight ? syringeObj.liquidWeight : 1.8;
+  syringeControls.weightText.text(`${w.toFixed(1)} g`);
+}
+
+function updateSyringeFillFromWeight(obj, animateShapes) {
+  if (!obj) return;
+  const w = obj.liquidWeight ?? 1.8;
+  const factor = Math.max(0, Math.min(1, (w - 1.6) / 0.4)); // 0..1 for 1.6g..2.0g
+  const minFill = 0.30; // 30% at 1.6 g
+  const maxFill = 0.90; // 90% at 2.0 g
+  const fillPct = minFill + factor * (maxFill - minFill);
+  
+  const newLiquidH = obj.innerL * fillPct;
+  const newLiquidY = obj.liquidBottomY - newLiquidH;
+  const newPlungerY = newLiquidY - obj.headH;
+  
+  // Update target baselines used by refill/push logic
+  obj.liquidH0 = newLiquidH;
+  obj.liquidY0 = newLiquidY;
+  obj.plungerY0 = newPlungerY;
+  
+  // If currently filled, reflect change visibly
+  if (obj.filled) {
+    if (animateShapes) {
+      obj.liquid.animate(200, '<>').y(newLiquidY).height(newLiquidH);
+      obj.plunger.animate(200, '<>').y(newPlungerY);
+    } else {
+      obj.liquid.y(newLiquidY).height(newLiquidH);
+      obj.plunger.y(newPlungerY);
+    }
+  }
+}
+
+function drawSwitch(draw, x, y, width, height, opacity = 1, toggle = (isOn) => {}) {
+  const switchGroup = draw.group();
+  switchGroup.isOn = false;
+  switchGroup.toggle = toggle;
+  const handleWidth = 5;
+  const handleHeight = height * 0.8;
+  const handle = switchGroup.rect(handleWidth, handleHeight)
+    .fill({ color: '#aaa', opacity: opacity })
+    .move(x + (width - handleWidth) / 2, y - height / 2);
+  switchGroup.handle = handle;
+
+  // Background body (make it explicitly clickable)
+  const body = switchGroup.rect(width, height)
+    .fill({ color: '#555', opacity: opacity })
+    .radius(height / 5)
+    .move(x, y)
+    .css('cursor', 'pointer')
+    .attr({ 'pointer-events': 'all' });
+
+  switchGroup.text('OFF')
+    .font({ size: 12, anchor: 'middle', fill: '#fff' })
+    .center(x + width * 0.25, y + height / 2);
+  switchGroup.text('ON')
+    .font({ size: 12, anchor: 'middle', fill: '#fff' })
+    .center(x + width * 0.75, y + height / 2);
+
+  handle.rotate(-20, x + width / 2, y + height / 2);
+
+  const onToggle = () => {
+    // Flip persistent state on the group
+    switchGroup.isOn = !switchGroup.isOn;
+    console.log('[drawSwitch] clicked -> isOn:', switchGroup.isOn);
+
+    // Rotate handle based on new state
+    if (switchGroup.isOn) {
+      handle.rotate(40, x + width / 2, y + height / 2);
+    } else {
+      handle.rotate(-40, x + width / 2, y + height / 2);
+    }
+
+    // Invoke external callback with the correct state
+    if (typeof switchGroup.toggle === 'function') {
+      try {
+        switchGroup.toggle(switchGroup.isOn);
+      } catch (e) {
+        console.error('[drawSwitch] toggle callback error:', e);
+      }
+    } else {
+      console.warn('[drawSwitch] No toggle callback set');
+    }
+  };
+
+  // Bind clicks to both the body and handle to be safe across SVG.js versions
+  switchGroup.on('click', onToggle);
+  // handle.on('click', onToggle);
+
+  return switchGroup;
+}
+
+
+function drawTemperatureController(g, px, py) {
+  // Remove prior UI if it exists
+  if (tempController && tempController.group) tempController.group.remove();
+
+  const ui = g.group();
+
+  // Panel
+  const panelW = 170, panelH = 80;
+  const panel = ui.rect(panelW, panelH)
+    .move(px, py)
+    .fill('#f8f8f8')
+    .stroke({ width: 1, color: '#999' })
+    .radius(8);
+
+  // Title
+  const title = ui.text('Temperature')
+    .font({ size: 14, weight: 'bold' })
+    .move(px + 10, py + 8);
+
+  // Readout box
+  const readoutBox = ui.rect(86, 32)
+    .move(px + 10, py + 32)
+    .fill('#ffffff')
+    .stroke({ width: 1, color: '#bbb' })
+    .radius(4);
+
+  const readoutText = ui.text('25 °C')
+    .font({ size: 16, weight: 'bold' })
+    .move(px + 18, py + 36);
+
+  // +/- buttons to change temperature (enabled only when heater is ON)
+  const btnW = 28, btnH = 28;
+  const minusBtn = ui.rect(btnW, btnH)
+    .move(px + 104, py + 34)
+    .fill('#efefef')
+    .stroke({ width: 1, color: '#aaa' })
+    .radius(6)
+    .css('cursor', 'pointer');
+  ui.text('−').font({ size: 18, weight: 'bold' }).move(px + 113, py + 34).css('pointer-events', 'none');
+
+  const plusBtn = ui.rect(btnW, btnH)
+    .move(px + 138, py + 34)
+    .fill('#efefef')
+    .stroke({ width: 1, color: '#aaa' })
+    .radius(6)
+    .css('cursor', 'pointer');
+  ui.text('+').font({ size: 18, weight: 'bold' }).move(px + 145, py + 34).css('pointer-events', 'none');
+
+  // Hint text
+  // const hint = ui.text('range 25–45 °C (step 5)')
+  //   .font({ size: 11, style: 'italic' })
+  //   .move(px + 10, py + 74);
+
+  // Wire up interactions
+  minusBtn.on('click', () => {
+    if (!heaterOn) return; // disabled when OFF
+    setTemperature(currentTempC - 5);
+  });
+  plusBtn.on('click', () => {
+    if (!heaterOn) return; // disabled when OFF
+    setTemperature(currentTempC + 5);
+  });
+
+  tempController = {
+    group: ui,
+    panel,
+    readoutBox,
+    readoutText,
+    minusBtn,
+    plusBtn
+  };
+
+  refreshTempController();
+}
+
+function refreshTempController() {
+  if (!tempController) return;
+
+  // Readout text
+  tempController.readoutText.text(`${currentTempC} °C`);
+
+  // Enabled/disabled styling for buttons based on heater state
+  const activeFill = '#efefef';
+  const inactiveFill = '#eeeeee';
+  const activeStroke = '#aaa';
+  const inactiveStroke = '#ddd';
+  const cursor = heaterOn ? 'pointer' : 'not-allowed';
+
+  tempController.minusBtn.fill(heaterOn ? activeFill : inactiveFill)
+    .stroke({ width: 1, color: heaterOn ? activeStroke : inactiveStroke })
+    .css('cursor', cursor);
+  tempController.plusBtn.fill(heaterOn ? activeFill : inactiveFill)
+    .stroke({ width: 1, color: heaterOn ? activeStroke : inactiveStroke })
+    .css('cursor', cursor);
+
+  // Readout box tint when heating
+  tempController.readoutBox.fill(heaterOn ? '#fff7e6' : '#ffffff');
+}
