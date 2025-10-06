@@ -251,12 +251,10 @@ export function initButton(id: string, onClick: () => void) {
         }, delay);
     }
 
-    btn.addEventListener("mousedown", start);
-    btn.addEventListener("touchstart", start);
+    btn.addEventListener("pointerdown", start);
 
-    btn.addEventListener("mouseup", stop);
-    btn.addEventListener("mouseleave", stop);
-    btn.addEventListener("touchend", stop);
+    btn.addEventListener("pointerup", stop);
+    btn.addEventListener("pointerleave", stop);
 }
 
 /**
