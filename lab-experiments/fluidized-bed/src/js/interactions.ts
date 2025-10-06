@@ -1,7 +1,7 @@
 import { ValveSetting, vec2 } from "../types";
 import { resetBeakers } from "./animation";
 import { updateCanvasPosition } from "./canvas";
-import { constrain, logscale, rescale, smoothLerp } from "./helpers";
+import { constrain, getDistance, logscale, rescale, smoothLerp } from "./helpers";
 import State from "./state";
 
 /* ********************** */
@@ -24,7 +24,7 @@ function findAngleFromDown(A: vec2, B: vec2) {
  *  Interaction for valve 1
  */
 var v1Angle = 90;
-valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
+valve1.addEventListener("pointerdown", ({ clientX, clientY }) => {
     // Find centroid
     var offset = valve1.getBoundingClientRect();
     var center: vec2 = {
@@ -32,13 +32,13 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
         y: (offset.top + offset.bottom) / 2,
     };
 
-    // Get client mouse position
+    // Get client pointer position
     var client = vec2(clientX, clientY);
 
-    // Get initial mouse angle
+    // Get initial pointer angle
     let th0 = findAngleFromDown(center, vec2(clientX, clientY));
 
-    const drag = ({ clientX, clientY }: MouseEvent) => {
+    const drag = ({ clientX, clientY }: MouseEvent | Touch) => {
         // Find angle from centroid to mouse
         let th = findAngleFromDown(center,vec2(clientX,clientY));
         // Find difference and reset th
@@ -62,12 +62,12 @@ valve1.addEventListener("mousedown", ({ clientX, clientY }) => {
         // }, 350);
     };
     const release = () => {
-        document.removeEventListener("mousemove", drag);
-        document.removeEventListener("mouseup", release);
+        document.removeEventListener("pointermove", drag);
+        document.removeEventListener("pointerup", release);
     };
 
-    document.addEventListener("mousemove", drag);
-    document.addEventListener("mouseup", release);
+    document.addEventListener("pointermove", drag);
+    document.addEventListener("pointerup", release);
 });
 
 // Set initial
@@ -174,96 +174,127 @@ function containsParentWithID(elem: HTMLElement, ids: string | Array<string>) {
     return false;
 }
 
-export function enableSvgZoom() {
-    const wrapper = document.getElementById("apparatus-wrapper");
+export function initSvgZoom() {
+    const wrapper = document.getElementById("apparatus-wrapper")!;
     const svg = wrapper.childNodes[0] as unknown as SVGAElement;
-    const viewBox = svg.getAttribute("viewBox").split(" ").map(Number);
+    const viewBox = svg.getAttribute("viewBox")!.split(" ").map(Number);
     viewState = {
         maxViewBox: viewBox,
         curViewBox: viewBox
     };
 
-  wrapper.addEventListener("wheel", (e) => {
-    e.preventDefault();
-    // set the scaling factor (and make sure it's at least 10%)
-    let scale = e.deltaY / 1000;
-    scale =
-      Math.abs(scale) < 0.1 ? (0.1 * e.deltaY) / Math.abs(e.deltaY) : scale;
+    const zoom = (scale: number, pt: DOMPoint) => {
+        // alert(scale)
+        pt = pt.matrixTransform(svg.getScreenCTM()!.inverse());
 
-    // get point in SVG space
-    let pt = new DOMPoint(e.clientX, e.clientY);
-    pt = pt.matrixTransform(svg.getScreenCTM().inverse());
+        // get viewbox transform
+        let [x, y, width, height] = svg
+        .getAttribute("viewBox")!
+        .split(" ")
+        .map(Number);
+        const amountZoomed =
+        width / (viewState.maxViewBox[2] - viewState.maxViewBox[0]);
+        scale *= Math.max(0.1, amountZoomed);
 
-    // get viewbox transform
-    let [x, y, width, height] = svg
-      .getAttribute("viewBox")
-      .split(" ")
-      .map(Number);
-    const amountZoomed =
-      width / (viewState.maxViewBox[2] - viewState.maxViewBox[0]);
-    scale *= Math.max(0.1, amountZoomed);
+        // get pt.x as a proportion of width and pt.y as proportion of height
+        let [xPropW, yPropH] = [(pt.x - x) / width, (pt.y - y) / height];
 
-    // get pt.x as a proportion of width and pt.y as proportion of height
-    let [xPropW, yPropH] = [(pt.x - x) / width, (pt.y - y) / height];
+        // calc new width and height, new x2, y2 (using proportions and new width and height)
+        let [width2, height2] = [
+        Math.min(viewState.maxViewBox[2], width + width * scale),
+        Math.min(viewState.maxViewBox[3], height + height * scale),
+        ];
+        let x2 = Math.max(0, pt.x - xPropW * width2);
+        let y2 = Math.max(0, pt.y - yPropH * height2);
 
-    // calc new width and height, new x2, y2 (using proportions and new width and height)
-    let [width2, height2] = [
-      Math.min(viewState.maxViewBox[2], width + width * scale),
-      Math.min(viewState.maxViewBox[3], height + height * scale),
-    ];
-    let x2 = Math.max(0, pt.x - xPropW * width2);
-    let y2 = Math.max(0, pt.y - yPropH * height2);
+        [width2, height2] = [
+        Math.max(10, Math.min(viewState.maxViewBox[2] - x2, width2)),
+        Math.max(10, Math.min(viewState.maxViewBox[3] - y2, height2)),
+        ];
 
-    [width2, height2] = [
-      Math.max(10, Math.min(viewState.maxViewBox[2] - x2, width2)),
-      Math.max(10, Math.min(viewState.maxViewBox[3] - y2, height2)),
-    ];
+        if (
+        Number.isNaN(x2) ||
+        Number.isNaN(y2) ||
+        Number.isNaN(width2) ||
+        Number.isNaN(height2)
+        ) {
+        return;
+        }
 
-    if (
-      Number.isNaN(x2) ||
-      Number.isNaN(y2) ||
-      Number.isNaN(width2) ||
-      Number.isNaN(height2)
-    ) {
-      return;
+        svg.setAttribute("viewBox", `${x2} ${y2} ${width2} ${height2}`);
     }
 
-    svg.setAttribute("viewBox", `${x2} ${y2} ${width2} ${height2}`);
-    updateCanvasPosition();
-  });
+    wrapper.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        // set the scaling factor (and make sure it's at least 10%)
+        let scale = e.deltaY / 1000;
+        scale = Math.abs(scale) < 0.1 ? (0.1 * e.deltaY) / Math.abs(e.deltaY) : scale;
+        // get point in SVG space
+        let pt = new DOMPoint(e.clientX, e.clientY);
+        // Zoom
+        console.log(scale)
+        zoom(scale, pt);
+    });
+
+    let startDist: number | null = null;
+    wrapper.addEventListener("touchstart", (e) => {
+        if (e.touches.length !== 2) return;
+        e.preventDefault();
+        const dist = getDistance(e.touches);
+        startDist = dist;
+    });
+
+    wrapper.addEventListener("touchmove", (e) => {
+        if (e.touches.length !== 2) return;
+        if (startDist === null) return;
+        e.preventDefault();
+        // Get the distance between the two points
+        const dist = getDistance(e.touches);
+        const scale = constrain((startDist / dist - 1) * 2, -.1, .1);
+        // alert(`scale = ${scale}`)
+        startDist = dist;
+
+        // Find the average point
+        const pt = new DOMPoint((e.touches.item(0)!.clientX + e.touches.item(1)!.clientX) / 2,
+                                    (e.touches.item(0)!.clientY + e.touches.item(1)!.clientY) / 2);
+
+        zoom(scale, pt)
+    });
+    wrapper.addEventListener("touchend", e => {
+        if (e.touches.length < 2) {
+            startDist = null;
+        }
+    });
 }
 
-var mousedown = false;
-var viewX = 0;
-var viewY = 0;
-export function enableSvgDrag() {
+export function initSvgDrag() {
     // Get the svg context
-    const wrapper = document.getElementById("apparatus-wrapper");
+    const wrapper = document.getElementById("apparatus-wrapper")!;
     const svg = wrapper.childNodes[0] as unknown as SVGAElement;
     // Set defaults
     let isDragging = false;
     let prevX = 0;
     let prevY = 0;
 
-    svg.addEventListener("mousedown", (e) => {
+    svg.addEventListener("pointerdown", (e) => {
         if (containsParentWithID(e.target as HTMLElement, ['Valve','Valve_2'])) return;
-        mousedown = true;
         isDragging = true;
         prevX = e.clientX;
         prevY = e.clientY;
     });
 
-    // Hold mouse to move the camera around
-    svg.addEventListener("mousemove", (e) => {
+    // Hold pointer to move the camera around
+    svg.addEventListener("pointermove", (e) => {
         if (isDragging) {
         const [x, y, width, height] = svg
-            .getAttribute("viewBox")
+            .getAttribute("viewBox")!
             .split(" ")
             .map(Number);
+        // const dx = ((prevX - e.clientX) * width) / svg.clientWidth;
         const dx = ((prevX - e.clientX) * width) / svg.clientWidth;
         const dy = ((prevY - e.clientY) * height) / svg.clientHeight;
-        viewX = Math.max(0, x + dx);
-        viewY = Math.max(0, y + dy);
+        let viewX = Math.max(0, x + dx);
+        let viewY = Math.max(0, y + dy);
         let viewWidth = Math.min(viewState.maxViewBox[2], width);
         let viewHeight = Math.min(viewState.maxViewBox[3], height);
         if (viewX + viewWidth >= viewState.maxViewBox[2]) {
@@ -278,13 +309,11 @@ export function enableSvgDrag() {
         );
         prevX = e.clientX;
         prevY = e.clientY;
-        updateCanvasPosition();
         }
     });
 
-    document.addEventListener("mouseup", () => {
+    document.addEventListener("pointerup", () => {
         isDragging = false;
-        mousedown = false;
     });
 }
 
@@ -350,7 +379,7 @@ export function addMagnifier() {
     });
 }
 
-enableSvgZoom();
-enableSvgDrag();
+initSvgZoom();
+initSvgDrag();
 updateCanvasPosition();
 addMagnifier();
