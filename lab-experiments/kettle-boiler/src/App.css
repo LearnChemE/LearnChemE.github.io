@@ -6,6 +6,13 @@
   position: relative;
 }
 
+svg {
+  -webkit-user-select: none; /* iOS Safari */
+  -webkit-touch-callout: none; /* Disable long-press menu */
+  user-select: none;
+  touch-action: none;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
