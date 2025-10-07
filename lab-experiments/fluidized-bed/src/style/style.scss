@@ -2,9 +2,12 @@
   margin: 10px;
 }
 
-// canvas {
-//   margin: 30px;
-// }
+svg {
+  -webkit-user-select: none; /* iOS Safari */
+  -webkit-touch-callout: none; /* Disable long-press menu */
+  user-select: none;
+  touch-action: none;
+}
 
 .sim-wrapper {
   display: grid;

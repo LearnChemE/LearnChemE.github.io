@@ -20,8 +20,8 @@ export const GlobeValve: Component<GlobeValveProps> = ({ onLiftChange }) => {
     isDragging = true;
     const svgMozCoords = getSVGCoords(e);
     prevTh = getAngleFromDown({x:498, y:629}, {x:svgMozCoords.x, y:svgMozCoords.y});
-    document.addEventListener("mousemove", onDrag);
-    document.addEventListener("mouseup", endDrag);
+    document.addEventListener("pointermove", onDrag);
+    document.addEventListener("pointerup", endDrag);
   };
 
   // On drag
@@ -61,8 +61,8 @@ export const GlobeValve: Component<GlobeValveProps> = ({ onLiftChange }) => {
   // End drag
   const endDrag = () => {
     isDragging = false;
-    document.removeEventListener("mousemove", onDrag);
-    document.removeEventListener("mouseup", endDrag);
+    document.removeEventListener("pointermove", onDrag);
+    document.removeEventListener("pointerup", endDrag);
   };
 
   // Render
@@ -102,7 +102,7 @@ export const GlobeValve: Component<GlobeValveProps> = ({ onLiftChange }) => {
           stroke="black"
         />
       </g>
-      <g id="feedValve" class="drag-exempt globeValveHandle" onmousedown={beginDrag} transform={`rotate(${currentAngle()} 498 629)`}>
+      <g id="feedValve" class="drag-exempt globeValveHandle" onpointerdown={beginDrag} transform={`rotate(${currentAngle()} 498 629)`}>
         <circle cx="498" cy="629" r="20" fill="red" opacity={0} />
         <path
           id="valve"
