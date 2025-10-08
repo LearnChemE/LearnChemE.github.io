@@ -7,4 +7,7 @@ export default defineConfig({
     outDir: "dist",
     sourcemap: true
   },
+  define: {
+    __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
+  },
 });

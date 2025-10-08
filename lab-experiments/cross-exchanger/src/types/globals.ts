@@ -1,8 +1,9 @@
 import { AnimationLoop, type AnimationFn } from ".";
 import { fanAnimation, makeFlowAnimation, makeThermometerAnimation } from "../ts/animations";
 import { Balance } from "./calcs";
+declare const __DEV__: boolean;
 
-export const FLOWRATE_GAIN = 16; // mL / min
+export const FLOWRATE_GAIN = 37.5; // mL / s
 
 export const THERMOMETER_NONE = 0;
 export const THERMOMETER_TANK = 1;
@@ -78,5 +79,10 @@ export class Simulation {
         this.addAnimation(makeFlowAnimation(this.state));
         this.addAnimation(makeThermometerAnimation(this.state));
     }
+
+    public getInfo = () => {
+        return this.state;
+    }
+    
 }
 

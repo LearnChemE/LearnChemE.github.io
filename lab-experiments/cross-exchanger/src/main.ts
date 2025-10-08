@@ -28,3 +28,11 @@ initInteractables(State);
 initSvgZoom();
 initSvgDrag();
 enableWindowResize();
+
+declare const __DEV__: boolean;
+// Debug
+if (__DEV__) {
+    import("./debug").then(({ debug }) => {
+        debug(State.getInfo());
+    });
+}
