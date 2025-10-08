@@ -545,10 +545,26 @@ function draw() {
     noStroke();
     fill(0);
     textSize(14);
-    textAlign(LEFT, CENTER);
-    text(`Depth: ${snapX.toPrecision(3)} µm`, px + 10, py - 20);
-    text(`Intensity: ${snapY.toPrecision(3)} mW/cm²`, px + 10, py);
-  }
+    
+    // Determine text width for spacing check
+    const depthText = `Depth: ${snapX.toPrecision(3)} µm`;
+    const intensityText = `Intensity: ${snapY.toPrecision(3)} mW/cm²`;
+    const textW = max(textWidth(depthText), textWidth(intensityText));
+    
+    // Default offsets
+    let xOffset = 10;
+    let alignMode = LEFT;
+    
+    // If too close to right edge, flip alignment to keep inside plot
+    if (px + textW + 20 > width) {
+      xOffset = -10;
+      alignMode = RIGHT;
+    }
+  
+    textAlign(alignMode, CENTER);
+    text(depthText, px + xOffset, py - 20);
+    text(intensityText, px + xOffset, py);
+    }
 
   // Combined absorptivity * concentration
   const totalAbsConc = Absorb * Conc + inertAbsorb * inertConc;
