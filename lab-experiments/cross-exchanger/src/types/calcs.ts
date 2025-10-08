@@ -6,11 +6,11 @@ const INIT_TANK_TEMP = 60; // C
 const UA_TANK = 1e-1; // W / K
 const UA_TUBE = 2e-1; // W / K
 const UA_HEX = 25; // W / K
-const CP = 4.184; // J / g / K
+export const CP = 4.184; // J / g / K
 const RHO = 0.998 // g / mL
 
-const CP_AIR = 1.006; // J / g / K
-const MDOT_AIR = 20; // g / s
+export const CP_AIR = 1.006; // J / g / K
+export const MDOT_AIR = 20; // g / s
 
 function calcQ(t1: number, T1: number, Ca: number, Cl: number) {
     const [Cmin , Cmax] = [Ca, Cl].sort();
@@ -74,16 +74,15 @@ export class Balance {
         const tubeTemp = this.tubeTemp;
 
         // Calculate HEX Values
-        const C_liq = flowrate * CP;
+        const C_liq = flowrate * CP; // W / K
         const C_air = fanIsOn ? MDOT_AIR * CP_AIR : 0.2 * CP_AIR;
 
         // Calculate heat exchange from HEX
-        const Qhex = (flowrate > 0 && liqInHex) ? calcQ(25, this.tubeTemp, C_air, C_liq) : 0;
-        console.log(`Qhex:`, Qhex);
+        const Qhex = (flowrate > 0 && liqInHex) ? calcQ(25, this.tankTemp, C_air, C_liq) : 0;
 
-        // // Calculate heat rates
-        const dQdt_tank = UA_TANK * (ROOM_TEMP - tankTemp) + flowrate * CP * (tubeTemp - tankTemp);
-        const dQdt_tube = UA_TUBE * (ROOM_TEMP - tubeTemp) + flowrate * CP * (tankTemp - tubeTemp) - Qhex;
+        // Calculate heat rates
+        const dQdt_tank = UA_TANK * (ROOM_TEMP - tankTemp) + C_liq * (tubeTemp - tankTemp);
+        const dQdt_tube = UA_TUBE * (ROOM_TEMP - tubeTemp) + C_liq * (tankTemp - tubeTemp) - Qhex;
 
         // Use the hex energy balance to calculate the theoretical air temp
         const airTempTheoretical = 25 + Qhex / C_air;
@@ -93,7 +92,16 @@ export class Balance {
 
         // Translate to rhs
         const dT_tank = this.tankFill !== 0 ? dQdt_tank / RHO / this.tankFill / CP * dt : 0; // K / s
-        const dT_tube = this.tubeFill !== 0 ? dQdt_tube / RHO / this.tubeFill / CP * dt : 0; // K / s
+        let dT_tube = 0;
+        if (this.tubeFill <= 0) {
+            dT_tube = 0;
+        }
+        else if (flowrate === 0) {
+            dT_tube = dQdt_tube / RHO / this.tubeFill / CP * dt;
+        }
+        else {
+            dT_tube = dQdt_tube / C_liq; // K / s
+        }
 
         // Evolve
         this.tankTemp += dT_tank;

@@ -100,7 +100,7 @@ export const makeFlowAnimation = (state: GlobalState): AnimationFn => {
         }
 
         // Integrate
-        const flow = state.outIsFlowing ? state.lift * FLOWRATE_GAIN : 0;
+        const flow = state.outIsFlowing ? state.lift * FLOWRATE_GAIN : 0; // mL / min
         state.systemBalance.integrate(flow, dt, state.fanIsOn, state.liqInHex);
     };
 }
