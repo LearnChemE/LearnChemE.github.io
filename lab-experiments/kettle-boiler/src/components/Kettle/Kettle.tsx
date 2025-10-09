@@ -4,6 +4,9 @@ import { animateChamberEnergyBalance, animateChamberMassBalance, calculateSteamO
 import { Boils } from "../Boils/Boils";
 import { Steam } from "../Steam/Steam";
 
+// Debug in dev mode only
+declare const __DEV__: boolean;
+
 export interface KettleProps {
   // Inputs
   feedRate: () => number; // in gal/min
