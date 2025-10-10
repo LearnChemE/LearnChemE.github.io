@@ -395,3 +395,53 @@ export function animate(fn: (dt: number, t: number) => boolean, then?: () => voi
     }
     requestAnimationFrame(frame);
 }
+
+type Coords = { x: number, y: number }
+/**
+ * Create a drag response function.
+ * @param onDrag Callback for each time the pointer is moved during drag
+ * @returns Callback to be attached to onpointerdown event
+ */
+export function createDrag(
+    onDrag: (
+        newCoords: Coords,
+        previousCoords: Coords
+    ) => void, 
+    onDragStart?: (coords: Coords) => void,
+    onDragEnd?: () => void
+) {
+    let isDragging = false;
+    let lastCoords = { x: 0, y: 0 };
+
+    // Begin drag
+    const beginDrag = (e: MouseEvent) => {
+        e.preventDefault();
+        isDragging = true;
+        lastCoords = { x: e.clientX, y: e.clientY };
+        document.addEventListener("pointermove", drag);
+        document.addEventListener("pointerup", endDrag);
+        onDragStart?.(lastCoords);
+    };
+
+    // On drag
+    const drag = (e: MouseEvent) => {
+        if (!isDragging) return;
+
+        // Call the callback with the new coords
+        const newCoords = { x: e.clientX, y: e.clientY };
+        onDrag(newCoords, lastCoords);
+
+        // Update coords
+        lastCoords = newCoords;
+    };
+
+    // End drag
+    const endDrag = () => {
+        isDragging = false;
+        document.removeEventListener("pointermove", drag);
+        document.removeEventListener("pointerup", endDrag);
+        onDragEnd?.();
+    };
+
+    return beginDrag;
+}
