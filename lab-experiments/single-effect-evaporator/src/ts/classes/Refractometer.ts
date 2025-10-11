@@ -55,7 +55,7 @@ export class Refractometer {
                     }
                     break;
                 case 2:
-                    var targTh = 10.5;
+                    var targTh = 30.4;
                     th = smoothLerp(th, targTh, Math.exp(-6), dt);
                     if (Math.abs(th - targTh) < .01) stage++;
                     break;
@@ -75,7 +75,7 @@ export class Refractometer {
             }
 
             this.bPipette.setAttribute("transform", `rotate(${th}, 650, 300)`);
-            this.rPipette.setAttribute("transform", `rotate(${th}, 850, 145)`);
+            this.rPipette.setAttribute("transform", `rotate(${th}, 560, 400)`);
 
             return this.playing;
         });
