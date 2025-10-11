@@ -12,7 +12,7 @@ export function initHamburgerMenu(worksheet: string, worksheetDownload: string) 
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'menu-button';
-    btn.innerHTML = `<div>☰</div>`;
+    btn.innerHTML = `<i class="fa-solid fa-bars" ></i>`;
 
     // Create download element
     const download = document.createElement("a");
@@ -271,4 +271,39 @@ export function makeObservable<T extends object>(obj: T, onChange: (prop: string
             return true;
         }
     });
+}
+
+/**
+ * Animate function to be called every frame.
+ * @param fn Function to call every frame. dt is time since last call in seconds, t is total time in ms. Return true to continue, false to stop.
+ * @param then Optional function to call when animation ends.
+ */
+export function animate(fn: (dt: number, t: number) => boolean, then?: () => void) {
+    let prevtime: number | null = null;
+
+    const frame = (time: number) => {
+        if (prevtime === null) prevtime = time;
+        const dt = (time - prevtime) / 1000; // in ms
+        prevtime = time;
+
+        // Call the function
+        const playing = fn(dt, time);
+
+        // Request next frame
+        if (playing) requestAnimationFrame(frame);
+        else then?.();
+    }
+    requestAnimationFrame(frame);
+}
+
+/**
+ * Smoothly lerp x towards targ using a framerate independant exponential decay function
+ * @param x number to lerp
+ * @param targ lerp target
+ * @param r lerping constant. Use form Math.exp(-1/tau) where tau is the time constant with same units as dt
+ * @param dt deltaTime. Same units as tau, as used in r.
+ * @returns x, but now lerped towards targ
+ */
+export function smoothLerp(x: number, targ: number, r: number, dt: number) {
+    return (x - targ) * r ** dt + targ;
 }
