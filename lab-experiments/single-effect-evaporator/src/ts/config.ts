@@ -19,9 +19,45 @@ export const steamFlowLabelDescriptor: DigitalLabelDescriptor = {
 };
 
 /**
- * Label for steam temperature
+ * Label for steam flowrate
+ */
+export const steamPresLabelDescriptor: DigitalLabelDescriptor = {
+  id: "steamPresLabel",
+  gid: "steamFlowGauge_2",
+  centerId: "steamPresScreen",
+  fill: "#F9F155",
+  units: "",
+  decimals: 1,
+  initialValue: 20,
+  range: {
+    range: [0, 10000],
+    overflowString: "OVER",
+    underflowString: "UNDER"
+  }
+};
+
+/**
+ * Label for steam flowrate
  */
 export const steamTempLabelDescriptor: DigitalLabelDescriptor = {
+  id: "steamTempLabel",
+  gid: "steamFlowGauge_3",
+  centerId: "steamTempScreen",
+  fill: "#F9F155",
+  units: "",
+  decimals: 1,
+  initialValue: 212.4,
+  range: {
+    range: [0, 10000],
+    overflowString: "OVER",
+    underflowString: "UNDER"
+  }
+};
+
+/**
+ * Label for steam temperature
+ */
+export const tankTempLabelDescriptor: DigitalLabelDescriptor = {
   id: "evapTempLabel",
   gid: "evapTempGauge",
   centerId: "evapTempScreen",
@@ -202,4 +238,19 @@ export const evapLabelDescriptor = {
     decimals: 1,
     initialValue: 0,
     flipToBottom: true
+}
+
+export const refractLabelDescriptor: DigitalLabelDescriptor = {
+  id: "refractLabel",
+  gid: "refract",
+  centerId: "refractScreen",
+  fill: "#000000",
+  units: "°Bx",
+  decimals: 1,
+  initialValue: 0,
+  range: {
+    range: [0, 100],
+    overflowString: "OVER",
+    underflowString: "UNDER"
+  }
 }

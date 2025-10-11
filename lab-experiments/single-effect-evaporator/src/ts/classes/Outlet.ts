@@ -45,7 +45,6 @@ export class Outlet {
 
     private catchAndWeigh = () => {
         if (this.measuring) return;
-        console.log("measuring")
         this.measuring = true;
 
         var prevtime: number | null = null;
@@ -56,14 +55,15 @@ export class Outlet {
             prevtime = time;
 
             const dt = deltaTime / 1000 / 60;
-            const dv = this.flowrate * dt;
+            const m  = this.bucketMass;
+            const dm = this.flowrate * dt;
 
             // Integrate the mass and composition
-            const v = this.bucketMass + dv;
-            this.bucketComp = (v !== 0) ? (this.bucketComp * this.bucketMass + this.composition * this.flowrate) / v : 0;
-            this.bucketMass += dv;
+            this.bucketComp = (m !== 0) ? (this.bucketComp * m + this.composition * dm) / (m + dm) : this.composition;
+            this.bucketMass = m + dm;
 
             this.label.setLabel(this.bucketMass);
+            console.log(this.composition.toFixed(3), this.bucketComp.toFixed(3))
 
             if (this.measuring) requestAnimationFrame(frame);
         }
@@ -79,6 +79,10 @@ export class Outlet {
         this.bucketMass = 0;
         this.bucketComp = 0;
         this.label.setLabel(0);
+    }
+
+    public measureConcentration = () => {
+        return this.bucketMass > 0 ? this.bucketComp : 0;
     }
 
     /**
