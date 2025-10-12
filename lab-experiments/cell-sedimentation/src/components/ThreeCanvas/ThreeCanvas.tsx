@@ -2,15 +2,11 @@ import { onCleanup, onMount, type Component } from "solid-js";
 import * as THREE from "three";
 import "./ThreeCanvas.css";
 import { animate, constrain, createDrag } from "../../ts/helpers";
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
-import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
-import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader";
-import glb from "../../assets/cellSedimentation.glb";
+import { EffectComposer, RenderPass, OutlinePass, GLTFLoader, ShaderPass, FXAAShader } from 'three-stdlib';
+import glbUrl from "../../assets/cellSedimentation.glb?url";
+import { addLights, resize, type Resizable } from "../../ts/threeHelpers";
 
-const asp = 16 / 9;
+const asp = 3/2;
 const r_th = Math.exp(-3);
 
 const Sin = (th: number) => {
@@ -33,29 +29,8 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({}) => {
     let th=0, ph=0;
     let tth=0, tph=0;
 
-    // Resize canvas logic
-    const resizeCanvas = () => {
-        // Read the current asp
-        const windowAspect = window.innerWidth / window.innerHeight;
-        let width: number, height: number;
-
-        if (windowAspect > asp) {
-            // Window is wider than target
-            height = window.innerHeight;
-            width = height * asp;
-        }
-        else {
-            // Window is taller than target
-            width = window.innerWidth;
-            height = width / asp;
-        }
-
-        if (renderer && camera && composer) {
-            renderer.setSize(width, height, false);
-            composer.setSize(width, height);
-            renderer.setPixelRatio(window.devicePixelRatio);
-        }
-    }
+    const resizeable: Resizable = { renderer, composer }; // starts null
+    const resizeCanvas = () => resize(asp, resizeable);
 
     // Drag to rotate
     const drag = createDrag((pt, pv) => {
@@ -78,25 +53,15 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({}) => {
         renderer = new THREE.WebGLRenderer({ canvas });
         renderer.setSize(canvas.clientWidth, canvas.clientHeight);
         renderer.setClearColor("rgb(255,255,255)");
-
-        // scene.add(cube);
-        camera.position.z = 4;
+        resizeable.renderer = renderer;
         
-        // Add a light source
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(5,0,5);
-        light.target.position.set(0,0,0);
-        scene.add(light);
-        // Ambient light
-        const ambient = new THREE.AmbientLight(0xffffff, 2);
-        scene.add(ambient);
-        // Hemisphere light
-        const hemisphere = new THREE.HemisphereLight(0xffffff, 1);
-        scene.add(hemisphere)
+        // Add lights
+        addLights(scene);
 
         // Add renderer to composer object and create render pass
         composer = new EffectComposer(renderer);
         composer.addPass(new RenderPass(scene, camera));
+        resizeable.composer = composer;
 
         // Add outline pass
         const outlinePass = new OutlinePass(
@@ -105,12 +70,11 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({}) => {
             camera
         )
         // Outline pass settings
-        outlinePass.edgeStrength = 3;
+        outlinePass.edgeStrength = 100;
         outlinePass.edgeGlow = 0;
         outlinePass.edgeThickness = .5;
         outlinePass.visibleEdgeColor.set("rgba(0,0,0,1)");
         outlinePass.overlayMaterial.blending = THREE.NormalBlending;
-        // outlinePass.hiddenEdgeColor.set(0x00ff00);
         composer.addPass(outlinePass);
 
         // FXAA Anti-aliasing
@@ -126,20 +90,30 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({}) => {
         // Start loading
         const loader = new GLTFLoader();
         let model!: THREE.Group<THREE.Object3DEventMap>;
-        loader.load(glb, gltf => {
+        // Load model
+        loader.load(glbUrl, gltf => {
+            // After model is loaded:
             model = gltf.scene;
+            // Traverse the object to modify necessary materials
             model.traverse(obj => {
                 if ((obj as THREE.Mesh).isMesh) {
                     const mesh = obj as THREE.Mesh;
                     if (mesh.material) {
+                        // Materials
                         const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
 
                         for (const mat of materials) {
                             mat.transparent = true;
                             mat.side = THREE.DoubleSide;
-                            if (mat.name.startsWith("Glass")) {
+                            // Add opacity to the glass
+                            if (mat.name === "Glass") {
                                 mat.opacity = .1;
                             }
+                            // Change the shader for the blood
+                            if (mat.name === "") {
+
+                            }
+
                         }
                     }
                 }
@@ -172,7 +146,7 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({}) => {
         resizeCanvas();
         animate(frame);
 
-        canvas.style = "";
+        canvas.style = ""; // remove width and height tags that three places on the canvas component.
         window.addEventListener("resize", resizeCanvas);
         onCleanup(() => renderer.dispose());
     });
