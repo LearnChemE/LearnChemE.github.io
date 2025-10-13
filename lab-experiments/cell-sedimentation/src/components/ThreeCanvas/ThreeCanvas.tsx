@@ -5,6 +5,7 @@ import { animate, constrain, createDrag } from "../../ts/helpers";
 import { EffectComposer, RenderPass, OutlinePass, GLTFLoader, ShaderPass, FXAAShader } from 'three-stdlib';
 import glbUrl from "../../assets/cellSedimentation.glb?url";
 import { addLights, resize, type Resizable } from "../../ts/threeHelpers";
+import { createBloodMacroMaterial } from "../../ts/materials";
 
 const asp = 3/2;
 const r_th = Math.exp(-3);
@@ -16,9 +17,12 @@ const Cos = (th: number) => {
     return Math.cos(th * Math.PI / 180);
 }
 
-interface ThreeCanvasProps {};
+interface ThreeCanvasProps {
+    onUniformPreparation: (setUniform: (uniform: THREE.Uniform) => void) => void,
+    onMatrixPreparation: () => void
+};
 
-export const ThreeCanvas: Component<ThreeCanvasProps> = ({}) => {
+export const ThreeCanvas: Component<ThreeCanvasProps> = ({ onUniformPreparation, onMatrixPreparation }) => {
     let canvas!: HTMLCanvasElement;
     let scene!: THREE.Scene;
     let camera!: THREE.PerspectiveCamera;
@@ -92,12 +96,16 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({}) => {
         let model!: THREE.Group<THREE.Object3DEventMap>;
         // Load model
         loader.load(glbUrl, gltf => {
+            // Prepare vial uniforms
+            const vials: Array<THREE.IUniform | null> = [null, null, null, null, null];
             // After model is loaded:
             model = gltf.scene;
             // Traverse the object to modify necessary materials
             model.traverse(obj => {
                 if ((obj as THREE.Mesh).isMesh) {
                     const mesh = obj as THREE.Mesh;
+
+                    let bloodMat: THREE.ShaderMaterial;
                     if (mesh.material) {
                         // Materials
                         const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
@@ -110,11 +118,20 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({}) => {
                                 mat.opacity = .1;
                             }
                             // Change the shader for the blood
-                            if (mat.name === "") {
-
+                            if (mat.name === "blood") {
+                                bloodMat = createBloodMacroMaterial();
+                                mesh.material = bloodMat;
+                                break;
                             }
 
                         }
+                    }
+
+                    // Prepare uniforms
+                    if (obj.name.startsWith("blood")) {
+                        const vialIdx = parseInt(obj.name.slice(5));
+                        // Attach the uniform to the corresponding vial
+                        vials[vialIdx] = bloodMat!.uniforms;
                     }
                 }
             })
@@ -130,12 +147,12 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({}) => {
             th = (th - tth) * r_th ** dt + tth;
             ph = (ph - tph) * r_th ** dt + tph;
 
-            if (model) {
-                model.matrix.copy(base);
-                // model.matrix.multiply(tempMatrix.makeRotationX(ph * Math.PI / 180));
-                // model.matrix.multiply(tempMatrix.makeRotationZ(th * Math.PI / 180));
-                // model.matrixWorldNeedsUpdate = true;
-            }
+            // if (model) {
+            //     model.matrix.copy(base);
+            //     // model.matrix.multiply(tempMatrix.makeRotationX(ph * Math.PI / 180));
+            //     // model.matrix.multiply(tempMatrix.makeRotationZ(th * Math.PI / 180));
+            //     // model.matrixWorldNeedsUpdate = true;
+            // }
             camera.position.set(-4 * Sin(th) * Cos(ph), 4 * Sin(ph), 4 * Cos(th) * Cos(ph));
             camera.lookAt(0,0,0);
 
@@ -143,10 +160,13 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({}) => {
             return true;
         }
 
+        // Initial resize and begin animation
         resizeCanvas();
         animate(frame);
 
-        canvas.style = ""; // remove width and height tags that three places on the canvas component.
+        // Remove width and height tags that three places on the canvas component.
+        canvas.style = "";
+        // Add listeners
         window.addEventListener("resize", resizeCanvas);
         onCleanup(() => renderer.dispose());
     });

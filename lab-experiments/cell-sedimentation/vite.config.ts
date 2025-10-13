@@ -9,5 +9,5 @@ export default defineConfig({
     outDir: "dist",
     sourcemap: true
   },
-  assetsInclude: ['**/*.glb','**/*.gltf']
+  assetsInclude: ['**/*.glb','**/*.gltf','**/*.vert','**/*.frag','**/*.glsl']
 })
