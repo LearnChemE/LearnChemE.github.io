@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attenuation Simulation -- Multiple Wavelengths</title>
+
+<!-- Libraries (only those needed for plot + GUI) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="./libraries/math.min.js"></script>
+<script src="./libraries/p5/p5.min.js"></script>
+<script src="./libraries/p5/p5.dom.min.js"></script>
+<script src="./libraries/p5/grafica.js"></script>
+<script src="./libraries/quicksettings3/quicksettings.js"></script>
+<script src="./libraries/p5/p5.gui.js"></script>
+<script src="./libraries/plotFun.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+
+<!-- MathJax (for equations in the Details modal) -->
+<script>
+  MathJax = {
+    chtml: { scale: 0.95, mathmlSpacing: true, displayAlign: 'left' }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+<!-- Custom CSS -->
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="sliders.css">
+
+<!-- Main JS (your cleaned version) -->
+<script src="main.js"></script>
+</head>
+
+<body>
+
+<!-- Canvas wrapper -->
+<div id="plot-wrapper"></div>
+
+<!-- Slider wrapper -->
+<div id="sliders-wrapper" class="sliders-container"></div>
+
+<!-- Hamburger menu (only core items) -->
+<div class="hamburger-container">
+  <button class="menu-button" onclick="toggleMenu()">☰</button>
+  <div id="menu" class="menu-content">
+    <div id="dir-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
+    <div id="det-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
+    <div id="abt-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+    <div id="abt-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#calculators-modal">Other Calculators</div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div id="directions-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Directions</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <p>
+        <b><u>Directions for Use</u></b><br>
+This interactive tool allows you to explore how light absorption by a photochemical material depends on wavelength, depth, and chromophore concentration. Follow these steps to investigate the fundamentals of photochemistry:
+
+<ol>
+  <li><b>Select a light source:</b> Choose from LED (Gaussian), Arc Lamp, or upload a custom spectrum. Observe how different spectral shapes influence absorption.</li>
+  
+  <li><b>Adjust LED parameters (if applicable):</b> Modify the LED peak wavelength and FWHM to see how the position and width of the spectrum affect photon absorption.</li>
+  
+  <li><b>Choose or upload an absorbance spectrum:</b> Pick a predefined photoinitiator (e.g., TPO, Irgacure 907) or provide a custom spectrum. The absorbance spectrum determines how efficiently each wavelength is absorbed.</li>
+  
+  <li><b>Set material properties:</b> Use the sliders to adjust chromophore concentration (mM) and sample thickness (µm). These parameters directly affect the fraction of light absorbed.</li>
+  
+  <li><b>Interpret the curves:</b>
+    <ul>
+      <li><b>Incident light:</b> The initial light intensity as a function of wavelength.</li>
+      <li><b>Absorbance:</b> Napierian absorptivity spectrum of the chromophore.</li>
+      <li><b>Incident absorbed photons:</b> Product of incident light and absorptivity at the surface.</li>
+      <li><b>Attenuated light:</b> Light remaining after passing through the material at the chosen depth.</li>
+      <li><b>Attenuated absorbed photons:</b> Light absorbed at the selected depth; the integral of this curve quantifies photons available for primary photochemical reactions.</li>
+    </ul>
+  </li>
+  
+  <li><b>Compare scenarios:</b> Vary the light source, concentration, and depth to see how these factors influence photon absorption and the availability of light for photochemical processes.</li>
+  
+  <li><b>Remember limitations:</b> This tool shows absorption trends and relative photon availability. It does <i>not</i> account for quantum yield, photobleaching, or secondary reactions. Focus on the primary absorption events.</li>
+</ol>
+
+<p>Use these directions to explore fundamental principles of light-matter interactions and understand how photochemical reactions are initiated by absorbed photons.</p>
+
+      </p>
+    </div>
+  </div></div>
+</div>
+
+<div id="details-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Details</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <b><u>Light Absorption Fundamentals</u></b><br>
+This tool illustrates how light is absorbed by a material containing a chromophore (e.g., photoinitiator) with a given concentration and thickness.  
+
+For a single wavelength, absorption follows the Beer–Lambert law:
+
+$$
+\frac{dI}{dz} = -I \, \varepsilon(\lambda) \, [C]
+$$
+
+$$
+I(z, \lambda) = I_0(\lambda) \, \exp\big(-\varepsilon(\lambda) \, [C] \, z \big)
+$$
+
+\( I_0(\lambda) \) – incident light intensity at wavelength \( \lambda \) <br>
+\( I(z, \lambda) \) – light intensity at depth \( z \) <br>
+\( \varepsilon(\lambda) \) – Napierian molar absorptivity \((\text{L/mol·cm})\) <br>
+\( [C] \) – chromophore concentration \((\text{mM})\) <br>
+\( z \) – material depth \((\mu\text{m})\) <br>
+<br>
+
+<b><u>Light source spectra</u></b><br>
+The tool allows exploration of different light sources:  <br>
+<br>
+1) LED (Gaussian):
+$$
+I_0(\lambda) = A \exp\Big[-\frac{(\lambda - \lambda_\text{center})^2}{2 \sigma^2}\Big]
+$$ <br>
+\( A \) – peak intensity (arbitrary units) <br>
+\( \lambda_\text{center} \) – LED peak wavelength (nm) <br>
+\( \sigma = \text{FWHM}/2.35482 \) – standard deviation of Gaussian (nm) <br>
+<br>
+2) Mercury arc lamp (EFOS Acticure A4000 with 400-500 nm filter) <br>
+3) Custom Spectrum: User-provided spectral shape
+<br>
+<br>
+<b><u>Photochemical relevance of absorbed photons</u></b><br>
+The number of photons absorbed at a given depth is:
+
+$$
+I_\text{abs}(\lambda) = I_0(\lambda) - I(z, \lambda)
+$$
+
+For a polychromatic light source, the total absorption is the **sum over all wavelengths**:
+
+$$
+\text{Total absorbed photons} = \int I_\text{abs}(\lambda) \, d\lambda
+$$
+
+This quantity is directly related to primary photochemical processes*, such as photoinitiator activation, because it represents the photons available to drive reactions.  
+<br>
+*Neglects quantum yield, secondary reactions, diffusion, and photobleaching.
+
+<br>
+<br>
+<b><u>Adjustable parameters</u></b><br>
+Depth (\( \mu\text{m} \)) – thickness of the material <br>
+Concentration (\( \text{mM} \)) – chromophore density <br>
+LED Center & FWHM – shape of the Gaussian light source (nm) <br>
+Light source type – LED, Hg Arc Lamp, or Custom <br>
+Absorber spectrum – predefined or user-provided <br>
+<br>
+
+    </div>
+  </div></div>
+</div>
+
+<div id="about-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">About</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <p>
+        This simulation was created in the Department of Chemical and Biological 
+        Engineering at University of Colorado Boulder for LearnChemE.com by 
+        Alexander Osterbaan under the direction of Professor John L. Falconer and 
+        Professor Christopher N. Bowman. 
+        Address any questions or comments to LearnChemE@gmail.com.
+      </p>
+    </div>
+  </div></div>
+</div>
+
+<div id="calculators-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Other Calculators</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+<p>
+  This section provides additional calculators useful for exploring photochemistry and light-matter interactions:
+</p>
+<ul>
+  <li>
+    <b><a href="https://learncheme.github.io/demos/LightAttenuation-SingleAbsorber/" target="_blank">Monochromatic Calculator</a>:</b> Analyze the simplest case with a single wavelength. Includes calculators for Napierian absorptivity, absorbance, and effective half-life at a given concentration and pathlength.
+  </li>
+  <li>
+    <b><a href="https://learncheme.github.io/demos/LightAttenuation-MultipleWavelength/" target="_blank">Multiwavelength Calculator</a>:</b> Extend analysis to polychromatic light sources. Compute wavelength-dependent absorption, incident and absorbed photons, and explore effects of spectral shape on photochemical processes.
+  </li>
+  <li>
+    <b><a href="https://aosterbaan.github.io/" target="_blank">Broadband Calculator</a>:</b> Model real-world sources with broad spectral distributions. Allows integration over the full spectrum to quantify total absorbed photons and compare different light sources.
+  </li>
+</ul>
+<p>
+  These calculators build on each other sequentially: start with the simple monochromatic case, then progress to multiwavelength, and finally broadband analysis for more realistic scenarios.
+</p>
+
+
+    </div>
+  </div></div>
+</div>
+
+
+
+</body>
+</html>
