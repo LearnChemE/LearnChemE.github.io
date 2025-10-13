@@ -11,7 +11,7 @@ function App() {
   return (
     <>
       <HamburgerMenu path="" downloadName="" Directions={DirectionsText} About={AboutText} />
-      <ThreeCanvas onUniformPreparation={vials.attachUniforms} onMatrixPreparation={() => {}} />
+      <ThreeCanvas onUniformPreparation={vials.attachUniforms} />
     </>
   )
 }

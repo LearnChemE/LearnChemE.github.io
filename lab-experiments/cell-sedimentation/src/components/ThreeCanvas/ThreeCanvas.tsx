@@ -18,11 +18,10 @@ const Cos = (th: number) => {
 }
 
 interface ThreeCanvasProps {
-    onUniformPreparation: (setUniform: (uniform: THREE.Uniform) => void) => void,
-    onMatrixPreparation: () => void
+    onUniformPreparation: (uniforms: Array<THREE.ShaderMaterial["uniforms"]>) => void
 };
 
-export const ThreeCanvas: Component<ThreeCanvasProps> = ({ onUniformPreparation, onMatrixPreparation }) => {
+export const ThreeCanvas: Component<ThreeCanvasProps> = ({ onUniformPreparation }) => {
     let canvas!: HTMLCanvasElement;
     let scene!: THREE.Scene;
     let camera!: THREE.PerspectiveCamera;
@@ -76,7 +75,7 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ onUniformPreparation,
         // Outline pass settings
         outlinePass.edgeStrength = 100;
         outlinePass.edgeGlow = 0;
-        outlinePass.edgeThickness = .5;
+        outlinePass.edgeThickness = 1e-4 * canvas.width;
         outlinePass.visibleEdgeColor.set("rgba(0,0,0,1)");
         outlinePass.overlayMaterial.blending = THREE.NormalBlending;
         composer.addPass(outlinePass);
@@ -97,7 +96,7 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ onUniformPreparation,
         // Load model
         loader.load(glbUrl, gltf => {
             // Prepare vial uniforms
-            const vials: Array<THREE.IUniform | null> = [null, null, null, null, null];
+            const vials: Array<THREE.ShaderMaterial["uniforms"] | null> = [null, null, null, null, null];
             // After model is loaded:
             model = gltf.scene;
             // Traverse the object to modify necessary materials
@@ -131,10 +130,13 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ onUniformPreparation,
                     if (obj.name.startsWith("blood")) {
                         const vialIdx = parseInt(obj.name.slice(5));
                         // Attach the uniform to the corresponding vial
+                        console.log(bloodMat!.uniforms);
                         vials[vialIdx] = bloodMat!.uniforms;
                     }
                 }
             })
+            // Call the uniform preparation function
+            onUniformPreparation(vials as Array<THREE.ShaderMaterial["uniforms"]>);
             model.matrixAutoUpdate = false;
             model.matrix.copy(base);
             scene.add(model);

@@ -10,6 +10,7 @@ export function createBloodMacroMaterial() {
             redConcentration: { value: new Float32Array(CONC_ARRAY_SIZE).fill(0) },
             whiteConcentration: { value: new Float32Array(CONC_ARRAY_SIZE).fill(0) },
         },
+        transparent: true,
         vertexShader: defaultVert,
         fragmentShader: defaultFrag,
     });

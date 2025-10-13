@@ -35,34 +35,32 @@ class Vial {
     private redConcentration: Float32Array;
     private whiteConcentration: Float32Array;
 
-    private uniform: THREE.Uniform | null = null;
+    private uniform: THREE.ShaderMaterial["uniforms"] | null = null;
 
     constructor (rConc: number, wConc: number) {
         this.redConcentration = new Float32Array(CONC_ARRAY_SIZE).fill(rConc);
         this.whiteConcentration = new Float32Array(CONC_ARRAY_SIZE).fill(wConc);
     }
 
-    public evolve = (dt: number) => {
+    public evolve = (dt: number, t: number) => {
         // Placeholder evolution logic: shift concentrations down the array
         for (let i = CONC_ARRAY_SIZE - 1; i > 0; i--) {
             this.redConcentration[i] = this.redConcentration[i - 1];
             this.whiteConcentration[i] = this.whiteConcentration[i - 1];
         }
-        // Introduce a small random fluctuation at the start
-        this.redConcentration[0] = Math.max(0, Math.min(1, this.redConcentration[0] + (Math.random() - 0.5) * 0.1));
-        this.whiteConcentration[0] = Math.max(0, Math.min(1, this.whiteConcentration[0] + (Math.random() - 0.5) * 0.1));
+        // Introduce a small random fluctuation at the 
+        this.redConcentration[0] = Math.max(0, Math.min(1, this.redConcentration[0] + (Math.sin(t /100) * .1)));
+        this.whiteConcentration[0] = Math.max(0, Math.min(1, this.whiteConcentration[0] + (Math.cos(t / 100) * 0.1)));
     }
 
-    public setUniform = (uniform: THREE.Uniform) => {
+    public setUniform = (uniform: THREE.ShaderMaterial["uniforms"]) => {
         this.uniform = uniform;
     }
 
     public updateUniform = () => {
         if (this.uniform) {
-            this.uniform.value = {
-                redConcentration: this.redConcentration,
-                whiteConcentration: this.whiteConcentration,
-            };
+            this.uniform.redConcentration.value = this.redConcentration;
+            this.uniform.whiteConcentration.value = this.whiteConcentration;
         }
     }
 
@@ -95,10 +93,11 @@ export class VialsArray {
         this.vials = Starting_Vial_Concentration.map(([r,w]) => new Vial(r,w));
     }
 
-    public attachUniforms = (uniforms: Array<THREE.Uniform>) => {
+    public attachUniforms = (uniforms: Array<THREE.ShaderMaterial["uniforms"]>) => {
         this.vials.forEach((vial, i) => {
             vial.setUniform(uniforms[i]);
         });
+        this.play();
     }
 
     public reset = () => {
@@ -112,9 +111,9 @@ export class VialsArray {
         if (this.playing) return;
         this.playing = true;
 
-        const frame = (dt: number) => {
+        const frame = (dt: number, t: number) => {
             this.vials.forEach(vial => {
-                vial.evolve(dt);
+                vial.evolve(dt, t);
                 vial.updateUniform();
             });
             return this.playing;
