@@ -46,6 +46,7 @@ let tarWave = 405;
 let mInt = 10;
 const advLabel = document.createElement("div");
 let tInt = 0;
+let advGuiY = 430;
 
 
 // -------------------- Preload CSV --------------------
@@ -80,6 +81,9 @@ function setup() {
   } else {
     GraphFS = 16; // default for desktop
     legendAdjust = 250;
+  }
+  if (window.innerWidth < 801){
+    advGuiY = 20;
   }
 
   initPlot();
@@ -1019,40 +1023,20 @@ function initAdvancedGUI() {
   updateTextEmbedded();
 
   // -------------------- Panel positioning --------------------
-  const topY = 430;
+  const topY = advGuiY;
   setPanelPosition(advGui, "right", topY, 20);
 }
-
-/**
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *          Correction Math
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- */
-  // ---------------- Part 1: Intensity correction ----------------
-  // 1) Normalize light spectrum for use
-  // 2) Divide by wavelength
-  // 3) Integrate
-  // 4) Multiply by target wavelength
-  // 5) This should be intensity correction factor
-
-  // ---------------- Part 2: Absorbance correction ----------------
-  // 1) Multiply normalized light spectrum by Absorance/absorbtivity spectrum
-  // 2) Integrate to get real absorbance
-  // 3) Prepare normalized thin gaussian with 
-  // 4) Multiply by absorbance/absorbtivity
-  // 5) Integrate to get standard
-  // 6) Absorbance factor = real/standard
 
 function updateText() {
   if (!dataX.length || (!gaussY.length && !lightX.length)) return;
 
-  // Use GUI slider values
+  // ---------------- Part 0: Pull current GUI values ----------------
   const tarWaveVal = advGui.sliders.find(s => s.labelDiv.innerText.includes("Target Wavelength"))?.val || tarWave;
   const mIntVal = advGui.sliders.find(s => s.labelDiv.innerText.includes("Measured Intensity"))?.val || mInt;
 
-  // ---------------- Part 0: Define light spectrum ----------------
-  let xVals = currentLightSpectrum === "LED" ? gaussY.map(p => p.x) : lightX;
-  let yLight = currentLightSpectrum === "LED" ? gaussY.map(p => p.y) : lightY;
+  // Use currently displayed light spectrum (Gaussian, already updated by GUI)
+  const xVals = gaussY.map(p => p.x);
+  const yLight = gaussY.map(p => p.y);
 
   // ---------------- Part 1: Intensity correction ----------------
   let intensityCorrection = 1; // default (no correction)
@@ -1071,21 +1055,33 @@ function updateText() {
     intensityCorrection = integralNorm * tarWaveVal;
   }
 
-  // ---------------- Part 2: Absorbance correction ----------------
+    // ---------------- Part 2: Absorbance correction ----------------
+  // 1) Multiply normalized light spectrum by absorbance/absorptivity spectrum
   const absorbY = xVals.map(x => interp1(dataX, dataY, x));
-  const yLightNorm = yLight?.map(y => y / (trapz(xVals, yLight) || 1)) || Array(xVals.length).fill(1);
-  const weightedAbs = absorbY.map((y, i) => y * yLightNorm[i]);
+
+  const integralLight = trapz(xVals, yLight);
+  const normLight = yLight.map(y => y / (integralLight || 1)); // normalize to integrate = 1
+  
+  const weightedAbs = normLight.map((y, i) => y * absorbY[i]);
+
+  // 2) Integrate to get real absorbance
   const integralReal = trapz(xVals, weightedAbs);
 
-  // Thin Gaussian reference
-  const GausSig = GausFWHM / 2.35482;
-  let thinGauss = xVals.map(x => Math.exp(-Math.pow(x - GausMean, 2) / (2 * GausSig * GausSig)));
+  // 3) Prepare normalized thin Gaussian
+  const GausSig = 0.1 / 2.35482;
+  let thinGauss = xVals.map(x => Math.exp(-Math.pow(x - tarWaveVal, 2) / (2 * GausSig * GausSig)));
   const integralThin = trapz(xVals, thinGauss);
-  thinGauss = thinGauss.map(y => y / (integralThin || 1));
+  thinGauss = thinGauss.map(y => y / (integralThin || 1)); // normalize to integrate = 1
+
+  // 4) Multiply by absorbance/absorptivity
   const thinWeightedAbs = thinGauss.map((y, i) => y * absorbY[i]);
+
+  // 5) Integrate to get standard
   const integralStandard = trapz(xVals, thinWeightedAbs);
 
+  // 6) Absorbance factor = real / standard
   const absorbanceFactor = integralReal / integralStandard;
+
 
   // ---------------- Part 3: Equivalent intensity ----------------
   tInt = mIntVal * intensityCorrection * absorbanceFactor;
@@ -1093,8 +1089,12 @@ function updateText() {
   // ---------------- Part 4: Update display ----------------
   advLabel.innerHTML = `
     <p>
-      <b> Observed equivalent incident intensity: <br>
-       Work in progress
+      <b> Observed equivalent incident intensity: </b><br>
+       ${formatSigFig(tInt, 3)} mW/cm² 
+       <br><br>
+      Intensity correction: ${formatSigFig(intensityCorrection, 3)}
+      <br>
+      Absorbance factor: ${formatSigFig(absorbanceFactor, 3)}
     </p>
   `;
 }
