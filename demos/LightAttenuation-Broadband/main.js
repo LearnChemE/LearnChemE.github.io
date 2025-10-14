@@ -39,6 +39,15 @@ let spectrumCache = {
   "Custom": null
 };
 
+let advancedGui;
+let advSelect;
+let currentAdvSelect = "Photons (Photodiode)";
+let tarWave = 405;
+let mInt = 10;
+const advLabel = document.createElement("div");
+let tInt = 0;
+
+
 // -------------------- Preload CSV --------------------
 function preload() {
   table = loadTable(currentFile, "csv", "header");
@@ -76,6 +85,7 @@ function setup() {
   initPlot();
   parseCSV();
   initSliders();
+  initAdvancedGUI();
 
   setTimeout(windowResized, 50);
 }
@@ -400,12 +410,16 @@ function updateCurve() {
     const yAbs = interp1(dataX, dataY, x, dataMax);
 
     // --- Light source intensity (LED Gaussian / ArcLamp / CustomLight)
-    let lightYval;
-    if (useArcLamp || useCustomLight) {
-      lightYval = interp1(lightX, lightY, x, 0); // normalized earlier
-    } else {
-      lightYval = GAUS_AMP * Math.exp(-Math.pow(x - GausMean, 2) / (2 * GausSig * GausSig));
-    }
+    // --- Light source intensity (LED Gaussian / ArcLamp / CustomLight)
+let lightYval;
+if (useArcLamp || useCustomLight) {
+  lightYval = interp1(lightX, lightY, x, 0); // normalized earlier
+} else {
+  // Clamp GausMean to 300 minimum
+  const safeMean = Math.max(GausMean, 300);
+  lightYval = GAUS_AMP * Math.exp(-Math.pow(x - safeMean, 2) / (2 * GausSig * GausSig));
+}
+
 
     // --- Compute combined effects ---
     const atten = Math.exp(-yAbs * Concentration/1000 * Depth/10000);
@@ -514,6 +528,7 @@ function drawPlot() {
 function draw() {
   clear();
   drawPlot();
+  updateText()
 }
 
 // -------------------- Plotting --------------------
@@ -816,10 +831,6 @@ function getTicks(minVal, maxVal, targetTicks = 5, spacingFraction = 0.02) {
   return ticks;
 }
 
-
-
-
-
 function niceNumber(range, round = true) {
   if (range === 0) return 0;
   const exponent = Math.floor(Math.log10(Math.abs(range)));
@@ -935,3 +946,161 @@ document.addEventListener('click', e => {
     menu.style.display = 'none';
   }
 });
+
+
+/**
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *           Advanced Gui
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+function initAdvancedGUI() {
+  // Create the advanced GUI panel
+  advGui = createGui('Spectral weighted intensity', 100, 100);
+  const parent = advGui.prototype._panel;
+
+  // -------------------- Sliders --------------------
+  const sliders = [
+    new ProductSlider('tarWave', 300, 600, tarWave, 1, 'Target Wavelength', 'nm'),
+    new ProductSlider('mInt', 0.1, 100, mInt, 0.1, 'Measured Intensity', 'mW/cm\u00B2')
+  ];
+
+  sliders.forEach(slider => slider.attachParent(parent));
+  advGui.sliders = sliders; // save reference for later updates
+
+  // Initialize slider values
+  sliders.forEach(slider => {
+    slider.valBox.value = formatSigFig(slider.val, 3);
+    slider.sliderDiv.value = slider.val;
+  });
+
+  // -------------------- Intensity Assessment --------------------
+  const advDiv = document.createElement("div");
+  advDiv.className = "qs_container";
+  advDiv.innerHTML = `<b>Intensity assessment:</b> `;
+
+  const advOptions = ["Photons (Photodiode)", "Energy (Thermal)"];
+  const advSelect = document.createElement("select");
+  advOptions.forEach(opt => advSelect.add(new Option(opt, opt)));
+  advSelect.value = currentAdvSelect;
+  advDiv.appendChild(advSelect);
+  parent.appendChild(advDiv);
+
+  advSelect.addEventListener("change", e => {
+    currentAdvSelect = e.target.value;
+    console.log("Intensity assessment type changed to:", currentAdvSelect);
+    updateCurve(); // recalc curves using new type
+  });
+
+  // -------------------- Embedded Display --------------------
+  const advContainer = document.createElement("div");
+  advContainer.id = `adv-container`;
+  advContainer.className = "qs_container";
+  advContainer.style.marginTop = "10px"; // spacing from sliders
+  parent.appendChild(advContainer);
+
+  // Use global advLabel (do NOT redeclare with const)
+  advLabel.id = `adv-label`;
+  advLabel.className = "qs_label";
+  advContainer.appendChild(advLabel);
+
+  // Function to update embedded text
+  function updateTextEmbedded() {
+    advLabel.innerHTML = `
+      <p>
+        Observed equivalent incident intensity: ${tInt} mW/cm²
+      </p>
+    `;
+  }
+
+  // Store reference globally so draw() or other functions can update
+  textGui = { updateText: updateTextEmbedded };
+
+  // Initial update so text appears immediately
+  updateTextEmbedded();
+
+  // -------------------- Panel positioning --------------------
+  const topY = 430;
+  setPanelPosition(advGui, "right", topY, 20);
+}
+
+/**
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *          Correction Math
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+  // ---------------- Part 1: Intensity correction ----------------
+  // 1) Normalize light spectrum for use
+  // 2) Divide by wavelength
+  // 3) Integrate
+  // 4) Multiply by target wavelength
+  // 5) This should be intensity correction factor
+
+  // ---------------- Part 2: Absorbance correction ----------------
+  // 1) Multiply normalized light spectrum by Absorance/absorbtivity spectrum
+  // 2) Integrate to get real absorbance
+  // 3) Prepare normalized thin gaussian with 
+  // 4) Multiply by absorbance/absorbtivity
+  // 5) Integrate to get standard
+  // 6) Absorbance factor = real/standard
+
+function updateText() {
+  if (!dataX.length || (!gaussY.length && !lightX.length)) return;
+
+  // Use GUI slider values
+  const tarWaveVal = advGui.sliders.find(s => s.labelDiv.innerText.includes("Target Wavelength"))?.val || tarWave;
+  const mIntVal = advGui.sliders.find(s => s.labelDiv.innerText.includes("Measured Intensity"))?.val || mInt;
+
+  // ---------------- Part 0: Define light spectrum ----------------
+  let xVals = currentLightSpectrum === "LED" ? gaussY.map(p => p.x) : lightX;
+  let yLight = currentLightSpectrum === "LED" ? gaussY.map(p => p.y) : lightY;
+
+  // ---------------- Part 1: Intensity correction ----------------
+  let intensityCorrection = 1; // default (no correction)
+  if (currentAdvSelect === "Photons (Photodiode)") {
+    // Normalize light spectrum so that integral = 1
+    const integralY = trapz(xVals, yLight);
+    const normLight = yLight.map(y => y / (integralY || 1));
+
+    // Divide by wavelength
+    const normDivLambda = normLight.map((y, i) => y / xVals[i]);
+
+    // Integrate normalized/divided spectrum
+    const integralNorm = trapz(xVals, normDivLambda);
+
+    // Multiply by target wavelength
+    intensityCorrection = integralNorm * tarWaveVal;
+  }
+
+  // ---------------- Part 2: Absorbance correction ----------------
+  const absorbY = xVals.map(x => interp1(dataX, dataY, x));
+  const yLightNorm = yLight?.map(y => y / (trapz(xVals, yLight) || 1)) || Array(xVals.length).fill(1);
+  const weightedAbs = absorbY.map((y, i) => y * yLightNorm[i]);
+  const integralReal = trapz(xVals, weightedAbs);
+
+  // Thin Gaussian reference
+  const GausSig = GausFWHM / 2.35482;
+  let thinGauss = xVals.map(x => Math.exp(-Math.pow(x - GausMean, 2) / (2 * GausSig * GausSig)));
+  const integralThin = trapz(xVals, thinGauss);
+  thinGauss = thinGauss.map(y => y / (integralThin || 1));
+  const thinWeightedAbs = thinGauss.map((y, i) => y * absorbY[i]);
+  const integralStandard = trapz(xVals, thinWeightedAbs);
+
+  const absorbanceFactor = integralReal / integralStandard;
+
+  // ---------------- Part 3: Equivalent intensity ----------------
+  tInt = mIntVal * intensityCorrection * absorbanceFactor;
+
+  // ---------------- Part 4: Update display ----------------
+  advLabel.innerHTML = `
+    <p>
+      <b> Observed equivalent incident intensity: <br>
+       Work in progress
+    </p>
+  `;
+}
+
+
+
+
+
+
