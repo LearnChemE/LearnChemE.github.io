@@ -21,7 +21,8 @@ let Depth = 50;
 let Concentration = 335;
 const GAUS_AMP = 1;
 const EXPONENTIAL_SCALE = 4000; // or 5000
-let GraphFS = 24;
+let GraphFS = 16;
+let legendAdjust = 250;
 
 
 let sliderMean, sliderFWHM;
@@ -60,12 +61,25 @@ function setup() {
   const cnv = createCanvas(wrapper.clientWidth, wrapper.clientHeight);
   cnv.parent(wrapper);
 
+  // --- Adjust font size for mobile ---
+  if (window.innerWidth < 600) {
+    GraphFS = 10; // smaller fonts for phones
+    legendAdjust = 170;
+  } else if (window.innerWidth < 900) {
+    GraphFS = 13; // medium for tablets
+    legendAdjust = 200;
+  } else {
+    GraphFS = 16; // default for desktop
+    legendAdjust = 250;
+  }
+
   initPlot();
   parseCSV();
   initSliders();
 
   setTimeout(windowResized, 50);
 }
+
 
 // -------------------- CSV Parsing --------------------
 function parseCSV() {
@@ -467,12 +481,12 @@ function drawPlot() {
 
   // Title
   noStroke(); fill(0);
-  textSize(16); textAlign(CENTER);
+  textSize(GraphFS); textAlign(CENTER);
   text(`Absorbed photons at max depth relative to surface = ${nf(integralPercent, 1, 1)}%`,
        width / 2, PAD / 2);
 
   // Legend
-  const legendX = width - PAD - 220;
+  const legendX = width - PAD - legendAdjust;
   let legendY = PAD;
   const legendSpacing = 20;
   const legendBoxSize = 12;
@@ -486,7 +500,7 @@ function drawPlot() {
   ];
 
   textAlign(LEFT, CENTER);
-  textSize(14);
+  textSize(GraphFS);
   legendItems.forEach(item => {
     fill(item.col);
     rect(legendX, legendY - legendBoxSize / 2, legendBoxSize, legendBoxSize);
@@ -494,18 +508,6 @@ function drawPlot() {
     text(item.label, legendX + legendBoxSize + 5, legendY);
     legendY += legendSpacing;
   });
-}
-
-// Updated interpolation remains the same
-function interp1(xs, ys, x, defaultValue = null) {
-  if (x < xs[0]) return defaultValue !== null ? defaultValue : ys[0];
-  if (x > xs[xs.length - 1]) return defaultValue !== null ? defaultValue : ys[ys.length - 1];
-  for (let i = 0; i < xs.length - 1; i++) {
-    if (x >= xs[i] && x <= xs[i + 1]) {
-      const t = (x - xs[i]) / (xs[i + 1] - xs[i]);
-      return lerp(ys[i], ys[i + 1], t);
-    }
-  }
 }
 
 // -------------------- Drawing --------------------
@@ -542,7 +544,7 @@ function drawAxes(PAD) {
   // X-axis
   line(PAD, height - PAD, width - PAD, height - PAD);
 
-  noStroke(); fill(0); textSize(14);
+  noStroke(); fill(0); textSize(GraphFS);
 
   // --- X-axis label ---
   textAlign(CENTER);
