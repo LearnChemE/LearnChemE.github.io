@@ -3,11 +3,11 @@ import { animate } from './helpers';
 
 export const CONC_ARRAY_SIZE = 128;
 const Starting_Vial_Concentration = [
+    [0.05, 0.05],
+    [0.15, 0.05],
+    [0.30, 0.05],
     [0.45, 0.05],
-    [0.40, 0.10],
-    [0.35, 0.15],
-    [0.30, 0.20],
-    [0.25, 0.25],
+    [0.60, 0.05],
 ];
 
 /**
@@ -43,14 +43,24 @@ class Vial {
     }
 
     public evolve = (dt: number, t: number) => {
-        // Placeholder evolution logic: shift concentrations down the array
-        for (let i = CONC_ARRAY_SIZE - 1; i > 0; i--) {
-            this.redConcentration[i] = this.redConcentration[i - 1];
-            this.whiteConcentration[i] = this.whiteConcentration[i - 1];
-        }
-        // Introduce a small random fluctuation at the 
-        this.redConcentration[0] = Math.max(0, Math.min(1, this.redConcentration[0] + (Math.sin(t /100) * .1)));
-        this.whiteConcentration[0] = Math.max(0, Math.min(1, this.whiteConcentration[0] + (Math.cos(t / 100) * 0.1)));
+        [this.redConcentration, this.whiteConcentration].forEach(arr => {
+            // Calculate first and second derivatives
+            const dudx = new Float32Array(CONC_ARRAY_SIZE);
+            const dudx2 = new Float32Array(CONC_ARRAY_SIZE);
+            for (let i = 1; i < CONC_ARRAY_SIZE - 1; i++) {
+                dudx[i] = (arr[i+1] - arr[i-1]) / 2;
+                dudx2[i] = arr[i+1] - 2 * arr[i] + arr[i-1];
+            }
+            dudx[0] = dudx[CONC_ARRAY_SIZE - 1] = 0;
+            dudx2[0] = dudx2[CONC_ARRAY_SIZE - 1] = 0;
+
+            // Update concentration using a simple finite difference scheme
+            for (let i = 0; i < CONC_ARRAY_SIZE; i++) {
+                // Calculate settling 
+                arr[i] += dt * (0.01 * dudx2[i] - 5 * dudx[i]);
+            }
+            arr[CONC_ARRAY_SIZE - 1] = 0; // Ensure bottom concentration is zero
+        });
     }
 
     public setUniform = (uniform: THREE.ShaderMaterial["uniforms"]) => {

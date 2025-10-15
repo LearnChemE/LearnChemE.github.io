@@ -1,4 +1,4 @@
-import { onCleanup, onMount, type Component } from "solid-js";
+import { onCleanup, onMount, type Accessor, type Component } from "solid-js";
 import * as THREE from "three";
 import "./ThreeCanvas.css";
 import { animate, constrain, createDrag } from "../../ts/helpers";
@@ -18,10 +18,11 @@ const Cos = (th: number) => {
 }
 
 interface ThreeCanvasProps {
+    drag: Accessor<boolean>,
     onUniformPreparation: (uniforms: Array<THREE.ShaderMaterial["uniforms"]>) => void
 };
 
-export const ThreeCanvas: Component<ThreeCanvasProps> = ({ onUniformPreparation }) => {
+export const ThreeCanvas: Component<ThreeCanvasProps> = ({ drag, onUniformPreparation }) => {
     let canvas!: HTMLCanvasElement;
     let scene!: THREE.Scene;
     let camera!: THREE.PerspectiveCamera;
@@ -36,7 +37,7 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ onUniformPreparation 
     const resizeCanvas = () => resize(asp, resizeable);
 
     // Drag to rotate
-    const drag = createDrag((pt, pv) => {
+    const dragfn = createDrag((pt, pv) => {
         const dx = pt.x - pv.x;
         const dy = pt.y - pv.y;
         tth += 180 * dx / canvas.width;  tth = constrain(tth, -90, 90);
@@ -176,7 +177,7 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ onUniformPreparation 
     return (<>
         <canvas 
             ref={canvas}
-            onPointerDown={drag}
+            onPointerDown={drag() ? dragfn : undefined}
         />
     </>);
 }
