@@ -38,3 +38,8 @@ svg {
   font-family: "digital";
   src: url("./media/digital-7.ttf") format("truetype");
 }
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none; 
+}

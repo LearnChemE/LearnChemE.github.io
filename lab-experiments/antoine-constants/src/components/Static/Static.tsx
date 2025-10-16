@@ -2,7 +2,7 @@ import type { Component } from "solid-js";
 
 export const StaticElements: Component = () => {
   return ( <g>
-    <rect width="583" height="391" fill="white"/>
+    {/* <rect width="583" height="391" fill="white"/> */}
 <rect x="-0.5" y="-0.5" width="9.03082" height="15.1003" rx="0.5" transform="matrix(0 -1 -1 0 256.317 110)" fill="url(#paint0_linear_10_932)" stroke="black"/>
 <path d="M249.267 41.2843C266.776 41.2843 280.968 55.4329 280.968 72.8829C280.968 90.3328 266.776 104.482 249.267 104.482C231.758 104.481 217.566 90.3327 217.566 72.8829C217.566 55.4331 231.758 41.2845 249.267 41.2843Z" fill="#5B8BF3" stroke="black"/>
 <path d="M249.267 43.2904C265.665 43.2907 278.955 56.5414 278.955 72.8832C278.955 89.2249 265.665 102.475 249.267 102.475C232.87 102.475 219.579 89.225 219.579 72.8832C219.579 56.5412 232.87 43.2904 249.267 43.2904Z" fill="white" stroke="black"/>
