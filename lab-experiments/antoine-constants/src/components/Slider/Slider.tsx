@@ -2,8 +2,8 @@ import { createEffect, createMemo, createSignal, type Component } from "solid-js
 import "./Slider.css";
 
 interface SliderProps {
-    min: number;
-    max: number;
+    min: number | (() => number);
+    max: number | (() => number);
     step?: number;
     initValue: number;
     label?: string;
@@ -28,15 +28,24 @@ export const Slider: Component<SliderProps> = ({ min, max, step, initValue, labe
     });
 
     if (!disabled) disabled = () => false;
+    const minFn = (typeof min === "function") ? min : () => min;
+    const maxFn = (typeof max === "function") ? max : () => max;
+
+    createEffect(() => {
+        const min = minFn();
+        const max = maxFn();
+        if (val() < min) setVal(minFn());
+        if (val() > max) setVal(maxFn());
+    })
 
     return (
-        <div class="slider-container">
-            <div class={"slider-label" + disabled() ? " disabled aria-disabled" : ""}>{label}</div>
+        <div class={"slider-container" + (disabled() ? " disabled aria-disabled" : "")}>
+            <div class={"slider-label"}>{label}</div>
             <input
             type="range"
             class="slider"
-            min={min}
-            max={max}
+            min={minFn()}
+            max={maxFn()}
             step={step}
             value={val()}
             onInput={(e) => setVal(parseFloat(e.currentTarget.value))}
