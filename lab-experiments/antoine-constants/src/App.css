@@ -47,3 +47,22 @@ svg {
   opacity: 0.5;
   pointer-events: none; 
 }
+
+.sliders-container {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: 50% 50%;
+  gap: 1rem; 
+  z-index: 10;
+}
+
+@media (max-width: 1000px) {
+  .sliders-container {
+    top: -20px;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+}

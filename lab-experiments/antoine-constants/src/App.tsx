@@ -150,7 +150,7 @@ function App() {
   return (
     <>
       <HamburgerMenu path={worksheet} downloadName='antoine_constants_worksheet.pdf' Directions={DirectionsText} About={AboutText} />
-      <div style={{position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)', display: 'grid', "grid-template-columns": "auto auto", gap: '3rem', 'z-index': 10}}>
+      <div class="sliders-container">
         <Slider label="temperature:"      units="°C" min={() => substance().tempRange[0]} max={() => substance().tempRange[1]} step={1} initValue={40} onChange={setTemperature} disabled={injecting} />
         <Slider label="volume to inject:" units="mL" min={0} max={1} step={.01} initValue={0.5} onChange={setVolumeToInject} decimalPlaces={2} disabled={injecting} />
       </div>
