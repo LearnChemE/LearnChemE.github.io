@@ -35,7 +35,7 @@ input[type="range"]::-moz-range-thumb {
     display: grid;
     margin: auto;
     width: fit-content;
-    grid-template-columns: max-content 200px max-content;
+    grid-template-columns: max-content max-content 60px;
     align-items: end;
-    gap: 1rem;
+    gap: .5rem;
 }

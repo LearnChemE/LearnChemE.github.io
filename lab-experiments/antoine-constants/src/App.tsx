@@ -5,17 +5,19 @@ import { AboutText, DirectionsText } from './components/Modal/modals'
 import worksheet from './media/antoine_constants_worksheet.pdf'
 import Gauge from './components/Gauge/Gauge';
 import { StaticElements } from './components/Static/Static';
-import { animate, enableWindowResize, initSvgDrag, initSvgZoom } from './ts/helpers';
+import { animate, enableWindowResize, initSvgDrag, initSvgZoom, smoothLerp } from './ts/helpers';
 import { Syringe } from './components/Syringe/Syringe';
 import { Button } from './components/Button/Button';
 import { Label } from './components/Label/Label';
 import { Slider } from './components/Slider/Slider';
 import { SelectList } from './components/List/List';
-import { substances } from './ts/calcs';
+import { calcPressure, substances, type Substance } from './ts/calcs';
+import { Thermometer } from './components/Thermometer/Thermometer';
+import Magnifier from './components/Magnifier/Magnifier';
 
 function App() {
   const [syringeVol, setSyringeVol] = createSignal(0);
-  const [molsInTank, setMolsInTank] = createSignal(0);
+  const [volInTank, setVolInTank] = createSignal(0);
   const [injecting, setInjecting] = createSignal(false);
   // Controls
   const [temperature, setTemperature] = createSignal(40); // °C
@@ -23,7 +25,12 @@ function App() {
   const [substance, setSubstance] = createSignal(substances[0]);
   // Pressure
   const [pressure, setPressure] = createSignal(0);
-  const [targetPressure, setTargetPressure] = createSignal(0);
+
+  const targetPressure = createMemo<number>(() => {
+    const v = volInTank();
+    const T = temperature();
+    return calcPressure(substance(), v, T);
+  });
 
   let playing = false;
   const playTankAni = () => {
@@ -31,10 +38,20 @@ function App() {
     playing = true;
 
     const frame = (dt: number) => {
-      setPressure(p => smoothler)
+      const r = Math.exp(-1/2);
+      setPressure(p => {
+        p = smoothLerp(p, targetPressure(), r, dt);
+        if (Math.abs(p - targetPressure()) <= .1) {
+          playing = false;
+          return targetPressure();
+        }
+        return p;
+      });
 
       return playing;
     }
+
+    animate(frame);
   }
 
   // Animate pressure when target is changed
@@ -63,7 +80,7 @@ function App() {
         return newV;
       });
       // Update moles injected
-      setMolsInTank(n => n + injected * 0.04087); // Multiply by concentration (M) to get moles
+      setVolInTank(n => n + injected); // Multiply by concentration (M) to get moles
 
       return injecting();
     }
@@ -75,7 +92,7 @@ function App() {
     setSubstance(substances[0]);
     setTemperature(40);
     setVolumeToInject(.5);
-    setMolsInTank(0);
+    setVolInTank(0);
 
   }
 
@@ -92,24 +109,28 @@ function App() {
   return (
     <>
       <HamburgerMenu path={worksheet} downloadName='antoine_constants_worksheet.pdf' Directions={DirectionsText} About={AboutText} />
-      <div style={{position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', display: 'grid', "grid-template-columns": "auto auto", gap: '3rem', 'z-index': 10}}>
-        <Slider label="temperature:"      units="°C" min={() => substance().tempRange[0]} max={() => substance().tempRange[1]} step={1} initValue={50} onChange={setTemperature} disabled={injecting} />
+      <div style={{position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)', display: 'grid', "grid-template-columns": "auto auto", gap: '3rem', 'z-index': 10}}>
+        <Slider label="temperature:"      units="°C" min={() => substance().tempRange[0]} max={() => substance().tempRange[1]} step={1} initValue={40} onChange={setTemperature} disabled={injecting} />
         <Slider label="volume to inject:" units="mL" min={0} max={1} step={.01} initValue={0.5} onChange={setVolumeToInject} decimalPlaces={2} disabled={injecting} />
       </div>
       
       {/* SVG */}
-      <svg width="583" viewBox="0 0 583 391" height="391" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg id="main-svg" width="583" viewBox="0 0 583 391" height="391" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g id="content">
         <StaticElements />
         <Syringe vol={syringeVol} />
         <Gauge pressure={pressure} maxPressure={1.2} />
+        <Thermometer temperature={temperature} />
         {/* Labels */}
         <Label fontSize="16" x={185} y={380} text="tank volume = 4 L" />
         <Label fontSize="12" x={355} y={230} text={() => `syringe contains ${syringeVol().toFixed(2)} mL liquid`} />
+        </g>
+        <Magnifier targetId='content' followMouse={false} circle={{ cx: 249, cy: 73, r: 75 }} hideOnMouseLeave={true} />
       </svg>
       {/* End SVG */}
 
       {/* Controls */}
-      <SelectList items={substances} onSelect={setSubstance} right={20} bottom={170} />
+      <SelectList items={substances} onSelect={(s) => { setSubstance(s as Substance); setSyringeVol(0); setVolInTank(0); }} right={20} bottom={170} />
       <Button coords={{ x: 20, y:  20 }} label="reset" onClick={reset} color="#e94646ff" />
       <Button coords={{ x: 20, y:  70 }} label="inject" onClick={inject} color="#67af55ff" disabled={injecting} />
       <Button coords={{ x: 20, y: 120 }} label="fill syringe" onClick={fillSyringe} color="#659ee9ff" disabled={injecting} />

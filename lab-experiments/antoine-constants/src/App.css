@@ -13,6 +13,10 @@ svg {
   touch-action: none;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

@@ -13,7 +13,6 @@ export const Modal: Component<ModalProps> = ({ key, title, BodyHTML, show }) => 
 
     const hideIfClickedOut = (e: MouseEvent) => {
         if (!ref.contains(e.target as Node)) {
-            console.log("setting off")
             setShow(false);
         }
     }
