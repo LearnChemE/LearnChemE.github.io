@@ -11,12 +11,44 @@ let tempSwitch = null;
 let thermoCouple = null;
 
 let tempController = null;   // UI elements group for temperature control
-let currentTempC = 25;       // °C
+let targetTempC = 25;       // °C setpoint user can change anytime
+let currentTempC = 25;      // °C measured/thermocouple reading
 let heaterOn = false;        // switch state
 let pressure = null;        // current pressure in bar
 let liquidWeight = 1.8;      // g of N2O4 in syringe (1.6 to 2.0 g)
 let liquidPushed = false;   // has the syringe been pushed?
+
 let temperatureText = null; // text element showing current temperature
+let allowTemperatureChange = true; // lockout flag during reset
+
+// --- measurement noise for pressure readout (display-only) ---
+// Standard deviation of the noise added to the displayed pressure, in bar.
+const PRESSURE_NOISE_STD = 0.02;
+
+// Box–Muller transform to sample zero-mean Gaussian noise
+function gaussianNoise(std = 1) {
+  const u1 = Math.random() || 1e-12;
+  const u2 = Math.random() || 1e-12;
+  const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+  return z0 * std;
+}
+
+// Return the *measured* (noisy) pressure for the gauge text only.
+// Underlying physics (computePressureWithConstantVolume) remains exact elsewhere.
+function measuredPressureBar(mass_g, tempC) {
+  if (!liquidPushed) return 0; // before injection, keep it at 0.00 bar
+  const pTrue = computePressureWithConstantVolume(mass_g, tempC);
+  const noisy = pTrue + gaussianNoise(PRESSURE_NOISE_STD);
+  return Math.max(0, noisy); // clamp to non-negative reading
+}
+
+// Centralized updater for the pressure text UI
+function updatePressureText(temp = null) {
+  if (pressure) {
+    const p = measuredPressureBar(liquidWeight, temp ?? currentTempC);
+    pressure.text(p.toFixed(2));
+  }
+}
 
 // --- non-blocking temperature→pressure ramp (0.5 °C steps) ---
 let tempRampTimerIds = [];
@@ -26,10 +58,14 @@ function clearTempRampTimers() {
 }
 function startTempPressureRamp(prevT, currT) {
   clearTempRampTimers();
+  allowTemperatureChange = false;
   // No ramp needed
   if (prevT === currT) {
+    currentTempC = currT;
     temperatureText && temperatureText.text(`${currT.toFixed(1)} °C`);
-    pressure && pressure.text(computePressureWithConstantVolume(liquidWeight, currT).toFixed(2));
+    updatePressureText();
+    refreshTempController();
+    allowTemperatureChange = true;
     return;
   }
   const dir = currT > prevT ? 1 : -1;
@@ -47,15 +83,25 @@ function startTempPressureRamp(prevT, currT) {
   const delayPerStepMs = 500; // adjust ramp speed here
   temps.forEach((temp, i) => {
     const id = setTimeout(() => {
-      // Update temperature readout on the side panel
+      // Update measured temperature & readouts
+      currentTempC = temp;
       temperatureText && temperatureText.text(`${temp.toFixed(1)} °C`);
-      // Update pressure text
-      if (pressure) {
-        const p = computePressureWithConstantVolume(liquidWeight, temp);
-        pressure.text(p.toFixed(2));
-      }
+      // Update pressure text based on measured temp (only text; physics already guards downstream)
+      refreshTempController(); // keep controller showing setpoint vs measured tint
     }, i * delayPerStepMs);
     tempRampTimerIds.push(id);
+  });
+
+  temps.forEach((temp, i) => {
+    const id = setTimeout(() => {
+      // Update pressure text based on measured temp (only text; physics already guards downstream)
+      updatePressureText(temp);
+      // Re-enable user control only after the final pressure update has been applied
+      if (i === temps.length - 1) {
+        allowTemperatureChange = true;
+        refreshTempController();
+      }
+    }, i * 1000);
   });
 }
 
@@ -63,23 +109,30 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const step5 = (v) => 5 * Math.round(v / 5);
 
 function setTemperature(newT) {
-  // currentTempC = clamp(step5(newT), 25, 45);
-  const prev = currentTempC;
-  if (newT < 25) { currentTempC = 25; }
-  else if (newT > 45) {currentTempC = 45;}
-  else {currentTempC = newT;}
-  if (!heaterOn) currentTempC = 25; // lock to 25 if heater is off
-  refreshTempController();
-  if (liquidPushed) {
-    startTempPressureRamp(prev, currentTempC);
+  const prevTarget = targetTempC;
+  // clamp 25–45 °C
+  if (newT < 25) { targetTempC = 25; }
+  else if (newT > 75) { targetTempC = 75; }
+  else { targetTempC = newT; }
+
+  refreshTempController(); // show new setpoint immediately in controller
+
+  // Only heat (increase measured) when heater is ON; otherwise measurement stays where it is
+  if (heaterOn) {
+    const prevMeasured = currentTempC;
+    startTempPressureRamp(prevMeasured, targetTempC);
   }
 }
 
 function setHeater(on) {
   heaterOn = !!on;
   clearTempRampTimers();
-  if (!heaterOn) currentTempC = 25;
+  // Do NOT reset measured temp when turning off; measurement just holds
   refreshTempController();
+  // When turning on, begin ramp from current measured to target setpoint
+  if (heaterOn) {
+    startTempPressureRamp(currentTempC, targetTempC);
+  }
 }
 
 
@@ -121,11 +174,18 @@ export function drawConstantVolumeSetup(draw) {
   draw.line(x + width, y + height - 375, x + width + 60, y + height - 380)
   .stroke({ width: 2, color: 'black', linecap: 'round', linejoin: 'round', opacity: 0.75 });
   // Temperature controller and readout (left side panel)
+  // Controller shows setpoint (targetTempC). The side readout near reactor shows measured temp (currentTempC).
   drawTemperatureController(g, x + 410, y + 40);
 
   g.line(x - 50, y + height - 345, x, y + height - 325)
     .stroke({ width: 2, color: 'black', linecap: 'round', linejoin: 'round', opacity: 0.75 });
+
+  // Heater switch
   tempSwitch = drawSwitch(g, x - 130, y + height - 370, 60 * 1.5, 30 * 1.5, 1);
+
+  // Start disabled until liquid is injected
+  if (tempSwitch && tempSwitch.setEnabled) tempSwitch.setEnabled(false);
+
   tempSwitch.toggle = (isOn) => {
     // Update sleeve color/gradient
     const leftHeaterGrad = draw.gradient('linear', add => {
@@ -348,9 +408,14 @@ function animateSyringeVertical(obj) {
       obj.animating = false;
       obj.filled = false;          // stay empty; no auto-refill
       refreshSyringeControls();    // update button state/label
-      pressure.text(computePressureWithConstantVolume(w, currentTempC).toFixed(2));
       liquidWeight = w;
+      updatePressureText();
       liquidPushed = true;
+
+      // Enable heater switch now that injection has completed
+      if (tempSwitch && typeof tempSwitch.setEnabled === 'function') {
+        tempSwitch.setEnabled(true);
+      }
     });
   });
 }
@@ -409,7 +474,7 @@ function refreshSyringeControls() {
   if (!syringeControls) return;
   // Update button label and styling based on fill state
   const isFilled = !!(syringeObj && syringeObj.filled);
-  syringeControls.pushText.text(isFilled ? 'push N₂O₄' : 'empty');
+  syringeControls.pushText.text(isFilled ? 'inject N₂O₄' : 'empty');
   // subtle disabled look when empty
   syringeControls.pushBtn.fill(isFilled ? 'green' : '#e9e9e9');
   syringeControls.pushBtn.stroke({ width: 1, color: isFilled ? '#777' : '#bbb' });
@@ -417,7 +482,7 @@ function refreshSyringeControls() {
   
   // Update weight text (1.6..2.0 g)
   const w = syringeObj && syringeObj.liquidWeight ? syringeObj.liquidWeight : 1.8;
-  syringeControls.weightText.text(`${w.toFixed(1)} g`);
+  syringeControls.weightText.text(`${w.toFixed(2)} g`);
 }
 
 function updateSyringeFillFromWeight(obj, animateShapes) {
@@ -451,8 +516,10 @@ function updateSyringeFillFromWeight(obj, animateShapes) {
 
 function drawSwitch(draw, x, y, width, height, opacity = 1, toggle = (isOn) => {}) {
   const switchGroup = draw.group();
+  switchGroup.isEnabled = true;      // NEW: enable/disable flag
   switchGroup.isOn = false;
   switchGroup.toggle = toggle;
+
   const handleWidth = 5;
   const handleHeight = height * 0.8;
   const handle = switchGroup.rect(handleWidth, handleHeight)
@@ -467,6 +534,7 @@ function drawSwitch(draw, x, y, width, height, opacity = 1, toggle = (isOn) => {
     .move(x, y)
     .css('cursor', 'pointer')
     .attr({ 'pointer-events': 'all' });
+  switchGroup.body = body;       // NEW: expose for styling
 
   switchGroup.text('OFF')
     .font({ size: 12, anchor: 'middle', fill: '#fff' })
@@ -475,9 +543,25 @@ function drawSwitch(draw, x, y, width, height, opacity = 1, toggle = (isOn) => {
     .font({ size: 12, anchor: 'middle', fill: '#fff' })
     .center(x + width * 0.75, y + height / 2);
 
+  // NEW: API to enable/disable the switch (dims visuals and changes cursor)
+  switchGroup.setEnabled = (flag) => {
+    switchGroup.isEnabled = !!flag;
+    const dim = opacity * 0.5;
+    body
+      .fill({ color: flag ? '#555' : '#999', opacity: flag ? opacity : dim })
+      .css('cursor', flag ? 'pointer' : 'not-allowed');
+    handle.fill({ color: flag ? '#aaa' : '#ccc', opacity: flag ? opacity : dim });
+  };
+
   handle.rotate(-20, x + width / 2, y + height / 2);
 
   const onToggle = () => {
+    // NEW: ignore clicks when disabled
+    if (!switchGroup.isEnabled) {
+      console.log('[drawSwitch] click ignored; switch disabled');
+      return;
+    }
+
     // Flip persistent state on the group
     switchGroup.isOn = !switchGroup.isOn;
     console.log('[drawSwitch] clicked -> isOn:', switchGroup.isOn);
@@ -501,9 +585,8 @@ function drawSwitch(draw, x, y, width, height, opacity = 1, toggle = (isOn) => {
     }
   };
 
-  // Bind clicks to both the body and handle to be safe across SVG.js versions
+  // Bind clicks to the group (body and handle are inside)
   switchGroup.on('click', onToggle);
-  // handle.on('click', onToggle);
 
   return switchGroup;
 }
@@ -557,19 +640,14 @@ function drawTemperatureController(g, px, py) {
     .css('cursor', 'pointer');
   ui.text('+').font({ size: 18, weight: 'bold' }).move(px + 145, py + 34).css('pointer-events', 'none');
 
-  // Hint text
-  // const hint = ui.text('range 25–45 °C (step 5)')
-  //   .font({ size: 11, style: 'italic' })
-  //   .move(px + 10, py + 74);
-
   // Wire up interactions
   minusBtn.on('click', () => {
-    if (!heaterOn) return; // disabled when OFF
-    setTemperature(currentTempC - 5);
+    if (!allowTemperatureChange) return;
+    setTemperature(targetTempC - 5);
   });
   plusBtn.on('click', () => {
-    if (!heaterOn) return; // disabled when OFF
-    setTemperature(currentTempC + 5);
+    if (!allowTemperatureChange) return;
+    setTemperature(targetTempC + 5);
   });
 
   tempController = {
@@ -588,7 +666,7 @@ function refreshTempController() {
   if (!tempController) return;
 
   // Readout text
-  tempController.readoutText.text(`${currentTempC} °C`);
+  tempController.readoutText.text(`${targetTempC} °C`);
 
   // Enabled/disabled styling for buttons based on heater state
   const activeFill = '#efefef';
@@ -606,4 +684,59 @@ function refreshTempController() {
 
   // Readout box tint when heating
   tempController.readoutBox.fill(heaterOn ? '#fff7e6' : '#ffffff');
+}
+
+export function resetConstantVolumeExperiment() {
+  // Stop any in-flight temperature→pressure ramp timers
+  clearTempRampTimers();
+
+  // If the switch still exists, ensure it is disabled on reset
+  if (tempSwitch && typeof tempSwitch.setEnabled === 'function') {
+    tempSwitch.setEnabled(false);
+  }
+
+  // Core state back to defaults
+  pressureGuage = null;
+  pressureReliefValve = null;
+  sleeve = null;
+  syringeObj = null;
+  syringeControls = null;
+  reactorBounds = null;
+  tempSwitch = null;
+  thermoCouple = null;
+
+  tempController = null;   // UI elements group for temperature control
+  targetTempC = 25;       // setpoint back to ambient
+  currentTempC = 25;      // measured back to ambient
+  heaterOn = false;        // switch state
+  pressure = null;        // current pressure in bar
+  liquidWeight = 1.8;      // g of N2O4 in syringe (1.6 to 2.0 g)
+  liquidPushed = false;   // has the syringe been pushed?
+  temperatureText = null;
+  allowTemperatureChange = true; // allow user to change temperature
+
+  // Reset temperature controller/readouts
+  refreshTempController();
+  if (temperatureText) {
+    temperatureText.text(`${currentTempC} °C`);
+  }
+  // Reset pressure readout: no gas injected yet → 0.00 bar
+  if (pressure) {
+    pressure.text('0.00');
+  }
+  // Refill syringe to default mass and snap geometry back to baseline
+  if (syringeObj) {
+    syringeObj.animating = false;
+    syringeObj.filled = true;
+    syringeObj.liquidWeight = 1.8;
+    // Update internal baseline targets based on the weight
+    updateSyringeFillFromWeight(syringeObj, false);
+    // Snap shapes to the baseline geometry
+    if (syringeObj.liquid && syringeObj.plunger) {
+      syringeObj.liquid.y(syringeObj.liquidY0).height(syringeObj.liquidH0);
+      syringeObj.plunger.y(syringeObj.plungerY0);
+    }
+  }
+  // Refresh syringe controls (button label, weight text, disabled style, etc.)
+  refreshSyringeControls();
 }

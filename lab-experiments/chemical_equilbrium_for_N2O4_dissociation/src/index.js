@@ -21,18 +21,7 @@ window.addEventListener('resize', function() {
     draw.size(windowWidth, windowHeight);
 });
 
-// document.addEventListener('DOMContentLoaded', () => {
-//   const hambIcon = document.getElementById('hamburger-icon');
-//   if (hambIcon) {
-//     hambIcon.addEventListener('click', toggleMenu);
-//   }
-// });
-
 document.addEventListener('DOMContentLoaded', () => {
-  // const hambIcon = document.getElementById('hamburger-icon');
-  // if (hambIcon) {
-  //   hambIcon.addEventListener('click', toggleMenu);
-  // }
   // Hook up the reset button to clear and redraw the SVG figure
   const resetBtn = document.getElementById('reset-button');
   if (resetBtn) {
