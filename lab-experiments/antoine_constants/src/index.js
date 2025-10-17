@@ -96,6 +96,7 @@ function handleInject() {
         document.getElementById("add-button").removeAttribute("disabled");
         document.getElementById("reset-button").removeAttribute("disabled");
         document.getElementById("v-slider").removeAttribute("disabled");
+        document.getElementById("t-slider").removeAttribute("disabled");
       }
     }
     if (g.percent_injected >= 1) {

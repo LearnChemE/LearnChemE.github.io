@@ -1,0 +1,27 @@
+.btn {
+    position: absolute;
+    /* Center text */
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    /* Size */
+    width: 8em;
+    height: 2.5em;
+    /* Style */
+    color: white;
+    background-color: #1a1a1a;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    box-shadow: 0 2px 1px #00000055;
+}
+.btn:hover {
+    filter: brightness(0.95);
+}
+
+.btn:disabled {
+    background-color: grey;
+    cursor: not-allowed;
+}
+.btn:disabled:hover {
+    border-color: grey;
+}

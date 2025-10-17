@@ -1,0 +1,56 @@
+/* Clean, cross-browser select styling for the SelectList component */
+select.select-list {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	display: inline-block;
+	width: 8rem;
+	max-width: 100%;
+	box-sizing: border-box;
+	padding: 8px 36px 8px 12px; /* room for custom arrow */
+	font-size: 14px;
+	line-height: 1.2;
+	color: #111827;
+	background-color: #ffffff;
+	border: 2px solid #c5c5c5;
+	border-radius: 6px;
+	box-shadow: 0 1px 2px rgba(16,24,40,0.04);
+	cursor: pointer;
+	transition: border-color 120ms ease, box-shadow 120ms ease;
+
+	/* simple arrow built from two gradients so we don't require images */
+	background-image:
+		linear-gradient(45deg, transparent 50%, #374151 50%),
+		linear-gradient(135deg, #374151 50%, transparent 50%);
+	background-position: calc(100% - 18px) calc(50% - 3px), calc(100% - 13px) calc(50% - 3px);
+	background-size: 6px 6px, 6px 6px;
+	background-repeat: no-repeat;
+}
+
+/* Hover and focus */
+select.select-list:hover {
+	border-color: #4478c7;
+}
+
+select.select-list:active {
+	outline: none;
+	border-color: #4478c7;
+}
+
+/* Options: many browsers ignore complex option styling, but basic colors help where supported */
+select.select-list option {
+	padding: 6px 8px;
+	background: #ffffff;
+	color: #111827;
+}
+
+/* Small utility sizes */
+select.select-list.small {
+	padding: 6px 32px 6px 10px;
+	font-size: 13px;
+}
+
+select.select-list.large {
+	padding: 10px 40px 10px 14px;
+	font-size: 16px;
+}
