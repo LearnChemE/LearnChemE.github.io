@@ -8,9 +8,12 @@ interface SelectListProps {
     onSelect: (item: LabelledItem) => void;
     right: number;
     bottom: number;
+    disabled?: () => boolean;
 }
 
 export const SelectList: Component<SelectListProps> = (props) => {
+    const disableFn = props.disabled ? props.disabled : () => false;
+
     const onChange = (e: Event) => {
         const sel = e.currentTarget as HTMLSelectElement;
         const idx = sel.selectedIndex;
@@ -19,7 +22,7 @@ export const SelectList: Component<SelectListProps> = (props) => {
     };
 
     return (
-        <select class="select-list" onChange={onChange} style={{ position: "absolute", right: `${props.right}px`, bottom: `${props.bottom}px` }}>
+        <select class={"select-list" + (disableFn() ? " disabled" : "")} onChange={onChange} style={{ position: "absolute", right: `${props.right}px`, bottom: `${props.bottom}px` }}>
             <For each={props.items}>{(item) => <option>{item.label}</option>}</For>
         </select>
     );

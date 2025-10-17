@@ -47,6 +47,7 @@ export const Magnifier: Component<MagnifierProps> = (props) => {
         if (mOver) {
             ref.addEventListener("mouseover", () => setOpacity(1));
             ref.addEventListener("mouseleave", () => setOpacity(0));
+            setOpacity(0);
         }
         if (!follow) return;
         onPointerMove = (e: PointerEvent) => {

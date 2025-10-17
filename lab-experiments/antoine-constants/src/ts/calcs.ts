@@ -20,7 +20,6 @@ export function calcPressure(substance: Substance, v: number, T: number) {
     // Calculate pressure if all is ideal gas
     const P_ig = n * R * (T + 273.15) / V;
     const Psat = antoineEquation(T, substance.coeffs);
-    console.log(Psat, T, substance)
     return Math.min(Psat, P_ig);
 }
 

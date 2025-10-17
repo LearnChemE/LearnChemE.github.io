@@ -25,6 +25,9 @@ function App() {
   const [substance, setSubstance] = createSignal(substances[0]);
   // Pressure
   const [pressure, setPressure] = createSignal(0);
+  // Labels
+  const [topLabelText, setTopLabelText] = createSignal("the tank is empty.\nready to fill the syringe");
+  const [bottomLabelText, setBottomLabelText] = createSignal("test");
 
   const targetPressure = createMemo<number>(() => {
     const v = volInTank();
@@ -69,12 +72,13 @@ function App() {
     setInjecting(true);
     
     const frame = (dt: number) => {
+      let playing = true;
       let injected = 0;
       setSyringeVol(v => {
         const newV = v - 0.33 * dt; // Inject at 0.5 L/s
         injected = v - newV;
         if (newV <= 0) {
-          setInjecting(false);
+          playing = false;
           return 0;
         }
         return newV;
@@ -82,10 +86,12 @@ function App() {
       // Update moles injected
       setVolInTank(n => n + injected); // Multiply by concentration (M) to get moles
 
-      return injecting();
+      return playing;
     }
     // Start animation
-    animate(frame);
+    animate(frame, () => {
+      setTimeout(() => setInjecting(false), 2000);
+    });
   }
 
   const reset = () => {
@@ -106,6 +112,41 @@ function App() {
     enableWindowResize();
   });
 
+  createEffect(() => {
+    if (injecting()) {
+      if (syringeVol() === 0) {
+        setBottomLabelText("system is equilibrating...");
+        setTopLabelText(" system is at equilibrium.\nyou may refill the syringe.");
+        return;
+      }
+      setBottomLabelText("injecting liquid...");
+      return;
+    }
+    if (volInTank() > 0 && syringeVol() === 0) {
+      setBottomLabelText(" system is at equilibrium.\nyou may refill the syringe.");
+      return;
+    }
+
+    setBottomLabelText(`syringe contains\n${syringeVol().toFixed(2)} mL liquid`);
+  });
+
+  createEffect(() => {
+    if (volInTank() > 0) {
+      if (syringeVol() > 0) {
+        setTopLabelText("");
+      } else {
+        setTopLabelText(`you have injected a\n total of ${volInTank().toFixed(2)} mL`);
+      }
+    } 
+    else {
+      if (syringeVol() > 0) {
+        setTopLabelText("ready to inject liquid\ninto empty vessel");
+      } else {
+        setTopLabelText("the tank is empty.\nready to fill the syringe");
+      }
+    }
+  });
+
   return (
     <>
       <HamburgerMenu path={worksheet} downloadName='antoine_constants_worksheet.pdf' Directions={DirectionsText} About={AboutText} />
@@ -123,16 +164,18 @@ function App() {
         <Thermometer temperature={temperature} />
         {/* Labels */}
         <Label fontSize="16" x={185} y={380} text="tank volume = 4 L" />
-        <Label fontSize="12" x={355} y={230} text={() => `syringe contains ${syringeVol().toFixed(2)} mL liquid`} />
+        <Label fontSize="12" x={305} y={80} text={"hover mouse over\n gauge to enlarge"} />
+        <Label fontSize="12" x={425} y={175} text={topLabelText} center={true} />
+        <Label fontSize="12" x={425} y={230} text={bottomLabelText} center={true} />
         </g>
         <Magnifier targetId='content' followMouse={false} circle={{ cx: 249, cy: 73, r: 75 }} hideOnMouseLeave={true} />
       </svg>
       {/* End SVG */}
 
       {/* Controls */}
-      <SelectList items={substances} onSelect={(s) => { setSubstance(s as Substance); setSyringeVol(0); setVolInTank(0); }} right={20} bottom={170} />
+      <SelectList items={substances} disabled={() => volInTank() > 0} onSelect={(s) => { setSubstance(s as Substance); setSyringeVol(0); setVolInTank(0); }} right={20} bottom={170} />
       <Button coords={{ x: 20, y:  20 }} label="reset" onClick={reset} color="#e94646ff" />
-      <Button coords={{ x: 20, y:  70 }} label="inject" onClick={inject} color="#67af55ff" disabled={injecting} />
+      <Button coords={{ x: 20, y:  70 }} label="inject" onClick={inject} color="#67af55ff" disabled={() => injecting() || syringeVol() === 0} />
       <Button coords={{ x: 20, y: 120 }} label="fill syringe" onClick={fillSyringe} color="#659ee9ff" disabled={injecting} />
       {/* End Controls */}
     </>
