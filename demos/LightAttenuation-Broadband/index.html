@@ -60,6 +60,7 @@
     <div id="dir-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#directions-modal">Directions</div>
     <div id="det-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#details-modal">Details</div>
     <div id="abt-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#about-modal">About</div>
+        <div id="abt-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#advanced-modal">Spectral Weighted Intensity</div>
     <div id="abt-btn" class="btn btn-light btn-wide" data-bs-toggle="modal" data-bs-target="#calculators-modal">Other Calculators</div>
   </div>
 </div>
@@ -228,7 +229,138 @@ Absorber spectrum – predefined or user-provided <br>
   </div></div>
 </div>
 
+<div id="advanced-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Other Calculators</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
 
+
+<p>
+   <b><u>Spectral Weighted Intensity</u></b><br>
+This module estimates a <b>monochromatic-equivalent intensity</b> — <i>not</i> the real measured intensity — 
+that would produce the <b>same total photon absorption</b> in a material as the actual broadband light source.
+It converts a measured total irradiance into an <b>effective wavelength-specific value</b> \( I_\text{target} \) (mW/cm²),
+as if all absorbed photons came from a single wavelength \( \lambda_0 \).
+<br><br>
+
+<b><u>Purpose</u></b><br>
+Light sources emit over broad spectral ranges, and both detectors and materials respond differently with wavelength. 
+The <i>Spectral Weighted Intensity</i> bridges that gap by estimating the equivalent monochromatic light intensity that 
+would deposit the same number of absorbed photons as the broadband source.  
+It accounts for: 
+<br>
+1) the lamp’s emission spectrum \( I(\lambda) \),<br>
+2) the detector’s photon or energy response, and<br>
+3) the material’s wavelength-dependent absorptivity \( \varepsilon(\lambda) \). 
+<br><br>
+
+<b><u>Concept</u></b><br>
+The measured total irradiance \( mInt \) represents light distributed across wavelengths.  
+The model applies a <b>spectral correction factor</b> to convert this broadband value into an <b>equivalent monochromatic intensity</b> at \( \lambda_0 \):
+<div style="text-align:center;">
+\( I_\text{target} = mInt \times f_\text{intensity}(\lambda_0) \times f_\text{absorbance}(\lambda_0) \)
+</div>
+Here, \( I_\text{target} \) is <b>not the real irradiance at that wavelength</b>, 
+but the <i>single-wavelength intensity that would yield the same total photon absorption rate</i> in the sample.
+<br><br>
+
+<b><u>1) Intensity Correction</u></b><br>
+The correction depends on whether the detector measures <b>photon flux</b> or <b>energy flux</b>:
+<br><br>
+
+<b>(a) Photon-counting detector (e.g., photodiode):</b><br>
+Photodiodes respond to the <b>number of incident photons</b>, not their energy.  
+Each absorbed photon ideally produces a single electron–hole pair, so the current is proportional to photon flux \( \Phi(\lambda) = I(\lambda) \, \lambda / hc \).  
+Because longer wavelengths carry less energy per photon, the same optical power produces <b>more photons</b> at longer wavelengths.  
+The appropriate correction therefore weights by \( 1/\lambda \):
+<div style="text-align:center;">
+\( f_\text{intensity}(\lambda_0)
+= \lambda_0
+\frac{\displaystyle \int I(\lambda)/\lambda \, d\lambda}
+     {\displaystyle \int I(\lambda) \, d\lambda} \)
+</div>
+
+<b>(b) Energy-measuring detector (thermal, thermopile, bolometer):</b><br>
+Thermal sensors respond to the <b>total absorbed energy</b> as heat, regardless of photon energy.  
+They integrate power directly across wavelengths, giving an effectively flat spectral response (neglecting coating reflectivity).  
+Hence no photon weighting is required:
+<div style="text-align:center;">
+\( f_\text{intensity}(\lambda_0) = 1 \)
+</div>
+
+<b><u>Justification for separate cases:</u></b><br>
+Photodiodes and thermal sensors fundamentally measure different physical quantities.  
+A photodiode converts <i>photon number</i> to current (A ∝ photons/s), while a thermal detector converts <i>energy flux</i> to temperature rise (W/cm²).  
+Because the photon energy \( E_\text{photon} = hc/\lambda \) decreases with wavelength, 
+a broadband lamp will appear relatively stronger to a photodiode than to a thermal sensor at longer wavelengths.  
+The model therefore applies distinct spectral corrections consistent with each detector’s underlying physics.
+<br><br>
+
+<b><u>When intensity correction matters most:</u></b><br>
+For smooth, narrow spectra (e.g., a narrow LED), this correction has only a minor effect.  
+However, for <b>multi-peaked or discontinuous spectra</b> — such as the <b>mercury arc lamp</b>, which emits sharp lines at 405, 436, 546 nm, etc. —  
+the relative photon weighting can shift the effective intensity substantially.  
+In such cases, the correction is <b>critical for meaningful comparison</b> between detectors or for matching experimental and simulated photon absorption.
+<br><br>
+
+<b>Note:</b> This neglects the <b>wavelength-dependent quantum yield (responsivity)</b> of the detector, 
+which in practice can be significant.  
+However, such data are rarely accessible, so a flat responsivity is assumed for simplicity.
+<br><br>
+
+<b><u>2) Absorbance Correction</u></b><br>
+Two spectra with the same total irradiance can drive different absorption rates depending on how light overlaps the 
+material’s absorbance.  
+This correction compares the absorbed photon flux for the actual spectrum versus a narrow monochromatic source:
+<div style="text-align:center;">
+\( f_\text{absorbance}(\lambda_0)
+= 
+\frac{
+\displaystyle \int I(\lambda)\,\varepsilon(\lambda)\,d\lambda
+}{
+\displaystyle \int G_{\lambda_0}(\lambda)\,\varepsilon(\lambda)\,d\lambda
+} \)
+</div>
+where \( G_{\lambda_0}(\lambda) \) is a narrow Gaussian (FWHM ≈ 0.1 nm) centered at \( \lambda_0 \).
+<br><br>
+
+<b><u>Result</u></b><br>
+The <b>Spectral Weighted Intensity</b> is:
+<div style="text-align:center;">
+\( I_\text{target}(\lambda_0)
+= mInt \times
+\lambda_0
+\frac{\displaystyle \int I(\lambda)/\lambda \, d\lambda}{\displaystyle \int I(\lambda)\,d\lambda}
+\times
+\frac{
+\displaystyle \int I(\lambda)\,\varepsilon(\lambda)\,d\lambda
+}{
+\displaystyle \int G_{\lambda_0}(\lambda)\,\varepsilon(\lambda)\,d\lambda
+} \)
+</div>
+
+This represents the <b>monochromatic-equivalent intensity</b> that would produce the 
+<b>same total photon absorption</b> in the material as the real broadband source.  
+It should <b>never be interpreted as the actual irradiance at that wavelength</b>, 
+but rather as a modeling construct useful for comparing spectral power distributions on an equivalent photon-absorption basis.
+<br><br>
+
+<b><u>Adjustable Parameters</u></b><br>
+Measured Intensity (\( mInt \)) – total irradiance from experiment or datasheet (mW/cm²) <br>
+Target Wavelength (\( \lambda_0 \)) – wavelength of interest (nm) <br>
+Detector Type – photon-counting (photodiode) or energy-measuring (thermal) <br>
+Light Source Spectrum – user-defined emission shape \( I(\lambda) \) <br>
+Absorbance Spectrum – material-specific molar absorptivity \( \varepsilon(\lambda) \) <br>
+
+</p>
+
+
+    </div>
+  </div></div>
+</div>
 
 </body>
 </html>
