@@ -1092,6 +1092,7 @@ function updateText() {
       <b> Observed equivalent incident intensity: </b><br>
        ${formatSigFig(tInt, 3)} mW/cm² 
        <br><br>
+       <b>**See details in menu**</b> <br>
       Intensity correction: ${formatSigFig(intensityCorrection, 3)}
       <br>
       Absorbance factor: ${formatSigFig(absorbanceFactor, 3)}
