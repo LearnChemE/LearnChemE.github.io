@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, type Component } from "solid-js";
+import { createEffect, createMemo, type Component } from "solid-js";
 import "./Slider.css";
 
 interface SliderProps {
@@ -9,22 +9,19 @@ interface SliderProps {
     label?: string;
     units?: string;
     decimalPlaces?: number;
+    value: () => number;
     onChange: (value: number) => void;
     disabled?: () => boolean;
 }
 
-export const Slider: Component<SliderProps> = ({ min, max, step, initValue, label, units, decimalPlaces, onChange, disabled }) => {
-    const [val, setVal] = createSignal(initValue);
+export const Slider: Component<SliderProps> = ({ min, max, step, label, units, decimalPlaces, value, onChange, disabled }) => {
+    const [val, setVal] = [value, onChange];
 
     const valLabel = createMemo(() => {
         if (decimalPlaces !== undefined) {
             return val().toFixed(decimalPlaces);
         }
         return val().toString();
-    });
-
-    createEffect(() => {
-        onChange(val());
     });
 
     if (!disabled) disabled = () => false;
