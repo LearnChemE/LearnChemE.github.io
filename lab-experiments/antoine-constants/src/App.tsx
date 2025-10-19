@@ -11,7 +11,7 @@ import { Button } from './components/Button/Button';
 import { Label } from './components/Label/Label';
 import { Slider } from './components/Slider/Slider';
 import { SelectList } from './components/List/List';
-import { calcPressure, substances, type Substance } from './ts/calcs';
+import { calcPressure, substances, TankVolume, type Substance } from './ts/calcs';
 import { Thermometer } from './components/Thermometer/Thermometer';
 import Magnifier from './components/Magnifier/Magnifier';
 
@@ -99,7 +99,7 @@ function App() {
     setTemperature(40);
     setVolumeToInject(.5);
     setVolInTank(0);
-
+    setSyringeVol(0);
   }
 
   // On mount, setup zooming and dragging
@@ -151,8 +151,8 @@ function App() {
     <>
       <HamburgerMenu path={worksheet} downloadName='antoine_constants_worksheet.pdf' Directions={DirectionsText} About={AboutText} />
       <div class="sliders-container">
-        <Slider label="temperature:"      units="°C" min={() => substance().tempRange[0]} max={() => substance().tempRange[1]} step={1} initValue={40} onChange={setTemperature} disabled={injecting} />
-        <Slider label="volume to inject:" units="mL" min={0} max={1} step={.01} initValue={0.5} onChange={setVolumeToInject} decimalPlaces={2} disabled={injecting} />
+        <Slider label="temperature:"      units="°C" min={() => substance().tempRange[0]} max={() => substance().tempRange[1]} step={1} initValue={40} value={temperature} onChange={setTemperature} disabled={injecting} />
+        <Slider label="volume to inject:" units="mL" min={0} max={1} step={.01} initValue={0.5} value={volumeToInject} onChange={setVolumeToInject} decimalPlaces={2} disabled={injecting} />
       </div>
       
       {/* SVG */}
@@ -163,7 +163,7 @@ function App() {
         <Gauge pressure={pressure} maxPressure={1.2} />
         <Thermometer temperature={temperature} />
         {/* Labels */}
-        <Label fontSize="16" x={185} y={380} text="tank volume = 4 L" />
+        <Label fontSize="16" x={185} y={380} text={`tank volume = ${TankVolume} L`} />
         <Label fontSize="12" x={305} y={80} text={"hover mouse over\n gauge to enlarge"} />
         <Label fontSize="12" x={425} y={175} text={topLabelText} center={true} />
         <Label fontSize="12" x={425} y={230} text={bottomLabelText} center={true} />

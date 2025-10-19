@@ -11,15 +11,16 @@ function antoineEquation(T: number, coeffs: AntoineCoefficients): number {
     return mmHg / 750.0616827;
 }
 
-const V = 4; // L
+export const TankVolume = 2; // L
 const R = .08314; // bar L / (mol K)
 
 export function calcPressure(substance: Substance, v: number, T: number) {
     // Calculate moles in system
     const n = v * substance.concentration;
     // Calculate pressure if all is ideal gas
-    const P_ig = n * R * (T + 273.15) / V;
+    const P_ig = n * R * (T + 273.15) / TankVolume;
     const Psat = antoineEquation(T, substance.coeffs);
+    console.log(substance.name, Psat);
     return Math.min(Psat, P_ig);
 }
 
@@ -43,14 +44,14 @@ export const substances: Substance[] = [
         name: "ethanol",
         label: "Species B",
         coeffs: { A: 8.1122, B: 1529.864, C: 226.184 },
-        tempRange: [20, 93],
+        tempRange: [20, 70],
         concentration: .01713
     },
     {
         name: "n-heptane",
         label: "Species C",
         coeffs: { A: 6.89677, B: 1264.9, C: 216.544 },
-        tempRange: [-2, 123],
+        tempRange: [-2, 104],
         concentration: .006723
     },
     {
