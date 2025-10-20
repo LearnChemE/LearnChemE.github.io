@@ -28,6 +28,9 @@ export const debug = (state: GlobalState) => {
                 Tco: t2, 
                 Thi: T1, 
                 Tho: T2, 
+                // Q: calcQ(25, T1, Ca, Cl),
+                // Ca: Ca,
+                // Cl: Cl,
                 timestamp, 
                 noplot: { Ca, Cl } 
             };
