@@ -1,5 +1,7 @@
 import numpy as np
+from numpy import exp
 import matplotlib.pyplot as plt
+from scipy.optimize import fsolve
 from collections import deque
 
 MAX_LEN = 1000
@@ -53,7 +55,7 @@ def init(ax):
     ax.set_title("test results")
     ax.set_xlabel("time (S)")
     ax.set_ylabel("UA value (W/K)")
-    ax.set_ylim([0,30])
+    # ax.set_ylim([0,30])
     line, = ax.plot([],[])
 
 def update(data, ax):
@@ -80,11 +82,26 @@ def update(data, ax):
     dt1 = thi - tco
     dt2 = tho - tci
     if (dt1 == 0 or dt2 == 0): return
-    lmtd = (dt1 - dt2) / np.log(dt1 / dt2)
+
+    # F correction method
+    # lmtd = (dt1 - dt2) / np.log(dt1 / dt2)
+    # f = crossflow_F_one_mixed(thi, tho, tci, tco)
+
+    # NTU Method
+    cmin = min(cl,ca)
+    cmax = max(cl,ca)
+    cr = cmin/cmax
+    qmax = cmin * (thi - tci)
+    if (qmax == 0): return
+    ep = q / qmax
+    # cross-flow, both sides unmixed: ep = 1 - exp((exp(-cr * NTU ** .78) - 1) / cr * NTU ** -.22)
+    def fn(ntu):
+        return 1 - exp((exp(-cr * ntu ** .78) - 1) / (cr * ntu ** -.22)) - ep
+    ntu = fsolve(fn, .5)
 
     # Calc UA
-    # f = crossflow_F_one_mixed(thi, tho, tci, tco)
-    ua = q / lmtd
+    ua = ntu * cmin
+    # ua = q / lmtd #/ f
     residuals.append(ua)
     times.append(ts)
 

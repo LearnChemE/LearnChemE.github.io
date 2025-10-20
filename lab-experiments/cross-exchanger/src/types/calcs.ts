@@ -4,7 +4,7 @@ const ROOM_TEMP = 25; // C
 const INIT_TANK_TEMP = 60; // C
 
 const UA_TANK = 1e-1; // W / K
-const UA_TUBE = 2e-1; // W / K
+const UA_TUBE = 2e-0; // W / K
 const UA_HEX = 25; // W / K
 export const CP = 4.184; // J / g / K
 const RHO = 0.998 // g / mL
@@ -12,22 +12,15 @@ const RHO = 0.998 // g / mL
 export const CP_AIR = 1.006; // J / g / K
 export const MDOT_AIR = 20; // g / s
 
-function calcQ(t1: number, T1: number, Ca: number, Cl: number) {
-    const [Cmin , Cmax] = [Ca, Cl].sort();
+export function calcQ(t1: number, T1: number, Ca: number, Cl: number) {
+    const UA = UA_HEX * Math.sqrt(Cl / (37.5 * CP));
+    const [Cmin , Cmax] = [Ca, Cl].sort((a,b) => a - b);
     const C = Cmin / Cmax;
-    const NTU = UA_HEX / Cmin;
+    const NTU = UA / Cmin;
 
     // Calculate effectiveness
-    let ep: number;
-    // Correlation depends on which fluid is mixed
-    if (Cmin === Ca) {
-        // Cmin is the mixed fluid
-        ep = 1 - Math.exp(-(1 - Math.exp(-NTU * C)) / C);
-    }
-    else {
-        // Cmin is the unmixed fluid
-        ep = 1 / C * (1 - Math.exp(-C * (1 - Math.exp(-NTU))));
-    }
+    // Correlation for both fluids unmixed
+    const ep = 1 - Math.exp((Math.exp(-C * NTU ** 0.78) - 1) / C / NTU ** -0.22);
 
     // Calculate the max heat transfer rate
     const Qmax = Cmin * (T1 - t1);
@@ -85,14 +78,11 @@ export class Balance {
         const dQdt_tube = UA_TUBE * (ROOM_TEMP - tubeTemp) + C_liq * (tankTemp - tubeTemp) - Qhex;
 
         // Use the hex energy balance to calculate the theoretical air temp
-        const airTempTheoretical = 25 + Qhex / C_air;
-        // // Use a moving average filter over the last 2 seconds to make the actual less awful
-        // const avgHi = this.airTemp + (airTempTheoretical - this.airTemp) * deltaTime / 5000;
-        this.airTemp = airTempTheoretical;//Math.min(airTempTheoretical, avgHi);
+        this.airTemp += (25 - this.airTemp + Qhex / C_air) * dt; 
 
         // Translate to rhs
         const dT_tank = this.tankFill !== 0 ? dQdt_tank / RHO / this.tankFill / CP * dt : 0; // K / s
-        let dT_tube = 0;
+        let dT_tube;
         if (this.tubeFill <= 0) {
             dT_tube = 0;
         }
@@ -100,12 +90,14 @@ export class Balance {
             dT_tube = dQdt_tube / RHO / this.tubeFill / CP * dt;
         }
         else {
-            dT_tube = dQdt_tube / C_liq; // K / s
+            const c = Math.max(C_liq, RHO * this.tubeFill * CP)
+            dT_tube = dQdt_tube / c * dt; // K / s
         }
 
         // Evolve
         this.tankTemp += dT_tank;
         this.tubeTemp += dT_tube;
+        // this.tubeTemp = Qhex > 0 ? -Qhex / C_liq + tankTemp : tankTemp;
 
     }
 
