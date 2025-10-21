@@ -1,6 +1,6 @@
 import type { EvaporatorState } from "../types";
 
-const UA = 1e4; // W / K
+const UA = 674; // W / K
 const STEAM_TEMP = 273.15 + 212; // deg C
 const EVAPORATOR_PRESSURE = 1; // bar
 const X_IN = 0.1;
