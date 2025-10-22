@@ -5,10 +5,10 @@ export const svgNS = "http://www.w3.org/2000/svg";
 export type EvaporatorState = {
     feedFlow: ControlType,
     feedTemp: ControlType,
+    steamPres: ControlType,
 
     steamFlow: number,
     steamTemp: number,
-    steamPres: number,
 
     evapFlow: number,
 
@@ -84,10 +84,12 @@ export type OutletDescriptor = {
 export type SimulationDescriptor = {
     flowCtrl: ControlType,
     tempCtrl: ControlType,
+    presCtrl: ControlType,
     steamFlowLabel: Label,
     steamTempLabel: Label,
     pressureLabel: Label,
     evapLabel: Label,
+    concTempLabel: Label,
     condensate: Outlet,
     concentrate: Outlet,
 }

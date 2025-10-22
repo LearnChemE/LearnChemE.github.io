@@ -55,4 +55,9 @@ export class BallValve {
 
         requestAnimationFrame(frame);
     }
+
+    public reset = () => {
+        this.state = false;
+        this.handle.setAttribute("transform", `rotate(${0} ${this.coords.x} ${this.coords.y})`);
+    }
 }

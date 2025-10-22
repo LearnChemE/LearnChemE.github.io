@@ -6,6 +6,7 @@ import { Waterfall } from "./Waterfall";
 export class Outlet {
     private flowrate: number;
     private composition: number;
+    private ballValve: BallValve;
 
     private bucketMass: number = 0;
     private bucketComp: number = 0;
@@ -27,7 +28,7 @@ export class Outlet {
         this.label = descriptor.label;
 
         // Initialize the valve
-        new BallValve(descriptor.valveDescriptor.id, descriptor.valveDescriptor.reverse, this.flow);
+        this.ballValve = new BallValve(descriptor.valveDescriptor.id, descriptor.valveDescriptor.reverse, this.flow);
     }
 
     private flow = (measure: boolean) => {
@@ -54,7 +55,7 @@ export class Outlet {
             const deltaTime = time - prevtime;
             prevtime = time;
 
-            const dt = deltaTime / 1000 / 60;
+            const dt = deltaTime / 1000 / 60; // min
             const m  = this.bucketMass;
             const dm = this.flowrate * dt;
 
@@ -63,7 +64,7 @@ export class Outlet {
             this.bucketMass = m + dm;
 
             this.label.setLabel(this.bucketMass);
-            console.log(this.composition.toFixed(3), this.bucketComp.toFixed(3))
+            // console.log(this.composition.toFixed(3), this.bucketComp.toFixed(3))
 
             if (this.measuring) requestAnimationFrame(frame);
         }
@@ -100,6 +101,11 @@ export class Outlet {
                 this.outFall.stop();
                 this.measureFall.stop();
             }
-        }, 5000);
+        }, 1000);
+    }
+
+    public reset = () => {
+        this.ballValve.reset();
+        this.flow(false);
     }
 }

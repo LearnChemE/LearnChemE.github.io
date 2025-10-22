@@ -41,7 +41,7 @@ export const steamPresLabelDescriptor: DigitalLabelDescriptor = {
  */
 export const steamTempLabelDescriptor: DigitalLabelDescriptor = {
   id: "steamTempLabel",
-  gid: "steamFlowGauge_3",
+  gid: "steamFlowGauge_2",
   centerId: "steamTempScreen",
   fill: "#F9F155",
   units: "",
@@ -198,6 +198,20 @@ export const tempSpDescriptor: SetpointControlDescriptor<ControlType> = {
     step: 5
 };
 
+/**
+ * Pressure Setpoint Device
+ */
+export const presSpDescriptor: SetpointControlDescriptor<ControlType> = {
+    ctrl: null,
+    upBtnId: "flowUpBtn_2",
+    downBtnId: "flowDownBtn_2",
+    spLabel: null,
+    outLabel: null,
+    min: 3,
+    max: 25,
+    step: 1
+};
+
 export const concentrateDescriptor: OutletDescriptor = {
   flowrate: 0,
   composition: 0.1,
@@ -245,7 +259,7 @@ export const refractLabelDescriptor: DigitalLabelDescriptor = {
   gid: "refract",
   centerId: "refractScreen",
   fill: "#000000",
-  units: "°Bx",
+  units: "wt%",
   decimals: 1,
   initialValue: 0,
   range: {

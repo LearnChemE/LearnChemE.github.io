@@ -9,9 +9,10 @@ export class DigitalLabel implements Label {
     public id;
 
     constructor(descriptor: DigitalLabelDescriptor) {
-        const g = document.getElementById(descriptor.gid)!;
+        let g = document.getElementById(descriptor.gid)!;
 
-        const screen = document.getElementById(descriptor.centerId)!;
+        let screen = document.getElementById(descriptor.centerId)!;
+        if (screen.tagName === "g") screen = screen.children[0] as HTMLElement;
         const cx = Number(screen.getAttribute("x")!) + Number(screen.getAttribute("width")!) / 2;
         const cy = Number(screen.getAttribute("y")!) + Number(screen.getAttribute("height")!) / 2;
 

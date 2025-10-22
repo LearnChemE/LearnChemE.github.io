@@ -6,7 +6,7 @@ export class SetpointControl<T extends ControlType> {
     private control: T;
     private displayPoint: number;
     private spLabel: DigitalLabel;
-    private outLabel: DigitalLabel;
+    private outLabel: DigitalLabel | null;
     private min: number;
     private max: number;
     private step: number;
@@ -15,7 +15,7 @@ export class SetpointControl<T extends ControlType> {
         if (descriptor.ctrl === null) {
             throw new Error("Error: null control object on Setpoint Descriptor");
         }
-        if (descriptor.spLabel === null || descriptor.outLabel === null) {
+        if (descriptor.spLabel === null) {
             throw new Error("Error: null control object on Setpoint Descriptor");
         }
         this.control = descriptor.ctrl;
@@ -49,9 +49,14 @@ export class SetpointControl<T extends ControlType> {
     private animate = (delay: number) => {
         setTimeout(() => {
             this.control.iterate(delay);
-            this.outLabel.setLabel(this.control.value);
+            this.outLabel?.setLabel(this.control.value);
             this.animate(delay);
         }, delay);
+    }
+
+    public reset(value: number) {
+        this.spLabel.setLabel(value);
+        this.displayPoint = value;
     }
 }
 

@@ -10,7 +10,7 @@ import { initInteractions } from './ts/interactions';
 import { Simulation } from './ts/classes/Simulation';
 import { AnalogLabel, DigitalLabel } from './ts/classes/Label';
 import { FirstOrder } from './ts/classes/Setpoint';
-import { concentrateDescriptor, concScaleLabelDescriptor, condensateDescriptor, condScaleLabelDescriptor, evapLabelDescriptor, pressureLabelDescriptor, steamFlowLabelDescriptor, steamPresLabelDescriptor, steamTempLabelDescriptor, tankTempLabelDescriptor } from './ts/config';
+import { concentrateDescriptor, concScaleLabelDescriptor, condensateDescriptor, condScaleLabelDescriptor, evapLabelDescriptor, pressureLabelDescriptor, steamFlowLabelDescriptor, steamTempLabelDescriptor, tankTempLabelDescriptor } from './ts/config';
 import { Outlet } from './ts/classes/Outlet';
 import type { SimulationDescriptor } from './types';
 import { Refractometer } from './ts/classes/Refractometer';
@@ -23,11 +23,10 @@ app.appendChild(initHamburgerMenu(worksheet, "singleEffectEvaporatorWorksheet.pd
 app.appendChild(insertSVG(svg));
 
 // Create label for steam temperature
-const steamTempLabel = new DigitalLabel(tankTempLabelDescriptor);
+const tankTempLabel = new DigitalLabel(tankTempLabelDescriptor);
 // Create label for steam flowrate
 const steamFlowLabel = new DigitalLabel(steamFlowLabelDescriptor);
-new DigitalLabel(steamPresLabelDescriptor);
-new DigitalLabel(steamTempLabelDescriptor);
+const steamTempLabel = new DigitalLabel(steamTempLabelDescriptor);
 // Scale labels
 const condLabel = new DigitalLabel(condScaleLabelDescriptor);
 const concLabel = new DigitalLabel(concScaleLabelDescriptor);
@@ -35,6 +34,7 @@ const concLabel = new DigitalLabel(concScaleLabelDescriptor);
 // Control variables for state
 const flowCtrl = new FirstOrder(0,   500, 200);
 const tempCtrl = new FirstOrder(25, 3000,1000);
+const presCtrl = new FirstOrder(20,  500,   0);
 
 // Outlets
 concentrateDescriptor.label = concLabel;
@@ -52,20 +52,34 @@ const evapLabel = new AnalogLabel(evapLabelDescriptor);
 const stateDescriptor: SimulationDescriptor = {
   flowCtrl: flowCtrl,
   tempCtrl: tempCtrl,
+  presCtrl: presCtrl,
   steamFlowLabel: steamFlowLabel,
   steamTempLabel: steamTempLabel,
   pressureLabel: presLabel,
   evapLabel: evapLabel,
+  concTempLabel: tankTempLabel,
   condensate: condOutlet,
   concentrate: concOutlet
 }
-new Simulation(stateDescriptor);
+const simulation = new Simulation(stateDescriptor);
 
 // Initialize interactions
-initInteractions<FirstOrder>(flowCtrl, tempCtrl);
-new Refractometer(() => concOutlet.measureConcentration() * 100);
+const [flowSp, tempSp, presSp] = initInteractions<FirstOrder>(flowCtrl, tempCtrl, presCtrl);
+const refractometer = new Refractometer(() => concOutlet.measureConcentration() * 100);
 
 // Visibility and accessibility
 initSvgZoom();
 initSvgDrag();
 enableWindowResize();
+
+const resetBtn = document.getElementById("reset-btn");
+resetBtn?.addEventListener("click", () => {
+  refractometer.reset();
+  simulation.reset();
+  concOutlet.reset();
+  condOutlet.reset();
+
+  flowSp.reset(0);
+  tempSp.reset(25);
+  presSp.reset(20);
+});
