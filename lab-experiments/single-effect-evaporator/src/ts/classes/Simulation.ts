@@ -4,6 +4,7 @@ import type { Outlet } from "./Outlet";
 
 export class Simulation {
     private state: EvaporatorState; 
+    private setTankTempLabel: (val: number) => void;
     private setSteamTempLabel: (val: number) => void;
     private setSteamFlowLabel: (val: number) => void;
     private setEvapFlowLabel: (val: number) => void;
@@ -16,13 +17,13 @@ export class Simulation {
         this.state = {
             feedFlow: descriptor.flowCtrl,
             feedTemp: descriptor.tempCtrl,
+            steamPres: descriptor.presCtrl,
             steamFlow: 0,
             steamTemp: 500,
-            steamPres: 0,
             evapFlow: 0,
             concFlow: 0,
             concComp: 0,
-            concTemp: 25
+            concTemp: 209.9
         }
 
         this.condensate = descriptor.condensate;
@@ -30,9 +31,10 @@ export class Simulation {
 
         // Save label callbacks
         this.setSteamFlowLabel = (val: number) => descriptor.steamFlowLabel.setLabel(val);
+        this.setTankTempLabel  = (val: number) => descriptor.concTempLabel.setLabel(val);
+        this.setEvapFlowLabel  = (val: number) => descriptor.evapLabel.setLabel(val);
+        this.setPressureLabel  = (val: number) => descriptor.pressureLabel.setLabel(val);
         this.setSteamTempLabel = (val: number) => descriptor.steamTempLabel.setLabel(val);
-        this.setEvapFlowLabel = (val: number) => descriptor.evapLabel.setLabel(val);
-        this.setPressureLabel = (val: number) => descriptor.pressureLabel.setLabel(val);
 
         this.animate();
     }
@@ -50,7 +52,8 @@ export class Simulation {
 
             // Update labels
             this.setSteamFlowLabel(this.state.steamFlow);
-            this.setSteamTempLabel(this.state.concTemp);
+            this.setSteamTempLabel(this.state.steamTemp);
+            this.setTankTempLabel(this.state.concTemp);
             this.setEvapFlowLabel(this.state.evapFlow);
             this.setPressureLabel(1);
             

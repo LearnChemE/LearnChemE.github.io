@@ -1,13 +1,12 @@
 import type { EvaporatorState } from "../types";
 
-const UA = 674; // W / K
-const STEAM_TEMP = 273.15 + 212; // deg C
+const UA = 1200; // W / K
 const EVAPORATOR_PRESSURE = 1; // bar
 const X_IN = 0.1;
 
 const MASS_IN_EVAPORATOR = 10; // kg
 const EVAPORATOR_HEAT_CAPACITTY = 5000; // J
-const DIFFUSE = 10;
+const DIFFUSE = 100;
 
 /**
  * Calculate saturated pressure from temperature
@@ -25,6 +24,19 @@ function antoines(T: number) {
         return 10 ** (A - B / (T + C));
     }
 }
+
+/**
+ * Calculate saturated temperature from pressure
+ */
+function inv_antoines(P: number) {
+    const logP = Math.log10(P);
+    const [A, B, C] = (P > 2.35) ? 
+        [ 3.55959,  643.748, -198.043 ] : 
+        [  4.6543, 1435.264,  -64.848 ];
+        
+    return B / (A - logP) - C;
+}
+const TVap1bar = inv_antoines(1);
 
 /**
  * Calculate sugar water solution's heat capacity based on temperature (K) and mole fraction
@@ -108,34 +120,52 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     const mdot_feed = state.feedFlow.value;
     const temp_feed = state.feedTemp.value + 273.15;
     var temp_conc = state.concTemp + 273.15;
-    const temp_stm  = STEAM_TEMP;
+    const pres_stm  = state.steamPres.value;
+    const temp_stm = inv_antoines(pres_stm);
     
     // Heat transferred from steam trap to vessel
-    const heat_rate = (mdot_feed !== 0) ? UA * (temp_stm - temp_conc) : 0;
-    // Flow rates out from vessel
-    const mdot_conc = concentrate_flow(temp_conc, mdot_feed);
-    const mdot_evap = mdot_feed - mdot_conc;
-    const x_c = (mdot_conc !== 0) ? X_IN * mdot_feed / mdot_conc : X_IN;
+    const heat_rate = UA * (temp_stm - temp_conc);
     // Energy in minus energy out
     const in_minus_out = mdot_feed * (Cp(temp_feed, X_IN) * temp_feed - Cp(temp_feed, X_IN) * temp_conc);
-    // Energy lost to evaporation
-    const cons = dHvap(temp_conc) * mdot_evap / 60;
 
-    // Use energy bal to evolve (no generation)
-    const acc = in_minus_out + heat_rate - cons;
+    // Use energy bal to evolve without consumption first
+    const acc_noCons = in_minus_out + heat_rate;
+    // Flow rates out from vessel
+    const x_c = (state.concFlow !== 0) ? X_IN * mdot_feed / state.concFlow : X_IN;
+    const a = (MASS_IN_EVAPORATOR * Cp(temp_conc, x_c) + EVAPORATOR_HEAT_CAPACITTY)
+    const dTdt_noCons = acc_noCons / a;
+    const newT_noCons = temp_conc + dTdt_noCons * dt;
+
+    console.log(newT_noCons, TVap1bar)
+    let mdot_conc, mdot_evap;
+    if (newT_noCons > TVap1bar) {
+        const deltaT_cons = newT_noCons - TVap1bar;
+        const max_cons = deltaT_cons * a; // Maximum power available for evaporation
+
+        // Calculate the actual rates based on the surplus energy
+        mdot_evap = Math.min(60 * max_cons / dHvap(temp_conc), mdot_feed * (1 - x_c) * .99);
+        mdot_conc = mdot_feed - mdot_evap;
+
+        // Calculate how much power is actually going to evaporation
+        const cons = mdot_evap * dHvap(temp_conc) / 60;
+        // Evolve
+        const dTdt = (in_minus_out + heat_rate - cons) / a;
+        temp_conc = temp_conc + dTdt * dt;
+    } else {
+        // Approximately no evaporation; keep previous results
+        mdot_conc = mdot_feed;
+        mdot_evap = 0;
+        temp_conc = newT_noCons;
+    }
 
 
-    // Evolve the temperature
-    const dTdt = acc / (MASS_IN_EVAPORATOR * Cp(temp_conc, x_c) + EVAPORATOR_HEAT_CAPACITTY);
-    temp_conc += dTdt * dt;
-
-    // Calculate current state
-    const mdot_stm = (mdot_feed !== 0) ? heat_rate / dHvap(temp_stm) * 60 : 0;
+    // Calculate steam rate
+    const mdot_stm = heat_rate / dHvap(temp_stm);
 
     // debug
     // console.log(`in - out = ${in_minus_out}\ngen = ${heat_rate}\ncons = ${cons}`)
     // if (mdot_evap > 0) console.warn(`Rate of consumption: ${cons/1000} kW`)
-    // console.log(`Evap: ${mdot_evap}\nConc: ${mdot_conc}\nxc: ${x_c}`)
+    console.log(`Evap: ${mdot_evap}\nConc: ${mdot_conc}\nxc: ${x_c}`)
     // if (mdot_evap > 0) console.warn(`dTdt: ${dTdt}`)
 
     // Set state
@@ -144,8 +174,8 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     state.concFlow = mdot_conc;
     state.concComp = x_c;
     state.concTemp = temp_conc - 273.15;
-    state.steamPres = antoines(STEAM_TEMP);
-    state.steamTemp = STEAM_TEMP - 273.15;
+    state.steamTemp = temp_stm - 273.15;
+    // console.log(state.steamTemp)
 
     // console.log(temp_conc)
 

@@ -100,6 +100,6 @@ export class Outlet {
                 this.outFall.stop();
                 this.measureFall.stop();
             }
-        }, 5000);
+        }, 1000);
     }
 }

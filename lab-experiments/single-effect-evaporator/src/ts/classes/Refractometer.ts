@@ -42,7 +42,7 @@ export class Refractometer {
                 case 0:
                     var targTh = -7;
                     th = smoothLerp(th, targTh, Math.exp(-4), dt);
-                    console.log(th)
+                    
                     if (Math.abs(th - targTh) < .1) stage++;
                     break;
                 case 1:
