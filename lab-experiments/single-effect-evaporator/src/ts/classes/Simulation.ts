@@ -68,5 +68,25 @@ export class Simulation {
         // Start the loop
         requestAnimationFrame(frame);
     }
+
+    public reset = () => {
+        // Create state object
+        this.state = {
+            ...this.state,
+            steamFlow: 0,
+            steamTemp: 500,
+            evapFlow: 0,
+            concFlow: 0,
+            concComp: 0,
+            concTemp: 209.9
+        }
+        // Reset controlled values
+        this.state.feedFlow.setpoint = 0;
+        this.state.feedTemp.setpoint = 25;
+        this.state.steamPres.setpoint = 20;
+        this.state.feedFlow.value = 0;
+        this.state.feedTemp.value = 25;
+        this.state.steamPres.value = 20;
+    }
 }
 

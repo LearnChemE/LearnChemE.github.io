@@ -53,6 +53,11 @@ export class SetpointControl<T extends ControlType> {
             this.animate(delay);
         }, delay);
     }
+
+    public reset(value: number) {
+        this.spLabel.setLabel(value);
+        this.displayPoint = value;
+    }
 }
 
 export class FirstOrder implements ControlType {

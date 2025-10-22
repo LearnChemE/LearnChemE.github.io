@@ -61,13 +61,25 @@ const stateDescriptor: SimulationDescriptor = {
   condensate: condOutlet,
   concentrate: concOutlet
 }
-new Simulation(stateDescriptor);
+const simulation = new Simulation(stateDescriptor);
 
 // Initialize interactions
-initInteractions<FirstOrder>(flowCtrl, tempCtrl, presCtrl);
-new Refractometer(() => concOutlet.measureConcentration() * 100);
+const [flowSp, tempSp, presSp] = initInteractions<FirstOrder>(flowCtrl, tempCtrl, presCtrl);
+const refractometer = new Refractometer(() => concOutlet.measureConcentration() * 100);
 
 // Visibility and accessibility
 initSvgZoom();
 initSvgDrag();
 enableWindowResize();
+
+const resetBtn = document.getElementById("reset-btn");
+resetBtn?.addEventListener("click", () => {
+  refractometer.reset();
+  simulation.reset();
+  concOutlet.reset();
+  condOutlet.reset();
+
+  flowSp.reset(0);
+  tempSp.reset(25);
+  presSp.reset(20);
+});

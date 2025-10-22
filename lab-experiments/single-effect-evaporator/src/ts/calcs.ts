@@ -1,6 +1,6 @@
 import type { EvaporatorState } from "../types";
 
-const UA = 1200; // W / K
+const UA = 2000; // W / K
 const EVAPORATOR_PRESSURE = 1; // bar
 const X_IN = 0.1;
 
@@ -118,7 +118,7 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
 
 
     // Calculate steam rate
-    const mdot_stm = heat_rate / dHvap(temp_stm);
+    const mdot_stm = heat_rate / dHvap(temp_stm) * 60;
 
     // debug
     // console.log(`in - out = ${in_minus_out}\ngen = ${heat_rate}\ncons = ${cons}`)

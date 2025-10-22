@@ -74,10 +74,19 @@ export class Refractometer {
                     break;
             }
 
-            this.bPipette.setAttribute("transform", `rotate(${th}, 650, 300)`);
-            this.rPipette.setAttribute("transform", `rotate(${th}, 560, 400)`);
-
+            if (this.playing) {
+                this.bPipette.setAttribute("transform", `rotate(${th}, 650, 300)`);
+                this.rPipette.setAttribute("transform", `rotate(${th}, 560, 400)`);
+            }
+            
             return this.playing;
         });
+    }
+
+    public reset = () => {
+        this.playing = false;
+        this.bPipette.setAttribute("transform", `rotate(${0}, 650, 300)`);
+        this.rPipette.setAttribute("transform", `rotate(${0}, 560, 400)`);
+
     }
 }
