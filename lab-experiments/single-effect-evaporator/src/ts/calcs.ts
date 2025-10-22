@@ -6,24 +6,23 @@ const X_IN = 0.1;
 
 const MASS_IN_EVAPORATOR = 10; // kg
 const EVAPORATOR_HEAT_CAPACITTY = 5000; // J
-const DIFFUSE = 100;
 
-/**
- * Calculate saturated pressure from temperature
- */
-function antoines(T: number) {
-    if(T < 399.94) {
-        const A = 4.6543;
-        const B = 1435.264;
-        const C = -64.848;
-        return 10 ** (A - B / (T + C));
-    } else {
-        const A = 3.55959;
-        const B = 643.748;
-        const C = -198.043;
-        return 10 ** (A - B / (T + C));
-    }
-}
+// /**
+//  * Calculate saturated pressure from temperature
+//  */
+// function antoines(T: number) {
+//     if(T < 399.94) {
+//         const A = 4.6543;
+//         const B = 1435.264;
+//         const C = -64.848;
+//         return 10 ** (A - B / (T + C));
+//     } else {
+//         const A = 3.55959;
+//         const B = 643.748;
+//         const C = -198.043;
+//         return 10 ** (A - B / (T + C));
+//     }
+// }
 
 /**
  * Calculate saturated temperature from pressure
@@ -36,7 +35,7 @@ function inv_antoines(P: number) {
         
     return B / (A - logP) - C;
 }
-const TVap1bar = inv_antoines(1);
+const TVap1bar = inv_antoines(EVAPORATOR_PRESSURE);
 
 /**
  * Calculate sugar water solution's heat capacity based on temperature (K) and mole fraction
@@ -65,47 +64,6 @@ function dHvap(T: number) {
     let H_vap = 193.1 - 10950 * Math.log( ( 374 - Tc ) / 647) * ( 374 - Tc )**0.785 / ( 273 + Tc ); // heat of vaporization (kJ/kg)
     H_vap *= 1000; // heat of vaporization converted to J/kg
     return H_vap;
-}
-
-/**
- * Calculate the roots of a polynomial equation.
- * @param poly 
- * @returns 
- */
-function quadraticRoots(poly: number[]) {
-    const [a, b, c] = poly;
-    const denom = 2 * a;
-    const disc = b ** 2 - 4 * a * c;
-
-    const left = -b / denom;
-    const right = Math.sqrt(disc) / denom;
-
-    return [ left - right, left + right ];
-}
-
-/**
- * Determine the concentrate flow
- * @param T temperature of tank
- * @param mdot_feed feed flowrate
- * @returns mdot_conc (kg / min)
- */
-function concentrate_flow(T: number, mdot_feed: number) {
-    const pvap = antoines(T);
-    // console.log(`Pressure: ${pvap}`)
-    if (pvap <= EVAPORATOR_PRESSURE)  {
-        // Not boiling
-        return mdot_feed;
-    }
-    else {
-        const poly = [ 1 , DIFFUSE * (pvap - EVAPORATOR_PRESSURE) - mdot_feed , -X_IN * mdot_feed * DIFFUSE * pvap ];
-        const [lo, hi] = quadraticRoots(poly);
-        const min = X_IN * mdot_feed;
-
-        // Return the one that falls in the correct range
-        if (lo >= min && lo <= mdot_feed) return lo;
-        else if (hi >= min && hi <= mdot_feed) return hi;
-        else return mdot_feed // Everything goes to the concentrate
-    }
 }
 
 /**
