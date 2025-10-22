@@ -4,6 +4,7 @@ import { computePressureWithConstantVolume, computeVolumeWithConstantPressure } 
 // Peak volume for 2.0 g at 75 °C is ~0.804 L (≈804 mL). Give students margin up to 850 mL.
 const MAX_VOLUME_ML = 850;
 const MIN_GAS_HEIGHT_PX = 10;
+const MIN_INITIAL_VOLUME_L = computeVolumeWithConstantPressure(1.6, 25);
 
 let pressureGuage = null;
 let pressureReliefValve = null;
@@ -111,13 +112,13 @@ function updatePressureText(temp = null) {
 function updatePistonVolume(tempC = currentTempC, animate = true) {
   if (!pistonAssembly) return;
 
-  let volumeL = 0;
+  let volumeL = MIN_INITIAL_VOLUME_L;
   if (liquidPushed) {
     try {
       volumeL = computeVolumeWithConstantPressure(liquidWeight, tempC);
     } catch (err) {
       console.warn('[updatePistonVolume] failed to compute volume:', err);
-      volumeL = 0;
+      volumeL = MIN_INITIAL_VOLUME_L;
     }
   }
 
