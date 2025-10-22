@@ -9,8 +9,32 @@ const UA_HEX = 25; // W / K
 export const CP = 4.184; // J / g / K
 const RHO = 0.998 // g / mL
 
+const INNER_RES = 4.8372e-4; // m**2 K / W
+
 export const CP_AIR = 1.006; // J / g / K
 export const MDOT_AIR = 20; // g / s
+
+/**
+ * Calculate the inner tube h value based on flowrate
+ * @param flowrate water flowrate in hex (g / s)
+ * @returns h_i (W / m2 / K)
+ */
+export function calcInnerHVal(flowrate: number) {
+    const Pr = 5.05; // Prandtl number
+    const asp = 3.105e-3 / .11054; // Tube aspect ratio
+    const u = flowrate / RHO * 23; // Fluid velocity, m / s
+    const Re = u * 4085.5; // Reynolds number
+
+    // Calculate Nusselt number
+    const Nu = 0.36 * (Re ** .8) * (Pr ** (1/3)) * (asp ** .055)
+    return Nu * 189.592; // W / m2 / K
+}
+
+export function calcUA(flowrate: number) {
+    const hi_inv = 1 / calcInnerHVal(flowrate);
+    const Ui = 1 / (4.8372e-4 + hi_inv); // U based on inner area (m2 K / W)
+    return 
+}
 
 export function calcQ(t1: number, T1: number, Ca: number, Cl: number) {
     const UA = UA_HEX * Math.sqrt(Cl / (37.5 * CP));
