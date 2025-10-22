@@ -19,7 +19,12 @@ let liquidWeight = 1.8;      // g of N2O4 in syringe (1.6 to 2.0 g)
 let liquidPushed = false;   // has the syringe been pushed?
 
 let temperatureText = null; // text element showing current temperature
-let allowTemperatureChange = true; // lockout flag during reset
+
+let lastPressureTrue = null;
+let lastPressureDisplayed = null;
+let hasCoolDownOccurred = false;
+let isTempRamping = false;
+let pendingTargetTempC = null;
 
 // --- measurement noise for pressure readout (display-only) ---
 // Standard deviation of the noise added to the displayed pressure, in bar.
@@ -36,10 +41,60 @@ function gaussianNoise(std = 1) {
 // Return the *measured* (noisy) pressure for the gauge text only.
 // Underlying physics (computePressureWithConstantVolume) remains exact elsewhere.
 function measuredPressureBar(mass_g, tempC) {
-  if (!liquidPushed) return 0; // before injection, keep it at 0.00 bar
+  if (!liquidPushed) {
+    lastPressureTrue = null;
+    lastPressureDisplayed = 0;
+    return 0;
+  }
+
   const pTrue = computePressureWithConstantVolume(mass_g, tempC);
-  const noisy = pTrue + gaussianNoise(PRESSURE_NOISE_STD);
-  return Math.max(0, noisy); // clamp to non-negative reading
+  const prevTrue = lastPressureTrue;
+  const prevDisplay = lastPressureDisplayed;
+
+  if (!hasCoolDownOccurred) {
+    lastPressureTrue = pTrue;
+    lastPressureDisplayed = pTrue;
+    return pTrue;
+  }
+
+  const EPS = 1e-4;
+  let reading = pTrue + gaussianNoise(PRESSURE_NOISE_STD);
+
+  if (prevTrue != null && prevDisplay != null) {
+    const deltaTrue = pTrue - prevTrue;
+    if (deltaTrue > EPS) {
+      const upperBound = pTrue + PRESSURE_NOISE_STD;
+      const rawStep = Math.max(Math.abs(deltaTrue) * 0.1, PRESSURE_NOISE_STD * 0.15);
+      const maxAvail = Math.max(upperBound - prevDisplay, 0);
+      const minStep = Math.min(rawStep, maxAvail);
+      const base = Math.min(prevDisplay + minStep, upperBound);
+      const jitterSpan = Math.max(upperBound - base, 0);
+      reading = base + Math.random() * jitterSpan;
+    } else if (deltaTrue < -EPS) {
+      const lowerBound = Math.max(0, pTrue - PRESSURE_NOISE_STD);
+      const rawStep = Math.max(Math.abs(deltaTrue) * 0.1, PRESSURE_NOISE_STD * 0.15);
+      const maxAvail = Math.max(prevDisplay - lowerBound, 0);
+      const minStep = Math.min(rawStep, maxAvail);
+      const base = Math.max(prevDisplay - minStep, lowerBound);
+      const jitterSpan = Math.max(base - lowerBound, 0);
+      reading = base - Math.random() * jitterSpan;
+    } else {
+      const band = PRESSURE_NOISE_STD * 0.6;
+      const lo = Math.max(0, pTrue - band);
+      const hi = pTrue + band;
+      const center = prevDisplay + gaussianNoise(band * 0.4);
+      reading = Math.max(lo, Math.min(hi, center));
+    }
+  } else {
+    const lo = Math.max(0, pTrue - PRESSURE_NOISE_STD);
+    const hi = pTrue + PRESSURE_NOISE_STD;
+    reading = Math.max(lo, Math.min(hi, reading));
+  }
+
+  const display = Math.max(0, reading);
+  lastPressureTrue = pTrue;
+  lastPressureDisplayed = display;
+  return display;
 }
 
 // Centralized updater for the pressure text UI
@@ -55,17 +110,16 @@ let tempRampTimerIds = [];
 function clearTempRampTimers() {
   for (const id of tempRampTimerIds) clearTimeout(id);
   tempRampTimerIds = [];
+  isTempRamping = false;
+  pendingTargetTempC = null;
 }
 function startTempPressureRamp(prevT, currT) {
-  clearTempRampTimers();
-  allowTemperatureChange = false;
   // No ramp needed
   if (prevT === currT) {
     currentTempC = currT;
     temperatureText && temperatureText.text(`${currT.toFixed(1)} °C`);
     updatePressureText();
     refreshTempController();
-    allowTemperatureChange = true;
     return;
   }
   const dir = currT > prevT ? 1 : -1;
@@ -81,6 +135,13 @@ function startTempPressureRamp(prevT, currT) {
     if (t === currT) break;
   }
   const delayPerStepMs = 500; // adjust ramp speed here
+  if (temps.length > 0) {
+    isTempRamping = true;
+  }
+  if (dir < 0) {
+    hasCoolDownOccurred = true;
+  }
+
   temps.forEach((temp, i) => {
     const id = setTimeout(() => {
       // Update measured temperature & readouts
@@ -96,12 +157,18 @@ function startTempPressureRamp(prevT, currT) {
     const id = setTimeout(() => {
       // Update pressure text based on measured temp (only text; physics already guards downstream)
       updatePressureText(temp);
-      // Re-enable user control only after the final pressure update has been applied
       if (i === temps.length - 1) {
-        allowTemperatureChange = true;
+        isTempRamping = false;
+        tempRampTimerIds = [];
+        const pending = pendingTargetTempC;
+        pendingTargetTempC = null;
         refreshTempController();
+        if (pending != null && Math.abs(pending - currentTempC) > 1e-6 && heaterOn) {
+          startTempPressureRamp(currentTempC, pending);
+        }
       }
     }, i * 1000);
+    tempRampTimerIds.push(id);
   });
 }
 
@@ -109,7 +176,6 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const step5 = (v) => 5 * Math.round(v / 5);
 
 function setTemperature(newT) {
-  const prevTarget = targetTempC;
   // clamp 25–45 °C
   if (newT < 25) { targetTempC = 25; }
   else if (newT > 75) { targetTempC = 75; }
@@ -119,8 +185,11 @@ function setTemperature(newT) {
 
   // Only heat (increase measured) when heater is ON; otherwise measurement stays where it is
   if (heaterOn) {
-    const prevMeasured = currentTempC;
-    startTempPressureRamp(prevMeasured, targetTempC);
+    if (isTempRamping) {
+      pendingTargetTempC = targetTempC;
+    } else {
+      startTempPressureRamp(currentTempC, targetTempC);
+    }
   }
 }
 
@@ -409,6 +478,11 @@ function animateSyringeVertical(obj) {
       obj.filled = false;          // stay empty; no auto-refill
       refreshSyringeControls();    // update button state/label
       liquidWeight = w;
+      hasCoolDownOccurred = false;
+      lastPressureTrue = null;
+      lastPressureDisplayed = null;
+      pendingTargetTempC = null;
+      isTempRamping = false;
       updatePressureText();
       liquidPushed = true;
 
@@ -642,11 +716,9 @@ function drawTemperatureController(g, px, py) {
 
   // Wire up interactions
   minusBtn.on('click', () => {
-    if (!allowTemperatureChange) return;
     setTemperature(targetTempC - 5);
   });
   plusBtn.on('click', () => {
-    if (!allowTemperatureChange) return;
     setTemperature(targetTempC + 5);
   });
 
@@ -713,8 +785,9 @@ export function resetConstantVolumeExperiment() {
   liquidWeight = 1.8;      // g of N2O4 in syringe (1.6 to 2.0 g)
   liquidPushed = false;   // has the syringe been pushed?
   temperatureText = null;
-  allowTemperatureChange = true; // allow user to change temperature
-
+  lastPressureTrue = null;
+  lastPressureDisplayed = null;
+  hasCoolDownOccurred = false;
   // Reset temperature controller/readouts
   refreshTempController();
   if (temperatureText) {
