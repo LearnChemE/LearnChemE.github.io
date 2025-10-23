@@ -1,7 +1,7 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  /* padding: 2rem; */
   text-align: center;
   position: relative;
 }
@@ -32,6 +32,12 @@ svg {
 
 .read-the-docs {
   color: #888;
+}
+
+p {
+  /* margin-top: 0; */
+  margin-bottom: 0;
+  line-height: 1.8;
 }
 
 @font-face {
