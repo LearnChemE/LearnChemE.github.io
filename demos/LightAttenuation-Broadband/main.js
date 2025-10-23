@@ -510,7 +510,7 @@ text(`Absorbed photons at depth relative to incident = ${nf(integralPercent, 1, 
   const legendBoxSize = 12;
 
 const legendItems = [
-  { col: color(0, 0, 255), label: "Absorptivity (material)" },
+  { col: color(0, 0, 255), label: "Napierian Absorptivity" },
   { col: color(0, 220, 0), label: "Incident light (surface)" },
   { col: color(220, 0, 0), label: "Absorbed photons (surface)" },
   { col: color(0, 180, 80), label: "Transmitted light (depth)" },
