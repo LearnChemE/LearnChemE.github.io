@@ -55,6 +55,11 @@ body {
     height: calc(100vh - 40px);
     max-width: calc((100vh - 40px) * 1000 / 600);
     max-height: calc((100vw - 40px) * 600 / 1000);
+
+    -webkit-user-select: none; /* iOS Safari */
+    -webkit-touch-callout: none; /* Disable long-press menu */
+    user-select: none;
+    touch-action: none;
 }
 
 #svg-container>svg {

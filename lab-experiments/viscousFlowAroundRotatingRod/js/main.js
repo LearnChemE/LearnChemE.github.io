@@ -192,14 +192,14 @@ function createConnectingRod() {
 }
 
 function setupDragHandlers() {
-    knob.on('mousedown', () => {
+    knob.on('pointerdown', () => {
         isDragging = true;
     });
-    shaft.on('mousedown', () => {
+    shaft.on('pointerdown', () => {
         isDragging = true;
     });
     
-    document.addEventListener('mousemove', (event) => {
+    document.addEventListener('pointermove', (event) => {
         if (!isDragging) { return };
         
         const pt = draw.node.createSVGPoint();
@@ -223,7 +223,7 @@ function setupDragHandlers() {
         updateFrontView(angleDeg);
     });
     
-    document.addEventListener('mouseup', () => {
+    document.addEventListener('pointerup', () => {
         isDragging = false;
     });
 }
@@ -570,14 +570,14 @@ function addOptionToDragAndZoom() {
     const background = draw.rect(canvasWidth, canvasHeight)
     .fill({ color: '#fff', opacity: 0 });
     
-    background.on('mousedown', function(event) {
+    background.on('pointerdown', function(event) {
         const vb = draw.viewbox();
         if (vb.width >= defaultViewbox.width) return;
         isPanning = true;
         panStart = { x: event.clientX, y: event.clientY };
     });
     
-    background.on('mousemove', function(event) {
+    background.on('pointermove', function(event) {
         if (!isPanning) return;
         event.preventDefault();
         
@@ -593,11 +593,12 @@ function addOptionToDragAndZoom() {
         panStart = { x: event.clientX, y: event.clientY };
     });
     
-    background.on('mouseup', function() {
+    background.on('pointerup', function() {
         isPanning = false;
     });
-    document.addEventListener('mouseup', () => { isPanning = false; });
+    document.addEventListener('pointerup', () => { isPanning = false; });
     
+    // Zoom with wheel
     draw.on('wheel', function(event) {
         event.preventDefault();
         
@@ -623,6 +624,63 @@ function addOptionToDragAndZoom() {
         newY = Math.max(0, Math.min(newY, canvasHeight - newHeight));
         
         draw.viewbox(newX, newY, newWidth, newHeight);
+    });
+
+    // Zoom with pinch
+    const getDistance = (touches) => {
+        const dx = touches[0].clientX - touches[1].clientX;
+        const dy = touches[0].clientY - touches[1].clientY;
+        return Math.sqrt(dx*dx + dy*dy);
+    }
+    const constrain = (x, min, max) => {
+        return Math.max(Math.min(x, max), min);
+    }
+    let startDist = null;
+    draw.on("touchstart", (e) => {
+        if (e.touches.length !== 2) return;
+        e.preventDefault();
+        const dist = getDistance(e.touches);
+        startDist = dist;
+    });
+
+    draw.on("touchmove", (e) => {
+        if (e.touches.length !== 2) return;
+        if (startDist === null) return;
+        e.preventDefault();
+        // Get the distance between the two points
+        const dist = getDistance(e.touches);
+        const scale = 1 + constrain((startDist / dist - 1) * 2, -.1, .1);
+        // alert(`scale = ${scale}`)
+        startDist = dist;
+
+        // Find the average point between touches
+        const pt = new DOMPoint((e.touches.item(0).clientX + e.touches.item(1).clientX) / 2,
+                                    (e.touches.item(0).clientY + e.touches.item(1).clientY) / 2);
+        // Previous viewbox
+        const vb = draw.viewbox();
+
+        // Compute new viewbox dimensions
+        const newWidth = vb.width * scale;
+        const newHeight = vb.height * scale;
+        if (newWidth >= defaultViewbox.width) {
+            draw.viewbox(defaultViewbox.x, defaultViewbox.y, defaultViewbox.width, defaultViewbox.height);
+            return;
+        }
+
+        const cursor = pt.matrixTransform(draw.node.getScreenCTM().inverse());
+        
+        let newX = cursor.x - (cursor.x - vb.x) * scale;
+        let newY = cursor.y - (cursor.y - vb.y) * scale;
+        
+        newX = Math.max(0, Math.min(newX, canvasWidth - newWidth));
+        newY = Math.max(0, Math.min(newY, canvasHeight - newHeight));
+
+        draw.viewbox(newX, newY, newWidth, newHeight)
+    });
+    draw.on("touchend", e => {
+        if (e.touches.length < 2) {
+            startDist = null;
+        }
     });
 }
 
