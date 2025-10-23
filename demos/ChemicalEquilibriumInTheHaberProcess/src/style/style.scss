@@ -8,6 +8,7 @@ $modal-xl: 1140px;
   --slider-width: 100px;
   --value-width: 28px;
   --unit-width: 22px;
+  --asp: calc(16 / 9);
 }
 
 #graphics-container {
@@ -19,25 +20,32 @@ $modal-xl: 1140px;
   border-radius: 5px;
   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
   width: min-content;
+  height: min-content;
 }
 
 #p5-container {
+  --container-width: calc(100vw - 10px);
+  --container-max-height: calc(100vh - 220px);
+
   position: relative;
   margin: auto;
-  width: calc(100vw - 10px);
-  max-width: calc(calc(100vh - 10px) * 150 / 120);
-  height: calc(calc(100vw - 10px) * 120 / 150);
-  max-height: calc(100vh - 10px);
+  width: var(--container-width); // w
+  max-width: calc(var(--container-max-height) * var(--asp)); // max-height * asp
+  min-width: 550px;
+  height: calc(var(--container-width) / var(--asp)); // w / asp
+  max-height: var(--container-max-height); // max-height
+  min-height: calc(550px / var(--asp));
 }
 
 #sliders-wrapper {
-  position: absolute;
+  // position: absolute;
   display: grid;
-  left: 50%;
+  margin: auto;
+  margin-top: 1em;
   top: 25px;
-  transform: translateX(-50%);
   width: max-content;
   height: max-content;
+  max-height: 75px;
   font-size: 0.7rem;
   gap: 10px;
 }
@@ -88,18 +96,15 @@ input[type="range"] {
 }
 
 canvas {
-  border-style: solid;
-  border-width: 1px;
-  border-color: black;
-  box-shadow: 0px 0px 2px 2px lightgrey;
+  border: none;
 }
 
 #eqn-container {
-  position: absolute;
-  left: 50%;
-  top: 17%;
-  transform: translateX(-50%);
   display: grid;
+  margin: auto;
+  margin-top: 1em;
+  width: max-content;
+  margin-bottom: -.8em;
   grid-template-columns: repeat(2, max-content);
   gap: 80px;
   align-content: center;

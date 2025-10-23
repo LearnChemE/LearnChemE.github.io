@@ -113,7 +113,7 @@ function drawBars(graph) {
 }
 
 export function drawAll() {
-  const margin = { top: 40, right: 20, bottom: 15, left: 20 };
+  const margin = { top: 4, right: 4, bottom: 10, left: 18 };
   const graphHeight = height - margin.top - margin.bottom;
   const graphWidth = width - margin.left - margin.right;
   const graph = { margin: margin, height: graphHeight, width: graphWidth };

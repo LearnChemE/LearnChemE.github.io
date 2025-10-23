@@ -39,12 +39,13 @@ window.setup = function() {
 
 window.draw = function() {
   window.width = 150;
-  window.height = 120;
+  window.height = 150 * 9 / 16;
   scale(relativeSize());
   background(255);
   drawAll();
 };
 
+const asp = 16 / 9;
 window.windowResized = () => {
   resizeCanvas(containerElement.offsetWidth, containerElement.offsetHeight);
 }
