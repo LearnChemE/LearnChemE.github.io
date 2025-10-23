@@ -509,13 +509,13 @@ text(`Absorbed photons at depth relative to incident = ${nf(integralPercent, 1, 
   const legendSpacing = 20;
   const legendBoxSize = 12;
 
-  const legendItems = [
-    { col: color(0, 0, 255), label: "Absorbtivity" },
-    { col: color(0, 220, 0), label: "Incident light (exposed surface)" },
-    { col: color(220, 0, 0), label: "Incident absorbed photons" },
-    { col: color(0, 180, 80), label: "Attenuated light (defined depth)" },
-    { col: color(180, 0, 80), label: "Attenuated absorbed photons" }
-  ];
+const legendItems = [
+  { col: color(0, 0, 255), label: "Absorptivity (material)" },
+  { col: color(0, 220, 0), label: "Incident light (surface)" },
+  { col: color(220, 0, 0), label: "Absorbed photons (surface)" },
+  { col: color(0, 180, 80), label: "Transmitted light (depth)" },
+  { col: color(180, 0, 80), label: "Absorbed photons (depth)" }
+];
 
   textAlign(LEFT, CENTER);
   textSize(GraphFS);
