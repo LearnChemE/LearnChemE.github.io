@@ -17,6 +17,13 @@ html {
   background-color: #f0f0f0;
 }
 
+canvas {
+  -webkit-user-select: none; /* iOS Safari */
+  -webkit-touch-callout: none; /* Disable long-press menu */
+  user-select: none;
+  touch-action: none;
+}
+
 #graphics-container {
   position: relative;
   margin: auto;
