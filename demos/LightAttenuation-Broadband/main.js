@@ -500,8 +500,8 @@ function drawPlot() {
   // Title
   noStroke(); fill(0);
   textSize(GraphFS); textAlign(CENTER);
-  text(`Absorbed photons at max depth relative to surface = ${nf(integralPercent, 1, 1)}%`,
-       width / 2, PAD / 2);
+text(`Absorbed photons at depth relative to incident = ${nf(integralPercent, 1, 1)}% 
+(analogous to I/I₀)`, width / 2, PAD / 2);
 
   // Legend
   const legendX = width - PAD - legendAdjust;
@@ -510,10 +510,10 @@ function drawPlot() {
   const legendBoxSize = 12;
 
   const legendItems = [
-    { col: color(0, 0, 255), label: "Absorbance" },
-    { col: color(0, 220, 0), label: "Incident light" },
+    { col: color(0, 0, 255), label: "Absorbtivity" },
+    { col: color(0, 220, 0), label: "Incident light (exposed surface)" },
     { col: color(220, 0, 0), label: "Incident absorbed photons" },
-    { col: color(0, 180, 80), label: "Attenuated light" },
+    { col: color(0, 180, 80), label: "Attenuated light (defined depth)" },
     { col: color(180, 0, 80), label: "Attenuated absorbed photons" }
   ];
 
@@ -574,7 +574,7 @@ function drawAxes(PAD) {
   translate(20, height / 2);
   rotate(-PI / 2);
   textAlign(CENTER, CENTER);
-  text("Light spectrum and absorbed photons (relative)", 0, 0);
+  text("Light spectrum and absorbed photons (relative to their respective maxima)", 0, 0);
   pop();
 
   // --- Right Y-axis (secondary) label ---
@@ -1092,6 +1092,8 @@ function updateText() {
       <b> Observed equivalent incident intensity: </b><br>
        ${formatSigFig(tInt, 3)} mW/cm² 
        <br><br>
+       (of ${formatSigFig(tarWaveVal, 3)} nm light results in the same quantity of absorbed photons as ${formatSigFig(mInt, 3)} mW/cm² of the selected light source)
+       <br>
        <b>**See details in menu**</b> <br>
       Intensity correction: ${formatSigFig(intensityCorrection, 3)}
       <br>
