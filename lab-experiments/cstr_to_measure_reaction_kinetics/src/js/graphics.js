@@ -913,7 +913,7 @@ window.mouseDragged = function() {
   handleInteractions();
 }
 
-function handleInteractions() {
+function handleInteractions(e) {
   const tankAX = width * 0.15;
   const tankBX = width * 0.30;
   const tankY = height * 0.4 + VERTICAL_OFFSET; // Add offset here

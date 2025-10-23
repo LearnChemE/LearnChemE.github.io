@@ -67,6 +67,10 @@ body {
   position: relative;
   z-index: 1001;
   background-color: none;
+  pointer-events: none;
+  button {
+    pointer-events: auto;
+  }
   
   #valueSlider {
     pointer-events: auto;
