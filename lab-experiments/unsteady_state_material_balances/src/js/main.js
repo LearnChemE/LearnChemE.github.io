@@ -614,7 +614,8 @@ function drawGasCylinder(draw, x, y, label) {
       .center(x + width * 0.75, y + height / 2);
       let isOn = false;
       handle.rotate(-20, x + width / 2, y + height / 2);
-  switchGroup.click(() => {
+  switchGroup.on("click", () => {
+    console.log("bro where am i")
     if (!(gasValveOpen && verticalValveOpen)) {
       isOn = !isOn;
       switchGroup.isOn = isOn;
