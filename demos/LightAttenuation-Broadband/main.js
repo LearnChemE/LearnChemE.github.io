@@ -1092,7 +1092,7 @@ function updateText() {
       <b> Observed equivalent incident intensity: </b><br>
        ${formatSigFig(tInt, 3)} mW/cm² 
        <br><br>
-       (of ${formatSigFig(tarWaveVal, 3)} nm light results in the same quantity of absorbed photons as ${formatSigFig(mInt, 3)} mW/cm² of the selected light source)
+       (of ${formatSigFig(tarWaveVal, 3)} nm light results in the same quantity of absorbed photons as ${formatSigFig(mIntVal, 3)} mW/cm² of the selected light source)
        <br>
        <b>**See details in menu**</b> <br>
       Intensity correction: ${formatSigFig(intensityCorrection, 3)}
