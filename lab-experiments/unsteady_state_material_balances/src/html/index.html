@@ -23,34 +23,29 @@
 
 <body>
   <div id="svg-container">
-    <div class="icon-container">
-      <!-- <div class="hamburger-wrapper">
-        <div id="hamburger-icon">
-          <img
-          src="assets/hamburger.svg"
-          alt="Menu"
-          class="hamburger-img"
-          />
-        </div>
-        <div id="hamburger-menu" class="hamburger-menu"></div>
-      </div> -->
-      
-      <!-- <div class="slider-group slider-container">
-        <label for="angleSlider"> angle (degrees)</label><br>
-        <input type="range" id="angleSlider" min="0" max="90" step="5" value="0">
-        <span id="angleValue">0</span>
-      </div> -->
-
-      <div class="d-flex flex-column gap-2 align-items-start">
-        <button id="directions" class="btn btn-sm btn-primary w-100" style="max-width:200px;">Directions</button>
-        <!-- <button id="details" class="btn btn-sm btn-primary w-100" style="max-width:200px;">Details</button> -->
-        <button id="about" class="btn btn-sm btn-primary w-100" style="max-width:200px;">About</button>
-        <button id="worksheet" class="btn btn-sm btn-primary w-100" style="max-width:200px;">Worksheet</button>
+    <!-- Hamburger Menu -->
+    <div class="hamburger-menu">
+      <div class="menu-btn">
+          <i class="fas fa-bars"></i>
       </div>
-
-      <button id="reset-button" class="btn btn-sm btn-danger">
-        Reset
-      </button>
+      <div class="menu-content">
+        <button id="directions" class="btn menu-item" style="max-width:200px;">
+            <i class="fas fa-book"></i>
+            <span>Directions</span>
+        </button>
+        <button id="about" class="btn menu-item" style="max-width:200px;">
+            <i class="fas fa-info-circle"></i>
+            <span>About</span>
+        </button>
+        <button id="worksheet" class="btn menu-item" style="max-width:200px;">
+          <i class="fas fa-download"></i>
+          <span>Worksheet</span>
+        </button>
+        <button id="reset-button" class="btn menu-item">
+          <i class="fas fa-arrows-rotate"></i>
+          <span>Reset</span>
+        </button>
+      </div>
     </div>
   </div>
   
