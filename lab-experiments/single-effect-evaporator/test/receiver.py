@@ -4,6 +4,21 @@ import json
 import matplotlib.pyplot as plt
 from collections import deque
 from typing import List, Dict, Any, Optional
+import datetime
+
+RED = "\033[91m"
+GREEN = "\033[92m"
+YELLOW = "\033[93m"
+RESET = "\033[0m"
+
+def ReceiverPrint(msg):
+    print(f"{GREEN}[Receiver]{RESET} {msg}")
+
+def ReceiverWarn(msg):
+    print(f"{GREEN}[Receiver]{RESET} {YELLOW}{msg}{RESET}")
+
+def ReceiverErr(msg):
+    print(f"{GREEN}[Receiver]{RESET} {RED}{msg}{RESET}")
 
 class WebSocketReceiver:
     """
@@ -25,7 +40,7 @@ class WebSocketReceiver:
             "channels": self.channels
         }))
         self.running = True
-        print(f"[Receiver] Connected to {self.uri} (channels: {self.channels})")
+        ReceiverPrint(f"Connected to {self.uri} (channels: {self.channels})")
 
     async def listen(self):
         """Main receive loop."""
@@ -38,9 +53,9 @@ class WebSocketReceiver:
                     packet = json.loads(msg)
                     await self.on_message(packet)
                 except json.JSONDecodeError:
-                    print("[Receiver] Warning: invalid JSON message.")
+                    ReceiverWarn("Warning: invalid JSON message.")
         except exceptions.ConnectionClosed:
-            print("[Receiver] Connection closed.")
+            ReceiverPrint("Connection closed.")
         finally:
             self.running = False
 
@@ -48,13 +63,26 @@ class WebSocketReceiver:
         """Default handler for raw incoming message."""
         channel = message.get("channel")
         data = message.get("data")
-        if channel is None or data is None:
-            return
-        await self.on_data(channel, data)
+        timestamp = message.get("timestamp")
 
-    async def on_data(self, channel: str, data: Any):
+        # Sanity check
+        if channel is None:
+            ReceiverWarn(f"Missing channel in message {message}")
+            return
+        if data is None:
+            ReceiverWarn(f"Missing data in message {message}")
+            return
+        if timestamp is None:
+            ReceiverWarn(f"Missing timestamp in message {message}")
+            return
+        
+        # Call the on_data method
+        timestamp /= 1000 # Convert unix timestamp from ms to s
+        await self.on_data(channel, data, timestamp)
+
+    async def on_data(self, channel: str, data: Any, timestamp):
         """Handle a parsed data payload. Override this for custom logic."""
-        print(f"[Receiver] ({channel}) {data}")
+        ReceiverPrint(f"{datetime.datetime.fromtimestamp(timestamp)} Received ({channel}) {data}")
 
     async def run(self):
         """Convenience wrapper for quick startup."""
@@ -79,8 +107,8 @@ class PlottingReceiver(WebSocketReceiver):
         self.ax.set_title(f"Channel: {channels[0]}")
         plt.ion()
 
-    async def on_data(self, channel: str, data: Any):
-        self.data.append((data["timestamp"], data["value"]))
+    async def on_data(self, channel: str, data: Any, timestamp):
+        self.data.append((timestamp, data["value"]))
         xs = [d[0] for d in self.data]
         ys = [d[1] for d in self.data]
         self.line.set_xdata(xs)

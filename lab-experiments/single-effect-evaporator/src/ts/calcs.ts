@@ -1,5 +1,10 @@
 import type { EvaporatorState } from "../types";
 
+declare const __DEV__: boolean;
+if (__DEV__) {
+var sendTestData = (await import("../debug")).default;
+}
+
 const UA = 2000; // W / K
 const EVAPORATOR_PRESSURE = 1; // bar
 const X_IN = 0.1;
@@ -94,7 +99,7 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     const dTdt_noCons = acc_noCons / a;
     const newT_noCons = temp_conc + dTdt_noCons * dt;
 
-    console.log(newT_noCons, TVap1bar)
+    // console.log(newT_noCons, TVap1bar)
     let mdot_conc, mdot_evap;
     if (newT_noCons > TVap1bar) {
         const deltaT_cons = newT_noCons - TVap1bar;
@@ -123,8 +128,14 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     // debug
     // console.log(`in - out = ${in_minus_out}\ngen = ${heat_rate}\ncons = ${cons}`)
     // if (mdot_evap > 0) console.warn(`Rate of consumption: ${cons/1000} kW`)
-    console.log(`Evap: ${mdot_evap}\nConc: ${mdot_conc}\nxc: ${x_c}`)
+    // console.log(`Evap: ${mdot_evap}\nConc: ${mdot_conc}\nxc: ${x_c}`)
     // if (mdot_evap > 0) console.warn(`dTdt: ${dTdt}`)
+if (__DEV__) {
+    const msg = {
+        value: temp_conc
+    }
+    sendTestData(msg, "temperature");
+}
 
     // Set state
     state.evapFlow = mdot_evap;

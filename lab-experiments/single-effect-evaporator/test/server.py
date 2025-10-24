@@ -9,7 +9,20 @@ from collections import defaultdict
 senders = set()
 receivers_by_channel = defaultdict(set)
 
+RED = "\033[91m"
+BLUE = "\033[94m"
+YELLOW = "\033[93m"
+RESET = "\033[0m"
+
+def ServerPrint(msg):
+    print(f"{BLUE}[Server]{RESET} {msg}")
+
+def ServerWarn(msg):
+    print(f"{BLUE}[Server]{RESET} {YELLOW}{msg}{RESET}")
+
 async def handler(websocket, path):
+    role = "unkown"
+    channels = []
     """
     Simple websocket server for residual testing. Recieves data from senders, unpacks json, and sends to recievers
     """
@@ -21,13 +34,13 @@ async def handler(websocket, path):
         role = info.get("role")
         if role == "sender":
             senders.add(websocket)
-            print("Sender connected.")
+            ServerPrint("Sender connected.")
         elif role == "receiver":
             # Subscribe the websocket to each channel it requests
             channels = info.get("channels", [])
             for ch in channels:
                 receivers_by_channel[ch].add(websocket)
-            print(f"Receiver connected, subscribed to: {channels}")
+            ServerPrint(f"Receiver connected, subscribed to: {channels}")
         else:
             await websocket.send(json.dumps({"error": "Missing or invalid role"}))
             return
@@ -52,21 +65,22 @@ async def handler(websocket, path):
                             receivers_by_channel[channel].discard(r)
                 
                 except json.JSONDecodeError:
-                    print("Recieved invalid JSON from sender:", message)
+                    ServerWarn(f"Recieved invalid JSON from sender: {message}")
             else:
-                print("Receiver sent message (ignored):", message)
+                ServerPrint(f"Receiver sent message (ignored): {message}")
 
     except websockets.exceptions.ConnectionClosed:
-        print("Client disconnected.")
+        ServerPrint(f"Client disconnected: {role}")
     finally:
         # Cleanup disconnected clients
         senders.discard(websocket)
-        for ch_set in receivers_by_channel:
+        for _,ch_set in receivers_by_channel.items():
             ch_set.discard(websocket)
-        print("Client disconnected.")
+        cleanupChannels = f" (subscribed to {channels})" if (role == "receiver") else ""
+        ServerPrint(f"Cleaning up {role} client" + cleanupChannels)
 async def main():
     async with serve(handler, "localhost", 8765):
-        print("Server running on ws://localhost:8765")
+        ServerPrint("Server running on ws://localhost:8765")
         await asyncio.Future() # run forever
 
 if __name__ == "__main__":
