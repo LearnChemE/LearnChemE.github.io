@@ -28,6 +28,21 @@ window.addEventListener('resize', function() {
 //   }
 // });
 
+const menuBtn = document.querySelector('.menu-btn');
+const menuContent = document.querySelector('.menu-content');
+// Hamburger menu functionality
+menuBtn.addEventListener('click', () => {
+    menuContent.classList.toggle('show');
+});
+
+// Close menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (!menuBtn.contains(e.target) && !menuContent.contains(e.target)) {
+        menuContent.classList.remove('show');
+    }
+});
+
+
 document.addEventListener('DOMContentLoaded', () => {
   // const hambIcon = document.getElementById('hamburger-icon');
   // if (hambIcon) {
