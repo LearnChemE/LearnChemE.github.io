@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Single Effect Evaporator</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/temperatureReader.css" />
+  <script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
+    options: {
+      renderActions: {
+        find_script: [10, function () {}], // Disable auto-render
+      }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
+</head>
+<body>
+  <div class="card">
+    <button class="menu-btn">
+      <img src="assets/hamburger.svg" alt="Menu" />
+    </button>
+
+    <!-- ==== DROPDOWN MENU ==== -->
+    <ul id="dropdownMenu" class="dropdown-menu hidden">
+      <li data-option="directions">Directions</li>
+      <li data-option="details">Details</li>
+      <li data-option="about">About</li>
+    </ul>
+    <!-- ======================= -->
+
+    <!-- ==== MAIN SIMULATION AREA ==== -->
+    <div class="simulation-container">
+      <div id="pressure" class="pressure-left"></div>
+      <div id="flowmeter" class="flowmeter-top"></div>
+      <div id="temperature-reader" class="temperature-reader-container"></div>
+      <div id="evaporator-canvas"></div>
+      <div id="condenser" class="condenser-right"></div>
+      <div id="valve" class="valve-top"></div>
+    </div>
+    <!-- ============================= -->
+  </div>
+
+  <!-- MODAL DIALOG -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+  
+  <script src="js/evaporatorDrawing.js"></script>
+  <script src="js/flowmeter.js"></script>
+  <script src="js/pressureGauge.js"></script>
+  <script src="js/temperatureReader.js"></script>
+  <script src="js/valve.js"></script>
+  <script src="js/condenser.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
