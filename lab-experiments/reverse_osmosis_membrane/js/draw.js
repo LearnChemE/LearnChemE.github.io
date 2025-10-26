@@ -758,7 +758,7 @@ function drawPressureGauge(x, y) {
 
   if (state.pumpOn == false) {
     pressureHeight -= 0.2;
-    pressurizeGaugeCountTimer = Math.log(10 / (10 - pressureHeight));
+    pressurizeGaugeCountTimer = Math.log(state.feedPressure / (state.feedPressure - pressureHeight));
 
     if (pressureHeight <= 0.0) {
       pressureHeight = 0;
