@@ -58,7 +58,7 @@ export function reset() {
   state.molarMassNaCl = 58.44; // g/mol
   state.saltWaterDensity = 1.025; // g/ml
   state.osmoticPressure = null; //bar
-  state.feedWaterConcentration = null;
+  state.feedWaterConcentration = 0.5;
   state.vantHoffNaCl_i = 2;
   state.gasConstant = 0.08314; // L*bar/K*mol
   state.permeatePressure = 1.01325; // bar <-- this is just atmospheric pressure
