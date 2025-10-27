@@ -78,6 +78,7 @@ async def handler(websocket, path):
             ch_set.discard(websocket)
         cleanupChannels = f" (subscribed to {channels})" if (role == "receiver") else ""
         ServerPrint(f"Cleaning up {role} client" + cleanupChannels)
+        
 async def main():
     async with serve(handler, "localhost", 8765):
         ServerPrint("Server running on ws://localhost:8765")
