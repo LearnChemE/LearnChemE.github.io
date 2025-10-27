@@ -11,7 +11,7 @@ export class SetpointControl<T extends ControlType> {
     private max: number;
     private step: number;
 
-    constructor(descriptor: SetpointControlDescriptor<T>) {
+    constructor(descriptor: SetpointControlDescriptor<T>, delay=500) {
         if (descriptor.ctrl === null) {
             throw new Error("Error: null control object on Setpoint Descriptor");
         }
@@ -29,7 +29,7 @@ export class SetpointControl<T extends ControlType> {
         initButton(descriptor.upBtnId, this.increment);
         initButton(descriptor.downBtnId, this.decrement);
 
-        this.animate(500);
+        this.animate(delay);
     }
 
     public increment = () => {

@@ -194,8 +194,8 @@ export const tempSpDescriptor: SetpointControlDescriptor<ControlType> = {
     spLabel: null,
     outLabel: null,
     min: 25,
-    max: 150,
-    step: 5
+    max: 100,
+    step: 1
 };
 
 /**
@@ -208,7 +208,7 @@ export const presSpDescriptor: SetpointControlDescriptor<ControlType> = {
     spLabel: null,
     outLabel: null,
     min: 3,
-    max: 25,
+    max: 30,
     step: 1
 };
 
