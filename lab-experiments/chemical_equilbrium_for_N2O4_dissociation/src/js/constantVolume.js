@@ -58,40 +58,38 @@ function measuredPressureBar(mass_g, tempC) {
   }
 
   const EPS = 1e-4;
-  let reading = pTrue + gaussianNoise(PRESSURE_NOISE_STD);
+  let reading = pTrue;
 
   if (prevTrue != null && prevDisplay != null) {
     const deltaTrue = pTrue - prevTrue;
     if (deltaTrue > EPS) {
-      const upperBound = pTrue + PRESSURE_NOISE_STD;
-      const rawStep = Math.max(Math.abs(deltaTrue) * 0.1, PRESSURE_NOISE_STD * 0.15);
-      const maxAvail = Math.max(upperBound - prevDisplay, 0);
-      const minStep = Math.min(rawStep, maxAvail);
-      const base = Math.min(prevDisplay + minStep, upperBound);
-      const jitterSpan = Math.max(upperBound - base, 0);
-      reading = base + Math.random() * jitterSpan;
+      const upperBound = pTrue + PRESSURE_NOISE_STD * 0.35;
+      const minStep = Math.min(deltaTrue, PRESSURE_NOISE_STD * 0.08);
+      const fraction = 0.6 + 0.4 * Math.random(); // stay close to truth, allow mild wander
+      const step = Math.min(deltaTrue, Math.max(minStep, deltaTrue * fraction));
+      const nextValue = prevDisplay + step;
+      reading = Math.min(Math.max(nextValue, prevDisplay), upperBound);
     } else if (deltaTrue < -EPS) {
-      const lowerBound = Math.max(0, pTrue - PRESSURE_NOISE_STD);
-      const rawStep = Math.max(Math.abs(deltaTrue) * 0.1, PRESSURE_NOISE_STD * 0.15);
-      const maxAvail = Math.max(prevDisplay - lowerBound, 0);
-      const minStep = Math.min(rawStep, maxAvail);
-      const base = Math.max(prevDisplay - minStep, lowerBound);
-      const jitterSpan = Math.max(base - lowerBound, 0);
-      reading = base - Math.random() * jitterSpan;
+      const lowerBound = Math.max(0, pTrue - PRESSURE_NOISE_STD * 0.35);
+      const minStep = Math.min(-deltaTrue, PRESSURE_NOISE_STD * 0.08);
+      const fraction = 0.6 + 0.4 * Math.random();
+      const step = Math.min(-deltaTrue, Math.max(minStep, -deltaTrue * fraction));
+      const nextValue = prevDisplay - step;
+      reading = Math.max(Math.min(nextValue, prevDisplay), lowerBound);
     } else {
-      const band = PRESSURE_NOISE_STD * 0.6;
+      const band = PRESSURE_NOISE_STD * 0.5;
       const lo = Math.max(0, pTrue - band);
       const hi = pTrue + band;
-      const center = prevDisplay + gaussianNoise(band * 0.4);
+      const center = prevDisplay + gaussianNoise(band * 0.5);
       reading = Math.max(lo, Math.min(hi, center));
     }
   } else {
     const lo = Math.max(0, pTrue - PRESSURE_NOISE_STD);
     const hi = pTrue + PRESSURE_NOISE_STD;
-    reading = Math.max(lo, Math.min(hi, reading));
+    reading = lo + Math.random() * (hi - lo);
   }
 
-  const display = Math.max(0, reading);
+  const display = Math.max(0, Math.min(reading, pTrue + PRESSURE_NOISE_STD));
   lastPressureTrue = pTrue;
   lastPressureDisplayed = display;
   return display;
