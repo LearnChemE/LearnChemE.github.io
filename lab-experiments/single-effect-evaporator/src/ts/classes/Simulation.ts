@@ -22,7 +22,7 @@ export class Simulation {
             steamTemp: 500,
             evapFlow: 0,
             concFlow: 0,
-            concComp: 0,
+            concComp: 0.05,
             concTemp: 209.9
         }
 
@@ -77,7 +77,7 @@ export class Simulation {
             steamTemp: 500,
             evapFlow: 0,
             concFlow: 0,
-            concComp: 0,
+            concComp: 0.05,
             concTemp: 209.9
         }
         // Reset controlled values

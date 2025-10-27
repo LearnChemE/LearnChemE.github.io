@@ -16,8 +16,8 @@ export function initInteractions<T extends ControlType>(flowCtrl: T, tempCtrl: T
     presSpDescriptor.spLabel = new DigitalLabel(steamPresLabelDescriptor);
 
     return [
-        new SetpointControl(flowSpDescriptor),
-        new SetpointControl(tempSpDescriptor),
-        new SetpointControl(presSpDescriptor)
+        new SetpointControl(flowSpDescriptor, 1000/60),
+        new SetpointControl(tempSpDescriptor, 1000/60),
+        new SetpointControl(presSpDescriptor, 1000/60)
     ];
 }
