@@ -131,19 +131,23 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     // console.log(newT_noCons, TVap3bar)
     let mdot_conc, mdot_evap;
     const Tboil = inv_antoines(EVAPORATOR_PRESSURE / (1 - y_c));
-    console.log(Tboil - 273)
-    if (newT_noCons > Tboil) {
+    if (newT_noCons >= Tboil - .05) {
         const deltaT_cons = Math.max(newT_noCons - Tboil, temp_conc - Tboil);
-        const max_cons = deltaT_cons * a; // Maximum power available for evaporation (W)
+        // You essentially create a P-only controller here, so you need to force the value down
+        const max_cons = Math.max(deltaT_cons * a + in_minus_out + heat_rate, deltaT_cons * a); // Maximum power available for evaporation (W)
+        // console.log(deltaT_cons * a + in_minus_out + heat_rate, deltaT_cons * a);
 
         // Calculate the actual rates based on the surplus energy
-        mdot_evap = Math.min(max_cons / dHvap(temp_feed), mdot_feed * (1 - x_c)); // kg / s
+        const dH = Math.max(dHvap(temp_conc), dHvap(temp_feed))
+        mdot_evap = Math.min(max_cons / dH, mdot_feed * (1 - x_c)); // kg / s
         mdot_conc = mdot_feed - mdot_evap; // kg / s
 
         // Calculate how much power is actually going to evaporation
-        const cons = mdot_evap * dHvap(temp_conc);
+        const cons = mdot_evap * dH;
+        // console.log(cons, max_cons)
         // Evolve
         const dTdt = (in_minus_out + heat_rate - cons) / a;
+        // console.log(temp_conc + dTdt * dt, newT_noCons)
         temp_conc = temp_conc + dTdt * dt;
     } else {
         // Approximately no evaporation; keep previous results
