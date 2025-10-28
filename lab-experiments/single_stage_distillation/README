@@ -1,0 +1,8 @@
+# Single-Stage Distillation — Lab Experiment
+
+- Author: Neil Hendren
+
+## Overview
+
+This lab is also being hosted by our Heroku app for logins.
+Use Node version 14 for dependencies (`nvm use 14.x`). Note that there are shared setup scripts with the manualonly version, so you will need to install node packages for both.
