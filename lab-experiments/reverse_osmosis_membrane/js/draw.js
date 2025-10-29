@@ -160,6 +160,7 @@ window.mouseClicked = function () {
       390 < (window.mY + zoomY * (zoom - 1)) / zoom &&
       (window.mY + zoomY * (zoom - 1)) / zoom < 440
     ) {
+      console.log("clicked pump switch!");
       state.pumpOn = !state.pumpOn;
     }
   }
