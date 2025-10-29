@@ -753,7 +753,7 @@ function drawPressureGauge(x, y) {
   pop();
 
   //--------------------Gauge Needle--------------------
-  console.log("pressure gauge timer: " + pressurizeGaugeCountTimer);
+  //console.log("pressure gauge timer: " + pressurizeGaugeCountTimer);
   fill("black");
   noStroke();
 
@@ -1060,7 +1060,7 @@ function drawWater(x, y) {
 
   rect(x + 178, y + 21, x + 190, y + 219);
 
-  console.log("pump to beakers timer:" + state.pumpToBeakersTimer);
+  //console.log("pump to beakers timer:" + state.pumpToBeakersTimer);
   //elbow to gauge
 
   //old pipe fill method
@@ -1163,7 +1163,7 @@ function drawWater(x, y) {
 
   //---------------------Beakers---------------------
 
-  console.log("delta: " + state.rententateBeakerTimer);
+  //console.log("delta: " + state.rententateBeakerTimer);
   let retentateWaterTY =
     state.figureY +
     373 -
