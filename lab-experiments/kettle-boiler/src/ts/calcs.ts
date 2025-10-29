@@ -1,17 +1,17 @@
 
-export const FEED_RATE_GAIN = 20; // Gain factor to convert lift to flow rate
+export const FEED_RATE_GAIN = 60; // Gain factor to convert lift to flow rate
 
 /**
  * Calculate saturation temperature (C) from pressure (psi) using Antoine equation
  * @param pressure Pressure in psi
  * @returns Temperature in Celsius
  */
-export function calculateSteamTemperature(psig: number): number {
+export function calculateSteamTemperature(barg: number): number {
     // If less than 0, fake it cooling to room temp
-    if (psig < 0) return (100.1 - 25.0) * psig + 100.1;
+    if (barg < 0) return (100.1 - 25.0) * barg + 100.1;
 
-    // Convert psig to bara (1 bar = 14.5038 psi)
-    const P = 1 + .068 * psig;
+    // Convert barg to bara
+    const P = 1 + barg;
 
     // Simplified Antoine equation for water/steam
     const [A, B, C] = [4.6543, 1435.264, -64.848]; // Valid for T < 399.94 C;

@@ -3,8 +3,8 @@ import { animate } from "../../ts/helpers";
 import type { KettleProps } from "./Kettle";
 import { antoines, dHvap } from "../../ts/calcs";
 
-const chamberVolume = 5; // gal
-const chamberCapac_kg = chamberVolume * 3.785 * 0.998; // kg
+const chamberVolume = 12; // L
+const chamberCapac_kg = chamberVolume * 0.998; // kg
 const UA0 = 5; // kW / K
 const MIN_UA = 5; // kW / K
 const Cp = 4.1868; // kJ / kg / K
@@ -37,6 +37,8 @@ export interface ChamberFills {
 };
 
 export function animateChamberMassBalance(props: KettleProps, fills: ChamberFills) {
+    const OVERFLOW_PIXELS_MAX = 5;
+    const MAX_OVERFLOW_RATE = 1; // L / s
     // Variables only seen by this
     let overflowRate = 0;
 
@@ -44,14 +46,14 @@ export function animateChamberMassBalance(props: KettleProps, fills: ChamberFill
     animate((dt: number) => {
         // Update chamber fill based on feed rate
         const fill = fills.chamberFill();
-        const flow = props.feedRate();
+        const flow = props.feedRate() / 60; // L / s
         // Pixels tall
-        const height = 127 * fill;
+        const height = 129 * fill;
 
         // Calculate new fill level
-        const fillIn = flow / chamberVolume * dt / 60; // Convert to per minute, then normalize to chamber volume (unitless)
-        overflowRate = (height > 124) ? (height - 124) * 20 / 3 : 0;
-        const fillOut = overflowRate * dt / 60 / chamberVolume; // unitless
+        const fillIn = flow / chamberVolume * dt; // normalize to chamber volume (unitless)
+        overflowRate = (height > 124) ? (height - 124) * MAX_OVERFLOW_RATE / OVERFLOW_PIXELS_MAX : 0;
+        const fillOut = overflowRate * dt / chamberVolume; // unitless
         const evapOut = fills.internalEvaporateRate() * dt / chamberCapac_kg; // unitless
 
         let newFill = fill + fillIn - fillOut - evapOut;
@@ -67,7 +69,7 @@ export function animateChamberMassBalance(props: KettleProps, fills: ChamberFill
     let filling: boolean = false;
     animate((dt: number) => {
         // Determine whether to start the animation
-        const start = (fills.chamberFill() * 127 > 124);
+        const start = (fills.chamberFill() * 129 > 124);
         if (start) filling = true;
 
         // If not started, keep waiting
@@ -88,18 +90,18 @@ export function animateChamberMassBalance(props: KettleProps, fills: ChamberFill
     () => animate((dt: number) => {
         // Update chamber fill based on feed rate
         const fill = fills.overflowFill();
-        const flowIn = overflowRate;
-        const flowOut = fill * 20; // GPM
+        const flowIn = overflowRate; // L / s
+        const flowOut = fill; // L / s
 
         // Calculate new fill level
-        let newFill = fill + (flowIn - flowOut) * dt/60 / .5;
+        let newFill = fill + (flowIn - flowOut) * dt;
         newFill = Math.min(1, newFill); // Clamp under 1
-        // console.log(`Overflow fill: ${newFill.toFixed(3)}`);
+        // console.log(`Overflow fill: ${newFill.toFixed(3)}\nflowIn: ${overflowRate}`);
 
         // Update and continue animation if not full
         fills.setOverflowFill(newFill);
         // Update the outlet
-        props.onOutletChange?.(flowOut * 3785 / 60);
+        props.onOutletChange?.(flowOut * 1000); // mL / s
         return true;
     }));
 }
@@ -130,6 +132,11 @@ export function animateChamberEnergyBalance(props: KettleProps, fills: ChamberFi
 
         // If unfilled, avoid dividing by zero
         if (fillFrac === 0) {
+            const UA = 10; // W / K
+            const outTemp = props.outTemp();
+            const Q = UA * (props.steamTemp() - props.outTemp()); // W
+            const dTdt = Q / chamberCapac_kg / Cp; // K / s
+            props.onOutTempChange(outTemp + dTdt * dt);
             return true;
         }
         // Feed rate
