@@ -1,11 +1,16 @@
 import * as config from './config.js';
 import { computePressureWithConstantVolume } from './calc.js';
+import {
+  configureWeightControl,
+  setWeightControlPosition,
+  setWeightControlState,
+  setWeightControlVisibility
+} from './weightControl.js';
 
 let pressureGuage = null;
 let pressureReliefValve = null;
 let sleeve = null;
 let syringeObj = null;
-let syringeControls = null;
 let reactorBounds = null;
 let tempSwitch = null;
 let thermoCouple = null;
@@ -192,14 +197,18 @@ function setTemperature(newT) {
 }
 
 function setHeater(on) {
-  heaterOn = !!on;
+  const turningOn = !!on;
+  heaterOn = turningOn;
   clearTempRampTimers();
-  // Do NOT reset measured temp when turning off; measurement just holds
-  refreshTempController();
-  // When turning on, begin ramp from current measured to target setpoint
-  if (heaterOn) {
-    startTempPressureRamp(currentTempC, targetTempC);
+  if (!heaterOn) {
+    pendingTargetTempC = null;
+    refreshTempController();
+    startTempPressureRamp(currentTempC, 25);
+    return;
   }
+
+  refreshTempController();
+  startTempPressureRamp(currentTempC, targetTempC);
 }
 
 
@@ -236,7 +245,7 @@ export function drawConstantVolumeSetup(draw) {
   .fill({color: 'lightgreen', opacity: 0.5});
   
   drawScaleOnVolumeContainer(g, x, y, width, height);
-  drawSyringeControls(g);
+  setupWeightControlUI();
 
   draw.line(x + width, y + height - 375, x + width + 60, y + height - 380)
   .stroke({ width: 2, color: 'black', linecap: 'round', linejoin: 'round', opacity: 0.75 });
@@ -474,7 +483,7 @@ function animateSyringeVertical(obj) {
       jet.remove();
       obj.animating = false;
       obj.filled = false;          // stay empty; no auto-refill
-      refreshSyringeControls();    // update button state/label
+      updateWeightControlUI();
       liquidWeight = w;
       hasCoolDownOccurred = false;
       lastPressureTrue = null;
@@ -492,69 +501,61 @@ function animateSyringeVertical(obj) {
   });
 }
 
-function drawSyringeControls(g) {
-  // Remove prior controls if present
-  if (syringeControls && syringeControls.group) syringeControls.group.remove();
-  const ui = g.group();
-  
-  // Base position: left side of the reactor (fallback to syringe anchor if bounds missing)
-  const btnW = 84, btnH = 26;
+function getWeightControlAnchor() {
+  if (!reactorBounds) {
+    return { x: 40, y: 160 };
+  }
+  const btnW = 84;
+  const btnH = 26;
   const margin = 325;
-  let px = reactorBounds ? (reactorBounds.x - margin - btnW) : (syringeObj.anchorX - margin - btnW);
-  const py = reactorBounds ? (reactorBounds.y) : (syringeObj.anchorY);
-  const pushBtn = ui.rect(btnW, btnH).move(px + 40, py + 100).fill('green').stroke({ width: 1, color: '#777' }).radius(4).css('cursor', 'pointer');
-  const pushText = ui.text('Push').fill('white').font({ size: 12 }).move(px + 12 + 40, py + 5 + 100).css('pointer-events', 'none');
-  pushBtn.on('click', () => {
-    if (!syringeObj.animating && syringeObj.filled) animateSyringeVertical(syringeObj);
-  });
-  
-  // Weight selector (1.6 g to 2.0 g)
-  const wy = py + btnH + 35;
-  ui.text('cooled liquid N₂O₄ weight').font({ size: 16 }).move(px, wy - 30);
-  
-  px = -110
-  const minus = ui.rect(22, 22).move(px + 60, wy - 2).fill('#f9f9f9').stroke({ width: 1, color: '#888' }).radius(4).css('cursor', 'pointer');
-  ui.text('−').font({ size: 16, weight: 'bold' }).move(px + 66, wy - 2).css('pointer-events', 'none');
-  
-  const weightText = ui.text('1.8 g').font({ size: 12, weight: 'bold' }).move(px + 88, wy);
-  
-  const plus = ui.rect(22, 22).move(px + 132, wy - 2).fill('#f9f9f9').stroke({ width: 1, color: '#888' }).radius(4).css('cursor', 'pointer');
-  ui.text('+').font({ size: 16, weight: 'bold' }).move(px + 138, wy - 2).css('pointer-events', 'none');
-  
-  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-  const step = () => +(Math.round(syringeObj.weightStep * 10) / 10).toFixed(1);
-  
-  minus.on('click', () => {
-    if (syringeObj.animating) return;
-    syringeObj.liquidWeight = clamp(+(syringeObj.liquidWeight - 0.1).toFixed(1), syringeObj.minWeight, syringeObj.maxWeight);
-    updateSyringeFillFromWeight(syringeObj, true);
-    refreshSyringeControls();
-  });
-  
-  plus.on('click', () => {
-    if (syringeObj.animating) return;
-    syringeObj.liquidWeight = clamp(+(syringeObj.liquidWeight + 0.1).toFixed(1), syringeObj.minWeight, syringeObj.maxWeight);
-    updateSyringeFillFromWeight(syringeObj, true);
-    refreshSyringeControls();
-  });
-  
-  syringeControls = { group: ui, pushBtn, pushText, weightText };
-  refreshSyringeControls();
+  const rawX = reactorBounds.x - margin - btnW;
+  const rawY = reactorBounds.y + btnH + 5;
+  return {
+    x: Math.max(40, rawX),
+    y: Math.max(80, rawY)
+  };
 }
 
-function refreshSyringeControls() {
-  if (!syringeControls) return;
-  // Update button label and styling based on fill state
+function setupWeightControlUI() {
+  configureWeightControl({
+    onDecrease: () => {
+      if (!syringeObj || syringeObj.animating) return;
+      const next = Math.max(syringeObj.minWeight, +(syringeObj.liquidWeight - 0.1).toFixed(1));
+      if (next === syringeObj.liquidWeight) return;
+      syringeObj.liquidWeight = next;
+      updateSyringeFillFromWeight(syringeObj, true);
+      updateWeightControlUI();
+    },
+    onIncrease: () => {
+      if (!syringeObj || syringeObj.animating) return;
+      const next = Math.min(syringeObj.maxWeight, +(syringeObj.liquidWeight + 0.1).toFixed(1));
+      if (next === syringeObj.liquidWeight) return;
+      syringeObj.liquidWeight = next;
+      updateSyringeFillFromWeight(syringeObj, true);
+      updateWeightControlUI();
+    },
+    onInject: () => {
+      if (!syringeObj || syringeObj.animating || !syringeObj.filled) return;
+      animateSyringeVertical(syringeObj);
+    }
+  });
+
+  setWeightControlVisibility(true);
+  setWeightControlPosition(getWeightControlAnchor(), { trackViewbox: false });
+  updateWeightControlUI();
+}
+
+function updateWeightControlUI() {
+  const weight = syringeObj && typeof syringeObj.liquidWeight === 'number'
+    ? syringeObj.liquidWeight
+    : liquidWeight;
   const isFilled = !!(syringeObj && syringeObj.filled);
-  syringeControls.pushText.text(isFilled ? 'inject N₂O₄' : 'empty');
-  // subtle disabled look when empty
-  syringeControls.pushBtn.fill(isFilled ? 'green' : '#e9e9e9');
-  syringeControls.pushBtn.stroke({ width: 1, color: isFilled ? '#777' : '#bbb' });
-  syringeControls.pushBtn.css('cursor', isFilled ? 'pointer' : 'not-allowed');
-  
-  // Update weight text (1.6..2.0 g)
-  const w = syringeObj && syringeObj.liquidWeight ? syringeObj.liquidWeight : 1.8;
-  syringeControls.weightText.text(`${w.toFixed(2)} g`);
+  const canInject = isFilled && !(syringeObj && syringeObj.animating);
+  setWeightControlState({
+    weight,
+    canInject,
+    label: isFilled ? 'inject N<sub>2</sub>O<sub>4</sub>' : 'empty'
+  });
 }
 
 function updateSyringeFillFromWeight(obj, animateShapes) {
@@ -621,7 +622,7 @@ function drawSwitch(draw, x, y, width, height, opacity = 1, toggle = (isOn) => {
     const dim = opacity * 0.5;
     body
       .fill({ color: flag ? '#555' : '#999', opacity: flag ? opacity : dim })
-      .css('cursor', flag ? 'pointer' : 'not-allowed');
+      .css('cursor', flag ? 'pointer' : 'default');
     handle.fill({ color: flag ? '#aaa' : '#ccc', opacity: flag ? opacity : dim });
   };
 
@@ -743,7 +744,7 @@ function refreshTempController() {
   const inactiveFill = '#eeeeee';
   const activeStroke = '#aaa';
   const inactiveStroke = '#ddd';
-  const cursor = heaterOn ? 'pointer' : 'not-allowed';
+  const cursor = heaterOn ? 'pointer' : 'default';
 
   tempController.minusBtn.fill(heaterOn ? activeFill : inactiveFill)
     .stroke({ width: 1, color: heaterOn ? activeStroke : inactiveStroke })
@@ -770,7 +771,6 @@ export function resetConstantVolumeExperiment() {
   pressureReliefValve = null;
   sleeve = null;
   syringeObj = null;
-  syringeControls = null;
   reactorBounds = null;
   tempSwitch = null;
   thermoCouple = null;
@@ -809,5 +809,5 @@ export function resetConstantVolumeExperiment() {
     }
   }
   // Refresh syringe controls (button label, weight text, disabled style, etc.)
-  refreshSyringeControls();
+  updateWeightControlUI();
 }

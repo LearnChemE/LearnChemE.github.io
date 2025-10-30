@@ -60,10 +60,9 @@ body {
   margin-left: 10px;
   margin-right: 10px;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
   position: relative;
   z-index: 1001;
   background-color: none;
@@ -75,12 +74,6 @@ body {
     flex: none;
     margin-top: -10px;
   }
-  
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  
-  // main.scss
   
   .slider-group {
     display: flex;
@@ -179,12 +172,12 @@ body {
 .icon-container .form {
   position: absolute;
   top: 0;                 /* align with top controls */
-  left: 50%;              /* center horizontally */
-  transform: translateX(-50%);
+  left: 100px;              /* center horizontally */
+  // transform: translateX(-250%);
   display: flex;
   flex-direction: column;
   gap: 4px;
-  width: 200px;           /* matches button width */
+  width: 230px;           /* matches button width */
   margin: 0;
   padding: 0;
   z-index: 1002;          /* above SVG */
@@ -197,6 +190,104 @@ body {
 
 .icon-container .form .form-select {
   width: 100%;
+}
+
+.weight-control {
+  position: absolute;
+  z-index: 1003;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  min-width: 180px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
+  transition: opacity 150ms ease-in-out;
+  font-size: 15px;
+
+  &--hidden {
+    display: none;
+  }
+
+  &__label {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 400;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  &__stepper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+  }
+
+  &__step {
+    width: 36px;
+    height: 32px;
+    border: 1px solid #888;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+    font-size: 15px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    transition: background-color 120ms ease-in-out, transform 120ms ease-in-out;
+
+    &:hover {
+      background-color: #e0e0e0;
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+  }
+
+  &__value {
+    min-width: 80px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  &__inject {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #fff;
+    background-color: #228b22;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    transition: background-color 120ms ease-in-out, transform 120ms ease-in-out, box-shadow 120ms ease-in-out;
+
+    &:hover {
+      background-color: #1a6e1a;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+
+    &--disabled {
+      background-color: #e1e1e1;
+      color: #666;
+      cursor: default;
+      box-shadow: none;
+      pointer-events: none;
+    }
+  }
 }
 
 @media (max-width: 600px) {

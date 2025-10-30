@@ -1,5 +1,6 @@
 import * as config from './config.js';
 import * as state from './state.js';
+import { refreshWeightControlPosition } from './weightControl.js';
 
 export function addOptionToDragAndZoom(draw) {
     // draw.text("zoom with the scroll wheel")
@@ -11,37 +12,44 @@ export function addOptionToDragAndZoom(draw) {
     // .font({ size: 16, anchor: 'left' })
     const defaultViewbox = { x: 0, y: 0, width: config.canvasWidth, height: config.canvasHeight };
     draw.viewbox(defaultViewbox.x, defaultViewbox.y, defaultViewbox.width, defaultViewbox.height);
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
     
     const background = draw.rect(config.canvasWidth, config.canvasHeight)
     .fill({ color: '#fff', opacity: 0 });
     background.back();
-    
-    background.on('mousedown', function(event) {
-        const vb = draw.viewbox();
-        if (vb.width >= defaultViewbox.width) return;
+
+    const canPan = () => draw.viewbox().width < defaultViewbox.width;
+    const startPan = (event) => {
+        if (event.button !== 0) return;
+        if (!canPan()) return;
+        if (event.target && typeof event.target.closest === 'function' && event.target.closest('[data-no-pan]')) return;
         state.setIsPanning(true);
         state.setPanStart({ x: event.clientX, y: event.clientY });
-    });
-    
-    background.on('mousemove', function(event) {
-        if (!state.isPanning) return;
+    };
+    const panMove = (event) => {
+        if (!state.getIsPanning()) return;
         event.preventDefault();
-        const dx = event.clientX - state.panStart.x;
-        const dy = event.clientY - state.panStart.y;
+        const start = state.getPanStart();
+        const dx = event.clientX - start.x;
+        const dy = event.clientY - start.y;
         const vb = draw.viewbox();
-        if (vb.width < defaultViewbox.width) {
-            draw.viewbox(vb.x - dx, vb.y - dy, vb.width, vb.height);
-        }
+        const maxX = Math.max(config.canvasWidth - vb.width, 0);
+        const maxY = Math.max(config.canvasHeight - vb.height, 0);
+        const nextX = clamp(vb.x - dx, 0, maxX);
+        const nextY = clamp(vb.y - dy, 0, maxY);
+        draw.viewbox(nextX, nextY, vb.width, vb.height);
+        refreshWeightControlPosition();
         state.setPanStart({ x: event.clientX, y: event.clientY });
-    });
-    
-    background.on('mouseup', function() {
+    };
+    const endPan = () => {
         state.setIsPanning(false);
-    });
-    
-    document.addEventListener('mouseup', () => {
-        state.setIsPanning(false);
-    });
+    };
+
+    draw.on('mousedown', startPan);
+    draw.on('mousemove', panMove);
+    draw.on('mouseup', endPan);
+    draw.on('mouseleave', endPan);
+    document.addEventListener('mouseup', endPan);
     
     draw.on('wheel', function(event) {
         event.preventDefault();
@@ -52,6 +60,7 @@ export function addOptionToDragAndZoom(draw) {
         let newHeight = vb.height * zoomFactor;
         if (newWidth >= defaultViewbox.width) {
             draw.viewbox(defaultViewbox.x, defaultViewbox.y, defaultViewbox.width, defaultViewbox.height);
+            refreshWeightControlPosition();
             return;
         }
         const pt = draw.node.createSVGPoint();
@@ -63,5 +72,6 @@ export function addOptionToDragAndZoom(draw) {
         newX = Math.max(0, Math.min(newX, config.canvasWidth - newWidth));
         newY = Math.max(0, Math.min(newY, config.canvasHeight - newHeight));
         draw.viewbox(newX, newY, newWidth, newHeight);
+        refreshWeightControlPosition();
     });
 }
