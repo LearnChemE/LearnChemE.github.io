@@ -1,5 +1,6 @@
 import { createSignal, For, type Component, type Setter } from "solid-js"
 import "./PRegulator.css";
+import { maxPressure } from "../Gauge/Gauge";
 
 interface PRegulatorProps {
     setPressure: Setter<number>;
@@ -47,7 +48,7 @@ export const PRegulator: Component<PRegulatorProps> = ({ setPressure }) => {
             setL(newL);
 
             // Update pressure
-            const newP = 20 * newL; // Scale lift to pressure (0-15 psi)
+            const newP = maxPressure * newL; // Scale lift to pressure (0-15 psi)
             setPressure(newP);
         };
 

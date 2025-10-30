@@ -1,26 +1,13 @@
 import { type Accessor, type Setter } from "solid-js";
 import { animate } from "../../ts/helpers";
 import type { KettleProps } from "./Kettle";
-import { antoines, dHvap } from "../../ts/calcs";
+import { dHvap } from "../../ts/calcs";
 
-const chamberVolume = 5; // gal
-const chamberCapac_kg = chamberVolume * 3.785 * 0.998; // kg
-const UA0 = 5; // kW / K
-const MIN_UA = 5; // kW / K
-const Cp = 4.1868; // kJ / kg / K
-const rho_kg_gal = 3.78; // kg / gal
-const HA = 1; // kg / s / bar
-
-// interface KettleProps {
-//   // Inputs
-//   feedRate: () => number; // in gal/min
-//   steamTemp: () => number; // in C
-//
-//   // Outputs
-//   onOutletChange?: (outletTemp: number) => void; // Callback for outlet temperature change, in Celsi
-//   onEvaporateChange?: (evapCh: number) => void; // Callback for evaporation change, in gal/m
-//   onConcentrateChange?: (concCh: number) => void; // Callback for concentration change, in gal/m
-// };
+const chamberVolume = 12; // L
+const chamberCapac_kg = chamberVolume * 0.998; // kg
+const chamberHeatCapac = 100; // J / K
+const Cp = 4186.8; // J / kg / K
+const rho = .998; // kg / L
 
 export interface ChamberFills { 
     // Fill Accessors
@@ -37,6 +24,8 @@ export interface ChamberFills {
 };
 
 export function animateChamberMassBalance(props: KettleProps, fills: ChamberFills) {
+    const OVERFLOW_PIXELS_MAX = 5;
+    const MAX_OVERFLOW_RATE = 1; // L / s
     // Variables only seen by this
     let overflowRate = 0;
 
@@ -44,14 +33,14 @@ export function animateChamberMassBalance(props: KettleProps, fills: ChamberFill
     animate((dt: number) => {
         // Update chamber fill based on feed rate
         const fill = fills.chamberFill();
-        const flow = props.feedRate();
+        const flow = props.feedRate() / 60; // L / s
         // Pixels tall
-        const height = 127 * fill;
+        const height = 129 * fill;
 
         // Calculate new fill level
-        const fillIn = flow / chamberVolume * dt / 60; // Convert to per minute, then normalize to chamber volume (unitless)
-        overflowRate = (height > 124) ? (height - 124) * 20 / 3 : 0;
-        const fillOut = overflowRate * dt / 60 / chamberVolume; // unitless
+        const fillIn = flow / chamberVolume * dt; // normalize to chamber volume (unitless)
+        overflowRate = (height > 124) ? (height - 124) * MAX_OVERFLOW_RATE / OVERFLOW_PIXELS_MAX : 0;
+        const fillOut = overflowRate * dt / chamberVolume; // unitless
         const evapOut = fills.internalEvaporateRate() * dt / chamberCapac_kg; // unitless
 
         let newFill = fill + fillIn - fillOut - evapOut;
@@ -67,7 +56,7 @@ export function animateChamberMassBalance(props: KettleProps, fills: ChamberFill
     let filling: boolean = false;
     animate((dt: number) => {
         // Determine whether to start the animation
-        const start = (fills.chamberFill() * 127 > 124);
+        const start = (fills.chamberFill() * 129 > 124);
         if (start) filling = true;
 
         // If not started, keep waiting
@@ -88,36 +77,44 @@ export function animateChamberMassBalance(props: KettleProps, fills: ChamberFill
     () => animate((dt: number) => {
         // Update chamber fill based on feed rate
         const fill = fills.overflowFill();
-        const flowIn = overflowRate;
-        const flowOut = fill * 20; // GPM
+        const flowIn = overflowRate; // L / s
+        const flowOut = fill; // L / s
 
         // Calculate new fill level
-        let newFill = fill + (flowIn - flowOut) * dt/60 / .5;
+        let newFill = fill + (flowIn - flowOut) * dt;
         newFill = Math.min(1, newFill); // Clamp under 1
-        // console.log(`Overflow fill: ${newFill.toFixed(3)}`);
+        // console.log(`Overflow fill: ${newFill.toFixed(3)}\nflowIn: ${overflowRate}`);
 
         // Update and continue animation if not full
         fills.setOverflowFill(newFill);
         // Update the outlet
-        props.onOutletChange?.(flowOut * 3785 / 60);
+        props.onOutletChange?.(flowOut * 1000); // mL / s
         return true;
     }));
 }
 
-/**
- * Energy balance to calculate the steam flowrate
- * @param chamberFill Fill ratio of the chamber (fraction)
- * @param steamTemp Temperature of steam (C)
- * @param chamberTemp Temperature of the chamber (K)
- * @returns Steam Flowrate (g/s)
- */
-export function calculateSteamOut(chamberFill: number, steamTemp: number, chamberTemp: number) {
-    const UA = Math.max(chamberFill * UA0, MIN_UA);
+// /**
+//  * Energy balance to calculate the steam flowrate
+//  * @param chamberFill Fill ratio of the chamber (fraction)
+//  * @param steamTemp Temperature of steam (C)
+//  * @param chamberTemp Temperature of the chamber (K)
+//  * @returns Steam Flowrate (g/s)
+//  */
+// export function calculateSteamOut(chamberFill: number, steamTemp: number, chamberTemp: number) {
+//     const UA = Math.max(chamberFill * UA0, MIN_UA);
 
-    // Heat rate
-    const Qs = UA * (steamTemp - chamberTemp); // W
-    const mdot_s = Qs / dHvap(steamTemp); // kg / s
-    return 1000 * mdot_s; // g / s
+//     // Heat rate
+//     const Qs = UA * (steamTemp - chamberTemp); // W
+//     const mdot_s = Qs / dHvap(steamTemp); // kg / s
+//     return 1000 * mdot_s; // g / s
+// }
+
+const controller = {
+    I: 0,
+    prev: 0,
+    kp: 1,
+    ki: 8,
+    kd: .2
 }
 
 export function animateChamberEnergyBalance(props: KettleProps, fills: ChamberFills) {
@@ -125,33 +122,54 @@ export function animateChamberEnergyBalance(props: KettleProps, fills: ChamberFi
     // Animate the energy balance
     animate((dt: number) => {
         const fillFrac = fills.chamberFill();
+        const fillMass = fillFrac * chamberCapac_kg; // mass in shell
         const Tc = props.outTemp();
-        const Tk = Tc + 273.15;
 
-        // If unfilled, avoid dividing by zero
-        if (fillFrac === 0) {
-            return true;
-        }
+        // Calc Heat rate
+        const UA = 3628;//Math.max(fillFrac * UA0, MIN_UA); // W / K
+        const heat_rate = UA * (props.steamTemp() - Tc); // W
+
         // Feed rate
-        const mdot_in = props.feedRate() * 3.785 / 60; // GPM to kg/s
-        // HEX UA value
-        const UA = Math.max(fillFrac * UA0, MIN_UA);
-
-        // Use an HA value for rate of evaporation
-        const pvap = antoines(Tk);
-        const mdot_evap = (pvap > 1) ? HA * (pvap - 1) : 0;
-        fills.setInternalEvaporateRate(mdot_evap);
-
+        const mdot_in = rho * props.feedRate() / 60; // LPM to kg/s
+        const T_in = 25; // C
+        
         // Balance
-        const nrg_in_minus_out = mdot_in * Cp * (298.15 - Tk);
-        const nrg_gen = UA * (props.steamTemp() - Tc);
-        const nrg_cons = mdot_evap * dHvap(Tc);
-        // console.log(`in-out:${nrg_in_minus_out}\ngen:${nrg_gen}\ncons:${nrg_cons}`);
+        const nrg_in = (fillMass > 0) ? mdot_in * Cp * (T_in - Tc) : 0;
+        const totCapac = fillMass * Cp + chamberHeatCapac; // kJ / K
+        
+        let cons = 0, evap = 0;
+        if (fillFrac > 0.05) {
+            // Solve for evaporation
+            const Tboil = 100; // K
+            const nrg_left = (Tc - Tboil) * totCapac; // W
+
+            // Controller to drive temp down while boiling
+            const proportional = nrg_left;
+            if (proportional > 0) {
+                controller.I += proportional * dt;
+            } else {
+                controller.I *= .98;
+            }
+            
+            let deriv = (proportional - controller.prev) / dt;
+            // deriv = (Tc > Tboil) ? deriv : 0;
+            controller.prev = proportional;
+
+            // Calculate controller output
+            cons = controller.kp * proportional + controller.ki * controller.I + controller.kd * deriv; // W
+            // if (cons > 0) console.log(controller.kp * proportional, controller.ki * controller.I, controller.kd * deriv)
+            cons = cons > 0 ? cons : 0; // W
+
+            // Use consumption to solve mass balance
+            evap = cons / dHvap(Tc) / 1000; // kg / s
+            if (evap > 0) console.log(`setting evap to ${evap}`)
+        }
 
         // Evolve
-        const acc = nrg_in_minus_out + nrg_gen - nrg_cons; // kW
-        const dTdt = acc / (rho_kg_gal * Cp * chamberVolume); // K / s
+        const acc = nrg_in + heat_rate - cons; // kW
+        const dTdt = acc / totCapac; // K / s
         props.onOutTempChange(Tc + dTdt * dt);
+        props.onEvaporateChange?.(evap);
 
         return true;
     });

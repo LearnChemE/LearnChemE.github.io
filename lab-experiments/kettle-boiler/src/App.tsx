@@ -20,7 +20,8 @@ function App() {
   return (
     <>
       <HamburgerMenu path={worksheet} downloadName='Kettle-Boiler-Worksheet.pdf' Directions={DirectionsText} About={AboutText} />
-      <Apparatus/>
+      <Apparatus />
+      <button type='button' class='btn btn-danger' onclick={() => location.reload()}>reset</button>
     </>
   )
 }

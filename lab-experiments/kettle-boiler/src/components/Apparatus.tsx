@@ -1,4 +1,4 @@
-import { createMemo, createSignal, type Component } from "solid-js";
+import { createEffect, createMemo, createSignal, type Component } from "solid-js";
 import StaticElements from "./Static/StaticElements";
 import StaticDefs from "./Static/StaticDefs";
 import Rotameter from "./Rotameter/Rotameter";
@@ -35,12 +35,14 @@ export const Apparatus: Component = () => {
     const target = ballValveOpen() ? regulatorPressure() : -1;
     const current = steamPressure();
     let next = (current - target) * r ** dt + target;
-    setSteamPressure(next);
+    setSteamPressure(Math.min(next, 1));
     return true;
   });
   const steamTemperature = createMemo(() => calculateSteamTemperature(steamPressure())); // Steam temperature based on pressure
+  createEffect(() => console.log(condRate()))
 
-  const outTempDisplay = createMemo(() => outRate() > 0.1 ? Math.min(outTemp(), 100.1).toFixed(1) : "--");
+  const outTempDisplay = createMemo(() => outRate() > 0.01 ? Math.min(outTemp(), 100.1).toFixed(1) : "--");
+  // const outTempDisplay = createMemo(() => outTemp().toFixed(1)); // Show internal temp always for debugging
 
 return (<svg
   width="1133"
@@ -80,14 +82,14 @@ return (<svg
 
     {/* Waterfalls */}
     <Waterfall key="cond" cx={157} rate={condRate} rateRange={[0, 400]} />
-    <Waterfall key="conc" cx={965} rate={outRate} />
+    <Waterfall key="conc" cx={965} rate={outRate}  rateRange={[0,1000]} />
 
     <Gauge pressure={steamPressure}/>
     <BallValve onToggle={(open) => setBallValveOpen(open)} />
     <GlobeValve onLiftChange={(lift) => setFeedRate(lift * FEED_RATE_GAIN)}/>
     <BeakerSystem leftFlow={condRate} rightFlow={outRate} />
 
-    <Steam showing={() => (regulatorPressure() > 15 && ballValveOpen())} x={230} y={90} w={5} h={7} />
+    <Steam showing={() => (regulatorPressure() > 1 && ballValveOpen())} x={230} y={90} w={5} h={7} />
   </g>
   <StaticDefs/>
 </svg>);

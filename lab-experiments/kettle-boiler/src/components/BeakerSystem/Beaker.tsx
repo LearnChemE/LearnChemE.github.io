@@ -110,7 +110,7 @@ export const Beaker: Component<BeakerProps> = (props) => {
     }
     // None
     else if (b !== null) {
-      console.log(`Unblocking trigger`)
+      // console.log(`Unblocking trigger`)
       props.block(b, null);
       setBlocked(null);
     }

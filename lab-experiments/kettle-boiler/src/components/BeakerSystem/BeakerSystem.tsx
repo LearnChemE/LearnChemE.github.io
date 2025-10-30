@@ -70,7 +70,7 @@ export const BeakerSystem: Component<BeakerSystemProps> = ({ leftFlow, rightFlow
         const val = blocks[0][0]();
         const setter = blocks[0][1];
         setter(val + leftFlow() * dt);
-      console.log("playing frame", val)
+      // console.log("playing frame", val)
       }
       // Right drain
       if (blocks[3] !== null) {

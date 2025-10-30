@@ -1,8 +1,11 @@
-import { createEffect, createMemo, createSignal, onMount, type Component } from "solid-js";
+import { createMemo, createSignal, onMount, type Component } from "solid-js";
 import "./Kettle.css";
-import { animateChamberEnergyBalance, animateChamberMassBalance, calculateSteamOut, type ChamberFills } from "./KettleLogic";
+import { animateChamberEnergyBalance, animateChamberMassBalance, type ChamberFills } from "./KettleLogic";
 import { Boils } from "../Boils/Boils";
 import { Steam } from "../Steam/Steam";
+
+// Debug in dev mode only
+declare const __DEV__: boolean;
 
 export interface KettleProps {
   // Inputs
@@ -31,9 +34,9 @@ export const Kettle: Component<KettleProps> = (props) => {
     }, 1000); // Slight delay to ensure CSS transition
   });
 
-  // Memo to update the steam outlet
-  const steamOut = createMemo(() => calculateSteamOut(chamberFill(), props.steamTemp(), props.outTemp()));
-  if (props.onSteamOutChange) createEffect(() => props.onSteamOutChange!(Math.max(steamOut(), 0)));
+  // // Memo to update the steam outlet
+  // const steamOut = createMemo(() => calculateSteamOut(chamberFill(), props.steamTemp(), props.outTemp()));
+  // if (props.onSteamOutChange) createEffect(() => props.onSteamOutChange!(Math.max(steamOut(), 0)));
 
   // Animations for the three fills
   const fills: ChamberFills = { chamberFill, pathFill, overflowFill, setChamberFill, setPathFill, setOverflowFill, internalEvaporateRate, setInternalEvaporateRate };
@@ -210,13 +213,15 @@ export const Kettle: Component<KettleProps> = (props) => {
             />
           </g>
         </g>
-        <path
+        <path 
           id="chamberFill"
-          d="M914 398H529.214C519.75 398 510.298 397.329 500.93 395.991L494.07 395.011C484.702 393.673 475.25 393 465.786 393H438V272.817C440.34 272.533 442.62 271.92 444.775 271H914V398Z"
-          fill="#3B8CCF"
+          transform="translate(438 269)"
+          d="M476 129H91.2139C81.7502 129 72.2982 128.334 62.9297 127.006L56.0703 126.034C46.7018 124.706 37.2498 124.038 27.7861 124.038H0V4.7793C4.33286 4.25776 8.46342 2.61488 11.9688 0H476V129Z" 
+          fill="#3B8CCF" 
           fill-opacity="0.6"
           clip-path="url(#chamberClip)"
         />
+
         <path
           id="overflowFill"
           d="M1056.33 386C1040.3 398.756 1023.51 397.937 1023.48 397.936H1018V398H914V386H1056.33Z"
@@ -227,7 +232,7 @@ export const Kettle: Component<KettleProps> = (props) => {
           id="overflowPath"
           d="M916 397V275C916 274.5 915.5 274 915 274H914"
           stroke="#78AEDD"
-          stroke-width={ Math.max(0, 254 * chamberFill() - 248) }
+          stroke-width={ Math.max(0, 2 * (129 * chamberFill() - 124)) }
           stroke-dasharray="126.7020263671875"
           stroke-dashoffset={126.7020263671875 * (1 + pathFill())}
         />
@@ -708,10 +713,10 @@ export const Kettle: Component<KettleProps> = (props) => {
     <defs>
       <clipPath id="chamberClip">
         <rect
-          x="435"
-          y={398 - 127 * chamberFill()}
+          x="0"
+          y={129 - 129 * chamberFill()}
           width="479"
-          height={127 * chamberFill()}
+          height={129 * chamberFill()}
           fill="white"
         />
       </clipPath>
@@ -728,5 +733,10 @@ export const Kettle: Component<KettleProps> = (props) => {
     </g>
   </>
 )};
+
+<svg width="476" height="129" viewBox="0 0 476 129" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M476 129H91.2139C81.7502 129 72.2982 128.334 62.9297 127.006L56.0703 126.034C46.7018 124.706 37.2498 124.038 27.7861 124.038H0V4.7793C4.33286 4.25776 8.46342 2.61488 11.9688 0H476V129Z" fill="#3B8CCF" fill-opacity="0.6"/>
+</svg>
+
 
 export default Kettle;
