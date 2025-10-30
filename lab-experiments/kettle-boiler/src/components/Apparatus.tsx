@@ -41,8 +41,8 @@ export const Apparatus: Component = () => {
   const steamTemperature = createMemo(() => calculateSteamTemperature(steamPressure())); // Steam temperature based on pressure
   createEffect(() => console.log(condRate()))
 
-  // const outTempDisplay = createMemo(() => outRate() > 0.01 ? outTemp().toFixed(1) /*Math.min(outTemp(), 100.1).toFixed(1)*/ : "--");
-  const outTempDisplay = createMemo(() => outTemp().toFixed(1));
+  const outTempDisplay = createMemo(() => outRate() > 0.01 ? Math.min(outTemp(), 100.1).toFixed(1) : "--");
+  // const outTempDisplay = createMemo(() => outTemp().toFixed(1)); // Show internal temp always for debugging
 
 return (<svg
   width="1133"

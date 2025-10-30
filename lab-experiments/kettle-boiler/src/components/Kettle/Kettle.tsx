@@ -1,6 +1,6 @@
-import { createEffect, createMemo, createSignal, onMount, type Component } from "solid-js";
+import { createMemo, createSignal, onMount, type Component } from "solid-js";
 import "./Kettle.css";
-import { animateChamberEnergyBalance, animateChamberMassBalance, calculateSteamOut, type ChamberFills } from "./KettleLogic";
+import { animateChamberEnergyBalance, animateChamberMassBalance, type ChamberFills } from "./KettleLogic";
 import { Boils } from "../Boils/Boils";
 import { Steam } from "../Steam/Steam";
 
@@ -34,9 +34,9 @@ export const Kettle: Component<KettleProps> = (props) => {
     }, 1000); // Slight delay to ensure CSS transition
   });
 
-  // Memo to update the steam outlet
-  const steamOut = createMemo(() => calculateSteamOut(chamberFill(), props.steamTemp(), props.outTemp()));
-  if (props.onSteamOutChange) createEffect(() => props.onSteamOutChange!(Math.max(steamOut(), 0)));
+  // // Memo to update the steam outlet
+  // const steamOut = createMemo(() => calculateSteamOut(chamberFill(), props.steamTemp(), props.outTemp()));
+  // if (props.onSteamOutChange) createEffect(() => props.onSteamOutChange!(Math.max(steamOut(), 0)));
 
   // Animations for the three fills
   const fills: ChamberFills = { chamberFill, pathFill, overflowFill, setChamberFill, setPathFill, setOverflowFill, internalEvaporateRate, setInternalEvaporateRate };
