@@ -134,8 +134,8 @@ export function animateChamberEnergyBalance(props: KettleProps, fills: ChamberFi
         const T_in = 25; // C
         
         // Balance
-        const nrg_in = (fillMass > 0) ? mdot_in * Cp * (T_in - Tc) : 0;
-        const totCapac = fillMass * Cp + chamberHeatCapac; // kJ / K
+        const nrg_in = (fillMass > 0) ? mdot_in * Cp * (T_in - Tc) : 0; // W
+        const totCapac = fillMass * Cp + chamberHeatCapac; // J / K
         
         let cons = 0, evap = 0;
         if (fillFrac > 0.05) {
@@ -151,7 +151,7 @@ export function animateChamberEnergyBalance(props: KettleProps, fills: ChamberFi
                 controller.I *= .98;
             }
             
-            let deriv = (proportional - controller.prev) / dt;
+            let deriv = (dt !== 0) ? (proportional - controller.prev) / dt : 0;
             // deriv = (Tc > Tboil) ? deriv : 0;
             controller.prev = proportional;
 
@@ -159,17 +159,20 @@ export function animateChamberEnergyBalance(props: KettleProps, fills: ChamberFi
             cons = controller.kp * proportional + controller.ki * controller.I + controller.kd * deriv; // W
             // if (cons > 0) console.log(controller.kp * proportional, controller.ki * controller.I, controller.kd * deriv)
             cons = cons > 0 ? cons : 0; // W
+            console.log(`cons: ${cons}`)
 
             // Use consumption to solve mass balance
-            evap = cons / dHvap(Tc) / 1000; // kg / s
+            evap = cons / dHvap(100) / 1000; // kg / s
             if (evap > 0) console.log(`setting evap to ${evap}`)
         }
 
         // Evolve
-        const acc = nrg_in + heat_rate - cons; // kW
+        const acc = nrg_in + heat_rate - cons; // W
         const dTdt = acc / totCapac; // K / s
+        const cond = heat_rate / dHvap(props.steamTemp()); // W kg / kJ == g / s
         props.onOutTempChange(Tc + dTdt * dt);
         props.onEvaporateChange?.(evap);
+        props.onSteamOutChange?.(cond);
 
         return true;
     });
