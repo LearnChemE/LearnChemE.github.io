@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (worksheetBtn) {
     worksheetBtn.addEventListener('click', () => {
       // Show worksheet overlay
-      buttonAction({ action: 'download', url: 'assets/worksheet.pdf', label: 'Worksheet', filename: 'Unsteady state material balances for a two-phase, multicomponent system worksheet.pdf' });
+      buttonAction({ action: 'download', url: 'assets/worksheet.pdf', label: 'Worksheet', filename: 'Chemical equilibirum for N2O4 dissociation worksheet.pdf' });
     });
   } 
 });
