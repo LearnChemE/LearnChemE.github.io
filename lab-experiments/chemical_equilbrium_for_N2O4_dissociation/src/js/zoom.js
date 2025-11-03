@@ -30,9 +30,12 @@ export function addOptionToDragAndZoom(draw) {
         if (!state.getIsPanning()) return;
         event.preventDefault();
         const start = state.getPanStart();
-        const dx = event.clientX - start.x;
-        const dy = event.clientY - start.y;
         const vb = draw.viewbox();
+        const bounds = draw.node.getBoundingClientRect();
+        const scaleX = bounds.width ? vb.width / bounds.width : 1;
+        const scaleY = bounds.height ? vb.height / bounds.height : 1;
+        const dx = (event.clientX - start.x) * scaleX;
+        const dy = (event.clientY - start.y) * scaleY;
         const maxX = Math.max(config.canvasWidth - vb.width, 0);
         const maxY = Math.max(config.canvasHeight - vb.height, 0);
         const nextX = clamp(vb.x - dx, 0, maxX);
