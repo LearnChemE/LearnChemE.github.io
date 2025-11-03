@@ -2,7 +2,6 @@ import * as config from './config.js';
 import { computePressureWithConstantVolume } from './calc.js';
 import {
   configureWeightControl,
-  setWeightControlPosition,
   setWeightControlState,
   setWeightControlVisibility
 } from './weightControl.js';
@@ -490,8 +489,8 @@ function animateSyringeVertical(obj) {
       lastPressureDisplayed = null;
       pendingTargetTempC = null;
       isTempRamping = false;
-      updatePressureText();
       liquidPushed = true;
+      updatePressureText();
 
       // Enable heater switch now that injection has completed
       if (tempSwitch && typeof tempSwitch.setEnabled === 'function') {
@@ -499,21 +498,6 @@ function animateSyringeVertical(obj) {
       }
     });
   });
-}
-
-function getWeightControlAnchor() {
-  if (!reactorBounds) {
-    return { x: 40, y: 160 };
-  }
-  const btnW = 84;
-  const btnH = 26;
-  const margin = 325;
-  const rawX = reactorBounds.x - margin - btnW;
-  const rawY = reactorBounds.y + btnH + 5;
-  return {
-    x: Math.max(40, rawX),
-    y: Math.max(80, rawY)
-  };
 }
 
 function setupWeightControlUI() {
@@ -541,7 +525,6 @@ function setupWeightControlUI() {
   });
 
   setWeightControlVisibility(true);
-  setWeightControlPosition(getWeightControlAnchor(), { trackViewbox: false });
   updateWeightControlUI();
 }
 

@@ -2,7 +2,6 @@ import * as config from './config.js';
 import { computePressureWithConstantVolume, computeVolumeWithConstantPressure } from './calc.js';
 import {
   configureWeightControl,
-  setWeightControlPosition,
   setWeightControlState,
   setWeightControlVisibility
 } from './weightControl.js';
@@ -34,6 +33,13 @@ let temperatureText = null; // text element showing current temperature
 let lastPressureTrue = null;
 let lastPressureDisplayed = null;
 let hasCoolDownOccurred = false;
+let isTempRamping = false;
+let pendingTargetTempC = null;
+let isVolumeSettling = false;
+let pendingVolumeUpdates = [];
+let volumeSettleTimerId = null;
+let deferredVolumeTimerIds = [];
+let pendingTempRampTarget = null;
 
 // --- measurement noise for pressure readout (display-only) ---
 // Standard deviation of the noise added to the displayed pressure, in bar.
@@ -114,8 +120,91 @@ function updatePressureText(temp = null) {
   }
 }
 
-function updatePistonVolume(tempC = currentTempC, animate = true) {
+function scheduleVolumeSettleCompletion(delayMs = 0) {
+  if (volumeSettleTimerId) {
+    clearTimeout(volumeSettleTimerId);
+  }
+  volumeSettleTimerId = setTimeout(() => {
+    volumeSettleTimerId = null;
+    isVolumeSettling = false;
+    if (pendingVolumeUpdates.length) {
+      const queue = pendingVolumeUpdates;
+      pendingVolumeUpdates = [];
+      let accumulatedDelay = 0;
+      clearDeferredVolumeTimers();
+      queue.forEach(({ tempC, options }, idx) => {
+        const nextOptions = { ...options, force: true };
+        const stepDelay = Math.max(0, nextOptions.deferDelayMs ?? 0);
+        if (idx === 0) {
+          accumulatedDelay = 0;
+        } else {
+          accumulatedDelay += stepDelay;
+        }
+        const callOptions = { ...nextOptions };
+        delete callOptions.deferDelayMs;
+        const timerId = setTimeout(() => {
+          deferredVolumeTimerIds = deferredVolumeTimerIds.filter((storedId) => storedId !== timerId);
+          updatePistonVolume(tempC, callOptions);
+        }, accumulatedDelay);
+        deferredVolumeTimerIds.push(timerId);
+      });
+    }
+    if (pendingTempRampTarget != null) {
+      const target = pendingTempRampTarget;
+      const origin = currentTempC;
+      pendingTempRampTarget = null;
+      startTempPressureRamp(origin, target, { force: true });
+    }
+  }, Math.max(0, delayMs));
+}
+
+function dropDeferredTemperatureVolumes() {
+  if (!pendingVolumeUpdates.length) return;
+  pendingVolumeUpdates = pendingVolumeUpdates.filter(({ options }) => options?.source !== 'temperature');
+}
+
+function clearDeferredVolumeTimers() {
+  if (!deferredVolumeTimerIds.length) return;
+  deferredVolumeTimerIds.forEach((id) => clearTimeout(id));
+  deferredVolumeTimerIds = [];
+}
+
+function updatePistonVolume(tempC = currentTempC, opts = {}) {
   if (!pistonAssembly) return;
+
+  let options;
+  if (typeof opts === 'boolean') {
+    options = { animate: opts };
+  } else if (!opts) {
+    options = {};
+  } else {
+    options = { ...opts };
+  }
+
+  const source = options.source || null;
+  const isInjection = source === 'injection';
+  const force = options.force === true;
+
+  if (isInjection) {
+    isVolumeSettling = true;
+    clearDeferredVolumeTimers();
+    pendingVolumeUpdates = [];
+  } else if (isVolumeSettling && !force) {
+    const queuedOptions = { ...options, force: true };
+    pendingVolumeUpdates.push({ tempC, options: queuedOptions });
+    return;
+  }
+
+  let animate = options.animate;
+  if (typeof animate !== 'boolean') {
+    animate = true;
+  }
+  let durationOverride = null;
+  if (typeof options.durationMs === 'number') {
+    durationOverride = options.durationMs;
+  } else if (typeof options.duration === 'number') {
+    durationOverride = options.duration;
+  }
 
   let volumeL = MIN_INITIAL_VOLUME_L;
   if (liquidPushed) {
@@ -142,7 +231,7 @@ function updatePistonVolume(tempC = currentTempC, animate = true) {
   const highlightY = pistonTop + piston.highlightOffset;
   const rodBottom = pistonTop + piston.height / 2;
 
-  const duration = animate ? 350 : 0;
+  const duration = animate ? (durationOverride ?? 350) : 0;
 
   const applyMove = (element, fn) => {
     if (!element) return;
@@ -167,6 +256,10 @@ function updatePistonVolume(tempC = currentTempC, animate = true) {
     const rodY = rodBottom - rod.height;
     applyMove(rod.rect, (el) => el.move(rod.x, rodY));
   }
+
+  if (isInjection) {
+    scheduleVolumeSettleCompletion(duration > 0 ? duration + 40 : 0);
+  }
 }
 
 // --- non-blocking temperature→pressure ramp (0.5 °C steps) ---
@@ -174,15 +267,23 @@ let tempRampTimerIds = [];
 function clearTempRampTimers() {
   for (const id of tempRampTimerIds) clearTimeout(id);
   tempRampTimerIds = [];
+  isTempRamping = false;
+  pendingTargetTempC = null;
+  dropDeferredTemperatureVolumes();
+  clearDeferredVolumeTimers();
 }
-function startTempPressureRamp(prevT, currT) {
-  clearTempRampTimers();
+function startTempPressureRamp(prevT, currT, opts = {}) {
+  if (isVolumeSettling && !opts.force) {
+    pendingTempRampTarget = currT;
+    return;
+  }
+  pendingTempRampTarget = null;
   // No ramp needed
   if (prevT === currT) {
     currentTempC = currT;
     temperatureText && temperatureText.text(`${currT.toFixed(1)} °C`);
     updatePressureText(currT);
-    updatePistonVolume(currT, true);
+    updatePistonVolume(currT, { animate: true, source: 'temperature', deferDelayMs: 0 });
     refreshTempController();
     return;
   }
@@ -202,15 +303,36 @@ function startTempPressureRamp(prevT, currT) {
     if (t === currT) break;
   }
   const delayPerStepMs = 500; // adjust ramp speed here
+  if (temps.length === 0) {
+    currentTempC = currT;
+    temperatureText && temperatureText.text(`${currT.toFixed(1)} °C`);
+    updatePressureText(currT);
+    updatePistonVolume(currT, { animate: true, source: 'temperature', deferDelayMs: 0 });
+    refreshTempController();
+    return;
+  }
+
+  isTempRamping = true;
   temps.forEach((temp, i) => {
     const id = setTimeout(() => {
       currentTempC = temp;
       temperatureText && temperatureText.text(`${temp.toFixed(1)} °C`);
       updatePressureText(temp);
-      updatePistonVolume(temp, i !== 0);
+      updatePistonVolume(temp, {
+        animate: i !== 0,
+        source: 'temperature',
+        deferDelayMs: i === 0 ? 0 : delayPerStepMs
+      });
+      refreshTempController();
       if (i === temps.length - 1) {
+        isTempRamping = false;
         tempRampTimerIds = [];
+        const pending = pendingTargetTempC;
+        pendingTargetTempC = null;
         refreshTempController();
+        if (pending != null && Math.abs(pending - currentTempC) > 1e-6 && heaterOn) {
+          startTempPressureRamp(currentTempC, pending);
+        }
       }
     }, i * delayPerStepMs);
     tempRampTimerIds.push(id);
@@ -230,8 +352,14 @@ function setTemperature(newT) {
 
   // Only heat (increase measured) when heater is ON; otherwise measurement stays where it is
   if (heaterOn) {
-    const prevMeasured = currentTempC;
-    startTempPressureRamp(prevMeasured, targetTempC);
+    if (isVolumeSettling) {
+      pendingTempRampTarget = targetTempC;
+    } else if (isTempRamping) {
+      pendingTargetTempC = targetTempC;
+    } else {
+      const prevMeasured = currentTempC;
+      startTempPressureRamp(prevMeasured, targetTempC);
+    }
   }
 }
 
@@ -317,7 +445,7 @@ export function drawConstantPressureSetup(draw) {
   temperatureText = g.text(`${currentTempC} °C`).center(x + width + 180, y + 390).font({ size: 16, weight: 'bold' });
   // g.text('bar').center(x + width / 2, y - 15).font({ size: 13, weight: 'bold' });
 
-  updatePistonVolume(currentTempC, false);
+  updatePistonVolume(currentTempC, { animate: false, force: true });
 }
 
 function drawScaleOnVolumeContainer(g, x, y, width, height, gasRegion = null) {
@@ -617,28 +745,13 @@ function animateSyringe(obj) {
       lastPressureDisplayed = null;
       updatePressureText();
       liquidPushed = true;
-      updatePistonVolume(currentTempC, true);
+      updatePistonVolume(currentTempC, { animate: true, durationMs: 50000, source: 'injection' });
 
       if (tempSwitch && typeof tempSwitch.setEnabled === 'function') {
         tempSwitch.setEnabled(true);
       }
     });
   });
-}
-
-function getWeightControlAnchor() {
-  if (!reactorBounds) {
-    return { x: 40, y: 160 };
-  }
-  const btnW = 84;
-  const btnH = 26;
-  const margin = 325;
-  const rawX = reactorBounds.x - margin - btnW;
-  const rawY = reactorBounds.y + btnH + 5;
-  return {
-    x: Math.max(40, rawX),
-    y: Math.max(80, rawY)
-  };
 }
 
 function setupWeightControlUI() {
@@ -666,7 +779,6 @@ function setupWeightControlUI() {
   });
 
   setWeightControlVisibility(true);
-  setWeightControlPosition(getWeightControlAnchor(), { trackViewbox: false });
   updateWeightControlUI();
 }
 
@@ -884,6 +996,13 @@ function refreshTempController() {
 export function resetConstantPressureExperiment() {
   // Stop any in-flight temperature→pressure ramp timers
   clearTempRampTimers();
+  if (volumeSettleTimerId) {
+    clearTimeout(volumeSettleTimerId);
+    volumeSettleTimerId = null;
+  }
+  isVolumeSettling = false;
+  pendingVolumeUpdates = [];
+  pendingTempRampTarget = null;
 
   // If the switch still exists, ensure it is disabled on reset
   if (tempSwitch && typeof tempSwitch.setEnabled === 'function') {
@@ -919,7 +1038,7 @@ export function resetConstantPressureExperiment() {
   if (pressure) {
     pressure.text('0.00');
   }
-  updatePistonVolume(25, false);
+  updatePistonVolume(25, { animate: false, force: true });
   // Refill syringe to default mass and snap geometry back to baseline
   if (syringeObj) {
     syringeObj.animating = false;
