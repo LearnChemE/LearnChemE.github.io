@@ -29,6 +29,8 @@ let lastPressureDisplayed = null;
 let hasCoolDownOccurred = false;
 let isTempRamping = false;
 let pendingTargetTempC = null;
+let isPressureSettling = false;
+let pressureSettleTimerIds = [];
 
 // --- measurement noise for pressure readout (display-only) ---
 // Standard deviation of the noise added to the displayed pressure, in bar.
@@ -101,9 +103,53 @@ function measuredPressureBar(mass_g, tempC) {
 
 // Centralized updater for the pressure text UI
 function updatePressureText(temp = null) {
-  if (pressure) {
-    const p = measuredPressureBar(liquidWeight, temp ?? currentTempC);
-    pressure.text(p.toFixed(2));
+  if (!pressure) return;
+  if (isPressureSettling) {
+    if (typeof lastPressureDisplayed === 'number') {
+      pressure.text(lastPressureDisplayed.toFixed(2));
+    }
+    return;
+  }
+  const p = measuredPressureBar(liquidWeight, temp ?? currentTempC);
+  pressure.text(p.toFixed(2));
+}
+
+function clearPressureSettleTimers() {
+  for (const id of pressureSettleTimerIds) clearTimeout(id);
+  pressureSettleTimerIds = [];
+  isPressureSettling = false;
+}
+
+function startPressureSettling(tempC = currentTempC, durationMs = 50000) {
+  clearPressureSettleTimers();
+  const target = computePressureWithConstantVolume(liquidWeight, tempC);
+  const start = Math.max(0, lastPressureDisplayed ?? 0);
+  const steps = Math.max(1, Math.round(durationMs / 60));
+  const stepDuration = durationMs / steps;
+  isPressureSettling = true;
+
+  for (let i = 0; i < steps; i += 1) {
+    const timerId = setTimeout(() => {
+      const t = (i + 1) / steps;
+      const smooth = t * t * (3 - 2 * t); // smoothstep easing
+      const value = start + (target - start) * smooth;
+      lastPressureDisplayed = value;
+      if (pressure) {
+        pressure.text(value.toFixed(2));
+      }
+      if (i === steps - 1) {
+        lastPressureTrue = target;
+        lastPressureDisplayed = target;
+        isPressureSettling = false;
+        pressureSettleTimerIds = [];
+        if (pendingTargetTempC != null && heaterOn) {
+          const pending = pendingTargetTempC;
+          pendingTargetTempC = null;
+          startTempPressureRamp(currentTempC, pending, { force: true });
+        }
+      }
+    }, i * stepDuration);
+    pressureSettleTimerIds.push(timerId);
   }
 }
 
@@ -115,7 +161,11 @@ function clearTempRampTimers() {
   isTempRamping = false;
   pendingTargetTempC = null;
 }
-function startTempPressureRamp(prevT, currT) {
+function startTempPressureRamp(prevT, currT, opts = {}) {
+  if (isPressureSettling && !opts.force) {
+    pendingTargetTempC = currT;
+    return;
+  }
   // No ramp needed
   if (prevT === currT) {
     currentTempC = currT;
@@ -187,7 +237,9 @@ function setTemperature(newT) {
 
   // Only heat (increase measured) when heater is ON; otherwise measurement stays where it is
   if (heaterOn) {
-    if (isTempRamping) {
+    if (isPressureSettling) {
+      pendingTargetTempC = targetTempC;
+    } else if (isTempRamping) {
       pendingTargetTempC = targetTempC;
     } else {
       startTempPressureRamp(currentTempC, targetTempC);
@@ -486,11 +538,14 @@ function animateSyringeVertical(obj) {
       liquidWeight = w;
       hasCoolDownOccurred = false;
       lastPressureTrue = null;
-      lastPressureDisplayed = null;
-      pendingTargetTempC = null;
-      isTempRamping = false;
+      lastPressureDisplayed = 0;
+      clearTempRampTimers();
+      clearPressureSettleTimers();
       liquidPushed = true;
-      updatePressureText();
+      if (pressure) {
+        pressure.text('0.00');
+      }
+      startPressureSettling(currentTempC);
 
       // Enable heater switch now that injection has completed
       if (tempSwitch && typeof tempSwitch.setEnabled === 'function') {
@@ -743,6 +798,7 @@ function refreshTempController() {
 export function resetConstantVolumeExperiment() {
   // Stop any in-flight temperature→pressure ramp timers
   clearTempRampTimers();
+  clearPressureSettleTimers();
 
   // If the switch still exists, ensure it is disabled on reset
   if (tempSwitch && typeof tempSwitch.setEnabled === 'function') {
