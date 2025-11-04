@@ -66,6 +66,7 @@ body {
   position: relative;
   z-index: 1001;
   background-color: none;
+  pointer-events: none;
   
   #valueSlider {
     pointer-events: auto;
@@ -166,6 +167,7 @@ body {
 
 .icon-container > * {
   align-self: flex-start; /* ensure all children align to the top/left */
+  pointer-events: auto;
 }
 
 /* Match the button column max-width and stack the label/select neatly */
