@@ -1,0 +1,13 @@
+.lens {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border: 2px solid black;
+    border-radius: 100%;
+    transform: translate(-50%,-50%);
+
+    canvas {
+        overflow: hidden;
+        clip-path: circle(50%);
+    }
+}

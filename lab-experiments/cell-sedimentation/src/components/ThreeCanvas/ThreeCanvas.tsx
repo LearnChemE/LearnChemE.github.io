@@ -25,7 +25,7 @@ interface ThreeCanvasProps {
 export const ThreeCanvas: Component<ThreeCanvasProps> = ({ drag, onUniformPreparation }) => {
     let canvas!: HTMLCanvasElement;
     let scene!: THREE.Scene;
-    let camera!: THREE.PerspectiveCamera;
+    let camera!: THREE.PerspectiveCamera | THREE.OrthographicCamera;
     let renderer!: THREE.WebGLRenderer;
     let composer!: EffectComposer;
 
@@ -53,7 +53,7 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ drag, onUniformPrepar
     onMount(() => {
         // Initialize WebGL, Matrix stack, etc.
         scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(49, asp, .1, 1000);
+        camera = new THREE.PerspectiveCamera(5, asp, .1, 1000);
         renderer = new THREE.WebGLRenderer({ canvas });
         renderer.setSize(canvas.clientWidth, canvas.clientHeight);
         renderer.setClearColor("rgb(255,255,255)");
@@ -156,7 +156,8 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ drag, onUniformPrepar
             //     // model.matrix.multiply(tempMatrix.makeRotationZ(th * Math.PI / 180));
             //     // model.matrixWorldNeedsUpdate = true;
             // }
-            camera.position.set(-4 * Sin(th) * Cos(ph), 4 * Sin(ph), 4 * Cos(th) * Cos(ph));
+            const r = 40
+            camera.position.set(-r * Sin(th) * Cos(ph), r * Sin(ph), r * Cos(th) * Cos(ph));
             camera.lookAt(0,0,0);
 
             composer.render();
@@ -176,6 +177,7 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ drag, onUniformPrepar
 
     return (<>
         <canvas 
+            id="main-cnv"
             ref={canvas}
             onPointerDown={drag() ? dragfn : undefined}
         />
