@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, onMount, type Accessor, type Component } from "solid-js";
+import { createEffect, createSignal, type Accessor, type Component } from "solid-js";
 import "./Magnifier.css"
 import MagnifierCanvas from "./MagnifierCanvas";
 import { constrain } from "../../ts/helpers";
@@ -32,6 +32,8 @@ export const Magnifier: Component<MagnifierProps> = ({ magnifying }) => {
             y: constrain(y_cnv * 100, topBd, botBd)
         };
         setCoord(newCoord);
+        setVial(vial);
+        
     }
 
     createEffect(() => {

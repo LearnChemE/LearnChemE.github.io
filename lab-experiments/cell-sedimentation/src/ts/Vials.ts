@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { animate } from './helpers';
 
-export const CONC_ARRAY_SIZE = 128;
+export const TUBE_LENGTH = 305; // mm
+const TUBE_CROSS_AREA = Math.PI * 3.5 ** 2; // mm^2
+
 const Starting_Vial_Concentration = [
     [0.05, 0.05],
     [0.15, 0.05],
