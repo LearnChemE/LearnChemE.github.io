@@ -11,3 +11,11 @@
         clip-path: circle(50%);
     }
 }
+
+.tube-selector {
+    /* border: 2px solid red; */
+    position: absolute;
+    width: 8%;
+    height: 100%;
+    top: 0%;
+}
