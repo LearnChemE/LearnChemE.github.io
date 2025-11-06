@@ -1,16 +1,33 @@
 import * as THREE from 'three';
 import { animate } from './helpers';
+import { conc_r, conc_w } from './calcs';
 
 export const TUBE_LENGTH = 305; // mm
 const TUBE_CROSS_AREA = Math.PI * 3.5 ** 2; // mm^2
 
-const Starting_Vial_Concentration = [
+type CellComposition = [red: number, white: number];
+const Starting_Vial_Concentration: Array<CellComposition> = [
     [0.05, 0.05],
     [0.15, 0.05],
     [0.30, 0.05],
     [0.45, 0.05],
     [0.60, 0.05],
 ];
+function concentration(composition: CellComposition) {
+    return [ conc_r(composition[0]), conc_w(composition[1]) ]
+}
+
+class FluidSection {
+    public composition;
+    public top: number;
+
+    constructor(top: number, x: CellComposition) {
+        this.top = top;
+        this.composition = x;
+    }
+
+    
+}
 
 /**
  * Represents a vial containing concentrations of red and white cells.
@@ -33,15 +50,19 @@ const Starting_Vial_Concentration = [
  * vial.reset(1.0, 0.5);
  * ```
  */
-class Vial {
-    private redConcentration: Float32Array;
-    private whiteConcentration: Float32Array;
+export class Vial {
+    private rTop: number;
+    private wTop: number;
+    private sedimentTop: number;
+
+    
 
     private uniform: THREE.ShaderMaterial["uniforms"] | null = null;
 
     constructor (rConc: number, wConc: number) {
-        this.redConcentration = new Float32Array(CONC_ARRAY_SIZE).fill(rConc);
-        this.whiteConcentration = new Float32Array(CONC_ARRAY_SIZE).fill(wConc);
+        const rTop = TUBE_LENGTH;
+        const wTop = TUBE_LENGTH;
+        const sedimentTop = 0;
     }
 
     public evolve = (dt: number, t: number) => {
@@ -79,6 +100,14 @@ class Vial {
     public reset = (rConc: number, wConc: number) => {
         this.redConcentration.fill(rConc);
         this.whiteConcentration.fill(wConc);
+    }
+
+    public getState = () => {
+        return {
+            rTop: this.rTop,
+            wTop: this.wTop,
+            sedimentTop: this.sedimentTop,
+        }
     }
 }
 
