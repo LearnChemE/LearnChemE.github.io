@@ -27,7 +27,7 @@ const State = new Simulation();
 initInteractables(State);
 initSvgZoom();
 initSvgDrag();
-enableWindowResize(922 / 357);
+enableWindowResize(922 / 357 * .8);
 
 declare const __DEV__: boolean;
 // Debug
