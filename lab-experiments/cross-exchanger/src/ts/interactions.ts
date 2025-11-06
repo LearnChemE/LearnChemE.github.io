@@ -266,8 +266,8 @@ export function enableWindowResize(asp?: number) {
     if (!asp) asp = e.clientWidth / e.clientHeight;
     // Attach event handler
     const resize = () => {
-        let windowWidth = Math.max(Math.min(window.innerWidth * .8, 1800), 400);
-        let windowHeight = window.innerHeight * .8;
+        let windowWidth = Math.max(Math.min(window.innerWidth * .9, 1800), 400);
+        let windowHeight = window.innerHeight * .9;
         // Enforce asp
         windowWidth = Math.min(windowWidth, windowHeight * asp);
         windowHeight = windowWidth / asp;
