@@ -261,9 +261,9 @@ export function initInteractables(state: Simulation) {
 }
 
 // --- Resize Handling ---
-export function enableWindowResize() {
+export function enableWindowResize(asp?: number) {
     const e = document.getElementById("apparatus-wrapper")!.childNodes[0] as unknown as SVGAElement;
-    const asp = e.clientWidth / e.clientHeight;
+    if (!asp) asp = e.clientWidth / e.clientHeight;
     // Attach event handler
     const resize = () => {
         let windowWidth = Math.max(Math.min(window.innerWidth * .8, 1800), 400);
