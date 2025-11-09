@@ -64,11 +64,11 @@ def rhs(t, y):
 if __name__ == "__main__":
 
     # ivp args
-    tmax = 112
+    tmax = 12
     tspan = (0, tmax)
     # t_eval = np.logspace(0,2,3) * 2
     t_eval = np.linspace(0,tmax,7)
-    sol = solve_ivp(rhs, tspan, y0, 'BDF', t_eval)
+    sol = solve_ivp(rhs, tspan, y0, 'LSODA', t_eval)
 
     y = sol.y
     print(y.shape)
