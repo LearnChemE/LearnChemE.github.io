@@ -1,0 +1,52 @@
+<div id="directions" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="directionsTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Directions</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <p>
+            This simulation shows how the partial pressures of the two components (A-blue, B-green) of a
+            binary mixture change with mole fraction of component B. An ideal solution obeys Raoult's
+            law; the partial pressure of each component is proportional to its mole fraction:
+            <em>P<sub>A</sub> = x<sub>A</sub> P<sub>A</sub><sup>sat</sup></em> and
+            <em>P<sub>B</sub> = x<sub>B</sub> P<sub>B</sub><sup>sat</sup></em>, where
+            P<sup>sat</sup><sub>A</sub> and P<sup>sat</sup><sub>B</sub> are the saturation pressures of A
+            and B at a given temperature. For an ideal solution, the total pressure
+            <em>P = x<sub>A</sub>P<sub>A</sub><sup>sat</sup> + x<sub>B</sub>P<sub>B</sub><sup>sat</sup></em>
+            is shown by the black curve.
+          </p>
+          <p>
+            Most real solutions exhibit deviations from Raoult's law. For a positive deviation,
+            <em>P<sub>A</sub> &gt; x<sub>A</sub>P<sub>A</sub><sup>sat</sup></em> and
+            <em>P<sub>B</sub> &gt; x<sub>B</sub>P<sub>B</sub><sup>sat</sup></em>; this indicates that
+            attractive interactions between like molecules is greater than between A and B molecules.
+            For a negative deviation, <em>P<sub>A</sub> &lt; x<sub>A</sub>P<sub>A</sub><sup>sat</sup></em>
+            and <em>P<sub>B</sub> &lt; x<sub>B</sub>P<sub>B</sub><sup>sat</sup></em>; this indicates that
+            attractive interactions between like molecules is less than between A and B molecules.
+          </p>
+          <p>
+            When the slider for deviation from ideality is at a value other than zero, the non‑ideal
+            behavior is shown by the solid lines and the dashed lines indicate ideal behavior. Even for
+            non‑ideal solutions, Raoult's law is asymptotically approached for A as x<sub>A</sub>
+            approaches 1 and for B as x<sub>B</sub> approaches 0.
+          </p>
+          <p>
+            Dilute solutions, on the other hand, are approximated by Henry's law:
+            <em>P<sub>A</sub> = x<sub>A</sub>K<sub>A</sub></em> for x<sub>A</sub> close to zero and
+            <em>P<sub>B</sub> = x<sub>B</sub>K<sub>B</sub></em> for x<sub>B</sub> close to zero. Check
+            “Show Henry's law” to display this behavior represented by dashed purple and orange lines.
+            Zoom with the scroll wheel and drag with the mouse. Move the cursor across the plot to read
+            the values on each curve.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
