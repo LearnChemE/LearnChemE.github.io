@@ -12,7 +12,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: './src/setupTests.ts'
+    setupFiles: './src/setupTests.ts',
+    reporters: ['dot']
   },
   assetsInclude: ['**/*.glb','**/*.gltf','**/*.vert','**/*.frag','**/*.glsl']
 })

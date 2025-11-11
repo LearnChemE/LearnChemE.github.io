@@ -5,7 +5,7 @@ from scipy.integrate import solve_ivp
 import settlingVel as vel
 
 # Spatial information
-nz = 505 # Spatial info
+nz = 500 # Spatial info
 lz = 305 # mm
 
 # max velocities
@@ -14,7 +14,7 @@ cr_max, cw_max = vel.concentration(1, vel.d_r), vel.concentration(1, vel.d_w)
 
 # Initial conditions
 xw0 = 0.05
-xr0 = 0.6
+xr0 = 0.05
 cr0 = vel.concentration(xr0, vel.d_r)
 cw0 = vel.concentration(xw0, vel.d_w)
 
@@ -35,6 +35,7 @@ def rhs(y, dz):
     # Unpack y
     cr = y[:nz]; cw = y[nz:]
     cr[0] = 0; cw[0] = 0
+    cr[-1] = cr[-2]; cw[-1] = cw[-2]
 
     # Determine velocity
     vr, vw = vel.particle_velocities(cr, cw)
@@ -42,8 +43,8 @@ def rhs(y, dz):
     vr[-1] = 0; vw[-1] = 0 # Bottom stops flow
 
     # Diffusion
-    dif_r = 1e1 * grad((1 - cr / cr_max)**10 * grad(cr, dz), dz)
-    dif_w = 1e1 * grad((1 - cw / cw_max)**10 * grad(cw, dz), dz)
+    dif_r = 5e0 * grad((1 - cr / cr_max)**10 * grad(cr, dz), dz)
+    dif_w = 5e0 * grad((1 - cw / cw_max)**10 * grad(cw, dz), dz)
     dif_r[0] = dif_r[-1] = 0 # no flux
     dif_w[0] = dif_w[-1] = 0 # no flux
     # Advection
@@ -53,7 +54,7 @@ def rhs(y, dz):
     drdt = dif_r - adv_r
     dwdt = dif_w - adv_w
     drdt[0]  = 0; dwdt[0]  = 0 # Maintain free surface
-    # drdt[-1] = 0; dwdt[-1] = 0 # Maintain free surface
+    # drdt[-1] = drdt[-2]; dwdt[-1] = dwdt[-2] # 
 
     return np.concatenate((drdt, dwdt))
 
@@ -81,6 +82,18 @@ def resize(y, z_old, y_threshold, sed_threshold=.1):
     cw_new = vel.concentration(np.interp(z_new, z_old, cw), vel.d_w)
     y_new = np.concatenate((cr_new, cw_new))
     return y_new, z_new
+
+def diffusion_smooth(y, alpha=0.25, steps=1):
+    """
+    Smooth y using a diffusion-like step that conserves total sum.
+    alpha controls smoothing amount (0 < alpha <= 0.5).
+    """
+    y = y.astype(float).copy()
+    for _ in range(steps):
+        y_new = y.copy()
+        y_new[1:-1] = y[1:-1] + alpha * (y[:-2] - 2*y[1:-1] + y[2:])
+        y = y_new
+    return y
 
 def smooth(y, window_size):
     """
@@ -123,8 +136,8 @@ def smooth(y, window_size):
 if __name__ == "__main__":
 
     # ivp args
-    t_max = 100
-    dt = 5 # s
+    t_max = 1000
+    dt = 20 # s
     tspan = (0, t_max)
     # t_eval = np.linspace(0,t_max,7)
 
@@ -156,12 +169,13 @@ if __name__ == "__main__":
     while (t_cur < t_max):
         # Figure out how long to solve the solver for
         tspan = (t_cur, t_cur + dt)     
-        sol = solve_ivp(rhs_wrapper, tspan, y_cur, 'BDF')
+        sol = solve_ivp(rhs_wrapper, tspan, y_cur, 'RK45')
         y_last = sol.y[:,-1]
 
         # Smooth the results
-        fsize = 7
+        fsize = 13
         cr_sm = smooth(y_last[:nz], fsize); cw_sm = smooth(y_last[nz:], fsize)
+        # cr_sm = diffusion_smooth(y_last[:nz]); cw_sm = diffusion_smooth(y_last[nz:])
         y_last = np.concatenate((cr_sm, cw_sm))
 
         # Save results to current time
@@ -172,7 +186,8 @@ if __name__ == "__main__":
         zs.append(z_cur)
 
         # Iterate time and resize y, z
-        y_cur, z_cur = resize(y_last, z_cur, .005)
+        y_cur, z_cur = resize(y_last, z_cur, 0.005)
+        # y_cur, z_cur = y_last, z_cur
         print(f"cur t: {t_cur:.2f} min z: {z_cur[0]:.1f}")
 
 
@@ -203,7 +218,7 @@ if __name__ == "__main__":
         # cr = cr / np.sum(cr) * tot_r
         xr = vel.vol_frac(cri, vel.d_r)
         xw = vel.vol_frac(cwi, vel.d_w)
-        plt.plot(zs[i], xw+xr, label=f'white t={t:.1f}')
+        plt.plot(zs[i], xw, label=f'white t={t:.1f}')
 
     plt.ylabel('concentration')
     plt.ylim((0,1))

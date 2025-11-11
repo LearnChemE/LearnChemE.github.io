@@ -3,7 +3,8 @@ import { animate } from './helpers';
 import { conc_r, conc_w } from './calcs';
 
 export const TUBE_LENGTH = 305; // mm
-const TUBE_CROSS_AREA = Math.PI * 3.5 ** 2; // mm^2
+export const CONC_ARRAY_SIZE = 500; // points in finite element mesh
+// const TUBE_CROSS_AREA = Math.PI * 3.5 ** 2; // mm^2
 
 type CellComposition = [red: number, white: number];
 const Starting_Vial_Concentration: Array<CellComposition> = [
@@ -13,21 +14,6 @@ const Starting_Vial_Concentration: Array<CellComposition> = [
     [0.45, 0.05],
     [0.60, 0.05],
 ];
-function concentration(composition: CellComposition) {
-    return [ conc_r(composition[0]), conc_w(composition[1]) ]
-}
-
-class FluidSection {
-    public composition;
-    public top: number;
-
-    constructor(top: number, x: CellComposition) {
-        this.top = top;
-        this.composition = x;
-    }
-
-    
-}
 
 /**
  * Represents a vial containing concentrations of red and white cells.
@@ -51,18 +37,21 @@ class FluidSection {
  * ```
  */
 export class Vial {
-    private rTop: number;
-    private wTop: number;
-    private sedimentTop: number;
+    private redConcentration: number[];
+    private whiteConcentration: number[];
 
     
 
     private uniform: THREE.ShaderMaterial["uniforms"] | null = null;
 
     constructor (rConc: number, wConc: number) {
-        const rTop = TUBE_LENGTH;
-        const wTop = TUBE_LENGTH;
-        const sedimentTop = 0;
+        // Convert to number concentration
+        rConc = conc_r(rConc);
+        wConc = conc_w(wConc);
+
+        // Initialize arrays
+        this.redConcentration = new Array(TUBE_LENGTH).fill(rConc);
+        this.whiteConcentration = new Array(TUBE_LENGTH).fill(wConc);
     }
 
     public evolve = (dt: number, t: number) => {
@@ -103,11 +92,7 @@ export class Vial {
     }
 
     public getState = () => {
-        return {
-            rTop: this.rTop,
-            wTop: this.wTop,
-            sedimentTop: this.sedimentTop,
-        }
+        return { red: this.redConcentration, white: this.whiteConcentration };
     }
 }
 
