@@ -112,36 +112,135 @@ export function rhs_adv_diff(y: number[], dz: number) {
     // Unpack y
     const cr = y.slice(0,CONC_ARRAY_SIZE); 
     const cw = y.slice(CONC_ARRAY_SIZE);
-    // Enforce BCs
+
+    // BCs
     cr[0] = 0; cw[0] = 0;
-    cr[CONC_ARRAY_SIZE - 1] = cr[CONC_ARRAY_SIZE - 2]; cw[CONC_ARRAY_SIZE - 1] = cw[CONC_ARRAY_SIZE - 2];
+    cr[CONC_ARRAY_SIZE - 1] = cr[CONC_ARRAY_SIZE - 2]; 
+    cw[CONC_ARRAY_SIZE - 1] = cw[CONC_ARRAY_SIZE - 2];
 
-    // Determine velocity
-    const vr: number[] = []; 
-    const vw: number[] = [];
-    cr.forEach((cri: number, i: number) => {
-        const { red, white } = particle_velocities(cri, cw[i]);
-        vr.push(red);
-        vw.push(white);
-    });
-    vr[0] = 0; vw[0] = 0 // Top is free surface
-    vr[-1] = 0; vw[-1] = 0 // Bottom stops flow
+    // For advection term
+    const crvr = new Array(CONC_ARRAY_SIZE);
+    const cwvw = new Array(CONC_ARRAY_SIZE);
+    crvr[0] = 0;
+    cwvw[0] = 0;
+    for (let i=1;i<CONC_ARRAY_SIZE;i++) {
+        // Determine velocity
+        const { red, white } = particle_velocities(cr[i], cw[i]);
+        if (red !== red) throw new Error(`bad red at concentration ${cr[i]} ${cw[i]}`)
+        crvr[i] = cr[i] * red;
+        cwvw[i] = cw[i] * white;
+        if (crvr[i] !== crvr[i]) throw new Error(`crvr err: ${crvr}`)
+    }
+    crvr[CONC_ARRAY_SIZE-1] = 0;
+    cwvw[CONC_ARRAY_SIZE-1] = 0;
 
-    // Diffusion
-    const dcr = grad(cr, dz);
-    const dcw = grad(cw, dz);
-    const dif_r = grad(cr.map((cri, i) => 5 * (1 - cri / cr_max)**10 * dcr[i]), dz);
-    const dif_w = grad(cr.map((cwi, i) => 5 * (1 - cwi / cw_max)**10 * dcw[i]), dz);
-    dif_r[0] = dif_r[CONC_ARRAY_SIZE - 1] = 0; // no flux
-    dif_w[0] = dif_w[CONC_ARRAY_SIZE - 1] = 0; // no flux
-    // Advection
-    const adv_r = grad(cr.map((cri, i) => cri * vr[i]), dz);
-    const adv_w = grad(cw.map((cwi, i) => cwi * vw[i]), dz);
+    // Advection term
+    const adv_r = grad(crvr, dz);
+    const adv_w = grad(cwvw, dz);
+    for (let i=0;i<CONC_ARRAY_SIZE;i++) {
+        if (adv_r !== adv_r) throw new Error(`adv_r error: ${adv_r}`)
+    }
 
-    const drdt = dif_r.map((di, i) => di - adv_r[i]);
-    const dwdt = dif_w.map((di, i) => di - adv_w[i]);
-    drdt[0]  = 0; dwdt[0]  = 0 // Maintain free surface
-    // drdt[-1] = drdt[-2]; dwdt[-1] = dwdt[-2] // 
+    // For diffusion term
+    const inner_dif_r = new Array(CONC_ARRAY_SIZE);
+    const inner_dif_w = new Array(CONC_ARRAY_SIZE);
+    inner_dif_r[0] = 0;
+    inner_dif_w[0] = 0;
+    for (let i=1;i<CONC_ARRAY_SIZE-1;i++) {
+        const dcri = (cr[i+1] - cr[i-1]) / 2 / dz;
+        const dcwi = (cw[i+1] - cw[i-1]) / 2 / dz;
+        inner_dif_r[i] = 5 * dcri * (1 - cr[i] / cr_max)**10;
+        inner_dif_w[i] = 5 * dcwi * (1 - cw[i] / cw_max)**10;
+        if (inner_dif_r[i] !== inner_dif_r[i]) throw new Error(`inner_dif_r err: ${inner_dif_r}`)
+    }
+    inner_dif_r[CONC_ARRAY_SIZE-1] = 0;
+    inner_dif_w[CONC_ARRAY_SIZE-1] = 0;
+
+    const dif_r = grad(inner_dif_r, dz);
+    const dif_w = grad(inner_dif_w, dz);
+    dif_r[CONC_ARRAY_SIZE-1] = 0;
+    dif_w[CONC_ARRAY_SIZE-1] = 0;
+
+    // Results 
+    const drdt = new Array(CONC_ARRAY_SIZE);
+    const dwdt = new Array(CONC_ARRAY_SIZE);
+    drdt[0] = dwdt[0] = 0;
+    for (let i=1; i<CONC_ARRAY_SIZE-1;i++) {
+        drdt[i] = dif_r[i] - adv_r[i];
+        dwdt[i] = dif_w[i] - adv_w[i];
+    }
+    drdt[CONC_ARRAY_SIZE-1] = -adv_r[CONC_ARRAY_SIZE-1];
+    dwdt[CONC_ARRAY_SIZE-1] = -adv_w[CONC_ARRAY_SIZE-1];
 
     return drdt.concat(dwdt);
+    // // Enforce BCs
+    // cr[0] = 0; cw[0] = 0;
+    // cr[CONC_ARRAY_SIZE - 1] = cr[CONC_ARRAY_SIZE - 2]; cw[CONC_ARRAY_SIZE - 1] = cw[CONC_ARRAY_SIZE - 2];
+
+    // // Determine velocity
+    // const vr: number[] = []; 
+    // const vw: number[] = [];
+    // cr.forEach((cri: number, i: number) => {
+    //     const { red, white } = particle_velocities(cri, cw[i]);
+    //     vr.push(red);
+    //     vw.push(white);
+    // });
+    // vr[0] = 0; vw[0] = 0 // Top is free surface
+    // vr[-1] = 0; vw[-1] = 0 // Bottom stops flow
+
+    // // Diffusion
+    // const dcr = grad(cr, dz);
+    // const dcw = grad(cw, dz);
+    // const dif_r = grad(cr.map((cri, i) => 5 * (1 - cri / cr_max)**10 * dcr[i]), dz);
+    // const dif_w = grad(cr.map((cwi, i) => 5 * (1 - cwi / cw_max)**10 * dcw[i]), dz);
+    // dif_r[0] = dif_r[CONC_ARRAY_SIZE - 1] = 0; // no flux
+    // dif_w[0] = dif_w[CONC_ARRAY_SIZE - 1] = 0; // no flux
+    // // Advection
+    // const adv_r = grad(cr.map((cri, i) => cri * vr[i]), dz);
+    // const adv_w = grad(cw.map((cwi, i) => cwi * vw[i]), dz);
+
+    // const drdt = dif_r.map((di, i) => di - adv_r[i]);
+    // const dwdt = dif_w.map((di, i) => di - adv_w[i]);
+    // drdt[0]  = 0; dwdt[0]  = 0 // Maintain free surface
+    // // drdt[-1] = drdt[-2]; dwdt[-1] = dwdt[-2] // 
+
+    // return drdt.concat(dwdt);
+}
+
+/**
+ * Convolve a 1D numpy array y with a moving average filter of given size.
+ * Pads the edges with the first and last values in y to maintain size.
+ * @param y array to smooth
+ * @param window_size size of kernel
+ * @returns smoothed array of same length as y
+ */
+export function movingAverageConvolve(y: number[], windowSize: number): number[] {
+  if (windowSize < 1) throw new Error("windowSize must be at least 1");
+  if (windowSize === 1) return [...y];
+
+  const padWidth = Math.floor(windowSize / 2);
+  const n = y.length;
+
+  // Pad edges with the first and last values
+  const padded = [
+    ...Array(padWidth).fill(y[0]),
+    ...y,
+    ...Array(padWidth).fill(y[n - 1])
+  ];
+
+  // Precompute kernel weight
+  const norm = 1 / windowSize;
+
+  const smoothed: number[] = new Array(n);
+
+  // Perform convolution
+  for (let i = 0; i < n; i++) {
+    let sum = 0;
+    for (let j = 0; j < windowSize; j++) {
+      sum += padded[i + j];
+    }
+    smoothed[i] = sum * norm;
+  }
+
+  return smoothed;
 }

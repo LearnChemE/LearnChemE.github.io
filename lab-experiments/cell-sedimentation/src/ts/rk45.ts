@@ -69,11 +69,11 @@ export function rk45(
 
   while (t < tEnd) {
     console.log(`[RK45] h = ${h}`)
-    if (t+h !== t+h) throw new Error("NaN encountered in h")
+    if (h !== h) throw new Error("NaN encountered in h")
     if (t + h > tEnd) h = tEnd - t;
 
     // Compute Runge-Kutta stages
-    const k1 = f(t, y);
+    const k1 = f(t, y.slice());
     const k2 = f(t + c2 * h, y.map((yi, i) => yi + h * a21 * k1[i]));
     const k3 = f(t + c3 * h, y.map((yi, i) => yi + h * (a31 * k1[i] + a32 * k2[i])));
     const k4 = f(t + c4 * h, y.map((yi, i) => yi + h * (a41 * k1[i] + a42 * k2[i] + a43 * k3[i])));
@@ -101,6 +101,7 @@ export function rk45(
     // Adapt timestep
     const scale = safety * Math.pow(1.0 / Math.max(err, 1e-10), 0.25);
     h = Math.min(dtMax, Math.max(dtMin, h * Math.min(4, Math.max(0.1, scale))));
+    if (h !== h) throw new Error("I have some strongly worded concerns about this h")
 
     if (h < dtMin && err > 1.0) {
       console.warn("Step size underflow — integration failed");

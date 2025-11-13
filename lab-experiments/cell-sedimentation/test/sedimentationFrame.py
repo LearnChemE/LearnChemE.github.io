@@ -17,6 +17,7 @@ xw0 = 0.05
 xr0 = 0.05
 cr0 = vel.concentration(xr0, vel.d_r)
 cw0 = vel.concentration(xw0, vel.d_w)
+print("settling vel", vel.particle_velocities(cr0, cw0))
 
 def grad(y, dx):
     left = np.roll(y, 1)
@@ -54,7 +55,7 @@ def rhs(y, dz):
     drdt = dif_r - adv_r
     dwdt = dif_w - adv_w
     drdt[0]  = 0; dwdt[0]  = 0 # Maintain free surface
-    # drdt[-1] = drdt[-2]; dwdt[-1] = dwdt[-2] # 
+    # drdt[-1] = drdt[-2]; dwdt[-1] = dwdt[-2] #
 
     return np.concatenate((drdt, dwdt))
 
@@ -136,7 +137,7 @@ def smooth(y, window_size):
 if __name__ == "__main__":
 
     # ivp args
-    t_max = 1000
+    t_max = 20
     dt = 20 # s
     tspan = (0, t_max)
     # t_eval = np.linspace(0,t_max,7)
@@ -173,7 +174,7 @@ if __name__ == "__main__":
         y_last = sol.y[:,-1]
 
         # Smooth the results
-        fsize = 13
+        fsize = 1#3
         cr_sm = smooth(y_last[:nz], fsize); cw_sm = smooth(y_last[nz:], fsize)
         # cr_sm = diffusion_smooth(y_last[:nz]); cw_sm = diffusion_smooth(y_last[nz:])
         y_last = np.concatenate((cr_sm, cw_sm))
@@ -186,7 +187,7 @@ if __name__ == "__main__":
         zs.append(z_cur)
 
         # Iterate time and resize y, z
-        y_cur, z_cur = resize(y_last, z_cur, 0.005)
+        y_cur, z_cur = resize(y_last, z_cur, -1)#0.005)
         # y_cur, z_cur = y_last, z_cur
         print(f"cur t: {t_cur:.2f} min z: {z_cur[0]:.1f}")
 
@@ -204,7 +205,7 @@ if __name__ == "__main__":
         plt.plot(zs[i], xr, label=f'red t={t:.1f}')
 
     plt.ylabel('concentration')
-    plt.ylim((0,1))
+    # plt.ylim((0,1))
     plt.xlabel('height')
     plt.legend()
     plt.show()
