@@ -26,6 +26,8 @@ export function createMassFlowController(draw, x, y) {
 
     const bottomHeight = 20;
 
+    group.node.classList.add("interactable")
+
     // Dark Gray Top Section
     group.rect(topWidth, topHeight)
         .fill('#4a4a4a')
@@ -89,32 +91,13 @@ export function createMassFlowController(draw, x, y) {
         .center(x + topWidth / 2, y + topHeight + bottomHeight + 15);
 
     
-        group.text("g/min")
+        group.text("mg/min")
         .font({ family: 'Arial', size: 16, anchor: 'middle', weight: 'bold' })
         .fill('#000')
         .center(x + topWidth / 2, y + topHeight + bottomHeight - 10);
 
+    group.click(() => {
+        showMFCZoomedView();
+    })
     return group;
-}
-
-export function mfcClicked(draw, x, y) {
-
-    const topWidth = 60;
-    const topHeight = 80;
-    const bottomHeight = 20;
-    const clickArea = draw.rect(
-        topWidth,
-        topHeight + bottomHeight + 30   // 30px extra to cover your label
-    )
-    .fill({ opacity: 0})               // truly invisible
-    .move(x, y)                         // same origin as the rest
-    .attr({
-      'pointer-events': 'all',          // catch clicks even on gaps
-      cursor: 'pointer'                 // show hand cursor
-    })
-    .click(() => {
-      // your one‐and‐only handler:
-      showMFCZoomedView();
-    })
-    .front();
 }

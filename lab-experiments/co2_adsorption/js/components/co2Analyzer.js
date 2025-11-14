@@ -2,7 +2,7 @@
 import * as config from '../config.js';
 import * as state from '../state.js';
 
-export function createCO2GasAnalyzer(draw, x, y, concentration = "00.00%") {
+export function createCO2GasAnalyzer(draw, x, y, concentration = "0.00%") {
     const group = draw.group();
     group.addClass('co2-analyzer'); // Add class for selection
 

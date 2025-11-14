@@ -6,7 +6,7 @@ import { drawPipes, stopAllFlows } from './pipes.js';
 import { createGasCylinder } from './components/gasCylinder.js';
 import { createConnectedGauges, createDigitalPressureGauge } from './components/gauges.js';
 import { createVerticalValve, createInteractiveValve, createTValve } from './components/valves.js';
-import { createMassFlowController, mfcClicked } from './components/mfc.js';
+import { createMassFlowController } from './components/mfc.js';
 import { createVerticalAdsorptionBedView } from './components/adsorptionBed.js';
 import { createCO2GasAnalyzer } from './components/co2Analyzer.js';
 import { createVentArrow } from './components/ventArrow.js';
@@ -94,13 +94,12 @@ export function resetEverything(draw, pipeGroup) { // Keep parameters if main.js
 
     createInteractiveValve(draw, multiValveX, multiValveY, true);
     createMassFlowController(draw, mfcX, mfcY);
-    mfcClicked(draw, mfcX, mfcY);
     createInteractiveValve(draw, outletValveX, outletValveY, false);
     createDigitalPressureGauge(draw, digPressureGaugeX, digPressureGaugeY, "--- bar");
     createVerticalAdsorptionBedView(draw, adsorptionBedX, adsorptionBedY);
     createInteractiveValve(draw, adsorptionOutletValveX, adsorptionOutletValveY, false, true);
     createTValve(draw, tValveX, tValveY);
-    createCO2GasAnalyzer(draw, co2AnalyzerX, co2AnalyzerY, "00.00%");
+    createCO2GasAnalyzer(draw, co2AnalyzerX, co2AnalyzerY, "0.00%");
 
     createVentArrow(draw, vent1BaseX + 5, vent1BaseY - 2, 270, 40);
     createVentArrow(draw, vent2BaseX, vent2BaseY, 0, 40);

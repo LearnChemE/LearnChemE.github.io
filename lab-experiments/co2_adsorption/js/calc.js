@@ -99,7 +99,7 @@ var th_co2 = 0; // Fraction of bed covered in CO2
  */
 export function yCO2_out(args) {
   const tStep = args.tStep * timeMultiplicationFactor;
-  const m = args.m * 1000; // g / s
+  const m = args.m * 1000; // mg / s
   const P = args.P; // bar
   const T = args.T; // K
   const V = BED_VOLUME; // L
@@ -109,12 +109,12 @@ export function yCO2_out(args) {
   const MW_N2 = 28.02; // g/mol
 
   // Get molar flowrate of each species
-  const ndot = m / (MW_CO2 * y + MW_N2 * (1 - y)); // total number of moles in the gas mixture
-  const ndot_co2 = ndot * y; // molar flow rate of CO2
-  const ndot_n2 = ndot * (1 - y); // molar flow rate of N2
+  const ndot = m / (MW_CO2 * y + MW_N2 * (1 - y)); // [mmol / s] total number of moles in the gas mixture
+  const ndot_co2 = ndot * y; // molar flow rate of CO2 [mmol / s]
+  const ndot_n2 = ndot * (1 - y); // molar flow rate of N2 [mmol / s]
 
   // Calculate partial pressure of what's already in the tank
-  const p_co2 = n_co2 * R * T / V;
+  const p_co2 = n_co2 * R * T / V; 
   console.log(`pco2: ${p_co2}\npN2: ${n_n2 * R * T / V}`)
 
   // Calculate rate constants
@@ -132,14 +132,14 @@ export function yCO2_out(args) {
   // Find the change in the bulk concentrations. 
   //   acc = in - out + gen - cons
   // Don't include out just yet because it should guaruntee we stay at pressure
-  const dthdt = (rate_ads - rate_des) / BED_MAX_CAPACITY;
-  const dcdt = ndot_co2 + gen_minus_cons;
-  const dndt = ndot_n2;
+  const dthdt = (rate_ads - rate_des) / BED_MAX_CAPACITY; // 
+  const dcdt = ndot_co2 + gen_minus_cons; // mmol / s ?
+  const dndt = ndot_n2; // mmol / s ?
 
   // Evolve the system
-  th_co2 += dthdt * dt;
-  n_co2  += dcdt  * dt;
-  n_n2   += dndt  * dt;
+  th_co2 += dthdt * dt; // unitless
+  n_co2  += dcdt  * dt; // mmol
+  n_n2   += dndt  * dt; // mmol
 
   // Constrain theta to range [0,1]
   if (th_co2 > 1) {

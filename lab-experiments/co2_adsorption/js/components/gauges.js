@@ -76,6 +76,7 @@ export function createConnectedGauges(draw, x, y, gaugeId) {
 
   // Main group for gauges and hexagon
   const group = draw.group().attr({ id: gaugeId });
+  group.node.classList.add("interactable");
 
   const leftGaugeX = x;
   const rightGaugeX = x + config.connectedGaugeSize;

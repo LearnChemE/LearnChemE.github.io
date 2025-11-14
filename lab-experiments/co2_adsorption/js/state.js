@@ -228,3 +228,10 @@ export function setOutletMoleFraction(value) { outletMoleFraction = value; }
 export var tempKelvin = 298.15; // Temperature in K
 export function setTemperature(newtemp) { tempKelvin = newtemp };
 export function getTemperature() { return tempKelvin };
+
+export const FLOW_BED = 0;
+export const FLOW_BYPASS = 1;
+export const FLOW_VENT = 2;
+var flowConfig = FLOW_BED;
+export function setFlowConfig(cfg) { flowConfig = cfg }
+export function getFlowConfig() { return flowConfig }
