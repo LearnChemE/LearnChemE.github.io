@@ -70,7 +70,8 @@ export function startMoleFractionCalculation(tankNum) {
     // Add the initial offset to continue from where we left off
 
     // Heat/cool the bed
-    const T = rampTemperature(1/60, state.getIsHeating(), state.getTemperature()); // Temperature from config
+    const isHeating = state.getIsHeating() && state.getFlowConfig() === state.FLOW_BED;
+    const T = rampTemperature(1/60, isHeating, state.getTemperature()); // Temperature from config
     updateTemperatureDisplay(T);
     state.setTemperature(T);
 
@@ -79,19 +80,29 @@ export function startMoleFractionCalculation(tankNum) {
 
     // Call the external calculation function
     if (gasIsFlowing) {
-      const y_out = yCO2_out({
-        t: t,
-        tStep: 1/60, // Use config timestep
-        m: m_g_s,
-        P: P_bar,
-        T: T,
-        yCO2: y, // Initial mole fraction of the feed gas
-        desorbing: state.getDesorbing(),
-        timeOfDesorption: state.getTimeOfDesorption(), // The simulation time 't' when desorption *started*
-        // m_controller: m_controller_mg_min // Pass m_controller if needed by yCO2_out, otherwise 'm' is sufficient
-      });
+      const flowCfg = state.getFlowConfig();
+      if (flowCfg === state.FLOW_BED) {
+        // Do calculation
+        const y_out = yCO2_out({
+          t: t,
+          tStep: 1/60, // Use config timestep
+          m: m_g_s,
+          P: P_bar,
+          T: T,
+          yCO2: y, // Initial mole fraction of the feed gas
+          desorbing: state.getDesorbing(),
+          timeOfDesorption: state.getTimeOfDesorption(), // The simulation time 't' when desorption *started*
+          // m_controller: m_controller_mg_min // Pass m_controller if needed by yCO2_out, otherwise 'm' is sufficient
+        });
 
-      state.setOutletMoleFraction(y_out);
+        state.setOutletMoleFraction(y_out);
+      }
+      else if (flowCfg === state.FLOW_BYPASS) {
+        state.setOutletMoleFraction(y);
+      }
+      else {
+        state.setOutletMoleFraction(0);
+      }
     }
     else {
       state.setOutletMoleFraction(0.0);
