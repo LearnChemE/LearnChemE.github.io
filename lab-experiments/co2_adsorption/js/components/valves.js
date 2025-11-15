@@ -45,6 +45,8 @@ export function createVerticalValve(draw, x, y, valveId) {
         .fill('#000') // Start closed (black)
         .stroke({ color: '#444', width: 1 });
 
+    group.node.classList.add("interactable");
+
     // Store the knob reference in the valve state
     state.valveStates[valveId].knob = knob; // Direct access okay here during creation
 
@@ -119,23 +121,24 @@ export function createVerticalValve(draw, x, y, valveId) {
     return group;
 }
 
-export function createInteractiveValve(draw, x, y, controller = true, isThreeValve = false) {
+export function createInteractiveValve(draw, name, x, y, angles, callback, twovalve=false) {
     const group = draw.group();
+    group.id(name)
     const radius = config.interactiveValveRadius;
 
     // Define initial entry positions (in degrees)
     // Tank positions: 1 at 180°, 2 at 90°, 3 at 0°, Outlet at 270°
-    let entryAngles = [270, 0, 90, 180];
-    const rotationSequence = isThreeValve ? [270, 0, 180] : [270, 0, 90, 180]; // Angles pointer stops at
+    // const rotationSequence = !twovalve ? [270, 0, 180] : [270, 0, 90, 180]; // Angles pointer stops at
 
     // Draw markers for each entry.
-    entryAngles.forEach(angle => {
+    const openings = twovalve ? [0, 180, 270] : [0, 90, 180, 270];
+    openings.forEach(angle => {
         const rad = angle * Math.PI / 180;
         const markerDistance = radius + config.interactiveValveMarkerOffset;
         const markerX = x + markerDistance * Math.cos(rad);
         const markerY = y + markerDistance * Math.sin(rad);
         if (angle === 90) {
-          if (!isThreeValve) {
+          if (!twovalve) {
             group.rect(20, 10).fill('black').center(markerX, markerY);
           }
         } else if (angle === 270) {
@@ -144,6 +147,8 @@ export function createInteractiveValve(draw, x, y, controller = true, isThreeVal
           group.rect(10, 20).fill('black').center(markerX, markerY);
         }
       });
+
+    if (callback) group.node.classList.add("interactable");
 
     // Draw valve circle (outer and inner)
     group.circle(radius * 2)
@@ -155,36 +160,36 @@ export function createInteractiveValve(draw, x, y, controller = true, isThreeVal
         .stroke({ color: '#444', width: 2 })
         .center(x, y);
 
-    if (controller) {
-        // Create pointer group
-        const pointerGroup = group.group();
-        const pointerLength = radius - config.interactiveValvePointerOffset;
-        pointerGroup.polygon(`${pointerLength},0 0,-5 0,5`) // Arrow shape
-            .fill('green')
-            .stroke({ color: '#444', width: 1 });
-        pointerGroup.center(x, y); // Position pivot point at valve center
+    // Create pointer group
+    const pointerGroup = group.group();
+    const pointerLength = radius - config.interactiveValvePointerOffset;
+    pointerGroup.polygon(`${pointerLength},0 0,-5 0,5`) // Arrow shape
+        .fill('green')
+        .stroke({ color: '#444', width: 1 });
+    pointerGroup.center(x, y); // Position pivot point at valve center
 
-        let currentAngleIndex = 2;
-          pointerGroup.rotate(180, x, y); // Initialize to 270 degrees
+    let currentAngleIndex = 0;
+    pointerGroup.rotate(angles[currentAngleIndex], x, y); // Initialize to 270 degrees
 
-            entryAngles = [0, 90, 180];
-          const entryAngles1 = [180, 90, 90]; // Initialize to current state or default
+    // entryAngles = [0, 90, 180];
+    const entryAngles1 = [180, 90, 90]; // Initialize to current state or default
 
-        group.on('click', function() {
-            currentAngleIndex = (currentAngleIndex + 1) % entryAngles.length;
-            const targetAngle = entryAngles[currentAngleIndex];
-            state.setCurrentMultiValvePosition(targetAngle); // Update global state
-
-            // Animate the pointer rotation
-            // The rotation amount is the difference, but rotate() sets absolute angle
-            pointerGroup.animate(300).rotate(entryAngles1[currentAngleIndex], x, y);
-
-            // Check if we should start/stop MFC flow for the new position
-             checkAndStartMFCFlow(draw);
-        });
-         // Store reference if this is the main controllable valve
-         state.setInteractiveValveKnobElement(group);
-    }
+    group.on('click', function() {
+        // Select the next angle
+        const nextAngleIndex = (currentAngleIndex + 1) % angles.length;
+        const thisAngle = angles[currentAngleIndex];
+        const targetAngle = angles[nextAngleIndex];
+        // const diff = (targetAngle > thisAngle) ? targetAngle - thisAngle : targetAngle + 360 - thisAngle;
+        const diff = targetAngle - thisAngle;
+        
+        // Animate the pointer rotation
+        // The rotation amount is the difference, but rotate() sets absolute angle
+        pointerGroup.animate(300).rotate(diff, x, y);
+        callback?.(targetAngle);
+        currentAngleIndex = nextAngleIndex;
+    });
+    // Store reference if this is the main controllable valve
+    state.setInteractiveValveKnobElement(group);
 
     return group;
 }

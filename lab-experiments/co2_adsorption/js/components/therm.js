@@ -42,7 +42,7 @@ export function createThermister(draw, x, y, temperature = 298) {
         .center(displayX + displayWidth / 2, displayY + displayHeight / 2);
 
     // Label for the Analyzer
-    group.text("Bed Temperature")
+    group.text("bed temperature")
         .font({ family: 'Arial', size: 14, anchor: 'middle', weight: 'bold' })
         .fill('#000')
         .center(x + analyzerWidth / 2, y + analyzerHeight - 15); // Position below display
@@ -56,6 +56,14 @@ export function createThermister(draw, x, y, temperature = 298) {
         .fill('#888')
         .stroke({ color: '#444', width: 1 })
         .move(connectorX, connectorY);
+        
+    // Down Triangle
+    group.path(`
+        M ${connectorX} ${connectorY + 3}
+        C ${connectorX - 30} ${connectorY + 3} ${connectorX - 50} ${connectorY + 30} ${connectorX - 70} ${connectorY + 30}
+    `)
+        .fill('none')
+        .stroke({ color: '#222222', width: 3 });
 
     // Store the text element reference IN THE GROUP for easy access later
     group.concentrationText = concentrationText; // Attach to group object

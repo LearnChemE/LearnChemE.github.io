@@ -12,17 +12,68 @@
 <body>
   <div class="canvas-container">
     <div class="icon-container">
-      <div class="hamburger-wrapper">
-        <div id="hamburger-icon" onclick="toggleMenu()">
-          <img src="./assets/hamburger.svg" alt="Menu" class="hamburger-img">
+      <div class="hamburger-menu" ref={ref}>
+            <div class="menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div class="menu-content">
+                <div class="menu-item" data-modal="directions">
+                    <i class="fas fa-book"></i>
+                    <span>Directions</span>
+                </div>
+                <a id="worksheet-download" download={downloadName} href={path}>
+                    <div class="menu-item" data-modal="details">
+                        <i class="fas fa-download"></i>
+                        <span>Worksheet</span>
+                    </div>
+                </a>
+                <div class="menu-item" data-modal="about">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </div>
+            </div>
         </div>
-        <div id="hamburger-menu" class="hamburger-menu"></div>
-      </div>
       <button id="reset-button" class="btn btn-sm btn-danger">Reset</button>
     </div>
     <div id="svg-container">
     </div>
   </div>
+
+  
+        <!-- Modal Dialogs -->
+        <div id="directions-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <div class="modal-header">
+                    <h2>Directions</h2>
+                </div>
+                <div class="modal-body">
+                    <p>
+                      This virtual experiment shows the adsorption and desorption of carbon dioxide from a zeolite bed.
+                      Click the valves above the three gas tanks to allow flow into the system.
+                      Click the pressure regulators above the tanks to adjust the system pressure.
+                      Click the mass flow controller to expand it, showing a menu where you can adjust the mass flowrate.
+                      Use the second valve to vent or bypass the bed. Heating will begin automatically when the pure
+                      nitrogen tank is selected.
+                      Scroll to zoom, then pan the camera with the mouse.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="about-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <div class="modal-header">
+                    <h2>About</h2>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This digital experiment was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Drew Smith, Jackson Dunlap, Neil Hendren, and Sanath Kavatooru. It is a JavaScript/HTML5 implementation of a Mathematica simulation that was prepared by Mark D. Normand, Maria G. Corradini, and Micha Peleg (<a href="https://demonstrations.wolfram.com/FlowFromATankAtConstantHeight/" target="_blank">https://demonstrations.wolfram.com/FlowFromATankAtConstantHeight/</a>) and modified by Neil Hendren and John L. Falconer. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to <a href="mailto:LearnChemE@gmail.com">LearnChemE@gmail.com</a>. If this simulation is too big or too small for your screen, zoom out or in using command - or command +  on Mac or ctrl - or ctrl +  on Windows.
+                    </p>  
+                </div>
+            </div>
+        </div>
 
   <div id="overlayContainer"></div>
   <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.1/dist/svg.min.js"></script>
@@ -33,99 +84,50 @@
   <script type="module" src="./js/main.js"></script>
 
   <script>
-    // Function to toggle the hamburger menu
-    function toggleMenu() {
-      const hamburgerMenu = document.getElementById('hamburger-menu');
-      const isCurrentlyShown = hamburgerMenu.classList.contains('show');
-      hamburgerMenu.classList.toggle('show');
+    
+const menuBtn = document.querySelector('.menu-btn');
+const menuContent = document.querySelector('.menu-content');
+const menuItems = document.querySelectorAll('.menu-item');
+const modals = document.querySelectorAll('.modal');
+const closeBtns = document.querySelectorAll('.close-btn');
 
-      // Only populate if opening
-      if (!isCurrentlyShown) {
-        // Clear any existing buttons
-        hamburgerMenu.innerHTML = '';
+// Hamburger menu functionality
+menuBtn.addEventListener('click', () => {
+    menuContent.classList.toggle('show');
+});
 
-        // --- Button Configuration ---
-        const buttons = [
-          { label: 'Directions', url: './overlay/directions.html', action: 'modal' },
-          { label: 'About', url: './overlay/about.html', action: 'modal' },
-          { label: 'Worksheet', url: 'assets/worksheet.pdf', action: 'download', filename: 'worksheet.pdf' }
-        ];
-
-        buttons.forEach((btnConfig) => {
-          const button = document.createElement('button');
-          button.type = 'button';
-          // Use classes defined in main.css if available, otherwise default Bootstrap
-          button.className = 'btn btn-light btn-sm hamburger-menu-button'; // Added a class for potential specific styling
-          button.textContent = btnConfig.label;
-
-          button.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent click from closing menu immediately
-
-            if (btnConfig.action === 'modal') {
-              // Fetch and display modal content
-              fetch(btnConfig.url)
-                .then(response => {
-                  if (!response.ok) throw new Error(`Network error loading ${btnConfig.url}`);
-                  return response.text();
-                })
-                .then(html => {
-                  const container = document.getElementById('overlayContainer');
-                  container.innerHTML = html; // Replace previous modal HTML
-
-                  // Modal ID assumed to be the same as the label lowercased
-                  const modalId = btnConfig.label.toLowerCase();
-                  const modalEl = document.getElementById(modalId);
-
-                  if (modalEl) {
-                     // Make sure no stray modals are lingering from previous fetches
-                     const existingModalInstance = bootstrap.Modal.getInstance(modalEl);
-                     if(existingModalInstance) {
-                         // If an instance exists but might be hidden or closing, dispose of it
-                         // before creating a new one to avoid conflicts.
-                         existingModalInstance.dispose();
-                     }
-                    const modal = new bootstrap.Modal(modalEl); // Create new instance
-                    modal.show();
-                  } else {
-                     console.error(`Modal element with ID '${modalId}' not found in fetched HTML from ${btnConfig.url}.`);
-                  }
-                })
-                .catch(error => console.error('Error loading/showing modal:', error));
-
-            } else if (btnConfig.action === 'download') {
-              // Trigger download
-              downloadFile(btnConfig.url, btnConfig.filename);
-            }
-
-            // Close menu after action
-            hamburgerMenu.classList.remove('show');
-          });
-
-          hamburgerMenu.appendChild(button);
-        });
-      }
-    } // End of toggleMenu
-
-    // Function to download a file
-    function downloadFile(fileUrl, fileName) {
-      const link = document.createElement('a');
-      link.href = fileUrl;
-      link.download = fileName || fileUrl.split('/').pop(); // Use provided name or derive from URL
-      document.body.appendChild(link);
-      link.click(); // Trigger the download
-      document.body.removeChild(link); // Clean up
+// Close menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (!menuBtn.contains(e.target) && !menuContent.contains(e.target)) {
+        menuContent.classList.remove('show');
     }
+});
 
-    // Close the hamburger menu when clicking outside
-    document.addEventListener('click', (event) => {
-      const hamburgerMenu = document.getElementById('hamburger-menu');
-      const hamburgerIcon = document.getElementById('hamburger-icon');
-
-      // Check if the menu/icon exist and if the click was outside both
-      if (hamburgerMenu && hamburgerIcon && !hamburgerMenu.contains(event.target) && !hamburgerIcon.contains(event.target)) {
-        hamburgerMenu.classList.remove('show');
-      }
+// Menu items click handlers
+menuItems.forEach(item => {
+    item.addEventListener('click', () => {
+        const modalId = item.getAttribute('data-modal') + '-modal';
+        document.getElementById(modalId).style.display = 'block';
+        menuContent.classList.remove('show');
     });
+});
+
+// Close modal buttons
+closeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        btn.closest('.modal').style.display = 'none';
+    });
+});
+
+// Close modal when clicking outside
+window.addEventListener('click', (e) => {
+    modals.forEach(modal => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
+
   </script>
 
 </body>

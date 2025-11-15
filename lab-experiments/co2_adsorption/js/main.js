@@ -2,12 +2,12 @@
 // Imports remain the same...
 import * as config from './config.js';
 import * as state from './state.js';
-import { drawPipes } from './pipes.js'; // Use the drawPipes you provided
+import { checkAndStartMFCFlow, drawPipes, playValve2Animation } from './pipes.js'; // Use the drawPipes you provided
 import { resetEverything } from './reset.js';
 import { createGasCylinder } from './components/gasCylinder.js';
 import { createConnectedGauges, createDigitalPressureGauge } from './components/gauges.js';
 import { createVerticalValve, createInteractiveValve, createTValve } from './components/valves.js';
-import { createMassFlowController, mfcClicked } from './components/mfc.js';
+import { createMassFlowController } from './components/mfc.js';
 import { createVerticalAdsorptionBedView } from './components/adsorptionBed.js';
 import { createCO2GasAnalyzer } from './components/co2Analyzer.js';
 import { createVentArrow } from './components/ventArrow.js';
@@ -59,9 +59,9 @@ function drawCanvas() {
     // --- 2. Create ALL Static Components FIRST ---
 
     // Create Tanks
-    createGasCylinder(draw, config.tanksMarginX, tankY, "90% CO2/N2");
-    createGasCylinder(draw, config.tanksMarginX + config.mainCylWidth + config.tanksGap, tankY, "10% CO2/N2");
-    createGasCylinder(draw, config.tanksMarginX + 2 * (config.mainCylWidth + config.tanksGap), tankY, "N2");
+    createGasCylinder(draw, config.tanksMarginX, tankY, "90% CO₂/N₂");
+    createGasCylinder(draw, config.tanksMarginX + config.mainCylWidth + config.tanksGap, tankY, "10% CO₂/N₂");
+    createGasCylinder(draw, config.tanksMarginX + 2 * (config.mainCylWidth + config.tanksGap), tankY, "N₂");
 
     // Create Tank Valves (Initialize state with position)
     const tv1_x = config.tanksMarginX + config.mainCylWidth / 2 - config.verticalValveBlockWidth / 2 - 2.5;
@@ -87,15 +87,15 @@ function drawCanvas() {
     const pv3_x = config.tanksMarginX + 2 * (config.mainCylWidth + config.tanksGap) + config.mainCylWidth / 2 - config.verticalValveBlockWidth / 2 - 2.5;
     createVerticalValve(draw, pv3_x, pv_y, 'pressureValve3'); // Use same Y
 
-    // Create Multi-Position Valve (Controller)
-    createInteractiveValve(draw, multiValveX, multiValveY, true); // true = controller
+    // First valve
+    createInteractiveValve(draw, "tankValve", multiValveX, multiValveY, [180, 0, 90], (angle) => {    
+        state.setCurrentMultiValvePosition(angle); // Update global state
+        checkAndStartMFCFlow(draw);
+    });
 
     // Create MFC
     createMassFlowController(draw, mfcX, mfcY);
-    mfcClicked(draw, mfcX, mfcY);
 
-    // Create Inlet Valve (Non-controller) - between MFC and Bed
-    createInteractiveValve(draw, outletValveX, outletValveY, false);
 
     // Create Digital Pressure Gauge
     createDigitalPressureGauge(draw, digPressureGaugeX, digPressureGaugeY, "--- bar"); // Use bar unit?
@@ -103,14 +103,31 @@ function drawCanvas() {
     // Create Adsorption Bed
     createVerticalAdsorptionBedView(draw, adsorptionBedX, adsorptionBedY);
 
-    // Create Outlet Valve (3-way, Non-controller) - after Bed
-    createInteractiveValve(draw, adsorptionOutletValveX, adsorptionOutletValveY, false, true); // true = isThreeValve
+    // Create Inlet Valve - between MFC and Bed
+    createInteractiveValve(draw, "inletValve", outletValveX, outletValveY, [0, 90, -90], (angle) => {
+        let path;
+        switch(angle) {
+            case -90:
+                path = state.FLOW_VENT;
+                break;
+            case   0:
+                path = state.FLOW_BED;
+                break;
+            case  90:
+                path = state.FLOW_BYPASS;
+                break;
+        }
+        state.setFlowConfig(path);
+        playValve2Animation(draw);
+    });
+    // Create Outlet Valve - after Bed
+    createInteractiveValve(draw, "outletValve", adsorptionOutletValveX, adsorptionOutletValveY, [0], undefined, true); // true = isThreeValve
 
     // Create T-Valve / Back Pressure Regulator
     createTValve(draw, tValveX, tValveY);
 
     // Create CO2 Analyzer
-    createCO2GasAnalyzer(draw, co2AnalyzerX, co2AnalyzerY, "00.00%"); // Initial text
+    createCO2GasAnalyzer(draw, co2AnalyzerX, co2AnalyzerY, "0.00%"); // Initial text
 
     // Create Thermister display
     createThermister(draw, thermX, thermY);
@@ -151,4 +168,5 @@ if (resetButton) {
 // Wrap in DOMContentLoaded to ensure elements exist, although placement at end of body helps
 document.addEventListener('DOMContentLoaded', () => {
      drawCanvas(); // Draw everything initially
+     
 });

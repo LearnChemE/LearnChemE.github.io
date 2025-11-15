@@ -17,6 +17,8 @@ const BED_MAX_CAPACITY = .01; // mol CO2 total
 const MAX_TEMP = 623.15; // K
 const R = 0.08314 // bar L / mol / K
 
+// 2.5 mmol CO2 / g zeolite
+
 /**
  * Calculate the amount of CO2 adsorbed on a surface
  * as a function of time using a first-order rate equation.
@@ -109,12 +111,12 @@ export function yCO2_out(args) {
   const MW_N2 = 28.02; // g/mol
 
   // Get molar flowrate of each species
-  const ndot = m / (MW_CO2 * y + MW_N2 * (1 - y)); // total number of moles in the gas mixture
-  const ndot_co2 = ndot * y; // molar flow rate of CO2
-  const ndot_n2 = ndot * (1 - y); // molar flow rate of N2
+  const ndot = m / (MW_CO2 * y + MW_N2 * (1 - y)); // [mol / s] total number of moles in the gas mixture
+  const ndot_co2 = ndot * y; // molar flow rate of CO2 [mol / s]
+  const ndot_n2 = ndot * (1 - y); // molar flow rate of N2 [mol / s]
 
   // Calculate partial pressure of what's already in the tank
-  const p_co2 = n_co2 * R * T / V;
+  const p_co2 = n_co2 * R * T / V; 
   console.log(`pco2: ${p_co2}\npN2: ${n_n2 * R * T / V}`)
 
   // Calculate rate constants
@@ -133,13 +135,13 @@ export function yCO2_out(args) {
   //   acc = in - out + gen - cons
   // Don't include out just yet because it should guaruntee we stay at pressure
   const dthdt = (rate_ads - rate_des) / BED_MAX_CAPACITY;
-  const dcdt = ndot_co2 + gen_minus_cons;
-  const dndt = ndot_n2;
+  const dcdt = ndot_co2 + gen_minus_cons; // mol / s
+  const dndt = ndot_n2; // mol / s
 
   // Evolve the system
-  th_co2 += dthdt * dt;
-  n_co2  += dcdt  * dt;
-  n_n2   += dndt  * dt;
+  th_co2 += dthdt * dt; // unitless
+  n_co2  += dcdt  * dt; // mmol
+  n_n2   += dndt  * dt; // mmol
 
   // Constrain theta to range [0,1]
   if (th_co2 > 1) {

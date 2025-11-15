@@ -7,12 +7,16 @@ import * as state from './state.js';
  */
 export function addOptionToDragAndZoom(draw) {
     draw.text("Zoom with the scroll wheel.")
-    .move(config.canvasWidth - 250, 100)
+    .move(config.canvasWidth - 240, 90)
     .font({ size: 16, anchor: 'left' })
 
-    draw.text("After zooming, drag mouse to move image.")
-    .move(config.canvasWidth - 300, 120)
-    .font({ size: 16, anchor: 'left' })
+    draw.text("After zooming, drag mouse\nto move image.")
+    .move(config.canvasWidth - 240, 110)
+    .font({ size: 16, anchor: 'left' });
+
+    draw.text("heating rate = 4 K/s")
+        .move(config.canvasWidth - 220, 310);
+
     const defaultViewbox = { x: 0, y: 0, width: config.canvasWidth, height: config.canvasHeight };
     draw.viewbox(defaultViewbox.x, defaultViewbox.y, defaultViewbox.width, defaultViewbox.height);
     
@@ -30,11 +34,12 @@ export function addOptionToDragAndZoom(draw) {
     background.on('mousemove', function(event) {
         if (!state.isPanning) return;
         event.preventDefault();
-        const dx = event.clientX - state.panStart.x;
-        const dy = event.clientY - state.panStart.y;
+        const dx = (event.clientX - state.panStart.x);
+        const dy = (event.clientY - state.panStart.y);
         const vb = draw.viewbox();
+        const scaleMod = vb.width / document.querySelector("svg").getAttribute("width");
         if (vb.width < defaultViewbox.width) {
-            draw.viewbox(vb.x - dx, vb.y - dy, vb.width, vb.height);
+            draw.viewbox(vb.x - dx * scaleMod, vb.y - dy * scaleMod, vb.width, vb.height);
         }
         state.setPanStart({ x: event.clientX, y: event.clientY });
     });
@@ -49,7 +54,7 @@ export function addOptionToDragAndZoom(draw) {
     
     draw.on('wheel', function(event) {
         event.preventDefault();
-        const zoomStep = 0.2;
+        const zoomStep = 0.05;
         const zoomFactor = event.deltaY < 0 ? (1 - zoomStep) : (1 + zoomStep);
         const vb = draw.viewbox();
         let newWidth = vb.width * zoomFactor;
