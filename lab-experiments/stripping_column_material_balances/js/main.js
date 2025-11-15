@@ -90,6 +90,7 @@ const V = 0.01;           // Vapor  flow (mol/s)
 const x0 = 0.35;          // Bottom liquid comp.
 const y4 = 1.0;           // Top vapor  comp.
 const H = 150;            // Height of column (m)
+const MEASUREMENT_NOISE = 0.01; // Small noise for simulated measurements
 let P = 1.0;            // Pressure of column (bar)
 
 function computeStageCompositions(L, V, x0, y4) {
@@ -117,16 +118,56 @@ function computeStageCompositions(L, V, x0, y4) {
 let result = computeStageCompositions(L, V, x0, y4);
 console.log(result);
 
-let streamComp = {
-  Y1: result.y1.toFixed(1),
-  Y2: result.y2.toFixed(1),
-  Y3: result.y3.toFixed(2),
-  Y4: y4.toFixed(1),
-  X0: x0.toFixed(2),
-  X1: result.x1.toFixed(2),
-  X2: result.x2.toFixed(2),
-  X3: result.x3.toFixed(2)
-};
+function applyMeasurementNoise(value, magnitude = MEASUREMENT_NOISE) {
+  const noise = (Math.random() * 2 - 1) * magnitude;
+  return Math.max(0, value + noise);
+}
+
+function buildStreamCompFromResult(res) {
+  const format = (value, decimals) => applyMeasurementNoise(value).toFixed(decimals);
+  return {
+    Y1: format(res.y1, 1),
+    Y2: format(res.y2, 1),
+    Y3: format(res.y3, 1),
+    Y4: format(y4, 1),
+    X0: format(x0, 2),
+    X1: format(res.x1, 2),
+    X2: format(res.x2, 2),
+    X3: format(res.x3, 2)
+  };
+}
+
+let streamComp = buildStreamCompFromResult(result);
+
+function getDisplayStreamValue(label) {
+  if (!streamComp.hasOwnProperty(label)) return null;
+  const liquidFlowing = pumpOn && nozzleOn;
+  const gasFlowing = isGasValveOpen;
+  const isXVal = label.startsWith('X');
+  const isYVal = label.startsWith('Y');
+
+  if (isXVal) {
+    if (liquidFlowing && gasFlowing) {
+      return streamComp[label];
+    }
+    if (liquidFlowing && !gasFlowing) {
+      return '0.35';
+    }
+    return null;
+  }
+
+  if (isYVal) {
+    if (liquidFlowing && gasFlowing) {
+      return streamComp[label];
+    }
+    if (gasFlowing && !liquidFlowing) {
+      return '1.0';
+    }
+    return null;
+  }
+
+  return streamComp[label];
+}
 
 function initTooltips() {
   moleFractionTooltip = uiGroup.group().hide();
@@ -141,12 +182,11 @@ function initTooltips() {
 }
 
 function showTooltip(label, event) {
-  if (!((pumpOn && nozzleOn) && isGasValveOpen)) {
-    return;
-  }
   // If this is a column stream label, show the computed comp.
   if (streamComp.hasOwnProperty(label)) {
-    const compVal = streamComp[label];
+    const compVal = getDisplayStreamValue(label);
+    if (compVal === null) return;
+
     tooltipText.clear().text(compVal + " ppm");
     // redraw tooltip background
     setTimeout(() => {
@@ -208,7 +248,8 @@ function drawCanvas() {
   drawTexts();
   // createConnectedGauges(655, 195, "1")
   gasImage = addSVGImage('./assets/gasFlowRateDevice.svg', 700, 247.5, 800/3, 200);
-  gasFlowRateText = drawCenteredText(809, 295, "0 mol/s", 14, 'black', 'Arial', 'black', 0.4);
+  gasFlowRateText = drawCenteredText(810, 280, `0 
+    mol/s`, 20, 'black', 'Arial', 'black', 0.4, 'normal');
   drawCenteredText(795, 377, "gas flow rate", 12, 'white', 'Arial', 'white', 0.7)
   addOptionToDragAndZoom();
   
@@ -531,12 +572,13 @@ function drawTexts() {
   textS.on('mouseout', hideTooltip);
 }
 
-function drawCenteredText(centerX, centerY, text, fontSize = 16, fillColor = '#000', fontFamily = 'Arial', strokeColor = null, strokeWidth = 0) {
+function drawCenteredText(centerX, centerY, text, fontSize = 16, fillColor = '#000', fontFamily = 'Arial', strokeColor = null, strokeWidth = 0, fontWeight = 'normal') {
   const textElement = draw.text(text)
   .font({
     family: fontFamily,
     size: fontSize,
     anchor: 'middle',
+    weight: fontWeight,
     leading: '1em'
   })
   .move(centerX, centerY)
@@ -644,14 +686,16 @@ function drawGasValves() {
         delay += duration + pipeDelay;
         if (pipe === rightPipe4) {
           setTimeout(() => {
-            gasFlowRateText.text("0.01 mol/s");
-            gasFlowRateText.front();    // bring it to the top
+            gasFlowRateText.text(`0.01 
+              mol/s`);
+            gasFlowRateText.front();
           }, duration * 8);
         }
       });
       isGasValveOpen = true;
     } else{
-      gasFlowRateText.text("0 mol/s");
+      gasFlowRateText.text(`0 
+        mol/s`);
       gasGroup.clear();
       isGasValveOpen = false;
     }
@@ -747,16 +791,7 @@ function resetAll() {
   // Recompute and reset tooltip data
   const initRes = computeStageCompositions(L, V, x0, y4);
   result = initRes;
-  streamComp = {
-    Y1: initRes.y1.toFixed(1),
-    Y2: initRes.y2.toFixed(1),
-    Y3: initRes.y3,
-    Y4: y4,
-    X0: x0,
-    X1: initRes.x1,
-    X2: initRes.x2,
-    X3: initRes.x3,
-  };
+  streamComp = buildStreamCompFromResult(initRes);
   // Stop any ongoing flow interval
   if (flowInterval) {
     clearInterval(flowInterval);
@@ -768,6 +803,7 @@ function resetAll() {
   // Reset tank volumes
   feedTankVolume = maxTankVolume;
   extractTankVolume = 0;
+  isGasValveOpen = false;
   // Reset liquid elements
   if (feedLiquidElement) feedLiquidElement.remove();
   if (extractLiquidElement) extractLiquidElement.remove();
@@ -785,12 +821,12 @@ document.getElementById('reset-button').addEventListener('click', resetAll);
 
 function addOptionToDragAndZoom() {
   uiGroup.add(
-    draw.text("zoom with the scroll wheel")
-    .move(canvasWidth / 2 - 100, 0)
+    draw.text("Zoom with the scroll wheel.")
+    .move(canvasWidth / 2 - 150, 0)
     .font({ size: 16, anchor: 'left' })
   );
   uiGroup.add(
-    draw.text("After zooming, drag mouse to move image")
+    draw.text("After zooming, drag mouse to move image.")
     .move(canvasWidth / 2 - 150, 15)
     .font({ size: 16, anchor: 'left' })
   );
@@ -958,15 +994,8 @@ function updateGaugePressure(pressureValue) {
   const newRes = computeStageCompositions(L, V, x0, y4);
   // Update globals
   result = newRes;
-  // Update streamComp so tooltips use fresh values
-  streamComp.Y1 = newRes.y1;
-  streamComp.Y2 = newRes.y2;
-  streamComp.Y3 = newRes.y3;
-  streamComp.Y4 = y4;
-  streamComp.X0 = x0;
-  streamComp.X1 = newRes.x1;
-  streamComp.X2 = newRes.x2;
-  streamComp.X3 = newRes.x3;
+  // Update streamComp so tooltips use fresh values with new noise
+  streamComp = buildStreamCompFromResult(newRes);
 }
 
 function createPressureGaugeView(draw, x, y) {
