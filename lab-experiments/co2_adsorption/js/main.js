@@ -59,9 +59,9 @@ function drawCanvas() {
     // --- 2. Create ALL Static Components FIRST ---
 
     // Create Tanks
-    createGasCylinder(draw, config.tanksMarginX, tankY, "90% CO2/N2");
-    createGasCylinder(draw, config.tanksMarginX + config.mainCylWidth + config.tanksGap, tankY, "10% CO2/N2");
-    createGasCylinder(draw, config.tanksMarginX + 2 * (config.mainCylWidth + config.tanksGap), tankY, "N2");
+    createGasCylinder(draw, config.tanksMarginX, tankY, "90% CO₂/N₂");
+    createGasCylinder(draw, config.tanksMarginX + config.mainCylWidth + config.tanksGap, tankY, "10% CO₂/N₂");
+    createGasCylinder(draw, config.tanksMarginX + 2 * (config.mainCylWidth + config.tanksGap), tankY, "N₂");
 
     // Create Tank Valves (Initialize state with position)
     const tv1_x = config.tanksMarginX + config.mainCylWidth / 2 - config.verticalValveBlockWidth / 2 - 2.5;

@@ -17,6 +17,8 @@ const BED_MAX_CAPACITY = .01; // mol CO2 total
 const MAX_TEMP = 623.15; // K
 const R = 0.08314 // bar L / mol / K
 
+// 2.5 mmol CO2 / g zeolite
+
 /**
  * Calculate the amount of CO2 adsorbed on a surface
  * as a function of time using a first-order rate equation.
@@ -99,7 +101,7 @@ var th_co2 = 0; // Fraction of bed covered in CO2
  */
 export function yCO2_out(args) {
   const tStep = args.tStep * timeMultiplicationFactor;
-  const m = args.m * 1000; // mg / s
+  const m = args.m * 1000; // g / s
   const P = args.P; // bar
   const T = args.T; // K
   const V = BED_VOLUME; // L
@@ -109,13 +111,13 @@ export function yCO2_out(args) {
   const MW_N2 = 28.02; // g/mol
 
   // Get molar flowrate of each species
-  const ndot = m / (MW_CO2 * y + MW_N2 * (1 - y)); // [mmol / s] total number of moles in the gas mixture
-  const ndot_co2 = ndot * y; // molar flow rate of CO2 [mmol / s]
-  const ndot_n2 = ndot * (1 - y); // molar flow rate of N2 [mmol / s]
+  const ndot = m / (MW_CO2 * y + MW_N2 * (1 - y)); // [mol / s] total number of moles in the gas mixture
+  const ndot_co2 = ndot * y; // molar flow rate of CO2 [mol / s]
+  const ndot_n2 = ndot * (1 - y); // molar flow rate of N2 [mol / s]
 
   // Calculate partial pressure of what's already in the tank
   const p_co2 = n_co2 * R * T / V; 
-  // console.log(`pco2: ${p_co2}\npN2: ${n_n2 * R * T / V}`)
+  console.log(`pco2: ${p_co2}\npN2: ${n_n2 * R * T / V}`)
 
   // Calculate rate constants
   const ka = Ka(T);
@@ -132,9 +134,9 @@ export function yCO2_out(args) {
   // Find the change in the bulk concentrations. 
   //   acc = in - out + gen - cons
   // Don't include out just yet because it should guaruntee we stay at pressure
-  const dthdt = (rate_ads - rate_des) / BED_MAX_CAPACITY; // 
-  const dcdt = ndot_co2 + gen_minus_cons; // mmol / s ?
-  const dndt = ndot_n2; // mmol / s ?
+  const dthdt = (rate_ads - rate_des) / BED_MAX_CAPACITY;
+  const dcdt = ndot_co2 + gen_minus_cons; // mol / s
+  const dndt = ndot_n2; // mol / s
 
   // Evolve the system
   th_co2 += dthdt * dt; // unitless
@@ -153,7 +155,7 @@ export function yCO2_out(args) {
     n_co2 += dif * BED_MAX_CAPACITY;
   }
 
-  // console.log(`theta:${th_co2.toFixed(2)}`);//\nn_CO2:${n_co2.toFixed(2)}\nn_N2:${n_n2.toFixed(2)}`);
+  console.log(`theta:${th_co2.toFixed(2)}`);//\nn_CO2:${n_co2.toFixed(2)}\nn_N2:${n_n2.toFixed(2)}`);
 
   // Calculate the amount of moles actually in the tank and compare to what the maximum pressure would allow
   const n_max = P * V / R / T; // maximum moles
