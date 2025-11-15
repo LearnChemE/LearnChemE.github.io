@@ -20,6 +20,10 @@ export let prevTankNum = null; // Tracks last CO2 tank used ('1' or '2')
 export let outletMoleFraction = 0;
 
 export let isHeating = false; // Adsorption bed state
+export let heatingPaused = false;
+export function pauseHeating() { heatingPaused = true }
+export function unpauseHeating() { heatingPaused = false }
+export function isHeatingPaused() { return heatingPaused }
 export let heatingInterval = null; // Interval ID
 
 // --- References to SVG Elements (Set by creation functions) ---
@@ -201,6 +205,7 @@ export function resetSimulationState() {
   timeWhenAdsorptionStopped = null;
   prevTankNum = null;
   isHeating = false;
+  pauseHeating = false;
   mfcValue = 15.0; // Reset MFC value
   mfcFlowSpeed = 50; // Reset flow speed
   currentMultiValvePosition = 180; // Reset valve position

@@ -44,7 +44,6 @@ export function animateGasFlow(draw, segmentId, color, opacity, onComplete = nul
   }
   // Avoid creating duplicate animations if one is already running for this segment
   let otherpath;
-  console.log(opacity)
   if (otherpath = state.getFlowPath(segmentId)) {
     // Just make the other animation invisible. The callbacks will happen in the correct order anyways, and the user won't notice any discrepancies because its so fast
     // This is not an example of the perfect way to do it, I just don't want to waste more time on it. Theoretically, there is a race condition if you hit the button 
@@ -252,6 +251,11 @@ export function drawPipes(draw, pipeGroup) {
 }
 
 
+const flowInfo = {
+  color: "#ff0000",
+  opacity: 0.9
+};
+
 // Logic to determine which flows should be active and start/stop them
 export function checkAndStartMFCFlow(draw) {
   // Stop all flows downstream of the multi-valve first
@@ -293,6 +297,8 @@ export function checkAndStartMFCFlow(draw) {
           color = 'grey';
           opacity = 1.0; // Should not happen
       }
+      flowInfo.color = color;
+      flowInfo.opacity = opacity;
 
       state.setGaugeValue(`gauge${tankNum}`, state.getGaugeValue(`gauge${tankNum}`, 5.0));
 
@@ -300,24 +306,12 @@ export function checkAndStartMFCFlow(draw) {
       // Flow reaches MFC
       animateGasFlow(draw, 'mfc_inlet', color, opacity, () => {
         // After MFC inlet completes, start MFC outlet and other paths
-        animateGasFlow(draw, 'mfc_outlet', color, opacity, null, true);
-
-        // Start these paths simultaneously
-        animateGasFlow(draw, 'adsorption_bed_inlet', color, opacity, () => {
-          // Start mole fraction calculation when adsorption bed inlet completes
-          startMoleFractionCalculation(tankNum);
+        animateGasFlow(draw, 'mfc_outlet', color, opacity, () => {
+          playValve2Animation(draw, tankNum);
         }, true);
+    }, true);
 
-        // animateGasFlow(draw, 'mfc_valve_outlet', color, opacity, () => {
-          // After MFC valve outlet completes, start adsorption bed outlet
-          animateGasFlow(draw, 'adsorption_bed_outlet', color, opacity, () => {
-            // After adsorption bed outlet completes, start remaining paths
-            animateGasFlow(draw, 'adsorption_bed_valve_outlet', color, opacity, null, true);
-            animateGasFlow(draw, 'bpg_valve_outlet', color, opacity, null, true);
-            animateGasFlow(draw, 'analyser_outlet', color, opacity, null, true);
-          }, true);
-        }, true);
-      // }, true); // isMFCControlled = true
+        
 
     } else {
       state.setGaugeValue(0.0, 0.0);
@@ -329,4 +323,47 @@ export function checkAndStartMFCFlow(draw) {
     startMoleFractionCalculation('-1');
     // No flow started, simulation already stopped.
   }
+}
+
+export function playValve2Animation(draw) {
+  const { color, opacity } = flowInfo;
+  const flowCfg = state.getFlowConfig();
+  // Determine selected tank and check valve states
+  const tankNum = getTankFromMultiValvePosition(state.getCurrentMultiValvePosition());
+
+  // Flow segments downstream of valve2
+  const valve2FlowSegments = [
+    'adsorption_bed_inlet',
+    'mfc_valve_outlet',
+    'adsorption_bed_outlet', 'adsorption_bed_valve_outlet', // To T-valve
+    'bpg_valve_outlet', // T-valve to Analyzer
+    'analyser_outlet' // Analyzer to Vent 2
+  ];
+  valve2FlowSegments.forEach(segment => state.removeFlowPath(segment));
+
+  // Bed
+  if (flowCfg === state.FLOW_BED) {
+    animateGasFlow(draw, 'adsorption_bed_inlet', color, opacity, () => {
+      // Start mole fraction calculation when adsorption bed inlet completes
+      startMoleFractionCalculation(tankNum);
+      // After MFC valve outlet completes, start adsorption bed outlet
+      animateGasFlow(draw, 'adsorption_bed_outlet', color, opacity, () => playOutlet(draw), true);
+    }, true);
+  }
+  else if (flowCfg === state.FLOW_BYPASS) {
+    // Bypass selected
+    animateGasFlow(draw, 'mfc_valve_outlet', color, opacity, () => {
+      playOutlet(draw);
+    });
+  }
+}
+
+function playOutlet(draw) {
+  const { color, opacity } = flowInfo;
+  // After adsorption bed outlet completes, start remaining paths
+  animateGasFlow(draw, 'adsorption_bed_valve_outlet', color, opacity, () => {
+    animateGasFlow(draw, 'bpg_valve_outlet', color, opacity, () => {
+      animateGasFlow(draw, 'analyser_outlet', color, opacity, null, true);
+    }, true);
+  }, true);
 }

@@ -34,7 +34,10 @@ export function startMoleFractionCalculation(tankNum) {
   } 
   else if (tankNum === '3') { // N2 Desorption
     y = 0.0;
-    startHeating(); // Turn heater on
+    startHeating();
+    if (state.getFlowConfig() !== state.FLOW_BED) {
+      state.pauseHeating();
+    }
   }
   else if (tankNum === '-1') {
     gasIsFlowing = false;
@@ -46,7 +49,7 @@ export function startMoleFractionCalculation(tankNum) {
   }
 
   // Set the global desorbing state
-  state.setDesorbing(currentDesorbingState);
+  // state.setDesorbing(currentDesorbingState);
 
   // Record the real-world start time of this calculation phase
   const calculationStartTime = Date.now();
@@ -69,9 +72,15 @@ export function startMoleFractionCalculation(tankNum) {
     // Calculate elapsed simulation time (t) since the *start* of the relevant phase (adsorption or desorption)
     // Add the initial offset to continue from where we left off
 
+    // Check if we need to pause the heating
+    if (state.getFlowConfig() !== state.FLOW_BED) {
+      state.pauseHeating();
+    }
+
     // Heat/cool the bed
-    const isHeating = state.getIsHeating() && state.getFlowConfig() === state.FLOW_BED;
-    const T = rampTemperature(1/60, isHeating, state.getTemperature()); // Temperature from config
+    const isHeating = state.getIsHeating();
+    // console.log(state.isHeatingPaused())
+    const T = state.isHeatingPaused() ? state.getTemperature() : rampTemperature(1/60, isHeating, state.getTemperature()); // Temperature from config
     updateTemperatureDisplay(T);
     state.setTemperature(T);
 
@@ -150,6 +159,7 @@ function stopMoleFractionCalculation() {
  */
 export function startHeating() {
   const draw = window.svgDraw; // Access draw object (assuming it's global for simplicity here)
+  state.unpauseHeating();
   if (!draw) {
     console.error("SVG draw object not found for heating.");
     return;
@@ -157,7 +167,7 @@ export function startHeating() {
 
   if (!state.getIsHeating()) {
     state.setIsHeating(true);
-    console.log("Starting Heating");
+    // console.log("Starting Heating");
 
     const heatingIntervalId = setInterval(() => {
       // Create Red gradient for heating
@@ -185,12 +195,12 @@ export function startHeating() {
  */
 export function stopHeating() {
   const draw = window.svgDraw; // Access draw object
+  state.unpauseHeating();
   if (!draw) return; // No drawing context, can't update visuals
 
   if (state.getIsHeating()) {
     state.setIsHeating(false);
     state.clearHeatingInterval(); // Clears interval via state function
-    console.log("Stopping Heating");
 
     // Reset heater gradients to Blue (cold)
     const gradient = draw.gradient('linear', function(add) {

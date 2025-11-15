@@ -115,7 +115,7 @@ export function yCO2_out(args) {
 
   // Calculate partial pressure of what's already in the tank
   const p_co2 = n_co2 * R * T / V; 
-  console.log(`pco2: ${p_co2}\npN2: ${n_n2 * R * T / V}`)
+  // console.log(`pco2: ${p_co2}\npN2: ${n_n2 * R * T / V}`)
 
   // Calculate rate constants
   const ka = Ka(T);
@@ -153,7 +153,7 @@ export function yCO2_out(args) {
     n_co2 += dif * BED_MAX_CAPACITY;
   }
 
-  console.log(`theta:${th_co2.toFixed(2)}`);//\nn_CO2:${n_co2.toFixed(2)}\nn_N2:${n_n2.toFixed(2)}`);
+  // console.log(`theta:${th_co2.toFixed(2)}`);//\nn_CO2:${n_co2.toFixed(2)}\nn_N2:${n_n2.toFixed(2)}`);
 
   // Calculate the amount of moles actually in the tank and compare to what the maximum pressure would allow
   const n_max = P * V / R / T; // maximum moles

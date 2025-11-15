@@ -2,7 +2,7 @@
 // Imports remain the same...
 import * as config from './config.js';
 import * as state from './state.js';
-import { checkAndStartMFCFlow, drawPipes } from './pipes.js'; // Use the drawPipes you provided
+import { checkAndStartMFCFlow, drawPipes, playValve2Animation } from './pipes.js'; // Use the drawPipes you provided
 import { resetEverything } from './reset.js';
 import { createGasCylinder } from './components/gasCylinder.js';
 import { createConnectedGauges, createDigitalPressureGauge } from './components/gauges.js';
@@ -90,7 +90,7 @@ function drawCanvas() {
     // First valve
     createInteractiveValve(draw, "tankValve", multiValveX, multiValveY, [180, 0, 90], (angle) => {    
         state.setCurrentMultiValvePosition(angle); // Update global state
-        checkAndStartMFCFlow(draw)
+        checkAndStartMFCFlow(draw);
     });
 
     // Create MFC
@@ -118,6 +118,7 @@ function drawCanvas() {
                 break;
         }
         state.setFlowConfig(path);
+        playValve2Animation(draw);
     });
     // Create Outlet Valve - after Bed
     createInteractiveValve(draw, "outletValve", adsorptionOutletValveX, adsorptionOutletValveY, [0], undefined, true); // true = isThreeValve
