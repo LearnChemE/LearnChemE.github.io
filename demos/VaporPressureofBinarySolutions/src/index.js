@@ -3,7 +3,7 @@ import { addOptionToDragAndZoom } from './js/zoom.js';
 import * as config from './js/config.js';
 import { buttonAction } from './js/hamburger.js';
 import { SVG } from '@svgdotjs/svg.js';
-import {drawFigure, reset} from './js/main.js';
+import { drawFigure } from './js/main.js';
 
 let windowWidth = window.innerWidth;
 let windowHeight = windowWidth * config.canvasHeight / config.canvasWidth;
@@ -22,16 +22,6 @@ window.addEventListener('resize', function() {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Hook up the reset button to clear and redraw the SVG figure
-  const resetBtn = document.getElementById('reset-button');
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      reset(draw); 
-      drawCanvas();          // clear any existing elements
-      addOptionToDragAndZoom(draw); // re‑enable pan/zoom on the fresh canvas
-    });
-  }
-
   const directionsBtn = document.getElementById('directions');
   if (directionsBtn) {
     directionsBtn.addEventListener('click', () => {

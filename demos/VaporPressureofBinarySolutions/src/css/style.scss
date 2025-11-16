@@ -153,6 +153,18 @@ body {
   font-weight: 400;
 }
 
+.slider-group--pa label,
+.slider-group--pa .math-label,
+.slider-value--pa {
+  color: #4e88ff;
+}
+
+.slider-group--pb label,
+.slider-group--pb .math-label,
+.slider-value--pb {
+  color: #27a659;
+}
+
 .slider-checkbox {
   display: flex;
   align-items: center;

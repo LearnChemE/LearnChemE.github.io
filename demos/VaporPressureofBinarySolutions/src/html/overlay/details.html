@@ -9,41 +9,17 @@
         </div>
         
         <div class="modal-body">
-          <p>
-            An ideal solution of two liquids A and B obeys Raoult's law, which states that the partial vapor
-            pressure of each component is proportional to its mole fraction:
-            <em>P<sub>A</sub> = x<sub>A</sub> P<sub>A</sub><sup>sat</sup></em> and
-            <em>P<sub>B</sub> = x<sub>B</sub> P<sub>B</sub><sup>sat</sup></em>, where
-            P<sub>A</sub><sup>sat</sup> and P<sub>B</sub><sup>sat</sup> are the saturation pressures of the pure
-            components at a given temperature. The total vapor pressure above the solution is
-            <em>P = P<sub>A</sub> + P<sub>B</sub> = P<sub>A</sub><sup>sat</sup>(1 - x<sub>B</sub>) + P<sub>B</sub><sup>sat</sup>x<sub>B</sub></em>,
-            assuming Dalton's law. Ideal solutions are convenient reference systems; good approximations include
-            mixtures such as benzene/toluene or carbon tetrachloride/silicon tetrachloride where the molecules have
-            similar size and intermolecular forces.
-          </p>
-          <p>
-            Most real solutions deviate from Raoult's law. A positive deviation occurs when
-            <em>P<sub>A</sub> &gt; x<sub>A</sub>P<sub>A</sub><sup>sat</sup></em> and
-            <em>P<sub>B</sub> &gt; x<sub>B</sub>P<sub>B</sub><sup>sat</sup></em>; this implies that attractions between like molecules
-            are stronger than those between unlike molecules. A negative deviation has
-            <em>P<sub>A</sub> &lt; x<sub>A</sub>P<sub>A</sub><sup>sat</sup></em> and
-            <em>P<sub>B</sub> &lt; x<sub>B</sub>P<sub>B</sub><sup>sat</sup></em>, signaling stronger interactions between unlike
-            molecules. The colored solid curves in this simulation are qualitative sketches of the real behavior,
-            while the dashed curves show the ideal limits predicted by Raoult's law.
-          </p>
-          <p>
-            Even for non-ideal solutions, Raoult's law is approached as x<sub>A</sub> or x<sub>B</sub> → 1. Dilute
-            solutions obey Henry's law: <em>P<sub>A</sub> ≈ K<sub>A</sub> x<sub>A</sub></em> for x<sub>A</sub> → 0 and
-            <em>P<sub>B</sub> ≈ K<sub>B</sub> x<sub>B</sub></em> for x<sub>B</sub> → 0. Checking “Show Henry's law” displays the
-            corresponding dashed lines.
-          </p>
-          <p>
-            Use the sliders to change P<sub>A</sub><sup>sat</sup>, P<sub>B</sub><sup>sat</sup>, and the deviation from ideality.
-            Move the mouse over any line to see its (x<sub>B</sub>, P) value and identify whether it represents the real,
-            ideal, or Henry's-law behavior.
-          </p>
+          <p>Liquids A and B behave ideally and obey Raoult's law of partial pressures:</p>
+          <p><em>P = P<sub>A</sub> + P<sub>B</sub>,</em></p>
+          <p><em>P<sub>A</sub> = x<sub>A</sub>P<sub>A</sub><sup>sat</sup>,</em></p>
+          <p><em>P<sub>B</sub> = x<sub>B</sub>P<sub>B</sub><sup>sat</sup>,</em></p>
+          <p>where <em>P = x<sub>A</sub>P<sub>A</sub><sup>sat</sup> + x<sub>B</sub>P<sub>B</sub><sup>sat</sup></em> is the total pressure, <em>P<sub>i</sub></em> is the partial pressure of component <em>i = (A, B)</em>, <em>P<sub>i</sub><sup>sat</sup></em> is the vapor pressure of the pure component at 25&nbsp;°C, <em>x<sub>i</sub></em> is the mole fraction of the pure component, and <em>x<sub>A</sub> + x<sub>B</sub> = 1</em>.</p>
+          <p>Henry's law gives the partial pressures:</p>
+          <p><em>P<sub>A</sub> = x<sub>A</sub>K<sub>A</sub>,</em></p>
+          <p><em>P<sub>B</sub> = x<sub>B</sub>K<sub>B</sub>,</em></p>
+          <p>where <em>K<sub>i</sub></em> is the Henry's law constant for component <em>i</em>.</p>
+          <p>Use the sliders to change <em>P<sub>A</sub><sup>sat</sup></em>, <em>P<sub>B</sub><sup>sat</sup></em>, and the deviation from ideality. Move the mouse over a curve to see whether it represents the real, ideal, or Henry's law behavior.</p>
         </div>
-
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>

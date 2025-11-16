@@ -46,28 +46,24 @@
         <button id="details" class="btn btn-sm btn-primary w-100" style="max-width:100px;">Details</button>
         <button id="about" class="btn btn-sm btn-primary w-100" style="max-width:100px;">About</button>
         <!-- <button id="worksheet" class="btn btn-sm btn-primary w-100" style="max-width:100px;">Worksheet</button> -->
-        <button id="reset-button" class="btn btn-sm btn-danger w-100" style="max-width:100px;">
-          Reset
-        </button>
       </div>
 
       <div id="control-bar" class="control-bar controls-container slider-controls" data-no-pan="true">
-        <div class="slider-group slider-container">
+        <div class="slider-group slider-container slider-group--pa">
           <label for="paSatSlider">
-            <span class="math-label"><em>p</em><sub>A</sub><sup>sat</sup></span>
-            (torr)
+            <span class="math-label"><em>P</em><sub>A</sub><sup>sat</sup></span> (torr)
           </label>
           <input type="range" id="paSatSlider" min="50" max="600" step="1" value="250" />
-          <span id="paSatValue">250</span>
+          <span id="paSatValue" class="slider-value slider-value--pa">250</span>
         </div>
 
-        <div class="slider-group slider-container">
+        <div class="slider-group slider-container slider-group--pb">
           <label for="pbSatSlider">
-            <span class="math-label"><em>p</em><sub>B</sub><sup>sat</sup></span>
+            <span class="math-label"><em>P</em><sub>B</sub><sup>sat</sup></span>
             (torr)
           </label>
           <input type="range" id="pbSatSlider" min="50" max="600" step="1" value="150" />
-          <span id="pbSatValue">150</span>
+          <span id="pbSatValue" class="slider-value slider-value--pb">150</span>
         </div>
 
         <div class="slider-group slider-container slider-group--gamma">

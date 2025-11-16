@@ -1,6 +1,6 @@
 import * as config from './config.js';
 
-const padding = { top: 60, right: 90, bottom: 90, left: 110 };
+const padding = { top: 80, right: 30, bottom: 80, left: 150 };
 const defaults = { paSat: 250, pbSat: 150, gamma: 0, showHenry: false };
 const plotColors = {
   idealA: '#9cc3ff',
@@ -9,12 +9,26 @@ const plotColors = {
   actualA: '#4e88ff',
   actualB: '#27a659',
   actualTotal: '#111111',
-  henry: '#cf2b2b'
+  henryB: '#cf2b2b',
+  henryA: '#ff8c8c'
+};
+const labelSpecs = {
+  P: { base: 'P', italic: true },
+  PA: { base: 'P', sub: 'A', italic: true },
+  PB: { base: 'P', sub: 'B', italic: true },
+  'PA(ideal)': { base: 'P', sub: 'A', suffix: ' (ideal)', italic: true },
+  'PB(ideal)': { base: 'P', sub: 'B', suffix: ' (ideal)', italic: true },
+  'P(ideal)': { base: 'P', suffix: ' (ideal)', italic: true },
+  "PB(Henry's law)": { base: 'P', sub: 'B', suffix: " (Henry's law)", italic: true },
+  "PA(Henry's law)": { base: 'P', sub: 'A', suffix: " (Henry's law)", italic: true },
+  PAsat: { base: 'P', sub: 'A', suffix: 'sat', italic: true },
+  PBsat: { base: 'P', sub: 'B', suffix: 'sat', italic: true }
 };
 
 let drawRef;
 let axisLayer;
 let plotLayer;
+let labelLayer;
 let hoverLayer;
 let hoverMarker;
 let tooltipEl;
@@ -28,6 +42,7 @@ export function drawFigure(svg) {
   drawRef = svg;
   axisLayer = svg.group().id('axis-layer');
   plotLayer = svg.group().id('plot-layer');
+  labelLayer = svg.group().id('label-layer');
   hoverLayer = svg.group().id('hover-layer');
   hoverMarker = hoverLayer.circle(10)
     .fill('#fff')
@@ -103,10 +118,11 @@ function renderPlot() {
 
   axisLayer.clear();
   plotLayer.clear();
+  if (labelLayer) labelLayer.clear();
   drawAxes(chartArea, scales, axisMax, tickStep);
   drawCurves(params, scales);
   drawHenryCurves(params, scales);
-  drawSaturationMarkers(params, scales, chartArea);
+  drawCurveAnnotations(params, scales, chartArea);
   if (hoverLayer) hoverLayer.front();
   hideTooltip();
 }
@@ -140,12 +156,12 @@ function computeCurveMaximum(params) {
 
   if (params.showHenry) {
     curves.push(
-      { fn: (x) => henryA(params, x), start: 0, end: 0.3 },
-      { fn: (x) => henryB(params, x), start: 0.7, end: 1 }
+      { fn: (x) => henryB(params, x), start: 0, end: 0.3 },
+      { fn: (x) => henryA(params, x), start: 0.7, end: 1 }
     );
   }
 
-  let maxVal = Math.max(params.paSat, params.pbSat);
+  let maxVal = 0;
   curves.forEach(({ fn, start = 0, end = 1, steps = 250 }) => {
     const val = sampleMax(fn, start, end, steps);
     if (Number.isFinite(val)) maxVal = Math.max(maxVal, val);
@@ -176,11 +192,16 @@ function niceNumber(value) {
 function drawAxes(area, scales, axisMax, tickStep) {
   axisLayer.rect(area.width, area.height)
     .fill('none')
-    .stroke({ color: '#000', width: 1 })
+    .stroke({ color: '#666', width: 1 })
     .move(area.x, area.y);
+  axisLayer.line(area.x, area.y, area.x, area.y + area.height)
+    .stroke({ color: '#000', width: 2 });
+  axisLayer.line(area.x, area.y + area.height, area.x + area.width, area.y + area.height)
+    .stroke({ color: '#000', width: 2 });
 
   // X-axis ticks
   const moleTicks = [0, 0.2, 0.4, 0.6, 0.8, 1];
+  const axisNumberFont = 19;
   moleTicks.forEach((value) => {
     const x = scales.x(value);
     axisLayer.line(x, area.y + area.height, x, area.y + area.height + 8)
@@ -191,9 +212,8 @@ function drawAxes(area, scales, axisMax, tickStep) {
         .attr({ 'stroke-dasharray': '4,8' });
     }
     const label = axisLayer.text(formatFraction(value))
-      .font({ size: 16, family: 'Helvetica, Arial, sans-serif', anchor: 'middle' })
-      .move(x, area.y + area.height + 12);
-    label.dy(8);
+      .font({ size: axisNumberFont, family: 'Helvetica, Arial, sans-serif', anchor: 'middle' });
+    label.center(x, area.y + area.height + 26);
   });
 
   // Y-axis ticks
@@ -207,8 +227,8 @@ function drawAxes(area, scales, axisMax, tickStep) {
     const y = scales.y(value);
     axisLayer.line(area.x - 8, y, area.x, y).stroke({ color: '#000', width: 1 });
     axisLayer.text(value.toFixed(0))
-      .font({ size: 16, family: 'Helvetica, Arial, sans-serif', anchor: 'end' })
-      .move(area.x - 36, y - 10);
+      .font({ size: axisNumberFont, family: 'Helvetica, Arial, sans-serif', anchor: 'end' })
+      .center(area.x - 28, y);
     axisLayer.line(area.x, y, area.x + area.width, y)
       .stroke({ color: '#e0e0e0', width: 1 })
       .attr({ 'stroke-dasharray': '6,6' });
@@ -218,19 +238,17 @@ function drawAxes(area, scales, axisMax, tickStep) {
 }
 
 function drawAxisLabels(area) {
-  const labelFont = { size: 18, family: 'Helvetica, Arial, sans-serif' };
+  const labelFont = { size: 22, family: 'Helvetica, Arial, sans-serif' };
   const xLabel = axisLayer.text((add) => {
     add.tspan('mole fraction ');
     add.tspan('x').font({ style: 'italic' });
     add.tspan('B').font({ size: 12 }).dy(6);
   }).font({ ...labelFont, anchor: 'middle' });
   const xPos = area.x + area.width / 2;
-  xLabel.center(xPos, area.y + area.height + 45);
+  xLabel.center(xPos, area.y + area.height + 60);
 
   const yLabel = axisLayer.text((add) => {
-    add.tspan('vapor pressure ');
-    add.tspan('p').font({ style: 'italic' });
-    add.tspan(' (torr)');
+    add.tspan('vapor pressure (torr)');
   }).font({ ...labelFont, anchor: 'middle' });
   yLabel.center(area.x - 70, area.y + area.height / 2);
   const labelBox = yLabel.bbox();
@@ -238,30 +256,47 @@ function drawAxisLabels(area) {
 }
 
 function drawCurves(params, scales) {
-  const curves = [
-    { fn: (x) => paIdeal(params, x), style: { color: plotColors.idealA, dash: '8,8', width: 2 } },
-    { fn: (x) => pbIdeal(params, x), style: { color: plotColors.idealB, dash: '8,8', width: 2 } },
-    { fn: (x) => paIdeal(params, x) + pbIdeal(params, x), style: { color: plotColors.idealTotal, dash: '6,6', width: 2.5 } },
-    { fn: (x) => paActual(params, x), style: { color: plotColors.actualA, width: 3 } },
-    { fn: (x) => pbActual(params, x), style: { color: plotColors.actualB, width: 3 } },
-    { fn: (x) => paActual(params, x) + pbActual(params, x), style: { color: plotColors.actualTotal, width: 3.2 } }
-  ];
+  const showIdeal = hasDeviation(params);
+  const curves = [];
+  if (showIdeal) {
+    curves.push(
+      { fn: (x) => paIdeal(params, x), style: { color: plotColors.actualA, dash: '8,8', width: 1.5, opacity: 1 } },
+      { fn: (x) => pbIdeal(params, x), style: { color: plotColors.actualB, dash: '8,8', width: 1.5, opacity: 1 } },
+      {
+        fn: (x) => paIdeal(params, x) + pbIdeal(params, x),
+        style: { color: plotColors.idealTotal, dash: '8,8', width: 1.5, opacity: 1 }
+      }
+    );
+  }
+  curves.push(
+    { fn: (x) => paActual(params, x), style: { color: plotColors.actualA, width: 1.5 } },
+    { fn: (x) => pbActual(params, x), style: { color: plotColors.actualB, width: 1.5 } },
+    { fn: (x) => paActual(params, x) + pbActual(params, x), style: { color: plotColors.actualTotal, width: 1.5 } }
+  );
 
   curves.forEach(({ fn, style }) => drawCurve(fn, scales, style));
 }
 
 function drawHenryCurves(params, scales) {
   if (!params.showHenry) return;
-  drawCurve((x) => henryA(params, x), scales, {
-    color: plotColors.henry,
-    width: 2.5,
-    dash: '6,6'
-  }, 0, 0.3);
   drawCurve((x) => henryB(params, x), scales, {
-    color: plotColors.henry,
-    width: 2.5,
-    dash: '6,6'
+    color: plotColors.henryB,
+    width: 1.5,
+    dash: '6,6',
+    opacity: 1
+  }, 0, 0.3);
+  drawCurve((x) => henryA(params, x), scales, {
+    color: plotColors.henryA,
+    width: 1.5,
+    dash: '6,6',
+    opacity: 1
   }, 0.7, 1);
+}
+
+function drawCurveAnnotations(params, scales, area) {
+  if (!labelLayer) return;
+  labelLayer.clear();
+  drawSaturationAxisLabels(params, scales, area);
 }
 
 function drawCurve(fn, scales, style, start = 0, end = 1, steps = 250) {
@@ -276,43 +311,9 @@ function drawCurve(fn, scales, style, start = 0, end = 1, steps = 250) {
   const pathData = points.map((point, idx) => `${idx === 0 ? 'M' : 'L'}${point[0]},${point[1]}`).join(' ');
   const path = plotLayer.path(pathData)
     .fill('none')
-    .stroke({ color: style.color, width: style.width });
+    .stroke({ color: style.color, width: style.width })
+    .opacity(style.opacity ?? 1);
   if (style.dash) path.attr({ 'stroke-dasharray': style.dash });
-}
-
-function drawSaturationMarkers(params, scales, area) {
-  const paPoint = { x: 0, y: params.paSat };
-  const pbPoint = { x: 1, y: params.pbSat };
-
-  [ { point: paPoint, color: plotColors.actualA }, { point: pbPoint, color: plotColors.actualB } ].forEach(({ point, color }) => {
-    const circle = plotLayer.circle(12)
-      .center(scales.x(point.x), scales.y(point.y))
-      .fill(color)
-      .stroke({ color: '#fff', width: 2 });
-    circle.front();
-  });
-
-  const leftText = plotLayer.text((add) => {
-    add.tspan('p').font({ style: 'italic' });
-    add.tspan('A').font({ size: 14 }).dy(6);
-    add.tspan('sat').font({ size: 14 }).dy(-10);
-  }).font({ size: 16, family: 'Helvetica, Arial, sans-serif', anchor: 'start' });
-  const leftY = clampLabelY(scales.y(paPoint.y), area);
-  leftText.move(scales.x(0) + 12, leftY + 16);
-
-  const rightText = plotLayer.text((add) => {
-    add.tspan('p').font({ style: 'italic' });
-    add.tspan('B').font({ size: 14 }).dy(6);
-    add.tspan('sat').font({ size: 14 }).dy(-10);
-  }).font({ size: 16, family: 'Helvetica, Arial, sans-serif', anchor: 'end' });
-  const rightY = clampLabelY(scales.y(pbPoint.y), area);
-  rightText.move(scales.x(1) - 42, rightY + 36);
-}
-
-function clampLabelY(y, area) {
-  const topLimit = area.y + 10;
-  const bottomLimit = area.y + area.height - 30;
-  return Math.min(bottomLimit, Math.max(topLimit, y - 24));
 }
 
 function initTooltip() {
@@ -389,19 +390,24 @@ function findClosestCurve(params, xFraction, svgPoint, scales) {
   const pbIdealVal = pbIdeal(params, x);
 
   const candidates = [
-    { label: 'pA (actual)', color: plotColors.actualA, value: paActualVal },
-    { label: 'pB (actual)', color: plotColors.actualB, value: pbActualVal },
-    { label: 'total (actual)', color: plotColors.actualTotal, value: paActualVal + pbActualVal },
-    { label: 'pA (ideal)', color: plotColors.idealA, value: paIdealVal },
-    { label: 'pB (ideal)', color: plotColors.idealB, value: pbIdealVal },
-    { label: 'total (ideal)', color: plotColors.idealTotal, value: paIdealVal + pbIdealVal }
+    { labelKey: 'PA', color: plotColors.actualA, value: paActualVal },
+    { labelKey: 'PB', color: plotColors.actualB, value: pbActualVal },
+    { labelKey: 'P', color: plotColors.actualTotal, value: paActualVal + pbActualVal }
   ];
+  const showIdeal = hasDeviation(params);
+  if (showIdeal) {
+    candidates.push(
+      { labelKey: 'PA(ideal)', color: plotColors.actualA, value: paIdealVal },
+      { labelKey: 'PB(ideal)', color: plotColors.actualB, value: pbIdealVal },
+      { labelKey: 'P(ideal)', color: plotColors.idealTotal, value: paIdealVal + pbIdealVal }
+    );
+  }
 
   if (params.showHenry && x <= 0.3) {
-    candidates.push({ label: 'pA (Henry)', color: plotColors.henry, value: henryA(params, x) });
+    candidates.push({ labelKey: "PB(Henry's law)", color: plotColors.henryB, value: henryB(params, x) });
   }
   if (params.showHenry && x >= 0.7) {
-    candidates.push({ label: 'pB (Henry)', color: plotColors.henry, value: henryB(params, x) });
+    candidates.push({ labelKey: "PA(Henry's law)", color: plotColors.henryA, value: henryA(params, x) });
   }
 
   let closest = null;
@@ -427,7 +433,8 @@ function findClosestCurve(params, xFraction, svgPoint, scales) {
 
 function updateTooltip(point) {
   if (!tooltipEl) return;
-  tooltipEl.innerHTML = `${point.xValue.toFixed(2)}, ${point.yValue.toFixed(2)}`;
+  const labelHtml = formatLabelHTML(point.labelKey);
+  tooltipEl.innerHTML = labelHtml || '';
   tooltipEl.style.borderColor = point.color;
   tooltipEl.style.color = '#111';
   const clientCoords = svgToClientCoords(point.screenX, point.screenY);
@@ -484,11 +491,13 @@ function pbActual({ pbSat, gamma }, xRaw) {
 }
 
 function henryA({ paSat, gamma }, x) {
-  return Math.max(0, paSat * (gamma + 1) * x);
+  const slope = -paSat * (gamma + 1);
+  return Math.max(0, slope * (x - 1));
 }
 
 function henryB({ pbSat, gamma }, x) {
-  return Math.max(0, pbSat * (gamma + 1) * (1 - x));
+  const slope = pbSat * (gamma + 1);
+  return Math.max(0, slope * x);
 }
 
 function clampComposition(value) {
@@ -509,4 +518,90 @@ function sampleMax(fn, start, end, steps) {
 function formatFraction(value) {
   const isInt = Math.abs(value - Math.round(value)) < 1e-6;
   return isInt ? Math.round(value).toString() : value.toFixed(1);
+}
+
+function hasDeviation({ gamma }) {
+  return Math.abs(gamma) > 1e-4;
+}
+
+function computeTangentAngle(fn, x, scales, start = 0, end = 1) {
+  const delta = Math.min(0.02, Math.max(0.002, (end - start) / 20));
+  const x1 = clampWithinRange(x - delta, start, end);
+  const x2 = clampWithinRange(x + delta, start, end);
+  if (x2 <= x1) return 0;
+  const y1 = fn(x1);
+  const y2 = fn(x2);
+  if (!Number.isFinite(y1) || !Number.isFinite(y2)) return 0;
+  const p1 = { x: scales.x(x1), y: scales.y(y1) };
+  const p2 = { x: scales.x(x2), y: scales.y(y2) };
+  return (Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180) / Math.PI;
+}
+
+function clampWithinRange(value, min, max) {
+  if (Number.isNaN(value)) return min;
+  if (min > max) return min;
+  return Math.min(Math.max(value, min), max);
+}
+
+function clampCoord(value, min, max) {
+  if (!Number.isFinite(value)) return min;
+  return Math.min(Math.max(value, min), max);
+}
+
+function drawSaturationAxisLabels(params, scales, area) {
+  if (!labelLayer) return;
+  const fontBase = { size: 18, family: 'Helvetica, Arial, sans-serif' };
+  const paY = clampCoord(scales.y(params.paSat), area.y + 16, area.y + area.height - 16);
+  const paText = labelLayer.text((add) => renderSvgLabel(add, 'PAsat'))
+    .font({ ...fontBase, anchor: 'end' })
+    .fill(plotColors.actualA);
+  paText.center(area.x - 30, paY);
+
+  const pbY = clampCoord(scales.y(params.pbSat), area.y + 16, area.y + area.height - 16);
+  const pbText = labelLayer.text((add) => renderSvgLabel(add, 'PBsat'))
+    .font({ ...fontBase, anchor: 'start' })
+    .fill(plotColors.actualB);
+  pbText.center(area.x + area.width + 30, pbY);
+}
+
+function renderSvgLabel(add, labelKey) {
+  const spec = labelSpecs[labelKey];
+  if (!spec) {
+    add.tspan(labelKey ?? '');
+    return;
+  }
+  const base = add.tspan(spec.base ?? '');
+  if (spec.italic) base.font({ style: 'italic' });
+  if (spec.sub) {
+    add.tspan(spec.sub)
+      .font({ size: 12 })
+      .dy(6);
+    add.tspan('').dy(-6);
+  }
+  if (spec.suffix) {
+    add.tspan(spec.suffix);
+  }
+}
+
+function formatLabelHTML(labelKey) {
+  const spec = labelSpecs[labelKey];
+  if (!spec) return escapeHtml(labelKey ?? '');
+  const baseRaw = escapeHtml(spec.base ?? '');
+  const base = spec.italic ? `<span style="font-style:italic;">${baseRaw}</span>` : baseRaw;
+  const sub = spec.sub ? `<sub>${escapeHtml(spec.sub)}</sub>` : '';
+  const suffix = spec.suffix ? escapeHtml(spec.suffix) : '';
+  return `${base}${sub}${suffix}`;
+}
+
+function escapeHtml(text) {
+  return (text ?? '').replace(/[&<>"']/g, (char) => {
+    switch (char) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      case "'": return '&#39;';
+      default: return char;
+    }
+  });
 }
