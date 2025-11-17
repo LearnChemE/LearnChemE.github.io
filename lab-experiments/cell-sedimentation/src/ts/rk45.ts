@@ -42,6 +42,7 @@ export function rk45(
     safety = 0.9,
   } = opts;
 
+  // In progress: Use Dormand-Prince?
   // Ai in wikipedia page
   const c2 = 1 / 4,
     c3 = 3 / 8,
@@ -101,7 +102,6 @@ export function rk45(
     // Adapt timestep
     const scale = safety * Math.pow(1.0 / Math.max(err, 1e-10), 0.25);
     h = Math.min(dtMax, Math.max(dtMin, h * Math.min(4, Math.max(0.1, scale))));
-    if (h !== h) throw new Error("I have some strongly worded concerns about this h")
 
     if (h < dtMin && err > 1.0) {
       console.warn("Step size underflow — integration failed");

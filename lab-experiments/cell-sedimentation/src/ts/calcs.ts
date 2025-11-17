@@ -144,8 +144,8 @@ export function rhs_adv_diff(y: number[], dz: number) {
     // For diffusion term
     const inner_dif_r = new Array(CONC_ARRAY_SIZE);
     const inner_dif_w = new Array(CONC_ARRAY_SIZE);
-    inner_dif_r[0] = 0;
-    inner_dif_w[0] = 0;
+    inner_dif_r[0] = 5 * (cr[1] - cr[0]) / dz * (1 - cr[0] / cr_max)**10;
+    inner_dif_w[0] = 5 * (cw[1] - cw[0]) / dz * (1 - cw[0] / cw_max)**10;
     for (let i=1;i<CONC_ARRAY_SIZE-1;i++) {
         const dcri = (cr[i+1] - cr[i-1]) / 2 / dz;
         const dcwi = (cw[i+1] - cw[i-1]) / 2 / dz;
@@ -153,13 +153,13 @@ export function rhs_adv_diff(y: number[], dz: number) {
         inner_dif_w[i] = 5 * dcwi * (1 - cw[i] / cw_max)**10;
         if (inner_dif_r[i] !== inner_dif_r[i]) throw new Error(`inner_dif_r err: ${inner_dif_r}`)
     }
-    inner_dif_r[CONC_ARRAY_SIZE-1] = 0;
-    inner_dif_w[CONC_ARRAY_SIZE-1] = 0;
+    inner_dif_r[CONC_ARRAY_SIZE-1] = 5 * (cr[CONC_ARRAY_SIZE-1] - cr[CONC_ARRAY_SIZE-2]) / dz * (1 - cr[CONC_ARRAY_SIZE-1] / cr_max)**10;
+    inner_dif_w[CONC_ARRAY_SIZE-1] = 5 * (cw[CONC_ARRAY_SIZE-1] - cw[CONC_ARRAY_SIZE-2]) / dz * (1 - cw[CONC_ARRAY_SIZE-1] / cw_max)**10;
 
     const dif_r = grad(inner_dif_r, dz);
     const dif_w = grad(inner_dif_w, dz);
-    dif_r[CONC_ARRAY_SIZE-1] = 0;
-    dif_w[CONC_ARRAY_SIZE-1] = 0;
+    dif_r[0] = dif_r[CONC_ARRAY_SIZE-1] = 0;
+    dif_w[0] = dif_w[CONC_ARRAY_SIZE-1] = 0;
 
     // Results 
     const drdt = new Array(CONC_ARRAY_SIZE);
@@ -173,38 +173,6 @@ export function rhs_adv_diff(y: number[], dz: number) {
     dwdt[CONC_ARRAY_SIZE-1] = -adv_w[CONC_ARRAY_SIZE-1];
 
     return drdt.concat(dwdt);
-    // // Enforce BCs
-    // cr[0] = 0; cw[0] = 0;
-    // cr[CONC_ARRAY_SIZE - 1] = cr[CONC_ARRAY_SIZE - 2]; cw[CONC_ARRAY_SIZE - 1] = cw[CONC_ARRAY_SIZE - 2];
-
-    // // Determine velocity
-    // const vr: number[] = []; 
-    // const vw: number[] = [];
-    // cr.forEach((cri: number, i: number) => {
-    //     const { red, white } = particle_velocities(cri, cw[i]);
-    //     vr.push(red);
-    //     vw.push(white);
-    // });
-    // vr[0] = 0; vw[0] = 0 // Top is free surface
-    // vr[-1] = 0; vw[-1] = 0 // Bottom stops flow
-
-    // // Diffusion
-    // const dcr = grad(cr, dz);
-    // const dcw = grad(cw, dz);
-    // const dif_r = grad(cr.map((cri, i) => 5 * (1 - cri / cr_max)**10 * dcr[i]), dz);
-    // const dif_w = grad(cr.map((cwi, i) => 5 * (1 - cwi / cw_max)**10 * dcw[i]), dz);
-    // dif_r[0] = dif_r[CONC_ARRAY_SIZE - 1] = 0; // no flux
-    // dif_w[0] = dif_w[CONC_ARRAY_SIZE - 1] = 0; // no flux
-    // // Advection
-    // const adv_r = grad(cr.map((cri, i) => cri * vr[i]), dz);
-    // const adv_w = grad(cw.map((cwi, i) => cwi * vw[i]), dz);
-
-    // const drdt = dif_r.map((di, i) => di - adv_r[i]);
-    // const dwdt = dif_w.map((di, i) => di - adv_w[i]);
-    // drdt[0]  = 0; dwdt[0]  = 0 // Maintain free surface
-    // // drdt[-1] = drdt[-2]; dwdt[-1] = dwdt[-2] // 
-
-    // return drdt.concat(dwdt);
 }
 
 /**
@@ -216,7 +184,7 @@ export function rhs_adv_diff(y: number[], dz: number) {
  */
 export function movingAverageConvolve(y: number[], windowSize: number): number[] {
   if (windowSize < 1) throw new Error("windowSize must be at least 1");
-  if (windowSize === 1) return [...y];
+  if (windowSize === 1) return y;
 
   const padWidth = Math.floor(windowSize / 2);
   const n = y.length;
@@ -243,4 +211,80 @@ export function movingAverageConvolve(y: number[], windowSize: number): number[]
   }
 
   return smoothed;
+}
+
+/**
+ * Linearly interpolate points in x to find corresponding points in y using xp and fp
+ * @param x x coordinates of resulting points
+ * @param xp x coordinates to interpolate between
+ * @param fp values corresponding to original xp array
+ * @returns f values corresponding to each x
+ */
+export function interp(x: number | number[], xp: number[], fp: number[]) {
+    if (!Array.isArray(x)) x = [x];
+    const f = x.map(xi => {
+        let nx = xp.length;
+        // Make sure we stay in the bounds
+        if (xi < xp[0]) {
+            console.warn(`interp point ${xi} out of range for x array with min ${xp[0]}`);
+            return fp[0];
+        }
+
+        // Find the lo and hi indices
+        let lo=0, hi=1;
+        for (let j=0;j<nx;j++) {
+            if (xp[j] <= xi) lo = j;
+            else break;
+        }
+
+        // Interpolate results
+        if (lo === nx-1) {
+            console.warn(`interp point ${xi} out of range for x array with min ${xp[nx-1]}`);
+            return fp[nx-1];
+        }
+        hi = lo + 1;
+        const fi = fp[lo] + (fp[hi] - fp[lo]) * (xi - xp[lo]) / (xp[hi] - xp[lo]);
+        return fi;
+    });
+
+    return f;
+}
+
+/**
+ * 
+ * @param y 
+ * @param z 
+ * @param lo 
+ * @param hi 
+ * @returns 
+ */
+export function resize(y: number[], z: number[], lo: number) {
+    const cr = y.slice(0, CONC_ARRAY_SIZE);
+    const cw = y.slice(CONC_ARRAY_SIZE);
+
+    if (cr.length !== z.length || cw.length !== z.length) throw new Error(`y and z must have same length\ncr:${cr.length}\ncw:${cw.length}\nz:${z.length}`);
+    const nz = cr.length;
+    const z_hi = z[nz - 1];
+    if (z_hi !== 305) throw new Error("double check z my guy");
+
+    // Determine where to start the new coordinate axis
+    let min_idx: number | undefined = undefined;
+    let sum = 0;
+    for (let i=0;i<cr.length;i++) {
+        const ph = cr[i] + cw[i];
+        sum += ph;
+        if (sum < lo) min_idx = i;
+        else if (sum >= 2*lo) break;
+    }
+    if (min_idx === undefined) return { y, z };
+
+    // Determine the new range and construct the new z array
+    const lz = z_hi - z[min_idx];
+    const z_new = Array.from({ length: nz }, (_,i) => i / (nz-1) * lz + z[min_idx]);
+
+    // Interpolate to get the new f(z) points in the array.
+    const cr_new = interp(z_new, z, cr);
+    const cw_new = interp(z_new, z, cw);
+    
+    return { y: cr_new.concat(cw_new), z: z_new };
 }

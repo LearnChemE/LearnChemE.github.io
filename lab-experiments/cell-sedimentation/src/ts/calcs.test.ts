@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { plotArrs, plotFn } from '../setupTests';
-import { conc_r, conc_w, movingAverageConvolve, particle_velocities, phi_r, phi_w, rhs_adv_diff } from './calcs';
+import { conc_r, conc_w, movingAverageConvolve, particle_velocities, phi_r, phi_w, resize, rhs_adv_diff } from './calcs';
 import { rk45 } from './rk45';
+import * as fs from "fs";
 
 
 describe('calcs.ts function visualization', () => {
@@ -18,16 +19,89 @@ describe('calcs.ts function visualization', () => {
     //     await plotFn(cr, (cr) => particle_velocities(cr,cw).white);
     // });
 
+    it("tests the rhs function at initial conditions", async () => {
+        const pydata = new Promise<number[]>((resolve, reject) => {
+
+            fs.readFile("./test/pyRhs.csv", "utf8", (err, data: string) => {
+                if (err) {
+                    console.warn(err);
+                    reject();
+                }
+                resolve(data.split('\n').map(str => Number(str)));
+            });
+
+        });
+
+        const nz = 500;
+        const lz = 305;
+        const dz = lz / (nz-1);
+        const xr0 = .05;
+        const xw0 = .05;
+        const cr0 = Array.from({ length: nz }, () => conc_r(xr0));
+        const cw0 = Array.from({ length: nz }, () => conc_w(xw0));
+        const y0 = cr0.concat(cw0);
+        const rhs = rhs_adv_diff(y0, dz);
+        
+        const py = await pydata;
+        const res = rhs.map((ts, i) => ts - py[i]);
+        console.log(res)
+        const ssqe = res.reduce((sum, err) => sum + err ** 2);
+        console.log(ssqe)
+
+
+        let zs = Array.from({ length: nz*2 }, (_,i) => i);
+        await plotArrs(zs, [res], {}, { title: { text: "Residuals of RoC for initial function call" }});
+        await plotArrs(zs, [rhs, py], {}, { title: { text: "RoC for initial function call" }});
+    }, 10000); 
+
+    it("tests the rhs function with a sinusoidal concentration profile", async () => {
+        const pydata = new Promise<number[]>((resolve, reject) => {
+
+            fs.readFile("./test/pySinRhs.csv", "utf8", (err, data: string) => {
+                if (err) {
+                    console.warn(err);
+                    reject();
+                }
+                resolve(data.split('\n').map(str => Number(str)));
+            });
+
+        });
+
+        const nz = 500;
+        const lz = 305;
+        const dz = lz / (nz-1);
+        const xr0 = .05;
+        const xw0 = .05;
+        const cr0 = Array.from({ length: nz }, (_,i) => (.5 + .5 * Math.sin(i * Math.PI / 90)) * conc_r(xr0));
+        const cw0 = Array.from({ length: nz }, (_,i) => (.5 + .5 * Math.cos(i * Math.PI / 90)) * conc_w(xw0));
+        const y0 = cr0.concat(cw0);
+        const rhs = rhs_adv_diff(y0, dz);
+        
+        const py = await pydata;
+        const res = rhs.map((ts, i) => ts - py[i]);
+        console.log(res)
+        const ssqe = res.reduce((sum, err) => sum + err ** 2);
+        console.log(ssqe) 
+
+
+        let zs = Array.from({ length: nz*2 }, (_,i) => i);
+        await plotArrs(zs, [rhs, py], {}, { title: { text: "RoC for sinusoidal concs" } });
+        await plotArrs(zs, [res], {}, { title: { text: "Residuals for sinusoidal RoCs" }});
+    }, 10000); 
+
     it("does a simple test run of the rhs function with the rk45 solver", async () => {
         console.log("starting test");
         const nz = 500;
         const lz = 305; // mm
-        const dz = lz / nz;
+        const dz = lz / (nz - 1);
         const xr0 = .05, xw0 = .05;
         const cr0: number[] = new Array(nz).fill(conc_r(xr0));
         const cw0: number[] = new Array(nz).fill(conc_w(xw0));
         cr0[0] = cw0[0] = 0;
         const smooth_fsize = 13;
+
+        // Make z array
+        let zs = Array.from({ length: nz }, (_,i) => i / (nz-1) * lz);
 
         // rhs wrapper
         const rhs = (_: number, y: number[]) => {
@@ -37,15 +111,13 @@ describe('calcs.ts function visualization', () => {
         let y_cur = cr0.concat(cw0);
         const crs = [Array.from({ length: nz }, () => xr0)];
         const cws = [Array.from({ length: nz }, () => xw0)];
-        const dt = 1, tmax = 2;
+        const dt = 20, tmax = 200;
 
         console.log("[Test] beginning solve loop")
         // Solve
         for (let t=0;t<tmax;t+=dt) {
             console.log("[Test] starting overall solve for t=", t)
-            const y_cpy = y_cur.slice()
             const sol = rk45(rhs, y_cur, t, t+dt);
-            expect(y_cpy === y_cur)
 
             // Extract solution
             y_cur = sol.y.at(-1)!;
@@ -54,8 +126,12 @@ describe('calcs.ts function visualization', () => {
 
             // Smooth
             cr_cur = movingAverageConvolve(cr_cur, smooth_fsize);
-            cw_cur = movingAverageConvolve(cr_cur, smooth_fsize);
+            cw_cur = movingAverageConvolve(cw_cur, smooth_fsize);
             y_cur = cr_cur.concat(cw_cur);
+            console.log(y_cur)
+            const resized = resize(y_cur, zs, .05);
+            y_cur = resized.y;
+            zs = resized.z;
 
             // Update results
             crs.push(cr_cur.map(cr => phi_r(cr)));
@@ -63,9 +139,9 @@ describe('calcs.ts function visualization', () => {
             ts.push(t+dt);
         }
 
-        // Make z array
-        const zs = Array.from({ length: nz }, (_,i) => i / nz * lz);
-        plotArrs(zs, crs);
-        await plotArrs(zs, cws);
+        plotArrs(zs, crs, {}, { title: { text: "Concentration of red particles" }});
+        await plotArrs(zs, cws, {}, { title: { text: "Concentration of white particles" }});
+        const tot = crs[crs.length-1].map((cr, i) => cr + cws[cws.length-1][i])
+        await plotArrs(zs, [tot], {}, { title: { text: "Total concentration at final time" }})
     }, 100000);
 });

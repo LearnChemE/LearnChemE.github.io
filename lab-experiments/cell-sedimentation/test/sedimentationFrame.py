@@ -17,7 +17,7 @@ xw0 = 0.05
 xr0 = 0.05
 cr0 = vel.concentration(xr0, vel.d_r)
 cw0 = vel.concentration(xw0, vel.d_w)
-print("settling vel", vel.particle_velocities(cr0, cw0))
+# print("settling vel", vel.particle_velocities(cr0, cw0))
 
 def grad(y, dx):
     left = np.roll(y, 1)
@@ -45,6 +45,7 @@ def rhs(y, dz):
 
     # Diffusion
     dif_r = 5e0 * grad((1 - cr / cr_max)**10 * grad(cr, dz), dz)
+    # print("dif_r:", dif_r)
     dif_w = 5e0 * grad((1 - cw / cw_max)**10 * grad(cw, dz), dz)
     dif_r[0] = dif_r[-1] = 0 # no flux
     dif_w[0] = dif_w[-1] = 0 # no flux
@@ -137,7 +138,7 @@ def smooth(y, window_size):
 if __name__ == "__main__":
 
     # ivp args
-    t_max = 20
+    t_max = 200
     dt = 20 # s
     tspan = (0, t_max)
     # t_eval = np.linspace(0,t_max,7)
@@ -174,7 +175,7 @@ if __name__ == "__main__":
         y_last = sol.y[:,-1]
 
         # Smooth the results
-        fsize = 1#3
+        fsize = 13
         cr_sm = smooth(y_last[:nz], fsize); cw_sm = smooth(y_last[nz:], fsize)
         # cr_sm = diffusion_smooth(y_last[:nz]); cw_sm = diffusion_smooth(y_last[nz:])
         y_last = np.concatenate((cr_sm, cw_sm))
@@ -187,7 +188,8 @@ if __name__ == "__main__":
         zs.append(z_cur)
 
         # Iterate time and resize y, z
-        y_cur, z_cur = resize(y_last, z_cur, -1)#0.005)
+        y_cur, z_cur = resize(y_last, z_cur, 0.005)
+        # y_cur = y_last
         # y_cur, z_cur = y_last, z_cur
         print(f"cur t: {t_cur:.2f} min z: {z_cur[0]:.1f}")
 

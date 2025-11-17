@@ -1,4 +1,4 @@
-import { plot, type Plot, type PlotData } from "nodeplotlib"
+import { plot, type Layout, type Plot, type PlotData } from "nodeplotlib"
 
 export async function plotFn(xRange: number[], fn: (x: number) => number, options?: Partial<PlotData>) {
     const y = xRange.map(fn);
@@ -6,7 +6,7 @@ export async function plotFn(xRange: number[], fn: (x: number) => number, option
     await new Promise((resolve) => setTimeout(resolve, 1000)); // Arbitrary timeout to give client time to load
 }
 
-export async function plotArrs(xRange: number[], yRanges: number[][], options?: Partial<Plot>) {
+export async function plotArrs(xRange: number[], yRanges: number[][], options?: Partial<Plot>, layout?: Layout) {
     const traces = yRanges.map((yRange: number[]): Plot => {
         return { 
             type: 'scatter',
@@ -15,6 +15,6 @@ export async function plotArrs(xRange: number[], yRanges: number[][], options?: 
             ...options
         }
     });
-    plot(traces);
+    plot(traces, layout);
     await new Promise((resolve) => setTimeout(resolve, 3000)); // Arbitrary timeout to give client time to load
 }

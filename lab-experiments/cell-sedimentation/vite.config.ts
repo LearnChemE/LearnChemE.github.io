@@ -10,7 +10,7 @@ export default defineConfig({
     sourcemap: true
   },
   test: {
-    environment: 'jsdom',
+    environment: 'node',
     globals: true,
     setupFiles: './src/setupTests.ts',
     reporters: ['dot']
