@@ -1,4 +1,5 @@
-import { CONC_ARRAY_SIZE } from "./Vials"
+import type { Profile } from "../types/globals"
+import { rk45 } from "./rk45"
 
 const rho_f = 0.868 // Fluid density (g/cc)
 const g = 981 // Gravitational acceleration (cm/s^2)
@@ -8,6 +9,9 @@ const rho_r = 1.08 // Red cell density (g/cc)
 const d_r = 275e-4 // Red cell diameter (cm)
 const rho_w = 1.00 // White cell density (g/cc)
 const d_w = 550e-4 // White cell diameter (cm)
+
+export const TUBE_LENGTH = 305; // mm
+export const CONC_ARRAY_SIZE = 500; // points in finite element mesh
 
 /**
  * Convert volume fraction to number concentration (#/[l]^3) for particles of diameter dp units [l].
@@ -287,4 +291,61 @@ export function resize(y: number[], z: number[], lo: number) {
     const cw_new = interp(z_new, z, cw);
     
     return { y: cr_new.concat(cw_new), z: z_new };
+}
+
+
+const nz = CONC_ARRAY_SIZE;
+const smooth_fsize = 13;
+const dt = 20;
+export class ProfileSolver {
+    private current: Profile;
+    private top = 0;
+
+    constructor(xr0: number, xw0: number) {
+        // Prepare the initial profile
+        const cr0: number[] = new Array(nz).fill(conc_r(xr0));
+        const cw0: number[] = new Array(nz).fill(conc_w(xw0));
+        cr0[0] = cw0[0] = 0; // Free surface
+        this.current = cr0.concat(cw0);
+
+        
+    }
+
+    // Spatial helpers
+    private lz = () => { return TUBE_LENGTH - this.top; }
+    private dz = () => { return this.lz() / (nz - 1); }
+    private create_z_arr = () => {
+        const dz = this.dz();
+        return Array.from({ length: nz }, (_,i) => i * dz);
+    }
+
+    // Rhs wrapper
+    private rhs = (_: number, y: number[]) => {
+        return rhs_adv_diff(y, this.dz());
+    };
+
+    /**
+     * Calculate one 20 second step for the profile
+     * @returns Results at time t + dt
+     */
+    public calculate_step = () => {
+        const sol = rk45(this.rhs, this.current, 0, dt);
+
+        // Extract solution
+        let y_cur: Profile = sol.y.at(-1)!;
+        let cr_cur = y_cur.slice(0,nz);
+        let cw_cur = y_cur.slice(nz);
+
+        // Smooth
+        cr_cur = movingAverageConvolve(cr_cur, smooth_fsize);
+        cw_cur = movingAverageConvolve(cw_cur, smooth_fsize);
+        y_cur = cr_cur.concat(cw_cur);
+
+        // Resize
+        const resized = resize(y_cur, this.create_z_arr(), .05);
+        this.current = resized.y;
+        this.top = resized.z[0];
+
+        return this.current.concat([this.top]);
+    }
 }

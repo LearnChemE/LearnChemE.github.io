@@ -2,9 +2,7 @@ import * as THREE from 'three';
 import { animate } from './helpers';
 import { conc_r, conc_w } from './calcs';
 
-export const TUBE_LENGTH = 305; // mm
-export const CONC_ARRAY_SIZE = 500; // points in finite element mesh
-// const TUBE_CROSS_AREA = Math.PI * 3.5 ** 2; // mm^2
+const SOLVER_TIMESTEP = 20; // s
 
 type CellComposition = [red: number, white: number];
 const Starting_Vial_Concentration: Array<CellComposition> = [
@@ -15,32 +13,11 @@ const Starting_Vial_Concentration: Array<CellComposition> = [
     [0.60, 0.05],
 ];
 
-/**
- * Represents a vial containing concentrations of red and white cells.
- * 
- * This class manages the concentration arrays for red and white cells,
- * provides methods to evolve their state over time, and synchronizes
- * the data with a THREE.js uniform for rendering purposes.
- *
- * @remarks
- * - The concentrations are stored as `Float32Array` of fixed size.
- * - The `evolve` method is intended to update concentrations over time.
- * - The `setUniform` and `updateUniform` methods allow integration with THREE.js shaders.
- *
- * @example
- * ```typescript
- * const vial = new Vial(1.0, 0.5);
- * vial.evolve(0.1);
- * vial.setUniform(someUniform);
- * vial.updateUniform();
- * vial.reset(1.0, 0.5);
- * ```
- */
 export class Vial {
+    // For assembling uniform
     private redConcentration: number[];
     private whiteConcentration: number[];
-
-    
+    private top: number;
 
     private uniform: THREE.ShaderMaterial["uniforms"] | null = null;
 
@@ -52,6 +29,7 @@ export class Vial {
         // Initialize arrays
         this.redConcentration = new Array(TUBE_LENGTH).fill(rConc);
         this.whiteConcentration = new Array(TUBE_LENGTH).fill(wConc);
+        this.top = 0;
     }
 
     public evolve = (dt: number, t: number) => {
