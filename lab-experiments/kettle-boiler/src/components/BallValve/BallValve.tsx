@@ -10,7 +10,7 @@ export const BallValve: Component<BallValveProps> = ({ onToggle }) => {
   const [isOpen, setIsOpen] = createSignal(false);
 
   // Rotation transform
-  const rotation = () => `rotate(${isOpen() ? -90 : 0} 75 278)`;
+  const rotation = () => `translate(0 0) rotate(${isOpen() ? -90 : 0} 75 278)`;
 
   // Toggle function
   const toggleValve = () => {
