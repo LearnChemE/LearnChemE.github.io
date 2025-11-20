@@ -20,8 +20,8 @@ function displayPressures() {
 }
 
 function displayFlowRates() {
-  const inletOffsetY = map(state.inletVolumetricFlowRate, 0, 50, 0, -50);
-  const outletOffsetY = map(state.outletVolumetricFlowRate, 0, 100, 0, -50);
+  const inletOffsetY = map(state.inletVolumetricFlowRate, 0, 50, 0, -50) + .625;
+  const outletOffsetY = map(state.outletVolumetricFlowRate, 0, 100, 0, -50) + .625;
   inletRotameterReadout.setAttribute("transform", `translate(0, ${inletOffsetY})`);
   outletRotameterReadout.setAttribute("transform", `translate(0, ${outletOffsetY})`);
 }
