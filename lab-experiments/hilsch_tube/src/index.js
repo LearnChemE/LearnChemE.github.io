@@ -5,7 +5,7 @@ import "./assets/digital-7.ttf";
 import "./assets/ranque_hilsch_vortex_tube_worksheet.pdf";
 import { importSVG, enableSvgZoom, enableSvgDrag } from "./js/svg";
 import { handleInputs } from "./js/inputs";
-import { calcAll } from "./js/calcs";
+import { calcAll, gaussNoise } from "./js/calcs";
 
 // GLOBAL VARIABLES OBJECT
 window.state = {
@@ -23,7 +23,7 @@ window.state = {
   inletVolumetricFlowRate: 0,
   outletVolumetricFlowRate: 0,
   vortexPortPosition: 0.5,
-  maxP: 6.89,
+  maxP: 6.89 + gaussNoise(0, .3),
   fractionInColdStream: 0.2,
   mousedown: false,
   maxViewBox: [-130, 10, 320, 240],
