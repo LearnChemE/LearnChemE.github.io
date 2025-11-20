@@ -17,6 +17,8 @@ export function drawValve() {
     .stroke({ color: '#b4b4ff', width: 2 })
     .center(valveCenterX, valveCenterY)
     .front();
+
+    valveGroup.node.classList.add("interactable")
     
     valveGroup.click(() => {
         setIsRotated(!isRotated);
