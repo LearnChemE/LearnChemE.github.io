@@ -45,7 +45,7 @@ function calculateTemperatures() {
 
   const P = barToPSI(state.inletPressure);
   const z = state.fractionInColdStream * 100; // % in cold stream
-  const TCold = 22 - 5 * interpolateFromData(P, z, TDropData) / 9; // Interpolate from data then convert to C
+  const TCold = 22 - coldTempBias * interpolateFromData(P, z, TDropData) * 5 / 9; // Interpolate from data then convert to C
   const THot = (22 - TCold) * state.fractionInColdStream / (1 - state.fractionInColdStream) + 22;
   // const THot = 22 + 5 * interpolateFromData(P, z, TRiseData) / 9;
   state.coldSideTemperature = TCold;
