@@ -51,6 +51,7 @@ window.draw = function() {
   scale(relativeSize());
   background(255);
   drawAll();
+  console.log(state)
 };
 
 window.windowResized = () => {
