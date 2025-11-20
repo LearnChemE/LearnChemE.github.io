@@ -1,7 +1,10 @@
+const inletFlowCoeff = gaussNoise(50, 2);
+const coldTempBias = Math.random() * .1 + .9;
+
 function calcInletFlowRate() {
   const P = state.inletPressure;
   const frac = map(P, 1, 8, 0, 1);
-  const Q = 50 * frac ** 0.4;
+  const Q = inletFlowCoeff * frac ** 0.4;
   state.inletVolumetricFlowRate = Q;
 }
 
@@ -118,6 +121,17 @@ function interpolateFromData(psi, percentage_open, data) {
       return T;
     }
   }
+}
+
+export function gaussNoise(mean, stdDev) {
+  // Use the Box-Muller transform
+  const u0 = Math.random();
+  const u1 = Math.random();
+  // Convert to Z space
+  const z0 = Math.sqrt(-2*Math.log(u0)) * Math.cos(2*Math.PI * u1);
+
+  // Give mean and stdev and return
+  return mean + stdDev * z0;
 }
 
 // [[psi, z], Tc]
