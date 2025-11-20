@@ -5,12 +5,16 @@ function calcInletFlowRate() {
   state.inletVolumetricFlowRate = Q;
 }
 
+/**
+ * Calculate the amount of moles entering the tube
+ * @returns molar flowrate [mol / s]
+ */
 function molesIn() {
-  const P = state.inletPressure;
-  const T = 273.15 + 22;
-  const R = 8.314;
-  const V = state.inletVolumetricFlowRate * 1e-6;
-  const n = P * V / (R * T);
+  const P = state.inletPressure; // bar
+  const T = 273.15 + 22; // K
+  const R = 8.314;  // m3 bar / mol / K
+  const V = state.inletVolumetricFlowRate * 1e-6; // m3 / s
+  const n = P * V / (R * T); // mol / s
   return n;
 }
 
@@ -30,14 +34,17 @@ function calcOutletPressureAndFlowRate() {
 
 function calculateTemperatures() {
   if (state.inletPressure <= 1) {
+    // No flow
     state.coldSideTemperature = 22;
     state.hotSideTemperature = 22;
     return;
   }
+
   const P = barToPSI(state.inletPressure);
-  const z = state.fractionInColdStream * 100;
-  const TCold = 22 - 5 * interpolateFromData(P, z, TDropData) / 9;
-  const THot = 22 + 5 * interpolateFromData(P, z, TRiseData) / 9;
+  const z = state.fractionInColdStream * 100; // % in cold stream
+  const TCold = 22 - 5 * interpolateFromData(P, z, TDropData) / 9; // Interpolate from data then convert to C
+  const THot = (22 - TCold) * state.fractionInColdStream / (1 - state.fractionInColdStream) + 22;
+  // const THot = 22 + 5 * interpolateFromData(P, z, TRiseData) / 9;
   state.coldSideTemperature = TCold;
   state.hotSideTemperature = THot;
 }
@@ -70,18 +77,29 @@ function barToPSI(bar) {
   return bar * 14.5038;
 }
 
+/**
+ * Uses bilinear interpolation to determine a target temperature based on data sorted in an... interesting fashion.
+ * @param {number} psi Feed pressure (psi)
+ * @param {number} percentage_open percent open (cold fraction * 100)
+ * @param {[number[], number][]} data: Array<[[psi, z], T]>
+ * @returns Temperature
+ */
 function interpolateFromData(psi, percentage_open, data) {
+  // Clamp the pressure range
   if (psi < 20) {
     psi = 20;
   }
   if (psi >= 100) {
     psi = 99.9;
   }
+  // Loop through interpolated data
   for (let i = 0; i < data.length; i++) {
-    if (psi >= data[i][0][0] &&
-      percentage_open >= data[i][0][1] &&
-      Math.abs(psi - data[i][0][0]) < 20 &&
-      Math.abs(percentage_open - data[i][0][1]) < 10) {
+    // Select the correct item from the data
+    if (psi >= data[i][0][0] && // Above data[i]'s feed pressure
+      percentage_open >= data[i][0][1] && // Above data[i]'s % open
+      Math.abs(psi - data[i][0][0]) < 20 && // Within data[i]'s range of feed pressure
+      Math.abs(percentage_open - data[i][0][1]) < 10) // Within data[i]'s range of % open
+    {
       const T1 = data[i][1];
       const T2 = data[i + 7][1];
       const T3 = data[i + 1][1];
@@ -102,6 +120,12 @@ function interpolateFromData(psi, percentage_open, data) {
   }
 }
 
+// [[psi, z], Tc]
+// Sorted in ascending z
+// then ascending psi with stride of 7.
+// So for bilinear interpolation, interpolate with points i, i+1, i+7, and i+8
+// And for heavens sake, use some sort of annotation if you do stuff like this
+// All you really need is a 2D array
 const TDropData = [
   [
     [20, 20], 63.1
@@ -221,121 +245,121 @@ const TDropData = [
   ]
 ];
 
-const TRiseData = [
-  [
-    [20, 20], 15.1
-  ],
-  [
-    [20, 30], 24.4
-  ],
-  [
-    [20, 40],
-    37.8
-  ],
-  [
-    [20, 50], 51.3
-  ],
-  [
-    [20, 60], 65.1
-  ],
-  [
-    [20, 70],
-    82.5
-  ],
-  [
-    [20, 80], 108.1
-  ],
-  [
-    [40, 20], 23.4
-  ],
-  [
-    [40, 30],
-    35.2
-  ],
-  [
-    [40, 40], 52.1
-  ],
-  [
-    [40, 50], 73.2
-  ],
-  [
-    [40, 60],
-    92.8
-  ],
-  [
-    [40, 70], 116.9
-  ],
-  [
-    [40, 80], 148.1
-  ],
-  [
-    [60, 20],
-    25.6
-  ],
-  [
-    [60, 30], 39.9
-  ],
-  [
-    [60, 40], 59.1
-  ],
-  [
-    [60, 50],
-    84.1
-  ],
-  [
-    [60, 60], 104.1
-  ],
-  [
-    [60, 70], 133.1
-  ],
-  [
-    [60, 80],
-    169.1
-  ],
-  [
-    [80, 20], 26.1
-  ],
-  [
-    [80, 30], 44.1
-  ],
-  [
-    [80, 40],
-    64.1
-  ],
-  [
-    [80, 50], 92.2
-  ],
-  [
-    [80, 60], 114.1
-  ],
-  [
-    [80, 70],
-    144.3
-  ],
-  [
-    [80, 80], 181.1
-  ],
-  [
-    [100, 20], 27.8
-  ],
-  [
-    [100, 30],
-    46.1
-  ],
-  [
-    [100, 40], 67.3
-  ],
-  [
-    [100, 50], 100.3
-  ],
-  [
-    [100, 60],
-    119.9
-  ],
-  [
-    [100, 70], 151.1
-  ],
-  [
-    [100, 80], 192.1
-  ]
-];
+// const TRiseData = [
+//   [
+//     [20, 20], 15.1
+//   ],
+//   [
+//     [20, 30], 24.4
+//   ],
+//   [
+//     [20, 40],
+//     37.8
+//   ],
+//   [
+//     [20, 50], 51.3
+//   ],
+//   [
+//     [20, 60], 65.1
+//   ],
+//   [
+//     [20, 70],
+//     82.5
+//   ],
+//   [
+//     [20, 80], 108.1
+//   ],
+//   [
+//     [40, 20], 23.4
+//   ],
+//   [
+//     [40, 30],
+//     35.2
+//   ],
+//   [
+//     [40, 40], 52.1
+//   ],
+//   [
+//     [40, 50], 73.2
+//   ],
+//   [
+//     [40, 60],
+//     92.8
+//   ],
+//   [
+//     [40, 70], 116.9
+//   ],
+//   [
+//     [40, 80], 148.1
+//   ],
+//   [
+//     [60, 20],
+//     25.6
+//   ],
+//   [
+//     [60, 30], 39.9
+//   ],
+//   [
+//     [60, 40], 59.1
+//   ],
+//   [
+//     [60, 50],
+//     84.1
+//   ],
+//   [
+//     [60, 60], 104.1
+//   ],
+//   [
+//     [60, 70], 133.1
+//   ],
+//   [
+//     [60, 80],
+//     169.1
+//   ],
+//   [
+//     [80, 20], 26.1
+//   ],
+//   [
+//     [80, 30], 44.1
+//   ],
+//   [
+//     [80, 40],
+//     64.1
+//   ],
+//   [
+//     [80, 50], 92.2
+//   ],
+//   [
+//     [80, 60], 114.1
+//   ],
+//   [
+//     [80, 70],
+//     144.3
+//   ],
+//   [
+//     [80, 80], 181.1
+//   ],
+//   [
+//     [100, 20], 27.8
+//   ],
+//   [
+//     [100, 30],
+//     46.1
+//   ],
+//   [
+//     [100, 40], 67.3
+//   ],
+//   [
+//     [100, 50], 100.3
+//   ],
+//   [
+//     [100, 60],
+//     119.9
+//   ],
+//   [
+//     [100, 70], 151.1
+//   ],
+//   [
+//     [100, 80], 192.1
+//   ]
+// ];
