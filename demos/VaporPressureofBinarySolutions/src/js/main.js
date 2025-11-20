@@ -10,7 +10,7 @@ const plotColors = {
   actualB: '#27a659',
   actualTotal: '#111111',
   henryB: '#cf2b2b',
-  henryA: '#ff8c8c'
+  henryA: '#cf2b2b'
 };
 const labelSpecs = {
   P: { base: 'P', italic: true },
@@ -21,8 +21,8 @@ const labelSpecs = {
   'P(ideal)': { base: 'P', suffix: ' (ideal)', italic: true },
   "PB(Henry's law)": { base: 'P', sub: 'B', suffix: " (Henry's law)", italic: true },
   "PA(Henry's law)": { base: 'P', sub: 'A', suffix: " (Henry's law)", italic: true },
-  PAsat: { base: 'P', sub: 'A', suffix: 'sat', italic: true },
-  PBsat: { base: 'P', sub: 'B', suffix: 'sat', italic: true }
+  PAsat: { base: 'P', sub: 'A', sup: 'sat', italic: true },
+  PBsat: { base: 'P', sub: 'B', sup: 'sat', italic: true }
 };
 
 let drawRef;
@@ -198,6 +198,8 @@ function drawAxes(area, scales, axisMax, tickStep) {
     .stroke({ color: '#000', width: 2 });
   axisLayer.line(area.x, area.y + area.height, area.x + area.width, area.y + area.height)
     .stroke({ color: '#000', width: 2 });
+  axisLayer.line(area.x + area.width, area.y, area.x + area.width, area.y + area.height)
+    .stroke({ color: '#000', width: 2 });
 
   // X-axis ticks
   const moleTicks = [0, 0.2, 0.4, 0.6, 0.8, 1];
@@ -281,13 +283,13 @@ function drawHenryCurves(params, scales) {
   if (!params.showHenry) return;
   drawCurve((x) => henryB(params, x), scales, {
     color: plotColors.henryB,
-    width: 1.5,
+    width: 2.5,
     dash: '6,6',
     opacity: 1
   }, 0, 0.3);
   drawCurve((x) => henryA(params, x), scales, {
     color: plotColors.henryA,
-    width: 1.5,
+    width: 2.5,
     dash: '6,6',
     opacity: 1
   }, 0.7, 1);
@@ -575,12 +577,14 @@ function renderSvgLabel(add, labelKey) {
   if (spec.sub) {
     add.tspan(spec.sub)
       .font({ size: 12 })
-      .dy(6);
-    add.tspan('').dy(-6);
+      .attr({ 'baseline-shift': 'sub' });
   }
-  if (spec.suffix) {
-    add.tspan(spec.suffix);
+  if (spec.sup) {
+    add.tspan(spec.sup)
+      .font({ size: 12 })
+      .attr({ 'baseline-shift': 'super' });
   }
+  if (spec.suffix) add.tspan(spec.suffix);
 }
 
 function formatLabelHTML(labelKey) {
@@ -589,8 +593,9 @@ function formatLabelHTML(labelKey) {
   const baseRaw = escapeHtml(spec.base ?? '');
   const base = spec.italic ? `<span style="font-style:italic;">${baseRaw}</span>` : baseRaw;
   const sub = spec.sub ? `<sub>${escapeHtml(spec.sub)}</sub>` : '';
+  const sup = spec.sup ? `<sup>${escapeHtml(spec.sup)}</sup>` : '';
   const suffix = spec.suffix ? escapeHtml(spec.suffix) : '';
-  return `${base}${sub}${suffix}`;
+  return `${base}${sub}${sup}${suffix}`;
 }
 
 function escapeHtml(text) {
