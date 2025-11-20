@@ -54,6 +54,7 @@ let toggle = null;
 let gasValve = null;
 
 let leftPipe = null;
+let leftPipe1 = null;
 let leftPipe2 = null;
 let leftPipe3 = null;
 let leftPipe4 = null;
@@ -243,6 +244,7 @@ function drawCanvas() {
   drawRectangleWithThreeSquares(canvasWidth / 2, canvasHeight / 2 - 50, 150, 350);
   drawPipes();
   drawPumps();
+  drawPumpSVG(draw, 200, 340, 4, 4);
   drawGasValves();
   drawTanks();
   drawTexts();
@@ -401,11 +403,18 @@ function drawPipes() {
   // Left pipe segments
   leftPipe = `
     M ${startX} ${startY} 
-    L ${startX} ${50} 
-    L ${startX + 375} ${50} 
-    L ${startX + 375} ${94.5} 
+    L ${startX} ${372.5}
+    L ${startX + 50} ${372.5}  
   `;
   drawPipeWithCurves(leftPipe);
+
+  leftPipe1 = `
+  M ${startX + 65} ${327}
+  L ${startX + 65} ${50} 
+  L ${startX + 375} ${50} 
+  L ${startX + 375} ${73.5} 
+  `;
+  drawPipeWithCurves(leftPipe1);
   
   leftPipe2 = `
     M ${startX + 375} ${94.5 + 91} 
@@ -631,12 +640,12 @@ const FLOW_RATE = 18; // ml per second
 function drawPumps() {
   const startX = pump1StartX;
   const startY = pump1StartY;
-  drawLineBetweenPoints(draw, startX, startY - 125, startX + 60, startY - 130, 1);
-  toggle = drawTap(startX, startY - 125, 30, 1);
+  drawLineBetweenPoints(draw, startX + 100, startY - 45, startX + 110, startY + 20, 1);
+  toggle = drawTap(startX - 75, startY - 190, 30, 1);
   toggle.rotate(90, startX, startY - 125);
   // Make toggle group pointer-sensitive and show pointer cursor
   toggle.attr({ 'pointer-events': 'all', 'cursor': 'pointer' });
-  pump = createToggleWithTextRect(draw, startX + 50, startY - 150, 100, 40, 1);
+  pump = createToggleWithTextRect(draw, startX + 100, startY, 100, 40, 1);
   // Make pump group pointer-sensitive and show pointer cursor
   pump.attr({ 'pointer-events': 'all', 'cursor': 'pointer' });
   // Enable pump toggle and update flow when clicked
@@ -711,6 +720,7 @@ function updateFlow() {
   const pipeSequence = {
     left: [
       { pipe: leftPipe, key: 'leftPipe' },
+      { pipe: leftPipe1, key: 'leftPipe1' },
       { pipe: leftPipe2, key: 'leftPipe2' },
       { pipe: leftPipe3, key: 'leftPipe3' },
       { pipe: leftPipe4, key: 'leftPipe4' }
@@ -1229,4 +1239,89 @@ function addSVGImage(url, x = 0, y = 0, width, height) {
   return img;
 }
     
+function drawPumpSVG(draw, x, y, scaleX, scaleY) {
+      // create a grouped coordinate frame
+      const g = draw.group()
+      
+      
+      // colors
+      const pumpColor     = '#b4b4ff'  // rgb(180,180,255)
+      const pumpStroke    = 'black'  // rgb(140,140,225)
+      const legColor      = '#a0a0f5'  // rgb(160,160,245)
+      const heatFill      = '#c8c8ff'  // rgb(200,200,255)
+      const heatStroke    = '#6464be'  // rgb(100,100,190)
+      const baseColor     = '#a0a0f5'  // rgb(160,160,245)
+      const outletColor   = '#aaaafa'  // rgb(170,170,250)
+      const cableColor    = '#282828'  // rgb(40,40,40)
+      
+      // helper to draw a stroked polygon
+      const poly = (pts, fillCol=pumpColor, strokeCol=pumpStroke, sw=0.15) =>
+        g.polygon(pts).fill(fillCol).stroke({ color: strokeCol, width: sw })
+      
+      // 1) Pump nose
+      poly([
+        [-2,-4],[-3,-4],[-3,4],[-2,4],
+        [-2,3.5],[4,3.5],[7,5],[7,6],
+        [8,6],[8,-6],[7,-6],[7,-5],
+        [4,-3.5],[-2,-3.5]
+      ])
+      // dividing lines
+      g.line(-2,-4, -2,4).stroke({ color:pumpStroke, width:0.15 })
+      g.line( 7,-6,  7,6).stroke({ color:pumpStroke, width:0.15 })
+      
+      // 2) Pump nose supports
+      ;[ [4,-2, 7,-3],
+      [-2,0, 7,0],
+      [4,2, 7,3] ].forEach(l =>
+        g.line(...l).stroke({ color:pumpStroke, width:0.4 })
+      )
+      
+      // 3) Pump legs
+      poly([[15,5],[12,8],[14,8],[17,5]], legColor, pumpStroke,0.15)
+      poly([[28,5],[31,8],[29,8],[26,5]], legColor, pumpStroke,0.15)
+      
+      // 4) Pump body
+      poly([
+        [8,6],[9,6],[9,4],[10,4],[14,5.75],[15,6],
+        [30,6],[30.5,5.5],[30.5,-5.5],[30,-6],[15,-6],
+        [14,-5.75],[10,-4],[9,-4],[9,-6],[8,-6]
+      ])
+      g.line(9,6, 9,-6).stroke({ color:pumpStroke, width:0.15 })
+      
+      // 5) Pump heat sink
+      for(let i=0; i<13; i++){
+        g.rect(10, 0.25 + Math.abs(i-6)*0.075)
+        .center(22.5, -6 + i)
+        .fill(heatFill)
+        .stroke({ color:heatStroke, width:0.1 })
+      }
+      
+      // 6) Body supports
+      ;[ [-3,  0, 11,  0],
+      [ 9, -3, 11, -3],
+      [ 9,  3, 11,  3] ].forEach(l=>
+        g.line(...l).stroke({ color:pumpStroke, width:0.4 })
+      )
+      
+      // 7) Pump base
+      g.rect(34,2).move(-2,8).fill(baseColor).stroke({ color:pumpStroke, width:0.15 }).radius(0.25)
+      
+      // 8) Pump outlet
+      g.rect(3.5,13).move(-0.5,-8).fill(outletColor).stroke({ color:outletColor, width:0.15 }).radius(2)
+      g.line(-0.5,-8, 3,-8).stroke({ color: pumpStroke, width:0.15 })
+      poly([[-0.5,-8],[-2,-10],[4.5,-10],[3,-8]], outletColor, pumpStroke,0.15)
+      g.rect(9.5,1).move(-3.5,-11).fill(outletColor).stroke({ color:pumpStroke, width:0.15 })
+      
+      // 9) Power cable (a smooth poly‐bezier)
+      // g.path('M30.5,0 Q33,0 35,-2 Q40,-8 35.5,-13 Q31,-18 18,-13')
+      //  .fill('none')
+      //  .stroke({ color:cableColor, width:0.3 })
+      
+      // 10) (Optional) your switch‐drawing helper
+      // drawPumpSwitchSVG(g, /*…*/)
+      g.move(x, y)
+      .scale(scaleX, scaleY)
+      .translate(0, 19)
+      return g
+    }
     drawCanvas();
