@@ -19,6 +19,13 @@ body {
     -ms-user-select: none; 
 }
 
+.interactable {
+    cursor: pointer;
+}
+.interactable:hover {
+    filter: drop-shadow(0 0 4px cyan);
+}
+
 .button-container {
     display: flex;
     /* gap: 10px; */
