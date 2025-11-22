@@ -464,3 +464,7 @@ export function transpose(arr: number[][]) {
     }
     return grid;
 }
+
+export function lerp(a: number, b: number, s: number) {
+    return a + (b - a) * s;
+}

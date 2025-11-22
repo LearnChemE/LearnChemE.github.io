@@ -1,69 +1,77 @@
-import type { Profile } from "../../types/globals";
+import type { DoubleBufferExport, TypedArrayConstructor } from "./worker-types";
 
-
-type Resolver<T> = (value: T | PromiseLike<T>) => void;
-
-export class ProfileBuffer {
-  // Bounded buffer
-  private buffer: Profile[] = [];
-  private readonly capacity: number;
-
-  // Pending events
-  private pendingResolvers: Resolver<Profile>[] = [];
-  private pendingProducers: Resolver<null>[] = [];
-
-  public loading = true;
-
-  constructor(capacity: number) {
-    this.capacity = capacity;
-  }
 /**
-   * Add an item to the queue (producer).
-   * Resolves immediately if space is free,
-   * waits if buffer is full.
-   */
-  async produce(item: Profile): Promise<void> {
-    // Check for full buffer
-    if (this.buffer.length >= this.capacity) {
-      // Wait to be resolved
-      await new Promise<void>((resolve) => {
-        this.pendingProducers.push(() => resolve());
-      });
+ * Double buffer class for controlled reading from/writing to a thread-safe buffer
+ */
+export class DoubleBuffer<T extends Float32Array> {
+    private readonly bufferA: SharedArrayBuffer;
+    private readonly bufferB: SharedArrayBuffer;
+    private readonly state: Int32Array;
+    private readonly View: TypedArrayConstructor<T>;
+    private readonly length: number;
+
+    constructor (length: number, View: TypedArrayConstructor<T>, stateBuffer?: SharedArrayBuffer) {
+        this.length = length;
+        this.View = View;
+
+        const bytes = length * View.BYTES_PER_ELEMENT;;
+
+        this.bufferA = new SharedArrayBuffer(bytes);
+        this.bufferB = new SharedArrayBuffer(bytes);
+
+        // state[0] tells which array is readable;
+        // 0 is A, 1 is B
+        this.state = stateBuffer ? new Int32Array(stateBuffer) : new Int32Array(new SharedArrayBuffer(4));
     }
 
-    // If a consumer is waiting, resolve immediately
-    if (this.pendingResolvers.length > 0) {
-      const resolve = this.pendingResolvers.shift()!;
-      resolve(item);
-      return;
+    /**
+     * Format pertinent double-buffer information as an object to send to a worker
+     * @returns object containing buffers, state buffer, and length.
+     */
+    export = (): DoubleBufferExport => {
+        return {
+            bufferA: this.bufferA,
+            bufferB: this.bufferB,
+            stateBuffer: this.state.buffer,
+            length: this.length
+        };
     }
 
-    this.buffer.push(item);
-    this.loading = false;
-  }
-
-  /**
-   * Remove an item from the queue (consumer).
-   * Waits if buffer is empty.
-   */
-  async consume(): Promise<Profile> {
-    if (this.buffer.length > 0) {
-      const item = this.buffer.shift()!;
-      if (this.buffer.length === 0) this.loading = true;
-
-      // Free a waiting producer if buffer dropped below capacity
-      if (this.pendingProducers.length > 0) {
-        const unblock = this.pendingProducers.shift()!;
-        unblock(null);
-      }
-
-      return item;
+    /**
+     * Get the current readable buffer
+     */
+    getReadable = (): T => {
+        // Get the current readable buffer (atomically)
+        const index = Atomics.load(this.state, 0);
+        return (index === 0) 
+            ? new this.View(this.bufferA) as T
+            : new this.View(this.bufferB) as T;
     }
 
-    // Empty → consumer waits
-    this.loading = true;
-    return new Promise<Profile>((resolve) => {
-      this.pendingResolvers.push(resolve);
-    });
-  }
+    /**
+     * Get the current writable buffer
+     */
+    getWritable = (): T => {
+        const index = Atomics.load(this.state, 0);
+        return index === 0
+            ? new this.View(this.bufferB) // reader reads A, so producer writes B
+            : new this.View(this.bufferA);
+    }
+
+    /** 
+     * Swap readable/writable buffers. Producer calls this after writing. 
+     */
+    swap() {
+        const next = Atomics.load(this.state, 0) === 0 ? 1 : 0;
+        Atomics.store(this.state, 0, next);
+        Atomics.notify(this.state, 0);
+    }
+
+    /** 
+     * Block until new data is available (optional; worker-only safe). 
+     */
+    waitForSwap() {
+        const current = Atomics.load(this.state, 0);
+        Atomics.wait(this.state, 0, current);
+    }
 }

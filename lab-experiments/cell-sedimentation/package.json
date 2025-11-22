@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@types/three": "^0.180.0",
+    "@vitest/web-worker": "^4.0.12",
     "fs": "^0.0.1-security",
     "jsdom": "^20.0.3",
     "nodeplotlib": "^1.1.2",

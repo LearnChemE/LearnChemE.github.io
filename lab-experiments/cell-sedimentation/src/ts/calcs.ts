@@ -12,6 +12,7 @@ const d_w = 550e-4 // White cell diameter (cm)
 
 export const TUBE_LENGTH = 305; // mm
 export const CONC_ARRAY_SIZE = 500; // points in finite element mesh
+export const PROFILE_LENGTH = 2 * CONC_ARRAY_SIZE + 2; // Size for time, top, cr[500], and cw[500]
 
 /**
  * Convert volume fraction to number concentration (#/[l]^3) for particles of diameter dp units [l].
@@ -296,10 +297,11 @@ export function resize(y: number[], z: number[], lo: number) {
 
 const nz = CONC_ARRAY_SIZE;
 const smooth_fsize = 13;
-const dt = 20;
+export const SOLVER_TIMESTEP = 20;
 export class ProfileSolver {
-    private current: Profile;
+    private current: number[];
     private top = 0;
+    private t = 0;
 
     constructor(xr0: number, xw0: number) {
         // Prepare the initial profile
@@ -307,8 +309,6 @@ export class ProfileSolver {
         const cw0: number[] = new Array(nz).fill(conc_w(xw0));
         cr0[0] = cw0[0] = 0; // Free surface
         this.current = cr0.concat(cw0);
-
-        
     }
 
     // Spatial helpers
@@ -326,13 +326,13 @@ export class ProfileSolver {
 
     /**
      * Calculate one 20 second step for the profile
-     * @returns Results at time t + dt
+     * @returns Results at time t + timestep
      */
     public calculate_step = () => {
-        const sol = rk45(this.rhs, this.current, 0, dt);
+        const sol = rk45(this.rhs, this.current, 0, SOLVER_TIMESTEP);
 
         // Extract solution
-        let y_cur: Profile = sol.y.at(-1)!;
+        let y_cur = sol.y.at(-1)!;
         let cr_cur = y_cur.slice(0,nz);
         let cw_cur = y_cur.slice(nz);
 
@@ -345,7 +345,8 @@ export class ProfileSolver {
         const resized = resize(y_cur, this.create_z_arr(), .05);
         this.current = resized.y;
         this.top = resized.z[0];
+        this.t += SOLVER_TIMESTEP;
 
-        return this.current.concat([this.top]);
+        return new Float32Array([this.t, this.top].concat(this.current)) as Profile;
     }
 }
