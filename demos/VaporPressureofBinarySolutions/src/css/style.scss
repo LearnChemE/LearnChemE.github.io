@@ -63,13 +63,13 @@ body {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 16px;
+  gap: 0px;
   z-index: 1001;
   pointer-events: none;
 }
 
 .button-column {
-  width: 210px;
+  width: auto;
   pointer-events: auto;
 }
 
@@ -173,6 +173,16 @@ body {
   font-size: 0.95rem;
   white-space: nowrap;
   pointer-events: auto;
+}
+
+.slider-checkbox--stacked {
+  margin-top: 8px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  padding: 8px 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  justify-content: flex-start;
 }
 
 .math-label {

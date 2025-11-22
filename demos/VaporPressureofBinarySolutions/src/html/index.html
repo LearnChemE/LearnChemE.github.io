@@ -46,6 +46,10 @@
         <button id="details" class="btn btn-sm btn-primary w-100" style="max-width:100px;">Details</button>
         <button id="about" class="btn btn-sm btn-primary w-100" style="max-width:100px;">About</button>
         <!-- <button id="worksheet" class="btn btn-sm btn-primary w-100" style="max-width:100px;">Worksheet</button> -->
+        <label class="slider-checkbox slider-checkbox--stacked" for="henryToggle">
+          <input type="checkbox" id="henryToggle" />
+          <span>Show Henry's law</span>
+        </label>
       </div>
 
       <div id="control-bar" class="control-bar controls-container slider-controls" data-no-pan="true">
@@ -71,11 +75,6 @@
           <input type="range" id="gammaSlider" min="-1.0" max="2.5" step="0.1" value="0" />
           <span id="gammaValue">0.0</span>
         </div>
-
-        <label class="slider-checkbox" for="henryToggle">
-          <input type="checkbox" id="henryToggle" />
-          <span>Show Henry's law</span>
-        </label>
       </div>
     </div>
   </div>

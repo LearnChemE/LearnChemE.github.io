@@ -574,17 +574,34 @@ function renderSvgLabel(add, labelKey) {
   }
   const base = add.tspan(spec.base ?? '');
   if (spec.italic) base.font({ style: 'italic' });
+
+  const baseFontSize = getTspanFontSize(base);
+  const applyOffsetSpan = (text, offset, { scale = 0.85, reset = true } = {}) => {
+    const span = add.tspan(text).font({ size: baseFontSize * scale });
+    span.dy(offset);
+    if (reset) {
+      // Reset baseline for subsequent characters
+      add.tspan('').dy(-offset);
+    }
+  };
+
   if (spec.sub) {
-    add.tspan(spec.sub)
-      .font({ size: 12 })
-      .attr({ 'baseline-shift': 'sub' });
+    applyOffsetSpan(spec.sub, baseFontSize * 0.35);
   }
   if (spec.sup) {
-    add.tspan(spec.sup)
-      .font({ size: 12 })
-      .attr({ 'baseline-shift': 'super' });
+    applyOffsetSpan(spec.sup, -baseFontSize * 0.85, { reset: Boolean(spec.suffix) });
   }
   if (spec.suffix) add.tspan(spec.suffix);
+}
+
+function getTspanFontSize(tspan) {
+  const attrSize = tspan.attr('font-size');
+  if (attrSize) {
+    const parsed = parseFloat(attrSize);
+    if (!Number.isNaN(parsed)) return parsed;
+  }
+  const fontSize = tspan.font().size;
+  return typeof fontSize === 'number' ? fontSize : 16;
 }
 
 function formatLabelHTML(labelKey) {
