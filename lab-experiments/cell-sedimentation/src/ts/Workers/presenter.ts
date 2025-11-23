@@ -1,5 +1,5 @@
 import type { Profile, InitConc } from "../../types/globals";
-import { CONC_ARRAY_SIZE, conc_r, conc_w, PROFILE_LENGTH } from "../calcs";
+import { createProfile, PROFILE_LENGTH } from "../calcs";
 import { DoubleBuffer } from "./profileBuffer";
 import producerURL from "./producer.ts?url";
 import type { InitMessage } from "./worker-types";
@@ -11,10 +11,13 @@ export class Presenter {
     private producer: Worker;
     private current: Profile;
     private next: Profile;
+    private nextIsReady = false;
 
     constructor(initConc: InitConc) {
         this.buffer = new DoubleBuffer(PROFILE_LENGTH, Float32Array);
+        console.log("Creating web worker...");
         this.producer = new Worker(producerURL);
+        this.producer.onmessage = (e) => console.log(e.data);
 
         // Initialize producer
         const initMsg: InitMessage = {
@@ -26,32 +29,36 @@ export class Presenter {
         };
         this.producer.postMessage(initMsg);
 
-        // Initialize profile
-        const cr0 = conc_r(initConc.xr0);
-        const cw0 = conc_w(initConc.xw0);
-        const init: number[] = new Array(PROFILE_LENGTH);
-        init[0] = 0; // time
-        init[1] = 0; // top
-        for (let i=2;i<CONC_ARRAY_SIZE+2;i++) {
-            init[i] = cr0;
-        }
-        for (let i=2+CONC_ARRAY_SIZE;i<2*CONC_ARRAY_SIZE+2;i++) {
-            init[i] = cw0;
-        }
-        this.current = new Float32Array(init);
-        this.next = new Float32Array(init);
+        // Initialize profiles
+        this.current = createProfile(initConc);
+        this.next = createProfile(initConc);
     }
 
+    private _await_ready_soln = () => {
+
+    }
+
+    /**
+     * Fetch the next solution in the 
+     * @returns 
+     */
     private getNextSol = () => {
+
         const readable = this.buffer.getReadable();
         if (readable[0] === this.next[0]) {
             return false;
         }
         this.next.set(readable);
+        this.producer.postMessage({ type: "produce" });
         return true;
     }
 
-    public step = (dt: number): Profile => {
+    /**
+     * Step the profile towards its next known state using the timestep provided
+     * @param dt timestep (s)
+     * @returns true if the buffer is ready; false if not
+     */
+    public step = (dt: number): boolean => {
         const current = this.current;
         const next = this.next;
 
@@ -67,7 +74,7 @@ export class Presenter {
             const loaded = this.getNextSol();
             if (!loaded) {
                 // still loading
-                return this.current;
+                return false;
             }
             else {
                 // next is ready; swap and reduce that amount of time.
@@ -83,6 +90,10 @@ export class Presenter {
             current[i] = lerp(current[i], next[i], s);
         }
 
-        return current;
+        return true;
+    }
+
+    public getCurrent = () => {
+        return this.current;
     }
 }

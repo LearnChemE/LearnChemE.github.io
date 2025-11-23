@@ -1,27 +1,44 @@
 import type { DoubleBufferExport, TypedArrayConstructor } from "./worker-types";
 
+// The regular worker message system would've actually been perfect for this,
+// I just didn't realize until after I had this solution.
+
 /**
  * Double buffer class for controlled reading from/writing to a thread-safe buffer
  */
 export class DoubleBuffer<T extends Float32Array> {
-    private readonly bufferA: SharedArrayBuffer;
-    private readonly bufferB: SharedArrayBuffer;
+    protected readonly bufferA: SharedArrayBuffer;
+    protected readonly bufferB: SharedArrayBuffer;
     private readonly state: Int32Array;
     private readonly View: TypedArrayConstructor<T>;
     private readonly length: number;
 
-    constructor (length: number, View: TypedArrayConstructor<T>, stateBuffer?: SharedArrayBuffer) {
+    constructor (arg: number | DoubleBufferExport, View: TypedArrayConstructor<T>) {
+        var length, bufferA, bufferB, stateBuffer, bytes;
+        if (typeof arg === "number") {
+            length = arg;
+            bytes = length * View.BYTES_PER_ELEMENT;
+            bufferA = new SharedArrayBuffer(bytes);
+            bufferB = new SharedArrayBuffer(bytes);
+            stateBuffer = new Int32Array(new SharedArrayBuffer(4));
+        }
+        else {
+            length = arg.length;
+            bufferA = arg.bufferA;
+            bufferB = arg.bufferB;
+            stateBuffer = new Int32Array(arg.stateBuffer as SharedArrayBuffer);
+        }
+
+        // Set privates
         this.length = length;
         this.View = View;
 
-        const bytes = length * View.BYTES_PER_ELEMENT;;
-
-        this.bufferA = new SharedArrayBuffer(bytes);
-        this.bufferB = new SharedArrayBuffer(bytes);
+        this.bufferA = bufferA;
+        this.bufferB = bufferB;
 
         // state[0] tells which array is readable;
         // 0 is A, 1 is B
-        this.state = stateBuffer ? new Int32Array(stateBuffer) : new Int32Array(new SharedArrayBuffer(4));
+        this.state = stateBuffer;
     }
 
     /**
@@ -73,5 +90,9 @@ export class DoubleBuffer<T extends Float32Array> {
     waitForSwap() {
         const current = Atomics.load(this.state, 0);
         Atomics.wait(this.state, 0, current);
+    }
+
+    waitAsync() {
+        
     }
 }

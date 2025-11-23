@@ -1,4 +1,4 @@
-import type { Profile } from "../types/globals"
+import type { InitConc, Profile } from "../types/globals"
 import { rk45 } from "./rk45"
 
 const rho_f = 0.868 // Fluid density (g/cc)
@@ -349,4 +349,22 @@ export class ProfileSolver {
 
         return new Float32Array([this.t, this.top].concat(this.current)) as Profile;
     }
+}
+
+
+export const createProfile = (initConc: InitConc): Profile => {
+    // Initialize profile
+    const cr0 = conc_r(initConc.xr0);
+    const cw0 = conc_w(initConc.xw0);
+    const init: number[] = new Array(PROFILE_LENGTH);
+    init[0] = 0; // time
+    init[1] = 0; // top
+    for (let i=2;i<CONC_ARRAY_SIZE+2;i++) {
+        init[i] = cr0;
+    }
+    for (let i=2+CONC_ARRAY_SIZE;i<2*CONC_ARRAY_SIZE+2;i++) {
+        init[i] = cw0;
+    }
+
+    return new Float32Array(init);
 }
