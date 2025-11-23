@@ -468,3 +468,29 @@ export function transpose(arr: number[][]) {
 export function lerp(a: number, b: number, s: number) {
     return a + (b - a) * s;
 }
+
+export type Deferred<T> = {
+    promise: Promise<T>,
+    resolve: (v: T) => void,
+    reject: (e: any) => void,
+    isReady: () => boolean,
+    value: T
+}
+export function makeDeferred<T>(): Deferred<T> {
+    let resolve!: (v:T) => void, reject!: (e: any) => void;
+    let isDone = false;
+    let value: T;
+
+    let promise = new Promise<T>((res, rej) => {
+        resolve = (v: T) => { isDone = true; value = v; res(v) };
+        reject = (e: any) => { isDone = true; rej(e); };
+    });
+
+    return {
+        promise,
+        resolve,
+        reject,
+        isReady: () => isDone,
+        get value() { return value; },
+    };
+}

@@ -1,8 +1,6 @@
 import * as THREE from 'three';
 import { animate } from './helpers';
-import { conc_r, conc_w } from './calcs';
-
-const SOLVER_TIMESTEP = 20; // s
+import { CONC_ARRAY_SIZE, conc_r, conc_w, TUBE_LENGTH } from './calcs';
 
 type CellComposition = [red: number, white: number];
 const Starting_Vial_Concentration: Array<CellComposition> = [
@@ -32,7 +30,7 @@ export class Vial {
         this.top = 0;
     }
 
-    public evolve = (dt: number, t: number) => {
+    public evolve = (dt: number, _: number) => {
         [this.redConcentration, this.whiteConcentration].forEach(arr => {
             // Calculate first and second derivatives
             const dudx = new Float32Array(CONC_ARRAY_SIZE);

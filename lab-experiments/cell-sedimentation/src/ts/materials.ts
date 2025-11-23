@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import defaultVert from '../shaders/default.vert?raw';
 import defaultFrag from '../shaders/default.frag?raw';
-import { CONC_ARRAY_SIZE } from './Vials';
+import { CONC_ARRAY_SIZE } from './calcs';
 
 export function createBloodMacroMaterial() {
     return new THREE.ShaderMaterial({

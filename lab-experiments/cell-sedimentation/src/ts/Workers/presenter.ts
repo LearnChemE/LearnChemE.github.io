@@ -2,8 +2,8 @@ import type { Profile, InitConc } from "../../types/globals";
 import { createProfile, PROFILE_LENGTH } from "../calcs";
 import { DoubleBuffer } from "./profileBuffer";
 import producerURL from "./producer.ts?url";
-import type { InitMessage } from "./worker-types";
-import { lerp } from "../helpers";
+import type { InitMessage, WorkerMessage } from "./worker-types";
+import { lerp, makeDeferred, type Deferred } from "../helpers";
 
 // Lives on the main thread
 export class Presenter {
@@ -11,13 +11,12 @@ export class Presenter {
     private producer: Worker;
     private current: Profile;
     private next: Profile;
-    private nextIsReady = false;
+    private promise: Deferred<Profile>;
 
     constructor(initConc: InitConc) {
         this.buffer = new DoubleBuffer(PROFILE_LENGTH, Float32Array);
         console.log("Creating web worker...");
         this.producer = new Worker(producerURL);
-        this.producer.onmessage = (e) => console.log(e.data);
 
         // Initialize producer
         const initMsg: InitMessage = {
@@ -28,29 +27,47 @@ export class Presenter {
             }
         };
         this.producer.postMessage(initMsg);
+        this.producer.addEventListener("message", (e) => console.log(e.data))
 
         // Initialize profiles
         this.current = createProfile(initConc);
         this.next = createProfile(initConc);
-    }
-
-    private _await_ready_soln = () => {
-
+        this.promise = this.requestNextSol();
     }
 
     /**
-     * Fetch the next solution in the 
-     * @returns 
+     * Request the deferred solution to the next timeframe.
+     * @returns Profile at next major time step after this.next
      */
-    private getNextSol = () => {
+    private requestNextSol = (): Deferred<Profile> => {
+        const def = makeDeferred<Profile>();
+        
+        // Handle solution response by resolving the promise
+        this.producer.addEventListener("message", (e) => {
+            const msg = e.data as WorkerMessage;
+            console.log(msg)
+            if (msg.type !== "data") throw new Error(`Worker sent message: ${e}`);
+            def.resolve(msg.payload);
+        }, { once: true });
 
-        const readable = this.buffer.getReadable();
-        if (readable[0] === this.next[0]) {
+        // Request the next soln
+        this.producer.postMessage({ type: "produce" });
+        return def;
+    }
+
+    /**
+     * Fetch the next solution from the promise if its ready, or 
+     * @returns whether sol is ready
+     */
+    private getNextSol = (): boolean => {
+        if (this.promise.isReady()) {
+            this.next = this.promise.value;
+            this.promise = this.requestNextSol();
+            return true;
+        } else {
+            // Not ready; fallback to loading state
             return false;
         }
-        this.next.set(readable);
-        this.producer.postMessage({ type: "produce" });
-        return true;
     }
 
     /**
@@ -58,7 +75,7 @@ export class Presenter {
      * @param dt timestep (s)
      * @returns true if the buffer is ready; false if not
      */
-    public step = (dt: number): boolean => {
+    public step = (dt: number): Profile => {
         const current = this.current;
         const next = this.next;
 
@@ -74,7 +91,7 @@ export class Presenter {
             const loaded = this.getNextSol();
             if (!loaded) {
                 // still loading
-                return false;
+                return this.current;
             }
             else {
                 // next is ready; swap and reduce that amount of time.
@@ -89,8 +106,9 @@ export class Presenter {
         for (let i=0;i<PROFILE_LENGTH;i++) {
             current[i] = lerp(current[i], next[i], s);
         }
+        console.log(this.current)
 
-        return true;
+        return this.current;
     }
 
     public getCurrent = () => {

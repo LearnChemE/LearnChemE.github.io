@@ -1,8 +1,6 @@
-import type { Profile } from "../../types/globals";
 import { ProfileSolver } from "../calcs";
 import { BaseWorker } from "./baseWorker";
-import { DoubleBuffer } from "./profileBuffer";
-import type { DoubleBufferExport, InitMessage, WorkerMessage } from "./worker-types";
+import type { DataMessage, InitMessage, WorkerMessage } from "./worker-types";
 
 try {
 /**
@@ -10,7 +8,6 @@ try {
  */
 class ProducerWorker extends BaseWorker {
     private solver: ProfileSolver | undefined = undefined;
-    private buffer: DoubleBuffer<Profile> | undefined = undefined;
 
     protected handleMessage(msg: WorkerMessage): void {
         if (msg.type === "init") {
@@ -23,10 +20,7 @@ class ProducerWorker extends BaseWorker {
                 this.post({ type: "error", payload: { reason: "no initializer payload" } });
             }
             const { xr0, xw0 } = payload.initConditions ?? { xr0: 0.05, xw0: 0.05 };
-            const exp = payload.bufferDetails as DoubleBufferExport;
             this.solver = new ProfileSolver(xr0, xw0);
-            this.buffer = new DoubleBuffer<Profile>(exp, Float32Array);
-            this.produce();
             return;
         }
 
@@ -37,20 +31,20 @@ class ProducerWorker extends BaseWorker {
     }
 
     private produce = () => {
-        if (!this.solver || !this.buffer) {
+        if (!this.solver) {
             this.error("uninitialized solver or buffer");
             return;
         }
 
         // Always generate data when available
         const sol = this.solver.calculate_step();
-        const buf = this.buffer!.getWritable();
-        buf.set(sol); // Copy data
-        this.buffer.swap();
+        const msg: DataMessage = { type: "data", payload: sol };
+        this.post(msg);
     }
 }
 
 new ProducerWorker();
+self.postMessage({ type: "hello" });
 
 }
 catch (e) {
