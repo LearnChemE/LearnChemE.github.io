@@ -69,7 +69,7 @@ export function rk45(
   const yVals = [y.slice()];
 
   while (t < tEnd) {
-    console.log(`[RK45] h = ${h}`)
+    // console.log(`[RK45] h = ${h}`)
     if (h !== h) throw new Error("NaN encountered in h")
     if (t + h > tEnd) h = tEnd - t;
 
@@ -96,7 +96,7 @@ export function rk45(
       y = y5;
       tVals.push(t);
       yVals.push(y.slice());
-      console.log(`[RK45] h accepted. New time is ${t}`)
+      // console.log(`[RK45] h accepted. New time is ${t}`)
     }
 
     // Adapt timestep

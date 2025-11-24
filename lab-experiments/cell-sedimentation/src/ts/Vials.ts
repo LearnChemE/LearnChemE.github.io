@@ -1,74 +1,53 @@
 import * as THREE from 'three';
 import { animate } from './helpers';
-import { CONC_ARRAY_SIZE, conc_r, conc_w, TUBE_LENGTH } from './calcs';
+import { Presenter } from './Workers/presenter';
+import type { InitConc, Profile } from '../types/globals';
 
-type CellComposition = [red: number, white: number];
-const Starting_Vial_Concentration: Array<CellComposition> = [
-    [0.05, 0.05],
-    [0.15, 0.05],
-    [0.30, 0.05],
-    [0.45, 0.05],
-    [0.60, 0.05],
+const Starting_Vial_Concentrations: Array<InitConc> = [
+    { xr0: 0.05, xw0: 0.05 },
+    // { xr0: 0.15, xw0: 0.05 },
+    // { xr0: 0.30, xw0: 0.05 },
+    // { xr0: 0.45, xw0: 0.05 },
+    // { xr0: 0.60, xw0: 0.05 },
 ];
 
+/**
+ * A class that incorporates a Presenter and a uniform for each vial
+ * Steps the presenter, manages a loading state, and updates uniforms each frame.
+ */
 export class Vial {
-    // For assembling uniform
-    private redConcentration: number[];
-    private whiteConcentration: number[];
-    private top: number;
-
+    private presenter: Presenter;
     private uniform: THREE.ShaderMaterial["uniforms"] | null = null;
+    private loading: boolean = false;
 
-    constructor (rConc: number, wConc: number) {
-        // Convert to number concentration
-        rConc = conc_r(rConc);
-        wConc = conc_w(wConc);
-
-        // Initialize arrays
-        this.redConcentration = new Array(TUBE_LENGTH).fill(rConc);
-        this.whiteConcentration = new Array(TUBE_LENGTH).fill(wConc);
-        this.top = 0;
+    constructor (initConc: InitConc) {
+        this.presenter = new Presenter(initConc);
     }
 
     public evolve = (dt: number, _: number) => {
-        [this.redConcentration, this.whiteConcentration].forEach(arr => {
-            // Calculate first and second derivatives
-            const dudx = new Float32Array(CONC_ARRAY_SIZE);
-            const dudx2 = new Float32Array(CONC_ARRAY_SIZE);
-            for (let i = 1; i < CONC_ARRAY_SIZE - 1; i++) {
-                dudx[i] = (arr[i+1] - arr[i-1]) / 2;
-                dudx2[i] = arr[i+1] - 2 * arr[i] + arr[i-1];
-            }
-            dudx[0] = dudx[CONC_ARRAY_SIZE - 1] = 0;
-            dudx2[0] = dudx2[CONC_ARRAY_SIZE - 1] = 0;
-
-            // Update concentration using a simple finite difference scheme
-            for (let i = 0; i < CONC_ARRAY_SIZE; i++) {
-                // Calculate settling 
-                arr[i] += dt * (0.01 * dudx2[i] - 5 * dudx[i]);
-            }
-            arr[CONC_ARRAY_SIZE - 1] = 0; // Ensure bottom concentration is zero
-        });
+        const newProf = this.presenter.step(dt);
+        this.updateUniform(newProf);
     }
 
     public setUniform = (uniform: THREE.ShaderMaterial["uniforms"]) => {
         this.uniform = uniform;
     }
 
-    public updateUniform = () => {
+    private updateUniform = (profile: Profile) => {
         if (this.uniform) {
-            this.uniform.redConcentration.value = this.redConcentration;
-            this.uniform.whiteConcentration.value = this.whiteConcentration;
+            // console.log("uniform would be updated with", profile);
+            // this.uniform.profile.value = profile;
+        } else {
+            console.warn("updateUniform called before Vial initialization");
         }
     }
 
-    public reset = (rConc: number, wConc: number) => {
-        this.redConcentration.fill(rConc);
-        this.whiteConcentration.fill(wConc);
+    public reset = (ic: InitConc) => {
+        // TODO: add reset message for web worker
     }
 
-    public getState = () => {
-        return { red: this.redConcentration, white: this.whiteConcentration };
+    public isLoading = () => {
+        return this.loading;
     }
 }
 
@@ -77,7 +56,7 @@ export class Vial {
  * Provides methods to attach shader uniforms, reset vial states, control animation playback, and reset animations.
  *
  * @remarks
- * - Vials are initialized using the `Starting_Vial_Concentration` array.
+ * - Vials are initialized using the `Starting_Vial_Concentrations` array.
  * - Animation is controlled via the `play` and `resetAnimation` methods.
  *
  * @example
@@ -92,7 +71,7 @@ export class VialsArray {
     private playing: boolean = false;
 
     constructor() {
-        this.vials = Starting_Vial_Concentration.map(([r,w]) => new Vial(r,w));
+        this.vials = Starting_Vial_Concentrations.map((ic) => new Vial(ic));
     }
 
     public attachUniforms = (uniforms: Array<THREE.ShaderMaterial["uniforms"]>) => {
@@ -102,13 +81,6 @@ export class VialsArray {
         this.play();
     }
 
-    public reset = () => {
-        this.vials.forEach((vial, i) => {
-            const [r,w] = Starting_Vial_Concentration[i];
-            vial.reset(r,w);
-        });
-    }
-
     public play = () => {
         if (this.playing) return;
         this.playing = true;
@@ -116,7 +88,6 @@ export class VialsArray {
         const frame = (dt: number, t: number) => {
             this.vials.forEach(vial => {
                 vial.evolve(dt, t);
-                vial.updateUniform();
             });
             return this.playing;
         }
@@ -124,15 +95,12 @@ export class VialsArray {
         animate(frame);
     }
 
-    public resetAnimation = () => {
+    public reset = () => {
         this.playing = false;
 
         this.vials.forEach((vial, i) => {
-            const [r,w] = Starting_Vial_Concentration[i];
-            vial.reset(r,w);
-            vial.updateUniform();
+            const ic = Starting_Vial_Concentrations[i];
+            vial.reset(ic);
         });
-
-        setTimeout(() => { this.play(); }, 1000);
     }
 }

@@ -231,7 +231,7 @@ export function interp(x: number | number[], xp: number[], fp: number[]) {
         let nx = xp.length;
         // Make sure we stay in the bounds
         if (xi < xp[0]) {
-            console.warn(`interp point ${xi} out of range for x array with min ${xp[0]}`);
+            console.warn(`interp point ${xi} out of min range for x array with min ${xp[0]}`);
             return fp[0];
         }
 
@@ -244,7 +244,6 @@ export function interp(x: number | number[], xp: number[], fp: number[]) {
 
         // Interpolate results
         if (lo === nx-1) {
-            console.warn(`interp point ${xi} out of range for x array with min ${xp[nx-1]}`);
             return fp[nx-1];
         }
         hi = lo + 1;
@@ -270,7 +269,7 @@ export function resize(y: number[], z: number[], lo: number) {
     if (cr.length !== z.length || cw.length !== z.length) throw new Error(`y and z must have same length\ncr:${cr.length}\ncw:${cw.length}\nz:${z.length}`);
     const nz = cr.length;
     const z_hi = z[nz - 1];
-    if (z_hi !== 305) throw new Error("double check z my guy");
+    if (z_hi < 304.99) throw new Error(`z_hi = ${z_hi} which is a significant deviation from l=305 mm`);
 
     // Determine where to start the new coordinate axis
     let min_idx: number | undefined = undefined;
@@ -290,7 +289,7 @@ export function resize(y: number[], z: number[], lo: number) {
     // Interpolate to get the new f(z) points in the array.
     const cr_new = interp(z_new, z, cr);
     const cw_new = interp(z_new, z, cw);
-    
+
     return { y: cr_new.concat(cw_new), z: z_new };
 }
 
@@ -316,7 +315,7 @@ export class ProfileSolver {
     private dz = () => { return this.lz() / (nz - 1); }
     private create_z_arr = () => {
         const dz = this.dz();
-        return Array.from({ length: nz }, (_,i) => i * dz);
+        return Array.from({ length: nz }, (_,i) => i * dz + this.top);
     }
 
     // Rhs wrapper
@@ -347,6 +346,7 @@ export class ProfileSolver {
         this.top = resized.z[0];
         this.t += SOLVER_TIMESTEP;
 
+        console.log("Solved to t=", this.t)
         return new Float32Array([this.t, this.top].concat(this.current)) as Profile;
     }
 }

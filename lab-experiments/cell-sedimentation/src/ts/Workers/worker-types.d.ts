@@ -8,7 +8,6 @@ export type InitMessage = {
     type: "init", 
     payload: {
         initConditions: { xr0: number, xw0: number },
-        bufferDetails: DoubleBufferExport
     }
 };
 

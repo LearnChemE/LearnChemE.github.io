@@ -16,9 +16,6 @@ class ProducerWorker extends BaseWorker {
             if (!payload) {
                 this.error("no initializer payload");
             }
-            if (!payload.bufferDetails) {
-                this.post({ type: "error", payload: { reason: "no initializer payload" } });
-            }
             const { xr0, xw0 } = payload.initConditions ?? { xr0: 0.05, xw0: 0.05 };
             this.solver = new ProfileSolver(xr0, xw0);
             return;
@@ -44,7 +41,6 @@ class ProducerWorker extends BaseWorker {
 }
 
 new ProducerWorker();
-self.postMessage({ type: "hello" });
 
 }
 catch (e) {

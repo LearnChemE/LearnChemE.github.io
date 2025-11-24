@@ -1,33 +1,30 @@
 import type { Profile, InitConc } from "../../types/globals";
 import { createProfile, PROFILE_LENGTH } from "../calcs";
-import { DoubleBuffer } from "./profileBuffer";
 import producerURL from "./producer.ts?url";
 import type { InitMessage, WorkerMessage } from "./worker-types";
 import { lerp, makeDeferred, type Deferred } from "../helpers";
 
 // Lives on the main thread
 export class Presenter {
-    private buffer: DoubleBuffer<Profile>;
     private producer: Worker;
     private current: Profile;
     private next: Profile;
     private promise: Deferred<Profile>;
 
     constructor(initConc: InitConc) {
-        this.buffer = new DoubleBuffer(PROFILE_LENGTH, Float32Array);
         console.log("Creating web worker...");
-        this.producer = new Worker(producerURL);
+        this.producer = new Worker(producerURL, {
+            type: "module"
+        });
 
         // Initialize producer
         const initMsg: InitMessage = {
             type: "init",
             payload: {
                 initConditions: initConc,
-                bufferDetails: this.buffer.export()
             }
         };
         this.producer.postMessage(initMsg);
-        this.producer.addEventListener("message", (e) => console.log(e.data))
 
         // Initialize profiles
         this.current = createProfile(initConc);
@@ -45,7 +42,6 @@ export class Presenter {
         // Handle solution response by resolving the promise
         this.producer.addEventListener("message", (e) => {
             const msg = e.data as WorkerMessage;
-            console.log(msg)
             if (msg.type !== "data") throw new Error(`Worker sent message: ${e}`);
             def.resolve(msg.payload);
         }, { once: true });
@@ -106,7 +102,6 @@ export class Presenter {
         for (let i=0;i<PROFILE_LENGTH;i++) {
             current[i] = lerp(current[i], next[i], s);
         }
-        console.log(this.current)
 
         return this.current;
     }
