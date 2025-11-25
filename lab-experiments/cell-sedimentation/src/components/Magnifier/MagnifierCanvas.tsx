@@ -1,7 +1,11 @@
-import { onCleanup, onMount } from "solid-js";
+import { onCleanup, onMount, type Accessor } from "solid-js";
 import * as THREE from "three";
+import type { MagnifierParticleInfo } from "../../types/globals";
+import { createParticleMaterial } from "../../ts/materials";
 
 type Props = {
+    particleInfo: Accessor<MagnifierParticleInfo>;
+    showing: Accessor<boolean>;
     count?: number;
 };
 
@@ -24,44 +28,41 @@ export default function MagnifierCanvas(props: Props) {
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
         camera.position.set(0, 0, 100);
+        scene.background = new THREE.Color(0x7777FF);
 
         // Particles geometry
         const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(count * 3);
-        const colors = new Float32Array(count * 3);
+        const particles = new Float32Array(count * 4);
 
-        const color = new THREE.Color();
         const spread = 60;
         for (let i = 0; i < count; i++) {
-            const i3 = i * 3;
+            const i4 = i * 4;
             // distribute in a sphere-ish volume
             const r = Math.cbrt(Math.random()) * spread;
             const theta = Math.random() * Math.PI * 2;
-            const phi = Math.acos(2 * Math.random() - 1);
-            positions[i3 + 0] = r * Math.sin(phi) * Math.cos(theta);
-            positions[i3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-            positions[i3 + 2] = r * Math.cos(phi);
-
-            // color gradient-ish
-            color.setHSL((i / count) * 0.7, 0.8, 0.6);
-            colors[i3 + 0] = color.r;
-            colors[i3 + 1] = color.g;
-            colors[i3 + 2] = color.b;
+            const z = (Math.random() * 2 - 1) * 200;
+            particles[i4 + 0] = r * Math.cos(theta);
+            particles[i4 + 1] = z;
+            particles[i4 + 2] = r * Math.sin(theta);
+            particles[i4 + 3] = i;
         }
+        console.log(particles)
+        const partBuf = new THREE.InterleavedBuffer(particles, 4);
 
-        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+        geometry.setAttribute("position", new THREE.InterleavedBufferAttribute(partBuf, 3, 0));
+        geometry.setAttribute("index", new THREE.InterleavedBufferAttribute(partBuf, 1, 12));
 
         // Points material
-        const material = new THREE.PointsMaterial({
-            size: 1.6,
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.95,
-            depthWrite: false,
-            sizeAttenuation: true,
-        });
+        // const material = new THREE.PointsMaterial({
+        //     size: 1.6,
+        //     vertexColors: true,
+        //     transparent: true,
+        //     opacity: 0.95,
+        //     depthWrite: false,
+        //     sizeAttenuation: true,
+        // });
 
+        const material = createParticleMaterial();
         const points = new THREE.Points(geometry, material);
         scene.add(points);
 
@@ -82,15 +83,14 @@ export default function MagnifierCanvas(props: Props) {
         const clock = new THREE.Clock();
         let raf = 0;
         function animate() {
-            const dt = clock.getDelta();
-            points.rotation.y += dt * 0.1;
-            points.rotation.x += dt * 0.02;
+            if (props.showing()) {
+                const t = clock.getElapsedTime();
+                material.uniforms.time.value = t;
+                // Set uniforms
 
-            // subtle pulsate
-            const s = 1 + Math.sin(clock.elapsedTime * 1.5) * 0.05;
-            points.scale.setScalar(s);
+                renderer.render(scene, camera);
 
-            renderer.render(scene, camera);
+            }
             raf = requestAnimationFrame(animate);
         }
         raf = requestAnimationFrame(animate);

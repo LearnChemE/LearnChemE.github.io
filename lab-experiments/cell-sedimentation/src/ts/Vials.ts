@@ -1,15 +1,35 @@
 import * as THREE from 'three';
 import { animate } from './helpers';
 import { Presenter } from './Workers/presenter';
-import type { InitConc, Profile } from '../types/globals';
+import type { InitConc, MagnifierParticleInfo, Profile } from '../types/globals';
+import { conc_r, particle_velocities } from './calcs';
 
 const Starting_Vial_Concentrations: Array<InitConc> = [
-    { xr0: 0.05, xw0: 0.05 },
-    { xr0: 0.15, xw0: 0.05 },
-    { xr0: 0.30, xw0: 0.05 },
-    { xr0: 0.45, xw0: 0.05 },
     { xr0: 0.60, xw0: 0.05 },
+    { xr0: 0.45, xw0: 0.05 },
+    { xr0: 0.30, xw0: 0.05 },
+    { xr0: 0.15, xw0: 0.05 },
+    { xr0: 0.05, xw0: 0.05 },
 ];
+
+function getPInfoAtIndex(profile: Profile, index: number): MagnifierParticleInfo {
+    const cr = profile[index + 2];
+    const cw = profile[index + 502];
+    return makePInfoFromConc(cr, cw);
+}
+
+const maxTotConc = conc_r(1);
+function makePInfoFromConc(xr: number, xw: number): MagnifierParticleInfo {
+    let cr = conc_r(xr);
+    let cw = conc_r(xw);
+    const { red, white } = particle_velocities(cr, cw);
+    return {
+        num: Math.min((cr + cw) / maxTotConc, 1),
+        fracR: cr / (cr + cw),
+        rVel: red,
+        wVel: white
+    }
+}
 
 /**
  * A class that incorporates a Presenter and a uniform for each vial
@@ -29,7 +49,6 @@ export class Vial {
         const newProf = this.presenter.step(dt);
         this.updateUniform(newProf);
         this.onChange?.(newProf);
-        console.log(`top: ${newProf[1]}`)
         // console.log(`t=${(_/1000).toFixed(2)}, prof@t=${newProf[0]}`)
     }
 
@@ -56,6 +75,16 @@ export class Vial {
 
     public attachPlot = (onProfileChange: (p: Profile) => void) => {
         this.onChange = onProfileChange;
+    }
+
+    public getParticleInfo = (y: number): MagnifierParticleInfo => {
+        const cur = this.presenter.getCurrent();
+        const i0 = Math.floor(y);
+        if (i0 === 499) return getPInfoAtIndex(cur, 499);
+
+        const xr = (i0 + 1 - y) * cur[i0 + 2] + (y - i0) * cur[i0 + 3];
+        const xw = (i0 + 1 - y) * cur[i0 + 502] + (y - i0) * cur[i0 + 503];
+        return makePInfoFromConc(xr, xw);
     }
 }
 
@@ -114,5 +143,12 @@ export class VialsArray {
 
     public attachPlot(vialIdx: number, onProfileChange: (p: Profile) => void) {
         this.vials[vialIdx].attachPlot(onProfileChange);
+    }
+
+    public getParticleInfo = (vial: number, y: number): MagnifierParticleInfo => {
+        const v = this.vials[vial];
+        y = y * 499 / 305;
+
+        return v.getParticleInfo(y);
     }
 }

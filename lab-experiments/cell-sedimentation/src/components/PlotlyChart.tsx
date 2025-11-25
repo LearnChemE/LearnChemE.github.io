@@ -1,7 +1,7 @@
 import Plotly from "plotly.js-dist-min";
 import { createEffect, createMemo, onCleanup, onMount, type Component } from "solid-js"
 import type { Profile } from "../types/globals";
-import { CONC_ARRAY_SIZE, phi_r, phi_w } from "../ts/calcs";
+import { CONC_ARRAY_SIZE } from "../ts/calcs";
 
 interface PlotlyChartProps {
     data: () => Profile,
