@@ -1,0 +1,28 @@
+.control-button {
+  background-color: white;
+  border: none;
+  color: black;
+  text-align: center;
+  cursor: pointer;
+  position: absolute;
+  right: 50px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+.control-button:hover {
+  background-color: #ddd;
+}
+
+.active {
+  background-color: #3498db;
+  color: white;
+}
+.control-button.active:hover {
+  background-color: #2980b9;
+}

@@ -1,0 +1,13 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+}
+
+canvas {
+  -webkit-user-select: none; /* iOS Safari */
+  -webkit-touch-callout: none; /* Disable long-press menu */
+  user-select: none;
+  touch-action: none;
+}
