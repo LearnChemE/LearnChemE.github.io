@@ -62,6 +62,7 @@ export class Presenter {
             return true;
         } else {
             // Not ready; fallback to loading state
+            console.log("%c[Presenter] " + `%c Next solution pending...`, "color: green", "color: white")
             return false;
         }
     }
@@ -72,16 +73,14 @@ export class Presenter {
      * @returns true if the buffer is ready; false if not
      */
     public step = (dt: number): Profile => {
-        const current = this.current;
-        const next = this.next;
-
         // Figure out the timestep
-        let currentTime = current[0];
-        let nextTime = next[0];
+        let currentTime = this.current[0];
+        let nextTime = this.next[0];
         let s = (nextTime > currentTime) ? dt / (nextTime - currentTime) : 1;
 
         // Determine how far to interpolate, and fetch the next if needed
         if (s >= 1) {
+            // console.log("%c[Presenter]" + `%c dt=${dt}: s=${s} > 1 ; Checking for next solution`, "color:green", "color:white")
             dt -= nextTime - currentTime;
             this.current = this.next;
             const loaded = this.getNextSol();
@@ -91,19 +90,18 @@ export class Presenter {
             }
             else {
                 // next is ready; swap and reduce that amount of time.
-                dt -= (nextTime - currentTime);
-                currentTime = current[0];
-                nextTime = next[0];
+                currentTime = this.current[0];
+                nextTime = this.next[0];
                 s = dt / (nextTime - currentTime);
             }
         }
 
         // Linearly interpolate the current towards the next
         for (let i=0;i<PROFILE_LENGTH;i++) {
-            current[i] = lerp(current[i], next[i], s);
+            this.current[i] = lerp(this.current[i], this.next[i], s);
         }
 
-        return this.current;
+        return this.current.slice();
     }
 
     public getCurrent = () => {

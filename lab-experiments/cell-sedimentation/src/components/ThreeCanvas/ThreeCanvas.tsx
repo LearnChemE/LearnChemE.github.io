@@ -115,7 +115,7 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ drag, onUniformPrepar
                             mat.side = THREE.DoubleSide;
                             // Add opacity to the glass
                             if (mat.name === "Glass") {
-                                mat.opacity = .1;
+                                mat.opacity = 0.1;
                             }
                             // Change the shader for the blood
                             if (mat.name === "blood") {
@@ -131,7 +131,7 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ drag, onUniformPrepar
                     if (obj.name.startsWith("blood")) {
                         const vialIdx = parseInt(obj.name.slice(5));
                         // Attach the uniform to the corresponding vial
-                        console.log(bloodMat!.uniforms);
+                        // console.log(bloodMat!.uniforms);
                         vials[vialIdx] = bloodMat!.uniforms;
                     }
                 }

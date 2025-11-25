@@ -5,10 +5,10 @@ import type { InitConc, Profile } from '../types/globals';
 
 const Starting_Vial_Concentrations: Array<InitConc> = [
     { xr0: 0.05, xw0: 0.05 },
-    // { xr0: 0.15, xw0: 0.05 },
-    // { xr0: 0.30, xw0: 0.05 },
-    // { xr0: 0.45, xw0: 0.05 },
-    // { xr0: 0.60, xw0: 0.05 },
+    { xr0: 0.15, xw0: 0.05 },
+    { xr0: 0.30, xw0: 0.05 },
+    { xr0: 0.45, xw0: 0.05 },
+    { xr0: 0.60, xw0: 0.05 },
 ];
 
 /**
@@ -19,6 +19,7 @@ export class Vial {
     private presenter: Presenter;
     private uniform: THREE.ShaderMaterial["uniforms"] | null = null;
     private loading: boolean = false;
+    private onChange?: (p: Profile) => void | undefined = undefined;
 
     constructor (initConc: InitConc) {
         this.presenter = new Presenter(initConc);
@@ -27,6 +28,9 @@ export class Vial {
     public evolve = (dt: number, _: number) => {
         const newProf = this.presenter.step(dt);
         this.updateUniform(newProf);
+        this.onChange?.(newProf);
+        console.log(`top: ${newProf[1]}`)
+        // console.log(`t=${(_/1000).toFixed(2)}, prof@t=${newProf[0]}`)
     }
 
     public setUniform = (uniform: THREE.ShaderMaterial["uniforms"]) => {
@@ -36,7 +40,7 @@ export class Vial {
     private updateUniform = (profile: Profile) => {
         if (this.uniform) {
             // console.log("uniform would be updated with", profile);
-            // this.uniform.profile.value = profile;
+            this.uniform.profile.value = profile;
         } else {
             console.warn("updateUniform called before Vial initialization");
         }
@@ -48,6 +52,10 @@ export class Vial {
 
     public isLoading = () => {
         return this.loading;
+    }
+
+    public attachPlot = (onProfileChange: (p: Profile) => void) => {
+        this.onChange = onProfileChange;
     }
 }
 
@@ -102,5 +110,9 @@ export class VialsArray {
             const ic = Starting_Vial_Concentrations[i];
             vial.reset(ic);
         });
+    }
+
+    public attachPlot(vialIdx: number, onProfileChange: (p: Profile) => void) {
+        this.vials[vialIdx].attachPlot(onProfileChange);
     }
 }

@@ -177,6 +177,9 @@ export function rhs_adv_diff(y: number[], dz: number) {
     drdt[CONC_ARRAY_SIZE-1] = -adv_r[CONC_ARRAY_SIZE-1];
     dwdt[CONC_ARRAY_SIZE-1] = -adv_w[CONC_ARRAY_SIZE-1];
 
+    // console.log(drdt.map((dr,i) => (dr !== dr) ? i : 0).filter(e => e !== 0));
+    // console.log(drdt.slice(490));
+
     return drdt.concat(dwdt);
 }
 
@@ -328,7 +331,7 @@ export class ProfileSolver {
      * @returns Results at time t + timestep
      */
     public calculate_step = () => {
-        const sol = rk45(this.rhs, this.current, 0, SOLVER_TIMESTEP);
+        const sol = rk45(this.rhs, this.current, 0, SOLVER_TIMESTEP, { rtol: 1e-4, atol: 1e-6 });
 
         // Extract solution
         let y_cur = sol.y.at(-1)!;
@@ -347,23 +350,30 @@ export class ProfileSolver {
         this.t += SOLVER_TIMESTEP;
 
         console.log("Solved to t=", this.t)
-        return new Float32Array([this.t, this.top].concat(this.current)) as Profile;
+        const returnProf = new Float32Array([this.t, this.top].concat(this.current)) as Profile
+        for (let i=2;i<502;i++) {
+            returnProf[i] = phi_r(returnProf[i]);
+        }
+        for (let i=502;i<1002;i++) {
+            returnProf[i] = phi_w(returnProf[i]);
+        }
+        return returnProf;
     }
 }
 
 
 export const createProfile = (initConc: InitConc): Profile => {
     // Initialize profile
-    const cr0 = conc_r(initConc.xr0);
-    const cw0 = conc_w(initConc.xw0);
+    const xr0 = initConc.xr0;
+    const xw0 = initConc.xw0;
     const init: number[] = new Array(PROFILE_LENGTH);
     init[0] = 0; // time
     init[1] = 0; // top
     for (let i=2;i<CONC_ARRAY_SIZE+2;i++) {
-        init[i] = cr0;
+        init[i] = xr0;
     }
     for (let i=2+CONC_ARRAY_SIZE;i<2*CONC_ARRAY_SIZE+2;i++) {
-        init[i] = cw0;
+        init[i] = xw0;
     }
 
     return new Float32Array(init);

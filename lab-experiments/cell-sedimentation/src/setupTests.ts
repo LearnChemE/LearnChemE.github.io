@@ -6,11 +6,20 @@ export async function plotFn(xRange: number[], fn: (x: number) => number, option
     await new Promise((resolve) => setTimeout(resolve, 1000)); // Arbitrary timeout to give client time to load
 }
 
-export async function plotArrs(xRange: number[], yRanges: number[][], options?: Partial<Plot>, layout?: Layout) {
-    const traces = yRanges.map((yRange: number[]): Plot => {
+export async function plotArrs(xRange: number[] | number[][], yRanges: number[][], options?: Partial<Plot>, layout?: Layout) {
+    if (!Array.isArray(xRange[0])) {
+        xRange = new Array(yRanges.length).fill(xRange);
+    } else {
+        if (xRange.length !== yRanges.length) {
+            throw new Error("xRange and yRanges must have same length if two dimensional.");
+        }
+    }
+    xRange = xRange as number[][];
+    
+    const traces = yRanges.map((yRange: number[], i: number): Plot => {
         return { 
             type: 'scatter',
-            x: xRange,
+            x: xRange[i],
             y: yRange,
             ...options
         }

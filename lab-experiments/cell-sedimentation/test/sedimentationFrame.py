@@ -14,7 +14,7 @@ cr_max, cw_max = vel.concentration(1, vel.d_r), vel.concentration(1, vel.d_w)
 
 # Initial conditions
 xw0 = 0.05
-xr0 = 0.05
+xr0 = 0.02
 cr0 = vel.concentration(xr0, vel.d_r)
 cw0 = vel.concentration(xw0, vel.d_w)
 # print("settling vel", vel.particle_velocities(cr0, cw0))

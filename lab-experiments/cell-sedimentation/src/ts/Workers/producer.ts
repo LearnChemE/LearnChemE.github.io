@@ -2,6 +2,8 @@ import { ProfileSolver } from "../calcs";
 import { BaseWorker } from "./baseWorker";
 import type { DataMessage, InitMessage, WorkerMessage } from "./worker-types";
 
+const printProducer = (str: string) => console.log("%c[Producer] " + `%c${str}`, "color: red", "color: white");
+
 try {
 /**
  * Producer class. On request, iterates its solver and sends the resulting data.
@@ -22,6 +24,7 @@ class ProducerWorker extends BaseWorker {
         }
 
         if (msg.type === "produce") {
+            printProducer("Recieved produce message")
             this.produce();
             return;
         }

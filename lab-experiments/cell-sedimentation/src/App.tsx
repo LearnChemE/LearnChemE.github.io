@@ -6,11 +6,15 @@ import { AboutText, DirectionsText } from './components/Modal/modals'
 import { ThreeCanvas } from './components/ThreeCanvas/ThreeCanvas'
 import { VialsArray } from './ts/Vials'
 import { Magnifier } from './components/Magnifier/Magnifier'
+import { PlotlyChart } from './components/PlotlyChart'
+import { createProfile } from './ts/calcs'
 
 function App() {
   const [magnifying, setMagnifying] = createSignal(false);
+  const [plotProfile, setPlotProfile] = createSignal(createProfile({ xr0: 0.05, xw0: 0.05 }))
 
   const vials = new VialsArray();
+  vials.attachPlot(0, setPlotProfile);
 
   return (
     <>
@@ -21,7 +25,9 @@ function App() {
       {/* Controls */}
       <HamburgerMenu path="" downloadName="" Directions={DirectionsText} About={AboutText} />
       <ControlButton icon="fa-solid fa-magnifying-glass" active={magnifying} label="mix vials" top={120} onClick={() => setMagnifying(!magnifying())} />
-      <ControlButton icon="fa-solid fa-rotate" label="mix vials" top={190} onClick={vials.resetAnimation} />
+      <ControlButton icon="fa-solid fa-rotate" label="mix vials" top={190} onClick={vials.reset} />
+
+      <PlotlyChart data={plotProfile} layout={{ xaxis: { range: [0, 305] } }} />
     </>
   )
 }

@@ -101,10 +101,10 @@ export function rk45(
 
     // Adapt timestep
     const scale = safety * Math.pow(1.0 / Math.max(err, 1e-10), 0.25);
-    h = Math.min(dtMax, Math.max(dtMin, h * Math.min(4, Math.max(0.1, scale))));
+    h = Math.min(dtMax, h * Math.min(4, Math.max(0.1, scale)));
 
     if (h < dtMin && err > 1.0) {
-      console.warn("Step size underflow — integration failed");
+      throw new Error("Step size underflow — integration failed");
       break;
     }
   }
