@@ -66,6 +66,7 @@ export class Vial {
     }
 
     public reset = (ic: InitConc) => {
+        console.log("reset vial", ic);
         // TODO: add reset message for web worker
     }
 

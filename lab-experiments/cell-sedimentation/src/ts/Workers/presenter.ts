@@ -1,6 +1,6 @@
 import type { Profile, InitConc } from "../../types/globals";
 import { createProfile, PROFILE_LENGTH } from "../calcs";
-import producerURL from "./producer.ts?url";
+import producerURL from "./producer.ts?worker&url";
 import type { InitMessage, WorkerMessage } from "./worker-types";
 import { lerp, makeDeferred, type Deferred } from "../helpers";
 
