@@ -13,7 +13,7 @@ const EVAPORATOR_PRESSURE = 1; // bar
 const X_IN = 0.05;
 const Y_IN = X_IN / MW_SUCROSE / (X_IN / MW_SUCROSE + (1 - X_IN) / MW_WATER);
 
-const MASS_IN_EVAPORATOR = 3; // kg
+const MASS_IN_EVAPORATOR = 0.25; // kg
 
 /**
  * Convert mass fraction sucrose to mole fraction sucrose
