@@ -117,7 +117,7 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     const m_c = x_c * MASS_IN_EVAPORATOR; // kg sucrose in evaporator
     const y_c = moleFrac(x_c); // mole frac
     // Energy in minus energy out
-    const in_minus_out = mdot_feed * (Cp(temp_feed, Y_IN) * temp_feed - Cp(temp_feed, y_c) * temp_conc); // W
+    const in_minus_out = mdot_feed * (Cp(temp_feed, Y_IN) * temp_feed - Cp(temp_conc, y_c) * temp_conc); // W
 
     // Use energy bal to evolve without consumption first
     const acc_noCons = in_minus_out + heat_rate; // W
