@@ -15,6 +15,40 @@ const Y_IN = X_IN / MW_SUCROSE / (X_IN / MW_SUCROSE + (1 - X_IN) / MW_WATER);
 
 const MASS_IN_EVAPORATOR = 0.25; // kg
 
+class PIDController {
+    private readonly kp: number;
+    private readonly ki: number;
+    private readonly kd: number;
+    private igrl: number = 0;
+    private prev: number = 0;
+
+    constructor(kp?: number, ki?: number, kd?: number) {
+        this.kp = kp ?? 1;
+        this.ki = ki ?? .5;
+        this.kd = kd ?? .25;
+    }
+
+    public calculate(err: number, dt: number) {
+        // Proportional
+        const P = err * this.kp;
+        // Integral
+        this.igrl += err * dt;
+        const I = this.ki * this.igrl;
+        // Derivative
+        const D = (dt > 0) ? this.kd * (err - this.prev) / dt : 0;
+        this.prev = err;
+        console.log(`P: ${P.toFixed(1)} I: ${I.toFixed(1)} D: ${D.toFixed(1)}`)
+
+        return P + I + D;
+    }
+
+    public decayIntegral(by: number) {
+        this.igrl *= by;
+    }
+}
+
+const evaporateControl = new PIDController(1, .3, 0);
+
 /**
  * Convert mass fraction sucrose to mole fraction sucrose
  * @param massFrac 
@@ -93,6 +127,7 @@ function dHvap(T: number) {
     return H_vap;
 }
 
+
 // console.log(TVap3bar - 273)
 let debugt = 0;
 /**
@@ -129,16 +164,30 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     const newT_noCons = temp_conc + dTdt_noCons * dt;
 
     let mdot_conc, mdot_evap;
-    console.log(`mol frac: ${y_c.toFixed(2)}\nmass frac: ${x_c.toFixed(2)}`);
+    // console.log(`mol frac: ${y_c.toFixed(2)}\nmass frac: ${x_c.toFixed(2)}`);
     const Tboil = inv_antoines(EVAPORATOR_PRESSURE / (1 - y_c));
+    console.log("Tboil:", (Tboil - 273.15).toFixed(2))
     if (newT_noCons >= Tboil - .05) {
         const deltaT_cons = Math.max(newT_noCons - Tboil, temp_conc - Tboil);
         // You essentially create a P-only controller here, so you need to force the value down
-        const max_cons = Math.max(deltaT_cons * a + in_minus_out + heat_rate, deltaT_cons * a); // Maximum power available for evaporation (W)
-
         // Calculate the actual rates based on the surplus energy
-        const dH = Math.max(dHvap(temp_conc), dHvap(temp_feed))
-        mdot_evap = Math.min(max_cons / dH, mdot_feed * (1 - x_c)); // kg / s
+        const dH = dHvap(Tboil) + a * (newT_noCons - Tboil);
+
+        // Calculate consumed energy to get to Tboil
+        const nrg_cons = deltaT_cons * dH; // Maximum power available for evaporation (W)
+        // Maximum based on feed flowrate
+        const evap_nrg_max = mdot_feed * (1 - x_c) * dH;
+        let actual_cons;
+        if (nrg_cons >= evap_nrg_max) {
+            actual_cons = evap_nrg_max;
+        }
+        else {
+            actual_cons = evaporateControl.calculate(nrg_cons, dt);
+        }
+
+        console.log(`xc: ${x_c}`)
+        // console.log(actual_cons * dH, mdot_feed * (1 - x_c));
+        mdot_evap = actual_cons / dH; // kg / s
         mdot_conc = mdot_feed - mdot_evap; // kg / s
 
         // Calculate how much power is actually going to evaporation
@@ -148,50 +197,52 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
         const dTdt = (in_minus_out + heat_rate - cons) / a;
         // console.log(temp_conc + dTdt * dt, newT_noCons)
         temp_conc = temp_conc + dTdt * dt;
-        console.log("temp, boiling:", (temp_conc - 273.15).toFixed(2), (Tboil - 273.15).toFixed(2));
+        // console.log("temp, boiling:", (temp_conc - 273.15).toFixed(2), (Tboil - 273.15).toFixed(2));
     } else {
         // Approximately no evaporation; keep previous results
         mdot_conc = mdot_feed;
         mdot_evap = 0;
         temp_conc = newT_noCons;
+        evaporateControl.decayIntegral(.95);
     }
 
     // Calculate RoC of sucrose
     const dmdt = mdot_feed * X_IN - mdot_conc * x_c;
+    console.log("dmdt: ", mdot_feed * X_IN, mdot_conc * x_c);
 
     // Calculate steam rate
     const mdot_stm = heat_rate / dHvap(temp_stm); // kg / s
 
     // debug
-// if (__DEV__) {
-//     if (debugt++ % 3 == 0) {
-//     const temp_msg = {
-//         thi: temp_stm,
-//         tci: temp_feed,
-//         tco: temp_conc
-//     }
-//     const flow_msg = {
-//         feed: mdot_feed * 60,
-//         steam: mdot_stm * 60,
-//         evap: mdot_evap * 60,
-//         conc: mdot_conc * 60
-//     }
-//     const comp_msg = {
-//         feed: X_IN,
-//         conc: x_c
-//     }
-//     sendTestData(temp_msg, "temperature");
-//     sendTestData(flow_msg, "flowrates");
-//     sendTestData(comp_msg, "composition");
-//     }
-// }
+if (__DEV__) {
+    if (debugt++ % 7 == 0) {
+    const temp_msg = {
+        thi: temp_stm,
+        tci: temp_feed,
+        tco: temp_conc
+    }
+    const flow_msg = {
+        feed: mdot_feed * 60,
+        steam: mdot_stm * 60,
+        evap: mdot_evap * 60,
+        conc: mdot_conc * 60
+    }
+    const comp_msg = {
+        feed: X_IN,
+        conc: x_c
+    }
+    sendTestData(temp_msg, "temperature");
+    sendTestData(flow_msg, "flowrates");
+    sendTestData(comp_msg, "composition");
+    }
+}
 
     // Set state
     state.evapFlow = mdot_evap * 60; // kg / min
     state.steamFlow = mdot_stm * 60; // kg / min
     state.concFlow = mdot_conc * 60; // kg / min
     state.concComp = (m_c + dmdt * dt) / MASS_IN_EVAPORATOR;
-    console.log(state.concComp)
+    // console.log(state.concComp)
     state.concTemp = temp_conc - 273.15;
     state.steamTemp = temp_stm - 273.15;
     // console.log(state.steamTemp)
