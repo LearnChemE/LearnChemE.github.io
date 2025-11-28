@@ -73,29 +73,22 @@ function run_CSTR(args) {
   let CB = CB0;
   let CC = CC0;
   let CD = CD0;
-  const time_steps = Math.ceil(t / dt);
 
-  if (t < dt) {
-    return { time: t, CA: CA, CB: CB, CC: CC, CD: CD, X: 0 };
-  }
+  const result = {};
 
-  const results = [];
+  const time = t + dt;
+  const X = CC / (vA * CAf / (vA + vB)); // Conversion of A
+  results.push({ time: time, CA: CA, CB: CB, CC: CC, CD: CD, X: X });
 
-  for (let i = 0; i <= time_steps; i++) {
-    const time = i * dt;
-    const X = CC / (vA * CAf / (vA + vB)); // Conversion of A
-    results.push({ time: time, CA: CA, CB: CB, CC: CC, CD: CD, X: X });
+  const dCA = dCA_dt(CA, CB, T) * dt;
+  const dCB = dCB_dt(CA, CB, T) * dt;
+  const dCC = dCC_dt(CA, CB, CC, T) * dt;
+  const dCD = dCD_dt(CA, CB, CD, T) * dt;
 
-    const dCA = dCA_dt(CA, CB, T) * dt;
-    const dCB = dCB_dt(CA, CB, T) * dt;
-    const dCC = dCC_dt(CA, CB, CC, T) * dt;
-    const dCD = dCD_dt(CA, CB, CD, T) * dt;
-
-    CA += dCA;
-    CB += dCB;
-    CC += dCC;
-    CD += dCD;
-  }
+  CA += dCA;
+  CB += dCB;
+  CC += dCC;
+  CD += dCD;
 
   return results[results.length - 1];
 }

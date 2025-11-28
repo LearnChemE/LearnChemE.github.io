@@ -4,7 +4,7 @@
   "description": "Two liquid reactants in a solvent flow into a steady-state, continuous stirred tank reactor (CSTR). The objective is to determine the rate constant and the reaction order with respect to one of the reactants.",
   "main": "index.js",
   "scripts": {
-    "start": "webpack serve --open --config ./_dev/webpack.config.js --mode=development --host 192.168.0.111",
+    "start": "webpack serve --open --config ./_dev/webpack.config.js --mode=development",
     "build": "webpack --config ./_dev/webpack.config.js --mode=production",
     "install-dependencies": "npm install --save bootstrap clean-webpack-plugin css-loader file-loader html-loader html-webpack-plugin mini-css-extract-plugin p5 postcss-loader sass sass-loader style-loader terser-webpack-plugin to-string-loader uglify-js webpack webpack-cli webpack-dev-server"
   },
@@ -36,5 +36,8 @@
     "webpack": "^5.99.6",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.1"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0"
   }
 }
