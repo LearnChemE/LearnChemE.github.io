@@ -16,7 +16,7 @@ const PRegLines: Component<{l: () => number}> = ({l}) => {
 
     return (
         <>
-            <For each={Array.from({length: 10}, (_,i) => (i * dTh + dTh - (300 * l()) % 18))}>
+            <For each={Array.from({length: 10}, (_,i) => (i * dTh + dTh + (300 * l()) % 18))}>
                 {th => {
                     // Calculate spoke angle
                     if (th > 180) return null; // Don't render past 180 degrees
@@ -44,7 +44,7 @@ export const PRegulator: Component<PRegulatorProps> = ({ setPressure }) => {
             startX = e.clientX;
 
             // Update lift with clamping
-            const newL = Math.min(1, Math.max(0, l() + deltaX * 0.003));
+            const newL = Math.min(1, Math.max(0, l() - deltaX * 0.003));
             setL(newL);
 
             // Update pressure
