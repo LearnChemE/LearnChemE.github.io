@@ -9,7 +9,7 @@ export const steamFlowLabelDescriptor: DigitalLabelDescriptor = {
   centerId: "steamFlowScreen",
   fill: "#F9F155",
   units: "",
-  decimals: 1,
+  decimals: 2,
   initialValue: 0,
   range: {
     range: [0, 10000],
@@ -27,7 +27,7 @@ export const steamPresLabelDescriptor: DigitalLabelDescriptor = {
   centerId: "steamPresScreen",
   fill: "#F9F155",
   units: "",
-  decimals: 1,
+  decimals: 2,
   initialValue: 20,
   range: {
     range: [0, 10000],
@@ -249,7 +249,7 @@ export const evapLabelDescriptor = {
     id: "evapLabel",
     centerId: "Group 1",
     units: "kg/min",
-    decimals: 1,
+    decimals: 2,
     initialValue: 0,
     flipToBottom: true
 }
