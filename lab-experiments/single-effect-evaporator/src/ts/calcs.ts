@@ -28,6 +28,8 @@ function moleFrac(massFrac: number) {
 
 /**
  * Calculate saturated temperature from pressure
+ * @param P Saturated Pressure (bar absolute)
+ * @returns Temperature (K)
  */
 function inv_antoines(P: number) {
     const logP = Math.log10(P);
