@@ -185,6 +185,12 @@ body {
   justify-content: flex-start;
 }
 
+.slider-checkbox--stacked span {
+  text-align: center;
+  display: inline-block;
+  width: 100%;
+}
+
 .math-label {
   font-style: italic;
   font-weight: 600;
