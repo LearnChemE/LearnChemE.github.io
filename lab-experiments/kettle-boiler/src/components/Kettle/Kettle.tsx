@@ -10,6 +10,7 @@ declare const __DEV__: boolean;
 export interface KettleProps {
   // Inputs
   feedRate: () => number; // in gal/min
+  evaporateRate: () => number; // in gal/min
   steamTemp: () => number; // in C
   outTemp: () => number; // in C
 
@@ -25,7 +26,6 @@ export const Kettle: Component<KettleProps> = (props) => {
   const [chamberFill, setChamberFill] = createSignal(0); // 0 to 1
   const [pathFill, setPathFill] = createSignal(0); // 0 to 1
   const [overflowFill, setOverflowFill] = createSignal(0); // 0 to 1
-  const [internalEvaporateRate, setInternalEvaporateRate] = createSignal(0);
 
   onMount(() => {
     // Initially hide the exterior
@@ -39,7 +39,7 @@ export const Kettle: Component<KettleProps> = (props) => {
   // if (props.onSteamOutChange) createEffect(() => props.onSteamOutChange!(Math.max(steamOut(), 0)));
 
   // Animations for the three fills
-  const fills: ChamberFills = { chamberFill, pathFill, overflowFill, setChamberFill, setPathFill, setOverflowFill, internalEvaporateRate, setInternalEvaporateRate };
+  const fills: ChamberFills = { chamberFill, pathFill, overflowFill, setChamberFill, setPathFill, setOverflowFill };
   animateChamberMassBalance(props, fills);
   animateChamberEnergyBalance(props, fills);
   const bubbleHeight = createMemo(() => 60 * chamberFill());;
