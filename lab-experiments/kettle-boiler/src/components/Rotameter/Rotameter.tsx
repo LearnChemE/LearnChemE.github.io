@@ -3,16 +3,16 @@ import "./Rotameter.css";
 
 interface RotameterProps {
   flowrate: () => number; // Optional prop to set the flowrate
+  onRef: (el: SVGGElement) => void;
 }
 
-const Rotameter: Component<RotameterProps> = ({ flowrate }) => {
+const Rotameter: Component<RotameterProps> = ({ flowrate, onRef }) => {
   const pixels = 80 * (1.4/1.6); // Total pixels the ball can move
   const maxFlowrate = 1.4; // Max flowrate corresponding to max pixels
   const pixelsPerFlowrate = pixels / maxFlowrate;
   
-
-  return (
-<g id="rotameter">
+  return (<>
+<g id="rotameter" ref={onRef} >
 <path
         id="ball"
         class="rotameter-ball"
@@ -150,6 +150,7 @@ const Rotameter: Component<RotameterProps> = ({ flowrate }) => {
 </g>
 </g>
 </g>
+</>
 )}
 
 export default Rotameter;

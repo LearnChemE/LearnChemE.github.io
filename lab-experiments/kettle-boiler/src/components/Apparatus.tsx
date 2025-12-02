@@ -1,4 +1,4 @@
-import { createMemo, createSignal, type Component } from "solid-js";
+import { createMemo, createSignal, onMount, type Component } from "solid-js";
 import StaticElements from "./Static/StaticElements";
 import StaticDefs from "./Static/StaticDefs";
 import Rotameter from "./Rotameter/Rotameter";
@@ -13,6 +13,7 @@ import { PRegulator } from "./PRegulator/PRegulator";
 import { calculateSteamTemperature, FEED_RATE_GAIN } from "../ts/calcs";
 import { animate } from "../ts/helpers";
 import { Steam } from "./Steam/Steam";
+import { MagnifierEmitter } from "./Magnifier/MagnifierEmitter";
 
 // Note: The Apparatus component is the main SVG container for the kettle boiler experiment. 
 // It includes static elements, interactable components like the rotameter and kettle, displays for temperature readings, waterfalls to represent fluid flow, 
@@ -27,6 +28,8 @@ export const Apparatus: Component = () => {
   const [outRate, setOutRate] = createSignal(0); // Kettle outlet
   const [condRate, setCondRate] = createSignal(0); // Condensate flowrate
   const [outTemp, setOutTemp] = createSignal(25);
+  const [rotameterRef, setRotameterRef] = createSignal<SVGGElement | null>(null);
+  onMount(() => console.log("apparatus ref for rotameter:", rotameterRef))
 
   // Memos
   // const steamPressure = createMemo(() => ballValveOpen() ? Math.min(regulatorPressure(), 15) : 0); // Steam pressure depends on ball valve state
@@ -39,9 +42,7 @@ export const Apparatus: Component = () => {
     return true;
   });
   const steamTemperature = createMemo(() => calculateSteamTemperature(steamPressure())); // Steam temperature based on pressure
-  // createEffect(() => console.log(condRate()))
 
-  // const outTempDisplay = createMemo(() => outRate() > 0.01 ? Math.min(outTemp(), 100.1).toFixed(1) : "--");
   const outTempDisplay = createMemo(() => outTemp().toFixed(1)); // Show internal temp always for debugging
 
 return (<svg
@@ -53,7 +54,9 @@ return (<svg
 >
   <g id="canvas" clip-path="url(#clip0_6_626)">
     <rect width="1133" height="777" fill="white" />
-    <Rotameter flowrate={feedRate}/>
+    <MagnifierEmitter emitterKey="rotameter" svgRef={rotameterRef()!}>
+      <Rotameter flowrate={feedRate} onRef={setRotameterRef} />
+    </MagnifierEmitter>
     <StaticElements/>
 
     {/* Interactables */}

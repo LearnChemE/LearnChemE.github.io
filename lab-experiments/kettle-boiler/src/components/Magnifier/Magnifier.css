@@ -1,0 +1,21 @@
+.lens {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border: 2px solid black;
+    border-radius: 100%;
+    transform: translate(-50%,-50%);
+
+    canvas {
+        overflow: hidden;
+        clip-path: circle(50%);
+    }
+}
+
+.tube-selector {
+    /* border: 2px solid red; */
+    position: absolute;
+    width: 8%;
+    height: 100%;
+    top: 0%;
+}
