@@ -1,5 +1,5 @@
 import { type Accessor, type Setter } from "solid-js";
-import { animate } from "../../ts/helpers";
+import { animate, constrain } from "../../ts/helpers";
 import type { KettleProps } from "./Kettle";
 import { dHvap, FEED_RATE_GAIN } from "../../ts/calcs";
 
@@ -18,10 +18,7 @@ export interface ChamberFills {
     // Fill Setters
     setChamberFill  : Setter<number>,
     setPathFill     : Setter<number>,
-    setOverflowFill : Setter<number>,
-    // Evaporate
-    internalEvaporateRate   : Accessor<number>,
-    setInternalEvaporateRate: Setter<number>,
+    setOverflowFill : Setter<number>
 };
 
 export function animateChamberMassBalance(props: KettleProps, fills: ChamberFills) {
@@ -41,7 +38,7 @@ export function animateChamberMassBalance(props: KettleProps, fills: ChamberFill
         const fillIn = flow / chamberVolume * dt; // normalize to chamber volume (unitless)
         overflowRate = (height > 124) ? (height - 124) * MAX_FLOWRATE / OVERFLOW_PIXELS_MAX : 0;
         const fillOut = overflowRate * dt / chamberVolume; // unitless
-        const evapOut = fills.internalEvaporateRate() * dt / chamberCapac_kg; // unitless
+        const evapOut = props.evaporateRate() * dt / chamberCapac_kg; // unitless
 
         let newFill = fill + fillIn - fillOut - evapOut;
         newFill = Math.min(1, newFill); // Clamp under 1
@@ -116,11 +113,13 @@ export function animateChamberEnergyBalance(props: KettleProps, fills: ChamberFi
         let cons = 0, evap = 0;
         // Solve for evaporation
         const Tboil = 100; // K
-        if (fillFrac > 0) {
+        if (fillFrac > 0 && Tc >= Tboil) {
             // Energy required to keep at boiling point\
             // Because this is differential, we only need to supply enough energy to cover losses
             cons = UA * (Ts - Tboil) + mdot_in * Cp * (T_in - Tboil); // W
-            cons = cons > 0 ? cons : 0; // W
+            const cons_max = Cp * fillMass * (Tc - Tboil) + dHvap(100) * fillMass * 1000; // W
+            cons = constrain(cons, 0, cons_max); // W
+            if (cons < 0) cons = 0;
             // Use consumption to solve mass balance
             evap = cons / dHvap(Tboil) / 1000; // kg / s 
         }
@@ -132,7 +131,8 @@ export function animateChamberEnergyBalance(props: KettleProps, fills: ChamberFi
         props.onOutTempChange(Tc + dTdt * dt);
         props.onEvaporateChange?.(evap);
         props.onSteamOutChange?.(cond);
-        console.log(cond)
+        // console.log("Feed rate: ", props.feedRate() / 60);
+        // console.log("Evaporate rate: ", evap);
 
         return true;
     });

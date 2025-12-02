@@ -25,6 +25,7 @@ export const Apparatus: Component = () => {
   const [regulatorPressure, setRegulatorPressure] = createSignal(0); // Pressure state for the PRegulator
   const [steamPressure, setSteamPressure] = createSignal(-1);
   const [feedRate, setFeedRate] = createSignal(0); // Feed flow rate
+  const [evaporateRate, setEvaporateRate] = createSignal(0); // Evaporation rate
   const [outRate, setOutRate] = createSignal(0); // Kettle outlet
   const [condRate, setCondRate] = createSignal(0); // Condensate flowrate
   const [outTemp, setOutTemp] = createSignal(25);
@@ -63,11 +64,12 @@ return (<svg
     <Kettle 
       // Kettle Inputs
       feedRate={feedRate} 
+      evaporateRate={evaporateRate}
       steamTemp={steamTemperature} 
       outTemp={outTemp}
       // Kettle Outputs
       onOutletChange={setOutRate}
-      onEvaporateChange={() => {}}
+      onEvaporateChange={setEvaporateRate}
       onSteamOutChange={setCondRate}
       onOutTempChange={setOutTemp}
     />
