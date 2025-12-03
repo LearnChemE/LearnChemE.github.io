@@ -1,3 +1,21 @@
+// args: {
+//   t,
+//   T,
+//   CAf,
+//   CBf,
+//   vA,
+//   vB
+// }
+// 
+// returns: { 
+//   time: time, 
+//   CA: CA, 
+//   CB: CB, 
+//   CC: CC, 
+//   CD: CD, 
+//   X: X 
+// }
+
 /**
  * @param {number} args.t - time in seconds
  * @param {number} args.T - temperature in Kelvin

@@ -86,7 +86,7 @@ let errorMessages = []; // Array to hold error messages
 let errorDisappear = 0;
 
 // Import hamburger menu functions
-import { drawHamburgerMenu, handleHamburgerClick } from './hamburger';
+// import { drawHamburgerMenu, handleHamburgerClick } from './hamburger';
 
 function drawPump(x, y, size, pipeWidth, label) {
   // Main pump body (circular housing)
@@ -1341,7 +1341,7 @@ export function drawSimulation(width, height) {
   drawConcentrationMonitors(baseX, baseY, indicatorW, indicatorH);
 
   // Draw hamburger menu last to ensure it's on top
-  drawHamburgerMenu();
+  // drawHamburgerMenu();
 
   // Draw operation instructions under the outlet pipe
   drawOperationInstructions(width, height);
@@ -1785,10 +1785,10 @@ function drawSimpleTank(x, y, w, h, liquidLevel, liquidColor, canvasWidth) {
 // Refactor mousePressed handler to check all switches and only return after toggling the correct one
 const oldMousePressed = window.mousePressed;
 window.mousePressed = function() {
-  // Check hamburger menu first
-  if (handleHamburgerClick(mX, mY)) {
-    return;
-  }
+  // // Check hamburger menu first
+  // if (handleHamburgerClick(mX, mY)) {
+  //   return;
+  // }
 
   // Check reset button
   if (resetButtonBounds &&
