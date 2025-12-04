@@ -39,3 +39,49 @@ window.windowResized = () => {
 window.relativeSize = () => {
   return containerElement.offsetWidth / state.canvasSize[0];
 }
+
+// Hamburger
+const menuBtn = document.querySelector('.menu-btn');
+const menuContent = document.querySelector('.menu-content');
+const menuItems = document.querySelectorAll('.menu-item');
+const modals = document.querySelectorAll('.modal');
+const closeBtns = document.querySelectorAll('.close-btn');
+
+
+// Hamburger menu functionality
+menuBtn.addEventListener('click', () => {
+    menuContent.classList.toggle('show');
+});
+
+// Close menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (!menuBtn.contains(e.target) && !menuContent.contains(e.target)) {
+        menuContent.classList.remove('show');
+    }
+});
+
+// Menu items click handlers
+menuItems.forEach(item => {
+    if (item.getAttribute('data-modal') === null) return;
+    item.addEventListener('click', () => {
+        const modalId = item.getAttribute('data-modal') + '-modal';
+        document.getElementById(modalId).style.display = 'block';
+        menuContent.classList.remove('show');
+    });
+});
+
+// Close modal buttons
+closeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        btn.closest('.modal').style.display = 'none';
+    });
+});
+
+// Close modal when clicking outside
+window.addEventListener('click', (e) => {
+    modals.forEach(modal => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
