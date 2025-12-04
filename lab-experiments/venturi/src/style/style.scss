@@ -28,6 +28,17 @@ $modal-xl: 1140px;
   }
 }
 
+// Responsive valve
+.draggable {
+  cursor: grab;
+}
+.draggable:hover {
+  filter: url(#shadow);
+}
+.draggable:active {
+  cursor: grabbing;
+}
+
 iframe {
   width: 100%;
   aspect-ratio: 16 / 9;
