@@ -144,6 +144,7 @@
        sodipodi:nodetypes="cccccccc" />
     <g
        id="valve"
+       class="draggable"
        transform="translate(0,43.871858)">
       <circle
          r="5.6618781"
@@ -636,7 +637,9 @@
   </g>
   <g
      transform="translate(-24.795686,1.5024241)"
-     id="ruler">
+     id="ruler"
+     class="draggable"
+     >
     <rect
        y="5"
        x="210"
