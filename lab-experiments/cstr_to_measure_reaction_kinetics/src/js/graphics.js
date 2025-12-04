@@ -1,3 +1,4 @@
+import { CSTR } from './cstr_calc';
 // CSTR (Continuous Stirred Tank Reactor) simulation graphics module
 
 // Global state variables
@@ -52,16 +53,14 @@ let tankBLastFlowTime = 0; // Last CH₃COOCH₃ flow
 let totalInletFlowRate = 0; // Total inlet flow
 
 // CSTR calculations
-let lastCalculationTime = 0; // Last calc time
 let currentCA1 = 0; // CH₃COONa conc
 let currentCB1 = 0; // CH₃OH conc
-let accumulatedTime = 0; // Reaction time
 
 // Color states
 let lastCSTRColor = null; // CSTR tank color
 
-// Import CSTR calculation module
-const run_CSTR = require('./cstr_calc');
+// // Import CSTR calculation module
+// const run_CSTR = require('./cstr_calc');
 
 // Simulation constants
 const TANK_VOLUME = 20000; // 20L in ml (was 200L)
@@ -87,6 +86,8 @@ let errorDisappear = 0;
 
 // Import hamburger menu functions
 // import { drawHamburgerMenu, handleHamburgerClick } from './hamburger';
+
+const cstr = new CSTR();
 
 function drawPump(x, y, size, pipeWidth, label) {
   // Main pump body (circular housing)
@@ -603,8 +604,7 @@ function drawOutletPipe(x, y, pipeWidth, valvePosition, label) {
   // Draw blue draggable handle at the end
   translate(handleLength, 0);
   // Use navy blue when pump is off, gray when pump is on
-  const isPumpOn = label === "Tank A" ? pumpASwitchOn : pumpBSwitchOn;
-  fill(isPumpOn ? color(180, 180, 180) : color('#4CAF50')); // Use exact same color as slider ball
+  fill(color('#4CAF50')); // Use exact same color as slider ball
   circle(0, 0, handleWidth * 1.5);
   
   // Add center dot to handle
@@ -975,7 +975,7 @@ function handleInteractions(e) {
   }
 
   // Check valve handle interactions (always allowed unless pump is on)
-  function updateValvePosition(handle, setPosition, isPumpOn, isDragging) {
+  function updateValvePosition(handle, setPosition, isDragging) {
     const { centerX, centerY } = handle;
 
     // Increase the interaction radius for stronger interaction
@@ -983,11 +983,6 @@ function handleInteractions(e) {
 
     // Check if we're either clicking the handle or already dragging
     if (dist(mX, mY, handle.x, handle.y) < handleRadius || isDragging) {
-      if (!handle || isPumpOn) {
-        const valveError = "Cannot adjust valve while pump is on";
-        error(valveError);
-        return false; // Don't allow valve adjustment if pump is on
-      }
       const deltaX = mX - centerX;
       const deltaY = mY - centerY;
       let angle = Math.atan2(deltaY, deltaX);
@@ -1013,8 +1008,8 @@ function handleInteractions(e) {
   }
 
   // Update valve positions and track drag state
-  const newValveAPosition = updateValvePosition(window.tankAHandle, (angle) => { valveAPosition = angle; }, pumpASwitchOn, isDraggingValveA);
-  const newValveBPosition = updateValvePosition(window.tankBHandle, (angle) => { valveBPosition = angle; }, pumpBSwitchOn, isDraggingValveB);
+  const newValveAPosition = updateValvePosition(window.tankAHandle, (angle) => { valveAPosition = angle; }, isDraggingValveA);
+  const newValveBPosition = updateValvePosition(window.tankBHandle, (angle) => { valveBPosition = angle; }, isDraggingValveB);
 
   // Update drag states
   isDraggingValveA = newValveAPosition;
@@ -1296,41 +1291,17 @@ export function drawSimulation(width, height) {
     if (rotorAngle > Math.PI * 2) rotorAngle -= Math.PI * 2;
   }
 
-  // Calculate CSTR values
-  const calcTime = millis();
+  // Calcs for CSTR
+  const Caf = parseFloat(sliderAValue);
+  const CBf = parseFloat(sliderBValue);
+  const vA = parseFloat(currentFlowRateA / 1000); // Round flow rate A to 4 decimal places (L/s)
+  const vB = parseFloat(currentFlowRateB / 1000); // Round flow rate B to 4 decimal places (L/s)
+  const cstrResult = cstr.step(Caf, CBf, vA, vB, temperatureValue + 273.15, deltaTime);
+  console.table(cstrResult);
 
-  const timeSinceLastCalc = (calcTime - lastCalculationTime) / 1000;
-
-  if (timeSinceLastCalc >= 0.1) { // Update every 100ms
-    // Only calculate when both pumps are on
-    if (pumpASwitchOn && pumpBSwitchOn) {
-      // Reset accumulated time when both pumps are on
-      if (accumulatedTime === 0) {
-        accumulatedTime = timeSinceLastCalc * TIME_LAPSE_FACTOR;
-      } else {
-        accumulatedTime += timeSinceLastCalc * TIME_LAPSE_FACTOR;
-      }
-      
-      const cstrResult = run_CSTR({
-        t: accumulatedTime,
-        T: Math.round(temperatureValue) + 273.15, // Convert °C to K and round temperature
-        CAf: parseFloat(sliderAValue.toFixed(3)), // Round concentration A to 3 decimal places
-        CBf: parseFloat(sliderBValue.toFixed(3)), // Round concentration B to 3 decimal places
-        vA: parseFloat((currentFlowRateA / 1000).toFixed(4)), // Round flow rate A to 4 decimal places (L/s)
-        vB: parseFloat((currentFlowRateB / 1000).toFixed(4)) // Round flow rate B to 4 decimal places (L/s)
-      });
-
-      // Update the values
-      currentCA1 = cstrResult.CC;
-      currentCB1 = cstrResult.CD;
-    } else {
-      // Reset concentrations and time when not both pumps are on
-      currentCA1 = 0;
-      currentCB1 = 0;
-      accumulatedTime = 0;
-    }
-    lastCalculationTime = calcTime;
-  }
+  // Update the values
+  currentCA1 = cstrResult.CC;
+  currentCB1 = cstrResult.CD;
 
   // Draw concentration monitors
   const indicatorW = 65;
@@ -1911,10 +1882,9 @@ function resetSimulation() {
   concentrationSet = false;
 
   // Reset CSTR calculations
-  lastCalculationTime = millis();
+  cstr.reset();
   currentCA1 = 0;
   currentCB1 = 0;
-  accumulatedTime = 0;
 
   // Reset tank colors
   lastCSTRColor = null;
