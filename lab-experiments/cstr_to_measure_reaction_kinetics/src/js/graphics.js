@@ -1,4 +1,5 @@
 import { CSTR } from './cstr_calc';
+import { ZoomView } from './zoom';
 // CSTR (Continuous Stirred Tank Reactor) simulation graphics module
 
 // Global state variables
@@ -88,6 +89,7 @@ let errorDisappear = 0;
 // import { drawHamburgerMenu, handleHamburgerClick } from './hamburger';
 
 const cstr = new CSTR();
+const zoom = new ZoomView(1400, 1000);
 
 function drawPump(x, y, size, pipeWidth, label) {
   // Main pump body (circular housing)
@@ -940,37 +942,39 @@ function handleInteractions(e) {
 
   const sliderHandleRadius = 16; // Adjusted to match the visual handle size (handleR) in drawSlider
   const operationalError = "Cannot set concentrations while tank\nis operational";
+  let negateDrag = false;
+  const [mx, my] = zoom.screenToWorld(mX, mY);
 
   // Only block slider logic if rotor is on
   if (!rotorOn) {
     // Check slider interactions (A)
     if (!concentrationSet) {
-      if (Math.abs(mY - (sliderAY - trackOffset)) < sliderHandleRadius) {
+      if (Math.abs(my - (sliderAY - trackOffset)) < sliderHandleRadius) {
         // Use the new sliderStartX and sliderEndX for mapping mouseX to value
-        if (mX >= sliderStartX && mX <= sliderEndX) {
-          sliderAValue = map(mX, sliderStartX, sliderEndX, 0.1, 0.5);
+        if (mx >= sliderStartX && mx <= sliderEndX) {
+          sliderAValue = map(mx, sliderStartX, sliderEndX, 0.1, 0.5);
           sliderAValue = parseFloat(constrain(sliderAValue, 0.1, 0.5).toFixed(2));
-          return; // Only allow one slider at a time
+          return true; // Only allow one slider at a time
         }
       }
     }
     // Check slider interactions (B)
     if (!concentrationSet) {
-      if (Math.abs(mY - (sliderBY - trackOffset)) < sliderHandleRadius) {
+      if (Math.abs(my - (sliderBY - trackOffset)) < sliderHandleRadius) {
         // Use the new sliderStartX and sliderEndX for mapping mouseX to value
-        if (mX >= sliderStartX && mX <= sliderEndX) {
-          sliderBValue = map(mX, sliderStartX, sliderEndX, 0.1, 0.5);
+        if (mx >= sliderStartX && mx <= sliderEndX) {
+          sliderBValue = map(mx, sliderStartX, sliderEndX, 0.1, 0.5);
           sliderBValue = parseFloat(constrain(sliderBValue, 0.1, 0.5).toFixed(2));
-          return;
+          return true;
         }
       }
     }
     // Check Set button interaction
-    if (setButtonBounds && mX >= setButtonBounds.x && mX <= setButtonBounds.x + setButtonBounds.w && mY >= setButtonBounds.y && mY <= setButtonBounds.y + setButtonBounds.h) {
+    if (setButtonBounds && mx >= setButtonBounds.x && mx <= setButtonBounds.x + setButtonBounds.w && my >= setButtonBounds.y && my <= setButtonBounds.y + setButtonBounds.h) {
       concentrationSet = true;
-      return;
+      return true;
     }
-  } else if ((Math.abs(mY - (sliderAY - trackOffset)) < sliderHandleRadius && (mX >= sliderStartX && mX <= sliderEndX) || Math.abs(mY - (sliderBY - trackOffset)) < sliderHandleRadius && (mX >= sliderStartX && mX <= sliderEndX))) {
+  } else if ((Math.abs(my - (sliderAY - trackOffset)) < sliderHandleRadius && (mx >= sliderStartX && mx <= sliderEndX) || Math.abs(my - (sliderBY - trackOffset)) < sliderHandleRadius && (mx >= sliderStartX && mx <= sliderEndX))) {
     error(operationalError);
   }
 
@@ -982,9 +986,9 @@ function handleInteractions(e) {
     const handleRadius = 20; // Increased from 15 to 20 for larger interaction area
 
     // Check if we're either clicking the handle or already dragging
-    if (dist(mX, mY, handle.x, handle.y) < handleRadius || isDragging) {
-      const deltaX = mX - centerX;
-      const deltaY = mY - centerY;
+    if (dist(mx, my, handle.x, handle.y) < handleRadius || isDragging) {
+      const deltaX = mx - centerX;
+      const deltaY = my - centerY;
       let angle = Math.atan2(deltaY, deltaX);
       
       // Normalize angle to be between -π and π
@@ -992,7 +996,7 @@ function handleInteractions(e) {
 
       // Only allow rotation in the correct direction (counter-clockwise from left to right)
       // If trying to rotate clockwise (angle > 0), ignore the movement
-      if (angle > 0) return isDragging; // Return current drag state if trying to rotate wrong way
+      if (angle > 0) return true; // Return current drag state if trying to rotate wrong way
 
       // Smooth mapping from mouse angle to valve position
       // Use a wider range for mouse movement but map smoothly to valve position
@@ -1007,13 +1011,10 @@ function handleInteractions(e) {
     return false; // Return false to indicate we're not dragging
   }
 
-  // Update valve positions and track drag state
-  const newValveAPosition = updateValvePosition(window.tankAHandle, (angle) => { valveAPosition = angle; }, isDraggingValveA);
-  const newValveBPosition = updateValvePosition(window.tankBHandle, (angle) => { valveBPosition = angle; }, isDraggingValveB);
-
-  // Update drag states
-  isDraggingValveA = newValveAPosition;
-  isDraggingValveB = newValveBPosition;
+  // Update valve positions and drag states
+  isDraggingValveA = updateValvePosition(window.tankAHandle, (angle) => { valveAPosition = angle; }, isDraggingValveA);
+  isDraggingValveB = updateValvePosition(window.tankBHandle, (angle) => { valveBPosition = angle; }, isDraggingValveB);
+  if (isDraggingValveA || isDraggingValveB) negateDrag = true; // Exit if dragging a valve
 
   // --- TEMPERATURE SLIDER LOG ---
   // These must match drawSlider for the temperature slider
@@ -1027,19 +1028,21 @@ function handleInteractions(e) {
   const tempSliderEndX = tempSliderX + tempSliderW / 2;
 
   if (!rotorOn && !temperatureSet) {
-    if (Math.abs(mY - (tempSliderY - tempTrackOffset)) < sliderHandleRadius) { // Use tempTrackOffset for temperature slider
+    if (Math.abs(my - (tempSliderY - tempTrackOffset)) < sliderHandleRadius) { // Use tempTrackOffset for temperature slider
       // Use the new tempSliderStartX and tempSliderEndX for mapping mouseX to value
-      if (mX >= tempSliderStartX && mX <= tempSliderEndX) {
+      if (mx >= tempSliderStartX && mx <= tempSliderEndX) {
         // Map mX to temperature value (25 to 85 °C)
-        temperatureValue = map(mX, tempSliderStartX, tempSliderEndX, 25, 85);
+        temperatureValue = map(mx, tempSliderStartX, tempSliderEndX, 25, 85);
         temperatureValue = parseFloat(constrain(temperatureValue, 25, 85).toFixed(2));
-        return;
+        return true;
       }
     }
-  } else if (Math.abs(mY - (tempSliderY - tempTrackOffset)) < sliderHandleRadius && mX >= tempSliderStartX && mX <= tempSliderEndX) {
+  } else if (Math.abs(my - (tempSliderY - tempTrackOffset)) < sliderHandleRadius && mx >= tempSliderStartX && mx <= tempSliderEndX) {
     const operationalError = "Cannot set temperature while tank\nis operational";
     error(operationalError);
   }
+
+  return negateDrag;
 }
 
 function drawConcentrationMonitors(baseX, baseY, indicatorW, indicatorH) {
@@ -1160,6 +1163,7 @@ function drawConcentrationMonitors(baseX, baseY, indicatorW, indicatorH) {
 
 export function drawSimulation(width, height) {
   background(255);
+  zoom.apply();
 
   // Calculate time delta for volume updates
   const currentTime = millis();
@@ -1297,7 +1301,6 @@ export function drawSimulation(width, height) {
   const vA = parseFloat(currentFlowRateA / 1000); // Round flow rate A to 4 decimal places (L/s)
   const vB = parseFloat(currentFlowRateB / 1000); // Round flow rate B to 4 decimal places (L/s)
   const cstrResult = cstr.step(Caf, CBf, vA, vB, temperatureValue + 273.15, deltaTime);
-  console.table(cstrResult);
 
   // Update the values
   currentCA1 = cstrResult.CC;
@@ -1754,52 +1757,65 @@ function drawSimpleTank(x, y, w, h, liquidLevel, liquidColor, canvasWidth) {
 }
 
 // Refactor mousePressed handler to check all switches and only return after toggling the correct one
-const oldMousePressed = window.mousePressed;
-window.mousePressed = function() {
-  // // Check hamburger menu first
-  // if (handleHamburgerClick(mX, mY)) {
-  //   return;
-  // }
+window.addEventListener("pointerdown", () => {
+  // Convert screen coordinates to world coordinates
+  const [mx, my] = zoom.screenToWorld(mX, mY);
 
   // Check reset button
   if (resetButtonBounds &&
-    mX >= resetButtonBounds.x &&
-    mX <= resetButtonBounds.x + resetButtonBounds.width &&
-    mY >= resetButtonBounds.y &&
-    mY <= resetButtonBounds.y + resetButtonBounds.height) {
+    mx >= resetButtonBounds.x &&
+    mx <= resetButtonBounds.x + resetButtonBounds.width &&
+    my >= resetButtonBounds.y &&
+    my <= resetButtonBounds.y + resetButtonBounds.height) {
     resetSimulation();
     return;
   }
   // Check other interactions
-  const mx = mX,
-    my = mY;
   let toggled = false;
   const rotorError = "Rotor must be ON to toggle pumps.";
+  // Check pump A switch
   if (rotorOn && pumpASwitchBounds && mx >= pumpASwitchBounds.x && mx <= pumpASwitchBounds.x + pumpASwitchBounds.w && my >= pumpASwitchBounds.y && my <= pumpASwitchBounds.y + pumpASwitchBounds.h) {
     pumpASwitchOn = !pumpASwitchOn;
     toggled = true;
   } else if (!rotorOn && pumpASwitchBounds && mx >= pumpASwitchBounds.x && mx <= pumpASwitchBounds.x + pumpASwitchBounds.w && my >= pumpASwitchBounds.y && my <= pumpASwitchBounds.y + pumpASwitchBounds.h) {
     error(rotorError);
   }
-  if (rotorOn && pumpBSwitchBounds && mx >= pumpBSwitchBounds.x && mx <= pumpBSwitchBounds.x + pumpBSwitchBounds.w && my >= pumpBSwitchBounds.y && my <= pumpBSwitchBounds.y + pumpBSwitchBounds.h) {
+  // Check pump B switch
+  else if (rotorOn && pumpBSwitchBounds && mx >= pumpBSwitchBounds.x && mx <= pumpBSwitchBounds.x + pumpBSwitchBounds.w && my >= pumpBSwitchBounds.y && my <= pumpBSwitchBounds.y + pumpBSwitchBounds.h) {
     pumpBSwitchOn = !pumpBSwitchOn;
     toggled = true;
   } else if (!rotorOn && pumpBSwitchBounds && mx >= pumpBSwitchBounds.x && mx <= pumpBSwitchBounds.x + pumpBSwitchBounds.w && my >= pumpBSwitchBounds.y && my <= pumpBSwitchBounds.y + pumpBSwitchBounds.h) {
     error(rotorError);
   }
-  if (switchBounds && mx >= switchBounds.x && mx <= switchBounds.x + switchBounds.w && my >= switchBounds.y && my <= switchBounds.y + switchBounds.h) {
+  // Check rotor switch
+  else if (switchBounds && mx >= switchBounds.x && mx <= switchBounds.x + switchBounds.w && my >= switchBounds.y && my <= switchBounds.y + switchBounds.h) {
     rotorOn = !rotorOn;
     toggled = true;
   }
-  if (!toggled && typeof oldMousePressed === 'function') oldMousePressed();
+  else {
+    const negateDrag = handleInteractions();
+    // Zoom handling
+    if (!negateDrag && mX >= 0 && mY >= 0 && mX <= 1400 && mY <= 1400) zoom.handleMousePressed();
+  }
 
-};
+});
 
 // Add mouseReleased handler to reset drag states
-window.mouseReleased = function() {
+window.addEventListener("pointerup", () => {
   isDraggingValveA = false;
   isDraggingValveB = false;
-};
+  zoom.handleMouseReleased();
+});
+
+// Zoom on mouse wheel
+window.addEventListener("wheel", (event) => {
+  zoom.handleMouseWheel(event);
+});
+
+// Drag when mouse is dragged
+window.addEventListener("mousemove", () => {
+  zoom.handleMouseDragged();
+});
 
 function drawResetButton() {
   const buttonWidth = 100;
@@ -1808,8 +1824,9 @@ function drawResetButton() {
   const buttonY = 20;
 
   // Check if mouse is hovering over the reset button, accounting for scaling
-  const isHovering = mX >= buttonX && mX <= buttonX + buttonWidth &&
-    mY >= buttonY && mY <= buttonY + buttonHeight;
+  const [mx, my] = zoom.screenToWorld(mX, mY);
+  const isHovering = mx >= buttonX && mx <= buttonX + buttonWidth &&
+    my >= buttonY && my <= buttonY + buttonHeight;
 
   // Button background
   // Use the specified red color
