@@ -1299,6 +1299,7 @@ export function drawSimulation(width, height) {
   const Caf = parseFloat(sliderAValue);
   const CBf = parseFloat(sliderBValue);
   const vA = parseFloat(currentFlowRateA / 1000); // Round flow rate A to 4 decimal places (L/s)
+  console.log("Flowrate A:", currentFlowRateA.toFixed(2))
   const vB = parseFloat(currentFlowRateB / 1000); // Round flow rate B to 4 decimal places (L/s)
   const cstrResult = cstr.step(Caf, CBf, vA, vB, temperatureValue + 273.15, deltaTime);
 

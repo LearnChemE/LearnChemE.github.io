@@ -5,7 +5,7 @@ const V = 2; // volume of tank (L)
 const k = (T) => {
   const Ea = 33.40e3; // J/mol
   const R = 8.314; // J/(mol*K)
-  const A = 5.8e5; // Pre-exponential factor (arbitrary units)
+  const A = 5.8e5; // Pre-exponential factor (L / mol / s)
   return A * Math.exp(-Ea / (R * T));
 }
 
