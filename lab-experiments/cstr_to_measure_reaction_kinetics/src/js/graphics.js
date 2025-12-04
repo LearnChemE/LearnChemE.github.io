@@ -1301,8 +1301,6 @@ export function drawSimulation(width, height) {
   const vA = parseFloat(currentFlowRateA / 1000); // Round flow rate A to 4 decimal places (L/s)
   const vB = parseFloat(currentFlowRateB / 1000); // Round flow rate B to 4 decimal places (L/s)
   const cstrResult = cstr.step(Caf, CBf, vA, vB, temperatureValue + 273.15, deltaTime);
-  const naohConversion = (Caf > 0) ? 1 - (cstrResult.CA / Caf) : 0; // Conversion percentage of NaOH
-  console.table({ ...cstrResult, naohConversion });
 
   // Update the values
   currentCA1 = cstrResult.CC;
