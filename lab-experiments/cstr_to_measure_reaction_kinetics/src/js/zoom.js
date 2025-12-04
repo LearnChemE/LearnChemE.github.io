@@ -43,8 +43,8 @@ export class ZoomView {
 
     handleMouseDragged = () => {
         if (this.isDragging) {
-            const dx = this.lastMouseX - mouseX;
-            const dy = this.lastMouseY - mouseY;
+            let dx = (this.lastMouseX - mouseX) * 2 / this.zoom;
+            let dy = (this.lastMouseY - mouseY) * 2 / this.zoom;
             this.zoomX = constrain(this.zoomX + dx, 0, this.width);
             this.zoomY = constrain(this.zoomY + dy, 0, this.height);
             this.lastMouseX = mouseX;
