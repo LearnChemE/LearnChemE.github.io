@@ -237,7 +237,7 @@
        d="m 71.2,118 h 8 l 0.75,-0.43 h 2.8 v 3 h -2.8 l -0.75,-0.43 h -8"
        style="fill:#f0f0f0;fill-opacity:0.4;stroke:#000000;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:0.5;opacity:1" />
     <g
-       style="opacity:0"
+       style="opacity:0; cursor: pointer"
        id="pinch-group"
        transform="translate(0.00907563,0.02437986)">
       <path
@@ -271,7 +271,8 @@
          style="opacity:0;fill:#ffffff;stroke:#ffffff;stroke-width:0.108159" />
     </g>
     <g
-       id="valve">
+       id="valve"
+       class="draggable">
       <circle
          r="5.6618781"
          cy="118.19462"
@@ -699,7 +700,8 @@
   </g>
   <g
      transform="translate(-9,0)"
-     id="ruler">
+     id="ruler"
+     class="draggable">
     <rect
        y="5"
        x="210"
