@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def k(T):
     Ea =  131550  # J/mol
     R = 8.314     # J/(mol*K)
@@ -14,9 +15,9 @@ if __name__ == "__main__":
     k_values = k(Tk_vals)
 
     # Plot 2: Conversion
-    Tk = 55 + 273.15
+    Tk = 25 + 273.15
     max_flow = 60 * 2 / 1000 # L / s
-    vol = 2 # L
+    vol = 1 # L
     flow = np.linspace(0.01, 1, 100) * max_flow
     Ca0 = .15; Cb0 = .15
     residence_times = vol / flow # spacetime, s
