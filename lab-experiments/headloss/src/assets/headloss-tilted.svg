@@ -268,7 +268,8 @@
     </g>
     <g
        id="valve"
-       transform="rotate(-18.679584,223.11221,130.15175)">
+       transform="rotate(-18.679584,223.11221,130.15175)"
+       class="draggable">
       <circle
          style="fill:#b4b4ff;fill-opacity:1;stroke:#000000;stroke-width:0.131292;stroke-dasharray:none;stroke-opacity:0.5"
          id="valve-circle"
@@ -286,7 +287,7 @@
          ry="0.89116836" />
     </g>
     <g
-       style="opacity:0"
+       style="opacity:0; cursor: pointer"
        id="pinch-group">
       <path
          style="fill:#f0f0f0;fill-opacity:0.4;stroke:#000000;stroke-width:0.1;stroke-dasharray:none;stroke-opacity:0.5"

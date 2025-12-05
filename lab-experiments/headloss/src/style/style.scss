@@ -30,6 +30,17 @@ iframe {
   aspect-ratio: 16 / 9;
 }
 
+// Responsive valve
+.draggable {
+  cursor: grab;
+}
+.draggable:hover {
+  filter: url(#shadow);
+}
+.draggable:active {
+  cursor: grabbing;
+}
+
 #reset,
 #tilt {
   position: absolute;
