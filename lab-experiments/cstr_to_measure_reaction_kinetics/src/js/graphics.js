@@ -1299,8 +1299,9 @@ export function drawSimulation(width, height) {
   const Caf = parseFloat(sliderAValue);
   const CBf = parseFloat(sliderBValue);
   const vA = parseFloat(currentFlowRateA / 1000); // Round flow rate A to 4 decimal places (L/s)
+  console.log("Flowrate A:", currentFlowRateA.toFixed(2))
   const vB = parseFloat(currentFlowRateB / 1000); // Round flow rate B to 4 decimal places (L/s)
-  const cstrResult = cstr.step(Caf, CBf, vA, vB, temperatureValue + 273.15, deltaTime);
+  const cstrResult = cstr.step(Caf, CBf, vA, vB, temperatureValue + 273.15, deltaTime * 10);
 
   // Update the values
   currentCA1 = cstrResult.CC;
@@ -1331,8 +1332,9 @@ export function drawSimulation(width, height) {
   const rectHeight = height * 0.48; // Height
 
   // Check for hover state
-  const isHoveringRect = mX >= rectX && mX <= rectX + rectWidth &&
-                         mY >= rectY && mY <= rectY + rectHeight;
+  const [mx, my] = zoom.screenToWorld(mouseX, mouseY);
+  const isHoveringRect = mx >= rectX && mx <= rectX + rectWidth &&
+                         my >= rectY && my <= rectY + rectHeight;
 
   // Set stroke color based on hover state
   stroke(isHoveringRect ? color("#254D70") : 0); // Lighter grey on hover, black otherwise
@@ -1771,26 +1773,27 @@ window.addEventListener("pointerdown", () => {
     return;
   }
   // Check other interactions
-  let toggled = false;
   const rotorError = "Rotor must be ON to toggle pumps.";
   // Check pump A switch
   if (rotorOn && pumpASwitchBounds && mx >= pumpASwitchBounds.x && mx <= pumpASwitchBounds.x + pumpASwitchBounds.w && my >= pumpASwitchBounds.y && my <= pumpASwitchBounds.y + pumpASwitchBounds.h) {
     pumpASwitchOn = !pumpASwitchOn;
-    toggled = true;
   } else if (!rotorOn && pumpASwitchBounds && mx >= pumpASwitchBounds.x && mx <= pumpASwitchBounds.x + pumpASwitchBounds.w && my >= pumpASwitchBounds.y && my <= pumpASwitchBounds.y + pumpASwitchBounds.h) {
     error(rotorError);
   }
   // Check pump B switch
   else if (rotorOn && pumpBSwitchBounds && mx >= pumpBSwitchBounds.x && mx <= pumpBSwitchBounds.x + pumpBSwitchBounds.w && my >= pumpBSwitchBounds.y && my <= pumpBSwitchBounds.y + pumpBSwitchBounds.h) {
     pumpBSwitchOn = !pumpBSwitchOn;
-    toggled = true;
   } else if (!rotorOn && pumpBSwitchBounds && mx >= pumpBSwitchBounds.x && mx <= pumpBSwitchBounds.x + pumpBSwitchBounds.w && my >= pumpBSwitchBounds.y && my <= pumpBSwitchBounds.y + pumpBSwitchBounds.h) {
     error(rotorError);
   }
   // Check rotor switch
   else if (switchBounds && mx >= switchBounds.x && mx <= switchBounds.x + switchBounds.w && my >= switchBounds.y && my <= switchBounds.y + switchBounds.h) {
     rotorOn = !rotorOn;
-    toggled = true;
+    // If rotor is turned off, also turn off both pumps
+    if (!rotorOn) {
+      pumpASwitchOn = false;
+      pumpBSwitchOn = false;
+    }
   }
   else {
     const negateDrag = handleInteractions();
