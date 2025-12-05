@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def k(T):
-    Ea =  33.40e3  # J/mol
+    Ea =  131550  # J/mol
     R = 8.314     # J/(mol*K)
-    A = 5.8e5     # Pre-exponential factor (L / mol / s)
+    A = 5.38e21     # Pre-exponential factor (L / mol / s)
     return A * np.exp(-Ea / (R * T))
 
 if __name__ == "__main__":
@@ -56,4 +56,11 @@ if __name__ == "__main__":
     axes[2].set_ylabel('Concentration (M)')
     axes[2].set_title('Concentrations for varying valve settings at 55 C')
     axes[2].legend()
+    plt.show()
+
+    plt.plot(flow / max_flow * 100, xa, 'k-')
+    plt.xlabel('Valve Open %')
+    plt.ylabel('Conversion NaOH')
+    plt.title('Conversion NaOH for varying valve lifts at 55 C')
+    plt.grid()
     plt.show()
