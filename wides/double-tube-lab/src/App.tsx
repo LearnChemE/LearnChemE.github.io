@@ -167,8 +167,8 @@ function App() {
             <button
               type="button"
               className="btn btn-success"
-              disabled={pumpsRunning}
-              aria-disabled={pumpsRunning}
+              disabled={isPumpBtnDisabled || canvasMode === SINGLE_BEAKER}
+              aria-disabled={isPumpBtnDisabled || canvasMode === SINGLE_BEAKER}
               onClick={() => handleMeasureClick()}
             >
               measure temperatures
@@ -273,8 +273,8 @@ function App() {
             <button
               type="button"
               className="btn btn-success"
-              disabled={pumpsRunning}
-              aria-disabled={pumpsRunning}
+              disabled={isPumpBtnDisabled}
+              aria-disabled={isPumpBtnDisabled}
               onClick={() => handleMeasureClick()}
             >
               measure temperatures

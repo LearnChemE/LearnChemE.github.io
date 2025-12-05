@@ -72,8 +72,8 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
 
 
     // Cretae shaders
-    blueShader = p.createShader(fillVertShaderSource,blueFragShaderSource);
-    orngShader = p.createShader(fillVertShaderSource,orngFragShaderSource);
+    blueShader = p.createShader(fillVertShaderSource, blueFragShaderSource);
+    orngShader = p.createShader(fillVertShaderSource, orngFragShaderSource);
 
     // Create the parameterized filling animation
     fillingAnimation = new AnimationFactory;
