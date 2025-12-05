@@ -41,8 +41,16 @@ export function drawAll() {
 
     // Outlet labels
     textAlign(LEFT);
-    text(`Pₒᵤₜ = ${window.state.P_out_1} bar`, centerX + 35, centerY1 - 6);
-    text(`Tₒᵤₜ = ${window.state.T_out_1} K`, centerX + 35, centerY1 + 8);
+    let pout1 = window.state.P_out_1;
+    pout1 = pout1 >= 10 ? pout1.toFixed(1) : pout1.toFixed(2);
+    text(`P   = ${pout1} bar`, centerX + 35, centerY1 - 6);
+    text(`T   = ${window.state.T_out_1} K`, centerX + 35, centerY1 + 8);
+
+    push();
+    textSize(2);
+    text(`out`, centerX + 37, centerY1 - 5.5);
+    text(`out`, centerX + 37, centerY1 + 8.5);
+    pop();
 
     // Box 2 - Bottom
     stroke(0);
@@ -73,8 +81,16 @@ export function drawAll() {
 
     // Outlet labels
     textAlign(LEFT);
-    text(`Pₒᵤₜ = ${window.state.P_out_2} bar`, centerX + 35, centerY2 - 6);
-    text(`Tₒᵤₜ = ${window.state.T_out_2} K`, centerX + 35, centerY2 + 8);
+    let pout2 = window.state.P_out_2;
+    pout2 = pout2 >= 10 ? pout2.toFixed(1) : pout2.toFixed(2);
+    text(`P   = ${pout2} bar`, centerX + 35, centerY2 - 6);
+    text(`T   = ${window.state.T_out_2} K`, centerX + 35, centerY2 + 8);
+
+    push();
+    textSize(2);
+    text(`out`, centerX + 37, centerY2 - 5.5);
+    text(`out`, centerX + 37, centerY2 + 8.5);
+    pop();
 
     // Work output label (only on bottom box)
     textAlign(CENTER);

@@ -15,10 +15,11 @@ window.state = {
   canvasSize: [150, 120],
 };
 
+
+
 const containerElement = document.getElementById("p5-container");
 
-
-window.setup = function () {
+window.setup = async function () {
   sizeContainer();
   createCanvas(containerElement.offsetWidth, containerElement.offsetHeight).parent(containerElement);
   handleInputs();
@@ -26,6 +27,7 @@ window.setup = function () {
   calcAll();
   pixelDensity(state.pixelDensity);
   frameRate(state.frameRate);
+  // Use system font because it often has the best subscripts 
 };
 
 window.draw = function () {
