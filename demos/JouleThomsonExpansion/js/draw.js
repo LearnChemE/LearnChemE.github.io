@@ -600,11 +600,11 @@ function jouleThomsonCoeffPlot() {
   pop();
 
   push();
-  textAlign(CENTER);
+  textAlign(CENTER, CENTER);
   stroke("Black");
   strokeWeight(0.2);
   fill("Black");
-  textSize(22);
+  textSize(26);
   for (let i = state.graphBottomY; i >= state.graphTopY; i -= (state.graphBottomY - state.graphTopY) / 4) {
     text(-1 - (i - state.graphBottomY) / ((state.graphBottomY - state.graphTopY) / 4), state.graphLeftSideX - 20, i + 5);
   }
@@ -631,14 +631,13 @@ function jouleThomsonCoeffPlot() {
   pop();
 
   push();
-  rotate(-PI / 2);
-  textAlign(CENTER);
+  rotate(-90);
+  textAlign(CENTER, CENTER);
   stroke("Black");
   strokeWeight(0.2);
   fill("Black");
-  textSize(22);
-  text("Joule-Thomson coefficient (K/MPa)", -330, 60);
-
+  textSize(26);
+  text("Joule-Thomson coefficient (K/MPa)", -330, 50);
   pop();
 
   push();
@@ -646,7 +645,7 @@ function jouleThomsonCoeffPlot() {
   stroke("Black");
   strokeWeight(0.2);
   fill("Black");
-  textSize(22);
+  textSize(26);
   text("temperature (K)", state.width / 2, 680);
 
   let xH2 = state.graphLeftSideX + (state.graphRightSideX - state.graphLeftSideX) / 5 + 5;
@@ -658,17 +657,18 @@ function jouleThomsonCoeffPlot() {
   let xNH3 = state.graphLeftSideX + (7 * (state.graphRightSideX - state.graphLeftSideX)) / 10;
   let yNH3 = state.graphTopY + (0.2 * state.graphBottomY - state.graphTopY);
 
+  textSize(30);
   text("H", xH2, yH2);
   text("N", xN2, yN2);
   text("CO", xCO2, yCO2);
   text("NH", xNH3, yNH3);
 
-  textSize(12);
+  textSize(16);
   strokeWeight(0.4);
-  text("2", xH2 + 11, yH2 + 5);
-  text("2", xN2 + 11, yN2 + 5);
-  text("2", xCO2 + 20, yCO2 + 5);
-  text("3", xNH3 + 20, yNH3 + 5);
+  text("2", xH2 + 15, yH2 + 5);
+  text("2", xN2 + 15, yN2 + 5);
+  text("2", xCO2 + 25, yCO2 + 5);
+  text("3", xNH3 + 26, yNH3 + 5);
   pop();
 }
 
@@ -806,7 +806,7 @@ function drawMouseGraphInteraction() {
       rectMode(CENTER);
       fill(210, 210, 255);
       stroke("Blue");
-      rect(calibratedXPointOnCO2Line + textOffSetX, calibratedYPointOnCO2Line - textOffSetY, 80, 25);
+      rect(calibratedXPointOnCO2Line + textOffSetX, calibratedYPointOnCO2Line - textOffSetY, 105, 35);
       pop();
 
       push();
@@ -814,7 +814,7 @@ function drawMouseGraphInteraction() {
       stroke("Black");
       strokeWeight(0.2);
       fill("Black");
-      textSize(16);
+      textSize(22);
       text(i * 5 + 290 + ", " + state.muCO2[p][i].toFixed(2), calibratedXPointOnCO2Line + textOffSetX, calibratedYPointOnCO2Line - textOffSetY);
       pop();
 
@@ -848,7 +848,7 @@ function drawMouseGraphInteraction() {
       rectMode(CENTER);
       fill(210, 255, 210);
       stroke("green");
-      rect(calibratedXPointOnN2Line + textOffSetX, calibratedYPointOnN2Line - textOffSetY, 80, 25);
+      rect(calibratedXPointOnN2Line + textOffSetX, calibratedYPointOnN2Line - textOffSetY, 105, 35);
       pop();
 
       push();
@@ -856,7 +856,7 @@ function drawMouseGraphInteraction() {
       stroke("Black");
       strokeWeight(0.2);
       fill("Black");
-      textSize(16);
+      textSize(22);
       text(i * 5 + 145 + ", " + state.muN2[p][i].toFixed(2), calibratedXPointOnN2Line + textOffSetX, calibratedYPointOnN2Line - textOffSetY);
       pop();
 
@@ -869,7 +869,7 @@ function drawMouseGraphInteraction() {
     let calibratedXPointOnH2Line = state.graphLeftSideX + ((i * 5 + 55) / 1000) * (state.graphRightSideX - state.graphLeftSideX);
     let calibratedYPointOnH2Line = state.graphBottomY + ((state.muH2[p][i] + 1) / 4) * (state.graphTopY - state.graphBottomY);
 
-    console.log(state.muH2[p][i]);
+    // console.log(state.muH2[p][i]);
     if (
       Math.abs(mouseXCalibrated - calibratedXPointOnH2Line) < 4 &&
       Math.abs(mouseYCalibrated - calibratedYPointOnH2Line) < 40 &&
@@ -891,7 +891,7 @@ function drawMouseGraphInteraction() {
       rectMode(CENTER);
       fill(252, 220, 187);
       stroke(242, 90, 2);
-      rect(calibratedXPointOnH2Line + textOffSetX, calibratedYPointOnH2Line - textOffSetY, 80, 25);
+      rect(calibratedXPointOnH2Line + textOffSetX, calibratedYPointOnH2Line - textOffSetY, 105, 35);
       pop();
 
       push();
@@ -899,7 +899,7 @@ function drawMouseGraphInteraction() {
       stroke("Black");
       strokeWeight(0.2);
       fill("Black");
-      textSize(16);
+      textSize(22);
       text(i * 5 + 55 + ", " + state.muH2[p][i].toFixed(2), calibratedXPointOnH2Line + textOffSetX, calibratedYPointOnH2Line - textOffSetY);
       pop();
 
@@ -933,7 +933,7 @@ function drawMouseGraphInteraction() {
       rectMode(CENTER);
       fill(227, 201, 255);
       stroke("purple");
-      rect(calibratedXPointOnNH3Line + textOffSetX, calibratedYPointOnNH3Line - textOffSetY, 80, 25);
+      rect(calibratedXPointOnNH3Line + textOffSetX, calibratedYPointOnNH3Line - textOffSetY, 105, 35);
       pop();
 
       push();
@@ -941,7 +941,7 @@ function drawMouseGraphInteraction() {
       stroke("Black");
       strokeWeight(0.2);
       fill("Black");
-      textSize(16);
+      textSize(22);
       text(i * 5 + 365 + ", " + state.muNH3[p][i].toFixed(2), calibratedXPointOnNH3Line + textOffSetX, calibratedYPointOnNH3Line - textOffSetY);
       pop();
 
