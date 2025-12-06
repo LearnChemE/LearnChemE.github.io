@@ -18,7 +18,7 @@ export const DirectionsModalDialogue = () => {
             <div className="modal-body-content">
               <h6>Experiment 1-2: Flow Patterns and Heat Transfer Rate</h6>
               <p>
-                This digital lab, which represents a double pipe heat exchanger
+                This digital lab, which represents a shell and tube heat exchanger
                 with countercurrent flow, is designed to be used with this{" "}
                 <a href="./Shell-and-Tube-Worksheet-2025.pdf" download>
                   worksheet
