@@ -37,7 +37,7 @@ let setButtonBounds = null; // Concentration set
 let tempSetButtonBounds = null; // Temperature set
 
 // Control states
-let temperatureValue = 55; // Temperature (°C) - default to middle of range
+let temperatureValue = 35; // Temperature (°C) - default to middle of range
 let temperatureSet = false; // Temp set state
 let concentrationSet = false; // Conc set state
 
@@ -1356,7 +1356,7 @@ export function drawSimulation(width, height) {
   fill(isHoveringRect ? color("#254D70") : 0); // Lighter red on hover, black otherwise
 
   // Draw text
-  text('Scaled 10x', rectX + rectWidth - 20, rectY + 20); // Position with padding
+  text('scaled 10x', rectX + rectWidth - 20, rectY + 20); // Position with padding
 
   // Reset line dash to solid
   drawingContext.setLineDash([]);
@@ -1895,7 +1895,7 @@ function resetSimulation() {
   lastVolumeUpdateTime = 0;
 
   // Reset temperature
-  temperatureValue = 55; // Default to middle of range (25-85 °C)
+  temperatureValue = 35; // Default of 35°C
   temperatureSet = false;
 
   // Reset concentration settings
