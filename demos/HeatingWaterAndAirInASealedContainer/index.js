@@ -95,7 +95,7 @@ let layout = {
         yanchor: 'top',
         orientation: 'h',
         font: { size: FontSize },
-        itemsizing: 'constant',
+        itemsizing: 'trace',
     },
     xaxis: {
         tickvals: [0, 1],
@@ -383,6 +383,22 @@ function boom() {
     Plotly.react('plotly-chart', updatedData, layout, config);
 }
 
+const traceLegend = [{
+    x: [null],
+    y: [null],
+    mode: "markers",
+    name: "dissolved",
+    marker: { color: '#9b59b6', size: 100, symbol: 'square' },
+    showlegend: true
+}, {
+    x: [null],
+    y: [null],
+    mode: "markers",
+    name: "gas phase",
+    marker: { color: '#2ecc71', size: 100, symbol: 'square' },
+    showlegend: true
+}]
+
 /**
  * Update Plotly chart with new data
  * @param {number} o2Gas mmol O2 in the gas phase
@@ -396,16 +412,18 @@ function updatePlotlyChart(o2Gas, o2Dissolved, n2Gas, n2Dissolved) {
         y: [o2Dissolved, n2Dissolved],
         name: 'dissolved',
         type: 'bar',
-        marker: {color: '#9b59b6'},
+        marker: { color: '#9b59b6' },
+        showlegend: false
     }, {
         x: ['oxygen', 'nitrogen'],
         y: [o2Gas, n2Gas],
         name: 'gas phase',
         type: 'bar',
-        marker: {color: '#2ecc71'}
+        marker: {color: '#2ecc71'},
+        showlegend: false
     }];
     
-    Plotly.react('plotly-chart', updatedData, layout, config);
+    Plotly.react('plotly-chart', [...updatedData, ...traceLegend], layout, config);
 }
 
 // Initialize simulation
