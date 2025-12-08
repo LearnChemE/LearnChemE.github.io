@@ -53,19 +53,24 @@ h1 {
 
 .sliders {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 30px;
     justify-content: center;
-    margin-bottom: 25px;
-    padding: 20px;
+    margin-bottom: 2em;
+    padding: 10px 5px;
     background: #f8f9fa;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
 }
 
 .control-group {
+    display: flex;
+    flex-wrap: nowrap;
     flex: 1;
     min-width: 250px;
+    align-items: center;
+    gap: .8em;
 }
 
 label {
@@ -74,6 +79,13 @@ label {
     font-weight: bold;
     color: #34495e;
     font-size: 1.1rem;
+    text-align: end;
+}
+
+.value-label {
+    font-size: 1.1rem;
+    text-wrap: nowrap;
+    margin-bottom: 8px;
 }
 
 input[type="range"] {
@@ -85,6 +97,9 @@ input[type="range"] {
     outline: none;
     border-radius: 5px;
     margin-bottom: 10px;
+    flex-grow: 0;
+    flex-shrink: 2;
+    margin-top: .3em;
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -113,21 +128,20 @@ input[type="range"]::-webkit-slider-thumb {
     display: flex;
     flex-wrap: wrap;
     gap: 30px;
-    margin-bottom: 20px;
+    width: 100%;
 }
 
 .container-vis-section {
-    flex: 1;
-    min-width: 300px;
+    flex: 1 1 0%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-end;
 }
 
 .container-wrapper {
     position: relative;
     width: 250px;
-    margin-bottom: 20px;
 }
 
 .pressure-gauge {
@@ -189,10 +203,12 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .chart-section {
-    flex: 1;
-    min-width: 300px;
+    /* flex: 1 0 0%; */
     display: flex;
     flex-direction: column;
+    min-width: 500px;
+    max-width: 0%;
+    align-items: center;
 }
 
 .chart-title {
@@ -209,6 +225,7 @@ input[type="range"]::-webkit-slider-thumb {
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     min-height: 350px;
+    width: 500px;
 }
 
 .legend {
@@ -238,8 +255,8 @@ input[type="range"]::-webkit-slider-thumb {
 /* Hamburger Menu */
 .hamburger-menu {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 10px;
+    right: 10px;
     z-index: 1000;
 }
 .menu-btn {
@@ -384,7 +401,7 @@ input[type="range"]::-webkit-slider-thumb {
     background: #f5f7fa;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 800px) {
     .visualization-container {
         flex-direction: column;
     }
