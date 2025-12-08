@@ -54,7 +54,9 @@
             initial height (m)
           </label>
           <input type="range" id="heightSlider" min="200" max="12000" step="10" value="2000" />
-          <span id="heightValue" class="slider-value slider-value--height">2000 m</span>
+          <div class="slider-value-container slider-value-container--height">
+            <span id="heightValue" class="slider-value slider-value--height">2000</span>
+          </div>
         </div>
 
         <div class="slider-group slider-container slider-group--radius">
@@ -62,7 +64,9 @@
             parachute radius (m)
           </label>
           <input type="range" id="radiusSlider" min="0.5" max="4" step="0.05" value="3.5" />
-          <span id="radiusValue" class="slider-value slider-value--radius">3.50 m</span>
+          <div class="slider-value-container slider-value-container--radius">
+            <span id="radiusValue" class="slider-value slider-value--radius">3.50</span>
+          </div>
         </div>
 
         <div id="resultCard" class="status-card">

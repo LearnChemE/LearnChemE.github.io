@@ -116,6 +116,7 @@ body {
   border-radius: 10px;
   padding: 12px 14px;
   pointer-events: auto;
+  margin: 0 0 0 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
@@ -125,6 +126,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
+  order: 1;
 }
 
 .control-bar.slider-controls .slider-group label {
@@ -199,6 +201,13 @@ body {
   border-radius: 10px;
   padding: 10px 14px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  order: 2;
+  text-align: center;
+}
+
+.control-bar.slider-controls > .status-card {
+  flex: 0 0 100%;
+  margin-top: 4px;
 }
 
 .status-message {
