@@ -29,10 +29,21 @@ import { SideBar } from "./elements/SideBar.tsx";
 const DOUBLE_BEAKER = 0;
 const SINGLE_BEAKER = 1;
 
+type MeasuringState = {
+  measuring: boolean;
+  measure: () => number[];
+}
+
+const notMeasuring = () => [-1, -1, -1, -1];
+const getMeasuredValues = () => [g.Th_in, g.Th_out_observed, g.Tc_in, g.Tc_out_observed];
+
 // Use functional style, not classes. Hooks make the code much better to work with.
 function App() {
   const [pumpsRunning, setPumpsRunning] = useState(false);
-  const [measured, setMeasured] = useState([-1, -1, -1, -1]);
+  const [measuringState, setMeasuringState] = useState<MeasuringState>({
+    measuring: false,
+    measure: notMeasuring,
+  });
   const [isPumpBtnDisabled, setPumpBtnDisabled] = useState(false);
   const [canvasMode, setCanvasMode] = useState(DOUBLE_BEAKER);
   const [showingSideBar, setShowingSideBar] = useState(false);
@@ -40,7 +51,6 @@ function App() {
   // start pumps button
   function handlePumpsClick() {
     setPumpsRunning((pumpsRunning) => !pumpsRunning);
-    setMeasured([-1, -1, -1, -1]);
 
     if (canvasMode === DOUBLE_BEAKER) {
       togglePumps(!pumpsRunning);
@@ -62,8 +72,8 @@ function App() {
 
   // measure temps button
   function handleMeasureClick() {
-    setMeasured([g.Th_in, g.Th_out_observed, g.Tc_in, g.Tc_out_observed]);
-    console.log("measured");
+    setMeasuringState(measuringState.measuring ? { measuring: false, measure: notMeasuring } : { measuring: true, measure: getMeasuredValues });
+    console.log("measurement");
   }
 
   // reset temps button
@@ -80,7 +90,7 @@ function App() {
     }
     setPumpsRunning(false);
     setPumpBtnDisabled(false);
-    setMeasured([-1, -1, -1, -1]);
+    setMeasuringState({ measuring: false, measure: notMeasuring });
     togglePumps(false);
     pumpBtnClass = "btn btn-primary";
     icon = "fa-solid fa-play";
@@ -92,6 +102,9 @@ function App() {
     handleResetClick();
     setAnimationTimeToNotStarted();
     setCanvasMode(newMode);
+    if (newMode === SINGLE_BEAKER) {
+      setMeasuringState({ measuring: true, measure: getMeasuredValues });
+    }
   }
 
   let pumpBtnClass: string, icon: string, innerHtml: string;
@@ -166,12 +179,12 @@ function App() {
             </button>
             <button
               type="button"
-              className="btn btn-success"
+              className={measuringState.measuring ? "btn btn-success" : "btn btn-outline-success"}
               disabled={isPumpBtnDisabled || canvasMode === SINGLE_BEAKER}
               aria-disabled={isPumpBtnDisabled || canvasMode === SINGLE_BEAKER}
               onClick={() => handleMeasureClick()}
             >
-              measure temperatures
+              { measuringState.measuring ? "stop measuring" : "measure temperatures" }
             </button>
             {/* <button
               type="button"
@@ -272,12 +285,12 @@ function App() {
             </button>
             <button
               type="button"
-              className="btn btn-success"
-              disabled={isPumpBtnDisabled}
-              aria-disabled={isPumpBtnDisabled}
+              className={"btn btn-success"}
+              disabled={isPumpBtnDisabled || canvasMode === SINGLE_BEAKER}
+              aria-disabled={isPumpBtnDisabled || canvasMode === SINGLE_BEAKER}
               onClick={() => handleMeasureClick()}
             >
-              measure temperatures
+              { measuringState.measuring ? "stop measuring" : "measure temperatures" }
             </button>
           </div>
           <div id="nav-bar-right">
@@ -310,7 +323,7 @@ function App() {
         <div
           className="graphics-wrapper"
           style={
-            measured[0] != -1
+            measuringState.measuring && canvasMode === DOUBLE_BEAKER
               ? { cursor: "url('thermometer.png') 25 95, auto" }
               : { cursor: "auto" }
           }
@@ -343,7 +356,7 @@ function App() {
       <ResetModalDialogue resetVars={() => handleResetClick()} />
 
       <Tooltips
-        measured={measured}
+        measure={measuringState.measure}
         canvasMode={canvasMode}
         pumpsAreRunning={pumpsRunning}
       />

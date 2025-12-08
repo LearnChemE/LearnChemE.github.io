@@ -320,8 +320,6 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
         p.endShape();
       }
   
-      console.log(orngFillPath.normDist);
-  
       const segmentTimes = orngFillPath.normDist;
       const aniTime = 3000;
       drawArc(p,199,156,false, normAniTime(time,aniTime * segmentTimes[1],aniTime * segmentTimes[2]));
@@ -432,7 +430,6 @@ function drawThermometer(
   graphicsObjs: SingleTubeGraphicsObjs
 ) {
   // show measurement of the outlet stream
-  console.log("drawing therm");
   p.push();
   p.translate(495, 455);
   p.rotate(-1.5);
