@@ -22,7 +22,10 @@ uniform float vw;
 
 attribute float index;
 
+varying vec2 vUv;
 varying vec4 vCol;
+varying vec3 vViewPosition;
+flat varying int vType;
 
 void main() {
   // Transform normal to view space
@@ -53,7 +56,11 @@ void main() {
 //   vViewPosition = -mvPosition.xyz;  // toward camera
   
   // Final clip-space position
-
   gl_Position = projectionMatrix * mvPosition;
   gl_PointSize = (type == 0) ? 2.0 : 4.0;
+
+  // Set varyings
+  vUv = uv;
+  vViewPosition = -mvPosition.xyz;  // toward camera
+  vType = type;
 }

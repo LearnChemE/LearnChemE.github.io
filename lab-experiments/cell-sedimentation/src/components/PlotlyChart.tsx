@@ -19,8 +19,8 @@ export const PlotlyChart: Component<PlotlyChartProps> = ({ data, layout, config 
         const cr = dat.slice(2,502);
         const cw = dat.slice(502);
         
-        console.log("Red:", dz * cr.reduce((a,b) => a + b, 0));
-        console.log("White:", dz * cw.reduce((a,b) => a + b, 0));
+        // console.log("Red:", dz * cr.reduce((a,b) => a + b, 0));
+        // console.log("White:", dz * cw.reduce((a,b) => a + b, 0));
         return [{
             x: z,
             y: cr,
