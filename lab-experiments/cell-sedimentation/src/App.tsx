@@ -6,15 +6,15 @@ import { AboutText, DirectionsText } from './components/Modal/modals'
 import { ThreeCanvas } from './components/ThreeCanvas/ThreeCanvas'
 import { VialsArray } from './ts/Vials'
 import { Magnifier } from './components/Magnifier/Magnifier'
-// import { PlotlyChart } from './components/PlotlyChart'
-// import { createProfile } from './ts/calcs'
+import { PlotlyChart } from './components/PlotlyChart'
+import { createProfile } from './ts/calcs'
 import { constrain } from './ts/helpers'
 
 function App() {
   const [magnifying, setMagnifying] = createSignal(false);
   const [pInfo, setPInfo] = createSignal({ num: 0, fracR: 0, rVel: 0, wVel: 0 });
   const [coord, setCoord] = createSignal({ x: 0, y: 0 });
-  // const [plotProfile, setPlotProfile] = createSignal(createProfile({ xr0: 0.05, xw0: 0.05 }));
+  const [plotProfile, setPlotProfile] = createSignal(createProfile({ xr0: 0.05, xw0: 0.05 }));
 
   const followMouse = (evt: MouseEvent | Touch) => {
       // Set new coordinates for the magnifier
@@ -47,7 +47,7 @@ function App() {
 
 
   const vials = new VialsArray();
-  // vials.attachPlot(0, setPlotProfile);
+  vials.attachPlot(4, setPlotProfile);
 
   return (
     <>
@@ -60,7 +60,7 @@ function App() {
       <ControlButton icon="fa-solid fa-magnifying-glass" active={magnifying} label="mix vials" top={120} onClick={() => setMagnifying(!magnifying())} />
       <ControlButton icon="fa-solid fa-rotate" label="mix vials" top={190} onClick={vials.reset} />
 
-      {/* <PlotlyChart data={plotProfile} layout={{ xaxis: { range: [0, 305] } }} /> */}
+      <PlotlyChart data={plotProfile} layout={{ xaxis: { range: [0, 305] } }} />
     </>
   )
 }

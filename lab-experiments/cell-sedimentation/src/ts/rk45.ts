@@ -15,18 +15,20 @@ export interface RK45Options {
   dtMin?: number;      // minimum step size
   dtMax?: number;      // maximum step size
   safety?: number;     // safety factor for adaptive step
+  verbose?: boolean;  // enable verbose logging
+  onUnderflow? : () => void; // callback on step size underflow
 }
 
 /**
- * Integrate dy/dt = f(t, y) from t0 to tEnd using adaptive RK45 (Fehlberg). I anticipate this to be horribly inefficient, but benchmark first optimize later.
+ * Integrate dy/dt = f(t, y) from t0 to tEnd using adaptive RK45 (Dormand-Prince).
  * @param f rhs for dyi/dt = f(t, y)
- * @param y0 inital values for y
+ * @param y0 initial values for y
  * @param t0 initial time
  * @param tEnd final time to end integration
  * @param opts additional options for solver
  * @returns object containing solution { t, y } where y is an array containing each yi array to be matched with t array
  */
-export function rk45(
+export function rk45_dormand_prince(
   f: ODEFunc,
   y0: number[],
   t0: number,
@@ -40,74 +42,116 @@ export function rk45(
     dtMin = 1e-8,
     dtMax = Math.abs(tEnd - t0) / 5,
     safety = 0.9,
+    verbose = false,
   } = opts;
 
-  // In progress: Use Dormand-Prince?
-  // Ai in wikipedia page
-  const c2 = 1 / 4,
-    c3 = 3 / 8,
-    c4 = 12 / 13,
-    c5 = 1,
-    c6 = 1 / 2;
+  // Dormand-Prince coefficients
+  // c_i values (nodes)
+  const c2 = 1/5, c3 = 3/10, c4 = 4/5, c5 = 8/9, c6 = 1, c7 = 1;
 
-  //   Bij in wikipedia page
-  const a21 = 1 / 4;
-  const a31 = 3 / 32, a32 = 9 / 32;
-  const a41 = 1932 / 2197, a42 = -7200 / 2197, a43 = 7296 / 2197;
-  const a51 = 439 / 216, a52 = -8, a53 = 3680 / 513, a54 = -845 / 4104;
-  const a61 = -8 / 27, a62 = 2, a63 = -3544 / 2565, a64 = 1859 / 4104, a65 = -11 / 40;
+  // a_ij values (Runge-Kutta matrix)
+  const a21 = 1/5;
+  const a31 = 3/40, a32 = 9/40;
+  const a41 = 44/45, a42 = -56/15, a43 = 32/9;
+  const a51 = 19372/6561, a52 = -25360/2187, a53 = 64448/6561, a54 = -212/729;
+  const a61 = 9017/3168, a62 = -355/33, a63 = 46732/5247, a64 = 49/176, a65 = -5103/18656;
+  const a71 = 35/384, a72 = 0, a73 = 500/1113, a74 = 125/192, a75 = -2187/6784, a76 = 11/84;
 
-  // Ci and Ci hat in wikipedia page
-  const b1 = 16 / 135, b3 = 6656 / 12825, b4 = 28561 / 56430, b5 = -9 / 50, b6 = 2 / 55; // 5th order weights
-  const b1s = 25 / 216, b3s = 1408 / 2565, b4s = 2197 / 4104, b5s = -1 / 5; // 6th order weights
+  // b_i values (5th order solution weights)
+  const b1 = 35/384, b3 = 500/1113, b4 = 125/192, b5 = -2187/6784, b6 = 11/84, b7 = 0;
+  
+  // b*_i values (4th order solution weights for error estimation)
+  const bs1 = 5179/57600, bs3 = 7571/16695, bs4 = 393/640, bs5 = -92097/339200, bs6 = 187/2100, bs7 = 1/40;
 
   let t = t0;
   let y = y0.slice();
   let h = dt;
+  let err = 1;
 
   const tVals = [t];
-  const yVals = [y.slice()];
+  const yVals =  [y.slice()];
+  // FSAL support: store k1 for reuse between attempts/steps. When a step is
+  // accepted we will set `last_k1` to the computed k7 so it can be reused as
+  // the k1 of the next step.
+  let last_k1: number[] | null = null;
 
   while (t < tEnd) {
-    // console.log(`[RK45] h = ${h}`)
-    if (h !== h) throw new Error("NaN encountered in h")
+    // if (t > .13517) {
+    //   let debug = 1;
+    // }
+    if (h !== h) {
+      throw new Error("NaN encountered in h");
+    }
     if (t + h > tEnd) h = tEnd - t;
 
-    // Compute Runge-Kutta stages
-    const k1 = f(t, y.slice());
-    const k2 = f(t + c2 * h, y.map((yi, i) => yi + h * a21 * k1[i]));
-    const k3 = f(t + c3 * h, y.map((yi, i) => yi + h * (a31 * k1[i] + a32 * k2[i])));
-    const k4 = f(t + c4 * h, y.map((yi, i) => yi + h * (a41 * k1[i] + a42 * k2[i] + a43 * k3[i])));
-    const k5 = f(t + c5 * h, y.map((yi, i) => yi + h * (a51 * k1[i] + a52 * k2[i] + a53 * k3[i] + a54 * k4[i])));
-    const k6 = f(t + c6 * h, y.map((yi, i) => yi + h * (a61 * k1[i] + a62 * k2[i] + a63 * k3[i] + a64 * k4[i] + a65 * k5[i])));
+    try {
+      // Compute Runge-Kutta stages (FSAL): reuse last_k1 when available,
+      // otherwise compute k1 and keep it so retries don't recompute it.
+      let k1: number[];
+      if (last_k1) {
+        k1 = last_k1;
+      } else {
+        k1 = f(t, y.slice());
+        last_k1 = k1;
+      }
+      const k2 = f(t + c2 * h, y.map((yi, i) => yi + h * a21 * k1[i]));
+      const k3 = f(t + c3 * h, y.map((yi, i) => yi + h * (a31 * k1[i] + a32 * k2[i])));
+      const k4 = f(t + c4 * h, y.map((yi, i) => yi + h * (a41 * k1[i] + a42 * k2[i] + a43 * k3[i])));
+      const k5 = f(t + c5 * h, y.map((yi, i) => yi + h * (a51 * k1[i] + a52 * k2[i] + a53 * k3[i] + a54 * k4[i])));
+      const k6 = f(t + c6 * h, y.map((yi, i) => yi + h * (a61 * k1[i] + a62 * k2[i] + a63 * k3[i] + a64 * k4[i] + a65 * k5[i])));
+      const k7 = f(t + c7 * h, y.map((yi, i) => yi + h * (a71 * k1[i] + a72 * k2[i] + a73 * k3[i] + a74 * k4[i] + a75 * k5[i] + a76 * k6[i])));
+    
+      // 5th order solution
+      const y5 = y.map((yi, i) => yi + h * (b1 * k1[i] + b3 * k3[i] + b4 * k4[i] + b5 * k5[i] + b6 * k6[i] + b7 * k7[i]));
+      
+      // 4th order solution for error estimation
+      const y4 = y.map((yi, i) => yi + h * (bs1 * k1[i] + bs3 * k3[i] + bs4 * k4[i] + bs5 * k5[i] + bs6 * k6[i] + bs7 * k7[i]));
 
-    // 4th and 5th order estimates
-    const y4 = y.map((yi, i) => yi + h * (b1s * k1[i] + b3s * k3[i] + b4s * k4[i] + b5s * k5[i]));
-    const y5 = y.map((yi, i) => yi + h * (b1 * k1[i] + b3 * k3[i] + b4 * k4[i] + b5 * k5[i] + b6 * k6[i]));
+      // Error estimate and tolerance check
+      const sqe = y.map((_, i) => Math.pow((y5[i] - y4[i]) / (atol + rtol * Math.max(Math.abs(y[i]), Math.abs(y5[i]))), 2));
+      const ssqe = sqe.reduce((a, b) => a + b, 0);
+      err = Math.sqrt(
+        ssqe / y.length
+      );
 
-    // Error estimate and tolerance check
-    const err = Math.sqrt(
-      y.map((_, i) => Math.pow((y5[i] - y4[i]) / (atol + rtol * Math.abs(y[i])), 2)).reduce((a, b) => a + b, 0) / y.length
-    );
+      // Accept step if error small enough
+      if (err <= 1.0) {
+        t += h;
+        if (verbose) console.log(`[RK45] Accepted step to t=${t} with h=${h} (err=${err})`);
+        y = y5;
+        tVals.push(t);
+        yVals.push(y.slice());
+        // FSAL: reuse k7 as k1 for the next step (k7 is evaluated at t+h,
+        // y5 for Dormand-Prince, so it can serve as the next first stage).
+        last_k1 = k7.slice();
+      }
 
-    // Accept step if error small enough
-    if (err <= 1.0) {
-      t += h;
-      y = y5;
-      tVals.push(t);
-      yVals.push(y.slice());
-      // console.log(`[RK45] h accepted. New time is ${t}`)
+      // Adapt timestep (using 5th order method)
+      const scale = safety * Math.pow(1.0 / Math.max(err, 1e-10), 0.2); // 1/(p+1) where p=4
+      if (scale !== scale) {
+        throw new Error("NaN encountered in h adaptation");
+      }
+      h = Math.min(dtMax, h * Math.min(5, Math.max(0.2, scale)));
+    } 
+    catch (e) {
+      if (verbose) {
+        console.error("Error computing RK45 stages at t =", t, "with h =", h, ":", e);
+      }
+      err = 2;
+      h = h * 0.5; // Reduce step size on error
     }
 
-    // Adapt timestep
-    const scale = safety * Math.pow(1.0 / Math.max(err, 1e-10), 0.25);
-    h = Math.min(dtMax, h * Math.min(4, Math.max(0.1, scale)));
-
     if (h < dtMin && err > 1.0) {
-      throw new Error("Step size underflow — integration failed");
-      break;
+      if (opts.onUnderflow) {
+        opts.onUnderflow();
+      }
+      else {
+        throw new Error("Step size underflow — integration failed");
+      }
     }
   }
 
   return { t: tVals, y: yVals };
 }
+
+export default rk45_dormand_prince;

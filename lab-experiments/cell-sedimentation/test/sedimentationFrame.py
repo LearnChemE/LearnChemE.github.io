@@ -13,7 +13,7 @@ vr_max, vw_max = vel.particle_velocities(0,0)
 cr_max, cw_max = vel.concentration(1, vel.d_r), vel.concentration(1, vel.d_w)
 
 # Initial conditions
-xw0 = 0.05
+xw0 = 0.02
 xr0 = 0.02
 cr0 = vel.concentration(xr0, vel.d_r)
 cw0 = vel.concentration(xw0, vel.d_w)
@@ -34,6 +34,7 @@ def grad2(y, dx):
 # Def rhs
 def rhs(y, dz):
     # Unpack y
+    y = y.copy() # avoid modifying input
     cr = y[:nz]; cw = y[nz:]
     cr[0] = 0; cw[0] = 0
     cr[-1] = cr[-2]; cw[-1] = cw[-2]
@@ -56,7 +57,7 @@ def rhs(y, dz):
     drdt = dif_r - adv_r
     dwdt = dif_w - adv_w
     drdt[0]  = 0; dwdt[0]  = 0 # Maintain free surface
-    # drdt[-1] = drdt[-2]; dwdt[-1] = dwdt[-2] #
+    drdt[-1] = drdt[-2]; dwdt[-1] = dwdt[-2] #
 
     return np.concatenate((drdt, dwdt))
 
@@ -138,7 +139,7 @@ def smooth(y, window_size):
 if __name__ == "__main__":
 
     # ivp args
-    t_max = 200
+    t_max = 100
     dt = 20 # s
     tspan = (0, t_max)
     # t_eval = np.linspace(0,t_max,7)
