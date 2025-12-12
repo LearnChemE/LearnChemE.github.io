@@ -77,30 +77,51 @@ describe('calcs.ts function visualization', () => {
     //     await plotArrs(zs, [res], {}, { title: { text: "Residuals for sinusoidal RoCs" }});
     // }, 10000); 
 
-    it ("tests the solver capabilities to handle a single ic", async () => {
-        let ic: InitConc = { xr0: 0.03, xw0: 0.05 };
-        let sol = new ProfileSolver(ic.xr0, ic.xw0);
-        const crs: number[][] = [], cws: number[][] = [];
-        const zs = [];
+    it ("tests the particle velocity calculations", async () => {
+        const xr0 = Array.from({ length: 10 }, (_,i) => i * 0.1);
+        const xw0 = Array.from({ length: 100 }, (_,i) => i * 0.01);
 
-        for (let i=0; i<10; i++) {
-            console.log(`[Test] calculating step ${i+1} (time t=${(i+1)*20}s)`);
-            const res = sol.calculate_step();
-            crs.push([...res.slice(2,502)]);
-            cws.push([...res.slice(502)]);
-
-            const top = res[1];
-            const l = 305 - top;
-            const dz = (l - 1) / 500;
-            zs.push(Array.from({ length: 500 }, (_,i) => top + i * dz));
-
-            plotArrs(zs, crs, {}, { title: { text: "cr" }});
-            await plotArrs(zs, cws, {}, { title: { text: "cw" }});
+        const vr = [];
+        const vw = []; 
+        for (let xr of xr0) {
+            const vr_row = [];
+            const vw_row = [];
+            for (let xw of xw0) {
+                const { red, white } = particle_velocities(conc_r(xr), conc_w(xw));
+                vr_row.push(red);
+                vw_row.push(white);
+            }
+            vr.push(vr_row);
+            vw.push(vw_row);
         }
 
-        plotArrs(zs, crs, {}, { title: { text: "cr" }});
-        await plotArrs(zs, cws, {}, { title: { text: "cw" }});
-    }, 100000);
+        await plotArrs(xw0, vr, {}, { title: { text: `Red Cell Velocity vs White Cell Concentration (xr0 varied)` } });
+    });
+
+    // it ("tests the solver capabilities to handle a single ic", async () => {
+    //     let ic: InitConc = { xr0: 0.03, xw0: 0.05 };
+    //     let sol = new ProfileSolver(ic.xr0, ic.xw0);
+    //     const crs: number[][] = [], cws: number[][] = [];
+    //     const zs = [];
+
+    //     for (let i=0; i<10; i++) {
+    //         console.log(`[Test] calculating step ${i+1} (time t=${(i+1)*20}s)`);
+    //         const res = sol.calculate_step();
+    //         crs.push([...res.slice(2,502)]);
+    //         cws.push([...res.slice(502)]);
+
+    //         const top = res[1];
+    //         const l = 305 - top;
+    //         const dz = (l - 1) / 500;
+    //         zs.push(Array.from({ length: 500 }, (_,i) => top + i * dz));
+
+    //         plotArrs(zs, crs, {}, { title: { text: "cr" }});
+    //         await plotArrs(zs, cws, {}, { title: { text: "cw" }});
+    //     }
+
+    //     plotArrs(zs, crs, {}, { title: { text: "cr" }});
+    //     await plotArrs(zs, cws, {}, { title: { text: "cw" }});
+    // }, 100000);
 
     // it("tests the rhs function at extreme conditions", async () => {
     //     const pydata = new Promise<number[]>((resolve, reject) => {

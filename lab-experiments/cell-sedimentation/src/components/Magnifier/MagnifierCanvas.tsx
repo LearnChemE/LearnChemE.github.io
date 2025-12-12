@@ -57,6 +57,19 @@ export default function MagnifierCanvas(props: Props) {
                 const t = clock.getElapsedTime();
                 material.uniforms.time.value = t;
                 // Set uniforms
+                const pInfo = props.particleInfo();
+                // uniforms: {
+                //     lightDirection: { value: new THREE.Vector3(5, 0, 5).normalize() },
+                //     time: { value: 0.0 },
+                //     num: { value: 1800 },
+                //     frac: { value: 0.5 },
+                //     vr: { value: 1.0 },
+                //     vw: { value: 0.5 }
+                // }
+                material.uniforms.num.value = pInfo.num * count;
+                material.uniforms.frac.value = pInfo.fracR;
+                material.uniforms.vr.value = pInfo.rVel;
+                material.uniforms.vw.value = pInfo.wVel;
 
                 renderer.render(scene, camera);
 

@@ -23,6 +23,7 @@ function makePInfoFromConc(xr: number, xw: number): MagnifierParticleInfo {
     let cr = conc_r(xr);
     let cw = conc_r(xw);
     const { red, white } = particle_velocities(cr, cw);
+    
     return {
         num: Math.min((cr + cw) / maxTotConc, 1),
         fracR: cr / (cr + cw),

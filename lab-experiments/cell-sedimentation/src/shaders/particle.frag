@@ -12,18 +12,19 @@ varying vec3 vViewPosition;
 
 void main() {
   vec2 xy = vec2(vUv.x - 0.5, vUv.y - 0.5);
+  float r2;
   if (vType == 0) {
-    // Red cells are smaller
-    if (xy.x * xy.x + xy.y * xy.y > 0.16) {
-      discard;
-    }
+    r2 = .1;
   }
   else {
-    // White cells are spherical
-    if (xy.x * xy.x + xy.y * xy.y > 0.25) {
-      discard;
-    }
+    r2 = .25;
   }
+
+  // Spherical cutoff
+  if (xy.x * xy.x + xy.y * xy.y > r2) {
+    discard;
+  }
+
   // Lighting
   vec3 normal = normalize(vec3(xy.x, xy.y, sqrt(1.0 - xy.x * xy.x - xy.y * xy.y)));
   float light = max(dot(normal, normalize(lightDirection)), 0.0);

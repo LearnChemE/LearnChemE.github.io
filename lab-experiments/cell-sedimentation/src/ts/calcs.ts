@@ -74,6 +74,7 @@ export function particle_velocities(conc_r: number, conc_w: number) {
     // Convert to volume fractions
     const ph_r = volume_fraction(conc_r, d_r)
     const ph_w = volume_fraction(conc_w, d_w)
+    if (ph_r + ph_w >= 1) return { red: 0, white: 0 } // Prevent unphysical concentrations
     
     const conc_f = 1 - ph_r - ph_w // volume fraction of fluid
     const rho_susp = ph_r * rho_r + ph_w * rho_w + conc_f * rho_f // Suspension density (g/cc)
@@ -352,7 +353,7 @@ export class ProfileSolver {
         this.top = resized.z[0];
         this.t += SOLVER_TIMESTEP;
 
-        console.log("Solved to t=", this.t)
+        // console.log("Solved to t=", this.t)
         const returnProf = new Float32Array([this.t, this.top].concat(this.current)) as Profile
         for (let i=2;i<502;i++) {
             returnProf[i] = phi_r(returnProf[i]);

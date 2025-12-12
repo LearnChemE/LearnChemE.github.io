@@ -34,7 +34,7 @@ export function createParticleMaterial() {
 }
 
 function createQuadVertices(index: number, x: number, y: number, z: number) {
-    const size = 2.0;
+    const size = 4.0;
 
     return new Float32Array([
         // First triangle
