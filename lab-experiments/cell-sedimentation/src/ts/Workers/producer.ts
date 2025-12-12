@@ -2,7 +2,7 @@ import { ProfileSolver } from "../calcs";
 import { BaseWorker } from "./baseWorker";
 import type { DataMessage, InitMessage, WorkerMessage } from "./worker-types";
 
-const printProducer = (str: string) => console.log("%c[Producer] " + `%c${str}`, "color: red", "color: white");
+// const printProducer = (str: string) => console.log("%c[Producer] " + `%c${str}`, "color: red", "color: white");
 
 try {
 /**
@@ -13,6 +13,7 @@ class ProducerWorker extends BaseWorker {
 
     protected handleMessage(msg: WorkerMessage): void {
         if (msg.type === "init") {
+            // printProducer("Recieved init message");
             msg = msg as InitMessage;
             const payload = msg.payload;
             if (!payload) {
@@ -24,7 +25,7 @@ class ProducerWorker extends BaseWorker {
         }
 
         if (msg.type === "produce") {
-            printProducer("Recieved produce message")
+            // printProducer("Recieved produce message");
             this.produce();
             return;
         }
@@ -40,6 +41,7 @@ class ProducerWorker extends BaseWorker {
         const sol = this.solver.calculate_step();
         const msg: DataMessage = { type: "data", payload: sol };
         this.post(msg);
+        // printProducer("Result produced and sent");
     }
 }
 

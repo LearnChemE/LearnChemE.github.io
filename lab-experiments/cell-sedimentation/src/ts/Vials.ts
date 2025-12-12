@@ -47,10 +47,10 @@ export class Vial {
     }
 
     public evolve = (dt: number, _: number) => {
+        // console.log("%c[Vial] " + `%c Evolving vial by dt=${dt}`, "color: blue", "color: white")
         const newProf = this.presenter.step(dt);
         this.updateUniform(newProf);
         this.onChange?.(newProf);
-        // console.log(`t=${(_/1000).toFixed(2)}, prof@t=${newProf[0]}`)
     }
 
     public setUniform = (uniform: THREE.ShaderMaterial["uniforms"]) => {
@@ -67,8 +67,8 @@ export class Vial {
     }
 
     public reset = (ic: InitConc) => {
-        console.log("reset vial", ic);
-        // TODO: add reset message for web worker
+        this.presenter.terminate();
+        this.presenter = new Presenter(ic);
     }
 
     public isLoading = () => {
@@ -116,8 +116,8 @@ export class VialsArray {
     public attachUniforms = (uniforms: Array<THREE.ShaderMaterial["uniforms"]>) => {
         this.vials.forEach((vial, i) => {
             vial.setUniform(uniforms[i]);
+            vial.evolve(0, 0); // Initialize uniform
         });
-        this.play();
     }
 
     public play = () => {
@@ -132,6 +132,10 @@ export class VialsArray {
         }
 
         animate(frame);
+    }
+
+    public pause = () => {
+        this.playing = false;
     }
 
     public reset = () => {

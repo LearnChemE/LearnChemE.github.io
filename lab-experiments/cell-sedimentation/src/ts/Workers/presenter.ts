@@ -62,7 +62,7 @@ export class Presenter {
             return true;
         } else {
             // Not ready; fallback to loading state
-            console.log("%c[Presenter] " + `%c Next solution pending...`, "color: green", "color: white")
+            // console.log("%c[Presenter] " + `%c Next solution pending...`, "color: green", "color: white")
             return false;
         }
     }
@@ -76,6 +76,7 @@ export class Presenter {
         // Figure out the timestep
         let currentTime = this.current[0];
         let nextTime = this.next[0];
+        // console.log("%c[Presenter] " + `%c Stepping from t=${currentTime} to t=${currentTime + dt} (next at t=${nextTime})`, "color: green", "color: white")
         let s = (nextTime > currentTime) ? dt / (nextTime - currentTime) : 1;
 
         // Determine how far to interpolate, and fetch the next if needed
@@ -106,5 +107,9 @@ export class Presenter {
 
     public getCurrent = () => {
         return this.current;
+    }
+
+    public terminate = () => {
+        this.producer.terminate();
     }
 }
