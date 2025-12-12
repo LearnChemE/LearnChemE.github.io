@@ -81,6 +81,15 @@ export class Vial {
 
     public getParticleInfo = (y: number): MagnifierParticleInfo => {
         const cur = this.presenter.getCurrent();
+        const top = cur[1];
+        y = y - top;
+        y = y * 499 / (305 - top);
+        if (y < top) return {
+            num: 0,
+            fracR: 1,
+            rVel: 0,
+            wVel: 0
+        }
         const i0 = Math.floor(y);
         if (i0 === 499) return getPInfoAtIndex(cur, 499);
 
@@ -153,7 +162,6 @@ export class VialsArray {
 
     public getParticleInfo = (vial: number, y: number): MagnifierParticleInfo => {
         const v = this.vials[vial];
-        y = y * 499 / 305;
 
         return v.getParticleInfo(y);
     }
