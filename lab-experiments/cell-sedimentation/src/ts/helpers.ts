@@ -396,6 +396,29 @@ export function animate(fn: (dt: number, t: number) => boolean, then?: () => voi
     requestAnimationFrame(frame);
 }
 
+export function animateThrottled(fn: (dt: number, t: number) => boolean, fps: number, then?: () => void) {
+    let prevtime: number | null = null;
+    const interval = 1000 / fps;
+
+    const frame = (time: number) => {
+        if (prevtime === null) prevtime = time;
+        const dt = (time - prevtime) / 1000; // in ms
+        prevtime = time;
+
+        // Call the function
+        const playing = fn(dt, time);
+
+        // Request next frame
+        if (playing) {
+            setTimeout(() => {
+                requestAnimationFrame(frame);
+            }, interval);
+        }
+        else then?.();
+    }
+    requestAnimationFrame(frame);
+}
+
 type Coords = { x: number, y: number }
 /**
  * Create a drag response function.

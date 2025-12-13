@@ -1,7 +1,7 @@
 import { createEffect, onCleanup, onMount, type Accessor, type Component } from "solid-js";
 import * as THREE from "three";
 import "./ThreeCanvas.css";
-import { animate, constrain, createDrag } from "../../ts/helpers";
+import { animateThrottled, constrain, createDrag } from "../../ts/helpers";
 import { EffectComposer, RenderPass, OutlinePass, GLTFLoader, ShaderPass, FXAAShader } from 'three-stdlib';
 import glbUrl from "../../assets/cellSedimentation.glb?url";
 import { addLights, resize, type Resizable } from "../../ts/threeHelpers";
@@ -184,7 +184,7 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ drag, onUniformPrepar
 
         // Initial resize and begin animation
         resizeCanvas();
-        animate(frame);
+        animateThrottled(frame, 40);
 
         // Remove width and height tags that three places on the canvas component.
         canvas.style = "";
