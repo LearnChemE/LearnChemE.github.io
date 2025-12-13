@@ -4,14 +4,6 @@ import { Presenter } from './Workers/presenter';
 import type { InitConc, MagnifierParticleInfo, Profile } from '../types/globals';
 import { conc_r, particle_velocities } from './calcs';
 
-const Starting_Vial_Concentrations: Array<InitConc> = [
-    { xr0: 0.60, xw0: 0.05 },
-    { xr0: 0.45, xw0: 0.05 },
-    { xr0: 0.30, xw0: 0.05 },
-    { xr0: 0.15, xw0: 0.05 },
-    { xr0: 0.05, xw0: 0.05 },
-];
-
 function getPInfoAtIndex(profile: Profile, index: number): MagnifierParticleInfo {
     const cr = profile[index + 2];
     const cw = profile[index + 502];
@@ -118,8 +110,8 @@ export class VialsArray {
     private vials: Array<Vial>;
     private playing: boolean = false;
 
-    constructor() {
-        this.vials = Starting_Vial_Concentrations.map((ic) => new Vial(ic));
+    constructor(initialConcs: Array<InitConc>) {
+        this.vials = initialConcs.map((ic) => new Vial(ic));
     }
 
     public attachUniforms = (uniforms: Array<THREE.ShaderMaterial["uniforms"]>) => {
@@ -147,11 +139,11 @@ export class VialsArray {
         this.playing = false;
     }
 
-    public reset = () => {
+    public reset = (ics: Array<InitConc>) => {
         this.playing = false;
 
         this.vials.forEach((vial, i) => {
-            const ic = Starting_Vial_Concentrations[i];
+            const ic = ics[i];
             vial.reset(ic);
         });
     }

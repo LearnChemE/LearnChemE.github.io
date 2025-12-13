@@ -6,6 +6,8 @@ import { AboutText, DirectionsText } from './components/Modal/modals'
 import { ThreeCanvas } from './components/ThreeCanvas/ThreeCanvas'
 import { VialsArray } from './ts/Vials'
 import { Magnifier } from './components/Magnifier/Magnifier'
+import type { InitConc } from './types/globals'
+import { TooltipSelector } from './components/Tooltip/TooltipSelector'
 // import { PlotlyChart } from './components/PlotlyChart'
 // import { createProfile } from './ts/calcs'
 
@@ -14,14 +16,22 @@ function App() {
   const [mixTrigger, setMixTrigger] = createSignal(false);
   const [pause, setPause] = createSignal(false);
   const [animating, setAnimating] = createSignal(true);
+  const [ics, setIcs] = createSignal<Array<InitConc>>([
+      { xr0: 0.60, xw0: 0.05 },
+      { xr0: 0.45, xw0: 0.05 },
+      { xr0: 0.30, xw0: 0.05 },
+      { xr0: 0.15, xw0: 0.05 },
+      { xr0: 0.05, xw0: 0.05 },
+  ]);
+  
   // const [plotProfile, setPlotProfile] = createSignal(createProfile({ xr0: 0.05, xw0: 0.05 }));
 
-  const vials = new VialsArray();
+  const vials = new VialsArray(ics());
 
   const reset = () => {
     // Reset vials
     setPause(false);
-    vials.reset();
+    vials.reset(ics());
     setMagnifying(false);
     setAnimating(true);
     // Trigger mix animation
@@ -53,6 +63,7 @@ function App() {
       <ControlButton icon="fa-solid fa-rotate" label="mix vials" top={190} disabled={animating} onClick={reset} />
       <ControlButton icon={() => { return pause() ? "fa-solid fa-play" : "fa-solid fa-pause" }} label="play/pause" top={260} disabled={animating} onClick={() => setPause(!pause())} />
 
+      <TooltipSelector showing={() => !animating()} ics={ics} setIcs={setIcs} />
       {/* <PlotlyChart data={plotProfile} layout={{ xaxis: { range: [0, 305] } }} /> */}
     </>
   )
