@@ -1,8 +1,8 @@
 import * as config from './config.js';
 
 const defaults = {
-  initialHeight: 2000,
-  parachuteRadius: 3.5,
+  initialHeight: 600,
+  parachuteRadius: 4,
   safeVelocity: 3.7
 };
 
