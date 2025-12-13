@@ -22,14 +22,17 @@ uniform float vw;
 
 attribute float index;
 
+varying vec2 vUv;
 varying vec4 vCol;
+varying vec3 vViewPosition;
+flat varying int vType;
 
 void main() {
   // Transform normal to view space
 //   vNormal = normalize(normalMatrix * normal);
     int type = 1; // white cell
     
-    if (index < 1.0) {//num * frac) {
+    if (index < num * frac) {
         type = 0; // red cell
         vCol = vec4(1.0, 0.0, 0.0, 1.0);
     }
@@ -42,7 +45,6 @@ void main() {
     }
 
     float vel = (type == 0) ? vr : vw;
-    vel = vel + (index - 1000.0) / 2000.0;
     vel *= 10.0;
   
   // Position in camera space
@@ -50,10 +52,12 @@ void main() {
   worldPos.y -= vel * time;
   worldPos.y = mod(worldPos.y + 100.0, 200.0) - 100.0;
   vec4 mvPosition = modelViewMatrix * worldPos;
-//   vViewPosition = -mvPosition.xyz;  // toward camera
   
   // Final clip-space position
-
   gl_Position = projectionMatrix * mvPosition;
-  gl_PointSize = (type == 0) ? 2.0 : 4.0;
+
+  // Set varyings
+  vUv = uv;
+  vViewPosition = -mvPosition.xyz;  // toward camera
+  vType = type;
 }

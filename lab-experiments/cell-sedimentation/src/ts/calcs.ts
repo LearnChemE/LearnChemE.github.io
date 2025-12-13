@@ -1,5 +1,5 @@
 import type { InitConc, Profile } from "../types/globals"
-import { rk45 } from "./rk45"
+import rk45 from "./rk45"
 
 const rho_f = 0.868 // Fluid density (g/cc)
 const g = 981 // Gravitational acceleration (cm/s^2)
@@ -74,6 +74,7 @@ export function particle_velocities(conc_r: number, conc_w: number) {
     // Convert to volume fractions
     const ph_r = volume_fraction(conc_r, d_r)
     const ph_w = volume_fraction(conc_w, d_w)
+    if (ph_r + ph_w >= 1) return { red: 0, white: 0 } // Prevent unphysical concentrations
     
     const conc_f = 1 - ph_r - ph_w // volume fraction of fluid
     const rho_susp = ph_r * rho_r + ph_w * rho_w + conc_f * rho_f // Suspension density (g/cc)
@@ -99,7 +100,7 @@ export function grad(y: number[], dx: number) {
     if (len < 2) return [0];
 
     // Generate array and set edges
-    const dydx = new Array(len);
+    const dydx = new Array(len).fill(0);
     dydx[0] = (y[1] - y[0]) / dx;
     dydx[len-1] = (y[len-1] - y[len-2]) / dx;
 
@@ -113,10 +114,16 @@ export function grad(y: number[], dx: number) {
     return dydx;
 }
 
-export function rhs_adv_diff(y: number[], dz: number) {
+export function rhs_adv_diff(y: number[], dz: number): number[] {
     // Unpack y
     const cr = y.slice(0,CONC_ARRAY_SIZE); 
     const cw = y.slice(CONC_ARRAY_SIZE);
+
+    // Defensive checks
+    if (!Number.isFinite(dz) || dz <= 0) throw new Error(`rhs_adv_diff: bad dz=${dz}`);
+    for (let i = 0; i < y.length; i++) {
+        if (!Number.isFinite(y[i])) throw new Error(`rhs_adv_diff: non-finite y[${i}] = ${y[i]}`);
+    }
 
     // BCs
     cr[0] = 0; cw[0] = 0;
@@ -124,14 +131,14 @@ export function rhs_adv_diff(y: number[], dz: number) {
     cw[CONC_ARRAY_SIZE - 1] = cw[CONC_ARRAY_SIZE - 2];
 
     // For advection term
-    const crvr = new Array(CONC_ARRAY_SIZE);
-    const cwvw = new Array(CONC_ARRAY_SIZE);
+    const crvr = new Array(CONC_ARRAY_SIZE).fill(0);
+    const cwvw = new Array(CONC_ARRAY_SIZE).fill(0);
     crvr[0] = 0;
     cwvw[0] = 0;
     for (let i=1;i<CONC_ARRAY_SIZE;i++) {
         // Determine velocity
         const { red, white } = particle_velocities(cr[i], cw[i]);
-        if (red !== red) throw new Error(`bad red at concentration ${cr[i]} ${cw[i]}`)
+        if (!Number.isFinite(red) || !Number.isFinite(white)) throw new Error(`particle_velocities returned non-finite at i=${i} cr=${cr[i]} cw=${cw[i]} red=${red} white=${white}`);
         crvr[i] = cr[i] * red;
         cwvw[i] = cw[i] * white;
         if (crvr[i] !== crvr[i]) throw new Error(`crvr err: ${crvr}`)
@@ -142,13 +149,10 @@ export function rhs_adv_diff(y: number[], dz: number) {
     // Advection term
     const adv_r = grad(crvr, dz);
     const adv_w = grad(cwvw, dz);
-    for (let i=0;i<CONC_ARRAY_SIZE;i++) {
-        if (adv_r !== adv_r) throw new Error(`adv_r error: ${adv_r}`)
-    }
 
     // For diffusion term
-    const inner_dif_r = new Array(CONC_ARRAY_SIZE);
-    const inner_dif_w = new Array(CONC_ARRAY_SIZE);
+    const inner_dif_r = new Array(CONC_ARRAY_SIZE).fill(0);
+    const inner_dif_w = new Array(CONC_ARRAY_SIZE).fill(0);
     inner_dif_r[0] = 5 * (cr[1] - cr[0]) / dz * (1 - cr[0] / cr_max)**10;
     inner_dif_w[0] = 5 * (cw[1] - cw[0]) / dz * (1 - cw[0] / cw_max)**10;
     for (let i=1;i<CONC_ARRAY_SIZE-1;i++) {
@@ -167,15 +171,15 @@ export function rhs_adv_diff(y: number[], dz: number) {
     dif_w[0] = dif_w[CONC_ARRAY_SIZE-1] = 0;
 
     // Results 
-    const drdt = new Array(CONC_ARRAY_SIZE);
-    const dwdt = new Array(CONC_ARRAY_SIZE);
+    const drdt = new Array(CONC_ARRAY_SIZE).fill(0);
+    const dwdt = new Array(CONC_ARRAY_SIZE).fill(0);
     drdt[0] = dwdt[0] = 0;
     for (let i=1; i<CONC_ARRAY_SIZE-1;i++) {
         drdt[i] = dif_r[i] - adv_r[i];
         dwdt[i] = dif_w[i] - adv_w[i];
     }
-    drdt[CONC_ARRAY_SIZE-1] = -adv_r[CONC_ARRAY_SIZE-1];
-    dwdt[CONC_ARRAY_SIZE-1] = -adv_w[CONC_ARRAY_SIZE-1];
+    drdt[CONC_ARRAY_SIZE-1] = drdt[CONC_ARRAY_SIZE-2];
+    dwdt[CONC_ARRAY_SIZE-1] = dwdt[CONC_ARRAY_SIZE-2];
 
     // console.log(drdt.map((dr,i) => (dr !== dr) ? i : 0).filter(e => e !== 0));
     // console.log(drdt.slice(490));
@@ -298,7 +302,7 @@ export function resize(y: number[], z: number[], lo: number) {
 
 
 const nz = CONC_ARRAY_SIZE;
-const smooth_fsize = 13;
+const smooth_fsize = 11; // must be odd
 export const SOLVER_TIMESTEP = 20;
 export class ProfileSolver {
     private current: number[];
@@ -344,12 +348,12 @@ export class ProfileSolver {
         y_cur = cr_cur.concat(cw_cur);
 
         // Resize
-        const resized = resize(y_cur, this.create_z_arr(), .05);
+        const resized = resize(y_cur, this.create_z_arr(), 5);
         this.current = resized.y;
         this.top = resized.z[0];
         this.t += SOLVER_TIMESTEP;
 
-        console.log("Solved to t=", this.t)
+        // console.log("Solved to t=", this.t)
         const returnProf = new Float32Array([this.t, this.top].concat(this.current)) as Profile
         for (let i=2;i<502;i++) {
             returnProf[i] = phi_r(returnProf[i]);

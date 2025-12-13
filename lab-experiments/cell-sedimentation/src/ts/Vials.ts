@@ -4,14 +4,6 @@ import { Presenter } from './Workers/presenter';
 import type { InitConc, MagnifierParticleInfo, Profile } from '../types/globals';
 import { conc_r, particle_velocities } from './calcs';
 
-const Starting_Vial_Concentrations: Array<InitConc> = [
-    { xr0: 0.60, xw0: 0.05 },
-    { xr0: 0.45, xw0: 0.05 },
-    { xr0: 0.30, xw0: 0.05 },
-    { xr0: 0.15, xw0: 0.05 },
-    { xr0: 0.05, xw0: 0.05 },
-];
-
 function getPInfoAtIndex(profile: Profile, index: number): MagnifierParticleInfo {
     const cr = profile[index + 2];
     const cw = profile[index + 502];
@@ -23,6 +15,7 @@ function makePInfoFromConc(xr: number, xw: number): MagnifierParticleInfo {
     let cr = conc_r(xr);
     let cw = conc_r(xw);
     const { red, white } = particle_velocities(cr, cw);
+    
     return {
         num: Math.min((cr + cw) / maxTotConc, 1),
         fracR: cr / (cr + cw),
@@ -46,10 +39,10 @@ export class Vial {
     }
 
     public evolve = (dt: number, _: number) => {
+        // console.log("%c[Vial] " + `%c Evolving vial by dt=${dt}`, "color: blue", "color: white")
         const newProf = this.presenter.step(dt);
         this.updateUniform(newProf);
         this.onChange?.(newProf);
-        // console.log(`t=${(_/1000).toFixed(2)}, prof@t=${newProf[0]}`)
     }
 
     public setUniform = (uniform: THREE.ShaderMaterial["uniforms"]) => {
@@ -66,8 +59,8 @@ export class Vial {
     }
 
     public reset = (ic: InitConc) => {
-        console.log("reset vial", ic);
-        // TODO: add reset message for web worker
+        this.presenter.terminate();
+        this.presenter = new Presenter(ic);
     }
 
     public isLoading = () => {
@@ -80,6 +73,15 @@ export class Vial {
 
     public getParticleInfo = (y: number): MagnifierParticleInfo => {
         const cur = this.presenter.getCurrent();
+        const top = cur[1];
+        y = y - top;
+        y = y * 499 / (305 - top);
+        if (y < top) return {
+            num: 0,
+            fracR: 1,
+            rVel: 0,
+            wVel: 0
+        }
         const i0 = Math.floor(y);
         if (i0 === 499) return getPInfoAtIndex(cur, 499);
 
@@ -108,15 +110,15 @@ export class VialsArray {
     private vials: Array<Vial>;
     private playing: boolean = false;
 
-    constructor() {
-        this.vials = Starting_Vial_Concentrations.map((ic) => new Vial(ic));
+    constructor(initialConcs: Array<InitConc>) {
+        this.vials = initialConcs.map((ic) => new Vial(ic));
     }
 
     public attachUniforms = (uniforms: Array<THREE.ShaderMaterial["uniforms"]>) => {
         this.vials.forEach((vial, i) => {
             vial.setUniform(uniforms[i]);
+            vial.evolve(0, 0); // Initialize uniform
         });
-        this.play();
     }
 
     public play = () => {
@@ -133,11 +135,15 @@ export class VialsArray {
         animate(frame);
     }
 
-    public reset = () => {
+    public pause = () => {
+        this.playing = false;
+    }
+
+    public reset = (ics: Array<InitConc>) => {
         this.playing = false;
 
         this.vials.forEach((vial, i) => {
-            const ic = Starting_Vial_Concentrations[i];
+            const ic = ics[i];
             vial.reset(ic);
         });
     }
@@ -148,7 +154,6 @@ export class VialsArray {
 
     public getParticleInfo = (vial: number, y: number): MagnifierParticleInfo => {
         const v = this.vials[vial];
-        y = y * 499 / 305;
 
         return v.getParticleInfo(y);
     }

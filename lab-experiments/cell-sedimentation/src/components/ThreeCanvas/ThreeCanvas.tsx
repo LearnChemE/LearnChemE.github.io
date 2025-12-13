@@ -1,4 +1,4 @@
-import { onCleanup, onMount, type Accessor, type Component } from "solid-js";
+import { createEffect, onCleanup, onMount, type Accessor, type Component } from "solid-js";
 import * as THREE from "three";
 import "./ThreeCanvas.css";
 import { animate, constrain, createDrag } from "../../ts/helpers";
@@ -6,6 +6,8 @@ import { EffectComposer, RenderPass, OutlinePass, GLTFLoader, ShaderPass, FXAASh
 import glbUrl from "../../assets/cellSedimentation.glb?url";
 import { addLights, resize, type Resizable } from "../../ts/threeHelpers";
 import { createBloodMacroMaterial } from "../../ts/materials";
+
+export const MAX_ANIMATION_TIME = 3000; // ms
 
 const asp = 3/2;
 const r_th = Math.exp(-3);
@@ -20,9 +22,11 @@ const Cos = (th: number) => {
 interface ThreeCanvasProps {
     drag: Accessor<boolean>,
     onUniformPreparation: (uniforms: Array<THREE.ShaderMaterial["uniforms"]>) => void
+    mixTrigger: Accessor<boolean>;
+    onAnimationEnd?: () => void;
 };
 
-export const ThreeCanvas: Component<ThreeCanvasProps> = ({ drag, onUniformPreparation }) => {
+export const ThreeCanvas: Component<ThreeCanvasProps> = ({ drag, onUniformPreparation, mixTrigger, onAnimationEnd }) => {
     let canvas!: HTMLCanvasElement;
     let scene!: THREE.Scene;
     let camera!: THREE.PerspectiveCamera | THREE.OrthographicCamera;
@@ -32,6 +36,7 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ drag, onUniformPrepar
     // State
     let th=0, ph=0;
     let tth=0, tph=0;
+    let aniTimer = 0;
 
     const resizeable: Resizable = { renderer, composer }; // starts null
     const resizeCanvas = () => resize(asp, resizeable);
@@ -48,6 +53,12 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ drag, onUniformPrepar
     }, () => {
         tth = 0;
         tph = 0;
+    });
+
+    createEffect(() => {
+        // On mix trigger, reset the animation timer
+        mixTrigger();
+        aniTimer = 0; // seconds of animation
     });
 
     onMount(() => {
@@ -144,18 +155,25 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ drag, onUniformPrepar
             outlinePass.selectedObjects.push(model);
         });
 
+        const tempMatrix = new THREE.Matrix4();
+
         // Main loop
         const frame = (dt: number) => {
             // Lerp th, ph
             th = (th - tth) * r_th ** dt + tth;
             ph = (ph - tph) * r_th ** dt + tph;
 
-            // if (model) {
-            //     model.matrix.copy(base);
-            //     // model.matrix.multiply(tempMatrix.makeRotationX(ph * Math.PI / 180));
-            //     // model.matrix.multiply(tempMatrix.makeRotationZ(th * Math.PI / 180));
-            //     // model.matrixWorldNeedsUpdate = true;
-            // }
+            if (model && aniTimer < MAX_ANIMATION_TIME) {
+                model.matrix.copy(base);
+                const mph = aniTimer * 2 / MAX_ANIMATION_TIME * 360;
+                const mth = 20 * Math.sin((aniTimer * 2 / MAX_ANIMATION_TIME) * Math.PI);
+
+                model.matrix.multiply(tempMatrix.makeRotationX(mph * Math.PI / 180));
+                model.matrix.multiply(tempMatrix.makeRotationZ(mth * Math.PI / 180));
+                model.matrixWorldNeedsUpdate = true;
+                aniTimer += dt * 1000;
+                if (aniTimer >= MAX_ANIMATION_TIME) onAnimationEnd?.();
+            }
             const r = 40
             camera.position.set(-r * Sin(th) * Cos(ph), r * Sin(ph), r * Cos(th) * Cos(ph));
             camera.lookAt(0,0,0);
