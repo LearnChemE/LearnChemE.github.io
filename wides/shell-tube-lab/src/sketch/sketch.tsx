@@ -10,6 +10,7 @@ import {
 } from "./functions";
 import { AnimationFactory, HexFill, PathTrace, TubeFill } from "../types";
 import { blueFragShaderSource, orngFragShaderSource, fillVertShaderSource } from "./shaders";
+import { ANIMATION_TIME } from "./functions";
 
 // Globals defined here
 export const g = {
@@ -151,8 +152,12 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
 
     if ((start = g.startTime) === PUMPS_NOT_STARTED) return; // Pumps not started
 
+    const ORIGINAL_ANIMATION_TIME = 5000;
     let current = p.millis() - start;
-    if (current < 5000) {
+    // Scale time based on ORIGINAL_ANIMATION_TIME and ANIMATION_TIME
+    // Because this sketch used to have a fixed 5 second animation time
+    current = (current * ORIGINAL_ANIMATION_TIME) / ANIMATION_TIME;
+    if (current < ORIGINAL_ANIMATION_TIME) {
 
       let s = current < 300 ? current / 300 : 1;
       fillPumps(s);
