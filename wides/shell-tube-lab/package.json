@@ -2,6 +2,7 @@
   "name": "shell-tube-lab",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@p5-wrapper/react": "^4.4.2",
     "@testing-library/jest-dom": "^5.17.0",
