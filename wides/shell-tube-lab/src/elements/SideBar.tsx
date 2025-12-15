@@ -35,9 +35,9 @@ const SideBar: React.FC<SideBarProps> = ({
           onClick={() => toggleSelected(0)}
         >
           {selected === 0
-            ? `Experiment 1-2: Flow Patterns and Heat Transfer
-          Rate`
-            : `Experiment 1-2`}
+            ? <span><b>Experiment 1-2:</b> Flow Patterns and Heat Transfer
+          Rate</span>
+            : <b>Experiment 1-2</b>}
         </div>
         <div
           className={
@@ -46,10 +46,10 @@ const SideBar: React.FC<SideBarProps> = ({
           onClick={() => toggleSelected(1)}
         >
           {selected === 1
-            ? `Experiment 3: Effect of Flowrate on Heat Transfer Rate`
-            : `Experiment 3`}
+            ? <span><b>Experiment 3:</b> Effect of Flowrate on Heat Transfer Rate</span>
+            : <b>Experiment 3</b>}
         </div>
-        <div className={dropDownShowing ? "sidebar-item vl" : "sidebar-item"}>
+        <div className={dropDownShowing ? "sidebar-item vl smallscr-only" : "sidebar-item smallscr-only"}>
           <div
             onClick={() =>
               setDropDownShowing((dropDownShowing) => !dropDownShowing)
@@ -68,7 +68,8 @@ const SideBar: React.FC<SideBarProps> = ({
         </div>
         <div style={{ display: "grid", margin: "auto" }}>
           <button className="btn btn-danger" onClick={() => onResetBtnClick()}>
-            Reset beakers
+            <i className="fa-solid fa-arrows-rotate"></i>
+            &nbsp; reset
           </button>
         </div>
       </div>
