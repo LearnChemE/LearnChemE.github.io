@@ -18,6 +18,7 @@ import { Tooltips } from "./elements/Tooltips";
 
 const DOUBLE_BEAKER_MODE = 0;
 const SINGLE_BEAKER_MODE = 1;
+const ANIMATION_TIME = 5000; // ms
 
 function App() {
   // State vars
@@ -36,9 +37,10 @@ function App() {
       g.startTime = -2; // START_NEXT_FRAME
       setPumpBtnDisabled(true);
       pumpBtnTimeout = setTimeout(() => {
+        g.fillBeakers = true;
         setPumpBtnDisabled(false);
         setAnimationFinished(true);
-      }, 5000);
+      }, ANIMATION_TIME);
     }
     g.hIsFlowing = !pumpsAreRunning;
     g.cIsFlowing = !pumpsAreRunning;
@@ -52,6 +54,7 @@ function App() {
   const resetBtnHandler = () => {
     g.vols = [1000, 0, 1000, 0]; // reset volumes
     g.startTime = -1; // NOT_STARTED
+    g.fillBeakers = false;
     g.hIsFlowing = false;
     g.cIsFlowing = false;
     setPumpBtnDisabled(false);
@@ -82,7 +85,7 @@ function App() {
         pumpsAreRunning={pumpsAreRunning}
         pumpBtnIsDisabled={pumpBtnIsDisabled}
         animationIsFinished={animationIsFinished}
-        showSwapBtn={experimentMode == DOUBLE_BEAKER_MODE}
+        showSwapBtn={experimentMode === DOUBLE_BEAKER_MODE}
         pumpBtnHandler={() => pumpBtnHandler()}
         measureBtnHandler={() => measureBtnHandler()}
         menuBtnHandler={() =>

@@ -18,6 +18,7 @@ export const g = {
   height: 640,
 
   startTime: -1, // -1 means it's not running, will be replaced by millis() once pumps are started
+  fillBeakers: false,
   // blueTime: -1,
 
   orangeFluidColor: [255, 50, 0, 200],

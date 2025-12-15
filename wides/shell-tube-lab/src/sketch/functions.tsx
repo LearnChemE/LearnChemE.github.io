@@ -125,19 +125,17 @@ function changeVols(deltaTime: number) {
   if (g.vols[0] > 0 && g.hIsFlowing) {
     dV = (g.mDotH * deltaTime) / 1000;
     g.vols[0] -= dV;
-    g.vols[1] += dV;
+    if (g.fillBeakers) g.vols[1] += dV;
   } else if (g.vols[0] <= 0) {
     g.vols[0] = 0.0;
-    g.vols[1] = 1000.0;
     g.hIsFlowing = false;
   }
   if (g.vols[2] > 0 && g.cIsFlowing) {
     dV = (g.mDotC * deltaTime) / 1000;
     g.vols[2] -= dV;
-    g.vols[3] += dV;
+    if (g.fillBeakers) g.vols[3] += dV;
   } else if (g.vols[2] <= 0) {
     g.vols[2] = 0.0;
-    g.vols[3] = 1000.0;
     g.cIsFlowing = false;
   }
 }

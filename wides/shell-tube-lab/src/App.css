@@ -78,6 +78,9 @@ canvas {
     grid-template-columns: none;
     /* margin: 0px; */
   }
+  .btn-danger {
+    margin-top: 1em;
+  }
 
   .nav-bar {
     grid-template-rows: auto auto auto;
@@ -106,14 +109,24 @@ canvas {
 }
 
 .sidebar-item {
+  margin-top: .5em;
   height: max-content;
   padding: 8px 8px 8px 8px;
-  text-align: center;
+  text-align: start;
   text-decoration: none;
   font-size: 18px;
   /* display: block; */
   transition: 0.3s;
   width: 300px;
+  font-weight: 400;
+
+  b {
+    font-weight: 500;
+  }
+}
+
+.smallscr-only {
+  display: none;
 }
 
 .sidebar-item.vl {
@@ -190,6 +203,10 @@ canvas {
         right: 30px;
         z-index: 1;
       }
+    }
+
+    .smallscr-only {
+      display: block;
     }
   }
 }
