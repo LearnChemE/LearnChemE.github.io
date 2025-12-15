@@ -1,6 +1,8 @@
 import { P5CanvasInstance } from "@p5-wrapper/react";
 import { g } from "./sketch";
 
+export const ANIMATION_TIME = 2500; // ms
+
 // Constants used in calculations
 const HYDRAULIC_DIAMETER_SHELL = ((0.0127 * 0.08) / 2) * (0.0127 + 0.08); // m
 const INNER_TUBE_DIAMETER = 0.00457; // m
@@ -120,20 +122,33 @@ function calcTubeRe() {
 }
 
 // Change the volumes each frame based on the deltaTime
+const FILL_ANIMATION_FLOWRATE = 50 * 1000 / ANIMATION_TIME; // (mL available) / (seconds of animation)
 function changeVols(deltaTime: number) {
   let dV;
   if (g.vols[0] > 0 && g.hIsFlowing) {
-    dV = (g.mDotH * deltaTime) / 1000;
-    g.vols[0] -= dV;
-    if (g.fillBeakers) g.vols[1] += dV;
+    if (g.fillBeakers) {
+      dV = (g.mDotH * deltaTime) / 1000;
+      g.vols[0] -= dV;
+      g.vols[1] += dV;
+    }
+    else {
+      dV = (FILL_ANIMATION_FLOWRATE * deltaTime) / 1000;
+      g.vols[0] -= dV;
+    }
   } else if (g.vols[0] <= 0) {
     g.vols[0] = 0.0;
     g.hIsFlowing = false;
   }
   if (g.vols[2] > 0 && g.cIsFlowing) {
-    dV = (g.mDotC * deltaTime) / 1000;
-    g.vols[2] -= dV;
-    if (g.fillBeakers) g.vols[3] += dV;
+    if (g.fillBeakers) {
+      dV = (g.mDotC * deltaTime) / 1000;
+      g.vols[2] -= dV;
+      g.vols[3] += dV;
+    }
+    else {
+      dV = (FILL_ANIMATION_FLOWRATE * deltaTime) / 1000;
+      g.vols[2] -= dV;
+    }
   } else if (g.vols[2] <= 0) {
     g.vols[2] = 0.0;
     g.cIsFlowing = false;

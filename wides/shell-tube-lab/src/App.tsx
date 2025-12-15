@@ -15,11 +15,10 @@ import {
   AboutModalDialogue,
 } from "./elements/ModalDialogues";
 import { Tooltips } from "./elements/Tooltips";
+import { ANIMATION_TIME } from "./sketch/functions";
 
 const DOUBLE_BEAKER_MODE = 0;
 const SINGLE_BEAKER_MODE = 1;
-const ANIMATION_TIME = 5000; // ms
-
 function App() {
   // State vars
   const [pumpsAreRunning, setPumpsAreRunning] = useState(false);
