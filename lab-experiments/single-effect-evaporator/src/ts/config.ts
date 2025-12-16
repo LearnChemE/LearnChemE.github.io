@@ -14,7 +14,7 @@ export const steamFlowLabelDescriptor: DigitalLabelDescriptor = {
   range: {
     range: [0, 10000],
     overflowString: "OVER",
-    underflowString: "UNDER"
+    underflowString: "0.00"
   }
 };
 
@@ -28,11 +28,11 @@ export const steamPresLabelDescriptor: DigitalLabelDescriptor = {
   fill: "#F9F155",
   units: "",
   decimals: 2,
-  initialValue: 20,
+  initialValue: 0,
   range: {
     range: [0, 10000],
     overflowString: "OVER",
-    underflowString: "UNDER"
+    underflowString: "0.00"
   }
 };
 
@@ -50,7 +50,7 @@ export const steamTempLabelDescriptor: DigitalLabelDescriptor = {
   range: {
     range: [0, 10000],
     overflowString: "OVER",
-    underflowString: "UNDER"
+    underflowString: "ERR"
   }
 };
 
@@ -207,7 +207,7 @@ export const presSpDescriptor: SetpointControlDescriptor<ControlType> = {
     downBtnId: "flowDownBtn_2",
     spLabel: null,
     outLabel: null,
-    min: 3,
+    min: 0,
     max: 30,
     step: 1
 };

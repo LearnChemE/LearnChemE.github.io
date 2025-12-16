@@ -14,6 +14,7 @@ import { concentrateDescriptor, concScaleLabelDescriptor, condensateDescriptor, 
 import { Outlet } from './ts/classes/Outlet';
 import type { SimulationDescriptor } from './types';
 import { Refractometer } from './ts/classes/Refractometer';
+import { triggerShutdown } from './ts/shutdown';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
@@ -34,7 +35,7 @@ const concLabel = new DigitalLabel(concScaleLabelDescriptor);
 // Control variables for state
 const flowCtrl = new FirstOrder(0,   500, 200);
 const tempCtrl = new FirstOrder(25, 3000,1000);
-const presCtrl = new FirstOrder(20, 1000,   0);
+const presCtrl = new FirstOrder(0,  1000,   0);
 
 // Outlets
 concentrateDescriptor.label = concLabel;
@@ -65,6 +66,10 @@ const simulation = new Simulation(stateDescriptor);
 
 // Initialize interactions
 const [flowSp, tempSp, presSp] = initInteractions<FirstOrder>(flowCtrl, tempCtrl, presCtrl);
+simulation.setOnSafetyShutdown(msg => {
+  presSp.reset(0);
+  triggerShutdown(msg);
+});
 const refractometer = new Refractometer(() => concOutlet.measureConcentration() * 100);
 
 // Visibility and accessibility
@@ -81,5 +86,5 @@ resetBtn?.addEventListener("click", () => {
 
   flowSp.reset(0);
   tempSp.reset(25);
-  presSp.reset(20);
+  presSp.reset(0);
 });

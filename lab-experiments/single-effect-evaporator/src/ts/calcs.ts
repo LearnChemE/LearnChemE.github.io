@@ -9,10 +9,11 @@ import { constrain } from "./helpers";
 const MW_SUCROSE = 342.2965; // g / mol
 const MW_WATER = 18; // g / mol
 
-const UA = 1.4e3; // W / K
+const UA = 700; // W / K
 const EVAPORATOR_PRESSURE = 1; // bar
 const X_IN = 0.05;
 const Y_IN = X_IN / MW_SUCROSE / (X_IN / MW_SUCROSE + (1 - X_IN) / MW_WATER);
+const OUTER_UA = 50; // W / K
 
 const MASS_IN_EVAPORATOR = .025; // kg
 
@@ -28,6 +29,8 @@ function moleFrac(massFrac: number) {
 
 /**
  * Calculate saturated temperature from pressure
+ * @param P Saturated Pressure (bar absolute)
+ * @returns Temperature (K)
  */
 function inv_antoines(P: number) {
     const logP = Math.log10(P);
@@ -37,6 +40,8 @@ function inv_antoines(P: number) {
         
     return B / (A - logP) - C;
 }
+
+export const max_temp = inv_antoines(1 / (1 - .83)) - 273.15; // K to C
 
 /**
  * Calculate sugar water solution's heat capacity (J/kg) based on temperature (K) and mole fraction
@@ -82,10 +87,10 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     const temp_feed = state.feedTemp.value + 273.15; // K
     var temp_conc = state.concTemp + 273.15; // K
     const pres_stm  = state.steamPres.value; // bar
-    const temp_stm = inv_antoines(pres_stm); // K
+    const temp_stm = Math.max(inv_antoines(pres_stm), 298.15); // K
     
     // Heat transferred from steam trap to vessel
-    const heat_rate = UA * (temp_stm - temp_conc); // W
+    const heat_rate = Math.max(UA * (temp_stm - temp_conc), 0); // W
     // Composition
     const x_c = state.concComp; // Use existing composition
     const m_c = x_c * MASS_IN_EVAPORATOR; // kg sucrose in evaporator
@@ -93,13 +98,16 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     // Energy in minus energy out
     const in_minus_out = mdot_feed * (Cp(temp_feed, Y_IN) * temp_feed - Cp(temp_conc, y_c) * temp_conc); // W
 
+    // Heat loss
+    const heat_loss = OUTER_UA * (temp_conc - 298.15); // W
+
     // Calculate rate of evaporate:
     // Calculate boiling temperature
     const Tboil = inv_antoines(EVAPORATOR_PRESSURE / (1 - y_c));
     // To make this work, we need to ensure that the steady state value will be correct.
     // As such, instead of using the proportional error, recalculate the previous term with the boiling point as a target value.
     // Basically, use any power available for boiling
-    var cons = mdot_feed * (Cp(temp_feed, Y_IN) * temp_feed - Cp(temp_conc, y_c) * Tboil) + UA * (temp_stm - Tboil);
+    var cons = mdot_feed * (Cp(temp_feed, Y_IN) * temp_feed - Cp(temp_conc, y_c) * Tboil) + UA * (temp_stm - Tboil) - OUTER_UA * (Tboil - 298.15);
     // Calculate the enthalpy change
     const dH = dHvap(temp_conc); // J / kg
     // Maximum based on feed flowrate
@@ -108,11 +116,10 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     
     const mdot_evap = cons / dH; // kg / s
     const mdot_conc = mdot_feed - mdot_evap; // kg / s
-    // console.log(`Tboil: ${(Tboil - 273.15).toFixed(2)}`);
 
     // Evolve
     const capac = (MASS_IN_EVAPORATOR * Cp(temp_conc, y_c) + 10); // Capacity [J / K]
-    const dTdt = (in_minus_out + heat_rate - cons) / capac;
+    const dTdt = (in_minus_out + heat_rate - cons - heat_loss) / capac;
     
     const newT = temp_conc + dTdt * dt;
 
