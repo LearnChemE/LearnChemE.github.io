@@ -93,8 +93,8 @@ const Controls: React.FC<controlProps> = ({
           <button
             type="button"
             className="btn btn-success"
-            disabled={pumpsAreRunning}
-            aria-disabled={pumpsAreRunning}
+            disabled={pumpsAreRunning && !animationIsFinished}
+            aria-disabled={pumpsAreRunning && !animationIsFinished}
             onClick={() => measureBtnHandler()}
           >
             measure temperatures

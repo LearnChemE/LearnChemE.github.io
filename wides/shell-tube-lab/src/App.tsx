@@ -19,10 +19,21 @@ import { ANIMATION_TIME } from "./sketch/functions";
 
 const DOUBLE_BEAKER_MODE = 0;
 const SINGLE_BEAKER_MODE = 1;
+const notMeasuring = () => [-1, -1, -1, -1];
+const getMeasuredValues = () => [g.Th_in, g.Th_out_observed, g.Tc_in, g.Tc_out_observed];
+
+type MeasuringState = {
+  measuring: boolean;
+  measure: () => number[];
+};
+
 function App() {
   // State vars
   const [pumpsAreRunning, setPumpsAreRunning] = useState(false);
-  const [measured, setMeasured] = useState([-1, -1, -1, -1]);
+  const [measuringState, setMeasuringState] = useState<MeasuringState>({
+    measuring: false,
+    measure: notMeasuring,
+  });
   const [pumpBtnIsDisabled, setPumpBtnDisabled] = useState(false);
   const [experimentMode, setExperimentMode] = useState(DOUBLE_BEAKER_MODE);
   const [sideBarIsShowing, setSideBarShowing] = useState(false);
@@ -44,11 +55,10 @@ function App() {
     g.hIsFlowing = !pumpsAreRunning;
     g.cIsFlowing = !pumpsAreRunning;
     setPumpsAreRunning((pumpsAreRunning) => !pumpsAreRunning);
-    setMeasured([-1, -1, -1, -1]);
+    setMeasuringState({ measuring: false, measure: notMeasuring });
   };
   const measureBtnHandler = () => {
-    setMeasured([g.Th_in, g.Th_out_observed, g.Tc_in, g.Tc_out_observed]);
-    console.log([g.Th_in,g.Th_out,g.Th_out_observed])
+    setMeasuringState(measuringState.measuring ? { measuring: false, measure: notMeasuring } : { measuring: true, measure: getMeasuredValues });
   };
   const resetBtnHandler = () => {
     g.vols = [1000, 0, 1000, 0]; // reset volumes
@@ -58,14 +68,14 @@ function App() {
     g.cIsFlowing = false;
     setPumpBtnDisabled(false);
     setPumpsAreRunning(false);
-    setMeasured([-1, -1, -1, -1]);
+    setMeasuringState({ measuring: false, measure: notMeasuring });
     clearTimeout(pumpBtnTimeout);
     setAnimationFinished(false);
   };
   // Swap the first and third beakers with the second and fourth. This is called the swap button, but is actually labelled "pour back"
   const swapBtnHandler = () => {
     // Temp measurements become outdated
-    setMeasured([-1,-1,-1,-1]);
+    setMeasuringState({ measuring: false, measure: notMeasuring });
 
     // Calc average temps. Use the observed values for the effluent; g.Tx_out will be recalculated on running the pumps.
     // Orange
@@ -103,7 +113,7 @@ function App() {
         <div
           className="graphics-wrapper"
           style={
-            measured[0] != -1
+            measuringState.measuring
               ? { cursor: "url('thermometer.png') 25 95, auto" }
               : { cursor: "auto" }
           }
@@ -145,7 +155,7 @@ function App() {
       {AboutModalDialogue}
 
       <Tooltips
-        measured={measured}
+        measure={measuringState.measure}
         canvasMode={experimentMode}
         pumpsAreRunning={pumpsAreRunning}
       />

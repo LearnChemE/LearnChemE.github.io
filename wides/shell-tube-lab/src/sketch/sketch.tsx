@@ -148,7 +148,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
   const fillAnimation = () => {
     let start: number;
     p.image(graphics.emptyTubes, 0, 0);
-    p.image(graphics.shellTube, 75, 75);
+    p.image(graphics.shellTube, 55, 55);
 
     if ((start = g.startTime) === PUMPS_NOT_STARTED) return; // Pumps not started
 
