@@ -48,10 +48,10 @@ const rand = (min: number, max: number) => {
 
 // Randomize temp and flowrate values in g
 export function randStartVals() {
-  g.Th_in = rand(MIN_HOT_WATER_TEMP, MAX_HOT_WATER_TEMP);
-  g.mDotH = rand(MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE);
+  g.Th_in = rand(MIN_HOT_WATER_TEMP,  MAX_HOT_WATER_TEMP);
+  g.mDotH = rand(MIN_HOT_FLOWRATE,    MAX_HOT_FLOWRATE);
   g.Tc_in = rand(MIN_COLD_WATER_TEMP, MAX_COLD_WATER_TEMP);
-  g.mDotC = rand(MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE);
+  g.mDotC = rand(MIN_COLD_FLOWRATE,   MAX_COLD_FLOWRATE);
 }
 
 function effectiveness(cmin: number, cmax: number, UA: number) {

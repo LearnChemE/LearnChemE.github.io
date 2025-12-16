@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { lerp } from "../sketch/functions";
 
 interface MeasuredVals {
-  measured: Array<number>;
+  measure: () => number[];
   canvasMode: number;
   pumpsAreRunning: boolean;
 }
 
 export const Tooltips: React.FC<MeasuredVals> = ({
-  measured,
+  measure,
   canvasMode,
   pumpsAreRunning,
 }) => {
@@ -24,11 +24,11 @@ export const Tooltips: React.FC<MeasuredVals> = ({
     return () => clearInterval(interval);
   });
 
-  if (measured[0] === -1) {
+  if (measure()[0] === -1) {
     measuredStrings = ["--", "--", "--", "--"];
   } else {
     for (let i = 0; i < 4; i++) {
-      measuredStrings[i] = measured[i].toFixed(1);
+      measuredStrings[i] = measure()[i].toFixed(1);
     }
   }
 
