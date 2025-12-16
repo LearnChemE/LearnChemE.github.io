@@ -41,6 +41,8 @@ function inv_antoines(P: number) {
     return B / (A - logP) - C;
 }
 
+export const max_temp = inv_antoines(1 / (1 - .83)) - 273.15; // K to C
+
 /**
  * Calculate sugar water solution's heat capacity (J/kg) based on temperature (K) and mole fraction
  * @param T temperature (K)
@@ -86,7 +88,6 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     var temp_conc = state.concTemp + 273.15; // K
     const pres_stm  = state.steamPres.value; // bar
     const temp_stm = Math.max(inv_antoines(pres_stm), 298.15); // K
-    console.log("Steam Temp (K): ", temp_stm);
     
     // Heat transferred from steam trap to vessel
     const heat_rate = Math.max(UA * (temp_stm - temp_conc), 0); // W
@@ -97,13 +98,16 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     // Energy in minus energy out
     const in_minus_out = mdot_feed * (Cp(temp_feed, Y_IN) * temp_feed - Cp(temp_conc, y_c) * temp_conc); // W
 
+    // Heat loss
+    const heat_loss = OUTER_UA * (temp_conc - 298.15); // W
+
     // Calculate rate of evaporate:
     // Calculate boiling temperature
     const Tboil = inv_antoines(EVAPORATOR_PRESSURE / (1 - y_c));
     // To make this work, we need to ensure that the steady state value will be correct.
     // As such, instead of using the proportional error, recalculate the previous term with the boiling point as a target value.
     // Basically, use any power available for boiling
-    var cons = mdot_feed * (Cp(temp_feed, Y_IN) * temp_feed - Cp(temp_conc, y_c) * Tboil) + UA * (temp_stm - Tboil);
+    var cons = mdot_feed * (Cp(temp_feed, Y_IN) * temp_feed - Cp(temp_conc, y_c) * Tboil) + UA * (temp_stm - Tboil) - OUTER_UA * (Tboil - 298.15);
     // Calculate the enthalpy change
     const dH = dHvap(temp_conc); // J / kg
     // Maximum based on feed flowrate
@@ -112,10 +116,6 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     
     const mdot_evap = cons / dH; // kg / s
     const mdot_conc = mdot_feed - mdot_evap; // kg / s
-    // console.log(`Tboil: ${(Tboil - 273.15).toFixed(2)}`);
-
-    // Heat loss
-    const heat_loss = OUTER_UA * (temp_conc - 298.15); // W
 
     // Evolve
     const capac = (MASS_IN_EVAPORATOR * Cp(temp_conc, y_c) + 10); // Capacity [J / K]

@@ -54,15 +54,16 @@ svg {
   opacity: 0.0;
 }
 
-/* .tooltip .tooltip-text::after {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 6px;
-  border-style: solid;
-  border-color: black transparent transparent transparent;
-} */
+/* Warning modal */
+
+.alert-danger {
+  background-color: #ffeeee;
+  color: #df0505;
+  border: 1px solid #df0505;
+  transition: opacity 0.3s ease;
+}
+
+
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Hamburger menu

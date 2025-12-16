@@ -1,5 +1,5 @@
 import type { EvaporatorState, SimulationDescriptor } from "../../types";
-import { calculateEvaporator } from "../calcs";
+import { calculateEvaporator, max_temp } from "../calcs";
 import type { Outlet } from "./Outlet";
 
 export class Simulation {
@@ -11,6 +11,7 @@ export class Simulation {
     private setPressureLabel: (val: number) => void;
     private condensate: Outlet;
     private concentrate: Outlet;
+    private onShutdown: ((msg: string) => void) | undefined = undefined;
     
     constructor(descriptor: SimulationDescriptor) {
         // Create state object
@@ -25,7 +26,7 @@ export class Simulation {
             concComp: 0.05,
             concTemp: 25
         }
-
+        // Save outlets
         this.condensate = descriptor.condensate;
         this.concentrate = descriptor.concentrate;
 
@@ -54,13 +55,23 @@ export class Simulation {
             this.setSteamFlowLabel(this.state.steamFlow);
             this.setSteamTempLabel(this.state.steamTemp);
             this.setTankTempLabel(this.state.concTemp);
-            console.log("Temp: ", this.state.concTemp);
             this.setEvapFlowLabel(this.state.evapFlow);
             this.setPressureLabel(1);
             
             // Update outlets
             this.condensate.setStreamConditions(this.state.steamFlow, 0);
             this.concentrate.setStreamConditions(this.state.concFlow, this.state.concComp);
+
+            // Safety: if concentrate exceeds 83% sucrose, shut down steam
+            if (this.state.concComp >= 0.83) {
+                this.state.steamPres.setpoint = 0;
+                this.onShutdown?.("concentration reached solubility limit");
+            }
+            // Safety: if concentrate exceeds 83% sucrose, shut down steam
+            if (this.state.concTemp >= max_temp) {
+                this.state.steamPres.setpoint = 0;
+                this.onShutdown?.("evaporator temperature exceeded safe limits");
+            }
 
             // Request next frame
             requestAnimationFrame(frame);
@@ -87,7 +98,11 @@ export class Simulation {
         this.state.steamPres.setpoint = 20;
         this.state.feedFlow.value = 0;
         this.state.feedTemp.value = 25;
-        this.state.steamPres.value = 20;
+        this.state.steamPres.value = 0;
+    }
+
+    public setOnSafetyShutdown = (shutdown: (msg: string) => void) => {
+        this.onShutdown = shutdown;
     }
 }
 
