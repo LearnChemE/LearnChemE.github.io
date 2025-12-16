@@ -9,10 +9,11 @@ import { constrain } from "./helpers";
 const MW_SUCROSE = 342.2965; // g / mol
 const MW_WATER = 18; // g / mol
 
-const UA = 1.4e3; // W / K
+const UA = 700; // W / K
 const EVAPORATOR_PRESSURE = 1; // bar
 const X_IN = 0.05;
 const Y_IN = X_IN / MW_SUCROSE / (X_IN / MW_SUCROSE + (1 - X_IN) / MW_WATER);
+const OUTER_UA = 50; // W / K
 
 const MASS_IN_EVAPORATOR = .025; // kg
 
@@ -84,10 +85,11 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     const temp_feed = state.feedTemp.value + 273.15; // K
     var temp_conc = state.concTemp + 273.15; // K
     const pres_stm  = state.steamPres.value; // bar
-    const temp_stm = inv_antoines(pres_stm); // K
+    const temp_stm = Math.max(inv_antoines(pres_stm), 298.15); // K
+    console.log("Steam Temp (K): ", temp_stm);
     
     // Heat transferred from steam trap to vessel
-    const heat_rate = UA * (temp_stm - temp_conc); // W
+    const heat_rate = Math.max(UA * (temp_stm - temp_conc), 0); // W
     // Composition
     const x_c = state.concComp; // Use existing composition
     const m_c = x_c * MASS_IN_EVAPORATOR; // kg sucrose in evaporator
@@ -112,9 +114,12 @@ export function calculateEvaporator(state: EvaporatorState, deltaTime: number) {
     const mdot_conc = mdot_feed - mdot_evap; // kg / s
     // console.log(`Tboil: ${(Tboil - 273.15).toFixed(2)}`);
 
+    // Heat loss
+    const heat_loss = OUTER_UA * (temp_conc - 298.15); // W
+
     // Evolve
     const capac = (MASS_IN_EVAPORATOR * Cp(temp_conc, y_c) + 10); // Capacity [J / K]
-    const dTdt = (in_minus_out + heat_rate - cons) / capac;
+    const dTdt = (in_minus_out + heat_rate - cons - heat_loss) / capac;
     
     const newT = temp_conc + dTdt * dt;
 

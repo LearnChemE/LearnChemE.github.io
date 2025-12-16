@@ -34,7 +34,7 @@ const concLabel = new DigitalLabel(concScaleLabelDescriptor);
 // Control variables for state
 const flowCtrl = new FirstOrder(0,   500, 200);
 const tempCtrl = new FirstOrder(25, 3000,1000);
-const presCtrl = new FirstOrder(20, 1000,   0);
+const presCtrl = new FirstOrder(0,  1000,   0);
 
 // Outlets
 concentrateDescriptor.label = concLabel;

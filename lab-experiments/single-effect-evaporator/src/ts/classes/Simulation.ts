@@ -23,7 +23,7 @@ export class Simulation {
             evapFlow: 0,
             concFlow: 0,
             concComp: 0.05,
-            concTemp: 209.9
+            concTemp: 25
         }
 
         this.condensate = descriptor.condensate;
@@ -54,6 +54,7 @@ export class Simulation {
             this.setSteamFlowLabel(this.state.steamFlow);
             this.setSteamTempLabel(this.state.steamTemp);
             this.setTankTempLabel(this.state.concTemp);
+            console.log("Temp: ", this.state.concTemp);
             this.setEvapFlowLabel(this.state.evapFlow);
             this.setPressureLabel(1);
             
