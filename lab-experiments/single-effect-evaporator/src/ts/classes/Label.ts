@@ -20,7 +20,6 @@ export class DigitalLabel implements Label {
         const label = document.createElementNS(svgNS, "text")!;
         label.id = descriptor.id;
         label.classList.add("digital-label");
-        label.innerHTML = `${descriptor.initialValue.toFixed(descriptor.decimals)} ${descriptor.units}`;
         label.setAttribute("text-anchor", "middle");
         label.setAttribute("x", `${cx}`);
         label.setAttribute("y", `${cy}`);
@@ -38,6 +37,9 @@ export class DigitalLabel implements Label {
         this.decimals = descriptor.decimals;
         this.range = descriptor.range;
         this.id = descriptor.id;
+
+        // Initialize label
+        this.setLabel(descriptor.initialValue);
     }
 
     /**
