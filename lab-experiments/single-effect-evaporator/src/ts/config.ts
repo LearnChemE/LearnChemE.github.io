@@ -30,9 +30,9 @@ export const steamPresLabelDescriptor: DigitalLabelDescriptor = {
   decimals: 2,
   initialValue: 0,
   range: {
-    range: [0, 10000],
+    range: [1, 10000],
     overflowString: "OVER",
-    underflowString: "0.00"
+    underflowString: "OFF"
   }
 };
 
