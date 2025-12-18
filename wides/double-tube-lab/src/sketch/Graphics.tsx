@@ -208,10 +208,10 @@ export function beakersAndTubes(p: P5CanvasInstance, tubes: P5CanvasInstance) {
 
   bt.push();
   bt.fill("black");
-  bt.textSize(16);
+  bt.textSize(20);
   bt.noStroke();
   bt.textAlign(bt.CENTER, bt.CENTER);
-  bt.text("enlarged view", 610, 48);
+  bt.text("enlarged view", 624, 46);
   bt.pop();
 
   return bt;
