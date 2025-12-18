@@ -16,8 +16,8 @@
 	</script>
 	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script type="module" crossorigin src="./assets/index-DIbz-tJ1.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-DDvm2JDs.css">
+    <script type="module" crossorigin src="./assets/index-Db797Cet.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DZrpTKP1.css">
   </head>
 
   <body>
@@ -26,68 +26,44 @@
 	</div>
 		<div id="warning-container" class="alert alert-danger" role="alert" style="position: absolute; top: 30%; left: 50%; transform: translateX(-50%); opacity: 0; pointer-events: none;">
 			<strong>Safety Shutdown:</strong> <span id="warning-message">the steam supply has been shut off.</span>
-
-    <!-- Modal content goes here. It will be hid by Bootstrap until activated -->
-		<div
-		id="directions-modal"
-		class="modal fade"
-		tabindex="-1"
-		aria-labelledby="simulation directions"
-		aria-hidden="true"
-		>
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Directions</h5>
-						<button
-						type="button"
-						class="btn-close"
-						data-bs-dismiss="modal"
-						aria-label="Close"
-						></button>
-					</div>
-					<div class="modal-body">
-						<p>
-							This simulation models a single-effect evaporator with a steam jacketed feed heater and manual catch-and-weigh outlet measurement.
-              Use the setpoint displays to control the feed temperature and flowrate, and hover over the evaporator and analog gauges to monitor.
-              Click the three-way ball valves to control flow to scales or the drain. Click the button on either scale to empty the bucket and tare.
-							Scroll to zoom and drag the screen to pan.
-						</p>
-					</div>
-				</div>
-			</div>
 		</div>
 
-		<div
-		id="about-modal"
-		class="modal fade"
-		tabindex="-1"
-		aria-labelledby="about the simulation"
-		aria-hidden="true"
-		>
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">About</h5>
-						<button
-						type="button"
-						class="btn-close"
-						data-bs-dismiss="modal"
-						aria-label="Close"
-						></button>
-					</div>
-					<div class="modal-body">
-						<p>
-						This digital experiment was created in the Department of Chemical and Biological Engineering at University of Colorado Boulder 
-            for LearnChemE.com by Drew Smith under the direction of Professor John L. Falconer and Michelle Medlin. It is based on a 
+    <!-- Modal content -->
+		<div id="directions-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <div class="modal-header">
+                    <h2>Directions</h2>
+                </div>
+                <div class="modal-body">
+                    <p>
+							This experiment concentrates a dilute sugar solution feed by boiling off water in a single-effect evaporator using saturated steam as the heat source. 
+							The feed temperatures and flow rate of the sugar solution are set with controllers. 
+							The steam feed pressure is set with a controller and this sets the steam temperature and flow rate. 
+							The rates of concentrate and condensate leaving the evaporator are measured by weighing the flows out. 
+							Mass and energy balances are carried out. It aims to demonstrate the effects of operating parameters on evaporator efficiency. 
+							Use the scroll wheel or pinch the screen to zoom, and drag your mouse or touchscreen to pan the camera.
+						</p>
+                </div>
+            </div>
+        </div>
+        
+		<div id="about-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <div class="modal-header">
+                    <h2>About</h2>
+                </div>
+                <div class="modal-body">
+                    <p>
+						This digital experiment was created in the <a href="https://www.colorado.edu/chbe">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder 
+            for <a href="http://learncheme.com">LearnChemE.com</a> by Drew Smith under the direction of Professor John L. Falconer. It is based on a 
             <a href="https://learncheme.com/simulations/separations/single-effect-evaporator/">browser-based simulation</a> by Neil Hendren at the University of Colorado Boulder.
-            It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State 
-            University.  Address any questions or comments to LearnChemE@gmail.com.   
+            This digital experiment was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.
 						</p>
-					</div>
-				</div>
-			</div>
-		</div>
+                </div>
+            </div>
+        </div>
   </body>
 
 </html>

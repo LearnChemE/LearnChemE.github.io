@@ -1,7 +1,8 @@
 import 'bootstrap';
 
 import 'bootstrap/scss/bootstrap.scss';
-import './style.css'
+import './style.css';
+import './hamburger.css';
 import { initButton, initHamburgerMenu, insertSVG } from './ts/helpers';
 import svg from './media/Evaporator.svg?raw';
 import worksheet from './media/Single-effect evaporator worksheet.pdf';

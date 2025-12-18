@@ -110,8 +110,7 @@ svg {
 
   width: min-content;
   grid-template-rows: max-content max-content max-content;
-  gap: 1em;
-  padding: .5rem;
+  padding: 0;
   /* keep this lower than modal's z-index */
 }
 
