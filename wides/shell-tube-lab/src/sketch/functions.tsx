@@ -138,6 +138,7 @@ function changeVols(deltaTime: number) {
   } else if (g.vols[0] <= 0) {
     g.vols[0] = 0.0;
     g.hIsFlowing = false;
+    return false
   }
   if (g.vols[2] > 0 && g.cIsFlowing) {
     if (g.fillBeakers) {
@@ -152,7 +153,9 @@ function changeVols(deltaTime: number) {
   } else if (g.vols[2] <= 0) {
     g.vols[2] = 0.0;
     g.cIsFlowing = false;
+    return false;
   }
+  return true;
 }
 
 // Constants for integrateTemps. These aren't scientific yet
@@ -201,6 +204,7 @@ export function handleSingleBeakerCalculations(deltaTime: number) {
 // Handle full calculations and set globals each frame in double-beaker mode
 export function handleDoubleBeakerCalculations(deltaTime: number) {
   calcHeatTransferRate();
-  changeVols(deltaTime);
+  const running = changeVols(deltaTime);
   integrateTemps(deltaTime);
+  return running;
 }
