@@ -25,6 +25,8 @@ export const MIN_HOT_FLOWRATE = 15;
 export const MAX_COLD_FLOWRATE = 22;
 export const MIN_COLD_FLOWRATE = 16;
 
+export const ANIMATION_TIME = 5000; // milliseconds
+
 /* ********************************************************************* */
 /* ** This file holds calculations for heat transfer and outlet temps ** */
 /* ********************************************************************* */
@@ -150,26 +152,42 @@ function calcGrashoffNumber() {
 }
 
 // iterate the volumes in the g.vols array based on flowrates
+const FILL_ANIMATION_FLOWRATE = 50 * 1000 / ANIMATION_TIME; // (mL available) / (seconds of animation)
 export function changeVols(p: P5CanvasInstance) {
   let dV;
+  const deltaTime = p.deltaTime;
+  const aniTime = (g.orngTime >= 0) ? p.millis() - g.orngTime : 0;
   if (g.vols[0] > 0 && g.hIsFlowing) {
-    dV = (g.mDotH * p.deltaTime) / 1000;
-    g.vols[0] -= dV;
-    g.vols[1] += dV;
+    if (aniTime >= ANIMATION_TIME) {
+      dV = (g.mDotH * deltaTime) / 1000;
+      g.vols[0] -= dV;
+      g.vols[1] += dV;
+    }
+    else {
+      dV = (FILL_ANIMATION_FLOWRATE * deltaTime) / 1000;
+      g.vols[0] -= dV;
+    }
   } else if (g.vols[0] <= 0) {
     g.vols[0] = 0.0;
-    g.vols[1] = 1000.0;
     g.hIsFlowing = false;
+    return false; // Stop animation
   }
   if (g.vols[2] > 0 && g.cIsFlowing) {
-    dV = (g.mDotC * p.deltaTime) / 1000;
-    g.vols[2] -= dV;
-    g.vols[3] += dV;
+    if (aniTime >= ANIMATION_TIME) {
+      dV = (g.mDotC * deltaTime) / 1000;
+      g.vols[2] -= dV;
+      g.vols[3] += dV;
+    }
+    else {
+      dV = (FILL_ANIMATION_FLOWRATE * deltaTime) / 1000;
+      g.vols[2] -= dV;
+    }
   } else if (g.vols[2] <= 0) {
     g.vols[2] = 0.0;
-    g.vols[3] = 1000.0;
     g.cIsFlowing = false;
+    return false; // Stop animation
   }
+  return true; // Continue animation
 }
 
 const UA_ROOM = 1e-3;
