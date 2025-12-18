@@ -54,6 +54,23 @@ export function doubleTubeGraphic(w: number, h: number, p: P5CanvasInstance) {
   dt.image(cPipe, 0, 0);
   dt.pop();
 
+  dt.push();
+  dt.stroke("black");
+  dt.strokeWeight(2);
+  console.log(dt.drawingContext);
+  dt.drawingContext.setLineDash([5, 5]);
+  dt.noFill();
+  const wpad = 48;
+  const hpad = 18;
+  dt.rect(lx - wpad, ty - hpad, wHex + 2 * wpad, hHex + 2 * hpad, 8);
+
+  dt.fill("black");
+  dt.textSize(16);
+  dt.noStroke();
+  dt.textAlign(dt.CENTER, dt.CENTER);
+  dt.text("enlarged view", lx + wpad, ty - hpad / 2 + 1);
+  dt.pop();
+
   return dt;
 }
 

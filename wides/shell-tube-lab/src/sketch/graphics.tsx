@@ -56,7 +56,7 @@ function createShellTubeGraphic(p: P5CanvasInstance) {
   st.fill('black');
   st.textAlign(st.RIGHT, st.CENTER);
   st.textSize(16);
-  st.text('scaled to view', width, -8);
+  st.text('enlarged view', width, -8);
   return st;
 }
 

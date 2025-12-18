@@ -45,11 +45,11 @@ export default function drawAll(
   // outTubes: P5CanvasInstance,
   fillingAnimation: AnimationFactory
 ) {
-  let tb;
-  tb = g.blueTime == -1 ? 0 : (p.millis() - g.blueTime) / 1000;
+  let tb; // animation timer
+  tb = (g.blueTime === -1) ? 0 : (p.millis() - g.blueTime) / 1000;
 
   // Calculations
-  changeVols(p);
+  const running = changeVols(p);
   integrateTemps(p);
 
   // Pumps 
@@ -78,7 +78,7 @@ export default function drawAll(
   displayValve(V1CX, V1CY+1, g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE, p, v);
   displayValve(V2CX, V2CY+1, g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE, p, v);
 
-  // console.log(`Flowrates: ${g.mDotH.toFixed(1)} ${g.mDotC.toFixed(1)}\nTemps: ${g.Th_in.toFixed(1)} ${g.Th_out.toFixed(1)} ${g.Tc_in.toFixed(1)} ${g.Tc_out.toFixed(1)}`);
+  return running;
 }
 
 // handle dragging

@@ -72,6 +72,12 @@ export default function sketch(p: P5CanvasInstance) {
   var fillingAnimation: AnimationFactory;
   var blueShader: any;
   var orngShader: any;
+
+  var onFinish: (() => void) | undefined = undefined;
+
+  p.updateWithProps = (props: any) => {
+    onFinish = props.onFinish;
+  }
    
   p.preload = () => {
     tubes = p.loadImage("./Tubes.png");
@@ -124,7 +130,10 @@ export default function sketch(p: P5CanvasInstance) {
     p.background(250);
     p.translate(-g.width/2, -g.height/2);
     calcHeatTransferRate();
-    drawAll(p, dt, bt, pa, v, fillingAnimation);
+    const running = drawAll(p, dt, bt, pa, v, fillingAnimation);
+    if (!running) {
+      onFinish?.();
+    }
   };
 
   p.mousePressed = () => {

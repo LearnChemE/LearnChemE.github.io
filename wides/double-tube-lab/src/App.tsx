@@ -17,7 +17,7 @@ import sketch, {
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import "./App.css";
-import { randStartVals } from "./sketch/Functions.tsx";
+import { ANIMATION_TIME, randStartVals } from "./sketch/Functions.tsx";
 import {
   SingleBeakerSketch,
   randSingleStartVals,
@@ -57,7 +57,7 @@ function App() {
       if (g.vols[0] >= 998) {
         setPumpBtnDisabled(true);
         // this sets a 3 second timer where the button is disabled
-        setTimeout(() => setPumpBtnDisabled(false), 3000);
+        setTimeout(() => setPumpBtnDisabled(false), ANIMATION_TIME);
       }
     } else if (canvasMode === SINGLE_BEAKER) {
       toggleSinglePumps(!pumpsRunning);
@@ -65,7 +65,7 @@ function App() {
       if (setAnimationTimeNextFrame()) {
         setPumpBtnDisabled(true);
         // this sets a 3 second timer where the button is disabled
-        setTimeout(() => setPumpBtnDisabled(false), 3000);
+        setTimeout(() => setPumpBtnDisabled(false), ANIMATION_TIME);
       }
     }
   }
@@ -329,7 +329,11 @@ function App() {
           }
         >
           {canvasMode == DOUBLE_BEAKER ? (
-            <ReactP5Wrapper sketch={sketch} />
+            <ReactP5Wrapper sketch={sketch} onFinish={() => {
+              setPumpsRunning(false);
+              setPumpBtnDisabled(true);
+              togglePumps(false);
+            }} />
           ) : (
             <ReactP5Wrapper sketch={SingleBeakerSketch} />
           )}
