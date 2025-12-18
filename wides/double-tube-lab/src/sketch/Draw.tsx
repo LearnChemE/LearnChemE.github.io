@@ -75,8 +75,8 @@ export default function drawAll(
 
   // Valves
   drag(p);
-  displayValve(V1CX, V1CY+1, g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE, p, v);
-  displayValve(V2CX, V2CY+1, g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE, p, v);
+  displayValve(V1CX, V1CY+1, g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE, p, v);
+  displayValve(V2CX, V2CY+1, g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE, p, v);
 
   return running;
 }
@@ -87,17 +87,17 @@ function drag(p: P5CanvasInstance) {
     var theta = p.atan2(p.mouseY - V1CY, p.mouseX - V1CX);
     var prevTheta = p.atan2(p.pmouseY - V1CY, p.pmouseX - V1CX);
     var dTheta = Math.sign(theta * prevTheta) === -1 ? 0 : theta - prevTheta;
-    var dmDot = p.map(dTheta, 0, p.PI / 4, 0, MAX_HOT_FLOWRATE);
+    var dmDot = p.map(dTheta, 0, p.PI / 4, 0, MAX_COLD_FLOWRATE);
 
-    g.mDotH += dmDot;
-    g.mDotH = p.constrain(g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE);
+    g.mDotC += dmDot;
+    g.mDotC = p.constrain(g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE);
   } else if (g.dragging2) {
     theta = p.atan2(p.mouseY - V2CY, p.mouseX - V2CX);
     prevTheta = p.atan2(p.pmouseY - V2CY, p.pmouseX - V2CX);
     dTheta = Math.sign(theta * prevTheta) === -1 ? 0 : theta - prevTheta;
-    dmDot = p.map(dTheta, 0, p.PI / 4, 0, MAX_COLD_FLOWRATE);
+    dmDot = p.map(dTheta, 0, p.PI / 4, 0, MAX_HOT_FLOWRATE);
 
-    g.mDotC += dmDot;
-    g.mDotC = p.constrain(g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE);
+    g.mDotH += dmDot;
+    g.mDotH = p.constrain(g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE);
   }
 }

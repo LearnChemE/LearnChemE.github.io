@@ -42,7 +42,7 @@ canvas {
 
 .nav-bar-center {
   display: grid;
-  grid-template-columns: 150px 200px;
+  grid-template-columns: 150px 200px 80px;
   gap: 10px;
   padding: 2px;
 }
