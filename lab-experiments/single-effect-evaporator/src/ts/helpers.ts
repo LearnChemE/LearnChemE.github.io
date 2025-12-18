@@ -18,21 +18,43 @@ export function initHamburgerMenu(worksheet: string, worksheetDownload: string) 
     const download = document.createElement("a");
     download.id="worksheet-download";
     download.download=worksheetDownload;
-    download.innerHTML=`<button id="wks-btn" type="button" class="btn btn-primary btn-wide"> Worksheet </button>`;
+    download.innerHTML=`
+<button class="menu-item">
+    <i class="fas fa-paperclip"></i>
+    <span>Worksheet</span> 
+</button>`;
     download.setAttribute("href", worksheet);
 
     // Create the menu element
     const menu = document.createElement("menu");
     menu.className = "menu-content";
-    menu.innerHTML = `
-            <button id="dir-btn" type="button" class="btn btn-primary btn-wide" data-bs-toggle="modal" data-bs-target="#directions-modal"> Directions </button>
-            `;
-    menu.appendChild(download);
-    menu.insertAdjacentHTML("beforeend", `
-            <button id="abt-btn" type="button" class="btn btn-primary btn-wide" data-bs-toggle="modal" data-bs-target="#about-modal"> About </button>
-        `);
 
-    // Give the button a callback to toggle the menu
+    // Create directions button
+    const directions = document.createElement("div");
+    directions.setAttribute("id", "dir-btn");
+    directions.classList.add("menu-item");
+    directions.setAttribute("data-modal", "directions-modal");
+    directions.innerHTML=`
+    <i class="fas fa-book"></i>
+    <span>Directions</span> 
+    `;
+
+    // Create the About button
+    const about = document.createElement("div");
+    about.setAttribute("id", "abt-btn");
+    about.classList.add("menu-item");
+    about.setAttribute("data-modal", "about-modal");
+    about.innerHTML=`
+    <i class="fas fa-info-circle"></i>
+    <span>About</span> 
+    `;
+
+    // Append items to menu
+    menu.appendChild(directions);
+    menu.appendChild(download);
+    menu.appendChild(about);
+
+    // Give the hamburger button a callback to toggle the menu
     function toggleMenu(): void {
         menu.style.display = (menu.style.display === 'grid') ? 'none' : 'grid';
     }
@@ -49,6 +71,41 @@ export function initHamburgerMenu(worksheet: string, worksheetDownload: string) 
         if (!btn.contains(trg) && !menu.contains(trg)) {
             menu.style.display = 'none';
         }
+    });
+
+    // Buttons open modals
+    [directions, about].forEach(btn => {
+        btn.addEventListener("click", () => {
+            const modalID = btn.getAttribute("data-modal")!;
+            const modal = document.getElementById(modalID);
+            if (modal) {
+                modal.style.display = "block";
+                modal.style.opacity = "1";
+            }
+            menu.style.display = 'none';
+        });
+    });
+
+    // Close modals buttons
+    const closeBtns = document.querySelectorAll('.close-btn')!;
+    closeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.closest('.modal')! as HTMLElement;
+            target.style.display = 'none';
+            target.style.opacity = '0';
+        });
+    });
+
+
+    // Close modal when clicking outside
+    const modals = document.querySelectorAll('.modal');
+    window.addEventListener('click', (e) => {
+        modals.forEach(modal => {
+            if (e.target === modal) {
+                (modal as HTMLElement).style.display = 'none';
+                (modal as HTMLElement).style.opacity = '0';
+            }
+        });
     });
 
     // Return the wrapper
