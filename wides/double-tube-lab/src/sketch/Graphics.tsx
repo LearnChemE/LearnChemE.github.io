@@ -63,14 +63,7 @@ export function doubleTubeGraphic(w: number, h: number, p: P5CanvasInstance) {
   const wpad = 48;
   const hpad = 18;
   dt.rect(lx - wpad, ty - hpad, wHex + 2 * wpad, hHex + 2 * hpad, 8);
-
-  dt.fill("black");
-  dt.textSize(16);
-  dt.noStroke();
-  dt.textAlign(dt.CENTER, dt.CENTER);
-  dt.text("enlarged view", lx + wpad, ty - hpad / 2 + 1);
-  dt.pop();
-
+  
   return dt;
 }
 
@@ -213,6 +206,14 @@ export function beakersAndTubes(p: P5CanvasInstance, tubes: P5CanvasInstance) {
   bt.image(b, 625, 461);
 
   bt.image(tubes,87,40);
+
+  bt.push();
+  bt.fill("black");
+  bt.textSize(16);
+  bt.noStroke();
+  bt.textAlign(bt.CENTER, bt.CENTER);
+  bt.text("enlarged view", 610, 48);
+  bt.pop();
 
   return bt;
 }
