@@ -188,15 +188,15 @@ function App() {
             >
               { measuringState.measuring ? "stop measuring" : "measure temperatures" }
             </button>
-            {/* <button
+            <button
               type="button"
-              className="btn btn-success"
+              className="btn btn-danger"
               disabled={pumpsRunning}
               aria-disabled={pumpsRunning}
-              onClick={() => handleMeasureClick()}
+              onClick={() => handleResetClick()}
             >
-              swap beakers
-            </button> */}
+              reset
+            </button>
           </div>
           <div id="nav-bar-right">
             <button
