@@ -57,13 +57,12 @@ export function doubleTubeGraphic(w: number, h: number, p: P5CanvasInstance) {
   dt.push();
   dt.stroke("black");
   dt.strokeWeight(2);
-  console.log(dt.drawingContext);
   dt.drawingContext.setLineDash([5, 5]);
   dt.noFill();
   const wpad = 48;
   const hpad = 18;
   dt.rect(lx - wpad, ty - hpad, wHex + 2 * wpad, hHex + 2 * hpad, 8);
-  
+
   return dt;
 }
 
@@ -166,7 +165,7 @@ function createBeaker(p: P5CanvasInstance) {
   let b = p.createGraphics(150, 150);
   b.scale(1.25);
 
-  b.strokeWeight(5);
+  b.strokeWeight(2);
   b.stroke("black");
   // lip
   b.line(0, 2, 10, 2);

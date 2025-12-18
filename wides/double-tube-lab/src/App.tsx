@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ReactP5Wrapper } from "@p5-wrapper/react";
 import { Tooltips } from "./elements/Tooltips.tsx";
 import {
@@ -40,6 +40,7 @@ const getMeasuredValues = () => [g.Th_in, g.Th_out_observed, g.Tc_in, g.Tc_out_o
 // Use functional style, not classes. Hooks make the code much better to work with.
 function App() {
   const [pumpsRunning, setPumpsRunning] = useState(false);
+  const [pumpsDone, setPumpsDone] = useState(false);
   const [measuringState, setMeasuringState] = useState<MeasuringState>({
     measuring: false,
     measure: notMeasuring,
@@ -90,6 +91,7 @@ function App() {
     }
     setPumpsRunning(false);
     setPumpBtnDisabled(false);
+    setPumpsDone(false);
     setMeasuringState({ measuring: false, measure: notMeasuring });
     togglePumps(false);
     pumpBtnClass = "btn btn-primary";
@@ -180,8 +182,8 @@ function App() {
             <button
               type="button"
               className={measuringState.measuring ? "btn btn-success" : "btn btn-outline-success"}
-              disabled={isPumpBtnDisabled || canvasMode === SINGLE_BEAKER}
-              aria-disabled={isPumpBtnDisabled || canvasMode === SINGLE_BEAKER}
+              disabled={(isPumpBtnDisabled && !pumpsDone) || canvasMode === SINGLE_BEAKER}
+              aria-disabled={(isPumpBtnDisabled && !pumpsDone) || canvasMode === SINGLE_BEAKER}
               onClick={() => handleMeasureClick()}
             >
               { measuringState.measuring ? "stop measuring" : "measure temperatures" }
@@ -214,6 +216,16 @@ function App() {
       </>
     );
   };
+
+  useEffect(() => {
+    console.log("pumpsDisabled:", isPumpBtnDisabled);
+  }, [isPumpBtnDisabled]);
+  useEffect(() => {
+    console.log("pumpsDone:", pumpsDone);
+  }, [pumpsDone]);
+  useEffect(() => {
+    console.log("Measure diables:", (isPumpBtnDisabled && !pumpsDone));
+  }, [isPumpBtnDisabled, pumpsDone]);
 
   return (
     <>
@@ -286,8 +298,8 @@ function App() {
             <button
               type="button"
               className={"btn btn-success"}
-              disabled={isPumpBtnDisabled || canvasMode === SINGLE_BEAKER}
-              aria-disabled={isPumpBtnDisabled || canvasMode === SINGLE_BEAKER}
+              disabled={(isPumpBtnDisabled && !pumpsDone) || canvasMode === SINGLE_BEAKER}
+              aria-disabled={(isPumpBtnDisabled && !pumpsDone) || canvasMode === SINGLE_BEAKER}
               onClick={() => handleMeasureClick()}
             >
               { measuringState.measuring ? "stop measuring" : "measure temperatures" }
@@ -332,7 +344,9 @@ function App() {
             <ReactP5Wrapper sketch={sketch} onFinish={() => {
               setPumpsRunning(false);
               setPumpBtnDisabled(true);
+              setPumpsDone(true);
               togglePumps(false);
+              console.log("animation finished");
             }} />
           ) : (
             <ReactP5Wrapper sketch={SingleBeakerSketch} />
