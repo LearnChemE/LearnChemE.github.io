@@ -124,6 +124,12 @@ function App() {
                 ? ShellTubeSketch
                 : SingleBeakerSketch
             }
+            onFinish={() => {
+              g.hIsFlowing = false;
+              g.cIsFlowing = false;
+              setPumpBtnDisabled(false);
+              setPumpsAreRunning(false);
+            }}
           />
           <a className="tooltip-anchor" id="hi-anchor" />
           <a className="tooltip-anchor" id="ho-anchor" />

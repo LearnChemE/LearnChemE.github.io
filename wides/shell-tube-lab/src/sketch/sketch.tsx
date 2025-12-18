@@ -72,8 +72,14 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
   var orngShader: any;
   var fillingAnimation: AnimationFactory;
 
+  var onFinish: (() => void) | undefined = undefined;
+  p.updateWithProps = (props: any) => {
+    onFinish = props.onFinish;
+  };
+
   const drag = (isDraggingValves: number) => {
     if (isDraggingValves === NOT_DRAGGING) return;
+
 
     // Take the change in angle to find change in mDot. Ignore if angle resets
     if (isDraggingValves === DRAGGING_HOT) {
@@ -261,7 +267,10 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       graphics.valve
     );
 
-    handleDoubleBeakerCalculations(p.deltaTime);
+    const running = handleDoubleBeakerCalculations(p.deltaTime);
+    if (!running) {
+      onFinish?.();
+    }
     // console.log(g.Th_in, g.Th_out, g.Tc_in, g.Tc_out);
 
     // prettier-ignore
