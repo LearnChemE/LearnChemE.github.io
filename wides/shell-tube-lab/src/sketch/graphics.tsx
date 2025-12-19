@@ -20,7 +20,7 @@ const ciTubeVertices = [[620, 620],[620, 35],[165, 35],[165, 75],[155, 75],[155,
 const coTubeVertices = [[440, 450],[440, 430],[440, 400],[485, 400],[485, 375],[495, 375],[495, 410],[450, 410],[450, 450]];
 
 function createShellTubeGraphic(p: P5CanvasInstance) {
-  const outline_pad = 20;
+  const outline_pad = 12;
   const width = 475,
     height = 300;
   let st = p.createGraphics(width + 2 * outline_pad, height + 2 * outline_pad);
@@ -52,11 +52,6 @@ function createShellTubeGraphic(p: P5CanvasInstance) {
   st.drawingContext.setLineDash([5, 5]);
   st.rect(-outline_pad, -outline_pad, width+2*outline_pad, height+2*outline_pad);
   
-  st.noStroke();
-  st.fill('black');
-  st.textAlign(st.RIGHT, st.CENTER);
-  st.textSize(16);
-  st.text('enlarged view', width, -8);
   return st;
 }
 
@@ -169,6 +164,13 @@ function createEmptyTubesGraphic(p: P5CanvasInstance) {
     bt.vertex(coTubeVertices[i][0], coTubeVertices[i][1]);
   }
   bt.endShape();
+
+
+  bt.noStroke();
+  bt.fill('black');
+  bt.textAlign(bt.RIGHT, bt.CENTER);
+  bt.textSize(20);
+  bt.text('enlarged view', 555, 52);
 
   return bt;
 }
