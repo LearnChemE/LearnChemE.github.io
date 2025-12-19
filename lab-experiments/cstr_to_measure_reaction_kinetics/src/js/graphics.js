@@ -1356,7 +1356,8 @@ export function drawSimulation(width, height) {
   fill(isHoveringRect ? color("#254D70") : 0); // Lighter red on hover, black otherwise
 
   // Draw text
-  text('transient state sped up 10x\nsize scaled to fit', rectX + rectWidth - 10, rectY + 10); // Position with padding
+  // textSize(24);
+  text('enlarged view\ntransient state sped up 10x', rectX + rectWidth - 10, rectY - 55); // Position with padding
 
   // Reset line dash to solid
   drawingContext.setLineDash([]);
