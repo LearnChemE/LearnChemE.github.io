@@ -127,14 +127,33 @@ export function solve() {
   }
 }
 
+/**
+ * Smoothly interpolate between current and target values in a frame-rate independent way.
+ * @param {*} current Current value
+ * @param {*} target Target value
+ * @param {*} r Interpolation rate (use exp(-1/timeConstant))
+ * @param {*} dt Delta time (same units as time constant)
+ * @returns Interpolated value
+ */
+function smoothLerp(current, target, r, dt) {
+  return (current - target) * r ** dt + target;
+}
+
+const inv_tau = 0.3; // time constant in seconds
+const r = Math.exp(-inv_tau);
+
 export function calcAll() {
+  // Only calculate if all valves are open
   if (state.rightTank.valveRotation > 0 && state.leftTank.valveRotation > 0 && state.valvePosition > 0) {
+    // Use calculated solution to gradually update tank properties
     const Tf1 = state.solution.Tf1;
     const Tf2 = state.solution.Tf2;
     const Pf = state.solution.P;
-    state.leftTank.temperature = 0.005 * (Tf1 - state.leftTank.temperature) + state.leftTank.temperature;
-    state.rightTank.temperature = 0.005 * (Tf2 - state.rightTank.temperature) + state.rightTank.temperature;
-    state.leftTank.pressure = 0.005 * (Pf - state.leftTank.pressure) + state.leftTank.pressure;
-    state.rightTank.pressure = 0.005 * (Pf - state.rightTank.pressure) + state.rightTank.pressure;
+    const dt = deltaTime / 1000;
+    // Interpolate towards final values
+    state. leftTank.temperature = smoothLerp(state. leftTank.temperature, Tf1, r, dt);
+    state.rightTank.temperature = smoothLerp(state.rightTank.temperature, Tf2, r, dt);
+    state. leftTank.pressure    = smoothLerp(state. leftTank.pressure,     Pf, r, dt);
+    state.rightTank.pressure    = smoothLerp(state.rightTank.pressure,     Pf, r, dt);
   }
 }
