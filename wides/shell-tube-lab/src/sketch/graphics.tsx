@@ -1,4 +1,4 @@
-import { P5CanvasInstance } from "@p5-wrapper/react";
+import { P5CanvasInstance } from "../components/ReactP5Wrapper";
 
 export const ORANGE_FLUID_COLOR = [255, 50, 0, 200];
 export const BLUE_FLUID_COLOR = [0, 80, 255, 180];
@@ -276,7 +276,7 @@ export interface graphicsObjects {
   valve: any;
   pumpAssembly: any;
 }
-export function createGraphicsObjects(p: P5CanvasInstance): graphicsObjects {
+export function createGraphicsObjects(p: P5CanvasInstance) : graphicsObjects {
   let g = {
     shellTube: createShellTubeGraphic(p),
     orngShellTube: createOrngShellTubeGraphic(p),
@@ -336,6 +336,14 @@ function createEmptySingleTubes(p: P5CanvasInstance) {
     bt.vertex(coSingleVert[i][0], coSingleVert[i][1]);
   }
   bt.endShape();
+
+  bt.push();
+  bt.noStroke();
+  bt.fill('black');
+  bt.textAlign(bt.RIGHT, bt.CENTER);
+  bt.textSize(20);
+  bt.text('enlarged view', 555, 52);
+  bt.pop();
 
   return bt;
 }

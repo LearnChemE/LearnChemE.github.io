@@ -3,17 +3,18 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
 import "./App.css";
 import { useState, useEffect } from "react";
-import Controls from "./elements/Controls";
-import SideBar from "./elements/SideBar";
-import { ReactP5Wrapper } from "@p5-wrapper/react";
+import Controls from "./components/Controls";
+import SideBar from "./components/SideBar";
+// import { ReactP5Wrapper } from "@p5-wrapper/react";
+import ReactP5Wrapper from "./components/ReactP5Wrapper";
 import ShellTubeSketch, { g } from "./sketch/sketch";
 import SingleBeakerSketch from "./sketch/SingleBeaker";
 import {
   DirectionsModalDialogue,
   DetailsModalDialogue,
   AboutModalDialogue,
-} from "./elements/ModalDialogues";
-import { Tooltips } from "./elements/Tooltips";
+} from "./components/ModalDialogues";
+import { Tooltips } from "./components/Tooltips";
 import { ANIMATION_TIME } from "./sketch/functions";
 
 const DOUBLE_BEAKER_MODE = 0;
