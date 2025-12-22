@@ -38,6 +38,7 @@
     "webpack-dev-server": "^5.2.1"
   },
   "devDependencies": {
+    "copy-webpack-plugin": "^11.0.0",
     "jest": "^30.2.0"
   }
 }

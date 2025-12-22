@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const module_rules = [{
     test: /\.ttf|\.wav$/i,
@@ -25,10 +26,7 @@ const module_rules = [{
   },
   {
     test: /\.(docx|pdf)$/i,
-    loader: 'file-loader',
-    options: {
-      name: 'assets/[name].[ext]',
-    },
+    type: 'asset/resource',
   }
 ];
 
@@ -68,6 +66,11 @@ let config = {
     }
   },
   plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: path.resolve(__dirname, '../src/assets'), to: 'assets' }
+      ]
+    }),
     new HtmlWebpackPlugin(html_options),
     new MiniCssExtractPlugin({
       filename: "[name].[contenthash].css",
