@@ -59,72 +59,56 @@ export function solve() {
   let Tf1, Tf2, Pff;
   let error = 1e12;
 
-  // Search for global minimum
-  for (let T1 = Ti; T1 > 173; T1 -= 0.5) {
-    for (let T2 = Ti; T2 < 783; T2 += 0.5) {
-      for (let Pf = 0; Pf < state.leftTank.pressure / 1000; Pf += 100) {
-        const diff1 = Pi * V1 / Ti - Pf * V1 / T1 - Pf * V2 / T2;
-        const diff2 = T1 / Ti - (Pf / Pi) ** (2 / 7);
-        const diff3 = Pi * V1 - Pf * V1 - Pf * V2;
-        const diff = abs(diff1) + abs(diff2) + abs(diff3);
-        if (diff < error) {
-          error = diff;
-          Tf1 = T1;
-          Tf2 = T2;
-          Pff = Pf;
-        }
-      }
-    }
-  }
+  console.time("Solving for final temperatures and pressure...");
 
-  // Refine search
-  for (let T1 = Tf1 + 20; T1 > Tf1 - 20; T1 -= 1) {
-    for (let T2 = Tf2 + 20; T2 > Tf2 - 20; T2 -= 1) {
-      for (let Pf = Pff - 50; Pf < Pff + 50; Pf++) {
-        const diff1 = Pi * V1 / Ti - Pf * V1 / T1 - Pf * V2 / T2;
-        const diff2 = T1 / Ti - (Pf / Pi) ** (2 / 7);
-        const diff3 = Pi * V1 - Pf * V1 - Pf * V2;
-        const diff = abs(diff1) + abs(diff2) + abs(diff3);
-        if (diff < error) {
-          error = diff;
-          Tf1 = T1;
-          Tf2 = T2;
-          Pff = Pf;
-        }
-      }
-    }
-  }
+  // Use changes in volume to calculate theoretical final pressure
+  var Pf = Pi * V1 / (V1 + V2); // Final pressure estimate
 
+  // Use adiabatic expansion law to calculate T1f
+  var T1 = Ti * (Pf / Pi) ** (2 / 7);
+
+  // Use energy balance to calculate T2f
+  var T2 = Pf * V2 / (Pi / Ti - Pf / T1) / V1;
+
+
+  // Calculate error ranges by sensitivity analysis
   const TErrorRange = [
     0.95 - 0.04 * (state.leftTank.pressure - 5e5) / 4.5e6 - 0.03 * (state.leftTank.temperature - 25) / 275,
     0.98 - 0.02 * (state.leftTank.pressure - 5e5) / 4.5e6 - 0.01 * (state.leftTank.temperature - 25) / 275,
   ]
 
+  // Generate errors based on ranges
   const leftTankError = random(2 - TErrorRange[0], 2 - TErrorRange[1]);
   const rightTankError = random(TErrorRange[0], TErrorRange[1]);
 
+  // Pressure error range depends on temperature errors
   const PErrorRange = [
     min(2 - leftTankError, 2 - rightTankError),
     max(2 - leftTankError, 2 - rightTankError)
   ]
 
+  // Generate pressure error based on range
   const pressureError = random(PErrorRange[0], PErrorRange[1]);
 
-  Tf1 -= 273.15;
-  Tf2 -= 273.15;
+  // Convert back to Celsius
+  T1 -= 273.15;
+  T2 -= 273.15;
 
-  Tf1 = leftTankInitialTemperature + (Tf1 - leftTankInitialTemperature) * leftTankError;
-  Tf2 = rightTankInitialTemperature + (Tf2 - rightTankInitialTemperature) * rightTankError;
+  // Apply errors
+  T1 = leftTankInitialTemperature + (T1 - leftTankInitialTemperature) * leftTankError;
+  T2 = rightTankInitialTemperature + (T2 - rightTankInitialTemperature) * rightTankError;
 
-  Pff *= 1000;
+  Pf *= 1000;
 
-  Pff = initialPressure + pressureError * (Pff - initialPressure);
+  Pf = initialPressure + pressureError * (Pf - initialPressure);
 
   state.solution = {
-    Tf1: Tf1,
-    Tf2: Tf2,
-    P: Pff,
+    Tf1: T1,
+    Tf2: T2,
+    P: Pf,
   }
+
+  console.timeEnd("Solving for final temperatures and pressure...");
 }
 
 /**
