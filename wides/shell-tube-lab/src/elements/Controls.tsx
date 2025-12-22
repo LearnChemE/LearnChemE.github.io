@@ -9,6 +9,7 @@ interface controlProps {
   measureBtnHandler: () => void;
   menuBtnHandler: () => void;
   swapBtnHandler: () => void;
+  onReset: () => void;
 }
 
 const Controls: React.FC<controlProps> = ({
@@ -19,7 +20,8 @@ const Controls: React.FC<controlProps> = ({
   pumpBtnHandler,
   measureBtnHandler,
   menuBtnHandler,
-  swapBtnHandler
+  swapBtnHandler,
+  onReset,
 }) => {
   let pumpBtnClass: string, icon: string, innerHtml: string;
   if (pumpsAreRunning) {
@@ -64,6 +66,10 @@ const Controls: React.FC<controlProps> = ({
           data-bs-target="#about-modal"
         >
           About
+        </button>
+        <button className="btn btn-danger" onClick={onReset}>
+          <i className="fa-solid fa-arrows-rotate"></i>
+          &nbsp; reset
         </button>
       </div>
       <div className="nav-bar">

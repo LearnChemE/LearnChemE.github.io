@@ -235,7 +235,7 @@ function blueTubeFluidGraphicException(
 function createValveGraphic(p: P5CanvasInstance) {
   let v = p.createGraphics(50, 50);
   v.push();
-  v.fill("blue");
+  v.fill("#6ea2f4ff");
   v.stroke("black");
   v.strokeWeight(2);
   v.circle(25, 25, 48);

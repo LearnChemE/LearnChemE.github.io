@@ -1,5 +1,4 @@
 import React from "react";
-import logo from "./logo.svg";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
 import "./App.css";
@@ -101,6 +100,7 @@ function App() {
           setSideBarShowing((sideBarIsShowing) => !sideBarIsShowing)
         }
         swapBtnHandler={() => swapBtnHandler()}
+        onReset={() => resetBtnHandler()}
       />
     );
   };
@@ -110,6 +110,7 @@ function App() {
     <>
       <div className="sim-wrapper">
         <ControlWrapper />
+        
         <div
           className="graphics-wrapper"
           style={
