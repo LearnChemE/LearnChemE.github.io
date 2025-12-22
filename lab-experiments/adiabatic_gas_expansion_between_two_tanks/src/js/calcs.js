@@ -59,8 +59,6 @@ export function solve() {
   let Tf1, Tf2, Pff;
   let error = 1e12;
 
-  console.time("Solving for final temperatures and pressure...");
-
   // Use changes in volume to calculate theoretical final pressure
   var Pf = Pi * V1 / (V1 + V2); // Final pressure estimate
 
@@ -107,8 +105,6 @@ export function solve() {
     Tf2: T2,
     P: Pf,
   }
-
-  console.timeEnd("Solving for final temperatures and pressure...");
 }
 
 /**
