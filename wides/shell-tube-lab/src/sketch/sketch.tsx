@@ -267,7 +267,8 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       graphics.valve
     );
 
-    const running = handleDoubleBeakerCalculations(p.deltaTime);
+    const deltaTime = Math.min(p.deltaTime, .2); // Cap deltaTime to avoid large jumps
+    const running = handleDoubleBeakerCalculations(deltaTime);
     if (!running) {
       onFinish?.();
     }
