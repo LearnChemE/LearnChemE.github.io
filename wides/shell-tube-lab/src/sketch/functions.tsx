@@ -1,4 +1,3 @@
-import { P5CanvasInstance } from "../components/ReactP5Wrapper";
 import { g } from "./sketch";
 
 export const ANIMATION_TIME = 2500; // ms
