@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { JSX, useState } from "react";
 
 const DIRECTIONS = 0;
 const WORKSHEET = 1;

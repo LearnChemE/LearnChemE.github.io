@@ -1,4 +1,4 @@
-import { P5CanvasInstance } from "@p5-wrapper/react";
+import { P5CanvasInstance } from "../components/ReactP5Wrapper";
 import { PathTrace } from "./pathTrace";
 
 interface AnimationSegment {
@@ -66,7 +66,7 @@ export class TubeFill implements AnimationSegment
         p.strokeCap(p.ROUND);
 
         // Draw all previous vertices
-        p.beginShape();
+        p.beginShape(p.LINE_STRIP);
         for (let i=0,n=prev+1;i<n;i++) {
             p.vertex(...v[i]);
         }

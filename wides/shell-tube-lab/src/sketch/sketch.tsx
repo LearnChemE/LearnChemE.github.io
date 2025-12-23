@@ -1,4 +1,4 @@
-import { P5CanvasInstance, P5WrapperClassName } from "@p5-wrapper/react";
+import { P5CanvasInstance } from "../components/ReactP5Wrapper";
 import createGraphicsObjects, { BLUE_FLUID_COLOR, ORANGE_FLUID_COLOR, graphicsObjects } from "./graphics";
 import {
   MIN_COLD_FLOWRATE,

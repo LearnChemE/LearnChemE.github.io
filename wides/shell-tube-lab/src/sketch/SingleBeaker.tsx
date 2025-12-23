@@ -1,4 +1,4 @@
-import { P5CanvasInstance, P5WrapperClassName } from "@p5-wrapper/react";
+import { P5CanvasInstance } from "../components/ReactP5Wrapper";
 import createGraphicsObjects, {
   graphicsObjects,
   singleGraphicsObj,
@@ -72,7 +72,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
   const fillAnimation = () => {
     let start: number;
     p.image(singleGraphics.emptyTubes, 0, 0);
-    p.image(graphics.shellTube, 55, 55);
+    p.image(graphics.shellTube, 63, 63);
 
     if ((start = g.startTime) === PUMPS_NOT_STARTED) return; // Pumps not started
 
@@ -215,6 +215,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
       );
       p.pop();
     }
+
     // Debug purposes
     // console.log(
     //   g.Th_in + " " + g.Th_out + " " + g.Tc_in + " " + g.Tc_out + " "

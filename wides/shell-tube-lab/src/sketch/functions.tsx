@@ -1,4 +1,3 @@
-import { P5CanvasInstance } from "@p5-wrapper/react";
 import { g } from "./sketch";
 
 export const ANIMATION_TIME = 2500; // ms
@@ -123,9 +122,10 @@ function calcTubeRe() {
 
 // Change the volumes each frame based on the deltaTime
 const FILL_ANIMATION_FLOWRATE = 50 * 1000 / ANIMATION_TIME; // (mL available) / (seconds of animation)
+const MIN_FILL = 100; // mL
 function changeVols(deltaTime: number) {
   let dV;
-  if (g.vols[0] > 0 && g.hIsFlowing) {
+  if (g.vols[0] > MIN_FILL && g.hIsFlowing) {
     if (g.fillBeakers) {
       dV = (g.mDotH * deltaTime) / 1000;
       g.vols[0] -= dV;
@@ -135,12 +135,11 @@ function changeVols(deltaTime: number) {
       dV = (FILL_ANIMATION_FLOWRATE * deltaTime) / 1000;
       g.vols[0] -= dV;
     }
-  } else if (g.vols[0] <= 0) {
-    g.vols[0] = 0.0;
+  } else if (g.vols[0] <= MIN_FILL) {
     g.hIsFlowing = false;
     return false
   }
-  if (g.vols[2] > 0 && g.cIsFlowing) {
+  if (g.vols[2] > MIN_FILL && g.cIsFlowing) {
     if (g.fillBeakers) {
       dV = (g.mDotC * deltaTime) / 1000;
       g.vols[2] -= dV;
@@ -150,8 +149,7 @@ function changeVols(deltaTime: number) {
       dV = (FILL_ANIMATION_FLOWRATE * deltaTime) / 1000;
       g.vols[2] -= dV;
     }
-  } else if (g.vols[2] <= 0) {
-    g.vols[2] = 0.0;
+  } else if (g.vols[2] <= MIN_FILL) {
     g.cIsFlowing = false;
     return false;
   }
