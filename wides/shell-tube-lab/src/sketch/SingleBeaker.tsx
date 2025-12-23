@@ -169,7 +169,8 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     // Coordinates in top left
     // showDebugCoordinates(p);
     // Calculations
-    handleSingleBeakerCalculations(p.deltaTime);
+    const deltaTime = Math.min(p.deltaTime, .2); // Cap deltaTime to avoid large jumps
+    handleSingleBeakerCalculations(deltaTime);
 
     // Pumps
     p.image(graphics.pumpAssembly,  60, 455);
