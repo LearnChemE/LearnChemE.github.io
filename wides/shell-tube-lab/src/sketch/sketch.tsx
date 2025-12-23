@@ -194,6 +194,11 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     p.fill(...color);
     p.noStroke();
     p.rect(x, 630 - vol, width, vol);
+    // p.stroke(...color);
+    // p.fill("red");
+    // p.strokeWeight(10);
+    // p.rect(x, 630 - vol, width, vol);
+    // p.circle(x + width / 2, 630 - vol, width);
     p.pop();
   };
 
@@ -267,7 +272,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       graphics.valve
     );
 
-    const deltaTime = Math.min(p.deltaTime, .2); // Cap deltaTime to avoid large jumps
+    const deltaTime = Math.min(p.deltaTime, 200); // Cap deltaTime to avoid large jumps
     const running = handleDoubleBeakerCalculations(deltaTime);
     if (!running) {
       onFinish?.();
