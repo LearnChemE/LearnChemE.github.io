@@ -56,7 +56,7 @@ body {
   width: 100%;
   font-family: sans-serif;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 18px;
   margin-top: 10px;
   overflow: hidden;
   user-select: none;
@@ -130,7 +130,7 @@ body {
 }
 
 .control-bar.slider-controls .slider-group label {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 400;
   white-space: nowrap;
 }
@@ -178,7 +178,7 @@ body {
   display: inline-block;
   min-width: 40px;
   text-align: right;
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 400;
 }
 
@@ -211,7 +211,7 @@ body {
 }
 
 .status-message {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   line-height: 1.4;
   color: #333;
 }
@@ -221,7 +221,7 @@ body {
   align-items: center;
   gap: 8px;
   font-weight: 400;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   white-space: nowrap;
   pointer-events: auto;
 }

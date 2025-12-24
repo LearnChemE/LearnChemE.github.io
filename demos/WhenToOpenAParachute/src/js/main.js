@@ -74,7 +74,7 @@ function getParams() {
 
 function updateOutputs({ initialHeight, parachuteRadius }) {
   if (elements.heightValue) elements.heightValue.textContent = `${Math.round(initialHeight)}`;
-  if (elements.radiusValue) elements.radiusValue.textContent = `${parachuteRadius.toFixed(2)}`;
+  if (elements.radiusValue) elements.radiusValue.textContent = `${parachuteRadius.toFixed(1)}`;
 }
 
 async function renderPlot() {
