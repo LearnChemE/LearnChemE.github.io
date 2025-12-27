@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Lever Rule for the Uranium-Titanium Solid-Liquid Phase Diagram</title>
+        <script src="./libraries/p5.js"></script>
+        <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+        <meta name="keywords" content="LearnChemE, chemical engineering, engineering, simulation">
+        <meta name="author" content="Patrick Doyle">
+        <meta name="application-name" content="LearnChemE simulation template">
+        <meta name="description" content="An interactive simulation demonstrating the lever rule for the uranium-titanium solid-liquid phase diagram.">
+
+        <link href="./sliders.css" rel="stylesheet">
+        <link href="./style.css" rel="stylesheet">
+        <link href="./bootstrap.min.css" rel="stylesheet">
+        <script>
+          MathJax = {
+            chtml: {
+              scale: 0.95,
+              mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+              displayAlign: 'left', // default for indentalign when set to 'auto'
+            }
+          };
+        </script>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="./jquery.js"></script>
+        <script src="./popper.js"></script>
+        <script src="./bootstrap.min.js"></script>
+    </head>
+
+    <body>
+        <div id="simulation-wrapper">
+                  
+
+          <div class="inputs-wrapper" style="justify-content: center;">
+            <div id="modal-buttons">
+                <div id="dir" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directionsModal">Directions</div>
+                <div id="detail" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detailsModal">Details</div>
+                <div id="about" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aboutModal">About</div>   
+            </div>
+        </div>
+            
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 10px;">
+            <div style="display: grid; grid-template-columns: 180px 300px 50px; gap: 10px; align-items: center;">
+                <div class="input-label" style="text-align: right;">uranium mole fraction</div>
+                <input type="range" id="uranium-slider" min="0" max="1" value="0.5" step="0.01" style="width: 300px; margin: 0;"/>
+                <div id="uranium-value" class="value-label">0.50</div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 180px 300px 50px; gap: 10px; align-items: center;">
+                <div class="input-label" id="slider-label" style="text-align: right;">temperature (°C)</div>
+                <input type="range" id="temp-slider" min="600" max="925" value="720" step="1" style="width: 300px; margin: 0;"/>
+                <div id="temp-value" class="value-label">720</div>
+            </div>
+        </div>
+
+        <div id="graphics-wrapper" style="margin-top: 30px;">
+
+        </div>
+
+        <div class="modal fade" id="directionsModal" tabindex="-1" role="dialog" aria-labelledby="directionsModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="directionsModalLabel">Directions</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>
+                  A solid-liquid phase diagram for the uranium-titanium system shows the regions of phase stability as a function of the temperature and overall composition. The phases are (1) a liquid mixture of uranium and titanium, (2) solid uranium, (3) solid titanium, and (4) a solid phase compound with the formula TiU\(_2\). The phase boundaries are solid black lines. Above all phase boundaries, only a liquid mixture is stable; its mole fraction is indicated by the red dotted line. At any point inside the phase boundaries, two phases are stable. The phases and their relative amounts are shown in the bar graph. Horizontal lines, tie lines, connect two phases in equilibrium. The lever rule is used to calculate the relative amounts of the two phases, which are shown on the bar graph. The relative amount of a phase is proportional to the dashed line of the same color.
+                </p>
+                
+                  
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Detailed equations and thermodynamic relationships for the uranium-titanium phase diagram will be added here.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="aboutModalLabel">About</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Sanjay Baskaran under the direction of Professor John L. Falconer and Michelle Medlin. It is a JavaScript/HTML5 implementation of a Mathematica simulation that was created by Lisa M. Goss and modified by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+        <script src="index.js"></script>
+        <script src="functions.js"></script>
+    </body>
+</html>
