@@ -152,8 +152,8 @@ function calcGrashoffNumber() {
 }
 
 // iterate the volumes in the g.vols array based on flowrates
-const MIN_FILL = 10; // mL
-const FILL_ANIMATION_FLOWRATE = (50 - MIN_FILL) * 1000 / ANIMATION_TIME; // (mL available) / (seconds of animation)
+const MIN_FILL = 100; // mL
+const FILL_ANIMATION_FLOWRATE = (50) * 1000 / ANIMATION_TIME; // (mL available) / (seconds of animation)
 export function changeVols(p: P5CanvasInstance) {
   let dV;
   const deltaTime = p.deltaTime;
@@ -170,7 +170,6 @@ export function changeVols(p: P5CanvasInstance) {
       g.vols[0] -= dV;
     }
   } else if (g.vols[0] <= MIN_FILL) {
-    g.vols[0] = 0.0;
     g.hIsFlowing = false;
     return false; // Stop animation
   }
@@ -185,7 +184,6 @@ export function changeVols(p: P5CanvasInstance) {
       g.vols[2] -= dV;
     }
   } else if (g.vols[2] <= MIN_FILL) {
-    g.vols[2] = 0.0;
     g.cIsFlowing = false;
     return false; // Stop animation
   }
