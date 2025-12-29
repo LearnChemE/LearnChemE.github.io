@@ -2,6 +2,15 @@ import type { EvaporatorState, SimulationDescriptor } from "../../types";
 import { calculateEvaporator, max_temp } from "../calcs";
 import type { Outlet } from "./Outlet";
 
+const InitialSimulationState: Partial<EvaporatorState> = {
+    steamFlow: 0,
+    steamTemp: 500,
+    evapFlow: 0,
+    concFlow: 0,
+    concComp: 0.05,
+    concTemp: 25
+}
+
 export class Simulation {
     private state: EvaporatorState; 
     private setTankTempLabel: (val: number) => void;
@@ -20,11 +29,12 @@ export class Simulation {
             feedTemp: descriptor.tempCtrl,
             steamPres: descriptor.presCtrl,
             steamFlow: 0,
-            steamTemp: 500,
+            steamTemp: 0,
             evapFlow: 0,
             concFlow: 0,
-            concComp: 0.05,
-            concTemp: 25
+            concComp: 0,
+            concTemp: 0,
+            ...InitialSimulationState
         }
         // Save outlets
         this.condensate = descriptor.condensate;
@@ -85,17 +95,13 @@ export class Simulation {
         // Create state object
         this.state = {
             ...this.state,
-            steamFlow: 0,
-            steamTemp: 500,
-            evapFlow: 0,
-            concFlow: 0,
-            concComp: 0.05,
-            concTemp: 209.9
+            ...InitialSimulationState
         }
+        console.log(this.state.concTemp)
         // Reset controlled values
         this.state.feedFlow.setpoint = 0;
         this.state.feedTemp.setpoint = 25;
-        this.state.steamPres.setpoint = 20;
+        this.state.steamPres.setpoint = 0;
         this.state.feedFlow.value = 0;
         this.state.feedTemp.value = 25;
         this.state.steamPres.value = 0;

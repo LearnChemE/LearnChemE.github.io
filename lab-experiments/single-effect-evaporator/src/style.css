@@ -1,6 +1,7 @@
 #app {
   display: grid;
   margin: auto;
+  margin-top: .5rem;
   width: min-content;
   height: min-content;
   position: relative;
