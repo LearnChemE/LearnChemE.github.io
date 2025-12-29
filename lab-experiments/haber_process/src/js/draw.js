@@ -1,4 +1,7 @@
 import { addGaussNoise, calcAll } from "./calcs.js";
+import { mass_flow_rate_left_button_x, mass_flow_rate_right_button_x } from "./events.js";
+import { h2_mass_flow_rate_button_y, n2_mass_flow_rate_button_y, nh3_mass_flow_rate_button_y } from "./events.js";
+import { hover_coords, T_controller_coords, knob_coords } from "./events.js";
 
 const tankHeight = 60;
 const tankWidth = 13;
@@ -55,20 +58,23 @@ function drawTankTubes() {
   drawTubeElbow(34, -20, 0);
   drawTJunction(50, -30, 0);
   drawTJunction(50, -20, 0);
+  // H2 mass flow meter
   drawMassFlowMeter(41, -40.325, state.tanks.h2, [
-    [62, 64.5],
-    [65, 67.5],
-    [7.9, 9.2]
+    mass_flow_rate_left_button_x,
+    mass_flow_rate_right_button_x,
+    h2_mass_flow_rate_button_y
   ]);
+  // N2 mass flow meter
   drawMassFlowMeter(41, -30.325, state.tanks.n2, [
-    [62, 64.5],
-    [65, 67.5],
-    [17.9, 19.2]
+    mass_flow_rate_left_button_x,
+    mass_flow_rate_right_button_x,
+    n2_mass_flow_rate_button_y
   ]);
+  // NH3 mass flow meter
   drawMassFlowMeter(41, -20.325, state.tanks.nh3, [
-    [62, 64.5],
-    [65, 67.5],
-    [27.9, 29.2]
+    mass_flow_rate_left_button_x,
+    mass_flow_rate_right_button_x,
+    nh3_mass_flow_rate_button_y
   ]);
   pop();
 }
@@ -151,11 +157,11 @@ function drawPressureRegulator(x, y) {
   rect(0, 0, 8, 8, 0.5);
   fill(100);
   // Controller background
-  rect(0, -1, 7.25, 5.25, 0.25);
+  rect(0, -1, 7.25, 4.55, 0.25);
   fill(20);
   rectMode(CORNER);
   // Pressure value background
-  rect(-2.55, -3.375, 5.3, 2.25, 0.125);
+  rect(-2.55, -2.375, 5.3, 2.25, 0.125);
   // Pressure setpoint background
   // rect(-1.25, -0.875, 4.5, 2, 0.125);
   noStroke();
@@ -169,15 +175,10 @@ function drawPressureRegulator(x, y) {
   textSize(2.25);
   textFont(state.meterFont);
   const P = round(state.P).toFixed(0);
-  text(P, 0.275, -2.375);
+  text(P, 0.275, -1.375);
   textSize(1.75);
   const P_sp = round(state.PSetPoint).toFixed(0);
   // text(P_sp, 1, 0.125);
-  const hover_coords = [
-    [81.5, 83.5],
-    [84.75, 86.75],
-    [49, 50.75]
-  ];
   fill(40);
   if (hover_coords[0][0] < mX && mX < hover_coords[0][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
     fill(120);
@@ -187,7 +188,7 @@ function drawPressureRegulator(x, y) {
     }
   }
   // Left button
-  rect(-2.5, 1.875, 1.75, 1.75, 0.25);
+  rect(-3, 1.8, 2.75, 1.95, 0.25);
   fill(40);
   if (hover_coords[1][0] < mX && mX < hover_coords[1][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
     fill(120);
@@ -197,7 +198,7 @@ function drawPressureRegulator(x, y) {
     }
   }
   // Right button
-  rect(0.75, 1.875, 1.75, 1.75, 0.25);
+  rect(0.25, 1.8, 2.75, 1.95, 0.25);
   fill("red");
   // Left triangle
   push();
@@ -274,6 +275,7 @@ function drawMassFlowMeter(x, y, chemical, hover_coords) {
   stroke(0);
   scale(1.2);
   translate(0.25, 0.325);
+  rect(-2.5, -3.3, 2, 1.65, 0.15);
   beginShape();
   vertex(-2.0, -3);
   vertex(-1.0, -3);
@@ -292,6 +294,7 @@ function drawMassFlowMeter(x, y, chemical, hover_coords) {
       chemical.mFrame = frameCount;
     }
   }
+  rect(0.5, -3.3, 2, 1.65, 0.15);
   beginShape();
   vertex(2.0, -2.0);
   vertex(1.0, -2.0);
@@ -354,7 +357,7 @@ function drawTank(x, y, w, h, tank) {
   // Tank valve knob
   const knobCoords = [
     [4, 9.5],
-    [-8.5, -6]
+    [-8.5, -5.8]
   ];
   if (mX - x > knobCoords[0][0] && mX - x < knobCoords[0][1] && mY - y > knobCoords[1][0] && mY - y < knobCoords[1][1]) {
     stroke(255, 255, 100);
@@ -530,11 +533,7 @@ function drawReactor() {
 
   // Reactor temperature adjustment buttons
   push();
-  const hover_coords = [
-    [60, 62.5],
-    [64, 66.5],
-    [102.5, 105]
-  ]
+  const hover_coords = T_controller_coords;
   const hoverColor = "rgb(255, 150, 150)";
   fill("red");
   if (hover_coords[0][0] < mX && mX < hover_coords[0][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
@@ -545,6 +544,7 @@ function drawReactor() {
   }
   stroke(0);
   translate(61, 103);
+  rect(-1.75, -1.5, 3.5, 3, .25);
   beginShape();
   vertex(-0.75, -0.75);
   vertex(0.75, -0.75);
@@ -562,6 +562,7 @@ function drawReactor() {
       state.T = min(state.maxT, state.T + 1);
     }
   }
+  rect(-1.75, -1.5, 3.5, 3, .25);
   beginShape();
   vertex(-0.75, 0.75);
   vertex(0.75, 0.75);
@@ -803,10 +804,6 @@ function drawPurgeValve() {
   }
 
   // Determine if hovered
-  const knob_coords = [
-    [89.5, 94.5],
-    [75.5, 80.5]
-  ];
   if (knob_coords[0][0] < mX && mX < knob_coords[0][1] && knob_coords[1][0] < mY && mY < knob_coords[1][1]) {
     stroke(255, 255, 100);
     strokeWeight(0.1);

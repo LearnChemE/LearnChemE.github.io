@@ -1,22 +1,28 @@
 import { mouseCoordinate } from '../index.js';
 import { calcAll } from './calcs.js';
 
+// Mass flow rate button coordinates
+export const mass_flow_rate_left_button_x = [61.5, 64.7];
+export const mass_flow_rate_right_button_x = [64.8, 68];
+export const h2_mass_flow_rate_button_y = [6.9, 9.7];
+export const n2_mass_flow_rate_button_y = [16.9, 19.7];
+export const nh3_mass_flow_rate_button_y = [26.9, 29.7];
+
+// Temperature controller coordinates
+export const T_controller_coords = [
+  [59, 63],
+  [63.5, 67.5],
+  [100.5, 106]
+];
+
+// Tank knob coordinates
+const h2_tank_knob_x = [8, 13.5];
+const n2_tank_knob_x = [25, 30.5];
+const nh3_tank_knob_x = [42, 47.5];
+const he_tank_knob_x = [102, 107.5];
+const knob_tank_y = [48, 51];
+
 window.mousePressed = function() {
-  const mass_flow_rate_left_button_x = [62, 64.5];
-  const mass_flow_rate_right_button_x = [65, 67.5];
-  const h2_mass_flow_rate_button_y = [7.9, 9.2];
-  const n2_mass_flow_rate_button_y = [17.9, 19.2];
-  const nh3_mass_flow_rate_button_y = [27.9, 29.2];
-  const h2_tank_knob_x = [8, 13.5];
-  const n2_tank_knob_x = [25, 30.5];
-  const nh3_tank_knob_x = [42, 47.5];
-  const he_tank_knob_x = [102, 107.5];
-  const knob_tank_y = [48, 51];
-  const T_controller_coords = [
-    [60, 62.5],
-    [64, 66.5],
-    [102.5, 105]
-  ];
   state.mouseDownFrame = frameCount;
 
   if (state.purge_position !== 0) {
@@ -119,12 +125,12 @@ window.mousePressed = function() {
   handlePressureController();
 }
 
-function handlePurge() {
-  const knob_coords = [
-    [89.5, 94.5],
-    [75.5, 80.5]
-  ];
+export const knob_coords = [
+  [87.5, 98.5],
+  [74.5, 81.5]
+];
 
+function handlePurge() {
   const clicked_on_valve = mX > knob_coords[0][0] && mX < knob_coords[0][1] && mY > knob_coords[1][0] && mY < knob_coords[1][1];
   const not_mid_purge_or_sample = (state.purgingTime === 0 || state.purgingTime === 1) && (state.takingSampleTime === 0 || state.takingSampleTime === 1);
   const tanks_open = !(state.tanks.he.valvePosition === 0 || (state.tanks.n2.valvePosition === 0 && state.tanks.nh3.valvePosition === 0 && state.tanks.h2.valvePosition === 0));
@@ -181,13 +187,13 @@ function handlePressures() {
   }
 }
 
-function handlePressureController() {
-  const hover_coords = [
-    [81.5, 83.5],
-    [84.75, 86.75],
-    [49, 50.75]
-  ];
+export const hover_coords = [
+  [80.5, 84],
+  [84.25, 87.75],
+  [48, 50.75]
+];
 
+function handlePressureController() {
   const clicked_on_decrease_pressure = mX > hover_coords[0][0] && mX < hover_coords[0][1] && mY > hover_coords[2][0] && mY < hover_coords[2][1];
   const clicked_on_increase_pressure = mX > hover_coords[1][0] && mX < hover_coords[1][1] && mY > hover_coords[2][0] && mY < hover_coords[2][1];
   if (clicked_on_decrease_pressure && !state.takingSample) {
