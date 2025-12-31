@@ -8,8 +8,8 @@ import { VialsArray } from './ts/Vials'
 import { Magnifier } from './components/Magnifier/Magnifier'
 import type { InitConc } from './types/globals'
 import { TooltipSelector } from './components/Tooltip/TooltipSelector'
-// import { PlotlyChart } from './components/PlotlyChart'
-// import { createProfile } from './ts/calcs'
+import { PlotlyChart } from './components/PlotlyChart'
+import { createProfile } from './ts/calcs'
 
 function App() {
   const [magnifying, setMagnifying] = createSignal(false);
@@ -24,9 +24,10 @@ function App() {
       { xr0: 0.05, xw0: 0.05 },
   ]);
   
-  // const [plotProfile, setPlotProfile] = createSignal(createProfile({ xr0: 0.05, xw0: 0.05 }));
+  const [plotProfile, setPlotProfile] = createSignal(createProfile({ xr0: 0.05, xw0: 0.05 }));
 
   const vials = new VialsArray(ics());
+  vials.attachPlot(0, setPlotProfile);
 
   const reset = () => {
     // Reset vials
@@ -64,7 +65,7 @@ function App() {
       <ControlButton icon={() => { return pause() ? "fa-solid fa-play" : "fa-solid fa-pause" }} label="play/pause" top={260} disabled={animating} onClick={() => setPause(!pause())} />
 
       <TooltipSelector showing={() => !animating()} ics={ics} setIcs={setIcs} />
-      {/* <PlotlyChart data={plotProfile} layout={{ xaxis: { range: [0, 305] } }} /> */}
+      <PlotlyChart data={plotProfile} layout={{ xaxis: { range: [0, 305] } }} />
     </>
   )
 }

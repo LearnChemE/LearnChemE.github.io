@@ -22,11 +22,11 @@ void SedimentSolver::initialize(double xr0, double xw0) {
         concs_[i].w = cw0;
     }
     for (int i = 0; i < WHITE_INDEX_OFFSET; ++i) {
-        prof_[i] = cr0; // TODO: use conc
+        prof_[i] = xr0; // TODO: use conc
     }
     // Initialize white concentration profile
     for (int i = WHITE_INDEX_OFFSET; i < PROFILE_LENGTH; ++i) {
-        prof_[i] = cw0; // TODO: use conc
+        prof_[i] = xw0; // TODO: use conc
     }
 }
 
@@ -45,7 +45,7 @@ bool SedimentSolver::solve(double time) {
     // double res_y[PROFILE_LENGTH]; // to hold rC y[],esult (temp)
     y0[0] = {0, 0}; // Free surface BC
     for (int i = 1; i < PROFILE_LENGTH; ++i) {
-        y0[i] = {prof_[i], prof_[i + WHITE_INDEX_OFFSET]};
+        y0[i] = { conc_r(prof_[i]), conc_w(prof_[i + WHITE_INDEX_OFFSET])};
     }
     y0[WHITE_INDEX_OFFSET] = {0, 0}; // Free surface BC for white cells
     // f(0.0, y0, res_y); // test call to ensure f works
@@ -77,8 +77,15 @@ bool SedimentSolver::solve(double time) {
     movingAverageConvolve(prof_, CONC_ARRAY_SIZE, SMOOTH_FILT_SIZE);
     movingAverageConvolve(prof_ + WHITE_INDEX_OFFSET, CONC_ARRAY_SIZE, SMOOTH_FILT_SIZE);
 
+    for (size_t i = 0; i < CONC_ARRAY_SIZE; ++i) {
+        prof_[i] = phi_r(prof_[i]);
+    }
+    for (size_t i = WHITE_INDEX_OFFSET; i < WHITE_INDEX_OFFSET + CONC_ARRAY_SIZE; ++i) {
+        prof_[i] = phi_w(prof_[i]);
+    }
+
     // Resize profile and update top coordinate
-    double new_top = resize(prof_, head_[1], 0.05);
+    double new_top = resize(prof_, head_[1], -1);
     head_[1] = new_top;
     head_[0] += time; // update time
     // std::cout << "Sediment solver completed." << std::endl;

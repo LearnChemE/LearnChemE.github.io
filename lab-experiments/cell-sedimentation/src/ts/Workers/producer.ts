@@ -1,7 +1,10 @@
 import { BaseWorker } from "./baseWorker";
 import type { DataMessage, InitMessage, WorkerMessage } from "./worker-types";
 import createSedimentModule from '../../wasm/sediment';
+import type { SedimentSolver } from "../../wasm/sediment";
 
+const sedimentModule = await createSedimentModule();
+const { SedimentSolver } = sedimentModule;
 
 try {
 /**
@@ -12,7 +15,7 @@ class ProducerWorker extends BaseWorker {
 
     protected handleMessage(msg: WorkerMessage): void {
         if (msg.type === "init") {
-            // printProducer("Recieved init message");
+            console.log("Recieved init message");
             msg = msg as InitMessage;
             const payload = msg.payload;
             if (!payload) {
@@ -24,20 +27,28 @@ class ProducerWorker extends BaseWorker {
         }
 
         if (msg.type === "produce") {
-            // printProducer("Recieved produce message");
-            this.produce();
+            console.log("Recieved produce message");
+            const time = msg.payload;
+            this.produce(time);
             return;
         }
     }
 
-    private produce = () => {
+    private produce = (time: number) => {
         if (!this.solver) {
             this.error("uninitialized solver or buffer");
             return;
         }
 
         // Always generate data when available
-        const sol = this.solver.calculate_step();
+        const status = this.solver.solve(20);
+        if (!status) {
+            throw new Error("Solver failed to converge");
+        }
+
+        const view = this.solver.getConcentrationView();
+        const sol = new Float32Array(view);
+        
         const msg: DataMessage = { type: "data", payload: sol };
         this.post(msg);
         // printProducer("Result produced and sent");
