@@ -1,15 +1,14 @@
-import { ProfileSolver } from "../calcs";
 import { BaseWorker } from "./baseWorker";
 import type { DataMessage, InitMessage, WorkerMessage } from "./worker-types";
+import createSedimentModule from '../../wasm/sediment';
 
-// const printProducer = (str: string) => console.log("%c[Producer] " + `%c${str}`, "color: red", "color: white");
 
 try {
 /**
  * Producer class. On request, iterates its solver and sends the resulting data.
  */
 class ProducerWorker extends BaseWorker {
-    private solver: ProfileSolver | undefined = undefined;
+    private solver: SedimentSolver | undefined = undefined;
 
     protected handleMessage(msg: WorkerMessage): void {
         if (msg.type === "init") {
@@ -20,7 +19,7 @@ class ProducerWorker extends BaseWorker {
                 this.error("no initializer payload");
             }
             const { xr0, xw0 } = payload.initConditions ?? { xr0: 0.05, xw0: 0.05 };
-            this.solver = new ProfileSolver(xr0, xw0);
+            this.solver = new SedimentSolver(xr0, xw0);
             return;
         }
 
