@@ -52,7 +52,7 @@
             
             <div style="display: grid; grid-template-columns: 180px 300px 50px; gap: 10px; align-items: center;">
                 <div class="input-label" id="slider-label" style="text-align: right;">temperature (°C)</div>
-                <input type="range" id="temp-slider" min="600" max="925" value="720" step="1" style="width: 300px; margin: 0;"/>
+                <input type="range" id="temp-slider" min="600" max="925" value="720" step="5" style="width: 300px; margin: 0;"/>
                 <div id="temp-value" class="value-label">720</div>
             </div>
         </div>
@@ -94,9 +94,15 @@
       </div>
 
       <div class="modal-body">
-        <p>
-          Detailed equations and thermodynamic relationships for the uranium-titanium phase diagram will be added here.
-        </p>
+        <p>The amounts of the phases are calculated from the lever rule:</p>
+        <p style="text-align: center;">\(\frac{n_1}{n_2} = \frac{L_2}{L_1}\)</p>
+        <p>where,</p>
+        <ul>
+          <li>\(n_1\) represents the number of moles of phase 1 and \(n_2\) represents the number of moles of phase 2 where phases 1 and 2 are in equilibrium</li>
+          <li>\(L_2\) represents the horizontal distance between the overall mole fraction of uranium and the mole fraction of phase 2, and \(L_1\) represents the horizontal distance between the overall mole fraction of uranium and the mole fraction of phase 1.</li>
+        </ul>
+        <p>The relative amounts in the bar chart are calculated from:</p>
+        <p style="text-align: center;">\(\frac{n_1}{n_1 + n_2}\) and \(\frac{n_2}{n_1 + n_2}\)</p>
       </div>
     </div>
   </div>
@@ -115,7 +121,7 @@
         <div class="modal-body">
           <p>
             This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of Chemical and Biological Engineering</a> at University of Colorado Boulder for <a
-              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Sanjay Baskaran under the direction of Professor John L. Falconer and Michelle Medlin. It is a JavaScript/HTML5 implementation of a Mathematica simulation that was created by Lisa M. Goss and modified by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Sanjay Baskaran under the direction of Professor John L. Falconer and Michelle Medlin. It is a JavaScript/HTML5 implementation of a <a href="https://demonstrations.wolfram.com/LeverRuleForTheUraniumTitaniumSolidLiquidPhaseDiagram/" target="_blank">Mathematica simulation</a> that was created by Lisa M. Goss and modified by Rachael L. Baumann. It was prepared with financial support from the National Science Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any questions or comments to LearnChemE@gmail.com.
           </p>
         </div>
       </div>
