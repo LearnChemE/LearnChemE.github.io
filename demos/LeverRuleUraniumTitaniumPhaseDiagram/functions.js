@@ -115,6 +115,7 @@ function drawPhaseDiagram() {
     push();
     noStroke();
     fill(0);
+    textFont('Arial');
     textSize(16);
     textAlign(CENTER, BASELINE);
     text("phase diagram", (g.lx + g.rx) / 2, g.ty - 15);
@@ -139,7 +140,8 @@ function drawAxes() {
         push();
         noStroke();
         fill(0);
-        textSize(14);
+        textFont('Arial');
+        textSize(16);
         textAlign(RIGHT, CENTER);
         text(yLabels[i], g.lx - 5, y);  // Reduced from -10 to -5
         pop();
@@ -167,7 +169,8 @@ function drawAxes() {
         push();
         noStroke();
         fill(0);
-        textSize(14);
+        textFont('Arial');
+        textSize(16);
         textAlign(CENTER, TOP);
         text(xLabels[i], px, g.by + 5);  // Reduced from +10 to +5
         pop();
@@ -192,22 +195,25 @@ function drawAxes() {
     push();
     noStroke();
     fill(0);
-    textSize(18);
+    textFont('Arial');
+    textSize(16);
     textAlign(CENTER, BASELINE);
     // Draw "mole fraction uranium x" and subscript "U"
     let xPos = (g.lx + g.rx) / 2;
-    let yPos = g.by + 40;  // Adjusted from 45 to 40
+    let yPos = g.by + 50;  // Adjusted from 45 to 40
     text('mole fraction uranium x', xPos - 5, yPos);
+    textFont('Arial');
     textSize(14);
     textAlign(LEFT, BASELINE);
-    text('U', xPos + 88, yPos + 8);  // Subscript: positioned lower for proper subscript appearance
+    text('U', xPos + 80, yPos + 8);  // Subscript: positioned lower for proper subscript appearance
     pop();
     
     push();
     noStroke();
     fill(0);
-    textSize(18);
-    translate(g.lx - 40, (g.ty + g.by) / 2);  // Moved right from -50 to -40
+    textFont('Arial');
+    textSize(16);
+    translate(g.lx - 45, (g.ty + g.by) / 2);  // Moved right from -50 to -40
     rotate(-PI / 2);
     textAlign(CENTER, BASELINE);
     text('temperature (°C)', 0, 0);
@@ -230,7 +236,9 @@ function drawPhasePoint() {
         strokeWeight(2);
         
         if(phaseInfo.phase1 === "Ti") {
-            stroke(g.solidTi);
+            // Use color of the OTHER phase (phase2)
+            let lineColor = phaseInfo.phase2 === "TiU2" ? g.solidTiU2 : g.liquid;
+            stroke(lineColor);
             let x1 = map(0, 0, 1, g.lx, g.rx);
             let y1 = map(g.pointT, 600, 925, g.by, g.ty);
             line(x1, y1, px, py);
@@ -238,6 +246,7 @@ function drawPhasePoint() {
             // Dotted line down from Ti
             drawingContext.setLineDash([2, 6]);
             strokeWeight(1.5);
+            stroke(g.solidTi);
             line(x1, y1, x1, g.by);
             
             // Draw Ti point
@@ -249,7 +258,14 @@ function drawPhasePoint() {
         if(phaseInfo.phase1 === "TiU2" || phaseInfo.phase2 === "TiU2") {
             drawingContext.setLineDash([5, 5]);
             strokeWeight(2);
-            stroke(g.solidTiU2);
+            // Use color of the OTHER phase
+            let lineColor;
+            if(phaseInfo.phase1 === "TiU2") {
+                lineColor = phaseInfo.phase2 === "U" ? g.solidU : (phaseInfo.phase2 === "Liquid" ? g.liquid : g.solidTi);
+            } else {
+                lineColor = phaseInfo.phase1 === "Ti" ? g.solidTi : (phaseInfo.phase1 === "Liquid" ? g.liquid : g.solidU);
+            }
+            stroke(lineColor);
             let x2 = map(pureTiU2x, 0, 1, g.lx, g.rx);
             let y2 = map(g.pointT, 600, 925, g.by, g.ty);
             line(px, py, x2, y2);
@@ -257,6 +273,7 @@ function drawPhasePoint() {
             // Dotted line down from TiU2
             drawingContext.setLineDash([2, 6]);
             strokeWeight(1.5);
+            stroke(g.solidTiU2);
             line(x2, y2, x2, g.by);
             
             // Draw TiU2 point
@@ -268,7 +285,9 @@ function drawPhasePoint() {
         if(phaseInfo.phase2 === "U") {
             drawingContext.setLineDash([5, 5]);
             strokeWeight(2);
-            stroke(g.solidU);
+            // Use color of the OTHER phase (phase1)
+            let lineColor = phaseInfo.phase1 === "TiU2" ? g.solidTiU2 : g.liquid;
+            stroke(lineColor);
             let x2 = map(1, 0, 1, g.lx, g.rx);
             let y2 = map(g.pointT, 600, 925, g.by, g.ty);
             line(px, py, x2, y2);
@@ -276,6 +295,7 @@ function drawPhasePoint() {
             // Dotted line down from U
             drawingContext.setLineDash([2, 6]);
             strokeWeight(1.5);
+            stroke(g.solidU);
             line(x2, y2, x2, g.by);
             
             // Draw U point
@@ -287,7 +307,15 @@ function drawPhasePoint() {
         if(phaseInfo.phase1 === "Liquid" || phaseInfo.phase2 === "Liquid") {
             drawingContext.setLineDash([5, 5]);
             strokeWeight(2);
-            stroke(g.liquid);
+            // Use color of the OTHER phase
+            let lineColor;
+            if(phaseInfo.phase2 === "Ti") lineColor = g.solidTi;
+            else if(phaseInfo.phase2 === "TiU2") lineColor = g.solidTiU2;
+            else if(phaseInfo.phase2 === "U") lineColor = g.solidU;
+            else if(phaseInfo.phase1 === "Ti") lineColor = g.solidTi;
+            else if(phaseInfo.phase1 === "TiU2") lineColor = g.solidTiU2;
+            else lineColor = g.solidU;
+            stroke(lineColor);
             let x1 = map(phaseInfo.liquidX, 0, 1, g.lx, g.rx);
             let y1 = map(g.pointT, 600, 925, g.by, g.ty);
             line(x1, y1, px, py);
@@ -295,6 +323,7 @@ function drawPhasePoint() {
             // Dotted line down
             drawingContext.setLineDash([2, 6]);
             strokeWeight(1.5);
+            stroke(g.liquid);
             line(x1, y1, x1, g.by);
             
             // Draw liquid point
@@ -476,7 +505,8 @@ function drawBarChart() {
     // Y-axis labels
     noStroke();
     fill(0);
-    textSize(13);  // Increased from 11 to 13
+    textFont('Arial');
+    textSize(16);  // Increased from 11 to 13
     textAlign(RIGHT, CENTER);
     for(let i = 0; i <= 5; i++) {
         let val = i * 0.2;
@@ -488,51 +518,53 @@ function drawBarChart() {
     push();
     noStroke();
     fill(0);
+    textFont('Arial');
     textSize(16);
     textAlign(CENTER, BASELINE);
     text("relative amounts", barX + frameWidth / 2, g.ty - 15);
     pop();
     
     // Labels below bars - vertical (rotated 90 degrees, reading downward from axis)
+    textFont('Arial');
     textSize(16);  // Increased from 13 to 15
     textAlign(LEFT, CENTER);  // LEFT alignment so text extends downward after rotation
     
     // Liquid label
     push();
-    translate(barX + barWidth / 2, barY + 50);
+    textFont('Arial');
+    translate(barX + barWidth / 2, barY + 48);
     rotate(-PI / 2);
     text("liquid", 0, 0);
     pop();
     
-    // Ti(s) label - split into Ti and subscript (s)
+    // Ti(s) label
     push();
+    textFont('Arial');
     translate(barX + barWidth + barGap + barWidth / 2, barY + 40);
     rotate(-PI / 2);
     textSize(16);
     textAlign(LEFT, CENTER);
-    text("Ti", 0, 0);
-    textSize(14);
-    textAlign(LEFT, TOP);
-    text("(s)", 14, 2);  // Subscript: x moves along text direction, y moves perpendicular (subscript shift)
+    text("Ti(s)", 0, 0);
     pop();
     
-    // TiU₂(s) label - split into TiU₂ and subscript (s)
+    // TiU₂(s) label
     push();
-    translate(barX + 2 * (barWidth + barGap) + barWidth / 2, barY + 60);
+    textFont('Arial');
+    translate(barX + 2 * (barWidth + barGap) + barWidth / 2, barY + 56);
     rotate(-PI / 2);
     textSize(16);
     textAlign(LEFT, CENTER);
-    text("TiU₂", 0, 0);
-    textSize(14);
-    textAlign(LEFT, TOP);
-    text("(s)", 33, 2);  // Subscript: x moves along text direction, y moves perpendicular (subscript shift)
+    text("TiU₂(s)", 0, 0);
     pop();
     
-    // U label (removed (s))
+    // U(s) label
     push();
-    translate(barX + 3 * (barWidth + barGap) + barWidth / 2, barY + 25);
+    textFont('Arial');
+    translate(barX + 3 * (barWidth + barGap) + barWidth / 2, barY + 40);
     rotate(-PI / 2);
-    text("U", 0, 0);
+    textSize(16);
+    textAlign(LEFT, CENTER);
+    text("U(s)", 0, 0);
     pop();
     
     // Display liquid composition on top of liquid bar if present
@@ -542,14 +574,15 @@ function drawBarChart() {
         let labelY = Math.max(liquidBarTop - 8, barY - barHeight + 18);
         // Position to the left of bar center
         let labelX = barX + barWidth / 2 - 10;
-        textSize(14);
+        textFont('Arial');
+        textSize(16);
         textAlign(CENTER, BASELINE);
         // Draw "x" and subscript "U" with "= value"
         text("x", labelX, labelY);
-        textSize(11);
+        textSize(13);
         textAlign(LEFT, BASELINE);
         text("U", labelX + 4, labelY + 4);
-        textSize(14);
+        textSize(16);
         text(" = " + phaseAmounts.liquidComp.toFixed(2), labelX + 10, labelY);
     }
     
