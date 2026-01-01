@@ -22,7 +22,7 @@
     "@vitest/web-worker": "^4.0.12",
     "fs": "^0.0.1-security",
     "jsdom": "^20.0.3",
-    "nodeplotlib": "^1.1.2",
+    "nodeplotlib": "^0.7.7",
     "plotly.js-dist-min": "^3.3.0",
     "three": "^0.180.0",
     "three-stdlib": "^2.36.0",
