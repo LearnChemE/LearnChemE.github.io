@@ -1706,7 +1706,7 @@ function drawComputer() {
   if (state.gc.takingSampleTime >= 1) {
     text(`x  = ${(round(100 * state.xL) / 100).toFixed(2)}`, -5, 6);
     textSize(2);
-    text("L", -3.2, 7.1);
+    text("1", -3.2, 7.1);
   } else {
     text("READY FOR SAMPLE", -15, 6);
   }
