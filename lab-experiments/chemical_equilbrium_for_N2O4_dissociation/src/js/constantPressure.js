@@ -153,7 +153,8 @@ function scheduleVolumeSettleCompletion(delayMs = 0) {
       const target = pendingTempRampTarget;
       const origin = currentTempC;
       pendingTempRampTarget = null;
-      startTempPressureRamp(origin, target, { force: true });
+      // startTempPressureRamp(origin, target, { force: true });
+      setTempRamp(target);
     }
   }, Math.max(0, delayMs));
 }
@@ -264,7 +265,10 @@ function updatePistonVolume(tempC = currentTempC, opts = {}) {
 
 // --- non-blocking temperature→pressure ramp (0.5 °C steps) ---
 let tempRampTimerIds = [];
+let tempSP = 25;
+let tempAni = undefined;
 function clearTempRampTimers() {
+  console.trace("rampTimersCleared:");
   for (const id of tempRampTimerIds) clearTimeout(id);
   tempRampTimerIds = [];
   isTempRamping = false;
@@ -272,71 +276,59 @@ function clearTempRampTimers() {
   dropDeferredTemperatureVolumes();
   clearDeferredVolumeTimers();
 }
-function startTempPressureRamp(prevT, currT, opts = {}) {
-  if (isVolumeSettling && !opts.force) {
-    pendingTempRampTarget = currT;
-    return;
-  }
-  pendingTempRampTarget = null;
-  // No ramp needed
-  if (prevT === currT) {
-    currentTempC = currT;
-    temperatureText && temperatureText.text(`${currT.toFixed(1)} °C`);
-    updatePressureText(currT);
-    updatePistonVolume(currT, { animate: true, source: 'temperature', deferDelayMs: 0 });
-    refreshTempController();
-    return;
-  }
-  const dir = currT > prevT ? 1 : -1;
-  if (dir < 0) {
-    hasCoolDownOccurred = true;
-  }
-  const step = 0.5 * dir;
-  const round1 = (x) => Math.round(x * 10) / 10;
-  const temps = [];
-  // Build the sequence of intermediate temps from prevT to currT (inclusive) at 0.5 °C steps.
-  let t = prevT;
-  while ((dir > 0 && t < currT) || (dir < 0 && t > currT)) {
-    t = round1(t + step);
-    if ((dir > 0 && t > currT) || (dir < 0 && t < currT)) t = currT;
-    temps.push(t);
-    if (t === currT) break;
-  }
-  const delayPerStepMs = 500; // adjust ramp speed here
-  if (temps.length === 0) {
-    currentTempC = currT;
-    temperatureText && temperatureText.text(`${currT.toFixed(1)} °C`);
-    updatePressureText(currT);
-    updatePistonVolume(currT, { animate: true, source: 'temperature', deferDelayMs: 0 });
-    refreshTempController();
-    return;
-  }
 
-  isTempRamping = true;
-  temps.forEach((temp, i) => {
-    const id = setTimeout(() => {
-      currentTempC = temp;
-      temperatureText && temperatureText.text(`${temp.toFixed(1)} °C`);
-      updatePressureText(temp);
-      updatePistonVolume(temp, {
-        animate: i !== 0,
+/**
+ * Animate function to be called every frame.
+ * @param {(dt: number, t: number) => boolean} fn Function to call every frame. dt is time since last call in seconds, t is total time in ms. Return true to continue, false to stop.
+ * @param {() => void | undefined} then Optional function to call when animation ends.
+ */
+export function animate(fn, then) {
+    let prevtime = null;
+
+    const frame = (time) => {
+        if (prevtime === null) prevtime = time;
+        const dt = (time - prevtime) / 1000; // in ms
+        prevtime = time;
+
+        // Call the function
+        const playing = fn(dt, time);
+
+        // Request next frame
+        if (playing) requestAnimationFrame(frame);
+        else then?.();
+    }
+    return requestAnimationFrame(frame);
+}
+
+const tr = Math.exp(-1 / 5);
+function _rampTemp(dt) {
+  // Smooth lerp towards target
+  let temp = (currentTempC - tempSP) * tr ** dt + tempSP;
+  // console.log(currentTempC, tempSP)
+  if (Math.abs(currentTempC - tempSP) < .05) currentTempC = tempSP;
+
+  // Update stuff
+  currentTempC = temp;
+  updatePressureText(currentTempC);
+  updatePistonVolume(temp, {
+        animate: false,
         source: 'temperature',
-        deferDelayMs: i === 0 ? 0 : delayPerStepMs
-      });
-      refreshTempController();
-      if (i === temps.length - 1) {
-        isTempRamping = false;
-        tempRampTimerIds = [];
-        const pending = pendingTargetTempC;
-        pendingTargetTempC = null;
-        refreshTempController();
-        if (pending != null && Math.abs(pending - currentTempC) > 1e-6 && heaterOn) {
-          startTempPressureRamp(currentTempC, pending);
-        }
-      }
-    }, i * delayPerStepMs);
-    tempRampTimerIds.push(id);
+        deferDelayMs: 0
   });
+  temperatureText && temperatureText.text(`${temp.toFixed(1)} °C`);
+
+  return !(currentTempC === tempSP);
+}
+
+function setTempRamp(target) {
+  tempSP = target;
+  console.log("New temp sp:", tempSP);
+
+  if (isTempRamping) return;
+  isTempRamping = true;
+
+  animate(_rampTemp, () => {isTempRamping = false});
+  
 }
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -352,14 +344,7 @@ function setTemperature(newT) {
 
   // Only heat (increase measured) when heater is ON; otherwise measurement stays where it is
   if (heaterOn) {
-    if (isVolumeSettling) {
-      pendingTempRampTarget = targetTempC;
-    } else if (isTempRamping) {
-      pendingTargetTempC = targetTempC;
-    } else {
-      const prevMeasured = currentTempC;
-      startTempPressureRamp(prevMeasured, targetTempC);
-    }
+    setTempRamp(targetTempC);
   }
 }
 
@@ -368,14 +353,17 @@ function setHeater(on) {
   heaterOn = turningOn;
   clearTempRampTimers();
 
+  console.trace("Set up heaters")
   if (!heaterOn) {
     refreshTempController();
-    startTempPressureRamp(currentTempC, 25);
+    // startTempPressureRamp(currentTempC, 25);
+    setTempRamp(25)
     return;
   }
 
   refreshTempController();
-  startTempPressureRamp(currentTempC, targetTempC);
+  // startTempPressureRamp(currentTempC, targetTempC);
+  setTempRamp(targetTempC)
 }
 
 
@@ -994,8 +982,6 @@ function refreshTempController() {
 }
 
 export function resetConstantPressureExperiment() {
-  // Stop any in-flight temperature→pressure ramp timers
-  clearTempRampTimers();
   if (volumeSettleTimerId) {
     clearTimeout(volumeSettleTimerId);
     volumeSettleTimerId = null;
@@ -1019,7 +1005,7 @@ export function resetConstantPressureExperiment() {
   thermoCouple = null;
 
   tempController = null;   // UI elements group for temperature control
-  targetTempC = 25;       // setpoint back to ambient
+  tempSP = 25;       // setpoint back to ambient
   currentTempC = 25;      // measured back to ambient
   heaterOn = false;        // switch state
   pressure = null;        // current pressure in bar
