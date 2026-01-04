@@ -171,6 +171,7 @@ function clearDeferredVolumeTimers() {
 }
 
 function updatePistonVolume(tempC = currentTempC, opts = {}) {
+  console.log("piston update recieved")
   if (!pistonAssembly) return;
 
   let options;
@@ -268,7 +269,6 @@ let tempRampTimerIds = [];
 let tempSP = 25;
 let tempAni = undefined;
 function clearTempRampTimers() {
-  console.trace("rampTimersCleared:");
   for (const id of tempRampTimerIds) clearTimeout(id);
   tempRampTimerIds = [];
   isTempRamping = false;
@@ -322,7 +322,6 @@ function _rampTemp(dt) {
 
 function setTempRamp(target) {
   tempSP = target;
-  console.log("New temp sp:", tempSP);
 
   if (isTempRamping) return;
   isTempRamping = true;
@@ -353,7 +352,6 @@ function setHeater(on) {
   heaterOn = turningOn;
   clearTempRampTimers();
 
-  console.trace("Set up heaters")
   if (!heaterOn) {
     refreshTempController();
     // startTempPressureRamp(currentTempC, 25);
@@ -699,6 +697,7 @@ function drawSyringeHorizontal(g, hx, hy, L = 220, W = 50, opts = {}) {
 
 function animateSyringe(obj) {
   if (obj.animating || !obj.filled) return;
+  console.log("Animating syringe");
   obj.animating = true;
   const dur = 1200;
 
