@@ -194,7 +194,6 @@ function _pistonVolumeFrame(dt) {
   } else {
     vapour = 0;
   }
-  console.table({ vapour, liquidWeight });
 
   const volumeL = computeVolumeWithConstantPressure(vapour, currentTempC);
 
@@ -233,19 +232,8 @@ function _pistonVolumeFrame(dt) {
 }
 
 // --- non-blocking temperature→pressure ramp (0.5 °C steps) ---
-let tempRampTimerIds = [];
 let tempSP = 25;
-let tempAni = undefined;
-function clearTempRampTimers() {
-  for (const id of tempRampTimerIds) clearTimeout(id);
-  tempRampTimerIds = [];
-  isTempRamping = false;
-  pendingTargetTempC = null;
-  dropDeferredTemperatureVolumes();
-  clearDeferredVolumeTimers();
-}
-
-const tr = Math.exp(-1 / 5);
+const tr = Math.exp(-1 / 3);
 function _rampTemp(dt) {
   // Smooth lerp towards target
   let temp = (currentTempC - tempSP) * tr ** dt + tempSP;
@@ -272,7 +260,6 @@ function setTempRamp(target) {
   isTempRamping = true;
 
   animate(_rampTemp, () => {isTempRamping = false});
-  
 }
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -295,11 +282,9 @@ function setTemperature(newT) {
 function setHeater(on) {
   const turningOn = !!on;
   heaterOn = turningOn;
-  clearTempRampTimers();
 
   if (!heaterOn) {
     refreshTempController();
-    // startTempPressureRamp(currentTempC, 25);
     setTempRamp(25)
     return;
   }
@@ -783,16 +768,6 @@ function drawSwitch(draw, x, y, width, height, opacity = 1, toggle = (isOn) => {
   switchGroup.text('ON')
     .font({ size: 12, anchor: 'middle', fill: '#fff' })
     .center(x + width * 0.75, y + height / 2);
-
-  // NEW: API to enable/disable the switch (dims visuals and changes cursor)
-  switchGroup.setEnabled = (flag) => {
-    switchGroup.isEnabled = !!flag;
-    const dim = opacity * 0.5;
-    body
-      .fill({ color: flag ? '#555' : '#999', opacity: flag ? opacity : dim })
-      .css('cursor', flag ? 'pointer' : 'default');
-    handle.fill({ color: flag ? '#aaa' : '#ccc', opacity: flag ? opacity : dim });
-  };
 
   handle.rotate(-20, x + width / 2, y + height / 2);
 
