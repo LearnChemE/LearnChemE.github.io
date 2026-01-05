@@ -15,3 +15,7 @@ learncheme_github_io_workspace.code-workspace
 .prettierrc.json
 .venv/
 __pycache__
+
+# For wasm
+*.o
+*.out
