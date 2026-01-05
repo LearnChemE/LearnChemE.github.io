@@ -5,6 +5,7 @@ import {
   setWeightControlState,
   setWeightControlVisibility
 } from './weightControl.js';
+import { animate } from './helpers.js';
 
 let pressureGuage = null;
 let pressureReliefValve = null;
@@ -102,15 +103,9 @@ function measuredPressureBar(mass_g, tempC) {
 }
 
 // Centralized updater for the pressure text UI
-function updatePressureText(temp = null) {
+function updatePressureText(temp = null, mass=liquidWeight) {
   if (!pressure) return;
-  if (isPressureSettling) {
-    if (typeof lastPressureDisplayed === 'number') {
-      pressure.text(lastPressureDisplayed.toFixed(2));
-    }
-    return;
-  }
-  const p = measuredPressureBar(liquidWeight, temp ?? currentTempC);
+  const p = measuredPressureBar(mass, temp ?? currentTempC);
   pressure.text(p.toFixed(2));
 }
 
@@ -120,109 +115,57 @@ function clearPressureSettleTimers() {
   isPressureSettling = false;
 }
 
+let vapour = 0;
 function startPressureSettling(tempC = currentTempC, durationMs = 50000) {
-  clearPressureSettleTimers();
-  const target = computePressureWithConstantVolume(liquidWeight, tempC);
-  const start = Math.max(0, lastPressureDisplayed ?? 0);
-  const steps = Math.max(1, Math.round(durationMs / 60));
-  const stepDuration = durationMs / steps;
+  if (isPressureSettling) return;
   isPressureSettling = true;
 
-  for (let i = 0; i < steps; i += 1) {
-    const timerId = setTimeout(() => {
-      const t = (i + 1) / steps;
-      const smooth = t * t * (3 - 2 * t); // smoothstep easing
-      const value = start + (target - start) * smooth;
-      lastPressureDisplayed = value;
-      if (pressure) {
-        pressure.text(value.toFixed(2));
-      }
-      if (i === steps - 1) {
-        lastPressureTrue = target;
-        lastPressureDisplayed = target;
-        isPressureSettling = false;
-        pressureSettleTimerIds = [];
-        if (pendingTargetTempC != null && heaterOn) {
-          const pending = pendingTargetTempC;
-          pendingTargetTempC = null;
-          startTempPressureRamp(currentTempC, pending, { force: true });
-        }
-      }
-    }, i * stepDuration);
-    pressureSettleTimerIds.push(timerId);
+  animate(_pressureFrame, () => isPressureSettling = false);
+}
+
+function _pressureFrame(dt) {
+  const r = Math.exp(-currentTempC/100);
+  // Smooth lerp towards target
+  if (liquidPushed) {
+    vapour = (vapour - liquidWeight) * r ** dt + liquidWeight;
+    if (Math.abs(vapour - liquidWeight) < .001) vapour = liquidWeight;
+  } else {
+    vapour = 0;
   }
+  // console.table({ vapour, liquidWeight });
+  updatePressureText(null, vapour);
+
+  return !(vapour === liquidWeight);
 }
 
 // --- non-blocking temperature→pressure ramp (0.5 °C steps) ---
-let tempRampTimerIds = [];
-function clearTempRampTimers() {
-  for (const id of tempRampTimerIds) clearTimeout(id);
-  tempRampTimerIds = [];
-  isTempRamping = false;
-  pendingTargetTempC = null;
-}
-function startTempPressureRamp(prevT, currT, opts = {}) {
-  if (isPressureSettling && !opts.force) {
-    pendingTargetTempC = currT;
-    return;
-  }
-  // No ramp needed
-  if (prevT === currT) {
-    currentTempC = currT;
-    temperatureText && temperatureText.text(`${currT.toFixed(1)} °C`);
-    updatePressureText();
-    refreshTempController();
-    return;
-  }
-  const dir = currT > prevT ? 1 : -1;
-  const step = 0.5 * dir;
-  const round1 = (x) => Math.round(x * 10) / 10;
-  const temps = [];
-  // Build the sequence of intermediate temps from prevT to currT (inclusive) at 0.5 °C steps.
-  let t = prevT;
-  while ((dir > 0 && t < currT) || (dir < 0 && t > currT)) {
-    t = round1(t + step);
-    if ((dir > 0 && t > currT) || (dir < 0 && t < currT)) t = currT;
-    temps.push(t);
-    if (t === currT) break;
-  }
-  const delayPerStepMs = 500; // adjust ramp speed here
-  if (temps.length > 0) {
-    isTempRamping = true;
-  }
-  if (dir < 0) {
-    hasCoolDownOccurred = true;
-  }
+let tempSP = 25;
+const tr = Math.exp(-1 / 3);
+function _rampTemp(dt) {
+  // Smooth lerp towards target
+  let temp = (currentTempC - tempSP) * tr ** dt + tempSP;
+  // console.log(currentTempC, tempSP)
+  if (Math.abs(currentTempC - tempSP) < .05) currentTempC = tempSP;
 
-  temps.forEach((temp, i) => {
-    const id = setTimeout(() => {
-      // Update measured temperature & readouts
-      currentTempC = temp;
-      temperatureText && temperatureText.text(`${temp.toFixed(1)} °C`);
-      // Update pressure text based on measured temp (only text; physics already guards downstream)
-      refreshTempController(); // keep controller showing setpoint vs measured tint
-    }, i * delayPerStepMs);
-    tempRampTimerIds.push(id);
-  });
+  // Update stuff
+  currentTempC = temp;
+  updatePressureText(currentTempC);
+  temperatureText && temperatureText.text(`${temp.toFixed(1)} °C`);
 
-  temps.forEach((temp, i) => {
-    const id = setTimeout(() => {
-      // Update pressure text based on measured temp (only text; physics already guards downstream)
-      updatePressureText(temp);
-      if (i === temps.length - 1) {
-        isTempRamping = false;
-        tempRampTimerIds = [];
-        const pending = pendingTargetTempC;
-        pendingTargetTempC = null;
-        refreshTempController();
-        if (pending != null && Math.abs(pending - currentTempC) > 1e-6 && heaterOn) {
-          startTempPressureRamp(currentTempC, pending);
-        }
-      }
-    }, i * 1000);
-    tempRampTimerIds.push(id);
-  });
+  return !(currentTempC === tempSP);
 }
+
+function setTempRamp(target) {
+  tempSP = target;
+
+  if (isTempRamping) return;
+  isTempRamping = true;
+
+  animate(_rampTemp, () => {isTempRamping = false});
+}
+
+
+let targetTemp = 25;
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const step5 = (v) => 5 * Math.round(v / 5);
@@ -237,29 +180,23 @@ function setTemperature(newT) {
 
   // Only heat (increase measured) when heater is ON; otherwise measurement stays where it is
   if (heaterOn) {
-    if (isPressureSettling) {
-      pendingTargetTempC = targetTempC;
-    } else if (isTempRamping) {
-      pendingTargetTempC = targetTempC;
-    } else {
-      startTempPressureRamp(currentTempC, targetTempC);
-    }
+    setTempRamp(targetTempC);
   }
 }
 
 function setHeater(on) {
   const turningOn = !!on;
   heaterOn = turningOn;
-  clearTempRampTimers();
+  
   if (!heaterOn) {
     pendingTargetTempC = null;
     refreshTempController();
-    startTempPressureRamp(currentTempC, 25);
+    setTempRamp(25);
     return;
   }
 
   refreshTempController();
-  startTempPressureRamp(currentTempC, targetTempC);
+  setTempRamp(targetTempC);
 }
 
 
@@ -539,7 +476,7 @@ function animateSyringeVertical(obj) {
       hasCoolDownOccurred = false;
       lastPressureTrue = null;
       lastPressureDisplayed = 0;
-      clearTempRampTimers();
+      
       clearPressureSettleTimers();
       liquidPushed = true;
       if (pressure) {
@@ -654,15 +591,15 @@ function drawSwitch(draw, x, y, width, height, opacity = 1, toggle = (isOn) => {
     .font({ size: 12, anchor: 'middle', fill: '#fff' })
     .center(x + width * 0.75, y + height / 2);
 
-  // NEW: API to enable/disable the switch (dims visuals and changes cursor)
-  switchGroup.setEnabled = (flag) => {
-    switchGroup.isEnabled = !!flag;
-    const dim = opacity * 0.5;
-    body
-      .fill({ color: flag ? '#555' : '#999', opacity: flag ? opacity : dim })
-      .css('cursor', flag ? 'pointer' : 'default');
-    handle.fill({ color: flag ? '#aaa' : '#ccc', opacity: flag ? opacity : dim });
-  };
+  // // NEW: API to enable/disable the switch (dims visuals and changes cursor)
+  // switchGroup.setEnabled = (flag) => {
+  //   switchGroup.isEnabled = !!flag;
+  //   const dim = opacity * 0.5;
+  //   body
+  //     .fill({ color: flag ? '#555' : '#999', opacity: flag ? opacity : dim })
+  //     .css('cursor', flag ? 'pointer' : 'default');
+  //   handle.fill({ color: flag ? '#aaa' : '#ccc', opacity: flag ? opacity : dim });
+  // };
 
   handle.rotate(-20, x + width / 2, y + height / 2);
 
@@ -797,7 +734,6 @@ function refreshTempController() {
 
 export function resetConstantVolumeExperiment() {
   // Stop any in-flight temperature→pressure ramp timers
-  clearTempRampTimers();
   clearPressureSettleTimers();
 
   // If the switch still exists, ensure it is disabled on reset
@@ -817,6 +753,8 @@ export function resetConstantVolumeExperiment() {
   tempController = null;   // UI elements group for temperature control
   targetTempC = 25;       // setpoint back to ambient
   currentTempC = 25;      // measured back to ambient
+  tempSP = 25;
+  vapour = 0;
   heaterOn = false;        // switch state
   pressure = null;        // current pressure in bar
   liquidWeight = 1.8;      // g of N2O4 in syringe (1.6 to 2.0 g)
