@@ -5,6 +5,8 @@ import {
   setWeightControlState,
   setWeightControlVisibility
 } from './weightControl.js';
+import { animate } from './helpers.js';
+console.log(animate)
 
 // Peak volume for 2.0 g at 75 °C is ~0.804 L (≈804 mL). Give students margin up to 850 mL.
 const MAX_VOLUME_ML = 850;
@@ -121,13 +123,14 @@ function updatePressureText(temp = null) {
 }
 
 function scheduleVolumeSettleCompletion(delayMs = 0) {
+  throw new Error("scheduleVolumeSettleCompletion")
   if (volumeSettleTimerId) {
     clearTimeout(volumeSettleTimerId);
   }
   volumeSettleTimerId = setTimeout(() => {
-    volumeSettleTimerId = null;
-    isVolumeSettling = false;
-    if (pendingVolumeUpdates.length) {
+    volumeSettleTimerId = null; // clear timer
+    isVolumeSettling = false; // volume not settling (can handle elsewhere)
+    if (pendingVolumeUpdates.length) { // handle pending updates (not needed)
       const queue = pendingVolumeUpdates;
       pendingVolumeUpdates = [];
       let accumulatedDelay = 0;
@@ -149,7 +152,7 @@ function scheduleVolumeSettleCompletion(delayMs = 0) {
         deferredVolumeTimerIds.push(timerId);
       });
     }
-    if (pendingTempRampTarget != null) {
+    if (pendingTempRampTarget != null) { // pending (not needed)
       const target = pendingTempRampTarget;
       const origin = currentTempC;
       pendingTempRampTarget = null;
@@ -170,98 +173,63 @@ function clearDeferredVolumeTimers() {
   deferredVolumeTimerIds = [];
 }
 
+let vapour = 0;
 function updatePistonVolume(tempC = currentTempC, opts = {}) {
-  console.log("piston update recieved")
+  // liquidPushed : whether syringe has been pushed
+  // liquidWeight : amount of liquid injected/to inject
   if (!pistonAssembly) return;
+  
+  if (isVolumeSettling) return;
+  isVolumeSettling = true;
 
-  let options;
-  if (typeof opts === 'boolean') {
-    options = { animate: opts };
-  } else if (!opts) {
-    options = {};
-  } else {
-    options = { ...opts };
-  }
+  animate(_pistonVolumeFrame, () => isVolumeSettling = false);
+}
 
-  const source = options.source || null;
-  const isInjection = source === 'injection';
-  const force = options.force === true;
-
-  if (isInjection) {
-    isVolumeSettling = true;
-    clearDeferredVolumeTimers();
-    pendingVolumeUpdates = [];
-  } else if (isVolumeSettling && !force) {
-    const queuedOptions = { ...options, force: true };
-    pendingVolumeUpdates.push({ tempC, options: queuedOptions });
-    return;
-  }
-
-  let animate = options.animate;
-  if (typeof animate !== 'boolean') {
-    animate = true;
-  }
-  let durationOverride = null;
-  if (typeof options.durationMs === 'number') {
-    durationOverride = options.durationMs;
-  } else if (typeof options.duration === 'number') {
-    durationOverride = options.duration;
-  }
-
-  let volumeL = MIN_INITIAL_VOLUME_L;
+function _pistonVolumeFrame(dt) {
+  const r = Math.exp(-currentTempC/100);
+  // Smooth lerp towards target
   if (liquidPushed) {
-    try {
-      volumeL = computeVolumeWithConstantPressure(liquidWeight, tempC);
-    } catch (err) {
-      console.warn('[updatePistonVolume] failed to compute volume:', err);
-      volumeL = MIN_INITIAL_VOLUME_L;
-    }
+    vapour = (vapour - liquidWeight) * r ** dt + liquidWeight;
+    if (Math.abs(vapour - liquidWeight) < .001) vapour = liquidWeight;
+  } else {
+    vapour = 0;
   }
+  console.table({ vapour, liquidWeight });
+
+  const volumeL = computeVolumeWithConstantPressure(vapour, currentTempC);
 
   const volumeML = volumeL * 1000;
-  const fraction = clamp(volumeML / MAX_VOLUME_ML, 0, 1);
+  const frac = clamp(volumeML / MAX_VOLUME_ML, 0, 1);
 
   const { gasRect, pistonRect, lines, gasRegion, piston, inner, rod } = pistonAssembly;
-  if (!gasRect || !pistonRect) return;
+  if (!gasRect || !pistonRect) return true;
 
   const maxHeight = gasRegion.maxHeight;
   const bottom = gasRegion.bottom;
-  const targetHeight = fraction * maxHeight;
-  const gasHeightPx = fraction <= 0 ? 0 : Math.max(MIN_GAS_HEIGHT_PX, targetHeight);
+  const targetHeight = frac * maxHeight;
+  const gasHeightPx = frac <= 0 ? 0 : Math.max(MIN_GAS_HEIGHT_PX, targetHeight);
   const gasTop = bottom - gasHeightPx;
   const pistonTop = gasTop - piston.height;
   const highlightY = pistonTop + piston.highlightOffset;
   const rodBottom = pistonTop + piston.height / 2;
 
-  const duration = animate ? (durationOverride ?? 350) : 0;
-
-  const applyMove = (element, fn) => {
-    if (!element) return;
-    if (duration > 0) {
-      fn(element.animate(duration, '<>'));
-    } else {
-      fn(element);
-    }
-  };
-
-  applyMove(gasRect, (el) => el.move(inner.x, gasTop).height(gasHeightPx));
-  applyMove(pistonRect, (el) => el.move(inner.x, pistonTop));
+  gasRect.move(inner.x, gasTop).height(gasHeightPx);
+  pistonRect.move(inner.x, pistonTop);
 
   if (lines?.gasSurface) {
-    applyMove(lines.gasSurface, (el) => el.plot(inner.x, gasTop, inner.x + inner.width, gasTop));
+    lines.gasSurface.plot(inner.x, gasTop, inner.x + inner.width, gasTop);
   }
   if (lines?.pistonHighlight) {
-    applyMove(lines.pistonHighlight, (el) => el.plot(inner.x, highlightY, inner.x + inner.width, highlightY));
+    lines.pistonHighlight.plot(inner.x, highlightY, inner.x + inner.width, highlightY);
   }
 
   if (rod?.rect) {
     const rodY = rodBottom - rod.height;
-    applyMove(rod.rect, (el) => el.move(rod.x, rodY));
+    rod.rect.move(rod.x, rodY);
   }
 
-  if (isInjection) {
-    scheduleVolumeSettleCompletion(duration > 0 ? duration + 40 : 0);
-  }
+
+  return !(vapour === liquidWeight) || !liquidPushed;
 }
 
 // --- non-blocking temperature→pressure ramp (0.5 °C steps) ---
@@ -275,29 +243,6 @@ function clearTempRampTimers() {
   pendingTargetTempC = null;
   dropDeferredTemperatureVolumes();
   clearDeferredVolumeTimers();
-}
-
-/**
- * Animate function to be called every frame.
- * @param {(dt: number, t: number) => boolean} fn Function to call every frame. dt is time since last call in seconds, t is total time in ms. Return true to continue, false to stop.
- * @param {() => void | undefined} then Optional function to call when animation ends.
- */
-export function animate(fn, then) {
-    let prevtime = null;
-
-    const frame = (time) => {
-        if (prevtime === null) prevtime = time;
-        const dt = (time - prevtime) / 1000; // in ms
-        prevtime = time;
-
-        // Call the function
-        const playing = fn(dt, time);
-
-        // Request next frame
-        if (playing) requestAnimationFrame(frame);
-        else then?.();
-    }
-    return requestAnimationFrame(frame);
 }
 
 const tr = Math.exp(-1 / 5);
