@@ -118,7 +118,7 @@ function drawCanvas() {
                 break;
         }
         state.setFlowConfig(path);
-        playValve2Animation(draw);
+        if (state.getFlowPath("mfc_inlet") !== undefined) playValve2Animation(draw);
     });
     // Create Outlet Valve - after Bed
     createInteractiveValve(draw, "outletValve", adsorptionOutletValveX, adsorptionOutletValveY, [0], undefined, true); // true = isThreeValve
