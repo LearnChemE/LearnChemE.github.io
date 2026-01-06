@@ -1,0 +1,255 @@
+body {
+  --controls-font-size: 0.8rem;
+  --equation-font-size: 0.8rem;
+  --button-padding: 0.25rem 0.4rem;
+  --button-width: 5rem;
+}
+
+.controls-area {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  width: 80vw;
+  max-width: 1080px;
+  align-content: center;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
+  margin: auto;
+  font-size: var(--controls-font-size);
+}
+
+#top-row {
+  display: flex;
+  grid-template-columns: max-content max-content;
+  padding: 5px;
+}
+
+#bottom-row {
+  padding: 0px 5px;
+  padding-bottom: 15px;
+}
+
+#selection-row {
+  display: flex;
+  grid-template-columns: max-content max-content;
+  height: min-content;
+  gap: 2px;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 5px;
+}
+
+.slider-wrapper {
+  display: flex;
+  grid-template-columns: max-content 120px 50px max-content;
+  align-items: center;
+  gap: 10px;
+  padding-left: 10px;
+  align-self: center;
+  justify-content: center;
+}
+
+#volume-slider-wrapper {
+  display: none;
+}
+
+.buttons-row-wrapper {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  grid-column: 1 / 3;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.selection-row-wrapper {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  grid-column: 2 / 3;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-right: 0px;
+}
+
+.selection-row-wrapper > .btn-group > .btn-check {
+  width: 17ch;
+  font-size: var(--controls-button-font-size);
+  padding-left: 10px;
+}
+
+.selection-row-wrapper > .button-text {
+  padding-right: 10px;
+}
+
+.btn-group-label {
+  align-self: center;
+  margin-right: 0px;
+}
+.btn-group {
+  padding-right: 10px;
+  padding-left: 5px;
+}
+
+.btn-group > .btn {
+  width: 9ch;
+  font-size: var(--controls-button-font-size);
+  text-align: center;
+}
+
+select {
+  width: 100%;
+}
+
+mjx-container {
+  transform: translateX(20px);
+}
+
+.modal-buttons-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0px 5px;
+}
+
+.right-side-controls {
+  display: grid;
+  grid-template-columns: repeat(3, var(--button-width));
+  gap: 10px;
+  margin: 5px;
+}
+
+.right-side-controls > .btn {
+  font-size: var(--modals-font-size);
+  padding: var(--button-padding);
+}
+
+.right-side-controls > * {
+  height: max-content;
+  align-self: center;
+}
+
+.right-side-controls > .input-area {
+  grid-column: 1 / -1;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+.modal.show {
+  padding-left: 0px !important;
+}
+
+.modal-body {
+  font-size: 0.8rem;
+}
+
+.modal-body > p {
+  font-size: 0.9rem;
+}
+
+.modal-body .modal-text {
+  max-width: 70ch;
+  text-align: justify;
+}
+
+.modal-body .modal-equation {
+  width: max-content;
+  margin-left: 15px;
+  padding: 2px;
+}
+
+.modal-text + .modal-text {
+  margin-top: 10px;
+}
+
+.modal-equation.no-padding {
+  padding: 0px;
+}
+
+main {
+  width: max-content;
+  margin: auto;
+}
+
+canvas {
+  outline: 1px solid black;
+  box-shadow: 0px 0px 2px black;
+}
+
+.references {
+  font-size: 0.8rem;
+}
+
+#p5-container {
+  position: relative;
+  width: calc(100vw - 40px);
+  max-height: calc(calc(100vw - 40px) * 720 / 1280);
+  max-width: calc(calc(100vh - 180px) * 1280 / 720);
+  height: calc(100vh - 180px);
+  margin: auto;
+}
+
+#equilibrium-text {
+  font-size: var(--equation-font-size);
+  font-family: "Noto Sans", sans-serif;
+  position: absolute;
+  top: 8%;
+  left: 72.5%;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  color: #000000;
+  display: block;
+}
+
+canvas {
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+  box-shadow: 0px 0px 2px 2px lightgrey;
+}
+
+@media screen and (min-width: 480px) {
+  body {
+    --controls-font-size: 0.6rem;
+    --controls-button-font-size: 0.6rem;
+    --modals-font-size: 0.7rem;
+    --button-padding: 0.4rem 0.6rem;
+    --button-width: 5rem;
+    --equation-font-size: 1.1rem;
+  }
+}
+
+@media screen and (min-width: 780px) {
+  body {
+    --controls-font-size: 0.7rem;
+    --controls-button-font-size: 0.7rem;
+    --modals-font-size: 0.8rem;
+    --button-padding: 0.5rem 0.7rem;
+    --button-width: 6rem;
+    --equation-font-size: 1.2rem;
+  }
+}
+
+@media screen and (min-width: 900px) {
+  body {
+    --controls-font-size: 0.8rem;
+    --controls-button-font-size: 0.8rem;
+    --modals-font-size: 0.9rem;
+    --button-padding: 0.6rem 0.8rem;
+    --button-width: 7rem;
+    --equation-font-size: 1.2rem;
+  }
+}
+
+@media screen and (min-width: 1320px) {
+  body {
+    --controls-font-size: 1rem;
+    --controls-button-font-size: 1rem;
+    --modals-font-size: 1.2rem;
+    --button-padding: 0.8rem 1rem;
+    --button-width: 8rem;
+    --equation-font-size: 1.2rem;
+  }
+}
