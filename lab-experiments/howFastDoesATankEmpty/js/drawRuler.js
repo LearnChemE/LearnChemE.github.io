@@ -7,10 +7,11 @@ export function drawRuler() {
     .move(canvasWidth / 2 - containerWidth / 2 - surfaceWidth - 32, tableY - legWidth - surfaceWidth - length + 12)
     .fill('#deb887');
 
-  for (let i = 0; i <= 80; i += 0.25) {
+  for (let i = 0; i <= 80; i += 1) {
     const x = startPoint.x;
     const y = startPoint.y - i * ratio;
-    const tickLength = i % 5 == 0 ? 15 : 10;
+    const tickLength = i % 5 == 0 ? 15 : 
+      i % 1 == 0 ? 12 : 8;
 
     draw.line(x, y, x - tickLength, y).stroke({ width: 0.5, color: '#000' });
     if (i % 5 === 0) {
