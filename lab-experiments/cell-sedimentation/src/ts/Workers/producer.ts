@@ -1,6 +1,6 @@
 import { BaseWorker } from "./baseWorker";
 import type { DataMessage, InitMessage, WorkerMessage } from "./worker-types";
-import createSedimentModule from '../../wasm/sediment';
+import createSedimentModule from '../../wasm/sediment.js';
 import type { SedimentSolver } from "../../wasm/sediment";
 
 const sedimentModule = await createSedimentModule();
@@ -41,7 +41,8 @@ class ProducerWorker extends BaseWorker {
         }
 
         // Always generate data when available
-        const status = this.solver.solve(20);
+        const status = this.solver.solve(time);
+        console.log(status)
         if (!status) {
             throw new Error("Solver failed to converge");
         }

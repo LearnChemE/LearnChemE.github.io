@@ -1,5 +1,5 @@
 import type { Profile, InitConc } from "../../types/globals";
-import { createProfile, PROFILE_LENGTH } from "../calcs";
+import { createProfile, PROFILE_LENGTH, SOLVER_TIMESTEP } from "../calcs";
 import producerURL from "./producer.ts?worker&url";
 import type { InitMessage, WorkerMessage } from "./worker-types";
 import { lerp, makeDeferred, type Deferred } from "../helpers";
@@ -47,7 +47,7 @@ export class Presenter {
         }, { once: true });
 
         // Request the next soln
-        this.producer.postMessage({ type: "produce" });
+        this.producer.postMessage({ type: "produce", payload: SOLVER_TIMESTEP });
         return def;
     }
 
