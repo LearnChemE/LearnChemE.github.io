@@ -2,6 +2,8 @@
 export const canvasWidth = 800;
 export const canvasHeight = 596;
 export const draw = SVG().addTo('#svg-container').size(canvasWidth, canvasHeight);
+console.log(draw)
+console.dir(draw)
 export const tableWidth = 500;
 export const tableHeight = 75;
 export const tableX = (canvasWidth - tableWidth) / 2;
