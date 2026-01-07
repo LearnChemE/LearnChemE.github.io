@@ -290,7 +290,7 @@ export function createTValve(draw, x, y) {
          .font({ family: 'Arial', size: 16, anchor: 'middle' }) // Smaller font
          .fill('#000')
          .leading(1.2) // Adjust line spacing
-         .center(bodyX + bodyWidth / 2, bodyY + bodyHeight + 16); // Position below body
+         .center(bodyX + bodyWidth / 2, bodyY + bodyHeight + 18); // Position below body
 
     // --- Finally, position the entire group at the desired absolute (x, y) ---
     group.move(x, y);

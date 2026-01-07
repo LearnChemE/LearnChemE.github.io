@@ -1,5 +1,6 @@
 import * as config from './config.js';
 import * as state from './state.js';
+import { zoomLabelX, zoomLabelY, betaLabelX, betaLabelY } from './main.js';
 
 /**
  * Enable dragging on the SVG Canvas via the viewbox element.
@@ -7,15 +8,15 @@ import * as state from './state.js';
  */
 export function addOptionToDragAndZoom(draw) {
     draw.text("Zoom with the scroll wheel.")
-    .move(config.canvasWidth - 240, 90)
+    .move(zoomLabelX, zoomLabelY)
     .font({ size: 16, anchor: 'left' })
 
     draw.text("After zooming, drag mouse\nto move image.")
-    .move(config.canvasWidth - 240, 110)
+    .move(zoomLabelX, zoomLabelY + 20)
     .font({ size: 16, anchor: 'left' });
 
     draw.text("heating rate = 4 K/s")
-        .move(config.canvasWidth - 220, 310);
+        .move(betaLabelX, betaLabelY);
 
     const defaultViewbox = { x: 0, y: 0, width: config.canvasWidth, height: config.canvasHeight };
     draw.viewbox(defaultViewbox.x, defaultViewbox.y, defaultViewbox.width, defaultViewbox.height);

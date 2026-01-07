@@ -198,54 +198,58 @@ export function drawPipes(draw, pipeGroup) {
   const MFCInletPath = `
     M ${startX} ${startY}
     L ${startX} ${startY - 10}
-    L ${startX + 150} ${startY - 10}
-    L ${startX + 150} ${startY + 20}
-    L ${startX + 187.5} ${startY + 20}
+    L ${startX + 130} ${startY - 10}
+    L ${startX + 130} ${startY + 20}
+    L ${startX + 156} ${startY + 20}
   `;
   drawPipeWithCurves(draw, pipeGroup, MFCInletPath, 'mfc_inlet');
 
+  const fourValveMiddleX = startX + 187.5 + 60 + 32.5 + 67.5;
+  const fourValveMiddleY = startY + 182.5;
+  const fourValveWidth = 33;
+
   const MFCOutletPath = `
-    M ${startX + 187.5 + 60} ${startY + 20}
-    L ${startX + 187.5 + 60 + 32.5} ${startY + 20}
+    M ${startX + 156 + 61} ${startY + 20}
+    L ${startX + 156 + 60 + 32.5} ${startY + 20}
+    L ${startX + 248.5} ${fourValveMiddleY}
+    L ${fourValveMiddleX - fourValveWidth} ${fourValveMiddleY}
   `;
   drawPipeWithCurves(draw, pipeGroup, MFCOutletPath, 'mfc_outlet');
 
+  const adsMiddleX = fourValveMiddleX + 193
+
   const AdsorptionBedInletPath = `
-    M ${startX + 187.5 + 60 + 32.5 + 65} ${startY + 20}
-    L ${startX + 187.5 + 60 + 32.5 + 65 + 92.5} ${startY + 20}
-    L ${startX + 187.5 + 60 + 32.5 + 65 + 92.5} ${startY + 20 + 62.5}
+    M ${fourValveMiddleX} ${fourValveMiddleY + fourValveWidth}
+    L ${fourValveMiddleX} ${fourValveMiddleY + fourValveWidth + 280}
+    L ${adsMiddleX} ${fourValveMiddleY + fourValveWidth + 280}
+    L ${adsMiddleX} ${fourValveMiddleY + fourValveWidth + 248}
   `;
   drawPipeWithCurves(draw, pipeGroup, AdsorptionBedInletPath, 'adsorption_bed_inlet');
 
-  const MFCValveOutletPath = `
-    M ${startX + 187.5 + 60 + 32.5 + 32.5} ${startY + 52.5}
-    L ${startX + 187.5 + 60 + 32.5 + 32.5} ${startY + 332.5}
-    L ${startX + 187.5 + 60 + 32.5 + 32.5 + 92.5} ${startY + 332.5}
-  `;
-  drawPipeWithCurves(draw, pipeGroup, MFCValveOutletPath, 'mfc_valve_outlet');
-
   const AdsorptionBedOutletPath = `
-    M ${startX + 187.5 + 60 + 32.5 + 65 + 92.5} ${startY + 20 + 62.5 + 200}
-    L ${startX + 187.5 + 60 + 32.5 + 65 + 92.5} ${startY + 20 + 62.5 + 200 + 17.5}
+    M ${adsMiddleX} ${fourValveMiddleY + fourValveWidth + 46}
+    L ${adsMiddleX} ${fourValveMiddleY}
+    L ${adsMiddleX - 30} ${fourValveMiddleY}
   `;
   drawPipeWithCurves(draw, pipeGroup, AdsorptionBedOutletPath, 'adsorption_bed_outlet');
 
   const AdsorptionBedValveOutletPath = `
-    M ${startX + 187.5 + 60 + 32.5 + 32.5 + 95 + 62.5} ${startY + 332.5}
-    L ${startX + 187.5 + 60 + 32.5 + 32.5 + 95 + 62.5 + 9.5} ${startY + 332.5}
+    M ${fourValveMiddleX + fourValveWidth + 45} ${fourValveMiddleY}
+    L ${fourValveMiddleX + fourValveWidth} ${fourValveMiddleY}
   `;
   drawPipeWithCurves(draw, pipeGroup, AdsorptionBedValveOutletPath, 'adsorption_bed_valve_outlet');
 
+  const outletY = startY + 22
   const BPGValveOutletPath = `
-    M ${startX + 187.5 + 60 + 32.5 + 32.5 + 95 + 62.5 + 95} ${startY + 332.5}
-    L ${startX + 187.5 + 60 + 32.5 + 32.5 + 95 + 62.5 + 95 + 35} ${startY + 332.5}
-    L ${startX + 187.5 + 60 + 32.5 + 32.5 + 95 + 62.5 + 95 + 35} ${startY + 332.5 + 50}
+    M ${fourValveMiddleX} ${fourValveMiddleY - fourValveWidth}
+    L ${fourValveMiddleX} ${outletY}
+    L ${fourValveMiddleX + 189} ${outletY}
   `;
   drawPipeWithCurves(draw, pipeGroup, BPGValveOutletPath, 'bpg_valve_outlet');
 
   const AnalyserOutletPath = `
-    M ${startX + 187.5 + 60 + 32.5 + 32.5 + 95 + 62.5 + 95 + 35 + 50 + 9} ${startY + 332.5 + 50 + 40}
-    L ${startX + 187.5 + 60 + 32.5 + 32.5 + 95 + 62.5 + 95 + 35 + 50 + 50} ${startY + 332.5 + 50 + 40}
+    M ${fourValveMiddleX + 311} ${outletY}
+    L ${fourValveMiddleX + 360} ${outletY}
   `;
   drawPipeWithCurves(draw, pipeGroup, AnalyserOutletPath, 'analyser_outlet');
 }
