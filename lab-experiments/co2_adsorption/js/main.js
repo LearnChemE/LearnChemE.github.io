@@ -28,7 +28,7 @@ draw.attr('preserveAspectRatio', 'xMidYMid meet');
 let pipeGroup = draw.group(); // Group for static pipes
 
 // --- Updated Initial Drawing Function ---
-function drawCanvas() {
+export function drawCanvas() {
     console.log("Drawing canvas components..."); // Add log
 
     // --- 1. Calculate Key Positions ---
@@ -88,7 +88,7 @@ function drawCanvas() {
     createVerticalValve(draw, pv3_x, pv_y, 'pressureValve3'); // Use same Y
 
     // First valve
-    createInteractiveValve(draw, "tankValve", multiValveX, multiValveY, [180, 0, 90], (angle) => {    
+    createInteractiveValve(draw, "tankValve", multiValveX, multiValveY, [180, 0, 90], (angle) => {
         state.setCurrentMultiValvePosition(angle); // Update global state
         checkAndStartMFCFlow(draw);
     });
@@ -118,7 +118,7 @@ function drawCanvas() {
                 break;
         }
         state.setFlowConfig(path);
-        playValve2Animation(draw);
+        if (state.getFlowPath("mfc_inlet") !== undefined) playValve2Animation(draw);
     });
     // Create Outlet Valve - after Bed
     createInteractiveValve(draw, "outletValve", adsorptionOutletValveX, adsorptionOutletValveY, [0], undefined, true); // true = isThreeValve

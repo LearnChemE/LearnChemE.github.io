@@ -122,6 +122,7 @@ export function createVerticalValve(draw, x, y, valveId) {
 }
 
 export function createInteractiveValve(draw, name, x, y, angles, callback, twovalve=false) {
+    console.trace("valve created:", name);
     const group = draw.group();
     group.id(name)
     const radius = config.interactiveValveRadius;

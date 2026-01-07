@@ -341,6 +341,7 @@ export function playValve2Animation(draw) {
   ];
   valve2FlowSegments.forEach(segment => state.removeFlowPath(segment));
 
+  
   // Bed
   if (flowCfg === state.FLOW_BED) {
     animateGasFlow(draw, 'adsorption_bed_inlet', color, opacity, () => {
