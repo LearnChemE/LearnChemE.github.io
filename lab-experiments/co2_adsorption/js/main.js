@@ -109,9 +109,6 @@ export function drawCanvas() {
     createInteractiveValve(draw, "inletValve", outletValveX, outletValveY, [0, 90], (angle) => {
         let path;
         switch(angle) {
-            case -90:
-                path = state.FLOW_VENT;
-                break;
             case   0:
                 path = state.FLOW_BED;
                 break;
