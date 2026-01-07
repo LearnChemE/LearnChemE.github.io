@@ -352,7 +352,11 @@ export function playValve2Animation(draw) {
       // Start mole fraction calculation when adsorption bed inlet completes
       startMoleFractionCalculation(tankNum);
       // After MFC valve outlet completes, start adsorption bed outlet
-      animateGasFlow(draw, 'adsorption_bed_outlet', color, opacity, () => playOutlet(draw), true);
+      animateGasFlow(draw, 'adsorption_bed_outlet', color, opacity, () => {
+        animateGasFlow(draw, 'adsorption_bed_valve_outlet', color, opacity, () => {
+          playOutlet(draw)
+      }, true);
+      }, true);
     }, true);
   }
   else if (flowCfg === state.FLOW_BYPASS) {
@@ -366,9 +370,8 @@ export function playValve2Animation(draw) {
 function playOutlet(draw) {
   const { color, opacity } = flowInfo;
   // After adsorption bed outlet completes, start remaining paths
-  animateGasFlow(draw, 'adsorption_bed_valve_outlet', color, opacity, () => {
+  // animateGasFlow(draw, 'adsorption_bed_valve_outlet', color, opacity, () => {
     animateGasFlow(draw, 'bpg_valve_outlet', color, opacity, () => {
       animateGasFlow(draw, 'analyser_outlet', color, opacity, null, true);
     }, true);
-  }, true);
 }

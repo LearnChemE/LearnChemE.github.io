@@ -14,7 +14,7 @@ import { createVentArrow } from './components/ventArrow.js';
 import { addOptionToDragAndZoom } from './zoom.js';
 import { createThermister } from './components/therm.js';
 
-export const zoomLabelX = 710, zoomLabelY = 150;
+export const zoomLabelX = 740, zoomLabelY = 190;
 export const betaLabelX = 810, betaLabelY = 485;
 
 // Define other component coordinates (matching those used in pipes.js)
@@ -106,7 +106,7 @@ export function drawCanvas() {
     createVerticalAdsorptionBedView(draw, adsorptionBedX, adsorptionBedY);
 
     // Create Inlet Valve - between MFC and Bed
-    createInteractiveValve(draw, "inletValve", outletValveX, outletValveY, [0, 90, -90], (angle) => {
+    createInteractiveValve(draw, "inletValve", outletValveX, outletValveY, [0, 90], (angle) => {
         let path;
         switch(angle) {
             case -90:
