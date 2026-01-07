@@ -164,9 +164,20 @@ export function createInteractiveValve(draw, name, x, y, angles, callback, twova
     // Create pointer group
     const pointerGroup = group.group();
     const pointerLength = radius - config.interactiveValvePointerOffset;
-    pointerGroup.polygon(`${pointerLength},0 0,-5 0,5`) // Arrow shape
-        .fill('green')
-        .stroke({ color: '#444', width: 1 });
+    if (angles.length === 2) {
+        const innerRadius = radius / 2 - 1;
+        const innerCtrl = innerRadius / Math.sqrt(2) / 2;
+        pointerGroup.path(`M 0 ${innerRadius} C 0 ${innerCtrl}   ${-innerCtrl} 0   ${-innerRadius} 0`) // Arrow shape
+            .fill("none")
+            .stroke({ color: 'green', width: 5 });
+        pointerGroup.path(`M 0 ${-innerRadius} C 0 ${-innerCtrl}   ${innerCtrl} 0   ${innerRadius} 0`) // Arrow shape
+            .fill("none")
+            .stroke({ color: 'green', width: 5 });
+    } else {
+        pointerGroup.polygon(`${pointerLength},0 0,-5 0,5`) // Arrow shape
+            .fill('green')
+            .stroke({ color: '#444', width: 1 });
+    }
     pointerGroup.center(x, y); // Position pivot point at valve center
 
     let currentAngleIndex = 0;
@@ -290,7 +301,7 @@ export function createTValve(draw, x, y) {
          .font({ family: 'Arial', size: 16, anchor: 'middle' }) // Smaller font
          .fill('#000')
          .leading(1.2) // Adjust line spacing
-         .center(bodyX + bodyWidth / 2, bodyY + bodyHeight + 16); // Position below body
+         .center(bodyX + bodyWidth / 2, bodyY + bodyHeight + 18); // Position below body
 
     // --- Finally, position the entire group at the desired absolute (x, y) ---
     group.move(x, y);
