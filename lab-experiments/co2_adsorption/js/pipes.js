@@ -305,6 +305,7 @@ export function checkAndStartMFCFlow(draw) {
       flowInfo.opacity = opacity;
 
       state.setGaugeValue(`gauge${tankNum}`, state.getGaugeValue(`gauge${tankNum}`, 5.0));
+      startMoleFractionCalculation(tankNum);
 
       // Start chained animations
       // Flow reaches MFC
@@ -361,9 +362,7 @@ export function playValve2Animation(draw) {
   }
   else if (flowCfg === state.FLOW_BYPASS) {
     // Bypass selected
-    animateGasFlow(draw, 'mfc_valve_outlet', color, opacity, () => {
-      playOutlet(draw);
-    });
+    playOutlet(draw);
   }
 }
 

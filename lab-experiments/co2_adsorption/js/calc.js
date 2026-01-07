@@ -1,6 +1,3 @@
-// import { COOLING_RATE, HEATING_RATE } from "./config";
-// import { getIsHeating, getTemperature, setTemperature } from "./state";
-
 const timeMultiplicationFactor = 1;
 
 export const HEATING_RATE = 4 // K / s
@@ -197,54 +194,4 @@ export function rampTemperature(deltaTime, isHeating, temperature) {
     newTemp = 298.15 + (oldTemp - 298.15) * Math.pow(COOLING_RATE, deltaTime);
   }
   return newTemp;
-}
-
-/**
- * Find the time required to adsorb a certain amount of CO2
- * to the zeolite membrane.
- *
- * @param {Object} args - The arguments object.
- * @param {number} args.tStep - The time step in seconds.
- * @param {number} args.m - The mass flow rate of the gas mixture in g / s.
- * @param {number} args.P - The total pressure of the gas mixture in bar.
- * @param {number} args.T - The temperature of the gas mixture in K.
- * @param {number} args.yTarget - The target mole fraction of CO2 in the gas mixture.
- * @param {number} args.yCO2 - The initial mole fraction of CO2 in the gas mixture.
- * @returns {number} - The time required to adsorb the target amount of CO2 in seconds.
- */
-export function findAdsorbTime(args) {
-  const tStep = args.tStep * timeMultiplicationFactor;
-  const m = args.m;
-  const P = args.P;
-  const T = args.T;
-  const yTarget = args.yTarget;
-  const yCO2 = args.yCO2;
-
-  let err = 1e9;
-  let tResult = 0;
-
-  if (yTarget <= 0) {
-    return 0;
-  }
-
-  for (let t = 0; t < 1200; t += tStep) {
-    const outlet = yCO2_out({
-      t: t,
-      tStep: tStep,
-      m: m,
-      P: P,
-      T: T,
-      yCO2: yCO2,
-      desorbing: false,
-      timeOfDesorption: 0,
-    });
-
-    const diff = Math.abs(outlet - yTarget);
-    if (diff < err) {
-      err = diff;
-      tResult = t;
-    }
-  }
-
-  return tResult;
 }
