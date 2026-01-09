@@ -10,6 +10,7 @@ import type { InitConc } from './types/globals'
 import { TooltipSelector } from './components/Tooltip/TooltipSelector'
 import { PlotlyChart } from './components/PlotlyChart'
 import { createProfile } from './ts/calcs'
+import { LoadWheel } from './components/LoadWheel/LoadWheel'
 
 function App() {
   const [loading, setLoading] = createSignal(true);
@@ -24,6 +25,7 @@ function App() {
       { xr0: 0.15, xw0: 0.05 },
       { xr0: 0.05, xw0: 0.05 },
   ]);
+  setLoading(true);
   
   const [plotProfile, setPlotProfile] = createSignal(createProfile({ xr0: 0.05, xw0: 0.05 }));
 
@@ -58,15 +60,17 @@ function App() {
       {/* Canvas */}
       <ThreeCanvas onUniformPreparation={vials.attachUniforms} drag={magnifying} mixTrigger={mixTrigger} onAnimationEnd={onAnimationEnd} />
       <Magnifier magnifying={magnifying} particleInfo={vials.getParticleInfo} />
+      <LoadWheel isLoading={loading} />
 
       {/* Controls */}
       <HamburgerMenu path="" downloadName="" Directions={DirectionsText} About={AboutText} />
       <ControlButton icon="fa-solid fa-magnifying-glass" disabled={animating} active={magnifying} label="magnify particles" top={120} onClick={() => setMagnifying(!magnifying())} />
       <ControlButton icon="fa-solid fa-rotate" label="mix vials" top={190} disabled={animating} onClick={reset} />
       <ControlButton icon={() => { return pause() ? "fa-solid fa-play" : "fa-solid fa-pause" }} label="play/pause" top={260} disabled={animating} onClick={() => setPause(!pause())} />
+      <ControlButton icon="fa-solid fa-vial" label="change vial compositions" top={330} onClick={() => {}} />
 
       <TooltipSelector showing={() => !animating()} ics={ics} setIcs={setIcs} />
-      <PlotlyChart data={plotProfile} layout={{ xaxis: { range: [0, 305] } }} />
+      {/* <PlotlyChart data={plotProfile} layout={{ xaxis: { range: [0, 305] } }} /> */}
     </>
   )
 }
