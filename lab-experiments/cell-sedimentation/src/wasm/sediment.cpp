@@ -85,7 +85,7 @@ bool SedimentSolver::solve(double time) {
     }
 
     // Resize profile and update top coordinate
-    double new_top = resize(prof_, head_[1], -1);
+    double new_top = resize(prof_, head_[1], 1e-8);
     head_[1] = new_top;
     head_[0] += time; // update time
     // std::cout << "Sediment solver completed." << std::endl;

@@ -12,6 +12,7 @@ import { PlotlyChart } from './components/PlotlyChart'
 import { createProfile } from './ts/calcs'
 
 function App() {
+  const [loading, setLoading] = createSignal(true);
   const [magnifying, setMagnifying] = createSignal(false);
   const [mixTrigger, setMixTrigger] = createSignal(false);
   const [pause, setPause] = createSignal(false);
@@ -26,8 +27,8 @@ function App() {
   
   const [plotProfile, setPlotProfile] = createSignal(createProfile({ xr0: 0.05, xw0: 0.05 }));
 
-  const vials = new VialsArray(ics());
-  vials.attachPlot(0, setPlotProfile);
+  const vials = new VialsArray(ics(), setLoading);
+  vials.attachPlot(4, setPlotProfile);
 
   const reset = () => {
     // Reset vials
@@ -40,10 +41,10 @@ function App() {
   }
 
   const onAnimationEnd = () => {
-    vials.play();
     setAnimating(false);
+    vials.play();
   }
-
+  
   createEffect(() => {
     if (pause()) {
       vials.pause();

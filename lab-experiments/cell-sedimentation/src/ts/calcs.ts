@@ -261,6 +261,12 @@ export function interp(x: number | number[], xp: number[], fp: number[]) {
     return f;
 }
 
+export function integrate(arr: number[], top: number) {
+    const dz = (305 - top) / 499;
+    const sum = arr.reduce((a,b) => a + b);
+    return sum * dz;
+}
+
 /**
  * 
  * @param y 
@@ -303,7 +309,7 @@ export function resize(y: number[], z: number[], lo: number) {
 
 const nz = CONC_ARRAY_SIZE;
 const smooth_fsize = 11; // must be odd
-export const SOLVER_TIMESTEP = 20;
+export const SOLVER_TIMESTEP = 1;
 export class ProfileSolver {
     private current: number[];
     private top = 0;
@@ -331,7 +337,7 @@ export class ProfileSolver {
     };
 
     /**
-     * Calculate one 20 second step for the profile
+     * Calculate one macro step for the profile
      * @returns Results at time t + timestep
      */
     public calculate_step = () => {

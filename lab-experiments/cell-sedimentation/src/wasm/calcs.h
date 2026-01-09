@@ -6,7 +6,7 @@
 #define CONC_ARRAY_SIZE 500
 #define PROFILE_LENGTH 1000
 #define WHITE_INDEX_OFFSET 500
-#define SMOOTH_FILT_SIZE 5
+#define SMOOTH_FILT_SIZE 3
 
 // Physical constants (ported from calcs.ts)
 constexpr double RHO_F = 0.868; // Fluid density (g/cc)
