@@ -172,7 +172,13 @@ export const ThreeCanvas: Component<ThreeCanvasProps> = ({ drag, onUniformPrepar
                 model.matrix.multiply(tempMatrix.makeRotationZ(mth * Math.PI / 180));
                 model.matrixWorldNeedsUpdate = true;
                 aniTimer += dt * 1000;
-                if (aniTimer >= MAX_ANIMATION_TIME) onAnimationEnd?.();
+                if (aniTimer >= MAX_ANIMATION_TIME) {
+                    console.log("animation over")
+                    onAnimationEnd?.();
+
+                    // Reset model matrix
+                    model.matrix.copy(base);
+                }
             }
             const r = 40
             camera.position.set(-r * Sin(th) * Cos(ph), r * Sin(ph), r * Cos(th) * Cos(ph));
