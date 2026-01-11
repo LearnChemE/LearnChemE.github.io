@@ -65,7 +65,7 @@ function App() {
 
       {/* Controls */}
       <HamburgerMenu path="" downloadName="" Directions={DirectionsText} About={AboutText} />
-      <ConcSelector showing={concMenuShowing} ics={ics} setIcs={setIcs} />
+      <ConcSelector showing={concMenuShowing} ics={ics} setIcs={setIcs} resetMessage={mixTrigger} />
       <ControlButton icon="fa-solid fa-magnifying-glass" disabled={animating} active={magnifying} label="magnify particles" top={120} onClick={() => setMagnifying(!magnifying())} />
       <ControlButton icon="fa-solid fa-rotate" label="mix vials" top={190} disabled={animating} onClick={reset} />
       <ControlButton icon={() => { return pause() ? "fa-solid fa-play" : "fa-solid fa-pause" }} label="play/pause" top={260} disabled={animating} onClick={() => setPause(!pause())} />

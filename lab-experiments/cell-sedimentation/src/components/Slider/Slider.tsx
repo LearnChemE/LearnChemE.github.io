@@ -1,34 +1,33 @@
-import type { Accessor } from 'solid-js';
+import { type Accessor } from 'solid-js';
 import './Slider.css';
 
 export type SliderProps = {
-  value?: Accessor<number> | number;
+  value: Accessor<number>;
   setValue?: (v: number) => void;
-  onChange?: (v: number) => void;
   min?: number;
-  max?: number;
+  max?: number | Accessor<number>;
   step?: number;
   label?: string;
+  fixed?: number;
   id?: string;
   unit?: string;
   class?: string;
 };
 
 export function Slider(props: SliderProps) {
-  const read = (): number =>
-    typeof props.value === 'function' ? (props.value as Accessor<number>)() : (props.value ?? 0);
-
   const handleInput = (e: Event) => {
     const target = e.target as HTMLInputElement;
     const v = target.valueAsNumber ?? Number(target.value);
     if (typeof props.setValue === 'function') props.setValue(v);
-    else if (typeof props.onChange === 'function') props.onChange(v);
   };
 
   const min = props.min ?? 0;
-  const max = props.max ?? 100;
+  const max: () => number = (props.max === undefined) ? () => 100 : 
+    typeof props.max === "number" ? () => props.max as number :
+    props.max;
   const step = props.step ?? 1;
   const id = props.id ?? `slider-${Math.random().toString(36).slice(2, 9)}`;
+  const fixed = props.fixed ?? 1;
 
   return (
     <div class={`slider ${props.class ?? ''}`}>
@@ -42,20 +41,14 @@ export function Slider(props: SliderProps) {
           id={id}
           type="range"
           min={min}
-          max={max}
+          max={max()}
           step={step}
-          value={read()}
+          value={props.value()}
           onInput={handleInput}
         />
-        <input
-          type="number"
-          class="slider-number"
-          min={min}
-          max={max}
-          step={step}
-          value={read()}
-          onInput={handleInput}
-        />
+        <div class="slider-value">
+            {props.value().toFixed(fixed)}
+        </div>
         {props.unit && <span class="slider-unit">{props.unit}</span>}
       </div>
     </div>

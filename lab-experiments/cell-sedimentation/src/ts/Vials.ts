@@ -192,6 +192,7 @@ export class VialsArray {
 
     public reset = (ics: Array<InitConc>) => {
         this.playing = false;
+        this.currentTime = 0;
 
         this.vials.forEach((vial, i) => {
             const ic = ics[i];
