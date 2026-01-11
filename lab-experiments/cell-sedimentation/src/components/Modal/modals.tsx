@@ -3,22 +3,19 @@ import type { Component } from "solid-js";
 export const DirectionsText: Component = () => {
     return <>
     <p>
-        This virtual experiment simulates a kettle boiler and its heat exchange capabilities.
+        This virtual experiment simulates the sedimentation of two types of particles in a rigid vial.
     </p>
     <p>
-        Use the flow-control valve (red) to adjust the feed flowrate, which can be read from the rotameter above it.
+        Use the top magnifying glass button to visualize the relative particle amounts and velocities within a section of the vial by hovering your mouse over it or tapping it on a touchscreen.
     </p>
     <p>
-        To fill the inner tubes with steam, click the steam shutoff valve to open it (parallel with the pipe), then drag the pressure regulator handle to adjust the pressure.
+        The reset button will shake the vials, mixing the particles well to reset the animation.
     </p>
     <p>
-        Tare the empty beakers for accuracy using the button on the scale.
-        Then, click and drag the beakers under the flowing streams to catch water, and drag them to the scale to weigh.
-        To empty a beaker, drag it onto the table and click on it, and then click on the "empty beaker" button.
-        Use a stopwatch during catch and weigh to record stream flowrates. 
+        The pause/play button will stop and start the animation of the particles settling.
     </p>
     <p>
-        Scroll to zoom and drag the screen to pan.
+        Lastly, use the vial button to change the initial concentrations of each vial. Hit reset after setting the desired concentrations to make it appear in the vials.
     </p>
 </>;
 }

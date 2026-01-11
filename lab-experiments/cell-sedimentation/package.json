@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "vite",
-    "dev": "vite --host",
-    "build": "tsc -b && vite build",
+    "build:wasm": "make wasm",
+    "start": "npm run build:wasm && vite",
+    "dev": "npm run build:wasm && vite --host",
+    "build": "npm run build:wasm && tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest --printConsoleTrace=true --silent=false",
     "test-loud": "vitest --printConsoleTrace=true --silent=false --disable-console-intercept"
@@ -21,13 +22,14 @@
     "@vitest/web-worker": "^4.0.12",
     "fs": "^0.0.1-security",
     "jsdom": "^20.0.3",
-    "nodeplotlib": "^1.1.2",
+    "nodeplotlib": "^0.7.7",
     "plotly.js-dist-min": "^3.3.0",
     "three": "^0.180.0",
     "three-stdlib": "^2.36.0",
     "typescript": "~5.8.3",
     "vite": "^7.1.7",
     "vite-plugin-solid": "^2.11.8",
+    "vite-plugin-wasm": "^3.5.0",
     "vitest": "^4.0.7"
   }
 }

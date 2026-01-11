@@ -1,9 +1,10 @@
 import { defineConfig } from 'vitest/config'
 import solid from 'vite-plugin-solid'
+import wasm from 'vite-plugin-wasm'
 
 export default defineConfig({
   base: './', // or ""
-  plugins: [solid()],
+  plugins: [solid(), wasm()],
   build: {
     // Other build options
     outDir: "dist",
