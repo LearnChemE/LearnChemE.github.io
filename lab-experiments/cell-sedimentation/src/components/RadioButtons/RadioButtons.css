@@ -1,0 +1,35 @@
+.btn {
+    padding: .25em;
+    min-width: 30px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: rgb(52, 152, 219);
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.btn-primary-outline {
+    background-color: white;
+    color: rgb(52, 152, 219);
+    border: 1px solid rgb(52, 152, 219);
+}
+
+.btn-primary-outline:hover {
+    color: #2980b9;
+    border-color: #2980b9;
+}
+
+.radio-container {
+    display: grid;
+    margin: auto;
+    width: clamp(100px, 70%, 500px);
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1em;
+}
