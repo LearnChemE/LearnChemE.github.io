@@ -7,10 +7,10 @@
 
 export function calcAll() {
   // for simplier variables
-  z.hBot = 1 - z.hTop - z.hMid;
+  /*  state.hBot = 1 - z.hTop - z.hMid;
   let h3 = z.hTop;
   let h2 = z.hMid;
-  let h1 = z.hBot;
+  let h1 = z.hBot; */
   /*
   The original base line equations to graph:
 
@@ -33,7 +33,7 @@ export function calcAll() {
   }
 
   function fluid2LineYOut(x) {
-    return (h3 * x * z.muMid + h1 * z.muTop + h2 * x * z.muTop - h1 * z.muMid * z.muTop + h1 * x * z.muMid * z.muTop) / (z.muTop);
+    return (h3 * x * z.muMid + h1 * z.muTop + h2 * x * z.muTop - h1 * z.muMid * z.muTop + h1 * x * z.muMid * z.muTop) / z.muTop;
   }
 
   function fluid2LineXOut(y) {
@@ -41,7 +41,10 @@ export function calcAll() {
   }
 
   function fluid3LineYOut(x) {
-    return (h1 * z.muMid + h2 * z.muMid + h3 * x * z.muMid - h2 * z.muTop + h2 * x * z.muTop - h1 * z.muMid * z.muTop + h1 * x * z.muMid * z.muTop) / (z.muMid);
+    return (
+      (h1 * z.muMid + h2 * z.muMid + h3 * x * z.muMid - h2 * z.muTop + h2 * x * z.muTop - h1 * z.muMid * z.muTop + h1 * x * z.muMid * z.muTop) /
+      z.muMid
+    );
   }
 
   function fluid3LineXOut(y) {
@@ -49,8 +52,8 @@ export function calcAll() {
   }
 
   // dist graph fluid height ratios
-  z.centerYTop = -((z.distBY - z.distTY) * z.hBot) - ((z.distBY - z.distTY) * z.hMid) - ((z.distBY - z.distTY) * z.hTop / 2) + z.distBY;
-  z.centerYMid = -((z.distBY - z.distTY) * z.hBot) - ((z.distBY - z.distTY) * z.hMid / 2) + z.distBY;
+  z.centerYTop = -((z.distBY - z.distTY) * z.hBot) - (z.distBY - z.distTY) * z.hMid - ((z.distBY - z.distTY) * z.hTop) / 2 + z.distBY;
+  z.centerYMid = -((z.distBY - z.distTY) * z.hBot) - ((z.distBY - z.distTY) * z.hMid) / 2 + z.distBY;
   z.centerYBot = -((z.distBY - z.distTY) * z.hBot) / 2 + z.distBY;
 
   // calculations for velocity line on dist graph
@@ -72,8 +75,8 @@ export function calcAll() {
 
   // Height Graph stuff
   z.centerXTop = -((z.distRX - z.distLX) * z.hTop) / 2 + z.distRX;
-  z.centerXMid = -((z.distRX - z.distLX) * z.hTop) - ((z.distRX - z.distLX) * z.hMid / 2) + z.distRX;
-  z.centerXBot = -((z.distRX - z.distLX) * z.hTop) - ((z.distRX - z.distLX) * z.hMid) - ((z.distRX - z.distLX) * z.hBot / 2) + z.distRX;
+  z.centerXMid = -((z.distRX - z.distLX) * z.hTop) - ((z.distRX - z.distLX) * z.hMid) / 2 + z.distRX;
+  z.centerXBot = -((z.distRX - z.distLX) * z.hTop) - (z.distRX - z.distLX) * z.hMid - ((z.distRX - z.distLX) * z.hBot) / 2 + z.distRX;
 
   // Points on the Graph
   z.heightY12 = (1 - (z.heightBY - z.heightTY)) * x12 + z.heightBY;
