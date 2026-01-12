@@ -1,3 +1,18 @@
+body {
+  --slider-primary-color: #3b82f6;
+  --background-color-normal: #f1f1f1;
+  --background-color-disable: #4c4c4c;
+  --background-color-disable-light: #adadad;
+}
+
+.slider-red {
+  --slider-primary-color: #f02222;
+}
+
+.slider-white {
+  --slider-primary-color: #3a445a;
+}
+
 .slider {
   display: flex;
   margin: auto;
@@ -22,17 +37,26 @@
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  background: transparent;
+  /* background: transparent; */
   width: 220px;
   height: 28px; /* gives space for thumb */
   cursor: pointer;
+  --primary-gradient-interpolant: 50%;
+  --secondary-gradient-interpolant: 75%;
 }
 
 /* WebKit (Chrome, Safari, Edge Chromium) */
 input[type="range"]::-webkit-slider-runnable-track {
   height: 8px;
-  background: #e6e6e6;
+  /* background: #4c4c4c; */
   border-radius: 999px;
+  background-image: linear-gradient(to right, var(--slider-primary-color), var(--slider-primary-color)),
+    linear-gradient(to right, var(--background-color-normal), var(--background-color-normal)),
+    repeating-linear-gradient(45deg, var(--background-color-disable), var(--background-color-disable) 4px, var(--background-color-disable-light) 4px, var(--background-color-disable-light) 8px);
+  background-repeat: no-repeat;
+  background-size: var(--primary-gradient-interpolant) 100%,
+    var(--secondary-gradient-interpolant) 100%,
+    100% 100%;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -41,7 +65,7 @@ input[type="range"]::-webkit-slider-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #3b82f6;
+  background: var(--slider-primary-color);
   border: 2px solid white;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
@@ -51,6 +75,8 @@ input[type="range"]::-moz-range-track {
   height: 8px;
   background: #e6e6e6;
   border-radius: 999px;
+  background-image: linear-gradient(var(--background-color-normal), var(--background-color-normal));
+  background-repeat: no-repeat;
 }
 input[type="range"]::-moz-range-thumb {
   width: 20px;
@@ -81,7 +107,7 @@ input[type="range"]::-ms-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #3b82f6;
+  background: var(--slider-primary-color);
   border: 2px solid white;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   margin-top: 0;
