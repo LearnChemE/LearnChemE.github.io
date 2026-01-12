@@ -1,0 +1,7 @@
+*.o
+*.a
+*.out
+
+sediment.wasm
+sediment.js
+sediment.d.ts

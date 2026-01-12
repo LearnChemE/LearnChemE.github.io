@@ -1,0 +1,41 @@
+.cmenu-selector {
+    position: absolute;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.cmenu {
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    background-color: rgba(255, 255, 255, 1);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: opacity 0.2s ease-in-out;
+    transform: translateX(-50%);
+    width: 80%;
+    height: max-content;
+    /* border: 0px solid black; */
+    box-shadow: 0 0 1px 2px rgb(44, 44, 44, 0.7);
+}
+
+.cmenu::after {
+    content: "";
+    position: absolute;
+    bottom: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 12px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.75) transparent transparent transparent;
+}
+
+.cmenu-msg {
+    margin-top: .5rem;
+}

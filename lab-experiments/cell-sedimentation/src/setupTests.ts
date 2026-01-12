@@ -1,6 +1,6 @@
-import { plot, type Layout, type Plot, type PlotData } from "nodeplotlib"
+import { plot, type Layout, type Plot } from "nodeplotlib"
 
-export async function plotFn(xRange: number[], fn: (x: number) => number, options?: Partial<PlotData>) {
+export async function plotFn(xRange: number[], fn: (x: number) => number, options?: any) {
     const y = xRange.map(fn);
     plot([{ x: xRange, y, type: 'scatter', ...options }]);
     await new Promise((resolve) => setTimeout(resolve, 1000)); // Arbitrary timeout to give client time to load

@@ -1,4 +1,4 @@
-import { type Component, type Accessor, createSignal, onMount, type Setter, Show, createMemo } from "solid-js";
+import { type Component, type Accessor, createSignal, onMount, Show, createMemo } from "solid-js";
 import "./Tooltip.css";
 import { constrain } from "../../ts/helpers";
 import type { InitConc } from "../../types/globals";
@@ -6,7 +6,6 @@ import type { InitConc } from "../../types/globals";
 interface TooltipSelectorProps {
     showing: Accessor<boolean>;
     ics: Accessor<Array<InitConc>>;
-    setIcs: Setter<Array<InitConc>>;
 }
 
 type ConcsType = {
@@ -38,11 +37,6 @@ export const TooltipSelector: Component<TooltipSelectorProps> = ({ showing, ics 
         // Determine vial
         const vial = (x_cnv > lBd && x_cnv < lBd + vialWidth * 5) ? constrain(Math.floor((x_cnv - lBd) / vialWidth), 0, 4) : null;
 
-        // // Calculate new coords
-        // const newCoord = {
-        //     x: 32.8 + vial * vialWidth * 100, 
-        // };
-        
         if (vial === null) setSelected(null);
         else
             setSelected(vial);

@@ -1,8 +1,13 @@
 import type { Profile, InitConc } from "../../types/globals";
-import { createProfile, PROFILE_LENGTH } from "../calcs";
+import { createProfile, PROFILE_LENGTH, SOLVER_TIMESTEP } from "../calcs";
 import producerURL from "./producer.ts?worker&url";
 import type { InitMessage, WorkerMessage } from "./worker-types";
 import { lerp, makeDeferred, type Deferred } from "../helpers";
+
+export type PresenterStepResult = {
+    status: "ready" | "loading";
+    profile: Profile;
+};
 
 // Lives on the main thread
 export class Presenter {
@@ -42,12 +47,15 @@ export class Presenter {
         // Handle solution response by resolving the promise
         this.producer.addEventListener("message", (e) => {
             const msg = e.data as WorkerMessage;
-            if (msg.type !== "data") throw new Error(`Worker sent message: ${e}`);
+            if (msg.type !== "data") {
+                console.dir(e)
+                throw new Error(`Worker sent message: ${e}`);
+            }
             def.resolve(msg.payload);
         }, { once: true });
 
         // Request the next soln
-        this.producer.postMessage({ type: "produce" });
+        this.producer.postMessage({ type: "produce", payload: SOLVER_TIMESTEP });
         return def;
     }
 
@@ -72,7 +80,7 @@ export class Presenter {
      * @param dt timestep (s)
      * @returns true if the buffer is ready; false if not
      */
-    public step = (dt: number): Profile => {
+    public step = (dt: number): PresenterStepResult => {
         // Figure out the timestep
         let currentTime = this.current[0];
         let nextTime = this.next[0];
@@ -87,7 +95,10 @@ export class Presenter {
             const loaded = this.getNextSol();
             if (!loaded) {
                 // still loading
-                return this.current;
+                return {
+                    status: "loading",
+                    profile: this.current
+                };
             }
             else {
                 // next is ready; swap and reduce that amount of time.
@@ -102,7 +113,10 @@ export class Presenter {
             this.current[i] = lerp(this.current[i], this.next[i], s);
         }
 
-        return this.current.slice();
+        return {
+            status: "ready",
+            profile: this.current.slice()
+        };
     }
 
     public getCurrent = () => {
