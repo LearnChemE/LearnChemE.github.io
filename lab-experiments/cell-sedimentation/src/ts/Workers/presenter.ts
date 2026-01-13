@@ -21,7 +21,6 @@ class TopRecorder {
     public isFinished() {
         const dif = this.window[this.window.length-1] - this.window[0];
         if (dif > this.max) this.max = dif;
-        console.log("Current top range:", dif.toFixed(2));
 
         return (dif < this.max * .2) && (this.max !== 0) && (this.window.length === this.size)
     }

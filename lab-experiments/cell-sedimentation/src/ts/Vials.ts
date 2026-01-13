@@ -103,7 +103,7 @@ export class Vial {
         y = (y - top) / (305 - top);
         // [0,1] => [0,499]
         y = y * 499;
-        console.log(y);
+        
         if (y < 0) return {
             num: 0,
             fracR: 1,

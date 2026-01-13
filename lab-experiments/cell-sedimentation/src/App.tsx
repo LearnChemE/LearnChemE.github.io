@@ -12,6 +12,7 @@ import { PlotlyChart } from './components/PlotlyChart'
 import { createProfile } from './ts/calcs'
 import { LoadWheel } from './components/LoadWheel/LoadWheel'
 import { ConcSelector } from './components/ConcSelector/ConcSelector'
+import { Ruler } from './components/Ruler/Ruler'
 
 function App() {
   const [loading, setLoading] = createSignal(true);
@@ -60,6 +61,7 @@ function App() {
     <>
       {/* Canvas */}
       <ThreeCanvas onUniformPreparation={vials.attachUniforms} drag={magnifying} mixTrigger={mixTrigger} onAnimationEnd={onAnimationEnd} />
+      <Ruler showing={() => !animating()} />
       <Magnifier magnifying={magnifying} particleInfo={vials.getParticleInfo} />
       <LoadWheel isLoading={loading} />
 
