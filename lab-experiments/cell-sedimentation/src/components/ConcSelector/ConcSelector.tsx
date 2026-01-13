@@ -18,6 +18,7 @@ const vialSelectors = [
     "4",
     "5"
 ];
+const MAX_VOL_FRAC = .7;
 
 export const ConcSelector: Component<ConcSelectorProps> = (props) => {
     const [selected, setSelected] = createSignal(0);
@@ -57,8 +58,8 @@ export const ConcSelector: Component<ConcSelectorProps> = (props) => {
             <div class="cmenu">
                 vial:
                 <RadioButtons selections={vialSelectors} onSelect={(_, idx) => setSelected(4 - idx)} />
-                <Slider value={redVal} setValue={setRed}   min={0} max={1 - whtVal()} step={.05} fixed={2} label="red cell volume fraction" />
-                <Slider value={whtVal} setValue={setWhite} min={0} max={1 - redVal()} step={.05} fixed={2} label="white cell volume fraction" />
+                <Slider value={redVal} setValue={setRed}   min={0} max={1} softMax={MAX_VOL_FRAC - whtVal()} step={.05} fixed={2} label="red cell volume fraction"   class="slider-red" />
+                <Slider value={whtVal} setValue={setWhite} min={0} max={1} softMax={MAX_VOL_FRAC - redVal()} step={.05} fixed={2} label="white cell volume fraction" class="slider-white" />
                 <Show when={showMsg()}>
                     <div class="cmenu-msg">
                         hit reset button to see new concentrations

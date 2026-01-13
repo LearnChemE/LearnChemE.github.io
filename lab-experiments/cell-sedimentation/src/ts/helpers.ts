@@ -383,7 +383,7 @@ export function animate(fn: (dt: number, t: number) => boolean, then?: () => voi
 
     const frame = (time: number) => {
         if (prevtime === null) prevtime = time;
-        const dt = (time - prevtime) / 1000; // in ms
+        const dt = constrain((time - prevtime) / 1000, 0, .3); // in ms
         prevtime = time;
 
         // Call the function

@@ -2,10 +2,32 @@ import type { Profile, InitConc } from "../../types/globals";
 import { createProfile, PROFILE_LENGTH, SOLVER_TIMESTEP } from "../calcs";
 import producerURL from "./producer.ts?worker&url";
 import type { InitMessage, WorkerMessage } from "./worker-types";
-import { lerp, makeDeferred, type Deferred } from "../helpers";
+import { constrain, lerp, makeDeferred, type Deferred } from "../helpers";
+
+class TopRecorder {
+    private size: number;
+    private window: number[] = [];
+    private max = 0;
+
+    constructor (size=5) {
+        this.size = size;
+    }
+
+    public shift(next: number) {
+        this.window.push(next);
+        if (this.window.length > this.size) this.window.shift();
+    };
+
+    public isFinished() {
+        const dif = this.window[this.window.length-1] - this.window[0];
+        if (dif > this.max) this.max = dif;
+
+        return (dif < this.max * .2) && (this.max !== 0) && (this.window.length === this.size)
+    }
+}
 
 export type PresenterStepResult = {
-    status: "ready" | "loading";
+    status: "ready" | "loading" | "finished";
     profile: Profile;
 };
 
@@ -15,6 +37,8 @@ export class Presenter {
     private current: Profile;
     private next: Profile;
     private promise: Deferred<Profile>;
+    private top: TopRecorder;
+    private finished: boolean = false;
 
     constructor(initConc: InitConc) {
         console.log("Creating web worker...");
@@ -31,10 +55,24 @@ export class Presenter {
         };
         this.producer.postMessage(initMsg);
 
+        // Figure out the correct sizing for the top
+        const totConc = initConc.xr0 + initConc.xw0;
+        let topSize = 3 + 18 * ((totConc * 100) ** 2 / 65 ** 2) // 3 at lowest, 21 at highest\
+        topSize = constrain(topSize, 3, 21);
+        topSize = Math.floor(topSize);
+
         // Initialize profiles
         this.current = createProfile(initConc);
         this.next = createProfile(initConc);
         this.promise = this.requestNextSol();
+        this.top = new TopRecorder(topSize);
+        
+        this.top.shift(this.next[1]);
+    }
+
+    private finish() {
+        console.log("Finished!");
+        this.finished = true;
     }
 
     /**
@@ -67,6 +105,13 @@ export class Presenter {
         if (this.promise.isReady()) {
             this.next = this.promise.value;
             this.promise = this.requestNextSol();
+            // Store the new top in the recorder
+            this.top.shift(this.next[1]);
+            // Determine if the calculations are finished
+            if (this.top.isFinished()) {
+                this.finish();
+            }
+
             return true;
         } else {
             // Not ready; fallback to loading state
@@ -114,8 +159,8 @@ export class Presenter {
         }
 
         return {
-            status: "ready",
-            profile: this.current.slice()
+            status: this.finished ? "finished" : "ready",
+            profile: this.current
         };
     }
 

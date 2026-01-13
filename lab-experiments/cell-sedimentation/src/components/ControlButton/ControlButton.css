@@ -5,7 +5,7 @@
   text-align: center;
   cursor: pointer;
   position: absolute;
-  right: 50px;
+  left: 50px;
 
   display: flex;
   justify-content: center;

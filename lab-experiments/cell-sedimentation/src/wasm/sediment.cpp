@@ -71,7 +71,6 @@ bool SedimentSolver::solve(double time) {
         prof_[i] = final_conc[i].r;
         prof_[i + WHITE_INDEX_OFFSET] = final_conc[i].w;
     }
-    delete[] res.y;
 
     // Smooth profile to avoid numerical artifacts
     movingAverageConvolve(prof_, CONC_ARRAY_SIZE, SMOOTH_FILT_SIZE);
@@ -89,6 +88,7 @@ bool SedimentSolver::solve(double time) {
     head_[1] = new_top;
     head_[0] += time; // update time
     // std::cout << "Sediment solver completed." << std::endl;
+    delete[] res.y;
 
     return true;
 }

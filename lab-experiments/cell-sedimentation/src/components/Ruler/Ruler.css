@@ -1,0 +1,7 @@
+.ruler-cnv {
+    position: absolute;
+}
+
+.ruler {
+    transition: opacity .5s;
+}

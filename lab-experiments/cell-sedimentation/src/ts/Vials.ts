@@ -35,20 +35,32 @@ export class Vial {
     private loading: boolean = false;
     private onChange?: (p: Profile) => void | undefined = undefined;
     private currentTime: number = 0;
+    public isFinished: boolean = false;
 
     constructor (initConc: InitConc) {
         this.presenter = new Presenter(initConc);
     }
 
     public evolve = (dt: number) => {
+        // If we are already done, no need to iterate
+        if (this.isFinished) {
+            return true;
+        }
+
+        // Iterate
         const result = this.presenter.step(dt);
+
         this.updateUniform(result.profile);
         this.onChange?.(result.profile);
         // Keep the current time so other objects can check that it's synchronized
         this.currentTime = result.profile[0];
         // Return true if ready; false if loading
-        if (result.status === "ready") return true;
-        else return false;
+        if (result.status === "loading") return false;
+        // If finished, 
+        else if (result.status === "finished") {
+            this.isFinished = true;
+        }
+        return true;
     }
 
     public setUniform = (uniform: THREE.ShaderMaterial["uniforms"]) => {
@@ -77,21 +89,32 @@ export class Vial {
         this.onChange = onProfileChange;
     }
 
+    /**
+     * Return particle information for a specific 
+     * @param y height coordinate for selected location [mm].
+     * @returns MagnifierParticleInfo: { num: number, fracR: number, rVel: number, wVel: number }
+     */
     public getParticleInfo = (y: number): MagnifierParticleInfo => {
+        // Get a reference to the current profile
         const cur = this.presenter.getCurrent();
+        // Top coodinate
         const top = cur[1];
-        y = y - top;
-        y = y * 499 / (305 - top);
-        if (y < top) return {
+        // Normalize y coord to [0,1]
+        y = (y - top) / (305 - top);
+        // [0,1] => [0,499]
+        y = y * 499;
+        
+        if (y < 0) return {
             num: 0,
             fracR: 1,
             rVel: 0,
             wVel: 0
         }
         const i0 = Math.floor(y);
-        if (i0 === 499) return getPInfoAtIndex(cur, 499);
+        if (i0 >= 499) return getPInfoAtIndex(cur, 499);
 
-        const xr = (i0 + 1 - y) * cur[i0 + 2] + (y - i0) * cur[i0 + 3];
+        // Linear interpolation
+        const xr = (i0 + 1 - y) * cur[i0 + 2]   + (y - i0) * cur[i0 + 3];
         const xw = (i0 + 1 - y) * cur[i0 + 502] + (y - i0) * cur[i0 + 503];
         return makePInfoFromConc(xr, xw);
     }
@@ -204,6 +227,12 @@ export class VialsArray {
         this.vials[vialIdx].attachPlot(onProfileChange);
     }
 
+    /**
+     * Request information about particle concentrations and velocities in a specific vial at a specific y. To be attached to the Magnifier component so it can request these directly.
+     * @param vial Index of selected vial
+     * @param y 
+     * @returns MagnifierParticleInfo: { num: number, fracR: number, rVel: number, wVel: number }
+     */
     public getParticleInfo = (vial: number, y: number): MagnifierParticleInfo => {
         const v = this.vials[vial];
 
