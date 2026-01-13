@@ -1,0 +1,23 @@
+<div id="details" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="directionsTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Details</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <p>The model applies Bernoulli&rsquo;s equation from the inlet section to each outlet stream, assuming the outlets discharge to the ambient pressure \(p_{\text{air}}\):</p>
+          <p class="text-center">\[p_1 + \frac{1}{2}\rho U_1^2 = p_{\text{air}} + \frac{1}{2}\rho U_2^2 = p_{\text{air}} + \frac{1}{2}\rho U_3^2.\]</p>
+          <p>This relates the inlet velocity \(U_1\) to the outlet velocities \(U_2\) and \(U_3\) for a specified inlet gauge pressure \(p_1 - p_{\text{air}}\). Continuity closes the system:</p>
+          <p class="text-center">\[A_1 U_1 = A_2 U_2 + A_3 U_3.\]</p>
+          <p>Here \(A = \pi R^2\) is the cross-sectional area of each pipe. The simulation reports the resulting velocities and volumetric flow rates \(Q = A\,U\). The assumption of identical outlet pressures makes the two outlet velocities equal, while the individual flow rates differ because their cross-sectional areas can be different.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
