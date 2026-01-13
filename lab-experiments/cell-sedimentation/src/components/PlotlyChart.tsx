@@ -1,7 +1,7 @@
 import Plotly from "plotly.js-dist-min";
 import { createEffect, createMemo, onCleanup, onMount, type Component } from "solid-js"
 import type { Profile } from "../types/globals";
-import { CONC_ARRAY_SIZE, integrate } from "../ts/calcs";
+import { CONC_ARRAY_SIZE } from "../ts/calcs";
 
 interface PlotlyChartProps {
     data: () => Profile,
@@ -13,9 +13,8 @@ export const PlotlyChart: Component<PlotlyChartProps> = ({ data, layout, config 
 
     const plotdata = createMemo((): Plotly.Data[] => {
         const dat = data();
-        console.log("Time:", dat[0].toFixed(2), 
-            "\nRed integral:", integrate(Array.from(dat).slice(2, 502),dat[1]).toFixed(2), 
-            "\nWhite integral:", integrate(Array.from(dat).slice(502),dat[1]).toFixed(2));
+        // console.log("Time:", dat[0].toFixed(2), 
+        //     "\nTop:", dat[1]);
         const top = dat[1];
         const dz = (305 - top) / 499;
         const z = Array.from({ length: CONC_ARRAY_SIZE }, (_,i) => top + i * dz);

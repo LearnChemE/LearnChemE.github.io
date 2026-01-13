@@ -35,20 +35,32 @@ export class Vial {
     private loading: boolean = false;
     private onChange?: (p: Profile) => void | undefined = undefined;
     private currentTime: number = 0;
+    public isFinished: boolean = false;
 
     constructor (initConc: InitConc) {
         this.presenter = new Presenter(initConc);
     }
 
     public evolve = (dt: number) => {
+        // If we are already done, no need to iterate
+        if (this.isFinished) {
+            return true;
+        }
+
+        // Iterate
         const result = this.presenter.step(dt);
+
         this.updateUniform(result.profile);
         this.onChange?.(result.profile);
         // Keep the current time so other objects can check that it's synchronized
         this.currentTime = result.profile[0];
         // Return true if ready; false if loading
-        if (result.status === "ready") return true;
-        else return false;
+        if (result.status === "loading") return false;
+        // If finished, 
+        else if (result.status === "finished") {
+            this.isFinished = true;
+        }
+        return true;
     }
 
     public setUniform = (uniform: THREE.ShaderMaterial["uniforms"]) => {
