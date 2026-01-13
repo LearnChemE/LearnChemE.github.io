@@ -13,6 +13,7 @@ import { createProfile } from './ts/calcs'
 import { LoadWheel } from './components/LoadWheel/LoadWheel'
 import { ConcSelector } from './components/ConcSelector/ConcSelector'
 import { Ruler } from './components/Ruler/Ruler'
+import worksheet from "./assets/worksheet.pdf?url";
 
 function App() {
   const [loading, setLoading] = createSignal(true);
@@ -66,7 +67,7 @@ function App() {
       <LoadWheel isLoading={loading} />
 
       {/* Controls */}
-      <HamburgerMenu path="" downloadName="" Directions={DirectionsText} About={AboutText} />
+      <HamburgerMenu path={worksheet} downloadName="bloodCellSedimentationWorksheet.pdf" Directions={DirectionsText} About={AboutText} />
       <ConcSelector showing={concMenuShowing} ics={ics} setIcs={setIcs} resetMessage={mixTrigger} />
       <ControlButton icon="fa-solid fa-magnifying-glass" disabled={animating} active={magnifying} label="magnify particles" top={120} onClick={() => setMagnifying(!magnifying())} />
       <ControlButton icon="fa-solid fa-rotate" label="mix vials" top={190} disabled={animating} onClick={reset} />

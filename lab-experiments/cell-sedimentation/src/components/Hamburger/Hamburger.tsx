@@ -2,6 +2,7 @@ import type { Component } from "solid-js";
 import { createSignal, onMount } from "solid-js";
 import "./Hamburger.css";
 import { Modal } from "../Modal/Modal";
+
 interface WorksheetProps {
     path: string;
     downloadName: string;

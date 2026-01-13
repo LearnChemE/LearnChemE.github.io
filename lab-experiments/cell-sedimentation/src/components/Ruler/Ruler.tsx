@@ -8,7 +8,6 @@ type RulerProps = {
 export const Ruler: Component<RulerProps> = ({ showing }) => {
     const [coords, setCoords] = createSignal({ top: 0, left: 0, scale: 1 });
 
-    let ref!: SVGSVGElement;
     const reposition = () => {
         const cnv = document.getElementById("main-cnv")!;
         const bds = cnv.getBoundingClientRect();
@@ -39,5 +38,4 @@ export const Ruler: Component<RulerProps> = ({ showing }) => {
 </svg>
     </>)
 }
-// style={{"top": `${coords().top}px`, "left": `${coords().left}`, "scale": `${coords().scale}`}}
 
