@@ -88,7 +88,7 @@ export function createMassFlowController(draw, x, y) {
     group.text("mass flow controller")
         .font({ family: 'Arial', size: 14, anchor: 'middle', weight: 'bold' })
         .fill('#000')
-        .center(x + topWidth / 2, y + topHeight + bottomHeight + 15);
+        .center(x + topWidth / 2, y - 15);
 
     
         group.text("mg/min")

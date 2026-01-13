@@ -109,3 +109,8 @@ label {
   padding: 0px;
 }
 
+/* Match slider label fonts to axes labels */
+.input-label, .value-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+}

@@ -9,16 +9,19 @@ const velocityProfiles = [
   {
     id: 'linear-saddle',
     label: 'x eₓ - y eᵧ',
+    latex: String.raw`\vec{v} = x\,\hat{\mathbf{e}}_x - y\,\hat{\mathbf{e}}_y`,
     velocity: (x, y) => ({ u: x, v: -y })
   },
   {
     id: 'linear-source',
     label: 'x eₓ + y eᵧ',
+    latex: String.raw`\vec{v} = x\,\hat{\mathbf{e}}_x + y\,\hat{\mathbf{e}}_y`,
     velocity: (x, y) => ({ u: x, v: y })
   },
   {
     id: 'rotation-cw',
     label: 'y/√(x² + y²) eₓ - x/√(x² + y²) eᵧ',
+    latex: String.raw`\vec{v} = \frac{y}{\sqrt{x^{2}+y^{2}}}\,\hat{\mathbf{e}}_x - \frac{x}{\sqrt{x^{2}+y^{2}}}\,\hat{\mathbf{e}}_y`,
     velocity: (x, y) => {
       const denom = Math.max(Math.hypot(x, y), 1e-6);
       return { u: y / denom, v: -x / denom };
@@ -27,6 +30,7 @@ const velocityProfiles = [
   {
     id: 'rotation-ccw',
     label: 'y/√(x² + y²) eₓ + x/√(x² + y²) eᵧ',
+    latex: String.raw`\vec{v} = \frac{y}{\sqrt{x^{2}+y^{2}}}\,\hat{\mathbf{e}}_x + \frac{x}{\sqrt{x^{2}+y^{2}}}\,\hat{\mathbf{e}}_y`,
     velocity: (x, y) => {
       const denom = Math.max(Math.hypot(x, y), 1e-6);
       return { u: y / denom, v: x / denom };
@@ -34,11 +38,15 @@ const velocityProfiles = [
   },
   {
     id: 'polynomial',
-    label: '(-3/2)x² - (1/3)x³, 3xy + x²y',
-    velocity: (x, y) => ({
-      u: (-3 / 2) * x * x - (1 / 3) * x * x * x,
-      v: 3 * x * y + x * x * y
-    })
+    label: 'x/(x² + y²) eₓ + y/(x² + y²) eᵧ',
+    latex: String.raw`\vec{v} = \frac{x}{x^{2}+y^{2}}\,\hat{\mathbf{e}}_x + \frac{y}{x^{2}+y^{2}}\,\hat{\mathbf{e}}_y`,
+    velocity: (x, y) => {
+      const denom = Math.max(x * x + y * y, 1e-6);
+      return {
+        u: x / denom,
+        v: y / denom
+      };
+    }
   }
 ];
 
@@ -52,7 +60,9 @@ let controlsReady = false;
 let plotlyRoot;
 let plotlyPromise;
 let plotInitialized = false;
+let selectedProfileId = defaults.profileId;
 const elements = {};
+let resizeObserverAttached = false;
 
 export function drawFigure(svg) {
   drawRef = svg;
@@ -70,7 +80,10 @@ export function reset() {
 
 function setupControls() {
   if (controlsReady) return;
-  elements.profileSelect = document.getElementById('profileSelect');
+  elements.profileList = document.getElementById('profileList');
+  elements.plotLayout = document.querySelector('.plot-layout');
+  elements.svgContainer = document.getElementById('svg-container');
+  elements.controlBar = document.getElementById('control-bar');
   elements.xSlider = document.getElementById('xSlider');
   elements.ySlider = document.getElementById('ySlider');
   elements.xValue = document.getElementById('xValue');
@@ -80,29 +93,46 @@ function setupControls() {
   populateProfileOptions();
   syncControls(defaults);
 
-  elements.profileSelect?.addEventListener('change', renderPlot);
   elements.xSlider?.addEventListener('input', renderPlot);
   elements.ySlider?.addEventListener('input', renderPlot);
   elements.flowRadios?.forEach((radio) => {
     radio.addEventListener('change', renderPlot);
   });
+  updatePlotLayoutOffset();
+  if (!resizeObserverAttached) {
+    window.addEventListener('resize', updatePlotLayoutOffset);
+    resizeObserverAttached = true;
+  }
 
   controlsReady = true;
 }
 
 function populateProfileOptions() {
-  if (!elements.profileSelect) return;
-  elements.profileSelect.innerHTML = '';
+  if (!elements.profileList) return;
+  elements.profileList.innerHTML = '';
   velocityProfiles.forEach((profile) => {
-    const option = document.createElement('option');
-    option.value = profile.id;
-    option.textContent = profile.label;
-    elements.profileSelect.appendChild(option);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'profile-list__item';
+    button.dataset.profileId = profile.id;
+    button.innerHTML = `\\(${profile.latex || profile.label}\\)`;
+    button.addEventListener('click', () => {
+      if (selectedProfileId === profile.id) return;
+      selectedProfileId = profile.id;
+      updateProfileSelection();
+      renderPlot();
+    });
+    elements.profileList.appendChild(button);
   });
+  updateProfileSelection();
+  if (window.MathJax?.typesetPromise) {
+    window.MathJax.typesetPromise([elements.profileList]).catch(() => {});
+  }
 }
 
 function syncControls(values) {
-  if (elements.profileSelect) elements.profileSelect.value = values.profileId;
+  selectedProfileId = values.profileId;
+  updateProfileSelection();
   if (elements.xSlider) elements.xSlider.value = values.xCenter;
   if (elements.ySlider) elements.ySlider.value = values.yCenter;
   elements.flowRadios?.forEach((radio) => {
@@ -113,7 +143,7 @@ function syncControls(values) {
 
 function getParams() {
   return {
-    profileId: elements.profileSelect?.value || defaults.profileId,
+    profileId: selectedProfileId || defaults.profileId,
     xCenter: parseFloat(elements.xSlider?.value) || defaults.xCenter,
     yCenter: parseFloat(elements.ySlider?.value) || defaults.yCenter,
     showFlow: document.querySelector('input[name="flowToggle"]:checked')?.value || defaults.showFlow
@@ -126,13 +156,13 @@ function updateOutputs({ xCenter, yCenter }) {
 }
 
 async function renderPlot() {
-  if (!elements.profileSelect) return;
   if (!plotlyRoot) plotlyRoot = document.getElementById('plotly-root');
   const params = getParams();
+  const profile = velocityProfiles.find((item) => item.id === params.profileId) || velocityProfiles[0];
   updateOutputs(params);
 
   if (!plotlyRoot) return;
-  const result = computeField(params);
+  const result = computeField(params, profile);
   if (!result) {
     showPlotPlaceholder('Unable to compute the velocity field.');
     plotInitialized = false;
@@ -148,7 +178,6 @@ async function renderPlot() {
   }
 
   const showFlow = params.showFlow === 'yes';
-  const flows = result.flowRates;
 
   renderPlotlyFigure({
     plotlyLib,
@@ -159,9 +188,9 @@ async function renderPlot() {
   plotInitialized = true;
 }
 
-function computeField(params) {
-  const profile = velocityProfiles.find((item) => item.id === params.profileId) || velocityProfiles[0];
-  const velocityFn = profile.velocity;
+function computeField(params, profile) {
+  const targetProfile = profile || velocityProfiles[0];
+  const velocityFn = targetProfile.velocity;
   const xGrid = linspace(-gridExtent, gridExtent, gridCount);
   const yGrid = linspace(-gridExtent, gridExtent, gridCount);
   const vectors = [];
@@ -181,6 +210,22 @@ function computeField(params) {
 
   const flowRates = computeFlowRates(params, velocityFn);
   return { vectors, maxMagnitude: Math.max(maxMagnitude, 1e-6), flowRates };
+}
+
+function updateProfileSelection() {
+  if (!elements.profileList) return;
+  const buttons = elements.profileList.querySelectorAll('.profile-list__item');
+  buttons.forEach((button) => {
+    button.classList.toggle('profile-list__item--active', button.dataset.profileId === selectedProfileId);
+  });
+}
+
+function updatePlotLayoutOffset() {
+  if (!elements.plotLayout || !elements.svgContainer || !elements.controlBar) return;
+  const containerRect = elements.svgContainer.getBoundingClientRect();
+  const controlRect = elements.controlBar.getBoundingClientRect();
+  const offset = Math.max(controlRect.bottom - containerRect.top + 12, 0);
+  elements.plotLayout.style.setProperty('--plot-top', `${offset}px`);
 }
 
 function computeFlowRates(params, velocityFn) {
@@ -276,21 +321,32 @@ function renderPlotlyFigure({ plotlyLib, params, field, showFlow }) {
 function buildVectorTrace(vectors, maxMagnitude) {
   const x = [];
   const y = [];
-  const scale = (sideLength * 0.6) / maxMagnitude;
-  const arrowSpread = 0.45;
+  const scale = (sideLength * 0.2) / maxMagnitude;
+  const arrowSpread = 0.35;
+  const minArrowLength = sideLength * 0.06;
 
   vectors.forEach(({ x: x0, y: y0, u, v }) => {
-    const dx = u * scale;
-    const dy = v * scale;
-    const x1 = x0 + dx;
-    const y1 = y0 + dy;
+    let dx = u * scale;
+    let dy = v * scale;
+    let x1 = x0 + dx;
+    let y1 = y0 + dy;
     if (!Number.isFinite(x1) || !Number.isFinite(y1)) return;
+
+    let length = Math.hypot(dx, dy);
+    if (length > 0 && length < minArrowLength) {
+      const boost = minArrowLength / length;
+      dx *= boost;
+      dy *= boost;
+      x1 = x0 + dx;
+      y1 = y0 + dy;
+      length = Math.hypot(dx, dy);
+    }
+
     x.push(x0, x1, null);
     y.push(y0, y1, null);
 
-    const length = Math.hypot(dx, dy);
     if (length === 0) return;
-    const headLength = Math.min(length * 0.35, 0.4);
+    const headLength = Math.min(length * 0.3, 0.18);
     const angle = Math.atan2(dy, dx);
     const leftAngle = angle + Math.PI - arrowSpread;
     const rightAngle = angle + Math.PI + arrowSpread;

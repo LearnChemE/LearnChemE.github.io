@@ -1,12 +1,9 @@
 // js/simulation.js
-import { yCO2_out, findAdsorbTime, rampTemperature } from './calc.js'; // Assuming calc.js is in the same directory or adjust path
+import { yCO2_out, rampTemperature } from './calc.js'; // Assuming calc.js is in the same directory or adjust path
 import * as state from './state.js';
 import * as config from './config.js';
 import { updateCO2AnalyzerDisplay } from './components/co2Analyzer.js';
-import { getTankFromMultiValvePosition } from './utils.js';
 import { updateTemperatureDisplay } from './components/therm.js';
-
-var timerID = null;
 
 /**
  * Misleading function name. Updates the tank number with whatever is currently happening.
@@ -17,6 +14,7 @@ export function startMoleFractionCalculation(tankNum) {
   // Stop any existing calculation first
   // stopMoleFractionCalculation();
 
+  console.trace("triggered")
   let y; // Initial mole fraction at the *inlet* of the bed for this run
   let currentDesorbingState = false;
   let initialTimeOffset = 0;
@@ -106,14 +104,13 @@ export function startMoleFractionCalculation(tankNum) {
 
         state.setOutletMoleFraction(y_out);
       }
-      else if (flowCfg === state.FLOW_BYPASS) {
-        state.setOutletMoleFraction(y);
-      }
       else {
-        state.setOutletMoleFraction(0);
+        console.log("good ending")
+        state.setOutletMoleFraction(y);
       }
     }
     else {
+      console.log("bad ending")
       state.setOutletMoleFraction(0.0);
     }
 

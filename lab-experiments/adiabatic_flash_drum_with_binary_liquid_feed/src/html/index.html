@@ -31,16 +31,25 @@
       <div id="fill-tank" class="btn btn-success">fill tank</div>
       <div id="empty-tank" class="btn btn-info">empty tank</div>
       <div id="hamburger">
-        <div id="hamburger-icon"></div>
+        <div id="hamburger-btn" class="menu-btn">
+            <i class="fas fa-bars"></i>
+        </div>
         <div id="controls">
+          <div id="button-header">
+            <button type="button" class="btn-close" aria-label="Close">
+              <span aria-hidden="true"></span>
+            </button>
+          </div>
           <div id="buttons">
-            <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
-              Directions
+            <div type="button" class="btn btn-primary menu-item" data-bs-toggle="modal" data-bs-target="#directions-modal">
+              <i class="fa-solid fa-book"></i><span>Directions</span>
             </div>
-            <div type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">
-              About
+            <div type="button" class="btn btn-primary menu-item" data-bs-toggle="modal" data-bs-target="#about-modal">
+              <i class="fa-solid fa-info-circle"></i><span>About</span>
             </div>
-            <a href="./assets/adiabatic_flash_drum_with_binary_liquid_feed_worksheet.pdf" class="btn btn-primary" id="worksheet" download>Worksheet</a>
+            <a href="./assets/adiabatic_flash_drum_with_binary_liquid_feed_worksheet.pdf" class="btn btn-primary menu-item" id="worksheet" download>
+              <i class="fa-solid fa-download"></i><span>Worksheet</span>
+            </a>
             <div id="controls-active-label">Tank is empty. You may now change the composition of the mixture.</div>
             <div class="slider-container">
               <div id="z-slider-label" class="slider-label">x<sub>F</sub> (chemical 1)</div>
@@ -57,7 +66,7 @@
               </select>
             </div>
             <div id="antoine-table">
-              <div class="table-label">Antoine Coefficients</div>
+              <div class="table-label">Antoine coefficients for pressure in mm Hg</div>
               <table>
                 <tr>
                   <th>compound</th>

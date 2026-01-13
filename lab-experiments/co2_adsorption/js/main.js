@@ -14,6 +14,20 @@ import { createVentArrow } from './components/ventArrow.js';
 import { addOptionToDragAndZoom } from './zoom.js';
 import { createThermister } from './components/therm.js';
 
+export const zoomLabelX = 740, zoomLabelY = 190;
+export const betaLabelX = 810, betaLabelY = 485;
+
+// Define other component coordinates (matching those used in pipes.js)
+const mfcX = 319; const mfcY = 22;
+const outletValveX = 510; const outletValveY = 250;
+export const digPressureGaugeX = 565, digPressureGaugeY = 530;
+const adsorptionBedX = 650; const adsorptionBedY = 330;
+const tValveX = 580, tValveY = 220;
+const co2AnalyzerX = 700, co2AnalyzerY = 50;
+const thermX = 800; const thermY = 380;
+const vent2BaseX = 875; const vent2BaseY = 85; // Base position for arrow placement
+
+
 // --- Global Canvas Setup ---
 let windowWidth = window.innerWidth - 60;
 let windowHeight = windowWidth * config.canvasHeight / config.canvasWidth;
@@ -28,7 +42,7 @@ draw.attr('preserveAspectRatio', 'xMidYMid meet');
 let pipeGroup = draw.group(); // Group for static pipes
 
 // --- Updated Initial Drawing Function ---
-function drawCanvas() {
+export function drawCanvas() {
     console.log("Drawing canvas components..."); // Add log
 
     // --- 1. Calculate Key Positions ---
@@ -43,18 +57,6 @@ function drawCanvas() {
 
     const verticalValveTotalHeightActual = config.verticalValveBlockHeight * 2 + config.verticalValveBodyHeight;
     const pv_y = gaugeY - config.connectedGaugeVerticalOffset - config.valveOnGaugesGapBetween - verticalValveTotalHeightActual + 27; // Position above hexagon
-
-    // Define other component coordinates (matching those used in pipes.js)
-    const mfcX = 350; const mfcY = 0;
-    const outletValveX = 475; const outletValveY = 87.5;
-    const digPressureGaugeX = 550; const digPressureGaugeY = 55;
-    const adsorptionBedX = 550; const adsorptionBedY = 150;
-    const adsorptionOutletValveX = 600; const adsorptionOutletValveY = 400;
-    const tValveX = 634.5; const tValveY = 370;
-    const co2AnalyzerX = 700; const co2AnalyzerY = 450;
-    const thermX = 700; const thermY = 200;
-    const vent1BaseX = 465; const vent1BaseY = 5; // Base position for arrow placement
-    const vent2BaseX = 870; const vent2BaseY = 485; // Base position for arrow placement
 
     // --- 2. Create ALL Static Components FIRST ---
 
@@ -88,7 +90,7 @@ function drawCanvas() {
     createVerticalValve(draw, pv3_x, pv_y, 'pressureValve3'); // Use same Y
 
     // First valve
-    createInteractiveValve(draw, "tankValve", multiValveX, multiValveY, [180, 0, 90], (angle) => {    
+    createInteractiveValve(draw, "tankValve", multiValveX, multiValveY, [180, 0, 90], (angle) => {
         state.setCurrentMultiValvePosition(angle); // Update global state
         checkAndStartMFCFlow(draw);
     });
@@ -104,12 +106,9 @@ function drawCanvas() {
     createVerticalAdsorptionBedView(draw, adsorptionBedX, adsorptionBedY);
 
     // Create Inlet Valve - between MFC and Bed
-    createInteractiveValve(draw, "inletValve", outletValveX, outletValveY, [0, 90, -90], (angle) => {
+    createInteractiveValve(draw, "inletValve", outletValveX, outletValveY, [0, 90], (angle) => {
         let path;
         switch(angle) {
-            case -90:
-                path = state.FLOW_VENT;
-                break;
             case   0:
                 path = state.FLOW_BED;
                 break;
@@ -118,10 +117,10 @@ function drawCanvas() {
                 break;
         }
         state.setFlowConfig(path);
-        playValve2Animation(draw);
+        if (state.getFlowPath("mfc_inlet") !== undefined) playValve2Animation(draw);
     });
     // Create Outlet Valve - after Bed
-    createInteractiveValve(draw, "outletValve", adsorptionOutletValveX, adsorptionOutletValveY, [0], undefined, true); // true = isThreeValve
+    // createInteractiveValve(draw, "outletValve", adsorptionOutletValveX, adsorptionOutletValveY, [0], undefined, true); // true = isThreeValve
 
     // Create T-Valve / Back Pressure Regulator
     createTValve(draw, tValveX, tValveY);
@@ -133,7 +132,6 @@ function drawCanvas() {
     createThermister(draw, thermX, thermY);
 
     // Create Vent Arrows
-    createVentArrow(draw, vent1BaseX + 5, vent1BaseY - 2, 270, 40); // Vent 1 (Top)
     createVentArrow(draw, vent2BaseX, vent2BaseY, 0, 40);  // Vent 2 (Right)
 
     // --- 3. Draw Pipes connecting the components ---

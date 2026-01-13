@@ -1,4 +1,3 @@
-import Hamburger from "../assets/hamburger.svg";
 import { calcAll, setDefaults } from "./calcs";
 
 export function handleInputs() {
@@ -237,44 +236,15 @@ function initializeDropdown() {
 
 function handleHamburger() {
   const hamburger = document.getElementById("hamburger");
-  const hamburgerIcon = document.getElementById("hamburger-icon");
-  const buttons = document.getElementById("buttons");
-
-  hamburgerIcon.style.transitionProperty = "background-color";
-  hamburgerIcon.style.transitionDuration = "0.5s";
-  const glowInterval = setInterval(() => {
-    if (!state.hamburgerHasBeenClicked) {
-      hamburgerIcon.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
-      setTimeout(() => {
-        hamburgerIcon.style.backgroundColor = "";
-      }, 800);
-    } else {
-      hamburgerIcon.style.backgroundColor = "";
-      hamburgerIcon.style.transitionProperty = "";
-      hamburgerIcon.style.transitionDuration = "";
-      clearInterval(glowInterval);
-    }
-  }, 1600);
+  const hamburgerIcon = document.getElementById("hamburger-btn");;
+  const buttons = document.getElementById("controls");
 
   hamburger.addEventListener("click", (e) => {
     if (
-      e.target.id !== "controls" &&
-      e.target.id !== "buttons" &&
-      !e.target.classList.contains("btn") &&
-      !e.target.classList.contains("dropdown-label") &&
-      !e.target.classList.contains("slider-label") &&
-      !e.target.classList.contains("slider-value") &&
-      !e.target.classList.contains("slider-container") &&
-      e.target.id !== "z-slider" &&
-      e.target.id !== "mixture-dropdown" &&
-      e.target.id !== "antoine-table" &&
-      e.target.tagName !== "TABLE" &&
-      e.target.tagName !== "TR" &&
-      e.target.tagName !== "TD" &&
-      e.target.tagName !== "TH" &&
-      !e.target.classList.contains("table-label")
+      !buttons.contains(e.target) || e.target.classList.contains("btn-close")
     ) {
       if (state.showButtons) {
+        console.log("hiding from 1")
         buttons.style.display = "none";
         state.showButtons = false;
         hamburgerIcon.classList.remove("active");
@@ -288,64 +258,51 @@ function handleHamburger() {
     }
   });
 
-  document.addEventListener("click", (e) => {
-    if (
-      e.target.id !== "controls" &&
-      e.target.id !== "buttons" &&
-      !e.target.classList.contains("btn") &&
-      e.target.id !== "hamburger" &&
-      e.target.id !== "hamburger-icon" &&
-      e.target.id !== "hamburger-svg" &&
-      e.target.id !== "z-slider" &&
-      e.target.id !== "mixture-dropdown" &&
-      e.target.id !== "antoine-table" &&
-      e.target.tagName !== "path" &&
-      e.target.tagName !== "TABLE" &&
-      e.target.tagName !== "TR" &&
-      e.target.tagName !== "TD" &&
-      e.target.tagName !== "TH" &&
-      !e.target.classList.contains("modal") &&
-      !e.target.classList.contains("modal-dialog") &&
-      !e.target.classList.contains("modal-content") &&
-      !e.target.classList.contains("modal-body") &&
-      !e.target.classList.contains("modal-header") &&
-      !e.target.classList.contains("dropdown-label") &&
-      !e.target.classList.contains("slider-label") &&
-      !e.target.classList.contains("slider-value") &&
-      !e.target.classList.contains("table-label") &&
-      !e.target.classList.contains("slider-container")
-    ) {
-      if (e.target.tagName !== "HTML") {
-        if (!e.target.parentElement.classList.contains("modal-body") &&
-          !e.target.parentElement.classList.contains("modal-header") &&
-          !e.target.classList.contains("dropdown-label") &&
-          !e.target.classList.contains("slider-label") &&
-          !e.target.classList.contains("slider-value") &&
-          !e.target.classList.contains("slider-container") &&
-          e.target.id !== "z-slider" &&
-          e.target.id !== "mixture-dropdown" &&
-          e.target.id !== "antoine-table" &&
-          e.target.tagName !== "TABLE" &&
-          e.target.tagName !== "TR" &&
-          e.target.tagName !== "TD" &&
-          e.target.tagName !== "TH" &&
-          !e.target.classList.contains("table-label")
-        ) {
-          buttons.style.display = "none";
-          state.showButtons = false;
-          hamburgerIcon.classList.remove("active");
-        }
-      } else {
-        buttons.style.display = "none";
-        state.showButtons = false;
-        hamburgerIcon.classList.remove("active");
-      }
-    }
-  });
+  // Make the DIV element draggable:
+  dragElement(buttons, document.getElementById("button-header"));
 }
 
 function initializeHamburger() {
-  const hamburgerContainer = document.getElementById("hamburger-icon");
-  hamburgerContainer.innerHTML = Hamburger;
   handleHamburger();
+}
+
+function dragElement(elmnt, header) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (header) {
+    // if present, the header is where you move the DIV from:
+    header.onmousedown = dragMouseDown;
+  } else {
+    // otherwise, move the DIV from anywhere inside the DIV:
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    // stop moving when mouse button is released:
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
 }

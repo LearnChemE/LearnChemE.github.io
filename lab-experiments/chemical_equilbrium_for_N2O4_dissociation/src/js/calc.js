@@ -59,6 +59,7 @@ function solveConstantVolume(weight_g, tempC, opts = {}) {
 }
 
 function solveConstantPressure(weight_g, tempC, opts = {}) {
+  // console.trace("Calculations")
   const {
     P = DEFAULT_PRESSURE_BAR,
     A = DEFAULT_LN_KP_A,

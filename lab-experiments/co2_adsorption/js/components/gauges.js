@@ -1,5 +1,6 @@
 // js/components/gauges.js
 import * as config from '../config.js';
+import { digPressureGaugeX, digPressureGaugeY } from '../main.js';
 import * as state from '../state.js'; // Import state module
 import { showGaugeInput } from '../uiInteractions.js'; // Import UI function
 import { writeTextAtPosition } from '../uiInteractions.js';
@@ -36,7 +37,7 @@ function createPressureGaugeView(draw, x, y) {
                 L ${x + needleWidth/2} ${y} Z`)
     .fill('black')
     .transform({ rotate: 45, cx: x, cy: y }); // Example rotation
-  writeTextAtPosition(550, 25, "bar");
+  writeTextAtPosition(digPressureGaugeX, digPressureGaugeY - 30, "bar");
   return group;
 }
 

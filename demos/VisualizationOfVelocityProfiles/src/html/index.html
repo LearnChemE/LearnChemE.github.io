@@ -49,13 +49,6 @@
       </div>
 
       <div id="control-bar" class="control-bar controls-container slider-controls" data-no-pan="true">
-        <div class="control-group control-group--select">
-          <label for="profileSelect">
-            velocity profile (m/s)
-          </label>
-          <select id="profileSelect" class="form-select form-select-sm"></select>
-        </div>
-
         <div class="slider-group slider-container slider-group--x">
           <label for="xSlider">
             x<sub>center</sub> (m)
@@ -75,9 +68,16 @@
             <span id="yValue" class="slider-value slider-value--y">0.00</span>
           </div>
         </div>
-
-        <div class="control-group radio-group">
-          <span>show flow rates (m²/s)</span>
+      </div>
+    </div>
+    <div class="plot-layout" data-no-pan="true">
+      <div class="plot-side-panel">
+        <div class="plot-side-panel__section">
+          <span class="plot-side-panel__title">Velocity Profile (m/s)</span>
+          <div id="profileList" class="profile-list"></div>
+        </div>
+        <div class="plot-side-panel__section">
+          <span class="plot-side-panel__title">Show Flow Rates (m²/s)</span>
           <div class="radio-options">
             <label>
               <input type="radio" name="flowToggle" value="yes" checked />
@@ -89,10 +89,11 @@
             </label>
           </div>
         </div>
-
+      </div>
+      <div class="plot-column">
+        <div id="plotly-root" class="plotly-container"></div>
       </div>
     </div>
-    <div id="plotly-root" class="plotly-container" data-no-pan="true"></div>
   </div>
   
   <div id="overlayContainer"></div>

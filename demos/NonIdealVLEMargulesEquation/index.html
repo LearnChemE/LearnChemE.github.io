@@ -1,0 +1,283 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Update everything below THIS -->
+  <meta name="description" content="Non-Ideal Vapor-Liquid Equilibrium (VLE) Modeled by the Margules Equation">
+  <meta name="keywords" content="simulation, engineering, interactive">
+  <meta name="author" content="Jackson Dunlap">
+
+  <title>Non-Ideal Vapor-Liquid Equilibrium (VLE) Modeled by the Margules Equation</title>
+  <!-- and above THIS -->
+
+  <!-- MathJax Settings -->
+  <script>
+    MathJax = {
+      chtml: {
+        scale: 0.95,
+        mathmlSpacing: true, // true for MathML spacing rules, false for TeX rules
+        displayAlign: 'left', // default for indentalign when set to 'auto'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- p5.js -->
+  <script type="text/javascript" src="./js/p5.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="./style/style.css">
+  <link rel="stylesheet" href="./style/slider.css">
+
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="./style/bootstrap-custom.css">
+  <script src="./js/bootstrap.min.js"></script>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-204988035-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-204988035-3');
+  </script>
+</head>
+
+<body>
+  <!-- The controls-area is at the top of the simulation, and contains all buttons, sliders, and dropdowns -->
+  <div class="controls-area">
+    <div id="controls-wrapper">
+      <div id=top-row>
+        <div id="selection-row">
+          <div class="buttons-row-wrapper">
+            <div class="btn-group-label">diagram</div>
+            <div class="btn-group" role="group" id="plot-type">
+              <input type="radio" class="btn-check" name="plot" id="r-P-x-y" value="P-x-y" autocomplete="off" checked>
+              <label class="btn btn-outline-primary btn-sm" for="r-P-x-y"><i>P-x-y</i></label>
+
+              <input type="radio" class="btn-check" name="plot" id="r-T-x-y" value="T-x-y" autocomplete="off" />
+              <label class="btn btn-outline-primary btn-sm" for="r-T-x-y"><i>T-x-y</i></label>
+            </div>
+          </div>
+
+          <div class="buttons-row-wrapper">
+            <div class="btn-group-label">deviation from Raoult's law</div>
+            <div class="btn-group" role="group" id="plot-type">
+              <input type="radio" class="btn-check" name="deviation" id="r-positive" value="positive" autocomplete="off"
+                checked>
+              <label class="btn btn-outline-primary btn-sm" for="r-positive">positive</label>
+
+              <input type="radio" class="btn-check" name="deviation" id="r-negative" value="negative"
+                autocomplete="off" />
+              <label class="btn btn-outline-primary btn-sm" for="r-negative">negative</label>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-buttons-row">
+          <div id="directions-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#directions-modal">
+            Directions</div>
+          <div id="details-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#details-modal">
+            Details
+          </div>
+          <div id="about-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#about-modal">About
+          </div>
+        </div>
+      </div>
+      <div id="bottom-row">
+        <div class="slider-wrapper" id="positive-slider-wrapper">
+          <div class="data-name" id="A21-slider-name">A<sub>21</sub> </div>
+          <input type="range" id="A21-slider" min="0" max="2" step="0.1" value="0.0">
+          <div class="data-value" id="A21-value">0.0</div>
+          <div class="data-metric"></div>
+
+          <div class="data-name">A<sub>12</sub></div>
+          <input type="range" id="A12-slider" min="0" max="2" step="0.1" value="0.0">
+          <div class="data-value" id="A12-value">0.0</div>
+          <div class="data-metric"></div>
+        </div>
+        <div class="slider-wrapper" id="negative-slider-wrapper">
+          <div class="data-name" id="A21-slider-name">A<sub>21</sub> </div>
+          <input type="range" id="A21-slider" min="0" max="2" step="0.1" value="0.0">
+          <div class="data-value" id="A21-value">0.0</div>
+          <div class="data-metric"></div>
+
+          <div class="data-name">A<sub>12</sub></div>
+          <input type="range" id="A12-slider" min="0" max="2" step="0.1" value="0.0">
+          <div class="data-value" id="A12-value">0.0</div>
+          <div class="data-metric"></div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <div id="p5-container">
+  </div>
+
+  <!--
+    Everything below here are modals, which are hidden by default. Any content
+    within the modals should be wrapped in a div with the class "modal-content".
+  -->
+  <div class="modal fade" id="directions-modal" tabindex="-1" role="dialog" aria-labelledby="directions-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="directions-modal-label">Directions</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            P-x-y and T-x-y diagrams are generated for one mole of a binary mixture in vapor-liquid equilibrium (VLE).
+            The P-x-y diagram is shown at a temperature of 110 °C, and the T-x-y diagram is shown at a pressure of 1.6
+            bar. The solid blue curve represents the liquid-phase boundary (bubble point) and the solid green curve
+            represents the vapor-phase boundary (dew point). The bar chart displays the moles of liquid (blue) and vapor
+            (green) in equilibrium and the mole fraction of component 1 in each phase (x1for liquid, y1 for vapor); the
+            relative amounts are calculated using the lever rule. Click and drag the black dot on the diagrams to change
+            the mole fraction of component 1 and the temperature (on T-x-y diagram) or pressure (on P-x-y diagram).
+            The non-ideal liquid mixture is modeled using the two-parameter Margules model. The interaction between the
+            two components can be attractive (where attractive interactions between components 1 and 2 are stronger than
+            the average of the pure-component interactions); this results in negative deviations from Raoult's law. The
+            interaction can be repulsive (where attractive interactions between components 1 and 2 are weaker than the
+            average of pure-component interactions); this results in positive deviations from Raoult's law. Use sliders
+            to change the degree of interaction by changing the Margules parameters (A12 and A21), which are used to
+            calculate the activity coefficients. When the Margules parameters are zero, the liquid solution is ideal and
+            the activity coefficients equal 1. When the activity coefficients deviate significantly from 1, the system
+            has an azeotrope. Zoom with the scroll wheel.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="details-modal" tabindex="-1" role="dialog" aria-labelledby="details-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="details-modal-label">Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <p>
+            The saturation pressure of component \(i = (1, 2)\) is calculated using the Antoine eequation:
+          </p>
+
+          <p>
+            $$ P_i^{sat} = 10^{A_i - \frac{B_i}{T+C_i}}$$
+          </p>
+
+          <p>
+            where /(P_i^{sat}/) is saturation pressure of component \(i=1, 2 (bar)\), \(A_{i}\), \(B_{i}\), and
+            \(C_{i}\) are Antoine constants,
+            and \(T\) is temperature (°C).
+          </p>
+
+          <p>The two-parameter Margueles model is used to calculate the activity coefficients for a non-ideal liquid
+            mixture of components 1 and 2. This model fits the excess Gibbs free energy:</p>
+
+          <p>
+            $$ \frac{G^E}{RT} = x_{1}x_{2}(A_{21}x_{1} + A_{12}x_{2}),$$
+          </p>
+
+          <p>
+            where \(G^E\) is excess Gibbs energy, and \(R\) is the ideal gas constant.
+          </p>
+
+          <p>
+            the activity coefficients \(\gamma_1, \gamma_2\) are given by:
+          </p>
+
+          <p>
+            $$ln \gamma_1 = x_2^2(A_{12} + 2(A_{21} - A_{12})x_1),$$
+            $$ln \gamma_1 = x_1^2(A_{21} + 2(A_{12} - A_{21})x_1),$$
+          </p>
+
+          <p>
+            where \(x_1\) and \(x_2\) are the liquid mole fractions of components 1 and 2 and \(x_1 + x_2 = 1\), and
+            \(A_{21}\) and \(A_{12}\) are the Margules parameters.
+          </p>
+
+          <p>
+            The modified Raoult's law is used to calculate the bubble-point and dew point pressures using the \(K\)
+            factors:
+          </p>
+
+          <p>
+            $$ K_i = \frac{y_i}{x_i} = \gamma_i\frac{P_i^{sat}}{P}$$
+          </p>
+
+          <p>
+            where \(y_i\) is the vapor mole fraction and \(y_1 + y_2 = 1\), and \(P\) is the total pressure (bar)
+          </p>
+
+          <p>
+            Bubble-point pressure calculation:
+          </p>
+
+          <p>
+            $$P = x_1\gamma_1P_1^{sat} + x_2\gamma_2P_2^{sat}$$
+          </p>
+
+          <p>
+            Dew-point pressure calculation:
+          </p>
+
+          <p>
+            $$P = \left(\frac{y_1}{\gamma_1P_1*sat} + \frac{y_2}{\gamma_2P_2^sat}\right)^{-1}.$$
+          </p>
+
+          <p>
+            Reference
+          </p>
+          <p>
+          <ol class="references">
+            <li>
+              J. R. Elliott and C. T. Lira, Introductory Chemical Engineering Thermodynamics, New York: Prentice Hall,
+              2012 pp. 372-377, 430.
+            </li>
+          </ol>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="about-modal-label">About</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This simulation was created in the <a href="https://www.colorado.edu/chbe" target="_blank">Department of
+              Chemical and Biological Engineering</a>, at University of Colorado Boulder for <a
+              href="http://www.learncheme.com" target="_blank">LearnChemE.com</a> by Jackson Dunlap under the direction
+            of Professor John L. Falconer and Michelle Medlin. It is a JavaScript/HTML5 implementation of a <a
+              href="https://demonstrations.wolfram.com/NonIdealVaporLiquidEquilibriumVLEModeledByTheMargulesEquatio/">Mathematica
+              simulation</a> by Rachael L. Baumann. It was prepared with financial support from the National Science
+            Foundation (DUE 2336987 and 2336988) in collaboration with Washington State University. Address any
+            questions or comments to LearnChemE@gmail.com.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+
+</html>
