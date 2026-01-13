@@ -1,5 +1,4 @@
 #include "sediment.h"
-#include <iostream>
 
 SedimentSolver::SedimentSolver(double xr0, double xw0) {
     initialize(xr0, xw0);

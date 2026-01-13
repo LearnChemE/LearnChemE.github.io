@@ -113,7 +113,7 @@ export class Vial {
         const i0 = Math.floor(y);
         if (i0 >= 499) return getPInfoAtIndex(cur, 499);
 
-
+        // Linear interpolation
         const xr = (i0 + 1 - y) * cur[i0 + 2]   + (y - i0) * cur[i0 + 3];
         const xw = (i0 + 1 - y) * cur[i0 + 502] + (y - i0) * cur[i0 + 503];
         return makePInfoFromConc(xr, xw);

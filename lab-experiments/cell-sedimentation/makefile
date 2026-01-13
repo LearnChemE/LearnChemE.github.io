@@ -24,7 +24,7 @@ WASM_OBJS  := $(filter-out $(SOURCE_DIR)/test.wasm.o, $(WASM_OBJS))
 LIBS = -lm #-pthread -fopenmp
 
 # Emscripten flags
-CFLG = -g -Wall --emit-tsd sediment.d.ts
+CFLG = -O3 -Wall --emit-tsd sediment.d.ts
 SFLG = --bind \
 	-s EXPORT_ES6=1 \
 	-s EXPORT_NAME=createSedimentModule \

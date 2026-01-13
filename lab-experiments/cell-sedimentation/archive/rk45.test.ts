@@ -1,6 +1,6 @@
 import { describe, it } from "vitest";
 import rk45 from "./rk45";
-import { plotArrs } from "../setupTests";
+import { plotArrs } from "../src/setupTests";
 
 describe("rk45 solver tests", () => {
     it("plots e^t", async () => {

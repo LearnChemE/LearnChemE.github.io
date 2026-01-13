@@ -160,7 +160,7 @@ export class Presenter {
 
         return {
             status: this.finished ? "finished" : "ready",
-            profile: this.current.slice()
+            profile: this.current
         };
     }
 
