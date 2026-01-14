@@ -37,7 +37,7 @@ function createPressureGaugeView(draw, x, y) {
                 L ${x + needleWidth/2} ${y} Z`)
     .fill('black')
     .transform({ rotate: 45, cx: x, cy: y }); // Example rotation
-  writeTextAtPosition(digPressureGaugeX, digPressureGaugeY - 30, "bar");
+
   return group;
 }
 
@@ -159,5 +159,8 @@ export function createDigitalPressureGauge(draw, x, y, pressure = "--- bar") {
     .stroke({ color: '#444', width: 1 })
     .move(connectorX, connectorY);
 
+  writeTextAtPosition(digPressureGaugeX, digPressureGaugeY - 30, "bar");
+  writeTextAtPosition(400, 300, "click on a regulator"); // Instruction text
+  writeTextAtPosition(400, 320, "to set pressure");
   return group;
 }

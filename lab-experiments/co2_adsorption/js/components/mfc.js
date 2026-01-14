@@ -86,13 +86,13 @@ export function createMassFlowController(draw, x, y) {
         .move(x, y + topHeight);
 
     group.text("mass flow controller")
-        .font({ family: 'Arial', size: 14, anchor: 'middle', weight: 'bold' })
+        .font({ family: 'Arial', size: 14, anchor: 'middle', weight: 'regular' })
         .fill('#000')
         .center(x + topWidth / 2, y - 15);
 
     
         group.text("mg/min")
-        .font({ family: 'Arial', size: 16, anchor: 'middle', weight: 'bold' })
+        .font({ family: 'Arial', size: 16, anchor: 'middle', weight: 'regular' })
         .fill('#000')
         .center(x + topWidth / 2, y + topHeight + bottomHeight - 10);
 
