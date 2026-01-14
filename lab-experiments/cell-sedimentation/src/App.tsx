@@ -63,7 +63,7 @@ function App() {
       {/* Canvas */}
       <ThreeCanvas onUniformPreparation={vials.attachUniforms} drag={magnifying} mixTrigger={mixTrigger} onAnimationEnd={onAnimationEnd} />
       <Ruler showing={() => !animating()} />
-      <Magnifier magnifying={magnifying} particleInfo={vials.getParticleInfo} />
+      <Magnifier magnifying={magnifying} particleInfo={vials.getParticleInfo} paused={pause} />
       <LoadWheel isLoading={loading} />
 
       {/* Controls */}

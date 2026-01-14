@@ -7,9 +7,10 @@ import type { MagnifierParticleInfo } from "../../types/globals";
 interface MagnifierProps {
     magnifying: Accessor<boolean>;
     particleInfo: (v: number, y: number) => MagnifierParticleInfo;
+    paused?: Accessor<boolean>;
 }
 
-export const Magnifier: Component<MagnifierProps> = ({ magnifying, particleInfo }) => {
+export const Magnifier: Component<MagnifierProps> = ({ magnifying, particleInfo, paused }) => {
     const [pInfo, setPInfo] = createSignal({ num: 0, fracR: 0, rVel: 0, wVel: 0 });
     const [coord, setCoord] = createSignal({ x: 0, y: 0 });
 
@@ -46,7 +47,7 @@ export const Magnifier: Component<MagnifierProps> = ({ magnifying, particleInfo 
 
     return (<>
         { magnifying() && <div class="lens" style={`left: ${coord().x}%; top: ${coord().y}px`}>
-            <MagnifierCanvas particleInfo={pInfo} showing={magnifying} />
+            <MagnifierCanvas particleInfo={pInfo} showing={magnifying} paused={paused} />
         </div> }
     </>);
 }

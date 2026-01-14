@@ -2,16 +2,20 @@ import { onCleanup, onMount, type Accessor } from "solid-js";
 import * as THREE from "three";
 import type { MagnifierParticleInfo } from "../../types/globals";
 import { createParticleGeometry, createParticleMaterial } from "../../ts/materials";
+import { animate } from "../../ts/helpers";
 
-type Props = {
+type MagnifierCanvasProps = {
     particleInfo: Accessor<MagnifierParticleInfo>;
     showing: Accessor<boolean>;
     count?: number;
+    paused?: Accessor<boolean>;
 };
 
-export default function MagnifierCanvas(props: Props) {
+export default function MagnifierCanvas(props: MagnifierCanvasProps) {
     let canvasRef!: HTMLCanvasElement;
     const count = props.count ?? 2000;
+
+    const paused = props.paused ?? (() => false);
 
     onMount(() => {
         if (!canvasRef) return;
@@ -50,11 +54,11 @@ export default function MagnifierCanvas(props: Props) {
         window.addEventListener("resize", resize);
 
         // Simple animation
-        const clock = new THREE.Clock();
-        let raf = 0;
-        function animate() {
-            if (props.showing()) {
-                const t = clock.getElapsedTime();
+        let playing = true;
+        let t = 0;
+        const frame = (dt: number) => {
+            if (props.showing() && !paused()) {
+                t += dt;
                 material.uniforms.time.value = t;
                 // Set uniforms
                 const pInfo = props.particleInfo();
@@ -74,13 +78,13 @@ export default function MagnifierCanvas(props: Props) {
                 renderer.render(scene, camera);
 
             }
-            raf = requestAnimationFrame(animate);
+            return playing;
         }
-        raf = requestAnimationFrame(animate);
+        animate(frame);
 
         // Cleanup
         onCleanup(() => {
-            cancelAnimationFrame(raf);
+            playing = false;
             window.removeEventListener("resize", resize);
             geometry.dispose();
             material.dispose();
