@@ -8,6 +8,7 @@ const constants = {
   rho: 997,
   inletRadius: 1,
   arrowScale: 0.5,
+  minArrowLength: 0.15,
   baseBounds: {
     minX: -3,
     maxX: 3,
@@ -126,11 +127,11 @@ async function renderPlot() {
 }
 
 function buildFigure(model) {
-  const baseBounds = constants.baseBounds;
+  const bounds = computeBounds(model);
   const fluidPolygon = getFluidPolygon(model);
   const wallCoords = getWallCoordinates(model);
-  const xRange = zoomedRange(baseBounds.minX, baseBounds.maxX, 0.05, 0.8);
-  const yRange = zoomedRange(baseBounds.minY, baseBounds.maxY, 0.05, 0.8);
+  const xRange = zoomedRange(bounds.minX, bounds.maxX, 0.05, 0.8);
+  const yRange = zoomedRange(bounds.minY, bounds.maxY, 0.05, 0.8);
 
   const fluidTrace = {
     type: 'scatter',
@@ -226,38 +227,43 @@ function getWallCoordinates(model) {
 }
 
 function buildAnnotations(model) {
-  const arrowScale = constants.arrowScale;
   const R1 = constants.inletRadius;
   const { diameters, velocities, pressure } = model;
+  const inletArrowLength = getArrowLength(velocities.inlet);
+  const leftArrowLength = getArrowLength(velocities.left);
+  const rightArrowLength = getArrowLength(velocities.right);
 
   const entries = [
     {
       text: `p<sub>air</sub><br>U<sub>3</sub> = ${formatNumber(velocities.right, 1)} m/s`,
       start: { x: 1 + R1, y: 1 + diameters.left - diameters.right / 2 },
-      end: { x: 1 + R1 + velocities.right * arrowScale, y: 1 + diameters.left - diameters.right / 2 },
-      xanchor: 'left',
-      yanchor: 'bottom',
-      align: 'left'
+      end: { x: 1 + R1 + rightArrowLength, y: 1 + diameters.left - diameters.right / 2 },
+      textPosition: {
+        x: 1 + R1 + rightArrowLength / 2,
+        y: 1 + diameters.left - diameters.right / 2 + 0.25
+      }
     },
     {
       text: `p<sub>air</sub><br>U<sub>2</sub> = ${formatNumber(velocities.left, 1)} m/s`,
       start: { x: -1 - R1, y: 1 + diameters.left / 2 },
-      end: { x: -1 - R1 - velocities.left * arrowScale, y: 1 + diameters.left / 2 },
-      xanchor: 'right',
-      yanchor: 'bottom',
-      align: 'right'
+      end: { x: -1 - R1 - leftArrowLength, y: 1 + diameters.left / 2 },
+      textPosition: {
+        x: -1 - R1 - leftArrowLength / 2,
+        y: 1 + diameters.left / 2 + 0.25
+      }
     },
     {
       text: `p<sub>1</sub> = ${formatNumber(pressure, 1)} kPa<br>U<sub>1</sub> = ${formatNumber(velocities.inlet, 1)} m/s`,
-      start: { x: 0, y: 0 },
-      end: { x: 0, y: -velocities.inlet * arrowScale },
-      xanchor: 'left',
-      yanchor: 'top',
-      align: 'left'
+      start: { x: 0, y: -inletArrowLength },
+      end: { x: 0, y: 0 },
+      textPosition: {
+        x: 0.3,
+        y: -0.3
+      }
     }
   ];
 
-  return entries.map((entry) => ({
+  const arrows = entries.map((entry) => ({
     x: entry.end.x,
     y: entry.end.y,
     ax: entry.start.x,
@@ -266,20 +272,36 @@ function buildAnnotations(model) {
     yref: 'y',
     axref: 'x',
     ayref: 'y',
-    text: entry.text,
     showarrow: true,
     arrowhead: 3,
     arrowcolor: '#111',
     arrowwidth: 2,
     arrowsize: 1,
     standoff: 4,
-    bgcolor: 'rgba(255,255,255,0.95)',
-    font: { size: 14, color: '#111' },
-    borderpad: 4,
-    xanchor: entry.xanchor,
-    yanchor: entry.yanchor,
-    align: entry.align || 'left'
+    arrowposition: 1,
+    xanchor: 'center',
+    yanchor: 'middle',
+    opacity: 1,
+    hovertext: entry.text,
+    hoverinfo: 'text'
   }));
+
+  const labels = entries.map((entry, index) => ({
+    x: entry.textPosition.x,
+    y: entry.textPosition.y,
+    xref: 'x',
+    yref: 'y',
+    showarrow: false,
+    text: entry.text,
+    xanchor: index === 1 ? 'right' : 'left',
+    yanchor: 'middle',
+    bgcolor: 'rgba(255,255,255,0.95)',
+    borderpad: 4,
+    font: { size: 14, color: '#111' },
+    align: index === 1 ? 'right' : 'left'
+  }));
+
+  return arrows.concat(labels);
 }
 
 function computeNetwork({ pressure, leftRadius, rightRadius }) {
@@ -319,7 +341,24 @@ function computeNetwork({ pressure, leftRadius, rightRadius }) {
   };
 }
 
-function zoomedRange(min, max, padding = 0.05, scale = 0.9) {
+function computeBounds(model) {
+  const { baseBounds } = constants;
+  const R1 = constants.inletRadius;
+  const leftArrowLength = getArrowLength(model.velocities.left);
+  const rightArrowLength = getArrowLength(model.velocities.right);
+  const inletArrowLength = getArrowLength(model.velocities.inlet);
+  const leftExtent = -1 - R1 - leftArrowLength - 0.5;
+  const rightExtent = 1 + R1 + rightArrowLength + 0.5;
+  const inletExtent = -inletArrowLength - 0.5;
+  return {
+    minX: Math.min(baseBounds.minX, leftExtent),
+    maxX: Math.max(baseBounds.maxX, rightExtent),
+    minY: Math.min(baseBounds.minY, inletExtent),
+    maxY: baseBounds.maxY
+  };
+}
+
+function zoomedRange(min, max, padding = 0.05, scale = 0.8) {
   const paddedMin = min - padding;
   const paddedMax = max + padding;
   const span = Math.max(paddedMax - paddedMin, 1e-3);
@@ -375,4 +414,12 @@ async function loadPlotly() {
 function formatNumber(value, digits = 2) {
   if (!Number.isFinite(value)) return '—';
   return Number(value).toFixed(digits);
+}
+
+function getArrowLength(velocity) {
+  const scale = constants.arrowScale;
+  const minLength = constants.minArrowLength || 0;
+  const scaled = Math.abs(velocity) * scale;
+  if (scaled <= 0) return minLength;
+  return Math.max(scaled, minLength);
 }
