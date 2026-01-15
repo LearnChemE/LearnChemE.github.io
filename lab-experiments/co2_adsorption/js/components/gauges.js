@@ -37,7 +37,7 @@ function createPressureGaugeView(draw, x, y) {
                 L ${x + needleWidth/2} ${y} Z`)
     .fill('black')
     .transform({ rotate: 45, cx: x, cy: y }); // Example rotation
-  writeTextAtPosition(digPressureGaugeX, digPressureGaugeY - 30, "bar");
+
   return group;
 }
 
@@ -146,7 +146,7 @@ export function createDigitalPressureGauge(draw, x, y, pressure = "--- bar") {
   const fontSize = Math.min(displayWidth * 0.8, displayHeight * 0.8);
 
   group.text(`${totalPressure}`)
-    .font({ family: 'monospace', size: fontSize, anchor: 'middle', weight: 'bold' })
+    .font({ family: 'monospace', size: fontSize, anchor: 'middle', weight: 'regular' })
     .center(x, y);
 
   // Bottom Connector
@@ -159,5 +159,8 @@ export function createDigitalPressureGauge(draw, x, y, pressure = "--- bar") {
     .stroke({ color: '#444', width: 1 })
     .move(connectorX, connectorY);
 
+  writeTextAtPosition(digPressureGaugeX, digPressureGaugeY - 30, "bar");
+  writeTextAtPosition(365, 280, "click on regulators"); // Instruction text
+  writeTextAtPosition(365, 300, "to set pressure");
   return group;
 }
