@@ -4,6 +4,7 @@ import * as state from './state.js';
 import * as config from './config.js';
 import { updateCO2AnalyzerDisplay } from './components/co2Analyzer.js';
 import { updateTemperatureDisplay } from './components/therm.js';
+import { betaLabelX, betaLabelY } from './main.js';
 
 /**
  * Misleading function name. Updates the tank number with whatever is currently happening.
@@ -14,7 +15,6 @@ export function startMoleFractionCalculation(tankNum) {
   // Stop any existing calculation first
   // stopMoleFractionCalculation();
 
-  console.trace("triggered")
   let y; // Initial mole fraction at the *inlet* of the bed for this run
   let currentDesorbingState = false;
   let initialTimeOffset = 0;
@@ -149,6 +149,7 @@ function stopMoleFractionCalculation() {
 
 
 // --- Heating Logic ---
+let heatingRateLabel = null;
 
 /**
  * Start the heater so temperature will rise linearly
@@ -165,6 +166,9 @@ export function startHeating() {
   if (!state.getIsHeating()) {
     state.setIsHeating(true);
     // console.log("Starting Heating");
+
+    heatingRateLabel = draw.text("heating rate = 4 K/s")
+        .move(betaLabelX, betaLabelY);
 
     const heatingIntervalId = setInterval(() => {
       // Create Red gradient for heating
@@ -198,6 +202,11 @@ export function stopHeating() {
   if (state.getIsHeating()) {
     state.setIsHeating(false);
     state.clearHeatingInterval(); // Clears interval via state function
+
+    if (heatingRateLabel) {
+      heatingRateLabel.remove();
+      heatingRateLabel = null;
+    }
 
     // Reset heater gradients to Blue (cold)
     const gradient = draw.gradient('linear', function(add) {

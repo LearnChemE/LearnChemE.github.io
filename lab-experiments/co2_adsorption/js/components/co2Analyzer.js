@@ -7,8 +7,8 @@ export function createCO2GasAnalyzer(draw, x, y, concentration = "0.00%") {
     group.addClass('co2-analyzer'); // Add class for selection
 
     // Analyzer Body Dimensions
-    const analyzerWidth = 120;
-    const analyzerHeight = 80;
+    const analyzerWidth = 80;
+    const analyzerHeight = 40;
     const cornerRadius = 5;
 
     // Main Analyzer Body
@@ -19,29 +19,30 @@ export function createCO2GasAnalyzer(draw, x, y, concentration = "0.00%") {
         .move(x, y);
 
     // Digital Display Area
-    const displayMargin = 10;
+    const displayMargin = 6;
     const displayWidth = analyzerWidth - 2 * displayMargin;
-    const displayHeight = analyzerHeight * 0.5;
+    const displayHeight = analyzerHeight - 2 * displayMargin;
     const displayX = x + displayMargin;
     const displayY = y + displayMargin;
 
     group.rect(displayWidth, displayHeight) // No need to store this rect typically
         .fill('#000') // Black background
         .stroke({ color: '#444', width: 1 })
+        .radius(2)
         .move(displayX, displayY);
 
     // CO₂ Concentration Text - THIS is what needs updating
     const concentrationText = group.text(concentration)
         // Ensure Digital-7 font is loaded via CSS (@font-face) or use fallback
-        .font({ family: 'Digital-7, monospace', size: 24, anchor: 'middle', weight: 'bold' })
+        .font({ family: 'Digital-7, monospace', size: 16, anchor: 'middle', weight: 'regular' })
         .fill('#0f0') // Green digital text
         .center(displayX + displayWidth / 2, displayY + displayHeight / 2);
 
     // Label for the Analyzer
     group.text("CO₂ analyzer")
-        .font({ family: 'Arial', size: 16, anchor: 'middle', weight: 'bold' })
+        .font({ family: 'Arial', size: 16, anchor: 'middle', weight: 'regular' })
         .fill('#000')
-        .center(x + analyzerWidth / 2, y + analyzerHeight - 15); // Position below display
+        .center(x + analyzerWidth / 2, y - 15); // Position below display
 
     // Bottom Connector
     const connectorWidth = 20;

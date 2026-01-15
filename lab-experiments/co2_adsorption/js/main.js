@@ -21,10 +21,10 @@ export const betaLabelX = 810, betaLabelY = 485;
 const mfcX = 319; const mfcY = 22;
 const outletValveX = 510; const outletValveY = 250;
 export const digPressureGaugeX = 565, digPressureGaugeY = 530;
-const adsorptionBedX = 650; const adsorptionBedY = 330;
+const adsorptionBedX = 682.5; const adsorptionBedY = 340;
 const tValveX = 580, tValveY = 220;
 const co2AnalyzerX = 700, co2AnalyzerY = 50;
-const thermX = 800; const thermY = 380;
+const thermX = 752; const thermY = 420;
 const vent2BaseX = 875; const vent2BaseY = 85; // Base position for arrow placement
 
 
