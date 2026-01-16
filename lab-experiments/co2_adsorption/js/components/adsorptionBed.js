@@ -67,7 +67,7 @@ import { insertSVG } from '../utils.js';
 
 
 export async function createVerticalAdsorptionBedView(draw, x, y) {
-    const response = await fetch('../assets/adsBed.svg');
+    const response = await fetch('./assets/adsBed.svg');
     const svg = await response.text();
     const div = insertSVG(svg);
     

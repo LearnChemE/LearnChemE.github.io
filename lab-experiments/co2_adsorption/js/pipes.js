@@ -248,7 +248,7 @@ export function drawPipes(draw, pipeGroup) {
   drawPipeWithCurves(draw, pipeGroup, BPGValveOutletPath, 'bpg_valve_outlet');
 
   const AnalyserOutletPath = `
-    M ${fourValveMiddleX + 311} ${outletY}
+    M ${fourValveMiddleX + 271} ${outletY}
     L ${fourValveMiddleX + 360} ${outletY}
   `;
   drawPipeWithCurves(draw, pipeGroup, AnalyserOutletPath, 'analyser_outlet');
