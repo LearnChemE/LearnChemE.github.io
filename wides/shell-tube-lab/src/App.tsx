@@ -15,7 +15,7 @@ import {
   AboutModalDialogue,
 } from "./components/ModalDialogues";
 import { Tooltips } from "./components/Tooltips";
-import { ANIMATION_TIME } from "./sketch/functions";
+import { ANIMATION_TIME, randStartVals } from "./sketch/functions";
 
 const DOUBLE_BEAKER_MODE = 0;
 const SINGLE_BEAKER_MODE = 1;
@@ -71,6 +71,7 @@ function App() {
     setMeasuringState({ measuring: false, measure: notMeasuring });
     clearTimeout(pumpBtnTimeout);
     setAnimationFinished(false);
+    randStartVals();
   };
   // Swap the first and third beakers with the second and fourth. This is called the swap button, but is actually labelled "pour back"
   const swapBtnHandler = () => {

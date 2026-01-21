@@ -11,6 +11,7 @@ import {
 import { AnimationFactory, HexFill, PathTrace, TubeFill } from "../types";
 import { blueFragShaderSource, orngFragShaderSource, fillVertShaderSource } from "./shaders";
 import { ANIMATION_TIME } from "./functions";
+import { makeZoomWheelCallback, mouseCoordinate, startDragging, stopDragging, Zoom } from "./zoom";
 
 // Globals defined here
 export const g = {
@@ -77,14 +78,19 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     onFinish = props.onFinish;
   };
 
+  let pmx = 0, pmy = 0;
   const drag = (isDraggingValves: number) => {
-    if (isDraggingValves === NOT_DRAGGING) return;
-
+    const [mx, my] = mouseCoordinate(p);
+    console.log(mx, my)
+    if (isDraggingValves === NOT_DRAGGING) {
+      pmx = mx; pmy = my;
+      return;
+    }
 
     // Take the change in angle to find change in mDot. Ignore if angle resets
     if (isDraggingValves === DRAGGING_HOT) {
-      var theta = p.atan2(p.mouseY - 440, p.mouseX - 75);
-      var prevTheta = p.atan2(p.pmouseY - 440, p.pmouseX - 75);
+      var theta = p.atan2(my - 427, mx - 75);
+      var prevTheta = p.atan2(pmy - 427, pmx - 75);
       var dTheta = Math.sign(theta * prevTheta) === -1 ? 0 : theta - prevTheta;
       var dmDot = p.map(
         dTheta,
@@ -97,8 +103,8 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       g.mDotH += dmDot;
       g.mDotH = p.constrain(g.mDotH, MIN_HOT_FLOWRATE, MAX_HOT_FLOWRATE);
     } else {
-      theta = p.atan2(p.mouseY - 442, p.mouseX - 447);
-      prevTheta = p.atan2(p.pmouseY - 442, p.pmouseX - 447);
+      theta = p.atan2(my - 426, mx - 436);
+      prevTheta = p.atan2(pmy - 426, pmx - 436);
       dTheta = Math.sign(theta * prevTheta) === -1 ? 0 : theta - prevTheta;
       dmDot = p.map(
         dTheta,
@@ -111,6 +117,8 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
       g.mDotC += dmDot;
       g.mDotC = p.constrain(g.mDotC, MIN_COLD_FLOWRATE, MAX_COLD_FLOWRATE);
     }
+
+    pmx = mx; pmy = my;
   };
 
   const drawValve = (
@@ -244,6 +252,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     if (g.startTime === START_PUMPS_NEXT_FRAME) g.startTime = p.millis();
     p.background(250);
     p.translate(-g.width/2,-g.height/2);
+    Zoom(p);
     // showDebugCoordinates(p);
 
     p.resetShader();
@@ -289,22 +298,29 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
 
   // P5 mousePressed handler determines if dragging
   p.mousePressed = () => {
-    let x: number = p.mouseX;
-    let y: number = p.mouseY;
+    const [x, y] = mouseCoordinate(p);
     if (y >= 360 && y <= 480) {
       if (x >= 35 && x <= 115) {
         isDraggingValves = DRAGGING_HOT;
+        return;
       }
-      if (x >= 405 && x <= 485) {
+      else if (x >= 405 && x <= 485) {
         isDraggingValves = DRAGGING_COLD;
+        return;
       }
     }
+
+    isDraggingValves = NOT_DRAGGING;
+    startDragging(p);
   };
 
   // Stop dragging
   p.mouseReleased = () => {
     isDraggingValves = NOT_DRAGGING;
+    stopDragging();
   };
+
+  p.mouseWheel = makeZoomWheelCallback(p);
 
   // Blue long so I can use shader
   const drawBlueFillLong = (p: P5CanvasInstance, time:number, blueFillPath: PathTrace) => {
