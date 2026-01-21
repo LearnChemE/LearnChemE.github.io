@@ -13,6 +13,7 @@ import {
 } from "./Functions";
 import { AnimationFactory, HexFill, PathTrace, TubeFill } from "../types";
 import { fillVertShaderSource, blueFragShaderSource, orngFragShaderSource } from "./shaders.ts";
+import { makeZoomWheelCallback, startDragging, stopDragging, Zoom } from "./zoom.ts";
 
 const NOT_STARTED = -1;
 const START_ON_RENDER = -2;
@@ -112,6 +113,7 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
     p.translate(-g.width/2, -g.height/2)
     singleBeakerCalculations(p);
     if (startAniTime === START_ON_RENDER) startAniTime = p.millis();
+    Zoom(p, g.width, g.height);
  
     p.image(graphicsObjs.pa, 410, 435);
     p.image(graphicsObjs.pa, 610, 435);
@@ -195,13 +197,19 @@ export function SingleBeakerSketch(p: P5CanvasInstance) {
         g.mDotC = MAX_COLD_FLOWRATE / 8;
       }, 1000);
     }
+    else {
+      startDragging(p);
+    }
   };
+
+  p.mouseWheel = makeZoomWheelCallback(p, g.width, g.height);
 
   p.mouseReleased = () => {
     pinchingColdTube = false;
     setTimeout(() => {
       g.mDotC = MAX_COLD_FLOWRATE;
     }, 1000);
+    stopDragging();
   };
 
     // Blue long so I can use shader
