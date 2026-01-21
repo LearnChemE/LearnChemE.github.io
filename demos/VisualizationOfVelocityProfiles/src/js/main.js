@@ -63,6 +63,8 @@ let plotInitialized = false;
 let selectedProfileId = defaults.profileId;
 const elements = {};
 let resizeObserverAttached = false;
+let plotlyLibRef;
+let pendingResizeFrame;
 
 export function drawFigure(svg) {
   drawRef = svg;
@@ -100,7 +102,7 @@ function setupControls() {
   });
   updatePlotLayoutOffset();
   if (!resizeObserverAttached) {
-    window.addEventListener('resize', updatePlotLayoutOffset);
+    window.addEventListener('resize', handleWindowResize);
     resizeObserverAttached = true;
   }
 
@@ -126,7 +128,7 @@ function populateProfileOptions() {
   });
   updateProfileSelection();
   if (window.MathJax?.typesetPromise) {
-    window.MathJax.typesetPromise([elements.profileList]).catch(() => {});
+    window.MathJax.typesetPromise([elements.profileList]).catch(() => { });
   }
 }
 
@@ -179,6 +181,7 @@ async function renderPlot() {
 
   const showFlow = params.showFlow === 'yes';
 
+  plotlyLibRef = plotlyLib;
   renderPlotlyFigure({
     plotlyLib,
     params,
@@ -228,6 +231,21 @@ function updatePlotLayoutOffset() {
   elements.plotLayout.style.setProperty('--plot-top', `${offset}px`);
 }
 
+function handleWindowResize() {
+  if (pendingResizeFrame) cancelAnimationFrame(pendingResizeFrame);
+  pendingResizeFrame = window.requestAnimationFrame(() => {
+    pendingResizeFrame = null;
+    updatePlotLayoutOffset();
+    if (plotlyLibRef?.Plots && plotlyRoot) {
+      try {
+        plotlyLibRef.Plots.resize(plotlyRoot);
+      } catch (error) {
+        // Ignore resize errors
+      }
+    }
+  });
+}
+
 function computeFlowRates(params, velocityFn) {
   const half = sideLength / 2;
   const xMin = params.xCenter - half;
@@ -266,6 +284,10 @@ function integrateSimpson(fn, a, b, segments = 256) {
 function renderPlotlyFigure({ plotlyLib, params, field, showFlow }) {
   if (!plotlyRoot || !plotlyLib) return;
   const vectorTrace = buildVectorTrace(field.vectors, field.maxMagnitude);
+  const axisPadding = 0.15;
+  const xPositiveExtra = 0.1;
+  const xRange = [-gridExtent - axisPadding, gridExtent + axisPadding + xPositiveExtra];
+  const yRange = [-gridExtent - axisPadding, gridExtent + axisPadding];
 
   const shapes = [
     {
@@ -284,24 +306,35 @@ function renderPlotlyFigure({ plotlyLib, params, field, showFlow }) {
   const annotations = buildFlowAnnotations(params, field.flowRates, showFlow);
 
   const layout = {
-    margin: { l: 70, r: 30, t: 30, b: 70 },
+    margin: { l: 70, r: 30, t: 12, b: 70 },
     paper_bgcolor: 'rgba(0,0,0,0)',
     plot_bgcolor: 'rgba(0,0,0,0)',
     hovermode: 'closest',
+    font: {
+      family: 'Arial, sans-serif',
+      size: 16,
+      color: '#000'
+    },
     xaxis: {
-      title: { text: 'x<sub>center</sub> (m)', standoff: 12, font: { color: '#111' } },
-      range: [-gridExtent - 0.5, gridExtent + 0.5],
+      title: { text: 'x<sub>center</sub> (m)', standoff: 12, font: { family: 'Arial, sans-serif', size: 18, color: '#111' } },
+      range: xRange,
       zeroline: false,
-      scaleanchor: 'y',
-      scaleratio: 1,
+      constrain: 'domain',
+      autorange: false,
       ticks: 'outside',
+      tickfont: { family: 'Arial, sans-serif', size: 16 },
       mirror: true
     },
     yaxis: {
-      title: { text: 'y<sub>center</sub> (m)', standoff: 12, font: { color: '#111' } },
-      range: [-gridExtent - 0.5, gridExtent + 0.5],
+      title: { text: 'y<sub>center</sub> (m)', standoff: 12, font: { family: 'Arial, sans-serif', size: 18, color: '#111' } },
+      range: yRange,
       zeroline: false,
+      scaleanchor: 'x',
+      scaleratio: 1,
+      constrain: 'domain',
+      autorange: false,
       ticks: 'outside',
+      tickfont: { family: 'Arial, sans-serif', size: 16 },
       mirror: true
     },
     shapes,
@@ -309,7 +342,11 @@ function renderPlotlyFigure({ plotlyLib, params, field, showFlow }) {
     showlegend: false
   };
 
-  const plotConfig = { displayModeBar: false, responsive: true };
+  const plotConfig = {
+    displayModeBar: false,
+    responsive: true,
+    staticPlot: true
+  };
   if (!plotInitialized || !plotlyRoot.data) {
     plotlyRoot.innerHTML = '';
     plotlyLib.newPlot(plotlyRoot, [vectorTrace], layout, plotConfig);
@@ -423,7 +460,7 @@ function buildFlowAnnotations(params, flowRates, showFlow) {
       arrowcolor: '#111',
       standoff: 4,
       text: showFlow ? formatFlow(entry.value) : '',
-      font: { size: 12, color: '#111' },
+      font: { family: 'Arial, sans-serif', size: 16, color: '#111' },
       bgcolor: showFlow ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0)',
       borderpad: showFlow ? 2 : 0,
       xanchor: entry.orientation === 'horizontal' ? entry.anchor : 'center',
