@@ -19,7 +19,7 @@ import { g } from "./sketch";
 import { blueFragShaderSource, fillVertShaderSource, orngFragShaderSource } from "./shaders";
 import { PathTrace } from "../types/pathTrace";
 import { AnimationFactory, HexFill, TubeFill } from "../types";
-import { makeZoomWheelCallback, startDragging, stopDragging, Zoom } from "./zoom";
+import { makeZoomWheelCallback, mouseCoordinate, startDragging, stopDragging, Zoom } from "./zoom";
 
 const showDebugCoordinates = (p: P5CanvasInstance) => {
   p.push();
@@ -230,11 +230,12 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
   const PINCH_TOP: number = 380;
   const PINCH_BOTTOM: number = 410;
   p.mousePressed = () => {
+    const [mx, my] = mouseCoordinate(p);
     if (
-      p.mouseX >= PINCH_LEFT &&
-      p.mouseX <= PINCH_RIGHT &&
-      p.mouseY >= PINCH_TOP &&
-      p.mouseY <= PINCH_BOTTOM
+      mx >= PINCH_LEFT &&
+      mx <= PINCH_RIGHT &&
+      my >= PINCH_TOP &&
+      my <= PINCH_BOTTOM
     ) {
       pinchingColdTube = true;
       setTimeout(() => {
