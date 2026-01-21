@@ -11,6 +11,7 @@ import {
 import { AnimationFactory, HexFill, PathTrace, TubeFill } from "../types";
 import { blueFragShaderSource, orngFragShaderSource, fillVertShaderSource } from "./shaders";
 import { ANIMATION_TIME } from "./functions";
+import { makeZoomWheelCallback, startDragging, stopDragging, Zoom } from "./zoom";
 
 // Globals defined here
 export const g = {
@@ -244,6 +245,7 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     if (g.startTime === START_PUMPS_NEXT_FRAME) g.startTime = p.millis();
     p.background(250);
     p.translate(-g.width/2,-g.height/2);
+    Zoom(p);
     // showDebugCoordinates(p);
 
     p.resetShader();
@@ -294,17 +296,26 @@ const ShellTubeSketch = (p: P5CanvasInstance) => {
     if (y >= 360 && y <= 480) {
       if (x >= 35 && x <= 115) {
         isDraggingValves = DRAGGING_HOT;
+        return;
       }
-      if (x >= 405 && x <= 485) {
+      else if (x >= 405 && x <= 485) {
         isDraggingValves = DRAGGING_COLD;
+        return;
       }
     }
+
+    isDraggingValves = NOT_DRAGGING;
+    console.log("Starting drag");
+    startDragging(p);
   };
 
   // Stop dragging
   p.mouseReleased = () => {
     isDraggingValves = NOT_DRAGGING;
+    stopDragging();
   };
+
+  p.mouseWheel = makeZoomWheelCallback(p);
 
   // Blue long so I can use shader
   const drawBlueFillLong = (p: P5CanvasInstance, time:number, blueFillPath: PathTrace) => {

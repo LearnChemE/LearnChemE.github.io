@@ -19,6 +19,7 @@ import { g } from "./sketch";
 import { blueFragShaderSource, fillVertShaderSource, orngFragShaderSource } from "./shaders";
 import { PathTrace } from "../types/pathTrace";
 import { AnimationFactory, HexFill, TubeFill } from "../types";
+import { makeZoomWheelCallback, startDragging, stopDragging, Zoom } from "./zoom";
 
 const showDebugCoordinates = (p: P5CanvasInstance) => {
   p.push();
@@ -166,6 +167,7 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     if (g.startTime === START_PUMPS_NEXT_FRAME) g.startTime = p.millis();
     p.background(250);
     p.translate(-p.width/2,-p.height/2);
+    Zoom(p);
     // Coordinates in top left
     // showDebugCoordinates(p);
     // Calculations
@@ -239,6 +241,9 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
         g.mDotC = MAX_COLD_FLOWRATE / 4;
       }, 1000);
     }
+    else {
+      startDragging(p);
+    }
   };
 
   p.mouseReleased = () => {
@@ -246,7 +251,10 @@ const SingleBeakerSketch = (p: P5CanvasInstance) => {
     setTimeout(() => {
       g.mDotC = MAX_COLD_FLOWRATE;
     }, 1000);
+    stopDragging();
   };
+
+  p.mouseWheel = makeZoomWheelCallback(p);
 
   // Blue long so I can use shader
   const drawBlueFillLong = (p: P5CanvasInstance, time:number, blueFillPath: PathTrace) => {
