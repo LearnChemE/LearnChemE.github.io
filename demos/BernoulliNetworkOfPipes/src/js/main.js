@@ -122,7 +122,11 @@ async function renderPlot() {
   }
 
   const figure = buildFigure(model);
-  const config = { displayModeBar: false, responsive: true };
+  const config = {
+    displayModeBar: false,
+    responsive: true,
+    staticPlot: true // prevent zooming or any interactive edits
+  };
   if (!plotInitialized) {
     plotlyRoot.innerHTML = '';
     plotlyLib.newPlot(plotlyRoot, figure.data, figure.layout, config);
@@ -488,9 +492,34 @@ function computeNetwork({ pressure, leftRadius, rightRadius }) {
   };
 }
 
-function computeBounds() {
+function computeBounds(model) {
   const { baseBounds } = constants;
-  return { ...baseBounds };
+  if (!model) return { ...baseBounds };
+
+  const { diameters, velocities } = model;
+  const inletArrowLength = getArrowLength(velocities.inlet);
+  const leftArrowLabelY = 1 + diameters.left / 2 + 0.35;
+  const rightArrowLabelY = 1 + diameters.left - diameters.right / 2 + 0.35;
+  const fluidTop = 1 + diameters.left + 0.35;
+  const verticalDimensionTop = 1 + diameters.left + 0.2;
+
+  const dynamicMaxY = Math.max(
+    baseBounds.maxY,
+    fluidTop,
+    leftArrowLabelY,
+    rightArrowLabelY,
+    verticalDimensionTop
+  );
+
+  const inletArrowBottom = -inletArrowLength - 0.35;
+  const dynamicMinY = Math.min(baseBounds.minY, inletArrowBottom);
+
+  return {
+    minX: baseBounds.minX,
+    maxX: baseBounds.maxX,
+    minY: dynamicMinY,
+    maxY: dynamicMaxY
+  };
 }
 
 function zoomedRange(min, max, padding = 0.05, scale = 0.8) {

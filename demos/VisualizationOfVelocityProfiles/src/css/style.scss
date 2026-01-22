@@ -5,9 +5,10 @@
   border: 2px solid #ccc;
   margin: 20px auto;
   padding: 10px;
-  width: calc(100vw - 40px);
+  background: transparent;
+  width: min(calc(100vw - 40px), 1100px);
   height: calc(100vh - 40px);
-  max-width: calc((100vh) * 1200 / 600);
+  max-width: min(1100px, calc((100vh) * 1200 / 600));
   max-height: calc((100vw) * 600 / 1200);
   
   > svg {
@@ -40,7 +41,7 @@
   width: 260px;
   min-width: 220px;
   flex: 0 0 260px;
-  background: rgba(255, 255, 255, 0.98);
+  // background: rgba(255, 255, 255, 1);
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
   padding: 16px 18px;
@@ -107,11 +108,24 @@
 .plotly-container {
   flex: 1;
   min-height: 0;
-  background: transparent;
+  background: transparent !important;
   border-radius: 14px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
   padding: 6px;
   overflow: hidden;
+}
+
+#plotly-root,
+#plotly-root .js-plotly-plot,
+#plotly-root .plot-container,
+#plotly-root .svg-container,
+#plotly-root .main-svg {
+  background: transparent !important;
+}
+
+#plotly-root .main-svg .bg,
+#plotly-root .bg {
+  fill: transparent !important;
 }
 
 #plotly-root {
@@ -137,7 +151,7 @@ body {
   justify-content: flex-start;
   align-items: center;
   height: 100vh;
-  background-color: white;
+  background-color: transparent;
   width: 100%;
   font-family: sans-serif;
   font-weight: 400;
