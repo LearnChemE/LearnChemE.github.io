@@ -1,13 +1,13 @@
 import type { Component } from "solid-js";
-import { paddingTop } from "../../globals";
+import { paddedHeight, paddingTop } from "../../globals";
 
 export const TopPipes: Component = () => {
     return (
 <g id="topPipes" transform="translate(151, 12)">
     <rect id="Rectangle 87" x="245.5" y="3.5" width="260" height="10" fill="url(#paint0_linear_34_318)" stroke="black"/>
     <rect id="Rectangle 77" x="26.5" y="3.5" width="146" height="10" fill="url(#paint1_linear_34_318)" stroke="black"/>
-    <rect id="Rectangle 88" x="528.5" y="26.5" width="223" height="10" transform="rotate(90 528.5 26.5)" fill="url(#paint2_linear_34_318)" stroke="black"/>
-    <rect id="Rectangle 76" x="13.5" y="26.5" width="26" height="10" transform="rotate(90 13.5 26.5)" fill="url(#paint3_linear_34_318)" stroke="black"/>
+    <rect id="Rectangle 88" x="528.5" y="26.5" width={224 + paddedHeight()} height="10" transform="rotate(90 528.5 26.5)" fill="url(#paint2_linear_34_318)" stroke="black"/>
+    <rect id="Rectangle 76" x="13.5" y="26.5" width={27 + paddedHeight()} height="10" transform="rotate(90 13.5 26.5)" fill="url(#paint3_linear_34_318)" stroke="black"/>
     <rect id="Rectangle 89" x="195.5" y="26.5" width={paddingTop()} height="10" transform="rotate(90 195.5 26.5)" fill="url(#paint4_linear_34_318)" stroke="black"/>
     <rect id="Rectangle 90" x="232.5" y="26.5" width={paddingTop()} height="10" transform="rotate(90 232.5 26.5)" fill="url(#paint5_linear_34_318)" stroke="black"/>
     

@@ -1,0 +1,154 @@
+body {
+  --slider-primary-color: #3b82f6;
+  --background-color-normal: #f1f1f1;
+  --background-color-disable: #4c4c4c;
+  --background-color-disable-light: #adadad;
+}
+
+.slider-red {
+  --slider-primary-color: #f02222;
+}
+
+.slider-white {
+  --slider-primary-color: #3a445a;
+}
+
+.slider {
+  display: flex;
+  margin: auto;
+  margin-top: .5rem;
+  width: min-content;
+  flex-direction: column;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: #222;
+}
+
+.slider-label {
+    margin-top: .5em;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* range input base reset */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  /* background: transparent; */
+  width: 220px;
+  height: 28px; /* gives space for thumb */
+  cursor: pointer;
+  --primary-gradient-interpolant: 50%;
+  --secondary-gradient-interpolant: 75%;
+}
+
+/* WebKit (Chrome, Safari, Edge Chromium) */
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  /* background: #4c4c4c; */
+  border-radius: 999px;
+  background-image: linear-gradient(to right, var(--slider-primary-color), var(--slider-primary-color)),
+    linear-gradient(to right, var(--background-color-normal), var(--background-color-normal)),
+    repeating-linear-gradient(45deg, var(--background-color-disable), var(--background-color-disable) 4px, var(--background-color-disable-light) 4px, var(--background-color-disable-light) 8px);
+  background-repeat: no-repeat;
+  background-size: var(--primary-gradient-interpolant) 100%,
+    var(--secondary-gradient-interpolant) 100%,
+    100% 100%;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -6px; /* (thumb-height - track-height) / -2 to center */
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--slider-primary-color);
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  background: #e6e6e6;
+  border-radius: 999px;
+  background-image: linear-gradient(to right, var(--slider-primary-color), var(--slider-primary-color)),
+    linear-gradient(to right, var(--background-color-normal), var(--background-color-normal)),
+    repeating-linear-gradient(45deg, var(--background-color-disable), var(--background-color-disable) 4px, var(--background-color-disable-light) 4px, var(--background-color-disable-light) 8px);
+  background-repeat: no-repeat;
+  background-size: var(--primary-gradient-interpolant) 100%,
+    var(--secondary-gradient-interpolant) 100%,
+    100% 100%;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--slider-primary-color);
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* IE / old Edge */
+input[type="range"]::-ms-track {
+  width: 100%;
+  height: 8px;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type="range"]::-ms-fill-lower {
+  background: #e6e6e6;
+  border-radius: 999px;
+}
+input[type="range"]::-ms-fill-upper {
+  background: #e6e6e6;
+  border-radius: 999px;
+}
+input[type="range"]::-ms-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--slider-primary-color);
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  margin-top: 0;
+}
+
+/* focus / hover states */
+input[type="range"]:focus {
+  outline: none;
+}
+input[type="range"]:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 6px rgba(59,130,246,0.12), 0 1px 3px rgba(0,0,0,0.2);
+}
+input[type="range"]:hover::-webkit-slider-thumb {
+  transform: scale(1.03);
+  transition: transform 120ms;
+}
+
+/* number display / value */
+.slider-number,
+.slider-value {
+  text-align: start;
+  color: #111;
+  background: transparent;
+}
+
+/* unit label */
+.slider-unit {
+  font-size: 0.9rem;
+  color: #444;
+}
+
+/* disabled state */
+input[disabled],
+input[disabled]::-webkit-slider-thumb,
+input[disabled]::-moz-range-thumb,
+input[disabled]::-ms-thumb {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

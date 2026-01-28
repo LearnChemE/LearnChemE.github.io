@@ -395,3 +395,14 @@ export function animate(fn: (dt: number, t: number) => boolean, then?: () => voi
     }
     requestAnimationFrame(frame);
 }
+
+// Helper to accept either a value or an accessor to a value
+export function resolveProperty<T>(val: T | (() => T) | undefined, fallback?: T): () => T {
+    if (val === undefined) {
+        if (fallback === undefined) {
+            throw new Error("resolveValue: both value and fallback are undefined");
+        }
+        return () => fallback;
+    }
+    return (typeof val === "function" ? val : () => val) as () => T;
+}

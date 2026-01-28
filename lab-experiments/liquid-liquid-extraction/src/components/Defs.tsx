@@ -145,7 +145,17 @@ export const Defs: Component = () => {
         <stop offset="1" stop-color="#305789" stop-opacity="0.6"/>
         </linearGradient>
 
-
+        <radialGradient id="paint0_radial_23_319" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(15.375 103.5) rotate(90) scale(4.5 5.34705)">
+        <stop stop-color="#C3C3C3"/>
+        <stop offset="0.182692" stop-color="#8A8A97"/>
+        <stop offset="0.625" stop-color="#7B7B7E"/>
+        <stop offset="1" stop-color="#0F0F10"/>
+        </radialGradient>
+        <linearGradient id="paint1_linear_23_319" x1="0" y1="2.5" x2="9" y2="2.5" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#585C61"/>
+        <stop offset="0.697115" stop-color="white"/>
+        <stop offset="1" stop-color="#8A8A97"/>
+        </linearGradient>
     </>);
 }
 
