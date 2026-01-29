@@ -441,10 +441,38 @@ function updateLandingSummary(result) {
   if (!result || !elements.landingSummary) return;
   const landing = result.groundEvent;
   if (landing) {
-    elements.landingSummary.textContent = `Hit ground (z=0) at t = ${formatNumber(landing.time, 2)} s`;
+    const v = Math.abs(landing.velocity);
+    const t = landing.time;
+    const safeMax = constants.safeVelocity.max;
+    const opened = t >= constants.deployTime;
+
+    let outcome;
+    if (v <= safeMax) {
+      outcome = 'safely landed';
+    } else if (!opened) {
+      outcome = 'hit the ground at unsafe speed since parachute never opened';
+    } else {
+      outcome = 'hit the ground at unsafe speed since parachute too small';
+    }
+
+    elements.landingSummary.textContent = outcome;
     return;
   }
-  elements.landingSummary.textContent = 'Did not hit ground within the simulated time window.';
+  // Did not reach the ground within the simulation window.
+  // Classify based on post-deployment terminal speed: if the eventual
+  // terminal speed (with parachute) is within the safe range, treat as
+  // "safely landed"; otherwise "too small".
+  const tEnd = Array.isArray(result.times) && result.times.length ? result.times[result.times.length - 1] : 0;
+  if (tEnd < constants.deployTime) {
+    elements.landingSummary.textContent = 'hit the ground at unsafe speed since parachute never opened';
+    return;
+  }
+
+  const dragTotal = constants.cDAperson + constants.cDparachute * (result.area || 0);
+  const vt = Math.sqrt((2 * constants.mass * constants.gravity) / (constants.airDensity * Math.max(dragTotal, 1e-9)));
+  elements.landingSummary.textContent = vt <= constants.safeVelocity.max
+    ? 'safely landed'
+    : 'hit the ground at unsafe speed since parachute too small';
 }
 
 function formatNumber(value, digits = 2) {
