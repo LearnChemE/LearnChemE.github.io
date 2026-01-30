@@ -44,11 +44,11 @@
       <div class="slider-stack" data-no-pan="true">
         <div id="control-bar" class="control-bar controls-container slider-controls" data-no-pan="true">
           <div class="slider-group slider-container slider-group--height">
-            <label for="altitudeSlider">jump altitude \(z_0\) (m)</label>
+            <label for="altitudeSlider">jump altitude (m)</label>
             <input
               type="range"
               id="altitudeSlider"
-              min="500"
+              min="1000"
               max="6000"
               step="100"
               value="3000"
@@ -63,7 +63,7 @@
             <input
               type="range"
               id="diameterSlider"
-              min="0"
+              min="10"
               max="20"
               step="0.5"
               value="10"
@@ -73,11 +73,8 @@
             </div>
           </div>
         </div>
-        <p class="text-muted small mt-2 mb-1" aria-live="polite">
-          Parachute automatically opens at t = 30 s.
-        </p>
+        
         <p class="landing-summary" id="landingMessage">
-          Hit ground (z=0) at t = 0.00 s
         </p>
       </div>
     </div>
@@ -86,7 +83,7 @@
       <div class="plot-column" data-no-pan="true">
         <div id="plotly-root" class="plotly-container">
           <div class="plotly-placeholder">
-            Adjust the sliders to generate the trajectory.
+            <!-- Adjust the sliders to generate the trajectory. -->
           </div>
         </div>
       </div>

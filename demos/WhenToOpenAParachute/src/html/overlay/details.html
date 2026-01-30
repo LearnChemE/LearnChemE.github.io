@@ -9,11 +9,27 @@
         </div>
         
         <div class="modal-body">
-          <p>Assume \(m\) is the mass of the person, \(g\) is gravity and \(v\) is velocity, \(c_{Dh}\) is the human drag coefficient, \(A_h\) is the human projecteda rea, \(c_{Dp}\) is the parachute draf coefficient, \(A_p\) is the parachute projected area, we can write the equation of motion as:</p>
-          <p class="text-center">\[ m \frac{dv}{dt} = mg - \rho \frac{v^2}{2} C_{Dh} A_{h} - \rho \frac{v^2}{2} C_{Dp} A_{p} H(t-t_{open}), \]</p>
-          <p>where \(H\) is heaviside function. The above is easily integrated with \(v(0)=0\), along with</p>
+          <p>The equation of motion is:</p>
+          <p class="text-center">\[ m \frac{dv}{dt} = mg - \rho \frac{v^2}{2} \, C_{Dh} A_h \; - \; \rho \frac{v^2}{2} \, C_{Dp} A_p \, H\!\left(t - t_{\text{open}}\right). \]</p>
+
+          <p>
+            where \(m\) is the mass of the person, \(g\) is gravity, \(v\) is velocity, \(C_{Dh}\) is the human drag coefficient,
+            \(A_h\) is the human projected area, \(C_{Dp}\) is the parachute drag coefficient, \(A_p\) is the parachute projected area,
+            and \(H\) is the Heaviside step function, defined by
+          </p>
+          <p class="text-center">\[ H(x) = \begin{cases} 0, & x < 0 \\ 1, & x \ge 0. \end{cases} \]</p>
+          <p>
+            The Heaviside term turns on the parachute drag at \(t \ge t_{\text{open}}\).
+            The equation of motion is integrated with \(v(0) = 0\) and
+          </p>
           <p class="text-center">\[ -\frac{dh}{dt} = v, \]</p>
-          <p>with \(h(0)=h_0\). To find the latest time to open the parachute, we find the roots for \(t_{open}\) such that \(v(h=1)\) is 3.7 m/s. Finally, look at the time and velocity versus time show that as soon as the parachute is released, the person almost reaches the ground. This is done so as to find the latest one can open the parachute. In real life scenarios, it is typical to have 5 minutes of parachute time. How will you adjust the condition to re-evaluate \(t_{open}\)?</p>
+          <p>with \(h(0) = 0\).</p>
+
+          <p>
+            In this simulation, the parachute opens at a fixed time of \(t_{\text{open}} = 30\,\text{s}\).
+            You can explore how changing the parachute diameter affects the post‑deployment (terminal) speed and the landing velocity.
+            A safe landing speed is in the range 2.5–3.5 m/s and the green band on the velocity plot indicates this range.
+          </p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

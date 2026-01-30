@@ -232,7 +232,10 @@ function renderPlot(result) {
   const figure = buildFigure(result);
   const config = {
     displayModeBar: false,
-    responsive: true
+    responsive: true,
+    staticPlot: true,
+    scrollZoom: false,
+    doubleClick: false
   };
 
   if (!plotInitialized) {
@@ -251,6 +254,7 @@ function buildFigure(result) {
   const xMax = Math.max(lastTime, constants.deployTime + 5);
   const vMax = Math.max(result.maxVelocity || 0, constants.safeVelocity.max * 1.2);
   const velocityRange = [0, vMax * 1.1];
+  const zMax = altitudes.reduce((max, value) => Math.max(max, value), 0);
 
   const altitudeTrace = {
     type: 'scatter',
@@ -283,7 +287,7 @@ function buildFigure(result) {
       x1: xMax,
       y0: constants.safeVelocity.min,
       y1: constants.safeVelocity.max,
-      fillcolor: 'rgba(25, 135, 84, 0.18)',
+      fillcolor: 'rgba(25, 135, 84, 0.6)',
       line: { width: 0 }
     },
     {
@@ -298,26 +302,49 @@ function buildFigure(result) {
     }
   ];
 
+  // Place the safe-landing label at a fixed offset above the green band.
+  // This keeps it independent of the red velocity curve.
+  const safeLabelX = Math.min(xMax * 0.5, times[times.length - 1] || 0);
+  const greenTop = constants.safeVelocity.max;
+  const safeLabelY = Math.min(greenTop + 0.25, velocityRange[1] - 0.5);
+
   const annotations = [
     {
+      text: 'Parachute automatically opens at t = 30 s',
+      x: xMax * 0.5,
+      xref: 'x',
+      y: Math.max(zMax * 0.98, zMax - 1),
+      yref: 'y',
+      showarrow: false,
+      align: 'center',
+      yanchor: 'top',
+      font: { size: 16, color: '#0b2240', family: '"Helvetica Neue", Helvetica, Arial, sans-serif' }
+    },
+    {
       text: 'parachute opens',
-      x: constants.deployTime + 1.5,
+      x: constants.deployTime,
       xref: 'x2',
-      y: Math.min(velocityRange[1] * 0.75, velocityRange[1] - 1),
+      y: Math.min(velocityRange[1] * 0.7, velocityRange[1] - 1),
       yref: 'y2',
       textangle: -90,
       showarrow: false,
-      font: { size: 12, color: '#495057' }
+      xanchor: 'left',
+      xshift: 6,
+      font: { size: 16, color: '#495057' }
     },
     {
       text: 'safe landing 2.5–3.5 m/s',
-      x: xMax * 0.5,
+      x: safeLabelX,
       xref: 'x2',
-      y: Math.min(constants.safeVelocity.max + 0.5, velocityRange[1] * 0.9),
+      y: safeLabelY,
       yref: 'y2',
       showarrow: false,
       align: 'center',
-      font: { size: 18, color: '#0b2240', family: '"Helvetica Neue", Helvetica, Arial, sans-serif' }
+      yanchor: 'bottom',
+      yshift: 4,
+      bgcolor: 'rgba(255,255,255,0.85)',
+      bordercolor: 'rgba(0,0,0,0)',
+      font: { size: 18, color: '#198754', family: '"Helvetica Neue", Helvetica, Arial, sans-serif' }
     }
   ];
 

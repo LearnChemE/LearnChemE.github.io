@@ -6,11 +6,12 @@
   margin: 20px auto;
   padding: 10px;
   background: transparent;
-  --plot-top: 130px;
-  width: min(calc(100vw - 40px), 1100px);
+  --plot-top: 100px;
+  /* Maintain 1000:700 (≈1.4286) aspect ratio driven by height */
+  width: min(calc(100vw - 40px), calc((100vh - 40px) * 1.4285714));
   height: calc(100vh - 40px);
-  max-width: min(1100px, calc((100vh) * 1200 / 600));
-  max-height: calc((100vw) * 600 / 1200);
+  max-width: calc((100vh - 40px) * 1.4285714);
+  max-height: calc(100vh - 40px);
   
   > svg {
     position: absolute;
@@ -26,7 +27,7 @@
   top: var(--plot-top, 120px);
   left: 10px;
   right: 10px;
-  bottom: 5px;
+  bottom: 0;
   display: flex;
   gap: 16px;
   align-items: flex-start;
@@ -107,7 +108,7 @@
   gap: 6px;
   flex: 1 1 auto;
   pointer-events: auto;
-  max-width: 720px;
+  max-width: 1100px;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
@@ -197,9 +198,9 @@ body {
 }
 
 .control-bar.slider-controls > .slider-group {
-  flex: 1 1 280px;
-  min-width: 220px;
-  max-width: 360px;
+  flex: 1 1 320px;    /* initial target width */
+  min-width: 320px;   /* keep single line: label + slider + value */
+  max-width: 640px;   /* reduce overall slider width */
   display: flex;
   align-items: center;
   gap: 6px;
@@ -249,6 +250,7 @@ body {
   flex: 1 1 auto;
   min-width: 0;
   max-width: none;
+  width: 100% !important;
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
