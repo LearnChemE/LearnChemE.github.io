@@ -1,0 +1,35 @@
+<div id="details" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="directionsTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Details</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <p><strong>Assumptions:</strong></p>
+          <p>1. the rate-determining step is the surface reaction between carbon monoxide CO and atomic oxygen O</p>
+          <p>2. carbon dioxide CO2 rapidly desorbs from catalyst surface</p>
+          <p>3. ideal plug flow reactor.</p>
+
+          <p>The fractional coverages \(\theta_i\) for the reaction \(\mathrm{CO} + \tfrac{1}{2}\,\mathrm{O_2} \rightarrow \mathrm{CO_2}\) are determined from Langmuir isotherms:</p>
+          <p class="text-center">\[\theta_{CO} = \frac{K_{CO} P_{CO}}{\Sigma},\qquad \theta_{O} = \frac{\sqrt{K_{O_2} P_{O_2}}}{\Sigma},\qquad \theta_{vacant} = 1 - \theta_{CO} - \theta_{O},\]</p>
+          <p class="text-center">\[\text{for simplicity, } \Sigma = 1 + K_{CO} P_{CO} + \sqrt{K_{O_2} P_{O_2}},\]</p>
+          <p>where \(K_i\) is the adsorption equilibrium constant of species \(i\) and \(P_i\) is the partial pressure.</p>
+
+          <p>The rate of reaction \(r\) is:</p>
+          <p class="text-center">\[r = k\,\theta_{CO}\,\theta_{O} = \frac{k\,K_{CO} P_{CO}\,\sqrt{K_{O_2} P_{O_2}}}{\left(1 + K_{CO} P_{CO} + \sqrt{K_{O_2} P_{O_2}}\right)^2},\]</p>
+          <p>where \(k\) is the rate constant.</p>
+
+          <p>The partial pressures of CO, O2 and CO2 are calculated from material balances:</p>
+          <p class="text-center">\[\frac{dP_{CO}}{dz} = -r,\qquad \frac{dP_{O_2}}{dz} = -\frac{r}{2},\qquad \frac{dP_{CO_2}}{dz} = r,\]</p>
+          <p>where \(z\) is distance down the reactor.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
