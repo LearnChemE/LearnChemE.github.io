@@ -102,4 +102,55 @@ const Pipes: Component = () => {
   );
 };
 
+{/* <rect x="26.5" y="454.5" width="39" height="10" fill="url(#paint0_linear_19_12)" stroke="black"/>
+<rect x="425.5" y="454.5" width="39" height="10" fill="url(#paint1_linear_19_12)" stroke="black"/>
+<rect x="367.5" y="196.5" width="26" height="10" fill="url(#paint2_linear_19_12)" stroke="black"/>
+<rect x="316.5" y="3.5" width="260" height="10" fill="url(#paint3_linear_19_12)" stroke="black"/>
+<rect x="316.5" y="402.5" width="15" height="10" fill="url(#paint4_linear_19_12)" stroke="black"/>
+<rect x="204.5" y="402.5" width="39" height="10" fill="url(#paint5_linear_19_12)" stroke="black"/>
+<rect x="97.5" y="3.5" width="146" height="10" fill="url(#paint6_linear_19_12)" stroke="black"/>
+<rect x="84.5" y="351.5" width="89" height="10" transform="rotate(90 84.5 351.5)" fill="url(#paint7_linear_19_12)" stroke="black"/>
+<rect x="416.5" y="351.5" width="89" height="10" transform="rotate(90 416.5 351.5)" fill="url(#paint8_linear_19_12)" stroke="black"/>
+<rect x="354.5" y="219.5" width="170" height="10" transform="rotate(90 354.5 219.5)" fill="url(#paint9_linear_19_12)" stroke="black"/>
+<rect x="599.5" y="26.5" width="399" height="10" transform="rotate(90 599.5 26.5)" fill="url(#paint10_linear_19_12)" stroke="black"/>
+<rect x="416.5" y="219.5" width="9" height="10" transform="rotate(90 416.5 219.5)" fill="url(#paint11_linear_19_12)" stroke="black"/>
+<rect x="84.5" y="26.5" width="202" height="10" transform="rotate(90 84.5 26.5)" fill="url(#paint12_linear_19_12)" stroke="black"/>
+<path d="M2.50586 450.5C2.57013 455.928 3.69075 459.609 6.04102 461.959C8.39128 464.309 12.0716 465.43 17.5 465.494V453.239C16.682 453.181 16.0036 452.968 15.5176 452.482C15.0315 451.996 14.8175 451.318 14.7598 450.5H2.50586Z" fill="url(#paint13_radial_19_12)" stroke="black"/>
+<rect x="0.5" y="-0.5" width="9" height="16" rx="0.5" transform="matrix(1 0 0 -1 17 467)" fill="url(#paint14_linear_19_12)" stroke="black"/>
+<rect x="0.5" y="0.5" width="9" height="16" rx="0.5" transform="matrix(0 1 1 0 0 441)" fill="url(#paint15_linear_19_12)" stroke="black"/>
+<path d="M292.506 398.5C292.57 403.928 293.691 407.609 296.041 409.959C298.391 412.309 302.072 413.43 307.5 413.494V401.239C306.682 401.181 306.004 400.968 305.518 400.482C305.032 399.996 304.818 399.318 304.76 398.5H292.506Z" fill="url(#paint16_radial_19_12)" stroke="black"/>
+<rect x="0.5" y="-0.5" width="9" height="16" rx="0.5" transform="matrix(1 0 0 -1 307 415)" fill="url(#paint17_linear_19_12)" stroke="black"/>
+<rect x="0.5" y="0.5" width="9" height="16" rx="0.5" transform="matrix(0 1 1 0 290 389)" fill="url(#paint18_linear_19_12)" stroke="black"/>
+<path d="M252.5 413.494C257.928 413.43 261.609 412.309 263.959 409.959C266.309 407.609 267.43 403.928 267.494 398.5H255.239C255.181 399.318 254.968 399.996 254.482 400.482C253.996 400.968 253.318 401.182 252.5 401.24V413.494Z" fill="url(#paint19_radial_19_12)" stroke="black"/>
+<rect x="-0.5" y="-0.5" width="9" height="16" rx="0.5" transform="matrix(0 -1 -1 0 269 398)" fill="url(#paint20_linear_19_12)" stroke="black"/>
+<rect x="0.5" y="-0.5" width="9" height="16" rx="0.5" transform="matrix(1 0 0 -1 243 415)" fill="url(#paint21_linear_19_12)" stroke="black"/>
+<path d="M473.5 465.494C478.928 465.43 482.609 464.309 484.959 461.959C487.309 459.609 488.43 455.928 488.494 450.5H476.239C476.181 451.318 475.968 451.996 475.482 452.482C474.996 452.968 474.318 453.182 473.5 453.24V465.494Z" fill="url(#paint22_radial_19_12)" stroke="black"/>
+<rect x="-0.5" y="-0.5" width="9" height="16" rx="0.5" transform="matrix(0 -1 -1 0 490 450)" fill="url(#paint23_linear_19_12)" stroke="black"/>
+<rect x="0.5" y="-0.5" width="9" height="16" rx="0.5" transform="matrix(1 0 0 -1 464 467)" fill="url(#paint24_linear_19_12)" stroke="black"/>
+<path d="M340.5 413.494C345.928 413.43 349.609 412.309 351.959 409.959C354.309 407.609 355.43 403.928 355.494 398.5H343.239C343.181 399.318 342.968 399.996 342.482 400.482C341.996 400.968 341.318 401.182 340.5 401.24V413.494Z" fill="url(#paint25_radial_19_12)" stroke="black"/>
+<rect x="-0.5" y="-0.5" width="9" height="16" rx="0.5" transform="matrix(0 -1 -1 0 357 398)" fill="url(#paint26_linear_19_12)" stroke="black"/>
+<rect x="0.5" y="-0.5" width="9" height="16" rx="0.5" transform="matrix(1 0 0 -1 331 415)" fill="url(#paint27_linear_19_12)" stroke="black"/>
+<path d="M267.494 17.5C267.43 12.0716 266.309 8.39128 263.959 6.04102C261.609 3.69075 257.928 2.57013 252.5 2.50586V14.7607C253.318 14.8185 253.996 15.0315 254.482 15.5176C254.968 16.0036 255.182 16.6819 255.24 17.5H267.494Z" fill="url(#paint28_radial_19_12)" stroke="black"/>
+<rect x="-0.5" y="0.5" width="9" height="16" rx="0.5" transform="matrix(-1 0 0 1 252 0)" fill="url(#paint29_linear_19_12)" stroke="black"/>
+<rect x="-0.5" y="-0.5" width="9" height="16" rx="0.5" transform="matrix(0 -1 -1 0 269 26)" fill="url(#paint30_linear_19_12)" stroke="black"/>
+<path d="M417.494 210.5C417.43 205.072 416.309 201.391 413.959 199.041C411.609 196.691 407.928 195.57 402.5 195.506V207.761C403.318 207.819 403.996 208.032 404.482 208.518C404.968 209.004 405.182 209.682 405.24 210.5H417.494Z" fill="url(#paint31_radial_19_12)" stroke="black"/>
+<rect x="-0.5" y="0.5" width="9" height="16" rx="0.5" transform="matrix(-1 0 0 1 402 193)" fill="url(#paint32_linear_19_12)" stroke="black"/>
+<rect x="-0.5" y="-0.5" width="9" height="16" rx="0.5" transform="matrix(0 -1 -1 0 419 219)" fill="url(#paint33_linear_19_12)" stroke="black"/>
+<path d="M600.494 17.5C600.43 12.0716 599.309 8.39128 596.959 6.04102C594.609 3.69075 590.928 2.57013 585.5 2.50586V14.7607C586.318 14.8185 586.996 15.0315 587.482 15.5176C587.968 16.0036 588.182 16.6819 588.24 17.5H600.494Z" fill="url(#paint34_radial_19_12)" stroke="black"/>
+<rect x="-0.5" y="0.5" width="9" height="16" rx="0.5" transform="matrix(-1 0 0 1 585 0)" fill="url(#paint35_linear_19_12)" stroke="black"/>
+<rect x="-0.5" y="-0.5" width="9" height="16" rx="0.5" transform="matrix(0 -1 -1 0 602 26)" fill="url(#paint36_linear_19_12)" stroke="black"/>
+<path d="M88.5 2.50586C83.0716 2.57013 79.3913 3.69075 77.041 6.04102C74.6907 8.39128 73.5701 12.0716 73.5059 17.5H85.7607C85.8185 16.682 86.0315 16.0036 86.5176 15.5176C87.0036 15.0315 87.6819 14.8175 88.5 14.7598V2.50586Z" fill="url(#paint37_radial_19_12)" stroke="black"/>
+<rect x="0.5" y="0.5" width="9" height="16" rx="0.5" transform="matrix(0 1 1 0 71 17)" fill="url(#paint38_linear_19_12)" stroke="black"/>
+<rect x="-0.5" y="0.5" width="9" height="16" rx="0.5" transform="matrix(-1 0 0 1 97 0)" fill="url(#paint39_linear_19_12)" stroke="black"/>
+<path d="M358.5 195.506C353.072 195.57 349.391 196.691 347.041 199.041C344.691 201.391 343.57 205.072 343.506 210.5H355.761C355.819 209.682 356.032 209.004 356.518 208.518C357.004 208.032 357.682 207.818 358.5 207.76V195.506Z" fill="url(#paint40_radial_19_12)" stroke="black"/>
+<rect x="0.5" y="0.5" width="9" height="16" rx="0.5" transform="matrix(0 1 1 0 341 210)" fill="url(#paint41_linear_19_12)" stroke="black"/>
+<rect x="-0.5" y="0.5" width="9" height="16" rx="0.5" transform="matrix(-1 0 0 1 367 193)" fill="url(#paint42_linear_19_12)" stroke="black"/>
+<path d="M195.5 401.506C190.072 401.57 186.391 402.691 184.041 405.041C181.691 407.391 180.57 411.072 180.506 416.5H192.761C192.819 415.682 193.032 415.004 193.518 414.518C194.004 414.032 194.682 413.818 195.5 413.76V401.506Z" fill="url(#paint43_radial_19_12)" stroke="black"/>
+<rect x="0.5" y="0.5" width="9" height="16" rx="0.5" transform="matrix(0 1 1 0 178 416)" fill="url(#paint44_linear_19_12)" stroke="black"/>
+<rect x="-0.5" y="0.5" width="9" height="16" rx="0.5" transform="matrix(-1 0 0 1 204 399)" fill="url(#paint45_linear_19_12)" stroke="black"/>
+<path d="M307.5 2.50586C302.072 2.57013 298.391 3.69075 296.041 6.04102C293.691 8.39128 292.57 12.0716 292.506 17.5H304.761C304.819 16.682 305.032 16.0036 305.518 15.5176C306.004 15.0315 306.682 14.8175 307.5 14.7598V2.50586Z" fill="url(#paint46_radial_19_12)" stroke="black"/>
+<rect x="0.5" y="0.5" width="9" height="16" rx="0.5" transform="matrix(0 1 1 0 290 17)" fill="url(#paint47_linear_19_12)" stroke="black"/>
+<rect x="-0.5" y="0.5" width="9" height="16" rx="0.5" transform="matrix(-1 0 0 1 316 0)" fill="url(#paint48_linear_19_12)" stroke="black"/>
+ */}
+
 export default Pipes;
