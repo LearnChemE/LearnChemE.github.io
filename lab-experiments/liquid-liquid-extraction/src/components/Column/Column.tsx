@@ -1,8 +1,9 @@
 import { createMemo, createSignal, For, onMount, type Accessor, type Component } from "solid-js";
-import { STAGE_HEIGHT } from "../../ts/config";
+import { FEED_MAX_RATE, STAGE_HEIGHT } from "../../ts/config";
 import { columnVolume, numberOfStages, paddingTop } from "../../globals";
 import "./Column.css";
 import { animate } from "../../ts/helpers";
+import { Boils } from "../Boils/Boils";
 
 type ColumnProps = {
     numberOfStages: Accessor<number>;
@@ -30,8 +31,9 @@ export const Column: Component<ColumnProps> = (props) => {
         });
     })
 
-    const totalFillHeight = createMemo(() => 76 + 18 + 32 * numberOfStages());
-
+    const totalFillHeight = createMemo(() => 76 + 32 * numberOfStages());
+    const paddedFillHeight = createMemo(() => totalFillHeight() + 18);
+    const bubbleRate = createMemo(() => feedIn() / FEED_MAX_RATE);
 
     return (
         // top
@@ -41,13 +43,15 @@ export const Column: Component<ColumnProps> = (props) => {
                 <path transform={`translate(325 ${92 + STAGE_HEIGHT * numberOfStages()})`} d="M2.12222e-07 38H70C70 38 70 27.5 70 19C70 9.5 65 9.5 65 0H5C5 9.5 1.93781e-06 9.5 2.12222e-07 19C-1.51337e-06 28.5 2.12222e-07 38 2.12222e-07 38Z" fill="#5b98e7" fill-opacity="0.6"/>
                 <path transform="translate(325 54)" d="M2.12222e-07 0H70C70 0 70 10.5 70 19C70 28.5 65 28.5 65 38H5C5 28.5 1.93781e-06 28.5 2.12222e-07 19C-1.51337e-06 9.5 2.12222e-07 0 2.12222e-07 0Z" fill="#5b98e7" fill-opacity="0.6"/>
                 <rect x="330" y="92" width="60" height={32 * numberOfStages()} fill="#5b98e7" fill-opacity="0.6"/>
+                {/* Bubbles */}
+                <Boils x={340} y={38} w={40} h={() => totalFillHeight() * .75} showing={() => feedIn() > 0} nbubbles={24} rate={bubbleRate} />
             </g>
 
             <defs>
                 <clipPath id="col-fill-clip">
-                    <rect x="325" y={54 + totalFillHeight() * (1 - fill() / columnVolume())} width="70" height={totalFillHeight() * fill() / columnVolume()} fill="red" />
+                    <rect x="325" y={54 + paddedFillHeight() * (1 - fill() / columnVolume())} width="70" height={paddedFillHeight() * fill() / columnVolume()} fill="red" />
                     <path 
-                        transform={`translate(325 ${28 + (totalFillHeight()) * (1 - fill() / columnVolume())}) scale(.049 .1)`} 
+                        transform={`translate(325 ${28 + (paddedFillHeight()) * (1 - fill() / columnVolume())}) scale(.049 .1)`} 
                         d={`M 0,400 L 0,150 C 85.33218825146,159.96221229817934 170.66437650292,169.92442459635865 234,153 C 297.33562349708,136.07557540364135 338.67468223978005,92.26451391274475 407,99 C 475.32531776021995,105.73548608725525 570.6368945379594,163.0175197526623 647,195 C 723.3631054620406,226.9824802473377 780.7777396083819,233.66540707660596 833,222 C 885.2222603916181,210.33459292339404 932.2521470285126,180.32085194091377 992,150 C 1051.7478529714874,119.67914805908622 1124.2136722775679,89.05118515973892 1201,89 C 1277.7863277224321,88.94881484026108 1358.8931638612162,119.47440742013055 1440,150 L 1440,400 L 0,400 Z`} 
                         stroke="none" 
                         stroke-width="0" 
@@ -58,8 +62,6 @@ export const Column: Component<ColumnProps> = (props) => {
                 </clipPath>
             </defs>
             
-        
-
 
             {/* Top */}
             <g id="top-col" transform={`translate(325 38)`}>
