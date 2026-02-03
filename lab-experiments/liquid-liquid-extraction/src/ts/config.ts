@@ -5,3 +5,6 @@ export const ZERO_STAGE_PADDING = 48;
 
 export const SOLVENT_MAX_RATE = 10;
 export const FEED_MAX_RATE = 10;
+
+export const COLUMN_BASE_VOL = 8; // L
+export const COLUMN_VOL_PER_STAGE = 3; // L

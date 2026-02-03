@@ -43,7 +43,7 @@ function App() {
         <PowerSwitch x={134} y={321 + paddedHeight()} label="feed" isOn={feedIsOn} setIsOn={setFeedIsOn} />
         <PowerSwitch x={434} y={321 + paddedHeight()} label="solvent" isOn={solvIsOn} setIsOn={setSolvIsOn} />
         
-        <Column numberOfStages={numberOfStages} />
+        <Column numberOfStages={numberOfStages} solvIn={solvRate} feedIn={feedRate} />
         <Rotameter flowrate={feedRate} flowrange={[0, FEED_MAX_RATE]} x={145} y={64 + paddedHeight()} />
         <Rotameter flowrate={solvRate} flowrange={[0, SOLVENT_MAX_RATE]} x={477} y={64 + paddedHeight()} />
         <Tank x={31}  y={107 + paddedHeight()} />

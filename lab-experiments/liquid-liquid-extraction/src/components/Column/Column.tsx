@@ -1,18 +1,68 @@
-import { For, type Accessor, type Component } from "solid-js";
+import { createMemo, createSignal, For, onMount, type Accessor, type Component } from "solid-js";
 import { STAGE_HEIGHT } from "../../ts/config";
-import { paddingTop } from "../../globals";
+import { columnVolume, numberOfStages, paddingTop } from "../../globals";
+import "./Column.css";
+import { animate } from "../../ts/helpers";
 
 type ColumnProps = {
     numberOfStages: Accessor<number>;
+    solvIn: Accessor<number>;
+    feedIn: Accessor<number>;
 };
 
 export const Column: Component<ColumnProps> = (props) => {
+    const { solvIn, feedIn } = props;
+    const [fill, setFill] = createSignal(0);
+
+    const fillAnimation = (dt: number) => {
+        const rate = solvIn();
+        if (rate <= 0) return true;
+
+        const dV = rate * dt;
+        setFill(fill() + dV);
+
+        return (fill() < columnVolume());
+    }
+
+    onMount(() => {
+        animate(fillAnimation, () => {
+
+        });
+    })
+
+    const totalFillHeight = createMemo(() => 76 + 18 + 32 * numberOfStages());
+
 
     return (
         // top
         <g id="Column" transform={`translate(0 ${paddingTop()})`}>
+            {/* Fill */}
+            <g clip-path="url(#col-fill-clip)">
+                <path transform={`translate(325 ${92 + STAGE_HEIGHT * numberOfStages()})`} d="M2.12222e-07 38H70C70 38 70 27.5 70 19C70 9.5 65 9.5 65 0H5C5 9.5 1.93781e-06 9.5 2.12222e-07 19C-1.51337e-06 28.5 2.12222e-07 38 2.12222e-07 38Z" fill="#5b98e7" fill-opacity="0.6"/>
+                <path transform="translate(325 54)" d="M2.12222e-07 0H70C70 0 70 10.5 70 19C70 28.5 65 28.5 65 38H5C5 28.5 1.93781e-06 28.5 2.12222e-07 19C-1.51337e-06 9.5 2.12222e-07 0 2.12222e-07 0Z" fill="#5b98e7" fill-opacity="0.6"/>
+                <rect x="330" y="92" width="60" height={32 * numberOfStages()} fill="#5b98e7" fill-opacity="0.6"/>
+            </g>
+
+            <defs>
+                <clipPath id="col-fill-clip">
+                    <rect x="325" y={54 + totalFillHeight() * (1 - fill() / columnVolume())} width="70" height={totalFillHeight() * fill() / columnVolume()} fill="red" />
+                    <path 
+                        transform={`translate(325 ${28 + (totalFillHeight()) * (1 - fill() / columnVolume())}) scale(.049 .1)`} 
+                        d={`M 0,400 L 0,150 C 85.33218825146,159.96221229817934 170.66437650292,169.92442459635865 234,153 C 297.33562349708,136.07557540364135 338.67468223978005,92.26451391274475 407,99 C 475.32531776021995,105.73548608725525 570.6368945379594,163.0175197526623 647,195 C 723.3631054620406,226.9824802473377 780.7777396083819,233.66540707660596 833,222 C 885.2222603916181,210.33459292339404 932.2521470285126,180.32085194091377 992,150 C 1051.7478529714874,119.67914805908622 1124.2136722775679,89.05118515973892 1201,89 C 1277.7863277224321,88.94881484026108 1358.8931638612162,119.47440742013055 1440,150 L 1440,400 L 0,400 Z`} 
+                        stroke="none" 
+                        stroke-width="0" 
+                        fill="red" 
+                        fill-opacity="1" 
+                        class="transition-all duration-300 ease-in-out delay-150 path-0"
+                    />
+                </clipPath>
+            </defs>
+            
+        
+
+
             {/* Top */}
-            <g id="top-col" transform={`translate(325 ${38})`}>
+            <g id="top-col" transform={`translate(325 38)`}>
                 <rect x="7.5" y="0.5" width="18" height="8" rx="1.5" fill="url(#paint0_linear_9_80)" stroke="black"/>
                 <rect x="44.5" y="0.5" width="18" height="8" rx="1.5" fill="url(#paint1_linear_9_80)" stroke="black"/>
                 <path d="M2.12222e-07 16H70C70 16 70 26.5 70 35C70 44.5 65 44.5 65 54H5C5 44.5 1.93781e-06 44.5 2.12222e-07 35C-1.51337e-06 25.5 2.12222e-07 16 2.12222e-07 16Z" fill="url(#paint2_linear_9_80)"/>
@@ -33,7 +83,6 @@ export const Column: Component<ColumnProps> = (props) => {
                     </g>
                 )}</For>
             </g>
-
 
             {/* Bottom */}
             <g id="bottom-col" transform={`translate(325 ${92 + STAGE_HEIGHT * props.numberOfStages()})`}>
