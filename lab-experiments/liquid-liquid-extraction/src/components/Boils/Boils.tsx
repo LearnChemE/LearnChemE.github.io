@@ -90,7 +90,7 @@ export const Boils: Component<BoilProps> = (props) => {
     });
 
   return (
-    <g>
+    <>
       <For each={bubbles}>
           {
           (b, i) => <Show when={i() <= rate() * nbubbles}>
@@ -107,6 +107,6 @@ export const Boils: Component<BoilProps> = (props) => {
             </Show>
           }
       </For>
-    </g>
+    </>
   );
 };

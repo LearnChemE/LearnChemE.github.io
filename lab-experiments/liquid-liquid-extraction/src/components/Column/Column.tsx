@@ -44,7 +44,7 @@ export const Column: Component<ColumnProps> = (props) => {
                 <path transform="translate(325 54)" d="M2.12222e-07 0H70C70 0 70 10.5 70 19C70 28.5 65 28.5 65 38H5C5 28.5 1.93781e-06 28.5 2.12222e-07 19C-1.51337e-06 9.5 2.12222e-07 0 2.12222e-07 0Z" fill="#5b98e7" fill-opacity="0.6"/>
                 <rect x="330" y="92" width="60" height={32 * numberOfStages()} fill="#5b98e7" fill-opacity="0.6"/>
                 {/* Bubbles */}
-                <Boils x={340} y={38} w={40} h={() => totalFillHeight() * .75} showing={() => feedIn() > 0} nbubbles={24} rate={bubbleRate} />
+                <Boils x={340} y={38} w={40} h={() => totalFillHeight() * .73 - 20} showing={() => feedIn() > 0} nbubbles={24} rate={bubbleRate} />
             </g>
 
             <defs>
