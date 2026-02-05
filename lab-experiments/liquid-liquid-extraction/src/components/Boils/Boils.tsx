@@ -89,11 +89,13 @@ export const Boils: Component<BoilProps> = (props) => {
         }
     });
 
+    createEffect(() => console.log(showing()))
+
   return (
-    <>
+    <Show when={showing()}>
       <For each={bubbles}>
           {
-          (b, i) => <Show when={i() <= rate() * nbubbles}>
+          (b, i) => <Show when={(i() <= rate() * nbubbles)}>
                 <circle 
                     fill="white"
                     stroke="#83dbdb"
@@ -107,6 +109,6 @@ export const Boils: Component<BoilProps> = (props) => {
             </Show>
           }
       </For>
-    </>
+    </Show>
   );
 };

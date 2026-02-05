@@ -14,6 +14,8 @@ import Pipes from './components/Pipes/Pipes'
 import { PowerSwitch } from './components/PowerSwitch/Switch'
 import { createMemo, createSignal } from 'solid-js'
 import { FEED_MAX_RATE, SOLVENT_MAX_RATE } from './ts/config'
+import { HamburgerMenu } from './components/Hamburger/Hamburger'
+import { AboutText, DirectionsText } from './components/Modal/modals'
 
 function App() {
   const [feedIsOn, setFeedIsOn] = createSignal(false);
@@ -33,24 +35,32 @@ function App() {
 
   return (
     <>
-      <Slider value={numberOfStages} setValue={setNumberOfStages} min={1} max={8} step={1} />
-      <SVGCanvas width={740} height={560} defs={Defs}>
-        <Background />
-        <Bucket x={225} y={() => 257 + paddedHeight()} />
-        <Bucket x={632} y={() => 257 + paddedHeight()} />
-        <TopPipes />
-        <Pipes />
-        <PowerSwitch x={134} y={321 + paddedHeight()} label="feed" isOn={feedIsOn} setIsOn={setFeedIsOn} />
-        <PowerSwitch x={434} y={321 + paddedHeight()} label="solvent" isOn={solvIsOn} setIsOn={setSolvIsOn} />
-        
-        <Column numberOfStages={numberOfStages} solvIn={solvRate} feedIn={feedRate} />
-        <Rotameter flowrate={feedRate} flowrange={[0, FEED_MAX_RATE]} x={145} y={64 + paddedHeight()} />
-        <Rotameter flowrate={solvRate} flowrange={[0, SOLVENT_MAX_RATE]} x={477} y={64 + paddedHeight()} />
-        <Tank x={31}  y={107 + paddedHeight()} />
-        <Tank x={522} y={107 + paddedHeight()} />
-        <Valve x={134.5} y={() => 195 + paddedHeight()} onLiftChange={setFeedLift} />
-        <Valve x={466.5} y={() => 195 + paddedHeight()} onLiftChange={setSolvLift} />
-      </SVGCanvas>
+
+      <div class="canvas-container">
+        <SVGCanvas width={740} height={560} defs={Defs}>
+          <Background />
+          <Bucket x={225} y={() => 257 + paddedHeight()} />
+          <Bucket x={632} y={() => 257 + paddedHeight()} />
+          <TopPipes />
+          <Pipes />
+          <PowerSwitch x={134} y={321 + paddedHeight()} label="feed" isOn={feedIsOn} setIsOn={setFeedIsOn} />
+          <PowerSwitch x={434} y={321 + paddedHeight()} label="solvent" isOn={solvIsOn} setIsOn={setSolvIsOn} />
+          
+          <Column numberOfStages={numberOfStages} solvIn={solvRate} feedIn={feedRate} />
+          <Rotameter flowrate={feedRate} flowrange={[0, FEED_MAX_RATE]} x={145} y={64 + paddedHeight()} />
+          <Rotameter flowrate={solvRate} flowrange={[0, SOLVENT_MAX_RATE]} x={477} y={64 + paddedHeight()} />
+          <Tank x={31}  y={107 + paddedHeight()} />
+          <Tank x={522} y={107 + paddedHeight()} />
+          <Valve x={134.5} y={() => 195 + paddedHeight()} onLiftChange={setFeedLift} />
+          <Valve x={466.5} y={() => 195 + paddedHeight()} onLiftChange={setSolvLift} />
+        </SVGCanvas>
+
+        <div class="stages-menu">
+          <Slider value={numberOfStages} setValue={setNumberOfStages} min={1} max={8} step={1} />
+        </div>
+
+        <HamburgerMenu path="" downloadName="lle_worksheet.pdf" Directions={DirectionsText} About={AboutText} />
+      </div>
     </>
   )
 }
