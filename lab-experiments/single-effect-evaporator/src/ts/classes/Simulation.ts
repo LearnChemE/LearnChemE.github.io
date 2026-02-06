@@ -105,6 +105,9 @@ export class Simulation {
         this.state.feedFlow.value = 0;
         this.state.feedTemp.value = 25;
         this.state.steamPres.value = 0;
+        // Reset outlets
+        this.condensate.reset();
+        this.concentrate.reset();
     }
 
     public setOnSafetyShutdown = (shutdown: (msg: string) => void) => {

@@ -5,10 +5,13 @@
   border: 2px solid #ccc;
   margin: 20px auto;
   padding: 10px;
-  width: calc(100vw - 40px);
+  background: transparent;
+  --plot-top: 100px;
+  /* Maintain 1000:700 (≈1.4286) aspect ratio driven by height */
+  width: min(calc(100vw - 40px), calc((100vh - 40px) * 1.4285714));
   height: calc(100vh - 40px);
-  max-width: calc((100vh) * 1200 / 600);
-  max-height: calc((100vw) * 600 / 1200);
+  max-width: calc((100vh - 40px) * 1.4285714);
+  max-height: calc(100vh - 40px);
   
   > svg {
     position: absolute;
@@ -19,19 +22,60 @@
   }
 }
 
-.plotly-container {
+.plot-layout {
   position: absolute;
-  top: 150px;
-  left: 20px;
-  right: 20px;
-  bottom: 20px;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 14px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  pointer-events: auto;
+  top: var(--plot-top, 120px);
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
   z-index: 1000;
-  overflow: visible;
+  pointer-events: none;
+}
+
+.plot-layout > * {
+  pointer-events: auto;
+}
+
+.plot-column {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-self: stretch;
+  margin: 0;
+}
+
+.plotly-container {
+  flex: 1;
+  min-height: 0;
+  background: transparent !important;
+  border-radius: 14px;
+  box-shadow: none;
+  padding: 6px;
+  overflow: hidden;
+}
+
+#plotly-root,
+#plotly-root .js-plotly-plot,
+#plotly-root .plot-container,
+#plotly-root .svg-container,
+#plotly-root .main-svg {
+  background: transparent !important;
+}
+
+#plotly-root .main-svg .bg,
+#plotly-root .bg {
+  fill: transparent !important;
+}
+
+#plotly-root {
+  width: 100%;
+  height: 100%;
 }
 
 .plotly-placeholder {
@@ -46,13 +90,45 @@
   font-weight: 500;
 }
 
+.landing-summary {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  padding: 6px 12px;
+  margin: 0;
+  font-size: 0.95rem;
+  color: #0b2240;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.slider-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  pointer-events: auto;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.slider-stack .control-bar {
+  justify-content: center;
+}
+
+.slider-stack .slider-group {
+  flex: 0 0 auto;
+}
+
 body {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
   height: 100vh;
-  background-color: white;
+  background-color: transparent;
   width: 100%;
   font-family: sans-serif;
   font-weight: 400;
@@ -90,7 +166,9 @@ body {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 0px;
+  justify-content: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
   z-index: 1001;
   pointer-events: none;
 }
@@ -102,8 +180,10 @@ body {
 
 #control-bar {
   flex: 1;
-  width: calc(100% - 226px);
-  min-width: 300px;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  align-self: flex-start;
 }
 
 .control-bar {
@@ -111,33 +191,68 @@ body {
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
-  justify-content: flex-start;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 10px;
-  padding: 12px 14px;
+  justify-content: center;
   pointer-events: auto;
-  margin: 0 0 0 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  margin: 0;
+  width: 100%;
 }
 
 .control-bar.slider-controls > .slider-group {
-  flex: 1 1 220px;
-  min-width: 220px;
+  flex: 1 1 320px;    /* initial target width */
+  min-width: 320px;   /* keep single line: label + slider + value */
+  max-width: 640px;   /* reduce overall slider width */
   display: flex;
   align-items: center;
   gap: 6px;
+  padding: 8px;
+  background-color: #fff;
+  border-radius: 4px;
   order: 1;
 }
 
+@media (max-width: 520px) {
+  .control-bar.slider-controls > .slider-group {
+    flex-basis: 100%;
+    min-width: 100%;
+    max-width: 100%;
+  }
+}
+
+.control-group {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  order: 0;
+}
+
+.control-group--select {
+  flex: 0 0 auto;
+  min-width: 200px;
+}
+
+.control-group--select select {
+  width: 100%;
+  max-width: 180px;
+  font-size: 1rem;
+  padding: 6px 8px;
+}
+
 .control-bar.slider-controls .slider-group label {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 400;
   white-space: nowrap;
+  color: #000;
 }
 
 .control-bar.slider-controls .slider-group input[type="range"] {
-  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+  width: 100% !important;
   -webkit-appearance: none;
+  appearance: none;
   background: transparent;
   margin: 0;
 }
@@ -176,44 +291,68 @@ body {
 
 .control-bar.slider-controls .slider-group span {
   display: inline-block;
-  min-width: 40px;
-  text-align: right;
-  font-size: 1.15rem;
+  min-width: 32px;
+  text-align: center;
+  font-size: 0.95rem;
   font-weight: 400;
+  color: #000;
+}
+
+.slider-value-container {
+  min-width: 40px;
+  text-align: center;
+}
+
+.slider-value {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #000;
 }
 
 .slider-group--height label,
 .slider-group--height .math-label,
-.slider-value--height {
-  color: #0d6efd;
-}
-
+.slider-value--height,
 .slider-group--radius label,
 .slider-group--radius .math-label,
-.slider-value--radius {
-  color: #198754;
+.slider-value--radius,
+.slider-group--x label,
+.slider-value--x,
+.slider-group--y label,
+.slider-value--y {
+  color: #000;
 }
 
-.status-card {
-  flex: 1 1 240px;
-  min-width: 220px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 10px;
-  padding: 10px 14px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  order: 2;
-  text-align: center;
+.radio-group {
+  flex: 0 0 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  order: 10;
+  margin-left: auto;
 }
 
-.control-bar.slider-controls > .status-card {
-  flex: 0 0 100%;
-  margin-top: 4px;
-}
-
-.status-message {
+.radio-group .radio-label {
   font-size: 1.05rem;
-  line-height: 1.4;
-  color: #333;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.radio-group .radio-options {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 1.05rem;
+}
+
+.radio-group label {
+  font-size: 1.05rem;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  text-transform: lowercase;
 }
 
 .slider-checkbox {

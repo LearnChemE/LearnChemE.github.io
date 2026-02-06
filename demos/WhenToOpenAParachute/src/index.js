@@ -5,8 +5,9 @@ import { buttonAction } from './js/hamburger.js';
 import { SVG } from '@svgdotjs/svg.js';
 import { drawFigure } from './js/main.js';
 
-let windowWidth = window.innerWidth;
-let windowHeight = windowWidth * config.canvasHeight / config.canvasWidth;
+const aspect = config.canvasWidth / config.canvasHeight; // 1000:700
+let windowHeight = window.innerHeight - 60;
+let windowWidth = windowHeight * aspect;
 
 const draw = SVG().addTo('#svg-container').size(windowWidth, windowHeight);
 window.svgDraw = draw; // Make global if needed by other modules like simulation/reset
@@ -15,9 +16,8 @@ draw.viewbox(0, 0, config.canvasWidth, config.canvasHeight);
 draw.attr('preserveAspectRatio', 'xMidYMid meet');
 
 window.addEventListener('resize', function() {
-    windowWidth = window.innerWidth - 60;
-    // Ensure height calculation respects potential container limits if needed
-    windowHeight = windowWidth * config.canvasHeight / config.canvasWidth;
+    windowHeight = window.innerHeight - 60;
+    windowWidth = windowHeight * aspect;
     draw.size(windowWidth, windowHeight);
 });
 

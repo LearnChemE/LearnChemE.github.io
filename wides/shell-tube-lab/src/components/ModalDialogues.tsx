@@ -39,6 +39,9 @@ export const DirectionsModalDialogue = () => {
                 flowrate of the cold water. Measure the effect of this on the
                 hot outlet tube.
               </p>
+              <p>
+                In either setup, scroll to zoom and drag the screen to pan.
+              </p>
             </div>
           </>
         );

@@ -158,7 +158,7 @@ export function changeVols(p: P5CanvasInstance) {
   let dV;
   const deltaTime = p.deltaTime;
   const aniTime = (g.orngTime >= 0) ? p.millis() - g.orngTime : 0;
-  console.table(g.vols);
+  // console.table(g.vols);
   if (g.vols[0] > MIN_FILL && g.hIsFlowing) {
     if (aniTime >= ANIMATION_TIME) {
       dV = (g.mDotH * deltaTime) / 1000;

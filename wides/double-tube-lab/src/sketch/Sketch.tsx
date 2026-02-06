@@ -5,6 +5,7 @@ import { calcHeatTransferRate, randStartVals } from "./Functions.tsx";
 import drawAll, { V1CX, V1CY, V2CX, V2CY } from "./Draw.tsx";
 import { AnimationFactory, HexFill, PathTrace, TubeFill } from "../types";
 import { fillVertShaderSource, blueFragShaderSource, orngFragShaderSource } from "./shaders.ts";
+import { makeZoomWheelCallback, mouseCoordinate, startDragging, stopDragging, Zoom } from "./zoom.ts";
 
 // Globals defined here
 export const g = {
@@ -129,6 +130,7 @@ export default function sketch(p: P5CanvasInstance) {
   p.draw = () => {
     p.background(250);
     p.translate(-g.width/2, -g.height/2);
+    Zoom(p, g.width, g.height);
     calcHeatTransferRate();
     const running = drawAll(p, dt, bt, pa, v, fillingAnimation);
     if (!running) {
@@ -137,17 +139,27 @@ export default function sketch(p: P5CanvasInstance) {
   };
 
   p.mousePressed = () => {
-    if (p.dist(V1CX, V1CY, p.mouseX, p.mouseY) <= 50) {
+    if (p.mouseX === 0 && p.mouseY === 0) return;
+    
+    const [mx, my] = mouseCoordinate(p);
+    console.log(`Mouse pressed at ${mx}, ${my}`);
+    if (p.dist(V1CX, V1CY, mx, my) <= 50) {
       g.dragging1 = true;
-    } else if (p.dist(V2CX, V2CY, p.mouseX, p.mouseY) <= 50) {
+    } else if (p.dist(V2CX, V2CY, mx, my) <= 50) {
       g.dragging2 = true;
+    }
+    else {
+      startDragging(p);
     }
   };
 
   p.mouseReleased = () => {
     g.dragging1 = false;
     g.dragging2 = false;
+    stopDragging();
   };
+
+  p.mouseWheel = makeZoomWheelCallback(p, g.width, g.height);
 
   // Blue long so I can use shader
   const drawBlueFillLong = (p: P5CanvasInstance, time:number, blueFillPath: PathTrace) => {

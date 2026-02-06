@@ -40,7 +40,7 @@ export function createGasCylinder(draw, x, y, label) {
             family: 'Arial',
             size: 20,
             anchor: 'middle',
-            weight: 'bold'
+            weight: 'regular'
         })
         .fill('white')
         .transform({ rotate: -90, cx: x + config.mainCylWidth / 2, cy: y + config.mainCylHeight / 2 });

@@ -107,5 +107,6 @@ export class Outlet {
     public reset = () => {
         this.ballValve.reset();
         this.flow(false);
+        this.tare();
     }
 }

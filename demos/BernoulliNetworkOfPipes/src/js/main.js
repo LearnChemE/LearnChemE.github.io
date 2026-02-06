@@ -7,14 +7,21 @@ const defaults = {
 const constants = {
   rho: 997,
   inletRadius: 1,
-  arrowScale: 0.5,
+  arrowScale: 0.4,
+  minArrowLength: 0.15,
   baseBounds: {
-    minX: -3,
-    maxX: 3,
-    minY: -2,
-    maxY: 3.2
+    minX: -2.6666666666666665,
+    maxX: 2.6666666666666665,
+    minY: -1.6,
+    maxY: 1.8666666666666667
   },
-  pAir: 0
+  pAir: 0,
+  displayAirPressure: 101
+};
+
+const colors = {
+  fluidFill: 'rgba(13, 110, 253, 0.15)',
+  labelFill: '#cfe2ff'
 };
 
 const plotlyScriptUrl = 'assets/plotly.js';
@@ -115,7 +122,11 @@ async function renderPlot() {
   }
 
   const figure = buildFigure(model);
-  const config = { displayModeBar: false, responsive: true };
+  const config = {
+    displayModeBar: false,
+    responsive: true,
+    staticPlot: true // prevent zooming or any interactive edits
+  };
   if (!plotInitialized) {
     plotlyRoot.innerHTML = '';
     plotlyLib.newPlot(plotlyRoot, figure.data, figure.layout, config);
@@ -126,11 +137,16 @@ async function renderPlot() {
 }
 
 function buildFigure(model) {
-  const baseBounds = constants.baseBounds;
+  const bounds = computeBounds(model);
   const fluidPolygon = getFluidPolygon(model);
   const wallCoords = getWallCoordinates(model);
-  const xRange = zoomedRange(baseBounds.minX, baseBounds.maxX, 0.05, 0.8);
-  const yRange = zoomedRange(baseBounds.minY, baseBounds.maxY, 0.05, 0.8);
+  const xRange = zoomedRange(bounds.minX, bounds.maxX, 0.05, 1);
+  const yRange = zoomedRange(bounds.minY, bounds.maxY, 0.05, 1);
+  const font = {
+    family: 'Arial, sans-serif',
+    size: 16,
+    color: '#000'
+  };
 
   const fluidTrace = {
     type: 'scatter',
@@ -138,7 +154,7 @@ function buildFigure(model) {
     x: fluidPolygon.map((pt) => pt.x),
     y: fluidPolygon.map((pt) => pt.y),
     fill: 'toself',
-    fillcolor: 'rgba(13, 110, 253, 0.15)',
+    fillcolor: colors.fluidFill,
     line: { color: 'rgba(13, 110, 253, 0.5)', width: 2 },
     hoverinfo: 'skip'
   };
@@ -152,11 +168,13 @@ function buildFigure(model) {
     hoverinfo: 'skip'
   };
 
+  const { annotations, dimensionTraces } = buildAnnotations(model, font);
   const layout = {
     margin: { l: 10, r: 10, t: 10, b: 10 },
     paper_bgcolor: 'rgba(0,0,0,0)',
     plot_bgcolor: 'rgba(0,0,0,0)',
     showlegend: false,
+    font,
     xaxis: {
       range: xRange,
       visible: false,
@@ -167,10 +185,10 @@ function buildFigure(model) {
       range: yRange,
       visible: false
     },
-    annotations: buildAnnotations(model)
+    annotations
   };
 
-  return { data: [fluidTrace, wallTrace], layout };
+  return { data: [fluidTrace, wallTrace, ...dimensionTraces], layout };
 }
 
 function getFluidPolygon(model) {
@@ -225,39 +243,45 @@ function getWallCoordinates(model) {
   return { x, y };
 }
 
-function buildAnnotations(model) {
-  const arrowScale = constants.arrowScale;
+function buildAnnotations(model, font) {
   const R1 = constants.inletRadius;
   const { diameters, velocities, pressure } = model;
+  const inletArrowLength = getArrowLength(velocities.inlet);
+  const leftArrowLength = getArrowLength(velocities.left);
+  const rightArrowLength = getArrowLength(velocities.right);
 
+  const airPressureText = `P<sub>air</sub> = ${constants.displayAirPressure} kPa`;
   const entries = [
     {
-      text: `p<sub>air</sub><br>U<sub>3</sub> = ${formatNumber(velocities.right, 1)} m/s`,
+      text: `${airPressureText}<br>U<sub>3</sub> = ${formatNumber(velocities.right, 1)} m/s`,
       start: { x: 1 + R1, y: 1 + diameters.left - diameters.right / 2 },
-      end: { x: 1 + R1 + velocities.right * arrowScale, y: 1 + diameters.left - diameters.right / 2 },
-      xanchor: 'left',
-      yanchor: 'bottom',
-      align: 'left'
+      end: { x: 1 + R1 + rightArrowLength, y: 1 + diameters.left - diameters.right / 2 },
+      textPosition: {
+        x: 1 + R1 + rightArrowLength / 2,
+        y: 1 + diameters.left - diameters.right / 2 + 0.25
+      }
     },
     {
-      text: `p<sub>air</sub><br>U<sub>2</sub> = ${formatNumber(velocities.left, 1)} m/s`,
+      text: `${airPressureText}<br>U<sub>2</sub> = ${formatNumber(velocities.left, 1)} m/s`,
       start: { x: -1 - R1, y: 1 + diameters.left / 2 },
-      end: { x: -1 - R1 - velocities.left * arrowScale, y: 1 + diameters.left / 2 },
-      xanchor: 'right',
-      yanchor: 'bottom',
-      align: 'right'
+      end: { x: -1 - R1 - leftArrowLength, y: 1 + diameters.left / 2 },
+      textPosition: {
+        x: -1 - R1 - leftArrowLength / 2,
+        y: 1 + diameters.left / 2 + 0.25
+      }
     },
     {
-      text: `p<sub>1</sub> = ${formatNumber(pressure, 1)} kPa<br>U<sub>1</sub> = ${formatNumber(velocities.inlet, 1)} m/s`,
-      start: { x: 0, y: 0 },
-      end: { x: 0, y: -velocities.inlet * arrowScale },
-      xanchor: 'left',
-      yanchor: 'top',
-      align: 'left'
+      text: `P<sub>1</sub> = ${formatNumber(pressure, 1)} kPa<br>U<sub>1</sub> = ${formatNumber(velocities.inlet, 1)} m/s`,
+      start: { x: 0, y: -inletArrowLength },
+      end: { x: 0, y: 0 },
+      textPosition: {
+        x: 0.3,
+        y: -0.3
+      }
     }
   ];
 
-  return entries.map((entry) => ({
+  const arrows = entries.map((entry) => ({
     x: entry.end.x,
     y: entry.end.y,
     ax: entry.start.x,
@@ -266,20 +290,169 @@ function buildAnnotations(model) {
     yref: 'y',
     axref: 'x',
     ayref: 'y',
-    text: entry.text,
     showarrow: true,
     arrowhead: 3,
     arrowcolor: '#111',
-    arrowwidth: 2,
-    arrowsize: 1,
-    standoff: 4,
-    bgcolor: 'rgba(255,255,255,0.95)',
-    font: { size: 14, color: '#111' },
-    borderpad: 4,
-    xanchor: entry.xanchor,
-    yanchor: entry.yanchor,
-    align: entry.align || 'left'
+    arrowwidth: 4,
+    arrowsize: 1.2,
+    standoff: 0,
+    arrowposition: 1,
+    xanchor: 'center',
+    yanchor: 'middle',
+    opacity: 1,
+    hovertext: entry.text,
+    hoverinfo: 'text'
   }));
+
+  const labels = entries.map((entry, index) => ({
+    x: entry.textPosition.x,
+    y: entry.textPosition.y,
+    xref: 'x',
+    yref: 'y',
+    showarrow: false,
+    text: entry.text,
+    xanchor: index === 1 ? 'right' : 'left',
+    yanchor: 'middle',
+    bgcolor: 'rgba(255,255,255,0.95)',
+    borderpad: 4,
+    font: { ...font, size: 16, color: '#111', weight: 500 },
+    align: index === 1 ? 'right' : 'left'
+  }));
+
+  const dimensionLabels = [];
+  const dimensionInset = 0.04;
+
+  const arrowLineTrace = {
+    type: 'scatter',
+    mode: 'lines',
+    x: [],
+    y: [],
+    line: { color: '#111', width: 2 },
+    hoverinfo: 'skip',
+    showlegend: false
+  };
+
+  const arrowHeadTrace = {
+    type: 'scatter',
+    mode: 'markers',
+    x: [],
+    y: [],
+    marker: {
+      color: '#111',
+      size: [],
+      symbol: [],
+      line: { color: '#111', width: 0.5 }
+    },
+    hoverinfo: 'skip',
+    showlegend: false
+  };
+
+  const addLineSegment = (points) => {
+    points.forEach(({ x, y }) => {
+      arrowLineTrace.x.push(x);
+      arrowLineTrace.y.push(y);
+    });
+    arrowLineTrace.x.push(null);
+    arrowLineTrace.y.push(null);
+  };
+
+  const addArrowHead = ({ x, y, direction }) => {
+    const symbolMap = {
+      up: 'triangle-up',
+      down: 'triangle-down',
+      left: 'triangle-left',
+      right: 'triangle-right'
+    };
+    const symbol = symbolMap[direction];
+    if (!symbol) return;
+    arrowHeadTrace.x.push(x);
+    arrowHeadTrace.y.push(y);
+    arrowHeadTrace.marker.symbol.push(symbol);
+    arrowHeadTrace.marker.size.push(12);
+  };
+
+  const addVerticalDimension = ({ x, yTop, yBottom, text, align = 'left' }) => {
+    const inset = Math.min(dimensionInset, Math.abs(yTop - yBottom) / 4);
+    const top = yTop - inset;
+    const bottom = yBottom + inset;
+    addLineSegment([
+      { x, y: bottom },
+      { x, y: top }
+    ]);
+    addArrowHead({ x, y: top, direction: 'up' });
+    addArrowHead({ x, y: bottom, direction: 'down' });
+    const labelX =
+      align === 'right' ? x - 0.08 : align === 'left' ? x + 0.08 : x;
+    dimensionLabels.push({
+      x: labelX,
+      y: (yTop + yBottom) / 2,
+      xref: 'x',
+      yref: 'y',
+      showarrow: false,
+      text,
+      xanchor: align === 'center' ? 'center' : align,
+      yanchor: 'middle',
+      bgcolor: colors.labelFill,
+      borderpad: 3,
+      font: { ...font, size: 15, color: '#111' },
+      align: align === 'right' ? 'right' : align === 'center' ? 'center' : 'left'
+    });
+  };
+
+  const addHorizontalDimension = ({ y, xLeft, xRight, text }) => {
+    const inset = Math.min(dimensionInset, Math.abs(xRight - xLeft) / 4);
+    const left = xLeft + inset;
+    const right = xRight - inset;
+    addLineSegment([
+      { x: left, y },
+      { x: right, y }
+    ]);
+    addArrowHead({ x: left, y, direction: 'left' });
+    addArrowHead({ x: right, y, direction: 'right' });
+    dimensionLabels.push({
+      x: (xLeft + xRight) / 2,
+      y: y - 0.2,
+      xref: 'x',
+      yref: 'y',
+      showarrow: false,
+      text,
+      xanchor: 'center',
+      yanchor: 'bottom',
+      bgcolor: colors.labelFill,
+      borderpad: 3,
+      font: { ...font, size: 15, color: '#111' },
+      align: 'center'
+    });
+  };
+
+  addVerticalDimension({
+    x: -R1 - 0.5,
+    yTop: 1 + diameters.left,
+    yBottom: 1,
+    text: `D<sub>2</sub> = ${formatNumber(diameters.left, 2)} m`,
+    align: 'center'
+  });
+
+  addVerticalDimension({
+    x: R1 + 0.5,
+    yTop: 1 + diameters.left,
+    yBottom: 1 + diameters.left - diameters.right,
+    text: `D<sub>3</sub> = ${formatNumber(diameters.right, 2)} m`,
+    align: 'center'
+  });
+
+  addHorizontalDimension({
+    y: 0.2,
+    xLeft: -R1,
+    xRight: R1,
+    text: `D<sub>1</sub> = ${formatNumber(diameters.inlet, 2)} m`
+  });
+
+  const annotations = arrows.concat(labels, dimensionLabels);
+  const dimensionTraces = [];
+  if (arrowLineTrace.x.length) dimensionTraces.push(arrowLineTrace);
+  if (arrowHeadTrace.x.length) dimensionTraces.push(arrowHeadTrace);
+  return { annotations, dimensionTraces };
 }
 
 function computeNetwork({ pressure, leftRadius, rightRadius }) {
@@ -319,7 +492,37 @@ function computeNetwork({ pressure, leftRadius, rightRadius }) {
   };
 }
 
-function zoomedRange(min, max, padding = 0.05, scale = 0.9) {
+function computeBounds(model) {
+  const { baseBounds } = constants;
+  if (!model) return { ...baseBounds };
+
+  const { diameters, velocities } = model;
+  const inletArrowLength = getArrowLength(velocities.inlet);
+  const leftArrowLabelY = 1 + diameters.left / 2 + 0.35;
+  const rightArrowLabelY = 1 + diameters.left - diameters.right / 2 + 0.35;
+  const fluidTop = 1 + diameters.left + 0.35;
+  const verticalDimensionTop = 1 + diameters.left + 0.2;
+
+  const dynamicMaxY = Math.max(
+    baseBounds.maxY,
+    fluidTop,
+    leftArrowLabelY,
+    rightArrowLabelY,
+    verticalDimensionTop
+  );
+
+  const inletArrowBottom = -inletArrowLength - 0.35;
+  const dynamicMinY = Math.min(baseBounds.minY, inletArrowBottom);
+
+  return {
+    minX: baseBounds.minX,
+    maxX: baseBounds.maxX,
+    minY: dynamicMinY,
+    maxY: dynamicMaxY
+  };
+}
+
+function zoomedRange(min, max, padding = 0.05, scale = 0.8) {
   const paddedMin = min - padding;
   const paddedMax = max + padding;
   const span = Math.max(paddedMax - paddedMin, 1e-3);
@@ -375,4 +578,12 @@ async function loadPlotly() {
 function formatNumber(value, digits = 2) {
   if (!Number.isFinite(value)) return '—';
   return Number(value).toFixed(digits);
+}
+
+function getArrowLength(velocity) {
+  const scale = constants.arrowScale;
+  const minLength = constants.minArrowLength || 0;
+  const scaled = Math.abs(velocity) * scale;
+  if (scaled <= 0) return minLength;
+  return Math.max(scaled, minLength);
 }

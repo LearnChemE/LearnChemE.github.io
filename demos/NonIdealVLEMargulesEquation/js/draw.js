@@ -1,6 +1,4 @@
 //import { calcAll } from "./calcs.js";
-import { positiveSlidersCase } from "./controls.js";
-import { negativeSlidersCase } from "./controls.js";
 const p5container = document.getElementById("p5-container");
 const positiveSliderWrapper = document.getElementById("positive-slider-wrapper");
 const negativeSliderWrapper = document.getElementById("negative-slider-wrapper");
@@ -25,23 +23,20 @@ window.setup = function () {
 };
 
 window.draw = function () {
-  console.log("drawing");
+  state.drawTimer++;
+  /* console.log("drawing"); */
   //control slider variables here so that it checks each frame if the selection is "positive" or "negative"
   const deviationSelectionElement = document.querySelector('input[name="deviation"]:checked');
   state.deviationSelection = deviationSelectionElement.value;
 
   if (state.deviationSelection == "positive") {
-    positiveSlidersCase();
-    console.log("im positve");
-    volumeSliderWrapper.style.display = "none";
-    pressureSliderWrapper.style.display = "grid";
-  }
-
-  if (state.deviationSelection == "negative") {
-    negativeSlidersCase();
-    console.log("im negative");
-    volumeSliderWrapper.style.display = "none";
-    pressureSliderWrapper.style.display = "grid";
+    /* console.log("im positve"); */
+    positiveSliderWrapper.style.display = "flex";
+    negativeSliderWrapper.style.display = "none";
+  } else if (state.deviationSelection == "negative") {
+    /* console.log("im negative"); */
+    positiveSliderWrapper.style.display = "none";
+    negativeSliderWrapper.style.display = "flex";
   }
   resize();
   background(255);

@@ -331,7 +331,6 @@ body {
   text-align: center;
 }
 
-
 @media (max-width: 600px) {
   body {
     padding: 10px;
@@ -381,16 +380,16 @@ body {
   font-size: 32px;
   font-family: monospace;
   width: 90%;
-  font-weight: bold;
+  font-weight: normal;
   position: relative;
 }
 
 .mfc-unit {
   position: absolute;
-  bottom: -20px;
+  bottom: -130px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 14px;
+  font-size: 20px;
   color: white;
 }
 

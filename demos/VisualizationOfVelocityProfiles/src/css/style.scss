@@ -5,9 +5,10 @@
   border: 2px solid #ccc;
   margin: 20px auto;
   padding: 10px;
-  width: calc(100vw - 40px);
+  background: transparent;
+  width: min(calc(100vw - 40px), 1100px);
   height: calc(100vh - 40px);
-  max-width: calc((100vh) * 1200 / 600);
+  max-width: min(1100px, calc((100vh) * 1200 / 600));
   max-height: calc((100vw) * 600 / 1200);
   
   > svg {
@@ -39,7 +40,8 @@
 .plot-side-panel {
   width: 260px;
   min-width: 220px;
-  background: rgba(255, 255, 255, 0.98);
+  flex: 0 0 260px;
+  // background: rgba(255, 255, 255, 1);
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
   padding: 16px 18px;
@@ -93,22 +95,37 @@
 }
 
 .plot-column {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 0;
   align-self: stretch;
+  margin: 0;
 }
 
 .plotly-container {
   flex: 1;
   min-height: 0;
-  background: rgba(255, 255, 255, 0.98);
+  background: transparent !important;
   border-radius: 14px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-  padding: 10px;
+  box-shadow: none;
+  padding: 6px;
   overflow: hidden;
+}
+
+#plotly-root,
+#plotly-root .js-plotly-plot,
+#plotly-root .plot-container,
+#plotly-root .svg-container,
+#plotly-root .main-svg {
+  background: transparent !important;
+}
+
+#plotly-root .main-svg .bg,
+#plotly-root .bg {
+  fill: transparent !important;
 }
 
 #plotly-root {
@@ -134,7 +151,7 @@ body {
   justify-content: flex-start;
   align-items: center;
   height: 100vh;
-  background-color: white;
+  background-color: transparent;
   width: 100%;
   font-family: sans-serif;
   font-weight: 400;
@@ -172,6 +189,7 @@ body {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
+  justify-content: center;
   gap: 0px;
   z-index: 1001;
   pointer-events: none;
@@ -184,8 +202,10 @@ body {
 
 #control-bar {
   flex: 1;
-  width: calc(100% - 226px);
-  min-width: 300px;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  align-self: flex-start;
 }
 
 .control-bar {
@@ -193,22 +213,31 @@ body {
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
-  justify-content: flex-start;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 10px;
-  padding: 12px 14px;
+  justify-content: center;
   pointer-events: auto;
-  margin: 0 0 0 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  margin: 0;
+  width: 100%;
 }
 
 .control-bar.slider-controls > .slider-group {
-  flex: 2 1 0;
-  min-width: 0;
+  flex: 1 1 280px;
+  min-width: 220px;
+  max-width: 360px;
   display: flex;
   align-items: center;
   gap: 6px;
+  padding: 8px;
+  background-color: #fff;
+  border-radius: 4px;
   order: 1;
+}
+
+@media (max-width: 520px) {
+  .control-bar.slider-controls > .slider-group {
+    flex-basis: 100%;
+    min-width: 100%;
+    max-width: 100%;
+  }
 }
 
 .control-group {
@@ -233,15 +262,18 @@ body {
 }
 
 .control-bar.slider-controls .slider-group label {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 400;
   white-space: nowrap;
+  color: #000;
 }
 
 .control-bar.slider-controls .slider-group input[type="range"] {
   flex: 1 1 auto;
-  width: auto;
+  min-width: 0;
+  max-width: none;
   -webkit-appearance: none;
+  appearance: none;
   background: transparent;
   margin: 0;
 }
@@ -280,42 +312,35 @@ body {
 
 .control-bar.slider-controls .slider-group span {
   display: inline-block;
-  min-width: 40px;
-  text-align: right;
-  font-size: 1.15rem;
+  min-width: 32px;
+  text-align: center;
+  font-size: 0.95rem;
   font-weight: 400;
+  color: #000;
 }
 
 .slider-value-container {
-  min-width: 60px;
-  text-align: right;
+  min-width: 40px;
+  text-align: center;
 }
 
 .slider-value {
   font-weight: 600;
-  font-size: 1.15rem;
+  font-size: 0.95rem;
+  color: #000;
 }
 
 .slider-group--height label,
 .slider-group--height .math-label,
-.slider-value--height {
-  color: #0d6efd;
-}
-
+.slider-value--height,
 .slider-group--radius label,
 .slider-group--radius .math-label,
-.slider-value--radius {
-  color: #198754;
-}
-
+.slider-value--radius,
 .slider-group--x label,
-.slider-value--x {
-  color: #0d6efd;
-}
-
+.slider-value--x,
 .slider-group--y label,
 .slider-value--y {
-  color: #d63384;
+  color: #000;
 }
 
 .radio-group {

@@ -23,12 +23,10 @@ window.state = {
   distTY: mainHeight / 2 - 32 - 240,
 
   //slider variables
-  A12PositiveValue: 0,
-  A21PositiveValue: 0,
-  A12NegativeValue: 0,
-  A21NegativeValue: 0,
-  A12Value: 0,
-  A21Value: 0,
+  positiveA12Value: 0,
+  positiveA21Value: 0,
+  negativeA12Value: 0,
+  negativeA21Value: 0,
 
   //radio button variables
   plotSelection: 0,
@@ -65,5 +63,7 @@ window.state = {
   heightX12: 0,
   heightX23: 0,
 
-  //arrows
+  //Timers
+  drawTimer: 0,
+  deviationSelectionTimer: 0,
 };

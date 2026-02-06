@@ -222,12 +222,12 @@ export function drawPipes(draw, pipeGroup) {
     M ${fourValveMiddleX} ${fourValveMiddleY + fourValveWidth}
     L ${fourValveMiddleX} ${fourValveMiddleY + fourValveWidth + 280}
     L ${adsMiddleX} ${fourValveMiddleY + fourValveWidth + 280}
-    L ${adsMiddleX} ${fourValveMiddleY + fourValveWidth + 248}
+    L ${adsMiddleX} ${fourValveMiddleY + fourValveWidth + 226}
   `;
   drawPipeWithCurves(draw, pipeGroup, AdsorptionBedInletPath, 'adsorption_bed_inlet');
 
   const AdsorptionBedOutletPath = `
-    M ${adsMiddleX} ${fourValveMiddleY + fourValveWidth + 46}
+    M ${adsMiddleX} ${fourValveMiddleY + fourValveWidth + 99}
     L ${adsMiddleX} ${fourValveMiddleY}
     L ${adsMiddleX - 30} ${fourValveMiddleY}
   `;
@@ -248,7 +248,7 @@ export function drawPipes(draw, pipeGroup) {
   drawPipeWithCurves(draw, pipeGroup, BPGValveOutletPath, 'bpg_valve_outlet');
 
   const AnalyserOutletPath = `
-    M ${fourValveMiddleX + 311} ${outletY}
+    M ${fourValveMiddleX + 271} ${outletY}
     L ${fourValveMiddleX + 360} ${outletY}
   `;
   drawPipeWithCurves(draw, pipeGroup, AnalyserOutletPath, 'analyser_outlet');

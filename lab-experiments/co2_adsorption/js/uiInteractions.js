@@ -322,10 +322,10 @@ export function updateDigitalPressureGauge() {
 
 export function writeTextAtPosition(x, y, text, options = {}) {
   const {
-    fontSize = '14px',
+    fontSize = '16px',
       fontFamily = 'Arial',
       fill = 'black',
-      fontWeight = 'normal',
+      fontWeight = 100,
       textAnchor = 'middle',
       className = '',
       id = ''

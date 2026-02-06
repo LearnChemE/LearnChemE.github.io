@@ -1,471 +1,508 @@
-import * as config from './config.js';
+import Plotly from 'plotly.js/dist/plotly';
 
 const defaults = {
-  initialHeight: 600,
-  parachuteRadius: 4,
-  safeVelocity: 3.7
+  z0: 3000,
+  dParachute: 10
 };
 
-const physics = {
-  mass: 71,
-  gravity: 9.81,
-  airDensity: 1.2,
-  cDPerson: 1,
-  cDParachute: 1.75,
-  waistRadius: 1.07 / (2 * Math.PI)
+const constants = {
+  mass: 68,
+  airDensity: 1,
+  cDAperson: 0.93,
+  cDparachute: 1.4,
+  gravity: 9.8,
+  deployTime: 30,
+  safeVelocity: { min: 2.5, max: 3.5 },
+  maxTime: 360,
+  dt: 0.02
 };
 
-const samples = 600;
-const plotlyCdnUrl = 'assets/plotly.js';
+const elements = {
+  plotRoot: null,
+  sliders: {},
+  sliderValues: {},
+  landingSummary: null
+};
 
-let drawRef;
-let controlsReady = false;
-const elements = {};
-let plotlyRoot;
-let plotlyPromise;
+const state = { ...defaults };
+
+let initialized = false;
 let plotInitialized = false;
+let resizeBound = false;
 
-export function drawFigure(svg) {
-  drawRef = svg;
-  if (drawRef?.hide) drawRef.hide();
-  plotlyRoot = document.getElementById('plotly-root');
+export function drawFigure(draw) {
+  if (draw?.hide) draw.hide();
+  cacheElements();
   setupControls();
-  renderPlot();
+  renderSimulation();
+  if (!resizeBound) {
+    window.addEventListener('resize', handleResize, { passive: true });
+    resizeBound = true;
+  }
 }
 
-export function reset() {
-  if (!controlsReady) return;
-  syncControls(defaults);
-  renderPlot();
+function cacheElements() {
+  elements.plotRoot = document.getElementById('plotly-root');
+  elements.sliders.z0 = document.getElementById('altitudeSlider');
+  elements.sliders.dParachute = document.getElementById('diameterSlider');
+  elements.sliderValues.z0 = document.getElementById('altitudeValue');
+  elements.sliderValues.dParachute = document.getElementById('diameterValue');
+  elements.landingSummary = document.getElementById('landingMessage');
 }
 
 function setupControls() {
-  if (controlsReady) return;
-  elements.heightSlider = document.getElementById('heightSlider');
-  elements.radiusSlider = document.getElementById('radiusSlider');
-  elements.heightValue = document.getElementById('heightValue');
-  elements.radiusValue = document.getElementById('radiusValue');
-  elements.statusMessage = document.getElementById('statusMessage');
+  if (initialized) {
+    syncControls(state);
+    return;
+  }
 
-  if (!elements.heightSlider || !elements.radiusSlider) return;
+  const sliderConfig = [
+    { key: 'z0', decimals: 0 },
+    { key: 'dParachute', decimals: 1 }
+  ];
 
-  const handleInput = () => renderPlot();
-  [elements.heightSlider, elements.radiusSlider].forEach((slider) => {
-    slider.addEventListener('input', handleInput);
+  sliderConfig.forEach(({ key, decimals }) => {
+    const slider = elements.sliders[key];
+    if (!slider) return;
+    slider.addEventListener('input', () => {
+      const value = parseFloat(slider.value);
+      if (!Number.isFinite(value)) return;
+      state[key] = value;
+      if (elements.sliderValues[key]) {
+        elements.sliderValues[key].textContent = value.toFixed(decimals);
+      }
+      renderSimulation();
+    });
   });
 
   syncControls(defaults);
-  controlsReady = true;
+  initialized = true;
 }
 
 function syncControls(values) {
-  if (elements.heightSlider) elements.heightSlider.value = values.initialHeight;
-  if (elements.radiusSlider) elements.radiusSlider.value = values.parachuteRadius;
-  updateOutputs(values);
+  Object.entries(values).forEach(([key, value]) => {
+    if (elements.sliders[key]) elements.sliders[key].value = value;
+    if (elements.sliderValues[key]) {
+      const decimals = key === 'z0' ? 0 : 1;
+      elements.sliderValues[key].textContent = Number(value).toFixed(decimals);
+    }
+    state[key] = Number(value);
+  });
 }
 
-function getParams() {
+function renderSimulation() {
+  const result = integrateTrajectory(state);
+  updateLandingSummary(result);
+  renderPlot(result);
+}
+
+function handleResize() {
+  if (plotInitialized && elements.plotRoot) {
+    Plotly.Plots.resize(elements.plotRoot);
+  }
+}
+
+function integrateTrajectory(params) {
+  const dt = constants.dt;
+  const maxSteps = Math.ceil(constants.maxTime / dt);
+  const area = Math.PI * (params.dParachute ** 2) / 4;
+  const times = [];
+  const altitudes = [];
+  const velocities = [];
+
+  let z = params.z0;
+  let U = 0;
+  let t = 0;
+  let groundEvent = null;
+
+  for (let step = 0; step < maxSteps; step += 1) {
+    const currentState = { t, z, U };
+    times.push(t);
+    altitudes.push(Math.max(z, 0));
+    velocities.push(U);
+
+    if (z <= 0) {
+      groundEvent = { time: t, velocity: U };
+      break;
+    }
+
+    const nextState = rk4Step(currentState, dt, area);
+
+    if (nextState.z <= 0) {
+      const landing = interpolateToAltitude(currentState, nextState, 0);
+      if (landing) {
+        times.push(landing.time);
+        altitudes.push(0);
+        velocities.push(landing.velocity);
+        groundEvent = { time: landing.time, velocity: landing.velocity };
+      } else {
+        groundEvent = { time: nextState.t, velocity: nextState.U };
+      }
+      break;
+    }
+
+    t = nextState.t;
+    z = nextState.z;
+    U = nextState.U;
+  }
+
+  if (!groundEvent && times[times.length - 1] < t) {
+    times.push(t);
+    altitudes.push(Math.max(z, 0));
+    velocities.push(U);
+  }
+
+  const maxVelocity = velocities.reduce((max, value) => Math.max(max, value), 0);
+
   return {
-    initialHeight: parseFloat(elements.heightSlider?.value) || defaults.initialHeight,
-    parachuteRadius: parseFloat(elements.radiusSlider?.value) || defaults.parachuteRadius,
-    safeVelocity: defaults.safeVelocity
+    times,
+    altitudes,
+    velocities,
+    area,
+    groundEvent,
+    maxVelocity
   };
 }
 
-function updateOutputs({ initialHeight, parachuteRadius }) {
-  if (elements.heightValue) elements.heightValue.textContent = `${Math.round(initialHeight)}`;
-  if (elements.radiusValue) elements.radiusValue.textContent = `${parachuteRadius.toFixed(1)}`;
+function rk4Step(state, dt, area) {
+  const k1 = derivatives(state.t, state.z, state.U, area);
+  const k2 = derivatives(
+    state.t + dt / 2,
+    state.z + (dt / 2) * k1.dzdt,
+    state.U + (dt / 2) * k1.dUdt,
+    area
+  );
+  const k3 = derivatives(
+    state.t + dt / 2,
+    state.z + (dt / 2) * k2.dzdt,
+    state.U + (dt / 2) * k2.dUdt,
+    area
+  );
+  const k4 = derivatives(
+    state.t + dt,
+    state.z + dt * k3.dzdt,
+    state.U + dt * k3.dUdt,
+    area
+  );
+
+  const dzdt = (k1.dzdt + 2 * k2.dzdt + 2 * k3.dzdt + k4.dzdt) / 6;
+  const dUdt = (k1.dUdt + 2 * k2.dUdt + 2 * k3.dUdt + k4.dUdt) / 6;
+
+  return {
+    t: state.t + dt,
+    z: state.z + dzdt * dt,
+    U: state.U + dUdt * dt
+  };
 }
 
-async function renderPlot() {
-  if (!elements.heightSlider) return;
-  if (!plotlyRoot) plotlyRoot = document.getElementById('plotly-root');
-  const params = getParams();
-  updateOutputs(params);
-  const result = computeTrajectory(params);
-
-  if (!plotlyRoot) {
-    setStatusMessage('Plot container not found.');
-    return;
+function derivatives(t, _z, U, area) {
+  const sign = Math.abs(U) < 1e-8 ? 1 : Math.sign(U);
+  const base = 0.5 * constants.airDensity * (U ** 2) * sign / constants.mass;
+  const dragPerson = base * constants.cDAperson;
+  let dragParachute = 0;
+  if (t >= constants.deployTime && area > 0) {
+    dragParachute = base * constants.cDparachute * area;
   }
 
-  if (!result.success) {
-    setStatusMessage(result.message);
+  return {
+    dzdt: -U,
+    dUdt: constants.gravity - dragPerson - dragParachute
+  };
+}
+
+function interpolateToAltitude(start, end, targetAltitude) {
+  const span = end.z - start.z;
+  if (span === 0) return null;
+  const fraction = (targetAltitude - start.z) / span;
+  return {
+    time: start.t + fraction * (end.t - start.t),
+    altitude: targetAltitude,
+    velocity: start.U + fraction * (end.U - start.U)
+  };
+}
+
+function renderPlot(result) {
+  if (!elements.plotRoot || !result) return;
+  if (!result.times.length) {
+    showPlotPlaceholder('Unable to compute the trajectory. Adjust the sliders.');
     plotInitialized = false;
-    showPlotPlaceholder(result.message);
     return;
   }
 
-  if (!plotInitialized) showPlotPlaceholder('Loading plot...');
+  const figure = buildFigure(result);
+  const config = {
+    displayModeBar: false,
+    responsive: true,
+    staticPlot: true,
+    scrollZoom: false,
+    doubleClick: false
+  };
 
-  let plotlyLib;
-  try {
-    plotlyLib = await loadPlotly();
-  } catch (err) {
-    setStatusMessage('Plotly failed to load. Please refresh the page.');
-    showPlotPlaceholder('Plotly failed to load. Please refresh the page.');
-    return;
+  if (!plotInitialized) {
+    Plotly.newPlot(elements.plotRoot, figure.data, figure.layout, config);
+    plotInitialized = true;
+  } else {
+    Plotly.react(elements.plotRoot, figure.data, figure.layout, config);
   }
-
-  if (!plotlyLib) {
-    setStatusMessage('Plotly failed to load. Please refresh the page.');
-    showPlotPlaceholder('Plotly failed to load. Please refresh the page.');
-    return;
-  }
-
-  const { times, heights, velocities, tOpen, finalTime, terminalVelocity } = result;
-  setStatusMessage(
-    `Open the parachute at ${tOpen.toFixed(2)} s. Terminal velocity is ${terminalVelocity.toFixed(1)} m/s (target landing speed ${params.safeVelocity.toFixed(1)} m/s).`
-  );
-
-  const timeStats = buildAxisStats([finalTime]);
-  const heightStats = buildAxisStats(heights);
-  const velocityStats = buildAxisStats(
-    velocities.concat([params.safeVelocity, terminalVelocity])
-  );
-
-  renderPlotlyFigure({
-    plotlyLib,
-    params,
-    result,
-    stats: { timeStats, heightStats, velocityStats },
-    initialized: plotInitialized
-  });
-  plotInitialized = true;
 }
 
-function setStatusMessage(message) {
-  if (elements.statusMessage) elements.statusMessage.textContent = message;
-}
+function buildFigure(result) {
+  const times = result.times;
+  const altitudes = result.altitudes;
+  const velocities = result.velocities;
+  const lastTime = times[times.length - 1] || constants.maxTime;
+  const xMax = Math.max(lastTime, constants.deployTime + 5);
+  const vMax = Math.max(result.maxVelocity || 0, constants.safeVelocity.max * 1.2);
+  const velocityRange = [0, vMax * 1.1];
+  const zMax = altitudes.reduce((max, value) => Math.max(max, value), 0);
 
-function renderPlotlyFigure({ plotlyLib, params, result, stats, initialized }) {
-  if (!plotlyRoot) return;
-  const { times, heights, velocities, tOpen } = result;
-  const { timeStats, heightStats, velocityStats } = stats;
-  const containerHeight = Math.max((plotlyRoot.clientHeight || window.innerHeight || 0) - 20, 320);
-
-  const heightTrace = {
-    x: times,
-    y: heights,
+  const altitudeTrace = {
+    type: 'scatter',
     mode: 'lines',
-    name: 'height',
+    x: times,
+    y: altitudes,
+    name: 'altitude',
     line: { color: '#0d6efd', width: 3 },
-    xaxis: 'x',
-    yaxis: 'y',
-    hovertemplate: 't: %{x:.2f} s<br>h: %{y:.0f} m<extra></extra>'
+    hovertemplate: 't = %{x:.1f} s<br>z = %{y:.0f} m<extra></extra>'
   };
 
   const velocityTrace = {
+    type: 'scatter',
+    mode: 'lines',
     x: times,
     y: velocities,
-    mode: 'lines',
-    name: 'velocity',
-    line: { color: '#dc3545', width: 3 },
+    name: 'downward speed',
     xaxis: 'x2',
     yaxis: 'y2',
-    hovertemplate: 't: %{x:.2f} s<br>U: %{y:.1f} m/s<extra></extra>'
+    line: { color: '#ff7a18', width: 3 },
+    hovertemplate: 't = %{x:.1f} s<br>U = %{y:.2f} m/s<extra></extra>'
+  };
+
+  const shapes = [
+    {
+      type: 'rect',
+      xref: 'x2',
+      yref: 'y2',
+      x0: 0,
+      x1: xMax,
+      y0: constants.safeVelocity.min,
+      y1: constants.safeVelocity.max,
+      fillcolor: 'rgba(25, 135, 84, 0.6)',
+      line: { width: 0 }
+    },
+    {
+      type: 'line',
+      xref: 'x2',
+      yref: 'y2',
+      x0: constants.deployTime,
+      x1: constants.deployTime,
+      y0: 0,
+      y1: velocityRange[1],
+      line: { color: '#6c757d', dash: 'dot', width: 2 }
+    }
+  ];
+
+  // Place the safe-landing label at a fixed offset above the green band.
+  // This keeps it independent of the red velocity curve.
+  const safeLabelX = Math.min(xMax * 0.5, times[times.length - 1] || 0);
+  const greenTop = constants.safeVelocity.max;
+  const safeLabelY = Math.min(greenTop + 0.25, velocityRange[1] - 0.5);
+
+  const annotations = [
+    {
+      text: 'Parachute automatically opens at t = 30 s',
+      x: xMax * 0.5,
+      xref: 'x',
+      y: Math.max(zMax * 0.98, zMax - 1),
+      yref: 'y',
+      showarrow: false,
+      align: 'center',
+      yanchor: 'top',
+      font: { size: 16, color: '#0b2240', family: '"Helvetica Neue", Helvetica, Arial, sans-serif' }
+    },
+    {
+      text: 'parachute opens',
+      x: constants.deployTime,
+      xref: 'x2',
+      y: Math.min(velocityRange[1] * 0.7, velocityRange[1] - 1),
+      yref: 'y2',
+      textangle: -90,
+      showarrow: false,
+      xanchor: 'left',
+      xshift: 6,
+      font: { size: 16, color: '#495057' }
+    },
+    {
+      text: 'safe landing 2.5–3.5 m/s',
+      x: safeLabelX,
+      xref: 'x2',
+      y: safeLabelY,
+      yref: 'y2',
+      showarrow: false,
+      align: 'center',
+      yanchor: 'bottom',
+      yshift: 4,
+      bgcolor: 'rgba(255,255,255,0.85)',
+      bordercolor: 'rgba(0,0,0,0)',
+      font: { size: 18, color: '#198754', family: '"Helvetica Neue", Helvetica, Arial, sans-serif' }
+    }
+  ];
+
+  if (result.groundEvent) {
+    shapes.push({
+      type: 'line',
+      xref: 'x2',
+      yref: 'paper',
+      x0: result.groundEvent.time,
+      x1: result.groundEvent.time,
+      y0: 0,
+      y1: 1,
+      line: { color: '#adb5bd', width: 1 }
+    });
+  }
+
+  shapes.push({
+    type: 'line',
+    xref: 'paper',
+    yref: 'paper',
+    x0: 0,
+    x1: 1,
+    y0: 0.5,
+    y1: 0.5,
+    line: { color: '#000', width: 2 }
+  });
+  shapes.push({
+    type: 'line',
+    xref: 'paper',
+    yref: 'paper',
+    x0: 0,
+    x1: 1,
+    y0: 1,
+    y1: 1,
+    line: { color: '#bfbfbf', width: 1 }
+  });
+  shapes.push({
+    type: 'line',
+    xref: 'paper',
+    yref: 'paper',
+    x0: 0,
+    x1: 1,
+    y0: 0,
+    y1: 0,
+    line: { color: '#bfbfbf', width: 1 }
+  });
+
+  const plotFont = {
+    family: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+    size: 16,
+    color: '#0b2240'
+  };
+
+  const axisBorder = {
+    mirror: true,
+    linecolor: '#bfbfbf',
+    linewidth: 1
   };
 
   const layout = {
-    height: containerHeight,
-    margin: { l: 80, r: 50, t: 12, b: 70 },
+    margin: { l: 90, r: 40, t: 18, b: 40 },
     paper_bgcolor: 'rgba(0,0,0,0)',
     plot_bgcolor: 'rgba(0,0,0,0)',
-    hovermode: 'closest',
-    grid: { rows: 1, columns: 2, pattern: 'independent', xgap: 0.18 },
-    xaxis: createAxisOptions('time (s)', timeStats),
-    xaxis2: createAxisOptions('time (s)', timeStats),
-    yaxis: createAxisOptions('height (m)', heightStats),
-    yaxis2: createAxisOptions('velocity (m/s)', velocityStats),
     showlegend: false,
-    shapes: [
-      { type: 'line', xref: 'x', yref: 'paper', x0: tOpen, x1: tOpen, y0: 0, y1: 1, line: { color: '#111', width: 2, dash: 'dot' } },
-      { type: 'line', xref: 'x2', yref: 'paper', x0: tOpen, x1: tOpen, y0: 0, y1: 1, line: { color: '#111', width: 2, dash: 'dot' } },
-      { type: 'line', xref: 'x2', yref: 'y2', x0: 0, x1: timeStats.max, y0: params.safeVelocity, y1: params.safeVelocity, line: { color: '#6c757d', width: 2, dash: 'dash' } }
-    ],
-    annotations: [
-      {
-        text: `safe velocity ${params.safeVelocity.toFixed(1)} m/s`,
-        xref: 'x2',
-        yref: 'y2',
-        x: timeStats.max,
-        y: params.safeVelocity,
-        xanchor: 'right',
-        yanchor: 'bottom',
-        showarrow: false,
-        font: { size: 12, color: '#6c757d' }
-      }
-    ]
+    font: plotFont,
+    grid: {
+      rows: 2,
+      columns: 1,
+      pattern: 'independent',
+      roworder: 'top to bottom',
+      ygap: 0
+    },
+    xaxis: {
+      range: [0, xMax],
+      title: { text: '', standoff: 0 },
+      showgrid: true,
+      showticklabels: false,
+      ticks: '',
+      zeroline: false,
+      automargin: true,
+      showline: false
+    },
+    yaxis: {
+      rangemode: 'tozero',
+      title: { text: 'position (m)', standoff: 12 },
+      showgrid: true,
+      zeroline: false,
+      automargin: true,
+      ...axisBorder
+    },
+    xaxis2: {
+      range: [0, xMax],
+      title: { text: 'time (s)', standoff: 8 },
+      showgrid: true,
+      zeroline: false,
+      automargin: true,
+      showline: false,
+      matches: 'x'
+    },
+    yaxis2: {
+      range: velocityRange,
+      title: { text: 'velocity (m/s)', standoff: 12 },
+      showgrid: true,
+      zeroline: false,
+      automargin: true,
+      ...axisBorder
+    },
+    shapes,
+    annotations
   };
 
-  const plotConfig = { responsive: true, displayModeBar: false };
-  if (!initialized || !plotlyRoot.data) {
-    plotlyRoot.innerHTML = '';
-    plotlyLib.newPlot(plotlyRoot, [heightTrace, velocityTrace], layout, plotConfig);
-  } else {
-    plotlyLib.react(plotlyRoot, [heightTrace, velocityTrace], layout, plotConfig);
-  }
-  resetPlotZoom(plotlyLib);
-}
-
-function createAxisOptions(label, stats) {
-  return {
-    title: { text: label, standoff: 12 },
-    range: [0, stats.max],
-    tickvals: stats.ticks,
-    ticktext: stats.ticks.map(formatAxisLabel),
-    zeroline: false,
-    mirror: true,
-    linecolor: '#444',
-    gridcolor: '#e4e4e4',
-    ticks: 'outside',
-    tickfont: { size: 13 },
-    automargin: true
-  };
+  return { data: [altitudeTrace, velocityTrace], layout };
 }
 
 function showPlotPlaceholder(message) {
-  if (!plotlyRoot) return;
-  plotlyRoot.innerHTML = `<div class="plotly-placeholder">${message}</div>`;
+  if (!elements.plotRoot) return;
+  elements.plotRoot.innerHTML = `<div class="plotly-placeholder">${message}</div>`;
 }
 
-async function loadPlotly() {
-  if (window.Plotly) return window.Plotly;
-  if (!plotlyPromise) {
-    plotlyPromise = new Promise((resolve, reject) => {
-      let script = document.querySelector('script[data-plotly-loader="true"]');
-      if (!script) {
-        script = document.createElement('script');
-        script.src = plotlyCdnUrl;
-        script.async = true;
-        script.dataset.plotlyLoader = 'true';
-      }
-      if (script.dataset.plotlyLoaded === 'true') {
-        resolve(window.Plotly);
-        return;
-      }
+function updateLandingSummary(result) {
+  if (!result || !elements.landingSummary) return;
+  const landing = result.groundEvent;
+  if (landing) {
+    const v = Math.abs(landing.velocity);
+    const t = landing.time;
+    const safeMax = constants.safeVelocity.max;
+    const opened = t >= constants.deployTime;
 
-      const handleLoad = () => {
-        script.dataset.plotlyLoaded = 'true';
-        if (window.Plotly) resolve(window.Plotly);
-        else {
-          plotlyPromise = null;
-          reject(new Error('Plotly failed to expose API'));
-        }
-      };
-
-      const handleError = () => {
-        plotlyPromise = null;
-        reject(new Error('Plotly failed to load'));
-      };
-
-      script.addEventListener('load', handleLoad, { once: true });
-      script.addEventListener('error', handleError, { once: true });
-      if (!script.parentNode) document.head.appendChild(script);
-    });
-  }
-  return plotlyPromise;
-}
-
-function buildAxisStats(values) {
-  const maxVal = Math.max(...values.map((val) => (Number.isFinite(val) ? val : 0)));
-  const sanitized = Math.max(maxVal, 1);
-  const ticks = buildTicks(sanitized);
-  return { ticks, max: ticks[ticks.length - 1] };
-}
-
-function buildTicks(maxValue) {
-  const sanitized = Math.max(maxValue, 1);
-  const step = niceNumber(sanitized / 4);
-  const ticks = [];
-  for (let value = 0; value <= sanitized + step * 0.5; value += step) {
-    ticks.push(parseFloat(value.toFixed(2)));
-  }
-  return ticks;
-}
-
-function niceNumber(value) {
-  if (value <= 0 || !Number.isFinite(value)) return 1;
-  const exponent = Math.floor(Math.log10(value));
-  const fraction = value / Math.pow(10, exponent);
-  let niceFraction;
-  if (fraction <= 1) niceFraction = 1;
-  else if (fraction <= 2) niceFraction = 2;
-  else if (fraction <= 5) niceFraction = 5;
-  else niceFraction = 10;
-  return niceFraction * Math.pow(10, exponent);
-}
-
-function formatAxisLabel(value) {
-  let decimals;
-  if (value >= 100) decimals = 0;
-  else if (value >= 10) decimals = 0;
-  else if (value >= 1) decimals = 1;
-  else decimals = 2;
-  const rounded = Number(value.toFixed(decimals));
-  return Number.isInteger(rounded) ? rounded.toString() : rounded.toString();
-}
-
-function resetPlotZoom(plotlyLib) {
-  if (!plotlyRoot || !plotlyLib) return;
-  plotlyLib.relayout(plotlyRoot, {
-    'xaxis.autorange': true,
-    'xaxis2.autorange': true,
-    'yaxis.autorange': true,
-    'yaxis2.autorange': true
-  }).catch(() => {});
-}
-
-function computeTrajectory(params) {
-  const env = buildEnvironment(params);
-  const terminalVelocity = Math.sqrt(physics.gravity / env.alphaAfter);
-  if (params.safeVelocity <= terminalVelocity) {
-    return {
-      success: false,
-      message: `Parachute is too small to reach ${params.safeVelocity.toFixed(1)} m/s. Terminal velocity is ${terminalVelocity.toFixed(1)} m/s.`
-    };
-  }
-
-  const lowerBound = Math.max(0.1, Math.sqrt((2 * params.initialHeight) / physics.gravity));
-  const upperBound = Math.max(lowerBound + 0.1, params.initialHeight * Math.sqrt(env.alphaAfter / physics.gravity));
-  const landingFn = (tOpen) => landingHeight(tOpen, env, params.safeVelocity);
-  const tOpen = findRootBisection(landingFn, lowerBound, upperBound);
-  if (!Number.isFinite(tOpen)) {
-    return {
-      success: false,
-      message: 'Unable to find a feasible deployment time with these settings.'
-    };
-  }
-
-  const model = buildTrajectoryModel(env, tOpen, params.safeVelocity);
-  if (!Number.isFinite(model.finalTime) || model.finalTime <= tOpen) {
-    return {
-      success: false,
-      message: 'Unable to find a feasible deployment time with these settings.'
-    };
-  }
-
-  const times = generateTimeArray(model.finalTime, samples);
-  const heights = times.map((t) => Math.max(model.height(t), 0));
-  const velocities = times.map((t) => Math.max(model.velocity(t), 0));
-  return {
-    success: true,
-    times,
-    heights,
-    velocities,
-    tOpen,
-    finalTime: model.finalTime,
-    terminalVelocity
-  };
-}
-
-function buildEnvironment(params) {
-  const personArea = Math.PI * physics.waistRadius * physics.waistRadius;
-  const parachuteArea = Math.PI * Math.pow(Math.max(params.parachuteRadius, 0.1), 2);
-  const dragBefore = physics.cDPerson * personArea;
-  const dragAfter = dragBefore + physics.cDParachute * parachuteArea;
-  const alphaBefore = (physics.airDensity * dragBefore) / (2 * physics.mass);
-  const alphaAfter = (physics.airDensity * dragAfter) / (2 * physics.mass);
-  return {
-    h0: params.initialHeight,
-    alphaBefore,
-    alphaAfter,
-    sqrtAlphaBg: Math.sqrt(alphaBefore * physics.gravity),
-    sqrtAlphaAg: Math.sqrt(alphaAfter * physics.gravity)
-  };
-}
-
-function landingHeight(tOpen, env, safeVelocity) {
-  const model = buildTrajectoryModel(env, tOpen, safeVelocity);
-  if (!Number.isFinite(model.finalTime)) return Number.NaN;
-  return model.height(model.finalTime);
-}
-
-function buildTrajectoryModel(env, tOpen, safeVelocity) {
-  const gamma = computeGamma(env, tOpen);
-  const hb = (time) => env.h0 - Math.log((1 + Math.cosh(2 * env.sqrtAlphaBg * time)) / 2) / (2 * env.alphaBefore);
-  const hOpen = hb(tOpen);
-  const ha = (time) => {
-    const delta = time - tOpen;
-    const coshTerm = Math.cosh(2 * env.sqrtAlphaAg * delta);
-    const sinhTerm = Math.sinh(2 * env.sqrtAlphaAg * delta);
-    const numerator = 2 * gamma + (1 + gamma * gamma) * coshTerm + (1 - gamma * gamma) * sinhTerm;
-    const denom = Math.pow(1 + gamma, 2);
-    const ratio = Math.max(numerator / denom, 1e-12);
-    return hOpen - Math.log(ratio) / (2 * env.alphaAfter);
-  };
-
-  const Ub = (time) => {
-    const expTerm = Math.exp(-2 * env.sqrtAlphaBg * time);
-    return Math.sqrt(physics.gravity / env.alphaBefore) * (1 - expTerm) / (1 + expTerm);
-  };
-
-  const Ua = (time) => {
-    const expTerm = Math.exp(-2 * env.sqrtAlphaAg * (time - tOpen));
-    return Math.sqrt(physics.gravity / env.alphaAfter) * (1 - gamma * expTerm) / (1 + gamma * expTerm);
-  };
-
-  const height = (time) => (time <= tOpen ? hb(time) : ha(time));
-  const velocity = (time) => (time <= tOpen ? Ub(time) : Ua(time));
-  const finalTime = computeFinalTime(env, gamma, tOpen, safeVelocity);
-
-  return { height, velocity, finalTime };
-}
-
-function computeGamma(env, tOpen) {
-  const expTerm = Math.exp(-2 * env.sqrtAlphaBg * tOpen);
-  const numerator = Math.sqrt(env.alphaBefore) * (1 + expTerm) - Math.sqrt(env.alphaAfter) * (1 - expTerm);
-  const denominator = Math.sqrt(env.alphaBefore) * (1 + expTerm) + Math.sqrt(env.alphaAfter) * (1 - expTerm);
-  return numerator / denominator;
-}
-
-function computeFinalTime(env, gamma, tOpen, safeVelocity) {
-  const ratio = safeVelocity * Math.sqrt(env.alphaAfter / physics.gravity);
-  const logArgument = gamma * (1 + ratio) / (1 - ratio);
-  if (logArgument <= 0) return Number.NaN;
-  return tOpen + Math.log(logArgument) / (2 * env.sqrtAlphaAg);
-}
-
-function findRootBisection(fn, lower, upper, tolerance = 1e-5, maxIter = 100) {
-  let a = lower;
-  let b = upper;
-  let fa = fn(a);
-  let fb = fn(b);
-  if (!Number.isFinite(fa) || !Number.isFinite(fb)) return Number.NaN;
-  if (Math.sign(fa) === Math.sign(fb)) {
-    for (let i = 0; i < 6; i += 1) {
-      a = Math.max(1e-4, a * 0.8);
-      b *= 1.2;
-      fa = fn(a);
-      fb = fn(b);
-      if (!Number.isFinite(fa) || !Number.isFinite(fb)) return Number.NaN;
-      if (Math.sign(fa) !== Math.sign(fb)) break;
-    }
-  }
-  if (Math.sign(fa) === Math.sign(fb)) return Number.NaN;
-
-  for (let i = 0; i < maxIter; i += 1) {
-    const mid = 0.5 * (a + b);
-    const fm = fn(mid);
-    if (!Number.isFinite(fm)) return Number.NaN;
-    if (Math.abs(fm) < tolerance) return mid;
-    if (Math.sign(fm) === Math.sign(fa)) {
-      a = mid;
-      fa = fm;
+    let outcome;
+    if (v <= safeMax) {
+      outcome = 'safely landed';
+    } else if (!opened) {
+      outcome = 'hit the ground at unsafe speed since parachute never opened';
     } else {
-      b = mid;
-      fb = fm;
+      outcome = 'hit the ground at unsafe speed since parachute too small';
     }
+
+    elements.landingSummary.textContent = outcome;
+    return;
   }
-  return 0.5 * (a + b);
+  // Did not reach the ground within the simulation window.
+  // Classify based on post-deployment terminal speed: if the eventual
+  // terminal speed (with parachute) is within the safe range, treat as
+  // "safely landed"; otherwise "too small".
+  const tEnd = Array.isArray(result.times) && result.times.length ? result.times[result.times.length - 1] : 0;
+  if (tEnd < constants.deployTime) {
+    elements.landingSummary.textContent = 'hit the ground at unsafe speed since parachute never opened';
+    return;
+  }
+
+  const dragTotal = constants.cDAperson + constants.cDparachute * (result.area || 0);
+  const vt = Math.sqrt((2 * constants.mass * constants.gravity) / (constants.airDensity * Math.max(dragTotal, 1e-9)));
+  elements.landingSummary.textContent = vt <= constants.safeVelocity.max
+    ? 'safely landed'
+    : 'hit the ground at unsafe speed since parachute too small';
 }
 
-function generateTimeArray(tf, count) {
-  const steps = Math.max(count, 2);
-  const dt = tf / (steps - 1);
-  const arr = [];
-  for (let i = 0; i < steps; i += 1) {
-    arr.push(i * dt);
-  }
-  return arr;
+function formatNumber(value, digits = 2) {
+  if (!Number.isFinite(value)) return '—';
+  return Number(value).toFixed(digits);
 }
