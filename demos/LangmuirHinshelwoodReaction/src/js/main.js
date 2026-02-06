@@ -72,10 +72,13 @@ function syncControls(values) {
 }
 
 function getParams() {
+  const Tval = parseFloat(elements.tempSlider?.value);
+  const ratioVal = parseFloat(elements.ratioSlider?.value);
   return {
     mode: selectedMode || defaults.mode,
-    T: parseFloat(elements.tempSlider?.value) || defaults.T,
-    ratio: parseFloat(elements.ratioSlider?.value) || defaults.ratio
+    // Use explicit NaN checks so valid 0 values are preserved
+    T: Number.isFinite(Tval) ? Tval : defaults.T,
+    ratio: Number.isFinite(ratioVal) ? ratioVal : defaults.ratio
   };
 }
 
@@ -118,7 +121,8 @@ async function renderPlot() {
 function computeModel({ T, ratio }) {
   // Parameters
   const R = 8.314;
-  const temperature = Math.max(1, T || 298);
+  // Preserve valid 0-like values and only fallback if T is not a number
+  const temperature = Math.max(1, Number.isFinite(T) ? T : 298);
 
   const k = 2.31e7 * Math.exp(-40000 / (R * temperature)); // mol CO/hr/mol catalyst
   const kO2 = 1.34e-2 * Math.exp(24830 / (R * temperature)); // 1/bar
