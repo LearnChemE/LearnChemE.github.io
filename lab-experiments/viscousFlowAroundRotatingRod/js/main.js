@@ -532,8 +532,12 @@ function drawHorizontalScale() {
         let lineHeight = i % 5 === 0 ? 20 : 10; // Longer lines for every 10th mark
         draw.line(x, startY - 23, x, startY - 23 + lineHeight).stroke({ width: 2, color: '#000' });
         
-        if (i % 10 === 0) {
-            draw.text(i.toString()).move(x, startY + 3).font({ size: 8, anchor: 'middle' });
+        if (i === 0) {
+            draw.text("0 cm").move(startX - 3, startY + 3).font({ size: 8, anchor: 'left' });
+        }
+        else if (i % 10 === 0) {
+            const str = i.toString();
+            draw.text(str).move(x, startY + 3).font({ size: 8, anchor: 'middle' });
         }
     }
 }
@@ -545,8 +549,8 @@ function drawVerticalScale() {
     
     const numPoints = 120;
     const step = (startY - endY) / numPoints;
-    draw.rect(35, endY - startY + 7.5)
-    .center(startX + 20, startY + (endY - startY) / 2)
+    draw.rect(39, endY - startY + 7.5)
+    .center(startX + 24, startY + (endY - startY) / 2)
     .fill('#deb887')
     .stroke({ color: 'black', width: 1 });
     
@@ -556,14 +560,15 @@ function drawVerticalScale() {
         draw.line(startX + 5, y, startX + lineHeight, y).stroke({ width: 2, color: '#000' });
         
         if (i % 10 === 0) {
-            draw.text(i.toString()).move(startX + lineHeight + 8, y - 2).font({ size: 8, anchor: 'middle' });
+            const str = (i === 0) ? "0 cm" : i.toString();
+            draw.text(str).move(startX + lineHeight + 2, y - 2).font({ size: 8, anchor: 'left' });
         }
     }
 }
 
 function addOptionToDragAndZoom() {
-    draw.text("zoom with the scroll wheel").move(10, canvasHeight - 50).font({ size: 16, anchor: 'left' });
-    draw.text("After zooming, drag mouse to move image").move(10, canvasHeight - 25).font({ size: 16, anchor: 'left' });
+    // draw.text("zoom with the scroll wheel").move(10, canvasHeight - 50).font({ size: 16, anchor: 'left' });
+    draw.text("Zoom with the scroll wheel and drag the mouse to move the image.").move(10, canvasHeight - 25).font({ size: 16, anchor: 'left' });
     const defaultViewbox = { x: 0, y: 0, width: canvasWidth, height: canvasHeight };
     draw.viewbox(defaultViewbox.x, defaultViewbox.y, defaultViewbox.width, defaultViewbox.height);
     
