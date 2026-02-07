@@ -56,7 +56,7 @@
   background: transparent !important;
   border-radius: 14px;
   box-shadow: none;
-  padding: 6px;
+  padding: 0; /* maximize usable plot area height */
   overflow: hidden;
 }
 
@@ -122,11 +122,17 @@
 }
 
 .mode-buttons {
-  margin-top: 6px;
+  /* Keep visible and clickable */
   display: flex;
   gap: 8px;
   justify-content: center;
   pointer-events: auto;
+
+  /* Make the three plot-mode buttons fixed on screen */
+  position: fixed;
+  top: 8px; /* JS repositions relative to control bar bottom */
+  left: 50%;
+  z-index: 1100;
 }
 
 body {

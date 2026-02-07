@@ -4,7 +4,13 @@ const defaults = {
   ratio: 1
 };
 
-const zMax = 10;
+// Compress x-axis to ~2/3 of prior range to match Mathematica
+const zMax = 6.7;
+// Plot margins (also used to align external UI horizontally with plot center)
+const PLOT_MARGIN_L = 90;
+const PLOT_MARGIN_R = 30;
+const PLOT_MARGIN_T = 70;
+const PLOT_MARGIN_B = 56;
 const zPoints = 2001; // finer sampling along reactor to reduce numerical noise
 const plotlyScriptUrl = 'assets/plotly.js';
 
@@ -36,12 +42,20 @@ function setupControls() {
   elements.plotLayout = document.querySelector('.plot-layout');
   elements.svgContainer = document.getElementById('svg-container');
   elements.controlBar = document.getElementById('control-bar');
+  elements.modeButtonsWrap = document.getElementById('modeButtons');
 
   elements.modeButtons = document.querySelectorAll('#modeButtons button');
   elements.tempSlider = document.getElementById('tempSlider');
   elements.tempValue = document.getElementById('tempValue');
   elements.ratioSlider = document.getElementById('ratioSlider');
   elements.ratioValue = document.getElementById('ratioValue');
+
+  // Enforce updated slider constraints at runtime (covers built HTML too)
+  if (elements.ratioSlider) {
+    if (parseFloat(elements.ratioSlider.min || '0') < 0.2) {
+      elements.ratioSlider.min = '0.2';
+    }
+  }
 
   syncControls(defaults);
 
@@ -113,6 +127,8 @@ async function renderPlot() {
 
   try {
     await plotlyLib.newPlot(plotlyRoot, data, layout, config);
+    // Align mode buttons horizontally to the plot center after render
+    window.requestAnimationFrame(() => updatePlotLayoutOffset());
   } catch (err) {
     showPlotPlaceholder('Unable to render the plot.');
   }
@@ -199,13 +215,15 @@ function buildPlot(model, params) {
   let yTitle = '';
   let yRange = undefined;
   const lineW = 3;
+  const axisLineW = Math.max(1, lineW / 2);
 
   if (mode === 'pressures') {
     traces.push({ x: z, y: pCO, type: 'scatter', mode: 'lines', line: { color: '#1f77b4', width: lineW }, name: 'P_CO' });
     traces.push({ x: z, y: pO2, type: 'scatter', mode: 'lines', line: { color: 'rgb(0,179,0)', width: lineW }, name: 'P_O₂' });
     traces.push({ x: z, y: pCO2, type: 'scatter', mode: 'lines', line: { color: '#800080', width: lineW }, name: 'P_CO₂' });
-    yTitle = 'pressure (bar)';
-    yRange = [-0.2, 3.1];
+    yTitle = 'partial pressure (bar)';
+    // cap y-axis ~2.2 since curves max at ~2
+    yRange = [0, 2.2];
   } else if (mode === 'coverage') {
     traces.push({ x: z, y: thetaCO, type: 'scatter', mode: 'lines', line: { color: '#1f77b4', width: lineW }, name: 'θ_CO' });
     traces.push({ x: z, y: thetaO, type: 'scatter', mode: 'lines', line: { color: 'rgb(255,51,128)', width: lineW }, name: 'θ_O' });
@@ -223,7 +241,8 @@ function buildPlot(model, params) {
   annotations.push(...equationAnnotations);
 
   const layout = {
-    margin: { l: 90, r: 30, t: 120, b: 70 },
+    // Increase plot area height by reducing top/bottom margins
+    margin: { l: PLOT_MARGIN_L, r: PLOT_MARGIN_R, t: PLOT_MARGIN_T, b: PLOT_MARGIN_B },
     paper_bgcolor: 'rgba(0,0,0,0)',
     plot_bgcolor: 'rgba(0,0,0,0)',
     hovermode: 'closest',
@@ -233,18 +252,26 @@ function buildPlot(model, params) {
       title: { text: 'distance down reactor (m)', standoff: 12, font: { family: 'Arial, sans-serif', size: 18, color: '#111' } },
       range: [0, zMax],
       zeroline: false,
+      showline: true,
+      linecolor: '#000',
+      linewidth: axisLineW,
       ticks: 'outside',
       tickfont: { family: 'Arial, sans-serif', size: 16 },
-      mirror: true
+      mirror: false
     },
     yaxis: {
       title: { text: yTitle, standoff: 12, font: { family: 'Arial, sans-serif', size: 18, color: '#111' } },
       range: yRange,
       autorange: false,
       zeroline: false,
+      showline: true,
+      linecolor: '#000',
+      linewidth: axisLineW,
+      tickformat: (mode === 'pressures' || mode === 'coverage') ? '.1f' : undefined,
+      dtick: (mode === 'pressures') ? 0.5 : undefined,
       ticks: 'outside',
       tickfont: { family: 'Arial, sans-serif', size: 16 },
-      mirror: true
+      mirror: false
     },
     annotations
   };
@@ -265,7 +292,8 @@ function updateModeButtons() {
 
 function buildAnnotations(model, mode) {
   const { z, pCO, pO2, pCO2, thetaCO, thetaO, thetaV } = model;
-  const xs = [2.5, 5, 7.5];
+  const xmax = z && z.length ? z[z.length - 1] : 10;
+  const xs = [0.25, 0.5, 0.75].map((f) => f * xmax);
   const anns = [];
 
   if (mode === 'pressures') {
@@ -292,7 +320,7 @@ function makeCurveLabel(x, y, text, color, yshift = 0) {
     yref: 'y',
     text,
     showarrow: false,
-    font: { family: 'Arial, sans-serif', size: 17, color },
+    font: { family: 'Arial, sans-serif', size: 20, color },
     bgcolor: 'white',
     bordercolor: 'white',
     borderpad: 2,
@@ -374,8 +402,36 @@ function updatePlotLayoutOffset() {
   if (!elements.plotLayout || !elements.svgContainer || !elements.controlBar) return;
   const containerRect = elements.svgContainer.getBoundingClientRect();
   const controlRect = elements.controlBar.getBoundingClientRect();
-  const offset = Math.max(controlRect.bottom - containerRect.top + 12, 0);
+  const buttonsRect = elements.modeButtonsWrap?.getBoundingClientRect();
+  const buttonsFixed = elements.modeButtonsWrap && getComputedStyle(elements.modeButtonsWrap).position === 'fixed';
+  const bottomMost = buttonsFixed
+    ? controlRect.bottom
+    : Math.max(controlRect.bottom, buttonsRect ? buttonsRect.bottom : controlRect.bottom);
+  // Minimize gap between mode buttons and plot to maximize plot height
+  const offset = Math.max(bottomMost - containerRect.top, 0);
   elements.plotLayout.style.setProperty('--plot-top', `${offset}px`);
+
+  // Positioning of mode buttons handled below based on fixed vs non-fixed
+
+  // Horizontally align mode buttons center with plot (paper) center
+  if (elements.modeButtonsWrap && plotlyRoot) {
+    const plotRect = plotlyRoot.getBoundingClientRect();
+    const plotInnerWidth = Math.max(0, plotRect.width - (PLOT_MARGIN_L + PLOT_MARGIN_R));
+    const plotCenterX = plotRect.left + PLOT_MARGIN_L + plotInnerWidth / 2;
+    const mbRect = elements.modeButtonsWrap.getBoundingClientRect();
+    const buttonsCenterX = mbRect.left + mbRect.width / 2;
+    const deltaX = Math.round(plotCenterX - buttonsCenterX);
+    // If fixed, position explicitly with left/top and clear transforms to prevent compounding shifts
+    if (buttonsFixed) {
+      const groupWidth = mbRect.width;
+      const left = Math.round(plotCenterX - groupWidth / 2);
+      elements.modeButtonsWrap.style.left = `${left}px`;
+      elements.modeButtonsWrap.style.top = `${Math.round(controlRect.bottom + 4)}px`;
+      elements.modeButtonsWrap.style.transform = 'none';
+    } else {
+      elements.modeButtonsWrap.style.transform = `translateX(${deltaX}px)`;
+    }
+  }
 }
 
 function handleWindowResize() {
@@ -384,7 +440,7 @@ function handleWindowResize() {
     pendingResizeFrame = null;
     updatePlotLayoutOffset();
     if (plotlyLibRef?.Plots && plotlyRoot) {
-      try { plotlyLibRef.Plots.resize(plotlyRoot); } catch (e) {}
+      try { plotlyLibRef.Plots.resize(plotlyRoot); } catch (e) { }
     }
   });
 }
