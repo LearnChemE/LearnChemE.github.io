@@ -8,10 +8,10 @@
   background: transparent;
   /* Removed z-index to avoid creating stacking context that traps overlays */
   --plot-top: 100px;
-  /* Maintain 1000:700 (≈1.4286) aspect ratio driven by height */
-  width: min(calc(100vw - 40px), calc((100vh - 40px) * 1.4285714));
+  /* Maintain 1100:700 (≈1.5714) aspect ratio driven by height */
+  width: min(calc(100vw - 40px), calc((100vh - 40px) * 1.5714286));
   height: calc(100vh - 40px);
-  max-width: calc((100vh - 40px) * 1.4285714);
+  max-width: calc((100vh - 40px) * 1.5714286);
   max-height: calc(100vh - 40px);
 
   >svg {
@@ -42,7 +42,7 @@
   right: 10px;
   bottom: 0;
   display: flex;
-  gap: 16px;
+  gap: 20px;
   align-items: flex-start;
   z-index: 2;
   pointer-events: none;
@@ -63,6 +63,27 @@
   margin: 0;
 }
 
+.plot-column--left {
+  flex: 0 0 300px;
+  max-width: 340px;
+}
+
+.plot-column--right {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 900px) {
+  .plot-layout {
+    flex-direction: column;
+  }
+
+  .plot-column--left,
+  .plot-column--right {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+}
+
 .plotly-container {
   flex: 1;
   min-height: 0;
@@ -76,11 +97,11 @@
   z-index: 2;
 }
 
-#plotly-root,
-#plotly-root .js-plotly-plot,
-#plotly-root .plot-container,
-#plotly-root .svg-container,
-#plotly-root .main-svg {
+.plotly-container,
+.plotly-container .js-plotly-plot,
+.plotly-container .plot-container,
+.plotly-container .svg-container,
+.plotly-container .main-svg {
   background: transparent !important;
 }
 
@@ -88,7 +109,7 @@
    annotation backgrounds. Plot background is already transparent via
    Plotly layout; leave annotation bg intact. */
 
-#plotly-root {
+.plotly-container {
   width: 100%;
   height: 100%;
 }
@@ -106,14 +127,14 @@
 }
 
 .landing-summary {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 10px;
-  padding: 6px 12px;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
   margin: 0;
   font-size: 0.95rem;
   color: #0b2240;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: none;
 }
 
 .slider-stack {
@@ -241,6 +262,20 @@ body {
   background-color: #fff;
   border-radius: 4px;
   order: 1;
+}
+
+.control-bar.slider-controls>.slider-group--feed {
+  flex-basis: 100%;
+  max-width: 640px;
+  order: 3;
+}
+
+.control-bar-message {
+  flex-basis: 100%;
+  order: 2;
+  align-self: stretch;
+  text-align: center;
+  margin: 0;
 }
 
 /* Force the rate constant slider to the second row */
