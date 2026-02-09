@@ -357,7 +357,7 @@ function buildEquationAnnotations() {
     // Catalyst directly on the arrow mark
     {
       x: 0.50,
-      y: 1.029, // just above the arrow baseline (1.05)
+      y: 1.023, // just above the arrow baseline (1.05)
       xref: 'paper',
       yref: 'paper',
       text: 'catalyst',
