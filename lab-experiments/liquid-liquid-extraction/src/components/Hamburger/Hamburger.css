@@ -1,4 +1,8 @@
+body {
+    --hamburger-color: #3498db;
+    --hamburger-hover-color: #2980b9;
 
+}
 
 /* Hamburger Menu */
 .hamburger-menu {
@@ -13,14 +17,14 @@
     align-items: center;
     width: 50px;
     height: 50px;
-    background-color: #3498db;
+    background-color: var(--hamburger-color);
     border-radius: 50%;
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     transition: all 0.3s;
 }
 .menu-btn:hover {
-    background-color: #2980b9;
+    background-color: var(--hamburger-hover-color);
     transform: scale(1.05);
 }
 .menu-btn i {
@@ -45,7 +49,7 @@
 }
 .menu-item {
     margin: 1em;
-    background-color: #3498db;
+    background-color: var(--hamburger-color);
     border-radius: .5em;
     color: white;
     padding: 10px;
@@ -55,7 +59,7 @@
     align-items: center;
 }
 .menu-item:hover {
-    background-color: #67aedd;
+    background-color: var(--hamburger-hover-color);
 }
 .menu-item i {
     margin-left: 5px;

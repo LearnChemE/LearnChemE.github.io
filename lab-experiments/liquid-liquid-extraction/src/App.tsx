@@ -3,8 +3,7 @@ import { SVGCanvas } from './components/SVGCanvas/SVGCanvas'
 import TopPipes from './components/TopPipes/TopPipes'
 import Defs from './components/Defs'
 import { Column } from './components/Column/Column'
-import { numberOfStages, paddedHeight, setNumberOfStages } from './globals'
-import { Slider } from './components/Slider/Slider'
+import { numberOfStages, paddedHeight } from './globals'
 import Rotameter from './components/Rotameter/Rotameter'
 import Background from './components/Background/Background'
 import Tank from './components/Tank/Tank'
@@ -12,16 +11,20 @@ import Valve from './components/Valve/Valve'
 import Bucket from './components/Bucket/Bucket'
 import Pipes from './components/Pipes/Pipes'
 import { PowerSwitch } from './components/PowerSwitch/Switch'
-import { createMemo, createSignal } from 'solid-js'
+import { batch, createEffect, createMemo, createSignal, Match, Show, Switch } from 'solid-js'
 import { FEED_MAX_RATE, SOLVENT_MAX_RATE } from './ts/config'
 import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import { AboutText, DirectionsText } from './components/Modal/modals'
+import { StagesMenu } from './components/StagesMenu/StagesMenu'
+import { ControlButton } from './components/ControlButton/ControlButton'
 
 function App() {
   const [feedIsOn, setFeedIsOn] = createSignal(false);
   const [solvIsOn, setSolvIsOn] = createSignal(false);
   const [feedLift, setFeedLift] = createSignal(0);
   const [solvLift, setSolvLift] = createSignal(0);
+  const [showMenu, setShowMenu] = createSignal(true);
+  const [lockStages, setLockStages] = createSignal(false);
 
   const solvRate = createMemo(() => {
     const effective_lift = solvLift() * (solvIsOn() ? 1 : 0)
@@ -32,6 +35,28 @@ function App() {
     const effective_lift = feedLift() * (feedIsOn() ? 1 : 0)
     return FEED_MAX_RATE * effective_lift;
   });
+
+  // Lock in the stages when solvent is first turned on
+  createEffect(() => {
+    if (!lockStages() && solvIsOn()) {
+      setShowMenu(false);
+      setLockStages(true);
+    }
+  });
+
+  // Reset simulation handler
+  const reset = () => {
+    batch(() => {
+      setShowMenu(true);
+      setLockStages(false);
+
+      // Reset streams
+      setFeedIsOn(false);
+      setFeedLift(0);
+      setSolvIsOn(false);
+      setSolvLift(0);
+    });
+  };
 
   return (
     <>
@@ -55,11 +80,18 @@ function App() {
           <Valve x={466.5} y={() => 195 + paddedHeight()} onLiftChange={setSolvLift} />
         </SVGCanvas>
 
-        <div class="stages-menu">
-          <Slider value={numberOfStages} setValue={setNumberOfStages} min={1} max={8} step={1} />
-        </div>
-
+        <Show when={showMenu()}>
+          <StagesMenu onClose={() => setShowMenu(!showMenu())} />
+        </Show>
         <HamburgerMenu path="" downloadName="lle_worksheet.pdf" Directions={DirectionsText} About={AboutText} />
+        <Switch>
+          <Match when={!lockStages()}>
+            <ControlButton icon="fa-solid fa-book" label="edit internals" top={100} onClick={() => setShowMenu(!showMenu())} active={showMenu} disabled={lockStages} />
+          </Match>
+          <Match when={true}>
+            <ControlButton icon="fa-solid fa-arrows-rotate" label="reset" top={100} onClick={reset} />
+          </Match>
+        </Switch>
       </div>
     </>
   )

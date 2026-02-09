@@ -55,7 +55,7 @@ export function Slider(props: SliderProps) {
           value={props.value()}
           onInput={handleInput}
           style={{
-            "--primary-gradient-interpolant": `${props.value() / max() * 100}%`,
+            "--primary-gradient-interpolant": `${(props.value() - min) / (max() - min) * 100}%`,
             "--secondary-gradient-interpolant": `${softmax() / max() * 100}%`
           }}
         />

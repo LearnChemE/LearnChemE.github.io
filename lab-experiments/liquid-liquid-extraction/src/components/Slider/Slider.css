@@ -1,5 +1,5 @@
 body {
-  --slider-primary-color: #3b82f6;
+  --slider-primary-color: #3498db;
   --background-color-normal: #f1f1f1;
   --background-color-disable: #4c4c4c;
   --background-color-disable-light: #adadad;
@@ -17,14 +17,16 @@ body {
   display: flex;
   margin: auto;
   margin-top: .5rem;
-  width: min-content;
-  flex-direction: column;
+  width: max-content;
+  flex-direction: row;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   color: #222;
+  padding: 0 1em;
+  gap: 1em;
 }
 
 .slider-label {
-    margin-top: .5em;
+    margin-top: .2em;
 }
 
 .slider-row {
