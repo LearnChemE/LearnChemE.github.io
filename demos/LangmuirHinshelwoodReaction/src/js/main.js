@@ -215,7 +215,7 @@ function buildPlot(model, params) {
   let yTitle = '';
   let yRange = undefined;
   const lineW = 3;
-  const axisLineW = Math.max(1, lineW / 2);
+  const axisLineW = 2;
 
   if (mode === 'pressures') {
     traces.push({ x: z, y: pCO, type: 'scatter', mode: 'lines', line: { color: '#1f77b4', width: lineW }, name: 'P_CO' });
@@ -267,8 +267,8 @@ function buildPlot(model, params) {
       showline: true,
       linecolor: '#000',
       linewidth: axisLineW,
-      tickformat: (mode === 'pressures' || mode === 'coverage') ? '.1f' : undefined,
-      dtick: (mode === 'pressures') ? 0.5 : undefined,
+      tickformat: '.1f',
+      dtick: (mode === 'pressures' || mode === 'rate') ? 0.5 : undefined,
       ticks: 'outside',
       tickfont: { family: 'Arial, sans-serif', size: 16 },
       mirror: false
