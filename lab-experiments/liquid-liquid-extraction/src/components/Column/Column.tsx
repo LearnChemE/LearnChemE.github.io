@@ -1,12 +1,11 @@
-import { createMemo, createSignal, For, onMount, type Accessor, type Component } from "solid-js";
+import { createEffect, createMemo, createSignal, For, onMount, type Accessor, type Component } from "solid-js";
 import { FEED_MAX_RATE, STAGE_HEIGHT } from "../../ts/config";
-import { columnVolume, numberOfStages, paddingTop } from "../../globals";
+import { columnVolume, numberOfStages, paddingTop, resetEvent, setColFull } from "../../globals";
 import "./Column.css";
 import { animate } from "../../ts/helpers";
 import { Boils } from "../Boils/Boils";
 
 type ColumnProps = {
-    numberOfStages: Accessor<number>;
     solvIn: Accessor<number>;
     feedIn: Accessor<number>;
 };
@@ -14,6 +13,7 @@ type ColumnProps = {
 export const Column: Component<ColumnProps> = (props) => {
     const { solvIn, feedIn } = props;
     const [fill, setFill] = createSignal(0);
+    let animating = true;
 
     const fillAnimation = (dt: number) => {
         const rate = solvIn();
@@ -25,10 +25,21 @@ export const Column: Component<ColumnProps> = (props) => {
         return (fill() < columnVolume());
     }
 
-    onMount(() => {
-        animate(fillAnimation, () => {
+    const start = () => animate(fillAnimation, () => {
+        animating = false;
+        setColFull(true);
+    });
 
-        });
+    onMount(start);
+
+    createEffect(() => {
+        resetEvent();
+        setColFull(false);
+        setFill(0);
+        if (!animating) {
+            animating = true;
+            start();
+        }
     })
 
     const totalFillHeight = createMemo(() => 76 + 32 * numberOfStages());
@@ -74,7 +85,7 @@ export const Column: Component<ColumnProps> = (props) => {
 
             {/* Stages */}
             <g id="stages" transform={`translate(330 92)`}>
-                <For each={[...Array(props.numberOfStages()).keys()]}>{(stageIndex) => (
+                <For each={[...Array(numberOfStages()).keys()]}>{(stageIndex) => (
                     <g id={`stage-${stageIndex}`} transform={`translate(0 ${STAGE_HEIGHT * stageIndex})`}>
                         <mask id="path-1-inside-1_34_234" fill="white">
                         <path d="M0 0H60V32H0V0Z"/>
@@ -87,7 +98,7 @@ export const Column: Component<ColumnProps> = (props) => {
             </g>
 
             {/* Bottom */}
-            <g id="bottom-col" transform={`translate(325 ${92 + STAGE_HEIGHT * props.numberOfStages()})`}>
+            <g id="bottom-col" transform={`translate(325 ${92 + STAGE_HEIGHT * numberOfStages()})`}>
                 <rect x="0.5" y="-0.5" width="18" height="8" rx="1.5" transform="matrix(1 0 0 -1 7 53)" fill="url(#paint0_linear_12_111)" stroke="black"/>
                 <rect x="0.5" y="-0.5" width="18" height="8" rx="1.5" transform="matrix(1 0 0 -1 44 53)" fill="url(#paint1_linear_12_111)" stroke="black"/>
                 <path d="M2.12222e-07 38H70C70 38 70 27.5 70 19C70 9.5 65 9.5 65 0H5C5 9.5 1.93781e-06 9.5 2.12222e-07 19C-1.51337e-06 28.5 2.12222e-07 38 2.12222e-07 38Z" fill="url(#paint2_linear_12_111)"/>

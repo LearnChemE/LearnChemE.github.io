@@ -1,5 +1,6 @@
 import { onMount, Show, type Component } from "solid-js";
 import "./Switch.css"
+import { resolveProperty } from "../../ts/helpers";
 
 export interface PowerSwitchProps {
   x: number;
@@ -7,9 +8,12 @@ export interface PowerSwitchProps {
   label: string;
   isOn: () => boolean;
   setIsOn: (value: boolean) => void;
+  disabled?: () => boolean;
 }
 
 export const PowerSwitch: Component<PowerSwitchProps> = (props) => {
+  const disabled = resolveProperty(props.disabled, false);
+
   return (
     <g transform={`translate(${props.x} ${props.y})`}>
         <PowerSwitchBackground label={props.label} />
@@ -19,7 +23,7 @@ export const PowerSwitch: Component<PowerSwitchProps> = (props) => {
           <rect x="2.18182" y="2.18182" width="43.6364" height="16.3636" fill="#7B0101"/>
           {/* On side */}
           <g class={!props.isOn() ? "switchPress drag-exempt" : "drag-exempt"} onClick={() => props.setIsOn(true)}>
-            <Show when={!props.isOn()}>
+            <Show when={!props.isOn() && !disabled()}>
               <path d="M4.36364 1.09094L24 2.21488V18.5455L4.36364 19.6364V1.09094Z" fill="#D90000"/> 
               <path d="M2.18182 2.21491L4.36364 1.09094V19.6364L2.18182 18.5455V2.21491Z" fill="#7B0101"/>
             </ Show>
@@ -28,7 +32,7 @@ export const PowerSwitch: Component<PowerSwitchProps> = (props) => {
 
           {/* Off side */}
           <g class={props.isOn() ? "switchPress drag-exempt" : "drag-exempt"} onClick={() => props.setIsOn(false)}>
-            <Show when={props.isOn()}>
+            <Show when={props.isOn() && !disabled()}>
               <path d="M43.6364 1.09088L24 2.18176V18.5454L43.6364 19.6363V1.09088Z" fill="#D90000"/>
               <path d="M45.8182 2.18179L43.6364 1.09088V19.6363L45.8182 18.5454V2.18179Z" fill="#7B0101"/>
             </Show>
