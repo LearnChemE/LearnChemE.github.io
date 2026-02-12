@@ -406,3 +406,22 @@ export function resolveProperty<T>(val: T | (() => T) | undefined, fallback?: T)
     }
     return (typeof val === "function" ? val : () => val) as () => T;
 }
+
+/**
+ * Transpose a 2x2 array
+ * @param arr array to transpose with dimension [m, n]
+ * @returns transposed array with dimension [n, m]
+ */
+export function transpose(arr: number[][]) {
+    const rows = arr.length, cols = arr[0].length;
+    const grid = [];
+    for (let j = 0; j<cols; j++) {
+        grid[j] = Array(rows);
+    }
+    for (let i=0;i<rows;i++) {
+        for (let j=0;j<cols;j++) {
+            grid[j][i] = arr[i][j];
+        }
+    }
+    return grid;
+}

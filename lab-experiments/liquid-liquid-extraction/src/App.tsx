@@ -3,7 +3,7 @@ import { SVGCanvas } from './components/SVGCanvas/SVGCanvas'
 import TopPipes from './components/TopPipes/TopPipes'
 import Defs from './components/Defs'
 import { Column } from './components/Column/Column'
-import { colFull, numberOfStages, paddedHeight, resetEvent, triggerResetEvent } from './globals'
+import { colFull, paddedHeight, triggerResetEvent } from './globals'
 import Rotameter from './components/Rotameter/Rotameter'
 import Background from './components/Background/Background'
 import Tank from './components/Tank/Tank'
@@ -18,6 +18,7 @@ import { AboutText, DirectionsText } from './components/Modal/modals'
 import { StagesMenu } from './components/StagesMenu/StagesMenu'
 import { ControlButton } from './components/ControlButton/ControlButton'
 import { ColumnData } from './components/Column/ColumnData'
+import { PlotlyChart } from './components/PlotlyChart'
 
 function App() {
   const [feedIsOn, setFeedIsOn] = createSignal(false);
@@ -84,19 +85,27 @@ function App() {
           <PowerSwitch x={434} y={321 + paddedHeight()} label="solvent" isOn={solvIsOn} setIsOn={setSolvIsOn} />
           
           <Column solvIn={solvRate} feedIn={feedRate} />
-          <ColumnData />
           <Rotameter flowrate={feedRate} flowrange={[0, FEED_MAX_RATE]} x={145} y={64 + paddedHeight()} />
           <Rotameter flowrate={solvRate} flowrange={[0, SOLVENT_MAX_RATE]} x={477} y={64 + paddedHeight()} />
           <Tank x={31}  y={107 + paddedHeight()} />
           <Tank x={522} y={107 + paddedHeight()} />
           <Valve x={134.5} y={() => 195 + paddedHeight()} onLiftChange={setFeedLift} />
           <Valve x={466.5} y={() => 195 + paddedHeight()} onLiftChange={setSolvLift} />
+
+          <Show when={feedIsOn()}>
+            <ColumnData />
+          </Show>
         </SVGCanvas>
 
+        {/* Menu for selecting stages */}
         <Show when={showMenu()}>
           <StagesMenu onClose={() => setShowMenu(!showMenu())} />
         </Show>
+
+        {/* Hamburger */}
         <HamburgerMenu path="" downloadName="lle_worksheet.pdf" Directions={DirectionsText} About={AboutText} />
+
+        {/* Stages/Reset Button */}
         <Switch>
           <Match when={!lockStages()}>
             <ControlButton icon="fa-solid fa-diagram-next" label="edit internals" top={100} onClick={() => setShowMenu(!showMenu())} active={showMenu} disabled={lockStages} />
@@ -106,6 +115,7 @@ function App() {
           </Match>
         </Switch>
       </div>
+      <PlotlyChart />
     </>
   )
 }

@@ -1,60 +1,37 @@
-import { type Component, type Accessor, createSignal, onMount, Show, createMemo } from "solid-js";
+import { type Component, type Accessor, createSignal, onMount, createMemo } from "solid-js";
 import "./Tooltip.css";
-import { constrain } from "../../ts/helpers";
-import type { InitConc } from "../../types/globals";
 
 interface TooltipSelectorProps {
-    showing: Accessor<boolean>;
-    ics: Accessor<Array<InitConc>>;
+    x: number;
+    y: number;
+    before: boolean;
+    comp: Accessor<Array<number>>;
+    anchor: SVGGElement;
 }
 
-type ConcsType = {
-    red: number;
-    white: number;
-};
-
-export const TooltipSelector: Component<TooltipSelectorProps> = ({ showing, ics }) => {
-    const [selected, setSelected] = createSignal<number | null>(null);
-    // Use mouse coordinate 
-    const concs = createMemo<ConcsType | -1>(() => {
-        if (selected() === null) return -1;
-        else {
-            const idx = 4 - selected()!;
-            return {
-                red: ics()[idx].xr0 * 100,
-                white: ics()[idx].xw0 * 100
-            };
-        }
-    });
-
-    const followMouse = (evt: MouseEvent | Touch) => {
-        // Set new coordinates for the magnifier
-        const bds = document.getElementById("main-cnv")!.getBoundingClientRect();
-        // X
-        const vialWidth = .086;
-        const lBd = .328 - vialWidth / 2;
-        const x_cnv = (evt.clientX - bds.x) / bds.width;
-        // Determine vial
-        const vial = (x_cnv > lBd && x_cnv < lBd + vialWidth * 5) ? constrain(Math.floor((x_cnv - lBd) / vialWidth), 0, 4) : null;
-
-        if (vial === null) setSelected(null);
-        else
-            setSelected(vial);
-    }
+export const SVGTooltip: Component<TooltipSelectorProps> = ({ x, y, comp, anchor, before }) => {
+    const [showing, setShowing] = createSignal<boolean>(false);
 
     onMount(() => {
-        window.addEventListener("pointermove", followMouse);
+        if (!anchor) throw new Error("Anchor ref undefined");
+        anchor.addEventListener("pointerenter", () => setShowing(true));
+        anchor.addEventListener("pointerleave", () => setShowing(false));
     });
 
+    const xc = createMemo(() => {
+        return 1 - comp()[0] - comp()[1];
+    })
+
     return (
-        <Show when={showing() && (selected() !== null)}>
-            <div class="tooltip" style={`left: ${32.8 + (selected()! * 8.6)}%; opacity: 1`}>
-                vial {selected()! + 1} volume %:
-                <br />
-                {`${(concs() as ConcsType).red.toFixed(0)}% red cells`}
-                <br />
-                {`${(concs() as ConcsType).white.toFixed(0)}% white cells`}
-            </div>
-        </Show>
+        <g class="tooltip" transform={`translate(${x} ${y})`} style={`opacity: ${showing() ? 1 : 0}`}>
+            <rect x="0" y="0" rx={4} width={100} height={74} fill="rgba(0, 0, 0, 0.8)"/>
+            <text x={0} y={0} font-family="Arial" font-size="14" fill="white">
+                <tspan x={3} dy="1.2em">{before ? "aqueous" : "organic"} phase:</tspan>
+                <tspan x={24} dy="1.2em">{comp()[0].toFixed(2)}% x</tspan>
+                <tspan x={24} dy="1.2em">{comp()[1].toFixed(2)}% y</tspan>
+                <tspan x={24} dy="1.2em">{xc().toFixed(2)}% z</tspan>
+            </text>
+            <polygon></polygon>
+        </g>
     );
 }

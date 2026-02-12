@@ -8,16 +8,16 @@
 }
 
 .tooltip {
-    position: absolute;
+    /* position: absolute; */
     top: 0;
-    background-color: rgba(0, 0, 0, 0.75);
+    background-color: rgba(0, 0, 0, 0.8);
     color: #fff;
     padding: 6px 10px;
     border-radius: 4px;
     font-size: 16px;
     pointer-events: none;
     transition: opacity 0.2s ease-in-out;
-    transform: translateX(-50%);
+    /* transform: translateX(-50%); */
 }
 
 .tooltip::after {
