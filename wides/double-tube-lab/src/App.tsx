@@ -85,6 +85,7 @@ function App() {
     g.blueTime = -1;
     if (canvasMode === DOUBLE_BEAKER) {
       randStartVals(p5_instance);
+      setMeasuringState({ measuring: false, measure: notMeasuring });
     } else {
       randSingleStartVals();
       setAnimationTimeToNotStarted();
@@ -92,7 +93,6 @@ function App() {
     setPumpsRunning(false);
     setPumpBtnDisabled(false);
     setPumpsDone(false);
-    setMeasuringState({ measuring: false, measure: notMeasuring });
     togglePumps(false);
     pumpBtnClass = "btn btn-primary";
     icon = "fa-solid fa-play";
@@ -106,6 +106,8 @@ function App() {
     setCanvasMode(newMode);
     if (newMode === SINGLE_BEAKER) {
       setMeasuringState({ measuring: true, measure: getMeasuredValues });
+    } else {
+      setMeasuringState({ measuring: false, measure: notMeasuring });
     }
   }
 
@@ -179,15 +181,15 @@ function App() {
                 &nbsp; {innerHtml}
               </div>
             </button>
-            <button
+            {canvasMode === 0 ? (<button
               type="button"
               className={measuringState.measuring ? "btn btn-success" : "btn btn-outline-success"}
-              disabled={(isPumpBtnDisabled && !pumpsDone) || canvasMode === SINGLE_BEAKER}
-              aria-disabled={(isPumpBtnDisabled && !pumpsDone) || canvasMode === SINGLE_BEAKER}
+              disabled={(isPumpBtnDisabled && !pumpsDone)}
+              aria-disabled={(isPumpBtnDisabled && !pumpsDone)}
               onClick={() => handleMeasureClick()}
             >
               { measuringState.measuring ? "stop measuring" : "measure temperatures" }
-            </button>
+            </button>) : <div/>}
             <button
               type="button"
               className="btn btn-danger"
