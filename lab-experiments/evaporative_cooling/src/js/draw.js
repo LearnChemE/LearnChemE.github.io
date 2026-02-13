@@ -1,3 +1,5 @@
+import { beginDrag } from "..";
+
 const coolerLocation = [90, 26];
 const bladeLength = 15;
 const beakerCoordinate = [90, 81];
@@ -822,15 +824,23 @@ function drawBeaker() {
   }
   endShape();
 
-  textSize(1.25 * relativeSize() ** 0.125);
+  textSize(1.5 * relativeSize() ** 0.125);
   textAlign(RIGHT, CENTER);
+  push();
+  noStroke();
+  fill(0);
+  text("mL", beakerWidth / 2 - 2.5, beakerHeight / 2 - 0.7 - 18.6 * beakerHeight / 22);
+  pop();
+
+  stroke(0);
+  strokeWeight(1.5 / relativeSize());
   for (let i = 1; i < 21; i++) {
     let xOffset;
     if (i % 4 === 0) {
       xOffset = 1.25;
       push();
       noStroke();
-      fill(100);
+      fill(0);
       text(i * 50, beakerWidth / 2 - 2.5, beakerHeight / 2 - 0.7 - i * beakerHeight / 22);
       pop();
     } else if (i % 2 === 0) {
@@ -1035,8 +1045,8 @@ function drawPumpPowerSwitch() {
   quadraticVertex(0, 28, -10, 28);
   endShape();
   strokeWeight(0.5 / relativeSize());
-  const x = mouseX / relativeSize();
-  const y = mouseY / relativeSize();
+  const x = mX;
+  const y = mY;
   if (x > pumpSwitchCenter[0] - 19 && x < pumpSwitchCenter[0] + 19 && y > pumpSwitchCenter[1] - 8 && y < pumpSwitchCenter[1] + 4) {
     stroke(150, 150, 0);
     strokeWeight(1 / relativeSize());
@@ -1142,6 +1152,9 @@ window.mousePressed = () => {
   }
   if (abs(x - fanSwitchCenter[0]) < bladeLength * 15 / 24 && abs(y - fanSwitchCenter[1]) < bladeLength * 5 / 12) {
     state.fanOn = !state.fanOn;
+  }
+  else {
+    beginDrag();
   }
 }
 
