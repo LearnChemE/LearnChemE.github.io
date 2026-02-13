@@ -56,11 +56,17 @@ w = { // For relative humidity = 100%
     px: [],
 }
 
+let font;
+function preload() {
+    font = loadFont("./fonts/OpenSans-Regular.ttf");
+}
+
 function setup() {
     g.cnv = createCanvas(780, 600);
     g.cnv.parent("graphics-wrapper");
     g.points.push(createVector(350, 350));
     defineLines();
+    textFont(font);
 }
 
 function draw() {

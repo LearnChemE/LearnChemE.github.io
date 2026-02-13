@@ -330,7 +330,7 @@ function volDisplay(){
     fill(0); textSize(22);
     text('volume (m  /kg dry air)',360,g.by+110);
     textSize(19);
-    text('3',463,g.by+105);
+    text('3',469,g.by+105);
     pop();
 }
 
