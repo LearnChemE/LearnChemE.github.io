@@ -3,7 +3,7 @@ import "p5";
 import "./assets/digital-7.ttf";
 import "./assets/evaporative_cooling_article.pdf";
 import "./assets/evaporative_cooling_worksheet.pdf";
-import calcAll from "./js/calcs";
+import calcAll, { randomizeStartingTemps } from "./js/calcs";
 import drawAll from "./js/draw";
 import { initializeHamburger, initializeReset, initializeUnitsButton } from "./js/inputs";
 import "./style/style.scss";
@@ -56,6 +56,7 @@ window.setup = () => {
   initializeUnitsButton();
   initializeReset();
   frameRate(60);
+  randomizeStartingTemps();
 }
 
 window.draw = () => {

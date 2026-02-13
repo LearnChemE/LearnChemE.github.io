@@ -1,4 +1,5 @@
 import Hamburger from "../assets/hamburger.svg";
+import { randomizeStartingTemps } from "./calcs";
 
 function handleHamburger() {
   const hamburger = document.getElementById("hamburger");
@@ -118,5 +119,7 @@ export function initializeReset() {
     state.waterOnMesh = false;
     state.waterInReservoir = false;
     state.reservoirVolume = 0;
+
+    randomizeStartingTemps();
   });
 }

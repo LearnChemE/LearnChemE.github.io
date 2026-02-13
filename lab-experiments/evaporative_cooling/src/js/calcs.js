@@ -205,6 +205,30 @@ function outletHumidity() {
   }
 }
 
+export function randomizeStartingTemps() {
+  // g:
+  // airInletTemperature: 22,
+  // waterOutletTemperature: 22,
+  // beakerTemperature: 52,
+  // apparatusTemperatureTop: 22,
+  // apparatusTargetTemperatureTop: 22,
+  // airOutletTemperature: 22,
+  // airOutletTargetTemperature: 22,
+
+  function evenDist(min, max) {
+    return (max - min) * Math.random() + min;
+  }
+
+  // Ambient (room) temperature
+  const ambientTemp = evenDist(20, 24)
+  state.airInletTemperature = ambientTemp;
+  state.waterOutletTemperature = ambientTemp;
+  state.apparatusTemperatureTop = state.apparatusTargetTemperatureTop = ambientTemp;
+  state.airOutletTemperature = state.airOutletTargetTemperature = ambientTemp;
+
+  state.beakerTemperature = evenDist(48, 52);
+}
+
 // export default function calcAll() {
 //   const Tb = state.beakerTemperature; // temperature of the beaker - C
 //   const Vl = state.valvePosition * 5; // volumetric flow rate - m^3 / s
