@@ -59,9 +59,63 @@ export const envelope: Array<Composition> = [
 [1, 0]
 ];
 
-const tiePt = [
-    1.535, .0297
+const tiePts: Composition[][] = [
+    [[0, 0], [1, 0]],
+    [[0.021030279370202187, 0.11050532198081608],
+    [0.9083300821531416, 0.06406105622076279]],
+    [[0.05325583858745653, 0.24022896082786083],
+    [0.8116985134474901, 0.12972363884704488]],
+    [[0.09995262766565477, 0.329914439536929],
+    [0.7049290791707452, 0.20179232709540307]],
+    [[0.16522404204955807, 0.39077244294665375],
+    [0.6027496602570491, 0.2674549097216851]],
 ]
+
+function generateTieLines() {
+    const lines: Array<{ slope: number, intercept: number }> = [];
+    tiePts.forEach(ptSet => {
+        const [pt1, pt2] = ptSet;
+        const slope = (pt2[1] - pt1[1]) / (pt2[0] - pt1[0]);
+        const intercept = pt1[1] - slope * pt1[0];
+        lines.push({ slope, intercept });
+    });
+    return lines;
+}
+
+const tieLines = generateTieLines();
+
+function findTieline(x: number, y: number) {
+    // Find what lines surround x and y
+    let nearestUnder = tieLines[0];
+    let nearestOver = undefined;
+    for (const { slope, intercept } of tieLines) {
+        const yofx = slope * x + intercept;
+        if (yofx < y) {
+            nearestUnder = { slope, intercept };
+        } else {
+            nearestOver = { slope, intercept };
+            break;
+        }
+    }
+
+    let slope;
+    // If nearest over wasn't set, we are above the top line
+    if (!nearestOver) {
+        slope = nearestUnder.slope;
+    }
+    else {
+        // Use lever rule to determine slope (linear interpolation)
+        const yofxUnder = nearestUnder.slope * x + nearestUnder.intercept;
+        const yofxOver = nearestOver.slope * x + nearestOver.intercept;
+        const dif = yofxOver - yofxUnder;
+        slope = nearestUnder.slope * (y - yofxUnder) / dif + nearestOver.slope * (yofxOver - y) / dif;
+    }
+
+    const intercept = y - slope * x;
+    return { slope, intercept };
+}
+
+function 
 
 export class Stage {
     private mixedComp = [0, 0];
