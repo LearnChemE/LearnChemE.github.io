@@ -169,7 +169,8 @@ function computeModel({ R, D0, k }) {
 function buildPlot(model, params) {
   const { r, CA, phi, M, eta, CAs } = model;
   const lineW = 3;
-  const axisLineW = Math.max(1, lineW / 2);
+  const axisLineW = 2;
+  const axisLineColor = '#000';
 
   const curveTrace = {
     x: r,
@@ -186,11 +187,11 @@ function buildPlot(model, params) {
   const annotations = [];
   annotations.push({
     x: params.R * 0.98,
-    y: CAs + 0.002,
+    y: CAs + 0.0005,
     xref: 'x',
     yref: 'y',
     showarrow: false,
-    text: `<i>C</i><sub>A, s</sub> = ${CAs.toFixed(2)} mmol/cm<sup>3</sup>`,
+    text: `<i>C</i><sub>A,s</sub> = ${CAs.toFixed(2)} mmol/cm<sup>3</sup>`,
     font: { family: 'Arial, sans-serif', size: 17, color: '#000' },
     xanchor: 'right',
     yanchor: 'bottom',
@@ -230,7 +231,7 @@ function buildPlot(model, params) {
   ].join('<br>');
   annotations.push({
     x: 0.25 * params.R,
-    y: CAs + 0.006,
+    y: CAs + 0.003,
     xref: 'x',
     yref: 'y',
     showarrow: false,
@@ -284,7 +285,7 @@ function buildPlot(model, params) {
       range: [0, params.R],
       zeroline: false,
       showline: true,
-      linecolor: '#000',
+      linecolor: axisLineColor,
       linewidth: axisLineW,
       ticks: 'outside',
       dtick: 0.1,
@@ -298,7 +299,7 @@ function buildPlot(model, params) {
       autorange: false,
       zeroline: false,
       showline: true,
-      linecolor: '#000',
+      linecolor: axisLineColor,
       linewidth: axisLineW,
       ticks: 'outside',
       dtick: 0.01,
@@ -328,11 +329,8 @@ function buildParticleInset() {
       <line x1="115" y1="115" x2="163" y2="67" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
       <line x1="115" y1="115" x2="162" y2="115" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
       <text x="120" y="85" font-size="24" font-style="italic" fill="#000" stroke="#fff" stroke-width="0.8" paint-order="stroke">R</text>
-      <text x="144" y="146" font-size="24" font-style="italic" fill="#000" stroke="#fff" stroke-width="0.8" paint-order="stroke">r</text>
-      <text x="172" y="66" font-size="18" fill="#000">
-        <tspan font-style="italic">C</tspan>
-        <tspan font-size="11" dy="4">A,s</tspan>
-      </text>
+      <text x="148" y="132" font-size="24" font-style="italic" fill="#000" stroke="#fff" stroke-width="0.8" paint-order="stroke">r</text>
+      <text x="172" y="66" font-size="18" fill="#000"><tspan font-style="italic">C</tspan><tspan font-size="11" dy="4">A,s</tspan></text>
     </svg>
   `;
 
@@ -341,10 +339,10 @@ function buildParticleInset() {
       source: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`,
       xref: 'paper',
       yref: 'paper',
-      x: 0.9,
+      x: 0.84,
       y: 0.18,
-      sizex: 0.46,
-      sizey: 0.46,
+      sizex: 0.36,
+      sizey: 0.36,
       xanchor: 'center',
       yanchor: 'middle',
       layer: 'above'

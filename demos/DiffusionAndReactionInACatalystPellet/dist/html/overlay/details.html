@@ -10,63 +10,63 @@
         
         <div class="modal-body">
           <p>
-            For the first-order reaction \(A \rightarrow B\) with rate law \(r_A = k\,C_A\), the differential
+            For the first-order reaction \(A \rightarrow B\) with rate law \(r_A = -k\,C_A\), the differential
             equation that describes diffusion and reaction in the catalyst pellet is:
           </p>
-          <p class="text-center">\[\frac{d^2 C_A}{dr^2} + \frac{2}{r}\frac{d C_A}{dr} - \frac{k\,C_A}{D_e} = 0,\]</p>
+          <p class="text-start equation-left">\[\frac{d^2 C_A}{dr^2} + \frac{2}{r}\frac{d C_A}{dr} - \frac{k\,C_A}{D_e} = 0,\]</p>
           <p>
-            where \(r\) is the radius of the catalyst pellet (cm); \(C_A\) is the concentration in the catalyst
-            (mmol/cm<sup>3</sup>); \(k\) is the first-order rate constant (1/s);
-            \(D_e = \frac{D_{AB}\,\phi\,\sigma}{\tau}\) is the effective diffusivity (cm<sup>2</sup>/s);
-            \(\phi\) is the pellet porosity; \(\sigma\) is the constriction factor; \(\tau\) is tortuosity; and
+            where \(r\) is the radius of the catalyst pellet (cm), \(C_A\) is the concentration in the catalyst
+            (mmol/cm<sup>3</sup>), \(k\) is the first-order rate constant (1/s),
+            \(D_e = \frac{D_{AB}\,\phi\,\sigma}{\tau}\) is the effective diffusivity (cm<sup>2</sup>/s),
+            \(\phi\) is the pellet porosity, \(\sigma\) is the constriction factor, \(\tau\) is tortuosity, and
             \(\phi\), \(\sigma\), and \(\tau\) are set based on typical values for these variables and are unitless.
           </p>
 
           <p>The boundary conditions for the differential equation in spherical coordinates are:</p>
-          <p class="text-center">\(C_A\) = finite at \(r = 0\),</p>
-          <p class="text-center">\(C_A = C_{A,s}\) at \(r = R\),</p>
+          <p class="text-start equation-left">\(C_A\) = finite at \(r = 0\),</p>
+          <p class="text-start equation-left">\(C_A = C_{A,s}\) at \(r = R\),</p>
           <p>
             where \(R\) is the pellet radius (cm) and \(C_{A,s}\) is the concentration (mmol/cm<sup>3</sup>) at \(r = R\).
           </p>
 
           <p>The differential equation in dimensionless form is:</p>
-          <p class="text-center">\[\frac{d^2 \Psi}{d\lambda^2} + \frac{2}{\lambda}\frac{d\Psi}{d\lambda} - \Phi^2 \Psi = 0,\]</p>
-          <p class="text-center">\[\Phi = R\sqrt{\frac{k}{D_e}},\]</p>
+          <p class="text-start equation-left">\[\frac{d^2 \Psi}{d\lambda^2} + \frac{2}{\lambda}\frac{d\Psi}{d\lambda} - \Phi^2 \Psi = 0,\]</p>
+          <p class="text-start equation-left">\[\Phi = R\sqrt{\frac{k}{D_e}},\]</p>
           <p>
             where \(\Psi = C_A/C_{A,s}\) and \(\lambda = r/R\). The Thiele modulus \(\Phi\) is the dimensionless
             ratio of the surface reaction rate to the diffusion rate.
           </p>
 
           <p>The boundary conditions in dimensionless form are:</p>
-          <p class="text-center">\(\Psi\) = finite at \(\lambda = 0\),</p>
-          <p class="text-center">\(\Psi = 1\) at \(\lambda = 1\).</p>
+          <p class="text-start equation-left">\(\Psi\) = finite at \(\lambda = 0\),</p>
+          <p class="text-start equation-left">\(\Psi = 1\) at \(\lambda = 1\).</p>
 
           <p>The solution to the differential equation in dimensionless form is:</p>
-          <p class="text-center">\[\Psi = \frac{c_1}{\lambda}\cosh(\Phi \lambda) + \frac{c_2}{\lambda}\sinh(\Phi \lambda),\]</p>
+          <p class="text-start equation-left">\[\Psi = \frac{c_1}{\lambda}\cosh(\Phi \lambda) + \frac{c_2}{\lambda}\sinh(\Phi \lambda),\]</p>
           <p>
             where \(c_1\) and \(c_2\) are constants that are obtained using the boundary conditions. The solution becomes:
           </p>
-          <p class="text-center">\[\Psi = \frac{1}{\lambda}\frac{\sinh(\Phi \lambda)}{\sinh \Phi},\]</p>
+          <p class="text-start equation-left">\[\Psi = \frac{1}{\lambda}\frac{\sinh(\Phi \lambda)}{\sinh \Phi},\]</p>
           <p>and substituting the dimensionless variables into the solution yields:</p>
-          <p class="text-center">\[C_A = C_{A,s}\,\frac{R}{r}\,\frac{\sinh(\Phi\,r/R)}{\sinh \Phi}.\]</p>
+          <p class="text-start equation-left">\[C_A = C_{A,s}\,\frac{R}{r}\,\frac{\sinh(\Phi\,r/R)}{\sinh \Phi}.\]</p>
 
           <p>The overall rate of reaction \(M_A\) is:</p>
-          <p class="text-center">\[M_A = 4\pi R D_e C_{A,s}\left.\frac{d\Psi}{d\lambda}\right|_{\lambda = 1},\]</p>
+          <p class="text-start equation-left">\[M_A = 4\pi R D_e C_{A,s}\left.\frac{d\Psi}{d\lambda}\right|_{\lambda = 1},\]</p>
           <p>where</p>
-          <p class="text-center">\[\left.\frac{d\Psi}{d\lambda}\right|_{\lambda = 1} = \Phi \coth \Phi - 1,\]</p>
+          <p class="text-start equation-left">\[\left.\frac{d\Psi}{d\lambda}\right|_{\lambda = 1} = \Phi \coth \Phi - 1,\]</p>
           <p>substituting this into the solution yields:</p>
-          <p class="text-center">\[M_A = 4\pi R D_e C_{A,s}\left(\Phi \coth \Phi - 1\right),\]</p>
+          <p class="text-start equation-left">\[M_A = 4\pi R D_e C_{A,s}\left(\Phi \coth \Phi - 1\right),\]</p>
           <p>
             where \(M_A\) has units of \(\frac{\mathrm{mmol}}{\mathrm{s}}\). The effectiveness factor \(\eta\) is the
             reaction rate in the pellet divided by the reaction rate at the surface:
           </p>
-          <p class="text-center">\[\eta = \frac{M_A}{M_{A,s}},\]</p>
+          <p class="text-start equation-left">\[\eta = \frac{M_A}{M_{A,s}},\]</p>
           <p>where</p>
-          <p class="text-center">\[M_{A,s} = -r_{A,s}\,\frac{4}{3}\pi R^3 = k\,C_{A,s}\,\frac{4}{3}\pi R^3.\]</p>
+          <p class="text-start equation-left">\[M_{A,s} = -r_{A,s}\,\frac{4}{3}\pi R^3 = k\,C_{A,s}\,\frac{4}{3}\pi R^3.\]</p>
           <p>Thus, \(\eta\) is:</p>
-          <p class="text-center">\[\eta = \frac{4\pi R D_e C_{A,s}\left(\Phi \coth \Phi - 1\right)}{k\,C_{A,s}\,\frac{4}{3}\pi R^3},\]</p>
+          <p class="text-start equation-left">\[\eta = \frac{4\pi R D_e C_{A,s}\left(\Phi \coth \Phi - 1\right)}{k\,C_{A,s}\,\frac{4}{3}\pi R^3},\]</p>
           <p>which reduces to:</p>
-          <p class="text-center">\[\eta = \frac{3}{\Phi^2}\left(\Phi \coth \Phi - 1\right).\]</p>
+          <p class="text-start equation-left">\[\eta = \frac{3}{\Phi^2}\left(\Phi \coth \Phi - 1\right).\]</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

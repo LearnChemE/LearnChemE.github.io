@@ -9,9 +9,9 @@
   /* Removed z-index to avoid creating stacking context that traps overlays */
   --plot-top: 100px;
   /* Maintain 1000:700 (≈1.4286) aspect ratio driven by height */
-  width: min(calc(100vw - 40px), calc((100vh - 40px) * 1.4285714));
+  width: min(calc((100vw - 40px) * 0.8), calc((100vh - 40px) * 1.4285714 * 0.8));
   height: calc(100vh - 40px);
-  max-width: calc((100vh - 40px) * 1.4285714);
+  max-width: calc((100vh - 40px) * 1.4285714 * 0.8);
   max-height: calc(100vh - 40px);
 
   >svg {
@@ -121,7 +121,8 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 6px;
-  flex: 1 1 auto;
+  flex: 1 1 0;
+  min-width: 0;
   pointer-events: auto;
   max-width: 900px;
   margin-left: 0;
@@ -198,7 +199,7 @@ body {
   align-items: flex-start;
   justify-content: flex-start;
   gap: 20px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   z-index: 1001;
   pointer-events: none;
 }
@@ -219,34 +220,35 @@ body {
 .control-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-  justify-content: center;
+  gap: 8px;
+  align-items: flex-start;
+  justify-content: flex-start;
   pointer-events: auto;
   margin: 0;
   width: 100%;
 }
 
 .control-bar.slider-controls>.slider-group {
-  flex: 1 1 300px;
+  flex: 1 1 0;
   /* target width for two-per-row */
-  min-width: 280px;
+  min-width: 160px;
   /* allow two columns beside buttons */
   max-width: 520px;
   /* reduce overall slider width */
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px;
+  padding: 4px 6px;
   background-color: #fff;
   border-radius: 4px;
   order: 1;
 }
 
-/* Force the rate constant slider to the second row */
+/* Force rate slider to second row while keeping same width and left-justified */
 .control-bar.slider-controls>.slider-group--rate {
   flex-basis: 100%;
-  max-width: 640px;
+  max-width: 520px;
+  margin-right: auto;
 }
 
 @media (max-width: 520px) {
@@ -431,6 +433,21 @@ body {
   sup {
     font-size: 0.7em;
   }
+}
+
+.equation-left {
+  text-align: left;
+  padding-left: 2.5rem;
+}
+
+.equation-left mjx-container {
+  text-align: left !important;
+}
+
+.equation-left mjx-container[display="true"] {
+  /* MathJax centers display equations via auto margins; override. */
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
 #curve-tooltip {
