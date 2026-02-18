@@ -1,17 +1,19 @@
 // main.scss
 
 #svg-container {
+  box-sizing: border-box;
   position: fixed;
   border: 2px solid #ccc;
-  margin: 20px auto;
+  margin: auto;
   padding: 10px;
   background: transparent;
   /* Removed z-index to avoid creating stacking context that traps overlays */
   --plot-top: 100px;
-  /* Maintain 1000:700 (≈1.4286) aspect ratio driven by height */
-  width: min(calc((100vw - 40px) * 0.8), calc((100vh - 40px) * 1.4285714 * 0.8));
+  /* JS sets explicit size to keep the Plotly graph at the desired aspect ratio. */
+  inset: 0;
+  width: calc(100vw - 40px);
   height: calc(100vh - 40px);
-  max-width: calc((100vh - 40px) * 1.4285714 * 0.8);
+  max-width: calc(100vw - 40px);
   max-height: calc(100vh - 40px);
 
   >svg {
@@ -37,7 +39,7 @@
 
 .plot-layout {
   position: absolute;
-  top: var(--plot-top, 120px);
+  top: var(--plot-top, 60px);
   left: 10px;
   right: 10px;
   bottom: 0;
@@ -71,7 +73,7 @@
   box-shadow: none;
   padding: 0;
   /* maximize usable plot area height */
-  overflow: hidden;
+  overflow: visible;
   position: relative;
   z-index: 2;
 }
@@ -131,7 +133,7 @@
 }
 
 .slider-stack .control-bar {
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .slider-stack .slider-group {
@@ -228,34 +230,36 @@ body {
   width: 100%;
 }
 
+.control-bar.slider-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  align-items: start;
+}
+
 .control-bar.slider-controls>.slider-group {
-  flex: 1 1 0;
-  /* target width for two-per-row */
-  min-width: 160px;
-  /* allow two columns beside buttons */
-  max-width: 520px;
-  /* reduce overall slider width */
+  width: 100%;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 4px 6px;
   background-color: #fff;
   border-radius: 4px;
-  order: 1;
 }
 
-/* Force rate slider to second row while keeping same width and left-justified */
+/* Third slider always starts a new row (same width as the others). */
 .control-bar.slider-controls>.slider-group--rate {
-  flex-basis: 100%;
-  max-width: 520px;
-  margin-right: auto;
+  grid-column: 1;
 }
 
 @media (max-width: 520px) {
+  .control-bar.slider-controls {
+    grid-template-columns: 1fr;
+  }
+
   .control-bar.slider-controls>.slider-group {
-    flex-basis: 100%;
-    min-width: 100%;
-    max-width: 100%;
+    width: 100%;
   }
 }
 

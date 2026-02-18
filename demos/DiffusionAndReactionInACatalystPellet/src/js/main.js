@@ -12,11 +12,15 @@ const constants = {
 };
 
 const plotlyScriptUrl = 'assets/plotly.js';
-const PLOT_MARGIN_L = 90;
+// Margins tuned for larger (1.5x) plot fonts while keeping labels readable.
+const PLOT_MARGIN_L = 100;
 const PLOT_MARGIN_R = 30;
-const PLOT_MARGIN_T = 40;
-const PLOT_MARGIN_B = 70;
+const PLOT_MARGIN_T = 0;
+const PLOT_MARGIN_B = 100;
 const samplePoints = 201;
+const TARGET_PLOT_ASPECT = 680 / 470;
+const VIEWPORT_INSET_PX = 40; // Matches CSS `calc(100vw - 40px)` / `calc(100vh - 40px)`.
+const MAX_ASPECT_FIT_ITERS = 3;
 
 let drawRef;
 let plotlyRoot;
@@ -61,7 +65,7 @@ function setupControls() {
   elements.diffusivitySlider?.addEventListener('input', renderPlot);
   elements.rateSlider?.addEventListener('input', renderPlot);
 
-  updatePlotLayoutOffset();
+  fitSvgContainerToPlotAspect();
   window.addEventListener('resize', handleWindowResize);
   controlsReady = true;
 }
@@ -168,6 +172,15 @@ function computeModel({ R, D0, k }) {
 
 function buildPlot(model, params) {
   const { r, CA, phi, M, eta, CAs } = model;
+  // Scale fonts dynamically based on actual container width (reference: 680px).
+  const containerW = plotlyRoot ? plotlyRoot.clientWidth : 680;
+  const fontScale = Math.min(1.2, Math.max(0.6, containerW / 680));
+  const baseFontSize = Math.round(16 * fontScale);
+  const annotationFontSize = Math.round(17 * fontScale);
+  const axisTitleFontSize = Math.round(18 * fontScale);
+  const tickFontSize = Math.round(16 * fontScale);
+  const axisTitleStandoff = Math.round(12 * fontScale);
+
   const lineW = 3;
   const axisLineW = 2;
   const axisLineColor = '#000';
@@ -192,7 +205,7 @@ function buildPlot(model, params) {
     yref: 'y',
     showarrow: false,
     text: `<i>C</i><sub>A,s</sub> = ${CAs.toFixed(2)} mmol/cm<sup>3</sup>`,
-    font: { family: 'Arial, sans-serif', size: 17, color: '#000' },
+    font: { family: 'Arial, sans-serif', size: annotationFontSize, color: '#000' },
     xanchor: 'right',
     yanchor: 'bottom',
     xshift: -6,
@@ -208,7 +221,7 @@ function buildPlot(model, params) {
     yref: 'paper',
     showarrow: false,
     text: '<i>r</i> = 0',
-    font: { family: 'Arial, sans-serif', size: 17, color: '#000' },
+    font: { family: 'Arial, sans-serif', size: annotationFontSize, color: '#000' },
     xanchor: 'center',
     yanchor: 'top'
   });
@@ -219,7 +232,7 @@ function buildPlot(model, params) {
     yref: 'paper',
     showarrow: false,
     text: '<i>r</i> = <i>R</i>',
-    font: { family: 'Arial, sans-serif', size: 17, color: '#000' },
+    font: { family: 'Arial, sans-serif', size: annotationFontSize, color: '#000' },
     xanchor: 'center',
     yanchor: 'top'
   });
@@ -231,13 +244,19 @@ function buildPlot(model, params) {
   ].join('<br>');
   annotations.push({
     x: 0.25 * params.R,
-    y: CAs + 0.003,
+    // Anchor the info box just above the CAs dashed line so it never intersects it.
+    y: CAs,
     xref: 'x',
     yref: 'y',
     showarrow: false,
     text: infoText,
     align: 'left',
-    font: { family: 'Arial, sans-serif', size: 17, color: '#000' }
+    yanchor: 'bottom',
+    yshift: 8,
+    font: { family: 'Arial, sans-serif', size: annotationFontSize, color: '#000' },
+    bgcolor: 'white',
+    bordercolor: 'white',
+    borderpad: 4
   });
 
   const shapes = [
@@ -249,6 +268,7 @@ function buildPlot(model, params) {
       x1: params.R,
       y0: CAs,
       y1: CAs,
+      layer: 'below',
       line: { color: '#000', width: 2, dash: 'dash' }
     },
     {
@@ -279,10 +299,11 @@ function buildPlot(model, params) {
     plot_bgcolor: 'rgba(0,0,0,0)',
     hovermode: 'closest',
     showlegend: false,
-    font: { family: 'Arial, sans-serif', size: 16, color: '#000' },
+    font: { family: 'Arial, sans-serif', size: baseFontSize, color: '#000' },
     xaxis: {
-      title: { text: 'catalyst pellet radius (cm)', standoff: 12, font: { family: 'Arial, sans-serif', size: 18, color: '#111' } },
+      title: { text: 'catalyst pellet radius (cm)', standoff: axisTitleStandoff, font: { family: 'Arial, sans-serif', size: axisTitleFontSize, color: '#111' } },
       range: [0, params.R],
+      showgrid: false,
       zeroline: false,
       showline: true,
       linecolor: axisLineColor,
@@ -290,13 +311,14 @@ function buildPlot(model, params) {
       ticks: 'outside',
       dtick: 0.1,
       tickformat: '.1f',
-      tickfont: { family: 'Arial, sans-serif', size: 16 },
+      tickfont: { family: 'Arial, sans-serif', size: tickFontSize },
       mirror: false
     },
     yaxis: {
-      title: { text: 'concentration (mmol/cm<sup>3</sup>)', standoff: 12, font: { family: 'Arial, sans-serif', size: 18, color: '#111' } },
+      title: { text: 'concentration (mmol/cm<sup>3</sup>)', standoff: axisTitleStandoff, font: { family: 'Arial, sans-serif', size: axisTitleFontSize, color: '#111' } },
       range: [0, CAs + 0.008],
       autorange: false,
+      showgrid: false,
       zeroline: false,
       showline: true,
       linecolor: axisLineColor,
@@ -304,7 +326,7 @@ function buildPlot(model, params) {
       ticks: 'outside',
       dtick: 0.01,
       tickformat: '.2f',
-      tickfont: { family: 'Arial, sans-serif', size: 16 },
+      tickfont: { family: 'Arial, sans-serif', size: tickFontSize },
       mirror: false
     },
     annotations,
@@ -339,7 +361,7 @@ function buildParticleInset() {
       source: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`,
       xref: 'paper',
       yref: 'paper',
-      x: 0.84,
+      x: 0.9,
       y: 0.18,
       sizex: 0.36,
       sizey: 0.36,
@@ -358,14 +380,51 @@ function updatePlotLayoutOffset() {
   elements.plotLayout.style.setProperty('--plot-top', `${offset}px`);
 }
 
+function fitSvgContainerToPlotAspect() {
+  if (!elements.svgContainer || !elements.plotLayout || !elements.controlBar) return;
+
+  const maxW = Math.max(0, window.innerWidth - VIEWPORT_INSET_PX);
+  const maxH = Math.max(0, window.innerHeight - VIEWPORT_INSET_PX);
+  if (maxW === 0 || maxH === 0) return;
+
+  // Start from the max viewport-constrained size and shrink as needed.
+  elements.svgContainer.style.width = `${Math.round(maxW)}px`;
+  elements.svgContainer.style.height = `${Math.round(maxH)}px`;
+
+  for (let i = 0; i < MAX_ASPECT_FIT_ITERS; i += 1) {
+    updatePlotLayoutOffset();
+
+    const containerRect = elements.svgContainer.getBoundingClientRect();
+    const plotRect = elements.plotLayout.getBoundingClientRect();
+
+    const extraW = containerRect.width - plotRect.width;
+    const topOffset = plotRect.top - containerRect.top;
+    const bottomGap = containerRect.bottom - plotRect.bottom;
+
+    const maxPlotW = Math.max(0, maxW - extraW);
+    const maxPlotH = Math.max(0, maxH - topOffset - bottomGap);
+    const plotW = Math.min(maxPlotW, maxPlotH * TARGET_PLOT_ASPECT);
+    const plotH = plotW / TARGET_PLOT_ASPECT;
+
+    const nextW = Math.round(plotW + extraW);
+    const nextH = Math.round(topOffset + plotH + bottomGap);
+
+    const done = Math.abs(nextW - containerRect.width) < 1 && Math.abs(nextH - containerRect.height) < 1;
+    elements.svgContainer.style.width = `${nextW}px`;
+    elements.svgContainer.style.height = `${nextH}px`;
+    if (done) break;
+  }
+
+  updatePlotLayoutOffset();
+}
+
 function handleWindowResize() {
   if (pendingResizeFrame) cancelAnimationFrame(pendingResizeFrame);
   pendingResizeFrame = window.requestAnimationFrame(() => {
     pendingResizeFrame = null;
-    updatePlotLayoutOffset();
-    if (plotlyLibRef?.Plots && plotlyRoot) {
-      try { plotlyLibRef.Plots.resize(plotlyRoot); } catch (e) { }
-    }
+    fitSvgContainerToPlotAspect();
+    // Re-render the full plot so font sizes recalculate for the new size.
+    renderPlot();
   });
 }
 
