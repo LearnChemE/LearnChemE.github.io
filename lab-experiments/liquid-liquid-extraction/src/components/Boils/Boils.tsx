@@ -89,8 +89,6 @@ export const Boils: Component<BoilProps> = (props) => {
         }
     });
 
-    createEffect(() => console.log(showing()))
-
   return (
     <Show when={showing()}>
       <For each={bubbles}>

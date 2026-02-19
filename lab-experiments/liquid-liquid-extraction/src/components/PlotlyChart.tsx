@@ -3,6 +3,7 @@ import { createEffect, createMemo, onCleanup, onMount, useContext, type Componen
 import { ColumnContext, envelope } from "../calcs";
 import { transpose } from "../ts/helpers";
 import { numberOfStages } from "../globals";
+import { FEED_COMP } from "../ts/config";
 
 interface PlotlyChartProps {
     // data: () => Profile,
@@ -22,6 +23,11 @@ export const PlotlyChart: Component<PlotlyChartProps> = ({ layout, config }) => 
             y: env[1],
             type: 'scatter',
             line: { color: "black" }
+        }, {
+            x: [0, FEED_COMP[0]],
+            y: [0, FEED_COMP[1]],
+            type: 'markers',
+            marker: { color: "blue", size: 8 }
         }];
 
     const columnCtx = useContext(ColumnContext);
@@ -41,7 +47,7 @@ export const PlotlyChart: Component<PlotlyChartProps> = ({ layout, config }) => 
         //     y_test.push(pt[1]);
         // });
 
-        const plotdata = [...data];
+        const plotdata = [...data] as Partial<Plotly.Data>[];
 
         // real data
         const x_test: number[] = [];
@@ -51,12 +57,12 @@ export const PlotlyChart: Component<PlotlyChartProps> = ({ layout, config }) => 
             const col = columnCtx!.column!;
             const n = numberOfStages();
             for (let i = 0; i < n; i++) {
-                // const raf = col.viewComposition(i, "raffinate");
-                // x_test.push(raf[0]);
-                // y_test.push(raf[1]);
-                // const ext = col.viewComposition(i, "extract");
-                // x_test.push(ext[0]);
-                // y_test.push(ext[1]);
+                const raf = col.viewComposition(i, "raffinate");
+                x_test.push(raf[0]);
+                y_test.push(raf[1]);
+                const ext = col.viewComposition(i, "extract");
+                x_test.push(ext[0]);
+                y_test.push(ext[1]);
                 // console.table({idx: i, raf, ext});
             }
 
@@ -67,7 +73,7 @@ export const PlotlyChart: Component<PlotlyChartProps> = ({ layout, config }) => 
                 mode: 'markers',
                 line: { color: "red" },
                 marker: { color: "red", size: 8 }
-            };
+            } as Partial<Plotly.Data>;
 
             plotdata.push(newData);
         }

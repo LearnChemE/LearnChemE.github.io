@@ -179,7 +179,7 @@ const RHO_W  = 1.00 / 18.01; // mol / cm3
 /**
  * Calculate the specific volume using a known composition.
  * @param comp Composition [chloroform, acetic acid] in mole fraction
- * @returns specific volume (cm3 / mol)
+ * @returns specific volume (L / mol)
  */
 export function specificVolume(comp: Composition) {
     const xc = comp[0];
@@ -219,10 +219,9 @@ class Stage {
 
     public settle() {
         const phases = separate(this.mixedComp[0], this.mixedComp[1]);
-        console.group(`Stage ${this.index} calling aqIn`);
         const aqIn = this.aqIn!();
-        console.groupEnd();
         const orgIn = this.orgIn();
+
         if (phases.length === 1) {
             // No separation, just one phase with the same composition as the mixed stream
             this.raffinate = this.mixedComp;
@@ -253,10 +252,7 @@ class Stage {
 
     public raffStream(): Stream {
         const ndot = this.ndot_out * this.phi;
-        // console.log(`raffinate: ${
-        //     [ndot,
-        //     this.raffinate]
-        // }`)
+
         return {
             ndot,
             comp: this.raffinate
@@ -265,7 +261,6 @@ class Stage {
 
     public extStream(): Stream {
         const ndot = this.ndot_out * (1 - this.phi);
-        console.log(`extStream from index ${this.index} called`)
         
         return {
             ndot,
@@ -276,7 +271,7 @@ class Stage {
     public evolve(deltaTime: number) {
         const orgInStream = this.orgIn();
         const aqInStream = this.aqIn!();
-        const currMoles = L_PER_STAGE / specificVolume(this.mixedComp) * 1000; // Convert from L to cm3
+        const currMoles = L_PER_STAGE / specificVolume(this.mixedComp); // Convert from L to cm3
 
         // console.table(orgInStream)
         // console.table(aqInStream)
@@ -290,7 +285,7 @@ class Stage {
         }
 
         // console.log(`Stage evolve: orgIn ${orgIn}, aqIn ${aqIn}, currMoles ${currMoles}, newComp ${this.mixedComp}`);
-        // console.table({ orgIn, aqIn, currMoles, newComp: this.mixedComp });
+        console.table({ index: this.index, orgIn, aqIn, currMoles, newComp: this.mixedComp });
     }
 }
 

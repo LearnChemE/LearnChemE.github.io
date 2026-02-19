@@ -33,7 +33,7 @@ export const Column: Component<ColumnProps> = (props) => {
         setColFull(true);
         // Create the calculation object and start the simulation
         const feedStream = createMemo(() => { return { ndot: feedIn() / FEED_SPECIFIC_VOL, comp: FEED_COMP } as Stream});
-        const solvStream = (() => { console.log("solvent called"); return { ndot: solvIn() / SOLV_SPECIFIC_VOL, comp: [0, 0] } as Stream});
+        const solvStream = createMemo(() => { return { ndot: solvIn() / SOLV_SPECIFIC_VOL, comp: [0, 0] } as Stream});
         const col = new ColumnCalc(numberOfStages(), feedStream, solvStream);
         // Attach the column to context so other components can access it
         columnContext!.column = col;
