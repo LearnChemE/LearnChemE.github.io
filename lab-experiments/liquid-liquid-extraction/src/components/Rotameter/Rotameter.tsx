@@ -1,4 +1,4 @@
-import { createEffect, type Component } from "solid-js";
+import { type Component } from "solid-js";
 import "./Rotameter.css";
 
 interface RotameterProps {
@@ -13,8 +13,6 @@ const Rotameter: Component<RotameterProps> = (props) => {
   const pixels = 85; // Total pixels the ball can move
   const maxFlowrate = props.flowrange[1] - props.flowrange[0]; // Max flowrate corresponding to max pixels
   const pixelsPerFlowrate = pixels / maxFlowrate;
-
-  createEffect(() => console.log(props.flowrate()))
   
   return (
 <g transform={`translate(${props.x}, ${props.y})`} ref={props.onRef}>

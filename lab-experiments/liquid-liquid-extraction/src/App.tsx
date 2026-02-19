@@ -19,6 +19,7 @@ import { StagesMenu } from './components/StagesMenu/StagesMenu'
 import { ControlButton } from './components/ControlButton/ControlButton'
 import { ColumnData } from './components/Column/ColumnData'
 import { PlotlyChart } from './components/PlotlyChart'
+import { ColumnContextProvider } from './calcs'
 
 function App() {
   const [feedIsOn, setFeedIsOn] = createSignal(false);
@@ -74,6 +75,7 @@ function App() {
 
   return (
     <>
+    <ColumnContextProvider>
       <div class="canvas-container">
         <SVGCanvas width={740} height={560} defs={Defs}>
           <Background />
@@ -116,6 +118,7 @@ function App() {
         </Switch>
       </div>
       <PlotlyChart />
+    </ColumnContextProvider>
     </>
   )
 }

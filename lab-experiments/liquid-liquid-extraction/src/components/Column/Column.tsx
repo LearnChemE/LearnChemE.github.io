@@ -1,9 +1,10 @@
-import { createEffect, createMemo, createSignal, For, onMount, type Accessor, type Component } from "solid-js";
-import { FEED_MAX_RATE, STAGE_HEIGHT } from "../../ts/config";
+import { createEffect, createMemo, createSignal, For, onMount, useContext, type Accessor, type Component } from "solid-js";
+import { FEED_COMP, FEED_MAX_RATE, STAGE_HEIGHT } from "../../ts/config";
 import { columnVolume, numberOfStages, paddingTop, resetEvent, setColFull } from "../../globals";
 import "./Column.css";
 import { animate } from "../../ts/helpers";
 import { Boils } from "../Boils/Boils";
+import { ColumnCalc, ColumnContext, FEED_SPECIFIC_VOL, SOLV_SPECIFIC_VOL, type Stream } from "../../calcs";
 
 type ColumnProps = {
     solvIn: Accessor<number>;
@@ -25,10 +26,23 @@ export const Column: Component<ColumnProps> = (props) => {
         return (fill() < columnVolume());
     }
 
-    const start = () => animate(fillAnimation, () => {
+    const columnContext = useContext(ColumnContext);
+
+    const onColFill = () => {
         animating = false;
         setColFull(true);
-    });
+        // Create the calculation object and start the simulation
+        const feedStream = createMemo(() => { return { ndot: feedIn() / FEED_SPECIFIC_VOL, comp: FEED_COMP } as Stream});
+        const solvStream = (() => { console.log("solvent called"); return { ndot: solvIn() / SOLV_SPECIFIC_VOL, comp: [0, 0] } as Stream});
+        const col = new ColumnCalc(numberOfStages(), feedStream, solvStream);
+        // Attach the column to context so other components can access it
+        columnContext!.column = col;
+        columnContext!.setColumnCreated(true);
+        // Start the column simulation
+        col.start();
+    }
+
+    const start = () => animate(fillAnimation, onColFill);
 
     onMount(start);
 
