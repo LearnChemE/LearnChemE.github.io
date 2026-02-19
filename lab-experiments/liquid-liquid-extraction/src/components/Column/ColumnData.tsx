@@ -27,8 +27,8 @@ export const ColumnData: Component = () => {
         </g>
 
         {/* Tooltip */}
-        <SVGTooltip x={200} y={100 + paddingTop() + i() * 32} before={false} comp={() => [1, 0]} anchor={lrefs[i()]} />
-        <SVGTooltip x={418} y={100 + paddingTop() + i() * 32} before={false} comp={() => [1, 0]} anchor={rrefs[i()]} />
+        <SVGTooltip x={150} y={100 + paddingTop() + i() * 32} stage={i()} stream={"raffinate"} anchor={lrefs[i()]} />
+        <SVGTooltip x={418} y={100 + paddingTop() + i() * 32} stage={i()} stream={"extract"} anchor={rrefs[i()]} />
       </>)}
     </For>
     )

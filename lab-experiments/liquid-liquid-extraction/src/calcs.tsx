@@ -193,7 +193,7 @@ export type Stream = {
     comp: Composition;
 }
 
-const L_PER_STAGE = 3; // L
+const L_PER_STAGE = 6; // L
 class Stage {
     private mixedComp: Composition = [0, 0];
     private raffinate: Composition;
@@ -204,13 +204,10 @@ class Stage {
     private orgIn: () => Stream;
     private aqIn: (() => Stream) | null = null;
 
-    private index: number;
-
-    constructor(orgIn: () => Stream, index: number) {
+    constructor(orgIn: () => Stream) {
         this.raffinate = [0, 0];
         this.extract = [0, 0];
         this.orgIn = orgIn;
-        this.index = index;
     }
 
     public setAqIn(aqIn: () => Stream) {
@@ -285,7 +282,7 @@ class Stage {
         }
 
         // console.log(`Stage evolve: orgIn ${orgIn}, aqIn ${aqIn}, currMoles ${currMoles}, newComp ${this.mixedComp}`);
-        console.table({ index: this.index, orgIn, aqIn, currMoles, newComp: this.mixedComp });
+        // console.table({ index: this.index, orgIn, aqIn, currMoles, newComp: this.mixedComp });
     }
 }
 
@@ -298,10 +295,10 @@ export class ColumnCalc {
     constructor(numStages: number, feed: () => Stream, solvent: () => Stream) {
         this.stages = [];
         // Construct stages with appropriate feed streams.
-        this.stages.push(new Stage(feed, 0));
+        this.stages.push(new Stage(feed));
         for (let i = 1; i < numStages; i++) {
             const prevRaff = this.stages[i - 1].raffStream.bind(this.stages[i - 1]);
-            this.stages.push(new Stage(prevRaff, i));
+            this.stages.push(new Stage(prevRaff));
         }
         // Set extract stream of each stage to be the solvent input of the previous stage
         for (let i = 0; i < numStages - 1; i++) {
