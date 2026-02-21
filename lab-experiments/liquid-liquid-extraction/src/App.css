@@ -35,7 +35,7 @@ p {
 
 @font-face {
   font-family: "digital";
-  src: url("./media/digital-7.ttf") format("truetype");
+  src: url("./assets/digital-7.ttf") format("truetype");
 }
 
 .canvas-container {
