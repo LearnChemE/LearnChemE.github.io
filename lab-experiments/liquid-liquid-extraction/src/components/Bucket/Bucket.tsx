@@ -1,16 +1,65 @@
-import type { Accessor, Component } from "solid-js";
-import { resolveProperty } from "../../ts/helpers";
+import { createEffect, createMemo, createSignal, useContext, type Accessor, type Component } from "solid-js";
+import { animate, constrain, resolveProperty } from "../../ts/helpers";
+import { ColumnContext, specificVolume } from "../../calcs";
+import "./Bucket.css"
 
 interface BucketProps {
     x: number | Accessor<number>;
     y: number | Accessor<number>;
+    stream: "raffinate" | "extract";
 }
 
 export const Bucket: Component<BucketProps> = (props: BucketProps) => {
     const x = resolveProperty(props.x, 0);
     const y = resolveProperty(props.y, 0);
+    const [rate, setRate] = createSignal(0);
+
+    // Subscribe to the appropriate stream in the column context to get the flowrate for the bucket
+    const ctx = useContext(ColumnContext)!;
+    createEffect(() => {
+        if (ctx.columnCreated()) {
+            const col = ctx.column!;
+            col.updated();
+            const r = (props.stream === "raffinate") ? col.raffinateOut() : col.extractOut();
+            const vdot = r.ndot * specificVolume(r.comp);
+            setRate(vdot);
+        }
+    });
+
+    // Scale of x reacts to the flowrate
+    const [min, max] = [0, 10]; // expected flowrate range in L/min
+    const range = max - min;
+    const sx = createMemo(() => constrain(rate() - min, 0, range) / range);
+    createEffect(() => console.log(sx()))
+
+    // ClipHeight
+    const [clipHeight, setClipHeight] = createSignal(0);
+
+    // Animation for the water falling
+    const waterfallAni = (dt: number) => {
+        let h = clipHeight();
+        h += dt * 4;
+        setClipHeight(Math.min(h, 1));
+        // Stop the animation when max height is passed
+        return (h < 1 && rate() !== 0);
+    }
+    let flowing = true;
+    animate(waterfallAni);
+
+    // Restart the clip height animation any time the flowrate hits zero
+    createEffect(() => {
+        if (sx() === 0) {
+        flowing = false;
+        }
+        else if (flowing === false) {
+        flowing = true;
+        setClipHeight(0);
+        animate(waterfallAni);
+        }
+    });
 
     return (
+        <>
     <g transform={`translate(${x()}, ${y()})`}>
         <path d="M5.87988 58.5H80.1201C80.3334 58.5 80.5232 58.6353 80.5928 58.8369L85.2988 72.5H0.701172L5.40723 58.8369C5.47679 58.6353 5.66659 58.5 5.87988 58.5Z" fill="#CECECE" stroke="black"/>
         <rect x="0.5" y="72.5" width="85" height="5" rx="0.5" fill="#CECECE" stroke="black"/>
@@ -30,10 +79,29 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
         <path d="M18.2142 12.069H66.7857V63.9655H18.2142V12.069Z" fill="#EE6300"/>
         <path d="M66.7857 12.069H65.7857V63.9655H66.7857H67.7857V12.069H66.7857ZM18.2142 63.9655H19.2142V12.069H18.2142H17.2142V63.9655H18.2142Z" fill="black" mask="url(#path-10-inside-1_34_44)"/>
         <path d="M67.5 19.3099C67.5 19.8436 67.0259 20.5102 65.752 21.223C64.5197 21.9124 62.7034 22.5499 60.416 23.0912C55.8491 24.1719 49.5146 24.8451 42.5 24.8451C35.4854 24.8451 29.1509 24.1719 24.584 23.0912C22.2966 22.5499 20.4803 21.9124 19.248 21.223C17.9741 20.5102 17.5 19.8436 17.5 19.3099V16.389C17.8536 16.7077 18.2827 17.001 18.7598 17.2679C20.1083 18.0224 22.0264 18.6859 24.3535 19.2367C29.0158 20.34 35.4314 21.0169 42.5 21.0169C49.5686 21.0169 55.9842 20.34 60.6465 19.2367C62.9737 18.6859 64.8917 18.0224 66.2402 17.2679C66.7173 17.001 67.1464 16.7077 67.5 16.389V19.3099Z" fill="#EE6300" stroke="black"/>
-        <path d="M46.5595 4.82758C43.4484 4.82758 40.3373 4.82758 37.2262 4.82758C37.3797 4.95122 37.5257 5.07487 37.6641 5.19852C38.9277 6.32736 39.5595 7.45619 39.5595 8.58503C39.5595 9.68188 39.5595 10.7787 39.5595 11.8756C39.5595 11.9992 39.5595 12.1229 39.5595 12.2465C41.115 12.2465 42.6706 12.2465 44.2262 12.2465C44.2262 12.1229 44.2262 11.9992 44.2262 11.8756C44.2262 10.7787 44.2262 9.68188 44.2262 8.58503C44.2262 7.45619 44.8579 6.32736 46.1215 5.19852C46.2599 5.07487 46.4059 4.95122 46.5595 4.82758Z" fill="#4D86FA"/>
+        {/* Waterfall here */}
+        <path 
+            d="M46.5595 4.82758C43.4484 4.82758 40.3373 4.82758 37.2262 4.82758C37.3797 4.95122 37.5257 5.07487 37.6641 5.19852C38.9277 6.32736 39.5595 7.45619 39.5595 8.58503C39.5595 9.68188 39.5595 10.7787 39.5595 11.8756C39.5595 11.9992 39.5595 12.1229 39.5595 12.2465C41.115 12.2465 42.6706 12.2465 44.2262 12.2465C44.2262 12.1229 44.2262 11.9992 44.2262 11.8756C44.2262 10.7787 44.2262 9.68188 44.2262 8.58503C44.2262 7.45619 44.8579 6.32736 46.1215 5.19852C46.2599 5.07487 46.4059 4.95122 46.5595 4.82758Z" 
+            fill="#4D86FA"
+            transform={`translate(${42.5 * (1 - sx())},0) scale(${sx()},1) translate(${0},0)`}
+            class="waterfall"
+            // clip-path={`url(#${key}-clip)`}
+            // mask={`url(#${props.stream}-mask)`}
+            />
+        {/* Last part of bucket */}
         <path d="M67.5 10.8616C67.5 11.3953 67.0259 12.0619 65.752 12.7747C64.5197 13.4641 62.7034 14.1016 60.416 14.6429C55.8491 15.7236 49.5146 16.3968 42.5 16.3968C35.4854 16.3968 29.1509 15.7236 24.584 14.6429C22.2966 14.1016 20.4803 13.4641 19.248 12.7747C17.9741 12.0619 17.5 11.3953 17.5 10.8616V7.94073C17.8536 8.25943 18.2827 8.55271 18.7598 8.81964C20.1083 9.57412 22.0264 10.2377 24.3535 10.7884C29.0158 11.8917 35.4314 12.5687 42.5 12.5687C49.5686 12.5687 55.9842 11.8917 60.6465 10.7884C62.9737 10.2377 64.8917 9.57412 66.2402 8.81964C66.7173 8.55271 67.1464 8.25943 67.5 7.94073V10.8616Z" fill="#EE6300" stroke="black"/>
     </g>
 
+    <defs>
+      <clipPath id={props.stream + "-clip"} clipPathUnits="objectBoundingBox">
+        <rect x="0" y="0" width="1" height={clipHeight()} />
+      </clipPath>
+      <mask maskUnits="objectBoundingBox" id={props.stream + "-mask"} >
+        <rect x="0" y="0" width="20" height="172" fill="white"/>
+      </mask>
+    </defs>
+
+    </>
     );
 }
 

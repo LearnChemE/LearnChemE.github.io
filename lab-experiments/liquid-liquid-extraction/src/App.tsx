@@ -79,8 +79,8 @@ function App() {
       <div class="canvas-container">
         <SVGCanvas width={740} height={560} defs={Defs}>
           <Background />
-          <Bucket x={225} y={() => 257 + paddedHeight()} />
-          <Bucket x={632} y={() => 257 + paddedHeight()} />
+          <Bucket x={225} y={() => 257 + paddedHeight()} stream="raffinate" />
+          <Bucket x={632} y={() => 257 + paddedHeight()} stream="extract" />
           <TopPipes />
           <Pipes />
           <PowerSwitch x={134} y={321 + paddedHeight()} label="feed" isOn={feedIsOn} setIsOn={setFeedIsOn} disabled={feedSwitchDisabled} />
