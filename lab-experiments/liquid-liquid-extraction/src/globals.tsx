@@ -3,6 +3,7 @@ import { COLUMN_BASE_VOL, COLUMN_VOL_PER_STAGE, DEFAULT_NUMBER_OF_STAGES, STAGE_
 
 // Global signals for application state
 export const [numberOfStages, setNumberOfStages] = createSignal(DEFAULT_NUMBER_OF_STAGES);
+export const [stageEfficiency, setStageEfficieny] = createSignal(1);
 export const [resetEvent, setResetEvent] = createSignal(false);
 export const [colFull, setColFull] = createSignal(false);
 export const paddingTop = createMemo(() => Math.max(0, (1 - numberOfStages()) * STAGE_HEIGHT + ZERO_STAGE_PADDING));

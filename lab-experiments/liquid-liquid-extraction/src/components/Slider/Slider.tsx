@@ -61,8 +61,8 @@ export function Slider(props: SliderProps) {
         />
         <div class="slider-value">
             {props.value().toFixed(fixed)}
+            {props.unit ?? ""}
         </div>
-        {props.unit && <span class="slider-unit">{props.unit}</span>}
       </div>
     </div>
   );

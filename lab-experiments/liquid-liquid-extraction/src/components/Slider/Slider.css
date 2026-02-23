@@ -23,16 +23,23 @@ body {
   color: #222;
   padding: 0 1em;
   gap: 1em;
+  justify-content: flex-end;
+  flex: 1;
 }
 
 .slider-label {
     margin-top: .2em;
+    width: 140px;
 }
 
 .slider-row {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+.slider-value {
+  width: 4ch;
 }
 
 /* range input base reset */
