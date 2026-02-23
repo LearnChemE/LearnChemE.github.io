@@ -16,7 +16,6 @@ const plotlyScriptUrl = 'assets/plotly.js';
 const PLOT_MARGIN_L = 100;
 const PLOT_MARGIN_R = 30;
 const PLOT_MARGIN_T = 0;
-const PLOT_MARGIN_B = 100;
 const samplePoints = 201;
 const TARGET_PLOT_ASPECT = 680 / 470;
 const VIEWPORT_INSET_PX = 40; // Matches CSS `calc(100vw - 40px)` / `calc(100vh - 40px)`.
@@ -179,7 +178,16 @@ function buildPlot(model, params) {
   const annotationFontSize = Math.round(17 * fontScale);
   const axisTitleFontSize = Math.round(18 * fontScale);
   const tickFontSize = Math.round(16 * fontScale);
-  const axisTitleStandoff = Math.round(12 * fontScale);
+  const axisTitleExtra = Math.round(10 * fontScale);
+  const axisTitleStandoff = Math.round(12 * fontScale) + axisTitleExtra;
+  const containerH = plotlyRoot ? plotlyRoot.clientHeight : 470;
+  const safeContainerH = containerH > 0 ? containerH : 470;
+  const plotMarginB = Math.max(0, Math.round(tickFontSize + axisTitleFontSize + axisTitleStandoff));
+  const plotHeight = Math.max(1, safeContainerH - plotMarginB - PLOT_MARGIN_T);
+  const titleCenterOffsetPx = tickFontSize + axisTitleStandoff + axisTitleFontSize * 0.5;
+  const labelPaperOffset = -titleCenterOffsetPx / plotHeight;
+  const labelLineGapPx = Math.max(4, Math.round(axisTitleFontSize * 0.35));
+  const labelLineEnd = Math.min(labelPaperOffset + (labelLineGapPx / plotHeight), -0.002);
 
   const lineW = 3;
   const axisLineW = 2;
@@ -194,8 +202,6 @@ function buildPlot(model, params) {
     hoverinfo: 'skip',
     showlegend: false
   };
-
-  const labelPaperOffset = -0.085;
 
   const annotations = [];
   annotations.push({
@@ -221,9 +227,9 @@ function buildPlot(model, params) {
     yref: 'paper',
     showarrow: false,
     text: '<i>r</i> = 0',
-    font: { family: 'Arial, sans-serif', size: annotationFontSize, color: '#000' },
+    font: { family: 'Arial, sans-serif', size: axisTitleFontSize, color: '#000' },
     xanchor: 'center',
-    yanchor: 'top'
+    yanchor: 'middle'
   });
   annotations.push({
     x: params.R,
@@ -232,9 +238,9 @@ function buildPlot(model, params) {
     yref: 'paper',
     showarrow: false,
     text: '<i>r</i> = <i>R</i>',
-    font: { family: 'Arial, sans-serif', size: annotationFontSize, color: '#000' },
+    font: { family: 'Arial, sans-serif', size: axisTitleFontSize, color: '#000' },
     xanchor: 'center',
-    yanchor: 'top'
+    yanchor: 'middle'
   });
 
   const infoText = [
@@ -242,6 +248,21 @@ function buildPlot(model, params) {
     `Thiele modulus = ${formatNumber(phi, 2)}`,
     `effectiveness factor = ${formatNumber(eta, 2)}`
   ].join('<br>');
+  const infoLineCount = infoText.split('<br>').length;
+  const infoLineHeightPx = annotationFontSize * 1.2;
+  const infoBorderPad = 4;
+  const infoYOffsetPx = 8;
+  const infoHeightPx = infoLineCount * infoLineHeightPx + 2 * infoBorderPad;
+  const neededHeadroomPx = infoYOffsetPx + infoHeightPx + 2;
+  let headroom = 0.008;
+  for (let i = 0; i < 3; i += 1) {
+    const span = CAs + headroom;
+    const dataPerPx = span / Math.max(1, plotHeight);
+    const neededHeadroom = neededHeadroomPx * dataPerPx;
+    if (neededHeadroom <= headroom + 1e-6) break;
+    headroom = neededHeadroom;
+  }
+  const yMax = CAs + headroom;
   annotations.push({
     x: 0.25 * params.R,
     // Anchor the info box just above the CAs dashed line so it never intersects it.
@@ -252,11 +273,11 @@ function buildPlot(model, params) {
     text: infoText,
     align: 'left',
     yanchor: 'bottom',
-    yshift: 8,
+    yshift: infoYOffsetPx,
     font: { family: 'Arial, sans-serif', size: annotationFontSize, color: '#000' },
     bgcolor: 'white',
     bordercolor: 'white',
-    borderpad: 4
+    borderpad: infoBorderPad
   });
 
   const shapes = [
@@ -278,7 +299,7 @@ function buildPlot(model, params) {
       x0: 0,
       x1: 0,
       y0: 0,
-      y1: labelPaperOffset,
+      y1: labelLineEnd,
       line: { color: '#000', width: 2 }
     },
     {
@@ -288,13 +309,13 @@ function buildPlot(model, params) {
       x0: params.R,
       x1: params.R,
       y0: 0,
-      y1: labelPaperOffset,
+      y1: labelLineEnd,
       line: { color: '#000', width: 2 }
     }
   ];
 
   const layout = {
-    margin: { l: PLOT_MARGIN_L, r: PLOT_MARGIN_R, t: PLOT_MARGIN_T, b: PLOT_MARGIN_B },
+    margin: { l: PLOT_MARGIN_L, r: PLOT_MARGIN_R, t: PLOT_MARGIN_T, b: plotMarginB },
     paper_bgcolor: 'rgba(0,0,0,0)',
     plot_bgcolor: 'rgba(0,0,0,0)',
     hovermode: 'closest',
@@ -316,7 +337,7 @@ function buildPlot(model, params) {
     },
     yaxis: {
       title: { text: 'concentration (mmol/cm<sup>3</sup>)', standoff: axisTitleStandoff, font: { family: 'Arial, sans-serif', size: axisTitleFontSize, color: '#111' } },
-      range: [0, CAs + 0.008],
+      range: [0, yMax],
       autorange: false,
       showgrid: false,
       zeroline: false,
