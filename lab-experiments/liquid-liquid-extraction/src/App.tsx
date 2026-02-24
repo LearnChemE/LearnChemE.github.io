@@ -12,7 +12,7 @@ import Bucket from './components/Bucket/Bucket'
 import Pipes from './components/Pipes/Pipes'
 import { PowerSwitch } from './components/PowerSwitch/Switch'
 import { batch, createEffect, createMemo, createSignal, Match, Show, Switch } from 'solid-js'
-import { FEED_MAX_RATE, SOLVENT_MAX_RATE } from './ts/config'
+import { FEED_MAX_RATE, INIT_FEED_LIFT, INIT_SOLV_LIFT, SOLVENT_MAX_RATE } from './ts/config'
 import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import { StagesMenu } from './components/StagesMenu/StagesMenu'
@@ -20,12 +20,13 @@ import { ControlButton } from './components/ControlButton/ControlButton'
 import { ColumnData } from './components/Column/ColumnData'
 // import { PlotlyChart } from './components/PlotlyChart'
 import { ColumnContextProvider } from './calcs'
+import worksheet from "./assets/worksheet.pdf?url"
 
 function App() {
   const [feedIsOn, setFeedIsOn] = createSignal(false);
   const [solvIsOn, setSolvIsOn] = createSignal(false);
-  const [feedLift, setFeedLift] = createSignal(0);
-  const [solvLift, setSolvLift] = createSignal(0);
+  const [feedLift, setFeedLift] = createSignal(INIT_FEED_LIFT);
+  const [solvLift, setSolvLift] = createSignal(INIT_SOLV_LIFT);
   const [showMenu, setShowMenu] = createSignal(true);
   const [lockStages, setLockStages] = createSignal(false);
   const [feedSwitchDisabled, setFeedSwitchDisabled] = createSignal(true);
@@ -91,8 +92,8 @@ function App() {
           <Rotameter flowrate={solvRate} flowrange={[0, SOLVENT_MAX_RATE]} x={477} y={64 + paddedHeight()} />
           <Tank x={31}  y={107 + paddedHeight()} />
           <Tank x={522} y={107 + paddedHeight()} />
-          <Valve x={134.5} y={() => 195 + paddedHeight()} onLiftChange={setFeedLift} />
-          <Valve x={466.5} y={() => 195 + paddedHeight()} onLiftChange={setSolvLift} />
+          <Valve x={134.5} y={() => 195 + paddedHeight()} onLiftChange={setFeedLift} initialLift={INIT_FEED_LIFT} />
+          <Valve x={466.5} y={() => 195 + paddedHeight()} onLiftChange={setSolvLift} initialLift={INIT_SOLV_LIFT} />
 
             <ColumnData feedIsOn={feedIsOn} />
         </SVGCanvas>
@@ -103,7 +104,7 @@ function App() {
         </Show>
 
         {/* Hamburger */}
-        <HamburgerMenu path="" downloadName="lle_worksheet.pdf" Directions={DirectionsText} About={AboutText} />
+        <HamburgerMenu path={worksheet} downloadName="lle_worksheet.pdf" Directions={DirectionsText} About={AboutText} />
 
         {/* Stages/Reset Button */}
         <Switch>

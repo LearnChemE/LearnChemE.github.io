@@ -3,6 +3,7 @@ import "./Valve.css";
 import { createSignal, type Component } from "solid-js";
 
 interface ValveProps {
+  initialLift?: number; // Optional initial lift value between 0 and 1
   onLiftChange?: (lift: number) => void;
   x: number | (() => number);
   y: number | (() => number);
@@ -18,7 +19,7 @@ export const Valve: Component<ValveProps> = (props) => {
     const cy = 36;
 
     // State
-    const [currentAngle, setCurrentAngle] = createSignal(0); // in pixels, range from 0 (closed) to 20 (fully open)
+    const [currentAngle, setCurrentAngle] = createSignal(props.initialLift ? props.initialLift * maxAngle : 0); // in pixels, range from 0 (closed) to 20 (fully open)
     let isDragging = false;
     let prevTh = 0;
 

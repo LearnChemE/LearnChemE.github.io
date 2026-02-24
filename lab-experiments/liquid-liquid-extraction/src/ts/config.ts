@@ -12,3 +12,6 @@ export const COLUMN_BASE_VOL = 8; // L
 export const COLUMN_VOL_PER_STAGE = 3; // L
 
 export const FEED_COMP: Composition = [.52, .43];
+
+export const INIT_FEED_LIFT = 0.75;
+export const INIT_SOLV_LIFT = 0.5;

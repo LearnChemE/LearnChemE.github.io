@@ -3,20 +3,22 @@ import type { Component } from "solid-js";
 export const DirectionsText: Component = () => {
     return <>
     <p>
-        This digital experiment simulates the sedimentation of two types of particles in a rigid vial.
+        This digital experiment simulates the separation of acetic acid from chloroform using an aqueous solvent.
     </p>
     <p>
-        Use the magnifying glass button to visualize the relative particle amounts and velocities within a section of the vial by hovering your mouse over it or tapping it on a touchscreen.
+        Before starting the experiment, use the menu in the top left to select the number of stages in the column and the stage efficiency.
     </p>
     <p>
-        The reset button shakes the vials to mix the particles and reset the animation.
+        To start the experiment, first click the solvent valve (right) to fill the column, then click the feed valve (left) to start the flow of feed. Drag and rotate each valve to change the flow rates.
     </p>
     <p>
-        The pause/play button stops and starts the animation.
+        Raffinate and extract compositions can be viewed by hovering near the column. Use the scales at each outlet to estimate flow rates.
     </p>
     <p>
-        The vial button opens a window so the red and white cell fractions can be changed for each vial. 
-        The changes occur when reset is clicked.
+        To reset the experiment, click the reset button in the top left. Note that this will also reset the number of stages and stage efficiency to their default values.
+    </p>
+    <p>
+        Scroll to zoom and drag the screen to pan.
     </p>
 </>;
 }
