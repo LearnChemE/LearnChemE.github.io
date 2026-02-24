@@ -105,8 +105,8 @@ function drawCanvas() {
     drawFrontView();
     drawTopView();
     drawPoints();
-    drawHorizontalScale();
     drawVerticalScale();
+    drawHorizontalScale();
 }
 
 function drawFrontView() {
@@ -519,10 +519,45 @@ function drawHorizontalScale() {
     const startY = canvasHeight / 2 + containerHeight / 2 + 25;
     const endX = 3/4 * canvasWidth + containerWidth / 2;
     const endY = canvasHeight / 2 + containerHeight / 2;
+    const group = draw.group();
+    group.node.classList.add("draggable");
+
+    let px, py;
+    let tx=0, ty=0;
+    const dragMove = (e) => {
+        const pt = draw.node.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        const cursor = pt.matrixTransform(draw.node.getScreenCTM().inverse());
+        tx += cursor.x - px;
+        ty += cursor.y - py;
+        px = cursor.x;
+        py = cursor.y;
+        group.node.setAttribute('transform', `translate(${tx}, ${ty})`);
+    }
+
+    const dragEnd = () => {
+        window.removeEventListener('pointermove', dragMove);
+        window.removeEventListener('pointerup', dragEnd);
+    }
+
+    const dragStart = (e) => {
+        console.log("drag start");
+        const pt = draw.node.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        const cursor = pt.matrixTransform(draw.node.getScreenCTM().inverse());
+        px = cursor.x;
+        py = cursor.y;
+        window.addEventListener('pointermove', dragMove);
+        window.addEventListener('pointerup', dragEnd);
+    }
+
+    group.on('pointerdown', dragStart);
     
     const numPoints = 80;
     const step = (endX - startX) / numPoints;
-    draw.rect(endX - startX + 15, 35)
+    group.rect(endX - startX + 15, 35)
     .center(startX + (endX - startX) / 2, startY - 6)
     .fill('#deb887')
     .stroke({ color: 'black', width: 1 });
@@ -530,26 +565,63 @@ function drawHorizontalScale() {
     for (let i = 0; i <= numPoints; i++) {
         let x = startX + i * step;
         let lineHeight = i % 5 === 0 ? 20 : 10; // Longer lines for every 10th mark
-        draw.line(x, startY - 23, x, startY - 23 + lineHeight).stroke({ width: 2, color: '#000' });
+        group.line(x, startY - 23, x, startY - 23 + lineHeight).stroke({ width: 2, color: '#000' });
         
         if (i === 0) {
-            draw.text("0 cm").move(startX - 3, startY + 3).font({ size: 8, anchor: 'left' });
+            group.text("0 cm").move(startX - 3, startY + 3).font({ size: 8, anchor: 'left' });
         }
         else if (i % 10 === 0) {
             const str = i.toString();
-            draw.text(str).move(x, startY + 3).font({ size: 8, anchor: 'middle' });
+            group.text(str).move(x, startY + 3).font({ size: 8, anchor: 'middle' });
         }
     }
+
+
 }
 
 function drawVerticalScale() {
     const startX = 3/4 * canvasWidth + containerWidth / 2;
     const startY = canvasHeight / 2 - containerHeight / 2;
     const endY = canvasHeight / 2 + containerHeight / 2;
+    const group = draw.group();
+    group.node.classList.add("draggable");
+
+    let px, py;
+    let tx=0, ty=0;
+    const dragMove = (e) => {
+        const pt = draw.node.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        const cursor = pt.matrixTransform(draw.node.getScreenCTM().inverse());
+        tx += cursor.x - px;
+        ty += cursor.y - py;
+        px = cursor.x;
+        py = cursor.y;
+        group.node.setAttribute('transform', `translate(${tx}, ${ty})`);
+    }
+
+    const dragEnd = () => {
+        window.removeEventListener('pointermove', dragMove);
+        window.removeEventListener('pointerup', dragEnd);
+    }
+
+    const dragStart = (e) => {
+        console.log("drag start");
+        const pt = draw.node.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        const cursor = pt.matrixTransform(draw.node.getScreenCTM().inverse());
+        px = cursor.x;
+        py = cursor.y;
+        window.addEventListener('pointermove', dragMove);
+        window.addEventListener('pointerup', dragEnd);
+    }
+
+    group.on('pointerdown', dragStart);
     
     const numPoints = 120;
     const step = (startY - endY) / numPoints;
-    draw.rect(39, endY - startY + 7.5)
+    group.rect(39, endY - startY + 7.5)
     .center(startX + 24, startY + (endY - startY) / 2)
     .fill('#deb887')
     .stroke({ color: 'black', width: 1 });
@@ -557,11 +629,11 @@ function drawVerticalScale() {
     for (let i = 0; i <= numPoints; i++) {
         let y = startY - i * step;
         let lineHeight = i % 5 === 0 ? 20 : 10; // Longer lines for every 10th mark
-        draw.line(startX + 5, y, startX + lineHeight, y).stroke({ width: 2, color: '#000' });
+        group.line(startX + 5, y, startX + lineHeight, y).stroke({ width: 2, color: '#000' });
         
         if (i % 10 === 0) {
             const str = (i === 0) ? "0 cm" : i.toString();
-            draw.text(str).move(startX + lineHeight + 2, y - 2).font({ size: 8, anchor: 'left' });
+            group.text(str).move(startX + lineHeight + 2, y - 2).font({ size: 8, anchor: 'left' });
         }
     }
 }
