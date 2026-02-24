@@ -18,7 +18,7 @@ import { AboutText, DirectionsText } from './components/Modal/modals'
 import { StagesMenu } from './components/StagesMenu/StagesMenu'
 import { ControlButton } from './components/ControlButton/ControlButton'
 import { ColumnData } from './components/Column/ColumnData'
-import { PlotlyChart } from './components/PlotlyChart'
+// import { PlotlyChart } from './components/PlotlyChart'
 import { ColumnContextProvider } from './calcs'
 
 function App() {
@@ -94,9 +94,7 @@ function App() {
           <Valve x={134.5} y={() => 195 + paddedHeight()} onLiftChange={setFeedLift} />
           <Valve x={466.5} y={() => 195 + paddedHeight()} onLiftChange={setSolvLift} />
 
-          <Show when={feedIsOn()}>
-            <ColumnData />
-          </Show>
+            <ColumnData feedIsOn={feedIsOn} />
         </SVGCanvas>
 
         {/* Menu for selecting stages */}
@@ -117,7 +115,7 @@ function App() {
           </Match>
         </Switch>
       </div>
-      <PlotlyChart />
+      {/* <PlotlyChart /> */}
     </ColumnContextProvider>
     </>
   )

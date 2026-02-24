@@ -30,7 +30,6 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
     const [min, max] = [0, 10]; // expected flowrate range in L/min
     const range = max - min;
     const sx = createMemo(() => constrain(rate() - min, 0, range) / range);
-    createEffect(() => console.log(sx()));
 
     // Accumulation of liquid in the bucket
     const [fill, setFill] = createSignal(0);
@@ -44,6 +43,8 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
     }
 
     animate(accumulate);
+
+    const text = createMemo(() => fill() > 20 ? "max" : `${fill().toFixed(1)} kg`);
 
     return (
         <>
@@ -85,7 +86,7 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
             <text
                 id="condTempVal"
                 class="digital-label"
-                x="54"
+                x="56"
                 y="90.5"
                 dominant-baseline="middle"
                 text-anchor="end"
@@ -93,7 +94,7 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
                 font-family="'Digital-7 Mono', monospace"
                 font-size="16"
             >
-                {fill().toFixed(1)} kg
+                {text()}
             </text>
         </g>
 

@@ -1,3 +1,4 @@
+import { stageEfficiency } from "./globals";
 import { FEED_COMP } from "./ts/config";
 import { animate } from "./ts/helpers";
 import { createContext, createSignal, type Accessor, type Setter } from "solid-js";
@@ -158,7 +159,7 @@ function findEnvelopeIntersections(line: { slope: number, intercept: number }) {
     return intersections;
 }
 
-export function separate(x: number, y: number): Composition[] {
+export function separate(x: number, y: number, leff=1, reff=1): Composition[] {
     const tieline = findTieline(x, y);
     const intersections = findEnvelopeIntersections(tieline);
 
@@ -168,6 +169,15 @@ export function separate(x: number, y: number): Composition[] {
     }
     else if (intersections[0][0] >= x || intersections[1][0] <= x) { // Left or right of phase envelope
         return [[x, y]];
+    }
+
+    // If efficiency is less than 1, only return a portion of the intersections
+    if (leff < 1 || reff < 1) {
+        intersections[0][0] = x + leff * (intersections[0][0] - x);
+        intersections[0][1] = y + leff * (intersections[0][1] - y);
+        intersections[1][0] = x + reff * (intersections[1][0] - x);
+        intersections[1][1] = y + reff * (intersections[1][1] - y);
+        return intersections;
     }
 
     return intersections; // Return in order of decreasing chloroform concentration
@@ -203,11 +213,24 @@ class Stage {
 
     private orgIn: () => Stream;
     private aqIn: (() => Stream) | null = null;
+    private leff: number;
+    private reff: number;
 
-    constructor(orgIn: () => Stream) {
+    constructor(orgIn: () => Stream, efficiency = 1, draw?: "raffinate" | "extract") {
         this.raffinate = [0, 0];
         this.extract = [0, 0];
         this.orgIn = orgIn;
+        // If there is a draw on the stage, the efficiency towards that phase is 100%
+        if (!draw) {
+            this.leff = efficiency;
+            this.reff = efficiency;
+        } else if (draw === "raffinate") {
+            this.leff = efficiency;
+            this.reff = 1;
+        } else {
+            this.leff = 1;
+            this.reff = efficiency;
+        }
     }
 
     public setAqIn(aqIn: () => Stream) {
@@ -215,7 +238,7 @@ class Stage {
     }
 
     public settle() {
-        const phases = separate(this.mixedComp[0], this.mixedComp[1]);
+        const phases = separate(this.mixedComp[0], this.mixedComp[1], this.leff, this.reff);
         const aqIn = this.aqIn!();
         const orgIn = this.orgIn();
 
@@ -293,12 +316,13 @@ export class ColumnCalc {
     private setUpdated: Setter<boolean>;
 
     constructor(numStages: number, feed: () => Stream, solvent: () => Stream) {
+        const eff = numStages === 1 ? 1 : stageEfficiency();
         this.stages = [];
         // Construct stages with appropriate feed streams.
-        this.stages.push(new Stage(feed));
+        this.stages.push(new Stage(feed, eff, "extract"));
         for (let i = 1; i < numStages; i++) {
             const prevRaff = this.stages[i - 1].raffStream.bind(this.stages[i - 1]);
-            this.stages.push(new Stage(prevRaff));
+            this.stages.push(new Stage(prevRaff, eff, i === numStages - 1 ? "raffinate" : undefined));
         }
         // Set extract stream of each stage to be the solvent input of the previous stage
         for (let i = 0; i < numStages - 1; i++) {
