@@ -170,3 +170,13 @@ body {
         width: 100%;
     }
 }
+
+.draggable {
+    cursor: grab;
+}
+.draggable:active {
+    cursor: grabbing;
+}
+.draggable:hover {
+    filter: brightness(1.1);
+}
