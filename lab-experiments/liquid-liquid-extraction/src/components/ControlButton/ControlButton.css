@@ -21,6 +21,20 @@
   background-color: #ddd;
 }
 
+.control-button[title]:hover:after {
+  content: attr(title);
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(.2,.2,.2,.8);
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 14pt;
+}
+
 .active {
   background-color: #3498db;
   color: white;

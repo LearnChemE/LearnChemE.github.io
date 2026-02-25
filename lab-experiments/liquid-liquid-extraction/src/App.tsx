@@ -18,7 +18,7 @@ import { AboutText, DirectionsText } from './components/Modal/modals'
 import { StagesMenu } from './components/StagesMenu/StagesMenu'
 import { ControlButton } from './components/ControlButton/ControlButton'
 import { ColumnData } from './components/Column/ColumnData'
-// import { PlotlyChart } from './components/PlotlyChart'
+import { PlotlyChart } from './components/PlotlyChart'
 import { ColumnContextProvider } from './calcs'
 import worksheet from "./assets/worksheet.pdf?url"
 
@@ -116,7 +116,7 @@ function App() {
           </Match>
         </Switch>
       </div>
-      {/* <PlotlyChart /> */}
+      <PlotlyChart />
     </ColumnContextProvider>
     </>
   )
