@@ -95,7 +95,7 @@ iframe {
   cursor: pointer;
   font-size: 1rem;
   transform: translate(-30%, 40%);
-  background-color: lightgreen;
+  background-color: rgb(243, 90, 90);
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -104,12 +104,17 @@ iframe {
   user-select: none;
 }
 
+#tilt {
+  transform: translate(-30%, calc(40% + 40px));
+  background-color: rgb(32, 178, 154);
+}
+
 #reset:hover {
-  background-color: rgb(177, 246, 177);
+  background-color: rgb(245, 145, 145);
 }
 
 #reset.clicked {
-  background-color: rgb(205, 249, 205);
+  background-color: rgb(249, 205, 205);
 }
 
 #buttons {
