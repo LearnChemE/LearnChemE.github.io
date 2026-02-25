@@ -150,12 +150,13 @@ evaporator.flowOut.subscribe((val) => console.log(val))
 // In Beaker is under
 inBeaker.overflow.subscribe(() => {
   if (pumpPower.get() === true) {
-    const e = GetElement("pumpSwitch");
-    e.dispatchEvent(new MouseEvent("click", {
+    const off = GetElement("pumpSwitchOff");
+    off.dispatchEvent(new MouseEvent("click", {
       bubbles: true,
       cancelable: true,
       view: window
     }));
+    const e = GetElement("pumpSwitch");
     e.style.pointerEvents = "none";
   }
 });
