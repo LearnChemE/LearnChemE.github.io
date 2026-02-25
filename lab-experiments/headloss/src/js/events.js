@@ -265,6 +265,7 @@ function handleReset(elts) {
     resetButton.classList.add("clicked");
     setTimeout(() => {
       resetButton.classList.remove("clicked");
+      window.location.reload();
     }, 100);
     setDefaults(elts);
   });
