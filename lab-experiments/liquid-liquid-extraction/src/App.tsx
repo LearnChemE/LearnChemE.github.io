@@ -18,7 +18,7 @@ import { AboutText, DirectionsText } from './components/Modal/modals'
 import { StagesMenu } from './components/StagesMenu/StagesMenu'
 import { ControlButton } from './components/ControlButton/ControlButton'
 import { ColumnData } from './components/Column/ColumnData'
-import { PlotlyChart } from './components/PlotlyChart'
+// import { PlotlyChart } from './components/PlotlyChart'
 import { ColumnContextProvider } from './calcs'
 import worksheet from "./assets/worksheet.pdf?url"
 
@@ -112,11 +112,11 @@ function App() {
             <ControlButton icon="fa-solid fa-diagram-next" label="edit internals" top={100} onClick={() => setShowMenu(!showMenu())} active={showMenu} disabled={lockStages} />
           </Match>
           <Match when={true}>
-            <ControlButton icon="fa-solid fa-arrows-rotate" label="reset" top={100} onClick={reset} />
+            <ControlButton icon="fa-solid fa-arrows-rotate" label="reset" top={100} onClick={reset} active={() => true} activeColor='#FF3B3B' />
           </Match>
         </Switch>
       </div>
-      <PlotlyChart />
+      {/* <PlotlyChart /> */}
     </ColumnContextProvider>
     </>
   )
