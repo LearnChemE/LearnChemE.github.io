@@ -12,7 +12,8 @@
 
 .menu-header {
     width: 100%;
-    padding: .5em;
+    padding: .4em;
+    font-size: 14pt;
 }
 
 hr {

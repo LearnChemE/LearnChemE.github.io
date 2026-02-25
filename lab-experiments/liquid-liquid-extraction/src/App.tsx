@@ -112,7 +112,7 @@ function App() {
             <ControlButton icon="fa-solid fa-diagram-next" label="edit internals" top={100} onClick={() => setShowMenu(!showMenu())} active={showMenu} disabled={lockStages} />
           </Match>
           <Match when={true}>
-            <ControlButton icon="fa-solid fa-arrows-rotate" label="reset" top={100} onClick={reset} />
+            <ControlButton icon="fa-solid fa-arrows-rotate" label="reset" top={100} onClick={reset} active={() => true} activeColor='#FF3B3B' />
           </Match>
         </Switch>
       </div>

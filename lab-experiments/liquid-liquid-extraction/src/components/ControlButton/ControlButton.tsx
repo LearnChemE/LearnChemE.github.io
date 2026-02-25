@@ -6,11 +6,12 @@ interface ControlButtonProps {
     label: string,
     top: number,
     active?: Accessor<boolean>,
+    activeColor?: string,
     onClick: () => void
     disabled?: Accessor<boolean>;
 }
 
-export const ControlButton: Component<ControlButtonProps> = ({ icon, label, onClick, top, active, disabled }) => {
+export const ControlButton: Component<ControlButtonProps> = ({ icon, label, onClick, top, active, disabled, activeColor }) => {
     if (!active) active = () => false;
     if (!disabled) disabled = () => false;
     
@@ -20,7 +21,7 @@ export const ControlButton: Component<ControlButtonProps> = ({ icon, label, onCl
                 <i class={typeof icon === "function" ? icon() : icon} />
             </button>
             ) : (
-            <button class={active() ? "control-button active" : "control-button"} style={`top: ${top}px`} onClick={() => { onClick(); }} title={label}>
+            <button class={active() ? "control-button active" : "control-button"} style={`top: ${top}px;` + (activeColor ? `background-color: ${activeColor};` : "")} onClick={() => { onClick(); }} title={label}>
                 <i class={typeof icon === "function" ? icon() : icon} />
             </button> 
         )}  
