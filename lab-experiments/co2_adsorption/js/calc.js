@@ -3,13 +3,24 @@ const timeMultiplicationFactor = 1;
 export const HEATING_RATE = 4 // K / s
 export const COOLING_RATE = Math.exp(-1/3);
 
+const LENGTH_BED = 20; // cm
+const RHO_ZEOLITE = 0.75; // g/cc
+const MASS_ZEOLITE = 4000; // g
+const MM_CO2 = 44.009; // g/mol
+const MM_N2 = 14.041 // g/mol
+const R = 83.14 // bar cc / mol / K
+const BED_MAX_CAPACITY = MASS_ZEOLITE / 1000 * 0.85; // mols
+// Spatial info
+const N = 201
+const x = Array.from({ length: N }).map((_,i) => i * LENGTH_BED / (N - 1));
+const dx = x[1] - x[0];
+
 const BED_VOLUME = .1; // L
 const KA0 = 2.764 * 10;
 const EA = 3400.814;
-const Ka = (T) => { return KA0 * Math.exp(-EA/T); }
 const KD0 = 2 * 10**5;
 const ED = 8209;
-const Kd = (T) => { return KD0 * Math.exp(-ED/T); }
+const k_val = (T) => { return KA0 * Math.exp(-EA/T); }
 const BED_MAX_CAPACITY = .01; // mol CO2 total
 const MAX_TEMP = 623.15; // K
 const R = 0.08314 // bar L / mol / K
