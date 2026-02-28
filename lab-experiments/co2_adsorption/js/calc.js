@@ -10,87 +10,131 @@ const MM_CO2 = 44.009; // g/mol
 const MM_N2 = 14.041 // g/mol
 const R = 83.14 // bar cc / mol / K
 const BED_MAX_CAPACITY = MASS_ZEOLITE / 1000 * 0.85; // mols
+const DIFFUSIVITY = 1.8e-9; // m^2/s, diffusivity of CO2 in zeolite
 // Spatial info
-const N = 201
+const N = 201; // number of points in spatial discretization
+const NT = 3*N + 6; // Size of arrays including padding
 const x = Array.from({ length: N }).map((_,i) => i * LENGTH_BED / (N - 1));
 const dx = x[1] - x[0];
 
-const BED_VOLUME = .1; // L
-const KA0 = 2.764 * 10;
-const EA = 3400.814;
-const KD0 = 2 * 10**5;
-const ED = 8209;
-const k_val = (T) => { return KA0 * Math.exp(-EA/T); }
-const BED_MAX_CAPACITY = .01; // mol CO2 total
-const MAX_TEMP = 623.15; // K
-const R = 0.08314 // bar L / mol / K
+const TH = 15; // min
+const BETA = 4; // K/min
 
-// 2.5 mmol CO2 / g zeolite
+// Geometry
+const BED_VOLUME = MASS_ZEOLITE / RHO_ZEOLITE; // cc
+const BED_CROSS_SECTION = BED_VOLUME / LENGTH_BED; // cm^2
+const BED_RADIUS = Math.sqrt(BED_CROSS_SECTION / Math.PI); // cm
+
+// type BedPoint = [
+//   pco2: Number,
+//   th_co2: Number,
+//   u: Number
+// ]
+
+const bed = Array.from({ length: N }).map(() => [0, 0, 0]); // initialize bed with zeros
 
 /**
- * Calculate the amount of CO2 adsorbed on a surface
- * as a function of time using a first-order rate equation.
- *
- * @param {Object} args - The arguments object.
- * @param {number} args.t - The time in seconds.
- * @param {number} args.ka - The adsorption rate constant in m^3/(mol*s).
- * @param {number} args.kd - The desorption rate constant in s^-1.
- * @param {number} args.cCO2 - The concentration of CO2 in mol/m^3.
- * @returns {number} - The amount of CO2 adsorbed on the surface.
+ * Utility functions for calculations
  */
-function theta(args) {
-  const t = args.t;
 
-  // These constants were chosen to achieve adsorption specified in OneNote. They are specifically hard-coded in
-  // to be the default unless overridden.
-  const ka = args.ka || 9.12e-6;
-  const kd = args.kd || 4.365e-4;
-  const cCO2 = args.cCO2;
-
-  const p = ka * cCO2 + kd;
-  const q = ka * cCO2;
-
-  const theta0 = 0; // initial amount adsorbed
-
-  const thetaEq = q / p;
-  const d = theta0 - thetaEq;
-
-  const exp = Math.exp(-p * t);
-
-  const theta = thetaEq + d * exp;
-
-  return theta;
+// Pad the edges of an array with the first and last values to make it easier to calculate derivatives
+function pad(y, left) {
+  return [ left, ...y, y[y.length - 1] ];
 }
 
-// // ----------- FOR DEBUGGING PURPOSES ONLY --------------
-// // Remove this from the code for production builds!!
-// // It is probably unsafe, and students could potentially use it to cheat the homework pretty easily.
-// // Normally, you could check if process.env.NODE_ENV === 'development' or something but this sim does not have a development environment set up.
-// async function sendDataToPython(data) {
-//   // You are making a POST request with the attached JSON to localhost port 5000's /plot endpoint (exposed by the Flask server)
-//   const response = await fetch('http://localhost:5000/plot', { 
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify(data)
-//   });
+// Remove the padding from an array
+function unpad(y) {
+  return y.slice(1, -1);
+}
 
-//   // Await the response from the server and print the results
-//   const result = await response.json();
-//   console.log('Python responded with: ', result);
-// }
-// let x=[], y=[], dx=.1;
-// for (let xn=0;xn<120;xn+=dx) {
-//   x.push(xn);
-//   y.push(theta({ t: xn, cCO2: 1 - (xn/120) }));
-// }
-// sendDataToPython({x: [x], y: [y]});
-// // ----------------- END DEBUG SECTION -------------------
+// Molar mass of the gas mixture based on the mole fraction of CO2
+function molar_mass(x_co2) {
+  return x_co2 * MM_CO2 + (1 - x_co2) * MM_N2;
+}
 
-var n_co2 = 0;
-var n_n2 = 5 * BED_VOLUME / R / 298.15;
-var th_co2 = 0; // Fraction of bed covered in CO2
+/**
+ * Calculte the velocity of the gas mixture through the bed based on the mass flow rate, mole fraction of CO2, and pressure.
+ * @param {Number} mdot Mass flow rate in g/s
+ * @param {Number} x_co2 mole fraction of CO2 in the gas mixture
+ * @param {Number} P overall pressure in bar
+ * @returns velocity in cm/s
+ */
+function calc_velocity(mdot, x_co2, P) {
+    // pv = nrt; Vdot = ndot * RT / P
+    ndot = mdot / molar_mass(x_co2) // mol/s
+    q = ndot * R * T / P // cc/s
+    return q / AC_BED // cm/s
+}
+
+function advection(y, dx) {
+  const inv_dx = 1 / dx;
+  const adv = Array.from({ length: 3*N + 6 }).fill(0);
+
+  for (let i = 3; i < NT - 3; i += 3) {
+    const ip = i;
+    // No theta; no advection for adsorbed carbon
+    const iu = i + 2;
+
+    const dp = y[ip] - y[ip - 3];
+    const du = y[iu] - y[iu - 3];
+    adv[ip] = - y[iu] * dp * inv_dx;
+    adv[iu] = - y[iu] * du * inv_dx
+  }
+
+  return adv;
+}
+
+function diffusion(y, dx) {
+  const inv_dx2 = 1 / dx / dx;
+  const dif = Array.from({ length: NT }).fill(0);
+
+  for (let i = 3; i < NT - 3; i += 3) {
+    const ip = i;
+    // No theta; no advection for adsorbed carbon
+    const iu = i + 2;
+
+    const d2p = y[ip + 3] + y[ip - 3] - 2 * y[ip];
+    const d2u = y[iu + 3] - y[iu - 3] - 2 * y[iu];
+    dif[ip] = DIFFUSIVITY * d2p * inv_dx;
+    dif[iu] = DIFFUSIVITY * d2u * inv_dx;
+  }
+
+  return dif;
+}
+
+function reaction(y, ka, kd) {
+  const rxn = Array.from({ length: NT }).fill(0);
+
+  for (let i=3; i < NT - 3; i += 3) {
+    const p = y[i];
+    const th = y[i + 1];
+    const th_star = 1 - th;
+
+    const ads = ka * p * th_star;
+    const des = kd * th;
+
+    rxn[i] = des - ads; // Pressure changes
+    rxn[i + 1] = (ads - des) / BED_MAX_CAPACITY; // Theta changes
+  }
+
+  return rxn;
+}
+
+// RHS for advection-diffusion eqn with reaction term
+function rhs(t, y, dx, ka, kd) {
+  const adv = advection(y, dx);
+  const dif = diffusion(y, dx);
+  const rxn = reaction(y, ka, kd);
+
+  return adv.map((a, i) => a + dif[i] + rxn[i]);
+}
+
+function evolve() {
+
+
+  sol = rk45()
+}
+
 /**
  * Calculate the outlet mole fraction of CO2 in a gas mixture
  * after passing through a zeolite membrane.
