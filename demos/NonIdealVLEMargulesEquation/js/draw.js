@@ -1,9 +1,7 @@
-/* import { Psat1 } from "./calcs.js";
-import { Psat2 } from "./calcs.js";
-import { gamma1 } from "./calcs.js";
-import { gamma2 } from "./calcs.js";
 import { Px } from "./calcs.js";
-import { Py } from "./calcs.js"; */
+import { Py } from "./calcs.js";
+import { Ty } from "./calcs.js";
+import { Tx } from "./calcs.js";
 const p5container = document.getElementById("p5-container");
 const positiveSliderWrapper = document.getElementById("positive-slider-wrapper");
 const negativeSliderWrapper = document.getElementById("negative-slider-wrapper");
@@ -610,32 +608,6 @@ function drawMouseDist() {
   ) {
     cursor(ARROW);
   } */
-}
-
-//fxs for drawgraphLines()
-
-function Psat1(temp) {
-  return (1 / 750) * 10 ** (6.84 - 1196.76 / (temp + 219.161)); // (bar)
-}
-
-function Psat2(temp) {
-  return (1 / 750) * 10 ** (6.95087 - 1342.31 / (temp + 219.187)); // (bar)
-}
-
-function gamma1(x, A12, A21) {
-  return Math.exp((1 - x) ** 2 * (A12 + 2 * (A21 - A12) * x));
-}
-
-function gamma2(x, A12, A21) {
-  return Math.exp(x ** 2 * (A21 + 2 * (A12 - A21) * (1 - x)));
-}
-
-function Px(x, temp, A12, A21) {
-  return gamma1(x, A12, A21) * x * Psat1(temp) + gamma2(x, A12, A21) * (1 - x) * Psat2(temp);
-}
-
-function Py(x, temp, A12, A21) {
-  return 1 / (x / (gamma1(x, A12, A21) * Psat1(temp)) + (1 - x) / (gamma2(x, A12, A21) * Psat2(temp)));
 }
 
 function drawgraphLinesPxyPositive() {
