@@ -1,8 +1,6 @@
 "use strict";
 // Adaptive RK45 ODE solver for systems of equations
 // --------------------------------------------------
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.rk45 = rk45;
 /**
  * Integrate dy/dt = f(t, y) from t0 to tEnd using adaptive RK45 (Fehlberg). I anticipate this to be horribly inefficient, but benchmark first optimize later.
  * @param f rhs for dyi/dt = f(t, y)
@@ -12,7 +10,7 @@ exports.rk45 = rk45;
  * @param opts additional options for solver
  * @returns object containing solution { t, y } where y is an array containing each yi array to be matched with t array
  */
-function rk45(f, y0, t0, tEnd, opts) {
+export function rk45(f, y0, t0, tEnd, opts) {
     if (opts === void 0) { opts = {}; }
     var _a = opts.dt, dt = _a === void 0 ? (tEnd - t0) / 1000 : _a, _b = opts.atol, atol = _b === void 0 ? 1e-6 : _b, _c = opts.rtol, rtol = _c === void 0 ? 1e-3 : _c, _d = opts.dtMin, dtMin = _d === void 0 ? 1e-8 : _d, _e = opts.dtMax, dtMax = _e === void 0 ? Math.abs(tEnd - t0) / 5 : _e, _f = opts.safety, safety = _f === void 0 ? 0.9 : _f;
     // In progress: Use Dormand-Prince?

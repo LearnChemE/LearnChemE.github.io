@@ -1,29 +1,40 @@
+import { rk45 } from "./rk45.js";
 const timeMultiplicationFactor = 1;
 
 export const HEATING_RATE = 4 // K / s
 export const COOLING_RATE = Math.exp(-1/3);
+const MAX_TEMP = 400 + 273; // K
 
-const LENGTH_BED = 20; // cm
+const LENGTH_BED = 40; // cm
 const RHO_ZEOLITE = 0.75; // g/cc
 const MASS_ZEOLITE = 4000; // g
 const MM_CO2 = 44.009; // g/mol
 const MM_N2 = 14.041 // g/mol
 const R = 83.14 // bar cc / mol / K
 const BED_MAX_CAPACITY = MASS_ZEOLITE / 1000 * 0.85; // mols
-const DIFFUSIVITY = 1.8e-9; // m^2/s, diffusivity of CO2 in zeolite
+const DIFFUSIVITY = 1.8e-1; // m^2/s, diffusivity of CO2 in zeolite
 // Spatial info
-const N = 201; // number of points in spatial discretization
+const N = 101; // number of points in spatial discretization
 const NT = 3*N + 6; // Size of arrays including padding
 const x = Array.from({ length: N }).map((_,i) => i * LENGTH_BED / (N - 1));
 const dx = x[1] - x[0];
 
-const TH = 15; // min
-const BETA = 4; // K/min
+
 
 // Geometry
 const BED_VOLUME = MASS_ZEOLITE / RHO_ZEOLITE; // cc
 const BED_CROSS_SECTION = BED_VOLUME / LENGTH_BED; // cm^2
 const BED_RADIUS = Math.sqrt(BED_CROSS_SECTION / Math.PI); // cm
+console.log("Radius: ", BED_RADIUS)
+
+// Kinetic parameters
+const ka0 = 2.196e4; // min^-1
+const ea = 2000; // convert from kJ/mol to K
+const kd0 = 8e6;
+const ed = 6e3;
+function k_val(k0, ea, T) {
+  return k0 * Math.exp(-ea / T);
+}
 
 // type BedPoint = [
 //   pco2: Number,
@@ -31,7 +42,7 @@ const BED_RADIUS = Math.sqrt(BED_CROSS_SECTION / Math.PI); // cm
 //   u: Number
 // ]
 
-const bed = Array.from({ length: N }).map(() => [0, 0, 0]); // initialize bed with zeros
+const bed = Array.from({ length: 3*N }).fill(0); // initialize bed with zeros
 
 /**
  * Utility functions for calculations
@@ -39,12 +50,20 @@ const bed = Array.from({ length: N }).map(() => [0, 0, 0]); // initialize bed wi
 
 // Pad the edges of an array with the first and last values to make it easier to calculate derivatives
 function pad(y, left) {
-  return [ left, ...y, y[y.length - 1] ];
+  const right = Array.from({ length: 3 }).map((_,i) => {
+    const yi = y[3 * N - 3 + i];
+    return yi;
+  });
+  // if (right[2] > 0) throw new Error(`Padding right with: ${right}, ${y}`)
+  return [ ...left, ...y, ...right ];
 }
 
 // Remove the padding from an array
-function unpad(y) {
-  return y.slice(1, -1);
+function updateBed(y) {
+  y = y.slice(3, -3);
+  for (let i=0; i<3*N; i++) {
+    bed[i] = y[i];
+  }
 }
 
 // Molar mass of the gas mixture based on the mole fraction of CO2
@@ -59,18 +78,18 @@ function molar_mass(x_co2) {
  * @param {Number} P overall pressure in bar
  * @returns velocity in cm/s
  */
-function calc_velocity(mdot, x_co2, P) {
+function calc_velocity(mdot, x_co2, T, P) {
     // pv = nrt; Vdot = ndot * RT / P
-    ndot = mdot / molar_mass(x_co2) // mol/s
-    q = ndot * R * T / P // cc/s
-    return q / AC_BED // cm/s
+    const ndot = mdot / molar_mass(x_co2) // mol/s
+    const q = ndot * R * T / P // cc/s
+    return q / BED_CROSS_SECTION // cm/s
 }
 
 function advection(y, dx) {
   const inv_dx = 1 / dx;
   const adv = Array.from({ length: 3*N + 6 }).fill(0);
 
-  for (let i = 3; i < NT - 3; i += 3) {
+  for (let i = 3; i < NT; i += 3) {
     const ip = i;
     // No theta; no advection for adsorbed carbon
     const iu = i + 2;
@@ -94,9 +113,9 @@ function diffusion(y, dx) {
     const iu = i + 2;
 
     const d2p = y[ip + 3] + y[ip - 3] - 2 * y[ip];
-    const d2u = y[iu + 3] - y[iu - 3] - 2 * y[iu];
-    dif[ip] = DIFFUSIVITY * d2p * inv_dx;
-    dif[iu] = DIFFUSIVITY * d2u * inv_dx;
+    const d2u = y[iu + 3] + y[iu - 3] - 2 * y[iu];
+    dif[ip] = DIFFUSIVITY * d2p * inv_dx2;
+    dif[iu] = DIFFUSIVITY * d2u * inv_dx2;
   }
 
   return dif;
@@ -126,13 +145,27 @@ function rhs(t, y, dx, ka, kd) {
   const dif = diffusion(y, dx);
   const rxn = reaction(y, ka, kd);
 
-  return adv.map((a, i) => a + dif[i] + rxn[i]);
+  const dydt = dif.map((dif, i) => dif + adv[i] + rxn[i]);
+  dydt[NT - 3] = 0;
+  dydt[NT - 1] = 0;
+  return dydt;
+  // return adv.map((a, i) => a + dif[i]);// + rxn[i]);
 }
 
-function evolve() {
+function evolve(tstep, T, left) {
+  const y0 = pad(bed, left);
+  const ka = k_val(ka0, ea, T);
+  const kd = k_val(kd0, ed, T);
 
+  const f = (t, y) => {
+    return rhs(t, y, dx, ka, kd);
+  }
 
-  sol = rk45()
+  const sol = rk45(f, y0, 0, tstep);
+  const soly = sol.y.at(-1);
+  
+  updateBed(soly);
+  updatePlot();
 }
 
 /**
@@ -151,83 +184,15 @@ function evolve() {
  * @param {number} [args.kd=4.365e-4] - The desorption rate constant in s^-1.
  * @returns {number} - The outlet mole fraction of CO2 in the gas mixture.
  */
-export function yCO2_out(args) {
-  const tStep = args.tStep * timeMultiplicationFactor;
-  const m = args.m * 1000; // g / s
-  const P = args.P; // bar
-  const T = args.T; // K
-  const V = BED_VOLUME; // L
-  const y = Math.min(args.yCO2, 0.99); // limit yCO2 to 0.99 to avoid division by zero
-  const dt = tStep * timeMultiplicationFactor;
-  const MW_CO2 = 44.01; // g/mol
-  const MW_N2 = 28.02; // g/mol
+export function yCO2_out(dt, mdot, T, P, y) {
+  mdot *= 60000; // mg/min
+  const ul = calc_velocity(mdot, y, T, P);
+  const left = [ y * P, 0, ul ];
+  // console.log(y*P)
+  evolve(dt, T, left);
 
-  // Get molar flowrate of each species
-  const ndot = m / (MW_CO2 * y + MW_N2 * (1 - y)); // [mol / s] total number of moles in the gas mixture
-  const ndot_co2 = ndot * y; // molar flow rate of CO2 [mol / s]
-  const ndot_n2 = ndot * (1 - y); // molar flow rate of N2 [mol / s]
-
-  // Calculate partial pressure of what's already in the tank
-  const p_co2 = n_co2 * R * T / V; 
-  // console.log(`pco2: ${p_co2}\npN2: ${n_n2 * R * T / V}`)
-
-  // Calculate rate constants
-  const ka = Ka(T);
-  const kd = Kd(T); 
-  // Calculate rates of adsorption and desorption
-  const rate_ads = ka * p_co2 * (1 - th_co2);
-  const rate_des = kd * th_co2;
-
-  // Rate of change of theta_co2
-  const gen_minus_cons = rate_des - rate_ads;
-
-  // Calculate new theta
-  
-  // Find the change in the bulk concentrations. 
-  //   acc = in - out + gen - cons
-  // Don't include out just yet because it should guaruntee we stay at pressure
-  const dthdt = (rate_ads - rate_des) / BED_MAX_CAPACITY;
-  const dcdt = ndot_co2 + gen_minus_cons; // mol / s
-  const dndt = ndot_n2; // mol / s
-
-  // Evolve the system
-  th_co2 += dthdt * dt; // unitless
-  n_co2  += dcdt  * dt; // mmol
-  n_n2   += dndt  * dt; // mmol
-
-  // Constrain theta to range [0,1]
-  if (th_co2 > 1) {
-    const dif = th_co2 - 1;
-    th_co2 = 1;
-    n_co2 += dif * BED_MAX_CAPACITY;
-  }
-  if (th_co2 < 0) {
-    const dif = th_co2;
-    th_co2 = 0;
-    n_co2 += dif * BED_MAX_CAPACITY;
-  }
-
-  // console.log(`theta:${th_co2.toFixed(2)}`);//\nn_CO2:${n_co2.toFixed(2)}\nn_N2:${n_n2.toFixed(2)}`);
-
-  // Calculate the amount of moles actually in the tank and compare to what the maximum pressure would allow
-  const n_max = P * V / R / T; // maximum moles
-  const n_tot = n_co2 + n_n2;
-  if (n_tot < n_max) {
-    // console.log(`${n_tot.toFixed(3)} moles of ${n_max.toFixed(3)}`);
-    // Not up to pressure; nothing will come out so it will accumulate
-    if (n_co2 < 0) n_co2 = 0;
-    if (n_n2 < 0) n_n2 = 0;
-    return 0;
-  }
-  else {
-    // Calculate mole fraction
-    const y_out = n_co2 / n_tot;
-    // Preserve that mole fraction but lower to n_max
-    n_co2 = n_max * y_out;
-    n_n2 = n_max * (1 - y_out);
-    // Return the outlet mole fraction because it is flowing
-    return Math.max(y_out, 0);
-  }
+  const outlet = bed[3*N - 3] / P
+  return outlet;
 }
 
 /**
@@ -249,4 +214,32 @@ export function rampTemperature(deltaTime, isHeating, temperature) {
     newTemp = 298.15 + (oldTemp - 298.15) * Math.pow(COOLING_RATE, deltaTime);
   }
   return newTemp;
+}
+
+// debug
+function plot_P() {
+  return Array.from({ length: N }).map((_,i) => bed[3 * i]);
+}
+
+function plot_th() {
+  const y = Array.from({ length: N }).map((_,i) => {
+    console.log(bed[3 * i + 1])
+    return bed[3 * i + 1];
+  });
+  return y;
+}
+
+// Debug
+var data = [{
+    x: x, y: plot_P(), type: 'scatter'
+}];
+var layout = {title: 'Pressure'};
+
+Plotly.newPlot('plotly-chart', data, layout);
+
+function updatePlot() {
+  var data = [{
+      x: x, y: plot_th(), type: 'scatter'
+  }];
+  Plotly.react('plotly-chart', data, layout);
 }

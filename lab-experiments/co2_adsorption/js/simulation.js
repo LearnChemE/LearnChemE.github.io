@@ -90,17 +90,18 @@ export function startMoleFractionCalculation(tankNum) {
       const flowCfg = state.getFlowConfig();
       if (flowCfg === state.FLOW_BED) {
         // Do calculation
-        const y_out = yCO2_out({
-          t: t,
-          tStep: 1/60, // Use config timestep
-          m: m_g_s,
-          P: P_bar,
-          T: T,
-          yCO2: y, // Initial mole fraction of the feed gas
-          desorbing: state.getDesorbing(),
-          timeOfDesorption: state.getTimeOfDesorption(), // The simulation time 't' when desorption *started*
-          // m_controller: m_controller_mg_min // Pass m_controller if needed by yCO2_out, otherwise 'm' is sufficient
-        });
+        // const y_out = yCO2_out({
+        //   t: t,
+        //   tStep: 1/60, // Use config timestep
+        //   m: m_g_s,
+        //   P: P_bar,
+        //   T: T,
+        //   yCO2: y, // Initial mole fraction of the feed gas
+        //   desorbing: state.getDesorbing(),
+        //   timeOfDesorption: state.getTimeOfDesorption(), // The simulation time 't' when desorption *started*
+        //   // m_controller: m_controller_mg_min // Pass m_controller if needed by yCO2_out, otherwise 'm' is sufficient
+        // });
+        const y_out = yCO2_out(1/60, m_g_s, T, P_bar, y);
 
         state.setOutletMoleFraction(y_out);
       }
