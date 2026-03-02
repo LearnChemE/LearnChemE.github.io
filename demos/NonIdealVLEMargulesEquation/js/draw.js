@@ -1,7 +1,13 @@
-//import { calcAll } from "./calcs.js";
+/* import { Psat1 } from "./calcs.js";
+import { Psat2 } from "./calcs.js";
+import { gamma1 } from "./calcs.js";
+import { gamma2 } from "./calcs.js";
+import { Px } from "./calcs.js";
+import { Py } from "./calcs.js"; */
 const p5container = document.getElementById("p5-container");
 const positiveSliderWrapper = document.getElementById("positive-slider-wrapper");
 const negativeSliderWrapper = document.getElementById("negative-slider-wrapper");
+let temp;
 
 // This function is used to scale the canvas based on the size of the container
 window.relativeSize = () => p5container.offsetWidth / 1280;
@@ -20,6 +26,7 @@ function resize() {
 // So this should never be inside a conditional statement.
 window.setup = function () {
   createCanvas(p5container.offsetWidth, p5container.offsetHeight).parent(p5container);
+  //frameRate(60);
 };
 
 window.draw = function () {
@@ -46,11 +53,19 @@ window.draw = function () {
   //calcAll();
 
   if (state.plotSelection === "P-x-y") {
+    temp = 110;
     drawPxyLeftGraph();
     drawPxyRightGraph();
+    drawMouseDist();
+    if (state.deviationSelection == "positive") {
+      drawgraphLinesPxyPositive();
+    } else if (state.deviationSelection == "negative") {
+      drawgraphLinesPxyNegative();
+    }
   } else if (state.plotSelection === "T-x-y") {
     drawTxyLeftGraph();
     drawTxyRightGraph();
+    drawMouseDist();
   }
 };
 
@@ -435,6 +450,282 @@ function drawTxyRightGraph() {
     pop();
   }
 }
+
+// Vars for drawMouseDist()
+let blackCircleX = 100;
+let blackCircleY = 100;
+
+let mousePressedInCircle = false;
+
+function drawMouseDist() {
+  textAlign(CENTER);
+  textSize(16);
+
+  state.circleX = mouseX / relativeSize();
+  state.circleY = mouseY / relativeSize();
+
+  state.mouseXPtCalibrated = mouseX / relativeSize();
+  state.mouseYPtCalibrated = mouseY / relativeSize();
+
+  if (mouseIsPressed === true && Math.abs(state.mouseXPtCalibrated - blackCircleX) < 10 && Math.abs(state.mouseYPtCalibrated - blackCircleY) < 10) {
+    mousePressedInCircle = true;
+  }
+
+  if (mouseIsPressed === true && mousePressedInCircle === true) {
+    blackCircleX = state.mouseXPtCalibrated;
+    blackCircleY = state.mouseYPtCalibrated;
+  } else {
+    mousePressedInCircle = false;
+  }
+
+  state.x_1 = 1 + (blackCircleX - state.graphCenterX - state.graphWidth / 2) / state.graphWidth;
+  state.y_1 = 1 + (blackCircleX - state.graphCenterX - state.graphWidth / 2) / state.graphWidth;
+
+  text(state.x_1, blackCircleX, blackCircleY - 30);
+
+  push();
+  fill("black");
+  circle(blackCircleX, blackCircleY, 20);
+  pop();
+
+  // line(z.mouseXPtCalibrated - 75, z.mouseYPtCalibrated - 15, z.mouseXPtCalibrated + 75, z.mouseYPtCalibrated - 15);
+  // text(`x: ${Math.abs(((z.mouseXPtCalibrated-z.distLX)/854).toFixed(3))} y: ${Math.abs(((z.mouseYPtCalibrated-z.distBY)/-480).toFixed(3))}`, z.mouseXPtCalibrated, z.mouseYPtCalibrated - 25);
+
+  // line(z.mouseXPtCalibrated - 75, z.mouseYPtCalibrated - 15, z.mouseXPtCalibrated + 75, z.mouseYPtCalibrated - 15);
+
+  /* if (Math.abs(z.circleX - z.distLX) < 7.5 && Math.abs(z.circleY - z.distBY) < 7.5) {
+    fill(100, 100, 100);
+    strokeWeight(2);
+    stroke("black");
+    ellipse(z.distLX, z.distBY, 15, 15);
+    fill("white");
+    textSize(22);
+    stroke("black");
+    strokeWeight(3.5);
+    text(`x: ${Math.abs((0).toFixed(3))} y: ${Math.abs((0).toFixed(3))}`, z.distLX, z.distBY + 35);
+  }
+
+  if (Math.abs(z.circleX - z.distRX) < 7.5 && Math.abs(z.circleY - z.distTY) < 7.5) {
+    fill(100, 100, 100);
+    strokeWeight(2);
+    stroke("black");
+    ellipse(z.distRX, z.distTY, 15, 15);
+    fill("white");
+    textSize(22);
+    stroke("black");
+    strokeWeight(3.5);
+    text(`x: ${Math.abs((1).toFixed(3))} y: ${Math.abs((1).toFixed(3))}`, z.distRX, z.distTY + 35);
+  }
+
+  if (Math.abs(z.circleX - z.distLineX12) < 7.5 && Math.abs(z.circleY - ((z.distBY - z.distTY) * (1 - z.hBot) + z.distTY)) < 7.5) {
+    fill(100, 100, 100);
+    strokeWeight(2);
+    stroke("black");
+    ellipse(z.distLineX12, (z.distBY - z.distTY) * (1 - z.hBot) + z.distTY, 15, 15);
+    fill("white");
+    textSize(22);
+    stroke("black");
+    strokeWeight(3.5);
+    text(
+      `x: ${Math.abs(((z.distLineX12 - z.distLX) / (z.distRX - z.distLX)).toFixed(3))} y: ${Math.abs((((z.distBY - z.distTY) * (1 - z.hBot) + z.distTY - z.distBY) / (z.distTY - z.distBY)).toFixed(3))}0`,
+      z.distLineX12,
+      (z.distBY - z.distTY) * (1 - z.hBot) + z.distTY + 35,
+    );
+  }
+
+  if (Math.abs(z.circleX - z.distLineX23) < 7.5 && Math.abs(z.circleY - ((z.distBY - z.distTY) * (1 - (z.hBot + z.hMid)) + z.distTY)) < 7.5) {
+    fill(100, 100, 100);
+    strokeWeight(2);
+    stroke("black");
+    ellipse(z.distLineX23, (z.distBY - z.distTY) * (1 - (z.hBot + z.hMid)) + z.distTY, 15, 15);
+    fill("white");
+    textSize(22);
+    stroke("black");
+    strokeWeight(3.5);
+    text(
+      `x: ${Math.abs(((z.distLineX23 - z.distLX) / (z.distRX - z.distLX)).toFixed(3))} y: ${Math.abs((((z.distBY - z.distTY) * (1 - (z.hBot + z.hMid)) + z.distTY - z.distBY) / (z.distTY - z.distBY)).toFixed(3))}0`,
+      z.distLineX23,
+      (z.distBY - z.distTY) * (1 - (z.hBot + z.hMid)) + z.distTY + 35,
+    );
+  }
+
+  // These if statements define what the mouse does and where to place the gray circle on the graph
+  if (z.mouseYPtCalibrated > z.distTY && z.mouseXPtCalibrated > z.distLX && z.distRX > z.mouseXPtCalibrated && z.mouseYPtCalibrated < z.distBY) {
+    // cursor('grab');
+
+    // if statements for points on the middle section of the plot
+    if (z.circleX > z.distLineX12 && z.circleX < z.distLineX23 && Math.abs(z.circleY - z.plotCircleY2) < 20) {
+      fill(100, 100, 100);
+      strokeWeight(2);
+      stroke("black");
+      ellipse(z.circleX, z.plotCircleY2, 15, 15);
+      fill("white");
+      textSize(22);
+      stroke("black");
+      strokeWeight(3.5);
+      text(
+        `x: ${Math.abs(((z.mouseXPtCalibrated - z.distLX) / (z.distRX - z.distLX)).toFixed(3))} y: ${Math.abs(((z.plotCircleY2 - z.distBY) / (z.distTY - z.distBY)).toFixed(3))}`,
+        z.mouseXPtCalibrated,
+        z.plotCircleY2 - 25,
+      );
+    }
+    // if for top section
+    if (z.circleX > z.distLineX23 && z.circleX < z.distRX && Math.abs(z.circleY - z.plotCircleY3) < 20) {
+      fill(100, 100, 100);
+      strokeWeight(2);
+      stroke("black");
+      ellipse(z.circleX, z.plotCircleY3, 15, 15);
+      fill("white");
+      textSize(22);
+      stroke("black");
+      strokeWeight(3.5);
+      text(
+        `x: ${Math.abs(((z.mouseXPtCalibrated - z.distLX) / (z.distRX - z.distLX)).toFixed(3))} y: ${Math.abs(((z.plotCircleY3 - z.distBY) / (z.distTY - z.distBY)).toFixed(3))}`,
+        z.mouseXPtCalibrated,
+        z.plotCircleY3 - 25,
+      );
+    }
+
+    // if for bottom section
+    if (z.circleX > z.distLX && z.circleX < z.distLineX12 && Math.abs(z.circleY - z.plotCircleY1) < 20) {
+      fill(100, 100, 100);
+      strokeWeight(2);
+      stroke("black");
+      ellipse(z.circleX, z.plotCircleY1, 15, 15);
+      fill("white");
+      textSize(22);
+      stroke("black");
+      strokeWeight(3.5);
+      text(
+        `x: ${Math.abs(((z.mouseXPtCalibrated - z.distLX) / (z.distRX - z.distLX)).toFixed(3))} y: ${Math.abs(((z.plotCircleY1 - z.distBY) / (z.distTY - z.distBY)).toFixed(3))}`,
+        z.mouseXPtCalibrated,
+        z.plotCircleY1 - 25,
+      );
+    }
+  } else if (
+    z.mouseYPtCalibrated < z.distTY ||
+    z.mouseXPtCalibrated < z.distLX ||
+    z.distRX < z.mouseXPtCalibrated ||
+    z.mouseYPtCalibrated > z.distBY
+  ) {
+    cursor(ARROW);
+  } */
+}
+
+//fxs for drawgraphLines()
+
+function Psat1(temp) {
+  return (1 / 750) * 10 ** (6.84 - 1196.76 / (temp + 219.161)); // (bar)
+}
+
+function Psat2(temp) {
+  return (1 / 750) * 10 ** (6.95087 - 1342.31 / (temp + 219.187)); // (bar)
+}
+
+function gamma1(x, A12, A21) {
+  return Math.exp((1 - x) ** 2 * (A12 + 2 * (A21 - A12) * x));
+}
+
+function gamma2(x, A12, A21) {
+  return Math.exp(x ** 2 * (A21 + 2 * (A12 - A21) * (1 - x)));
+}
+
+function Px(x, temp, A12, A21) {
+  return gamma1(x, A12, A21) * x * Psat1(temp) + gamma2(x, A12, A21) * (1 - x) * Psat2(temp);
+}
+
+function Py(x, temp, A12, A21) {
+  return 1 / (x / (gamma1(x, A12, A21) * Psat1(temp)) + (1 - x) / (gamma2(x, A12, A21) * Psat2(temp)));
+}
+
+function drawgraphLinesPxyPositive() {
+  console.log(Px(0, 110, state.positiveA12Value, state.positiveA21Value));
+  console.log(Px(0.5, 110, state.positiveA12Value, state.positiveA21Value));
+  console.log(Px(1, 110, state.positiveA12Value, state.positiveA21Value));
+
+  push();
+  strokeWeight(3);
+  stroke("blue");
+  noFill();
+  beginShape();
+  for (let x = 0; x <= 1; x += 0.001) {
+    let y = Px(x, temp, state.positiveA12Value, state.positiveA21Value);
+    /*  vertex(
+      x * state.graphWidth + state.graphCenterX - state.graphWidth / 2,
+      (-y / (2.7 - 0.9)) * state.graphHeight + state.graphCenterY + state.graphHeight / 2,
+    ); */
+    vertex(
+      x * state.graphWidth + state.graphCenterX - state.graphWidth / 2,
+      (-(y - 0.9) / (2.7 - 0.9)) * state.graphHeight + state.graphCenterY + state.graphHeight / 2,
+    );
+  }
+  endShape();
+  pop();
+
+  push();
+  strokeWeight(3);
+  stroke("green");
+  noFill();
+  beginShape();
+  for (let x = 0; x <= 1; x += 0.001) {
+    let y = Py(x, temp, state.positiveA12Value, state.positiveA21Value);
+    /*  vertex(
+      x * state.graphWidth + state.graphCenterX - state.graphWidth / 2,
+      (-y / (2.7 - 0.9)) * state.graphHeight + state.graphCenterY + state.graphHeight / 2,
+    ); */
+    vertex(
+      x * state.graphWidth + state.graphCenterX - state.graphWidth / 2,
+      -((y - 0.9) / (2.7 - 0.9)) * state.graphHeight + state.graphCenterY + state.graphHeight / 2,
+    );
+  }
+  endShape();
+  pop();
+}
+
+function drawgraphLinesPxyNegative() {
+  console.log(Px(0, 110, state.negativeA12Value, state.negativeA21Value));
+  console.log(Px(0.5, 110, state.negativeA12Value, state.negativeA21Value));
+  console.log(Px(1, 110, state.negativeA12Value, state.negativeA21Value));
+
+  push();
+  strokeWeight(3);
+  stroke("blue");
+  noFill();
+  beginShape();
+  for (let x = 0; x <= 1; x += 0.001) {
+    let y = Px(x, temp, state.negativeA12Value, state.negativeA21Value);
+    /*  vertex(
+      x * state.graphWidth + state.graphCenterX - state.graphWidth / 2,
+      (-y / (2.7 - 0.9)) * state.graphHeight + state.graphCenterY + state.graphHeight / 2,
+    ); */
+    vertex(
+      x * state.graphWidth + state.graphCenterX - state.graphWidth / 2,
+      (-(y - 0.7) / (2.3 - 0.7)) * state.graphHeight + state.graphCenterY + state.graphHeight / 2,
+    );
+  }
+  endShape();
+  pop();
+
+  push();
+  strokeWeight(3);
+  stroke("green");
+  noFill();
+  beginShape();
+  for (let x = 0; x <= 1; x += 0.001) {
+    let y = Py(x, temp, state.negativeA12Value, state.negativeA21Value);
+    /*  vertex(
+      x * state.graphWidth + state.graphCenterX - state.graphWidth / 2,
+      (-y / (2.7 - 0.9)) * state.graphHeight + state.graphCenterY + state.graphHeight / 2,
+    ); */
+    vertex(
+      x * state.graphWidth + state.graphCenterX - state.graphWidth / 2,
+      -((y - 0.7) / (2.3 - 0.7)) * state.graphHeight + state.graphCenterY + state.graphHeight / 2,
+    );
+  }
+  endShape();
+  pop();
+}
+
 /* 
 function drawAxesLabelsPxy() {
   push();

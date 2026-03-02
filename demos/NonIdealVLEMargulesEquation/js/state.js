@@ -23,6 +23,22 @@ window.state = {
   negativeA12Value: 0,
   negativeA21Value: 0,
 
+  //Calculation Vars
+  y_1: 0.5,
+  y_2: 0.5,
+  X_1: 0.5,
+  x_2: 0.5,
+  Psat1: 0,
+  Psat2: 0,
+  gamma1: 0,
+  gamma2: 0,
+  Px: 0,
+  Py: 0,
+  Tx: 0,
+  Ty: 0,
+  A21: 0,
+  A12: 0,
+
   //radio button variables
   plotSelection: 0,
   deviationSelection: 0,
