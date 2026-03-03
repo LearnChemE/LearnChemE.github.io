@@ -205,7 +205,7 @@ function evolve(tstep, T, y0) {
   const soly = sol.y.at(-1);
   
   updateBed(soly);
-  updatePlot();
+  // updatePlot();
 }
 
 /**
