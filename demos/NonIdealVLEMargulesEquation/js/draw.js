@@ -1,11 +1,12 @@
 import { Px } from "./calcs.js";
 import { Py } from "./calcs.js";
-import { Ty } from "./calcs.js";
-import { Tx } from "./calcs.js";
+import { TxBisection } from "./calcs.js";
+import { TyBisection } from "./calcs.js";
 const p5container = document.getElementById("p5-container");
 const positiveSliderWrapper = document.getElementById("positive-slider-wrapper");
 const negativeSliderWrapper = document.getElementById("negative-slider-wrapper");
 let temp;
+let pressure;
 
 // This function is used to scale the canvas based on the size of the container
 window.relativeSize = () => p5container.offsetWidth / 1280;
@@ -56,14 +57,20 @@ window.draw = function () {
     drawPxyRightGraph();
     drawMouseDist();
     if (state.deviationSelection == "positive") {
-      drawgraphLinesPxyPositive();
+      drawGraphLinesPxyPositive();
     } else if (state.deviationSelection == "negative") {
-      drawgraphLinesPxyNegative();
+      drawGraphLinesPxyNegative();
     }
   } else if (state.plotSelection === "T-x-y") {
+    pressure = 1.6;
     drawTxyLeftGraph();
     drawTxyRightGraph();
     drawMouseDist();
+    if (state.deviationSelection == "positive") {
+      drawGraphLinesTxyPositive();
+    } else if (state.deviationSelection == "negative") {
+      drawGraphLinesTxyNegative();
+    }
   }
 };
 
@@ -610,7 +617,7 @@ function drawMouseDist() {
   } */
 }
 
-function drawgraphLinesPxyPositive() {
+function drawGraphLinesPxyPositive() {
   console.log(Px(0, 110, state.positiveA12Value, state.positiveA21Value));
   console.log(Px(0.5, 110, state.positiveA12Value, state.positiveA21Value));
   console.log(Px(1, 110, state.positiveA12Value, state.positiveA21Value));
@@ -654,11 +661,7 @@ function drawgraphLinesPxyPositive() {
   pop();
 }
 
-function drawgraphLinesPxyNegative() {
-  console.log(Px(0, 110, state.negativeA12Value, state.negativeA21Value));
-  console.log(Px(0.5, 110, state.negativeA12Value, state.negativeA21Value));
-  console.log(Px(1, 110, state.negativeA12Value, state.negativeA21Value));
-
+function drawGraphLinesPxyNegative() {
   push();
   strokeWeight(3);
   stroke("blue");
@@ -692,6 +695,70 @@ function drawgraphLinesPxyNegative() {
     vertex(
       x * state.graphWidth + state.graphCenterX - state.graphWidth / 2,
       -((y - 0.7) / (2.3 - 0.7)) * state.graphHeight + state.graphCenterY + state.graphHeight / 2,
+    );
+  }
+  endShape();
+  pop();
+}
+
+function drawGraphLinesTxyPositive() {
+  push();
+  strokeWeight(3);
+  stroke("blue");
+  noFill();
+  beginShape();
+  for (let x = 0; x <= 1; x += 0.001) {
+    let y = TxBisection(x, pressure, state.positiveA12Value, state.positiveA21Value);
+    vertex(
+      x * state.graphWidth + state.graphCenterX - state.graphWidth / 2,
+      (-(y - 90) / (130 - 90)) * state.graphHeight + state.graphCenterY + state.graphHeight / 2,
+    );
+  }
+  endShape();
+  pop();
+
+  push();
+  strokeWeight(3);
+  stroke("green");
+  noFill();
+  beginShape();
+  for (let x = 0; x <= 1; x += 0.001) {
+    let y = TyBisection(x, pressure, state.positiveA12Value, state.positiveA21Value);
+    vertex(
+      x * state.graphWidth + state.graphCenterX - state.graphWidth / 2,
+      -((y - 90) / (130 - 90)) * state.graphHeight + state.graphCenterY + state.graphHeight / 2,
+    );
+  }
+  endShape();
+  pop();
+}
+
+function drawGraphLinesTxyNegative() {
+  push();
+  strokeWeight(3);
+  stroke("blue");
+  noFill();
+  beginShape();
+  for (let x = 0; x <= 1; x += 0.001) {
+    let y = TxBisection(x, pressure, state.negativeA12Value, state.negativeA21Value);
+    vertex(
+      x * state.graphWidth + state.graphCenterX - state.graphWidth / 2,
+      (-(y - 90) / (140 - 90)) * state.graphHeight + state.graphCenterY + state.graphHeight / 2,
+    );
+  }
+  endShape();
+  pop();
+
+  push();
+  strokeWeight(3);
+  stroke("green");
+  noFill();
+  beginShape();
+  for (let x = 0; x <= 1; x += 0.001) {
+    let y = TyBisection(x, pressure, state.negativeA12Value, state.negativeA21Value);
+    vertex(
+      x * state.graphWidth + state.graphCenterX - state.graphWidth / 2,
+      -((y - 90) / (140 - 90)) * state.graphHeight + state.graphCenterY + state.graphHeight / 2,
     );
   }
   endShape();
