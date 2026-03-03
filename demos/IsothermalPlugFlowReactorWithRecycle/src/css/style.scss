@@ -142,9 +142,11 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 6px;
-  flex: 1 1 auto;
+  flex: 1 1 0;
+  min-width: 0;
   pointer-events: auto;
-  max-width: 900px;
+  max-width: none;
+  --slider-input-max-width: 360px;
   margin-left: 0;
   margin-right: 0;
   text-align: left;
@@ -219,7 +221,7 @@ body {
   align-items: flex-start;
   justify-content: flex-start;
   gap: 20px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   z-index: 1001;
   pointer-events: none;
 }
@@ -240,9 +242,11 @@ body {
 .control-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 6px;
+  /* Reduced gap between rows */
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  /* Left align items */
   pointer-events: auto;
   margin: 0;
   width: 100%;
@@ -251,10 +255,10 @@ body {
 .control-bar.slider-controls>.slider-group {
   flex: 1 1 300px;
   /* target width for two-per-row */
-  min-width: 280px;
+  min-width: 0;
   /* allow two columns beside buttons */
   max-width: 520px;
-  /* reduce overall slider width */
+  /* keep reduced overall slider width for top row */
   display: flex;
   align-items: center;
   gap: 6px;
@@ -266,22 +270,24 @@ body {
 
 .control-bar.slider-controls>.slider-group--feed {
   flex-basis: 100%;
-  max-width: 640px;
+  max-width: none;
   order: 3;
 }
 
 .control-bar-message {
   flex-basis: 100%;
   order: 2;
-  align-self: stretch;
-  text-align: center;
+  align-self: flex-start;
+  /* Left align text */
+  text-align: left;
+  /* Left align text */
   margin: 0;
 }
 
 /* Force the rate constant slider to the second row */
 .control-bar.slider-controls>.slider-group--rate {
   flex-basis: 100%;
-  max-width: 640px;
+  max-width: none;
 }
 
 @media (max-width: 520px) {
@@ -323,7 +329,7 @@ body {
 .control-bar.slider-controls .slider-group input[type="range"] {
   flex: 1 1 auto;
   min-width: 0;
-  max-width: none;
+  max-width: var(--slider-input-max-width);
   width: 100% !important;
   -webkit-appearance: none;
   appearance: none;

@@ -6,6 +6,59 @@ import { updateCO2AnalyzerDisplay } from './components/co2Analyzer.js';
 import { updateTemperatureDisplay } from './components/therm.js';
 import { betaLabelX, betaLabelY } from './main.js';
 
+
+let simAniPlaying = false;
+let conditions = { m: 0, P: 1, y: 0 };
+function startSimAni(y, m, P) {
+  // Update conditions
+  conditions.y = y;
+  conditions.m = m;
+  conditions.P = P;
+
+  if (simAniPlaying) return;
+  simAniPlaying = true;
+
+  const simFrame = (dt) => {
+    // Calculate elapsed simulation time (t) since the *start* of the relevant phase (adsorption or desorption)
+    // Add the initial offset to continue from where we left off
+
+    // Check if we need to pause the heating
+    if (state.getFlowConfig() !== state.FLOW_BED) {
+      state.pauseHeating();
+    }
+
+    // Heat/cool the bed
+    const isHeating = state.getIsHeating();
+    // console.log(state.isHeatingPaused())
+    const T = state.isHeatingPaused() ? state.getTemperature() : rampTemperature(dt, isHeating, state.getTemperature()); // Temperature from config
+    updateTemperatureDisplay(T);
+    state.setTemperature(T);
+    console.log(dt)
+
+    const flowCfg = state.getFlowConfig();
+    console.log(flowCfg)
+    if (flowCfg === state.FLOW_BED) {
+      // Do calculation
+      const y_out = yCO2_out(dt, conditions.m, T, conditions.P, conditions.y);
+
+      state.setOutletMoleFraction(y_out);
+    }
+    else {
+      yCO2_out(dt, 0, T, 1, 0, true);
+      state.setOutletMoleFraction(conditions.y);
+    }
+
+    // Update the analyzer display
+    updateCO2AnalyzerDisplay(state.outletMoleFraction);
+
+    return true;
+  }; // Update display roughly once per real second (adjust interval based on multiplier)
+
+  return animate(simFrame, () => {playing = false});
+}
+
+
+
 /**
  * Misleading function name. Updates the tank number with whatever is currently happening.
  * @param {*} tankNum Tank number set by user
@@ -39,15 +92,13 @@ export function startMoleFractionCalculation(tankNum) {
   }
   else if (tankNum === '-1') {
     gasIsFlowing = false;
+    y = 0.0;
     stopHeating();
   }
   else {
     console.error("Invalid tank number for calculation:", tankNum);
     return;
   }
-
-  // Set the global desorbing state
-  // state.setDesorbing(currentDesorbingState);
 
   // Record the real-world start time of this calculation phase
   const calculationStartTime = Date.now();
@@ -58,93 +109,14 @@ export function startMoleFractionCalculation(tankNum) {
   const pressureGaugeId = `gauge${tankNum}`;
   const P_bar = state.getGaugeValue(pressureGaugeId, 5.0); // Get pressure in bar, default 1.0 bar
 
-  const m_controller_mg_min = state.getMfcValue(); // Get current MFC setting (mg/min)
-  const m_g_s = m_controller_mg_min * 1e-3 / 60; // Convert mg/min to g/s
-
-  // console.log('Calculation Params:', { tankNum, y, P_bar, m_controller_mg_min, m_g_s, desorbing: state.getDesorbing(), timeOfDesorption: state.getTimeOfDesorption(), initialTimeOffset });
-
+  const m = gasIsFlowing ? state.getMfcValue() : 0; // Get current MFC setting (mg/min)
 
   // --- Interval Timer ---
-  stopMoleFractionCalculation();
-  const timerId = setInterval(() => {
-    // Calculate elapsed simulation time (t) since the *start* of the relevant phase (adsorption or desorption)
-    // Add the initial offset to continue from where we left off
-
-    // Check if we need to pause the heating
-    if (state.getFlowConfig() !== state.FLOW_BED) {
-      state.pauseHeating();
-    }
-
-    // Heat/cool the bed
-    const isHeating = state.getIsHeating();
-    // console.log(state.isHeatingPaused())
-    const T = state.isHeatingPaused() ? state.getTemperature() : rampTemperature(1/60, isHeating, state.getTemperature()); // Temperature from config
-    updateTemperatureDisplay(T);
-    state.setTemperature(T);
-
-    const elapsedRealTime_ms = Date.now() - state.getStartTime();
-    const t = initialTimeOffset + (elapsedRealTime_ms / 1000) * config.simulationSpeedMultiplier;
-
-    // Call the external calculation function
-    if (gasIsFlowing) {
-      const flowCfg = state.getFlowConfig();
-      if (flowCfg === state.FLOW_BED) {
-        // Do calculation
-        const y_out = yCO2_out({
-          t: t,
-          tStep: 1/60, // Use config timestep
-          m: m_g_s,
-          P: P_bar,
-          T: T,
-          yCO2: y, // Initial mole fraction of the feed gas
-          desorbing: state.getDesorbing(),
-          timeOfDesorption: state.getTimeOfDesorption(), // The simulation time 't' when desorption *started*
-          // m_controller: m_controller_mg_min // Pass m_controller if needed by yCO2_out, otherwise 'm' is sufficient
-        });
-
-        state.setOutletMoleFraction(y_out);
-      }
-      else {
-        console.log("good ending")
-        state.setOutletMoleFraction(y);
-      }
-    }
-    else {
-      console.log("bad ending")
-      state.setOutletMoleFraction(0.0);
-    }
-
-    // Update the analyzer display
-    updateCO2AnalyzerDisplay(state.outletMoleFraction);
-
-    // Optional: Log detailed state every few seconds
-    // if (Math.floor(t) % 5 === 0 && Math.abs(t - Math.floor(t)) < (config.timeStep * config.simulationSpeedMultiplier / 2)) { // Log roughly every 5s
-    //   console.log(`Sim Time: ${t.toFixed(2)}s, Outlet CO2: ${state.outletMoleFraction.toFixed(4)}, Desorbing: ${state.getDesorbing()}, T_desorp: ${state.getTimeOfDesorption().toFixed(2)}s`);
-    // }
-
-  }, 1000/60 / config.simulationSpeedMultiplier); // Update display roughly once per real second (adjust interval based on multiplier)
-
-  state.setMoleFractionTimer(timerId);
+  startSimAni(y, m, P_bar);
 }
 
 function stopMoleFractionCalculation() {
-  if (state.getMoleFractionTimer()) {
-    state.clearMoleFractionTimer(); // Clears interval using state function
-
-    // // Record the simulation time when stopped IF it was an adsorption phase
-    // if (!state.getDesorbing() && state.getStartTime()) {
-    //   const elapsedRealTime_ms = Date.now() - state.getStartTime();
-    //   const lastTimeOffset = state.getTimeWhenAdsorptionStopped() || 0; // Get previous offset if resuming
-    //   const stopTime = lastTimeOffset + (elapsedRealTime_ms / 1000) * config.simulationSpeedMultiplier;
-    //   state.setTimeWhenAdsorptionStopped(stopTime); // Store simulation time
-    //   console.log(`Calculation stopped during Adsorption at sim time: ${stopTime.toFixed(2)}s`);
-    // } else {
-    //   console.log('Calculation stopped (during Desorption or no start time).');
-    //   // Optionally reset timeWhenAdsorptionStopped if stopping during desorption?
-    //   // state.setTimeWhenAdsorptionStopped(null);
-    // }
-    // // Don't reset startTime here, might be needed if quickly switching tanks
-  }
+  state.clearMoleFractionTimer(); // Clears interval using state function
 }
 
 
@@ -170,23 +142,6 @@ export function startHeating() {
     heatingRateLabel = draw.text("heating rate = 4 K/s")
         .move(betaLabelX, betaLabelY);
 
-    const heatingIntervalId = setInterval(() => {
-      // Create Red gradient for heating
-      const gradient = draw.gradient('linear', function(add) {
-        add.stop(0, '#ff0000');
-        add.stop(0.5, '#ff6600'); // More orange in middle
-        add.stop(1, '#ff0000');
-      });
-      gradient.from(0, 0).to(0, 1); // Vertical gradient
-
-      // Apply to heaters
-      const heaters = draw.find('.heater'); // Find elements by class
-      heaters.forEach(heater => {
-        heater.fill(gradient);
-      });
-
-    }, 500); // Update gradient periodically (visual effect)
-    state.setHeatingInterval(heatingIntervalId);
   }
 }
 
@@ -222,4 +177,27 @@ export function stopHeating() {
       heater.fill(gradient);
     });
   }
+}
+
+/**
+ * Animate function to be called every frame.
+ * @param {(dt: number, t: number) => boolean} fn Function to call every frame. dt is time since last call in seconds, t is total time in ms. Return true to continue, false to stop.
+ * @param {(() => void) | undefined} then Optional function to call when animation ends.
+ */
+export function animate(fn, then) {
+    let prevtime = null;
+
+    const frame = (time) => {
+        if (prevtime === null) prevtime = time;
+        const dt = Math.min((time - prevtime) / 1000, .3); // in ms
+        prevtime = time;
+
+        // Call the function
+        const playing = fn(dt, time);
+
+        // Request next frame
+        if (playing) requestAnimationFrame(frame);
+        else then?.();
+    }
+    return requestAnimationFrame(frame);
 }

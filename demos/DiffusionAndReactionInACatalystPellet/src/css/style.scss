@@ -127,6 +127,7 @@
   min-width: 0;
   pointer-events: auto;
   max-width: 900px;
+  --slider-input-max-width: 320px;
   margin-left: 0;
   margin-right: 0;
   text-align: left;
@@ -138,6 +139,7 @@
 
 .slider-stack .slider-group {
   flex: 0 0 auto;
+  max-width: 520px;
 }
 
 .mode-buttons {
@@ -222,7 +224,7 @@ body {
 .control-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px;
   align-items: flex-start;
   justify-content: flex-start;
   pointer-events: auto;
@@ -233,7 +235,7 @@ body {
 .control-bar.slider-controls {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 4px;
   align-items: start;
 }
 
@@ -251,6 +253,8 @@ body {
 /* Third slider always starts a new row (same width as the others). */
 .control-bar.slider-controls>.slider-group--rate {
   grid-column: 1;
+  max-width: none;
+  justify-self: start;
 }
 
 @media (max-width: 520px) {
@@ -294,7 +298,7 @@ body {
 .control-bar.slider-controls .slider-group input[type="range"] {
   flex: 1 1 auto;
   min-width: 0;
-  max-width: none;
+  max-width: var(--slider-input-max-width);
   width: 100% !important;
   -webkit-appearance: none;
   appearance: none;

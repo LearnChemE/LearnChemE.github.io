@@ -162,7 +162,8 @@ export function getInteractiveValveKnobElement() { return interactiveValveKnobEl
 export function setMoleFractionTimer(timerId) { moleFractionTimer = timerId; }
 export function getMoleFractionTimer() { return moleFractionTimer; }
 export function clearMoleFractionTimer() {
-  if (moleFractionTimer) clearInterval(moleFractionTimer);
+  if (moleFractionTimer) cancelAnimationFrame(moleFractionTimer);
+  console.log("cleared")
   moleFractionTimer = null;
 }
 
