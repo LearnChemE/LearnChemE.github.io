@@ -261,30 +261,30 @@ export function rampTemperature(deltaTime, isHeating, temperature) {
   return newTemp;
 }
 
-// debug
-function plot_P() {
-  return Array.from({ length: N }).map((_,i) => bed[3 * i]);
-}
+// // debug
+// function plot_P() {
+//   return Array.from({ length: N }).map((_,i) => bed[3 * i]);
+// }
 
-function plot_th() {
-  const y = Array.from({ length: N }).map((_,i) => {
-    // console.log(bed[3 * i + 1])
-    return bed[3 * i + 1];
-  });
-  return y;
-}
+// function plot_th() {
+//   const y = Array.from({ length: N }).map((_,i) => {
+//     // console.log(bed[3 * i + 1])
+//     return bed[3 * i + 1];
+//   });
+//   return y;
+// }
 
-// Debug
-var data = [{
-    x: x, y: plot_P(), type: 'scatter'
-}];
-var layout = {title: 'Pressure'};
+// // Debug
+// var data = [{
+//     x: x, y: plot_P(), type: 'scatter'
+// }];
+// var layout = {title: 'Pressure'};
 
-Plotly.newPlot('plotly-chart', data, layout);
+// Plotly.newPlot('plotly-chart', data, layout);
 
-function updatePlot() {
-  var data = [{
-      x: x, y: plot_P(), type: 'scatter'
-  }];
-  Plotly.react('plotly-chart', data, layout);
-}
+// function updatePlot() {
+//   var data = [{
+//       x: x, y: plot_P(), type: 'scatter'
+//   }];
+//   Plotly.react('plotly-chart', data, layout);
+// }
