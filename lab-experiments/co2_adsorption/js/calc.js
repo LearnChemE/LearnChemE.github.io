@@ -14,7 +14,7 @@ const R = 83.14 // bar cc / mol / K
 const BED_MAX_CAPACITY = MASS_ZEOLITE / 1000 * 0.85; // mols
 const DIFFUSIVITY = 1.8e-1; // m^2/s, diffusivity of CO2 in zeolite
 // Spatial info
-const N = 101; // number of points in spatial discretization
+const N = 51; // number of points in spatial discretization
 const NT = 3*N + 6; // Size of arrays including padding
 const x = Array.from({ length: N }).map((_,i) => i * LENGTH_BED / (N - 1));
 const dx = x[1] - x[0];
@@ -49,8 +49,8 @@ const bed = Array.from({ length: 3*N }).fill(0); // initialize bed with zeros
  */
 
 // Pad the edges of an array with the first and last values to make it easier to calculate derivatives
-function pad(y, left) {
-  const right = Array.from({ length: 3 }).map((_,i) => {
+function pad(y, left, right) {
+  if (!right) right = Array.from({ length: 3 }).map((_,i) => {
     const yi = y[3 * N - 3 + i];
     return yi;
   });
@@ -60,9 +60,8 @@ function pad(y, left) {
 
 // Remove the padding from an array
 function updateBed(y) {
-  y = y.slice(3, -3);
   for (let i=0; i<3*N; i++) {
-    bed[i] = y[i];
+    bed[i] = y[i + 3];
   }
 }
 
@@ -141,19 +140,60 @@ function reaction(y, ka, kd) {
 
 // RHS for advection-diffusion eqn with reaction term
 function rhs(t, y, dx, ka, kd) {
-  const adv = advection(y, dx);
-  const dif = diffusion(y, dx);
-  const rxn = reaction(y, ka, kd);
+  const dydt = Array.from({ length: NT }).fill(0);
+  const inv_dx = 1 / dx;
+  const inv_dx2 = inv_dx / dx;
 
-  const dydt = dif.map((dif, i) => dif + adv[i] + rxn[i]);
-  dydt[NT - 3] = 0;
-  dydt[NT - 1] = 0;
+  for (let i = 3; i < NT - 3; i += 3) {
+    const ip = i;
+    const it = i + 1;
+    const iu = i + 2;
+
+    // Advection
+    const dp = y[ip] - y[ip - 3];
+    const du = y[iu] - y[iu - 3];
+    const adv_p = - y[iu] * dp * inv_dx;
+    const adv_u = - y[iu] * du * inv_dx
+
+    // Diffusion
+    const d2p = y[ip + 3] + y[ip - 3] - 2 * y[ip];
+    const d2u = y[iu + 3] + y[iu - 3] - 2 * y[iu];
+    const dif_p = DIFFUSIVITY * d2p * inv_dx2;
+    const dif_u = DIFFUSIVITY * d2u * inv_dx2;
+
+    // Reaction
+    const th = y[it];
+    const th_star = 1 - th;
+
+    const ads = ka * y[ip] * th_star;
+    const des = kd * th;
+
+    const rxn_p = des - ads; // Pressure changes
+    const rxn_t = (ads - des) / BED_MAX_CAPACITY; // Theta changes
+
+    // Sum
+    dydt[ip] = dif_p + adv_p + rxn_p;
+    dydt[iu] = dif_u + adv_u;
+    dydt[it] = rxn_t;
+  }
+
   return dydt;
-  // return adv.map((a, i) => a + dif[i]);// + rxn[i]);
 }
 
-function evolve(tstep, T, left) {
-  const y0 = pad(bed, left);
+// // RHS for advection-diffusion eqn with reaction term
+// function rhs(t, y, dx, ka, kd) {
+//   const adv = advection(y, dx);
+//   const dif = diffusion(y, dx);
+//   const rxn = reaction(y, ka, kd);
+
+//   const dydt = dif.map((dif, i) => dif + adv[i] + rxn[i]);
+//   dydt[NT - 3] = 0;
+//   dydt[NT - 1] = 0;
+//   return dydt;
+//   // return adv.map((a, i) => a + dif[i]);// + rxn[i]);
+// }
+
+function evolve(tstep, T, y0) {
   const ka = k_val(ka0, ea, T);
   const kd = k_val(kd0, ed, T);
 
@@ -184,15 +224,20 @@ function evolve(tstep, T, left) {
  * @param {number} [args.kd=4.365e-4] - The desorption rate constant in s^-1.
  * @returns {number} - The outlet mole fraction of CO2 in the gas mixture.
  */
-export function yCO2_out(dt, mdot, T, P, y) {
-  mdot *= 60000; // mg/min
+export function yCO2_out(dt, mdot, T, P, y, open) {
   const ul = calc_velocity(mdot, y, T, P);
-  const left = [ y * P, 0, ul ];
-  // console.log(y*P)
-  evolve(dt, T, left);
+  if (!open) {
+    const left = [ y * P, 0, ul ];
+    const y0 = pad(bed, left);
+    evolve(dt, T, y0);
+  }
+  else {
+    const y0 = pad(bed, [0,0,0], [0,0,0])
+    evolve(dt, T, y0);
+  }
 
   const outlet = bed[3*N - 3] / P
-  return outlet;
+  return outlet < 0 ? 0 : outlet;
 }
 
 /**
@@ -223,7 +268,7 @@ function plot_P() {
 
 function plot_th() {
   const y = Array.from({ length: N }).map((_,i) => {
-    console.log(bed[3 * i + 1])
+    // console.log(bed[3 * i + 1])
     return bed[3 * i + 1];
   });
   return y;
@@ -239,7 +284,7 @@ Plotly.newPlot('plotly-chart', data, layout);
 
 function updatePlot() {
   var data = [{
-      x: x, y: plot_th(), type: 'scatter'
+      x: x, y: plot_P(), type: 'scatter'
   }];
   Plotly.react('plotly-chart', data, layout);
 }
