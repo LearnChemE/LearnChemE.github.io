@@ -1,0 +1,46 @@
+<div id="details" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="detailsTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="detailsTitle">Details</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <p>
+            In this Demonstration, the height of the batch reactor is equal to the inner diameter, so reactor
+            volume and surface area can be simplified to:
+          </p>
+          <p class="text-start equation-left">\[A = \frac{\pi}{4}h^2 + \pi h^2,\]</p>
+          <p class="text-start equation-left">\[V = \frac{\pi}{4}h^3,\]</p>
+          <p>
+            where \(A\) is the reactor surface area (cm<sup>2</sup>), \(V\) is reactor volume
+            (cm<sup>3</sup>), and \(h\) and \(d\) are the height and diameter of the reactor and \(h = d\) (cm).
+          </p>
+
+          <p>
+            Mass and energy balances are done to get the temperature of the reactor and moles in the reactor:
+          </p>
+          <p class="text-start equation-left">\[N_{A,0} C_p \frac{dT}{dt} = \Delta H\, r_A V + U A (T_a - T),\]</p>
+          <p class="text-start equation-left">\[\frac{dN_A}{dt} = r_A V,\]</p>
+          <p class="text-start equation-left">\[r_A = -k_0 e^{-E_a/(RT)} C_A,\]</p>
+          <p class="text-start equation-left">\[C_A = \frac{N_A}{V},\]</p>
+          <p class="text-start equation-left">\[N_{A,0} = C_{A,0} V,\]</p>
+
+          <p>
+            where \(N_A\) are moles of \(A\) (mol), \(C_A\) is the concentration of \(A\) (mol/cm<sup>3</sup>),
+            the subscript 0 refers to the initial condition, \(T\) and \(T_a\) are the reaction and cooling liquid
+            temperatures (K), \(t\) is time (min), \(r_A\) is the rate of reaction (mol/[cm<sup>3</sup> min]),
+            \(C_p\) is heat capacity of \(A\) (J/[mol K]), \(\Delta H\) is the heat of reaction (J/mol),
+            \(U\) is the heat transfer coefficient (J/[cm<sup>2</sup> K min]), \(k_0\) is the pre-exponential
+            factor (1/min), \(E_a\) is activation energy (J/mol), and \(R\) is the ideal gas constant (J/[mol K]).
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
