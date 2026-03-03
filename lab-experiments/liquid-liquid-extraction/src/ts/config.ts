@@ -15,3 +15,5 @@ export const FEED_COMP: Composition = [.52, .43];
 
 export const INIT_FEED_LIFT = 0.75;
 export const INIT_SOLV_LIFT = 0.5;
+
+export const MIN_EFFICIENCY = 50; // %

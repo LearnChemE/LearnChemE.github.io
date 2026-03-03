@@ -159,28 +159,34 @@ function findEnvelopeIntersections(line: { slope: number, intercept: number }) {
     return intersections;
 }
 
-export function separate(x: number, y: number, leff=1, reff=1): Composition[] {
+type SeparationResult = {
+    streams: Composition[];
+    pure?: Composition[];
+};
+
+export function separate(x: number, y: number, leff=1, reff=1): SeparationResult {
     const tieline = findTieline(x, y);
     const intersections = findEnvelopeIntersections(tieline);
 
     // Tests to make sure the stream should actually be separated
     if (intersections.length !== 2) { // Definitely outside phase envelope if there are not 2 intersections
-        return [[x, y]];
+        return { streams: [[x, y]] };
     }
     else if (intersections[0][0] >= x || intersections[1][0] <= x) { // Left or right of phase envelope
-        return [[x, y]];
+        return { streams: [[x, y]] };
     }
 
     // If efficiency is less than 1, only return a portion of the intersections
     if (leff < 1 || reff < 1) {
-        intersections[0][0] = x + leff * (intersections[0][0] - x);
-        intersections[0][1] = y + leff * (intersections[0][1] - y);
-        intersections[1][0] = x + reff * (intersections[1][0] - x);
-        intersections[1][1] = y + reff * (intersections[1][1] - y);
-        return intersections;
+        const mixed: Composition[] = [[0, 0], [0, 0]];
+        mixed[0][0] = x + leff * (intersections[0][0] - x);
+        mixed[0][1] = y + leff * (intersections[0][1] - y);
+        mixed[1][0] = x + reff * (intersections[1][0] - x);
+        mixed[1][1] = y + reff * (intersections[1][1] - y);
+        return { streams: mixed, pure: intersections };
     }
 
-    return intersections; // Return in order of decreasing chloroform concentration
+    return { streams: intersections }; // Return in order of decreasing chloroform concentration
 }
 
 const RHO_AA = 1.05 / 60.05; // mol / cm3
@@ -208,6 +214,8 @@ class Stage {
     private mixedComp: Composition = [0, 0];
     private raffinate: Composition;
     private extract: Composition;
+    private rafObserved: Composition;
+    private extObserved: Composition;
     private phi: number = 0; // Relative amount of raffinate vs extract (raffinate / (raffinate + extract))
     private ndot_out: number = 0;
 
@@ -219,6 +227,8 @@ class Stage {
     constructor(orgIn: () => Stream, efficiency = 1, draw?: "raffinate" | "extract") {
         this.raffinate = [0, 0];
         this.extract = [0, 0];
+        this.rafObserved = [0, 0];
+        this.extObserved = [0, 0];
         this.orgIn = orgIn;
         // If there is a draw on the stage, the efficiency towards that phase is 100%
         if (!draw) {
@@ -238,14 +248,16 @@ class Stage {
     }
 
     public settle() {
-        const phases = separate(this.mixedComp[0], this.mixedComp[1], this.leff, this.reff);
+        const { streams, pure } = separate(this.mixedComp[0], this.mixedComp[1], this.leff, this.reff);
         const aqIn = this.aqIn!();
         const orgIn = this.orgIn();
 
-        if (phases.length === 1) {
+        if (streams.length === 1) {
             // No separation, just one phase with the same composition as the mixed stream
             this.raffinate = this.mixedComp;
             this.extract = this.mixedComp;
+            this.rafObserved = this.raffinate;
+            this.extObserved = this.extract;
             const aq =  aqIn.ndot;
             const org = orgIn.ndot;
             this.phi = (aq || org) ? org / (org + aq) : .5; // Just set phi based on relative flow rates since there is no separation
@@ -256,10 +268,17 @@ class Stage {
             // console.log(aq, org, this.ndot_out, this.phi)
         }
         else {
-            const raffComp = phases[1];
-            const extComp = phases[0];
+            const raffComp = streams[1];
+            const extComp = streams[0];
             this.raffinate = raffComp;
             this.extract = extComp;
+            if (pure !== undefined) {
+                this.rafObserved = pure[1];
+                this.extObserved = pure[0];
+            } else {
+                this.rafObserved = this.raffinate;
+                this.extObserved = this.extract;
+            }
             // Determine relative amounts of each phase using the lever rule
             const leverTotal = Math.sqrt((extComp[0] - raffComp[0]) ** 2 + (extComp[1] - raffComp[1]) ** 2);
             const leverRaff = Math.sqrt((extComp[0] - this.mixedComp[0]) ** 2 + (extComp[1] - this.mixedComp[1]) ** 2);
@@ -285,6 +304,14 @@ class Stage {
         return {
             ndot,
             comp: this.extract
+        }
+    }
+
+    public observe(which: "raffinate" | "extract") {
+        if (which === "raffinate") {
+            return this.rafObserved;
+        } else {
+            return this.extObserved;
         }
     }
 
@@ -376,13 +403,9 @@ export class ColumnCalc {
         this.playing = false;
     }
 
-    public viewComposition(stage: number, stream: "raffinate" | "extract"): Composition {
-        if (stream === "raffinate") {
-            return this.stages[stage].raffStream().comp;
-        }
-        else {
-            return this.stages[stage].extStream().comp;
-        }
+    public viewComposition(stageIdx: number, stream: "raffinate" | "extract"): Composition {
+        const stage = this.stages[stageIdx];
+        return stage.observe(stream);
     }
 }
 
