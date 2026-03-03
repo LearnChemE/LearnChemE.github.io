@@ -16,6 +16,9 @@ const plotlyScriptUrl = 'assets/plotly.js';
 
 const LEFT_MARGIN = { l: 78, r: 18, t: 52, b: 64 };
 const RIGHT_MARGIN = { l: 86, r: 28, t: 52, b: 64 };
+const FONT_REF_WIDTH = 680;
+const FONT_SCALE_MIN = 0.6;
+const FONT_SCALE_MAX = 1.2;
 
 let drawRef;
 let plotlyLeftRoot;
@@ -103,6 +106,7 @@ async function renderPlots() {
   updateOutputs(params);
 
   const model = computeModel(params);
+  const fontMetrics = getPlotFontMetrics();
 
   let plotlyLib;
   try {
@@ -114,8 +118,8 @@ async function renderPlots() {
   }
   plotlyLibRef = plotlyLib;
 
-  const leftPlot = buildLeftPlot(model);
-  const rightPlot = buildRightPlot(model);
+  const leftPlot = buildLeftPlot(model, fontMetrics);
+  const rightPlot = buildRightPlot(model, fontMetrics);
   const config = {
     displayModeBar: false,
     responsive: true,
@@ -171,9 +175,18 @@ function computeModel({ recycle, volume, CA0 }) {
   };
 }
 
-function buildLeftPlot(model) {
+function buildLeftPlot(model, fontMetrics) {
   const { CAf, CAfCalc } = model;
   const axisLineW = 1.5;
+  const {
+    fontScale,
+    baseFontSize,
+    annotationFontSize,
+    axisTitleFontSize,
+    tickFontSize,
+    titleFontSize,
+    axisTitleStandoff
+  } = fontMetrics;
 
   const ringTrace = {
     x: [0],
@@ -227,10 +240,10 @@ function buildLeftPlot(model) {
       yref: 'y',
       text: 'calculated <i>C</i><sub>A,f</sub>',
       showarrow: false,
-      font: { family: 'Arial, sans-serif', size: 16, color: '#000' },
+      font: { family: 'Arial, sans-serif', size: annotationFontSize, color: '#000' },
       xanchor: 'center',
       yanchor: 'bottom',
-      xshift: 62,
+      xshift: 70,
       yshift: -2
     },
     {
@@ -240,28 +253,28 @@ function buildLeftPlot(model) {
       yref: 'y',
       text: `${formatNumber(CAfCalc, 3)} mol/L`,
       showarrow: false,
-      font: { family: 'Arial, sans-serif', size: 16, color: '#000' },
+      font: { family: 'Arial, sans-serif', size: annotationFontSize, color: '#000' },
       xanchor: 'center',
       yanchor: 'top',
-      xshift: 55,
+      xshift: 60,
       yshift: 0
     }
   ];
 
   const layout = {
-    margin: LEFT_MARGIN,
+    margin: scaleMargins(LEFT_MARGIN, fontScale),
     paper_bgcolor: 'rgba(0,0,0,0)',
     plot_bgcolor: 'rgba(0,0,0,0)',
     hovermode: 'closest',
     showlegend: false,
-    font: { family: 'Arial, sans-serif', size: 15, color: '#000' },
+    font: { family: 'Arial, sans-serif', size: baseFontSize, color: '#000' },
     title: {
       text: buildCAfLabel(CAf),
-      x: 0.5,
+      x: 0.7,
       y: 0.98,
       xanchor: 'center',
       yanchor: 'top',
-      font: { family: 'Arial, sans-serif', size: 16, color: '#000' }
+      font: { family: 'Arial, sans-serif', size: titleFontSize, color: '#000' }
     },
     xaxis: {
       range: [-0.02, 0.2],
@@ -270,6 +283,7 @@ function buildLeftPlot(model) {
       linecolor: '#000',
       linewidth: axisLineW,
       ticks: '',
+      tickwidth: axisLineW,
       showticklabels: false,
       showgrid: false,
       fixedrange: true
@@ -277,8 +291,8 @@ function buildLeftPlot(model) {
     yaxis: {
       title: {
         text: 'concentration of A (mol/L)',
-        standoff: 12,
-        font: { family: 'Arial, sans-serif', size: 16, color: '#111' }
+        standoff: axisTitleStandoff,
+        font: { family: 'Arial, sans-serif', size: axisTitleFontSize, color: '#111' }
       },
       range: [0.15, 0.4],
       autorange: false,
@@ -287,10 +301,15 @@ function buildLeftPlot(model) {
       linecolor: '#000',
       linewidth: axisLineW,
       ticks: 'outside',
-      tickfont: { family: 'Arial, sans-serif', size: 14 },
+      ticklen: 6,
+      tickwidth: axisLineW,
+      tickfont: { family: 'Arial, sans-serif', size: tickFontSize },
+      dtick: 0.05,
+      minor: { dtick: 0.01, ticklen: 4, tickwidth: axisLineW, ticks: 'outside' },
       tickformat: '.2f',
       showgrid: false,
-      fixedrange: true
+      fixedrange: true,
+      automargin: true
     },
     annotations
   };
@@ -298,9 +317,17 @@ function buildLeftPlot(model) {
   return { data: [ringTrace, targetTrace], layout };
 }
 
-function buildRightPlot(model) {
+function buildRightPlot(model, fontMetrics) {
   const { V, CA, CAf, CAe, Vr } = model;
   const axisLineW = 1.5;
+  const {
+    fontScale,
+    baseFontSize,
+    axisTitleFontSize,
+    tickFontSize,
+    titleFontSize,
+    axisTitleStandoff
+  } = fontMetrics;
 
   const trace = {
     x: V,
@@ -313,36 +340,40 @@ function buildRightPlot(model) {
   };
 
   const layout = {
-    margin: RIGHT_MARGIN,
+    margin: scaleMargins(RIGHT_MARGIN, fontScale),
     paper_bgcolor: 'rgba(0,0,0,0)',
     plot_bgcolor: 'rgba(0,0,0,0)',
     hovermode: 'closest',
     showlegend: false,
-    font: { family: 'Arial, sans-serif', size: 15, color: '#000' },
+    font: { family: 'Arial, sans-serif', size: baseFontSize, color: '#000' },
     title: {
-      text: buildCAfLabel(CAf),
+      text: "",
       x: 0.5,
       y: 0.98,
       xanchor: 'center',
       yanchor: 'top',
-      font: { family: 'Arial, sans-serif', size: 16, color: '#000' }
+      font: { family: 'Arial, sans-serif', size: titleFontSize, color: '#000' }
     },
     xaxis: {
-      title: { text: 'reactor volume (L)', standoff: 12, font: { family: 'Arial, sans-serif', size: 16, color: '#111' } },
+      title: { text: 'reactor volume (L)', standoff: axisTitleStandoff, font: { family: 'Arial, sans-serif', size: axisTitleFontSize, color: '#111' } },
       range: [0, Vr],
       zeroline: false,
       showline: true,
       linecolor: '#000',
       linewidth: axisLineW,
       ticks: 'outside',
+      ticklen: 6,
+      tickwidth: axisLineW,
       tick0: 0,
-      dtick: 100,
-      tickfont: { family: 'Arial, sans-serif', size: 14 },
+      dtick: 50,
+      minor: { dtick: 10, ticklen: 4, tickwidth: axisLineW, ticks: 'outside' },
+      tickfont: { family: 'Arial, sans-serif', size: tickFontSize },
       showgrid: false,
-      fixedrange: true
+      fixedrange: true,
+      automargin: true
     },
     yaxis: {
-      title: { text: 'concentration of A (mol/L)', standoff: 12, font: { family: 'Arial, sans-serif', size: 16, color: '#111' } },
+      title: { text: 'concentration of A (mol/L)', standoff: axisTitleStandoff, font: { family: 'Arial, sans-serif', size: axisTitleFontSize, color: '#111' } },
       range: [0, 0.2],
       autorange: false,
       zeroline: false,
@@ -350,10 +381,15 @@ function buildRightPlot(model) {
       linecolor: '#000',
       linewidth: axisLineW,
       ticks: 'outside',
-      tickfont: { family: 'Arial, sans-serif', size: 14 },
+      ticklen: 6,
+      tickwidth: axisLineW,
+      tickfont: { family: 'Arial, sans-serif', size: tickFontSize },
+      dtick: 0.05,
+      minor: { dtick: 0.01, ticklen: 4, tickwidth: axisLineW, ticks: 'outside' },
       tickformat: '.2f',
       showgrid: false,
-      fixedrange: true
+      fixedrange: true,
+      automargin: true
     },
     images: buildPfrInset(CAf, CAe)
   };
@@ -371,25 +407,25 @@ function buildPfrInset(CAf, CAe) {
           <path d="M0,0 L8,4 L0,8 Z" fill="#000"/>
         </marker>
       </defs>
-      <line x1="40" y1="70" x2="150" y2="70" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
-      <line x1="210" y1="70" x2="320" y2="70" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
-      <path d="M130,70 L130,112 L230,112 L230,70" fill="none" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
-      <rect x="150" y="55" width="60" height="30" fill="none" stroke="#000" stroke-width="2"/>
-      <text x="180" y="74" font-size="12" font-family="Arial, sans-serif" text-anchor="middle">PFR</text>
+      <line x1="0" y1="70" x2="130" y2="70" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="240" y1="70" x2="370" y2="70" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
+      <path d="M300,70 L300,120 L60,120 L60,70" fill="none" stroke="#000" stroke-width="2" marker-end="url(#arrow)"/>
+      <rect x="130" y="55" width="110" height="30" fill="none" stroke="#000" stroke-width="2"/>
+      <text x="185" y="74" font-size="16" font-family="Arial, sans-serif" text-anchor="middle">PFR</text>
 
-      <text x="-30" y="58" font-size="16" font-family="Arial, sans-serif" text-anchor="start">
+      <text x="-40" y="58" font-size="16" font-family="Arial, sans-serif" text-anchor="start">
         <tspan font-style="italic">C</tspan><tspan font-size="8" dy="3">A,f</tspan><tspan dy="-3"> = ${CAfText} mol/L</tspan>
       </text>
 
-      <text x="135" y="58" font-size="16" font-family="Arial, sans-serif" text-anchor="middle">
+      <text x="110" y="58" font-size="16" font-family="Arial, sans-serif" text-anchor="middle">
         <tspan font-style="italic">C</tspan><tspan font-size="8" dy="3">A,0</tspan>
       </text>
 
-      <text x="180" y="130" font-size="16" font-family="Arial, sans-serif" text-anchor="middle">
+      <text x="175" y="136" font-size="16" font-family="Arial, sans-serif" text-anchor="middle">
         <tspan font-style="italic">C</tspan><tspan font-size="8" dy="3">A,e</tspan><tspan dy="-3"> = ${CAeText} mol/L</tspan>
       </text>
 
-      <text x="278" y="58" font-size="16" font-family="Arial, sans-serif" text-anchor="middle">
+      <text x="310" y="58" font-size="16" font-family="Arial, sans-serif" text-anchor="middle">
         <tspan font-style="italic">C</tspan><tspan font-size="8" dy="3">A,e</tspan><tspan dy="-3"> = ${CAeText} mol/L</tspan>
       </text>
     </svg>
@@ -401,7 +437,7 @@ function buildPfrInset(CAf, CAe) {
       xref: 'paper',
       yref: 'paper',
       x: 0.5,
-      y: 0.86,
+      y: 0.9,
       sizex: 0.72,
       sizey: 0.32,
       xanchor: 'center',
@@ -413,6 +449,39 @@ function buildPfrInset(CAf, CAe) {
 
 function buildCAfLabel(CAf) {
   return `<i>C</i><sub>A,f</sub> = ${formatNumber(CAf, 3)} mol/L`;
+}
+
+function getPlotFontMetrics() {
+  const leftW = plotlyLeftRoot?.clientWidth ?? 0;
+  const rightW = plotlyRightRoot?.clientWidth ?? 0;
+  const referenceW = Math.max(leftW, rightW, FONT_REF_WIDTH);
+  const fontScale = Math.min(FONT_SCALE_MAX, Math.max(FONT_SCALE_MIN, referenceW / FONT_REF_WIDTH));
+  const baseFontSize = Math.round(16 * fontScale);
+  const annotationFontSize = Math.round(17 * fontScale);
+  const axisTitleFontSize = Math.round(18 * fontScale);
+  const tickFontSize = Math.round(16 * fontScale);
+  const titleFontSize = Math.round(18 * fontScale);
+  const axisTitleExtra = Math.round(10 * fontScale);
+  const axisTitleStandoff = Math.round(12 * fontScale) + axisTitleExtra;
+
+  return {
+    fontScale,
+    baseFontSize,
+    annotationFontSize,
+    axisTitleFontSize,
+    tickFontSize,
+    titleFontSize,
+    axisTitleStandoff
+  };
+}
+
+function scaleMargins(base, fontScale) {
+  return {
+    l: Math.round(base.l * fontScale),
+    r: Math.round(base.r * fontScale),
+    t: Math.round(base.t * fontScale),
+    b: Math.round(base.b * fontScale)
+  };
 }
 
 function updatePlotLayoutOffset() {
@@ -428,14 +497,7 @@ function handleWindowResize() {
   pendingResizeFrame = window.requestAnimationFrame(() => {
     pendingResizeFrame = null;
     updatePlotLayoutOffset();
-    if (plotlyLibRef?.Plots) {
-      if (plotlyLeftRoot) {
-        try { plotlyLibRef.Plots.resize(plotlyLeftRoot); } catch (e) { }
-      }
-      if (plotlyRightRoot) {
-        try { plotlyLibRef.Plots.resize(plotlyRightRoot); } catch (e) { }
-      }
-    }
+    renderPlots();
   });
 }
 
