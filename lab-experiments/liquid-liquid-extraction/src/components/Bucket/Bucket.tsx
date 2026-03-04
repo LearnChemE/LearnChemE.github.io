@@ -2,6 +2,7 @@ import { createEffect, createMemo, createSignal, useContext, type Accessor, type
 import { animate, constrain, resolveProperty } from "../../ts/helpers";
 import { ColumnContext, specificVolume } from "../../calcs";
 import "./Bucket.css";
+import { resetEvent } from "../../globals";
 
 interface BucketProps {
     x: number | Accessor<number>;
@@ -42,9 +43,18 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
         setFill(0);
     }
 
+    // Animate the accumulation constantly
     animate(accumulate);
 
+    // Reactive display
     const text = createMemo(() => fill() > 20 ? "max" : `${fill().toFixed(1)} kg`);
+
+    // Reset with simulation
+    createEffect(() => {
+        resetEvent();
+        reset();
+    });
+
 
     return (
         <>
