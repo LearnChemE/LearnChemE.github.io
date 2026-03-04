@@ -2,7 +2,9 @@ import type { Composition } from "../calcs";
 
 // Configuration constants for the liquid-liquid extraction lab experiment
 export const STAGE_HEIGHT = 32;
-export const DEFAULT_NUMBER_OF_STAGES = 2;
+export const DEFAULT_NUMBER_OF_STAGES = 4;
+export const MIN_STAGES = 3;
+export const MAX_STAGES = 5;
 export const ZERO_STAGE_PADDING = 48;
 
 export const SOLVENT_MAX_RATE = 10;
