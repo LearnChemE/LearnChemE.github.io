@@ -58,9 +58,7 @@ function App() {
 
       // Reset streams
       setFeedIsOn(false);
-      setFeedLift(0);
       setSolvIsOn(false);
-      setSolvLift(0);
 
       // Trigger reset event so other scopes can reset
       triggerResetEvent();
