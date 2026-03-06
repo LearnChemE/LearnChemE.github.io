@@ -159,34 +159,29 @@ function findEnvelopeIntersections(line: { slope: number, intercept: number }) {
     return intersections;
 }
 
-type SeparationResult = {
-    streams: Composition[];
-    pure?: Composition[];
-};
-
-export function separate(x: number, y: number, leff=1, reff=1): SeparationResult {
+export function separate(x: number, y: number): Composition[] {
     const tieline = findTieline(x, y);
     const intersections = findEnvelopeIntersections(tieline);
 
     // Tests to make sure the stream should actually be separated
     if (intersections.length !== 2) { // Definitely outside phase envelope if there are not 2 intersections
-        return { streams: [[x, y]] };
+        return [[x, y]];
     }
     else if (intersections[0][0] >= x || intersections[1][0] <= x) { // Left or right of phase envelope
-        return { streams: [[x, y]] };
+        return [[x, y]];
     }
 
-    // If efficiency is less than 1, only return a portion of the intersections
-    if (leff < 1 || reff < 1) {
-        const mixed: Composition[] = [[0, 0], [0, 0]];
-        mixed[0][0] = x + leff * (intersections[0][0] - x);
-        mixed[0][1] = y + leff * (intersections[0][1] - y);
-        mixed[1][0] = x + reff * (intersections[1][0] - x);
-        mixed[1][1] = y + reff * (intersections[1][1] - y);
-        return { streams: mixed, pure: intersections };
-    }
+    // // If efficiency is less than 1, only return a portion of the intersections
+    // if (leff < 1 || reff < 1) {
+    //     const mixed: Composition[] = [[0, 0], [0, 0]];
+    //     mixed[0][0] = x + leff * (intersections[0][0] - x);
+    //     mixed[0][1] = y + leff * (intersections[0][1] - y);
+    //     mixed[1][0] = x + reff * (intersections[1][0] - x);
+    //     mixed[1][1] = y + reff * (intersections[1][1] - y);
+    //     return { streams: mixed, pure: intersections };
+    // }
 
-    return { streams: intersections }; // Return in order of decreasing chloroform concentration
+    return intersections; // Return in order of decreasing chloroform concentration
 }
 
 const RHO_AA = 1.05 / 60.05; // mol / cm3
@@ -209,7 +204,7 @@ export type Stream = {
     comp: Composition;
 }
 
-const L_PER_STAGE = 6; // L
+const L_PER_STAGE = 5; // L
 class Stage {
     private mixedComp: Composition = [0, 0];
     private raffinate: Composition;
@@ -224,23 +219,15 @@ class Stage {
     private leff: number;
     private reff: number;
 
-    constructor(orgIn: () => Stream, efficiency = 1, draw?: "raffinate" | "extract") {
+    constructor(orgIn: () => Stream, efficiency = 1) {
         this.raffinate = [0, 0];
         this.extract = [0, 0];
         this.rafObserved = [0, 0];
         this.extObserved = [0, 0];
         this.orgIn = orgIn;
-        // If there is a draw on the stage, the efficiency towards that phase is 100%
-        if (!draw) {
-            this.leff = efficiency;
-            this.reff = efficiency;
-        } else if (draw === "raffinate") {
-            this.leff = efficiency;
-            this.reff = 1;
-        } else {
-            this.leff = 1;
-            this.reff = efficiency;
-        }
+
+        this.leff = efficiency;
+        this.reff = efficiency;
     }
 
     public setAqIn(aqIn: () => Stream) {
@@ -248,7 +235,7 @@ class Stage {
     }
 
     public settle() {
-        const { streams, pure } = separate(this.mixedComp[0], this.mixedComp[1], this.leff, this.reff);
+        const streams = separate(this.mixedComp[0], this.mixedComp[1]);
         const aqIn = this.aqIn!();
         const orgIn = this.orgIn();
 
@@ -270,22 +257,41 @@ class Stage {
         else {
             const raffComp = streams[1];
             const extComp = streams[0];
-            this.raffinate = raffComp;
-            this.extract = extComp;
-            if (pure !== undefined) {
-                this.rafObserved = pure[1];
-                this.extObserved = pure[0];
-            } else {
-                this.rafObserved = this.raffinate;
-                this.extObserved = this.extract;
-            }
-            // Determine relative amounts of each phase using the lever rule
-            const leverTotal = Math.sqrt((extComp[0] - raffComp[0]) ** 2 + (extComp[1] - raffComp[1]) ** 2);
-            const leverRaff = Math.sqrt((extComp[0] - this.mixedComp[0]) ** 2 + (extComp[1] - this.mixedComp[1]) ** 2);
-            this.phi = leverRaff / leverTotal;
-            // Use volume balance to determine the amount of each phase
-            const vdot_in = orgIn.ndot * specificVolume(orgIn.comp) + aqIn.ndot * specificVolume(aqIn.comp);
-            this.ndot_out = vdot_in / (specificVolume(this.mixedComp));
+            this.rafObserved = raffComp;
+            this.extObserved = extComp;
+
+            // Determine the flowrates of each stream using 2x2 inverse matrix formula
+            const c_in = aqIn.comp[0] * aqIn.ndot + orgIn.comp[0] * orgIn.ndot;
+            const a_in = aqIn.comp[1] * aqIn.ndot + orgIn.comp[1] * orgIn.ndot;
+            const a = raffComp[0], b = extComp[0], c = raffComp[1], d = extComp[1];
+            // Pre-calculate inverse of denominator
+            if (a * d === c * b) throw new Error('non-invertable 2x2 matrix')
+            const inv_denom = 1 / (a * d - c * b);
+            // Solve for theoretical raffinate and extract flowrates
+            const nr_t = (c_in * d - a_in * b) * inv_denom;
+            const ne_t = (a_in * a - c_in * c) * inv_denom;
+            
+            // Use efficiency formulas to determine actual flowrates
+            // raffinate
+            const xrw = 1 - raffComp[0] - raffComp[1], xow = 1 - orgIn.comp[0] - orgIn.comp[1]
+            const nrc = this.leff * (raffComp[0] * nr_t - orgIn.comp[0] * orgIn.ndot) + orgIn.comp[0] * orgIn.ndot;
+            const nra = this.leff * (raffComp[1] * nr_t - orgIn.comp[1] * orgIn.ndot) + orgIn.comp[1] * orgIn.ndot;
+            const nrw = this.leff * (xrw * nr_t - xow * orgIn.ndot) + xow * orgIn.ndot;
+            const nr = nrc + nra + nrw;
+            // extract
+            const xew = 1 - extComp[0] - extComp[1], xaw = 1 - aqIn.comp[0] - aqIn.comp[1];
+            const nec = this.reff * (extComp[0] * ne_t - aqIn.comp[0] * aqIn.ndot) + aqIn.comp[0] * aqIn.ndot;
+            const nea = this.reff * (extComp[1] * ne_t - aqIn.comp[1] * aqIn.ndot) + aqIn.comp[1] * aqIn.ndot;
+            const n_ew= this.reff * (xew * ne_t - xaw * aqIn.ndot) + xaw * aqIn.ndot;
+            const ne = nec + nea + n_ew;
+
+            // Update extract and raffinate out streams
+            this.raffinate = (nr !== 0) ? [ nrc / nr, nra / nr ] : raffComp;
+            this.extract   = (ne !== 0) ? [ nec / ne, nea / ne ] : extComp;
+            // Use balance to determine the amount of each phase
+            if (nr + ne === 0) return;
+            this.phi = nr / (nr + ne);
+            this.ndot_out = nr + ne;
         }
     }
 
@@ -346,10 +352,10 @@ export class ColumnCalc {
         const eff = numStages === 1 ? 1 : stageEfficiency();
         this.stages = [];
         // Construct stages with appropriate feed streams.
-        this.stages.push(new Stage(feed, eff, "extract"));
+        this.stages.push(new Stage(feed, eff));
         for (let i = 1; i < numStages; i++) {
             const prevRaff = this.stages[i - 1].raffStream.bind(this.stages[i - 1]);
-            this.stages.push(new Stage(prevRaff, eff, i === numStages - 1 ? "raffinate" : undefined));
+            this.stages.push(new Stage(prevRaff, eff));
         }
         // Set extract stream of each stage to be the solvent input of the previous stage
         for (let i = 0; i < numStages - 1; i++) {
