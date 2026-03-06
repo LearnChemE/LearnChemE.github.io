@@ -243,7 +243,7 @@ function buildLeftPlot(model, fontMetrics) {
       font: { family: 'Arial, sans-serif', size: annotationFontSize, color: '#000' },
       xanchor: 'center',
       yanchor: 'bottom',
-      xshift: 70,
+      xshift: 80,
       yshift: -2
     },
     {
@@ -256,7 +256,7 @@ function buildLeftPlot(model, fontMetrics) {
       font: { family: 'Arial, sans-serif', size: annotationFontSize, color: '#000' },
       xanchor: 'center',
       yanchor: 'top',
-      xshift: 60,
+      xshift: 70,
       yshift: 0
     }
   ];
@@ -401,7 +401,7 @@ function buildPfrInset(CAf, CAe) {
   const CAfText = formatNumber(CAf, 3);
   const CAeText = formatNumber(CAe, 3);
   const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="360" height="140" viewBox="0 0 360 140">
+    <svg xmlns="http://www.w3.org/2000/svg" width="360" height="140" viewBox="-100 0 550 140">
       <defs>
         <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
           <path d="M0,0 L8,4 L0,8 Z" fill="#000"/>
@@ -413,11 +413,11 @@ function buildPfrInset(CAf, CAe) {
       <rect x="130" y="55" width="110" height="30" fill="none" stroke="#000" stroke-width="2"/>
       <text x="185" y="74" font-size="16" font-family="Arial, sans-serif" text-anchor="middle">PFR</text>
 
-      <text x="-40" y="58" font-size="16" font-family="Arial, sans-serif" text-anchor="start">
+      <text x="-80" y="58" font-size="16" font-family="Arial, sans-serif" text-anchor="start">
         <tspan font-style="italic">C</tspan><tspan font-size="8" dy="3">A,f</tspan><tspan dy="-3"> = ${CAfText} mol/L</tspan>
       </text>
 
-      <text x="110" y="58" font-size="16" font-family="Arial, sans-serif" text-anchor="middle">
+      <text x="95" y="58" font-size="16" font-family="Arial, sans-serif" text-anchor="middle">
         <tspan font-style="italic">C</tspan><tspan font-size="8" dy="3">A,0</tspan>
       </text>
 
@@ -425,7 +425,7 @@ function buildPfrInset(CAf, CAe) {
         <tspan font-style="italic">C</tspan><tspan font-size="8" dy="3">A,e</tspan><tspan dy="-3"> = ${CAeText} mol/L</tspan>
       </text>
 
-      <text x="310" y="58" font-size="16" font-family="Arial, sans-serif" text-anchor="middle">
+      <text x="380" y="58" font-size="16" font-family="Arial, sans-serif" text-anchor="middle">
         <tspan font-style="italic">C</tspan><tspan font-size="8" dy="3">A,e</tspan><tspan dy="-3"> = ${CAeText} mol/L</tspan>
       </text>
     </svg>
