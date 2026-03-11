@@ -184,9 +184,12 @@ export function separate(x: number, y: number): Composition[] {
     return intersections; // Return in order of decreasing chloroform concentration
 }
 
-const RHO_AA = 1.05 / 60.05; // mol / cm3
-const RHO_C  = 1.49 / 119.378; // mol / cm3
-const RHO_W  = 1.00 / 18.01; // mol / cm3
+const MM_AA = 60.052;
+const MM_C = 119.38;
+const MM_W = 18.01;
+const CONC_PURE_AA = 1.05 / 60.05; // mol / cm3
+const CONC_PURE_C  = 1.49 / 119.378; // mol / cm3
+const CONC_PURE_W  = 1.00 / 18.01; // mol / cm3
 /**
  * Calculate the specific volume using a known composition.
  * @param comp Composition [chloroform, acetic acid] in mole fraction
@@ -196,7 +199,14 @@ export function specificVolume(comp: Composition) {
     const xc = comp[0];
     const xa = comp[1];
     const xw = 1 - xc - xa;
-    return (xc / RHO_C + xa / RHO_AA + xw / RHO_W) * 1000; // Convert from cm3 / mol to L / mol
+    return (xc / CONC_PURE_C + xa / CONC_PURE_AA + xw / CONC_PURE_W) / 1000; // Convert from cm3 / mol to L / mol
+}
+
+export function molarMass(comp: Composition) {
+    const xc = comp[0];
+    const xa = comp[1];
+    const xw = 1 - xc - xa;
+    return xc * MM_C + xa * MM_AA + xw * MM_W; // g solution / 1 mol
 }
 
 export type Stream = {
@@ -247,12 +257,10 @@ class Stage {
             this.extObserved = this.extract;
             const aq =  aqIn.ndot;
             const org = orgIn.ndot;
-            this.phi = (aq || org) ? org / (org + aq) : .5; // Just set phi based on relative flow rates since there is no separation
+            this.phi = (aq + org !== 0) ? org / (org + aq) : .5; // Just set phi based on relative flow rates since there is no separation
 
             // Use volume balance to determine the amount of each phase
-            const vdot_in = orgIn.ndot * specificVolume(orgIn.comp) + aq * specificVolume(aqIn.comp);
-            this.ndot_out = vdot_in / (specificVolume(this.mixedComp));
-            // console.log(aq, org, this.ndot_out, this.phi)
+            this.ndot_out = org + aq;
         }
         else {
             const raffComp = streams[1];
@@ -261,15 +269,31 @@ class Stage {
             this.extObserved = extComp;
 
             // Determine the flowrates of each stream using 2x2 inverse matrix formula
-            const c_in = aqIn.comp[0] * aqIn.ndot + orgIn.comp[0] * orgIn.ndot;
-            const a_in = aqIn.comp[1] * aqIn.ndot + orgIn.comp[1] * orgIn.ndot;
-            const a = raffComp[0], b = extComp[0], c = raffComp[1], d = extComp[1];
+            // Use water and overall mass balances because there will always be water in the system.
+            const w_in = (1 - aqIn.comp[0] - aqIn.comp[1]) * aqIn.ndot + (1 - orgIn.comp[0] - orgIn.comp[1]) * orgIn.ndot;
+            const n_in = aqIn.ndot + orgIn.ndot;
+            const a = (1 - raffComp[0] - raffComp[1]), b = (1 - extComp[0] - extComp[0]), c = 1, d = 1;
             // Pre-calculate inverse of denominator
             if (a * d === c * b) throw new Error('non-invertable 2x2 matrix')
             const inv_denom = 1 / (a * d - c * b);
             // Solve for theoretical raffinate and extract flowrates
-            const nr_t = (c_in * d - a_in * b) * inv_denom;
-            const ne_t = (a_in * a - c_in * c) * inv_denom;
+            let nr_t = (w_in * d - n_in * b) * inv_denom;
+            let ne_t = (n_in * a - w_in * c) * inv_denom;
+
+            if (nr_t <= 0 || ne_t <= 0) {
+                // No separation, just one phase with the same composition as the mixed stream
+                this.raffinate = this.mixedComp;
+                this.extract = this.mixedComp;
+                this.rafObserved = this.raffinate;
+                this.extObserved = this.extract;
+                const aq =  aqIn.ndot;
+                const org = orgIn.ndot;
+                this.phi = (aq + org !== 0) ? org / (org + aq) : .5; // Just set phi based on relative flow rates since there is no separation
+
+                // Use volume balance to determine the amount of each phase
+                this.ndot_out = org + aq;
+                return;
+            }
             
             // Use efficiency formulas to determine actual flowrates
             // raffinate
@@ -289,7 +313,7 @@ class Stage {
             this.raffinate = (nr !== 0) ? [ nrc / nr, nra / nr ] : raffComp;
             this.extract   = (ne !== 0) ? [ nec / ne, nea / ne ] : extComp;
             // Use balance to determine the amount of each phase
-            if (nr + ne === 0) return;
+            if (nr + ne <= 0) return;
             this.phi = nr / (nr + ne);
             this.ndot_out = nr + ne;
         }
@@ -383,12 +407,12 @@ export class ColumnCalc {
         // Iterate mass balance
         for (const stage of this.stages) {
             stage.evolve(deltaTime);
+            if (stage.extStream().ndot < 0) throw new Error("ext under in evolve")
         }
         // Solve eqm
         for (const stage of this.stages) {
             stage.settle();
-            const t = stage.extStream().comp[0]
-            if (t !== t) throw new Error("bad ext")
+            if (stage.extStream().ndot < 0) throw new Error(`ext under in settle ${stage.extStream().comp}`)
         }
     }
 
