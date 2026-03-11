@@ -280,7 +280,7 @@ class Stage {
             let nr_t = (w_in * d - n_in * b) * inv_denom;
             let ne_t = (n_in * a - w_in * c) * inv_denom;
 
-            if (nr_t <= 0 || ne_t <= 0) {
+            if ((nr_t <= 0 && ne_t <= 0) || inv_denom !== inv_denom) {
                 // No separation, just one phase with the same composition as the mixed stream
                 this.raffinate = this.mixedComp;
                 this.extract = this.mixedComp;
@@ -301,13 +301,15 @@ class Stage {
             const nrc = this.leff * (raffComp[0] * nr_t - orgIn.comp[0] * orgIn.ndot) + orgIn.comp[0] * orgIn.ndot;
             const nra = this.leff * (raffComp[1] * nr_t - orgIn.comp[1] * orgIn.ndot) + orgIn.comp[1] * orgIn.ndot;
             const nrw = this.leff * (xrw * nr_t - xow * orgIn.ndot) + xow * orgIn.ndot;
-            const nr = nrc + nra + nrw;
+            let nr = nrc + nra + nrw;
             // extract
             const xew = 1 - extComp[0] - extComp[1], xaw = 1 - aqIn.comp[0] - aqIn.comp[1];
             const nec = this.reff * (extComp[0] * ne_t - aqIn.comp[0] * aqIn.ndot) + aqIn.comp[0] * aqIn.ndot;
             const nea = this.reff * (extComp[1] * ne_t - aqIn.comp[1] * aqIn.ndot) + aqIn.comp[1] * aqIn.ndot;
             const n_ew= this.reff * (xew * ne_t - xaw * aqIn.ndot) + xaw * aqIn.ndot;
-            const ne = nec + nea + n_ew;
+            let ne = nec + nea + n_ew;
+            if (nr < 0) nr = 0;
+            if (ne < 0) ne = 0;
 
             // Update extract and raffinate out streams
             this.raffinate = (nr !== 0) ? [ nrc / nr, nra / nr ] : raffComp;
