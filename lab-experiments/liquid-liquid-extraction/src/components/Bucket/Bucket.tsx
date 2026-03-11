@@ -1,8 +1,9 @@
 import { createEffect, createMemo, createSignal, useContext, type Accessor, type Component } from "solid-js";
 import { animate, constrain, resolveProperty } from "../../ts/helpers";
-import { ColumnContext, specificVolume } from "../../calcs";
+import { ColumnContext, molarMass, specificVolume } from "../../calcs";
 import "./Bucket.css";
 import { resetEvent } from "../../globals";
+import { FEED_MAX_RATE } from "../../ts/config";
 
 interface BucketProps {
     x: number | Accessor<number>;
@@ -14,6 +15,7 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
     const x = resolveProperty(props.x, 0);
     const y = resolveProperty(props.y, 0);
     const [rate, setRate] = createSignal(0);
+    const [mdot, setMdot] = createSignal(0);
 
     // Subscribe to the appropriate stream in the column context to get the flowrate for the bucket
     const ctx = useContext(ColumnContext)!;
@@ -23,31 +25,37 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
             col.updated();
             const r = (props.stream === "raffinate") ? col.raffinateOut() : col.extractOut();
             const vdot = r.ndot * specificVolume(r.comp);
+            const mdot = r.ndot * molarMass(r.comp) / 1000; // mol/min to kg/min
+
             setRate(vdot);
+            setMdot(mdot);
         }
     });
 
     // Scale of x reacts to the flowrate
-    const [min, max] = [0, 10]; // expected flowrate range in L/min
+    const [min, max] = [0, FEED_MAX_RATE]; // expected flowrate range in L/min
     const range = max - min;
     const sx = createMemo(() => constrain(rate() - min, 0, range) / range);
 
     // Accumulation of liquid in the bucket
     const [fill, setFill] = createSignal(0);
+    const [mass, setMass] = createSignal(0);
     const accumulate = (dt: number) => {
         const vdot = rate(); // L/min
         setFill(fill() + vdot * dt / 60); // L/s * s
+        setMass(mass() + mdot() * dt / 60);
         return true;
     };
     const reset = () => {
         setFill(0);
+        setMass(0);
     }
 
     // Animate the accumulation constantly
     animate(accumulate);
 
     // Reactive display
-    const text = createMemo(() => fill() > 20 ? "max" : `${fill().toFixed(1)} kg`);
+    const text = createMemo(() => fill() > 20 ? "max" : `${mass().toFixed(1)} kg`);
 
     // Reset with simulation
     createEffect(() => {
