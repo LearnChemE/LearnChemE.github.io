@@ -1,0 +1,31 @@
+<div id="details" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="detailsTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsTitle">Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Water at high pressure undergoes Joule–Thomson expansion when passing through a throttling valve. This process is assumed to
+          be adiabatic, so the enthalpy change is zero.
+        </p>
+        <p>\(\Delta H = 0\), so \(H_1 = H_2\), where \(H_1\) is the inlet enthalpy and \(H_2\) is the exit enthalpy.</p>
+        <p>
+          When two phases are present, the saturated vapor enthalpy \(H^V\) and the saturated liquid enthalpy \(H^L\) are used to
+          determine the fraction of the exit stream that is vapor. For the conditions chosen, liquid and vapor exit the throttle at
+          saturation conditions, because \(H^L &lt; H_2 &lt; H^V\).
+        </p>
+        <p>The steam quality \(q\) is calculated by:</p>
+        <p class="text-start">\(H_2 = q H^V + (1 - q) H^L\),</p>
+        <p class="text-start">so that \(q = \dfrac{H_2 - H^L}{H^V - H^L}\).</p>
+        <p>When only liquid is present \(q = 0\) and \(H_2 = H^L\).</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
