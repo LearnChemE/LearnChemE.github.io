@@ -1,6 +1,6 @@
 import { onMount, Show, type Component } from "solid-js";
 import "./Switch.css"
-import { resolveProperty } from "../../ts/helpers";
+import { resolveProperty } from "../../globals";
 
 export interface PowerSwitchProps {
   x: number;

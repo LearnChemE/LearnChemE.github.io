@@ -1,14 +1,13 @@
 import { createEffect, createMemo, createSignal, useContext, type Accessor, type Component } from "solid-js";
-import { animate, constrain, resolveProperty } from "../../ts/helpers";
-import { ColumnContext, molarMass, specificVolume } from "../../calcs";
+import { animate, constrain, resolveProperty } from "../../globals/";
+import { ColumnContext } from "../../globals/";
 import "./Bucket.css";
-import { resetEvent } from "../../globals";
-import { FEED_MAX_RATE } from "../../ts/config";
+import { resetEvent } from "../../globals/";
+import { FEED_MAX_RATE } from "../../globals/";
 
 interface BucketProps {
     x: number | Accessor<number>;
     y: number | Accessor<number>;
-    stream: "raffinate" | "extract";
 }
 
 export const Bucket: Component<BucketProps> = (props: BucketProps) => {
@@ -23,9 +22,9 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
         if (ctx.columnCreated()) {
             const col = ctx.column!;
             col.updated();
-            const r = (props.stream === "raffinate") ? col.raffinateOut() : col.extractOut();
-            const vdot = r.ndot * specificVolume(r.comp);
-            const mdot = r.ndot * molarMass(r.comp) / 1000; // mol/min to kg/min
+            const r = col.liqOut();
+            const vdot = r.ndot / 1000; // L  / s
+            const mdot = r.ndot / 1000; // kg / s
 
             setRate(vdot);
             setMdot(mdot);
@@ -42,8 +41,8 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
     const [mass, setMass] = createSignal(0);
     const accumulate = (dt: number) => {
         const vdot = rate(); // L/min
-        setFill(fill() + vdot * dt / 60); // L/s * s
-        setMass(mass() + mdot() * dt / 60);
+        setFill(fill() + vdot * dt); // L/s * s
+        setMass(mass() + mdot() * dt);
         return true;
     };
     const reset = () => {

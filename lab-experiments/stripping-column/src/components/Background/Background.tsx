@@ -1,6 +1,6 @@
 import type { Component } from "solid-js";
-import { numberOfStages, paddedHeight, paddingTop } from "../../globals";
-import { STAGE_HEIGHT } from "../../ts/config";
+import { numberOfStages, paddedHeight, paddingTop } from "../../globals/";
+import { STAGE_HEIGHT } from "../../globals/";
 
 
 const Background: Component = () => {

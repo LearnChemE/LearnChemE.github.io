@@ -1,4 +1,4 @@
-import { getAngleFromDown, getSVGCoords, resolveProperty } from "../../ts/helpers";
+import { getAngleFromDown, getSVGCoords, resolveProperty } from "../../globals/";
 import "./Valve.css";
 import { createSignal, type Component } from "solid-js";
 

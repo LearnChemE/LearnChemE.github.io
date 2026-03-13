@@ -1,23 +1,22 @@
 import { createEffect, createMemo, createSignal, For, onMount, useContext, type Accessor, type Component } from "solid-js";
-import { FEED_COMP, FEED_MAX_RATE, STAGE_HEIGHT } from "../../ts/config";
-import { columnVolume, numberOfStages, paddingTop, resetEvent, setColFull } from "../../globals";
+import { FEED_PPM, GAS_INIT_PPM, STAGE_HEIGHT } from "../../globals/config";
+import { columnVolume, numberOfStages, paddingTop, resetEvent, setColFull } from "../../globals/signals";
 import "./Column.css";
-import { animate } from "../../ts/helpers";
-import { Boils } from "../Boils/Boils";
-import { ColumnCalc, ColumnContext, FEED_SPECIFIC_VOL, SOLV_SPECIFIC_VOL, type Stream } from "../../calcs";
+import { animate } from "../../globals/helpers";
+import { ColumnCalc, ColumnContext, type Stream } from "../../globals/calcs";
 
 type ColumnProps = {
-    solvIn: Accessor<number>;
+    gasIn: Accessor<number>;
     feedIn: Accessor<number>;
 };
 
 export const Column: Component<ColumnProps> = (props) => {
-    const { solvIn, feedIn } = props;
+    const { gasIn, feedIn } = props;
     const [fill, setFill] = createSignal(0);
     let animating = true;
 
     const fillAnimation = (dt: number) => {
-        const rate = solvIn();
+        const rate = feedIn();
         if (rate <= 0) return true;
 
         const dV = rate * dt;
@@ -32,9 +31,9 @@ export const Column: Component<ColumnProps> = (props) => {
         animating = false;
         setColFull(true);
         // Create the calculation object and start the simulation
-        const feedStream = createMemo(() => { return { ndot: feedIn() / FEED_SPECIFIC_VOL, comp: FEED_COMP } as Stream});
-        const solvStream = createMemo(() => { return { ndot: solvIn() / SOLV_SPECIFIC_VOL, comp: [0, 0] } as Stream});
-        const col = new ColumnCalc(numberOfStages(), feedStream, solvStream);
+        const liqStream = createMemo(() => { return { ndot: feedIn() * 1000 / 60, ppm: FEED_PPM     } as Stream});
+        const gasStream = createMemo(() => { return { ndot: gasIn(),              ppm: GAS_INIT_PPM } as Stream});
+        const col = new ColumnCalc(numberOfStages(), liqStream, gasStream);
         // Attach the column to context so other components can access it
         columnContext!.column = col;
         columnContext!.setColumnCreated(true);
@@ -58,7 +57,6 @@ export const Column: Component<ColumnProps> = (props) => {
 
     const totalFillHeight = createMemo(() => 76 + 32 * numberOfStages());
     const paddedFillHeight = createMemo(() => totalFillHeight() + 18);
-    const bubbleRate = createMemo(() => feedIn() / FEED_MAX_RATE);
 
     return (
         // top
@@ -68,8 +66,6 @@ export const Column: Component<ColumnProps> = (props) => {
                 <path transform={`translate(325 ${92 + STAGE_HEIGHT * numberOfStages()})`} d="M2.12222e-07 38H70C70 38 70 27.5 70 19C70 9.5 65 9.5 65 0H5C5 9.5 1.93781e-06 9.5 2.12222e-07 19C-1.51337e-06 28.5 2.12222e-07 38 2.12222e-07 38Z" fill="#5b98e7" fill-opacity="0.6"/>
                 <path transform="translate(325 54)" d="M2.12222e-07 0H70C70 0 70 10.5 70 19C70 28.5 65 28.5 65 38H5C5 28.5 1.93781e-06 28.5 2.12222e-07 19C-1.51337e-06 9.5 2.12222e-07 0 2.12222e-07 0Z" fill="#5b98e7" fill-opacity="0.6"/>
                 <rect x="330" y="92" width="60" height={32 * numberOfStages()} fill="#5b98e7" fill-opacity="0.6"/>
-                {/* Bubbles */}
-                <Boils x={340} y={38} w={40} h={() => totalFillHeight() * .73 - 20} showing={() => feedIn() > 0} nbubbles={24} rate={bubbleRate} />
             </g>
 
             <defs>

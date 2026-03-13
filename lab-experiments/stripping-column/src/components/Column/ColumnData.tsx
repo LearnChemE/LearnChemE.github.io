@@ -1,7 +1,6 @@
 import { For, Show, type Accessor, type Component } from "solid-js";
-import { numberOfStages, paddedHeight, paddingTop } from "../../globals";
+import { FEED_PPM, GAS_INIT_PPM, numberOfStages, paddedHeight, paddingTop } from "../../globals/";
 import { SVGTooltip } from "../Tooltip/TooltipSelector";
-import { FEED_COMP } from "../../ts/config";
 
 type ColumnDataProps = {
     feedIsOn: Accessor<boolean>;
@@ -36,8 +35,8 @@ export const ColumnData: Component<ColumnDataProps> = (props) => {
         </g>
 
         {/* Tooltip */}
-        <SVGTooltip x={150} y={100 + paddingTop() + i() * 32} stage={i()} stream={"raffinate"} anchor={lrefs[i()]} />
-        <SVGTooltip x={418} y={100 + paddingTop() + i() * 32} stage={i()} stream={"extract"} anchor={rrefs[i()]} />
+        <SVGTooltip x={150} y={100 + paddingTop() + i() * 32} stage={i()} stream={"liquid"} anchor={lrefs[i()]} />
+        <SVGTooltip x={418} y={100 + paddingTop() + i() * 32} stage={i()} stream={"vapor"} anchor={rrefs[i()]} />
       </>)}
     </For>
 </Show>
@@ -61,8 +60,8 @@ export const ColumnData: Component<ColumnDataProps> = (props) => {
         </g>
     </g>
 
-<SVGTooltip x={135} y={() => 58 + paddedHeight()} stage={FEED_COMP} label="feed" anchor={feed} />
-<SVGTooltip x={465} y={() => 8 + paddedHeight()} stage={[0, 0]} label="solvent" anchor={solv} />
+<SVGTooltip x={135} y={() => 58 + paddedHeight()} ppm={FEED_PPM} label="feed" anchor={feed} />
+<SVGTooltip x={465} y={() => 8 + paddedHeight()}  ppm={GAS_INIT_PPM} label="solvent" anchor={solv} />
     </>
     )
 }

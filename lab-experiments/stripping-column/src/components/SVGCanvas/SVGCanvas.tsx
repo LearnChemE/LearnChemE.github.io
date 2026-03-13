@@ -1,6 +1,6 @@
 import { onMount, type Accessor, type Component } from "solid-js";
 import "./SVGCanvas.css";
-import { enableWindowResize, initSvgDrag, initSvgZoom, resolveProperty } from "../../ts/helpers";
+import { enableWindowResize, initSvgDrag, initSvgZoom, resolveProperty } from "../../globals/";
 
 type SVGCanvasProps = {
     width?: number | Accessor<number>;

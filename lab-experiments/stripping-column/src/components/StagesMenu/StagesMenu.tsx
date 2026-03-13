@@ -1,8 +1,8 @@
 import type { Component } from "solid-js"
 import { Slider } from "../Slider/Slider"
-import { numberOfStages, setNumberOfStages, setStageEfficieny, stageEfficiency } from "../../globals"
+import { numberOfStages, setNumberOfStages, setStageEfficieny, stageEfficiency } from "../../globals/signals"
 import "./StagesMenu.css"
-import { MIN_EFFICIENCY } from "../../ts/config";
+import { MIN_EFFICIENCY } from "../../globals/config";
 
 interface StagesMenuProps {
     onClose: () => void;
