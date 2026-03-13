@@ -263,6 +263,13 @@ function buildScene(draw) {
   buildValveAssembly(g);
   buildTempGauges(g);
   buildPressureGauges(g);
+
+  // Ensure upper pipe stroke is visible above fills and overlays.
+  const outline = g.group();
+  outline.polygon(pipeUpperLeft).fill('none').stroke({ color: '#000', width: 2 });
+  outline.polygon(pipeUpperMid).fill('none').stroke({ color: '#000', width: 2 });
+  outline.polygon(pipeUpperRight).fill('none').stroke({ color: '#000', width: 2 });
+  outline.front();
 }
 
 function buildTempGauges(group) {
@@ -453,8 +460,8 @@ function addSideFlanges(group) {
     const waterStartY = pipeTopY - 50;
     const waterH = pipeTopY - waterStartY;
 
-    const waterRect = group.rect(stemW, waterH + 0.3)
-      .move(stemX, waterStartY)
+    const waterRect = group.rect(stemW - 1, waterH + 0.3)
+      .move(stemX + 0.5, waterStartY)
       .fill(waterFill)
       .stroke({ width: 0 });
 
