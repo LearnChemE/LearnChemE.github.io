@@ -19,6 +19,7 @@ import { AboutText, DirectionsText } from './components/Modal/modals'
 import Defs from './components/Defs'
 import { paddedHeight } from './globals/signals'
 import { FEED_MAX_RATE, INIT_FEED_LIFT, INIT_GAS_SP } from './globals/config'
+import TopPipes from './components/TopPipes/TopPipes'
 
 function App() {
   // Liquid feed
@@ -54,7 +55,7 @@ function App() {
         <SVGCanvas width={700} height={560} defs={Defs}>
           <Background />
           <Bucket x={225} y={() => 257 + paddedHeight()} />
-          {/* <TopPipes /> */}
+          <TopPipes />
           <Pipes />
           <PowerSwitch x={134} y={321 + paddedHeight()} label="feed" isOn={feedIsOn} setIsOn={setFeedIsOn} />
           
