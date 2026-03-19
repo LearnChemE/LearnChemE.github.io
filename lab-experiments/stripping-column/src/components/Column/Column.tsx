@@ -85,12 +85,12 @@ export const Column: Component<ColumnProps> = (props) => {
             
 
             {/* Top */}
-            <g id="top-col" transform={`translate(325 38)`}>
-                <rect x="7.5" y="0.5" width="18" height="8" rx="1.5" fill="url(#paint0_linear_9_80)" stroke="black"/>
-                <rect x="44.5" y="0.5" width="18" height="8" rx="1.5" fill="url(#paint1_linear_9_80)" stroke="black"/>
-                <path d="M2.12222e-07 16H70C70 16 70 26.5 70 35C70 44.5 65 44.5 65 54H5C5 44.5 1.93781e-06 44.5 2.12222e-07 35C-1.51337e-06 25.5 2.12222e-07 16 2.12222e-07 16Z" fill="url(#paint2_linear_9_80)"/>
-                <path d="M64.5 54C64.5 44.5 69.5 44.5 69.5 35C69.5 25.5 69.5 16.5 69.5 16.5H0.500001C0.500001 16.5 0.499998 25.5 0.5 35C0.500002 44.5 5.5 44.5 5.5 54" stroke="black"/>
-                <path d="M4 5.5H66C67.933 5.5 69.5 7.067 69.5 9V16.5H0.5V9C0.5 7.067 2.067 5.5 4 5.5Z" fill="url(#paint3_linear_9_80)" stroke="black"/>
+            <g id="top-col" transform={`translate(322 40)`}>
+                <path d="M3 14H73C73 14 73 24.5 73 33C73 42.5 68 42.5 68 52H8C8 42.5 3 42.5 3 33C3 23.5 3 14 3 14Z" fill="url(#paint0_linear_0_12)"/>
+                <path d="M67.5 52C67.5 42.5 72.5 42.5 72.5 33C72.5 23.5 72.5 14.5 72.5 14.5H3.5C3.5 14.5 3.5 23.5 3.5 33C3.5 42.5 8.5 42.5 8.5 52" stroke="black"/>
+                <path d="M7 3.5H69C70.933 3.5 72.5 5.067 72.5 7V14.5H3.5V7C3.5 5.067 5.067 3.5 7 3.5Z" fill="url(#paint1_linear_0_12)" stroke="black"/>
+                <rect x="0.5" y="59.5" width="14" height="8" rx="1.5" transform="rotate(-90 0.5 59.5)" fill="url(#paint2_linear_0_12)" stroke="black"/>
+                <rect x="53.5" y="3.5" width="3" height="7" rx="0.5" transform="rotate(-90 53.5 3.5)" fill="#989898" stroke="black"/>
             </g>
 
             {/* Stages */}
@@ -110,7 +110,6 @@ export const Column: Component<ColumnProps> = (props) => {
             {/* Bottom */}
             <g id="bottom-col" transform={`translate(325 ${92 + STAGE_HEIGHT * numberOfStages()})`}>
                 <rect x="0.5" y="-0.5" width="18" height="8" rx="1.5" transform="matrix(1 0 0 -1 7 53)" fill="url(#paint0_linear_12_111)" stroke="black"/>
-                <rect x="0.5" y="-0.5" width="18" height="8" rx="1.5" transform="matrix(1 0 0 -1 44 53)" fill="url(#paint1_linear_12_111)" stroke="black"/>
                 <path d="M2.12222e-07 38H70C70 38 70 27.5 70 19C70 9.5 65 9.5 65 0H5C5 9.5 1.93781e-06 9.5 2.12222e-07 19C-1.51337e-06 28.5 2.12222e-07 38 2.12222e-07 38Z" fill="url(#paint2_linear_12_111)"/>
                 <path d="M64.5 0C64.5 9.5 69.5 9.5 69.5 19C69.5 28.5 69.5 37.5 69.5 37.5H0.500001C0.500001 37.5 0.499998 28.5 0.5 19C0.500002 9.5 5.5 9.5 5.5 0" stroke="black"/>
                 <path d="M4 48.5H66C67.933 48.5 69.5 46.933 69.5 45V37.5H0.5V45C0.5 46.933 2.067 48.5 4 48.5Z" fill="url(#paint3_linear_12_111)" stroke="black"/>

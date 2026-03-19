@@ -17,5 +17,8 @@ export const FEED_MAX_RATE = 10;
 export const INIT_GAS_SP = 5;
 export const GAS_MAX_RATE = 10;
 export const GAS_SP_INTERVAL = 0.5;
+export const MAX_PRESSURE = 20;
 
 export const MIN_EFFICIENCY = 50; // %
+
+export const MAX_TANK_VALVE_ROTATION = 360; // degrees

@@ -20,6 +20,8 @@ import Defs from './components/Defs'
 import { paddedHeight } from './globals/signals'
 import { FEED_MAX_RATE, INIT_FEED_LIFT, INIT_GAS_SP } from './globals/config'
 import TopPipes from './components/TopPipes/TopPipes'
+import { Regulator } from './components/Regulator/Regulator'
+import { TankValve } from './components/TankValve/TankValve'
 
 function App() {
   // Liquid feed
@@ -28,9 +30,9 @@ function App() {
   const feedRate = createMemo(() => feedIsOn() ? feedLift() * FEED_MAX_RATE : 0);
 
   // Gas Pressure
-  const [gasLinePressurized, setGasLinePressurized] = createSignal(false);
-  const [pressureSP, setPressureSP] = createSignal(false);
-  const gasPressure = createMemo(() => gasLinePressurized() ? pressureSP() : 0);
+  const [gasLinePressurized, setGasLinePressurized] = createSignal(0);
+  const [pressureSP, setPressureSP] = createSignal(INIT_GAS_SP);
+  const gasPressure = createMemo(() => Math.min(gasLinePressurized(), pressureSP()));
 
   // Gas flowrate
   const [gasSP, setGasSP] = createSignal(INIT_GAS_SP);
@@ -41,9 +43,9 @@ function App() {
 
   const reset = () => {
     batch(() => {
-      setGasLinePressurized(false);
+      setGasLinePressurized(0);
       setFeedIsOn(false);
-      setPressureSP(false);
+      setPressureSP(INIT_GAS_SP);
       setLockStages(false);
       setShowMenu(true);
     })
@@ -57,7 +59,9 @@ function App() {
           <Bucket x={225} y={() => 257 + paddedHeight()} />
           <TopPipes />
           <Pipes />
+          <Regulator inPres={gasLinePressurized} outPres={gasPressure} gasSP={gasSP} setGasSP={setGasSP} />
           <PowerSwitch x={134} y={321 + paddedHeight()} label="feed" isOn={feedIsOn} setIsOn={setFeedIsOn} />
+          <TankValve pressure={gasLinePressurized} setPressure={setGasLinePressurized} />
           
           <Column gasIn={gasRate} feedIn={feedRate} />
           <Rotameter flowrate={feedRate} flowrange={[0, FEED_MAX_RATE]} x={145} y={64 + paddedHeight()} />
