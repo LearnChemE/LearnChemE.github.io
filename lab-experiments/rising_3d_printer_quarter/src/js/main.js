@@ -1,9 +1,5 @@
-import * as config from './config.js';
-import { computeVolumeVsTime, volumeAtTime } from './calc.js';
-
-
 let coin = null;
-let terminalVelocity = 0.19;
+let terminalVelocity = 0.095;
 let currentOrientation = 'face-down';
 // Animation state variables
 let animId = null;
@@ -12,15 +8,15 @@ let isFalling = false;
 let orientationLocked = false; // once motion starts, orientation stays locked until reset
 let lineData = null;
 const vesselX = 375;
-  const vesselY = 125;
-  const W = 200;
-  const H = 475;
+const vesselY = 125;
+const W = 200;
+const H = 475;
 const margin = 75;
 // Save the SVG.js context so other functions can reuse it
 export function drawFigure(svg) {
   // Clear previous drawing (if any)
   svg.clear();
-  drawVessel(svg, vesselX- margin, vesselY, W, H);
+  drawVessel(svg, vesselX - margin, vesselY, W, H);
   drawScale(svg, 366 - margin, 160);
   lineData = svg.line(457.5 - margin, 587, 457.5 - margin, 510).stroke({ width: 1, color: '#000' });
 
@@ -207,7 +203,7 @@ function initOrientationControl(targetCoin, svg) {
     if (requested === 'face-down') {
       rot.rotate(-90, cx, cy);
       rot.move(bbox.x, bbox.y - 2.426 * 7);
-      terminalVelocity = 0.19;
+      terminalVelocity = 0.095;
       lineData.remove();
       lineData = svg.line(457.5 - margin, 587, 457.5 - margin, 510).stroke({ width: 1, color: '#000' });
     } else if (requested === 'edge-on') {
@@ -215,7 +211,7 @@ function initOrientationControl(targetCoin, svg) {
       rot.move(bbox.x + 2.426 * 7, bbox.y);
       lineData.remove();
       lineData = svg.line(457.5 - margin, 587, 457.5 - margin, 543).stroke({ width: 1, color: '#000' });
-      terminalVelocity = 0.28;
+      terminalVelocity = 0.14;
     }
 
     currentOrientation = requested; // persist selection
@@ -336,7 +332,7 @@ export function reset(draw) {
     }
   }
   currentOrientation = 'face-down';
-  terminalVelocity = 0.39;
+  terminalVelocity = 0.095;
   orientationLocked = false;
   if (sel) {
     sel.disabled = false;
