@@ -1,12 +1,16 @@
-import { Px } from "./calcs.js";
-import { Py } from "./calcs.js";
+import { Px, Px_xVal } from "./calcs.js";
+import { Py, Py_xVal } from "./calcs.js";
 import { TxBisection } from "./calcs.js";
 import { TyBisection } from "./calcs.js";
 const p5container = document.getElementById("p5-container");
 const positiveSliderWrapper = document.getElementById("positive-slider-wrapper");
 const negativeSliderWrapper = document.getElementById("negative-slider-wrapper");
-let temp;
-let pressure;
+let temp = 110;
+let pressure = 1.6;
+// Vars for drawMouseDist()
+let blackCircleX = 590;
+let blackCircleY = 420;
+let mousePressedInCircle = false;
 
 // This function is used to scale the canvas based on the size of the container
 window.relativeSize = () => p5container.offsetWidth / 1280;
@@ -49,27 +53,29 @@ window.draw = function () {
   }
   resize();
   background(255);
-  //calcAll();
+  makeArrays();
 
   if (state.plotSelection === "P-x-y") {
     temp = 110;
     drawPxyLeftGraph();
-    drawPxyRightGraph();
     drawMouseDist();
     if (state.deviationSelection == "positive") {
       drawGraphLinesPxyPositive();
+      drawPxyRightGraphPositive();
     } else if (state.deviationSelection == "negative") {
       drawGraphLinesPxyNegative();
+      drawPxyRightGraphNegative();
     }
   } else if (state.plotSelection === "T-x-y") {
     pressure = 1.6;
     drawTxyLeftGraph();
-    drawTxyRightGraph();
     drawMouseDist();
     if (state.deviationSelection == "positive") {
       drawGraphLinesTxyPositive();
+      drawTxyRightGraphPositive();
     } else if (state.deviationSelection == "negative") {
       drawGraphLinesTxyNegative();
+      drawTxyRightGraphNegative();
     }
   }
 };
@@ -78,6 +84,35 @@ window.windowResized = () => {
   resizeCanvas(p5container.offsetWidth, p5container.offsetHeight);
 };
 
+function makeArrays() {
+  //make Tx and Ty arrays
+  for (let x = 0; x <= 1; x += 0.001) {
+    state.TxPositive.push({
+      x: x,
+      y: TxBisection(x, pressure, state.positiveA12Value, state.positiveA21Value),
+    });
+  }
+
+  for (let x = 0; x <= 1; x += 0.001) {
+    state.TyPositive.push({
+      x: x,
+      y: TyBisection(x, pressure, state.positiveA12Value, state.positiveA21Value),
+    });
+  }
+  for (let x = 0; x <= 1; x += 0.001) {
+    state.TxNegative.push({
+      x: x,
+      y: TxBisection(x, pressure, state.negativeA12Value, state.negativeA21Value),
+    });
+  }
+
+  for (let x = 0; x <= 1; x += 0.001) {
+    state.TyNegative.push({
+      x: x,
+      y: TyBisection(x, pressure, state.negativeA12Value, state.negativeA21Value),
+    });
+  }
+}
 function drawPxyLeftGraph() {
   push();
 
@@ -232,20 +267,96 @@ function drawPxyLeftGraph() {
   pop();
 }
 
-function drawPxyRightGraph() {
+function drawPxyRightGraphPositive() {
+  //calculated mouse VLE values
+  push();
+
+  let blackValueX = 1 + (blackCircleX - state.graphCenterX - state.graphWidth / 2) / state.graphWidth;
+  let blackValueY = (0.9 - 2.7) * ((blackCircleY - state.graphCenterY - state.graphHeight / 2) / state.graphHeight) + 0.9;
+
+  textAlign(CENTER, CENTER);
+  textSize(32);
+  fill("white");
+  noStroke();
+
+  if (
+    Py(blackValueX, temp, state.positiveA12Value, state.positiveA21Value) < blackValueY &&
+    blackValueY < Px(blackValueX, temp, state.positiveA12Value, state.positiveA21Value)
+  ) {
+    state.x_1 = Px_xVal(blackValueY, temp, state.positiveA12Value, state.positiveA21Value);
+    state.y_1 = Py_xVal(blackValueY, temp, state.positiveA12Value, state.positiveA21Value);
+    push();
+    rectMode(CORNERS);
+    noStroke();
+    fill("green");
+    rect(
+      state.graphCenterX + 660 - state.graphWidth / 8,
+      state.graphCenterY - state.graphHeight / 2,
+      state.graphCenterX + 660 + state.graphWidth / 8,
+      state.graphCenterY + state.graphHeight / 2 - (state.graphHeight * (state.y_1 - blackValueX)) / (state.y_1 - state.x_1),
+    );
+    fill("blue");
+    rect(
+      state.graphCenterX + 660 - state.graphWidth / 8,
+      state.graphCenterY + state.graphHeight / 2,
+      state.graphCenterX + 660 + state.graphWidth / 8,
+      state.graphCenterY - state.graphHeight / 2 + (state.graphHeight * (blackValueX - state.x_1)) / (state.y_1 - state.x_1),
+    );
+    pop();
+    text(
+      "X1: " + state.x_1.toFixed(2),
+      state.graphCenterX + 660,
+      state.graphCenterY + (state.graphHeight * (blackValueX - state.x_1)) / (2 * (state.y_1 - state.x_1)),
+    );
+    text(
+      "Y1: " + state.y_1.toFixed(2),
+      state.graphCenterX + 660,
+      state.graphCenterY - (state.graphHeight * (state.y_1 - blackValueX)) / (2 * (state.y_1 - state.x_1)),
+    );
+  } else if (Py(blackValueX, temp, state.positiveA12Value, state.positiveA21Value) < blackValueY) {
+    state.x_1 = blackValueX;
+    state.y_1 = 0;
+    push();
+    rectMode(CENTER);
+    noStroke();
+    fill("blue");
+    rect(state.graphCenterX + 660, state.graphCenterY, state.graphWidth / 4, state.graphHeight);
+    pop();
+    text("X1: " + state.x_1.toFixed(2), state.graphCenterX + 660, state.graphCenterY);
+  } else if (blackValueY < Px(blackValueX, temp, state.positiveA12Value, state.positiveA21Value)) {
+    state.x_1 = 0;
+    state.y_1 = blackValueX;
+    push();
+    rectMode(CENTER);
+    noStroke();
+    fill("green");
+    rect(state.graphCenterX + 660, state.graphCenterY, state.graphWidth / 4, state.graphHeight);
+    pop();
+    text("Y1: " + state.y_1.toFixed(2), state.graphCenterX + 660, state.graphCenterY);
+  }
+
+  //outer box, tick marks and text
   push();
 
   rectMode(CENTER);
   stroke("black");
+  noFill();
   strokeWeight(1);
   rect(state.graphCenterX + 660, state.graphCenterY, state.graphWidth / 4, state.graphHeight);
+
+  textAlign(CENTER, CENTER);
+  fill("black");
+  noStroke();
+  translate(state.graphCenterX + 470, state.graphCenterY);
+  rotate((3 * PI) / 2);
+  text("liquid and vapor amounts (mol)", 0, 0);
 
   pop();
 
   for (let i = state.graphCenterY - state.graphHeight / 2; i < state.graphCenterY + state.graphHeight / 2 - 1; i += state.graphHeight / 20) {
     push();
     stroke("black");
-    strokeWeight(1);
+    strokeWeight(2);
     line(state.graphCenterX + 660 - state.graphWidth / 8, i, state.graphCenterX + 660 - state.graphWidth / 8 + 5, i);
     pop();
   }
@@ -257,7 +368,7 @@ function drawPxyRightGraph() {
   ) {
     push();
     stroke("black");
-    strokeWeight(1);
+    strokeWeight(2);
     line(state.graphCenterX + 660 - state.graphWidth / 8, i, state.graphCenterX + 660 - state.graphWidth / 8 + 10, i);
     pop();
 
@@ -273,7 +384,375 @@ function drawPxyRightGraph() {
     );
     pop();
   }
+
+  pop();
 }
+
+function drawPxyRightGraphNegative() {
+  //calculated mouse VLE values
+  push();
+
+  let blackValueX = 1 + (blackCircleX - state.graphCenterX - state.graphWidth / 2) / state.graphWidth;
+  let blackValueY = (0.7 - 2.3) * ((blackCircleY - state.graphCenterY - state.graphHeight / 2) / state.graphHeight) + 0.7;
+
+  textAlign(CENTER, CENTER);
+  textSize(32);
+  fill("white");
+  noStroke();
+
+  if (
+    Py(blackValueX, temp, state.negativeA12Value, state.negativeA21Value) < blackValueY &&
+    blackValueY < Px(blackValueX, temp, state.negativeA12Value, state.negativeA21Value)
+  ) {
+    state.x_1 = Px_xVal(blackValueY, temp, state.negativeA12Value, state.negativeA21Value);
+    state.y_1 = Py_xVal(blackValueY, temp, state.negativeA12Value, state.negativeA21Value);
+    push();
+    rectMode(CORNERS);
+    noStroke();
+    fill("green");
+    rect(
+      state.graphCenterX + 660 - state.graphWidth / 8,
+      state.graphCenterY - state.graphHeight / 2,
+      state.graphCenterX + 660 + state.graphWidth / 8,
+      state.graphCenterY + state.graphHeight / 2 - (state.graphHeight * (state.y_1 - blackValueX)) / (state.y_1 - state.x_1),
+    );
+    fill("blue");
+    rect(
+      state.graphCenterX + 660 - state.graphWidth / 8,
+      state.graphCenterY + state.graphHeight / 2,
+      state.graphCenterX + 660 + state.graphWidth / 8,
+      state.graphCenterY - state.graphHeight / 2 + (state.graphHeight * (blackValueX - state.x_1)) / (state.y_1 - state.x_1),
+    );
+    pop();
+    text(
+      "X1: " + state.x_1.toFixed(2),
+      state.graphCenterX + 660,
+      state.graphCenterY + (state.graphHeight * (blackValueX - state.x_1)) / (2 * (state.y_1 - state.x_1)),
+    );
+    text(
+      "Y1: " + state.y_1.toFixed(2),
+      state.graphCenterX + 660,
+      state.graphCenterY - (state.graphHeight * (state.y_1 - blackValueX)) / (2 * (state.y_1 - state.x_1)),
+    );
+  } else if (Py(blackValueX, temp, state.negativeA12Value, state.negativeA21Value) < blackValueY) {
+    state.x_1 = blackValueX;
+    state.y_1 = 0;
+    push();
+    rectMode(CENTER);
+    noStroke();
+    fill("blue");
+    rect(state.graphCenterX + 660, state.graphCenterY, state.graphWidth / 4, state.graphHeight);
+    pop();
+    text("X1: " + state.x_1.toFixed(2), state.graphCenterX + 660, state.graphCenterY);
+  } else if (blackValueY < Px(blackValueX, temp, state.negativeA12Value, state.negativeA21Value)) {
+    state.x_1 = 0;
+    state.y_1 = blackValueX;
+    push();
+    rectMode(CENTER);
+    noStroke();
+    fill("green");
+    rect(state.graphCenterX + 660, state.graphCenterY, state.graphWidth / 4, state.graphHeight);
+    pop();
+    text("Y1: " + state.y_1.toFixed(2), state.graphCenterX + 660, state.graphCenterY);
+  }
+
+  //outer box, tick marks and text
+  push();
+
+  rectMode(CENTER);
+  stroke("black");
+  noFill();
+  strokeWeight(1);
+  rect(state.graphCenterX + 660, state.graphCenterY, state.graphWidth / 4, state.graphHeight);
+
+  textAlign(CENTER, CENTER);
+  fill("black");
+  noStroke();
+  translate(state.graphCenterX + 470, state.graphCenterY);
+  rotate((3 * PI) / 2);
+  text("liquid and vapor amounts (mol)", 0, 0);
+
+  pop();
+
+  for (let i = state.graphCenterY - state.graphHeight / 2; i < state.graphCenterY + state.graphHeight / 2 - 1; i += state.graphHeight / 20) {
+    push();
+    stroke("black");
+    strokeWeight(2);
+    line(state.graphCenterX + 660 - state.graphWidth / 8, i, state.graphCenterX + 660 - state.graphWidth / 8 + 5, i);
+    pop();
+  }
+
+  for (
+    let i = state.graphCenterY - state.graphHeight / 2 - state.graphHeight / 5;
+    i <= state.graphCenterY + state.graphHeight / 2 - 1;
+    i += state.graphHeight / 5
+  ) {
+    push();
+    stroke("black");
+    strokeWeight(2);
+    line(state.graphCenterX + 660 - state.graphWidth / 8, i, state.graphCenterX + 660 - state.graphWidth / 8 + 10, i);
+    pop();
+
+    push();
+    textAlign(CENTER, CENTER);
+    textSize(32);
+    noStroke();
+    fill("black");
+    text(
+      (0.8 - (i - (state.graphCenterY - state.graphHeight / 2)) / state.graphHeight).toFixed(1),
+      state.graphCenterX + 660 - state.graphWidth / 8 - 32,
+      i + state.graphHeight / 5,
+    );
+    pop();
+  }
+
+  pop();
+}
+
+function drawTxyRightGraphPositive() {
+  //calculated mouse VLE values
+  push();
+
+  let blackValueX = 1 + (blackCircleX - state.graphCenterX - state.graphWidth / 2) / state.graphWidth;
+  let blackValueY = (90 - 130) * ((blackCircleY - state.graphCenterY - state.graphHeight / 2) / state.graphHeight) + 90;
+
+  textAlign(CENTER, CENTER);
+  textSize(32);
+  fill("white");
+  noStroke();
+
+  if (
+    TyBisection(blackValueX, pressure, state.positiveA12Value, state.positiveA21Value) > blackValueY &&
+    blackValueY > TxBisection(blackValueX, pressure, state.positiveA12Value, state.positiveA21Value)
+  ) {
+    state.x_1 = state.TxPositive.reduce((prev, curr) => (Math.abs(curr.y - blackValueY) < Math.abs(prev.y - blackValueY) ? curr : prev)).x;
+
+    state.y_1 = state.TyPositive.reduce((prev, curr) => (Math.abs(curr.y - blackValueY) < Math.abs(prev.y - blackValueY) ? curr : prev)).x;
+    push();
+    rectMode(CORNERS);
+    noStroke();
+    fill("green");
+    rect(
+      state.graphCenterX + 660 - state.graphWidth / 8,
+      state.graphCenterY - state.graphHeight / 2,
+      state.graphCenterX + 660 + state.graphWidth / 8,
+      state.graphCenterY + state.graphHeight / 2 - (state.graphHeight * (state.y_1 - blackValueX)) / (state.y_1 - state.x_1),
+    );
+    fill("blue");
+    rect(
+      state.graphCenterX + 660 - state.graphWidth / 8,
+      state.graphCenterY + state.graphHeight / 2,
+      state.graphCenterX + 660 + state.graphWidth / 8,
+      state.graphCenterY - state.graphHeight / 2 + (state.graphHeight * (blackValueX - state.x_1)) / (state.y_1 - state.x_1),
+    );
+    pop();
+    text(
+      "X1: " + state.x_1.toFixed(2),
+      state.graphCenterX + 660,
+      state.graphCenterY + (state.graphHeight * (blackValueX - state.x_1)) / (2 * (state.y_1 - state.x_1)),
+    );
+    text(
+      "Y1: " + state.y_1.toFixed(2),
+      state.graphCenterX + 660,
+      state.graphCenterY - (state.graphHeight * (state.y_1 - blackValueX)) / (2 * (state.y_1 - state.x_1)),
+    );
+  } else if (TyBisection(blackValueX, pressure, state.positiveA12Value, state.positiveA21Value) > blackValueY) {
+    state.x_1 = blackValueX;
+    state.y_1 = 0;
+    push();
+    rectMode(CENTER);
+    noStroke();
+    fill("blue");
+    rect(state.graphCenterX + 660, state.graphCenterY, state.graphWidth / 4, state.graphHeight);
+    pop();
+    text("X1: " + state.x_1.toFixed(2), state.graphCenterX + 660, state.graphCenterY);
+  } else if (blackValueY > TxBisection(blackValueX, pressure, state.positiveA12Value, state.positiveA21Value)) {
+    state.x_1 = 0;
+    state.y_1 = blackValueX;
+    push();
+    rectMode(CENTER);
+    noStroke();
+    fill("green");
+    rect(state.graphCenterX + 660, state.graphCenterY, state.graphWidth / 4, state.graphHeight);
+    pop();
+    text("Y1: " + state.y_1.toFixed(2), state.graphCenterX + 660, state.graphCenterY);
+  }
+
+  //outer box, tick marks and text
+  push();
+
+  rectMode(CENTER);
+  stroke("black");
+  noFill();
+  strokeWeight(1);
+  rect(state.graphCenterX + 660, state.graphCenterY, state.graphWidth / 4, state.graphHeight);
+
+  textAlign(CENTER, CENTER);
+  fill("black");
+  noStroke();
+  translate(state.graphCenterX + 470, state.graphCenterY);
+  rotate((3 * PI) / 2);
+  text("liquid and vapor amounts (mol)", 0, 0);
+
+  pop();
+
+  for (let i = state.graphCenterY - state.graphHeight / 2; i < state.graphCenterY + state.graphHeight / 2 - 1; i += state.graphHeight / 20) {
+    push();
+    stroke("black");
+    strokeWeight(2);
+    line(state.graphCenterX + 660 - state.graphWidth / 8, i, state.graphCenterX + 660 - state.graphWidth / 8 + 5, i);
+    pop();
+  }
+
+  for (
+    let i = state.graphCenterY - state.graphHeight / 2 - state.graphHeight / 5;
+    i <= state.graphCenterY + state.graphHeight / 2 - 1;
+    i += state.graphHeight / 5
+  ) {
+    push();
+    stroke("black");
+    strokeWeight(2);
+    line(state.graphCenterX + 660 - state.graphWidth / 8, i, state.graphCenterX + 660 - state.graphWidth / 8 + 10, i);
+    pop();
+
+    push();
+    textAlign(CENTER, CENTER);
+    textSize(32);
+    noStroke();
+    fill("black");
+    text(
+      (0.8 - (i - (state.graphCenterY - state.graphHeight / 2)) / state.graphHeight).toFixed(1),
+      state.graphCenterX + 660 - state.graphWidth / 8 - 32,
+      i + state.graphHeight / 5,
+    );
+    pop();
+  }
+
+  pop();
+}
+
+function drawTxyRightGraphNegative() {
+  //calculated mouse VLE values
+  push();
+
+  let blackValueX = 1 + (blackCircleX - state.graphCenterX - state.graphWidth / 2) / state.graphWidth;
+  let blackValueY = (90 - 140) * ((blackCircleY - state.graphCenterY - state.graphHeight / 2) / state.graphHeight) + 90;
+
+  textAlign(CENTER, CENTER);
+  textSize(32);
+  fill("white");
+  noStroke();
+
+  if (
+    TyBisection(blackValueX, pressure, state.negativeA12Value, state.negativeA21Value) > blackValueY &&
+    blackValueY > TxBisection(blackValueX, pressure, state.negativeA12Value, state.negativeA21Value)
+  ) {
+    state.x_1 = state.TxNegative.reduce((prev, curr) => (Math.abs(curr.y - blackValueY) < Math.abs(prev.y - blackValueY) ? curr : prev)).x;
+
+    state.y_1 = state.TyNegative.reduce((prev, curr) => (Math.abs(curr.y - blackValueY) < Math.abs(prev.y - blackValueY) ? curr : prev)).x;
+    push();
+    rectMode(CORNERS);
+    noStroke();
+    fill("green");
+    rect(
+      state.graphCenterX + 660 - state.graphWidth / 8,
+      state.graphCenterY - state.graphHeight / 2,
+      state.graphCenterX + 660 + state.graphWidth / 8,
+      state.graphCenterY + state.graphHeight / 2 - (state.graphHeight * (state.y_1 - blackValueX)) / (state.y_1 - state.x_1),
+    );
+    fill("blue");
+    rect(
+      state.graphCenterX + 660 - state.graphWidth / 8,
+      state.graphCenterY + state.graphHeight / 2,
+      state.graphCenterX + 660 + state.graphWidth / 8,
+      state.graphCenterY - state.graphHeight / 2 + (state.graphHeight * (blackValueX - state.x_1)) / (state.y_1 - state.x_1),
+    );
+    pop();
+    text(
+      "X1: " + state.x_1.toFixed(2),
+      state.graphCenterX + 660,
+      state.graphCenterY + (state.graphHeight * (blackValueX - state.x_1)) / (2 * (state.y_1 - state.x_1)),
+    );
+    text(
+      "Y1: " + state.y_1.toFixed(2),
+      state.graphCenterX + 660,
+      state.graphCenterY - (state.graphHeight * (state.y_1 - blackValueX)) / (2 * (state.y_1 - state.x_1)),
+    );
+  } else if (TyBisection(blackValueX, pressure, state.negativeA12Value, state.negativeA21Value) > blackValueY) {
+    state.x_1 = blackValueX;
+    state.y_1 = 0;
+    push();
+    rectMode(CENTER);
+    noStroke();
+    fill("blue");
+    rect(state.graphCenterX + 660, state.graphCenterY, state.graphWidth / 4, state.graphHeight);
+    pop();
+    text("X1: " + state.x_1.toFixed(2), state.graphCenterX + 660, state.graphCenterY);
+  } else if (blackValueY > TxBisection(blackValueX, pressure, state.negativeA12Value, state.negativeA21Value)) {
+    state.x_1 = 0;
+    state.y_1 = blackValueX;
+    push();
+    rectMode(CENTER);
+    noStroke();
+    fill("green");
+    rect(state.graphCenterX + 660, state.graphCenterY, state.graphWidth / 4, state.graphHeight);
+    pop();
+    text("Y1: " + state.y_1.toFixed(2), state.graphCenterX + 660, state.graphCenterY);
+  }
+
+  //outer box, tick marks and text
+  push();
+
+  rectMode(CENTER);
+  stroke("black");
+  noFill();
+  strokeWeight(1);
+  rect(state.graphCenterX + 660, state.graphCenterY, state.graphWidth / 4, state.graphHeight);
+
+  textAlign(CENTER, CENTER);
+  fill("black");
+  noStroke();
+  translate(state.graphCenterX + 470, state.graphCenterY);
+  rotate((3 * PI) / 2);
+  text("liquid and vapor amounts (mol)", 0, 0);
+
+  pop();
+
+  for (let i = state.graphCenterY - state.graphHeight / 2; i < state.graphCenterY + state.graphHeight / 2 - 1; i += state.graphHeight / 20) {
+    push();
+    stroke("black");
+    strokeWeight(2);
+    line(state.graphCenterX + 660 - state.graphWidth / 8, i, state.graphCenterX + 660 - state.graphWidth / 8 + 5, i);
+    pop();
+  }
+
+  for (
+    let i = state.graphCenterY - state.graphHeight / 2 - state.graphHeight / 5;
+    i <= state.graphCenterY + state.graphHeight / 2 - 1;
+    i += state.graphHeight / 5
+  ) {
+    push();
+    stroke("black");
+    strokeWeight(2);
+    line(state.graphCenterX + 660 - state.graphWidth / 8, i, state.graphCenterX + 660 - state.graphWidth / 8 + 10, i);
+    pop();
+
+    push();
+    textAlign(CENTER, CENTER);
+    textSize(32);
+    noStroke();
+    fill("black");
+    text(
+      (0.8 - (i - (state.graphCenterY - state.graphHeight / 2)) / state.graphHeight).toFixed(1),
+      state.graphCenterX + 660 - state.graphWidth / 8 - 32,
+      i + state.graphHeight / 5,
+    );
+    pop();
+  }
+
+  pop();
+}
+
 function drawTxyLeftGraph() {
   push();
 
@@ -413,55 +892,6 @@ function drawTxyLeftGraph() {
   pop();
 }
 
-function drawTxyRightGraph() {
-  push();
-
-  rectMode(CENTER);
-  stroke("black");
-  strokeWeight(1);
-  rect(state.graphCenterX + 660, state.graphCenterY, state.graphWidth / 4, state.graphHeight);
-
-  pop();
-
-  for (let i = state.graphCenterY - state.graphHeight / 2; i < state.graphCenterY + state.graphHeight / 2 - 1; i += state.graphHeight / 20) {
-    push();
-    stroke("black");
-    strokeWeight(1);
-    line(state.graphCenterX + 660 - state.graphWidth / 8, i, state.graphCenterX + 660 - state.graphWidth / 8 + 5, i);
-    pop();
-  }
-
-  for (
-    let i = state.graphCenterY - state.graphHeight / 2 - state.graphHeight / 5;
-    i <= state.graphCenterY + state.graphHeight / 2 - 1;
-    i += state.graphHeight / 5
-  ) {
-    push();
-    stroke("black");
-    strokeWeight(1);
-    line(state.graphCenterX + 660 - state.graphWidth / 8, i, state.graphCenterX + 660 - state.graphWidth / 8 + 10, i);
-    pop();
-
-    push();
-    textAlign(CENTER, CENTER);
-    textSize(32);
-    noStroke();
-    fill("black");
-    text(
-      (0.8 - (i - (state.graphCenterY - state.graphHeight / 2)) / state.graphHeight).toFixed(1),
-      state.graphCenterX + 660 - state.graphWidth / 8 - 32,
-      i + state.graphHeight / 5,
-    );
-    pop();
-  }
-}
-
-// Vars for drawMouseDist()
-let blackCircleX = 100;
-let blackCircleY = 100;
-
-let mousePressedInCircle = false;
-
 function drawMouseDist() {
   textAlign(CENTER);
   textSize(16);
@@ -482,11 +912,6 @@ function drawMouseDist() {
   } else {
     mousePressedInCircle = false;
   }
-
-  state.x_1 = 1 + (blackCircleX - state.graphCenterX - state.graphWidth / 2) / state.graphWidth;
-  state.y_1 = 1 + (blackCircleX - state.graphCenterX - state.graphWidth / 2) / state.graphWidth;
-
-  text(state.x_1, blackCircleX, blackCircleY - 30);
 
   push();
   fill("black");
@@ -618,10 +1043,6 @@ function drawMouseDist() {
 }
 
 function drawGraphLinesPxyPositive() {
-  console.log(Px(0, 110, state.positiveA12Value, state.positiveA21Value));
-  console.log(Px(0.5, 110, state.positiveA12Value, state.positiveA21Value));
-  console.log(Px(1, 110, state.positiveA12Value, state.positiveA21Value));
-
   push();
   strokeWeight(3);
   stroke("blue");

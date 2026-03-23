@@ -34,8 +34,10 @@ window.state = {
   gamma2: 0,
   Px: 0,
   Py: 0,
-  Tx: 0,
-  Ty: 0,
+  TxPositive: [],
+  TyPositive: [],
+  TxNegative: [],
+  TyNegative: [],
   A21: 0,
   A12: 0,
 

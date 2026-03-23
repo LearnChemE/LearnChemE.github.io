@@ -31,21 +31,11 @@ export function Py(x, temp, A12, A21) {
   return 1 / (x / (gamma1(x, A12, A21) * Psat1(temp)) + (1 - x) / (gamma2(x, A12, A21) * Psat2(temp)));
 }
 
-//this is the bubble point
-export function TxRootFxn(x, pressure, A12, A21) {
-  return 1;
-}
-
-//this is the dew point
-export function TyRootFxn(x, pressure, A12, A21) {
-  return 1;
-}
-
 export function TxBisection(x, pressure, A12, A21) {
-  let low = 0;
-  let high = 1000;
+  let low = 80;
+  let high = 150;
   let mid = (low + high) / 2;
-  while (high - low > 0.0001) {
+  while (high - low > 0.01) {
     if (Px(x, mid, A12, A21) > pressure) {
       high = mid;
     } else {
@@ -57,11 +47,41 @@ export function TxBisection(x, pressure, A12, A21) {
 }
 
 export function TyBisection(x, pressure, A12, A21) {
-  let low = 0;
-  let high = 1000;
+  let low = 80;
+  let high = 150;
   let mid = (low + high) / 2;
-  while (high - low > 0.0001) {
+  while (high - low > 0.01) {
     if (Py(x, mid, A12, A21) > pressure) {
+      high = mid;
+    } else {
+      low = mid;
+    }
+    mid = (low + high) / 2;
+  }
+  return mid;
+}
+
+export function Px_xVal(y, temp, A12, A21) {
+  let low = 0.5;
+  let high = 2.6;
+  let mid = (low + high) / 2;
+  while (high - low > 0.01) {
+    if (Px(mid, temp, A12, A21) > y) {
+      high = mid;
+    } else {
+      low = mid;
+    }
+    mid = (low + high) / 2;
+  }
+  return mid;
+}
+
+export function Py_xVal(y, temp, A12, A21) {
+  let low = 0.5;
+  let high = 2.75;
+  let mid = (low + high) / 2;
+  while (high - low > 0.01) {
+    if (Py(mid, temp, A12, A21) > y) {
       high = mid;
     } else {
       low = mid;
