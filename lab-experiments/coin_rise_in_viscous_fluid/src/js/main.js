@@ -6,6 +6,7 @@ let animId = null;
 let lastTs = null;
 let isFalling = false;
 let orientationLocked = false; // once motion starts, orientation stays locked until reset
+let atTop = false; // coin has reached the top; only reset should allow another run
 let lineData = null;
 const vesselX = 375;
 const vesselY = 125;
@@ -180,6 +181,18 @@ function drawCoin(svg, cx, topY, diameter = 2.426 * 14, opts = {}) {
   return holder;
 }
 
+function resetRotTransform(rot) {
+  // Reset to a known base transform to avoid cumulative rotation drift
+  rot.transform({
+    rotation: 0,
+    scaleX: 1,
+    scaleY: 1,
+    skewX: 0,
+    skewY: 0,
+    translateX: 0,
+    translateY: 0,
+  });
+}
 
 function initOrientationControl(targetCoin, svg) {
   const sel = document.getElementById('volume-select');
@@ -201,14 +214,22 @@ function initOrientationControl(targetCoin, svg) {
     const cy = bbox.cy;
 
     if (requested === 'face-down') {
-      rot.rotate(-90, cx, cy);
-      rot.move(bbox.x, bbox.y - 2.426 * 7);
+      resetRotTransform(rot);
+      const base = rot.bbox();
+      const baseCx = base.cx;
+      const baseCy = base.cy;
+      rot.rotate(-90, baseCx, baseCy);
+      rot.move(base.x, base.y - 2.426 * 7);
       terminalVelocity = 0.095;
       lineData.remove();
       lineData = svg.line(457.5 - margin, 587, 457.5 - margin, 510).stroke({ width: 1, color: '#000' });
     } else if (requested === 'edge-on') {
-      rot.rotate(90, cx, cy);
-      rot.move(bbox.x + 2.426 * 7, bbox.y);
+      resetRotTransform(rot);
+      const base = rot.bbox();
+      const baseCx = base.cx;
+      const baseCy = base.cy;
+      rot.rotate(90, baseCx, baseCy);
+      rot.move(base.x + 2.426 * 7, base.y);
       lineData.remove();
       lineData = svg.line(457.5 - margin, 587, 457.5 - margin, 543).stroke({ width: 1, color: '#000' });
       terminalVelocity = 0.14;
@@ -243,7 +264,7 @@ export function initReleaseButton(svg, coin) {
 }
 
 function startAnimation(svg, coin) {
-  if (isFalling) return; // prevent multiple RAF loops
+  if (isFalling || atTop) return; // prevent multiple RAF loops or re-run at top
   isFalling = true;
   lastTs = null;
 
@@ -267,6 +288,7 @@ function startAnimation(svg, coin) {
     const distPx = - coin.bbox().cy + startY;
     if (distPx >= 25 * pxPerCm) {
       stopAnimation();
+      atTop = true;
       const btn = document.getElementById('release-button');
       if (btn) {
         btn.textContent = "Release";
@@ -309,6 +331,7 @@ function stopAnimation() {
 
 export function reset(draw) {
   stopAnimation();
+  atTop = false;
   const btn = document.getElementById('release-button');
   const sel = document.getElementById('volume-select');
   if (btn) {
@@ -326,6 +349,7 @@ export function reset(draw) {
     // Reset rotation/orientation to face-down
     const rot = coin.remember('rot');
     if (rot) {
+      resetRotTransform(rot);
       const bbox = rot.bbox();
       rot.rotate(-90, bbox.cx, bbox.cy);
       rot.move(bbox.x, bbox.y + 14);

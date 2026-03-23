@@ -233,7 +233,7 @@ export function initOverlayButtonsForNewIndex() {
         { id: 'directions', label: 'Directions', url: 'html/overlay/directions.html', action: 'modal', modalId: 'directions' },
         { id: 'details',    label: 'Details',    url: 'html/overlay/details.html',    action: 'modal', modalId: 'details'    },
         { id: 'about',      label: 'About',      url: 'html/overlay/about.html',      action: 'modal', modalId: 'about'      },
-        { id: 'worksheet',  label: 'Worksheet',  url: 'assets/worksheet.pdf',action: 'download', filename: '3D Printed Quarter: Face-Down vs. Edge-On Rising Worksheet.pdf' }
+        { id: 'worksheet',  label: 'Worksheet',  url: 'assets/worksheet.pdf',action: 'download', filename: 'Coin Rise in Viscous Fluid Worksheet.pdf' }
     ];
     // configs.forEach(cfg => {
     //     const el = document.getElementById(cfg.id);
