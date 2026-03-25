@@ -62,21 +62,22 @@ export type Stream = {
     ppm: number;
 }
 
-const L_PER_STAGE = 5; // L
+const MAX_VOL_STAGE = 5; // L
 class Stage {
     private liqOut: Stream = { ndot: 0, ppm: FEED_PPM };
     private vapOut: Stream = { ndot: 0, ppm: 0 };
 
     private liqIn: () => Stream;
     private vapIn: (() => Stream) | null = null;
-    private leff: number;
-    private reff: number;
+    private eff: number;
+
+    private fill = 0;
+    private mixedFrac = 0;
 
     constructor(liqIn: () => Stream, efficiency = 1) {
         this.liqIn = liqIn;
 
-        this.leff = efficiency;
-        this.reff = efficiency;
+        this.eff = efficiency;
     }
 
     public setVapIn(vapIn: () => Stream) {
@@ -107,7 +108,7 @@ export class ColumnCalc {
     private setUpdated: Setter<boolean>;
 
     constructor(numStages: number, liqFeed: () => Stream, gasFeed: () => Stream) {
-        const eff = numStages === 1 ? 1 : stageEfficiency();
+        const eff = stageEfficiency();
         this.stages = [];
         // Construct stages with appropriate feed streams.
         this.stages.push(new Stage(liqFeed, eff));

@@ -95,16 +95,13 @@ export const Column: Component<ColumnProps> = (props) => {
 
             {/* Stages */}
             <g id="stages" transform={`translate(330 92)`}>
-                <For each={[...Array(numberOfStages()).keys()]}>{(stageIndex) => (
-                    <g id={`stage-${stageIndex}`} transform={`translate(0 ${STAGE_HEIGHT * stageIndex})`}>
-                        <mask id="path-1-inside-1_34_234" fill="white">
-                        <path d="M0 0H60V32H0V0Z"/>
-                        </mask>
-                        <path d="M0 0H60V32H0V0Z" fill="url(#paint0_linear_34_234)"/>
-                        <path d="M60 0H59V32H60H61V0H60ZM0 32H1V0H0H-1V32H0Z" fill="black" mask="url(#path-1-inside-1_34_234)"/>
-                        <line y1="31.5" x2="60" y2="31.5" stroke="black" stroke-dasharray="3 1"/>
-                    </g>
-                )}</For>
+                <For each={[...Array(numberOfStages()).keys()]}>
+                    {(stageIndex) => (
+                        <g id={`stage-${stageIndex}`} transform={`translate(0 ${STAGE_HEIGHT * stageIndex})`}>
+                            <Stage flip={stageIndex % 2 === 1} />
+                        </g>
+                    )}
+                </For>
             </g>
 
             {/* Bottom */}
@@ -114,7 +111,57 @@ export const Column: Component<ColumnProps> = (props) => {
                 <path d="M64.5 0C64.5 9.5 69.5 9.5 69.5 19C69.5 28.5 69.5 37.5 69.5 37.5H0.500001C0.500001 37.5 0.499998 28.5 0.5 19C0.500002 9.5 5.5 9.5 5.5 0" stroke="black"/>
                 <path d="M4 48.5H66C67.933 48.5 69.5 46.933 69.5 45V37.5H0.5V45C0.5 46.933 2.067 48.5 4 48.5Z" fill="url(#paint3_linear_12_111)" stroke="black"/>
             </g>
+
+
+<defs>
+<linearGradient id="paint0_linear_133_34" x1="-6" y1="16" x2="64.5" y2="16" gradientUnits="userSpaceOnUse">
+<stop stop-color="#305789" stop-opacity="0.6"/>
+<stop offset="0.625" stop-color="#D9D9D9" stop-opacity="0"/>
+<stop offset="1" stop-color="#305789" stop-opacity="0.6"/>
+</linearGradient>
+</defs>
         </g>
     );
 }
 
+type StageProps = {
+    flip: boolean;
+}
+
+const Stage: Component<StageProps> = (props) => {
+
+
+
+return (<>
+<g transform={props.flip ? "scale(-1,1) translate(-60, 0)" : ""}>
+    <rect x="4" y="1" width="52" height="5" fill="#398CF9" fill-opacity="0.6"/>
+    <mask id="path-2-inside-1_133_34" fill="white">
+    <path d="M0 0H60V32H0V0Z"/>
+    </mask>
+    <line x1="10" y1="6.5" x2="56" y2="6.5" stroke="black" stroke-dasharray="3 1"/>
+    <line y1="6.5" x2="10" y2="6.5" stroke="black"/>
+    <line x1="55.5" y1="28" x2="55.5" y2="2" stroke="black"/>
+    <rect x="56" y="1" width="3" height="37" fill="#398CF9" fill-opacity="0.6"/>
+</g>
+<path d="M0 0H60V32H0V0Z" fill="url(#paint0_linear_133_34)"/>
+<path d="M60 0H59V32H60H61V0H60ZM0 32H1V0H0H-1V32H0Z" fill="black" mask="url(#path-2-inside-1_133_34)"/>
+</>);
+}
+
+{/* <rect width="52" height="5" transform="matrix(-1 0 0 1 56 1)" fill="#398CF9" fill-opacity="0.6"/>
+<mask id="path-2-inside-1_133_41" fill="white">
+<path d="M60 0H0V32H60V0Z"/>
+</mask>
+<path d="M60 0H0V32H60V0Z" fill="url(#paint0_linear_133_41)"/>
+<path d="M0 0H1V32H0H-1V0H0ZM60 32H59V0H60H61V32H60Z" fill="black" mask="url(#path-2-inside-1_133_41)"/>
+<line y1="-0.5" x2="46" y2="-0.5" transform="matrix(-1 0 0 1 50 7)" stroke="black" stroke-dasharray="3 1"/>
+<line y1="-0.5" x2="10" y2="-0.5" transform="matrix(-1 0 0 1 60 7)" stroke="black"/>
+<line y1="-0.5" x2="26" y2="-0.5" transform="matrix(0 -1 -1 0 4 28)" stroke="black"/>
+<rect width="3" height="37" transform="matrix(-1 0 0 1 4 1)" fill="#398CF9" fill-opacity="0.6"/> */}
+{/* <defs>
+<linearGradient id="paint0_linear_133_41" x1="66" y1="16" x2="-4.5" y2="16" gradientUnits="userSpaceOnUse">
+<stop stop-color="#305789" stop-opacity="0.6"/>
+<stop offset="0.375" stop-color="#D9D9D9" stop-opacity="0"/>
+<stop offset="1" stop-color="#305789" stop-opacity="0.6"/>
+</linearGradient>
+</defs> */}

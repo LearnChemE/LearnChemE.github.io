@@ -425,3 +425,26 @@ export function transpose(arr: number[][]) {
     }
     return grid;
 }
+
+export function repeatClick(fn: () => void, initialDelay: number = 600, successiveDelay: number = 200) {
+    let playing = true;
+
+    // Cleanup when pointer is released
+    const clean = () => {
+        playing = false;
+        document.removeEventListener("pointerup", clean);
+    }
+    document.addEventListener("pointerup", clean);
+
+    // Wrapper for successive presses
+    const fnCaller = () => {
+        if (!playing) return;
+        fn();
+        // Set next delay
+        window.setTimeout(fnCaller, successiveDelay);
+    };
+    // Initial Press
+    fn();
+    // Next press
+    window.setTimeout(fnCaller, initialDelay);
+}

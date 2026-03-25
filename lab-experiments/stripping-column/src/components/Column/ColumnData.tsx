@@ -26,7 +26,7 @@ export const ColumnData: Component<ColumnDataProps> = (props) => {
                 <circle cx="0" cy="0" r="2.5" fill="white"/>
             </g>
         </g>
-        <g transform={`translate(401 ${112 + paddingTop() + i() * 32})`} ref={rrefs[i()]}> 
+        <g transform={`translate(401 ${106 + paddingTop() + i() * 32})`} ref={rrefs[i()]}> 
             <g class="col-data-anchor">
                 <circle cx="0" cy="0" r="16" fill="red" opacity={0}/>
                 <circle cx="0" cy="0" r="4" fill="white"/>

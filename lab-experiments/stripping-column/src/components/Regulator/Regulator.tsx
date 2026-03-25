@@ -1,5 +1,5 @@
 import { createMemo, type Accessor, type Component, type Setter } from "solid-js";
-import { getAngleFromDown, getSVGCoords, MAX_PRESSURE, paddedHeight, } from "../../globals";
+import { constrain, getAngleFromDown, getSVGCoords, MAX_PRESSURE, paddedHeight, } from "../../globals";
 
 type RegulatorProps = {
     inPres: Accessor<number>;
@@ -12,16 +12,15 @@ const minAngle = -135;
 const maxAngle = 135;
 
 export const Regulator: Component<RegulatorProps> = (props) => {
-    const x = 159;
-    const y = createMemo(() => paddedHeight() + 10);
+    const x = 474;
+    const y = createMemo(() => paddedHeight() + 142);
 
     const rAngle = createMemo(() => minAngle + (maxAngle - minAngle) * props.inPres() / MAX_PRESSURE);
     const lAngle = createMemo(() => minAngle + (maxAngle - minAngle) * props.outPres() / MAX_PRESSURE);
 
-
-    const maxAngle_knob = -720; // Degrees for fully open
-    const cx = 25.5;
-    const cy = 36;
+    const maxAngle_knob = 720; // Degrees for fully open
+    const cx = 18;
+    const cy = 27;
 
     // State
     const currentAngle_knob = createMemo(() => props.gasSP() * maxAngle_knob / MAX_PRESSURE); // in pixels, range from 0 (closed) to 20 (fully open)
@@ -45,7 +44,7 @@ export const Regulator: Component<RegulatorProps> = (props) => {
         // Calculate angle change
         const angle = currentAngle_knob();
         const svgMozCoords = getSVGCoords(e);
-        const th = getAngleFromDown({ x: cx + x(), y: cy + y() }, { x: svgMozCoords.x, y: svgMozCoords.y });
+        const th = getAngleFromDown({ x: cx + x, y: cy + y() }, { x: svgMozCoords.x, y: svgMozCoords.y });
         let deltaTh = th - prevTh; // Positive if moving up
         if (Math.abs(deltaTh) > 180) {
             // Handle wrap-around
@@ -60,12 +59,12 @@ export const Regulator: Component<RegulatorProps> = (props) => {
 
         // Update angle with clamping
         let newAngle = angle + deltaTh;
-        newAngle = Math.min(0, Math.max(maxAngle_knob, newAngle)); // Clamp between 0 and 20
-        console.log(angle, newAngle)
 
         // Update state and callback if changed
         if (newAngle !== angle) {
-            props.setGasSP(newAngle * MAX_PRESSURE / maxAngle);
+            let sp = newAngle * MAX_PRESSURE / maxAngle_knob;
+            sp = constrain(sp, 0, MAX_PRESSURE);
+            props.setGasSP(sp);
         }
         
         // Update previous angle
@@ -80,7 +79,7 @@ export const Regulator: Component<RegulatorProps> = (props) => {
     };
 
     return (<>
-    <g transform={`translate(474, ${paddedHeight() + 142})`}>
+    <g transform={`translate(${x}, ${y()})`}>
 <rect x="33.5" y="23.5" width="4" height="7" rx="0.5" fill="#C8AA3C" stroke="black"/>
 <rect x="0.5" y="23.5" width="3" height="7" rx="0.5" fill="#989898" stroke="black"/>
 <rect x="28.5" y="24.5" width="5" height="5" fill="#C8AA3C" stroke="black"/>
@@ -167,7 +166,7 @@ export const Regulator: Component<RegulatorProps> = (props) => {
     <path d="M28 7.625C28.2071 7.625 28.375 7.79289 28.375 8C28.375 8.20711 28.2071 8.375 28 8.375C27.7929 8.375 27.625 8.20711 27.625 8C27.625 7.79289 27.7929 7.625 28 7.625Z" fill="#C8AA3C" stroke="black" stroke-width="0.25"/>
 </g>
 {/* Knob */}
-<g class="globeValveHandle drag-exempt" onPointerDown={beginDrag} transform={`rotate(${currentAngle_knob()}, 10, 10)`}>
+<g class="globeValveHandle drag-exempt" onPointerDown={beginDrag} transform={`rotate(${currentAngle_knob()}, ${cx}, ${cy})`}>
 <mask id="path-80-inside-1_123_75" fill="white">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M18.9999 18C19.5522 18 19.9999 18.4477 19.9999 19V19.252C21.4295 19.6198 22.7039 20.3735 23.707 21.3945L23.9286 21.2676C24.4069 20.9917 25.0188 21.1556 25.2949 21.6338L26.2949 23.3662C26.5708 23.8445 26.4069 24.4563 25.9286 24.7324L25.7079 24.8594C25.8968 25.5409 25.9999 26.2583 25.9999 27C25.9999 27.7413 25.8967 28.4584 25.7079 29.1396L25.9286 29.2676C26.4068 29.5437 26.5708 30.1555 26.2949 30.6338L25.2949 32.3662C25.0188 32.8444 24.4069 33.0084 23.9286 32.7324L23.707 32.6045C22.7038 33.6258 21.4297 34.3801 19.9999 34.748V35C19.9999 35.5523 19.5522 36 18.9999 36H16.9999C16.4478 35.9998 15.9999 35.5522 15.9999 35V34.7471C14.5703 34.379 13.2959 33.6258 12.2929 32.6045L12.0722 32.7324C11.5939 33.0085 10.9821 32.8444 10.706 32.3662L9.70599 30.6338C9.43001 30.1555 9.59397 29.5437 10.0722 29.2676L10.2919 29.1396C10.1032 28.4584 9.99994 27.7413 9.99994 27C9.99994 26.2584 10.1031 25.5409 10.2919 24.8594L10.0722 24.7324C9.59396 24.4563 9.42997 23.8445 9.70599 23.3662L10.706 21.6338C10.9821 21.1556 11.594 20.9915 12.0722 21.2676L12.2929 21.3945C13.2959 20.3734 14.5705 19.6199 15.9999 19.252V19C16 18.4479 16.4478 18.0002 16.9999 18H18.9999Z"/>
 </mask>

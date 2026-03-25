@@ -1,6 +1,6 @@
-import { batch, createMemo, createSignal, Match, Show, Switch } from 'solid-js'
+import { batch, createEffect, createMemo, createSignal, Match, Show, Switch } from 'solid-js'
 import './App.css'
-// import { PlotlyChart } from './components/PlotlyChart'
+import { PlotlyChart } from './components/PlotlyChart'
 import { ControlButton } from './components/ControlButton/ControlButton'
 import { SVGCanvas } from './components/SVGCanvas/SVGCanvas'
 import Background from './components/Background/Background'
@@ -22,6 +22,8 @@ import { FEED_MAX_RATE, INIT_FEED_LIFT, INIT_GAS_SP } from './globals/config'
 import TopPipes from './components/TopPipes/TopPipes'
 import { Regulator } from './components/Regulator/Regulator'
 import { TankValve } from './components/TankValve/TankValve'
+import { Controller } from './components/Controller/Controller'
+import { ColumnContextProvider } from './globals'
 
 function App() {
   // Liquid feed
@@ -41,6 +43,14 @@ function App() {
   const [showMenu, setShowMenu] = createSignal(true);
   const [lockStages, setLockStages] = createSignal(false);
 
+  // Lock in the stages when solvent is first turned on
+  createEffect(() => {
+    if (!lockStages() && (feedIsOn() || gasLinePressurized() > 0)) {
+      setShowMenu(false);
+      setLockStages(true);
+    }
+  });
+
   const reset = () => {
     batch(() => {
       setGasLinePressurized(0);
@@ -52,16 +62,17 @@ function App() {
   }
 
   return (
-    <>
+    <ColumnContextProvider>
       <div class="canvas-container">
         <SVGCanvas width={700} height={560} defs={Defs}>
           <Background />
           <Bucket x={225} y={() => 257 + paddedHeight()} />
           <TopPipes />
           <Pipes />
-          <Regulator inPres={gasLinePressurized} outPres={gasPressure} gasSP={gasSP} setGasSP={setGasSP} />
+          <Regulator inPres={gasLinePressurized} outPres={gasPressure} gasSP={pressureSP} setGasSP={setPressureSP} />
           <PowerSwitch x={134} y={321 + paddedHeight()} label="feed" isOn={feedIsOn} setIsOn={setFeedIsOn} />
           <TankValve pressure={gasLinePressurized} setPressure={setGasLinePressurized} />
+          <Controller gasSP={gasSP} setGasSP={setGasSP} />
           
           <Column gasIn={gasRate} feedIn={feedRate} />
           <Rotameter flowrate={feedRate} flowrange={[0, FEED_MAX_RATE]} x={145} y={64 + paddedHeight()} />
@@ -89,8 +100,8 @@ function App() {
           </Match>
         </Switch>
       </div>
-      {/* <PlotlyChart /> */}
-    </>
+      <PlotlyChart />
+    </ColumnContextProvider>
   )
 }
 

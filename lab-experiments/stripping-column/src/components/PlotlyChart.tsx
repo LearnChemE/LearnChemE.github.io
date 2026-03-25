@@ -1,9 +1,7 @@
 import Plotly from "plotly.js-dist-min";
 import { createEffect, createMemo, onCleanup, onMount, useContext, type Component } from "solid-js"
 import { ColumnContext } from "../globals/";
-import { transpose } from "../globals/";
 import { numberOfStages } from "../globals/";
-import { FEED_PPM } from "../globals/";
 
 interface PlotlyChartProps {
     // data: () => Profile,
@@ -12,22 +10,12 @@ interface PlotlyChartProps {
 };
 
 export const PlotlyChart: Component<PlotlyChartProps> = ({ layout, config }) => {
-    const env = transpose(envelope);
+    // const env = transpose(envelope);
     const data = [{
             x: [0, 1],
             y: [1, 0],
             type: 'scatter',
             line: { color: "black" }
-        }, {
-            x: env[0],
-            y: env[1],
-            type: 'scatter',
-            line: { color: "black" }
-        }, {
-            x: [0, FEED_COMP[0]],
-            y: [0, FEED_COMP[1]],
-            type: 'markers',
-            marker: { color: "blue", size: 8 }
         }];
 
     const columnCtx = useContext(ColumnContext);
@@ -57,12 +45,10 @@ export const PlotlyChart: Component<PlotlyChartProps> = ({ layout, config }) => 
             const col = columnCtx!.column!;
             const n = numberOfStages();
             for (let i = 0; i < n; i++) {
-                const raf = col.viewComposition(i, "raffinate");
-                x_test.push(raf[0]);
-                y_test.push(raf[1]);
-                const ext = col.viewComposition(i, "extract");
-                x_test.push(ext[0]);
-                y_test.push(ext[1]);
+                const liq = col.viewPPM(i, "liquid");
+                const vap = col.viewPPM(i, "vapor");
+                x_test.push(liq);
+                y_test.push(vap);
                 // console.table({idx: i, raf, ext});
             }
 

@@ -43,14 +43,13 @@ export const TankValve: Component<TankValveProps> = (props) => {
             }
 
             props.setPressure(p);
-            console.log(p, MAX_PRESSURE, rotation())
             return playing;
         }
 
         animate(frame);
     }
 
-    return (<g transform={`translate(517.5, ${153 + paddedHeight()})`} 
+    return (<g transform={`translate(517.5, ${153 + paddedHeight()})`}
         class="drag-exempt globeValveHandle"
         onClick={start}>
     <rect x="0" y="1" width={VALVE_WIDTH} height="9" rx="2.5" fill="#67A8EF" stroke="black"/>
