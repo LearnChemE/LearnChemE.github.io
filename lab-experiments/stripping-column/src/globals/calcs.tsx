@@ -21,15 +21,15 @@ export const ColumnContextProvider = (props: { children: any }) => {
     );
 }
 
-function intersection(line1: { slope: number, intercept: number }, line2: { slope: number, intercept: number }) {
-    if (line1.slope === line2.slope) {
-        return null; // Lines are parallel
-    }
+// function intersection(line1: { slope: number, intercept: number }, line2: { slope: number, intercept: number }) {
+//     if (line1.slope === line2.slope) {
+//         return null; // Lines are parallel
+//     }
 
-    const x = (line2.intercept - line1.intercept) / (line1.slope - line2.slope);
-    const y = line1.slope * x + line1.intercept;
-    return [x, y];
-}
+//     const x = (line2.intercept - line1.intercept) / (line1.slope - line2.slope);
+//     const y = line1.slope * x + line1.intercept;
+//     return [x, y];
+// }
 
 // export function separate(x: number, y: number): number[] {
 //     const tieline = findTieline(x, y);
@@ -46,10 +46,6 @@ function intersection(line1: { slope: number, intercept: number }, line2: { slop
 //     return intersections; // Return in order of decreasing chloroform concentration
 // }
 
-const CONC_PURE_AA = 1.05 / 60.05; // mol / cm3
-const CONC_PURE_C  = 1.49 / 119.378; // mol / cm3
-const CONC_PURE_W  = 1.00 / 18.01; // mol / cm3
-
 // export function molarMass(comp: Composition) {
 //     const xc = comp[0];
 //     const xa = comp[1];
@@ -57,12 +53,22 @@ const CONC_PURE_W  = 1.00 / 18.01; // mol / cm3
 //     return xc * MM_C + xa * MM_AA + xw * MM_W; // g solution / 1 mol
 // }
 
+// Constants to be used
+const Ea = 5000;
+const R = 8.314;
+const T0 = 298;
+const H0 = 211.19;
+export function Henrys(T: number) {
+    return H0 * Math.exp(-Ea / R * (1 / (T + 273) - 1 / T0));
+}
+
 export type Stream = {
     ndot: number;
     ppm: number;
 }
 
-const MAX_VOL_STAGE = 5; // L
+const STAGE_LIQ_MOLES = 50;
+const STAGE_GAS_VOL = 5; // L
 class Stage {
     private liqOut: Stream = { ndot: 0, ppm: FEED_PPM };
     private vapOut: Stream = { ndot: 0, ppm: 0 };
@@ -71,8 +77,7 @@ class Stage {
     private vapIn: (() => Stream) | null = null;
     private eff: number;
 
-    private fill = 0;
-    private mixedFrac = 0;
+    private ppm = FEED_PPM;
 
     constructor(liqIn: () => Stream, efficiency = 1) {
         this.liqIn = liqIn;
@@ -92,13 +97,59 @@ class Stage {
         return this.liqOut;
     }
 
-    public equilibrium() {
+    public equilibrium(T: number, P: number) {
+        if (P === 0) return;
+        const lin = this.liqIn();
+        const vin = this.vapIn!();
+        const L = lin.ndot;
+        const xn1 = lin.ppm;
+        const V = vin.ndot;
+        const yn1 = vin.ppm;
         
+        const m = Henrys(T) / P; // y_n = m * x_n
+        // eqm: yn = m * xn =>
+        // meb: in = out (S.S.) => 
+        //      xn1 * L + yn1 * V = xn * L + yn * V
+        //      (in) = xn * L + m * xn * V = xn * (L + m * V)
+        //    ∴ xn = (in) / (L + m * V)
+        const n_in = xn1 * L + yn1 * V;
+        const xn = n_in / (L + m * V);
+        const yn = m * xn;
+
+        if (this.eff !== 1) {
+            // Update
+            this.liqOut = { ndot: L, ppm: this.eff * (xn - xn1) + xn1 };
+            this.vapOut = { ndot: V, ppm: this.eff * (yn - yn1) + yn1 };
+        }
+        else {
+            // Update
+            this.liqOut = { ndot: L, ppm: xn };
+            this.vapOut = { ndot: V, ppm: yn };
+        }
     }
 
-    public massBal(deltaTime: number) {
-        
+    // Mixing
+    public massBal(deltaTime: number, P: number) {
+        const lin = this.liqIn();
+        const vin = this.vapIn!();
+        const L = lin.ndot;
+        const xn1 = lin.ppm;
+        const V = vin.ndot;
+        const yn1 = vin.ppm;
+        const lout = this.liqOut;
+        const vout = this.vapOut;
+
+        const dndt = xn1 * L + yn1 * V - lout.ppm * lout.ndot - vout.ppm * vout.ndot; // * 1e-6
+        const stage_capac = STAGE_LIQ_MOLES + P * STAGE_GAS_VOL / 0.08314 / T0;
+        const dppmdt = dndt / stage_capac; // * 1e-6 * 1e+6
+
+        this.ppm += dppmdt * deltaTime;
     }
+}
+
+type DebugInfo = {
+    liqIn: Accessor<Stream>
+    vapIn: Accessor<Stream>;
 }
 
 export class ColumnCalc {
@@ -106,8 +157,10 @@ export class ColumnCalc {
     private playing: boolean = false;
     public updated: Accessor<boolean>;
     private setUpdated: Setter<boolean>;
+    private getPressure: Accessor<number>;
+    private debugInfo: DebugInfo;
 
-    constructor(numStages: number, liqFeed: () => Stream, gasFeed: () => Stream) {
+    constructor(numStages: number, liqFeed: () => Stream, gasFeed: () => Stream, gasPressure: () => number) {
         const eff = stageEfficiency();
         this.stages = [];
         // Construct stages with appropriate feed streams.
@@ -128,6 +181,10 @@ export class ColumnCalc {
         const [updated, setUpdated] = createSignal(false);
         this.updated = updated;
         this.setUpdated = setUpdated;
+        this.getPressure = gasPressure;
+
+        // Debug info
+        this.debugInfo = { liqIn: liqFeed, vapIn: gasFeed };
     }
 
     public vapOut(): Stream {
@@ -139,14 +196,16 @@ export class ColumnCalc {
     }
 
     private evolve(deltaTime: number) {
+        const T = T0;
+        const P = this.getPressure() + 1;
         // Iterate mass balance
         for (const stage of this.stages) {
-            stage.massBal(deltaTime);
+            stage.massBal(deltaTime, P);
             if (stage.vapStream().ndot < 0) throw new Error("gas rate under in evolve");
         }
         // Solve eqm
         for (const stage of this.stages) {
-            stage.equilibrium();
+            stage.equilibrium(T, P);
             if (stage.vapStream().ndot < 0) throw new Error(`gas under in settle`);
         }
     }
@@ -172,5 +231,19 @@ export class ColumnCalc {
         const stage = this.stages[stageIdx];
         const str = stream === "liquid" ? stage.liqStream() : stage.vapStream();
         return str.ppm;
+    }
+
+    public currentPressure() {
+        return this.getPressure();
+    }
+
+    public operatingLine() {
+        const { liqIn, vapIn } = this.debugInfo;
+        const lin = liqIn();
+        const vin = vapIn();
+        const vout = this.stages[0].vapStream();
+        const slope = lin.ndot / vin.ndot;
+        const intercept = (vout.ppm - slope * lin.ppm);
+        return { slope, intercept };
     }
 }

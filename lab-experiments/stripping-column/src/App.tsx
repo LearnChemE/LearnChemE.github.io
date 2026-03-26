@@ -17,7 +17,7 @@ import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import worksheet from "./assets/worksheet.pdf?url";
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import Defs from './components/Defs'
-import { paddedHeight } from './globals/signals'
+import { paddedHeight, triggerResetEvent } from './globals/signals'
 import { FEED_MAX_RATE, INIT_FEED_LIFT, INIT_GAS_SP } from './globals/config'
 import TopPipes from './components/TopPipes/TopPipes'
 import { Regulator } from './components/Regulator/Regulator'
@@ -58,6 +58,7 @@ function App() {
       setPressureSP(INIT_GAS_SP);
       setLockStages(false);
       setShowMenu(true);
+      triggerResetEvent();
     })
   }
 
@@ -74,7 +75,7 @@ function App() {
           <TankValve pressure={gasLinePressurized} setPressure={setGasLinePressurized} />
           <Controller gasSP={gasSP} setGasSP={setGasSP} />
           
-          <Column gasIn={gasRate} feedIn={feedRate} />
+          <Column gasIn={gasRate} feedIn={feedRate} gasPressure={gasPressure} />
           <Rotameter flowrate={feedRate} flowrange={[0, FEED_MAX_RATE]} x={145} y={64 + paddedHeight()} />
           <Tank x={31}  y={107 + paddedHeight()} />
           <Valve x={134.5} y={() => 195 + paddedHeight()} onLiftChange={setFeedLift} initialLift={INIT_FEED_LIFT} />

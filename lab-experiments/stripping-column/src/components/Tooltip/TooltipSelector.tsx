@@ -54,7 +54,7 @@ export const SVGTooltip: Component<TooltipSelectorProps> = ({ x, y, anchor, ppm,
             <rect x="0" y="0" rx={4} width={150} height={74} fill="rgba(0, 0, 0, 0.8)"/>
             <text x={0} y={0} font-family="Arial" font-size="14" fill="white">
                 <tspan x={5} dy="1.2em">{label}:</tspan>
-                <tspan x={24} dy="1.2em">{dispPPM().toFixed(1)} PPM</tspan>
+                <tspan x={24} dy="1.2em">{dispPPM().toFixed(2)} PPM</tspan>
             </text>
             <polygon></polygon>
         </g>

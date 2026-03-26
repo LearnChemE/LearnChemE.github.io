@@ -8,10 +8,11 @@ import { ColumnCalc, ColumnContext, type Stream } from "../../globals/calcs";
 type ColumnProps = {
     gasIn: Accessor<number>;
     feedIn: Accessor<number>;
+    gasPressure: Accessor<number>;
 };
 
 export const Column: Component<ColumnProps> = (props) => {
-    const { gasIn, feedIn } = props;
+    const { gasIn, feedIn, gasPressure } = props;
     const [fill, setFill] = createSignal(0);
     let animating = true;
 
@@ -33,7 +34,7 @@ export const Column: Component<ColumnProps> = (props) => {
         // Create the calculation object and start the simulation
         const liqStream = createMemo(() => { return { ndot: feedIn() * 1000 / 60, ppm: FEED_PPM     } as Stream});
         const gasStream = createMemo(() => { return { ndot: gasIn(),              ppm: GAS_INIT_PPM } as Stream});
-        const col = new ColumnCalc(numberOfStages(), liqStream, gasStream);
+        const col = new ColumnCalc(numberOfStages(), liqStream, gasStream, gasPressure);
         // Attach the column to context so other components can access it
         columnContext!.column = col;
         columnContext!.setColumnCreated(true);
@@ -47,6 +48,7 @@ export const Column: Component<ColumnProps> = (props) => {
 
     createEffect(() => {
         resetEvent();
+        console.log("reset col")
         setColFull(false);
         setFill(0);
         if (!animating) {

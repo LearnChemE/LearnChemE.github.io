@@ -6,8 +6,8 @@ export const ZERO_STAGE_PADDING = 48;
 export const COLUMN_BASE_VOL = 8; // L
 export const COLUMN_VOL_PER_STAGE = 2; // L
 
-export const FEED_PPM = 0;
-export const GAS_INIT_PPM = 10;
+export const FEED_PPM = .5;
+export const GAS_INIT_PPM = .1;
 
 // Feed
 export const INIT_FEED_LIFT = 0.75;
