@@ -14,7 +14,7 @@ export const INIT_FEED_LIFT = 0.75;
 export const FEED_MAX_RATE = 10;
 
 // Gas
-export const INIT_GAS_SP = 0;
+export const INIT_GAS_SP = 5;
 export const GAS_MAX_RATE = 10;
 export const GAS_SP_INTERVAL = 0.5;
 export const MAX_PRESSURE = 20;

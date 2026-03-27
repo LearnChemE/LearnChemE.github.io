@@ -1,8 +1,8 @@
 import { createEffect, createMemo, createSignal, For, onMount, useContext, type Accessor, type Component } from "solid-js";
 import { FEED_PPM, GAS_INIT_PPM, STAGE_HEIGHT } from "../../globals/config";
-import { columnVolume, numberOfStages, paddingTop, resetEvent, setColFull } from "../../globals/signals";
+import { numberOfStages, paddingTop, resetEvent, setColFull } from "../../globals/signals";
 import "./Column.css";
-import { animate } from "../../globals/helpers";
+import { animate, constrain } from "../../globals/helpers";
 import { ColumnCalc, ColumnContext, type Stream } from "../../globals/calcs";
 
 type ColumnProps = {
@@ -11,13 +11,22 @@ type ColumnProps = {
     gasPressure: Accessor<number>;
 };
 
+const FALL_HEIGHT = 37;
+const LAST_FALL = 68;
+// Give equal-time weights to each segment
+const wt = 3; // tray
+const wf = 1; // fall
+const wl = wf * LAST_FALL / FALL_HEIGHT; // last fall
+const w_per_stage = wt + wf;
+
 export const Column: Component<ColumnProps> = (props) => {
     const { gasIn, feedIn, gasPressure } = props;
     const [fill, setFill] = createSignal(0);
     let animating = true;
+    const columnVolume = createMemo(() => wt * numberOfStages() + wf * (numberOfStages() - 1) + wl);
 
     const fillAnimation = (dt: number) => {
-        const rate = feedIn();
+        const rate = feedIn(); // mL
         if (rate <= 0) return true;
 
         const dV = rate * dt;
@@ -48,7 +57,6 @@ export const Column: Component<ColumnProps> = (props) => {
 
     createEffect(() => {
         resetEvent();
-        console.log("reset col")
         setColFull(false);
         setFill(0);
         if (!animating) {
@@ -63,13 +71,6 @@ export const Column: Component<ColumnProps> = (props) => {
     return (
         // top
         <g id="Column" transform={`translate(0 ${paddingTop()})`}>
-            {/* Fill */}
-            <g clip-path="url(#col-fill-clip)">
-                <path transform={`translate(325 ${92 + STAGE_HEIGHT * numberOfStages()})`} d="M2.12222e-07 38H70C70 38 70 27.5 70 19C70 9.5 65 9.5 65 0H5C5 9.5 1.93781e-06 9.5 2.12222e-07 19C-1.51337e-06 28.5 2.12222e-07 38 2.12222e-07 38Z" fill="#5b98e7" fill-opacity="0.6"/>
-                <path transform="translate(325 54)" d="M2.12222e-07 0H70C70 0 70 10.5 70 19C70 28.5 65 28.5 65 38H5C5 28.5 1.93781e-06 28.5 2.12222e-07 19C-1.51337e-06 9.5 2.12222e-07 0 2.12222e-07 0Z" fill="#5b98e7" fill-opacity="0.6"/>
-                <rect x="330" y="92" width="60" height={32 * numberOfStages()} fill="#5b98e7" fill-opacity="0.6"/>
-            </g>
-
             <defs>
                 <clipPath id="col-fill-clip">
                     <rect x="325" y={54 + paddedFillHeight() * (1 - fill() / columnVolume())} width="70" height={paddedFillHeight() * fill() / columnVolume()} fill="red" />
@@ -98,11 +99,14 @@ export const Column: Component<ColumnProps> = (props) => {
             {/* Stages */}
             <g id="stages" transform={`translate(330 92)`}>
                 <For each={[...Array(numberOfStages()).keys()]}>
-                    {(stageIndex) => (
+                    {(stageIndex) => {
+                    const stageFill = createMemo(() => Math.max(0, fill() - stageIndex * w_per_stage));
+
+                    return (
                         <g id={`stage-${stageIndex}`} transform={`translate(0 ${STAGE_HEIGHT * stageIndex})`}>
-                            <Stage flip={stageIndex % 2 === 1} />
+                            <Stage fill={stageFill} index={stageIndex} />
                         </g>
-                    )}
+                    )}}
                 </For>
             </g>
 
@@ -127,43 +131,39 @@ export const Column: Component<ColumnProps> = (props) => {
 }
 
 type StageProps = {
-    flip: boolean;
+    fill: Accessor<number>;
+    index: number;
 }
 
-const Stage: Component<StageProps> = (props) => {
 
+const Stage: Component<StageProps> = ({ fill, index }) => {
+    const flip  = index % 2 === 1; 
+    const first = index === 0;
+    const last  = createMemo(() => index === numberOfStages() - 1); 
 
+    const trayHeight = createMemo(() => {
+        const tfill = Math.min(fill(), wt);
+        return tfill / wt * 5;
+    });
+    const fallHeight = createMemo(() => {
+        const height = last() ? LAST_FALL : FALL_HEIGHT;
+        const w = last() ? wl : wf;
+        const ffill = constrain(fill() - wt, 0, w);
+        return ffill / w * height;
+    });
 
 return (<>
-<g transform={props.flip ? "scale(-1,1) translate(-60, 0)" : ""}>
-    <rect x="4" y="1" width="52" height="5" fill="#398CF9" fill-opacity="0.6"/>
+<g transform={ flip ? "scale(-1,1) translate(-60, 0)" : "" }>
+    <rect x={first ? 0 : 4} y={6 - trayHeight()} width={first ? 56 : 52} height={trayHeight()} fill="#398CF9" fill-opacity="0.6"/>
     <mask id="path-2-inside-1_133_34" fill="white">
     <path d="M0 0H60V32H0V0Z"/>
     </mask>
     <line x1="10" y1="6.5" x2="56" y2="6.5" stroke="black" stroke-dasharray="3 1"/>
     <line y1="6.5" x2="10" y2="6.5" stroke="black"/>
     <line x1="55.5" y1="28" x2="55.5" y2="2" stroke="black"/>
-    <rect x="56" y="1" width="3" height="37" fill="#398CF9" fill-opacity="0.6"/>
+    <rect x="56" y="1" width="3" height={fallHeight()} fill="#398CF9" fill-opacity="0.6"/>
 </g>
 <path d="M0 0H60V32H0V0Z" fill="url(#paint0_linear_133_34)"/>
 <path d="M60 0H59V32H60H61V0H60ZM0 32H1V0H0H-1V32H0Z" fill="black" mask="url(#path-2-inside-1_133_34)"/>
 </>);
 }
-
-{/* <rect width="52" height="5" transform="matrix(-1 0 0 1 56 1)" fill="#398CF9" fill-opacity="0.6"/>
-<mask id="path-2-inside-1_133_41" fill="white">
-<path d="M60 0H0V32H60V0Z"/>
-</mask>
-<path d="M60 0H0V32H60V0Z" fill="url(#paint0_linear_133_41)"/>
-<path d="M0 0H1V32H0H-1V0H0ZM60 32H59V0H60H61V32H60Z" fill="black" mask="url(#path-2-inside-1_133_41)"/>
-<line y1="-0.5" x2="46" y2="-0.5" transform="matrix(-1 0 0 1 50 7)" stroke="black" stroke-dasharray="3 1"/>
-<line y1="-0.5" x2="10" y2="-0.5" transform="matrix(-1 0 0 1 60 7)" stroke="black"/>
-<line y1="-0.5" x2="26" y2="-0.5" transform="matrix(0 -1 -1 0 4 28)" stroke="black"/>
-<rect width="3" height="37" transform="matrix(-1 0 0 1 4 1)" fill="#398CF9" fill-opacity="0.6"/> */}
-{/* <defs>
-<linearGradient id="paint0_linear_133_41" x1="66" y1="16" x2="-4.5" y2="16" gradientUnits="userSpaceOnUse">
-<stop stop-color="#305789" stop-opacity="0.6"/>
-<stop offset="0.375" stop-color="#D9D9D9" stop-opacity="0"/>
-<stop offset="1" stop-color="#305789" stop-opacity="0.6"/>
-</linearGradient>
-</defs> */}

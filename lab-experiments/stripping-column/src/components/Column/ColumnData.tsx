@@ -17,26 +17,26 @@ export const ColumnData: Component<ColumnDataProps> = (props) => {
 <Show when={props.feedIsOn()}>
     <For each={Array(numberOfStages())}>
       {(_,i) => (<>
-        <g transform={`translate(317 ${130 + paddingTop() + i() * 32})`}>
+        <g transform={`translate(317 ${98 + paddingTop() + i() * 32})`}>
             <g class="col-data-anchor" ref={lrefs[i()]} >
                 {/* Large anchor for easy readability */}
                 <circle cx="0" cy="0" r="16" fill="red" opacity={0}/> 
                 {/* Visible */}
-                <circle cx="0" cy="0" r="4" fill="#83dbdb"/>
-                <circle cx="0" cy="0" r="2.5" fill="white"/>
-            </g>
-        </g>
-        <g transform={`translate(401 ${106 + paddingTop() + i() * 32})`} ref={rrefs[i()]}> 
-            <g class="col-data-anchor">
-                <circle cx="0" cy="0" r="16" fill="red" opacity={0}/>
                 <circle cx="0" cy="0" r="4" fill="white"/>
                 <circle cx="0" cy="0" r="3" fill="var(--hamburger-color)"/>
             </g>
         </g>
+        <g transform={`translate(401 ${98 + paddingTop() + i() * 32})`} ref={rrefs[i()]}> 
+            <g class="col-data-anchor">
+                <circle cx="0" cy="0" r="16" fill="red" opacity={0}/>
+                <circle cx="0" cy="0" r="4" fill="#83dbdb"/>
+                <circle cx="0" cy="0" r="2.5" fill="white"/>
+            </g>
+        </g>
 
         {/* Tooltip */}
-        <SVGTooltip x={150} y={100 + paddingTop() + i() * 32} stage={i()} stream={"liquid"} anchor={lrefs[i()]} />
-        <SVGTooltip x={418} y={100 + paddingTop() + i() * 32} stage={i()} stream={"vapor"} anchor={rrefs[i()]} />
+        <SVGTooltip x={200} y={80 + paddingTop() + i() * 32} stage={i()} stream={"liquid"} anchor={lrefs[i()]} />
+        <SVGTooltip x={418} y={80 + paddingTop() + i() * 32} stage={i()} stream={"vapor"} anchor={rrefs[i()]} />
       </>)}
     </For>
 </Show>
@@ -46,22 +46,22 @@ export const ColumnData: Component<ColumnDataProps> = (props) => {
             {/* Large anchor for easy readability */}
             <circle cx="0" cy="0" r="16" fill="red" opacity={0}/> 
             {/* Visible */}
-            <circle cx="0" cy="0" r="4" fill="#83dbdb"/>
-            <circle cx="0" cy="0" r="3" fill="white"/>
-        </g>
-    </g>
-    <g transform={`translate(532 ${98 + paddedHeight()})`}>
-        <g class="col-data-anchor" ref={solv} >
-            {/* Large anchor for easy readability */}
-            <circle cx="0" cy="0" r="16" fill="red" opacity={0}/> 
-            {/* Visible */}
             <circle cx="0" cy="0" r="4" fill="white"/>
             <circle cx="0" cy="0" r="3" fill="var(--hamburger-color)"/>
         </g>
     </g>
+    <g transform={`translate(562 ${178 + paddedHeight()})`}>
+        <g class="col-data-anchor" ref={solv} >
+            {/* Large anchor for easy readability */}
+            <circle cx="0" cy="0" r="16" fill="red" opacity={0}/> 
+            {/* Visible */}
+            <circle cx="0" cy="0" r="4" fill="#83dbdb"/>
+            <circle cx="0" cy="0" r="3" fill="white"/>
+        </g>
+    </g>
 
-<SVGTooltip x={135} y={() => 58 + paddedHeight()} ppm={FEED_PPM} label="feed" anchor={feed} />
-<SVGTooltip x={465} y={() => 8 + paddedHeight()}  ppm={GAS_INIT_PPM} label="solvent" anchor={solv} />
+<SVGTooltip x={135} y={() => 78 + paddedHeight()} ppm={FEED_PPM} label="feed" anchor={feed} />
+<SVGTooltip x={495} y={() => 8 + paddedHeight()}  ppm={GAS_INIT_PPM} label="solvent" anchor={solv} />
     </>
     )
 }
