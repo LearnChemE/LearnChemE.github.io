@@ -551,13 +551,16 @@ function buildBarChart(group) {
   // Y-axis with ticks and labels (0.0 to 1.0)
   chart.line(axisX, y + pad, axisX, barBaseY)
     .stroke({ color: '#666', width: 2 });
+  // X-axis along the bar baseline.
+  chart.line(axisX, barBaseY, axisX + 10 + innerW, barBaseY)
+    .stroke({ color: '#666', width: 2 });
 
   const tickValues = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
   tickValues.forEach((val) => {
     const ty = barBaseY - val * innerH;
     chart.line(axisX, ty, axisX + 6, ty).stroke({ color: '#666', width: 2 });
     chart.text(val.toFixed(1))
-      .font({ size: 18, family: 'Arial', anchor: 'end', weight: 600 })
+      .font({ size: 18, family: 'Arial', anchor: 'end', weight: 400 })
       .fill('#000')
       .attr({ x: axisX - 8, y: ty + 6 });
   });

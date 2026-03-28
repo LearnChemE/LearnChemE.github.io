@@ -2304,6 +2304,105 @@ function interp1(xs, ys, x) {
   return lerp(y0, y1, t);
 }
 
+// Data extracted from the original Mathematica notebook to match its outputs.
+const NB_HT_T = [
+  0.01, 10.01, 20.01, 30.01, 40.01, 50.01, 60.01, 70.01,
+  80.01, 90.01, 100.01, 110.01, 120.01, 130.01, 140.01, 150.01,
+  160.01, 170.01, 180.01, 190.01, 200.01, 210.01, 220.01, 230.01,
+  240.01, 250.01, 260.01, 270.01, 280.01, 290.01, 300.01, 310.01,
+  320.01, 330.01, 340.01, 350.01, 360.01, 365.75, 365.76, 370.01,
+  380.01, 390.01, 400.01
+];
+
+const NB_HT_H = [
+  20.07, 61.35, 102.61, 143.88, 185.2, 226.55, 267.96, 309.42,
+  350.94, 392.53, 434.21, 475.99, 517.88, 559.91, 602.11, 644.49,
+  687.09, 729.94, 773.06, 816.51, 860.31, 904.53, 949.21, 994.41,
+  1040.2, 1086.7, 1134, 1182.2, 1231.6, 1282.2, 1334.4, 1388.7,
+  1445.5, 1506, 1571.7, 1646.1, 1740.2, 1827.2, 2412.3, 2526.7,
+  2659.5, 2747.3, 2816.9
+];
+
+const NB_HLP_P = [
+  0.06, 1.06, 2.06, 3.06, 4.06, 5.06, 6.06, 7.06,
+  8.06, 9.06, 10.06, 11.06, 12.06, 13.06, 14.06, 15.06,
+  16.06, 17.06, 18.06, 19.06, 20.06, 21.06, 22.06
+];
+
+const NB_HLP_HL = [
+  359.91, 773.78, 915.37, 1013.6, 1091.8, 1158.4, 1217.3, 1270.7,
+  1320.2, 1366.6, 1410.7, 1452.9, 1493.9, 1533.9, 1573.3, 1612.6,
+  1652.1, 1692.5, 1734.7, 1780, 1830.4, 1891.9, 2055.6
+];
+
+const NB_HVP_P = [
+  0.06, 1.06, 2.06, 3.06, 4.06, 5.06, 6.06, 7.06,
+  8.06, 9.06, 10.06, 11.06, 12.06, 13.06, 14.06, 15.06,
+  16.06, 17.06, 18.06, 19.06, 20.06, 21.06, 22.06
+];
+
+const NB_HVP_HV = [
+  2652.9, 2779.3, 2798.9, 2803.2, 2800.5, 2793.7, 2783.9, 2771.8,
+  2757.8, 2741.9, 2724.4, 2705.1, 2684.1, 2661.3, 2636.3, 2609,
+  2578.9, 2545.4, 2507.4, 2463.1, 2408.7, 2333, 2115.7
+];
+
+const NB_TP_P = [
+  0.0006, 0.0009, 0.0012, 0.0017, 0.0023, 0.0032, 0.0042, 0.0056,
+  0.0074, 0.0096, 0.0124, 0.0158, 0.0199, 0.025, 0.0312, 0.0386,
+  0.0474, 0.0579, 0.0702, 0.0846, 0.1014, 0.1434, 0.1987, 0.2703,
+  0.3615, 0.4762, 0.6182, 0.7922, 1.0028, 1.2552, 1.5549, 1.9077,
+  2.3196, 2.7971, 3.3469, 3.9762, 4.6923, 5.503, 6.4166, 7.4418,
+  8.5879, 9.8651, 11.284, 12.858, 14.601, 16.529, 18.666, 21.044,
+  22.064
+];
+
+const NB_TP_T = [
+  0.01, 5, 10, 15, 20, 25, 30, 35,
+  40, 45, 50, 55, 60, 65, 70, 75,
+  80, 85, 90, 95, 100, 110, 120, 130,
+  140, 150, 160, 170, 180, 190, 200, 210,
+  220, 230, 240, 250, 260, 270, 280, 290,
+  300, 310, 320, 330, 340, 350, 360, 370,
+  373.95
+];
+
+const NB_HLT_H = [
+  0, 42.06, 83.96, 125.78, 167.57, 209.38, 251.22, 293.11,
+  335.05, 377.08, 419.21, 461.46, 503.85, 546.43, 589.2, 632.22,
+  675.52, 719.13, 763.1, 807.48, 852.32, 897.68, 943.62, 990.24,
+  1037.6, 1085.8, 1135, 1185.3, 1236.9, 1290.1, 1345.1, 1402.3,
+  1462.3, 1525.9, 1594.6, 1671, 1761.8, 1890.9
+];
+
+const NB_HLT_T = [
+  0.01, 10.01, 20.01, 30.01, 40.01, 50.01, 60.01, 70.01,
+  80.01, 90.01, 100.01, 110.01, 120.01, 130.01, 140.01, 150.01,
+  160.01, 170.01, 180.01, 190.01, 200.01, 210.01, 220.01, 230.01,
+  240.01, 250.01, 260.01, 270.01, 280.01, 290.01, 300.01, 310.01,
+  320.01, 330.01, 340.01, 350.01, 360.01, 370.01
+];
+
+function nbLiquidEnthalpyAtP1FromT(TC) {
+  return interp1(NB_HT_T, NB_HT_H, TC);
+}
+
+function nbSatLiquidEnthalpyFromP(PMPa) {
+  return interp1(NB_HLP_P, NB_HLP_HL, PMPa);
+}
+
+function nbSatVaporEnthalpyFromP(PMPa) {
+  return interp1(NB_HVP_P, NB_HVP_HV, PMPa);
+}
+
+function nbSatTemperatureFromP(PMPa) {
+  return interp1(NB_TP_P, NB_TP_T, PMPa);
+}
+
+function nbTemperatureFromLiquidEnthalpy(hf) {
+  return interp1(NB_HLT_H, NB_HLT_T, hf);
+}
+
 export function satLiquidEnthalpyFromT(TC) {
   return interp1(SAT_T, SAT_HF, TC);
 }
@@ -2330,10 +2429,10 @@ export function computeThrottling({ T1C, P2MPa }) {
   const inletTempC = clampNumber(T1C, 100, 312);
   const outletPressureMPa = clampNumber(P2MPa, 0.1, 2);
 
-  const h1 = satLiquidEnthalpyFromT(inletTempC);
+  const h1 = nbLiquidEnthalpyAtP1FromT(inletTempC);
 
-  const hf2 = satLiquidEnthalpyFromP(outletPressureMPa);
-  const hg2 = satVaporEnthalpyFromP(outletPressureMPa);
+  const hf2 = nbSatLiquidEnthalpyFromP(outletPressureMPa);
+  const hg2 = nbSatVaporEnthalpyFromP(outletPressureMPa);
 
   let quality = (h1 - hf2) / (hg2 - hf2);
   if (!Number.isFinite(quality)) quality = 0;
@@ -2345,7 +2444,7 @@ export function computeThrottling({ T1C, P2MPa }) {
   else phase2 = 'vapor/liquid mixture';
 
   const isTwoPhase = quality > 0 && quality < 1;
-  const T2C = isTwoPhase ? satTemperatureFromP(outletPressureMPa) : satTemperatureFromLiquidEnthalpy(h1);
+  const T2C = isTwoPhase ? nbSatTemperatureFromP(outletPressureMPa) : nbTemperatureFromLiquidEnthalpy(h1);
 
   return {
     P1MPa,
