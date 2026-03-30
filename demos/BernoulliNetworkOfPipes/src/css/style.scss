@@ -5,12 +5,12 @@
   border: 2px solid #ccc;
   margin: 20px auto;
   padding: 10px;
-  width: calc(100vw - 40px);
+  width: calc(100vw - 380px);
   height: calc(100vh - 40px);
   max-width: calc((100vh) * 1200 / 600);
   max-height: calc((100vw) * 600 / 1200);
-  
-  > svg {
+
+  >svg {
     position: absolute;
     left: 10px;
     top: 10px;
@@ -32,7 +32,7 @@
   pointer-events: none;
 }
 
-.plot-layout > * {
+.plot-layout>* {
   pointer-events: auto;
 }
 
@@ -78,7 +78,7 @@ body {
   display: flex;
   margin-top: 10px;
   justify-content: flex-start;
-  
+
   .btn {
     margin-right: 10px;
   }
@@ -138,7 +138,7 @@ body {
   width: 100%;
 }
 
-.control-bar.slider-controls > .slider-group {
+.control-bar.slider-controls>.slider-group {
   flex: 1 1 280px;
   min-width: 220px;
   max-width: 360px;
@@ -152,7 +152,7 @@ body {
 }
 
 @media (max-width: 520px) {
-  .control-bar.slider-controls > .slider-group {
+  .control-bar.slider-controls>.slider-group {
     flex-basis: 100%;
     min-width: 100%;
     max-width: 100%;
@@ -332,11 +332,11 @@ body {
 .math-label {
   font-style: italic;
   font-weight: 600;
-  
+
   sub {
     font-size: 0.75em;
   }
-  
+
   sup {
     font-size: 0.7em;
   }
@@ -356,13 +356,14 @@ body {
   transition: opacity 120ms ease-in-out;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   z-index: 1500;
-  
+
   &.curve-tooltip--visible {
     opacity: 1;
   }
 }
 
-#lengthValue, #elevationValue {
+#lengthValue,
+#elevationValue {
   width: 30px;
 }
 
@@ -374,24 +375,29 @@ body {
 //   z-index: 1000;
 // }
 
-.icon-container > * {
-  align-self: flex-start; /* ensure all children align to the top/left */
+.icon-container>* {
+  align-self: flex-start;
+  /* ensure all children align to the top/left */
   pointer-events: auto;
 }
 
 /* Match the button column max-width and stack the label/select neatly */
 .icon-container .form {
   position: absolute;
-  top: 0;                 /* align with top controls */
-  left: 100px;              /* center horizontally */
+  top: 0;
+  /* align with top controls */
+  left: 100px;
+  /* center horizontally */
   // transform: translateX(-250%);
   display: flex;
   flex-direction: column;
   gap: 4px;
-  width: 242px;           /* matches button width */
+  width: 242px;
+  /* matches button width */
   margin: 0;
   padding: 0;
-  z-index: 1002;          /* above SVG */
+  z-index: 1002;
+  /* above SVG */
 }
 
 .icon-container .form label.form-label {
@@ -507,23 +513,23 @@ body {
   body {
     padding: 10px;
   }
-  
+
   .button-container {
     width: 100%;
     flex-direction: column;
     align-items: center;
   }
-  
+
   .button {
     width: 80%;
     margin: 10px 0;
   }
-  
+
   .slider-container {
     grid-template-columns: 1fr;
     grid-gap: 15px;
   }
-  
+
   .canvas {
     width: 100%;
   }
@@ -535,6 +541,7 @@ svg text {
   -moz-user-select: none;
   -ms-user-select: none;
 }
+
 .plot-column {
   flex: 1;
   min-width: 0;

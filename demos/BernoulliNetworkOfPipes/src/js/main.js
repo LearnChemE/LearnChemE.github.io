@@ -9,11 +9,14 @@ const constants = {
   inletRadius: 1,
   arrowScale: 0.4,
   minArrowLength: 0.15,
+  minInletArrowLength: 0.35,
+  arrowLabelOffset: 0.5,
+  arrowLabelBoundsPadding: 0.15,
   baseBounds: {
     minX: -2.6666666666666665,
     maxX: 2.6666666666666665,
-    minY: -1.6,
-    maxY: 1.8666666666666667
+    minY: -2.3,
+    maxY: 2.75
   },
   pAir: 0,
   displayAirPressure: 101
@@ -246,7 +249,7 @@ function getWallCoordinates(model) {
 function buildAnnotations(model, font) {
   const R1 = constants.inletRadius;
   const { diameters, velocities, pressure } = model;
-  const inletArrowLength = getArrowLength(velocities.inlet);
+  const inletArrowLength = getArrowLength(velocities.inlet, constants.minInletArrowLength);
   const leftArrowLength = getArrowLength(velocities.left);
   const rightArrowLength = getArrowLength(velocities.right);
 
@@ -258,7 +261,7 @@ function buildAnnotations(model, font) {
       end: { x: 1 + R1 + rightArrowLength, y: 1 + diameters.left - diameters.right / 2 },
       textPosition: {
         x: 1 + R1 + rightArrowLength / 2,
-        y: 1 + diameters.left - diameters.right / 2 + 0.25
+        y: 1 + diameters.left - diameters.right / 2 + constants.arrowLabelOffset
       }
     },
     {
@@ -267,7 +270,7 @@ function buildAnnotations(model, font) {
       end: { x: -1 - R1 - leftArrowLength, y: 1 + diameters.left / 2 },
       textPosition: {
         x: -1 - R1 - leftArrowLength / 2,
-        y: 1 + diameters.left / 2 + 0.25
+        y: 1 + diameters.left / 2 + constants.arrowLabelOffset
       }
     },
     {
@@ -497,9 +500,10 @@ function computeBounds(model) {
   if (!model) return { ...baseBounds };
 
   const { diameters, velocities } = model;
-  const inletArrowLength = getArrowLength(velocities.inlet);
-  const leftArrowLabelY = 1 + diameters.left / 2 + 0.35;
-  const rightArrowLabelY = 1 + diameters.left - diameters.right / 2 + 0.35;
+  const inletArrowLength = getArrowLength(velocities.inlet, constants.minInletArrowLength);
+  const labelPad = constants.arrowLabelOffset + constants.arrowLabelBoundsPadding;
+  const leftArrowLabelY = 1 + diameters.left / 2 + labelPad;
+  const rightArrowLabelY = 1 + diameters.left - diameters.right / 2 + labelPad;
   const fluidTop = 1 + diameters.left + 0.35;
   const verticalDimensionTop = 1 + diameters.left + 0.2;
 
@@ -580,9 +584,8 @@ function formatNumber(value, digits = 2) {
   return Number(value).toFixed(digits);
 }
 
-function getArrowLength(velocity) {
+function getArrowLength(velocity, minLength = constants.minArrowLength) {
   const scale = constants.arrowScale;
-  const minLength = constants.minArrowLength || 0;
   const scaled = Math.abs(velocity) * scale;
   if (scaled <= 0) return minLength;
   return Math.max(scaled, minLength);
