@@ -1,9 +1,11 @@
-import { createMemo, type Accessor, type Component, type Setter } from "solid-js";
-import { animate, constrain, MAX_PRESSURE, MAX_TANK_VALVE_ROTATION, paddedHeight } from "../../globals";
+import { createEffect, createMemo, createSignal, type Accessor, type Component, type Setter } from "solid-js";
+import { animate, constrain, MAX_PRESSURE, MAX_TANK_VALVE_ROTATION, paddedHeight, resolveProperty } from "../../globals";
+import "./TankValve.css";
 
 type TankValveProps = {
     pressure: Accessor<number>;
     setPressure: Setter<number>;
+    disabled?: Accessor<boolean>;
 }
 
 function Sin(x: number) {
@@ -18,6 +20,23 @@ const BAFFLE_WIDTH = 8;
 
 export const TankValve: Component<TankValveProps> = (props) => {
     const rotation = createMemo(() => (1 - props.pressure() / MAX_PRESSURE) * MAX_TANK_VALVE_ROTATION % 60);
+    const disabled = resolveProperty(props.disabled, false);
+    const [flash, setFlash] = createSignal(false);
+
+    const flashAni = (_: number, time: number) => {
+        const t = Math.floor(time / 500);
+        const flashing = (t % 2 === 0);
+        console.log(flashing)
+        if (flashing !== flash()) {
+            setFlash(flashing);
+        }
+        return time < 3000;
+    }
+    createEffect(() => {
+        if (!disabled()) {
+            animate(flashAni, () => setFlash(false));
+        }
+    });
 
     let playing = false;
     const start = () => {
@@ -50,8 +69,9 @@ export const TankValve: Component<TankValveProps> = (props) => {
     }
 
     return (<g transform={`translate(517.5, ${153 + paddedHeight()})`}
-        class="drag-exempt globeValveHandle"
-        onClick={start}>
+        class={"drag-exempt globeValveHandle " + (disabled() ? "tv-disabled" : "") + (flash() ? "tv-flash" : "")}
+        onClick={start}
+        style="transition: filter 400ms ease-in-out">
     <rect x="0" y="1" width={VALVE_WIDTH} height="9" rx="2.5" fill="#67A8EF" stroke="black"/>
     <TValveBaffle offset={0}   rotation={rotation} />
     <TValveBaffle offset={60}  rotation={rotation} />

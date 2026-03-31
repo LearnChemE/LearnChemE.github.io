@@ -380,14 +380,16 @@ export function getSVGCoords(evt: MouseEvent | Touch) {
  */
 export function animate(fn: (dt: number, t: number) => boolean, then?: () => void) {
     let prevtime: number | null = null;
+    let startTime: number | null = null;
 
     const frame = (time: number) => {
         if (prevtime === null) prevtime = time;
+        if (startTime === null) startTime = time;
         const dt = Math.min((time - prevtime) / 1000, .3); // in ms
         prevtime = time;
 
         // Call the function
-        const playing = fn(dt, time);
+        const playing = fn(dt, time - startTime);
 
         // Request next frame
         if (playing) requestAnimationFrame(frame);

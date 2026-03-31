@@ -17,7 +17,7 @@ import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import worksheet from "./assets/worksheet.pdf?url";
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import Defs from './components/Defs'
-import { paddedHeight, triggerResetEvent } from './globals/signals'
+import { colFull, paddedHeight, triggerResetEvent } from './globals/signals'
 import { FEED_MAX_RATE, INIT_FEED_LIFT, INIT_GAS_SP } from './globals/config'
 import TopPipes from './components/TopPipes/TopPipes'
 import { Regulator } from './components/Regulator/Regulator'
@@ -72,7 +72,7 @@ function App() {
           <Pipes />
           <Regulator inPres={gasLinePressurized} outPres={gasPressure} gasSP={pressureSP} setGasSP={setPressureSP} />
           <PowerSwitch x={134} y={321 + paddedHeight()} label="feed" isOn={feedIsOn} setIsOn={setFeedIsOn} />
-          <TankValve pressure={gasLinePressurized} setPressure={setGasLinePressurized} />
+          <TankValve pressure={gasLinePressurized} setPressure={setGasLinePressurized} disabled={() => !colFull()} />
           <Controller gasSP={gasSP} setGasSP={setGasSP} />
           
           <Column gasIn={gasRate} feedIn={feedRate} gasPressure={gasPressure} />
