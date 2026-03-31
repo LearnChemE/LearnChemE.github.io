@@ -17,7 +17,7 @@ const VALVE_WIDTH = 27;
 const BAFFLE_WIDTH = 8;
 
 export const TankValve: Component<TankValveProps> = (props) => {
-    const rotation = createMemo(() => props.pressure() / MAX_PRESSURE * MAX_TANK_VALVE_ROTATION % 60);
+    const rotation = createMemo(() => (1 - props.pressure() / MAX_PRESSURE) * MAX_TANK_VALVE_ROTATION % 60);
 
     let playing = false;
     const start = () => {

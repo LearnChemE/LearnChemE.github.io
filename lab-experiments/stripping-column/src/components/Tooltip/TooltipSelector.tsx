@@ -1,6 +1,6 @@
 import { type Component, createSignal, onMount, useContext, createEffect, type Accessor } from "solid-js";
 import "./Tooltip.css";
-import { ColumnContext, resolveProperty } from "../../globals/";
+import { ColumnContext, FEED_PPM, GAS_INIT_PPM, resolveProperty } from "../../globals/";
 
 interface TooltipSelectorProps {
     x: number;
@@ -9,12 +9,16 @@ interface TooltipSelectorProps {
     stage?: number;
     stream?: "liquid" | "vapor";
     label?: string;
+    override?: Accessor<string>;
     anchor: SVGGElement;
+    width?: number;
 }
 
-export const SVGTooltip: Component<TooltipSelectorProps> = ({ x, y, anchor, ppm, stage, stream, label }) => {
+export const SVGTooltip: Component<TooltipSelectorProps> = ({ x, y, anchor, ppm, stage, stream, label, override, width }) => {
+    let initPPM = (stream === "liquid") ? FEED_PPM :
+        (stream === "vapor") ? GAS_INIT_PPM : 0;
     const [showing, setShowing] = createSignal<boolean>(false);
-    const [dispPPM, setDispPPM] = createSignal<number>(0);
+    const [dispPPM, setDispPPM] = createSignal<number>(initPPM);
     const colCtx = useContext(ColumnContext)!;
     y = resolveProperty(y, 0);
 
@@ -38,7 +42,7 @@ export const SVGTooltip: Component<TooltipSelectorProps> = ({ x, y, anchor, ppm,
     else if (ppm !== undefined) {
         setDispPPM(ppm);
     }
-    else {
+    else if (!override) {
         throw new Error("Must specify either stage to track or PPM value for tooltip hint");
     }
 
@@ -51,10 +55,10 @@ export const SVGTooltip: Component<TooltipSelectorProps> = ({ x, y, anchor, ppm,
 
     return (
         <g class="tooltip" transform={`translate(${x} ${y()})`} style={`opacity: ${showing() ? 1 : 0}`}>
-            <rect x="0" y="0" rx={4} width={100} height={40} fill="rgba(0, 0, 0, 0.8)"/>
+            <rect x="0" y="0" rx={4} width={width ?? 100} height={40} fill="rgba(0, 0, 0, 0.8)"/>
             <text x={0} y={0} font-family="Arial" font-size="14" fill="white">
                 <tspan x={5} dy="1.2em">{label}:</tspan>
-                <tspan x={24} dy="1.2em">{dispPPM().toFixed(2)} PPM</tspan>
+                <tspan x={override ? 8 : 24} dy="1.2em">{override ? override() : `${dispPPM().toFixed(2)} PPM`}</tspan>
             </text>
             <polygon></polygon>
         </g>

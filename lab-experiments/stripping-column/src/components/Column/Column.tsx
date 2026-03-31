@@ -41,8 +41,8 @@ export const Column: Component<ColumnProps> = (props) => {
         animating = false;
         setColFull(true);
         // Create the calculation object and start the simulation
-        const liqStream = createMemo(() => { return { ndot: feedIn() * 1000 / 60, ppm: FEED_PPM     } as Stream});
-        const gasStream = createMemo(() => { return { ndot: gasIn(),              ppm: GAS_INIT_PPM } as Stream});
+        const liqStream = createMemo(() => { return { ndot: feedIn() * 1000 / 18 / 60, ppm: FEED_PPM     } as Stream});
+        const gasStream = createMemo(() => { return { ndot: gasIn() / 60,              ppm: GAS_INIT_PPM } as Stream});
         const col = new ColumnCalc(numberOfStages(), liqStream, gasStream, gasPressure);
         // Attach the column to context so other components can access it
         columnContext!.column = col;

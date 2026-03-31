@@ -4,6 +4,7 @@ import { SVGTooltip } from "../Tooltip/TooltipSelector";
 
 type ColumnDataProps = {
     feedIsOn: Accessor<boolean>;
+    gasIsOn: Accessor<boolean>;
 };
 
 export const ColumnData: Component<ColumnDataProps> = (props) => {
@@ -17,6 +18,7 @@ export const ColumnData: Component<ColumnDataProps> = (props) => {
 <Show when={props.feedIsOn()}>
     <For each={Array(numberOfStages())}>
       {(_,i) => (<>
+        {/* Left: Liquid */}
         <g transform={`translate(317 ${98 + paddingTop() + i() * 32})`}>
             <g class="col-data-anchor" ref={lrefs[i()]} >
                 {/* Large anchor for easy readability */}
@@ -26,17 +28,19 @@ export const ColumnData: Component<ColumnDataProps> = (props) => {
                 <circle cx="0" cy="0" r="3" fill="var(--hamburger-color)"/>
             </g>
         </g>
-        <g transform={`translate(401 ${98 + paddingTop() + i() * 32})`} ref={rrefs[i()]}> 
-            <g class="col-data-anchor">
-                <circle cx="0" cy="0" r="16" fill="red" opacity={0}/>
-                <circle cx="0" cy="0" r="4" fill="#83dbdb"/>
-                <circle cx="0" cy="0" r="2.5" fill="white"/>
-            </g>
-        </g>
-
-        {/* Tooltip */}
         <SVGTooltip x={200} y={80 + paddingTop() + i() * 32} stage={i()} stream={"liquid"} anchor={lrefs[i()]} />
-        <SVGTooltip x={418} y={80 + paddingTop() + i() * 32} stage={i()} stream={"vapor"} anchor={rrefs[i()]} />
+
+        {/* Right: Vapor */}
+        <Show when={props.gasIsOn()}>
+            <g transform={`translate(401 ${98 + paddingTop() + i() * 32})`} ref={rrefs[i()]}> 
+                <g class="col-data-anchor">
+                    <circle cx="0" cy="0" r="16" fill="red" opacity={0}/>
+                    <circle cx="0" cy="0" r="4" fill="#83dbdb"/>
+                    <circle cx="0" cy="0" r="2.5" fill="white"/>
+                </g>
+            </g>
+            <SVGTooltip x={418} y={80 + paddingTop() + i() * 32} stage={i()} stream={"vapor"} anchor={rrefs[i()]} />
+        </Show>
       </>)}
     </For>
 </Show>
@@ -60,8 +64,8 @@ export const ColumnData: Component<ColumnDataProps> = (props) => {
         </g>
     </g>
 
-<SVGTooltip x={135} y={() => 78 + paddedHeight()} ppm={FEED_PPM} label="feed" anchor={feed} />
-<SVGTooltip x={495} y={() => 8 + paddedHeight()}  ppm={GAS_INIT_PPM} label="solvent" anchor={solv} />
+<SVGTooltip x={135} y={() => 78 + paddedHeight()} ppm={FEED_PPM} label="liquid feed" anchor={feed} />
+<SVGTooltip x={550} y={() => 128 + paddedHeight()}  ppm={GAS_INIT_PPM} label="gas feed" anchor={solv} />
     </>
     )
 }

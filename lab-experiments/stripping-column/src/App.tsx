@@ -80,7 +80,7 @@ function App() {
           <Tank x={31}  y={107 + paddedHeight()} />
           <Valve x={134.5} y={() => 195 + paddedHeight()} onLiftChange={setFeedLift} initialLift={INIT_FEED_LIFT} />
 
-          <ColumnData feedIsOn={feedIsOn} gasIsOn={} />
+          <ColumnData feedIsOn={feedIsOn} gasIsOn={() => gasRate() > 0} />
         </SVGCanvas>
 
         {/* Menu for selecting stages */}

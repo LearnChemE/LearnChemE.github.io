@@ -1,5 +1,6 @@
 import { createMemo, type Accessor, type Component, type Setter } from "solid-js";
 import { constrain, getAngleFromDown, getSVGCoords, MAX_PRESSURE, paddedHeight, } from "../../globals";
+import { SVGTooltip } from "../Tooltip/TooltipSelector";
 
 type RegulatorProps = {
     inPres: Accessor<number>;
@@ -78,8 +79,10 @@ export const Regulator: Component<RegulatorProps> = (props) => {
     document.removeEventListener("pointerup", endDrag);
     };
 
+    let ref!: SVGGElement;
+
     return (<>
-    <g transform={`translate(${x}, ${y()})`}>
+    <g transform={`translate(${x}, ${y()})`} ref={ref}>
 <rect x="33.5" y="23.5" width="4" height="7" rx="0.5" fill="#C8AA3C" stroke="black"/>
 <rect x="0.5" y="23.5" width="3" height="7" rx="0.5" fill="#989898" stroke="black"/>
 <rect x="28.5" y="24.5" width="5" height="5" fill="#C8AA3C" stroke="black"/>
@@ -175,5 +178,7 @@ export const Regulator: Component<RegulatorProps> = (props) => {
 <circle cx="18" cy="27" r="4.5" fill="#D9D9D9" stroke="black"/>
 </g>
 </g>
+
+<SVGTooltip x={550} y={() => 128 + paddedHeight()} width={128} label="pressure" override={() => `${props.outPres().toFixed(1)} bar / ${props.inPres().toFixed(1)} bar`} anchor={ref} />
     </>);
 }
