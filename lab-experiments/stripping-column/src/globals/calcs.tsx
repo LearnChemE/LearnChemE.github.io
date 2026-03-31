@@ -1,5 +1,5 @@
 import { stageEfficiency } from "./signals";
-import { animate } from "./helpers";
+import { animate, smoothLerp } from "./helpers";
 import { createContext, createSignal, type Accessor, type Setter } from "solid-js";
 import { feedPPM } from "./signals";
 
@@ -67,8 +67,8 @@ export type Stream = {
     ppm: number;
 }
 
-const STAGE_LIQ_MOLES = 50;
-const STAGE_GAS_VOL = 5; // L
+const STAGE_LIQ_MOLES = 10;
+const STAGE_GAS_VOL = 1; // L
 class Stage {
     private liqOut: Stream = { ndot: 0, ppm: feedPPM() };
     private vapOut: Stream = { ndot: 0, ppm: 0 };
@@ -97,7 +97,7 @@ class Stage {
         return this.liqOut;
     }
 
-    public equilibrium(T: number, P: number) {
+    public equilibrium(T: number, P: number, dt: number) {
         if (P === 0) return;
         const lin = this.liqIn();
         const vin = this.vapIn!();
@@ -113,19 +113,32 @@ class Stage {
         //      (in) = xn * L + m * xn * V = xn * (L + m * V)
         //    ∴ xn = (in) / (L + m * V)
         const n_in = xn1 * L + yn1 * V;
-        const xn = n_in / (L + m * V);
-        const yn = m * xn;
+        const denom = L + m * V
+        const xn = (denom !== 0) ? n_in / (L + m * V) : this.liqOut.ppm;
+        const yn = (denom !== 0) ? m * xn : this.vapOut.ppm;
 
+        let liqTarg, vapTarg;
         if (this.eff !== 1) {
             // Update
-            this.liqOut = { ndot: L, ppm: this.eff * (xn - xn1) + xn1 };
-            this.vapOut = { ndot: V, ppm: this.eff * (yn - yn1) + yn1 };
+            liqTarg = { ndot: L, ppm: this.eff * (xn - xn1) + xn1 };
+            vapTarg = { ndot: V, ppm: this.eff * (yn - yn1) + yn1 };
         }
         else {
             // Update
-            this.liqOut = { ndot: L, ppm: xn };
-            this.vapOut = { ndot: V, ppm: yn };
+            liqTarg = { ndot: L, ppm: xn };
+            vapTarg = { ndot: V, ppm: yn };
         }
+
+        const liqTau = STAGE_LIQ_MOLES / Math.max(L, 0.1);
+        // tau = V / Vdot
+        // P Vdot = ndot R T => Vdot = ndot R T / P
+        // tau = P * V / ndot / R / T
+        const vapTau = P * STAGE_GAS_VOL / Math.max(V, 0.1) / 0.08314 / T;
+        const rl = Math.exp(-1 / liqTau);
+        const rv = Math.exp(-1 / vapTau);
+
+        this.liqOut = { ndot: smoothLerp(this.liqOut.ndot, liqTarg.ndot, rl, dt), ppm: smoothLerp(this.liqOut.ppm, liqTarg.ppm, rl, dt) };
+        this.vapOut = { ndot: smoothLerp(this.vapOut.ndot, vapTarg.ndot, rv, dt), ppm: smoothLerp(this.vapOut.ppm, vapTarg.ppm, rv, dt) };
     }
 
     // Mixing
@@ -205,7 +218,7 @@ export class ColumnCalc {
         }
         // Solve eqm
         for (const stage of this.stages) {
-            stage.equilibrium(T, P);
+            stage.equilibrium(T, P, deltaTime);
             if (stage.vapStream().ndot < 0) throw new Error(`gas under in settle`);
         }
     }
