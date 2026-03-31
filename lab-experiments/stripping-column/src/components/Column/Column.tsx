@@ -1,6 +1,6 @@
 import { createEffect, createMemo, createSignal, For, onMount, useContext, type Accessor, type Component } from "solid-js";
-import { FEED_PPM, GAS_INIT_PPM, STAGE_HEIGHT } from "../../globals/config";
-import { numberOfStages, paddingTop, resetEvent, setColFull } from "../../globals/signals";
+import { STAGE_HEIGHT } from "../../globals/config";
+import { feedPPM, gasPPM, numberOfStages, paddingTop, resetEvent, setColFull } from "../../globals/signals";
 import "./Column.css";
 import { animate, constrain } from "../../globals/helpers";
 import { ColumnCalc, ColumnContext, type Stream } from "../../globals/calcs";
@@ -41,8 +41,8 @@ export const Column: Component<ColumnProps> = (props) => {
         animating = false;
         setColFull(true);
         // Create the calculation object and start the simulation
-        const liqStream = createMemo(() => { return { ndot: feedIn() * 1000 / 18 / 60, ppm: FEED_PPM     } as Stream});
-        const gasStream = createMemo(() => { return { ndot: gasIn() / 60,              ppm: GAS_INIT_PPM } as Stream});
+        const liqStream = createMemo(() => { return { ndot: feedIn() * 1000 / 18 / 60, ppm: feedPPM()     } as Stream});
+        const gasStream = createMemo(() => { return { ndot: gasIn() / 60,              ppm: gasPPM() } as Stream});
         const col = new ColumnCalc(numberOfStages(), liqStream, gasStream, gasPressure);
         // Attach the column to context so other components can access it
         columnContext!.column = col;

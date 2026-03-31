@@ -51,12 +51,12 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
-
+/* 
 .btn {
   position: absolute;
   right: -5px;
   top: 100px;
-}
+} */
 
 /* @media (prefers-color-scheme: light) {
   :root {

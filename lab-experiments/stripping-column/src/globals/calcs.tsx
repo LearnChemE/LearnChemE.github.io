@@ -1,7 +1,7 @@
 import { stageEfficiency } from "./signals";
 import { animate } from "./helpers";
 import { createContext, createSignal, type Accessor, type Setter } from "solid-js";
-import { FEED_PPM } from "./config";
+import { feedPPM } from "./signals";
 
 // Context for column calculations
 export type ColumnContextType = {
@@ -70,14 +70,14 @@ export type Stream = {
 const STAGE_LIQ_MOLES = 50;
 const STAGE_GAS_VOL = 5; // L
 class Stage {
-    private liqOut: Stream = { ndot: 0, ppm: FEED_PPM };
+    private liqOut: Stream = { ndot: 0, ppm: feedPPM() };
     private vapOut: Stream = { ndot: 0, ppm: 0 };
 
     private liqIn: () => Stream;
     private vapIn: (() => Stream) | null = null;
     private eff: number;
 
-    private ppm = FEED_PPM;
+    private ppm = feedPPM();
 
     constructor(liqIn: () => Stream, efficiency = 1) {
         this.liqIn = liqIn;

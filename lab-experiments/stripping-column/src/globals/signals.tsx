@@ -1,5 +1,5 @@
 import { createMemo, createSignal } from "solid-js";
-import { DEFAULT_NUMBER_OF_STAGES, STAGE_HEIGHT, ZERO_STAGE_PADDING } from "./config";
+import { DEFAULT_NUMBER_OF_STAGES, INIT_FEED_PPM, INIT_GAS_PPM, STAGE_HEIGHT, ZERO_STAGE_PADDING } from "./config";
 
 // Global signals for application state
 export const [numberOfStages, setNumberOfStages] = createSignal(DEFAULT_NUMBER_OF_STAGES);
@@ -13,3 +13,7 @@ export const paddingTop = createMemo(() => Math.max(0, (1 - numberOfStages()) * 
  */
 export const paddedHeight = createMemo(() => Math.max(0, STAGE_HEIGHT * (numberOfStages() - 1) - ZERO_STAGE_PADDING));
 export const triggerResetEvent = () => setResetEvent(!resetEvent());
+
+// Adjustable feed and stripping ppms
+export const [feedPPM, setFeedPPM] = createSignal(INIT_FEED_PPM);
+export const [gasPPM, setGasPPM] = createSignal(INIT_GAS_PPM);

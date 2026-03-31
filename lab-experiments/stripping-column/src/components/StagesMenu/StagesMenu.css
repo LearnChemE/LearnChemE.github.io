@@ -38,3 +38,10 @@ hr {
     margin-right: 5%;
     background-color: var(--hamburger-color);
 }
+
+.menu-msg {
+    display: block;
+    padding: 1em;
+    text-align: center;
+    /* text-align-last: center; */
+}

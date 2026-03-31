@@ -1,5 +1,5 @@
 import { For, Show, type Accessor, type Component } from "solid-js";
-import { FEED_PPM, GAS_INIT_PPM, numberOfStages, paddedHeight, paddingTop } from "../../globals/";
+import { feedPPM, gasPPM, numberOfStages, paddedHeight, paddingTop } from "../../globals/";
 import { SVGTooltip } from "../Tooltip/TooltipSelector";
 
 type ColumnDataProps = {
@@ -64,8 +64,8 @@ export const ColumnData: Component<ColumnDataProps> = (props) => {
         </g>
     </g>
 
-<SVGTooltip x={135} y={() => 78 + paddedHeight()} ppm={FEED_PPM} label="liquid feed" anchor={feed} />
-<SVGTooltip x={550} y={() => 128 + paddedHeight()}  ppm={GAS_INIT_PPM} label="gas feed" anchor={solv} />
+<SVGTooltip x={135} y={() => 78 + paddedHeight()} ppm={feedPPM} label="liquid feed" anchor={feed} />
+<SVGTooltip x={550} y={() => 128 + paddedHeight()}  ppm={gasPPM} label="gas feed" anchor={solv} />
     </>
     )
 }

@@ -29,7 +29,7 @@
 .radio-container {
     display: grid;
     margin: auto;
-    width: clamp(100px, 70%, 500px);
-    grid-template-columns: repeat(5, 1fr);
-    gap: 1em;
+    width: 50%;
+    grid-template-columns: repeat(2, 1fr);
+    gap: .25em;
 }

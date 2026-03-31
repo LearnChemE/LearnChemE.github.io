@@ -1,11 +1,11 @@
 import { type Component, createSignal, onMount, useContext, createEffect, type Accessor } from "solid-js";
 import "./Tooltip.css";
-import { ColumnContext, FEED_PPM, GAS_INIT_PPM, resolveProperty } from "../../globals/";
+import { ColumnContext, feedPPM, gasPPM, resolveProperty } from "../../globals/";
 
 interface TooltipSelectorProps {
     x: number;
     y: number | Accessor<number>;
-    ppm?: number;
+    ppm?: number | Accessor<number>;
     stage?: number;
     stream?: "liquid" | "vapor";
     label?: string;
@@ -15,8 +15,8 @@ interface TooltipSelectorProps {
 }
 
 export const SVGTooltip: Component<TooltipSelectorProps> = ({ x, y, anchor, ppm, stage, stream, label, override, width }) => {
-    let initPPM = (stream === "liquid") ? FEED_PPM :
-        (stream === "vapor") ? GAS_INIT_PPM : 0;
+    let initPPM = (stream === "liquid") ? feedPPM() :
+        (stream === "vapor") ? gasPPM() : 0;
     const [showing, setShowing] = createSignal<boolean>(false);
     const [dispPPM, setDispPPM] = createSignal<number>(initPPM);
     const colCtx = useContext(ColumnContext)!;
@@ -40,7 +40,12 @@ export const SVGTooltip: Component<TooltipSelectorProps> = ({ x, y, anchor, ppm,
         }); 
     }
     else if (ppm !== undefined) {
-        setDispPPM(ppm);
+        if (typeof ppm === "function") {
+            createEffect(() => setDispPPM(ppm()));
+        }
+        else {
+            setDispPPM(ppm);
+        }
     }
     else if (!override) {
         throw new Error("Must specify either stage to track or PPM value for tooltip hint");
