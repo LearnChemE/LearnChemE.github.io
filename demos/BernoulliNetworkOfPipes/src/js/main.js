@@ -12,6 +12,7 @@ const constants = {
   minInletArrowLength: 0.35,
   arrowLabelOffset: 0.5,
   arrowLabelBoundsPadding: 0.15,
+  dimensionLabelPadding: -1,
   baseBounds: {
     minX: -2.6666666666666665,
     maxX: 2.6666666666666665,
@@ -278,8 +279,8 @@ function buildAnnotations(model, font) {
       start: { x: 0, y: -inletArrowLength },
       end: { x: 0, y: 0 },
       textPosition: {
-        x: 0.3,
-        y: -0.3
+        x: 0.45,
+        y: -0.45
       }
     }
   ];
@@ -396,7 +397,7 @@ function buildAnnotations(model, font) {
       xanchor: align === 'center' ? 'center' : align,
       yanchor: 'middle',
       bgcolor: colors.labelFill,
-      borderpad: 3,
+      borderpad: constants.dimensionLabelPadding,
       font: { ...font, size: 15, color: '#111' },
       align: align === 'right' ? 'right' : align === 'center' ? 'center' : 'left'
     });
@@ -422,7 +423,7 @@ function buildAnnotations(model, font) {
       xanchor: 'center',
       yanchor: 'bottom',
       bgcolor: colors.labelFill,
-      borderpad: 3,
+      borderpad: constants.dimensionLabelPadding,
       font: { ...font, size: 15, color: '#111' },
       align: 'center'
     });
