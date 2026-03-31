@@ -1,6 +1,6 @@
 import { batch, createEffect, createMemo, createSignal, Match, Show, Switch } from 'solid-js'
 import './App.css'
-import { PlotlyChart } from './components/PlotlyChart'
+// import { PlotlyChart } from './components/PlotlyChart'
 import { ControlButton } from './components/ControlButton/ControlButton'
 import { SVGCanvas } from './components/SVGCanvas/SVGCanvas'
 import Background from './components/Background/Background'
@@ -101,7 +101,7 @@ function App() {
           </Match>
         </Switch>
       </div>
-      <PlotlyChart />
+      {/* <PlotlyChart /> */}
     </ColumnContextProvider>
   )
 }

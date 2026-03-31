@@ -37,6 +37,6 @@ export const MIN_STAGES_MEB = 3;
 export const MAX_STAGES_MEB = 5;
 
 // Each simulation will link to eachother
-export const STR_LINK = "https://learncheme.github.io/lab-experiments/stripping-column/dist?mode=stripping";
-export const ABS_LINK = "https://learncheme.github.io/lab-experiments/stripping-column/dist?mode=absorption";
-export const MEB_LINK = "https://learncheme.github.io/lab-experiments/stripping-column/dist?mode=meb";
+export const STR_LINK = "https://learncheme.github.io/lab-experiments/stripping-column/dist";
+export const ABS_LINK = "https://learncheme.github.io/lab-experiments/absorption-column";
+export const MEB_LINK = "https://learncheme.github.io/lab-experiments/stripping-absorption-meb";
