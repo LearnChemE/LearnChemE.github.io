@@ -70,6 +70,11 @@ body {
     max-width: calc(100% - 20px);
 }
 
+#play-button {
+    position: relative;
+    z-index: 1001;
+}
+
 /* main.css */
 .icon-container {
     margin-top: 10px;
@@ -80,6 +85,11 @@ body {
     justify-content: space-between; /* Distribute space between items */
     align-items: flex-start; /* Align items to the top */
     gap: 10px; /* Space between icons (optional) */
+}
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
 }
 
 .hamburger-wrapper {
