@@ -23,6 +23,7 @@ let knob = null;
 let shaft = null;
 let shaftLine = null;
 let currentAngle = 0;
+let accumulatedAngle = 0;
 let shaftFrontView = null;
 let knobFrontView = null;
 let connectingRod = null;
@@ -49,6 +50,7 @@ let panStart = { x: 0, y: 0 };
 
 const resetButton = document.getElementById('reset-button');
 const measureAngleButton = document.getElementById('measure-angle-button');
+const playButton = document.getElementById('play-button');
 
 let windowWidth = window.innerWidth - 60;
 let windowHeight = windowWidth * 600 / 1000;
@@ -64,6 +66,57 @@ window.addEventListener('resize', function() {
   let windowHeight = windowWidth * 600 / 1000;
   draw.size(windowWidth, windowHeight);
 });
+
+/**
+ * Animate function to be called every frame.
+ * @param fn Function to call every frame. dt is time since last call in seconds, t is total time in ms. Return true to continue, false to stop.
+ * @param then Optional function to call when animation ends.
+ */
+export function animate(fn, then) {
+    let prevtime = null;
+    let startTime = null;
+
+    const frame = (time) => {
+        if (prevtime === null) prevtime = time;
+        if (startTime === null) startTime = time;
+        const dt = Math.min((time - prevtime) / 1000, .3); // in ms
+        prevtime = time;
+
+        // Call the function
+        const playing = fn(dt, time - startTime);
+
+        // Request next frame
+        if (playing) requestAnimationFrame(frame);
+        else then?.();
+    }
+    requestAnimationFrame(frame);
+}
+
+let playing = false;
+const dthdt = -2 * Math.PI / 60; // Rotate 2 pi in 60 seconds
+const autoRotate = (dt) => {
+    if (!playing) return;
+    
+    const dth = dthdt * dt;
+    let newAngle = currentAngle * Math.PI / 180 + dth;
+    if (newAngle <= -Math.PI) newAngle += 2 * Math.PI;
+    setCurrentAngle(newAngle);
+
+    return playing; // Stop after 2 full rotations
+};
+
+function updatePlay() {
+    if (accumulatedAngle <= -720) {
+        playing = false;
+        playButton.innerHTML = "play";
+        playButton.classList.remove("btn-danger");
+        playButton.classList.add("btn-success");
+        playButton.classList.add("disabled");
+    }
+    else {
+        playButton.classList.remove("disabled");
+    }
+}
 
 function resetCanvas() {
     resetButton.addEventListener('click', () => {
@@ -95,9 +148,29 @@ function resetCanvas() {
         if (isMeasuringAngle) {
             protractor = drawProtractor(canvasWidth / 4, canvasHeight / 2, 200);
             shaftLine.show();
+            measureAngleButton.classList.remove('btn-outline-primary');
+            measureAngleButton.classList.add('btn-primary');
         } else if (protractor) {
             protractor.remove();
             shaftLine.hide();
+            measureAngleButton.classList.remove('btn-primary');
+            measureAngleButton.classList.add('btn-outline-primary');
+        }
+    });
+
+    playButton.addEventListener('click', () => {
+        if (playing) {
+            playing = false;
+            playButton.classList.remove("btn-danger");
+            playButton.classList.add("btn-success");
+            playButton.innerHTML = "play";
+        }
+        else {
+            playing = true;
+            animate(autoRotate);
+            playButton.classList.add("btn-danger");
+            playButton.classList.remove("btn-success");
+            playButton.innerHTML = "pause";
         }
     });
 }
@@ -191,6 +264,29 @@ function createConnectingRod() {
     .stroke({ color: "silver", width: 1 });
 }
 
+function setCurrentAngle(angle) {
+    const angleDeg = angle * 180 / Math.PI;
+
+    knob.center(
+        centerX + radius * Math.cos(angle),
+        centerY + radius * Math.sin(angle)
+    );
+    
+    shaft.rotate(angleDeg - currentAngle, centerX, centerY);
+    shaftLine.rotate(angleDeg - currentAngle, centerX, centerY);
+
+    accumulatedAngle += angleDeg - currentAngle;
+    if (Math.abs(angleDeg) > 90 /* left half */ &&
+        angleDeg * currentAngle < 0 /* crossed the vertical */) {
+            accumulatedAngle += (angleDeg > 0) ? -360 : +360;
+    }
+    
+    currentAngle = angleDeg;
+    console.log(accumulatedAngle);
+    updateFrontView(angleDeg);
+    updatePlay();
+}
+
 function setupDragHandlers() {
     knob.on('pointerdown', () => {
         isDragging = true;
@@ -210,17 +306,8 @@ function setupDragHandlers() {
         const dx = cursor.x - centerX;
         const dy = cursor.y - centerY;
         const angle = Math.atan2(dy, dx);
-        const angleDeg = angle * 180 / Math.PI;
         
-        knob.center(
-            centerX + radius * Math.cos(angle),
-            centerY + radius * Math.sin(angle)
-        );
-        
-        shaft.rotate(angleDeg - currentAngle, centerX, centerY);
-        shaftLine.rotate(angleDeg - currentAngle, centerX, centerY);
-        currentAngle = angleDeg;
-        updateFrontView(angleDeg);
+        setCurrentAngle(angle);
     });
     
     document.addEventListener('pointerup', () => {
@@ -431,7 +518,6 @@ function updatePointsWithShaftRotation(newAngle) {
         
         const dotX = centerX + radius * Math.cos(dot.effectiveAngle);
         const dotY = centerY + radius * Math.sin(dot.effectiveAngle);
-        console.log(dot.view, dot);
         dot.view.center(dotX, dotY);
     }
 }
