@@ -19,7 +19,7 @@ export const ColumnData: Component<ColumnDataProps> = (props) => {
     <For each={Array(numberOfStages())}>
       {(_,i) => (<>
         {/* Left: Liquid */}
-        <g transform={`translate(317 ${98 + paddingTop() + i() * 32})`}>
+        <g transform={`translate(317 ${108 + paddingTop() + i() * 32})`}>
             <g class="col-data-anchor" ref={lrefs[i()]} >
                 {/* Large anchor for easy readability */}
                 <circle cx="0" cy="0" r="16" fill="red" opacity={0}/> 
@@ -32,14 +32,14 @@ export const ColumnData: Component<ColumnDataProps> = (props) => {
 
         {/* Right: Vapor */}
         <Show when={props.gasIsOn()}>
-            <g transform={`translate(401 ${98 + paddingTop() + i() * 32})`} ref={rrefs[i()]}> 
+            <g transform={`translate(401 ${88 + paddingTop() + i() * 32})`} ref={rrefs[i()]}> 
                 <g class="col-data-anchor">
                     <circle cx="0" cy="0" r="16" fill="red" opacity={0}/>
                     <circle cx="0" cy="0" r="4" fill="#83dbdb"/>
                     <circle cx="0" cy="0" r="2.5" fill="white"/>
                 </g>
             </g>
-            <SVGTooltip x={418} y={80 + paddingTop() + i() * 32} stage={i()} stream={"vapor"} anchor={rrefs[i()]} />
+            <SVGTooltip x={418} y={80 + paddingTop() + i() * 32} stage={i()} fixed={1} stream={"vapor"} anchor={rrefs[i()]} />
         </Show>
       </>)}
     </For>
@@ -65,7 +65,7 @@ export const ColumnData: Component<ColumnDataProps> = (props) => {
     </g>
 
 <SVGTooltip x={135} y={() => 78 + paddedHeight()} ppm={feedPPM} label="liquid feed" anchor={feed} />
-<SVGTooltip x={550} y={() => 128 + paddedHeight()}  ppm={gasPPM} label="gas feed" anchor={solv} />
+<SVGTooltip x={550} y={() => 128 + paddedHeight()}  ppm={gasPPM} fixed={1} label="gas feed" anchor={solv} />
     </>
     )
 }

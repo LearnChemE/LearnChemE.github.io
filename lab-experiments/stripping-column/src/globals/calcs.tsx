@@ -67,8 +67,8 @@ export type Stream = {
     ppm: number;
 }
 
-const STAGE_LIQ_MOLES = 10;
-const STAGE_GAS_VOL = 1; // L
+const STAGE_LIQ_MOLES = 1;
+const STAGE_GAS_VOL = .5; // L
 class Stage {
     private liqOut: Stream = { ndot: 0, ppm: feedPPM() };
     private vapOut: Stream = { ndot: 0, ppm: 0 };
@@ -212,10 +212,10 @@ export class ColumnCalc {
         const T = T0;
         const P = this.getPressure() + 1;
         // Iterate mass balance
-        for (const stage of this.stages) {
-            stage.massBal(deltaTime, P);
-            if (stage.vapStream().ndot < 0) throw new Error("gas rate under in evolve");
-        }
+        // for (const stage of this.stages) {
+        //     stage.massBal(deltaTime, P);
+        //     if (stage.vapStream().ndot < 0) throw new Error("gas rate under in evolve");
+        // }
         // Solve eqm
         for (const stage of this.stages) {
             stage.equilibrium(T, P, deltaTime);

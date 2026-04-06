@@ -23,8 +23,8 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
             const col = ctx.column!;
             col.updated();
             const r = col.liqOut();
-            const vdot = r.ndot / 1000; // L  / s
-            const mdot = r.ndot / 1000; // kg / s
+            const vdot = r.ndot * 18 / 1000; // L  / s
+            const mdot = r.ndot * 18 / 1000; // kg / s
 
             setRate(vdot);
             setMdot(mdot);
@@ -32,7 +32,7 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
     });
 
     // Scale of x reacts to the flowrate
-    const [min, max] = [0, FEED_MAX_RATE]; // expected flowrate range in L/min
+    const [min, max] = [0, FEED_MAX_RATE / 60]; // expected flowrate range in L/min
     const range = max - min;
     const sx = createMemo(() => constrain(rate() - min, 0, range) / range);
 
@@ -54,8 +54,9 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
     animate(accumulate);
 
     // Reactive display
-    const text = createMemo(() => fill() > 20 ? "max" : `${mass().toFixed(1)} kg`);
+    const text = createMemo(() => fill() > 20 ? "max" : `${mass().toFixed(2)} kg`);
 
+    createEffect(() =>  console.log(`Rate: ${rate()} L/min`));
     // Reset with simulation
     createEffect(() => {
         resetEvent();
@@ -109,7 +110,7 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
                 text-anchor="end"
                 fill="#d7ce1bff"
                 font-family="'Digital-7 Mono', monospace"
-                font-size="16"
+                font-size="14"
             >
                 {text()}
             </text>

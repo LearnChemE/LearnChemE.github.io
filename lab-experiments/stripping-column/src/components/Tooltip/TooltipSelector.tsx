@@ -12,14 +12,16 @@ interface TooltipSelectorProps {
     override?: Accessor<string>;
     anchor: SVGGElement;
     width?: number;
+    fixed?: number;
 }
 
-export const SVGTooltip: Component<TooltipSelectorProps> = ({ x, y, anchor, ppm, stage, stream, label, override, width }) => {
+export const SVGTooltip: Component<TooltipSelectorProps> = ({ x, y, anchor, ppm, stage, stream, label, override, width, fixed }) => {
     let initPPM = (stream === "liquid") ? feedPPM() :
         (stream === "vapor") ? gasPPM() : 0;
     const [showing, setShowing] = createSignal<boolean>(false);
     const [dispPPM, setDispPPM] = createSignal<number>(initPPM);
     const colCtx = useContext(ColumnContext)!;
+    if (fixed === undefined) fixed = 2;
     y = resolveProperty(y, 0);
 
 
@@ -63,7 +65,7 @@ export const SVGTooltip: Component<TooltipSelectorProps> = ({ x, y, anchor, ppm,
             <rect x="0" y="0" rx={4} width={width ?? 100} height={40} fill="rgba(0, 0, 0, 0.8)"/>
             <text x={0} y={0} font-family="Arial" font-size="14" fill="white">
                 <tspan x={5} dy="1.2em">{label}:</tspan>
-                <tspan x={override ? 8 : 24} dy="1.2em">{override ? override() : `${dispPPM().toFixed(2)} PPM`}</tspan>
+                <tspan x={override ? 8 : 24} dy="1.2em">{override ? override() : `${dispPPM().toFixed(fixed)} PPM`}</tspan>
             </text>
             <polygon></polygon>
         </g>
