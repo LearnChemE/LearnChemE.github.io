@@ -1,0 +1,77 @@
+<div id="details" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="detailsTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsTitle">Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Rates of cell growth \(r_g\), cell death \(r_d\), and substrate consumption \(-r_s\) are:
+        </p>
+        <p class="text-start">
+          \(r_g = \mu C_c\), &nbsp; \(r_d = k_d C_c\), &nbsp; \(-r_s = Y_{s/c} r_g\),
+        </p>
+        <p class="text-start">
+          \(\mu = \mu_{\max} \dfrac{C_s}{k_s + C_s}\),
+        </p>
+        <p>
+          where \(\mu\) is the specific cell growth rate (1/h), \(C_c\) and \(C_s\) are the cell and substrate concentrations (g/L),
+          \(k_d\) is the specific death rate constant (1/h), \(Y_{s/c}\) is the yield coefficient, \(\mu_{\max}\) is the maximum specific
+          growth rate (1/h), and \(k_s\) is the Monod constant (g/L).
+        </p>
+        <p>
+          The cell and substrate concentrations are found by solving the CSTR mass balances at steady-state:
+        </p>
+        <p class="text-start">
+          \(0 = -D C_c + r_g - r_d\),
+        </p>
+        <p class="text-start">
+          \(0 = D(C_{s,0} - C_s) + r_s\),
+        </p>
+        <p>
+          solving for \(C_c\) and \(C_s\):
+        </p>
+        <p class="text-start">
+          \(C_c = Y_{c/s} \dfrac{D(C_{s,0} - C_s)}{\mu}\),
+        </p>
+        <p class="text-start">
+          \(C_s = -k_s \dfrac{D + k_d}{D + k_d - \mu_{\max}}\),
+        </p>
+        <p>
+          where \(D\) is the dilution rate (1/h), \(C_{s,0}\) is the feed substrate concentration (g/L), and
+          \(Y_{c/s} = -1/(Y_{s/c})\).
+        </p>
+        <p>
+          Wash-out (\(D_{\max}\)) occurs when the cell concentration is zero:
+        </p>
+        <p class="text-start">
+          \(D_{\max} = -\dfrac{C_{s,0} k_d + k_d k_s - C_{s,0} \mu_{\max}}{C_{s,0} + k_s}\).
+        </p>
+        <p>
+          The maximum rate of cell production (\(D_{\max\mathrm{prod}}\)) is where \(D C_c\) is greatest, or:
+        </p>
+        <p class="text-start">
+          \(\dfrac{\mathrm{d}(D C_c)}{\mathrm{d}D} = 0\),
+        </p>
+        <p class="text-start">
+          \(D_{\max\mathrm{prod}} =
+          Y_{c/s} D \left[
+          \dfrac{
+          2(D + k_d) k_s (D + 2k_d - 2\mu_{\max}) + C_{s,0}(D + 2k_d)^2
+          }{
+          2(D + k_d)^2 (D + k_d - \mu_{\max})
+          }\right]\).
+        </p>
+        <p>
+          \(D_{\max}\) and \(D_{\max\mathrm{prod}}\) are in units of 1/h.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

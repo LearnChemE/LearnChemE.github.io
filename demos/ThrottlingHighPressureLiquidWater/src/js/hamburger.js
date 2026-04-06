@@ -118,8 +118,7 @@ function forceBackdropCleanup() {
 //         const buttons = [
 //             { label: 'Directions', url: 'html/overlay/directions.html', action: 'modal' },
 //             // { label: 'Details', url: 'html/overlay/details.html', action: 'modal' },
-//             { label: 'About', url: 'html/overlay/about.html', action: 'modal' },
-//             { label: 'Worksheet', url: 'assets/worksheet.pdf', action: 'download', filename: 'worksheet.pdf' }
+//             { label: 'About', url: 'html/overlay/about.html', action: 'modal' }
 //         ];
         
 //         buttons.forEach((btnConfig) => {
@@ -232,8 +231,7 @@ export function initOverlayButtonsForNewIndex() {
     const configs = [
         { id: 'directions', label: 'Directions', url: 'html/overlay/directions.html', action: 'modal', modalId: 'directions' },
         { id: 'details',    label: 'Details',    url: 'html/overlay/details.html',    action: 'modal', modalId: 'details'    },
-        { id: 'about',      label: 'About',      url: 'html/overlay/about.html',      action: 'modal', modalId: 'about'      },
-        { id: 'worksheet',  label: 'Worksheet',  url: 'assets/Unsteady state material balances for a two-phase, multicomponent system worksheet.pdf',action: 'download', filename: 'Unsteady state material balances for a two-phase, multicomponent system worksheet.pdf' }
+        { id: 'about',      label: 'About',      url: 'html/overlay/about.html',      action: 'modal', modalId: 'about'      }
     ];
     // configs.forEach(cfg => {
     //     const el = document.getElementById(cfg.id);

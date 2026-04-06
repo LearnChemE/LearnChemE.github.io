@@ -72,13 +72,13 @@ module.exports = (env, argv) => {
         },
 
         // ───────────────────────────────────────────────────────────────────
-        // 5.2) FONTS & AUDIO & DOCS (TTF, WAV, DOCX, PDF) → dist/assets/
+        // 5.2) FONTS & AUDIO & DOCS (TTF, WAV, DOCX, PDF)
         // ───────────────────────────────────────────────────────────────────
         {
           test: /\.(ttf|wav|docx|pdf)$/i,
           type: 'asset/resource',
           generator: {
-            filename: 'assets/[name][ext]',
+            filename: '[name][ext]',
           },
         },
 
@@ -90,12 +90,12 @@ module.exports = (env, argv) => {
           test: /\.svg$/i,
           use: ['to-string-loader', 'html-loader'],
         },
-        // Other images (PNG, JPG, GIF) → dist/assets/
+        // Other images (PNG, JPG, GIF)
         {
           test: /\.(png|jpe?g|gif)$/i,
           type: 'asset/resource',
           generator: {
-            filename: 'assets/[name][ext]',
+            filename: '[name][ext]',
           },
         },
 
@@ -148,22 +148,17 @@ module.exports = (env, argv) => {
       new CleanWebpackPlugin({
         cleanOnceBeforeBuildPatterns: [
           '**/*',
-          '!assets/**', // Keep assets if needed, this was in your original
         ],
       }),
 
       // ─────────────────────────────────────────────────────────────────────
-      // 6.4) CopyWebpackPlugin (kept from your original config)
+      // 6.4) CopyWebpackPlugin
       // ─────────────────────────────────────────────────────────────────────
       new CopyWebpackPlugin({
         patterns: [
           {
             from: path.resolve(__dirname, '../src/html/overlay'),
             to:   path.resolve(__dirname, '../dist/html/overlay'),
-          },
-          {
-            from: path.resolve(__dirname, '../src/assets'),
-            to:   path.resolve(__dirname, '../dist/assets'),
           },
         ],
       }),
