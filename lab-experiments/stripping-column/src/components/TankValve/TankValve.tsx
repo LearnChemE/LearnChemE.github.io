@@ -44,12 +44,12 @@ export const TankValve: Component<TankValveProps> = (props) => {
         playing = true;
 
         // Determine direction
-        const dthdt = (props.pressure() === 0) ? +90 : -90;
+        const dthdt = (props.pressure() === 0) ? -90 : +90;
         const target = (props.pressure() === 0) ? 
                     (p: number) => p >= MAX_PRESSURE :
                     (p: number) => p <= 0;
         // Convert to pressure
-        const dpdt = dthdt * MAX_PRESSURE / MAX_TANK_VALVE_ROTATION;
+        const dpdt = dthdt * MAX_PRESSURE / -MAX_TANK_VALVE_ROTATION;
 
         // Create the animation callback
         const frame = (dt: number) => {
