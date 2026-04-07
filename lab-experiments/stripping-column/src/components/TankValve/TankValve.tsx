@@ -19,7 +19,7 @@ const VALVE_WIDTH = 27;
 const BAFFLE_WIDTH = 8;
 
 export const TankValve: Component<TankValveProps> = (props) => {
-    const rotation = createMemo(() => (1 - props.pressure() / MAX_PRESSURE) * MAX_TANK_VALVE_ROTATION % 60);
+    const rotation = createMemo(() => (1 - props.pressure() / MAX_PRESSURE) * -MAX_TANK_VALVE_ROTATION % 60);
     const disabled = resolveProperty(props.disabled, false);
     const [flash, setFlash] = createSignal(false);
 
@@ -73,9 +73,9 @@ export const TankValve: Component<TankValveProps> = (props) => {
         onClick={start}
         style="transition: filter 400ms ease-in-out">
     <rect x="0" y="1" width={VALVE_WIDTH} height="9" rx="2.5" fill="#67A8EF" stroke="black"/>
-    <TValveBaffle offset={0}   rotation={rotation} />
-    <TValveBaffle offset={60}  rotation={rotation} />
-    <TValveBaffle offset={120} rotation={rotation} />
+    <TValveBaffle offset={60}   rotation={rotation} />
+    <TValveBaffle offset={120}  rotation={rotation} />
+    <TValveBaffle offset={180} rotation={rotation} />
     </g>);
 }
 
