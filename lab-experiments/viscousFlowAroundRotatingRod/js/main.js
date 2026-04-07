@@ -282,7 +282,7 @@ function setCurrentAngle(angle) {
     }
     
     currentAngle = angleDeg;
-    console.log(accumulatedAngle);
+    // console.log(accumulatedAngle);
     updateFrontView(angleDeg);
     updatePlay();
 }
@@ -560,41 +560,115 @@ function updatePointsFrontView(newAngle) {
 function drawProtractor(centerX, centerY, radius) {
     // Create a group to hold all the protractor elements.
     const oneView = draw.group();
+    const labels = oneView.group();
+    const ticks = new Array(360);
     
     // Draw the outer circle.
-    oneView.circle(radius * 2)
-    .center(centerX, centerY)
-    .fill('none')
-    .stroke({ width: 2, color: 'black' });
+    const circle = oneView.circle(radius * 2)
+        .center(centerX, centerY)
+        .fill('none')
+        .stroke({ width: 2, color: 'black' });
     
     // Draw the tick marks and angle labels.
     for (let angle = 0; angle < 360; angle++) {
         const radian = angle * (Math.PI / 180);
         const innerRadius = radius - (angle % 10 === 0 ? radius - 25 : (angle % 5 === 0 ? radius / 2 : radius / 8));
+        const outerRadius = (angle % 10 === 0) ? radius + 4 : radius;
         
-        const x1 = centerX + radius * Math.cos(radian);
-        const y1 = centerY + radius * Math.sin(radian);
+        const x1 = centerX + outerRadius * Math.cos(radian);
+        const y1 = centerY + outerRadius * Math.sin(radian);
         const x2 = centerX + innerRadius * Math.cos(radian);
         const y2 = centerY + innerRadius * Math.sin(radian);
         
-        oneView.line(x1, y1, x2, y2)
-        .stroke({ width: 1, color: 'black' });
-        
+        const tick = oneView.line(x1, y1, x2, y2);
+        tick.stroke({ width: 1, color: 'black' });
+
+        ticks[angle] = tick;
+
         if (angle % 10 === 0) {
-            const textRadius = radius;
-            const textX = centerX + textRadius * Math.cos(radian);
-            const textY = centerY + textRadius * Math.sin(radian);
+            const textRadius = radius + 18;
+            const offset = angle > 90 && angle < 270 ? Math.PI / 60 : -Math.PI / 60; // Move text outward for angles between 90 and 270
+            const textX = centerX + textRadius * Math.cos(radian + offset);
+            const textY = centerY + textRadius * Math.sin(radian + offset);
+            const rotate = angle > 90 && angle < 270 ? angle - 180 : angle; // Rotate text upside down for angles between 90 and 270
             
-            oneView.text(angle.toString())
+            labels.text(angle.toString())
             .font({ size: 12, anchor: 'middle', fill: 'black' })
             .attr({
                 'text-anchor': 'middle',
-                'dominant-baseline': 'middle',
+                'dominant-baseline': 'baseline',
                 // Translate to (textX, textY) then rotate about that point.
-                transform: `translate(${textX}, ${textY}) rotate(${angle - 90})`
+                transform: `translate(${textX}, ${textY}) rotate(${rotate})`
             });
         }
     }
+    
+    let current = null;
+    let curLabel = null;
+    window.addEventListener('pointermove', (event) => {
+        const pt = draw.node.createSVGPoint();
+        pt.x = event.clientX;
+        pt.y = event.clientY;
+        const cursor = pt.matrixTransform(draw.node.getScreenCTM().inverse());
+        const dx = cursor.x - centerX;
+        const dy = cursor.y - centerY;
+        const r = Math.sqrt(dx * dx + dy * dy);
+
+
+        if (r <= radius) {
+            let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            if (angle < 0) angle += 360;
+            if (r <= radius / 2 - 2) { 
+                angle = Math.round(angle / 10) * 10; // Snap to nearest 10 degrees
+            }
+            else if (r <= radius - 27) {
+                angle = Math.round(angle / 5) * 5; // Snap to nearest 5 degrees
+            }
+            current = Math.round(angle);
+
+
+            if (current === 360) current = 0;
+
+            ticks.forEach((tick, index) => {
+                if (index === current) {
+                    tick.stroke({ width: 2, color: 'black' });
+                } else {
+                    tick.stroke({ width: 1, color: 'grey' });
+                }
+            });
+            circle.stroke({ width: 2, color: 'grey' });
+            labels.opacity(0.3);
+
+            curLabel?.remove();
+            
+            const textRadius = radius + 18;
+            const offset = angle > 90 && angle < 270 ? Math.PI / 60 : -Math.PI / 60; // Move text outward for angles between 90 and 270
+            const radian = current * (Math.PI / 180);
+            const textX = centerX + textRadius * Math.cos(radian + offset);
+            const textY = centerY + textRadius * Math.sin(radian + offset);
+            const rotate = angle > 90 && angle < 270 ? angle - 180 : angle; // Rotate text upside down for angles between 90 and 270
+            
+            curLabel = oneView.text(`${current}`)
+            .font({ size: 12, anchor: 'middle', fill: 'black' })
+            .attr({
+                'text-anchor': 'middle',
+                'dominant-baseline': 'baseline',
+                // Translate to (textX, textY) then rotate about that point.
+                transform: `translate(${textX}, ${textY}) rotate(${rotate})`
+            });
+
+        } else if (current !== null) {
+            ticks.forEach((tick, index) => {
+                tick.stroke({ width: 1, color: 'black' });
+            });
+            circle.stroke({ width: 2, color: 'black' });
+            labels.opacity(1);
+            current = null;
+            curLabel?.remove();
+            curLabel = null;
+        }
+
+    });
     
     // Return the group so it can be used/manipulated later.
     return oneView;
@@ -628,7 +702,6 @@ function drawHorizontalScale() {
     }
 
     const dragStart = (e) => {
-        console.log("drag start");
         const pt = draw.node.createSVGPoint();
         pt.x = e.clientX;
         pt.y = e.clientY;
@@ -692,7 +765,7 @@ function drawVerticalScale() {
     }
 
     const dragStart = (e) => {
-        console.log("drag start");
+        // console.log("drag start");
         const pt = draw.node.createSVGPoint();
         pt.x = e.clientX;
         pt.y = e.clientY;
