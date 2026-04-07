@@ -28,6 +28,9 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
 
             setRate(vdot);
             setMdot(mdot);
+        } else {
+            setRate(0);
+            setMdot(0);
         }
     });
 
@@ -56,7 +59,6 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
     // Reactive display
     const text = createMemo(() => fill() > 20 ? "max" : `${mass().toFixed(2)} kg`);
 
-    createEffect(() =>  console.log(`Rate: ${rate()} L/min`));
     // Reset with simulation
     createEffect(() => {
         resetEvent();

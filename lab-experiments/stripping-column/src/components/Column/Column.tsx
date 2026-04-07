@@ -59,6 +59,7 @@ export const Column: Component<ColumnProps> = (props) => {
         resetEvent();
         setColFull(false);
         setFill(0);
+        columnContext?.setColumnCreated(false);
         if (!animating) {
             animating = true;
             start();

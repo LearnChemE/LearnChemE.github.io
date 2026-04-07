@@ -1,16 +1,19 @@
 import type { Component } from "solid-js";
-import { createSignal, onMount } from "solid-js";
+import { createSignal, Match, onMount, Switch } from "solid-js";
 import "./Hamburger.css";
 import { Modal } from "../Modal/Modal";
+import { SIM_MODE } from "../../globals";
 
 interface WorksheetProps {
-    path: string;
-    downloadName: string;
+    abspath: string;
+    strpath: string;
+    absmebpath: string;
+    strmebpath: string;
     Directions: Component;
     About: Component;
 }
 
-export const HamburgerMenu: Component<WorksheetProps> = ({ path, downloadName, Directions, About }) => {
+export const HamburgerMenu: Component<WorksheetProps> = ({ abspath, strpath, absmebpath, strmebpath, Directions, About }) => {
     const [showMenu, setShowMenu] = createSignal(false);
     const [showDirections, setShowDirections] = createSignal(false);
     const [showAbout, setShowAbout] = createSignal(false);
@@ -37,12 +40,38 @@ export const HamburgerMenu: Component<WorksheetProps> = ({ path, downloadName, D
                     <i class="fas fa-book"></i>
                     <span>Directions</span>
                 </div>
-                <a id="worksheet-download" download={downloadName} href={path}>
-                    <div class="menu-item" data-modal="details">
-                        <i class="fas fa-download"></i>
-                        <span>Worksheet</span>
-                    </div>
-                </a>
+                <Switch>
+                    <Match when={SIM_MODE === "meb"}>
+                        <a id="worksheet-download" download={"stripping-column-meb-worksheet.pdf"} href={strmebpath}>
+                            <div class="menu-item" data-modal="details">
+                                <i class="fas fa-download"></i>
+                                <span>Worksheet (stripping)</span>
+                            </div>
+                        </a>
+                        <a id="worksheet-download" download={"absorption-column-meb-worksheet.pdf"} href={absmebpath}>
+                            <div class="menu-item" data-modal="details">
+                                <i class="fas fa-download"></i>
+                                <span>Worksheet (absorption)</span>
+                            </div>
+                        </a>
+                    </Match>
+                    <Match when={SIM_MODE === "stripping"}>
+                        <a id="worksheet-download" download={"stripping-efficiency-worksheet.pdf"} href={strpath}>
+                            <div class="menu-item" data-modal="details">
+                                <i class="fas fa-download"></i>
+                                <span>Worksheet</span>
+                            </div>
+                        </a>
+                    </Match>
+                    <Match when={SIM_MODE === "absorption"}>
+                        <a id="worksheet-download" download={"absorption-efficiency-worksheet.pdf"} href={abspath}>
+                            <div class="menu-item" data-modal="details">
+                                <i class="fas fa-download"></i>
+                                <span>Worksheet</span>
+                            </div>
+                        </a>
+                    </Match>
+                </Switch>
                 <div class="menu-item" data-modal="about" onClick={() => {setShowAbout(true); setShowMenu(false)}}>
                     <i class="fas fa-info-circle"></i>
                     <span>About</span>

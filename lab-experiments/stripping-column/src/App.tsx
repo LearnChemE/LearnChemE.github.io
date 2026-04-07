@@ -14,7 +14,6 @@ import Valve from './components/Valve/Valve'
 import { ColumnData } from './components/Column/ColumnData'
 import { StagesMenu } from './components/StagesMenu/StagesMenu'
 import { HamburgerMenu } from './components/Hamburger/Hamburger'
-import worksheet from "./assets/worksheet.pdf?url";
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import Defs from './components/Defs'
 import { colFull, paddedHeight, triggerResetEvent } from './globals/signals'
@@ -24,6 +23,12 @@ import { Regulator } from './components/Regulator/Regulator'
 import { TankValve } from './components/TankValve/TankValve'
 import { Controller } from './components/Controller/Controller'
 import { ColumnContextProvider } from './globals'
+
+// Worksheets
+import strmeb from "./assets/strMeb.pdf?url";
+import absmeb from "./assets/absMeb.pdf?url";
+import streff from "./assets/strEff.pdf?url";
+import abseff from "./assets/absEff.pdf?url";
 
 function App() {
   // Liquid feed
@@ -89,7 +94,7 @@ function App() {
         </Show>
 
         {/* Hamburger */}
-        <HamburgerMenu path={worksheet} downloadName="strippingCol_worksheet.pdf" Directions={DirectionsText} About={AboutText} />
+        <HamburgerMenu strmebpath={strmeb} absmebpath={absmeb} strpath={streff} abspath={abseff} Directions={DirectionsText} About={AboutText} />
 
         {/* Stages/Reset Button */}
         <Switch>
