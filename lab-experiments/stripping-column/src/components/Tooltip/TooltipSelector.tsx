@@ -1,4 +1,4 @@
-import { type Component, createSignal, onMount, useContext, createEffect, type Accessor } from "solid-js";
+import { type Component, createSignal, onMount, useContext, createEffect, type Accessor, Match, For, Switch } from "solid-js";
 import "./Tooltip.css";
 import { ColumnContext, feedPPM, gasPPM, resolveProperty } from "../../globals/";
 
@@ -9,7 +9,7 @@ interface TooltipSelectorProps {
     stage?: number;
     stream?: "liquid" | "vapor";
     label?: string;
-    override?: Accessor<string>;
+    override?: Accessor<Array<string>>;
     anchor: SVGGElement;
     width?: number;
     fixed?: number;
@@ -62,10 +62,19 @@ export const SVGTooltip: Component<TooltipSelectorProps> = ({ x, y, anchor, ppm,
 
     return (
         <g class="tooltip" transform={`translate(${x} ${y()})`} style={`opacity: ${showing() ? 1 : 0}`}>
-            <rect x="0" y="0" rx={4} width={width ?? 100} height={40} fill="rgba(0, 0, 0, 0.8)"/>
+            <rect x="0" y="0" rx={4} width={width ?? 100} height={override ? 22 + override().length * 18 : 40} fill="rgba(0, 0, 0, 0.8)"/>
             <text x={0} y={0} font-family="Arial" font-size="14" fill="white">
                 <tspan x={5} dy="1.2em">{label}:</tspan>
-                <tspan x={override ? 8 : 24} dy="1.2em">{override ? override() : `${dispPPM().toFixed(fixed)} PPM`}</tspan>
+                <Switch>
+                    <Match when={override}>
+                        <For each={override!()}>
+                            {line => <tspan x={12} dy="1.2em">{line}</tspan>}
+                        </For>
+                    </Match>
+                    <Match when={!override}>
+                        <tspan x={24} dy="1.2em">{`${dispPPM().toFixed(fixed)} PPM`}</tspan>
+                    </Match>
+                </Switch>
             </text>
             <polygon></polygon>
         </g>

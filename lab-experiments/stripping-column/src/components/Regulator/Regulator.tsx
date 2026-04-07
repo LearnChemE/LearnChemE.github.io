@@ -179,6 +179,6 @@ export const Regulator: Component<RegulatorProps> = (props) => {
 </g>
 </g>
 
-<SVGTooltip x={550} y={() => 128 + paddedHeight()} width={86} label="pressure" override={() => `${props.outPres().toFixed(1)} bar (g)`} anchor={ref} />
+<SVGTooltip x={550} y={() => 128 + paddedHeight()} width={86} label="pressure" override={() => [`${props.outPres().toFixed(1)} bar`,`(gauge)`]} anchor={ref} />
     </>);
 }
