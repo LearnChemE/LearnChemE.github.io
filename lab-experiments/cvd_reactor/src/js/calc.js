@@ -33,31 +33,32 @@ console.log(
 );
 
 export function massSiO2WithRecycle(gasFlowRate, TEOSFraction, conversion, recycleRatio) {
-  // 1. Fresh TEOS molar flow [mol/s]
-  const freshTEOS = gasFlowRate * TEOSFraction;
-
-  // 2. Total TEOS molar flow into reactor [mol/s]
-  const TEOSIn = freshTEOS * (recycleRatio / (1 + recycleRatio)) * (1 - conversion) + freshTEOS * (1 / (1 + recycleRatio));
-
-  // 3. Moles reacted per second [mol/s]
-  const reactedTEOS = TEOSIn * conversion;
+  const feedRate = gasFlowRate * 1 / (1 + recycleRatio); // mol/s
+  const recycleRate = gasFlowRate * recycleRatio / (1 + recycleRatio); // mol/s
+  const xf = (1 - conversion) * TEOSFraction * feedRate / (gasFlowRate - (1 - conversion) * recycleRate);
+  const fracIn = (feedRate * TEOSFraction + recycleRate * xf) / gasFlowRate;
+  // console.log(`xi: ${fracIn}, xf: ${xf}`);
+  const reactedTEOS = gasFlowRate * (fracIn - xf); // mol/s TEOS converted
 
   // 4. Mass SiO₂ formed [g/s]
-  console.log(
-    `Fresh TEOS: ${freshTEOS.toFixed(5)} mol/s, Total TEOS into reactor: ${TEOSIn.toFixed(5)} mol/s, Reacted TEOS: ${reactedTEOS.toFixed(5)} mol/s, Mass SiO₂: ${(reactedTEOS * M_SIO2).toFixed(5)} g/s`
-  );
+  // console.log(`
+  //   Fresh TEOS: ${feedRate * TEOSFraction} mol/s, 
+  //   Total TEOS into reactor: ${feedRate * TEOSFraction + xf * (gasFlowRate - feedRate)} mol/s, 
+  //   Reacted TEOS: ${reactedTEOS.toFixed(5)} mol/s, 
+  //   Mass SiO₂: ${(reactedTEOS * M_SIO2).toFixed(5)} g/s`
+  // );
   return reactedTEOS * M_SIO2;
 }
 
 export function splitFlows(totalInletFlow, R) {
   const fresh = totalInletFlow / (1 + R);
   const recycle = (R * totalInletFlow) / (1 + R);
-  console.log(1 / (1 + R));
+  // console.log(1 / (1 + R));
   return { recycle, fresh };
 }
 
 // Example for R = 1.0:
-console.log(
-  massSiO2WithRecycle(1, TEOSFraction, conversion, gasFlowRate).toFixed(5),
-  'g/s'
-);
+// console.log(
+//   massSiO2WithRecycle(1, TEOSFraction, conversion, gasFlowRate).toFixed(5),
+//   'g/s'
+// );
