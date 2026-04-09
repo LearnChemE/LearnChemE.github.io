@@ -80,11 +80,10 @@ body {
     margin-top: 10px;
     margin-left: 10px;
     margin-right: 10px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between; /* Distribute space between items */
-    align-items: flex-start; /* Align items to the top */
-    gap: 10px; /* Space between icons (optional) */
+
+    display: grid;
+    justify-content: space-between;
+    grid-template-columns: max-content max-content max-content;
 }
 
 .disabled {
@@ -99,11 +98,12 @@ body {
     position: relative;
     z-index: 1001; /* Higher than SVG canvas */
     pointer-events: auto;
+    flex-basis: 33.33%;
 }
 
 #hamburger-icon {
     cursor: pointer;
-    display: flex;
+
     align-items: center; /* Center the image vertically */
     border: 2px solid #000; /* Add a border */
     border-radius: 8px; /* Add corner radius */
@@ -118,6 +118,12 @@ body {
     position: relative;
     z-index: 1001; /* Higher than SVG canvas */
     pointer-events: auto;
+    width: 100px;
+}
+
+#timer {
+    grid-column: 2;
+    justify-self: center;
 }
 
 .hamburger-img {
