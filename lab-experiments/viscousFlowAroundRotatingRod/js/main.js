@@ -117,13 +117,13 @@ function setPlaying(value) {
 
 }
 
-const dthdt = -2 * Math.PI / 60; // Rotate 2 pi in 60 seconds
+const dthdt = 2 * Math.PI / 60; // Rotate 2 pi in 60 seconds
 const autoRotate = (dt) => {
     if (!playing) return;
     
     const dth = dthdt * dt;
     let newAngle = currentAngle * Math.PI / 180 + dth;
-    if (newAngle <= -Math.PI) newAngle += 2 * Math.PI;
+    if (newAngle >= Math.PI) newAngle -= 2 * Math.PI;
     setCurrentAngle(newAngle);
 
     setTimer(timerVal + dt);
@@ -132,7 +132,8 @@ const autoRotate = (dt) => {
 };
 
 function updatePlay() {
-    if (accumulatedAngle <= -720) {
+    console.log(accumulatedAngle);
+    if (accumulatedAngle >= 720) {
         setPlaying(false);
         playButton.classList.add("disabled");
     }
@@ -152,6 +153,7 @@ function resetCanvas() {
         bluePointTopView = null;
         
         prevAngle = 0;
+        accumulatedAngle = 0;
         totalRotation = 0;
         knob = null;
         shaft = null;
@@ -161,6 +163,10 @@ function resetCanvas() {
         connectingRod = null;
         isDragging = false;
         isMeasuringAngle = false;
+
+        setPlaying(false);
+        setTimer(0);
+
         draw.clear();
         addOptionToDragAndZoom();
         drawCanvas();
