@@ -103,7 +103,6 @@ let playing = false;
 function setPlaying(value) {
     playing = value;
     if (playing) {
-            setTimer(0);
             animate(autoRotate);
             playButton.classList.add("btn-danger");
             playButton.classList.remove("btn-success");
@@ -317,6 +316,7 @@ function setupDragHandlers() {
     document.addEventListener('pointermove', (event) => {
         if (!isDragging) { return };
         
+        setTimer(0);
         const pt = draw.node.createSVGPoint();
         pt.x = event.clientX;
         pt.y = event.clientY;
