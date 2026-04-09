@@ -92,25 +92,49 @@ export function animate(fn, then) {
     requestAnimationFrame(frame);
 }
 
+let timer = document.getElementById('timer');
+let timerVal = 0;
+function setTimer(val) {
+    timerVal = val;
+    timer.textContent = `timer: ${timerVal.toFixed(1)} s`;
+}
+
 let playing = false;
-const dthdt = -2 * Math.PI / 60; // Rotate 2 pi in 60 seconds
+function setPlaying(value) {
+    playing = value;
+    if (playing) {
+            setTimer(0);
+            animate(autoRotate);
+            playButton.classList.add("btn-danger");
+            playButton.classList.remove("btn-success");
+            playButton.innerHTML = "pause";
+        }
+        else {
+            playButton.classList.remove("btn-danger");
+            playButton.classList.add("btn-success");
+            playButton.innerHTML = "rotate";
+        }
+
+}
+
+const dthdt = 2 * Math.PI / 60; // Rotate 2 pi in 60 seconds
 const autoRotate = (dt) => {
     if (!playing) return;
     
     const dth = dthdt * dt;
     let newAngle = currentAngle * Math.PI / 180 + dth;
-    if (newAngle <= -Math.PI) newAngle += 2 * Math.PI;
+    if (newAngle >= Math.PI) newAngle -= 2 * Math.PI;
     setCurrentAngle(newAngle);
+
+    setTimer(timerVal + dt);
 
     return playing; // Stop after 2 full rotations
 };
 
 function updatePlay() {
-    if (accumulatedAngle <= -720) {
-        playing = false;
-        playButton.innerHTML = "play";
-        playButton.classList.remove("btn-danger");
-        playButton.classList.add("btn-success");
+    console.log(accumulatedAngle);
+    if (accumulatedAngle >= 720) {
+        setPlaying(false);
         playButton.classList.add("disabled");
     }
     else {
@@ -129,6 +153,7 @@ function resetCanvas() {
         bluePointTopView = null;
         
         prevAngle = 0;
+        accumulatedAngle = 0;
         totalRotation = 0;
         knob = null;
         shaft = null;
@@ -138,6 +163,10 @@ function resetCanvas() {
         connectingRod = null;
         isDragging = false;
         isMeasuringAngle = false;
+
+        setPlaying(false);
+        setTimer(0);
+
         draw.clear();
         addOptionToDragAndZoom();
         drawCanvas();
@@ -159,19 +188,7 @@ function resetCanvas() {
     });
 
     playButton.addEventListener('click', () => {
-        if (playing) {
-            playing = false;
-            playButton.classList.remove("btn-danger");
-            playButton.classList.add("btn-success");
-            playButton.innerHTML = "play";
-        }
-        else {
-            playing = true;
-            animate(autoRotate);
-            playButton.classList.add("btn-danger");
-            playButton.classList.remove("btn-success");
-            playButton.innerHTML = "pause";
-        }
+        setPlaying(!playing);
     });
 }
 function drawCanvas() {
@@ -290,9 +307,11 @@ function setCurrentAngle(angle) {
 function setupDragHandlers() {
     knob.on('pointerdown', () => {
         isDragging = true;
+        setPlaying(false);
     });
     shaft.on('pointerdown', () => {
         isDragging = true;
+        setPlaying(false);
     });
     
     document.addEventListener('pointermove', (event) => {
@@ -602,8 +621,16 @@ function drawProtractor(centerX, centerY, radius) {
             });
         }
     }
+
+    tickInteractions(oneView, ticks, circle, labels, centerX, centerY, radius);
     
+    // Return the group so it can be used/manipulated later.
+    return oneView;
+}
+
+function tickInteractions(oneView, ticks, circle, labels, centerX, centerY, radius) {
     let current = null;
+    let curLine = null;
     let curLabel = null;
     window.addEventListener('pointermove', (event) => {
         const pt = draw.node.createSVGPoint();
@@ -613,7 +640,6 @@ function drawProtractor(centerX, centerY, radius) {
         const dx = cursor.x - centerX;
         const dy = cursor.y - centerY;
         const r = Math.sqrt(dx * dx + dy * dy);
-
 
         if (r <= radius) {
             let angle = Math.atan2(dy, dx) * (180 / Math.PI);
@@ -629,21 +655,29 @@ function drawProtractor(centerX, centerY, radius) {
 
             if (current === 360) current = 0;
 
-            ticks.forEach((tick, index) => {
-                if (index === current) {
-                    tick.stroke({ width: 2, color: 'black' });
-                } else {
-                    tick.stroke({ width: 1, color: 'grey' });
-                }
+            // Mute colors of protractor
+            ticks.forEach(tick => {
+                tick.stroke({ width: 1, color: 'grey' });
             });
             circle.stroke({ width: 2, color: 'grey' });
             labels.opacity(0.3);
 
+            // Draw bold line for current angle
+            curLine?.remove();
+            const radian = current * (Math.PI / 180);
+            const x1 = centerX + radius * Math.cos(radian);
+            const y1 = centerY + radius * Math.sin(radian);
+            const x2 = centerX;
+            const y2 = centerY;
+            
+            curLine = oneView.line(x1, y1, x2, y2);
+            curLine.stroke({ width: 2, color: 'black' });
+
+            // Create new label for current angle
             curLabel?.remove();
             
             const textRadius = radius + 18;
             const offset = angle > 90 && angle < 270 ? Math.PI / 60 : -Math.PI / 60; // Move text outward for angles between 90 and 270
-            const radian = current * (Math.PI / 180);
             const textX = centerX + textRadius * Math.cos(radian + offset);
             const textY = centerY + textRadius * Math.sin(radian + offset);
             const rotate = angle > 90 && angle < 270 ? angle - 180 : angle; // Rotate text upside down for angles between 90 and 270
@@ -664,14 +698,13 @@ function drawProtractor(centerX, centerY, radius) {
             circle.stroke({ width: 2, color: 'black' });
             labels.opacity(1);
             current = null;
+            curLine?.remove();
+            curLine = null;
             curLabel?.remove();
             curLabel = null;
         }
 
     });
-    
-    // Return the group so it can be used/manipulated later.
-    return oneView;
 }
 
 function drawHorizontalScale() {
