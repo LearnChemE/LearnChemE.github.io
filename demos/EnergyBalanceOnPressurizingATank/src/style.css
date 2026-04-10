@@ -57,7 +57,7 @@ canvas {
 
 .slider-wrapper {
   display: grid;
-  grid-template-columns: 160px 180px 50px;
+  grid-template-columns: max-content 180px 50px;
   justify-self: right;
   gap: .25em;
   text-align: end;
