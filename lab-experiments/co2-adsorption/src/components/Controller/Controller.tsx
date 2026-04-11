@@ -1,31 +1,35 @@
 import { createMemo, type Accessor, type Component, type Setter } from "solid-js";
-import { constrain, GAS_MAX_RATE, GAS_SP_INTERVAL, paddedHeight, repeatClick } from "../../globals";
+import { constrain, repeatClick } from "../../globals";
 import "./Controller.css";
 
 type ControllerProps = {
-    gasSP: Accessor<number>;
-    setGasSP: Setter<number>;
+    sp: Accessor<number>;
+    setSP: Setter<number>;
+    step: number;
+    range: [min: number, max: number];
 };
 
 export const Controller: Component<ControllerProps> = (props) => {
+    const [min, max] = props.range;
+
     const text = createMemo(() => {
-        const gsp = props.gasSP();
+        const gsp = props.sp();
         return `${gsp.toFixed(1)}`;
     });
 
     const increment = () => {
-        let gsp = props.gasSP();
-        gsp += GAS_SP_INTERVAL;
-        props.setGasSP(constrain(gsp, 0, GAS_MAX_RATE));
+        let gsp = props.sp();
+        gsp += props.step;
+        props.setSP(constrain(gsp, min, max));
     }
 
     const decrement = () => {
-        let gsp = props.gasSP();
-        gsp -= GAS_SP_INTERVAL;
-        props.setGasSP(constrain(gsp, 0, GAS_MAX_RATE));
+        let gsp = props.sp();
+        gsp -= props.step;
+        props.setSP(constrain(gsp, min, max));
     }
 
-    return (<g transform={`translate(447, ${76 + paddedHeight()})`}>
+    return (<g transform="translate(447, 0)">
 <rect x="33.9999" y="0.5" width="55" height="58" rx="1.5" fill="#888888" stroke="black"/>
 <path d="M38.4999 15.5H84.4999C85.3283 15.5 85.9999 16.1716 85.9999 17V54C85.9999 54.8284 85.3283 55.5 84.4999 55.5H38.4999C37.6715 55.5 36.9999 54.8284 36.9999 54V17C36.9999 16.1716 37.6715 15.5 38.4999 15.5Z" fill="#CECECE" stroke="black"/>
 <rect x="39.9999" y="18.5" width="43" height="17" rx="1.5" fill="#141414" stroke="black"/>

@@ -1,5 +1,5 @@
 import { createMemo, type Accessor, type Component, type Setter } from "solid-js";
-import { constrain, getAngleFromDown, getSVGCoords, MAX_PRESSURE, paddedHeight, } from "../../globals";
+import { constrain, getAngleFromDown, getSVGCoords, MAX_PRESSURE } from "../../globals";
 import { SVGTooltip } from "../Tooltip/TooltipSelector";
 
 type RegulatorProps = {
@@ -7,15 +7,14 @@ type RegulatorProps = {
     outPres: Accessor<number>;
     gasSP: Accessor<number>;
     setGasSP: Setter<number>;
+    x: number;
+    y: number;
 };
 
 const minAngle = -135;
 const maxAngle = 135;
 
 export const Regulator: Component<RegulatorProps> = (props) => {
-    const x = 474;
-    const y = createMemo(() => paddedHeight() + 142);
-
     const rAngle = createMemo(() => minAngle + (maxAngle - minAngle) * props.inPres() / MAX_PRESSURE);
     const lAngle = createMemo(() => minAngle + (maxAngle - minAngle) * props.outPres() / MAX_PRESSURE);
 
@@ -33,7 +32,7 @@ export const Regulator: Component<RegulatorProps> = (props) => {
         e.preventDefault();
         isDragging = true;
         const svgMozCoords = getSVGCoords(e);
-        prevTh = getAngleFromDown({x:cx + x, y:cy + y()}, {x:svgMozCoords.x, y:svgMozCoords.y});
+        prevTh = getAngleFromDown({x:cx + props.x, y:cy + props.y}, {x:svgMozCoords.x, y:svgMozCoords.y});
         document.addEventListener("pointermove", onDrag);
         document.addEventListener("pointerup", endDrag);
     };
@@ -45,7 +44,7 @@ export const Regulator: Component<RegulatorProps> = (props) => {
         // Calculate angle change
         const angle = currentAngle_knob();
         const svgMozCoords = getSVGCoords(e);
-        const th = getAngleFromDown({ x: cx + x, y: cy + y() }, { x: svgMozCoords.x, y: svgMozCoords.y });
+        const th = getAngleFromDown({ x: cx + props.x, y: cy + props.y }, { x: svgMozCoords.x, y: svgMozCoords.y });
         let deltaTh = th - prevTh; // Positive if moving up
         if (Math.abs(deltaTh) > 180) {
             // Handle wrap-around
@@ -82,7 +81,7 @@ export const Regulator: Component<RegulatorProps> = (props) => {
     let ref!: SVGGElement;
 
     return (<>
-    <g transform={`translate(${x}, ${y()})`} ref={ref}>
+    <g transform={`translate(${props.x}, ${props.y})`} ref={ref}>
 <rect x="33.5" y="23.5" width="4" height="7" rx="0.5" fill="#C8AA3C" stroke="black"/>
 <rect x="0.5" y="23.5" width="3" height="7" rx="0.5" fill="#989898" stroke="black"/>
 <rect x="28.5" y="24.5" width="5" height="5" fill="#C8AA3C" stroke="black"/>
@@ -179,6 +178,6 @@ export const Regulator: Component<RegulatorProps> = (props) => {
 </g>
 </g>
 
-<SVGTooltip x={550} y={() => 128 + paddedHeight()} width={86} label="pressure" override={() => [`${props.outPres().toFixed(1)} bar`,`(gauge)`]} anchor={ref} />
+<SVGTooltip x={props.x - 50} y={props.y + 20} width={86} label="pressure" override={() => [`${props.outPres().toFixed(1)} bar`,`(gauge)`]} anchor={ref} />
     </>);
 }

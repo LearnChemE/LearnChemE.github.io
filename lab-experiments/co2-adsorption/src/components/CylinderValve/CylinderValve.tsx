@@ -1,8 +1,8 @@
 import { createEffect, createMemo, createSignal, type Accessor, type Component, type Setter } from "solid-js";
-import { animate, constrain, MAX_PRESSURE, MAX_TANK_VALVE_ROTATION, paddedHeight, resolveProperty } from "../../globals";
-import "./TankValve.css";
+import { animate, constrain, MAX_PRESSURE, MAX_CYL_VALVE_ROTATION, resolveProperty } from "../../globals";
+import "./CylinderValve.css";
 
-type TankValveProps = {
+type CylinderValveProps = {
     pressure: Accessor<number>;
     setPressure: Setter<number>;
     disabled?: Accessor<boolean>;
@@ -18,22 +18,21 @@ function Cos(x: number) {
 const VALVE_WIDTH = 27;
 const BAFFLE_WIDTH = 8;
 
-export const TankValve: Component<TankValveProps> = (props) => {
-    const rotation = createMemo(() => (1 - props.pressure() / MAX_PRESSURE) * -MAX_TANK_VALVE_ROTATION % 60);
+export const CylinderValve: Component<CylinderValveProps> = (props) => {
+    const rotation = createMemo(() => (1 - props.pressure() / MAX_PRESSURE) * -MAX_CYL_VALVE_ROTATION % 60);
     const disabled = resolveProperty(props.disabled, false);
     const [flash, setFlash] = createSignal(false);
 
     const flashAni = (_: number, time: number) => {
         const t = Math.floor(time / 500);
         const flashing = (t % 2 === 0);
-        console.log(flashing)
         if (flashing !== flash()) {
             setFlash(flashing);
         }
         return time < 3000;
     }
     createEffect(() => {
-        if (!disabled()) {
+        if (props.disabled && !disabled()) {
             animate(flashAni, () => setFlash(false));
         }
     });
@@ -49,7 +48,7 @@ export const TankValve: Component<TankValveProps> = (props) => {
                     (p: number) => p >= MAX_PRESSURE :
                     (p: number) => p <= 0;
         // Convert to pressure
-        const dpdt = dthdt * MAX_PRESSURE / -MAX_TANK_VALVE_ROTATION;
+        const dpdt = dthdt * MAX_PRESSURE / -MAX_CYL_VALVE_ROTATION;
 
         // Create the animation callback
         const frame = (dt: number) => {
@@ -68,7 +67,7 @@ export const TankValve: Component<TankValveProps> = (props) => {
         animate(frame);
     }
 
-    return (<g transform={`translate(517.5, ${153 + paddedHeight()})`}
+    return (<g transform="translate(517.5, 153)"
         class={"drag-exempt globeValveHandle " + (disabled() ? "tv-disabled" : "") + (flash() ? "tv-flash" : "")}
         onClick={start}
         style="transition: filter 400ms ease-in-out">
