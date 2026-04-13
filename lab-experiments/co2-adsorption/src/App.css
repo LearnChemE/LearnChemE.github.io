@@ -6,6 +6,26 @@
   position: relative;
 }
 
+.clickable {
+  cursor: pointer;
+}
+.clickable:hover {
+  filter: drop-shadow(0 0 2px #000000aa)
+    brightness(1.2);
+}
+
+.draggable {
+  cursor: grab;
+  transition: filter 200ms;
+}
+.draggable:hover {
+  filter: drop-shadow(0 0 2px #000000aa)
+    brightness(1.1);
+}
+.draggable:active {
+  cursor: grabbing;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

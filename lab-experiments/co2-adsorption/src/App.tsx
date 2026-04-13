@@ -13,6 +13,7 @@ import worksheet from './assets/worksheet.pdf?url';
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import { ControlButton } from './components/ControlButton/ControlButton'
 import { MASS_FLOW_STEP, MAX_MASS_FLOWRATE, MIN_MASS_FLOWRATE } from './globals'
+import { MultiValve } from './components/MultiValve/MultiValve'
 
 function App() {
   const [cylValvePres, setCylValvePres] = createSignal(0);
@@ -20,20 +21,21 @@ function App() {
   const [massSP, setMassSP] = createSignal(0);
   const linePressure = createMemo(() => Math.min(cylValvePres(), pressureSP()));
 
+  const [valve1Angle, setValve1Angle] = createSignal(0);
+
   const reset = () => {};
 
   return (
     <>
       <div class="canvas-container">
-        <SVGCanvas width={700} height={560} defs={Defs}>
+        <SVGCanvas width={809} height={684} defs={Defs}>
           <Background />
           <Pipes />
-          <Regulator inPres={cylValvePres} outPres={linePressure} gasSP={pressureSP} setGasSP={setPressureSP} />
-          <CylinderValve pressure={cylValvePres} setPressure={setCylValvePres} />
+          <CylinderValve x={40} y={324} pressure={cylValvePres} setPressure={setCylValvePres} />
+          <Regulator x={99} y={310} inPres={cylValvePres} outPres={linePressure} gasSP={pressureSP} setGasSP={setPressureSP} />
           <Controller sp={massSP} setSP={setMassSP} range={[MIN_MASS_FLOWRATE, MAX_MASS_FLOWRATE]} step={MASS_FLOW_STEP} />
+          <MultiValve x={303} y={240} angle={valve1Angle} setAngle={setValve1Angle} directions={[0, 90, 180]} />
           
-          {/* <Valve x={134.5} y={() => 195 + paddedHeight()} onLiftChange={setFeedLift} initialLift={INIT_FEED_LIFT} /> */}
-
           {/* <ColumnData feedIsOn={feedIsOn} gasIsOn={() => gasRate() > 0} /> */}
         </SVGCanvas>
 
