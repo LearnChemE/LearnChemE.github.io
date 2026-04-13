@@ -1,4 +1,4 @@
-import { getAngleFromDown, getSVGCoords, resolveProperty } from "../../globals";
+import { animate, resolveProperty, smoothLerp } from "../../globals";
 import "./MultiValve.css";
 import { createSignal, type Accessor, type Component, type Setter } from "solid-js";
 
@@ -13,11 +13,35 @@ interface MultiValveProps {
 export const MultiValve: Component<MultiValveProps> = (props) => {
     const directions = resolveProperty(props.directions, [0]);
     const angle = resolveProperty(props.angle, directions()[0]);
+    const [dispAngle, setDispAngle] = createSignal(angle());
     const x = resolveProperty(props.x);
     const y = resolveProperty(props.y);
 
-    const cx = 25.5;
-    const cy = 36;
+    const cx = 18;
+    const cy = 18;
+
+    const r = Math.exp(-1/0.1); // 0.1 is the time constant for the animation
+    let animating = false;
+    const animateDispAngle = () => {
+      if (animating) return;
+      animating = true;
+
+      const frame = (dt: number) => {
+        const curAngle = dispAngle();
+        const targetAngle = angle();
+        const newAngle = smoothLerp(curAngle, targetAngle, r, dt);
+        setDispAngle(newAngle);
+
+        if (Math.abs(newAngle - targetAngle) < 0.5) {
+          setDispAngle(targetAngle);
+          animating = false;
+        }
+
+        return animating;
+      }
+
+      animate(frame);
+    }
 
     const nextAng = () => {
       const dirs = directions();
@@ -25,7 +49,9 @@ export const MultiValve: Component<MultiValveProps> = (props) => {
       const curIdx = dirs.findIndex(val => val === curAngle);
       if (curIdx === -1) throw new Error(`Couldn't find angle ${curAngle} in directions array: ${dirs.toString()}`);
 
-      props.setAngle((curIdx + 1) % dirs.length);
+      const nextIdx = (curIdx + 1) % dirs.length;
+      props.setAngle(dirs[nextIdx]);
+      animateDispAngle();
     }
 
   // Render
@@ -41,7 +67,7 @@ export const MultiValve: Component<MultiValveProps> = (props) => {
 
 <g 
   class="drag-exempt clickable" 
-  transform={`translate(${angle()}, ${cx}, ${cy})`}
+  transform={`rotate(${dispAngle()}, ${cx}, ${cy})`}
   onClick={nextAng}>
   <rect x="24.5" y="15.5" width="5" height="10" rx="1.5" transform="rotate(90 24.5 15.5)" fill="#D9D9D9" stroke="black"/>
   <path d="M16.3926 18.9277V17.0732L18 16.1445L19.6074 17.0732V18.9277L18 19.8564L16.3926 18.9277Z" fill="#F2F2F2" stroke="black" stroke-width="0.25"/>

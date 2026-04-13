@@ -10,3 +10,5 @@ export const MASS_FLOW_STEP = 0.5;
 
 export const MAX_CYL_VALVE_ROTATION = 360;
 export const MAX_PRESSURE = 10; // bar
+
+export const VALVE_1_ANGLES = [0, 90, 180];

@@ -1,4 +1,4 @@
-import { createMemo, createSignal, Match, Switch } from 'solid-js'
+import { createMemo, createSignal, For, Match, Switch, type Setter } from 'solid-js'
 import './App.css'
 import { SVGCanvas } from './components/SVGCanvas/SVGCanvas'
 import Defs from './components/Defs'
@@ -12,16 +12,24 @@ import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import worksheet from './assets/worksheet.pdf?url';
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import { ControlButton } from './components/ControlButton/ControlButton'
-import { MASS_FLOW_STEP, MAX_MASS_FLOWRATE, MIN_MASS_FLOWRATE } from './globals'
+import { GasCylinder, MASS_FLOW_STEP, MAX_MASS_FLOWRATE, MIN_MASS_FLOWRATE, VALVE_1_ANGLES } from './globals'
 import { MultiValve } from './components/MultiValve/MultiValve'
 
 function App() {
+  const cylinders = ["C90", "C10", "N"].map((key, idx) => new GasCylinder(key, 40 + idx * 154));
+
   const [cylValvePres, setCylValvePres] = createSignal(0);
   const [pressureSP, setPressureSP] = createSignal(0);
-  const [massSP, setMassSP] = createSignal(0);
   const linePressure = createMemo(() => Math.min(cylValvePres(), pressureSP()));
 
   const [valve1Angle, setValve1Angle] = createSignal(0);
+
+  const [massSP, setMassSP] = createSignal(0);
+  const bedPressure = createMemo(() => {
+    const idx = VALVE_1_ANGLES.findIndex(val => val === valve1Angle());
+    const curCyl = cylinders[idx];
+    return curCyl.linePres();
+  });
 
   const reset = () => {};
 
@@ -31,10 +39,16 @@ function App() {
         <SVGCanvas width={809} height={684} defs={Defs}>
           <Background />
           <Pipes />
-          <CylinderValve x={40} y={324} pressure={cylValvePres} setPressure={setCylValvePres} />
-          <Regulator x={99} y={310} inPres={cylValvePres} outPres={linePressure} gasSP={pressureSP} setGasSP={setPressureSP} />
+          <For each={cylinders}>
+            {
+              (cyl, idx) => <>
+                <CylinderValve x={40 + idx() * 154} y={324} pressure={cyl.getCylPres} setPressure={cyl.setCylPres} />
+                <Regulator x={99 + idx() * 154} y={310} inPres={cyl.getCylPres} outPres={cyl.linePres} gasSP={cyl.getRegSP} setGasSP={cyl.setRegSP} />
+              </>
+            }
+          </For>
           <Controller sp={massSP} setSP={setMassSP} range={[MIN_MASS_FLOWRATE, MAX_MASS_FLOWRATE]} step={MASS_FLOW_STEP} />
-          <MultiValve x={303} y={240} angle={valve1Angle} setAngle={setValve1Angle} directions={[0, 90, 180]} />
+          <MultiValve x={303} y={240} angle={valve1Angle} setAngle={setValve1Angle} directions={VALVE_1_ANGLES} />
           
           {/* <ColumnData feedIsOn={feedIsOn} gasIsOn={() => gasRate() > 0} /> */}
         </SVGCanvas>

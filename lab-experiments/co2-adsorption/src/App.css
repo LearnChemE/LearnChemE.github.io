@@ -58,6 +58,28 @@ p {
   src: url("./assets/digital-7.ttf") format("truetype");
 }
 
+.digital-label {
+  font-family: "digital" !important;
+  font-weight: 100;
+  font-size: 11;
+
+  position: absolute;
+  text-anchor: end;
+  text-justify: middle;
+  dominant-baseline: middle;
+}
+
+.display {
+  font-family: "digital" !important;
+  font-weight: 100;
+  font-size: 11;
+
+  position: absolute;
+  text-anchor: middle;
+  text-justify: middle;
+  dominant-baseline: middle;
+}
+
 .canvas-container {
   position: relative;
 }
