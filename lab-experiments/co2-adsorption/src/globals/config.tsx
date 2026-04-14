@@ -13,3 +13,11 @@ export const MAX_PRESSURE = 10; // bar
 
 export const VALVE_1_ANGLES = [180, 0, 90];
 export const VALVE_2_ANGLES = [180, 90];
+
+export const BETA_INIT = 4;
+export const BETA_MIN = 1;
+export const BETA_MAX = 10;
+export const BETA_STEP = 1;
+
+export const TEMP_ROOM = 298;
+export const TEMP_MAX = 623;

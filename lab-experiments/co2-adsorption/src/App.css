@@ -26,6 +26,11 @@
   cursor: grabbing;
 }
 
+.disabled {
+  pointer-events: none;
+  filter: grayscale(1) opacity(0.8);
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -83,3 +88,4 @@ p {
 .canvas-container {
   position: relative;
 }
+

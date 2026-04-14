@@ -12,9 +12,11 @@ import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import worksheet from './assets/worksheet.pdf?url';
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import { ControlButton } from './components/ControlButton/ControlButton'
-import { createCylinders, expMemo, MASS_FLOW_STEP, MAX_MASS_FLOWRATE, MIN_MASS_FLOWRATE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
+import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, MASS_FLOW_STEP, MAX_MASS_FLOWRATE, MIN_MASS_FLOWRATE, TEMP_ROOM, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
 import { MultiValve } from './components/MultiValve/MultiValve'
 import { Manometer } from './components/Manometer/Manometer'
+import { BetaCtrl } from './components/BetaCtrl/BetaCtrl'
+import { DigitalGauge } from './components/DigitalGauge/DigitalGauge'
 
 function App() {
   const cylinders = createCylinders();
@@ -29,6 +31,8 @@ function App() {
 
     return cyl.linePres();
   });
+
+  const [temperature, setTemperature] = createSignal(TEMP_ROOM);
 
   const reset = () => {};
 
@@ -51,6 +55,10 @@ function App() {
           <MultiValve x={487} y={184} angle={valve2Angle} setAngle={setValve2Angle} directions={VALVE_2_ANGLES} />
 
           <Manometer pressure={bedPressure} maxPressure={12} />
+          <BetaCtrl temperature={temperature} setTemperature={setTemperature} range={[BETA_MIN, BETA_MAX]} step={BETA_STEP} />
+
+          <DigitalGauge x={556} y={310} label={() => `${temperature().toFixed(0)} K`} />
+          <DigitalGauge x={597} y={110} label={() => `${(2.8).toFixed(2)} %`} />
           
           {/* <ColumnData feedIsOn={feedIsOn} gasIsOn={() => gasRate() > 0} /> */}
         </SVGCanvas>
