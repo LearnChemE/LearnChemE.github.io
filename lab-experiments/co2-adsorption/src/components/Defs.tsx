@@ -433,6 +433,28 @@ export const Defs: Component = () => {
 </linearGradient>
 </defs>
 
+<defs>
+<linearGradient id="paint0_linear_46_80" x1="11" y1="14" x2="11" y2="0" gradientUnits="userSpaceOnUse">
+<stop stop-color="#585C61"/>
+<stop offset="0.697115" stop-color="white"/>
+<stop offset="1" stop-color="#8A8A97"/>
+</linearGradient>
+<linearGradient id="paint1_linear_46_80" x1="5" y1="16" x2="5" y2="0" gradientUnits="userSpaceOnUse">
+<stop stop-color="#585C61"/>
+<stop offset="0.697115" stop-color="white"/>
+<stop offset="1" stop-color="#8A8A97"/>
+</linearGradient>
+<linearGradient id="paint2_linear_46_80" x1="5" y1="11" x2="5" y2="1" gradientUnits="userSpaceOnUse">
+<stop stop-color="#585C61"/>
+<stop offset="0.591346" stop-color="#BABEC2"/>
+<stop offset="1" stop-color="#8A8A97"/>
+</linearGradient>
+<linearGradient id="paint3_linear_46_80" x1="5" y1="16" x2="5" y2="0" gradientUnits="userSpaceOnUse">
+<stop stop-color="#585C61"/>
+<stop offset="0.697115" stop-color="white"/>
+<stop offset="1" stop-color="#8A8A97"/>
+</linearGradient>
+</defs>
 
     </>);
 }

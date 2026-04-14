@@ -35,12 +35,13 @@ export const Controller: Component<ControllerProps> = (props) => {
 <path d="M4 19.5H54C54.8284 19.5 55.5 20.1716 55.5 21V61C55.5 61.8284 54.8284 62.5 54 62.5H4C3.17157 62.5 2.5 61.8284 2.5 61V21C2.5 20.1716 3.17157 19.5 4 19.5Z" fill="#CECECE" stroke="black"/>
 <rect x="4.5" y="21.5" width="49" height="19" rx="1.5" fill="#141414" stroke="black"/>
 
-<g>
+<g class="drag-exempt clickable" onpointerdown={() => repeatClick(decrement)}>
 <rect x="30.5" y="42.5" width="22" height="17" rx="0.5" fill="#D51F1F" stroke="black"/>
 <path d="M41.7018 54.2734C41.5087 54.6032 41.0326 54.6032 40.8395 54.2734L37.3131 48.2529C37.1179 47.9196 37.3585 47.5 37.7448 47.5H44.7975C45.1835 47.5003 45.4233 47.9197 45.2281 48.2529L41.7018 54.2734Z" fill="#590F0F" stroke="#310000"/>
 </g>
 
-<g>
+<g class="drag-exempt clickable" onpointerdown={() => repeatClick(increment)}>
+
 <rect x="5.5" y="42.5" width="22" height="17" rx="0.5" fill="#D51F1F" stroke="black"/>
 <path d="M16.0732 47.6572C16.2682 47.3382 16.7318 47.3382 16.9268 47.6572L20.6436 53.7393C20.8472 54.0724 20.6073 54.5 20.2168 54.5H12.7832C12.3927 54.5 12.1528 54.0724 12.3564 53.7393L16.0732 47.6572Z" fill="#590F0F" stroke="#310000"/>
 </g>
