@@ -1,4 +1,4 @@
-import { createSignal, For, Match, Switch } from 'solid-js'
+import { createMemo, createSignal, For, Match, Switch } from 'solid-js'
 import './App.css'
 import { SVGCanvas } from './components/SVGCanvas/SVGCanvas'
 import Defs from './components/Defs'
@@ -17,6 +17,7 @@ import { MultiValve } from './components/MultiValve/MultiValve'
 import { Manometer } from './components/Manometer/Manometer'
 import { BetaCtrl } from './components/BetaCtrl/BetaCtrl'
 import { DigitalGauge } from './components/DigitalGauge/DigitalGauge'
+import { BedContextProvider, type ContextDescriptor } from './components/Context'
 
 function App() {
   const cylinders = createCylinders();
@@ -25,19 +26,31 @@ function App() {
   const [valve2Angle, setValve2Angle] = createSignal(180);
 
   const [massSP, setMassSP] = createSignal(0);
-  const bedPressure = expMemo(() => {
+  const currentCylinder = createMemo(() => {
     const cyl = cylinders.find(cyl => cyl.angle === valve1Angle());
     if (cyl === undefined) throw new Error(`Cylinder undefined for angle ${valve1Angle()}`);
-
+    return cyl;
+  });
+  const bedPressure = expMemo(() => {
+    const cyl = currentCylinder()
     return cyl.linePres();
   });
 
   const [temperature, setTemperature] = createSignal(TEMP_ROOM);
+  const [yOut, setYOut] = createSignal(0);
 
   const reset = () => {};
 
+  const ctxDescriptor: ContextDescriptor = {
+    tempK: temperature,
+    cylinder: currentCylinder,
+    v2Angle: valve2Angle,
+    massSP,
+    onYOut: setYOut
+  };
+
   return (
-    <>
+    <BedContextProvider descriptor={ctxDescriptor}>
       <div class="canvas-container">
         <SVGCanvas width={809} height={684} defs={Defs}>
           <Background />
@@ -58,7 +71,7 @@ function App() {
           <BetaCtrl temperature={temperature} setTemperature={setTemperature} range={[BETA_MIN, BETA_MAX]} step={BETA_STEP} />
 
           <DigitalGauge x={556} y={310} label={() => `${temperature().toFixed(0)} K`} />
-          <DigitalGauge x={597} y={110} label={() => `${(2.8).toFixed(2)} %`} />
+          <DigitalGauge x={597} y={110} label={() => `${yOut().toFixed(2)} %`} />
           
           {/* <ColumnData feedIsOn={feedIsOn} gasIsOn={() => gasRate() > 0} /> */}
         </SVGCanvas>
@@ -82,7 +95,7 @@ function App() {
         </Switch>
       </div>
 
-    </>
+    </BedContextProvider>
   )
 }
 

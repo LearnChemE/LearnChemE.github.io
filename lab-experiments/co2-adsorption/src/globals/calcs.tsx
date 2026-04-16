@@ -1,262 +1,359 @@
-// import { stageEfficiency } from "./signals";
-// import { animate, smoothLerp } from "./helpers";
-// import { createContext, createSignal, type Accessor, type Setter } from "solid-js";
-// import { feedPPM } from "./signals";
+import { type Accessor, type Setter } from "solid-js";
 
-// // Context for column calculations
-// export type ColumnContextType = {
-//     column?: ColumnCalc;
-//     columnCreated: Accessor<boolean>;
-//     setColumnCreated: Setter<boolean>;
-// };
-// export const ColumnContext = createContext<ColumnContextType>();
-// export const ColumnContextProvider = (props: { children: any }) => {
-//     const [columnCreated, setColumnCreated] = createSignal(false);
-//     const store: ColumnContextType = { columnCreated, setColumnCreated };
+import rk45, { type ODEFunc } from "./rk45";
+import { animate } from "./helpers";
 
-//     return (
-//     <ColumnContext.Provider value={store}>
-//         {props.children}
-//     </ColumnContext.Provider>
-//     );
+const LENGTH_BED = 40; // cm
+const RHO_ZEOLITE = 0.75; // g/cc
+const MASS_ZEOLITE = 4000; // g
+const MM_CO2 = 44.009; // g/mol
+const MM_N2 = 14.041 // g/mol
+const R = 83.14 // bar cc / mol / K
+const BED_MAX_CAPACITY = MASS_ZEOLITE / 1000 * 0.85; // mols
+const DIFFUSIVITY = 1.8e-1; // m^2/s, diffusivity of CO2 in zeolite
+// Spatial info
+const N = 51; // number of points in spatial discretization
+const NT = 3*N + 6; // Size of arrays including padding
+const x = Array.from({ length: N }).map((_,i) => i * LENGTH_BED / (N - 1));
+const dx = x[1] - x[0];
+
+
+
+// Geometry
+const BED_VOLUME = MASS_ZEOLITE / RHO_ZEOLITE; // cc
+const BED_CROSS_SECTION = BED_VOLUME / LENGTH_BED; // cm^2
+const BED_RADIUS = Math.sqrt(BED_CROSS_SECTION / Math.PI); // cm
+console.log("Radius: ", BED_RADIUS)
+
+// Kinetic parameters
+const ka0 = 2.196e4; // min^-1
+const ea = 2000; // convert from kJ/mol to K
+const kd0 = 8e6;
+const ed = 6e3;
+function k_val(k0: number, ea: number, T: number) {
+  return k0 * Math.exp(-ea / T);
+}
+
+// type BedPoint = [
+//   pco2: Number,
+//   th_co2: Number,
+//   u: Number
+// ]
+
+
+/**
+ * Utility functions for calculations
+ */
+
+// Pad the edges of an array with the first and last values to make it easier to calculate derivatives
+function pad(y:number[], left: number[], right?: number[]) {
+  if (!right) right = Array.from({ length: 3 }).map((_,i) => {
+    const yi = y[3 * N - 3 + i];
+    return yi;
+  });
+  // if (right[2] > 0) throw new Error(`Padding right with: ${right}, ${y}`)
+  return [ ...left, ...y, ...right ];
+}
+
+// // Remove the padding from the array and update the bed state
+// function updateBed(y: number[]) {
+//   for (let i=0; i<3*N; i++) {
+//     bed[i] = y[i + 3];
+//   }
 // }
 
-// // function intersection(line1: { slope: number, intercept: number }, line2: { slope: number, intercept: number }) {
-// //     if (line1.slope === line2.slope) {
-// //         return null; // Lines are parallel
-// //     }
+// Molar mass of the gas mixture based on the mole fraction of CO2
+function molar_mass(x_co2: number) {
+  return x_co2 * MM_CO2 + (1 - x_co2) * MM_N2;
+}
 
-// //     const x = (line2.intercept - line1.intercept) / (line1.slope - line2.slope);
-// //     const y = line1.slope * x + line1.intercept;
-// //     return [x, y];
-// // }
+/**
+ * Calculte the velocity of the gas mixture through the bed based on the mass flow rate, mole fraction of CO2, and pressure.
+ * @param {Number} mdot Mass flow rate in g/s
+ * @param {Number} x_co2 mole fraction of CO2 in the gas mixture
+ * @param {Number} P overall pressure in bar
+ * @returns velocity in cm/s
+ */
+function calc_velocity(mdot: number, x_co2: number, T: number, P: number) {
+    // pv = nrt; Vdot = ndot * RT / P
+    const ndot = mdot / molar_mass(x_co2) // mol/s
+    const q = ndot * R * T / P // cc/s
+    return q / BED_CROSS_SECTION // cm/s
+}
 
-// // export function separate(x: number, y: number): number[] {
-// //     const tieline = findTieline(x, y);
-// //     const intersections = findEnvelopeIntersections(tieline);
+// function advection(y: number[], dx: number) {
+//   const inv_dx = 1 / dx;
+//   const adv = Array.from({ length: 3*N + 6 }).fill(0);
 
-// //     // Tests to make sure the stream should actually be separated
-// //     if (intersections.length !== 2) { // Definitely outside phase envelope if there are not 2 intersections
-// //         return [[x, y]];
-// //     }
-// //     else if (intersections[0][0] >= x || intersections[1][0] <= x) { // Left or right of phase envelope
-// //         return [[x, y]];
-// //     }
+//   for (let i = 3; i < NT; i += 3) {
+//     const ip = i;
+//     // No theta; no advection for adsorbed carbon
+//     const iu = i + 2;
 
-// //     return intersections; // Return in order of decreasing chloroform concentration
-// // }
+//     const dp = y[ip] - y[ip - 3];
+//     const du = y[iu] - y[iu - 3];
+//     adv[ip] = - y[iu] * dp * inv_dx;
+//     adv[iu] = - y[iu] * du * inv_dx
+//   }
 
-// // export function molarMass(comp: Composition) {
-// //     const xc = comp[0];
-// //     const xa = comp[1];
-// //     const xw = 1 - xc - xa;
-// //     return xc * MM_C + xa * MM_AA + xw * MM_W; // g solution / 1 mol
-// // }
-
-// // Constants to be used
-// const Ea = 5000;
-// const R = 8.314;
-// const T0 = 298;
-// const H0 = 211.19;
-// export function Henrys(T: number) {
-//     return H0 * Math.exp(-Ea / R * (1 / (T + 273) - 1 / T0));
+//   return adv;
 // }
 
-// export type Stream = {
-//     ndot: number;
-//     ppm: number;
+// function diffusion(y: number[], dx: number) {
+//   const inv_dx2 = 1 / dx / dx;
+//   const dif = Array.from({ length: NT }).fill(0);
+
+//   for (let i = 3; i < NT - 3; i += 3) {
+//     const ip = i;
+//     // No theta; no advection for adsorbed carbon
+//     const iu = i + 2;
+
+//     const d2p = y[ip + 3] + y[ip - 3] - 2 * y[ip];
+//     const d2u = y[iu + 3] + y[iu - 3] - 2 * y[iu];
+//     dif[ip] = DIFFUSIVITY * d2p * inv_dx2;
+//     dif[iu] = DIFFUSIVITY * d2u * inv_dx2;
+//   }
+
+//   return dif;
 // }
 
-// const STAGE_LIQ_MOLES = 1;
-// const STAGE_GAS_VOL = .5; // L
-// class Stage {
-//     private liqOut: Stream = { ndot: 0, ppm: feedPPM() };
-//     private vapOut: Stream = { ndot: 0, ppm: 0 };
+// function reaction(y: number[], ka: number, kd: number) {
+//   const rxn = Array.from({ length: NT }).fill(0);
 
-//     private liqIn: () => Stream;
-//     private vapIn: (() => Stream) | null = null;
-//     private eff: number;
+//   for (let i=3; i < NT - 3; i += 3) {
+//     const p = y[i];
+//     const th = y[i + 1];
+//     const th_star = 1 - th;
 
-//     private ppm = feedPPM();
+//     const ads = ka * p * th_star;
+//     const des = kd * th;
 
-//     constructor(liqIn: () => Stream, efficiency = 1) {
-//         this.liqIn = liqIn;
+//     rxn[i] = des - ads; // Pressure changes
+//     rxn[i + 1] = (ads - des) / BED_MAX_CAPACITY; // Theta changes
+//   }
 
-//         this.eff = efficiency;
-//     }
+//   return rxn;
+// }
 
-//     public setVapIn(vapIn: () => Stream) {
-//         this.vapIn = vapIn;
-//     }
+// RHS for advection-diffusion eqn with reaction term
+function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
+  const dydt = Array.from({ length: NT }).fill(0) as number[];
+  const inv_dx = 1 / dx;
+  const inv_dx2 = inv_dx / dx;
 
-//     public vapStream(): Stream {
-//         return this.vapOut;
-//     }
+  for (let i = 3; i < NT - 3; i += 3) {
+    const ip = i;
+    const it = i + 1;
+    const iu = i + 2;
 
-//     public liqStream(): Stream {
-//         return this.liqOut;
-//     }
+    // Advection
+    const dp = y[ip] - y[ip - 3];
+    const du = y[iu] - y[iu - 3];
+    const adv_p = - y[iu] * dp * inv_dx;
+    const adv_u = - y[iu] * du * inv_dx
 
-//     public equilibrium(T: number, P: number, dt: number) {
-//         if (P === 0) return;
-//         const lin = this.liqIn();
-//         const vin = this.vapIn!();
-//         const L = lin.ndot;
-//         const xn1 = lin.ppm;
-//         const V = vin.ndot;
-//         const yn1 = vin.ppm;
+    // Diffusion
+    const d2p = y[ip + 3] + y[ip - 3] - 2 * y[ip];
+    const d2u = y[iu + 3] + y[iu - 3] - 2 * y[iu];
+    const dif_p = DIFFUSIVITY * d2p * inv_dx2;
+    const dif_u = DIFFUSIVITY * d2u * inv_dx2;
+
+    // Reaction
+    const th = y[it];
+    const th_star = 1 - th;
+
+    const ads = ka * y[ip] * th_star;
+    const des = kd * th;
+
+    const rxn_p = des - ads; // Pressure changes
+    const rxn_t = (ads - des) / BED_MAX_CAPACITY; // Theta changes
+
+    // Sum
+    dydt[ip] = dif_p + adv_p + rxn_p;
+    dydt[iu] = dif_u + adv_u;
+    dydt[it] = rxn_t;
+  }
+
+  return dydt;
+}
+
+// // old RHS for advection-diffusion eqn with reaction term
+// function rhs(t, y, dx, ka, kd) {
+//   const adv = advection(y, dx);
+//   const dif = diffusion(y, dx);
+//   const rxn = reaction(y, ka, kd);
+
+//   const dydt = dif.map((dif, i) => dif + adv[i] + rxn[i]);
+//   dydt[NT - 3] = 0;
+//   dydt[NT - 1] = 0;
+//   return dydt;
+//   // return adv.map((a, i) => a + dif[i]);// + rxn[i]);
+// }
+
+// function evolve(tstep: number, T: number, y0: number[]) {
+//   const ka = k_val(ka0, ea, T);
+//   const kd = k_val(kd0, ed, T);
+
+//   const f: ODEFunc = (t: number, y: number[]) => {
+//     return rhs(t, y, dx, ka, kd);
+//   };
+
+//   const sol = rk45(f, y0, 0, tstep);
+//   const soly = sol.y.at(-1)!;
+  
+//   updateBed(soly);
+//   // updatePlot();
+// }
+
+// /**
+//  * Calculate the outlet mole fraction of CO2 in a gas mixture
+//  * after passing through a zeolite membrane.
+//  *
+//  * @param {Object} args - The arguments object.
+//  * @param {number} args.t - The time in seconds.
+//  * @param {number} args.tStep - The time step in seconds.
+//  * @param {number} args.m - The mass flow rate of the gas mixture in g / s.
+//  * @param {number} args.P - The total pressure of the gas mixture in bar.
+//  * @param {number} args.T - The temperature of the gas mixture in K.
+//  * @param {number} args.yCO2 - The mole fraction of CO2 in the gas mixture.
+//  * @param {boolean} [args.desorbing=false] - Whether the CO2 is desorbing.
+//  * @param {number} [args.timeOfDesorption=0] - The time of desorption in seconds.
+//  * @param {number} [args.kd=4.365e-4] - The desorption rate constant in s^-1.
+//  * @returns {number} - The outlet mole fraction of CO2 in the gas mixture.
+//  */
+// export function yCO2_out(dt: number, mdot: number, T: number, P: number, y: number, open: boolean) {
+//   const ul = calc_velocity(mdot, y, T, P);
+//   if (!open) {
+//     const left = [ y * P, 0, ul ];
+//     const y0 = pad(bed, left);
+//     evolve(dt, T, y0);
+//   }
+//   else {
+//     const y0 = pad(bed, [0,0,0], [0,0,0])
+//     evolve(dt, T, y0);
+//   }
+
+//   const outlet = bed[3*N - 3] / P
+//   return outlet < 0 ? 0 : outlet;
+// }
+
+export type BedDescriptor = {
+    // Inputs
+    tempK: Accessor<number>;
+    presBar: Accessor<number>;
+    yIn: Accessor<number>;
+    open: Accessor<boolean>;
+    mdot: Accessor<number>;
+    // Outputs
+    on_yOut: Setter<number>;
+};
+
+export class BedCalc {
+    private bed = Array.from({ length: 3*N }).fill(0) as number[]; // initialize bed with zeros
+    private playing = false;
+
+    // Inputs
+    private tempK: Accessor<number>;
+    private presBar: Accessor<number>;
+    private yIn: Accessor<number>;
+    private open: Accessor<boolean>;
+    private mdot: Accessor<number>;
+
+    // Outputs
+    private on_yOut: Setter<number>;
+
+    constructor(desc: BedDescriptor) {
+        this.tempK = desc.tempK;
+        this.presBar = desc.presBar;
+        this.yIn = desc.yIn;
+        this.open = desc.open;
+        this.mdot = desc.mdot;
+        this.on_yOut = desc.on_yOut;
+    }
+
+    public play() {
+        if (this.playing) return;
+        this.playing = true;
+        animate(dt => this.iterate(dt));
+    }
+
+    public reset() {
+        this.playing = false;
+        this.bed = this.bed.fill(0);
+        this.on_yOut(0);
+    }
+
+    private iterate(dt: number) {
+        const T = this.tempK();
+        const P = this.presBar();
+        const y = this.yIn();
+        const open = this.open();
+        const mdot = this.mdot();
+
+        const yOut = this.yCO2_out(dt, mdot, T, P, y, open);
+        this.on_yOut(yOut);
+        console.log(y)
         
-//         const m = Henrys(T) / P; // y_n = m * x_n
-//         // eqm: yn = m * xn =>
-//         // meb: in = out (S.S.) => 
-//         //      xn1 * L + yn1 * V = xn * L + yn * V
-//         //      (in) = xn * L + m * xn * V = xn * (L + m * V)
-//         //    ∴ xn = (in) / (L + m * V)
-//         const n_in = xn1 * L + yn1 * V;
-//         const denom = L + m * V
-//         const xn = (denom !== 0) ? n_in / (L + m * V) : this.liqOut.ppm;
-//         const yn = (denom !== 0) ? m * xn : this.vapOut.ppm;
+        // For animation purposes
+        return this.playing;
+    }
 
-//         let liqTarg, vapTarg;
-//         if (this.eff !== 1) {
-//             // Update
-//             liqTarg = { ndot: L, ppm: this.eff * (xn - xn1) + xn1 };
-//             vapTarg = { ndot: V, ppm: this.eff * (yn - yn1) + yn1 };
-//         }
-//         else {
-//             // Update
-//             liqTarg = { ndot: L, ppm: xn };
-//             vapTarg = { ndot: V, ppm: yn };
-//         }
+    /**
+     * Calculate the outlet mole fraction of CO2 in a gas mixture
+     * after passing through a zeolite membrane.
+     *
+     * @param {Object} args - The arguments object.
+     * @param {number} args.t - The time in seconds.
+     * @param {number} args.tStep - The time step in seconds.
+     * @param {number} args.m - The mass flow rate of the gas mixture in g / s.
+     * @param {number} args.P - The total pressure of the gas mixture in bar.
+     * @param {number} args.T - The temperature of the gas mixture in K.
+     * @param {number} args.yCO2 - The mole fraction of CO2 in the gas mixture.
+     * @param {boolean} [args.desorbing=false] - Whether the CO2 is desorbing.
+     * @param {number} [args.timeOfDesorption=0] - The time of desorption in seconds.
+     * @param {number} [args.kd=4.365e-4] - The desorption rate constant in s^-1.
+     * @returns {number} - The outlet mole fraction of CO2 in the gas mixture.
+     */
+    public yCO2_out(dt: number, mdot: number, T: number, P: number, y: number, open: boolean) {
+        const ul = calc_velocity(mdot, y, T, P);
+        if (!open) {
+            const left = [ y * P, 0, ul ];
+            const y0 = pad(this.bed, left);
+            this.evolve(dt, T, y0);
+        }
+        else {
+            const rightP = this.bed[3*N - 3];
+            const u = this.bed[3*N - 1] * Math.exp(-dt / 3);
+            const y0 = pad(this.bed, [rightP,0,u], [rightP,0,u]);
+            this.evolve(dt, T, y0);
+        }
 
-//         const liqTau = STAGE_LIQ_MOLES / Math.max(L, 0.1);
-//         // tau = V / Vdot
-//         // P Vdot = ndot R T => Vdot = ndot R T / P
-//         // tau = P * V / ndot / R / T
-//         const vapTau = P * STAGE_GAS_VOL / Math.max(V, 0.1) / 0.08314 / T;
-//         const rl = Math.exp(-1 / liqTau);
-//         const rv = Math.exp(-1 / vapTau);
+        const outlet = this.bed[3*N - 3] / P;
+        return outlet < 0 ? 0 : outlet;
+    }
 
-//         this.liqOut = { ndot: smoothLerp(this.liqOut.ndot, liqTarg.ndot, rl, dt), ppm: smoothLerp(this.liqOut.ppm, liqTarg.ppm, rl, dt) };
-//         this.vapOut = { ndot: smoothLerp(this.vapOut.ndot, vapTarg.ndot, rv, dt), ppm: smoothLerp(this.vapOut.ppm, vapTarg.ppm, rv, dt) };
-//     }
+    private evolve(tstep: number, T: number, y0: number[]) {
+        const ka = k_val(ka0, ea, T);
+        const kd = k_val(kd0, ed, T);
 
-//     // Mixing
-//     public massBal(deltaTime: number, P: number) {
-//         const lin = this.liqIn();
-//         const vin = this.vapIn!();
-//         const L = lin.ndot;
-//         const xn1 = lin.ppm;
-//         const V = vin.ndot;
-//         const yn1 = vin.ppm;
-//         const lout = this.liqOut;
-//         const vout = this.vapOut;
+        const f: ODEFunc = (t: number, y: number[]) => {
+            return rhs(t, y, dx, ka, kd);
+        };
 
-//         const dndt = xn1 * L + yn1 * V - lout.ppm * lout.ndot - vout.ppm * vout.ndot; // * 1e-6
-//         const stage_capac = STAGE_LIQ_MOLES + P * STAGE_GAS_VOL / 0.08314 / T0;
-//         const dppmdt = dndt / stage_capac; // * 1e-6 * 1e+6
-
-//         this.ppm += dppmdt * deltaTime;
-//     }
-// }
-
-// type DebugInfo = {
-//     liqIn: Accessor<Stream>
-//     vapIn: Accessor<Stream>;
-// }
-
-// export class ColumnCalc {
-//     private stages: Stage[];
-//     private playing: boolean = false;
-//     public updated: Accessor<boolean>;
-//     private setUpdated: Setter<boolean>;
-//     private getPressure: Accessor<number>;
-//     private debugInfo: DebugInfo;
-
-//     constructor(numStages: number, liqFeed: () => Stream, gasFeed: () => Stream, gasPressure: () => number) {
-//         const eff = stageEfficiency();
-//         this.stages = [];
-//         // Construct stages with appropriate feed streams.
-//         this.stages.push(new Stage(liqFeed, eff));
-//         for (let i = 1; i < numStages; i++) {
-//             const prevLiqOut = this.stages[i - 1].liqStream.bind(this.stages[i - 1]);
-//             this.stages.push(new Stage(prevLiqOut, eff));
-//         }
-//         // Set vapor stream of each stage to be the solvent input of the previous stage
-//         for (let i = 0; i < numStages - 1; i++) {
-//             const nextVapOut = this.stages[i + 1].vapStream.bind(this.stages[i + 1]);
-//             this.stages[i].setVapIn(nextVapOut);
-//         }
-//         // Set solvent input of the last stage to be the solvent feed
-//         this.stages[numStages - 1].setVapIn(gasFeed);
-
-//         // Set up updated signal so other scopes can react to changes in the column
-//         const [updated, setUpdated] = createSignal(false);
-//         this.updated = updated;
-//         this.setUpdated = setUpdated;
-//         this.getPressure = gasPressure;
-
-//         // Debug info
-//         this.debugInfo = { liqIn: liqFeed, vapIn: gasFeed };
-//     }
-
-//     public vapOut(): Stream {
-//         return this.stages[this.stages.length - 1].vapStream();
-//     }
-
-//     public liqOut(): Stream {
-//         return this.stages[0].liqStream();
-//     }
-
-//     private evolve(deltaTime: number) {
-//         const T = T0;
-//         const P = this.getPressure() + 1;
-//         // Iterate mass balance
-//         // for (const stage of this.stages) {
-//         //     stage.massBal(deltaTime, P);
-//         //     if (stage.vapStream().ndot < 0) throw new Error("gas rate under in evolve");
-//         // }
-//         // Solve eqm
-//         for (const stage of this.stages) {
-//             stage.equilibrium(T, P, deltaTime);
-//             if (stage.vapStream().ndot < 0) throw new Error(`gas under in settle`);
-//         }
-//     }
-
-//     public start() {
-//         if (this.playing) return;
-//         this.playing = true;
+        const sol = rk45(f, y0, 0, tstep);
+        const soly = sol.y.at(-1)!;
         
-//         const frame = (deltaTime: number) => {
-//             this.evolve(deltaTime);
-//             this.setUpdated(u => !u); // Trigger update for any listening scopes
-//             return this.playing;
-//         }
+        this.updateBed(soly);
+        // updatePlot();
+    }
 
-//         animate(frame);
-//     }
+    private updateBed(y: number[]) {
+        for (let i=0; i<3*N; i++) {
+            this.bed[i] = y[i + 3];
+        }
+    }
 
-//     public stop() {
-//         this.playing = false;
-//     }
-
-//     public viewPPM(stageIdx: number, stream: "liquid" | "vapor"): number {
-//         const stage = this.stages[stageIdx];
-//         const str = stream === "liquid" ? stage.liqStream() : stage.vapStream();
-//         return str.ppm;
-//     }
-
-//     public currentPressure() {
-//         return this.getPressure();
-//     }
-
-//     public operatingLine() {
-//         const { liqIn, vapIn } = this.debugInfo;
-//         const lin = liqIn();
-//         const vin = vapIn();
-//         const vout = this.stages[0].vapStream();
-//         const slope = lin.ndot / vin.ndot;
-//         const intercept = (vout.ppm - slope * lin.ppm);
-//         return { slope, intercept };
-//     }
-// }
+    public view() {
+        return this.bed.slice();
+    }
+}

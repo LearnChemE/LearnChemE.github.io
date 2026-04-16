@@ -10,12 +10,14 @@ type GasCylinderDescriptor = {
     name: string;
     x: number;
     angle: number;
+    yCO2: number;
 }
 
 export type GasCylinder = {
     name: string,
     x: number,
     angle: number,
+    yCO2: number,
 
     cylPres: Signal<number>,
     regSP: Signal<number>,
@@ -29,6 +31,7 @@ export function GasCylinder(descriptor: GasCylinderDescriptor) {
         name: descriptor.name,
         x: descriptor.x,
         angle: descriptor.angle,
+        yCO2: descriptor.yCO2,
 
         cylPres,
         regSP,
@@ -40,17 +43,20 @@ const cylinderDescriptors: GasCylinderDescriptor[] = [
     {
         name: "90%",
         x: 40,
-        angle: 180
+        angle: 180,
+        yCO2: 0.9
     }, 
     {
         name: "10%",
         x: 194,
-        angle: 90
+        angle: 90,
+        yCO2: 0.1
     }, 
     {
         name: "N2",
         x: 348,
-        angle: 0
+        angle: 0,
+        yCO2: 0
     }
 ];
 
