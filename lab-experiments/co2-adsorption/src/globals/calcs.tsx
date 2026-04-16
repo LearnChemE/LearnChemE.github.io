@@ -3,7 +3,7 @@ import { type Accessor, type Setter } from "solid-js";
 import rk45, { type ODEFunc } from "./rk45";
 import { animate } from "./helpers";
 
-const LENGTH_BED = 40; // cm
+export const LENGTH_BED = 40; // cm
 const RHO_ZEOLITE = 0.75; // g/cc
 const MASS_ZEOLITE = 4000; // g
 const MM_CO2 = 44.009; // g/mol
@@ -246,6 +246,7 @@ export type BedDescriptor = {
     mdot: Accessor<number>;
     // Outputs
     on_yOut: Setter<number>;
+    onUpdate: () => void;
 };
 
 export class BedCalc {
@@ -261,6 +262,7 @@ export class BedCalc {
 
     // Outputs
     private on_yOut: Setter<number>;
+    private onUpdate: () => void;
 
     constructor(desc: BedDescriptor) {
         this.tempK = desc.tempK;
@@ -269,6 +271,7 @@ export class BedCalc {
         this.open = desc.open;
         this.mdot = desc.mdot;
         this.on_yOut = desc.on_yOut;
+        this.onUpdate = desc.onUpdate;
     }
 
     public play() {
@@ -292,7 +295,7 @@ export class BedCalc {
 
         const yOut = this.yCO2_out(dt, mdot, T, P, y, open);
         this.on_yOut(yOut);
-        console.log(y)
+        this.onUpdate();
         
         // For animation purposes
         return this.playing;
@@ -353,7 +356,14 @@ export class BedCalc {
         }
     }
 
-    public view() {
-        return this.bed.slice();
+    public view(which: "p" | "theta" | "u" = "p") {
+        switch (which) {
+            case "p":
+                return this.bed.filter((_, i) => i % 3 === 0);
+            case "theta":
+                return this.bed.filter((_, i) => i % 3 === 1);
+            case "u":
+                return this.bed.filter((_, i) => i % 3 === 2);
+        }
     }
 }

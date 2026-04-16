@@ -1,7 +1,7 @@
 import Plotly from "plotly.js-dist-min";
 import { createEffect, createMemo, onCleanup, onMount, useContext, type Component } from "solid-js"
-import { ColumnContext, Henrys } from "../globals/";
-import { numberOfStages } from "../globals/";
+import { BedContext } from "./Context";
+import { LENGTH_BED } from "../globals";
 
 interface PlotlyChartProps {
     // data: () => Profile,
@@ -9,7 +9,7 @@ interface PlotlyChartProps {
     config?: Partial<Plotly.Config>
 };
 
-export const PlotlyChart: Component<PlotlyChartProps> = ({ layout, config }) => {
+export const PlotlyChart: Component<PlotlyChartProps> = (props) => {
     // const env = transpose(envelope);
     const data = [{
             x: [],
@@ -18,98 +18,44 @@ export const PlotlyChart: Component<PlotlyChartProps> = ({ layout, config }) => 
             line: { color: "black" }
         }];
 
-    const columnCtx = useContext(ColumnContext);
-
+    const bedCtx = useContext(BedContext);
+    if (!bedCtx) throw new Error("Bed context undefined");
         
 
     const plotdata = createMemo((): Plotly.Data[] => {
-        // // test data
-        // const mix = [0.131, 0.109];
-        // // const pts = [[0,0],[0,0]]
-        // const pts = separate(mix[0], mix[1]);
-        // console.log(pts)
-        // const x_test = [mix[0]];
-        // const y_test = [mix[1]];
-        // pts.forEach(pt => {
-        //     x_test.push(pt[0]);
-        //     y_test.push(pt[1]);
-        // });
-
         const plotdata = [...data] as Partial<Plotly.Data>[];
 
-        // real data
-        const x_test: number[] = [];
-        const y_test: number[] = [];
-        if (columnCtx!.columnCreated()) {
+        const bed = bedCtx!.bed;
+        if (!bed) return [];
 
-            columnCtx!.column!.updated();
-            const col = columnCtx!.column!;
+        const view = bed.view("p");
+        const N = view.length;
+        const x = Array.from({ length: N }).map((_,i) => i / (N - 1) * LENGTH_BED);
+        
+        const newData = {
+            x: x,
+            y: view,
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: "black" },
+            marker: { color: "red", size: 8 }
+        } as Partial<Plotly.Data>;
 
-            const P = col.currentPressure() + 1;
-
-            const n = numberOfStages();
-            for (let i = 0; i < n; i++) {
-                const liq = col.viewPPM(i, "liquid");
-                const vap = col.viewPPM(i, "vapor");
-                x_test.push(liq);
-                y_test.push(vap);
-            }
-
-            const newData = {
-                x: x_test,
-                y: y_test,
-                type: 'scatter',
-                mode: 'markers',
-                line: { color: "red" },
-                marker: { color: "red", size: 8 }
-            } as Partial<Plotly.Data>;
-
-            const eqm_x = Math.max(...x_test) * 1.1;
-            const eqm_y = eqm_x * Henrys(298) / P;
-            const eqm_line = {
-                x: [0, eqm_x],
-                y: [0, eqm_y],
-                type: 'scatter',
-                mode: 'lines',
-                line: { color: "orange" }
-            } as Partial<Plotly.Data>;
-            plotdata.push(eqm_line);
-            plotdata.push(newData);
-
-            const ol = col.operatingLine();
-            const x_int = Math.max(- ol.intercept / ol.slope, 0);
-            const op_line = {
-                x: [x_int, eqm_x],
-                y: [x_int * ol.slope + ol.intercept, eqm_x * ol.slope + ol.intercept],
-                type: 'scatter',
-                mode: 'lines',
-                line: { color: "pink" }
-            } as Partial<Plotly.Data>;
-            plotdata.push(op_line);
-        }
-
-        // const plotdata = [...data, {
-        //     x: x_test,
-        //     y: y_test,
-        //     type: 'scatter',
-        //     mode: 'markers',
-        //     line: { color: "red" },
-        //     marker: { color: "red", size: 8 }
-        // }];
+        plotdata.push(newData);
 
         return plotdata as Plotly.Data[];
     });
 
     let chartDiv!: HTMLDivElement;
     onMount(() => {
-        Plotly.newPlot(chartDiv, plotdata(), layout, config)
+        Plotly.newPlot(chartDiv, plotdata(), props.layout, props.config)
     });
 
     // Update chartdiv when necessary
     createEffect(() => {
         const data = plotdata();
         if (chartDiv) {
-            Plotly.react(chartDiv, data, layout, config);
+            Plotly.react(chartDiv, data, props.layout, props.config);
         }
     });
 

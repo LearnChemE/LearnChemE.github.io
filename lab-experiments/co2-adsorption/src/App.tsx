@@ -18,6 +18,7 @@ import { Manometer } from './components/Manometer/Manometer'
 import { BetaCtrl } from './components/BetaCtrl/BetaCtrl'
 import { DigitalGauge } from './components/DigitalGauge/DigitalGauge'
 import { BedContextProvider, type ContextDescriptor } from './components/Context'
+import { PlotlyChart } from './components/PlotlyChart'
 
 function App() {
   const cylinders = createCylinders();
@@ -76,6 +77,7 @@ function App() {
           {/* <ColumnData feedIsOn={feedIsOn} gasIsOn={() => gasRate() > 0} /> */}
         </SVGCanvas>
 
+
         {/* Menu for selecting stages */}
         {/* <Show when={showMenu()}>
           <StagesMenu onClose={() => setShowMenu(!showMenu())} />
@@ -94,6 +96,8 @@ function App() {
           </Match>
         </Switch>
       </div>
+
+      <PlotlyChart />
 
     </BedContextProvider>
   )

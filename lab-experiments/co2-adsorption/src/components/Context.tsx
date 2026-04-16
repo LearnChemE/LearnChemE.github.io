@@ -1,4 +1,4 @@
-import { createContext, createMemo, type Accessor, type Setter } from "solid-js";
+import { createContext, createMemo, createSignal, type Accessor, type Setter } from "solid-js";
 import { BedCalc, GasCylinder, type BedDescriptor } from "../globals";
 
 export type ContextDescriptor = {
@@ -6,51 +6,54 @@ export type ContextDescriptor = {
     cylinder: Accessor<GasCylinder>,
     v2Angle: Accessor<number>,
     massSP: Accessor<number>,
-    onYOut: (val: number) => null;
+    onYOut: (val: number) => void;
 };
 
 // Context definition and creation for column calculations
 export type BedContextType = {
     bed: BedCalc;
+    bedUpdated: Accessor<boolean>;
 };
 export const BedContext = createContext<BedContextType>();
 export const BedContextProvider = (props: { children: any, descriptor: ContextDescriptor }) => {
-    const { children, descriptor } = props;
+    const [bedUpdated, setBedUpdated] = createSignal(false);
 
     // From cylinder
     const presBar = createMemo(() => {
-        const cyl = descriptor.cylinder();
+        const cyl = props.descriptor.cylinder();
         return cyl.linePres();
     })
     const yIn = createMemo(() => {
-        const cyl = descriptor.cylinder();
+        const cyl = props.descriptor.cylinder();
         console.log("y in:", cyl.yCO2)
         return cyl.yCO2;
     });
 
     const open = createMemo(() => {
-        const v2a = descriptor.v2Angle();
+        const v2a = props.descriptor.v2Angle();
         return (v2a === 180) ? true : false;
     });
 
     const bedDescriptor: BedDescriptor = {
         // Inputs
-        tempK: descriptor.tempK,
+        tempK: props.descriptor.tempK,
         presBar,
         yIn,
         open,
-        mdot: descriptor.massSP,
+        mdot: props.descriptor.massSP,
         // Outputs
-        on_yOut: descriptor.onYOut as Setter<number>
+        on_yOut: props.descriptor.onYOut as Setter<number>,
+        onUpdate: () => setBedUpdated(v => !v)
     };
 
     const bed = new BedCalc(bedDescriptor);
     bed.play();
-    const store: BedContextType = { bed };
+    const store: BedContextType = { bed, bedUpdated };
 
+    console.log("Providing bed context");
     return (
     <BedContext.Provider value={store}>
-        {children}
+        {props.children}
     </BedContext.Provider>
     );
 }
