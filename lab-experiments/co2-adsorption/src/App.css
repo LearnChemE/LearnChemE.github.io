@@ -1,0 +1,91 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  /* padding: 2rem; */
+  text-align: center;
+  position: relative;
+}
+
+.clickable {
+  cursor: pointer;
+}
+.clickable:hover {
+  filter: drop-shadow(0 0 2px #000000aa)
+    brightness(1.2);
+}
+
+.draggable {
+  cursor: grab;
+  transition: filter 200ms;
+}
+.draggable:hover {
+  filter: drop-shadow(0 0 2px #000000aa)
+    brightness(1.1);
+}
+.draggable:active {
+  cursor: grabbing;
+}
+
+.disabled {
+  pointer-events: none;
+  filter: grayscale(1) opacity(0.8);
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.solid:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+p {
+  /* margin-top: 0; */
+  margin-bottom: 0;
+  line-height: 1.8;
+}
+
+@font-face {
+  font-family: "digital";
+  src: url("./assets/digital-7.ttf") format("truetype");
+}
+
+.digital-label {
+  font-family: "digital" !important;
+  font-weight: 100;
+  font-size: 11;
+
+  position: absolute;
+  text-anchor: end;
+  text-justify: middle;
+  dominant-baseline: middle;
+}
+
+.display {
+  font-family: "digital" !important;
+  font-weight: 100;
+  font-size: 11;
+
+  position: absolute;
+  text-anchor: middle;
+  text-justify: middle;
+  dominant-baseline: middle;
+}
+
+.canvas-container {
+  position: relative;
+}
+
