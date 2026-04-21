@@ -12,13 +12,13 @@ import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import worksheet from './assets/worksheet.pdf?url';
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import { ControlButton } from './components/ControlButton/ControlButton'
-import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, MASS_FLOW_STEP, MAX_MASS_FLOWRATE, MIN_MASS_FLOWRATE, SIM_MODE, TEMP_ROOM, V1_N2_ANGLE, V2_BYPASS_ANGLE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
+import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, MASS_FLOW_STEP, MAX_MASS_FLOWRATE, MIN_MASS_FLOWRATE, SIM_MODE, TEMP_ROOM, V1_N2_ANGLE, V2_BED_ANGLE, V2_BYPASS_ANGLE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
 import { MultiValve } from './components/MultiValve/MultiValve'
 import { Manometer } from './components/Manometer/Manometer'
 import { BetaCtrl } from './components/BetaCtrl/BetaCtrl'
 import { DigitalGauge } from './components/DigitalGauge/DigitalGauge'
 import { BedContextProvider, type ContextDescriptor } from './components/Context'
-import { PlotlyChart } from './components/PlotlyChart'
+// import { PlotlyChart } from './components/PlotlyChart'
 import { AniLines } from './components/AniLines/AniLines'
 
 function App() {
@@ -45,7 +45,7 @@ function App() {
   const compLabel = createMemo(() => {
     if (valve2Angle() === V2_BYPASS_ANGLE) {
       const y = currentCylinder().yCO2;
-      const flowing = massSP() > 0 && bedPressure() > 0;
+      const flowing = massSP() > 0 && currentCylinder().linePres() > 0;
       return `${flowing ? (y * 100).toFixed(2) : "--"} %`;
     }
     else {
@@ -55,7 +55,7 @@ function App() {
     }
   });
 
-  const reset = () => {};
+  const reset = () => window.location.reload();
 
   const ctxDescriptor: ContextDescriptor = {
     tempK: temperature,
@@ -91,7 +91,13 @@ function App() {
           <DigitalGauge x={556} y={310} label={() => `${temperature().toFixed(0)} K`} />
           <DigitalGauge x={597} y={110} label={compLabel} />
           
-          <AniLines isShowing={showLines} />
+          <AniLines 
+            isShowing={showLines} 
+            cyls={cylinders}
+            cyl={currentCylinder} 
+            passMfc={() => massSP() > 0}
+            showLoop={() => valve2Angle() === V2_BED_ANGLE}
+          />
         </SVGCanvas>
 
 
@@ -104,17 +110,10 @@ function App() {
         <HamburgerMenu path={worksheet} downloadName="co2AdsorptionWorksheet.pdf" Directions={DirectionsText} About={AboutText} />
 
         {/* Stages/Reset Button */}
-        <Switch>
-          {/* <Match when={!lockStages()}>
-            <ControlButton icon="fa-solid fa-diagram-next" label="edit internals" top={100} onClick={() => setShowMenu(!showMenu())} active={showMenu} disabled={lockStages} />
-          </Match> */}
-          <Match when={true}>
-            <ControlButton icon="fa-solid fa-arrows-rotate" label="reset" top={100} onClick={reset} active={() => true} activeColor='#FF3B3B' />
-          </Match>
-        </Switch>
+        <ControlButton icon="fa-solid fa-arrows-rotate" label="reset" top={100} onClick={reset} active={() => true} activeColor='#FF3B3B' />
       </div>
 
-      <PlotlyChart />
+      {/* <PlotlyChart /> */}
 
     </BedContextProvider>
   )

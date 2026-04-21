@@ -1,5 +1,5 @@
 import { createContext, createMemo, createSignal, type Accessor, type Setter } from "solid-js";
-import { BedCalc, GasCylinder, type BedDescriptor } from "../globals";
+import { BedCalc, GasCylinder, V2_BED_ANGLE, type BedDescriptor } from "../globals";
 
 export type ContextDescriptor = {
     tempK: Accessor<number>,
@@ -31,7 +31,7 @@ export const BedContextProvider = (props: { children: any, descriptor: ContextDe
 
     const flowing = createMemo(() => {
         const v2a = props.descriptor.v2Angle();
-        return (v2a === 180) ? true : false;
+        return (v2a === V2_BED_ANGLE) ? true : false;
     });
 
     const bedDescriptor: BedDescriptor = {

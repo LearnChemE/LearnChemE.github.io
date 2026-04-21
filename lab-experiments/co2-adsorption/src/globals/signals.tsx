@@ -12,6 +12,7 @@ type GasCylinderDescriptor = {
     x: number;
     angle: number;
     yCO2: number;
+    color: string;
 }
 
 export type GasCylinder = {
@@ -19,6 +20,7 @@ export type GasCylinder = {
     x: number,
     angle: number,
     yCO2: number,
+    color: string,
 
     cylPres: Signal<number>,
     regSP: Signal<number>,
@@ -33,6 +35,7 @@ export function GasCylinder(descriptor: GasCylinderDescriptor) {
         x: descriptor.x,
         angle: descriptor.angle,
         yCO2: descriptor.yCO2,
+        color: descriptor.color,
 
         cylPres,
         regSP,
@@ -47,19 +50,22 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         name: "90%",
         x: 40,
         angle: 180,
-        yCO2: 0.9
+        yCO2: 0.9,
+        color: "#BF0000"
     }, 
     {
         name: "10%",
         x: 194,
         angle: 90,
-        yCO2: 0.1
+        yCO2: 0.1,
+        color: "#EA6C6C"
     }, 
     {
         name: "N2",
         x: 348,
         angle: 0,
-        yCO2: 0
+        yCO2: 0,
+        color: "#68A246",
     }
 ] :
 // Desorption: N2 only
@@ -68,7 +74,8 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         name: "N2",
         x: 194,
         angle: 0,
-        yCO2: 0
+        yCO2: 0,
+        color: "#68A246",
     }
 ];
 
