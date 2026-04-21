@@ -1,6 +1,5 @@
 import { createMemo, type Accessor, type Component, type Setter } from "solid-js";
 import { constrain, getAngleFromDown, getSVGCoords, MAX_PRESSURE } from "../../globals";
-import { SVGTooltip } from "../Tooltip/TooltipSelector";
 
 type RegulatorProps = {
     inPres: Accessor<number>;
@@ -187,9 +186,6 @@ export const Regulator: Component<RegulatorProps> = (props) => {
 </g>
 
 </g>
-
-
-<SVGTooltip x={props.x - 50} y={props.y + 20} width={86} label="pressure" override={() => [`${props.outPres().toFixed(1)} bar`,`(gauge)`]} anchor={ref} />
 
 <defs>
 <clipPath id="paint6_angular_35_319_clip_path"><circle cx="27" cy="38" r="15.5"/></clipPath><linearGradient id="paint0_linear_35_319" x1="6" y1="45" x2="6" y2="31" gradientUnits="userSpaceOnUse">

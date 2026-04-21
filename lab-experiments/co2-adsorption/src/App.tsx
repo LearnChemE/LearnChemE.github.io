@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For, Match, Show, Switch } from 'solid-js'
+import { createMemo, createSignal, For, Show } from 'solid-js'
 import './App.css'
 import { SVGCanvas } from './components/SVGCanvas/SVGCanvas'
 import Defs from './components/Defs'
@@ -20,6 +20,7 @@ import { DigitalGauge } from './components/DigitalGauge/DigitalGauge'
 import { BedContextProvider, type ContextDescriptor } from './components/Context'
 // import { PlotlyChart } from './components/PlotlyChart'
 import { AniLines } from './components/AniLines/AniLines'
+import { SVGTooltip } from './components/Tooltip/TooltipSelector'
 
 function App() {
   const cylinders = createCylinders();
@@ -50,7 +51,6 @@ function App() {
     }
     else {
       const { y, u } = out();
-      console.log("velocity:", u)
       return `${u > 0.1 ? (y * 100).toFixed(2) : "--"} %`;
     }
   });
@@ -73,10 +73,15 @@ function App() {
           <Pipes />
           <For each={cylinders}>
             {
-              cyl => <>
+              cyl => { 
+                let ref!: SVGGElement;
+              return <>
                 <CylinderValve x={cyl.x} y={324} pressure={cyl.cylPres.get} setPressure={cyl.cylPres.set} />
-                <Regulator x={59 + cyl.x} y={310} inPres={cyl.cylPres.get} outPres={cyl.linePres} gasSP={cyl.regSP.get} setGasSP={cyl.regSP.set} />
-              </>
+                <g ref={ref}>
+                  <Regulator x={59 + cyl.x} y={310} inPres={cyl.cylPres.get} outPres={cyl.linePres} gasSP={cyl.regSP.get} setGasSP={cyl.regSP.set} />
+                  <SVGTooltip x={59 + cyl.x} y={370} anchor={ref} label={() => `${(cyl.linePres()).toFixed(2)} bar`} width={70} height={26} />
+                </g>
+              </>}
             }
           </For>
           <Controller sp={massSP} setSP={setMassSP} range={[MIN_MASS_FLOWRATE, MAX_MASS_FLOWRATE]} step={MASS_FLOW_STEP} />

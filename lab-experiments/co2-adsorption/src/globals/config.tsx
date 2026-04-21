@@ -2,7 +2,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 const mode = urlParams.get('mode');
 
-export const SIM_MODE = (mode === "adsorption" || mode === "desorption") ? mode : "desorption";
+export const SIM_MODE = (mode === "adsorption" || mode === "desorption") ? mode : "absorption";
 
 export const MIN_MASS_FLOWRATE = 0;
 export const MAX_MASS_FLOWRATE = 20;

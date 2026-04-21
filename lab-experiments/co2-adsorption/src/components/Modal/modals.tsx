@@ -3,16 +3,12 @@ import type { Component } from "solid-js";
 export const DirectionsText: Component = () => {
     return <>
     <p>
-        This digital experiment simulates the stripping of a volatile solute from a liquid stream to a gas stream. 
-        Before starting the experiment, use the menu on the top left to select the number of stages in the column and the stage efficiency. 
-        Switch on the liquid feed pump (left) first to fill the column, and then drag and rotate the red feed valve to change the liquid flow rate. 
-        Next, click on the cylinder valve (right) to open it and pressurize the line. 
-        Rotate the regulator valve to change the pressure, and use the buttons on the flow controller to adjust the gas flow. 
-        Allow the system to reach steady state and then view the liquid and vapor mole ratios by hovering over the blue and white dots next to the column. 
-        Use the weight scale at the liquid outlet to measure the corresponding mass flowrate. 
+        This virtual experiment shows the adsorption and desorption of carbon dioxide from a zeolite bed.
+        Click the cylinder valves and click and drag the regulators to allow flow into the system.
+        Use the left valve handle to change what cylinder is connected to the bed system. Use the right valve handle to direct the flow of gas towards the bed or bypass it.
+        Click the buttons on the mass flow controller to adjust the mass flowrate.
         
         To reset the experiment, click the reset button with the rotating arrows in the top left. 
-        This also resets the number of stages and stage efficiency to their default values. 
         Click on Worksheet to see a detailed experimental plan. Scroll to zoom and drag the screen to pan. 
     </p>
 </>;
