@@ -13,8 +13,10 @@ const BED_MAX_CAPACITY = MASS_ZEOLITE / 1000 * 0.85; // mols
 const DIFFUSIVITY = 1.8e-1; // m^2/s, diffusivity of CO2 in zeolite
 // Spatial info
 const N = 51; // number of points in spatial discretization
-const NT = 3*N + 6; // Size of arrays including padding
-const x = Array.from({ length: N }).map((_,i) => i * LENGTH_BED / (N - 1));
+const E = 4; // number of equations per point (tot pressure, co2 pressure, theta, velocity); stride
+const NE = N * E; // number of equations in the system
+const NT = NE + 2 * E; // Size of arrays including padding
+const x = Array.from({ length: N }).map((_,i) => i * LENGTH_BED / (N - 1)); // spatial points
 const dx = x[1] - x[0];
 
 
@@ -36,6 +38,7 @@ function k_val(k0: number, ea: number, T: number) {
 
 // type BedPoint = [
 //   pco2: Number,
+//   pn2: Number,
 //   th_co2: Number,
 //   u: Number
 // ]
@@ -47,20 +50,13 @@ function k_val(k0: number, ea: number, T: number) {
 
 // Pad the edges of an array with the first and last values to make it easier to calculate derivatives
 function pad(y:number[], left: number[], right?: number[]) {
-  if (!right) right = Array.from({ length: 3 }).map((_,i) => {
-    const yi = y[3 * N - 3 + i];
+  if (!right) right = Array.from({ length: E }).map((_,i) => {
+    const yi = y[NE - E + i];
     return yi;
   });
   // if (right[2] > 0) throw new Error(`Padding right with: ${right}, ${y}`)
   return [ ...left, ...y, ...right ];
 }
-
-// // Remove the padding from the array and update the bed state
-// function updateBed(y: number[]) {
-//   for (let i=0; i<3*N; i++) {
-//     bed[i] = y[i + 3];
-//   }
-// }
 
 // Molar mass of the gas mixture based on the mole fraction of CO2
 function molar_mass(x_co2: number) {
@@ -81,82 +77,33 @@ function calc_velocity(mdot: number, x_co2: number, T: number, P: number) {
     return q / BED_CROSS_SECTION // cm/s
 }
 
-// function advection(y: number[], dx: number) {
-//   const inv_dx = 1 / dx;
-//   const adv = Array.from({ length: 3*N + 6 }).fill(0);
-
-//   for (let i = 3; i < NT; i += 3) {
-//     const ip = i;
-//     // No theta; no advection for adsorbed carbon
-//     const iu = i + 2;
-
-//     const dp = y[ip] - y[ip - 3];
-//     const du = y[iu] - y[iu - 3];
-//     adv[ip] = - y[iu] * dp * inv_dx;
-//     adv[iu] = - y[iu] * du * inv_dx
-//   }
-
-//   return adv;
-// }
-
-// function diffusion(y: number[], dx: number) {
-//   const inv_dx2 = 1 / dx / dx;
-//   const dif = Array.from({ length: NT }).fill(0);
-
-//   for (let i = 3; i < NT - 3; i += 3) {
-//     const ip = i;
-//     // No theta; no advection for adsorbed carbon
-//     const iu = i + 2;
-
-//     const d2p = y[ip + 3] + y[ip - 3] - 2 * y[ip];
-//     const d2u = y[iu + 3] + y[iu - 3] - 2 * y[iu];
-//     dif[ip] = DIFFUSIVITY * d2p * inv_dx2;
-//     dif[iu] = DIFFUSIVITY * d2u * inv_dx2;
-//   }
-
-//   return dif;
-// }
-
-// function reaction(y: number[], ka: number, kd: number) {
-//   const rxn = Array.from({ length: NT }).fill(0);
-
-//   for (let i=3; i < NT - 3; i += 3) {
-//     const p = y[i];
-//     const th = y[i + 1];
-//     const th_star = 1 - th;
-
-//     const ads = ka * p * th_star;
-//     const des = kd * th;
-
-//     rxn[i] = des - ads; // Pressure changes
-//     rxn[i + 1] = (ads - des) / BED_MAX_CAPACITY; // Theta changes
-//   }
-
-//   return rxn;
-// }
-
 // RHS for advection-diffusion eqn with reaction term
 function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
   const dydt = Array.from({ length: NT }).fill(0) as number[];
   const inv_dx = 1 / dx;
   const inv_dx2 = inv_dx / dx;
 
-  for (let i = 3; i < NT - 3; i += 3) {
+  for (let i = E; i < NT - E; i += E) {
     const ip = i;
-    const it = i + 1;
-    const iu = i + 2;
+    const iP = i + 1;
+    const it = i + 2;
+    const iu = i + 3;
 
     // Advection
-    const dp = y[ip] - y[ip - 3];
-    const du = y[iu] - y[iu - 3];
+    const dp = y[ip] - y[ip - E];
+    const dP = y[iP] - y[iP - E];
+    const du = y[iu] - y[iu - E];
     const adv_p = - y[iu] * dp * inv_dx;
+    const adv_P = - y[iu] * dP * inv_dx;
     const adv_u = - y[iu] * du * inv_dx
 
     // Diffusion
-    const d2p = y[ip + 3] + y[ip - 3] - 2 * y[ip];
-    const d2u = y[iu + 3] + y[iu - 3] - 2 * y[iu];
+    const d2p = y[ip + E] + y[ip - E] - 2 * y[ip];
+    const d2P = y[iP + E] + y[iP - E] - 2 * y[iP];
+    const d2u = y[iu + E] + y[iu - E] - 2 * y[iu];
     const dif_p = DIFFUSIVITY * d2p * inv_dx2;
-    const dif_u = DIFFUSIVITY * d2u * inv_dx2;
+    const dif_P = DIFFUSIVITY * d2P * inv_dx2;
+    const dif_u = (DIFFUSIVITY * 1e1) * d2u * inv_dx2;
 
     // Reaction
     const th = y[it];
@@ -170,6 +117,7 @@ function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
 
     // Sum
     dydt[ip] = dif_p + adv_p + rxn_p;
+    dydt[iP] = dif_P + adv_P;
     dydt[iu] = dif_u + adv_u;
     dydt[it] = rxn_t;
   }
@@ -177,100 +125,40 @@ function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
   return dydt;
 }
 
-// // old RHS for advection-diffusion eqn with reaction term
-// function rhs(t, y, dx, ka, kd) {
-//   const adv = advection(y, dx);
-//   const dif = diffusion(y, dx);
-//   const rxn = reaction(y, ka, kd);
-
-//   const dydt = dif.map((dif, i) => dif + adv[i] + rxn[i]);
-//   dydt[NT - 3] = 0;
-//   dydt[NT - 1] = 0;
-//   return dydt;
-//   // return adv.map((a, i) => a + dif[i]);// + rxn[i]);
-// }
-
-// function evolve(tstep: number, T: number, y0: number[]) {
-//   const ka = k_val(ka0, ea, T);
-//   const kd = k_val(kd0, ed, T);
-
-//   const f: ODEFunc = (t: number, y: number[]) => {
-//     return rhs(t, y, dx, ka, kd);
-//   };
-
-//   const sol = rk45(f, y0, 0, tstep);
-//   const soly = sol.y.at(-1)!;
-  
-//   updateBed(soly);
-//   // updatePlot();
-// }
-
-// /**
-//  * Calculate the outlet mole fraction of CO2 in a gas mixture
-//  * after passing through a zeolite membrane.
-//  *
-//  * @param {Object} args - The arguments object.
-//  * @param {number} args.t - The time in seconds.
-//  * @param {number} args.tStep - The time step in seconds.
-//  * @param {number} args.m - The mass flow rate of the gas mixture in g / s.
-//  * @param {number} args.P - The total pressure of the gas mixture in bar.
-//  * @param {number} args.T - The temperature of the gas mixture in K.
-//  * @param {number} args.yCO2 - The mole fraction of CO2 in the gas mixture.
-//  * @param {boolean} [args.desorbing=false] - Whether the CO2 is desorbing.
-//  * @param {number} [args.timeOfDesorption=0] - The time of desorption in seconds.
-//  * @param {number} [args.kd=4.365e-4] - The desorption rate constant in s^-1.
-//  * @returns {number} - The outlet mole fraction of CO2 in the gas mixture.
-//  */
-// export function yCO2_out(dt: number, mdot: number, T: number, P: number, y: number, open: boolean) {
-//   const ul = calc_velocity(mdot, y, T, P);
-//   if (!open) {
-//     const left = [ y * P, 0, ul ];
-//     const y0 = pad(bed, left);
-//     evolve(dt, T, y0);
-//   }
-//   else {
-//     const y0 = pad(bed, [0,0,0], [0,0,0])
-//     evolve(dt, T, y0);
-//   }
-
-//   const outlet = bed[3*N - 3] / P
-//   return outlet < 0 ? 0 : outlet;
-// }
-
 export type BedDescriptor = {
     // Inputs
     tempK: Accessor<number>;
     presBar: Accessor<number>;
     yIn: Accessor<number>;
-    open: Accessor<boolean>;
+    flowing: Accessor<boolean>;
     mdot: Accessor<number>;
     // Outputs
-    on_yOut: Setter<number>;
+    onOut: Setter<{ y: number, u: number }>;
     onUpdate: () => void;
 };
 
 export class BedCalc {
-    private bed = Array.from({ length: 3*N }).fill(0) as number[]; // initialize bed with zeros
+    private bed = Array.from({ length: NE }).fill(0) as number[]; // initialize bed with zeros
     private playing = false;
 
     // Inputs
     private tempK: Accessor<number>;
     private presBar: Accessor<number>;
     private yIn: Accessor<number>;
-    private open: Accessor<boolean>;
+    private flowing: Accessor<boolean>;
     private mdot: Accessor<number>;
 
     // Outputs
-    private on_yOut: Setter<number>;
+    private onOut: Setter<{ y: number, u: number }>;
     private onUpdate: () => void;
 
     constructor(desc: BedDescriptor) {
         this.tempK = desc.tempK;
         this.presBar = desc.presBar;
         this.yIn = desc.yIn;
-        this.open = desc.open;
+        this.flowing = desc.flowing;
         this.mdot = desc.mdot;
-        this.on_yOut = desc.on_yOut;
+        this.onOut = desc.onOut;
         this.onUpdate = desc.onUpdate;
     }
 
@@ -283,18 +171,18 @@ export class BedCalc {
     public reset() {
         this.playing = false;
         this.bed = this.bed.fill(0);
-        this.on_yOut(0);
+        this.onOut({ y: 0, u: 0 });
     }
 
     private iterate(dt: number) {
         const T = this.tempK();
-        const P = this.presBar();
+        const P = this.presBar(); // absolute pressure
         const y = this.yIn();
-        const open = this.open();
-        const mdot = this.mdot();
+        const flowing = this.flowing();
+        const mdot = (P > 0) ? this.mdot() : 0;
 
-        const yOut = this.yCO2_out(dt, mdot, T, P, y, open);
-        this.on_yOut(yOut);
+        const out = this.yCO2_out(dt, mdot, T, P, y, flowing);
+        this.onOut(out);
         this.onUpdate();
         
         // For animation purposes
@@ -317,22 +205,28 @@ export class BedCalc {
      * @param {number} [args.kd=4.365e-4] - The desorption rate constant in s^-1.
      * @returns {number} - The outlet mole fraction of CO2 in the gas mixture.
      */
-    public yCO2_out(dt: number, mdot: number, T: number, P: number, y: number, open: boolean) {
-        const ul = calc_velocity(mdot, y, T, P);
-        if (!open) {
-            const left = [ y * P, 0, ul ];
+    public yCO2_out(dt: number, mdot: number, T: number, P: number, y: number, flowing: boolean) {
+        let ul = calc_velocity(mdot, y, T, P);
+        ul = isNaN(ul) ? 0 : ul;
+        if (flowing) {
+            const left = [ y * P, (1 - y) * P, 0, ul ];
             const y0 = pad(this.bed, left);
             this.evolve(dt, T, y0);
         }
         else {
-            const rightP = this.bed[3*N - 3];
-            const u = this.bed[3*N - 1] * Math.exp(-dt / 3);
-            const y0 = pad(this.bed, [rightP,0,u], [rightP,0,u]);
+            const rightYP = this.bed[NE - E]
+            const rightP = this.bed[NE - E + 1]; // Pressure at the right boundary;
+            const u = this.bed[NE - 1] * 0.8;
+            const y0 = pad(this.bed, [rightYP, rightP, 0, u], [rightYP, rightP, 0, u]);
             this.evolve(dt, T, y0);
         }
 
-        const outlet = this.bed[3*N - 3] / P;
-        return outlet < 0 ? 0 : outlet;
+        // return this.bed[NE - E + 3]
+        const pc = this.bed[NE - E];
+        const pn = this.bed[NE - E + 1];
+        const u = this.bed[NE - 1];
+        const outlet = pc / (pc + pn);
+        return { y: (outlet < 0 || isNaN(outlet)) ? 0 : outlet, u };
     }
 
     private evolve(tstep: number, T: number, y0: number[]) {
@@ -351,19 +245,21 @@ export class BedCalc {
     }
 
     private updateBed(y: number[]) {
-        for (let i=0; i<3*N; i++) {
-            this.bed[i] = y[i + 3];
+        for (let i=0; i<NE; i++) {
+            this.bed[i] = y[i + E];
         }
     }
 
-    public view(which: "p" | "theta" | "u" = "p") {
+    public view(which: "p" | "total pressure" | "theta" | "u" = "p") {
         switch (which) {
             case "p":
-                return this.bed.filter((_, i) => i % 3 === 0);
+                return this.bed.filter((_, i) => i % E === 0);
+            case "total pressure":
+                return this.bed.filter((_, i) => i % E === 1);
             case "theta":
-                return this.bed.filter((_, i) => i % 3 === 1);
+                return this.bed.filter((_, i) => i % E === 2);
             case "u":
-                return this.bed.filter((_, i) => i % 3 === 2);
+                return this.bed.filter((_, i) => i % E === 3);
         }
     }
 }

@@ -1,5 +1,6 @@
 import { createEffect, createMemo, createSignal, type Accessor, type Setter } from "solid-js";
 import { animate, smoothLerp } from "./helpers";
+import { SIM_MODE } from "./config";
 
 export type Signal<T> = { get: Accessor<T>, set: Setter<T> };
 export function Signal<T>(raw: [() => T, (v: T) => null]) {
@@ -39,7 +40,9 @@ export function GasCylinder(descriptor: GasCylinderDescriptor) {
     } as GasCylinder;
 }
 
-const cylinderDescriptors: GasCylinderDescriptor[] = [
+const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption") ? 
+// Adsorption: All three cylinders
+[
     {
         name: "90%",
         x: 40,
@@ -55,6 +58,15 @@ const cylinderDescriptors: GasCylinderDescriptor[] = [
     {
         name: "N2",
         x: 348,
+        angle: 0,
+        yCO2: 0
+    }
+] :
+// Desorption: N2 only
+[
+    {
+        name: "N2",
+        x: 194,
         angle: 0,
         yCO2: 0
     }

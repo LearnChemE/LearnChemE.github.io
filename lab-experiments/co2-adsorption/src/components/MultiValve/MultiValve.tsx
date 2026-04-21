@@ -5,9 +5,11 @@ import { createSignal, type Accessor, type Component, type Setter } from "solid-
 interface MultiValveProps {
   x: number | Accessor<number>;
   y: number | Accessor<number>;
+  key: string;
   directions?: number[] | Accessor<number[]>;
   angle?: Accessor<number>;
   setAngle: Setter<number>;
+  setShowLines?: Setter<boolean>;
 }
 
 export const MultiValve: Component<MultiValveProps> = (props) => {
@@ -54,9 +56,12 @@ export const MultiValve: Component<MultiValveProps> = (props) => {
       animateDispAngle();
     }
 
+    const pointerEnter = () => props.setShowLines?.(true);
+    const pointerLeave = () => props.setShowLines?.(false);
+
   // Render
   return (
-    <g transform={`translate(${x()}, ${y()})`}>
+    <g transform={`translate(${x()}, ${y()})`} onPointerEnter={pointerEnter} onPointerLeave={pointerLeave}>
 
 <rect x="0.5" y="10.5" width="4" height="15" rx="0.5" fill="url(#paint0_linear_45_20)" stroke="black"/>
 <rect x="25.5" y="0.5" width="4" height="15" rx="0.5" transform="rotate(90 25.5 0.5)" fill="url(#paint1_linear_45_20)" stroke="black"/>
@@ -72,7 +77,9 @@ export const MultiValve: Component<MultiValveProps> = (props) => {
   <rect x="24.5" y="15.5" width="5" height="10" rx="1.5" transform="rotate(90 24.5 15.5)" fill="#D9D9D9" stroke="black"/>
   <path d="M16.3926 18.9277V17.0732L18 16.1445L19.6074 17.0732V18.9277L18 19.8564L16.3926 18.9277Z" fill="#F2F2F2" stroke="black" stroke-width="0.25"/>
   <path d="M77.5 18C77.5 21.0376 75.0376 23.5 72 23.5H24C23.1716 23.5 22.5 22.8284 22.5 22V14C22.5 13.1716 23.1716 12.5 24 12.5H72L72.2832 12.5068C75.1892 12.6542 77.5 15.0574 77.5 18Z" fill="#E8AD17" stroke="black"/>
+  <g id={props.key}></g>
 </g>
+
 
 <defs>
 <clipPath id="paint4_angular_45_20_clip_path"><circle cx="18" cy="18" r="15.5"/></clipPath><clipPath id="paint5_angular_45_20_clip_path"><circle cx="18" cy="18" r="7.5"/></clipPath><linearGradient id="paint0_linear_45_20" x1="2.5" y1="25" x2="2.5" y2="11" gradientUnits="userSpaceOnUse">
@@ -96,7 +103,6 @@ export const MultiValve: Component<MultiValveProps> = (props) => {
 <stop offset="1" stop-color="#8A8A97"/>
 </linearGradient>
 </defs>
-
     </g>
 )};
 

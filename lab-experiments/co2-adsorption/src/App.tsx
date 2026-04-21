@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For, Match, Switch } from 'solid-js'
+import { createMemo, createSignal, For, Match, Show, Switch } from 'solid-js'
 import './App.css'
 import { SVGCanvas } from './components/SVGCanvas/SVGCanvas'
 import Defs from './components/Defs'
@@ -12,19 +12,21 @@ import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import worksheet from './assets/worksheet.pdf?url';
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import { ControlButton } from './components/ControlButton/ControlButton'
-import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, MASS_FLOW_STEP, MAX_MASS_FLOWRATE, MIN_MASS_FLOWRATE, TEMP_ROOM, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
+import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, MASS_FLOW_STEP, MAX_MASS_FLOWRATE, MIN_MASS_FLOWRATE, SIM_MODE, TEMP_ROOM, V1_N2_ANGLE, V2_BYPASS_ANGLE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
 import { MultiValve } from './components/MultiValve/MultiValve'
 import { Manometer } from './components/Manometer/Manometer'
 import { BetaCtrl } from './components/BetaCtrl/BetaCtrl'
 import { DigitalGauge } from './components/DigitalGauge/DigitalGauge'
 import { BedContextProvider, type ContextDescriptor } from './components/Context'
 import { PlotlyChart } from './components/PlotlyChart'
+import { AniLines } from './components/AniLines/AniLines'
 
 function App() {
   const cylinders = createCylinders();
 
-  const [valve1Angle, setValve1Angle] = createSignal(180);
-  const [valve2Angle, setValve2Angle] = createSignal(180);
+  const [valve1Angle, setValve1Angle] = createSignal(V1_N2_ANGLE);
+  const [valve2Angle, setValve2Angle] = createSignal(V2_BYPASS_ANGLE);
+  const [showLines, setShowLines] = createSignal(false);
 
   const [massSP, setMassSP] = createSignal(0);
   const currentCylinder = createMemo(() => {
@@ -33,12 +35,25 @@ function App() {
     return cyl;
   });
   const bedPressure = expMemo(() => {
-    const cyl = currentCylinder()
-    return cyl.linePres();
+    const cyl = currentCylinder();
+    return (valve2Angle() === V2_BYPASS_ANGLE) ? 0 : cyl.linePres();
   });
 
   const [temperature, setTemperature] = createSignal(TEMP_ROOM);
-  const [yOut, setYOut] = createSignal(0);
+  const [out, setOut] = createSignal({ y: 0, u: 0 });
+
+  const compLabel = createMemo(() => {
+    if (valve2Angle() === V2_BYPASS_ANGLE) {
+      const y = currentCylinder().yCO2;
+      const flowing = massSP() > 0 && bedPressure() > 0;
+      return `${flowing ? (y * 100).toFixed(2) : "--"} %`;
+    }
+    else {
+      const { y, u } = out();
+      console.log("velocity:", u)
+      return `${u > 0.1 ? (y * 100).toFixed(2) : "--"} %`;
+    }
+  });
 
   const reset = () => {};
 
@@ -47,7 +62,7 @@ function App() {
     cylinder: currentCylinder,
     v2Angle: valve2Angle,
     massSP,
-    onYOut: setYOut
+    onOut: setOut
   };
 
   return (
@@ -58,23 +73,25 @@ function App() {
           <Pipes />
           <For each={cylinders}>
             {
-              (cyl, idx) => <>
-                <CylinderValve x={40 + idx() * 154} y={324} pressure={cyl.cylPres.get} setPressure={cyl.cylPres.set} />
-                <Regulator x={99 + idx() * 154} y={310} inPres={cyl.cylPres.get} outPres={cyl.linePres} gasSP={cyl.regSP.get} setGasSP={cyl.regSP.set} />
+              cyl => <>
+                <CylinderValve x={cyl.x} y={324} pressure={cyl.cylPres.get} setPressure={cyl.cylPres.set} />
+                <Regulator x={59 + cyl.x} y={310} inPres={cyl.cylPres.get} outPres={cyl.linePres} gasSP={cyl.regSP.get} setGasSP={cyl.regSP.set} />
               </>
             }
           </For>
           <Controller sp={massSP} setSP={setMassSP} range={[MIN_MASS_FLOWRATE, MAX_MASS_FLOWRATE]} step={MASS_FLOW_STEP} />
-          <MultiValve x={303} y={240} angle={valve1Angle} setAngle={setValve1Angle} directions={VALVE_1_ANGLES} />
-          <MultiValve x={487} y={184} angle={valve2Angle} setAngle={setValve2Angle} directions={VALVE_2_ANGLES} />
+          <MultiValve x={303} y={240} key="valve1-ani" angle={valve1Angle} setAngle={setValve1Angle} directions={VALVE_1_ANGLES} setShowLines={setShowLines} />
+          <MultiValve x={487} y={184} key="valve2-ani" angle={valve2Angle} setAngle={setValve2Angle} directions={VALVE_2_ANGLES} setShowLines={setShowLines} />
 
           <Manometer pressure={bedPressure} maxPressure={12} />
-          <BetaCtrl temperature={temperature} setTemperature={setTemperature} range={[BETA_MIN, BETA_MAX]} step={BETA_STEP} />
+          <Show when={SIM_MODE === "desorption"}>
+            <BetaCtrl temperature={temperature} setTemperature={setTemperature} range={[BETA_MIN, BETA_MAX]} step={BETA_STEP} />
+          </Show>
 
           <DigitalGauge x={556} y={310} label={() => `${temperature().toFixed(0)} K`} />
-          <DigitalGauge x={597} y={110} label={() => `${yOut().toFixed(2)} %`} />
+          <DigitalGauge x={597} y={110} label={compLabel} />
           
-          {/* <ColumnData feedIsOn={feedIsOn} gasIsOn={() => gasRate() > 0} /> */}
+          <AniLines isShowing={showLines} />
         </SVGCanvas>
 
 

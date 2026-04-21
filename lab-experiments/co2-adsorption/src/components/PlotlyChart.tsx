@@ -25,6 +25,7 @@ export const PlotlyChart: Component<PlotlyChartProps> = (props) => {
     const plotdata = createMemo((): Plotly.Data[] => {
         const plotdata = [...data] as Partial<Plotly.Data>[];
 
+        bedCtx!.bedUpdated();
         const bed = bedCtx!.bed;
         if (!bed) return [];
 
@@ -55,6 +56,7 @@ export const PlotlyChart: Component<PlotlyChartProps> = (props) => {
     createEffect(() => {
         const data = plotdata();
         if (chartDiv) {
+            // console.log("plotly react")
             Plotly.react(chartDiv, data, props.layout, props.config);
         }
     });

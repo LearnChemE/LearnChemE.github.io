@@ -6,7 +6,7 @@ export type ContextDescriptor = {
     cylinder: Accessor<GasCylinder>,
     v2Angle: Accessor<number>,
     massSP: Accessor<number>,
-    onYOut: (val: number) => void;
+    onOut: (val: { y: number, u: number }) => void;
 };
 
 // Context definition and creation for column calculations
@@ -29,7 +29,7 @@ export const BedContextProvider = (props: { children: any, descriptor: ContextDe
         return cyl.yCO2;
     });
 
-    const open = createMemo(() => {
+    const flowing = createMemo(() => {
         const v2a = props.descriptor.v2Angle();
         return (v2a === 180) ? true : false;
     });
@@ -39,10 +39,10 @@ export const BedContextProvider = (props: { children: any, descriptor: ContextDe
         tempK: props.descriptor.tempK,
         presBar,
         yIn,
-        open,
+        flowing,
         mdot: props.descriptor.massSP,
         // Outputs
-        on_yOut: props.descriptor.onYOut as Setter<number>,
+        onOut: props.descriptor.onOut as Setter<{ y: number, u: number }>,
         onUpdate: () => setBedUpdated(v => !v)
     };
 
