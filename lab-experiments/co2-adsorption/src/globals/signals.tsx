@@ -71,8 +71,15 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
 // Desorption: N2 only
 [
     {
-        name: "N2",
+        name: "90%",
         x: 194,
+        angle: 90,
+        yCO2: 0.1,
+        color: "#BF0000"
+    }, 
+    {
+        name: "N2",
+        x: 348,
         angle: 0,
         yCO2: 0,
         color: "#68A246",
