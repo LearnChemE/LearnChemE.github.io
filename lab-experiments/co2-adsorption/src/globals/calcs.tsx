@@ -11,6 +11,7 @@ const MM_N2 = 14.041 // g/mol
 const R = 83.14 // bar cc / mol / K
 const BED_MAX_CAPACITY = MASS_ZEOLITE / 1000 * 0.85; // mols
 const DIFFUSIVITY = 1.8e-1; // m^2/s, diffusivity of CO2 in zeolite
+
 // Spatial info
 const N = 51; // number of points in spatial discretization
 const E = 4; // number of equations per point (tot pressure, co2 pressure, theta, velocity); stride
@@ -18,8 +19,6 @@ const NE = N * E; // number of equations in the system
 const NT = NE + 2 * E; // Size of arrays including padding
 const x = Array.from({ length: N }).map((_,i) => i * LENGTH_BED / (N - 1)); // spatial points
 const dx = x[1] - x[0];
-
-
 
 // Geometry
 const BED_VOLUME = MASS_ZEOLITE / RHO_ZEOLITE; // cc
@@ -42,7 +41,6 @@ function k_val(k0: number, ea: number, T: number) {
 //   th_co2: Number,
 //   u: Number
 // ]
-
 
 /**
  * Utility functions for calculations

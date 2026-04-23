@@ -18,9 +18,10 @@ import { Manometer } from './components/Manometer/Manometer'
 import { BetaCtrl } from './components/BetaCtrl/BetaCtrl'
 import { DigitalGauge } from './components/DigitalGauge/DigitalGauge'
 import { BedContextProvider, type ContextDescriptor } from './components/Context'
-// import { PlotlyChart } from './components/PlotlyChart'
 import { AniLines } from './components/AniLines/AniLines'
 import { SVGTooltip } from './components/Tooltip/TooltipSelector'
+
+// import { PlotlyChart } from './components/PlotlyChart'
 
 function App() {
   const cylinders = createCylinders();
@@ -105,17 +106,11 @@ function App() {
           />
         </SVGCanvas>
 
-
-        {/* Menu for selecting stages */}
-        {/* <Show when={showMenu()}>
-          <StagesMenu onClose={() => setShowMenu(!showMenu())} />
-        </Show> */}
-
         {/* Hamburger */}
         <HamburgerMenu path={worksheet} downloadName="co2AdsorptionWorksheet.pdf" Directions={DirectionsText} About={AboutText} />
 
         {/* Stages/Reset Button */}
-        <ControlButton icon="fa-solid fa-arrows-rotate" label="reset" top={100} onClick={reset} active={() => true} activeColor='#FF3B3B' />
+        <ControlButton icon="fa-solid fa-arrows-rotate" label="reset" left={90} onClick={reset} active={() => true} activeColor='#FF3B3B' />
       </div>
 
       {/* <PlotlyChart /> */}
