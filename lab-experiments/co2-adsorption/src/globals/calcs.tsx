@@ -162,6 +162,25 @@ export class BedCalc {
         this.onUpdate = desc.onUpdate;
     }
 
+    public fill() {
+        const P = this.presBar();
+        const y = this.yIn();
+        const T = this.tempK();
+        const u = calc_velocity(this.mdot(), y, T, P);
+
+        // Solve the steady state balance to determine theta
+        const ka = k_val(ka0, ea, T);
+        const kd = k_val(kd0, ed, T);
+        const th = ka * y * P / (ka * y * P + kd);
+
+        for (let i=0; i<NE; i += E) {
+            this.bed[i] = P * y;
+            this.bed[i + 1] = P * (1 - y);
+            this.bed[i + 2] = th;
+            this.bed[i + 3] = u;
+        }
+    }
+
     public play() {
         if (this.playing) return;
         this.playing = true;

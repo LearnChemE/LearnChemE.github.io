@@ -12,7 +12,7 @@ import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import worksheet from './assets/worksheet.pdf?url';
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import { ControlButton } from './components/ControlButton/ControlButton'
-import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, MASS_FLOW_STEP, MAX_MASS_FLOWRATE, MIN_MASS_FLOWRATE, SIM_MODE, TEMP_ROOM, V1_N2_ANGLE, V2_BED_ANGLE, V2_BYPASS_ANGLE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
+import { BETA_MAX, BETA_MIN, BETA_STEP, createCylinders, expMemo, MASS_FLOW_INIT, MASS_FLOW_STEP, MAX_MASS_FLOWRATE, MIN_MASS_FLOWRATE, SIM_MODE, TEMP_ROOM, V1_ANGLE_INIT, V2_ANGLE_INIT, V2_BED_ANGLE, V2_BYPASS_ANGLE, VALVE_1_ANGLES, VALVE_2_ANGLES } from './globals'
 import { MultiValve } from './components/MultiValve/MultiValve'
 import { Manometer } from './components/Manometer/Manometer'
 import { BetaCtrl } from './components/BetaCtrl/BetaCtrl'
@@ -25,11 +25,11 @@ import { SVGTooltip } from './components/Tooltip/TooltipSelector'
 function App() {
   const cylinders = createCylinders();
 
-  const [valve1Angle, setValve1Angle] = createSignal(V1_N2_ANGLE);
-  const [valve2Angle, setValve2Angle] = createSignal(V2_BYPASS_ANGLE);
+  const [valve1Angle, setValve1Angle] = createSignal(V1_ANGLE_INIT);
+  const [valve2Angle, setValve2Angle] = createSignal(V2_ANGLE_INIT);
   const [showLines, setShowLines] = createSignal(false);
 
-  const [massSP, setMassSP] = createSignal(0);
+  const [massSP, setMassSP] = createSignal(MASS_FLOW_INIT);
   const currentCylinder = createMemo(() => {
     const cyl = cylinders.find(cyl => cyl.angle === valve1Angle());
     if (cyl === undefined) throw new Error(`Cylinder undefined for angle ${valve1Angle()}`);

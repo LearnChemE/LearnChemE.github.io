@@ -1,6 +1,6 @@
 import { createEffect, createMemo, createSignal, type Accessor, type Setter } from "solid-js";
 import { animate, smoothLerp } from "./helpers";
-import { SIM_MODE } from "./config";
+import { MAX_PRESSURE, SIM_MODE } from "./config";
 
 export type Signal<T> = { get: Accessor<T>, set: Setter<T> };
 export function Signal<T>(raw: [() => T, (v: T) => null]) {
@@ -13,6 +13,9 @@ type GasCylinderDescriptor = {
     angle: number;
     yCO2: number;
     color: string;
+
+    initCylPres: number;
+    initRegSP: number;
 }
 
 export type GasCylinder = {
@@ -28,8 +31,8 @@ export type GasCylinder = {
 };
 
 export function GasCylinder(descriptor: GasCylinderDescriptor) {
-    const cylPres = Signal<number>(createSignal(0));
-    const regSP = Signal<number>(createSignal(0));
+    const cylPres = Signal<number>(createSignal(descriptor.initCylPres));
+    const regSP = Signal<number>(createSignal(descriptor.initRegSP));
     return {
         name: descriptor.name,
         x: descriptor.x,
@@ -51,14 +54,20 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         x: 40,
         angle: 180,
         yCO2: 0.9,
-        color: "#BF0000"
+        color: "#BF0000",
+
+        initCylPres: 0,
+        initRegSP: 0
     }, 
     {
         name: "10%",
         x: 194,
         angle: 90,
         yCO2: 0.1,
-        color: "#EA6C6C"
+        color: "#EA6C6C",
+
+        initCylPres: 0,
+        initRegSP: 0
     }, 
     {
         name: "N2",
@@ -66,6 +75,9 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         angle: 0,
         yCO2: 0,
         color: "#68A246",
+
+        initCylPres: 0,
+        initRegSP: 0
     }
 ] :
 // Desorption: N2 only
@@ -74,8 +86,11 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         name: "90%",
         x: 194,
         angle: 90,
-        yCO2: 0.1,
-        color: "#BF0000"
+        yCO2: 0.9,
+        color: "#BF0000",
+
+        initCylPres: MAX_PRESSURE,
+        initRegSP: MAX_PRESSURE / 2
     }, 
     {
         name: "N2",
@@ -83,6 +98,9 @@ const cylinderDescriptors: GasCylinderDescriptor[] = (SIM_MODE === "adsorption")
         angle: 0,
         yCO2: 0,
         color: "#68A246",
+
+        initCylPres: 0,
+        initRegSP: 0
     }
 ];
 
