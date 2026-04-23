@@ -1,5 +1,5 @@
-import { createMemo, type Accessor, type Component } from "solid-js";
-import { expMemo, GasCylinder } from "../../globals";
+import { createMemo, Match, Show, Switch, type Accessor, type Component } from "solid-js";
+import { expMemo, GasCylinder, SIM_MODE } from "../../globals";
 import "./AniLines.css"
 import { Portal } from "solid-js/web";
 
@@ -48,15 +48,25 @@ export const AniLines: Component<AniLinesProps> = (props) => {
             <path d="M460 102L596 102V135" stroke={color()} stroke-width={showLoop()} stroke-linejoin="round" class="colored-line" />
             <path d="M442 120L442 380H596V346" stroke={color()} stroke-width={showLoop()} stroke-linejoin="round" class="colored-line"/>
             
-            {/* cyl lines - always same color */}
-            <path d="M217 248H155V269.5" stroke={props.cyls[1].color} stroke-width={showCyl[1]()} stroke-linejoin="round" class="colored-line" />
-            <path d="M63 247H1L1 268.5" stroke={props.cyls[0].color}  stroke-width={showCyl[0]()} stroke-linejoin="round" class="colored-line" />
-            <path d="M371 248H309V269.5" stroke={props.cyls[2].color} stroke-width={showCyl[2]()} stroke-linejoin="round" class="colored-line"/>
-            
-            {/* reg lines - always same color */}
-            <path d="M63 247H104V158H240" stroke={props.cyls[0].color}    stroke-width={showReg[0]()} stroke-linejoin="round" class="colored-line"/>
-            <path d="M371 248H412V158H276.5" stroke={props.cyls[2].color} stroke-width={showReg[2]()} stroke-linejoin="round" class="colored-line"/>
-            <path d="M217 248H258V176" stroke={props.cyls[1].color}       stroke-width={showReg[1]()} stroke-linejoin="round" class="colored-line"/>
+            <Switch>
+                <Match when={SIM_MODE === "adsorption"}>
+                    {/* cyl lines - always same color */}
+                    <path d="M217 248H155V269.5" stroke={props.cyls[1].color} stroke-width={showCyl[1]()} stroke-linejoin="round" class="colored-line" />
+                    <path d="M63 247H1L1 268.5" stroke={props.cyls[0].color}  stroke-width={showCyl[0]()} stroke-linejoin="round" class="colored-line" />
+                    <path d="M371 248H309V269.5" stroke={props.cyls[2].color} stroke-width={showCyl[2]()} stroke-linejoin="round" class="colored-line"/>
+                    
+                    {/* reg lines - always same color */}
+                    <path d="M63 247H104V158H240" stroke={props.cyls[0].color}    stroke-width={showReg[0]()} stroke-linejoin="round" class="colored-line"/>
+                    <path d="M371 248H412V158H276.5" stroke={props.cyls[2].color} stroke-width={showReg[2]()} stroke-linejoin="round" class="colored-line"/>
+                    <path d="M217 248H258V176" stroke={props.cyls[1].color}       stroke-width={showReg[1]()} stroke-linejoin="round" class="colored-line"/>
+                </Match>
+                <Match when={SIM_MODE === "desorption"}>
+                    <path d="M217 248H155V269.5" stroke={props.cyls[0].color}  stroke-width={showCyl[0]()} stroke-linejoin="round" class="colored-line" />
+                    <path d="M217 248H258V176" stroke={props.cyls[0].color}    stroke-width={showReg[0]()} stroke-linejoin="round" class="colored-line"/>
+                    <path d="M371 248H309V269.5" stroke={props.cyls[1].color} stroke-width={showCyl[1]()} stroke-linejoin="round" class="colored-line"/>
+                    <path d="M371 248H412V158H276.5" stroke={props.cyls[1].color} stroke-width={showReg[1]()} stroke-linejoin="round" class="colored-line"/>
+                </Match>
+            </Switch>
         </g>
     </g>
 
@@ -87,11 +97,13 @@ const DarkLines = () => {
 <path d="M632 2L443 2L443 85" stroke="black" stroke-width="6" stroke-linejoin="round"/>
 <path d="M425 103L367.5 103" stroke="black" stroke-width="6"/>
 <path d="M461 103L597 103V136" stroke="black" stroke-width="6" stroke-linejoin="round"/>
-<path d="M64 248H105V159H241" stroke="black" stroke-width="6" stroke-linejoin="round"/>
 <path d="M372 249H413V159H277.5" stroke="black" stroke-width="6" stroke-linejoin="round"/>
 <path d="M218 249H259V177" stroke="black" stroke-width="6" stroke-linejoin="round"/>
 <path d="M218 249H156V270.5" stroke="black" stroke-width="6" stroke-linejoin="round"/>
-<path d="M64 248H2L2 269.5" stroke="black" stroke-width="6" stroke-linejoin="round"/>
+<Show when={SIM_MODE === "adsorption"}>
+    <path d="M64 248H105V159H241" stroke="black" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M64 248H2L2 269.5" stroke="black" stroke-width="6" stroke-linejoin="round"/>
+</Show>
 <path d="M372 249H310V270.5" stroke="black" stroke-width="6" stroke-linejoin="round"/>
 </>)
 }
