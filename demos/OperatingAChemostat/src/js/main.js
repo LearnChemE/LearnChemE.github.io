@@ -13,11 +13,11 @@ const colors = {
 };
 
 const fontSizes = {
-    base: 16,
-    axisTitle: 18,
-    tick: 16,
-    label: 17,
-    info: 12
+    base: 20,
+    axisTitle: 24,
+    tick: 20,
+    label: 22,
+    info: 16
 };
 
 let drawRef;
@@ -254,7 +254,7 @@ function buildFigure(model) {
     const annotations = buildAnnotations(model, infoText);
 
     const layout = {
-        margin: { l: 75, r: 80, t: 10, b: 60 },
+        margin: { l: 90, r: 90, t: 20, b: 75 },
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
         showlegend: false,
@@ -274,7 +274,7 @@ function buildFigure(model) {
             linewidth: 1,
             ticks: 'outside',
             tickfont: { size: fontSizes.tick },
-            // tickformat: getTickFormat(model.xMax),
+            tickformat: '.2f',
             exponentformat: 'none',
             zeroline: false,
             showgrid: false
@@ -290,7 +290,7 @@ function buildFigure(model) {
             linewidth: 1,
             ticks: 'outside',
             tickfont: { size: fontSizes.tick, color: colors.blue },
-            // tickformat: getTickFormat(model.yMax - model.yMin),
+            tickformat: '.1f',
             exponentformat: 'none',
             zeroline: false,
             showgrid: false
@@ -308,7 +308,7 @@ function buildFigure(model) {
             linewidth: 1,
             ticks: 'outside',
             tickfont: { size: fontSizes.tick, color: colors.green },
-            // tickformat: getTickFormat(model.y2Max - model.y2Min),
+            tickformat: '.2f',
             exponentformat: 'none',
             zeroline: false,
             showgrid: false

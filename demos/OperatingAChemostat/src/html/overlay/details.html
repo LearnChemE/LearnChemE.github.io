@@ -37,7 +37,7 @@
           \(C_c = Y_{c/s} \dfrac{D(C_{s,0} - C_s)}{\mu}\),
         </p>
         <p class="text-start">
-          \(C_s = -k_s \dfrac{D + k_d}{D + k_d - \mu_{\max}}\),
+          \(C_s = k_s \dfrac{D + k_d}{\mu_{\max} - (D + k_d)}\),
         </p>
         <p>
           where \(D\) is the dilution rate (1/h), \(C_{s,0}\) is the feed substrate concentration (g/L), and
@@ -47,7 +47,7 @@
           Wash-out (\(D_{\max}\)) occurs when the cell concentration is zero:
         </p>
         <p class="text-start">
-          \(D_{\max} = -\dfrac{C_{s,0} k_d + k_d k_s - C_{s,0} \mu_{\max}}{C_{s,0} + k_s}\).
+          \(D_{\max} = \dfrac{C_{s,0} \mu_{\max} - (C_{s,0} k_d + k_d k_s)}{C_{s,0} + k_s}\).
         </p>
         <p>
           The maximum rate of cell production (\(D_{\max\mathrm{prod}}\)) is where \(D C_c\) is greatest, or:
@@ -57,12 +57,11 @@
         </p>
         <p class="text-start">
           \(D_{\max\mathrm{prod}} =
-          Y_{c/s} D \left[
           \dfrac{
-          2(D + k_d) k_s (D + 2k_d - 2\mu_{\max}) + C_{s,0}(D + 2k_d)^2
+          Y_{c/s} D \left( (D+k_d)^2 k_s (D+2k_d - 2\mu_{\max}) + C_{s,0} (D+2k_d) (D+k_d-\mu_{\max})^2 \right)
           }{
-          2(D + k_d)^2 (D + k_d - \mu_{\max})
-          }\right]\).
+          (D+k_d)^2 (D+k_d-\mu_{\max})^2
+          }\).
         </p>
         <p>
           \(D_{\max}\) and \(D_{\max\mathrm{prod}}\) are in units of 1/h.
