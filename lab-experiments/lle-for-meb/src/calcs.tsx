@@ -257,10 +257,13 @@ class Stage {
             this.extObserved = this.extract;
             const aq =  aqIn.ndot;
             const org = orgIn.ndot;
-            this.phi = (aq + org !== 0) ? org / (org + aq) : .5; // Just set phi based on relative flow rates since there is no separation
+            const vaq = aq * specificVolume(aqIn.comp);
+            const vorg = org * specificVolume(orgIn.comp);
+            this.phi = (vaq + vorg !== 0) ? vorg / (vorg + vaq) : this.phi; // Just set phi based on relative flow rates since there is no separation
 
             // Use volume balance to determine the amount of each phase
             this.ndot_out = org + aq;
+
         }
         else {
             const raffComp = streams[1];
@@ -288,7 +291,9 @@ class Stage {
                 this.extObserved = this.extract;
                 const aq =  aqIn.ndot;
                 const org = orgIn.ndot;
-                this.phi = (aq + org !== 0) ? org / (org + aq) : .5; // Just set phi based on relative flow rates since there is no separation
+                const vaq = aq * specificVolume(aqIn.comp);
+                const vorg = org * specificVolume(orgIn.comp);
+                this.phi = (vaq + vorg !== 0) ? vorg / (vorg + vaq) : this.phi; // Just set phi based on relative flow rates since there is no separation
 
                 // Use volume balance to determine the amount of each phase
                 this.ndot_out = org + aq;
@@ -366,6 +371,13 @@ class Stage {
         // console.log(`Stage evolve: orgIn ${orgIn}, aqIn ${aqIn}, currMoles ${currMoles}, newComp ${this.mixedComp}`);
         // console.table({ index: this.index, orgIn, aqIn, currMoles, newComp: this.mixedComp });
     }
+
+    public reportFlows() {
+        return {
+            raffinate: this.raffStream(),
+            extract: this.extStream()
+        }
+    }
 }
 
 export class ColumnCalc {
@@ -416,6 +428,9 @@ export class ColumnCalc {
             stage.settle();
             if (stage.extStream().ndot < 0) throw new Error(`ext under in settle ${stage.extStream().comp}`)
         }
+
+        const { raffinate, extract } = this.stages[0].reportFlows();
+        console.log(`phi: ${(raffinate.ndot / (raffinate.ndot + extract.ndot)).toFixed(3)}\ntot: ${raffinate.ndot + extract.ndot}`);
     }
 
     public start() {
