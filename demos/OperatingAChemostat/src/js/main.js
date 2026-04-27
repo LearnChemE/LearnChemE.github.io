@@ -254,7 +254,7 @@ function buildFigure(model) {
     const annotations = buildAnnotations(model, infoText);
 
     const layout = {
-        margin: { l: 90, r: 90, t: 20, b: 75 },
+        margin: { l: 90, r: 130, t: 20, b: 75 },
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
         showlegend: false,
@@ -299,7 +299,8 @@ function buildFigure(model) {
             range: [model.y2Min, model.y2Max],
             title: {
                 text: '<i>D</i> &times; concentration (g/[L h])',
-                font: { size: fontSizes.axisTitle, color: colors.green }
+                font: { size: fontSizes.axisTitle, color: colors.green },
+                standoff: 25
             },
             overlaying: 'y',
             side: 'right',
@@ -308,8 +309,9 @@ function buildFigure(model) {
             linewidth: 1,
             ticks: 'outside',
             tickfont: { size: fontSizes.tick, color: colors.green },
-            tickformat: '.2f',
-            exponentformat: 'none',
+            exponentformat: 'power',
+            showexponent: 'all',
+            minexponent: 0,
             zeroline: false,
             showgrid: false
         },
