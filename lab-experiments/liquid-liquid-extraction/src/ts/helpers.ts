@@ -432,3 +432,15 @@ export function transpose(arr: number[][]) {
     }
     return grid;
 }
+
+/**
+ * Smoothly lerp x towards targ using a framerate independant exponential decay function
+ * @param x number to lerp
+ * @param targ lerp target
+ * @param r lerping constant. Use form Math.exp(-1/tau) where tau is the time constant with same units as dt
+ * @param dt deltaTime. Same units as tau, as used in r.
+ * @returns x, but now lerped towards targ
+ */
+export function smoothLerp(x: number, targ: number, r: number, dt: number) {
+    return (x - targ) * r ** dt + targ;
+}
