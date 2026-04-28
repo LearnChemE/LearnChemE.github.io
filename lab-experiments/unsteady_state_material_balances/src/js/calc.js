@@ -34,7 +34,7 @@ const ANTOINE = {
 
 /** Convert N2 flow from sccm to mol/min (approx, 25 °C). */
 function sccmToMolPerMin(sccm) {
-  const CM3_PER_MOL = 24465; // cm^3/mol at ~25 °C, 1 bar
+  const CM3_PER_MOL = 22414 // 24465; // cm^3/mol at ~25 °C, 1 bar
   return sccm / CM3_PER_MOL;
 }
 
@@ -148,7 +148,8 @@ export function computeVolumeVsTime(opts) {
   const ps = getPsatBar(T_C, useAntoine);
 
   // Convert flow to mol/min
-  const FN2_mol_min = useWorksheetFN2 ? 0.0156 : sccmToMolPerMin(FN2_sccm);
+  const FN2_mol_min = useWorksheetFN2 ? sccmToMolPerMin(35) : sccmToMolPerMin(FN2_sccm);
+  // console.log(`Flow: ${FN2_sccm} sccm = ${sccmToMolPerMin(FN2_sccm)} mol/min`);
 
   // Initial moles from total volume and equimolar assumption
   let state = initialMolesFromVolumeEquimolar(V0_cm3);
