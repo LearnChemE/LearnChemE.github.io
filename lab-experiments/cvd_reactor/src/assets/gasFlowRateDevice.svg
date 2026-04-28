@@ -5,8 +5,6 @@
   <rect id="svg_3" height="27" width="15" y="409" x="256" stroke="#000" fill="#5bc0eb"/>
   <rect id="svg_4" height="27" width="15" y="407" x="511" stroke="#000" fill="#5bc0eb"/>
   <rect stroke="#000" id="svg_5" height="12" width="28" y="328" x="377" fill="#eaeaea"/>
-  <rect rx="50" stroke="#000000" id="svg_6" height="274.00001" width="320" y="54.99999" x="239.99999" fill="none"/>
-  <path stroke="#000" stroke-width="10" id="svg_8" d="m274.99999,83.99999l250.00003,0l0,208.00001l-250.00003,0l0,-208.00001z" opacity="undefined" fill="#eaeaea"/>
  </g>
 
 </svg>

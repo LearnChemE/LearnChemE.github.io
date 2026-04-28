@@ -96,12 +96,12 @@ export function startDepositionTimer(draw, interval = 1000) {
 export function drawFigure(draw) {
   // Text box to display accumulated mass gain
   const massBoxGroup = draw.group();
-  massBoxGroup.rect(160, 30)
+  massBoxGroup.rect(190, 30)
   .fill('#ffffff')
   .stroke({ color: '#000000', width: 1 })
   .move(450, 200);
-  const massText = massBoxGroup.text('mass gain: 0 g')
-  .font({ family: 'Arial', size: 14, anchor: 'start' })
+  const massText = massBoxGroup.text('mass gain: 0.000 g')
+  .font({ family: 'Arial', size: 20, anchor: 'start' })
   .move(455, 205);
   // Store reference for future updates
   window.massTextEl = massText;
@@ -109,12 +109,12 @@ export function drawFigure(draw) {
   draw.line(350, 320, 400, 355)
   .stroke({ color: '#444', width: 2, linecap: 'round' });
   addSVGImage(draw, 'assets/bubbler.svg', 20, 250, 250, 250);
-  drawGasCylinder(draw, 0, canvasHeight - 250, 'He gas cylinder');
+  drawGasCylinder(draw, 0, 270, 'He gas cylinder');
   drawHorizontalCVDReactor(draw, 400, 50, 200, 60);
   createInteractiveValve(draw, 250, 80, true);
-  createVerticalValve(draw, 22.5, 250);
+  createVerticalValve(draw, 22.5, 175);
   drawPipes(draw);
-  recycleValve = drawCutoffValve(draw, 900, 300, 40);
+  recycleValve = drawCutoffValve(draw, 800, 300, 40);
   drawHoodString(draw);
   drawPump(draw, 400, 350, 60, 30);
   drawSwitch(draw, 650, 120, 80, 40);
@@ -125,21 +125,25 @@ export function drawFigure(draw) {
   .fill('black')
   .move(118, 350);
   drawPumpSVG(draw, 375, 247.5, 5, 5)
-  const connector = drawThreeWayValve(draw, 860, 62.5);
+  const connector = drawThreeWayValve(draw, 960, 62.5);
   connector.rotate(180, 891.5, 81);
   
   const connector2 = drawThreeWayValve(draw, 220, 300);
   connector2.rotate(180, 257, 298.5);
   
   draw.text('furnace')
-  .font({ family: 'Arial', size: 14, anchor: 'start', strokeColor: '#000' })
+  .font({ family: 'Arial', size: 20, anchor: 'start', strokeColor: '#000' })
   .fill('black')
-  .move(667.5, 160);
+  .move(658, 165);
   
-  gasFlowRateDevice = addSVGImage(draw, 'assets/gasFlowRateDevice.svg', 220, 115, 135, 135 * 6 / 8);
+  gasFlowRateDevice = addSVGImage(draw, 'assets/gasFlowRateDisplay.svg', 220, 115, 135, 135 * 6 / 8);
+  addSVGImage(draw, 'assets/gasFlowRateDevice.svg', 220, 115, 135, 135 * 6 / 8);
   gasFlowRate(draw, false); // Initially off
 
-  gasFlowRateDevice1 = addSVGImage(draw, 'assets/gasFlowRateDevice.svg', 420, 105, 135, 135 * 6 / 8).rotate(90, 200 + 150 / 2, 115 + 150 * 6 / 8 / 2);
+  addSVGImage(draw, 'assets/gasFlowRateDevice.svg', 260, 305.5, 135, 135 * 6 / 8).rotate(90, 200 + 150 / 2, 115 + 150 * 6 / 8 / 2);
+
+  gasFlowRateDevice1 = addSVGImage(draw, 'assets/gasFlowRateDisplay.svg', 246, 350, 135, 135 * 6 / 8);
+  addSVGImage(draw, 'assets/gasFlowRateDevice.svg', 420, 105, 135, 135 * 6 / 8).rotate(90, 200 + 150 / 2, 115 + 150 * 6 / 8 / 2);
   gasFlowRate1(draw, 0); // Initially off
 }
 
@@ -196,9 +200,9 @@ function drawGasCylinder(draw, x, y, label) {
     flowRate = draw.text(on ? `1.00 
       mol/s` : `0.00
        mol/s`)
-    .font({ family: 'Arial', size: 12, anchor: 'middle', strokeColor: '#000' })
+    .font({ family: 'Arial', size: 16, anchor: 'middle', strokeColor: '#000' })
     .fill('black')
-    .center(287.5, 145);
+    .center(287, 147);
     flowRate.front();
   }
 
@@ -219,10 +223,9 @@ function gasFlowRate1(draw, value = 0) {
   // console.log(value);
   flowRate1 = draw.text(`${(value).toFixed(2)} 
   mol/s`)
-    .font({ family: 'Arial', size: 12, anchor: 'middle', strokeColor: '#000' })
+    .font({ family: 'Arial', size: 16, anchor: 'middle', strokeColor: '#000', weight: '500' })
     .fill('black')
-    .center(487.5, 135)
-    .rotate(90, 200 + 150 / 2, 115 + 150 * 6 / 8 / 2);
+    .center(313, 381)
 
   if (flowRate1 && typeof flowRate1.front === 'function') flowRate1.front();
 }
@@ -506,7 +509,7 @@ function gasFlowRate1(draw, value = 0) {
           .filter(el => !!el.attr('data-pipe-side'))
           .forEach(el => el.remove());
         } else {
-          [window.leftPipe1El, window.leftPipe2El, window.leftPipe2_1El].forEach(pipeEl => {
+          [window.leftPipe1El, window.leftPipe1_2El, window.leftPipe2El, window.leftPipe2_1El].forEach(pipeEl => {
             if (pipeEl) {
               animateWaterFlow(draw, pipeEl, 0, 100, undefined, undefined, undefined, 'right');
             }
@@ -531,22 +534,27 @@ function gasFlowRate1(draw, value = 0) {
     function drawPipes(draw) {
       pipeGroup = draw.group();
       let startX = 30;
-      let startY = canvasHeight - 294;
+      let startY = 306;
       
       leftPipe = `
-    M ${startX} ${startY} 
-    L ${startX} ${startY - 20}
+    M ${startX} ${startY - 80} 
+    L ${startX} ${startY - 95}
   `;
       drawPipeWithCurves(draw, leftPipe, 4, 'red');
       
       const leftPipe1Path = `
-    M ${startX} ${startY - 56.5} 
-    L ${startX} ${startY - 100}
-    L ${startX + 30} ${startY - 100}
-    L ${startX + 30} ${startY - 27.5}
-    L ${startX + 67.5} ${startY - 27.5}
+    M ${startX} ${startY - 56.5 - 75} 
+    L ${startX} ${startY - 150}
+    L ${startX + 40} ${startY - 150}
+    L ${startX + 40} ${startY - 104}
   `;
       window.leftPipe1El = drawPipeWithCurves(draw, leftPipe1Path, 4);
+
+      const leftPipe1_2Path = `
+    M ${startX + 40} ${startY - 64}
+    L ${startX + 40} ${startY - 27.5}
+    L ${startX + 67.5} ${startY - 27.5}`;
+      window.leftPipe1_2El = drawPipeWithCurves(draw, leftPipe1_2Path, 4);
       
       const leftPipe2Path = `
     M ${startX + 163} ${startY - 27.5}
@@ -576,24 +584,31 @@ function gasFlowRate1(draw, value = 0) {
       
       leftPipe5 = `
     M ${startX + 571} ${startY - 225}
-    L ${startX + 853} ${startY - 225}
+    L ${startX + 753} ${startY - 225}
   `;
       window.leftPipe5El = drawPipeWithCurves(draw, leftPipe5, 4);
       
       leftPipe6 = `
-    M ${startX + 870} ${startY - 209}
-    L ${startX + 870} ${startY + 10}
+    M ${startX + 770} ${startY - 209}
+    L ${startX + 770} ${startY + 10}
   `;
       window.leftPipe6El = drawPipeWithCurves(draw, leftPipe6, 4);
       
       const leftPipe7 = `
-    M ${startX + 870} ${startY + 10}
-    L ${startX + 870} ${startY + 225}
-    L ${startX + 240} ${startY + 225}
+    M ${startX + 770} ${startY + 10}
+    L ${startX + 770} ${startY + 150}
+    L ${startX + 240} ${startY + 150}
     L ${startX + 240} ${startY - 11.5}
   `;
       window.leftPipe7El = drawPipeWithCurves(draw, leftPipe7, 4);
-    }
+
+    draw.path(`
+    M ${startX + 55} ${222}
+    C ${startX + 120} ${222}
+    ${285} ${322}
+    ${285} ${201}
+    `).stroke({ color: 'black', width: 1 }).fill('none');
+  }
     
     function drawPipeWithCurves(draw, pathString, pipeWidth = 15, strokeColor = '#f7f7f7', outlineColor = '#d5d5d5') {
       let outline = draw.path(pathString)
@@ -622,9 +637,9 @@ function gasFlowRate1(draw, value = 0) {
       group.flowRate = group.flowRate || 0;
       // Display current flow rate
       let rateText = group.text("recycle ratio: " + String(group.flowRate))
-      .font({ family: 'Arial', size: 14, anchor: 'start' })
+      .font({ family: 'Arial', size: 20, anchor: 'start' })
       .fill('#000')
-      .move(x - size/2 - 100, y - 7);
+      .move(x - size/2 - 140, y - 10);
       
       // Outer circle for valve body
       group.circle(size)
@@ -752,7 +767,6 @@ function gasFlowRate1(draw, value = 0) {
           document.addEventListener('click', onDocClick);
         }, 0);
       });
-      
       
       return group;
     }

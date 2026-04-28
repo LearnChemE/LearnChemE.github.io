@@ -1,0 +1,8 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <rect rx="50" stroke="#000000" id="svg_6" height="274" width="320" y="55" x="240" fill="#333333"/>
+  <rect rx="42" stroke="#000000" fill="#eaeaea" id="svg_6" height="250" width="300" y="67" x="250" />
+  <!-- <path stroke="#000" stroke-width="10" id="svg_8" d="m276,84l250,0l0,208l-250,0l0,-208z" opacity="undefined" fill="#eaeaea"/> -->
+ </g>
+
+</svg>
