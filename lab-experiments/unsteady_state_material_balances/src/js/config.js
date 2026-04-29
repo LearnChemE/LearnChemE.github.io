@@ -26,3 +26,6 @@ export function setPipeGroup(v) {
 export function getPipeGroup() {
   return pipeGroup;
 }
+
+export const VOL_INIT = 61.5;
+export const FLOW_N2_SCCM = 35;

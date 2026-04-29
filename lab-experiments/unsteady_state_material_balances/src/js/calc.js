@@ -1,3 +1,5 @@
+import { FLOW_N2_SCCM, VOL_INIT } from "./config";
+
 // === Physical constants (at ~20–25 °C) ===
 const MW = { // g/mol
   pentane: 72.151,
@@ -118,81 +120,66 @@ function volumeFromMoles({ Npent, Nhex }) {
   return Vpent + Vhex;
 }
 
-/**
- * Compute volume–time curve until volume reaches 20% of initial (or tMax).
- *
- * @param {Object} opts
- * @param {number} opts.T_C                  Temperature in °C (e.g., 15, 20, 25). With useAntoine=true you may use other T within Antoine ranges.
- * @param {number} [opts.V0_cm3=61.5]        Initial total liquid volume (cm^3)
- * @param {number} [opts.FN2_sccm=35]        N2 flow (standard cm^3/min)
- * @param {boolean}[opts.useWorksheetFN2=false] Use 0.0156 mol/min as in worksheet
- * @param {boolean}[opts.useAntoine=true]    If true, compute P_sat(T) from Antoine; else use PSAT_BAR table
- * @param {boolean}[opts.stopAt20pct=true]   Stop once V ≤ 20% of initial
- * @param {number} [opts.dt_s=0.5]           Integrator time step (seconds)
- * @param {number} [opts.tMax_min=240]       Hard cap on runtime (minutes)
- * @returns {{t_min:number[], V_cm3:number[], states: {Npent:number, Nhex:number}[]}}
- */
-export function computeVolumeVsTime(opts) {
-  const {
-    T_C,
-    V0_cm3 = 61.5,
-    FN2_sccm = 35,
-    useWorksheetFN2 = false,
-    useAntoine = true,
-    stopAt20pct = true,
-    dt_s = 0.5,
-    tMax_min = 240,
-  } = opts || {};
+class BeakerCalc {
+  Npent;
+  Nhex;
+  flowN2 = sccmToMolPerMin(FLOW_N2_SCCM);
+  Psat;
 
-  // Precompute P_sat at this temperature (bar)
-  const ps = getPsatBar(T_C, useAntoine);
-
-  // Convert flow to mol/min
-  const FN2_mol_min = useWorksheetFN2 ? sccmToMolPerMin(35) : sccmToMolPerMin(FN2_sccm);
-  // console.log(`Flow: ${FN2_sccm} sccm = ${sccmToMolPerMin(FN2_sccm)} mol/min`);
-
-  // Initial moles from total volume and equimolar assumption
-  let state = initialMolesFromVolumeEquimolar(V0_cm3);
-  const V0 = volumeFromMoles(state); // recomputed initial volume (≈ input)
-  const Vstop = stopAt20pct ? 0.2 * V0 : 0;
-
-  const dt_min = dt_s / 60;
-  const t_min = [0];
-  const V_cm3 = [V0];
-  const states = [ { ...state } ];
-
-  let t = 0;
-  while (t < tMax_min) {
-    // advance one step
-    const next = stepMoles(state, dt_min, ps, FN2_mol_min);
-    t += dt_min;
-
-    // compute new volume
-    const V = volumeFromMoles(next);
-
-    t_min.push(t);
-    V_cm3.push(V);
-    states.push({ ...next });
-
-    state = next;
-
-    if ((stopAt20pct && V <= Vstop) || (next.Npent + next.Nhex) <= 1e-10) break;
+  constructor(opts) {
+    const tc = opts.temp_C ?? 15;
+    this.Psat = getPsatBar(tc, true);
+    const { Npent, Nhex } = initialMolesFromVolumeEquimolar(VOL_INIT);
+    this.Npent = Npent;
+    this.Nhex = Nhex;
   }
 
-  return { t_min, V_cm3, states };
+  setTemp(tc) {
+    console.log(`Setting temp to ${tc} °C`);
+    this.Psat = getPsatBar(tc, true);
+  }
+
+  setFlow(sccm) {
+    this.flowN2 = sccmToMolPerMin(sccm);
+  }
+
+  evolve(dt) {
+    const next = stepMoles(this, dt, this.Psat, this.flowN2);
+    this.Npent = next.Npent;
+    this.Nhex  = next.Nhex;
+  }
+
+  getVol() {
+    return volumeFromMoles(this);
+  }
+
+  reset() {
+    const { Npent, Nhex } = initialMolesFromVolumeEquimolar(VOL_INIT);
+    this.Npent = Npent;
+    this.Nhex = Nhex;
+  }
 }
+export const beakerCalc = new BeakerCalc({ temp_C: 15 });
 
 /**
- * Convenience: get total liquid volume at a specific time (minutes),
- * using the same integrator.
+ * Animate function to be called every frame.
+ * @param fn Function to call every frame. dt is time since last call in seconds, t is total time in ms. Return true to continue, false to stop.
+ * @param then Optional function to call when animation ends.
  */
-export function volumeAtTime(T_C, t_query_min, opts = {}) {
-  const res = computeVolumeVsTime({ T_C, ...opts, tMax_min: t_query_min + 1 });
-  const { t_min, V_cm3 } = res;
-  // find the last index not exceeding t_query_min
-  let idx = t_min.length - 1;
-  for (let i = 0; i < t_min.length; i++) {
-    if (t_min[i] > t_query_min) { idx = Math.max(0, i - 1); break; }
-  }
-  return V_cm3[idx];
+export function animate(fn, then) {
+    let prevtime = null;
+
+    const frame = time => {
+        if (prevtime === null) prevtime = time;
+        const dt = (time - prevtime) / 1000; // in ms
+        prevtime = time;
+
+        // Call the function
+        const playing = fn(dt, time);
+
+        // Request next frame
+        if (playing) requestAnimationFrame(frame);
+        else then?.();
+    }
+    requestAnimationFrame(frame);
 }

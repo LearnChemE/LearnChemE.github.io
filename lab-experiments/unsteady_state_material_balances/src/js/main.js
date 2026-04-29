@@ -1,5 +1,5 @@
 import * as config from './config.js';
-import { computeVolumeVsTime, volumeAtTime } from './calc.js';
+import { animate, beakerCalc, computeVolumeVsTime, volumeAtTime } from './calc.js';
 
 // Simulation time scale: 1 second real time = 10 seconds simulated
 const TIME_SCALE = 10;
@@ -576,15 +576,14 @@ function drawGasCylinder(draw, x, y, label) {
           if (switchGroup.isOn) {
             // Turned ON: heat based on current target temperature, start bubbles
             updateHeaterHeat(g.targetTemperature || targetTemp);
+            beakerCalc.setTemp(changedTemp);
             // startBubbles();
             // timerId = startTimer(draw, currentTemp);
             // animateBubbleFlow(draw);
           } else {
             // Turned OFF: cool gradient, stop bubbles
             applyOffGradient();
-            // stopBubbles();
-            // clearInterval(timerId);
-            // animateBubbleFlow(draw);
+            beakerCalc.setTemp(15);
           }
         });
       }
@@ -615,7 +614,6 @@ function drawGasCylinder(draw, x, y, label) {
       let isOn = false;
       handle.rotate(-20, x + width / 2, y + height / 2);
   switchGroup.on("click", () => {
-    if (!(gasValveOpen && verticalValveOpen)) {
       isOn = !isOn;
       switchGroup.isOn = isOn;
       if (switchGroup.isOn) {
@@ -634,7 +632,6 @@ function drawGasCylinder(draw, x, y, label) {
           readout.text(currentTemp + '°C');
           // if (typeof readout.hide === 'function') readout.hide();
         }
-      }
     }
   });
       return switchGroup;
@@ -697,23 +694,15 @@ function drawGasCylinder(draw, x, y, label) {
       
       function inc() {
         const next = changedTemp + step;
-        if (next <= maxTemp && !isHeaterOn) {
-          changedTemp = next;
-          updateDisplay();
-        } else {
-          // still force a refresh in case UI got desynced
-          // updateDisplay();
-        }
+        changedTemp = Math.min(next, maxTemp);
+        updateDisplay();
+        if (isHeaterOn) beakerCalc.setTemp(changedTemp);
       }
       function dec() {
         const next = changedTemp - step;
-        if (next >= minTemp && !isHeaterOn) {
-          changedTemp = next;
-          updateDisplay();
-        } else {
-          // still force a refresh in case UI got desynced
-          // updateDisplay();
-        }
+        changedTemp = Math.max(next, minTemp);
+        updateDisplay();
+        if (isHeaterOn) beakerCalc.setTemp(changedTemp);
       }
       
       // Enable clicks on both the rect and the text and also listen to pointerdown (more reliable)
@@ -735,7 +724,7 @@ function drawGasCylinder(draw, x, y, label) {
       
       // API
       g.getTemp = () => currentTemp;
-      g.setTemp = (t) => { updateDisplay(); };
+      g.setTemp = (t) => { updateDisplay(); beakerCalc.setTemp(t) };
       
       if (typeof g.front === 'function') g.front();
       // updateDisplay();
@@ -813,7 +802,6 @@ function drawGasCylinder(draw, x, y, label) {
             valve.front();
           }
         });
-        // console.log(multiValvePosition, gasValveOpen);
       }
       
       if (gasValveOpen && verticalValveOpen) {
@@ -893,26 +881,22 @@ function drawGasCylinder(draw, x, y, label) {
       return img;
     }
     
-    
+    let playing = false;
     function startTimer(draw, temp, interval = 1000) {
-      console.log('Starting timer with temp:', temp);
-      if (timerId) {
-        clearInterval(timerId);
-        timerId = null;
-      }
+      if (playing) return;
+      playing = true;
       // let elapsedSeconds = 0;
       let rate = 0;
-      timerId = setInterval(() => {
+      const frame = (deltaTime) => {
         // Calculate mass rate [g/s] and update elapsed time
         if (gasValveOpen && verticalValveOpen) {
           // Advance simulated time at TIME_SCALE × real time
-          const realDeltaSec = interval / 1000;
+          const realDeltaSec = deltaTime;
           const simDeltaSec = realDeltaSec * TIME_SCALE;
           elapsedSeconds += simDeltaSec;
           // Increment accumulated mass
-          const simulatedMinutes = elapsedSeconds / 60; // seconds → minutes
-          const volume = volumeAtTime(temp, simulatedMinutes, { useWorksheetFN2: true, useAntoine: true });
-          console.log(volume, elapsedSeconds);
+          beakerCalc.evolve(deltaTime);
+          const volume = beakerCalc.getVol();
           const TANK_H = 300;
           const WALL = 6;
           const liquidH = (TANK_H - 5 - 2 * WALL) * (volume / 70);
@@ -946,8 +930,9 @@ function drawGasCylinder(draw, x, y, label) {
           }
         }
         // Log formatted output
-      }, interval);
-      return timerId;
+        return playing;
+      };
+      animate(frame);
     }
     
     export function reset(draw) {
@@ -956,10 +941,8 @@ function drawGasCylinder(draw, x, y, label) {
       //   clearInterval(outletBubbleTimer);
       //   outletBubbleTimer = null;
       // }
-      if (timerId) {
-        clearInterval(timerId);
-        timerId = null;
-      }
+      playing = false;
+      beakerCalc.reset();
       
       // 2) Clear outlet bubble layer and force fresh layer on next start
       // if (outletBubbleLayer) {
