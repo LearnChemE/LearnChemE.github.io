@@ -60,12 +60,12 @@ function updateVentIndicator(draw, show) {
     
     // Text label exactly aligned with the arrow line baseline, starting just after the arrow tip
     ventLabel = draw.text('vent')
-    .font({ family: 'Arial', size: 12})
+    .font({ family: 'Arial', size: 18})
     .fill('#ff0000');
     // Align the text vertically to the line and anchor from the left
     ventLabel.attr({ 'text-anchor': 'start', 'dominant-baseline': 'middle', 'alignment-baseline': 'middle' });
     // Place the label so its vertical middle sits on y=0 and its left edge starts after the arrow tip
-    ventLabel.move(770, 47.5);
+    ventLabel.move(770, 42.5);
     
     // Ensure it doesn't block clicks on other UI elements
     ventIndicator.attr({ 'pointer-events': 'none' });
@@ -99,8 +99,8 @@ export function drawFigure(svg) {
   container = drawLiquidColumnWithVent(svg, 500, 80, switchGroup); // pass switch to control heaters & bubbles
   valve = drawValve(svg, 580, 450).rotate(90);
   gasFlowRateDevice = addSVGImage(svg, 'assets/gasFlowRateDevice.svg', 90, 145, 160, 120);
-  gasFlowRateText = svg.text('0').center(174, 180).font({ size: 12, anchor: 'middle' });
-  svg.text('cm³/min').stroke({ color: '#000', width: 0.05 }).center(172, 202.5).font({ size: 14 });
+  gasFlowRateText = svg.text('0').center(174, 178).font({ size: 18, anchor: 'middle' });
+  svg.text('cm³/min').stroke({ color: '#000', width: 0.05 }).center(168, 202.5).font({ size: 16 });
   const tempController = drawTemperatureController(svg, 745, 300, 20, 15, 25, 5);
   const tempReadOut = drawTemperatureReadOut(svg, 300, 100);
   // if (tempController && typeof tempController.front === 'function') tempController.front();
