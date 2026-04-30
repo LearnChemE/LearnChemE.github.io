@@ -29,7 +29,7 @@ export const PlotlyChart: Component<PlotlyChartProps> = (props) => {
         const bed = bedCtx!.bed;
         if (!bed) return [];
 
-        const view = bed.view("p");
+        const view = bed.view("u");
         const N = view.length;
         const x = Array.from({ length: N }).map((_,i) => i / (N - 1) * LENGTH_BED);
         
@@ -69,3 +69,20 @@ export const PlotlyChart: Component<PlotlyChartProps> = (props) => {
 
     return <div ref={chartDiv} />;
 }
+
+/**
+ * MM co2 = 44.01 g / mol
+ * MM n2  = 28.01 g / mol
+ * 
+ * MM for 10% co2/n2 = 4.401 + 25.209 = 29.61 g / mol
+ * MM for 90% co2/n2 = 39.609 + 2.801 = 42.41 g / mol
+ * 
+ * @  0%: 10 g/min = 0.357 mol/min
+ * @ 10%: 10 g/min = 0.338 mol/min
+ * @ 90%: 10 g/min = 0.236 mol/min
+ * velocity of 10% is 1.43 times higher
+ * 
+ * flowrate of CO2 @ 10% is actually 0.034 mol/min
+ * flowrate of CO2 @ 90% is actually 0.212 mol/min
+ * 90% flowrate is 6.28 times higher
+ */

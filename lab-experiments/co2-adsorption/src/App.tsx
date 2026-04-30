@@ -21,7 +21,7 @@ import { BedContextProvider, type ContextDescriptor } from './components/Context
 import { AniLines } from './components/AniLines/AniLines'
 import { SVGTooltip } from './components/Tooltip/TooltipSelector'
 
-// import { PlotlyChart } from './components/PlotlyChart'
+import { PlotlyChart } from './components/PlotlyChart'
 
 function App() {
   const cylinders = createCylinders();
@@ -113,7 +113,7 @@ function App() {
         <ControlButton icon="fa-solid fa-arrows-rotate" label="reset" left={90} onClick={reset} active={() => true} activeColor='#FF3B3B' />
       </div>
 
-      {/* <PlotlyChart /> */}
+      <PlotlyChart />
 
     </BedContextProvider>
   )
