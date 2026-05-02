@@ -1,0 +1,63 @@
+<div id="details" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="directionsTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Details</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+  <p>
+    As outlined in the Directions tab, the learning objective of this simulation is to understand the interplay of kinetic energy, potential energy, and friction losses. We have three tanks and will apply modified Bernoulli's equation to them.
+  </p>
+  <p>
+    First, we choose the top of tanks A and B, and apply Bernoulli's principle:
+  </p>
+  <p>
+    \[
+    \frac{P_A}{\rho g} + h_A + \frac{u_A^2}{2g}  = \frac{P_B}{\rho g} + h_B + \frac{u_B^2}{2g} + \frac{u_{AB}^2}{2g} \cdot \frac{f \ell_{AB}}{D}
+    \]
+  </p>
+  <p>
+    where \( P \), \( h \), \( u \) denote the pressure, height, and velocity, with the subscript denoting the location of the quantity and either point A or B. The symbol \( u_{AB} \) is the velocity inside the pipe connecting the two tanks, \( f \) is the friction factor, \( \ell_{AB} \) is the length of the pipe connecting them, and \( D \) is diameter of the pipe. Since both A and B are open to the atmosphere, \( P_A = P_B \). Moreover, the problems suggest that the tank height remains roughly steady, so \( u_A = u_B = 0 \). Rearranging, it is easy to see:
+  </p>
+  <p>
+    \[
+    u_{AB} = \sqrt{ \frac{2 (h_A - h_B) g}{ f \ell_{AB}/D} }, \quad Q_{\text{in}} = \frac{\pi}{4} D^2 u_{AB}
+    \]
+  </p>
+  <p>
+    Similarly, it is straightforward to derive:
+  </p>
+  <p>
+    \[
+    u_{BC} = \sqrt{ \frac{2 (h_B - h_C) g}{ f \ell_{BC}/D} }, \quad Q_{\text{out}} = \frac{\pi}{4} D^2 u_{BC}
+    \]
+  </p>
+  <p>
+    Equating \( Q_{\text{in}} = Q_{\text{out}} \) from the above equations yields:
+  </p>
+  <p>
+    \[
+    \frac{h_A - h_B}{h_B - h_C} = \frac{d_{AB}}{d_{BC}}
+    \]
+  </p>
+  <p>
+    This equation thus provides a way to arrive at the condition needed.
+  </p>
+  <p>
+    If \( h_B = 30 \) ft, \( d_{BC} = \frac{2}{7}d_{AB} = 28.57 \) ft. The simulation agrees with the calculations as at \( d_{BC} = 28.5 \) ft, \( Q_{\text{in}} \approx Q_{\text{out}} \). In addition, \( u_{BC} = 43 \) ft/s and \( Q = 33.8 \) ft³/s.
+  </p>
+  <p>
+    If \( h_B = 50 \) ft, \( d_{BC} = \frac{4}{5}d_{AB} = 80 \) ft. The simulation agrees with the calculations as at \( d_{BC} = 80 \) ft, \( Q_{\text{in}} \approx Q_{\text{out}} \). In addition, \( u_{AB} = 38 \) ft/s and \( Q = 29.8 \) ft³/s.
+  </p>
+</div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
