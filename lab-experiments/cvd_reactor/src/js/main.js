@@ -822,18 +822,18 @@ function gasFlowRate1(draw, value = 0) {
       reactorOutletHood = draw.text("hood")
       .font({ family: 'Arial', size: 14, anchor: 'start' })
       .fill('#000')
-      .move(810,54.5)
+      .move(800,54.5)
       .hide();
       
       const outHoodx = 818
-      reactorOutletHoodArrow = drawArrowLine(draw, outHoodx, 80, 16 + outHoodx, 80, {
+      reactorOutletHoodArrow = drawArrowLine(draw, outHoodx, 80, 12 + outHoodx, 80, {
         color: '#ff0000',
         width: 3,
         len: 12,
         base: 8
       }).hide();
     }
-    
+
     function drawPump(draw, x, y, width, height, opacity = 1) {
       const switchGroup = draw.group();
       switchGroup.isOn = false;
