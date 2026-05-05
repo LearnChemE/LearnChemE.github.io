@@ -822,10 +822,11 @@ function gasFlowRate1(draw, value = 0) {
       reactorOutletHood = draw.text("hood")
       .font({ family: 'Arial', size: 14, anchor: 'start' })
       .fill('#000')
-      .move(970,72.5)
+      .move(810,54.5)
       .hide();
       
-      reactorOutletHoodArrow = drawArrowLine(draw, 934 - 18, 80, 960, 80, {
+      const outHoodx = 818
+      reactorOutletHoodArrow = drawArrowLine(draw, outHoodx, 80, 16 + outHoodx, 80, {
         color: '#ff0000',
         width: 3,
         len: 12,
