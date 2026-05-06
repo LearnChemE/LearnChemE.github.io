@@ -116,7 +116,7 @@ function setPlaying(value) {
 
 }
 
-const dthdt = 2 * Math.PI / 60; // Rotate 2 pi in 60 seconds
+const dthdt = 2 * Math.PI / 30; // Rotate 2 pi in 30 seconds
 const autoRotate = (dt) => {
     if (!playing) return;
     
@@ -131,8 +131,8 @@ const autoRotate = (dt) => {
 };
 
 function updatePlay() {
-    console.log(accumulatedAngle);
-    if (accumulatedAngle >= 720) {
+    // Play until 4 full rotations
+    if (accumulatedAngle >= 4 * 360) {
         setPlaying(false);
         playButton.classList.add("disabled");
     }

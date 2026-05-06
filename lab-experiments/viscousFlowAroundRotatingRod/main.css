@@ -124,6 +124,7 @@ body {
 #timer {
     grid-column: 2;
     justify-self: center;
+    font-size: 1.5rem;
 }
 
 .hamburger-img {
