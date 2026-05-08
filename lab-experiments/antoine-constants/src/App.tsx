@@ -1,11 +1,11 @@
-import { createEffect, createMemo, createSignal, onMount } from 'solid-js';
+import { createEffect, createSignal, onMount } from 'solid-js';
 import './App.css'
 import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import worksheet from './media/antoine_constants_worksheet.pdf'
 import Gauge from './components/Gauge/Gauge';
 import { StaticElements } from './components/Static/Static';
-import { animate, enableWindowResize, initSvgDrag, initSvgZoom, smoothLerp } from './ts/helpers';
+import { animate, animateEase, easeInOut, enableWindowResize, expMemo, initSvgDrag, initSvgZoom } from './ts/helpers';
 import { Syringe } from './components/Syringe/Syringe';
 import { Button } from './components/Button/Button';
 import { Label } from './components/Label/Label';
@@ -21,50 +21,75 @@ function App() {
   const [injecting, setInjecting] = createSignal(false);
   // Controls
   const [temperature, setTemperature] = createSignal(40); // °C
+  const [displayTemp, setDisplayTemp] = expMemo(temperature, 1, .1);
   const [volumeToInject, setVolumeToInject] = createSignal(0.5); // mL
   const [substance, setSubstance] = createSignal(substances[0]);
   // Pressure
-  const [pressure, setPressure] = createSignal(0);
+  // const [pressure, setPressure] = createSignal(0);
   // Labels
   const [topLabelText, setTopLabelText] = createSignal("the tank is empty.\nready to fill the syringe");
   const [bottomLabelText, setBottomLabelText] = createSignal("test");
+  // Syringe angle for animation
+  const [syringeAngle, setSyringeAngle] = createSignal(15);
 
-  const targetPressure = createMemo<number>(() => {
+  const [pressure, setPressure] = expMemo(() => {
     const v = volInTank();
     const T = temperature();
     return calcPressure(substance(), v, T);
-  });
+  }, 2, .0001);
 
-  let playing = false;
-  const playTankAni = () => {
-    if (playing) return;
-    playing = true;
+  // let playing = false;
+  // const playTankAni = () => {
+  //   if (playing) return;
+  //   playing = true;
 
-    const frame = (dt: number) => {
-      const r = Math.exp(-1/2);
-      setPressure(p => {
-        p = smoothLerp(p, targetPressure(), r, dt);
-        if (Math.abs(p - targetPressure()) <= .1) {
-          playing = false;
-          return targetPressure();
-        }
-        return p;
-      });
+  //   const frame = (dt: number) => {
+  //     const r = Math.exp(-1/2);
+  //     setPressure(p => {
+  //       p = smoothLerp(p, targetPressure(), r, dt);
+  //       if (Math.abs(p - targetPressure()) <= .1) {
+  //         playing = false;
+  //         return targetPressure();
+  //       }
+  //       return p;
+  //     });
 
-      return playing;
+  //     return playing;
+  //   }
+
+  //   animate(frame);
+  // }
+
+  // // Animate pressure when target is changed
+  // createEffect(() => {
+  //   targetPressure();
+  //   playTankAni();
+  // });
+
+  const syringeAniDuration = 1000; // ms
+  let syringeAniPlaying = false;
+  const playSyringeAni = () => {
+    if (syringeAniPlaying) return;
+    syringeAniPlaying = true;
+    const targetAngle = 0;
+
+    const frame = (s: number) => {
+      const angle = s * targetAngle + (1 - s) * 15;
+      setSyringeAngle(angle);
     }
 
-    animate(frame);
+    animateEase(frame, syringeAniDuration, easeInOut);
   }
 
-  // Animate pressure when target is changed
-  createEffect(() => {
-    targetPressure();
-    playTankAni();
-  });
+  const resetSyringeAni = () => {
+    setSyringeAngle(15);
+    syringeAniPlaying = false;
+  }
 
   const fillSyringe = () => {
+    resetSyringeAni();
     setSyringeVol(volumeToInject());
+    playSyringeAni();
   }
   
   const inject = () => {
@@ -97,9 +122,12 @@ function App() {
   const reset = () => {
     setSubstance(substances[0]);
     setTemperature(40);
+    setDisplayTemp(40);
     setVolumeToInject(.5);
     setVolInTank(0);
     setSyringeVol(0);
+    resetSyringeAni();
+    setPressure(0);
   }
 
   // On mount, setup zooming and dragging
@@ -147,6 +175,8 @@ function App() {
     }
   });
 
+  createEffect(() => console.log(displayTemp()));
+
   return (
     <>
       <HamburgerMenu path={worksheet} downloadName='antoine_constants_worksheet.pdf' Directions={DirectionsText} About={AboutText} />
@@ -159,21 +189,21 @@ function App() {
       <svg id="main-svg" width="583" viewBox="0 0 583 391" height="391" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="content">
         <StaticElements />
-        <Syringe vol={syringeVol} />
+        <Syringe vol={syringeVol} angle={syringeAngle} />
         <Gauge pressure={pressure} maxPressure={1.2} />
-        <Thermometer temperature={temperature} />
+        <Thermometer temperature={displayTemp} />
         {/* Labels */}
         <Label fontSize="16" x={185} y={380} text={`tank volume = ${TankVolume} L`} />
-        <Label fontSize="12" x={305} y={80} text={"hover mouse over\n gauge to enlarge"} />
-        <Label fontSize="12" x={425} y={175} text={topLabelText} center={true} />
-        <Label fontSize="12" x={425} y={230} text={bottomLabelText} center={true} />
+        <Label fontSize="16" x={305} y={80} text={"hover mouse over\n gauge to enlarge"} />
+        <Label fontSize="16" x={435} y={155} text={topLabelText} center={true} />
+        <Label fontSize="16" x={435} y={230} text={bottomLabelText} center={true} />
         </g>
         <Magnifier targetId='content' followMouse={false} circle={{ cx: 249, cy: 73, r: 75 }} hideOnMouseLeave={true} />
       </svg>
       {/* End SVG */}
 
       {/* Controls */}
-      <SelectList items={substances} disabled={() => volInTank() > 0} onSelect={(s) => { setSubstance(s as Substance); setSyringeVol(0); setVolInTank(0); }} right={20} bottom={170} />
+      <SelectList items={substances} disabled={() => volInTank() > 0} onSelect={(s) => { setSubstance(s as Substance); setSyringeVol(0); setVolInTank(0); resetSyringeAni(); }} right={20} bottom={170} />
       <Button coords={{ x: 20, y:  20 }} label="reset" onClick={reset} color="#e94646ff" />
       <Button coords={{ x: 20, y:  70 }} label="inject" onClick={inject} color="#67af55ff" disabled={() => injecting() || syringeVol() === 0} />
       <Button coords={{ x: 20, y: 120 }} label="fill syringe" onClick={fillSyringe} color="#659ee9ff" disabled={injecting} />

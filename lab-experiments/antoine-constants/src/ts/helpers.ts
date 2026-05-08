@@ -464,3 +464,164 @@ export function createDrag(
 export function smoothLerp(x: number, targ: number, r: number, dt: number) {
     return (x - targ) * r ** dt + targ;
 }
+
+export type EasingFunction = (t: number) => number;
+export type EasedCallback = (s: number, t: number) => void | boolean;
+
+/**
+ * Animate a value over time using an easing function. onUpdate will be called every frame with the eased progress (0-1) and total time in ms. onComplete will be called when animation finishes.
+ * @param onUpdate Callback to call every frame with eased progress and total time in ms. Return false to end animation early.
+ * @param duration duration of animation in ms
+ * @param easeFn easing function to convert a number from 0 to 1 to corresponing eased value. Can be used to create non-linear animations. Default is linear (t => t).
+ * @param onComplete function to call when animation completes
+ */
+export function animateEase(onUpdate: EasedCallback, duration: number, easeFn: EasingFunction = (t) => t, onComplete?: () => void) {
+    let startTime: number | null = null;
+
+    const frame = (time: number) => {
+        if (startTime === null) startTime = time;
+        const t = time - startTime;
+        const s = easeFn(Math.min(t / duration, 1));
+        const res = onUpdate(s, t);
+        if (typeof res === "boolean" && !res) { // stop if onUpdate returns false (provides a way to end animation early if desired)
+            onComplete?.();
+        }
+        else if (t < duration) {
+            requestAnimationFrame(frame);
+        }
+        else {
+            onComplete?.();
+        }
+    }
+    requestAnimationFrame(frame);
+}
+
+export function easeInOut(t: number) {
+    return t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+}
+
+import { createMemo, createSignal, createEffect, type Accessor, type Setter } from "solid-js";
+export function expMemo(f: () => number, tau: number = 0.5, threshold: number = 0.1): [Accessor<number>, Setter<number>] {
+    const target = createMemo(f);
+    const [actual, setActual] = createSignal(target());
+    const r = Math.exp(-1/tau);
+
+    const evaluate = (val: number) => {
+        const dist = Math.abs(val - target());
+        return dist <= threshold;
+    }
+
+    let playing = false;
+    const frame = (dt: number) => {
+        const nextVal = smoothLerp(actual(), target(), r, dt);
+        const done = evaluate(nextVal);
+        if (done) {
+            setActual(target());
+            playing = false;
+        }
+        else {
+            setActual(nextVal);
+        }
+
+        return playing;
+    }
+
+    const start = () => {
+        if (playing) return;
+        playing = true;
+        animate(frame);
+    }
+
+    createEffect(() => {
+        target();
+        start();
+    });
+
+    return [actual, setActual];
+}
+
+// abstract class Response {
+//     protected value: number;
+//     private playing: boolean = false;
+//     private onUpdate: (value: number) => void;
+
+//     constructor(value: number, onUpdate: (value: number) => void) {
+//         this.value = value;
+//         this.onUpdate = (value: number) => {
+//             this.value = value;
+//             onUpdate(value);
+//         };
+//     }
+    
+//     protected abstract iterate(dt: number, t: number): number;
+//     protected abstract targetReached(next: number, prev: number): boolean;
+//     protected abstract onComplete?(): void;
+
+//     protected startAnimation() {
+//         if (this.playing) return;
+//         this.playing = true;
+//         const frame = (dt: number, t: number) => {
+//             const prevVal = this.value;
+//             const nextVal = this.iterate(dt, t);
+//             this.onUpdate(nextVal);
+//             if (this.targetReached(nextVal, prevVal)) {
+//                 this.playing = false;
+//                 this.onComplete?.();
+//             }
+//             return this.playing;
+//         };
+
+//         animate(frame);
+//     }
+// }
+
+// abstract class TargetedResponse extends Response {
+//     protected target: number;
+
+//     constructor(value: number, onUpdate: (value: number) => void) {
+//         super(value, onUpdate);
+//         this.target = value;
+//     }
+
+//     public setTarget(target: number) {
+//         this.target = target;
+//     }
+// }
+
+// export class FirstOrderResponse extends TargetedResponse {
+//     private r: number;
+//     private tol: number;
+
+//     constructor(value: number, onUpdate: (value: number) => void, tau: number, tol: number = 0.1) {
+//         super(value, onUpdate);
+//         this.target = value;
+//         this.r = Math.exp(-1 / tau);
+//         this.tol = tol;
+//     }
+
+//     protected iterate(dt: number): number {
+//         return smoothLerp(this.value, this.target, this.r, dt);
+//     }
+
+//     protected targetReached(_: number, next: number): boolean {
+//         return Math.abs(next - this.target) <= this.tol;
+//     }
+
+//     protected onComplete = undefined;
+
+//     public setTarget(target: number) {
+//         this.target = target;
+//         this.startAnimation();
+//     }
+// }
+
+// import { createMemo } from "solid-js";
+// export class TargetedResponseMemo<T extends TargetedResponse> {
+//     private response: T;
+//     private targetProvider;
+
+//     constructor(memoFn: (v?: number) => number, args: ConstructorParameters<typeof FirstOrderResponse>, ResponseType: new (...args: ConstructorParameters<typeof FirstOrderResponse>) => T) {
+//         this.response = new ResponseType(...args);
+//         createMemo<number>(memoFn);
+//     }
+// }
