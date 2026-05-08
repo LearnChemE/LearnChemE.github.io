@@ -50,7 +50,7 @@ export const substances: Substance[] = [
         name: "n-heptane",
         label: "Species C",
         coeffs: { A: 6.89677, B: 1264.9, C: 216.544 },
-        tempRange: [-2, 104],
+        tempRange: [10, 104],
         concentration: .006723
     },
     {

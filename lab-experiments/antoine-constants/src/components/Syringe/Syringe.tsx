@@ -2,17 +2,18 @@ import { createMemo, type Component } from "solid-js";
 
 interface SyringeProps {
   vol: () => number;
+  angle: () => number;
 }
 
-export const Syringe: Component<SyringeProps> = ({ vol }) => {
+export const Syringe: Component<SyringeProps> = (props) => {
 
     const dx = createMemo(() => {
         // Map 0-1.00 mL to -71.5 px -- 0 px
-        return -71.5 + (vol() / 1.0) * 71.5;
+        return -71.5 + (props.vol() / 1.0) * 71.5;
     });
 
     return (
-    <g id="syringe">
+    <g id="syringe" transform={`rotate(${props.angle()}, 451.517, 244.25)`}>
         <rect id="Rectangle 58" x="348.517" y="204.25" width="31.5" height="1.5" fill="#747474" stroke="black" stroke-width="0.5"/>
         <rect id="Rectangle 59" x="379.517" y="202.25" width="1.5" height="5.5" fill="#BABABA" stroke="black" stroke-width="0.5"/>
         <g id="plunger" transform={`translate(${dx()}, 0)`}>
