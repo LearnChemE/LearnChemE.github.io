@@ -61,6 +61,20 @@ function molar_mass(x_co2: number) {
   return x_co2 * MM_CO2 + (1 - x_co2) * MM_N2;
 }
 
+// /**
+//  * Calculte the velocity of the gas mixture through the bed based on the mass flow rate, mole fraction of CO2, and pressure.
+//  * @param {Number} mdot Mass flow rate in g/s
+//  * @param {Number} x_co2 mole fraction of CO2 in the gas mixture
+//  * @param {Number} P overall pressure in bar
+//  * @returns velocity in cm/s
+//  */
+// function calc_velocity(mdot: number, x_co2: number, T: number, P: number) {
+//     // pv = nrt; Vdot = ndot * RT / P
+//     const ndot = mdot / molar_mass(x_co2) // mol/s
+//     const q = ndot * R * T / P // cc/s
+//     return q / BED_CROSS_SECTION // cm/s
+// }
+
 /**
  * Calculte the velocity of the gas mixture through the bed based on the mass flow rate, mole fraction of CO2, and pressure.
  * @param {Number} mdot Mass flow rate in g/s
@@ -68,11 +82,11 @@ function molar_mass(x_co2: number) {
  * @param {Number} P overall pressure in bar
  * @returns velocity in cm/s
  */
-function calc_velocity(mdot: number, x_co2: number, T: number, P: number) {
-    // pv = nrt; Vdot = ndot * RT / P
-    const ndot = mdot / molar_mass(x_co2) // mol/s
-    const q = ndot * R * T / P // cc/s
-    return q / BED_CROSS_SECTION // cm/s
+function calc_velocity(sccm: number, T: number, P: number) {
+    const Tstd = 273.15; // K
+    const Pstd = 1; // bar
+    const ccm = sccm * (Pstd / P) * (T / Tstd);
+    return ccm / BED_CROSS_SECTION * 60; // cm/s
 }
 
 // RHS for advection-diffusion eqn with reaction term
@@ -129,7 +143,7 @@ export type BedDescriptor = {
     presBar: Accessor<number>;
     yIn: Accessor<number>;
     flowing: Accessor<boolean>;
-    mdot: Accessor<number>;
+    sccm: Accessor<number>;
     // Outputs
     onOut: Setter<{ y: number, u: number }>;
     onUpdate: () => void;
@@ -144,7 +158,7 @@ export class BedCalc {
     private presBar: Accessor<number>;
     private yIn: Accessor<number>;
     private flowing: Accessor<boolean>;
-    private mdot: Accessor<number>;
+    private sccm: Accessor<number>;
 
     // Outputs
     private onOut: Setter<{ y: number, u: number }>;
@@ -155,7 +169,7 @@ export class BedCalc {
         this.presBar = desc.presBar;
         this.yIn = desc.yIn;
         this.flowing = desc.flowing;
-        this.mdot = desc.mdot;
+        this.sccm = desc.sccm;
         this.onOut = desc.onOut;
         this.onUpdate = desc.onUpdate;
     }
@@ -164,7 +178,7 @@ export class BedCalc {
         const P = this.presBar();
         const y = this.yIn();
         const T = this.tempK();
-        const u = calc_velocity(this.mdot(), y, T, P);
+        const u = calc_velocity(this.sccm(), T, P);
 
         // Solve the steady state balance to determine theta
         const ka = k_val(ka0, ea, T);
@@ -196,9 +210,9 @@ export class BedCalc {
         const P = this.presBar(); // absolute pressure
         const y = this.yIn();
         const flowing = this.flowing();
-        const mdot = (P > 0) ? this.mdot() : 0;
+        const sccm = (P > 0) ? this.sccm() : 0;
 
-        const out = this.yCO2_out(dt, mdot, T, P, y, flowing);
+        const out = this.yCO2_out(dt, sccm, T, P, y, flowing);
         this.onOut(out);
         this.onUpdate();
         
@@ -222,8 +236,8 @@ export class BedCalc {
      * @param {number} [args.kd=4.365e-4] - The desorption rate constant in s^-1.
      * @returns {number} - The outlet mole fraction of CO2 in the gas mixture.
      */
-    public yCO2_out(dt: number, mdot: number, T: number, P: number, y: number, flowing: boolean) {
-        let ul = calc_velocity(mdot, y, T, P);
+    public yCO2_out(dt: number, sccm: number, T: number, P: number, y: number, flowing: boolean) {
+        let ul = calc_velocity(sccm, T, P);
         ul = isNaN(ul) ? 0 : ul;
         if (flowing) {
             const left = [ y * P, (1 - y) * P, 0, ul ];

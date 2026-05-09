@@ -21,7 +21,7 @@ import { BedContextProvider, type ContextDescriptor } from './components/Context
 import { AniLines } from './components/AniLines/AniLines'
 import { SVGTooltip } from './components/Tooltip/TooltipSelector'
 
-// import { PlotlyChart } from './components/PlotlyChart'
+import { PlotlyChart } from './components/PlotlyChart'
 
 function App() {
   const cylinders = createCylinders();
@@ -30,7 +30,7 @@ function App() {
   const [valve2Angle, setValve2Angle] = createSignal(V2_ANGLE_INIT);
   const [showLines, setShowLines] = createSignal(false);
 
-  const [massSP, setMassSP] = createSignal(MASS_FLOW_INIT);
+  const [sccmSP, setSccmSP] = createSignal(MASS_FLOW_INIT);
   const currentCylinder = createMemo(() => {
     const cyl = cylinders.find(cyl => cyl.angle === valve1Angle());
     if (cyl === undefined) throw new Error(`Cylinder undefined for angle ${valve1Angle()}`);
@@ -47,7 +47,7 @@ function App() {
   const compLabel = createMemo(() => {
     if (valve2Angle() === V2_BYPASS_ANGLE) {
       const y = currentCylinder().yCO2;
-      const flowing = massSP() > 0 && currentCylinder().linePres() > 0;
+      const flowing = sccmSP() > 0 && currentCylinder().linePres() > 0;
       return `${flowing ? (y * 100).toFixed(2) : "--"} %`;
     }
     else {
@@ -62,7 +62,7 @@ function App() {
     tempK: temperature,
     cylinder: currentCylinder,
     v2Angle: valve2Angle,
-    massSP,
+    sccmSP,
     onOut: setOut
   };
 
@@ -85,7 +85,7 @@ function App() {
               </>}
             }
           </For>
-          <Controller sp={massSP} setSP={setMassSP} range={[MIN_MASS_FLOWRATE, MAX_MASS_FLOWRATE]} step={MASS_FLOW_STEP} />
+          <Controller sp={sccmSP} setSP={setSccmSP} range={[MIN_MASS_FLOWRATE, MAX_MASS_FLOWRATE]} step={MASS_FLOW_STEP} />
           <MultiValve x={303} y={240} key="valve1-ani" angle={valve1Angle} setAngle={setValve1Angle} directions={VALVE_1_ANGLES} setShowLines={setShowLines} />
           <MultiValve x={487} y={184} key="valve2-ani" angle={valve2Angle} setAngle={setValve2Angle} directions={VALVE_2_ANGLES} setShowLines={setShowLines} />
 
@@ -101,7 +101,7 @@ function App() {
             isShowing={showLines} 
             cyls={cylinders}
             cyl={currentCylinder} 
-            passMfc={() => massSP() > 0}
+            passMfc={() => sccmSP() > 0}
             showLoop={() => valve2Angle() === V2_BED_ANGLE}
           />
         </SVGCanvas>
@@ -113,7 +113,7 @@ function App() {
         <ControlButton icon="fa-solid fa-arrows-rotate" label="reset" left={90} onClick={reset} active={() => true} activeColor='#FF3B3B' />
       </div>
 
-      {/* <PlotlyChart /> */}
+      <PlotlyChart />
 
     </BedContextProvider>
   )
