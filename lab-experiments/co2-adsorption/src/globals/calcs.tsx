@@ -57,7 +57,7 @@ function pad(y:number[], left: number[], right?: number[]) {
 }
 
 // Molar mass of the gas mixture based on the mole fraction of CO2
-function molar_mass(x_co2: number) {
+export function molar_mass(x_co2: number) {
   return x_co2 * MM_CO2 + (1 - x_co2) * MM_N2;
 }
 
@@ -145,7 +145,7 @@ export type BedDescriptor = {
     flowing: Accessor<boolean>;
     sccm: Accessor<number>;
     // Outputs
-    onOut: Setter<{ y: number, u: number }>;
+    onOut: Setter<{ y: number, mdot: number }>;
     onUpdate: () => void;
 };
 
@@ -161,7 +161,7 @@ export class BedCalc {
     private sccm: Accessor<number>;
 
     // Outputs
-    private onOut: Setter<{ y: number, u: number }>;
+    private onOut: Setter<{ y: number, mdot: number }>;
     private onUpdate: () => void;
 
     constructor(desc: BedDescriptor) {
@@ -202,7 +202,7 @@ export class BedCalc {
     public reset() {
         this.playing = false;
         this.bed = this.bed.fill(0);
-        this.onOut({ y: 0, u: 0 });
+        this.onOut({ y: 0, mdot: 0 });
     }
 
     private iterate(dt: number) {
@@ -257,7 +257,13 @@ export class BedCalc {
         const pn = this.bed[NE - E + 1];
         const u = this.bed[NE - 1];
         const outlet = pc / (pc + pn);
-        return { y: (outlet < 0 || isNaN(outlet)) ? 0 : outlet, u };
+
+        const ccm = u * BED_CROSS_SECTION;
+        // PV = nRT = mRT/M
+        // m = MPV/RT
+        const yout = (outlet < 0 || isNaN(outlet)) ? 0 : outlet;
+        const mdot = molar_mass(yout) * P * ccm / R / T * 1000 / 60;
+        return { y: yout, mdot };
     }
 
     private evolve(tstep: number, T: number, y0: number[]) {

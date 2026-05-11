@@ -4,10 +4,10 @@ const mode = urlParams.get('mode');
 
 export const SIM_MODE = (mode === "adsorption" || mode === "desorption") ? mode : "adsorption";
 
-export const MIN_MASS_FLOWRATE = 0;
-export const MAX_MASS_FLOWRATE = 20;
-export const MASS_FLOW_STEP = 0.5;
-export const MASS_FLOW_INIT = (SIM_MODE === "adsorption") ? 0 : MAX_MASS_FLOWRATE / 2;
+export const MIN_SCCM_FLOWRATE = 5;
+export const MAX_SCCM_FLOWRATE = 100;
+export const SCCM_FLOW_STEP = 5;
+export const SCCM_FLOW_INIT = MAX_SCCM_FLOWRATE / 2;
 
 export const MAX_CYL_VALVE_ROTATION = 360;
 export const MAX_PRESSURE = 10; // bar
