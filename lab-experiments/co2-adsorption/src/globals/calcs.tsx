@@ -6,11 +6,12 @@ import { animate } from "./helpers";
 export const LENGTH_BED = 40; // cm
 const RHO_ZEOLITE = 0.75; // g/cc
 const MASS_ZEOLITE = 4000; // g
+const ZEOLITE_CAPACITY = 2.7; // mmol/g
 const MM_CO2 = 44.009; // g/mol
 const MM_N2 = 14.041 // g/mol
 const R = 83.14 // bar cc / mol / K
-const BED_MAX_CAPACITY = MASS_ZEOLITE / 1000 * 0.85; // mols
-const DIFFUSIVITY = 1.8e-1; // m^2/s, diffusivity of CO2 in zeolite
+const BED_MAX_CAPACITY = MASS_ZEOLITE * ZEOLITE_CAPACITY / 1000; // mols
+const DIFFUSIVITY = 1.8e-1 * 60; // m^2/s, diffusivity of CO2 in zeolite
 
 // Spatial info
 const N = 51; // number of points in spatial discretization
