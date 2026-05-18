@@ -2,17 +2,23 @@ import { mouseCoordinate } from '../index.js';
 import { calcAll } from './calcs.js';
 
 // Mass flow rate button coordinates
-export const mass_flow_rate_left_button_x = [61.5, 64.7];
-export const mass_flow_rate_right_button_x = [64.8, 68];
-export const h2_mass_flow_rate_button_y = [6.9, 9.7];
-export const n2_mass_flow_rate_button_y = [16.9, 19.7];
-export const nh3_mass_flow_rate_button_y = [26.9, 29.7];
+export const h2_flow_rate_left_button_x = [34.1, 37.8];
+export const h2_flow_rate_right_button_x = [38.1, 41.8];
+export const h2_mass_flow_rate_button_y = [8.0, 11.0];
+
+export const n2_flow_rate_left_button_x = [48.5, 52.2];
+export const n2_flow_rate_right_button_x = [52.5, 56.2];
+export const n2_mass_flow_rate_button_y = [18.0, 21.0];
+
+export const nh3_flow_rate_left_button_x = [62.9, 66.6];
+export const nh3_flow_rate_right_button_x = [66.9, 70.6];
+export const nh3_mass_flow_rate_button_y = [28.1, 31.2];
 
 // Temperature controller coordinates
 export const T_controller_coords = [
-  [59, 63],
-  [63.5, 67.5],
-  [100.5, 106]
+  [59, 63], // left x
+  [63.5, 67.5], // right x
+  [100.5, 106] // y
 ];
 
 // Tank knob coordinates
@@ -22,36 +28,55 @@ const nh3_tank_knob_x = [42, 47.5];
 const he_tank_knob_x = [102, 107.5];
 const knob_tank_y = [48, 51];
 
+function evaluateButtonClick1D(coord, clickRange) {
+  return clickRange[0] < coord && coord < clickRange[1];
+}
+
+export function evaluateButtonClick(xRange, yRange) {
+  const inX = evaluateButtonClick1D(mX, xRange);
+  const inY = evaluateButtonClick1D(mY, yRange);
+  return inX && inY;
+}
+
 window.mousePressed = function() {
   state.mouseDownFrame = frameCount;
+  // The following code is problematic.
+  // A more acceptable form of this would be to create an octree that you can register callbacks to specific coordinate ranges.
 
   if (state.purge_position !== 0) {
+
     // Mass Flow Setpoint - lower
-    if (mX < mass_flow_rate_left_button_x[1] && mX > mass_flow_rate_left_button_x[0]) {
-      if (mY < h2_mass_flow_rate_button_y[1] && mY > h2_mass_flow_rate_button_y[0]) {
-        state.tanks.h2.mSetPoint = max(state.minFlowRate, state.tanks.h2.mSetPoint - 1);
-        state.tanks.h2.mFrame = frameCount;
-      } else if (mY < n2_mass_flow_rate_button_y[1] && mY > n2_mass_flow_rate_button_y[0]) {
-        state.tanks.n2.mSetPoint = max(state.minFlowRate, state.tanks.n2.mSetPoint - 1);
-        state.tanks.n2.mFrame = frameCount;
-      } else if (mY < nh3_mass_flow_rate_button_y[1] && mY > nh3_mass_flow_rate_button_y[0]) {
-        state.tanks.nh3.mSetPoint = max(state.minFlowRate, state.tanks.nh3.mSetPoint - 1);
-        state.tanks.nh3.mFrame = frameCount;
-      }
+    if (evaluateButtonClick(h2_flow_rate_left_button_x, h2_mass_flow_rate_button_y)) {
+      state.tanks.h2.mSetPoint = max(state.minFlowRate, state.tanks.h2.mSetPoint - 1);
+      state.tanks.h2.mFrame = frameCount;
+      state.doCalc = true;
+    } 
+    else if (evaluateButtonClick(n2_flow_rate_left_button_x, n2_mass_flow_rate_button_y)) {
+      state.tanks.n2.mSetPoint = max(state.minFlowRate, state.tanks.n2.mSetPoint - 1);
+      state.tanks.n2.mFrame = frameCount;
+      state.doCalc = true;
+    } 
+    else if (evaluateButtonClick(nh3_flow_rate_left_button_x, nh3_mass_flow_rate_button_y)) {
+      state.tanks.nh3.mSetPoint = max(state.minFlowRate, state.tanks.nh3.mSetPoint - 1);
+      state.tanks.nh3.mFrame = frameCount;
       state.doCalc = true;
     }
+
     // Mass Flow Setpoint - raise
-    if (mX < mass_flow_rate_right_button_x[1] && mX > mass_flow_rate_right_button_x[0]) {
-      if (mY < h2_mass_flow_rate_button_y[1] && mY > h2_mass_flow_rate_button_y[0]) {
-        state.tanks.h2.mSetPoint = min(state.maxFlowRate, state.tanks.h2.mSetPoint + 1);
-        state.tanks.h2.mFrame = frameCount;
-      } else if (mY < n2_mass_flow_rate_button_y[1] && mY > n2_mass_flow_rate_button_y[0]) {
-        state.tanks.n2.mSetPoint = min(state.maxFlowRate, state.tanks.n2.mSetPoint + 1);
-        state.tanks.n2.mFrame = frameCount;
-      } else if (mY < nh3_mass_flow_rate_button_y[1] && mY > nh3_mass_flow_rate_button_y[0]) {
-        state.tanks.nh3.mSetPoint = min(state.maxFlowRate, state.tanks.nh3.mSetPoint + 1);
-        state.tanks.nh3.mFrame = frameCount;
-      }
+    if (evaluateButtonClick(h2_flow_rate_right_button_x, h2_mass_flow_rate_button_y)) {
+      state.tanks.h2.mSetPoint = min(state.maxFlowRate, state.tanks.h2.mSetPoint + 1);
+      state.tanks.h2.mFrame = frameCount;
+      state.doCalc = true;
+    } 
+    else if (evaluateButtonClick(n2_flow_rate_right_button_x, n2_mass_flow_rate_button_y)) {
+      state.tanks.n2.mSetPoint = min(state.maxFlowRate, state.tanks.n2.mSetPoint + 1);
+      state.tanks.n2.mFrame = frameCount;
+      state.doCalc = true;
+    } 
+    else if (evaluateButtonClick(nh3_flow_rate_right_button_x, nh3_mass_flow_rate_button_y)) {
+      console.log('here')
+      state.tanks.nh3.mSetPoint = min(state.maxFlowRate, state.tanks.nh3.mSetPoint + 1);
+      state.tanks.nh3.mFrame = frameCount;
       state.doCalc = true;
     }
 

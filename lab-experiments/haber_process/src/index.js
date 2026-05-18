@@ -65,12 +65,12 @@ window.draw = function() {
   drawAll();
   pop();
 
-  // // Debug coordinates:
+  // Debug coordinates:
   // push();
   // fill('black');
   // noStroke();
   // textSize(10);
-  // text(`x: ${window.mX.toFixed(1)}\ny: ${window.mY.toFixed(1)}`, 50, 20);
+  // text(`x: ${window.mX.toFixed(2)}\ny: ${window.mY.toFixed(2)}`, 50, 20);
   // pop();
 };
 
@@ -139,4 +139,4 @@ resetBtn.addEventListener("click", () => {
   window.location.reload();
 });
 
-require("./js/events.js");
+// require("./js/events.js");
