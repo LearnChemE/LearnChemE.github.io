@@ -2,6 +2,15 @@ import { addGaussNoise, calcAll } from "./calcs.js";
 import { mass_flow_rate_left_button_x, mass_flow_rate_right_button_x } from "./events.js";
 import { h2_mass_flow_rate_button_y, n2_mass_flow_rate_button_y, nh3_mass_flow_rate_button_y } from "./events.js";
 import { hover_coords, T_controller_coords, knob_coords } from "./events.js";
+import {
+  h2_flow_rate_left_button_x,
+  h2_flow_rate_right_button_x,
+  n2_flow_rate_left_button_x,
+  n2_flow_rate_right_button_x,
+  nh3_flow_rate_left_button_x,
+  nh3_flow_rate_right_button_x,
+  evaluateButtonClick
+} from "./events.js";
 
 const tankHeight = 60;
 const tankWidth = 13;
@@ -59,21 +68,24 @@ function drawTankTubes() {
   drawTJunction(50, -30, 0);
   drawTJunction(50, -20, 0);
   // H2 mass flow meter
-  drawMassFlowMeter(41, -40.325, state.tanks.h2, [
-    mass_flow_rate_left_button_x,
-    mass_flow_rate_right_button_x,
+  const h2_offset = -24;
+  const vert_pipe_offset = 8.4;
+  drawMassFlowMeter(36 + h2_offset, -32, state.tanks.h2, [
+    h2_flow_rate_left_button_x,
+    h2_flow_rate_right_button_x,
     h2_mass_flow_rate_button_y
   ]);
   // N2 mass flow meter
-  drawMassFlowMeter(41, -30.325, state.tanks.n2, [
-    mass_flow_rate_left_button_x,
-    mass_flow_rate_right_button_x,
+  const n2_offset = -12;
+  drawMassFlowMeter(36 + n2_offset, vert_pipe_offset - 32, state.tanks.n2, [
+    n2_flow_rate_left_button_x,
+    n2_flow_rate_right_button_x,
     n2_mass_flow_rate_button_y
   ]);
   // NH3 mass flow meter
-  drawMassFlowMeter(41, -20.325, state.tanks.nh3, [
-    mass_flow_rate_left_button_x,
-    mass_flow_rate_right_button_x,
+  drawMassFlowMeter(36, 2 * vert_pipe_offset - 32, state.tanks.nh3, [
+    nh3_flow_rate_left_button_x,
+    nh3_flow_rate_right_button_x,
     nh3_mass_flow_rate_button_y
   ]);
   pop();
@@ -149,19 +161,20 @@ function drawPressureRegulator(x, y) {
   vertex(4, 5.75);
   vertex(6, 5.75);
   endShape();
-  translate(9.75, 5.75);
+  translate(9.75, 6.75);
+  scale(1.2);
   fill(240);
   strokeWeight(0.05);
   rectMode(CENTER);
   // Controller body
-  rect(0, 0, 8, 8, 0.5);
+  rect(0, 0, 8, 8.5, 0.5);
   fill(100);
   // Controller background
-  rect(0, -1, 7.25, 4.55, 0.25);
+  rect(0, -1.4, 7.25, 3.8, 0.25);
   fill(20);
   rectMode(CORNER);
   // Pressure value background
-  rect(-2.55, -2.375, 5.3, 2.25, 0.125);
+  rect(-2.75, -2.85, 5.7, 2.75, 0.125);
   // Pressure setpoint background
   // rect(-1.25, -0.875, 4.5, 2, 0.125);
   noStroke();
@@ -172,38 +185,55 @@ function drawPressureRegulator(x, y) {
   // text("SP", -1.5, 0);
   fill("yellow");
   textAlign(CENTER, CENTER);
-  textSize(2.25);
+  textSize(3);
   textFont(state.meterFont);
   const P = round(state.P).toFixed(0);
-  text(P, 0.275, -1.375);
+  text(P, 0.25, -1.6);
   textSize(1.75);
   const P_sp = round(state.PSetPoint).toFixed(0);
   // text(P_sp, 1, 0.125);
-  fill(40);
+
+  fill("red");
+  stroke(0);
+  strokeWeight(.15);
   if (hover_coords[0][0] < mX && mX < hover_coords[0][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
-    fill(120);
+    fill(255,100,100);
     if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 5 === 0 && state.purge_position !== 0) {
       state.PSetPoint = max(1, state.PSetPoint - 1);
       calcAll();
     }
   }
   // Left button
-  rect(-3, 1.8, 2.75, 1.95, 0.25);
-  fill(40);
+  rect(-3.4, 0.9, 3.25, 2.75, 0.25);
+  // Left triangle
+  push();
+  translate(0.05, 0.5);
+  scale(1.2);
+  beginShape();
+  vertex(-2.0, 1.0);
+  vertex(-1.0, 1.0);
+  vertex(-0.9, 1.1);
+  vertex(-1.45, 2.0);
+  vertex(-1.55, 2.0);
+  vertex(-2.1, 1.1);
+  endShape(CLOSE);
+  pop();
+
+  fill("red");
   if (hover_coords[1][0] < mX && mX < hover_coords[1][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
-    fill(120);
+    fill(255,100,100);
     if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 5 === 0 && state.purge_position !== 0) {
       state.PSetPoint = min(state.maxP, state.PSetPoint + 1);
       calcAll();
     }
   }
   // Right button
-  rect(0.25, 1.8, 2.75, 1.95, 0.25);
-  fill("red");
-  // Left triangle
+  rect(0.3, 0.9, 3.25, 2.75, 0.25);
+  // Right triangle
   push();
-  translate(-0.4, 1.6);
-  scale(0.8);
+  translate(0.1, 4.1);
+  rotate(PI);
+  scale(1.2);
   beginShape();
   vertex(-2.0, 1.0);
   vertex(-1.0, 1.0);
@@ -214,30 +244,19 @@ function drawPressureRegulator(x, y) {
   endShape(CLOSE);
   pop();
 
-  push();
-  translate(0.45, 4);
-  rotate(PI);
-  scale(0.8);
-  beginShape();
-  vertex(-2.0, 1.0);
-  vertex(-1.0, 1.0);
-  vertex(-0.9, 1.1);
-  vertex(-1.45, 2.0);
-  vertex(-1.55, 2.0);
-  vertex(-2.1, 1.1);
-  endShape(CLOSE);
-  pop();
+  // label
   fill(0);
   noStroke();
   textFont("Arial");
-  textSize(2);
-  text("pressure (bar)", 0, 6);
+  textSize(3);
+  text("pressure\n(bar)", 0, 8);
   pop();
 }
 
 function drawMassFlowMeter(x, y, chemical, hover_coords) {
   push();
-  fill(ironColor);
+  scale(1.2);
+  fill(225);
   stroke(0);
   strokeWeight(0.05);
   translate(x, y);
@@ -245,9 +264,9 @@ function drawMassFlowMeter(x, y, chemical, hover_coords) {
   fill(100);
   rect(-3.5, -1.25, 7, -7, 0, 0, 0.25, 0.25);
   fill(20);
-  rect(-3, -7.125, 6, 3);
+  rect(-3, -7.5, 6, 3);
   textFont(state.meterFont);
-  textSize(3);
+  textSize(3.5);
   textAlign(CENTER, CENTER);
   noStroke();
   let m;
@@ -258,23 +277,25 @@ function drawMassFlowMeter(x, y, chemical, hover_coords) {
     fill("yellow");
     m = chemical.m.toFixed(0);
   }
-  text(m, 0, -5.675);
+  text(m, 0, -6);
   fill("black");
   textFont("Arial");
-  textSize(1.5);
-  text("mg / min", 0, 0);
+  textSize(2);
+  text("mg/min", 0, 0);
   const hoverColor = "rgb(255, 150, 150)";
   fill("red");
-  if (hover_coords[0][0] < mX && mX < hover_coords[0][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
+  if (evaluateButtonClick(hover_coords[0], hover_coords[2])) {
     fill(hoverColor);
     if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 5 === 0 && state.purge_position !== 0) {
       chemical.mSetPoint = max(state.minFlowRate, chemical.mSetPoint - 1);
       chemical.mFrame = frameCount;
     }
   }
+  // left button
   stroke(0);
-  scale(1.2);
-  translate(0.25, 0.325);
+  strokeWeight(0.08)
+  scale(1.5);
+  translate(0.4, 0.7);
   rect(-2.5, -3.3, 2, 1.65, 0.15);
   beginShape();
   vertex(-2.0, -3);
@@ -285,9 +306,9 @@ function drawMassFlowMeter(x, y, chemical, hover_coords) {
   vertex(-2.1, -2.9);
   endShape(CLOSE);
 
-  translate(-0.5, 0);
+  translate(-0.8, 0);
   fill("red");
-  if (hover_coords[1][0] < mX && mX < hover_coords[1][1] && hover_coords[2][0] < mY && mY < hover_coords[2][1]) {
+  if (evaluateButtonClick(hover_coords[1], hover_coords[2])) {
     fill(hoverColor);
     if (mouseIsPressed && frameCount - state.mouseDownFrame > 30 && (frameCount - state.mouseDownFrame) % 5 === 0 && state.purge_position !== 0) {
       chemical.mSetPoint = min(state.maxFlowRate, chemical.mSetPoint + 1);
@@ -1312,6 +1333,9 @@ function drawComputer() {
     text("TAKING SAMPLE ...", -18, 6);
   } else if (state.purgingTime > 0 && state.purgingTime < 1) {
     text("PURGING ...", -11, 6);
+  } else if (state.tanks.he.valvePosition === 0) {
+    textSize(3.8);
+    text("AWAITING CARRIER GAS", -22.8, 6);
   } else {
     text("READY FOR SAMPLE", -20, 6);
   }
@@ -1362,7 +1386,9 @@ function drawInstructionText() {
 
 export function drawAll() {
   let maxPressure = 0;
+  // Update valve positions and mass flow rates for each tank
   [state.tanks.h2, state.tanks.n2, state.tanks.nh3, state.tanks.he].forEach((tank) => {
+    // Handle valve opening and closing
     if (tank.isTurningOn) {
       tank.valvePosition = (1, tank.valvePosition + 0.01);
       if (tank.valvePosition >= 1) {
@@ -1379,6 +1405,7 @@ export function drawAll() {
         state.doCalc = true;
       }
     }
+    // If the valve is open, set mass flow to set point, otherwise 0
     if (tank.valvePosition >= 1) {
       tank.m = tank.mSetPoint;
     } else {
@@ -1390,14 +1417,15 @@ export function drawAll() {
     }
   });
 
+  // Handle purging and taking sample
   if (state.tanks.h2.m > 0 || state.tanks.n2.m > 0 || state.tanks.nh3.m > 0) {
     if (state.purge_position === 0) {
       state.purging = false;
       state.takingSample = true;
     }
   } else {
-    state.outlet.yH2 = 0;
-    state.outlet.yN2 = 0;
+    state.outlet.yH2  = 0;
+    state.outlet.yN2  = 0;
     state.outlet.yNH3 = 0;
   }
   if (state.tanks.he.valvePosition > 0 && state.purge_position === 1) {
@@ -1425,6 +1453,7 @@ export function drawAll() {
     state.doCalc = false;
   }
 
+  // Render
   drawTanks();
   drawHeTank(98, height / 2 - 3, tankWidth, tankHeight, state.tanks.he);
   drawOutletTubes();
