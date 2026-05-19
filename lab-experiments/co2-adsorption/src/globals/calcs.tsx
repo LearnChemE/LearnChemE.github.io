@@ -103,20 +103,20 @@ function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
     const iu = i + 3;
 
     // Advection
-    const dp = y[ip] - y[ip - E];
-    const dP = y[iP] - y[iP - E];
-    const du = y[iu] - y[iu - E];
-    const adv_p = - y[iu] * dp * inv_dx;
-    const adv_P = - y[iu] * dP * inv_dx;
-    const adv_u = - y[iu] * du * inv_dx
+    const dpdx = (y[ip] - y[ip - E]) * inv_dx;
+    const dPdx = (y[iP] - y[iP - E]) * inv_dx;
+    const q = - 10 * (dpdx + dPdx);
+    const adv_p = - q * dpdx;
+    const adv_P = - q * dPdx;
+    // const adv_u = - q * (y[iu] - y[iu - E]) * inv_dx;
 
     // Diffusion
     const d2p = y[ip + E] + y[ip - E] - 2 * y[ip];
     const d2P = y[iP + E] + y[iP - E] - 2 * y[iP];
-    const d2u = y[iu + E] + y[iu - E] - 2 * y[iu];
+    // const d2u = y[iu + E] + y[iu - E] - 2 * y[iu];
     const dif_p = DIFFUSIVITY * d2p * inv_dx2;
     const dif_P = DIFFUSIVITY * d2P * inv_dx2;
-    const dif_u = (DIFFUSIVITY * 1e1) * d2u * inv_dx2;
+    // const dif_u = (DIFFUSIVITY) * d2u * inv_dx2;
 
     // Reaction
     const th = y[it];
@@ -130,8 +130,9 @@ function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
 
     // Sum
     dydt[ip] = dif_p + adv_p + rxn_p;
-    dydt[iP] = dif_P + adv_P;
-    dydt[iu] = dif_u + adv_u;
+    dydt[iP] = dif_P + adv_P + rxn_p;
+    dydt[iu] = (q - y[iu]) * 0.5; // Relax velocity to flow rate, rather than solving momentum balance
+    // dydt[iu] = dif_u + adv_u;
     dydt[it] = rxn_t;
   }
 
