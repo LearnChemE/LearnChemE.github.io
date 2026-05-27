@@ -41,7 +41,7 @@ function App() {
   });
 
   const [temperature, setTemperature] = createSignal(TEMP_ROOM);
-  const [out, setOut] = createSignal({ y: 0, mdot: 0 });
+  const [out, setOut] = createSignal({ y: 0, u: 0 });
 
   const compLabel = createMemo(() => {
     if (valve2Angle() === V2_BYPASS_ANGLE) {
@@ -50,8 +50,8 @@ function App() {
       return `${flowing ? (y * 100).toFixed(2) : "--"} %`;
     }
     else {
-      const { y, mdot } = out();
-      return `${mdot > 0.01 ? (y * 100).toFixed(2) : "--"} %`;
+      const { y, u } = out();
+      return `${u > 0.01 ? (y * 100).toFixed(2) : "--"} %`;
     }
   });
 
@@ -60,16 +60,17 @@ function App() {
       // PV = nRT
       // n = m/M = PV / RT; P = 1 bar, T = 273.15, R = 83.14 mL bar / mol K
       // m = MPV / RT
-      const Q = sccmSP();
+      if (currentCylinder().linePres() <= 0) return "0.0";
+      const sccm = sccmSP();
+      const ndot = sccm / 83.14 / 273.15; // mol / min
       const y = currentCylinder().yCO2;
       const MM = molar_mass(y);
-      const mdot = (currentCylinder().linePres() > 0) ? 1000 * MM * Q / 83.14 / 273.15 :
-       0; // mg/min
+      const mdot = ndot * MM * 1000; // mg/min
       return `${mdot.toFixed(1)}`;
     }
     else {
-      const { mdot } = out();
-      return `${mdot.toFixed(1)}`;
+      const { u } = out();
+      return `${u.toFixed(1)}`;
     }
   });
 
