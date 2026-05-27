@@ -49,12 +49,12 @@ window.setup = function () {
 
 graphicsWrapper.addEventListener("mouseover", () => {
   isMouseInside = true;
-  console.log("Mouse entered the element!");
+  // console.log("Mouse entered the element!");
 });
 
 graphicsWrapper.addEventListener("mouseout", () => {
   isMouseInside = false;
-  console.log("Mouse left the element!");
+  // console.log("Mouse left the element!");
 });
 
 function mouseCoordinate() {
@@ -481,11 +481,11 @@ function drawTextOnTopOfDiagram(x, y) {
   // Add text
   textAlign(CENTER, CENTER);
   fill(0);
-  textSize(20);
+  textSize(24);
   text("salt", x, y);
   text("solution", x, y + 25);
-  text("membrane module", x + 560, y - 65);
-  textSize(16);
+  text("membrane", x + 560, y - 75);
+  text("module", x + 560, y - 50);
   text("back pressure regulator", x + 825, y - 100);
   pop();
 }
@@ -1223,22 +1223,25 @@ function drawBeaker(x, y, beakerWidth, beakerHeight, beakerType) {
 
   //Beaker mL lables
   push();
+  textSize(16);
+  fill("black");
+  textAlign(RIGHT, CENTER);
+  text("mL", x + 55, y - 2);
+  textSize(18);
   for (let i = 1; i < 11; i++) {
-    fill("black");
     strokeWeight(0.2);
-    textAlign(CENTER, CENTER);
-    if (i % 2 == 0 && i < 10) {
-      text(i * 100, x + beakerWidth / 2 + 30, y + beakerHeight - (i * (beakerHeight - state.beakerThickness)) / 11 - state.beakerThickness);
-    } else if (i >= 10) {
-      text(i * 100 + " mL", x + beakerWidth / 2 + 45, y + beakerHeight - (i * (beakerHeight - state.beakerThickness)) / 11 - state.beakerThickness);
-    }
+    if (i % 2 == 0) {
+      text(i * 100, x + 55, y + beakerHeight - (i * (beakerHeight - state.beakerThickness)) / 11 - state.beakerThickness);
+    } //else if (i >= 10) {
+    //   text(i * 100 + " mL", x + 45, y + beakerHeight - (i * (beakerHeight - state.beakerThickness)) / 11 - state.beakerThickness);
+    // }
 
     stroke(0);
     strokeWeight(2);
     line(
-      x + beakerWidth / 2 - 10 - 10,
+      x + beakerWidth / 2 - 10 - 30,
       y + beakerHeight - (i * (beakerHeight - state.beakerThickness)) / 11 - state.beakerThickness,
-      x + beakerWidth / 2 + 10,
+      x + beakerWidth / 2 - 10 - 2,
       y + beakerHeight - (i * (beakerHeight - state.beakerThickness)) / 11 - state.beakerThickness
     );
   }
@@ -1247,23 +1250,24 @@ function drawBeaker(x, y, beakerWidth, beakerHeight, beakerType) {
   stroke(0);
   strokeWeight(2);
   line(
-    x + beakerWidth / 2 - 10 - 10,
+    x + beakerWidth / 2 - 12,
     y + beakerHeight - (beakerHeight - state.beakerThickness) / 11 - state.beakerThickness,
-    x + beakerWidth / 2 - 10 - 10,
+    x + beakerWidth / 2 - 12,
     y + beakerHeight - (10 * (beakerHeight - state.beakerThickness)) / 11 - state.beakerThickness
   );
 
   fill("black");
   strokeWeight(0.2);
   textAlign(CENTER, CENTER);
-  textSize(16);
-  if (beakerType == "permeate") {
-    //text(beakerType, x + beakerWidth - 50, y);
-    text(beakerType, x + beakerWidth / 2 - 48, y);
-  }
-  if (beakerType == "retentate") {
-    text(beakerType, x + beakerWidth / 2 - 48, y);
-  }
+  textSize(24);
+  // if (beakerType == "permeate") {
+  //   //text(beakerType, x + beakerWidth - 50, y);
+  //   text(beakerType, x + beakerWidth / 2 - 48, y);
+  // }
+  // if (beakerType == "retentate") {
+  //   text(beakerType, x + beakerWidth / 2 - 48, y);
+  // }
+  text(beakerType, x + beakerWidth / 2, y + beakerHeight + 22);
 
   pop();
 
@@ -1283,7 +1287,7 @@ function drawPumpSwitch(x, y, switchValue) {
   push();
   fill("gray");
   rectMode(CENTER);
-  rect(x - 47, y - 43, 60, 15);
+  rect(x - 47, y - 43, 60, 25);
   pop();
 
   if (switchValue == true) {
@@ -1292,7 +1296,7 @@ function drawPumpSwitch(x, y, switchValue) {
     stroke("white");
     strokeWeight(0);
     textAlign(CENTER, CENTER);
-    textSize(16);
+    textSize(20);
     text("on", x - 47, y - 42);
 
     pop();
@@ -1302,7 +1306,7 @@ function drawPumpSwitch(x, y, switchValue) {
     stroke("white");
     strokeWeight(0);
     textAlign(CENTER, CENTER);
-    textSize(16);
+    textSize(20);
     text("off", x - 47, y - 42);
 
     pop();
