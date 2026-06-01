@@ -30,7 +30,7 @@ export const Controller: Component<ControllerProps> = (props) => {
     }
 
     return (<g transform="translate(310, 116)">
-
+<g transform="translate(-14, -20) scale(1.25)">
 <rect x="0.5" y="0.5" width="57" height="64" rx="1.5" fill="#888888" stroke="black"/>
 <path d="M4 19.5H54C54.8284 19.5 55.5 20.1716 55.5 21V61C55.5 61.8284 54.8284 62.5 54 62.5H4C3.17157 62.5 2.5 61.8284 2.5 61V21C2.5 20.1716 3.17157 19.5 4 19.5Z" fill="#CECECE" stroke="black"/>
 <rect x="4.5" y="21.5" width="49" height="19" rx="1.5" fill="#141414" stroke="black"/>
@@ -54,8 +54,6 @@ export const Controller: Component<ControllerProps> = (props) => {
     font-family="Arial"
     font-size="12"
     fill="black">SCCM</text>
-<path d="M58 11.214C89 11.214 119.5 -0.786012 119.5 15.714" stroke="black"/>
-
 <g id="display">
     <text
         id="gmVal"
@@ -71,6 +69,8 @@ export const Controller: Component<ControllerProps> = (props) => {
         {text()}
     </text>
 </g>
+</g>
+<path d="M58 11.214C89 11.214 119.5 -0.786012 119.5 15.714" stroke="black"/>
 
     </g>)
 }

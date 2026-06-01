@@ -96,7 +96,7 @@ function calc_velocity(sccm: number, T: number, P: number) {
 function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
     const dydt = Array.from({ length: NT }).fill(0) as number[];
     const inv_dx = 1 / dx;
-    const inv_dx2 = inv_dx / dx;
+    // const inv_dx2 = inv_dx / dx;
 
     // Left boundary diffusion term
     let dl;
@@ -125,7 +125,7 @@ function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
         const ip = i;
         const iP = i + 1;
         const it = i + 2;
-        const iu = i + 3;
+        // const iu = i + 3;
 
         // Pre allocate variables for clarity
         // Values at relevant centroids
@@ -135,15 +135,15 @@ function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
         const P_n = y[iP + E];
         const P_p = y[iP];
         const P_pp= y[iP - E];
-        const u_n = y[iu + E];
-        const u_p = y[iu];
-        const u_pp= y[iu - E];
+        // const u_n = y[iu + E];
+        // const u_p = y[iu];
+        // const u_pp= y[iu - E];
 
         // TVD
         // Assume forward flow for upwinding
         const rp = (p_p - p_pp) ? (p_n - p_p) / (p_p - p_pp) : 0;
         const rP = (P_p - P_pp) ? (P_n - P_p) / (P_p - P_pp) : 0;
-        const ru = (u_p - u_pp) ? (u_n - u_p) / (u_p - u_pp) : 0;
+        // const ru = (u_p - u_pp) ? (u_n - u_p) / (u_p - u_pp) : 0;
         // Use for flux limiting
         const rhph = p_p + 1/2 * fluxLimiter(rp, TVD_METHOD) * (p_p - p_pp); // * inv_RT
         const rh   = P_p + 1/2 * fluxLimiter(rP, TVD_METHOD) * (P_p - P_pp); // * inv_RT
@@ -153,7 +153,7 @@ function rhs(_: number, y: number[], dx: number, ka: number, kd: number) {
         // adv = sum [ S * rh * u * ph ] for each face
         const adv_p = rhph * u * inv_dx
         const adv_P = rh * u * inv_dx
-        const adv_u = u * inv_dx;
+        // const adv_u = u * inv_dx;
 
         // Diffusion for pco2
         // dif_face = S * rh * DIFFUSIVITY * P * del y since the mole fraction will be diffused, but not total pressure

@@ -1,5 +1,5 @@
 import { createMemo, type Accessor, type Component, type Setter } from "solid-js";
-import { constrain, getAngleFromDown, getSVGCoords, MAX_PRESSURE } from "../../globals";
+import { constrain, getAngleFromDown, getSVGCoords, MAX_PRESSURE, REG_ROTATION_RANGE } from "../../globals";
 
 type RegulatorProps = {
     inPres: Accessor<number>;
@@ -10,8 +10,8 @@ type RegulatorProps = {
     y: number;
 };
 
-const minAngle = -135;
-const maxAngle = 135;
+const minAngle = -135; // degrees, for 0 pressure
+const maxAngle = +135; // degrees, for MAX_PRESSURE
 
 export const Regulator: Component<RegulatorProps> = (props) => {
     const rAngle = createMemo(() => minAngle + (maxAngle - minAngle) * props.inPres() / MAX_PRESSURE);

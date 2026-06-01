@@ -23,12 +23,13 @@ inv_RT = 1 / R / T # 1 / (R * T) in mol / bar / cc
 # [ pco2, Ptot, theta_co2 ], referred to as [p, P, th]
 
 # Spatial info
-N = 201 # number of points in spatial discretization
+N = 51 # number of points in spatial discretization
 E = 3 # number of equations per point (tot pressure, co2 pressure, theta, velocity) stride
 NE = N * E # number of equations in the system
 NT = NE + 2 * E # Size of arrays including padding
 x = np.linspace(0, TOTAL_LENGTH, N) # spatial points
 dx = x[1] - x[0]
+ELEM_MAX_CAPACITY = BED_MAX_CAPACITY * dx / LENGTH_BED # mols per element
 
 BED_END_IDX = int((N - 1) * LENGTH_BED / TOTAL_LENGTH)
 print("Bed end index: ", BED_END_IDX, " at position ", x[BED_END_IDX])
@@ -44,14 +45,12 @@ def molar_mass(x_co2):
     return x_co2 * MM_CO2 + (1 - x_co2) * MM_N2
 
 # Kinetic parameters
-ka0 = 4.196e0 # min^-1
+ka0 = 4.196e2 # min^-1
 ea = 1000 # convert from kJ/mol to K
-kd0 = 8e0
-ed = 6e3
+kd0 = 8e2
+ed = 6e4
 def k_val(k0, ea, T):
     return k0 * np.exp(-ea / T)
-ka = k_val(ka0, ea, T)
-kd = k_val(kd0, ed, T)
 
 TVD_METHOD = "MinMod" # "MinMod", "VanLeer", or "SuperBee"
 
@@ -68,7 +67,7 @@ def fluxLimiter(r, method):
 # 1D linear coordinates
 # V d(ph)/dt = -adv + dif + src
 
-def rhs(t, y, y_l, P_l, u_l):
+def rhs(t, y, y_l, P_l, u_l, ka, kd):
     S = AREA_BED
     V = VOL_BED
     dydt = np.zeros_like(y)
@@ -143,7 +142,7 @@ def rhs(t, y, y_l, P_l, u_l):
         des = kd * th
 
         rxn_p = des - ads # Pressure changes
-        rxn_t = (ads - des) / BED_MAX_CAPACITY # Theta changes
+        rxn_t = (ads - des) / ELEM_MAX_CAPACITY # Theta changes
         # if (i == N-1):
         #     rxn_p = 0
         #     rxn_t = 0
@@ -198,16 +197,24 @@ def smooth(y, window_size):
 
 if __name__ == "__main__":
     P_l = 5 # bar
-    y_l = 0.9 # mol fraction of CO2 in feed
+    y_l = 0.1 # mol fraction of CO2 in feed
     sccm = 50
     y0 = np.zeros(NE)
 
+    ka = k_val(ka0, ea, T)
+    kd = k_val(kd0, ed, T)
+
     Q = sccm * (1 / P_l) * T / 273.15
     u_l = Q / AREA_BED # cm / min
-    print(u_l)
+
+    ndot = P_l * Q / R / T
+    mdot = molar_mass(y_l) * ndot
+    print("Inlet mass flowrate (mg/min): ", mdot * 1000)
+    print("CO2 inlet mole flowrate (mol/min): ", ndot * y_l)
+    print("Time scale of stoicheometric adsorption (min): ", BED_MAX_CAPACITY / (ndot * y_l))
 
     def rhs_wrapped(t, y):
-        return rhs(t, y, y_l, P_l, u_l)
+        return rhs(t, y, y_l, P_l, u_l, ka, kd)
 
     sol = solve_ivp(rhs_wrapped, [0, 20], y0, 'RK45')
 
@@ -268,8 +275,8 @@ if __name__ == "__main__":
     # Show plot integrated to breakthrough
     plt.plot(t, n, 'k-', label=r'outlet $CO_2$ pressure')
     plt.vlines(t[idx_breakthrough], 0, n_final, color='k', linewidth=1, linestyle='--', label='breakthrough time')
-    plt.fill_between(t[:idx_breakthrough], n[:idx_breakthrough], n_final, color="b", alpha=0.3, label=r"$CO_2$ adsorbed")
-    plt.legend()
+    plt.fill_between(t[:idx_breakthrough+1], n[:idx_breakthrough+1], n_final, color="b", alpha=0.3, label=r"$CO_2$ adsorbed")
+    # plt.legend()
     plt.xlabel('time (min)')
     plt.ylabel(r'outlet $CO_2$ flowrate (mg/min)')
     plt.show()
@@ -280,7 +287,7 @@ if __name__ == "__main__":
     
     # Show plot integrated to saturation
     plt.plot(t, n, 'k-', label='outlet $CO_2$ pressure')
-    plt.fill_between(t[:idx_breakthrough], n[:idx_breakthrough], n_final, color="b", alpha=0.3, label=r"$CO_2$ adsorbed")
+    plt.fill_between(t[:idx_breakthrough+1], n[:idx_breakthrough+1], n_final, color="b", alpha=0.3, label=r"$CO_2$ adsorbed")
     plt.vlines(t[idx_breakthrough], 0, n_final, color='k', linewidth=1, linestyle='--', label='breakthrough time')
     plt.vlines(t[idx_saturation], 0, n_final, color='k', linewidth=1, linestyle=':', label='saturation time')
 
@@ -290,7 +297,7 @@ if __name__ == "__main__":
     plt.plot(line_t, line_y, color='b', linestyle='-', label='integration symmetry line')
     plt.fill_between(line_t, line_y, n_final, color="b", alpha=0.3)
 
-    plt.legend()
+    # plt.legend()
     plt.xlabel('time (min)')
     plt.ylabel(r'outlet $CO_2$ flowrate (mg/min)')
     plt.show()
