@@ -32,12 +32,12 @@ function App() {
   const [lockStages, setLockStages] = createSignal(false);
   const [feedSwitchDisabled, setFeedSwitchDisabled] = createSignal(true);
 
-  const solvRate = createMemo(() => {
+  const solvRate = createMemo(() => { // flowrate in L/min
     const effective_lift = solvLift() * (solvIsOn() ? 1 : 0)
     return SOLVENT_MAX_RATE * effective_lift;
   });
 
-  const feedRate = createMemo(() => {
+  const feedRate = createMemo(() => { // flowrate in L/min
     const effective_lift = feedLift() * (feedIsOn() ? 1 : 0)
     return FEED_MAX_RATE * effective_lift;
   });

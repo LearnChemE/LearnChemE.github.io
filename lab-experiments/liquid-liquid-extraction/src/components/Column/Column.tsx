@@ -4,11 +4,11 @@ import { columnVolume, numberOfStages, paddingTop, resetEvent, setColFull } from
 import "./Column.css";
 import { animate } from "../../ts/helpers";
 import { Boils } from "../Boils/Boils";
-import { ColumnCalc, ColumnContext, FEED_SPECIFIC_VOL, SOLV_SPECIFIC_VOL, type Stream } from "../../calcs";
+import { ColumnCalc, ColumnContext, FEED_DENSITY, SOLV_DENSITY, type Stream } from "../../calcs";
 
 type ColumnProps = {
-    solvIn: Accessor<number>;
-    feedIn: Accessor<number>;
+    solvIn: Accessor<number>; // L / min
+    feedIn: Accessor<number>; // L / min
 };
 
 export const Column: Component<ColumnProps> = (props) => {
@@ -32,8 +32,8 @@ export const Column: Component<ColumnProps> = (props) => {
         animating = false;
         setColFull(true);
         // Create the calculation object and start the simulation
-        const feedStream = createMemo(() => { return { ndot: feedIn() / FEED_SPECIFIC_VOL, comp: FEED_COMP } as Stream});
-        const solvStream = createMemo(() => { return { ndot: solvIn() / SOLV_SPECIFIC_VOL, comp: [0, 0] } as Stream});
+        const feedStream = createMemo(() => { return { mdot: feedIn() * FEED_DENSITY, comp: FEED_COMP } as Stream}); // convert to g/min
+        const solvStream = createMemo(() => { return { mdot: solvIn() * SOLV_DENSITY, comp: [0, 0] } as Stream}); // convert to g/min
         const col = new ColumnCalc(numberOfStages(), feedStream, solvStream);
         // Attach the column to context so other components can access it
         columnContext!.column = col;

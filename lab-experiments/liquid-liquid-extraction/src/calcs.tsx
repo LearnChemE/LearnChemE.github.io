@@ -184,33 +184,42 @@ export function separate(x: number, y: number): Composition[] {
     return intersections; // Return in order of decreasing chloroform concentration
 }
 
-const MM_AA = 60.052;
-const MM_C = 119.38;
-const MM_W = 18.01;
-const CONC_PURE_AA = 1.05 / 60.05; // mol / cm3
-const CONC_PURE_C  = 1.49 / 119.378; // mol / cm3
-const CONC_PURE_W  = 1.00 / 18.01; // mol / cm3
-/**
- * Calculate the specific volume using a known composition.
- * @param comp Composition [chloroform, acetic acid] in mole fraction
- * @returns specific volume (L / mol)
- */
-export function specificVolume(comp: Composition) {
+// const MM_AA = 60.052;
+// const MM_C = 119.38;
+// const MM_W = 18.01;
+
+const rho_C = 1.49; // g/cm3
+const rho_AA= 1.04; // g/cm3
+const rho_W = 1.00; // g/cm3
+
+// /**
+//  * Calculate the specific volume using a known composition.
+//  * @param comp Composition [chloroform, acetic acid] in mole fraction
+//  * @returns specific volume (L / mol)
+//  */
+// export function specificVolume(comp: Composition) {
+//     const xc = comp[0];
+//     const xa = comp[1];
+//     const xw = 1 - xc - xa;
+//     return (xc / CONC_PURE_C + xa / CONC_PURE_AA + xw / CONC_PURE_W) / 1000; // Convert from cm3 / mol to L / mol
+// }
+
+export function density(comp: Composition) {
     const xc = comp[0];
     const xa = comp[1];
     const xw = 1 - xc - xa;
-    return (xc / CONC_PURE_C + xa / CONC_PURE_AA + xw / CONC_PURE_W) / 1000; // Convert from cm3 / mol to L / mol
+    return xc * rho_C + xa * rho_AA + xw * rho_W; // g / cm3
 }
 
-export function molarMass(comp: Composition) {
-    const xc = comp[0];
-    const xa = comp[1];
-    const xw = 1 - xc - xa;
-    return xc * MM_C + xa * MM_AA + xw * MM_W; // g solution / 1 mol
-}
+// export function molarMass(comp: Composition) {
+//     const xc = comp[0];
+//     const xa = comp[1];
+//     const xw = 1 - xc - xa;
+//     return xc * MM_C + xa * MM_AA + xw * MM_W; // g solution / 1 mol
+// }
 
 export type Stream = {
-    ndot: number;
+    mdot: number;
     comp: Composition;
 }
 
@@ -222,7 +231,7 @@ class Stage {
     private rafObserved: Composition;
     private extObserved: Composition;
     private phi: number = 0; // Relative amount of raffinate vs extract (raffinate / (raffinate + extract))
-    private ndot_out: number = 0;
+    private mdot_out: number = 0;
 
     private orgIn: () => Stream;
     private aqIn: (() => Stream) | null = null;
@@ -255,14 +264,14 @@ class Stage {
             this.extract = this.mixedComp;
             this.rafObserved = this.raffinate;
             this.extObserved = this.extract;
-            const aq =  aqIn.ndot;
-            const org = orgIn.ndot;
-            const vaq = aq * specificVolume(aqIn.comp);
-            const vorg = org * specificVolume(orgIn.comp);
+            const aq =  aqIn.mdot;
+            const org = orgIn.mdot;
+            const vaq = aq / density(aqIn.comp);
+            const vorg = org / density(orgIn.comp);
             this.phi = (vaq + vorg !== 0) ? vorg / (vorg + vaq) : this.phi; // Just set phi based on relative flow rates since there is no separation
 
             // Use volume balance to determine the amount of each phase
-            this.ndot_out = org + aq;
+            this.mdot_out = org + aq;
 
         }
         else {
@@ -273,23 +282,23 @@ class Stage {
 
             const phi = (this.mixedComp[0] - extComp[0]) / (raffComp[0] - extComp[0])
             this.phi = phi;
-            const M = aqIn.ndot + orgIn.ndot;
+            const M = aqIn.mdot + orgIn.mdot;
 
             let nr_t = M * phi;
             let ne_t = M - nr_t;
-            
+
             // Use efficiency formulas to determine actual flowrates
             // raffinate
             const xrw = 1 - raffComp[0] - raffComp[1], xow = 1 - orgIn.comp[0] - orgIn.comp[1]
-            const nrc = this.leff * (raffComp[0] * nr_t - orgIn.comp[0] * orgIn.ndot) + orgIn.comp[0] * orgIn.ndot;
-            const nra = this.leff * (raffComp[1] * nr_t - orgIn.comp[1] * orgIn.ndot) + orgIn.comp[1] * orgIn.ndot;
-            const nrw = this.leff * (xrw * nr_t - xow * orgIn.ndot) + xow * orgIn.ndot;
+            const nrc = this.leff * (raffComp[0] * nr_t - orgIn.comp[0] * orgIn.mdot) + orgIn.comp[0] * orgIn.mdot;
+            const nra = this.leff * (raffComp[1] * nr_t - orgIn.comp[1] * orgIn.mdot) + orgIn.comp[1] * orgIn.mdot;
+            const nrw = this.leff * (xrw * nr_t - xow * orgIn.mdot) + xow * orgIn.mdot;
             let nr = nrc + nra + nrw;
             // extract
             const xew = 1 - extComp[0] - extComp[1], xaw = 1 - aqIn.comp[0] - aqIn.comp[1];
-            const nec = this.reff * (extComp[0] * ne_t - aqIn.comp[0] * aqIn.ndot) + aqIn.comp[0] * aqIn.ndot;
-            const nea = this.reff * (extComp[1] * ne_t - aqIn.comp[1] * aqIn.ndot) + aqIn.comp[1] * aqIn.ndot;
-            const n_ew= this.reff * (xew * ne_t - xaw * aqIn.ndot) + xaw * aqIn.ndot;
+            const nec = this.reff * (extComp[0] * ne_t - aqIn.comp[0] * aqIn.mdot) + aqIn.comp[0] * aqIn.mdot;
+            const nea = this.reff * (extComp[1] * ne_t - aqIn.comp[1] * aqIn.mdot) + aqIn.comp[1] * aqIn.mdot;
+            const n_ew= this.reff * (xew * ne_t - xaw * aqIn.mdot) + xaw * aqIn.mdot;
             let ne = nec + nea + n_ew;
             if (nr < 0) nr = 0;
             if (ne < 0) ne = 0;
@@ -300,24 +309,24 @@ class Stage {
             // Use balance to determine the amount of each phase
             if (nr + ne <= 0) return;
             this.phi = nr / (nr + ne);
-            this.ndot_out = nr + ne;
+            this.mdot_out = nr + ne;
         }
     }
 
     public raffStream(): Stream {
-        const ndot = this.ndot_out * this.phi;
+        const mdot = this.mdot_out * this.phi;
 
         return {
-            ndot,
+            mdot,
             comp: this.raffinate
         }
     }
 
     public extStream(): Stream {
-        const ndot = this.ndot_out * (1 - this.phi);
+        const mdot = this.mdot_out * (1 - this.phi);
         
         return {
-            ndot,
+            mdot,
             comp: this.extract
         }
     }
@@ -333,16 +342,16 @@ class Stage {
     public evolve(deltaTime: number) {
         const orgInStream = this.orgIn();
         const aqInStream = this.aqIn!();
-        const currMoles = L_PER_STAGE / specificVolume(this.mixedComp); // Convert from L to cm3
+        const currMass = L_PER_STAGE * density(this.mixedComp); // Convert from L to cm3
 
         // console.table(orgInStream)
         // console.table(aqInStream)
-        const orgIn = orgInStream.ndot * deltaTime;
-        const aqIn = aqInStream.ndot * deltaTime;
-        const ntot = orgIn + aqIn + currMoles;
+        const orgIn = orgInStream.mdot * deltaTime;
+        const aqIn = aqInStream.mdot * deltaTime;
+        const ntot = orgIn + aqIn + currMass;
         if (ntot === 0) return;
         for (let i = 0; i < 2; i++) {
-            const xi = (orgInStream.comp[i] * orgIn + aqInStream.comp[i] * aqIn + currMoles * this.mixedComp[i]) / ntot;
+            const xi = (orgInStream.comp[i] * orgIn + aqInStream.comp[i] * aqIn + currMass * this.mixedComp[i]) / ntot;
             
             this.mixedComp[i] = xi;
         }
@@ -408,12 +417,12 @@ export class ColumnCalc {
         // Iterate mass balance
         for (const stage of this.stages) {
             stage.evolve(deltaTime);
-            if (stage.extStream().ndot < 0) throw new Error("ext under in evolve")
+            if (stage.extStream().mdot < 0) throw new Error("ext under in evolve")
         }
         // Solve eqm
         for (const stage of this.stages) {
             stage.settle();
-            if (stage.extStream().ndot < 0) throw new Error(`ext under in settle ${stage.extStream().comp}`)
+            if (stage.extStream().mdot < 0) throw new Error(`ext under in settle ${stage.extStream().comp}`)
         }
 
         // // Inlets - for verifying overall mass balances
@@ -451,5 +460,5 @@ export class ColumnCalc {
     }
 }
 
-export const FEED_SPECIFIC_VOL = specificVolume(FEED_COMP);
-export const SOLV_SPECIFIC_VOL = specificVolume([0, 0]);
+export const FEED_DENSITY = density(FEED_COMP);
+export const SOLV_DENSITY = density([0, 0]);
