@@ -271,34 +271,12 @@ class Stage {
             this.rafObserved = raffComp;
             this.extObserved = extComp;
 
-            // Determine the flowrates of each stream using 2x2 inverse matrix formula
-            // Use water and overall mass balances because there will always be water in the system.
-            const w_in = (1 - aqIn.comp[0] - aqIn.comp[1]) * aqIn.ndot + (1 - orgIn.comp[0] - orgIn.comp[1]) * orgIn.ndot;
-            const n_in = aqIn.ndot + orgIn.ndot;
-            const a = (1 - raffComp[0] - raffComp[1]), b = (1 - extComp[0] - extComp[0]), c = 1, d = 1;
-            // Pre-calculate inverse of denominator
-            if (a * d === c * b) throw new Error('non-invertable 2x2 matrix')
-            const inv_denom = 1 / (a * d - c * b);
-            // Solve for theoretical raffinate and extract flowrates
-            let nr_t = (w_in * d - n_in * b) * inv_denom;
-            let ne_t = (n_in * a - w_in * c) * inv_denom;
+            const phi = (this.mixedComp[0] - extComp[0]) / (raffComp[0] - extComp[0])
+            this.phi = phi;
+            const M = aqIn.ndot + orgIn.ndot;
 
-            if ((nr_t <= 0 && ne_t <= 0) || inv_denom !== inv_denom) {
-                // No separation, just one phase with the same composition as the mixed stream
-                this.raffinate = this.mixedComp;
-                this.extract = this.mixedComp;
-                this.rafObserved = this.raffinate;
-                this.extObserved = this.extract;
-                const aq =  aqIn.ndot;
-                const org = orgIn.ndot;
-                const vaq = aq * specificVolume(aqIn.comp);
-                const vorg = org * specificVolume(orgIn.comp);
-                this.phi = (vaq + vorg !== 0) ? vorg / (vorg + vaq) : this.phi; // Just set phi based on relative flow rates since there is no separation
-
-                // Use volume balance to determine the amount of each phase
-                this.ndot_out = org + aq;
-                return;
-            }
+            let nr_t = M * phi;
+            let ne_t = M - nr_t;
             
             // Use efficiency formulas to determine actual flowrates
             // raffinate
@@ -362,6 +340,7 @@ class Stage {
         const orgIn = orgInStream.ndot * deltaTime;
         const aqIn = aqInStream.ndot * deltaTime;
         const ntot = orgIn + aqIn + currMoles;
+        if (ntot === 0) return;
         for (let i = 0; i < 2; i++) {
             const xi = (orgInStream.comp[i] * orgIn + aqInStream.comp[i] * aqIn + currMoles * this.mixedComp[i]) / ntot;
             
@@ -376,6 +355,14 @@ class Stage {
         return {
             raffinate: this.raffStream(),
             extract: this.extStream()
+        }
+    }
+
+    public reportInlet(which: "raffinate" | "extract") {
+        if (which === "raffinate") {
+            return this.orgIn();
+        } else {
+            return this.aqIn!();
         }
     }
 }
@@ -429,8 +416,16 @@ export class ColumnCalc {
             if (stage.extStream().ndot < 0) throw new Error(`ext under in settle ${stage.extStream().comp}`)
         }
 
-        const { raffinate, extract } = this.stages[0].reportFlows();
-        console.log(`phi: ${(raffinate.ndot / (raffinate.ndot + extract.ndot)).toFixed(3)}\ntot: ${raffinate.ndot + extract.ndot}`);
+        // // Inlets - for verifying overall mass balances
+        // const raffinateInlet = this.stages[0].reportInlet("raffinate");
+        // const extractInlet = this.stages[this.stages.length - 1].reportInlet("extract");
+
+        // const { extract } = this.stages[0].reportFlows();
+        // const { raffinate } = this.stages[this.stages.length - 1].reportFlows();
+
+        // console.log(`inlets - raffinate: ${raffinateInlet.ndot.toFixed(3)} moles/s, extract: ${extractInlet.ndot.toFixed(3)} moles/s`);
+        // console.log(`outlets - raffinate: ${raffinate.ndot.toFixed(3)} moles/s, extract: ${extract.ndot.toFixed(3)} moles/s`);
+        // console.log(`phi: ${(raffinate.ndot / (raffinate.ndot + extract.ndot)).toFixed(3)}\ntot: ${raffinate.ndot + extract.ndot}`);
     }
 
     public start() {
