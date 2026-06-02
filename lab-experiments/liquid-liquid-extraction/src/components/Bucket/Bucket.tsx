@@ -1,6 +1,6 @@
 import { createEffect, createMemo, createSignal, useContext, type Accessor, type Component } from "solid-js";
 import { animate, constrain, resolveProperty } from "../../ts/helpers";
-import { ColumnContext, molarMass, specificVolume } from "../../calcs";
+import { ColumnContext, density } from "../../calcs";
 import "./Bucket.css";
 import { resetEvent } from "../../globals";
 import { FEED_MAX_RATE } from "../../ts/config";
@@ -24,8 +24,8 @@ export const Bucket: Component<BucketProps> = (props: BucketProps) => {
             const col = ctx.column!;
             col.updated();
             const r = (props.stream === "raffinate") ? col.raffinateOut() : col.extractOut();
-            const vdot = r.ndot * specificVolume(r.comp);
-            const mdot = r.ndot * molarMass(r.comp) / 1000; // mol/min to kg/min
+            const vdot = r.mdot / density(r.comp); // L/min
+            const mdot = r.mdot; // kg/min
 
             setRate(vdot);
             setMdot(mdot);
