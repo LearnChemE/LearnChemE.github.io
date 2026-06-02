@@ -21,7 +21,7 @@ import { ColumnData } from './components/Column/ColumnData'
 import { ColumnContextProvider } from './calcs'
 import worksheet from "./assets/worksheet.pdf?url"
 
-import { PlotlyChart } from './components/PlotlyChart'
+// import { PlotlyChart } from './components/PlotlyChart'
 
 function App() {
   const [feedIsOn, setFeedIsOn] = createSignal(false);
@@ -115,7 +115,7 @@ function App() {
           </Match>
         </Switch>
       </div>
-      <PlotlyChart />
+      {/* <PlotlyChart /> */}
     </ColumnContextProvider>
     </>
   )
