@@ -1,6 +1,22 @@
 import type { Component } from "solid-js";
+import { MEB_MODE } from "../../ts/config";
 
-export const DirectionsText: Component = () => {
+export const DirectionsText: Component = (MEB_MODE) ? 
+() => {
+    return <>
+    <p>
+        This digital experiment simulates the separation of acetic acid from chloroform using an aqueous solvent.
+        Before starting the experiment, use the menu in the top left to select the number of stages in the column.
+        To start the experiment, first switch on the solvent pump (right) to fill the column, then switch on the feed pump (left) to start the flow of feed. 
+        Drag and rotate each valve to change the flow rates.
+        Raffinate and extract compositions can be viewed by hovering over the white and blue dots next to the column. 
+        Use the weight scales at each outlet to measure outlet mass flowrates.
+
+        To reset the experiment, click the reset button with the rotating arrows in the top left. Note that this will also reset the number of stages to its default value.
+        Scroll to zoom and drag the screen to pan.
+    </p>
+</>;
+} : () => {
     return <>
     <p>
         This digital experiment simulates the separation of acetic acid from chloroform using an aqueous solvent.

@@ -1,8 +1,15 @@
 import type { Composition } from "../calcs";
 
+const urlParams = new URLSearchParams(window.location.search);
+const mode = urlParams.get('mode');
+
+export const MEB_MODE = (mode === "meb");
+
 // Configuration constants for the liquid-liquid extraction lab experiment
 export const STAGE_HEIGHT = 32;
-export const DEFAULT_NUMBER_OF_STAGES = 2;
+export const DEFAULT_NUMBER_OF_STAGES = MEB_MODE ? 4 : 2;
+export const MIN_STAGES = MEB_MODE ? 3 : 1;
+export const MAX_STAGES = MEB_MODE ? 5 : 8;
 export const ZERO_STAGE_PADDING = 48;
 
 export const SOLVENT_MAX_RATE = 10;
