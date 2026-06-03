@@ -12,14 +12,16 @@ import Bucket from './components/Bucket/Bucket'
 import Pipes from './components/Pipes/Pipes'
 import { PowerSwitch } from './components/PowerSwitch/Switch'
 import { batch, createEffect, createMemo, createSignal, Match, Show, Switch } from 'solid-js'
-import { FEED_MAX_RATE, INIT_FEED_LIFT, INIT_SOLV_LIFT, SOLVENT_MAX_RATE } from './ts/config'
+import { FEED_MAX_RATE, INIT_FEED_LIFT, INIT_SOLV_LIFT, MEB_MODE, SOLVENT_MAX_RATE } from './ts/config'
 import { HamburgerMenu } from './components/Hamburger/Hamburger'
 import { AboutText, DirectionsText } from './components/Modal/modals'
 import { StagesMenu } from './components/StagesMenu/StagesMenu'
 import { ControlButton } from './components/ControlButton/ControlButton'
 import { ColumnData } from './components/Column/ColumnData'
 import { ColumnContextProvider } from './calcs'
-import worksheet from "./assets/worksheet.pdf?url"
+
+import effworksheet from "./assets/effWorksheet.pdf?url"
+import mebworksheet from "./assets/mebWorksheet.pdf?url"
 
 // import { PlotlyChart } from './components/PlotlyChart'
 
@@ -103,7 +105,7 @@ function App() {
         </Show>
 
         {/* Hamburger */}
-        <HamburgerMenu path={worksheet} downloadName="lle_worksheet.pdf" Directions={DirectionsText} About={AboutText} />
+        <HamburgerMenu path={(MEB_MODE) ? mebworksheet : effworksheet} downloadName={MEB_MODE ? "lle_meb_worksheet.pdf" : "lle_worksheet.pdf"} Directions={DirectionsText} About={AboutText} />
 
         {/* Stages/Reset Button */}
         <Switch>
