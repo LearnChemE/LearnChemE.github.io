@@ -8,11 +8,10 @@ interface MagnifierLensProps {
 }
 
 export function MagnifierLens(props: MagnifierLensProps) {
-  const scale = props.scale || 2;
   const size = props.size || 150;
   const magnifier = useMagnifier();
   let lensRef: HTMLDivElement | undefined;
-  let svgRef: SVGSVGElement | undefined;
+  let svgRef:   SVGSVGElement | undefined;
 
   const [mousePos, setMousePos] = createSignal({ x: 0, y: 0 });
 
@@ -52,7 +51,7 @@ export function MagnifierLens(props: MagnifierLensProps) {
             height: '100%',
             'transform-origin': 'top left'
           }}
-          viewBox={`${magnifier.lensPosition().x - size / (2 * scale)} ${magnifier.lensPosition().y - size / (2 * scale)} ${size / scale} ${size / scale}`}
+          viewBox={`${magnifier.lensPosition().x - size / (2 * magnifier.scale())} ${magnifier.lensPosition().y - size / (2 * magnifier.scale())} ${size / magnifier.scale()} ${size / magnifier.scale()}`}
         >
           <Show when={magnifier.activeKey()}>
             {(() => {

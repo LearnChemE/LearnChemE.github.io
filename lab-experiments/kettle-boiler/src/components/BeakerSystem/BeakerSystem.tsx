@@ -14,7 +14,7 @@ export const BeakerSystem: Component<BeakerSystemProps> = ({ leftFlow, rightFlow
   // central registry of rects
   const [beakers, setBeakers] = createSignal<RectState[]> ([{
     idx: 0,
-    x: 280,
+    x: 260,
     y: 610,
     value: 0,
     blocking: null

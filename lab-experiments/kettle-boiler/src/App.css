@@ -44,3 +44,8 @@ p {
   font-family: "digital";
   src: url("./media/digital-7.ttf") format("truetype");
 }
+
+@font-face {
+  font-family: "digital-mono";
+  src: url("./media/digital-7-mono.ttf") format("truetype");
+}
