@@ -55,7 +55,7 @@ button:focus-visible {
 .btn {
   position: absolute;
   right: -5px;
-  top: 100px;
+  top: 10px;
 }
 
 /* @media (prefers-color-scheme: light) {
