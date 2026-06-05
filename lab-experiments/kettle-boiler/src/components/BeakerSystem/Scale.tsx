@@ -3,7 +3,7 @@ import "./Scale.css"
 
 type SignalT = [get: Accessor<number>, set: Setter<number>];
 
-const EMPTY_BEAKER_WEIGHT = 538.1; // g
+const EMPTY_BEAKER_WEIGHT = 538.2; // g
 
 export interface ScaleProps {
   blockSignal: Accessor<Array<SignalT | null>>;
@@ -32,17 +32,19 @@ export const Scale: Component<ScaleProps> = ({ blockSignal, blockIds }) => {
         x={`${631}`}
         y={`${720}`}
         fill="#d7ce1bff"
-        font-family="'Digital-7 Mono', monospace"
-        font-size="26"
+        font-family="digital"//"'Digital-7 Mono', monospace"
+        font-size="32"
       >
-        {`${(weight() - tare()).toFixed(1)}`}
+        {`${(weight() - tare()).toFixed(0)}`}
+        <tspan font-family="digital">.</tspan>
+        {`${(weight() - tare()).toFixed(1).split(".")[1]}`}
       </text>
       <text
         class="scale-label"
         x={`${651}`}
         y={`${722}`}
         fill="#d7ce1bff"
-        font-family="'Digital-7 Mono', monospace"
+        font-family="'Arial', monospace"
         font-size="18"
       >
         g

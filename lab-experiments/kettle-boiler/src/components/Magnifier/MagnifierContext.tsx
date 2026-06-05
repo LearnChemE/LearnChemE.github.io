@@ -10,6 +10,8 @@ export interface MagnifierContextType {
   lensPosition: () => { x: number; y: number };
   activeKey: () => string | null;
   getEmitterRef: (key: string) => SVGElement | undefined;
+  scale: () => number;
+  setScale: (scale: number) => void;
 }
 
 const MagnifierContext = createContext<MagnifierContextType>();
@@ -19,6 +21,7 @@ export function MagnifierProvider(props: { children: JSX.Element }) {
   const [emitters, setEmitters] = createSignal<Map<string, SVGElement>>(new Map());
   const [lensPosition, setLensPosition] = createSignal({ x: 0, y: 0 });
   const [activeKey, setActiveKey] = createSignal<string | null>(null);
+  const [scale, setScale] = createSignal(2);
 
   const registerEmitter = (key: string, ref: SVGElement) => {
     console.log(`Emitter ${key}: ${ref}`)
@@ -50,7 +53,9 @@ export function MagnifierProvider(props: { children: JSX.Element }) {
         setActiveKey,
         lensPosition,
         activeKey,
-        getEmitterRef
+        getEmitterRef,
+        scale,
+        setScale
       }}
     >
       {props.children}

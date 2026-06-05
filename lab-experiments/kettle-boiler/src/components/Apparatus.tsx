@@ -14,6 +14,7 @@ import { calculateSteamTemperature, FEED_RATE_GAIN } from "../ts/calcs";
 import { animate } from "../ts/helpers";
 import { Steam } from "./Steam/Steam";
 import { MagnifierEmitter } from "./Magnifier/MagnifierEmitter";
+import { Label } from "./Label/Label";
 
 // Note: The Apparatus component is the main SVG container for the kettle boiler experiment. 
 // It includes static elements, interactable components like the rotameter and kettle, displays for temperature readings, waterfalls to represent fluid flow, 
@@ -30,6 +31,7 @@ export const Apparatus: Component = () => {
   const [condRate, setCondRate] = createSignal(0); // Condensate flowrate
   const [outTemp, setOutTemp] = createSignal(25);
   const [rotameterRef, setRotameterRef] = createSignal<SVGGElement | null>(null);
+  const [gaugeRef, setGaugeRef] = createSignal<SVGGElement | null>(null);
   onMount(() => console.log("apparatus ref for rotameter:", rotameterRef))
 
   // Memos
@@ -55,10 +57,25 @@ return (<svg
 >
   <g id="canvas" clip-path="url(#clip0_6_626)">
     <rect width="1133" height="777" fill="white" />
-    <MagnifierEmitter emitterKey="rotameter" svgRef={rotameterRef()!}>
+    <MagnifierEmitter emitterKey="rotameter" svgRef={rotameterRef} scale={4} moveY={true}>
       <Rotameter flowrate={feedRate} onRef={setRotameterRef} />
     </MagnifierEmitter>
     <StaticElements/>
+
+    <Label x={212}  y={20} text="1.0 bar" />
+    <Label x={180}  y={44} text="release valve" />
+    <Label x={972}  y={110} text="1.0 bar" />
+    <Label x={940}  y={134} text="release valve" />
+    <Label x={8}  y={154} text="saturated steam" />
+    <Label x={18} y={180} text="inlet at 7 bar" />
+    <Label x={858} y={80} text="vent" />
+    <Label x={92} y={344} text="pressure" />
+    <Label x={92} y={368} text="regulator" />
+    <Label x={200} y={574} text="steam trap" />
+    <Label x={354} y={624} text="flow-control" />
+    <Label x={384} y={646} text="valve" />
+    <Label x={410} y={700} text="cold water" />
+    <Label x={442} y={726} text="inlet" />
 
     {/* Interactables */}
     <Kettle 
@@ -77,11 +94,11 @@ return (<svg
 
     {/* Displays */}
     {/* Condensate Temperature Display */}
-    <Display x={350.5} y={565.5} val={steamTemperature}/>
+    <Display x={320.5} y={550.5} val={steamTemperature}/>
     {/* Feed Temperature Display */}
     <Display x={576.5} y={428.5} val={"25.0"} />
     {/* Steam Temperature Display */}
-    <Display x={220.5} y={351.5} val={steamTemperature}/>
+    <Display x={190.5} y={351.5} val={steamTemperature}/>
     {/* Outlet Temperature Display */}
     <Display x={820.5} y={479.5} val={outTempDisplay}/>
 
@@ -89,7 +106,9 @@ return (<svg
     <Waterfall key="cond" cx={157} rate={condRate} rateRange={[0, 30]} />
     <Waterfall key="conc" cx={965} rate={outRate}  rateRange={[0, 30]} />
 
-    <Gauge pressure={steamPressure}/>
+    <MagnifierEmitter emitterKey="pgauge" svgRef={gaugeRef} scale={2.25} offset={{ x: 0, y: -3 }}>
+      <Gauge pressure={steamPressure} onRef={setGaugeRef} />
+    </MagnifierEmitter>
     <BallValve onToggle={(open) => setBallValveOpen(open)} />
     <GlobeValve onLiftChange={(lift) => setFeedRate(lift * FEED_RATE_GAIN)}/>
     <BeakerSystem leftFlow={condRate} rightFlow={outRate} />

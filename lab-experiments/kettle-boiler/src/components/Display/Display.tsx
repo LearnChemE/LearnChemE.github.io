@@ -14,11 +14,12 @@ export const Display: Component<DisplayProps> = ({ x, y, val, tofixed }) => {
   const dec = (tofixed !== undefined) ? tofixed : 1;
   const strFn = (typeof fn() === "number") ? () => (fn() as number).toFixed(dec) : fn;
 
+  const scale = 1.5; // Scale factor for the display size
   return (
-    <g id="display">
+    <g id="display" transform={`scale(${scale})`}>
       <rect
-        x={`${x}`}
-        y={`${y}`}
+        x={`${x/scale}`}
+        y={`${y/scale}`}
         width="80"
         height="33"
         rx="3.5"
@@ -27,8 +28,8 @@ export const Display: Component<DisplayProps> = ({ x, y, val, tofixed }) => {
       />
       <rect
         id="condTempScreen"
-        x={`${x + 3}`}
-        y={`${y + 3}`}
+        x={`${x/scale + 3}`}
+        y={`${y/scale + 3}`}
         width="74"
         height="27"
         rx="3.5"
@@ -38,8 +39,8 @@ export const Display: Component<DisplayProps> = ({ x, y, val, tofixed }) => {
       <text
         id="condTempVal"
         class="digital-label"
-        x={`${x + 38}`}
-        y={`${y + 16.5}`}
+        x={`${x/scale + 38}`}
+        y={`${y/scale + 16.5}`}
         dominant-baseline="middle"
         fill="#d7ce1bff"
         font-family="'Digital-7 Mono', monospace"

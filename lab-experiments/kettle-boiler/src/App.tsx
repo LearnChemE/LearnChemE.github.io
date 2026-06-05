@@ -24,7 +24,7 @@ function App() {
       <HamburgerMenu path={worksheet} downloadName='Kettle-Boiler-Worksheet.pdf' Directions={DirectionsText} About={AboutText} />
       <MagnifierProvider>
         <Apparatus />
-        <MagnifierLens scale={4} />
+        <MagnifierLens />
       </MagnifierProvider>
       <button type='button' class='btn btn-danger' onclick={() => location.reload()}>reset</button>
     </>
