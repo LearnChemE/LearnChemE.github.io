@@ -11,16 +11,20 @@ def createActual(tmax, beta):
     def rhs_actual(t, y):
         T = 298 + beta * t * 60
         kd = k_val(kd0, ed, T)
-        dydt = - kd * y / BED_MAX_CAPACITY
+        dydt = - kd * y * VOL_BED / CAPACITY
         return dydt
     
-    sol = solve_ivp(rhs_actual, [0, tmax], [y0], 'RK45', t_eval=np.linspace(0, tmax, 300))
+    sol = solve_ivp(rhs_actual, [0, tmax], [y0], 'BDF', t_eval=np.linspace(0, tmax, 300))
     t = sol.t
     T = 298 + beta * t * 60
     kd = k_val(kd0, ed, T)
     rd = kd * sol.y[0]
+    n = rd * VOL_BED
 
-    return t, rd
+    tot = np.trapezoid(n, t)
+    print("Ideal total moles adsorbed =", tot)
+
+    return t, n
 
 if __name__ == "__main__":
     P_l = 1 # bar
@@ -28,15 +32,15 @@ if __name__ == "__main__":
     y0 = np.zeros(NE)
     for i in range(N):
         y0[i * E] = 0
-        y0[i * E + 1] = 1
+        y0[i * E + 1] = P_l
         y0[i * E + 2] = 1
 
     beta = [0.3, 3.0]
 
-    sccms = [50, 100, 500, 1000]
+    sccms = [50, 100]
+    tf = 30
 
     for sccm in sccms:
-
 
         ln_peak = []
         inv_T_peak = []
@@ -48,21 +52,23 @@ if __name__ == "__main__":
                 ka = k_val(ka0, ea, T)
                 kd = k_val(kd0, ed, T)
 
-                Q = sccm * (1 / P_l) * T / 273.15
+                Q = sccm * (1 / P_l) * 298 / 273.15
                 u = Q / AREA_BED # cm / min
 
                 return rhs(t, y, y_l, P_l, u, ka, kd)
 
-            sol = solve_ivp(rhs_wrapped, [0, 20], y0, 'RK45')
+            sol = solve_ivp(rhs_wrapped, [0, tf], y0, 'BDF')
 
             t = sol.t
             T = 298 + t * b * 60
-            Q = sccm * (sol.y[BED_END_IDX * E + 1, :] / P_l) / 273.15
-            y = sol.y[BED_END_IDX * E, :] * Q / 0.08314
+            Q = sccm * (1 / P_l) * (298 / 273.15)
+            y = sol.y[BED_END_IDX * E, :] * Q / R / 298
+            tot = np.trapezoid(y, t)
             y = smooth(y, window_size=3) # smooth out numerical noise
 
             # Show plot integrated to breakthrough
             plt.plot(t, y, label=rf'{sccm:.0f} SCCM $\beta$={b:.1f}')
+            print("For SCCM =", sccm, "and beta =", b, "total moles adsorbed =", tot)
 
             # Find peak and time to peak
             peak = np.max(y)
@@ -83,7 +89,7 @@ if __name__ == "__main__":
     inv_T_peak = []
 
     for b in beta:
-        t_actual, y_actual = createActual(20, b)
+        t_actual, y_actual = createActual(tf, b)
         plt.plot(t_actual, y_actual, label=rf'ideal, $\beta$={b:.1f}')
 
         # Find peak and time to peak

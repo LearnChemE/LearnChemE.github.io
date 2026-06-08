@@ -15,29 +15,30 @@ MASS_ZEOLITE = 100 # g
 MM_CO2 = 44.009 # g/mol
 MM_N2 = 14.041 # g/mol
 R = 83.14 # bar cc / mol / K
-BED_MAX_CAPACITY = MASS_ZEOLITE / 1000 * 2.5 # mols, 2.5 mol/kg is common
-DIFFUSIVITY = 1.8e-3 * 60 # m^2/s, diffusivity of CO2 in zeolite
+CAPACITY = MASS_ZEOLITE / 1000 * 2.5 # mols, 2.5 mol/kg is common
+DIFFUSIVITY = 1.8e-2 * 60 # m^2/s, diffusivity of CO2 in zeolite
 inv_RT = 1 / R / T # 1 / (R * T) in mol / bar / cc
 
 # Per element scheme:
 # [ pco2, Ptot, theta_co2 ], referred to as [p, P, th]
 
 # Spatial info
-N = 51 # number of points in spatial discretization
+N = 50 # number of points in spatial discretization
 E = 3 # number of equations per point (tot pressure, co2 pressure, theta, velocity) stride
 NE = N * E # number of equations in the system
 NT = NE + 2 * E # Size of arrays including padding
-x = np.linspace(0, TOTAL_LENGTH, N) # spatial points
-dx = x[1] - x[0]
-ELEM_MAX_CAPACITY = BED_MAX_CAPACITY * dx / LENGTH_BED # mols per element
+dx = TOTAL_LENGTH / N # cm, spatial step size
+x = np.linspace(0, TOTAL_LENGTH - dx, N) # spatial points
+centroids = x + dx / 2
 
-BED_END_IDX = int((N - 1) * LENGTH_BED / TOTAL_LENGTH)
-print("Bed end index: ", BED_END_IDX, " at position ", x[BED_END_IDX])
+BED_END_IDX = centroids.searchsorted(LENGTH_BED) - 1
+print("Bed end index: ", BED_END_IDX, " at position ", centroids[BED_END_IDX])
 
 # Geometry
 VOL_BED = MASS_ZEOLITE / RHO_ZEOLITE # cc
 AREA_BED = VOL_BED / LENGTH_BED # cm^2
 BED_RADIUS = np.sqrt(AREA_BED / np.pi) # cm
+PRESSURE_CAPACITY_EQUIV = CAPACITY * R * T / VOL_BED # bar, should be mol/m3
 print("Radius: ", BED_RADIUS)
 
 # note: uses mole fractions
@@ -45,10 +46,10 @@ def molar_mass(x_co2):
     return x_co2 * MM_CO2 + (1 - x_co2) * MM_N2
 
 # Kinetic parameters
-ka0 = 4.196e2 # min^-1
+ka0 = 0.9 # bar^-1 min^-1
 ea = 1000 # convert from kJ/mol to K
-kd0 = 8e2
-ed = 6e4
+kd0 = 8e4 # 
+ed = 6e3
 def k_val(k0, ea, T):
     return k0 * np.exp(-ea / T)
 
@@ -141,16 +142,16 @@ def rhs(t, y, y_l, P_l, u_l, ka, kd):
         ads = ka * y[ip] * th_star
         des = kd * th
 
-        rxn_p = des - ads # Pressure changes
-        rxn_t = (ads - des) / ELEM_MAX_CAPACITY # Theta changes
+        rxn_p = (des - ads) * R * T * (dx / LENGTH_BED) # Pressure changes: mol/cm3/min to bar/min
+        rxn_t = (ads - des) * (dx * AREA_BED) / CAPACITY # Theta changes: mol/cm3/min to min^-1
         # if (i == N-1):
         #     rxn_p = 0
         #     rxn_t = 0
         
         
         # in - out
-        dydt[ip] = (pf[0] - adv_p) / dx + (pf[2] - dif_p) / dx + rxn_p # * RT
-        dydt[iP] = (pf[1] - adv_P) / dx + rxn_p # * RT
+        dydt[ip] = (pf[0] - adv_p) / dx + (pf[2] - dif_p) / dx + rxn_p
+        dydt[iP] = (pf[1] - adv_P) / dx + rxn_p
         dydt[it] = rxn_t
 
         pf = [ adv_p, adv_P, dif_p ] # for the next face
@@ -196,9 +197,9 @@ def smooth(y, window_size):
     return smoothed
 
 if __name__ == "__main__":
-    P_l = 5 # bar
-    y_l = 0.1 # mol fraction of CO2 in feed
-    sccm = 50
+    P_l = 1 # bar
+    y_l = 0.9 # mol fraction of CO2 in feed
+    sccm = 100
     y0 = np.zeros(NE)
 
     ka = k_val(ka0, ea, T)
@@ -209,14 +210,16 @@ if __name__ == "__main__":
 
     ndot = P_l * Q / R / T
     mdot = molar_mass(y_l) * ndot
-    print("Inlet mass flowrate (mg/min): ", mdot * 1000)
+    print("Inlet velocity (cm/min): ", u_l)
     print("CO2 inlet mole flowrate (mol/min): ", ndot * y_l)
-    print("Time scale of stoicheometric adsorption (min): ", BED_MAX_CAPACITY / (ndot * y_l))
+    print("Time scale of stoicheometric adsorption (min): ", CAPACITY / (ndot * y_l))
+    print("Time scale of flow through bed (min): ", VOL_BED / Q)
 
     def rhs_wrapped(t, y):
+        # print("solving at time", t)
         return rhs(t, y, y_l, P_l, u_l, ka, kd)
 
-    sol = solve_ivp(rhs_wrapped, [0, 20], y0, 'RK45')
+    sol = solve_ivp(rhs_wrapped, [0, 90], y0, 'RK45')
 
     yf = sol.y[:, -1]
     
@@ -268,12 +271,21 @@ if __name__ == "__main__":
         print("Warning: Breakthrough or saturation point not found in data.")
         exit(1)
     
-    Qco2 = y / y_final * Q
-    n = P_l * Qco2 / R / T * molar_mass(y_l) * 1000
+    n = y * Q / R / T # mol/min
+    m = n * molar_mass(y_l) * 1000 # mg/min
     n_final = n[-1]
+
+    area_under = np.trapezoid(n, t)
+    area_total = n_final * (t[-1] - t[0])
+    n_over = y_l * P_l * VOL_BED / R / T # number of moles in the bed in gas phase
+    n_adsorbed = area_total - area_under
+    
+    print(f"Breakthrough time: {t[idx_breakthrough]:.2f} min, Saturation time: {t[idx_saturation]:.2f} min")
+    print(f"mols adsorbed: {n_adsorbed} mols (capacity of {CAPACITY} mols)")
+    print(f"Accounting for {n_over} moles in gas phase in bed, {n_adsorbed - n_over} moles adsorbed")
     
     # Show plot integrated to breakthrough
-    plt.plot(t, n, 'k-', label=r'outlet $CO_2$ pressure')
+    plt.plot(t, m, 'k-', label=r'outlet $CO_2$ pressure')
     plt.vlines(t[idx_breakthrough], 0, n_final, color='k', linewidth=1, linestyle='--', label='breakthrough time')
     plt.fill_between(t[:idx_breakthrough+1], n[:idx_breakthrough+1], n_final, color="b", alpha=0.3, label=r"$CO_2$ adsorbed")
     # plt.legend()
